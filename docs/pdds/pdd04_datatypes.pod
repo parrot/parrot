@@ -203,14 +203,18 @@ How the data is encoded, for example fixed 8-bit characters, UTF-8, or
 UTF-32. Note that this specifies encoding only -- it's valid to encode 
 EBCDIC characters with the UTF-8 algorithm. Silly, but valid.
 
-TODO: explain what the encoding structure is.
+The ENCODING structure specifies the encoding (by index number and by name,
+for ease of lookup), the maximum number of bytes that a single character
+will occupy in that encoding, as well as functions for manipulating strings
+with that encoding.
 
 =item type
 
 What sort of string data is in the buffer, for example ASCII, EBCDIC,
 or Unicode. 
 
-TODO: explain what the type structure is.
+The CHARTYPE structure specifies the character type (by index number and by 
+name) and provides functions for transcoding to and from that character type.
 
 =item language
 
