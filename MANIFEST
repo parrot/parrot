@@ -314,6 +314,7 @@ include/parrot/exceptions.h                       [devel]include
 include/parrot/exec.h                             [devel]include
 include/parrot/exec_save.h                        [devel]include
 include/parrot/exit.h                             [devel]include
+include/parrot/extend.h				  [devel]include
 include/parrot/global_setup.h                     [devel]include
 include/parrot/hash.h                             [devel]include
 include/parrot/headers.h                          [devel]include
