@@ -128,8 +128,7 @@ Holds the object representing the subroutine.
 
 =item P1
 
-Holds the continuation for the caller, assuming this sub was called
-with callcc. Otherwise NULL.
+Holds the return continuation for the caller.
 
 =item P2
 

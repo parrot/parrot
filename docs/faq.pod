@@ -341,7 +341,86 @@ L<Really.|"LINKS">
 
 =head2 You're not using reference counting. Why not?
 
+Reference counting has three big issues.
+
+=over 4
+
+=item Code complexity
+
+Every single place where an object is referenced, and every single
+place where a reference is dropped, I<must> properly alter the
+refcount of the objects being manipulated. One mistake and an object
+(and everything it references, directly or indirectly) lives forever
+or dies prematurely. Since a lot of code references objects, that's a
+lot of places to scatter reference counting code. While some of it
+can be automated, that's a lot of discipline that has to be
+maintained.
+
+It's enough of a problem to track down garbage collection systems as
+it is, and when your garbage collection system is scattered across
+your entire source base, and possibly across all your extensions,
+it's a massive annoyance. More sophisticated garbage collection
+systems, on the other hand, involve much less code. It is, granted,
+trickier code, but it's a small chunk of code, contained in one
+spot. Once you get that one chunk correct, you don't have to bother
+with the garbage collector any more.
+
+=item Cost
+
+For reference counting to work right, you need to twiddle reference
+counts every time an object is references, or unreferenced. This
+generally includes even short-lived objects that will exist only
+briefly before dying. The cost of a reference counting scheme is
+directly linked to the number of times code references, or
+unreferences, objects. A tracing system of one sort or another (and
+there are many) has an average-case cost that's based on the number
+of live objects. 
+
+There are a number of hidden costs in a reference-counting
+scheme. Since the code to manipiulate the reference counts I<must> be
+scattered throughout the interpreter, the interpreter code is less
+dense than it would be without reference counts. That means that more
+of the processor's cache is dedicated to reference count code, code
+that is ultimately just interrpeter bookkeeping, and not dedicated to
+running your program. The data is also less dense, as there has to be
+a reference count embedded in it. Once again, that means more cache
+used for each object during normal running, and lower cache density.
+
+A tracing collector, on the other hand, has much denser code, since
+all it's doing is running through active objects in a tight loop. If
+done right, the entire tracing system will fit nicely in a
+processor's L1 cache, which is about as tight as you can get. The
+data being accessed is also done in a linear fashion, at least in
+part, which lends itself well to processor's prefech mechanisms where
+they exist. The garbage collection data can also be put in a separate
+area and designed in a way that's much tighter and more cache-dense.
+
+Having said that, the worst-case performance for a tracing garbage
+collecting system is worse than that of a reference counting
+system. Luckily the pathological cases are quite rare, and there are
+a number of fairly good techniques to deal with those. Refcounting
+schemes are also more deterministic than tracing systems, which can
+be an advantage in some cases. Making a tracing collector
+deterministic can be somewhat expensive.
+
+=item Self-referential structures live forever
+
+Or nearly forever. Since the only time an object is destroyed is when
+its refcount drops to zero, data in a self-referential structure will
+live on forever. It's possible to detect this and clean it up, of
+course... by implementing a full tracing garbage collector. That
+means that you have two full garbage collection systems rather than
+one, which adds to the code complexity.
+
+=back
+
 =head2 Could we do a partial refcounting scheme?
+
+Well... no. It's all or nothing. If we were going to do a partial
+scheme we might as well do a full scheme. (A partial refcounting
+scheme is actually more expensive, since partial schemes check to see
+whether refcounts need twiddling, and checks are more expensive than
+you might think)
 
 =head1 LINKS
 
