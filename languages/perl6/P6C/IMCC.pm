@@ -1581,29 +1581,31 @@ sub default_signature {
 # extra rule params.
 sub get_params {
     my ($x) = @_;
-    my @params;
 
+    my @params;
+    my $add_on_slurpy_array;
     if (defined($x->params)) {
-	if (UNIVERSAL::isa($x->params, 'P6C::params')) {
-	    @params = map { $_->var } @{$x->params->req}; # XXX:
-	} else {
-	    # Explicit parameter list in "-> $foo, $bar { ... }"
-	    foreach (P6C::Util::flatten_leftop($x->params, ';')) {
-		push @params, P6C::Util::flatten_leftop($_, ',');
-	    }
-	}
+	if (UNIVERSAL::isa($x->params, 'P6C::signature')) {
+            return $x->params;
+        }
+
+        # Explicit parameter list in "-> $foo, $bar { ... }"
+        foreach (P6C::Util::flatten_leftop($x->params, ';')) {
+            push @params, P6C::Util::flatten_leftop($_, ',');
+        }
     } else {
-	my %impl;
+	my %implicit;
 	# Look for implicit param-vars like $^a:
 	map_preorder {
 	    if (UNIVERSAL::isa($_, 'P6C::variable')
 		&& $_->implicit) {
-		$impl{$_->name} = $_;
+		$implicit{$_->name} = $_;
 	    }
 	} $x->block;
-	if (keys %impl) {
-	    @params = sort { $a->name cmp $b->name } values %impl;
+	if (keys %implicit) {
+	    @params = sort { $a->name cmp $b->name } values %implicit;
 	}
+        $add_on_slurpy_array = 1;
     }
 
     # Rules have a set of undeclared parameters.
@@ -1612,7 +1614,16 @@ sub get_params {
         unshift(@params, P6C::Rules::rule_vars());
     }
 
-    return @params;
+    my @sigparams = map { new P6C::sigparam var => $_,
+                                            type => $_->type,
+                                            zone => 'optional',
+                        } @params;
+    my $slurpy_array;
+    if ($add_on_slurpy_array) {
+        $slurpy_array = default_signature()->slurpy_array;
+    }
+    return new P6C::signature positional => \@sigparams,
+                              slurpy_array => $slurpy_array;
 }
 
 sub default_args {
@@ -1635,7 +1646,6 @@ sub val {
     code("# ".$x->{comment}) if $x->{comment};
 
     my ($name, $ofunc);		# for closure return value.
-    my @params;
     push_scope;
     if ($ctx->{is_anon_sub}) {
 	# We need to create an anonymous sub.
@@ -1644,14 +1654,7 @@ sub val {
 	$ofunc = set_function($name);
     }
 
-    # Figure out params:
-    unless ($x->params) {
-        if ($x->is_rule) {
-            $x->params(P6C::Rules::default_signature());
-        } else {
-	$x->params(P6C::closure::default_signature());
-    }
-    }
+    $x->params(get_params($x));
 
     set_function_params($x->params);
 
@@ -1671,30 +1674,39 @@ sub val {
 
     declare_label type => 'return' unless ($ctx->{noreturn});
 
-	my @catchers;
-    $x->block([$x->block]) unless UNIVERSAL::isa($x->block, 'ARRAY');
-	foreach (@{$x->block}) {
-	    if ($_->isa('P6C::prefix') && defined($_->name)
-		&& $_->name eq 'CATCH') {
-		push @catchers, $_->args;
-		$_->name(undef);
-	    }
-	}
+    # Get a list of statements in the block. I'm not sure why this
+    # isn't always in a predictable type. FIXME.
+    my @stmts;
+    if (UNIVERSAL::isa($x->block, 'ARRAY')) {
+        @stmts = @{ $x->block };
+    } else {
+        @stmts = ($x->block);
+    }
+
+    my @catchers;
+    foreach (@stmts) {
+        if ($_->isa('P6C::prefix') && defined($_->name)
+            && $_->name eq 'CATCH') {
+            push @catchers, $_->args;
+            $_->name(undef);
+        }
+    }
 
     my $ret;
-	if (@catchers) {
-	    die "Only one catch block per block, please" if @catchers > 1;
-	    $ret = wrap_with_catch($x, $catchers[0]);
-	    die unless $ret || $ctx->{noreturn};
-	} elsif (@{$x->block} > 0) {
-	    foreach my $stmt (@{$x->block}[0..$#{$x->block} - 1]) {
-		$stmt->val;
-	    }
-	    $ret = $x->block->[-1]->val;
-        confess "missing return value" unless $ret || $ctx->{noreturn};
-	} else {
-	    $ret = newtmp 'PerlUndef';
-	}
+    if (@catchers) {
+        die "Only one catch block per block, please" if @catchers > 1;
+        $ret = wrap_with_catch($x, $catchers[0]);
+        die unless $ret || $ctx->{noreturn};
+    } elsif (@stmts > 0) {
+        foreach my $stmt (@stmts[0..$#stmts-1]) {
+            $stmt->val;
+        }
+        $ret = $stmts[-1]->val;
+        confess "missing return value for " . $stmts[-1]->render
+          unless $ret || $ctx->{noreturn};
+    } else {
+        $ret = newtmp 'PerlUndef';
+    }
 
 	unless ($ctx->{noreturn}) {
         code("\t.pcc_begin_return");

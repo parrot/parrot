@@ -646,41 +646,17 @@ sub P6C::closure::ctx_right {
     $x->{ctx}{noreturn} = is_noreturn($x, $ctx);
     delete $x->{ctx}{is_sub_def};
 
-    if ($x->{ctx}{is_anon_sub}) {
-	my @params = $x->get_params();
-	if (@params) {
-            my $vals = $x->default_args();
-	    my $paramvar;
-	    if (@params == 1 && is_array_expr($params[0]->type)) {
-		$paramvar = $params[0];
-	    } else {
-		$paramvar = \@params;
-	    }
-	    my $vars = new P6C::decl(vars => $paramvar,
-				     props => [],
-				     qual => new P6C::scope_class scope=>'my');
-            $vars->{comment} = "source: anon sub bind params";
-	    my $init = new P6C::Binop(op => ':=', l => $vars, r => $vals);
-	    if ($x->is_rule) {
-                $x->block([$init,$x->block]);
-            } elsif (defined $x->block) {
-		unshift @{$x->block}, $init;
-	    } else {
-		diag "Closure with no statements?";
-		$x->block([$init]);
-	    }
-	    $x->params(undef);	# will fill them in in IMCC.pm
-	}
-    }
-
     if (!defined $x->block) {
     } elsif (UNIVERSAL::isa($x->block, 'ARRAY')) {
 	# Sub block
 	# Look for CATCH blocks in the current block:
 	setup_catch_blocks($x);
 
+        # FIXME: Add runtime context for return value
 	if ($x->{ctx}{noreturn}) {
 	    P6C::Context::block_ctx($x->block, $x->{ctx});
+        } elsif ($x->{return_context}) {
+	    P6C::Context::block_ctx($x->block, $x->{return_context});
 	} else {
 	    P6C::Context::block_ctx($x->block,
 				    new P6C::Context type => 'PerlArray');
@@ -719,8 +695,6 @@ sub P6C::ValueList::ctx_right {
 	}
 
     } elsif ($ctx->is_sig) {
-
-        $DB::single = 'why do i set the ctx directly in prefix.pm gen_sub_call? why is this not good enough?';
 
         # Separate out the named and unnamed args.
         my (@named_args, @unnamed_args);
