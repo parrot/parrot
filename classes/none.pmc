@@ -1,0 +1,93 @@
+/*
+Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+$Id$
+
+=head1 NAME
+
+classes/none.pmc - NULL
+
+=head1 DESCRIPTION
+
+A subtype of the NULL PMC. Mostly throws exception on access, except
+for the implemented methods.
+
+This class is a singleton.
+
+=head2 Methods
+
+=over 4
+
+=cut
+
+*/
+
+#include "parrot/parrot.h"
+#include <assert.h>
+
+static PMC * Py_None;
+
+pmclass None singleton {
+
+
+
+/*
+
+=item C<void *get_pointer()>
+
+=item C<void set_pointer(void *ptr)>
+
+These two functions are part of the singleton creation interface. For more
+information see F<src/pmc.c>.
+
+=cut
+
+*/
+
+    void* get_pointer() {
+        return Py_None;
+    }
+
+    void set_pointer(void* ptr) {
+        assert(!Py_None);
+        Py_None = (PMC*) ptr;
+    }
+
+    STRING* name () {
+	return SELF->vtable->whoami;
+    }
+
+    STRING* get_string () {
+	return SELF->vtable->whoami;
+    }
+
+    INTVAL get_bool () {
+	return 0;
+    }
+
+    INTVAL type () {
+	return SELF->vtable->base_type;
+    }
+}
+
+/*
+
+=back
+
+=head1 HISTORY
+
+2004.06.24 initial by leo
+
+=cut
+
+*/
+
+/*
+ * Local variables:
+ * c-indentation-style: bsd
+ * c-basic-offset: 4
+ * indent-tabs-mode: nil
+ * End:
+ *
+ * vim: expandtab shiftwidth=4:
+*/
+
