@@ -54,8 +54,10 @@ EOF
                                 $(INC)/oplib/core_ops_cgp.h $(OPS)/core_ops_cgp.c',
       cg_flag       => '-DHAVE_COMPUTED_GOTO'
     );
+    print " (yes) ";
   }
   else {
+    print " (no) ";
     Configure::Data->set(
       cg_h    => '',
       cg_c    => '',

@@ -45,6 +45,7 @@ END
       exit(-1);
     }
     cc_clean();
+    print " (yes) ";
   }
 }
 

@@ -41,6 +41,7 @@ sub runstep {
   my $major = $gnuc{__GNUC__};
   my $minor = $gnuc{__GNUC_MINOR__};
   unless (defined $major) {
+    print " (no) ";
     return;
   }
   if ($major =~ tr/0-9//c) {
@@ -53,6 +54,7 @@ sub runstep {
     $gccversion = $major;
     $gccversion .= ".$minor" if defined $minor;
   }
+  print " (yep: $gccversion )";
 
   if ($gccversion) {
     # If using gcc, crank up its warnings as much as possible and make it
