@@ -9,11 +9,14 @@
 #
 # compute the factorial recursively for 0 to 6 and print the results.
 #
+# 20020316 bdwheele@indiana.edu 
+#   changed local labels to global for new assembler
+#   use pushi instead of the now missing 'clonei'
 
 main:
 	set 	I1,0
 
-$loop:
+loop:
 	print	"fact of "
 	print	I1
 	print	" is: "
@@ -22,25 +25,25 @@ $loop:
 	print	I0
 	print	"\n"
 	inc	I1,1
-	eq	I1,7,$done
-	branch	$loop
-$done:
+	eq	I1,7,done
+	branch	loop
+done:
 	end
 
 # I0 is the number to compute
 fact:
-	clonei
-	lt	I0,2,$is_one
+	pushi
+	lt	I0,2,is_one
 	set	I1,I0
 	dec	I0,1	
 	bsr	fact
 	mul	I0,I0,I1
 	save	I0
-	branch	$done
-$is_one:
+	branch	fact_done
+is_one:
 	set	I0,1
 	save	I0
-$done:
+fact_done:
 	popi
 	restore	I0
 	ret
