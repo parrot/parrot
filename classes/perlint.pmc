@@ -155,7 +155,7 @@ pmclass PerlInt extends perlscalar {
 
 	pmci = SELF->cache.int_val;
 	if (vtype == enum_class_PerlUndef) {
-            VTABLE_set_integer_native(INTERP, dest, pmci);
+            VTABLE_set_integer_native(INTERP, dest, 0);
 	    return;
 	}
 
