@@ -19,7 +19,7 @@ keep track of retrieved PMCs.
 The individual information of PMCs is frozen/thawed by their vtables.
 
 To avoid recursion, the whole functionality is driven by
-C<<pmc->vtable->visit>>, which is called for the first PMC initially.
+C<< pmc->vtable->visit >>, which is called for the first PMC initially.
 Container PMCs call a "todo-callback" for all contained PMCs. The
 individual action vtable (freeze/thaw) is then called for all todo-PMCs.
 
@@ -822,7 +822,7 @@ do_action(Parrot_Interp interpreter, PMC *pmc, visit_info *info,
         int seen, UINTVAL id)>
 
 Called from C<visit_next_for_GC()> and C<visit_todo_list()> to perform
-the action specified in C<<info->what>.
+the action specified in C<< info->what >>.
 
 Currently only C<VISIT_FREEZE_NORMAL> is implemented.
 

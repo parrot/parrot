@@ -598,7 +598,7 @@ pt_DOD_start_mark(Parrot_Interp interpreter)>
 
 DOD is gonna start the mark phase. In the presence of shared PMCs, we
 can only run one DOD run at a time because
-C<<interpreter->dod_mark_ptr>> may be changed.
+C<< interpreter->dod_mark_ptr >> may be changed.
 
 TODO - Have a count of shared PMCs and check it during DOD.
 

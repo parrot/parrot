@@ -121,7 +121,7 @@ Parrot_exec(struct Parrot_Interp *interpreter, opcode_t *pc,
 add_data_member(Parrot_exec_objfile_t *obj, void *src, size_t len)>
 
 Adds a member to the data section, storing the size of it at
-C<<obj->data_size[N]>>.
+C<< obj->data_size[N] >>.
 
 =cut
 

@@ -602,7 +602,7 @@ sub delete_contents
 
 =head1 SEE ALSO
 
-C<Parrot::IO::File>, C<Parrot::IO::Path>.
+L<Parrot::IO::File>, L<Parrot::IO::Path>.
 
 =cut
 

@@ -20,7 +20,7 @@ We use "tree-stacks" and COW (copy-on-write) semantics in order to make
 continuations easy. A stack chunk is a bufferlike structure and may be
 GCed or COWed. As top chunks are COWed on usage, its only safe to walk
 the stack from top down via the prev pointers.
-C<<stack_chunk->prev->next>> may not equal C<stack_chunk> if C<prev> is
+C<< stack_chunk->prev->next >> may not equal C<stack_chunk> if C<prev> is
 COWed and not copied yet.
 
 COWed chunks are NOT magically copied, so any attempts to write should
@@ -64,7 +64,7 @@ void stack_system_init(Interp *interpreter)
 =item C<Stack_Chunk_t *
 new_stack(Interp *interpreter, const char *name)>
 
-Create a new stack and name it. C<<stack->name>> is used for
+Create a new stack and name it. C<< stack->name >> is used for
 debugging/error reporting.
 
 =cut
@@ -173,7 +173,7 @@ stack_height(Interp *interpreter, Stack_Chunk_t *top)
 =item C<Stack_Entry_t *
 stack_entry(Interp *interpreter, Stack_Chunk_t *stack, Intval depth)>
 
-If C<depth >= 0>, return the entry at that depth from the top of the
+If C<< depth >= 0 >>, return the entry at that depth from the top of the
 stack, with 0 being the top entry. If C<depth < 0>, then return the
 entry C<|depth|> entries from the bottom of the stack. Returns C<NULL>
 if C<|depth| > number> of entries in stack.

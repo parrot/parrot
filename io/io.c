@@ -581,8 +581,8 @@ PIO_copy_stack(ParrotIOLayer *stack)
 =item C<INTVAL
 PIO_parse_open_flags(const char *flagstr)>
 
-Parses C<*flagstr> for Perl-style file open mode flags (C<<<>>, C<<>>>,
-C<<<>>>>>, C<<+<>>, C<<+>>>) and returns the combined generic bit flags.
+Parses C<*flagstr> for Perl-style file open mode flags (C<< < >>, C<< > >>,
+C<<< >> >>>, C<< +< >>, C<< +> >>) and returns the combined generic bit flags.
 
 The low level OS layers may then interpret the generic bits differently
 depending on platform.
@@ -680,7 +680,7 @@ Refer to the C<PIOCTL*> values in F<include/parrot/io.h>.
 
 All "set" operations return C<0> on success and a negative value on
 error. "get" operations will use the return value as the value
-requested, but should always be C<<>= 0>>. A negative value indicates an
+requested, but should always be C<< >= 0 >>. A negative value indicates an
 error. This may be too limited but we will see. --Melvin
 
 =cut

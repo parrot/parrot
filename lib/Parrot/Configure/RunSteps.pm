@@ -1,3 +1,19 @@
+# Copyright: 2001-2004 The Perl Foundation.  All Rights Reserved.
+# $Id$
+
+=head1 NAME
+
+Parrot::Configure::RunSteps - Configuration Steps
+
+=head1 DESCRIPTION
+
+This lists in order the configuration steps that will be run by
+F<Configure.pl>.
+
+=over 4
+
+=cut
+
 package Parrot::Configure::RunSteps;
 
 use strict;
@@ -46,6 +62,12 @@ use vars qw(@steps);
 	gen/libparrot_def.pl
 );
 
+=item C<runsteps()>
+
+Loops over the configuration steps, running each one in turn.
+
+=cut
+
 sub runsteps {
 	shift;
 	my %args=@_;
@@ -72,5 +94,17 @@ sub runsteps {
 		print "$Configure::Step::result." unless m{^inter/} && $args{ask};
 	}
 }
+
+=back
+
+=head1 SEE ALSO
+
+=over 4
+
+=item L<Parrot::Configure::Step>
+
+=back
+
+=cut
 
 1;

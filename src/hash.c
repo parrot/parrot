@@ -236,7 +236,7 @@ promote_hash_key(Interp *interpreter, Hash *hash, void *key, int for_insert)>
 
 Check and possibly promote a hash key to UTF-8.
 
-If C<<hash->key_type>> matches C<key> then it is ok and doesn't need promotion.
+If C<< hash->key_type >> matches C<key> then it is ok and doesn't need promotion.
 
 If the hash's key type is ASCII and C<for_insert> is true, then this
 calls C<convert_hash_keys_to_utf8()> to convert the hash's key type to
@@ -481,7 +481,7 @@ hash value, after the ones previously used.
 So we scan through all the buckets in order, moving the buckets that
 need to be moved. No bucket will be scanned twice, and the cache should
 be reasonably happy because the hashtable accesses will be two parallel
-sequential scans. (Of course, this also mucks with the C<<->next>>
+sequential scans. (Of course, this also mucks with the C<< ->next >>
 pointers, and they'll be all over memory.)
 
 =cut
@@ -1030,7 +1030,7 @@ add C<new_cstring_hash()> function
 
 =item * 2003.11.04
 
-C<<bucket->value>> is now a plain pointer, no more an C<HASH_ENTRY>
+C<< bucket->value >> is now a plain pointer, no more an C<HASH_ENTRY>
 
 With little changes, we can again store arbitrary items if needed, see
 TODO in code.

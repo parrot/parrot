@@ -337,7 +337,7 @@ get_op_lib_init(int core_op, int which, PMC *lib)
 =item C<static void
 load_prederef(struct Parrot_Interp *interpreter, int which)>
 
-C<<interpreter->op_lib>> = prederefed oplib.
+C<< interpreter->op_lib >> = prederefed oplib.
 
 =cut
 
@@ -439,7 +439,7 @@ stop_prederef(struct Parrot_Interp *interpreter)
 =item C<void
 exec_init_prederef(struct Parrot_Interp *interpreter, void *prederef_arena)>
 
-C<<interpreter->op_lib>> = prederefed oplib
+C<< interpreter->op_lib >> = prederefed oplib
 
 The "normal" C<op_lib> has a copy in the interpreter structure - but get
 the C<op_code> lookup function from standard core prederef has no

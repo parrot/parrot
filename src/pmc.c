@@ -609,7 +609,7 @@ mmd_fallback_bxor_pmc(Parrot_Interp interp, PMC *left, PMC *right, PMC *dest)
 mmd_fallback_bsl_pmc(Parrot_Interp interp, PMC *left, PMC *right, PMC *dest)>
 
 Gets integers from C<left> and C<right>, performs a binary shift left
-(C<<<<<>>>) and sets the result as an integer in C<dest>.
+(C<<< << >>>) and sets the result as an integer in C<dest>.
 
 =cut
 
@@ -629,7 +629,7 @@ mmd_fallback_bsl_pmc(Parrot_Interp interp, PMC *left, PMC *right, PMC *dest)
 mmd_fallback_bsr_pmc(Parrot_Interp interp, PMC *left, PMC *right, PMC *dest)>
 
 Gets integers from C<left> and C<right>, performs a binary shift right
-(C<<<>>>>>) and sets the result as an integer in C<dest>.
+(C<<< >> >>>) and sets the result as an integer in C<dest>.
 
 =cut
 

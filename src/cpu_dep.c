@@ -103,7 +103,7 @@ trace_system_areas(struct Parrot_Interp *interpreter)
 =item C<static void
 trace_system_stack(struct Parrot_Interp *interpreter)>
 
-Traces the memory block starting at C<<interpreter->lo_var_ptr>>.
+Traces the memory block starting at C<< interpreter->lo_var_ptr >>.
 
 =cut
 

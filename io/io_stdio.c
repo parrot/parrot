@@ -144,7 +144,7 @@ PIO_stdio_open(theINTERP, ParrotIOLayer *layer,
               const char *spath, INTVAL flags)>
 
 Open modes (read, write, append, etc.) are done in pseudo-Perl style
-using C<<<>>, C<<>>>, etc.
+using C<< < >>, C<< > >>, etc.
 
 =cut
 

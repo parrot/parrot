@@ -53,8 +53,8 @@ F<icu/README.parrot>.
 
 =head3 Parrot Configuration Options
 
-You can add and remove option values with C<<:rem{<opt>}>> and
-C<<:add{<opt>}>>. For example:
+You can add and remove option values with C<< :rem{<opt>} >> and
+C<< :add{<opt>} >>. For example:
 
     perl Configure.pl --ccflags="rem{-g} :add{-O2}"
 

@@ -118,7 +118,7 @@ make_branch_list(struct Parrot_Interp *interpreter,
         Parrot_jit_optimizer_t * optimizer,
         opcode_t *cur_op, opcode_t *code_start, opcode_t *code_end)>
 
-C<<optimizer->map_branch>> parallels the opcodes with a list of
+C<< optimizer->map_branch >> parallels the opcodes with a list of
 branch information and register mapping information
 
 =over 4

@@ -29,9 +29,9 @@ because if you start at 'list' and follow prev pointers, you
 will loop through all the used nodes of the list, as usual. But
 if you follow next pointers instead, you might find a spare
 node hanging off the last node in the list (the last node is
-always C<<list->prev>>, so if there is a spare node, it will be at
-C<<list->prev->next>>. If no spare exists, then
-C<<list->prev->next==list>>.)
+always C<< list->prev >>, so if there is a spare node, it will be at
+C<< list->prev->next >>. If no spare exists, then
+C<< list->prev->next==list >>.)
 
 The first node in the list may be partly full; the intermediate
 nodes are always completely full; and the last node may be
@@ -43,7 +43,7 @@ except for possibly the last node).
 
 To make it concrete, let's walk through some sample operations.
 To push onto the end of the list, first find the last chunk:
-C<<list->prev>>. Then if C<<chunk->end < INTLIST_CHUNK_SIZE>>, there is
+C<< list->prev >>. Then if C<< chunk->end < INTLIST_CHUNK_SIZE >>, there is
 space to fit another element and so just stick it in. If not,
 we must add a chunk to the end of the list. If there is a
 spare, just link it fully into the list (forming a conventional
@@ -51,7 +51,7 @@ doubly-linked list). Otherwise, create a new chunk and link it
 fully into the list. Easy enough.
 
 To pop something off the end, first go to the end chunk
-(C<<list->prev>>). Pop off an element and decrement C<.end> if the
+(C<< list->prev >>). Pop off an element and decrement C<.end> if the
 chunk is nonempty. If it is empty, make that last chunk into
 the spare (discarding the previous spare). Then go to the
 previous chunk, which is guaranteed to have C<.end> set to
@@ -63,7 +63,7 @@ shift or unshift), then the length is copied to the new header.
 
 Invariants:
 
-There is always space in C<<list->prev>> to insert an element.
+There is always space in C<< list->prev >> to insert an element.
 
 The 'list' chunk is never empty unless the entire list is
 empty.
@@ -93,8 +93,8 @@ Unshift a chunk if necessary, write element.
 
 Direct aka indexed access of intlist data:
 
-The classic method would be to walk the C<<intlist->next>> pointers
-(or optimized, the C<<->prev>> pointers if an index near the end is
+The classic method would be to walk the C<< intlist->next >> pointers
+(or optimized, the C<< ->prev >> pointers if an index near the end is
 requested) and locate the chunk, that holds the wanted list
 item.
 

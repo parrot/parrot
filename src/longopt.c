@@ -45,7 +45,7 @@ Call it iteratively with the same C<info_buf> until it returns 0 or -1.
 
 0  means you have reached the end of options. 
 
--1 means a parse error, with error put in C<<info_buf->opt_error>>.
+-1 means a parse error, with error put in C<< info_buf->opt_error >>.
 
 Any other value is a valid option identifier.
 
@@ -193,9 +193,9 @@ longopt_get_shortopt(Parrot_Interp interp, int argc, char* argv[],
 Find the option identifier of the next short option.
 
 This next short option may be in the middle of a bundle (C<-abcd>), and
-C<<info_buf->_shortopt_pos>> maintains a pointer into that bundle.
+C<< info_buf->_shortopt_pos >> maintains a pointer into that bundle.
 
-C<<argv[info_buf->opt_index]>> is guaranteed to be at least two
+C<< argv[info_buf->opt_index] >> is guaranteed to be at least two
 characters long and start with a dash.
 
 =cut

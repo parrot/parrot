@@ -11,14 +11,14 @@ pf/pf_items.c - Fetch/store packfile data
 Low level packfile functions to fetch and store Parrot data, i.e.
 C<INTVAL>, C<FLOATVAL>, C<STRING> ...
 
-C<<PF_fetch_<item>()>> functions retrieve the datatype item from the
+C<< PF_fetch_<item>() >> functions retrieve the datatype item from the
 opcode stream and convert byteordering or binary format on the fly,
 depending on the packfile header.
 
-C<<PF_store_<item>()>> functions write the datatype item to the stream
+C<< PF_store_<item>() >> functions write the datatype item to the stream
 as is. These functions don't check the available size.
 
-C<<PF_size_<item>()>> functions return the store size of item in
+C<< PF_size_<item>() >> functions return the store size of item in
 C<opcode_t> units.
 
 =head2 Functions

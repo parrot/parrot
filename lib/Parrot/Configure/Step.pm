@@ -1,3 +1,18 @@
+# Copyright: 2001-2004 The Perl Foundation.  All Rights Reserved.
+# $Id$
+
+=head1 NAME
+
+Parrot::Configure::Step - Configuration Step
+
+=head1 DESCRIPTION
+
+A configuration step run by F<Configure.pl>.
+
+=over 4
+
+=cut
+
 package Parrot::Configure::Step;
 
 use strict;
@@ -24,6 +39,12 @@ use vars qw(@ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
 #Configure::Data->keys()
 #Configure::Data->dump()
 
+=item C<integrate($orig, $new)>
+
+Integrates C<$new> into C<$orig>.
+
+=cut
+
 sub integrate {
     my($orig, $new)=@_;
 
@@ -47,6 +68,12 @@ sub integrate {
     return $orig;
 }
 
+=item C<prompt($message, $value)>
+
+Prompts the user with the specified message and default value.
+
+=cut
+
 sub prompt {
 	my($message, $value)=@_;
 
@@ -69,6 +96,12 @@ sub prompt {
 	return integrate($value, $input);
 }
 
+=item C<file_checksum($filename, $ignorePattern)>
+
+Creates a checksum for the specified file.
+
+=cut
+
 sub file_checksum {
     my ($filename, $ignorePattern) = @_;
     open(FILE, "< $filename") or die "Can't open $filename: $!";
@@ -80,6 +113,12 @@ sub file_checksum {
     close FILE;
     return $sum;
 }
+
+=item C<copy_if_diff($from, $to, $ignorePattern)>
+
+Copies the specified file if it's contents have changed.
+
+=cut
 
 sub copy_if_diff {
     my ($from, $to, $ignorePattern) = @_;
@@ -98,11 +137,23 @@ sub copy_if_diff {
     utime $now, $now, $to;
 }
 
+=item C<move_if_diff($from, $to, $ignorePattern)>
+
+Moves the specified file if it's contents have changed.
+
+=cut
+
 sub move_if_diff {
     my ($from, $to, $ignorePattern) = @_;
     copy_if_diff($from, $to, $ignorePattern);
     unlink $from;
 }
+
+=item C<genfile($source, $target, %options)>
+
+Generates the specified file.
+
+=cut
 
 sub genfile {
   my($source, $target, %options)=@_;
@@ -171,6 +222,12 @@ sub genfile {
     move_if_diff("$target.tmp", $target, $options{ignorePattern});
 }
 
+=item C<_run_command($command, $out, $err)>
+
+Runs the specified command.
+
+=cut
+
 sub _run_command {
     my ($command, $out, $err) = @_;
     my $verbose = Configure::Data->get('verbose');
@@ -222,11 +279,23 @@ sub _run_command {
     return $exit_code;
 }
 
+=item C<cc_gen($source)>
+
+Generates F<test.c> with the specified source.
+
+=cut
+
 sub cc_gen {
 	my($source)=@_;
 
 	genfile($source, "test.c");
 }
+
+=item C<cc_build($cc, $ccflags, $ldout, $o, $link, $linkflags, $cc_exe_out, $exe, $libs)>
+
+Builds F<test.c>.
+
+=cut
 
 sub cc_build {
 	my($cc, $ccflags, $ldout, $o, $link, $linkflags, $cc_exe_out, $exe, $libs)=
@@ -240,6 +309,12 @@ sub cc_build {
                      'test.ldo', 'test.ldo')
             and confess "Linker failed (see test.ldo)";
 }
+
+=item C<cc_run()>
+
+Runs  F<text.c>.
+
+=cut
 
 sub cc_run {
 	my $exe=Configure::Data->get('exe');
@@ -262,6 +337,12 @@ sub cc_run {
     return $output;
 }
 
+=item C<cc_run_capture()>
+
+Runs  F<text.c> capturing the output.
+
+=cut
+
 sub cc_run_capture {
 	my $exe=Configure::Data->get('exe');
     my $slash=Configure::Data->get('slash');
@@ -283,10 +364,28 @@ sub cc_run_capture {
     return $output;
 }
 
+=item C<cc_clean()>
+
+Cleans up after running F<text.c>, deleting any files created.
+
+=cut
+
 sub cc_clean {
 	unlink map "test$_",
 		qw( .c .cco .ldo .out),
 		Configure::Data->get( qw( o exe ) );
 }
+
+=back
+
+=head1 SEE ALSO
+
+=over 4
+
+=item L<Parrot::Configure::Steps>
+
+=back
+
+=cut
 
 1;

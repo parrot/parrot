@@ -8,7 +8,7 @@ src/warnings.c - Warning and error reporting
 
 =head1 DESCRIPTION
 
-Parrot <STRING> and C string versions of a function to print warning/error
+Parrot C<STRING> and C string versions of a function to print warning/error
 messages.
  
 =cut

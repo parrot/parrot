@@ -21,7 +21,7 @@ These stacks all differ only in the size of items and items per chunk.
 cst_new_stack(Interp *interpreter, const char *name, size_t item_size,
   size_t items_per_chunk)>
 
-Create a new stack and name it. C<<stack->name>> is used for
+Create a new stack and name it. C<< stack->name >> is used for
 debugging/error reporting.
 
 =cut

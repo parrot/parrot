@@ -1,6 +1,15 @@
-#
-# BuildUtil.pm
-#
+# Copyright: 2001-2004 The Perl Foundation.  All Rights Reserved.
+# $Id$
+
+=head1 NAME
+
+lib/Parrot/BuildUtil.pm - Build Utility
+
+=head1 DESCRIPTION
+
+=over 4
+
+=cut
 
 use strict;
 
@@ -14,10 +23,11 @@ BEGIN {
   @EXPORT = qw(&parrot_version);
 }
 
+=item C<parrot_version()>
 
-#
-# parrot_version()
-#
+Returns the current version number for Parrot.
+
+=cut
 
 my $parrot_version;
 my @parrot_version;
@@ -61,6 +71,10 @@ sub parrot_version
   if (wantarray) { return @parrot_version; }
   else           { return $parrot_version; }
 }
+
+=back
+
+=cut
 
 1;
 

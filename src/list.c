@@ -34,7 +34,7 @@ better, what should be done.
 
 =over 4
 
-=item * end of list is not C<<list->prev>> but C<<list->end>>
+=item * end of list is not C<< list->prev >> but C<< list->end >>
 
 =item * start of list is list->first
 
@@ -46,8 +46,8 @@ better, what should be done.
 
 =back
 
-- list chunks don't have C<<->start>> and C<<->end>> fields. Instead the list has
-C<<->start>>, which is start of first chunk, and C<<->cap>>, the total usable
+- list chunks don't have C<< ->start >> and C<< ->end >> fields. Instead the list has
+C<< ->start >>, which is start of first chunk, and C<< ->cap >>, the total usable
 capacity in the list.
 
 - number of items in chunks are not fixed, but there is a mode
@@ -122,7 +122,7 @@ Have allocated space but any size.
 
 =item C<sparse>
 
-Only dummy allocation, C<<chunk->items>> holds the items of this sparse
+Only dummy allocation, C<< chunk->items >> holds the items of this sparse
 hole.
 
 =back
@@ -1883,7 +1883,7 @@ list_splice(Interp *interpreter, List *list, PMC *value, INTVAL offset,
 =item * 1.2
 
 11.10.2002 More documentation, optimized irregular chunk blocks,
-fixed indexed access WRT C<<list->start>>, cosmetics.
+fixed indexed access WRT C<< list->start >>, cosmetics.
 
 =item * 1.3
 

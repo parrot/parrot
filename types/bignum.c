@@ -433,7 +433,7 @@ int BN_set_sNAN(PINTD_ BIGNUM* bn) {
 BN_set_verybig(PINTD_ BIGNUM* bn, BN_CONTEXT *context)>
 
 Used when an operation has overflowed, sets C<bn> according to
-C<<context->rounding>> and the sign of C<bn>:
+C<< context->rounding >> and the sign of C<bn>:
 
  ROUND_HALF_UP, ROUND_HALF_EVEN => sign Infinity
  ROUND_DOWN => sign, largest finite number in given precision (or Inf, if
@@ -1523,7 +1523,7 @@ Operations are performed like this:
 
 =item Rounding
 
-Both operands are rounded to have no more than C<<context->precision>>
+Both operands are rounded to have no more than C<< context->precision >>
 digits.
 
 =item Computation

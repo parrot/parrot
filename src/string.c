@@ -1202,7 +1202,7 @@ Compare two strings, performing type and encoding conversions if
 necessary.
 
 Returns the standard -1, 0, 1 comparison result, indicating whether
-C<*s1> was C<<<>>, C<==>, C<<>>> C<*s2>.
+C<*s1> was C<< < >>, C<==>, C<< > >> C<*s2>.
 
 =cut
 

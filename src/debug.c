@@ -238,14 +238,14 @@ parse_command(const char* command, unsigned long* cmdP)
 
 Get a command from the user input to execute.
 
-It saves the last command executed (in C<<pdb->last_command>>), so it
+It saves the last command executed (in C<< pdb->last_command >>), so it
 first frees the old one and updates it with the current one.
 
 Also prints the next line to run if the program is still active.
 
 The user input can't be longer than 255 characters.
 
-The input is saved in C<<pdb->cur_command>>.
+The input is saved in C<< pdb->cur_command >>.
 
 =cut
 

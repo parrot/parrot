@@ -82,6 +82,189 @@ HEADER
 	return 1;
 }
 
+=item C<do_middle()>
+
+Does the middle of the document.
+
+=cut
+
+sub do_middle 
+{
+	my $self = shift;
+	my $fh = $self->{'output_fh'};
+  	my ($token, $type, $tagname);
+	my @stack;
+	my $dont_wrap = 0;
+  
+	while ( $token = $self->get_token )
+	{
+		if ( ($type = $token->type) eq 'start' ) 
+		{
+			if ( ($tagname = $token->tagname) eq 'L' ) 
+			{
+				Pod::Simple::HTML::esc($type = $self->do_link($token));
+				
+				if ( defined $type and length $type ) 
+				{
+					print $fh "<a href='$type'>";
+				} 
+				else 
+				{
+					print $fh "<a>";
+				}
+			}
+			elsif ( $tagname eq 'F' )
+			{
+				my $text = Pod::Simple::HTML::esc($self->get_token->text);
+				my $dist = Parrot::Distribution->new;
+				
+				# Only link to files that will have HTML pages.
+				
+				if ( $dist->relative_path_is_file($text) 
+					and $dist->file_with_relative_path($text)->contains_pod )
+				{
+					my $path = $self->append_html_suffix($text);
+					my $file = $self->{TARGET}->file_with_relative_path($path);
+			
+					$path = $self->{DOCS_FILE}->parent->relative_path($file);
+			
+					print $fh $self->{'Tagmap'}{$tagname} . 
+						"<a href='$path'>$text</a>";
+				}
+				else
+				{
+					print $fh "<i>$text</i>";
+				}
+			}
+			elsif ($tagname eq 'item-text' or $tagname =~ m/^head\d$/s) 
+			{
+				print $fh $self->{'Tagmap'}{$tagname} || next;
+				
+				my @to_unget;
+				
+				while ( 1 )
+				{
+					push @to_unget, $self->get_token;
+					
+					last if $to_unget[-1]->is_end
+						and $to_unget[-1]->tagname eq $tagname;
+				}
+				
+				my $name = $self->linearize_tokens(@to_unget);
+				
+				if ( defined $name ) 
+				{
+					$name =~ tr/ /_/;
+					print $fh "<a name=\"", 
+						Pod::Simple::HTML::esc($name), "\"\n>";
+				} 
+				else 
+				{
+					print $fh "<a\n>";
+				}
+				
+				$self->unget_token(@to_unget);
+			} 
+			elsif ($tagname eq 'Data') 
+			{
+				my $next = $self->get_token;
+				
+				next unless defined $next;
+				
+				unless( $next->type eq 'text' )
+				{
+					$self->unget_token($next);
+					next;
+				}
+				
+				printf $fh "\n" . $next->text . "\n";
+				next;
+			} 
+			else 
+			{
+				if( $tagname =~ m/^over-(.+)$/s ) 
+				{
+					push @stack, $1;
+				} 
+				elsif ( $tagname eq 'Para') 
+				{
+					$tagname = 'Para_item' if @stack and $stack[-1] eq 'text';
+				}
+				
+				print $fh $self->{'Tagmap'}{$tagname} || next;
+				
+				++$dont_wrap if 
+					$tagname eq 'Verbatim' 
+					or $tagname eq "VerbatimFormatted"
+					or $tagname eq 'X';
+			}
+		} 
+		elsif ( $type eq 'end' ) 
+		{
+			if( ($tagname = $token->tagname) =~ m/^over-/s ) 
+			{
+				pop @stack;
+			}
+			elsif ( $tagname eq 'Para' ) 
+			{
+				$tagname = 'Para_item' if @stack and $stack[-1] eq 'text';
+			}
+
+			print $fh $self->{'Tagmap'}{"/$tagname"} || next;
+			
+			--$dont_wrap if $tagname eq 'Verbatim' or $tagname eq 'X';
+		} 
+		elsif ( $type eq 'text' ) 
+		{
+			Pod::Simple::HTML::esc($type = $token->text);
+			$type =~ s/([\?\!\"\'\.\,]) /$1\n/g unless $dont_wrap;
+			
+			# URLs not in L<>.
+			$type =~ s|(http://[^\s)]+)|<a href="$1">$1</a>|gs;
+	
+			print $fh $type;
+		}
+	}
+	
+	return 1;
+}
+
+=item C<resolve_pod_page_link($to, $section)>
+
+Resolves the POD link. Perl modules are converted to paths.
+
+=cut
+
+sub resolve_pod_page_link 
+{
+	my $self = shift;
+	my $to = shift;
+	my $section = shift;
+	my $dist = Parrot::Distribution->new;
+	
+	if ( $to =~ /::/o )
+	{
+		# This is not very obvious, so let me explain. We get the file
+		# for the module, then we take its path relative to the 
+		# distribution, then we append the HTML suffix and get the
+		# docs file. Once we have that all we need is the relative
+		# path from the current directory to the file and return that
+		# as the link.
+		
+		my $file = $dist->file_for_perl_module($to);
+		
+		return 'TODO' unless $file;
+		
+		my $path = $self->append_html_suffix($dist->relative_path($file));
+			
+		$file = $self->{TARGET}->file_with_relative_path($path);
+		
+		return $self->{DOCS_FILE}->parent->relative_path($file);
+	}
+	
+	return 'TODO';
+}
+
 =item C<do_end()>
 
 Reimplements the C<Pod::Simple::HTML> method to add a footer to the end
@@ -130,21 +313,6 @@ sub html_for_file
 	$string =~ s|<dt>|<dt><b>|gs;
 	$string =~ s|</dt>|</b></dt>|gs;
 	
-	# Unlinked URLs. We should not be having to do this here.
-	$string =~ s|(http://[^\s<)]+)|<a href="$1">$1</a>|gs;
-	
-	# And I really don't want to do this here.
-	# my ($see_also) = $string =~ m|(<h1><a name="SEE_ALSO".*?<p>.*?</p>)|s;
-	#
-	# if ( $see_also )
-	# { 
-	#      my $original = $see_also;
-	#	
-	#		...
-	#		
-	#      $string =~ s|$original|$see_also|s;
-	# }
-	
 	return $string;
 }
 
@@ -166,12 +334,16 @@ sub write_html
 	
 	return unless $file->contains_pod;
 	
+	$self->{TARGET} = $target;
+	
 	# Use our own method for consistency.
 	$self->{'Title'} = $file->short_description;
 	
 	$rel_path = $self->append_html_suffix($rel_path);
 		
 	my $docs_file = $target->file_with_relative_path($rel_path);
+	
+	$self->{DOCS_FILE} = $docs_file;
 
 	$rel_path = $docs_file->parent->relative_path($target->parent_path);
 
