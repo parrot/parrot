@@ -321,6 +321,13 @@ Parrot_really_destroy(int exit_code, void *vinterp)
     Parrot_do_dod_run(interpreter, DOD_finish_FLAG);
 
     Parrot_dod_sweep(interpreter, interpreter->arena_base->pmc_pool);
+    /*
+     * that doesn't get rid of constant PMCs like these in vtable->data
+     * so if such a PMC needs destroy, we got a memory leak, like for
+     * the SharedRef PMC
+     * TODO sweep constants too or special treatment - depends on how
+     *      many constant PMCs we'll create
+     */
 
     /* Now the PIOData gets also cleared */
     PIO_finish(interpreter);
@@ -383,13 +390,23 @@ Parrot_really_destroy(int exit_code, void *vinterp)
     /* intstack */
     intstack_free(interpreter, interpreter->ctx.intstack);
 
+    /* predefined excpetions */
+    mem_sys_free(interpreter->exception_list);
+    if (interpreter->evc_func_table)
+        mem_sys_free(interpreter->evc_func_table);
     /* strings, chartype, encodings */
     if (!interpreter->parent_interpreter) {
         string_deinit(interpreter);
-/*
-        chartype_destroy();
-        encoding_destroy();
-*/
+        /*
+           chartype_destroy();
+           encoding_destroy();
+           */
+        mem_sys_free(interpreter);
+        /*
+         * finally free other globals
+         */
+        mem_sys_free(Parrot_base_vtables);
+        Parrot_base_vtables = NULL;
     }
 
     else {

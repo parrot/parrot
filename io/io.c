@@ -330,6 +330,7 @@ PIO_finish(theINTERP)
     }
     mem_sys_free(interpreter->piodata->table);
     mem_sys_free(interpreter->piodata);
+    mem_sys_free(pio_registered_layers);
 }
 
 /*

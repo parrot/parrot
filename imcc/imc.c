@@ -78,7 +78,7 @@ imc_compile_all_units(Interp *interp)
 #if 1
     for (unit = interp->imc_info->imc_units; unit;) {
         unit_next = unit->next;
-#if 0
+#if 1
         for (ins = unit->instructions; ins; ) {
             ins_next = ins->next;
             free_ins(ins);
