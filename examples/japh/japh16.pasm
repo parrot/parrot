@@ -1,4 +1,4 @@
-# s. japhc.c for instructions to generate japhc.$(SO)
+# s. examples/compilers/japhc.c for instructions to generate japhc.$(SO)
 
 # a JapH compiler japhc.so compiles this program:
     set S6, "pJ pa pP pH pn e "
