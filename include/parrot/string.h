@@ -45,7 +45,9 @@ typedef enum BUFFER_flag {
     /* Marks the contents as shared */
     BUFFER_shared_FLAG		= 2 << 2,
     /* Mark the contents as Copy on write */
-    BUFFER_COW_FLAG		= 2 << 3
+    BUFFER_COW_FLAG		= 2 << 3,
+    /* Mark the buffer as pointing to system memory */
+    BUFFER_sysmem_FLAG		= 2 << 4
 } BUFFER_flags;
 
 #endif

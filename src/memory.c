@@ -99,10 +99,10 @@ mem_setup_allocator(struct Parrot_Interp *interpreter) {
 }
 
 void *
-mem_realloc(void *from, UINTVAL fromsize, UINTVAL tosize) {
+mem_realloc(struct Parrot_Interp *interpreter, void *from, UINTVAL fromsize, UINTVAL tosize) {
     UINTVAL copysize = (fromsize > tosize ? tosize : fromsize);
     void *mem;
-    mem = mem_sys_allocate(copysize);
+    mem = Parrot_allocate(interpreter, copysize);
     if (!mem) {
         return NULL;
     }

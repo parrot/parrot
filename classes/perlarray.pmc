@@ -12,11 +12,11 @@
 
 #include "parrot/parrot.h"
 
-static void resize_array ( PMC* self, INTVAL size ) {
+static void resize_array ( struct Parrot_Interp *interpreter, PMC* self, INTVAL size ) {
     size++;
     if(self->data != NULL) {
 	if(size >= 0) {
-	    self->data = (DPOINTER*)mem_realloc(self->data,self->cache.int_val*sizeof(PMC *),sizeof(PMC*)*size);
+	    self->data = (DPOINTER*)mem_realloc(interpreter, self->data,self->cache.int_val*sizeof(PMC *),sizeof(PMC*)*size);
 	}
 	else {
             internal_exception(OUT_OF_BOUNDS,
@@ -24,7 +24,7 @@ static void resize_array ( PMC* self, INTVAL size ) {
 	}
     }
     else {
-	self->data = mem_sys_allocate(sizeof(PMC*)*size);
+	self->data = Parrot_allocate(interpreter, sizeof(PMC*)*size);
     }
 }
 
@@ -78,7 +78,7 @@ pmclass PerlArray {
         ix = kp->cache.int_val;
 
         if (ix > SELF->cache.int_val) {
-	    resize_array(SELF,ix);
+	    resize_array(interpreter, SELF,ix);
         }
         if (ix < 0) {
             ix += SELF->cache.int_val;
@@ -105,7 +105,7 @@ pmclass PerlArray {
         ix = kp->cache.int_val;
 
         if (ix > SELF->cache.int_val) {
-	    resize_array(SELF,ix);
+	    resize_array(interpreter, SELF,ix);
         }
         if (ix < 0) {
             ix += SELF->cache.int_val;
@@ -132,7 +132,7 @@ pmclass PerlArray {
         ix = kp->cache.int_val;
 
         if (ix > SELF->cache.int_val) {
-	    resize_array(SELF,ix);
+	    resize_array(interpreter, SELF,ix);
         }
         else if (ix < 0) {
             ix += SELF->cache.int_val;
@@ -160,11 +160,11 @@ pmclass PerlArray {
 
     void set_integer (PMC* value) {
 	INTVAL size = value->vtable->get_integer(INTERP,value);
-	resize_array(SELF,size);
+	resize_array(interpreter, SELF,size);
     }
 
     void set_integer_native (INTVAL size) {
-	resize_array(SELF,size);
+	resize_array(interpreter, SELF,size);
     }
 
     void set_integer_bigint (BIGINT value) {
@@ -172,7 +172,7 @@ pmclass PerlArray {
 
     void set_integer_same (PMC * value) {
 	INTVAL size = value->cache.int_val;
-	resize_array(SELF,size);
+	resize_array(interpreter, SELF,size);
     }
 
     void set_integer_keyed (KEY * key, INTVAL value) {
@@ -188,7 +188,7 @@ pmclass PerlArray {
         ix = kp->cache.int_val;
 
         if (ix > SELF->cache.int_val) {
-	    resize_array(SELF,ix);
+	    resize_array(interpreter, SELF,ix);
         }
         else if (ix < 0) {
             ix += SELF->cache.int_val;
@@ -200,11 +200,11 @@ pmclass PerlArray {
 
     void set_number (PMC * value) {
 	INTVAL size = (INTVAL)value->cache.num_val;
-	resize_array(SELF,size);
+	resize_array(interpreter, SELF,size);
     }
 
     void set_number_native (FLOATVAL size) {
-	resize_array(SELF,(INTVAL)size);
+	resize_array(interpreter, SELF,(INTVAL)size);
     }
 
     void set_number_bigfloat (BIGFLOAT value) {
@@ -212,7 +212,7 @@ pmclass PerlArray {
 
     void set_number_same (PMC * value) {
 	INTVAL size = value->cache.int_val;
-	resize_array(SELF,size);
+	resize_array(interpreter, SELF,size);
     }
 
     void set_number_keyed (KEY * key, FLOATVAL value) {
@@ -228,7 +228,7 @@ pmclass PerlArray {
         ix = kp->cache.int_val;
 
         if (ix > SELF->cache.int_val) {
-	    resize_array(SELF,ix);
+	    resize_array(interpreter, SELF,ix);
         }
         else if (ix < 0) {
             ix += SELF->cache.int_val;
@@ -266,7 +266,7 @@ pmclass PerlArray {
         ix = kp->cache.int_val;
 
         if (ix > SELF->cache.int_val) {
-	    resize_array(SELF,ix);
+	    resize_array(interpreter, SELF,ix);
         }
         else if (ix < 0) {
             ix += SELF->cache.int_val;

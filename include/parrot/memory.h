@@ -20,7 +20,9 @@ void *
 mem_sys_allocate(UINTVAL);
 
 void *
-mem_realloc(void *, UINTVAL, UINTVAL);
+mem_realloc(struct Parrot_Interp *, void *, UINTVAL, UINTVAL);
+
+#define gc_used mem_realloc
 
 void *
 mem_sys_realloc(void *, UINTVAL);
