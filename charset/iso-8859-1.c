@@ -4,18 +4,18 @@ $Id$
 
 =head1 NAME
 
-charset/ascii.c
+charset/iso-8859-1.c
 
 =head1 DESCRIPTION
 
-This file implements the charset functions for ascii data
+This file implements the charset functions for iso-8859-1 data
 
 =cut
 
 */
 
 #include "parrot/parrot.h"
-#include "ascii.h"
+#include "iso-8859-1.h"
 
 /* The encoding we prefer, given a choice */
 static ENCODING *preferred_encoding;
@@ -30,7 +30,7 @@ static void set_graphemes(Interp *interpreter, STRING *source_string, UINTVAL of
 }
 
 static void to_charset(Interp *interpreter, STRING *source_string, CHARSET *new_charset) {
-    internal_exception(UNIMPLEMENTED, "to_charset for ascii not implemented");
+    internal_exception(UNIMPLEMENTED, "to_charset for iso-8859-1 not implemented");
 }
 
 static STRING *copy_to_charset(Interp *interpreter, STRING *source_string, CHARSET *new_charset) {
@@ -40,14 +40,14 @@ static STRING *copy_to_charset(Interp *interpreter, STRING *source_string, CHARS
 }
 
 static void to_unicode(Interp *interpreter, STRING *source_string) {
-    internal_exception(UNIMPLEMENTED, "to_unicode for ascii not implemented");
+    internal_exception(UNIMPLEMENTED, "to_unicode for iso-8859-1 not implemented");
 }
 
-/* A noop. can't compose ascii */
+/* A noop. can't compose iso-8859-1 */
 static void compose(Interp *interpreter, STRING *source_string) {
 }
 
-/* A noop. can't decompose ascii */
+/* A noop. can't decompose iso-8859-1 */
 static void decompose(Interp *interpreter, STRING *source_string) {
 }
 
@@ -205,10 +205,10 @@ static INTVAL find_word_boundary(Interp *interpreter, STRING *source_string, UIN
   return -1;
 }
 
-CHARSET *Parrot_charset_ascii_init(Interp *interpreter) {
+CHARSET *Parrot_charset_iso_8859_1_init(Interp *interpreter) {
   CHARSET *return_set = Parrot_new_charset(interpreter);
   CHARSET base_set = {
-      "ascii",
+      "iso-8859-1",
       get_graphemes,
       set_graphemes,
       to_charset,

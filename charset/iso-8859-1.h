@@ -1,17 +1,17 @@
-/* ascii.h
+/* iso_8859_1.h
  *  Copyright: 2004 The Perl Foundation.  All Rights Reserved.
  *  CVS Info
  *     $Id$
  *  Overview:
- *     This is the header for the ascii charset functions
+ *     This is the header for the iso_8859-1 charset functions
  *  Data Structure and Algorithms:
  *  History:
  *  Notes:
  *  References:
  */
 
-#if !defined(PARROT_CHARSET_ASCII_H_GUARD)
-#define PARROT_CHARSET_ASCII_H_GUARD
+#if !defined(PARROT_CHARSET_ISO_8859_1_H_GUARD)
+#define PARROT_CHARSET_ISO_8859_1_H_GUARD
 
 static STRING *get_graphemes(Interp *interpreter, STRING *source_string, UINTVAL offset, UINTVAL count);
 static void set_graphemes(Interp *interpreter, STRING *source_string, UINTVAL offset, UINTVAL replace_count, STRING *insert_string);
@@ -49,7 +49,7 @@ static INTVAL find_word_boundary(Interp *interpreter, STRING *source_string, UIN
 CHARSET *Parrot_charset_iso_8859_1_init(Interp *interpreter);
 
 
-#endif /* PARROT_CHARSET_ASCII_H_GUARD */
+#endif /* PARROT_CHARSET_ISO_8859_1_H_GUARD */
 /*
  * Local variables:
  * c-indentation-style: bsd
