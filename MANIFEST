@@ -388,6 +388,8 @@ languages/perl6/perl6
 languages/perl6/perl6re/Perl6RE.bnf
 languages/perl6/perl6re/Perl6RE.pm
 languages/perl6/prd-perl6.pl
+languages/perl6/t/builtins/array.t
+languages/perl6/t/builtins/string.t
 languages/perl6/t/compiler/1.t
 languages/perl6/t/compiler/2.t
 languages/perl6/t/compiler/3.t
@@ -398,7 +400,6 @@ languages/perl6/t/compiler/7.t
 languages/perl6/t/compiler/8.t
 languages/perl6/t/compiler/9.t
 languages/perl6/t/compiler/a.t
-#languages/perl6/t/compiler/builtins.t
 languages/perl6/t/compiler/qsort.t
 languages/perl6/t/harness
 languages/perl6/t/parser/Makefile
