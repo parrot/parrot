@@ -818,6 +818,27 @@ pcc_emit_flatten(Parrot_Interp interp, IMC_Unit * unit, Instruction *ins,
 }
 
 
+static Instruction*
+pcc_insert_signature(Parrot_Interp interp, IMC_Unit * unit, Instruction *ins,
+        struct pcc_sub_t *pcc_sub)
+{
+    int i, n;
+    SymReg *regs[IMCC_MAX_REGS];
+    char buffer[20];    /* TODO is there a limit? */
+
+    n = pcc_sub->nargs;
+    buffer[0] = '"';
+    for (i = 0; i < n && i < 15; ++i) {
+        buffer[i + 1] = pcc_sub->args[i]->set;
+    }
+    buffer[i + 1] = '"';
+    buffer[i + 2] = '\0';
+    regs[0] = get_pasm_reg(interp, "S0");
+    regs[1] = mk_const(interp, str_dup(buffer), 'S');
+    ins = insINS(interp, unit, ins, "set", regs, 2);
+    return ins;
+}
+
 /*
  * Expand a PCC subroutine call (IMC) into its PASM instructions
  * This is the nuts and bolts of pdd03 routine call style
@@ -828,12 +849,12 @@ expand_pcc_sub_call(Parrot_Interp interp, IMC_Unit * unit, Instruction *ins)
 {
     SymReg *arg, *sub, *reg, *regs[IMCC_MAX_REGS];
     int  n;
-    Instruction *tmp;
     int need_cc;
     int tail_call;
     int proto;
     int meth_call = 0;
     SymReg *s0 = NULL;
+    Instruction *get_name;
 
     tail_call = 0;
 #ifdef CREATE_TAIL_CALLS
@@ -850,6 +871,7 @@ expand_pcc_sub_call(Parrot_Interp interp, IMC_Unit * unit, Instruction *ins)
      * See if we need to create a temporary sub object for the short
      * function call syntax _f()
      */
+    get_name = NULL;
     if (ins->type & ITCALL) {
         SymReg * the_sub = sub->pcc_sub->sub;
         if (!meth_call && the_sub->type == VTADDRESS) {
@@ -868,10 +890,13 @@ expand_pcc_sub_call(Parrot_Interp interp, IMC_Unit * unit, Instruction *ins)
             the_sub->type = VTCONST;
             regs[0] = reg;
             regs[1] = the_sub;
-            tmp = INS(interp, unit, "set_p_pc", "", regs, 2, 0, 0);
+            /*
+             * set_p_pc gets replaced in imcc/pbc.c, if the
+             * function can't located in the current namespace
+             */
+            get_name = INS(interp, unit, "set_p_pc", "", regs, 2, 0, 0);
 
             ins->type &= ~ITCALL;
-            prepend_ins(unit, ins, tmp);
         }
         else
             add_pcc_sub(sub, the_sub);
@@ -885,6 +910,17 @@ expand_pcc_sub_call(Parrot_Interp interp, IMC_Unit * unit, Instruction *ins)
     proto = sub->pcc_sub->pragma & P_PROTOTYPED;
     ins = pcc_put_args(interp, unit, ins, sub->pcc_sub, n,
                 proto, sub->pcc_sub->args);
+    /*
+     * insert get_name after args have been setup, so that
+     * a possible MMD call can inspect the passed arguments
+     */
+    if (get_name) {
+        /* for now, put a call signature in S0 */
+        if (!meth_call)
+            ins = pcc_insert_signature(interp, unit, ins, sub->pcc_sub);
+        insert_ins(unit, ins, get_name);
+        ins = get_name;
+    }
 
 
     /*

@@ -102,35 +102,6 @@ METHOD void sort(PMC *cmp_func) {
 
 /*
 
-=item C<void* invoke(void* next)>
-
-Pythonic object constructor. SELF is a FixedPMCArray Class object. Return a new
-C<tuple> object according to 2.1. Built-in Functions.
-
-=cut
-
-*/
-    void* invoke(void* next) {
-        int argcP = REG_INT(3);
-        PMC *res = pmc_new(INTERP, enum_class_FixedPMCArray);
-        PMC *arg;
-        if (argcP) {
-            if (argcP > 1) {
-                real_exception(INTERP, NULL, E_TypeError,
-                        "TypeError: tuple expected at most 1 arguments, got %d",
-                        (int)argcP);
-            }
-            arg = REG_PMC(5);
-            if (arg->vtable->base_type == enum_class_FixedPMCArray)
-                res = arg; /* if a tuple is passed, return it */
-            else
-                Parrot_py_fill(INTERP, res, arg);
-        }
-        REG_PMC(5) = res;
-        return next;
-    }
-/*
-
 =back
 
 =head2 Methods

@@ -27,34 +27,6 @@ pmclass ResizablePMCArray extends FixedPMCArray need_ext does array {
 
 /*
 
-=item C<void* invoke(void* next)>
-
-Pythonic object constructor. SELF is a ResizeablePMCArray Class object.
-Return a new C<list> object according to 2.1. Built-in Functions.
-
-=cut
-
-*/
-    void* invoke(void* next) {
-        int argcP = REG_INT(3);
-        PMC *res = pmc_new(INTERP, enum_class_ResizablePMCArray);
-        PMC *arg;
-
-        if (argcP) {
-            if (argcP > 1) {
-                real_exception(INTERP, NULL, E_TypeError,
-                        "TypeError: list expected at most 1 arguments, got %d",
-                        (int)argcP);
-            }
-            arg = REG_PMC(5);
-            Parrot_py_fill(INTERP, res, arg);
-        }
-        REG_PMC(5) = res;
-        return next;
-    }
-
-/*
-
 =item C<void set_integer_native(INTVAL size)>
 
 Resizes the array to C<size> elements.

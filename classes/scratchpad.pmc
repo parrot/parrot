@@ -8,10 +8,10 @@ classes/scratchpad.pmc - Lexical Scratchpad
 
 =head1 DESCRIPTION
 
-These are the vtable functions for the Scratchpad PMC. 
+These are the vtable functions for the Scratchpad PMC.
 
 A ScratchPad PMC is a FixedPMCArray of OrderedHashes. It is used in the implementation
-of the opcodes in F<ops/var.ops>. 
+of the opcodes in F<ops/var.ops>.
 
 =head2 Methods
 
@@ -198,7 +198,7 @@ Deletes the lexical variable for C<*key>.
 
 =head1 SEE ALSO
 
-F<ops/var.ops> 
+F<ops/var.ops>
 F<src/lexical.c>
 
 =cut

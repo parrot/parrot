@@ -46,7 +46,7 @@ OKAY:
     store_global "_parrotlib", "include_paths", includes
 
     # get the directory handler
-    $P0 = find_global "_parrotlib::internal", "handle_directory"
+    $P0 = find_global "_parrotlib", "handle_directory"
 
     # fill the includes array
 LOOP:
@@ -63,6 +63,17 @@ LOOP:
     set_signature( "include_file_location", "SS" )
     set_signature( "imcc_compile_file_location", "SS" )
     set_signature( "dynext_location", "SSSP" )
+.end
+
+.sub set_signature
+    .param string name
+    .param string sig
+
+    $P1 = new .PerlString
+    $P1 = sig
+    find_global $P0, "_parrotlib", name
+    setprop $P0, "signature", $P1
+    store_global "_parrotlib", name, $P0
 .end
 
 =item STRING = include_file_location( STRING )
@@ -147,8 +158,6 @@ END:
 .end
 
 
-.namespace ["_parrotlib::internal"]
-
 .sub find_file_path
     .param string name
     .param pmc array
@@ -189,17 +198,6 @@ OK:
     .pcc_begin_return
     .return $S0
     .pcc_end_return
-.end
-
-.sub set_signature
-    .param string name
-    .param string sig
-
-    $P1 = new .PerlString
-    $P1 = sig
-    find_global $P0, "_parrotlib", name
-    setprop $P0, "signature", $P1
-    store_global "_parrotlib", name, $P0
 .end
 
 =back

@@ -419,11 +419,18 @@ find_global_label(char *name, struct subs *sym, int *pc, struct subs **s1)
     struct subs *s;
     *pc = 0;
     for (s = globals.cs->first; s; s = s->next) {
+#if 0
+        fprintf(stderr, "namespace %s\n", s->unit->namespace ?
+                s->unit->namespace->name : "(null");
+        debug_dump_sym_hash(s->labels);
+        fprintf(stderr, "\n");
+#endif
         if (sym && (
-                ((sym->unit->namespace && s->unit->namespace) &&
-                 sym->unit->namespace == s->unit->namespace)
-                || (sym->unit->namespace && !s->unit->namespace)
-                || (!sym->unit->namespace && s->unit->namespace)))
+                    ((sym->unit->namespace && s->unit->namespace) &&
+                     strcmp(sym->unit->namespace->name,
+                         s->unit->namespace->name))
+                    || (sym->unit->namespace && !s->unit->namespace)
+                    || (!sym->unit->namespace && s->unit->namespace)))
             continue;
         if ( (r = _get_sym(s->labels, name)) ) {
             *pc += r->color;    /* here pc was stored */
@@ -469,15 +476,22 @@ fixup_bsrs(Interp *interpreter)
                      * set_p_pc  => find_name p_sc
                      */
                     if (!lab) {
-                        int op = interpreter->op_lib->op_code("find_name_p_sc", 1);
-                        int col;
+                        int op, col;
+                        SymReg *nam;
+                        op = interpreter->op_lib->op_code("find_name_p_sc", 1);
                         assert(op);
                         interpreter->code->byte_code[addr] = op;
-                        col = add_const_str(interpreter, bsr);
+                        nam = mk_const(interpreter, str_dup(bsr->name), 'S');
+                        if (nam->color >= 0)
+                            col = nam->color;
+                        else {
+                            col = nam->color = add_const_str(interpreter, nam);
+                        }
                         interpreter->code->byte_code[addr+2] = col;
-                        IMCC_debug(interpreter, DEBUG_PBC_FIXUP, "fixup const PMC"
-                                " find_name sub '%s' const nr: %d\n", bsr->name,
-                            col);
+                        IMCC_debug(interpreter, DEBUG_PBC_FIXUP,
+                                "fixup const PMC"
+                                " find_name sub '%s' const nr: %d\n",
+                                bsr->name, col);
                         continue;
                     }
                     pmc_const = s1->pmc_const;

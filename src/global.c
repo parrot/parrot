@@ -141,6 +141,9 @@ the interpreter's errors setting.
 
 */
 
+/* XXX */
+PMC *Parrot_MMD_search_default_func(Interp *, STRING *meth, STRING *signature);
+
 PMC *
 Parrot_get_name(Interp* interpreter, STRING *name)
 {
@@ -148,14 +151,23 @@ Parrot_get_name(Interp* interpreter, STRING *name)
 
     pad = scratchpad_get_current(interpreter);
     g = scratchpad_find(interpreter, pad, name);
-    if (g)
-        return g;
-    g = Parrot_find_global(interpreter, NULL, name);
-    if (g)
-        return g;
-    g = Parrot_find_builtin(interpreter, name);
-    if (g)
-        return g;
+    if (!g)
+        g = Parrot_find_global(interpreter, NULL, name);
+    if (!g)
+        g = Parrot_find_builtin(interpreter, name);
+    if (g) {
+        if (g->vtable->base_type == enum_class_MultiSub) {
+            /*
+             * signature is currently passed in S0
+             * see also imcc/pcc.c
+             */
+            g = Parrot_MMD_search_default_func(interpreter, name, REG_STR(0));
+            if (g)
+                return g;
+        }
+        else
+            return g;
+    }
     if (PARROT_ERRORS_test(interpreter, PARROT_ERRORS_GLOBALS_FLAG))  {
         real_exception(interpreter, NULL, E_NameError,
                 "Name '%Ss' not found", name);

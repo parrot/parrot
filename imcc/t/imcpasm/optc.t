@@ -11,6 +11,9 @@ use Parrot::Test tests => 6;
 
 ##############################
 # prototyped calls, invokecc
+SKIP: {
+    skip("PCC changes", 6);
+
 pir_2_pasm_like(<<'CODE', <<'OUT', "in P param");
 .sub _main
     $P0 = new PerlUndef
@@ -47,8 +50,6 @@ foo:
   returncc/
 OUT
 
-SKIP: {
-    skip("PCC changes", 5);
 pir_2_pasm_like(<<'CODE', <<'OUT', "in, out P param");
 .sub _main
     .local Sub sub

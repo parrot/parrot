@@ -16,7 +16,7 @@ Tests the multi-method dispatch.
 
 =cut
 
-use Parrot::Test tests => 9;
+use Parrot::Test tests => 10;
 
 pir_output_is(<<'CODE', <<'OUTPUT', "PASM divide");
 
@@ -309,3 +309,46 @@ ok
 1
 7
 OUTPUT
+
+pir_output_is(<<'CODE', <<'OUT', "first dynamic MMD call");
+
+.namespace ["Main"]
+.sub main @MAIN
+    .local pmc F, B, f, b, m, s
+    newclass F, "Foo"
+    f = F."instantiate"()
+    newclass B, "Bar"
+    b = B."instantiate"()
+    # create a multi the hard way
+    m = new MultiSub
+    s = find_global "Foo", "foo"
+    push m, s
+    s = find_global "Bar", "foo"
+    push m, s
+    global "foo" = m
+    print "calling foo(f, b)\n"
+    foo(f, b)
+    print "calling foo(b, f)\n"
+    foo(b, f)
+.end
+
+.namespace ["Foo"]
+.sub foo method
+    .param pmc x
+    .param pmc y
+    print "  Foo::foo\n"
+.end
+
+.namespace ["Bar"]
+.sub foo method
+    .param pmc x
+    .param pmc y
+    print "  Bar::foo\n"
+.end
+CODE
+calling foo(f, b)
+  Foo::foo
+calling foo(b, f)
+  Bar::foo
+OUT
+

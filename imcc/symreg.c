@@ -680,6 +680,20 @@ clear_sym_hash(SymReg **hsh)
     }
 }
 
+void debug_dump_sym_hash(SymReg **hsh);
+
+void
+debug_dump_sym_hash(SymReg **hsh)
+{
+    int i;
+    SymReg * p;
+    for (i = 0; i < HASH_SIZE; i++) {
+	for (p = hsh[i]; p; p = p->next) {
+            fprintf(stderr, "%s ", p->name);
+        }
+    }
+}
+
 /* Deletes all local symbols and clears life info */
 void
 clear_locals(IMC_Unit * unit)

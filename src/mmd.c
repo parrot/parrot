@@ -850,7 +850,7 @@ static PMC*
 mmd_search_default(Interp *interpreter, STRING *meth, PMC *arg_tuple)
 {
     PMC *candidate_list, *pmc;
-    INTVAL i, n;
+    INTVAL n;
     STRING *_sub;
 
     /*
@@ -862,13 +862,13 @@ mmd_search_default(Interp *interpreter, STRING *meth, PMC *arg_tuple)
      *    if the first found function is a plain Sub: finito
      */
     n = VTABLE_elements(interpreter, candidate_list);
-    if (!n)
-        return NULL;
-    pmc = VTABLE_get_pmc_keyed_int(interpreter, candidate_list, 0);
-    _sub = CONST_STRING(interpreter, "Sub");
+    if (n) {
+        pmc = VTABLE_get_pmc_keyed_int(interpreter, candidate_list, 0);
+        _sub = CONST_STRING(interpreter, "Sub");
 
-    if (VTABLE_isa(interpreter, pmc, _sub)) {
-        return pmc;
+        if (VTABLE_isa(interpreter, pmc, _sub)) {
+            return pmc;
+        }
     }
     /*
      * 4) first is a MultiSub - go through all found MultiSubs and check
@@ -876,10 +876,14 @@ mmd_search_default(Interp *interpreter, STRING *meth, PMC *arg_tuple)
      *    where the first argument matches
      */
     mmd_search_classes(interpreter, meth, arg_tuple, candidate_list);
+    n = VTABLE_elements(interpreter, candidate_list);
+    if (!n)
+        return NULL;
     /*
      * 5) sort the list
      */
-    mmd_sort_candidates(interpreter, arg_tuple, candidate_list);
+    if (n > 1)
+        mmd_sort_candidates(interpreter, arg_tuple, candidate_list);
     /*
      * 6) Uff, return first one
      */
