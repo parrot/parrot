@@ -206,7 +206,7 @@ sub unpack
 
   $self->{MAGIC} = $magic;
 
-  die "Bad PARROT_MAGIC" unless $magic == $PARROT_MAGIC;
+  die "Bad PARROT_MAGIC: got [$magic]" unless $magic == $PARROT_MAGIC;
 
   $self->{OPCODETYPE} = shift_op($string);
 
