@@ -201,6 +201,12 @@ destination to continue execution.
 
         caller_regs = interpreter->ctx.bp;
         restore_context(interpreter, &cc->ctx);
+        if (Interp_flags_TEST(interpreter, PARROT_TRACE_FLAG)) {
+            PMC *sub = interpreter->ctx.current_sub;
+            STRING *unk = CONST_STRING(interpreter, "(unknown");
+            PIO_eprintf(interpreter, "# Back in sub '%Ss'\n#",
+                sub && PMC_sub(sub)->name ? PMC_sub(sub)->name : unk);
+        }
         if (PMC_struct_val(SELF))
             copy_regs(interpreter, caller_regs);
         else if (!cc->seg) {
