@@ -3,6 +3,8 @@
 # into executable bytecode and runs it
     find_global P0, "_japhc"
     # compile program
+    set I0, 1
+    set I2, 1
     invokecc
     # run program
     invoke P5
@@ -60,4 +62,6 @@ next:
     ## print S6
     compreg P0, "PASM"
     compile P5, P0, S6
+    set I0, 0
+    set I3, 1
     invoke P1

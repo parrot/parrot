@@ -1,13 +1,13 @@
 # hack interpreters internals
     bsr _init
 
-    set P0[0;0;0;31], 13
+    set P0[0;0;0;0;31], 13
     sets_ind I31, "Hacker"
-    set P0[0;0;0;31], 12
+    set P0[0;0;0;0;31], 12
     sets_ind I31, "Parrot "
-    set P0[0;0;0;31], 11
+    set P0[0;0;0;0;31], 11
     sets_ind I31, "another "
-    set P0[0;0;0;31], 10
+    set P0[0;0;0;0;31], 10
     sets_ind I31, "Just "
 
     print S10
@@ -41,5 +41,13 @@ _init:
     setprop P9, "_struct", P4
     push P5, 0
     push P5, 0
-    assign P0, P5
+    new P6, .UnManagedStruct, P5
+
+    new P7, .PerlArray
+    push P7, -68
+    set P10, P7[-1]
+    setprop P10, "_struct", P6
+    push P7, 0
+    push P7, 0
+    assign P0, P7
     ret

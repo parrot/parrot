@@ -49,20 +49,20 @@ create_seg(struct PackFile_Directory *dir, pack_file_types t, const char *name)
     return seg;
 }
 
-static struct PackFile *
+struct PackFile_ByteCode *
 create_pf_segs(Parrot_Interp interpreter)
 {
-    struct PackFile *pf = PackFile_new(0);
+    struct PackFile *pf = interpreter->code;
     struct PackFile_Segment *seg;
     struct PackFile_ByteCode *cur_cs;
 
     seg = create_seg(&pf->directory, PF_BYTEC_SEG, "JaPHc_bc");
-    cur_cs = pf->cur_cs = (struct PackFile_ByteCode*)seg;
+    cur_cs = (struct PackFile_ByteCode*)seg;
 
     seg = create_seg(&pf->directory, PF_CONST_SEG, "JaPHc_const");
-    cur_cs->consts = pf->const_table = (struct PackFile_ConstTable*) seg;
+    cur_cs->consts = (struct PackFile_ConstTable*) seg;
     cur_cs->consts->code = cur_cs;
-    return pf;
+    return cur_cs;
 }
 
 static int
@@ -140,11 +140,12 @@ add_const_str(Parrot_Interp interpreter,
 void*
 japh_compiler(Parrot_Interp interpreter, const char *program)
 {
-    struct PackFile *pf;
-    struct PackFile_ByteCode *cur_cs;
+    struct PackFile_ByteCode *cur_cs, *old_cs;
     struct PackFile_ConstTable *consts;
     opcode_t* pc;
     const char *p;
+    PMC *sub;
+    parrot_sub_t sub_data;
 
 #define CODE_SIZE 128
     cdebug((stderr, "japh_compiler '%s'\n", program));
@@ -152,8 +153,8 @@ japh_compiler(Parrot_Interp interpreter, const char *program)
     /*
      * need some packfile segments
      */
-    pf = create_pf_segs(interpreter);
-    cur_cs = pf->cur_cs;
+    cur_cs = create_pf_segs(interpreter);
+    old_cs = Parrot_switch_to_cs(interpreter, cur_cs, 0);
     /*
      * alloc byte code mem
      */
@@ -193,5 +194,18 @@ japh_compiler(Parrot_Interp interpreter, const char *program)
 		break;
 	}
     }
-    return pf;
+    if (old_cs) {
+        /* restore old byte_code, */
+        (void)Parrot_switch_to_cs(interpreter, old_cs, 0);
+    }
+    /*
+     * create sub PMC
+     */
+    sub = pmc_new(interpreter, enum_class_Eval);
+    sub_data = PMC_sub(sub);
+    sub_data->seg = cur_cs;
+    sub_data->address = cur_cs->base.data;
+    sub_data->end = cur_cs->base.data + cur_cs->base.size;
+    sub_data->name = string_from_cstring(interpreter, "JaPHC", 0);
+    return sub;
 }
