@@ -1124,10 +1124,6 @@ Parrot_really_destroy(int exit_code, void *vinterp)
      */
     if (!interpreter->parent_interpreter) {
         pt_join_threads(interpreter);
-        /*
-         * and terminate the event loop
-         */
-        Parrot_kill_event_loop();
     }
     /* if something needs destruction (e.g. closing PIOs)
      * we must destroy it now:
@@ -1138,6 +1134,14 @@ Parrot_really_destroy(int exit_code, void *vinterp)
 
     /* Now the PIOData gets also cleared */
     PIO_finish(interpreter);
+
+    /*
+     * now all objects that need timely destruction should be finalized
+     * so terminate the event loop
+     */
+    if (!interpreter->parent_interpreter) {
+        Parrot_kill_event_loop();
+    }
 
     /* we destroy all child interpreters and the last one too,
      * if the --leak-test commandline was given
