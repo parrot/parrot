@@ -1,6 +1,6 @@
 #! perl -w
 
-use Parrot::Test tests => 83;
+use Parrot::Test tests => 85;
 use Test::More;
 use Parrot::PMC qw(%pmc_types);
 my $max_pmc = scalar(keys(%pmc_types)) + 1;
@@ -1810,6 +1810,41 @@ ok 5
 ok 6
 OUTPUT
 
+output_is(<<'CODE', <<OUTPUT, "lt_p_i");
+      new P0, .PerlInt
+      set P0, 1
+
+      lt P0, 2, OK1
+      print "not "
+OK1:  print "ok 1\n"
+
+      lt P0, 0, BAD2
+      branch OK2
+BAD2: print "not ok 2\n"
+OK2:  print "ok 2\n"
+
+      new P2, .PerlNum
+      set P2, 12.49
+      set I2, 15
+
+      lt P2, I2, OK3
+      print "not "
+OK3:  print "ok 3\n"
+
+      set I2, 10
+      lt P2, I2, BAD4
+      branch OK4
+BAD4: print "not ok 4\n"
+OK4:  print "ok 4\n"
+
+      end
+CODE
+ok 1
+ok 2
+ok 3
+ok 4
+OUTPUT
+
 output_is(<<'CODE', <<OUTPUT, "le_p_p");
       new P0, .PerlInt
       new P1, .PerlInt
@@ -1852,6 +1887,49 @@ OK6:  print "ok 6\n"
       end
 
 
+CODE
+ok 1
+ok 2
+ok 3
+ok 4
+ok 5
+ok 6
+OUTPUT
+
+output_is(<<'CODE', <<OUTPUT, "le_p_i");
+      new P0, .PerlInt
+      set P0, 1
+
+      le P0, 1, OK1
+      print "not "
+OK1:  print "ok 1\n"
+
+      le P0, 0, BAD2
+      branch OK2
+BAD2: print "not ok 2\n"
+OK2:  print "ok 2\n"
+
+      le P0, 2, OK3
+      print "not "
+OK3:  print "ok 3\n"
+
+      new P2, .PerlNum
+      set P2, 12.0
+
+      le P2, 12, OK4
+      print "not "
+OK4:  print "ok 4\n"
+
+      le P2, 11, BAD5
+      branch OK5
+BAD5: print "not ok 5\n"
+OK5:  print "ok 5\n"
+
+      le P2, 13, OK6
+      print "not "
+OK6:  print "ok 6\n"
+
+      end
 CODE
 ok 1
 ok 2
