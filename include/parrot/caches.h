@@ -63,7 +63,7 @@ void init_object_cache(Parrot_Interp interpreter);
 void add_to_retc_free_list(Parrot_Interp, PMC*);
 PMC *get_retc_from_free_list(Parrot_Interp);
 void mark_object_cache(Parrot_Interp);
-void mark_stack_not_reusable(Parrot_Interp, struct Parrot_Context *ctx);
+void mark_stack_reusable(Parrot_Interp, struct Parrot_Context *ctx);
 void mark_saved_regs(Parrot_Interp interpreter);
 
 

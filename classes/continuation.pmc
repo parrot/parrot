@@ -22,6 +22,7 @@ information.
 
 #include "parrot/parrot.h"
 #include "parrot/method_util.h"
+#include <assert.h>
 
 pmclass Continuation extends Closure {
 
@@ -70,23 +71,34 @@ Creates and returns a clone of the continuation.
 
     PMC* clone() {
         struct Parrot_Sub * sub;
+        struct Parrot_Sub *cc_self = PMC_sub(SELF);
         PMC* ret = pmc_new_noinit(INTERP, SELF->vtable->base_type);
         PObj_custom_mark_destroy_SETALL(ret);
         sub = PMC_sub(ret) = mem_sys_allocate(sizeof(struct Parrot_Sub));
-        memcpy(sub, PMC_sub(SELF), sizeof(struct Parrot_Sub));
-        mark_stack_not_reusable(interpreter, &sub->ctx);
+        memcpy(sub, cc_self, sizeof(struct Parrot_Sub));
+        PObj_get_FLAGS(SELF) &= ~PObj_private2_FLAG;
+        /* be sure its not recycled */
+        assert (!(PObj_get_FLAGS(ret) & PObj_private2_FLAG));
 
         PMC_struct_val(ret) = PMC_struct_val(SELF);
         return ret;
     }
 
+/*
+
+=item C<PMC *set_pmc()>
+
+Assign context.
+
+=cut
+
+*/
     void set_pmc(PMC* src) {
         struct Parrot_Sub *cc_self = PMC_sub(SELF);
         struct Parrot_Sub *cc_src  = PMC_sub(src);
 
         memcpy(cc_self, cc_src, sizeof(struct Parrot_Sub));
         PMC_struct_val(SELF) = PMC_struct_val(src);
-        mark_stack_not_reusable(interpreter, &cc_self->ctx);
     }
 /*
 
