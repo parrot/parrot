@@ -1571,6 +1571,7 @@ math.ops
 memory.c
 method_util.c
 misc.c
+nci.c
 obscure.ops
 ops2c.pl
 ops2cgc.pl

@@ -105,7 +105,8 @@ INTERP_O_FILES = exceptions$(O) global_setup$(O) interpreter$(O) parrot$(O) \
 	embed$(O) warnings$(O)  ${cg_o} \
 	packout$(O) byteorder$(O) debug$(O) smallobject$(O) \
 	headers$(O) dod$(O) method_util$(O) exit$(O) \
-	misc$(O) spf_render$(O) spf_vtable$(O) datatypes$(O) fingerprint$(O)
+	misc$(O) spf_render$(O) spf_vtable$(O) datatypes$(O) fingerprint$(O) \
+	nci$(O)
 
 O_FILES = $(INTERP_O_FILES) $(IO_O_FILES) $(CLASS_O_FILES) \
 	$(ENCODING_O_FILES) $(CHARTYPE_O_FILES)
@@ -421,6 +422,8 @@ core_ops$(O) : $(GENERAL_H_FILES) core_ops.c
 dataypes$(O) : $(GENERAL_H_FILES) dataypes.c
 
 exit$(O) : $(GENERAL_H_FILES) exit.c
+
+nci$(O) : $(GENERAL_H_FILES) exit.c
 
 #core_ops depends upon config.h so that it gets updated along with updates to config.h's version numbers
 core_ops.c $(INC)/oplib/core_ops.h : $(OPS_FILES) ops2c.pl lib/Parrot/OpsFile.pm lib/Parrot/Op.pm $(INC)/config.h
