@@ -562,52 +562,52 @@ AUTO_OP pow_n_n_n {
 
 /* sin_n_i */
 AUTO_OP sin_n_i {
-   NUM_REG(P1) = sin(INT_REG(P2));
+   NUM_REG(P1) = sin((NV)INT_REG(P2));
 }
 
 /* cos_n_i */
 AUTO_OP cos_n_i {
-   NUM_REG(P1) = cos(INT_REG(P2));
+   NUM_REG(P1) = cos((NV)INT_REG(P2));
 }
 
 /* tan_n_i */
 AUTO_OP tan_n_i {
-   NUM_REG(P1) = tan(INT_REG(P2));
+   NUM_REG(P1) = tan((NV)INT_REG(P2));
 }
 
 /* sec_n_i */
 AUTO_OP sec_n_i {
-   NUM_REG(P1) = ((NV)1) / cos(INT_REG(P2));
+   NUM_REG(P1) = ((NV)1) / cos((NV)INT_REG(P2));
 }
 
 /* atan_n_i */
 AUTO_OP atan_n_i {
-   NUM_REG(P1) = atan(INT_REG(P2));
+   NUM_REG(P1) = atan((NV)INT_REG(P2));
 }
 
 /* atan2_n_n_i */
 AUTO_OP atan2_n_n_i {
-   NUM_REG(P1) = atan2(NUM_REG(P2), INT_REG(P3));
+   NUM_REG(P1) = atan2(NUM_REG(P2), (NV)INT_REG(P3));
 }
 
 /* atan2_n_i_n */
 AUTO_OP atan2_n_i_n {
-   NUM_REG(P1) = atan2(INT_REG(P2), NUM_REG(P3));
+   NUM_REG(P1) = atan2((NV)INT_REG(P2), NUM_REG(P3));
 }
 
 /* atan2_n_i_i */
 AUTO_OP atan2_n_i_i {
-   NUM_REG(P1) = atan2(INT_REG(P2), INT_REG(P3));
+   NUM_REG(P1) = atan2((NV)INT_REG(P2), (NV)INT_REG(P3));
 }
 
 /* asin_n_i */
 AUTO_OP asin_n_i {
-   NUM_REG(P1) = asin(INT_REG(P2));
+   NUM_REG(P1) = asin((NV)INT_REG(P2));
 }
 
 /* acos_n_i */
 AUTO_OP acos_n_i {
-   NUM_REG(P1) = acos(INT_REG(P2));
+   NUM_REG(P1) = acos((NV)INT_REG(P2));
 }
 
 /* asec_n_i */
@@ -617,57 +617,57 @@ AUTO_OP asec_n_i {
 
 /* cosh_n_i */
 AUTO_OP cosh_n_i {
-   NUM_REG(P1) = cosh(INT_REG(P2));
+   NUM_REG(P1) = cosh((NV)INT_REG(P2));
 }
 
 /* sinh_n_i */
 AUTO_OP sinh_n_i {
-   NUM_REG(P1) = sinh(INT_REG(P2));
+   NUM_REG(P1) = sinh((NV)INT_REG(P2));
 }
 
 /* tanh_n_i */
 AUTO_OP tanh_n_i {
-   NUM_REG(P1) = tanh(INT_REG(P2));
+   NUM_REG(P1) = tanh((NV)INT_REG(P2));
 }
 
 /* sech_n_i */
 AUTO_OP sech_n_i {
-   NUM_REG(P1) = ((NV)1) / cosh(INT_REG(P2));
+   NUM_REG(P1) = ((NV)1) / cosh((NV)INT_REG(P2));
 }
 
 /* log2_n_i */
 AUTO_OP log2_n_i {
-   NUM_REG(P1) = log(INT_REG(P2)) / log((NV)2);
+   NUM_REG(P1) = log((NV)INT_REG(P2)) / log((NV)2);
 }
 
 /* log10_n_i */
 AUTO_OP log10_n_i {
-   NUM_REG(P1) = log10(INT_REG(P2));
+   NUM_REG(P1) = log10((NV)INT_REG(P2));
 }
 
 /* ln_n_i */
 AUTO_OP ln_n_i {
-   NUM_REG(P1) = log(INT_REG(P2));
+   NUM_REG(P1) = log((NV)INT_REG(P2));
 }
 
 /* exp_n_i */
 AUTO_OP exp_n_i {
-   NUM_REG(P1) = exp(INT_REG(P2));
+   NUM_REG(P1) = exp((NV)INT_REG(P2));
 }
 
 /* pow_n_n_i */
 AUTO_OP pow_n_n_i {
-   NUM_REG(P1) = pow(NUM_REG(P2), INT_REG(P3));
+   NUM_REG(P1) = pow(NUM_REG(P2), (NV)INT_REG(P3));
 }
 
 /* pow_n_i_i */
 AUTO_OP pow_n_i_i {
-   NUM_REG(P1) = pow(INT_REG(P2), INT_REG(P3));
+   NUM_REG(P1) = pow((NV)INT_REG(P2), (NV)INT_REG(P3));
 }
 
 /* pow_n_n_i */
 AUTO_OP pow_n_i_n {
-   NUM_REG(P1) = pow(INT_REG(P2), NUM_REG(P3));
+   NUM_REG(P1) = pow((NV)INT_REG(P2), NUM_REG(P3));
 }
 
 /* AND_i */

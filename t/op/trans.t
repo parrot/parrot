@@ -3,7 +3,7 @@
 use Parrot::Test tests => 18;
 use Math::Trig qw( tan sec atan asin acos asec cosh sinh tanh sech );
 
-output_is( <<"CODE", sprintf( "%f%f", sin(1), sin(1) ), "sin" );
+output_is( <<"CODE", sprintf( "%f%f", sin(1.0), sin(1.0) ), "sin" );
     set N1, 1.0
     sin N2, N1
     print N2
@@ -13,7 +13,7 @@ output_is( <<"CODE", sprintf( "%f%f", sin(1), sin(1) ), "sin" );
     end
 CODE
 
-output_is( <<"CODE", sprintf( "%f%f", cos(1), cos(1) ), "cos" );
+output_is( <<"CODE", sprintf( "%f%f", cos(1.0), cos(1.0) ), "cos" );
     set N1, 1.0
     cos N2, N1
     print N2
@@ -23,7 +23,7 @@ output_is( <<"CODE", sprintf( "%f%f", cos(1), cos(1) ), "cos" );
     end
 CODE
 
-output_is( <<"CODE", sprintf( "%f%f", tan(1), tan(1) ), "tan" );
+output_is( <<"CODE", sprintf( "%f%f", tan(1.0), tan(1.0) ), "tan" );
     set N1, 1.0
     tan N2, N1
     print N2
@@ -33,7 +33,7 @@ output_is( <<"CODE", sprintf( "%f%f", tan(1), tan(1) ), "tan" );
     end
 CODE
 
-output_is( <<"CODE", sprintf( "%f%f", sec(1), sec(1) ), "sec" );
+output_is( <<"CODE", sprintf( "%f%f", sec(1.0), sec(1.0) ), "sec" );
     set N1, 1.0
     sec N2, N1
     print N2
@@ -43,7 +43,7 @@ output_is( <<"CODE", sprintf( "%f%f", sec(1), sec(1) ), "sec" );
     end
 CODE
 
-output_is( <<"CODE", sprintf( "%f%f", atan(1), atan(1) ), "atan" );
+output_is( <<"CODE", sprintf( "%f%f", atan(1.0), atan(1.0) ), "atan" );
     set N1, 1.0
     atan N2, N1
     print N2
@@ -53,7 +53,7 @@ output_is( <<"CODE", sprintf( "%f%f", atan(1), atan(1) ), "atan" );
     end
 CODE
 
-output_is( <<"CODE", sprintf( "%f%f", asin(1), asin(1) ), "asin" );
+output_is( <<"CODE", sprintf( "%f%f", asin(1.0), asin(1.0) ), "asin" );
     set N1, 1.0
     asin N2, N1
     print N2
@@ -63,7 +63,7 @@ output_is( <<"CODE", sprintf( "%f%f", asin(1), asin(1) ), "asin" );
     end
 CODE
 
-output_is( <<"CODE", sprintf( "%f%f", acos(1), acos(1) ), "acos" );
+output_is( <<"CODE", sprintf( "%f%f", acos(1.0), acos(1.0) ), "acos" );
     set N1, 1.0
     acos N2, N1
     print N2
@@ -73,7 +73,7 @@ output_is( <<"CODE", sprintf( "%f%f", acos(1), acos(1) ), "acos" );
     end
 CODE
 
-output_is( <<"CODE", sprintf( "%f%f", asec(1), asec(1) ), "asec" );
+output_is( <<"CODE", sprintf( "%f%f", asec(1.0), asec(1.0) ), "asec" );
     set N1, 1.0
     asec N2, N1
     print N2
@@ -83,7 +83,7 @@ output_is( <<"CODE", sprintf( "%f%f", asec(1), asec(1) ), "asec" );
     end
 CODE
 
-output_is( <<"CODE", sprintf( "%f%f", cosh(1), cosh(1) ), "cosh" );
+output_is( <<"CODE", sprintf( "%f%f", cosh(1.0), cosh(1.0) ), "cosh" );
     set N1, 1.0
     cosh N2, N1
     print N2
@@ -93,7 +93,7 @@ output_is( <<"CODE", sprintf( "%f%f", cosh(1), cosh(1) ), "cosh" );
     end
 CODE
 
-output_is( <<"CODE", sprintf( "%f%f", sinh(1), sinh(1) ), "sinh" );
+output_is( <<"CODE", sprintf( "%f%f", sinh(1.0), sinh(1.0) ), "sinh" );
     set N1, 1.0
     sinh N2, N1
     print N2
@@ -103,7 +103,7 @@ output_is( <<"CODE", sprintf( "%f%f", sinh(1), sinh(1) ), "sinh" );
     end
 CODE
 
-output_is( <<"CODE", sprintf( "%f%f", tanh(1), tanh(1) ), "tanh" );
+output_is( <<"CODE", sprintf( "%f%f", tanh(1.0), tanh(1.0) ), "tanh" );
     set N1, 1.0
     tanh N2, N1
     print N2
@@ -113,7 +113,7 @@ output_is( <<"CODE", sprintf( "%f%f", tanh(1), tanh(1) ), "tanh" );
     end
 CODE
 
-output_is( <<"CODE", sprintf( "%f%f", sech(1), sech(1) ), "sech" );
+output_is( <<"CODE", sprintf( "%f%f", sech(1.0), sech(1.0) ), "sech" );
     set N1, 1.0
     sech N2, N1
     print N2
@@ -123,7 +123,7 @@ output_is( <<"CODE", sprintf( "%f%f", sech(1), sech(1) ), "sech" );
     end
 CODE
 
-output_is( <<'CODE', sprintf( "%f%f%f%f", atan2(1,1), atan2(1,1), atan2(1,1), atan2(1,1) ), "atan2" );
+output_is( <<'CODE', sprintf( "%f%f%f%f", atan2(1.0,1.0), atan2(1.0,1.0), atan2(1.0,1.0), atan2(1.0,1.0) ), "atan2" );
    set N1, 1.0
    set I1, 1
    set N2, 1.0
@@ -139,7 +139,7 @@ output_is( <<'CODE', sprintf( "%f%f%f%f", atan2(1,1), atan2(1,1), atan2(1,1), at
    end
 CODE
 
-output_is( <<"CODE", sprintf( "%f%f", log(10) / log(2), log(10) / log(2) ), "log2" );
+output_is( <<"CODE", sprintf( "%f%f", log(10.0) / log(2.0), log(10.0) / log(2.0) ), "log2" );
         set N1, 10.0
         log2 N2, N1
         print N2
@@ -149,7 +149,7 @@ output_is( <<"CODE", sprintf( "%f%f", log(10) / log(2), log(10) / log(2) ), "log
         end
 CODE
 
-output_is( <<"CODE", sprintf( "%f%f", log(10) / log(10), log(10) / log(10) ), "log10" );
+output_is( <<"CODE", sprintf( "%f%f", log(10.0) / log(10.0), log(10.0) / log(10.0) ), "log10" );
         set N1, 10.0
         log10 N2, N1
         print N2
@@ -159,7 +159,7 @@ output_is( <<"CODE", sprintf( "%f%f", log(10) / log(10), log(10) / log(10) ), "l
         end
 CODE
 
-output_is( <<"CODE", sprintf( "%f%f", log(10), log(10) ), "ln" );
+output_is( <<"CODE", sprintf( "%f%f", log(10.0), log(10.0) ), "ln" );
         set N1, 10.0
         ln N2, N1
         print N2
@@ -169,7 +169,7 @@ output_is( <<"CODE", sprintf( "%f%f", log(10), log(10) ), "ln" );
         end
 CODE
 
-output_is( <<"CODE", sprintf( "%f%f", exp(10), exp(10) ), "exp" );
+output_is( <<"CODE", sprintf( "%f%f", exp(10.0), exp(10.0) ), "exp" );
         set N1, 10.0
         exp N2, N1
         print N2
@@ -179,7 +179,7 @@ output_is( <<"CODE", sprintf( "%f%f", exp(10), exp(10) ), "exp" );
         end
 CODE
 
-output_is( <<'CODE', sprintf( "%f%f%f%f", 3 ** 5, 3 ** 5, 3 ** 5, 3 ** 5 ), "pow" );
+output_is( <<'CODE', sprintf( "%f%f%f%f", 3.0 ** 5.0, 3.0 ** 5.0, 3.0 ** 5.0, 3.0 ** 5.0 ), "pow" );
    set N1, 3.0
    set I1, 3
    set N2, 5.0
