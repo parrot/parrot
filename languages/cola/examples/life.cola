@@ -1,0 +1,67 @@
+// life.cola
+//
+// Game of life
+//
+// Copyright (C) 2002 Melvin Smith
+//
+public class Life {
+    public string generate(string input) {
+        int cell, neighbours;
+        int len = strlen(input);
+        int pos, offset, i;
+        string birth = "   *     ";
+        string death = "  **     ";
+        string output = input;
+        cell = 0; 
+        while(cell < len) {
+            neighbours = 0;
+            if(input[(cell + len - 1) % len] == "*") neighbours++;
+            if(input[(cell + len + 1) % len] == "*") neighbours++;
+            if(input[(cell + len - 16) % len] == "*") neighbours++;
+            if(input[(cell + len + 16) % len] == "*") neighbours++;
+            if(input[(cell + len - 15) % len] == "*") neighbours++;
+            if(input[(cell + len + 15) % len] == "*") neighbours++;
+            if(input[(cell + len - 14) % len] == "*") neighbours++;
+            if(input[(cell + len + 14) % len] == "*") neighbours++;
+            if (input[cell] == "*")
+                output[cell] = death[neighbours];
+            else
+                output[cell] = birth[neighbours];
+            ++cell;
+        } 
+        return output;
+    }
+
+    public void PrintWorld(string world) {
+        int i;
+        for(i = 0; i < 16; i++) {
+            puts(substr(world, i * 16, 16) + "\n");
+        }
+	}
+    
+    static void Main() {
+        string s =  "   **   * * *   " +
+                    " **  *  *       " +
+                    " **  *          " +
+                    "        *       " +
+                    " **  *  *       " +
+                    "     *          " +
+                    "  *     *       " +
+                    "        *       " +
+                    " **  *   *  **  " +
+                    "  *  *  *       " +
+                    " **     *    *  " +
+                    "          *     " +
+                    "  *             " +
+                    " *          *   " +
+                    "     *          " +
+                    "     *         *"
+                    ;
+        int i, j;
+        for(i = 0; i < 1000; i++) {
+            PrintWorld(s);
+	        s = generate(s);
+	        sleep(1);
+	    }
+    }
+}
