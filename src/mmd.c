@@ -672,12 +672,12 @@ static int  mmd_search_builtin(Interp *, STRING *meth, PMC *arg_tuple, PMC *);
 
 =item C<PMC *Parrot_MMD_search_default_inline(Interp *, STRING *meth, STRING *signature, ...)>
 
-Default implementation of MMD lookup. The singature contains the letters
+Default implementation of MMD lookup. The signature contains the letters
 "INSP" for the argument types. B<PMC> arguments are given in the function call.
 
 =item C<PMC *Parrot_MMD_search_default_func(Interp *, STRING *meth, STRING *signature)>
 
-Default implementation of MMD lookup. The singature contains the letters
+Default implementation of MMD lookup. The signature contains the letters
 "INSP" for the argument types. B<PMC> arguments are taken from registers
 C<P5> and up according to calling conventions.
 
@@ -714,7 +714,7 @@ Parrot_MMD_search_default_inline(Interp *interpreter, STRING *meth,
 =item C<
 static PMC* mmd_arg_tuple_inline(Interp *, STRING *signature, va_list args)>
 
-Return a list of argument types. PMC arguments are specifiec as function
+Return a list of argument types. PMC arguments are specified as function
 arguments.
 
 =cut
@@ -731,22 +731,27 @@ mmd_arg_tuple_inline(Interp *interpreter, STRING *signature, va_list args)
     sig_len = string_length(interpreter, signature);
     if (!sig_len)
         return arg_tuple;
+    VTABLE_set_integer_native(interpreter, arg_tuple, sig_len);
     for (i = 0; i < sig_len; ++i) {
         type = string_index(interpreter, signature, i);
         switch (type) {
             case 'I':
-                VTABLE_push_integer(interpreter, arg_tuple, enum_type_INTVAL);
+                VTABLE_set_integer_keyed_int(interpreter, arg_tuple,
+                        i, enum_type_INTVAL);
                 break;
             case 'N':
-                VTABLE_push_integer(interpreter, arg_tuple, enum_type_FLOATVAL);
+                VTABLE_set_integer_keyed_int(interpreter, arg_tuple,
+                        i, enum_type_FLOATVAL);
                 break;
             case 'S':
-                VTABLE_push_integer(interpreter, arg_tuple, enum_type_STRING);
+                VTABLE_set_integer_keyed_int(interpreter, arg_tuple,
+                        i, enum_type_STRING);
                 break;
             case 'P':
                 arg = va_arg(args, PMC *);
                 type = VTABLE_type(interpreter, arg);
-                VTABLE_push_integer(interpreter, arg_tuple, type);
+                VTABLE_set_integer_keyed_int(interpreter, arg_tuple,
+                        i, type);
                 break;
             default:
                 internal_exception(1,
@@ -919,6 +924,16 @@ the MMD search should stop.
 static int
 mmd_search_package(Interp *interpreter, STRING *meth, PMC *arg_tuple, PMC *cl)
 {
+    STRING *name_space = interpreter->ctx.current_package;
+    PMC *pmc;
+
+    if (!name_space)
+        return 0;
+    pmc = Parrot_find_global(interpreter, name_space, meth);
+    if (pmc) {
+        if (mmd_maybe_candidate(interpreter, pmc, arg_tuple, cl))
+            return 1;
+    }
     return 0;
 }
 
@@ -934,6 +949,13 @@ the MMD search should stop.
 static int
 mmd_search_global(Interp *interpreter, STRING *meth, PMC *arg_tuple, PMC *cl)
 {
+    PMC *pmc;
+
+    pmc = Parrot_find_global(interpreter, NULL, meth);
+    if (pmc) {
+        if (mmd_maybe_candidate(interpreter, pmc, arg_tuple, cl))
+            return 1;
+    }
     return 0;
 }
 

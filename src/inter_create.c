@@ -203,7 +203,7 @@ make_interpreter(Parrot_Interp parent, Interp_flags flags)
     /* Set up defaults for line/package/file */
     interpreter->current_file =
         string_make(interpreter, "(unknown file)", 14, "iso-8859-1", 0);
-    interpreter->current_package =
+    interpreter->ctx.current_package =
         string_make(interpreter, "(unknown package)", 18, "iso-8859-1", 0);;
 
     SET_NULL_P(interpreter->code, struct PackFile *);

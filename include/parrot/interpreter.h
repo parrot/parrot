@@ -183,6 +183,7 @@ typedef struct Parrot_Context {
     UINTVAL current_class_offset; /* Offset into the class array of the
                                     currently found method */
     opcode_t *current_pc;       /* program counter of Sub invocation */
+    String *current_package;    /* The package we're currently in */
 } parrot_context_t;
 
 struct _Thread_data;    /* in thread.h */
@@ -252,7 +253,6 @@ struct parrot_interp_t {
     size_t current_line;        /* Which line we're executing in the
                                  * source */
     String *current_file;       /* The file we're currently in */
-    String *current_package;    /* The package we're currently in */
 
 
     PDB_t *pdb;                 /* Debug system */

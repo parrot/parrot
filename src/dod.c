@@ -506,8 +506,6 @@ trace_active_buffers(Interp *interpreter)
     /* The interpreter has a few strings of its own */
     if (interpreter->current_file)
         pobject_lives(interpreter, (PObj *)interpreter->current_file);
-    if (interpreter->current_package)
-        pobject_lives(interpreter, (PObj *)interpreter->current_package);
 }
 
 #ifdef GC_IS_MALLOC

@@ -92,6 +92,9 @@ mark_context(Interp* interpreter, struct Parrot_Context* ctx)
     obj = (PObj*)ctx->current_method;
     if (obj)
         pobject_lives(interpreter, obj);
+    obj = (PObj*)ctx->current_package;
+    if (obj)
+        pobject_lives(interpreter, obj);
 }
 
 /*

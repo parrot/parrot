@@ -12,13 +12,12 @@ t/pmc/multisub.t - Multi Sub PMCs
 
 =head1 DESCRIPTION
 
-Tests the creation and invocation Perl6 multi subs.
+Tests the creation and invocation of Perl6 multi subs.
 
 =cut
 
 use Parrot::Test tests => 1;
 use Test::More;
-use Parrot::Config;
 
 output_is(<<'CODE', <<'OUTPUT', "create PMC");
     new P0, .MultiSub

@@ -934,7 +934,7 @@ Set the name of the package for which we're currently executing code.
 =cut
 
 inline op setpackage(in STR) {
-  interpreter->current_package = $1;
+  interpreter->ctx.current_package = $1;
   goto NEXT();
 }
 
@@ -945,7 +945,7 @@ Get the name of the current package.
 =cut
 
 inline op getpackage(out STR) {
-  $1 = interpreter->current_package;
+  $1 = interpreter->ctx.current_package;
   goto NEXT();
 }
 
