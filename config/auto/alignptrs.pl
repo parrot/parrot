@@ -9,6 +9,7 @@ $description="Determining your minimum pointer alignment...";
 @args=qw();
 
 sub runstep {
+  return if (defined(Configure::Data->get('ptr_alignment')));
   cc_gen('config/auto/alignptrs/test_c.in');
   cc_build();
   my $results=cc_run();

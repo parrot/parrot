@@ -1,3 +1,4 @@
 Configure::Data->set(
-  ld => "cc"
+  ld => "cc",
+  ptr_alignment => 8
 );
