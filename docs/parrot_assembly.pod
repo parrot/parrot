@@ -251,7 +251,7 @@ Pop the location off the top of the stack and go there.
 
 =head2 Data manipulation
 
-These ops handle manipulating the data in registers
+These ops handle manipulating the data in registers.
 
 =over 4
 
@@ -267,7 +267,7 @@ The following cases provide exceptions to this rule:
 
 =item set Px, Py
 
-Copies the pmc pointer in Py into Px, both registers now refer to
+Copies the pmc pointer in Py into Px.  Both registers now refer to
 the B<same> pmc.  Use L<clone> to copy pmc contents.
 
 =item clone Px, Py
@@ -283,13 +283,13 @@ storing the result in string register x.
 =item add tx, ty, tz *
 
 Add registers y and z and store the result in register
-x. (x = y + z) The registers must all be the same type, PMC, integer,
+x. (x = y + z) The registers must all be the same type: PMC, integer,
 or number.
 
 =item sub tx, ty, tz *
 
 Subtract register z from register y and store the result in register
-x. (x = y - z) The registers must all be the same type, PMC, integer,
+x. (x = y - z) The registers must all be the same type: PMC, integer,
 or number.
 
 =item mul tx, ty, tz *
@@ -335,85 +335,85 @@ register.
 
 =item sin nx, ty
 
-Return the sine of the number in Y
+Return the sine of the number in Y.
 
 =item cos nx, ty
 
-Return the cosine of the number in Y
+Return the cosine of the number in Y.
 
 =item tan nx, ty
 
-Return the tangent of the number in Y
+Return the tangent of the number in Y.
 
 =item sec nx, ty
 
-Return the secant of the number in Y
+Return the secant of the number in Y.
 
 =item atan nx, ty
 
-Return the arctangent of Y
+Return the arctangent of Y.
 
 =item atan2 nx, ty
 
-Return the result of atan2 of Y
+Return the result of atan2 of Y.
 
 =item asin nx, ty
 
-Return the arcsine of y
+Return the arcsine of y.
 
 =item acos nx, ty
 
-Return the arccosine of y
+Return the arccosine of y.
 
 =item asec nx, ty
 
-Return the arcsecant of y
+Return the arcsecant of y.
 
 =item cosh nx, ty
 
-Return the hyperbolic cosine of y
+Return the hyperbolic cosine of y.
 
 =item sinh nx, ty
 
-Return the hyperbolic sine of y
+Return the hyperbolic sine of y.
 
 =item tanh nx, ty
 
-Return the hyperbolic tangent of y
+Return the hyperbolic tangent of y.
 
 =item sech nx, ty
 
-Return the hyperbolic secant of y
+Return the hyperbolic secant of y.
 
 =item log2 nx, ty
 
-Return the base 2 log of y
+Return the base 2 log of y.
 
 =item log10 nx, ty
 
-Return the base 10 log of y
+Return the base 10 log of y.
 
 =item ln Nx, ty
 
-Return the base e log of y
+Return the base e log of y.
 
 =item log nx, ty, tz
 
-Return the base Z log of Y
+Return the base Z log of Y.
 
 =item pow nx, ty, tz
 
-Return Y to the Z power
+Return Y to the Z power.
 
 =item exp nx, ty
 
-Return e to the Y power
+Return e to the Y power.
 
 =back
 
 =head2 Register and stack ops
 
-These opcodes deal with registers and stacks
+These opcodes deal with registers and stacks.
 
 =over 4
 
@@ -469,39 +469,39 @@ The same as L<pop_p>, for the floating-point register set.
 
 =item save_i Ix
 
-Push register X onto the generic stack
+Push register X onto the generic stack.
 
 =item save_s Sx
 
-Push register X onto the generic stack
+Push register X onto the generic stack.
 
 =item save_p Px
 
-Push register X onto the generic stack
+Push register X onto the generic stack.
 
 =item save_n Nx
 
-Push register X onto the generic stack
+Push register X onto the generic stack.
 
 =item restore_i Ix
 
-Restore register X from the generic stack
+Restore register X from the generic stack.
 
 =item restore_s Ix
 
-Restore register X from the generic stack
+Restore register X from the generic stack.
 
 =item restore_p Px
 
-Restore register X from the generic stack
+Restore register X from the generic stack.
 
 =item restore_n Nx
 
-Restore register X from the generic stack
+Restore register X from the generic stack.
 
 =item entrytype Ix, iy
 
-Put the type of stack entry Y into integer register X
+Put the type of stack entry Y into integer register X.
 
 =item set_warp string
 
@@ -545,7 +545,7 @@ Find the lexical of name sy and store the PMC pointer in register Px.
 =item find_global Px, sy, sz
 
 Find the PMC for the global variable sy from the table sz and store it
-in register X
+in register X.
 
 =item find_global Px, sy
 
@@ -553,7 +553,7 @@ Find the PMC for the global in the default table and put it in X.
 
 =item find_global_table Px, sy
 
-Find the global symbol table Y and store its PMC in X
+Find the global symbol table Y and store its PMC in X.
 
 =item find_global_slot ix, Py, sz
 
@@ -562,13 +562,13 @@ its slot in register X.
 
 =item fetch_lex Px, iy, iz
 
-Fetch the lexical in slot y of scratchpad z. If z is negative, search
+Fetch the lexical in slot y of scratchpad z. If Z is negative, search
 out from the current pad, if positive search inwards from the
-outermost pad. Put the resulting PMC pointer in register x
+outermost pad. Put the resulting PMC pointer in register x.
 
 =item fetch_global Px, Py, iz
 
-Fetch the global in slot Z of the symbol table pointed to by Y
+Fetch the global in slot Z of the symbol table pointed to by Y.
 
 =item store_global Px, sy
 
@@ -596,11 +596,11 @@ handler is in scope.
 
 =item clear_eh
 
-Clear out the most recently placed exception 
+Clear out the most recently placed exception.
 
 =item throw Px
 
-Throw an exception represented by the object in PMC register x. 
+Throw an exception represented by the object in PMC register x.
 
 =item rethrow Px
 
@@ -641,8 +641,8 @@ Find the method Z for object Y, and return a PMC for it in X.
 =head2 Module handling
 
 These opcodes deal with loading in bytecode or executable code
-libraries, and fetching info about those libraries. This is all
-dealing with precompiled bytecode or shared libraries.
+libraries, and fetching info about those libraries. This all
+pertains to precompiled bytecode or shared libraries.
 
 =over 4
 
@@ -657,15 +657,15 @@ path if needed.
 
 =item load_string_lib sx
 
-Load in the string handling library named X
+Load in the string handling library named X.
 
 =item get_op_count sx
 
-Return the number of opcodes in opcode library X
+Return the number of opcodes in opcode library X.
 
 =item get_string_name sx
 
-Get the name of the string encoding that the library X handles
+Get the name of the string encoding that the library X handles.
 
 =item find_string_lib sx, sy
 
@@ -682,11 +682,11 @@ Reads and writes read and write records, for some value of record.
 
 =item new_fh px
 
-Create a new filehandle px
+Create a new filehandle px.
 
 =item open px, sy
 
-Open the file Y on filehandle X
+Open the file Y on filehandle X.
 
 =item read px, py, pz
 
@@ -699,7 +699,7 @@ Write the string Y to filehandle X. PMC Z is the sync object.
 
 =item wait px
 
-Wait for the I/O operation represented by sync object X to finish
+Wait for the I/O operation represented by sync object X to finish.
 
 =item readw px, py
 
@@ -712,13 +712,13 @@ Write string Y to filehandle X, waiting for the write to complete.
 
 =item seek px, ty
 
-Seek filehndle X to position Y.
+Seek filehandle X to position Y.
 
 =item tell tx, py
 
 Return the current position of filehandle Y and put it in X. Returns
--1 for filehandles where this can't be determined. (Such as stream
-connections)
+-1 for filehandles where this can't be determined, such as stream
+connections.
 
 =item status px, py, tz
 
@@ -735,15 +735,15 @@ forth.
 
 =item * lock Px
 
-Take out a high-level lock on the PMC in register X
+Take out a high-level lock on the PMC in register X.
 
 =item * unlock Px
 
-Unlock the PMC in register X
+Unlock the PMC in register X.
 
 =item * pushunlock Px
 
-Push an unlock request on the stack
+Push an unlock request on the stack.
 
 =back
 
@@ -758,11 +758,11 @@ Create a new interpreter in X, using the passed flags.
 =item * runinterp Px, iy
 
 Jump into interpreter X and run the code starting at offset Y from the
-current location. (This is temporary until we get something better)
+current location. (This is temporary until we get something better.)
 
 =item * callout Pw, Px, sy, pz
 
-Call routine Y in interpreter x, passing it the list of parameters
+Call routine Y in interpreter X, passing it the list of parameters
 Z. V is a synchronization object returned. It can be waited on like
 the sync objects returned from async I/O routines.
 
@@ -774,11 +774,11 @@ the sync objects returned from async I/O routines.
 
 =item sweep
 
-Fire off a dead object sweep
+Fire off a dead object sweep.
 
 =item collect
 
-Fire off a garbage collection sweep
+Fire off a garbage collection sweep.
 
 =item pausecollect
 
@@ -814,7 +814,7 @@ be either an S register or a constant.
 
 =item size_key Sx, iy
 
-Make the key structure X large enough to hold Y key entries
+Make the key structure X large enough to hold Y key entries.
 
 =item key_size Ix, ky
 
