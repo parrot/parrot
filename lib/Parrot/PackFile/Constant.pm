@@ -110,7 +110,8 @@ sub unpack
 
   my ($flags, $encoding, $type, $size) = unpack('l l l l', $string);
 
-  my $block_size = $size + ($size % 4);
+  my $under      = ($size % 4) ? 4 - ($size % 4) : 0;
+  my $block_size = $size + $under;
   my $data       = unpack("x16 a$block_size", $string);
 
   $self->{FLAGS}    = $flags;
@@ -131,7 +132,9 @@ sub pack
 {
   my $self = shift;
   
-  my $block = $self->data . ("\0" x ($self->size % 4));
+  my $size  = $self->size;
+  my $under = ($size % 4) ? 4 - ($size % 4) : 0;
+  my $block = $self->data . ("\0" x $under);
 
   return pack('l l l l a*', $self->flags, $self->encoding, $self->type, $self->size,
     $block);

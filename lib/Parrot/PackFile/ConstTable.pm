@@ -16,6 +16,8 @@ use strict;
 
 package Parrot::PackFile::ConstTable;
 
+use Carp;
+
 use Parrot::PackFile::Constant;
 
 my $template = "l/(l l l l/a*)*";
@@ -66,6 +68,10 @@ sub unpack
   for (1..$count) {
     my $const = new Parrot::PackFile::Constant;
     my $used = $const->unpack($string);
+
+    confess "PackFile::ConstTable: Internal error: Unpacked Constant returned bad byte count '$used'!"
+      unless defined($used) and $used > 0 and $used <= length $string;
+    
     $string = substr($string, $used);
 
     push @{$self->{CONST}}, $const;
