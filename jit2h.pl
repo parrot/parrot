@@ -84,6 +84,9 @@ sub readjit($) {
 		    my $tbody = $body;
 		    while ($asm =~ s/\b(s(.).+?\2.*?\2)(?:\s+)?//) {
 			eval "\$tbody =~ ${1}g";
+			if ($@) {
+			    die "error in template subst: $@\n";
+			}
 		    }
 		    $asm = $tbody;
 		    # reset iterator for next run

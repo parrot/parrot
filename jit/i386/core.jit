@@ -811,7 +811,7 @@ Parrot_eq_i_ic_ic {
 }
 
 Parrot_eq_n_nc_ic {
-    Parrot_cmp_x_xc_ic s/<_N>/_n/ s/<je>/emitm_je/ s/<typ>/&NUM/ s/ISR/FSR/
+    Parrot_cmp_x_xc_ic s/<_N>/_n/ s/<je>/emitm_je/ s/<typ>/&NUM/ s/ISR/FSR/ s/INT_R/NUM_R/
 }
 
 Parrot_ne_i_ic_ic {
@@ -819,7 +819,7 @@ Parrot_ne_i_ic_ic {
 }
 
 Parrot_ne_n_nc_ic {
-    Parrot_cmp_x_xc_ic s/<_N>/_n/ s/<je>/emitm_jne/ s/<typ>/&NUM/ s/ISR/FSR/
+    Parrot_cmp_x_xc_ic s/<_N>/_n/ s/<je>/emitm_jne/ s/<typ>/&NUM/ s/ISR/FSR/ s/INT_R/NUM_R/
 }
 
 Parrot_gt_i_ic_ic {
@@ -827,7 +827,7 @@ Parrot_gt_i_ic_ic {
 }
 
 Parrot_gt_n_nc_ic {
-    Parrot_cmp_x_xc_ic s/<_N>/_n/ s/<je>/emitm_ja/ s/<typ>/&NUM/ s/ISR/FSR/
+    Parrot_cmp_x_xc_ic s/<_N>/_n/ s/<je>/emitm_ja/ s/<typ>/&NUM/ s/ISR/FSR/ s/INT_R/NUM_R/
 }
 
 Parrot_ge_i_ic_ic {
@@ -835,7 +835,7 @@ Parrot_ge_i_ic_ic {
 }
 
 Parrot_ge_n_nc_ic {
-    Parrot_cmp_x_xc_ic s/<_N>/_n/ s/<je>/emitm_jnb/ s/<typ>/&NUM/ s/ISR/FSR/
+    Parrot_cmp_x_xc_ic s/<_N>/_n/ s/<je>/emitm_jnb/ s/<typ>/&NUM/ s/ISR/FSR/ s/INT_R/NUM_R/
 }
 
 Parrot_lt_i_ic_ic {
@@ -843,7 +843,7 @@ Parrot_lt_i_ic_ic {
 }
 
 Parrot_lt_n_nc_ic {
-    Parrot_cmp_x_xc_ic s/<_N>/_n/ s/<je>/emitm_jb/ s/<typ>/&NUM/ s/ISR/FSR/
+    Parrot_cmp_x_xc_ic s/<_N>/_n/ s/<je>/emitm_jb/ s/<typ>/&NUM/ s/ISR/FSR/ s/INT_R/NUM_R/
 }
 
 Parrot_le_i_ic_ic {
@@ -851,7 +851,7 @@ Parrot_le_i_ic_ic {
 }
 
 Parrot_le_n_nc_ic {
-    Parrot_cmp_x_xc_ic s/<_N>/_n/ s/<je>/emitm_jbe/ s/<typ>/&NUM/ s/ISR/FSR/
+    Parrot_cmp_x_xc_ic s/<_N>/_n/ s/<je>/emitm_jbe/ s/<typ>/&NUM/ s/ISR/FSR/ s/INT_R/NUM_R/
 }
 
 TEMPLATE Parrot_cmp_xc_x_ic {
@@ -921,7 +921,7 @@ TEMPLATE Parrot_cmp_x_x_ic {
         jit_emit_cmp_rm<_N>(NATIVECODE, MAP[1], <typ>_REG[2]);
     }
     else if (MAP[2]) {
-        jit_emit_cmpr_mr<_N>(NATIVECODE, <typ>_REG[2], MAP[1]);
+        jit_emit_cmpr_mr<_N>(NATIVECODE, <typ>_REG[1], MAP[2]);
     }
     else {
         jit_emit_mov_rm<_N>(NATIVECODE, ISR1, <typ>_REG[1]);
@@ -931,7 +931,7 @@ TEMPLATE Parrot_cmp_x_x_ic {
 }
 
 Parrot_eq_i_i_ic {
-    Parrot_cmp_x_x_ic s/<_N>/_i/ s/<je>/emitm_je/ s/<typ>/*INT/
+    Parrot_cmp_x_x_ic s/<_N>/_i/ s/<je>/emitm_je/ s/<typ>/&INT/
 }
 
 Parrot_eq_n_n_ic {
@@ -939,7 +939,7 @@ Parrot_eq_n_n_ic {
 }
 
 Parrot_ne_i_i_ic {
-    Parrot_cmp_x_x_ic s/<_N>/_i/ s/<je>/emitm_jne/ s/<typ>/*INT/
+    Parrot_cmp_x_x_ic s/<_N>/_i/ s/<je>/emitm_jne/ s/<typ>/&INT/
 }
 
 Parrot_ne_n_n_ic {
@@ -947,7 +947,7 @@ Parrot_ne_n_n_ic {
 }
 
 Parrot_gt_i_i_ic {
-    Parrot_cmp_x_x_ic s/<_N>/_i/ s/<je>/emitm_jg/ s/<typ>/*INT/
+    Parrot_cmp_x_x_ic s/<_N>/_i/ s/<je>/emitm_jg/ s/<typ>/&INT/
 }
 
 Parrot_gt_n_n_ic {
@@ -955,7 +955,7 @@ Parrot_gt_n_n_ic {
 }
 
 Parrot_ge_i_i_ic {
-    Parrot_cmp_x_x_ic s/<_N>/_i/ s/<je>/emitm_jnl/ s/<typ>/*INT/
+    Parrot_cmp_x_x_ic s/<_N>/_i/ s/<je>/emitm_jnl/ s/<typ>/&INT/
 }
 
 Parrot_ge_n_n_ic {
@@ -963,7 +963,7 @@ Parrot_ge_n_n_ic {
 }
 
 Parrot_lt_i_i_ic {
-    Parrot_cmp_x_x_ic s/<_N>/_i/ s/<je>/emitm_jl/ s/<typ>/*INT/
+    Parrot_cmp_x_x_ic s/<_N>/_i/ s/<je>/emitm_jl/ s/<typ>/&INT/
 }
 
 Parrot_lt_n_n_ic {
@@ -971,7 +971,7 @@ Parrot_lt_n_n_ic {
 }
 
 Parrot_le_i_i_ic {
-    Parrot_cmp_x_x_ic s/<_N>/_i/ s/<je>/emitm_jle/ s/<typ>/*INT/
+    Parrot_cmp_x_x_ic s/<_N>/_i/ s/<je>/emitm_jle/ s/<typ>/&INT/
 }
 
 Parrot_le_n_n_ic {
