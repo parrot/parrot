@@ -33,7 +33,7 @@ main(int argc, char *argv[])
         return 1;
     }
 
-    Parrot_init(interpreter);
+    Parrot_init(interpreter, (void*) &interpreter);
 
     if (argc != 2) {
         fprintf(stderr, "Usage: disassemble programfile \n");

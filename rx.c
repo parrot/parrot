@@ -27,10 +27,10 @@ const char *RX_NEWLINES = "\r\n";       /* XXX Unicode defines a few more. */
  *               Initial version by Brent Dax                *
  *************************************************************/
 
-rxinfo *
-rx_allocate_info(struct Parrot_Interp *interpreter, STRING *string)
+void
+rx_allocate_info(struct Parrot_Interp *interpreter, STRING *string, void ** info)
 {
-    rxinfo *rx = mem_sys_allocate(sizeof(rxinfo));
+    rxinfo *rx = *info = mem_sys_allocate(sizeof(rxinfo));
 
     rx->minlength = rx->index = rx->startindex = 0;
     rx->flags = enum_rxflags_none;
@@ -45,8 +45,15 @@ rx_allocate_info(struct Parrot_Interp *interpreter, STRING *string)
 
     string_transcode(interpreter, rx->string, encoding_lookup("utf32"),
                      rx->string->type, &rx->string);
+}
 
-    return rx;
+PMC* rx_mark(struct Parrot_Interp* interp, void* info, PMC* last)
+{
+    rxinfo *rx = (rxinfo *) info;
+    if (rx->string) buffer_lives((Buffer *)rx->string);
+    if (rx->groupstart) last = mark_used(rx->groupstart, last);
+    if (rx->groupend) last = mark_used(rx->groupend, last);
+    return last;
 }
 
 INTVAL

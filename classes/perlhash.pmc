@@ -91,7 +91,8 @@ pmclass PerlHash {
 	}
 
 	ret->vtable = &(Parrot_base_vtables[enum_class_PerlHash]);
-	ret->data = hash_clone(INTERP, (HASH *)SELF->data);
+        ret->flags |= PMC_custom_mark_FLAG;
+        hash_clone(INTERP, (HASH *)SELF->data, (HASH **)&ret->data);
 	return ret;
     }
     

@@ -431,7 +431,7 @@ output_is(<<'CODE', <<OUTPUT, "Testing clone");
     set P1["a"], "A"
     
     # P0 = { a => "a", b => [undef, undef, undef], c => 4 }
-    # P0 = { a => "A", b => [undef, undef] }
+    # P1 = { a => "A", b => [undef, undef] }
 
     set S0, P0["a"]
     eq S0, "a", ok1

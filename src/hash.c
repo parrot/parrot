@@ -127,7 +127,7 @@ mark_hash(Interp *interpreter, HASH *hash, PMC *end_of_used_list)
 
     buffer_lives((Buffer *)hash);
 
-    if(hash->bucket_pool){
+    if(hash->bucket_pool) {
         buffer_lives(hash->bucket_pool);
     }
 
@@ -288,6 +288,8 @@ find_bucket(Interp *interpreter, HASH* hash, BucketIndex head, STRING *key)
     return NULL;
 }
 
+/* FIXME: This function can go back to just returning the hash struct
+ * pointer once Buffers can define their own custom mark routines. */
 void
 new_hash(Interp *interpreter, HASH **hash_ptr)
 {
@@ -421,12 +423,12 @@ hash_delete(Interp *interpreter, HASH *hash, STRING *key)
     PANIC("hash_delete given nonexistent key");
 }
 
-HASH *
-hash_clone(struct Parrot_Interp * interp, HASH * hash) {
-    HASH *ret;
+void
+hash_clone(struct Parrot_Interp * interp, HASH * hash, HASH ** clone)
+{
     BucketIndex* table = (BucketIndex*) hash->buffer.bufstart;
     BucketIndex i;
-    new_hash(interp, &ret);
+    new_hash(interp, clone);
     for (i = 0; i <= hash->max_chain; i++) {
         HASHBUCKET * b = lookupBucket(hash, i);
         while (b) {
@@ -442,23 +444,24 @@ hash_clone(struct Parrot_Interp * interp, HASH * hash) {
                 valtmp.type = enum_key_string;
                 valtmp.val.string_val
                     = string_copy(interp, b->value.val.string_val);
+                b = lookupBucket(hash, i);
                 break;
 
             case enum_key_pmc:
                 valtmp.type = enum_key_pmc;
                 valtmp.val.pmc_val = b->value.val.pmc_val->vtable->clone(
                     interp, b->value.val.pmc_val);
+                b = lookupBucket(hash, i);
                 break;
 
             default:
                 internal_exception(-1, "hash corruption: type = %d\n",
                                    b->value.type);
             };
-            hash_put(interp, ret, b->key, &valtmp);
+            hash_put(interp, *clone, b->key, &valtmp);
             b = getBucket(hash, b->next);
         }
     }
-    return ret;
 }
 
 /*

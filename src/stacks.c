@@ -33,8 +33,12 @@ new_stack(Interp *interpreter)
     /* Set buffer to null before allocation which might call GC */
     stack->buffer = NULL;
     stack->buffer = new_buffer_header(interpreter);
+
+    /* Block DOD from murdering our newly allocated stack->buffer. */
+    interpreter->DOD_block_level++;
     Parrot_allocate(interpreter, stack->buffer,
                     sizeof(Stack_Entry_t) * STACK_CHUNK_DEPTH);
+    interpreter->DOD_block_level--;
 
 #ifdef TIDY
     entry = (Stack_Entry_t *)stack->buffer->bufstart;

@@ -67,7 +67,8 @@ typedef struct rxinfo {
 } rxinfo;
 
 
-rxinfo *rx_allocate_info(struct Parrot_Interp *, STRING *);
+void rx_allocate_info(struct Parrot_Interp *, STRING *, void ** data);
+PMC* rx_mark(struct Parrot_Interp *, void* info, PMC* last);
 
 INTVAL rx_is_word_character(struct Parrot_Interp *, INTVAL ch);
 INTVAL rx_is_number_character(struct Parrot_Interp *, INTVAL ch);

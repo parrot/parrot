@@ -21,7 +21,7 @@ typedef struct _hashbucket HASHBUCKET;
 typedef struct _hash HASH;
 
 void new_hash(Interp * interpreter, HASH **hash_ptr);
-HASH *hash_clone(Interp * interpreter, HASH * hash);
+void hash_clone(Interp * interpreter, HASH * src, HASH **clone);
 INTVAL hash_size(Interp * interpreter, HASH *hash);
 void hash_set_size(Interp * interpreter, HASH *hash, UINTVAL size);
 void hash_destroy(Interp * interpreter, HASH *hash);

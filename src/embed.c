@@ -35,7 +35,7 @@ Parrot_new(void)
 }
 
 void
-Parrot_init(struct Parrot_Interp *interpreter)
+Parrot_init(struct Parrot_Interp *interpreter, void* stacktop)
 {
     /* This function currently unused, but is here in case we need it later. */
 
@@ -44,6 +44,8 @@ Parrot_init(struct Parrot_Interp *interpreter)
         world_inited = 1;
         init_world();
     }
+
+    if (stacktop) interpreter->lo_var_ptr = stacktop;
 }
 
 void
@@ -237,11 +239,9 @@ Parrot_loadbc(struct Parrot_Interp *interpreter, struct PackFile *pf)
 void
 Parrot_runcode(struct Parrot_Interp *interpreter, int argc, char *argv[])
 {
-    void *dummy_ptr;
     INTVAL i;
     PMC *userargv;
     KEY key;
-    interpreter->lo_var_ptr = &dummy_ptr;
 
     /* Debugging mode nonsense. */
     if (Interp_flags_TEST(interpreter, PARROT_DEBUG_FLAG)) {
@@ -289,6 +289,7 @@ Parrot_runcode(struct Parrot_Interp *interpreter, int argc, char *argv[])
     key.atom.type = enum_key_int;
     key.next = NULL;
 
+    userargv->vtable->set_integer_native(interpreter, userargv, (INTVAL) argc);
     for (i = 0; i < argc; i++) {
         /* Run through argv, adding everything to @ARGS. */
         STRING *arg = string_make(interpreter, argv[i], strlen(argv[i]),

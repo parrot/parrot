@@ -25,6 +25,7 @@ static void version(void);
 int
 main(int argc, char *argv[])
 {
+    int dummy_var;
     Parrot_Interp interpreter;
     char *filename;
     Parrot_PackFile pf;
@@ -35,7 +36,7 @@ main(int argc, char *argv[])
         return 1;
     }
 
-    Parrot_init(interpreter);
+    Parrot_init(interpreter, (void*) &dummy_var);
 
     filename = parseflags(interpreter, &argc, &argv);
 

@@ -10,6 +10,7 @@
  *  References:
  */
 
+#include <assert.h>
 #include "parrot/parrot.h"
 #include "parrot/interp_guts.h"
 #include "parrot/oplib/core_ops.h"
@@ -573,9 +574,11 @@ make_interpreter(Interp_flags flags)
 
     /* Need a user stack */
     interpreter->ctx.user_stack = new_stack(interpreter);
+    assert(interpreter->ctx.user_stack->buffer != interpreter->ctx.pad_stack->buffer);
 
     /* And a control stack */
     interpreter->ctx.control_stack = new_stack(interpreter);
+    assert(interpreter->ctx.control_stack->buffer != interpreter->ctx.user_stack->buffer);
 
     /* A regex stack would be nice too. */
     interpreter->ctx.intstack = intstack_new(interpreter);
