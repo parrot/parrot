@@ -8,7 +8,7 @@ package Parrot::Jit::i386Generic;
 
 use IO::File;
 
-use constant DEBUG   => 0;
+use constant DEBUG   => 1;
 
 use constant TMP_OBJ => "t.o";
 use constant TMP_AS  => "t.s";
@@ -189,7 +189,7 @@ sub disassemble($$$$) {
     # FIXME
     $result =~ s/\\x00 \\x00 $// unless $result =~ m/\\x0f \\x82 \\x00 \\x00 \\x00 \\x00/;
     # These 2 are OK by now.
-    $result =~ s/\\x\w\w \\xff \\xff \\xff JUMP/JUMP/g;
+    $result =~ s/\\xff \\xff \\x00 \\x00 JUMP/JUMP/g;
     $result =~ s/\\x00 JUMP/JUMP/g;
 
     if (defined($Parrot::Jit::Correct_objdump_output)) {
