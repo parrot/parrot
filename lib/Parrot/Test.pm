@@ -84,9 +84,9 @@ sub generate_pbc_for {
 }
 
 # Map the Parrot::Test function to a Test::Builder method.
-my %Test_Map = ( output_is   => 'is_eq', 
-                 output_isnt => 'isnt_eq', 
-                 output_like => 'like' 
+my %Test_Map = ( output_is   => 'is_eq',
+                 output_isnt => 'isnt_eq',
+                 output_like => 'like'
                );
 
 my $count = 0;
@@ -138,15 +138,15 @@ sub generate_functions {
     }
   }
 
-  my %C_Test_Map = ( c_output_is   => 'is_eq', 
-                     c_output_isnt => 'isnt_eq', 
-                     c_output_like => 'like' 
+  my %C_Test_Map = ( c_output_is   => 'is_eq',
+                     c_output_isnt => 'isnt_eq',
+                     c_output_like => 'like'
                    );
 
   foreach my $func ( keys %C_Test_Map ) {
     no strict 'refs';
 
-    *{'Parrot::Test::'.$func} = sub ($$;$) {
+    *{$package.'::'.$func} = sub ($$;$) {
       my( $source, $output, $desc ) = @_;
 
       ++$count;
