@@ -131,6 +131,78 @@ Return SELF.
     PMC* get_class() {
         return SELF;
     }
+
+/*
+
+=item C<void visit(visit_info *info)>
+
+This is used by freeze/thaw to visit the contents of the class.
+
+C<*info> is the visit info, (see F<include/parrot/pmc_freeze.h>).
+
+=item C<void freeze(visit_info *info)>
+
+Used to archive the class.
+
+=item C<void thaw(visit_info *info)>
+
+Used to unarchive the class.
+
+=cut
+
+*/
+
+    void visit(visit_info *info) {
+        INTVAL i, n;
+        PMC **class_data, **pos;
+
+        class_data = (PMC **)PMC_data(SELF);
+
+        /* 2) direct parents array */
+        pos = class_data + PCD_PARENTS;
+        info->thaw_ptr = pos;
+        (info->visit_pmc_now)(interpreter, *pos, info);
+        /* 3) attributes */
+        pos = class_data + PCD_ATTRIBUTES;
+        info->thaw_ptr = pos;
+        (info->visit_pmc_now)(interpreter, *pos, info);
+        SUPER(info);
+    }
+
+    void freeze(visit_info *info) {
+        IMAGE_IO *io = info->image_io;
+        PMC **class_data, **pos;
+
+        SUPER(info);
+        class_data = (PMC **)PMC_data(SELF);
+        /* 1) freeze class name */
+        pos = class_data + PCD_CLASS_NAME;
+        io->vtable->push_string(INTERP, io,
+                VTABLE_get_string(INTERP, *pos));
+    }
+
+    void thaw(visit_info *info) {
+        IMAGE_IO *io = info->image_io;
+        SUPER(info);
+        if (info->extra_flags == EXTRA_IS_NULL) {
+            STRING *class_name;
+            INTVAL new_type;
+            /* thaw class name */
+            class_name = io->vtable->shift_string(INTERP, io);
+            /* if class exists in this interpreter, check if the
+             * thawed class is the same, if not bail out, if yes
+             * ignore the class, consume the byte string
+             */
+            new_type = pmc_type(INTERP, class_name);
+            if (new_type > enum_type_undef) {
+                /* TODO */
+            }
+            else {
+                Parrot_new_class(INTERP, *info->thaw_ptr, class_name);
+            }
+        }
+    }
+
 }
 
 /*

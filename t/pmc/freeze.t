@@ -16,8 +16,10 @@ Tests the freeze/thaw archiving subsystem.
 
 =cut
 
-use Parrot::Test tests => 15;
+use Parrot::Test tests => 17;
 use Test::More;
+
+END { unlink "temp.fpmc"; };
 
 output_is(<<'CODE', <<'OUTPUT', "freeze/thaw a PerlInt");
     new P1, .PerlInt
@@ -436,5 +438,47 @@ FixedPMCArray 3
 777
 666
 ok same
+OUTPUT
+
+output_is(<<'CODE', <<'OUTPUT', "freeze class");
+    newclass P10, "Foo"
+    classname S10, P10
+    print S10
+    print "\n"
+    freeze S11, P10
+    print "ok 1\n"
+    open P3, "temp.fpmc", ">"
+    print P3, S11
+    close P3
+    print "ok 2\n"
+    end
+CODE
+Foo
+ok 1
+ok 2
+OUTPUT
+
+output_is(<<'CODE', <<'OUTPUT', "thaw class into new interpreter");
+    set S3, "temp.fpmc"
+    .include "stat.pasm"
+    stat I0, S3, .STAT_FILESIZE
+    gt I0, 1, ok1
+    print "stat failed\n"
+    exit 1
+ok1:
+    open P3, S3, "<"
+    read S3, P3, I0
+    close P3
+    print "ok 1\n"
+    thaw P4, S3
+    print "ok 2\n"
+    classname S10, P4
+    print S10
+    print "\n"
+    end
+CODE
+ok 1
+ok 2
+Foo
 OUTPUT
 
