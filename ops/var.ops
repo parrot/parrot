@@ -81,7 +81,7 @@ Pop the current lexical scope pad off the stack
 =item B<pop_pad>(out PMC)
 
 Pop the current lexical scope pad off the stack and store
-it in $1 (XXX JPS: not implemented yet).
+it in $1
 
 =cut
 

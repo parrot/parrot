@@ -16,7 +16,7 @@ Tests various lexical scratchpad operations.
 
 =cut
 
-use Parrot::Test tests => 12;
+use Parrot::Test tests => 13;
 
 output_is(<<CODE, <<OUTPUT, "simple store and fetch");
 	new_pad 0
@@ -233,6 +233,47 @@ CODE
 7
 12
 7
+OUTPUT
+
+output_is(<<'CODE', <<OUTPUT, "pop_pad_p");
+	new_pad P10, 0
+        new_pad P11, 0
+        new_pad P12, 0
+
+	new P0, .Integer
+	new P1, .Integer
+	new P2, .Integer
+	set P0, 12
+	set P1, 7
+	set P2, 46
+
+        set P10[0;"a"], P0
+        set P11[0;"a"], P1
+        set P12[0;"a"], P2
+
+        push_pad P10
+        push_pad P11
+        push_pad P12
+
+        pop_pad P1
+        pop_pad P2
+        pop_pad P3
+
+        set P4, P1[0;"a"]
+        set P5, P2[0;"a"]
+        set P6, P3[0;"a"]
+
+        print P4
+        print "\n"
+        print P5
+        print "\n"
+        print P6
+        print "\n"
+	end
+CODE
+46
+7
+12
 OUTPUT
 
 output_is(<<CODE, <<OUTPUT, "access by position");
