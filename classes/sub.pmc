@@ -325,4 +325,9 @@ pmclass Sub {
    void repeat_same (PMC * value, PMC* dest) {
    }
 */
+
+   INTVAL invoke () {
+     /* return address that the interpreter should jump to */
+     return ((struct Parrot_Sub*)SELF->data)->init;
+   } 
 }

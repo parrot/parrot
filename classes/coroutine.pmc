@@ -324,4 +324,15 @@ pmclass Coroutine {
    void repeat_same (PMC * value, PMC* dest) {
    }
 */
+
+   INTVAL invoke () {
+     struct Parrot_Coroutine* co = (struct Parrot_Sub*)SELF->data;
+
+     /* Resuming co-routine or fresh call? */
+     if(!co->resume) {
+       return co->init;
+     }
+
+     return co->resume;
+   } 
 }

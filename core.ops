@@ -4170,6 +4170,34 @@ inline op callnative(out PMC, in PMC, in PMC, in STR) {
   goto NEXT();
 }
 
+inline op invoke() {
+  opcode_t *dest;
+  PMC * p = interpreter->ctx.pmc_reg.registers[0];
+
+  /*
+   * FIXME: the stack manipulation code (this push and the pop below) should
+   * be moved to the vtable method. (I think ?)
+   */
+  stack_push(interpreter, &interpreter->ctx.control_stack, expr NEXT(), STACK_ENTRY_DESTINATION, STACK_CLEANUP_NULL);
+
+  dest = (opcode_t *)p->vtable->invoke(interpreter, p);
+  if(dest == 0) {
+    /*
+     * invoke returned 0 (means nothing more needs to be done), so just
+     * move on to the next instruction
+     */
+    stack_pop(interpreter, &interpreter->ctx.control_stack, NULL, STACK_ENTRY_DESTINATION);
+    goto NEXT();
+  }
+  else {
+    /* 
+     * invoke returned non 0, so it should have returned a and address
+     * so that's our next
+     */
+    goto ADDRESS(dest);
+  }
+}
+
 inline op call() {
   /* This op will be a vtable entry */
   struct Parrot_Sub * sub = (struct Parrot_Sub*)interpreter->ctx.pmc_reg.registers[0]->data;

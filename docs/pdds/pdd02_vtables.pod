@@ -1194,6 +1194,18 @@ Return a substring of B<self> keyed by B<key>.
 
 The key is guaranteed to be not NULL.
 
+=item INTVAL invoke(INTERP, PMC* self)
+
+For invoking Invoke the given PMC. 
+
+It should set up the environment for the sub and return the absolute
+address that the interpreter should jump to. If it returns 0, then 
+the interpreter should just take up with the next instruction. (If the 
+sub just goes and does its thing and returns, which most C subs will 
+do at the moment) 
+
+See pdd03_calling_conventions.pod for more details.
+
 =back
 
 =cut
