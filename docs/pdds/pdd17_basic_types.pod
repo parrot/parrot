@@ -155,6 +155,10 @@ A dynamically sized array which holds only String values.
 
 =over 4
 
+=item Hash
+
+A container with key-value semantics. The values are PMCs. 
+
 =item Env
 
 Env is a singleton PMC class, that is there is only one Env PMC in any
