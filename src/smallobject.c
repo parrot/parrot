@@ -442,6 +442,7 @@ Creates a new C<Small_Object_Pool> and returns a pointer to it.
 
 */
 
+
 struct Small_Object_Pool *
 new_small_object_pool(Interp *interpreter,
         size_t object_size, size_t objects_per_alloc)
@@ -457,6 +458,15 @@ new_small_object_pool(Interp *interpreter,
     return pool;
 }
 
+void
+gc_pmc_ext_pool_init(Interp *interpreter, struct Small_Object_Pool *pool)
+{
+    pool->add_free_object = gc_ms_add_free_object;
+    pool->get_free_object = gc_ms_get_free_object;
+    pool->alloc_objects   = gc_ms_alloc_objects;
+    pool->more_objects    = gc_ms_alloc_objects;
+}
+
 static void
 gc_ms_pool_init(Interp *interpreter, struct Small_Object_Pool *pool)
 {
@@ -468,8 +478,6 @@ gc_ms_pool_init(Interp *interpreter, struct Small_Object_Pool *pool)
     if (pool->object_size >= sizeof(Dead_PObj))
         pool->get_free_object = get_free_object_df;
 #endif
-    if (pool == interpreter->arena_base->pmc_ext_pool)
-        pool->more_objects = pool->alloc_objects;
 }
 
 /*

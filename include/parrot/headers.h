@@ -46,6 +46,7 @@ size_t get_min_pmc_address(Interp *interpreter);
 int is_buffer_ptr(Interp *, void *);
 int is_pmc_ptr(Interp *, void *);
 
+void gc_pmc_ext_pool_init(Interp *, struct Small_Object_Pool *pool);
 
 /* pool iteration */
 typedef enum {

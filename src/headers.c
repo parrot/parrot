@@ -295,17 +295,13 @@ new_pmc_ext(Interp *interpreter)
     struct Small_Object_Pool *pool = interpreter->arena_base->pmc_ext_pool;
     void *ptr;
     /*
-     * can't use normall get_free_object--PMC_EXT doesn't have flags
+     * can't use normal get_free_object--PMC_EXT doesn't have flags
      * it isn't a Buffer
      */
-#if PARROT_GC_GMS
-    ptr = pool->get_free_object(interpreter, pool);
-#else
     if (!pool->free_list)
         (*pool->more_objects) (interpreter, pool);
     ptr = pool->free_list;
     pool->free_list = *(void **)ptr;
-#endif
     memset(ptr, 0, sizeof(PMC_EXT));
     return ptr;
 }
@@ -586,7 +582,13 @@ Parrot_initialize_header_pools(Interp *interpreter)
     /* pmc extension buffer */
     arena_base->pmc_ext_pool =
         new_small_object_pool(interpreter, sizeof(struct PMC_EXT), 1024);
-    (arena_base->init_pool)(interpreter, arena_base->pmc_ext_pool);
+    /*
+     * pmc_ext isn't a managed item. If a PMC has a pmc_ext structure
+     * it is returned to the pool instantly - the structure is never
+     * marked.
+     * Use GS MS pool functions
+     */
+    gc_pmc_ext_pool_init(interpreter, arena_base->pmc_ext_pool);
     arena_base->pmc_ext_pool->name = "pmc_ext";
 
     /* constant PMCs */
