@@ -77,21 +77,35 @@ while (<F>) {
 
 my ($cfile) = grep /\.c$/, @ARGV;
 
-foreach my $option (@options) {
-    if ($cfile =~ $option->[0]) {
-	if ($option->[1] eq '+') {
-	    splice @ARGV, 1, 0, $option->[2];
-	}
-	elsif ($option->[1] eq '-') {
-	    @ARGV = grep { $_ ne $option->[2] } @ARGV;
-	}
-	else {
-	    foreach my $arg (@ARGV) {
-		$arg =~ s/$option->[2]/$option->[3]/;
-	    }
-	}
-    }
-}
+my ($inject_point, $where);                       
+
+foreach (@ARGV) { 
+  last if $_ eq ''; 
+  ++$where; 
+} 
+if ($where) { 
+  # Found a "" - remove it 
+  splice @ARGV, $where, 1; 
+  $inject_point = $where; 
+} else { 
+  $inject_point = 1; 
+} 
+ 
+foreach my $option (@options) { 
+    if ($cfile =~ $option->[0]) { 
+        if ($option->[1] eq '+') { 
+            splice @ARGV, $inject_point, 0, $option->[2]; 
+        } 
+        elsif ($option->[1] eq '-') { 
+            @ARGV = grep { $_ ne $option->[2] } @ARGV; 
+        } 
+        else { 
+            foreach my $arg (@ARGV) { 
+                $arg =~ s/$option->[2]/$option->[3]/; 
+            } 
+        } 
+    } 
+} 
 
 #print "@ARGV\n";
 print "$cfile\n";

@@ -390,8 +390,13 @@ LIBNCI_SO       = $(DYNEXT_DIR)/libnci$(SO)
 ${make_set_make}
 MAKE_C = ${make_c}
 
+# Passing an empty argument in @ARGV to cc_flags.pl to indicate where extra -Is
+# (etc) should go. Otherwise it will insert them after the first space, which
+# makes life go horribly wrong if $(CC) contains spaces but can't have -I
+# arguments (etc) injected in the middle.
+# There is probably a better way to do this, but I can't work it out right now.
 .c$(O) :
-	@$(PERL) tools/dev/cc_flags.pl ./CFLAGS $(CC) $(CFLAGS) -I$(@D) ${cc_o_out}$@ -c $<
+	@$(PERL) tools/dev/cc_flags.pl ./CFLAGS $(CC) "" $(CFLAGS) -I$(@D) ${cc_o_out}$@ -c $<
 
 ###############################################################################
 #
