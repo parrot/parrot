@@ -465,6 +465,18 @@ inline op clone(out STR, in STR) {
 
 ########################################
 
+=item B<set_addr>(out INT, in INT)
+
+Sets register $1 to the current address plus the offset $2
+
+inline op set_addr(out INT, in INT) {
+  $1 = cur_opcode + $2;
+  goto NEXT();
+}
+
+
+########################################
+
 =item B<set>(out INT, in INT)
 
 =item B<set>(out INT, in NUM)
@@ -2697,7 +2709,7 @@ Jump to the address held in register $1.
 =cut
 
 inline op jump(in INT) {
-  goto OFFSET($1);
+  goto ADDRESS($1);
 }
 
 =back
