@@ -254,11 +254,11 @@ sub process_file_start_token
             my $path = $self->append_html_suffix($text);
             my $file = $self->{TARGET}->file_with_relative_path($path);
     
-            $path = $self->{DOCS_FILE}->parent->relative_path($file);
-    
             print {$self->{'output_fh'}} 
-                $self->{'Tagmap'}{$tagname} . "<a href='$path'>" .
-                esc($text) . "</a>";
+                $self->{'Tagmap'}{$tagname} . 
+                $self->html_link(
+                    $self->{DOCS_FILE}->parent->relative_path($file),
+                    esc($text));
         }
         else
         {
@@ -559,7 +559,7 @@ sub href_for_perl_module
     # There's no point in linking to the file you are already in.
     return undef if $file == $self->{DOCS_FILE};
     
-    return $self->{DOCS_FILE}->parent->relative_path($file);
+    return $self->href_path($self->{DOCS_FILE}->parent->relative_path($file));
 }
 
 =item C<do_end()>
@@ -626,7 +626,8 @@ sub write_html
     
     $self->{DOCS_FILE} = $docs_file;
 
-    $rel_path = $docs_file->parent->relative_path($target->parent_path);
+    $rel_path = $self->href_path(
+        $docs_file->parent->relative_path($target->parent_path));
 
     my $name = $target->name;
     
@@ -651,6 +652,39 @@ sub append_html_suffix
     my $path = shift;
     
     return $path . '.html';
+}
+
+=item C<html_link($href, $text)>
+
+Returns an HTML anchor with the specified "href".
+
+=cut
+
+sub html_link
+{
+    my $self = shift;
+    my $href = $self->href_path(shift);
+    my $text = shift || $href;
+    
+    return "<a href=\"$href\">$text</a>";
+}
+
+=item href_path($path)
+
+Converts the path for use in an "href".
+
+Sequences of backslashes are converted to forward slash.
+
+=cut
+
+sub href_path
+{
+    my $self = shift;
+    my $path = shift;
+
+    $path =~ s|\\+|/|go;
+
+    return $path;
 }
 
 =back

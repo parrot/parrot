@@ -6,7 +6,7 @@ t/perl/Parrot_Docs.t - Parrot::Docs unit tests
 
 =head1 SYNOPSIS
 
-	% perl t/perl/Parrot_Docs.t
+    % perl t/perl/Parrot_Docs.t
 
 =head1 DESCRIPTION
 
@@ -22,7 +22,12 @@ use lib 'lib';
 use Test::More 'tests' => 23;
 use File::Spec::Functions qw(:ALL);
 
-# IO stuff first.
+BEGIN { use_ok("Parrot::Docs::POD2HTML") }
+
+ok(Parrot::Docs::POD2HTML->href_path('docs\pdds\pdd00_pdd.pod.html') eq 
+    'docs/pdds/pdd00_pdd.pod.html', 
+    'href_path');
+
 BEGIN { use_ok('Parrot::Docs::Directory') };
 BEGIN { use_ok('Parrot::Docs::File') };
 
@@ -38,7 +43,7 @@ ok(@a == 0, 'files_of_type fail');
 my $f = $d->file_with_name('File.pm');
 ok($f->is_of_type('Perl module'), 'is_of_type succeed');
 ok(!$f->is_of_type('foo'), 'is_of_type fail');
-ok($f->short_description eq 'Docs-related file methods', 'short_description');
+ok($f->short_description eq 'Docs-Related File', 'short_description');
 
 # We have to sleep(1) here to ensure the modification time changes.
 $f = Parrot::Docs::File->new(tmp_file_path('file.pod'));
@@ -49,7 +54,7 @@ $f->write("=head1 FOO\n\nFoo\n\n=cut\n\nbar\n");
 ok($f->contains_pod, 'contains_pod yes, no errors');
 ok($f->num_pod_errors == 0, 'num_pod_errors none');
 # Not the best of tests, but at least something.
-ok($f->pod_as_html =~ m|<html>.*?</html>|s, 'pod_as_html');
+ok($f->pod_as_html =~ m|<html>.*?</html>|si, 'pod_as_html');
 sleep(1);
 $f->write("=haed1 FOO\n\nFoo\n\n=cut\n\nbar\n");
 ok($f->contains_pod, 'contains_pod yes, errors');
@@ -79,17 +84,17 @@ my $i = Parrot::Docs::Item->new('Usual suspects', 'foo', 'bar');
 ok($i, 'new item');
 
 my $g = Parrot::Docs::Group->new('Usual suspects', '',
-	Parrot::Docs::Item->new('', 'foo'),
-	Parrot::Docs::Item->new('', 'bar'));
+    Parrot::Docs::Item->new('', 'foo'),
+    Parrot::Docs::Item->new('', 'bar'));
 
 ok($g, 'new group');
 ok($g->name eq 'Usual suspects', 'name');
 
 $s = Parrot::Docs::Section->new('Usual Suspects', 'index.html',
-		'here they are...',
-	    Parrot::Docs::Item->new('our old friend', 'foo'),
-		Parrot::Docs::Group->new('Bar', 'no jeans',
-	    	Parrot::Docs::Item->new('time please', 'bar', 'pub')));
+        'here they are...',
+        Parrot::Docs::Item->new('our old friend', 'foo'),
+        Parrot::Docs::Group->new('Bar', 'no jeans',
+            Parrot::Docs::Item->new('time please', 'bar', 'pub')));
 
 ok($s, 'new section');
 
@@ -116,31 +121,31 @@ teardown();
 
 sub teardown
 {
-	Parrot::Docs::File->new(tmp_file_path('file.pod'))->delete;
-	Parrot::Docs::Directory->new(tmp_dir_path('src'));
-	Parrot::Docs::Directory->new(tmp_dir_path('tgt'));
+    Parrot::Docs::File->new(tmp_file_path('file.pod'))->delete;
+    Parrot::Docs::Directory->new(tmp_dir_path('src'));
+    Parrot::Docs::Directory->new(tmp_dir_path('tgt'));
 }
 
 # tmp_dir_path(@dirs)
 sub tmp_dir_path
 {
-	return catdir(tmpdir, @_);
+    return catdir(tmpdir, @_);
 }
 
 # tmp_file_path(@dirs, $file)
 sub tmp_file_path
 {
-	my $file;
-	
-	if ( @_ == 1 )
-	{
-		$file = catfile(tmp_dir_path(), shift);
-	}
-	else
-	{
-		$file = pop(@_);
-		$file = catfile(tmp_dir_path(@_), $file);
-	}
-	
-	return $file;
+    my $file;
+    
+    if ( @_ == 1 )
+    {
+        $file = catfile(tmp_dir_path(), shift);
+    }
+    else
+    {
+        $file = pop(@_);
+        $file = catfile(tmp_dir_path(@_), $file);
+    }
+    
+    return $file;
 }
