@@ -458,7 +458,7 @@ flags_dummy:
 	@echo Compiling with:
 	@$(PERL) tools/dev/cc_flags.pl ./CFLAGS echo $(CC) $(CFLAGS) xx$(O) -c xx.c
 
-library/config.fpmc: $(TEST_PROG) config_lib.pasm
+library/config.fpmc: myconfig config_lib.pasm
 	@echo Invoking Parrot to generate library/config.fpmc--cross your fingers
 	./parrot config_lib.pasm
 	@echo If the next line prints $(VERSION), it did help.
