@@ -33,7 +33,14 @@ struct Parrot_Interp {
     IV *(*(*opcode_funcs)[2048])();	  /* Opcode */
                                           /* function table */
     STRING_FUNCS *(*(*string_funcs)[64])();  /* String function table */
+    IV flags;				  /* Various interpreter flags
+                                           that signal that runops
+                                           should do something */
 };
+
+#define PARROT_DEBUG_FLAG 0x01		/* Bit in the flags that says
+                                           we're debugging */
+#define PARROT_TRACE_FLAG 0x02		/* We're tracing execution */
 
 struct Parrot_Interp *
 make_interpreter();
