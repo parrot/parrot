@@ -200,6 +200,24 @@ C<initializer> if it is supplied, otherwise C<init()> is called.
 
 /*
 
+=item C<PMC* new_extended()>
+
+Default fallback. Creates a new PMC of the type of the class SELF and
+calls init().
+
+=cut
+
+*/
+
+    PMC* new_extended() {
+        INTVAL type = SELF->vtable->base_type;
+        PMC* ret = pmc_new_noinit(INTERP, type);
+        VTABLE_init(INTERP, ret);
+        return ret;
+    }
+
+/*
+
 =item C<void mark()>
 
 Panics with a "no custom mark routine defined" error message.

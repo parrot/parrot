@@ -5,6 +5,7 @@ void init()
 # init must be first for JITed vtable meths
 void init_pmc(PMC* initializer)
 void init_pmc_props(PMC* initializer, PMC* properties)
+PMC* new_extended()
 void morph(INTVAL type)
 void mark()
 void destroy()

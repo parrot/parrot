@@ -93,6 +93,21 @@ op new(out PMC, in INT, in PMC, in PMC) {
   goto NEXT();
 }
 
+=item B<new_extended>(out PMC)
+
+Create a new PMC of the type of class REG_PMC(2). This is a classmethod.
+Arguments are passed according to the calling conventions in
+F<docs/pdds/pdd03_calling_conventions.pod>. See also the I<getclass> opcode
+to get a class PMC.
+
+=cut
+
+inline op new_extended(out PMC) {
+  PMC* class = REG_PMC(2);
+  $1 = VTABLE_new_extended(interpreter, class);
+  goto NEXT();
+}
+
 ########################################
 
 =item B<morph>(in PMC, in INT)

@@ -955,54 +955,69 @@ move_cc:
     /* meth hash value: I4 */
     ins = set_I_const(interp, unit, ins, 4, 0);
 #endif
+
     /*
-     * emit a savetop for now
+     * special case - new_extended looks like a method call
+     * but is actually the new_extended object constructor opcode that
+     * takes method-like arguments according to pdd03
+     *
+     * so convert to opcode and await the returned PMC as P5
      */
-    if (!sub->pcc_sub->nci)
-        ins = insINS(interp, unit, ins, "savetop", regs, 0);
-    /*
-     * if we reuse the continuation, update it
-     */
-    if (!sub->pcc_sub->nci)
-        if (!need_cc)
-            ins = insINS(interp, unit, ins, "updatecc", regs, 0);
-    /* restore self */
-    if (meth_call && !sub->pcc_sub->nci) {
-        regs[0] = s0;
-        n = 0;
-        if (s0)
-            n = 1;
-        ins = insINS(interp, unit, ins,
-                need_cc ? "callmethodcc" : "callmethod", regs, n);
+    if (meth_call && strcmp(s0->name, "\"new_extended\"") == 0) {
+        SymReg *p5 = get_pasm_reg("P5");
+        regs[0] = p5;
+        ins = insINS(interp, unit, ins, "new_extended", regs, 1);
     }
-    else
-        ins = insINS(interp, unit, ins,
-                need_cc ? "invokecc" : "invoke", regs, 0);
-    ins->type |= ITPCCSUB;
-    /*
-     * move the pcc_sub structure to the invoke
-     */
-    ins->r[0] = meth_call ? s0 ? s0 : get_pasm_reg("S0") : get_pasm_reg("P0");
-    ins->r[0]->pcc_sub = sub->pcc_sub;
-    sub->pcc_sub = NULL;
-    sub = ins->r[0];
-    /*
-     * locate return label, if there is one skip it
-     */
-    if (sub->pcc_sub->label && ins->next->type == ITLABEL) {
-        ins = ins->next;
-    }
-    if (!sub->pcc_sub->nci)
-        ins = insINS(interp, unit, ins, "restoretop", regs, 0);
-    if (p1) {
-        regs[0] = get_pasm_reg("P1");
-        regs[1] = p1;
-        ins = insINS(interp, unit, ins, "set", regs, 2);
-    }
-    if (p2) {
-        regs[0] = get_pasm_reg("P2");
-        regs[1] = p2;
-        ins = insINS(interp, unit, ins, "set", regs, 2);
+    else {
+        /*
+         * emit a savetop for now
+         */
+        if (!sub->pcc_sub->nci)
+            ins = insINS(interp, unit, ins, "savetop", regs, 0);
+        /*
+         * if we reuse the continuation, update it
+         */
+        if (!sub->pcc_sub->nci)
+            if (!need_cc)
+                ins = insINS(interp, unit, ins, "updatecc", regs, 0);
+        /* restore self */
+        if (meth_call && !sub->pcc_sub->nci) {
+            regs[0] = s0;
+            n = 0;
+            if (s0)
+                n = 1;
+            ins = insINS(interp, unit, ins,
+                    need_cc ? "callmethodcc" : "callmethod", regs, n);
+        }
+        else
+            ins = insINS(interp, unit, ins,
+                    need_cc ? "invokecc" : "invoke", regs, 0);
+        ins->type |= ITPCCSUB;
+        /*
+         * move the pcc_sub structure to the invoke
+         */
+        ins->r[0] = meth_call ? s0 ? s0 : get_pasm_reg("S0") : get_pasm_reg("P0");
+        ins->r[0]->pcc_sub = sub->pcc_sub;
+        sub->pcc_sub = NULL;
+        sub = ins->r[0];
+        /*
+         * locate return label, if there is one skip it
+         */
+        if (sub->pcc_sub->label && ins->next->type == ITLABEL) {
+            ins = ins->next;
+        }
+        if (!sub->pcc_sub->nci)
+            ins = insINS(interp, unit, ins, "restoretop", regs, 0);
+        if (p1) {
+            regs[0] = get_pasm_reg("P1");
+            regs[1] = p1;
+            ins = insINS(interp, unit, ins, "set", regs, 2);
+        }
+        if (p2) {
+            regs[0] = get_pasm_reg("P2");
+            regs[1] = p2;
+            ins = insINS(interp, unit, ins, "set", regs, 2);
+        }
     }
     /*
      * handle return results

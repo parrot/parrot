@@ -16,7 +16,7 @@ Tests the object/class subsystem.
 
 =cut
 
-use Parrot::Test tests => 49;
+use Parrot::Test tests => 51;
 use Test::More;
 
 output_is(<<'CODE', <<'OUTPUT', "findclass (base class)");
@@ -1556,3 +1556,55 @@ ok 1
 ok 2
 Foo
 OUTPUT
+
+output_is(<<'CODE', <<'OUTPUT', "new_extended");
+    subclass P2, "Integer", "Foo"
+    set I0, 0
+    set I3, 1
+    new P5, .Integer
+    set P5, 42
+    new_extended P1
+    print P1
+    print "\n"
+    end
+.namespace [ "Foo" ]
+.pcc_sub __new_extended:	# create object the hard way
+    find_type I0, "Foo"
+    new P10, I0			# should inspect passed arguments
+    classoffset I0, P10, "Foo"	# better should clone the argument
+    setattribute P10, I0, P5	# the first attribute is the internal __value
+    set P5, P10			# set return value
+    invoke P1
+CODE
+42
+OUTPUT
+
+output_is(<<'CODE', <<'OUTPUT', "new_extended - PIR");
+##PIR##
+.sub main @MAIN
+    .local pmc cl
+    cl = subclass "Integer", "Foo"
+    .local pmc i
+    i = cl."new_extended"(42)
+    print i
+    print "\n"
+.end
+
+.namespace ["Foo"]
+.sub __new_extended method
+    .param int val		# in realiter check what is passed
+    $I0 = find_type "Foo"
+    .local pmc obj
+    obj = new $I0
+    $I1 = classoffset obj, "Foo"
+    $P0 = new Integer
+    $P0 = val
+    setattribute obj, $I1, $P0
+    .pcc_begin_return
+	.return obj
+    .pcc_end_return
+.end
+CODE
+42
+OUTPUT
+
