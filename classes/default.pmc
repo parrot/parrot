@@ -160,6 +160,10 @@ pmclass default noinit {
      SELF->cache.struct_val = value;
    }
 
+   void set_pmc (PMC* value) {
+     SELF->cache.struct_val = value->vtable->get_value(INTERP, value);
+   }
+
    void add (PMC * value,  PMC* dest) {
      /* XXX: overflow detection, bignum promotion? */
 
