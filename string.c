@@ -269,6 +269,11 @@ string_concat(struct Parrot_Interp *interpreter, const STRING *a,
     if (a != NULL && a->strlen != 0) {
         if (b != NULL && b->strlen != 0) {
             /* transcode first so we know the length and avoid infanticide */
+            /* XXX But it doesn't avoid anything. string_transcode
+             * returns a copy that isn't anchored to the root set. For
+             * now, I'll just block DOD (collection is ok, because b
+             * is marked live.) */
+            interpreter->DOD_block_level++;
             if (a->type != b->type || a->encoding != b->encoding) {
                 b = string_transcode(interpreter, b, a->encoding, a->type,
                                      NULL);
@@ -280,6 +285,7 @@ string_concat(struct Parrot_Interp *interpreter, const STRING *a,
                             b->bufstart, b->bufused);
             result->strlen = a->strlen + b->strlen;
             result->bufused = a->bufused + b->bufused;
+            interpreter->DOD_block_level--;
         }
         else {
             return string_copy(interpreter, a);

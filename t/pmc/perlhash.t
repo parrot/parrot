@@ -1,6 +1,6 @@
 #! perl
 
-use Parrot::Test tests => 8;
+use Parrot::Test tests => 10;
 use Test::More;
 
 output_is(<<'CODE', <<OUTPUT, "simple set / get");
@@ -178,6 +178,114 @@ CODE
 ok 1
 ok 2
 ok 3
+OUTPUT
+
+output_is(<<CODE, <<OUTPUT, "stress test: loop(set, check)");
+	new	P0, PerlHash
+
+        set I0, 200
+        set S0, "mikey"
+        set_keyed P0, S0, "base"
+        concat S1, S0, "s"
+        set_keyed P0, S1, "bases"
+        set S2, I0
+        concat S1, S0, S2
+        set_keyed P0, S1, "start"
+        get_keyed S3, P0, "mikey"
+        print S3
+        print "\\n"
+        get_keyed S3, P0, "mikeys"
+        print S3
+        print "\\n"
+        get_keyed S3, P0, "mikey200"
+        print S3
+        print "\\n"
+LOOP:
+        eq I0, 0, DONE
+        sub I0, I0, 1
+        set S2, I0
+        concat S1, S0, S2
+        concat S4, S0, S2
+        eq S1, S4, L1
+        print "concat mismatch: "
+        print S1
+        print " vs "
+        print S4
+        print "\\n"
+L1:
+        set_keyed P0, S1, I0
+        get_keyed I1, P0, S1
+        eq I0, I1, L2
+        print "lookup mismatch: "
+        print I0
+        print " vs "
+        print I1
+        print "\\n"
+L2:
+        branch LOOP
+DONE:
+        get_keyed I0, P0, "mikey199"
+        print I0
+        print "\\n"
+        get_keyed I0, P0, "mikey117"
+        print I0
+        print "\\n"
+        get_keyed I0, P0, "mikey1"
+        print I0
+        print "\\n"
+        get_keyed I0, P0, "mikey23"
+        print I0
+        print "\\n"
+        get_keyed I0, P0, "mikey832"
+        print I0
+        print "\\n"
+        end
+CODE
+base
+bases
+start
+199
+117
+1
+23
+0
+OUTPUT
+
+# Check all values after setting all of them
+output_is(<<CODE, <<OUTPUT, "stress test: loop(set), loop(check)");
+	new	P0, PerlHash
+
+        set I0, 200
+        set S0, "mikey"
+SETLOOP:
+        eq I0, 0, DONE
+        sub I0, I0, 1
+        set S2, I0
+        concat S1, S0, S2
+        set_keyed P0, S1, I0
+        branch SETLOOP
+
+        set I0, 200
+GETLOOP:
+        eq I0, 0, DONE
+        sub I0, I0, 1
+        set S2, I0
+        concat S1, S0, S2
+        get_keyed I1, P0, S1
+        eq I0, I1, L2
+        print "lookup mismatch: "
+        print I0
+        print " vs "
+        print I1
+        print "\\n"
+L2:
+        branch GETLOOP
+
+DONE:
+        print "done\\n"
+        end
+CODE
+done
 OUTPUT
 
 1;
