@@ -181,7 +181,7 @@ is guaranteed not to be NULL for this method.
 
 =item UINTVAL subtype(INTERP, PMC* self, INTVAL type)
 
-Returns the subtype of a PMC. (Note that this may be unimplemented,
+Return the subtype of a PMC. (Note that this may be unimplemented,
 and may go away) This is intended to return information about the
 PMC--what type of number or string it is, whether it's a scalar, hash,
 array, or list, and suchlike things.
@@ -219,7 +219,7 @@ The B<key> parameter is guaranteed not to be NULL for this method.
 
 =item PMC* find_method(INTERP, PMC* self, STRING* method_name) 
 
-Returns a subroutine PMC for the passed method name. This subroutine
+Return a subroutine PMC for the passed method name. This subroutine
 PMC may be cached, so the method I<must> return an equivalent sub PMC
 each time, or be capable of dealing with the returned sub PMCs being
 reused.
@@ -228,7 +228,7 @@ reused.
 
 =item PMC* find_method_keyed_int(INTERP, PMC* self, INTVAL* key, STRING* method_name)
 
-Returns a subroutine PMC for the passed method name. This subroutine
+Return a subroutine PMC for the passed method name. This subroutine
 PMC may be cached, so the method I<must> return an equivalent sub PMC
 each time, or be capable of dealing with the returned sub PMCs being
 reused.
@@ -236,76 +236,76 @@ The B<key> parameter is guaranteed not to be NULL for this method.
 
 =item INTVAL get_integer(INTERP, PMC* self)
 
-Returns the native integer value of the PMC.
+Return the native integer value of the PMC.
 
 =item INTVAL get_integer_keyed(INTERP, PMC* self, KEY* key)
 
 =item INTVAL get_integer_keyed_int(INTERP, PMC* self, INTVAL* key)
 
-Returns the native integer value of the PMC indexed by B<key>.
+Return the native integer value of the PMC indexed by B<key>.
 The B<key> parameter is guaranteed not to be NULL for this method.
 
 =item FLOATVAL get_number(INTERP, PMC* self)
 
-Returns the native floating-point value of the PMC.
+Return the native floating-point value of the PMC.
 
 =item FLOATVAL get_number_keyed(INTERP, PMC* self, KEY* key)
 
 =item FLOATVAL get_number_keyed_int(INTERP, PMC* self, INTVAL* key)
 
-Returns the native floating-point value of the PMC indexed by B<key>.
+Return the native floating-point value of the PMC indexed by B<key>.
 The B<key> parameter is guaranteed not to be NULL for this method.
 
 =item BIGNUM* get_bignum(INTERP, PMC* self)
 
-Returns the value of the PMC as a bignum.
+Return the value of the PMC as a bignum.
 
 =item BIGNUM* get_bignum_keyed(INTERP, PMC* self, KEY* key)
 
 =item BIGNUM* get_bignum_keyed_int(INTERP, PMC* self, INTVAL* key)
 
-Returns the bignum value of the PMC indexed by B<key>.
+Return the bignum value of the PMC indexed by B<key>.
 The B<key> parameter is guaranteed not to be NULL for this method.
 
 =item STRING* get_string(INTERP, PMC* self)
 
-Returns the native string value of the PMC. This may be in the
+Return the native string value of the PMC. This may be in the
 encoding of the PMC's choice.
 
 =item STRING* get_string_keyed(INTERP, PMC* self, KEY* key)
 
 =item STRING* get_string_keyed_int(INTERP, PMC* self, INTVAL* key)
 
-Returns the string value of the PMC indexed by B<key>.
+Return the string value of the PMC indexed by B<key>.
 The B<key> parameter is guaranteed not to be NULL for this method.
 
 =item INTVAL get_bool(INTERP, PMC* self)
 
-Returns the constant TRUE if the PMC is true, or FALSE if the PMC is
+Return the constant TRUE if the PMC is true, or FALSE if the PMC is
 false.
 
 =item INTVAL get_bool_keyed(INTERP, PMC* self, KEY* key)
 
 =item INTVAL get_bool_keyed_int(INTERP, PMC* self, INTVAL* key)
 
-Returns the constant TRUE if the PMC indexed by B<key> is true,
+Return the constant TRUE if the PMC indexed by B<key> is true,
 or FALSE if the PMC indexed by B<key> is false.
 The B<key> parameter is guaranteed not to be NULL for this method.
 
 =item INTVAL elements(INTERP, PMC* self)
 
-Returns the number of elements in the PMC.
+Return the number of elements in the PMC.
 
 =item INTVAL elements_keyed(INTERP, PMC* self, KEY* key)
 
 =item INTVAL elements_keyed_int(INTERP, PMC* self, INTVAL* key)
 
-Returns the number of elements in the PMC indexed by B<key>.
+Return the number of elements in the PMC indexed by B<key>.
 The B<key> parameter is guaranteed not to be NULL for this method.
 
 =item PMC* get_pmc(INTERP, PMC* self)
 
-Returns the PMC for this PMC. While this may seem nonsensical, it's
+Return the PMC for this PMC. While this may seem nonsensical, it's
 useful in several circumstances. If the thing being accessed may 
 return something odd, for example a reference, it may return a 
 value different than the PMC that get_pmc is being called
@@ -315,12 +315,12 @@ on.
 
 =item PMC* get_pmc_keyed_int(INTERP, PMC* self, INTVAL* key)
 
-Returns the PMC indexed by B<key>.
+Return the PMC indexed by B<key>.
 The B<key> parameter is guaranteed not to be NULL for this method.
 
 =item INTVAL is_same(INTERP, PMC* self, PMC* value)
 
-Returns TRUE if the PMCs are the same, and FALSE if
+Return TRUE if the PMCs are the same, and FALSE if
 they're not. In this case, "the same" means identical at a low
 level. For plain equality, use the is_equal method.
 
@@ -328,7 +328,7 @@ level. For plain equality, use the is_equal method.
 
 =item INTVAL is_same_keyed_int(INTERP, PMC* self, INTVAL* key, PMC* value, INTVAL* value_key)
 
-Returns TRUE if the PMC keyed by B<key> is the same as the
+Return TRUE if the PMC keyed by B<key> is the same as the
 PMC in B<value> keyed by B<value_key>.  At least one of the
 two keys is guaranteed not to be NULL.
 
@@ -449,65 +449,65 @@ throw an exception if the PMC class is a non-aggregate type.
 
 =item INTVAL pop_integer(INTERP, PMC* self)
 
-Returns the integer value of the last item on the list, removing that item.
+Return the integer value of the last item on the list, removing that item.
 
 =item INTVAL pop_integer_keyed(INTERP, PMC* self, KEY* key)
 
 =item INTVAL pop_integer_keyed_int(INTERP, PMC* self, INTVAL* key)
 
-Returns the integer value of the last item of the list keyed by B<key>,
+Return the integer value of the last item of the list keyed by B<key>,
 removing that item from the list. 
 The B<key> parameter is guaranteed not to be NULL for this method.
 
 =item FLOATVAL pop_float(INTERP, PMC* self)
 
-Returns the floating-point value of the last item on the list, 
+Return the floating-point value of the last item on the list, 
 removing that item.
 
 =item FLOATVAL pop_float_keyed(INTERP, PMC* self, KEY* key)
 
 =item FLOATVAL pop_float_keyed_int(INTERP, PMC* self, INTVAL* key)
 
-Returns the floating-point value of the last item of the list keyed by B<key>,
+Return the floating-point value of the last item of the list keyed by B<key>,
 removing that item from the list. 
 The B<key> parameter is guaranteed not to be NULL for this method.
 
 =item BIGNUM* pop_bignum(INTERP, PMC* self)
 
-Returns the bignum value of the last item on the list, 
+Return the bignum value of the last item on the list, 
 removing that item.
 
 =item BIGNUM* pop_bignum_keyed(INTERP, PMC* self, KEY* key)
 
 =item BIGNUM* pop_bignum_keyed_int(INTERP, PMC* self, INTVAL* key)
 
-Returns the bignum value of the last item of the list keyed by B<key>,
+Return the bignum value of the last item of the list keyed by B<key>,
 removing that item from the list. 
 The B<key> parameter is guaranteed not to be NULL for this method.
 
 =item STRING* pop_string(INTERP, PMC* self)
 
-Returns the string value of the last item on the list, 
+Return the string value of the last item on the list, 
 removing that item.
 
 =item STRING* pop_string_keyed(INTERP, PMC* self, KEY* key)
 
 =item STRING* pop_string_keyed_int(INTERP, PMC* self, INTVAL* key)
 
-Returns the string value of the last item of the list keyed by B<key>,
+Return the string value of the last item of the list keyed by B<key>,
 removing that item from the list. 
 The B<key> parameter is guaranteed not to be NULL for this method.
 
 =item PMC* pop_pmc(INTERP, PMC* self)
 
-Returns the PMC value of the last item on the list,
+Return the PMC value of the last item on the list,
 removing that item.
 
 =item PMC* pop_pmc_keyed(INTERP, PMC* self, KEY* key)
 
 =item PMC* pop_pmc_keyed_int(INTERP, PMC* self, INTVAL* key)
 
-Returns the PMC value of the last item of the list keyed by B<key>,
+Return the PMC value of the last item of the list keyed by B<key>,
 removing that item from the list. 
 The B<key> parameter is guaranteed not to be NULL for this method.
 
@@ -570,65 +570,65 @@ method will use B<value>.
 
 =item INTVAL shift_integer(INTERP, PMC* self)
 
-Returns the integer value of the first item on the list, removing that item.
+Return the integer value of the first item on the list, removing that item.
 
 =item INTVAL shift_integer_keyed(INTERP, PMC* self, KEY* key)
 
 =item INTVAL shift_integer_keyed_int(INTERP, PMC* self, INTVAL* key)
 
-Returns the integer value of the fisrt item of the list keyed by B<key>,
+Return the integer value of the fisrt item of the list keyed by B<key>,
 removing that item from the list. 
 The B<key> parameter is guaranteed not to be NULL for this method.
 
 =item FLOATVAL shift_float(INTERP, PMC* self)
 
-Returns the floating-point value of the first item on the list, 
+Return the floating-point value of the first item on the list, 
 removing that item.
 
 =item FLOATVAL shift_float_keyed(INTERP, PMC* self, KEY* key)
 
 =item FLOATVAL shift_float_keyed_int(INTERP, PMC* self, INTVAL* key)
 
-Returns the floating-point value of the first item of the list keyed by B<key>,
+Return the floating-point value of the first item of the list keyed by B<key>,
 removing that item from the list. 
 The B<key> parameter is guaranteed not to be NULL for this method.
 
 =item BIGNUM* shift_bignum(INTERP, PMC* self)
 
-Returns the bignum value of the first item on the list, 
+Return the bignum value of the first item on the list, 
 removing that item.
 
 =item BIGNUM* shift_bignum_keyed(INTERP, PMC* self, KEY* key)
 
 =item BIGNUM* shift_bignum_keyed_int(INTERP, PMC* self, INTVAL* key)
 
-Returns the bignum value of the first item of the list keyed by B<key>,
+Return the bignum value of the first item of the list keyed by B<key>,
 removing that item from the list. 
 The B<key> parameter is guaranteed not to be NULL for this method.
 
 =item STRING* shift_string(INTERP, PMC* self)
 
-Returns the string value of the first item on the list, 
+Return the string value of the first item on the list, 
 removing that item.
 
 =item STRING* shift_string_keyed(INTERP, PMC* self, KEY* key)
 
 =item STRING* shift_string_keyed_int(INTERP, PMC* self, INTVAL* key)
 
-Returns the string value of the first item of the list keyed by B<key>,
+Return the string value of the first item of the list keyed by B<key>,
 removing that item from the list. 
 The B<key> parameter is guaranteed not to be NULL for this method.
 
 =item PMC* shift_pmc(INTERP, PMC* self)
 
-Returns the PMC value of the first item on the list,
+Return the PMC value of the first item on the list,
 removing that item.
 
 =item PMC* shift_pmc_keyed(INTERP, PMC* self, KEY* key)
 
 =item PMC* shift_pmc_keyed_int(INTERP, PMC* self, INTVAL* key)
 
-Returns the PMC value of the first item of the list keyed by B<key>,
+Return the PMC value of the first item of the list keyed by B<key>,
 removing that item from the list. 
 The B<key> parameter is guaranteed not to be NULL for this method.
 
@@ -952,76 +952,76 @@ At least one of the three keys is guaranteed to not be NULL.
 
 =item INTVAL is_equal(INTERP, PMC* self, PMC* value)
 
-Returns TRUE if the two PMCs are generically equivalent, or
+Return TRUE if the two PMCs are generically equivalent, or
 FALSE if they aren't. 
 
 =item INTVAL is_equal_keyed(INTERP, PMC* self, KEY* key, PMC* value, KEY* value_key)
 
-Returns TRUE if the PMC at B<self> keyed by B<key> is generally
+Return TRUE if the PMC at B<self> keyed by B<key> is generally
 equivalent to the PMC at B<value> keyed by B<value_key>, or
 FALSE if they aren't.
 
 =item INTVAL cmp(INTERP, PMC* self, PMC* value)
 
-Compares the two PMCs as PMCs (whatever that means for the class).
-Returns -1 if B<self> is smaller, 0 if the two are equal, and 1
+Compare the two PMCs as PMCs (whatever that means for the class).
+Return -1 if B<self> is smaller, 0 if the two are equal, and 1
 if B<value> is smaller.
 
 =item INTVAL cmp_keyed(INTERP, PMC* self, KEY* key, PMC* value, KEY* value_key)
 
 =item INTVAL cmp_keyed_int(INTERP, PMC* self, INTVAL* key, PMC* value, INTVAL* value_key)
 
-Compares the PMC at B<self> keyed by B<key> with the PMC at B<value> keyed by
+Compare the PMC at B<self> keyed by B<key> with the PMC at B<value> keyed by
 B<value_key> as PMCs (whatever that means for the class).
-Returns -1 if B<self> is smaller, 0 if the two are equal, and 1
+Return -1 if B<self> is smaller, 0 if the two are equal, and 1
 if B<value> is smaller.
 
 At least one key is guaranteed to be not NULL.
 
 =item INTVAL cmp_num(INTERP, PMC* self, PMC* value)
 
-Compares the two PMCs numerically.
-Returns -1 if B<self> is smaller, 0 if the two are equal, and 1
+Compare the two PMCs numerically.
+Return -1 if B<self> is smaller, 0 if the two are equal, and 1
 if B<value> is smaller.
 
 =item INTVAL cmp_num_keyed(INTERP, PMC* self, KEY* key, PMC* value, KEY* value_key)
 
 =item INTVAL cmp_num_keyed_int(INTERP, PMC* self, INTVAL* key, PMC* value, INTVAL* value_key)
 
-Compares the PMC at B<self> keyed by B<key> with the PMC at B<value> keyed by
+Compare the PMC at B<self> keyed by B<key> with the PMC at B<value> keyed by
 B<value_key> numerically.
-Returns -1 if B<self> is smaller, 0 if the two are equal, and 1
+Return -1 if B<self> is smaller, 0 if the two are equal, and 1
 if B<value> is smaller.
 
 At least one key is guaranteed to be not NULL.
 
 =item INTVAL cmp_string(INTERP, PMC* self, PMC* value)
 
-Compares the two PMCs as strings.
-Returns -1 if B<self> is smaller, 0 if the two are equal, and 1
+Compare the two PMCs as strings.
+Return -1 if B<self> is smaller, 0 if the two are equal, and 1
 if B<value> is smaller.
 
 =item INTVAL cmp_string_keyed(INTERP, PMC* self, KEY* key, PMC* value, KEY* value_key)
 
 =item INTVAL cmp_string_keyed_int(INTERP, PMC* self, INTVAL* key, PMC* value, INTVAL* value_key)
 
-Compares the PMC at B<self> keyed by B<key> with the PMC at B<value> keyed by
+Compare the PMC at B<self> keyed by B<key> with the PMC at B<value> keyed by
 B<value_key> numerically.
-Returns -1 if B<self> is smaller, 0 if the two are equal, and 1
+Return -1 if B<self> is smaller, 0 if the two are equal, and 1
 if B<value> is smaller.
 
 At least one key is guaranteed to be not NULL.
 
 =item void logical_or(INTERP, PMC* self, PMC* value, PMC* dest)
 
-Does a short-circuiting logical-OR of B<self> and B<value>, storing
+Do a short-circuiting logical-OR of B<self> and B<value>, storing
 the winner in B<dest>. 
 
 =item void logical_or_keyed(INTERP, PMC* self, KEY* key, PMC* value, KEY* value_key, PMC* dest, KEY* dest_key)
 
 =item void logical_or_keyed_int(INTERP, PMC* self, INTVAL* key, PMC* value, INTVAL* value_key, PMC* dest, INTVAL* dest_key)
 
-Does a short-circuiting logical-OR of B<self> keyed by B<key> and 
+Do a short-circuiting logical-OR of B<self> keyed by B<key> and 
 B<value> keyed by B<value_key>, storing the winner in B<dest> keyed
 by B<dest_key>. 
 
@@ -1029,14 +1029,14 @@ At least one key is guaranteed to be not NULL.
 
 =item void logical_and(INTERP, PMC* self, PMC* value, PMC* dest)
 
-Does a short-circuiting logical-AND of B<self> and B<value>, storing
+Do a short-circuiting logical-AND of B<self> and B<value>, storing
 the winner in dest.
 
 =item void logical_and_keyed(INTERP, PMC* self, KEY* key, PMC* value, KEY* value_key, PMC* dest, KEY* dest_key)
 
 =item void logical_and_keyed_int(INTERP, PMC* self, INTVAL* key, PMC* value, INTVAL* value_key, PMC* dest, INTVAL* dest_key)
 
-Does a short-circuiting logical-AND of B<self> keyed by B<key> and 
+Do a short-circuiting logical-AND of B<self> keyed by B<key> and 
 B<value> keyed by B<value_key>, storing the winner in B<dest> keyed
 by B<dest_key>. 
 
@@ -1059,13 +1059,13 @@ At least one key is guaranteed to be not NULL.
 
 =item void logical_not(INTERP, PMC* self, PMC* dest)
 
-Does a logical-NOT on B<self> and stores the result in B<dest>.
+Do a logical-NOT on B<self> and stores the result in B<dest>.
 
 =item void logical_not_keyed(INTERP, PMC* self, KEY* key, PMC* dest, KEY* dest_key)
 
 =item void logical_not_keyed_int(INTERP, PMC* self, INTVAL* key, PMC* dest, INTVAL* dest_key)
 
-Does a logical-NOT on B<self> keyed by B<key> and stores the result 
+Do a logical-NOT on B<self> keyed by B<key> and stores the result 
 in B<dest> keyed by B<dest_key>.
 
 At least one key is guaranteed to be not NULL.
@@ -1122,7 +1122,7 @@ guaranteed to be non-NULL.
 
 =item INTVAL exists_keyed_int(INTERP, PMC* self, INTVAL* key)
 
-This is only valid for keyed access. Returns TRUE or
+This is only valid for keyed access. Return TRUE or
 FALSE if the key exists or doesn't in the aggregate being
 queried.
 
@@ -1130,13 +1130,13 @@ The key is guaranteed to not be NULL.
 
 =item INTVAL defined(INTERP, PMC* self)
 
-Checks to see if the PMC is defined. Returns TRUE or FALSE.
+Check to see if the PMC is defined. Return TRUE or FALSE.
 
 =item INTVAL defined_keyed(INTERP, PMC* self, KEY* key)
 
 =item INTVAL defined_keyed_int(INTERP, PMC* self, INTVAL* key)
 
-Returns TRUE if the value of B<self> keyed by B<key> is defined,
+Return TRUE if the value of B<self> keyed by B<key> is defined,
 FALSE otherwise.
 
 The key is guaranteed to be not NULL.
