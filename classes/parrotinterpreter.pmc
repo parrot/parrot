@@ -17,7 +17,7 @@
 
 #include "parrot/parrot.h"
 
-pmclass ParrotInterpreter {
+pmclass ParrotInterpreter need_ext {
 
     void init () {
 	struct Parrot_Interp *new_interp;

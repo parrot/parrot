@@ -12,7 +12,8 @@
 
 #include "parrot/parrot.h"
 
-pmclass Iterator {
+pmclass Iterator need_ext {
+/* TODO switch to the pmc ptr */
 
     void init () {
 	internal_exception(1, "Iterator init without aggregate\n");

@@ -19,7 +19,7 @@
 #include "parrot/parrot.h"
 #include "perlhash.h"
 
-pmclass OrderedHash extends PerlArray {
+pmclass OrderedHash extends PerlArray need_ext {
     void init () {
 	SUPER();
 	PerlHash.SUPER();

@@ -78,26 +78,8 @@ get_new_pmc_header(struct Parrot_Interp *interpreter, INTVAL base_type,
 static void
 pmc_new_ext(Parrot_Interp interpreter, PMC *pmc, INTVAL base_type)
 {
-    /* TODO have a bit in the vtable defining if a pmc_ext is needed */
-    switch (base_type) {
-        case enum_class_PerlInt:
-        case enum_class_PerlNum:
-        case enum_class_PerlString:
-        case enum_class_PerlUndef:
-        case enum_class_Boolean:
-        case enum_class_PerlHash:
-
-        case enum_class_Sub:
-        case enum_class_Closure:
-        case enum_class_Continuation:
-        case enum_class_RetContinuation:
-        case enum_class_Coroutine:
-        case enum_class_Eval:
-            break;
-        default:
-            add_pmc_ext(interpreter, pmc);
-            break;
-    }
+    if (pmc->vtable->flags & VTABLE_PMC_NEEDS_EXT)
+        add_pmc_ext(interpreter, pmc);
 }
 
 /*=for api pmc pmc_new_noinit

@@ -259,11 +259,11 @@ sub parse_superpmc {
   my ($classname) = s/(?:.*?)^\s*pmclass ([\w]*)//ms;
 
   my $superpmc = 'default';
-  my $saw_extends;
+  my $saw_extends = 0;
   while (s/^(\s*)(\w+)//s) {
-      if ($saw_extends) {
+      if ($saw_extends == 1) {
           $superpmc = $2;
-          last;
+          $saw_extends = 2;
       } elsif ($2 eq 'extends') {
           $saw_extends = 1;
       }

@@ -27,7 +27,7 @@
 
 #include "parrot/parrot.h"
 
-pmclass ParrotClass {
+pmclass ParrotClass need_ext {
 
   void init () {
     /* Hang an array off the data pointer, empty of course */

@@ -24,7 +24,7 @@ enum {
     PObj_UnManagedStruct_my_memory_FLAG = PObj_private0_FLAG
 };
 
-pmclass UnManagedStruct {
+pmclass UnManagedStruct need_ext {
 
     INTVAL is_equal (PMC* value) {
 	return (SELF->vtable == value->vtable

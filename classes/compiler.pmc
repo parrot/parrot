@@ -16,7 +16,7 @@
 #include "parrot/method_util.h"
 #include "parrot/interp_guts.h"
 
-pmclass Compiler extends NCI {
+pmclass Compiler extends NCI need_ext {
 
     void* invoke (void * code_ptr) {
 	/*

@@ -13,7 +13,7 @@
 
 #include "parrot/parrot.h"
 
-pmclass Scratchpad {
+pmclass Scratchpad need_ext {
 
     void init () {
         PObj_custom_mark_destroy_SETALL(SELF);

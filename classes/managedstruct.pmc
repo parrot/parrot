@@ -14,7 +14,7 @@
 #include "parrot/parrot.h"
 #include "parrot/method_util.h"
 
-pmclass ManagedStruct extends UnManagedStruct {
+pmclass ManagedStruct extends UnManagedStruct need_ext {
 
     void init () {
       PObj_active_destroy_SET(SELF);

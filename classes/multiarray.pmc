@@ -44,7 +44,7 @@ static INTVAL calc_offset(Interp* interp, List*list, PMC *key)
     return l;
 }
 
-pmclass MultiArray extends Array {
+pmclass MultiArray extends Array need_ext {
 
     void init () {
 	/* override default in Array - no init */

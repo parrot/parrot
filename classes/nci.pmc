@@ -17,7 +17,7 @@
 #include "parrot/parrot.h"
 #include "parrot/method_util.h"
 
-pmclass NCI {
+pmclass NCI need_ext {
 
     void init() {
 	SELF->cache.struct_val = NULL;

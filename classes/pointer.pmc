@@ -13,7 +13,7 @@
 #include "parrot/parrot.h"
 #define POINTER_ERROR internal_exception(PARROT_POINTER_ERROR, "An illegal operation was performed on a Pointer (vtable function at %s line %d).\n", __FILE__, __LINE__);
 
-pmclass Pointer {
+pmclass Pointer need_ext {
 
     void init () {
         PObj_custom_mark_SET(SELF);

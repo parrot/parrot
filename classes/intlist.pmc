@@ -14,7 +14,7 @@
 
 #define THROW_UNSUPPORTED internal_exception(INTERP_ERROR, "Operation not supported\n")
 
-pmclass IntList {
+pmclass IntList need_ext {
 
     void clone (PMC *dest) {
         PObj_custom_mark_SET(dest);

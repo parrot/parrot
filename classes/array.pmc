@@ -76,7 +76,7 @@ Parrot_Array_set_pmc_ptr(Interp *interp, List *list, INTVAL key)
 }
 
 
-pmclass Array {
+pmclass Array need_ext {
 
     void class_init() {
         /* class_init_code */

@@ -38,7 +38,7 @@ void Parrot_NCI_class_init(Parrot_Interp, int);
 void Parrot_PerlHash_class_init(Parrot_Interp, int);
 void Parrot_PerlUndef_class_init(Parrot_Interp, int);
 
-pmclass ParrotIO {
+pmclass ParrotIO need_ext {
 
     void class_init () {
         PMC *method_table;

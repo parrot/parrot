@@ -11,7 +11,7 @@
 
 #include "parrot/parrot.h"
 
-pmclass Key {
+pmclass Key need_ext {
 
     void init () {
         PObj_custom_mark_SET(SELF);
