@@ -952,23 +952,44 @@ is an invocable C<Sub> PMC.
 void
 Parrot_runops_fromc(Parrot_Interp interpreter, PMC *sub)
 {
-    PMC *ret_c = NULL;
+    PMC *ret_c, *old_c;
     opcode_t offset, *dest;
 
+    /*
+     * the caller doesn't know, that a subroutine is called
+     * so P1 isn't copied up to the upper half of the register
+     * frames and isn't stored with savetop - it's totally unachored
+     *
+     * we have to dod_register the caller's return continuation
+     * to prevent it from sudden death
+     */
+    old_c = REG_PMC(1);
+    dod_register_pmc(interpreter, old_c);
     /* we need one return continuation with a NULL offset */
     ret_c = pmc_new(interpreter, enum_class_RetContinuation);
+#if GC_VERBOSE
+    PObj_report_SET(ret_c);     /* s. also dod.c */
+#endif
+    /*
+     * also be sure that this continuation isn't destroyed
+     */
+    dod_register_pmc(interpreter, ret_c);
     REG_PMC(1) = ret_c;
     /* invoke the sub, which places the context of the sub in the
      * interpreter, and switches code segments if needed
      */
     dest = VTABLE_invoke(interpreter, sub, NULL);
     if (!dest) {
+        dod_unregister_pmc(interpreter, ret_c);
+        dod_unregister_pmc(interpreter, old_c);
         /* code was run inside invoke - probably - e.g. for NCI */
         return;
     }
 
     offset = dest - interpreter->code->byte_code;
     runops(interpreter, offset);
+    dod_unregister_pmc(interpreter, ret_c);
+    dod_unregister_pmc(interpreter, old_c);
 }
 
 /*

@@ -681,9 +681,13 @@ free_unused_pobjects(struct Parrot_Interp *interpreter,
             else {
                 /* it must be dead */
 #if GC_VERBOSE
-                if (GC_DEBUG(interpreter) && PObj_report_TEST(b))
-                    fprintf(stderr, "Freeing pobject %p -> %p\n",
-                            b, b->bufstart);
+                if (GC_DEBUG(interpreter) && PObj_report_TEST(b)) {
+                    fprintf(stderr, "Freeing pobject %p\n", b);
+                    if (PObj_is_PMC_TEST(b)) {
+                        fprintf(stderr, "\t = PMC type %s\n",
+                                (char*) ((PMC*)b)->vtable->whoami->strstart);
+                    }
+                }
 #endif
                 /* if object is a PMC and needs destroying */
                 if (PObj_is_PMC_TEST(b)) {

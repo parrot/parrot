@@ -16,7 +16,7 @@ Tests garbage collection with the C<interpinfo> operation.
 
 =cut
 
-use Parrot::Test tests => 9;
+use Parrot::Test tests => 10;
 
 output_is( <<'CODE', '1', "sweep 1" );
       interpinfo I1, 2   # How many DOD runs have we done already?
@@ -167,5 +167,50 @@ err:
     print "\n"
     end
 CODE
+ok
+OUTPUT
+
+output_is(<<'CODE', <<OUTPUT, "vanishing return continuation in method calls");
+    newclass P1, "Foo"
+
+    find_global P2, "_init"
+    store_global "Foo", "__init", P2
+    find_global P2, "_inc"
+    store_global "Foo", "__increment", P2
+
+    find_type I1, "Foo"
+    new P3, I1
+    print "ok\n"
+    end
+
+.pcc_sub _init:
+    set P16, P1
+    print "init\n"
+    sweep 1
+    new P6, .PerlString
+    set P6, "hi"
+    newsub P0, .Sub, _do_inc
+    savetop
+    invokecc
+    restoretop
+    sweep 1
+    set P1, P16
+    invoke P1
+
+_do_inc:
+    sweep 1
+    inc P2
+    sweep 1
+    print "back from _inc\n"
+    invoke P1
+
+.pcc_sub _inc:
+    print "inc\n"
+    sweep 1
+    invoke P1
+CODE
+init
+inc
+back from _inc
 ok
 OUTPUT

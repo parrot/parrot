@@ -194,7 +194,7 @@ pmc_new_noinit(struct Parrot_Interp *interpreter, INTVAL base_type)
          * - get_pointer: return NULL or a pointer to the single instance
          * - set_pointer: set the only instance once
          *
-         * - singletons are created in the constant pmc pool  
+         * - singletons are created in the constant pmc pool
          */
         pmc = (Parrot_base_vtables[base_type]->get_pointer)(interpreter, NULL);
         /* LOCK */
@@ -998,6 +998,9 @@ dod_register_pmc(Parrot_Interp interpreter, PMC* pmc)
     Hash *hash;
     HashBucket *bucket;
 
+    /* Better not trigger a DOD run with a potentially unanchored PMC */
+    Parrot_block_DOD(interpreter);
+
     if (!interpreter->DOD_registry) {
         PMC *registry;
         registry = interpreter->DOD_registry = pmc_new_noinit(interpreter,
@@ -1005,16 +1008,18 @@ dod_register_pmc(Parrot_Interp interpreter, PMC* pmc)
         new_hash_x(interpreter, &hash, enum_type_int, 0, Hash_key_type_int,
                 int_compare, key_hash_int, pobject_lives);
         PObj_custom_mark_SET(registry);
-        PMC_ptr1v(registry) = hash;
+        PMC_struct_val(registry) = hash;
     }
     else
-        hash = PMC_ptr1v(interpreter->DOD_registry);
+        hash = PMC_struct_val(interpreter->DOD_registry);
 
     bucket = hash_get_bucket(interpreter, hash, pmc);
     if (bucket)
         LVALUE_CAST(long, bucket->value) ++;
     else
         hash_put(interpreter, hash, pmc, (void *) 1);
+    Parrot_unblock_DOD(interpreter);
+
 }
 
 /*
