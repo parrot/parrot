@@ -1,6 +1,6 @@
 #! perl -w
 
-use Parrot::Test tests => 15;
+use Parrot::Test tests => 18;
 use Test::More;
 
 # Tests for stack operations, currently push*, push_*_c and pop*
@@ -87,6 +87,24 @@ CODE
 3031
 OUTPUT
 
+
+my ($code, $output);
+for (0..1024) {
+   $code .= "   set I0, $_\n";
+   $code .= "   set I31, " . (1024-$_) . "\n";
+   $code .= "   pushi\n";
+}
+for (0..1024) {
+   $code .= "   popi\n";
+   $code .= "   print I0\n";
+   $code .= "   print I31\n";
+   $code .= "   print \"\\n\"\n";
+   $output .= (1024-$_) . "$_\n";
+}
+$code .= "      end\n";
+output_is($code, $output, "pushi & popi (deep)" );
+
+
 output_is(<<"CODE", <<'OUTPUT', 'pushs & pops');
 @{[ set_str_regs( sub {$_[0]%2} ) ]}
 	pushs
@@ -101,6 +119,24 @@ CODE
 10101010101010101010101010101010
 01010101010101010101010101010101
 OUTPUT
+
+
+($code, $output) = ();
+for (0..1024) {
+   $code .= "   set S0, \"$_\"\n";
+   $code .= "   set S31, \"" . (1024-$_) . "\"\n";
+   $code .= "   pushs\n";
+}
+for (0..1024) {
+   $code .= "   pops\n";
+   $code .= "   print S0\n";
+   $code .= "   print S31\n";
+   $code .= "   print \"\\n\"\n";
+   $output .= (1024-$_) . "$_\n";
+}
+$code .= "      end\n";
+output_is($code, $output, "pushs & pops (deep)" );
+
 
 output_is(<<"CODE", <<'OUTPUT', 'pushn & popn');
 @{[ set_num_regs( sub { "1.0".$_ } ) ]}
@@ -119,6 +155,7 @@ Seem to have negative Nx
 Seem to have positive Nx after pop
 OUTPUT
 
+
 output_is(<<"CODE", <<'OUTPUT', 'pushp & popp');
 	new	P0, PerlString
 	set	P0, "BUTTER IN HELL!\\n"
@@ -132,6 +169,26 @@ output_is(<<"CODE", <<'OUTPUT', 'pushp & popp');
 CODE
 THERE'LL BE NO BUTTER IN HELL!
 OUTPUT
+
+
+($code, $output) = ();
+for (0..1024) {
+   $code .= "   new P0, PerlString\n";
+   $code .= "   new P31, PerlString\n";
+   $code .= "   set P0, \"$_\"\n";
+   $code .= "   set P31, \"" . (1024-$_) . "\"\n";
+   $code .= "   pushp\n";
+}
+for (0..1024) {
+   $code .= "   popp\n";
+   $code .= "   print P0\n";
+   $code .= "   print P31\n";
+   $code .= "   print \"\\n\"\n";
+   $output .= (1024-$_) . "$_\n";
+}
+$code .= "      end\n";
+output_is($code, $output, "pushp & popp (deep)" );
+
 
 # Test proper stack chunk handling
 output_is(<<CODE, <<'OUTPUT', 'save_i & restore_i');
