@@ -16,7 +16,7 @@ Tests the object/class subsystem.
 
 =cut
 
-use Parrot::Test tests => 53;
+use Parrot::Test tests => 56;
 use Test::More;
 
 output_is(<<'CODE', <<'OUTPUT', "findclass (base class)");
@@ -357,6 +357,39 @@ output_is(<<'CODE', <<'OUTPUT', "addattribute subclass - same name");
     end
 CODE
 ok 1
+OUTPUT
+
+output_like(<<'CODE', <<'OUTPUT', "classoffset: normal operation");
+    newclass P1, "Foo"
+    find_type I0, "Foo"
+    new P2, I0
+    classoffset I1, P2, "Foo"
+    print I1
+    end
+CODE
+/\d+/
+OUTPUT
+
+output_like(<<'CODE', <<'OUTPUT', "classoffset: invalid parent class");
+    newclass P1, "Foo"
+    find_type I0, "Foo"
+    new P2, I0
+    classoffset I1, P2, "Bar"
+    print I1
+    end
+CODE
+/Class not parent of object/
+OUTPUT
+
+output_like(<<'CODE', <<'OUTPUT', "classoffset: non-object argument");
+    newclass P1, "Foo"
+    find_type I0, "Foo"
+    new P2, .Undef
+    classoffset I1, P2, "Foo"
+    print I1
+    end
+CODE
+/Not an object/
 OUTPUT
 
 output_is(<<'CODE', <<'OUTPUT', "set/get object attribs");
