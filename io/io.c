@@ -301,7 +301,8 @@ PIO_push_layer(theINTERP, ParrotIOLayer *layer, PMC *pmc)
         return -1;
     if (!PMC_IS_NULL(pmc)) {
         ParrotIO *io = PMC_data(pmc);
-
+        if (!io)
+            return -1;
         if (io->stack == NULL && (layer->flags & PIO_L_TERMINAL) == 0) {
             /* Error( 1st layer must be terminal) */
             return -1;
@@ -354,7 +355,9 @@ PIO_pop_layer(theINTERP, PMC *pmc)
     ParrotIOLayer *layer;
     ParrotIO *io = PMC_data(pmc);
 
-    if (io) {
+    if (!PMC_IS_NULL(pmc)) {
+        if (!io)
+            return -1;
         layer = io->stack;
         if (layer) {
             io->stack = layer->down;
@@ -701,7 +704,7 @@ PIO_eof(theINTERP, PMC *pmc)
      * we just fake EOF since eof test is usually in a boolean context.
      */
     if (io) {
-        return (io->flags & (PIO_F_EOF)) != 0;
+        return (io->flags & (PIO_F_EOF)) ? 1 : 0;
     }
     return 1;
 }
