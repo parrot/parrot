@@ -15,7 +15,8 @@ use vars qw(@steps);
 	inter/ops.pl
 	inter/exp.pl
 	inter/pmc.pl
-    auto/alignptrs.pl
+	auto/ccflags.pl	
+	auto/alignptrs.pl
 	auto/headers.pl
 	auto/sizes.pl
 	auto/stackdir.pl
@@ -35,7 +36,6 @@ use vars qw(@steps);
 	gen/libparrot_def.pl
         gen/core_pmcs.pl
 );
-#	auto/alignptrs.pl
 
 sub runsteps {
 	shift;

@@ -12,9 +12,8 @@ sub runstep {
     return unless defined $_[0];
 
     print "Yes..";
-    Configure::Data->set(
-        ccflags => '-DMINIPARROT'
-    );
+    
+    Configure::Data->set('miniparrot' => 1);
 }
 
 1;
