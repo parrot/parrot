@@ -136,6 +136,32 @@ Creates and returns a copy of the array.
         return dest;
     }
 
+/*
+
+=item C<void mark()>
+
+Marks the array as live.
+
+=cut
+
+*/
+
+    void mark () {
+        SizeStringData *sd;
+        int i, end;
+        STRING **data;
+        if (!PMC_data(SELF))
+            return;
+        sd = (SizeStringData *)PMC_data(SELF);
+        data = sd->data;
+        end = PMC_int_val(SELF);
+        for(i = 0; i < end; i++) {
+            if(data[i]) {
+                pobject_lives(INTERP, (PObj *) data[i]);
+            }
+        }
+    }
+
 }
 
 /*
