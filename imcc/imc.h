@@ -14,7 +14,8 @@ enum VARTYPE {    /*variable type can be      */
 enum INSTYPE {    /*instruction type can be   */
     ITBRANCH = 1, /*            branch        */
     ITOP,         /*            normal op     */
-    ITCALL        /*            funciton call */
+    ITCALL,       /*            function call */
+    ITLABEL       /*            label         */	
 };
 
 /* Ok, this won't scale to architectures like i386, but thats not
@@ -57,7 +58,14 @@ typedef struct _Instruction {
     SymReg * r3;
     int flags;             /* how the instruction affects each of the values */    
     int type;
+    int block;             /* basic block */
 } Instruction;
+
+typedef struct _Block {
+    int start;
+    int end;
+    SymReg *label;
+} Block;
 
 
 typedef enum {
@@ -93,6 +101,7 @@ void compute_du_chain(SymReg * r);
 int interferes(SymReg * r0, SymReg * r1);
 int map_colors(int x, SymReg ** graph, int colors[]);
 SymReg ** compute_graph();
+int ** compute_cf_graph();
 void allocate();
 int simplify (SymReg **g);
 void order_spilling (SymReg **g);
@@ -108,6 +117,8 @@ char                *str_cat(const char *, const char *);
 
 
 /* Stack declarations. Stolen from rxstacks.h */
+
+int IMCC_DEBUG;
 
 #define STACK_CHUNK_DEPTH 256
 

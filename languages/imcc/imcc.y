@@ -100,7 +100,8 @@ SymReg * iBRANCH(SymReg * r0) {
 }
 
 SymReg * iLABEL(SymReg * r0) {
-    emitb(mk_instruction("%s", r0, NULL, NULL, NULL, AFF_r0_read)); /* AFF_r0_read ? */
+    Instruction *i = emitb(mk_instruction("%s", r0, NULL, NULL, NULL, AFF_r0_read)); /* AFF_r0_read ? */
+    i->type = ITLABEL;
     return r0;
 }
 
@@ -385,24 +386,42 @@ const:
 %%
 
 extern FILE *yyin;
+int IMCC_DEBUG = 0;
 
 int main(int argc, char * argv[])
 {
-    if(argc > 1) {
-        if(!(yyin = fopen(argv[1], "r")))    {
-            fprintf(stderr, "Error reading source file %s.\n", argv[1] );
-            exit(0);
-        }
+    char* output;
+    
+    if( argc > 1 && ! strcmp (argv[1], "--debug")) {
+    	IMCC_DEBUG = 1;
+	argc--;
+	argv++;
     }
-    else {
+    
+    if (argc <= 1) {
         fprintf(stderr, "No source file specified.\n" );
         exit(0);
     }
 
+    if(!(yyin = fopen(argv[1], "r")))    {
+        fprintf(stderr, "Error reading source file %s.\n", argv[1] );
+        exit(0);
+    }
+   
     line = 1;
 
-    fprintf(stderr, "Pass 1: Starting parse...\n");
-    freopen("a.pasm", "w", stdout);
+    if (IMCC_DEBUG)
+    	fprintf(stderr, "Pass 1: Starting parse...\n");
+    
+    if (argc > 2) {
+        output = argv[2];
+    }
+    else {
+        output = "a.pasm";
+    }
+    
+    freopen(output, "w", stdout);
+    
     yyparse();
 
     /* Flush any pending code such as .emits */
@@ -410,8 +429,10 @@ int main(int argc, char * argv[])
 
     fclose(yyin);
     fclose(stdout);
+
     fprintf(stderr, "%ld lines compiled.\n", line);
-    fprintf(stderr, "Compiling assembly module a.pasm\n");
+    fprintf(stderr, "Compiling assembly module %s\n", output);
+
     return 0;
 }
 

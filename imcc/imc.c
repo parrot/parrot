@@ -5,9 +5,13 @@
 #include "imcparser.h"
 
 long ip;
+int cnt_basic_blocks;
+
 SymReg * hash[HASH_SIZE];
 Instruction ** instructions;
+
 int spill_counter;
+int cnt_basic_blocks;
 
 void relop_to_op(int relop, char * op) {
     switch(relop) {
@@ -243,12 +247,16 @@ IntStack nodeStack;
 void allocate() {
 
     SymReg ** g;
+    int    ** CFG;
     int spilled;
 
     spill_counter = 0;
 
+    printf("# %d", spill_counter);
+    
     while (1) {
     
+        CFG = compute_cf_graph();
         g = compute_graph();    
         nodeStack = intstack_new();  
 
@@ -263,8 +271,8 @@ void allocate() {
 	    free(g);
 	    emit_flush();
 	    clear_tables();
-	    
-	    fprintf(stderr, "\n");
+	    if(IMCC_DEBUG) 
+	        fprintf(stderr, "\n");
             spill_counter = 0;
 	    return;
 	}
@@ -321,7 +329,10 @@ SymReg ** compute_graph() {
             /* Add each symbol to its slot on the X axis of the graph */
     	    for(; r; r = r->next) {
                 if(r->type == VTREG || r->type == VTIDENTIFIER) {
-    		    fprintf(stderr, "#putting %s into graph\n", r->name); 
+			
+    		    if (IMCC_DEBUG) 
+			fprintf(stderr, "#putting %s into graph\n", r->name); 
+
     	            graph[count++] = r;
                 }
 	    }
@@ -334,8 +345,11 @@ SymReg ** compute_graph() {
     	for(x = 0; x < count; x++) {
             for(y = 0; y < count; y++) {
                 if(interferes(graph[x], graph[y])) {
-    	            fprintf(stderr, "#[%d %d] %s interferes with %s\n", x, y, graph[x]->name,
-				    graph[y]->name); 
+
+		    if (IMCC_DEBUG) 
+      	                fprintf(stderr, "#[%d %d] %s interferes with %s\n", x, y, graph[x]->name,
+			        	 graph[y]->name); 
+
                     graph[(1+x)*count+y+1] = graph[y];
 
 	           }
@@ -368,8 +382,73 @@ void compute_du_chain(SymReg * r) {
         else if(r == ins->r2) r->last = i-1;
         else if(r == ins->r3) r->last = i-1;
     }
-    fprintf(stderr, "#compute_du_chain(%s) = [%d,%d]\n", r->name, r->first,
-    	    r->last);
+    /*
+    if (IMCC_DEBUG)
+	    sprintf(stderr, "#compute_du_chain(%s) = [%d,%d]\n", r->name, r->first,
+                    	    r->last);*/
+}
+
+/* A basic block is the longest sequence of instructions that we are
+ * sure will be executed sequencally: no branches, no function calls, 
+ * no labels.
+ *
+ * The control-flow graph is a directed graph that reflects the 
+ * flow of execution between blocks.
+ *
+ */
+ 
+int** compute_cf_graph() {
+    Block* blocks;
+    int** CFG;
+    int j, i, k;
+    SymReg *label, *r0, *r1, *r2, *r3;
+    
+    blocks = calloc(256, sizeof(Block)); /* <==== */ 
+    i = 0; 
+    
+    blocks[0].start = 0;
+    blocks[0].label = NULL;
+	    
+    /* calculate the basic blocks */
+    for(j = 0; instructions[j]; j++) {
+
+	if(instructions[j]->type == ITLABEL) {
+	    blocks[i].end   = j;
+	    i++;
+	    blocks[i].start = j;
+	    blocks[i].label = instructions[j]->r0;
+	}
+			
+	instructions[j]->block = i;	
+
+        if(instructions[j]->type == ITBRANCH) {
+	    blocks[i].end   = j;
+	    i++;
+	    blocks[i].label = NULL;
+	}
+	  
+    }
+    
+    cnt_basic_blocks = i;
+    CFG = calloc(cnt_basic_blocks*cnt_basic_blocks*cnt_basic_blocks+1, sizeof(SymReg*));
+
+    /* compute the control flow graph */
+    for (j = 0; j <= cnt_basic_blocks; j++) {
+	r0   = instructions[blocks[i].end]->r0;
+	r1   = instructions[blocks[i].end]->r1;
+	r2   = instructions[blocks[i].end]->r2;
+	r3   = instructions[blocks[i].end]->r3;
+	
+        for (k = 0; k <= cnt_basic_blocks; k++) {
+	   if (( label = blocks[k].label )) {
+	      if ((label == r0) || (label == r1) || (label == r2) || (label == r3)) {  	 
+                   CFG[j][k] = 1;
+	      } 
+	   }
+	}
+    }	
+
+    return CFG;
 }
 
 /* See if r0's chain interferes with r1. */
@@ -417,7 +496,8 @@ int simplify (SymReg **g){
 	}
 		
 	if ( neighbours(x, g) < MAX_COLOR) {
-            fprintf(stderr, "#simplifying [%s]\n", g[x]->name);
+            if (IMCC_DEBUG) 
+	        fprintf(stderr, "#simplifying [%s]\n", g[x]->name);
 	    
 	    intstack_push(nodeStack, x);
 	    
@@ -505,8 +585,10 @@ int color_graph(SymReg ** graph) {
 	    for(color = 0; color < MAX_COLOR; color++) {
                 if(!colors[color]) {	    
             	   graph[x]->color = color;		
-            	   fprintf(stderr, "#[%s] provisionally gets color [%d] (%d free colors, score %d)\n", 
-		                    graph[x]->name, color, free_colors, graph[x]->score);
+            	   
+		   if (IMCC_DEBUG)
+		       fprintf(stderr, "#[%s] provisionally gets color [%d] (%d free colors, score %d)\n", 
+		                       graph[x]->name, color, free_colors, graph[x]->score);
 		   
             	   sprintf(buf, graph[x]->fmt, graph[x]->color);
             	   graph[x]->reg = str_dup(buf);
@@ -561,7 +643,8 @@ void spill (SymReg **g, int spilled) {
     SymReg *new_symbol, *old_symbol; 
     char buf[256];
 
-    fprintf(stderr, "#Spilling [%s]:\n", g[spilled]->name);
+    if (IMCC_DEBUG) 
+	fprintf(stderr, "#Spilling [%s]:\n", g[spilled]->name);
 		    
     old_symbol = g[spilled]; 
 
@@ -590,14 +673,9 @@ void spill (SymReg **g, int spilled) {
 	    tmp->r0 = new_symbol;
 	}
 
-	if (needs_fetch)
-		fprintf(stderr, "flag is %d, op is %s", tmp->flags, tmp->fmt);	    
-		
-
 	if (tmp->r1 == old_symbol) {
 		if (tmp->flags & AFF_r1_read)
 			needs_fetch = 1;
-
 		if (tmp->flags & AFF_r1_write)
 			needs_store = 1;
 
