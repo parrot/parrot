@@ -233,6 +233,8 @@ examples/assembly/mops.c: examples/assembly/mops.pbc pbc2c.pl
 examples/assembly/mops${exe}: examples/assembly/mops$(O) $(O_FILES)
 	$(LD) $(LDFLAGS) ${ld_out}examples/assembly/mops${exe} examples/assembly/mops$(O) $(O_FILES) $(C_LIBS)
 
+examples/assembly/life.pbc: examples/assembly/life.pasm assemble.pl
+	cd examples && cd assembly && $(MAKE) life.pbc PERL=$(PERL) && cd .. && cd ..
 
 ###############################################################################
 #
@@ -345,6 +347,9 @@ test: $(TEST_PROG) assemble.pl .test_dummy
 
 mopstest: $(TEST_PROG) examples/assembly/mops.pbc
 	$(TEST_PROG) examples/assembly/mops.pbc
+
+lifetest: $(TEST_PROG) examples/assembly/life.pbc
+	$(TEST_PROG) examples/assembly/life.pbc
 
 
 ###############################################################################

@@ -60,7 +60,7 @@ getout:	time N6
 	set N8, I2
 	div N1, N8, N7
 	print N1
-	print " generations/sec"
+	print " generations/sec\n"
 
 	end
 
