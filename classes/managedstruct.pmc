@@ -37,47 +37,6 @@ pmclass ManagedStruct extends UnManagedStruct need_ext {
 	}
     }
 
-    /* Returns -1 for out-of-bounds access */
-    INTVAL get_integer_keyed(PMC* key) {
-	INTVAL ix;
-
-	if (!key)
-            return -1;
-        ix = key_2_idx(INTERP, SELF, key);
-        if (!PMC_pmc_val(SELF) && (ix < 0 || ix >= PMC_int_val(SELF)))
-	    return -1;
-	return SUPER(key);
-
-    }
-
-    INTVAL get_integer_keyed_int(INTVAL ix) {
-        if (!PMC_pmc_val(SELF) && (ix < 0 || ix >= PMC_int_val(SELF)))
-	    return -1;
-	return SUPER(ix);
-    }
-
-    /* Does nothing for out-of-bound access */
-    void set_integer_keyed (PMC* key, INTVAL value) {
-        INTVAL ix;
-
-        if (!key)
-            return;
-        ix = key_2_idx(INTERP, SELF, key);
-        if (!PMC_pmc_val(SELF) && (ix < 0 || ix >= PMC_int_val(SELF)))
-            return;
-        SUPER(key, value);
-    }
-
-    void set_integer_keyed_int (INTVAL ix, INTVAL value) {
-        if (!PMC_pmc_val(SELF) && (ix < 0 || ix >= PMC_int_val(SELF)))
-            return;
-        SUPER(ix, value);
-    }
-
-    INTVAL get_integer () {
-        return(PMC_int_val(SELF));
-    }
-
     void set_integer_native (INTVAL value) {
         if (PMC_data(SELF) && (! value)) {
             mem_sys_free(PMC_data(SELF));

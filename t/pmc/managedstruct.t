@@ -1,7 +1,8 @@
 #! perl -w
 
-use Parrot::Test tests => 10;
+use Parrot::Test tests => 5;
 use Test::More;
+use Parrot::Config;
 
 output_is(<<'CODE', <<'OUTPUT', "Setting ManagedStruct size");
 	new P0,.ManagedStruct
@@ -19,134 +20,13 @@ OK_2:	print "ok 2\n"
 	eq I0,2,OK_3
 	print "not "
 OK_3:	print "ok 3\n"
-        new P1, .PerlInt
-        set P1, 3
-	set P0,P1
-	set I0,P0
-	eq I0,3,OK_4
-	print "not "
-OK_4:	print "ok 4\n"
         end
 CODE
 ok 1
 ok 2
 ok 3
-ok 4
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "Setting first element");
-        new P0, .ManagedStruct
-        set P0, 1
-	set P0[0],7
-	set I0,P0[0]
-	eq I0,7,OK_1
-	print "not "
-OK_1:	print "ok 1\n"
-	end
-CODE
-ok 1
-OUTPUT
-
-output_is(<<'CODE', <<'OUTPUT', "Setting second element");
-        new P0, .ManagedStruct
-        set P0, 2
-	set P0[1], 7
-	set I0, P0[1]
-	eq I0,7,OK_1
-	print "not "
-OK_1:	print "ok 1\n"
-	end
-CODE
-ok 1
-OUTPUT
-
-output_is(<<'CODE', <<'OUTPUT', "Setting out-of-bounds elements");
-        new P0, .ManagedStruct
-        set P0, 1
-	set P0[1], 99
-	print "ok 1\n"
-        set I0, P0[1]
-        eq I0, -1, OK_2
-        print "not "
-OK_2:   print "ok 2\n"
-
-	set P0[-1], 100
-	print "ok 3\n"
-        set I0, P0[-1]
-        eq I0, -1, OK_4
-        print "not "
-OK_4:   print "ok 4\n"
-
-# How about something _really_ out-of-bounds?
-
-        set P0[2100000000], 42
-	print "ok 5\n"
-        set I0, P0[2100000000]
-        eq I0, -1, OK_6
-        print "not "
-OK_6:   print "ok 6\n"
-
-	end
-CODE
-ok 1
-ok 2
-ok 3
-ok 4
-ok 5
-ok 6
-OUTPUT
-
-output_is(<<'CODE', <<'OUTPUT', "Getting out-of-bounds elements");
-        new P0, .ManagedStruct
-        set P0, 1
-        set I0, P0[1]
-        eq I0, -1, OK_1
-	print "not "
-OK_1:	print "ok 1\n"
-
-	set I0, P0[10]
-	eq I0, -1, OK_2
-	print "not "
-OK_2:	print "ok 2\n"
-	end
-CODE
-ok 1
-ok 2
-OUTPUT
-
-output_is(<<'CODE', <<'OUTPUT', "Re-allocating space (growing)");
-        new P0, .ManagedStruct
-        set P0, 10
-        set P0[5], 99
-        set P0, 20
-        set I0, P0[5]
-        eq I0, 99, OK_1
-	print "not "
-OK_1:	print "ok 1\n"
-	end
-CODE
-ok 1
-OUTPUT
-
-output_is(<<'CODE', <<'OUTPUT', "Re-allocating space (shrinking)");
-        new P0, .ManagedStruct
-        set P0, 10
-        set P0[5], 99
-        set P0, 2
-        set I0, P0[5]
-        eq I0, -1, OK_1
-	print "not "
-OK_1:	print "ok 1\n"
-        set P0, 0
-        set I0, P0
-        eq I0, 0, OK_2
-	print "not "
-OK_2:	print "ok 2\n"
-	end
-CODE
-ok 1
-ok 2
-OUTPUT
 
 output_is(<<'CODE', <<'OUTPUT', "element access - float, double");
     new P2, .PerlArray
@@ -279,4 +159,61 @@ x: 2
 y: 16
 OUTPUT
 
-1;
+SKIP: {
+    skip("intval size != 4", 1) if ($PConfig{intvalsize} != 4);
+
+output_is(<<'CODE', <<'OUTPUT', "nested struct offsets");
+  # the nested structure
+  .include "datatypes.pasm"
+  new P3, .PerlArray
+  push P3, .DATATYPE_INT
+  push P3, 0
+  push P3, 0
+  push P3, .DATATYPE_INT
+  push P3, 0
+  push P3, 0
+  new P4, .UnManagedStruct, P3
+  # outer structure
+  new P2, .PerlArray
+  push P2, .DATATYPE_INT
+  push P2, 0
+  push P2, 0
+  push P2, .DATATYPE_STRUCT
+  # attach the unmanged struct as property
+  set P1, P2[-1]
+  setprop P1, "_struct", P4
+  push P2, 0
+  push P2, 0
+  push P2, .DATATYPE_INT
+  push P2, 0
+  push P2, 0
+  # attach struct initializer
+  new P5, .UnManagedStruct, P2
+
+  # now check offsets
+  set I0, P2[2]
+  print I0
+  print "\n"
+  set I0, P2[5]
+  print I0
+  print "\n"
+  set I0, P2[8]
+  print I0
+  print "\n"
+  # nested
+  set I0, P3[2]
+  print I0
+  print "\n"
+  set I0, P3[5]
+  print I0
+  print "\n"
+  end
+CODE
+0
+4
+12
+0
+4
+OUTPUT
+
+}

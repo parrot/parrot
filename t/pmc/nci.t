@@ -1,4 +1,4 @@
-use Parrot::Test tests => 23;
+use Parrot::Test tests => 25;
 use Parrot::Config;
 
 print STDERR $PConfig{jitcpuarch}, " JIT CPU\n";
@@ -601,6 +601,114 @@ output_is(<<'CODE', <<'OUTPUT', "nci_p_i - func_ptr* with signature");
 CODE
 hello call_back
 4711
+OUTPUT
+
+output_is(<<'CODE', <<'OUTPUT', "nci_p_i - nested struct aligned");
+  loadlib P1, "libnci"
+  dlfunc P0, P1, "nci_pi", "pi"
+  # this test function returns a struct { int; {int; int} int }
+  set I5, 6
+  invoke
+.include "datatypes.pasm"
+  # the nested structure
+  new P3, .PerlArray
+  push P3, .DATATYPE_INT
+  push P3, 0
+  push P3, 0
+  push P3, .DATATYPE_INT
+  push P3, 0
+  push P3, 0
+  new P4, .UnManagedStruct, P3
+  # outer structure
+  new P2, .PerlArray
+  push P2, .DATATYPE_INT
+  push P2, 0
+  push P2, 0
+  push P2, .DATATYPE_STRUCT
+  # attach the unmanged struct as property
+  set P1, P2[-1]
+  setprop P1, "_struct", P4
+  push P2, 0
+  push P2, 0
+  push P2, .DATATYPE_INT
+  push P2, 0
+  push P2, 0
+  # attach struct initializer
+  assign P5, P2
+  set I0, P5[0]
+  print I0
+  print "\n"
+  # get item _y.i
+  set I0, P5[1;0]
+  print I0
+  print "\n"
+  # _y.j
+  set I0, P5[1;1]
+  print I0
+  print "\n"
+  set I0, P5[2]
+  print I0
+  print "\n"
+  end
+CODE
+32
+127
+12345
+33
+OUTPUT
+
+output_is(<<'CODE', <<'OUTPUT', "nci_p_i - nested struct unaligned");
+  loadlib P1, "libnci"
+  dlfunc P0, P1, "nci_pi", "pi"
+  # this test function returns a struct { char; {char; int} char }
+  set I5, 7
+  invoke
+.include "datatypes.pasm"
+  # the nested structure
+  new P3, .PerlArray
+  push P3, .DATATYPE_CHAR
+  push P3, 0
+  push P3, 0
+  push P3, .DATATYPE_INT
+  push P3, 0
+  push P3, 0
+  new P4, .UnManagedStruct, P3
+  # outer structure
+  new P2, .PerlArray
+  push P2, .DATATYPE_CHAR
+  push P2, 0
+  push P2, 0
+  push P2, .DATATYPE_STRUCT
+  # attach the unmanged struct as property
+  set P1, P2[-1]
+  setprop P1, "_struct", P4
+  push P2, 0
+  push P2, 0
+  push P2, .DATATYPE_CHAR
+  push P2, 0
+  push P2, 0
+  # attach struct initializer
+  assign P5, P2
+  set I0, P5[0]
+  print I0
+  print "\n"
+  # get item _y.i
+  set I0, P5[1;0]
+  print I0
+  print "\n"
+  # _y.j
+  set I0, P5[1;1]
+  print I0
+  print "\n"
+  set I0, P5[2]
+  print I0
+  print "\n"
+  end
+CODE
+32
+127
+12345
+33
 OUTPUT
 
 output_is(<<'CODE', <<'OUTPUT', "nci_i_p");
