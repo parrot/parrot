@@ -105,22 +105,23 @@ PackFile_Constant_dump(Interp *interpreter,
         PIO_printf(interpreter, "    [ 'PFC_PMC', {\n");
         {
             PMC *pmc = self->u.key;
-            struct Parrot_Sub *sub;
-            int code_start = (int)interpreter->code->cur_cs->base.data;
+            parrot_sub_t sub;
+            INTVAL code_start =
+                PTR2INTVAL(interpreter->code->cur_cs->base.data);
             switch (pmc->vtable->base_type) {
                 case enum_class_Sub:
                 case enum_class_Closure:
                 case enum_class_Continuation:
                 case enum_class_Coroutine:
-                    sub = (struct Parrot_Sub*) PMC_sub(pmc);
+                    sub = PMC_sub(pmc);
                     PIO_printf(interpreter,
                             "\tclass => %s, "
                             "start_offs => %d, "
                             "end_offs => %d, "
                             "packed => '%s'\n",
                             (char*)pmc->vtable->whoami->strstart,
-                            (int)PMC_struct_val(pmc) - code_start,
-                            (int)sub->end - code_start,
+                            PTR2INTVAL(PMC_struct_val(pmc)) - code_start,
+                            PTR2INTVAL(sub->end) - code_start,
                             sub->packed);
                     break;
                 default:
