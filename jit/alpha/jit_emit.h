@@ -188,7 +188,7 @@ emit_l_s_r(char *pc,
            long *address)
 {
     long v = (long)(((char *)address) - 
-             (char *)&interpreter->int_reg.registers[0]);
+             (char *)&interpreter->ctx.int_reg.registers[0]);
 
     pc = emit_l_s(pc, ld_st, target, base, &v); 
 

@@ -333,13 +333,13 @@ static void Parrot_jit_int_load(Parrot_jit_info *jit_info,
             break;
 
         case PARROT_ARG_I:
-            val = (int)&interpreter->int_reg.registers[val];
+            val = (int)&interpreter->ctx.int_reg.registers[val];
             emitm_ld_i(jit_info->native_ptr, Parrot_jit_regbase,
                        Parrot_jit_regoff(val, interpreter), hwreg);
             break;
 
         case PARROT_ARG_N:
-            val = (int)&interpreter->num_reg.registers[val];
+            val = (int)&interpreter->ctx.num_reg.registers[val];
             emitm_ldd_i(jit_info->native_ptr, Parrot_jit_regbase,
                        Parrot_jit_regoff(val, interpreter), hwreg);
             break;
@@ -364,13 +364,13 @@ static void Parrot_jit_int_store(Parrot_jit_info *jit_info,
 
     switch(op_type){
         case PARROT_ARG_I:
-            val = (int)&interpreter->int_reg.registers[val];
+            val = (int)&interpreter->ctx.int_reg.registers[val];
             emitm_st_i(jit_info->native_ptr, hwreg, Parrot_jit_regbase,
                        Parrot_jit_regoff(val, interpreter));
             break;
 
         case PARROT_ARG_N:
-            val = (int)&interpreter->num_reg.registers[val];
+            val = (int)&interpreter->ctx.num_reg.registers[val];
             emitm_std_i(jit_info->native_ptr, hwreg, Parrot_jit_regbase,
                        Parrot_jit_regoff(val, interpreter));
             break;
@@ -394,13 +394,13 @@ static void Parrot_jit_float_load(Parrot_jit_info *jit_info,
 
     switch(op_type){
         case PARROT_ARG_I:
-            val = (int)&interpreter->int_reg.registers[val];
+            val = (int)&interpreter->ctx.int_reg.registers[val];
             emitm_ldf_i(jit_info->native_ptr, Parrot_jit_regbase,
                         Parrot_jit_regoff(val, interpreter), hwreg);
             break;
 
         case PARROT_ARG_N:
-            val = (int)&interpreter->num_reg.registers[val];
+            val = (int)&interpreter->ctx.num_reg.registers[val];
             emitm_lddf_i(jit_info->native_ptr, Parrot_jit_regbase,
                          Parrot_jit_regoff(val, interpreter), hwreg);
             break;
@@ -424,13 +424,13 @@ static void Parrot_jit_float_store(Parrot_jit_info *jit_info,
 
     switch(op_type){
         case PARROT_ARG_I:
-            val = (int)&interpreter->int_reg.registers[val];
+            val = (int)&interpreter->ctx.int_reg.registers[val];
             emitm_stf_i(jit_info->native_ptr, hwreg, Parrot_jit_regbase,
                        Parrot_jit_regoff(val, interpreter));
             break;
 
         case PARROT_ARG_N:
-            val = (int)&interpreter->num_reg.registers[val];
+            val = (int)&interpreter->ctx.num_reg.registers[val];
             emitm_stdf_i(jit_info->native_ptr, hwreg, Parrot_jit_regbase,
                        Parrot_jit_regoff(val, interpreter));
             break;
