@@ -1,13 +1,5 @@
 # $Id$
 
-# pragmata
-use strict;
-
-use Test::Harness;
-use File::Spec;
-
-my $language = 'm4';
-
 =head1 NAME
 
 languages/m4/t/harness - A harness for Parrot m4
@@ -22,7 +14,6 @@ languages/m4/t/harness - A harness for Parrot m4
                    m4/t/basic/006_define_with_rest \
                    m4/t/regex/003_two_compiles.t
 
-
 =head1 DESCRIPTION
 
 Conformant to a recent post on p6i, if I'm called with a single
@@ -34,6 +25,14 @@ If I'm called with no args, I run all tests.
 Otherwise I try to run the list of passed tests.
 
 =cut
+
+# pragmata
+use strict;
+
+use Test::Harness();
+use File::Spec;
+
+my $language = 'm4';
 
 if ( grep { m/^-files$/ } @ARGV ) 
 {
@@ -56,7 +55,7 @@ else
     # Propably called out of 'parrot/languages'
     @files = glob( "m4/t/*/*.t" );
   }
-  runtests( @files ) if scalar(@files);
+  Test::Harness::runtests( @files ) if scalar(@files);
 }
 
 =head1 HISTORY

@@ -32,7 +32,8 @@ typedef int eval_t;
 /* This file contains the functions to evaluate integer expressions for
    the "eval" macro.  It is a little, fairly self-contained module, with
    its own scanner, and a recursive descent parser.  The only entry point
-   is evaluate ().  */
+   is evaluate ().  
+*/
 
 
 /* Evaluates token types.  */
@@ -66,8 +67,8 @@ typedef enum eval_error
 eval_error;
 
 
+/* declarations */
 static eval_error logical_or_term( eval_token, eval_t * );
-
 static eval_error logical_and_term( eval_token, eval_t * );
 static eval_error or_term( eval_token, eval_t * );
 static eval_error xor_term( eval_token, eval_t * );
@@ -81,6 +82,7 @@ static eval_error mult_term( eval_token, eval_t * );
 static eval_error exp_term( eval_token, eval_t * );
 static eval_error unary_term( eval_token, eval_t * );
 static eval_error simple_term( eval_token, eval_t * );
+boolean           evaluate (const char *, eval_t *);
 
 /*--------------------.
 | Lexical functions.  |
@@ -908,6 +910,9 @@ m4_eval_compiler( Parrot_Interp interpreter, const char *program )
     opcode_t* pc;
 
 
+    /*
+     * The real work is done here
+     */
     evaluate( program, &value );
 
     /*
@@ -921,18 +926,37 @@ m4_eval_compiler( Parrot_Interp interpreter, const char *program )
     cur_cs->base.data = mem_sys_allocate(CODE_SIZE * sizeof(opcode_t));
     cur_cs->base.size = CODE_SIZE;
     consts = cur_cs->consts;
+
     /*
-     * now start compiling
+     * Generate some bytecode
      */
     pc = cur_cs->base.data;
-    /* *pc++ = interpreter->op_lib->op_code("print_sc", 1); */
-    /* *pc++ = add_const_str(interpreter, consts, "asdfasdf" ); */
-    *pc++ = interpreter->op_lib->op_code("set_p_ic", 1);
-    *pc++ = 16;
-    *pc++ = value;
-    /* *pc++ = add_const_str(interpreter, consts, program ); */
-    /* *pc++ = interpreter->op_lib->op_code("invoke_p", 1); */
-    /* *pc++ = 1; */
+    /* first integer return value */
+    *pc++ = interpreter->op_lib->op_code("set_i_ic", 1); 
+    *pc++ = 5; 
+    *pc++ = value; 
+    /* promise to fill in the counters */
+    *pc++ = interpreter->op_lib->op_code("set_i_ic", 1); 
+    *pc++ = 0; 
+    *pc++ = 1; 
+    /* one integer return value */
+    *pc++ = interpreter->op_lib->op_code("set_i_ic", 1); 
+    *pc++ = 1; 
+    *pc++ = 1; 
+    /* no string return values */
+    *pc++ = interpreter->op_lib->op_code("set_i_ic", 1); 
+    *pc++ = 2; 
+    *pc++ = 0; 
+    /* no PMC return values */
+    *pc++ = interpreter->op_lib->op_code("set_i_ic", 1); 
+    *pc++ = 3; 
+    *pc++ = 0; 
+    /* no numeric return values */
+    *pc++ = interpreter->op_lib->op_code("set_i_ic", 1); 
+    *pc++ = 3; 
+    *pc++ = 0; 
+    /* do something else now */
+    *pc++ = interpreter->op_lib->op_code("end", 1); 
 
     return pf;
 }

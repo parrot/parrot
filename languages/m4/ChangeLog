@@ -1,5 +1,25 @@
 # $Id$
 
+2004-09-20     Bernhard Schmalhofer
+        * Play again with 'm4_eval_compiler'
+
+2004-08-09     Bernhard Schmalhofer
+        * Fix failing test basic/012_eval.t
+
+2004-07-06     Bernhard Schmalhofer
+        * Make tests work again
+        * add some tests for 'eval'
+        * yank it up to revision 0.0.7
+
+2004-06-27     Andy Dougherty
+        * Build patches for Solaris, RT#30320
+
+2004-06-21    Bernhard Schmalhofer
+        * Don't write test files into '/tmp'
+
+2004-06-10    Bernhard Schmalhofer
+        * The symbolic link 'blib' isn't needed any more
+
 2004-07-06     Bernhard Schmalhofer
         * Make tests work again
         * add some tests for 'eval'

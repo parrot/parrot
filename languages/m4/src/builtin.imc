@@ -497,7 +497,7 @@ Define a user defined macro.
 
 =head2 _m4_eval
 
-Frontend for printf like formatting. 
+Integer arithmetics.
 
 =cut
 
@@ -506,17 +506,18 @@ Frontend for printf like formatting.
     .param PerlArray arguments
 
     # get compiler
-    compreg P1, "m4_eval_compiler"
+    .local pmc m4_eval_compiler
+    m4_eval_compiler = compreg "m4_eval_compiler"
 
     # compile code and run it
-    .local string code
-    code = arguments[0]
+    .local string expression
+    expression = arguments[0]
     .local pmc compiled_code
-    compiled_code = compile P1, code
-    P16 = new PerlString
-    invoke compiled_code
+    compiled_code = compile m4_eval_compiler, expression
+    .local int evaluated_expression
+    ( evaluated_expression ) = compiled_code()
     .local string ret
-    ret = P16
+    ret = evaluated_expression
     .pcc_begin_return
       .return ret
     .pcc_end_return

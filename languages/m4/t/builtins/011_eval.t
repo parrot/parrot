@@ -2,7 +2,7 @@
 
 use strict;
 
-use Parrot::Test tests => 2;
+use Parrot::Test tests => 3;
 
 # Test the m4-Builtin function 'eval'
 
@@ -89,3 +89,19 @@ CODE
 OUT
 }
 
+
+{
+  language_output_is( 'm4', <<'CODE', <<'OUT', 'bitwise ops' );
+1   eval(   `1 | 2')  bitwise OR
+2   eval(   `1 | 3')  bitwise OR
+3   eval(   `4 & 5')  bitwise AND
+4   eval(   `4 ^ 5')  bitwise XOR
+5   eval(   `~ 254')  bitwise negation
+CODE
+1   3  bitwise OR
+2   3  bitwise OR
+3   4  bitwise AND
+4   1  bitwise XOR
+5   -255  bitwise negation
+OUT
+}

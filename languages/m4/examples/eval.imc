@@ -17,21 +17,29 @@ Just a sample.
     # load shared lib
     # There is a init-function in the shared lib,
     # which registers the new compiler
+    print "Loading shared library, let the library register the compiler\n"
     .local pmc m4_eval_compiler_lib
     m4_eval_compiler_lib = loadlib "m4_eval_compiler"
 
     # get compiler
-    compreg P1, "m4_eval_compiler"
+    print "Getting the compiler\n"
+    .local pmc m4_eval_compiler
+    m4_eval_compiler = compreg "m4_eval_compiler"
 
     # compile code and run it
-    .local string code
-    code = '1'
+    .local string expression
+    expression = '1 + 1 * 117'
+    print "Evaluating expression: "
+    print expression
+    print "\n"
     .local pmc compiled_code
-    compiled_code = compile P1, code
-    .local pmc evaled_code
-    P16 = new PerlString
-    invoke compiled_code
-    print P16
-    print "\ninvoked compiled code\n"
+    compiled_code = compile m4_eval_compiler, expression
+
+    print "Invoking compiled code, and receive returned expression\n"
+    .local int evaluated_expression
+    ( evaluated_expression ) = compiled_code()
+    print "evaluated: "
+    print evaluated_expression
+    print "\n"
     end
 .end
