@@ -1113,8 +1113,12 @@ libnci.dll: $(SRC)/nci_test$(O)
 
 # ctags
 
-tags:
+tags:	tags.dummy
+	$(RM_F) tags
 	ctags -R --links=no .
+	$(PERL) editor/addtags ops/*.ops
+
+tags.dummy:
 
 # test the EXEC stuff
 

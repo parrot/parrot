@@ -1,0 +1,25 @@
+#!/usr/bin/perl -w
+# add ops/*.ops to tags
+use strict;
+my %seen;
+
+open T, ">>tags" or die "Can't append tags";
+while (<>) {
+    if (/\bop \s+ (\w+) \s* \(/x) {
+        next if $seen{$1}++;
+	# tag file excmd xflags
+	print T qq{$1\t./$ARGV\t$.;"\tf\n};
+    }
+} continue {
+    close ARGV  if eof;           # reset $.
+}
+close T;
+# Vim needs sorted tags
+open T, "tags";
+my @tags = <T>;
+close T;
+open T, ">tags";
+@tags = sort @tags;
+print T @tags;
+close T;
+
