@@ -21,34 +21,34 @@ for (@$Parrot::OpLib::core::ops) {
 # The first pass over the code detaches keys and saves labels
 my @asm;
 my $pc = 0;
+my %labels;
 while (<>) {
     next if /^\s*#/;
     chomp;
     $_ = detach_key($_);
     s/,\s*$//; # In case of comments, trailing commas, etc.
     push @asm, $_;
-    define_labels($_);
+    define_labels(\%labels,$_);
 }
 
 # Reset variables
 $pc = 0;
 my $lineno = 0;
 my $bc;
+my %const_hash;
+my @const_array;
 
 # The second pass expands labels and ops, removes constants and emits
 # bytecode
 for (@asm) {
     $lineno++;
-    $_ = replace_labels($_);
-    $_ = expand_op($_);
-    $bc .= emit($_);
+    $_ = replace_labels($lineno,\%labels,$_);
+    $_ = expand_op(\%ops,$lineno,$_);
+    $bc .= emit(\%const_hash,\@const_array,\%fullops,$_);
 }
-my %labels;
-my %const_table;
-my @const_table;
 my $packfile = {
     bytecode => $bc,
-    constants => \@const_table
+    constants => \@const_array
 };
 
 print Parrot::PakFile2::output_bytecode($packfile);
@@ -79,12 +79,13 @@ sub detach_key {
 }
 
 sub define_labels {
+    my $labels = shift;
     local $_ = shift;
 
     # If we find a label, store its PC
     if (s/^(\s*(\w+):)//) {
-        die "Redefined label $2 at line $.\n" if exists $labels{$2};
-        $labels{$2} = $pc;
+        die "Redefined label $2 at line $.\n" if exists $labels->{$2};
+        $labels->{$2} = $pc;
     }
 
     s/^(\s*)//;
@@ -102,6 +103,8 @@ sub define_labels {
 }
 
 sub replace_labels {
+    my $lineno = shift;
+    my $labels = shift;
     local $_ = shift;
     my $output;
 
@@ -119,8 +122,8 @@ sub replace_labels {
         my ($arg_t, $arg, $extra) = @_;
         $pc++;
         if ($arg_t eq "label") {
-            if (defined $labels{$arg}) {
-                push @args, $labels{$arg} - $ops_pc;
+            if (defined $labels->{$arg}) {
+                push @args, $labels->{$arg} - $ops_pc;
             } else {
                 die "Undefined label $arg used at line $lineno\n";
             }
@@ -132,12 +135,14 @@ sub replace_labels {
 }
 
 sub expand_op {
+    my $ops = shift;
+    my $lineno = shift;
     local $_ = shift;
     s/^\s*//;
     return unless $_;
 
     s/(\w+)\s*//;
-    die "Don't know op $1" unless $ops{$1};
+    die "Don't know op $1" unless $ops->{$1};
     my $op = $1;
 
     # Now let's look at the arguments
@@ -151,19 +156,22 @@ sub expand_op {
     my $complete = $op;
     $complete .="_$type_specifier" if $type_specifier;
     warn "Can't find op $complete at line $lineno\n" 
-        unless exists $ops{$op}{$type_specifier};
+        unless exists $ops->{$op}{$type_specifier};
     return $complete." ".join ",",@args;
 }
 
 sub emit {
+    my $const_href = shift;
+    my $const_aref = shift;
+    my $fullops = shift;
     local $_ = shift;
     my $rv;
     s/^\s*//;
     return unless $_;
 
     s/(\w+)\s*//;
-    die "Can't find op $1\n" unless exists $fullops{$1};
-    $rv .= pack_op($fullops{$1}); 
+    die "Can't find op $1\n" unless exists $fullops->{$1};
+    $rv .= pack_op($fullops->{$1}); 
     Parrot::Assembler::Utils::map_args {
         my ($arg_t, $arg) = @_;
         if ($arg_t =~ /^[ispn]$/) {
@@ -174,7 +182,7 @@ sub emit {
             if ($type eq "s") {
                 $arg = eval $arg;
             }
-            $rv .= pack_op(constantize($arg, $type));
+            $rv .= pack_op(constantize($const_href,$const_aref,$arg, $type));
         } elsif ($arg_t eq "ic") {
             $rv .= pack_op($arg);
         } elsif ($arg_t eq "r") {
@@ -187,8 +195,10 @@ sub emit {
 }
 
 sub constantize {
+    my $const_href = shift;
+    my $const_aref = shift;
     my ($arg, $type) = @_;
-    return $const_table{$type}{$arg} if exists $const_table{$type}{$arg};
-    push @const_table, [uc $type, $arg];
-    return $const_table{$type}{$arg} = $#const_table;
+    return $const_href->{$type}{$arg} if exists $const_href->{$type}{$arg};
+    push @$const_aref, [uc $type, $arg];
+    return $const_href->{$type}{$arg} = $#{$const_aref};
 }
