@@ -1,4 +1,24 @@
-VERSION 0.0.5
+VERSION 0.0.6
+
+New in 0.0.6
+
+- New assembler that support keyed types (Jeff)
+- New macro layer, allowing constants (Jeff)
+- New Configure.pl (Brent)
+- Changes to bytecode format, endian issues resolved (Melvin)
+- GC improvements and bug fixes (Peter Gibbs, Mike Lambert)
+- JIT compiler rewrite (Jason and Daniel)
+- Parrot assembler in Parrot (Daniel)
+- Parrot debugger (Daniel)
+- BASIC polished, Eliza.bas is new (Clint)
+- Cola compiler committed and working, with limited OOP (Melvin)
+- Keyed aggregates (Steve Fink)
+- Global ops (Melvin)
+- Compile-time speedup (Melvin)
+- Much documentation
+- New PDDs (Dan)
+- Contributed tetris and lzw files
+- And many more, from the cast of thousands
 
 New in 0.0.5
 
