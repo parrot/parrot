@@ -3994,6 +3994,27 @@ op destroy(in PMC) {
   goto NEXT();
 }
 
+
+=item B<typeof>(out STR, in PMC)
+
+=item B<typeof>(out INT, in PMC)
+
+Return the type of PMC in $2.
+
+=cut
+
+inline op typeof (out STR, in PMC) {
+  PMC *p = $2;
+  $1 = (p->vtable->name(interpreter, p));
+  goto NEXT();
+}
+
+inline op typeof (out INT, in PMC) {
+  PMC *p = $2;
+  $1 = (p->vtable->type(interpreter, p));
+  goto NEXT();
+}
+
 ########################################
 
 =item B<find_type>(out INT, in STR)
