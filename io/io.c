@@ -499,7 +499,7 @@ PIO_pioctl(theINTERP, PMC *pmc, INTVAL cmd, INTVAL arg)
                return PIO_setlinebuf(interpreter, pmc);
             else if(arg == PIOCTL_BLKBUF)
                return PIO_setbuf(interpreter, pmc, PIO_UNBOUND);
-            else return -3;
+            else return -1;
 
        case PIOCTL_CMDGETBUFTYPE:
             if(io->flags & PIO_F_LINEBUF) return PIOCTL_LINEBUF;
@@ -511,8 +511,8 @@ PIO_pioctl(theINTERP, PMC *pmc, INTVAL cmd, INTVAL arg)
 
        case PIOCTL_CMDGETBUFSIZE:
              if(b) return b->size;
-             else return -6;
-       default: return -100;
+             else return -1;
+       default: return -1;
     }
 
     return 0;
