@@ -3,3 +3,4 @@ Makefile
 *.h
 *.tmp
 *.dump
+*.str
