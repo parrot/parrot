@@ -616,7 +616,12 @@ sub handle_arguments {
       $args[$_] =~ s/[\[\]]//g;
     }
     else {
-      $args[$_] = oct($args[$_]) if($args[$_]=~/^0[xb]?[0-9a-f]*$/);
+      if ($args[$_] =~ /^0b[01]+$/) {
+        $args[$_] = from_binary( $args[$_] );
+      }
+      elsif ($args[$_] =~ /^0x?[0-9a-f]*$/) {
+        $args[$_] = oct($args[$_]);
+      }
     }
     $pc += sizeof($rtype);
     $bytecode .= pack_arg($rtype, $args[$_]);
@@ -628,6 +633,14 @@ sub handle_arguments {
 # adds a line to the listing string.
 sub add_line_to_listing {
   $listing .= $_[0];
+}
+
+# from_binary
+# convert a string of the form 0b[01]+ to a decimal number
+sub from_binary {
+  my ($pow, $final) = (0,0);
+  $final += $_ * 2 ** $pow++ for split //, reverse substr( shift, 2 );
+  return $final;
 }
 
 # error
