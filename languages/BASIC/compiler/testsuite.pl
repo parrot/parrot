@@ -32,6 +32,28 @@ while(1) {
 }
 
 __DATA__
+' 5 and PI
+dim a$(), m()
+a$(1)="5"
+print a$(1)
+m(99)=3.14
+print m(99)
+
+' basic I/O  1..5
+open "_testfile" for output as #3
+for i=1 to 5
+	print #3, i
+next i
+close #3
+open "_testfile" for input as #5
+for i = 1 to 5
+	input #5,a$
+	print a$,
+next i
+close #5
+print
+
+
 ' Expect 5, 0, "Hello"
 common i, a$
 sub mysub
@@ -48,7 +70,6 @@ c$="WRONG"
 call mysub()
 
 
-STOPPLEASE
 ' Expect 10
 sub second(b() )
 	b(5)=10
@@ -69,7 +90,6 @@ if ( y > 0 ) and (x > 0) then
 end if
 
 
-STOPPLEASE
 
 ' Passing string arrays, expect 99 and "Hello"
 function foo(i, thing$())

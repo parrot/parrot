@@ -120,15 +120,15 @@ PARSE_NOFEED:
 			defint | const | declare | lprint | static	# Maybe these...
 		)$/x) {
 		print "WARNING: $syms[CURR] is unimplemented, skipping.\n";
-		print CODE "\t# Unimplemented '$syms[CURR] ";
+		push @{$code{$seg}->{code}}, "\t# Unimplemented '$syms[CURR] ";
 		while(1) {
 			feedme();
 			$_=$type[CURR];
 			last unless $_;
 			last if $_ =~ /STMT|COMM|COMP/;
-			print CODE "$syms[CURR] ";
+			push @{$code{$seg}->{code}}, "$syms[CURR] ";
 		}
-		print CODE "'\n";
+		push @{$code{$seg}->{code}}, "'\n";
 		goto PARSE;
 	}
 	if ($syms[CURR] eq "redim") {

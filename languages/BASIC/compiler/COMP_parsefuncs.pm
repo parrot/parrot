@@ -128,16 +128,10 @@ sub input_read_assign {
 
 	push @{$code{$seg}->{code}}, $prompt; 
 	my $sf=1;
-	if ($filedesc) {
-		# FIXME, P17 is still global
-		push @{$code{$seg}->{code}}, qq{\tset I1, P17["$filedesc"]\n};
-		push @{$code{$seg}->{code}}, qq{\teq I1, 0, ERR_BADF\n};
-		$sf=0;
-	} else {
-		push @{$code{$seg}->{code}}, "\t.arg $filedesc   # STDIN\n";
-	}
+	$sf=0 if ($filedesc);
 
 	push @{$code{$seg}->{code}},<<INP1;
+	.arg $filedesc
 	call _READLINE
 	.result \$S0
 	.arg $sf
@@ -150,7 +144,7 @@ INP1
 	# Bug here...FIXME.. I'm using $vars before it's set.
 	$vars=1;
 	if ($noreloop) {
-		push @{$code{$seg}->{code}}, "\tne \$I0, $vars, ERR_INPFIELDS\n";
+		push @{$code{$seg}->{code}}, "\t#ne \$I0, $vars, ERR_INPFIELDS\n";
 	} else {
 		push @{$code{$seg}->{code}}, "\tne \$I0, $vars, INPUT_$inputcounts  # Re-prompt\n";
 	}
@@ -233,7 +227,7 @@ sub parse_on {
 	gt $result, 255.0, ONERR_${ons}
 	branch ONOK_${ons}
 ONERR_${ons}:
-	call _ERR_ON_RANGE
+	print "On...goto/gosub out of range at $sourceline\\n"
 	call _platform_shutdown
 	end
 ONOK_${ons}:
@@ -361,15 +355,15 @@ CLS
 	feedme();
 }
 sub parse_open {
-	my(@filename)=EXPRESSION;
+	($result, $type, @code)=EXPRESSION();
 	feedme();
 	die "Expecting FOR at $sourceline" unless $syms[CURR] eq "for";
 	feedme();
 	my $mode="";
 	if ($syms[CURR] eq "input") {
-		$mode="r";
+		$mode="<";
 	} elsif ($syms[CURR] eq "output") {
-		$mode="w";
+		$mode=">";
 	} elsif ($syms[CURR] eq "random") {
 		die "random file i/o not implemented yet at $sourceline"
 	} else {
@@ -381,14 +375,11 @@ sub parse_open {
 	die "Expecting #" unless $syms[CURR] eq "#";
 	feedme();
 	$fd=$syms[CURR];
-	print CODE <<OPEN;
-@filename
-	bsr DEREF
-	bsr UNSTUFF
-	ne S2, "STRING", ERR_FN
-	set S1, "$mode"
-	bsr OPEN
-	set P17["$fd"], I0
+	push @{$code{$seg}->{code}},<<OPEN;
+@code	.arg $fd
+	.arg "$mode"
+	.arg $result
+	call _OPEN
 OPEN
 }
 sub parse_close {
@@ -396,18 +387,20 @@ sub parse_close {
 	die "Expecting # at $sourceline" unless $syms[CURR] eq "#";
 	feedme();
 	$fd=$syms[CURR];
-	print CODE<<CLOSE;
-	set I0, P17["$fd"]
-	bsr CLOSE
-	set P17["$fd"], 0
+	push @{$code{$seg}->{code}},<<CLOSE;
+	.arg $fd
+	call _CLOSE
 CLOSE
 }
 sub fdprint {	
 	my($fd, $string)=@_;
 	if ($fd) {
-		print CODE qq{\tset S0, "$string"\n};
-		print CODE qq{\tset I1, P17["$fd"]\n};
-		print CODE qq{\tbsr PRINTLINE\n};
+		push @{$code{$seg}->{code}}, <<PRINT;
+	.arg "$string"
+	.arg 1
+	.arg $fd
+	call _WRITE
+PRINT
 	} else {
 		if ($string ne "\\n") {
 			push @{$code{$seg}->{code}}, <<PRINT;
@@ -474,11 +467,20 @@ sub parse_print {
 		last if $expr;
 		($result, $type, @code)=EXPRESSION({nofeed => 1});
 		feedme();
-		push @{$code{$seg}->{code}}, <<PRINT;
+		if ($fd) { 
+			push @{$code{$seg}->{code}}, <<PRINT;
+@code	.arg $result
+	.arg 1
+	.arg $fd
+	call _WRITE
+PRINT
+		} else {
+			push @{$code{$seg}->{code}}, <<PRINT;
 @code	.arg $result
 	.arg 1
 	call _BUILTIN_DISPLAY
 PRINT
+		}
 		#print "After Expression have $type[CURR] $syms[CURR]\n";
 		$eol=0;
 		$expr=1;

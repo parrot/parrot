@@ -21,6 +21,14 @@
 	store_global "DEBUGGER", $P0
 	$P0=new PerlHash
 	store_global "COMMON", $P0
+	$P0=new PerlArray
+	fdopen $P1, 0, "r"	# STDIN and friends...
+	$P0[0]=$P1
+	fdopen $P1, 1, "w"
+	$P0[1]=$P1
+	fdopen $P1, 2, "w"
+	$P0[2]=$P1
+	store_global "FDS", $P0
 
 	JUMPLABEL = ""
 

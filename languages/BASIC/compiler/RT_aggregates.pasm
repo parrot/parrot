@@ -120,23 +120,23 @@ END_ASSIGN:
 	restoreall
 	ret
 .end
-.sub _ARRAY_ASSIGN_S	# void ARRAY_ASSIGN_N(string array, string rhs, int keycount[, string|float keys])
-	saveall
-	.param string array
-	.param string rhs
-	.local string key
-	.local PerlHash BASICARR
-	find_global BASICARR, "BASICARR"
+#.sub _ARRAY_ASSIGN_S	# void ARRAY_ASSIGN_N(string array, string rhs, int keycount[, string|float keys])
+#	saveall
+#	.param string array
+#	.param string rhs
+#	.local string key
+#	.local PerlHash BASICARR
+#	find_global BASICARR, "BASICARR"
 
-	call _ARRAY_BUILDKEY   # Will absorb rest of arguments.
-	.result key
-	set $P0, BASICARR[array]
-	set $P0[key], rhs
-
-	store_global "BASICARR", BASICARR
-	restoreall
-	ret
-.end
+#	call _ARRAY_BUILDKEY   # Will absorb rest of arguments.
+#	.result key
+#	set $P0, BASICARR[array]
+#	set $P0[key], rhs
+#
+#	store_global "BASICARR", BASICARR
+#	restoreall
+#	ret
+#.end
 # These are probably defined somewhere, I can't find them.
 .const int FLOAT = 2
 .const int STRING = 3

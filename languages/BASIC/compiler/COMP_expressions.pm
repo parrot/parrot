@@ -486,7 +486,10 @@ sub pushargs {
 	return(scalar @args, @args);
 }
 sub optype_of {
-	my($func)=@_;
+	my($func, $extra)=@_;
+	if ($extra and $extra->[2] eq "STRING") {
+		return "S";
+	}
 	if ($func=~/\$$/) {
 		return "S";
 	} else {
@@ -557,7 +560,7 @@ NEST_ARRAY_ASSIGN:		push @code, qq{\t.arg $ac\t\t\t# argc};
 						push @code, "\t.result $arg->[0]";
 					} else {
 						push @code, "\t.result \$"
-						. optype_of($arg->[0]) 
+						. optype_of($arg->[0], $arg) 
 						. "$retcount\t# Dummy, thrown away";
 						$retcount++;
 					}

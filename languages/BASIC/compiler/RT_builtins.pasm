@@ -2,7 +2,19 @@
 #
 .const int FLOAT = 2
 .const int STRING = 3
-.sub _BUILTIN_DISPLAY	 	# void display(string|float thingy[, string|float thingy2])
+.sub _BUILTIN_DISPLAY		 	# void display(....)
+	saveall
+	.local string buf
+	call _BUILTIN_DISPLAY_WORK
+	.result buf
+	print buf
+	restoreall
+	ret
+.end
+# Prepares stuff for printing.  Side effect: edits the global PRINTCOL
+#  for the current column.
+#
+.sub _BUILTIN_DISPLAY_WORK	 	# string display_work(string|float thingy[, string|float thingy2])
 	saveall
 	.param int argc
 	.local string buf
@@ -64,7 +76,7 @@ DISPTAB:
 DISPNL:	set PRINTCOL, 0
 	branch NEXT
 END_DISPLAY:
-	print buf
+	.return buf
 	set $P0["value"], PRINTCOL
 	store_global "PRINTCOL", $P0
 	restoreall

@@ -208,7 +208,8 @@ NOTNUM:
 	die "unknown: $cur at source line $stmts";
 	goto MAIN;
 
-END:	return;
+END:	emit("STMT");
+	return;
 
 }
 

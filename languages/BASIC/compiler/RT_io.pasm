@@ -4,58 +4,78 @@
 	#
 	# Not a lot of error handling here yet
 .sub _READCHARS 	# string readchars(int numchar, int fd)
-	call _line_read
-
 	saveall
 	.param int numchar
 	.param int fd
+	ne fd, 0, NORESET
+	call _line_read
+NORESET:find_global $P0, "FDS"
+	$P1=$P0[fd]
 	set $S0, ""
-	read $S0, fd, numchar
+	read $S0, $P1, numchar
 	.return $S0
 	restoreall
 	ret
 .end
+.sub _OPEN		# void open(string filename, string mode, int fd)
+	saveall
+	.param string filename
+	.param string mode
+	.param int fd
+	.local int error
+	open $P1, filename, mode
+	err error
+	eq error, 0, OPEN_OK
+	print "Error "
+	print error
+	print " in open\n"
+	end
+OPEN_OK:
+	find_global $P0, "FDS"
+	$P0[fd]=$P1
+	store_global "FDS", $P0
+	restoreall
+	ret
+.end
+.sub _CLOSE		# void close(int fd)
+	saveall
+	.param int fd
+	.local int error
+	find_global $P0, "FDS"
+	set $P1, $P0[fd]
+	close $P1
+	err error
+	eq error, 0, CLOSE_OK
+	print "Error "
+	print error
+	print " in close\n"
+	end
+CLOSE_OK:
+	store_global "FDS", $P0
+	restoreall
+	ret
+.end
+.sub _WRITE		# void writestring(int fd, 1, string stuff)
+	saveall
+	.param int fd
+	.local string buffer
+	.local int oldprintcol
 
+	find_global $P1, "PRINTCOL"
+	oldprintcol=$P1["value"]
+	call _BUILTIN_DISPLAY_WORK
+	.result buffer
+	find_global $P1, "PRINTCOL"
+	$P1["value"]=oldprintcol
+	store_global "PRINTCOL", $P1
 
+	find_global $P0, "FDS"
+	set $P1, $P0[fd]
+	print $P1, buffer
+	restoreall
+	ret
+.end
 
-#	# ###########################
-#	# OPEN
-#	#   Takes:
-#	#	S0   Filename
-#	#	S1   Mode   (r, w, a)
-#	#   Returns:
-#	#       I0   File Descriptor
-#	# 	I1   0
-#OPEN:	open I0, S0, S1
-#	err I1
-#	ne I1, 0, ERR_OPEN
-#	ret
-#
-#ERR_FN:
-#	print "Expecting string as filename"
-#	branch GEN_ERROR
-#
-#ERR_OPEN:
-#	print "Unable to open "
-#	print S0
-#	branch IO_ERR
-#
-#CLOSE:	eq I0, 0, ERR_BADF
-#	close I0
-#	err I1
-#	ne I1, 0, ERR_CLOSE
-#	ret
-#
-#ERR_CLOSE:
-#	print "Unable to close "
-#	print I0
-#	branch IO_ERR
-#
-#IO_ERR:	err S1
-#	print ": "
-#	print S1
-#	branch GEN_ERROR
-#	
 #
 #        # ###########################
 #        # READLINE    Read FD until EOL
@@ -66,11 +86,18 @@
 #        # Returns:
 #        #       I0   Error?
 .sub _READLINE		# string readline(int fd)
-	call _line_read
 	saveall
 	.param int fd
-	set $S0, ""
+	ne 0, fd, NOTSTDIN
+	call _line_read
 	readline $S0, fd
+	branch ENDREAD
+NOTSTDIN:
+	find_global $P0, "FDS"
+	$P1=$P0[fd]
+	set $S0, ""
+	read $S0, $P1, 255
+ENDREAD:
 	.return $S0
 	restoreall
 	ret
