@@ -52,3 +52,13 @@ PMC* pmc_new(struct Parrot_Interp *interpreter, INTVAL base_type) {
     pmc->vtable->init(interpreter, pmc);
     return pmc;
 }
+
+/*
+ * Local variables:
+ * c-indentation-style: bsd
+ * c-basic-offset: 4
+ * indent-tabs-mode: nil
+ * End:
+ *
+ * vim: expandtab shiftwidth=4:
+ */

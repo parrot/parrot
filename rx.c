@@ -160,3 +160,13 @@ void bitmap_destroy(Bitmap bmp) {
 	mem_sys_free(bmp->bmp);
 	mem_sys_free(bmp);
 }
+
+/*
+ * Local variables:
+ * c-indentation-style: bsd
+ * c-basic-offset: 4
+ * indent-tabs-mode: nil
+ * End:
+ *
+ * vim: expandtab shiftwidth=4:
+ */
