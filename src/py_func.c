@@ -61,6 +61,55 @@ parrot_py_chr(Interp *interpreter, PMC *pmc)
 }
 
 static PMC *
+parrot_py_filter(Interp *interpreter, PMC *func, PMC *list)
+{
+    PMC *res, *iter;
+    INTVAL i, n;
+    STRING *s;
+    INTVAL type;
+    int none_func;
+
+    type = list->vtable->base_type;
+    iter = NULL;
+    switch (type) {
+        case enum_class_String:
+        case enum_class_PerlString:
+            res = pmc_new(interpreter, type);
+            break;
+        case enum_class_Iterator:
+            iter = list;
+            /* fall through */
+        default:
+            res = pmc_new(interpreter, enum_class_PerlArray);
+            break;
+    }
+    if (!iter)
+        iter = pmc_new_init(interpreter, enum_class_Iterator, list);
+    VTABLE_set_integer_native(interpreter, iter, 0);
+    i = 0;
+    none_func = PMC_IS_NULL(func) ||
+        func == Parrot_base_vtables[enum_class_None]->data;
+    while (VTABLE_get_bool(interpreter, iter)) {
+        PMC *item = VTABLE_shift_pmc(interpreter, iter);
+        if (none_func) {
+            if (!VTABLE_get_bool(interpreter, item))
+                continue;
+        }
+        else {
+            /* run filter func -
+             * TODO save registers once around loop
+             */
+            PMC *t = Parrot_runops_fromc_args_save(interpreter, func,
+                    "PP", item);
+            if (!VTABLE_get_bool(interpreter, t))
+                continue;
+        }
+        VTABLE_set_pmc_keyed_int(interpreter, res, i++, item);
+    }
+    return res;
+}
+
+static PMC *
 parrot_py_hash(Interp *interpreter, PMC *pmc)
 {
     PMC *h = pmc_new_noinit(interpreter, enum_class_PerlInt);
@@ -125,6 +174,9 @@ parrot_py_range_3(Interp *interpreter, PMC *sta, PMC *pmc, PMC *ste)
     INTVAL start = VTABLE_get_integer(interpreter, sta);
     INTVAL end = VTABLE_get_integer(interpreter, pmc);
     INTVAL step = VTABLE_get_integer(interpreter, ste);
+    if (step == 0)
+        real_exception(interpreter, NULL, E_ValueError,
+                "range() step argument must not be zero");
     return parrot_py_range(interpreter, start, end, step);
 }
 
@@ -198,6 +250,9 @@ parrot_py_create_funcs(Interp *interpreter)
     STRING *iter     = CONST_STRING(interpreter, "iter");
     STRING *iter_sig = CONST_STRING(interpreter, "PIP");
 
+    STRING *filter     = CONST_STRING(interpreter, "filter");
+    STRING *filter_sig = CONST_STRING(interpreter, "PIPP");
+
     STRING *range_1     = CONST_STRING(interpreter, "range_1");
     STRING *range_1_sig = CONST_STRING(interpreter, "PIP");
 
@@ -218,6 +273,8 @@ parrot_py_create_funcs(Interp *interpreter)
             hash, hash_sig);
     parrot_py_global(interpreter, F2DPTR(parrot_py_iter),
             iter, iter_sig);
+    parrot_py_global(interpreter, F2DPTR(parrot_py_filter),
+            filter, filter_sig);
     parrot_py_global(interpreter, F2DPTR(parrot_py_range_1),
             range_1, range_1_sig);
     parrot_py_global(interpreter, F2DPTR(parrot_py_range_2),
@@ -259,6 +316,21 @@ parrot_py_create_exceptions(Interp *interpreter)
     ex = ex_list[E_NameError];
     s = CONST_STRING(interpreter, "NameError");
     Parrot_store_global(interpreter, NULL, s, ex);
+
+    ex = ex_list[E_ValueError];
+    s = CONST_STRING(interpreter, "ValueError");
+    Parrot_store_global(interpreter, NULL, s, ex);
+}
+
+static void
+parrot_py_create_vars(Interp *interpreter)
+{
+    PMC *p;
+    STRING *s;
+
+    p = Parrot_base_vtables[enum_class_None]->data;
+    s = CONST_STRING(interpreter, "None");
+    Parrot_store_global(interpreter, NULL, s, p);
 }
 
 /*
@@ -269,10 +341,12 @@ Initialize Python functions.
 
 */
 
-void Parrot_py_init(Interp *interpreter) {
+void
+Parrot_py_init(Interp *interpreter)
+{
     parrot_py_create_funcs(interpreter);
     parrot_py_create_exceptions(interpreter);
-
+    parrot_py_create_vars(interpreter);
 }
 
 /*

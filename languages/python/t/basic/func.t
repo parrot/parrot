@@ -3,7 +3,7 @@
 use strict;
 use lib '../../lib';
 
-use Parrot::Test tests => 14;
+use Parrot::Test tests => 17;
 
 sub test {
     language_output_is('python', $_[0], '', $_[1]);
@@ -110,6 +110,19 @@ if __name__ == '__main__':
     main()
 CODE
 
+test(<<'CODE', 'range 3 0 step');
+
+def main():
+    try:
+	for i in range(1,2,0):
+	    print i
+    except ValueError,e:
+	print e
+if __name__ == '__main__':
+    main()
+
+CODE
+
 test(<<'CODE', 'tuple 1');
 def main():
     print tuple("abcd")[1]
@@ -124,6 +137,23 @@ def main():
     i = iter(s)
     print tuple(i)[2]
 
+if __name__ == '__main__':
+    main()
+CODE
+
+test(<<'CODE', 'filter no func');
+
+def main():
+    for i in filter(None, range(3)):
+	print i
+if __name__ == '__main__':
+    main()
+CODE
+
+test(<<'CODE', 'filter no func ar');
+def main():
+    for i in filter(None, (0,1,2,0,3,0,4,0)):
+	print i
 if __name__ == '__main__':
     main()
 CODE
