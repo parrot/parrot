@@ -26,7 +26,7 @@ PackFile_pack_size(struct PackFile *self)
 {
     opcode_t header_size;
     opcode_t magic_size;
-    opcode_t oct_size; /* opcode_type */
+    opcode_t oct_size;          /* opcode_type */
     opcode_t segment_length_size;
     opcode_t fixup_table_size;
     opcode_t const_table_size;
@@ -84,17 +84,17 @@ PackFile_pack(struct PackFile *self, opcode_t *packed)
     self->header->major = PARROT_MAJOR_VERSION;
     self->header->flags = 0;
     self->header->floattype = 0;
- 
+
     /* Pack the header */
     mem_sys_memcopy(cursor, self->header, PACKFILE_HEADER_BYTES);
     cursor += PACKFILE_HEADER_BYTES / sizeof(opcode_t);
-    
+
     /* Pack the magic */
     *cursor++ = PARROT_MAGIC;
 
     /* Pack opcode type */
     *cursor++ = OPCODE_TYPE_PERL;
-    
+
     /* Pack the fixup table size, followed by the packed fixup table */
 
     *cursor++ = fixup_table_size;
@@ -178,8 +178,8 @@ PackFile_ConstTable_pack_size()!
 ***************************************/
 
 void
-PackFile_ConstTable_pack(struct PackFile * packfile, struct PackFile_ConstTable *self,
-                            opcode_t *packed)
+PackFile_ConstTable_pack(struct PackFile *packfile,
+                         struct PackFile_ConstTable *self, opcode_t *packed)
 {
     opcode_t *cursor;
     opcode_t i;

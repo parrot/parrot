@@ -48,16 +48,16 @@
 struct _hashbucket {
     STRING *key;
     KEY_ATOM value;
-    HASHBUCKET* next;
+    HASHBUCKET *next;
 };
 
 struct _hash {
-    Buffer buffer; /* This struct is a Buffer subclass! */
+    Buffer buffer;              /* This struct is a Buffer subclass! */
     UINTVAL num_buckets;
-    UINTVAL entries; /* Number of values stored in hashtable */
-    Buffer* bucket_pool; /* Buffer full of buckets, used and unused */
-    HASHBUCKET* free_list;
-    HASHBUCKET* former_base;
+    UINTVAL entries;            /* Number of values stored in hashtable */
+    Buffer *bucket_pool;        /* Buffer full of buckets, used and unused */
+    HASHBUCKET *free_list;
+    HASHBUCKET *former_base;
 };
 
 /* This routine must be called at the beginning of all public entry
@@ -65,39 +65,40 @@ struct _hash {
  * moved things around. If it bothers you that this has to scan the
  * whole hashtable and so will slow things down tremendously, consider
  * this: that's what garbage collection does during DOD anyway! */
-static void restore_invariants(Interp* interpreter, HASH* hash)
+static void
+restore_invariants(Interp *interpreter, HASH *hash)
 {
     ptrdiff_t adjust;
     UINTVAL i;
-    HASHBUCKET** table;
-    HASHBUCKET* current_base = (HASHBUCKET*) hash->bucket_pool->bufstart;
+    HASHBUCKET **table;
+    HASHBUCKET *current_base = (HASHBUCKET *)hash->bucket_pool->bufstart;
     UINTVAL table_size;
 
     UNUSED(interpreter);
 
     if (current_base == NULL || current_base == hash->former_base)
-        return; /* Nothing has moved, so we're good. */
+        return;                 /* Nothing has moved, so we're good. */
 
     if (hash->former_base == NULL) {
         /* Moved from nowhere to somewhere, so no fixup needed */
         hash->former_base = current_base;
         return;
     }
-    
+
 /*      fprintf(stderr, "Moving hash %p buckets from %p -> %p\n", */
 /*              hash, hash->former_base, current_base); */
 
-    adjust = (char*)current_base - (char*)hash->former_base;
+    adjust = (char *)current_base - (char *)hash->former_base;
 
     /* Fix up the free list */
     if (hash->free_list)
-        hash->free_list = (HASHBUCKET*)((char*)hash->free_list + adjust);
+        hash->free_list = (HASHBUCKET *)((char *)hash->free_list + adjust);
 
     /* Fix up the hashtable */
-    table = (HASHBUCKET**) hash->buffer.bufstart;
+    table = (HASHBUCKET **)hash->buffer.bufstart;
     for (i = 0; i < hash->num_buckets; i++) {
         if (table[i])
-            table[i] = (HASHBUCKET*)((char*)table[i] + adjust);
+            table[i] = (HASHBUCKET *)((char *)table[i] + adjust);
     }
 
     /* Fix up the buckets themselves. All buckets in the pool are
@@ -107,8 +108,8 @@ static void restore_invariants(Interp* interpreter, HASH* hash)
     table_size = hash->bucket_pool->buflen / sizeof(HASHBUCKET);
     for (i = 0; i < table_size; i++) {
         if (current_base[i].next)
-            current_base[i].next = (HASHBUCKET*)((char*)current_base[i].next
-                                                 + adjust);
+            current_base[i].next = (HASHBUCKET *)((char *)current_base[i].next
+                                                  + adjust);
     }
 
     hash->former_base = current_base;
@@ -139,39 +140,43 @@ key_hash(Interp *interpreter, STRING *value)
 }
 
 void
-dump_hash(Interp* interpreter, HASH* hash)
+dump_hash(Interp *interpreter, HASH *hash)
 {
     UINTVAL i;
-    HASHBUCKET** buckets = (HASHBUCKET**) hash->buffer.bufstart;
+    HASHBUCKET **buckets = (HASHBUCKET **)hash->buffer.bufstart;
     fprintf(stderr, "Hashtable[" INTVAL_FMT "/" INTVAL_FMT "]\n",
             hash->entries, hash->num_buckets);
     for (i = 0; i <= hash->num_buckets; i++) {
-        HASHBUCKET* bucket;
-        if (i == hash->num_buckets) bucket = hash->free_list;
-        else bucket = buckets[i];
-        if (bucket == NULL) continue;
+        HASHBUCKET *bucket;
+        if (i == hash->num_buckets)
+            bucket = hash->free_list;
+        else
+            bucket = buckets[i];
+        if (bucket == NULL)
+            continue;
         fprintf(stderr, "  Bucket " INTVAL_FMT ": ", i);
         while (bucket) {
             fprintf(stderr, "type(%d)", bucket->value.type);
             bucket = bucket->next;
-            if (bucket) fprintf(stderr, " -> ");
+            if (bucket)
+                fprintf(stderr, " -> ");
         }
         fprintf(stderr, "\n");
     }
 }
 
-PMC*
-mark_hash(Interp* interpreter, HASH* hash, PMC* end_of_used_list)
+PMC *
+mark_hash(Interp *interpreter, HASH *hash, PMC *end_of_used_list)
 {
     UINTVAL i;
-    HASHBUCKET** buckets = (HASHBUCKET**) hash->buffer.bufstart;
+    HASHBUCKET **buckets = (HASHBUCKET **)hash->buffer.bufstart;
 
     restore_invariants(interpreter, hash);
 
     buffer_lives((Buffer *)hash);
     buffer_lives(hash->bucket_pool);
     for (i = 0; i < hash->num_buckets; i++) {
-        HASHBUCKET* bucket = buckets[i];
+        HASHBUCKET *bucket = buckets[i];
         while (bucket) {
             buffer_lives((Buffer *)bucket->key);
             if (bucket->value.type == enum_key_string)
@@ -206,37 +211,37 @@ mark_hash(Interp* interpreter, HASH* hash, PMC* end_of_used_list)
  * with the ->next pointers, and they'll be all over memory.)
  */
 static void
-expand_hash(Interp *interpreter, HASH* hash)
+expand_hash(Interp *interpreter, HASH *hash)
 {
-    HASHBUCKET** table;
-    HASHBUCKET* bucket;
+    HASHBUCKET **table;
+    HASHBUCKET *bucket;
     UINTVAL new_size = (hash->num_buckets ? hash->num_buckets * 2
-                                          : INITIAL_BUCKETS);
+                        : INITIAL_BUCKETS);
     UINTVAL i;
     UINTVAL old_pool_size = hash->bucket_pool->buflen / sizeof(HASHBUCKET);
     UINTVAL new_pool_size = new_size * MAXFULL_PERCENT / 100;
 
-    Parrot_reallocate(interpreter, hash, new_size * sizeof(HASHBUCKET*));
+    Parrot_reallocate(interpreter, hash, new_size * sizeof(HASHBUCKET *));
     Parrot_reallocate(interpreter, hash->bucket_pool,
                       new_pool_size * sizeof(HASHBUCKET));
-    restore_invariants(interpreter, hash); /* Bucket pool may have moved */
+    restore_invariants(interpreter, hash);      /* Bucket pool may have moved */
 
     /* Add the newly allocated buckets onto the free list */
     for (i = old_pool_size; i < new_pool_size; i++) {
-        bucket = &((HASHBUCKET*) hash->bucket_pool->bufstart)[i];
+        bucket = &((HASHBUCKET *)hash->bucket_pool->bufstart)[i];
         bucket->next = hash->free_list;
         hash->free_list = bucket;
     }
 
-    table = (HASHBUCKET**) hash->buffer.bufstart;
+    table = (HASHBUCKET **)hash->buffer.bufstart;
 
     /* NULL out new space in table */
     memset(table + hash->num_buckets, 0,
-           (new_size - hash->num_buckets) * sizeof(HASHBUCKET*));
+           (new_size - hash->num_buckets) * sizeof(HASHBUCKET *));
 
     /* Move buckets to new homes */
     for (i = 0; i < hash->num_buckets; i++) {
-        HASHBUCKET** bucketP = &table[i];
+        HASHBUCKET **bucketP = &table[i];
         while (*bucketP != NULL) {
             bucket = *bucketP;
             if ((key_hash(interpreter, bucket->key) % new_size) != i) {
@@ -257,7 +262,7 @@ expand_hash(Interp *interpreter, HASH* hash)
 }
 
 static HASHBUCKET *
-new_bucket(Interp *interpreter, HASH* hash, STRING *key, KEY_ATOM *value)
+new_bucket(Interp *interpreter, HASH *hash, STRING *key, KEY_ATOM *value)
 {
     if (key == NULL) {
         internal_exception(INTERNAL_PANIC, "NULL key\n");
@@ -304,7 +309,7 @@ find_bucket(Interp *interpreter, HASHBUCKET *head, STRING *key)
 HASH *
 new_hash(Interp *interpreter)
 {
-    HASH* hash = (HASH *) new_tracked_header(interpreter, sizeof(*hash));
+    HASH *hash = (HASH *)new_tracked_header(interpreter, sizeof(*hash));
 /*      hash->buffer.flags |= BUFFER_report_FLAG; */
     hash->num_buckets = 0;
     hash->entries = 0;
@@ -337,38 +342,39 @@ hash_size(Interp *interpreter, HASH *hash)
     }
 }
 
-static HASHBUCKET*
-hash_lookup(Interp *interpreter, HASH *hash, STRING* key)
+static HASHBUCKET *
+hash_lookup(Interp *interpreter, HASH *hash, STRING *key)
 {
-    HASHBUCKET** table = (HASHBUCKET**) hash->buffer.bufstart;
+    HASHBUCKET **table = (HASHBUCKET **)hash->buffer.bufstart;
     UINTVAL hashval = key_hash(interpreter, key);
-    HASHBUCKET* chain = table[hashval % hash->num_buckets];
+    HASHBUCKET *chain = table[hashval % hash->num_buckets];
     return find_bucket(interpreter, chain, key);
 }
 
 KEY_ATOM *
-hash_get(Interp *interpreter, HASH *hash, STRING* key)
+hash_get(Interp *interpreter, HASH *hash, STRING *key)
 {
-    HASHBUCKET* bucket;
+    HASHBUCKET *bucket;
     restore_invariants(interpreter, hash);
     bucket = hash_lookup(interpreter, hash, key);
-    if (bucket == NULL) return NULL; /* Not found */
+    if (bucket == NULL)
+        return NULL;            /* Not found */
     return &bucket->value;
 }
 
 /* The key is *not* copied. */
 void
-hash_put(Interp *interpreter, HASH *hash, STRING* key, KEY_ATOM* value)
+hash_put(Interp *interpreter, HASH *hash, STRING *key, KEY_ATOM *value)
 {
-    HASHBUCKET** table;
+    HASHBUCKET **table;
     UINTVAL hashval;
-    HASHBUCKET* chain;
-    HASHBUCKET* bucket;
+    HASHBUCKET *chain;
+    HASHBUCKET *bucket;
 
     restore_invariants(interpreter, hash);
 /*      dump_hash(interpreter, hash); */
 
-    table = (HASHBUCKET**) hash->buffer.bufstart;
+    table = (HASHBUCKET **)hash->buffer.bufstart;
     hashval = key_hash(interpreter, key);
     chain = table ? table[hashval % hash->num_buckets] : NULL;
     bucket = find_bucket(interpreter, chain, key);
@@ -384,7 +390,7 @@ hash_put(Interp *interpreter, HASH *hash, STRING* key, KEY_ATOM* value)
         /* Create new bucket */
         hash->entries++;
         bucket = new_bucket(interpreter, hash, key, value);
-        table = (HASHBUCKET**) hash->buffer.bufstart;
+        table = (HASHBUCKET **)hash->buffer.bufstart;
         bucket->next = table[hashval % hash->num_buckets];
         table[hashval % hash->num_buckets] = bucket;
     }
@@ -392,24 +398,26 @@ hash_put(Interp *interpreter, HASH *hash, STRING* key, KEY_ATOM* value)
 }
 
 void
-hash_delete(Interp *interpreter, HASH *hash, STRING* key)
+hash_delete(Interp *interpreter, HASH *hash, STRING *key)
 {
-    HASHBUCKET** table;
+    HASHBUCKET **table;
     UINTVAL hashval;
-    HASHBUCKET* chain;
-    HASHBUCKET* bucket;
-    HASHBUCKET* prev = NULL;
+    HASHBUCKET *chain;
+    HASHBUCKET *bucket;
+    HASHBUCKET *prev = NULL;
 
     restore_invariants(interpreter, hash);
 
-    table = (HASHBUCKET**) hash->buffer.bufstart;
+    table = (HASHBUCKET **)hash->buffer.bufstart;
     hashval = key_hash(interpreter, key);
     chain = table[hashval % hash->num_buckets];
 
     for (bucket = chain; bucket != NULL; bucket = bucket->next) {
         if (string_compare(interpreter, key, bucket->key) == 0) {
-            if (prev) prev->next = bucket->next;
-            else table[hashval % hash->num_buckets] = bucket->next;
+            if (prev)
+                prev->next = bucket->next;
+            else
+                table[hashval % hash->num_buckets] = bucket->next;
             hash->entries--;
             return;
         }

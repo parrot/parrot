@@ -21,19 +21,20 @@
 /*
  * Byte order handlers.
  */
- 
+
 /*
  * Configure should have checked for supported word sizes
  */
 
 INTVAL
-fetch_iv_le(INTVAL w) {
+fetch_iv_le(INTVAL w)
+{
 #if !PARROT_BIGENDIAN
     return w;
 #else
     INTVAL r;
 #  if INTVAL_SIZE == 4
-    return (w << 24) | ((w & 0xff00) << 8) | ((w & 0xff0000) >> 8) | (w>>24); 
+    return (w << 24) | ((w & 0xff00) << 8) | ((w & 0xff0000) >> 8) | (w >> 24);
 #  else
     r = w << 56;
     r |= (w & 0xff00) << 40;
@@ -42,18 +43,19 @@ fetch_iv_le(INTVAL w) {
     r |= (w & 0xff00000000) >> 8;
     r |= (w & 0xff0000000000) >> 24;
     r |= (w & 0xff00000000000000) >> 56;
-    return r;    
+    return r;
 #  endif
 #endif
 }
 
 INTVAL
-fetch_iv_be(INTVAL w) {
+fetch_iv_be(INTVAL w)
+{
 #if PARROT_BIGENDIAN
     return w;
 #else
 #  if INTVAL_SIZE == 4
-    return (w << 24) | ((w & 0xff00) << 8) | ((w & 0xff0000) >> 8) | (w>>24); 
+    return (w << 24) | ((w & 0xff00) << 8) | ((w & 0xff0000) >> 8) | (w >> 24);
 #  else
     INTVAL r;
     r = w << 56;
@@ -63,7 +65,7 @@ fetch_iv_be(INTVAL w) {
     r |= (w & 0xff00000000) >> 8;
     r |= (w & 0xff0000000000) >> 24;
     r |= (w & 0xff00000000000000) >> 56;
-    return r;    
+    return r;
 #  endif
 #endif
 }
@@ -73,13 +75,14 @@ fetch_iv_be(INTVAL w) {
  * Same as above for opcode_t
  */
 opcode_t
-fetch_op_be(opcode_t w) {
+fetch_op_be(opcode_t w)
+{
 #if PARROT_BIGENDIAN
     return w;
 #else
 #  if OPCODE_T_SIZE == 4
-    return  (w << 24) | ((w & 0x0000ff00) << 8) | ((w & 0x00ff0000) >> 8) |
-            ((w & 0xff000000) >>24); 
+    return (w << 24) | ((w & 0x0000ff00) << 8) | ((w & 0x00ff0000) >> 8) |
+        ((w & 0xff000000) >> 24);
 #  else
     opcode_t r;
     r = w << 56;
@@ -89,20 +92,21 @@ fetch_op_be(opcode_t w) {
     r |= (w & 0xff00000000) >> 8;
     r |= (w & 0xff0000000000) >> 24;
     r |= (w & 0xff00000000000000) >> 56;
-    return r;    
+    return r;
 #  endif
-#endif    
+#endif
 }
 
 opcode_t
-fetch_op_le(opcode_t w) {
+fetch_op_le(opcode_t w)
+{
 #if !PARROT_BIGENDIAN
     return w;
 #else
     opcode_t r;
 #  if OPCODE_T_SIZE == 4
-    return  (w << 24) | ((w & 0x0000ff00) << 8) | ((w & 0x00ff0000) >> 8) |
-            ((w & 0xff000000) >>24); 
+    return (w << 24) | ((w & 0x0000ff00) << 8) | ((w & 0x00ff0000) >> 8) |
+        ((w & 0xff000000) >> 24);
 #  else
     r = w << 56;
     r |= (w & 0xff00) << 40;
@@ -111,9 +115,9 @@ fetch_op_le(opcode_t w) {
     r |= (w & 0xff00000000) >> 8;
     r |= (w & 0xff0000000000) >> 24;
     r |= (w & 0xff00000000000000) >> 56;
-    return r;    
+    return r;
 #  endif
-#endif    
+#endif
 }
 
 /*
@@ -122,7 +126,8 @@ fetch_op_le(opcode_t w) {
  * pulling something out of a padded buffer.    
  */
 void
-fetch_buf_be_4(unsigned char * rb, unsigned char * b) {
+fetch_buf_be_4(unsigned char *rb, unsigned char *b)
+{
 #if PARROT_BIGENDIAN
     memcpy(rb, b, 4);
 #else
@@ -134,7 +139,8 @@ fetch_buf_be_4(unsigned char * rb, unsigned char * b) {
 }
 
 void
-fetch_buf_le_4(unsigned char * rb, unsigned char * b) {
+fetch_buf_le_4(unsigned char *rb, unsigned char *b)
+{
 #if !PARROT_BIGENDIAN
     memcpy(rb, b, 4);
 #else
@@ -146,7 +152,8 @@ fetch_buf_le_4(unsigned char * rb, unsigned char * b) {
 }
 
 void
-fetch_buf_be_8(unsigned char * rb, unsigned char * b) {
+fetch_buf_be_8(unsigned char *rb, unsigned char *b)
+{
 #if PARROT_BIGENDIAN
     memcpy(rb, b, 8);
 #else
@@ -162,7 +169,8 @@ fetch_buf_be_8(unsigned char * rb, unsigned char * b) {
 }
 
 void
-fetch_buf_le_8(unsigned char * rb, unsigned char * b) {
+fetch_buf_le_8(unsigned char *rb, unsigned char *b)
+{
 #if !PARROT_BIGENDIAN
     memcpy(rb, b, 8);
 #else
@@ -178,7 +186,8 @@ fetch_buf_le_8(unsigned char * rb, unsigned char * b) {
 }
 
 void
-fetch_buf_le_12(unsigned char * rb, unsigned char * b) {
+fetch_buf_le_12(unsigned char *rb, unsigned char *b)
+{
 #if !PARROT_BIGENDIAN
     memcpy(rb, b, 12);
 #else
@@ -198,7 +207,8 @@ fetch_buf_le_12(unsigned char * rb, unsigned char * b) {
 }
 
 void
-fetch_buf_be_12(unsigned char * rb, unsigned char * b) {
+fetch_buf_be_12(unsigned char *rb, unsigned char *b)
+{
 #if PARROT_BIGENDIAN
     memcpy(rb, b, 12);
 #else
@@ -218,7 +228,8 @@ fetch_buf_be_12(unsigned char * rb, unsigned char * b) {
 }
 
 void
-fetch_buf_le_16(unsigned char * rb, unsigned char * b) {
+fetch_buf_le_16(unsigned char *rb, unsigned char *b)
+{
 #if !PARROT_BIGENDIAN
     memcpy(rb, b, 16);
 #else
@@ -242,7 +253,8 @@ fetch_buf_le_16(unsigned char * rb, unsigned char * b) {
 }
 
 void
-fetch_buf_be_16(unsigned char * rb, unsigned char * b) {
+fetch_buf_be_16(unsigned char *rb, unsigned char *b)
+{
 #if PARROT_BIGENDIAN
     memcpy(rb, b, 16);
 #else

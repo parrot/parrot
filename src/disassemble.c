@@ -24,7 +24,7 @@ int
 main(int argc, char *argv[])
 {
     Parrot_Interp interpreter;
-    char *filename,*disassemble;
+    char *filename, *disassemble;
     Parrot_PackFile pf;
 
     interpreter = Parrot_new();
@@ -35,9 +35,8 @@ main(int argc, char *argv[])
 
     Parrot_init(interpreter);
 
-    if (argc != 2)
-    {
-        fprintf(stderr,"Usage: disassemble programfile \n");
+    if (argc != 2) {
+        fprintf(stderr, "Usage: disassemble programfile \n");
         exit(1);
     }
 

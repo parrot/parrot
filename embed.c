@@ -41,8 +41,10 @@ void
 Parrot_setflag(struct Parrot_Interp *interpreter, Parrot_Interp_flag flag,
                Parrot_Interp_flag_val value)
 {
-    if (value) Interp_flags_SET(interpreter, flag);
-    else       Interp_flags_CLEAR(interpreter, flag);
+    if (value)
+        Interp_flags_SET(interpreter, flag);
+    else
+        Interp_flags_CLEAR(interpreter, flag);
 }
 
 void
@@ -207,7 +209,7 @@ Parrot_runcode(struct Parrot_Interp *interpreter, int argc, char *argv[])
     key.next = NULL;
 
     for (i = 0; i < argc; i++) {
-        STRING* arg = string_make(interpreter, argv[i], strlen(argv[i]),
+        STRING *arg = string_make(interpreter, argv[i], strlen(argv[i]),
                                   0, BUFFER_external_FLAG, 0);
 
         if (Interp_flags_TEST(interpreter, PARROT_DEBUG_FLAG)) {
@@ -308,7 +310,7 @@ Parrot_debug(struct Parrot_Interp *interpreter)
     while (!(pdb->state & PDB_EXIT)) {
         PDB_get_command(interpreter);
         command = pdb->cur_command;
-        PDB_run_command(interpreter,command);
+        PDB_run_command(interpreter, command);
     }
 }
 
@@ -317,24 +319,23 @@ Parrot_disassemble(struct Parrot_Interp *interpreter)
 {
     PDB_t *pdb;
     PDB_line_t *line;
-    char *dis,*c;
+    char *dis, *c;
 
     pdb = (PDB_t *)mem_sys_allocate(sizeof(PDB_t));
 
     interpreter->pdb = pdb;
     pdb->cur_opcode = interpreter->code->byte_code;
 
-    PDB_disassemble(interpreter,NULL);
+    PDB_disassemble(interpreter, NULL);
     line = pdb->file->line;
 
-    while (line->next)
-    {
+    while (line->next) {
         /* If it has a label print it */
         if (line->label)
-            printf("L%li:\t",line->label->number);
+            printf("L%li:\t", line->label->number);
         c = pdb->file->source + line->source_offset;
-        while (*c != '\n'  && c)
-            printf("%c",*(c++));
+        while (*c != '\n' && c)
+            printf("%c", *(c++));
         printf("\n");
         line = line->next;
     }

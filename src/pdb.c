@@ -37,9 +37,8 @@ main(int argc, char *argv[])
 
     Parrot_init(interpreter);
 
-    if (argc != 2)
-    {
-        fprintf(stderr,"Usage: pdb programfile\n");
+    if (argc != 2) {
+        fprintf(stderr, "Usage: pdb programfile\n");
         exit(1);
     }
 
@@ -64,7 +63,7 @@ main(int argc, char *argv[])
 void
 PDB_printwelcome()
 {
-    fprintf(stderr,"Parrot Debugger 0.0.1\n");
+    fprintf(stderr, "Parrot Debugger 0.0.1\n");
 }
 
 /*

@@ -107,7 +107,7 @@ static void
 init_prederef(struct Parrot_Interp *interpreter)
 {
 #ifndef DYNAMIC_OPLIBS
-    extern op_lib_t * PARROT_CORE_PREDEREF_OPLIB_INIT(void);
+    extern op_lib_t *PARROT_CORE_PREDEREF_OPLIB_INIT(void);
 #endif
     char file_name[50];
     char func_name[50];
@@ -139,7 +139,8 @@ init_prederef(struct Parrot_Interp *interpreter)
      */
 
     prederef_oplib_init =
-        (oplib_init_f)(ptrcast_t)Parrot_dlsym(prederef_oplib_handle,func_name);
+        (oplib_init_f)(ptrcast_t)Parrot_dlsym(prederef_oplib_handle,
+                                              func_name);
 #else
     prederef_oplib_init = PARROT_CORE_PREDEREF_OPLIB_INIT;
 #endif

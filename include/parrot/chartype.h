@@ -36,8 +36,8 @@ struct parrot_chartype_t {
 #ifdef PARROT_IN_CORE
 
 #define CHARTYPE struct parrot_chartype_t
-const CHARTYPE *
-chartype_lookup_index(INTVAL n);
+
+const CHARTYPE * chartype_lookup_index(INTVAL n);
 
 typedef Parrot_CharType_Transcoder CHARTYPE_TRANSCODER;
 
