@@ -28,13 +28,14 @@
 
 #include "parrot/config.h"
 
+/* ANSI C89 headers */
 #include <stdlib.h>
 #include <stdio.h>
-/*#include <types.h> */
+#include <errno.h>
+#include <string.h>
+#include <ctype.h>
 
-#ifdef _WIN32
-#  include <io.h>
-#endif
+/* Other headers, where available */
 
 #ifdef HAS_HEADER_UNISTD
 #  include <unistd.h>
@@ -56,20 +57,6 @@
 #  include <fcntl.h>
 #endif
 
-#ifdef HAS_HEADER_NETINETTCP
-#  include <sys/socket.h>
-#  include <netinet/in.h>
-#  include <netinet/tcp.h>
-#endif
-
-#ifdef HAS_HEADER_ARPAINET
-#  include <arpa/inet.h>
-#endif
-
-#ifdef HAS_HEADER_NETDB
-#  include <netdb.h>
-#endif
-
 #ifdef HAS_HEADER_SYSTYPES
 #  include <sys/types.h>
 #endif
@@ -78,9 +65,6 @@
 #  include <sys/stat.h>
 #endif
 
-#include <errno.h>
-#include <string.h>
-#include <ctype.h>
 
 #define NUM_REGISTERS 32
 #define PARROT_MAGIC 0x13155a1

@@ -34,6 +34,10 @@
 #  endif
 #endif
 
+#ifdef PIO_OS_WIN32
+#  include <io.h>
+#endif
+
 #ifndef STDIN_FILENO
 # define STDIN_FILENO 0
 #endif
