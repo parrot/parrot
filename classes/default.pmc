@@ -393,9 +393,12 @@ Store the method as a global in the namespace of this class.
 
     PMC* find_method(STRING* method_name) {
         PMC *method = Parrot_find_method_with_cache(INTERP, SELF, method_name);
-        if (method && method->vtable->base_type == enum_class_MultiSub)
+        if (method && method->vtable->base_type == enum_class_MultiSub &&
+                REG_STR(1)) {
             return Parrot_MMD_search_default_func(interpreter,
                     method_name, REG_STR(1));
+        }
+        return method;
     }
 
     void add_method(STRING *method_name, PMC *sub_pmc) {
@@ -834,6 +837,13 @@ Look for NCI methods and propertys.
             PMC *bound_meth = VTABLE_clone(INTERP, p);
             bound_meth->vtable = Parrot_base_vtables[enum_class_Bound_NCI];
             VTABLE_set_pmc(INTERP, bound_meth, SELF);
+            return bound_meth;
+        }
+        else if (p->vtable->base_type == enum_class_MultiSub) {
+            PMC *bound_meth = pmc_new(INTERP, enum_class_Bound_NCI);
+            VTABLE_set_pmc(INTERP, bound_meth, SELF);
+            PMC_struct_val(bound_meth) = p;
+            PObj_get_FLAGS(bound_meth) |= PObj_private0_FLAG;
             return bound_meth;
         }
         /* TODO bound user functions */

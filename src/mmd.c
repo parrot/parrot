@@ -729,6 +729,37 @@ Parrot_MMD_search_default_func(Interp *interpreter, STRING *meth,
     return mmd_search_default(interpreter, meth, arg_tuple);
 }
 
+/* XXX */
+PMC * Parrot_MMD_dispatch_func(Interp *, PMC *multi, STRING *signature);
+
+PMC *
+Parrot_MMD_dispatch_func(Interp *interpreter, PMC *multi,
+        STRING *signature)
+{
+    PMC* arg_tuple, *pmc;
+    INTVAL n;
+    /*
+     * 1) create argument tuple
+     */
+    arg_tuple = mmd_arg_tuple_func(interpreter, signature);
+    n = VTABLE_elements(interpreter, multi);
+    if (!n)
+        return NULL;
+    /*
+     * 5) sort the list
+     */
+    if (n > 1)
+        mmd_sort_candidates(interpreter, arg_tuple, multi);
+    n = VTABLE_elements(interpreter, multi);
+    if (!n)
+        return NULL;
+    /*
+     * 6) Uff, return first one
+     */
+    pmc = VTABLE_get_pmc_keyed_int(interpreter, multi, 0);
+    return pmc;
+}
+
 /*
 
 =item C<
@@ -846,6 +877,14 @@ mmd_arg_tuple_func(Interp *interpreter, STRING *signature)
         }
 
     }
+    /*
+     * XXX invalidate S1
+     * this is needed for this seqeuence:
+     * "__add"(l, r, d)             # multi sub call - create S1
+     * m = getattribute l, "__add"  # create bound method
+     * m(r, d)
+     */
+    REG_STR(1) = NULL;
     return arg_tuple;
 }
 

@@ -154,7 +154,6 @@ shifted down.
             while (i--)
                 REG_PMC(6+i)=REG_PMC(5+i);
             REG_PMC(5) = REG_PMC(2);
-            ++REG_INT(3);
         }
         func(INTERP, SELF);
         return next;

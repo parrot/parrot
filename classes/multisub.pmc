@@ -22,6 +22,9 @@ Sub PMCs with the same short name, but different long names.
 #include "parrot/parrot.h"
 
 
+/* XXX */
+PMC * Parrot_MMD_dispatch_func(Interp *, PMC *multi, STRING *signature);
+
 pmclass MultiSub extends ResizablePMCArray need_ext does array {
 
     void push_pmc(PMC* value) {
@@ -50,6 +53,11 @@ pmclass MultiSub extends ResizablePMCArray need_ext does array {
 
     void set_number_keyed_int (INTVAL key, FLOATVAL value) {
 	internal_exception(1, "attempt to set non Sub PMC");
+    }
+
+    void* invoke(void *next) {
+        PMC *func = Parrot_MMD_dispatch_func(INTERP, SELF, REG_STR(1));
+        return VTABLE_invoke(INTERP, func, next);
     }
 }
 

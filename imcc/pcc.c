@@ -926,6 +926,8 @@ expand_pcc_sub_call(Parrot_Interp interp, IMC_Unit * unit, Instruction *ins)
         insert_ins(unit, ins, get_name);
         ins = get_name;
     }
+    else
+        ins = pcc_insert_signature(interp, unit, ins, sub->pcc_sub);
 
 
     /*
@@ -951,7 +953,6 @@ expand_pcc_sub_call(Parrot_Interp interp, IMC_Unit * unit, Instruction *ins)
             else
                 ins = insINS(interp, unit, ins, "set", regs, 2);
         }
-        ins = pcc_insert_signature(interp, unit, ins, sub->pcc_sub);
         if (sub->pcc_sub->nci)
             goto move_sub;
     }

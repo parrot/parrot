@@ -683,7 +683,7 @@ interferes(Interp *interpreter, IMC_Unit * unit, SymReg * r0, SymReg * r1)
     if (r0->set != r1->set)
         return 0;
     /* If the first time r0 appears is in the same instruction as the
-     * last appearance of r1, or after its last appearance, then they 
+     * last appearance of r1, or after its last appearance, then they
      * can't interfere.
      *
      * Even if r0 and r1 are called in the same instruction, and even
@@ -904,7 +904,7 @@ ig_find_color(Interp* interpreter, IMC_Unit *unit, int x, char *avail)
     static const char assignable[4][5] = {
        /* 0  1  2  3  4  */
         { 0, 0, 0, 0, 0, },     /* I */
-        { 0, 1, 1, 1, 1, },     /* S */
+        { 0, 0, 1, 1, 1, },     /* S */
         { 0, 0, 0, 1, 1, },     /* P */
         { 1, 1, 1, 1, 1, },     /* N */
     };

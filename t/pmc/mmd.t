@@ -16,7 +16,7 @@ Tests the multi-method dispatch.
 
 =cut
 
-use Parrot::Test tests => 21;
+use Parrot::Test tests => 22;
 
 pir_output_is(<<'CODE', <<'OUTPUT', "PASM divide");
 
@@ -718,4 +718,29 @@ pir_output_is(<<'CODE', <<'OUTPUT', "__add as function - Int, Float");
 .end
 CODE
 42.42
+OUTPUT
+
+pir_output_is(<<'CODE', <<'OUTPUT', "bound __add method");
+.sub main @MAIN
+    .local pmc d, l, r, m
+    d = new Integer
+    l = new Integer
+    r = new Float
+    l = 3
+    r = 39.42
+    m = getattribute l, "__add"
+    m(r, d)
+    print d
+    print "\n"
+    r = new Integer
+    r = 39
+    m = getattribute l, "__add"
+    m(r, d)
+    print d
+    print "\n"
+    end
+.end
+CODE
+42.42
+42
 OUTPUT

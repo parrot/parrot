@@ -57,17 +57,34 @@ Set the bound object live.
     }
 
     void* invoke (void * next) {
-        Parrot_csub_t func = (Parrot_csub_t)D2FPTR(PMC_data(SELF));
-        PMC *p2 = REG_PMC(2);
-        REG_PMC(2) = PMC_pmc_val(SELF);
-        SUPER(next);
-        REG_PMC(2) = p2;
+        if (PObj_get_FLAGS(SELF) & PObj_private0_FLAG) {
+            /* bound multi sub
+             * XXX maybe create separate PMC class
+             * see also classes/default.pmc:get_attr_str()
+             * */
+            PMC *multi = PMC_struct_val(SELF);
+            INTVAL i = REG_INT(3)++;
+            while (i--)
+                REG_PMC(6+i)=REG_PMC(5+i);
+            REG_PMC(5) = PMC_pmc_val(SELF);
+            next = VTABLE_invoke(INTERP, multi, next);
+        }
+        else {
+            PMC *p2 = REG_PMC(2);
+            REG_PMC(2) = PMC_pmc_val(SELF);
+            SUPER(next);
+            REG_PMC(2) = p2;
+        }
         return next;
     }
 
     void mark() {
         if (PMC_pmc_val(SELF))
             pobject_lives(INTERP, (PObj *)PMC_pmc_val(SELF));
+        if (PObj_get_FLAGS(SELF) & PObj_private0_FLAG) {
+            if (PMC_struct_val(SELF))
+                pobject_lives(INTERP, (PObj *)PMC_struct_val(SELF));
+        }
     }
 
 }
