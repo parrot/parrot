@@ -282,7 +282,11 @@ void
 mmd_destroy(Parrot_Interp interpreter)
 {
     if (interpreter->binop_mmd_funcs->tables) {
-        /* TODO we are leaking functions here */
+        UINTVAL i;
+        for (i = 0; i <interpreter->binop_mmd_funcs->tables; ++i) {
+            if (interpreter->binop_mmd_funcs->mmd_funcs[i])
+                mem_sys_free(interpreter->binop_mmd_funcs->mmd_funcs[i]);
+        }
         mem_sys_free(interpreter->binop_mmd_funcs->mmd_funcs);
 
         mem_sys_free(interpreter->binop_mmd_funcs->x);
