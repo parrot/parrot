@@ -1,4 +1,31 @@
-VERSION 0.0.3
+VERSION 0.0.4
+
+New in 0.0.4
+
+- Arena-based memory allocation system
+- Copying GC
+- New IO subsystem
+- "Predereferencing" mode - ./parrot -P - 22% speedup
+- JIT compiler - ./parrot -j
+- Parrot now builds warnings-clean on many platforms
+- Many more PMC methods implemented
+- Regular expression operations
+- Added a FAQ
+- Basic support for embedding Parrot in other programs
+- Warnings support
+- Added PDDs to distribution
+- Bignum library
+
+- PMC inheritance
+- Added an assembly optimizer
+- Improved string encoding/type support
+- Many more tests
+- Source reformatting
+- Major refactoring in packfile library
+- More Miniperl functionality
+- New PMC "clone" operator
+- Beginnings of key-based access to PMCs - arrays and hashes
+- MOPS comparisons in examples/mops/
 
 New in 0.0.3
 
