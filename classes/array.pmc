@@ -86,6 +86,12 @@ pmclass Array {
         SELF->flags |= PMC_custom_mark_FLAG;
     }
 
+    void init_pmc (PMC *init) {
+        SELF->data = list_new_init(INTERP, enum_type_PMC, init);
+        SELF->flags |= PMC_custom_mark_FLAG;
+    }
+
+
     PMC* mark (PMC *end_of_used_list) {
         return list_mark(INTERP, (List *) SELF->data,
                              end_of_used_list);

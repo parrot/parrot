@@ -22,7 +22,7 @@
    F<pmc.h>). Once the PMC has been successfully created and
    its vtable pointer initialized, we call its C<init> method to
    perform any other necessary initialization.
-   
+
 =cut
 */
 
@@ -40,8 +40,8 @@ pmc_new(struct Parrot_Interp *interpreter, INTVAL base_type)
     pmc->vtable = &(Parrot_base_vtables[base_type]);
 
     if (!pmc->vtable || !pmc->vtable->init) {
-        /* This is usually because you either didn't call init_world early 
-         * enough or you added a new PMC class without adding 
+        /* This is usually because you either didn't call init_world early
+         * enough or you added a new PMC class without adding
          * Parrot_(classname)_class_init to init_world. */
         PANIC("Null vtable used");
         return NULL;
@@ -59,7 +59,7 @@ pmc_new(struct Parrot_Interp *interpreter, INTVAL base_type)
    F<pmc.h>). Unlike C<pmc_new>, C<pmc_new_noinit> does not call its
    C<init> method.  This allows separate allocation and initialization
    for continuations.
-   
+
 =cut
 */
 
@@ -77,8 +77,8 @@ pmc_new_noinit(struct Parrot_Interp *interpreter, INTVAL base_type)
     pmc->vtable = &(Parrot_base_vtables[base_type]);
 
     if (!pmc->vtable || !pmc->vtable->init) {
-        /* This is usually because you either didn't call init_world early 
-         * enough or you added a new PMC class without adding 
+        /* This is usually because you either didn't call init_world early
+         * enough or you added a new PMC class without adding
          * Parrot_(classname)_class_init to init_world. */
         PANIC("Null vtable used");
         return NULL;
@@ -87,15 +87,15 @@ pmc_new_noinit(struct Parrot_Interp *interpreter, INTVAL base_type)
     return pmc;
 }
 
-/*=for api pmc pmc_new_sized
+/*=for api pmc pmc_new_init
 
-   As C<pmc_new>, but passes C<size> to the PMC's C<init> method.
+   As C<pmc_new>, but passes C<init> to the PMC's C<init_pmc> method.
 
 =cut
 */
 
 PMC *
-pmc_new_sized(struct Parrot_Interp *interpreter, INTVAL base_type, INTVAL size)
+pmc_new_init(struct Parrot_Interp *interpreter, INTVAL base_type, PMC * init)
 {
     PMC *pmc = new_pmc_header(interpreter);
 
@@ -108,15 +108,14 @@ pmc_new_sized(struct Parrot_Interp *interpreter, INTVAL base_type, INTVAL size)
     pmc->vtable = &(Parrot_base_vtables[base_type]);
 
     if (!pmc->vtable || !pmc->vtable->init) {
-        /* This is usually because you either didn't call init_world early 
-         * enough or you added a new PMC class without adding 
+        /* This is usually because you either didn't call init_world early
+         * enough or you added a new PMC class without adding
          * Parrot_(classname)_class_init to init_world. */
         PANIC("Null vtable used");
         return NULL;
     }
 
-    /* XXX - pmc->vtable->init(interpreter, pmc, size); */
-    pmc->vtable->init(interpreter, pmc);
+    pmc->vtable->init_pmc(interpreter, pmc, init);
 
     return pmc;
 }

@@ -1,6 +1,6 @@
 #! perl -w
 
-use Parrot::Test tests => 17;
+use Parrot::Test tests => 18;
 use Test::More;
 
 output_is(<<'CODE', <<'OUTPUT', "size of the array");
@@ -910,6 +910,24 @@ ok_4:
     print "\n"
     end
 ok_5:
+    print "ok\n"
+    end
+CODE
+ok
+OUTPUT
+
+output_is(<<'CODE', <<'OUTPUT', "set intial size");
+    new P1, .PerlArray
+    set P1[0], 0	# size key
+    set I1, 100000	# value
+    set P1[1], I1
+    new P0, .PerlArray, P1
+    set I0, P0
+    eq I0, I1, ok
+    print "nok: "
+    print I0
+    print "\n"
+ok:
     print "ok\n"
     end
 CODE

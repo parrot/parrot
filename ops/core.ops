@@ -129,7 +129,7 @@ inline op open(out INT, in STR) {
     perror("Can't open");
     exit(1);
   }
-  
+
   goto NEXT();
 }
 
@@ -156,11 +156,11 @@ If for some reason the line's longer than 64K you get only 64K
 inline op readline(out STR, in INT) {
   FILE *file;
   switch ($2) {
-    case 0: file = stdin; 
+    case 0: file = stdin;
                 break;
-    case 1: file = stdout; 
+    case 1: file = stdout;
                 break;
-    case 2: file = stderr; 
+    case 2: file = stderr;
                 break;
     default: file = OPCODE_T2PTR(FILE *, $2);
   }
@@ -274,11 +274,11 @@ op print(in PMC) {
 op print(in INT, in INT) {
   FILE *file;
   switch ($1) {
-    case 0: file = stdin; 
+    case 0: file = stdin;
                 break;
-    case 1: file = stdout; 
+    case 1: file = stdout;
                 break;
-    case 2: file = stderr; 
+    case 2: file = stderr;
                 break;
     default: file = OPCODE_T2PTR(FILE *, $1);
   }
@@ -289,11 +289,11 @@ op print(in INT, in INT) {
 op print(in INT, in NUM) {
   FILE *file;
   switch ($1) {
-    case 0: file = stdin; 
+    case 0: file = stdin;
                 break;
-    case 1: file = stdout; 
+    case 1: file = stdout;
                 break;
-    case 2: file = stderr; 
+    case 2: file = stderr;
                 break;
     default: file = OPCODE_T2PTR(FILE *, $1);
   }
@@ -305,11 +305,11 @@ op print(in INT, in STR) {
   FILE *file;
   STRING *s = $2;
   switch ($1) {
-    case 0: file = stdin; 
+    case 0: file = stdin;
                 break;
-    case 1: file = stdout; 
+    case 1: file = stdout;
                 break;
-    case 2: file = stderr; 
+    case 2: file = stderr;
                 break;
     default: file = OPCODE_T2PTR(FILE *, $1);
   }
@@ -324,11 +324,11 @@ op print(in INT, in PMC) {
   PMC *p = $2;
   STRING *s = (p->vtable->get_string(interpreter, p));
   switch ($1) {
-    case 0: file = stdin; 
+    case 0: file = stdin;
                 break;
-    case 1: file = stdout; 
+    case 1: file = stdout;
                 break;
-    case 2: file = stderr; 
+    case 2: file = stderr;
                 break;
     default: file = OPCODE_T2PTR(FILE *, $1);
   }
@@ -1317,7 +1317,7 @@ mod operator (x % y), which is
 
 Also:
 
-    ... if the second operand is 0, the result is undefined. 
+    ... if the second operand is 0, the result is undefined.
     Otherwise, it is always true that (a/b)*b + a%b is equal to z. If
     both operands are non-negative, then the remainder is non-
     negative and smaller than the divisor; if not, it is guaranteed
@@ -1936,8 +1936,8 @@ The index function searches for one string within
 another, but without the wildcard-like behavior of
 a full regular-expression pattern match.  It
 returns the position of the first occurrence of
-$3 in $2 at or after $4.  If $4 is omitted, starts 
-searching from the beginning of the string.  
+$3 in $2 at or after $4.  If $4 is omitted, starts
+searching from the beginning of the string.
 The return value is based at "0".
 If the substring is not found, returns "-1".
 
@@ -1948,7 +1948,7 @@ inline op index(out INT, in STR, in STR) {
     STRING *p = $3;
     INTVAL i,j,ls,lp;
     const char *cs, *cp;
-    
+
     ls = string_length(s);
     lp = string_length(p);
     if (s && ls && lp) {
@@ -1973,7 +1973,7 @@ inline op index(out INT, in STR, in STR, in INT) {
     STRING *p = $3;
     INTVAL i,j,ls,lp;
     const char *cs, *cp;
-    
+
     ls = string_length(s);
     lp = string_length(p);
     if (s && ls && lp) {
@@ -2042,10 +2042,10 @@ inline op pack(inout STR, in INT, in STR) {
     char buf[3];
 
     if (s->buflen < len) {
-        t = string_make(interpreter, buf, (UINTVAL)(len - s->buflen), NULL, 0, NULL); 
+        t = string_make(interpreter, buf, (UINTVAL)(len - s->buflen), NULL, 0, NULL);
         $1 = string_concat(interpreter, $1, s, 1);
     } else {
-        t = string_make(interpreter, s->strstart, (UINTVAL)len, NULL, 0, NULL); 
+        t = string_make(interpreter, s->strstart, (UINTVAL)len, NULL, 0, NULL);
     }
     $1 = string_concat(interpreter, $1, t, 1);
 
@@ -2059,7 +2059,7 @@ inline op pack(inout STR, in INT, in INT, in INT) {
     INTVAL ln;
     const char *t;
     int i;
-    
+
     s = string_make(interpreter, c, (UINTVAL)$2, NULL, 0, NULL);
     ln = string_length($1);
     if (ln < $4 + $2)
@@ -2073,8 +2073,8 @@ inline op pack(inout STR, in INT, in INT, in INT) {
     n = $1->strstart;
     t = string_to_cstring(interpreter, s);
     for (i = $4; i < $4 + $2; i++)
-        n[i] = t[i - $4]; 
-    
+        n[i] = t[i - $4];
+
 
     goto NEXT();
 }
@@ -2087,14 +2087,14 @@ inline op pack(inout STR, in INT, in INT, in INT) {
 
 =item C<sprintf>(out PMC, in PMC) [unimplemented]
 
-Sets $1 to the result of calling C<Parrot_psprintf> with the 
+Sets $1 to the result of calling C<Parrot_psprintf> with the
 given format ($2) and arguments ($3, which should be an ordered
 aggregate PMC).  In the (unimplemented) versions that don't include
 $3, arguments are popped off the user stack.
 
-The result is quite similar to using the system C<sprintf>, but is 
-protected against buffer overflows and the like.  There are some 
-differences, especially concerning sizes (which are largely ignored); 
+The result is quite similar to using the system C<sprintf>, but is
+protected against buffer overflows and the like.  There are some
+differences, especially concerning sizes (which are largely ignored);
 see F<misc.c> for details.
 
 =back
@@ -3276,7 +3276,7 @@ inline op restore(out NUM) {
 }
 
 inline op restore(out PMC) {
-  (void)stack_pop(interpreter, &interpreter->ctx.user_stack, &($1), 
+  (void)stack_pop(interpreter, &interpreter->ctx.user_stack, &($1),
                   STACK_ENTRY_PMC);
   goto NEXT();
 }
@@ -3611,7 +3611,7 @@ Ops to manipulate the symbol table
 
 =item B<new_pad>()
 
-Create a new lexical scope pad and push it onto the 
+Create a new lexical scope pad and push it onto the
 current lexical scope stack.
 
 =item B<pop_pad>()
@@ -3918,7 +3918,7 @@ op enternative() {
 
 =item B<new>(out PMC, in INT)
 
-=item B<new>(out PMC, in INT, in INT)
+=item B<new>(out PMC, in INT, in PMC)
 
 Create a new PMC of class $2; look in F<pmc.h> for the base
 vtable types. The assembler allows you to specify PMCs by type
@@ -3927,10 +3927,9 @@ to avoid problems if the base types get reassigned. For example:
 
   new P0, .PerlScalar
 
-Optionally a size may be passed to the constructor which may or
-may not be used by the particular class. For example:
-
-  new P0, .PerlStruct, 64
+Optionally a pmc may be passed to the constructor. It's up to the
+class, what to do with the intializer.
+s. PDD02 for more.
 
 =cut
 
@@ -3948,13 +3947,11 @@ op new(out PMC, in INT) {
   goto NEXT();
 }
 
-op new(out PMC, in INT, in INT) {
-  PMC* newpmc;
+op new(out PMC, in INT, in PMC) {
   if ($2 <= 0 || $2 >= enum_class_max) {
     internal_exception(1, "Illegal PMC enum (%d) in new\n", $2);
   }
-  newpmc = pmc_new_sized(interpreter, $2, $3);
-  $1 = newpmc;
+  $1 = pmc_new_init(interpreter, $2, $3);
   goto NEXT();
 }
 
@@ -4206,7 +4203,7 @@ op find_method(out PMC, in PMC, in STR) {
 
 =item B<warningson>(in INT)
 
-Turns on warnings categories.  Categories already turned on will 
+Turns on warnings categories.  Categories already turned on will
 stay on.  Current categories and the numbers they map to are:
 
 =over 4
@@ -4230,8 +4227,8 @@ inline op warningson(in INT) {
 
 =item B<warningsoff>(in INT)
 
-Turns off warnings categories.  Categories already turned off will 
-stay off.  See the documentation for B<warningson> for category 
+Turns off warnings categories.  Categories already turned off will
+stay off.  See the documentation for B<warningson> for category
 numbers.
 
 =cut

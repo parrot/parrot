@@ -911,6 +911,36 @@ list_new(Interp *interpreter, INTVAL type)
     }
     return list;
 }
+/*
+ * list_new_init uses these initializers:
+ * 0 ... size (set initial size of list)
+ *
+ */
+List *
+list_new_init(Interp *interpreter, INTVAL type, PMC * init)
+{
+    List * list = list_new(interpreter, type);
+    INTVAL i, len, size, key;
+
+    if (!init->vtable || init->vtable != Parrot_base_vtables +
+            enum_class_PerlArray)
+        internal_exception(1, "Illegal initializer for init\n");
+    len = init->vtable->elements(interpreter, init);
+    if (len & 1)
+        internal_exception(1, "Illegal initializer for init: odd elements\n");
+    for (i = 0; i < len; i+= 2) {
+        key = init->vtable->get_integer_keyed_int(interpreter, init, &i);
+        if (key == 0) {
+            INTVAL val = i+1;
+            size = init->vtable->get_integer_keyed_int(interpreter, init, &val);
+            break;
+        }
+    }
+    if (size)
+        list_set_length(interpreter, list, size);
+    return list;
+}
+
 
 /* barely tested: clone */
 /* TODO optimize new array structure, fixed if big */

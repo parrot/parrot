@@ -28,11 +28,11 @@ struct PMC {
     /* completely different data.  That's why it's */
     /* referred to as a "cache". */
     UnionVal cache;
-    
+
     SYNC *synchronize;
-    /* This flag determines the next PMC in the 'used' list during 
-       dead object detection in the GC. It is a linked list, which is 
-       only valid in trace_active_PMCs. Also, the linked list is 
+    /* This flag determines the next PMC in the 'used' list during
+       dead object detection in the GC. It is a linked list, which is
+       only valid in trace_active_PMCs. Also, the linked list is
        guaranteed to have the tail element's next_for_GC point to itself,
        which makes much of the logic and checks simpler. We then have to
        check for PMC->next_for_GC == PMC to find the end of list. */
@@ -101,10 +101,7 @@ typedef enum {
 /* Prototypes */
 PMC *pmc_new(struct Parrot_Interp *interpreter, INTVAL base_type);
 PMC *pmc_new_noinit(struct Parrot_Interp *interpreter, INTVAL base_type);
-PMC *pmc_new_sized(struct Parrot_Interp *interpreter, INTVAL base_type,
-                        INTVAL size);
-PMC *pmc_new_sized_pmc(struct Parrot_Interp *interpreter, INTVAL base_type, 
-                       PMC *p);
+PMC *pmc_new_init(struct Parrot_Interp *interpreter, INTVAL base_type, PMC *p);
 
 
 #endif
@@ -113,7 +110,7 @@ PMC *pmc_new_sized_pmc(struct Parrot_Interp *interpreter, INTVAL base_type,
  * Local variables:
  * c-indentation-style: bsd
  * c-basic-offset: 4
- * indent-tabs-mode: nil 
+ * indent-tabs-mode: nil
  * End:
  *
  * vim: expandtab shiftwidth=4:
