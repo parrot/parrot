@@ -7,6 +7,7 @@ PERL = ${perl}
 RM_F = ${rm_f}
 SO = ${so}
 OPS2C = -I..${slash}lib ..${slash}build_tools${slash}ops2c.pl
+CFLAGS = ${ccflags} ${cc_debug} ${ccwarn} ${cc_hasjit} ${cg_flag} ${gc_flag}
 
 
 # add your dynamic oplibs here
@@ -38,7 +39,8 @@ all: myops_ops$(SO) myops_ops_cg$(SO) myops_ops_cgp$(SO) \
 	$(PERL) $(OPS2C) CSwitch --dynamic $<
 
 %$(SO) : %.c
-	$(LD) $(LD_SHARED) $(LD_SHARED_FLAGS) $(LDFLAGS) -o $@ \
+	$(LD) $(CFLAGS) $(LD_SHARED) $(LD_SHARED_FLAGS) $(LDFLAGS) \
+	${cc_o_out}$@ \
 		-I..${slash}include \
 		-L..${slash}blib${slash}lib -lparrot $<
 	$(PERL) -MFile::Copy=cp -e ${PQ}cp q|$@|, q|../runtime/parrot/dynext/$@|${PQ}

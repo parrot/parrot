@@ -6,13 +6,14 @@ LD_SHARED = ${ld_shared}
 PERL = ${perl}
 RM_F = ${rm_f}
 SO = ${so}
+CFLAGS = ${ccflags} ${cc_debug} ${ccwarn} ${cc_hasjit} ${cg_flag} ${gc_flag}
 
 
 # add your dynamic pmcs here
 
 all: foo$(SO) subproxy$(SO)  \
 tclobject$(SO) tclstring$(SO) tclint$(SO) tclfloat$(SO) \
-tcllist$(SO) tclarray$(SO) 
+tcllist$(SO) tclarray$(SO)
 
 .SUFFIXES: .pmc .c $(SO)
 
@@ -24,7 +25,8 @@ tcllist$(SO) tclarray$(SO)
 	$(PERL) ..${slash}classes${slash}pmc2c2.pl --c $<
 
 %$(SO) : %.c
-	$(LD) $(LD_SHARED) $(LD_SHARED_FLAGS) $(LDFLAGS) -o $@ \
+	$(LD) $(CFLAGS) $(LD_SHARED) $(LD_SHARED_FLAGS) $(LDFLAGS) \
+	${cc_o_out}$@ \
 		-I..${slash}include -I..${slash}classes \
 		-L..${slash}blib${slash}lib -lparrot $<
 	$(PERL) -MFile::Copy=cp -e ${PQ}cp q|$@|, q|../runtime/parrot/dynext/$@|${PQ}
