@@ -41,7 +41,7 @@ set_cstring_prop(Parrot_Interp interpreter, PMC *lib_pmc, const char *what,
 
     prop = pmc_new(interpreter, enum_class_PerlString);
     VTABLE_set_string_native(interpreter, prop, name);
-    key = string_from_cstring(interpreter, what, 0);
+    key = const_string(interpreter, what);
     VTABLE_setprop(interpreter, lib_pmc, key, prop);
 }
 
@@ -105,7 +105,7 @@ is_loaded(Parrot_Interp interpreter, STRING *path)
         return NULL;
     }
     n = VTABLE_elements(interpreter, dyn_libs);
-    key = string_from_cstring(interpreter, "_filename", 0);
+    key = const_string(interpreter, "_filename");
     /* we could use an ordered hash for faster lookup here */
     for (i = 0; i < n; i++) {
         lib_pmc = VTABLE_get_pmc_keyed_int(interpreter, dyn_libs, i);
@@ -251,15 +251,15 @@ Parrot_load_lib(Interp *interpreter, STRING *lib, PMC *initializer)
          * s. also build_tools/ops2c.pl and lib/Parrot/Pmc2c.pm
          */
         lib_pmc = pmc_new(interpreter, enum_class_ParrotLibrary);
-        type = string_from_cstring(interpreter, "NCI", 0);
+        type = const_string(interpreter, "NCI");
     }
     else {
         lib_pmc = (*load_func)(interpreter);
         /* we could set a private flag in the PMC header too
          * but currently only ops files have struct_val set
          */
-        type = string_from_cstring(interpreter,
-                lib_pmc->cache.struct_val ? "Ops" : "PMC", 0);
+        type = const_string(interpreter,
+                lib_pmc->cache.struct_val ? "Ops" : "PMC");
     }
     /*
      *  call init, if it exists

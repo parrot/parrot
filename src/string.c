@@ -51,7 +51,7 @@ static const CHARTYPE *string_unicode_type;
 
 #define const_cast(b) (__ptr_u.__c_ptr = (b), __ptr_u.__ptr)
 
-/* 
+/*
 
 =back
 
@@ -304,16 +304,31 @@ string_from_cstring(struct Parrot_Interp *interpreter, const void *buffer,
 
 Make a C<STRING *> from a passed in C string.
 
+=item C<
+STRING *
+const_string(struct Parrot_Interp *interpreter, const char *buffer)>
+
+Make a constant STRING from a const C string.
+
 =cut
 
 */
 
 STRING *
 string_from_cstring(struct Parrot_Interp *interpreter, const void *buffer,
-                     UINTVAL len) {
+                     UINTVAL len)
+{
     return string_make(interpreter, buffer, len ? len :
             buffer ? strlen(buffer) : 0,
                        NULL, 0, NULL);
+}
+
+STRING *
+const_string(struct Parrot_Interp *interpreter, const char *buffer)
+{
+    /* TODO cache the strings */
+    return string_make(interpreter, buffer, strlen(buffer),
+                   NULL, PObj_external_FLAG|PObj_constant_FLAG, NULL);
 }
 
 /*
@@ -1006,7 +1021,7 @@ string_replace(struct Parrot_Interp *interpreter, STRING *src,
 This should follow the Perl semantics for:
 
     substr EXPR, OFFSET, LENGTH, REPLACEMENT
-      
+
 Replace substring of C<*src> with C*rep>, returning what was there
 before.
 
@@ -1990,7 +2005,7 @@ string_to_cstring(struct Parrot_Interp * interpreter, STRING * s)
 =item C<void
 string_cstring_free(void *ptr)>
 
-Free a string created by C<string_to_cstring()>. 
+Free a string created by C<string_to_cstring()>.
 
 Hopefully this can be a go away at some point, as it's got all sorts of
 leak potential otherwise.

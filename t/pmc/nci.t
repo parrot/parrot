@@ -825,7 +825,6 @@ OUTPUT
 
 output_is(<<'CODE', <<'OUTPUT', "nci_cb_C1");
   bounds 1	# no JIT yet
-  sweepoff	# SEGV in dynext.c:235
   # we need a flag if the call_back is already done
   new P10, .PerlInt
   store_global "cb_done", P10
@@ -843,7 +842,7 @@ output_is(<<'CODE', <<'OUTPUT', "nci_cb_C1");
   invoke
   # now call the external sub, that takes a call_back and user_data
   loadlib P1, "libnci"
-  dlfunc P0, P1, "nci_cb_C1", "vPP"
+  dlfunc P0, P1, "nci_cb_C1", "vpP"
   print "ok 2\n"
   # P5 is the cb
   # get user_data i.e. the Sub

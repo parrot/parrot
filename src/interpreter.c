@@ -1144,7 +1144,7 @@ Register a callback function according to pdd16
 PMC*
 Parrot_make_cb(Parrot_Interp interpreter, PMC* sub, PMC* user_data)
 {
-    PMC* interp_pmc;
+    PMC* interp_pmc, *cb;
     /*
      * we stuff all the information into the Sub PMC and pass that
      * on to the external sub
@@ -1168,10 +1168,14 @@ Parrot_make_cb(Parrot_Interp interpreter, PMC* sub, PMC* user_data)
 
     /*
      * finally the external lib awaits a function pointer
-     * fake a PMC that points to Parrot_callback_C (or _D)
+     * create a PMC that points to Parrot_callback_C (or _D)
+     * it can be passed on with signature 'p'
      */
+    cb = pmc_new(interpreter, enum_class_UnManagedStruct);
+    PMC_data(cb) = F2DPTR(Parrot_callback_C);
+    dod_register_pmc(interpreter, cb);
 
-    return F2DPTR(Parrot_callback_C);
+    return cb;
 }
 
 /*

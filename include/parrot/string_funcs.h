@@ -59,6 +59,7 @@ INTVAL string_index(const STRING *, UINTVAL idx);
 INTVAL string_str_index(struct Parrot_Interp *interpreter, const STRING *s,
         const STRING *s2, UINTVAL start);
 STRING *string_from_cstring(struct Parrot_Interp *, const void *, UINTVAL);
+STRING *const_string(struct Parrot_Interp *, const char *);
 char *string_to_cstring(struct Parrot_Interp *, STRING *);
 void string_cstring_free(void *);
 void string_pin(struct Parrot_Interp *, STRING *);
