@@ -31,7 +31,7 @@ Lookup the PMC type which is used for storing native integers.
 TODO: PMCs extending Hash should probably register themselves.
 
 =cut
- 
+
 */
 
 static PMC* get_integer_pmc(Interp* interpreter, INTVAL base_type ) {
@@ -54,7 +54,7 @@ cheap to call C<pmc_new>.
 TODO: PMCs extending Hash should probably register themselves.
 
 =cut
- 
+
 */
 
 static PMC * get_none_pmc(Interp* interpreter, INTVAL base_type ) {
@@ -76,7 +76,7 @@ Lookup the PMC type which is used for floating point numbers.
 TODO: PMCs extending Hash should probably register themselves.
 
 =cut
- 
+
 */
 
 static PMC * get_number_pmc(Interp* interpreter, INTVAL base_type ) {
@@ -98,7 +98,7 @@ Lookup the PMC type which is used for storing strings.
 TODO: PMCs extending Hash should probably register themselves.
 
 =cut
- 
+
 */
 
 static PMC * get_string_pmc(Interp* interpreter, INTVAL base_type ) {
@@ -198,6 +198,7 @@ already exist.
 */
 
     void init () {
+        PMC_struct_val(SELF) = NULL;
         PObj_custom_mark_SET(SELF);
         new_pmc_hash(INTERP, SELF);
     }
@@ -231,7 +232,7 @@ Returns the type of the element for C<*key>.
         HashBucket* b = hash_get_bucket(INTERP, (Hash*) PMC_struct_val(SELF),
                                         key);
         if (b == NULL) {
-            PMC * none = get_none_pmc(INTERP, SELF->vtable->base_type); 
+            PMC * none = get_none_pmc(INTERP, SELF->vtable->base_type);
 
             return VTABLE_type(INTERP, none);
         }
@@ -255,7 +256,7 @@ Returns the type of the element for C<*key>.
         HashBucket* b = hash_get_bucket(INTERP, (Hash*) PMC_struct_val(SELF),
                                             keystr);
         if (b == NULL) {
-            PMC * none = get_none_pmc(INTERP, SELF->vtable->base_type); 
+            PMC * none = get_none_pmc(INTERP, SELF->vtable->base_type);
 
             return VTABLE_type(INTERP, none);
         }
@@ -314,7 +315,7 @@ Returns the size of the hash.
                                         key);
         if (b == NULL) {
             /* XXX Warning: use of uninitialized value */
-            PMC * none = get_none_pmc(INTERP, SELF->vtable->base_type); 
+            PMC * none = get_none_pmc(INTERP, SELF->vtable->base_type);
 
             return VTABLE_get_integer(INTERP, none);
         }
@@ -360,7 +361,7 @@ Returns the integer value for the element at C<*key>.
         b = hash_get_bucket(INTERP, hash, keystr);
         if (b == NULL) {
             /* XXX Warning: use of uninitialized value */
-            PMC * none = get_none_pmc(INTERP, SELF->vtable->base_type); 
+            PMC * none = get_none_pmc(INTERP, SELF->vtable->base_type);
 
             return VTABLE_get_integer(INTERP, none);
         }
@@ -386,7 +387,7 @@ Returns the integer value for the element at C<*key>.
                                         key);
         if (b == NULL) {
             /* XXX Warning: Use of uninitialized value */
-            PMC * none = get_none_pmc(INTERP, SELF->vtable->base_type); 
+            PMC * none = get_none_pmc(INTERP, SELF->vtable->base_type);
 
             return VTABLE_get_number(INTERP, none);
         }
@@ -415,7 +416,7 @@ Returns the floating-point value for the element at C<*key>.
         PMC* nextkey;
         if (b == NULL) {
             /* XXX Warning: Use of uninitialized value */
-            PMC * none = get_none_pmc(INTERP, SELF->vtable->base_type); 
+            PMC * none = get_none_pmc(INTERP, SELF->vtable->base_type);
 
             return VTABLE_get_number(INTERP, none);
         }
@@ -501,7 +502,7 @@ For Python returns its repr.
                                         key);
         if (b == NULL) {
             /* XXX Warning: use of uninitialized value */
-            PMC * none = get_none_pmc(INTERP, SELF->vtable->base_type); 
+            PMC * none = get_none_pmc(INTERP, SELF->vtable->base_type);
 
             return VTABLE_get_string(INTERP, none);
         }
@@ -544,7 +545,7 @@ Returns the string value for the element at C<*key>.
         b = hash_get_bucket(INTERP, hash, keystr);
         if (b == NULL) {
             /* XXX Warning: use of uninitialized value */
-            PMC * none = get_none_pmc(INTERP, SELF->vtable->base_type); 
+            PMC * none = get_none_pmc(INTERP, SELF->vtable->base_type);
 
             return VTABLE_get_string(INTERP, none);
         }
@@ -598,7 +599,7 @@ Returns the number of elements in the hash.
                                         key);
         if (b == NULL) {
             /* XXX should store the undef for consistency */
-            return get_none_pmc(INTERP, SELF->vtable->base_type); 
+            return get_none_pmc(INTERP, SELF->vtable->base_type);
         }
         return b->value;
     }
@@ -666,7 +667,7 @@ Returns the PMC value for the element at C<*key>.
                                         keystr);
         if (b == NULL) {
             /* XXX should store the undef for consistency */
-            return get_none_pmc(INTERP, SELF->vtable->base_type); 
+            return get_none_pmc(INTERP, SELF->vtable->base_type);
         }
         nextkey = key_next(INTERP, key);
         if (!nextkey)

@@ -94,6 +94,7 @@ Initializes the instance.
 */
 
     void init () {
+        PMC_struct_val(SELF) = NULL;
         PObj_custom_mark_SET(SELF);
         new_pmc_hash_x(INTERP, SELF,
             enum_type_PMC,
