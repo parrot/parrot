@@ -50,6 +50,7 @@ SymbolTable global_sym_tab;
  * No nested classes for now.
  */
 static Class * current_class;
+static Instruction * current_call;
 IMC_Unit * cur_unit;
 
 /*
@@ -238,10 +239,10 @@ static char * inv_op(char *op) {
 %type <i> sub emit pcc_sub sub_body pcc_ret pcc_yield
 %type <i> compilation_units compilation_unit
 %type <s> classname relop
-%type <i> labels _labels label statements statement
+%type <i> labels _labels label statements statement sub_call
 %type <i> pcc_sub_call
 %type <sr> sub_param sub_params pcc_arg pcc_result pcc_args pcc_results pcc_params pcc_param
-%type <sr> pcc_returns pcc_return pcc_call
+%type <sr> pcc_returns pcc_return pcc_call arg
 %type <t> pcc_proto pcc_sub_proto
 %type <i> instruction assignment if_statement labeled_inst opt_label
 %type <sr> target reg const var rc string
@@ -249,6 +250,7 @@ static char * inv_op(char *op) {
 %type <sr> vars _vars var_or_i _var_or_i label_op
 %type <i> pasmcode pasmline pasm_inst
 %type <sr> pasm_args lhs
+%type <symlist> targetlist arglist
 %token <sr> VAR
 %token <t> LINECOMMENT
 %token <s> FILECOMMENT
@@ -577,6 +579,7 @@ helper_clear_state: { clear_state(); } %prec LOW_PREC
 statement:  helper_clear_state
         instruction                   { $$ = $2; }
         | MACRO '\n'                  { $$ = 0; }
+        | sub_call                    { $$ = 0; current_call = NULL; }
         | pcc_sub_call                { $$ = 0; }
         | pcc_ret
         | pcc_yield
@@ -697,6 +700,67 @@ assignment:
     |  DEFINED target COMMA var '[' keylist ']'  { keyvec=KEY_BIT(2);
                                   $$ = MK_I(interp, cur_unit, "defined", 3, $2, $4, $6); }
     |  CLONE target COMMA var     { $$ = MK_I(interp, cur_unit, "clone", 2, $2, $4); }
+       /* Subroutine call the short way */
+    |  target '=' sub_call
+          {
+             add_pcc_result($3->r[0], $1);
+             current_call = NULL;
+             $$ = 0;
+          }
+    |
+           {
+              char name[128];
+              SymReg * r;
+              Instruction *i;
+              sprintf(name, "#pcc_sub_call_%d", line - 1);
+              r = mk_pcc_sub(str_dup(name), 0);
+              current_call = i = iLABEL(cur_unit, r);
+              i->type = ITCALL | ITPCCSUB;
+              $<i>$ = i;
+           }
+       '(' targetlist  ')' '=' IDENTIFIER '(' arglist ')'
+           {
+              current_call->r[0]->pcc_sub->sub = mk_address($6, U_add_once);
+              current_call->r[0]->pcc_sub->prototyped = 1;
+              if (cur_unit->type == IMC_PCCSUB)
+                  cur_unit->instructions->r[1]->pcc_sub->calls_a_sub = 1;
+
+              current_call = NULL;
+           }
+    ;
+
+sub_call:
+    IDENTIFIER
+        {
+            char name[128];           
+            SymReg * r; 
+            Instruction *i;
+            sprintf(name, "#pcc_sub_call_%d", line - 1);
+            r = mk_pcc_sub(str_dup(name), 0);
+            current_call = i = iLABEL(cur_unit, r);
+            i->type = ITCALL | ITPCCSUB;
+            $$ = i;
+            current_call->r[0]->pcc_sub->sub = mk_address($1, U_add_once);
+            current_call->r[0]->pcc_sub->prototyped = 1;
+            if (cur_unit->type == IMC_PCCSUB)
+                cur_unit->instructions->r[1]->pcc_sub->calls_a_sub = 1;
+        }
+    '(' arglist ')'
+        {   $$ = $<i>2; }
+    ;
+
+arglist: /* empty */               { $$ = 0; }
+    | arglist COMMA arg            { $$ = 0; add_pcc_arg(current_call->r[0], $3); }
+    | arg                          { $$ = 0; add_pcc_arg(current_call->r[0], $1); }
+    ;
+
+arg: var                           { $$ = $1; }
+    | FLATTEN_ARG target           { $2->type |= VT_FLATTEN; $$ = $2; }
+    ;
+
+targetlist:
+       targetlist COMMA target     { $$ = 0; add_pcc_result(current_call->r[0], $3); }
+    |  target                      { $$ = 0; add_pcc_result(current_call->r[0], $1); }   
     ;
 
 if_statement:
@@ -719,10 +783,10 @@ relop:
     |  RELOP_LTE			{ $$ = "le"; }
     ;
 
-
 target: VAR
     |  reg
     ;
+
 lhs: VAR        /* duplicated because of reduce conflict */
     |  reg
     ;
@@ -740,10 +804,12 @@ _var_or_i: var_or_i                     { regs[nargs++] = $1; }
                                           keyvec |= KEY_BIT(nargs);
                                           regs[nargs++] = $3; $$ = $1; }
     ;
+
 label_op:
        IDENTIFIER			{ $$ = mk_address($1, U_add_once); }
     |  PARROT_OP                        { $$ = mk_address($1, U_add_once); }
     ;
+
 var_or_i:
       label_op
     |  var
