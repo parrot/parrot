@@ -33,7 +33,7 @@ object:
 
 You can also get return value(s):
 
-   ($P1,$P2) = $P0( $P1, $P2, $P3 )
+  ($P1,$P2) = $P0( $P1, $P2, $P3 )
 
 =head2 How do I generate a method call in PIR?
 
@@ -44,18 +44,52 @@ Similar to function calls, just append C<.> and the method:
 The method name may also be a string variable representing a method name:
 
   .local string m
-  n = "bold"
+  m = "bold"
   curses_obj.m()
 
 =head2 How do I generate a sub call with a variable-length parameter list in PIR?
 
 Use unprototyped calls and functions and pass as many arguments as you have.
+If you have a variable amounts of arguments in an array, you can pass all items
+of that array with the C<.flatten_arg> directive.
+
+  ar = new PerlArray
+  push ar, "arg 1\n"
+  push ar, "arg 2\n"
+  .pcc_begin non_prototyped
+  .flatten_arg ar
+  .pcc_call sub
+  ...
 
 =head2 How to I retrieve the contents of a variable-length parameter list being passed to me?
 
-You can check the passed parameter count in the subroutine with the C<argcP>
-variable. A simpler way is to use the C<foldup> opcode, which creates an array
-of all passed arguments.
+You can check the passed PMC parameter count in the subroutine
+with the argcP variable (an alias to I3). Remember, the first
+eleven PMC parameters are passed in P5 through P15, with
+overflow parameters an array-like PMC in P3.
+
+A simpler way is to use the
+foldup opcode, which creates an array of all passed
+PMC arguments.
+
+  .sub _mysub non_prototyped
+    .local pmc argv
+    .local int argc
+    argv = foldup
+    argc = argv
+    ...
+
+If you have a few fixed parameters too, you can use a variant of
+C<foldup> to capture variable arguments from that position on.
+
+  .sub _mysub non_prototyped
+    .param pmc arg0
+    .param pmc arg1
+    .local pmc varargs
+    .local int num_varargs
+    varargs = foldup, 2
+    num_varargs = varargs
+    ...
 
 =head2 How do I create nested subroutines?
 

@@ -5,6 +5,7 @@ RELPATH = ..${slash}..${slash}
 MYPATH  = languages${slash}tcl${slash}
 
 DEPS = $(RELPATH)$(PARROT) \
+lib/tcllib.imc \
 lib/backslash_newline_subst.imc \
 lib/commands/append.imc \
 lib/commands/array.imc \
