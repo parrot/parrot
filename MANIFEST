@@ -375,6 +375,7 @@ languages/perl6/P6C/Nodes.pm
 languages/perl6/P6C/Parser.pm
 languages/perl6/P6C/TestCompiler.pm
 languages/perl6/P6C/Tree.pm
+languages/perl6/P6C/Tree/String.pm
 languages/perl6/P6C/Util.pm
 languages/perl6/README
 languages/perl6/examples/life-ar.p6
@@ -400,6 +401,7 @@ languages/perl6/t/compiler/7.t
 languages/perl6/t/compiler/8.t
 languages/perl6/t/compiler/9.t
 languages/perl6/t/compiler/a.t
+languages/perl6/t/compiler/b.t
 languages/perl6/t/compiler/qsort.t
 languages/perl6/t/harness
 languages/perl6/t/parser/Makefile
