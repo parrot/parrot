@@ -78,21 +78,23 @@ sub cc_build {
 
 sub cc_run {
 	my $exe=Configure::Data->get('exe');
+    my $slash=Configure::Data->get('slash');
     if (defined($_[0]) && length($_[0])) {
-	    `./test$exe $_[0]`;
+	    `.${slash}test$exe $_[0]`;
     }
     else {
-	    `./test$exe`;
+	    `.${slash}test$exe`;
     }
 }
 
 sub cc_run_capture {
 	my $exe=Configure::Data->get('exe');
+    my $slash=Configure::Data->get('slash');
     if (defined($_[0]) && length($_[0])) {
-	    `./test$exe $_[0] 2>&1`;
+	    `.${slash}test$exe $_[0] 2>&1`;
     }
     else {
-	    `./test$exe 2>&1`;
+	    `.${slash}test$exe 2>&1`;
     }
 }
 
