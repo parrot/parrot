@@ -65,12 +65,22 @@ struct PRegChunk {
 
 /* This macro masks off the low bits of a register chunk address,
    since we're guaranteed to be aligned */
-#define CHUNK_BASE(x) (void *)(MASK_CHUNK_LOW_BITS && (IV)x)
+#define CHUNK_BASE(x) (void *)(MASK_CHUNK_LOW_BITS & (IV)x)
 
-void clear_i(struct Perl_Interp *);
-void clear_s(struct Perl_Interp *);
-void clear_p(struct Perl_Interp *);
-void clear_n(struct Perl_Interp *);
+void Parrot_clear_i(struct Perl_Interp *);
+void Parrot_clear_s(struct Perl_Interp *);
+void Parrot_clear_p(struct Perl_Interp *);
+void Parrot_clear_n(struct Perl_Interp *);
+
+void Parrot_push_i(struct Perl_Interp *);
+void Parrot_push_n(struct Perl_Interp *);
+void Parrot_push_s(struct Perl_Interp *);
+void Parrot_push_p(struct Perl_Interp *);
+
+void Parrot_pop_i(struct Perl_Interp *);
+void Parrot_pop_n(struct Perl_Interp *);
+void Parrot_pop_s(struct Perl_Interp *);
+void Parrot_pop_p(struct Perl_Interp *);
 
 
 #endif /* __PARROT_REGISTER_H */

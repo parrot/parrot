@@ -6,18 +6,21 @@
 
 #include "parrot.h"
 
-void push_i(struct Perl_Interp *interpreter) {
+void Parrot_push_i(struct Perl_Interp *interpreter) {
   struct IRegChunk *chunk_base;
 
   chunk_base = CHUNK_BASE(interpreter->int_reg);
+  printf("Chunk base is %x for %x\n", chunk_base, interpreter->int_reg);
   /* Do we have any slots left in the current chunk? */
   if (chunk_base->free) {
+    printf("Free was %i\n", chunk_base->free);
     interpreter->int_reg = &chunk_base->IReg[chunk_base->used++];
     chunk_base->free--;
   }
   /* Nope, so plan B time. Allocate a new chunk of integer register frames */
   else {
     struct IRegChunk *new_chunk;
+    printf("Allocating a new piece\n");
     new_chunk = Allocate_Aligned(sizeof(struct IRegChunk));
     new_chunk->used = 1;
     new_chunk->free = FRAMES_PER_INT_REG_CHUNK - 1;
@@ -28,7 +31,7 @@ void push_i(struct Perl_Interp *interpreter) {
   }
 }
 
-void pop_i(struct Perl_Interp *interpreter) {
+void Parrot_pop_i(struct Perl_Interp *interpreter) {
   struct IRegChunk *chunk_base;
   chunk_base = CHUNK_BASE(interpreter->int_reg);
   /* Is there more than one register frame in use? */
@@ -53,14 +56,14 @@ void pop_i(struct Perl_Interp *interpreter) {
   }
 }
 
-void clear_i(struct Perl_Interp *interpreter) {
+void Parrot_clear_i(struct Perl_Interp *interpreter) {
   int i;
   for (i=0; i<NUM_REGISTERS; i++) {
     INT_REG(i) = 0;
   }
 }
 
-void push_s(struct Perl_Interp *interpreter) {
+void Parrot_push_s(struct Perl_Interp *interpreter) {
   struct SRegChunk *chunk_base;
 
   chunk_base = CHUNK_BASE(interpreter->string_reg);
@@ -82,7 +85,7 @@ void push_s(struct Perl_Interp *interpreter) {
   }
 }
 
-void pop_s(struct Perl_Interp *interpreter) {
+void Parrot_pop_s(struct Perl_Interp *interpreter) {
   struct SRegChunk *chunk_base;
   chunk_base = CHUNK_BASE(interpreter->string_reg);
   /* Is there more than one register frame in use? */
@@ -107,14 +110,14 @@ void pop_s(struct Perl_Interp *interpreter) {
   }
 }
 
-void clear_s(struct Perl_Interp *interpreter) {
+void Parrot_clear_s(struct Perl_Interp *interpreter) {
   int i;
   for (i=0; i<NUM_REGISTERS; i++) {
     STR_REG(i) = NULL;
   }
 }
 
-void push_n(struct Perl_Interp *interpreter) {
+void Parrot_push_n(struct Perl_Interp *interpreter) {
   struct NRegChunk *chunk_base;
 
   chunk_base = CHUNK_BASE(interpreter->num_reg);
@@ -136,7 +139,7 @@ void push_n(struct Perl_Interp *interpreter) {
   }
 }
 
-void pop_n(struct Perl_Interp *interpreter) {
+void Parrot_pop_n(struct Perl_Interp *interpreter) {
   struct NRegChunk *chunk_base;
   chunk_base = CHUNK_BASE(interpreter->num_reg);
   /* Is there more than one register frame in use? */
@@ -161,14 +164,14 @@ void pop_n(struct Perl_Interp *interpreter) {
   }
 }
 
-void clear_n(struct Perl_Interp *interpreter) {
+void Parrot_clear_n(struct Perl_Interp *interpreter) {
   int i;
   for (i=0; i<NUM_REGISTERS; i++) {
     NUM_REG(i) = 0;
   }
 }
 
-void push_p(struct Perl_Interp *interpreter) {
+void Parrot_push_p(struct Perl_Interp *interpreter) {
   struct PRegChunk *chunk_base;
 
   chunk_base = CHUNK_BASE(interpreter->pmc_reg);
@@ -190,7 +193,7 @@ void push_p(struct Perl_Interp *interpreter) {
   }
 }
 
-void pop_p(struct Perl_Interp *interpreter) {
+void Parrot_pop_p(struct Perl_Interp *interpreter) {
   struct PRegChunk *chunk_base;
   chunk_base = CHUNK_BASE(interpreter->pmc_reg);
   /* Is there more than one register frame in use? */
@@ -215,15 +218,15 @@ void pop_p(struct Perl_Interp *interpreter) {
   }
 }
 
-void clear_p(struct Perl_Interp *interpreter) {
+void Parrot_clear_p(struct Perl_Interp *interpreter) {
   int i;
   for (i=0; i<NUM_REGISTERS; i++) {
     PMC_REG(i) = NULL;
   }
 }
 
-void push_on_stack(void *thing, IV size, IV type) {
+void Parrot_push_on_stack(void *thing, IV size, IV type) {
 }
 
-void pop_off_stack(void *thing, IV type) {
+void Parrot_pop_off_stack(void *thing, IV type) {
 }
