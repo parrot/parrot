@@ -74,6 +74,12 @@ trace_op_dump(struct Parrot_Interp *interpreter, opcode_t *code_start,
                 INTERNAL_EXCEPTION(ARG_OP_NOT_HANDLED,
                                    "PARROT_ARG_OP in enumeration not handled in switch");
                 break;
+            default:
+                /* -Wall expects us to cover PARROT_ARG_OP somewhere. */
+                fprintf(stderr, "?(%i)%ld=???",
+                        interpreter->op_info_table[*pc].types[i],
+                        (long) *(pc + i));
+                break;
             }
         }
         fprintf(stderr, ")");
