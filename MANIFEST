@@ -244,6 +244,7 @@ examples/assembly/hanoi.pasm                      [main]doc
 examples/assembly/io1.pasm                        [main]doc
 examples/assembly/io2.pasm                        [main]doc
 examples/assembly/jump.pasm                       [main]doc
+examples/assembly/hello-dwim.imc                  [main]doc
 examples/assembly/lexical.pasm                    [main]doc
 examples/assembly/lexical2.pasm                   [main]doc
 examples/assembly/lexical3.pasm                   [main]doc
@@ -2063,6 +2064,7 @@ resources.c                                       []
 runops_cores.c                                    []
 runtime/parrot/chartypes/8859-1.TXT               []
 runtime/parrot/include/README                     [main]doc
+runtime/parrot/include/DWIM.imc                   [main]doc
 rx.c                                              []
 rx.ops                                            []
 rxstacks.c                                        []

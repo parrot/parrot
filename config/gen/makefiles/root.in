@@ -50,10 +50,11 @@ GEN_CONFIGS  = include/parrot/config.h include/parrot/platform.h \
 	lib/Parrot/Config.pm lib/Parrot/PMC.pm platform.c \
 	include/parrot/core_pmcs.h core_pmcs.c \
 	CFLAGS languages/imcc/CFLAGS \
-	libparrot.def \
-	runtime/parrot/include/*.pasm
+	libparrot.def
 
-STICKY_FILES = $(GEN_CONFIGS) $(GEN_MAKEFILES) myconfig
+GEN_PASM_INCLUDES = ${gen_pasm_includes}
+
+STICKY_FILES = $(GEN_CONFIGS) $(GEN_MAKEFILES) myconfig $(GEN_PASM_INCLUDES)
 
 
 ###############################################################################

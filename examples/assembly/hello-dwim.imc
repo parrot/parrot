@@ -1,0 +1,9 @@
+.pcc_sub _main prototyped
+    .include "DWIM.imc"
+    print "The answer is\n"
+    add $I0, 20, 23
+    dec $I0
+    print $I0
+    print "\nsay's Parrot!\n"
+    end
+.end

@@ -26,6 +26,7 @@ my $destdir = 'runtime/parrot/include';
 @args=();
 
 sub runstep {
+    my @generated = ();
     for my $f (@files) {
 	my $in_def = ''; # in #define='def', in enum='enum'
 	my ($inc, $prefix, $last_val, $subst, %values);
@@ -59,6 +60,7 @@ EOF
 	    if (/&end_gen/) {
 		close INC;
 		move_if_diff("$inc.tmp", "$destdir/$inc");
+		push(@generated, "$destdir/$inc");
 		$in_def = '';
 		next;
 	    }
@@ -99,6 +101,9 @@ EOF
 	}
 	close(F);
     }
+    Configure::Data->set(
+	gen_pasm_includes => join("\t\\\n\t", @generated)
+    );
 }
 
 1;
