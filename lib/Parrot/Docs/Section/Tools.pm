@@ -54,6 +54,7 @@ sub new
 		),
 		$self->new_group('QA', '',
 			$self->new_item('', 'parrotbug'),
+			$self->new_item('', 'tools/dev/parrotbench.pl'),
 			$self->new_item('', 'tools/dev/check_source_standards.pl'),
 			$self->new_item('', 'tools/dev/run_indent.pl'),
 			$self->new_item('', 'tools/docs/pod_errors.pl'),
