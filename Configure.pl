@@ -188,6 +188,9 @@ buildconfigpm();
 # and the types file
 buildfile("Types_pm", "Parrot");
 
+# Temporary hack
+system("make op_info.c include/parrot/vtable.h include/parrot/op.h");
+
 # and now we figure out how big our things are
 print <<"END";
 
