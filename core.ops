@@ -1146,7 +1146,7 @@ Throw the exception in $1.
 
 Only valid inside an exception handler. Rethrow the exception $1.
 
-=item B<die_hard(in INT, in INT)
+=item B<die_hard>(in INT, in INT)
 
 Die with severity $1 and error $2.
 
