@@ -80,7 +80,7 @@ sub file   { return shift->{FILE};     }
 sub line   { return shift->{LINE};     }
 
 sub is_constant { return shift->kind eq 'const'; }
-sub is_variable { my $self = shift; return $self->kind eq 'var' or $self->kind = 'arg'; }
+sub is_variable { my $self = shift; return ($self->kind eq 'var') or ($self->kind = 'arg'); }
 sub is_sub      { my $self = shift; return $self->kind eq 'sub'; }
 sub is_module   { my $self = shift; return $self->kind eq 'module'; }
 
