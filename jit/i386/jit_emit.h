@@ -617,11 +617,73 @@ emit_movb_i_m(char *pc, char imm, int base, int i, int scale, long disp)
     emitm_smull_op(pc); \
     (pc) = emit_r_X((pc), emit_reg(reg1 - 1), b, i, s, (long)d); }
 
+#ifdef NO_MUL_OPT
 #  define jit_emit_mul_rir_i(pc, reg2, imm, reg1) \
     *(pc++) = 0x69; \
     *(pc++) = 0xc0 | (reg1 - 1) | (reg2 - 1) << 3; \
     *(long *)(pc) = (long)imm; \
     pc += 4
+#else
+extern UINTVAL ld(UINTVAL);
+static char *
+opt_mul(char *pc, int dest, INTVAL imm, int src)
+{
+    UINTVAL ld2 = ld((UINTVAL) imm);
+
+    if (imm == 0) {
+        jit_emit_mov_ri_i(pc, dest, 0);
+    }
+    else if (imm > 0 && !(imm & (imm - 1))) {
+        /* positive power of 2 - do a shift */
+        jit_emit_mov_rr_i(pc, dest, src);
+        pc = emit_shift_i_r(pc, emit_b100, ld2, dest);
+    }
+    else {
+        /* special small numbers */
+        switch (imm) {
+            case 3:
+                /* LEA dest, base, index, scale, displace
+                 * note: src may be dest, so can't be reused
+                 *
+                 * dest = src + src*2 */
+                emitm_lea_m_r(pc, dest, src, src, 2, 0);
+                break;
+            case 5:      /* dest = src + src*4 */
+                emitm_lea_m_r(pc, dest, src, src, 4, 0);
+                break;
+            case 6:     /* dest = src*3; dest += dest */
+                emitm_lea_m_r(pc, dest, src, src, 2, 0);
+                jit_emit_add_rr_i(pc, dest, dest);
+                break;
+            case 9:      /* dest = src + src*8 */
+                emitm_lea_m_r(pc, dest, src, src, 8, 0);
+                break;
+            case 10:      /* dest = src + src*4 ; dest+= dest */
+                emitm_lea_m_r(pc, dest, src, src, 4, 0);
+                jit_emit_add_rr_i(pc, dest, dest);
+                break;
+            case 12:     /* dest= src*3; dest <<= 2 */
+                emitm_lea_m_r(pc, dest, src, src, 2, 0);
+                pc = emit_shift_i_r(pc, emit_b100, 2, dest);
+                break;
+            case 100:      /* dest = src + src*4 ; dest <<= 2; dest = 5*dest*/
+                emitm_lea_m_r(pc, dest, src, src, 4, 0);
+                pc = emit_shift_i_r(pc, emit_b100, 2, dest);
+                emitm_lea_m_r(pc, dest, dest, dest, 4, 0);
+                break;
+            default:
+                *(pc++) = 0x69;
+                *(pc++) = 0xc0 | (src - 1) | (dest - 1) << 3;
+                *(long *)(pc) = (long)imm;
+                pc += 4;
+        }
+    }
+    return pc;
+}
+#define jit_emit_mul_rir_i(pc, dest, imm, src) \
+    pc = opt_mul(pc, dest, imm, src)
+
+#endif
 
 #  define jit_emit_mul_ri_i(pc, r, imm) jit_emit_mul_rir_i(pc, r, imm, r)
 
@@ -1747,10 +1809,10 @@ Parrot_jit_vtable_n_op(Parrot_jit_info_t *jit_info,
     int st = 0;         /* stack pop correction */
     int saved = 0;
     Parrot_jit_register_usage_t *ru = jit_info->optimizer->cur_section->ru;
-    /* this is not callee saved, 3 is the # of emit_EDX in intval_map
+    /* this is not callee saved, emit_EDX is 4th in intval_map
      * should also save floating regs back?
      */
-    if (ru[0].reg_dir[ru[0].reg_usage[3]]) {
+    if (ru[0].registers_used == 4) {
         emitm_pushl_r(jit_info->native_ptr, emit_EDX);
         saved = 1;
     }
@@ -2091,10 +2153,10 @@ Parrot_jit_vtable_newp_ic_op(Parrot_jit_info_t *jit_info,
     int nvtable = op_jit[*jit_info->cur_op].extcall;
     int saved = 0;
     Parrot_jit_register_usage_t *ru = jit_info->optimizer->cur_section->ru;
-    /* this is not callee saved, 3 is the # of emit_EDX in intval_map
+    /* this is not callee saved, emit_EDX is 4th in intval_map
      * should also save floating regs back?
      */
-    if (ru[0].reg_dir[ru[0].reg_usage[3]]) {
+    if (ru[0].registers_used == 4) {
         emitm_pushl_r(jit_info->native_ptr, emit_EDX);
         saved = 1;
     }

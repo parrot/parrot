@@ -289,9 +289,8 @@ So this is rather simple once it gets going.
 
 =head1 BUGS
 
-The register <%edx> above was preserved over the vtable calls, though
-it's unused.  The floating point registers do not get saved to
-parrots, this assumes, that external routines do preserve the FP stack
+The floating point registers do not get saved to parrots before vtable
+calls, this assumes, that external routines do preserve the FP stack
 pointer and don't use more the 4 floating point registers at once.
 
 =head1 AUTHOR

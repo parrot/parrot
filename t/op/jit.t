@@ -1,6 +1,6 @@
 #! perl -w
 # test WRT JIT register allocation
-use Parrot::Test tests => 42;
+use Parrot::Test tests => 44;
 
 output_is(<<'CODE', <<'OUTPUT', "add_i_i_i 1,2,3 mapped");
 set I0,0
@@ -751,3 +751,108 @@ end
 CODE
 ok 1
 OUTPUT
+
+# multiply optimization tests
+
+output_is(<<'CODE', <<'OUTPUT', "power of 2");
+   set I0, 5
+   mul I1, I0, 0
+   eq I1, 0, ok_1
+   print "nok mul 0 "
+ok_1:
+   print "ok 1\n"
+
+   mul I1, I0, 1
+   eq I1, 5, ok_2
+   print "nok mul 1 "
+ok_2:
+   print "ok 2\n"
+
+   mul I1, I0, 2
+   eq I1, 10, ok_3
+   print "nok mul 2 "
+ok_3:
+   print "ok 3\n"
+
+   mul I1, I0, 4
+   eq I1, 20, ok_4
+   print "nok mul 4 "
+ok_4:
+   print "ok 4\n"
+
+   mul I1, I0, 8
+   eq I1, 40, ok_5
+   print "nok mul 8 "
+ok_5:
+   print "ok 5\n"
+
+   mul I1, I0, 1024
+   eq I1, 5120, ok_6
+   print "nok mul 1024 "
+ok_6:
+   print "ok 6\n"
+   end
+CODE
+ok 1
+ok 2
+ok 3
+ok 4
+ok 5
+ok 6
+OUTPUT
+
+output_is(<<'CODE', <<'OUTPUT', "small imm");
+   set I0, 5
+   mul I1, I0, 3
+   eq I1, 15, ok_1
+   print "nok mul 3 "
+ok_1:
+   print "ok 1\n"
+
+   mul I1, I0, 5
+   eq I1, 25, ok_2
+   print "nok mul 5 "
+ok_2:
+   print "ok 2\n"
+
+   mul I1, I0, 6
+   eq I1, 30, ok_3
+   print "nok mul 6 "
+ok_3:
+   print "ok 3\n"
+
+   mul I1, I0, 9
+   eq I1, 45, ok_4
+   print "nok mul 9 "
+ok_4:
+   print "ok 4\n"
+
+   mul I1, I0, 10
+   eq I1, 50, ok_5
+   print "nok mul 10 "
+ok_5:
+   print "ok 5\n"
+
+   mul I1, I0, 12
+   eq I1, 60, ok_6
+   print "nok mul 12 "
+ok_6:
+   print "ok 6\n"
+
+   mul I1, I0, 100
+   eq I1, 500, ok_7
+   print "nok mul 100 "
+ok_7:
+   print "ok 7\n"
+
+   end
+CODE
+ok 1
+ok 2
+ok 3
+ok 4
+ok 5
+ok 6
+ok 7
+OUTPUT
+
