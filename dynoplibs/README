@@ -1,0 +1,10 @@
+This directory is intended for building dynamic opcode libs.
+
+1) edit/create your foo.ops source (s. myops.ops)
+
+2) edit Makefile and append your ops target(s)
+
+$ export LD_LIBRARY_PATH=.:blib/lib
+$ make -s
+$ make shared
+$ make -C dynoplibs

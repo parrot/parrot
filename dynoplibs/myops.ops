@@ -1,0 +1,50 @@
+/*
+** myops.ops - sample
+*/
+
+#include "parrot/dynext.h"
+VERSION = PARROT_VERSION;
+
+=head1 NAME
+
+myops.ops - Parrot Sample Ops
+
+=cut
+
+=head1 DESCRIPTION
+
+A dynamic oplib loadable at demand.
+
+=cut
+
+=head1 Essential ops
+
+=over 4
+
+=item B<fortytwo>(out INT)
+
+The famous and ever wanted opcode, proposed by Jos Visser in
+"We *need* this op! :-)".
+
+=item B<what_do_you_get_if_you_multiply_six_by_nine>(out INT)
+
+Alternate spelling of this op, proposed by Nicholas Clark. It might bring
+imcc to its limits due the lengthy name.
+
+=cut
+
+inline op fortytwo(out INT) {
+    $1 = 42;
+    goto NEXT();
+}
+
+inline op what_do_you_get_if_you_multiply_six_by_nine(out INT) {
+    $1 = 42;
+    goto NEXT();
+}
+
+=back
+
+=cut
+
+# vim: sw=4

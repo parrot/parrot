@@ -37,6 +37,8 @@ sub runstep {
           commentType => '#', replace_slashes => 1);
   genfile('config/gen/makefiles/dynclasses.in',   'dynclasses/Makefile',
           commentType => '#', replace_slashes => 1);
+  genfile('config/gen/makefiles/dynoplibs.in',   'dynoplibs/Makefile',
+          commentType => '#', replace_slashes => 1);
 
 
   # set up docs/Makefile, partly based on the .ops in the root dir
