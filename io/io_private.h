@@ -19,6 +19,7 @@
 #define PARROT_IO_PRIVATE_H_GUARD
 
 #define PARROT_IN_IO 1
+#define PARROT_ASYNC_DEVEL 0
 
 #include <parrot/io.h>
 
@@ -35,6 +36,7 @@
 #define PIO_F_LINEBUF   00010000        /* Flushes on newline           */
 #define PIO_F_BLKBUF    00020000
 #define PIO_F_SHARED    00100000        /* Stream shares a file handle  */
+#define PIO_F_ASYNC     10000000        /* In Parrot async is default   */
 
 /* Buffer flags */
 #define PIO_BF_MALLOC   00000001        /* Buffer malloced              */

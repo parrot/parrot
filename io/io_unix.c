@@ -192,6 +192,34 @@ PIO_unix_open(theINTERP, ParrotIOLayer *layer,
 }
 
 
+#if PARROT_ASYNC_DEVEL
+/* experimental code, this is gonna get messy */
+
+/*
+ * Toggle ASYNC on the IO descriptor.
+ */
+static INTVAL 
+PIO_unix_async(theINTERP, ParrotIOLayer *layer, ParrotIO *io, INTVAL b)
+{
+    int rflags;
+#if defined(linux)
+    if((rflags = fcntl(io->fd, F_GETFL, 0)) >= 0) {
+        if(b)
+            rflags |= O_ASYNC;
+        else
+            rflags &= ~O_ASYNC;
+        return fcntl(io->fd, F_SETFL, rflags); 
+    }
+#else
+    internal_exception(PIO_NOT_IMPLEMENTED, "Async support not available");
+#endif 
+    return -1;
+}
+
+#endif
+
+
+
 static ParrotIO *
 PIO_unix_fdopen(theINTERP, ParrotIOLayer *layer, PIOHANDLE fd, INTVAL flags)
 {
