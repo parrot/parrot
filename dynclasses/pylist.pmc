@@ -66,6 +66,21 @@ Initializes the PMC by calling the underlying C<list_new()> function.
 
 /*
 
+=item C<void "append" (PMC* value)>
+
+Extends the array by adding an element of value C<*value> to the end of
+the array.
+
+=cut
+
+*/
+
+    METHOD void append (PMC* value) {
+        VTABLE_push_pmc(INTERP, SELF, value);
+    }
+
+/*
+
 =item C<void mark()>
 
 Mark the array and its contents as live.

@@ -134,6 +134,16 @@ enter_nci_method should create these as locals to begin with.
         scratchpad_store_by_name(INTERP, pad, 0, key, item);
 
         /* exceptions */
+        key = const_string(INTERP, "RuntimeError");
+        item = pmc_new(INTERP, dynclass_PyException);
+        VTABLE_set_integer_native(INTERP, item, E_RuntimeError);
+        scratchpad_store_by_name(INTERP, pad, 0, key, item);
+
+        key = const_string(INTERP, "StopIteration");
+        item = pmc_new(INTERP, dynclass_PyException);
+        VTABLE_set_integer_native(INTERP, item, E_StopIteration);
+        scratchpad_store_by_name(INTERP, pad, 0, key, item);
+
         key = const_string(INTERP, "ValueError");
         item = pmc_new(INTERP, dynclass_PyException);
         VTABLE_set_integer_native(INTERP, item, E_ValueError);
