@@ -43,9 +43,9 @@ static void Parrot_scalar_clone (struct Parrot_Interp *interpreter, PMC* pmc, PM
     struct PerlScalarData *s = pmc->data;
     struct PerlScalarData *d; /* This may change when d is instantiated */
 
-    dest->vtable->destroy(interpreter, dest); /* MAY NOT BE NEEDED */
+    dest->vtable->destroy(interpreter, dest);
     dest->vtable = pmc->vtable;
-    dest->vtable->new(interpreter, dest);     /* Similarly, may not be needed */
+    dest->vtable->new(interpreter, dest);
     dest->flags &= ~(PS_STRING_OK | PS_INTEGER_OK | PS_NUMBER_OK);
     dest->flags |= pmc->flags & (PS_STRING_OK | PS_INTEGER_OK | PS_NUMBER_OK);
     d = dest->data;
@@ -162,7 +162,7 @@ static void* Parrot_scalar_get_value (struct Parrot_Interp *interpreter, PMC* pm
     return pmc->data;
 }
 
-static BOOLVAL Parrot_scalar_is_same (struct Parrot_Interp *interpreter, PMC* pmc1, PMC* pmc2) {
+static BOOLVAL Parrot_scalar_is_equal (struct Parrot_Interp *interpreter, PMC* pmc1, PMC* pmc2) {
     struct PerlScalarData* d = pmc1->data;
 
     if (pmc1->flags & PS_NUMBER_OK) {
@@ -351,7 +351,7 @@ static void Parrot_scalar_concatenate_4 (struct Parrot_Interp *interpreter, PMC*
 static void Parrot_scalar_concatenate_5 (struct Parrot_Interp *interpreter, PMC* pmc, PMC* left,  PMC* right) {
 }
 
-static void Parrot_scalar_is_equal (struct Parrot_Interp *interpreter, PMC* pmc, PMC* left) {
+static BOOLVAL Parrot_scalar_is_same (struct Parrot_Interp *interpreter, PMC* pmc, PMC* left) {
 }
 
 static void Parrot_scalar_logical_or (struct Parrot_Interp *interpreter, PMC* pmc, PMC* left,  PMC* right) {

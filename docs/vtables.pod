@@ -96,7 +96,44 @@ C<Parrot_base_vtables> array.
 
 =head2 What You Can and Cannot Do
 
+The usual way to continue from the F<genclass.pl>-generated skeleton
+is to define a structure that will hook onto the C<data>, if your data
+type needs to use that, and then also define some user-defined flags.
+
+Flags are accessed by C<< pmc->flags >>, but a number of these flags
+are reserved by Parrot internally. Hence, you should start your
+user-defined flags from offset C<PMC_USER_FLAG>, like this:
+
+    #define FOOBYNUMBER_IS_BIGNUM (1<<(PMC_USER_FLAG))
+    #define FOOBYNUMBER_IS_BIGINT (1<<(PMC_USER_FLAG+1))
+    ...
+
+You're quite at liberty to make these two definitions in a separate
+header file, but I find it more convenient to keep everything together
+in F<foobynumber.c>.
+
+You may also use the C<cache> union in the PMC structure to remove
+some extraneous dereferences in your code if that would help. 
+
 =head2 Multimethods
+
+One slightly (potentially) tricky element of implementing vtables
+is that several of the vtable functions have variant forms depending on
+the type of data that they're being called with.
+
+Typical vtable dispatch for these "multimethod" forms will look like
+this:
+
+        ($2->vtable->add[$3->vtable->num_type])(interpreter, $1, $2,$3);
+
+And this is where the C<num_type>, C<float_type>, and C<string_type>
+fields of the vtable structure fit in.
+
+  int_type: 0, 1, 2, 3 for "same as you", native int, bigint, object
+  float_type: 0, 1, 2, 3 for "same as you", native float, bigfloat, object
+  num_type: 0, 1, 2, 3, 4, 5 for "same as you", native int, bigint, native float, bigfloat, object
+  string_type: 0, 1, 2, 3, 4 for "same as you", native string, unicode, other, object
+
 
 =head2 Methods you need to implement
 

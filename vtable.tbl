@@ -30,15 +30,15 @@ int	void set_integer	INTVAL integer
 float	void set_number		FLOATVAL number
 str	void set_string		STRING* string
 unique	void set_value		void* value
-num	void add		PMC* left	 PMC* right 
-num	void subtract		PMC* left	 PMC* right 
-num	void multiply		PMC* left	 PMC* right 
-num	void divide		PMC* left	 PMC* right 
-num	void modulus		PMC* left	 PMC* right 
-str	void concatenate	PMC* left	 PMC* right 
-unique	void is_equal		PMC* left 
-unique	void logical_or		PMC* left	 PMC* right 
-unique	void logical_and	PMC* left	 PMC* right 
-unique	void logical_not	PMC* left 
-str	void match		PMC* left	 REGEX* re
-str	void repeat		PMC* left	 PMC* right 
+num	void add		PMC* other	 PMC* dest 
+num	void subtract		PMC* other	 PMC* dest 
+num	void multiply		PMC* other	 PMC* dest 
+num	void divide		PMC* other	 PMC* dest 
+num	void modulus		PMC* other	 PMC* dest 
+str	void concatenate	PMC* other	 PMC* dest 
+unique	BOOLVAL is_equal		PMC* other 
+unique	void logical_or		PMC* other	 PMC* dest 
+unique	void logical_and	PMC* other	 PMC* dest 
+unique	void logical_not	PMC* other 
+str	void match		PMC* other	 REGEX* re
+str	void repeat		PMC* other	 PMC* dest 
