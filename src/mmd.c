@@ -5,70 +5,84 @@
  *  Overview:
  *     Multimethod dispatch handling for parrot
  *  Data Structure and Algorithms:
- *     
+ *
  *  History:
  *  Notes:
  *  References:
  */
 
 #include "parrot/parrot.h"
+typedef PMC *(*pmc_mmd_f)(PMC *, PMC *);
+typedef STRING *(*string_mmd_f)(PMC *, PMC *);
+typedef INTVAL (*intval_mmd_f)(PMC *, PMC *);
+typedef FLOATVAL (*floatval_mmd_f)(PMC *, PMC *);
 
 PMC *
 mmd_dispatch_pmc(struct Parrot_Interp *interpreter,
-		 PMC *left, PMC *right, INTVAL function) {
-    PMC *(*real_function)(PMC *, PMC *);
+		 PMC *left, PMC *right, INTVAL function)
+{
+    pmc_mmd_f real_function;
     INTVAL left_type, right_type;
     UINTVAL offset;
     left_type = VTABLE_type(interpreter, left);
     right_type = VTABLE_type(interpreter, right);
     offset = interpreter->binop_mmd_funcs->x[function] * right_type + left_type;
-    real_function = interpreter->binop_mmd_funcs->mmd_funcs[function] + offset;
-    return ((*real_function)(left, right));
+    real_function = (pmc_mmd_f)(interpreter->binop_mmd_funcs->mmd_funcs[
+            function] + offset);
+    return (*real_function)(left, right);
 }
 
 STRING *
 mmd_dispatch_string(struct Parrot_Interp *interpreter,
-		 PMC *left, PMC *right, INTVAL function) {
-    STRING *(*real_function)(PMC *, PMC *);
+		 PMC *left, PMC *right, INTVAL function)
+{
+    string_mmd_f real_function;
     INTVAL left_type, right_type;
     UINTVAL offset;
     left_type = VTABLE_type(interpreter, left);
     right_type = VTABLE_type(interpreter, right);
     offset = interpreter->binop_mmd_funcs->x[function] * right_type + left_type;
-    real_function = interpreter->binop_mmd_funcs->mmd_funcs[function] + offset;
-    return ((*real_function)(left, right));
+    real_function = (string_mmd_f)(interpreter->binop_mmd_funcs->mmd_funcs[
+            function] + offset);
+    return (*real_function)(left, right);
 }
 
 INTVAL
 mmd_dispatch_intval(struct Parrot_Interp *interpreter,
-		 PMC *left, PMC *right, INTVAL function) {
-    INTVAL (*real_function)(PMC *, PMC *);
+		 PMC *left, PMC *right, INTVAL function)
+{
+    intval_mmd_f real_function;
     INTVAL left_type, right_type;
     UINTVAL offset;
     left_type = VTABLE_type(interpreter, left);
     right_type = VTABLE_type(interpreter, right);
     offset = interpreter->binop_mmd_funcs->x[function] * right_type + left_type;
-    real_function = interpreter->binop_mmd_funcs->mmd_funcs[function] + offset;
-    return ((*real_function)(left, right));
+    real_function = (intval_mmd_f)(interpreter->binop_mmd_funcs->mmd_funcs[
+            function] + offset);
+    return (*real_function)(left, right);
 }
 
 FLOATVAL
 mmd_dispatch_numval(struct Parrot_Interp *interpreter,
-		 PMC *left, PMC *right, INTVAL function) {
-  
-    FLOATVAL (*real_function)(PMC *, PMC *);
+		 PMC *left, PMC *right, INTVAL function)
+{
+
+    floatval_mmd_f real_function;
     INTVAL left_type, right_type;
     UINTVAL offset;
     left_type = VTABLE_type(interpreter, left);
     right_type = VTABLE_type(interpreter, right);
     offset = interpreter->binop_mmd_funcs->x[function] * right_type + left_type;
-    real_function = interpreter->binop_mmd_funcs->mmd_funcs[function] + offset;
-    return ((*real_function)(left, right));
+    real_function = (floatval_mmd_f)(interpreter->binop_mmd_funcs->mmd_funcs[
+            function] + offset);
+    return (*real_function)(left, right);
 }
 
 /* Add a new binary MMD function to the table */
 void
-mmd_add_function(struct Parrot_Interp *interpreter, INTVAL funcnum, funcptr_t function) {
+mmd_add_function(struct Parrot_Interp *interpreter,
+        INTVAL funcnum, funcptr_t function)
+{
     UINTVAL func_count = funcnum + 1;
     UINTVAL cur_func_count = interpreter->binop_mmd_funcs->tables;
 
@@ -90,11 +104,16 @@ mmd_add_function(struct Parrot_Interp *interpreter, INTVAL funcnum, funcptr_t fu
         new_functable = mem_sys_allocate_zeroed(sizeof(funcptr_t) * func_count);
 
         /* Now copy the data over */
-        memcpy(new_x, interpreter->binop_mmd_funcs->x, sizeof(UINTVAL) * cur_func_count);
-        memcpy(new_y, interpreter->binop_mmd_funcs->y, sizeof(UINTVAL) * cur_func_count);
-        memcpy(new_func_count, interpreter->binop_mmd_funcs->funcs_in_table, sizeof(UINTVAL) * cur_func_count);
-        memcpy(new_default, interpreter->binop_mmd_funcs->default_func, sizeof(funcptr_t) * cur_func_count);
-        memcpy(new_functable, interpreter->binop_mmd_funcs->mmd_funcs, sizeof(funcptr_t) * cur_func_count);
+        memcpy(new_x, interpreter->binop_mmd_funcs->x,
+                sizeof(UINTVAL) * cur_func_count);
+        memcpy(new_y, interpreter->binop_mmd_funcs->y,
+                sizeof(UINTVAL) * cur_func_count);
+        memcpy(new_func_count, interpreter->binop_mmd_funcs->funcs_in_table,
+                sizeof(UINTVAL) * cur_func_count);
+        memcpy(new_default, interpreter->binop_mmd_funcs->default_func,
+                sizeof(funcptr_t) * cur_func_count);
+        memcpy(new_functable, interpreter->binop_mmd_funcs->mmd_funcs,
+                sizeof(funcptr_t) * cur_func_count);
 
         /* And set the values */
         interpreter->binop_mmd_funcs->x = new_x;
@@ -112,7 +131,8 @@ mmd_add_function(struct Parrot_Interp *interpreter, INTVAL funcnum, funcptr_t fu
 
 /* The table needs to get bigger in the X direction. Do so. */
 static void
-mmd_expand_x(struct Parrot_Interp *interpreter, INTVAL function, INTVAL new_x) {
+mmd_expand_x(struct Parrot_Interp *interpreter, INTVAL function, INTVAL new_x)
+{
     funcptr_t *new_table;
     UINTVAL x;
     UINTVAL y;
@@ -147,12 +167,14 @@ mmd_expand_x(struct Parrot_Interp *interpreter, INTVAL function, INTVAL new_x) {
         INTVAL newoffset, oldoffset;
         newoffset = i * new_x;
         oldoffset = i * x;
-        memcpy(new_table + newoffset, interpreter->binop_mmd_funcs->mmd_funcs[function] + oldoffset, sizeof(funcptr_t) * x);
+        memcpy(new_table + newoffset, interpreter->binop_mmd_funcs->mmd_funcs[
+                function] + oldoffset, sizeof(funcptr_t) * x);
     }
 }
 
 static void
-mmd_expand_y(struct Parrot_Interp *interpreter, INTVAL function, INTVAL new_y) {
+mmd_expand_y(struct Parrot_Interp *interpreter, INTVAL function, INTVAL new_y)
+{
     funcptr_t *new_table;
     UINTVAL x;
     UINTVAL y;
@@ -178,7 +200,8 @@ mmd_expand_y(struct Parrot_Interp *interpreter, INTVAL function, INTVAL new_y) {
     }
 
     /* Then copy the old table over. */
-    memcpy(new_table, interpreter->binop_mmd_funcs->mmd_funcs[function], sizeof(funcptr_t) * x * y);
+    memcpy(new_table, interpreter->binop_mmd_funcs->mmd_funcs[function],
+            sizeof(funcptr_t) * x * y);
     interpreter->binop_mmd_funcs->y[function] = new_y;
 
 }
@@ -197,7 +220,8 @@ void
 mmd_register(struct Parrot_Interp *interpreter,
              INTVAL type,
              INTVAL left_type, INTVAL right_type,
-             funcptr_t funcptr) {
+             funcptr_t funcptr)
+{
 
     INTVAL cur_x, cur_y;
     INTVAL offset;

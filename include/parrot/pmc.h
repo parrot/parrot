@@ -29,6 +29,13 @@ PMC *constant_pmc_new_noinit(struct Parrot_Interp *, INTVAL base_type);
 PMC *constant_pmc_new(struct Parrot_Interp *, INTVAL base_type);
 PMC *constant_pmc_new_init(struct Parrot_Interp *, INTVAL base_type, PMC *);
 
+/* multi method fallbacks */
+void mmd_fallback_add_pmc(Parrot_Interp, PMC *left, PMC *right, PMC *dest);
+void mmd_fallback_subtract_pmc(Parrot_Interp, PMC *left, PMC *right, PMC *dest);
+void mmd_fallback_multiply_pmc(Parrot_Interp, PMC *left, PMC *right, PMC *dest);
+void mmd_fallback_divide_pmc(Parrot_Interp, PMC *left, PMC *right, PMC *dest);
+void mmd_fallback_cmod_pmc(Parrot_Interp, PMC *left, PMC *right, PMC *dest);
+void mmd_fallback_mod_pmc(Parrot_Interp, PMC *left, PMC *right, PMC *dest);
 
 #endif
 
