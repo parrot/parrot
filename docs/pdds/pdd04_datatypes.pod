@@ -1,6 +1,6 @@
 =head1 TITLE
 
-Perl's internal data types
+Parrot's internal data types
 
 =head1 VERSION
 
@@ -59,27 +59,27 @@ None. First version
 
 =head1 ABSTRACT
 
-This PDD describes parrot's known internal data types.
+This PDD describes Parrot's internal data types.
 
 =head1 DESCRIPTION
 
-This PDD details the primitive datatypes that the parrot core knows how
-to deal with. These types are lower-level than what's presented to the
-perl programmer.
+This PDD details the primitive datatypes that the Parrot core knows how
+to deal with. These types may be at a lower-level than those used by high
+level languages running on top of Parrot.
 
 =head1 IMPLEMENTATION
 
 =head2 Integer data types
 
 Integer data types are generically referred to as C<INT>s. C<INT>s are
-conceptual things, and there is no data structure that corresponds to them.
+conceptual things and there is no data structure that corresponds to them.
 
 =over 4
 
 =item Platform-native integer
 
-These are whatever size native integer was chosen at parrot
-configuration time. The C-level typedef C<IV> and C<UV> get you a
+These are whatever size native integer was chosen at Parrot configuration 
+time. The C-level typedefs C<INTVAL> and C<UINTVAL> get you a
 platform-native signed and unsigned integer respectively.
 
 =item Arbitrary precision integers
@@ -87,16 +87,16 @@ platform-native signed and unsigned integer respectively.
 Big integers, or bigints, are arbitrary-length integer numbers. The
 only limit to the number of digits in a bigint is the lesser of the
 amount of memory available or the maximum value that can be
-represented by a C<UV>. This will generally allow at least 4 billion
+represented by a C<UINTVAL>. This will generally allow at least 4 billion
 digits, which ought to be far more than enough for anyone.
 
 The C structure that represents a bigint is:
 
    struct bigint {
      void *buffer;
-     UV length;
-     IV exponent;
-     UV flags;
+     UINTVAL length;
+     INTVAL exponent;
+     UINTVAL flags;
    }
 
 =begin question
@@ -107,7 +107,7 @@ to make the buffer bigger we have to adjust anything pointing to it.
 
 =end question
 
-The C<num_buffer> pointer points to the buffer holding the actual
+The C<buffer> pointer points to the buffer holding the actual
 number, C<length> is the length of the buffer, C<exponent> is the base
 10 exponent for the number (so 2e4532 doesn't take up much space), and
 C<flags> are some flags for the bigint.
@@ -117,19 +117,21 @@ in to make the base structure identical in size and field types to
 other structures. They may be removed before the first release of perl
 6.
 
+TODO: bring this up to date
+
 =back
 
 =head2 Floating point data types
 
 Floating point data types are generically referred to as C<NUM>s. Like
-C<INT>s, C<NUM>s are a conceptual things, not a real data structure.
+C<INT>s, C<NUM>s are conceptual things, not real data structures.
 
 =over 4
 
 =item Platform native float
 
 These are whatever size float was chosen when parrot was configured. The
-C level typedef C<NV> will get you one of these.
+C level typedef C<FLOATVAL> will get you one of these.
 
 =item Arbitrary precision decimal numbers
 
@@ -139,9 +141,9 @@ the structure:
 
    struct bignum {
      void *buffer;
-     UV length;
-     IV exponent;
-     UV flags;
+     UINTVAL length;
+     INTVAL exponent;
+     UINTVAL flags;
    }
 
 and yes, this looks identical to the bigint structure. This isn't
@@ -154,67 +156,69 @@ tack the data on the end?
 
 =end question
 
+TODO: bring this up to date
+
 =back
 
 =head2 String data types
 
 Parrot has a single internal string form:
 
-   struct perl_string {
-     void *buffer;
-     UV allocated;
-     UV bytes;
-     UV flags;
-     UV characters;
-     UV encoding;
-     UV type;
-     UV unused;
+   struct parrot_string_t {
+     pobj_t obj;
+     UINTVAL bufused;
+     void *strstart;
+     UINTVAL strlen;
+     const ENCODING *encoding;
+     const CHARTYPE *type;
+     INTVAL language;
    }
 
 The fields are:
 
 =over 4
 
-=item buffer
+=item obj
 
-Pointer to the start of the string's data.
+A pointer to a Parrot object, Parrot's most general internal data type.
+In this case, it holds the buffer for the string data, the size of the
+buffer in bytes, and any applicable flags. 
 
-=item allocated
+=item bufused
 
-How many bytes are allocated in the buffer.
+The amount of the buffer currently in use, in bytes.
 
-=item bytes
+=item strstart
 
-How many bytes are used in the buffer.
+A pointer to the beginning of the actual string (which may not be positioned 
+at the start of the buffer).
 
-=item flags
+=item strlen
 
-Flags indicating whatever. Bits 0-15 are reserved for parrot, bits 16-23
-for the encoding/decoding code, and the rest for the type code.
-
-=item characters
-
-How many characters are in the buffer. An optional cache field.
+The length of the string, in characters. 
 
 =item encoding
 
 How the data is encoded, for example fixed 8-bit characters, UTF-8, or
-UTF-32. An index into the encoding/decoding function table. Note that
-this specifies encoding only--it's valid to encode EBCDIC characters
-with the UTF-8 algorithm. Silly, but valid.
+UTF-32. Note that this specifies encoding only -- it's valid to encode 
+EBCDIC characters with the UTF-8 algorithm. Silly, but valid.
+
+TODO: explain what the encoding structure is.
 
 =item type
 
 What sort of string data is in the buffer, for example ASCII, EBCDIC,
-or Unicode. Used to index into the table of string functions.
+or Unicode. 
 
-=item unused
+TODO: explain what the type structure is.
 
-Filler. Here to make sure we're both exactly double the size of a
-bigint/bigfloat header and to make sure we don't cross cache lines on
-any modern processor.
+=item language
+
+TODO: explain what this is for. 
 
 =back
+
+TODO: Parrot's other internal datatypes
 
 =head1 ATTACHMENTS
 
