@@ -1,6 +1,6 @@
 #! perl -w
 
-use Parrot::Test tests => 32;
+use Parrot::Test tests => 35;
 
 my $fp_equality_macro = <<'ENDOFMACRO';
 .macro fp_eq (	J, K, L )
@@ -600,3 +600,70 @@ ok 1
 ok 2
 OUTPUT
 
+
+output_is(<<"CODE", <<OUTPUT, "eq_p_n");
+        new P0, .PerlNum
+
+        set P0, 12.5
+        eq P0, 12.5, OK1
+        print "not "
+OK1:    print "ok 1\\n"
+
+        eq P0, 25.0, BAD2
+        branch OK2 
+BAD2:   print "not "
+OK2:    print "ok 2\\n"
+        end
+CODE
+ok 1
+ok 2
+OUTPUT
+
+
+output_is(<<"CODE", <<OUTPUT, "ne_p_n");
+        new P0, .PerlNum
+
+        set P0, 12.5
+        ne P0, 12.0, OK1
+        print "not "
+OK1:    print "ok 1\\n"
+
+        ne P0, 12.5, BAD2
+        branch OK2 
+BAD2:   print "not "
+OK2:    print "ok 2\\n"
+        end
+CODE
+ok 1
+ok 2
+OUTPUT
+
+output_is(<<"CODE", <<OUTPUT, "eq_num");
+        new P0, .PerlNum
+        new P1, .PerlNum
+
+        set N0, 12.5
+        set P0, N0
+        set P1, N0
+
+        eq_num P0, P1, OK1
+        print "not "
+OK1:    print "ok 1\\n"
+
+        inc P1
+        eq_num P0, P1, BAD2
+        branch OK2 
+BAD2:   print "not "
+OK2:    print "ok 2\\n"
+
+        new P2, .PerlInt
+        set P2, N0
+        eq_num P0, P2, OK3
+        print "not "
+OK3:    print "ok 3\\n"
+        end
+CODE
+ok 1
+ok 2
+ok 3
+OUTPUT
