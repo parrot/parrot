@@ -36,7 +36,7 @@ for (vtbl_enumerate(%vtbl)) {
     $thisproto =~ s[(\S+) (\S+)]
                    [$1 $2];
     # Quick hack - don't do that at home:
-    $thisproto =~ s/struct Parrot_Interp \*interpreter, PMC\* pmc,* *//;
+    $thisproto =~ s/struct Parrot_Interp\* interpreter, PMC\* pmc,* *//;
     print "   $thisproto {\n";
     print "   }\n\n";
 }
