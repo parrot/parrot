@@ -30,13 +30,10 @@ ParrotIOLayer   * pio_registered_layers;
 ParrotIOLayer   * pio_default_stack;
 */
 
-/* The standard streams */
 /*
-  Note: These are now interpreter->piodata->table[PIO_STD*_FILENO].
+        The standard streams are:
 
-        ParrotIO * pio_stdin;
-        ParrotIO * pio_stdout;
-        ParrotIO * pio_stderr;
+                interpreter->piodata->table[PIO_STD*_FILENO].
 */
 
 

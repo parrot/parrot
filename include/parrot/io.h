@@ -287,10 +287,6 @@ extern INTVAL           PIO_unix_getblksize(PIOHANDLE fd);
 # define PIO_getblksize(x)   PIO_unix_getblksize(x)
 #endif
 
-extern ParrotIO * pio_stdin;
-extern ParrotIO * pio_stdout;
-extern ParrotIO * pio_stderr;
-
 
 #endif
 
