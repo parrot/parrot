@@ -3,8 +3,9 @@
     .param pmc argv
     .sym int argc
     argc = argv
-    .sym int N
-    N = 24
+    .sym pmc N
+    N = new PerlInt
+    N = 28
     if argc <= 1 goto noarg
     $S0 = argv[1]
     N = $S0
@@ -16,14 +17,14 @@ noarg:
     .local pmc B
     .local pmc b
 
-    newclass A, "A"
-    subclass B, A, "B"
+    A = newclass "A"
+    B = subclass  A, "B"
 
-    find_type I0, "B"
-    new b, I0
+    find_type $I0, "B"
+    b = new  $I0
 
-    .sym int r
-    r = b.fib(N)  
+    .sym pmc r
+    r = b."fib"(N)
 
     .sym float fin
     time fin
@@ -41,20 +42,23 @@ noarg:
 .namespace ["A"]
 
 .sub fib method
-    .param int n
+    .param pmc n
     if n >= 2 goto rec
     .pcc_begin_return
     .return n
     .pcc_end_return
 rec:
-    .sym int n1
-    .sym int n2
-    .sym int r1
-    .sym int r2
+    .sym pmc n1
+    .sym pmc n2
+    .sym pmc r1
+    .sym pmc r2
+    n1 = new PerlInt
+    n2 = new PerlInt
     n1 = n - 1
     n2 = n - 2
-    r1 = self.fibA(n1)
-    r2 = self.fibB(n2)
+    r1 = self."fibA"(n1)
+    r2 = self."fibB"(n2)
+    #n = new PerlInt	# not really needed???
     n = r1 + r2
     .pcc_begin_return
     .return n
@@ -62,20 +66,23 @@ rec:
 .end
 
 .sub fibA method
-    .param int n
+    .param pmc n
     if n >= 2 goto rec
     .pcc_begin_return
     .return n
     .pcc_end_return
 rec:
-    .sym int n1
-    .sym int n2
-    .sym int r1
-    .sym int r2
+    .sym pmc n1
+    .sym pmc n2
+    .sym pmc r1
+    .sym pmc r2
+    n1 = new PerlInt
+    n2 = new PerlInt
     n1 = n - 1
     n2 = n - 2
-    r1 = self.fib(n1)
-    r2 = self.fibB(n2)
+    r1 = self."fib"(n1)
+    r2 = self."fibB"(n2)
+    #n = new PerlInt	# not really needed
     n = r1 + r2
     .pcc_begin_return
     .return n
@@ -85,20 +92,23 @@ rec:
 .namespace ["B"]
 
 .sub fibB method
-    .param int n
+    .param pmc n
     if n >= 2 goto rec
     .pcc_begin_return
     .return n
     .pcc_end_return
 rec:
-    .sym int n1
-    .sym int n2
-    .sym int r1
-    .sym int r2
+    .sym pmc n1
+    .sym pmc n2
+    .sym pmc r1
+    .sym pmc r2
+    n1 = new PerlInt
+    n2 = new PerlInt
     n1 = n - 1
     n2 = n - 2
-    r1 = self.fib(n1)
-    r2 = self.fibA(n2)
+    r1 = self."fib"(n1)
+    r2 = self."fibA"(n2)
+    #n = new PerlInt	# not really needed
     n = r1 + r2
     .pcc_begin_return
     .return n

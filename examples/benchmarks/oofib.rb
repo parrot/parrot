@@ -20,6 +20,6 @@ end
 
 b = B.new
 
-N = Integer( ARGV.shift || 24 )
+N = Integer( ARGV.shift || 28 )
 
 puts "fib(#{N}) = #{ b.fib(N) }"

@@ -20,7 +20,7 @@ class B (A):
         return( self.fib(n-2) + self.fibA(n-1) )
 
 
-N = int(len(sys.argv) == 2 and sys.argv[1] or 24)
+N = int(len(sys.argv) == 2 and sys.argv[1] or 28)
 
 b = B()
 
