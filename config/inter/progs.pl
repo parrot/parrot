@@ -14,14 +14,14 @@ sub runstep {
   my %args;
   @args{@args}=@_;
   
-  my($cc, $ld, $ccflags, $ldflags)=Configure::Data->get(qw(cc ld ccflags ldflags));
+  my($cc, $ld, $ccflags, $ldflags, $libs)=Configure::Data->get(qw(cc ld ccflags ldflags libs));
   $ccflags =~ s/-D(PERL|HAVE)_\w+\s*//g;
   $ldflags =~ s/-libpath:\S+//g;
   my $debug='n';
   
   my $libs=join ' ',
            grep { $^O=~/VMS|MSWin/ || !/^-l(c|gdbm|dbm|ndbm|db)$/ }
-           split ' ', $Config{libs};
+           split(' ', $libs);
   
   $cc=$args{cc}           if defined $args{cc};
   $ld=$args{ld}           if defined $args{ld};

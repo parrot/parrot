@@ -19,6 +19,8 @@ sub runstep {
     ld            => $Config{ld},
     ldflags       => $Config{ldflags},
     
+    libs          => $Config{libs},
+    
     cc_inc	  => "-I./include",
     cc_debug      => '-g',
     cc_warn       => '',
