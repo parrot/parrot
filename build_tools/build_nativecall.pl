@@ -248,8 +248,9 @@ build_call_func(Interp *interpreter, PMC *pmc_nci,
 {
     char       *c;
     STRING     *ns, *message;
-    HashBucket *b;
+    PMC        *b;
     PMC        *iglobals;
+    PMC        *temp_pmc;
 
     void       *result        = NULL;
     Hash       *known_frames  = NULL;
@@ -282,29 +283,22 @@ build_call_func(Interp *interpreter, PMC *pmc_nci,
         HashPointer = VTABLE_get_pmc_keyed_int(interpreter, iglobals,
             IGLOBALS_NCI_FUNCS);
 
-    if (HashPointer)
-        known_frames = PMC_struct_val(HashPointer);
-
-    if (known_frames == NULL)
-    {
-        new_cstring_hash( interpreter, &known_frames );
+    if (!HashPointer) {
+        HashPointer = pmc_new(interpreter, enum_class_PerlHash);
 
 $icky_global_bit
 
         if (iglobals)
         {
-            HashPointer = pmc_new(interpreter, enum_class_Pointer);
             VTABLE_set_pmc_keyed_int(interpreter, iglobals, IGLOBALS_NCI_FUNCS,
                 HashPointer);
-            PMC_struct_val(HashPointer) = known_frames;
         }
     }
 
-    b = hash_get_bucket(interpreter, known_frames,
-        string_to_cstring(interpreter, signature));
+    b = VTABLE_get_pmc_keyed_str(interpreter, HashPointer, signature);
 
     if (b)
-        return F2DPTR( b->value );
+        return F2DPTR(PMC_data(b));
 
     /*
       These three lines have been added to aid debugging. I want to be able to
@@ -481,7 +475,10 @@ HEADER
     ( "$return", "pcf_${return}" ));
 
   push @icky_global_variable,
-        qq|        hash_put( interpreter, known_frames, const_cast("$key"), $value );|;
+        qq|        temp_pmc = pmc_new(interpreter, enum_class_UnManagedStruct);|,
+        qq|        PMC_data(temp_pmc) = $value;|,
+        qq|        VTABLE_set_pmc_keyed_str(interpreter, HashPointer, string_from_cstring(interpreter, "$key", 0), temp_pmc);|;
+#        qq|        hash_put( interpreter, known_frames, const_cast("$key"), $value );|;
 }
 
 
