@@ -103,6 +103,9 @@ W: http://pirate.tangentcode.com/
 V: 0.0.11
 
 N: regex
+A: Steve Fink
+S: Working but fairly minimal
+M: Yes
 
 N: Ruby
 
