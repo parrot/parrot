@@ -1,8 +1,8 @@
-	
 /* perlint.pmc
  *  Copyright: (When this is determined...it will go here)
  *  CVS Info
- *     $Id: genclass.pl,v 1.4 2001/11/16 16:15:26 simon Exp   Overview:
+ *     $Id$
+ *  Overview:
  *     These are the vtable functions for the PerlInt base class
  *  Data Structure and Algorithms:
  *  History:

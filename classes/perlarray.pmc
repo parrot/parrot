@@ -1,7 +1,8 @@
-/* PerlArray.pmc
+/* perlarray.pmc
  *  Copyright: (When this is determined...it will go here)
  *  CVS Info
- *     $Id: genclass.pl,v 1.5 2001/11/16 21:57:28 jgoff Exp   Overview:
+ *     $Id$
+ *  Overview:
  *     These are the vtable functions for the PerlArray base class
  *  Data Structure and Algorithms:
  *  History:
