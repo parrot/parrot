@@ -40,10 +40,12 @@ pmclass SArray {
 	for (i = start; i < end; i++, e++) {
 	    switch (e->type) {
 		case enum_hash_string:
-		    pobject_lives(INTERP, (PObj *)e->val.string_val);
+		    if (e->val.string_val)
+			pobject_lives(INTERP, (PObj *)e->val.string_val);
 		    break;
 		case enum_hash_pmc:
-		    pobject_lives(INTERP, (PObj *)e->val.pmc_val);
+		    if (e->val.pmc_val)
+			pobject_lives(INTERP, (PObj *)e->val.pmc_val);
 		    break;
 		default:
 		    break;

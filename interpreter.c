@@ -595,7 +595,6 @@ make_interpreter(Interp_flags flags)
     SET_NULL_P(interpreter->prederef_code, void **);
     SET_NULL(interpreter->jit_info);
 
-    SET_NULL_P(interpreter->Parrot_compreg_hash, PMC *);
     /* register assembler/compilers */
     setup_default_compreg(interpreter);
 
@@ -792,13 +791,15 @@ interpinfo(struct Parrot_Interp *interpreter, INTVAL what)
 void Parrot_compreg(Parrot_Interp interpreter, STRING *type, PMC *func)
 {
     PMC* key, *hash;
-    if (!interpreter->Parrot_compreg_hash) {
-        hash = interpreter->Parrot_compreg_hash =
-            pmc_new_noinit(interpreter, enum_class_PerlHash);
+    PMC* iglobals = interpreter->iglobals;
+    hash = VTABLE_get_pmc_keyed_int(interpreter, interpreter->iglobals,
+            IGLOBALS_COMPREG_HASH);
+    if (!hash) {
+        hash = pmc_new_noinit(interpreter, enum_class_PerlHash);
         VTABLE_init(interpreter, hash);
+        VTABLE_set_pmc_keyed_int(interpreter, iglobals,
+                (INTVAL)IGLOBALS_COMPREG_HASH, hash);
     }
-    else
-        hash = interpreter->Parrot_compreg_hash;
     key = key_new_string(interpreter, type);
     VTABLE_set_pmc_keyed(interpreter, hash, key, func);
 }

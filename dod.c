@@ -132,14 +132,12 @@ trace_active_PMCs(struct Parrot_Interp *interpreter)
     UINTVAL mask = PObj_is_PMC_ptr_FLAG | PObj_is_buffer_ptr_FLAG
         | PObj_custom_mark_FLAG;
 
-    /* We have to start somewhere, and the classname hash is a good place */
-    interpreter->mark_ptr = current = interpreter->Parrot_base_classname_hash;
+    /* We have to start somewhere, the interpreter globals is a good place */
+    interpreter->mark_ptr = current = interpreter->iglobals;
 
     /* mark it as used  */
     pobject_lives(interpreter, (PObj *)current);
     pobject_lives(interpreter, interpreter->ctx.warns);
-    if (interpreter->Parrot_compreg_hash)
-        pobject_lives(interpreter, (PObj *)interpreter->Parrot_compreg_hash);
     /* Now, go run through the PMC registers and mark them as live */
     /* First mark the current set. */
     for (i = 0; i < NUM_REGISTERS; i++) {

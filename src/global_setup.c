@@ -21,6 +21,11 @@ extern void Parrot_register_core_pmcs(Interp *interp, PMC *registry);
 void
 init_world(Interp *interpreter)
 {
+    INTVAL i;
+
+    PMC *iglobals;
+    PMC *classname_hash;
+
     string_init();              /* Set up the string subsystem */
 
     /* Call base vtable class constructor methods */
@@ -29,12 +34,20 @@ init_world(Interp *interpreter)
     /* Now register the names of the PMCs */
 
     /* We need a hash */
-    interpreter->Parrot_base_classname_hash =
-        pmc_new(interpreter, enum_class_PerlHash);
+    classname_hash = pmc_new(interpreter, enum_class_PerlHash);
 
     /* Now fill the hash */
-    Parrot_register_core_pmcs(interpreter,
-            interpreter->Parrot_base_classname_hash);
+    Parrot_register_core_pmcs(interpreter, classname_hash);
+
+    /* init the interpreter globals array */
+    iglobals = pmc_new(interpreter, enum_class_SArray);
+    interpreter->iglobals = iglobals;
+    VTABLE_set_integer_native(interpreter, iglobals, (INTVAL)IGLOBALS_SIZE);
+    /* clear the array */
+    for (i = 0; i < (INTVAL)IGLOBALS_SIZE; i++)
+        VTABLE_set_pmc_keyed_int(interpreter, iglobals, i, NULL);
+    VTABLE_set_pmc_keyed_int(interpreter, iglobals,
+            (INTVAL)IGLOBALS_CLASSNAME_HASH, classname_hash);
 }
 
 /*

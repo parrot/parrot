@@ -4755,10 +4755,10 @@ Find the PMC type or parrot data type by name.
 
 op find_type(out INT, in STR) {
     PMC * key = key_new_string(interpreter, $2);
+    PMC *classname_hash = VTABLE_get_pmc_keyed_int(interpreter,
+      interpreter->iglobals, IGLOBALS_CLASSNAME_HASH);
 
-    $1 = interpreter->Parrot_base_classname_hash->vtable->
-    	get_integer_keyed(interpreter,
-		interpreter->Parrot_base_classname_hash, key);
+    $1 = VTABLE_get_integer_keyed(interpreter, classname_hash, key);
     if ($1 == enum_type_undef)
 	$1 = Parrot_get_datatype_enum(interpreter, $2);
     goto NEXT();
@@ -4965,8 +4965,9 @@ inline op compile(OUT PMC, in PMC, in STR) {
 
 inline op compreg(OUT PMC, in STR) {
   PMC *key = key_new_string(interpreter, $2);
-  $1 = interpreter->Parrot_compreg_hash->vtable->get_pmc_keyed(
-    interpreter, interpreter->Parrot_compreg_hash, key);
+  PMC *compreg_hash = VTABLE_get_pmc_keyed_int(interpreter,
+      interpreter->iglobals, IGLOBALS_COMPREG_HASH);
+  $1 = VTABLE_get_pmc_keyed(interpreter, compreg_hash, key);
   goto NEXT();
 }
 
