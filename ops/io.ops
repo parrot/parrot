@@ -113,9 +113,9 @@ not stable enough to replace STDIO.
 =cut
 
 op puts(in STR) {
-  STRING *s = $1;
-  if (s && string_length(s)) {
-    PIO_puts(interpreter, PIO_STDOUT(interpreter), (const char *) s->bufstart);
+  if (($1) && string_length($1)) {
+    PIO_write(interpreter, PIO_STDOUT(interpreter), ($1)->bufstart,
+			string_length($1));
   }
   goto NEXT();
 }
@@ -140,27 +140,35 @@ Warning: This is a quick hack.
 
 op read(out STR, in INT) {
   UINTVAL n;
+  INTVAL nr;
   if($2 >= 65535)
     n = 65535;
   else
     n = $2; 
   $1 = string_make(interpreter, NULL, n, NULL, 0, NULL);
   memset(($1)->bufstart, 0, n);
-  PIO_read(interpreter, PIO_STDIN(interpreter), ($1)->bufstart, (size_t)n);
-  ($1)->strlen = ($1)->bufused = strlen(($1)->bufstart);
+  nr = PIO_read(interpreter, PIO_STDIN(interpreter), ($1)->bufstart, (size_t)n);
+  if(nr > 0)
+    ($1)->strlen = ($1)->bufused = nr;
+  else
+    ($1)->strlen = ($1)->bufused = 0;
   goto NEXT();
 }
 
 op read(out STR, in PMC, in INT) {
   UINTVAL n;
+  INTVAL nr;
   if($3 >= 65535)
     n = 65535;
   else
     n = $3; 
   $1 = string_make(interpreter, NULL, n, NULL, 0, NULL);
   memset(($1)->bufstart, 0, n);
-  PIO_read(interpreter, (ParrotIO*)($2->data), ($1)->bufstart, (size_t)n);
-  ($1)->strlen = ($1)->bufused = strlen(($1)->bufstart);
+  nr = PIO_read(interpreter, (ParrotIO*)($2->data), ($1)->bufstart, (size_t)n);
+  if(nr > 0)
+    ($1)->strlen = ($1)->bufused = nr;
+  else
+    ($1)->strlen = ($1)->bufused = 0;
   goto NEXT();
 }
 
