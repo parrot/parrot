@@ -37,7 +37,7 @@ This means that:
     set P0, "foo"
     set N0, P0
 
-will put '0' in C<N0>. In fact, this is very usefull: you can convert
+will put '0' in C<N0>. In fact, this is very useful: you can convert
 a numeric value to string using:
 
     set P0, 3.1415926
@@ -52,23 +52,24 @@ Concatenating strings is done using the C<concat> operator:
     new P2, .PerlString
 
     set P0, "Fred"
-    set P1, "Flinstone"
+    set P1, "Flintstone"
 
     concat P2, P0, P1
 
-Then, P2 will hold "FredFlinstone" string. To speed-up things, you
+Then, P2 will hold "FredFlintstone" string. To speed-up things, you
 can use string registers instead:
 
     new P0, .PerlString
     new P1, .PerlString
 
     set P0, "Fred "
-    set S0, "Flinstone"
+    set S0, "Flintstone"
 
     concat P1, P0, S0
 
-Note that after concatenating the string, you can change original
-values without changing the concatenation result.
+Note that concatenation creates a new string; this means that after 
+concatenating the string, you can change the original values without 
+changing the concatenation result.
 
 =head2 Repeating strings
 
