@@ -79,7 +79,7 @@ scratchpad_index(struct Parrot_Interp* interpreter, PMC* pad,
         return NULL;
     }
 
-    return ((struct Parrot_Lexicals **)pad->data)[scope_index];
+    return &(((struct Parrot_Lexicals *)pad->data)[scope_index]);
 }
 
 /*
@@ -126,7 +126,7 @@ scratchpad_find(struct Parrot_Interp* interp, PMC* pad, STRING * name,
     struct Parrot_Lexicals * lex = NULL;
 
     for (i = pad->cache.int_val - 1; i >= 0; i--) {
-        lex = ((struct Parrot_Lexicals **)pad->data)[i];
+        lex = &(((struct Parrot_Lexicals *)pad->data)[i]);
         pos = lexicals_get_position(interp, lex, name);
         if (pos == list_length(interp, lex->names))
             lex = NULL;
@@ -144,7 +144,6 @@ scratchpad_find(struct Parrot_Interp* interp, PMC* pad, STRING * name,
 PMC*
 scratchpad_new(struct Parrot_Interp * interp, PMC * base, INTVAL depth)
 {
-    struct Parrot_Lexicals * lex;
     PMC * pad_pmc;
 
     Parrot_block_DOD(interp);
@@ -170,16 +169,16 @@ scratchpad_new(struct Parrot_Interp * interp, PMC * base, INTVAL depth)
                sizeof(struct Parrot_Lexicals));
     }
 
-    lex = mem_sys_allocate(sizeof(struct Parrot_Lexicals));
-    lex->names = NULL;
-    lex->values = NULL;
-    /* the list_new below might trigger GC, so anchor the lex structure
-     * early
-     */
-    ((struct Parrot_Lexicals **)pad_pmc->data)[depth] = lex;
     pad_pmc->cache.int_val = depth + 1;
-    lex->values = list_new(interp, enum_type_PMC);
-    lex->names = list_new(interp, enum_type_STRING);
+
+    /* in case call to list_new triggers gc */
+    ((struct Parrot_Lexicals *)pad_pmc->data)[depth].values = NULL;
+    ((struct Parrot_Lexicals *)pad_pmc->data)[depth].names = NULL;
+
+    ((struct Parrot_Lexicals *)pad_pmc->data)[depth].values = 
+        list_new(interp, enum_type_PMC);
+    ((struct Parrot_Lexicals *)pad_pmc->data)[depth].names = 
+        list_new(interp, enum_type_STRING);
 
     Parrot_unblock_DOD(interp);
 

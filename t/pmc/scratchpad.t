@@ -1,6 +1,6 @@
 #! perl -w
 
-use Parrot::Test tests => 3;
+use Parrot::Test tests => 4;
 
 output_is(<<CODE, <<OUTPUT, "direct set and get on scratchpad pmc");
 	new_pad P20, 0
@@ -162,6 +162,33 @@ CODE
 202
 102
 202
+101
+OUTPUT
+
+output_is(<<CODE, <<OUTPUT, "clone scratchpads");
+	new_pad P20, 0
+	new P0, .PerlInt
+	set P0, 100
+	new P1, .PerlInt
+	set P1, 101
+
+        set P20[0;"var0"], P0
+        set P20[0;"var1"], P1
+
+        clone P21, P20
+
+        new P20, .PerlInt
+
+        set P22, P21[0;"var0"] # original pad should be gc'ed
+        set P23, P21[0;"var1"]
+
+        print P22
+        print "\\n"
+        print P23
+        print "\\n"
+	end
+CODE
+100
 101
 OUTPUT
 
