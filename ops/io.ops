@@ -120,6 +120,50 @@ op puts(in STR) {
   goto NEXT();
 }
 
+########################################
+
+=item B<read>(out STR, in INT)
+
+Read up to N bytes from standard input stream
+If stream is linebuffered, will return at EOL, for
+files it will read MIN(MAX(avail, N), 65535) bytes.
+Warning: This is a quick hack.
+
+=item B<read>(out STR, in PMC, in INT)
+
+Read up to N bytes from IO PMC stream. 
+If stream is linebuffered, will return at EOL, for
+files it will read MIN(MAX(avail, N), 65535) bytes.
+Warning: This is a quick hack.
+
+=cut
+
+op read(out STR, in INT) {
+  UINTVAL n;
+  if($2 >= 65535)
+    n = 65535;
+  else
+    n = $2; 
+  $1 = string_make(interpreter, NULL, n, NULL, 0, NULL);
+  memset(($1)->bufstart, 0, n);
+  PIO_read(interpreter, PIO_STDIN(interpreter), ($1)->bufstart, (size_t)n);
+  ($1)->strlen = ($1)->bufused = strlen(($1)->bufstart);
+  goto NEXT();
+}
+
+op read(out STR, in PMC, in INT) {
+  UINTVAL n;
+  if($3 >= 65535)
+    n = 65535;
+  else
+    n = $3; 
+  $1 = string_make(interpreter, NULL, n, NULL, 0, NULL);
+  memset(($1)->bufstart, 0, n);
+  PIO_read(interpreter, (ParrotIO*)($2->data), ($1)->bufstart, (size_t)n);
+  ($1)->strlen = ($1)->bufused = strlen(($1)->bufstart);
+  goto NEXT();
+}
+
 ##########################################
 
 =item B<seek>(out INT, in PMC, in INT, in INT)
