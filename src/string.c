@@ -938,10 +938,6 @@ INTVAL
 string_compare(struct Parrot_Interp *interpreter, STRING *s1,
                STRING *s2)
 {
-    const char *s1start;
-    const char *s1end;
-    const char *s2start;
-    const char *s2end;
     INTVAL cmp;
 
     if (!s1 && !s2) {
@@ -967,42 +963,42 @@ string_compare(struct Parrot_Interp *interpreter, STRING *s1,
                 NULL);
     }
 
-    s1start = s1->strstart;
-    s1end = s1start + s1->bufused;
-    s2start = s2->strstart;
-    s2end = s2start + s2->bufused;
-
     if (s1->encoding->index == enum_encoding_singlebyte) {
         size_t minlen = s1->bufused > s2->bufused ? s2->bufused : s1->bufused;
-
-        cmp = memcmp(s1start, s2start, minlen);
-        s1start += minlen;
-        s2start += minlen;
-    }
-    else {
-        cmp = 0;
-        while (cmp == 0 && s1start < s1end && s2start < s2end) {
-            INTVAL c1 = s1->encoding->decode(s1start);
-            INTVAL c2 = s2->encoding->decode(s2start);
-
-            cmp = c1 - c2;
-
-            s1start = s1->encoding->skip_forward(s1start, 1);
-            s2start = s2->encoding->skip_forward(s2start, 1);
+        cmp = memcmp(s1->strstart, s2->strstart, minlen);
+        if (cmp == 0) {
+            if (minlen < s1->bufused)
+                cmp = 1;
+            else if (minlen < s2->bufused)
+                cmp = -1;
         }
-    }
-
-    if (cmp == 0) {
-        if (s1start < s1end)
+        else if (cmp > 0) {
             cmp = 1;
-        else if (s2start < s2end)
+        }
+        else
             cmp = -1;
     }
-    else if (cmp > 0) {
-        cmp = 1;
+    else {
+        struct string_iterator_t i1;
+        struct string_iterator_t i2;
+        string_iterator_init(&i1, s1);
+        string_iterator_init(&i2, s2);
+        cmp = 0;
+        while (!cmp && i1.charpos < s1->strlen && i2.charpos < s2->strlen) {
+            cmp = i1.decode_and_advance(&i1) - i2.decode_and_advance(&i2);
+        }
+        if (cmp == 0) {
+            if (i1.charpos < s1->strlen)
+                cmp = 1;
+            else if (i2.charpos < s2->strlen)
+                cmp = -1;
+        }
+        else if (cmp > 0) {
+            cmp = 1;
+        }
+        else
+            cmp = -1;
     }
-    else
-        cmp = -1;
 
     return cmp;
 }
