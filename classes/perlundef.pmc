@@ -355,6 +355,9 @@ pmclass PerlUndef extends PerlInt {
         }
     }
 
+    /* Since we know that we're false, the logical ops are particularly
+       simple, and there's no need to use the versions in Scalar */
+
     void logical_or (PMC* value,  PMC* dest) {
         VTABLE_set_pmc(INTERP, dest, value);
     }
