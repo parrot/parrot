@@ -88,9 +88,9 @@ offset_fixup(Parrot_exec_objfile_t *obj)
     int i,j;
 
     for (i = 0; i < obj->data_count; i++) {
-        obj->symbol_table[i].offset_text = obj->text.size;
+        obj->symbol_table[i].value = obj->text.size;
         for (j = 0; j < i; j++) 
-            obj->symbol_table[i].offset_text += obj->data_size[j];
+            obj->symbol_table[i].value += obj->data_size[j];
     }
 }
 
@@ -192,7 +192,7 @@ Parrot_exec_save(Parrot_exec_objfile_t *obj, const char *file)
     for (i = 0; i < obj->symbol_count; i++) {
         save_int(fp, obj->symbol_table[i].offset_list);
         save_int(fp, obj->symbol_table[i].type);
-        save_int(fp, obj->symbol_table[i].offset_text);
+        save_int(fp, obj->symbol_table[i].value);
     }
     /* Symbol list */
     for (i = 0; i < obj->symbol_count; i++) {
