@@ -17,7 +17,7 @@ Tests the extension API.
 
 =cut
 
-use Parrot::Test tests => 12;
+use Parrot::Test tests => 13;
 use Parrot::Config;
 
 c_output_is(<<'CODE', <<'OUTPUT', "set/get_intreg");
@@ -169,6 +169,41 @@ int main(int argc, char* argv[]) {
 }
 CODE
 101010
+OUTPUT
+
+
+c_output_is(<<'CODE', <<'OUTPUT', "PMC_set/get_intval_intkey");
+
+#include <stdio.h>
+#include "parrot/embed.h"
+#include "parrot/extend.h"
+
+int main(int argc, char* argv[]) {
+    Parrot_Interp interpreter;
+    Parrot_Int type, value, key, new_value;
+    Parrot_PMC array;
+
+    /* Interpreter set-up */
+    interpreter = Parrot_new(NULL);
+    if ( interpreter == NULL ) return 1;
+    Parrot_init(interpreter);
+
+    type = Parrot_PMC_typenum(interpreter, "PerlArray");
+    array = Parrot_PMC_new(interpreter, type);
+
+    value = 12345;
+    key   = 10;
+    Parrot_PMC_set_intval_intkey(interpreter, array, value, key);
+
+    new_value = Parrot_PMC_get_intval_intkey(interpreter, array, key);
+
+    printf("%ld\n", (long)new_value);
+
+    Parrot_exit(0);
+    return 0;
+}
+CODE
+12345
 OUTPUT
 
 c_output_is(<<'CODE', <<'OUTPUT', "set/get_pmcreg");
