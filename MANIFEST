@@ -1748,6 +1748,7 @@ t/src/intlist.t
 t/src/list.t
 t/src/manifest.t
 t/src/sprintf.t
+t/stress/gc.t
 test_main.c
 tools/dev/check_source_standards.pl
 tools/dev/extract_file_descriptions.pl
