@@ -24,14 +24,15 @@ A Data::Dumper::Default object has the following methods:
 
 =cut
 
-.include "library/onload.imc"
-.include "library/objects.imc"
 .include "library/sort.imc"
 
-# autoload method
-.sub __onload
+.sub __library_data_dumper_default_onload @LOAD
+    find_type I0, "Data::Dumper::Default"
+    if I0 > 1 goto END
     load_bytecode "library/Data/Dumper/Base.imc"
-    __new_class( "Data::Dumper::Default", "Data::Dumper::Base" )
+    getclass P0, "Data::Dumper::Base"
+    subclass P0, P0, "Data::Dumper::Default"
+END:
     .pcc_begin_return
     .pcc_end_return
 .end

@@ -4,7 +4,7 @@ Data::Dumper::Base - style baseclass
 
 =head1 VERSION
 
-version 0.10
+version 0.11
 
 =head1 SYNOPSIS
 
@@ -22,11 +22,20 @@ A Data::Dumper::Base object has the following methods:
 
 =cut
 
-.include "library/onload.imc"
-.include "library/objects.imc"
+.const int attrDumper = 0
+.const int attrLevel = 1
+.const int attrIndention = 2
+.const int attrCache = 3
 
-.sub __onload
-    __new_class( "Data::Dumper::Base" )
+.sub __library_data_dumper_base_onload @LOAD
+    find_type I0, "Data::Dumper::Base"
+    if I0 > 1 goto END
+    newclass P0, "Data::Dumper::Base"
+    addattribute P0, "dumper"
+    addattribute P0, "level"
+    addattribute P0, "indention"
+    addattribute P0, "cache"
+END:
     .pcc_begin_return
     .pcc_end_return
 .end
@@ -43,19 +52,27 @@ A Data::Dumper::Base object has the following methods:
     .local string stemp
     .local pmc temp
 
-    setprop self, "dumper", dumper
+    classoffset I0, self, "Data::Dumper::Base"
+    add I0, attrDumper
+    setattribute self, I0, dumper
 
     new temp, .PerlInt
     set temp, 0
-    setprop self, "level", temp
+    classoffset I0, self, "Data::Dumper::Base"
+    add I0, attrLevel
+    setattribute self, I0, temp
     
     new temp, .PerlString
     clone stemp, indent
     set temp, stemp
-    setprop self, "indention", temp
+    classoffset I0, self, "Data::Dumper::Base"
+    add I0, attrIndention
+    setattribute self, I0, temp
 
     new temp, .PerlArray
-    setprop self, "cache", temp
+    classoffset I0, self, "Data::Dumper::Base"
+    add I0, attrCache
+    setattribute self, I0, temp
 
     .pcc_begin_return
     .pcc_end_return
@@ -74,7 +91,10 @@ A Data::Dumper::Base object has the following methods:
     .local string name
     .local pmc pname
 
-    getprop cache, "cache", self
+    classoffset I0, self, "Data::Dumper::Base"
+    add I0, attrCache
+    getattribute cache, self, I0
+
     set i, cache
 LOOP:
     dec i
@@ -111,7 +131,9 @@ NOTFOUND:
     .local pmc temp
     .local string indent
 
-    getprop temp, "indention", self
+    classoffset I0, self, "Data::Dumper::Base"
+    add I0, attrIndention
+    getattribute temp, self, I0
     set indent, temp
     clone indent, indent
     repeat indent, indent, level
@@ -130,7 +152,9 @@ NOTFOUND:
     .local string indent
     .local int level
         
-    getprop temp, "level", self
+    classoffset I0, self, "Data::Dumper::Base"
+    add I0, attrLevel
+    getattribute temp, self, I0
     set level, temp
 
     indent = self."createIndent"( level )
@@ -150,7 +174,9 @@ NOTFOUND:
     .local string indent2
     .local int level
         
-    getprop temp, "level", self
+    classoffset I0, self, "Data::Dumper::Base"
+    add I0, attrLevel
+    getattribute temp, self, I0
     set level, temp
     inc temp
 
@@ -173,7 +199,9 @@ NOTFOUND:
     .local string indent
     .local int level
         
-    getprop temp, "level", self
+    classoffset I0, self, "Data::Dumper::Base"
+    add I0, attrLevel
+    getattribute temp, self, I0
     dec temp
     set level, temp
 

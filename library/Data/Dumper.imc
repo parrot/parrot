@@ -1,9 +1,9 @@
-.include "library/onload.imc"
-.include "library/objects.imc"
-
-.sub __onload
+.sub __library_data_dumper_onload @LOAD
+    find_type I0, "Data::Dumper"
+    if I0 > 1 goto END
     load_bytecode "library/Data/Dumper/Default.imc"
-    __new_class( "Data::Dumper" )
+    newclass P0, "Data::Dumper"
+END:
     .pcc_begin_return
     .pcc_end_return
 .end
