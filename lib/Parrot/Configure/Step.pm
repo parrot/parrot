@@ -9,11 +9,11 @@ use vars qw(@ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
 
 @EXPORT=();
 
-@EXPORT_OK=qw(prompt genfile copy_if_diff move_if_diff
+@EXPORT_OK=qw(prompt genfile copy_if_diff move_if_diff integrate
               cc_gen cc_build cc_run cc_clean cc_run_capture);
 
 %EXPORT_TAGS=(
-	inter => ['prompt'],
+	inter => [qw(prompt integrate)],
 	auto  => [qw(cc_gen cc_build cc_run cc_clean cc_run_capture)],
 	gen   => [qw(genfile copy_if_diff move_if_diff)]
 );
@@ -24,6 +24,29 @@ my $redir_err = (($ENV{COMSPEC} || "")=~ /command\.com/i) ? "" : "2>&1";
 #Configure::Data->set('key', 'value')
 #Configure::Data->keys()
 #Configure::Data->dump()
+
+sub integrate {
+    my($orig, $new)=@_;
+    
+    unless(defined $new) {
+        warn "String to be integrated in to '$orig' undefined";
+        return $orig;
+    }
+    
+	while($new =~ s/:add\{([^}]+)\}//) {
+		$orig .= $1;
+	}
+
+	while($new =~ s/:rem\{([^}]+)\}//) {
+		$orig =~ s/\Q$1\E//;
+	}
+
+	if($new =~ /\S/) {
+		$orig =  $new;
+	}
+    
+    return $orig;
+}
 
 sub prompt {
 	my($message, $value)=@_;
@@ -44,7 +67,7 @@ sub prompt {
 		$value =  $input;
 	}
 
-	return $value;
+	return integrate($value, $input);
 }
 
 sub file_checksum {

@@ -45,17 +45,12 @@ sub runstep {
     $lex = $yacc = $null;
   }
 
-  $cc=$args{cc}           if defined $args{cc};
-  $link=$args{link}       if defined $args{link};
-  $ld=$args{ld}           if defined $args{ld};
-  $ccflags=$args{ccflags} if defined $args{ccflags};
-  $linkflags=$args{linkflags} if defined $args{linkflags};
-  $ldflags=$args{ldflags} if defined $args{ldflags};
-  $libs=$args{libs}       if defined $args{libs};
+  for my $var(qw(cc link ld ccflags linkflags ldflags libs ccwarn lex yacc)) {
+    #Symrefs to lexicals are a no-no, so we have to use eval STRING.  %MY, anyone?
+    eval qq{ \$$var=integrate(\$$var, \$args{$var}) if defined \$args{$var} };
+  }
+  
   $debug='y'              if defined $args{debugging};
-  $cc_warn=$args{ccwarn}  if defined $args{ccwarn};
-  $cc_warn=$args{lex}     if defined $args{lex};
-  $cc_warn=$args{yacc}    if defined $args{yacc};
 
   if($args{ask}) {
     print <<'END';
