@@ -15,7 +15,6 @@ byteorder.c
 chartype.c
 chartypes/unicode.c
 chartypes/usascii.c
-check_source_standards.pl
 classes/array.pmc
 classes/default.pmc
 classes/genclass.pl
@@ -338,7 +337,6 @@ lib/Test/Builder.pm
 lib/Test/More.pm
 lib/Test/Simple.pm
 lib/Text/Balanced.pm
-lib_deps.pl
 make.pl
 make_vtable_ops.pl
 manicheck.pl
@@ -353,7 +351,6 @@ packdump.c
 packfile.c
 packout.c
 parrot.c
-parrot_coverage.pl
 pbc2c.pl
 pdb.c
 pdump.c
@@ -361,7 +358,6 @@ pmc.c
 pmc_pm.pl
 register.c
 resources.c
-run_indent.pl
 runops_cores.c
 rx.c
 rx.ops
@@ -389,6 +385,10 @@ t/pmc/perlhash.t
 t/pmc/perlstring.t
 t/pmc/pmc.t
 test_main.c
+tools/dev/check_source_standards.pl
+tools/dev/lib_deps.pl
+tools/dev/parrot_coverage.pl
+tools/dev/run_indent.pl
 trace.c
 types/bignum.c
 types/bignum.h

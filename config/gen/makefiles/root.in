@@ -164,15 +164,15 @@ $(TEST_PROG) : test_main$(O) $(GEN_HEADERS) $(O_FILES) lib/Parrot/OpLib/core.pm 
 	$(LD) ${ld_out}$(TEST_PROG) $(LDFLAGS) $(O_FILES) test_main$(O) $(C_LIBS)
 
 lib_deps_object : $(O_FILES)
-	$(PERL) lib_deps.pl object $(O_FILES)
+	$(PERL) tools/dev/lib_deps.pl object $(O_FILES)
 
 lib_deps_source : $(GENERAL_H_FILES)
-	$(PERL) lib_deps.pl source all_source
+	$(PERL) tools/dev/lib_deps.pl source all_source
 
 lib_deps : lib_deps_object lib_deps_source
 
 check_source : $(GENERAL_H_FILES)
-	$(PERL) check_source_standards.pl all_source
+	$(PERL) tools/dev/check_source_standards.pl all_source
 
 ###############################################################################
 #
