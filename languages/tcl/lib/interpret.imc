@@ -4,54 +4,46 @@ Given a pre-parsed chunk of Tcl, interpret it.
 
 =cut
 
+#.include "runtime/parrot/library/dumper.imc"
+
 .namespace [ "_Tcl" ]
 
 .sub __interpret
   .param pmc commands
-  
-  #load_bytecode "library/Data/Dumper.imc"
-  #$P1= find_global "Data::Dumper", "dumper"
-  #$P1(commands)
 
   # our running return value, type
   .local int return_type
   return_type = TCL_OK
-  .local pmc retval
-
-  .local pmc escaper
+  .local pmc retval,escaper
    escaper = find_global "Data::Escape", "String"
 
   # Which command are we processing?
-  .local int command_num
+  .local int command_num,num_commands
   command_num = -1
-  .local int num_commands
   num_commands = commands
   .local pmc command
   .local string proc
-  .local pmc args
-  .local pmc my_cmd
-  .local pmc parsed_body
-  .local pmc argument_list
+  .local pmc args,my_cmd,parsed_body,argument_list
 
 end_scope:
   #print "end_scope:\n"
   inc command_num
   if command_num == num_commands goto done
   if return_type != TCL_OK goto done
-  #print "not done\n"
   command = commands[command_num] 
 
   # this should stringify the tclword object, which performs
   # all necessary substitutions. 
   $P0 = command[0]
+  #print "#1 Blah?\n"
   (return_type,retval) = $P0.__get_pmc()
-  
+ 
+
   if return_type != TCL_OK goto done
   proc = retval 
 
-  .local int num_args 
+  .local int num_args,arg_num
   num_args = command
-  .local int arg_num
   arg_num = 1
   
   # The subs we're calling expect flattened args. There's no opcode to
@@ -71,15 +63,18 @@ end_scope:
   isnull my_cmd, no_command
 
   .local pmc folded_args
-  folded_args = new PerlArray
+  .local int TclList
+  TclList = find_type "TclList"
+  folded_args = new TclList
   .local pmc current_word
 
 loop:
   if arg_num == num_args goto loop_done
-
+  $I0 = arg_num - 1
   current_word = command[arg_num]
   (return_type,retval) = current_word.__get_pmc()
   if return_type != TCL_OK goto done
+
   push folded_args, retval
   inc arg_num
   if arg_num == num_args goto loop_done
