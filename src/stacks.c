@@ -64,7 +64,14 @@ void rotate_entries(struct Parrot_Interp *interpreter, struct StackChunk *base_c
     *stack_entry(interpreter, base_chunk, depth - 1) = temp;
 }
 
-/* Push something on the generic stack. Return a pointer to the entry */
+/* Push something on the generic stack. Return a pointer to the entry
+
+   Note that the cleanup pointer, if non-NULL, points to a routine
+   that'll be called when the entry is removed from the stack. This is
+   handy for those cases where you need some sort of activity to take
+   place when an entry is removed, such as when you push a lexical
+   lock onto the call stack, or localize (or tempify, or whatever
+   we're calling it)  variable or something */
 struct Stack_Entry *push_generic_entry(struct Parrot_Interp *interpreter, struct Stack_Entry **top, void *thing, INTVAL type,  void (*cleanup)(struct Stack_Entry *)) {
     struct StackChunk *chunk_base;
     
