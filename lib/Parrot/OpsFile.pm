@@ -99,6 +99,8 @@ sub read_ops
   my $seen_pod;
   my $seen_op;
   my $line;
+  my $flags;
+  my @labels;
 
   while (<OPS>) {
     $seen_pod = 1 if m|^=|;
@@ -159,7 +161,7 @@ sub read_ops
     #   kc   Key constant index
     #
 
-    if (/^(inline\s+)?op\s+([a-zA-Z]\w*)\s*\((.*)\)\s*{/) {
+    if (/^(inline\s+)?op\s+([a-zA-Z]\w*)\s*\((.*)\)\s*(\S*)?\s*{/) {
       if ($seen_op) {
         die "$ops_file [$.]: Cannot define an op within an op definition!\n";
       }
@@ -167,8 +169,10 @@ sub read_ops
       $type       = defined($1) ? 'inline' : 'function';
       $short_name = lc $2;
       $args       = trim(lc $3);
+      $flags      = $4 ? trim(lc $4) : "";
       @args       = split(/\s*,\s*/, $args);
       @argdirs    = ();
+      @labels     = ();
       $body       = '';
       $seen_op    = 1;
       $line	      = $.+1;
@@ -176,7 +180,10 @@ sub read_ops
       my @temp = ();
 
       foreach my $arg (@args) {
-	my ($use, $type) = $arg =~ m/^(in|out|inout|inconst|invar)\s+(INT|NUM|STR|PMC|KEY|INTKEY)$/i;
+	my ($use, $type) = $arg =~
+	m/^(in|out|inout|inconst|invar|label|labelconst|labelvar)
+	  \s+
+	  (INT|NUM|STR|PMC|KEY|INTKEY)$/ix;
 
         die "Unrecognized arg format '$arg' in '$_'!" unless defined($use) and defined($type);
 
@@ -186,6 +193,15 @@ sub read_ops
         else {
           $type = lc substr($type, 0, 1);
         }
+        # convert e.g. "labelvar" to "invar" and remember labels
+	if ($use =~ /label(\w*)/) {
+	  push @labels, 1;
+	  $use = "in$1";
+	}
+	else {
+	  push @labels, 0;
+	}
+
 
         if ($use eq 'in') {
           push @temp, ($type eq 'p') ? 'p' : "$type|${type}c";
@@ -226,7 +242,7 @@ sub read_ops
 
     if (/^}\s*$/) {
       $count += $self->make_op($count, $type, $short_name, $body, \@args,
-		\@argdirs, $line, $orig);
+		\@argdirs, $line, $orig, \@labels, $flags);
 
       $seen_op = 0;
 
@@ -274,7 +290,7 @@ sub or_flag
 sub make_op
 {
   my ($self, $code, $type, $short_name, $body, $args, $argdirs,
-            $line, $file) = @_;
+            $line, $file, $labels, $flags) = @_;
   my $counter = 0;
   my $absolute = 0;
   my $branch = 0;
@@ -283,9 +299,9 @@ sub make_op
   my $restart = 0;
 
   foreach my $variant (expand_args(@$args)) {
-      my(@fixedargs)=split(/,/,$variant);
+      my (@fixedargs)=split(/,/,$variant);
       my $op = Parrot::Op->new($code++, $type, $short_name,
-        [ 'op', @fixedargs ], [ '', @$argdirs ]);
+        [ 'op', @fixedargs ], [ '', @$argdirs ], [0, @$labels], $flags);
       my $op_size = $op->size;
       my $jumps = "0";
 

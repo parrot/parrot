@@ -119,19 +119,19 @@ inline op check_events() {
   goto ADDRESS(next);	/* force this being a branch op */
 }
 
-inline op check_events__() {
+inline op check_events__() :internal {
   opcode_t *this = CUR_OPCODE;
   this = HANDLE_EVENTS(interpreter, this);
   goto ADDRESS(this);	/* force this being a branch op */
 }
 
-inline op wrapper__() {
+inline op wrapper__() :internal {
     opcode_t *pc = CUR_OPCODE;
     DO_OP(pc, interpreter);
     goto ADDRESS(pc);
 }
 
-inline op prederef__() {
+inline op prederef__() :internal {
     do_prederef((void**)cur_opcode, interpreter, op_lib.core_type);
     goto OFFSET(0);
 }
@@ -140,7 +140,7 @@ inline op reserved(in INT) {
   goto NEXT();  /* reserve 2 entries */
 }
 
-inline op load_bytecode(in STR) {
+inline op load_bytecode(in STR) :load_file {
   char * file = string_to_cstring(interpreter, $1);
   Parrot_load_bytecode(interpreter, file);
   string_cstring_free(file);
@@ -163,24 +163,24 @@ The control flow opcodes check conditions and manage program flow.
 
 ########################################
 
-=item B<branch>(in INT)
+=item B<branch>(label INT)
 
 Branch forward or backward by the amount in $1.
 
 =cut
 
-inline op branch (in INT) {
+inline op branch (label INT) :base_loop {
   goto OFFSET($1);
 }
 
 
-=item B<branch_cs>(in STR)
+=item B<branch_cs>(label STR)
 
 Intersegment branch to location in fixup table named $1.
 
 =cut
 
-inline op branch_cs (in STR) {
+inline op branch_cs (label STR) :base_loop,check_event {
     char * label = string_to_cstring(interpreter, $1);
     struct PackFile_FixupEntry *fe = PackFile_find_fixup_entry(interpreter,
 	    enum_fixup_label, label);
@@ -204,7 +204,7 @@ stack for later returning.
 
 =cut
 
-inline op bsr (in INT) {
+inline op bsr (label INT) :base_core,check_event {
   stack_push(interpreter, &interpreter->ctx.control_stack, expr NEXT(),  STACK_ENTRY_DESTINATION, STACK_CLEANUP_NULL);
   goto OFFSET($1);
 }
@@ -222,14 +222,14 @@ inline op ret() {
 
 ########################################
 
-=item B<jsr>(in INT)
+=item B<jsr>(label INT)
 
 Jump to the location specified by register $1. Push the current
 location onto the call stack for later returning.
 
 =cut
 
-inline op jsr(in INT) {
+inline op jsr(label INT) :base_core,check_event {
   opcode_t * loc;
   stack_push(interpreter, &interpreter->ctx.control_stack, expr NEXT(),  STACK_ENTRY_DESTINATION, STACK_CLEANUP_NULL);
   loc = INTVAL2PTR(opcode_t *, $1);
@@ -239,13 +239,13 @@ inline op jsr(in INT) {
 
 ########################################
 
-=item B<jump>(in INT)
+=item B<jump>(label INT)
 
 Jump to the address held in register $1.
 
 =cut
 
-inline op jump(in INT) {
+inline op jump(label INT) :base_loop {
   opcode_t * loc;
   loc = INTVAL2PTR(opcode_t *, $1);
   goto ADDRESS(loc);
