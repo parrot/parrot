@@ -39,10 +39,10 @@ static void set_codepoint(Interp *interpreter, STRING *source_string, UINTVAL of
 }
 
 static UINTVAL get_byte(Interp *interpreter, STRING *source_string, UINTVAL offset) {
+  char *contents = source_string->strstart;
   if (offset >= source_string->bufused) {
     internal_exception(0, "get_byte past the end of the buffer");
   }
-  char *contents = source_string->strstart;
   return contents[offset];
 }
 
@@ -51,13 +51,13 @@ static void set_byte(Interp *interpreter, STRING *source_string, UINTVAL offset,
 
 /* Delegate to get_bytes */
 static STRING *get_codepoints(Interp *interpreter, STRING *source_string, UINTVAL offset, UINTVAL count) {
- 
+
   return get_bytes(interpreter, source_string, offset, count);
 }
 
 static STRING *get_bytes(Interp *interpreter, STRING *source_string, UINTVAL offset, UINTVAL count) {
   STRING *return_string = NULL;
- 
+
   return return_string;
 }
 

@@ -127,11 +127,11 @@ static INTVAL compare(Interp *interpreter, STRING *lhs, STRING *rhs) {
   return 0;
 }
 
-static INTVAL index(Interp *interpreter, STRING *source_string, STRING *search_string, UINTVAL offset) {
+static INTVAL cs_index(Interp *interpreter, STRING *source_string, STRING *search_string, UINTVAL offset) {
   return -1;
 }
 
-static INTVAL rindex(Interp *interpreter, STRING *source_string, STRING *search_string, UINTVAL offset) {
+static INTVAL cs_rindex(Interp *interpreter, STRING *source_string, STRING *search_string, UINTVAL offset) {
   return -1;
 }
 
@@ -223,8 +223,8 @@ CHARSET *Parrot_charset_ascii_init(Interp *interpreter) {
       downcase_first,
       titlecase_first,
       compare,
-      index,
-      rindex,
+      cs_index,
+      cs_rindex,
       validate,
       is_wordchar,
       find_wordchar,
@@ -245,10 +245,10 @@ CHARSET *Parrot_charset_ascii_init(Interp *interpreter) {
   };
 
   preferred_encoding = Parrot_load_encoding(interpreter, "fixed_8");
-  
+
   memcpy(return_set, &base_set, sizeof(CHARSET));
   return return_set;
-  
+
 }
 
 /*
