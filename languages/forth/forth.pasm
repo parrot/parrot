@@ -209,6 +209,7 @@ InitializeCoreOps:
     set .SpecialWords["do"], 7
     set .SpecialWords["loop"], 8
     set .SpecialWords["+loop"], 9
+    set .SpecialWords["compile,"], 10
 
     .AddCoreOp(Int_Dot,".")
     .AddCoreOp(Int_Dot, "u.")
@@ -1427,7 +1428,13 @@ AddSpecialWord:
     concat .NewBodyString, "pop P31, P30\npop P31, P30\n"
     branch EndSpecWord    
   NotPlusLoop:
+    ne .CurrentWord, "compile,", NotCompileComma
+    concat .NewBodyString, "restore P31\n"
+    concat .NewBodyString, "set I31, P31\n"
+    concat .NewBodyString, "jsr I31\n"
+    branch EndSpecWord
 
+  NotCompileComma:
     branch EndSpecWord    
 
 
