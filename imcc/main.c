@@ -191,20 +191,20 @@ parseflags(Parrot_Interp interp, int *argc, char **argv[])
                 break;
             case 'd':
                 if (opt.opt_arg) {
-                    interp->imc_info->debug = strtoul(opt.opt_arg, 0, 16);
+                    IMCC_INFO(interp)->debug = strtoul(opt.opt_arg, 0, 16);
                 }
                 else {
-                    interp->imc_info->debug++;
+                    IMCC_INFO(interp)->debug++;
                 }
-                if (interp->imc_info->debug & 1)
+                if (IMCC_INFO(interp)->debug & 1)
                     setopt(PARROT_DEBUG_FLAG);
                 break;
             case 'w':
                 Parrot_setwarnings(interp, PARROT_WARNINGS_ALL_FLAG);
-                interp->imc_info->imcc_warn = 1;
+                IMCC_INFO(interp)->imcc_warn = 1;
                 break;
             case 'G':
-                interp->imc_info->gc_off = 1;
+                IMCC_INFO(interp)->gc_off = 1;
                 break;
             case '.':  /* Give Windows Parrot hackers an opportunity to
                         * attach a debuggger. */
@@ -231,7 +231,7 @@ parseflags(Parrot_Interp interp, int *argc, char **argv[])
                 load_pbc = 1;
                 break;
             case 'v':
-                interp->imc_info->verbose++;
+                IMCC_INFO(interp)->verbose++;
                 break;
             case 'y':
                 yydebug = 1;
@@ -241,14 +241,14 @@ parseflags(Parrot_Interp interp, int *argc, char **argv[])
                 break;
             case 'o':
                 run_pbc = 0;
-                interp->imc_info->output = str_dup(opt.opt_arg);
+                IMCC_INFO(interp)->output = str_dup(opt.opt_arg);
                 break;
 
             case OPT_PBC_OUTPUT:
                 run_pbc = 0;
                 write_pbc = 1;
-                if (!interp->imc_info->output)
-                    interp->imc_info->output = str_dup("-");
+                if (!IMCC_INFO(interp)->output)
+                    IMCC_INFO(interp)->output = str_dup("-");
                 break;
 
             case 'O':
@@ -424,7 +424,7 @@ main(int argc, char * argv[])
     IMCC_ast_init(interp);
 
     sourcefile = parseflags(interp, &argc, &argv);
-    output = interp->imc_info->output;
+    output = IMCC_INFO(interp)->output;
 
     if (Interp_flags_TEST(interp, PARROT_PYTHON_MODE))
         Parrot_py_init(interp);
@@ -473,9 +473,9 @@ main(int argc, char * argv[])
 
     /* Do we need to produce an output file? If so, what type? */
     obj_file = 0;
-    if (interp->imc_info->output) {
+    if (IMCC_INFO(interp)->output) {
         char *ext;
-        ext = strrchr(interp->imc_info->output, '.');
+        ext = strrchr(IMCC_INFO(interp)->output, '.');
         if (ext && strcmp (ext, ".pbc") == 0) {
             write_pbc = 1;
         }
@@ -496,10 +496,10 @@ main(int argc, char * argv[])
                 "main: outputfile is sourcefile\n");
     }
 
-    interp->imc_info->write_pbc = write_pbc;
+    IMCC_INFO(interp)->write_pbc = write_pbc;
 
-    if (interp->imc_info->verbose) {
-        IMCC_info(interp, 1,"debug = 0x%x\n", interp->imc_info->debug);
+    if (IMCC_INFO(interp)->verbose) {
+        IMCC_info(interp, 1,"debug = 0x%x\n", IMCC_INFO(interp)->debug);
         IMCC_info(interp, 1,"Reading %s\n", yyin == stdin ? "stdin":sourcefile);
     }
 
@@ -586,11 +586,11 @@ main(int argc, char * argv[])
     /* Run the bytecode */
     if (run_pbc) {
 
-        if (interp->imc_info->imcc_warn)
+        if (IMCC_INFO(interp)->imcc_warn)
             PARROT_WARNINGS_on(interp, PARROT_WARNINGS_ALL_FLAG);
         else
             PARROT_WARNINGS_off(interp, PARROT_WARNINGS_ALL_FLAG);
-        if (!interp->imc_info->gc_off) {
+        if (!IMCC_INFO(interp)->gc_off) {
             Parrot_unblock_DOD(interp);
             Parrot_unblock_GC(interp);
         }
@@ -608,7 +608,7 @@ main(int argc, char * argv[])
     Parrot_destroy(interp);
     if (output)
         free(output);
-    mem_sys_free(interp->imc_info);
+    mem_sys_free(IMCC_INFO(interp));
     Parrot_exit(0);
 
     return 0;

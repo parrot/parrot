@@ -486,12 +486,12 @@ imcc_compile(Parrot_Interp interp, const char *s, int pasm_file)
         void * __ptr;
     } __ptr_u;
 
-    if (interp->imc_info->last_unit) {
+    if (IMCC_INFO(interp)->last_unit) {
         /* got a reentrant compile */
         imc_info = mem_sys_allocate_zeroed(sizeof(imc_info_t));
-        imc_info->ghash = interp->imc_info->ghash;
-        imc_info->prev = interp->imc_info;
-        interp->imc_info = imc_info;
+        imc_info->ghash = IMCC_INFO(interp)->ghash;
+        imc_info->prev = IMCC_INFO(interp);
+        IMCC_INFO(interp) = imc_info;
     }
 
     sprintf(name, "EVAL_" INTVAL_FMT, ++interp->code->eval_nr);
@@ -509,7 +509,7 @@ imcc_compile(Parrot_Interp interp, const char *s, int pasm_file)
     }
     IMCC_push_parser_state(interp);
     if (imc_info)
-        interp->imc_info->state->next = NULL;
+        IMCC_INFO(interp)->state->next = NULL;
     IMCC_INFO(interp)->state->pasm_file = pasm_file;
     IMCC_INFO(interp)->state->file = name;
     expect_pasm = 0;
@@ -535,9 +535,9 @@ imcc_compile(Parrot_Interp interp, const char *s, int pasm_file)
     sub_data->name = string_from_cstring(interp, name, 0);
 
     if (imc_info) {
-        interp->imc_info = imc_info->prev;
+        IMCC_INFO(interp) = imc_info->prev;
         mem_sys_free(imc_info);
-        imc_info = interp->imc_info;
+        imc_info = IMCC_INFO(interp);
         cur_unit = imc_info->last_unit;
         cur_namespace = imc_info->cur_namespace;
     }
@@ -571,12 +571,12 @@ imcc_compile_file (Parrot_Interp interp, const char *s)
     FILE *fp;
     struct _imc_info_t *imc_info = NULL;
 
-    if (interp->imc_info->last_unit) {
+    if (IMCC_INFO(interp)->last_unit) {
         /* got a reentrant compile */
         imc_info = mem_sys_allocate_zeroed(sizeof(imc_info_t));
-        imc_info->ghash = interp->imc_info->ghash;
-        imc_info->prev = interp->imc_info;
-        interp->imc_info = imc_info;
+        imc_info->ghash = IMCC_INFO(interp)->ghash;
+        imc_info->prev = IMCC_INFO(interp);
+        IMCC_INFO(interp) = imc_info;
     }
 
     fullname = Parrot_locate_runtime_file(interp, s, PARROT_RUNTIME_FT_SOURCE);
@@ -624,7 +624,7 @@ imcc_compile_file (Parrot_Interp interp, const char *s)
     string_cstring_free(fullname);
 
     if (imc_info) {
-        interp->imc_info = imc_info->prev;
+        IMCC_INFO(interp) = imc_info->prev;
         mem_sys_free(imc_info);
     }
     return pf;
@@ -1015,7 +1015,7 @@ str_cat(const char * s1, const char * s2)
 void
 imcc_init(Parrot_Interp interpreter)
 {
-    interpreter->imc_info = mem_sys_allocate_zeroed(sizeof(imc_info_t));
+    IMCC_INFO(interpreter) = mem_sys_allocate_zeroed(sizeof(imc_info_t));
     /* register PASM and PIR compilers to parrot core */
     register_compilers(interpreter);
 }

@@ -197,7 +197,7 @@ find_basic_blocks (Parrot_Interp interpreter, IMC_Unit * unit, int first)
         }
     }
 
-    if (interpreter->imc_info->debug & DEBUG_CFG) {
+    if (IMCC_INFO(interpreter)->debug & DEBUG_CFG) {
         dump_instructions(interpreter, unit);
         dump_labels(unit);
     }
@@ -480,7 +480,7 @@ propagate_alias(Parrot_Interp interpreter)
 	    }
 	}
     }
-    if (any && (interpreter->imc_info->debug & DEBUG_CFG)) {
+    if (any && (IMCC_INFO(interpreter)->debug & DEBUG_CFG)) {
 	IMCC_debug(interpreter, DEBUG_CFG, "\nAfter propagate_alias\n");
 	dump_instructions(interpreter, unit);
     }
@@ -797,7 +797,7 @@ compute_dominators (Parrot_Interp interpreter, IMC_Unit * unit)
         }
     }
 #endif
-    if (interpreter->imc_info->debug & DEBUG_CFG)
+    if (IMCC_INFO(interpreter)->debug & DEBUG_CFG)
         dump_dominators(unit);
 #if USE_BFS
     free(q);
@@ -907,7 +907,7 @@ find_loops (Parrot_Interp interpreter, IMC_Unit * unit)
     }
 
     sort_loops(interpreter, unit);
-    if (interpreter->imc_info->debug & DEBUG_CFG)
+    if (IMCC_INFO(interpreter)->debug & DEBUG_CFG)
         dump_loops(unit);
 }
 

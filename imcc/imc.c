@@ -23,7 +23,7 @@ imc_compile_all_units_for_ast(Interp *interp)
 {
     IMC_Unit *unit, *unit_next;
 #if COMPILE_IMMEDIATE
-    for (unit = interp->imc_info->imc_units; unit; unit = unit_next) {
+    for (unit = IMCC_INFO(interp)->imc_units; unit; unit = unit_next) {
         unit_next = unit->next;
         imc_compile_unit(interp, unit);
     }
@@ -38,7 +38,7 @@ imc_compile_all_units(Interp *interp)
     IMC_Unit *unit, *unit_next;
     Instruction *ins, *ins_next;
 #if ! COMPILE_IMMEDIATE
-    for (unit = interp->imc_info->imc_units; unit; unit = unit_next) {
+    for (unit = IMCC_INFO(interp)->imc_units; unit; unit = unit_next) {
         unit_next = unit->next;
         imc_compile_unit(interp, unit);
     }
@@ -46,7 +46,7 @@ imc_compile_all_units(Interp *interp)
     emit_close(interp, NULL);
     /* All done with compilation, now free instructions and other structures */
 
-    for (unit = interp->imc_info->imc_units; unit;) {
+    for (unit = IMCC_INFO(interp)->imc_units; unit;) {
         unit_next = unit->next;
         for (ins = unit->instructions; ins; ) {
             ins_next = ins->next;
@@ -57,8 +57,8 @@ imc_compile_all_units(Interp *interp)
         unit = unit_next;
     }
 
-    interp->imc_info->imc_units = NULL;
-    interp->imc_info->last_unit = NULL;
+    IMCC_INFO(interp)->imc_units = NULL;
+    IMCC_INFO(interp)->last_unit = NULL;
 }
 
 /* imc_compile_unit is the main loop of the IMC compiler for each unit. It
@@ -82,8 +82,8 @@ void
 imc_cleanup(Interp *interp)
 {
      clear_globals(interp);
-     mem_sys_free(interp->imc_info->ghash);
-     interp->imc_info->ghash = NULL;
+     mem_sys_free(IMCC_INFO(interp)->ghash);
+     IMCC_INFO(interp)->ghash = NULL;
 }
 
 
@@ -111,7 +111,7 @@ imc_open_unit(Parrot_Interp interp, IMC_Unit_Type t)
     imc_info_t *imc_info;
 
     unit = imc_new_unit(t);
-    imc_info = interp->imc_info;
+    imc_info = IMCC_INFO(interp);
     if (!imc_info->imc_units)
        imc_info->imc_units = unit;
     if (!imc_info->ghash)
@@ -150,7 +150,7 @@ imc_close_unit(Parrot_Interp interp, IMC_Unit * unit)
 static void
 imc_free_unit(Parrot_Interp interp, IMC_Unit * unit)
 {
-    imc_info_t *imc = interp->imc_info;
+    imc_info_t *imc = IMCC_INFO(interp);
 
 #if IMC_TRACE_HIGH
     fprintf(stderr, "imc_free_unit()\n");
