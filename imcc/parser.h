@@ -35,6 +35,7 @@ void *imcc_eval_pasm(Parrot_Interp, const char *s);
 void *imcc_eval_pir (Parrot_Interp, const char *s);
 int try_find_op(Parrot_Interp, char *, SymReg **, int, int);
 
+extern void compile_file(Interp *interp, FILE *file);
 #endif
 
 /*

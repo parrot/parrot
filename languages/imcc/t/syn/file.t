@@ -1,6 +1,6 @@
 #!perl
 use strict;
-use TestCompiler tests => 7;
+use TestCompiler tests => 8;
 use lib '../../lib';
 use Parrot::Config;
 
@@ -230,9 +230,40 @@ loaded
 sub2
 OUT
 
+# write sub2
+open FOO, ">temp.imc" or die "Cant write temp.imc\n";
+print FOO <<'ENDF';
+.pcc_sub _sub2 prototyped
+    print "sub2\n"
+   .pcc_begin_return
+   .pcc_end_return
+    end
+.end
+ENDF
+# compile it
+
+output_is(<<'CODE', <<'OUT', "call sub in external imc, return");
+.pcc_sub _sub1 prototyped
+    print "sub1\n"
+    load_bytecode "temp.imc"
+    print "loaded\n"
+    $P0 = global "_sub2"
+    .pcc_begin prototyped
+    .pcc_call $P0
+    ret:
+    .pcc_end
+    print "back\n"
+    end
+.end
+CODE
+sub1
+loaded
+sub2
+back
+OUT
 
 END {
   unlink $file;
-  unlink "temp.imc";
+  #unlink "temp.imc";
   unlink "temp.pbc";
 }

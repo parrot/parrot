@@ -716,6 +716,20 @@ scan_file (struct macro_frame_t *frame, FILE *file)
     yy_switch_to_buffer(yy_create_buffer(file, YY_BUF_SIZE));
 }
 
+void
+compile_file(Interp *interp, FILE *file)
+{
+    YY_BUFFER_STATE buffer;
+
+    buffer = YY_CURRENT_BUFFER;
+    yy_switch_to_buffer(yy_create_buffer(file, YY_BUF_SIZE));
+
+    emit_open(1, interp);
+    yyparse((void *) interp);
+    emit_close(interp);
+
+    yy_switch_to_buffer(buffer);
+}
 /*
  * Local variables:
  * c-indentation-style: bsd

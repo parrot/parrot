@@ -2445,16 +2445,36 @@ void
 Parrot_load_bytecode(struct Parrot_Interp *interpreter, char *filename)
 {
     char *ext;
+    const char *mode = NULL;
 
     ext = strrchr(filename, '.');
-    if (ext && strcmp (ext, ".pasm") == 0) {
-        internal_exception(1, "Can't load PASM yet.");
-    }
-    else if (ext && strcmp (ext, ".pbc") == 0) {
+    if (ext && strcmp (ext, ".pbc") == 0) {
         PackFile_append_pbc(interpreter, filename);
     }
-    else
-        internal_exception(1, "Can't load this file yet.");
+    else {
+        PMC * compiler, *code;
+        PMC *key = key_new_cstring(interpreter, "FILE");
+        PMC *compreg_hash = VTABLE_get_pmc_keyed_int(interpreter,
+                interpreter->iglobals, IGLOBALS_COMPREG_HASH);
+        struct PackFile *pf;
+        STRING *file;
+
+        compiler = VTABLE_get_pmc_keyed(interpreter, compreg_hash, key);
+        if (!VTABLE_defined(interpreter, compiler)) {
+            internal_exception(1, "Couldn't find FILE compiler");
+            return;
+        }
+        file = string_from_cstring(interpreter, filename, 0);
+        code = VTABLE_invoke(interpreter, compiler, file);
+        pf = code->cache.struct_val;
+        if (pf) {
+            PackFile_add_segment(&interpreter->code->directory,
+                    &pf->directory.base);
+            fixup_subs(interpreter, pf);
+        }
+        else
+            internal_exception(1, "compiler return NULL PackFile");
+    }
 }
 
 /*
