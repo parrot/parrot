@@ -7,6 +7,14 @@ myconfig
 *.patch
 *.tmp
 test
+test.c
+test.o
+test.cco
+test.ilk
+test.ldo
+test.out
+test.pdb
+vc60.pdb
 CFLAGS
 disassemble
 pbc_info
