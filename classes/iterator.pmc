@@ -103,7 +103,8 @@ pmclass Iterator {
     }
 
     STRING* get_string_keyed (PMC* key) {
-        return (STRING*)0;
+        return VTABLE_get_string_keyed(INTERP,
+		(PMC *)PMC_data(SELF), key);
     }
 
     STRING* get_string_keyed_int (INTVAL* key) {
@@ -356,6 +357,12 @@ pmclass Iterator {
     }
 
     STRING* shift_string () {
+	PMC *key = SELF->cache.struct_val;
+	PMC *agg = PMC_data(SELF);
+	STRING * ret = VTABLE_shift_string_keyed(INTERP, agg, key);
+	SELF->cache.struct_val =
+	    VTABLE_nextkey_keyed(INTERP, agg, key, 1);
+        return ret;
         return (STRING*)0;
     }
 
