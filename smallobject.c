@@ -97,6 +97,17 @@ alloc_objects(struct Parrot_Interp *interpreter,
     memset(new_arena->start_objects, 0, 
            pool->object_size * pool->objects_per_alloc);
  
+    /* Maintain the *_arena_memory invariant for stack walking code. 
+     * Set it regardless if we're the first pool to be added.
+     */
+    if (!pool->last_Arena || (pool->start_arena_memory > (size_t)new_arena->start_objects))
+        pool->start_arena_memory = (size_t)new_arena->start_objects;
+
+    if (!pool->last_Arena || (pool->end_arena_memory < (size_t)new_arena->start_objects
+                               + pool->object_size * pool->objects_per_alloc))
+        pool->end_arena_memory = (size_t)new_arena->start_objects
+                               + pool->object_size * pool->objects_per_alloc;
+
     /* Hook up the new object block into the object pool */
     new_arena->used = pool->objects_per_alloc;
     new_arena->total_objects = pool->objects_per_alloc;
@@ -106,14 +117,6 @@ alloc_objects(struct Parrot_Interp *interpreter,
         new_arena->prev->next = new_arena;
     }
     pool->last_Arena = new_arena;
-
-    if (pool->start_arena_memory > (size_t)new_arena->start_objects)
-        pool->start_arena_memory = (size_t)new_arena->start_objects;
-
-    if (pool->end_arena_memory < (size_t)new_arena->start_objects
-                               + pool->object_size * pool->objects_per_alloc)
-        pool->end_arena_memory = (size_t)new_arena->start_objects
-                               + pool->object_size * pool->objects_per_alloc;
 
     /* Move all the new objects into the free list */
     object = new_arena->start_objects;
@@ -135,13 +138,17 @@ new_small_object_pool(struct Parrot_Interp *interpreter,
     struct Small_Object_Pool *pool;
 
     pool = mem_sys_allocate(sizeof(struct Small_Object_Pool));
+    pool->last_Arena = NULL;
     pool->object_size = object_size;
     pool->objects_per_alloc = objects_per_alloc;
+    pool->total_objects = 0;
+    pool->num_free_objects = 0;
+    pool->replenish_level = 0;
+    pool->free_list = NULL;
     pool->add_free_object = add_free_object;
     pool->get_free_object = get_free_object;
     pool->alloc_objects = alloc_objects;
-    pool->replenish_level = 0;
-    pool->free_list = NULL;
+    pool->mem_pool = NULL;
     return pool;
 }
 

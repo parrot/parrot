@@ -111,7 +111,6 @@ new_pmc_pool(struct Parrot_Interp *interpreter)
     pmc_pool->alloc_objects = alloc_pmcs;
     pmc_pool->more_objects = more_traceable_objects;
     pmc_pool->mem_pool = interpreter->arena_base->memory_pool;
-    
     return pmc_pool;
 }
 
@@ -283,18 +282,18 @@ size_t
 get_min_buffer_address(struct Parrot_Interp *interpreter)
 {
     UINTVAL i;
-    size_t min = interpreter->arena_base->string_header_pool->end_arena_memory;
+    size_t min = interpreter->arena_base->string_header_pool->start_arena_memory;
 
-    if (min > interpreter->arena_base->buffer_header_pool->end_arena_memory)
-        min = interpreter->arena_base->buffer_header_pool->end_arena_memory;
+    if (min > interpreter->arena_base->buffer_header_pool->start_arena_memory)
+        min = interpreter->arena_base->buffer_header_pool->start_arena_memory;
 
-    if (min > interpreter->arena_base->constant_string_header_pool->end_arena_memory)
-        min = interpreter->arena_base->constant_string_header_pool->end_arena_memory;
+    if (min > interpreter->arena_base->constant_string_header_pool->start_arena_memory)
+        min = interpreter->arena_base->constant_string_header_pool->start_arena_memory;
 
     for(i = 0; i<interpreter->arena_base->num_sized; i++) {
         if (interpreter->arena_base->sized_header_pools[i]) {
-            if (min > interpreter->arena_base->sized_header_pools[i]->end_arena_memory)
-                min = interpreter->arena_base->sized_header_pools[i]->end_arena_memory;
+            if (min > interpreter->arena_base->sized_header_pools[i]->start_arena_memory)
+                min = interpreter->arena_base->sized_header_pools[i]->start_arena_memory;
         }
     }
     
