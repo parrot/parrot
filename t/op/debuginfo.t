@@ -12,6 +12,7 @@ output_is( <<'CODE', <<OUTPUT, "set/getline" );
 	getline I0
 	print I0
 	print "\n"
+	end
 CODE
 2
 1
@@ -27,6 +28,7 @@ output_is( <<'CODE', <<OUTPUT, "set/getpackage" );
 	getpackage S0
 	print S0
 	print "\n"
+	end
 CODE
 bar
 foo
@@ -42,6 +44,7 @@ output_is( <<'CODE', <<OUTPUT, "set/getfile" );
 	getfile S0
 	print S0
 	print "\n"
+	end
 CODE
 bar
 foo
@@ -73,6 +76,7 @@ output_is( <<'CODE', <<OUTPUT, "set/getpackage with regs" );
 	print "\n"
 	print S2
 	print "\n"
+	end
 CODE
 bar
 2
