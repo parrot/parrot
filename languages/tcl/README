@@ -26,8 +26,6 @@ setting the environment variable C<TEST_PROG_ARGS> to C<-G> and retry.
 If the tests now pass, there's a GC bug that needs to be reported to
 the perl6-internals list.
 
-NB: Some tests are currently failing due to issues with exception handling and MMD.
-
 =head2 Documentation
 
 Various documentation (in various states of decay at the moment):
