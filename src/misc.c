@@ -19,7 +19,7 @@ The naming convention used is:
 
 =over 4
 
-=item C<Parrot_v?n?sprintf> 
+=item C<Parrot_v?n?sprintf>
 
 A (nearly) drop-in replacement for v?n?sprintf.
 
@@ -89,9 +89,7 @@ Parrot_vsprintf_c(Interp *interpreter, const char *pat,
     realpat = string_make(interpreter, pat, strlen(pat),
                                   "iso-8859-1", PObj_external_FLAG);
 
-	Parrot_block_GC(interpreter); /* don't allow realpat to get collected; need a better way to ensure that.... */
     ret = Parrot_vsprintf_s(interpreter, realpat, args);
-	Parrot_unblock_GC(interpreter);
 
     return ret;
 }
