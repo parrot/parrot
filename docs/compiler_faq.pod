@@ -5,21 +5,37 @@
 
 docs/compiler_faq.pod - Parrot FAQ for compiler writers
 
-=head1 GENERAL QUESTIONS
+=head1 Subroutines
 
-=head2 How do I generate a sub call in PIR
+=head2 How do I generate a sub call in PIR?
 
-=head2 How do I generate a method call in PIR
+=head2 How do I generate a method call in PIR?
+
+=head2 How do I generate a sub call with a variable-length parameter list in PIR?
+
+=head2 How to I retrieve the contents of a variable-length parameter list being passed to me?
+
+=head1 Variables
 
 =head2 How do I fetch a variable from the global namespace?
 
 =head2 How do I fetch a variable from the current lexical pad?
 
+=head1 Modules and Classes
+
+=head2 How do I create a module?
+
+=head2 How do I create a class?
+
+=head2 How do I instantiate a class?
+
+=head2 How do I access module/class variables?
+
 =head1 VERSION
 
 =over 4
 
-=item Revision 0.1 - 10 May 2004
+=item Revision 0.2 - 10 May 2004
 
 =back
 
