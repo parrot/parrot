@@ -64,6 +64,8 @@ typedef struct PMC PMC;
 typedef unsigned char BOOLVAL;
 typedef void STRING_FUNCS;
 typedef void REGEX;
+typedef void BIGINT;
+typedef void BIGFLOAT;
 
 #include "parrot/global_setup.h"
 #include "parrot/interpreter.h"

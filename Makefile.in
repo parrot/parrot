@@ -12,10 +12,13 @@ $(INC)/pmc.h $(INC)/resources.h $(INC)/platform.h
 
 O_FILES = global_setup$(O) interpreter$(O) parrot$(O) register$(O) \
 core_ops$(O) memory$(O) packfile$(O) stacks$(O) string$(O) encoding$(O) \
-chartype$(O) runops_cores$(O) trace$(O) vtable_ops$(O) pmc$(O) classes/intclass$(O) \
+chartype$(O) runops_cores$(O) trace$(O) vtable_ops$(O) pmc$(O) \
 encodings/singlebyte$(O) encodings/utf8$(O) encodings/utf16$(O) \
 encodings/utf32$(O) chartypes/unicode$(O) chartypes/usascii$(O) resources$(O) \
 platform$(O)
+
+# classes/intclass.o and classes/scalarclass.o removed for now, while
+# multimethods are being reworked
 
 #DO NOT ADD C COMPILER FLAGS HERE
 #Add them in Configure.pl--look for the
@@ -91,7 +94,8 @@ encoding/utf16$(O): $(H_FILES)
 
 encoding/utf32$(O): $(H_FILES)
 
-classes/intclass$(O): $(H_FILES)
+# classes/intclass$(O): $(H_FILES)
+# classes/scalarclass$(O): $(H_FILES)
 
 interpreter$(O): interpreter.c $(H_FILES)
 

@@ -11,6 +11,9 @@
 # string	void frob	INTVAL foo	STRING bar
 #
 # Note that we don't include the source "PMC* pmc" - that's done implicitly.
+#
+# "value" in non-unique methods (multimethods) is a magic name. Its type
+# will be replaced appropriately.
 
 unique	INTVAL type	
 unique	STRING* name
@@ -26,19 +29,19 @@ unique	STRING* get_string
 unique	BOOLVAL get_bool	 
 unique	void* get_value	
 unique	BOOLVAL is_same		PMC* pmc2
-int	void set_integer	INTVAL integer
-float	void set_number		FLOATVAL number
-str	void set_string		STRING* string
+int	void set_integer	INTVAL value
+float	void set_number		FLOATVAL value
+str	void set_string		STRING* value
 unique	void set_value		void* value
-num	void add		PMC* other	 PMC* dest 
-num	void subtract		PMC* other	 PMC* dest 
-num	void multiply		PMC* other	 PMC* dest 
-num	void divide		PMC* other	 PMC* dest 
-num	void modulus		PMC* other	 PMC* dest 
-str	void concatenate	PMC* other	 PMC* dest 
-unique	BOOLVAL is_equal		PMC* other 
-unique	void logical_or		PMC* other	 PMC* dest 
-unique	void logical_and	PMC* other	 PMC* dest 
-unique	void logical_not	PMC* other 
-str	void match		PMC* other	 REGEX* re
-str	void repeat		PMC* other	 PMC* dest 
+num	void add		PMC* value	 PMC* dest 
+num	void subtract		PMC* value	 PMC* dest 
+num	void multiply		PMC* value	 PMC* dest 
+num	void divide		PMC* value	 PMC* dest 
+num	void modulus		PMC* value	 PMC* dest 
+str	void concatenate	PMC* value	 PMC* dest 
+unique	BOOLVAL is_equal		PMC* value 
+unique	void logical_or		PMC* value	 PMC* dest 
+unique	void logical_and	PMC* value	 PMC* dest 
+unique	void logical_not	PMC* value 
+str	void match		PMC* value	 REGEX* re
+str	void repeat		PMC* value	 PMC* dest 

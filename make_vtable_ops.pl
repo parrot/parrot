@@ -25,6 +25,7 @@ while (<DATA>) {
 sub multimethod {
     my $type = $vtable{$_[0]}{meth_type};
     return ""               if $type eq "unique";
+    return ""; # Spike it for now, until I'm convinced of how to do this
     return '[$3->vtable->num_type]' if $type eq "num";
     return '[$3->vtable->string_type]' if $type eq "str";
     die "Coding error - undefined type $type\n";

@@ -4,11 +4,21 @@ use strict;
 @Parrot::Vtable::ISA = qw(Exporter);
 @Parrot::Vtable::EXPORT = qw(parse_vtable vtbl_defs vtbl_struct vtbl_enumerate);
 
-my(%type_counts) = (unique => 1,
-		    int => 5,
-		    float =>5,
-		    num =>7,
-		    str => 5);
+my(%expand) = (
+    unique => [""], # Dummy element, so we go through the loop exactly once
+    int    => [qw[object native bigint same]],
+    float  => [qw[object native bigfloat same]],
+    num    => [qw[object int bigint float bigfloat same]],
+    str    => [qw[object native unicode other same]]
+);
+
+my (%types)  = (
+    int   => ["PMC *", "INTVAL", "BIGINT", "PMC *"],
+    float => ["PMC *", "FLOATVAL", "BIGFLOAT", "PMC *"],
+    num   => ["PMC *", "INTVAL", "BIGINT", "FLOATVAL", "BIGFLOAT", "PMC *"],
+    str   => ["PMC *", "STRING *", "STRING *", "STRING *", "PMC *"]
+);
+
 
 sub parse_vtable {
     my (%vtbl, @order);
@@ -22,36 +32,42 @@ sub parse_vtable {
 	my $meth_type = shift @line; # Method type
         my $tn = shift @line; # Type and name;
         my ($type, $name) = $tn =~ /(.*?)\s+(\w+)/;
-        $vtbl{$name}{type} = $type;
-	$vtbl{$name}{meth_type} = $meth_type;
-        $vtbl{$name}{proto} = "$type (*$name)(struct Parrot_Interp *interpreter, PMC* pmc";
-        for (@line) {
-            my ($argtype, $argname) = /(.*?)\s+(\w+)/;
-            push @{$vtbl{$name}{args}},
-                { type => $argtype, name => $argname };
-            $vtbl{$name}{proto} .= ", $_";
+
+        # You are in a maze of twisty multimethods, all different.
+        for my $i (0..$#{$expand{$meth_type}}) {
+            my $expand_name = $name;
+
+            # If we're in a multimethod, we need to expand the name if
+            # it's not the default argument type of "object".
+            $expand_name .= "_".$expand{$meth_type}[$i] 
+                unless $meth_type eq "unique"
+                    or $expand{$meth_type}[$i] eq "object"; # as a default
+
+            $vtbl{$expand_name}{type} = $type;
+            $vtbl{$expand_name}{proto} = "$type (*$expand_name)(struct Parrot_Interp *interpreter, PMC* pmc";
+
+            # Parse the function parameters
+            for (@line) {
+                my ($argtype, $argname) = /(.*?)\s+(\w+)$/;
+
+                # In multimethods, we need to rewrite the type of
+                # parameters called "value".
+                $argtype = $types{$meth_type}[$i]
+                    if $argname eq "value" and $meth_type ne "unique";
+
+                # Add the function parameters to the prototype
+                push @{$vtbl{$expand_name}{args}},
+                    { type => $argtype, name => $argname };
+                $vtbl{$expand_name}{proto} .= ", $argtype $argname";
+            }
+            $vtbl{$expand_name}{proto} .=")";
+            
+            # So they're ordered according to their position in the file
+            push @order, $expand_name;
         }
-        $vtbl{$name}{proto} .=")";
-        push @order, $name;
     }
     $vtbl{order} = [@order];
     return %vtbl;
-}
-
-# This code is unused, but I'm keeping it around in case
-# we ever go back to using array-based vtables.
-sub vtbl_defs {
-    my %vtbl = @_;
-    my $rv;
-    my $offset = 0;
-
-    # First, typedef all the methods.
-    for (@{$vtbl{order}}) {
-        my $decl = "VTABLE_" . uc($_);
-        $rv .= "#define $decl $offset\n";
-	$offset += $type_counts{$vtbl{$_}{meth_type}};
-    }
-    return $rv;
 }
 
 sub vtbl_struct {
@@ -85,14 +101,14 @@ EOF
     return $rv;
 }
 
-# Returns an array of [type, name, prototype, variations] arrays
+# Returns an array of [type, name, prototype] arrays
 sub vtbl_enumerate {
     my %vtbl = @_;
     my @rv;
     for (@{$vtbl{order}}) {
         my $proto = $vtbl{$_}{proto};
         $proto =~ s/\(\*$_\)/$_ /;
-        push @rv, [ "${_}_method_t", $_, $proto, $type_counts{$vtbl{$_}{meth_type}}];
+        push @rv, [ "${_}_method_t", $_, $proto];
     }
     return @rv;
 }
