@@ -450,7 +450,7 @@ typedef union {
     SymbolList * symlist;
     SymbolTable * symtab;
 } yystype;
-/* Line 193 of /usr/share/bison/yacc.c.  */
+/* Line 193 of /usr/local/share/bison/yacc.c.  */
 #line 455 "imcc/imcparser.c"
 # define YYSTYPE yystype
 # define YYSTYPE_IS_TRIVIAL 1
@@ -471,7 +471,7 @@ typedef struct yyltype
 /* Copy the second part of user declarations.  */
 
 
-/* Line 213 of /usr/share/bison/yacc.c.  */
+/* Line 213 of /usr/local/share/bison/yacc.c.  */
 #line 476 "imcc/imcparser.c"
 
 #if ! defined (yyoverflow) || YYERROR_VERBOSE
@@ -2648,7 +2648,7 @@ yyreduce:
 #line 793 "imcc/imcc.y"
     {
             current_call->r[0]->pcc_sub->sub = mk_sub_address(yyvsp[-3].s);
-            current_call->r[0]->pcc_sub->prototyped = 0;
+            current_call->r[0]->pcc_sub->prototyped = 1;
             if(cur_unit->type == IMC_PCCSUB)
                cur_unit->instructions->r[1]->pcc_sub->calls_a_sub = 1;
 
@@ -2668,7 +2668,7 @@ yyreduce:
            i->type = ITCALL | ITPCCSUB;
            yyval.i = i;
            current_call->r[0]->pcc_sub->sub = mk_sub_address(yyvsp[0].s);
-           current_call->r[0]->pcc_sub->prototyped = 0;
+           current_call->r[0]->pcc_sub->prototyped = 1;
            if(cur_unit->type == IMC_PCCSUB)
               cur_unit->instructions->r[1]->pcc_sub->calls_a_sub = 1;
         }
@@ -2886,7 +2886,7 @@ yyreduce:
 
     }
 
-/* Line 1016 of /usr/share/bison/yacc.c.  */
+/* Line 1016 of /usr/local/share/bison/yacc.c.  */
 #line 2891 "imcc/imcparser.c"
 
   yyvsp -= yylen;
