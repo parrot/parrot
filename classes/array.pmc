@@ -79,12 +79,22 @@ pmclass Array {
         return 0;
     }
     
+    INTVAL type_keyed_int (INTVAL* key) {
+        /* XXX - Do this */
+        return 0;
+    }
+
     UINTVAL subtype (INTVAL type) {
         /* XXX */
         return 0;
     }
     
     UINTVAL subtype_keyed (KEY* key, INTVAL type) {
+        /* XXX */
+        return 0;
+    }
+
+    UINTVAL subtype_keyed_int (INTVAL* key, INTVAL type) {
         /* XXX */
         return 0;
     }
@@ -98,6 +108,11 @@ pmclass Array {
         return NULL;
     }
 
+    STRING* name_keyed_int (INTVAL* key) {
+        /* XXX */
+        return NULL;
+    }
+
     PMC* clone () {
         return NULL;
     }
@@ -107,11 +122,21 @@ pmclass Array {
         return NULL;
     }
     
+    PMC* clone_keyed_int (INTVAL* key) {
+        /* XXX */
+        return NULL;
+    }
+
     PMC* find_method (STRING* method_name) {
         return NULL;
     }
     
     PMC* find_method_keyed (KEY* key, STRING* method_name) {
+        /* XXX */
+        return NULL;
+    }
+
+    PMC* find_method_keyed_int (INTVAL* key, STRING* method_name) {
         /* XXX */
         return NULL;
     }
@@ -140,6 +165,24 @@ pmclass Array {
         return value->vtable->get_integer(INTERP, value);
     }
 
+    INTVAL get_integer_keyed_int (INTVAL* key) {
+        INTVAL ix;
+        PMC* value;
+
+        if (!key) {
+            return 0;
+        }
+
+        ix = *key;
+
+        if (ix > SELF->cache.int_val || ix < 0) {
+            internal_exception(OUT_OF_BOUNDS, "Array element out of bounds!\n");
+        }
+
+        value = ((PMC**)(((Buffer *)SELF->data)->bufstart))[ix];
+        return value->vtable->get_integer(INTERP, value);
+    }
+
     FLOATVAL get_number () {
         return (FLOATVAL)(SELF->cache.int_val);
     }
@@ -155,6 +198,24 @@ pmclass Array {
 
         kp = &key->atom;
         ix = atom2int(INTERP, kp);
+
+        if (ix > SELF->cache.int_val || ix < 0) {
+            internal_exception(OUT_OF_BOUNDS, "Array element out of bounds!\n");
+        }
+
+        value = ((PMC**)(((Buffer *)SELF->data)->bufstart))[ix];
+        return value->vtable->get_number(INTERP, value);
+    }
+
+    FLOATVAL get_number_keyed_int (INTVAL* key) {
+        INTVAL ix;
+        PMC* value;
+
+        if (!key) {
+            return 0;
+        }
+
+        ix = *key;
 
         if (ix > SELF->cache.int_val || ix < 0) {
             internal_exception(OUT_OF_BOUNDS, "Array element out of bounds!\n");
@@ -189,6 +250,24 @@ pmclass Array {
         return value->vtable->get_bignum(INTERP, value);
     }
 
+    BIGNUM* get_bignum_keyed_int (INTVAL* key) {
+        INTVAL ix;
+        PMC* value;
+
+        if (!key) {
+            return 0;
+        }
+
+        ix = *key;
+
+        if (ix > SELF->cache.int_val || ix < 0) {
+            internal_exception(OUT_OF_BOUNDS, "Array element out of bounds!\n");
+        }
+
+        value = ((PMC**)(((Buffer *)SELF->data)->bufstart))[ix];
+        return value->vtable->get_bignum(INTERP, value);
+    }
+
     STRING* get_string () {
         return NULL;
     }
@@ -213,6 +292,24 @@ pmclass Array {
         return value->vtable->get_string(INTERP, value);
     }
 
+    STRING* get_string_keyed_int (INTVAL * key) {
+        INTVAL ix;
+        PMC* value;
+
+        if (!key) {
+            return 0;
+        }
+
+        ix = *key;
+
+        if (ix > SELF->cache.int_val || ix < 0) {
+            internal_exception(OUT_OF_BOUNDS, "Array element out of bounds!\n");
+        }
+
+        value = ((PMC**)(((Buffer *)SELF->data)->bufstart))[ix];
+        return value->vtable->get_string(INTERP, value);
+    }
+
     INTVAL get_bool () {
         return (INTVAL)(SELF->cache.int_val != 0);
     }
@@ -228,6 +325,24 @@ pmclass Array {
 
         kp = &key->atom;
         ix = atom2int(INTERP, kp);
+
+        if (ix > SELF->cache.int_val || ix < 0) {
+            internal_exception(OUT_OF_BOUNDS, "Array element out of bounds!\n");
+        }
+
+        value = ((PMC**)(((Buffer *)SELF->data)->bufstart))[ix];
+        return value->vtable->get_bool(INTERP, value);
+    }
+
+    INTVAL get_bool_keyed_int (INTVAL* key) {
+        INTVAL ix;
+        PMC* value;
+
+        if (!key) {
+            return 0;
+        }
+
+        ix = *key;
 
         if (ix > SELF->cache.int_val || ix < 0) {
             internal_exception(OUT_OF_BOUNDS, "Array element out of bounds!\n");
@@ -262,6 +377,24 @@ pmclass Array {
         return value->vtable->elements(INTERP, value);
     }        
 
+    INTVAL elements_keyed_int (INTVAL* key) {
+        INTVAL ix;
+        PMC* value;
+
+        if (!key) {
+            return 0;
+        }
+
+        ix = *key;
+
+        if (ix > SELF->cache.int_val || ix < 0) {
+            internal_exception(OUT_OF_BOUNDS, "Array element out of bounds!\n");
+        }
+
+        value = ((PMC**)(((Buffer *)SELF->data)->bufstart))[ix];
+        return value->vtable->elements(INTERP, value);
+    }
+
     PMC* get_pmc_keyed (KEY* key) {
         KEY_ATOM* kp;
         INTVAL ix;
@@ -283,6 +416,25 @@ pmclass Array {
         return value;
     }
 
+    PMC* get_pmc_keyed_int (INTVAL* key) {
+        INTVAL ix;
+        PMC* value;
+
+        if (!key) {
+            return 0;
+        }
+
+        ix = *key;
+
+        if (ix > SELF->cache.int_val || ix < 0) {
+            internal_exception(OUT_OF_BOUNDS, "Array element out of bounds!\n");
+        }
+
+        value = ((PMC**)(((Buffer *)SELF->data)->bufstart))[ix];
+        /* XXX - should this be value->get_pmc? */
+        return value;
+    }
+
     INTVAL is_same (PMC* other) {
         STRING* s1 = (STRING*)SELF->cache.struct_val;
         STRING* s2 = (STRING*)other->cache.struct_val;
@@ -292,6 +444,11 @@ pmclass Array {
     }
     
     INTVAL is_same_keyed (KEY* key, PMC* pmc2, KEY* pmc2_key) {
+        /* XXX */
+        return 0;
+    }
+
+    INTVAL is_same_keyed_int (INTVAL* key, PMC* pmc2, INTVAL* pmc2_key) {
         /* XXX */
         return 0;
     }
@@ -325,6 +482,24 @@ pmclass Array {
 
         kp = &key->atom;
         ix = atom2int(INTERP, kp);
+
+        if (ix >= SELF->cache.int_val || ix < 0) {
+            internal_exception(OUT_OF_BOUNDS, "Array element out of bounds!\n");
+        }
+
+        mypmc = ((PMC**)(((Buffer *)SELF->data)->bufstart))[ix];
+        mypmc->vtable->set_integer_native(INTERP, mypmc, value);
+    }
+
+    void set_integer_keyed_int (INTVAL* key, INTVAL value) {
+        INTVAL ix;
+        PMC* mypmc;
+
+        if (!key) {
+            return;
+        }
+
+        ix = *key;
 
         if (ix >= SELF->cache.int_val || ix < 0) {
             internal_exception(OUT_OF_BOUNDS, "Array element out of bounds!\n");
@@ -372,6 +547,24 @@ pmclass Array {
         mypmc->vtable->set_number_native(INTERP, mypmc, value);
     }
 
+    void set_number_keyed_int (INTVAL * key, FLOATVAL value) {
+        INTVAL ix;
+        PMC* mypmc;
+
+        if (!key) {
+            return;
+        }
+
+        ix = *key;
+
+        if (ix >= SELF->cache.int_val || ix < 0) {
+            internal_exception(OUT_OF_BOUNDS, "Array element out of bounds!\n");
+        }
+
+        mypmc = ((PMC**)(((Buffer *)SELF->data)->bufstart))[ix];
+        mypmc->vtable->set_number_native(INTERP, mypmc, value);
+    }
+
     void set_string_keyed (KEY * key, STRING * value) {
         KEY_ATOM* kp;
         INTVAL ix;
@@ -383,6 +576,24 @@ pmclass Array {
 
         kp = &key->atom;
         ix = atom2int(INTERP, kp);
+
+        if (ix >= SELF->cache.int_val || ix < 0) {
+            internal_exception(OUT_OF_BOUNDS, "Array element out of bounds!\n");
+        }
+
+        mypmc = ((PMC**)(((Buffer *)SELF->data)->bufstart))[ix];
+        mypmc->vtable->set_string_native(INTERP, mypmc, value);
+    }
+
+    void set_string_keyed_int (INTVAL * key, STRING * value) {
+        INTVAL ix;
+        PMC* mypmc;
+
+        if (!key) {
+            return;
+        }
+
+        ix = *key;
 
         if (ix >= SELF->cache.int_val || ix < 0) {
             internal_exception(OUT_OF_BOUNDS, "Array element out of bounds!\n");
@@ -405,6 +616,21 @@ pmclass Array {
             /* $#array = $foo[$bar] */
             resize_array(interpreter, SELF, 1+src->vtable->get_integer(INTERP, src));
         }       
+    }
+
+    void set_pmc_keyed_int(INTVAL * dest_key, PMC* src, INTVAL* src_key) {
+        if (src_key) {
+            src = src->vtable->get_pmc_keyed_int(INTERP, src, src_key);
+        }
+        if (dest_key) {
+            INTVAL ix = *dest_key;
+            PMC* dest = ((PMC**)(((Buffer *)SELF->data)->bufstart))[ix];
+            dest->vtable->set_pmc(INTERP, dest, src);
+        }
+        else {
+            /* $#array = $foo[$bar] */
+            resize_array(interpreter, SELF, 1+src->vtable->get_integer(INTERP, src));
+        }
     }
 
     void add (PMC * value, PMC* dest) {
