@@ -26,7 +26,7 @@ package Parrot::PackFile;
 use Parrot::PackFile::FixupTable;
 use Parrot::PackFile::ConstTable;
 use Parrot::Types;
-use Config;
+use Parrot::Config;
 
 use FileHandle;
 
@@ -49,7 +49,7 @@ sub new
     MINOR => 0,
     FLAGS => 0,
     PAD => 'PAD ',
-    BYTEORDER => $Config{byteorder},
+    BYTEORDER => $PConfig{byteorder},
     MAGIC => $PARROT_MAGIC,
     OPCODETYPE => 0x5045524c,
     FIXUP => Parrot::PackFile::FixupTable->new(),
