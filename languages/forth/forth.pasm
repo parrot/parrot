@@ -36,6 +36,7 @@
 .constant NestLevel	I18
 .constant PendingElse   I17
 .constant LastCellUsed	I16
+.constant LastConstant	I29
 
 .macro NewNestLevel
   inc .NestLevel
@@ -62,8 +63,11 @@
 
 .constant TempStr    	S23
 
+.constant PendingConstant S24
+
 #
 
+.constant StringConstants P15
 .constant CoreOps       P16
 .constant UserOps       P18
 .constant SpecialWords	P19
@@ -191,6 +195,7 @@ InitializeCoreOps:
     new .UserOps, .PerlHash
     new .SpecialWords, .PerlHash
     new .ReturnStack, .PerlArray
+    new .StringConstants, .PerlArray
     new .TruePMC, .Integer
     set .TruePMC, 1
     new .FalsePMC, .Integer
@@ -199,6 +204,7 @@ InitializeCoreOps:
     set .CellPMC, .CellSize   # Our cell area is 64K by default
     set .LastCellUsed, 0
     new .LabelStack, .PerlArray
+    set .StringConstants, 0
 
     set .SpecialWords["if"], 1
     set .SpecialWords["then"], 2
@@ -210,6 +216,7 @@ InitializeCoreOps:
     set .SpecialWords["loop"], 8
     set .SpecialWords["+loop"], 9
     set .SpecialWords["compile,"], 10
+    set .SpecialWords['p"'], 11
 
     .AddCoreOp(Int_Dot,".")
     .AddCoreOp(Int_Dot, "u.")
@@ -1236,8 +1243,6 @@ Float_Div:
     branch DoneInterpretWord
 
 
-
-
 DoneInterpretWord:
     ret
 
@@ -1507,6 +1512,34 @@ AddSpecialWord:
     branch EndSpecWord
 
   NotCompileComma:
+    ne .CurrentWord, 'p"', NotParrotString
+    # Okay, we need to yank the string out of the input stream
+    set .PendingConstant, ""
+   MoreString:
+    bsr EatLeadingWhitespace
+    bsr CollectWord
+    eq '"', .CurrentWord, GotConstant
+    length .TempInt, .PendingConstant
+    unless .TempInt, AfterSpace
+    concat .PendingConstant, " "
+   AfterSpace:
+    concat .PendingConstant, .CurrentWord
+    length .TempInt, .Commands
+    if .TempInt, MoreString    
+
+   GotConstant:
+    inc .LastConstant
+    set .StringConstants[.LastConstant], .PendingConstant
+    concat .NewBodyString, "set S31, P15["
+    set .TempString, .LastConstant
+    concat .NewBodyString, .TempString
+    concat .NewBodyString, "]\n"
+    concat .NewBodyString, "new P17, .PerlString\n"
+    concat .NewBodyString, "set P17, S31\n"
+    concat .NewBodyString, "save P17\n"
+    branch EndSpecWord
+
+  NotParrotString:
     branch EndSpecWord    
 
 
