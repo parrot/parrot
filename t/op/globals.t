@@ -1,5 +1,5 @@
 #! perl -w
-# Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+# Copyright: 2001-2005 The Perl Foundation.  All Rights Reserved.
 # $Id$
 
 =head1 NAME
@@ -16,7 +16,7 @@ Tests the C<store_global> and C<find_global> operations.
 
 =cut
 
-use Parrot::Test tests => 3;
+use Parrot::Test tests => 4;
 
 output_is(<<'CODE', '12', "Fetch and store");
 	new P0, .PerlInt
@@ -28,6 +28,14 @@ output_is(<<'CODE', '12', "Fetch and store");
 	print P1
 	end
 CODE
+
+output_like(<<'CODE', <<'OUTPUT', "Find null global");
+       null S0
+       find_global P1, S0
+       end
+CODE
+/Tried to get null global/
+OUTPUT
 
 output_like(<<'CODE', <<OUT, "not found exception");
 	find_global P1, "no_such_global"
