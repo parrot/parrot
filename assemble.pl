@@ -755,7 +755,25 @@ and the constant table packed.
 
 sub constant_table {
     my $self = shift;
-
+    
+    # XXX Some perls < 5.8.0 recognize the 'D' pack format, but it's
+    # a regular double, not a long double.  This is a problem.  
+    # Of course, the packfile format currently only supports 8 and 12 byte
+    # floats anyway.  This hack prevents the creation of size
+    # mismatches and invalid types.  Once packfile generation et al are
+    # really fixed, this can go away, which is why it's here, and not 
+    # elsewhere.
+    my $numpackformat = $PConfig{packtype_n};
+    my $numpacksize   = $PConfig{numvalsize};
+    if ($numpackformat eq "D" and (
+           not (defined $^V and $^V ge v5.8.0) or
+           ($numpacksize != 8 or $numpacksize != 12))) 
+    {
+        $numpackformat = 'd';
+        $numpacksize   = length pack 'd', 1;        
+    } 
+        
+    
     # $constl = the length in bytes of the constant table
     my ($constl, $wordsize);
     my $const = "";
@@ -790,13 +808,13 @@ sub constant_table {
         # if it's a float constant.
         elsif ($_->[0] eq 'N') {
             # The size of the whole constant.
-            $constl += 2 * $wordsize + $PConfig{numvalsize};
+            $constl += 2 * $wordsize + $numpacksize;
             # Constant type, N
             $const .= pack($packtype,0x6e);
             # Sizeof the Parrot floatval.
-            $const .= pack($packtype,$PConfig{numvalsize});
+            $const .= pack($packtype,$numpacksize);
             # The number if self.
-            $const .= pack($PConfig{'packtype_n'},$_->[1]);
+            $const .= pack($numpackformat,$_->[1]);
         }
         # if it's a key constant.
         elsif ($_->[0] eq 'K') {
@@ -818,7 +836,8 @@ sub constant_table {
     }
 
     return ('table' => $const,
-            'length' => $constl);
+            'length' => $constl,
+            'floattype' => ($numpacksize == 12) ? 0x01 : 0x00);
 }
 
 =item output_bytecode
@@ -855,6 +874,7 @@ sub output_bytecode {
     # during devel, we check PATCH too
     my $minor = $PConfig{MINOR} | $PConfig{PATCH};
 
+      
     my $packfile_header = {
         wordsize    => $wordsize, # unsigned char wordsize
         byteorder   => $byteorder, # unsigned char byteorder
@@ -862,7 +882,7 @@ sub output_bytecode {
         minor       => $minor, # unsigned char minor
 
         flags       => 0x00, # unsigned char flags
-        floattype   => 0x00, # unsigned char floattype
+        floattype   => $const_table{'floattype'}, # unsigned char floattype
         pad         => [ _fingerprint ],
 
         magic       => 0x0131_55a1, # opcode_t magic
