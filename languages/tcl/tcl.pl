@@ -16,7 +16,7 @@ my @cmd_files = readdir(CMDDIR);
 closedir(CMDDIR);
 
 my $math_dir = "lib/functions";
-opendir(FUNCDIR,$math_dir) or die;
+opendir(FUNCDIR,$math_dir);
 my @math_files = readdir(FUNCDIR);
 closedir(FUNCDIR);
 

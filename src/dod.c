@@ -313,7 +313,10 @@ Parrot_dod_trace_root(Interp *interpreter, int trace_stack)
      * get created as constant PMCs
      */
     for (i = enum_class_core_max; i < (unsigned int)enum_class_max; i++) {
-        if (Parrot_base_vtables[i]->data)
+        /*
+         * XXX dynclasses groups have empty slots for abstract objects
+         */
+        if (Parrot_base_vtables[i] && Parrot_base_vtables[i]->data)
             pobject_lives(interpreter, (PObj*)Parrot_base_vtables[i]->data);
     }
 
