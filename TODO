@@ -1,107 +1,11 @@
-Note: To add things to the web-visible TODO list, living at
-http://www.parrotcode.org/todo, send them in to
-bugs-parrot@bugs6.perl.org. They then need to be tagged as todo in the
-RT web interface.
+All TODO items should be documented in RT. (http://rt.perl.org/)
 
-Tests
------
+A listing of all TODO items is available at:
 
-    Run different run cores inside Test.pm.
+ http://www.parrotcode.org/todo
 
-String subsystem
-----------------
+To add TODOs to this list (which is powered by RT), send an email to 
 
-    Use string iterators where applicable.
-    Implement character class & properties testing (for regular expressions)
-    Automate string vtable generation
-    Fill in vtables for non-ASCII encodings: UTF-8, UTF-16, UTF-32, etc.
+ bugs-parrot@bugs6.perl.org
 
-    Find a decent way of including Unicode properties tables. (Not for
-    the faint of heart.)
-
-Vtables
--------
-    PythonInteger/String/Object?
-
-JIT
----
-    More instructions needed!
-    Make it work on more architectures
-
-Configure system
-----------------
-    Long term, should be replaced with a bootstrapping miniparrot system.
-    Short term, fix the dependencies (eg, more needs to depend on classes/*)
-    Platform-independent library creation for pbc2c2.pl & extensions
-    Valgrind test target on supporting platforms
-    Checks for various functions and features (socket related, threads,
-    sigaction ...)
-
-Platforms
----------
-    Provide own library functions e.g. snprintf for poor platforms.
-
-IO
---
-    Async IO
-    Layer handling
-    Full going-over to make sure it works
-    Socket IO
-    Docs!
-
-Regular expression engine
--------------------------
-    Implement case folding
-    More speed!
-
-Interpreter
------------
-    Combine dynamic op lib cores.
-    Make the MMD tables shareable between interpreters for faster
-     startup. (Though there are issues with this)
-    Have exec and spawn split up their command-line arguments, rather than
-     relying on the operating system shell to do this, which is unsafe
-
-Opcodes
--------
-
-Mark IN/OUT register usage of ops. This is mainly for stack push/pop
-opcodes that have hidden semantics towards register life-time.
-
-Assembler
----------
-    Debugging and source line number info
-
-Bytecode
---------
-    Metadata (source line number info, symbol table)
-
-pdump
------
-    Dumping constants shouldn't unpack the constants, but
-    just print out the segment.
-
-Stability
----------
-    Purify, Valgrind, and other memory badness detectors
-
-Performance
------------
-    Mo' betta benchmarks
-    Add profiling build options
-    Add the above to tinderbox
-
-Documentation
--------------
-    Update docs and pdds to reflect current state.
-    Parrotguts currently too difficult to approach
-
-Debugger
---------
-    Add commands history and completion
-    Load the commands from a file
-    Make breakpoints at labels
-    Read core dumps
-    Attach to a running program
-    List breakpoints
-    Handle restart opcodes
+Begin your subject with '[TODO]'.
