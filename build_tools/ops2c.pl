@@ -272,7 +272,7 @@ foreach my $op ($ops->ops) {
     "$full_name",
     "$func_name",
     "", /* TODO: Put the body here */
-    $jump, /* 1 = rel 2 = abs 4 = pop 8 = enext 16 = gnext 32 = unpredict */
+    $jump,
     $arg_count,
     $arg_types,
     $arg_dirs

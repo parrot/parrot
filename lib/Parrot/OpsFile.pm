@@ -251,6 +251,19 @@ sub read_ops
   return;
 }
 
+# Extends a string containing an or expression "0" .. "A" .. "A|B" etc.
+sub or_flag
+{
+    my ($flag, $value) = @_;
+
+    if($$flag eq '0'){
+	$$flag = $value;
+    }
+    else {
+	$$flag .= "|$value";
+    }
+}
+
 
 #
 # make_op()
@@ -265,13 +278,14 @@ sub make_op
   my $branch = 0;
   my $pop = 0;
   my $next = 0;
-  my $jumps = 0;
+  my $restart = 0;
 
   foreach my $variant (expand_args(@$args)) {
       my(@fixedargs)=split(/,/,$variant);
       my $op = Parrot::Op->new($code++, $type, $short_name,
         [ 'op', @fixedargs ], [ '', @$argdirs ]);
       my $op_size = $op->size;
+      my $jumps = "0";
 
       #
       # Macro substitutions:
@@ -325,8 +339,14 @@ sub make_op
 
                     $body =~ s/\bHALT\(\)/{{=0}}/mg;
 
-      $branch   ||= $body =~ s/\brestart\s+OFFSET\((.*?)\)/{{=0,+=$1}}/mg;
-      $next     ||= $body =~ s/\brestart\s+NEXT\(\)/{{=0,+=$op_size}}/mg;
+      if($body =~ s/\brestart\s+OFFSET\((.*?)\)/{{=0,+=$1}}/mg) {
+ 	$branch = 1;
+	$restart = 1;
+      }
+      elsif($body =~ s/\brestart\s+NEXT\(\)/{{=0,+=$op_size}}/mg) {
+	$restart = 1;
+	$next = 1;
+      }
 
                     $body =~ s/\$(\d+)/{{\@$1}}/mg;
 
@@ -336,14 +356,15 @@ sub make_op
         $op->body(qq{#line $line "$file"\n}.$body);
       }
 
-      # Must be in sync with the PARROT_JUMP* defines in include/parrot/op.h
-
-      $jumps |= 1 if ($branch);
-      $jumps |= 2 if ($absolute);
-      $jumps |= 4 if ($pop);
-      $jumps |= 8 if ($next);
+      # Constants here are defined in include/parrot/op.h
+      or_flag(\$jumps, "PARROT_JUMP_RELATIVE")   if ($branch);
+      or_flag(\$jumps, "PARROT_JUMP_ADDRESS")    if ($absolute);
+      or_flag(\$jumps, "PARROT_JUMP_POP")        if ($pop);
+      or_flag(\$jumps, "PARROT_JUMP_ENEXT")      if ($next);
       # I'm assuming the op branches to the value in the last argument.
-      $jumps |= 16 if (($jumps) && ($fixedargs[@fixedargs - 1]) && ($fixedargs[@fixedargs - 1] eq 'i'));
+      or_flag(\$jumps, "PARROT_JUMP_GNEXT")      if (($jumps) && ($fixedargs[@fixedargs - 1]) && ($fixedargs[@fixedargs - 1] eq 'i'));
+      or_flag(\$jumps, "PARROT_JUMP_RESTART")     if ($restart);
+
       $op->jump($jumps);
 
       $self->push_op($op);
