@@ -1,6 +1,6 @@
 #! perl -w
 
-use Parrot::Test tests => 82;
+use Parrot::Test tests => 79;
 use Test::More;
 use Parrot::PMC qw(%pmc_types);
 my $max_pmc = scalar(keys(%pmc_types)) + 1;
@@ -1269,81 +1269,6 @@ ok
 OUTPUT
 
 
-output_is(<<CODE, <<OUTPUT, "IntQueue test 1");
-	new P0,.IntQueue
-	set P0,32
-	set P0,-7
-
-	set I0,P0
-	eq I0,32,OK_1
-	print "not "
-OK_1:	print "ok 1\\n"
-
-	if P0,OK_2
-	print "not "
-OK_2:	print "ok 2\\n"
-
-	set I0,P0
-	eq I0,-7,OK_3
-	print "not "
-OK_3:	print "ok 3\\n"
-
-		if P0,NOT_OK_4
-		print "ok 4\\n"
-		branch DONE
-NOT_OK_4:	print "not ok 4\\n"
-DONE:
-
-	end
-CODE
-ok 1
-ok 2
-ok 3
-ok 4
-OUTPUT
-
-output_is(<<CODE, <<OUTPUT, "IntQueue test 2");
-	new P0,.IntQueue
-	set P0,32
-	set P0,-7
-
-	set I0,P0
-	eq I0,32,OK_1
-	print "not "
-OK_1:	print "ok 1\\n"
-
-	if P0,OK_2
-	print "not "
-OK_2:	print "ok 2\\n"
-
-	set I0,P0
-	eq I0,-7,OK_3
-	print "not "
-OK_3:	print "ok 3\\n"
-
-		if P0,NOT_OK_4
-		print "ok 4\\n"
-		branch DONE
-NOT_OK_4:	print "not ok 4\\n"
-DONE:
-
-	end
-CODE
-ok 1
-ok 2
-ok 3
-ok 4
-OUTPUT
-
-output_is(<<CODE, <<OUTPUT, "IntQueue test 3");
-	new P0,.IntQueue
-        set I0, P0
-        end
-CODE
-*** dequeue tried to dequeue empty bucket
-OUTPUT
-
-
 output_is(<<CODE, <<OUTPUT, "mul_p_p, PerlInt");
 @{[ $fp_equality_macro ]}
         new P0,.PerlInt
@@ -2044,7 +1969,7 @@ output_is(<<'CODE', <<OUTPUT, "assign Px,Py");
     print ":"
     print P13
     print "\n"
-    
+
     assign P10, P1
     assign P11, P1
     assign P12, P1
@@ -2057,7 +1982,7 @@ output_is(<<'CODE', <<OUTPUT, "assign Px,Py");
     print ":"
     print P13
     print "\n"
-    
+
     assign P10, P2
     assign P11, P2
     assign P12, P2
@@ -2070,7 +1995,7 @@ output_is(<<'CODE', <<OUTPUT, "assign Px,Py");
     print ":"
     print P13
     print "\n"
-    
+
     assign P10, P3
     assign P11, P3
     assign P12, P3

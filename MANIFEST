@@ -25,7 +25,6 @@ classes/csub.pmc
 classes/default.pmc
 classes/genclass.pl
 classes/intlist.pmc
-classes/intqueue.pmc
 classes/key.pmc
 classes/multiarray.pmc
 classes/perlarray.pmc
