@@ -165,7 +165,7 @@ Returns the value of the element at index C<*key>.
 
 /*
 
-=item C<void push_number(FLOATVAL value)>
+=item C<void push_float(FLOATVAL value)>
 
 Adds C<value> to the end of the list.
 
@@ -180,7 +180,7 @@ Adds C<value> to the end of the list.
 
 /*
 
-=item C<FLOATVAL pop_number()>
+=item C<FLOATVAL pop_float()>
 
 Removes and returns the last element in the list.
 
@@ -196,7 +196,7 @@ Removes and returns the last element in the list.
 
 /*
 
-=item C<void unshift_number(FLOATVAL value)>
+=item C<void unshift_float(FLOATVAL value)>
 
 Adds C<value> to the start of the list.
 
@@ -211,7 +211,7 @@ Adds C<value> to the start of the list.
 
 /*
 
-=item C<FLOATVAL shift_number()>
+=item C<FLOATVAL shift_float()>
 
 Removes and returns the first element in the list.
 
