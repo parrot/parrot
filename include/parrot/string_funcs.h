@@ -42,8 +42,8 @@ STRING *int_to_str(struct Parrot_Interp *,
            char *tc, HUGEINTVAL num, char base);
 STRING *string_from_num(struct Parrot_Interp *, FLOATVAL f);
 STRING *string_grow(struct Parrot_Interp *, STRING *s, INTVAL addlen);
-STRING *string_make(struct Parrot_Interp *, const void *buffer,
-                    UINTVAL buflen, const ENCODING *, UINTVAL flags,
+STRING *string_make(struct Parrot_Interp *, const void *buff,
+                    UINTVAL len, const ENCODING *, UINTVAL flags,
                     const CHARTYPE *);
 STRING *string_copy(struct Parrot_Interp *, STRING *);
 STRING *string_set(struct Parrot_Interp *, STRING *d, STRING *s);

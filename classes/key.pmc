@@ -25,7 +25,7 @@ pmclass Key {
 
 	for (; key ; ) {
 
-	    switch (key->flags & KEY_type_FLAGS) {
+	    switch (PObj_get_FLAGS(key) & KEY_type_FLAGS) {
 		case KEY_integer_FLAG:
 		case KEY_integer_FLAG|KEY_register_FLAG:
 		    key_set_integer(INTERP, dkey, key_integer(INTERP, key));

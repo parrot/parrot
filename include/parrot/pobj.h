@@ -15,8 +15,87 @@
 
 #include "parrot/config.h"
 
+typedef union UnionVal {
+    INTVAL int_val;             /* PMC unionval members */
+    FLOATVAL num_val;
+    DPOINTER* struct_val;
+    struct parrot_string_t * string_val;
+    PMC* pmc_val;
+    struct {                    /* Buffers structure */
+        void * bufstart;
+        size_t buflen;
+    } b;
+} UnionVal;
+
+/* Parrot Object - base class for all others */
+typedef struct PObj {
+    UnionVal u;
+    Parrot_UInt flags;
+#if ! DISABLE_GC_DEBUG
+    UINTVAL version;
+#endif
+} PObj;
+
+/* plain Buffer is the smallest Parrot Obj */
+typedef struct Buffer {
+    PObj obj;
+} Buffer;
+
+/* macros for accessing old buffer members */
+#define bufstart obj.u.b.bufstart
+#define buflen   obj.u.b.buflen
+#if ! DISABLE_GC_DEBUG
+#define version obj.version
+#endif
+
+struct parrot_string_t {
+    PObj obj;
+    UINTVAL bufused;
+    void *strstart;
+    UINTVAL strlen;
+    const ENCODING *encoding;
+    const CHARTYPE *type;
+    INTVAL language;
+};
+
+    /* cache.* is intended to just be *shortcuts* to*/
+    /* commonly-accessed data, *not* pointers to */
+    /* completely different data.  That's why it's */
+    /* referred to as a "cache". */
+struct PMC {
+    PObj obj;
+    VTABLE *vtable;
+    DPOINTER *data;
+    PMC *metadata;
+
+    SYNC *synchronize;
+    /* This flag determines the next PMC in the 'used' list during
+       dead object detection in the GC. It is a linked list, which is
+       only valid in trace_active_PMCs. Also, the linked list is
+       guaranteed to have the tail element's next_for_GC point to itself,
+       which makes much of the logic and checks simpler. We then have to
+       check for PMC->next_for_GC == PMC to find the end of list. */
+    PMC *next_for_GC;         /* Yeah, the GC data should be out of
+                                 band, but that makes things really
+                                 slow when actually marking things for
+                                 the GC runs. Unfortunately putting
+                                 this here makes marking things clear
+                                 for the GC pre-run slow as well, as
+                                 we need to touch all the PMC
+                                 structs. (Though we will for flag
+                                 setting anyway) We can potentially
+                                 make this a pointer to the real GC
+                                 stuff, which'd merit an extra
+                                 dereference when setting, but let us
+                                 memset the actual GC data in a big
+                                 block */
+};
+
+/* macro for accessing union data */
+#define cache obj.u
+
 /* PObj flags */
-typedef enum PObj {
+typedef enum PObj_enum {
     /* This first 8 flags may be used privately by a Parrot Object.
      * It is suggested that you alias these within an individual
      * class's header file
@@ -93,14 +172,16 @@ typedef enum PObj {
  * directly using any flags is strongly deprecated, please use
  * these macros
  */
-#define PObj_get_FLAGS(o) (o)->flags
 
-#define PObj_flag_TEST(flag, o) ((o)->flags & PObj_ ## flag ## _FLAG)
-#define PObj_flag_SET(flag, o) ((o)->flags |= PObj_ ## flag ## _FLAG)
+
+#define PObj_get_FLAGS(o) ((o)->obj.flags)
+
+#define PObj_flag_TEST(flag, o) ((o)->obj.flags & PObj_ ## flag ## _FLAG)
+#define PObj_flag_SET(flag, o) ((o)->obj.flags |= PObj_ ## flag ## _FLAG)
 #define PObj_flag_CLEAR(flag, o) \
-        ((o)->flags &= ~(UINTVAL)(PObj_ ## flag ## _FLAG))
+        ((o)->obj.flags &= ~(UINTVAL)(PObj_ ## flag ## _FLAG))
 
-#define PObj_flags_SETTO(o, f) (o)->flags = (f)
+#define PObj_flags_SETTO(o, f) (o)->obj.flags = (f)
 #define PObj_flags_CLEARALL(o) PObj_flags_SETTO(o, 0)
 
 #define PObj_COW_TEST(o) PObj_flag_TEST(COW, o)
@@ -142,78 +223,31 @@ typedef enum PObj {
 #define PObj_is_buffer_ptr_CLEAR(o) PObj_flag_CLEAR(is_buffer_ptr, o)
 
 /* some combinations */
-#define PObj_is_cowed_TESTALL(o) ((o)->flags & \
+#define PObj_is_cowed_TESTALL(o) ((o)->obj.flags & \
             (PObj_COW_FLAG|PObj_constant_FLAG|PObj_external_FLAG))
-#define PObj_is_cowed_SETALL(o) ((o)->flags |= \
+#define PObj_is_cowed_SETALL(o) ((o)->obj.flags |= \
             (PObj_COW_FLAG|PObj_constant_FLAG|PObj_external_FLAG))
 
-#define PObj_is_external_TESTALL(o) ((o)->flags & \
+#define PObj_is_external_TESTALL(o) ((o)->obj.flags & \
             (UINTVAL)(PObj_COW_FLAG|PObj_bufstart_external_FLAG| \
 		    PObj_external_FLAG|PObj_immobile_FLAG))
 
-#define PObj_is_external_or_free_TESTALL(o) ((o)->flags & \
+#define PObj_is_external_or_free_TESTALL(o) ((o)->obj.flags & \
             (UINTVAL)(PObj_external_FLAG|PObj_on_free_list_FLAG))
 
-#define PObj_is_external_CLEARALL(o) ((o)->flags &= \
+#define PObj_is_external_CLEARALL(o) ((o)->obj.flags &= \
             ~(UINTVAL)(PObj_COW_FLAG|PObj_bufstart_external_FLAG| \
 		    PObj_external_FLAG|PObj_immobile_FLAG))
 
-#define PObj_is_live_or_free_TESTALL(o) ((o)->flags & \
+#define PObj_is_live_or_free_TESTALL(o) ((o)->obj.flags & \
         (PObj_live_FLAG | PObj_on_free_list_FLAG | PObj_constant_FLAG))
 
-#define PObj_is_movable_TESTALL(o) (!((o)->flags & \
+#define PObj_is_movable_TESTALL(o) (!((o)->obj.flags & \
         (PObj_immobile_FLAG | PObj_on_free_list_FLAG | \
          PObj_constant_FLAG | PObj_external_FLAG)))
 
-#define PObj_custom_mark_destroy_SETALL(o) ((o)->flags |= \
+#define PObj_custom_mark_destroy_SETALL(o) ((o)->obj.flags |= \
         (PObj_custom_mark_FLAG | PObj_active_destroy_FLAG))
-
-/* compat macros */
-
-/* Buffer flags */
-#if 0
-typedef enum BUFFER_flag {
-    BUFFER_private0_FLAG = PObj_private0_FLAG,
-    BUFFER_private1_FLAG = PObj_private1_FLAG,
-    BUFFER_private2_FLAG = PObj_private2_FLAG,
-    BUFFER_private3_FLAG = PObj_private3_FLAG,
-    BUFFER_private4_FLAG = PObj_private4_FLAG,
-    BUFFER_private5_FLAG = PObj_private5_FLAG,
-    BUFFER_private6_FLAG = PObj_private6_FLAG,
-    BUFFER_private7_FLAG = PObj_private7_FLAG,
-    BUFFER_immobile_FLAG = PObj_immobile_FLAG,
-    BUFFER_external_FLAG = PObj_external_FLAG,
-    BUFFER_sysmem_FLAG = PObj_sysmem_FLAG,
-    BUFFER_COW_FLAG = PObj_COW_FLAG,
-    BUFFER_live_FLAG = PObj_live_FLAG,
-    BUFFER_needs_GC_FLAG = PObj_custom_GC_FLAG,
-    BUFFER_on_free_list_FLAG = PObj_on_free_list_FLAG,
-    BUFFER_constant_FLAG = PObj_constant_FLAG,
-    BUFFER_report_FLAG =PObj_report_FLAG,
-    BUFFER_bufstart_external_FLAG = PObj_bufstart_external_FLAG,
-    BUFFER_strstart_FLAG = PObj_is_string_FLAG
-} BUFFER_flags;
-
-typedef enum {
-    PMC_private0_FLAG = PObj_private0_FLAG,
-    PMC_private1_FLAG = PObj_private1_FLAG,
-    PMC_private2_FLAG = PObj_private2_FLAG,
-    PMC_private3_FLAG = PObj_private3_FLAG,
-    PMC_private4_FLAG = PObj_private4_FLAG,
-    PMC_private5_FLAG = PObj_private5_FLAG,
-    PMC_private6_FLAG = PObj_private6_FLAG,
-    PMC_private7_FLAG = PObj_private7_FLAG,
-    PMC_active_destroy_FLAG = PObj_active_destroy_FLAG,
-    PMC_is_buffer_ptr_FLAG = PObj_is_buffer_ptr_FLAG,
-    PMC_is_PMC_ptr_FLAG = PObj_is_PMC_ptr_FLAG,
-    PMC_private_GC_FLAG = PObj_custom_GC_FLAG,
-    PMC_custom_mark_FLAG = PObj_custom_mark_FLAG,
-    PMC_live_FLAG = PObj_live_FLAG,
-    PMC_on_free_list_FLAG = PObj_on_free_list_FLAG,
-    PMC_constant_FLAG = PObj_constant_FLAG
-} PMC_flags;
-
-#endif
 
 #endif
 

@@ -22,34 +22,7 @@ struct parrot_string_t;
 
 #ifdef PARROT_IN_CORE
 
-struct parrot_string_t {
-    void *bufstart;
-    UINTVAL buflen;
-    UINTVAL flags;
-#if ! DISABLE_GC_DEBUG
-    UINTVAL version;
-#endif
-    UINTVAL bufused;
-    void *strstart;
-    UINTVAL strlen;
-    const ENCODING *encoding;
-    const CHARTYPE *type;
-    INTVAL language;
-};
-
-#define Parrot_String struct parrot_string_t *
-
 #include "parrot/parrot.h"
-
-/* Generic buffer header. Enough to GC */
-typedef struct {
-    void *bufstart;
-    UINTVAL buflen;
-    UINTVAL flags;
-#if ! DISABLE_GC_DEBUG
-    UINTVAL version;
-#endif
-} Buffer;
 
 typedef struct parrot_string_t String;
 

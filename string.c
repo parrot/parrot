@@ -74,13 +74,13 @@ unmake_COW(struct Parrot_Interp *interpreter, STRING *s)
 static void copy_string_header(struct Parrot_Interp *interpreter,
                                String *dest, String *src)
 {
-    UINTVAL version;
 #if ! DISABLE_GC_DEBUG
-    version = dest->version;
+    UINTVAL vers;
+    vers= dest->version;
 #endif
     memcpy(dest, src, sizeof(String));
 #if ! DISABLE_GC_DEBUG
-    dest->version = version;
+    dest->version = vers;
 #endif
 }
 
@@ -204,8 +204,8 @@ string_append(struct Parrot_Interp *interpreter, STRING *a,
  */
 STRING *
 string_from_c_string(struct Parrot_Interp *interpreter, const void *buffer,
-                     UINTVAL buflen) {
-    return string_make(interpreter, buffer, buflen ? buflen : strlen(buffer),
+                     UINTVAL len) {
+    return string_make(interpreter, buffer, len ? len : strlen(buffer),
                        NULL, 0, NULL);
 }
 
@@ -215,7 +215,7 @@ string_from_c_string(struct Parrot_Interp *interpreter, const void *buffer,
  */
 STRING *
 string_make(struct Parrot_Interp *interpreter, const void *buffer,
-            UINTVAL buflen, const ENCODING *encoding, UINTVAL flags,
+            UINTVAL len, const ENCODING *encoding, UINTVAL flags,
             const CHARTYPE *type)
 {
     STRING *s;
@@ -240,11 +240,11 @@ string_make(struct Parrot_Interp *interpreter, const void *buffer,
            (The cast is necessary to pacify TenDRA's tcc.)
            */
         s->bufstart = const_cast(buffer);
-        s->buflen = buflen;
+        s->buflen = len;
         PObj_bufstart_external_SET(s);
     }
     else {
-        Parrot_allocate_string(interpreter, s, buflen);
+        Parrot_allocate_string(interpreter, s, len);
     }
     s->encoding = encoding;
     s->type = type;
@@ -255,9 +255,9 @@ string_make(struct Parrot_Interp *interpreter, const void *buffer,
             PObj_bufstart_external_SET(s);
         }
         else {
-            mem_sys_memcopy(s->strstart, buffer, buflen);
+            mem_sys_memcopy(s->strstart, buffer, len);
         }
-        s->bufused = buflen;
+        s->bufused = len;
         (void)string_compute_strlen(s);
     }
     else {

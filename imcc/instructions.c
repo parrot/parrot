@@ -62,6 +62,7 @@ close_comp_unit(void)
     n_comp_units--;
     instructions = comp_unit[n_comp_units].instructions;
     last_ins = comp_unit[n_comp_units].last_ins;
+    clear_tables();
     hash = comp_unit[n_comp_units].hash;
 }
 

@@ -193,6 +193,8 @@ allocate_chunk(Interp *interpreter, List *list, UINTVAL items, UINTVAL size)
     return chunk;
 }
 
+#define flags obj.flags
+
 #ifdef LIST_DEBUG
 /* only char and int are supported currently */
 static void

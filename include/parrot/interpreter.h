@@ -52,14 +52,6 @@ typedef Parrot_Interp_flag Interp_flags;
 
 #include "parrot/debug.h"
 
-typedef union UnionVal {
-    INTVAL int_val;
-    FLOATVAL num_val;
-    DPOINTER* struct_val;
-    STRING* string_val;
-    PMC* pmc_val;
-} UnionVal;
-
 typedef struct warnings_t {
     Warnings_classes classes;
 } *Warnings;

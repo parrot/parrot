@@ -22,6 +22,7 @@ key_new(struct Parrot_Interp *interpreter)
     return key;
 }
 
+#define flags obj.flags
 PMC *
 key_new_integer(struct Parrot_Interp *interpreter, INTVAL value)
 {

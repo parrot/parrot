@@ -61,7 +61,7 @@ trace_key_dump(struct Parrot_Interp *interpreter, PMC *key)
     PIO_eprintf(interpreter, "[");
 
     while (key) {
-        switch (key->flags & KEY_type_FLAGS) {
+        switch (PObj_get_FLAGS(key) & KEY_type_FLAGS) {
         case 0:
             break;
         case KEY_integer_FLAG:

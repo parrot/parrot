@@ -214,13 +214,14 @@ set_register_usage(struct Parrot_Interp *interpreter,
             PMC *key = interpreter->code->const_table->constants[
                 *(cur_op + argn)]->key;
             while (key) {
-                if (key->flags & KEY_register_FLAG) {
+                UINTVAL flags = PObj_get_FLAGS(key);
+                if (flags & KEY_register_FLAG) {
                     INTVAL n = key->cache.int_val;
-                    if (key->flags & KEY_integer_FLAG)
+                    if (flags & KEY_integer_FLAG)
                         typ = 0;
-                    else if (key->flags & KEY_pmc_FLAG)
+                    else if (flags & KEY_pmc_FLAG)
                         typ = 1;
-                    else if (key->flags & KEY_string_FLAG)
+                    else if (flags & KEY_string_FLAG)
                         typ = 2;
 
                     if (!ru[typ].reg_count[n]++)

@@ -58,7 +58,7 @@ get_free_pmc(struct Parrot_Interp *interpreter, struct Small_Object_Pool *pool)
     pmc = pool->free_list;
     pool->free_list = *(void **)pmc;
 
-    pmc->flags = 0;
+    PObj_flags_SETTO(pmc, 0);
     /* Make sure it doesn't seem to be on the GC list */
     pmc->next_for_GC = NULL;
 

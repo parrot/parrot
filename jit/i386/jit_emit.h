@@ -1790,8 +1790,9 @@ store:
     }
     /* push interpreter */
     emitm_pushl_i(jit_info->native_ptr, interpreter);
-    /* mov (eax), eax i.e. $1->vtable */
-    emitm_movl_m_r(jit_info->native_ptr, emit_EAX, emit_EAX, emit_None, 1, 0);
+    /* mov (offs)%eax, %eax i.e. $1->vtable */
+    emitm_movl_m_r(jit_info->native_ptr, emit_EAX, emit_EAX, emit_None, 1,
+            offsetof(struct PMC, vtable));
     /* call *(offset)eax */
     emitm_callm(jit_info->native_ptr, emit_EAX, emit_None, emit_None, offset);
     if (bp)
@@ -1963,8 +1964,9 @@ Parrot_jit_vtable_newp_ic_op(Parrot_jit_info_t *jit_info,
     emitm_pushl_r(jit_info->native_ptr, emit_EAX);
     /* push interpreter */
     emitm_pushl_i(jit_info->native_ptr, interpreter);
-    /* mov (eax), eax i.e. $1->vtable */
-    emitm_movl_m_r(jit_info->native_ptr, emit_EAX, emit_EAX, emit_None, 1, 0);
+    /* mov (offs)%eax, %eax i.e. $1->vtable */
+    emitm_movl_m_r(jit_info->native_ptr, emit_EAX, emit_EAX, emit_None, 1,
+            offsetof(struct PMC, vtable));
     /* call *(offset)eax */
     emitm_callm(jit_info->native_ptr, emit_EAX, emit_None, emit_None, offset);
     /* adjust 4 args pushed */

@@ -294,7 +294,7 @@ PackFile_Constant_pack(struct PackFile_Constant *self, opcode_t *packed)
         packed_size = 4 * sizeof(opcode_t) + padded_size;
 
         *cursor++ = packed_size;
-        *cursor++ = self->string->flags;
+        *cursor++ = PObj_get_FLAGS(self->string); /* XXX useless info -leo */
         *cursor++ = self->string->encoding->index;
         *cursor++ = self->string->type->index;
         *cursor++ = self->string->bufused;
@@ -335,7 +335,7 @@ PackFile_Constant_pack(struct PackFile_Constant *self, opcode_t *packed)
         *cursor++ = i;
         /* and now type / value per component */
         for (key = self->key; key; key = key->data) {
-            switch (key->flags & KEY_type_FLAGS) {
+            switch (PObj_get_FLAGS(key) & KEY_type_FLAGS) {
             case KEY_integer_FLAG:
                 *cursor++ = PARROT_ARG_IC;
                 *cursor++ = key->cache.int_val;

@@ -1099,7 +1099,7 @@ PDB_disassemble_op(struct Parrot_Interp *interpreter, char* dest, int space,
             dest[size-1] = '[';
             k = interpreter->code->const_table->constants[op[j]]->key;
             while (k) {
-                switch (k->flags & KEY_type_FLAGS) {
+                switch (PObj_get_FLAGS(k)) {
                 case 0:
                     break;
                 case KEY_integer_FLAG:
@@ -1733,7 +1733,8 @@ dump_string(struct Parrot_Interp *interpreter, STRING* s)
 {
     if (s) {
         PIO_fprintf(interpreter, PIO_STDERR(interpreter),"\tBuflen  =\t%12ld\n",s->buflen);
-        PIO_fprintf(interpreter, PIO_STDERR(interpreter),"\tFlags   =\t%12ld\n",s->flags);
+        PIO_fprintf(interpreter, PIO_STDERR(interpreter),
+                "\tFlags   =\t%12ld\n", PObj_get_FLAGS(s));
         PIO_fprintf(interpreter, PIO_STDERR(interpreter),"\tBufused =\t%12ld\n",s->bufused);
         PIO_fprintf(interpreter, PIO_STDERR(interpreter),"\tStrlen  =\t%12ld\n",s->strlen);
         PIO_fprintf(interpreter, PIO_STDERR(interpreter),"\tOffset  =\t%12d\n",

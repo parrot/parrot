@@ -4016,7 +4016,7 @@ inline op stringinfo(out INT, in STR, in INT) {
                               break;
     case STRINGINFO_BUFLEN:   $1 = $2->buflen;
                               break;
-    case STRINGINFO_FLAGS:    $1 = $2->flags;
+    case STRINGINFO_FLAGS:    $1 = PObj_get_FLAGS($2);
                               break;
     case STRINGINFO_BUFUSED:  $1 = $2->bufused;
                               break;

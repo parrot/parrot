@@ -39,6 +39,6 @@ Retrieve the flags from a PMC
 =cut
 
 inline op pmcflags(out INT, in PMC) {
-  $1 = $2->flags;
+  $1 = PObj_get_FLAGS($2);
   goto NEXT();
 }

@@ -38,7 +38,7 @@ static void help(void)
     exit(0);
 }
 
-static void version(void)
+static void imcc_version(void)
 {
     printf("imcc version " IMCC_VERSION "\n");
     exit(0);
@@ -104,7 +104,7 @@ parseflags(Parrot_Interp interpreter, int *argc, char **argv[])
 		help();
 		break;
 	    case 'V':
-		version();
+		imcc_version();
 		break;
 	    case 'r':
 		pbc = 1;

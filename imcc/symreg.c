@@ -352,8 +352,6 @@ void delete_sym(const char * name) {
 void clear_tables() {
     int i;
     SymReg * p, *next;
-    if (namespace)
-        fatal(1, "clear_tables", "namespace %s not closed\n", namespace->name);
     for(i = 0; i < HASH_SIZE; i++) {
 	for(p = hash[i]; p; ) {
 	    next = p->next;
