@@ -8,7 +8,7 @@
 
 #include <assert.h>
 
-#ifdef __GNUC__
+#if defined HAVE_COMPUTED_GOTO && defined __GCC__
 #  define JIT_CGP
 #endif
 
