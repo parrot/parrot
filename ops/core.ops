@@ -156,13 +156,13 @@ If for some reason the line's longer than 64K you get only 64K
 inline op readline(out STR, in INT) {
   FILE *file;
   switch ($2) {
-	case 0: file = stdin; 
+    case 0: file = stdin; 
                 break;
-	case 1: file = stdout; 
+    case 1: file = stdout; 
                 break;
-	case 2: file = stderr; 
+    case 2: file = stderr; 
                 break;
-	default: file = OPCODE_T2PTR(FILE *, $2);
+    default: file = OPCODE_T2PTR(FILE *, $2);
   }
 
   $1 = string_make(interpreter, NULL, 65535, NULL, 0, NULL);
@@ -258,13 +258,13 @@ op print(in PMC) {
 op print(in INT, in INT) {
   FILE *file;
   switch ($1) {
-	case 0: file = stdin; 
+    case 0: file = stdin; 
                 break;
-	case 1: file = stdout; 
+    case 1: file = stdout; 
                 break;
-	case 2: file = stderr; 
+    case 2: file = stderr; 
                 break;
-	default: file = OPCODE_T2PTR(FILE *, $1);
+    default: file = OPCODE_T2PTR(FILE *, $1);
   }
   fprintf(file, INTVAL_FMT, (INTVAL)$2);
   goto NEXT();
@@ -273,13 +273,13 @@ op print(in INT, in INT) {
 op print(in INT, in NUM) {
   FILE *file;
   switch ($1) {
-	case 0: file = stdin; 
+    case 0: file = stdin; 
                 break;
-	case 1: file = stdout; 
+    case 1: file = stdout; 
                 break;
-	case 2: file = stderr; 
+    case 2: file = stderr; 
                 break;
-	default: file = OPCODE_T2PTR(FILE *, $1);
+    default: file = OPCODE_T2PTR(FILE *, $1);
   }
   fprintf(file, FLOATVAL_FMT, $2);
   goto NEXT();
@@ -289,13 +289,13 @@ op print(in INT, in STR) {
   FILE *file;
   STRING *s = $2;
   switch ($1) {
-	case 0: file = stdin; 
+    case 0: file = stdin; 
                 break;
-	case 1: file = stdout; 
+    case 1: file = stdout; 
                 break;
-	case 2: file = stderr; 
+    case 2: file = stderr; 
                 break;
-	default: file = OPCODE_T2PTR(FILE *, $1);
+    default: file = OPCODE_T2PTR(FILE *, $1);
   }
   if (s && string_length(s)) {
     fprintf(file, "%s", string_to_cstring(interpreter, (s)));
@@ -308,13 +308,13 @@ op print(in INT, in PMC) {
   PMC *p = $2;
   STRING *s = (p->vtable->get_string(interpreter, p));
   switch ($1) {
-	case 0: file = stdin; 
+    case 0: file = stdin; 
                 break;
-	case 1: file = stdout; 
+    case 1: file = stdout; 
                 break;
-	case 2: file = stderr; 
+    case 2: file = stderr; 
                 break;
-	default: file = OPCODE_T2PTR(FILE *, $1);
+    default: file = OPCODE_T2PTR(FILE *, $1);
   }
   if (s) {
     fprintf(file, "%s", string_to_cstring(interpreter, (s)));
@@ -3857,7 +3857,7 @@ op interpinfo(out INT, in INT) {
     $1 = interpreter->mem_allocs_since_last_collect;
     break;
     case TOTAL_COPIED: $1 = interpreter->memory_collected;
-		       break;
+               break;
   }
   goto NEXT();
 }
@@ -3994,7 +3994,7 @@ Destroy the PMC.
 op destroy(in PMC) {
 
   if ($1->flags & PMC_active_destroy_FLAG) {
-	$1->vtable->destroy(interpreter, $1);
+    $1->vtable->destroy(interpreter, $1);
   }
   /* Should just assign undef, but we don't have one yet */
   $1->vtable = YOU_LOSE_VTABLE;
@@ -4196,7 +4196,7 @@ inline op loadlib(out PMC, in STR) {
 op dlfunc (out PMC, in PMC, in STR) {
   const char * name = string_to_cstring(interpreter, ($3));
   extern PMC * Parrot_new_csub(struct Parrot_Interp * ,
-			       void (*p)(Interp *, PMC *));
+                   void (*p)(Interp *, PMC *));
   void (*p)(Interp *, PMC *) = (void (*)(Interp *, PMC *))D2FPTR(Parrot_dlsym(
                                                 ($2)->data, name));
   if(p == NULL) {
