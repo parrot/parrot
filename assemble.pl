@@ -72,14 +72,16 @@ foreach my $file (@ARGV) {
 my $pc=0; my $op_pc=0;
 my ($bytecode,%label,%fixup,%constants,@constants);
 my (%local_label, %local_fixup, $last_label, %macros);
-my $line=0;
+my ($file,$line,$pline,$sline);
 my %equate=('*'=>sub { return $pc },
 	    '__DATE__'=>'"'.scalar(localtime).'"',
 	    '__VERSION__'=>'" $Revision$ "',
-	    '__LINE__' => sub { return $line });
+	    '__LINE__' => sub { return $line },
+	    '__FILE__' => sub { return "\"$file\"" });
+
 my($code,$in_macro,$cur_macro);
 while(my $l=shift(@program)) {
-    my($file,$line,$pline,$sline)=@$l;
+    ($file,$line,$pline,$sline)=@$l;
     if($in_macro) {
 	if($pline=~m/^endm$/i) {
 	    # end of the macro
