@@ -12,10 +12,14 @@
  *      Win32 System Programming, 2nd Edition
  */
 
+#ifdef WIN32
+#  include <windows.h>
+#endif
+
+#include "parrot/parrot.h"
+
 #ifdef PIO_OS_WIN32
 
-#  include <windows.h>
-#  include "parrot/parrot.h"
 #  include <tchar.h>
 
 /* Defined at bottom */
