@@ -11,7 +11,7 @@ hpux
 ?-ia64
 irix6.5                                  Y                 Y       Y/2
 linux-ppc-gcc3.2.3          Y    Y       Y      Y          Y       Y
-linux-x86-gcc2.92.2    Y    Y    Y       Y      Y          Y       Y
+linux-x86-gcc2.95.2    Y    Y    Y       Y      Y          Y       Y
 linux-x86-gcc3.3.3     Y    Y    Y       Y      Y          Y       Y
 linux-x64
 openbsd                Y    Y/5  Y       Y      -          Y       Y
