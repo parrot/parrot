@@ -402,12 +402,13 @@ runops (struct Parrot_Interp *interpreter, struct PackFile * code,
             unsigned int i;
 
             if (interpreter->profile == NULL) {
-                interpreter->profile = (INTVAL *)
-                    mem_sys_allocate(interpreter->op_count * sizeof(INTVAL));
+                interpreter->profile = (ProfData *)
+                    mem_sys_allocate(interpreter->op_count * sizeof(ProfData));
             }
 
             for (i = 0; i < interpreter->op_count; i++) {
-                interpreter->profile[i] = 0;
+                interpreter->profile[i].numcalls = 0;
+                interpreter->profile[i].time = 0.0;
             }
         }
 
@@ -534,7 +535,7 @@ make_interpreter(INTVAL flags) {
     /* Done. Return and be done with it */
 
     interpreter->code = (struct PackFile *)NULL;
-    interpreter->profile = (INTVAL *)NULL;
+    interpreter->profile = (ProfData *)NULL;
 
     interpreter->resume_flag   = 0;
     interpreter->resume_offset = 0;

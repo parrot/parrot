@@ -28,6 +28,12 @@ typedef STRING_FUNCS * (str_func_t)();
     STRING_FUNCS *(**string_funcs)();     /* String function table */
 #endif
 
+typedef struct ProfData {
+	INTVAL numcalls;
+	FLOATVAL time;
+} ProfData;
+
+
 struct Parrot_Interp {
     struct IReg *int_reg;            /* Current top of int reg stack */
     struct NReg *num_reg;            /* Current top of the float reg stack */
@@ -57,7 +63,7 @@ struct Parrot_Interp {
     INTVAL flags;				          /* Various interpreter flags
                                              that signal that runops
                                              should do something */
-    INTVAL * profile;                     /* The array where we keep the profile counters */
+    ProfData* profile;                     /* The array where we keep the profile counters */
 
     INTVAL resume_flag;
     size_t resume_offset;

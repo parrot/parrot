@@ -255,26 +255,37 @@ main(int argc, char **argv) {
             unsigned int j;
             int op_count   = 0;
             int call_count = 0;
+            FLOATVAL time = 0.0;
 
             printf("Operation profile:\n\n");
 
-            printf("  CODE   OP FULL NAME  CALLS\n");
-            printf("  -----  ------------  ------------\n");
+            printf("  CODE   OP FULL NAME  CALLS        TOTAL TIME AVG TIME  \n");
+            printf("  -----  ------------  ------------ ---------- ----------\n");
 
             for (j = 0; j < interpreter->op_count; j++) {
-                if(interpreter->profile[j] > 0) {
+                if(interpreter->profile[j].numcalls > 0) {
                     op_count++;
-                    call_count += interpreter->profile[j];
+                    call_count += interpreter->profile[j].numcalls;
+                    time += interpreter->profile[j].time;
 
-                    printf("  %5d  %-12s  %12ld\n", j, 
+                    printf("  %5d  %-12s  %12ld  %5.6f  %5.6f\n", j, 
                            interpreter->op_info_table[j].full_name,
-                           interpreter->profile[j]);
+                           interpreter->profile[j].numcalls,
+                           interpreter->profile[j].time,
+                           interpreter->profile[j].time / (FLOATVAL)interpreter->profile[j].numcalls
+                    );
                 }
 
             }
 
-            printf("  -----  ------------  ------------\n");
-            printf("  %5d  %-12s  %12d\n", op_count, "", call_count);
+            printf("  -----  ------------  ------------ ---------- ----------\n");
+            printf("  %5d  %-12s  %12d  %5.6f  %5.6f\n", 
+                op_count,
+                "",
+                call_count,
+                time,
+                time / (FLOATVAL)call_count
+            );
         }
     }
 

@@ -44,6 +44,8 @@ runops_slow_core (struct Parrot_Interp *interpreter, opcode_t * pc) {
     opcode_t * code_start;
     INTVAL     code_size;
     opcode_t * code_end;
+    opcode_t * lastpc;
+    FLOATVAL time;
 
     code_start = (opcode_t *)interpreter->code->byte_code;
     code_size  = interpreter->code->byte_code_size;
@@ -55,13 +57,18 @@ runops_slow_core (struct Parrot_Interp *interpreter, opcode_t * pc) {
     
     while (pc && pc >= code_start && pc < code_end ) {
         if (interpreter->flags & PARROT_PROFILE_FLAG) {
-            interpreter->profile[*pc]++;
+            interpreter->profile[*pc].numcalls++;
+            lastpc=pc;
+            time=Parrot_floatval_time();
         }
 
         DO_OP(pc, interpreter);
 
         if (interpreter->flags & PARROT_TRACE_FLAG) {
             trace_op(interpreter, code_start, code_end, pc);
+        }
+        if (interpreter->flags & PARROT_PROFILE_FLAG) {
+            interpreter->profile[*lastpc].time += Parrot_floatval_time() - time;
         }
     }
 
