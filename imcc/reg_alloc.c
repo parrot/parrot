@@ -83,7 +83,8 @@ static void ig_clear(int i, int j, int N, unsigned int* graph)
     *word &= ~(1 << bit_ofs);
 }
 
-static int ig_test(int i, int j, int N, unsigned int* graph)
+int ig_test(int i, int j, int N, unsigned int* graph);
+int ig_test(int i, int j, int N, unsigned int* graph)
 {
     int bit_ofs;
     unsigned int* word = ig_get_word(i, j, N, graph, &bit_ofs);
@@ -92,8 +93,9 @@ static int ig_test(int i, int j, int N, unsigned int* graph)
 
 static unsigned int* ig_allocate(int N)
 {
-    // size is N*N bits, but we want don't want to allocate a partial
-    // word, so round up to the nearest multiple of sizeof(int).
+    /* size is N*N bits, but we want don't want to allocate a partial
+     * word, so round up to the nearest multiple of sizeof(int).
+     */
     int need_bits = N * N;
     int num_words = (need_bits + sizeof(int) - 1) / sizeof(int);
     return (unsigned int*) calloc(num_words, sizeof(int));

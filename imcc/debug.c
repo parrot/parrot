@@ -259,13 +259,14 @@ dump_liveness_status_var(IMC_Unit * unit, SymReg* r)
     fprintf(stderr, "\n");
 }
 
+extern int ig_test(int i, int j, int N, unsigned int* graph); /* reg_alloc.c */
 void
 dump_interference_graph(IMC_Unit * unit)
 {
     int x, y, cnt;
     SymReg *r;
     SymReg** reglist = unit->reglist;
-    SymReg** interference_graph = unit->interference_graph;
+    unsigned int* interference_graph = unit->interference_graph;
     int n_symbols = unit->n_symbols;
 
     fprintf(stderr, "\nDumping the Interf. graph:"
@@ -279,7 +280,9 @@ dump_interference_graph(IMC_Unit * unit)
 
         for (y = 0; y < n_symbols; y++) {
 
-	     r = interference_graph[x*n_symbols + y];
+            if (! ig_test(x, y, n_symbols, interference_graph))
+                continue;
+            r = unit->reglist[y];
 	     if ( r && !r->simplified) {
 	        fprintf(stderr, "%s ", r->name);
 		cnt++;
