@@ -18,7 +18,7 @@
 
 /* Globals: */
 
-IntStack nodeStack;
+IMCStack nodeStack;
 int n_spilled;
 int lastbranch;
 
@@ -30,18 +30,20 @@ int lastbranch;
 void allocate() {
     int to_spill;
     
-    nodeStack = intstack_new(); 
+    nodeStack = imcstack_new();
     n_spilled = 0;
 
     while (1) {
 
         find_basic_blocks();	
+#if 0
 	build_cfg();
 	compute_dominators();
 	find_loops();
 
 	life_analysis();
 	compute_spilling_costs();
+#endif
 	build_interference_graph();  
 	
         while (simplify()) {}      /* simplify until no changes can be made */
@@ -51,13 +53,15 @@ void allocate() {
 	
 	if ( to_spill >= 0 ) {
             spill(to_spill);
-	    life_analysis();
-	    build_interference_graph();
+/*	    life_analysis(); */
+	    clear_basic_blocks();
+	    free_interference_graph();
         }
         else {
             /* the process is finished */
 	    clear_basic_blocks(); 
 	    free_interference_graph();
+	    imcstack_free(nodeStack);
 	    return;
 	}
      }
@@ -110,6 +114,8 @@ void build_interference_graph() {
             /* Add each symbol to its slot on the X axis of the graph */
     	    for(; r; r = r->next) {
                 if(r->type == VTREG || r->type == VTIDENTIFIER) {
+		    if (r->score < 10000)
+			r->score += r->last - r->first;
     	            interference_graph[count++] = r;
                 }
 	    }
@@ -185,6 +191,32 @@ int interferes(SymReg * r0, SymReg * r1) {
     /* If symbol was never used in a statment, it can't interfere */
     if(r0->first < 0 || r1->first < 0) return 0;
 
+    /* if instructions are in same block and don't overlap
+     * => no interference
+     */
+    if (instructions[r0->first]->bbindex ==
+	    instructions[r1->last]->bbindex &&
+	    instructions[r1->first]->bbindex ==
+	    instructions[r0->last]->bbindex) {
+	if (r0->first > r1->last)
+	    return 0;
+	if (r1->first > r0->last)
+	    return 0;
+    }
+    /* if they only cover one block and don't overlap
+     * => no interference
+     */
+    if (instructions[r0->first]->bbindex ==
+	    instructions[r0->last]->bbindex &&
+	    instructions[r1->first]->bbindex ==
+	    instructions[r1->last]->bbindex) {
+	if (r0->first > r1->last)
+	    return 0;
+	if (r1->first > r0->last)
+	    return 0;
+    }
+    return 1;
+    /* now look more detailled */
     /* Now: */
     
     if (r0->life_info == NULL || r1->life_info == NULL) {
@@ -238,7 +270,7 @@ int simplify (){
             if (IMCC_DEBUG) 
 	        fprintf(stderr, "#simplifying [%s]\n", g[x]->name);
 	    
-	    intstack_push(nodeStack, x);
+	    imcstack_push(nodeStack, x);
 	    
 	    g[x]->simplified = 1;
 	    changes = 1;
@@ -259,7 +291,7 @@ int simplify (){
 
 void order_spilling () {
     int min_score, total_score;
-    int min_node = -1;
+    int min_node;
     int x;
 	
     while (1) {
@@ -281,9 +313,9 @@ void order_spilling () {
 	      * I have no clue of how good it is
  	     */
 	    if (!(interference_graph[x]->simplified)) {
-	        total_score = interference_graph[x]->score - neighbours(x);
+	        total_score = interference_graph[x]->score; /* - neighbours(x); */
 		    
-                if ( (min_node = -1) || (min_score > total_score) )  {
+                if ( (min_node == -1) || (min_score > total_score) )  {
     	           min_node  = x;
 	           min_score = total_score;
 	        }
@@ -292,7 +324,7 @@ void order_spilling () {
 
 	if (min_node == -1) return; /* We are finished */
 		
-	intstack_push(nodeStack, min_node);
+	imcstack_push(nodeStack, min_node);
 	interference_graph[min_node]->simplified = 1;
     }
 }
@@ -322,23 +354,26 @@ void free_interference_graph() {
 int try_allocate() {
     int x = 0;
     int color, colors[MAX_COLOR];
-    int free_colors;
+    int free_colors, t;
     char buf[256];
     SymReg ** graph = interference_graph;
 
-    while ((intstack_depth(nodeStack) > 0) ) {
-	x=intstack_pop(nodeStack);
+    while ((imcstack_depth(nodeStack) > 0) ) {
+	x=imcstack_pop(nodeStack);
 
+	for(t = 0; t < 4; t++) {
+	    int typ = "INSP"[t];
         memset(colors, 0, sizeof(colors));
-        free_colors = map_colors(x, graph, colors);
+	    if (graph[x]->set == typ) {
+		free_colors = map_colors(x, graph, colors, typ);
         if (free_colors > 0) { 
-	    for(color = 0; color < MAX_COLOR; color++) {
+		    for(color = 0; color < MAX_COLOR - (typ=='P'); color++) {
                 if(!colors[color]) {	    
             	   graph[x]->color = color;		
             	   
-		   /*if (IMCC_DEBUG)
+			    if (IMCC_DEBUG)
 		       fprintf(stderr, "#[%s] provisionally gets color [%d] (%d free colors, score %d)\n", 
-		                       graph[x]->name, color, free_colors, graph[x]->score);*/
+					graph[x]->name, color, free_colors, graph[x]->score);
 		   
             	   sprintf(buf, graph[x]->fmt, graph[x]->color);
             	   graph[x]->reg = str_dup(buf);
@@ -348,12 +383,16 @@ int try_allocate() {
         }
 
 	if (graph[x]->color == -1) {
+		    if (IMCC_DEBUG)
+			fprintf(stderr, "# no more colors free = %d\n", free_colors);
 		
 	    /* It has been impossible to assign a color to this node, return it
 	       so it gets spilled */
 	    
 	    restore_interference_graph();
             return x;
+	}
+    }
 	}
     }
 
@@ -367,18 +406,21 @@ int try_allocate() {
 /*
  * map_colors: calculates what colors can be assigned to the x-th symbol.
  */
-int map_colors(int x, SymReg ** graph, int colors[]) {
+int map_colors(int x, SymReg ** graph, int colors[], int typ) {
     int y = 0;
     SymReg * r;
-    int free_colors = MAX_COLOR;
+    int color, free_colors;
     memset(colors, 0, sizeof(colors[0]) * MAX_COLOR);
     for(y = 0; y < n_symbols; y++) {
         if((r = graph[(1+x)*n_symbols+y+1])
-    	    && r->color != -1) {
+    	    && r->color != -1
+	    && r->set == typ) {
     	    colors[r->color] = 1;
-    	    free_colors--;
     	}
     }
+    for(color = free_colors = 0; color < MAX_COLOR - (typ=='P'); color++)
+	if(!colors[color])
+	    free_colors++;
     return free_colors;    
 }
 
@@ -413,6 +455,7 @@ void spill(int spilled) {
 
     sprintf(buf, "%s_%d", old_symbol->name, 0);
     new_symbol = mk_symreg(buf, old_symbol->set);
+    new_symbol->score = 10000;
 
     n_spilled++;
     after_spilled = 0;
@@ -433,19 +476,11 @@ void spill(int spilled) {
 		
 	needs_spilling = needs_fetch || needs_store;
 
-	if (needs_fetch && !after_spilled) {
+	if (needs_fetch) {
 	    sprintf(buf, "set %s, P31[%d] #FETCH", "%s", n_spilled); /*ouch*/
 	    emitb( mk_instruction(buf, new_symbol, NULL, NULL, NULL, IF_r0_write));
 	}
 
-	if (!needs_spilling && after_needs_store) {
-	    sprintf(buf, "set P31[%d], %s #STORE", n_spilled, "%s"); /*ouch, ouch*/
-	    emitb ( mk_instruction(buf, new_symbol, NULL, NULL, NULL, IF_r1_read));
-
-            sprintf(buf, "%s_%d", old_symbol->name, n_spilled);
-            new_symbol =  mk_ident(buf, old_symbol->set);
-	}
-		
 	/* Emit the old instruction, with the symbol changed */
 	{
             SymReg *r0, *r1, *r2, *r3;
@@ -461,16 +496,34 @@ void spill(int spilled) {
             if(r3==old_symbol) r3=new_symbol;
 
             emitb( mk_instruction(tmp->fmt, r0, r1, r2, r3, tmp->flags) );
+	    instructions[n_instructions - 1]->type = old_instructions[i]->type;
 
 	    old_symbol->first = -1;
             /* and remember how much it's offset by: */
             offset[i] = n_instructions - 1;
 	}
+	if (needs_store) {
+	    sprintf(buf, "set P31[%d], %s #STORE", n_spilled, "%s"); /*ouch, ouch*/
+	    emitb ( mk_instruction(buf, new_symbol, NULL, NULL, NULL, IF_r1_read));
+
+	}
+#if 1
+	if (needs_spilling) {
+            sprintf(buf, "%s_%d", old_symbol->name, ++j);
+            new_symbol =  mk_symreg(buf, old_symbol->set);
+	    new_symbol->score = 10000;
+	}
+#endif
+
 	after_needs_store = needs_store;
 	after_spilled = needs_spilling;
     }
 
+    for(i = 0; i < old_n_instructions; i++) {
+	free_ins(old_instructions[i]);
+    }
     free(old_instructions);
+    free(buf);
 
     /* old_symbol doesn't get deleted. It simply loses all references from 
        instructions. So this means that the symbol table gets polluted with 
@@ -482,6 +535,9 @@ void spill(int spilled) {
     if(IMCC_DEBUG) 
         dump_instructions();
 
+#if 0
+/*     first, last is recaled in compute_du_chain */
+
     /* Now go through the symbols and fix up their first and last offsets */
     for(i = 0; i < HASH_SIZE; i++) {
         SymReg * r = hash[i];
@@ -492,6 +548,8 @@ void spill(int spilled) {
             }
         }
     }
+#endif
+    free(offset);
 }
 
 int neighbours(int node) {

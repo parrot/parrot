@@ -4,10 +4,10 @@
 
 /* Stack functions. Stolen from rxstacks.c */
 
-IntStack
-intstack_new()
+IMCStack
+imcstack_new()
 {
-    IntStack stack = malloc(sizeof(struct IntStack_chunk_t));
+    IMCStack stack = malloc(sizeof(struct IMCStack_chunk_t));
     stack->used = 0;
     stack->next = stack;
     stack->prev = stack;
@@ -15,9 +15,9 @@ intstack_new()
 }
 
 int
-intstack_depth(IntStack stack)
+imcstack_depth(IMCStack stack)
 {
-    IntStack_Chunk chunk;
+    IMCStack_Chunk chunk;
     int depth = stack->used;
 
     for (chunk = stack->next; chunk != stack; chunk = chunk->next)
@@ -27,17 +27,30 @@ intstack_depth(IntStack stack)
 }
 
 void
-intstack_push(IntStack stack, int data)
+imcstack_free(IMCStack stack)
 {
-    IntStack_Chunk chunk = stack->prev;
-    IntStack_Entry entry = &chunk->entry[chunk->used];
+    IMCStack_Chunk chunk, next;
+
+    for (chunk = stack->next; chunk != stack; ) {
+       next = chunk->next;
+        free(chunk);
+       chunk = next;
+    }
+    free(stack);
+}
+
+void
+imcstack_push(IMCStack stack, int data)
+{
+    IMCStack_Chunk chunk = stack->prev;
+    IMCStack_Entry entry = &chunk->entry[chunk->used];
 
     entry->value = data;
 
     /* Register the new entry */
     if (++chunk->used == STACK_CHUNK_DEPTH) {
         /* Need to add a new chunk */
-        IntStack_Chunk new_chunk = malloc(sizeof(*new_chunk));
+        IMCStack_Chunk new_chunk = malloc(sizeof(*new_chunk));
         new_chunk->used = 0;
         new_chunk->next = stack;
         new_chunk->prev = chunk;
@@ -48,10 +61,10 @@ intstack_push(IntStack stack, int data)
 }
 
 int
-intstack_pop(IntStack stack)
+imcstack_pop(IMCStack stack)
 {
-    IntStack_Chunk chunk = stack->prev;
-    IntStack_Entry entry;
+    IMCStack_Chunk chunk = stack->prev;
+    IMCStack_Entry entry;
 
     /* We may have an empty chunk at the end of the list */
     if (chunk->used == 0 && chunk != stack) {

@@ -149,6 +149,12 @@ Instruction * emitb(Instruction * i) {
     return i;
 }
 
+void free_ins(Instruction *ins)
+{
+    free(ins->fmt);
+    free(ins);
+}
+
 Instruction * emit(Instruction * i) {
     printf(i->fmt, i->r0->reg, i->r1->reg, i->r2->reg, i->r3->reg);
     printf("\n");

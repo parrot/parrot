@@ -5,17 +5,19 @@
 DEBUG = -g
 # GCC
 #CC = gcc -efence -Wall -pedantic
-CC = gcc -Wall -pedantic
+CC = gcc -Wall $(DEBUG) -pedantic -I../../include
 YACC = bison -v -y
 LEX = flex
-LIBS =
+LIBS = -lm -ldl
 #LIBS = -lefence
 #LIBS = -ll -ly
 
-HEADERS = imc.h imcparser.h stacks.h cfg.h instructions.h cfg.h debug.h sets.h
+HEADERS = imc.h imcparser.h stacks.h cfg.h instructions.h cfg.h debug.h \
+	sets.h anyop.h
 
 default :
 	$(MAKE) imcc
+	cd ../..; $(MAKE) shared; rm -f parrot parrot.exe; $(MAKE)
 
 clean :
 	rm -f core
@@ -30,7 +32,7 @@ realclean:
 	rm -f a.pasm
 	rm -f imcparser.*
 	rm -f imclexer.*
-	
+
 imcparser.c : imcc.y
 	$(YACC) -d -o imcparser.c imcc.y
 
@@ -51,7 +53,7 @@ type.o : type.c $(HEADERS)
 
 imc.o : imc.c $(HEADERS)
 	$(CC) $(DEBUG) -c imc.c
-	
+
 stacks.o: stacks.c $(HEADERS)
 	$(CC) $(DEBUG) -c stacks.c
 
@@ -70,6 +72,12 @@ sets.o: sets.c $(HEADERS)
 debug.o: debug.c $(HEADERS)
 	$(CC) $(DEBUG) -c debug.c
 
-imcc : imcparser.o imclexer.o imc.o stacks.o symreg.o instructions.o cfg.o sets.o debug.o
-	$(CC) $(DEBUG) -o imcc imc.o imcparser.o imclexer.o stacks.o symreg.o instructions.o cfg.o sets.o debug.o $(LIBS)
+anyop.o: anyop.c $(HEADERS)
+	$(CC) $(DEBUG) -c anyop.c
+
+imcc : imcparser.o imclexer.o imc.o stacks.o symreg.o instructions.o cfg.o \
+	sets.o debug.o anyop.o ../../platform.o
+
+	$(CC) $(DEBUG) -o imcc imc.o imcparser.o imclexer.o stacks.o symreg.o \
+		instructions.o cfg.o sets.o debug.o anyop.o ../../platform.o $(LIBS)
 

@@ -24,6 +24,7 @@ int yyerror(char *);
 
 LETTER          [a-zA-Z_]
 DIGIT           [0-9]
+DOT		[.]
 LETTERDIGIT     [a-zA-Z0-9_]
 SIGN            [-+]
 STRINGCONSTANT  \"[^"\n]*["\n]
@@ -80,7 +81,7 @@ RANKSPEC        \[[,]*\]
 "addr"          return(ADDR);
 "global"        return(GLOBAL);
 "clone"         return(CLONE);
-"string"        return(STRING);
+"string"        return(STRINGV);
 "call"          return(CALL);
 "print"         return(PRINT);
 "push"          return(PUSH);
@@ -98,6 +99,7 @@ RANKSPEC        \[[,]*\]
 "=="            return(RELOP_EQ);
 "!="            return(RELOP_NE);
 "**"            return(POW);
+","             return(COMMA);
 
 {LETTER}{LETTERDIGIT}*":" {
 	yytext[yyleng-1] = 0;  /* trim last ':' */
@@ -105,7 +107,7 @@ RANKSPEC        \[[,]*\]
         return(LABEL);
     }
 
-{LETTER}{LETTERDIGIT}* {
+{DOT}?{LETTER}{LETTERDIGIT}* {
         yylval.s = str_dup(yytext);
         return(IDENTIFIER);
     }

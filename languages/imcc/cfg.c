@@ -30,6 +30,7 @@ void find_basic_blocks () {
     nu = 0;
     ins = NULL;
     
+    instructions[0]->bbindex = 0;
     for(j = 1; instructions[j]; j++) {
 
 	next = instructions[j];
@@ -52,6 +53,7 @@ void find_basic_blocks () {
 	else {
 	    next->basic_block = bb;
 	}
+	instructions[j]->bbindex = n_basic_blocks - 1;
 	
 	ins = next;
     }
@@ -398,8 +400,11 @@ void init_basic_blocks() {
 }
 
 void clear_basic_blocks() {
-   free(bb_list);
-   bb_list = NULL;
+    int i;
+    for (i=0; i < n_basic_blocks; i++)
+	free(bb_list[i]);
+    free(bb_list);
+    bb_list = NULL;
 }
 
 Basic_block* make_basic_block(Instruction* ins) {

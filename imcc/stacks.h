@@ -3,20 +3,20 @@
 
 #define STACK_CHUNK_DEPTH 256
 
-typedef struct IntStack_entry_t {
+typedef struct IMCStack_entry_t {
    int value;
-} *IntStack_Entry;
+} *IMCStack_Entry;
 
-typedef struct IntStack_chunk_t {
+typedef struct IMCStack_chunk_t {
     int used;
-    struct IntStack_chunk_t *next;
-    struct IntStack_chunk_t *prev;
-    struct IntStack_entry_t entry[STACK_CHUNK_DEPTH];
-} *IntStack_Chunk;
+    struct IMCStack_chunk_t *next;
+    struct IMCStack_chunk_t *prev;
+    struct IMCStack_entry_t entry[STACK_CHUNK_DEPTH];
+} *IMCStack_Chunk;
 
-typedef IntStack_Chunk IntStack;
-IntStack intstack_new();
-int intstack_depth(IntStack);
-void intstack_push(IntStack, int);
-int intstack_pop(IntStack);
+typedef IMCStack_Chunk IMCStack;
+IMCStack imcstack_new();
+int imcstack_depth(IMCStack);
+void imcstack_push(IMCStack, int);
+int imcstack_pop(IMCStack);
 

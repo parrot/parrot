@@ -13,10 +13,11 @@
 #include <stdio.h>
 #include <stdlib.h> 
 #include <sysexits.h>
+#include <assert.h>
 #include "imc.h"
+#include "anyop.h"
 
 #define YYDEBUG 1
-
 
 int         yyerror(char *);
 int         yylex();
@@ -219,6 +220,7 @@ SymReg * iINDEXFETCH(SymReg * r0, SymReg * r1, SymReg * r2) {
     }
     else if (r1->set == 'P') {
 	emitb(mk_instruction("set %s, %s[%s]", r0, r1, r2, NULL, IF_binary));
+	r1->score = 1000;
     }
     else {
         fprintf(stderr, "FIXME: Internal error, unsupported indexed fetch operation\n");
@@ -237,7 +239,8 @@ SymReg * iINDEXSET(SymReg * r0, SymReg * r1, SymReg * r2) {
     else if (r0->set == 'P') {
 	/* XXX: SEAN: is "read" right for setting an array?  */
 	emitb(mk_instruction("set %s[%s], %s", r0, r1, r2, NULL,
-			     IF_r0_read | IF_r1_read | IF_r2_read));
+			     IF_r0_write | IF_r1_read | IF_r2_read));
+	r0->score = 1000;
     }
     else {
         fprintf(stderr, "FIXME: Internal error, unsupported indexed set operation\n");
@@ -348,6 +351,98 @@ SymReg * iEND() {
     return 0;
 }
 
+int nargs = 0;
+SymReg * args[16] = { NULL };
+
+static void
+op_fullname(char * dest, const char * name, SymReg * args[], int nargs) {
+    int i;
+    int key_index = -1;
+    
+    strcpy(dest, name);
+    dest += strlen(name);
+    if (strcmp(name, "set") == 0) {
+	if (args[0]->set == 'P' && args[1]->set != 'P') {
+	    key_index = 1;
+	}
+	else if (args[1]->set == 'P' && args[2]->set != 'P') {
+	    key_index = 2;
+	}
+	else {
+	    fprintf(stderr, "Can't figure out keyed op!\n");
+	    exit(EX_SOFTWARE);
+	}
+    }
+    for (i = 0; i < nargs; i++) {
+	char set;
+	if (args[i]->type == VTADDRESS)
+	    set = 'I';
+	else
+	    set = args[i]->set;
+	
+	*dest++ = '_';
+	if (key_index == i)
+	    *dest++ = 'k';
+	*dest++ = tolower(set);
+	if (args[i]->type == VTCONST || args[i]->type == VTADDRESS)
+	    *dest++ = 'c';
+    }
+    *dest = '\0';
+}
+ 
+SymReg * iANY(char * name) {
+    char fullname[64];
+    int i;
+    int dirs = 0;
+    op_t op;
+    op_fullname(fullname, name, args, nargs);
+    op = op_find_exact(fullname);
+    if (!same_op(op, NULLOP)) {
+	op_info_t * info = op_info(op);
+	char format[128];
+	int len;
+	if (IMCC_DEBUG) {
+	    fprintf(stderr, "Op %s (%d, %d)\n", name, op.lib, op.op);
+	    print_op_info(stderr, info);
+	}
+
+	sprintf(format, "%s  ", name);
+	for (i = 1; i < info->arg_count; i++) {
+	    switch (info->dirs[i]) {
+	    case PARROT_ARGDIR_IN:
+		dirs |= 1 << (i - 1);
+		break;
+
+	    case PARROT_ARGDIR_OUT:
+		dirs |= 1 << (4 + i - 1);
+		break;
+
+	    case PARROT_ARGDIR_INOUT:
+		dirs |= 1 << (i - 1) | 1 << (4 + i - 1);
+		break;
+
+	    default:
+		assert(0);
+	    };
+	    strcat(format, "%s, ");
+	}
+	if (info->jump) {
+	    /* XXX: assume the jump is relative to the last arg.
+	     * usually true. */
+	    dirs |= 1 << (8 + nargs - 2);
+	}
+	len = strlen(format);
+	len -= 2;
+	format[len] = '\0';
+	emitb(mk_instruction(format, args[0], args[1], args[2], args[3],
+			     dirs));
+    } else {
+	fprintf(stderr, "NO Op %s (%s<%d>)\n", fullname, name, nargs);
+	exit(EX_SOFTWARE);
+    }
+    return NULL;
+}
+
 void relop_to_op(int relop, char * op) {
     switch(relop) {
         case RELOP_EQ:    strcpy(op, "eq"); return;
@@ -372,16 +467,18 @@ void relop_to_op(int relop, char * op) {
 
 %token <i> CALL GOTO BRANCH ARG RET PRINT IF UNLESS NEW END SAVEALL RESTOREALL
 %token <i> SUB NAMESPACE CLASS ENDCLASS SYM LOCAL PARAM PUSH POP INC DEC
-%token <i> SHIFT_LEFT SHIFT_RIGHT INT FLOAT STRING DEFINED LOG_XOR
+%token <i> SHIFT_LEFT SHIFT_RIGHT INT FLOAT STRINGV DEFINED LOG_XOR
 %token <i> RELOP_EQ RELOP_NE RELOP_GT RELOP_GTE RELOP_LT RELOP_LTE
 %token <i> GLOBAL ADDR CLONE RESULT RETURN POW
+%token <i> COMMA
 %token <s> EMIT LABEL
 %token <s> IREG NREG SREG PREG IDENTIFIER STRINGC INTC FLOATC
 %type <i> type program subs sub sub_start relop
-%type <s> classname
+%type <s> classname opname
 %type <sr> labels label statements statement
 %type <sr> instruction assignment if_statement
 %type <sr> target reg const var rc string
+%type <sr> vars _vars var_or_i
 
 %start program 
 
@@ -463,7 +560,7 @@ instruction:
 type:
         INT { $$ = 'I'; }
     |   FLOAT { $$ = 'N'; }
-    |   STRING { $$ = 'S'; }
+    |   STRINGV { $$ = 'S'; }
     |   classname { $$ = 'P'; }
     ;
 
@@ -496,6 +593,8 @@ assignment:
     |  labels target '=' ADDR IDENTIFIER        { $$ = iSET_ADDR($2, mk_address($5)); }
     |  labels target '=' GLOBAL string          { $$ = iGET_GLOBAL($2, $5); }
     |  labels GLOBAL string '=' var             { $$ = iSET_GLOBAL($3, $5); }
+    |  labels opname { nargs = 0; memset(args, 0, sizeof(args)); }
+                                    vars        { $$ = iANY($2); }
     ;
 
 if_statement:
@@ -516,10 +615,27 @@ relop:
     |  RELOP_LTE { $$ = RELOP_LTE; }
     ;
 
+opname:
+    IDENTIFIER { $$ = $1; }
+    ;
+
 target:
        IDENTIFIER
        { $$ = get_sym($1); }
     |  reg 
+    ;
+
+vars:  { $$ = NULL; }
+    |  _vars { $$ = $1; }
+    ;
+
+_vars: _vars COMMA var_or_i { args[nargs++] = $3; $$ = args[0]; }
+    |  var_or_i { args[nargs++] = $1; $$ = $1; }
+    ;
+
+var_or_i:
+       IDENTIFIER { $$ = mk_address($1); }
+    |  rc
     ;
 
 var:
@@ -584,6 +700,13 @@ int main(int argc, char * argv[])
         exit(EX_IOERR);
     }
    
+    if (IMCC_DEBUG)
+	fprintf(stderr, "loading libs...");
+    op_load_file("../../blib/lib/libparrot.so");
+    op_load_lib("core", 0, 0, 7);
+    if (IMCC_DEBUG)
+	fprintf(stderr, "done\n");
+
     line = 1;
 
     if (IMCC_DEBUG)
@@ -619,6 +742,3 @@ int yyerror(char * s)
     fprintf(stderr, "Didn't create output asm.\n" );
     exit(EX_UNAVAILABLE);
 }
-
-
-

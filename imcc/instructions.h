@@ -17,8 +17,9 @@ typedef struct _Instruction {
     SymReg * r3;
     long flags;            /* how the instruction affects each of the values */    
     int type;
-    void * basic_block;    /* basic block */
+    struct _basic_block * basic_block;    /* basic block */
     int index;             /* index on instructions[] */
+    int bbindex;	   /* nr of bb, where ins is in */
 } Instruction;
 
 

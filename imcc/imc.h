@@ -20,7 +20,7 @@
 void relop_to_op(int, char * x);
 void compute_du_chain(SymReg * r);
 int interferes(SymReg * r0, SymReg * r1);
-int map_colors(int x, SymReg ** graph, int colors[]);
+int map_colors(int x, SymReg ** graph, int colors[], int typ);
 void build_interference_graph();
 void allocate();
 int simplify ();
