@@ -50,7 +50,7 @@ def main():
     check_functions()
     check_functions(j=10, i=10)
     for i in range(0,500,249):
-	print "i:", i
+        print "i:", i
         check_functions(j=long(i*1000000), i=i*1000000)
 
 if __name__ == '__main__':
@@ -76,7 +76,7 @@ def main():
     check_functions()
     check_functions(j=10, i=10)
     for i in range(0,500,249):
-	print "i:", i
+        print "i:", i
         check_functions(j=long(i*1000000), i=i*1000000)
 
 if __name__ == '__main__':
@@ -103,7 +103,7 @@ def main():
     check_functions()
     check_functions(j=10, i=10)
     for i in range(0,500,249):
-	print "i:", i
+        print "i:", i
         check_functions(j=long(i*1000000), i=i*1000000)
 
 if __name__ == '__main__':
@@ -130,7 +130,7 @@ def main():
     check_functions()
     check_functions(j=10, i=10)
     for i in range(0,500,249):
-	print "i:", i
+        print "i:", i
         check_functions(j=long(i*1000000), i=i*1000000)
 
 if __name__ == '__main__':
@@ -156,7 +156,7 @@ def main():
     check_functions()
     check_functions(j=10, i=10)
     for i in range(0,500,249):
-	print "i:", i
+        print "i:", i
         check_functions(j=long(i*1000000), i=i*1000000)
 
 if __name__ == '__main__':
@@ -180,7 +180,7 @@ def main():
     check_functions()
     check_functions(j=10, i=10)
     for i in range(0,500,249):
-	print "i:", i
+        print "i:", i
         check_functions(j=long(i*1000000), i=i*1000000)
 
 if __name__ == '__main__':
@@ -204,8 +204,8 @@ def main():
     check_functions()
     check_functions(j=10, i=10)
     for i in range(0,500,249):
-	print "i:", i
-	check(filter(lambda x: x < 5, range(10)), range(5))
+        print "i:", i
+        check(filter(lambda x: x < 5, range(10)), range(5))
 
 if __name__ == '__main__':
     main()
@@ -228,10 +228,10 @@ def main():
     check_functions()
     check_functions(j=10, i=10)
     for i in range(0,500,249):
-	print "i:", i
-	check(float("1.5"), 1.5)
-	check(float(15*i), 15.0*i)
-	check(float(10**100), 1e100)
+        print "i:", i
+        check(float("1.5"), 1.5)
+        check(float(15*i), 15.0*i)
+        check(float(10**100), 1e100)
 
 if __name__ == '__main__':
     main()
@@ -254,11 +254,11 @@ def main():
     check_functions()
     check_functions(j=10, i=10)
     for i in range(0,500,249):
-	print "i:", i
-	check(hash(42), hash(42L))
-	check(hash(42), hash(42.0))
-	check(hash(42+0j), hash(42.0))
-	print hash("abc") == hash(u"abc")
+        print "i:", i
+        check(hash(42), hash(42L))
+        check(hash(42), hash(42.0))
+        check(hash(42+0j), hash(42.0))
+        print hash("abc") == hash(u"abc")
 
 if __name__ == '__main__':
     main()
@@ -281,9 +281,9 @@ def main():
     check_functions()
     check_functions(j=10, i=10)
     for i in range(0,500,249):
-	print "i:", i
-	check(hex(42).lower(), "0x2a")
-	check(hex(42L).lower(), "0x2al")
+        print "i:", i
+        check(hex(42).lower(), "0x2a")
+        check(hex(42L).lower(), "0x2al")
 
 if __name__ == '__main__':
     main()
@@ -306,14 +306,14 @@ def main():
     check_functions()
     check_functions(j=10, i=10)
     for i in range(0,500,249):
-	print "i:", i
-	check(int("42"), 42)
-	check(int("12345678910"), 12345678910)
-	check(int("42", 0), 42)
-	check(int("042", 0), 34)
-	check(int("0x42", 0), 66)
-	check(int("42", 8), 34)
-	check(int("42", 16), 66)
+        print "i:", i
+        check(int("42"), 42)
+        check(int("12345678910"), 12345678910)
+        check(int("42", 0), 42)
+        check(int("042", 0), 34)
+        check(int("0x42", 0), 66)
+        check(int("42", 8), 34)
+        check(int("42", 16), 66)
 
 if __name__ == '__main__':
     main()
@@ -336,10 +336,10 @@ def main():
     check_functions()
     check_functions(j=10, i=10)
     for i in range(0,500,249):
-	print "i:", i
-	check(list((1, 2, 3)), [1, 2, 3])
-	check(list("abc"), ['a', 'b', 'c'])
-	check(list(u"abc"), ['a', 'b', 'c'])
+        print "i:", i
+        check(list((1, 2, 3)), [1, 2, 3])
+        check(list("abc"), ['a', 'b', 'c'])
+        check(list(u"abc"), ['a', 'b', 'c'])
 
 if __name__ == '__main__':
     main()
@@ -362,14 +362,14 @@ def main():
     check_functions()
     check_functions(j=10, i=10)
     for i in range(0,500,249):
-	print "i:", i
-	check(long("42"), 42)
-	check(long("12345678910"), 12345678910)
-	check(long("42", 0), 42)
-	check(long("042", 0), 34)
-	check(long("0x42", 0), 66)
-	check(long("42", 8), 34)
-	check(long("42", 16), 66)
+        print "i:", i
+        check(long("42"), 42)
+        check(long("12345678910"), 12345678910)
+        check(long("42", 0), 42)
+        check(long("042", 0), 34)
+        check(long("0x42", 0), 66)
+        check(long("42", 8), 34)
+        check(long("42", 16), 66)
 
 if __name__ == '__main__':
     main()
@@ -380,7 +380,7 @@ show = True
 
 def check(a, b):
     if __debug__:
-	if show:
+        if show:
             print `a`, "==", `b`
     if not a == b:
         raise AssertionError("%.30r != %.30r" % (a, b))

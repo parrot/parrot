@@ -131,10 +131,10 @@ def main():
     N = 20000
     K = 1
     for i in range(N):
-	a.append(i)
+        a.append(i)
     for i in range(N):
-	if a[i] != i:
-	    print a[i]
+        if a[i] != i:
+            print a[i]
     print "A", a[:K], a[N//2:N//2+K], a[-K:]
 
 main()
