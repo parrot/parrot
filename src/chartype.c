@@ -14,14 +14,10 @@
 
 /* 
  * Unicode mapping table
- * Type 1 = simple array of unicode code points (always 256 for now)
- * Type 2 = array of ranges (not yet implemented)
  */
 struct chartype_unicode_map_t {
-    int type;
-    union {
-        INTVAL *cparray;
-    } u;
+    UINTVAL n1;
+    INTVAL *cparray;
 };
 
 
@@ -39,7 +35,7 @@ static int transcoder_count = 0;
 struct chartype_digit_map_t default_digit_map = { 0x30, 0x39, 0 };
 
 /*
- * Register a chartype entry and its transcoders
+ * Register a chartype entry and TODO its transcoders
  */
 static void
 chartype_register(CHARTYPE *type)
@@ -74,28 +70,35 @@ malloc_and_strcpy(const char *in)
     return out;
 }
 
-/* TODO Currently handles type 1 maps only */
 static UINTVAL
 chartype_to_unicode_cparray(const CHARTYPE *from, const CHARTYPE *to, UINTVAL c)
 {
-    return from->unicode_map->u.cparray[c];
+    const struct chartype_unicode_map_t *map = from->unicode_map;
+    if (c < map->n1)
+        return c;
+    else {
+        return map->cparray[c - map->n1];
+    }
 }
 
-/* TODO 
- *    Currently handles type 1 maps only (with 256 entry fixed size)
- *    SLOW! - Need a reverse mapping (hash or sparse array)
- */
 static UINTVAL
 chartype_from_unicode_cparray(const CHARTYPE *from, const CHARTYPE *to, 
                               UINTVAL c)
 {
-    int i;
-    for (i=0; i<256; i++) {
-        if (to->unicode_map->u.cparray[i] == (INTVAL)c)
-            return i;
+    const struct chartype_unicode_map_t *map = to->unicode_map;
+    if (c < map->n1) {
+        return c;
     }
-    internal_exception(INVALID_CHARACTER, "Invalid character for chartype\n");
-    return 0;
+    else {
+        UINTVAL i;
+        for (i = 0; i < 256 - map->n1; i++) {
+            if (map->cparray[i] == (INTVAL)c)
+                return i + map->n1;
+        }
+        internal_exception(INVALID_CHARACTER, 
+                           "Invalid character for chartype\n");
+        return 0;
+    }
 }
 
 /*
@@ -117,8 +120,9 @@ chartype_create_from_mapping(const char *name)
     char line[80];
     INTVAL typecode;
     INTVAL unicode;
-    INTVAL *cparray;
+    INTVAL *cparray = NULL;
     struct chartype_unicode_map_t *map;
+    int one2one = 0;
 
     path = mem_sys_allocate(strlen(name) + 32);
     sprintf(path, "runtime/parrot/chartypes/%s.TXT", name);
@@ -128,15 +132,22 @@ chartype_create_from_mapping(const char *name)
         return NULL;
     }
 
-    cparray = mem_sys_allocate(256 * sizeof(INTVAL));
-    memset(cparray, 0, 256 * sizeof(INTVAL));
-    
     while (!feof(f)) {
         char *p = fgets(line, 80, f);
         if (line[0] != '#') {
             int n = sscanf(line, "%li\t%li", &typecode, &unicode);
             if (n == 2 && typecode >= 0 && typecode < 256) {
-                cparray[typecode] = unicode;
+                if (typecode == one2one && unicode == typecode) {
+                    one2one++;
+                }
+                else {
+                    if (!cparray) {
+                        int size = (256 - one2one) * sizeof(INTVAL);
+                        cparray = mem_sys_allocate(size);
+                        memset(cparray, 0xFF, size);
+                    }
+                    cparray[typecode-one2one] = unicode;
+                }
             }
         }
     }
@@ -150,8 +161,8 @@ chartype_create_from_mapping(const char *name)
     type->get_digit = chartype_get_digit_map1;
     type->digit_map = &default_digit_map;
     map = mem_sys_allocate(sizeof(struct chartype_unicode_map_t));
-    map->type = 1;
-    map->u.cparray = cparray;
+    map->n1 = one2one;
+    map->cparray = cparray;
     type->unicode_map = map;
     type->from_unicode = chartype_from_unicode_cparray;
     type->to_unicode = chartype_to_unicode_cparray;
