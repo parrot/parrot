@@ -34,12 +34,12 @@ sub multimethod {
 
     if ($type eq "int") {
         push @rv, 
-            [ (join ",", ("p", ("p") x ($count-2), "i")), $name."_native"];
+            [ (join ",", ("p", ("p") x ($count-2), "i|ic")), $name."_native"];
     }
     if ($type eq "num") {
         push @rv, 
-            [ (join ",", ("p", ("p") x ($count-2), "n")), $name."_float"],
-            [ (join ",", ("p", ("p") x ($count-2), "i")), $name."_int"];
+            [ (join ",", ("p", ("p") x ($count-2), "n|nc")), $name."_float"],
+            [ (join ",", ("p", ("p") x ($count-2), "i|ic")), $name."_int"];
     }
     if ($type eq "str") {
         push @rv, 
