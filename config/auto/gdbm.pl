@@ -48,9 +48,9 @@ sub runstep {
 
     cc_gen('config/auto/gdbm/gdbm.in');
     if ($^O =~ /mswin32/i) {
-      eval { cc_build('', 'gdbm.lib'); };
+        eval { cc_build('', 'gdbm.lib'); };
     } else { 
-    eval { cc_build('', '-lgdbm'); };
+        eval { cc_build('', '-lgdbm'); };
     }
     my $has_gdbm = 0;
     if (! $@) {

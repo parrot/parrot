@@ -296,7 +296,7 @@ sub generate_functions {
             if ( $func =~ /^pir_output/ ) {
                 $code_f = per_test('.imc', $test_no);
             }
-            elsif ( $func =~ m/^output_/ ) {
+            elsif ( $func =~ m/^output_/ || $func =~ m/^pasm_output_/ ) {
                 $code_f = per_test('.pasm', $test_no);
             }
             elsif ( $func =~ /^pir_2_pasm_/) {
