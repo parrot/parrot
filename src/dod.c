@@ -25,10 +25,10 @@ static size_t find_common_mask(size_t val1, size_t val2);
 PMC *
 mark_used(PMC *used_pmc, PMC *current_end_of_list)
 {
-    /* If the PMC we've been handed has already been marked as live (ie we put 
+    /* If the PMC we've been handed has already been marked as live (ie we put
      * it on the list already) we just return. Otherwise we could get in some
      * nasty loops */
-    /* Also, be sure to check that we don't mark PMCs that are already part of 
+    /* Also, be sure to check that we don't mark PMCs that are already part of
      * the free list. This can happen with a conservative marking routine
      * which marks dead PMCs as live, such as a C stack walk */
     if (used_pmc->next_for_GC || used_pmc->flags & PMC_on_free_list_FLAG) {
@@ -99,7 +99,7 @@ trace_active_PMCs(struct Parrot_Interp *interpreter)
         stash = stash->parent_stash;
     }
 
-    /* Now walk the pmc stack. Make sure to walk from top down since stack may 
+    /* Now walk the pmc stack. Make sure to walk from top down since stack may
      * have segments above top that we shouldn't walk. */
     for (cur_chunk = interpreter->ctx.pmc_reg_top; cur_chunk;
             cur_chunk = cur_chunk->prev) {
@@ -171,7 +171,7 @@ trace_active_PMCs(struct Parrot_Interp *interpreter)
     for (; current != prev; current = current->next_for_GC) {
         UINTVAL bits = current->flags & mask;
 
-        /* Start by checking if there's anything at all. This assumes that the 
+        /* Start by checking if there's anything at all. This assumes that the
          * largest percentage of PMCs won't have anything in their data
          * pointer that we need to trace */
         if (bits) {
@@ -222,7 +222,7 @@ trace_active_buffers(struct Parrot_Interp *interpreter)
     Stack_Entry_t *entry;
 
     /* First mark the current set. We assume that all pointers in S registers
-     * are pointing to valid buffers. This is not a good assumption, but it'll 
+     * are pointing to valid buffers. This is not a good assumption, but it'll
      * do for now */
     for (i = 0; i < NUM_REGISTERS; i++) {
         Buffer *reg = (Buffer *)interpreter->ctx.string_reg.registers[i];
@@ -431,6 +431,8 @@ free_unused_buffers(struct Parrot_Interp *interpreter,
                             pool->mem_pool)->possibly_reclaimable += b->buflen;
                 }
 #endif
+                if (object_size > sizeof(Buffer))
+                    memset(b + 1, 0, object_size - sizeof(Buffer));
                 add_free_buffer(interpreter, pool, b);
             }
             else if (!(b->flags & BUFFER_on_free_list_FLAG)) {
@@ -572,15 +574,17 @@ Parrot_do_dod_run(struct Parrot_Interp *interpreter)
             header_pool = interpreter->arena_base->buffer_header_pool;
         else
             header_pool = interpreter->arena_base->sized_header_pools[j];
-        /* this should be: if (header_pool) { but this breaks users of
-         * buffer_like_headers e.g. hash or list something is wrong in DOD */
-        if (header_pool && j < 0) {
+        if (header_pool) {
             free_unused_buffers(interpreter, header_pool, 0);
         }
     }
-    /* update mem stats */
+#ifdef GC_IS_MALLOC
+    /* update mem stats - not, it's time consuming, this should
+     * be done on demand, i.e. before using/printing it
+     */
 #if 0
     interpreter->memory_allocated = mallinfo().uordblks;
+#endif
 #endif
     /* Note it */
     interpreter->dod_runs++;
