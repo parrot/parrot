@@ -16,5 +16,5 @@ echo "run-yamd -l2 -f -n ./parrot.orig  \$@ 2>&1 | perl -ne'
 	print \$1 if (/((?:WARNI|ERROR).*)/);
 	1;'" > parrot
 chmod 755 parrot
-perl t/harness --gc-debug --running-make-test -j quick $@
+perl t/harness --gc-debug --running-make-test -j --leak-test $@
 cleanup

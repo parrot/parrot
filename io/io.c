@@ -154,11 +154,17 @@ PIO_finish(theINTERP)
     fflush(stdout);
     fflush(stderr);
 
+#if 0
+    /* new_io_pmc isn't possible aynmore  - mem subsystem is down already */
+
+    /* TODO: close std descriptors */
+
     for (i = 0 ; i < PIO_NR_OPEN; i++) {
         if ( (io = GET_INTERP_IOD(interpreter)->table[i]) ) {
             PIO_close(interpreter, new_io_pmc(interpreter, io));
         }
     }
+#endif
     for (p = GET_INTERP_IO(interpreter); p; ) {
         down = p->down;
         if (p->api->Delete)
@@ -466,7 +472,7 @@ PIO_setlinebuf(theINTERP, PMC *pmc)
 
     while (l) {
         if (l->api->SetLineBuf) {
-            ParrotIO *io = PMC_data(pmc);            
+            ParrotIO *io = PMC_data(pmc);
             return (*l->api->SetLineBuf) (interpreter, l, io);
         }
         l = PIO_DOWNLAYER(l);
@@ -684,7 +690,7 @@ PIO_puts(theINTERP, PMC *pmc, const char *s)
 }
 
 INTVAL
-PIO_putps(theINTERP, PMC *pmc, STRING *s) 
+PIO_putps(theINTERP, PMC *pmc, STRING *s)
 {
     INTVAL retVal;
 
@@ -720,7 +726,7 @@ PIO_printf(theINTERP, const char *s, ...) {
     str=Parrot_vsprintf_c(interpreter, s, args);
 
     if(interpreter) {
-        ret=PIO_putps(interpreter, 
+        ret=PIO_putps(interpreter,
                       new_io_pmc(interpreter, PIO_STDOUT(interpreter)), str);
     }
     else {
@@ -748,7 +754,7 @@ PIO_eprintf(theINTERP, const char *s, ...) {
     if(interpreter) {
         str=Parrot_vsprintf_c(interpreter, s, args);
 
-        ret=PIO_putps(interpreter, 
+        ret=PIO_putps(interpreter,
                       new_io_pmc(interpreter, PIO_STDERR(interpreter)), str);
     }
     else {
