@@ -260,8 +260,7 @@ END_C
 
 #print STDERR "Top level op chars: ", keys %$remembered_ops, "\n";
 
-#BD 9 March 2002: Cuts core size by 50K on my box
-#generate_switch($remembered_ops);
+generate_switch($remembered_ops);
 
 print SOURCE <<END_C;
 }
