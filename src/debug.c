@@ -431,7 +431,7 @@ PDB_cond(struct Parrot_Interp *interpreter, const char *command)
 
     /* return if no more arguments */
     if (!(command && *command)) {
-        free(condition);
+        mem_sys_free(condition);
         return NULL;
     }
 
@@ -454,7 +454,7 @@ PDB_cond(struct Parrot_Interp *interpreter, const char *command)
             break;
         default:
             PIO_eprintf(interpreter, "First argument must be a register\n");
-            free(condition);
+            mem_sys_free(condition);
             return NULL;
     }
 
@@ -462,7 +462,7 @@ PDB_cond(struct Parrot_Interp *interpreter, const char *command)
     condition->reg = atoi(++command);
     if (condition->reg >= NUM_REGISTERS ) {
         PIO_eprintf(interpreter, "Out-of-bounds register\n");
-        free(condition);
+        mem_sys_free(condition);
         return NULL;
     }
 
@@ -508,7 +508,7 @@ PDB_cond(struct Parrot_Interp *interpreter, const char *command)
             break;
         default:
 INV_COND:   PIO_eprintf(interpreter, "Invalid condition\n");
-            free(condition);
+            mem_sys_free(condition);
             return NULL;
     }
 
@@ -522,7 +522,7 @@ INV_COND:   PIO_eprintf(interpreter, "Invalid condition\n");
 
     /* return if no more arguments */
     if (!(command && *command)) {
-        free(condition);
+        mem_sys_free(condition);
         return NULL;
     }
 
@@ -533,7 +533,7 @@ INV_COND:   PIO_eprintf(interpreter, "Invalid condition\n");
         reg_number = (int)atoi(++command);
         if (reg_number >= (int) NUM_REGISTERS || reg_number < 0) {
             PIO_eprintf(interpreter, "Out-of-bounds register\n");
-            free(condition);
+            mem_sys_free(condition);
             return NULL;
         }
         condition->value = (void *)mem_sys_allocate(sizeof(int));
@@ -589,6 +589,7 @@ PDB_set_break(struct Parrot_Interp *interpreter, const char *command)
 {
     PDB_t *pdb = interpreter->pdb;
     PDB_breakpoint_t *newbreak,*sbreak;
+    PDB_condition_t *condition;
     PDB_line_t *line;
     long ln,i;
 
@@ -627,35 +628,54 @@ PDB_set_break(struct Parrot_Interp *interpreter, const char *command)
         i++;
     }
 
-    /* Revive the breakpoint if was deleted */
-    if (sbreak && sbreak->skip == -1) {
-        PIO_fprintf(interpreter, PIO_STDERR(interpreter),
-                    "Breakpoint %li at line %li\n",i,line->number);
-        sbreak->skip = 0;
-        return;
-    }
     /* Don't do anything if there is already a breakpoint at this line */
-    if (sbreak) {
+    if (sbreak && sbreak->skip > -1) {
         PIO_fprintf(interpreter, PIO_STDERR(interpreter),
                     "Breakpoint %li already at line %li\n",i,line->number);
         return;
     }
 
+    /* Revive the breakpoint if was deleted */
+    if (sbreak && sbreak->skip == -1) {
+        sbreak->skip = 0;
+    }
+    else {
     /* Allocate the new break point */
-    newbreak = (PDB_breakpoint_t *)mem_sys_allocate(sizeof(PDB_breakpoint_t));
+        newbreak = (PDB_breakpoint_t *)mem_sys_allocate(sizeof(PDB_breakpoint_t));
+    }
 
     na(command);
+    condition = NULL;
 
     /* if there is another argument to break, besides the line number,
      * it should be an 'if', so we call another handler. */
     if (command && *command) {
         na(command);
-        if (!(newbreak->condition = PDB_cond(interpreter, command)))
-            return;
+        if ((condition = PDB_cond(interpreter, command))) {
+            if (sbreak) {
+                sbreak->condition = condition;
+                return;
+            }
+            else {
+                newbreak->condition = condition;
+            }
+        }
     }
-    else {
-        newbreak->condition = NULL;
+
+    /* If there are no other arguments, or if there isn't a valid condition,
+       then condition will be NULL */
+    if (!condition) {
+        if (sbreak) {
+           sbreak->condition = NULL;
+           return;
+        }
+        else {
+           newbreak->condition = NULL;
+        }
     }
+
+    /* We only reach this point if we're a new breakpoint, in which 
+     * case there are several other things to set up */
 
     /* Set the address where to stop */
     newbreak->pc = line->opcode;
@@ -808,10 +828,10 @@ PDB_delete_condition(struct Parrot_Interp *interpreter,
         }
         else {
             /* 'value' is a float or an int, so we can just free it */
-            free(breakpoint->condition->value);
+            mem_sys_free(breakpoint->condition->value);
         }
     }
-    free(breakpoint->condition);
+    mem_sys_free(breakpoint->condition);
 }
 
 /* PDB_skip_breakpoint
