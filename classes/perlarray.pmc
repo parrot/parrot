@@ -78,8 +78,28 @@ pmclass PerlArray {
     }
 
     PMC* clone () { 
-        /* XXX */
-        return NULL;
+        PMC* dest;
+        INTVAL ix, size;
+        PMC* element;
+        PMC** array;
+
+        dest = pmc_new(INTERP, enum_class_PerlArray);
+        dest->vtable = SELF->vtable;
+	dest->vtable->init(interpreter, dest);
+	size = SELF->cache.int_val;
+	resize_array(interpreter, dest, size);
+	for (ix = 0; ix < size; ix++) {
+	    PMC *new;
+	    array = ((Buffer *) SELF->data)->bufstart;
+	    element = array[ix];
+
+	    if (element) {
+		new = element->vtable->clone(interpreter, element);
+		((PMC**)((Buffer *) dest->data)->bufstart)[ix] = new;
+	    }
+
+	}
+        return dest;
     }
 
     INTVAL get_integer () {
