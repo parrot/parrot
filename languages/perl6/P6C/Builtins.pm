@@ -195,7 +195,7 @@ __setup_arg:
     inc I2
 __setup_arg_end:
     lt I1, I0, __setup_arg
-    store_global "_AV_ARGV", P1
+    store_global "_AV_ARGS", P1
 
 # exception handling:
     new P0, .PerlArray
