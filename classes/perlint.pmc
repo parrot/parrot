@@ -119,27 +119,27 @@ pmclass PerlInt {
 
     void set_string (PMC * value) {
 	SELF->vtable = &(Parrot_base_vtables[enum_class_PerlString]);
-	SELF->cache.struct_val = value->cache.struct_val;
+	SELF->data = value->data;
     }
 
     void set_string_native (STRING * value) {
 	SELF->vtable = &(Parrot_base_vtables[enum_class_PerlString]);
-	SELF->cache.struct_val = value;
+	SELF->data = value;
     }
 
     void set_string_unicode (STRING * value) {
 	SELF->vtable = &(Parrot_base_vtables[enum_class_PerlString]);
-	SELF->cache.struct_val = value;
+	SELF->data = value;
     }
 
     void set_string_other (STRING * value) {
 	SELF->vtable = &(Parrot_base_vtables[enum_class_PerlString]);
-	SELF->cache.struct_val = value;
+	SELF->data = value;
     }
 
     void set_string_same (PMC * value) {
 	SELF->vtable = &(Parrot_base_vtables[enum_class_PerlString]);
-	SELF->cache.struct_val = value->cache.struct_val;
+	SELF->data = value->data;
     }
 
     void set_value (void* value) {

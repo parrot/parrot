@@ -76,7 +76,7 @@ stack_entry(Interp *interpreter, Stack_chunk *stack_base, Intval depth)
     }
     else {
         chunk = stack_base->prev;    /* Start at top */
-        while (offset > chunk->used && chunk != stack_base) {
+        while (offset >= chunk->used && chunk != stack_base) {
             offset -= chunk->used;
             chunk  = chunk->prev;
         }

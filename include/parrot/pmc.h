@@ -38,6 +38,12 @@ struct PMC {
         DPOINTER *struct_val; /* referred to as a "cache". */
     } cache;
     SYNC *synchronize;
+    /* This flag determines the next PMC in the 'used' list during 
+       dead object detection in the GC. It is a linked list, which is 
+       only valid in trace_active_PMCs. Also, the linked list is 
+       guaranteed to have the tail element's next_for_GC point to itself,
+       which makes much of the logic and checks simpler. We then have to
+       check for PMC->next_for_GC == PMC to find the end of list. */
     PMC *next_for_GC;         /* Yeah, the GC data should be out of
                                  band, but that makes things really
                                  slow when actually marking things for
@@ -98,7 +104,10 @@ typedef enum {
     /* Our refcount */
     PMC_refcount_field = 1 << 16 | 1 << 17,
     /* Constant flag */
-    PMC_constant_FLAG = 1 << 18
+    PMC_constant_FLAG = 1 << 18,
+    /* Immortal flag, for ensuring a PMC survives DOD. Used internally
+	 * by the GC: should not be used in PMC code. */
+    PMC_immortal_FLAG = 1 << 19
 } PMC_flags;
 
 /* XXX add various bit test macros once we have need of them */

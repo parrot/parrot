@@ -139,6 +139,8 @@ PMC *new_pmc_header(struct Parrot_Interp *interpreter) {
     interpreter->active_PMCs++;
     /* Mark it live */
     return_me->flags = PMC_live_FLAG;
+    /* Don't let it point to garbage memory */
+    return_me->data = NULL;
     /* Return it */
     return return_me;
   }
@@ -242,6 +244,8 @@ new_buffer_header(struct Parrot_Interp *interpreter) {
     interpreter->active_Buffers++;
     /* Mark it live */
     return_me->flags = BUFFER_live_FLAG;
+    /* Don't let it point to garbage memory */
+    return_me->bufstart = NULL;
     /* Return it */
     return return_me;
   }
@@ -348,6 +352,9 @@ mark_used(PMC *used_pmc, PMC *current_end_of_list) {
     /* Now put it on the end of the list */
     current_end_of_list->next_for_GC = used_pmc;
 
+    /* Explicitly make the tail of the linked list be self-referential */
+    used_pmc->next_for_GC = used_pmc;
+
     /* return the PMC we were passed as the new end of the list */
     return used_pmc;
 }
@@ -355,20 +362,20 @@ mark_used(PMC *used_pmc, PMC *current_end_of_list) {
 /* Do a full trace run and mark all the PMCs as active if they are */
 static void
 trace_active_PMCs(struct Parrot_Interp *interpreter) {
-    PMC *last, *current; /* Pointers to the last marked PMC and the
-                            currently being processed PMC. */
+    PMC *last, *current, *prev; /* Pointers to the last marked PMC, the
+                                   currently being processed PMC, and in
+                                   the previously processed PMC in a loop. */
     unsigned int i, j, chunks_traced;
     Stack_chunk *cur_stack, *start_stack;
     struct PRegChunk *cur_chunk;
+
     /* We have to start somewhere, and the global stash is a good
        place */
     last = current = interpreter->perl_stash->stash_hash;
+
     /* mark it as used and get an updated end of list */
     last = mark_used(current, last);
 
-    /* Wipe out the next for gc bit, otherwise we'll never get anywhere */
-    last->next_for_GC = NULL;
-    
     /* Now, go run through the PMC registers and mark them as live */
     /* First mark the current set. */
     for (i=0; i < NUM_REGISTERS; i++) {
@@ -407,7 +414,8 @@ trace_active_PMCs(struct Parrot_Interp *interpreter) {
 
     /* Okay, we've marked the whole root set, and should have a
        good-sized list 'o things to look at. Run through it */
-    for (; current; current = current->next_for_GC) {
+    prev = NULL;
+    for (; current != prev; current = current->next_for_GC) {
         UINTVAL mask = PMC_is_PMC_ptr_FLAG | PMC_is_buffer_ptr_FLAG;
         UINTVAL bits = current->flags & mask;
 
@@ -420,7 +428,9 @@ trace_active_PMCs(struct Parrot_Interp *interpreter) {
             }
             else {
                 if (bits == PMC_is_buffer_ptr_FLAG) {
-                    buffer_lives(current->data);
+                    if (current->data) {
+                        buffer_lives(current->data);
+                    }
                 }
                 else {
                     /* The only thing left is "buffer of PMCs" */
@@ -434,6 +444,7 @@ trace_active_PMCs(struct Parrot_Interp *interpreter) {
                 }
             }
         }
+        prev = current;
     }
 }
 
@@ -498,7 +509,7 @@ free_unused_PMCs(struct Parrot_Interp *interpreter) {
     PMC *pmc_array = cur_arena->start_PMC;
     for (i = 0; i < cur_arena->used; i++) {
       /* If it's not live or on the free list, put it on the free list */
-      if (!(pmc_array[i].flags & (PMC_live_FLAG |
+      if (!(pmc_array[i].flags & (PMC_live_FLAG | PMC_immortal_FLAG |
                                   PMC_on_free_list_FLAG))) {
         add_pmc_to_free(interpreter,
                         interpreter->arena_base->pmc_pool,
@@ -645,6 +656,8 @@ STRING *new_string_header(struct Parrot_Interp *interpreter) {
     interpreter->active_Buffers++;
     /* Mark it live */
     return_me->flags = BUFFER_live_FLAG;
+    /* Don't let it point to garbage memory */
+    return_me->bufstart = NULL;
     /* Return it */
     return return_me;
   }
@@ -826,6 +839,7 @@ Parrot_allocate(struct Parrot_Interp *interpreter, size_t size) {
   if (NULL == interpreter) {
     return mem_sys_allocate(size);
   }
+
   /* Make sure we round up to a multiple of 16 */
   size += 16;
   size &= ~0x0f;
