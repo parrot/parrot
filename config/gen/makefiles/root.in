@@ -648,15 +648,6 @@ fulltest_dummy :
 	$(PERL) t/harness $(EXTRA_TEST_ARGS) -P $(TEST_PROG_ARGS)
 	$(PERL) t/harness $(EXTRA_TEST_ARGS) -b $(TEST_PROG_ARGS)
 
-quickfulltest : $(TEST_PROG) test_prep quickfulltest_dummy
-
-.PHONY: quickfulltest_dummy
-quickfulltest_dummy :
-	$(PERL) t/harness $(EXTRA_TEST_ARGS) $(TEST_PROG_ARGS) quick
-	$(PERL) t/harness $(EXTRA_TEST_ARGS) -j $(TEST_PROG_ARGS) quick
-	$(PERL) t/harness $(EXTRA_TEST_ARGS) -P $(TEST_PROG_ARGS) quick
-	$(PERL) t/harness $(EXTRA_TEST_ARGS) -b $(TEST_PROG_ARGS) quick
-
 # Common prep for all test targets
 test_prep : $(LIBPARROT) $(TEST_PROG)
 
@@ -673,25 +664,20 @@ testj : $(TEST_PROG) test_prep test_dummy_j
 test_dummy_j :
 	$(PERL) t/harness $(EXTRA_TEST_ARGS) $(TEST_PROG_ARGS) -j
 
-quicktest : $(TEST_PROG) test_prep quicktest_dummy
+mopstest :
+	$(TEST_PROG) $(TEST_PROG_ARGS) examples/assembly/mops.pasm
 
-quicktest_dummy :
-	$(PERL) t/harness $(EXTRA_TEST_ARGS) $(TEST_PROG_ARGS) quick
-
-mopstest : $(TEST_PROG) examples/assembly/mops.pbc
-	$(TEST_PROG) $(TEST_PROG_ARGS) examples/assembly/mops.pbc
-
-lifetest : $(TEST_PROG) examples/assembly/life.pbc
-	$(TEST_PROG) $(TEST_PROG_ARGS) examples/assembly/life.pbc
+lifetest :
+	$(TEST_PROG) $(TEST_PROG_ARGS) examples/assembly/life.pasm
 
 test_imcc :
-	cd $(IMCC_DIR) && $(PERL) t/harness && cd ../..
+	$(MAKE_C) $(IMCC_DIR) test
 
 fulltest_imcc :
-	cd $(IMCC_DIR) && $(PERL) t/harness && cd ../..
-	cd $(IMCC_DIR) && $(PERL) t/harness -j && cd ../..
-	cd $(IMCC_DIR) && $(PERL) t/harness -P && cd ../..
-	cd $(IMCC_DIR) && $(PERL) t/harness -b && cd ../..
+	$(MAKE_C) $(IMCC_DIR) test
+	$(MAKE_C) $(IMCC_DIR) testj
+	$(MAKE_C) $(IMCC_DIR) testP
+	$(MAKE_C) $(IMCC_DIR) testb
 
 # For reporting success or failure with different configurations
 ok:
@@ -838,3 +824,8 @@ exec_so : exec_start$(O) blib/lib/libparrot$(SO)
 
 libnci.so: nci_test.c
 	$(LD) $(LD_SHARED) $(LD_SHARED_FLAGS) $(LDFLAGS) $< -o $@
+
+# ctags
+
+tags:
+	ctags -R --links=no .

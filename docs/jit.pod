@@ -531,12 +531,7 @@ attaches the symbol file, after it got built in F<build_asm>.
 	# dddp
 	# run ddd parrot with given file
 	# gdb confirmations should be off
-	# $ ln -s languages/imcc imcc
-	# is assumed
-	cd languages/imcc
-	make -s
-	cd -
-	imcc -o $1.pbc -d -O1 $1.pasm
+	parrot -o $1.pbc -d $1.pasm
 	echo "b runops_jit
 	r -d -j $1.pbc
 	n

@@ -1,4 +1,5 @@
 RM_F = ${rm_f}
+PERL = ${perl}
 
 all :
 	@echo "Don't make imcc, make parrot"
@@ -14,4 +15,13 @@ realclean: clean
 
 test:
 	$(PERL) t/harness
+
+testj:
+	$(PERL) t/harness -j
+
+testP:
+	$(PERL) t/harness -P
+
+testb:
+	$(PERL) t/harness -b
 

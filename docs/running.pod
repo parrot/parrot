@@ -90,36 +90,4 @@ target:
 
   make fulltest
 
-=item B<make quicktest>
-
-C<make quicktest> is similar to make test, except that it skips some steps
-that are unnecessary most of the time, allowing for a significant speed gain.
-It's intended to be used as a quick check during development, lowering the
-barrier to checking tests. A C<make test> should be performed before
-submitting patches, just in case it is affected.
-
-Instead of recompiling the .pasm files to .pbc files each time
-the test is run, C<make quicktest> checks to see if the .pasm file is
-identical to the test. If so, it uses the previously-generated .pbc file.
-
-This option was originally developed when C<assemble.pl> was being used as
-the primary Parrot assembler, as the assembly step dominated the runtime of
-the test suite. Now that C<assemble.pl> is no longer being used, the gain
-that one gets from C<make quicktest> is much smaller, and this option may
-well disappear at some point in the future.
-
-WARNING: C<make quicktest> can fail under the following circumstances:
-
-- it is cancelled before the generation of the .pbc file can be completed
-- the .pbc file format changes
-- the numbering of opcodes used in the tests is changed
-- the assembler changes in a manner that would affect its output on tests
-
-If C<make quicktest> fails to work properly, C<make test> is always
-available as a fallback.
-
-C<make quickfulltest> may be used to run all tests under all available
-dispatchers. This actually doesn't take all that long, since the *.pbc
-files are guaranteed to be reused after the first complete test pass.
-
 =back
