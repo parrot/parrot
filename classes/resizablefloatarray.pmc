@@ -83,10 +83,11 @@ C<value>.
 Resizes the array to C<size> elements.
 
 When growing, if the new size stays smaller than twice the old size,
-grow to two twice the old size, otherwise grow to the new size.
+grow to twice the old size; otherwise, grow to the new size.
 
-When shrinking, if the new size gets smaller than half the old size,
-shrink to one and half times the new size (three thirds of the old size).
+When shrinking, if the new size is smaller than half the old size,
+shrink to one and half times the new size (which is less than or
+equal to three quarters of the old size).
 
 =cut
 
