@@ -208,22 +208,29 @@ stack_push(Interp *interpreter, Stack_Chunk_t **stack_base_p,
 
     /* Do we need a new chunk? */
     if (chunk->used == STACK_CHUNK_DEPTH) {
-        /* Need to add a new chunk */
-        Stack_Chunk_t *new_chunk = mem_allocate_aligned(sizeof(Stack_Chunk_t));
+        if (chunk->next == stack_base) {
+            /* Need to add a new chunk */
+            Stack_Chunk_t *new_chunk = mem_allocate_aligned(sizeof(Stack_Chunk_t));
 
-        new_chunk->used = 0;
-        new_chunk->next = stack_base;
-        new_chunk->prev = chunk;
-        chunk->next = new_chunk;
-        stack_base->prev = new_chunk;
-        chunk = new_chunk;
+            new_chunk->used = 0;
+            new_chunk->next = stack_base;
+            new_chunk->prev = chunk;
+            chunk->next = new_chunk;
+            stack_base->prev = new_chunk;
+            chunk = new_chunk;
 
-        /* Need to initialize this pointer before the collector sees it */
-        chunk->buffer = NULL;
-        chunk->buffer = new_buffer_header(interpreter);
+            /* Need to initialize this pointer before the collector sees it */
+            chunk->buffer = NULL;
+            chunk->buffer = new_buffer_header(interpreter);
 
-        Parrot_allocate(interpreter, chunk->buffer,
-                        sizeof(Stack_Entry_t) * STACK_CHUNK_DEPTH);
+            Parrot_allocate(interpreter, chunk->buffer,
+                            sizeof(Stack_Entry_t) * STACK_CHUNK_DEPTH);
+        }
+        else {
+            /* Reuse the spare chunk we kept */
+            chunk = chunk->next;
+            stack_base->prev = chunk;
+        }
     }
 
     entry = (Stack_Entry_t *)(chunk->buffer->bufstart) + chunk->used;
@@ -286,11 +293,17 @@ stack_pop(Interp *interpreter, Stack_Chunk_t **stack_base_p,
         /* That chunk != stack check is just to allow the empty stack case
          * to fall through to the following exception throwing code. */
 
-        /* Need to pop off the last entry */
-        stack_base->prev = chunk->prev;
-        stack_base->prev->next = stack_base;
-        /* Relying on GC feels dirty... */
-        chunk = stack_base->prev;
+        /* If the chunk that has just become empty is not the last chunk
+         * on the stack then we make it the last chunk - the GC will clean
+         * up any chunks that are discarded by this operation. */
+        if (chunk->next != stack_base) {
+            chunk->next = stack_base;
+        }
+
+        /* Now back to the previous chunk - we'll keep the one we have
+         * just emptied around for now in case we need it again. */
+        chunk = chunk->prev;
+        stack_base->prev = chunk;
     }
 
     /* Quick sanity check */

@@ -46,13 +46,20 @@ intstack_push(struct Parrot_Interp *interpreter, IntStack stack, INTVAL data)
 
     /* Register the new entry */
     if (++chunk->used == STACK_CHUNK_DEPTH) {
-        /* Need to add a new chunk */
-        IntStack_Chunk new_chunk = mem_allocate_aligned(sizeof(*new_chunk));
-        new_chunk->used = 0;
-        new_chunk->next = stack;
-        new_chunk->prev = chunk;
-        chunk->next = new_chunk;
-        stack->prev = new_chunk;
+        if (chunk->next == stack) {
+            /* Need to add a new chunk */
+            IntStack_Chunk new_chunk = mem_allocate_aligned(sizeof(*new_chunk));
+            new_chunk->used = 0;
+            new_chunk->next = stack;
+            new_chunk->prev = chunk;
+            chunk->next = new_chunk;
+            stack->prev = new_chunk;
+        }
+        else {
+            /* Reuse the spare chunk we kept */
+            chunk = chunk->next;
+            stack->prev = chunk;
+        }
     }
 }
 
@@ -67,11 +74,17 @@ intstack_pop(struct Parrot_Interp *interpreter, IntStack stack)
         /* That chunk != stack check is just to allow the empty stack case
          * to fall through to the following exception throwing code. */
 
-        /* Need to pop off the last entry */
-        stack->prev = chunk->prev;
-        stack->prev->next = stack;
-        /* Relying on GC feels dirty... */
-        chunk = stack->prev;
+        /* If the chunk that has just become empty is not the last chunk
+         * on the stack then we make it the last chunk - the GC will clean
+         * up any chunks that are discarded by this operation. */
+        if (chunk->next != stack) {
+            chunk->next = stack;
+        }
+
+        /* Now back to the previous chunk - we'll keep the one we have
+         * just emptied around for now in case we need it again. */
+        chunk = chunk->prev;
+        stack->prev = chunk;
     }
 
     /* Quick sanity check */
