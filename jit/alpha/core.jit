@@ -27,10 +27,10 @@ Parrot_set_i_i {
 
 Parrot_set_i_ic {
     if (MAP[1]) {
-        jit_emit_load_ri_i(NATIVECODE, MAP[1], *INT_CONST[2]);
+        jit_emit_mov_ri_i(NATIVECODE, MAP[1], *INT_CONST[2]);
     }
     else {
-        jit_emit_load_ri_i(NATIVECODE, ISR1, *INT_CONST[2]);
+        jit_emit_mov_ri_i(NATIVECODE, ISR1, *INT_CONST[2]);
         jit_emit_mov_mr_i(NATIVECODE, &INT_REG[1], ISR1);
     }
 }

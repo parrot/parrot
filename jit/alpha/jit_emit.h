@@ -240,7 +240,7 @@ enum { JIT_ALPHABRANCH, JIT_ALPHABSR };
   
 /* Load a constant */
 
-#define jit_emit_load_ri_i(pc, target, constant) \
+#define jit_emit_mov_ri_i(pc, target, constant) \
   pc = emit_l_c(jit_info, interpreter, target, (long)constant)
 
 static void
@@ -369,9 +369,9 @@ Parrot_jit_begin(Parrot_jit_info_t *jit_info,
     emit_ldah(jit_info->native_ptr,REG15_s6, -1, REG15_s6);
     */
     emit_lda_b(jit_info->native_ptr, REG15_s6, -0x7ff8, REG15_s6); 
-    jit_emit_load_ri_i(jit_info->native_ptr, REG10_s1,
+    jit_emit_mov_ri_i(jit_info->native_ptr, REG10_s1,
         interpreter->code->byte_code); 
-    jit_emit_load_ri_i(jit_info->native_ptr, REG11_s2, jit_info->arena.op_map); 
+    jit_emit_mov_ri_i(jit_info->native_ptr, REG11_s2, jit_info->arena.op_map); 
 }
 
 void
@@ -419,7 +419,7 @@ emit_bsr(Parrot_jit_info_t *jit_info,
 {
     char *pc = jit_info->native_ptr;
 
-    jit_emit_load_ri_i(pc, REG27_t12, 
+    jit_emit_mov_ri_i(pc, REG27_t12, 
         interpreter->op_func_table[*(jit_info->cur_op)]);
 
     Parrot_jit_newfixup(jit_info);
@@ -454,7 +454,7 @@ void
 Parrot_jit_normal_op(Parrot_jit_info_t *jit_info,
     struct Parrot_Interp *interpreter)
 {
-    jit_emit_load_ri_i(jit_info->native_ptr, REG16_a0, jit_info->cur_op);
+    jit_emit_mov_ri_i(jit_info->native_ptr, REG16_a0, jit_info->cur_op);
     jit_emit_mov_rr(jit_info->native_ptr, REG9_s0, REG17_a1);
     jit_info->native_ptr = emit_bsr(jit_info, interpreter);
 }
