@@ -16,7 +16,7 @@ Tests the C<String> PMC.
 
 =cut
 
-use Parrot::Test tests => 31;
+use Parrot::Test tests => 32;
 use Test::More; # Included for skip().
 
 my $fp_equality_macro = <<'ENDOFMACRO';
@@ -1136,3 +1136,13 @@ CODE
 0
 OUTPUT
 
+output_is(<< 'CODE', << 'OUTPUT', "Clone");
+    new P0, .String
+    set P0, "Tacitus\n"
+    clone P1, P0
+    set P0, ""
+    print P1
+    end
+CODE
+Tacitus
+OUTPUT
