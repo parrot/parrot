@@ -20,7 +20,13 @@ use Parrot::Test;
 use Test::More;
 use strict;
 
+# actually more platforms should work - all POSIX compliant ones - but 
+# signals are currently not enabled for all in src/events.c
+# a second problem is to get the test doing the right thing: mainly figuring 
+# out what PID to kill. The "ps" command isn't one of the portable ones.
+
 my %platforms = map {$_=>1} qw/
+    darwin
     hpux
     linux
 /;
@@ -41,10 +47,11 @@ my $pid;
 sub send_SIGHUP {
     $SIG{ALRM} = sub {
 	# get PID of parrot
-	my @ps = `ps -C parrot -o pid`;
+	my @ps = `ps axw | grep [p]arrot`;
 	die 'no output from ps' unless @ps;
 	# the IO thread parrot process
-	# on 2.2.x there are 4 processes, last is the IO thread
+	# on linux 2.2.x there are 4 processes, last is the IO thread
+        # posix compliant threads have exactly one PID for parrot
 	my $io_thread = pop @ps;
 	if ($io_thread =~ /^\s*(\d+)/) {
 	    $pid = $1;
@@ -60,7 +67,7 @@ sub send_SIGHUP {
 
 sub check_running {
     select undef, undef, undef, 0.1;
-    my @ps = `ps -C parrot -o pid`;
+    my @ps = `ps axw | grep [p]arrot`;
     my $thread = pop @ps;
     if ($thread =~ /^\s*(\d+)/ && $1 == $pid) {
 	ok(0, "parrot $pid still running");

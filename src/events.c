@@ -28,8 +28,9 @@ dispatches these to one or all interpreters.
 #define EVENT_DEBUG 0
 /*
  * not yet - need to sort out platform code and fix exceptions first
+ * TODO get some config for POSIX compliant
  */
-#ifdef linux
+#if defined(linux) || defined(darwin)
 #  define INSTALL_EVENT_HANDLER 1
 #else
 #  define INSTALL_EVENT_HANDLER 0
