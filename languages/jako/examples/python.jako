@@ -1,0 +1,40 @@
+#
+# python.jako
+#
+# A python lexer written in Jako.
+#
+# TODO: Doesn't do much yet. Sure would be nice if it did...
+#
+# Copyright (C) 2003 Gregor N. Purdy. All rights reserved.
+# This program is free software. Its use is subject to the
+# same license as Parrot.
+#
+
+use sys;
+use string;
+
+sub split (str pat, str input)
+{
+  var int pos = 0;
+  var int found = 0;
+  var int pat_len;
+
+  pat_len = string::length(pat);
+
+  while (1 == 1) {
+    var str temp;
+    var int match_len;
+
+    found = string::index(input, pat, pos);
+    last unless (found >= 0);
+    match_len = found - pos;
+    temp = string::substr(input, pos, match_len);
+    sys::print("MATCH: '$temp'\n");
+    pos = found + pat_len;
+  }
+}
+
+var str input = "if 1:\n  print 'Hello, world!\n";
+
+split("\n", input);
+
