@@ -28,11 +28,11 @@ use vars qw(@steps);
     init/manifest.pl
     init/data.pl
     init/miniparrot.pl
-    auto/gcc.pl
     init/hints.pl
-    init/optimize.pl
     init/headers.pl
     inter/progs.pl
+    auto/gcc.pl
+    init/optimize.pl
     inter/types.pl
     inter/ops.pl
     inter/exp.pl
