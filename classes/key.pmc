@@ -8,7 +8,7 @@ classes/key.pmc - Key PMC
 
 =head1 DESCRIPTION
 
-These are the vtable functions for the default PMC class.
+These are the vtable functions for the Key PMC class.
 
 =head2 Methods
 
@@ -51,7 +51,7 @@ Creates and returns a clone of the key.
         PMC *dkey = dest;
         PMC *key = SELF;
         PMC *p;
-    
+
         PObj_custom_mark_SET(dest);
         for (; key ; ) {
             switch (PObj_get_FLAGS(key) & KEY_type_FLAGS) {
@@ -272,7 +272,7 @@ Raises an exception of an attempt is made to iterate backwards.
 
     PMC* nextkey_keyed (PMC* key, INTVAL what) {
         PMC *ret = SELF;
-    
+
         switch (what) {
             case ITERATE_FROM_START:    /* reset key */
             break;

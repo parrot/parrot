@@ -16,7 +16,7 @@ Tests the C<Iterator> PMC.
 
 =cut
 
-use Parrot::Test tests => 12;
+use Parrot::Test tests => 13;
 use Test::More qw(skip);
 
 output_is(<<'CODE', <<'OUTPUT', "new iter");
@@ -539,3 +539,17 @@ ok 6
 2
 OUTPUT
 }
+
+output_is(<<'CODE', <<'OUTPUT', "slice syntax");
+   new P0, .PerlArray
+   slice P2, P0[2 .. 3, 4, 5 ..6]
+   slice P2, P0[10 ..]
+   slice P2, P0[.. 11]
+   slice P2, P0[I1..3]
+   new P1, .PerlHash
+   slice P2, P1["0","a".."b","c"]
+   print "ok\n"
+   end
+CODE
+ok
+OUTPUT

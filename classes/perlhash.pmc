@@ -111,7 +111,7 @@ Returns the type of the element for C<*key>.
 */
 
     INTVAL type_keyed_str (STRING* key) {
-        HashBucket* b = hash_get_bucket(INTERP, (Hash*) PMC_struct_val(SELF), 
+        HashBucket* b = hash_get_bucket(INTERP, (Hash*) PMC_struct_val(SELF),
                                         key);
         if (!b)
             return enum_hash_undef;
@@ -157,7 +157,7 @@ Creates and returns a clone of the hash.
     PMC* clone () {
         PMC* dest = pmc_new_noinit(INTERP, SELF->vtable->base_type);
         PObj_custom_mark_SET(dest);
-        hash_clone(INTERP, (Hash *)PMC_struct_val(SELF), 
+        hash_clone(INTERP, (Hash *)PMC_struct_val(SELF),
                    (Hash**)&PMC_struct_val(dest));
         return dest;
     }
@@ -230,7 +230,7 @@ Returns the integer value for the element at C<*key>.
 */
 
     FLOATVAL get_number_keyed_str (STRING* key) {
-        HashBucket *b = hash_get_bucket(INTERP, (Hash*) PMC_struct_val(SELF), 
+        HashBucket *b = hash_get_bucket(INTERP, (Hash*) PMC_struct_val(SELF),
                                         key);
         if (b == NULL) {
             /* XXX Warning: Use of uninitialized value */
@@ -275,7 +275,7 @@ Returns the floating-point value for the element at C<*key>.
 */
 
     BIGNUM* get_bignum_keyed_str (STRING* key) {
-        HashBucket *b = hash_get_bucket(INTERP, (Hash*) PMC_struct_val(SELF), 
+        HashBucket *b = hash_get_bucket(INTERP, (Hash*) PMC_struct_val(SELF),
                                         key);
         if (b == NULL) {
             /* XXX Warning: Use of uninitialized value */
@@ -335,7 +335,7 @@ memory address.
 */
 
     STRING* get_string_keyed_str (STRING* key) {
-        HashBucket *b = hash_get_bucket(INTERP, (Hash*) PMC_struct_val(SELF), 
+        HashBucket *b = hash_get_bucket(INTERP, (Hash*) PMC_struct_val(SELF),
                                         key);
         if (b == NULL) {
             /* XXX Warning: use of uninitialized value */
@@ -359,7 +359,7 @@ Returns the big number value for the element at C<*key>.
         STRING* keystr;
         HashBucket *b;
         PMC* nextkey;
-    
+
         switch (PObj_get_FLAGS(key) & KEY_type_FLAGS) {
             case KEY_integer_FLAG:
                 /* called from iterator with an integer idx in key */
@@ -416,7 +416,7 @@ Returns the number of elements in the hash.
 */
 
     PMC* get_pmc_keyed_str (STRING* key) {
-        HashBucket *b = hash_get_bucket(INTERP, (Hash*) PMC_struct_val(SELF), 
+        HashBucket *b = hash_get_bucket(INTERP, (Hash*) PMC_struct_val(SELF),
                                         key);
         if (b == NULL) {
             /* XXX should store the undef for consistency */
@@ -428,6 +428,10 @@ Returns the number of elements in the hash.
 
 /*
 
+=item C<PMC* slice (PMC *key)>
+
+Return a new iterator for the slice PMC C<key>
+
 =item C<PMC *get_pmc_keyed(PMC *key)>
 
 Returns the PMC value for the element at C<*key>.
@@ -435,6 +439,10 @@ Returns the PMC value for the element at C<*key>.
 =cut
 
 */
+
+    PMC* slice (PMC* key) {
+	return NULL;
+    }
 
     PMC* get_pmc_keyed (PMC* key) {
         STRING* keystr = make_hash_key(INTERP, key);
@@ -698,7 +706,7 @@ Currently just returns false, C<*value> is ignored.
 */
 
     INTVAL exists_keyed_str(STRING* key) {
-        HashBucket *b = hash_get_bucket(INTERP, (Hash*) PMC_struct_val(SELF), 
+        HashBucket *b = hash_get_bucket(INTERP, (Hash*) PMC_struct_val(SELF),
                                         key);
         return b != NULL;
     }
@@ -736,7 +744,7 @@ Returns whether a key C<*key> exists in the hash.
 */
 
     INTVAL defined_keyed_str(STRING* key) {
-        HashBucket *b = hash_get_bucket(INTERP, (Hash*) PMC_struct_val(SELF), 
+        HashBucket *b = hash_get_bucket(INTERP, (Hash*) PMC_struct_val(SELF),
                                         key);
         if (b == NULL)
             return 0;       /* no such key */
@@ -817,7 +825,7 @@ Returns the next key relative to the location specified in C<what>.
 
     PMC* nextkey_keyed (PMC* key, INTVAL what) {
         PMC *ret = key;
-    
+
         INTVAL n = SELF.elements();
         PObj_get_FLAGS(ret) &= ~KEY_type_FLAGS;
         PObj_get_FLAGS(ret) |= KEY_integer_FLAG;

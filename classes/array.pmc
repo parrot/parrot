@@ -1,4 +1,4 @@
-/* 
+/*
 Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
 $Id$
 
@@ -119,9 +119,9 @@ Parrot_Array_shift_pmc_ptr(Interp *interp, List *list)
 =item C<static PMC*
 Parrot_Array_set_pmc_ptr(Interp *interp, List *list, INTVAL key)>
 
-Returns a pointer to the element at index C<key> of C<*list>. If 
+Returns a pointer to the element at index C<key> of C<*list>. If
 this element was previously empty, then this function also creates
-and assigns an "undef" PMC (currently a C<PerlUndef>, but this may 
+and assigns an "undef" PMC (currently a C<PerlUndef>, but this may
 change) to that element.
 
 =cut
@@ -529,7 +529,7 @@ Sets the integer value of the PMC at element C<key> to C<value>.
 
     void set_integer_keyed_int (INTVAL key, INTVAL value) {
         PMC * ptr;
-    
+
         ptr = Parrot_Array_set_pmc_ptr(INTERP, (List *) PMC_data(SELF), key);
         VTABLE_set_integer_native(INTERP, ptr, value);
     }
@@ -663,7 +663,7 @@ Sets the string value of the PMC at element C<key> to C<value>.
 
 =item C<void set_pmc_keyed_int(INTVAL idx, PMC* src)>
 
-Sets the PMC at element C<idx> to C<*src>. 
+Sets the PMC at element C<idx> to C<*src>.
 
 =cut
 
@@ -675,7 +675,7 @@ Sets the PMC at element C<idx> to C<*src>.
         if (idx >= length || -idx > length) {
             internal_exception(OUT_OF_BOUNDS, "Array index out of bounds!\n");
         }
-    
+
         list_assign(INTERP, (List *) PMC_data(SELF), idx,
             (void*)src, enum_type_PMC);
     }
@@ -684,7 +684,7 @@ Sets the PMC at element C<idx> to C<*src>.
 
 =item C<void set_pmc_keyed (PMC* key, PMC* value)>
 
-Sets the PMC at element C<key> to C<*value>. 
+Sets the PMC at element C<key> to C<*value>.
 
 =cut
 
@@ -989,7 +989,7 @@ Returns TRUE is the element at C<key> is defined; otherwise returns false.
     INTVAL defined_keyed_int (INTVAL key) {
         PMC* value;
         void *ret;
-    
+
         ret = list_get(INTERP, (List *) PMC_data(pmc), key, enum_type_PMC);
         if (ret == 0 || ret == (void *) -1)
             return 0;
@@ -1116,6 +1116,10 @@ The C<==> operation. Currently just returns C<0>.
 
 /*
 
+=item C<PMC* slice (PMC *key)>
+
+Return a new iterator for the slice PMC C<key>
+
 =item C<PMC* nextkey_keyed (PMC* key, INTVAL what)>
 
 Used by an iterator to get the next index after C<*key>.
@@ -1126,9 +1130,13 @@ C<what> indicates what kind of iteration is being performed.
 
 */
 
+    PMC* slice (PMC* key) {
+	return NULL;
+    }
+
     PMC* nextkey_keyed (PMC* key, INTVAL what) {
         PMC *ret = key;
-    
+
         INTVAL n = SELF.elements();
         PObj_get_FLAGS(ret) &= ~KEY_type_FLAGS;
         PObj_get_FLAGS(ret) |= KEY_integer_FLAG;
