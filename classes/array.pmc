@@ -1120,12 +1120,6 @@ The C<==> operation. Currently just returns C<0>.
 
 Return a new iterator for the slice PMC C<key>
 
-=item C<PMC* nextkey_keyed (PMC* key, INTVAL what)>
-
-Used by an iterator to get the next index after C<*key>.
-
-C<what> indicates what kind of iteration is being performed.
-
 =cut
 
 */
@@ -1134,10 +1128,6 @@ C<what> indicates what kind of iteration is being performed.
 	PMC *iter = pmc_new_init(interpreter, enum_class_Iterator, SELF);
         PMC_struct_val(iter) = key;
         return iter;
-    }
-
-    PMC* nextkey_keyed (PMC* key, INTVAL what) {
-        return VTABLE_nextkey_keyed(interpreter, key, SELF, what);
     }
 
 /*

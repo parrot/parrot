@@ -17,7 +17,7 @@ MULTIDIM CALC OFFSET
 Algorithm:
 
     i + j*Ni + k*Ni*Nj + l*Ni*Nj*Nk ...
-    
+
 where i,j,k,l... are coordinates in a multidimensional space and
 Ni,Nj,Nk... are the lengths of the dimensions.
 

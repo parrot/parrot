@@ -298,7 +298,7 @@ advance to next position in the range, dpending on what.
         switch (what) {
             case ITERATE_FROM_START:
             case ITERATE_FROM_START_KEYS:    /* reset key */
-                if (PObj_get_FLAGS(SELF) & PObj_private1_FLAG) {
+                if (!agg) {
                     /* xrange implementation - the slice PMC
                      * itself serves as the aggregate. It's already
                      * initialized

@@ -223,9 +223,6 @@ Removes and returns the first element in the list.
         return iter;
     }
 
-    PMC* nextkey_keyed (PMC* key, INTVAL what) {
-        return VTABLE_nextkey_keyed(interpreter, key, SELF, what);
-    }
 /*
 
 =item C<void multiply_int(INTVAL value,  PMC *dest)>

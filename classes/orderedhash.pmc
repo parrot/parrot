@@ -393,30 +393,6 @@ Deletes the key C<*key> from the hash.
            the mapping from the PerlHash to the PerlArray */
         DYNSELF.set_pmc_keyed_int(n,new_undef);
     }
-/*
-
-=item C<PMC *nextkey_keyed(PMC *key, INTVAL what)>
-
-Returns the next key after C<*key> relative to the location specified in
-C<what>.
-
-=cut
-
-*/
-
-    PMC* nextkey_keyed (PMC* key, INTVAL what) {
-        switch (what) {
-            case ITERATE_FROM_START_KEYS:
-                PObj_get_FLAGS(SELF) |= PObj_private0_FLAG;
-                break;
-            case ITERATE_FROM_START:
-                PObj_get_FLAGS(SELF) &= ~PObj_private0_FLAG;
-                break;
-        }
-        if ((PObj_get_FLAGS(SELF) & PObj_private0_FLAG))
-            return PerlHash.SUPER(key, what);
-        return SUPER(key, what);
-    }
 
 /*
 

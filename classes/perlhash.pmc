@@ -942,10 +942,6 @@ Deletes the element associated with C<*key>.
 
 Return a new iterator for the slice PMC C<key>
 
-=item C<PMC *nextkey_keyed(PMC *key, INTVAL what)>
-
-Returns the next key relative to the location specified in C<what>.
-
 =cut
 
 */
@@ -956,19 +952,6 @@ Returns the next key relative to the location specified in C<what>.
         return iter;
     }
 
-    PMC* nextkey_keyed (PMC* key, INTVAL what) {
-
-        switch (what) {
-            case ITERATE_FROM_START:    /* reset key */
-            case ITERATE_FROM_START_KEYS:
-            case ITERATE_GET_NEXT:
-                return VTABLE_nextkey_keyed(interpreter, key, SELF, what);
-            default:
-                internal_exception(1, "Can't iterate from end\n");
-                break;
-        }
-        return key;
-    }
 
 /*
 

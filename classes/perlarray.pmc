@@ -40,7 +40,7 @@ static PMC* undef(Interp* interpreter)
 =item C<static PMC *
 Parrot_PerlArray_set_pmc_ptr(Interp *interp, List *list, INTVAL key)>
 
-Returns the PMC pointer for the element at index C<key>. 
+Returns the PMC pointer for the element at index C<key>.
 
 =cut
 

@@ -302,16 +302,28 @@ Reset the Iterator. C<value> must be one of
 */
 
     void set_integer_native (INTVAL value) {
-        PMC *key;
+        PMC *key, *agg;
         if (value < ITERATE_FROM_START || value > ITERATE_FROM_END)
             internal_exception(1, "Illegal set_integer on iterator\n");
         /* reset iterator on aggregate */
-        if (!PMC_struct_val(SELF)) {
-            PMC_struct_val(SELF) = key_new(INTERP);
+        agg = (PMC*) PMC_pmc_val(SELF);
+        if (agg->vtable->base_type == enum_class_Slice) {
+            /* its an xrange serving as its own aggregate */
+            PMC_struct_val(SELF) =
+                VTABLE_nextkey_keyed(INTERP, agg, NULL, value);
         }
-        key = PMC_struct_val(SELF);
-        PMC_struct_val(SELF) =
-            VTABLE_nextkey_keyed(INTERP, (PMC*) PMC_pmc_val(SELF), key, value);
+        else {
+            if (!PMC_struct_val(SELF)) {
+                PMC_struct_val(SELF) = key_new(INTERP);
+            }
+            if (agg->vtable->base_type == enum_class_OrderedHash &&
+                    value == ITERATE_FROM_START_KEYS) {
+                PObj_get_FLAGS(agg) |= PObj_private0_FLAG;
+            }
+            key = PMC_struct_val(SELF);
+            PMC_struct_val(SELF) =
+                VTABLE_nextkey_keyed(INTERP, key, agg, value);
+        }
     }
 
 /*
@@ -327,7 +339,7 @@ Reset the Iterator. C<value> must be one of
         PMC *agg = PMC_pmc_val(SELF);
         INTVAL ret = VTABLE_get_integer_keyed(INTERP, agg, key);
         PMC_struct_val(SELF) =
-            VTABLE_nextkey_keyed(INTERP, agg, key, ITERATE_GET_PREV);
+            VTABLE_nextkey_keyed(INTERP, key, agg, ITERATE_GET_PREV);
         return ret;
     }
 
@@ -344,7 +356,7 @@ Reset the Iterator. C<value> must be one of
         PMC *agg = PMC_pmc_val(SELF);
         FLOATVAL ret = VTABLE_get_number_keyed(INTERP, agg, key);
         PMC_struct_val(SELF) =
-            VTABLE_nextkey_keyed(INTERP, agg, key, ITERATE_GET_PREV);
+            VTABLE_nextkey_keyed(INTERP, key, agg, ITERATE_GET_PREV);
         return ret;
     }
 
@@ -361,7 +373,7 @@ Reset the Iterator. C<value> must be one of
         PMC *agg = PMC_pmc_val(SELF);
         BIGNUM *ret = VTABLE_get_bignum_keyed(INTERP, agg, key);
         PMC_struct_val(SELF) =
-            VTABLE_nextkey_keyed(INTERP, agg, key, ITERATE_GET_PREV);
+            VTABLE_nextkey_keyed(INTERP, key, agg, ITERATE_GET_PREV);
         return ret;
     }
 
@@ -378,7 +390,7 @@ Reset the Iterator. C<value> must be one of
         PMC *agg = PMC_pmc_val(SELF);
         STRING *ret = VTABLE_get_string_keyed(INTERP, agg, key);
         PMC_struct_val(SELF) =
-            VTABLE_nextkey_keyed(INTERP, agg, key, ITERATE_GET_PREV);
+            VTABLE_nextkey_keyed(INTERP, key, agg, ITERATE_GET_PREV);
         return ret;
     }
 
@@ -398,7 +410,7 @@ the previous one.
         PMC *agg = PMC_pmc_val(SELF);
         PMC *ret = VTABLE_get_pmc_keyed(INTERP, agg, key);
         PMC_struct_val(SELF) =
-            VTABLE_nextkey_keyed(INTERP, agg, key, ITERATE_GET_PREV);
+            VTABLE_nextkey_keyed(INTERP, key, agg, ITERATE_GET_PREV);
         return ret;
     }
 
@@ -415,7 +427,7 @@ the previous one.
         PMC *agg = PMC_pmc_val(SELF);
         INTVAL ret = VTABLE_get_integer_keyed(INTERP, agg, key);
         PMC_struct_val(SELF) =
-            VTABLE_nextkey_keyed(INTERP, agg, key, ITERATE_GET_NEXT);
+            VTABLE_nextkey_keyed(INTERP, key, agg, ITERATE_GET_NEXT);
         return ret;
     }
 
@@ -432,7 +444,7 @@ the previous one.
         PMC *agg = PMC_pmc_val(SELF);
         FLOATVAL ret = VTABLE_get_number_keyed(INTERP, agg, key);
         PMC_struct_val(SELF) =
-            VTABLE_nextkey_keyed(INTERP, agg, key, ITERATE_GET_NEXT);
+            VTABLE_nextkey_keyed(INTERP, key, agg, ITERATE_GET_NEXT);
         return ret;
     }
 
@@ -449,7 +461,7 @@ the previous one.
         PMC *agg = PMC_pmc_val(SELF);
         BIGNUM *ret = VTABLE_get_bignum_keyed(INTERP, agg, key);
         PMC_struct_val(SELF) =
-            VTABLE_nextkey_keyed(INTERP, agg, key, ITERATE_GET_NEXT);
+            VTABLE_nextkey_keyed(INTERP, key, agg, ITERATE_GET_NEXT);
         return ret;
     }
 
@@ -466,7 +478,7 @@ the previous one.
         PMC *agg = PMC_pmc_val(SELF);
         STRING * ret = VTABLE_get_string_keyed(INTERP, agg, key);
         PMC_struct_val(SELF) =
-            VTABLE_nextkey_keyed(INTERP, agg, key, ITERATE_GET_NEXT);
+            VTABLE_nextkey_keyed(INTERP, key, agg, ITERATE_GET_NEXT);
         return ret;
     }
 
@@ -486,7 +498,7 @@ the next one.
         PMC *agg = PMC_pmc_val(SELF);
         PMC *ret = VTABLE_get_pmc_keyed(INTERP, agg, key);
         PMC_struct_val(SELF) =
-            VTABLE_nextkey_keyed(INTERP, agg, key, ITERATE_GET_NEXT);
+            VTABLE_nextkey_keyed(INTERP, key, agg, ITERATE_GET_NEXT);
         return ret;
     }
 

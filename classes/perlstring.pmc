@@ -658,10 +658,6 @@ Return a new iterator for the slice PMC C<key>
 
 Return length of the string.
 
-=item C<PMC *nextkey_keyed(PMC *key, INTVAL what)>
-
-Returns the next key relative to the location and direction specified in
-C<what>.
 
 =cut
 
@@ -677,14 +673,6 @@ C<what>.
         return iter;
     }
 
-    PMC* nextkey_keyed (PMC* key, INTVAL what) {
-        PMC *ret = key;
-        STRING *s = PMC_str_val(SELF);
-
-        ret = VTABLE_nextkey_keyed(interpreter, key, SELF, what);
-
-        return ret;
-    }
 
 /*
 

@@ -793,63 +793,7 @@ Adds an element with PMC value C<*value> to the end of the array.
         DYNSELF.set_pmc_keyed_int(nextix, value);
     }
 
-/*
-
-=back
-
-=head2 Iterator Methods
-
-=over 4
-
-=item C<PMC *nextkey_keyed(PMC *key, INTVAL what)>
-
-Returns the next PMC key relative to the location and direction
-specified in C<what>.
-
-=cut
-
-*/
-
-    PMC* nextkey_keyed (PMC* key, INTVAL what) {
-        PMC *ret = key;
-        HashEntry *e;
-        INTVAL n = SELF.elements();
-        INTVAL start_index, end_index;
-
-        PObj_get_FLAGS(ret) &= ~KEY_type_FLAGS;
-        PObj_get_FLAGS(ret) |= KEY_integer_FLAG;
-        if (!n) {
-            PMC_int_val(ret) = -1;
-            return ret;
-        }
-        e = (HashEntry *) PMC_data(SELF);
-            start_index = UVal_int(e[0].val);
-            end_index   = UVal_int(e[1].val);
-
-        switch (what) {
-            case ITERATE_FROM_START:    /* reset key, iterate from start */
-                PMC_int_val(ret) = start_index;
-                break;
-            case ITERATE_GET_NEXT:
-                if (PMC_int_val(ret) < end_index - 1)
-                    ++PMC_int_val(ret);
-                else
-                    PMC_int_val(ret) = -1;
-                break;
-            case ITERATE_GET_PREV:
-                if (PMC_int_val(ret) >= start_index)
-                    --PMC_int_val(ret);
-                else
-                    PMC_int_val(ret) = -1;
-                break;
-            case ITERATE_FROM_END:
-                PMC_int_val(ret) = end_index - 1;
-                break;
-        }
-        return ret;
-    }
 }
-
 /*
 
 =back
