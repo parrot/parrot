@@ -380,7 +380,7 @@ int main(int argc, char * argv[])
     struct Parrot_Interp *interpreter = Parrot_new();
 
     Parrot_init(interpreter, (void*)&stacktop);
-    IMCC_INFO(interpreter) = mem_sys_allocate_zeroed(sizeof(imcc_info_t));
+    interpreter->imcc_info = mem_sys_allocate_zeroed(sizeof(imcc_info_t));
 
     interpreter->DOD_block_level++;
 

@@ -1,18 +1,22 @@
 #
-# sample Makefile to create foo_pmc.so
+# sample Makefile
 #
 
-all: foo_pmc.so
+all: foo_pmc.so subproxy_pmc.so
 
-foo.c  : foo.pmc
-	cd .. ; perl classes/pmc2c.pl dynclasses/foo.pmc
+.SUFFIXES: .pmc .c .so
+# preserve .c if needed
+#.PRECIOUS: foo.c subproxy.c
 
-foo_pmc.so : foo.c
-	cc -shared -g -o foo_pmc.so \
-	-I../include -I../classes -L../blib/lib -lparrot foo.c
+%.c  : %.pmc
+	cd .. ; perl classes/pmc2c.pl dynclasses/$<
+
+%_pmc.so : %.c
+	cc -shared -g -o $@  \
+	-I../include -I../classes -L../blib/lib -lparrot $<
 
 clean :
-	rm -f foo.c foo.h foo_pmc.so
+	rm -f *.c *.h *.so
 
 realclean: clean
 
