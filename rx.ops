@@ -189,7 +189,7 @@ is the string to match against.
 
 op rx_allocinfo(out pmc, in str) {
 	$1=pmc_new(interpreter, enum_class_Pointer);
-        $1->cache.struct_val = rx_mark;
+        $1->cache.struct_val = F2DPTR(rx_mark);
         rx_allocate_info(interpreter, $2, &$1->data);
 
 	goto NEXT();
@@ -197,7 +197,7 @@ op rx_allocinfo(out pmc, in str) {
 
 op rx_allocinfo(out pmc, in pmc) {
 	$1=pmc_new(interpreter, enum_class_Pointer);
-        $1->cache.struct_val = rx_mark;
+        $1->cache.struct_val = F2DPTR(rx_mark);
         rx_allocate_info(interpreter, $2->vtable->get_string(interpreter, $2), &$1->data);
 	
 	goto NEXT();

@@ -43,7 +43,7 @@ inline op gcd(out INT, in INT, in INT) {
 UINTVAL q = 0;
 UINTVAL c = 0;
   while ($3 != 0) {
-    q = floor( (FLOATVAL)$2/$3 );
+    q = (UINTVAL)floor( (FLOATVAL)$2/$3 );
     c = $2 - $3*q;
     $2 = $3;
     $3 = c;
@@ -54,15 +54,15 @@ UINTVAL c = 0;
 
 inline op gcd(out INT, in NUM, in NUM){ 
 
-UINTVAL q = 0;
-UINTVAL c = 0;
+FLOATVAL q = 0;
+FLOATVAL c = 0;
   while ($3 != 0) {
     q = floor( (FLOATVAL)$2/$3 );
     c = $2 - $3*q;
     $2 = $3;
     $3 = c;
   }
-  $1 = $2;
+  $1 = (INTVAL)$2;
   goto NEXT();
 }
 
@@ -83,7 +83,7 @@ UINTVAL c = 0;
 INTVAL saved_var2 = $2;
 INTVAL saved_var3 = $3;
   while ($3 != 0) {
-    q = floor( (FLOATVAL)$2/$3 );
+    q = (UINTVAL)floor( (FLOATVAL)$2/$3 );
     c = $2 - $3*q;
     $2 = $3;
     $3 = c;
@@ -100,7 +100,7 @@ UINTVAL c = 0;
 INTVAL saved_var2 = $2;
 INTVAL saved_var3 = $3;
   while ($3 != 0) {
-    q = floor( (FLOATVAL)$2/$3 );
+    q = (UINTVAL)floor( (FLOATVAL)$2/$3 );
     c = $2 - $3*q;
     $2 = $3;
     $3 = c;
@@ -138,7 +138,7 @@ inline op fact(out NUM, in INT) {
 /* Coercing a negative to a UINT can get pretty ugly
  * in this situation. */
 INTVAL i = $2;
-UINTVAL q = 1;
+FLOATVAL q = 1;
   while(i>0) {
     q = q*i;
     i--;

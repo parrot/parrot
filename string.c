@@ -36,7 +36,6 @@ STRING *
 string_append(struct Parrot_Interp *interpreter, STRING *a,
               STRING *b, UINTVAL Uflags)
 {
-    STRING *temp;
     UNUSED(Uflags);
 
     /* If B isn't real, we just bail */

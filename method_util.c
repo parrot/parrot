@@ -30,7 +30,6 @@ Parrot_new_csub(struct Parrot_Interp * interp, Parrot_csub_t func) {
  */
 void
 Parrot_push_argv(struct Parrot_Interp * interp, INTVAL argc, PMC * argv[]) {
-    opcode_t * next;
     interp->ctx.int_reg.registers[0] = 0; /* no prototype */
     interp->ctx.int_reg.registers[1] = argc;
     while (argc--) {
@@ -57,7 +56,7 @@ Parrot_pop_argv(struct Parrot_Interp * interp, PMC *** argv) {
 }
 
 /* XXX: blech, blech, blech.  This is ugly. */
-#define push_these(npush, interp, regs, argc, arg, arg2, stacktype) do { \
+#define push_these(npush, interp, regs, argc, arg, arg2, stacktype) { \
     int i; \
     int nthings = (argc) < 27 ? (argc) : 27; \
     for (i = 0; i < nthings; i++) { \
@@ -68,7 +67,7 @@ Parrot_pop_argv(struct Parrot_Interp * interp, PMC *** argv) {
                    (stacktype), STACK_CLEANUP_NULL); \
     } \
     npush += (i < 27 ? 0 : i - 27); \
-} while (0)
+}
 
 /*
  * Push prototyped arguments.

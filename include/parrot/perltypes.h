@@ -15,7 +15,7 @@
  * as necessary.
  */
 
-#define CHANGE_TYPE(thing, type) do { \
+#define CHANGE_TYPE(thing, type) { \
     if ((thing)->vtable == &Parrot_base_vtables[enum_class_PerlString]) { \
 	(thing)->flags &= ~(UINTVAL)PMC_is_buffer_ptr_FLAG; \
     } \
@@ -23,7 +23,7 @@
     if (enum_class_ ## type == enum_class_PerlString) { \
          (thing)->flags = PMC_is_buffer_ptr_FLAG; \
     } \
-} while (0)
+}
 
 /*
  * Local variables:

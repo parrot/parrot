@@ -24,7 +24,8 @@ pmclass Pointer {
     }
 
     PMC* mark (PMC *end_of_used_list) {
-        PMC* (*mark_function)(struct Parrot_Interp*, void*, PMC *) = SELF->cache.struct_val;
+        PMC* (*mark_function)(struct Parrot_Interp*, void*, PMC *) = 
+            (PMC*(*)(struct Parrot_Interp*, void*, PMC*))D2FPTR(SELF->cache.struct_val);
         if (SELF->data == NULL) return end_of_used_list;
         if (SELF->cache.struct_val == NULL) return end_of_used_list;
         return (*mark_function)(INTERP, SELF->data, end_of_used_list);

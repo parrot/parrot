@@ -125,7 +125,7 @@ pmclass default noinit {
     INTVAL get_integer_keyed_int (INTVAL* key) {
         KEY r_key;
         MAKE_KEY_INT(r_key, *key);
-        return DYNSELF.get_number_keyed(&r_key);
+        return DYNSELF.get_integer_keyed(&r_key);
     }
 
     FLOATVAL get_number () {
@@ -2005,7 +2005,6 @@ pmclass default noinit {
 
     void logical_or_keyed (KEY* key, PMC* value, KEY* value_key, PMC* dest, KEY* dest_key) {
         if (key == NULL) {
-            PMC* new_value;
             if (DYNSELF.get_bool()) {
                 if (dest_key != NULL)
                     dest->vtable->set_pmc_keyed(INTERP, dest, dest_key, SELF, NULL);

@@ -52,12 +52,11 @@ XXX: integral file descriptors may not exist outside of the UNIX
 =cut
 
 inline op fdopen(out PMC, in INT, in STR) {
-  ParrotIO * io;
   /* These char * need to go away soon */
   const char * mode;
   mode = string_to_cstring(interpreter, $3);
 #ifdef IO_OS_UNIX
-  io = PIO_fdopen(interpreter, $2, mode);
+  ParrotIO *io = PIO_fdopen(interpreter, $2, mode);
   if(io) {
     $1 = new_io_pmc(interpreter, io);
   }

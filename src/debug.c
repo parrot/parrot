@@ -67,10 +67,10 @@ PDB_get_command(struct Parrot_Interp *interpreter)
 
     fprintf(stderr,"\n(pdb) ");
 
-    *c = fgetc(stdin);
+    *c = (char)fgetc(stdin);
 
     while ((c[i - 1] !=  '\n') && (i < 255))
-        c[i++] = fgetc(stdin);
+        c[i++] = (char)fgetc(stdin);
 
     c[--i] = '\0';
     
@@ -436,8 +436,6 @@ PDB_delete_breakpoint(struct Parrot_Interp *interpreter,
 void
 PDB_skip_breakpoint(struct Parrot_Interp *interpreter, long i)
 {
-    PDB_breakpoint_t *cur_breakpoint;
-
     interpreter->pdb->breakpoint_skip = i - 1;
 }
 
@@ -601,9 +599,7 @@ PDB_disassemble(struct Parrot_Interp *interpreter, const char *command)
     PDB_line_t *pline,*newline;
     PDB_label_t *label;
     opcode_t *code_end,*pc = interpreter->code->byte_code;
-    STRING *s;
     FLOATVAL f;
-    unsigned long size = 0, label_count = 0;
     char buf[256];
     char *ptr,*escaped;
     int neg = 0, j;
@@ -852,7 +848,7 @@ PDB_load_source(struct Parrot_Interp *interpreter, const char *command)
     pline->number = 1;
 
     while (!feof(file)) {
-        c = fgetc(file);
+        c = (char)fgetc(file);
         /* Grow it */
         if (++size == 1024) {
             pfile->source = mem_sys_realloc(pfile->source,
@@ -964,8 +960,6 @@ PDB_list(struct Parrot_Interp *interpreter, const char *command)
 void
 PDB_eval(struct Parrot_Interp *interpreter, const char *command)
 {
-    PDB_t *pdb = interpreter->pdb;
-    struct PackFile_ConstTable *const_table;
     char buf[256];
     char s[1], *c = buf;
     op_info_t *op_info;
@@ -1058,7 +1052,6 @@ PDB_extend_const_table(struct Parrot_Interp *interpreter)
 void
 PDB_print_stack(struct Parrot_Interp *interpreter, const char *command)
 {
-    PDB_t *pdb = interpreter->pdb;
     int i;
     unsigned long c = 0;
 
@@ -1248,7 +1241,6 @@ PDB_print_user_stack(struct Parrot_Interp *interpreter, const char *command)
 void
 PDB_print(struct Parrot_Interp *interpreter, const char *command)
 {
-    PDB_t *pdb = interpreter->pdb;
     int i;
     unsigned long c = 0;
 

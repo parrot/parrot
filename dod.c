@@ -335,7 +335,7 @@ free_unused_buffers(struct Parrot_Interp *interpreter,
 /* Find a mask covering the longest common bit-prefix of val1 and val2 */
 static size_t
 find_common_mask(size_t val1, size_t val2){
-    int i, count;
+    int i;
     int bound = sizeof(size_t) * 8;
 
     for(i = 0; i < bound; i++){

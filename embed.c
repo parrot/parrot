@@ -408,7 +408,7 @@ Parrot_disassemble(struct Parrot_Interp *interpreter)
 {
     PDB_t *pdb;
     PDB_line_t *line;
-    char *dis, *c;
+    char *c;
 
     pdb = (PDB_t *)mem_sys_allocate(sizeof(PDB_t));
 

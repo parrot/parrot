@@ -426,7 +426,6 @@ hash_delete(Interp *interpreter, HASH *hash, STRING *key)
 void
 hash_clone(struct Parrot_Interp * interp, HASH * hash, HASH ** clone)
 {
-    BucketIndex* table = (BucketIndex*) hash->buffer.bufstart;
     BucketIndex i;
     new_hash(interp, clone);
     for (i = 0; i <= hash->max_chain; i++) {

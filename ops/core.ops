@@ -3675,7 +3675,7 @@ op pop_pad() {
 op store_lex(in STR, in PMC) {
     PMC * hash = NULL;
     KEY key;
-    Stack_entry_type type = 0;
+    Stack_entry_type type = NO_STACK_ENTRY_TYPE;
     MAKE_KEY(key, $1, enum_key_string, struct_val);
     hash = (PMC *)stack_peek(interpreter, interpreter->ctx.pad_stack, &type);
     hash->vtable->set_pmc_keyed(interpreter, hash, NULL, $2, &key);
@@ -3685,7 +3685,7 @@ op store_lex(in STR, in PMC) {
 op find_lex(out PMC, in STR) {
     PMC * hash = NULL;
     KEY key;
-    Stack_entry_type type = 0;
+    Stack_entry_type type = NO_STACK_ENTRY_TYPE;
     MAKE_KEY(key, $2, enum_key_string, struct_val);
     hash = (PMC *)stack_peek(interpreter, interpreter->ctx.pad_stack, &type);
     $1 = hash->vtable->get_pmc_keyed(interpreter, hash, &key);
@@ -4158,7 +4158,6 @@ Call the subroutine in P0, as described in PDD03.
 =cut
 
 inline op loadext(in STR, in STR) {
-  PMC * pmc;
   void * p;
   void (*func)(void);
   string_to_cstring(interpreter, ($2));
