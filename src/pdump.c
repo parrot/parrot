@@ -13,11 +13,6 @@
 #include "parrot/parrot.h"
 #include "parrot/embed.h"
 
-/* s. packdump.c */
-void PackFile_ConstTable_dump(struct Parrot_Interp *,
-                                     struct PackFile_ConstTable *);
-void PackFile_Fixup_dump(Parrot_Interp , struct PackFile_FixupTable *ft);
-
 static void
 const_dump (struct Parrot_Interp *interpreter, struct PackFile_Segment *segp)
 {

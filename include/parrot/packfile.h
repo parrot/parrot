@@ -281,6 +281,9 @@ opcode_t PackFile_FixupTable_pack_size(struct PackFile_FixupTable * self);
 void PackFile_FixupTable_pack(struct PackFile_FixupTable * self,
                               opcode_t * packed);
 
+void PackFile_Fixup_dump(struct Parrot_Interp *, 
+                         struct PackFile_FixupTable *ft);
+
 /* create new fixup entry */
 void PackFile_FixupTable_new_entry(struct Parrot_Interp *, char *label,
                 enum_fixup_t, opcode_t offs);
@@ -306,6 +309,8 @@ struct PackFile_Debug * Parrot_new_debug_seg(struct Parrot_Interp *,
 
 void PackFile_ConstTable_clear(struct PackFile_ConstTable * self);
 
+void PackFile_ConstTable_dump(struct Parrot_Interp *,
+                              struct PackFile_ConstTable *);
 size_t PackFile_ConstTable_pack_size(struct PackFile_Segment * self);
 
 opcode_t * PackFile_ConstTable_pack(struct PackFile_Segment *, opcode_t *);
