@@ -363,8 +363,8 @@ output_is(<<'CODE', <<'OUTPUT', "nci_i_4i");
   loadlib P1, "libnci"
   dlfunc P0, P1, "nci_i4i", "i4i"
   new P5, .PerlInt
-  set P5, 6
-  set I5, 7
+  set P5, -6
+  set I5, -7
   invoke
   print I5
   print "\n"
@@ -377,10 +377,10 @@ output_is(<<'CODE', <<'OUTPUT', "nci_i_i3");
 .include "datatypes.pasm"
   loadlib P1, "libnci"
   dlfunc P0, P1, "nci_ii3", "ii3"
-  set I5, 6
+  set I5, -6
 
   new P5, .PerlInt
-  set P5, 7
+  set P5, -7
 
   set I0, 1
   set I1, 1
