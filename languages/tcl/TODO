@@ -16,6 +16,11 @@ TODO tests would also suffice, where possible.
 
 =over 4
 
+=item List to String [ Assigned to KJ ] 
+
+The current list to string logic in C<dynclasses/tcllist.pmc> is missing logic
+to properly escape string elements.
+
 =item PMC based parser
 
 Instead of the current PIR level parsing, we should instead use
@@ -35,8 +40,8 @@ methods is probably sufficient.
 =item Use PMCs to handle numifying
 
 not the pir routines we now have. Verify that [expr 2a + 2b] behaves
-appropriately when doing this. Include proper numififcation of octal and
-hex
+appropriately when doing this. Include proper numification of octal and
+hex.
 
 =back
 
@@ -65,11 +70,11 @@ ready for this yet) in C<lib/parser.imc>
 
 =item unimplemented commands/subcommands
 
-[after] [array get] [array names] [array unset] 
+[after] [array get]* [array names] [array unset] 
 [array statistics] [array anymore] [array donesearch]
 [array nextelement] [array startsearch] [bgerror] [binary] 
 [case] [clock] [close] [cd] [dde] [encoding] [eof] [exec]
-[fblocked] [fconfigure] [fcopy] [file] [filename] [fileevent]
+[fblocked] [fconfigure] [fcopy] [file] [fileevent]
 [flush] [foreach] [gets] [glob] [http] [info] [interp] [library]
 [lindex] [load] [lreplace] [lsearch] [lset] [lsort] 
 [memory] [msgcat] [namespace] [open] [package] [pid] [pwd]
@@ -78,15 +83,11 @@ ready for this yet) in C<lib/parser.imc>
 [string repeat] [string replace] [string tolower]
 [string totitle] [string toupper] [string trim] [string trimleft]
 [string trimright] [string compare] [string equal] [string last]
-[string bytelength] [string compare] [string is] [string map]
+[string bytelength] [string is] [string map]
 [string wordstart] [string wordend] [string map] [switch] [tcltest]
 [tell] [update] [variable] [vwait]
 
-=item interpreter exit value
-
-If the return type of the outermost script is not OK, return the
-I<appropriate> code to the system.
-
+* - assigned
 
 =back
 
@@ -104,7 +105,7 @@ tests so they're consistent.
 tclword.imc, PMCs, the macros, expr's precedence and parens,
 [puts]'s ability to write to other channels, the C<compreg> compiler.
 
-[concat] [join] [lrepeat] [uplevel] [upvar] [lrange] [array set] [global] [string match] [inline]
+[uplevel] [upvar] [lrange] [inline]
 
 =item pass tcl test suite
 
