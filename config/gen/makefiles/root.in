@@ -506,7 +506,7 @@ flags_dummy :
 	@echo Compiling with:
 	@$(PERL) tools/dev/cc_flags.pl ./CFLAGS echo $(CC) $(CFLAGS) xx$(O) -c xx.c
 
-runtime/parrot/include/parrotlib.pbc: runtime/parrot/library/parrotlib.imc
+runtime/parrot/include/parrotlib.pbc: runtime/parrot/library/parrotlib.imc $(TEST_PROG)
 	./parrot -o $@ runtime/parrot/library/parrotlib.imc
 
 runtime/parrot/include/config.fpmc : myconfig config_lib.pasm $(TEST_PROG)
