@@ -14,6 +14,7 @@ TODO
 Types_pm.in
 VERSION
 assemble.pl
+byteorder.c
 chartype.c
 chartypes/unicode.c
 chartypes/usascii.c
