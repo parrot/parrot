@@ -24,7 +24,7 @@ new_stack(Interp *interpreter)
     Stack_Entry_t *entry;
 #endif
 
-    Stack_Chunk_t *stack = mem_allocate_aligned(sizeof(Stack_Chunk_t));
+    Stack_Chunk_t *stack = mem_sys_allocate(sizeof(Stack_Chunk_t));
     
     stack->used = 0;
     stack->flags = NO_STACK_CHUNK_FLAGS;
@@ -76,7 +76,7 @@ stack_copy(struct Parrot_Interp * interp, Stack_Chunk_t *old_top) {
     Stack_Chunk_t *new_top = NULL;
     Stack_Chunk_t *last = NULL;
     do {
-        new_chunk = mem_allocate_aligned(sizeof(Stack_Chunk_t));
+        new_chunk = mem_sys_allocate(sizeof(Stack_Chunk_t));
         if(new_top == NULL) {
             new_top = new_chunk;
             new_top->next = NULL;
