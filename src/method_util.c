@@ -152,11 +152,9 @@ mark_stack(struct Parrot_Interp *interpreter,
     size_t i;
 
     for (; cur_stack; cur_stack = cur_stack->prev) {
-        if (cur_stack->buffer == NULL)
-            continue;
 
-        pobject_lives(interpreter, (PObj *)cur_stack->buffer);
-        entry = (Stack_Entry_t *)(cur_stack->buffer->bufstart);
+        pobject_lives(interpreter, (PObj *)cur_stack);
+        entry = (Stack_Entry_t *)(cur_stack->items.bufstart);
         for (i = 0; i < cur_stack->used; i++) {
             if ((STACK_ENTRY_PMC == entry[i].entry_type ||
                 STACK_ENTRY_STRING == entry[i].entry_type) &&

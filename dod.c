@@ -290,8 +290,7 @@ clear_cow(struct Parrot_Interp *interpreter, struct Small_Object_Pool *pool,
     Buffer *b;
     int *refcount;
 
-    /* clear refcount for COWable objects. As these are STRINGs only these
-     * have _is_string_FLAG set */
+    /* clear refcount for COWable objects. */
     for (cur_arena = pool->last_Arena;
             NULL != cur_arena; cur_arena = cur_arena->prev) {
         b = cur_arena->start_objects;
@@ -308,7 +307,7 @@ clear_cow(struct Parrot_Interp *interpreter, struct Small_Object_Pool *pool,
                     PObj_live_CLEAR(b);
                 }
 
-                if (PObj_is_string_TEST(b) && b->bufstart &&
+                if (PObj_COW_TEST(b) && b->bufstart &&
                         !PObj_external_TEST(b)) {
                     refcount = ((int *)b->bufstart);
                     *refcount = 0;
@@ -335,7 +334,7 @@ used_cow(struct Parrot_Interp *interpreter, struct Small_Object_Pool *pool,
         b = cur_arena->start_objects;
         for (i = 0; i < cur_arena->used; i++) {
             if (!PObj_on_free_list_TEST(b) &&
-                    PObj_is_string_TEST(b) &&
+                    PObj_COW_TEST(b) &&
                     b->bufstart &&
                     !PObj_external_TEST(b)) {
                 refcount = ((int *)b->bufstart);
@@ -533,7 +532,7 @@ free_unused_pobjects(struct Parrot_Interp *interpreter,
                      * but not if it is used COW or external
                      */
                     if (b->bufstart && !PObj_is_external_or_free_TESTALL(b)) {
-                        if (PObj_is_string_TEST(b)) {
+                        if (PObj_COW_TEST(b)) {
                             int *refcount = ((int *)b->bufstart);
 
                             if (!--(*refcount))

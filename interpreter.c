@@ -542,18 +542,15 @@ make_interpreter(Interp_flags flags)
     Parrot_clear_s(interpreter);
     Parrot_clear_p(interpreter);
 
+    stack_system_init(interpreter);
     /* Stack for lexical pads */
     interpreter->ctx.pad_stack = new_stack(interpreter, "Pad");
 
     /* Need a user stack */
     interpreter->ctx.user_stack = new_stack(interpreter, "User");
-    assert(interpreter->ctx.user_stack->buffer !=
-            interpreter->ctx.pad_stack->buffer);
 
     /* And a control stack */
     interpreter->ctx.control_stack = new_stack(interpreter, "Control");
-    assert(interpreter->ctx.control_stack->buffer !=
-            interpreter->ctx.user_stack->buffer);
 
     /* A regex stack would be nice too. */
     interpreter->ctx.intstack = intstack_new(interpreter);

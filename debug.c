@@ -1928,7 +1928,7 @@ PDB_print_user_stack(struct Parrot_Interp *interpreter, const char *command)
 
     valid_chunk(chunk, command, depth, STACK_CHUNK_DEPTH, i);
 
-    entry = (Stack_Entry_t *)(chunk->buffer->bufstart) + depth;
+    entry = (Stack_Entry_t *)(chunk->items.bufstart) + depth;
 
     switch (entry->entry_type) {
         case STACK_ENTRY_INT:
