@@ -14,6 +14,9 @@
 #
 # $Id$
 # $Log$
+# Revision 1.3  2002/05/22 17:22:22  clintp
+# Uses PerlHash for speed
+#
 # Revision 1.2  2002/04/29 01:10:04  clintp
 # Speed changes, new language features
 #
@@ -89,8 +92,7 @@ I_DUMP: pushi
 	restore I0
 	bsr CLEAR
 	restore I0
-	print S21
-	print "\n"
+	print "DUMP (NO-OP)\n"
 	popi
 	pops
 	ret
@@ -123,7 +125,7 @@ RESTEXPR:
 	save I5
 	bsr CLEAR
 	restore I0   # Empty pointer
-	set I26, 0
+	set I26, -1
 	set I27, 0
 
 END_I_RESTORE:
@@ -240,16 +242,12 @@ DO_READ_DATA_AGAIN:
 	branch DO_READ_DATA
 
 END_I_READ:
-	save S20
-	save S21
 	save I26
 	save I27
 	popi
 	pops
 	restore I27
 	restore I26
-	restore S21
-	restore S20
 	ret
 
 # PRINT		 (just a newline)
@@ -344,14 +342,10 @@ END_I_LET:
 	bsr CLEAR    # Clear the token stack
 	restore I0   # Pull the 0
 
-	save S20
-	save S21
 	save I24
 	popi
 	pops
 	restore I24
-	restore S21
-	restore S20
 	ret
 
 ERR_I_LET:
@@ -659,12 +653,10 @@ NOSTEP:
 	save I5
 
 END_I_FOR:
-	save S20
 	save I24
 	popi
 	pops
 	restore I24
-	restore S20
 	ret
 
 FOR_SYNTAX1:
@@ -769,12 +761,10 @@ GO_BACK:
 	set I23, I11  # New line #
 
 	save I23
-	save S20
 	save I24
 	popi
 	pops
 	restore I24
-	restore S20
 	restore I23
 	ret
 
@@ -877,16 +867,21 @@ I_LIST:
 	save "-"
 	bsr EVAL_EXPR
 	bsr ATOI
-	restore I2
+	restore I2     # Either the start of a range, or one line #
 
 	restore I5
 	eq I5, 0, LIST_ONE_LINE  # All tokens used.
 	branch LIST_RANGE
 
-LIST_ONE_LINE:
-	set I3, I2
-	branch DO_I_LIST
 
+
+
+LIST_ONE_LINE:
+	get_keyed S0, P22, I2
+	print S0
+	print "\n"
+	branch END_LIST
+	
 LIST_RANGE:
 	restore S0  	# -
 	dec I5
@@ -894,24 +889,25 @@ LIST_RANGE:
 	save ""
 	bsr EVAL_EXPR
 	bsr ATOI
-	restore I3
+	restore I3      # This is the top end of the range
 
-DO_I_LIST:
-	set I0, I2
+	# List from I2 to I3
+	#  If I3 is -1 then no range applies.
+DO_I_LIST:  set I0, 0
+DOLISTL: gt I0, I28, END_LIST
+        get_keyed I1, P24, I0   # Get the next line
+        get_keyed S0, P22, I1   # Get the line code itself
+	eq I3, -1, LIST_SHOW
+	lt I2, I1, LIST_NEXT
+	gt I3, I1, LIST_NEXT
 
-LIST_LOOP:
-	save I0
-	bsr CFETCH
-	restore I0
-	eq I0, -1, END_LIST
-	restore S0
-	print S0
-	print "\n"
-	inc I0
-	eq I3, -1 LIST_LOOP  # Go to the end
-	gt I0, I3, END_LIST
-	branch LIST_LOOP
+LIST_SHOW:
+        print S0
+        print "\n"
 
+LIST_NEXT:
+        inc I0
+        branch DOLISTL
 
 END_LIST:
 	popi
@@ -926,8 +922,9 @@ I_RUN:  restore I10   # Line number
 
 	set I20, 1    # Runline mode
         set I23, -1   # Program Counter
-	set S20, "#"  # Clear numerics
-	set S21, "#"  # Clear Alpha
+	new P20, 6   # PerlHash  # Clear Numerics
+	new P21, 6   # PerlHash  # Clear Alphas
+
 	set I26, -1   # Reset READ/DATA line number
 	set I27, 0    # And thingy.
 
@@ -956,11 +953,15 @@ I_NEW:  pushi
 	restore I10
 	bsr CLEAR
 	restore I10
-	set S22, "#"  # Initialize Codespace
-	save S22
+	# Initialize program area
+        new P22, PerlHash     # The lines themselves  (Keyed on Line #)
+        new P23, PerlHash     # Pointers from the lines to the array  (Keyed on Line #)
+        new P24, PerlArray    # Array of line numbers
+        set I28, -1	      # Array length
+	save I28
 	popi
 	pops
-	restore S22
+	restore I28
 	ret
 
 # LOAD
@@ -1026,7 +1027,12 @@ ENDLINES:
 	close P0
 	save I5
 	eq I20, 1, ENDLINES2
-	set S22, "#"
+
+	# Initialize program area
+        new P22, PerlHash     # The lines themselves  (Keyed on Line #)
+        new P23, PerlHash     # Pointers from the lines to the array  (Keyed on Line #)
+        new P24, PerlArray    # Array of line numbers
+        set I28, -1
 
 ENDLINES2:
 	bsr CENDLOAD
@@ -1075,12 +1081,8 @@ INPSTRING:
 	branch ENDINPUT
 
 ENDINPUT:
-	save S20
-	save S21
 	popi
 	pops
-	restore S21
-	restore S20
 	ret
 
 # TRACE

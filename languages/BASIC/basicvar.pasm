@@ -16,6 +16,9 @@
 #
 # $Id$
 # $Log$
+# Revision 1.3  2002/05/22 17:22:22  clintp
+# Uses PerlHash for speed
+#
 # Revision 1.2  2002/04/29 01:10:04  clintp
 # Speed changes, new language features
 #
@@ -353,14 +356,12 @@ VDCODE:
 	branch VDESTROYEND
 
 VDESTROYEND:	
-	save S20
 	save S21
 	save S22
 	popi
 	pops
 	restore S22
 	restore S21
-	restore S20
 	ret
 VDFATAL:
 	print "Unknown type in DESTROY"
@@ -371,7 +372,6 @@ VDFATAL:
 #    Should be saved/restored okay though.
 
 # Numeric variable handling
-#   NCREATE (almost never needed)
 #   NSTORE
 #   NFETCH
 #
@@ -380,90 +380,29 @@ VDFATAL:
 #    push the value (if needed)
 #    call
 #
-# Create Numeric
-.const NUMWIDTH 12
-NCREATE:
-	pushi
-	pushs
-	restore S0  # Name
-	save S0
-	save NTYPE
-	bsr VFIND
-	restore I0
-	ne I0, -1, NCREATED
-	save S0
-	save NTYPE
-	save NUMWIDTH
-	bsr VCREATE
-	save S0
-	save NTYPE
-	save NUMWIDTH
-	save "0"
-	bsr VSTORE
-NCREATED:
-	save S20
-	popi
-	pops
-	restore S20
-	ret
-
 # Store numerics
-NSTORE:
+NSTORE: 
 	pushi
 	pushs
 	restore I1   # Value
 	restore S0   # Name
-
-	save S0
-	save NTYPE
-	bsr VFIND
-	restore I0
-	ne I0, -1, NSCREATED
-	save S0
-	save NTYPE
-	save NUMWIDTH
-	bsr VCREATE
-NSCREATED:
-	save I1
-	bsr ITOA
-	restore S1
-	save S0
-	save NTYPE
-	save NUMWIDTH
-	save S1
-	bsr VSTORE
-	save S20
+	set_keyed P20, S0, I1
 	popi
 	pops
-	restore S20
 	ret
 
 # Fetch Numerics
-NFETCH: pushi
+NFETCH: 
+	pushi
 	pushs
-	restore S0
-	save S0
-	save NTYPE
-	bsr VFIND
-	restore I0
-	ne I0, -1, NFCREATED
-	save S0
-	bsr NCREATE
-NFCREATED:
-	save S0
-	save NTYPE
-	bsr VFETCH
-	restore S0
-	set I1, S0
+	restore S0   # Name
+	get_keyed I1, P20, S0
 	save I1
-	save S20
 	popi
 	pops
-	restore S20
 	ret
 
 # String variable handling
-#   SCREATE (DIM)
 #   SSTORE
 #   SFETCH
 # Strings are \n terminated internally
@@ -475,120 +414,26 @@ NFCREATED:
 #
 # Create String 
 # DIMENSION is now a no-op.
-SCREATE:
-	pushi
-	pushs
-	restore I1  # Dimensioned width
-	restore S0  # Name
-	inc I1      # Add one for the terminator
-	save S0
-	save STYPE
-	bsr VFIND
-	restore I0
-	ne I0, -1, DIMERROR
-	save S0
-	save STYPE
-	save I1
-	bsr VCREATE
-
-	save S0
-	save STYPE
-	save I1
-	save TERMINATOR
-	bsr VSTORE
-	save S21
-	popi
-	pops
-	restore S21
-	ret
-DIMERROR:
-	print "DIM FAILURE"
-	end
-
+#
 # Strings are a little smarter now.  They work *exactly* like
 # numeric variables, except that if the store size exceeds the 
 # allocated storage we destroy the existing variable and create a new one.
 #
-SSTORE:
-	pushi
-	pushs
+SSTORE: pushs
 	restore S1  # Value
 	restore S0  # Name
-	save S0
-	save STYPE
-	bsr VFIND
-	restore I0
-	eq I0, -1, NODIMERR
-	add I0, I0, NAMEWIDTH
-	substr S2, S21, I0, 3
-	set I1, S2
-
-	length I0, S1
-	ge I0, I1, STRTOOLONG
-
-	concat S1, TERMINATOR
-STOREIT:
-	save S0
-	save STYPE
-	save I1
-	save S1
-	bsr VSTORE
-	save S21
-	popi
+	set_keyed P21, S0, S1
 	pops
-	restore S21
 	ret
-
-	# These are no longer errors.
-	# Create a new string slot
-	# Always create them for at least STRINGMINW
-NODIMERR:
-	concat S1, TERMINATOR
-	length I1, S1
-	gt I1, STRINGMINW, LENOKAY
-	set I1, STRINGMINW
-LENOKAY:save S0
-	save STYPE
-	save I1
-	bsr VCREATE
-	branch STOREIT
-
-	# Destroy the old slot, create a new one
-STRTOOLONG:
-	save S0
-	save STYPE
-	bsr VDESTROY
-	branch NODIMERR
-
+	
 # Fetch a string
 # If the string wasn't previously dimensioned then
 # we return the empty string
-SFETCH:
-	pushi
-	pushs
+SFETCH: pushs
 	restore S0  # Name
-	save S0
-	save STYPE
-	bsr VFIND
-	restore I0
-	ne I0, -1, GETSVAL
-	set S1, ""
-	branch RETSVAL
-
-GETSVAL:save S0
-	save STYPE
-	bsr VFETCH
-	bsr STRIPSPACE
-	restore S1
-
-	length I1, S1		# chopn S1, 1
-	dec I1
-	substr S1, S1, 0, I1
-
-RETSVAL:save S1
-	set S1, S1  # Fix bug?
-	popi
-	pops  # No state-saving needed
+	get_keyed S1, P21, S0
+	save S1
+	pops
 	ret
 
 # Code Storage and Retrieval
@@ -607,58 +452,64 @@ RETSVAL:save S1
 #   jumps, this means that only backwards jumps are O(n)
 #  
 CFETCH: pushi
-	pushs
-	restore I1   # Line number we want
+        pushs
+        restore I0            # Line number to fetch.
+        set I2, I0
+        eq I0, -1, CFETCHSTART
+        get_keyed S0, P22, I0
+        ne S0, "", CFETCHEND
 
-INCACHE:
-	save I1
-	bsr ITOA
-	save CTYPE
-	bsr VFIND
-	restore I0   # Offset, line that was found.
-	eq I0, -1, CNOLINE
+        # Not found.  Let's see if this is a +1
+        dec I0
+        get_keyed S0, P22, I0
+        ne S0, "", CFETCHNEXT
+        branch CNOTFOUND
 
-	substr S3, S22, I0, NAMEWIDTH
-	set I3, S3
+CFETCHNEXT:
+        get_keyed I1, P23, I0  # Okay, got the line before
+        inc I1
+        gt I1, I28, COVERFLOW
+        get_keyed I0, P24, I1  # Next line number is...
+        eq I0, 0, COVERFLOW
+        get_keyed S0, P22, I0  # Fetch it.
+        ne S0, "", CFETCHEND
+        branch CNOTFOUND       # This is a should-not-happen, I think.
 
-	add I0, I0, NAMEWIDTH
-	substr S4, S22, I0, VARWIDTH
-	set I1, S4
+CFETCHSTART:
+        set I6, 0    # Line position to fetch
+        gt I6, I28, COVERFLOW
+        get_keyed I0, P24, I6
+        eq I0, 0, COVERFLOW
+        get_keyed S0, P22, I0  # Fetch line
+        ne S0, "", CFETCHEND
+        branch CNOTFOUND       # This is a should-not-happen, I think.
 
-	add I0, I0, VARWIDTH
-	substr S4, S22, I0, I1
-	save S4
-	bsr STRIPSPACE
-	restore S4
+CFETCHEND:
+        save S0
+        save I0
 
-	length I2, S4		# chopn S4, 1
-	dec I2
-	substr S4, S4, 0, I2
-
-	save S4		# The line
-	save I3		# The line number
-
-	popi
-	pops
-	ret
-
-CNOLINE:
-	save -1
-	popi
-	pops
-	ret
-
+CFETCHEND2:
+        popi
+        pops
+        ret
+COVERFLOW:
+        save -1
+        branch CFETCHEND2
+CNOTFOUND:
+        print "LINE "
+        print I2
+        print " NOT FOUND\n"
+        save -1
+        branch CFETCHEND2
 
 # CSTORE
 #  Inputs: A code line on the stack.  Must be formatted like this:
 #                  \d+\s
 # Outputs: Nothing
-# Trashes I0-I4, S0-S4
-CSTORE:
-	pushi
+CSTORE: pushi
 	pushs
 	set I8, 0   # One-token-only flag
-	restore S0  # Safekeeping
+	restore S0  # Safekeeping (the line to insert)
 	save S0
 	bsr TOKENIZER
 	bsr REVERSESTACK
@@ -670,97 +521,57 @@ ONELNCK:
 	dec I0
 	save I0
 	bsr CLEAR   # Empty the stack
-	save S1
-	bsr ATOI
-	restore I1  # Number as numeric
+	restore I5  # Dummy
+
+	set I1, S1
 	lt I1, 1, ENOTVALIDLINE
-	# This is fucking ugly.  :)
-	# Load the stack up with the lines so far, skipping the
-	#    one entry we (might be) replacing.
-	set I2, 0	# Depth
-	set I0, 0
-	eq I8, 1, CNEXT # Don't add if it's just a number
-	save S0		# The line we're adding
-	inc I2
-CNEXT:
-	set S3, ""
-	substr S3, S22, I0, NAMEWIDTH
-	save S3
-	bsr STRIPSPACE
-	restore S3
-	eq S3, "#", CEND
 
-	add I0, I0, NAMEWIDTH
-	set S4, ""
-	substr S4, S22, I0, VARWIDTH
-	set I1, S4
+	set I5, 0   # Start with a blank stack.
 
-	add I0, I0, VARWIDTH
-	set S4, ""
-	substr S4, S22, I0, I1
-	add I0, I0, I1
-	save S4
-	bsr STRIPSPACE
-	restore S4
-
-	length I3, S4
-	dec I3
-	substr S4, S4, 0, I3
-
-	eq S1, S3, CNEXT  # Skipping this line
-	save S4  # The line
-	inc I2
+CLOAD:  set I0, 0
+CNEXT:  gt I0, I28, CEND
+        get_keyed I3, P24, I0   # Get the next line
+        get_keyed S1, P22, I3   # Get the line code itself
+	inc I0
+	eq I3, I1, CNEXT	# Skip this, it's being replaced.
+	save S1
+	inc I5
 	branch CNEXT
 
-	# At this point the stack is full of stuff
-	# Sort it.
-CEND:   save I2
-	set S22, "#"
+CEND:   eq I8, 1, CINIT
+	save S0			# Insert the new line
+	bsr STRIPSPACE
+	inc I5
+
+CINIT:  save I5
+	# Initialize program area
+        new P22, PerlHash     # The lines themselves  (Keyed on Line #)
+        new P23, PerlHash     # Pointers from the lines to the array  (Keyed on Line #)
+        new P24, PerlArray    # Array of line numbers
+	set I28, -1
+
 CENDLOAD:		# Entry point for LOAD
 	bsr REVERSESTACK
 	bsr NSORTSTACK
-	bsr REVERSESTACK
 
 	# Take the stack and re-insert it as lines
-	set I0, 0
-	restore I1
-	set I0, I1
-	# Stuff the lines into the storage area
-ADDLINE:
-	eq 0, I0, DONEADD
-	set S0, ""
-	restore S0	 # Whole line
+        restore I5
+STOREC: eq I5, 0, DONEADD
+        restore S0              # Code line
+        set I1, S0              # Line Number
 
-	save S0
-	save " "
-	save 0
-	bsr STRNCHR
-	restore I2
-	set S1, ""
-	substr S1, S0, 0, I2
-
-	concat S0, TERMINATOR
-	length I2, S0
-
-	save S1
-	save CTYPE
-	save I2
-	bsr VCREATE
-
-	save S1
-	save CTYPE
-	save I2
-	save S0
-	bsr VSTORE
-
-	dec I0
-	branch ADDLINE
+        set_keyed P22, I1, S0   # The line itself
+        inc I28
+        set_keyed P23, I1, I28   # Index back to array
+        set_keyed P24, I28, I1
+        dec I5
+        branch STOREC
 
 DONEADD:
-	save S22
+	save I28
 	popi
 	pops
-	restore S22	
+	restore I28
 	ret
 
 ENOTVALIDLINE:

@@ -1,17 +1,16 @@
 # Expression Evaluation routines
 #
 # Global Variables:
-#    S24  -- the pseudo stack.  Set to "" to reset the stack.
-#            accessed through PUSHOPSTACK, POPOPSTACK, OPSTACKDEPTH
+#    P25  -- The op stack
 #    I24  -- Random number generator seed
 #
 # There are external dependancies on stackops, basicvars, and alpha.
 #
-# TODO: A space on the op stack will be reduced to an empty expression
-#    fix PUSHOPSTACK/POPOPSTACK when not so exhausted...
-#
 # $Id$
 # $Log$
+# Revision 1.4  2002/05/22 17:22:22  clintp
+# Uses PerlHash for speed
+#
 # Revision 1.3  2002/04/30 17:39:42  clintp
 # Changed terminator
 #
@@ -36,52 +35,40 @@
 #
 
 # Width of things on the pseudo-stack
-.const STACKSIZE 80
 .const FUNCMARK "\x0"
-
-# Some stack stuff.  Allows me to move things from one stack to another, etc..
-#
+# Create an artificial "stack" so that I can shift from one stack to the other.
 PUSHOPSTACK:
-	pushs
-	restore S0
-	concat S0, TERMINATOR   # Marker
-	save S0
-	save STACKSIZE
-	bsr PAD
-	restore S0
-	concat S24, S0
-	savec S24
-	pops
-	restore S24
-	ret
+        pushi
+        pushs
+        get_keyed I0, P25, 0
+        inc I0
+        restore S0
+        set_keyed P25, I0, S0
+        set_keyed P25, 0, I0
+        popi
+        pops
+        ret
 POPOPSTACK:
-	pushi
-	pushs
-	length I0, S24
-	sub I1, I0, STACKSIZE
-	substr S0, S24, I1, STACKSIZE
-	substr S24, S24, 0, I1
-	savec S0
-	bsr STRIPSPACE
-	restore S0
-	length I0, S0
-	dec I0
-	substr S0, S0, 0, I0	# Remove trailing 
-	save S0
-	
-	savec S24
-	popi
-	pops
-	restore S24
-	ret
-
+        pushi
+        pushs
+        get_keyed I0, P25, 0
+        get_keyed S0, P25, I0
+        save S0
+        dec I0
+        set_keyed P25, 0, I0
+        popi
+        pops
+        ret
 OPSTACKDEPTH:
-	pushi
-	length I0, S24
-	div I0, I0, STACKSIZE
-	save I0
-	popi
-	ret
+        pushi
+        get_keyed I0, P25, 0
+        save I0
+        popi
+        ret
+INITOPSTACK:
+        new P25, PerlArray
+        set_keyed P25, 0, 0
+        ret
 
 # Function Dispatcher and Test
 #  Functions are dispatched from here.  BASIC functions have a *FIXED* number of
@@ -440,7 +427,7 @@ DOSUBRET:
 EVAL_EXPR:
 	pushs
 	pushi
-	set S24, ""	  # clear the multipurpose stack
+	bsr INITOPSTACK
 	restore S1	  # Stop word
 	restore I5
 
@@ -493,7 +480,7 @@ COOK_EXPR:
 	pushi
 	pushs
 	restore I5
-	set S24, ""	# Stack thingy
+	bsr INITOPSTACK
 	set I6, 1	# Unary flag
 	set I7, 0	# func flag
 	set I8, 0	# Seen < flag
@@ -604,7 +591,7 @@ INFIXPOSTFIX:
 	pushs
 	restore I5  # Stack depth
 
-	set S24, ""
+	bsr INITOPSTACK
 	set S0, ""  # The postfix stack
 	set S7, ""  # Input
 
@@ -818,7 +805,7 @@ ENDINFIX:
 DOCALC:
 	pushi
 	pushs
-	set S24, ""
+	bsr INITOPSTACK
 	bsr REVERSESTACK
 	restore I5
 	set S0, ""

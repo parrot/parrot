@@ -10,6 +10,9 @@
 #
 # $Id$
 # $Log$
+# Revision 1.3  2002/05/22 17:22:22  clintp
+# Uses PerlHash for speed
+#
 # Revision 1.2  2002/04/29 01:10:04  clintp
 # Speed changes, new language features
 #
@@ -199,8 +202,10 @@ NOERR:  save S20
 	save I27
 	save I20
 	save I24
+	save I28
 	popi
 	pops
+	restore I28
 	restore I24
 	restore I20
 	restore I27

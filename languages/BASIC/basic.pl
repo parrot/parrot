@@ -1,72 +1,7 @@
 #!/usr/bin/perl -w
-# BASIC in PASM build harness program
+
 #
-# $Id$
-# $Log$
-# Revision 1.4  2002/05/12 15:00:44  clintp
-# Removed temporary print statements for GC workaround
-#
-# Revision 1.3  2002/04/29 01:10:04  clintp
-# Speed changes, new language features
-#
-# Revision 1.8  2002/04/28 01:09:36  Clinton
-# Added speedups by using set Ix, Sx and avoiding a lot of
-# STRIPSPACE calls.  Compensated for weird read-data bug.
-#
-# Revision 1.6  2002/04/14 20:51:17  Clinton
-# Fixed pathname for inclusion as languages\basic
-#
-# Revision 1.2  2002/04/11 02:21:15  jgoff
-# Altered system() calls to point to the correct directory.
-#
-# Revision 1.1  2002/04/11 01:25:59  jgoff
-# Adding clintp's BASIC interpreter.
-#
-# Revision 1.5  2002/04/07 04:10:07  Clinton
-# Debugging
-#
-# Revision 1.4  2002/04/01 22:16:54  Clinton
-# Seed Random Number generator with time
-#
-# Revision 1.3  2002/03/31 05:14:02  Clinton
-# Id Keywords
-#
-# Revision 1.2  2002/03/31 05:09:57  Clinton
-# *** empty log message ***
-#
-# Revision 1.1  2002/03/31 04:54:21  Clinton
-# Initial revision
-#
-# $Id$
-# $Log$
-# Revision 1.4  2002/05/12 15:00:44  clintp
-# Removed temporary print statements for GC workaround
-#
-# Revision 1.3  2002/04/29 01:10:04  clintp
-# Speed changes, new language features
-#
-# Revision 1.8  2002/04/28 01:09:36  Clinton
-# Added speedups by using set Ix, Sx and avoiding a lot of
-# STRIPSPACE calls.  Compensated for weird read-data bug.
-#
-# Revision 1.6  2002/04/14 20:51:17  Clinton
-# Fixed pathname for inclusion as languages\basic
-#
-# Revision 1.2  2002/04/11 02:21:15  jgoff
-# Altered system() calls to point to the correct directory.
-#
-# Revision 1.1  2002/04/11 01:25:59  jgoff
-# Adding clintp's BASIC interpreter.
-#
-# Revision 1.5  2002/04/07 04:10:07  Clinton
-# Debugging
-#
-# Revision 1.4  2002/04/01 22:16:54  Clinton
-# Seed Random Number generator with time
-#
-# Revision 1.3  2002/03/31 05:14:02  Clinton
-# Id Keywords
-#
+# Test Harness...
 #
 
 open(T, ">test.pasm") || die;
@@ -75,9 +10,11 @@ $a=<<'EOF';
 
 # I5 Stack Depth?
 
-	set S20, "#"
-	set S21, "#"
-	set S22, "#"
+	new P20, 6     #PerlHash   # Numerics
+	new P21, 6   # Alphabetics.
+
+	set S22, "#"	    # Code
+
 	time I24      # Seed the random number generator
 
 	branch MAIN
@@ -163,4 +100,3 @@ unlink "out.pbc";
 system("perl -I../../lib ../../assemble.pl test.pasm > out.pbc");
 
 system("../../parrot out.pbc");
-
