@@ -476,10 +476,6 @@ make_interpreter(Interp_flags flags)
     /* Get an empty interpreter from system memory */
     interpreter = mem_sys_allocate_zeroed(sizeof(struct Parrot_Interp));
 
-    /* PANIC will fail until this is done */
-    SET_NULL(interpreter->piodata);
-    PIO_init(interpreter);
-
     /* must be set after if this is not the first interpreter */
     SET_NULL(interpreter->parent_interpreter);
 
@@ -489,6 +485,11 @@ make_interpreter(Interp_flags flags)
     /* Must initialize flags here so the GC_DEBUG stuff is available before
      * mem_setup_allocator() is called. */
     interpreter->flags = flags;
+
+    /* PANIC will fail until this is done */
+    SET_NULL(interpreter->piodata);
+    PIO_init(interpreter);
+
 
     if (env_var_set("PARROT_GC_DEBUG")) {
 #if ! DISABLE_GC_DEBUG
@@ -581,6 +582,8 @@ make_interpreter(Interp_flags flags)
     /* register assembler/compilers */
     setup_default_compreg(interpreter);
 
+    /* setup stdio PMCs */
+    PIO_init(interpreter);
     /* Done. Return and be done with it */
 
     /* Okay, we've finished doing anything that might trigger GC.

@@ -115,8 +115,12 @@ void
 PIO_init(theINTERP)
 {
     /* Has interp been initialized already? */
-    if (interpreter->piodata)
+    if (interpreter->piodata) {
+        /* memsub system is up and running:
+         * TODO: create stdio PMCs and store them away for later
+         */
         return;
+    }
 
     interpreter->piodata = mem_sys_allocate(sizeof(ParrotIOData));
     if (interpreter->piodata == NULL)
@@ -137,8 +141,7 @@ PIO_init(theINTERP)
     }
 
     if (Interp_flags_TEST(interpreter, PARROT_DEBUG_FLAG)) {
-        PIO_puts(interpreter, new_io_pmc(interpreter, PIO_STDERR(interpreter)),
-                 "PIO: IO system initialized.\n");
+        PIO_eprintf(NULL, "PIO: IO system initialized.\n");
     }
 }
 
