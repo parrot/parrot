@@ -1,6 +1,6 @@
 #! perl -w
 # test WRT JIT register allocation
-use Parrot::Test tests => 8;
+use Parrot::Test tests => 9;
 
 output_is(<<'CODE', <<'OUTPUT', "sub_i_i_i 1,2,3 mapped");
 set N0,0
@@ -188,3 +188,23 @@ CODE
 4.000000
 OUTPUT
 
+output_is(<<'CODE', <<'OUTPUT', "sub_i_i_i mapped same");
+set N2, 1
+add N2, N2, N2	# reserve first reg
+add N2, N2, N2
+set N0, 10.0
+set N1, 20.0
+sub N0, N0, N1
+sub N1, N1
+print N2
+print "\n"
+print N1
+print "\n"
+print N0
+print "\n"
+end
+CODE
+4.000000
+0.000000
+-10.000000
+OUTPUT
