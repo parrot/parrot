@@ -9,7 +9,7 @@ sub main() {
     my $a = (2,3,4);
     my ($b, $c) = (2,3,4);
     my ($d, $e, $f) = (5,6);
-    print1(@a[0] _ ' ' _ @a[1] _ ' ' _ @a[2]);
+    print1(@a[0] ~ ' ' ~ @a[1] ~ ' ' ~ @a[2]);
     print1($a);
     print1($b);
     print1($c);
@@ -33,9 +33,9 @@ output_is(<<'CODE', <<'OUT', 'Arrays');
 sub main() {
     my @a = (1,2,3,4);
     my @b = @a[0,2];
-    print1(@b[0] _ ', ' _ @b[1]);
-    print1(@a[0] _ ', ' _ @a[2]);
-    print1(@a[1] _ ', ' _ @a[3]);
+    print1(@b[0] ~ ', ' ~ @b[1]);
+    print1(@a[0] ~ ', ' ~ @a[2]);
+    print1(@a[1] ~ ', ' ~ @a[3]);
     my @c = @a;
     @a[2] = 5;
     @c[0] = 6;
@@ -58,7 +58,7 @@ sub main() {
     %x{a} = 'ay?';
     %x{b} = 'be!';
     %x{$x} = 'twenty-three';
-    print1(%x{a} _', ' _%x{$b} _', ' _%x{23});
+    print1(%x{a} ~', ' ~%x{$b} ~', ' ~%x{23});
 }
 
 CODE
@@ -75,7 +75,7 @@ sub main() {
     %x{b} = 'be!';
     %x{$x} = 'twenty-three';
     my @x = %x{'b', 'a', $x};
-    print1(@x[0] _@x[1] _@x[2]);
+    print1(@x[0] ~@x[1] ~@x[2]);
     my %y = %x;
     %y{a} = 'ay!';
     %x{b} = 'be?';
@@ -92,7 +92,7 @@ OUT
 ##############################
 output_is(<<'CODE', <<'OUT', "Flattening");
 sub foo {
-    print1(@_[0]_' '_@_[2]);
+    print1(@_[0]~' '~@_[2]);
 }
 
 sub main() {
@@ -137,9 +137,9 @@ sub main() {
     my @b = @a[@i];
     my @c = @a[1..3];
     my ($d, $e) = @a[1..3];
-    print1(@b[0] _ ' ' _ @b[1] _ ' ' _ @b[2]);
-    print1(@c[0] _ ' ' _ @c[1] _ ' ' _ @c[2]);
-    print1($d _ ' ' _ $e);
+    print1(@b[0] ~ ' ' ~ @b[1] ~ ' ' ~ @b[2]);
+    print1(@c[0] ~ ' ' ~ @c[1] ~ ' ' ~ @c[2]);
+    print1($d ~ ' ' ~ $e);
 }
 
 CODE

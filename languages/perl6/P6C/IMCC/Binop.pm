@@ -10,7 +10,7 @@ require Exporter;
 use vars qw(@ISA %EXPORT_TAGS @EXPORT_OK);
 @ISA = qw(Exporter);
 @EXPORT_OK = qw(do_pow do_logand do_logor do_defined do_concat do_repeat
-		do_range do_smartmatch imcc_op);
+		do_range do_smartmatch imcc_op simple_binary simple_binary_pasm);
 %EXPORT_TAGS = (all => [@EXPORT_OK]);
 
 sub do_pow ;
@@ -28,14 +28,49 @@ sub sm_hash_scalar ;
 sub sm_expr_num ;
 sub sm_expr_str ;
 
-# Remap operator names from P6 to IMCC.
+# Remap operator symbols from P6 to IMCC.
 sub imcc_op {
 	my $op = shift;
-
 	return "~~" if ($op eq '^^');
-	return "." if ($op eq '_');
-
+	return "."  if ($op eq '~');
+	return "|"  if ($op eq '+|');
+	return "&"  if ($op eq '+&');
+	return "~"  if ($op eq '+^');
 	return $op;
+}
+
+# Remap operator symbols from P6 to PASM opcodes
+sub pasm_op {
+	my $op = shift;
+	return "bands" if ($op eq '~&');
+	return "bors"  if ($op eq '~|');
+	return "bxors" if ($op eq '~^');
+	return $op;
+}
+
+#
+# Create generic code for $a op $b.
+sub simple_binary {
+    my $x = shift;
+    my $ltmp = $x->l->val;
+    my $rtmp = $x->r->val;
+    my $dest = newtmp 'PerlUndef';
+    my $op = imcc_op($x->op);
+    code("\t$dest = $ltmp $op $rtmp\n");
+    return $dest;
+}
+
+#
+# Some p6 operators correspond to a single PASM opcode but don't
+# have PIR syntax.
+sub simple_binary_pasm {
+    my $x = shift;
+    my $dest = newtmp 'PerlUndef';
+    my $ltmp = $x->l->val;
+    my $rtmp = $x->r->val;
+    my $opcode = pasm_op($x->op);
+    code("\t$opcode $dest, $ltmp, $rtmp\n");
+    return $dest;
 }
 
 1;

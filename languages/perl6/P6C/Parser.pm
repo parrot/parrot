@@ -251,22 +251,23 @@ BEGIN {
     $VCLOSE	= qr/<</;
     $NAMEPART	= qr/[a-zA-Z_][\w_]*/;
     $COMPARE	= qr{(?:cmp|eq|[gnl]e|[gl]t)\b|<=>|[<>=!]=|<|>};
-    $CONTEXT	= qr{[\%\@\$\&*_?]|\+(?!\+)};
+    $CONTEXT	= qr{[\%\@\$\&*?]|\+(?!\+)|~(?![~\&\|\^])};
     $MULDIV	= qr{[\%*x]|/(?!/)};
     $MATCH	= qr{[=!]~};
     $INCR	= qr{\+\+|--};
-    $PREFIX	= qr{ [!~\\]   |    # logical negation '!', bitwise negation '~', create a reference '\'
+    $PREFIX	= qr{ [!\\]    |    # logical negation '!', create a reference '\'
+                      \+\^     |    # unary bitwise XOR (bitwise negation)
                       \+(?!\+) |    # posification '+', but not increment '++' 
                       -(?![->])     # negation '-', but not decrement '--', but not dereference '->'
                     }x;
-    $ADDSUB	= qr{[-+_]};
+    $ADDSUB	= qr{[-+~](?![\&\|\^])};
     $BITSHIFT	= qr{<<|>>};
     $LOG_OR	= qr{(?:x?or|err)\b};
     $LOGOR	= qr{\|\||\^\^|//};
-    $BITOR	= qr{(?:\|(?!\|)|~(?!~))};
-    $BITAND	= qr{&(?!&)};
+    $BITOR	= qr{(?:\|(?!\|)|[~\+][\|\^])};
+    $BITAND	= qr{(?:\+\&|~\&)};
     $FILETEST	= qr{-[rwxoRWXOezsfdlpSbctugkTBMAC]+\b};
-    $ASSIGN	= qr{(?:!|:|//|&&?|\|\|?|~|\^\^|<<|>>|$ADDSUB|$MULDIV|\*\*)?=};
+    $ASSIGN	= qr{(?:!|:|//|&&?|\|\|?|\+[\&\|\^]|~[\&\|\^]|\^\^|<<|>>|$ADDSUB|$MULDIV|\*\*)?=};
     # Used for flushing syntax errors
     $FLUSH	= qr/\w+|[^\s\w;}#'"]+/;
     $NUMPART	= qr/(?!_)[\d_]+(?<!_)/;
@@ -523,7 +524,7 @@ muldiv:		  <leftop: match muldiv_op match>
 muldiv_op:	  /$MULDIV|$VOPEN$MULDIV$VCLOSE/o
 
 addsub:		  <leftop: muldiv addsub_op muldiv>
-# addsub_op:	  '+' | '-' | '_'
+# addsub_op:	  '+' | '-' | '~'
 addsub_op:	  /$ADDSUB|$VOPEN$ADDSUB$VCLOSE/o
 
 bitshift:	  <leftop: addsub bitshift_op addsub>

@@ -27,10 +27,10 @@ sub qsort(@a, $lo, $hi) {
 sub main() {
     my @a = 1..10;
     qsort @a, 0, @a - 1;
-    print @a >>_<< "\n";
+    print @a >>~<< "\n";
     @a = (10,9,8,7,6,5,4,3,2,1);
     qsort @a, 0, @a - 1;
-    print @a >>_<< "\n";
+    print @a >>~<< "\n";
 }
 CODE
 10

@@ -21,8 +21,8 @@ sub qsort(@a, $lo, $hi) {
 sub main() {
     my @a = 1..(@ARGS[0] || 100);
     qsort @a, 0, @a - 1;
-    print @a ^_ "\n";
+    print @a >>~<< "\n";
     @a = reverse @a;
     qsort @a, 0, @a - 1;
-    print @a ^_ "\n";
+    print @a >>~<< "\n";
 }

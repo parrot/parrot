@@ -12,7 +12,7 @@ sub main() {
     # qq + interpolation
     print(qq|$speech $action $person\n"But you speak like a fool."\n|);
     # obviously refering to those folks who think Perl6 is a "bad thing." :)
-    print "\"pass " _ 'test"' _ "\n"; # backslash quotes + spacing
+    print "\"pass " ~ 'test"' ~ "\n"; # backslash quotes + spacing
 }
 CODE
 "You have not seen, so I forgive your jest," said Gimli.

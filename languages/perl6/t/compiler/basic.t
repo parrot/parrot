@@ -6,7 +6,7 @@ use Test::More qw(skip);
 ##############################
 output_is(<<'CODE', <<'OUT', "Basic hello.");
 sub main() {
-    print1("Hello, " _ "world");
+    print1("Hello, " ~ "world");
 }
 CODE
 Hello, world
@@ -37,7 +37,7 @@ sub main() {
     print1(2 * 3);
     print1(6 / 2);
     print1(2 % 3);
-    print1(2 _ 3);
+    print1(2 ~ 3);
     print1(2 ** 3);
     print1(2 ** 3 ** 1);
     print1(2 ** 1 ** 3);
@@ -65,7 +65,7 @@ sub main() {
     print1 "ok 3" if (--$x == 2);
     my $y = $x++;
     print1 "ok 4" if ($x == 3 && $y == 2);
-    print1 ("ok "_ ($x++ + $y++));
+    print1 ("ok "~ ($x++ + $y++));
     print1 "ok 6" if ($x == 4 && $y == 3);
 }
 CODE
@@ -84,15 +84,15 @@ sub main() {
     my $y = $x;
     my @z = ($x, $y);
     # actually above statement makes next fail -lt
-    print1 (++$x _ ' ' _ $y);
+    print1 (++$x ~ ' ' ~ $y);
     $x--;
-    print ++$x _ ' ' _ $y _ "\n";
-    print $x++ _ ' ' _ $y _ "\n";
-    print $x _ ' ' _ $y++ _ "\n";
-    print $x _ ' ' _ ++$y _ "\n";
-    print @z[0]++ _ ' ' _ ++@z[1] _ "\n";
-    print $x _ ' ' _ $y _ "\n";
-    print @z[0] _ ' ' _ @z[1] _ "\n";
+    print ++$x ~ ' ' ~ $y ~ "\n";
+    print $x++ ~ ' ' ~ $y ~ "\n";
+    print $x ~ ' ' ~ $y++ ~ "\n";
+    print $x ~ ' ' ~ ++$y ~ "\n";
+    print @z[0]++ ~ ' ' ~ ++@z[1] ~ "\n";
+    print $x ~ ' ' ~ $y ~ "\n";
+    print @z[0] ~ ' ' ~ @z[1] ~ "\n";
 }
 CODE
 3 2
@@ -110,9 +110,9 @@ output_is(<<'CODE', <<'OUT', "Binary bit ops");
 sub main() {
     print1(2 << 3);
     print1(32 >> 3);
-    print1(32 | 3);
-    print1(31 & 3);
-    print1(10 ~ 12);		# 1010 ~ 1100 -> 0110 == 6
+    print1(32 +| 3);
+    print1(31 +& 3);
+    print1(10 +^ 12);		# 1010 +^ 1100 -> 0110 == 6
 }
 CODE
 16
@@ -256,19 +256,19 @@ sub main() {
     my $a = 3;
     if 1 {
 	my $a = 4;
-	if 2 { my $a = 5; print1("a is " _ $a) }
-	print1("a is " _ $a);
+	if 2 { my $a = 5; print1("a is " ~ $a) }
+	print1("a is " ~ $a);
     }
-    print1("a is " _ $a);
+    print1("a is " ~ $a);
     if 1 {
 	my $a = 5;
-	print1("a is " _ $a);
+	print1("a is " ~ $a);
     }
-    print1("a is " _ $a);
+    print1("a is " ~ $a);
     if 1 {
 	$a = 6;
     }
-    print1("a is " _ $a);
+    print1("a is " ~ $a);
 }
 CODE
 a is 5

@@ -21,9 +21,9 @@ use vars qw(@ISA @EXPORT_OK);
 
 use vars '%optype';
 BEGIN {
-    my %opmap = (int => [ qw(>> << | & ~ ^^)],
+    my %opmap = (int => [ qw(>> << +| +& +^ ^^)],
 		 num => [ qw(+ - * / % **)],
-		 str => [ qw(_) ]);
+		 str => [ qw(~ ~| ~& ~^) ]);
     while (my ($t, $ops) = each %opmap) {
 	@optype{@$ops} = ($t) x @$ops;
     }
@@ -120,7 +120,7 @@ sub do_hyped {
 	return hype_scalar_array(@_);
     } else {
 	diag "Tried to hyper-operate two scalars";
-	return P6C::Binop::simple_binary(@_);
+	return P6C::IMCC::Binop::simple_binary(@_);
     }
 }
 

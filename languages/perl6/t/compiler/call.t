@@ -7,7 +7,7 @@ use Test::More;
 output_is(<<'CODE', <<'OUT', "subroutine call");
 sub _fact($tot, $max, $n) {
     if $n > $max {
-	print1($max _ "! = " _ $tot);
+	print1($max ~ "! = " ~ $tot);
     } else {
 	_fact $tot * $n, $max, $n + 1;
     }
@@ -15,7 +15,7 @@ sub _fact($tot, $max, $n) {
 
 sub fact($n) {
     unless 0 <= $n < 20 {
-	print1("Sorry, can't take " _ $n _ " factorial");
+	print1("Sorry, can't take " ~ $n ~ " factorial");
     } else {
 	_fact 1, $n, 1
     }
@@ -38,7 +38,7 @@ OUT
 ##############################
 output_is(<<'CODE', <<'OUT', "no args");
 sub noargs() {
-    print "ok " _ $i++ _ "\n";
+    print "ok " ~ $i++ ~ "\n";
 }
 
 sub main() {
@@ -62,7 +62,7 @@ sub main() {
 }
 
 sub noargs() {
-    print "ok " _ $i++ _ "\n";
+    print "ok " ~ $i++ ~ "\n";
 }
 
 CODE
@@ -288,15 +288,15 @@ sub zero() {
 }
 
 sub one($x) {
-    print1('one ' _$x);
+    print1('one ' ~$x);
 }
 
 sub two($x, $y) {
-    print1('two ' _$x _' ' _$y);
+    print1('two ' ~$x ~' ' ~$y);
 }
 
 sub three($x, $y, $z) {
-    print1('three ' _$x _' ' _$y _' ' _$z);
+    print1('three ' ~$x ~' ' ~$y ~' ' ~$z);
 }
 
 sub main() {

@@ -153,9 +153,10 @@ sub concat_list {
     my ($list) = @_;
     my $type = 'PerlString';
     if (@$list > 1) {
-        my $val = new P6C::Binop op => '_', l => make_node(shift @$list), r => make_node(shift @$list);
+	# XXX: hardcoded P6 op, nasty
+        my $val = new P6C::Binop op => '~', l => make_node(shift @$list), r => make_node(shift @$list);
         while (@$list) {
-            $val = new P6C::Binop op => '_', l => $val, r => make_node(shift @$list)
+            $val = new P6C::Binop op => '~', l => $val, r => make_node(shift @$list)
         }
         return $val;
     }

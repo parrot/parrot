@@ -18,7 +18,7 @@ sub main() {
 	die;
 	CATCH { default { 2 } }
     }
-    print $x _' ' _$y, "\n";
+    print $x ~' ' ~$y, "\n";
 }
 CODE
 dying

@@ -6,7 +6,7 @@ use P6C::TestCompiler tests => 1;
 ##############################
 output_is(<<'CODE', <<'OUT', "globals");
 sub foo() {
-    print $x, " is ", @xs >>_<< ' ', "\n";
+    print $x, " is ", @xs >>~<< ' ', "\n";
     $y = 0;
     for @xs { $y = $y + $_ }
 }

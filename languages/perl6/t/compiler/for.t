@@ -78,7 +78,7 @@ OUT
 output_is(<<'CODE', <<'OUT', "For 1;1 -> 2;3");
 sub main() {
     for 11..20 ; 1..15 -> $a, $b ; $c, $d, $e {
-	print1($a _ ' ' _ $c);
+	print1($a ~ ' ' ~ $c);
     }
 }
 

@@ -40,13 +40,13 @@ BEGIN { # Add types for builtin binary operators.
     # type => [list-of-ops].
     my %opmap =
 	( # Ops that work differently for different scalar types:
-	 PerlUndef => [ qw(| & ~ // ..),
+	 PerlUndef => [ qw(| & +^ ~^ // ..),
 	  # Unfortunately, these work differently on ints and nums:
 			qw(+ - * / % **)],
 
 	 PerlInt => [ qw(<< >>) ],
 
-	 PerlString => [ qw(_) ],
+	 PerlString => [ qw(~) ],
 
 	 # NOTE: Actually, according to apo 3, boolean operators
 	 # propagate values in their surrounding context (even though
@@ -900,7 +900,7 @@ BEGIN {
 			      @ PerlArray
                               * PerlArray
 			      $ PerlUndef
-			      _ PerlString
+			      ~ PerlString
 			      ? bool
 			      + PerlNum);
 }

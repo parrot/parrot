@@ -1341,16 +1341,6 @@ use P6C::IMCC ':all';
 use P6C::Util ':all';
 use P6C::Context;
 
-# Create generic code for $a op $b.
-sub simple_binary {
-    my $x = shift;
-    my $ltmp = $x->l->val;
-    my $rtmp = $x->r->val;
-    my $dest = newtmp 'PerlUndef';
-    my $op = imcc_op($x->op);
-    code("\t$dest = $ltmp $op $rtmp\n");
-    return $dest;
-}
 
 # '=' assignment op.
 sub do_assign {
@@ -1392,12 +1382,14 @@ BEGIN {
 
  '>>'	=> \&simple_binary,
  '<<'	=> \&simple_binary,
- '|'	=> \&simple_binary,
- '&'	=> \&simple_binary,
- '~'	=> \&simple_binary,
+ '+&'	=> \&simple_binary,
+ '~&'	=> \&simple_binary_pasm,
+ '+|'	=> \&simple_binary,
+ '~|'	=> \&simple_binary_pasm,
+ '+^'	=> \&simple_binary,
+ '~^'	=> \&simple_binary_pasm,
 
-# '_' => \&simple_binary, # PMC concat broken.
- '_'	=> \&do_concat,
+ '~'	=> \&do_concat,
  '='	=> \&do_assign,
  '||'	=> \&do_logor,
  '&&'	=> \&do_logand,
@@ -1413,7 +1405,7 @@ BEGIN {
 
 use vars '%op_is_array';
 BEGIN {
-    my @arrayops = qw(= .. x // ^^ && || _);
+    my @arrayops = qw(= .. x // ^^ && || ~);
     push(@arrayops, ',');
     @op_is_array{@arrayops} = (1) x @arrayops;
 }
