@@ -1,8 +1,16 @@
 MAKE = ${make}
 
-all : imcc jako scheme befunge bf cola ook perl6
+all : imcc regex befunge bf cola ook perl6
+	@echo "SKIPPED: scheme (nothing to make, but should not default to make test)"
+	@echo "SKIPPED: jako (fallen behind imcc changes)"
 
-test : imcc.test regex.test befunge.test bf.test ook.test perl6.test
+complete-all : imcc jako regex scheme befunge bf cola ook perl6
+
+test: imcc.test regex.test scheme.test befunge.test bf.test ook.test perl6.test
+	@echo "SKIPPED: jako (fallen behind imcc changes)"
+	@echo "SKIPPED: cola (no make test)"
+
+complete-test: imcc.test jako.test regex.test scheme.test befunge.test bf.test cola.test ook.test perl6.test
 
 # Could someone please comment on the reason for all these *.dummy
 # targets?
@@ -19,10 +27,16 @@ jako: jako.dummy imcc.dummy
 jako.dummy:
 	cd jako && $(MAKE) && cd ..
 
+jako.test:
+	cd jako && $(MAKE) test && cd ..
+
 scheme: scheme.dummy
 
 scheme.dummy:
 	cd scheme && $(MAKE) && cd ..
+
+scheme.test:
+	cd scheme && $(MAKE) test && cd ..
 
 regex: regex.dummy
 
@@ -52,6 +66,9 @@ cola : cola.dummy
 
 cola.dummy:
 	cd cola && $(MAKE) && cd ..
+
+cola.test:
+	cd cola && $(MAKE) test && cd ..
 
 ook : ook.dummy
 
