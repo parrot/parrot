@@ -39,6 +39,10 @@ struct Parrot_Interp;
 
 typedef struct Parrot_Interp *Parrot_Interp;
 
+typedef opcode_t *(*native_func_t)(struct Parrot_Interp * interpreter,
+                                  opcode_t * cur_opcode,
+                                  opcode_t * start_code);
+
 #if defined(PARROT_IN_CORE)
 
 typedef Parrot_Interp_flag Interp_flags;
@@ -244,9 +248,8 @@ INTVAL interpinfo(struct Parrot_Interp *interpreter, INTVAL what);
 void runops(struct Parrot_Interp *, size_t offset);
 void runops_int(struct Parrot_Interp *, size_t offset);
 
-VAR_SCOPE opcode_t *(*run_native)(struct Parrot_Interp * interpreter,
-                                  opcode_t * cur_opcode,
-                                  opcode_t * start_code);
+VAR_SCOPE native_func_t run_native;
+
 void Parrot_compreg(Parrot_Interp interpreter, STRING *type, PMC *func);
 INTVAL sysinfo_i(Parrot_Interp interpreter, INTVAL info_wanted);
 STRING *sysinfo_s(Parrot_Interp interpreter, INTVAL info_wanted);

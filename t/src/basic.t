@@ -18,28 +18,23 @@ c_output_is(<<'CODE', <<'OUTPUT', "direct internal_exception call");
         #include <parrot/exceptions.h>
 
         int main(int argc, char* argv[]) {
-                internal_exception(0, "Blow'd Up(tm)\n");
+                internal_exception(0, "Blow'd Up(tm)\n"); /* ' */
         }
 CODE
 Blow'd Up(tm)
 OUTPUT
+# vor $EDITOR '
 
-c_output_is(<<'CODE', <<'OUTPUT', "run_native");
+c_output_is(<<'CODE', <<'OUTPUT', "Parrot_run_native");
 
 #include <parrot/parrot.h>
 #include <parrot/embed.h>
 
-static opcode_t* run_compiled(Parrot_Interp,
-	opcode_t *cur_opcode, opcode_t *start_code);
+static opcode_t *the_test(Parrot_Interp, opcode_t *, opcode_t *);
 
 int main(int argc, char* argv[])
 {
-    static opcode_t program_code[] = {
-	22,	/* enternative op# - TODO use op_lib->op_code */
-	0
-    };
     struct Parrot_Interp *     interpreter;
-    struct PackFile *          pf;
 
     interpreter = Parrot_new();
     if (!interpreter) {
@@ -47,36 +42,30 @@ int main(int argc, char* argv[])
     }
     Parrot_init(interpreter);
 
-    /*
-     * these + the program code could be hidden in embed
-     */
-    pf = PackFile_new(0);
-    pf->cur_cs = (struct PackFile_ByteCode *)
-	(pf->PackFuncs[PF_BYTEC_SEG].new_seg)(pf, "code", 1);
-    pf->byte_code = pf->cur_cs->base.data = program_code;
-    pf->cur_cs->base.size = 2;
-    Parrot_loadbc(interpreter, pf);
-    /*
-     * till here
-     */
+    PIO_eprintf(interpreter, "main\n");
 
-    run_native = run_compiled;
-    runops(interpreter, 0);
+    Parrot_run_native(interpreter, the_test);
+
     PIO_eprintf(interpreter, "back\n");
     Parrot_exit(0);
     return 0;
 }
 
 static opcode_t*
-run_compiled(struct Parrot_Interp *interpreter, opcode_t *cur_opcode,
-	opcode_t *start_code)
+the_test(struct Parrot_Interp *interpreter,
+	opcode_t *cur_op, opcode_t *start)
 {
+    UNUSED(cur_op);
+    UNUSED(start);
+
     /* tests go here */
     PIO_eprintf(interpreter, "ok\n");
-    return 0;
+
+    return NULL; /* always return 0 or bad things may happen */
 }
 
 CODE
+main
 ok
 back
 OUTPUT

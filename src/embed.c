@@ -514,6 +514,30 @@ Parrot_disassemble(struct Parrot_Interp *interpreter)
     return;
 }
 
+/*=for api embed Parrot_run_native(Parrot_Interp, native_func_t func)
+
+Run the C function B<func> through the program [enternative, end].
+This ensures that the function is run with the same setup as in other
+run loops.
+
+*/
+void
+Parrot_run_native(Parrot_Interp interpreter, native_func_t func)
+{
+    static opcode_t program_code[2];
+    struct PackFile *          pf;
+
+    program_code[0] = interpreter->op_lib->op_code("enternative", 0);
+    program_code[1] = 0; /* end */
+    pf = PackFile_new(0);
+    pf->cur_cs = (struct PackFile_ByteCode *)
+	(pf->PackFuncs[PF_BYTEC_SEG].new_seg)(pf, "code", 1);
+    pf->byte_code = pf->cur_cs->base.data = program_code;
+    pf->cur_cs->base.size = 2;
+    Parrot_loadbc(interpreter, pf);
+    run_native = func;
+    runops(interpreter, 0);
+}
 /*
  * Local variables:
  * c-indentation-style: bsd
