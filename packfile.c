@@ -573,6 +573,12 @@ PackFile_unpack(struct Parrot_Interp *interpreter, struct PackFile *self,
                     "bytecode")) {
             return 0;
         }
+        else if (header->bytecode_ss == 0) {
+            /* Must have at least one instruction */
+            PIO_eprintf(NULL, 
+                "Packfile_unpack: No bytecode present in bytecode segment.\n");
+            return 0;
+        }
         self->cur_cs->base.size = header->bytecode_ss / sizeof(opcode_t);
         cursor = default_unpack(interpreter,
                 (struct PackFile_Segment *) self->cur_cs, cursor);
