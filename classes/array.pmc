@@ -113,7 +113,7 @@ pmclass Array {
     PMC* clone () {
         PMC* dest;
 
-        dest = pmc_new(INTERP, enum_class_Array);
+	dest = new_pmc_header(INTERP);
         dest->flags |= PMC_custom_mark_FLAG;
         dest->vtable = SELF->vtable;
         dest->data = list_clone(INTERP, (List *) SELF->data);
