@@ -50,8 +50,8 @@ sub runstep {
     #Symrefs to lexicals are a no-no, so we have to use eval STRING.  %MY, anyone?
     eval qq{ \$$var=integrate(\$$var, \$args{$var}) if defined \$args{$var} };
   }
-  
-  $debug='y'              if defined $args{debugging};
+
+  $debug='y'              if $args{debugging};
 
   if($args{ask}) {
     print <<'END';

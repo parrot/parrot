@@ -54,7 +54,7 @@ Parrot Configuration Options:
                         you can remove parts of a line with :rem{<opt>}
                         and add options with :add{<opt>} e.g.
                         :rem{-g} :add{-O2}
-   --debugging          Enable debugging
+   --debugging = 0      Disable debugging, default = 1
    --optimize           Optimized compile
    --cc=(compiler)      Use the given compiler
    --ld=(linker)        Use the given linker
@@ -70,6 +70,8 @@ EOT
     $args{$key}=$value;
   }
 }
+
+$args{debugging} = 1 unless ((exists $args{debugging}) && !$args{debugging});
 
 print <<"END";
 Parrot Version $parrot_version Configure 2.0
