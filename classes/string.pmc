@@ -625,6 +625,14 @@ from the end.
 
 Returns the integer value (ord) at C<*key>.
 
+=item C<void set_string_keyed(PMC *key, STRING *val)>
+
+Replace the string at C<key> with C<value>.
+
+=item C<void set_integer_keyed(PMC *key, INTVAL val)>
+
+Replace the string at C<key> with the chr of C<value>.
+
 =cut
 
 */
@@ -641,6 +649,17 @@ Returns the integer value (ord) at C<*key>.
         return string_ord(INTERP, s, key_integer(INTERP, key));
     }
 
+    void set_string_keyed(PMC* key, STRING *value) {
+        STRING *s = PMC_str_val(SELF);
+	INTVAL len = string_length(INTERP, value);
+	string_replace(INTERP, s, key_integer(INTERP, key), len, value, NULL);
+    }
+
+    void set_integer_keyed(PMC* key, INTVAL value) {
+        STRING *s = PMC_str_val(SELF);
+	STRING *c = string_chr(INTERP, (UINTVAL) value);
+	string_replace(INTERP, s, key_integer(INTERP, key), 1, c, NULL);
+    }
 /*
 
 =back
