@@ -57,6 +57,7 @@ SymReg * mk_const(const char * name, char t) {
     r->reg = str_dup(name);
     r->first = -1;
     r->color = -1;
+    r->set = t;
     r->type = VTCONST;
     if(name[0])
         store_symreg(r);
@@ -248,6 +249,9 @@ void compute_du_chain(SymReg * r) {
         fprintf(stderr, "Internal error: symreg %s not referenced\n", r->name);
         abort();
     }
+    /* Symbol was never used in a statement, ignore for register allocation */
+    if(r->first < 0) return;
+        
     r->last = r->first;
     i = r->first;
     for(ins = instructions[i++]; ins; ins = instructions[i++]) {
@@ -270,6 +274,9 @@ int interferes(SymReg * r0, SymReg * r1) {
 
     if(r0->first > r1->last) return 0;
     else if(r0->last < r1->first) return 0;
+
+    /* If symbol was never used in a statment, it can't interfere */
+    if(r0->first < 0 || r1->first < 0) return 0;
 
     return 1;
 }
