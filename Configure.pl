@@ -626,6 +626,8 @@ if ($c{nv} eq "double") {
     die "Configure.pl:  Can't find a printf-style format specifier for type \"$c{nv}\"\n";
 }
 
+print "\nYour byteorder seems to be [", $c{byteorder}, "]\n";
+
 #
 # Build config.h, the Makfefiles and Types.pm:
 #
