@@ -62,7 +62,7 @@ pmclass PerlUndef {
 
     PMC* get_pmc() {
         Parrot_warn(INTERP, PARROT_WARNINGS_UNDEF_FLAG, "Use of uninitialized value in PMC context");
-        return NULL;
+        return SELF;
     }
 
     INTVAL get_bool () {
