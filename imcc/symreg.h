@@ -89,7 +89,7 @@ EXTERN Namespace * namespace;
 SymReg * mk_symreg(char *, char t);
 SymReg * mk_ident(char *, char t);
 SymReg * mk_const(char *, char t);
-SymReg * mk_const_ident(char *, char t, SymReg *);
+SymReg * mk_const_ident(char *, char t, SymReg *, int);
 SymReg * mk_address(char *, int uniq);
 SymReg * mk_pcc_sub(char *, char proto);
 void add_pcc_arg(SymReg *r, SymReg * arg);

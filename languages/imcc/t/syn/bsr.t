@@ -1,6 +1,6 @@
 #!perl
 use strict;
-use TestCompiler tests => 14;
+use TestCompiler tests => 12;
 
 ##############################
 # this tests register allocation/preserving of local bsr calls
@@ -284,58 +284,6 @@ _routine:
 .end
 CODE
 Hello perl6.
-OUT
-
-##############################
-# nested subs
-# NOTE: global labels necessary
-#
-output_is(<<'CODE', <<'OUT', "nested subs");
-.sub _main
-         .sub _dummy
-                 call _inner1
-                 call _inner2
-                 end
-         .end
-         .sub _inner1
-                 print "Inner1\n"
-                 ret
-         .end
-         .sub _inner2
-                 print "Inner2\n"
-                 ret
-         .end
-.end
-CODE
-Inner1
-Inner2
-OUT
-
-output_is(<<'CODE', <<'OUT', "nested subs 2");
-.sub __main
- 	call _main
-	end
-.end
-.sub _main
-	 print "main\n"
-	 call _inner1
-	 call _inner2
-         .sub _inner1
-                 print "Inner1\n"
-                 ret
-         .end
-         .sub _inner2
-                 print "Inner2\n"
-                 ret
-         .end
-	 print "back\n"
-	 ret
-.end
-CODE
-main
-Inner1
-Inner2
-back
 OUT
 
 output_is(<<'CODE', <<'OUT', "newsub");

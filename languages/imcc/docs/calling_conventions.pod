@@ -24,6 +24,95 @@ As imcc does register allocation, it has to track the life span of
 variables. This includes the (possible) data flow in and out of
 subroutines.
 
+=head1 Parrot calling conventions - CPS
+
+=head2 PASM Subroutines
+
+  newsub $P0, .Sub, _sub_label
+  newsub $P1, .Continuation, ret_addr
+  ...
+  .pcc_begin prototyped|non_prototyped
+  .arg x	# I5
+  .arg y	# I6
+  .arg z	# I7
+  .pcc_call $P0, $P1	# r = _sub_label(x, y, z)
+  ret_addr:
+  .local int r  # optional - new result var
+  .result r
+  .pcc_end
+
+  .pcc_sub _sub_label [prototyped|non_prototyped]
+   .param int a # I5
+   .param int b # I6
+   .param int c # I7
+  ...
+  .pcc_begin_return
+   .return xy   # e.g. I5
+  .pcc_end_return
+  ...
+  .end
+
+Notes:
+
+=over 4
+
+=item * B<prototyped>, B<non_rototyped>
+
+If a subroutine doesn't have any prototyped specifier, code gets
+emitted to receive parameters by both flavors.
+
+=item * B<newsub>
+
+Currently needs the B<.Class> syntax, i.e. a B<dot> in front of the
+class name.
+
+=item * B<pcc_call>
+
+Takes either 2 arguments: the sub and the return continuation, or the
+sub only. For the latter case an B<invokecc> gets emitted.
+
+=item * Saved Regs:
+
+Only the top half of registers are preserved currently.
+
+=item * B<.args>, B<.param>, B<.result>, and B<.return> are optional.
+
+=item * B<.param>
+
+The B<.param> declarations must be the first statements in the
+sub if any. No other statements are allowed between B<.param>.
+
+=back
+
+=head2 NCI
+
+Proposed syntax:
+
+  $P0 = load_lib "libname"
+  $P1 = dlfunc $P0, "funcname", "signature"
+  ...
+  .nci_begin
+  .arg x	# I5
+  .arg y	# I6
+  .arg z	# I7
+  invoke $P1	# r = funcname(x, y, z)
+  .local int r  # optional - new result var
+  .result r
+  .nci_end
+
+This prepares parameters as described in
+F<pdd03_calling_conventions.pod>, saves the registers and invokes the
+function.  The B<.arg> pseudo ops put the given argument into
+increasing registers of the appropriate type.
+
+=head2 Status
+
+Partially implemented, s. t/*/pcc.t.
+
+=head1 Exception handlers
+
+TBD.
+
 =head1 Stack calling conventions
 
 Arguments are B<save>d in reverse order onto the user stack:
@@ -95,96 +184,6 @@ incorrect register allocation.
 
 Implemented. When the subroutine does B<saveall>/B<restoreall>, the
 branch from the B<ret> statement back is ignored in the CFG.
-
-=head1 Parrot calling conventions - CPS
-
-=head2 PASM Subroutines
-
-  newsub $P0, .Sub, _sub_label
-  newsub $P1, .Continuation, ret_addr
-  ...
-  .pcc_begin prototyped|non_prototyped
-  .arg x	# I5
-  .arg y	# I6
-  .arg z	# I7
-  .pcc_call $P0, $P1	# r = _sub_label(x, y, z)
-  ret_addr:
-  .local int r  # optional - new result var
-  .result r
-  .pcc_end
-
-  .pcc_sub _sub_label [prototyped|non_prototyped]
-   .param int a # I5
-   .param int b # I6
-   .param int c # I7
-  ...
-  .pcc_begin_return
-   .return xy   # e.g. I5
-  .pcc_end_return
-  ...
-  .end
-
-Notes:
-
-=over 4
-
-=item * B<prototyped>, B<non_rototyped>
-
-If a subroutine doesn't have any prototyped specifier, code gets
-emitted to receieve parameters by both flavors.
-
-=item * B<newsub>
-
-Currently needs the B<.Class> syntax, i.e. a B<dot> in front of the
-class name.
-
-=item * B<pcc_call>
-
-Takes either 2 arguments: the sub and the return
-continuation, or the sub only. For the latter case an B<invokecc> gets
-emitted.
-
-=item * Saved Regs:
-
-Only the top half of registers are preserved currently.
-
-=item * B<.args>, B<.param>, B<.result>, and B<.return> are optional.
-
-=item * B<.param>
-
-The B<.param> function params must be the first statements in the
-sub if any.
-
-=back
-
-=head2 NCI
-
-Proposed syntax:
-
-  $P0 = load_lib "libname"
-  $P1 = dlfunc $P0, "funcname", "signature"
-  ...
-  .nci_begin
-  .arg x	# I5
-  .arg y	# I6
-  .arg z	# I7
-  invoke $P1	# r = funcname(x, y, z)
-  .local int r  # optional - new result var
-  .result r
-  .nci_end
-
-This prepares parameters as described in
-F<pdd03_calling_conventions.pod>, saves the registers and invokes the
-function.  The B<.arg> pseudo ops put the given argument into
-increasing registers of the appropriate type.
-
-=head2 Status
-
-Partially implemented, s. t/*/pcc.t.
-
-=head1 Exception handlers
-
-TBD.
 
 =head1 Namespaces and lexicals
 

@@ -12,6 +12,8 @@ IMCC - parsing
 
 =item 0.3 pod markers
 
+=item 0.4 deprecate nested subs and code outside compilation units
+
 =back
 
 =head1 OVERVIEW
@@ -28,11 +30,9 @@ end of the unit is reached.
 
 =head1 General imcc syntax
 
-	program: statements ...
+	program: subs
 
-where a statement is a simple statement like B<if ...>	or a
-I<compilation unit> containing statements. This allows e.g. nested
-subs.
+	subs: statements ...
 
 =head2 Comments
 
@@ -50,7 +50,7 @@ A POD starts with a B<=> in columns 1 and ends with B<=cut> on its own line.
 
 =head1 Compilation units
 
-=head2 Subroutines .sub ... .end and .pcc_sub ... .end
+=head2 Subroutines .sub ... .end
 
 	.sub _name
 		statements
@@ -61,6 +61,14 @@ defines a subroutine with the entry point B<_name>. Subroutine entry
 points (as all global labels) have to start with an underscore. The
 statements may contain valid PIR or PASM statements.
 
+=head2 Subroutines .pcc_sub ... .end
+
+	.pcc_sub _name
+		statements
+		...
+	.end
+
+Like above with parrot calling conventions.
 Subroutines according to Parrot Calling Conventions (PCC) are
 described in F<docs/calling_conventions.pod>.
 
@@ -79,71 +87,11 @@ usage is for language initialization and builtins code.
 
 =head2 Code outside compilation units
 
-	stmt1
-	.sub _main
-	   stmt2
-	   ret
-	.end
-	stmt3
-
-This generates the following PASM equivalent:
-
-	_main:
-		stmt2
-		ret
-
-		stmt1
-		stmt3
-
-which is basically a sequence of unreachable code after the B<ret>. To
-really use code outside compilation units, the first statement should
-have a global label.
-
-	_outside:
-	    stmt1
-	.sub _main
-	    stmt2
-	    call _outside
-	    ret
-	.end
-	    stmt3
-	    ret
-
-This generates the following PASM equivalent:
-
-	_main:
-		stmt2
-		bsr _outside
-		ret
-	_outside:
-		stmt1
-		stmt3
-		ret
+Anything outside compilation units will be ignored in the near future.
 
 =head2 Nested subs
 
-As code is produced as soon as a I<compilation unit> is closed, the
-code for nested subroutines appears before the outer subroutine:
-
-	.sub _outer
-	    stmt1
-	    .sub _inner
-		stmt2
-		ret
-	    .end
-	    call _inner
-	    ret
-	.end
-
-generates code like this:
-
-	_inner:
-	    stmt2
-	    ret
-	_outer:
-	    stmt1
-	    bsr _inner
-	    ret
+Nested subroutines are deprecated and will be removed as well.
 
 =head1 Symbols, constants and labels
 
@@ -151,41 +99,10 @@ I<Compilation units> maintain their own symbol table containing local
 labels and variable symbols. This symbol table I<hash> is not visible
 to code in different units.
 
-Lexicals and named constants declared in an outer scope are visible and used,
-when not overridden by a C<.local> or C<.const> directive with the same name.
-See F<t/syn/scope.t> for examples for this.
-
-Please note that variables declared with C<.local> in an outer scope only
-make the symbol available in inner scopes. It does not mean that imcc
-keeps track of the usage of such variables when they are used in
-different compilation units. Such variables have to be passed to other
-subs like other subroutine arguments - they are not intended to replace
-global variables.
-
-	.sub _main
-	    call _f
-	    call _g
-	    end
-	.end
-	.local int a
-	.sub _f
-	    a = 1
-	    I0 = 2
-	    ret
-	.end
-	.sub _g
-	    print a
-	    ret
-	.end
-
-will print 2 (both C<a> and C<I0> are getting the same register).
-
-The current behavior will be replaced by a consistent one in the future
-or tossed altogether.
-
+If you need global variables please use the B<global> opcode.
 
 Global labels and constants are kept in the global symbol table
-I<ghash>, which is the symbol table of the outmost compilation unit.
+I<ghash>.
 
 This allows for global constant folding beyond subroutine scope.
 

@@ -401,7 +401,7 @@ iANY(struct Parrot_Interp *interpreter, char * name,
 
 %token <t> CALL GOTO ARG IF UNLESS NEW END SAVEALL RESTOREALL
 %token <t> SUB NAMESPACE ENDNAMESPACE CLASS ENDCLASS SYM LOCAL CONST PARAM
-%token <t> INC DEC
+%token <t> INC DEC GLOBAL_CONST
 %token <t> SHIFT_LEFT SHIFT_RIGHT INTV FLOATV STRINGV DEFINED LOG_XOR
 %token <t> RELOP_EQ RELOP_NE RELOP_GT RELOP_GTE RELOP_LT RELOP_LTE
 %token <t> GLOBAL ADDR CLONE RESULT RETURN POW SHIFT_RIGHT_U LOG_AND LOG_OR
@@ -651,7 +651,9 @@ labeled_inst:
     |   ENDNAMESPACE IDENTIFIER         { pop_namespace($2); }
     |   LOCAL { is_def=1; } type IDENTIFIER { mk_ident($4, $3);is_def=0; }
     |   CONST { is_def=1; } type IDENTIFIER '=' const
-                                    { mk_const_ident($4, $3, $6);is_def=0; }
+                                    { mk_const_ident($4, $3, $6, 0);is_def=0; }
+    |   GLOBAL_CONST { is_def=1; } type IDENTIFIER '=' const
+                                    { mk_const_ident($4, $3, $6, 1);is_def=0; }
     |   PARAM { is_def=1; } type IDENTIFIER { $$ = MK_I(interp, "restore",
 		                            R1(mk_ident($4, $3)));is_def=0; }
     |   PARAM reg			{ $$ = MK_I(interp, "restore", R1($2)); }

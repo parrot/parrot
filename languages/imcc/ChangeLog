@@ -1,4 +1,8 @@
-- 2003-07-31	leo
+- 2003-08-02	leo
+
+	* DEPRECATE NESTED SUBROUTINES and CODE OUTSIDE OF SUBS
+
+- 2003-08-01	leo
 
 	* version 0.0.10.3
 

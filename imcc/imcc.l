@@ -166,6 +166,7 @@ WS              [\t\f\r ]
 ".endnamespace" return(ENDNAMESPACE);
 ".local"        return(LOCAL);
 ".const"        return(CONST);
+".globalconst"  return(GLOBAL_CONST);
 ".param"        return(PARAM);
 "end"           return(END);
 "goto"          return(GOTO);

@@ -181,9 +181,13 @@ SymReg * mk_ident(char * name, char t) {
 
 /* Makes a new identifier constant with value val */
 SymReg *
-mk_const_ident(char *name, char t, SymReg *val)
+mk_const_ident(char *name, char t, SymReg *val, int global)
 {
-    SymReg *r = mk_ident(name, t);
+    SymReg *r;
+    if (global)
+        r = _mk_symreg(ghash, name, t);
+    else
+        r = mk_ident(name, t);
     r->type = VT_CONSTP;
     r->reg = val;
     return r;
