@@ -23,8 +23,8 @@ pmclass Array {
     }
 
     void init () {
-	SELF->cache.struct_val = key_new(INTERP);
-	key_set_size(INTERP,SELF->cache.struct_val,0);
+	SELF->data = key_new(INTERP);
+	key_set_size(INTERP,SELF->data,0);
     }
 
     void clone (PMC* dest) { 
@@ -42,29 +42,24 @@ pmclass Array {
     }
 
     void destroy () {
-	key_destroy(INTERP,SELF->cache.struct_val);
+	key_destroy(INTERP,SELF->data);
     }
 
     INTVAL get_integer () {
-	KEY* key = SELF->cache.struct_val;
-	return key_size(INTERP,key);
+	return key_size(INTERP,SELF->data);
     }
 
     INTVAL get_integer_index ( INTVAL idx ) {
-	KEY* key = SELF->cache.struct_val;
-	KEY_PAIR* key_pair = key_element_value_i(INTERP,key,idx);
+	KEY_PAIR* key_pair = key_element_value_i(INTERP,SELF->data,idx);
 	return key_pair->cache.int_val;
     }
 
     FLOATVAL get_number () {
-	KEY* key = SELF->cache.struct_val;
-	INTVAL size = key_size(INTERP,key);
-	return (FLOATVAL)size;
+	return (FLOATVAL)key_size(INTERP,SELF->data);
     }
 
     FLOATVAL get_number_index ( INTVAL idx ) {
-	KEY* key = SELF->cache.struct_val;
-	KEY_PAIR* key_pair = key_element_value_i(INTERP,key,idx);
+	KEY_PAIR* key_pair = key_element_value_i(INTERP,SELF->data,idx);
 	return key_pair->cache.num_val;
     }
 
@@ -73,15 +68,12 @@ pmclass Array {
     }
 
     STRING* get_string_index ( INTVAL idx ) {
-	KEY* key = SELF->cache.struct_val;
-	KEY_PAIR* key_pair = key_element_value_i(INTERP,key,idx);
+	KEY_PAIR* key_pair = key_element_value_i(INTERP,SELF->data,idx);
 	return key_pair->cache.struct_val;
     }
 
     BOOLVAL get_bool () {
-	KEY* key = SELF->cache.struct_val;
-	INTVAL size = key_size(INTERP,key);
-	return (BOOLVAL)(size != 0);
+	return (BOOLVAL)(key_size(INTERP,SELF->data) != 0);
     }
 
     void* get_value () {
@@ -97,13 +89,11 @@ pmclass Array {
 
     void set_integer (PMC* value) {
 	INTVAL size = value->vtable->get_integer(INTERP,value);
-	KEY* key = SELF->cache.struct_val;
-	key_set_size(INTERP,key,size);
+	key_set_size(INTERP,SELF->data,size);
     }
 
     void set_integer_native (INTVAL size) {
-	KEY* key = SELF->cache.struct_val;
-	key_set_size(INTERP,key,size);
+	key_set_size(INTERP,SELF->data,size);
     }
 
     void set_integer_bigint (BIGINT value) {
@@ -111,28 +101,24 @@ pmclass Array {
 
     void set_integer_same (PMC * value) {
 	INTVAL size = value->cache.int_val;
-	KEY* key = SELF->cache.struct_val;
-	key_set_size(INTERP,key,size);
+	key_set_size(INTERP,SELF->data,size);
     }
 
     void set_integer_index (INTVAL value, INTVAL idx) {
-	KEY* key = SELF->cache.struct_val;
 	KEY_PAIR key_pair;
-	INTVAL size = key_size(INTERP,key);
+	INTVAL size = key_size(INTERP,SELF->data);
 	key_pair.type = enum_key_int;
 	key_pair.cache.int_val = value;
-	key_set_element_value_i(INTERP,key,idx,&key_pair);
+	key_set_element_value_i(INTERP,SELF->data,idx,&key_pair);
     }
 
     void set_number (PMC * value) {
 	INTVAL size = (INTVAL)value->cache.num_val;
-	KEY* key = SELF->cache.struct_val;
-	key_set_size(INTERP,key,size);
+	key_set_size(INTERP,SELF->data,size);
     }
 
     void set_number_native (FLOATVAL size) {
-	KEY* key = SELF->cache.struct_val;
-	key_set_size(INTERP,key,(INTVAL)size);
+	key_set_size(INTERP,SELF->data,(INTVAL)size);
     }
 
     void set_number_bigfloat (BIGFLOAT value) {
@@ -140,16 +126,14 @@ pmclass Array {
 
     void set_number_same (PMC * value) {
 	INTVAL size = value->cache.int_val;
-	KEY* key = SELF->cache.struct_val;
-	key_set_size(INTERP,key,size);
+	key_set_size(INTERP,SELF->data,size);
     }
 
     void set_number_index (FLOATVAL value, INTVAL idx) {
-	KEY* key = SELF->cache.struct_val;
 	KEY_PAIR key_pair;
 	key_pair.type = enum_key_num;
 	key_pair.cache.num_val = value;
-	key_set_element_value_i(INTERP,key,idx,&key_pair);
+	key_set_element_value_i(INTERP,SELF->data,idx,&key_pair);
     }
 
     void set_string (PMC * value) {
@@ -168,11 +152,10 @@ pmclass Array {
     }
 
     void set_string_index (STRING * value, INTVAL idx) {
-	KEY* key = SELF->cache.struct_val;
 	KEY_PAIR key_pair;
 	key_pair.type = enum_key_string;
 	key_pair.cache.struct_val = value;
-	key_set_element_value_i(INTERP,key,idx,&key_pair);
+	key_set_element_value_i(INTERP,SELF->data,idx,&key_pair);
     }
 
     void set_value (void* value) {

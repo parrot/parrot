@@ -93,12 +93,12 @@ pmclass IntQueue {
     }
 
     void init () {
-	SELF->cache.struct_val = (STRING*)new_container();
+	SELF->data = (STRING*)new_container();
     }
 
     void clone (PMC* dest) { 
         dest->vtable = SELF->vtable;
-	dest->cache.int_val = SELF->cache.int_val;
+	dest->data = SELF->data;
     }
 
     void morph (INTVAL type) {
@@ -117,7 +117,7 @@ pmclass IntQueue {
     }
 
     INTVAL get_integer () {
-	return dequeue((CONTAINER*)SELF->cache.struct_val);
+	return dequeue((CONTAINER*)SELF->data);
     }
 
     INTVAL get_integer_index (INTVAL idx) {
@@ -147,7 +147,7 @@ pmclass IntQueue {
     }
 
     BOOLVAL get_bool () {
-	return queue_length(SELF->cache.struct_val) != 0;
+	return queue_length(SELF->data) != 0;
     }
 
     void* get_value () {
@@ -165,7 +165,7 @@ pmclass IntQueue {
     }
 
     void set_integer_native (INTVAL value) {
-	enqueue(SELF->cache.struct_val,value);
+	enqueue(SELF->data,value);
     }
 
     void set_integer_bigint (BIGINT value) {
