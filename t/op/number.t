@@ -1,6 +1,6 @@
 #! perl -w
 
-use Parrot::Test tests => 37;
+use Parrot::Test tests => 38;
 use Test::More;
 
 output_is(<<CODE, <<OUTPUT, "set_n_nc");
@@ -1034,5 +1034,21 @@ CODE
 2500.000000
 0.000000
 OUTPUT
+
+output_is(<<'CODE', <<OUTPUT, "null");
+    set N31, 12.5
+    print N31
+    print "\n"
+
+    null N31
+    print N31
+    print "\n"
+   
+    end
+CODE
+12.500000
+0.000000
+OUTPUT
+
 1;
 
