@@ -1,3 +1,5 @@
+#ifndef __SYMREG_H
+#define __SYMREG_H
 
 /* constants */
 
@@ -148,3 +150,6 @@ void pop_namespace(char * name);
 /* globals */
 
 EXTERN SymReg * hash[HASH_SIZE], *ghash[HASH_SIZE];
+
+#endif
+
