@@ -2350,6 +2350,11 @@ Parrot_jit_begin(Parrot_jit_info_t *jit_info,
 /* code_start: */
 }
 
+/*
+ * XXX needs some fixing
+ * s. t/sub/pmc_{8,9}.t: the 2 print in tail call without that 'end'
+ *    are recogniced as one non JIIted block
+ */
 void
 Parrot_jit_normal_op(Parrot_jit_info_t *jit_info,
                      struct Parrot_Interp * interpreter)

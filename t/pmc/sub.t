@@ -1,6 +1,6 @@
 #! perl -w
 
-use Parrot::Test tests => 8;
+use Parrot::Test tests => 10;
 use Test::More;
 
 output_is(<<'CODE', <<'OUTPUT', "PASM subs - newsub");
@@ -256,6 +256,7 @@ func1:
 
     invoke    # tail invoke (reuses context already in P1)
     print "this should not be called\n"
+    end
 
 func2:
     print "in func2\n"
@@ -265,6 +266,63 @@ CODE
 in func1
 in func2
 done
+OUTPUT
+
+output_is(<<'CODE', <<'OUTPUT', "PASM subs - tail invoke with newsub");
+    newsub P0, .Sub, func1
+
+    invokecc
+    print "done\n"
+    end
+
+func1:
+    print "in func1\n"
+
+    newsub P0, .Sub, func2
+
+    invoke    # tail invoke (reuses context already in P1)
+    print "this should not be called\n"
+    # XXX this end is here for JIT/i386
+    end
+
+func2:
+    print "in func2\n"
+    invoke P1
+
+CODE
+in func1
+in func2
+done
+OUTPUT
+
+output_is(<<'CODE', <<'OUTPUT', "sub calling a sub");
+    print "main\n"
+    newsub .Sub, .Continuation, _func1, ret1
+    invoke
+ret1:
+    print "back\n"
+    end
+
+_func1:
+    print "func1\n"
+    pushbottomp
+    newsub .Sub, .Continuation, _func2, ret2
+    invoke
+ret2:
+    popbottomp
+    print "func1\n"
+    invoke P1
+
+_func2:
+    print "func2\n"
+    invoke P1
+
+CODE
+main
+func1
+func2
+func1
+back
 OUTPUT
 
 1;
