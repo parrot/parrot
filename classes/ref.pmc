@@ -30,6 +30,10 @@ C<Parrot::Pmc2c>.
 
 #define VTABLE_bitwise_xor(i,l,r,d) mmd_dispatch_v_ppp(i,l,r,d,MMD_BXOR)
 #define VTABLE_bitwise_xor_int(i,l,r,d) mmd_dispatch_v_pip(i,l,r,d,MMD_BXOR_INT)
+#define VTABLE_add(i, l, r, d) mmd_dispatch_v_ppp(i, l, r, d, MMD_ADD)
+#define VTABLE_subtract(i,l,r,d) mmd_dispatch_v_ppp(i,l,r,d,MMD_SUBTRACT)
+#define VTABLE_multiply(i,l,r,d) mmd_dispatch_v_ppp(i,l,r,d,MMD_MULTIPLY)
+#define VTABLE_divide(i,l,r,d) mmd_dispatch_v_ppp(i,l,r,d,MMD_DIVIDE)
 
 pmclass Ref does ref {
 

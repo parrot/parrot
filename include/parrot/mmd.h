@@ -15,8 +15,10 @@
 
 void mmd_dispatch_v_ppp(Parrot_Interp, PMC *, PMC *, PMC *, INTVAL);
 void mmd_dispatch_v_pip(Parrot_Interp, PMC *, INTVAL, PMC *, INTVAL);
-INTVAL mmd_dispatch_i_pp(Parrot_Interp, PMC *, PMC *, INTVAL);
+void mmd_dispatch_v_pnp(Parrot_Interp, PMC *, FLOATVAL, PMC *, INTVAL);
+void mmd_dispatch_v_psp(Parrot_Interp, PMC *, STRING *, PMC *, INTVAL);
 
+INTVAL mmd_dispatch_i_pp(Parrot_Interp, PMC *, PMC *, INTVAL);
 void mmd_add_by_class(Parrot_Interp, INTVAL, STRING *, STRING *, funcptr_t);
 void mmd_register(Parrot_Interp, INTVAL, INTVAL, INTVAL, funcptr_t);
 void mmd_register_sub(Parrot_Interp, INTVAL, INTVAL, INTVAL, PMC*);
