@@ -328,7 +328,7 @@ extern SymReg *cur_namespace; /* ugly hack for mk_address */
  * add namespace to sub if any
  * */
 static char *
-add_ns(SymReg *r, char *name)
+add_ns(char *name)
 {
     int len, l;
     char *ns_name;
@@ -361,7 +361,7 @@ _mk_address(SymReg *hsh[], char * name, int uniq)
         return r;
     }
     if (uniq == U_add_uniq_sub)
-        name = add_ns(r, name);
+        name = add_ns(name);
 
     if (uniq && (r = _get_sym(hsh, name)) &&
             r->type == VTADDRESS &&

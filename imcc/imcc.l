@@ -194,6 +194,7 @@ SP              [ ]
 ".pcc_end_yield"      return(PCC_END_YIELD);
 "prototyped"    return(PROTOTYPED);
 "non_prototyped"    return(NON_PROTOTYPED);
+"method"        return(METHOD);
 <emit,INITIAL>"@MAIN"    return(MAIN);
 <emit,INITIAL>"@LOAD"    return(LOAD);
 <emit,INITIAL>"@IMMEDIATE"    return(IMMEDIATE);
@@ -206,7 +207,7 @@ SP              [ ]
 <emit,INITIAL>".namespace"    return(NAMESPACE);
 ".endnamespace" return(ENDNAMESPACE);
 ".field"        return(FIELD);
-".method"       return(METHOD);
+".method"       return(DOT_METHOD);
 ".local"        return(LOCAL);
 ".global"       return(GLOBAL);
 ".const"        return(CONST);
@@ -365,6 +366,14 @@ SP              [ ]
 		    valp->sr = r;
 		    return VAR;
 		}
+                if (cur_unit && cur_unit->instructions &&
+                        !strcmp(yytext, "self") &&
+                        (r = cur_unit->instructions->r[1])) {
+                    if (r->pcc_sub && r->pcc_sub->pragma & P_METHOD)
+                        valp->s = str_dup("P2");
+                        return REG;
+                }
+
 	}
         valp->s = str_dup(yytext);
         return(!is_def && is_op(interp, valp->s) ? PARROT_OP : IDENTIFIER);

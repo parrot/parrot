@@ -1,13 +1,12 @@
 #!perl
 use strict;
-use TestCompiler tests => 5;
+use TestCompiler tests => 6;
 
 ##############################
 # Parrot Calling Conventions
 
 
 output_is(<<'CODE', <<'OUT', "meth call syntax");
-.namespace [ "Foo" ]
 
 .sub _main
     .local pmc class
@@ -20,6 +19,8 @@ output_is(<<'CODE', <<'OUT', "meth call syntax");
     print "done\n"
     end
 .end
+
+.namespace [ "Foo" ]
 .sub _meth
     print "in meth\n"
 .end
@@ -30,7 +31,6 @@ done
 OUT
 
 output_is(<<'CODE', <<'OUT', "meth call syntax m.o(arg)");
-.namespace [ "Foo" ]
 .sub _main
     .local pmc class
     .local pmc obj
@@ -43,6 +43,8 @@ output_is(<<'CODE', <<'OUT', "meth call syntax m.o(arg)");
     print "done\n"
     end
 .end
+
+.namespace [ "Foo" ]
 .sub _meth
     .param pmc s
     print "in meth\n"
@@ -55,7 +57,6 @@ done
 OUT
 
 output_is(<<'CODE', <<'OUT', "meth call ret = o.m(arg)");
-.namespace [ "Foo" ]
 .sub _main
     .local pmc class
     .local pmc obj
@@ -68,6 +69,8 @@ output_is(<<'CODE', <<'OUT', "meth call ret = o.m(arg)");
     print $S0
     end
 .end
+
+.namespace [ "Foo" ]
 .sub _meth
     .param pmc s
     print "in meth\n"
@@ -83,7 +86,6 @@ done
 OUT
 
 output_is(<<'CODE', <<'OUT', "meth call syntax");
-.namespace [ "Foo" ]
 .sub _main
     .local pmc class
     .local pmc obj
@@ -101,6 +103,7 @@ output_is(<<'CODE', <<'OUT', "meth call syntax");
     print "done\n"
     end
 .end
+.namespace [ "Foo" ]
 .sub _meth
     print "in meth\n"
 .end
@@ -152,3 +155,30 @@ in sub
 done
 OUT
 
+output_is(<<'CODE', <<'OUT', "meth call syntax - method, self");
+
+.sub _main
+    .local pmc class
+    .local pmc obj
+    newclass class, "Foo"
+    find_type $I0, "Foo"
+    new obj, $I0
+    obj._meth()
+    print "done\n"
+    end
+.end
+
+.namespace [ "Foo" ]
+.sub _meth method
+    print "in meth\n"
+    isa $I0, self, "Foo"
+    if $I0, ok
+    print "not "
+ok:
+    print "ok\n"
+.end
+CODE
+in meth
+ok
+done
+OUT

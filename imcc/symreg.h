@@ -125,6 +125,7 @@ typedef enum {
 	P_NON_PROTOTYPED = 0x00,	/* must be 0 */
 	P_PROTOTYPED     = 0x01,	/* must be 1 */
 	P_NONE           = 0x04,
+	P_METHOD         = 0x08,
 
 	P_MAIN           = PObj_private4_FLAG,	/* s. packfile.c ... */
 	P_LOAD           = PObj_private5_FLAG,
