@@ -9,11 +9,6 @@
   .param string buffer
   .param int start_pos
 
-  .include "languages/tcl/lib/macros/debug.imc"
-  .const int debug = 0
-
-  #_dumper(buffer,"match_close_buffer")
-
   .local int opener
   .local int closer
   .local int peekchar
@@ -29,21 +24,8 @@
 
   position = start_pos
 
-  .debug("position=")
-  .debug(position)
-  .debug("\n")
-
   length bufferlen, buffer
-  .debug("buffer={")
-  .debug(buffer)
-  .debug("}\n")
-  .debug("bufferlen=")
-  .debug(bufferlen)
-  .debug("\n")
   ord opener, buffer, start_pos
-  .debug("opener=")
-  .debug(opener)
-  .debug("\n")
   closer = -1
 
   # {}
@@ -54,52 +36,38 @@
 
   # []
 trycommand:
-  .debug("match_close:trycommand:\n")
   if opener != 91 goto tryquote
   closer = 93
   goto gotcloser 
 
   # ""
 tryquote: 
-  .debug("match_close:tryquote:\n")
   if opener != 34 goto tryparen
   closer = 34
 
 tryparen: 
-  .debug("match_close:tryparen:\n")
   if opener != 40 goto gotcloser
   hierarchical = 1
   closer = 41
 
 gotcloser: 
-  .debug("match_close:gotcloser:\n")
   if closer == -1 goto die1 
-  .debug("closer='")
-  .debug(closer)
-  .debug("'\n")
 
   count = 1
   state = 1
   # 1 == normal, 2 == saw a \
 
 outer:
-  .debug("match_close:outer:\n")
 
   if count == 0 goto outer_done
 
   inc position 
 
-  .debug("position=")
-  .debug(position)
-  .debug("\n")
 
   if position == bufferlen goto die2
 
   ord peekchar,buffer,position
 
-  .debug("peekchar =")
-  .debug(peekchar)
-  .debug("\n")
 
   if state==2 goto state2
 
@@ -114,55 +82,39 @@ outer:
 
 # a \ is only special the first time...
 state2:
-  .debug("match_close:state2:\n")
   state = 1
   goto outer
 
 # found a closer
 decr:
-  .debug("match_close:decr:\n")
   if opener == closer goto outer_done 
   count = count - 1
   goto outer
 
 # found another opener
 incr:
-  .debug("match_close:incr:\n")
   if hierarchical == 0 goto outer
   count = count + 1
   goto outer
 
 outer_done:
-  .debug("match_close:outer_done:\n")
-  .debug("position='")
-  .debug(position)
-  .debug("'\n")
-  .debug("start_pos='")
-  .debug(start_pos)
-  .debug("'\n")
 
   $I1 = position - start_pos
   # off by two?
   inc $I1
-  .debug("length='")
-  .debug($I1)
-  .debug("'\n") 
   goto done
 
 die1:
-  .debug("match_close:die1\n")
   # invalid opening match char
   $I1 = -1
   goto done
 
 die2:
-  .debug("match_close:die2\n")
   # no closing char found
   $I1 = -2
 
 done:
-  .debug("match_close:done\n")
   .pcc_begin_return
-  .return $I1
+    .return $I1
   .pcc_end_return
 .end
