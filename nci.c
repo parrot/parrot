@@ -13,6 +13,19 @@
 
 #include "parrot/parrot.h"
 
+#if !defined(INT_REG)
+#define INT_REG(x) interpreter->ctx.int_reg.registers[x]
+#endif
+#if !defined(NUM_REG)
+#define NUM_REG(x) interpreter->ctx.num_reg.registers[x]
+#endif
+#if !defined(STR_REG)
+#define STR_REG(x) interpreter->ctx.string_reg.registers[x]
+#endif
+#if !defined(PMC_REG)
+#define PMC_REG(x) interpreter->ctx.pmc_reg.registers[x]
+#endif
+
 #if !defined(CAN_BUILD_CALL_FRAMES)
 /* All our static functions that call in various ways. Yes, terribly
    hackish, but that's just fine */
@@ -36,6 +49,21 @@ static void pcf_i_v(struct Parrot_Interp *interpreter, PMC *self) {
   int return_data;
   pointer = self->cache.struct_val;
   return_data = (int)(*pointer)();
+  interpreter->ctx.int_reg.registers[5] = return_data;
+  interpreter->ctx.int_reg.registers[0] = 0;
+  interpreter->ctx.int_reg.registers[1] = 1;
+  interpreter->ctx.int_reg.registers[2] = 0;
+  interpreter->ctx.int_reg.registers[3] = 0;
+  interpreter->ctx.int_reg.registers[4] = 0;
+  return;
+}
+
+/* Return int, take nothing */
+static void pcf_i_i(struct Parrot_Interp *interpreter, PMC *self) {
+  int (*pointer)();
+  int return_data;
+  pointer = self->cache.struct_val;
+  return_data = (int)(*pointer)(INT_REG(5));
   interpreter->ctx.int_reg.registers[5] = return_data;
   interpreter->ctx.int_reg.registers[0] = 0;
   interpreter->ctx.int_reg.registers[1] = 1;
@@ -94,6 +122,8 @@ void *build_call_func(struct Parrot_Interp *interpreter, String *signature) {
   if (0 == string_length(signature)) return pcf_v_v;
   if (!string_compare(interpreter, signature, string_from_c_string(interpreter, "i", 1)))
     return pcf_i_v;
+  if (!string_compare(interpreter, signature, string_from_c_string(interpreter, "ii", 1)))
+    return pcf_i_i;
   if (!string_compare(interpreter, signature, string_from_c_string(interpreter, "d", 1)))
     return pcf_d_v;
   if (!string_compare(interpreter, signature, string_from_c_string(interpreter, "dd", 2)))
