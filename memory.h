@@ -16,5 +16,7 @@ void Setup_Allocator(struct Perl_Interp *);
 #define Allocate_New_Stash() NULL
 #define Allocate_New_Stack() NULL
 #define Sys_Memcopy memcpy
+#define Sys_Realloc realloc
+#define Sys_Free free
 
 #endif
