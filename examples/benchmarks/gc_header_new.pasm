@@ -1,0 +1,79 @@
+	set I0, 40000
+	set I1, 0
+	set S0,  ""
+	time N5
+loop:
+	concat S1, S0, S0
+	concat S2, S0, S0
+	concat S3, S0, S0
+	concat S4, S0, S0
+	concat S5, S0, S0
+	concat S6, S0, S0
+	concat S7, S0, S0
+	concat S8, S0, S0
+	concat S9, S0, S0
+	concat S10, S0, S0
+	concat S11, S0, S0
+	concat S12, S0, S0
+	concat S13, S0, S0
+	concat S14, S0, S0
+	concat S15, S0, S0
+	concat S16, S0, S0
+	concat S17, S0, S0
+	concat S18, S0, S0
+	concat S19, S0, S0
+	concat S20, S0, S0
+	concat S20, S0, S0
+	concat S21, S0, S0
+	concat S22, S0, S0
+	concat S23, S0, S0
+	concat S24, S0, S0
+	concat S25, S0, S0
+	concat S26, S0, S0
+	concat S27, S0, S0
+	concat S28, S0, S0
+	concat S29, S0, S0
+	concat S30, S0, S0
+	concat S31, S0, S0
+	pushs
+	inc I1
+	lt I1, I0, loop
+
+
+getout:	time N6
+
+	sub N7, N6, N5
+	print N7
+ 	print " seconds.\n"
+
+	interpinfo I1, 1
+	print "A total of "
+	print I1
+	print " bytes were allocated\n"
+
+	interpinfo I1, 2
+	print "A total of "
+	print I1
+	print " DOD runs were made\n"
+
+	interpinfo I1, 3
+	print "A total of "
+	print I1
+	print " collection runs were made\n"
+
+	interpinfo I1, 10
+	print "Copying a total of "
+	print I1
+	print " bytes\n"
+
+	interpinfo I1, 5
+	print "There are "
+	print I1
+	print " active Buffer structs\n"
+
+	interpinfo I1, 7
+	print "There are "
+	print I1
+	print " total Buffer structs\n"
+
+	end
