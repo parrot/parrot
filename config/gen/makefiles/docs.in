@@ -5,16 +5,13 @@ OPS  = bit.pod cmp.pod core.pod debug.pod dotgnu.pod io.pod math.pod \
        object.pod obscure.pod pmc.pod rx.pod set.pod stack.pod string.pod \
        sys.pod var.pod
 
-all: packfile-c.pod packfile-perl.pod $(OPS)
+all: packfile-c.pod packfile-perl.pod
 
 packfile-c.pod: ../packfile.c
 	perldoc -u ../packfile.c > packfile-c.pod
 
 packfile-perl.pod: ../lib/Parrot/PackFile.pm
 	perldoc -u ../lib/Parrot/PackFile.pm > packfile-perl.pod
-
-%.pod: ../%.ops
-	perldoc -u $< > ops/$@
 
 clean:
 	$(RM_F) packfile-c.pod packfile-perl.pod
