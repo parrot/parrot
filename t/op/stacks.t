@@ -1,6 +1,6 @@
 #! perl -w
 
-use Parrot::Test tests => 19;
+use Parrot::Test tests => 15;
 
 # Tests for stack operations, currently push*, push_*_c and pop*
 # where * != p.
@@ -86,39 +86,6 @@ CODE
 3031
 OUTPUT
 
-output_is(<<"CODE", <<'OUTPUT', "clonei & popi");
-@{[ set_int_regs( sub {$_[0]}) ]}
-	clonei
-@{[ print_int_regs() ]}
-@{[ set_int_regs( sub {-$_[0]}) ]}
-@{[ print_int_regs() ]}
-	popi
-@{[ print_int_regs() ]}
-	end
-CODE
-01234
-56789
-1011121314
-1516171819
-2021222324
-2526272829
-3031
-0-1-2-3-4
--5-6-7-8-9
--10-11-12-13-14
--15-16-17-18-19
--20-21-22-23-24
--25-26-27-28-29
--30-31
-01234
-56789
-1011121314
-1516171819
-2021222324
-2526272829
-3031
-OUTPUT
-
 output_is(<<"CODE", <<'OUTPUT', 'pushs & pops');
 @{[ set_str_regs( sub {$_[0]%2} ) ]}
 	pushs
@@ -130,24 +97,6 @@ output_is(<<"CODE", <<'OUTPUT', 'pushs & pops');
 	print "\\n"
 	end
 CODE
-10101010101010101010101010101010
-01010101010101010101010101010101
-OUTPUT
-
-output_is(<<"CODE", <<'OUTPUT', 'clones & pops');
-@{[ set_str_regs( sub {$_[0]%2} ) ]}
-	clones
-@{[ print_str_regs() ]}
-	print "\\n"
-@{[ set_str_regs( sub {($_[0]+1) %2} ) ]}
-@{[ print_str_regs() ]}
-	print "\\n"
-	pops
-@{[ print_str_regs() ]}
-	print "\\n"
-	end
-CODE
-01010101010101010101010101010101
 10101010101010101010101010101010
 01010101010101010101010101010101
 OUTPUT
@@ -181,79 +130,6 @@ output_is(<<"CODE", <<'OUTPUT', 'pushp & popp');
 	end
 CODE
 THERE'LL BE NO BUTTER IN HELL!
-OUTPUT
-
-output_is(<<CODE, <<OUTPUT, "clonep & popp");
-	new	P0, PerlString
-	new	P1, PerlString
-	new	P2, PerlString
-	new	P3, PerlString
-	new	P4, PerlString
-	new	P5, PerlString
-
-	set	P0, "Quarantine\\n"
-	set	P1, "Permutation City\\n"
-	set	P2, "Axiomatic\\n"
-	set	P3, "Distress\\n"
-	set	P4, "Diaspora\\n"
-	set	P5, "Luminous\\n"
-
-	clonep
-
-	print	P0
-	print	P1
-	print	P2
-	print	P3
-	print	P4
-	print	P5
-
-	set	P5, "Greg Egan\\n" 	# this should modify the saved P5
-					# as well
-	new	P4, PerlString
-	set	P4, "HONK if you like\\n" # this won't
-	popp
-
-	print	P0
-	print	P1
-	print	P2
-	print	P3
-	print	P4
-	print	P5
-
-	end
-CODE
-Quarantine
-Permutation City
-Axiomatic
-Distress
-Diaspora
-Luminous
-Quarantine
-Permutation City
-Axiomatic
-Distress
-Diaspora
-Greg Egan
-OUTPUT
-
-output_is(<<"CODE", <<'OUTPUT', 'clonen & popn');
-@{[ set_num_regs( sub { "1.0".$_ } ) ]}
-	clonen
-@{[ cgt_num_regs() ]}
-	print "Seem to have positive Nx before clone\\n"
-@{[ set_num_regs( sub { "-1.0".$_} ) ]}
-@{[ clt_num_regs() ]}
-	print "Seem to have negative Nx\\n"
-	popn
-@{[ cgt_num_regs() ]}
-	print "Seem to have positive Nx after pop\\n"
-	branch ALLOK
-ERROR:	print "not ok\\n"
-ALLOK:	end
-CODE
-Seem to have positive Nx before clone
-Seem to have negative Nx
-Seem to have positive Nx after pop
 OUTPUT
 
 # Test proper stack chunk handling

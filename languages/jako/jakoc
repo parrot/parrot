@@ -1399,10 +1399,10 @@ sub begin_sub_block
   # TODO: Enable the 'P' regs when we start doing PMCs.
   #
 
-  emit_code 'clonei', [ ];
-  emit_code 'clonen', [ ];
-#  emit_code 'clonep', [ ];
-  emit_code 'clones', [ ];
+  emit_code 'pushi', [ ];
+  emit_code 'pushn', [ ];
+#  emit_code 'pushp', [ ];
+  emit_code 'pushs', [ ];
 
   #
   # Record the subroutine information.
