@@ -5,6 +5,7 @@
 /*
  * return true if the Numval has a negative sign
  */
+#if DOUBLE_SIZE == 2 * INT_SIZE
 int
 Parrot_signbit(double x)
 {
@@ -19,8 +20,9 @@ Parrot_signbit(double x)
    return u.i[1] < 0;
 #endif
 }
+#endif
 
-#if NUMVAL_SIZE == 12
+#if NUMVAL_SIZE == 12 && DOUBLE_SIZE == 3 * INT_SIZE && PARROT_LITTLE_ENDIAN
 int
 Parrot_signbit_l(long double x)
 {

@@ -71,6 +71,7 @@ typedef ${hugefloatval} HUGEFLOATVAL;
 #define INT_SIZE ${intsize}
 #define LONG_SIZE ${longsize}
 #define HUGEINTVAL_SIZE ${hugeintvalsize}
+#define DOUBLE_SIZE ${doublesize}
 
 /* We don't have a portable config for 64-bit
  * registers yet. */
