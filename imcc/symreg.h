@@ -40,7 +40,8 @@ typedef struct _Life_range {
 
 enum USAGE {
 	U_KEYED		= 1 << 0,	/* array, hash, keyed */
-	U_NEW		= 1 << 1,	/* PMS was inited */
+	U_NEW		= 1 << 1,	/* PMC was inited */
+	U_SPILL		= 1 << 2,	/* reg is spilled */
 };
 
 typedef struct _SymReg {

@@ -41,7 +41,7 @@ void allocate(struct Parrot_Interp *interpreter) {
     debug(DEBUG_IMC, "\n------------------------\n");
     debug(DEBUG_IMC, "processing sub %s\n", function);
     debug(DEBUG_IMC, "------------------------\n\n");
-    if (IMCC_VERBOSE > 1 || (IMCC_DEBUG & DEBUG_IMC))
+    if (IMCC_VERBOSE || (IMCC_DEBUG & DEBUG_IMC))
         imc_stat_init();
 
     /* consecutive labels, if_branch, unused_labels ... */
@@ -89,7 +89,7 @@ void allocate(struct Parrot_Interp *interpreter) {
         compute_spilling_costs();
         /* simplify until no changes can be made */
         /* while (simplify()) {} */
-        order_spilling();          /* puts the remaing item on stack */
+        order_spilling();          /* put the remaining items on stack */
 
         to_spill = try_allocate();
         allocated = 1;
@@ -97,6 +97,12 @@ void allocate(struct Parrot_Interp *interpreter) {
         if ( to_spill >= 0 ) {
             allocated = 0;
             spill(interpreter, to_spill);
+            /*
+             * TODO build the new cfg/reglist on the fly in spill() and
+             * do life analysis there for only the involved regs
+             */
+            find_basic_blocks();
+            build_cfg();
             build_reglist();
             life_analysis();
         }
@@ -107,7 +113,7 @@ void allocate(struct Parrot_Interp *interpreter) {
     }
     if (IMCC_DEBUG & DEBUG_IMC)
         dump_instructions();
-    if (IMCC_VERBOSE > 1 || (IMCC_DEBUG & DEBUG_IMC))
+    if (IMCC_VERBOSE  || (IMCC_DEBUG & DEBUG_IMC))
         print_stat();
     imcstack_free(nodeStack);
 }
@@ -392,7 +398,7 @@ void compute_spilling_costs () {
                         used = 1;
                         break;
                     }
-                if (used && ins->flags & ITSPILL) {
+                if (used && r->usage & U_SPILL) {
                     r->score = 100000;
                     goto done;
                 }
@@ -692,6 +698,7 @@ void spill(struct Parrot_Interp *interpreter, int spilled) {
     debug(DEBUG_IMC, "#Spilling [%s]:\n", reglist[spilled]->name);
 
     new_symbol = old_symbol = reglist[spilled];
+    new_symbol->usage |= U_SPILL;
     p31 = mk_pasm_reg(str_dup("P31"));
 
     n_spilled++;
@@ -713,7 +720,7 @@ void spill(struct Parrot_Interp *interpreter, int spilled) {
             regs[1] = p31;
             sprintf(buf, "%d", n_spilled);
             regs[2] = mk_const(str_dup(buf), 'I');
-	    sprintf(buf, "%%s, %%s[%%s] #FETCH %s", new_symbol->name);
+	    sprintf(buf, "%%s, %%s[%%s] #FETCH %s", old_symbol->name);
 	    tmp = INS(interpreter, "set", buf, regs, 3, 4, 0);
 	    tmp->bbindex = ins->bbindex;
             tmp->flags |= ITSPILL;
@@ -746,12 +753,13 @@ void spill(struct Parrot_Interp *interpreter, int spilled) {
         if (needs_fetch || needs_store) {
             sprintf(buf, "%s_%d", old_symbol->name, n++);
             new_symbol = mk_symreg(str_dup(buf), old_symbol->set);
+            new_symbol->usage |= U_SPILL;
         }
     }
 
     free(buf);
 
-    /* update line nr info */
+    /* update index */
     for(i = 0, ins = instructions; ins; ins = ins->next) {
 	ins->index = i++;
     }
