@@ -456,7 +456,7 @@ alloc_objects(struct Parrot_Interp *interpreter,
                 GC_DEBUG_REPLENISH_LEVEL_FACTOR);
     }
     else {
-        pool->objects_per_alloc = (size_t) pool->objects_per_alloc * UNITS_PER_ALLOC_GROWTH_FACTOR;
+        pool->objects_per_alloc = (UINTVAL) pool->objects_per_alloc * UNITS_PER_ALLOC_GROWTH_FACTOR;
         pool->replenish_level =
                 (size_t)(pool->total_objects * REPLENISH_LEVEL_FACTOR);
     }

@@ -2355,7 +2355,6 @@ size_t
 PackFile_Constant_pack_size(struct PackFile_Constant *self)
 {
     size_t packed_size;
-    opcode_t padded_size;
     PMC *component;
 
     switch (self->type) {

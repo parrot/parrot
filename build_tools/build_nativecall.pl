@@ -236,11 +236,6 @@ void *
 build_call_func(struct Parrot_Interp *interpreter, PMC *pmc_nci,
                 STRING *signature)
 {
-
-    STRING *ns;
-    STRING *message;
-    char *c;
-
 #if defined(CAN_BUILD_CALL_FRAMES)
     /* This would be a good place to put the code that builds the
        frames. Undoubtedly painfully platform-dependent */

@@ -454,8 +454,6 @@ PMC *
 Parrot_find_method_with_cache(Parrot_Interp interpreter, PMC *class,
                               STRING *method_name) {
     PMC* method = NULL;  /* The method we ultimately return */
-    PMC* classname;      /* The classname PMC for the currently
-                            searched class */
     PMC* curclass;          /* PMC for the current search class */
     PMC* classsearch_array; /* The array of classes we're searching
                                for the method in */
@@ -465,8 +463,6 @@ Parrot_find_method_with_cache(Parrot_Interp interpreter, PMC *class,
     STRING *FQ_method;   /* The fully qualified name of the method
                             that we're going to look for, rebuilt for
                             each class we search */
-    STRING *fallback_name; /* The name of the fallback method for
-                              this class */
     STRING *shortcut_name; /* The method name with the separator
                               prepended */
 

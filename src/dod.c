@@ -378,7 +378,7 @@ them as active.
 static void
 trace_active_buffers(struct Parrot_Interp *interpreter)
 {
-    UINTVAL i, j;
+    UINTVAL i;
 
     /* First mark the current set. We assume that all pointers in S registers
      * are pointing to valid buffers. This is not a good assumption, but it'll

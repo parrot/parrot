@@ -240,6 +240,11 @@ print JITCPU<<END_C;
 #include"parrot/jit.h"
 #define JIT_EMIT $jit_emit_n
 
+/* Disable "truncation from 'const int' to 'char'" warning. */
+#if defined (_MSC_VER)
+#pragma warning(disable: 4305)
+#endif
+
 /*
  *define default jit_funcs, if architecture doesn't have these optimizations
  */
