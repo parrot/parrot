@@ -2040,7 +2040,7 @@ Parrot_jit_build_call_func(struct Parrot_Interp *interpreter,
     /* this ought to be enough - the caller of this function
      * should free the function pointer returned here
      */
-    jit_info.native_ptr = jit_info.arena.start = mem_sys_allocate((size_t)128);
+    jit_info.native_ptr = jit_info.arena.start = mem_sys_allocate((size_t)256);
     pc = jit_info.native_ptr;
 
     /* make stack frame */
@@ -2110,7 +2110,7 @@ Parrot_jit_build_call_func(struct Parrot_Interp *interpreter,
         emitm_addb_i_r(pc, st, emit_ESP);
 
     /* now place return value in registers */
-    next_i = next_n = 5;
+    next_i = next_n = next_p = 5;
     /* first in signature is the return value */
     switch (*sig) {
         case 'f':
@@ -2134,6 +2134,21 @@ Parrot_jit_build_call_func(struct Parrot_Interp *interpreter,
             /* fall through */
         case 'v': /* void - do nothing */
             break;
+        case 'p':   /* make a new unmanaged struct */
+            /* save return value on stack */
+            emitm_pushl_r(pc, emit_EAX);
+            /* make new pmc */
+            emitm_pushl_i(pc, enum_class_UnManagedStruct);
+            emitm_pushl_i(pc, interpreter);
+            emitm_calll(pc, (char*)pmc_new - pc - 4);
+            emitm_addb_i_r(pc, 8, emit_ESP);
+            /* eax = PMC, get return value into edx */
+            emitm_popl_r(pc, emit_EDX);
+            /* stuff return value into pmc->data */
+            emitm_movl_r_m(pc, emit_EDX, emit_EAX, 0, 1,
+                        offsetof(struct PMC, data));
+            jit_emit_mov_mr_i(pc, &PMC_REG(next_p++), emit_EAX);
+            break;
         default:
             internal_exception(1,
                     "Parrot_jit_build_call_func: unimp return value\n");
@@ -2144,11 +2159,12 @@ Parrot_jit_build_call_func(struct Parrot_Interp *interpreter,
     /* set return values in I,S,P,N regs */
     jit_emit_mov_mi_i(pc, &INT_REG(1), next_i-5);
     jit_emit_mov_mi_i(pc, &INT_REG(2), 0);
-    jit_emit_mov_mi_i(pc, &INT_REG(3), 0);
+    jit_emit_mov_mi_i(pc, &INT_REG(3), next_p-5);
     jit_emit_mov_mi_i(pc, &INT_REG(4), next_n-5);
 
     jit_emit_stack_frame_leave(pc);
     emitm_ret(pc);
+    assert(pc - jit_info.arena.start < 256);
 
     return (jit_f)D2FPTR(jit_info.arena.start);
 }
