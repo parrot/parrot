@@ -454,12 +454,14 @@ add_const_str(struct Parrot_Interp *interpreter, char *str) {
     if (*buf == '"') {
         buf++;
         l = unescape(buf);
+        if (l)
         buf[--l] = '\0';
     }
     else if (*buf == '\'') {
         buf++;
         l = strlen(buf);
-        buf[--l] = '\0';
+        if (l)
+            buf[--l] = '\0';
     }
     else {
         l = unescape(buf);
