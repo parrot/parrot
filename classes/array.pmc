@@ -88,7 +88,7 @@ pmclass Array {
     }
 
     void init () {
-        SELF->data = list_new(INTERP, enum_type_PMC);
+        PMC_data(SELF) = list_new(INTERP, enum_type_PMC);
         PObj_custom_mark_SET(SELF);
     }
 
@@ -99,13 +99,13 @@ pmclass Array {
      *
      */
     void init_pmc (PMC *init) {
-        SELF->data = list_new_init(INTERP, enum_type_PMC, init);
+        PMC_data(SELF) = list_new_init(INTERP, enum_type_PMC, init);
         PObj_custom_mark_SET(SELF);
     }
 
 
     void mark () {
-        list_mark(INTERP, (List *) SELF->data);
+        list_mark(INTERP, (List *) PMC_data(SELF));
     }
 
     INTVAL type () {
@@ -118,7 +118,7 @@ pmclass Array {
 
     void clone (PMC *dest) {
         PObj_custom_mark_SET(dest);
-        dest->data = list_clone(INTERP, (List *) SELF->data);
+        PMC_data(dest) = list_clone(INTERP, (List *) PMC_data(SELF));
     }
 
     INTVAL get_integer () {
@@ -130,7 +130,7 @@ pmclass Array {
     }
 
     INTVAL elements () {
-        return ((List *) SELF->data)->length;
+        return ((List *) PMC_data(SELF))->length;
     }
 
     FLOATVAL get_number () {
@@ -147,7 +147,7 @@ pmclass Array {
         if (!key) {
             return 0;
         }
-        value = Parrot_Array_get_pmc_ptr(INTERP, (List*)SELF->data, *key);
+        value = Parrot_Array_get_pmc_ptr(INTERP, (List*)PMC_data(SELF), *key);
         return VTABLE_get_integer(INTERP, value);
     }
 
@@ -173,7 +173,7 @@ pmclass Array {
         if (!key) {
             return 0;
         }
-        value = Parrot_Array_get_pmc_ptr(INTERP, (List *) SELF->data, *key);
+        value = Parrot_Array_get_pmc_ptr(INTERP, (List *) PMC_data(SELF), *key);
         return VTABLE_get_number(INTERP, value);
 
     }
@@ -200,7 +200,7 @@ pmclass Array {
         if (!key) {
             return 0;
         }
-        value = Parrot_Array_get_pmc_ptr(INTERP, (List *) SELF->data, *key);
+        value = Parrot_Array_get_pmc_ptr(INTERP, (List *) PMC_data(SELF), *key);
         return VTABLE_get_string(INTERP, value);
     }
 
@@ -224,7 +224,7 @@ pmclass Array {
         if (!key) {
             return 0;
         }
-        return Parrot_Array_get_pmc_ptr(INTERP, (List *)SELF->data, *key);
+        return Parrot_Array_get_pmc_ptr(INTERP, (List *)PMC_data(SELF), *key);
     }
 
     PMC* get_pmc_keyed (PMC* key) {
@@ -244,16 +244,16 @@ pmclass Array {
 
     void set_integer (PMC* value) {
         INTVAL size = VTABLE_get_integer(INTERP,value);
-        list_set_length(INTERP, (List *) SELF->data ,size);
+        list_set_length(INTERP, (List *) PMC_data(SELF) ,size);
     }
 
     void set_integer_native (INTVAL size) {
-        list_set_length(INTERP, (List *) SELF->data ,size);
+        list_set_length(INTERP, (List *) PMC_data(SELF) ,size);
     }
 
     void set_integer_same (PMC* value) {
         INTVAL size = DYNSELF.elements();
-        list_set_length(INTERP, (List *) SELF->data ,size);
+        list_set_length(INTERP, (List *) PMC_data(SELF) ,size);
     }
 
     void set_integer_keyed_int (INTVAL* key, INTVAL value) {
@@ -263,7 +263,7 @@ pmclass Array {
             return;
         }
 
-	ptr = Parrot_Array_set_pmc_ptr(INTERP, (List *) SELF->data, *key);
+	ptr = Parrot_Array_set_pmc_ptr(INTERP, (List *) PMC_data(SELF), *key);
         VTABLE_set_integer_native(INTERP, ptr, value);
     }
 
@@ -294,7 +294,7 @@ pmclass Array {
         if (!key) {
             return;
         }
-	ptr = Parrot_Array_set_pmc_ptr(INTERP, (List *) SELF->data, *key);
+	ptr = Parrot_Array_set_pmc_ptr(INTERP, (List *) PMC_data(SELF), *key);
         VTABLE_set_number_native(INTERP, ptr, value);
     }
 
@@ -324,7 +324,7 @@ pmclass Array {
         if (!key) {
             return;
         }
-	ptr = Parrot_Array_set_pmc_ptr(INTERP, (List *) SELF->data, *key);
+	ptr = Parrot_Array_set_pmc_ptr(INTERP, (List *) PMC_data(SELF), *key);
         VTABLE_set_string_native(INTERP, ptr, value);
     }
 
@@ -355,14 +355,14 @@ pmclass Array {
             return;
         }
 	idx = *dest_key;
-        length = ((List *) SELF->data)->length;
+        length = ((List *) PMC_data(SELF))->length;
 	if (idx >= length || -idx > length) {
 	    internal_exception(OUT_OF_BOUNDS, "Array index out of bounds!\n");
 	}
 
         if (src_key)
 	    src = VTABLE_get_pmc_keyed_int(INTERP, src, src_key);
-	list_assign(INTERP, (List *) SELF->data, idx,
+	list_assign(INTERP, (List *) PMC_data(SELF), idx,
 		(void*)src, enum_type_PMC);
     }
 
@@ -404,75 +404,75 @@ pmclass Array {
 
     void unshift_integer (INTVAL value) {
 	PMC * val = undef(INTERP);
-	list_unshift(INTERP, (List*)SELF->data, val, enum_type_PMC);
+	list_unshift(INTERP, (List*)PMC_data(SELF), val, enum_type_PMC);
 	VTABLE_set_integer_native(INTERP, val, value);
     }
 
     void unshift_float (FLOATVAL value) {
 	PMC * val = undef(INTERP);
-	list_unshift(INTERP, (List*)SELF->data, val, enum_type_PMC);
+	list_unshift(INTERP, (List*)PMC_data(SELF), val, enum_type_PMC);
 	VTABLE_set_number_native(INTERP, val, value);
     }
 
     void unshift_string (STRING *value) {
 	PMC * val = undef(INTERP);
-	list_unshift(INTERP, (List*)SELF->data, val, enum_type_PMC);
+	list_unshift(INTERP, (List*)PMC_data(SELF), val, enum_type_PMC);
 	VTABLE_set_string_native(INTERP, val, value);
     }
 
     void unshift_pmc (PMC *value) {
-	list_unshift(INTERP, (List*)SELF->data, value, enum_type_PMC);
+	list_unshift(INTERP, (List*)PMC_data(SELF), value, enum_type_PMC);
     }
 
     INTVAL pop_integer () {
-	PMC *ptr = Parrot_Array_pop_pmc_ptr(INTERP, (List*) SELF->data);
+	PMC *ptr = Parrot_Array_pop_pmc_ptr(INTERP, (List*) PMC_data(SELF));
 	return VTABLE_get_integer(INTERP, ptr);
     }
 
     FLOATVAL pop_float () {
-	PMC *ptr = Parrot_Array_pop_pmc_ptr(INTERP, (List*) SELF->data);
+	PMC *ptr = Parrot_Array_pop_pmc_ptr(INTERP, (List*) PMC_data(SELF));
 	return VTABLE_get_number(INTERP, ptr);
     }
 
     STRING* pop_string () {
-	PMC *ptr = Parrot_Array_pop_pmc_ptr(INTERP, (List*) SELF->data);
+	PMC *ptr = Parrot_Array_pop_pmc_ptr(INTERP, (List*) PMC_data(SELF));
 	return VTABLE_get_string(INTERP, ptr);
     }
 
     PMC* pop_pmc () {
-	return Parrot_Array_pop_pmc_ptr(INTERP, (List*) SELF->data);
+	return Parrot_Array_pop_pmc_ptr(INTERP, (List*) PMC_data(SELF));
     }
 
     INTVAL shift_integer () {
-	PMC *ptr = Parrot_Array_shift_pmc_ptr(INTERP, (List*) SELF->data);
+	PMC *ptr = Parrot_Array_shift_pmc_ptr(INTERP, (List*) PMC_data(SELF));
 	return VTABLE_get_integer(INTERP, ptr);
     }
 
     FLOATVAL shift_float () {
-	PMC *ptr = Parrot_Array_shift_pmc_ptr(INTERP, (List*) SELF->data);
+	PMC *ptr = Parrot_Array_shift_pmc_ptr(INTERP, (List*) PMC_data(SELF));
 	return VTABLE_get_number(INTERP, ptr);
     }
 
     STRING* shift_string () {
-	PMC *ptr = Parrot_Array_shift_pmc_ptr(INTERP, (List*) SELF->data);
+	PMC *ptr = Parrot_Array_shift_pmc_ptr(INTERP, (List*) PMC_data(SELF));
 	return VTABLE_get_string(INTERP, ptr);
     }
 
     PMC* shift_pmc () {
-	return Parrot_Array_shift_pmc_ptr(INTERP, (List*) SELF->data);
+	return Parrot_Array_shift_pmc_ptr(INTERP, (List*) PMC_data(SELF));
     }
 
     void splice(PMC* value, INTVAL offset, INTVAL count) {
 	if (SELF->vtable->base_type != value->vtable->base_type)
 	    internal_exception(1, "Type mismatch in splice\n");
-	list_splice(INTERP, (List*) SELF->data, value, offset, count);
+	list_splice(INTERP, (List*) PMC_data(SELF), value, offset, count);
     }
 
     INTVAL defined_keyed_int (INTVAL* key) {
         PMC* value;
 	void *ret;
 
-	ret = list_get(INTERP, (List *) pmc->data, *key, enum_type_PMC);
+	ret = list_get(INTERP, (List *) PMC_data(pmc), *key, enum_type_PMC);
 	if (ret == 0 || ret == (void *) -1)
 	    return 0;
 	value = *(PMC**) ret;
@@ -500,7 +500,7 @@ pmclass Array {
     INTVAL exists_keyed_int (INTVAL* key) {
         void * ret;
 
-	ret = list_get(INTERP, (List *) pmc->data, *key, enum_type_PMC);
+	ret = list_get(INTERP, (List *) PMC_data(pmc), *key, enum_type_PMC);
 	if (ret == 0 || ret == (void *) -1)
 	    return 0;
         return *(PMC**) ret != NULL;

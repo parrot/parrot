@@ -18,7 +18,6 @@ pmclass scalar abstract noinit {
     void clone (PMC *dest) {
 	VTABLE_init(INTERP, dest);
         memcpy(&dest->cache, &SELF->cache, sizeof(UnionVal));
-        dest->data = 0;
     }
 
     INTVAL get_integer () {

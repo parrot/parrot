@@ -46,7 +46,7 @@ pmclass Boolean extends PerlInt {
     }
 
     void set_string (PMC* value) {
-	SELF->cache.int_val = string_bool(value->data);
+	SELF->cache.int_val = string_bool(value->cache.string_val);
     }
 
     void set_string_native (STRING* value) {
@@ -54,7 +54,7 @@ pmclass Boolean extends PerlInt {
     }
 
     void set_string_same (PMC* value) {
-	SELF->cache.int_val = string_bool(value->data);
+	SELF->cache.int_val = string_bool(value->cache.string_val);
     }
 
 

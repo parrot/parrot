@@ -25,31 +25,31 @@ pmclass Coroutine {
     }
 
     void init () {
-        SELF->data = new_coroutine(INTERP, NULL);
+        PMC_data(SELF) = new_coroutine(INTERP, NULL);
         PObj_custom_mark_destroy_SETALL(SELF);
     }
 
     void destroy () {
 	/* XXX stack_destroy for deeper stacks */
-	mem_sys_free(((struct Parrot_Coroutine *)SELF->data)->ctx.user_stack);
-	mem_sys_free(((struct Parrot_Coroutine *)SELF->data)->ctx.control_stack);
-        mem_sys_free(SELF->data);
+	mem_sys_free(((struct Parrot_Coroutine *)PMC_data(SELF))->ctx.user_stack);
+	mem_sys_free(((struct Parrot_Coroutine *)PMC_data(SELF))->ctx.control_stack);
+        mem_sys_free(PMC_data(SELF));
     }
 
     void mark () {
-        struct Parrot_Coroutine * co = (struct Parrot_Coroutine *)SELF->data;
+        struct Parrot_Coroutine * co = (struct Parrot_Coroutine *)PMC_data(SELF);
         mark_stack(INTERP, co->ctx.user_stack);
         mark_stack(INTERP, co->ctx.control_stack);
         mark_stack(INTERP, co->ctx.pad_stack);
     }
 
     void set_integer (PMC * value) {
-        ((struct Parrot_Coroutine*)SELF->data)->resume
+        ((struct Parrot_Coroutine*)PMC_data(SELF))->resume
             = (opcode_t*)VTABLE_get_integer(INTERP, value);
     }
 
     void set_integer_native (INTVAL value) {
-        ((struct Parrot_Coroutine*)SELF->data)->resume = (opcode_t*)value;
+        ((struct Parrot_Coroutine*)PMC_data(SELF))->resume = (opcode_t*)value;
     }
 
     PMC* get_pmc () {
@@ -62,21 +62,21 @@ pmclass Coroutine {
 
     INTVAL is_equal (PMC* value) {
         return (SELF->vtable == value->vtable
-                && memcmp(value->data, SELF->data,
+                && memcmp(PMC_data(value), PMC_data(SELF),
                           sizeof(struct Parrot_Coroutine)) == 0);
     }
 
     INTVAL defined () {
-        return ((struct Parrot_Coroutine*)SELF->data)->resume != NULL;
+        return ((struct Parrot_Coroutine*)PMC_data(SELF))->resume != NULL;
     }
 
     void* invoke (void* next) {
-        struct Parrot_Coroutine* co = (struct Parrot_Coroutine*)SELF->data;
+        struct Parrot_Coroutine* co = (struct Parrot_Coroutine*)PMC_data(SELF);
         struct Stack_Chunk * tmp_stack = NULL;
         void * dest = co->resume;
         co->resume = (opcode_t *)next;
 
-	/* 
+	/*
          * Swap control, user and pad stacks. Data in other parts of the
          * context are not preserved between calls to the coroutine.
          */
@@ -98,9 +98,9 @@ pmclass Coroutine {
 
     void clone(PMC *ret) {
         struct Parrot_Coroutine * retc;
-        ret->data = retc = mem_sys_allocate(sizeof(struct Parrot_Coroutine));
+        PMC_data(ret) = retc = mem_sys_allocate(sizeof(struct Parrot_Coroutine));
         PObj_custom_mark_destroy_SETALL(ret);
-        memcpy(ret->data, SELF->data, sizeof(struct Parrot_Coroutine));
+        memcpy(PMC_data(ret), PMC_data(SELF), sizeof(struct Parrot_Coroutine));
         stack_mark_cow(retc->ctx.user_stack);
         stack_mark_cow(retc->ctx.control_stack);
         stack_mark_cow(retc->ctx.pad_stack);

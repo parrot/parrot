@@ -3,14 +3,12 @@
  *  CVS Info
  *     $Id$
  *  Overview:
- *     PMC class to hold structs that parrot's not responsible for disposing of
- *     If a number is assigned to a PMC, creates a buffer of that size suitable for
- *			passing to external programs in NCI.  Buffer can be resized by re-assignment.
- *			If set to 0, or the PMC is destroyed, buffer is free()'d.
- *	   Buffer can be accessed using keyed assignments to PMC.  Out of bounds (on a 
- *			"managed" UnManagedStruct) will return -1 on a get.
- *	   If the PMC is assigned to an Ix register, returns the size of the managed, UnManagedStruct
- *			or 0 if completely unmanaged.
+ *     PMC class to hold structs that parrot's not responsible for
+ *     disposing of.
+ *
+ *     Buffer can be accessed using keyed assignments to PMC.  Out of
+ *     bounds access will very likely segfault.
+ *
  *  Data Structure and Algorithms:
  *  History:
  *     Initial revision by sean 2002/08/04
@@ -29,38 +27,38 @@ enum {
 pmclass UnManagedStruct {
 
     STRING* name () {
-        return whoami;
+	return whoami;
     }
 
     INTVAL is_equal (PMC* value) {
-        return (SELF->vtable == value->vtable
-		&& SELF->data == value->data);
+	return (SELF->vtable == value->vtable
+		&& PMC_data(SELF) == PMC_data(value));
     }
 
     INTVAL defined () {
-        return SELF->data != NULL;
+	return PMC_data(SELF) != NULL;
     }
-    
+
     /* May cause segfaults if value is out of bounds */
     INTVAL get_integer_keyed(PMC* key) {
-		INTVAL ix;
-		
-		if (!key) return -1;
-        ix = key_integer(INTERP, key);
-        if (ix < 0) return -1;
-		return  (unsigned char)((char *)SELF->data)[ix];      
-        
+	INTVAL ix;
+
+	if (!key) return -1;
+	ix = key_integer(INTERP, key);
+	if (ix < 0) return -1;
+	return  (unsigned char)((char *)PMC_data(SELF))[ix];
+
     }
-    
+
     /* May cause segfaults if value is out of bounds */
     void set_integer_keyed (PMC* key, INTVAL value) {
-		INTVAL ix;
-		
-        if (!key) return;
-        ix = key_integer(INTERP, key);
-        if (ix < 0) return;
-		((char *)SELF->data)[ix]=(0xff & value);
-		return;
-	}
-  
+	INTVAL ix;
+
+	if (!key) return;
+	ix = key_integer(INTERP, key);
+	if (ix < 0) return;
+	((char *)PMC_data(SELF))[ix]=(0xff & value);
+	return;
+    }
+
 }

@@ -6,7 +6,7 @@
  *     These are the vtable functions for the Pointer base class
  *  Data Structure and Algorithms:
  *  History:
- *  Notes:  The actual pointer is in ->data
+ *  Notes:  The actual pointer is in PMC_data
  *  References:
  */
 
@@ -16,7 +16,6 @@
 pmclass Pointer {
 
     void init () {
-        SELF->data=NULL;
         PObj_custom_mark_SET(SELF);
     }
 
@@ -27,14 +26,11 @@ pmclass Pointer {
         void (*mark_function)(struct Parrot_Interp*, void*) =
             (void (*)(struct Parrot_Interp*, void*))
 	    	D2FPTR(SELF->cache.struct_val);
-        if (SELF->data == NULL)
+        if (PMC_data(SELF) == NULL)
 		return;
         if (SELF->cache.struct_val == NULL)
 		return;
-        (*mark_function)(INTERP, SELF->data);
-    }
-
-    void destroy () {
+        (*mark_function)(INTERP, PMC_data(SELF));
     }
 
     INTVAL type () {
@@ -47,15 +43,15 @@ pmclass Pointer {
 
     void clone (PMC *dest) {
         PObj_custom_mark_SET(dest);
-        dest->data = SELF->data;
+        PMC_data(dest) = PMC_data(SELF);
     }
 
     INTVAL get_integer () {
-        return (INTVAL)SELF->data;
+        return (INTVAL)PMC_data(SELF);
     }
 
     FLOATVAL get_number () {
-        return (FLOATVAL)(INTVAL)SELF->data;
+        return (FLOATVAL)(INTVAL)PMC_data(SELF);
     }
 
     STRING* get_string () {
@@ -65,7 +61,7 @@ pmclass Pointer {
         /* XXX Dangerous if you have a 196-bit system or above
         (and if you do, you have too comfortable a life and
         deserve to be tormented by coredumps). */
-        sprintf(target, "Pointer=0x%p", SELF->data);
+        sprintf(target, "Pointer=0x%p", PMC_data(SELF));
         ret=string_make(interpreter, target, strlen(target), 0, 0, 0);
 
         mem_sys_free(target);
@@ -73,11 +69,12 @@ pmclass Pointer {
     }
 
     INTVAL get_bool () {
-        return (INTVAL)(SELF->data != NULL);
+        return (INTVAL)(PMC_data(SELF) != NULL);
     }
 
     INTVAL is_same (PMC* pmc2) {
-        return (INTVAL)(SELF->vtable == pmc2->vtable && SELF->data == pmc2->data);
+        return (INTVAL)(SELF->vtable == pmc2->vtable &&
+		PMC_data(SELF) == PMC_data(pmc2));
     }
 
     void set_integer (PMC* value) {

@@ -466,7 +466,7 @@ pmclass default abstract noinit {
 
     void set_same (PMC* value) {
         SELF->cache.struct_val = value->cache.struct_val;
-	SELF->data = value->data;
+	PMC_data(SELF) = PMC_data(value);
     }
 
     void set_same_keyed (PMC* dest_key, PMC* src, PMC* src_key) {
@@ -1314,7 +1314,7 @@ pmclass default abstract noinit {
     INTVAL is_equal (PMC* value) {
         return (SELF->vtable == value->vtable
                 && SELF->cache.struct_val == value->cache.struct_val
-		&& SELF->data == value->data);
+		&& PMC_data(SELF) == PMC_data(value));
     }
 
     INTVAL is_equal_keyed (PMC* key, PMC* value, PMC* value_key) {

@@ -23,10 +23,10 @@ pmclass Eval extends Sub {
    }
 
    void* invoke (void* next) {
-       PMC * pad = ((struct Parrot_Sub *)SELF->data)->lex_pad;
+       PMC * pad = ((struct Parrot_Sub *)PMC_data(SELF))->lex_pad;
        struct PackFile_ByteCode *old_cs;
        struct PackFile_ByteCode *eval_cs = (struct PackFile_ByteCode *)
-	   ((struct Parrot_Sub *)SELF->data)->init;
+	   ((struct Parrot_Sub *)PMC_data(SELF))->init;
 
        if (pad) {
 	   /* put the correct pad in place

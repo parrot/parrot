@@ -25,13 +25,13 @@ pmclass Scratchpad {
         struct Parrot_Lexicals * lex;
 
 	for (j = 0; j < SELF->cache.int_val; j++) {
-            lex = &(((struct Parrot_Lexicals *)SELF->data)[j]);
+            lex = &(((struct Parrot_Lexicals *)PMC_data(SELF))[j]);
             lexicals_mark(INTERP, lex);
         }
     }
 
     void destroy () {
-	mem_sys_free(SELF->data);
+	mem_sys_free(PMC_data(SELF));
     }
 
     STRING* name () {
@@ -40,10 +40,10 @@ pmclass Scratchpad {
 
     void clone (PMC *ret) {
         PObj_custom_mark_destroy_SETALL(ret);
-	ret->data = mem_sys_allocate(SELF->cache.int_val *
+	PMC_data(ret) = mem_sys_allocate(SELF->cache.int_val *
                                      sizeof(struct Parrot_Lexicals));
 	ret->cache.int_val = SELF->cache.int_val;
-	mem_sys_memcopy(ret->data, SELF->data,
+	mem_sys_memcopy(PMC_data(ret), PMC_data(SELF),
 			SELF->cache.int_val * sizeof(struct Parrot_Lexicals));
     }
 

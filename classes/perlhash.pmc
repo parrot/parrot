@@ -40,12 +40,12 @@ pmclass PerlHash {
             VTABLE_init(INTERP, undef);
         }
         PObj_custom_mark_SET(SELF);
-        new_hash(INTERP, (HASH **)&SELF->data);
+        new_hash(INTERP, (HASH **)&PMC_data(SELF));
     }
 
     void mark () {
-        if (SELF->data)
-            mark_hash(INTERP, SELF->data);
+        if (PMC_data(SELF))
+            mark_hash(INTERP, PMC_data(SELF));
     }
 
     INTVAL type () {
@@ -58,17 +58,17 @@ pmclass PerlHash {
 
     void clone (PMC *ret) {
         PObj_custom_mark_SET(ret);
-        hash_clone(INTERP, (HASH *)SELF->data, (HASH **)&ret->data);
+        hash_clone(INTERP, (HASH *)PMC_data(SELF), (HASH **)&PMC_data(ret));
     }
 
     INTVAL get_integer () {
-        return hash_size(INTERP, SELF->data);
+        return hash_size(INTERP, PMC_data(SELF));
     }
 
     INTVAL get_integer_keyed (PMC* key) {
         PMC* valpmc;
         STRING* keystr = make_hash_key(INTERP, key);
-        HASH_ENTRY* entry = hash_get(INTERP, (HASH*) SELF->data, keystr);
+        HASH_ENTRY* entry = hash_get(INTERP, (HASH*) PMC_data(SELF), keystr);
         if (entry == NULL) {
             /* XXX Warning: use of uninitialized value */
             return VTABLE_get_integer(INTERP, undef);
@@ -91,7 +91,7 @@ pmclass PerlHash {
     FLOATVAL get_number_keyed (PMC* key) {
         PMC* valpmc;
         STRING* keystr = make_hash_key(INTERP, key);
-        HASH_ENTRY* entry = hash_get(INTERP, (HASH*) SELF->data, keystr);
+        HASH_ENTRY* entry = hash_get(INTERP, (HASH*) PMC_data(SELF), keystr);
         if (entry == NULL) {
             /* XXX Warning: Use of uninitialized value */
             return VTABLE_get_number(INTERP, undef);
@@ -113,7 +113,7 @@ pmclass PerlHash {
     BIGNUM* get_bignum_keyed (PMC* key) {
         PMC* valpmc;
         STRING* keystr = make_hash_key(INTERP, key);
-        HASH_ENTRY* entry = hash_get(INTERP, (HASH*) SELF->data, keystr);
+        HASH_ENTRY* entry = hash_get(INTERP, (HASH*) PMC_data(SELF), keystr);
         if (entry == NULL) {
             /* XXX Warning: Use of uninitialized value */
             return VTABLE_get_bignum(INTERP, undef);
@@ -139,7 +139,7 @@ pmclass PerlHash {
     STRING* get_string_keyed (PMC* key) {
         PMC* valpmc;
         STRING* keystr = make_hash_key(INTERP, key);
-        HASH_ENTRY* entry = hash_get(INTERP, (HASH*) SELF->data, keystr);
+        HASH_ENTRY* entry = hash_get(INTERP, (HASH*) PMC_data(SELF), keystr);
         if (entry == NULL) {
             /* XXX Warning: use of uninitialized value */
             return VTABLE_get_string(INTERP, undef);
@@ -159,16 +159,16 @@ pmclass PerlHash {
     }
 
     INTVAL get_bool () {
-        return hash_size(INTERP, SELF->data) != 0;
+        return hash_size(INTERP, PMC_data(SELF)) != 0;
     }
 
     INTVAL elements () {
-        return hash_size(INTERP, SELF->data);
+        return hash_size(INTERP, PMC_data(SELF));
     }
 
     PMC* get_pmc_keyed (PMC* key) {
         STRING* keystr = make_hash_key(INTERP, key);
-        HASH_ENTRY* entry = hash_get(INTERP, (HASH*) SELF->data, keystr);
+        HASH_ENTRY* entry = hash_get(INTERP, (HASH*) PMC_data(SELF), keystr);
         if (entry == NULL) {
             /* XXX Warning: use of uninitialized value */
             return (PMC*)VTABLE_get_pmc(INTERP, undef);
@@ -212,7 +212,7 @@ pmclass PerlHash {
         HASH_ENTRY entry;
         entry.type = enum_hash_int;
         entry.val.int_val = value;
-        hash_put(INTERP, SELF->data, keystr, &entry);
+        hash_put(INTERP, PMC_data(SELF), keystr, &entry);
     }
 
     void set_number (PMC* value) {
@@ -232,7 +232,7 @@ pmclass PerlHash {
         HASH_ENTRY entry;
         entry.type = enum_hash_num;
         entry.val.num_val = value;
-        hash_put(INTERP, SELF->data, keystr, &entry);
+        hash_put(INTERP, PMC_data(SELF), keystr, &entry);
     }
 
     void set_bignum (PMC* value) {
@@ -268,7 +268,7 @@ pmclass PerlHash {
         HASH_ENTRY entry;
         entry.type = enum_hash_string;
         entry.val.string_val = value;
-        hash_put(INTERP, SELF->data, keystr, &entry);
+        hash_put(INTERP, PMC_data(SELF), keystr, &entry);
     }
 
     void set_pmc_keyed (PMC* dest_key, PMC* value, PMC* val_key) {
@@ -276,7 +276,7 @@ pmclass PerlHash {
         HASH_ENTRY entry;
         entry.type = enum_hash_pmc;
         entry.val.pmc_val = value;
-        hash_put(INTERP, SELF->data, keystr, &entry);
+        hash_put(INTERP, PMC_data(SELF), keystr, &entry);
     }
 
 
@@ -287,7 +287,7 @@ pmclass PerlHash {
 
     INTVAL exists_keyed(PMC* key) {
 	STRING * sx;
-	HASH * h = (HASH *)SELF->data;
+	HASH * h = (HASH *)PMC_data(SELF);
 	HASH_ENTRY * he;
 	sx = key_string(INTERP, key);
 	key = key_next(INTERP, key);
@@ -302,7 +302,7 @@ pmclass PerlHash {
 
     INTVAL defined_keyed(PMC* key) {
 	STRING * sx;
-	HASH * h = (HASH *)SELF->data;
+	HASH * h = (HASH *)PMC_data(SELF);
 	HASH_ENTRY * he;
 	sx = key_string(INTERP, key);
 	key = key_next(INTERP, key);
@@ -323,7 +323,7 @@ pmclass PerlHash {
 
     void delete_keyed(PMC* key) {
 	STRING * sx;
-	HASH * h = (HASH *)SELF->data;
+	HASH * h = (HASH *)PMC_data(SELF);
 	HASH_ENTRY * he;
 	sx = key_string(INTERP, key);
 	key = key_next(INTERP, key);

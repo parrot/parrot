@@ -89,6 +89,8 @@ struct PMC {
     struct PMC_EXT *pmc_ext;
 };
 
+#define PMC_data(pmc) (pmc)->data
+
 struct PMC_EXT {
     PMC *metadata;      /* properties */
 

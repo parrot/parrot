@@ -23,31 +23,31 @@ pmclass Sub {
        INTVAL address = 0; /* XXX this was originally passed as a
                             * parameter, but that's not valid.  So
                             * this is totally broken now. */
-       SELF->data = new_sub(INTERP, (opcode_t*)address);
+       PMC_data(SELF) = new_sub(INTERP, (opcode_t*)address);
        PObj_custom_mark_destroy_SETALL(SELF);
    }
 
    void mark () {
-       PMC * pad = ((struct Parrot_Sub *)SELF->data)->lex_pad;
+       PMC * pad = ((struct Parrot_Sub *)PMC_data(SELF))->lex_pad;
        if (pad) {
            pobject_lives(INTERP, (PObj *)pad);
        }
    }
 
    void destroy () {
-       mem_sys_free(SELF->data);
+       mem_sys_free(PMC_data(SELF));
    }
 
    void set_integer (PMC * value) {
-       ((struct Parrot_Sub*)SELF->data)->init = (opcode_t*)VTABLE_get_integer(INTERP, value);
+       ((struct Parrot_Sub*)PMC_data(SELF))->init = (opcode_t*)VTABLE_get_integer(INTERP, value);
    }
 
    void set_integer_native (INTVAL value) {
-       ((struct Parrot_Sub*)SELF->data)->init = (opcode_t*)value;
+       ((struct Parrot_Sub*)PMC_data(SELF))->init = (opcode_t*)value;
    }
 
    void* invoke (void* next) {
-       PMC * pad = ((struct Parrot_Sub *)SELF->data)->lex_pad;
+       PMC * pad = ((struct Parrot_Sub *)PMC_data(SELF))->lex_pad;
 
        if (pad) {
            /* put the correct pad in place */
@@ -59,13 +59,13 @@ pmclass Sub {
        stack_push(INTERP, &(INTERP->ctx.control_stack), next,
 		  STACK_ENTRY_DESTINATION, STACK_CLEANUP_NULL);
 
-       return ((struct Parrot_Sub*)SELF->data)->init;
+       return ((struct Parrot_Sub*)PMC_data(SELF))->init;
    }
 
    void clone (PMC *ret) {
         PObj_custom_mark_destroy_SETALL(ret);
-	ret->data = mem_sys_allocate(sizeof(struct Parrot_Sub));
-	memcpy(ret->data, SELF->data, sizeof(struct Parrot_Sub));
+	PMC_data(ret) = mem_sys_allocate(sizeof(struct Parrot_Sub));
+	memcpy(PMC_data(ret), PMC_data(SELF), sizeof(struct Parrot_Sub));
    }
 
 }

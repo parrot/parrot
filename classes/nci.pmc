@@ -23,7 +23,7 @@ pmclass NCI {
     void set_string_keyed (PMC* func, STRING* value) {
 	/* key = func_ptr, value = signature */
 	SELF->cache.struct_val = (DPOINTER *)func;
-	SELF->data = build_call_func(INTERP, SELF, value);
+	PMC_data(SELF) = build_call_func(INTERP, SELF, value);
     }
 
     STRING* name () {
@@ -31,8 +31,8 @@ pmclass NCI {
     }
 
     void destroy() {
-	if (SELF->data)
-	    mem_sys_free(SELF->data);
+	if (PMC_data(SELF))
+	    mem_sys_free(PMC_data(SELF));
     }
 
     void clone (PMC *ret) {
@@ -41,15 +41,15 @@ pmclass NCI {
 	 * the length of data here, to memcpy it
 	 * ManagedStruct or Buffer?
 	 */
-	ret->data = SELF->data;
+	PMC_data(ret) = PMC_data(SELF);
     }
 
     INTVAL defined () {
-        return SELF->data != NULL;
+        return PMC_data(SELF) != NULL;
     }
 
     void* invoke (void * next) {
-        Parrot_csub_t func = (Parrot_csub_t)D2FPTR(SELF->data);
+        Parrot_csub_t func = (Parrot_csub_t)D2FPTR(PMC_data(SELF));
         func(INTERP, SELF);
         return next;
     }

@@ -19,33 +19,33 @@ pmclass Iterator {
     }
 
     void init_pmc (PMC* initializer) {
-	SELF->data = initializer; /* the aggregate itself */
+	PMC_data(SELF) = initializer; /* the aggregate itself */
         SELF->cache.struct_val = NULL;
         PObj_custom_mark_SET(SELF);
     }
 
     void mark () {
-        pobject_lives(INTERP, (PObj *)SELF->data);
+        pobject_lives(INTERP, (PObj *)PMC_data(SELF));
 	if (SELF->cache.struct_val) /* the KEY */
 	     pobject_lives(INTERP, (PObj *) SELF->cache.struct_val);
-	if (SELF->data)		/* the aggregate */
-	     pobject_lives(INTERP, (PObj *) SELF->data);
+	if (PMC_data(SELF))		/* the aggregate */
+	     pobject_lives(INTERP, (PObj *) PMC_data(SELF));
     }
 
     PMC* getprop (STRING* key) {
-	return VTABLE_getprop(INTERP, (PMC*) SELF->data, key);
+	return VTABLE_getprop(INTERP, (PMC*) PMC_data(SELF), key);
     }
 
     void setprop (STRING* key, PMC* value) {
-        VTABLE_setprop(INTERP, (PMC *)SELF->data, key, value);
+        VTABLE_setprop(INTERP, (PMC *)PMC_data(SELF), key, value);
     }
 
     void delprop (STRING* key) {
-        VTABLE_delprop(INTERP, (PMC *)SELF->data, key);
+        VTABLE_delprop(INTERP, (PMC *)PMC_data(SELF), key);
     }
 
     PMC* getprops () {
-        return VTABLE_getprops(INTERP, (PMC *)SELF->data);
+        return VTABLE_getprops(INTERP, (PMC *)PMC_data(SELF));
     }
 
     STRING* name () {
@@ -59,19 +59,19 @@ pmclass Iterator {
 
     INTVAL get_integer () {
         return VTABLE_get_integer(INTERP,
-		(PMC *)SELF->data);
+		(PMC *)PMC_data(SELF));
     }
 
     INTVAL get_integer_keyed (PMC* key) {
 	/* XXX adjust index */
         return VTABLE_get_integer_keyed(INTERP,
-		(PMC *)SELF->data, key);
+		(PMC *)PMC_data(SELF), key);
     }
 
     INTVAL get_integer_keyed_int (INTVAL* key) {
 	/* XXX adjust index */
         return VTABLE_get_integer_keyed_int(INTERP,
-		(PMC *)SELF->data, key);
+		(PMC *)PMC_data(SELF), key);
     }
 
     FLOATVAL get_number () {
@@ -112,7 +112,7 @@ pmclass Iterator {
 
     INTVAL get_bool () {
 	PMC *key = SELF->cache.struct_val;
-	PMC *agg = SELF->data;
+	PMC *agg = PMC_data(SELF);
         return key && key->cache.int_val >= 0 &&
 	    key->cache.int_val < VTABLE_elements(INTERP, agg);
     }
@@ -174,7 +174,7 @@ pmclass Iterator {
 	}
 	key = SELF->cache.struct_val;
 	SELF->cache.struct_val =
-	    VTABLE_nextkey_keyed(INTERP, (PMC*) SELF->data, key, value);
+	    VTABLE_nextkey_keyed(INTERP, (PMC*) PMC_data(SELF), key, value);
     }
 
     void set_integer_same (PMC* value) {
@@ -251,7 +251,7 @@ pmclass Iterator {
 
     INTVAL pop_integer () {
 	PMC *key = SELF->cache.struct_val;
-	PMC *agg = SELF->data;
+	PMC *agg = PMC_data(SELF);
 	INTVAL ret = VTABLE_get_integer_keyed(INTERP, agg, key);
 	SELF->cache.struct_val =
 	    VTABLE_nextkey_keyed(INTERP, agg, key, 2);
@@ -316,7 +316,7 @@ pmclass Iterator {
 
     INTVAL shift_integer () {
 	PMC *key = SELF->cache.struct_val;
-	PMC *agg = SELF->data;
+	PMC *agg = PMC_data(SELF);
 	INTVAL ret = VTABLE_get_integer_keyed(INTERP, agg, key);
 	SELF->cache.struct_val =
 	    VTABLE_nextkey_keyed(INTERP, agg, key, 1);

@@ -23,7 +23,7 @@ pmclass Compiler extends NCI {
     }
 
     void* invoke (void * code_ptr) {
-        Parrot_csub_t func = (Parrot_csub_t)D2FPTR(SELF->data);
+        Parrot_csub_t func = (Parrot_csub_t)D2FPTR(PMC_data(SELF));
 	PMC *code_seg;
         struct PackFile_ByteCode *eval_cs;
 
@@ -41,7 +41,7 @@ pmclass Compiler extends NCI {
         Parrot_pop_i(interpreter);
 	(void)stack_pop(interpreter, &interpreter->ctx.user_stack, &code_seg,
                   STACK_ENTRY_PMC);
-	eval_cs = (struct PackFile_ByteCode *) code_seg->data;
+	eval_cs = (struct PackFile_ByteCode *) PMC_data(code_seg);
 	/* morph the Byte_cointer *pointer in code_seg to an invokable sub */
 	code_seg->vtable = &Parrot_base_vtables[enum_class_Eval];
 	VTABLE_init(interpreter, code_seg);

@@ -19,27 +19,27 @@ pmclass Continuation {
     void init () {
         struct Parrot_Continuation * cc;
         cc = new_continuation(interpreter, 0);
-        SELF->data = cc;
+        PMC_data(SELF) = cc;
         PObj_custom_mark_destroy_SETALL(SELF);
     }
 
     void destroy () {
-        mem_sys_free(SELF->data);
+        mem_sys_free(PMC_data(SELF));
     }
 
     void set_integer_native (INTVAL value) {
-        ((struct Parrot_Continuation *)SELF->data)->continuation
+        ((struct Parrot_Continuation *)PMC_data(SELF))->continuation
             = (opcode_t *)value;
     }
 
     void mark () {
         mark_stack(
             INTERP,
-            ((struct Parrot_Continuation *)SELF->data)->ctx.user_stack
+            ((struct Parrot_Continuation *)PMC_data(SELF))->ctx.user_stack
         );
         mark_stack(
             INTERP,
-            ((struct Parrot_Continuation *)SELF->data)->ctx.control_stack
+            ((struct Parrot_Continuation *)PMC_data(SELF))->ctx.control_stack
         );
     }
 
@@ -54,9 +54,9 @@ pmclass Continuation {
     void clone (PMC *ret) {
         struct Parrot_Continuation * retc
             = mem_sys_allocate(sizeof(struct Parrot_Continuation));
-        ret->data = retc;
+        PMC_data(ret) = retc;
         PObj_custom_mark_destroy_SETALL(ret);
-        memcpy(retc, SELF->data, sizeof(struct Parrot_Continuation));
+        memcpy(retc, PMC_data(SELF), sizeof(struct Parrot_Continuation));
         /* we may have copied our stack already, so we need to re-COW
          * it */
         stack_mark_cow(retc->ctx.user_stack);
@@ -72,22 +72,22 @@ pmclass Continuation {
     }
 
     void set_same (PMC* value) {
-        SELF->data = value->data;
+        PMC_data(SELF) = PMC_data(value);
     }
 
     INTVAL is_equal (PMC* value) {
         return (SELF->vtable == value->vtable
-                && memcmp(value->data, SELF->data,
+                && memcmp(PMC_data(value), PMC_data(SELF),
                           sizeof(struct Parrot_Continuation)) == 0);
     }
 
     INTVAL defined () {
-        return ((struct Parrot_Continuation *)SELF->data)->continuation != NULL;
+        return ((struct Parrot_Continuation *)PMC_data(SELF))->continuation != NULL;
     }
 
     void* invoke (void* next) {
         struct Parrot_Continuation * cc
-            = (struct Parrot_Continuation*)SELF->data;
+            = (struct Parrot_Continuation*)PMC_data(SELF);
         restore_context(interpreter, &cc->ctx);
         return cc->continuation; /* interp will jump to this address */
     }

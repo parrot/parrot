@@ -26,11 +26,11 @@ pmclass IntList {
 
     void clone (PMC *dest) {
         PObj_custom_mark_SET(dest);
-        dest->data = intlist_clone(INTERP, (IntList *) SELF->data);
+        PMC_data(dest) = intlist_clone(INTERP, (IntList *) PMC_data(SELF));
     }
 
     void init () {
-        SELF->data = intlist_new(INTERP);
+        PMC_data(SELF) = intlist_new(INTERP);
         SELF->cache.int_val = 0;
         PObj_custom_mark_SET(SELF);
     }
@@ -38,12 +38,12 @@ pmclass IntList {
     /* The end_of_used_list parameter is passed into the mark_used
      * function of the garbage collector. */
     void mark () {
-        intlist_mark(INTERP, (IntList *) SELF->data);
+        intlist_mark(INTERP, (IntList *) PMC_data(SELF));
     }
 
     void set_integer_keyed_int (INTVAL* key, INTVAL value) {
         if (!key) return;
-        intlist_assign(INTERP, (IntList*) SELF->data, *key, value);
+        intlist_assign(INTERP, (IntList*) PMC_data(SELF), *key, value);
     };
 
     void set_integer_keyed (PMC* key, INTVAL value) {
@@ -52,7 +52,7 @@ pmclass IntList {
         if (!key) return;
 
         ix = key_integer(INTERP, key);
-        intlist_assign(INTERP, (IntList*) SELF->data, ix, value);
+        intlist_assign(INTERP, (IntList*) PMC_data(SELF), ix, value);
     };
 
 
@@ -60,7 +60,7 @@ pmclass IntList {
 
         if (!key) return;
 
-        intlist_assign(INTERP, (IntList*) SELF->data, *key, (INTVAL) value);
+        intlist_assign(INTERP, (IntList*) PMC_data(SELF), *key, (INTVAL) value);
     };
 
     void set_number_keyed (PMC* key, FLOATVAL value) {
@@ -69,7 +69,7 @@ pmclass IntList {
         if (!key) return;
 
         ix = key_integer(INTERP, key);
-        intlist_assign(INTERP, (IntList*) SELF->data, ix, (INTVAL) value);
+        intlist_assign(INTERP, (IntList*) PMC_data(SELF), ix, (INTVAL) value);
     };
 
     void set_string_keyed_int (INTVAL* key, STRING* value) {
@@ -86,7 +86,7 @@ pmclass IntList {
         if (!key) return;
 
         value = VTABLE_get_integer_keyed_int(INTERP, src, src_key);
-        intlist_assign(INTERP, (IntList*) SELF->data, *key, value);
+        intlist_assign(INTERP, (IntList*) PMC_data(SELF), *key, value);
     };
 
     void set_pmc_keyed (PMC* key, PMC* src, PMC* src_key) {
@@ -98,22 +98,22 @@ pmclass IntList {
         ix = key_integer(INTERP, key);
 
         value = VTABLE_get_integer_keyed(INTERP, src, src_key);
-        intlist_assign(INTERP, (IntList*) SELF->data, ix, value);
+        intlist_assign(INTERP, (IntList*) PMC_data(SELF), ix, value);
     };
 
     INTVAL get_integer () {
-        return intlist_length(INTERP, (IntList*) SELF->data);
+        return intlist_length(INTERP, (IntList*) PMC_data(SELF));
     };
 
     INTVAL get_integer_keyed_int (INTVAL* key) {
-        return intlist_get(INTERP, (IntList*) SELF->data, *key);
+        return intlist_get(INTERP, (IntList*) PMC_data(SELF), *key);
     };
 
     INTVAL get_integer_keyed (PMC* key) {
         INTVAL ix;
         if (!key) return 0;
         ix = key_integer(INTERP, key);
-        return intlist_get(INTERP, (IntList*) SELF->data, ix);
+        return intlist_get(INTERP, (IntList*) PMC_data(SELF), ix);
     }
 
     FLOATVAL get_number_keyed_int (INTVAL* key) {
@@ -147,15 +147,15 @@ pmclass IntList {
     }
 
     void push_integer (INTVAL value) {
-        intlist_push(INTERP, (IntList*) SELF->data, value);
+        intlist_push(INTERP, (IntList*) PMC_data(SELF), value);
     }
 
     void push_float (FLOATVAL value) {
-        intlist_push(INTERP, (IntList*) SELF->data, (INTVAL) value);
+        intlist_push(INTERP, (IntList*) PMC_data(SELF), (INTVAL) value);
     }
 
     INTVAL pop_integer() {
-        return intlist_pop(INTERP, (IntList*) SELF->data);
+        return intlist_pop(INTERP, (IntList*) PMC_data(SELF));
     }
 
     INTVAL pop_integer_keyed(PMC* key) {
@@ -169,11 +169,11 @@ pmclass IntList {
     }
 
     void unshift_integer (INTVAL value) {
-        intlist_unshift(INTERP, (IntList**) &SELF->data, value);
+        intlist_unshift(INTERP, (IntList**) &PMC_data(SELF), value);
     }
 
     INTVAL shift_integer() {
-        return intlist_shift(INTERP, (IntList**) &SELF->data);
+        return intlist_shift(INTERP, (IntList**) &PMC_data(SELF));
     }
 
 }
