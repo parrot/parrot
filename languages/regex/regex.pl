@@ -45,7 +45,8 @@ $options{'no-tree-optimize'} = 1 if ! $tree_opt;
 $options{'no-list-optimize'} = 1 if ! $list_opt;
 $options{'DEBUG'} = 1 if $debug;
 
-my $tree = Regex::expr_to_tree($expr, %options);
+my $ctx = { };
+my $tree = Regex::expr_to_tree($expr, $ctx, %options);
 
 if ($operation eq 'unparse' || $operation eq 'render') {
     print $tree->render(), "\n";
@@ -55,11 +56,10 @@ if ($operation eq 'unparse' || $operation eq 'render') {
     exit;
 }
 
-my $ctx = { };
 my $code = Regex::tree_to_list($tree, $ctx, 'regex_done', 'regex_done',
                                %options);
 
-my @asm = Regex::list_to_pasm($code, %options);
+my @asm = Regex::list_to_pasm($code, $ctx, %options);
 
 local *OUTPUT;
 if (! defined $output || $output eq '-') {

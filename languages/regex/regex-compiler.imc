@@ -1,0 +1,65 @@
+.sub __init_compiler @LOAD
+  loadlib $P0, "match_group"
+  newsub $P0, .Sub, _compile_regex
+  compreg "regex", $P0
+  .pcc_begin_return
+  .pcc_end_return
+.end
+
+.sub _compile_regex
+  .local string code
+  code = S5
+
+  .local int pid
+  .local string imcfile
+  .local string pir_data
+  .local string cmdline
+
+  pid = getpid
+  imcfile = "/tmp/regex-"
+  $S0 = pid
+  imcfile = concat $S0
+  imcfile = concat ".imc"
+  
+  cmdline = "regex.pl --sub-name=_regex -o "
+  cmdline = concat imcfile
+  cmdline = concat " '"
+  cmdline = concat code
+  cmdline = concat "'"
+
+  $I0 = spawnw cmdline
+  unless $I0 goto imc_to_pbc
+  print "Failed to compile to .imc file.\n"
+  invoke P1
+
+imc_to_pbc:
+  pir_data = _readfile(imcfile)
+  $P0 = compreg "PIR"
+  $P1 = compile $P0, pir_data
+
+#  $P0 = compreg "FILE"
+#  $P1 = $P0(imcfile)
+#  $P1 = compile $P0, imcfile
+
+  $P1 = find_global "_regex"
+  .pcc_begin_return
+  .return $P1
+  .pcc_end_return
+.end
+
+.sub _readfile
+        .param string filename
+        .local pmc file
+        .local string result
+        .local string buffer
+        result = ""
+        file = open filename, "<"
+loop:   buffer = read file, 65536
+        $I0 = length buffer
+        le $I0, 0, done
+        result = concat buffer
+        goto loop
+done:   .pcc_begin_return
+        .return result
+        .pcc_end_return
+.end

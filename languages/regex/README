@@ -34,6 +34,12 @@ Or you can have it render the tree back to a regular expression:
 
 All of this really ought to be in a usage message.
 
+New stuff: now you can use the compiler as an embedded Parrot compiler.
+Run 'make regex-compiler.pbc' to generate regex-compiler.pbc. Then run
+../../parrot 01_basic.imc, ../../parrot 02_date.imc, etc. These will
+dynamically load in the regex-compiler as the compiler for the "regex"
+language, and then use it to compile some code and execute it.
+
 STATUS
 ======
 
@@ -106,14 +112,13 @@ instead strings describing what they're marking.) For details on
 exactly how things are translated with this compiler, read Rewrite.pm
 and Rewrite/Stackless.pm.
 
-Register Usage:
- I0 - temporary, not preserved between tree op rewrites
+"Local" variables:
+ * One integer temporary, not preserved between tree op rewrites
       (it's just a very short-term temp register)
- I1 - current position within the input string
- I2 - length of the input string
- P0 - array of start indices for parenthesis matches
- P1 - array of end indices for parenthesis matches
- I3.. - callee-saved temporary registers
+ * The current position within the input string
+ * The length of the input string
+ * A Match PMC, for holding start and stop positions for matched groups
+ * Other stuff, but this list is hopelessly out of date at the moment
 
 Optimizations implemented (notation: parentheses here are non-capturing):
 

@@ -49,12 +49,7 @@ sub alloc_temp_int {
     my ($self, $name) = @_;
     my $NUM_REGISTERS = 32; # ?
     $name ||= "_temp_int_" . $self->{_temp_int_count};
-    my $register = "I" . $self->{_temp_int_count};
-
-    if (++$self->{_temp_int_count} > $NUM_REGISTERS) {
-        # Time to switch to IMCC.
-        die "Too many temporaries requested! Implement register spilling!";
-    }
+    my $register = "\$I" . $self->{_temp_int_count};
 
     $self->{_temps}{$name} = $register;
     return $register;
@@ -1005,12 +1000,6 @@ sub run {
 
     # Glue them together
     @ops = (@pre_ops, @ops, @post_ops);
-
-    foreach my $temp_reg (values %{ $self->{_temps} }) {
-        warn "temp register $temp_reg: I'm not sure this is supported anymore";
-        unshift @ops, aop('push_reg', [ $temp_reg ]);
-        push @ops, aop('pop_reg', [ $temp_reg ]);
-    }
 
     return { lastback => $back, code => \@ops };
 }
