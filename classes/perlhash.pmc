@@ -297,6 +297,7 @@ pmclass PerlHash need_ext does hash {
 
     void freeze(visit_info *info) {
 	IMAGE_IO *io = info->image_io;
+	SUPER(info);
 	io->vtable->push_integer(INTERP, io, VTABLE_elements(INTERP, SELF));
     }
 

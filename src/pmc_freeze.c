@@ -412,12 +412,14 @@ ft_init(Parrot_Interp interpreter, visit_info *info)
 }
 
 static void visit_todo_list(Parrot_Interp, PMC*, visit_info* info);
+static void add_pmc_todo_list(Parrot_Interp, PMC*, visit_info* info);
 
 static void
 todo_list_init(Parrot_Interp interpreter, visit_info *info)
 {
     Hash *hash;
-    info->visit_child_function = visit_todo_list;
+    info->visit_pmc_now = visit_todo_list;
+    info->visit_pmc_later = add_pmc_todo_list;
     /* we must use PMCs here, so that they get marked properly */
     info->todo = pmc_new(interpreter, enum_class_Array);
     info->seen = pmc_new_noinit(interpreter, enum_class_PerlHash);
@@ -480,7 +482,7 @@ thaw_pmc(Parrot_Interp interpreter, visit_info *info,
         if (*type <= 0 || *type >= enum_class_max)
             internal_exception(1, "Unknown PMC type to thaw %d", (int) *type);
     }
-    *id = (UINTVAL) n & ~3;
+    *id = (UINTVAL) n;
     return seen;
 }
 
@@ -497,7 +499,7 @@ do_action(Parrot_Interp interpreter, PMC *pmc, visit_info *info,
         case VISIT_FREEZE_AT_DESTRUCT:
         case VISIT_FREEZE_NORMAL:
             freeze_pmc(interpreter, pmc, info, seen, id);
-            info->visit_function = pmc->vtable->freeze;
+            info->visit_action = pmc->vtable->freeze;
             break;
         default:
             internal_exception(1, "Illegal action %d", info->what);
@@ -537,19 +539,19 @@ do_thaw(Parrot_Interp interpreter, PMC* pmc, visit_info *info, int *seen)
 {
     UINTVAL id;
     INTVAL type;
-    PMC ** b;
+    PMC ** pos;
     int must_have_seen = thaw_pmc(interpreter, info, &id, &type);
 
-    b = list_get(interpreter, PMC_data(info->id_list), id >> 2,
-            enum_type_PMC);
-    if (b == (void*)-1)
-        b = NULL;
-    else if (b) {
-        pmc = *(PMC**)b;
+    id >>= 2;
+    pos = list_get(interpreter, PMC_data(info->id_list), id, enum_type_PMC);
+    if (pos == (void*)-1)
+        pos = NULL;
+    else if (pos) {
+        pmc = *(PMC**)pos;
         if (!pmc)
-            b = NULL;
+            pos = NULL;
     }
-    if (b) {
+    if (pos) {
         *seen = 1;
 #if FREEZE_USE_NEXT_FOR_GC
         /*
@@ -573,9 +575,8 @@ do_thaw(Parrot_Interp interpreter, PMC* pmc, visit_info *info, int *seen)
     *seen = 0;
     pmc = thaw_create_pmc(interpreter, pmc, info, type);
 
-    info->visit_function = pmc->vtable->thaw;
-    list_assign(interpreter, PMC_data(info->id_list), id >> 2, pmc,
-            enum_type_PMC);
+    info->visit_action = pmc->vtable->thaw;
+    list_assign(interpreter, PMC_data(info->id_list), id, pmc, enum_type_PMC);
     /* remember nested aggregates depth first */
     if (pmc->pmc_ext)
         list_push(interpreter, PMC_data(info->todo), pmc, enum_type_PMC);
@@ -649,8 +650,20 @@ id_from_pmc(Parrot_Interp interpreter, PMC* pmc)
 #endif
 
 /*
+ * remember pmc for later processing
+ */
+static void
+add_pmc_next_for_GC(Parrot_Interp interpreter, PMC *pmc, visit_info *info)
+{
+    if (pmc->pmc_ext) {
+        info->mark_ptr->next_for_GC = pmc;
+        info->mark_ptr = pmc->next_for_GC = pmc;
+    }
+}
+
+/*
  * remember next child to visit via the next_for_GC pointer
- *   generate a unique ID per PMC and freeze the ID not the PMC addr
+ *   generate a unique ID per PMC and freeze the ID (not the PMC addr)
  *   so thaw the hash-lookup can be replaced by an array lookup then
  *   which is a lot faster
  */
@@ -679,6 +692,14 @@ skip:
     return seen;
 }
 
+/*
+ * remember pmc to be processed later
+ */
+static void
+add_pmc_todo_list(Parrot_Interp interpreter, PMC *pmc, visit_info *info)
+{
+    list_push(interpreter, PMC_data(info->todo), pmc, enum_type_PMC);
+}
 /*
  * return true if PMC was seen, else put in on the todo list
  * generate ID (tag) for PMC, offset by 4 as are addresses, lo bits
@@ -723,7 +744,7 @@ visit_next_for_GC(Parrot_Interp interpreter, PMC* pmc, visit_info* info)
      * callback is there.
      */
     if (!seen)
-        (info->visit_function)(interpreter, pmc, info);
+        (info->visit_action)(interpreter, pmc, info);
 }
 
 /*
@@ -736,7 +757,7 @@ visit_todo_list(Parrot_Interp interpreter, PMC* pmc, visit_info* info)
     int seen = todo_list_seen(interpreter, pmc, info, &id);
     do_action(interpreter, pmc, info, seen, id);
     if (!seen)
-        (info->visit_function)(interpreter, pmc, info);
+        (info->visit_action)(interpreter, pmc, info);
 }
 
 /*
@@ -749,7 +770,7 @@ visit_todo_list_thaw(Parrot_Interp interpreter, PMC* old, visit_info* info)
     int seen;
     PMC* pmc = do_thaw(interpreter, old, info, &seen);
     if (!seen)
-        (info->visit_function)(interpreter, pmc, info);
+        (info->visit_action)(interpreter, pmc, info);
 }
 
 /*
@@ -778,10 +799,26 @@ visit_loop_todo_list(Parrot_Interp interpreter, PMC *current,
         visit_info *info)
 {
     List *todo = PMC_data(info->todo);
-    (info->visit_child_function)(interpreter, current, info);
-    while (list_length(interpreter, todo)) {
-        current = *(PMC**)list_shift(interpreter, todo, enum_type_PMC);
+    int i;
+
+    (info->visit_pmc_now)(interpreter, current, info);
+    /*
+     * can't cache upper limit, visit may append items
+     */
+    for (i = 0; i < (int)list_length(interpreter, todo); ++i) {
+        current = *(PMC**)list_get(interpreter, todo, i, enum_type_PMC);
         VTABLE_visit(interpreter, current, info);
+    }
+    /*
+     * on thawing call thawfinish for each processed PMC
+     */
+    if (info->what == VISIT_THAW_CONSTANTS ||
+            info->what == VISIT_THAW_NORMAL) {
+        int n = (int)list_length(interpreter, todo);
+        for (i = 0; i < n ; ++i) {
+            current = *(PMC**)list_get(interpreter, todo, i, enum_type_PMC);
+            VTABLE_thawfinish(interpreter, current, info);
+        }
     }
 }
 
@@ -837,7 +874,8 @@ run_thaw(Parrot_Interp interpreter, STRING* image, visit_enum_type what)
 
     info.what = what;   /* _NORMAL or _CONSTANTS */
     todo_list_init(interpreter, &info);
-    info.visit_child_function = visit_todo_list_thaw;
+    info.visit_pmc_now = visit_todo_list_thaw;
+    info.visit_pmc_later = add_pmc_todo_list;
 
     n = new_pmc_header(interpreter);
     visit_loop_todo_list(interpreter, n, &info);
@@ -867,7 +905,8 @@ Parrot_freeze_at_destruct(Parrot_Interp interpreter, PMC* pmc)
     cleanup_next_for_GC(interpreter);
     info.what = VISIT_FREEZE_AT_DESTRUCT;
     info.mark_ptr = pmc;
-    info.visit_child_function = visit_next_for_GC;
+    info.visit_pmc_now = visit_next_for_GC;
+    info.visit_pmc_later = add_pmc_next_for_GC;
     create_image(interpreter, pmc, &info);
     ft_init(interpreter, &info);
 

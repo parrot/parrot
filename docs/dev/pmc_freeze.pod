@@ -107,26 +107,30 @@ DOD runs and is thread-safe.
 =head2 Putting items on the todo list
 
 This is done by a callback function inside the B<visit_info> structure
-called B<visit_child_function>. It gets called initially to put the
+called B<visit_pmc_now>. It gets called initially to put the
 first item on the list and is called thereafter from all PMCs for
 contained PMCs inside the B<visit> vtable method.
+
+There is another callback B<visit_pmc_later> which adds PMCs to the
+todo list for later processing, but doesn't do any action on these
+immediately.
 
 
 =head2 The visit() vtable
 
 The general scheme above shows that this method is called for all
 items on the B<todo_list>. B<visit> has to call
-B<visit_child_function> for all contained PMCs, which then get
+B<visit_pmc_now> for all contained PMCs, which then get
 visited until all is done.
 
-=head2 The visit_child_function() callback
+=head2 The visit_pmc_now() callback
 
 The basic operation is:
 
   (seen, id) = was_already_seen(pmc)
   do_specific_action(pmc, seen, id)
   if (!seen)
-     pmc->visit_function()
+     pmc->visit_action()
 
 =head2 Avoiding duplicates
 
@@ -189,8 +193,7 @@ So after all we finally arrived at the point to actually perform the
 desired functionality. First the PMC-specific part is done inside
 F<pmc_freeze.c> then the specific vtable method B<freeze>, B<thaw>,
 whatever, is called, again via a function pointer called
-B<visit_function> (albeit B<action_function> might be a better name
-for it).
+B<visit_action>.
 
 =head1 Freeze and thaw
 
@@ -272,6 +275,10 @@ A PMC with a property hash thus looks like:
   <id+0x3><type><id-prop><pmc-data><prop-data>
 
 [ To be continued ]
+
+=head1 FILES
+
+F<src/pmc_freeze.c>, F<pf/pf_items.c>
 
 =head1 Author
 

@@ -1177,7 +1177,7 @@ list_visit(Interp *interpreter, List *list, void *pinfo)
             for (i = 0; i < chunk->items && idx < n; i++, idx++) {
                 pos = ((PMC **)chunk->data.bufstart) + i;
                 info->thaw_ptr = pos;
-                (info->visit_child_function)(interpreter, *pos, info);
+                (info->visit_pmc_now)(interpreter, *pos, info);
             }
         }
         /*

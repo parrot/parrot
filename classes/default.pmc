@@ -318,12 +318,19 @@ pmclass default abstract noinit {
     }
 
     void visit(visit_info *info) {
+	/* default - no action */
     }
 
     void freeze(visit_info *info) {
+	/* default - no action */
     }
 
     void thaw(visit_info *info) {
+	/* default - initialize the PMC */
 	DYNSELF.init();
+    }
+
+    void thawfinish(visit_info *info) {
+	/* default - no action */
     }
 }

@@ -470,6 +470,7 @@ pmclass PerlInt extends perlscalar {
 
     void freeze(visit_info *info) {
 	IMAGE_IO *io = info->image_io;
+	SUPER(info);
 	io->vtable->push_integer(INTERP, io, SELF->cache.int_val);
     }
 

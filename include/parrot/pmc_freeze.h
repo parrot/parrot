@@ -14,7 +14,6 @@
 #define      PARROT_PMC_FREEZE_H_GUARD
 
 struct _visit_info;
-typedef void (*visit_child_f)(Parrot_Interp, PMC*, struct _visit_info*);
 typedef void (*visit_f)(Parrot_Interp, PMC*, struct _visit_info*);
 
 typedef enum {
@@ -55,8 +54,9 @@ typedef struct _image_io {
 } image_io;
 
 typedef struct _visit_info {
-    visit_child_f       visit_child_function;
-    visit_f             visit_function; /* freeze, thaw ... */
+    visit_f             visit_pmc_now;
+    visit_f             visit_pmc_later;
+    visit_f             visit_action;   /* freeze, thaw ... */
     visit_enum_type     what;
     STRING*             image;
     PMC*                mark_ptr;
@@ -64,7 +64,7 @@ typedef struct _visit_info {
     INTVAL              last_type;
     PMC*                seen;           /* seen hash */
     PMC*                todo;           /* todo list */
-    PMC*                id_list;        /* used by thaw */
+    PMC*                id_list;        /* seen list used by thaw */
     UINTVAL             id;             /* freze ID of PMC */
     void*               extra;          /* PMC specific */
     IMAGE_IO            *image_io;

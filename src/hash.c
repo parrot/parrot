@@ -327,7 +327,7 @@ hash_visit(Interp *interpreter, Hash *hash, void* pinfo)
                 key = io->vtable->shift_string(interpreter, io);
                 b = hash_put(interpreter, hash, key, NULL);
                 info->thaw_ptr = (PMC**)&b->value;
-                (info->visit_child_function)(interpreter, NULL, info);
+                (info->visit_pmc_now)(interpreter, NULL, info);
             }
             break;
         default:
@@ -336,7 +336,7 @@ hash_visit(Interp *interpreter, Hash *hash, void* pinfo)
                 while (b) {
                     if (freezing)
                         io->vtable->push_string(interpreter, io, b->key);
-                    (info->visit_child_function)(interpreter, b->value, info);
+                    (info->visit_pmc_now)(interpreter, b->value, info);
                     b = getBucket(hash, b->next);
                 }
             }
