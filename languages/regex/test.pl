@@ -189,9 +189,13 @@ END
     my $cgen = Regex::CodeGen::Pasm->new(DEBUG => $DEBUG);
 
     my $tree = $parser->compile($pattern);
+    $tree = $opt1->pre_rewrite_optimize($tree);
     my @code = $rewrite->run($tree);
     my @asm = $cgen->output(@code);
-    @optcode = @code; # my @optcode = $opt2->optimize(@code);
+
+#    @optcode = @code;
+    my @optcode = $opt2->optimize(@code);
+
     my @optasm = $cgen->output(@optcode);
     print PASM "$_\n" foreach (@optasm);
 

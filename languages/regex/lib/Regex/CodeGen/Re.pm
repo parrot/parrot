@@ -25,7 +25,7 @@ sub output_onfail {
     return "re_onfail P0, ".$self->output_label_use($label);
 }
 
-sub output_bytematch {
+sub output_match {
     my ($self, $byte) = @_;
     my $comment = '';
     if ($byte =~ /^[\w ]$/) {

@@ -1,7 +1,19 @@
 languages/regex: Compile regular expressions into optimized bytecode.
 
-CURRENT STATUS
-==============
+RUNNING
+=======
+
+To run a bunch of tests:
+
+  make test
+
+To compile an arbitrary regexp down to code:
+
+  perl regex.pl '(a*|b)a'
+
+
+STATUS
+======
 
 Everything should be more or less working, though many operators are
 untested. Theoretically, this release should support:
@@ -20,7 +32,7 @@ untested. Theoretically, this release should support:
  {n,m}   - greedily match n..m times
  {n,m}?  - nongreedily match n..m times
 
-Missing:
+Missing perl5 features:
  [...]   - character classes
  \w      - character classes
  \U      - arbitrary codepoints
@@ -36,14 +48,22 @@ Missing:
  (?{ })  - embedded code
  (??{ }) - match-time evaluated subexpression
  (?>R)   - independent subexpression
- (?(cond)R|S) - conditional expression
+ (?(cond)R|S)
+         - conditional expression
  (R?)*   - empty match suppression
+
+Other features I'd like to have:
+ (?1)    - recursive expressions
+ @A =~   - array matching
+ ?       - reentrant, suspendable, coroutinish regexes
+ ?       - two-dimensional regexes
 
 Regular expressions are compiled down to regular opcodes, not to the
 rx_* set of opcodes. P0 and P1 are PerlArrays containing the starting
 and ending indexes, respectively, of () groups. The user stack is used
 as the backtracking stack. See rx.ops for a good description of how
-operators are converted to code sequences. Marks are the value '-1';
+operators are converted to code sequences (except I don't use the rx_*
+ops that it describes. You can work it out.) Marks are the value -1;
 indices are nonnegative integers. (Except in debugging mode, when
 marks are instead strings describing what they're marking.)
 
@@ -55,10 +75,23 @@ Optimizations implemented (notation: parentheses here are non-capturing):
 
 Future plans:
 
+Primary plan is to stop messing up the user stack! Right now, the
+compiler is generating invalid subroutines because they don't put
+things back the way they found them. I'm still undecided on whether to
+clean up the stack when done (not so good for reentrant regexen), make
+a new PMC, or reuse array.pmc or perlarray.pmc. Or a hybrid -- use the
+user stack, but stuff it into a PMC before returning.
+
 Relatively soon, I would like to add array-based regular
 expressions. A simple cut of this should be nearly trivial.
 
+I'd really like to put in recursive regular expressions. See
+<http://www.puffinry.freeserve.co.uk/regex-extension.html>.
+
 Near-term optimizations planned:
+
+ Length-check suppression: /xyz/ should check the length of the string
+ once, not three times.
 
  Simple subexpression alternation: the code for alternations can be
  simplified if the subexpressions do not contain backtrack points.
@@ -86,15 +119,20 @@ Longer-term optimization vague ideas:
  DFAs. Translate them into in-line DFAs. The jump tables above are a
  primitive form of this. The hard part is figuring out whether a DFA
  would produce exactly the same results as an NFA for a given
- expression.
+ expression. (It's a cost/benefit game. Some expressions
+ trivially behave the same, some trivially behave differently, and some
+ are difficult to determine.)
 
 BUGS
 ====
 
-I suspect I'm making a mess of the user stack when regular expressions
-succeed. I need to add a preamble that remembers the depth of the
-initial stack, and a postamble that pops stuff off until it's back to
-the original depth.
+Trashing the user stack is a bug.
+
+The miserable lack of documentation is a bug.
+
+The ad-hoc list op data structure is a bug.
+
+The lack of complex test cases is a bug.
 
 DEVELOPER NOTES
 ===============

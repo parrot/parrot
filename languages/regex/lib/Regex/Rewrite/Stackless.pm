@@ -26,11 +26,6 @@ sub init {
     $self->{_labels}{'fail'} = $FAIL;
 }
 
-sub rewrite_accept {
-    my ($self, $R, $lastback) = @_;
-    return $self->rewrite($R, $lastback);
-}
-
 sub rewrite_try {
     my ($self, $R, $lastback) = @_;
     return $self->rewrite($R, $lastback);

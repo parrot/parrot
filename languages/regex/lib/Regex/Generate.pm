@@ -7,10 +7,6 @@ sub output_nop {
     return "nop";
 }
 
-sub output_accept {
-    return "accept";
-}
-
 sub output_terminate {
     return "terminate";
 }
@@ -49,9 +45,9 @@ sub output_onfail {
     return "onfail $label->[1]";
 }
 
-sub output_bytematch {
+sub output_match {
     my ($byte) = @_;
-    return "bytematch '$byte'";
+    return "match '$byte'";
 }
 
 sub output_classmatch {

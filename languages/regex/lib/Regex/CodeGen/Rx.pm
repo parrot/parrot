@@ -33,7 +33,7 @@ sub output_advance {
     }
 }
 
-sub output_bytematch {
+sub output_match {
     my ($self, $byte, $failLabel) = @_;
     return "rx_literal P0, \"$byte\", ".$self->output_label_use($failLabel);
 }

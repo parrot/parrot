@@ -13,7 +13,6 @@ sub new {
 sub init {
 }
 
-# R (accept, R) : try R, accept immediately if it matches
 # R (seq, R, S, ...) : return R && S && ...
 # R (scan, R) : scan for R at every position
 # R (test, op1, check, op2, dest)
@@ -24,7 +23,7 @@ sub init {
 # O (advance, n) : advance input <n> chars
 # O (fork, R)
 # O (reverse_fork, R)
-# O (bytematch, b) : return if start of input is b, advance 1 char
+# O (match, b) : return if start of input is b, advance 1 char
 # O (classmatch, charclass) : return if start of input is charclass, advance 1
 # O (start, n) : mark start of n-th paren match
 # O (end, n) : mark end of n-th paren match

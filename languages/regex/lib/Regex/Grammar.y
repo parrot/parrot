@@ -23,10 +23,7 @@ sub op {
 
 %%
 
-regex : regex0 { return op('accept' => [ $_[1] ]); }
-;
-
-regex0 : regex1
+regex : regex1
    { return $_[1]; }
       | regex1 '$'
    { return op('seq' => [ $_[1], op('atend') ]); }
@@ -43,7 +40,7 @@ expr : expr '|' expr
      | expr expr %prec SEQUENCE
    { return op('seq' => [ $_[1], $_[2] ]); }
      | CHAR
-   { return op('bytematch' => [ $_[1] ]); }
+   { return op('match' => [ ord($_[1]) ]); }
      | charclass
    { return op('classmatch' => [ $_[1] ]); }
      | expr '*'

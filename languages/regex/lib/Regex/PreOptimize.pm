@@ -12,8 +12,7 @@ sub new {
 sub init {
 }
 
-# R (accept, R) : try R, accept immediately if it matches
-# R (seq, R, S, ...) : return R && S && ...
+# R (seq, R, S, ...) : R followed by S followed by...
 # R (scan, R) : scan for R at every position
 # R (test, op1, check, op2, dest)
 # R (alternate, R, S)
@@ -23,22 +22,11 @@ sub pre_rewrite_optimize {
     my ($self, $t) = @_;
     return $t if ! ref $t;
     my $type = $t->{name};
-    if ($type eq 'terminate'
-	|| $type eq 'accept'
-	|| $type eq 'scan'
-	|| $type eq 'fork'
-	|| $type eq 'reverse_fork')
-    {
-        # Recurse into subtree
-	$t->{args}->[0] = $self->pre_rewrite_optimize($t->{args}->[0]);
-	return $t;
-    } elsif ($type eq 'seq') {
+    if ($type eq 'seq') {
         # R.(S.T) => R.S.T
         # Or parenthetically, seq(R,seq(\alpha)) => seq(R, \alpha)
         #
 	my @pre_pieces = map { $self->pre_rewrite_optimize($_) } @{ $t->{args} };
-	shift(@pre_pieces);
-
 	my @pieces;
 	foreach (@pre_pieces) {
 	    if (ref $_ && $_->{name} eq 'seq') {
@@ -70,7 +58,7 @@ sub pre_rewrite_optimize {
 	    $R0 = $R;
 	}
 
-	if ($S->[0] eq 'seq') {
+	if ($S->{name} eq 'seq') {
             my ($S0, @Srest) = @{ $S->{args} };
 	} else {
 	    $S0 = $S;
@@ -92,7 +80,14 @@ sub pre_rewrite_optimize {
 	}
 	return $self->pre_rewrite_optimize(rop('seq', [ $R0, $alt ]));
     } else {
-	return $t;
+        # Find all subtrees, and recurse through them.
+        foreach my $arg (@{ $t->{args} }) {
+            if (UNIVERSAL::isa($arg, 'Regex::Ops::Tree')) {
+                # $arg is a reference variable, remember.
+                $arg = $self->pre_rewrite_optimize($arg);
+            }
+        }
+        return $t;
     }
 }
 
@@ -107,8 +102,8 @@ sub matchsame {
     return 0 if ! ref $S;
     return 0 if $R->{name} ne $S->{name};
     my $type = $R->{name};
-    if ($type eq 'bytematch') {
-	return $R->{args}[0] eq $S->{args}[0];
+    if ($type eq 'match') {
+	return $R->{args}[0] == $S->{args}[0];
     } elsif ($type eq 'classmatch') {
 	return $R->{args}[0] eq $S->{args}[0];
     } elsif ($type eq 'start' || $type eq 'end') {

@@ -85,11 +85,6 @@ sub rewrite_test {
     }
 }
 
-sub rewrite_accept {
-    my ($self, $R, $lastback) = @_;
-    return $self->rewrite($R, $lastback);
-}
-
 sub rewrite_seq {
     my $self = shift;
     return @_;

@@ -30,40 +30,41 @@ sub output_match_failed {
 sub output_advance {
     my ($self, $distance, $failLabel) = @_;
     $failLabel = $self->output_label_use($failLabel);
-    return ("add I1, I1, $distance",
-            "ge I1, I2, $failLabel",
-            "set_keyed P0, 0, I1");
+    return ("add I1, I1, $distance # pos++",
+            "ge I1, I2, $failLabel # past end of input?",
+            "set_keyed P0, 0, I1 # group 0 start := pos");
 }
 
 # SLOW! Most of the time we probably don't need to check for end of string
-sub output_bytematch {
-    my ($self, $byte, $failLabel) = @_;
+sub output_match {
+    my ($self, $code, $failLabel) = @_;
+    my $comment = Regex::Ops::Tree::isplain($code) ? " # match '".chr($code)."'" : "";
     return (
-            "ge I1, I2, ".$self->output_label_use($failLabel),
-            "ord I0, S0, I1",
-            "ne I0, ".ord($byte).", ".$self->output_label_use($failLabel),
-            "add I1, I1, 1"
+            "ge I1, I2, ".$self->output_label_use($failLabel)." # is there anything left?",
+            "ord I0, S0, I1 # I0 := S0[pos]",
+            "ne I0, $code, ".$self->output_label_use($failLabel).$comment,
+            "add I1, I1, 1 # pos++"
            );
 }
 
 sub output_start {
     my ($self, $n) = @_;
-    return "set_keyed P0, $n, I1";
+    return "set_keyed P0, $n, I1 # open group $n";
 }
 
 sub output_end {
     my ($self, $n) = @_;
-    return "set_keyed P1, $n, I1";
+    return "set_keyed P1, $n, I1 # close group $n";
 }
 
 sub output_delete {
     my ($self, $n) = @_;
-    return "set_keyed P1, $n, -2";
+    return "set_keyed P1, $n, -2 # delete group $n";
 }
 
 sub output_atend {
     my ($self, $failLabel) = @_;
-    return ("le I0, I2, ".$self->output_label_use($failLabel));
+    return ("le I0, I2, ".$self->output_label_use($failLabel)." # at end?");
 }
 
 sub output_pushmark {
@@ -77,7 +78,7 @@ sub output_pushmark {
 	}
 	return (@ops, 'bsr DUMPSTACK');
     } else {
-	return "save -1";
+	return "save -1 # pushmark";
     }
 }
 
@@ -86,7 +87,7 @@ sub output_pushindex {
     if ($self->{DEBUG}) {
 	return ("save I1", 'print "PUSHED: "', 'bsr DUMPSTACK');
     } else {
-	return "save I1";
+	return "save I1 # pushindex";
     }
 }
 
@@ -113,9 +114,9 @@ sub output_popindex {
 		"print \"  \"",
 		"bsr DUMPSTACK");
     } else {
-	return ("restore I0",
-		"eq I0, -1, ".$self->output_label_use($fallback),
-		"set I1, I0");
+	return ("restore I0 # popindex",
+		"eq I0, -1, ".$self->output_label_use($fallback)." # was a mark?",
+		"set I1, I0 # nope, set pos := popped index");
     }
 }
 

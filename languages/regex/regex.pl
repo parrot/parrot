@@ -29,6 +29,7 @@ my $expr = shift || "hell|hello|help\$";
 
 my $tree = $parser->compile($expr);
 $tree = $opt1->pre_rewrite_optimize($tree);
+#$DB::single = 1; print $tree->render(), "\n"; exit;
 
 # dumpTree($tree);
 
