@@ -528,7 +528,7 @@ END_C
 
 if ($suffix eq '' && !$dynamic) {
     $getop = 'get_op';
-    my $hash_size = 2273;
+    my $hash_size = 3041;
     $tot = $index + scalar keys(%names);
     if ($hash_size < $tot * 1.2) {
 	    print STDERR
