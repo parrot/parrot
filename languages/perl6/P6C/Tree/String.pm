@@ -217,7 +217,9 @@ sub string_special {
         }
         else {
             use charnames qw(:full);
-            $val = eval qq["\\N{$_}"];
+            # The charnames doesn't seem to propagate into the eval""
+            # for me -- sfink
+            $val = eval qq[use charnames qw(:full); "\\N{$_}"];
             error ("Error in interpolation of control-char: $@"),die if $@;
         }
         $val = '\\x'.sprintf("%x",ord $val) if ord($val) < 256;
