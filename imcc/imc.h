@@ -43,6 +43,11 @@
 # define MAX_COLOR 4
 #endif      
 
+/* IMCC reserves this character for internally generated labels
+ * and identifiers that won't collide with high level compiler generated names.
+ */
+#define IMCC_INTERNAL_CHAR '@'
+
 #include "symreg.h"
 #include "instructions.h"
 #include "symbol.h"
