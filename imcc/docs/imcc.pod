@@ -20,9 +20,9 @@ is the primary target of language implementations. PIR code files usually have
 the extension C<.imc>.
 
 This document describes available IMCC documentation, located in
-parrot/imcc/docs unless otherwise described. 
+F<parrot/imcc/docs> unless otherwise described. 
 
-See also the documentation in parrot/docs.
+See also the general Parrot documentation, located in F<parrot/docs>.
 
 =head1 DESCRIPTION
 
