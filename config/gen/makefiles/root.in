@@ -1,4 +1,4 @@
-O = ${o}
+o = ${o}
 SO = ${so}
 A = ${a}
 RM_F = ${rm_f}
@@ -564,6 +564,7 @@ clean : testclean
 testclean :
 	$(RM_F) t/op/*.pasm t/op/*.pbc t/op/*.out
 	$(RM_F) t/pmc/*.pasm t/pmc/*.pbc t/pmc/*.out
+	$(RM_F) t/src/*.o t/src/*.c
 
 realclean : clean
 	$(RM_F) $(STICKY_FILES)
