@@ -36,6 +36,7 @@ classes/key.pmc
 classes/managedstruct.pmc
 classes/multiarray.pmc
 classes/nci.pmc
+classes/parrotclass.pmc
 classes/perlarray.pmc
 classes/perlhash.pmc
 classes/perlint.pmc
@@ -1760,6 +1761,7 @@ memory.c
 method_util.c
 misc.c
 nci_test.c
+object.ops
 obscure.ops
 ops2c.pl
 ops2cgc.pl
