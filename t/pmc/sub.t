@@ -17,7 +17,7 @@ C<Continuation> PMCs.
 
 =cut
 
-use Parrot::Test tests => 70;
+use Parrot::Test tests => 73;
 use Test::More;
 use Parrot::Config;
 
@@ -1147,3 +1147,57 @@ back
 OUTPUT
 
 unlink($temp);
+
+output_like(<<'CODE', <<'OUTPUT', "warn on in main");
+##PIR##
+.sub _main @MAIN
+.include "warnings.pasm"
+    warningson .PARROT_WARNINGS_UNDEF_FLAG
+    _f1()
+.end
+.sub _f1
+    $P0 = new PerlUndef
+    print $P0
+.end
+CODE
+/uninit/
+OUTPUT
+
+output_is(<<'CODE', <<'OUTPUT', "warn on in sub");
+##PIR##
+.sub _main @MAIN
+.include "warnings.pasm"
+    _f1()
+    $P0 = new PerlUndef
+    print $P0
+    print "ok\n"
+.end
+.sub _f1
+    warningson .PARROT_WARNINGS_UNDEF_FLAG
+.end
+CODE
+ok
+OUTPUT
+
+output_like(<<'CODE', <<'OUTPUT', "warn on in sub, turn off in f2");
+##PIR##
+.sub _main @MAIN
+.include "warnings.pasm"
+    _f1()
+    $P0 = new PerlUndef
+    print "back\n"
+    print $P0
+    print "ok\n"
+.end
+.sub _f1
+    warningson .PARROT_WARNINGS_UNDEF_FLAG
+    _f2()
+    $P0 = new PerlUndef
+    print $P0
+.end
+.sub _f2
+    warningsoff .PARROT_WARNINGS_UNDEF_FLAG
+.end
+CODE
+/uninit.*\n.*\nback\nok/
+OUTPUT

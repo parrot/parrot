@@ -259,6 +259,8 @@ insert_ins(IMC_Unit *unit, Instruction *ins, Instruction * tmp)
         tmp->next = next;
         next->prev = tmp;
         tmp->line = next->line;
+        if (!next)
+            unit->last_ins = tmp;
     }
     else {
         next = ins->next;
@@ -267,6 +269,8 @@ insert_ins(IMC_Unit *unit, Instruction *ins, Instruction * tmp)
         tmp->next = next;
         if (next)
             next->prev = tmp;
+        else
+            unit->last_ins = tmp;
         if (!tmp->line)
             tmp->line = ins->line;
     }

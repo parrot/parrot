@@ -367,10 +367,20 @@ INTVAL
 pmc_type(Parrot_Interp interp, STRING *name)
 {
     INTVAL return_val;
-    PMC *classname_hash = VTABLE_get_pmc_keyed_int(interp,
+    int w = PARROT_WARNINGS_test(interp, PARROT_WARNINGS_UNDEF_FLAG);
+    PMC *classname_hash;
+    /*
+     * turn undef warns on - the compiler uses this function to
+     * probe for PMC types
+     */
+    PARROT_WARNINGS_off(interp, PARROT_WARNINGS_UNDEF_FLAG);
+    classname_hash = VTABLE_get_pmc_keyed_int(interp,
                             interp->iglobals, IGLOBALS_CLASSNAME_HASH);
 
     return_val = VTABLE_get_integer_keyed_str(interp, classname_hash, name);
+    if (w)
+        PARROT_WARNINGS_on(interp, PARROT_WARNINGS_UNDEF_FLAG);
+
     if (return_val == enum_type_undef) {
 	return_val = Parrot_get_datatype_enum(interp, name);
     }

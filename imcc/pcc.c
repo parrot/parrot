@@ -445,16 +445,14 @@ NONAMEDPARAMS: /* If no named params, don't generate any param code */
             ins = insINS(interpreter, unit, ins, "null", regs, 1);
             regs[0] = get_pasm_reg("I3");  /* no P regs */
             ins = insINS(interpreter, unit, ins, "null", regs, 1);
-            unit->last_ins = ins;
             if (sub->pcc_sub->cc_sym)
                 regs[0] = sub->pcc_sub->cc_sym;
             else
-                regs[0] = mk_pasm_reg(str_dup("P1"));
+                regs[0] = get_pasm_reg("P1");
             tmp = INS(interpreter, unit, "invoke", NULL, regs, 1, 0, 0);
         }
         debug(interpreter, DEBUG_IMC, "add sub ret - %I\n", tmp);
         insert_ins(unit, unit->last_ins, tmp);
-        unit->last_ins = tmp;
     }
 }
 
@@ -667,7 +665,7 @@ pcc_emit_flatten(Parrot_Interp interpreter, IMC_Unit * unit, Instruction *ins,
     s = str_dup("?i0");
     s[0] = IMCC_INTERNAL_CHAR;
 
-    i2 = mk_pasm_reg(str_dup("I3"));
+    i2 = get_pasm_reg("I3");
 /*
     i2 = mk_pasm_reg(str_dup("I2"));
 */
@@ -675,7 +673,7 @@ pcc_emit_flatten(Parrot_Interp interpreter, IMC_Unit * unit, Instruction *ins,
     s[0] = IMCC_INTERNAL_CHAR;
     py = mk_symreg(s, 'P');
 
-    p3 = mk_pasm_reg(str_dup("P3"));
+    p3 = get_pasm_reg("P3");
     /* first time */
     if (!(*flatten)++) {
         regs[0] = i2;
@@ -736,7 +734,7 @@ pcc_emit_flatten(Parrot_Interp interpreter, IMC_Unit * unit, Instruction *ins,
     tmp = INS_LABEL(unit, over1, 0);
     insert_ins(unit, ins, tmp);
     ins = tmp;
-    p3 = mk_pasm_reg(str_dup("P3"));
+    p3 = get_pasm_reg("P3");
     tmp = iNEW(interpreter, unit, p3, str_dup("PerlArray"), NULL, 0);
     insert_ins(unit, ins, tmp);
     ins = tmp;
