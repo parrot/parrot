@@ -77,8 +77,13 @@ sub parse_vtable {
 	if (/^\[(\w+)\]/) {
 	    $section = $1;
 	}
-        elsif (/^\s*($type_re)\s+($ident_re)\s*\(($arglist_re)\)\s*$/) {
-            push @{$vtable}, [ $1, $2, $3, $section ];
+        elsif (m/^\s*
+	        ($type_re)\s+
+	        ($ident_re)\s*
+		\(($arglist_re)\)
+		(?:\s+(MMD_\w+))?\s*$/x) {
+	    my $mmd = defined $4 ? $4 : -1;
+            push @{$vtable}, [ $1, $2, $3, $section, $mmd ];
         } else {
             die "Syntax error at $file line ".$fh->input_line_number()."\n";
         }

@@ -246,7 +246,8 @@ sub dump_default {
             parameters => $entry->[2],
             meth =>       $entry->[1],
             type =>       $entry->[0],
-            section =>    $entry->[3]
+            section =>    $entry->[3],
+            mmd =>        $entry->[4]
         });
     }
     $vt{'has_method'} = \%meth_hash;
