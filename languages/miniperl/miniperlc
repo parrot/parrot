@@ -1,0 +1,17 @@
+#!/usr/bin/perl -w
+
+use strict;
+use lib '.';
+use Miniperl;
+
+sub Usage {
+  print <<_EOF_;
+usage: $0 <file.mpl>
+_EOF_
+  exit;
+}
+
+defined $ARGV[0] or Usage();
+$ARGV[0]=~/.mpl$/i or Usage();
+
+Miniperl->new($ARGV[0])->compile();
