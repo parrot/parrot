@@ -103,6 +103,80 @@ op print_newline() :base_io {
   goto NEXT();
 }
 
+=item B<print_item>(in PMC, in INT)
+
+=item B<print_item>(in PMC, in NUM)
+
+=item B<print_item>(in PMC, in PMC)
+
+=item B<print_item>(in PMC, in STR)
+
+Print $2 to IO stream object $1. If another C<print_item> follows, a
+space is inserted.
+
+=item B<print_newline>(in PMC)
+
+Print a newline char to IO stream object $1.
+
+=cut
+
+inline op print_item(in PMC, in INT) :base_io {
+  PMC *io = $1;
+  if (PIO_softspace(interpreter, io, 0))
+    PIO_puts(interpreter, io, " ");
+  PIO_fprintf(interpreter, io, INTVAL_FMT, (INTVAL)$2);
+  PIO_softspace(interpreter, io, 1);
+  goto NEXT();
+}
+
+inline op print_item(in PMC, in NUM) :base_io {
+  PMC *io = $1;
+  STRING *s;
+  if (PIO_softspace(interpreter, io, 0))
+    PIO_puts(interpreter, io, " ");
+  s = Parrot_sprintf_c(interpreter, "%.12g", (double)$2);
+  PIO_putps(interpreter, io, s);
+  if (string_str_index(interpreter, s,
+	const_string(interpreter, "."), 0) == -1 &&
+      string_str_index(interpreter, s,
+	const_string(interpreter, "e"), 0) == -1)
+    PIO_puts(interpreter, io, ".0");
+  PIO_softspace(interpreter, io, 1);
+  goto NEXT();
+}
+
+op print_item(in PMC, in STR) :base_io {
+  STRING *s = $2;
+  PMC *io = $1;
+  if (s && string_length(interpreter, s)) {
+    if (PIO_softspace(interpreter, io, 0))
+      PIO_puts(interpreter, io, " ");
+    PIO_putps(interpreter, io, s);
+    PIO_softspace(interpreter, io, 1);
+  }
+  goto NEXT();
+}
+
+op print_item(in PMC, in PMC) :base_io {
+  PMC *p = $2;
+  PMC *io = $1;
+  STRING *s = (VTABLE_get_string(interpreter, p));
+  if (s) {
+    if (PIO_softspace(interpreter, io, 0))
+      PIO_puts(interpreter, io, " ");
+    PIO_putps(interpreter, io, s);
+    PIO_softspace(interpreter, io, 1);
+  }
+  goto NEXT();
+}
+
+op print_newline(in PMC) :base_io {
+  PMC *io = $1;
+  PIO_puts(interpreter, io, "\n");
+  PIO_softspace(interpreter, io, 0);
+  goto NEXT();
+}
+
 ########################################
 
 =back

@@ -300,6 +300,7 @@ INTERP_O_FILES = \
     $(SRC)/mmd$(O) \
     $(SRC)/mmd_fallback$(O) \
     $(SRC)/extend$(O) \
+    $(SRC)/py_func$(O)  \
     $(PF)/pf_items$(O) \
     $(OPS)/core_ops$(O) \
     $(OPS)/core_ops_prederef$(O) \
@@ -312,7 +313,6 @@ INTERP_O_FILES = \
 O_FILES = \
     $(INTERP_O_FILES) \
     $(IO_O_FILES) $(CLASS_O_FILES) \
-    $(SRC)/py_func$(O)  \
     $(ENCODING_O_FILES) \
     $(IMCC_O_FILES)
 
@@ -781,7 +781,7 @@ $(SRC)/inter_create$(O) : $(SRC)/inter_create.c $(GENERAL_H_FILES)
 $(SRC)/inter_run$(O) : $(SRC)/inter_run.c $(GENERAL_H_FILES)
 
 $(SRC)/py_func$(O) : $(SRC)/inter_cb.c $(GENERAL_H_FILES) \
-    $(SRC)/py_func.str
+    $(SRC)/py_func.str classes/pmc_default.h
 
 io/io$(O) : $(GENERAL_H_FILES) io/io_private.h
 
