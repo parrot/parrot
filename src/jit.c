@@ -26,18 +26,16 @@ optimize_jit(struct Parrot_Interp *interpreter, opcode_t *cur_op,
 
     /* Allocate space for the optimizer */
     optimizer = (Parrot_jit_optimizer_t *)
-        mem_sys_allocate(sizeof(Parrot_jit_optimizer_t));
+        mem_sys_allocate_zeroed(sizeof(Parrot_jit_optimizer_t));
 
     /* Allocate space for the branch information and register map */
     optimizer->map_branch = map = branch =
-        (char *)mem_sys_allocate((size_t)(code_end - code_start));
-    memset(optimizer->map_branch, 0, (size_t)(code_end - code_start));
+        (char *)mem_sys_allocate_zeroed((size_t)(code_end - code_start));
 
     /* Allocate space for the branch list */
     optimizer->branch_list = (opcode_t **)
-        mem_sys_allocate((size_t)(code_end - code_start) * sizeof(opcode_t *));
-    memset(optimizer->branch_list, 0,
-           (size_t)(code_end - code_start) * sizeof(opcode_t *));
+        mem_sys_allocate_zeroed(
+                (size_t)(code_end - code_start) * sizeof(opcode_t *));
 
     while (cur_op < code_end) {
         /* If the opcode jumps we may:
@@ -47,30 +45,30 @@ optimize_jit(struct Parrot_Interp *interpreter, opcode_t *cur_op,
          *      thus we mark the branch target and the branch source.
          *
          * PARROT_JUMP_ADDRESS:
-         *      The op jumps to an absolute address,thus we mark the branch 
+         *      The op jumps to an absolute address,thus we mark the branch
          *      target.
          *
          * PARROT_JUMP_POP:
-         *      The op pops the address to jump to,thus we don't mark the 
+         *      The op pops the address to jump to,thus we don't mark the
          *      branch target, anyway it may probably use expr(NEXT)
          *
          * PARROT_JUMP_ENEXT:
          *      The op does something with expr(NEXT),
-         *      XXX I'll assume that it's stored in the control stack for 
+         *      XXX I'll assume that it's stored in the control stack for
          *          later returning since that's the only way it's used now
-         *          but this should go away by the time we add some metadata 
+         *          but this should go away by the time we add some metadata
          *          to the ops.
          *      So we will mark the branch target.
          *
          * PARROT_JUMP_GNEXT:
-         *      Means the opcode does some other kind of jump, and also 
+         *      Means the opcode does some other kind of jump, and also
          *      might goto(NEXT)
          *
          * PARROT_JUMP_UNPREDICTABLE:
          *      The branch target is unpredictable.
-         *      Things get a little tricky since it's not 100% true that the 
-         *      target is unpredictable because of the set_addr opcode, we 
-         *      need to find a solution for this, in the mean time, we will 
+         *      Things get a little tricky since it's not 100% true that the
+         *      target is unpredictable because of the set_addr opcode, we
+         *      need to find a solution for this, in the mean time, we will
          *      make each section have it's own arena and try to avoid
          *      going in and out from them as much as posible.
          */
@@ -116,14 +114,10 @@ optimize_jit(struct Parrot_Interp *interpreter, opcode_t *cur_op,
 
     /* Allocate the first section */
     cur_section = optimizer->sections = (Parrot_jit_optimizer_section_t *)
-        mem_sys_allocate(sizeof(Parrot_jit_optimizer_section_t));
-    memset(cur_section->int_reg_count, 0, NUM_REGISTERS * sizeof(INTVAL));
-    cur_section->prev = NULL;
-    cur_section->next = NULL;
+        mem_sys_allocate_zeroed(sizeof(Parrot_jit_optimizer_section_t));
     cur_section->begin = code_start;
-    cur_section->jit_op_count = 0;
     /* Init the register usage */
-    for (i = 0; i < NUM_REGISTERS; i++) {
+    for (i = 1; i < NUM_REGISTERS; i++) {
         cur_section->int_reg_usage[i] = i;
 #if FLOAT_REGISTERS_TO_MAP
         cur_section->float_reg_usage[i] = i;
@@ -178,7 +172,7 @@ optimize_jit(struct Parrot_Interp *interpreter, opcode_t *cur_op,
                 goto END_SECTION;
         }
         else
-            /* The current section is not jitted, end it if the next opcode 
+            /* The current section is not jitted, end it if the next opcode
              * is. */
         if (next_op < code_end && !op_jit[*next_op].extcall)
             goto END_SECTION;
@@ -202,7 +196,8 @@ optimize_jit(struct Parrot_Interp *interpreter, opcode_t *cur_op,
             if (next_op < code_end) {
                 /* Allocate a new section */
                 t_section = (Parrot_jit_optimizer_section_t *)
-                    mem_sys_allocate(sizeof(Parrot_jit_optimizer_section_t));
+                    mem_sys_allocate_zeroed(
+                            sizeof(Parrot_jit_optimizer_section_t));
                 /* Add it to the double linked list */
                 cur_section->next = t_section;
                 t_section->prev = cur_section;
@@ -210,19 +205,8 @@ optimize_jit(struct Parrot_Interp *interpreter, opcode_t *cur_op,
                 cur_section = t_section;
                 /* Save the address where the section begins */
                 cur_section->begin = next_op;
-                /* Set to 0 the register count, just in case ... */
-                memset(cur_section->int_reg_count, 0,
-                       NUM_REGISTERS * sizeof(INTVAL));
-#if FLOAT_REGISTERS_TO_MAP
-                memset(cur_section->float_reg_count, 0,
-                       NUM_REGISTERS * sizeof(INTVAL));
-#endif
-                /* No next section yet */
-                cur_section->next = NULL;
-                /* 0 jitted opcodes  */
-                cur_section->jit_op_count = 0;
                 /* Init the register usage */
-                for (i = 0; i < NUM_REGISTERS; i++) {
+                for (i = 1; i < NUM_REGISTERS; i++) {
                     cur_section->int_reg_usage[i] = i;
 #if FLOAT_REGISTERS_TO_MAP
                     cur_section->float_reg_usage[i] = i;
@@ -254,7 +238,7 @@ optimize_jit(struct Parrot_Interp *interpreter, opcode_t *cur_op,
             cur_section->float_registers_used = 1;
 #endif
         /* Sort the registers by the usage,
-         * Start from the register number 1 since we compare it with the    
+         * Start from the register number 1 since we compare it with the
          * previous one */
         for (i = 1; i < NUM_REGISTERS; i++) {
             /* If the register is not used continue to the next one */
@@ -452,30 +436,22 @@ build_asm(struct Parrot_Interp *interpreter, opcode_t *pc,
     /* Byte code size in opcode_t's */
     jit_info.arena.map_size = (code_end - code_start) + 1;
     jit_info.arena.op_map =
-        (Parrot_jit_opmap_t *)mem_sys_allocate(jit_info.arena.map_size *
-                                               sizeof(*
-                                                      (jit_info.arena.
-                                                       op_map)));
-
-    /* This memory MUST be zeroed for conversion of offsets to pointers to 
-     * work later
-     */
-    memset(jit_info.arena.op_map, 0,
-           jit_info.arena.map_size * sizeof(*(jit_info.arena.op_map)));
+        (Parrot_jit_opmap_t *)mem_sys_allocate_zeroed(
+            jit_info.arena.map_size * sizeof(* (jit_info.arena.op_map)));
 
 #if REQUIRES_CONSTANT_POOL
     Parrot_jit_init_arenas(&jit_info);
 #else
     jit_info.arena.size = 1024;
     jit_info.native_ptr = jit_info.arena.start =
-        mem_sys_allocate((size_t)jit_info.arena.size);
+        mem_sys_allocate_zeroed((size_t)jit_info.arena.size);
 #endif
 
     jit_info.op_i = 0;
     jit_info.arena.fixups = NULL;
 
-    /* 
-     *   op_map holds the offset from arena.start 
+    /*
+     *   op_map holds the offset from arena.start
      *   of the parrot op at the given opcode index
      *
      *  bytecode:       56  1   1   56  1   1
@@ -567,7 +543,7 @@ build_asm(struct Parrot_Interp *interpreter, opcode_t *pc,
     /* Convert offsets to pointers */
     for (i = 0; i < jit_info.arena.map_size; i++) {
 
-        /* Assuming native code chunks contain some initialization code, 
+        /* Assuming native code chunks contain some initialization code,
          * the first op (and every other op) is at an offset > 0
          */
         if (jit_info.arena.op_map[i].offset) {
@@ -591,7 +567,7 @@ Parrot_jit_newfixup(Parrot_jit_info_t *jit_info)
 {
     Parrot_jit_fixup_t *fixup;
 
-    fixup = mem_sys_allocate(sizeof(*fixup));
+    fixup = mem_sys_allocate_zeroed(sizeof(*fixup));
 
     if (!fixup)
         internal_exception(ALLOCATION_ERROR,
@@ -610,7 +586,7 @@ Parrot_jit_newfixup(Parrot_jit_info_t *jit_info)
  * Local variables:
  * c-indentation-style: bsd
  * c-basic-offset: 4
- * indent-tabs-mode: nil 
+ * indent-tabs-mode: nil
  * End:
  *
  * vim: expandtab shiftwidth=4:
