@@ -12,7 +12,7 @@ $(INC)/pmc.h $(INC)/resources.h $(INC)/platform.h
 
 O_FILES = global_setup$(O) interpreter$(O) parrot$(O) register$(O) \
 core_ops$(O) memory$(O) packfile$(O) stacks$(O) string$(O) encoding$(O) \
-chartype$(O) runops_cores$(O) trace$(O) vtable_ops$(O) classes/intclass$(O) \
+chartype$(O) runops_cores$(O) trace$(O) vtable_ops$(O) pmc$(O) classes/intclass$(O) \
 encodings/singlebyte$(O) encodings/utf8$(O) encodings/utf16$(O) \
 encodings/utf32$(O) chartypes/unicode$(O) chartypes/usascii$(O) resources$(O) \
 platform$(O)
@@ -57,7 +57,7 @@ Parrot/OpLib/core.pm: core.ops ops2pm.pl
 	$(PERL) ops2pm.pl core.ops
 
 Parrot/OpLib/vtable.pm: vtable.ops ops2pm.pl
-	$(PERL) ops2pm.pl vtabls.ops
+	$(PERL) ops2pm.pl vtable.ops
 
 examples/assembly/mops.c: examples/assembly/mops.pbc pbc2c.pl
 	$(PERL) pbc2c.pl examples/assembly/mops.pbc > examples/assembly/mops.c
@@ -66,6 +66,8 @@ examples/assembly/mops${exe}: examples/assembly/mops$(O) $(O_FILES)
 	$(CC) $(CFLAGS) -o examples/assembly/mops${exe} examples/assembly/mops$(O) $(O_FILES) $(C_LIBS)
 
 global_setup$(O): $(H_FILES)
+
+pmc$(O): $(H_FILES)
 
 resources$(O): $(H_FILES)
 

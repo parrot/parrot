@@ -28,21 +28,21 @@
 =cut
 */
 
-PMC* pmc_new(struct Perl_Interp *interpreter, PMC* pmc, INTVAL base_type) {
+PMC* pmc_new(struct Parrot_Interp *interpreter, PMC* pmc, INTVAL base_type) {
     if (pmc) { /* We've got some memory */
         if (pmc->vtable && pmc->vtable->new) { /* And it even looks like a PMC */
             PMC* newpmc = pmc->vtable->new(interpreter, pmc);
             /* Ensure it's the type we want */
-            if (newpmc->vtable->type(interpreter, newpmc) == base_type)
-                return newpmc;
-            else
-                return newpmc->vtable->morph(interpreter, newpmc, base_type);
+            if (newpmc->vtable->type(interpreter, newpmc) != base_type) {
+                newpmc->vtable->morph(interpreter, newpmc, base_type);
+            }
+            return newpmc;
         }
     } else {
       pmc = new_pmc_header(interpreter);
     }
     pmc->flags = 0;
     pmc->data  = 0;
-    pmc->vtable = Parrot_base_vtables[base_type];
+    pmc->vtable = &(Parrot_base_vtables[base_type]);
     return pmc;
 }
