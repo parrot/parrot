@@ -1,0 +1,25 @@
+* Finish specification of return continuation and sub being called
+  slots in interpreter, with introspection
+
+* Get python bytecode translator done
+
+* Get hash (probably SHA1) added to bytecode segments
+
+* Spec out bytecode metadata system and introspection/modification
+  system
+
+* Specify what we need to serialize continuations
+
+* Spec out threading system
+
+* Final namespace spec
+
+* Final lexical pad spec
+
+* Find someone to speed up the OrderedHash implementation
+
+* Finish event and IO specification
+
+* Rearchitect internals for the string specifications
+
+* Solidify design for Truly Evil speed hack for fast regex/string matching
