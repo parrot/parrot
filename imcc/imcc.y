@@ -266,7 +266,7 @@ itcall_sub(SymReg* sub)
 %token <t> SUB SYM LOCAL CONST
 %token <t> INC DEC GLOBAL_CONST
 %token <t> PLUS_ASSIGN MINUS_ASSIGN MUL_ASSIGN DIV_ASSIGN CONCAT_ASSIGN
-%token <t> BAND_ASSIGN BOR_ASSIGN BXOR_ASSIGN
+%token <t> BAND_ASSIGN BOR_ASSIGN BXOR_ASSIGN FDIV FDIV_ASSIGN
 %token <t> SHR_ASSIGN SHL_ASSIGN SHR_U_ASSIGN
 %token <t> SHIFT_LEFT SHIFT_RIGHT INTV FLOATV STRINGV PMCV OBJECTV  LOG_XOR
 %token <t> RELOP_EQ RELOP_NE RELOP_GT RELOP_GTE RELOP_LT RELOP_LTE
@@ -803,6 +803,7 @@ assignment:
    | target '=' var '*' var	{ $$ = MK_I(interp, cur_unit, "mul", 3, $1, $3, $5); }
    | target '=' var POW var	{ $$ = MK_I(interp, cur_unit, "pow", 3, $1, $3, $5); }
    | target '=' var '/' var	{ $$ = MK_I(interp, cur_unit, "div", 3, $1, $3, $5); }
+   | target '=' var FDIV var	{ $$ = MK_I(interp, cur_unit, "fdiv", 3, $1, $3, $5); }
    | target '=' var '%' var	{ $$ = MK_I(interp, cur_unit, "mod", 3, $1, $3, $5); }
    | target '=' var CONCAT var	{ $$ = MK_I(interp, cur_unit, "concat", 3, $1,$3,$5); }
    | target '=' var SHIFT_LEFT var
@@ -893,6 +894,8 @@ op_assign:
                    { $$ = MK_I(interp, cur_unit, "mul", 2, $1, $3); }
    | target DIV_ASSIGN var
                    { $$ = MK_I(interp, cur_unit, "div", 2, $1, $3); }
+   | target FDIV_ASSIGN var
+                   { $$ = MK_I(interp, cur_unit, "fdiv", 2, $1, $3); }
    | target CONCAT_ASSIGN var
                    { $$ = MK_I(interp, cur_unit, "concat", 2, $1, $3); }
    | target BAND_ASSIGN var

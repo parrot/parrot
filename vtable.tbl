@@ -39,9 +39,6 @@ FLOATVAL get_number_keyed_int(INTVAL key)
 FLOATVAL get_number_keyed_str(STRING* key)
 
 BIGNUM* get_bignum()
-BIGNUM* get_bignum_keyed(PMC* key)
-BIGNUM* get_bignum_keyed_int(INTVAL key)
-BIGNUM* get_bignum_keyed_str(STRING* key)
 
 STRING* get_string()
 STRING* get_repr()
@@ -80,9 +77,6 @@ void set_number_keyed_str(STRING* key, FLOATVAL value)
 
 void set_bignum_native(BIGNUM* value)
 void set_bignum_same(PMC* value)
-void set_bignum_keyed(PMC* key, BIGNUM* value)
-void set_bignum_keyed_int(INTVAL key, BIGNUM* value)
-void set_bignum_keyed_str(STRING* key, BIGNUM* value)
 
 void set_string_native(STRING* value)
 void assign_string_native(STRING* value)
@@ -113,28 +107,24 @@ INTVAL elements()
 [POP]
 INTVAL pop_integer()
 FLOATVAL pop_float()
-BIGNUM* pop_bignum()
 STRING* pop_string()
 PMC* pop_pmc()
 
 [PUSH]
 void push_integer(INTVAL value)
 void push_float(FLOATVAL value)
-void push_bignum(BIGNUM* value)
 void push_string(STRING* value)
 void push_pmc(PMC* value)
 
 [SHIFT]
 INTVAL shift_integer()
 FLOATVAL shift_float()
-BIGNUM* shift_bignum()
 STRING* shift_string()
 PMC* shift_pmc()
 
 [UNSHIFT]
 void unshift_integer(INTVAL value)
 void unshift_float(FLOATVAL value)
-void unshift_bignum(BIGNUM* value)
 void unshift_string(STRING* value)
 void unshift_pmc(PMC* value)
 
@@ -146,32 +136,30 @@ void splice(PMC* value, INTVAL offset, INTVAL count)
 [MATH]
 void add(PMC* value, PMC* dest)             MMD_ADD
 void add_int(INTVAL value, PMC* dest)       MMD_ADD_INT
-void add_bignum(BIGNUM* value, PMC* dest)
 void add_float(FLOATVAL value, PMC* dest)   MMD_ADD_FLOAT
 
 void subtract(PMC* value, PMC* dest)        MMD_SUBTRACT
 void subtract_int(INTVAL value, PMC* dest)  MMD_SUBTRACT_INT
-void subtract_bignum(BIGNUM* value, PMC* dest)
 void subtract_float(FLOATVAL value, PMC* dest)  MMD_SUBTRACT_FLOAT
 
 void multiply(PMC* value, PMC* dest)        MMD_MULTIPLY
 void multiply_int(INTVAL value, PMC* dest)  MMD_MULTIPLY_INT
-void multiply_bignum(BIGNUM* value, PMC* dest)
 void multiply_float(FLOATVAL value, PMC* dest)  MMD_MULTIPLY_FLOAT
 
 void divide(PMC* value, PMC* dest)           MMD_DIVIDE
 void divide_int(INTVAL value, PMC* dest)     MMD_DIVIDE_INT
-void divide_bignum(BIGNUM* value, PMC* dest)
 void divide_float(FLOATVAL value, PMC* dest) MMD_DIVIDE_FLOAT
+
+void floor_divide(PMC* value, PMC* dest)           MMD_FLOOR_DIVIDE
+void floor_divide_int(INTVAL value, PMC* dest)     MMD_FLOOR_DIVIDE_INT
+void floor_divide_float(FLOATVAL value, PMC* dest) MMD_FLOOR_DIVIDE_FLOAT
 
 void modulus(PMC* value, PMC* dest)         MMD_MOD
 void modulus_int(INTVAL value, PMC* dest)   MMD_MOD_INT
-void modulus_bignum(BIGNUM* value, PMC* dest)
 void modulus_float(FLOATVAL value, PMC* dest) MMD_MOD_FLOAT
 
 void cmodulus(PMC* value, PMC* dest)        MMD_CMOD
 void cmodulus_int(INTVAL value, PMC* dest)  MMD_CMOD_INT
-void cmodulus_bignum(BIGNUM* value, PMC* dest)
 void cmodulus_float(FLOATVAL value, PMC* dest) MMD_CMOD_FLOAT
 
 void neg(PMC* dest)

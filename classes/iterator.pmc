@@ -177,33 +177,7 @@ Get number value of current position plus idx.
         return VTABLE_get_number_keyed_int(INTERP, agg, PMC_int_val(key) + idx );
     }
 
-/*
 
-=item C<BIGNUM *get_bignum_keyed(PMC *key)>
-
-=cut
-
-*/
-
-    BIGNUM* get_bignum_keyed (PMC* key) {
-        return VTABLE_get_bignum_keyed(INTERP, (PMC *)PMC_pmc_val(SELF), key);
-    }
-
-/*
-
-=item C<BIGNUM *get_bignum_keyed_int(INTVAL idx)>
-
-Get bignum value of current position plus idx.
-
-=cut
-
-*/
-
-    BIGNUM* get_bignum_keyed_int (INTVAL idx) {
-        PMC *key = PMC_struct_val(SELF);
-        PMC *agg = PMC_pmc_val(SELF);
-        return VTABLE_get_bignum_keyed_int(INTERP, agg, PMC_int_val(key) + idx );
-    }
 
 /*
 
@@ -367,23 +341,6 @@ Reset the Iterator. C<value> must be one of
 
 /*
 
-=item C<BIGNUM *pop_bignum()>
-
-=cut
-
-*/
-
-    BIGNUM* pop_bignum () {
-        PMC *key = PMC_struct_val(SELF);
-        PMC *agg = PMC_pmc_val(SELF);
-        BIGNUM *ret = VTABLE_get_bignum_keyed(INTERP, agg, key);
-        PMC_struct_val(SELF) =
-            VTABLE_nextkey_keyed(INTERP, key, agg, ITERATE_GET_PREV);
-        return ret;
-    }
-
-/*
-
 =item C<STRING *pop_string()>
 
 =cut
@@ -501,22 +458,6 @@ See F<docs/pdds/pdd03_calling_conventions.pod>.
         return ret;
     }
 
-/*
-
-=item C<BIGNUM *shift_bignum()>
-
-=cut
-
-*/
-
-    BIGNUM* shift_bignum () {
-        PMC *key = PMC_struct_val(SELF);
-        PMC *agg = PMC_pmc_val(SELF);
-        BIGNUM *ret = VTABLE_get_bignum_keyed(INTERP, agg, key);
-        PMC_struct_val(SELF) =
-            VTABLE_nextkey_keyed(INTERP, key, agg, ITERATE_GET_NEXT);
-        return ret;
-    }
 
 /*
 

@@ -90,7 +90,7 @@ Unimplimented. Returns C<NULL>.
 */
 
     BIGNUM* get_bignum () {
-        /* XXX */
+        internal_exception(1, "perlnum: unimp get_bignum");
         return NULL;
     }
 
@@ -216,20 +216,9 @@ Unimplemented. Does nothing.
 */
 
     void set_bignum_native (BIGNUM* value) {
+        internal_exception(1, "perlnum: unimp set_bignum");
     }
 
-/*
-
-=item C<void set_bignum_same(PMC *value)>
-
-Unimplemented. Does nothing.
-
-=cut
-
-*/
-
-    void set_bignum_same (PMC* value) {
-    }
 
 /*
 
@@ -280,18 +269,6 @@ Adds C<value> to the number and returns the result in C<*dest>.
             PMC_num_val(SELF) + value);
     }
 
-/*
-
-=item C<void add_bignum(BIGNUM *value, PMC *dest)>
-
-Unimplemented. Does nothing.
-
-=cut
-
-*/
-
-    void add_bignum (BIGNUM* value, PMC* dest) {
-    }
 
 /*
 
@@ -341,18 +318,6 @@ Subtracts C<value> from the number and returns the result in C<*dest>.
         );
     }
 
-/*
-
-=item C<void subtract_bignum(BIGNUM *value, PMC *dest)>
-
-Unimplemented. Does nothing.
-
-=cut
-
-*/
-
-    void subtract_bignum (BIGNUM* value, PMC* dest) {
-    }
 
 /*
 
@@ -400,19 +365,6 @@ Multiplies the number by C<value> and returns the result in C<*dest>.
         VTABLE_set_number_native(INTERP, dest,
             PMC_num_val(SELF) * value
         );
-    }
-
-/*
-
-=item C<void multiply_bignum(BIGNUM *value, PMC *dest)>
-
-Unimplemented. Does nothing.
-
-=cut
-
-*/
-
-    void multiply_bignum (BIGNUM* value, PMC* dest) {
     }
 
 /*

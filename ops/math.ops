@@ -363,6 +363,35 @@ Divide $1 by $2.
 Set $1 to the quotient of $2 divided by $3. In the case of INTVAL division, the
 result is truncated (NOT rounded or floored).
 
+=item B<fdiv>(inout INT, in INT)
+
+=item B<fdiv>(inout NUM, in INT)
+
+=item B<fdiv>(inout NUM, in NUM)
+
+=item B<fdiv>(in PMC, in INT)
+
+=item B<fdiv>(in PMC, in NUM)
+
+=item B<fdiv>(in PMC, in PMC)
+
+Floor divide $1 by $2.
+
+=item B<fdiv>(out INT, in INT, in INT)
+
+=item B<fdiv>(out NUM, in NUM, in INT)
+
+=item B<fdiv>(out NUM, in NUM, in NUM)
+
+=item B<fdiv>(in PMC, in PMC, in INT)
+
+=item B<fdiv>(in PMC, in PMC, in NUM)
+
+=item B<fdiv>(in PMC, in PMC, in PMC)
+
+Set $1 to the quotient of $2 divided by $3. The result is the floor()
+of the division i.e. the next whole integer towards -inf.
+
 =cut
 
 inline op div(inout INT, in INT) :base_core {
@@ -422,6 +451,66 @@ inline op div (in PMC, in PMC, in NUM) :base_core {
 
 inline op div (in PMC, in PMC, in PMC) :base_core {
   mmd_dispatch_v_ppp(interpreter, $2, $3, $1, MMD_DIVIDE);
+  goto NEXT();
+}
+
+inline op fdiv(inout INT, in INT) :base_core {
+  $1 = floor($1 / $2);
+  goto NEXT();
+}
+
+inline op fdiv(inout NUM, in INT) :base_core {
+  $1 = floor($1 / $2);
+  goto NEXT();
+}
+
+inline op fdiv(inout NUM, in NUM) :base_core {
+  $1 = floor($1 / $2);
+  goto NEXT();
+}
+
+inline op fdiv (in PMC, in PMC) :base_core {
+  mmd_dispatch_v_ppp(interpreter, $1, $2, $1, MMD_FLOOR_DIVIDE);
+  goto NEXT();
+}
+
+inline op fdiv (in PMC, in INT) :base_core {
+  mmd_dispatch_v_pip(interpreter, $1, $2, $1, MMD_FLOOR_DIVIDE_INT);
+  goto NEXT();
+}
+
+inline op fdiv (in PMC, in NUM) :base_core {
+  mmd_dispatch_v_pnp(interpreter, $1, $2, $1, MMD_FLOOR_DIVIDE_FLOAT);
+  goto NEXT();
+}
+
+inline op fdiv(out INT, in INT, in INT) :base_core {
+  $1 = floor($2 / $3);
+  goto NEXT();
+}
+
+inline op fdiv(out NUM, in NUM, in INT) :base_core {
+  $1 = floor($2 / $3);
+  goto NEXT();
+}
+
+inline op fdiv(out NUM, in NUM, in NUM) :base_core {
+  $1 = floor($2 / $3);
+  goto NEXT();
+}
+
+inline op fdiv (in PMC, in PMC, in INT) :base_core {
+  mmd_dispatch_v_pip(interpreter, $2, $3, $1, MMD_FLOOR_DIVIDE_INT);
+  goto NEXT();
+}
+
+inline op fdiv (in PMC, in PMC, in NUM) :base_core {
+  mmd_dispatch_v_pnp(interpreter, $2, $3, $1, MMD_FLOOR_DIVIDE_FLOAT);
+  goto NEXT();
+}
+
+inline op fdiv (in PMC, in PMC, in PMC) :base_core {
+  mmd_dispatch_v_ppp(interpreter, $2, $3, $1, MMD_FLOOR_DIVIDE);
   goto NEXT();
 }
 

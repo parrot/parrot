@@ -408,50 +408,6 @@ Returns the floating-point value for the element at C<*key>.
         return VTABLE_get_number_keyed(INTERP, valpmc, nextkey);
     }
 
-/*
-
-=item C<BIGNUM *get_bignum_keyed_str(STRING *key)>
-
-=cut
-
-*/
-
-    BIGNUM* get_bignum_keyed_str (STRING* key) {
-        HashBucket *b = hash_get_bucket(INTERP, (Hash*) PMC_struct_val(SELF),
-                                        key);
-        if (b == NULL) {
-            /* XXX Warning: Use of uninitialized value */
-            return VTABLE_get_bignum(INTERP, undef);
-        }
-        return VTABLE_get_bignum(INTERP, (PMC*) b->value);
-    }
-
-/*
-
-=item C<BIGNUM *get_bignum_keyed(PMC *key)>
-
-Returns the big number value for the element at C<*key>.
-
-=cut
-
-*/
-
-    BIGNUM* get_bignum_keyed (PMC* key) {
-        PMC* valpmc;
-        STRING* keystr = make_hash_key(INTERP, key);
-        HashBucket *b = hash_get_bucket(INTERP, (Hash*) PMC_struct_val(SELF),
-                                        keystr);
-        PMC* nextkey;
-        if (b == NULL) {
-            /* XXX Warning: Use of uninitialized value */
-            return VTABLE_get_bignum(INTERP, undef);
-        }
-        nextkey = key_next(INTERP, key);
-        valpmc = b->value;
-        if (!nextkey)
-            return VTABLE_get_bignum(INTERP, valpmc);
-        return VTABLE_get_bignum_keyed(INTERP, valpmc, nextkey);
-    }
 
 /*
 
@@ -792,32 +748,6 @@ Sets C<value> as the value for C<*key>.
         PMC *val = pmc_new(interpreter, enum_class_PerlNum);
         PMC_num_val(val) = value;
         hash_put(INTERP, PMC_struct_val(SELF), key, val);
-    }
-
-/*
-
-=item C<void set_bignum_keyed(PMC *key, BIGNUM *value)>
-
-=cut
-
-*/
-
-    void set_bignum_keyed (PMC* key, BIGNUM* value) {
-        /* XXX */
-    }
-
-/*
-
-=item C<void set_bignum_keyed_str(STRING *key, BIGNUM *value)>
-
-These two methods are unimplemented.
-
-=cut
-
-*/
-
-    void set_bignum_keyed_str (STRING* key, BIGNUM* value) {
-        /* XXX */
     }
 
 /*

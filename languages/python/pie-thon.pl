@@ -646,14 +646,7 @@ sub binary
     my $r = pop @stack;
     my $l = pop @stack;
     my ($t, $n);
-    if ($r->[2] eq 'I' && $l->[2] eq 'I') {
-	$n = temp($t = 'I');
-	# TODO only if args are small constants
-	print <<"EOC";
-	$n = $l->[1] $op $r->[1] $cmt
-EOC
-    }
-    else {
+    {
 	my $nl = promote($l);
 	$n = temp($t = 'P');
 	print <<"EOC";
@@ -689,14 +682,7 @@ sub BINARY_MULTIPLY
 sub BINARY_FLOOR_DIVIDE
 {
     my ($n, $c, $cmt) = @_;
-    binary('/', $cmt);	# XXX
-    my $l = pop @stack;
-    my $i = temp('I');
-    print <<EOC;
-	$i = $l->[1]
-	$l->[1] = $i
-EOC
-    push @stack, $l;
+    binary('//', $cmt);
 }
 sub BINARY_DIVIDE
 {
@@ -1169,11 +1155,18 @@ sub STORE_FAST
     my $tos = pop @stack;
     my $p;
     if ($p = $lexicals{$c}) {
-	print <<"EOC";
+	if ($p eq $tos->[1]) {
+	    print <<"EOC";
+	\t $cmt
+EOC
+	}
+	else {
+	    print <<"EOC";
 	# assign $c, $tos->[1] $cmt
 	set $p, $tos->[1] $cmt
 EOC
-	$lexicals{$c} = $p;
+	    $lexicals{$c} = $p;
+	}
     }
     else {
 	$lexicals{$c} = promote($tos);
@@ -1289,14 +1282,6 @@ sub FOR_ITER
     }
     my $var = temp('P');
     my $name = $tos->[0];
-    if ($rev_type_map{$name} || $builtins{$name}) {
-	$name =~ s/^Py_//;
-	print <<EOC;
-	.local NCI iter\:\:$name
-	iter\:\:$name = $iter
-EOC
-	$iter = 'iter::' . $name;
-    }
     print <<EOC;
 	unless $iter goto $targ # $tos->[0]
 	$var = shift $iter $cmt

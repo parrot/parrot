@@ -386,21 +386,6 @@ C<get_number_keyed()> with it.
         return DYNSELF.get_number_keyed(r_key);
     }
 
-/*
-
-=item C<BIGNUM *get_bignum_keyed_int(INTVAL key)>
-
-Converts C<key> to a PMC key and returns the result of calling
-C<get_bignum_keyed()> with it.
-
-=cut
-
-*/
-
-    BIGNUM* get_bignum_keyed_int (INTVAL key) {
-        PMC* r_key = INT2KEY(INTERP, key);
-        return DYNSELF.get_bignum_keyed(r_key);
-    }
 
 /*
 
@@ -532,21 +517,6 @@ and C<value>.
         DYNSELF.set_number_keyed(r_key, value);
     }
 
-/*
-
-=item C<void set_bignum_keyed_int(INTVAL key, BIGNUM *value)>
-
-Converts C<key> to a PMC key and calls C<set_bignum_keyed()> with it
-and C<value>.
-
-=cut
-
-*/
-
-    void set_bignum_keyed_int (INTVAL key, BIGNUM* value) {
-        PMC* r_key = INT2KEY(INTERP, key);
-        DYNSELF.set_bignum_keyed(r_key, value);
-    }
 
 /*
 

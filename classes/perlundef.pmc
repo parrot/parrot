@@ -58,24 +58,6 @@ Warns of the use of an unitialized value, and returns C<0.0>.
 
 /*
 
-=item C<BIGNUM *get_bignum()>
-
-Warns of the use of an unitialized value, and returns C<NULL>.
-
-TODO - should return big number zero.
-
-=cut
-
-*/
-
-    BIGNUM* get_bignum () {
-        Parrot_warn(INTERP, PARROT_WARNINGS_UNDEF_FLAG,
-        "Use of uninitialized value in numeric context");
-        return NULL;
-    }
-
-/*
-
 =item C<STRING *get_string()>
 
 Warns of the use of an unitialized value, and returns an empty Parrot
@@ -211,19 +193,6 @@ Morphs to a C<PerlString> with the value of C<*value>.
         VTABLE_set_integer_native(INTERP, dest, value);
     }
 
-/*
-
-=item C<void add_bignum(BIGNUM *value,  PMC *dest)>
-
-=cut
-
-*/
-
-    void add_bignum (BIGNUM* value,  PMC* dest) {
-        Parrot_warn(INTERP, PARROT_WARNINGS_UNDEF_FLAG,
-        "Use of uninitialized value in addition");
-        SUPER(value, dest);
-    }
 
 /*
 
@@ -267,19 +236,6 @@ Morphs to a C<PerlString> with the value of C<*value>.
         VTABLE_set_integer_native(INTERP, dest, 0-value);
     }
 
-/*
-
-=item C<void subtract_bignum(BIGNUM *value, PMC *dest)>
-
-=cut
-
-*/
-
-    void subtract_bignum (BIGNUM* value,  PMC* dest) {
-        Parrot_warn(INTERP, PARROT_WARNINGS_UNDEF_FLAG,
-        "Use of uninitialized value in subtraction");
-        SUPER(value, dest);
-    }
 
 /*
 
@@ -323,19 +279,6 @@ Morphs to a C<PerlString> with the value of C<*value>.
         VTABLE_set_integer_native(INTERP, dest, 0);
     }
 
-/*
-
-=item C<void multiply_bignum(BIGNUM *value, PMC *dest)>
-
-=cut
-
-*/
-
-    void multiply_bignum (BIGNUM* value,  PMC* dest) {
-        Parrot_warn(INTERP, PARROT_WARNINGS_UNDEF_FLAG,
-        "Use of uninitialized value in bignum multiplication");
-        VTABLE_set_integer_native(INTERP, dest, 0);
-    }
 
 /*
 
@@ -394,20 +337,6 @@ Morphs to a C<PerlString> with the value of C<*value>.
         VTABLE_set_integer_native(INTERP, dest, 0);
     }
 
-/*
-
-=item C<void divide_bignum(BIGNUM *value, PMC *dest)>
-
-=cut
-
-*/
-
-    void divide_bignum (BIGNUM* value,  PMC* dest) {
-        Parrot_warn(INTERP, PARROT_WARNINGS_UNDEF_FLAG,
-        "Use of uninitialized value in bignum division");
-        /* need test for value == 0 */
-        VTABLE_set_integer_native(INTERP, dest, 0);
-    }
 
 /*
 
@@ -469,20 +398,6 @@ Morphs to a C<PerlString> with the value of C<*value>.
         VTABLE_set_integer_native(INTERP, dest, 0);
     }
 
-/*
-
-=item C<void modulus_bignum(BIGNUM *value, PMC *dest)>
-
-=cut
-
-*/
-
-    void modulus_bignum (BIGNUM* value,  PMC* dest) {
-        Parrot_warn(INTERP, PARROT_WARNINGS_UNDEF_FLAG,
-        "Use of uninitialized value in bignum modulus");
-        /* need test for value == 0 */
-        VTABLE_set_integer_native(INTERP, dest, 0);
-    }
 
 /*
 

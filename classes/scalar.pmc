@@ -203,20 +203,6 @@ TODO - overflow detection, bigint promotion?
 
 /*
 
-=item C<void add_bignum(BIGNUM *value, PMC *dest)>
-
-Unimplemented. Does nothing.
-
-=cut
-
-*/
-
-    void add_bignum (BIGNUM* value, PMC* dest) {
-        /* XXX: bignum magic */
-    }
-
-/*
-
 =item C<void add_float(FLOATVAL value, PMC *dest)>
 
 Adds C<value> to the scalar and returns the result in C<*dest>.
@@ -273,19 +259,6 @@ TODO - overflow detection, bigint promotion?
         VTABLE_set_number_native(INTERP, dest, result);
     }
 
-/*
-
-=item C<void subtract_bignum(BIGNUM *value, PMC *dest)>
-
-Unimplemented. Does nothing.
-
-=cut
-
-*/
-
-    void subtract_bignum (BIGNUM* value,  PMC* dest) {
-        /* XXX: bignum magic */
-    }
 
 /*
 
@@ -348,20 +321,6 @@ TODO - overflow detection, bigint promotion?
             * value;
 
         VTABLE_set_number_native(INTERP, dest, result);
-    }
-
-/*
-
-=item C<void multiply_bignum(BIGNUM *value, PMC *dest)>
-
-Unimplemented. Does nothing.
-
-=cut
-
-*/
-
-    void multiply_bignum (BIGNUM* value,  PMC* dest) {
-        /* XXX: bignum magic */
     }
 
 /*
@@ -429,20 +388,6 @@ TODO - overflow detection, bigint promotion?
 
 /*
 
-=item C<void divide_bignum(BIGNUM *value, PMC *dest)>
-
-Unimplemented. Does nothing.
-
-=cut
-
-*/
-
-    void divide_bignum (BIGNUM* value,  PMC* dest) {
-        /* XXX: bignum magic */
-    }
-
-/*
-
 =item C<void divide_float(FLOATVAL value, PMC *dest)>
 
 Divides the scalar by C<value> and returns the result in C<*dest>.
@@ -505,20 +450,6 @@ Returns in C<*dest> the value of the scalar C<mod> C<value>.
             % value;
 
         VTABLE_set_integer_native(INTERP, dest, result);
-    }
-
-/*
-
-=item C<void modulus_bignum(BIGNUM *value, PMC *dest)>
-
-Calls the superclass implementation.
-
-=cut
-
-*/
-
-    void modulus_bignum (BIGNUM* value,  PMC* dest) {
-        SUPER(value, dest);
     }
 
 /*

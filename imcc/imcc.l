@@ -258,6 +258,8 @@ SP              [ ]
 "-="            return(MINUS_ASSIGN);
 "*="            return(MUL_ASSIGN);
 "/="            return(DIV_ASSIGN);
+"//"            return(FDIV);
+"//="           return(FDIV_ASSIGN);
 "&="            return(BAND_ASSIGN);
 "|="            return(BOR_ASSIGN);
 "~="            return(BXOR_ASSIGN);

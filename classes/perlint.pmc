@@ -497,6 +497,20 @@ MMD_DEFAULT: {
             VTABLE_set_number_native(INTERP, dest, d);
         }
     }
+    void floor_divide (PMC* value, PMC* dest) {
+MMD_PerlUndef: {
+            internal_exception(DIV_BY_ZERO, "division by zero!\n");
+        }
+MMD_BigInt:     {
+            overflow_p(INTERP, SELF, value, dest, MMD_DIVIDE);
+        }
+MMD_DEFAULT: {
+        FLOATVAL valf = VTABLE_get_number(INTERP, value);
+
+        FLOATVAL d = floor(PMC_int_val(SELF)/valf);
+        VTABLE_set_integer_native(INTERP, dest, (INTVAL)d);
+    }
+    }
 
 /*
 
@@ -521,6 +535,19 @@ Divides the integer by C<value> and returns the result in C<*dest>.
             /* TODO BIG* promotion */
             VTABLE_set_number_native(INTERP, dest, divf);
         }
+    }
+/*
+
+=item C<void floor_divide_int(INTVAL value, PMC *dest)>
+
+Divides the integer by C<value> and returns the result in C<*dest>.
+
+=cut
+
+*/
+    void floor_divide_int (INTVAL value, PMC* dest) {
+        FLOATVAL d = floor(PMC_int_val(SELF)/value);
+        VTABLE_set_integer_native(INTERP, dest, (INTVAL) d);
     }
 
 /*
