@@ -58,6 +58,12 @@ sub suffix
 
 sub opsarraytype { return 'void *' };
 
+sub gen_goto {
+    my ($self, $where_str) = @_;
+    return "return $where_str";
+}
+
+
 # expr_pop
 #
 # Addresses on the stack are pointers into the bytecode array, and so
