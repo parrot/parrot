@@ -1693,15 +1693,16 @@ YY_RULE_SETUP
 	BEGIN(macro);
 	c = yylex_skip(valp, interp, " ");
 	if (c != IDENTIFIER)
-	    fataly(EX_SOFTWARE, ".constant", line,
+	    fataly(EX_SOFTWARE, sourcefile, line,
 		   "Constant names must be identifiers");
 
 	name = str_dup(valp->s);
 
 	c = yylex_skip(valp, interp, " ");
         if (c != INTC && c != FLOATC && c != STRINGC && c != REG)
-        fataly(EX_SOFTWARE, name, line, "Constant value must be a number, "
-            "stringliteral or register");
+        fataly(EX_SOFTWARE, sourcefile, line,
+        "Constant '%s' value must be a number, "
+            "stringliteral or register", name);
 
 	m = macros + num_macros++;
 	m->name = name;
@@ -1714,7 +1715,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 74:
 YY_RULE_SETUP
-#line 265 "imcc.l"
+#line 266 "imcc.l"
 {
         int c;
 
@@ -1727,7 +1728,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 75:
 YY_RULE_SETUP
-#line 275 "imcc.l"
+#line 276 "imcc.l"
 {
         char *label;
 
@@ -1746,7 +1747,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 76:
 YY_RULE_SETUP
-#line 291 "imcc.l"
+#line 292 "imcc.l"
 {
         char *label;
 
@@ -1764,12 +1765,12 @@ YY_RULE_SETUP
 	YY_BREAK
 case 77:
 YY_RULE_SETUP
-#line 306 "imcc.l"
+#line 307 "imcc.l"
 return(COMMA);
 	YY_BREAK
 case 78:
 YY_RULE_SETUP
-#line 308 "imcc.l"
+#line 309 "imcc.l"
 {
 	YYCHOP();  /* trim last ':' */
 	DUP_AND_RET(valp,LABEL);
@@ -1777,7 +1778,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 79:
 YY_RULE_SETUP
-#line 313 "imcc.l"
+#line 314 "imcc.l"
 {
         int type = Parrot_get_pmc_num(interp, yytext+1);
 
@@ -1788,12 +1789,12 @@ YY_RULE_SETUP
 	    return INTC;
 	}
 	if (!expand_macro(valp, interp, yytext+1))
-            fataly(1, "", line, "unknown macro '%s'\n", yytext);
+            fataly(1, sourcefile, line, "unknown macro '%s'\n", yytext);
     }
 	YY_BREAK
 case 80:
 YY_RULE_SETUP
-#line 326 "imcc.l"
+#line 327 "imcc.l"
 {
 	if (!is_def) {
 		SymReg *r = find_sym(yytext);
@@ -1808,27 +1809,27 @@ YY_RULE_SETUP
 	YY_BREAK
 case 81:
 YY_RULE_SETUP
-#line 338 "imcc.l"
+#line 339 "imcc.l"
 DUP_AND_RET(valp, FLOATC);
 	YY_BREAK
 case 82:
 YY_RULE_SETUP
-#line 339 "imcc.l"
+#line 340 "imcc.l"
 DUP_AND_RET(valp, INTC);
 	YY_BREAK
 case 83:
 YY_RULE_SETUP
-#line 340 "imcc.l"
+#line 341 "imcc.l"
 DUP_AND_RET(valp, INTC);
 	YY_BREAK
 case 84:
 YY_RULE_SETUP
-#line 341 "imcc.l"
+#line 342 "imcc.l"
 DUP_AND_RET(valp, INTC);
 	YY_BREAK
 case 85:
 YY_RULE_SETUP
-#line 343 "imcc.l"
+#line 344 "imcc.l"
 {
 	valp->s = str_dup(yytext);
         return(STRINGC); /* XXX delete quotes, -> emit, pbc */
@@ -1836,7 +1837,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 86:
 YY_RULE_SETUP
-#line 348 "imcc.l"
+#line 349 "imcc.l"
 {
         valp->s = str_dup(yytext); /* XXX delete quotes, -> emit, pbc */
         return(STRINGC);
@@ -1844,38 +1845,38 @@ YY_RULE_SETUP
 	YY_BREAK
 case 87:
 YY_RULE_SETUP
-#line 353 "imcc.l"
+#line 354 "imcc.l"
 DUP_AND_RET(valp, IREG);
 	YY_BREAK
 case 88:
 YY_RULE_SETUP
-#line 354 "imcc.l"
+#line 355 "imcc.l"
 DUP_AND_RET(valp, NREG);
 	YY_BREAK
 case 89:
 YY_RULE_SETUP
-#line 355 "imcc.l"
+#line 356 "imcc.l"
 DUP_AND_RET(valp, SREG);
 	YY_BREAK
 case 90:
 YY_RULE_SETUP
-#line 356 "imcc.l"
+#line 357 "imcc.l"
 DUP_AND_RET(valp, PREG);
 	YY_BREAK
 case 91:
 YY_RULE_SETUP
-#line 358 "imcc.l"
+#line 359 "imcc.l"
 /* skip */;
 	YY_BREAK
 case 92:
 YY_RULE_SETUP
-#line 360 "imcc.l"
+#line 361 "imcc.l"
 {
         return yytext[0];
     }
 	YY_BREAK
 case YY_STATE_EOF(emit):
-#line 364 "imcc.l"
+#line 365 "imcc.l"
 {
         BEGIN (INITIAL);
         if (pasm_file) {
@@ -1886,17 +1887,17 @@ case YY_STATE_EOF(emit):
     }
 	YY_BREAK
 case YY_STATE_EOF(INITIAL):
-#line 373 "imcc.l"
+#line 374 "imcc.l"
 yyterminate();
 	YY_BREAK
 case 93:
 YY_RULE_SETUP
-#line 375 "imcc.l"
+#line 376 "imcc.l"
 DUP_AND_RET(valp, ENDM);
 	YY_BREAK
 case 94:
 YY_RULE_SETUP
-#line 377 "imcc.l"
+#line 378 "imcc.l"
 {
         line++;
         DUP_AND_RET(valp, '\n');
@@ -1904,18 +1905,18 @@ YY_RULE_SETUP
 	YY_BREAK
 case 95:
 YY_RULE_SETUP
-#line 382 "imcc.l"
+#line 383 "imcc.l"
 return LABEL;
 	YY_BREAK
 case 96:
 YY_RULE_SETUP
-#line 383 "imcc.l"
+#line 384 "imcc.l"
 {
         char *label;
 	char *name = macros[num_macros].name;
 
 	if (yylex(valp, interp) != LABEL)
-	    fataly(EX_SOFTWARE, "", line, "LABEL expected");
+	    fataly(EX_SOFTWARE, sourcefile, line, "LABEL expected");
 
 	if (valp) {
 	    YYCHOP();
@@ -1931,7 +1932,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 97:
 YY_RULE_SETUP
-#line 402 "imcc.l"
+#line 403 "imcc.l"
 {
         char *label;
 	char *name = macros[num_macros].name;
@@ -1948,39 +1949,39 @@ YY_RULE_SETUP
 	YY_BREAK
 case 98:
 YY_RULE_SETUP
-#line 416 "imcc.l"
+#line 417 "imcc.l"
 /* skip leading ws */;
 	YY_BREAK
 case 99:
 YY_RULE_SETUP
-#line 417 "imcc.l"
+#line 418 "imcc.l"
 DUP_AND_RET(valp, ' ');
 	YY_BREAK
 case 100:
 YY_RULE_SETUP
-#line 418 "imcc.l"
+#line 419 "imcc.l"
 DUP_AND_RET(valp, IDENTIFIER);
 	YY_BREAK
 case 101:
 YY_RULE_SETUP
-#line 419 "imcc.l"
+#line 420 "imcc.l"
 DUP_AND_RET(valp, MACRO);
 	YY_BREAK
 case 102:
 YY_RULE_SETUP
-#line 420 "imcc.l"
+#line 421 "imcc.l"
 DUP_AND_RET(valp, yytext[0]);
 	YY_BREAK
 case YY_STATE_EOF(macro):
-#line 421 "imcc.l"
+#line 422 "imcc.l"
 yyterminate();
 	YY_BREAK
 case 103:
 YY_RULE_SETUP
-#line 423 "imcc.l"
+#line 424 "imcc.l"
 ECHO;
 	YY_BREAK
-#line 1984 "imclexer.c"
+#line 1985 "imclexer.c"
 case YY_STATE_EOF(pod):
 case YY_STATE_EOF(cmt1):
 case YY_STATE_EOF(cmt2):
@@ -2873,7 +2874,7 @@ int main()
 	return 0;
 	}
 #endif
-#line 423 "imcc.l"
+#line 424 "imcc.l"
 
 
 #ifdef yywrap
@@ -2975,8 +2976,9 @@ read_params (YYSTYPE *valp, void *interp, struct params_t *params,
 
     while(c != ')') {
 	if (c == 0)
-	    fataly(EX_SOFTWARE, macro_name, line,
-		   "End of file reached while reading arguments");
+	    fataly(EX_SOFTWARE, sourcefile, line,
+		   "End of file reached while reading arguments in '%s'",
+                   macro_name);
 	else if (c == ',') {
 	    params->name[params->num_param++] = current;
 	    current = str_dup("");
@@ -2984,8 +2986,9 @@ read_params (YYSTYPE *valp, void *interp, struct params_t *params,
 	    c = yylex_skip(&val, interp, " \n");
 	}
 	else if (need_id && (*current || c != IDENTIFIER) && c != ' ') {
-	    fataly(EX_SOFTWARE, macro_name, line,
-		   "Parameter definition must be IDENTIFIER");
+	    fataly(EX_SOFTWARE, sourcefile, line,
+		   "Parameter definition in '%s' must be IDENTIFIER",
+                   macro_name);
 	}
 	else {
 	    if (!need_id || c != ' ') {
@@ -3019,7 +3022,8 @@ read_macro (YYSTYPE *valp, void *interp)
 
     c = yylex_skip(valp, interp, " ");
     if (c != IDENTIFIER)
-	fataly(EX_SOFTWARE, ".macro", line, "Macro names must be identifiers");
+	fataly(EX_SOFTWARE, sourcefile, line,
+            "Macro names must be identifiers");
 
     m->name = valp->s;
     m->line = line;
@@ -3037,8 +3041,8 @@ read_macro (YYSTYPE *valp, void *interp)
 
     while (c != ENDM) {
 	if (c == 0)
-	    fataly (EX_SOFTWARE, m->name, line,
-		    "File ended before macro was complete");
+	    fataly (EX_SOFTWARE, sourcefile, line,
+		    "File ended before macro '%s' was complete", m->name);
 
 	strcat(temp_buffer, valp->s);
 	free(valp->s);
@@ -3115,8 +3119,9 @@ expand_macro (YYSTYPE *valp, void *interp, const char *name)
 	if (c != '(') {
 	    unput(c);
 	    if (m->params.num_param != 0)
-		fataly (EX_SOFTWARE, m->name, line,
-			"macro needs %d parameters", m->params.num_param);
+		fataly (EX_SOFTWARE, sourcefile, line,
+			"macro '%s' needs %d parameters",
+                        m->name, m->params.num_param);
 	    scan_string(frame, m->expansion);
 	    return 1;
 	}
@@ -3134,9 +3139,9 @@ expand_macro (YYSTYPE *valp, void *interp, const char *name)
 	}
 
 	if (frame->expansion.num_param != m->params.num_param) {
-	    fataly(EX_SOFTWARE, m->name, line,
-		   "Macro requires %d arguments, but %d given",
-		   frame->expansion.num_param, m->params.num_param);
+	    fataly(EX_SOFTWARE, sourcefile, line,
+		   "Macro '%s' requires %d arguments, but %d given",
+		   m->name, frame->expansion.num_param, m->params.num_param);
 	}
 
 	line = m->line;
