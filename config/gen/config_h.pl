@@ -9,9 +9,13 @@ $description="Generating config.h...";
 @args=();
 
 sub runstep {
-  genfile('config/gen/config_h/config_h.in', 'include/parrot/config.h', '#');
+  genfile('config/gen/config_h/config_h.in', 'include/parrot/config.h',
+          commentType => '/*',
+          ignorePattern => 'PARROT_CONFIG_DATE');
 
-  open(HH, ">include/parrot/has_header.h") or die "Can't open has_header.h: $!";
+  my $hh = "include/parrot/has_header.h";
+  open(HH, ">$hh.tmp")
+    or die "Can't open has_header.h: $!";
 
   print HH qq(
 /*
@@ -32,6 +36,8 @@ sub runstep {
   }
   
   close HH;
+
+  copy_if_diff("$hh.tmp", $hh);
 }
 
 1;

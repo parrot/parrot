@@ -2,8 +2,7 @@ package Configure::Step;
 
 use strict;
 use vars qw($description @args);
-use Parrot::Configure::Step;
-use File::Copy 'copy';
+use Parrot::Configure::Step qw(copy_if_diff);
 
 $description="Moving platform files into place...";
 
@@ -16,11 +15,8 @@ sub runstep {
   $platform="ansi" if defined($_[0]);
   $platform="generic" unless -e "config/gen/platform/$platform.c";
   
-  copy("config/gen/platform/$platform.c", "platform.c");
-  copy("config/gen/platform/$platform.h", "include/parrot/platform.h");
-  
-  my $now=time;
-  utime $now, $now, "platform.c", "include/parrot/platform.h";
+  copy_if_diff("config/gen/platform/$platform.c", "platform.c");
+  copy_if_diff("config/gen/platform/$platform.h", "include/parrot/platform.h");
 }
 
 1;
