@@ -4,7 +4,7 @@ $Id$
 
 =head1 NAME
 
-examples/benchmarks/primes.py - Calculate prime numbers < 50000
+examples/benchmarks/primes.py - Calculate prime numbers < 5000
 
 =head1 SYNOPSIS
 
@@ -38,7 +38,7 @@ def main():
     l = 0
     i6 = 0
     i7 = 0
-    max = 10000
+    max = 5000
 
     while 1:
 
@@ -59,11 +59,11 @@ if __name__ == "__main__":
 
 =head1 SEE ALSO
 
-F<examples/benchmarks/primes.c>, 
+F<examples/benchmarks/primes.c>,
 F<examples/benchmarks/primes.pasm>,
-F<examples/benchmarks/primes.pl>, 
+F<examples/benchmarks/primes.pl>,
 F<examples/benchmarks/primes2_p.pasm>,
-F<examples/benchmarks/primes2.c>, 
+F<examples/benchmarks/primes2.c>,
 F<examples/benchmarks/primes2.pasm>,
 F<examples/benchmarks/primes2.py>.
 

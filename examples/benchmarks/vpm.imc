@@ -1,6 +1,6 @@
 # perl program by Thomas Klausner posted on Vienna-PM list
 #
-# timings in seconds on Athlon 800
+# timings in seconds on Athlon 800 for 300.000 runs
 #
 # perl         vpm.pl    19.8
 # perl58-th    vpm.pl    30.8
@@ -32,7 +32,7 @@
    String = new PerlUndef
    String = "just another perl hacker"
 
-# for (0 .. 299999) {
+# for (0 .. 99999) {
    $P0 = new PerlUndef
    $P0 = 0
 loop:
@@ -67,7 +67,7 @@ loop:
    if $I1 < $I0 goto jlp
 #}
   inc $P0
-  if  $P0 <= 299999 goto loop
+  if  $P0 <= 99999 goto loop
 
 #print "$big;
    print big

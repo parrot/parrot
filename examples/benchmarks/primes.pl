@@ -4,7 +4,7 @@
 
 =head1 NAME
 
-examples/benchmarks/primes.pl - Calculate prime numbers < 50000
+examples/benchmarks/primes.pl - Calculate prime numbers < 10000
 
 =head1 SYNOPSIS
 
@@ -18,7 +18,7 @@ of primes and the last one found.
 =cut
 
 my $i1 = 1;
-my $i2 = 50000;
+my $i2 = 10000;
 my $i3;
 my $i4;
 my $i5;
@@ -47,10 +47,10 @@ $i4 = $i1 / 2;
 
 =head1 SEE ALSO
 
-F<examples/benchmarks/primes.c>, 
+F<examples/benchmarks/primes.c>,
 F<examples/benchmarks/primes.pasm>,
 F<examples/benchmarks/primes2_p.pasm>,
-F<examples/benchmarks/primes2.c>, 
+F<examples/benchmarks/primes2.c>,
 F<examples/benchmarks/primes2.pasm>,
 F<examples/benchmarks/primes2.py>.
 
