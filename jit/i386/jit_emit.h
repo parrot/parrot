@@ -2498,11 +2498,13 @@ Parrot_jit_begin(Parrot_jit_info_t *jit_info,
     if (!jit_info->objfile) {
         emitm_pushl_i(jit_info->native_ptr, interpreter);
     }
+#    if EXEC_CAPABLE
     else {
         emitm_pushl_i(jit_info->native_ptr, 0x0);
         Parrot_exec_add_text_rellocation(jit_info->objfile,
             jit_info->native_ptr, RTYPE_COM, "interpre", -4);
     }
+#    endif
 
     /* get the pc from stack:  mov 12(%ebp), %eax */
     emitm_movl_m_r(jit_info->native_ptr, emit_EAX, emit_EBP, emit_None, 1, 12);
