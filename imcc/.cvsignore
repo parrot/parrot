@@ -1,3 +1,4 @@
 imcc
 imcparser.output
 Makefile
+*.tmp

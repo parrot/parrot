@@ -6,11 +6,12 @@ core_ops.c
 core_ops_prederef.c
 disassemble
 libparrot.a
+libparrot.def
 Makefile
+myconfig
 pdb
 pdump
 parrot
-Makefile
 *.patch
 vtable.ops
 vtable_ops.c

@@ -321,6 +321,7 @@ languages/imcc/cfg.h
 languages/imcc/ChangeLog
 languages/imcc/debug.c
 languages/imcc/debug.h
+languages/imcc/examples/README
 languages/imcc/examples/sample.imc
 languages/imcc/examples/test_spilling.imc
 languages/imcc/imc.c
@@ -387,6 +388,7 @@ languages/perl6/P6C/Tree.pm
 languages/perl6/P6C/Tree/String.pm
 languages/perl6/P6C/Util.pm
 languages/perl6/README
+languages/perl6/examples/bnf.p6
 languages/perl6/examples/life-ar.p6
 languages/perl6/examples/life.p6
 languages/perl6/examples/mandel.p6
