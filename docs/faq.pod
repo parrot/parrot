@@ -41,7 +41,8 @@ bytecode-compiled languages such as Python, Ruby and Tcl.
 The name "Parrot" relates to Simon Cozens's L<April Fool's Joke|"LINKS"> where Larry Wall and Guido van Rossum announced the merger of 
 the Perl and Python languages.
 
-When not orchestrating elaborate pranks such as this, Simon spends a modicum of time as Parrot's lead developer.
+As penance, Simon spent time as Parrot's lead developer, but he's
+gotten better.
 
 =head2 Is Parrot the same as Perl 6?
 
@@ -54,7 +55,7 @@ Larry's L<apocolypses|"LINKS">.
 
 =head2 Can I use Parrot today?
 
-Well, almost.  :^)
+Yes.
 
 Parrot is in the early phases of its implementation.  The primary way to use Parrot is to write Parrot assembly code,
 described in L<PDD6|pdds/pdd6.pod>.
@@ -97,13 +98,34 @@ Leon Brocard has released a proof-of-concept L<Java bytecode to Parrot bytecode|
 
 =item *
 
-Gregor Purdy is working on a little language called Jako that targets Parrot bytecode directly.  (Available with the
-Parrot distribution.)
+Gregor Purdy is working on a little language called Jako that targets
+Parrot bytecode directly.  (Available with the Parrot distribution.)
 
 =item *
 
 Dan Sugalski and Jeff Goff have started work on compiling Scheme down to Parrot bytecode.  (Available with the Parrot
 distribution.)
+
+=item *
+
+Clint Pierce wrote an Integer Basic implementation in parrot
+assembly, which is shipped with the parrot distribution, as are a few
+example programs. (Including Hunt the Wumpus and Eliza)
+
+=item *
+
+There's a Befunge interpreter in the languages directory
+
+=item *
+
+There's an (ahem)BF interpreter in the languages directory. Be aware
+that BF is not, strictly speaking, the language's name, merely its initials.
+
+=item *
+
+There is a prototype perl 6 implementation in the langauges directory
+as well, though it's only as complete as the perl 6 spec. (Which, at
+this writing, isn't sufficiently complete)
 
 =back
 
@@ -183,10 +205,14 @@ stuff.
 
 =head2 Why your own virtual machine?  Why not compile to JVM/.NET?
 
-Those VMs are designed for statically typed languages. That's fine, 
-since Java, C#, and lots of other languages are statically typed. Perl isn't. 
-For a variety of reasons, it means that Perl would run more slowly there than on 
-an interpreter geared towards dynamic languages.
+Those VMs are designed for statically typed languages. That's fine,
+since Java, C#, and lots of other languages are statically typed. Perl
+isn't.  For a variety of reasons, it means that Perl would run more
+slowly there than on an interpreter geared towards dynamic languages.
+
+The .NET VM didn't even exist when we started development, or at
+least we didn't know about it when we were working on the design. We
+do now, though it's still not suitable.
 
 =head2 So you won't run on JVM/.NET?
 
@@ -194,11 +220,20 @@ Sure we will. They're just not our first target. We build our own
 interpreter/VM, then when that's working we start in on the JVM and/or .NET back 
 ends.
 
+=head2 What about I<insert other VM here>
+
+While I'm sure that's a perfectly nice, fast VM, it's probably got
+the same issues as do the languages in the "Why not something besides
+C" question does. I realize that the Scheme-48 interpreter's darned
+fast, for example, but we're looking at the same sort of portability
+and talent pool problems that we are with, say, Erlang or Haskell as
+an implementation language.
+
 =head2 Why is the development list called perl6-internals?
 
 The mailing list precedes the Parrot joke and subsequent unveiling of
 the True Grand Project by a number of months. We've just not gotten
-around to renaming the mailing list.
+around to renaming the mailing list. We will.
 
 =head1 PARROT AND PERL
 
