@@ -390,6 +390,112 @@ fprintf(stderr,"perlint_modulus not implemented for floating point\n");
         dest->cache.int_val = SELF->cache.int_val % value->cache.int_val;
     }
 
+    void neg (PMC* dest) {
+        dest->vtable->set_integer_native(INTERP, dest, -SELF->cache.int_val);
+    }
+
+    void bitwise_or (PMC* value, PMC* dest) {
+        dest->vtable->set_integer_native(INTERP, dest,
+            SELF->cache.int_val |
+            value->vtable->get_integer(INTERP, value)
+        );
+    }
+
+    void bitwise_or_int (INTVAL value, PMC* dest) {
+        dest->vtable->set_integer_native(INTERP, dest,
+            SELF->cache.int_val | value
+        );
+    }
+
+    void bitwise_or_same (PMC* value, PMC* dest) {
+        dest->vtable->set_integer_native(INTERP, dest,
+            SELF->cache.int_val |
+            value->cache.int_val
+        );
+    }
+
+    void bitwise_and (PMC* value, PMC* dest) {
+        dest->vtable->set_integer_native(INTERP, dest,
+            SELF->cache.int_val &
+            value->vtable->get_integer(INTERP, value)
+        );
+    }
+
+    void bitwise_and_int (INTVAL value, PMC* dest) {
+        dest->vtable->set_integer_native(INTERP, dest,
+            SELF->cache.int_val & value
+        );
+    }
+
+    void bitwise_and_same (PMC* value, PMC* dest) {
+        dest->vtable->set_integer_native(INTERP, dest,
+            SELF->cache.int_val &
+            value->cache.int_val
+        );
+    }
+
+    void bitwise_xor (PMC* value, PMC* dest) {
+        dest->vtable->set_integer_native(INTERP, dest,
+            SELF->cache.int_val ^
+            value->vtable->get_integer(INTERP, value)
+        );
+    }
+
+    void bitwise_xor_int (INTVAL value, PMC* dest) {
+        dest->vtable->set_integer_native(INTERP, dest,
+            SELF->cache.int_val ^ value
+        );
+    }
+
+    void bitwise_xor_same (PMC* value, PMC* dest) {
+        dest->vtable->set_integer_native(INTERP, dest,
+            SELF->cache.int_val ^
+            value->cache.int_val
+        );
+    }
+
+    void bitwise_not (PMC* dest) {
+        dest->vtable->set_integer_native(INTERP, dest, ~SELF->cache.int_val);
+    }
+
+    void bitwise_shr (PMC* value, PMC* dest) {
+        dest->vtable->set_integer_native(INTERP, dest,
+            SELF->cache.int_val >>
+            value->vtable->get_integer(INTERP, value)
+        );
+    }
+
+    void bitwise_shr_int (INTVAL value, PMC* dest) {
+        dest->vtable->set_integer_native(INTERP, dest,
+            SELF->cache.int_val >> value
+        );
+    }
+
+    void bitwise_shr_same (PMC* value, PMC* dest) {
+        dest->vtable->set_integer_native(INTERP, dest,
+            SELF->cache.int_val >> value->cache.int_val
+        );
+    }
+
+    void bitwise_shl (PMC* value, PMC* dest) {
+        dest->vtable->set_integer_native(INTERP, dest,
+            SELF->cache.int_val <<
+            value->vtable->get_integer(INTERP, value)
+        );
+    }
+
+    void bitwise_shl_int (INTVAL value, PMC* dest) {
+        dest->vtable->set_integer_native(INTERP, dest,
+            SELF->cache.int_val << value
+        );
+    }
+
+    void bitwise_shl_same (PMC* value, PMC* dest) {
+        dest->vtable->set_integer_native(INTERP, dest,
+            SELF->cache.int_val << value->cache.int_val
+        );
+    }
+
     void concatenate (PMC* value, PMC* dest) {
 	STRING* s;
 	s = string_concat(INTERP,

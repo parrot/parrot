@@ -2151,7 +2151,7 @@ sub do_mod
 sub do_bit_and
 {
   my ($dest, $a, $b) = map_args(@_);
-  emit_code("and", [$dest, $a, $b]);
+  emit_code("band", [$dest, $a, $b]);
 }
 
 
@@ -2162,7 +2162,7 @@ sub do_bit_and
 sub do_bit_or
 {
   my ($dest, $a, $b) = map_args(@_);
-  emit_code("or", [$dest, $a, $b]);
+  emit_code("bor", [$dest, $a, $b]);
 }
 
 

@@ -142,13 +142,13 @@ CODE
 40
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "xor_i_i (^)");
+output_is(<<'CODE', <<'OUTPUT', "bxor_i_i (~)");
 	set	I0, 0b001100
 	set	I1, 0b100110
-	xor	I2, I0, I1
+	bxor	I2, I0, I1
 	print	I2
 	print	"\n"
-	xor	I1, I0, I1
+	bxor	I1, I0, I1
 	print	I1
 	print	"\n"
 	print	I0
@@ -160,14 +160,14 @@ CODE
 12
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "xor_i_ic (^)");
+output_is(<<'CODE', <<'OUTPUT', "bxor_i_ic (~)");
  	set I0, 0b001100
- 	xor I2, I0, 0b100110
+	bxor I2, I0, 0b100110
  	print I2
  	print "\n"
  	print I0
  	print "\n"
- 	xor I0, I0, 0b100110
+	bxor I0, I0, 0b100110
  	print I0
  	print "\n"
  	end
@@ -177,13 +177,13 @@ CODE
 42
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "and_i_i (&)");
+output_is(<<'CODE', <<'OUTPUT', "band_i_i (&)");
 	set	I0, 0b001100
 	set	I1, 0b010110
-	and	I2, I0,I1
+	band	I2, I0,I1
 	print	I2
 	print	"\n"
-	and	I1,I0,I1
+	band	I1,I0,I1
 	print	I1
 	print	"\n"
 	print	I0
@@ -195,14 +195,14 @@ CODE
 12
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "and_i_ic (&)");
+output_is(<<'CODE', <<'OUTPUT', "band_i_ic (&)");
  	set I0, 0b001100
- 	and I2, I0,0b010110
+	band I2, I0,0b010110
  	print I2
  	print "\n"
  	print I0
  	print "\n"
- 	and I0,I0,0b010110
+	band I0,I0,0b010110
  	print I0
  	print "\n"
         end
@@ -212,13 +212,13 @@ CODE
 4
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "or_i_i (|)");
+output_is(<<'CODE', <<'OUTPUT', "bor_i_i (|)");
  	set I0, 0b001100
  	set I1, 0b010110
- 	or I2, I0,I1
+	bor I2, I0,I1
  	print I2
  	print "\n"
- 	or I1,I0,I1
+	bor I1,I0,I1
  	print I1
  	print "\n"
  	print I0
@@ -230,14 +230,14 @@ CODE
 12
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "or_i_ic (|)");
+output_is(<<'CODE', <<'OUTPUT', "bor_i_ic (|)");
  	set I0, 0b001100
- 	or I2, I0,0b010110
+	bor I2, I0,0b010110
  	print I2
  	print "\n"
  	print I0
  	print "\n"
- 	or I0,I0,0b010110
+	bor I0,I0,0b010110
  	print I0
  	print "\n"
         end
@@ -248,16 +248,16 @@ CODE
 OUTPUT
 
 # use C<and> to only check low order bits, this should be platform nice
-output_is(<<'CODE', <<'OUTPUT', "not_i (~)");
+output_is(<<'CODE', <<'OUTPUT', "bnot_i (~)");
 	set	I0, 0b001100
 	set	I1, 0b001100
 	set	I31, 0b111111
-	not	I2, I0
-	and	I2, I2, I31
+	bnot	I2, I0
+	band	I2, I2, I31
 	print	I2
 	print	"\n"
-	not	I1, I1
-	and	I1, I1, I31
+	bnot	I1, I1
+	band	I1, I1, I31
 	print	I1
 	print	"\n"
 	print	I0

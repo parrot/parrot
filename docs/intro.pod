@@ -491,7 +491,7 @@ create a new PMC with
 
     new P0, <typename>
 
-and then use any of the instructions in F<core.ops> or F<vtable.ops>
+and then use any of the instructions in F<core.ops>
 which support PMCs. F<doc/vtables.pod> also tells you how to implement
 your own PMC vtable classes.
 

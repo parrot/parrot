@@ -890,7 +890,6 @@ Copies a PMC $1 to $2.
 =cut
 
 inline op clone(out PMC, in PMC) {
-  /* XXX - Is this ok to do? */
   $1 = $2->vtable->clone(interpreter, $2);
   goto NEXT();
 }
@@ -1349,6 +1348,10 @@ Increase $1 by the amount in $2.
 
 =item B<add>(out NUM, in NUM, in NUM)
 
+=item B<add>(out PMC, in PMC, in INT)
+
+=item B<add>(out PMC, in PMC, in PMC)
+
 Set $1 to the sum of $2 and $3.
 
 =cut
@@ -1390,6 +1393,11 @@ inline op add(out NUM, in NUM, in NUM) {
 
 inline op add(out PMC, in PMC, in INT) {
   $2->vtable->add_int(interpreter, $2, $3, $1);
+  goto NEXT();
+}
+
+inline op add (out PMC, in PMC, in PMC) {
+  $2->vtable->add(interpreter, $2, $3, $1);
   goto NEXT();
 }
 
@@ -1507,6 +1515,8 @@ inline op dec(inout PMC) {
 
 =item B<div>(out NUM, in NUM, in NUM)
 
+=item B<div>(out PMC, in PMC, in PMC)
+
 Set $1 to the quotient of $2 divided by $3. In the case of INTVAL division, the
 result is truncated (NOT rounded or floored).
 
@@ -1522,6 +1532,10 @@ inline op div(out NUM, in NUM, in NUM) {
   goto NEXT();
 }
 
+inline op div (out PMC, out PMC, out PMC) {
+  $2->vtable->divide(interpreter, $2, $3, $1);
+  goto NEXT();
+}
 
 ########################################
 
@@ -1573,6 +1587,10 @@ References:
   [2] Ronald L. Graham, Donald E. Knuth and Oren Patashnik, *Concrete
       Mathematics*, Second Edition. Addison-Wesley, 1994.
 
+=item B<mod>(out PMC, in PMC, in PMC)
+
+Sets $1 to the modulus of $2 and $3.
+
 =cut
 
 op mod(out INT, in INT, in INT) {
@@ -1602,6 +1620,10 @@ op mod(out INT, in INT, in INT) {
   goto NEXT();
 }
 
+inline op mod (out PMC, out PMC, out PMC) {
+  $2->vtable->modulus(interpreter, $2, $3, $1);
+  goto NEXT();
+}
 
 ########################################
 
@@ -1635,6 +1657,8 @@ op mod(out NUM, in NUM, in NUM) {
 
 =item B<mul>(out NUM, in NUM, in NUM)
 
+=item B<mul>(out PMC, in PMC, in PMC)
+
 Set $1 to the product of $2 and $3.
 
 =cut
@@ -1649,6 +1673,10 @@ inline op mul(out NUM, in NUM, in NUM) {
   goto NEXT();
 }
 
+inline op mul (out PMC, out PMC, out PMC) {
+  $2->vtable->multiply(interpreter, $2, $3, $1);
+  goto NEXT();
+}
 
 ########################################
 
@@ -1726,6 +1754,8 @@ Decrease $1 by the amount in $2.
 
 =item B<sub>(out PMC, in PMC, in INT)
 
+=item B<sub>(out PMC, in PMC, in PMC)
+
 Set $1 to $2 minus $3.
 
 =cut
@@ -1770,6 +1800,10 @@ inline op sub(out PMC, in PMC, in INT) {
   goto NEXT();
 }
 
+inline op sub (out PMC, out PMC, out PMC) {
+  $2->vtable->subtract(interpreter, $2, $3, $1);
+  goto NEXT();
+}
 
 =back
 
@@ -1809,6 +1843,8 @@ inline op chopn(inout STR, in INT) {
 
 =item B<concat>(out STR, in STR, in STR)
 
+=item B<concat>(out PMC, in PMC, in PMC)
+
 Append the string in $2 to the string in $1.
 
 The three argument version appends the string $3 to $2 and places the result
@@ -1826,9 +1862,16 @@ inline op concat(out STR, in STR, in STR) {
   goto NEXT();
 }
 
+inline op concat (out PMC, out PMC, out PMC) {
+  $2->vtable->concatenate(interpreter, $2, $3, $1);
+  goto NEXT();
+}
+
 #######################################
 
 =item B<repeat>(out STR, in STR, in INT)
+
+=item B<repeat>(out PMC, in PMC, in PMC)
 
 Repeats string $2 $3 times and stores result in $1.
 
@@ -1839,6 +1882,11 @@ inline op repeat(out STR, in STR, in INT) {
       internal_exception(NEG_REPEAT, "Cannot repeat with negative arg");
   }
   $1 = string_repeat(interpreter, $2, (UINTVAL)$3, NULL);
+  goto NEXT();
+}
+
+inline op repeat (out PMC, in PMC, in PMC) {
+  $2->vtable->repeat(interpreter, $2, $3, $1);
   goto NEXT();
 }
 
@@ -2471,42 +2519,121 @@ These operations apply  bitwise logical functions to their arguments.
 
 ########################################
 
-=item B<and>(out INT, in INT, in INT)
+=item B<band>(inout INT, in INT)
+
+=item B<band>(inout PMC, in INT)
+
+=item B<band>(inout PMC, in PMC)
+
+Set the bits of $1 according to the B<and> of the corresponding bits from $1 and $2.
+
+=item B<band>(out INT, in INT, in INT)
+
+=item B<band>(out PMC, in PMC, in INT)
+
+=item B<band>(out PMC, in PMC, in PMC)
 
 Set the bits of $1 according to the B<and> of the corresponding bits from $2 and $3.
 
 =cut
 
-inline op and(out INT, in INT, in INT) {
+inline op band(inout INT, in INT) {
+  $1 &= $2;
+  goto NEXT();
+}
+
+inline op band(inout PMC, in INT) {
+  $1->vtable->bitwise_and_int(interpreter, $1, $2, $1);
+  goto NEXT();
+}
+
+inline op band(inout PMC, in PMC) {
+  $1->vtable->bitwise_and(interpreter, $1, $2, $1);
+  goto NEXT();
+}
+
+inline op band(out INT, in INT, in INT) {
   $1 = $2 & $3;
   goto NEXT();
 }
 
+inline op band(out PMC, in PMC, in INT) {
+  $2->vtable->bitwise_and_int(interpreter, $2, $3, $1);
+  goto NEXT();
+}
+
+inline op band(out PMC, in PMC, in PMC) {
+  $2->vtable->bitwise_and(interpreter, $2, $3, $1);
+  goto NEXT();
+}
 
 ########################################
 
-=item B<not>(out INT, in INT)
+=item B<bnot>(out INT, in INT)
+
+=item B<bnot>(out PMC, in PMC)
 
 Set the bits of $1 to the B<not> of the corresponding bits from $2.
 
 =cut
 
-inline op not(out INT, in INT) {
+inline op bnot(out INT, in INT) {
   $1 = ~ $2;
   goto NEXT();
 }
 
+inline op bnot(out PMC, in PMC) {
+  $2->vtable->bitwise_not(interpreter, $2, $1);
+  goto NEXT();
+}
 
 ########################################
 
-=item B<or>(out INT, in INT, in INT)
+=item B<bor>(inout INT, in INT)
+
+=item B<bor>(inout PMC, in INT)
+
+=item B<bor>(inout PMC, in PMC)
+
+Set the bits of $1 according to the B<or> of the corresponding bits from $1 and $2.
+
+=item B<bor>(out INT, in INT, in INT)
+
+=item B<bor>(out PMC, in PMC, in INT)
+
+=item B<bor>(out PMC, in PMC, in PMC)
 
 Set the bits of $1 according to the B<or> of the corresponding bits from $2 and $3.
 
 =cut
 
-inline op or(out INT, in INT, in INT) {
+inline op bor(inout INT, in INT) {
+  $1 |= $2;
+  goto NEXT();
+}
+
+inline op bor(inout PMC, in INT) {
+  $1->vtable->bitwise_or_int(interpreter, $1, $2, $1);
+  goto NEXT();
+}
+
+inline op bor(inout PMC, in PMC) {
+  $1->vtable->bitwise_or(interpreter, $1, $2, $1);
+  goto NEXT();
+}
+
+inline op bor(out INT, in INT, in INT) {
   $1 = $2 | $3;
+  goto NEXT();
+}
+
+inline op bor(out PMC, in PMC, in INT) {
+  $2->vtable->bitwise_or_int(interpreter, $2, $3, $1);
+  goto NEXT();
+}
+
+inline op bor(out PMC, in PMC, in PMC) {
+  $2->vtable->bitwise_or(interpreter, $2, $3, $1);
   goto NEXT();
 }
 
@@ -2540,22 +2667,154 @@ inline op shr(out INT, in INT, in INT) {
 
 ########################################
 
-=item B<xor>(out INT, in INT, in INT)
+=item B<bxor>(inout INT, in INT)
+
+=item B<bxor>(inout PMC, in INT)
+
+=item B<bxor>(inout PMC, in PMC)
+
+Set the bits of $1 according to the B<xor> of the corresponding bits from $1 and $2.
+
+=item B<bxor>(out INT, in INT, in INT)
+
+=item B<bxor>(out PMC, in PMC, in INT)
+
+=item B<bxor>(out PMC, in PMC, in PMC)
 
 Set the bits of $1 according to the B<xor> of the corresponding bits from $2 and $3.
 
 =cut
 
-inline op xor(out INT, in INT, in INT) {
+inline op bxor(inout INT, in INT) {
+  $1 ^= $2;
+  goto NEXT();
+}
+
+inline op bxor(inout PMC, in INT) {
+  $1->vtable->bitwise_xor_int(interpreter, $1, $2, $1);
+  goto NEXT();
+}
+
+inline op bxor(inout PMC, in PMC) {
+  $1->vtable->bitwise_xor(interpreter, $1, $2, $1);
+  goto NEXT();
+}
+
+inline op bxor(out INT, in INT, in INT) {
   $1 = $2 ^ $3;
   goto NEXT();
 }
 
+inline op bxor(out PMC, in PMC, in INT) {
+  $2->vtable->bitwise_xor_int(interpreter, $2, $3, $1);
+  goto NEXT();
+}
+
+inline op bxor(out PMC, in PMC, in PMC) {
+  $2->vtable->bitwise_xor(interpreter, $2, $3, $1);
+  goto NEXT();
+}
 
 =back
 
 =cut
 
+
+###############################################################################
+
+=head2 Logical operations
+
+These operations apply logical functions to their arguments.
+
+=over 4
+
+=cut
+
+
+########################################
+
+=item B<and>(out INT, in INT, in INT)
+
+=item B<and>(out PMC, in PMC, in PMC)
+
+Short-circuiting logical and.  Returns $2 if it's false, else returns $3.
+
+=cut
+
+inline op and(out INT, in INT, in INT) {
+  $1 = $2 ? $3 : $2;
+  goto NEXT();
+}
+
+inline op and(out PMC, in PMC, in PMC) {
+  $2->vtable->logical_and(interpreter, $2, $3, $1);
+  goto NEXT();
+}
+
+########################################
+
+=item B<not>(out INT, in INT)
+
+=item B<not>(out PMC, in PMC)
+
+Set the boolean state of $1 to the opposite of the boolean state from $2.
+
+=cut
+
+inline op not(out INT, in INT) {
+  $1 = ! $2;
+  goto NEXT();
+}
+
+inline op not(out PMC, in PMC) {
+  $2->vtable->logical_not(interpreter, $2, $1);
+  goto NEXT();
+}
+
+########################################
+
+=item B<or>(out INT, in INT, in INT)
+
+=item B<or>(out PMC, in PMC, in PMC)
+
+Short-circuiting logical or.  Returns $2 if it's true, else returns $3.
+
+=cut
+
+inline op or(out INT, in INT, in INT) {
+  $1 = $2 ? $2 : $3;
+  goto NEXT();
+}
+
+inline op or(out PMC, in PMC, in PMC) {
+  $2->vtable->logical_or(interpreter, $2, $3, $1);
+  goto NEXT();
+}
+
+########################################
+
+=item B<xor>(out INT, in INT, in INT)
+
+=item B<xor>(out PMC, in PMC, in PMC)
+
+Logical xor.  Returns $2 if it's true and $3 isn't,
+returns $3 if it's true and $2 isn't, else returns false.
+
+=cut
+
+inline op xor(out INT, in INT, in INT) {
+  $1 = ($2 && ! $3) ? $2 : ($3 && ! $2) ? $3 : 0;
+  goto NEXT();
+}
+
+inline op xor(out PMC, in PMC, in PMC) {
+  $2->vtable->logical_xor(interpreter, $2, $3, $1);
+  goto NEXT();
+}
+
+=back
+
+=cut
 
 ###############################################################################
 
@@ -3456,7 +3715,7 @@ inline op loadext(in STR, in STR) {
      fprintf(stderr, "%s\n", err);
      PANIC("Failed to load native library");
   }
-  func = Parrot_dlsym(p, $2->bufstart);
+  func = (void(*)())Parrot_dlsym(p, $2->bufstart);
   if (NULL == func) {
     PANIC("Failed to find symbol in native library");
   }

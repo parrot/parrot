@@ -77,7 +77,8 @@ versions of these)
 
 The init vtable method takes an unused PMC as a parameter, and turns
 it into a PMC appropriate for the class owning the vtable. Called as a
-class method.
+class method.  There is also a form that accepts a PMC initializer as
+a third argument.
 
 =item void morph(INTERP, PMC, type)
 
@@ -248,9 +249,29 @@ dest.
 
 =back
 
+The following vtable functions have a variation for INTVAL and PMC
+values.  They have keyed and non-keyed versions.
+
+Each function does what its name implies and puts the result in
+dest.
+
+=over 4
+
+=item void bitwise_or(INTERP, PMC, value, dest)
+
+=item void bitwise_and(INTERP, PMC, value, dest)
+
+=item void bitwise_xor(INTERP, PMC, value, dest)
+
+=back
+
 The following vtable functions all have a keyed and non-keyed version.
 
 =over 4
+
+=item void bitwise_not(INTERP, PMC, dest)
+
+Applies a bitwise negation to PMC and stores the result in dest.
 
 =item void concatenante(INTERP, PMC, value, dest)
 
@@ -288,6 +309,10 @@ dest.
 
 Does a logical xor on the two parameters, storing the result in
 dest.
+
+=item void logical_not(INTERP, PMC, dest)
+
+Does a logical not on PMC and stores the result in dest.
 
 =item void repeat(INTERP, PMC, value, dest)
 

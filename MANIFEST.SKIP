@@ -11,7 +11,6 @@ CVS/[^/]+$
 ^platform\.c$
 ^config.opt$
 
-^vtable\.ops$
 ^include/parrot/vtable\.h$
 ^include/parrot/jit_struct\.h$
 ^include/parrot/oplib/core_ops\.h$
@@ -20,7 +19,6 @@ CVS/[^/]+$
 
 ^core_ops\.c$
 ^core_ops_prederef\.c$
-^vtable_ops\.c$
 
 ^lib/Parrot/Jit\.pm$
 ^lib/Parrot/PMC\.pm$

@@ -3,11 +3,13 @@
 # Lines have the following format:
 # [keyed] <method-type> <return-type> <method_name>([<type> <pname>[, <type> <pname>...]])
 #
-# <method-type> is either int, float, num, str, or unique if the method
-# has a set of int entries, float entries, num entries, string
+# <method-type> is either int, float, num, str, bitwise, bignum,
+# or unique if the method has a set of int entries, float entries, 
+# num entries, string entries, is a bitwise operator, has bignum
 # entries, or is a unique method.
 #
-# If keyed is specified, a keyed version will also be generated.
+# If keyed is specified, a keyed version will also be generated that
+# is keyed by a KEY* or an INTVAL.
 #
 # So, for instance, a function with two arguments where the second
 # argument is a string would look like this:
@@ -22,6 +24,7 @@
 # is not neccessary to specify keyed in that case.
 
 unique void init()
+unique void init_pmc(PMC* value)
 unique void morph(INTVAL type)
 unique PMC* mark(PMC* end_of_used_list)
 unique void destroy()
@@ -55,6 +58,15 @@ keyed num void subtract(PMC* value,PMC* dest)
 keyed num void multiply(PMC* value,PMC* dest)
 keyed num void divide(PMC* value,PMC* dest)
 keyed num void modulus(PMC* value,PMC* dest)
+keyed unique void neg(PMC* dest)
+
+keyed bitwise void bitwise_or(PMC* value,PMC* dest)
+keyed bitwise void bitwise_and(PMC* value,PMC* dest)
+keyed bitwise void bitwise_xor(PMC* value,PMC* dest)
+keyed unique void bitwise_not(PMC* dest)
+
+keyed bitwise void bitwise_shr(PMC* value,PMC* dest)
+keyed bitwise void bitwise_shl(PMC* value,PMC* dest)
 
 keyed str void concatenate(PMC* value,PMC* dest)
 

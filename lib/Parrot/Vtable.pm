@@ -5,7 +5,8 @@ use strict;
 @Parrot::Vtable::EXPORT = qw(parse_vtable vtbl_defs vtbl_struct vtbl_enumerate);
 
 my(%expand) = (
-    unique => [""], # Dummy element, so we go through the loop exactly once
+    unique => [""], # Dummy element, so we go through the loop exactly
+    bitwise=> [qw[object int same]],
     int    => [qw[object native bignum same]],
     float  => [qw[object native bignum same]],
     bignum => [qw[object int native float same]],
@@ -15,6 +16,7 @@ my(%expand) = (
 
 my (%types)  = (
     unique => [""],
+    bitwise=> ["PMC *", "INTVAL", "PMC *"],
     int    => ["PMC *", "INTVAL", "BIGNUM *", "PMC *"],
     float  => ["PMC *", "FLOATVAL", "BIGNUM *", "PMC *"],
     bignum => ["PMC *", "INTVAL", "BIGNUM *", "FLOATVAL", "PMC *"],

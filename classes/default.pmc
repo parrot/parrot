@@ -16,6 +16,10 @@ pmclass default noinit {
     void init () {
     }
 
+    void init_pmc (PMC* value) {
+        SELF->vtable->init(INTERP, SELF);
+    }
+
     void morph (INTVAL type) {
     }
 
@@ -554,6 +558,190 @@ pmclass default noinit {
         internal_exception(OUT_OF_BOUNDS, "Subscript on something that's not an aggregate!\n");
     }
 
+    void neg (PMC* dest) {
+        INTVAL result;
+        
+        result = -SELF->vtable->get_integer(INTERP, SELF);
+        
+        dest->vtable->set_integer_native(INTERP, dest, result);
+    }
+
+    void neg_keyed (KEY* key, PMC* dest_value, KEY* dest_value_key) {
+        internal_exception(OUT_OF_BOUNDS, "Subscript on something that's not an aggregate!\n");
+    }
+
+    void bitwise_or (PMC* value, PMC* dest) {
+        INTVAL result;
+        
+        result = SELF->vtable->get_integer(INTERP, SELF)
+            | value->vtable->get_integer(INTERP, value);
+        
+        dest->vtable->set_integer_native(INTERP, dest, result);
+    }
+
+    void bitwise_or_int (INTVAL value, PMC* dest) {
+        INTVAL result;
+        
+        result = SELF->vtable->get_integer(INTERP, SELF)
+            | value;
+        
+        dest->vtable->set_integer_native(INTERP, dest, result);
+    }
+
+    void bitwise_or_same (PMC* value, PMC* dest) {
+        INTVAL result;
+        
+        result = SELF->vtable->get_integer(INTERP, SELF)
+            | value->vtable->get_integer(INTERP, value);
+        
+        dest->vtable->set_integer_native(INTERP, dest, result);
+    }
+
+    void bitwise_or_keyed (KEY* key, PMC* src_value, KEY* src_value_key,
+            PMC* dest_value, KEY* dest_value_key) {
+        internal_exception(OUT_OF_BOUNDS, "Subscript on something that's not an aggregate!\n");
+    }
+
+    void bitwise_and (PMC* value, PMC* dest) {
+        INTVAL result;
+        
+        result = SELF->vtable->get_integer(INTERP, SELF)
+            & value->vtable->get_integer(INTERP, value);
+        
+        dest->vtable->set_integer_native(INTERP, dest, result);
+    }
+
+    void bitwise_and_int (INTVAL value, PMC* dest) {
+        INTVAL result;
+        
+        result = SELF->vtable->get_integer(INTERP, SELF)
+            & value;
+        
+        dest->vtable->set_integer_native(INTERP, dest, result);
+    }
+
+    void bitwise_and_same (PMC* value, PMC* dest) {
+        INTVAL result;
+        
+        result = SELF->vtable->get_integer(INTERP, SELF)
+            & value->vtable->get_integer(INTERP, value);
+        
+        dest->vtable->set_integer_native(INTERP, dest, result);
+    }
+
+    void bitwise_and_keyed (KEY* key, PMC* src_value, KEY* src_value_key,
+            PMC* dest_value, KEY* dest_value_key) {
+        internal_exception(OUT_OF_BOUNDS, "Subscript on something that's not an aggregate!\n");
+    }
+
+    void bitwise_xor (PMC* value, PMC* dest) {
+        INTVAL result;
+        
+        result = SELF->vtable->get_integer(INTERP, SELF)
+            ^ value->vtable->get_integer(INTERP, value);
+        
+        dest->vtable->set_integer_native(INTERP, dest, result);
+    }
+
+    void bitwise_xor_int (INTVAL value, PMC* dest) {
+        INTVAL result;
+        
+        result = SELF->vtable->get_integer(INTERP, SELF)
+            ^ value;
+        
+        dest->vtable->set_integer_native(INTERP, dest, result);
+    }
+
+    void bitwise_xor_same (PMC* value, PMC* dest) {
+        INTVAL result;
+        
+        result = SELF->vtable->get_integer(INTERP, SELF)
+            ^ value->vtable->get_integer(INTERP, value);
+        
+        dest->vtable->set_integer_native(INTERP, dest, result);
+    }
+
+    void bitwise_xor_keyed (KEY* key, PMC* src_value, KEY* src_value_key,
+            PMC* dest_value, KEY* dest_value_key) {
+        internal_exception(OUT_OF_BOUNDS, "Subscript on something that's not an aggregate!\n");
+    }
+
+    void bitwise_not (PMC* dest) {
+        INTVAL result;
+        
+        result = ~SELF->vtable->get_integer(INTERP, SELF);
+        
+        dest->vtable->set_integer_native(INTERP, dest, result);
+    }
+
+    void bitwise_not_keyed (KEY* key, PMC* dest_value, KEY* dest_value_key) {
+        internal_exception(OUT_OF_BOUNDS, "Subscript on something that's not an aggregate!\n");
+    }
+    
+    void bitwise_shr (PMC* value, PMC* dest) {
+        INTVAL result;
+        
+        result = SELF->vtable->get_integer(INTERP, SELF)
+            >> value->vtable->get_integer(INTERP, value);
+        
+        dest->vtable->set_integer_native(INTERP, dest, result);
+    }
+
+    void bitwise_shr_int (INTVAL value, PMC* dest) {
+        INTVAL result;
+        
+        result = SELF->vtable->get_integer(INTERP, SELF)
+            >> value;
+        
+        dest->vtable->set_integer_native(INTERP, dest, result);
+    }
+
+    void bitwise_shr_same (PMC* value, PMC* dest) {
+        INTVAL result;
+        
+        result = SELF->vtable->get_integer(INTERP, SELF)
+            >> value->vtable->get_integer(INTERP, value);
+        
+        dest->vtable->set_integer_native(INTERP, dest, result);
+    }
+
+    void bitwise_shr_keyed (KEY* key, PMC* src_value, KEY* src_value_key,
+            PMC* dest_value, KEY* dest_value_key) {
+        internal_exception(OUT_OF_BOUNDS, "Subscript on something that's not an aggregate!\n");
+    }
+
+    void bitwise_shl (PMC* value, PMC* dest) {
+        INTVAL result;
+        
+        result = SELF->vtable->get_integer(INTERP, SELF)
+            << value->vtable->get_integer(INTERP, value);
+        
+        dest->vtable->set_integer_native(INTERP, dest, result);
+    }
+
+    void bitwise_shl_int (INTVAL value, PMC* dest) {
+        INTVAL result;
+        
+        result = SELF->vtable->get_integer(INTERP, SELF)
+            << value;
+        
+        dest->vtable->set_integer_native(INTERP, dest, result);
+    }
+
+    void bitwise_shl_same (PMC* value, PMC* dest) {
+        INTVAL result;
+        
+        result = SELF->vtable->get_integer(INTERP, SELF)
+            << value->vtable->get_integer(INTERP, value);
+        
+        dest->vtable->set_integer_native(INTERP, dest, result);
+    }
+
+    void bitwise_shl_keyed (KEY* key, PMC* src_value, KEY* src_value_key,
+            PMC* dest_value, KEY* dest_value_key) {
+        internal_exception(OUT_OF_BOUNDS, "Subscript on something that's not an aggregate!\n");
+    }
+
     void concatenate (PMC* value,  PMC* dest) {
         STRING* s = string_concat(INTERP,
             SELF->vtable->get_string(INTERP, SELF),
@@ -656,10 +844,12 @@ pmclass default noinit {
     }
 
     void logical_or (PMC* value,  PMC* dest) {
-        dest->vtable->set_integer_native(INTERP, dest, 
-            SELF->vtable->get_bool(INTERP, SELF) ||
-            value->vtable->get_bool(INTERP, value)
-        );
+        if (SELF->vtable->get_bool(INTERP, SELF)) {
+            dest->vtable->set_pmc(INTERP, dest, SELF);
+        }
+        else {
+            dest->vtable->set_pmc(INTERP, dest, value);
+        }
     }
 
     void logical_or_keyed (KEY* key, PMC* value, KEY* value_key, PMC* dest, KEY* dest_key) {
@@ -667,10 +857,12 @@ pmclass default noinit {
     }
 
     void logical_and (PMC* value,  PMC* dest) {
-        dest->vtable->set_integer_native(INTERP, dest, 
-            SELF->vtable->get_bool(INTERP, SELF) &&
-            value->vtable->get_bool(INTERP, value)
-        );
+        if (SELF->vtable->get_bool(INTERP, SELF)) {
+            dest->vtable->set_pmc(INTERP, dest, value);
+        }
+        else {
+            dest->vtable->set_pmc(INTERP, dest, SELF);
+        }
     }
 
     void logical_and_keyed (KEY* key, PMC* value, KEY* value_key, PMC* dest, KEY* dest_key) {
@@ -678,11 +870,20 @@ pmclass default noinit {
     }
 
     void logical_xor (PMC* value,  PMC* dest) {
-        /* XXX - If get_bool returns something other than 0 or 1 we're in trouble - DML */
-        dest->vtable->set_integer_native(INTERP, dest, 
-            SELF->vtable->get_bool(INTERP, SELF) ^
-            value->vtable->get_bool(INTERP, value)
-        );
+        INTVAL my_bool, value_bool;
+        my_bool = SELF->vtable->get_bool(INTERP, SELF);
+        value_bool = value->vtable->get_bool(INTERP, value);
+        
+        if (my_bool && ! value_bool) {
+            dest->vtable->set_pmc(INTERP, dest, SELF);
+        }
+        else if (value_bool && ! my_bool) {
+            dest->vtable->set_pmc(INTERP, dest, value);
+        }
+        else {
+            /* XXX - Need a better way to set FALSE */
+            dest->vtable->set_integer_native(INTERP, dest, 0);
+        }
     }
 
     void logical_xor_keyed (KEY* key, PMC* value, KEY* value_key, PMC* dest, KEY* dest_key) {
@@ -690,6 +891,7 @@ pmclass default noinit {
     }
 
     void logical_not (PMC* dest) {
+        /* XXX - Need a better way to set boolean state */
         dest->vtable->set_integer_native(INTERP, dest,
             ! SELF->vtable->get_bool(INTERP, SELF));
     }

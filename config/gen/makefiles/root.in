@@ -42,12 +42,12 @@ STICKY_FILES = $(GEN_CONFIGS) $(GEN_MAKEFILES) config.opt
 #
 ###############################################################################
 
-GEN_OPSFILES = vtable.ops
+GEN_OPSFILES = 
 
 GEN_HEADERS = $(INC)/vtable.h $(INC)/oplib/core_ops.h \
 $(INC)/oplib/core_ops_prederef.h
 
-GEN_SOURCES = core_ops.c core_ops_prederef.c vtable_ops.c
+GEN_SOURCES = core_ops.c core_ops_prederef.c
 
 GEN_MODULES = lib/Parrot/Jit.pm lib/Parrot/PMC.pm lib/Parrot/OpLib/core.pm
 
@@ -392,9 +392,6 @@ ${cg_c}
 warnings$(O) : $(H_FILES)
 
 misc$(O) : $(H_FILES)
-
-vtable.ops : make_vtable_ops.pl
-	$(PERL) make_vtable_ops.pl > vtable.ops
 
 $(STICKY_FILES) : Configure.pl
 	$(PERL) Configure.pl

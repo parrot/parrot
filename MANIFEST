@@ -354,7 +354,6 @@ lib/Test/More.pm
 lib/Test/Simple.pm
 lib/Text/Balanced.pm
 make.pl
-make_vtable_ops.pl
 memory.c
 misc.c
 obscure.ops
