@@ -16,7 +16,7 @@ Tests the namespace manipulation.
 
 =cut
 
-use Parrot::Test tests => 9;
+use Parrot::Test tests => 10;
 use Test::More;
 
 pir_output_is(<<'CODE', <<'OUTPUT', "find_global Foo::bar");
@@ -178,3 +178,55 @@ ok
 baz
 OUTPUT
 
+TODO: {
+  local $TODO = "probably wrong function called";
+  pir_output_like(<<'CODE', <<'OUTPUT', "func() namespace resolution");
+
+.sub main @MAIN
+    print "calling foo\n"
+    foo()
+    print "calling Foo::foo\n"
+    $P0 = find_global "Foo", "foo"
+    $P0()
+    print "calling baz\n"
+    baz()
+.end
+
+.sub foo
+    print "  foo\n"
+    bar()
+.end
+
+.sub bar
+    print "  bar\n"
+.end
+
+.sub fie
+    print "  fie\n"
+.end
+
+.namespace ["Foo"]
+
+.sub foo
+    print "  Foo::foo\n"
+    bar()
+    fie()
+.end
+
+.sub bar
+    print "  Foo::bar\n"
+.end
+
+.sub baz
+    print "  Foo::baz\n"
+.end
+CODE
+/calling foo
+  foo
+  bar
+calling Foo::foo
+  Foo::foo
+  Foo::bar
+fie.*not found/
+OUTPUT
+}
