@@ -940,7 +940,7 @@ Parrot_allocate(struct Parrot_Interp *interpreter, void *buffer, size_t size)
     ((Buffer *)buffer)->buflen = 0;
     ((Buffer *)buffer)->bufstart = NULL;
     ((Buffer *)buffer)->bufstart = mem_allocate(interpreter, &req_size);
-    ((Buffer *)buffer)->buflen = size;
+    ((Buffer *)buffer)->buflen = req_size;
     return buffer;
 }
 
