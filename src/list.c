@@ -187,6 +187,10 @@ allocate_chunk(Interp *interpreter, List *list, UINTVAL items, UINTVAL size)
     Parrot_block_GC(interpreter);
     chunk = (List_chunk *)new_bufferlike_header(interpreter, sizeof(*chunk));
     chunk->items = items;
+    chunk->n_chunks = 0;
+    chunk->n_items  = 0;
+    chunk->next     = NULL;
+    chunk->prev     = NULL;
     Parrot_allocate_zeroed(interpreter, (Buffer *)chunk, size);
     Parrot_unblock_DOD(interpreter);
     Parrot_unblock_GC(interpreter);
