@@ -774,6 +774,35 @@ string_to_num(const STRING *s)
     return f;
 }
 
+STRING *
+string_from_int(struct Parrot_Interp * interpreter, INTVAL i) {
+    const char * digits = "0123456789";
+    char buf[128];
+    char *ptr = &buf[127];
+    int neg = 0;
+
+    if(i < 0) {
+        neg = 1;
+        i = abs(i);
+    }
+
+    /* Dangerous looking but no 32/64/128/.... bit int
+     * would approach 128 characters in the buffer.
+     */
+    do {
+        *--ptr = digits[i % 10];
+        i /= 10;
+    }
+    while(i);
+
+    if(neg)
+        *--ptr = '-';
+
+    return string_make(interpreter, ptr, (UINTVAL)(127 - (ptr - buf)),
+                            NULL, 0, NULL);
+}
+
+
 /*
  * Local variables:
  * c-indentation-style: bsd

@@ -540,6 +540,11 @@ inline op set(out STR, in STR) {
   goto NEXT();
 }
 
+inline op set(out STR, in INT) {
+  $1 = string_from_int(interpreter, $2);
+  goto NEXT();
+}
+
 inline op set(out PMC, in INT) { 
   $1->vtable->set_integer_native(interpreter, $1, $2);
   goto NEXT();
