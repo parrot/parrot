@@ -37,8 +37,8 @@ struct PackFile_Header {
     unsigned char pad[10];
     /* Start words/opcodes on 16-byte boundary */
     opcode_t magic;
-    opcode_t opcodetype; 
-    opcode_t fixup_ss;  
+    opcode_t opcodetype;
+    opcode_t fixup_ss;
     opcode_t const_ss;
     opcode_t bytecode_ss;
 };
@@ -97,18 +97,22 @@ opcode_t PackFile_unpack(struct Parrot_Interp *interpreter,
                          struct PackFile *self, opcode_t *packed,
                          size_t packed_size);
 
+/* fingerprint functions */
+int PackFile_check_fingerprint (void *cursor);
+size_t PackFile_write_fingerprint (void *cursor);
+
 /*
 ** PackFile_FixupTable Functions:
 */
 
 void PackFile_FixupTable_clear(struct PackFile_FixupTable * self);
 
-INTVAL PackFile_FixupTable_unpack(struct PackFile_FixupTable * self, 
+INTVAL PackFile_FixupTable_unpack(struct PackFile_FixupTable * self,
                                   opcode_t * packed, opcode_t packed_size);
 
 opcode_t PackFile_FixupTable_pack_size(struct PackFile_FixupTable * self);
 
-void PackFile_FixupTable_pack(struct PackFile_FixupTable * self, 
+void PackFile_FixupTable_pack(struct PackFile_FixupTable * self,
                               opcode_t * packed);
 
 /*
@@ -136,7 +140,7 @@ struct PackFile_Constant *PackFile_Constant_new(void);
 
 opcode_t PackFile_Constant_pack_size(struct PackFile_Constant * self);
 
-void PackFile_Constant_pack(struct PackFile_Constant * self, 
+void PackFile_Constant_pack(struct PackFile_Constant * self,
                             opcode_t * packed);
 
 void PackFile_Constant_destroy(struct PackFile_Constant * self);
