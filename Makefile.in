@@ -20,7 +20,7 @@ INC=include/parrot
 #
 ###############################################################################
 
-GEN_MAKEFILES = Makefile classes/Makefile languages/Makefile \
+GEN_MAKEFILES = Makefile classes/Makefile languages/Makefile docs/Makefile \
 languages/jako/Makefile languages/miniperl/Makefile languages/scheme/Makefile
 
 GEN_CONFIGS  = include/parrot/config.h include/parrot/platform.h Parrot/Config.pm \
