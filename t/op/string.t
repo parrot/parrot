@@ -1,6 +1,6 @@
 #! perl -w
 
-use Parrot::Test tests => 82;
+use Parrot::Test tests => 83;
 use Test::More;
 
 output_is( <<'CODE', <<OUTPUT, "set_s_s|sc" );
@@ -1140,6 +1140,15 @@ CODE
 -1
 OUTPUT
 
+output_is(<<'CODE',<<OUTPUT,"string to num");
+    set N0, 80.43 
+    set S0, N0
+    print S0
+    print "\n"
+    end
+CODE
+80.430000
+OUTPUT
 
 # Set all string registers to values given by &$_[0](reg num)
 sub set_str_regs {

@@ -624,7 +624,7 @@ inline op set(out STR, in INT) {
 }
 
 inline op set(out STR, in NUM) {
-  $1 = Parrot_sprintf_c(interpreter, "%f", $2);
+  $1 = string_from_num(interpreter, $2);
   goto NEXT();
 }
 
