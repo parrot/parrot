@@ -5,7 +5,8 @@
 # This allows a single bignum test to be run directly through the C
 # library.  Usage available by getting the args wrong.
 
-use Inline C => Config => CCFLAGS => '-I/usr/home/alex/perl6/parrot/types';
+use lib "../lib";
+use Inline C => Config => CCFLAGS => '-I.';
 use Inline C => <<'END_OF_C_SECTION';
 #include "bignum.c"
 
@@ -40,7 +41,7 @@ int runtest (char* lef, char *rih, int oper, int prec, int round, int extended) 
   two = BN_from_string(rih, &context);
 
   result = BN_new(1);
-  
+
   switch (oper) {
   case 1 : BN_add(result, one, two, &context);
     break;
@@ -64,7 +65,7 @@ int runtest (char* lef, char *rih, int oper, int prec, int round, int extended) 
     break;
   case 11: BN_power(result, one, two, &context);
     break;
-    
+
   default : printf("No operation of type %i\n", oper);
     exit(0);
   }
