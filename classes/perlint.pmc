@@ -575,10 +575,16 @@ the result in C<*dest>.
 
 */
     void bitwise_xor (PMC* value, PMC* dest) {
+MMD_PerlInt: {
+        VTABLE_set_integer_native(INTERP, dest,
+            PMC_int_val(SELF) ^ PMC_int_val(value));
+             }
+MMD_DEFAULT: {
         VTABLE_set_integer_native(INTERP, dest,
             PMC_int_val(SELF) ^
             VTABLE_get_integer(INTERP, value)
         );
+             }
     }
 
 /*

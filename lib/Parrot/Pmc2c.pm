@@ -21,6 +21,7 @@ file) is used by F<classes/pmc2c2.pl> to generate C code from PMC files.
 =cut
 
 package Parrot::Pmc2c;
+use strict;
 use vars qw(@EXPORT_OK @writes %writes );
 
 use base qw( Exporter );
@@ -30,6 +31,8 @@ BEGIN {
     @writes = qw(STORE PUSH POP SHIFT UNSHIFT DELETE);
     @writes{@writes} = (1) x @writes;
 };
+
+use Text::Balanced 'extract_bracketed';
 
 =item C<does_write($method, $section)>
 
@@ -420,8 +423,34 @@ EOC
     $body =~ s/^\t/        /mg;
     $body =~ s/^[ ]{4}//mg;
     my $super = $self->{super}{$meth};
-    $cout .= rewrite_method($classname, $meth, $super, $self->{super},
-    $body);
+    my $total_body = rewrite_method($classname, $meth, $super,
+                      $self->{super}, $body);
+    # now split into MMD if necessary:
+    my $additional_bodies= '';
+    $total_body = substr $total_body, 1, -1;
+    my $standard_body = $total_body;
+    while ($total_body =~ s/\bMMD_(\w+):\s*//) {
+        my $right_type = $1;
+        my $body_part = extract_bracketed($total_body, '{');
+        $body_part = substr($body_part, 1, -1);
+        if ($right_type eq 'DEFAULT') {
+            $standard_body = $body_part
+        }
+        else {
+            my $sub_meth_decl = $self->decl($classname, $method);
+            $sub_meth_decl =~ /(\w+)\(/;
+            my $sub_meth_name = $1;
+            my $sub_meth = "static " . $sub_meth_decl;
+            $sub_meth =~ s/\(/_$right_type(/;
+            $additional_bodies .= $sub_meth;
+            $additional_bodies .= "{$body_part\n}";
+            push @{ $self->{mmd_variants}{$meth} },
+                [ $right_type, $sub_meth_name ];
+        }
+
+    }
+    $cout .= "{$standard_body\n}\n";
+    $cout .= $additional_bodies;
     $cout .= "\n\n";
 }
 
@@ -510,6 +539,12 @@ sub init_func() {
             $left = "enum_class_$classname";
             $right = 0;
             push @mmds, [ $func, $left, $right, $meth_name ];
+            foreach my $variant (@{ $self->{mmd_variants}{$meth} }) {
+                $right = "enum_class_$variant->[0]";
+                $meth_name = $variant->[1] . '_' .$variant->[0];
+                push @mmds, [ $func, $left, $right, $meth_name];
+            }
+
         }
     }
     my $methlist = join(",\n        ", @meths);
