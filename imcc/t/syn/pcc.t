@@ -1,6 +1,6 @@
 #!perl
 use strict;
-use TestCompiler tests => 27;
+use TestCompiler tests => 28;
 
 ##############################
 # Parrot Calling Conventions
@@ -1140,3 +1140,36 @@ ok 12
 last
 OUT
 
+output_is(<<'CODE', <<'OUT', ".flatten_arg multiple instances");
+.pcc_sub _main prototyped
+    .local Sub sub
+    newsub sub, .Sub, _sub
+    .local var ar
+    ar = new PerlArray
+    push ar, "ok 1\n"
+    push ar, "ok 2\n"
+    .pcc_begin non_prototyped
+    .flatten_arg ar
+    .pcc_call sub
+    ret:
+    .pcc_end
+    .pcc_begin non_prototyped
+    .flatten_arg ar
+    .pcc_call sub
+    ret2:
+    .pcc_end
+    end
+.end
+.pcc_sub _sub non_prototyped
+    .param var a
+    .param var b
+    print a
+    print b
+    end
+.end
+CODE
+ok 1
+ok 2
+ok 1
+ok 2
+OUT
