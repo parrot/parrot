@@ -25,8 +25,9 @@ Interprets a Parrot ByteCode file.
 C<test_parrot> has two alternate modes of operation: prederef mode
 (C<test_parrot -P>) and jit mode (C<test_parrot -j>).
 
-Jit mode works for the mops.pasm test, but doesn't work for many other
-things. The reason why is unknown.
+Jit mode works for any program that doesn't use the stack ops.
+That's because we use fixed address for registers, this problem will
+be solved soon.
 
 Prederef mode only works as a shared library. For example, on most
 Unix platforms:
