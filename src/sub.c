@@ -256,7 +256,10 @@ scratchpad_store(struct Parrot_Interp * interp, PMC * pad,
     if (name) {
         /* use name to find lex and position */
         lex = scratchpad_find(interp, pad, name, &position);
-        if (!lex) internal_exception(-1, "Lexical not found");
+        if (!lex)
+            internal_exception(-1, "Lexical '%s' not found",
+                               (name == NULL) ? "???"
+                               : string_to_cstring(interp, name));
     }
     else {
         /* assume current lexical pad */
@@ -300,7 +303,10 @@ scratchpad_get(struct Parrot_Interp * interp, PMC * pad, STRING * name,
     if (name) lex = scratchpad_find(interp, pad, name, &position);
     else lex = scratchpad_index(interp, pad, -1);
 
-    if (!lex) internal_exception(-1, "Lexical not found");
+    if (!lex)
+        internal_exception(-1, "Lexical '%s' not found",
+                           (name == NULL) ? "???"
+                           : string_to_cstring(interp, name));
 
     return *(PMC **)list_get(interp, lex->values, position, enum_type_PMC);
 }
@@ -316,7 +322,9 @@ scratchpad_get_index(struct Parrot_Interp * interp, PMC * pad,
     }
 
     if (!lex || position < 0 || position >= list_length(interp, lex->values)) {
-        internal_exception(-1, "Lexical not found");
+        internal_exception(-1, "Lexical '%s' not found",
+                           (name == NULL) ? "???"
+                           : string_to_cstring(interp, name));
     }
 
     return *(PMC **)list_get(interp, lex->values, position, enum_type_PMC);
