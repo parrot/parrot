@@ -203,6 +203,10 @@ Instruction * IMCC_create_itcall_label(Interp *);
 void IMCC_itcall_sub(Interp* interpreter, SymReg* sub);
 
 STRING * IMCC_string_from_reg(Interp *interpreter, SymReg *r);
+Instruction * IMCC_subst_constants_umix(Interp *, IMC_Unit * unit, char *name,
+        SymReg **r, int n);
+Instruction * IMCC_subst_constants(Interp *, IMC_Unit * unit, char *name,
+        SymReg **r, int n, int *op);
 
 #endif /* PARROT_IMCC_IMC_H_GUARD */
 

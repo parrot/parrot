@@ -55,9 +55,6 @@ static int unused_label(Interp *interpreter, IMC_Unit *);
 static int dead_code_remove(Interp *interpreter, IMC_Unit *);
 
 static void strength_reduce(Interp *interpreter, IMC_Unit *);
-static void subst_constants_mix(Interp *interpreter, IMC_Unit *);
-static void subst_constants_umix(Interp *interpreter, IMC_Unit *);
-static void subst_constants(Interp *interpreter, IMC_Unit *);
 
 static int constant_propagation(Interp *interpreter, IMC_Unit *);
 static int used_once(Interp *, IMC_Unit *);
@@ -71,9 +68,6 @@ pre_optimize(Interp *interpreter, IMC_Unit * unit)
 {
     info(interpreter, 2, "pre_optimize\n");
     /* TODO integrate all in one pass */
-    subst_constants_mix(interpreter, unit);
-    subst_constants_umix(interpreter, unit);
-    subst_constants(interpreter, unit);
     strength_reduce(interpreter, unit);
     if (!dont_optimize)
         if_branch(interpreter, unit);
@@ -382,81 +376,37 @@ next_constant:;
 
 
 /*
- * rewrite e.g. add_n_nc_ic => add_n_nc_nc
- */
-static void
-subst_constants_mix(Interp *interpreter, IMC_Unit * unit)
-{
-    Instruction *ins, *tmp;
-    const char *ops[] = {
-        "add", "sub", "mul", "div", "fdiv", "pow"
-    };
-    size_t i;
-    char b[128];
-    SymReg *r;
-
-    info(interpreter, 2, "\tsubst_constants_mix\n");
-    for (ins = unit->instructions; ins; ins = ins->next) {
-        for (i = 0; i < sizeof(ops)/sizeof(ops[0]); i++) {
-            /* TODO compare ins->opnum with a list of instructions
-             * containing add_n_nc_ic, ...
-             */
-            if (!strcmp(ins->op, ops[i]) && ins->opsize == 4 &&
-                    ins->r[1]->type == VTCONST &&
-                    ins->r[1]->set == 'N' &&
-                    ins->r[2]->type == VTCONST &&
-                    ins->r[2]->set == 'I') {
-                debug(interpreter, DEBUG_OPT1, "opt1 %I => ", ins);
-                strcpy(b, ins->r[2]->name);
-                r = mk_const(str_dup(b), 'N');
-                --ins->r[2]->use_count;
-                ins->r[2] = r;
-                tmp = INS(interpreter, unit, ins->op, "", ins->r, 3, 0, 0);
-                debug(interpreter, DEBUG_OPT1, "%I\n", tmp);
-                subst_ins(unit, ins, tmp, 1);
-                ins = tmp;
-            }
-        }
-    }
-}
-
-/*
  * rewrite e.g. add_n_ic => add_n_nc
  */
-static void
-subst_constants_umix(Interp *interpreter, IMC_Unit * unit)
+Instruction *
+IMCC_subst_constants_umix(Interp *interpreter, IMC_Unit * unit, char *name,
+        SymReg **r, int n)
 {
-    Instruction *ins, *tmp;
+    Instruction *tmp;
     const char *ops[] = {
-        "add", "div", "mul", "sub", "fdiv"
+        "abs", "add", "div", "mul", "sub", "fdiv"
     };
     size_t i;
     char b[128];
-    SymReg *r;
 
-    info(interpreter, 2, "\tsubst_constants_umix\n");
-    for (ins = unit->instructions; ins; ins = ins->next) {
-        for (i = 0; i < sizeof(ops)/sizeof(ops[0]); i++) {
-            /* TODO compare ins->opnum with a list of instructions
-             * containing add_n_ic, ...
-             */
-            if (ins->opsize == 3 &&
-                    ins->r[0]->set == 'N' &&
-                    ins->r[1]->type == VTCONST &&
-                    ins->r[1]->set == 'I' &&
-                    !strcmp(ins->op, ops[i])) {
-                debug(interpreter, DEBUG_OPT1, "opt1 %I => ", ins);
-                strcpy(b, ins->r[1]->name);
-                r = mk_const(str_dup(b), 'N');
-                --ins->r[1]->use_count;
-                ins->r[1] = r;
-                tmp = INS(interpreter, unit, ins->op, "", ins->r, 2, 0, 0);
-                debug(interpreter, DEBUG_OPT1, "%I\n", tmp);
-                subst_ins(unit, ins, tmp, 1);
-                ins = tmp;
-            }
+    tmp = NULL;
+    for (i = 0; i < sizeof(ops)/sizeof(ops[0]); i++) {
+        /* TODO compare ins->opnum with a list of opcodes
+         * containing add_n_ic, ...
+         */
+        if (n == 3 &&
+                r[0]->set == 'N' &&
+                r[1]->type == VTCONST &&
+                r[1]->set == 'I' &&
+                !strcmp(name, ops[i])) {
+            debug(interpreter, DEBUG_OPT1, "opt1 %s_nc_ic => ", name);
+            strcpy(b, r[1]->name);
+            r[1] = mk_const(str_dup(b), 'N');
+            tmp = INS(interpreter, unit, name, "", r, 2, -1, 0);
+            debug(interpreter, DEBUG_OPT1, "%I\n", tmp);
         }
     }
+    return tmp;
 }
 
 /*
@@ -465,30 +415,14 @@ subst_constants_umix(Interp *interpreter, IMC_Unit * unit)
  * core evaluates the constants
  */
 static int
-eval_ins(Interp *interpreter, Instruction *ins, size_t ops)
+eval_ins(Interp *interpreter, char *op, size_t ops, SymReg **r)
 {
     opcode_t eval[4], *pc;
-    char op[20];
     int opnum;
     int i;
     STRING *s;
     op_info_t *op_info;
 
-    /*
-     * create instruction e.g. add_i_ic_ic => add_i_i_i
-     *                    or   if_ic_ic    => if_i_ic
-     */
-    if (ops == 4)
-        sprintf(op, "%s_%c_%c_%c", ins->op, tolower(ins->r[0]->set),
-                tolower(ins->r[1]->set), tolower(ins->r[2]->set));
-    else if (ops == 3)
-        sprintf(op, "%s_%c_%c", ins->op, tolower(ins->r[0]->set),
-                tolower(ins->r[1]->set));
-    else  if (ops == 2) /* e.g. eq_n_n_ic */
-        sprintf(op, "%s_%c_%c_ic", ins->op, tolower(ins->r[0]->set),
-                tolower(ins->r[1]->set));
-    else        /* if_x_ic */
-        sprintf(op, "%s_%c_ic", ins->op, tolower(ins->r[0]->set));
     opnum = interpreter->op_lib->op_code(op, 1);
     if (opnum < 0)
         fatal(1, "eval_ins", "op '%s' not found\n", op);
@@ -509,20 +443,20 @@ eval_ins(Interp *interpreter, Instruction *ins, size_t ops)
             case PARROT_ARG_S:
                 eval[i] = i - 1;        /* regs used are I0, I1, I2 */
                 if (ops <= 2 || i > 1) { /* fill source regs */
-                    switch (ins->r[i-1]->set) {
+                    switch (r[i-1]->set) {
                         case 'I':
                             REG_INT(i-1) =
-                                (INTVAL)strtol(ins->r[i-1]->name, 0, 10);
+                                (INTVAL)strtol(r[i-1]->name, 0, 10);
                             break;
                         case 'N':
                             s = string_from_cstring(interpreter,
-                                    ins->r[i-1]->name, 0);
+                                    r[i-1]->name, 0);
                             REG_NUM(i-1) =
                                 string_to_num(interpreter, s);
                             break;
                         case 'S':
                             REG_STR(i-1) =
-                                IMCC_string_from_reg(interpreter, ins->r[i-1]);
+                                IMCC_string_from_reg(interpreter, r[i-1]);
                             break;
                     }
                 }
@@ -548,13 +482,16 @@ eval_ins(Interp *interpreter, Instruction *ins, size_t ops)
  *              eq_ic_ic_ic => branch_ic / delete
  *              if_ic_ic    => branch_ic / delete
  */
-static void
-subst_constants(Interp *interpreter, IMC_Unit * unit)
+
+Instruction *
+IMCC_subst_constants(Interp *interpreter, IMC_Unit * unit, char *name,
+        SymReg **r, int n, int *ok)
 {
-    Instruction *ins, *tmp;
+    Instruction *tmp;
     const char *ops[] = {
-        "add", "sub", "mul", "div", "fdiv", "cmod", "mod", "pow", "atan"
-        "shr", "srl", "lsr",
+        "add", "sub", "mul", "div", "fdiv", "pow",
+        "cmod", "mod", "atan"
+            "shr", "srl", "lsr",
         "band", "bor", "bxor",
         "and", "or", "xor",
         "iseq", "isne", "islt", "isle", "isgt", "isge", "cmp"
@@ -572,19 +509,12 @@ subst_constants(Interp *interpreter, IMC_Unit * unit)
     };
 
     size_t i;
-    char b[128], fmt[64];
-    SymReg *r;
+    char b[128], fmt[64], op[20];
+    const char *debug_fmt;
     int found, branched;
     struct parrot_regs_t *bp;
     Stack_Chunk_t *stack_p, *reg_stack;
 
-    info(interpreter, 2, "\tsubst_constants\n");
-
-    /* preserve registers */
-    bp = interpreter->ctx.bp;
-    reg_stack = interpreter->ctx.reg_stack;
-    interpreter->ctx.bp = new_register_frame(interpreter,
-                &interpreter->ctx.reg_stack);
 
     /* construct a FLOATVAL_FMT with needed precision */
     switch (NUMVAL_SIZE) {
@@ -601,113 +531,124 @@ subst_constants(Interp *interpreter, IMC_Unit * unit)
             break;
     }
 
-    for (ins = unit->instructions; ins; ins = ins->next) {
-        found = 0;
-        for (i = 0; i < sizeof(ops)/sizeof(ops[0]); i++) {
-            /* TODO compare ins->opnum with a list of opcodes
-             * containing add_i_ic_ic, add_n_nc_nc ...
-             */
-            if (ins->opsize == 4 &&
-                    ins->r[1]->type == VTCONST &&
-                    ins->r[2]->type == VTCONST &&
-                    !strcmp(ins->op, ops[i])) {
-                found = 4;
-                break;
-            }
-        }
-        for (i = 0; !found && i < sizeof(ops2)/sizeof(ops2[0]); i++) {
-            /*
-             * abs_i_ic ...
-             */
-            if (ins->opsize == 3 &&
-                    ins->r[1]->type == VTCONST &&
-                    !strcmp(ins->op, ops2[i])) {
-                found = 3;
-                break;
-            }
-        }
-        for (i = 0; !found && i < sizeof(ops3)/sizeof(ops3[0]); i++) {
-            /*
-             * eq_xc_xc_labelc ...
-             */
-            if (ins->opsize == 4 &&
-                    ins->r[0]->type == VTCONST &&
-                    ins->r[1]->type == VTCONST &&
-                    !strcmp(ins->op, ops3[i])) {
-                found = 2;
-                break;
-            }
-        }
-        for (i = 0; !found && i < sizeof(ops4)/sizeof(ops4[0]); i++) {
-            /*
-             * if_xc_labelc, unless
-             */
-            if (ins->opsize == 3 &&
-                    ins->r[0]->type == VTCONST &&
-                    !strcmp(ins->op, ops4[i])) {
-                found = 1;
-                break;
-            }
-        }
-
-        if (!found)
-            continue;
-        debug(interpreter, DEBUG_OPT1, "opt1 %I => ", ins);
-        /* we construct a parrot instruction
-         * here and let parrot do the calculation in a
-         * separate context and make a constant
-         * from the result
+    tmp = NULL;
+    found = 0;
+    for (i = 0; i < sizeof(ops)/sizeof(ops[0]); i++) {
+        /* TODO compare ins->opnum with a list of opcodes
+         * containing add_i_ic_ic, add_n_nc_nc ...
          */
-        branched = eval_ins(interpreter, ins, found);
-        /*
-         * for math ops result is in I0/N0
-         * if it was a branch with constant args, the result is
-         * the return value
-         */
-        if (found <= 2) {
+        if (n == 4 &&
+                r[1]->type == VTCONST &&
+                r[2]->type == VTCONST &&
+                !strcmp(name, ops[i])) {
+            found = 4;
             /*
-             * emit a branch or delete instruction
+             * create instruction e.g. add_i_ic_ic => add_i_i_i
              */
-            if (branched) {
-                --ins->r[0]->use_count;
-                if (found == 2)
-                    --ins->r[1]->use_count;
-                ins->r[0] = ins->r[found];
-                tmp = INS(interpreter, unit, "branch", "", ins->r,
-                        1, 0, 0);
-            }
-            else {
-                debug(interpreter, DEBUG_OPT1, "deleted\n");
-                ins = delete_ins(unit, ins, 1);
-                ins = ins->prev ? ins->prev : unit->instructions;
-                tmp = NULL;
-            }
-        }
-        else {
-            /*
-             * emit set x, constant
-             */
-            switch (ins->r[0]->set) {
-                case 'I':
-                    sprintf(b, INTVAL_FMT, REG_INT(0));
-                    break;
-                case 'N':
-                    sprintf(b, fmt, REG_NUM(0));
-                    break;
-            }
-            r = mk_const(str_dup(b), ins->r[0]->set);
-            --ins->r[1]->use_count;
-            if (ins->opsize == 4)
-                --ins->r[2]->use_count;
-            ins->r[1] = r;
-            tmp = INS(interpreter, unit, "set", "", ins->r, 2, 0, 0);
-        }
-        if (tmp) {
-            debug(interpreter, DEBUG_OPT1, "%I\n", tmp);
-            subst_ins(unit, ins, tmp, 1);
-            ins = tmp;
+            sprintf(op, "%s_%c_%c_%c", name, tolower(r[0]->set),
+                    tolower(r[1]->set), tolower(r[2]->set));
+            debug_fmt = "opt %s_x_xc_xc => ";
+            break;
         }
     }
+    for (i = 0; !found && i < sizeof(ops2)/sizeof(ops2[0]); i++) {
+        /*
+         * abs_i_ic ...
+         */
+        if (n == 3 &&
+                r[1]->type == VTCONST &&
+                !strcmp(name, ops2[i])) {
+            found = 3;
+            sprintf(op, "%s_%c_%c", name, tolower(r[0]->set),
+                    tolower(r[1]->set));
+            debug_fmt = "opt %s_x_xc => ";
+            break;
+        }
+    }
+    for (i = 0; !found && i < sizeof(ops3)/sizeof(ops3[0]); i++) {
+        /*
+         * eq_xc_xc_labelc ...
+         */
+        if (n == 4 &&
+                r[0]->type == VTCONST &&
+                r[1]->type == VTCONST &&
+                !strcmp(name, ops3[i])) {
+            found = 2;
+            sprintf(op, "%s_%c_%c_ic", name, tolower(r[0]->set),
+                    tolower(r[1]->set));
+            debug_fmt = "opt %s_xc_xc_ic => ";
+            break;
+        }
+    }
+    for (i = 0; !found && i < sizeof(ops4)/sizeof(ops4[0]); i++) {
+        /*
+         * if_xc_labelc, unless
+         */
+        if (n == 3 &&
+                r[0]->type == VTCONST &&
+                !strcmp(name, ops4[i])) {
+            found = 1;
+            sprintf(op, "%s_%c_ic", name, tolower(r[0]->set));
+            debug_fmt = "opt %s_xc_ic => ";
+            break;
+        }
+    }
+
+    if (!found) {
+        *ok = 0;
+        return NULL;
+    }
+    /* preserve registers */
+    bp = interpreter->ctx.bp;
+    reg_stack = interpreter->ctx.reg_stack;
+    interpreter->ctx.bp = new_register_frame(interpreter,
+            &interpreter->ctx.reg_stack);
+
+    debug(interpreter, DEBUG_OPT1, debug_fmt, name);
+    /* we construct a parrot instruction
+     * here and let parrot do the calculation in a
+     * separate context and make a constant
+     * from the result
+     */
+    branched = eval_ins(interpreter, op, found, r);
+    /*
+     * for math ops result is in I0/N0
+     * if it was a branch with constant args, the result is
+     * the return value
+     */
+    if (found <= 2) {
+        /*
+         * create a branch or delete instruction
+         */
+        if (branched) {
+            r[0] = r[found];
+            tmp = INS(interpreter, unit, "branch", "", r,
+                    1, -1, 0);
+        }
+        else {
+            debug(interpreter, DEBUG_OPT1, "deleted\n");
+        }
+    }
+    else {
+        /*
+         * create set x, constant
+         */
+        switch (r[0]->set) {
+            case 'I':
+                sprintf(b, INTVAL_FMT, REG_INT(0));
+                break;
+            case 'N':
+                sprintf(b, fmt, REG_NUM(0));
+                break;
+        }
+        r[1] = mk_const(str_dup(b), r[0]->set);
+        tmp = INS(interpreter, unit, "set", "", r,
+                    2, -1, 0);
+    }
+    if (tmp) {
+        debug(interpreter, DEBUG_OPT1, "%I\n", tmp);
+    }
+    *ok = 1;
     /*
      * restore and recycle register frame
      */
@@ -715,6 +656,7 @@ subst_constants(Interp *interpreter, IMC_Unit * unit)
     interpreter->ctx.bp = bp;
     interpreter->ctx.reg_stack = reg_stack;
     add_to_fp_cache(interpreter, stack_p);
+    return tmp;
 }
 
 

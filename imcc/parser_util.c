@@ -284,140 +284,173 @@ INS(Interp *interpreter, IMC_Unit * unit, char *name,
     int dirs = 0;
     int op;
     Instruction * ins;
+    op_info_t * op_info;
+    char format[128];
+    int len;
 
 #if 1
+    if (keyvec >= 0) {  /* XXX see below */
     ins = multi_keyed(interpreter, unit, name, r, n, keyvec, emit);
     if (ins)
         return ins;
+    }
 #endif
-    op_fullname(fullname, name, r, n, keyvec);
+    if (keyvec == -1)
+        op_fullname(fullname, name, r, n, 0);   /* XXX */
+    else
+        op_fullname(fullname, name, r, n, keyvec);
     op = interpreter->op_lib->op_code(fullname, 1);
     if (op < 0)         /* maybe we got a fullname */
         op = interpreter->op_lib->op_code(name, 1);
     if (op < 0)         /* still wrong, try to find an existing op */
         op = try_find_op(interpreter, unit, name, r, n, keyvec, emit);
+    /*
+     * XXX the opcodes still exists, so the op number is >= 0
+     *     but we want to replace the ops and sub_constants is using
+     *     INS which gives nice recursion.
+     *     If coming from subst_constants keyvec := -1 therefore
+     * XXX
+     */
+    if (keyvec == -1)
+        keyvec = 0;
+    else
+
+    if (1 || op < 0) {
+        int ok;
+        /* check mixed constants */
+        ins = IMCC_subst_constants_umix(interpreter, unit, name, r, n + 1);
+        if (ins)
+            goto found_ins;
+        /* and finally multiple constants */
+        ins = IMCC_subst_constants(interpreter, unit, name, r, n + 1, &ok);
+        if (ok) {
+            if (ins)
+                goto found_ins;
+            else
+                return NULL;
+        }
+        if (op < 0)
+            strcpy(fullname, name);
+    }
     else
         strcpy(fullname, name);
-    if (op >= 0) {
-        op_info_t * op_info = &interpreter->op_info_table[op];
-        char format[128];
-        int len;
-
-        *format = '\0';
-        /* info->arg_count is offset by one, first is opcode
-         * build instruction format
-         * set LV_in / out flags */
-        if (n != op_info->arg_count-1)
-            fataly(EX_SOFTWARE, sourcefile, line,
-                    "arg count mismatch: op #%d '%s' needs %d given %d",
-                    op, fullname, op_info->arg_count-1, n);
-        for (i = 0; i < op_info->arg_count-1; i++) {
-            switch (op_info->dirs[i+1]) {
-                case PARROT_ARGDIR_INOUT:
-                    dirs |= 1 << (16 + i);
-                    /* go on */
-                case PARROT_ARGDIR_IN:
-                    dirs |= 1 << i ;
-                    break;
-
-                case PARROT_ARGDIR_OUT:
-                    dirs |= 1 << (16 + i);
-                    break;
-
-                default:
-                    assert(0);
-            };
-            if (keyvec & KEY_BIT(i)) {
-                len = strlen(format);
-                len -= 2;
-                format[len] = '\0';
-                strcat(format, "[%s], ");
-            }
-            else
-                strcat(format, "%s, ");
-        }
-        len = strlen(format);
-        if (len >= 2)
-            len -= 2;
-        format[len] = '\0';
-        if (fmt && *fmt)
-            strcpy(format, fmt);
-        memset(r + n, 0, sizeof(*r) * (IMCC_MAX_REGS - n));
-#if 1
-        debug(interpreter, DEBUG_PARSER,"%s %s\t%s\n", name, format, fullname);
-#endif
-        /* make the instruction */
-
-        ins = _mk_instruction(name, format, r, dirs);
-        ins->keys |= keyvec;
-        /* fill iin oplib's info */
-        ins->opnum = op;
-        ins->opsize = op_info->arg_count;
-        /* mark end as absolute branch */
-        if (!strcmp(name, "end")) {
-            ins->type |= ITBRANCH | IF_goto;
-        }
-        else if (!strcmp(name, "warningson")) {
-            /* emit a debug seg, if this op is seen */
-            PARROT_WARNINGS_on(interpreter, PARROT_WARNINGS_ALL_FLAG);
-        }
-        else if (!strcmp(name, "loadlib")) {
-            SymReg *r1 = r[1];   /* lib name */
-            STRING *lib;
-            if (r1->type == VTCONST) {
-                /*
-                 * XXX we should not read in dynamic PMC classes
-                 *     OTOH we have to load dynamic opcodes
-                 *     to get at the opcode information
-                 */
-                lib = string_from_cstring(interpreter, r1->name + 1,
-                        strlen(r1->name) - 2);
-                Parrot_load_lib(interpreter, lib, NULL);
-            }
-        }
-        else if (!memcmp(name, "invoke", 6) ||
-                !memcmp(name, "callmethod", 10)) {
-            if (cur_unit->type & IMC_PCCSUB)
-                cur_unit->instructions->r[1]->pcc_sub->calls_a_sub |= 1;
-        }
-        /* set up branch flags */
-        /*
-         * mark registers that are labels
-         */
-        for (i = 0; i < op_info->arg_count-1; i++) {
-            if (op_info->labels[i+1])
-                ins->type |= ITBRANCH | (1 << i);
-            else {
-                if (r[i]->type == VTADDRESS)
-                    fataly(EX_SOFTWARE, sourcefile, line,
-                            "undefined identifier '%s'\n", r[i]->name);
-            }
-        }
-        if (op_info->jump && op_info->jump != PARROT_JUMP_ENEXT) {
-            ins->type |= ITBRANCH;
-            if (!strcmp(name, "branch"))
-                ins->type |= IF_goto;
-            else if (!strcmp(fullname, "jump_i") ||
-                    !strcmp(fullname, "jsr_i") ||
-                    !strcmp(fullname, "branch_i") ||
-                    !strcmp(fullname, "bsr_i"))
-                dont_optimize = 1;
-        }
-        else if (!strcmp(name, "set") && n == 2) {
-            /* set Px, Py: both PMCs have the same address */
-            if (r[0]->set == r[1]->set &&
-                    (r[1]->type & VTREGISTER))
-                ins->type |= ITALIAS;
-        }
-        else if (!strcmp(name, "compile"))
-            ++has_compile;
-
-        if (emit)
-            emitb(unit, ins);
-    } else {
+    if (op < 0) {
         fataly(EX_SOFTWARE, sourcefile, line,"op not found '%s' (%s<%d>)\n",
                 fullname, name, n);
     }
+    op_info = &interpreter->op_info_table[op];
+
+    *format = '\0';
+    /* info->arg_count is offset by one, first is opcode
+     * build instruction format
+     * set LV_in / out flags */
+    if (n != op_info->arg_count-1)
+        fataly(EX_SOFTWARE, sourcefile, line,
+                "arg count mismatch: op #%d '%s' needs %d given %d",
+                op, fullname, op_info->arg_count-1, n);
+    for (i = 0; i < op_info->arg_count-1; i++) {
+        switch (op_info->dirs[i+1]) {
+            case PARROT_ARGDIR_INOUT:
+                dirs |= 1 << (16 + i);
+                /* go on */
+            case PARROT_ARGDIR_IN:
+                dirs |= 1 << i ;
+                break;
+
+            case PARROT_ARGDIR_OUT:
+                dirs |= 1 << (16 + i);
+                break;
+
+            default:
+                assert(0);
+        };
+        if (keyvec & KEY_BIT(i)) {
+            len = strlen(format);
+            len -= 2;
+            format[len] = '\0';
+            strcat(format, "[%s], ");
+        }
+        else
+            strcat(format, "%s, ");
+    }
+    len = strlen(format);
+    if (len >= 2)
+        len -= 2;
+    format[len] = '\0';
+    if (fmt && *fmt)
+        strcpy(format, fmt);
+    memset(r + n, 0, sizeof(*r) * (IMCC_MAX_REGS - n));
+#if 1
+    debug(interpreter, DEBUG_PARSER,"%s %s\t%s\n", name, format, fullname);
+#endif
+    /* make the instruction */
+
+    ins = _mk_instruction(name, format, r, dirs);
+    ins->keys |= keyvec;
+    /* fill iin oplib's info */
+    ins->opnum = op;
+    ins->opsize = op_info->arg_count;
+    /* mark end as absolute branch */
+    if (!strcmp(name, "end")) {
+        ins->type |= ITBRANCH | IF_goto;
+    }
+    else if (!strcmp(name, "warningson")) {
+        /* emit a debug seg, if this op is seen */
+        PARROT_WARNINGS_on(interpreter, PARROT_WARNINGS_ALL_FLAG);
+    }
+    else if (!strcmp(name, "loadlib")) {
+        SymReg *r1 = r[1];   /* lib name */
+        STRING *lib;
+        if (r1->type == VTCONST) {
+            /*
+             * XXX we should not read in dynamic PMC classes
+             *     OTOH we have to load dynamic opcodes
+             *     to get at the opcode information
+             */
+            lib = string_from_cstring(interpreter, r1->name + 1,
+                    strlen(r1->name) - 2);
+            Parrot_load_lib(interpreter, lib, NULL);
+        }
+    }
+    else if (!memcmp(name, "invoke", 6) ||
+            !memcmp(name, "callmethod", 10)) {
+        if (cur_unit->type & IMC_PCCSUB)
+            cur_unit->instructions->r[1]->pcc_sub->calls_a_sub |= 1;
+    }
+    /* set up branch flags */
+    /*
+     * mark registers that are labels
+     */
+    for (i = 0; i < op_info->arg_count-1; i++) {
+        if (op_info->labels[i+1])
+            ins->type |= ITBRANCH | (1 << i);
+        else {
+            if (r[i]->type == VTADDRESS)
+                fataly(EX_SOFTWARE, sourcefile, line,
+                        "undefined identifier '%s'\n", r[i]->name);
+        }
+    }
+    if (op_info->jump && op_info->jump != PARROT_JUMP_ENEXT) {
+        ins->type |= ITBRANCH;
+        if (!strcmp(name, "branch"))
+            ins->type |= IF_goto;
+        else if (!strcmp(fullname, "jump_i") ||
+                !strcmp(fullname, "jsr_i") ||
+                !strcmp(fullname, "branch_i") ||
+                !strcmp(fullname, "bsr_i"))
+            dont_optimize = 1;
+    }
+    else if (!strcmp(name, "set") && n == 2) {
+        /* set Px, Py: both PMCs have the same address */
+        if (r[0]->set == r[1]->set &&
+                (r[1]->type & VTREGISTER))
+            ins->type |= ITALIAS;
+    }
+    else if (!strcmp(name, "compile"))
+        ++has_compile;
+found_ins:
+    if (emit)
+        emitb(unit, ins);
     return ins;
 }
 
