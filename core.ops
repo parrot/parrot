@@ -3916,7 +3916,7 @@ this would be the this/self pointer.
 inline op loadext(in STR, in STR) {
   PMC * pmc;
   void * p;
-  void (*func)();
+  void (*func)(void);
   string_to_cstring(interpreter, ($2));
   string_to_cstring(interpreter, ($1));
   p = Parrot_dlopen($1->bufstart);
@@ -3925,7 +3925,7 @@ inline op loadext(in STR, in STR) {
      fprintf(stderr, "%s\n", err);
      PANIC("Failed to load native library");
   }
-  func = (void(*)())Parrot_dlsym(p, $2->bufstart);
+  func = Parrot_dlsym(p, $2->bufstart);
   if (NULL == func) {
     PANIC("Failed to find symbol in native library");
   }
