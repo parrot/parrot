@@ -6,7 +6,8 @@ use Test::More;
 output_is(<<'CODE', <<'OUTPUT', "multiarray creation");
 	new P1, .PerlArray
 	# intial size
-	set P1[0], 100
+	set P1[0], 0
+	set P1[1], 100
 	# dimensions
 	# XXX can this be done w/o push/append a key?
 	new P2, .Key
@@ -14,7 +15,8 @@ output_is(<<'CODE', <<'OUTPUT', "multiarray creation");
 	new P3, .Key
 	set P3, 5
 	push P2, P3
-	set P1[1], P2
+	set P1[2], 1
+	set P1[3], P2
 	new P0, .MultiArray, P1
 	print "ok\n"
 	end
@@ -25,14 +27,16 @@ OUTPUT
 output_is(<<'CODE', <<'OUTPUT', "multiarray access 2d");
 	new P1, .PerlArray
 	# intial size
-	set P1[0], 100
+	set P1[0], 0
+	set P1[1], 100
 	# dimensions
 	new P2, .Key
 	set P2, 10
 	new P3, .Key
 	set P3, 5
 	push P2, P3
-	set P1[1], P2
+	set P1[2], 1
+	set P1[3], P2
 	new P0, .MultiArray, P1
 	set P0, 200
 
@@ -79,7 +83,8 @@ OUTPUT
 output_is(<<'CODE', <<'OUTPUT', "multiarray access 3d");
 	new P1, .PerlArray
 	# intial size
-	set P1[0], 200
+	set P1[0], 0
+	set P1[1], 200
 	# dimensions
 	new P2, .Key
 	set P2, 10
@@ -89,7 +94,8 @@ output_is(<<'CODE', <<'OUTPUT', "multiarray access 3d");
 	new P3, .Key
 	set P3, 4
 	push P2, P3
-	set P1[1], P2
+	set P1[2], 1
+	set P1[3], P2
 	new P0, .MultiArray, P1
 	set P0, 200
 

@@ -548,7 +548,7 @@ ld(UINTVAL x)
 
 #else
     {
-        /* 
+        /*
          * Based on branch-free nlz algorithm in chapter 5 of Henry S. Warren
          * Jr's book "Hacker's Delight". */
 
@@ -642,7 +642,7 @@ get_chunk(Interp *interpreter, List *list, UINTVAL *idx)
         return chunk;
     }
 
-    /* else look at chunks flags, what grow type follows and adjust chunks and 
+    /* else look at chunks flags, what grow type follows and adjust chunks and
      * idx */
     for (i = 0, chunk = list->first; chunk;) {
         /* if we have no more items, we have found the chunk */
@@ -878,9 +878,6 @@ list_append(Interp *interpreter, List *list, void *item, int type, UINTVAL idx)
 
 /* public interface functions */
 
-/*
- * TODO pass grow policy additionally
- */
 List *
 list_new(Interp *interpreter, INTVAL type)
 {
@@ -921,33 +918,65 @@ list_new(Interp *interpreter, INTVAL type)
  * list_new_init uses these initializers:
  * 0 ... size (set initial size of list)
  * 1 ... array dimensions (multiarray)
+ * 2 ... type (overriding type parameter)
+ * 3 ... itemsize for type_size (N/Y)
+ *
+ * after getting these values out of the key/value pairs, a new
+ * array with this values is stored in user_data, where the keys
+ * are explicit.
  *
  */
 List *
 list_new_init(Interp *interpreter, INTVAL type, PMC *init)
 {
-    List *list = list_new(interpreter, type);
-    INTVAL i, len, size, key;
+    List *list;
+    PMC * user_array, *multi_key;
+    INTVAL i, len, size, key, val;
 
-    if (!init->vtable || init->vtable != Parrot_base_vtables +
-            enum_class_PerlArray)
+    if (!init->vtable ||
+            ((init->vtable->base_type != enum_class_PerlArray) &&
+             (init->vtable->base_type != enum_class_Array)))
         internal_exception(1, "Illegal initializer for init\n");
     len = init->vtable->elements(interpreter, init);
     if (len & 1)
         internal_exception(1, "Illegal initializer for init: odd elements\n");
     for (i = size = 0; i < len; i += 2) {
         key = init->vtable->get_integer_keyed_int(interpreter, init, &i);
-        if (key == 0) {
-            INTVAL val = i + 1;
-
-            size = init->vtable->get_integer_keyed_int(interpreter,
-                    init, &val);
-            break;
+        val = i + 1;
+        switch (key) {
+            case 0:
+                size = init->vtable->get_integer_keyed_int(interpreter,
+                        init, &val);
+                break;
+            case 1:
+                multi_key = init->vtable->get_pmc_keyed_int(interpreter,
+                        init, &val);
+                break;
+            case 2:
+                type = init->vtable->get_integer_keyed_int(interpreter,
+                        init, &val);
+                break;
+            /* case 3: reserved item_size */
         }
     }
+    list = list_new(interpreter, type);
     if (size)
         list_set_length(interpreter, list, size);
-    list->user_data = init;
+    /* make a private copy of init data */
+    user_array = pmc_new(interpreter, enum_class_Array);
+    /* set length */
+    user_array->vtable->set_integer_native(interpreter, user_array, 4);
+    /* store values */
+    key = 0;
+    user_array->vtable->set_integer_keyed_int(interpreter, user_array,
+            &key, size);
+    key = 1;
+    user_array->vtable->set_pmc_keyed_int(interpreter, user_array,
+            &key, multi_key, NULL);
+    key = 2;
+    user_array->vtable->set_integer_keyed_int(interpreter, user_array,
+            &key, type);
+    list->user_data = user_array;
     return list;
 }
 
