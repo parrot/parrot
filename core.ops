@@ -2292,7 +2292,8 @@ Save register or constant $1 onto the stack.
 =cut
 
 inline op save(in INT) {
-  stack_push(interpreter, interpreter->user_stack, &($1), STACK_ENTRY_INT, NULL);
+  INTVAL i = $1;
+  stack_push(interpreter, interpreter->user_stack, &i, STACK_ENTRY_INT, NULL);
   goto NEXT();
 }
 
