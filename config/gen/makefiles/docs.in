@@ -1,12 +1,37 @@
+# Copyright: 2001-2004 The Perl Foundation.  All Rights Reserved.
+# $Id$
+
+#
+# Setup of some commands
+#
+
 PERL = ${perl}
 RM_F = ${rm_f}
-
 # Make directory; do not die if dir exists.
 MKDIR = $(PERL) -e ${PQ}-d or mkdir $$_,0777 or die foreach @ARGV${PQ}
 
+# long list of .pod files
 POD = ${pod}
 
+#
+# Targets
+#
+
+# The default target
 all: doc-prep packfile-c.pod $(POD)
+
+# This is a listing of all targets, that are meant to be called by users
+# Most of them are proxied in the root makefile parrot/Makefile
+help :
+	@echo ""
+	@echo "Following targets are available to the user:"
+	@echo ""
+	@echo "  all:               Generate documentation from .pod files or from the sources."
+	@echo "                     This is the default target."
+	@echo "  clean:             Remove the generated documentation."
+	@echo "  html:              Generate HTML documentation."
+	@echo "  html-clean:        Remove the generated HTML documentation."
+	@echo ""
 
 doc-prep:
 	$(MKDIR) ops
@@ -22,5 +47,3 @@ html:
 
 html-clean:
 	$(PERL) -I../lib -MParrot::Distribution -e "Parrot::Distribution->new->delete_html_docs"
-
-
