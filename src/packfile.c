@@ -1857,7 +1857,7 @@ byte_code_destroy (struct PackFile_Segment *self)
     Parrot_destroy_jit(byte_code->jit_info);
 #endif
     if (byte_code->prederef.code) {
-        mem_sys_free(byte_code->prederef.code);
+        Parrot_free_memalign(byte_code->prederef.code);
 	byte_code->prederef.code = NULL;
         if (byte_code->prederef.branches) {
             mem_sys_free(byte_code->prederef.branches);
