@@ -17,7 +17,7 @@
 pmclass Coroutine extends Continuation {
 
     void init () {
-        PMC_data(SELF) = new_coroutine(INTERP);
+        PMC_sub(SELF) = new_coroutine(INTERP);
         SELF->cache.struct_val = NULL;
         PObj_custom_mark_destroy_SETALL(SELF);
         PObj_get_FLAGS(SELF) &= ~PObj_private0_FLAG;

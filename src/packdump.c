@@ -81,7 +81,7 @@ PackFile_Constant_dump(struct Parrot_Interp *interpreter,
                 case enum_class_Closure:
                 case enum_class_Continuation:
                 case enum_class_Coroutine:
-                    sub = (struct Parrot_Sub*) PMC_data(pmc);
+                    sub = (struct Parrot_Sub*) PMC_sub(pmc);
                     PIO_printf(interpreter,
                             "\tclass => %s, "
                             "start_offs => %d, "

@@ -17,18 +17,18 @@
 pmclass Sub {
 
    void init () {
-       PMC_data(SELF) = new_sub(INTERP, sizeof(struct Parrot_Sub));
+       PMC_sub(SELF) = new_sub(INTERP, sizeof(struct Parrot_Sub));
        SELF->cache.struct_val = NULL;
        PObj_custom_mark_destroy_SETALL(SELF);
    }
 
    void destroy () {
-       struct Parrot_Sub * sub = (struct Parrot_Sub *)PMC_data(SELF);
+       struct Parrot_Sub * sub = (struct Parrot_Sub *)PMC_sub(SELF);
        mem_sys_free(sub);
    }
 
    void mark () {
-        struct Parrot_Sub * sub = (struct Parrot_Sub *)PMC_data(SELF);
+        struct Parrot_Sub * sub = (struct Parrot_Sub *)PMC_sub(SELF);
         pobject_lives(INTERP, sub->ctx.warns);
    }
 
@@ -49,7 +49,7 @@ pmclass Sub {
    }
 
    void* invoke (void* next) {
-	struct Parrot_Sub * sub = (struct Parrot_Sub *)PMC_data(SELF);
+	struct Parrot_Sub * sub = (struct Parrot_Sub *)PMC_sub(SELF);
 	interpreter->ctx.warns = sub->ctx.warns;
 	if (interpreter->code->cur_cs != sub->seg)
 	     Parrot_switch_to_cs(interpreter, sub->seg);
@@ -59,8 +59,8 @@ pmclass Sub {
    void clone (PMC *ret) {
        struct Parrot_Sub * sub;
        PObj_custom_mark_destroy_SETALL(ret);
-       sub = PMC_data(ret) = mem_sys_allocate(sizeof(struct Parrot_Sub));
-       memcpy(sub, PMC_data(SELF), sizeof(struct Parrot_Sub));
+       sub = PMC_sub(ret) = mem_sys_allocate(sizeof(struct Parrot_Sub));
+       memcpy(sub, PMC_sub(SELF), sizeof(struct Parrot_Sub));
        buffer_mark_COW(sub->ctx.warns);
        ret->cache.struct_val = SELF->cache.struct_val;
    }

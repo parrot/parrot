@@ -525,7 +525,7 @@ fixup_subs(struct Parrot_Interp *interpreter, struct PackFile *self)
                             sizeof(opcode_t);
                         rel += (INTVAL) self->cur_cs->base.data;
                         sub_pmc->cache.struct_val = (void*) rel;
-                        sub = (struct Parrot_Sub*) PMC_data(sub_pmc);
+                        sub = (struct Parrot_Sub*) PMC_sub(sub_pmc);
                         rel = (INTVAL) sub->end * sizeof(opcode_t);
                         rel += (INTVAL) self->cur_cs->base.data;
                         sub->end = (opcode_t *) rel;
@@ -2065,7 +2065,7 @@ PackFile_Constant_pack_size(struct PackFile_Constant *self)
             case enum_class_Continuation:
             case enum_class_Coroutine:
                 packed_size = cstring_packed_size(
-                        ((struct Parrot_Sub*)PMC_data(component))->packed);
+                        ((struct Parrot_Sub*)PMC_sub(component))->packed);
                 break;
             default:
                 PIO_eprintf(NULL, "pack_size: Unknown PMC constant");
@@ -2312,7 +2312,7 @@ PackFile_Constant_unpack_pmc(struct Parrot_Interp *interpreter,
     VTABLE_init(interpreter, sub_pmc);
 
     sub_pmc->cache.struct_val = (void *) start;
-    sub = PMC_data(sub_pmc);
+    sub = PMC_sub(sub_pmc);
     sub->end = (opcode_t*)end;
     sub->packed = pmcs;
     /*

@@ -47,6 +47,9 @@ typedef union UnionVal {
 #define struct_val ptrs.struct_val
 #define pmc_val ptrs.pmc_val
 
+#define PMC_ptr1v(pmc) (pmc)->cache.struct_val
+#define PMC_ptr2p(pmc) (pmc)->cache.pmc_val
+
 /* Parrot Object - base class for all others */
 typedef struct pobj_t {
     UnionVal u;

@@ -246,7 +246,7 @@ PackFile_Constant_pack(struct PackFile_Constant *self, opcode_t *cursor)
             case enum_class_Coroutine:
                 {
                     size_t len;
-                    char *s = ((struct Parrot_Sub*)PMC_data(key))->packed;
+                    char *s = ((struct Parrot_Sub*)PMC_sub(key))->packed;
                     len = strlen(s) + 1;
                     *cursor++ = (len + sizeof(opcode_t) - 1) / sizeof(opcode_t);
 

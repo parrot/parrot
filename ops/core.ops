@@ -419,7 +419,7 @@ inline op invokecc(in PMC) {
 }
 
 inline op updatecc() {
-  struct Parrot_Sub *sub = (struct Parrot_Sub*) PMC_data(REG_PMC(1));
+  struct Parrot_Sub *sub = (struct Parrot_Sub*) PMC_sub(REG_PMC(1));
   /* update context */
   save_context(interpreter, &sub->ctx);
   goto NEXT();

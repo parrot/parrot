@@ -17,7 +17,7 @@
 pmclass Continuation extends Closure {
 
     void init () {
-        PMC_data(SELF) = new_continuation(INTERP);
+        PMC_sub(SELF) = new_continuation(INTERP);
 	SELF->cache.struct_val = NULL;
 	PObj_custom_mark_destroy_SETALL(SELF);
     }
@@ -25,7 +25,7 @@ pmclass Continuation extends Closure {
 
     void mark () {
         struct Parrot_Sub * cc
-            = (struct Parrot_Sub*)PMC_data(SELF);
+            = (struct Parrot_Sub*)PMC_sub(SELF);
 	mark_stack(INTERP, cc->ctx.user_stack);
 	mark_stack(INTERP, cc->ctx.control_stack);
 	SUPER();	/* mark pad_stack, warns in closure */
@@ -34,13 +34,13 @@ pmclass Continuation extends Closure {
     void clone(PMC *ret) {
 	struct Parrot_Sub * sub;
 	SUPER(ret);
-	sub = PMC_data(ret);
+	sub = PMC_sub(ret);
 	stack_mark_cow(sub->ctx.user_stack);
 	stack_mark_cow(sub->ctx.control_stack);
     }
 
     void* invoke (void* next) {
-	struct Parrot_Sub * cc = (struct Parrot_Sub*)PMC_data(SELF);
+	struct Parrot_Sub * cc = (struct Parrot_Sub*)PMC_sub(SELF);
 	restore_context(interpreter, &cc->ctx);
 	return SUPER(next);
     }

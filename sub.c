@@ -156,7 +156,7 @@ swap_context(struct Parrot_Interp *interp, struct PMC *sub)
 {
     struct Stack_Chunk * tmp_stack = NULL;
     Buffer * warns;
-    struct Parrot_Coroutine* co = (struct Parrot_Coroutine *)PMC_data(sub);
+    struct Parrot_Coroutine* co = (struct Parrot_Coroutine *)PMC_sub(sub);
     struct Parrot_Context *ctx = &co->ctx;
     /*
      * Swap user stacks and warnings

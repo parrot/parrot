@@ -86,6 +86,13 @@ pmc_new_ext(Parrot_Interp interpreter, PMC *pmc, INTVAL base_type)
         case enum_class_PerlUndef:
         case enum_class_Boolean:
         case enum_class_PerlHash:
+
+        case enum_class_Sub:
+        case enum_class_Closure:
+        case enum_class_Continuation:
+        case enum_class_RetContinuation:
+        case enum_class_Coroutine:
+        case enum_class_Eval:
             break;
         default:
             add_pmc_ext(interpreter, pmc);

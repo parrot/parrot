@@ -49,7 +49,7 @@ pmclass Eval extends Closure {
 	}
 	/* restore ctx */
 	interpreter->ctx.pad_stack =
-	    ((struct Parrot_Sub*) PMC_data(SELF))->ctx.pad_stack;
+	    ((struct Parrot_Sub*) PMC_sub(SELF))->ctx.pad_stack;
 	/* if code jumped to different code segment, branch_cs
 	 * is setting the resum_flag to 2, so that the
 	 * runloop was left
