@@ -61,6 +61,9 @@ The following I<must> apply:
 4 column indents for code and 2 column indents for nested CPP #directives.
 All indentation must consist of spaces, no tabs (for ease of patching).
 
+There are two exceptions to the CPP indenting- neither PARROT_IN_CORE nor
+the outermost _GUARD #ifdefs cause the level of indenting to increase.
+
 To ensure that tabs aren't inadvertently used for indentation, the following
 boilerplate code must appear at the bottom of each source file. (This
 rule may be rescinded if I'm ever threatened with a lynching....)
