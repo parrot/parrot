@@ -21,7 +21,7 @@ MAKE_F=${make}
 PMC2C=$(PERL) pmc2c.pl
 
 .c$(O):
-	$(CC) $(CFLAGS) ${cc_exe_out}$@ -c $<
+	$(CC) $(CFLAGS) ${cc_o_out}$@ -c $<
 
 all : $(O_FILES)
 
