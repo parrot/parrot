@@ -7,8 +7,8 @@ embed.pod - Parrot embedding system
 	#include "parrot/embed.h"
 	
 	int main(int argc, char *argv[]) {
-		struct Parrot_Interp *interp;
-		struct PackFile *pf;
+		Parrot_Interp interp;
+		Parrot_PackFile pf;
 		char *bcfile="program.pbc";
 
 		argc--; argv++;	/* skip the program name */
@@ -52,13 +52,34 @@ designed to do just that.
 
 =over 4
 
-=item C<struct Parrot_Interp>
+=item C<Parrot_Interp>
 
-This structure represents an actual Parrot interpreter.
+This typedef represents (a pointer to) an actual Parrot interpreter.
 
-=item C<struct PackFile>
+=item C<Parrot_PackFile>
 
-This structure represents a 'packfile'--a Parrot bytecode file.
+This structure represents (a pointer to) a 'packfile'--a Parrot bytecode file.
+
+=item C<Parrot_Interp_flag>
+
+An interpreter flag.
+
+=item C<Parrot_Interp_flag_val>
+
+The value passed in with an interpreter flag.  Unused at the moment--just pass
+in C<NULL>.
+
+=item C<Parrot_Int>
+
+=item C<Parrot_UInt>
+
+=item C<Parrot_Float>
+
+=item C<Parrot_Opcode>
+
+=item C<Parrot_Bool>
+
+Various Parrot internal types; most are chosen at Configure time.
 
 =back
 
@@ -127,6 +148,10 @@ This constant contains the second part of Parrot's version number.
 
 This constant contains the third part of Parrot's version number.
 
+=item C<PARROT_CONFIG_DATE>
+
+This constant contains the date that Configure was run to generate config.h.
+
 =item C<PARROT_JIT_CAPABLE>
 
 This constant is true if Parrot supports JIT on this platform, false 
@@ -137,38 +162,47 @@ otherwise.
 This constant contains a string representation of the Parrot JIT's name for
 the current architecture.
 
+=item C<PARROT_CPU_ARCH>
+
+This constant contains the name of your processor (as the JIT sees it).
+
+=item C<PARROT_OS_NAME>
+
+This constant contains the name of your operating system (as the JIT sees
+it).
+
 =back
 
 =head2 Functions
 
 =over 4
 
-=item C<struct Parrot_Interp *Parrot_new()>
+=item C<Parrot_Interp Parrot_new()>
 
 Allocates and returns a new Parrot interpreter.
 
-=item C<void Parrot_init(struct Parrot_Interp *)>
+=item C<void Parrot_init(Parrot_Interp)>
 
 Initializes a Parrot interpreter.
 
-=item C<void Parrot_setflag(struct Parrot_Interp *, Parrot_flag, Parrot_flag_val)>
+=item C<void Parrot_setflag(Parrot_Interp, Parrot_Interp_flag, Parrot_Interp_flag_val)>
 
 Sets a flag in the Parrot interpreter.
 
-=item C<struct PackFile * Parrot_readbc(struct Parrot_Interp *, char *filename)>
+=item C<Parrot_PackFile Parrot_readbc(Parrot_Interp, char *filename)>
 
 Reads in a bytecode file and returns a packfile structure for it.
 
-=item C<void Parrot_loadbc(struct Parrot_Interp *, struct PackFile *)>
+=item C<void Parrot_loadbc(Parrot_Interp, Parrot_PackFile)>
 
 Loads a packfile into a Parrot interpreter.
 
-=item C<void Parrot_runcode(struct Parrot_Interp *, int argc, char *argv[])>
+=item C<void Parrot_runcode(Parrot_Interp, int argc, char *argv[])>
 
 Runs the bytecode associated with a Parrot interpreter.  C<argc> and C<argv>
 are the parameters the bytecode should receive.
 
-=item C<Parrot_destroy(struct Parrot_Interp *)>
+=item C<Parrot_destroy(Parrot_Interp)>
 
 Deallocates all memory associated with a Parrot interpreter.
 
