@@ -5,7 +5,7 @@
 2004-03-15
 
 	* More builtin procs supported, notably:
-		proc, expr, for, format, 
+		proc, expr, eval, for, format, 
 		while, break, continue, return, source
 	* Initial expr support
 		Decimal operands, most operators, most builtin math funcs,
@@ -16,3 +16,17 @@
 	* changed substitution macro mess to pcc sub mess
 	* support various return codes (TCL_OK, TCL_ERROR, etc.)
 	* cleaned up examples/
+
+2004-03-25
+	* use improved imcc sub-calling syntax everywhere
+	* more builtin procs supported:
+		string (partial), array (partial)
+  	* [set] now deals with unknown variables properly
+ 	* support for array variables 
+	* builtin channels, e.g. [puts stderr eek]
+
+2004-05-14
+	* generate examples/Makefile at config time
+	* updated to use new test suite.
+	* refactored parser/interpreter (slight speed improvement,
+	  needed for upcoming compiler)
