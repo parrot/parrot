@@ -16,7 +16,7 @@ Tests the object/class subsystem.
 
 =cut
 
-use Parrot::Test tests => 27;
+use Parrot::Test tests => 29;
 use Test::More;
 
 output_is(<<'CODE', <<'OUTPUT', "findclass (base class)");
@@ -919,3 +919,67 @@ CODE
 A
 B
 OUTPUT
+
+output_is(<<'CODE', <<'OUTPUT', "multiple inheritance, with attributes");
+    newclass P1, "Star"
+    addattribute P1, "Spectral Type"
+
+    newclass P2, "Company"
+    addattribute P2, "Annual Profit"
+
+    subclass P3, P1, "Sun"
+    addparent P3, P2
+
+    find_type I0, "Sun"
+    new P4, I0
+
+    classoffset I1, P4, "Star"
+    new P5, .PerlString
+    set P5, "G"
+    setattribute P4, I1, P5
+
+    classoffset I2, P4, "Company"
+    new P6, .PerlString
+    set P6, "$100,000,000"
+    setattribute P4, I2, P6
+
+    getattribute P7, P4, I1
+    print P7
+    print "\n"
+    getattribute P8, P4, I2
+    print P8
+    print "\n"
+    end
+CODE
+G
+$100,000,000
+OUTPUT
+
+output_is(<<'CODE', <<'OUTPUT', "two levels of inheritance");
+    newclass P0, "Astronomical Object"
+    addattribute P0, "Location"
+
+    subclass P1, P0, "Star"
+    addattribute P1, "Spectral Type"
+
+    newclass P2, "Sun"
+    addparent P2, P1
+    addparent P2, P0
+
+    find_type I0, "Sun"
+    new P4, I0
+    classoffset I1, P4, "Astronomical Object"
+
+    new P5, .PerlString
+    set P5, "Taurus"
+    setattribute P4, I1, P5
+    getattribute P6, P4, I1
+    print P6
+    print "\n"
+    end
+CODE
+Taurus
+OUTPUT
+
+1;
+
