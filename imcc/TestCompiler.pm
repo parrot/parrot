@@ -87,7 +87,10 @@ sub generate_functions {
 	my $out_f = per_test('.out',$count);
 
 	my $TEST_PROG_ARGS = $ENV{TEST_PROG_ARGS} || '';
-	my $IMCC = $ENV{IMCC} || ".$PConfig{slash}imcc";
+	my $s = $PConfig{slash};
+	my $IMCC = $ENV{IMCC} || ".${s}imcc";
+	# If $ENV{IMCC} is set from root Makefile, adjust the path.
+	$IMCC =~ s/^languages${s}imcc${s}/.${s}/;
 
 	if ($gen_pasm) {
 	    $TEST_PROG_ARGS =~ s/-O.//;

@@ -78,8 +78,9 @@ END
       $pmc_build .= "$pmc\$(O): \$(H_FILES) $parent_headers $pmc.h\n";
   }
 
-  # build list of libraries for link line in Makfile
-  (my $pmc_classes_o = $pmc_o) =~ s/^| / classes\//g;
+  # build list of libraries for link line in Makefile
+  (my $pmc_classes_o   = $pmc_o   ) =~ s/^| / classes\//g;
+  (my $pmc_classes_pmc = $pmc_list) =~ s/^| / classes\//g;
 
   # Gather the actual names (with MixedCase) of all of the
   # non-abstract built-in PMCs.
@@ -104,11 +105,12 @@ END
   }
 
   Configure::Data->set(
-    pmc           => $pmc_list,
-    pmc_names     => join(" ", @names),
-    pmc_o         => $pmc_o,
-    pmc_build     => $pmc_build,
-    pmc_classes_o => $pmc_classes_o
+    pmc             => $pmc_list,
+    pmc_names       => join(" ", @names),
+    pmc_o           => $pmc_o,
+    pmc_build       => $pmc_build,
+    pmc_classes_o   => $pmc_classes_o,
+    pmc_classes_pmc => $pmc_classes_pmc,
   );
 }
 

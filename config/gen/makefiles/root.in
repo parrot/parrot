@@ -99,7 +99,7 @@ GENERAL_H_FILES = $(INC)/config.h $(INC)/exceptions.h $(INC)/io.h $(INC)/op.h \
 
 ALL_H_FILES = $(GENERAL_H_FILES)
 
-O_DIRS = classes
+CLASS_PMC_FILES = ${pmc_classes_pmc}
 
 CLASS_O_FILES = ${pmc_classes_o}
 
@@ -149,6 +149,9 @@ C_LIBS = ${libs}
 CC = ${cc}
 PERL = ${perl}
 
+# Make directory; do not die if dir exists.
+MKDIR = $(PERL) -e ${PQ}-d or mkdir $$_ or die foreach @ARGV${PQ}
+
 
 ###############################################################################
 #
@@ -160,6 +163,7 @@ TEST_PROG = ${test_prog}${exe}
 TEST_PROG_SO = ${test_prog}_so${exe}
 LIBPARROT = ${blib_lib_libparrot_a}
 PDUMP = pdump${exe}
+IMCC_PROG = languages/imcc/imcc${exe}
 
 # lclint has changed name to splint at v3.0
 LINT = splint
@@ -185,7 +189,6 @@ LINTOPTS =
 # This is set to  MAKE=$make if your $make command doesn't
 # do it for you.
 #
-
 ${make_set_make}
 
 .c$(O) :
@@ -193,12 +196,13 @@ ${make_set_make}
 
 all : $(TEST_PROG) docs
 
+
 mops : examples/assembly/mops${exe} examples/mops/mops${exe}
 
 $(TEST_PROG) : test_main$(O) $(GEN_HEADERS) $(LIBPARROT) lib/Parrot/OpLib/core.pm
 	$(LINK) ${ld_out}$(TEST_PROG) $(LINKFLAGS) test_main$(O) $(LIBPARROT) $(C_LIBS)
 
-lib_deps_object : $(O_DIRS) $(O_FILES)
+lib_deps_object : $(O_FILES)
 	$(PERL) tools/dev/lib_deps.pl object $(O_FILES)
 
 lib_deps_source : $(GENERAL_H_FILES)
@@ -215,20 +219,16 @@ check_source : $(GENERAL_H_FILES)
 #
 ###############################################################################
 
-blib :
-	-mkdir blib
-
-blib/lib : blib
-	-mkdir blib${slash}lib
-
-shared : $(GEN_HEADERS) blib/lib blib/lib/libparrot$(SO) $(LIBPARROT)
+shared : $(GEN_HEADERS) blib/lib/libparrot$(SO) $(LIBPARROT)
 static : $(GEN_HEADERS) $(LIBPARROT)
 
-$(LIBPARROT) : blib/lib $(O_DIRS) $(O_FILES)
+$(LIBPARROT) : $(O_FILES)
+	$(MKDIR) blib blib/lib
 	$(AR_CR) ${ar_out}$@ $(O_FILES)
 	$(RANLIB) $@
 
-blib/lib/libparrot$(SO) : blib/lib $(O_DIRS) $(O_FILES)
+blib/lib/libparrot$(SO) : $(O_FILES)
+	$(MKDIR) blib blib/lib
 	$(LD) $(LD_SHARED) $(LD_SHARED_FLAGS) $(LDFLAGS) $(LD_OUT)blib/lib/libparrot$(SO) $(O_FILES) $(C_LIBS)
 
 $(TEST_PROG_SO) : test_main$(O) blib/lib/libparrot$(SO) lib/Parrot/OpLib/core.pm
@@ -238,7 +238,8 @@ $(TEST_PROG_SO) : test_main$(O) blib/lib/libparrot$(SO) lib/Parrot/OpLib/core.pm
 #     because those should be done at "make install" and not "make shared"
 #     It also makes the task of getting this working on win32 much easier. :)
 #
-#blib/lib/libparrot$(SO).${VERSION} : blib/lib $(O_DIRS) $(O_FILES)
+#blib/lib/libparrot$(SO).${VERSION} : $(O_FILES)
+#	$(MKDIR) blib blib/lib
 #	$(LD) $(LD_SHARED) -Wl,-soname,libparrot$(SO).${MAJOR} $(LDFLAGS) $(LD_OUT)blib/lib/libparrot$(SO).${VERSION} $(O_FILES)
 #
 #blib/lib/libparrot$(SO).${MAJOR}.${MINOR} : blib/lib/libparrot$(SO).${VERSION}
@@ -253,7 +254,7 @@ $(TEST_PROG_SO) : test_main$(O) blib/lib/libparrot$(SO) lib/Parrot/OpLib/core.pm
 #	$(RM_F) $@
 #	cd blib/lib; ln -s libparrot$(SO).${MAJOR} libparrot$(SO)
 #
-#blib/lib/libcore_prederef$(SO).${VERSION} : blib/lib core_ops_prederef$(O)
+#blib/lib/libcore_prederef$(SO).${VERSION} : core_ops_prederef$(O)
 #	$(LD) $(LD_SHARED) -Wl,-soname,libparrot$(SO).${MAJOR} $(LDFLAGS) $(LD_OUT)blib/lib/libcore_prederef$(SO).${VERSION} core_ops_prederef$(O)
 #
 #blib/lib/libcore_prederef$(SO).${MAJOR}.${MINOR} : blib/lib/libcore_prederef$(SO).${VERSION}
@@ -499,15 +500,24 @@ docs : docs/.dummy
 docs/.dummy :
 	cd docs && $(MAKE) && cd ..
 
-classes : classes/.dummy
-
-classes/.dummy :
-	cd classes && $(MAKE) && cd ..
-
 languages : languages.dummy
 
 languages.dummy :
 	cd languages && $(MAKE) && cd ..
+
+# If anything in the classes directory is out of date,
+# then run `make` in sub-dir to rebuild only the out of date files.
+$(CLASS_O_FILES) : $(CLASS_PMC_FILES) $(INC)/vtable.h
+	cd classes && $(MAKE) && cd ..
+
+
+$(IMCC_PROG) : $(LIBPARROT)        \
+               languages/imcc/*.c \
+               languages/imcc/*.h \
+               languages/imcc/*.y \
+               languages/imcc/*.l \
+               languages/imcc/*.o
+	cd languages${slash}imcc && $(MAKE) && cd ..${slash}..
 
 
 ###############################################################################
