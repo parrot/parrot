@@ -24,7 +24,7 @@ pmclass PerlArray {
 
     void init () {
 	SELF->cache.struct_val = key_new(INTERP);
-	key_set_size(INTERP,SELF->cache.struct_val,1);
+	key_set_size(INTERP,SELF->cache.struct_val,0);
     }
 
     void clone (PMC* dest) { 
@@ -53,7 +53,14 @@ pmclass PerlArray {
 
     INTVAL get_integer_index ( INTVAL index ) {
 	KEY* key = SELF->cache.struct_val;
-	KEY_PAIR* key_pair = key_element_value_i(INTERP,key,index);
+	KEY_PAIR* key_pair;
+	INTVAL size = key_size(INTERP,key);
+	if(index<0) {
+	    key_pair = key_element_value_i(INTERP,key,size+index);
+	}
+	else {
+	    key_pair = key_element_value_i(INTERP,key,index);
+	}
 	return key_pair->cache.int_val;
     }
 
@@ -116,8 +123,9 @@ pmclass PerlArray {
     void set_integer_index (INTVAL value, INTVAL index) {
 	KEY* key = SELF->cache.struct_val;
 	KEY_PAIR key_pair;
-	if(index >= key_size(INTERP,key)) {
-	    key_set_size(INTERP,key,index);
+	INTVAL size = key_size(INTERP,key);
+	if(index >= size) {
+	    key_set_size(INTERP,key,index+1);
 	}
 	key_pair.type = enum_key_int;
 	key_pair.cache.int_val = value;
