@@ -11,7 +11,6 @@ struct Small_Object_Arena {
     UINTVAL * dod_flags;
     struct Small_Object_Pool * pool;
     size_t live_objects;
-    void *free_list;
 #endif
     struct Small_Object_Arena *prev;
     struct Small_Object_Arena *next;
@@ -27,20 +26,11 @@ struct Small_Object_Pool {
     size_t num_free_objects;    /* number of resources in the free pool */
     int skip;
     size_t replenish_level;
-#if ARENA_DOD_FLAGS
-    struct Small_Object_Arena *free_arena;
-#else
     void *free_list;
-#endif
     UINTVAL align_1;    /* alignment (must be power of 2) minus one */
     /* adds a free object to the pool's free list  */
-#if ARENA_DOD_FLAGS
-    void  (*add_free_object)(struct Parrot_Interp *,
-                             struct Small_Object_Arena *, void *);
-#else
     void  (*add_free_object)(struct Parrot_Interp *,
                              struct Small_Object_Pool *, void *);
-#endif
     /* gets and removes a free object from the pool's free list */
     void *(*get_free_object)(struct Parrot_Interp *,
                              struct Small_Object_Pool *);
@@ -69,13 +59,8 @@ void more_traceable_objects(struct Parrot_Interp *interpreter,
 void more_non_traceable_objects(struct Parrot_Interp *interpreter,
                 struct Small_Object_Pool *pool);
 
-#if ARENA_DOD_FLAGS
-void add_free_object(struct Parrot_Interp *,
-                     struct Small_Object_Arena *, void *);
-#else
 void add_free_object(struct Parrot_Interp *,
                      struct Small_Object_Pool *, void *);
-#endif
 void *get_free_object(struct Parrot_Interp *,
                       struct Small_Object_Pool *);
 

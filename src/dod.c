@@ -702,18 +702,10 @@ free_unused_pobjects(struct Parrot_Interp *interpreter,
                         /* if the PMC has a PMC_EXT structure,
                          * return it to the pool/arena
                          */
-#if ARENA_DOD_FLAGS
-                        struct Small_Object_Arena *ext_arena =
-                            GET_ARENA(((PMC *)b)->pmc_ext);
-                        ext_arena->pool->
-                            add_free_object(interpreter, ext_arena,
-                                    ((PMC *)b)->pmc_ext);
-#else
                         struct Small_Object_Pool *ext_pool =
                             interpreter->arena_base->pmc_ext_pool;
                         ext_pool->add_free_object(interpreter, ext_pool,
                                 ((PMC *)b)->pmc_ext);
-#endif
                     }
                 }
                 /* else object is a buffer(like) */
@@ -757,10 +749,10 @@ free_unused_pobjects(struct Parrot_Interp *interpreter,
                 }
 #if ARENA_DOD_FLAGS
                 *dod_flags |= PObj_on_free_list_FLAG << nm;
-                pool->add_free_object(interpreter, cur_arena, b);
 #else
-                pool->add_free_object(interpreter, pool, b);
+                PObj_flags_SETTO((PObj *)b, PObj_on_free_list_FLAG);
 #endif
+                pool->add_free_object(interpreter, pool, b);
             }
             b = (Buffer *)((char *)b + object_size);
         }

@@ -87,7 +87,6 @@ Parrot_is_const_pmc(Parrot_Interp interpreter, PMC *pmc)
     return c;
 }
 
-static int find_free_list(struct Small_Object_Pool *pool);
 
 /*
 
@@ -107,7 +106,7 @@ more_traceable_objects(struct Parrot_Interp *interpreter,
 {
     if (pool->skip)
         pool->skip = 0;
-    else {
+    else if (pool->last_Arena) {
         Parrot_do_dod_run(interpreter, DOD_trace_stack_FLAG);
         if (pool->num_free_objects <= pool->replenish_level)
             pool->skip = 1;
@@ -115,15 +114,9 @@ more_traceable_objects(struct Parrot_Interp *interpreter,
 
     /* requires that num_free_objects be updated in Parrot_do_dod_run. If dod
      * is disabled, then we must check the free list directly. */
-#if  ARENA_DOD_FLAGS
-    if (!find_free_list(pool)) {
-        (*pool->alloc_objects) (interpreter, pool);
-    }
-#else
     if (!pool->free_list) {
         (*pool->alloc_objects) (interpreter, pool);
     }
-#endif
 }
 
 /*
@@ -145,54 +138,13 @@ more_non_traceable_objects(struct Parrot_Interp *interpreter,
     (*pool->alloc_objects) (interpreter, pool);
 }
 
-#if  ARENA_DOD_FLAGS
-/*
-
-=item C<static int
-find_free_list(struct Small_Object_Pool *pool)>
-
-Returns whether a free list can be found in C<*pool>.
-
-=cut
-
-*/
-
-static int
-find_free_list(struct Small_Object_Pool *pool)
-{
-    struct Small_Object_Arena *arena;
-
-    for (arena = pool->last_Arena; arena; arena = arena->prev) {
-        if (arena->free_list) {
-            pool->free_arena = arena;
-            return 1;
-        }
-    }
-    return 0;
-}
-
 /*
 
 =item C<void
 add_free_object(struct Parrot_Interp *interpreter,
-        struct Small_Object_Arena *arena, void *to_add)>
+        struct Small_Object_Pool *pool, void *to_add)>
 
 Add an unused object back to the free pool for later reuse.
-
-=cut
-
-*/
-
-void
-add_free_object(struct Parrot_Interp *interpreter,
-        struct Small_Object_Arena *arena, void *to_add)
-{
-    *(void **)to_add = arena->free_list;
-    arena->free_list = to_add;
-}
-
-/*  */
-/*
 
 =item C<void *
 get_free_object(struct Parrot_Interp *interpreter,
@@ -204,57 +156,14 @@ Get a new object from the free pool and return it.
 
 */
 
-void *
-get_free_object(struct Parrot_Interp *interpreter,
-        struct Small_Object_Pool *pool)
-{
-    void *ptr;
-    struct Small_Object_Arena *arena;
-    size_t n;
-
-    /* if we don't have any objects */
-    if (!pool->free_arena)
-        (*pool->alloc_objects) (interpreter, pool);
-    if (!pool->free_arena->free_list)
-        if (!find_free_list(pool))
-            (*pool->more_objects) (interpreter, pool);
-
-    arena = pool->free_arena;
-    ptr = arena->free_list;
-    arena->free_list = *(void **)ptr;
-    n = GET_OBJ_N(arena, ptr);
-    arena->dod_flags[ n >> ARENA_FLAG_SHIFT ] &=
-         ~((PObj_on_free_list_FLAG << (( n & ARENA_FLAG_MASK ) << 2)));
-#if ! DISABLE_GC_DEBUG
-    if (GC_DEBUG(interpreter) && pool !=
-            interpreter->arena_base->pmc_ext_pool)
-        ((Buffer*)ptr)->pobj_version++;
-#endif
-    return ptr;
-}
-
-#else
-
-/*
-
-Add an unused object back to the free pool for later reuse.
-
-*/
-
 void
 add_free_object(struct Parrot_Interp *interpreter,
         struct Small_Object_Pool *pool, void *to_add)
 {
-    PObj_flags_SETTO((PObj *)to_add, PObj_on_free_list_FLAG);
     *(void **)to_add = pool->free_list;
     pool->free_list = to_add;
 }
 
-/*
-
-Get a new object from the free pool and return it.
-
-*/
 
 void *
 get_free_object(struct Parrot_Interp *interpreter,
@@ -265,9 +174,11 @@ get_free_object(struct Parrot_Interp *interpreter,
     /* if we don't have any objects */
     if (!pool->free_list)
         (*pool->more_objects) (interpreter, pool);
-
     ptr = pool->free_list;
     pool->free_list = *(void **)ptr;
+#if ARENA_DOD_FLAGS
+    PObj_on_free_list_CLEAR((PObj*) ptr);
+#endif
 #if ! DISABLE_GC_DEBUG
     if (GC_DEBUG(interpreter) && pool !=
             interpreter->arena_base->pmc_ext_pool)
@@ -275,7 +186,6 @@ get_free_object(struct Parrot_Interp *interpreter,
 #endif
     return ptr;
 }
-#endif
 
 /*
 
@@ -322,10 +232,10 @@ add_to_free_list(struct Parrot_Interp *interpreter,
             *dod_flags = ALL_FREE_MASK;
             ++dod_flags;
         }
-        pool->add_free_object (interpreter, arena, object);
 #else
-        pool->add_free_object (interpreter, pool, object);
+        PObj_flags_SETTO((PObj *)object, PObj_on_free_list_FLAG);
 #endif
+        pool->add_free_object (interpreter, pool, object);
         object = (void *)((char *)object + pool->object_size);
     }
 #if ARENA_DOD_FLAGS
@@ -401,7 +311,6 @@ alloc_objects(struct Parrot_Interp *interpreter,
 #endif
     new_arena->dod_flags = mem_sys_allocate(ARENA_FLAG_SIZE(pool));
     new_arena->pool = pool;
-    new_arena->free_list = NULL;
 #else
     new_arena = mem_sys_allocate(sizeof(struct Small_Object_Arena));
     if (!new_arena)
@@ -431,9 +340,8 @@ alloc_objects(struct Parrot_Interp *interpreter,
     else {
         /* first arena, start with x objects */
         start = 0;
-        end = 1024;
+        end = 1024*2;
     }
-    pool->free_arena = new_arena;
 #else
     start = 0;
     end = pool->objects_per_alloc;
