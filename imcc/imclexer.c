@@ -1016,6 +1016,7 @@ struct macro_frame_t {
     char *file;
     int line;
     int pasm_file;      /* pasm_file mode of previous frame */
+    int is_macro;
 };
 
 struct macro_frame_t *frames = NULL;
@@ -1060,7 +1061,7 @@ static int prev_state;
 
 #define cmt5 8
 
-#line 1064 "languages/imcc/imclexer.c"
+#line 1065 "languages/imcc/imclexer.c"
 
 /* Macros after this point can all be overridden by user definitions in
  * section 1.
@@ -1214,7 +1215,7 @@ YY_DECL
 	register char *yy_cp, *yy_bp;
 	register int yy_act;
 
-#line 106 "languages/imcc/imcc.l"
+#line 107 "languages/imcc/imcc.l"
 
         /* for emacs "*/
         if (expect_pasm == 1 && !in_pod) {
@@ -1231,7 +1232,7 @@ YY_DECL
             return 0;
         }
 
-#line 1235 "languages/imcc/imclexer.c"
+#line 1236 "languages/imcc/imclexer.c"
 
 	if ( yy_init )
 		{
@@ -1317,7 +1318,7 @@ do_action:	/* This label is used only to access EOF actions. */
 
 case 1:
 YY_RULE_SETUP
-#line 122 "languages/imcc/imcc.l"
+#line 123 "languages/imcc/imcc.l"
 { prev_state = YYSTATE; BEGIN(cmt2);
                        valp->t = atoi(yytext+6);
                        return LINECOMMENT;
@@ -1325,7 +1326,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 2:
 YY_RULE_SETUP
-#line 126 "languages/imcc/imcc.l"
+#line 127 "languages/imcc/imcc.l"
 { BEGIN(cmt3);
                       valp->s = str_dup(yytext);
                       return FILECOMMENT;
@@ -1333,22 +1334,22 @@ YY_RULE_SETUP
 	YY_BREAK
 case 3:
 YY_RULE_SETUP
-#line 130 "languages/imcc/imcc.l"
+#line 131 "languages/imcc/imcc.l"
 { BEGIN(prev_state) ; line++; }
 	YY_BREAK
 case 4:
 YY_RULE_SETUP
-#line 132 "languages/imcc/imcc.l"
+#line 133 "languages/imcc/imcc.l"
 { prev_state = YYSTATE; BEGIN(cmt2); }
 	YY_BREAK
 case 5:
 YY_RULE_SETUP
-#line 133 "languages/imcc/imcc.l"
+#line 134 "languages/imcc/imcc.l"
 { prev_state = YYSTATE; BEGIN(cmt1); }
 	YY_BREAK
 case 6:
 YY_RULE_SETUP
-#line 134 "languages/imcc/imcc.l"
+#line 135 "languages/imcc/imcc.l"
 {
                        valp->t = atoi(yytext);
                        BEGIN(cmt4);
@@ -1357,12 +1358,12 @@ YY_RULE_SETUP
 	YY_BREAK
 case 7:
 YY_RULE_SETUP
-#line 139 "languages/imcc/imcc.l"
+#line 140 "languages/imcc/imcc.l"
 { BEGIN(prev_state) ; line++; }
 	YY_BREAK
 case 8:
 YY_RULE_SETUP
-#line 141 "languages/imcc/imcc.l"
+#line 142 "languages/imcc/imcc.l"
 {
         if (expect_pasm == 2)
 	  BEGIN(INITIAL);
@@ -1373,12 +1374,12 @@ YY_RULE_SETUP
 	YY_BREAK
 case 9:
 YY_RULE_SETUP
-#line 149 "languages/imcc/imcc.l"
+#line 150 "languages/imcc/imcc.l"
 { prev_state = YYSTATE; BEGIN(cmt5); }
 	YY_BREAK
 case 10:
 YY_RULE_SETUP
-#line 150 "languages/imcc/imcc.l"
+#line 151 "languages/imcc/imcc.l"
 {
         if (expect_pasm == 2)
 	  BEGIN(INITIAL);
@@ -1391,7 +1392,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 11:
 YY_RULE_SETUP
-#line 161 "languages/imcc/imcc.l"
+#line 162 "languages/imcc/imcc.l"
 {
 	BEGIN(emit);
 	return(EMIT);
@@ -1399,7 +1400,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 12:
 YY_RULE_SETUP
-#line 166 "languages/imcc/imcc.l"
+#line 167 "languages/imcc/imcc.l"
 {
 	BEGIN(INITIAL);
 	return EOM;
@@ -1407,7 +1408,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 13:
 YY_RULE_SETUP
-#line 171 "languages/imcc/imcc.l"
+#line 172 "languages/imcc/imcc.l"
 {
 	valp->s = str_dup(yytext);
 	return REG;
@@ -1415,314 +1416,314 @@ YY_RULE_SETUP
 	YY_BREAK
 case 14:
 YY_RULE_SETUP
-#line 176 "languages/imcc/imcc.l"
+#line 177 "languages/imcc/imcc.l"
 { in_pod = 1; yy_push_state(pod); }
 	YY_BREAK
 case 15:
 YY_RULE_SETUP
-#line 177 "languages/imcc/imcc.l"
+#line 178 "languages/imcc/imcc.l"
 { in_pod = 0; yy_pop_state(); ++line; }
 	YY_BREAK
 case 16:
 YY_RULE_SETUP
-#line 178 "languages/imcc/imcc.l"
+#line 179 "languages/imcc/imcc.l"
 { /*ignore*/ }
 	YY_BREAK
 case 17:
 YY_RULE_SETUP
-#line 179 "languages/imcc/imcc.l"
+#line 180 "languages/imcc/imcc.l"
 { ++line; }
 	YY_BREAK
 case 18:
 YY_RULE_SETUP
-#line 181 "languages/imcc/imcc.l"
+#line 182 "languages/imcc/imcc.l"
 return(LOCAL);
 	YY_BREAK
 case 19:
 YY_RULE_SETUP
-#line 182 "languages/imcc/imcc.l"
+#line 183 "languages/imcc/imcc.l"
 return(ARG);
 	YY_BREAK
 case 20:
 YY_RULE_SETUP
-#line 183 "languages/imcc/imcc.l"
+#line 184 "languages/imcc/imcc.l"
 return(FLATTEN_ARG);
 	YY_BREAK
 case 21:
 YY_RULE_SETUP
-#line 184 "languages/imcc/imcc.l"
+#line 185 "languages/imcc/imcc.l"
 return(SUB);
 	YY_BREAK
 case 22:
 YY_RULE_SETUP
-#line 185 "languages/imcc/imcc.l"
+#line 186 "languages/imcc/imcc.l"
 return(ESUB);
 	YY_BREAK
 case 23:
 YY_RULE_SETUP
-#line 186 "languages/imcc/imcc.l"
+#line 187 "languages/imcc/imcc.l"
 return(PCC_BEGIN);
 	YY_BREAK
 case 24:
 YY_RULE_SETUP
-#line 187 "languages/imcc/imcc.l"
+#line 188 "languages/imcc/imcc.l"
 return(PCC_END);
 	YY_BREAK
 case 25:
 YY_RULE_SETUP
-#line 188 "languages/imcc/imcc.l"
+#line 189 "languages/imcc/imcc.l"
 return(PCC_CALL);
 	YY_BREAK
 case 26:
 YY_RULE_SETUP
-#line 189 "languages/imcc/imcc.l"
+#line 190 "languages/imcc/imcc.l"
 return(NCI_CALL);
 	YY_BREAK
 case 27:
 YY_RULE_SETUP
-#line 190 "languages/imcc/imcc.l"
+#line 191 "languages/imcc/imcc.l"
 return(PCC_SUB);
 	YY_BREAK
 case 28:
 YY_RULE_SETUP
-#line 191 "languages/imcc/imcc.l"
+#line 192 "languages/imcc/imcc.l"
 return(PCC_BEGIN_RETURN);
 	YY_BREAK
 case 29:
 YY_RULE_SETUP
-#line 192 "languages/imcc/imcc.l"
+#line 193 "languages/imcc/imcc.l"
 return(PCC_END_RETURN);
 	YY_BREAK
 case 30:
 YY_RULE_SETUP
-#line 193 "languages/imcc/imcc.l"
+#line 194 "languages/imcc/imcc.l"
 return(PCC_BEGIN_YIELD);
 	YY_BREAK
 case 31:
 YY_RULE_SETUP
-#line 194 "languages/imcc/imcc.l"
+#line 195 "languages/imcc/imcc.l"
 return(PCC_END_YIELD);
 	YY_BREAK
 case 32:
 YY_RULE_SETUP
-#line 195 "languages/imcc/imcc.l"
+#line 196 "languages/imcc/imcc.l"
 return PROTOTYPED;
 	YY_BREAK
 case 33:
 YY_RULE_SETUP
-#line 196 "languages/imcc/imcc.l"
+#line 197 "languages/imcc/imcc.l"
 return NON_PROTOTYPED;
 	YY_BREAK
 case 34:
 YY_RULE_SETUP
-#line 198 "languages/imcc/imcc.l"
+#line 199 "languages/imcc/imcc.l"
 return(RESULT);
 	YY_BREAK
 case 35:
 YY_RULE_SETUP
-#line 199 "languages/imcc/imcc.l"
+#line 200 "languages/imcc/imcc.l"
 return(RETURN);
 	YY_BREAK
 case 36:
 YY_RULE_SETUP
-#line 200 "languages/imcc/imcc.l"
+#line 201 "languages/imcc/imcc.l"
 return(CLASS);
 	YY_BREAK
 case 37:
 YY_RULE_SETUP
-#line 201 "languages/imcc/imcc.l"
+#line 202 "languages/imcc/imcc.l"
 return(ENDCLASS);
 	YY_BREAK
 case 38:
 YY_RULE_SETUP
-#line 202 "languages/imcc/imcc.l"
+#line 203 "languages/imcc/imcc.l"
 return(NAMESPACE);
 	YY_BREAK
 case 39:
 YY_RULE_SETUP
-#line 203 "languages/imcc/imcc.l"
+#line 204 "languages/imcc/imcc.l"
 return(ENDNAMESPACE);
 	YY_BREAK
 case 40:
 YY_RULE_SETUP
-#line 204 "languages/imcc/imcc.l"
+#line 205 "languages/imcc/imcc.l"
 return(LOCAL);
 	YY_BREAK
 case 41:
 YY_RULE_SETUP
-#line 205 "languages/imcc/imcc.l"
+#line 206 "languages/imcc/imcc.l"
 return(CONST);
 	YY_BREAK
 case 42:
 YY_RULE_SETUP
-#line 206 "languages/imcc/imcc.l"
+#line 207 "languages/imcc/imcc.l"
 return(GLOBAL_CONST);
 	YY_BREAK
 case 43:
 YY_RULE_SETUP
-#line 207 "languages/imcc/imcc.l"
+#line 208 "languages/imcc/imcc.l"
 return(PARAM);
 	YY_BREAK
 case 44:
 YY_RULE_SETUP
-#line 208 "languages/imcc/imcc.l"
+#line 209 "languages/imcc/imcc.l"
 return(END);
 	YY_BREAK
 case 45:
 YY_RULE_SETUP
-#line 209 "languages/imcc/imcc.l"
+#line 210 "languages/imcc/imcc.l"
 return(GOTO);
 	YY_BREAK
 case 46:
 YY_RULE_SETUP
-#line 210 "languages/imcc/imcc.l"
+#line 211 "languages/imcc/imcc.l"
 return(IF);
 	YY_BREAK
 case 47:
 YY_RULE_SETUP
-#line 211 "languages/imcc/imcc.l"
+#line 212 "languages/imcc/imcc.l"
 return(UNLESS);
 	YY_BREAK
 case 48:
 YY_RULE_SETUP
-#line 212 "languages/imcc/imcc.l"
+#line 213 "languages/imcc/imcc.l"
 return(INTV);
 	YY_BREAK
 case 49:
 YY_RULE_SETUP
-#line 213 "languages/imcc/imcc.l"
+#line 214 "languages/imcc/imcc.l"
 return(INC);
 	YY_BREAK
 case 50:
 YY_RULE_SETUP
-#line 214 "languages/imcc/imcc.l"
+#line 215 "languages/imcc/imcc.l"
 return(DEC);
 	YY_BREAK
 case 51:
 YY_RULE_SETUP
-#line 215 "languages/imcc/imcc.l"
+#line 216 "languages/imcc/imcc.l"
 return(FLOATV);
 	YY_BREAK
 case 52:
 YY_RULE_SETUP
-#line 216 "languages/imcc/imcc.l"
+#line 217 "languages/imcc/imcc.l"
 return(NEW);
 	YY_BREAK
 case 53:
 YY_RULE_SETUP
-#line 217 "languages/imcc/imcc.l"
+#line 218 "languages/imcc/imcc.l"
 return(DEFINED);
 	YY_BREAK
 case 54:
 YY_RULE_SETUP
-#line 218 "languages/imcc/imcc.l"
+#line 219 "languages/imcc/imcc.l"
 return(ADDR);
 	YY_BREAK
 case 55:
 YY_RULE_SETUP
-#line 219 "languages/imcc/imcc.l"
+#line 220 "languages/imcc/imcc.l"
 return(GLOBAL);
 	YY_BREAK
 case 56:
 YY_RULE_SETUP
-#line 220 "languages/imcc/imcc.l"
+#line 221 "languages/imcc/imcc.l"
 return(CLONE);
 	YY_BREAK
 case 57:
 YY_RULE_SETUP
-#line 221 "languages/imcc/imcc.l"
+#line 222 "languages/imcc/imcc.l"
 return(STRINGV);
 	YY_BREAK
 case 58:
 YY_RULE_SETUP
-#line 222 "languages/imcc/imcc.l"
+#line 223 "languages/imcc/imcc.l"
 return(CALL);
 	YY_BREAK
 case 59:
 YY_RULE_SETUP
-#line 223 "languages/imcc/imcc.l"
+#line 224 "languages/imcc/imcc.l"
 return(SAVEALL);
 	YY_BREAK
 case 60:
 YY_RULE_SETUP
-#line 224 "languages/imcc/imcc.l"
+#line 225 "languages/imcc/imcc.l"
 return(RESTOREALL);
 	YY_BREAK
 case 61:
 YY_RULE_SETUP
-#line 225 "languages/imcc/imcc.l"
+#line 226 "languages/imcc/imcc.l"
 return(SHIFT_LEFT);
 	YY_BREAK
 case 62:
 YY_RULE_SETUP
-#line 226 "languages/imcc/imcc.l"
+#line 227 "languages/imcc/imcc.l"
 return(SHIFT_RIGHT);
 	YY_BREAK
 case 63:
 YY_RULE_SETUP
-#line 227 "languages/imcc/imcc.l"
+#line 228 "languages/imcc/imcc.l"
 return(SHIFT_RIGHT_U);
 	YY_BREAK
 case 64:
 YY_RULE_SETUP
-#line 228 "languages/imcc/imcc.l"
+#line 229 "languages/imcc/imcc.l"
 return(LOG_AND);
 	YY_BREAK
 case 65:
 YY_RULE_SETUP
-#line 229 "languages/imcc/imcc.l"
+#line 230 "languages/imcc/imcc.l"
 return(LOG_OR);
 	YY_BREAK
 case 66:
 YY_RULE_SETUP
-#line 230 "languages/imcc/imcc.l"
+#line 231 "languages/imcc/imcc.l"
 return(LOG_XOR);
 	YY_BREAK
 case 67:
 YY_RULE_SETUP
-#line 231 "languages/imcc/imcc.l"
+#line 232 "languages/imcc/imcc.l"
 return(RELOP_LT);
 	YY_BREAK
 case 68:
 YY_RULE_SETUP
-#line 232 "languages/imcc/imcc.l"
+#line 233 "languages/imcc/imcc.l"
 return(RELOP_LTE);
 	YY_BREAK
 case 69:
 YY_RULE_SETUP
-#line 233 "languages/imcc/imcc.l"
+#line 234 "languages/imcc/imcc.l"
 return(RELOP_GT);
 	YY_BREAK
 case 70:
 YY_RULE_SETUP
-#line 234 "languages/imcc/imcc.l"
+#line 235 "languages/imcc/imcc.l"
 return(RELOP_GTE);
 	YY_BREAK
 case 71:
 YY_RULE_SETUP
-#line 235 "languages/imcc/imcc.l"
+#line 236 "languages/imcc/imcc.l"
 return(RELOP_EQ);
 	YY_BREAK
 case 72:
 YY_RULE_SETUP
-#line 236 "languages/imcc/imcc.l"
+#line 237 "languages/imcc/imcc.l"
 return(RELOP_NE);
 	YY_BREAK
 case 73:
 YY_RULE_SETUP
-#line 237 "languages/imcc/imcc.l"
+#line 238 "languages/imcc/imcc.l"
 return(POW);
 	YY_BREAK
 case 74:
 YY_RULE_SETUP
-#line 239 "languages/imcc/imcc.l"
+#line 240 "languages/imcc/imcc.l"
 {
         return read_macro(valp, interp);
     }
 	YY_BREAK
 case 75:
 YY_RULE_SETUP
-#line 243 "languages/imcc/imcc.l"
+#line 244 "languages/imcc/imcc.l"
 {
         int c;
 	char *name;
@@ -1753,7 +1754,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 76:
 YY_RULE_SETUP
-#line 271 "languages/imcc/imcc.l"
+#line 272 "languages/imcc/imcc.l"
 {
         int c;
 
@@ -1766,7 +1767,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 77:
 YY_RULE_SETUP
-#line 281 "languages/imcc/imcc.l"
+#line 282 "languages/imcc/imcc.l"
 {
         char *label;
 
@@ -1785,7 +1786,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 78:
 YY_RULE_SETUP
-#line 297 "languages/imcc/imcc.l"
+#line 298 "languages/imcc/imcc.l"
 {
         char *label;
 
@@ -1803,12 +1804,12 @@ YY_RULE_SETUP
 	YY_BREAK
 case 79:
 YY_RULE_SETUP
-#line 312 "languages/imcc/imcc.l"
+#line 313 "languages/imcc/imcc.l"
 return(COMMA);
 	YY_BREAK
 case 80:
 YY_RULE_SETUP
-#line 314 "languages/imcc/imcc.l"
+#line 315 "languages/imcc/imcc.l"
 {
 	YYCHOP();  /* trim last ':' */
 	DUP_AND_RET(valp,LABEL);
@@ -1816,7 +1817,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 81:
 YY_RULE_SETUP
-#line 319 "languages/imcc/imcc.l"
+#line 320 "languages/imcc/imcc.l"
 {
         int type = pmc_type(interp, string_from_cstring(interp, yytext+1, 0));
 
@@ -1832,7 +1833,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 82:
 YY_RULE_SETUP
-#line 332 "languages/imcc/imcc.l"
+#line 333 "languages/imcc/imcc.l"
 {
 	if (!is_def) {
 		SymReg *r = find_sym(yytext);
@@ -1847,27 +1848,27 @@ YY_RULE_SETUP
 	YY_BREAK
 case 83:
 YY_RULE_SETUP
-#line 344 "languages/imcc/imcc.l"
+#line 345 "languages/imcc/imcc.l"
 DUP_AND_RET(valp, FLOATC);
 	YY_BREAK
 case 84:
 YY_RULE_SETUP
-#line 345 "languages/imcc/imcc.l"
+#line 346 "languages/imcc/imcc.l"
 DUP_AND_RET(valp, INTC);
 	YY_BREAK
 case 85:
 YY_RULE_SETUP
-#line 346 "languages/imcc/imcc.l"
+#line 347 "languages/imcc/imcc.l"
 DUP_AND_RET(valp, INTC);
 	YY_BREAK
 case 86:
 YY_RULE_SETUP
-#line 347 "languages/imcc/imcc.l"
+#line 348 "languages/imcc/imcc.l"
 DUP_AND_RET(valp, INTC);
 	YY_BREAK
 case 87:
 YY_RULE_SETUP
-#line 349 "languages/imcc/imcc.l"
+#line 350 "languages/imcc/imcc.l"
 {
 	valp->s = str_dup(yytext);
         return(STRINGC); /* XXX delete quotes, -> emit, pbc */
@@ -1875,7 +1876,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 88:
 YY_RULE_SETUP
-#line 354 "languages/imcc/imcc.l"
+#line 355 "languages/imcc/imcc.l"
 {
         valp->s = str_dup(yytext); /* XXX delete quotes, -> emit, pbc */
         return(STRINGC);
@@ -1883,38 +1884,38 @@ YY_RULE_SETUP
 	YY_BREAK
 case 89:
 YY_RULE_SETUP
-#line 359 "languages/imcc/imcc.l"
+#line 360 "languages/imcc/imcc.l"
 DUP_AND_RET(valp, IREG);
 	YY_BREAK
 case 90:
 YY_RULE_SETUP
-#line 360 "languages/imcc/imcc.l"
+#line 361 "languages/imcc/imcc.l"
 DUP_AND_RET(valp, NREG);
 	YY_BREAK
 case 91:
 YY_RULE_SETUP
-#line 361 "languages/imcc/imcc.l"
+#line 362 "languages/imcc/imcc.l"
 DUP_AND_RET(valp, SREG);
 	YY_BREAK
 case 92:
 YY_RULE_SETUP
-#line 362 "languages/imcc/imcc.l"
+#line 363 "languages/imcc/imcc.l"
 DUP_AND_RET(valp, PREG);
 	YY_BREAK
 case 93:
 YY_RULE_SETUP
-#line 364 "languages/imcc/imcc.l"
+#line 365 "languages/imcc/imcc.l"
 /* skip */;
 	YY_BREAK
 case 94:
 YY_RULE_SETUP
-#line 366 "languages/imcc/imcc.l"
+#line 367 "languages/imcc/imcc.l"
 {
         return yytext[0];
     }
 	YY_BREAK
 case YY_STATE_EOF(emit):
-#line 370 "languages/imcc/imcc.l"
+#line 371 "languages/imcc/imcc.l"
 {
         BEGIN (INITIAL);
         if (pasm_file) {
@@ -1925,17 +1926,17 @@ case YY_STATE_EOF(emit):
     }
 	YY_BREAK
 case YY_STATE_EOF(INITIAL):
-#line 379 "languages/imcc/imcc.l"
+#line 380 "languages/imcc/imcc.l"
 yyterminate();
 	YY_BREAK
 case 95:
 YY_RULE_SETUP
-#line 381 "languages/imcc/imcc.l"
+#line 382 "languages/imcc/imcc.l"
 DUP_AND_RET(valp, ENDM);
 	YY_BREAK
 case 96:
 YY_RULE_SETUP
-#line 383 "languages/imcc/imcc.l"
+#line 384 "languages/imcc/imcc.l"
 {
         line++;
         DUP_AND_RET(valp, '\n');
@@ -1943,12 +1944,12 @@ YY_RULE_SETUP
 	YY_BREAK
 case 97:
 YY_RULE_SETUP
-#line 388 "languages/imcc/imcc.l"
+#line 389 "languages/imcc/imcc.l"
 return LABEL;
 	YY_BREAK
 case 98:
 YY_RULE_SETUP
-#line 389 "languages/imcc/imcc.l"
+#line 390 "languages/imcc/imcc.l"
 {
         char *label;
 	char *name = macros[num_macros].name;
@@ -1970,7 +1971,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 99:
 YY_RULE_SETUP
-#line 408 "languages/imcc/imcc.l"
+#line 409 "languages/imcc/imcc.l"
 {
         char *label;
 	char *name = macros[num_macros].name;
@@ -1987,39 +1988,39 @@ YY_RULE_SETUP
 	YY_BREAK
 case 100:
 YY_RULE_SETUP
-#line 422 "languages/imcc/imcc.l"
+#line 423 "languages/imcc/imcc.l"
 /* skip leading ws */;
 	YY_BREAK
 case 101:
 YY_RULE_SETUP
-#line 423 "languages/imcc/imcc.l"
+#line 424 "languages/imcc/imcc.l"
 DUP_AND_RET(valp, ' ');
 	YY_BREAK
 case 102:
 YY_RULE_SETUP
-#line 424 "languages/imcc/imcc.l"
+#line 425 "languages/imcc/imcc.l"
 DUP_AND_RET(valp, IDENTIFIER);
 	YY_BREAK
 case 103:
 YY_RULE_SETUP
-#line 425 "languages/imcc/imcc.l"
+#line 426 "languages/imcc/imcc.l"
 DUP_AND_RET(valp, MACRO);
 	YY_BREAK
 case 104:
 YY_RULE_SETUP
-#line 426 "languages/imcc/imcc.l"
+#line 427 "languages/imcc/imcc.l"
 DUP_AND_RET(valp, yytext[0]);
 	YY_BREAK
 case YY_STATE_EOF(macro):
-#line 427 "languages/imcc/imcc.l"
+#line 428 "languages/imcc/imcc.l"
 yyterminate();
 	YY_BREAK
 case 105:
 YY_RULE_SETUP
-#line 429 "languages/imcc/imcc.l"
+#line 430 "languages/imcc/imcc.l"
 ECHO;
 	YY_BREAK
-#line 2023 "languages/imcc/imclexer.c"
+#line 2024 "languages/imcc/imclexer.c"
 case YY_STATE_EOF(pod):
 case YY_STATE_EOF(cmt1):
 case YY_STATE_EOF(cmt2):
@@ -2912,7 +2913,7 @@ int main()
 	return 0;
 	}
 #endif
-#line 429 "languages/imcc/imcc.l"
+#line 430 "languages/imcc/imcc.l"
 
 
 #ifdef yywrap
@@ -3155,6 +3156,11 @@ expand_macro (YYSTYPE *valp, void *interp, const char *name)
     m = find_macro(name);
     frame->params = &m->params;
     if (m) {
+        /* remember macro name for error reporting
+         * properly
+         */
+        sourcefile = name;
+        frame->is_macro = 1;
 	/* whitespace can be savely ignored */
 	do {
 	    c = input();
@@ -3271,10 +3277,14 @@ compile_file(Interp *interp, FILE *file)
 }
 
 void
-print_inc(void)
+print_inc(const char *file, int lin)
 {
     struct macro_frame_t *f;
 
+    if (frames->is_macro)
+        fprintf(stderr, "\nin macro '.%s' line %d\n", file, lin);
+    else
+        fprintf(stderr, "\nin file '%s' line %d\n", file, lin);
     for (f = frames; f; f = f->next) {
         if (f->file && strcmp(f->file, sourcefile))
             f->next ?

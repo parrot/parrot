@@ -1,4 +1,4 @@
-/* A Bison parser, made from imcc.y, by GNU bison 1.75.  */
+/* A Bison parser, made from languages/imcc/imcc.y, by GNU bison 1.75.  */
 
 /* Skeleton parser for Yacc-like parsing with Bison,
    Copyright (C) 1984, 1989, 1990, 2000, 2001, 2002 Free Software Foundation, Inc.
@@ -23,8 +23,8 @@
    This special exception was added by the Free Software Foundation
    in version 1.24 of Bison.  */
 
-#ifndef BISON_IMCPARSER_H
-# define BISON_IMCPARSER_H
+#ifndef BISON_LANGUAGES_IMCC_IMCPARSER_H
+# define BISON_LANGUAGES_IMCC_IMCPARSER_H
 
 /* Tokens.  */
 #ifndef YYTOKENTYPE
@@ -191,7 +191,7 @@
 
 
 #ifndef YYSTYPE
-#line 191 "imcc.y"
+#line 191 "languages/imcc/imcc.y"
 typedef union {
     int t;
     char * s;
@@ -199,12 +199,12 @@ typedef union {
     Instruction *i;
 } yystype;
 /* Line 1281 of /usr/share/bison/yacc.c.  */
-#line 203 "imcparser.h"
+#line 203 "languages/imcc/imcparser.h"
 # define YYSTYPE yystype
 #endif
 
 
 
 
-#endif /* not BISON_IMCPARSER_H */
+#endif /* not BISON_LANGUAGES_IMCC_IMCPARSER_H */
 
