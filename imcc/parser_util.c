@@ -373,7 +373,7 @@ INS(Interp *interpreter, IMC_Unit * unit, char *name,
         }
         else if (!memcmp(name, "invoke", 6) ||
                 !memcmp(name, "callmethod", 10)) {
-            if (cur_unit->type == IMC_PCCSUB)
+            if (cur_unit->type & IMC_PCCSUB)
                 cur_unit->instructions->r[1]->pcc_sub->calls_a_sub |= 1;
         }
         /* set up branch flags */

@@ -8,10 +8,11 @@
  */
 
 typedef enum {
-    IMC_PASM = 0,
-    IMC_PCCSUB = 1,
-    IMC_FASTSUB = 2,
-    IMC_CLASS = 3
+    IMC_PASM    	= 0x01,
+    IMC_PCCSUB  	= 0x02,
+    IMC_FASTSUB 	= 0x04,
+    IMC_CLASS 		= 0x08,
+    IMC_HAS_SELF	= 0x10
 } IMC_Unit_Type;
 
 

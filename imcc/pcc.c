@@ -410,13 +410,27 @@ expand_pcc_sub(Parrot_Interp interpreter, IMC_Unit * unit, Instruction *ins)
     label1 = label2 = NULL;
     ps = pe = sub->pcc_sub->pragma & P_PROTOTYPED;
     if (!pe && (sub->pcc_sub->pragma & P_NONE)) {
-        ps = 0; pe = 1;
+        int i, all_pmc;
+
         /* subroutine can handle both */
-        i0 = get_pasm_reg("I0");
-        regs[0] = i0;
-        sprintf(buf, "%csub_%s_p1", IMCC_INTERNAL_CHAR, sub->name);
-        regs[1] = label1 = mk_address(str_dup(buf), U_add_uniq_label);
-        ins = insINS(interpreter, unit, ins, "if", regs, 2);
+        ps = 0; pe = 1;
+        /* check if PMC only */
+        for (all_pmc = 1, i = 0; i < sub->pcc_sub->nargs; ++i)
+            if (sub->pcc_sub->args[i]->set != 'P') {
+                all_pmc = 0;
+                break;
+            }
+        if (all_pmc) {
+            ps = pe = 1;
+        }
+        else {
+            /* and subroutine has mixed args */
+            i0 = get_pasm_reg("I0");
+            regs[0] = i0;
+            sprintf(buf, "%csub_%s_p1", IMCC_INTERNAL_CHAR, sub->name);
+            regs[1] = label1 = mk_address(str_dup(buf), U_add_uniq_label);
+            ins = insINS(interpreter, unit, ins, "if", regs, 2);
+        }
     }
     for (proto = ps; proto <= pe; ++proto) {
         nargs = sub->pcc_sub->nargs;
@@ -443,6 +457,19 @@ expand_pcc_sub(Parrot_Interp interpreter, IMC_Unit * unit, Instruction *ins)
 NONAMEDPARAMS: /* If no named params, don't generate any param code */
 
     /*
+     * if this sub references self, fetch it
+     */
+    if (unit->type & IMC_HAS_SELF) {
+        sub->pcc_sub->p2_sym = regs[0] = get_sym("self");
+        assert(regs[0]);
+
+        sprintf(buf, "%d", CURRENT_OBJECT);
+        regs[1] = get_const(buf, 'I');
+        ins = insINS(interpreter, unit, ins, "interpinfo", regs, 2);
+        regs[1] = get_pasm_reg("P2");
+        ins = insINS(interpreter, unit, ins, "set", regs, 2);
+    }
+    /*
      * if we call out, the return cc in P1 must be saved
      */
     if (sub->pcc_sub->calls_a_sub) {
@@ -450,12 +477,6 @@ NONAMEDPARAMS: /* If no named params, don't generate any param code */
         if (!(sub->pcc_sub->pragma & P_MAIN)) {
             regs[0] = sub->pcc_sub->cc_sym = mk_temp_reg('P');
             regs[1] = get_pasm_reg("P1");
-            insINS(interpreter, unit, ins, "set", regs, 2);
-        }
-        /* in a method we need a reg for P2 */
-        if (sub->pcc_sub->pragma & P_METHOD) {
-            regs[0] = sub->pcc_sub->p2_sym = mk_temp_reg('P');
-            regs[1] = get_pasm_reg("P2");
             insINS(interpreter, unit, ins, "set", regs, 2);
         }
         /* if its a coroutine, preserve the sub P0 */
@@ -484,10 +505,6 @@ NONAMEDPARAMS: /* If no named params, don't generate any param code */
             ins = insINS(interpreter, unit, ins, "null", regs, 1);
             regs[0] = get_pasm_reg("I3");  /* no P regs */
             ins = insINS(interpreter, unit, ins, "null", regs, 1);
-            if (sub->pcc_sub->cc_sym)
-                regs[0] = sub->pcc_sub->cc_sym;
-            else
-                regs[0] = get_pasm_reg("P1");
             tmp = INS(interpreter, unit, "returncc", NULL, regs, 0, 0, 0);
         }
         debug(interpreter, DEBUG_IMC, "add sub ret - %I\n", tmp);
@@ -520,7 +537,7 @@ NONAMEDPARAMS: /* If no named params, don't generate any param code */
 void
 expand_pcc_sub_ret(Parrot_Interp interpreter, IMC_Unit * unit, Instruction *ins)
 {
-    SymReg *sub, *reg, *regs[IMCC_MAX_REGS], *call;
+    SymReg *sub, *regs[IMCC_MAX_REGS];
     int  n, arg_count;
 
 #if IMC_TRACE
@@ -551,24 +568,18 @@ expand_pcc_sub_ret(Parrot_Interp interpreter, IMC_Unit * unit, Instruction *ins)
         regs[0] = get_pasm_reg("P0");
         regs[1] = unit->instructions->r[1]->pcc_sub->p0_sym;
         ins = insINS(interpreter, unit, ins, "set", regs, 2);
+        ins = insINS(interpreter, unit, ins, "invoke", regs, 0);
     }
-    /*
-     * insert return invoke
-     */
-    call = unit->instructions->r[1];
-    if (call->pcc_sub->cc_sym)
-        regs[0] = call->pcc_sub->cc_sym;
-    else
-        regs[0] = get_pasm_reg("P1");
-    ins = insINS(interpreter, unit, ins, "invoke", regs, arg_count);
-    reg = regs[0];
+    else {
+        /*
+         * insert return invoke
+         */
+        ins = insINS(interpreter, unit, ins, "returncc", regs, 0);
+    }
     /*
      * move the pcc_sub structure to the invoke
      */
-    if (arg_count == 0)
-        ins->r[0] = reg = get_pasm_reg("P0");;
-    reg->pcc_sub = sub->pcc_sub;
-    sub->pcc_sub = NULL;
+    ins->r[0] = sub;
 
     /*
      * mark the invoke instruction's PCC sub type
@@ -852,17 +863,8 @@ pcc_emit_flatten(Parrot_Interp interpreter, IMC_Unit * unit, Instruction *ins,
 
 /*
  * Expand a PCC subroutine call (IMC) into its PASM instructions
- * This is the nuts and bolts of Perl6/Parrot routine call style
+ * This is the nuts and bolts of pdd03 routine call style
  *
- * XXX FIXME: VTCONST and VT_CONSTP, VTREG and VT_REGP are
- * mixed and matched here. There should only be pointer types
- * in sub->args. Trim out non-pointer type checks and verify
- * correctness. (see symreg.c: add_pcc_arg())
- * This potentially applies to much of the flow analysis code
- * that is currently lazy and checks for too many things, which
- * is fine but it was the source of a really nasty bug when add_pcc_arg()
- * was not setting arg->type correctly.
- * And THAT is the reason for all this nasty TRACE code. -Mel
  */
 void
 expand_pcc_sub_call(Parrot_Interp interp, IMC_Unit * unit, Instruction *ins)

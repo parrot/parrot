@@ -395,8 +395,9 @@ SP              [ ]
                         r->pcc_sub) {
                     if ((r->pcc_sub->pragma & P_METHOD) &&
                         !strcmp(yytext, "self")) {
-                        valp->s = str_dup("P2");
-                        return REG;
+                        valp->sr  = mk_ident(str_dup("self"), 'P');
+                        cur_unit->type |= IMC_HAS_SELF;
+                        return VAR;
                     }
                     if (!strcmp(yytext, "argcI")) {
                         valp->s = str_dup("I1");
