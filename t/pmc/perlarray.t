@@ -45,12 +45,21 @@ output_is(<<'CODE', <<'OUTPUT', "set/get by index");
 	get_keyed S1,P0,2      # set S1, P0[2]
 	print S1
 	print "\n"
-        
+
+        set P0, 4
+        new P1, PerlInt
+        set P1, 42
+	set_keyed P0,3,P1      # set P0[3], P1
+	get_keyed P2,P0,3      # set S1, P0[3]
+	print P2
+	print "\n"
+
         end
 CODE
 3
 3.700000
 hey
+42
 OUTPUT
 
 output_is(<<'CODE', <<'OUTPUT', "same, but with implicit resizing");
@@ -70,11 +79,19 @@ output_is(<<'CODE', <<'OUTPUT', "same, but with implicit resizing");
 	print S1
 	print "\n"
 
+        new P1, PerlInt
+        set P1, 42
+	set_keyed P0,3,P1      # set P0[3], P1
+	get_keyed P2,P0,3      # set S1, P0[3]
+	print P2
+	print "\n"
+
         end
 CODE
 3
 3.700000
 hey
+42
 OUTPUT
 
 output_is(<<'CODE', <<'OUTPUT', "keys of different types");
