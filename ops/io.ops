@@ -116,6 +116,22 @@ inline op getstderr(out PMC) {
 
 #########################################
 
+=item B<pioctl>(out INT, in PMC, in INT, in INT)
+
+Perform an operation an an IO object. This is a general purpose
+hook for setting various flags, modes, etc.
+Examples: setting the record seperator or setting the buffering
+
+=cut
+
+inline op pioctl(out INT, in PMC, in INT, in INT) {
+  $1 = PIO_pioctl(interpreter, $2, $3, $4);
+  goto NEXT();
+}
+
+
+#########################################
+
 =item B<open>(out PMC, in STR, in STR)
 
 Open URL (file, address, database, in core image) named $2 with
