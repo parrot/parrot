@@ -794,21 +794,30 @@ single_quoted_string_body:
         | m/(?:[^\Q$arg[0]\E\\]+|\\(?!qq\{).)*/ {
 			$item[-1] =~ s/\\'/'/g; quotemeta($item[-1]) }
 
-backslashed_expr: <rulevar:$delim>
 backslashed_expr:
           /(?=[qQ])/ single_quoted_string { $item[2] }
         | 'c' '[' string_set ']'
+        | 'c' '[' /[^\]]+/ ']'
         | ':' '[' string_set ']'
+        | ':' '[' /[^\]]+/ ']'
+        | 'x' '[' hex_set ']'
+        | 'x' '[' /[0-9a-fA-F]+/ ']'
+        | '0' '[' number_set ']'
+        | '0' '[' base ']'
+        | base
+        | 'x' /[0-9a-fA-F]+/
         | /[UL]/ '[' /[^\]]*/ ']'
         | /[ul]/ /./
-        | /[trfn]/
+        | /[trfne0\\]/
+
+hex_set:
+        ( /[0-9a-fA-F]+/ ';' )(s) /[0-9a-fA-F]+/
+
+number_set:
+        ( base ';' )(s) base
 
 string_set:
-        (
-            ...!/[:\]]+\]/
-            single_quoted_string_body[';'](s)
-        )(s?)
-        single_quoted_string_body[']'](s)
+        ( /(?=[^\];]+;)[^;]+/ ';' )(s) /[^\]]+/
 
 ##############################
 # Regexes:

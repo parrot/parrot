@@ -166,8 +166,13 @@ use P6C::Util qw(unimp error);
 sub tree {
     my $x = shift;
     my $val = "";
-    if ($x->[1] eq 'c') {
-        return string_special($x->[5]->tree)
+    if (ref $x->[1] eq 'P6C::base') {
+	    $val = $x->[1]->tree->lval;
+    }
+    elsif ($x->[1] eq 'c') {
+        return string_special($x->[3]->tree)
+            if ref $x->[3] eq 'P6C::string_set';
+        return string_special($x->[3]);
     }
     elsif ($x->[1] eq ':') {
         unimp qq("\\:[]")
@@ -177,32 +182,46 @@ sub tree {
         $val = uc $x->[3] if @$x > 3
     }
     elsif ($x->[1] =~ /l/i) {
-        $val = lc $x->[2];
-        $val = lc $x->[3] if @$x > 3
+          $val = lc $x->[2];
+          $val = lc $x->[3] if @$x > 3
+      }
+
+    elsif ($x->[1] eq 'x') {
+        if (ref $x->[3] eq 'P6C::hex_set') {
+            return $x->[3]->tree
     }
-    elsif ($x->[1] eq 'e') {
-        $val = '\\' . quotemeta $x->[2];
-    }
-    elsif ($x->[1] eq 'E') {
-        $val = quotemeta $x->[3];
-        $val =~ s/\\/\\\\/g;
+      elsif (@$x > 3) {
+	        $val = '\\' . $x->[2] . $x->[3]
     }
     else {
-        $val = '\\' . $x->[1]
+            $val = '\\' . $x->[1] . $x->[2]
+        }
+    }
+    elsif ($x->[1] eq '0') {
+        return $x->[3]->tree if @$x > 3;
+    }
+    else {
+        $val = '\\' . $x->[1];
+        $val = "\\x5C" if ($x->[1] eq '\\');
     }
     return new P6C::sv_literal type => "PerlString", lval => qq{"$val"};
 }
 
 sub string_special {
     foreach (@_) {
-        my $data = $_->lval;
-        if (substr($data,0,1) eq '^') {
-            $data = substr($data,1);
-            $_->lval(eval qq["\\c$data"]);
+        my $val="";
+        if (substr($_,0,1) eq '^') {
+            $_ = substr($_,1);
+            $val = eval qq["\\c$_"];
+            error ("Error in interpolation of control-char: $@"),die if $@;
         }
         else {
-            $_->lval(eval qq["\\N{$data}"]);
+            use charnames qw(:full);
+            $val = eval qq["\\N{$_}"];
+            error ("Error in interpolation of control-char: $@"),die if $@;
         }
+        $val = '\\x'.sprintf("%x",ord $val) if ord($val) < 256;
+        $_ = new P6C::sv_literal type => "PerlString", lval => qq["$val"];
     }
     return @_
 }
@@ -247,15 +266,47 @@ sub tree {
 package P6C::string_set;
 use P6C::Nodes;
 use strict;
-use P6C::Util qw(unimp error);
 
 sub tree {
     my $x = shift;
     my @items;
-    foreach my $item (@{$x->[1]}) {
-        push @items, P6C::quoted_string::tree($x->[1]->[2])
+    foreach (@{$x->[1]}) {
+        push @items, $_->[1];
     }
-    push @items, P6C::quoted_string::tree($x->[2]);
+    push @items, $x->[2];
+    return @items
+}
+
+package P6C::number_set;
+use strict;
+
+sub tree {
+    my $x = shift;
+    my @items;
+    foreach (@{$x->[1]}) {
+        my $item = $_->[1]->[1]->tree;
+        $item->type('PerlString');
+        $item->lval('"'.$item->lval().'"');
+        push @items, $item;
+    }
+    my $item = $x->[2]->tree;
+    $item->type('PerlString');
+    $item->lval('"'.$item->lval().'"');
+    push @items, $item;
+    return @items
+}
+
+package P6C::hex_set;
+use strict;
+use P6C::Nodes;
+
+sub tree {
+    my $x = shift;
+    my @items;
+    foreach (@{$x->[1]}) {
+        push @items, P6C::quoted_string::make_node('"\\x'.$_->[1].'"');
+    }
+    push @items, P6C::quoted_string::make_node('"\\x'.$x->[2].'"');
     return @items
 }
 
