@@ -11,7 +11,7 @@ sub output_terminate {
     return "terminate";
 }
 
-sub output_incr {
+sub output_increment {
     my $var = shift;
     return "$var++";
 }

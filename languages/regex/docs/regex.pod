@@ -1,0 +1,540 @@
+=head1 TITLE
+
+Irregular expressions and how to implement 'em (WORK IN PROGRESS)
+
+=head1 OVERVIEW
+
+This document describes how the languages/regex compiler implements
+perl5/6-style regular expressions. I know; I really should come up
+with a better name than "languages/regex".
+
+=head2 PHILOSOPHY
+
+Everything must be implemented with primitive operations. The compiler
+should be language-agnostic, for both the input and output. Operations
+are implemented independently. Control flow is explicit: operations
+maintain their own state and do direct jumps to the next operation (or
+back to the previous, when failing). Optimizations should apply as
+generally as possible.
+
+=head2 STAGES
+
+The input to the compiler is a tree containing the expression to be
+compiled. This tree is traversed to gather information for
+optimization, optimized, and then converted to a simple list of
+operators. This list is then itself optimized with a peephole
+optimizer, and finally converted to the target language.
+
+The initial tree is constructed out of what are called "tree ops", and
+are compiled into different (simpler) ops referred to as "list
+ops". Dumb names, but simple, yes?
+
+=head2 EXAMPLE
+
+We'll compile the expression (a|bc)* down to the list ops, ignoring
+optimizations.
+
+The tree representing that expression is:
+
+  star
+    alternate
+      literal(a)
+      sequence
+        literal(b)
+        literal(c)
+
+=head3 REWRITING A GREEDY CLOSURE (R*)
+
+First, we apply the 'star' rewrite rule. This rule says R* is
+converted to
+
+ 1   start: push 0
+ 2    loop: R or next
+ 3          push 1
+ 4          goto loop
+ 5    back: popint -> $temp
+ 6          if ($temp) goto R.back
+ 7          goto lastback
+ 8    next:
+
+This is a sequence of list ops that are expected to be run
+sequentially. It is entered at the top, and on success will end up at
+the 'next' label. On failure, control should transfer to 'lastback',
+which is a label passed into the rewrite engine from a previous
+rewrite that is used to inform the previous tree op that matching has
+failed. 'back' is the label for the 'star' tree op, which will be used
+as the 'lastback' for the subsequent op. ('loop' is a local label used
+only within this rewritten code segment.) 'next', 'back', and
+'lastback' are common to all rewrite rules.
+
+Let's walk through the code line by line.
+
+Line 1 is pushing a value onto the regex stack. The regex stack should
+*not* be the same stack used for control flow or subroutine parameter
+passing in the host language; it should be an independent stack that
+can be manipulated independently of the regular stack(s). In Parrot,
+normally an IntList PMC would be used. The zero value will be used in
+this case to record that we have not yet matched any occurrences of
+the subexpression R. We will see later how this is used.
+
+Line 2 is really a placeholder for the recursively rewritten ops for
+the subexpression R. The 'or next' assigns the 'lastback' label for
+the rewrite of R; intuitively, "R or SOMELABEL means "try to match R,
+and if you fail, clean up any partial state and then jump to
+SOMELABEL."
+
+Line 3 records the fact that we have matched R at least
+once. Remember, the rewrite rule for R will allow control flow to
+continue past the generated code if it succeeds (effectively, line 3
+will end up prefixed with the 'next' label for the R rewrite).
+
+Line 4 goes back to the top of the loop and tries to match another
+R. At this point, we can see basically how this rewrite rule will
+work: it attempts to match R as many times as possible. When it
+finally fails, it will jump to the 'next' label to continue matching
+the rest of the overall regular expression. That corresponds with how
+a backtracking regular expression engine is supposed to behave.
+
+Line 5 says what to do if the remainder of the regular expression
+fails. It will be returned from this rewrite rule and most probably
+used as the 'lastback' of the next subexpression in a sequence. To the
+expression R* that is currently being rewritten, it means to backtrack
+and try to find a different way of matching R*. If this is confusing,
+consider what happens with the perl code C<"eek!" =~ /e*ek/>. First,
+as many e's as possible are matched; in this case, that means 2. Then
+the engine tries to match another 'e', which fails (we already used up
+both e's on the e* match.) So, it backs up and tries to find another
+way of matching e*. In this case, it's possible by matching only one e
+instead of both. So it continues again to the remainder of the
+expression, trying to match another 'e' (which succeeds) and then a
+'k' (which also succeeds). At this point, we stop, because the entire
+expression has been matched successfully. If the pattern had instead
+been /e*ej/, then the same thing would have happened up until we tried
+to match the 'k', which would fail. So it would undo the 'e' match and
+try yet another way to match e*. This attempt would succeed yet again,
+this time by matching zero occurrences of 'e' (remember, * means zero
+or more). It would continue, trying once again to match "ej", and
+would once again fail. Finally, it would try one last time to match
+e*, which would fail because every possible way has already been
+tried. It would propagate this failure back to e*'s predecessor (just
+like the 'ej' did to its predecessor), which in this case is the
+overall expression, so the whole expression would fail.
+
+Back to our rewrite example, still on line 5. The following expression
+has failed to match, so we need to find another way of matching the
+current expression (if possible). So we pop our signal value off of
+the regex stack, and test whether we matched any R's to begin with. If
+so, then we try to match the last-matched R in a different way, by
+jumping to its 'back' label. (Think of the example /(a|b)*/ -- you'd
+want to try matching "aaa", and then "aab" if that failed. Only if
+both of those failed would you go onto things like "aa", "ab", etc.)
+
+Popping the signal value off of the regex stack actually serves two
+different purposes. The first is described in the previous paragraph:
+the value is needed to figure out whether we have any matched R's to
+backtrack through. The second purpose is to clean up after
+ourselves. Part of the duty of the 'back' label is to restore the
+program's state to what it was before the current subexpression
+attempted to match. The two main parts of that state are the position
+marker within the input string, and the regex stack. The
+"languages/regex" compiler makes the policy that every rewrite rule
+must clean up after itself (and *only* itself). That means that, since
+this rewrite rule does not modify the input position pointer, it
+should not undo any changes to it either. That responsibility is left
+to the rewrite rules that actually consume input themselves, such as
+literal character matches (which advance the pointer by one when they
+match, and back it up by one when they backtrack).
+
+Line 7 is reached if we have never successfully matched any R (or did,
+but have backtracked back past all of them.) It means that the overall
+R* rule has failed, and we should backtrack to the caller's 'lastback'
+label.
+
+Line 8 is just a label for the beginning of the subsequent expression,
+used here only so that we have somewhere to jump to.
+
+So there's the whole rewrite rule -- but there's something
+missing. Think about the expression /a*/. If given an input string
+three characters long, it should try to match "aaa", then "aa", then
+"a", and then finally "". Where in this rewrite rule do we "unmatch"
+an 'a'? It should be in the 'back' label, because we only want to
+unmatch things if the following expression fails.
+
+And that is exactly where it is. When we jump to R.back, it will undo
+whatever it previously did (in the case of /a*/, it will back up the
+position marker in the input string by one character). The only other
+evidence that we every matched the extra 'a' is the marker value that
+we pushed onto the regex stack, and we undo that too. So if R.back is
+unable to find another way of matching R (and it never will, in the
+case of /a/, since there's only one way that it could ever match),
+then it will jump to the WHATEVER label in the "or WHATEVER"
+clause. But by the time it reaches WHATEVER, it will have completely
+undone the last (failed) match of R.
+
+=head3 REWRITING AN ALTERNATION (R|S)
+
+Whew. So we now know how to rewrite R*. To continue with our example
+-- you remember our original example, right? -- we need to now compile
+/a|bc/. We will do this with a rewrite rule for alternation, which
+covers any /R|S/ expression.
+
+   R|S -> start: R or tryS
+                 push 0
+                 goto next
+           tryS: S or lastback
+                 push 1
+                 goto next
+           back: popint -> I0
+                 eq I0, 0, R.back
+                 goto S.back
+           next:
+
+(This could be very slightly simplified, but the form given is easily
+extended to R|S|T|U|...)
+
+In many ways, this is very similar to the R* case. I will describe it
+in more general terms.
+
+This rewrite rule first attempts to match R. If R matches, then R's
+partial state will be stored onto the regex stack, and we'll push a
+zero on top of the stack so that when we backtrack, we know whether we
+should try to match R in a different way, or whether R has already
+been matched every way possible and we should backtrack into S
+instead. If (or once) R fails, we'll try matching S, which in turn
+will leave its partial state on the stack, and we'll push a one marker
+on top of it.
+
+When the following expression fails and jumps to our 'back' label,
+we'll first pop the marker off the stack to figure out which
+expression was currently being matched. We'll then jump to the
+appropriate backtracking label within that expression.
+
+I'm guessing your head is hurting about as much as mine right now, so
+I'll throw in one more thing to see if I can make it completely
+explode. Notice that this expression never jumps directly to
+'lastback' itself. Instead, it passes 'lastback' into the rewriter for
+a subexpression, so that the subexpression's failure will trigger an
+immediate jump to the 'lastback' label. This works only because all
+rewriters follow the policies previously described: in particular, a
+subexpression is responsible for cleaning up its partial state before
+failing and jumping to its 'lastback' label. So in the example of R|S
+above, the only information on the regex stack at the point S.back is
+jumped to (S.back refers to S's 'back' label, by the way) is the
+partial state of S. So once S fails, there will be no trace of it on
+the stack, and hence no trace of the R|S match either. (This is also
+true of R failing; however, the rewrite rule for R was passed 'tryS'
+as its 'lastback' label, so the state difference is stored within the
+generated code itself, and need not be on the stack.)
+
+If you're still reading at this point, then either your head did not
+explode, or I am now writing for whoever wiped your brains off of the
+ceiling and was curious as to what caused to catastrophe. So, let's go
+on to the simplest rewrite rule of all, and almost the only one that
+actually does any work:
+
+=head3 REWRITING A SINGLE-CHARACTER MATCH
+
+Now we have to match the trivial expression /a/. This is easy, right?
+You just do "if input[pos] != 'a', then goto lastback", right?
+
+Wrong. But it's not too bad:
+
+    'a' -> start: if pos >= length(input), goto lastback
+                  if input[pos] != 'a', goto lastback
+                  pos++
+                  goto next
+            back: pos--
+                  goto lastback
+            next:
+
+Notice that the pos variable is incremented on a match, and restored
+on backtracking. This follows the policy I described above, but notice
+that it is not the only (or even the fastest) way to do it. For
+example, consider 'a*'. If 'a' matches 50 times but the whole
+expression ultimately fails, 'a' will have to be unmatched 50
+times. But remember the rewrite rule for '*'? It saves a signal value
+saying whether its subexpression has matched yet or not. But what if
+it used 'pos' as the signal value? Then instead of popping the value
+into a temporary variable and testing it for zero, it could pop the
+value directly into 'pos' (and test it for zero instead). Of course,
+that only works at the beginning of the string, but you could push the
+offset of pos from the beginning of when you tried to match 'a*' or
+whatever.
+
+The real problem is that this violates the philosophy of generating
+each expression independently -- the rewrite rule for R* would change
+depending on exactly what R is. Maintaining a dozen different rewrite
+rules for every tree operator would be a major pain in the posterior.
+
+=head3 REWRITING THE SEQUENCE RS
+
+We now know how to rewrite everything in the sample expression except
+for the 'sequence' tree op. The specific case of /bc/ is easy, but
+let's consider the more general RS. It becomes:
+
+ start: R or lastback
+        S or R.back
+        goto next
+  back: goto S.back
+  next:
+
+Actually, that's probably not really the way it's implemented. Too
+many jumps. More likely, 'back' would be set equal to 'S.back', and it
+would just be:
+
+ start: R or lastback
+        S or R.back
+  next: 
+
+Yay, no excess jumps!
+
+=head3 LIES!! ALL LIES!!!
+
+(scanning)
+
+=head3 OPTIMIZATIONS
+
+If you put all that together, you get a lot of code. 34 lines, if I'm
+counting correctly. More, in fact, than is strictly necessary. Here is
+something closer to the minimum necessary for the subexpression
+/(a|bc)*/:
+
+ start: push 0
+  loop: if pos >= length(input) goto next
+        if input[pos] == 'a' goto gotA
+        if input[pos] == 'b' goto gotB
+  fail: pop $temp
+        if $temp == 0 goto lastback
+        pos -= $temp
+        goto next
+  gotA: pos++
+        push 1
+        goto loop
+  gotB: if pos+1 >= length(input) goto fail
+        if input[pos+1] != 'c' goto fail
+        pos += 2
+        push 2
+        goto loop
+  back: goto fail (or really, make back == fail)
+  next:
+
+There are some small bits of cheating in there (C<if pos+1 >=
+length>), but if you complain about those then I'll convert the tests
+for 'a' and 'b' into a jump table keyed off of input[pos], so
+phbbttt!!
+
+So what happened? What inefficiencies led us to the code that was
+twice as long?
+
+Well, one thing has been previously mentioned: if we discard the
+notion of being able to rewrite tree ops independently of each other,
+then we gain back some of the slop. (Here, we use the usual stack
+state that the star operator keeps to store the size the subexpression
+matched -- either 1 or 2, or zero to flag the beginning of the whole
+search.) But that doesn't actually buy very much.
+
+A major difference with the optimized code is that it makes use of the
+fact that if /a/ matches at one point in the input string, we know
+that /bc/ will not, and vice versa. That means that we don't need to
+keep track of which alternative we used in order to backtrack
+correctly, because if one alternative matches and then is backtracked
+through, we need not bother to try the other alternative; we know the
+whole alternation will fail. And that simplifies alternation immensely
+-- we don't need to remember anything on the stack, so we don't need
+to undo any alternation-specific state either.
+
+Notice that these optimizations aren't horribly complicated; they are
+a fairly natural consequence of noticing certain properties about the
+expression being compiled. If we added in a preprocessing step that
+scans through the whole op tree to detect these exploitable
+situations, we might even be able to automate them. That is exactly
+what "languages/regex" does, although it currently only implements a
+small handful of optimizations.
+
+=head1 GENERAL REWRITING
+
+So now we've seen several examples of rewrite rules. I will now
+describe rewrite rules in general, and lay out the contract that a
+rewrite must follow in order to be used within the overall system.
+
+=head2 CONTROL FLOW API
+
+A rewrite rule must define four control flow points, two incoming and
+two outgoing: the initial entry point when attempting to process the
+match ('start'); the exit point where the following match is begun
+('next'); the entry point when backtracking through the rewrite code
+to attempt the match in a different way ('back'); and the exit label
+to use when the match fails completely and must backtrack through the
+calling expression ('lastback').
+
+=head2 STATE MAINTENANCE
+
+Various bits of state are modified during regular expression matching:
+the regex stack, the position within the input string, registers, the
+control (return address) stack, and the "normal" stack. All of these
+must be restored to their original values at the appropriate times.
+
+Call the state of the world at 'start' the initial state. When a
+rewritten section transfers control to the 'lastback' label, the state
+should be restored to (or unchanged from) the initial state. This is
+similar to a regular "callee-save" policy.
+
+At the 'back' point, the state is guaranteed to be identical to the
+state at the 'next' point (thanks to the above rule holding for the
+subsequent rewrites.)
+
+The state is allowed to change arbitrarily between 'start' and 'next',
+as long as the first condition holds (i.e., as long as it's still
+possible to restore the full initial state before jumping to
+'lastback'). Obviously, this also means that the state can change
+arbitrarily between 'back' and 'lastback' (it had better be able to,
+because 'back' == 'next' != 'start' == 'lastback').
+
+Notice that the possible paths of control flow through a rewrite rule
+are:
+
+  start -> next
+  start -> lastback
+  back -> next
+  back -> lastback
+
+This implies that local variables are dangerous. A rewrite may use a
+temporary variable if its value only needs to be preserved within the
+four paths listed above, but no variable will hold its value across
+the external paths of next->back or lastback->start. An example of
+where this applies is the rewrite rule for R<m..n>. The simplistic way
+of implementing this would be to keep a local variable which counts
+the number of times that R has matched so far. However, this variable
+will not persist across next->back (especially if the overall
+expression re-enters the same rewrite rule, as in (R<m..n>)*!) So it
+must be saved somewhere before leaving via 'next', and that somewhere
+pretty much has to be a stack. Upon re-entering via 'back', the value
+will need to be restored (or at the very least popped off the stack,
+in order to maintain the same state at 'lastback' as existed at
+'start'.) So that's all fine, but also notice that B<a different local
+variable must be used for each instance of that rewrite rule>. So
+local variables are not local to a subroutine; they are local to the
+code generated for a particular rewrite, and the "locality" must be
+managed manually when that code is exited or entered.
+
+Also, these local variables must also be considered to be regular
+local variables, i.e. they must be preserved across function
+calls. After all, the function containing the current regular
+expression may be re-entered through a recursive call. (Yes, you can
+call arbitrary code from within regular expressions.)
+
+=head2 RAMIFICATIONS
+
+Hmm. You can call arbitrary code from within regular expressions? What
+must that code look like?
+
+Well, for a start, the code must be able to be backtracked
+through. That means either it shouldn't do anything that needs to be
+undone, or it should export an interface (which here means "entry
+point") by which it can be backtracked through. Also, it really
+shouldn't cause any irreversible side effects, because then it's going
+to be impossible to write the backtracking code.
+
+Let's consider the case of a regular subroutine that wants to get
+called at some point in the match. The rewrite rule for sub foo()
+would be:
+
+  start: save local variables to stack
+         call foo
+         restore local variables from stack
+         goto next
+   back: save local variables to stack
+         call unfoo
+         restore local variables from stack
+         goto lastback
+
+But that assumes the presence of an unfoo() routine that is able to
+undo whatever foo did. Another possibility would be to add a parameter
+to foo() that indicates whether we are calling it normally, or for the
+purpose of backtracking.
+
+A question you may ask at this point is: so if it's that
+straightforward, why not implement all of the rewrite rules as
+subroutine calls and forget about all of this weird unstructured
+'next', 'back', and 'lastback' junk?
+
+The answer is that you could -- but it's pretty nasty for everything
+but the "leaf" rules that do not contain subexpressions. The problem
+with subexpressions is that you have to be able to backtrack into
+them, which means that they need to be able to resume processing as if
+they had succeeded the first time. Huh? What? Well, here's my first
+attempt at reimplementing R* as a perl subroutine:
+
+ sub Star::match {
+     my ($expr, $entry, $stack) = @_;
+     my $R_result;
+     if ($entry eq 'start') {
+         push @$stack, 0;
+         while (1) {
+             LOOP:
+             $R_result = $expr->subexpr->match('start', $stack);
+             return 'next' if ($R_result eq 'lastback');
+             push @$stack, 1;
+         }
+     } else { # $entry eq 'back'
+         my $temp = pop @$stack;
+         return 'lastback' if $temp == 0;
+         $R_result = $expr->subexpr->match('back', $stack);
+         goto LOOP;
+     }
+ }
+
+Notice the $entry being passed in. That's necessary because rewrite
+rules have two entry points: regular entry ('start') and backtracking
+('back'). The subroutine also returns two possible values: 'next' or
+'lastback'. They correspond to whether the matching succeeded or
+failed. (It would make more sense to just return true or false, but I
+wanted to demonstrate the connection to the previous R* rewrite rule.)
+
+The nastiness comes in when the subexpression $expr->subexpr is
+backtracked into (i.e., invoked with $entry eq 'back'). We need to
+resume processing exactly as if we had succeeded in matching the
+subexpression in the first place. That's kinda weird, but a natural
+use for a goto. Don't like gotos? Okay:
+
+ sub Star::match {
+     my ($expr, $entry, $stack) = @_;
+     push(@$stack, 0) if $entry eq 'start';
+     while (1) {
+         my $R_result;
+         if ($entry eq 'start') {
+             $R_result = $expr->R->match('start', $stack);
+         } else { # $entry eq 'back'
+             my $temp = pop @$stack;
+             return 'lastback' if $temp == 0;
+             $R_result = $expr->R->match('back', $stack);
+         }
+         return 'next' if ($R_result eq 'lastback');
+         push @$stack, 1;
+     }
+ }
+
+or, if you forget about using similar labels:
+
+ sub Star::match {
+     my ($expr, $stack, $backtracking) = @_;
+     push(@$stack, 0) if not $backtracking;
+     while (1) {
+         if ($backtracking) {
+             return if pop(@$stack) == 0; # Ran out of R's to unmatch
+             $expr->R->match($stack, 'backtrack') or return 1;
+         } else {
+             $expr->R->match($stack) or return 1;
+         }
+         push @$stack, 1;
+     }
+ }
+
+If you stare at that long enough, it'll start to make a certain amount
+of sense -- not much, but some. It is useful for seeing why local
+variables are so tricky. Any local variables in this routine are
+nicely preserved over the call to the subexpression R, but during the
+course of matching, this entire routine may return and be re-called
+multiple times for the same star. That makes it hard to do things like
+count the number of times R has matched so far, for example. (You'd
+have to remember that on the regex $stack.)

@@ -14,7 +14,7 @@ use vars qw(@AsmOps @EXPORT);
     [ "terminate()" ],
     [ "atend()" => "return whether at end of input string" ],
     [ "advance(n)" => "advance input <n> chars" ],
-    [ "increment(n)" => "advance input <n> chars" ],
+    [ "increment(var,[amount])" => "advance input <n> chars" ],
     [ "check(n)" => "require at least <n> chars remaining" ],
     [ "onfail(R)" ],
     [ "match(b)" => "return if start of input is b, advance 1 char" ],
@@ -26,7 +26,6 @@ use vars qw(@AsmOps @EXPORT);
 
     [ "goto(label)" => "unconditional jump to label" ],
     [ "label(name)" => "declare a label" ],
-    [ "incr(name)" => "???" ],
     [ "assign(name, val)" => "???" ],
     [ "if(a, condition, b, label)" => "if (A) CONDITION (B) goto LABEL" ],
     [ "fail()" ],

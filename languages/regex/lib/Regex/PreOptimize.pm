@@ -18,9 +18,9 @@ sub init {
 }
 
 sub optimize_tree {
-    my ($self, $t) = @_;
-    $t = $self->pass1($t);
-    $self->disable_implicit_checks($t);
+    my ($self, $t, $ctx) = @_;
+    $t = $self->pass1($t, $ctx);
+    $self->disable_implicit_checks($t, $ctx);
     $t = $self->add_checks($t, 0, 0);
     return $t;
 }
@@ -33,13 +33,13 @@ sub optimize_tree {
 #    <null>|R -> R??
 #
 sub pass1 {
-    my ($self, $t) = @_;
+    my ($self, $t, $ctx) = @_;
     my $type = $t->{name};
     if ($type eq 'seq') {
         # R.(S.T) => R.S.T
         # Or parenthetically, seq(R,seq(\alpha)) => seq(R, \alpha)
         #
-	my @pre_pieces = map { $self->pass1($_) } @{ $t->{args} };
+	my @pre_pieces = map { $self->pass1($_, $ctx) } @{ $t->{args} };
 	my @pieces;
 	foreach (@pre_pieces) {
 	    if (ref $_ && $_->{name} eq 'seq') {
@@ -57,7 +57,7 @@ sub pass1 {
         # opt(R|)    => opt(R)?
         # opt(|R)    => opt(R)??
         #
-        my @children = map { $self->pass1($_) } @{ $t->{args} };
+        my @children = map { $self->pass1($_, $ctx) } @{ $t->{args} };
         if (@children == 1) {
             return $children[0];
         }
@@ -76,7 +76,7 @@ sub pass1 {
                 return rop('multi_match', [0,1,0,$children[0]]);
             } else {
                 @{ $t->{args} } = @children;
-                return rop('multi_match', [0,1,0,$self->pass1($t)]);
+                return rop('multi_match', [0,1,0,$self->pass1($t, $ctx)]);
             }
         }
 
@@ -89,7 +89,7 @@ sub pass1 {
                 return rop('multi_match', [0,1,1,$children[0]]);
             } else {
                 @{ $t->{args} } = @children;
-                return rop('multi_match', [0,1,1,$self->pass1($t)]);
+                return rop('multi_match', [0,1,1,$self->pass1($t, $ctx)]);
             }
         }
 
@@ -101,7 +101,7 @@ sub pass1 {
 
         # opt(R|...) -> (opt(R)|opt(...)) (R is not a sequence)
         if ($R->{name} ne 'seq') {
-            my $subtree = $self->pass1(rop('alternate', \@children));
+            my $subtree = $self->pass1(rop('alternate', \@children), $ctx);
             @{ $t->{args} } = ($R, $subtree);
             return $t;
         }
@@ -120,14 +120,14 @@ sub pass1 {
 
         # None, so use opt(R|...) -> (opt(R)|opt(...))
         if (@shrunken == 0) {
-            my $subtree = $self->pass1(rop('alternate', \@children));
+            my $subtree = $self->pass1(rop('alternate', \@children), $ctx);
             @{ $t->{args} } = ($R, $subtree);
             return $t;
         }
 
         # Have at least one to combine with, but possibly not all
         @{ $R->{args} } = @Rrest;
-        my $subtree = $self->pass1(rop('alternate', [ $R, @shrunken ]));
+        my $subtree = $self->pass1(rop('alternate', [ $R, @shrunken ]), $ctx);
         my $opt = rop('seq', [ $R0, $subtree ]);
         if (@children == 0) {
             # Nothing left, so the original alternation disappears
@@ -135,7 +135,7 @@ sub pass1 {
         }
 
         # Something left: opt(aR|aS|T|...) -> a opt(R|S) | opt(T|...)
-        my $leftovers = $self->pass1(rop('alternate', \@children));
+        my $leftovers = $self->pass1(rop('alternate', \@children), $ctx);
         @{ $t->{args} } = ($opt, $leftovers);
         return $t;
     } else {
@@ -143,7 +143,7 @@ sub pass1 {
         foreach my $arg (@{ $t->{args} }) {
             if (UNIVERSAL::isa($arg, 'Regex::Ops::Tree')) {
                 # $arg is a reference variable, remember.
-                $arg = $self->pass1($arg);
+                $arg = $self->pass1($arg, $ctx);
             }
         }
         return $t;
@@ -230,7 +230,7 @@ sub add_checks {
     return $t if (defined($t->maxlen()) && $guarantee >= $t->maxlen());
 
     # Need more for even the shortest match of this subtree?
-    if ($t->minlen() > $guarantee) {
+    if (($t->minlen() || 0) > $guarantee) {
         my $newtree = $self->add_checks($t, $t->minlen(), $follow_min);
         return rop('check', [ $t->minlen() + $follow_min, $newtree ]);
     }
@@ -320,11 +320,11 @@ sub add_checks {
 # routine disables all of those checks. So you should call
 # add_checks() to put the (hopefully fewer) checks back in.
 sub disable_implicit_checks {
-    my ($self, $t) = @_;
+    my ($self, $t, $ctx) = @_;
     $t->{nocheck} = 1;
     foreach my $arg (@{ $t->{args} }) {
         if (UNIVERSAL::isa($arg, 'Regex::Ops::Tree')) {
-            $self->disable_implicit_checks($arg);
+            $self->disable_implicit_checks($arg, $ctx);
         }
     }
     return $t;

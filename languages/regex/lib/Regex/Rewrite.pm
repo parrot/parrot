@@ -136,11 +136,17 @@ sub rewrite_multi_match {
 
 ####### Old Stackless start #######
 
+# Does nothing if DEBUG is not set (if you're using this through
+# perl6, then you can turn this on with the $RX_DEBUG environment
+# variable)
+#
+# Otherwise, emits a print of the given string, but with %-escapes.
 sub dbprint {
     my ($self, $what) = @_;
     return () unless $self->{DEBUG};
     my @ops;
-    foreach my $part ($what =~ /((?:\%\??\w+)|[^\%]+)/g) {
+    $what = "%<rx_pos>: $what";
+    foreach my $part ($what =~ /((?:\%\<\w+\>)|[^\%]+)/g) {
         if ($part =~ /^%/) {
             push @ops, aop('print', [ substr($part, 1) ]);
         } else {
@@ -199,7 +205,7 @@ sub rewrite_group {
                         aop('pushint', [ 'I0' ]),
                         aop('setstart', [ $group, 'pos' ]),
                         @R_ops,
-                        $self->dbprint("setting end[$group] := %?R_POS\n"),
+                        $self->dbprint("setting end[$group] := %<rx_pos>\n"),
                         aop('setend', [ $group, 'pos' ]),
                         aop('goto', [ $next ]),
               $rfail => $self->dbprint("R in group failed\n"),
@@ -233,7 +239,7 @@ sub rewrite_match {
         my $old_lastback = $lastback;
         $lastback = $self->genlabel('debug_matchback');
         @debugging = ($lastback =>
-                      $self->dbprint("failed to match $char at %?R_POS\n"),
+                      $self->dbprint("failed to match $char at %<rx_pos>\n"),
                       aop('goto', [ $old_lastback ]));
     }
     push @ops, (
@@ -263,6 +269,20 @@ sub rewrite_check {
 sub rewrite_charclass {
     my ($self, $op, $incexc, $lastback) = @_;
 
+    # Handle literal strings (things like "aeiou" but not "a-z")
+    if (! ref($incexc)) {
+        my @chars = sort map { ord($_) } split(//, $incexc);
+        $incexc = [];
+        while (@chars) {
+            push @$incexc, shift(@chars);
+            my $last = $incexc->[-1];
+            while (@chars && $chars[0] <= $last + 1) {
+                $last = shift(@chars);
+            }
+            push @$incexc, $last + 1;
+        }
+    }
+
     my @ops;
     push @ops, aop('check', [ 1, $lastback ])
       unless ($op->{nocheck});
@@ -271,7 +291,8 @@ sub rewrite_charclass {
     my $next = $self->genlabel('after_charclass');
 
     push @ops, (
-                         aop('charclass', [ $incexc, $lastback ]),
+                         $self->dbprint("trying classmatch\n"),
+                         aop('classmatch', [ $incexc, $lastback ]),
                          aop('increment', [ 1, $lastback ]),
                          aop('goto', [ $next ]),
                 $back => aop('increment', [ -1, $lastback ]),
@@ -394,6 +415,56 @@ sub rewrite_alternate {
     return ($back, @ops);
 }
 
+# Dynamic alternation: a set of alternatives that should be tried in
+# turn, but the exact alternatives are unknown (eg because they're
+# coming from an array.)
+#
+# @R ->          .local $counter
+#                $counter = 0
+#           try: R[$counter] or goto fail
+#                push $counter
+#                goto next
+#          fail: $counter++
+#                if $counter >= @R goto lastback
+#                goto try
+#          back: pop $counter
+#                goto R[].back
+#          next:
+#
+# The code below does not assume the alternatives are coming from an
+# array; instead, a callback is given that should rewrite the
+# alternative that corresponds to the (dynamic) $counter passed in.
+#
+sub rewrite_dynamic_alternate {
+    my ($self, $op, $chooser, $lastback) = @_;
+
+    my $try = $self->genlabel('dalt_try');
+    my $fail = $self->genlabel('dalt_fail');
+    my $back = $self->genlabel('dalt_back');
+    my $next = $self->genlabel('dalt_next');
+
+    my $counter = $self->new_local("counter");
+    my ($R_back, $N, @R_ops) = $chooser->($self, $op, $counter, $fail);
+
+#    $DB::single = 1;
+    my @ops =  ( aop('assign', [ $counter, 0 ]),
+         $try => $self->dbprint("matching dynalt[%$counter]\n"),
+                 @R_ops,
+		 aop('pushint', [ $counter, "dynamic alt counter" ]),
+		 aop('goto', [ $next ]),
+	$fail => $self->dbprint("failed dynalt, advancing from %$counter\n"),
+                 aop('add', [ $counter, 1 ]),
+		 aop('ge', [ $counter, $N, $lastback ]),
+		 aop('goto', [ $try ]),
+	$back => aop('popint', [ $counter ]),
+                 $self->dbprint("backtracking into dynalt with %$counter matches left\n"),
+		 aop('goto', [ $R_back ]),
+	$next =>
+		 );
+
+    return ($back, @ops);
+}
+
 # R<min,max> -> $matchcount = 0
 #         loop: if $matchcount >= max goto next
 #               R or check
@@ -412,7 +483,6 @@ sub rewrite_alternate {
 
 sub rewrite_greedy_range {
     my ($self, $op, $R, $min, $max, $lastback) = @_;
-#    $DB::single = 1;
 
     my ($loop, $back, $check, $next) =
      map { $self->genlabel("gr_$_") } qw(loop back check next);
@@ -573,9 +643,9 @@ sub rewrite_plus {
     my @ops = (
                         aop('pushmark', [ "+" ]),
                $loop => @R_ops,
-                        aop('pushint', [ 0 ]),
+                        aop('pushint', [ 0, 'plus matched marker' ]),
                         aop('goto', [ $loop ]),
-              $rfail => aop('popindex', [ '?R_TMP', $lastback ]),
+              $rfail => aop('popindex', [ '<rx_tmp>', $lastback ]),
               );
 
     return ($R_back, @ops);
@@ -601,7 +671,7 @@ sub rewrite_nongreedy_plus {
                $back => @R_ops,
                         aop('pushint', [ 0 ]),
                         aop('goto', [ $next ]),
-              $rfail => aop('popindex', [ '?R_TMP', $lastback ]),
+              $rfail => aop('popindex', [ '<rx_tmp>', $lastback ]),
                         aop('goto', [ $R_back ]),
                $next =>
               );
@@ -672,6 +742,24 @@ sub rewrite_nongreedy_optional {
     return ($back, @ops);
 }
 
+sub rewrite_rule {
+    die "rules should be handled by host language";
+#     my ($self, $op, $R, $lastback) = @_;
+#     my $fail = $self->genlabel("fail");
+#     my $mode = $self->new_local("mode", "int");
+#     my $params = $self->new_local("params");
+#     my ($R_back, @R_ops) = $self->rewrite($R, $fail);
+#     my @ops = (       aop('return' => [ "int", 777 ]),
+#                       aop('param' => [ "mode", "int", $mode ]),
+#                       aop('param' => [ "params", "PerlArray", $params ]),
+#                       aop('eq' => [ $mode, 1, $R_back ]),
+#                       @R_ops,
+#                       aop('return' => [ "int", 1 ]),
+#              $fail => aop('return' => [ "int", 0 ])
+#               );
+#     return (undef, @ops); # Nothing should ever use the backtracking point
+}
+
 ###################### New stuff ###################
 
 # Most rewrite rules will declare a fallback point, and also jump back
@@ -720,12 +808,12 @@ sub wrap {
     my $db_back = $self->genlabel($op->{name}."_back");
     my $db_start = $self->genlabel($op->{name}."_enter");
     return ( $db_back,
-                       $self->dbprint("-> $desc ENTER pos=%?R_POS\n"),
+                       $self->dbprint("-> $desc ENTER\n"),
                        aop('goto', [ $db_start ]),
-           $db_back => $self->dbprint("<- $desc BACK pos=%?R_POS\n"),
+           $db_back => $self->dbprint("<- $desc BACK\n"),
                        aop('goto', [ $back ]),
           $db_start => @ops,
-                       $self->dbprint(".. $desc NEXT pos=%?R_POS\n"),
+                       $self->dbprint(".. $desc NEXT\n"),
            );
 }
 
@@ -752,22 +840,21 @@ sub rewrite {
 }
 
 sub run {
-    my $self = shift;
+    my ($self, $orig_tree, $ctx, $pass_label, $fail_label) = @_;
+    die "Wrong #args" if @_ != 5;
 
-    my $RETURN = $self->{_labels}{'return'} = $self->genlabel("RETURN");
     my $FAIL = $self->{_labels}{'fail'};
 
-    # Stuff that goes after the regular expression code
-    push @_, (
-              aop('match_succeeded'),
-              aop('goto', [ $RETURN ]),
-              $FAIL => aop('match_failed'),
-              $RETURN =>
-             );
+    # Set up the success/failure handling
+    my $tree = rop('seq', [ $orig_tree,
+                            aop('match_succeeded'),
+                            aop('literal', [ "branch", $pass_label ]),
+                   $FAIL => aop('match_failed'),
+                            aop('literal', [ "branch", $fail_label ]),
+                          ]);
 
     # Generate the main regular expression code
-    my $tree = rop('seq', [ @_ ]);
-    my (undef, @ops) = $self->rewrite($tree, $FAIL);
+    my ($backtrack, @ops) = $self->rewrite($tree, $FAIL);
 
     # Set up the full preamble, including stuff gathered from
     # rewriting the expression.
@@ -782,9 +869,7 @@ sub run {
         push @ops, aop('pop_reg', [ $temp_reg ]);
     }
 
-    push @ops, aop('terminate');
-
-    return @ops;
+    return { lastback => $backtrack, code => \@ops };
 }
 
 sub startup {

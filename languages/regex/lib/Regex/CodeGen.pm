@@ -14,6 +14,27 @@ sub init {
     $self->{state} ||= Regex->global_state();
 }
 
+sub init_context {
+}
+
+sub dbprint {
+    my ($self, $ctx, $what) = @_;
+    return () unless $self->{DEBUG};
+    $what = "\$($ctx->{rx_pos}): $what";
+
+    my @ops;
+    foreach my $part ($what =~ /(<\w+>|[^<]+)/g) {
+        if ($part =~ /^\%/) {
+            push @ops, $self->output_print(substr($part, 2, -1));
+        } else {
+            $part =~ s/(["'\\])/\\$1/g;
+            $part =~ s/\n/\\n/g;
+            push @ops, $self->output_print("\"$part\"");
+        }
+    }
+    return @ops;
+}
+
 sub render {
     my ($self, $op) = @_;
 
@@ -26,22 +47,24 @@ sub render {
 }
 
 sub output {
-    my $self = shift;
+    my ($self, $ops, $ctx) = @_;
 
-    if (ref($_[0]) eq 'LABEL_COMMENTS') {
-        $self->{_label_comments} = shift;
+    if (ref($ops->[0]) eq 'LABEL_COMMENTS') {
+        $self->{_label_comments} = shift(@$ops);
     }
+
+    $self->{ctx} = $ctx;
 
     my @r;
     my $label = '';
-    for my $op (@_) {
+    for my $op (@$ops) {
         die $op if ! ref $op;
 
         if ($op->{name} eq 'LABEL') {
             $label .= $self->output_label_def($op);
         } else {
             foreach my $line ($self->render($op)) {
-                $line =~ s/\?(\w+)/$self->{$1}/g;
+                $line =~ s/<(\w+)>/$ctx->{$1} || $1/eg;
                 if (length($label) >= 8) {
                     push @r, $label;
                     $label = '';
@@ -65,9 +88,10 @@ sub output_nop {
     return "noop";
 }
 
-sub output_incr {
-    my ($self, $var) = @_;
-    return "add $var, $var, 1";
+sub output_increment {
+    my ($self, $var, $amount) = @_;
+    $amount = 1 if ! defined($amount);
+    return "add $var, $amount";
 }
 
 sub output_assign {
@@ -98,11 +122,12 @@ sub output_if {
 
 sub output_goto {
     my ($self, $where) = @_;
+    $DB::single = 1 if ! ref($where);
     return "branch ".$self->output_label_use($where);
 }
 
 sub output_terminate {
-    return "ret";
+    # return "ret";
 }
 
 sub output_label_use {
@@ -128,6 +153,16 @@ sub output_push_reg {
 sub output_pop_reg {
     my ($self, $reg) = @_;
     return "restore $reg";
+}
+
+sub output_comment {
+    my ($self, $string) = @_;
+    return map { "# $_" } split(/\n/, $string);
+}
+
+sub output_literal {
+    my ($self, @args) = @_;
+    return join(" ", @args);
 }
 
 1;

@@ -111,14 +111,14 @@ But perhaps this should be handled in the Tree -> List rewrite??
 =cut
 
 sub optimize {
-    my $self = shift;
+    my ($self, $ops, $ctx) = @_;
+    die "Wrong #args" if @_ != 3;
 
-    # @_ : (ops)
     my @equivs; # (labels)
     my @output; # (ops)
 
     # Merge adjacent (equivalent) labels, renaming them
-    for my $stmt (@_) {
+    for my $stmt (@$ops) {
 	if (ref $stmt && $stmt->{name} eq 'LABEL') {
 	    push @equivs, $stmt;
 	} else {

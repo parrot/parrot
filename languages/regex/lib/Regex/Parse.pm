@@ -32,14 +32,14 @@ sub init {
 # O (end, n) : mark end of n-th paren match
 # O (goto, label)
 # O (label, name)
-# O (incr, name)
+# O (increment, name [, amount])
 # O (assign, name, val)
 # O (fail)
 # O (nop)
 
 sub compile {
-    my $self = shift;
-    my ($vals, $types) = Regex::Grammar::tokenize(shift());
+    my ($self, $expr, $ctx) = @_;
+    my ($vals, $types) = Regex::Grammar::tokenize($expr);
     my $lexer = sub {
 #        print "TOK($vals->[0]) TYPE($types->[0])\n" if @$vals;
         return shift(@$types), shift(@$vals) if (@$types);

@@ -46,17 +46,17 @@ untested. Theoretically, this release should support:
  R*?     - nongreedy/parsimonious Kleene closure
  R?      - greedy optional
  R??     - nongreedy/parsimonious optional
- R+      - greedy one or more (more or one?)
+ R+      - greedy one or more ("more or one")
  R+?     - nongreedy one or more
  (R)     - capturing groups
  (?:R)   - noncapturing grouping
  a       - codepoint literals
+ [a-z]   - character classes
  {n,m}   - greedily match n..m times
  {n,m}?  - nongreedily match n..m times
 
 Missing perl5 features:
- [...]   - character classes
- \w      - character classes
+ \w      - named character classes
  \U      - arbitrary codepoints
  \p      - properties
  \b      - word boundary
@@ -83,9 +83,11 @@ Missing perl6 features:
 hypotheticals - code refs with two entry points (enter and backtrack)
 @var     - run-time alternatives
 <@var>   - run-time alternative regexps (requires run-time regex compiler)
-%var     - sucking in hashes
+%var     - hash key alternatives
 <%var>   - as above, but values are always regexps
-<!...>   - negation (is this just negative lookahead?)
+<!...>   - negation (what is this?) (is this just negative lookahead?)
+<rule>   - rule invocation
+...      - and many, many, many more
 
 Other features I'd like to have:
  (?1)    - recursive expressions
@@ -93,8 +95,8 @@ Other features I'd like to have:
  ?       - reentrant, suspendable, coroutinish regexes
  ?       - two-dimensional regexes
 
-Regular expressions are compiled down to regular opcodes, not to the
-rx_* set of opcodes. P0 and P1 are PerlArrays containing the starting
+Regular expressions are compiled down to regular opcodes (not the
+rx_* set of opcodes). P0 and P1 are PerlArrays containing the starting
 and ending indexes, respectively, of () groups. The user stack is used
 as the backtracking stack. See rx.ops for a good description of how
 operators are converted to code sequences (except I don't use the rx_*
@@ -116,6 +118,7 @@ Register Usage:
 Optimizations implemented (notation: parentheses here are non-capturing):
 
  aR|aS    -> a(R|S)
+ Rb|Sb    -> (R|S)b
  R|       -> R?
  |R       -> R??
 
@@ -171,11 +174,6 @@ BUGS
 - The miserable state of documentation
 - The ad-hoc list op data structure
 - The lack of complex test cases
-
-TODO
-====
-- character classes
-- named entry point
 
 DEVELOPER NOTES
 ===============

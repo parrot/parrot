@@ -13,8 +13,6 @@ use Regex::PreOptimize;
 use Regex::Optimize;
 
 use Regex::Rewrite;
-#use Regex::CodeGen::Rx;
-use Regex::CodeGen::Pasm;
 use Regex::CodeGen::IMCC;
 
 use strict;
@@ -26,55 +24,53 @@ sub global_state {
 }
 
 sub expr_to_tree {
-    my ($expr, %options) = @_;
+    my ($expr, $ctx, %options) = @_;
 
     $options{state} ||= global_state();
 
     my $parser = Regex::Parse->new(%options);
-    return $parser->compile($expr);
+    return $parser->compile($expr, $ctx);
 }
 
 sub tree_to_list {
-    my ($tree, %options) = @_;
+    my ($tree, $ctx, $pass_label, $fail_label, %options) = @_;
 
     $options{state} ||= global_state();
 
     # Tree optimizations
     unless ($options{'no-tree-optimize'}) {
         my $opt1 = Regex::PreOptimize->new();
-        $tree = $opt1->optimize_tree($tree);
+        $tree = $opt1->optimize_tree($tree, $ctx);
     }
 
     my $rewrite = Regex::Rewrite->new(%options);
-    my @code = $rewrite->run($tree);
-    return @code if $options{'no-list-optimize'};
+    my $code = $rewrite->run($tree, $ctx,
+                             $pass_label, $fail_label);
+    return $code if $options{'no-list-optimize'};
 
     my $opt2 = Regex::Optimize->new(%options);
-    return $opt2->optimize(@code);
+    $code->{code} = [ $opt2->optimize($code->{code}, $ctx) ];
+    return $code;
 }
 
 sub list_to_pasm {
-    my ($code, %options) = @_;
+    my ($list_regex, $ctx, %options) = @_;
     my $cgen;
 
     $options{state} ||= global_state();
 
-    if (($options{output} || '') eq 'IMCC') {
-        $cgen = Regex::CodeGen::IMCC->new(%options);
-    } else {
-        $cgen = Regex::CodeGen::Pasm->new(%options);
-    }
-    return $cgen->output(@$code);
+    $cgen = Regex::CodeGen::IMCC->new(%options);
+    return $cgen->output($list_regex->{code}, $ctx);
 }
 
 sub compile {
-    my ($expr, %options) = @_;
+    my ($expr, $ctx, $pass_label, $fail_label, %options) = @_;
 
     $options{state} ||= global_state();
 
-    my $tree = expr_to_tree($expr, %options);
-    my @code = tree_to_list($tree, %options);
-    return list_to_pasm(\@code, %options);
+    my $tree = expr_to_tree($expr, $ctx, %options);
+    my $code = tree_to_list($tree, $ctx, $pass_label, $fail_label, %options);
+    return list_to_pasm($code, $ctx, %options);
 }
 
 1;
