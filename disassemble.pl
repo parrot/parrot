@@ -26,7 +26,9 @@ while (<GUTS>) {
 open OPCODES, "<opcode_table" or die "Can't get opcode table, $!/$^E";
 while (<OPCODES>) {
     next if /^\s*#/;
+    s/^\s+//;
     chomp;
+    next unless $_;
     my ($name, $args, @types) = split /\s+/, $_;
     next unless defined $name;
     $opcodes{$name}{ARGS} = $args;
