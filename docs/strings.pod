@@ -2,10 +2,24 @@
 
 Parrot Strings
 
-=head1 The Parrot String API
+=head1 HISTORY
+
+=over
+
+=item 4 October 2003
+
+Revised to reflect changes since Buffer/PMC unification.
+
+=back
+
+=head1 ABSTRACT
 
 This document describes how Parrot abstracts the programmer's interface
-to string types. All strings used in the Parrot core should use the
+to string types.
+
+=head1 The Parrot String API
+
+All strings used in the Parrot core should use the
 Parrot C<STRING> structure; Parrot programmers should not deal with
 C<char *> or other string-like types outside of this abstraction without
 very good reason.
@@ -123,7 +137,7 @@ be compared.
 
 To test a string for truth, use:
 
-    BOOLVAL string_bool(STRING* s);
+    INTVAL string_bool(STRING* s);
 
 A string is false if it
 
@@ -138,32 +152,29 @@ To format output into a string, use
 
     STRING* string_nprintf(struct Parrot_Interp *, STRING* dest, INTVAL len, char* format, ...)
 
-C<dest> may be a null pointer, in which case a new B<native> string will
-be created. If C<len> is zero, the behaviour becomes more C<sprintf>ish
-than C<snprintf>-like.
+C<dest> may be a null pointer, in which case a new string will be created. If
+C<len> is zero, the behaviour becomes more C<sprintf>ish than C<snprintf>-like.
 
 =head1 Notes for Implementors
 
 =head2 Termination
 
-The character buffer pointed to by *bustart is not expected to be
+The character buffer pointed to by *strstart is not expected to be
 terminated by a nul byte and functions which provide the string api
 will not add one.  Any functions which access the buffer directly and
 which require a terminating nul byte must place one there themselves
 and also be very careful about nul bytes within the used portion of
-the character buffer.  In particular, if bufused == buflen more space
+the character buffer.  In particular, if C<bufused == buflen> more space
 must be allocated to hold a terminating byte.
 
 =head1 Elements of the C<STRING> structure
 
 Those implementing the C<STRING> API will obviously need to know about
 how the C<STRING> structure works. You can find the definition of this
-structure in F<string.h>:
+structure in F<pobj.h>:
 
     struct parrot_string_t {
-        void *bufstart;
-        UINTVAL buflen;
-        UINTVAL flags;
+        pobj_t obj;
         UINTVAL bufused;
         void *strstart;
         UINTVAL strlen;
@@ -174,19 +185,19 @@ structure in F<string.h>:
 
 Let's look at each element of this structure in turn.
 
-=head2 C<bufstart>
+=head2 C<obj.u.b.bufstart>
 
 This pointer points to the buffer which holds the string, encoded in
 whatever is the string's specified encoding. Because of this, you should
 not make any assumptions about what's in the buffer, and hence you
 shouldn't try and access it directly.
 
-=head2 C<buflen>
+=head2 C<obj.u.b.buflen>
 
 This is used for memory allocation; it tells you the currently allocated
 size of the buffer in bytes.
 
-=head2 C<flags>
+=head2 C<obj.flags>
 
 This is a general holding area for string flags. The exact flags
 required have not yet been determined.
@@ -209,132 +220,26 @@ match variables), this is a pointer into the start of the string.
 This is the length of the string in characters, as you would expect to
 find from C<length $string> in Perl. Again, because string buffers may
 be in one of a number of encodings, this must be computed by the
-appropriate encoding function. C<string_compute_strlen(STRING)> updates
-this value, calling the C<compute_strlen> function in the STRING's
-vtable.
+appropriate encoding. C<string_compute_strlen(STRING)> updates
+this value, calling the encoding's C<characters()> function.
 
 =head2 C<encoding>
 
-This is a vtable of functions; the vtable should normally be taken from
-the array C<Parrot_string_vtable>. Entries in this array specify the
-encoding of the string, from the following C<enum>:
-
-    enum {
-        enc_native,
-        enc_utf8,
-        enc_utf16,
-        enc_utf32,
-        enc_foreign,
-        enc_max
-    };
-
-The "native" string type is whatever happens when you set C<LANG=C> in
-your shell; it's usually ISO-8859-1 in most English-speaking machines.
-A character equals a byte equals eight bits. No shifts, no wide
-characters, nothing.
-
-UTF8, UTF16, and UTF32 are what they sound like. UTF16 and UTF32 should
-use the native endianness of the machine.
-
-C<enc_foreign> is there to allow for expansion; foreign strings will
-call functions from a user-defined string vtable instead of the Perl
-built-in ones.
-
-C<enc_max> isn't an encoding. These aren't the droids you're looking for.
-It's just there to help know how big to make arrays.
+This specifies the encoding used to encode the characters in the data. There
+are currently four character encodings used in Parrot: singlebyte, UTF-8,
+UTF-16 and UTF-32. UTF-16 and UTF-32 should use the native endianness of the
+machine.
 
 =head2 C<type>
 
-XXX I don't know what this is for.
+This specifes the character set for the string. There are currently two
+character sets in Parrot: US ASCII and Unicode. Each character set has
+a default encoding. The default character set is US ASCII.
 
 =head2 C<language>
 
-This field is currently unused; however, it can be used to
-hold a pointer to the correct vtable for foreign strings.
-
-=head1 String Vtable Functions
-
-The L</String Manipulation Functions> above are implemented in terms of
-string vtables to create encoding abstraction; here's an example of one:
-
-    STRING*
-    string_concat(struct Parrot_Interp *interpreter, STRING* a, STRING* b, INTVAL flags) {
-        return (ENC_VTABLE(a).concat)(a, b, flags);
-    }
-
-C<ENC_VTABLE(a)> is shorthand for:
-
-    a->encoding
-
-Vtables are taken from the C<Parrot_string_vtable> array, defined in
-C<string.c>. Each encoding has its own vtable; to call the concatenation
-function for C<a>, we look up its vtable and retrieve the C<concat>
-entry from that vtable. This produces a function pointer we can throw
-the arguments at.
-
-To get the actual position in the array from the vtable, use the
-C<which> entry, which returns an C<INTVAL> index into
-C<Parrot_string_vtable>.
-
-Most of the string vtable functions are self-explanatory as they are
-thin wrappers around the functions given above. Some of them, however,
-are for internal use only, to help implement other functions. You'll
-find them in the next section.
-
-=head2 How to add new vtable functions
-
-The first thing to note is that if what you're doing isn't remotely
-encoding-specific, you don't need to add a vtable function; you can
-just add a function in F<string.c> (don't forget to add the function
-prototype to F<string.h>) and you don't need any more of this section.
-However, most things that people do with strings depend on the encoding
-of the string data, so if you need to add anything slightly complex,
-read on.
-
-Currently, the construction of the vtables is not automated; it's hoped
-that soon someone will automate this and fix this section. However, for
-the time being, this is what you need to do when you implement a new
-vtable function:
-
-=over 3
-
-=item 1
-
-Check to see whether or not the function's type has a typedef in
-F<string.h>: for instance, if you have a function that takes a string
-and an C<INTVAL> and returns a string, use C<string_iv_to_string_t>;
-otherwise, add your own type.
-
-=item 2
-
-Add the unqualified name of the function (C<frobnicate>), together with
-your type, to C<string_vtable> in F<string.h>.
-
-=item 3
-
-Create a function C<string_frobnicate> in C<string.c> which is a wrapper
-around C<frobnicate>. This function B<must> take a C<STRING*> parameter,
-so that the encoding can be extracted and the relevant encoding vtable
-be found and despatched. It should look something like this:
-
-    yadda
-    string_frobnicate(STRING *s, ...) {
-        return (ENC_VTABLE(s).frobnicate)(s, ...);
-    }
-
-=item 4
-
-Create functions C<string_XXX_frobnicate> for all values of C<XXX> in
-the encoding table; (or better still, get other people to write them for
-you) C<string_native_frobnicate> should go in F<strnative.c>,
-C<string_utf8_frobnicate> should go in F<strutf8.c>, and so on.
-
-=item 5
-
-Add C<string_XXX_frobnicate> to the end of each vtable returned by
-C<string_XXX_vtable>.
-
-=back
+This field is currently unused; however, it can be used to hold a
+pointer to the correct vtable for foreign strings.
 
 =head1 Non-user-visible String Manipulation Functions
 
@@ -350,22 +255,22 @@ and
 
     INTVAL string_max_bytes(STRING *s, INTVAL iv)
 
-The first updates the contents of C<< s->strlen >> by contemplating the
-buffer C<bufstart> and working out how many characters it contains. The
-second is given a number of characters which we assume are going to be
-added into the string at some point; it returns the maximum number of
-bytes that need to be allocated to admit that number of characters. For
-fixed-width encodings, this is trivial - the "native" encoding, for
-instance, encodes one byte per character, so C<string_native_max_bytes>
-simply returns the C<INTVAL> it is passed; C<string_utf8_max_bytes>, on the
-other hand, returns three times the value that it is passed because a
-UTF8 character may occupy up to three bytes.
+The first updates the contents of C<<s->strlen>> by contemplating the buffer
+C<strstart> and working out how many characters it contains. The second is
+given a number of characters which we assume are going to be added into the
+string at some point; it returns the maximum number of bytes that need to be
+allocated to admit that number of characters. For fixed-width encodings, this
+is trivial - the singlebyte encoding, for instance, encodes one byte per
+character, so C<string_max_bytes()> simply returns the C<INTVAL> it is passed;
+calling C<string_max_bytes()> on a UTF-8 string, on the other hand, returns
+three times the value that it is passed because a UTF-8 character may occupy up
+to three bytes.
 
 To grow a string to a specified size, use
 
     void string_grow(struct Parrot_Interp *, STRING *s, INTVAL newsize)
 
-The size is given in characters; C<string_max_bytes> is called to turn
+The size is given in characters; C<string_max_bytes()> is called to turn
 this into a size in bytes, and then the buffer is grown to accomodate
 (at least) that many bytes.
 
@@ -378,23 +283,13 @@ we have the option of turning the later string into a string that
 matches the first string's encoding. This process, translating a string
 from one encoding into another, is called "transcoding".
 
-In Parrot, transcoding is implemented by the two-dimensional array
+In Parrot, transcoding is implemented by C<Parrot_CharType_Transcode> functions
+which take two character sets (C<CHARTYPE>) and a character (C<Parrot_UInt>)
+and returns the character converted from the first to the second character set.
 
-    Parrot_transcode_table[enc_from][enc_to]
-
-Each entry in this table is a function pointer which takes two
-parameters:
-
-    string_utf32_to_utf8(STRING* from, STRING* to)
-
-(If C<to> is a null pointer, a new C<STRING*> will be allocated. As
-before, it's all about avoiding memory allocation at runtime.)
-
-A null pointer in the table should signify that no transcoding is
-necessary; C<Parrot_transcode_table[x][x]> should always be C<NULL>.
-
-C<Parrot_transcode_table[enc_native][enc_utf8]> isn't C<NULL>. Don't
-fall for that, because "native" doesn't necessarily mean ISO-8859-1.
+Each C<CHARTYPE> has a number of transcoders associated with it, of which those
+to and from Unicode are explicitly singled out because of their expected
+frequent use. The C<transcoders> array is currently not used.
 
 =head2 Foreign Encodings
 
@@ -402,8 +297,6 @@ Fill this in later; if anyone wants to implement new encodings at this
 stage they must be mad.
 
 =head1 Work In Progress
-
-The transcoding section is out of sync with the code.
 
 Should the following functions be mentioned?
 C<string_append>,
@@ -418,6 +311,3 @@ C<string_to_cstring>,
 C<string_to_int>,
 C<string_to_num>,
 C<string_transcode>.
-
-C<string_bool> is here said to return C<BOOLVAL>.  But the code is
-returning C<INTVAL> (2002Dec).  Which is the right thing?
