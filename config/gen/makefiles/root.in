@@ -286,6 +286,7 @@ INTERP_O_FILES = \
     $(SRC)/utils$(O) \
     $(SRC)/vtables$(O) \
     $(SRC)/mmd$(O) \
+    $(SRC)/mmd_fallback$(O) \
     $(SRC)/extend$(O) \
     $(PF)/pf_items$(O) \
     $(OPS)/core_ops$(O) \
@@ -767,7 +768,9 @@ io/io_passdown$(O) : $(GENERAL_H_FILES) io/io_private.h
 
 $(SRC)/memory$(O) : $(GENERAL_H_FILES)
 
-$(SRC)/mmd$(O) : $(GENERAL_H_FILES) $(INC)/mmd.h
+$(SRC)/mmd$(O) : $(GENERAL_H_FILES)
+
+$(SRC)/mmd_fallback$(O) : $(GENERAL_H_FILES)
 
 $(SRC)/objects$(O) : $(GENERAL_H_FILES) $(SRC)/objects.str
 
