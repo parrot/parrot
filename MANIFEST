@@ -443,6 +443,7 @@ examples/assembly/lexical2.pasm                   [main]doc
 examples/assembly/lexical3.pasm                   [main]doc
 examples/assembly/life.pasm                       [main]doc
 examples/assembly/local_label.pasm                [main]doc
+examples/assembly/mandel.imc                      [main]doc
 examples/assembly/mandel.pasm                     [main]doc
 examples/assembly/mops.pasm                       [main]doc
 examples/assembly/mops_p.pasm                     [main]doc

@@ -1,0 +1,99 @@
+# Copyright (C) 2005 The Perl Foundation.  All rights reserved.
+# $Id$
+
+=head1 NAME
+
+examples/assembly/mandel.imc - Print the Mandelbrot set
+
+=head1 SYNOPSIS
+
+    % ./parrot examples/assembly/mandel.imc
+
+=head1 DESCRIPTION
+
+This prints an ASCII-art representation of the Mandelbrot set.
+
+Translated from C code by Glenn Rhoads into Parrot assembler by Leon
+Brocard <acme@astray.com>.
+Translated from PASM to PIR by Bernhard Schmalhofer.
+
+The C code is:
+
+    main() {
+        int x, y, k;
+        char *b = " .:,;!/>)|&IH%*#";
+        float r, i, z, Z, t, c, C;
+        for (y=30; puts(""), C = y*0.1 - 1.5, y--;) {
+            for (x=0; c = x*0.04 - 2, z=0, Z=0, x++ < 75;) {
+                for (r=c, i=C, k=0; t = z*z - Z*Z + r, Z = 2*z*Z + i, z=t, k<112; k++)
+                    if (z*z + Z*Z > 10) break;
+                printf ("%c", b[k%16]);
+            }
+        }
+    }
+
+=cut
+
+.sub main @MAIN
+
+        .local string b
+        .local int    x, y, k
+        .local num    r, i, z, Z, t, c, C, temp1, temp2
+
+	b = " .:,;!/>)|&IH%*#"
+	set y, 30
+
+YREDO:  #  C = y*0.1 - 1.5
+        mul C, y, 0.1
+	sub C, C, 1.5
+
+	set x, 0
+
+XREDO:  # c = x*0.04 - 2
+	mul c, x, 0.04
+	sub c, c, 2.0
+	set z, 0
+	set Z, 0
+
+        set r, c
+        set i, C
+
+        set k, 0
+
+KREDO:  # t = z*z - Z*Z + r
+        mul temp1, z, z
+        mul temp2, Z, Z
+        sub t, temp1, temp2
+        add t, t, r
+
+        # Z = 2*z*Z + i
+        add Z, Z, Z
+        mul Z, Z, z
+        add Z, Z, i
+
+        # z = t
+        set z, t
+
+        # if (z*z + Z*Z > 10) break;
+        mul temp1, z, z
+        mul temp2, Z, Z
+        add temp1, temp1, temp2
+        gt temp1, 10.0, PRINT
+
+	inc k
+	lt k, 112, KREDO
+
+PRINT:  mod I4, k, 16
+        substr S2, b, I4, 1
+	print S2
+
+	inc x
+	lt x, 75, XREDO
+
+	print "\n"
+	dec y
+	gt y, 0, YREDO
+
+END:
+
+.end

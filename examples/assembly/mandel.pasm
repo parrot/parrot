@@ -1,9 +1,9 @@
-# Copyright (C) 2001-2003 The Perl Foundation.  All rights reserved.
+# Copyright (C) 2001-2005 The Perl Foundation.  All rights reserved.
 # $Id$
 
 =head1 NAME
 
-examples/assembly/mandel.pasm - Print the Mandlebrot set
+examples/assembly/mandel.pasm - Print the Mandelbrot set
 
 =head1 SYNOPSIS
 
@@ -12,7 +12,7 @@ examples/assembly/mandel.pasm - Print the Mandlebrot set
 =head1 DESCRIPTION
 
 This really does something - prints an ASCII-art representation of the
-Mandlebrot set.
+Mandelbrot set.
 
 Translated from C code by Glenn Rhoads into Parrot assembler by Leon
 Brocard <acme@astray.com>.
