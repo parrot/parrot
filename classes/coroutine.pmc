@@ -64,6 +64,13 @@ stopped. See the L<Glossary|docs/glossary.pod> for more information.
 
 pmclass Coroutine extends Sub {
 
+    void class_init() {
+        if (pass) {
+            enter_nci_method(INTERP, enum_class_Coroutine,
+                    F2DPTR(Parrot_Coroutine_shift_pmc), "next", "PIO");
+        }
+    }
+
 /*
 
 =item C<void init()>

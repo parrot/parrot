@@ -402,11 +402,6 @@ parrot_py_id(PMC *pmc)
     return (INTVAL) pmc;
 }
 
-static PMC *
-parrot_py_iter(Interp *interpreter, PMC *pmc)
-{
-    return pmc_new_init(interpreter, enum_class_Iterator, pmc);
-}
 
 static PMC *
 parrot_py_range(Interp *interpreter, PMC *pstart, PMC *pend, PMC *pstep)

@@ -556,7 +556,8 @@ do_py_initcall(Parrot_Interp interpreter, PMC* class, PMC *object)
         if (!PObj_is_class_TEST(parent_class)) {
             PMC *attr;
             SLOTTYPE *obj_data = PMC_data(object);
-            VTABLE_invoke(interpreter, parent_class, NULL);
+            if (!parent_class->vtable->base_type == enum_class_ParrotClass)
+                VTABLE_invoke(interpreter, parent_class, NULL);
             attr = REG_PMC(5);
             set_attrib_num(obj_data, POD_FIRST_ATTRIB, attr);
         }

@@ -661,11 +661,11 @@ EOC
 sub RETURN_VALUE
 {
     my ($n, $c, $cmt) = @_;
-    my $tos = pop @stack;
+    my $tos = promote(pop @stack);
     unless ($cur_func eq 'test::main') {
 	print <<EOC;
     	.pcc_begin_return $cmt
-	.return $tos->[1]
+	.return $tos
 	.pcc_end_return
 EOC
     }
@@ -679,10 +679,10 @@ EOC
 sub YIELD_VALUE
 {
     my ($n, $c, $cmt) = @_;
-    my $tos = pop @stack;
+    my $tos = promote(pop @stack);
     print <<EOC;
     	.pcc_begin_yield $cmt
-	.return $tos->[1]
+	.return $tos
 	.pcc_end_yield
 EOC
 }
