@@ -279,7 +279,7 @@ maps string prefixes to encodings.
 
 =cut
 
-my %encodings=('' => 0, 'U8' => 1, 'U16' => 2, 'U32' => 3);
+my %encodings=('' => 0, 'N' => 0, 'U' => 3);
 
 my %opcodes = Parrot::Opcode::read_ops( -f "../opcode_table" ? "../opcode_table" : "opcode_table" );
 
@@ -662,7 +662,7 @@ is the index into the constants table where the constant is located.
 
 sub replace_string_constants {
   my $code = shift;
-  $code =~ s/(U(?:8|16|32))?\"([^\\\"]*(?:\\.[^\\\"]*)*)\"/constantize_string($2,$1)/eg;
+  $code =~ s/([NU])?\"([^\\\"]*(?:\\.[^\\\"]*)*)\"/constantize_string($2,$1)/eg;
   return $code;
 }
 
