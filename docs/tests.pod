@@ -9,7 +9,9 @@ written.  The testing system is liable to change in the future, but
 tests written following the guidelines below should be easy to port
 into a new test suite.
 
-=head2 How to write a test
+=head1 How to write a test
+
+=head2 Assembler tests
 
 First, find an appropriate file in F<t/op/*.t> (for basic ops),
 F<t/pmc/*.t> (for anything to do with PMCs), and F<t/src/*.t> for C
@@ -37,7 +39,17 @@ by:
     1
     OUTPUT
 
-or, if it is a C test, some code like this:
+Tests in F<t/op/> or F<t/pmc/> are considered to be B<PASM> tests.
+Tests in F<imcc/t/> are assumed to be B<PIR> tests. You can put B<PIR>
+tests into F<t/op/> or F<t/pmc/> by inserting the special comment B<##PIR##>
+in the test code:
+
+    output_is(<<'CODE', <<'OUTPUT', "name for test");
+    ##PIR##
+        $P0 = new Integer
+	...
+
+=head2 C source tests
 
     c_output_is(<<'CODE', <<'OUTPUT', "name for test");
     #include <stdio.h>
@@ -77,7 +89,7 @@ Note, it's always a good idea to output "done" to confirm that the compiled
 code executed completely. When mixing C<printf> and C<PIO_printf> always
 append a C<fflush(stdout);> after the former.
 
-=head2 Ideal tests:
+=head1 Ideal tests:
 
 =over 4
 
