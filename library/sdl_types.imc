@@ -441,6 +441,7 @@ _idle:
 
 	time nexttime
 	add nexttime, 0.05
+	branch _poll
 
 _wait:
 	event = _SDL_WaitEvent()
