@@ -53,7 +53,7 @@
 #  endif
 #endif
 
-#ifdef __GNUC__
+#if defined __GNUC__ || defined __IBMC__
 void Parrot_jit_debug(struct Parrot_Interp* interpreter);
 #endif
 
@@ -1162,7 +1162,7 @@ build_asm(struct Parrot_Interp *interpreter, opcode_t *pc,
 #endif
 
     /* assume gdb is available: generate symbol information  */
-#ifdef __GNUC__
+#if defined __GNUC__ || defined __IBMC__
     if (Interp_flags_TEST(interpreter, PARROT_DEBUG_FLAG))
         Parrot_jit_debug(interpreter);
 #endif

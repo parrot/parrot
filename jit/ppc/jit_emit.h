@@ -745,6 +745,7 @@ ppc_sync_cache (void *_start, void *_end)
     char *end = (char *)((((int)_end)+CACHELINESIZE-1) &~(CACHELINESIZE - 1));
     char *_sync;
 
+#ifndef __IBMC__
     for (_sync = start; _sync < end; _sync += CACHELINESIZE) {
         __asm__ __volatile__ (
         "dcbf 0,%0"
@@ -753,6 +754,7 @@ ppc_sync_cache (void *_start, void *_end)
         );
     }
     __asm__ __volatile__ ("sync");
+#endif /* __IBMC__ */
 }
 
 #endif /* JIT_EMIT == 0 */

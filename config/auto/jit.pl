@@ -96,7 +96,7 @@ sub runstep {
       jitcapable  => 1,
       cc_hasjit   => " -DHAS_JIT -D\U$jitcpuarch",
       jit_h       => '$(INC)/jit.h',
-      jit_o       => 'jit$(O) jit_cpu$(O) jit_debug$(O)'
+      jit_o       => 'jit$(O) jit_cpu$(O) jit_debug$(O) jit_debug_xcoff$(O)'
     );
 
     if (($jitcpuarch eq 'i386' && ($osname =~ /bsd$/i || $osname =~ /linux/i))
