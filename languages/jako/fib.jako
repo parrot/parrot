@@ -1,0 +1,30 @@
+#
+# fibo.jako
+#
+# Adapted from fibo.pasm by lars@kultunaut.dk.
+#
+# Copyright (C) 2001 Gregor N. Purdy. All rights reserved.
+# This program is free software. It is subject to the same
+# license as Perl itself.
+#
+
+var int n = 24;
+var int a =  1;
+var int b =  1;
+var int f =  1; 
+var int i =  3;
+
+print("Algorithm F2 (Fibonacci's function)\n");
+print("  Calculating fib(", n, ") = ...\n");
+
+while (i <= n) {
+  f = a + b;
+  a = b;
+  b = f;
+  i++;
+}
+
+print("  ... = ", f, "\n");
+
+end;
+

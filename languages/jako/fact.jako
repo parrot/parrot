@@ -1,0 +1,27 @@
+#
+# fact.jako
+#
+# Some simple code to print some factorials
+#
+# Based on fact.pasm originally be Leon Brocard <acme@astray.com> 2001-09-14.
+#
+# Copyright (C) 2001 Gregor N. Purdy. All rights reserved.
+# This program is free software. It is subject to the same
+# license as Perl itself.
+#
+
+var int n = 15;
+var int i =  0;
+var int f =  1;
+
+print("Algorithm F1 (The factorial function)\n");
+print("    Calculating fact(", n, ") = ...\n");
+
+while(i <= n) {
+  i++;
+  f *= i;
+}
+
+print("    ... = ", f, "\n");
+
+end;

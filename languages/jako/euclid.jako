@@ -15,24 +15,13 @@
 # license as Perl itself.
 #
 
-m    is int;
-n    is int;
-zero is int;
-r    is int;
-s    is string;
-
-zero = 0;
-
-m = 96;
-n = 64;
+var int m    = 96;
+var int n    = 64;
+var int zero =  0;
+var int r;
 
 print("Algorithm E (Euclid's algorithm)\n");
-
-print("  Calculating gcd(");
-print(m);
-print(", ");
-print(n);
-print(") = ...\n");
+print("  Calculating gcd(", m, ", ", n, ") = ...\n");
 
 r = mod(m, n);
 while (r != zero) {
@@ -41,9 +30,7 @@ while (r != zero) {
   r = mod(m, n);
 } 
 
-print("  ... = ");
-print(n);
-print("\n");
+print("  ... = ", n, "\n");
 
 end;    
 
