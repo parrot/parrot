@@ -343,6 +343,7 @@ sub output_tree {
 	verbose(2, "compiling tree");
 	warnings(sub { P6C::IMCC::compile($x) }, $fw);
 	my $f = "$filebase.imc";
+	$OPT{output} ||= '';
 	if ($OPT{output} eq '-') {
 	    verbose(2, "Writing to STDOUT");
 	    $OPT{imc} = 1;	# stop after pipeing output to imcc
@@ -641,6 +642,7 @@ sub pass2($$) {
     }
     my $debug = join(' ', map { defined $OPT{$_} && $OPT{$_} ? "-$_" : '' }
 		qw(debug yydebug verbose runpbc c G));
+    # TODO $debug .= ' -O'.$OPT{optimize}.' ' if ($OPT{optimize});
     if($OPT{runpbc} || $OPT{'c'}) {
 	# compile per imcc, run .pbc through parrot
 	if ($OPT{'c'}) {
