@@ -168,7 +168,7 @@ main(int argc, char **argv)
             exit(1);
         }
         fclose(fp);
-        free(pack);
+        mem_sys_free(pack);
         Parrot_exit(0);
     }
 
