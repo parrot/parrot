@@ -94,6 +94,9 @@ The name of this method may change, as per discussion on p6i.
 
 .sub _new method
 	.param pmc args
+	.local int argc
+	
+	argc = argcP
 
 	.local pmc  fetch_layout
 	find_global fetch_layout, 'SDL::NCI', 'fetch_layout'
@@ -109,6 +112,8 @@ The name of this method may change, as per discussion on p6i.
 	.local int x
 	.local int y
 
+	if argc == 0 goto ZEROS
+	
 	set height, args['height']
 	set rect['height'], height
 
@@ -120,7 +125,15 @@ The name of this method may change, as per discussion on p6i.
 
 	set y, args['y']
 	set rect['y'], y
+	branch DONE
 
+ZEROS:
+	set rect['height'], 0
+	set rect['width'], 0
+	set rect['x'], 0
+	set rect['y'], 0
+
+DONE:
 	.local int offset
 	classoffset  offset,   self, 'SDL::Rect'
 	setattribute   self, offset, rect
