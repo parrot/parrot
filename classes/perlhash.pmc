@@ -347,7 +347,7 @@ pmclass PerlHash {
 	key = key_next(INTERP, key);
 	he = hash_get(INTERP, h, sx);
 	if (he == NULL)
-	    ;		/* no such key */
+            return;  /* no such key */
 	else if (key == NULL)
 	    hash_delete(INTERP, h, sx);
 	else
