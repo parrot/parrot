@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-=head2 Parrot Assembler
+=head1 Parrot Assembler
 
 The Parrot Assembler's job is to take .pasm (Parrot Assembly) files and assemble
 them into Parrot bytecode. Plenty of references for Parrot assembly syntax
@@ -22,9 +22,9 @@ accumulates the (finally completely numeric) bytecode onto the output string.
 The XS portion takes the constants and bytecode, generates a header, tacks the
 constants and bytecode on, and finally prints out the string.
 
-=head1 Macro
+=head2 Macro
 
-The Parrot assebler's macro layer has now been more-or-less defined, with one
+The Parrot assembler's macro layer has now been more-or-less defined, with one
 or two additions to come. The addition of the '.' preface will hopefully make
 things easier to parse, inasmuch as everything within an assembler file that
 needs to be expanded or processed by the macro engine will have a period ('.')
@@ -132,6 +132,8 @@ use Parrot::PMC qw(%pmc_types);
 
 =head2 Macro class
 
+=over 4
+
 =item new
 
 Create a new Macro instance. Simply take the argument list and treat it as a
@@ -145,7 +147,7 @@ sub new {
   my $self;
   #
   # Read the files, strip leading and trailing whitespace, and put the lines
-  # into an array in $self->{contents}.
+  # into an array in $self->{cur_contents}.
   #
   for(@_) {
     open FILE,"< $_" or
@@ -207,33 +209,54 @@ compilation.
   .constant name {"string constant"}
   .constant name {'string constant'}
 
-    Are removed from the array. Given the line:
+are removed from the array. Given the line:
 
-    '.constant HelloWorld "Hello, World!"'
+  '.constant HelloWorld "Hello, World!"'
 
-    One can expand HelloWorld via:
+one can expand HelloWorld via:
 
-    'print .HelloWorld' # Note the period to indicate a thing to expand.
+  'print .HelloWorld' # Note the period to indicate a thing to expand.
 
-    Some predefined constants exist for your convenience, namely:
+Some predefined constants exist for your convenience, namely:
 
-      .Array
-      .PerlHash
-      .PerlArray
-      and the other PMC types.
+  .Array
+  .PerlHash
+  .PerlArray
 
-    This should be generated from include/parrot/pmc.h, but isn't at the moment.
-    A .include should be added, but currently is awaiting more time and sleep.
+and the other PMC types.
+(This should be generated from include/parrot/pmc.h, but isn't at the moment.)
 
-  .include "{file name}" # Not quite ready.
+The contents of external files can be included by use of the C<.include> 
+macro:
+
+  .include "{filename}" 
+
+The contents of the included file are inserted at the point where the
+C<.include> macro occurs. This means that code like this:
+
+  print "Hello "
+  .include "foo.pasm"
+  end
+
+where F<foo.pasm> contains:
+
+  print "World \n"
+
+becomes:
+
+  print "Hello "
+  print "World \n"
+  end
+
+Attempting to include a non-existent file is a non-fatal error.
 
   .macro name ({arguments?})
   ...
   .endm
 
-    Optional arguments are simply identifiers separated by commas. These
-    arguments are matched to instances inside the macro named '.foo'. A
-    simple example follows:
+Optional arguments are simply identifiers separated by commas. These
+arguments are matched to instances inside the macro named '.foo'. A
+simple example follows:
 
   .macro inc3 (A,BLAM)
     inc .A # Mark the argument to expand with a '.'.
@@ -292,6 +315,7 @@ sub preprocess {
         my @include;
         while(<FOO>) {
           chomp;
+          s/(^\s+|\s+$)//g;    # Need to strip leading & trailing whitespace
           push(@include,$_);
         }
         unshift(@todo,@include);
@@ -381,6 +405,8 @@ sub preprocess {
 Access the C<$self->{contents}> internal array, where the post-processed data
 is stored.
 
+=back
+
 =cut
 
 sub contents {
@@ -403,6 +429,8 @@ use Parrot::OpLib::core;
 use Parrot::Config;
 
 =head2 Assembler class
+
+=over 4
 
 =item new
 
@@ -908,6 +936,8 @@ internal PC tracking.
 The third pass takes labels and replaces them with the PC offset to the actual
 instruction, and generates bytecode. It returns the bytecode, and we're done.
 
+=back
+
 =cut
 
 sub to_bytecode {
@@ -1070,10 +1100,14 @@ exit;
 
 #------------------------------------------------------------------------------
 
+=over 4
+
 =item process_args
 
-Process the argument list and return the list of arguments and files to process.
-Only legal and sane arguments and files should get past this point.
+Process the argument list and return the list of arguments and files to 
+process. Only legal and sane arguments and files should get past this point.
+
+=back
 
 =cut
 
