@@ -14,9 +14,12 @@ if (! @files) {
 
 if ($files[0] eq "all_source") {
     # do a little "find" action for now.
-
     @files = ();
     File::Find::find({wanted => sub {
+                          if ($File::Find::dir =~ /(languages|icu)$/) {
+                              $File::Find::prune = 1;	
+                          }
+
                           /^.*\.[ch]\z/s &&
                             push @files, $File::Find::name;
                       }}, '.');
