@@ -189,11 +189,11 @@ the specified op files.
 
 sub new
 {
-    my ($class, @files) = @_;
+    my ($class, $files, $nolines) = @_;
 
     my $self = bless { PREAMBLE => '' }, $class;
 
-    $self->read_ops($_) for @files;
+    $self->read_ops($_, $nolines) for @{$files};
 
     # FILE holds a space separated list of opsfile name
     if ($self->{FILE}) {
@@ -210,7 +210,7 @@ sub new
 
 =over 4
 
-=item C<read_ops($file)>
+=item C<read_ops($file,$nolines)>
 
 Reads in the specified .ops file, gathering information about the ops.
 
@@ -218,7 +218,7 @@ Reads in the specified .ops file, gathering information about the ops.
 
 sub read_ops
 {
-    my ($self, $file) = @_;
+    my ($self, $file, $nolines) = @_;
     my $ops_file = "src/" . $file;
 
     open OPS, $file or die "Could not open ops file '$file' ($!)!";
@@ -413,7 +413,7 @@ sub read_ops
         if (/^}\s*$/)
         {
             $count += $self->make_op($count, $type, $short_name, $body, \@args,
-                \@argdirs, $line, $orig, \@labels, $flags);
+                \@argdirs, $line, $orig, \@labels, $flags, $nolines);
 
             $seen_op = 0;
 
@@ -460,7 +460,7 @@ sub or_flag
 }
 
 =item C<make_op($code,
-$type, $short_name, $body, $args, $argdirs, $line, $file, $labels, $flags)>
+$type, $short_name, $body, $args, $argdirs, $line, $file, $labels, $flags, $nolines)>
 
 Returns a new C<Parrot::Op> instance for the specified arguments.
 
@@ -469,7 +469,7 @@ Returns a new C<Parrot::Op> instance for the specified arguments.
 sub make_op
 {
     my ($self, $code, $type, $short_name, $body, $args, $argdirs,
-            $line, $file, $labels, $flags) = @_;
+        $line, $file, $labels, $flags, $nolines) = @_;
     my $counter = 0;
     my $absolute = 0;
     my $branch = 0;
@@ -564,14 +564,7 @@ sub make_op
 
         $body =~ s/\$(\d+)/{{\@$1}}/mg;
 
-        if ($ENV{PARROT_NO_LINE})
-        {
-            $op->body($body);
-        }
-        else
-        {
-            $op->body(qq{#line $line "$file"\n}.$body);
-        }
+        $op->body( $nolines ? $body : qq{#line $line "$file"\n$body} );
 
         # Constants here are defined in include/parrot/op.h
         or_flag(\$jumps, "PARROT_JUMP_RELATIVE")   if ($branch);

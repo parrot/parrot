@@ -8,7 +8,8 @@ build_tools/ops2c.pl - Parser for .ops files
 
 =head1 SYNOPSIS
 
-    % perl build_tools/ops2c.pl transform options
+    % perl build_tools/ops2c.pl trans [--help] [--no-lines] [--dynamic] [--core | input.ops [input2.ops ...]]
+       trans := C | CGoto | CGP | CSwitch | CPrederef
 
 For example:
 
@@ -58,6 +59,10 @@ Create the predereferenced run loop.
 
 =over 4
 
+=item C<--help>
+
+Print synopsis.
+
 =item C<--dynamic>
 
 Indicate that the opcode library is dynamic.
@@ -65,6 +70,10 @@ Indicate that the opcode library is dynamic.
 =item C<--core>
 
 Build the Parrot core opcode library.
+
+=item C<--no-lines>
+
+Do not generate C<#line> directives in the generated C code.
 
 =back
 
@@ -98,6 +107,9 @@ Build the Parrot core opcode library.
 
 use strict;
 use lib 'lib';
+
+use Getopt::Long;
+
 use Parrot::OpsFile;
 use Parrot::OpLib::core;
 
@@ -108,45 +120,44 @@ my %arg_dir_mapping = (
 	'io' => 'PARROT_ARGDIR_INOUT'
 );
 
+#
+# Look at the command line options
+#
+
+# TODO: Use Pod::Usage
+my ( $nolines_flag, $help_flag, $dynamic_flag, $core_flag );
+GetOptions( "no-lines"      => \$nolines_flag,
+            "help"          => \$help_flag,
+            "dynamic|d"     => \$dynamic_flag,
+            "core"          => \$core_flag,
+          );
+
 sub Usage {
     print STDERR <<_EOF_;
-usage: $0 trans [--dynamic] [--core | input.ops [input2.ops ...]]
+usage: $0 trans [--help] [--no-lines] [--dynamic] [--core | input.ops [input2.ops ...]]
        trans := C | CGoto | CGP | CSwitch | CPrederef
 _EOF_
     exit 1;
 }
 
-#
-# Process command-line argument:
-#
-
-Usage() unless @ARGV >= 2;
+Usage() if $help_flag;
+Usage() unless @ARGV;
 
 my $trans_class = "Parrot::OpTrans::" . shift @ARGV;
 
 eval "require $trans_class";
 
-my $trans = $trans_class->new;
+my $trans = $trans_class->new();
 
 # Not used
-my $prefix  = $trans->prefix;
-my $suffix  = $trans->suffix;
+my $prefix  = $trans->prefix();
+my $suffix  = $trans->suffix();
 # Used as ${defines}
-my $defines = $trans->defines;
-my $opsarraytype = $trans->opsarraytype;
-my $core_type = $trans->core_type;
+my $defines = $trans->defines();
+my $opsarraytype = $trans->opsarraytype();
+my $core_type = $trans->core_type();
 
-my $dynamic;
-my $file = shift @ARGV;
-if ($file eq '-d' || $file eq '--dynamic') {
-    $file = shift @ARGV;
-    $dynamic = 1;
-}
-my $core = 0;
-if ($file eq '--core') {
-	$file = 'core.ops';
-	$core = 1;
-}
+my $file = $core_flag ? 'core.ops' : shift @ARGV;
 
 my $base = $file;
 $base =~ s/\.ops$//;
@@ -156,12 +167,12 @@ my $include = "parrot/oplib/${base}_ops${suffix}.h";
 my $header  = "include/$include";
 my $source  = "ops/${base}_ops${suffix}.c";
 
-if ($base =~ m!^dynoplibs/! || $dynamic) {
+if ($base =~ m!^dynoplibs/! || $dynamic_flag) {
     $source  =~ s!ops/!!;
     $header = "${base}_ops${suffix}.h";
     $base =~ s!^.*[/\\]!!;
     $include = "${base}_ops${suffix}.h";
-    $dynamic = 1;
+    $dynamic_flag = 1;
 }
 
 my %hashed_ops;
@@ -171,8 +182,8 @@ my %hashed_ops;
 #
 
 my $ops;
-if ($core) {
-    $ops = Parrot::OpsFile->new('ops/core.ops');
+if ($core_flag) {
+    $ops = Parrot::OpsFile->new( [ "ops/$file" ], $nolines_flag );
     $ops->{OPS} = $Parrot::OpLib::core::ops;
     $ops->{PREAMBLE} = $Parrot::OpLib::core::preamble;
 }
@@ -192,7 +203,7 @@ else {
 	die "$0: Could not read ops file '$opsfile'!\n" unless -r $opsfile;
     }
 
-    $ops = new Parrot::OpsFile @opsfiles;
+    $ops = Parrot::OpsFile->new( \@opsfiles, $nolines_flag );
 
     my $cur_code = 0;
     for(@{$ops->{OPS}}) {
@@ -214,7 +225,7 @@ my $num_entries = $num_ops + 1; # For trailing NULL
 # Open the output files:
 #
 
-if (!$dynamic && ! -d $incdir) {
+if (!$dynamic_flag && ! -d $incdir) {
     mkdir($incdir, 0755) or die "ops2c.pl: Could not mkdir $incdir $!!\n";
 }
 
@@ -405,7 +416,7 @@ open(SOURCE, "<$source") || die "Error re-reading $source: $!\n";
 my $line = 0; while (<SOURCE>) { $line++; } $line+=2;
 close(SOURCE);
 open(SOURCE, ">>$source") || die "Error appending to $source: $!\n";
-print SOURCE "#line $line \"$source\"\n" unless $ENV{PARROT_NO_LINE};
+print SOURCE qq{#line $line "$source"\n} unless $nolines_flag;
 
 
 #
@@ -497,7 +508,7 @@ END_C
 END_C
 }
 
-if ($suffix eq '' && !$dynamic) {
+if ($suffix eq '' && !$dynamic_flag) {
     $getop = 'get_op';
     my $hash_size = 3041;
     $tot = $index + scalar keys(%names);
@@ -672,7 +683,7 @@ $init_set_dispatch
 
 END_C
 
-if ($dynamic) {
+if ($dynamic_flag) {
     my $load_func = "Parrot_lib_${base}_ops${suffix}_load";
     print SOURCE <<END_C;
 /*

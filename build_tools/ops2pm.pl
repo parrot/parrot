@@ -1,5 +1,6 @@
 #! perl -w
-# Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+
+# Copyright: 2001-2004 The Perl Foundation.  All Rights Reserved.
 # $Id$
 
 =head1 NAME
@@ -8,12 +9,26 @@ build_tools/ops2pm.pl - Generate Perl module from operation definitions
 
 =head1 SYNOPSIS
 
-    % perl build_tools/ops2pm.pl ops/core.ops ops/bit.ops ...
+    % perl build_tools/ops2pm.pl [--help] [--no-lines] input.ops [input2.ops ...]
 
 =head1 DESCRIPTION
 
 Reads the ops files listed on the command line and outputs a
 C<Parrot::OpLib::core> module containing information about the ops.
+
+=head2 Options
+
+=over 4
+
+=item C<--help>
+
+Print synopsis.
+
+=item C<--no-lines>
+
+Do not generate C<#line> directives in the generated C code.
+
+=back
 
 =head2 WARNING
 
@@ -56,22 +71,33 @@ modified so that it doesn't need to concatenate separate ops files.
 
 use strict;
 use lib 'lib';
-use Parrot::OpsFile;
 
 use Data::Dumper;
 $Data::Dumper::Useqq  = 1;
 #$Data::Dumper::Terse  = 1;
 #$Data::Dumper::Indent = 0;
+use Getopt::Long;
 
-my $moddir  = "lib/Parrot/OpLib";
+use Parrot::OpsFile;
+
+#
+# Look at the command line options
+#
+
+# TODO: Use Pod::Usage
+my ( $nolines_flag, $help_flag );
+GetOptions( "no-lines"      => \$nolines_flag,
+            "help"          => \$help_flag,
+          );
 
 sub Usage {
     print STDERR <<_EOF_;
-usage: $0 input.ops [input2.ops ...]
+usage: $0 [--help] [--no-lines] input.ops [input2.ops ...]
 _EOF_
     exit;
 }
 
+Usage() if $help_flag;
 Usage() unless @ARGV;
 
 
@@ -79,14 +105,14 @@ Usage() unless @ARGV;
 # Read in the first ops file.
 #
 
-my $file = shift @ARGV;
 my $package = "core";
-my $module  = "lib/Parrot/OpLib/core.pm";
+my $moddir  = "lib/Parrot/OpLib";
+my $module  = "$moddir/core.pm";
 
+my $file = shift @ARGV;
 die "$0: Could not find ops file '$file'!\n" unless -e $file;
-my $ops = new Parrot::OpsFile $file;
+my $ops = Parrot::OpsFile->new( [ $file ], $nolines_flag );
 die "$0: Could not read ops file '$file'!\n" unless defined $ops;
-
 
 #
 # Copy the ops from the remaining .ops files to the object just created.
@@ -102,7 +128,7 @@ for $file (@ARGV) {
     $seen{$file} = 1;
 
     die "$0: Could not find ops file '$file'!\n" unless -e $file;
-    my $temp_ops = new Parrot::OpsFile $file;
+    my $temp_ops = Parrot::OpsFile->new( [ $file ], $nolines_flag );
     die "$0: Could not read ops file '$file'!\n" unless defined $temp_ops;
 
     die "OPS invalid for $file" unless ref $temp_ops->{OPS};
@@ -122,22 +148,21 @@ for $file (@ARGV) {
 
 
 # Renumber the ops based on ops.num
-#
+{
+    load_op_map_file();
 
-&load_op_map_file;
+    my $cur_code = 0;
+    for(@{$ops->{OPS}}) {
+        $_->{CODE} = find_op_number($_->full_name, $_->{experimental});
+    }
 
-my $cur_code = 0;
-for(@{$ops->{OPS}}) {
-    $_->{CODE} = find_op_number($_->full_name, $_->{experimental});
+    @{$ops->{OPS}} = sort { $a->{CODE} <=> $b->{CODE} } (@{$ops->{OPS}} );
 }
-
-my @sorted = sort { $a->{CODE} <=> $b->{CODE} } (@{$ops->{OPS}} );
-@{$ops->{OPS}} = @sorted;
 
 # create opsfile with valid ops from ops.num
 # or from experimental
 
-my $real_ops = new Parrot::OpsFile;
+my $real_ops = Parrot::OpsFile->new( [ ], $nolines_flag );
 $real_ops->{PREAMBLE} = $ops->{PREAMBLE};
 $real_ops->version($ops->version);
 
@@ -156,10 +181,8 @@ for(@{$ops->{OPS}}) {
     push @{$real_ops->{OPS}}, $_;
     ++$seq;
 }
-#
+ 
 # Open the output file:
-#
-
 if (! -d $moddir) {
     mkdir($moddir, 0755) or die "$0: Could not mkdir $moddir: $!!\n";
 }
@@ -171,7 +194,7 @@ open MODULE, ">$module"
 # Print the preamble for the MODULE file:
 #
 
-my $version = $real_ops->version;
+my $version = $real_ops->version();
 
 # Hide the pod.
 
@@ -325,3 +348,4 @@ sub load_op_map_file {
 
 exit 0;
 
+# vim: expandtab shiftwidth=4:
