@@ -1,6 +1,7 @@
 #ifndef P6GE_H_GUARD
 #define P6GE_H_GUARD
 
+#include "parrot/parrot.h"
 #include <limits.h>
 #include <stdio.h>
 
@@ -41,14 +42,20 @@ typedef struct _P6GE_Exp {
 } P6GE_Exp;
 
 
-P6GE_Exp* p6ge_parse(const char* s);
-P6GE_Exp* p6ge_parsep5(const char* s);
+P6GE_Exp* p6ge_parse(const unsigned char* s);
+P6GE_Exp* p6ge_parsep5(const unsigned char* s);
+
 P6GE_Exp* p6ge_parse_new(p6ge_exp_t type, P6GE_Exp* exp1, P6GE_Exp* exp2);
 void p6ge_parse_free(P6GE_Exp* e);
-void p6ge_init();
+void p6ge_init(void);
 void p6ge_printexp(FILE* fp, P6GE_Exp* e, int depth);
-char* p6ge_p6rule_pir(const char* s);
- 
+
+char* p6ge_p6rule_pir(const unsigned char* s);
+char* p6ge_p5rule_pir(const unsigned char* s);
+
+void Parrot_lib_p6ge_init(Parrot_Interp interpreter, PMC* lib);
+
+
 #endif /* P6GE_H_GUARD */ 
 
 /*

@@ -48,7 +48,7 @@ emit(const char* fmt, ...)
 
 
 static void
-emitlcount()
+emitlcount(void)
 {
     char* s;
     int lcount = 0;
@@ -81,7 +81,7 @@ emitsub(const char* sub, ...)
 
 /* strcon(...) converts string values into PIR string constants */
 static char*
-strcon(const char* s, int len)
+strcon(const unsigned char* s, int len)
 {
     static char esc[P6GE_MAX_LITERAL_LEN * 2 + 3];
     char* t = esc;
@@ -108,9 +108,7 @@ static void
 p6ge_gen_pattern_end(P6GE_Exp* e, const char* succ)
 {
     emit("R%d:                               # end of pattern\n", e->id);
-    emit("    saveall\n");
     emit("    .yield(pos)\n");
-    emit("    restoreall\n");
     emit("    goto fail\n");
 }
 
@@ -380,6 +378,7 @@ p6ge_gen_anchor(P6GE_Exp* e, const char* succ)
         emit("    if $S0 != \"\\n\" goto %s\n", succ);
         emit("    goto fail\n\n");
         return;
+    default: break;
     }
 }
 
@@ -456,13 +455,14 @@ is_bos_anchored(P6GE_Exp* e)
         return is_bos_anchored(e->exp1) || is_bos_anchored(e->exp2);
     case P6GE_GROUP: return is_bos_anchored(e->exp1);
     case P6GE_ALT: return is_bos_anchored(e->exp1) && is_bos_anchored(e->exp2);
+    default: break;
     }
     return 0;
 }
 
 /*
 
-=item C<char* p6ge_p6rule_pir(const char* s)>
+=item C<char* p6ge_p6rule_pir(const unsigned char* s)>
 
 Converts the rule expression in s to its equivalent PIR code.
 This function calls p6ge_parse() to build an expression tree from
@@ -474,7 +474,7 @@ from the expression tree.
 */
 
 char*
-p6ge_p6rule_pir(const char* s)
+p6ge_p6rule_pir(const unsigned char* s)
 {
     P6GE_Exp* e = 0;
     P6GE_Exp* dot0 = 0;
@@ -510,7 +510,7 @@ from the expression tree.
 */
 
 char*
-p6ge_p5rule_pir(const char* s)
+p6ge_p5rule_pir(const unsigned char* s)
 {
     P6GE_Exp* e = 0;
     P6GE_Exp* dot0 = 0;

@@ -18,10 +18,9 @@ fold in perl 5 syntax a bit later.
 
 P6GE assumes that it is part of the parrot distribution in the 
 F<compilers/p6ge> directory.   Simply type C<make> in this directory
-to build the F<p6ge.so> shared library it needs.  You can
-either leave this file in the current directory (and set LD_LIBRARY_PATH
-or equivalent appropriately), or move it to F<runtime/parrot/dynext>.
-(XXX: Need to update Parrot configure so this happens automatically?)
+to build the F<p6ge.so> shared library it needs -- p6ge.so is
+then placed in F<runtime/parrot/dynext>.  In some environments you
+may need to set LD_LIBRARY_PATH to search this correctly.
 
 The distribution comes with a small F<demo.pir> program that gives an
 example of using P6GE.  To run the demo, simply do 

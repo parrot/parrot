@@ -22,6 +22,7 @@ expression code.
 #include <ctype.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 int p6ge_ctype[256];
 int p6ge_cmeta[256];
@@ -34,7 +35,7 @@ p6ge_init()
     unsigned int c;
     for(c=0; c<256; c++) {
         p6ge_ctype[c] = (isspace(c)) ? (ctmeta | ctspace) : 0;
-        p6ge_cmeta[c] = (!isalnum(c)) ? c : -1;
+        p6ge_cmeta[c] = (!isalnum(c)) ? (int)c : -1;
     }
     p6ge_ctype[0] |= ctmeta | ctket;
     p6ge_ctype['['] |= ctmeta;
@@ -62,7 +63,7 @@ static void
 p6ge_parse_error(P6GE_Text* t, const char* msg)
 {
    printf("%s at offset %d (found '%c')\n", msg, t->pos - t->text, *(t->pos));
-   t->pos = "";
+   t->pos = NULL;
 }
 
 
@@ -134,10 +135,10 @@ p6ge_parse_literal(P6GE_Text* t)
 {
     static unsigned char lit[P6GE_MAX_LITERAL_LEN];
     P6GE_Exp* e = 0;
-    int len = 0;
-    int c;
+    unsigned int len = 0;
+    unsigned char c;
 
-    while (len<sizeof(lit) && (c = *(t->pos))) {
+    while (len < sizeof(lit) && (c = *(t->pos))) {
         if ((p6ge_ctype[c] & ctmeta) == 0)
             { lit[len++] = c; p6ge_skip(t, 1); }
         else if (c == '\\' && p6ge_cmeta[t->pos[1]] >= 0)
@@ -231,7 +232,7 @@ p6ge_parse_quant(P6GE_Text* t)
             p6ge_parse_error(t, "Missing { after ** quantifier");
         p6ge_skip(t, 1);
         if (isdigit(*(t->pos))) {
-            q->min = q->max = atoi(t->pos);
+            q->min = q->max = atoi((const char*)t->pos);
             while (isdigit(*(t->pos))) t->pos++;
             p6ge_skip(t, 0);
         } else p6ge_parse_error(t, "Missing min value in **{} quantifier");
@@ -239,7 +240,7 @@ p6ge_parse_quant(P6GE_Text* t)
             p6ge_skip(t, 2);
             if (t->pos[0] == '.') { q->max = P6GE_INF; p6ge_skip(t, 1); }
             else if (isdigit(*(t->pos))) {
-                q->max = atoi(t->pos);
+                q->max = atoi((const char*)t->pos);
                 while (isdigit(*(t->pos))) t->pos++;
                 p6ge_skip(t, 0);
             }
@@ -292,7 +293,7 @@ Builds a regular expression tree from the string specified in s.
 */
 
 P6GE_Exp*
-p6ge_parse(const char* s)
+p6ge_parse(const unsigned char* s)
 {
     P6GE_Text t;
     P6GE_Exp* e = 0;
@@ -361,6 +362,8 @@ p6ge_printexp(FILE* fp, P6GE_Exp* e, int depth)
 Initial version by Patrick R. Michaud, 2004.11.16
 
 =cut
+
+*/
 
 /*
  * Local variables:

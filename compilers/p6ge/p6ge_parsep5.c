@@ -22,6 +22,7 @@ expression code.
 #include <ctype.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 static P6GE_Exp* p5re_parse_expr(P6GE_Text* t);
 
@@ -29,7 +30,7 @@ static void
 p5re_parse_error(P6GE_Text* t, const char* msg)
 {
    printf("%s at offset %d (found '%c')\n", msg, t->pos - t->text, *(t->pos));
-   t->pos = "";
+   t->pos = NULL;
 }
 
 
@@ -56,7 +57,7 @@ p5re_parse_literal(P6GE_Text* t)
 {
     static unsigned char lit[P6GE_MAX_LITERAL_LEN];
     P6GE_Exp* e = 0;
-    int len = 0;
+    unsigned int len = 0;
     int c;
 
     while (len<sizeof(lit) && (c = *(t->pos))) {
@@ -143,14 +144,14 @@ p5re_parse_quant(P6GE_Text* t)
     else if (c == '*') { q->min = 0; q->max = P6GE_INF; }
     else if (c == '{') {
         if (isdigit(*(t->pos))) {
-            q->min = q->max = atoi(t->pos);
+            q->min = q->max = atoi((const char *) t->pos);
             while (isdigit(*(t->pos))) t->pos++;
             p5re_skip(t, 0);
         } else p5re_parse_error(t, "Missing min value in {} quantifier");
         if (t->pos[0] == ',') {
             p5re_skip(t, 1);
             if (isdigit(*(t->pos))) {
-                q->max = atoi(t->pos);
+                q->max = atoi((const char *) t->pos);
                 while (isdigit(*(t->pos))) t->pos++;
                 p5re_skip(t, 0);
             }
@@ -203,7 +204,7 @@ Builds a regular expression tree from the string specified in s.
 */
 
 P6GE_Exp*
-p6ge_parsep5(const char* s)
+p6ge_parsep5(const unsigned char* s)
 {
     P6GE_Text t;
     P6GE_Exp* e = 0;
@@ -226,6 +227,8 @@ p6ge_parsep5(const char* s)
 Initial version by Patrick R. Michaud, 2004.11.16
 
 =cut
+
+*/
 
 /*
  * Local variables:
