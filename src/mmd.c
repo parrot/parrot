@@ -174,8 +174,11 @@ mmd_expand_x(struct Parrot_Interp *interpreter, INTVAL function, INTVAL new_x)
         newoffset = i * (new_x+1);
         oldoffset = i * (x+1);
         memcpy(new_table + newoffset,
-               interpreter->binop_mmd_funcs->mmd_funcs[function] + oldoffset, sizeof(funcptr_t) * (x+1));
+               interpreter->binop_mmd_funcs->mmd_funcs[function] + oldoffset,
+               sizeof(funcptr_t) * (x+1));
     }
+    if (interpreter->binop_mmd_funcs->mmd_funcs[function])
+        mem_sys_free(interpreter->binop_mmd_funcs->mmd_funcs[function]);
     /* Set the old table to point to the new table */
     interpreter->binop_mmd_funcs->mmd_funcs[function] = new_table;
 }
@@ -212,6 +215,8 @@ mmd_expand_y(struct Parrot_Interp *interpreter, INTVAL function, INTVAL new_y)
         memcpy(new_table, interpreter->binop_mmd_funcs->mmd_funcs[function],
                sizeof(funcptr_t) * (x+1) * (y+1));
     }
+    if (interpreter->binop_mmd_funcs->mmd_funcs[function])
+        mem_sys_free(interpreter->binop_mmd_funcs->mmd_funcs[function]);
     interpreter->binop_mmd_funcs->y[function] = new_y;
     interpreter->binop_mmd_funcs->mmd_funcs[function] = new_table;
 
@@ -273,6 +278,20 @@ mmd_register(struct Parrot_Interp *interpreter,
     *(interpreter->binop_mmd_funcs->mmd_funcs[type] + offset) = funcptr;
 }
 
+void
+mmd_destroy(Parrot_Interp interpreter)
+{
+    if (interpreter->binop_mmd_funcs->tables) {
+        /* TODO we are leaking functions here */
+        mem_sys_free(interpreter->binop_mmd_funcs->mmd_funcs);
+
+        mem_sys_free(interpreter->binop_mmd_funcs->x);
+        mem_sys_free(interpreter->binop_mmd_funcs->y);
+        mem_sys_free(interpreter->binop_mmd_funcs->default_func);
+        mem_sys_free(interpreter->binop_mmd_funcs->funcs_in_table);
+    }
+    mem_sys_free(interpreter->binop_mmd_funcs);
+}
 
 /*
  * Local variables:

@@ -949,11 +949,6 @@ Parrot_really_destroy(int exit_code, void *vinterp)
      * no DOD run, so everything is considered dead
      */
 
-    /* XXX boe: This hack explicitly marks the piodata, these filehandles
-     *          need to be open until PIO_finish is called
-     */
-    Parrot_IOData_mark(interpreter, interpreter->piodata);
-
     free_unused_pobjects(interpreter, interpreter->arena_base->pmc_pool);
 
     /* Now the PIOData gets also cleared */
@@ -990,6 +985,7 @@ Parrot_really_destroy(int exit_code, void *vinterp)
     /* free vtables */
     for (i = 1; i < (int)enum_class_max; i++)
         Parrot_destroy_vtable(interpreter, Parrot_base_vtables[i]);
+    mmd_destroy(interpreter);
 
     if (interpreter->profile)
         mem_sys_free(interpreter->profile);
