@@ -33,10 +33,10 @@ string B<error> and int B<errptr>.
     .param string pat
     .param int options
 
-    .sym var NULL
-    .sym var code
+    .sym pmc NULL
+    .sym pmc code
     .sym string error
-    .sym var COMPILE
+    .sym pmc COMPILE
     COMPILE = global "pcre::compile"
     repeat error, " ", 500	# could be enough
     .sym int errptr
@@ -69,18 +69,18 @@ ovector in var B<res>.
 =cut
 
 .pcc_sub _pcre_exec prototyped
-    .param var regex
+    .param pmc regex
     .param string s
     .param int start
     .param int options
     .sym int len
     length len, s
-    .sym var NULL
+    .sym pmc NULL
     null NULL
-    .sym var ovector
+    .sym pmc ovector
     ovector = new ManagedStruct
     ovector = 120	# 1/(2/3) * 4  * 2 * 10 for 10 result pairs
-    .sym var EXEC	# on 32 bit systems
+    .sym pmc EXEC	# on 32 bit systems
     EXEC = global "pcre::exec"
 
     .pcc_begin prototyped
@@ -113,7 +113,7 @@ Extract from string B<str> the int B<n>th result into string B<match>.
 .pcc_sub _pcre_result prototyped
     .param string s
     .param int ok
-    .param var ovector
+    .param pmc ovector
     .param int n
 
     .sym string match
@@ -122,7 +122,7 @@ Extract from string B<str> the int B<n>th result into string B<match>.
 
     .local int ovecs
     .local int ovece
-    .sym var struct
+    .sym pmc struct
     struct = new SArray
     struct = 3
 .include "datatypes.pasm"

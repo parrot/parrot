@@ -277,7 +277,7 @@ print_err:
 	total = size * size
 	.sym int cols
 	.sym int rows
-	.sym var ENV
+	.sym pmc ENV
 	ENV = new Env
 	$S0 = ENV["COLUMNS"]
 	cols = $S0
@@ -584,7 +584,7 @@ nocol:
 .end
 
 .pcc_sub _load_file prototyped
-	.param var argv
+	.param pmc argv
 	.param int size
 
 	.sym string world
@@ -593,7 +593,7 @@ nocol:
 	.sym string file
 	file = argv[1]
 	err = "File not found " . file
-	.sym var io
+	.sym pmc io
 	open io, file, "<"
 	$I0 = defined io
 	unless $I0 goto nok
@@ -611,7 +611,7 @@ nocol:
 	.const int PICTURE = 1
 	.const int ABS     = 2
 	.const int REL     = 3
-	.sym   var points
+	.sym   pmc points
 
 loop:
 	readline line, io

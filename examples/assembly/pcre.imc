@@ -1,6 +1,6 @@
 # experimental string match with pcre
 .pcc_sub _main prototyped
-    .param var argv
+    .param pmc argv
 .include "library/pcre.imc"
     .sym int argc
     argc = argv
@@ -14,17 +14,17 @@
     print " =~ /"
     print pat
     print "/\n"
-    .sym var PCRE_LIB
+    .sym pmc PCRE_LIB
     .PCRE_INIT(PCRE_LIB)
     .sym string error
     .sym int errptr
-    .sym var code
+    .sym pmc code
     .PCRE_COMPILE(pat, 0, code, error, errptr)
     $I0 = defined code
     unless $I0 goto match_err
 
     .sym int ok
-    .sym var result
+    .sym pmc result
     .PCRE_MATCH(code, s, 0, 0, ok, result)
     if ok < 0 goto nomatch
     print ok
