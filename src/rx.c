@@ -34,7 +34,7 @@ rxinfo * rx_allocate_info(struct Parrot_Interp *interpreter, STRING *string) {
 	rx->groupstart=pmc_new(interpreter, enum_class_PerlArray);
 	rx->groupend=pmc_new(interpreter, enum_class_PerlArray);
 
-	new_stack(interpreter, &rx->stack_base, &rx->stack_top);
+	rx->stack = new_stack(interpreter);
 
 	return rx;
 }

@@ -357,7 +357,7 @@ Pushes the current index onto the stack contained in the info structure.
 op rx_pushindex(in pmc) {
 	RX_dUNPACK($1);
 
-	push_generic_entry(interpreter, &rx->stack_top, &rx->index, STACK_ENTRY_INT, NULL);
+	stack_push(interpreter, rx->stack, &rx->index, STACK_ENTRY_INT, NULL);
 	
 	goto NEXT();
 }
@@ -375,7 +375,7 @@ op rx_pushmark(in pmc) {
 	RX_dUNPACK($1);
 
 	/* Don't worry about the const warning from the next line */
-	push_generic_entry(interpreter, &rx->stack_top, &RX_MARK, STACK_ENTRY_INT, NULL);
+	stack_push(interpreter, rx->stack, &RX_MARK, STACK_ENTRY_INT, NULL);
 	
 	goto NEXT();
 }
@@ -393,7 +393,7 @@ op rx_popindex(in pmc, in int) {
 	RX_dUNPACK($1);
 	int i;
 	
-	pop_generic_entry(interpreter, &rx->stack_top, &i, STACK_ENTRY_INT);
+	stack_pop(interpreter, rx->stack, &i, STACK_ENTRY_INT);
 
 	if(i==RX_MARK) {
 		goto OFFSET($2);
@@ -484,8 +484,8 @@ op rx_advance(in pmc, in int) {
 
 	rx->index=rx->startindex;
 	
-	while(stack_depth(interpreter, rx->stack_base)) {
-		pop_generic_entry(interpreter, &rx->stack_top, NULL, STACK_ENTRY_INT);
+	while(stack_depth(interpreter, rx->stack)) {
+		stack_pop(interpreter, rx->stack, NULL, STACK_ENTRY_INT);
 	}
 	
 	goto NEXT();

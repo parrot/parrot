@@ -47,8 +47,7 @@ typedef struct rxinfo {
 
 	opcode_t *substfunc;
 
-	struct Stack_Entry *stack_top;
-	struct StackChunk *stack_base;
+        struct Stack_chunk_t* stack;
 } rxinfo;
 
 rxinfo * rx_allocate_info(struct Parrot_Interp *, STRING *);

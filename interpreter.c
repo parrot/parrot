@@ -509,12 +509,10 @@ make_interpreter(INTVAL flags) {
     Parrot_clear_p(interpreter);
     
     /* Need a user stack */
-    new_stack(interpreter, &interpreter->user_stack_base,
-              &interpreter->user_stack_top);
+    interpreter->user_stack = new_stack(interpreter);
     
     /* And a control stack */
-    new_stack(interpreter, &interpreter->control_stack_base,
-              &interpreter->control_stack_top);
+    interpreter->control_stack = new_stack(interpreter);
 
     /* Need an empty stash */
     interpreter->perl_stash = mem_allocate_new_stash();

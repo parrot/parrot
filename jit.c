@@ -308,10 +308,10 @@ build_asm(struct Parrot_Interp *interpreter,opcode_t *pc, opcode_t *code_start, 
                         address = (INTVAL *)string_compare; 
                         break;
                 case 4: 
-                        address = (INTVAL *)pop_generic_entry; 
+                        address = (INTVAL *)stack_pop;
                         break;
                 case 5: 
-                        address = (INTVAL *)push_generic_entry; 
+                        address = (INTVAL *)stack_push;
                         break;
                 case 6: 
                         address = (INTVAL *)interpreter->op_func_table[*pc];
@@ -340,7 +340,7 @@ build_asm(struct Parrot_Interp *interpreter,opcode_t *pc, opcode_t *code_start, 
                         address = (INTVAL *)interpreter; 
                         break;
                 case 1: 
-                        address = (INTVAL *)&interpreter->control_stack_top; 
+                        address = (INTVAL *)interpreter->control_stack; 
                         break;
             }
 

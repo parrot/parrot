@@ -2266,13 +2266,13 @@ Gets the type of entry $2 of the stack and puts in in $1
 
 op entrytype(out INT, in INT) {
   INTVAL depth;
-  struct Stack_Entry *entry;
-  depth = stack_depth(interpreter, interpreter->user_stack_base);
+  Stack_Entry entry;
+  depth = stack_depth(interpreter, interpreter->user_stack);
   if (depth <= $2) {
     INTERNAL_EXCEPTION(99, "Stack Depth wrong");
   }
 
-  entry = stack_entry(interpreter, interpreter->user_stack_base, $2);
+  entry = stack_entry(interpreter, interpreter->user_stack, $2);
   $1 = get_entry_type(interpreter, entry);
   goto NEXT();
 }
@@ -2292,22 +2292,22 @@ Save register or constant $1 onto the stack.
 =cut
 
 inline op save(in INT) {
-  push_generic_entry(interpreter, &interpreter->user_stack_top, &($1), STACK_ENTRY_INT, NULL);
+  stack_push(interpreter, interpreter->user_stack, &($1), STACK_ENTRY_INT, NULL);
   goto NEXT();
 }
 
 inline op save(in NUM) {
-  push_generic_entry(interpreter, &interpreter->user_stack_top, &($1), STACK_ENTRY_FLOAT, NULL);
+  stack_push(interpreter, interpreter->user_stack, &($1), STACK_ENTRY_FLOAT, NULL);
   goto NEXT();
 }
 
 inline op save(in PMC) {
-  push_generic_entry(interpreter, &interpreter->user_stack_top, $1, STACK_ENTRY_PMC, NULL);
+  stack_push(interpreter, interpreter->user_stack, $1, STACK_ENTRY_PMC, NULL);
   goto NEXT();
 }
 
 inline op save(in STR) {
-  push_generic_entry(interpreter,  &interpreter->user_stack_top, $1, STACK_ENTRY_STRING, NULL);
+  stack_push(interpreter, interpreter->user_stack, $1, STACK_ENTRY_STRING, NULL);
   goto NEXT();
 }
 
@@ -2327,22 +2327,22 @@ Restore register $1 from the appropriate register stack.
 =cut
 
 inline op restore(out INT) {
-  pop_generic_entry(interpreter, &interpreter->user_stack_top, &($1), STACK_ENTRY_INT);
+  stack_pop(interpreter, interpreter->user_stack, &($1), STACK_ENTRY_INT);
   goto NEXT();
 }
 
 inline op restore(out NUM) {
-  pop_generic_entry(interpreter, &interpreter->user_stack_top, &($1), STACK_ENTRY_FLOAT);
+  stack_pop(interpreter, interpreter->user_stack, &($1), STACK_ENTRY_FLOAT);
   goto NEXT();
 }
 
 inline op restore(out PMC) {
-  pop_generic_entry(interpreter, &interpreter->user_stack_top, &($1), STACK_ENTRY_PMC);
+  stack_pop(interpreter, interpreter->user_stack, &($1), STACK_ENTRY_PMC);
   goto NEXT();
 }
 
 inline op restore(out STR) {
-  pop_generic_entry(interpreter, &interpreter->user_stack_top, &($1), STACK_ENTRY_STRING);
+  stack_pop(interpreter, interpreter->user_stack, &($1), STACK_ENTRY_STRING);
   goto NEXT();
 }
 
@@ -2357,7 +2357,7 @@ becomes the bottom entry in that range.
 =cut
 
 inline op rotate_up(in INT) {
-  rotate_entries(interpreter, interpreter->user_stack_base, interpreter->user_stack_top, $1);
+  rotate_entries(interpreter, interpreter->user_stack, $1);
   goto NEXT();
 }
 
@@ -2400,7 +2400,7 @@ stack for later returning.
 =cut
 
 inline op bsr (in INT) {
-  push_generic_entry(interpreter, &interpreter->control_stack_top, CUR_OPCODE + 2,  STACK_ENTRY_DESTINATION, NULL);
+  stack_push(interpreter, interpreter->control_stack, CUR_OPCODE + 2,  STACK_ENTRY_DESTINATION, NULL);
   goto OFFSET($1);
 }
 

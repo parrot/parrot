@@ -17,7 +17,7 @@
 
 #define STACK_CHUNK_DEPTH 256
 
-struct Stack_Entry {
+typedef struct Stack_entry_t {
     union {
         FLOATVAL num_val;
         INTVAL int_val;
@@ -27,28 +27,45 @@ struct Stack_Entry {
     } entry;
     INTVAL entry_type;
     INTVAL flags;
-    void (*cleanup)(struct Stack_Entry *);
-};
+    void (*cleanup)(struct Stack_entry_t *);
+}* Stack_Entry;
 
-struct StackChunk {
+typedef struct Stack_chunk_t {
   INTVAL used;
-  INTVAL free;
-  struct StackChunk *next;
-  struct StackChunk *prev;
-  struct Stack_Entry entry[STACK_CHUNK_DEPTH];
-};
+  struct Stack_chunk_t *next;
+  struct Stack_chunk_t *prev;
+  struct Stack_entry_t entry[STACK_CHUNK_DEPTH];
+}* Stack_Chunk;
 
-void new_stack(struct Parrot_Interp *, struct StackChunk **, struct Stack_Entry **);
+typedef Stack_Chunk Stack;
 
-INTVAL stack_depth(struct Parrot_Interp *,struct StackChunk *chunk);
-struct Stack_Entry *stack_entry(struct Parrot_Interp *, struct StackChunk *chunk,INTVAL);
-void rotate_entries(struct Parrot_Interp *, struct StackChunk *, struct Stack_Entry *, INTVAL);
+Stack
+new_stack(struct Parrot_Interp *);
 
-struct Stack_Entry *push_generic_entry(struct Parrot_Interp *, struct Stack_Entry **top, void *thing, INTVAL type,  void (*cleanup)(struct Stack_Entry *));
-void *pop_generic_entry(struct Parrot_Interp *, struct Stack_Entry **top, void *where, INTVAL type);
-void *pop_dest(struct Parrot_Interp *);
-void toss_generic_entry(struct Parrot_Interp *, struct Stack_Entry **top, INTVAL type);
-INTVAL get_entry_type(struct Parrot_Interp *, struct Stack_Entry *entry);
+INTVAL
+stack_depth(struct Parrot_Interp *, Stack);
+
+Stack_Entry
+stack_entry(struct Parrot_Interp *, Stack, INTVAL);
+
+void
+rotate_entries(struct Parrot_Interp *, Stack, INTVAL depth);
+
+void
+stack_push(struct Parrot_Interp *, Stack,
+           void *thing, INTVAL type, void (*cleanup)(Stack_Entry));
+
+void *
+stack_pop(struct Parrot_Interp *, Stack, void *where, INTVAL type);
+
+void *
+pop_dest(struct Parrot_Interp *interpreter);
+
+void *
+stack_peek(struct Parrot_Interp *interpreter, Stack stack, INTVAL* type);
+
+INTVAL
+get_entry_type(struct Parrot_Interp *interpreter, Stack_Entry entry);
 
 #define STACK_ENTRY_INT 1
 #define STACK_ENTRY_FLOAT 2
@@ -58,8 +75,6 @@ INTVAL get_entry_type(struct Parrot_Interp *, struct Stack_Entry *entry);
 #define STACK_ENTRY_DESTINATION 6
 
 #define STACK_ENTRY_CLEANUP 0x01
-
-#define STACK_CHUNK_BASE(x) (void *)(MASK_STACK_CHUNK_LOW_BITS & (ptrcast_t)x)
 
 #define ERROR_STACK_EMPTY 1
 #define ERROR_STACK_SHALLOW 1
