@@ -94,7 +94,7 @@ fprintf(stderr,"morph not implemented\n");
 
     void set_integer_same (PMC * value) {
 	SELF->vtable = &(Parrot_base_vtables[enum_class_PerlInt]);
-	SELF->cache.int_val = value;
+	SELF->cache.int_val = value->cache.int_val;
     }
 
     void set_number (PMC * value) {
