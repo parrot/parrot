@@ -98,6 +98,7 @@ void imcc_globals_destroy(int ex, void *param)
     clear_tables();
     hash = globals.key_consts;
     clear_tables();
+    free(ghash);
     globals.cs = NULL;
 }
 

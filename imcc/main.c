@@ -51,6 +51,7 @@ static void help(void)
     "    -w --warnings\n"
     "    -G --no-gc\n"
     "       --gc-debug\n"
+    "       --leak-test|--destroy-at-end\n"
     "    -. --wait    Read a keystroke before starting\n"
     "   <Compiler options>\n"
     "    -v --verbose\n"
@@ -109,7 +110,7 @@ static struct longopt_opt_decl options[] = {
     { 'o', 'o', OPTION_required_FLAG, { "--output" } },
     { 'O', 'O', OPTION_optional_FLAG, { "--optimize" } },
     { '\0', OPT_GC_DEBUG, 0, { "--gc-debug" } },
-    {'\0', OPT_DESTROY_FLAG, 0,   { "--leak_test", "--destroy-at-end" } },
+    {'\0', OPT_DESTROY_FLAG, 0,   { "--leak-test", "--destroy-at-end" } },
     { 0, 0, 0, { NULL } }
 };
 
