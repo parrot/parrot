@@ -69,13 +69,14 @@ Exit, calling any registered exit handlers.
 */
 
 void Parrot_exit(int status) {
-    handler_node_t *node, *next_node;
-
     /* call all the exit handlers */
-    for (node = exit_handler_list; node; node = next_node) {
-        (node->function)(status, node->arg);
-        next_node = node->next;
 
+    /* Must write the loop this way to protect against an exit handler calling
+       exit and re-entering this function. */
+    while (exit_handler_list) {
+        handler_node_t *node = exit_handler_list;
+        exit_handler_list = exit_handler_list->next;
+        (node->function)(status, node->arg);
         mem_sys_free(node);
     }
 
