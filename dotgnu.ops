@@ -38,7 +38,7 @@ inline op conv_u1(inout INT) {
 }
 
 inline op conv_u1_ovf(inout INT) {
-  if($1 >= 0 && $1 <= 256 ) {
+  if($1 >= 0 && $1 <= 255 ) {
     $1 = (INTVAL)((unsigned char)($1));
   }
   else {
