@@ -8,7 +8,7 @@ src/sub.c - Subroutines
 
 =head1 DESCRIPTION
 
-Sub-routines, continuations, co-routines and other fun stuff...
+Subroutines, continuations, co-routines and other fun stuff...
 
 =head2 Functions
 
@@ -194,7 +194,7 @@ swap_context(Interp *interpreter, struct PMC *sub)
             invalidate_retc_context(interpreter, ctx);
         }
         /*
-         * construct stacks that have the interpreterreter stack
+         * construct stacks that have the interpreter stack
          * at bottom and the coroutine stack at top
          *
          * XXX is this needed if we don't create a new stack for
@@ -365,7 +365,7 @@ Mark the objects in the return continuation cache being alive.
 add_to_retc_cache(Interp *interpreter, PMC *pmc)>
 
 Add the return continuation C<pmc> to the cache and turn off custom
-marking, so that it's context isn't marked.
+marking, so that its context isn't marked.
 
 Note: the context structure in C<PMC_cont(pmc)> remains allocated.
 
@@ -399,7 +399,8 @@ add_to_retc_cache(Interp *interpreter, PMC *pmc)
 =item C<PMC *
 new_ret_continuation_pmc(Interp * interp, opcode_t * address)>
 
-Returns a new C<RetContinuation> PMC if possible from the cache.
+Returns a new C<RetContinuation> PMC. Uses one from the cache,
+if possible; otherwise, creates a new one.
 
 =cut
 
@@ -496,11 +497,11 @@ invalidate_retc_context(Interp *interpreter, struct Parrot_Context *ctx)
     cont = ctx->current_cont;
     while (!PMC_IS_NULL(cont)) {
         /*
-         * We could stop if we enocunter a true continuation, because
+         * We could stop if we encounter a true continuation, because
          * if one were created, everything up the chain would have been
          * invalidated earlier.
          * But as long as Continuation usage can be considered being rare,
-         * the tests are probably more expensive then to stop early.
+         * the tests are probably more expensive than to stop early.
          */
         cont->vtable = Parrot_base_vtables[enum_class_Continuation];
         cc = PMC_cont(cont);
