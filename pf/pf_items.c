@@ -128,49 +128,57 @@ fetch_op_test(unsigned char *b)
 /*
  * opcode fetch helper function
  *
- * This is mostly wrong
+ * This is mostly wrong or at least untested
  *
- * - it doesn't consider the endianess of the packfile
- * - should be separated into several different fetch functions
- *
+ * Fetch an opcode and convert to LE
  */
 static opcode_t
-fetch_op_mixed(unsigned char *b)
+fetch_op_mixed_le(unsigned char *b)
 {
 #if OPCODE_T_SIZE == 4
     union {
         unsigned char buf[8];
         opcode_t o[2];
     } u;
+    /* wordsize = 8 then */
+    fetch_buf_le_8(u.buf, (unsigned char *) b);
+    return u.o[0]; /* or u.o[1] */
 #else
     union {
         unsigned char buf[4];
         opcode_t o;
     } u;
-    opcode_t o;
+
+    /* wordsize = 4 */
+    u.o = 0;
+    fetch_buf_le_4(u.buf, b);
+    return u.o;
 #endif
+}
 
-#if PARROT_BIGENDIAN
-#  if OPCODE_T_SIZE == 4
-     /* wordsize = 8 then */
-     fetch_buf_le_8(u.buf, (unsigned char *) b);
-     return u.o[1]; /* or u.o[0] */
-#  else
-     o = fetch_op_le(b);        /* or fetch_be_le_4 and convert? */
-     return o >> 32;    /* or o & 0xffffffff */
-#  endif
+/*
+ * Fetch an opcode and convert to BE
+ */
+static opcode_t
+fetch_op_mixed_be(unsigned char *b)
+{
+#if OPCODE_T_SIZE == 4
+    union {
+        unsigned char buf[8];
+        opcode_t o[2];
+    } u;
+    /* wordsize = 8 then */
+    fetch_buf_be_8(u.buf, (unsigned char *) b);
+    return u.o[1]; /* or u.o[0] */
 #else
-#  if OPCODE_T_SIZE == 4
-     /* wordsize = 8 then */
-     fetch_buf_be_8(u.buf, (unsigned char *) b);
-     return u.o[0]; /* or u.o[1] */
-#  else
-     /* fetch 4 bytes from a LE pbc, result 8 byte LE opcode_t */
-     u.o = 0;
-     fetch_buf_le_4(u.buf, b);
-     return u.o;
-#  endif
-
+    union {
+        unsigned char buf[4];
+        opcode_t o;
+    } u;
+    /* wordsize = 4 */
+    u.o = 0;
+    fetch_buf_be_4(u.buf, b);
+    return u.o;
 #endif
 }
 
@@ -583,38 +591,45 @@ Assign transform functions to vtable.
 */
 
 void
-PackFile_assign_transforms(struct PackFile *pf) {
-#if PARROT_BIGENDIAN
-    if(pf->header->byteorder != PARROT_BIGENDIAN) {
-        pf->need_endianize = 1;
-        if (pf->header->wordsize == sizeof(opcode_t))
-            pf->fetch_op = (opcode_t (*)(unsigned char*))fetch_op_le;
-        else {
-            pf->need_wordsize = 1;
-            pf->fetch_op = fetch_op_mixed;
-        }
+PackFile_assign_transforms(struct PackFile *pf)
+{
+    int need_endianize = pf->header->byteorder != PARROT_BIGENDIAN;
+    int need_wordsize  = pf->header->wordsize != sizeof(opcode_t);
 
-        pf->fetch_iv = fetch_iv_le;
-        if (pf->header->floattype == 0)
-            pf->fetch_nv = fetch_buf_le_8;
-        else if (pf->header->floattype == 1)
-            pf->fetch_nv = cvt_num12_num8_le;
-    }
-#else
-    if(pf->header->byteorder != PARROT_BIGENDIAN) {
-        pf->need_endianize = 1;
-        if (pf->header->wordsize == sizeof(opcode_t)) {
+    pf->need_endianize = need_endianize;
+    pf->need_wordsize  = need_wordsize;
+#if PARROT_BIGENDIAN
+    /*
+     * this Parrot is on a BIG ENDIAN machine
+     */
+    if (need_endianize || need_wordsize) {
+        if (need_wordsize)
+            pf->fetch_op = fetch_op_mixed_be;
+        else {
             pf->fetch_op = (opcode_t (*)(unsigned char*))fetch_op_be;
         }
-        else {
-            pf->need_wordsize = 1;
-            pf->fetch_op = fetch_op_mixed;
-        }
-        pf->fetch_iv = (opcode_t (*)(unsigned char*))fetch_iv_be;
+    }
+    if (need_endianize) {
         if (pf->header->floattype == 0)
             pf->fetch_nv = fetch_buf_be_8;
         else if (pf->header->floattype == 1)
             pf->fetch_nv = cvt_num12_num8_be;
+    }
+#else
+    /*
+     * this Parrot is on a LITTLE ENDIAN machine
+     */
+    if (need_endianize || need_wordsize) {
+        if (need_wordsize)
+            pf->fetch_op = fetch_op_mixed_le;
+        else
+            pf->fetch_op = (opcode_t (*)(unsigned char*))fetch_op_le;
+    }
+    if (need_endianize) {
+        if (pf->header->floattype == 0)
+            pf->fetch_nv = fetch_buf_le_8;
+        else if (pf->header->floattype == 1)
+            pf->fetch_nv = cvt_num12_num8_le;
     }
     else {
         if (NUMVAL_SIZE == 8 && pf->header->floattype == 1)
@@ -622,15 +637,7 @@ PackFile_assign_transforms(struct PackFile *pf) {
         else if (NUMVAL_SIZE != 8 && pf->header->floattype == 0)
             pf->fetch_nv = fetch_buf_le_8;
     }
-#  if TRACE_PACKFILE
-        PIO_eprintf(NULL, "header->byteorder [%d] native byteorder [%d]\n",
-            pf->header->byteorder, PARROT_BIGENDIAN);
-#  endif
 #endif
-    if (pf->header->wordsize != sizeof(opcode_t)) {
-        pf->need_wordsize = 1;
-        pf->fetch_op = fetch_op_mixed;
-    }
 }
 
 /*

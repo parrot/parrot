@@ -80,6 +80,11 @@ static opcode_t * pf_debug_unpack (struct Parrot_Interp *,
         struct PackFile_Segment *self, opcode_t *);
 static void pf_debug_destroy (struct PackFile_Segment *self);
 
+#define ROUND_16(val) ((val) & 0xf) ? 16 - ((val) & 0xf) : 0
+#define ALIGN_16(st, cursor) do { \
+        LVALUE_CAST(unsigned char*, cursor) += \
+            ROUND_16((unsigned char*)(cursor) - (unsigned char*)(st)); \
+    } while (0)
 
 /*
 
@@ -470,9 +475,14 @@ PackFile_unpack(struct Parrot_Interp *interpreter, struct PackFile *self,
     cursor = (opcode_t*)((char*)packed + PACKFILE_HEADER_BYTES);
     memcpy(header, packed, PACKFILE_HEADER_BYTES);
 
-    if(header->wordsize != 4 && header->wordsize != 8) {
+    if (header->wordsize != 4 && header->wordsize != 8) {
         PIO_eprintf(NULL, "PackFile_unpack: Invalid wordsize %d\n",
                 header->wordsize);
+        return 0;
+    }
+    if (header->floattype != 0 && header->floattype != 1) {
+        PIO_eprintf(NULL, "PackFile_unpack: Invalid floattype %d\n",
+                header->floattype);
         return 0;
     }
 
@@ -483,12 +493,18 @@ PackFile_unpack(struct Parrot_Interp *interpreter, struct PackFile *self,
     PIO_eprintf(NULL, "byteorder: %d\n", header->byteorder);
 #endif
 
+#if 0
+    /*
+     * disable version check, so that we can fix PF platforms
+     * issues
+     */
     if (header->major != PARROT_MAJOR_VERSION ||
-            header->minor != (PARROT_MINOR_VERSION|PARROT_PATCH_VERSION)) {
+            header->minor != PARROT_MINOR_VERSION) {
         PIO_eprintf(NULL, "PackFile_unpack: Bytecode not valid for this "
                 "interpreter: version mismatch\n");
         return 0;
     }
+#endif
 
     /* check the fingerprint */
     if (!PackFile_check_fingerprint (header->pad)) {
@@ -719,8 +735,7 @@ PackFile_set_header(struct PackFile *self)
     self->header->wordsize = sizeof(opcode_t);
     self->header->byteorder = PARROT_BIGENDIAN;
     self->header->major = PARROT_MAJOR_VERSION;
-    /* XXX during development, we check PATCH_LEVEL too */
-    self->header->minor = PARROT_MINOR_VERSION | PARROT_PATCH_VERSION;
+    self->header->minor = PARROT_MINOR_VERSION;
     self->header->intvalsize = sizeof(INTVAL);
     if (NUMVAL_SIZE == 8)
         self->header->floattype = 0;
@@ -1134,7 +1149,6 @@ PackFile_Segment_unpack(struct Parrot_Interp *interpreter,
 {
     PackFile_Segment_unpack_func_t f =
         self->pf->PackFuncs[self->type].unpack;
-    size_t align = 16/sizeof(opcode_t);
 
     cursor = default_unpack(interpreter, self, cursor);
     if (!cursor)
@@ -1144,8 +1158,7 @@ PackFile_Segment_unpack(struct Parrot_Interp *interpreter,
         if (!cursor)
             return 0;
     }
-    if (align && (cursor - self->pf->src) % align)
-        cursor += align - (cursor - self->pf->src) % align;
+    ALIGN_16(self->pf->src, cursor);
     return cursor;
 }
 
@@ -1255,7 +1268,6 @@ directory_unpack (struct Parrot_Interp *interpreter,
     struct PackFile_Directory *dir = (struct PackFile_Directory *) segp;
     struct PackFile      * pf = dir->base.pf;
     opcode_t *pos;
-    size_t align;
 
     dir->num_segments = PF_fetch_opcode (pf, &cursor);
     dir->segments = mem_sys_realloc (dir->segments,
@@ -1302,9 +1314,7 @@ directory_unpack (struct Parrot_Interp *interpreter,
         seg->dir = dir;
     }
 
-    align = 16/sizeof(opcode_t);
-    if (align && (cursor - pf->src) % align)
-        cursor += align - (cursor - pf->src) % align;
+    ALIGN_16(pf->src, cursor);
     /* and now unpack contents of dir */
     for (i = 0; cursor && i < dir->num_segments; i++) {
         opcode_t *csave = cursor;
