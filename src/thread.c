@@ -445,6 +445,8 @@ Helper for detach and kill.
 
 Returns the interpreter, if it didn't finish yet.
 
+=cut
+
 */
 
 static Parrot_Interp
