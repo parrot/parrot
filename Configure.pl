@@ -137,7 +137,7 @@ my(%c)=(
     ld_debug      => '',                  # include debug info in executable
 
     perl          => $^X,
-    test_prog     => 'test_parrot' . $Config{_exe},
+    test_prog     => 'test_parrot',
     debugging     => $opt_debugging,
     rm_f          => 'rm -f',
     rm_rf         => 'rm -rf',
@@ -693,7 +693,7 @@ sub compiletestc {
     my $name;
     $name = shift;
     $name = "test" unless $name;
-    system("$c{cc} $c{ccflags} -I./include -o test_siz$c{exe} $name.c") and die "C compiler died!";
+    system("$c{cc} $c{ccflags} -I./include $c{ld_out}test_siz$c{exe} $name.c") and die "C compiler died!";
 }
 
 

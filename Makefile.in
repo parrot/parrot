@@ -108,8 +108,8 @@ PERL = ${perl}
 #
 ###############################################################################
 
-TEST_PROG = ${test_prog}
-TEST_PROG_SO = ${test_prog}_so
+TEST_PROG = ${test_prog}${exe}
+TEST_PROG_SO = ${test_prog}_so${exe}
 PDUMP = pdump${exe}
 LINT = lclint
 LINTFLAGS = +showscan +posixlib -weak +longintegral +matchanyintegral -formattype
@@ -136,7 +136,7 @@ all : $(TEST_PROG) $(PDUMP) docs
 mops: examples/assembly/mops${exe} examples/mops/mops${exe}
 
 $(TEST_PROG): test_main$(O) $(GEN_HEADERS) $(O_FILES) Parrot/OpLib/core.pm Parrot/PMC.pm
-	$(CC) $(CFLAGS) -o $(TEST_PROG) $(O_FILES) test_main$(O) $(C_LIBS)
+	$(LD) ${ld_out}$(TEST_PROG) $(O_FILES) test_main$(O) $(C_LIBS)
 
 
 ###############################################################################
@@ -156,7 +156,7 @@ blib_lib:
 shared: blib_lib blib/lib/libparrot$(SO) blib/lib/libcore_prederef$(SO) $(TEST_PROG_SO)
 
 blib/lib/libparrot$(SO).${VERSION}: $(O_FILES)
-	$(CC) -shared -Wl,-soname,libparrot$(SO).${MAJOR} -o blib/lib/libparrot$(SO).${VERSION} $(O_FILES)
+	$(LD) -shared -Wl,-soname,libparrot$(SO).${MAJOR} -o blib/lib/libparrot$(SO).${VERSION} $(O_FILES)
 
 blib/lib/libparrot$(SO).${MAJOR}.${MINOR}: blib/lib/libparrot$(SO).${VERSION}
 	rm -f $@
@@ -171,7 +171,7 @@ blib/lib/libparrot$(SO): blib/lib/libparrot$(SO).${MAJOR}
 	cd blib/lib; ln -s libparrot$(SO).${MAJOR} libparrot$(SO)
 
 blib/lib/libcore_prederef$(SO).${VERSION}: core_ops_prederef$(O)
-	$(CC) -shared -Wl,-soname,libparrot$(SO).${MAJOR} -o blib/lib/libcore_prederef$(SO).${VERSION} core_ops_prederef$(O)
+	$(LD) -shared -Wl,-soname,libparrot$(SO).${MAJOR} -o blib/lib/libcore_prederef$(SO).${VERSION} core_ops_prederef$(O)
 
 blib/lib/libcore_prederef$(SO).${MAJOR}.${MINOR}: blib/lib/libcore_prederef$(SO).${VERSION}
 	rm -f $@
@@ -186,7 +186,7 @@ blib/lib/libcore_prederef$(SO): blib/lib/libcore_prederef$(SO).${MAJOR}
 	cd blib/lib; ln -s libcore_prederef$(SO).${MAJOR} libcore_prederef$(SO)
 
 $(TEST_PROG_SO): test_main$(O) blib/lib/libparrot$(SO) Parrot/OpLib/core.pm Parrot/PMC.pm
-	$(CC) $(CFLAGS) -o $(TEST_PROG) test_main$(O) $(C_LIBS) -L blib/lib -lparrot
+	$(LD) ${ld_out}$(TEST_PROG) test_main$(O) $(C_LIBS) -L blib/lib -lparrot
 
 
 #
@@ -194,7 +194,7 @@ $(TEST_PROG_SO): test_main$(O) blib/lib/libparrot$(SO) Parrot/OpLib/core.pm Parr
 #
 
 $(PDUMP): pdump$(O) $(O_FILES)
-	$(CC) $(CFLAGS) -o $(PDUMP) $(O_FILES) pdump$(O) $(C_LIBS)
+	$(LD) ${ld_out}$(PDUMP) $(O_FILES) pdump$(O) $(C_LIBS)
 
 
 ###############################################################################
@@ -228,7 +228,7 @@ examples/assembly/mops.c: examples/assembly/mops.pbc pbc2c.pl
 	$(PERL) pbc2c.pl examples/assembly/mops.pbc > examples/assembly/mops.c
 
 examples/assembly/mops${exe}: examples/assembly/mops$(O) $(O_FILES)
-	$(CC) $(CFLAGS) -o examples/assembly/mops${exe} examples/assembly/mops$(O) $(O_FILES) $(C_LIBS)
+	$(LD) ${ld_out}examples/assembly/mops${exe} examples/assembly/mops$(O) $(O_FILES) $(C_LIBS)
 
 
 ###############################################################################
@@ -240,7 +240,7 @@ examples/assembly/mops${exe}: examples/assembly/mops$(O) $(O_FILES)
 examples/mops/mops$(O): examples/mops/mops.c
 
 examples/mops/mops${exe}: examples/mops/mops$(O) platform$(O)
-	$(CC) $(CFLAGS) -o examples/mops/mops${exe} examples/mops/mops$(O) platform$(O) $(C_LIBS)
+	$(LD) ${ld_out}examples/mops/mops${exe} examples/mops/mops$(O) platform$(O) $(C_LIBS)
 
 
 ###############################################################################
