@@ -566,7 +566,6 @@ imcc_vfprintf(FILE *fd, const char *format, va_list ap) {
     int ch, n;
     int _int;
     double _double;
-    char _char;
     Instruction  *_ins;
     char *_string;
     char buf[128];
@@ -609,6 +608,7 @@ imcc_vfprintf(FILE *fd, const char *format, va_list ap) {
             case 'x':
             case 'X':
             case 'p':
+            case 'c':
                 _int = va_arg(ap, int);
                 memcpy(buf, cp, n = (fmt - cp));
                 buf[n] = '\0';
@@ -624,12 +624,6 @@ imcc_vfprintf(FILE *fd, const char *format, va_list ap) {
                 memcpy(buf, cp, n = (fmt - cp));
                 buf[n] = '\0';
                 len += fprintf(fd, buf, _double);
-                break;
-            case 'c':
-                _char = va_arg(ap, char);
-                memcpy(buf, cp, n = (fmt - cp));
-                buf[n] = '\0';
-                len += fprintf(fd, buf, _char);
                 break;
             case 's':
                 _string = va_arg(ap, char *);

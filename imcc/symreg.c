@@ -111,9 +111,15 @@ add_pcc_result(SymReg *r, SymReg * arg)
         r->pcc_sub->ret[n]->reg = arg;
         r->pcc_sub->ret[n]->type = VT_REGP;
     }
+    else if (arg->type & VTCONST) {
+        r->pcc_sub->ret[n]->reg = arg;
+        r->pcc_sub->ret[n]->type = VT_CONSTP;
+    }
+#if 0
     else
         fataly(EX_SOFTWARE, sourcefile, line,
                 "result is not a variable '%s'\n", arg->name);
+#endif
     r->pcc_sub->nret++;
 }
 
