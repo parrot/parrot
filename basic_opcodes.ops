@@ -326,6 +326,12 @@ AUTO_OP chopn_s_ic {
    string_chopn(STR_REG(P1), P2);
 }
 
+// SUBSTR Sx, Sx, Ix, Ix
+AUTO_OP substr_s_s_i {
+    STRING *s = string_substr(STR_REG(P2), INT_REG(P3), INT_REG(P4), &STR_REG(P1));
+    STR_REG(P1) = s;
+}
+
 // NOOP
 AUTO_OP noop {
 }

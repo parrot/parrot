@@ -56,6 +56,7 @@ set_s_sc       2       S s
 print_s        1       S
 length_i_s     2       I S
 chopn_s_ic     2       S i
+substr_s_s_i   4       S S I I
 
 # Comparators
 

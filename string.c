@@ -6,8 +6,6 @@
 
 #include "parrot.h"
 
-static STRING_VTABLE Parrot_string_vtable[enc_max];
-
 /* Basic string stuff - creation, enlargement, destruction, etc. */
 
 void
@@ -20,7 +18,7 @@ string_make(void *buffer, IV buflen, IV encoding, IV flags, IV type) {
     STRING *s = Sys_Allocate(sizeof(STRING));
     s->bufstart = Sys_Allocate(buflen);
     Sys_Memcopy(s->bufstart, buffer, buflen);
-    s->encoding = encoding;
+    s->encoding = &(Parrot_string_vtable[encoding]);
     s->buflen = s->bufused = buflen;
     s->flags = flags;
     string_compute_strlen(s);
@@ -51,31 +49,45 @@ string_length(STRING* s) {
 
 STRING*
 string_copy(STRING *s) {
-    return string_make(s->bufstart, s->buflen, s->encoding, s->flags, s->type);
+    return string_make(s->bufstart, s->buflen, s->encoding->which, s->flags, s->type);
 }
 
 /* vtable despatch functions */
 
-#define ENC_VTABLE(x) Parrot_string_vtable[x->encoding]
+#define ENC_VTABLE(x) x->encoding
 
 IV
 string_compute_strlen(STRING* s) {
-    return (s->strlen = (ENC_VTABLE(s).compute_strlen)(s));
+    return (s->strlen = (ENC_VTABLE(s)->compute_strlen)(s));
 }
 
 IV
 string_max_bytes(STRING* s, IV iv) {
-    return (ENC_VTABLE(s).max_bytes)(iv);
+    return (ENC_VTABLE(s)->max_bytes)(iv);
 }
 
 STRING* 
 string_concat(STRING* a, STRING* b, IV flags) {
-    return (ENC_VTABLE(a).concat)(a, b, flags);
+    return (ENC_VTABLE(a)->concat)(a, b, flags);
+}
+
+STRING*
+string_substr(STRING* src, IV offset, IV length, STRING** d) {
+    STRING *dest;
+    if (offset < 0)
+        offset = src->strlen - offset;
+    if (length < 0)
+        length = 0;
+    if (!d || !*d)
+        dest = string_make(NULL, 0, src->encoding->which, 0, 0);
+    else
+        dest = *d;
+    return (ENC_VTABLE(src)->substr)(src, offset, length, dest);   
 }
 
 STRING*
 string_chopn(STRING* s, IV n) {
     if (n > s->strlen)
         n = s->strlen;
-    return (ENC_VTABLE(s).chopn)(s, n);
+    return (ENC_VTABLE(s)->chopn)(s, n);
 }
