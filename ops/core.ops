@@ -2230,8 +2230,8 @@ op find_encoding(out INT, in STR) {
   char encoding[255];
 
   /* Copy the string to stack storage and free. Ick. */
-  strncpy(encoding, temp_encoding, 254);
-  encoding[255] = 0;
+  strncpy(encoding, temp_encoding, sizeof(encoding));
+  encoding[sizeof(encoding)-1] = 0;
   string_cstring_free(temp_encoding);
 
   $1 = encoding_find_encoding(encoding);
