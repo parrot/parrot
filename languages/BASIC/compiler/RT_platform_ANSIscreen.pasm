@@ -9,33 +9,33 @@
 .sub _ansi_setup
 	saveall
 	$P0=new PerlArray
-	set P0[0], BLACK
-	set P0[1], BLUE
-	set P0[2], GREEN
-	set P0[3], CYAN
-	set P0[4], RED
-	set P0[5], MAGENTA
-	set P0[6], YELLOW
-	set P0[7], WHITE
+	set $P0[0], BLACK
+	set $P0[1], BLUE
+	set $P0[2], GREEN
+	set $P0[3], CYAN
+	set $P0[4], RED
+	set $P0[5], MAGENTA
+	set $P0[6], YELLOW
+	set $P0[7], WHITE
 	store_global "ANSI_fgcolors", $P0
 
 	$P0=new PerlArray
-	set P0[0], BLACK
-	set P0[1], BLUE
-	set P0[2], GREEN
-	set P0[3], CYAN
-	set P0[4], RED
-	set P0[5], MAGENTA
-	set P0[6], YELLOW
-	set P0[7], WHITE
-	set P0[8], BLACK
-	set P0[9], BLUE
-	set P0[10], GREEN
-	set P0[11], CYAN
-	set P0[12], RED
-	set P0[13], MAGENTA
-	set P0[14], YELLOW
-	set P0[15], 8
+	set $P0[0], BLACK
+	set $P0[1], BLUE
+	set $P0[2], GREEN
+	set $P0[3], CYAN
+	set $P0[4], RED
+	set $P0[5], MAGENTA
+	set $P0[6], YELLOW
+	set $P0[7], WHITE
+	set $P0[8], BLACK
+	set $P0[9], BLUE
+	set $P0[10], GREEN
+	set $P0[11], CYAN
+	set $P0[12], RED
+	set $P0[13], MAGENTA
+	set $P0[14], YELLOW
+	set $P0[15], 8
 	store_global "ANSI_bgcolors", $P0
 	restoreall
 	ret
