@@ -4,7 +4,7 @@ $Id$
 
 =head1 NAME
 
-src/nci_test.c - tests of the NCI use this as an example shared library 
+src/nci_test.c - shared library used for testing the Native Call Interface
 
 =head1 DESCRIPTION
 
@@ -18,25 +18,20 @@ The resulting shared library should be copied to a location like:
 
    parrot/runtime/parrot/dynext/libnci.so
 
-At that location the shared library should be loadable with the opcode 'loadlib'. 
-The functions should be loadable with the opcode 'dlfunc'.
+At that location the shared library is loadable with the opcode 'loadlib'. 
+The functions in the library are available with the opcode 'dlfunc'.
 
 =head1 Functions
 
 The name of a test function is usually 'nci_<signature>'. E.g. the function
 'nci_ip' takes a 'pointer' and returns a 'int'.
 
-=head1 SEE ALSO:
-
-  F<docs/pdds/pdd16_native_call.pod>
-  F<config/gen/makefiles/root.in>
-  F<t/pmc/nci.t>
- 
 =cut
 
 */
 
 #include <stdio.h>
+#include <stdlib.h>
 
 /*
 
@@ -85,9 +80,11 @@ typedef struct {
 } Rect_Like;
 
 void nci_pip (int count, Rect_Like *rects);
-int nci_i_33 (int *double_me, int *triple_me);
-void nci_v_pii (Outer *my_data, int my_x, int my_y);
-void * nci_p_iiii (int alpha, int beta, int gamma, int delta);
+int nci_i33 (int *double_me, int *triple_me);
+void nci_vpii (Outer *my_data, int my_x, int my_y);
+void * nci_piiii (int alpha, int beta, int gamma, int delta);
+void * nci_pii (int, int);
+int nci_i( void );
 
 /*
 
@@ -145,7 +142,8 @@ nci_it(void *p) {
 }
 
 static char s[] = "xx worked\n";
-char *nci_tt(void *p) {
+char *
+nci_tt(void *p) {
     s[0] = ((char*) p)[1];
     s[1] = ((char*) p)[0];
 
@@ -328,6 +326,11 @@ nci_pi(int test) {
                 };
                 return &_x;
             }
+        case 9:
+            {
+                static int i = 55555;
+                return &i;
+            }
         default:
             fprintf(stderr, "unknown test number\n");
     }
@@ -346,7 +349,7 @@ nci_vP(void *pmc) {
 
 /*
 
-Functions used for pdd16 tests
+=head1 Functions used for pdd16 tests
 
 */
 
@@ -381,7 +384,7 @@ nci_pip (int count, Rect_Like *rects) {
 }
 
 int 
-nci_i_33 (int *double_me, int *triple_me) {
+nci_i33 (int *double_me, int *triple_me) {
     *double_me *= 2;
     *triple_me *= 3;
 
@@ -389,14 +392,14 @@ nci_i_33 (int *double_me, int *triple_me) {
 }
 
 void 
-nci_v_pii (Outer *my_data, int my_x, int my_y) {
+nci_vpii (Outer *my_data, int my_x, int my_y) {
     my_data->x            = my_x;
     my_data->nested->y    = my_y;
 }
 
 static int my_array[4];
 void * 
-nci_p_iiii (int alpha, int beta, int gamma, int delta) {
+nci_piiii (int alpha, int beta, int gamma, int delta) {
     static struct array_container
     {
         int   x;
@@ -412,6 +415,20 @@ nci_p_iiii (int alpha, int beta, int gamma, int delta) {
     container.array = my_array;
 
     return &container;
+}
+
+static int my_product;
+void * 
+nci_pii (int fac1, int fac2) {
+   my_product = fac1 * fac2;
+
+   return &my_product;
+}
+
+int 
+nci_i( void ) {
+
+   return my_product;
 }
 
 #ifdef TEST
@@ -431,6 +448,18 @@ main() {
 }
 
 #endif
+
+/*
+
+=head1 SEE ALSO:
+
+  F<docs/pdds/pdd16_native_call.pod>
+  F<config/gen/makefiles/root.in>
+  F<t/pmc/nci.t>
+ 
+=cut
+
+*/
 
 /*
  * Local variables:

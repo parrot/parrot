@@ -13,11 +13,17 @@ t/pmc/nci.t - Native Call Interface
 =head1 DESCRIPTION
 
 This tests the Native Call Interface, that is the ParrotLibrary PMC. 
-The tests are all skipped unless the F<libnci.so> library is found.
+Most tests are skipped when the F<libnci.so> library is not found.
+
+=head1 SEE ALSO
+
+  F<docs/pdds/pdd16_native_call.pod>
+  F<config/gen/makefiles/root.in>
+  F<src/nci_test.c>
 
 =cut
 
-use Parrot::Test tests => 37;
+use Parrot::Test tests => 39;
 use Parrot::Config;
 
 SKIP: {
@@ -26,7 +32,7 @@ unless ( -e "runtime/parrot/dynext/libnci" . $PConfig{so} ) {
           Test::Builder->expected_tests() );
 }
 
-output_is(<<'CODE', <<'OUTPUT', "nci_d_d");
+output_is(<<'CODE', <<'OUTPUT', "nci_dd - PASM");
   loadlib P1, "libnci"
   print "loaded\n"
   dlfunc P0, P1, "nci_dd", "dd"
@@ -56,7 +62,7 @@ ok 1
 ok 2
 OUTPUT
 
-output_is( << 'CODE', << 'OUTPUT', "nci_dd in PIR" );
+output_is( << 'CODE', << 'OUTPUT', "nci_dd - PIR" );
 ##PIR##
 .sub _test @MAIN
     .local string library_name
@@ -104,7 +110,7 @@ CODE
 libnci$PConfig{so} was successfully loaded
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "nci_f_ff");
+output_is(<<'CODE', <<'OUTPUT', "nci_fff");
   loadlib P1, "libnci"
   print "loaded\n"
   dlfunc P0, P1, "nci_fff", "fff"
@@ -135,7 +141,7 @@ ok 1
 ok 2
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "nci_i_sc");
+output_is(<<'CODE', <<'OUTPUT', "nci_isc");
   loadlib P1, "libnci"
   print "loaded\n"
   dlfunc P0, P1, "nci_isc", "isc"
@@ -167,7 +173,7 @@ ok 2
 OUTPUT
 
 
-output_is(<<'CODE', <<'OUTPUT', "nci_s_sc");
+output_is(<<'CODE', <<'OUTPUT', "nci_ssc");
   loadlib P1, "libnci"
   print "loaded\n"
   dlfunc P0, P1, "nci_ssc", "ssc"
@@ -198,7 +204,7 @@ ok 1
 ok 2
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "nci_c_sc");
+output_is(<<'CODE', <<'OUTPUT', "nci_csc");
   loadlib P1, "libnci"
   print "loaded\n"
   dlfunc P0, P1, "nci_csc", "csc"
@@ -240,7 +246,7 @@ ok 2
 OUTPUT
 
 
-output_is(<<'CODE', <<'OUTPUT', "nci_i_t");
+output_is(<<'CODE', <<'OUTPUT', "nci_it");
   loadlib P1, "libnci"
   printerr "loaded\n"
   dlfunc P0, P1, "nci_it", "it"
@@ -269,7 +275,7 @@ ok
 ok 2
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "nci_t_t");
+output_is(<<'CODE', <<'OUTPUT', "nci_tt");
   loadlib P1, "libnci"
   print "loaded\n"
   dlfunc P0, P1, "nci_tt", "tt"
@@ -298,7 +304,7 @@ ok worked
 ok 2
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "nci_d_d - stress test");
+output_is(<<'CODE', <<'OUTPUT', "nci_dd - stress test");
   loadlib P1, "libnci"
   print "loaded\n"
   set I10, 100000
@@ -332,7 +338,7 @@ ok 1
 ok 2
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "nci_d_d - clone");
+output_is(<<'CODE', <<'OUTPUT', "nci_dd - clone");
   loadlib P1, "libnci"
   print "loaded\n"
   dlfunc P0, P1, "nci_dd", "dd"
@@ -373,7 +379,7 @@ ok 3
 ok 4
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "nci_i_iii");
+output_is(<<'CODE', <<'OUTPUT', "nci_iiii");
   loadlib P1, "libnci"
   dlfunc P0, P1, "nci_iiii", "iiii"
   set I0, 1	# prototype used - unchecked
@@ -389,7 +395,7 @@ CODE
 2
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "nci_i_4i");
+output_is(<<'CODE', <<'OUTPUT', "nci_i4i");
   loadlib P1, "libnci"
   dlfunc P0, P1, "nci_i4i", "i4i"
   new P5, .PerlInt
@@ -403,7 +409,7 @@ CODE
 42
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "nci_i_i3");
+output_is(<<'CODE', <<'OUTPUT', "nci_ii3");
 .include "datatypes.pasm"
   loadlib P1, "libnci"
   dlfunc P0, P1, "nci_ii3", "ii3"
@@ -427,7 +433,7 @@ CODE
 4711
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "nci_t_b");
+output_is(<<'CODE', <<'OUTPUT', "nci_tb");
   loadlib P1, "libnci"
   dlfunc P0, P1, "nci_tb", "tb"
   set S5, "ko\n"
@@ -438,7 +444,7 @@ CODE
 ok worked
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "nci_t_B");
+output_is(<<'CODE', <<'OUTPUT', "nci_tB");
   loadlib P1, "libnci"
   dlfunc P0, P1, "nci_tB", "tB"
   set S5, "ko\n"
@@ -449,7 +455,7 @@ CODE
 ok done
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "nci_p_i");
+output_is(<<'CODE', <<'OUTPUT', "nci_pi - struct with ints");
   loadlib P1, "libnci"
   dlfunc P0, P1, "nci_pi", "pi"
   # this test function returns a struct { int[2]; char }
@@ -480,7 +486,7 @@ CODE
 66
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "nci_p_i");
+output_is(<<'CODE', <<'OUTPUT', "nci_pi - struct with floats");
   loadlib P1, "libnci"
   dlfunc P0, P1, "nci_pi", "pi"
   # this test function returns a struct { float[2]; double }
@@ -511,7 +517,7 @@ CODE
 47.110000
 OUTPUT
 
-output_like(<<'CODE', <<'OUTPUT', "nci_p_i - align");
+output_like(<<'CODE', <<'OUTPUT', "nci_pi - align");
   loadlib P1, "libnci"
   dlfunc P0, P1, "nci_pi", "pi"
   # this test function returns a struct { char; int }
@@ -544,7 +550,7 @@ CODE
 /
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "nci_p_i - char*");
+output_is(<<'CODE', <<'OUTPUT', "nci_pi - char*");
   loadlib P1, "libnci"
   dlfunc P0, P1, "nci_pi", "pi"
   # this test function returns a struct { char*; int }
@@ -571,7 +577,7 @@ hello
 20
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "nci_p_i - nested struct *");
+output_is(<<'CODE', <<'OUTPUT', "nci_pi - nested struct *");
   loadlib P1, "libnci"
   dlfunc P0, P1, "nci_pi", "pi"
   # this test function returns a struct { char; x->{int, double} }
@@ -625,7 +631,7 @@ CODE
 200.000000
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "nci_p_i - nested struct * w named access");
+output_is(<<'CODE', <<'OUTPUT', "nci_pi - nested struct * w named access");
   loadlib P1, "libnci"
   dlfunc P0, P1, "nci_pi", "pi"
   set I5, 8  # test fun number
@@ -694,8 +700,7 @@ CODE
 77
 OUTPUT
 
-
-output_is(<<'CODE', <<'OUTPUT', "nci_p_i - func_ptr* with signature");
+output_is(<<'CODE', <<'OUTPUT', "nci_pi - func_ptr* with signature");
   loadlib P1, "libnci"
   dlfunc P0, P1, "nci_pi", "pi"
   # this test function returns a struct { int (*f)(char *) }
@@ -724,7 +729,7 @@ hello call_back
 4711
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "nci_p_i - nested struct aligned");
+output_is(<<'CODE', <<'OUTPUT', "nci_pi - nested struct aligned");
   loadlib P1, "libnci"
   dlfunc P0, P1, "nci_pi", "pi"
   # this test function returns a struct { int; {int; int} int }
@@ -778,7 +783,7 @@ CODE
 33
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "nci_p_i - nested struct unaligned");
+output_is(<<'CODE', <<'OUTPUT', "nci_pi - nested struct unaligned");
   loadlib P1, "libnci"
   dlfunc P0, P1, "nci_pi", "pi"
   # this test function returns a struct { char; {char; int} char }
@@ -832,7 +837,7 @@ CODE
 33
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "nci_p_i - nested, unaligned, named");
+output_is(<<'CODE', <<'OUTPUT', "nci_pi - nested, unaligned, named");
   loadlib P1, "libnci"
   dlfunc P0, P1, "nci_pi", "pi"
   # this test function returns a struct { char; {char; int} char }
@@ -885,7 +890,46 @@ CODE
 12345
 33
 OUTPUT
-output_is(<<'CODE', <<'OUTPUT', "nci_i_p");
+
+output_is( << 'CODE', << "OUTPUT", "nci_pi - int");
+##PIR##
+.include "datatypes.pasm"
+
+.sub _test @MAIN
+ 
+  # load library
+  .local pmc libnci
+  libnci = loadlib "libnci"
+  unless libnci goto NOT_LOADED
+  print "libnci was successfully loaded\n"
+
+  # calling a function in libnci
+  .local pmc nci_pi
+  dlfunc nci_pi, libnci, "nci_pi", "pi"
+  .local pmc nci_pi_out
+  ( nci_pi_out ) = nci_pi( 9 )
+
+  # the contained structure pointer
+  .local pmc nci_pi_out_decl
+  nci_pi_out_decl = new PerlArray
+  push nci_pi_out_decl, .DATATYPE_INT
+  push nci_pi_out_decl, 0
+  push nci_pi_out_decl, 0
+
+  # attach struct initializer
+  assign nci_pi_out, nci_pi_out_decl
+  set I0, nci_pi_out[0]
+  print I0
+NOT_LOADED:
+  print "\n"
+  end
+.end
+CODE
+libnci was successfully loaded
+55555
+OUTPUT
+
+output_is(<<'CODE', <<'OUTPUT', "nci_ip");
   loadlib P1, "libnci"
   dlfunc P0, P1, "nci_ip", "ip"
   # this test function wants a struct
@@ -930,7 +974,8 @@ hello from Parrot
 31
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "nci_v_P");
+
+output_is(<<'CODE', <<'OUTPUT', "nci_vP");
   loadlib P1, "libnci"
   dlfunc P0, P1, "nci_vP", "vP"
   new P5, .PerlString
@@ -944,7 +989,7 @@ ok
 got null
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "nci_cb_C1");
+output_is(<<'CODE', <<'OUTPUT', "nci_cb_C1 - PASM");
 
   # we need a flag if the call_back is already done
   new P10, .PerlInt
@@ -1002,7 +1047,7 @@ external data: succeeded
 done.
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "nci_cb_C1 in PIR");
+output_is(<<'CODE', <<'OUTPUT', "nci_cb_C1 - PIR");
 ##PIR##
 .sub _test @MAIN
 
@@ -1012,16 +1057,15 @@ output_is(<<'CODE', <<'OUTPUT', "nci_cb_C1 in PIR");
     cb_done = 0
     store_global "cb_done", cb_done
 
-    # this callback function will eventually by called by the library
-    .local pmc cb
-    cb = newsub _call_back 
-
     # prepare user data
     .local pmc user_data
     user_data = new Integer
     user_data = 42
 
     # A Sub that can be given to the library
+    # this callback function will eventually by called by the library
+    .local pmc cb
+    cb = newsub _call_back 
     .local pmc cb_wrapped
     cb_wrapped = new_callback cb, user_data, "tU"	# Z in pdd16
     print "created a callback sub\n"
@@ -1192,7 +1236,7 @@ external data: 77
 done.
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', 'array of structs');
+output_is(<<'CODE', <<'OUTPUT', 'nci_pip - array of structs');
 
 .include "datatypes.pasm"
   new P3, .OrderedHash
@@ -1269,7 +1313,7 @@ W: 420
 H: 430
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', 'out parameters and return values');
+output_is(<<'CODE', <<'OUTPUT', 'nci_i33 - out parameters and return values');
 
 .include "datatypes.pasm"
   new P2, .PerlInt
@@ -1285,7 +1329,7 @@ output_is(<<'CODE', <<'OUTPUT', 'out parameters and return values');
   set I3, 2
   set I4, 0
   loadlib P1, "libnci"
-  dlfunc P0, P1, "nci_i_33", "i33"
+  dlfunc P0, P1, "nci_i33", "i33"
   invoke
 
   print "Double: "
@@ -1303,7 +1347,7 @@ Triple: 6
 Sum: 12
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', 'nested structs');
+output_is(<<'CODE', <<'OUTPUT', 'nci_vpii - nested structs');
 
 .include "datatypes.pasm"
   new  P8, .OrderedHash
@@ -1346,7 +1390,7 @@ output_is(<<'CODE', <<'OUTPUT', 'nested structs');
   set I4, 0
 
   loadlib P1, "libnci"
-  dlfunc P0, P1, "nci_v_pii", "vpii"
+  dlfunc P0, P1, "nci_vpii", "vpii"
   invoke
 
   set I0, P5[ 'x' ]
@@ -1371,7 +1415,7 @@ Y: 2
 2
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', 'nested array in a struct');
+output_is(<<'CODE', <<'OUTPUT', 'nci_piiii - nested array in a struct');
 .include "datatypes.pasm"
   set I0, 1
   set I1, 4
@@ -1384,7 +1428,7 @@ output_is(<<'CODE', <<'OUTPUT', 'nested array in a struct');
   set I8, 800
 
   loadlib P1, "libnci"
-  dlfunc P0, P1, "nci_p_iiii", "piiii"
+  dlfunc P0, P1, "nci_piiii", "piiii"
   invoke
 
   new  P6, .OrderedHash
@@ -1439,9 +1483,62 @@ Count: 4
 3: 800
 OUTPUT
 
+output_is( << 'CODE', << "OUTPUT", "nci_pii - writing back to libnci.so" );
+##PIR##
+.include "datatypes.pasm"
+
+.sub _test @MAIN
+ 
+  # load library
+  .local pmc libnci
+  libnci = loadlib "libnci"
+  unless libnci goto NOT_LOADED
+  print "libnci was successfully loaded\n"
+
+  # calling a function in libnci
+  .local pmc multiply
+  multiply = dlfunc libnci, "nci_pii", "pii"
+  .local pmc product_pointer
+  ( product_pointer ) = multiply( -5, 11111 )
+
+  # the contained structure pointer
+  .local pmc product_pointer_decl
+  product_pointer_decl = new PerlArray
+  push product_pointer_decl, .DATATYPE_INT
+  push product_pointer_decl, 0
+  push product_pointer_decl, 0
+  assign product_pointer, product_pointer_decl
+
+  # check result of multiplication
+  .local int product
+  product = product_pointer[0]
+  print product
+  print "\n"
+
+  # Write back into libnci and check it
+  product_pointer[0] = 333
+  product = 4444
+  print product
+  print "\n"
+  .local pmc get_product
+  dlfunc get_product, libnci, "nci_i", "i"
+  ( product ) = get_product() 
+  print product
+  print "\n"
+
+NOT_LOADED:
+  end
+.end
+CODE
+libnci was successfully loaded
+-55555
+4444
+333
+OUTPUT
+
 } # SKIP
 
-output_is(<< 'CODE', << 'OUTPUT', "check wether interface is done");
+output_is(<< 'CODE', << 'OUTPUT', "opcode 'does'");
 ##PIR##
 .sub _test @MAIN
     .local pmc pmc1
