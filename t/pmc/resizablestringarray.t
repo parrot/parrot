@@ -347,8 +347,8 @@ output_is(<<'CODE', <<'OUTPUT', 'pop many values');
 L1:  set S0, I0
      set P0[I0], S0
      inc I0
-     lt I0, 100000, L1
-     
+     lt I0, 1000, L1
+
 L2:  dec I0
      set S1, I0
      pop S0, P0

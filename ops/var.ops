@@ -91,6 +91,12 @@ op pop_pad() {
     goto NEXT();
 }
 
+op pop_pad(out PMC) {
+    stack_pop(interpreter, &interpreter->ctx.pad_stack,
+              &$1, STACK_ENTRY_PMC);
+    goto NEXT();
+}
+
 ########################################
 
 =item B<peek_pad>(out PMC)
