@@ -1,6 +1,6 @@
 #! perl -w
 
-use Parrot::Test tests => 87;
+use Parrot::Test tests => 90;
 use Test::More;
 
 output_is( <<'CODE', <<OUTPUT, "set_s_s|sc" );
@@ -1289,6 +1289,56 @@ CODE
 0
 OUTPUT
 
+
+output_is( <<'CODE', <<OUTPUT, "concat/substr (COW)" );
+	set S0, "<JA"
+	set S1, "PH>"
+	set S2, ""
+	concat S2, S2, S0
+	concat S2, S2, S1
+	print S2
+	print "\n"
+	substr S0, S2, 1, 4
+	print S0
+	print "\n"
+	end
+CODE
+<JAPH>
+JAPH
+OUTPUT
+
+output_is( <<'CODE', <<OUTPUT, "constant to cstring" );
+  stringinfo I0, "\n", 2
+  stringinfo I1, "\n", 2
+  eq I1, I0, ok1
+  print "N"
+ok1:
+  print "OK"
+  print "\n"
+  stringinfo I2, "\n", 2
+  eq I2, I0, ok2
+  print "N"
+ok2:
+  print "OK\n"
+  end
+CODE
+OK
+OK
+OUTPUT
+
+output_is( <<'CODE', <<OUTPUT, "COW with chopn leaving original untouched" );
+  set S0, "ABCD"
+  clone S1, S0
+  chopn S0, 1
+  print S0
+  print "\n"
+  print S1
+  print "\n"
+  end
+CODE
+ABC
+ABCD
+OUTPUT
 
 # Set all string registers to values given by &$_[0](reg num)
 sub set_str_regs {

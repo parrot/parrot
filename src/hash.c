@@ -86,9 +86,9 @@ Return the hashed value of the string
 static INTVAL
 key_hash(Interp *interpreter, STRING *value)
 {
-    char *buffptr = value->bufstart;
-    UINTVAL len = value->bufused;
-    register UINTVAL hash = 5381;
+    char *buffptr = value->strstart;
+    INTVAL len = value->strlen;
+    register INTVAL hash = 5381;
 
     UNUSED(interpreter);
 

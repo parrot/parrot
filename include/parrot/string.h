@@ -26,6 +26,7 @@ struct parrot_string_t {
     UINTVAL buflen;
     UINTVAL flags;
     UINTVAL bufused;
+    void *strstart;
     UINTVAL strlen;
     const ENCODING *encoding;
     const CHARTYPE *type;
@@ -44,6 +45,15 @@ typedef struct {
 } Buffer;
 
 typedef struct parrot_string_t String;
+
+
+/* Tail added to end of string buffers; used for COW GC */
+struct Buffer_Tail {
+    unsigned char flags;
+};
+typedef enum TAIL_flag {
+    TAIL_moved_FLAG = 1 << 0,
+} TAIL_flags;
 
 /* Buffer flags */
 typedef enum BUFFER_flag {
@@ -76,12 +86,18 @@ typedef enum BUFFER_flag {
     /* For debugging, report when this buffer gets moved around */
     BUFFER_report_FLAG = 1 << 16,
     /* Generation in the GC pools */
-    BUFFER_generation_FLAG = 1 << 17 | 1 << 18
+    BUFFER_generation_FLAG = 1 << 17 | 1 << 18,
+    /* Buffer header has a strstart which needs to be updated with bufstart */
+    BUFFER_strstart_FLAG = 1 << 19,
+    /* Buffer's memory data is in this header's header pool's memory pool */
+    /* for now, this is true in constant headers for constant buffer data,and 
+     * true for non-constant headers pointing at non-constant buffer data */
+    BUFFER_selfpoolptr_FLAG = 1 << 20,
 } BUFFER_flags;
 
 /* stringinfo parameters */
 #define STRINGINFO_HEADER   1
-#define STRINGINFO_BUFSTART 2
+#define STRINGINFO_STRSTART 2
 #define STRINGINFO_BUFLEN   3
 #define STRINGINFO_FLAGS    4
 #define STRINGINFO_BUFUSED  5

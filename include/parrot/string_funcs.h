@@ -23,7 +23,7 @@ STRING *string_append(struct Parrot_Interp *, STRING *, STRING *, UINTVAL);
 STRING *string_repeat(struct Parrot_Interp *, const STRING *, UINTVAL,
                       STRING **);
 STRING *string_chopn(STRING *, INTVAL);
-STRING *string_substr(struct Parrot_Interp *, const STRING *, INTVAL,
+STRING *string_substr(struct Parrot_Interp *, STRING *, INTVAL,
                       INTVAL, STRING **);
 STRING *string_replace(struct Parrot_Interp *, STRING *, INTVAL, INTVAL,
                        STRING *, STRING **);
@@ -43,8 +43,8 @@ void string_destroy(STRING *);
 STRING *string_make(struct Parrot_Interp *, const void *buffer,
                     UINTVAL buflen, const ENCODING *, UINTVAL flags,
                     const CHARTYPE *);
-STRING *string_copy(struct Parrot_Interp *, const STRING *);
-STRING *string_transcode(struct Parrot_Interp *, const STRING *src,
+STRING *string_copy(struct Parrot_Interp *, STRING *);
+STRING *string_transcode(struct Parrot_Interp *, STRING *src,
                          const ENCODING *, const CHARTYPE *,
                          STRING **dest_ptr);
 void string_init(void);

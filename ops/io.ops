@@ -109,7 +109,7 @@ op print(in PMC, in STR) {
   ParrotIO * io;
   io = (ParrotIO*)($1->data);
   if ($2 && io) {
-    PIO_write(interpreter, io, ($2)->bufstart, string_length($2));
+    PIO_write(interpreter, io, ($2)->strstart, string_length($2));
   }
   goto NEXT();
 }
@@ -124,7 +124,7 @@ Print $1 to interp.stderr IO stream (unbuffered)
 
 op printerr(in STR) {
   if ($1) {
-    PIO_write(interpreter, PIO_STDERR(interpreter), ($1)->bufstart,
+    PIO_write(interpreter, PIO_STDERR(interpreter), ($1)->strstart,
 			string_length($1));
   }
   goto NEXT();
@@ -147,7 +147,7 @@ not stable enough to replace STDIO.
 
 op puts(in STR) {
   if (($1) && string_length($1)) {
-    PIO_write(interpreter, PIO_STDOUT(interpreter), ($1)->bufstart,
+    PIO_write(interpreter, PIO_STDOUT(interpreter), ($1)->strstart,
 			string_length($1));
   }
   goto NEXT();
@@ -156,7 +156,7 @@ op puts(in STR) {
 op puts(in INT) {
   STRING * s = string_from_int(interpreter, $1);
   if (string_length(s)) {
-    PIO_write(interpreter, PIO_STDOUT(interpreter), s->bufstart,
+    PIO_write(interpreter, PIO_STDOUT(interpreter), s->strstart,
 			string_length(s));
   }
   goto NEXT();
@@ -165,7 +165,7 @@ op puts(in INT) {
 op puts(in NUM) {
   STRING * s = Parrot_sprintf_c(interpreter, "%Vf", $1);
   if (string_length(s)) {
-    PIO_write(interpreter, PIO_STDOUT(interpreter), s->bufstart,
+    PIO_write(interpreter, PIO_STDOUT(interpreter), s->strstart,
 			string_length(s));
   }
   goto NEXT();
@@ -197,8 +197,8 @@ op read(out STR, in INT) {
   else
     n = $2; 
   $1 = string_make(interpreter, NULL, n, NULL, 0, NULL);
-  memset(($1)->bufstart, 0, n);
-  nr = PIO_read(interpreter, PIO_STDIN(interpreter), ($1)->bufstart, (size_t)n);
+  memset(($1)->strstart, 0, n);
+  nr = PIO_read(interpreter, PIO_STDIN(interpreter), ($1)->strstart, (size_t)n);
   if(nr > 0)
     ($1)->strlen = ($1)->bufused = nr;
   else
@@ -214,8 +214,8 @@ op read(out STR, in PMC, in INT) {
   else
     n = $3; 
   $1 = string_make(interpreter, NULL, n, NULL, 0, NULL);
-  memset(($1)->bufstart, 0, n);
-  nr = PIO_read(interpreter, (ParrotIO*)($2->data), ($1)->bufstart, (size_t)n);
+  memset(($1)->strstart, 0, n);
+  nr = PIO_read(interpreter, (ParrotIO*)($2->data), ($1)->strstart, (size_t)n);
   if(nr > 0)
     ($1)->strlen = ($1)->bufused = nr;
   else

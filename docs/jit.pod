@@ -164,9 +164,9 @@ B<NUM_CONST[n]>
 
 Gets replaced by the C<FLOATVAL> constant specified in the I<n>th argument.
 
-B<STRING_CONST_bufstart[n]>
+B<STRING_CONST_strstart[n]>
 
-Gets replaced by C<bufstart> of the C<STRING> constant specified in the I<n>th argument.
+Gets replaced by C<strstart> of the C<STRING> constant specified in the I<n>th argument.
 
 B<STRING_CONST_buflen[n]>
 
@@ -285,7 +285,7 @@ B<Intel x86 assembly version of the Parrot ops:>
 
  Parrot_print_sc {
     movl $1,&TEMP_INT[1]
-    SYSTEMCALL(WRITE,3, A&TEMP_INT[1] V&STRING_CONST_bufstart[1] V*STRING_CONST_strlen[1])
+    SYSTEMCALL(WRITE,3, A&TEMP_INT[1] V&STRING_CONST_strstart[1] V*STRING_CONST_strlen[1])
  }
 
  Parrot_end {

@@ -495,7 +495,7 @@ Parrot_vsprintf(struct Parrot_Interp *interpreter, char *targ, const char *pat,
     STRING *ret = Parrot_vsprintf_c(interpreter, pat, args);
 /*    string_transcode(interpreter, ret, NULL, NULL, &ret);*/
 
-    memcpy(targ, ret->bufstart, ret->bufused);
+    memcpy(targ, ret->strstart, ret->bufused);
     targ[ret->bufused + 1] = 00;
 }
 
@@ -510,7 +510,7 @@ Parrot_vsnprintf(struct Parrot_Interp *interpreter, char *targ,
         len = ret->bufused;
     }
 
-    memcpy(targ, ret->bufstart, len);
+    memcpy(targ, ret->strstart, len);
     targ[len + 1] = 0;
 }
 

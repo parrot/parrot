@@ -162,15 +162,16 @@ Those implementing the C<STRING> API will obviously need to know about
 how the C<STRING> structure works. You can find the definition of this
 structure in F<string.h>:
 
-    struct parrot_string {
-      void *bufstart;
-      INTVAL buflen;
-      INTVAL bufused;
-      INTVAL flags;
-      INTVAL strlen;
-      INTVAL encoding;
-      INTVAL type;
-      INTVAL unused;
+    struct parrot_string_t {
+        void *bufstart;
+        UINTVAL buflen;
+        UINTVAL flags;
+        UINTVAL bufused;
+        void *strstart;
+        UINTVAL strlen;
+        const ENCODING *encoding;
+        const CHARTYPE *type;
+        INTVAL language;
     };
 
 Let's look at each element of this structure in turn.
@@ -187,6 +188,11 @@ shouldn't try and access it directly.
 This is used for memory allocation; it tells you the currently allocated
 size of the buffer in bytes.
 
+=head2 C<flags>
+
+This is a general holding area for string flags. The exact flags
+required have not yet been determined.
+
 =head2 C<bufused>
 
 C<bufused> on the other hand, contains the number of bytes out of the
@@ -194,10 +200,11 @@ allocated buffer which are actually in use. This, together with
 C<buflen>, is used by the buffer growing algorithm to determine when and
 by how much to grow the allocation buffer.
 
-=head2 C<flags>
+=head2 C<strstart>
 
-This is a general holding area for string flags. The exact flags
-required have not yet been determined.
+This stores the actual start of the string. In the case of COW strings 
+holding references to portions of a larger string, (for example, in regex 
+match variables), this is a pointer into the start of the string.
 
 =head2 C<strlen>
 
@@ -242,9 +249,9 @@ It's just there to help know how big to make arrays.
 
 XXX I don't know what this is for.
 
-=head2 C<unused>
+=head2 C<language>
 
-This field is, as its name suggests, unused; however, it can be used to
+This field is currently unused; however, it can be used to
 hold a pointer to the correct vtable for foreign strings.
 
 =head1 String Vtable Functions

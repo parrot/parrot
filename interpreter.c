@@ -43,7 +43,7 @@ check_fingerprint(struct Parrot_Interp *interpreter)
         const char *fp_data;
         INTVAL fp_len;
 
-        fp_data = PCONST(0)->string->bufstart;
+        fp_data = PCONST(0)->string->strstart;
         fp_len = PCONST(0)->string->buflen;
 
         if (strncmp(OPCODE_FINGERPRINT, fp_data, fp_len)) {

@@ -166,9 +166,9 @@ inline op readline(out STR, in INT) {
   }
 
   $1 = string_make(interpreter, NULL, 65535, NULL, 0, NULL);
-  memset(($1)->bufstart, 0, 65535);
-  fgets(($1)->bufstart, 65534, file);
-  ($1)->strlen = ($1)->bufused = strlen(($1)->bufstart);
+  memset(($1)->strstart, 0, 65535);
+  fgets(($1)->strstart, 65534, file);
+  ($1)->strlen = ($1)->bufused = strlen(($1)->strstart);
   goto NEXT();
 }
 
@@ -354,7 +354,7 @@ op read(out STR, in INT, in INT) {
   UINTVAL len = $3;
 
   s = string_make(interpreter, NULL, len, NULL, 0, NULL);
-  read($2, s->bufstart, len);
+  read($2, s->strstart, len);
   s->bufused = len;
   $1 = s;
   goto NEXT();
@@ -418,7 +418,7 @@ op write(in INT, in NUM) {
 op write(in INT, in STR) {
   STRING * s = $2;
   UINTVAL count = string_length(s);
-  write($1, s->bufstart, count);
+  write($1, s->strstart, count);
   goto NEXT();
 }
 
@@ -2069,7 +2069,7 @@ inline op pack(inout STR, in INT, in STR) {
         t = string_make(interpreter, buf, (UINTVAL)(len - s->buflen), NULL, 0, NULL); 
         $1 = string_concat(interpreter, $1, s, 1);
     } else {
-        t = string_make(interpreter, s->bufstart, (UINTVAL)len, NULL, 0, NULL); 
+        t = string_make(interpreter, s->strstart, (UINTVAL)len, NULL, 0, NULL); 
     }
     $1 = string_concat(interpreter, $1, t, 1);
 
@@ -2094,7 +2094,7 @@ inline op pack(inout STR, in INT, in INT, in INT) {
     }
 
     /* XXX this is EVIL, use string_replace */
-    n = $1->bufstart;
+    n = $1->strstart;
     t = string_to_cstring(interpreter, s);
     for (i = $4; i < $4 + $2; i++)
         n[i] = t[i - $4]; 
@@ -3713,7 +3713,7 @@ inline op stringinfo(out INT, in STR, in INT) {
   switch ($3) {
     case STRINGINFO_HEADER:   $1 = PTR2UINTVAL($2);
                               break;
-    case STRINGINFO_BUFSTART: $1 = PTR2UINTVAL($2->bufstart);
+    case STRINGINFO_STRSTART: $1 = PTR2UINTVAL($2->strstart);
                               break;
     case STRINGINFO_BUFLEN:   $1 = $2->buflen;
                               break;
@@ -3984,13 +3984,13 @@ inline op loadext(in STR, in STR) {
   void (*func)(void);
   string_to_cstring(interpreter, ($2));
   string_to_cstring(interpreter, ($1));
-  p = Parrot_dlopen($1->bufstart);
+  p = Parrot_dlopen($1->strstart);
   if(p == NULL) {
      const char * err = Parrot_dlerror();
      fprintf(stderr, "%s\n", err);
      PANIC("Failed to load native library");
   }
-  func = D2FPTR(Parrot_dlsym(p, $2->bufstart));
+  func = D2FPTR(Parrot_dlsym(p, $2->strstart));
   if (NULL == func) {
     PANIC("Failed to find symbol in native library");
   }

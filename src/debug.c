@@ -688,7 +688,7 @@ PDB_disassemble(struct Parrot_Interp *interpreter, const char *command)
                         constants[pc[j]]->string->strlen)
                     {
                         escaped = PDB_escape(interpreter->code->const_table->
-                                         constants[pc[j]]->string->bufstart,
+                                         constants[pc[j]]->string->strstart,
                                              interpreter->code->const_table->
                                          constants[pc[j]]->string->strlen);
                         if (escaped)

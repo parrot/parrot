@@ -29,7 +29,9 @@ struct Memory_Pool {
     void (*compact)(struct Parrot_Interp *, struct Memory_Pool *);
     size_t minimum_block_size;
     size_t total_allocated; /* total bytes allocated to this pool */
-    size_t reclaimable;     /* bytes that can be reclaimed (approximate) */
+    size_t guaranteed_reclaimable;     /* bytes that can definitely be reclaimed*/
+    size_t possibly_reclaimable;     /* bytes that can possibly be reclaimed 
+                                      * (above plus COW-freed bytes) */
     FLOATVAL reclaim_factor; /* minimum percentage we will reclaim */
 };
 

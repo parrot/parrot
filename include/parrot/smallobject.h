@@ -36,6 +36,7 @@ struct Small_Object_Pool {
     void *mem_pool;
     size_t start_arena_memory;
     size_t end_arena_memory;
+    STRING* name;
 };
 
 INTVAL contained_in_pool(struct Parrot_Interp *,

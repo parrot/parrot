@@ -95,7 +95,7 @@ PackFile_Constant_dump(struct PackFile_Constant *self)
         printf("        SIZE     => %ld,\n", (long)self->string->bufused);
         /* TODO: Won't do anything reasonable for most encodings */
         printf("        DATA     => '%.*s'\n",
-               (int)self->string->bufused, (char *)self->string->bufstart);
+               (int)self->string->bufused, (char *)self->string->strstart);
         printf("    } ],\n");
         break;
 

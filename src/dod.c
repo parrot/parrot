@@ -295,9 +295,8 @@ free_unused_PMCs(struct Parrot_Interp *interpreter)
         interpreter->arena_base->pmc_pool->total_objects - total_used;
 }
 
-/* Put any free buffers that aren't on the free list on the free list 
- * Free means: not 'live' and not immune 
- * Temporary immunity is also granted to newborns */
+/* Put any buffers that are now unused, on to the free list
+ * Avoid buffers that are immune from collection (ie, constant) */
 static void
 free_unused_buffers(struct Parrot_Interp *interpreter, 
                     struct Small_Object_Pool *pool)
@@ -312,13 +311,16 @@ free_unused_buffers(struct Parrot_Interp *interpreter,
          cur_arena = cur_arena->prev) {
         Buffer *b = cur_arena->start_objects;
         for (i = 0; i < cur_arena->used; i++) {
-            /* If it's not live or on the free list, put it on the free list */
-            if (!(b->flags & (BUFFER_live_FLAG | BUFFER_on_free_list_FLAG)) &&
-                (!(b->flags & BUFFER_constant_FLAG) || 
-                 (b->flags & BUFFER_COW_FLAG))) 
+            /* If this thing is not live and not dead yet, make it dead now. */
+            if (!(b->flags & ( BUFFER_on_free_list_FLAG
+                             | BUFFER_constant_FLAG
+                             | BUFFER_live_FLAG )))
             {
                 if (pool->mem_pool) {
-                    ((struct Memory_Pool *)pool->mem_pool)->reclaimable += b->buflen;
+                    if (!(b->flags & BUFFER_COW_FLAG)) {
+                        ((struct Memory_Pool *)pool->mem_pool)->guaranteed_reclaimable += b->buflen;
+                    }
+                    ((struct Memory_Pool *)pool->mem_pool)->possibly_reclaimable += b->buflen;
                 }
                 add_free_buffer(interpreter, pool, b);
             } else if (!(b->flags & BUFFER_on_free_list_FLAG)) {

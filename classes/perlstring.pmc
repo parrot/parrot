@@ -72,7 +72,7 @@ pmclass PerlString {
         STRING* s2 = (STRING*)other->data;
         return (INTVAL)( other->vtable == SELF->vtable &&
                           s1->bufused   == s2->bufused  &&
-            (memcmp(s1->bufstart,s2->bufstart,(size_t)s1->bufused)==0));
+            (memcmp(s1->strstart,s2->bufstart,(size_t)s1->bufused)==0));
     }
 
     void set_integer (PMC* value) {

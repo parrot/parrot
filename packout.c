@@ -276,8 +276,8 @@ PackFile_Constant_pack(struct PackFile_Constant *self, opcode_t *packed)
          * characters to ensure padding.  */
         charcursor = (char *)cursor;
 
-        if (self->string->bufstart) {
-            mem_sys_memcopy(charcursor, self->string->bufstart,
+        if (self->string->strstart) {
+            mem_sys_memcopy(charcursor, self->string->strstart,
                             self->string->bufused);
             charcursor += self->string->bufused;
 
