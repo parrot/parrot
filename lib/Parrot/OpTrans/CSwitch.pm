@@ -8,8 +8,8 @@ Parrot::OpTrans::CSwitch - C Switch Transform
 =head1 DESCRIPTION
 
 C<Parrot::OpTrans::CSwitch> inherits from C<Parrot::OpTrans::CPrederef>
-to provide a mixture of prederefed register addressing and a C<switch>ed 
-run loop.
+to provide a mixture of predereferenced register addressing and a
+C<switch>ed run loop.
 
 =head2 Instance Methods
 
@@ -33,7 +33,8 @@ The core type is C<PARROT_SWITCH_CORE>.
 
 =cut
 
-sub core_type {
+sub core_type 
+{
     return 'PARROT_SWITCH_CORE';
 }
 
@@ -43,7 +44,10 @@ The prefix is C<'switch_'>.
 
 =cut
 
-sub core_prefix { return "switch_"; }
+sub core_prefix 
+{ 
+    return "switch_"; 
+}
 
 =item C<suffix()>
 
@@ -53,7 +57,7 @@ The suffix is C<'_switch'>.
 
 sub suffix
 {
-  return "_switch";
+    return "_switch";
 }
 
 =item C<defines()>
@@ -64,7 +68,7 @@ Returns the C C<#define> macros required by the ops.
 
 sub defines
 {
-  return <<END;
+    return <<END;
 #define REL_PC ((size_t)((opcode_t*)cur_opcode - (opcode_t*)interpreter->prederef.code))
 #define CUR_OPCODE (interpreter->code->byte_code + REL_PC)
 
@@ -90,13 +94,18 @@ relevant C code.
 
 sub goto_address
 {
-  my ($self, $addr) = @_;
-#print STDERR "pbcc: map_ret_abs($addr)\n";
-  if ($addr eq '0') {
-  	return "return (0);"
-  } else {
-  	return " {cur_opcode = (opcode_t *) opcode_to_prederef(interpreter, $addr); goto SWITCH_AGAIN; }";
-  }
+    my ($self, $addr) = @_;
+    
+    #print STDERR "pbcc: map_ret_abs($addr)\n";
+
+    if ($addr eq '0')
+    {
+  	    return "return (0);"
+    } 
+    else 
+    {
+  	    return " {cur_opcode = (opcode_t *) opcode_to_prederef(interpreter, $addr); goto SWITCH_AGAIN; }";
+    }
 }
 
 =item C<goto_offset($offset)>
@@ -108,8 +117,8 @@ relevant C code.
 
 sub goto_offset
 {
-  my ($self, $offset) = @_;
-  return "{ cur_opcode += $offset; goto SWITCH_AGAIN; }";
+    my ($self, $offset) = @_;
+    return "{ cur_opcode += $offset; goto SWITCH_AGAIN; }";
 }
 
 =item C<goto_pop()>
@@ -121,8 +130,8 @@ code.
 
 sub goto_pop
 {
-  my ($self) = @_;
-  return "{ cur_opcode = (opcode_t*)opcode_to_prederef(interpreter,pop_dest(interpreter));\n  goto SWITCH_AGAIN; }";
+    my ($self) = @_;
+    return "{ cur_opcode = (opcode_t*)opcode_to_prederef(interpreter,pop_dest(interpreter));\n  goto SWITCH_AGAIN; }";
 }
 
 =item C<run_core_func_decl($core)>
@@ -131,11 +140,13 @@ Returns the C code for the run core function declaration.
 
 =cut
 
-sub run_core_func_decl {
+sub run_core_func_decl 
+{
     my ($self, $core) = @_;
-    "opcode_t * " .
-    $self->core_prefix .
-    "$core(opcode_t *cur_op, Parrot_Interp interpreter)";
+    
+    return "opcode_t * " .
+        $self->core_prefix .
+        "$core(opcode_t *cur_op, Parrot_Interp interpreter)";
 }
 
 =item C<run_core_func_start()>
@@ -144,7 +155,8 @@ Returns the C code prior to the run core function.
 
 =cut
 
-sub run_core_func_start {
+sub run_core_func_start
+{
     return <<END_C;
     opcode_t *cur_opcode = cur_op;
 
@@ -163,7 +175,8 @@ Returns the C code following the run core function.
 
 =cut
 
-sub run_core_finish {
+sub run_core_finish 
+{
     my ($self, $base) = @_;
     my $bs = $base . $self->suffix . '_';
     my $c = <<END_C;
@@ -179,8 +192,10 @@ sub run_core_finish {
     return NULL;
 }
 END_C
+    
     $c .= " /* " . $self->core_prefix . "$base */\n\n";
-    $c;
+    
+    return $c;
 }
 
 =back

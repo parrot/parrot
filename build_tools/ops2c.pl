@@ -1,14 +1,16 @@
 #! perl -w
-################################################################################
 # Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
 # $Id$
-################################################################################
 
 =head1 NAME
 
 build_tools/ops2c.pl - Parser for .ops files
 
 =head1 SYNOPSIS
+
+    % perl build_tools/ops2c.pl transform options
+
+For example:
 
     % perl build_tools/ops2c.pl C --core
 
@@ -18,7 +20,7 @@ build_tools/ops2c.pl - Parser for .ops files
 
 This script uses a supplied transform to create a pair of C header and
 implementation files from the operation definitions found in one or more
-.ops files.
+F<*.ops> files.
 
 =head2 Transforms
 
@@ -30,23 +32,23 @@ code. Each creates a different type of run loop.
 
 =over
 
-=item C
+=item C<C>
 
 Create the function-based (slow or fast core) run loop.
 
-=item CGoto
+=item C<CGoto>
 
 Create the C<goto> run loop.
 
-=item CGP
+=item C<CGP>
 
 Create the C<goto> and predereferenced run loop.
 
-=item CSwitch
+=item C<CSwitch>
 
 Create the C<switch>ed and predereferenced run loop.
 
-=item CPrederef
+=item C<CPrederef>
 
 Create the predereferenced run loop.
 
@@ -68,18 +70,37 @@ Build the Parrot core opcode library.
 
 =head1 SEE ALSO
 
-C<Parrot::OpTrans::C>, C<Parrot::OpTrans::CGoto>,
-C<Parrot::OpTrans::CGP>, C<Parrot::OpTrans::CSwitch>,
-C<Parrot::OpTrans::CPrederef>, F<build_tools/ops2pm.pl>.
+=over 4
+
+=item F<build_tools/ops2pm.pl>
+
+=item C<Parrot::OpsFile>
+
+=item C<Parrot::Op>
+
+=item C<Parrot::OpTrans>
+
+=item C<Parrot::OpTrans::C>
+
+=item C<Parrot::OpTrans::CGoto>
+
+=item C<Parrot::OpTrans::Compiled>
+
+=item C<Parrot::OpTrans::CGP>
+
+=item C<Parrot::OpTrans::CSwitch>
+
+=item C<Parrot::OpTrans::CPrederef>
+
+=back
 
 =cut
-
-################################################################################
 
 use strict;
 use lib 'lib';
 use Parrot::OpsFile;
 use Parrot::OpLib::core;
+use warnings;
 
 my %arg_dir_mapping = (
 	''   => 'PARROT_ARGDIR_IGNORED',
@@ -108,8 +129,10 @@ eval "require $trans_class";
 
 my $trans = $trans_class->new;
 
+# Not used
 my $prefix  = $trans->prefix;
 my $suffix  = $trans->suffix;
+# Used as ${defines}
 my $defines = $trans->defines;
 my $opsarraytype = $trans->opsarraytype;
 my $core_type = $trans->core_type;

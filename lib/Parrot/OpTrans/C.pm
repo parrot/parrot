@@ -31,7 +31,8 @@ Returns C<PARROT_FUNCTION_CORE>.
 
 =cut
 
-sub core_type {
+sub core_type 
+{
     return 'PARROT_FUNCTION_CORE';
 }
 
@@ -41,8 +42,9 @@ Returns an empty string.
 
 =cut
 
-sub core_prefix {
-    "";
+sub core_prefix 
+{
+    return "";
 }
 
 =item C<defines()>
@@ -53,7 +55,7 @@ Returns the C C<#define> macros for register access etc.
 
 sub defines
 {
-  return <<END;
+    return <<END;
 #undef CONST
 #define REL_PC     ((size_t)(cur_opcode - interpreter->code->byte_code))
 #define CUR_OPCODE cur_opcode
@@ -71,8 +73,10 @@ Reimplements the superclass method so that C<$where> is suitably cast.
 
 =cut
 
-sub gen_goto {
+sub gen_goto 
+{
     my ($self, $where_str) = @_;
+
     return "return (opcode_t *)$where_str";
 }
 
@@ -82,9 +86,11 @@ Returns the C code for C<ADDRESS($address)>. Called by C<goto_address()>.
 
 =cut
 
-sub expr_address {
-  my ($self, $addr) = @_;
-  return $addr;
+sub expr_address 
+{
+    my ($self, $addr) = @_;
+
+    return $addr;
 }
 
 =item C<expr_offset($offset)>
@@ -93,8 +99,10 @@ Returns the C code for C<OFFSET($offset)>. Called by C<goto_offset()>.
 
 =cut
 
-sub expr_offset {
+sub expr_offset 
+{
     my ($self, $offset) = @_;
+
     return "cur_opcode + $offset";
 }
 
@@ -104,8 +112,10 @@ Returns the C code for C<POP()>. Called by C<goto_offset()>.
 
 =cut
 
-sub expr_pop {
+sub expr_pop 
+{
     my ($self) = @_;
+
     return "pop_dest(interpreter)";
 }
 
@@ -136,12 +146,12 @@ C<Parrot::OpTrans>) and value. C<$op> is an instance of C<Parrot::Op>.
 
 sub access_arg
 {
-  my ($self, $type, $num, $op) = @_;
+    my ($self, $type, $num, $op) = @_;
 
-  die "Unrecognized type '$type' for num '$num' in opcode @{[$op->full_name]}"
-    unless exists $arg_maps{$type};
+    die "Unrecognized type '$type' for num '$num' in opcode @{[$op->full_name]}"
+        unless exists $arg_maps{$type};
 
-  return sprintf($arg_maps{$type}, $num);
+    return sprintf($arg_maps{$type}, $num);
 }
 
 =item C<restart_offset($offset)>
@@ -152,8 +162,9 @@ Returns the C code for C<restart OFFSET($offset)>.
 
 sub restart_offset
 {
-  my ($self, $offset) = @_;
-  return "interpreter->resume_offset = REL_PC + $offset; interpreter->resume_flag = 1";
+    my ($self, $offset) = @_;
+
+    return "interpreter->resume_offset = REL_PC + $offset; interpreter->resume_flag = 1";
 }
 
 =item C<restart_address($address)>
@@ -164,8 +175,9 @@ Returns the C code for C<restart ADDRESS($address)>.
 
 sub restart_address
 {
-  my ($self, $addr) = @_;
-  return "interpreter->resume_offset = $addr; interpreter->resume_flag = 1";
+    my ($self, $addr) = @_;
+
+    return "interpreter->resume_offset = $addr; interpreter->resume_flag = 1";
 }
 
 =back

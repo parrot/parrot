@@ -1,8 +1,6 @@
 #! perl -w
-################################################################################
 # TODO: Resolve copyright. See ADDITIONAL section at end of file.
 # $Id$
-################################################################################
 
 =head1 NAME
 
@@ -18,8 +16,6 @@ Parse the Parrot PackFile listed on the command line, or from standard
 input if no file is named, and turn it into a C implementation file.
 
 =cut
-
-################################################################################
 
 use strict;
 

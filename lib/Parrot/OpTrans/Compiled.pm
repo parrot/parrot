@@ -34,7 +34,7 @@ Returns the C C<#define> macros required by the ops.
 
 sub defines
 {
-  return <<END;
+    return <<END;
 #define REL_PC (cur_opcode - start_code)
 #define IREG(i) interpreter->int_reg.registers[i]
 #define NREG(i) interpreter->num_reg.registers[i]
@@ -54,14 +54,16 @@ Sets/gets the current position in Parrot code.
 
 sub pc
 {
-  my $self = shift;
+    my $self = shift;
 
-  if (@_) {
-    $self->{PC} = shift;
-  }
-  else {
-    return $self->{PC};
-  }
+    if (@_) 
+    {
+        $self->{PC} = shift;
+    }
+    else 
+    {
+        return $self->{PC};
+    }
 }
 
 =item C<args(@args)>
@@ -74,15 +76,16 @@ Sets/gets the transform's arguments.
 
 sub args
 {
-  my $self = shift;
+    my $self = shift;
 
-  if (@_) {
-    $self->{ARGS} = [ @_ ];
-  }
-  else {
-    return $self->{ARGS};
-  }
-
+    if (@_) 
+    {
+        $self->{ARGS} = [ @_ ];
+    }
+    else 
+    {
+        return $self->{ARGS};
+    }
 }
 
 =item C<arg($index)>
@@ -93,9 +96,9 @@ Returns the argument at index C<$index>.
 
 sub arg
 {
-  my $self = shift;
+    my $self = shift;
 
-  return $self->{ARGS}[shift];
+    return $self->{ARGS}[shift];
 }
 
 =item C<goto_address($address)>
@@ -107,9 +110,11 @@ relevant C code.
 
 sub goto_address
 {
-  my ($self, $addr) = @_;
-#print STDERR "pbcc: map_ret_abs($addr)\n";
-  return "cur_opcode = $addr;\ngoto switch_label";
+    my ($self, $addr) = @_;
+
+    #print STDERR "pbcc: map_ret_abs($addr)\n";
+
+    return "cur_opcode = $addr;\ngoto switch_label";
 }
 
 =item C<expr_offset($offset)>
@@ -121,8 +126,10 @@ interpretation is global across all runops cores.
 
 =cut
 
-sub expr_offset {
+sub expr_offset
+{
     my ($self, $offset) = @_;
+
     return sprintf("start_code + %d + %s", $self->pc, $offset);
 }
 
@@ -135,13 +142,18 @@ relevant C code.
 
 sub goto_offset
 {
-  my ($self, $offset) = @_;
-  if ($offset =~ /^-?\d+$/) {
-  return sprintf("goto PC_%d", $self->pc + $offset);
-  } else {
-      return sprintf("cur_opcode = &&PC_%d; cur_opcode += %s; goto switch_label", $self->pc, $offset);
-  }
-#print STDERR "pbcc: map_ret_rel($offset)\n";
+    my ($self, $offset) = @_;
+
+    if ($offset =~ /^-?\d+$/) 
+    {
+        return sprintf("goto PC_%d", $self->pc + $offset);
+    } 
+    else 
+    {
+        return sprintf("cur_opcode = &&PC_%d; cur_opcode += %s; goto switch_label", $self->pc, $offset);
+    }
+    
+    #print STDERR "pbcc: map_ret_rel($offset)\n";
 }
 
 =item C<goto_pop()>
@@ -153,24 +165,25 @@ code.
 
 sub goto_pop
 {
-  my ($self) = @_;
-  return "cur_opcode = pop_dest(interpreter);\ngoto switch_label";
+    my ($self) = @_;
+
+    return "cur_opcode = pop_dest(interpreter);\ngoto switch_label";
 }
 
 my %arg_maps = (
-  'i'  => "IREG(%ld)",
-  'n'  => "NREG(%ld)",
-  'p'  => "PREG(%ld)",
-  's'  => "SREG(%ld)",
-  'k'  => "PREG(%ld)",
-  'ki' => "IREG(%ld)",
-
-  'ic' => "%ld",
-  'nc' => "CONST(%ld)->u.number",
-  'pc' => "%ld /* ERROR: Don't know how to handle PMC constants yet! */",
-  'sc' => "CONST(%ld)->u.string",
-  'kc' => "CONST(%ld)->u.key",
-  'kic' => "%ld",
+    'i'  => "IREG(%ld)",
+    'n'  => "NREG(%ld)",
+    'p'  => "PREG(%ld)",
+    's'  => "SREG(%ld)",
+    'k'  => "PREG(%ld)",
+    'ki' => "IREG(%ld)",
+    
+    'ic' => "%ld",
+    'nc' => "CONST(%ld)->u.number",
+    'pc' => "%ld /* ERROR: Don't know how to handle PMC constants yet! */",
+    'sc' => "CONST(%ld)->u.string",
+    'kc' => "CONST(%ld)->u.key",
+    'kic' => "%ld",
 );
 
 =item C<access_arg($type, $value, $op)>
@@ -182,9 +195,11 @@ C<Parrot::OpTrans>) and value. C<$op> is an instance of C<Parrot::Op>.
 
 sub access_arg
 {
-  my ($self, $type, $num, $op) = @_;
-#print STDERR "pbcc: map_arg($type, $num)\n";
-  return sprintf($arg_maps{$type}, $self->arg($num - 1));
+    my ($self, $type, $num, $op) = @_;
+
+    #print STDERR "pbcc: map_arg($type, $num)\n";
+
+    return sprintf($arg_maps{$type}, $self->arg($num - 1));
 }
 
 =item C<restart_address($address)>
@@ -195,8 +210,9 @@ Returns the C code for C<restart ADDRESS($address)>.
 
 sub restart_address
 {
-  my ($self, $addr) = @_;
-  die "pbc2c.pl: Cannot handle RESUME ops!";
+    my ($self, $addr) = @_;
+
+    die "pbc2c.pl: Cannot handle RESUME ops!";
 }
 
 =item C<restart_offset($offset)>
@@ -207,8 +223,9 @@ Returns the C code for C<restart OFFSET($offset)>.
 
 sub restart_offset
 {
-  my ($self, $offset) = @_;
-  die "pbc2c.pl: Cannot handle RESUME ops!";
+    my ($self, $offset) = @_;
+
+    die "pbc2c.pl: Cannot handle RESUME ops!";
 }
 
 =back

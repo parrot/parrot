@@ -33,7 +33,8 @@ The core type is C<PARROT_PREDEREF_CORE>.
 
 =cut
 
-sub core_type {
+sub core_type 
+{
     return 'PARROT_PREDEREF_CORE';
 }
 
@@ -41,9 +42,14 @@ sub core_type {
 
 The prefix is C<'Parrot_pred_'>.
 
+This is used in C<Parrot::Op>'s C<func_name()>.
+
 =cut
 
-sub prefix { return 'Parrot_pred_'; }
+sub prefix 
+{ 
+    return 'Parrot_pred_'; 
+}
 
 =item C<defines()>
 
@@ -53,7 +59,7 @@ Returns the C C<#define> macros required by the ops.
 
 sub defines
 {
-  return <<END;
+    return <<END;
 #define REL_PC ((size_t)(cur_opcode - interpreter->prederef.code))
 #define CUR_OPCODE (interpreter->code->byte_code + REL_PC)
 
@@ -86,7 +92,7 @@ The suffix is C<'_prederef'>.
 
 sub suffix
 {
-  return "_prederef";
+    return "_prederef";
 }
 
 =item C<opsarraytype()>
@@ -95,7 +101,10 @@ The ops array type is C<void *>.
 
 =cut
 
-sub opsarraytype { return 'void *' };
+sub opsarraytype 
+{ 
+    return 'void *' 
+};
 
 =item C<gen_goto($where)>
 
@@ -104,7 +113,8 @@ should not be duplicated.
 
 =cut
 
-sub gen_goto {
+sub gen_goto
+{
     my ($self, $where_str) = @_;
     return "return $where_str";
 }
@@ -118,8 +128,8 @@ must be converted to pointers into the prederef array.
 
 sub expr_pop
 {
-  my ($self) = @_;
-  return "opcode_to_prederef(interpreter, pop_dest(interpreter))";
+    my ($self) = @_;
+    return "opcode_to_prederef(interpreter, pop_dest(interpreter))";
 }
 
 =item C<expr_address($address)>
@@ -130,8 +140,8 @@ Same logic as C<expr_pop()>.
 
 sub expr_address
 {
-  my ($self, $addr) = @_;
-  return "opcode_to_prederef(interpreter, $addr)";
+    my ($self, $addr) = @_;
+    return "opcode_to_prederef(interpreter, $addr)";
 }
 
 =item C<expr_offset($offset)>
@@ -147,17 +157,20 @@ works.)
 
 =cut
 
-sub expr_offset {
+sub expr_offset
+{
     my ($self, $offset) = @_;
     return "CUR_OPCODE + $offset";
 }
 
-sub goto_offset {
+sub goto_offset
+{
     my ($self, $offset) = @_;
     return "return cur_opcode + $offset";
 }
 
-sub goto_address {
+sub goto_address
+{
     my ($self, $addr) = @_;
     return "return opcode_to_prederef(interpreter,  (opcode_t *)$addr)";
 }
@@ -171,30 +184,30 @@ C<Parrot::OpTrans>) and value. C<$op> is an instance of C<Parrot::Op>.
 
 sub access_arg
 {
-  my ($self, $type, $num, $op) = @_;
+    my ($self, $type, $num, $op) = @_;
 
-  my %arg_maps = (
-    'op' => "cur_opcode[%ld]",
+    my %arg_maps = (
+        'op' => "cur_opcode[%ld]",
+    
+        'i'  => "(*(INTVAL *)cur_opcode[%ld])",
+        'n'  => "(*(FLOATVAL *)cur_opcode[%ld])",
+        'p'  => "(*(PMC **)cur_opcode[%ld])",
+        's'  => "(*(STRING **)cur_opcode[%ld])",
+        'k'  => "(*(PMC **)cur_opcode[%ld])",
+        'ki'  => "(*(INTVAL *)cur_opcode[%ld])",
+    
+        'ic' => "(*(INTVAL *)cur_opcode[%ld])",
+        'nc' => "(*(FLOATVAL *)cur_opcode[%ld])",
+        'pc' => "%ld /* ERROR: Don't know how to handle PMC constants yet! */",
+        'sc' => "(*(STRING **)cur_opcode[%ld])",
+        'kc' => "(*(PMC **)cur_opcode[%ld])",
+        'kic' => "(*(INTVAL *)cur_opcode[%ld])"
+    );
 
-    'i'  => "(*(INTVAL *)cur_opcode[%ld])",
-    'n'  => "(*(FLOATVAL *)cur_opcode[%ld])",
-    'p'  => "(*(PMC **)cur_opcode[%ld])",
-    's'  => "(*(STRING **)cur_opcode[%ld])",
-    'k'  => "(*(PMC **)cur_opcode[%ld])",
-    'ki'  => "(*(INTVAL *)cur_opcode[%ld])",
+    die "Unrecognized type '$type' for num '$num' in opcode @{[$op->full_name]}"
+        unless exists $arg_maps{$type};
 
-    'ic' => "(*(INTVAL *)cur_opcode[%ld])",
-    'nc' => "(*(FLOATVAL *)cur_opcode[%ld])",
-    'pc' => "%ld /* ERROR: Don't know how to handle PMC constants yet! */",
-    'sc' => "(*(STRING **)cur_opcode[%ld])",
-    'kc' => "(*(PMC **)cur_opcode[%ld])",
-    'kic' => "(*(INTVAL *)cur_opcode[%ld])"
-  );
-
-  die "Unrecognized type '$type' for num '$num' in opcode @{[$op->full_name]}"
-    unless exists $arg_maps{$type};
-
-  return sprintf($arg_maps{$type}, $num);
+    return sprintf($arg_maps{$type}, $num);
 }
 
 =back
