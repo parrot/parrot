@@ -55,17 +55,24 @@ runops(Interp *interpreter, size_t offs)
         if (setjmp(interpreter->exceptions->destination)) {
             /* an exception was thrown */
             offset = handle_exception(interpreter);
+            /* update profile for exception execution time */
+            if (interpreter->profile &&
+                    Interp_flags_TEST(interpreter, PARROT_PROFILE_FLAG)) {
+                RunProfile *profile = interpreter->profile;
+                if (profile->cur_op == PARROT_PROF_EXCEPTION) {
+                    profile->data[PARROT_PROF_EXCEPTION].time +=
+                        Parrot_floatval_time() - profile->starttime;
+                }
+            }
         }
     }
-    if (interpreter->profile &&
-            Interp_flags_TEST(interpreter, PARROT_PROFILE_FLAG)) {
-        RunProfile *profile = interpreter->profile;
-        if (profile->cur_op == PARROT_PROF_EXCEPTION) {
-            profile->data[PARROT_PROF_EXCEPTION].time +=
-                Parrot_floatval_time() - profile->starttime;
-        }
+    if (interpreter->exceptions->runloop_level ==
+            interpreter->ctx.runloop_level) {
+        /* if we are coming from an exception and it was thrown deeper
+         * in a nested run loop, we just leave this loop
+         */
+        runops_int(interpreter, offset);
     }
-    runops_int(interpreter, offset);
     /*
      * pop off exception and put it onto the free list
      * s. above

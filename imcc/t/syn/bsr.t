@@ -235,10 +235,12 @@ output_is(<<'CODE', <<'OUT', "tail recursive bsr, parrot cc");
    print $I0
    print "\n"
    end
+.end
+
 # the callers args I5, I6 are used to do the calculation and have
 # the same state after, so instead of calling again the sub, just
 # a branch to the entry is done
-_fact:
+.sub _fact
    if I6 <= 1 goto fin
    I5 = I5 * I6
    dec I6

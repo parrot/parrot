@@ -430,8 +430,6 @@ A::blah
 B::foo
 OUTPUT
 
-SKIP: {
-    skip("currently failing - exceptions are being redone", 1);
 output_is(<<'CODE', <<'OUTPUT', "exceptions and different runloops");
 _main:
     newsub P0, .Exception_Handler, eh
@@ -461,7 +459,6 @@ new
 in __init
 back in main
 OUTPUT
-}
 
 output_is(<<'CODE', <<'OUTPUT', "fetchmethod");
     newclass P3, "Foo"
