@@ -2825,6 +2825,8 @@ string_pin(Interp * interpreter, STRING * s) {
     memory = mem_sys_allocate(size);
     mem_sys_memcopy(memory, PObj_bufstart(s), size);
     PObj_bufstart(s) = memory;
+    s->strstart = memory;
+    s->strlen = size;
     /* Mark the memory as both from the system and immobile */
     PObj_flags_SETTO(s, PObj_get_FLAGS(s) |
         (PObj_immobile_FLAG | PObj_sysmem_FLAG));
