@@ -653,8 +653,6 @@ sub append_html_suffix
     return $path . '.html';
 }
 
-=over
-
 =head2 Functions
 
 =over 4
