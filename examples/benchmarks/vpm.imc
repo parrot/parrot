@@ -10,8 +10,6 @@ _string = "just another perl hacker"
 
 $I0 = 0
 
-$I1 = length _string
-$I2 = $I1 + 1
 loop0:
 	.sym pmc _str
 	.sym pmc _f
@@ -24,6 +22,8 @@ loop0:
 
        # you can't push onto the type of array that split returns. Do a 
        # two step.
+       $I1 = _str
+       $I2 = $I1 + 1
        _str = $I2
        _str[$I1] = _f
 
