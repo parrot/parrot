@@ -16,7 +16,7 @@ Tests PMC object methods.
 
 =cut
 
-use Parrot::Test tests => 6;
+use Parrot::Test tests => 7;
 use Test::More;
 
 output_like(<<'CODE', <<'OUTPUT', "callmethod - unknown");
@@ -144,4 +144,43 @@ CODE
 ok 1
 ok 2
 42
+OUTPUT
+
+output_is(<<'CODE', <<'OUTPUT', "constructor - parents");
+    newclass P1, "Foo"
+    find_global P12, "_foo::init"
+    store_global "Foo", "__init", P12
+    subclass P2, P1, "Bar"
+    find_global P12, "_bar::init"
+    store_global "Bar", "__init", P12
+    subclass P3, P2, "Baz"
+    find_global P12, "_baz::init"
+    store_global "Baz", "__init", P12
+    find_type I1, "Baz"
+    new P3, I1
+    find_type I1, "Bar"
+    new P3, I1
+    print "done\n"
+    end
+.pcc_sub _foo::init:
+    print "foo_init\n"
+    classname S0, P2
+    print S0
+    print "\n"
+    invoke P1
+.pcc_sub _bar::init:
+    print "bar_init\n"
+    invoke P1
+.pcc_sub _baz::init:
+    print "baz_init\n"
+    invoke P1
+CODE
+foo_init
+Baz
+bar_init
+baz_init
+foo_init
+Bar
+bar_init
+done
 OUTPUT

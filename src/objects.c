@@ -456,6 +456,27 @@ Parrot_class_register(Parrot_Interp interpreter, STRING *class_name,
     return new_type;
 }
 
+
+static void
+do_initcall(Parrot_Interp interpreter, PMC* class, PMC *object)
+{
+
+    PMC *class_data = PMC_data(class);
+    PMC *classsearch_array =
+        VTABLE_get_pmc_keyed_int(interpreter, class_data, PCD_ALL_PARENTS);
+    PMC *parent_class;
+    INTVAL i, nparents;
+
+    nparents = VTABLE_get_integer(interpreter, classsearch_array);
+    for (i = nparents - 1; i >= 0; --i) {
+        parent_class = VTABLE_get_pmc_keyed_int(interpreter,
+                classsearch_array, i);
+        Parrot_base_vtables[enum_class_delegate]->init_pmc(interpreter,
+                object, parent_class);
+    }
+    Parrot_base_vtables[enum_class_delegate]->init(interpreter, object);
+}
+
 /*
 
 =item C<void
@@ -515,7 +536,7 @@ Parrot_instantiate_object(Parrot_Interp interpreter, PMC *object) {
     /* We really ought to call the class init routines here...
      * this assumes that an object isa delegate
      */
-    Parrot_base_vtables[enum_class_delegate]->init(interpreter, object);
+    do_initcall(interpreter, class, object);
 }
 
 /*

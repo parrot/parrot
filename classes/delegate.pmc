@@ -178,10 +178,11 @@ is true then an exception will be raised if the method is not found.
 */
 
 PARROT_INLINE static void
-noarg_noreturn(Parrot_Interp interpreter, PMC *obj, const char *meth, int die) {
+noarg_noreturn(Parrot_Interp interpreter, PMC *obj, PMC* class,
+        const char *meth, int die) {
     struct regsave *data = save_regs(interpreter);
-    PMC *method = die ? find_or_die(interpreter, obj, meth) :
-                    find_meth  (interpreter, obj, meth);
+    PMC *method = die ? find_or_die(interpreter, class, meth) :
+                    find_meth  (interpreter, class, meth);
     if (PMC_IS_NULL(method))
         goto ret;
     REG_PMC(2) = obj;
@@ -214,9 +215,12 @@ Calls the delegated C<init()> method.
 */
 
     void init () {
-        noarg_noreturn(INTERP, SELF, PARROT_VTABLE_INIT_METHNAME, 0);
+        noarg_noreturn(INTERP, SELF, SELF, PARROT_VTABLE_INIT_METHNAME, 0);
     }
 
+    void init_pmc (PMC* class) {
+        noarg_noreturn(INTERP, SELF, class, PARROT_VTABLE_INIT_METHNAME, 0);
+    }
 
 }
 
