@@ -1,27 +1,48 @@
-/* parrotclass.pmc
- *  Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
- *  CVS Info
- *     $Id$
- *  Overview:
- *     These are the vtable functions for the ParrotClass base class
- *  Data Structure and Algorithms:
- *  History:
- *  Notes:
- *  References:
- */
+/*
+Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+$Id$
 
-/* The structure of a parrot class is reasonably straightforward. The
-   PMC's cached integer value is the number of attribute slots that
-   an object of this type requires. The data pointer holds a pointer
-   to an array of PMCs. That array has:
+=head1 NAME
 
-   0: An array of immediate parents
-   1: The class name PMC
-   2: An array of all parents, in search order
-   3: A hash, keys are the class names, values are the offsets to
-      their attributes
-   4: A hash, the keys are the classname/attrib name pair (separated
-      by a NULL), while the value is the offset to the attribute
+classes/parrotclass.pmc - Parrot Class
+
+=head1 DESCRIPTION
+
+The structure of a parrot class is reasonably straightforward. The PMC's
+cached integer value is the number of attribute slots that an object of
+this type requires. The data pointer holds a pointer to an array of
+PMCs. That array has:
+
+=over 4
+
+=item 0
+
+An array of immediate parents.
+
+=item 1
+
+The class name PMC.
+
+=item 2
+
+An array of all parents, in search order.
+
+=item 3
+
+A hash, keys are the class names, values are the offsets to their attributes.
+
+=item 4
+
+A hash, the keys are the classname/attrib name pair (separated by a
+C<NULL>), while the value is the offset to the attribute.
+
+=back
+
+=head2 Methods
+
+=over 4
+
+=cut
 
 */
 
@@ -29,64 +50,139 @@
 
 pmclass ParrotClass need_ext {
 
-    void init () {
-	/* No attributes to start with */
-	PMC_int_val(SELF) = 0;
-	/* But we are a class, really */
-	PObj_is_class_SET(SELF);
-	/* And, coincidentally, data points to a PMC. Fancy that... */
-	PObj_flag_SET(is_PMC_ptr, SELF);
-	/* s. Parrot_new_class() for more initialization */
+/*
+
+=item C<void init()>
+
+Initializes the class.
+
+=cut
+
+*/
+
+	void init () {
+        /* No attributes to start with */
+        PMC_int_val(SELF) = 0;
+        /* But we are a class, really */
+        PObj_is_class_SET(SELF);
+        /* And, coincidentally, data points to a PMC. Fancy that... */
+        PObj_flag_SET(is_PMC_ptr, SELF);
+        /* s. Parrot_new_class() for more initialization */
     }
+
+/*
+
+=item C<INTVAL isa(STRING *classname)>
+
+Returns whether the class is or inherits from C<*classname>.
+
+=cut
+
+*/
 
     INTVAL isa(STRING * classname) {
-	PMC *class;
-	if (SUPER(classname))
+        PMC *class;
+        if (SUPER(classname))
             return 1;
-	class = Parrot_class_lookup(interpreter, classname);
-	return Parrot_object_isa(INTERP, SELF, class);
+        class = Parrot_class_lookup(interpreter, classname);
+        return Parrot_object_isa(INTERP, SELF, class);
     }
 
-    /* Figure out which method PMC we need. By default we just defer to the
-     * system method lookup code
-     */
+/*
+
+=item C<PMC *find_method(STRING *name)>
+
+Figure out which method PMC we need. By default we just defer to the
+system method lookup code.
+
+=cut
+
+*/
+
     PMC* find_method(STRING* name) {
-	return Parrot_find_method_with_cache(INTERP, SELF, name);
+        return Parrot_find_method_with_cache(INTERP, SELF, name);
     }
+
+/*
+
+=item C<INTVAL can(STRING *method)>
+
+Returns whether the class can perform C<*method>.
+
+=cut
+
+*/
 
     INTVAL can(STRING* method) {
-	return VTABLE_find_method(interpreter, SELF, method) != NULL;
+        return VTABLE_find_method(interpreter, SELF, method) != NULL;
     }
 
-    /*
-     * attrib count
-     */
+/*
+
+=item C<INTVAL elements()>
+
+=cut
+
+*/
+
     INTVAL elements() {
-	PMC* class_array = (PMC*) PMC_data(SELF);
-	PMC* attr_hash = VTABLE_get_pmc_keyed_int(interpreter,
-		class_array, PCD_ATTRIBUTES);
-	return VTABLE_elements(interpreter, attr_hash);
+        PMC* class_array = (PMC*) PMC_data(SELF);
+        PMC* attr_hash = VTABLE_get_pmc_keyed_int(interpreter,
+            class_array, PCD_ATTRIBUTES);
+        return VTABLE_elements(interpreter, attr_hash);
     }
+
+/*
+
+=item C<INTVAL get_integer()>
+
+Returns the attribute count.
+
+=cut
+
+*/
 
     INTVAL get_integer() {
-	return SELF.elements();
+        return SELF.elements();
     }
 
-    /*
-     * attribute access meths
-     */
+/*
+
+=item C<INTVAL get_integer_keyed_str(STRING *attr)>
+
+=cut
+
+*/
 
     INTVAL get_integer_keyed_str (STRING* attr) {
-	PMC* class_array = (PMC*) PMC_data(SELF);
-	PMC* attr_hash = VTABLE_get_pmc_keyed_int(interpreter,
-		class_array, PCD_ATTRIBUTES);
-	if (VTABLE_exists_keyed_str(interpreter, attr_hash, attr))
-	    return VTABLE_get_integer_keyed_str(interpreter,
-		    attr_hash, attr);
-	return -1;
+        PMC* class_array = (PMC*) PMC_data(SELF);
+        PMC* attr_hash = VTABLE_get_pmc_keyed_int(interpreter,
+            class_array, PCD_ATTRIBUTES);
+        if (VTABLE_exists_keyed_str(interpreter, attr_hash, attr))
+            return VTABLE_get_integer_keyed_str(interpreter,
+                attr_hash, attr);
+        return -1;
     }
 
+/*
+
+=item C<INTVAL get_integer_keyed(PMC *attr)>
+
+Attribute accessor methods.
+
+=cut
+
+*/
+
     INTVAL get_integer_keyed (PMC* attr) {
-	return SELF.get_integer_keyed_str(key_string(interpreter, attr));
+        return SELF.get_integer_keyed_str(key_string(interpreter, attr));
     }
 }
+
+/*
+
+=back
+
+=cut
+
+*/

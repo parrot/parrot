@@ -1,15 +1,22 @@
-/* ParrotIO.pmc
- *  Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
- *  CVS Info
- *     $Id$
- *  Overview:
- *     These are the vtable functions for Parrot IO
- *  Data Structure and Algorithms:
- *  History:
- *     Initial version by leo 2003/06/23
- *  Notes:
- *  References:
- */
+/*
+Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+$Id$
+
+=head1 NAME
+
+classes/parrotio.pmc - Parrot IO
+
+=head1 DESCRIPTION
+
+These are the vtable functions for Parrot IO.
+
+=head2 Methods
+
+=over 4
+
+=cut
+
+*/
 
 #include "parrot/parrot.h"
 
@@ -22,6 +29,16 @@ void Parrot_PerlHash_class_init(Parrot_Interp, int);
 void Parrot_PerlUndef_class_init(Parrot_Interp, int);
 
 pmclass ParrotIO need_ext {
+
+/*
+
+=item C<void class_init()>
+
+Class initialization.
+
+=cut
+
+*/
 
     void class_init () {
 
@@ -50,12 +67,32 @@ pmclass ParrotIO need_ext {
                          F2DPTR(PIO_eof), "eof", "iIP");
     }
 
+/*
+
+=item C<void init()>
+
+Initializes the IO PMC.
+
+=cut
+
+*/
+
     void init () {
-	PObj_active_destroy_SET(SELF);
+        PObj_active_destroy_SET(SELF);
     }
 
+/*
+
+=item C<void destroy()>
+
+Destroys the IO PMC, flushing and closing as necessary.
+
+=cut
+
+*/
+
     void destroy () {
-	ParrotIO *io = PMC_data(SELF);
+        ParrotIO *io = PMC_data(SELF);
         if (io) {
             /* shared filehandles will only get flushed */
             if (io->flags & PIO_F_SHARED) {
@@ -67,18 +104,50 @@ pmclass ParrotIO need_ext {
         }
     }
 
+/*
+
+=item C<PMC* clone()>
+
+Clones the IO PMC.
+
+For now both PMCs refer to the same C<ParrotIO> object. If we have
+different IO layers, we might copy C<data> and C<struct_val>.
+
+=cut
+
+*/
+
     PMC* clone () {
-	PMC* dest = pmc_new(INTERP, SELF->vtable->base_type);
-	/* For now both PMCs refer to the same ParrotIO object.
-	 * If we have different IO layers, we might copy these structures
-	 */
-	PMC_data(dest) = PMC_data(SELF);
-	PMC_struct_val(dest) = PMC_struct_val(SELF);
-	return dest;
+        PMC* dest = pmc_new(INTERP, SELF->vtable->base_type);
+        PMC_data(dest) = PMC_data(SELF);
+        PMC_struct_val(dest) = PMC_struct_val(SELF);
+        return dest;
     }
 
+/*
+
+=item C<INTVAL get_bool()>
+
+Returns whether at C<EOF> or not.
+
+=cut
+
+*/
+
     INTVAL get_bool() {
-	return !PIO_eof(INTERP, SELF);
+        return !PIO_eof(INTERP, SELF);
     }
 
 }
+
+/*
+
+=back
+
+=head1 HISTORY
+
+Initial version by leo 2003/06/23.
+
+=cut
+
+*/

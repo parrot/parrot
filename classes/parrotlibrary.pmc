@@ -1,51 +1,104 @@
-/* parrotlibrary.pmc
- *  Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
- *  CVS Info
- *     $Id$
- *  Overview:
- *     Class for holding info about dynamic libraries.
- *  Data Structure and Algorithms:
- *
- *     PMC data
- *       PMC_struct_val(SELF)  oplib init function
- *       PMC_data(SELF)        DLL handle
- *
- *     Properties:
- *       _filename               full path/file of lib
- *       _ro                     true after init
- *
- *     All ParrotLibrary PMCs are in interperter->iglobals
- *
- *  History:
- *     Initial version by leo 2003.10.12
- *  Notes:
- *     When a dynamic library (pmc or ops) is loaded, the
- *     load function returns a Library PMC.
- *  References:
- *     Date:    Mon, 29 Sep 2003 14:37:11 -0400 (EDT)
- *     Subject: Library loading and initialization sequence
- *     From:    Dan Sugalski
- */
+/*
+Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+$Id$
+
+=head1 NAME
+
+classes/parrotlibrary.pmc - Dynamic Library
+
+=head1 DESCRIPTION
+
+Class for holding info about dynamic libraries.
+
+     PMC data
+     PMC_struct_val(SELF)   oplib init function
+     PMC_data(SELF)         DLL handle
+
+Properties:
+
+    _filename               full path/file of lib
+    _ro                     true after init
+ 
+All ParrotLibrary PMCs are in interperter->iglobals
+
+When a dynamic library (pmc or ops) is loaded, the load function returns
+a ParrotLibrary PMC.
+
+=head2 Methods
+
+=over 4
+
+=cut
+
+*/
 
 #include "parrot/parrot.h"
 
 pmclass ParrotLibrary need_ext does library const_too {
 
-    void init() {
-	 PMC_struct_val(SELF) = NULL;
+/*
+
+=item C<void init()>
+
+Initializes the library with a C<NULL> oplib init function.
+
+=cut
+
+*/
+
+	void init() {
+        PMC_struct_val(SELF) = NULL;
     }
+
+/*
+
+=item C<void morph(INTVAL type)>
+
+Morphs to C<type>.
+
+=cut
+
+*/
 
     void morph(INTVAL type) {
-	SUPER(type);
+        SUPER(type);
     }
 
+/*
+
+=item C<PMC *clone()>
+
+Creates and returns a clone of the library.
+
+=cut
+
+*/
+
     PMC* clone() {
-	PMC* dest = pmc_new_noinit(INTERP, SELF->vtable->base_type);
-	PMC_struct_val(dest) = PMC_struct_val(SELF);
-	PMC_data(dest) = PMC_data(SELF);
-	if (PMC_metadata(SELF)) {
-	    PMC_metadata(dest) = VTABLE_clone(INTERP, PMC_metadata(SELF));
-	}
-	return dest;
+        PMC* dest = pmc_new_noinit(INTERP, SELF->vtable->base_type);
+        PMC_struct_val(dest) = PMC_struct_val(SELF);
+        PMC_data(dest) = PMC_data(SELF);
+        if (PMC_metadata(SELF)) {
+            PMC_metadata(dest) = VTABLE_clone(INTERP, PMC_metadata(SELF));
+        }
+        return dest;
     }
 }
+
+/*
+
+=back
+
+=head1 SEE ALSO
+
+    Date:    Mon, 29 Sep 2003 14:37:11 -0400 (EDT)
+    Subject: Library loading and initialization sequence
+    From:    Dan Sugalski
+
+=head1 HISTORY
+
+Initial version by leo 2003.10.12.
+
+=cut
+
+*/
