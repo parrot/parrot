@@ -14,6 +14,7 @@
 #define PARROT_EVENT_H_GUARD
 
 #define CHECK_EVENTS(x)
+#define HANDLE_EVENTS(x)
 
 void Parrot_init_signals(void);
 

@@ -1,6 +1,6 @@
 #! perl -w
 
-use Parrot::Test tests => 6;
+use Parrot::Test tests => 7;
 
 output_is(<<'CODE', <<'OUTPUT', "runinterp - new style");
 	new P0, .ParrotInterpreter
@@ -104,6 +104,16 @@ PC=\d+.*\n
 In\s2\n
 PC=\d+.*\n
 ending\n/x
+OUTPUT
+
+output_is(<<'CODE', <<'OUTPUT', "check_events");
+    print "before\n"
+    check_events
+    print "after\n"
+    end
+CODE
+before
+after
 OUTPUT
 
 1;
