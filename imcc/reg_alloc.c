@@ -175,7 +175,7 @@ imc_reg_alloc(struct Parrot_Interp *interpreter, IMC_Unit * unit)
         }
     }
     if (optimizer_level & OPT_SUB)
-        pcc_optimize(interpreter, unit);
+        sub_optimize(interpreter, unit);
     if (IMCC_INFO(interpreter)->debug & DEBUG_IMC)
         dump_instructions(unit);
     if (IMCC_INFO(interpreter)->verbose  ||

@@ -193,8 +193,8 @@ SP              [ ]
 ".pcc_end_return"      return(PCC_END_RETURN);
 ".pcc_begin_yield"    return(PCC_BEGIN_YIELD);
 ".pcc_end_yield"      return(PCC_END_YIELD);
-"prototyped"    return PROTOTYPED;
-"non_prototyped"    return NON_PROTOTYPED;
+"prototyped"    return(PROTOTYPED);
+"non_prototyped"    return(NON_PROTOTYPED);
 
 ".result"       return(RESULT);
 ".return"       return(RETURN);
@@ -273,6 +273,17 @@ SP              [ ]
 
 	BEGIN (emit);
 	return MACRO;
+    }
+
+<*>".pragma" {
+        int tok = yylex(valp, interp);
+        if(tok == STRINGC) {
+            YYCHOP();
+            imc_pragma(yytext+1);
+        }
+        else if(tok == IDENTIFIER) {
+            imc_pragma(yytext);
+        }
     }
 
 <*>".include" {

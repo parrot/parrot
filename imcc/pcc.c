@@ -1,16 +1,37 @@
+/*
+ * pcc.c
+ *
+ * A specific call convention implementation. Called by the generic
+ * API for subs (see sub.c).
+ *
+ * FASTCALL convention can be enabled with: 
+ * .pragma fastcall
+ * at the start of an IMC module.
+ *
+ * This will allow library developers (or non-Perl languages) to turn
+ * on very efficient optimizations and a lightweight calling convention. 
+ * It could also be used for internal libs that do not callout to PCC 
+ * routines, but present PCC entry points for the module itself.
+ *
+ * XXX FIXME: FASTCALL is not currently finished and may not be completely
+ * compatible with PCC convention. (ie. you can't mix and match, for now at least)
+ *
+ * see: docs/pdds/pdd03_calling_conventions.pod
+ *
+ * PCC Implementation by Leopold Toetsch
+ */
+
 #include <stdlib.h>
 #include <string.h>
 #include <assert.h>
 #include "imc.h"
 #include "parser.h"
 
-/*
- * pcc.c - parrot calling conventions stuff
- *
- * s. docs/pdds/pdd03_calling_conventions.pod
- *
- */
 
+/*
+ * Utilty instruction routine. Creates and inserts an instruction
+ * into the current block in one call.
+ */
 static Instruction *
 insINS(struct Parrot_Interp *interpreter, IMC_Unit * unit, Instruction *ins,
         char *name, SymReg **regs, int n)
@@ -183,6 +204,12 @@ pcc_emit_check_param(Parrot_Interp interpreter, IMC_Unit * unit, Instruction *in
     return ins;
 }
 
+
+/*
+ * Expand a PCC (Parrot Calling Convention) subroutine
+ * by generating the appropriate prologue and epilogue
+ * for parameter passing/returning.
+ */
 void
 expand_pcc_sub(Parrot_Interp interpreter, IMC_Unit * unit, Instruction *ins)
 {
@@ -194,7 +221,18 @@ expand_pcc_sub(Parrot_Interp interpreter, IMC_Unit * unit, Instruction *ins)
     SymReg *p3, *i0, *regs[IMCC_MAX_REGS], *label1, *label2;
     char buf[128];
 
+#if IMC_TRACE
+    PIO_eprintf("expand_pcc_sub\n");
+#endif
+
     sub = ins->r[1];
+
+    /* Don't generate any parameter checking code if there
+     * are no named arguments.
+     */
+    if(sub->pcc_sub->nargs <= 0)
+        goto NONAMEDPARAMS;
+    
     p3 = i0 = NULL;
     label1 = label2 = NULL;
     ps = pe = sub->pcc_sub->prototyped;
@@ -231,9 +269,9 @@ expand_pcc_sub(Parrot_Interp interpreter, IMC_Unit * unit, Instruction *ins)
                                     ins, sub, i0, NULL, i == 0, 0);
 			/* assign register to that param
                          *
-                         * if this subroutine calls another one,
-                         * new registers are ssigned, so that
-                         * they don't interfer with this subs params
+                         * if this subroutine calls another subroutine
+                         * new registers are assigned so that
+                         * they don't interfer with this sub's params
                          */
                         if (sub->pcc_sub->calls_a_sub) {
                             regs[0] = arg;
@@ -301,6 +339,8 @@ overflow:
         }
     } /* proto */
 
+NONAMEDPARAMS: /* If no named params, don't generate any param code */
+
     /*
      * if we call out, the return cc in P1 must be saved
      */
@@ -311,6 +351,10 @@ overflow:
     }
 }
 
+
+/*
+ * Expand a PCC sub return directive into its PASM instructions
+ */
 void
 expand_pcc_sub_ret(Parrot_Interp interpreter, IMC_Unit * unit, Instruction *ins)
 {
@@ -320,6 +364,10 @@ expand_pcc_sub_ret(Parrot_Interp interpreter, IMC_Unit * unit, Instruction *ins)
     Instruction *tmp;
     char buf[128];
     int n_p3;
+
+#if IMC_TRACE
+    PIO_eprintf("expand_pcc_sub_ret\n");
+#endif
 
     arg_count = ins->type & ITPCCYIELD ? 0 : 1;
     for (i = 0; i < 4; i++)
@@ -671,6 +719,11 @@ pcc_emit_flatten(Parrot_Interp interpreter, IMC_Unit * unit, Instruction *ins,
     return ins;
 }
 
+
+/*
+ * Expand a PCC subroutine call (IMC) into its PASM instructions
+ * This is the nuts and bolts of Perl6/Parrot routine call style
+ */
 void
 expand_pcc_sub_call(Parrot_Interp interpreter, IMC_Unit * unit, Instruction *ins)
 {
@@ -684,6 +737,10 @@ expand_pcc_sub_call(Parrot_Interp interpreter, IMC_Unit * unit, Instruction *ins
     int n_p3;
     int tail_call;
     int flatten;
+
+#if IMC_TRACE
+    PIO_eprintf("expand_pcc_sub_call\n");
+#endif
 
     tail_call = check_tail_call(interpreter, unit, ins);
     if (tail_call)
@@ -982,15 +1039,16 @@ optc_savetop(Parrot_Interp interpreter, IMC_Unit * unit, Instruction *ins)
             break;
     }
 }
+
 /*
  * special peephole optimizer for code generated mainly by
  * above functions
  */
 void
-pcc_optimize(Parrot_Interp interpreter, IMC_Unit * unit)
+pcc_sub_optimize(Parrot_Interp interpreter, IMC_Unit * unit)
 {
     Instruction *ins, *tmp;
-    info(interpreter, 2, "\tpcc_optimize\n");
+    info(interpreter, 2, "\tpcc_sub_optimize\n");
     for (ins = unit->instructions; ins; ins = ins->next) {
         if (ins->opsize == 3 &&
                 ins->r[1]->type == VTCONST &&
@@ -1033,6 +1091,10 @@ pcc_optimize(Parrot_Interp interpreter, IMC_Unit * unit)
     }
 }
 
+/*
+ * Check argument symbols of a sub and see which are used
+ * Return 0 if none are used, 1 if at least 1 symbol is used.
+ */
 static int
 pcc_args(Instruction* ins, SymReg* r)
 {
@@ -1049,6 +1111,10 @@ pcc_args(Instruction* ins, SymReg* r)
     return 0;
 }
 
+/*
+ * Check return symbols of a sub and see which are used
+ * Return 0 if none are used, 1 if at least 1 symbol is used.
+ */
 static int
 pcc_ret(Instruction* ins, SymReg* r)
 {
@@ -1065,6 +1131,9 @@ pcc_ret(Instruction* ins, SymReg* r)
     return 0;
 }
 
+/*
+ * See if the sub writes to the symbol, checks args and returns
+ */
 int
 pcc_sub_writes(Instruction* ins, SymReg* r)
 {
@@ -1073,6 +1142,9 @@ pcc_sub_writes(Instruction* ins, SymReg* r)
     return pcc_ret(ins, r) || pcc_args(ins, r);
 }
 
+/*
+ * See if the sub reads the symbol, checks args and returns
+ */
 int
 pcc_sub_reads(Instruction* ins, SymReg* r)
 {

@@ -59,6 +59,7 @@ void imc_compile_unit(struct Parrot_Interp *, IMC_Unit * unit);
 void imc_close_unit(struct Parrot_Interp *, IMC_Unit *);
 void imc_free_unit(struct Parrot_Interp *, IMC_Unit *);
 void imc_cleanup(struct Parrot_Interp *);
+void imc_pragma(char * str);
 
 /*
  * instructions.c
@@ -88,21 +89,50 @@ char *str_cat(const char *, const char *);
 int imcc_vfprintf(FILE *fd, const char *format, va_list ap);
 int imcc_fprintf(FILE *fd, const char *fmt, ...);
 
+
+/* Call convention independant API */
+
+/*
+ * sub.c
+ */
+void expand_sub(Parrot_Interp interpreter, IMC_Unit *, Instruction *ins);
+void expand_sub_ret(Parrot_Interp interpreter, IMC_Unit *, Instruction *ins);
+void expand_sub_call(Parrot_Interp interpreter, IMC_Unit *, Instruction *ins);
+void sub_optimize(Parrot_Interp interpreter, IMC_Unit *);
+
+/* Call convention specific implementations (currently 2, FASTSUB and PCCSUB)*/
+
 /* 
  * pcc.c
  */
 void expand_pcc_sub(Parrot_Interp interpreter, IMC_Unit *, Instruction *ins);
-void expand_pcc_sub_call(Parrot_Interp interpreter, IMC_Unit *, Instruction *ins);
 void expand_pcc_sub_ret(Parrot_Interp interpreter, IMC_Unit *, Instruction *ins);
-void pcc_optimize(Parrot_Interp interpreter, IMC_Unit *);
+void expand_pcc_sub_call(Parrot_Interp interpreter, IMC_Unit *, Instruction *ins);
+void pcc_sub_optimize(Parrot_Interp interpreter, IMC_Unit *);
 
 int pcc_sub_reads(Instruction* ins, SymReg* r);
 int pcc_sub_writes(Instruction* ins, SymReg* r);
 
+/*
+ * fastcall.c
+ */    
+void expand_fast_sub(Parrot_Interp interpreter, IMC_Unit *, Instruction *ins);
+void expand_fast_sub_ret(Parrot_Interp interpreter, IMC_Unit *, Instruction *ins);
+void expand_fast_sub_call(Parrot_Interp interpreter, IMC_Unit *, Instruction *ins);
+void fast_sub_optimize(Parrot_Interp interpreter, IMC_Unit *);
+    
+
 
 /* globals */
 
+/* Compiler pragma options that may affect the whole module being compiled */
+struct _imc_pragmas {
+  int fastcall;          /* Use low level branch op, pass/return on stack 
+                          * as opposed to pcc convention and invoke */
+                         /* more to come */
+};
 
+EXTERN struct _imc_pragmas pragmas;
 
 EXTERN char * sourcefile;	/* current file */
 EXTERN char * function;	/* current function */

@@ -199,6 +199,9 @@ get_keyvec(Parrot_Interp interpreter, int op)
     return k;
 }
 
+/*
+ * Return opcode value for op name
+ */
 int
 check_op(struct Parrot_Interp *interpreter, char *fullname,
         char *name, SymReg *r[], int narg, int keyvec)
@@ -208,9 +211,11 @@ check_op(struct Parrot_Interp *interpreter, char *fullname,
     op_fullname(fullname, name, r, narg, keyvec);
     op = interpreter->op_lib->op_code(fullname, 1);
     return op;
-
 }
 
+/*
+ * Is instruction a parrot opcode?
+ */
 int
 is_op(struct Parrot_Interp *interpreter, char *name)
 {

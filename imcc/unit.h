@@ -11,8 +11,9 @@
 
 typedef enum {
     IMC_PASM = 0,
-    IMC_SUB = 1,
-    IMC_CLASS = 2
+    IMC_PCCSUB = 1,
+    IMC_FASTSUB = 2,
+    IMC_CLASS = 3
 } IMC_Unit_Type;
 
 

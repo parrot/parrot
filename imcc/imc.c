@@ -199,6 +199,19 @@ imc_free_unit(Parrot_Interp interp, IMC_Unit * unit)
     free(unit);
 }
 
+/*
+ * Set a global compiler option. No fancy parsing needed.
+ */
+void
+imc_pragma(char * str)
+{
+#if IMC_TRACE
+    fprintf(stderr, "imc_pragma %s\n", str);
+#endif
+    if(!strcmp(str, "fastcall")) pragmas.fastcall = 1;
+    else return;
+    /* More options here */
+}
 
 
 /*

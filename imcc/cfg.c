@@ -75,11 +75,12 @@ find_basic_blocks (Parrot_Interp interpreter, IMC_Unit * unit, int first)
         }
     }
 
+    /* XXX FIXME: Now the way to check for a sub is unit->type */
     ins = unit->instructions;
     if (first && ins->type == ITLABEL && ins->r[1]) {
         debug(interpreter, DEBUG_CFG, "pcc_sub %s nparams %d\n",
                 ins->r[0]->name, ins->r[1]->pcc_sub->nargs);
-        expand_pcc_sub(interpreter, unit, ins);
+        expand_sub(interpreter, unit, ins);
     }
     ins->index = i = 0;
 
@@ -114,13 +115,14 @@ find_basic_blocks (Parrot_Interp interpreter, IMC_Unit * unit, int first)
         }
         if (ins->opnum == -1 && (ins->type & ITPCCSUB)) {
             if (first) {
+                /* XXX FIXME: Now the way to check for a sub is unit->type */
                 if (ins->type & ITLABEL) {
-                    expand_pcc_sub_ret(interpreter, unit, ins);
+                    expand_sub_ret(interpreter, unit, ins);
                     ins->type &= ~ITLABEL;
                 }
                 else {
-                    /* if this is a pcc_sub_call expand it */
-                    expand_pcc_sub_call(interpreter, unit, ins);
+                    /* if this is a sub call expand it */
+                    expand_sub_call(interpreter, unit, ins);
                 }
                 ins->type &= ~ITPCCSUB;
             }

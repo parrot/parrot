@@ -216,6 +216,7 @@ static char * inv_op(char *op) {
 %nonassoc '\n'
 %nonassoc <t> PARAM
 
+%token <t> PRAGMA
 %token <t> CALL GOTO ARG FLATTEN_ARG IF UNLESS END SAVEALL RESTOREALL
 %token <t> NEW NEWSUB NEWCLOSURE NEWCOR NEWCONT
 %token <t> NAMESPACE ENDNAMESPACE CLASS ENDCLASS FIELD METHOD
@@ -234,12 +235,12 @@ static char * inv_op(char *op) {
 %token <s> PARROT_OP
 %type <t> type newsub
 %type <i> program class class_body member_decls member_decl field_decl method_decl
-%type <i> sub sub_start emit pcc_sub sub_body pcc_ret pcc_yield
+%type <i> sub emit pcc_sub sub_body pcc_ret pcc_yield
 %type <i> compilation_units compilation_unit
 %type <s> classname relop
 %type <i> labels _labels label statements statement
 %type <i> pcc_sub_call
-%type <sr> pcc_arg pcc_result pcc_args pcc_results pcc_params pcc_param
+%type <sr> sub_param sub_params pcc_arg pcc_result pcc_args pcc_results pcc_params pcc_param
 %type <sr> pcc_returns pcc_return pcc_call
 %type <t> pcc_proto pcc_sub_proto
 %type <i> instruction assignment if_statement labeled_inst opt_label
@@ -258,7 +259,7 @@ static char * inv_op(char *op) {
 
 %%
 
-program:                         { $$ = 0;}
+program:
     compilation_units            { $$ = 0; }
     ;
 
@@ -382,31 +383,51 @@ method_decl:
         }
     ;
 
-sub:	sub_start
-        sub_body
+sub:	
+        SUB
+        {
+           cur_unit = (pragmas.fastcall ? imc_open_unit(interp, IMC_FASTSUB)
+                                          : imc_open_unit(interp, IMC_PCCSUB));
+        }
+        IDENTIFIER pcc_sub_proto '\n'
+        {
+          char *name = str_dup($3);
+          Instruction *i = iSUBROUTINE(cur_unit, mk_address($3, U_add_uniq_sub));
+          i->r[1] = $<sr>$ = mk_pcc_sub(name, 0);
+          i->r[1]->pcc_sub->prototyped = $4;
+        }
+        sub_params
+        sub_body { $$ = 0; }
+    ;
+
+sub_params: /* empty */                   { $$ = 0; } %prec LOW_PREC
+    | '\n'                                { $$ = 0; }
+    | sub_params sub_param '\n'           { add_pcc_param($<sr>0, $2);}
+    ;
+
+sub_param: PARAM         { is_def=1; }
+         type IDENTIFIER { $$ = mk_ident($4, $3); is_def=0; }
     ;
 
 sub_body:
         statements ESUB
         {
           $$ = 0;
-          /*
-	  imc_compile_unit(interp, instructions);
-	  emit_flush(interp);
-          */
         }
      ;
 
+/*
 sub_start:
-        SUB                           { cur_unit = imc_open_unit(interp, IMC_SUB); }
+        SUB                           { cur_unit = imc_open_unit(interp, IMC_PCCSUB); }
         IDENTIFIER '\n'
         { $$ = 0;
           iSUBROUTINE(cur_unit, mk_address($3, U_add_uniq_sub));
         }
     ;
+*/
 
 pcc_sub:
-        PCC_SUB   { cur_unit = imc_open_unit(interp, IMC_SUB); }
+        PCC_SUB   { cur_unit = imc_open_unit(interp, IMC_PCCSUB); }
         IDENTIFIER pcc_sub_proto '\n'
         {
           char *name = str_dup($3);
