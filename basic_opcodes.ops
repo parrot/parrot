@@ -145,12 +145,12 @@ AUTO_OP time_i {
 
 /* PRINT Ix */
 AUTO_OP print_i {
-  printf("%li", INT_REG(P1));
+  printf("%li", (long) INT_REG(P1));
 }
 
 /* PRINT ic */
 AUTO_OP print_ic {
-  printf("%li", P1);
+  printf("%li", (long) P1);
 }
 
  

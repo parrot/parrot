@@ -84,7 +84,7 @@ trace_op(opcode_t * code_start, opcode_t * code_end, opcode_t *pc) {
             fprintf(stderr, "; ARGS=(");
             for(i = 0; i < op_args[*pc]; i++) {
                 if (i) { fprintf(stderr, ", "); }
-                fprintf(stderr, "%ld", *(pc + i + 1));
+                fprintf(stderr, "%ld", (long) *(pc + i + 1));
             }
             fprintf(stderr, ")");
         }
@@ -147,7 +147,7 @@ runops_generic (opcode_t * (*core)(struct Parrot_Interp *), struct Parrot_Interp
     pc = core(interpreter);
 
     if (pc < code_start || pc >= code_end) {
-        fprintf(stderr, "Error: Control left bounds of byte-code block (now at location %d)!\n", pc - code_start);
+        fprintf(stderr, "Error: Control left bounds of byte-code block (now at location %d)!\n", (int) (pc - code_start));
         exit(1);
     }
 }

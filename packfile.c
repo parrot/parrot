@@ -1679,7 +1679,7 @@ PackFile_Constant_dump(struct PackFile_Constant * self) {
             break;
 
         case PFC_INTEGER:
-            printf("    [ 'PFC_INTEGER', %ld ],\n", self->integer);
+            printf("    [ 'PFC_INTEGER', %ld ],\n", (long) self->integer);
             break;
 
         case PFC_NUMBER:
@@ -1689,9 +1689,9 @@ PackFile_Constant_dump(struct PackFile_Constant * self) {
         case PFC_STRING:
             printf("    [ 'PFC_STRING', {\n");
             printf("        FLAGS    => 0x%04x,\n", self->string->flags);
-            printf("        ENCODING => %ld,\n",  self->string->encoding->which);
-            printf("        TYPE     => %ld,\n",  self->string->type);
-            printf("        SIZE     => %ld,\n",  self->string->bufused);
+            printf("        ENCODING => %ld,\n",  (long) self->string->encoding->which);
+            printf("        TYPE     => %ld,\n",  (long) self->string->type);
+            printf("        SIZE     => %ld,\n",  (long) self->string->bufused);
             printf("        DATA     => '%s'\n",  self->string->bufstart); /* TODO: Not a good idea in general */
             printf("    } ],\n");
             break;
