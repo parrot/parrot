@@ -28,6 +28,7 @@ typedef UINTVAL (*encoding_codepoints_t)(Interp* interpreter, STRING *source_str
 typedef UINTVAL (*encoding_bytes_t)(Interp* interpreter, STRING *source_string);
 
 struct _encoding {
+    const char *name;
     encoding_to_encoding_t to_encoding;
     encoding_copy_to_encoding_t copy_to_encoding;
     encoding_get_codepoint_t get_codepoint;
@@ -46,6 +47,8 @@ struct _encoding {
 typedef struct _encoding ENCODING;
 
 ENCODING *Parrot_new_encoding(Interp* interpreter);
+ENCODING *Parrot_load_encoding(Interp* interpreter, const char *encoding_name);
+
 
 #endif /* PARROT_ENCODING_H_GUARD */
 /*

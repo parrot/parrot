@@ -87,6 +87,7 @@ ENCODING *Parrot_encoding_fixed_8_init(Interp *interpreter) {
   ENCODING *return_encoding = Parrot_new_encoding(interpreter);
 
   ENCODING base_encoding = {
+      "fixed_8",
       to_encoding,
       copy_to_encoding,
       get_codepoint,

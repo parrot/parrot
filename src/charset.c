@@ -15,7 +15,8 @@ These are parrot's generic charset handling functions
 #include "parrot/parrot.h"
 
 CHARSET *Parrot_new_charset(Interp *interpreter) {
-  return mem_sys_allocate(sizeof(CHARSET));
+
+    return mem_sys_allocate(sizeof(CHARSET));
 }
 
 /*

@@ -17,6 +17,9 @@ This file implements the charset functions for binary data
 #include "parrot/parrot.h"
 #include "binary.h"
 
+/* The encoding we prefer, given a choice */
+static ENCODING *preferred_encoding;
+
 static STRING *get_graphemes(Interp *interpreter, STRING *source_string, UINTVAL offset, UINTVAL count) {
   STRING *return_string = NULL;
 
@@ -26,10 +29,10 @@ static STRING *get_graphemes(Interp *interpreter, STRING *source_string, UINTVAL
 static void set_graphemes(Interp *interpreter, STRING *source_string, UINTVAL offset, UINTVAL replace_count, STRING *insert_string) {
 }
 
-static void to_charset(Interp *interpreter, STRING *source_string, CHARSET new_charset) {
+static void to_charset(Interp *interpreter, STRING *source_string, CHARSET *new_charset) {
 }
 
-static STRING *copy_to_charset(Interp *interpreter, STRING *source_string, CHARSET new_charset) {
+static STRING *copy_to_charset(Interp *interpreter, STRING *source_string, CHARSET *new_charset) {
   STRING *return_string = NULL;
 
   return return_string;
@@ -75,6 +78,7 @@ static INTVAL rindex(Interp *interpreter, STRING *source_string, STRING *search_
 }
 
 static UINTVAL validate(Interp *interpreter, STRING *source_string) {
+    return 1;
 }
 
 static INTVAL is_wordchar(Interp *interpreter, STRING *source_string, UINTVAL offset) {
@@ -144,8 +148,44 @@ static INTVAL find_word_boundary(Interp *interpreter, STRING *source_string, UIN
 CHARSET *Parrot_charset_binary_init(Interp *interpreter) {
   CHARSET *return_set = Parrot_new_charset(interpreter);
   CHARSET base_set = {
+      "binary",
+      get_graphemes,
+      set_graphemes,
+      to_charset,
+      copy_to_charset,
+      to_unicode,
+      compose,
+      decompose,
+      upcase,
+      downcase,
+      titlecase,
+      upcase_first,
+      downcase_first,
+      titlecase_first,
+      compare,
+      index,
+      rindex,
+      validate,
+      is_wordchar,
+      find_wordchar,
+      find_not_wordchar,
+      is_whitespace,
+      find_whitespace,
+      find_not_whitespace,
+      is_digit,
+      find_digit,
+      find_not_digit,
+      is_punctuation,
+      find_punctuation,
+      find_not_punctuation,
+      is_newline,
+      find_newline,
+      find_not_newline,
+      find_word_boundary
   };
 
+  preferred_encoding = Parrot_load_encoding(interpreter, "fixed_8");
+  
   memcpy(return_set, &base_set, sizeof(CHARSET));
   return return_set;
   
