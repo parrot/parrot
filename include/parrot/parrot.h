@@ -37,6 +37,10 @@
 
 /* Other headers, where available */
 
+#ifdef PARROT_HAS_HEADER_ARPAINET 
+#  include <arpa/inet.h>
+#endif
+
 #ifdef PARROT_HAS_HEADER_UNISTD
 #  include <unistd.h>
 #endif
@@ -59,6 +63,10 @@
 
 #ifdef PARROT_HAS_HEADER_SYSTYPES
 #  include <sys/types.h>
+#endif
+
+#ifdef PARROT_HAS_HEADER_NIIN 
+#  include <netinet/in.h>
 #endif
 
 #ifdef PARROT_HAS_HEADER_SYSSTAT
