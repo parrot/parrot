@@ -14,6 +14,7 @@ aware of Parrot.
 
 Ask libsyck to do some work.
 Uses the native call interface.
+Needs synchronous callbacks.
 
 =head1 METHODS
 
@@ -24,6 +25,8 @@ Uses the native call interface.
 Parses a YAML string and returns a data structure.
 
 =cut
+
+.include "datatypes.pasm"
 
 .sub load 
     .param string yaml_string
@@ -210,7 +213,7 @@ Provide a patch for libsyck.
 
 =head1 AUTHOR
 
-Bernhard Schmalhofer - L<Bernhard.Schmalhofer@biomax.de>
+Bernhard Schmalhofer - <Bernhard.Schmalhofer@gmx.de>
 
 =head1 SEE ALSO
 

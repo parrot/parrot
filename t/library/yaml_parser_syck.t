@@ -26,7 +26,6 @@ TODO: {
 
   pir_output_is( << 'CODE', << 'OUT', "basic parsing" );
 
-.include "datatypes.pasm"
 .include "library/YAML/Parser/Syck.imc"
 .include "library/dumper.imc"
 .sub test @MAIN 
