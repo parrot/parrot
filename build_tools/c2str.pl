@@ -88,9 +88,9 @@ HEADER
     while (<IN>) {
 	$line++;
 	next if m/^\s*#/; # ignore preprocessor
-	next unless s/\bCONST_STRING\s*\(\w+\s*,\s*//;
+	next unless s/.*\bCONST_STRING\s*\(\w+\s*,//;
 
-	my $str = extract_delimited $_, '"';
+	my $str = extract_delimited; # $_, '"';
 	$str = substr $str, 1, -1;
 	# print STDERR "** '$str' $line\n";
 	my $n;

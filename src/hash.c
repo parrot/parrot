@@ -153,6 +153,10 @@ key_hash_STRING(Interp *interpreter, Hash *hash, void *value)
 {
     STRING *s = value;
 
+    if (s->hashval) {
+        return s->hashval ^ hash->seed;
+    }
+
     return string_hash(interpreter, s) ^ hash->seed;
 }
 

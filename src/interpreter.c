@@ -1298,16 +1298,18 @@ Parrot_make_cb(Parrot_Interp interpreter, PMC* sub, PMC* user_data,
     PMC* interp_pmc, *cb, *cb_sig;
     int type = '?';     /* avoid -Ox warning */
     char * sig_str;
+    STRING *sc;
     /*
      * we stuff all the information into the user_data PMC and pass that
      * on to the external sub
      */
     interp_pmc = VTABLE_get_pmc_keyed_int(interpreter, interpreter->iglobals,
             (INTVAL) IGLOBALS_INTERPRETER);
-    VTABLE_setprop(interpreter, user_data,
-            CONST_STRING(interpreter, "_interpreter"), interp_pmc);
-    VTABLE_setprop(interpreter, user_data,
-            CONST_STRING(interpreter, "_sub"), sub);
+    /* be sure __LINE__ is consistent */
+    sc = CONST_STRING(interpreter, "_interpreter");
+    VTABLE_setprop(interpreter, user_data, sc, interp_pmc);
+    sc = CONST_STRING(interpreter, "_sub");
+    VTABLE_setprop(interpreter, user_data, sc, sub);
     /* only ASCII sigs supported */
     sig_str = cb_signature->strstart;
     if (*sig_str == 'U') {
@@ -1326,8 +1328,8 @@ Parrot_make_cb(Parrot_Interp interpreter, PMC* sub, PMC* user_data,
 
     cb_sig = pmc_new(interpreter, enum_class_PerlString);
     VTABLE_set_string_native(interpreter, cb_sig, cb_signature);
-    VTABLE_setprop(interpreter, user_data,
-            CONST_STRING(interpreter, "_signature"), cb_sig);
+    sc = CONST_STRING(interpreter, "_signature");
+    VTABLE_setprop(interpreter, user_data, sc, cb_sig);
     /*
      * we are gonna passing this PMC to external code, the PMCs
      * might get out of scope until the callback is called -
@@ -1438,11 +1440,12 @@ callback_CD(Parrot_Interp interpreter, void *external_data, PMC *callback_info)
 
     PMC *passed_interp;         /* the interp that originated the CB */
     int async = 1;              /* cb is hitting this sub somewhen inmidst */
+    STRING *sc;
     /*
      * 3) check interpreter ...
      */
-    passed_interp = VTABLE_getprop(interpreter, callback_info,
-            CONST_STRING(interpreter, "_interpreter"));
+    sc = CONST_STRING(interpreter, "_interpreter");
+    passed_interp = VTABLE_getprop(interpreter, callback_info, sc);
     if (PMC_data(passed_interp) != interpreter)
         PANIC("callback gone to wrong interpreter");
     /*
@@ -1491,11 +1494,12 @@ Parrot_run_callback(Parrot_Interp interpreter, PMC* cbi, void* ext)
     char pasm_sig[4];
     INTVAL   i_param;
     void*    param = NULL;      /* avoid -Ox warning */
+    STRING *sc;
 
-    sub = VTABLE_getprop(interpreter, cbi,
-            CONST_STRING(interpreter, "_sub"));
-    sig = VTABLE_getprop(interpreter, cbi,
-            CONST_STRING(interpreter, "_signature"));
+    sc = CONST_STRING(interpreter, "_sub");
+    sub = VTABLE_getprop(interpreter, cbi, sc);
+    sc = CONST_STRING(interpreter, "_signature");
+    sig = VTABLE_getprop(interpreter, cbi, sc);
     user_data = cbi;
 
     sig_str = VTABLE_get_string(interpreter, sig);

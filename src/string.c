@@ -2842,10 +2842,6 @@ string_hash(struct Parrot_Interp * interpreter, STRING *s)
     if (!s)
         return 0;
 
-    if (s->hashval) {
-        return s->hashval;
-    }
-
     h = 0;
     switch (s->representation) {
         case enum_stringrep_one:
