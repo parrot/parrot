@@ -31,8 +31,6 @@ void alloc_pmcs(struct Parrot_Interp *interpreter,
                      struct Small_Object_Pool *pool);
 
 /* buffer header small-object methods */
-void add_free_buffer(struct Parrot_Interp *interpreter,
-                     struct Small_Object_Pool *pool, void *buffer);
 void *get_free_buffer(struct Parrot_Interp *interpreter,
                       struct Small_Object_Pool *pool);
 void alloc_buffers(struct Parrot_Interp *interpreter,

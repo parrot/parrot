@@ -63,7 +63,8 @@ void
 add_free_object(struct Parrot_Interp *interpreter,
         struct Small_Object_Pool *pool, void *to_add)
 {
-    /* This code is copied to add_free_pmc and add_free_buffer */
+    /* This code is copied to add_free_pmc */
+    PObj_flags_SETTO((PObj *)to_add, PObj_on_free_list_FLAG);
     *(void **)to_add = pool->free_list;
     pool->free_list = to_add;
 }

@@ -44,9 +44,9 @@ void Parrot_do_dod_run(struct Parrot_Interp *);
 void trace_system_areas(struct Parrot_Interp *);
 void trace_mem_block(struct Parrot_Interp *, size_t, size_t);
 
-void free_unused_buffers(struct Parrot_Interp *interpreter,
-                    struct Small_Object_Pool *pool, int cleanup);
-void free_unused_PMCs(struct Parrot_Interp *interpreter);
+void free_unused_pobjects(struct Parrot_Interp *interpreter,
+                    struct Small_Object_Pool *pool);
+
 void used_cow(struct Parrot_Interp *interpreter,
         struct Small_Object_Pool *pool, int cleanup);
 void clear_cow(struct Parrot_Interp *interpreter,

@@ -185,7 +185,7 @@ output_is(<<'CODE', <<'OUTPUT', "nci_i_p");
   set I0, 1	# prototype used - unchecked
   set I1, 0	# items on stack - unchecked
   new P5, .PerlString
-  set P5, "ko\n"
+  set P5, "ko\n"	# big HACK, broken with GC_IS_MALLOC
   invoke
   ne I5, 2, nok_1
   ne I0, 0, nok_2	# test return value convention
@@ -216,7 +216,7 @@ output_is(<<'CODE', <<'OUTPUT', "nci_p_p");
   set I0, 1	# prototype used - unchecked
   set I1, 0	# items on stack - unchecked
   new P5, .PerlString
-  set P5, "ko\n"
+  set P5, "ko\n"	# big HACK, broken with GC_IS_MALLOC
   invoke	# cant test ret value yet, print it
   dlfunc P0, P1, "nci_ip", "ip"
   print "dlfunced\n"

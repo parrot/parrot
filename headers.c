@@ -34,13 +34,12 @@ void
 add_free_pmc(struct Parrot_Interp *interpreter,
         struct Small_Object_Pool *pool, void *pmc)
 {
-    if (PObj_active_destroy_TEST((PMC *)pmc))
-        ((PMC *)pmc)->vtable->destroy(interpreter, (PMC *)pmc);
     PObj_flags_SETTO((PMC *)pmc, PObj_on_free_list_FLAG);
 
     /* Don't let it point to garbage memory */
     ((PMC *)pmc)->data = NULL;
     ((PMC *)pmc)->metadata = NULL;
+    ((PMC *)pmc)->synchronize = NULL;
 
     /* Copied from add_free_object */
     *(void **)pmc = pool->free_list;
@@ -60,6 +59,10 @@ get_free_pmc(struct Parrot_Interp *interpreter, struct Small_Object_Pool *pool)
     pool->free_list = *(void **)pmc;
 
     PObj_flags_SETTO(pmc, PObj_is_PMC_FLAG);
+    /* PMCs mem is already washed, set pointers to NULL if needed */
+    SET_NULL(pmc->data);
+    SET_NULL(pmc->metadata);
+    SET_NULL(pmc->synchronize);
 
     return pmc;
 }
@@ -75,41 +78,6 @@ alloc_pmcs(struct Parrot_Interp *interpreter, struct Small_Object_Pool *pool)
 
 /** Buffer Header Functions for small-object lookup table **/
 
-void
-add_free_buffer(struct Parrot_Interp *interpreter,
-        struct Small_Object_Pool *pool, void *vp_buffer)
-{
-    Buffer *buffer = (Buffer *)vp_buffer;
-
-    if (GC_DEBUG(interpreter) && PObj_report_TEST(buffer))
-        fprintf(stderr, "Freeing buffer %p -> %p\n", buffer, buffer->bufstart);
-
-#ifdef GC_IS_MALLOC
-    /* free allocated space at bufstart, but not if it is used
-     * COW or it is external
-     */
-    /* external_FLAG | on_free_list_FLAG */
-    if (buffer->bufstart && !PObj_is_external_or_free_TESTALL(buffer))
-    {
-        if (PObj_is_string_TEST(buffer)) {
-            int *refcount = ((int *)buffer->bufstart);
-
-            if (!--(*refcount))
-                free(refcount); /* the actual bufstart */
-        }
-        else
-            free(buffer->bufstart);
-    }
-#endif /* GC_IS_MALLOC */
-    PObj_flags_SETTO(buffer, PObj_on_free_list_FLAG);
-    /* Use the right length */
-    buffer->buflen = 0;
-
-    /* Copied from add_free_object */
-    *(void **)buffer = pool->free_list;
-    pool->free_list = buffer;
-}
-
 void *
 get_free_buffer(struct Parrot_Interp *interpreter,
         struct Small_Object_Pool *pool)
@@ -124,6 +92,7 @@ get_free_buffer(struct Parrot_Interp *interpreter,
 
     /* Don't let it point to garbage memory */
     buffer->bufstart = NULL;
+    buffer->buflen = 0;
     /* Clear the flagpole (especially _on_free_list_FLAG) */
     PObj_flags_CLEARALL(buffer);
 #if ! DISABLE_GC_DEBUG
@@ -156,7 +125,7 @@ new_pmc_pool(struct Parrot_Interp *interpreter)
     pmc_pool->get_free_object = get_free_pmc;
     pmc_pool->alloc_objects = alloc_pmcs;
     pmc_pool->more_objects = more_traceable_objects;
-    pmc_pool->mem_pool = interpreter->arena_base->memory_pool;
+    pmc_pool->mem_pool = NULL;
     return pmc_pool;
 }
 
@@ -174,7 +143,6 @@ new_bufferlike_pool(struct Parrot_Interp *interpreter,
     struct Small_Object_Pool *pool =
             new_small_object_pool(interpreter, buffer_size, num_headers);
 
-    pool->add_free_object = add_free_buffer;
     pool->get_free_object = get_free_buffer;
     pool->alloc_objects = alloc_buffers;
     pool->more_objects = more_traceable_objects;
@@ -265,7 +233,7 @@ new_string_header(struct Parrot_Interp *interpreter, UINTVAL flags)
             arena_base->constant_string_header_pool :
             interpreter->arena_base->string_header_pool);
     PObj_flags_SETTO(string, flags | PObj_is_string_FLAG);
-    string->strstart = 0;
+    SET_NULL(string->strstart);
     return string;
 }
 
@@ -437,7 +405,7 @@ Parrot_destroy_header_pools(struct Parrot_Interp *interpreter)
             if (pool) {
                 if (j == -1) {
                     if (i == 2)
-                        free_unused_PMCs(interpreter);
+                        free_unused_pobjects(interpreter, pool);
                 }
                 else {
 #ifdef GC_IS_MALLOC
@@ -447,7 +415,7 @@ Parrot_destroy_header_pools(struct Parrot_Interp *interpreter)
                         used_cow(interpreter, pool, 1);
                     else
 #endif
-                        free_unused_buffers(interpreter, pool, 1);
+                        free_unused_pobjects(interpreter, pool);
                 }
             }
             if (i == 2 && pool) {

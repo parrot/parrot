@@ -39,12 +39,14 @@ void pobject_lives(struct Parrot_Interp *interpreter, PObj *obj)
     /* if object is a PMC and contains buffers or PMCs, then attach
      * the PMC to the chained mark list
      */
-    if (PObj_is_PMC_TEST(obj) &&
-            ((PObj_get_FLAGS(obj) & mask) || ((PMC*)obj)->metadata)) {
-        /* put it on the end of the list */
-        interpreter->mark_ptr->next_for_GC = (PMC *)obj;
-        /* Explicitly make the tail of the linked list be self-referential */
-        interpreter->mark_ptr = ((PMC*)obj)->next_for_GC = (PMC *)obj;
+    if (PObj_is_PMC_TEST(obj)) {
+        if ( (PObj_get_FLAGS(obj) & mask) || ((PMC*)obj)->metadata) {
+            /* put it on the end of the list */
+            interpreter->mark_ptr->next_for_GC = (PMC *)obj;
+            /* Explicitly make the tail of the linked list be
+             * self-referential */
+            interpreter->mark_ptr = ((PMC*)obj)->next_for_GC = (PMC *)obj;
+        }
         return;
     }
 #if ! DISABLE_GC_DEBUG
@@ -230,39 +232,6 @@ trace_active_buffers(struct Parrot_Interp *interpreter)
     }
 }
 
-/* Free up any PMCs that aren't in use */
-void
-free_unused_PMCs(struct Parrot_Interp *interpreter)
-{
-    struct Small_Object_Arena *cur_arena;
-    UINTVAL i, total_used = 0;
-    struct Small_Object_Pool *pool = interpreter->arena_base->pmc_pool;
-
-    /* Run through all the buffer header pools and mark */
-    for (cur_arena = pool->last_Arena;
-            NULL != cur_arena; cur_arena = cur_arena->prev) {
-        PMC *pmc_array = cur_arena->start_objects;
-
-        for (i = 0; i < cur_arena->used; i++) {
-            /* If it's not live or on the free list, put it on the free list.
-             * Note that it is technically possible to have a PMC be both
-             * on_free_list and live, because of our conservative stack-walk
-             * collection. We must be wary of this case. */
-
-            /* live_FLAG | on_free_list_FLAG | constant_FLAG */
-            if (!PObj_is_live_or_free_TESTALL(&pmc_array[i])) {
-                pool->add_free_object(interpreter, pool, &pmc_array[i]);
-            }
-            else if (!PObj_on_free_list_TEST(&pmc_array[i])) {
-                total_used++;
-                PObj_live_CLEAR(&pmc_array[i]);
-            }
-        }
-    }
-    interpreter->active_PMCs += total_used;
-    pool->num_free_objects = pool->total_objects - total_used;
-}
-
 #ifdef GC_IS_MALLOC
 
 /* clear ref count */
@@ -287,7 +256,7 @@ clear_cow(struct Parrot_Interp *interpreter, struct Small_Object_Pool *pool,
                     /* clear COWed external FLAG */
                     PObj_external_CLEAR(b);
                     /* the real external flag */
-                    if (!PObj_bufstart_external_TEST(b))
+                    if (PObj_bufstart_external_TEST(b))
                         PObj_external_SET(b);
                     /* if cleanup (Parrot_destroy) constants are dead too */
                     PObj_constant_CLEAR(b);
@@ -337,22 +306,18 @@ used_cow(struct Parrot_Interp *interpreter, struct Small_Object_Pool *pool,
 }
 #endif /* GC_IS_MALLOC */
 
-/* Put any buffers that are now unused, on to the free list.
+/* Put any buffers/PMCs that are now unused, on to the pools free list.
  * If GC_IS_MALLOC bufstart gets freed too if possible.
  * Avoid buffers that are immune from collection (ie, constant) */
 void
-free_unused_buffers(struct Parrot_Interp *interpreter,
-        struct Small_Object_Pool *pool, int cleanup)
+free_unused_pobjects(struct Parrot_Interp *interpreter,
+        struct Small_Object_Pool *pool)
 {
     struct Small_Object_Arena *cur_arena;
     UINTVAL i, total_used = 0;
     UINTVAL object_size = pool->object_size;
+    UINTVAL wash_size = object_size - sizeof(Buffer);
 
-#ifdef GC_IS_MALLOC
-    if (!cleanup) {
-        used_cow(interpreter, pool, 0);
-    }
-#endif /* GC_IS_MALLOC */
     /* Run through all the buffer header pools and mark */
     for (cur_arena = pool->last_Arena;
             NULL != cur_arena; cur_arena = cur_arena->prev) {
@@ -364,39 +329,61 @@ free_unused_buffers(struct Parrot_Interp *interpreter,
              * on_free_list and live, because of our conservative stack-walk
              * collection. We must be wary of this case. */
             if (!PObj_is_live_or_free_TESTALL(b)) {
-#ifndef GC_IS_MALLOC
-                if (pool->mem_pool) {
+#if GC_VERBOSE
+                if (GC_DEBUG(interpreter) && PObj_report_TEST(b))
+                    fprintf(stderr, "Freeing pobject %p -> %p\n",
+                            b, b->bufstart);
+#endif
+                /* if object is a PMC and needs destroying */
+                if (PObj_is_PMC_TEST(b)) {
+                    /* then destroy it here, add_free_pmc is called from
+                     * more_objects too
+                     */
+                    if (PObj_active_destroy_TEST(b))
+                        ((PMC *)b)->vtable->destroy(interpreter, (PMC *)b);
+                }
+                else {
+                    /* else object is a buffer(like) */
+#ifdef GC_IS_MALLOC
+                    /* free allocated space at bufstart,
+                     * but not if it is used COW or external
+                     */
+                    if (b->bufstart && !PObj_is_external_or_free_TESTALL(b)) {
+                        if (PObj_is_string_TEST(b)) {
+                            int *refcount = ((int *)b->bufstart);
+
+                            if (!--(*refcount))
+                                free(refcount); /* the actual bufstart */
+                        }
+                        else
+                            free(b->bufstart);
+                    }
+#else
                     if (!PObj_COW_TEST(b)) {
                         ((struct Memory_Pool *)
-                                pool->mem_pool)->guaranteed_reclaimable +=
-                                b->buflen;
+                         pool->mem_pool)->guaranteed_reclaimable += b->buflen;
                     }
                     ((struct Memory_Pool *)
-                            pool->mem_pool)->possibly_reclaimable += b->buflen;
-                }
+                     pool->mem_pool)->possibly_reclaimable += b->buflen;
 #endif
-                /* clean memory for buffer_likes, no need to clean
-                 * strings - a slight optimization would be to have
-                 * a separate flag for buffer_likes
-                 */
-                if (!PObj_is_string_TEST(b) &&
-                        object_size > sizeof(Buffer))
-                    memset(b + 1, 0, object_size - sizeof(Buffer));
-                add_free_buffer(interpreter, pool, b);
+                    /*
+                     * clean memory for buffer_likes
+                     * this is the slow thing in the whole sub, so PMCs
+                     * have there own add_free function, which clears
+                     * PMC specific data members
+                     */
+                    memset(b + 1, 0, wash_size);
+                }
+                pool->add_free_object(interpreter, pool, b);
             }
             else if (!PObj_on_free_list_TEST(b)) {
+                /* should be live then */
                 total_used++;
+                PObj_live_CLEAR(b);
             }
-            PObj_live_CLEAR(b);
             b = (Buffer *)((char *)b + object_size);
         }
     }
-#ifdef GC_IS_MALLOC
-    if (!cleanup) {
-        clear_cow(interpreter, pool, 0);
-    }
-#endif /* GC_IS_MALLOC */
-    interpreter->active_Buffers += total_used;
     pool->num_free_objects = pool->total_objects - total_used;
 }
 
@@ -508,7 +495,6 @@ Parrot_do_dod_run(struct Parrot_Interp *interpreter)
     }
     Parrot_block_DOD(interpreter);
 
-    interpreter->active_PMCs = 0;
     interpreter->active_Buffers = 0;
 
     /* Now go trace the PMCs */
@@ -518,13 +504,24 @@ Parrot_do_dod_run(struct Parrot_Interp *interpreter)
     trace_active_buffers(interpreter);
 
     /* Now put unused PMCs on the free list */
-    free_unused_PMCs(interpreter);
+    header_pool = interpreter->arena_base->pmc_pool;
+    free_unused_pobjects(interpreter, header_pool);
+    interpreter->active_PMCs =
+        header_pool->total_objects - header_pool->num_free_objects;
 
     /* And unused buffers on the free list */
     for (j = 0; j < (INTVAL)interpreter->arena_base->num_sized; j++) {
         header_pool = interpreter->arena_base->sized_header_pools[j];
         if (header_pool) {
-            free_unused_buffers(interpreter, header_pool, 0);
+#ifdef GC_IS_MALLOC
+            used_cow(interpreter, header_pool, 0);
+#endif
+            free_unused_pobjects(interpreter, header_pool);
+            interpreter->active_Buffers +=
+                header_pool->total_objects - header_pool->num_free_objects;
+#ifdef GC_IS_MALLOC
+            clear_cow(interpreter, header_pool, 0);
+#endif
         }
     }
 #ifdef GC_IS_MALLOC
