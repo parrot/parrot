@@ -241,6 +241,14 @@ pull the parameters out of the registers based on that signature,
 properly handling the potential for the parameters to come in without
 prototyping. The top word on the stack is the parameter count.
 
+=item export ( xt s -- )
+
+Export execution token XT as name S, in the global parrot namespace. S
+should be a parrot string, and fully qualified. This word will be
+called with registers set as per Parrot's calling conventions, so
+should decode the registers as need be to get its parameters in a
+Forth-like state.
+
 =back
 
 =head1 CREDITS

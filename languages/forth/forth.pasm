@@ -704,6 +704,8 @@ InitializeCoreOps:
    .AddCoreOp(Get_Params, "getparams")
    .AddCoreOp(Get_Time, "curtime")
 
+   .AddCoreOp(Export_Word, "export")
+
     ret
 
 #------------------------------------------------------------------------------
@@ -1568,6 +1570,17 @@ Parrot_String:
     save .PMCStack
     .DoneInterpretWord
 
+Export_Word:
+    .PopStr
+    .PopInt
+    new .TempPMC, .Sub
+    set_addr .Temp_PMC, .TempInt
+    new .TempPMC2, .Integer
+    set .TempPMC2, .IntStack
+    setprop .TempPMC, "__forth_spot", .TempPMC2
+    store_global .StrStack, .TempPMC
+    .DoneInterpretWord
+
 DoneInterpretWord:
     ret
 
@@ -1946,6 +1959,10 @@ AddControlStruct:
 ExternalEntry:
    save P1
 
+   # Figure out where we're supposed to go, while we still have free PMCs
+   getprop P16, "__forth_spot", P0
+   set .TempInt, P16
+
    find_global .CoreOps, "__forth::CoreOps"
    find_global .UserOps, "__forth::UserOps"
    find_global .SpecialWords, "__forth::SpecialWords"
@@ -1955,10 +1972,8 @@ ExternalEntry:
    find_global .FalsePMC, "__forth::False"
    find_global .CellPMC, "__forth::CellArray"
    find_global .LabelStack, "__forth::LabelStack"
-   
-# Magic happens
-   
- 
+
+   bsr .TempInt
 
    restore P0
    invoke
