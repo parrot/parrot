@@ -7,7 +7,7 @@ output_is(<<'CODE', '12', "Fetch and store");
 	new P1, .PerlInt
 	set P0, 12
 	set P1, 7
-	store_global "Integer", P0
+	store_global P0, "Integer"
 	find_global P1, "Integer"
 	print P1
 	end
