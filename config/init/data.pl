@@ -95,6 +95,9 @@ sub runstep {
     # Some systems may lack these
     yacc          => 'bison -v -y',
     lex           => 'flex',
+
+    icu_make      => '# Building of ICU disabled',
+    buildicu      => 0,
     
   );
 

@@ -646,6 +646,8 @@ $(CLASS_O_FILES) : $(CLASS_PMC_FILES) $(NONGEN_HEADERS)
 	$(MAKE_C) classes
 
 
+${icu_make}
+
 ###############################################################################
 #
 # Testing Targets:

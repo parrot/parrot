@@ -33,6 +33,7 @@ use vars qw(@steps);
 	auto/memalign.pl
 	auto/signal.pl
 	auto/env.pl
+        gen/icu.pl
 	gen/config_h.pl
 	gen/feature_h.pl
 	gen/config_pm.pl
