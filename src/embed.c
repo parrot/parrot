@@ -19,7 +19,7 @@
 static BOOLVAL world_inited=0;
 
 struct Parrot_Interp *
-Parrot_new() {
+Parrot_new(void) {
     if(!world_inited) {
         world_inited=1;
         init_world();
