@@ -78,9 +78,10 @@ stack_copy(struct Parrot_Interp * interp, Stack_Chunk_t *old_base) {
             new_base->prev = new_base;
         }
         else {
-            new_chunk->next = new_base->next;
-            new_chunk->prev = new_base;
+            new_chunk->next = new_base;
+            new_chunk->prev = new_base->prev;
             new_base->prev->next = new_chunk;
+            new_base->prev = new_chunk;
         }
         new_chunk->used = old_chunk->used;
         new_chunk->flags = old_chunk->flags & ~STACK_CHUNK_COW_FLAG;
