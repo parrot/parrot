@@ -331,13 +331,20 @@ init_prederef(struct Parrot_Interp *interpreter, int which)
 
 /*=for api interpreter stop_prederef
  *
- * Unload the prederef oplib.
+ * Restore func tables to initial state
  */
 
 static void
 stop_prederef(struct Parrot_Interp *interpreter)
 {
-    (void) PARROT_CORE_PREDEREF_OPLIB_INIT(0);
+    if (interpreter->resume_flag & RESUME_RESTART) {
+        interpreter->op_func_table = PARROT_CORE_OPLIB_INIT(1)->op_func_table;
+        if (interpreter->evc_func_table) {
+            mem_sys_free(interpreter->evc_func_table);
+            interpreter->evc_func_table = NULL;
+        }
+        setup_event_func_ptrs(interpreter);
+    }
 }
 
 #if EXEC_CAPABLE
@@ -507,6 +514,7 @@ runops_cgp(struct Parrot_Interp *interpreter, opcode_t *pc)
     init_prederef(interpreter, PARROT_CGP_CORE);
     pc_prederef = interpreter->prederef.code + (pc - code_start);
     pc = cgp_core((opcode_t*)pc_prederef, interpreter);
+    stop_prederef(interpreter);
     return pc;
 #else
     PIO_eprintf(interpreter,
@@ -524,6 +532,7 @@ runops_switch(struct Parrot_Interp *interpreter, opcode_t *pc)
     init_prederef(interpreter, PARROT_SWITCH_CORE);
     pc_prederef = interpreter->prederef.code + (pc - code_start);
     pc = switch_core((opcode_t*)pc_prederef, interpreter);
+    stop_prederef(interpreter);
     return pc;
 }
 
