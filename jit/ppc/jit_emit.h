@@ -383,7 +383,7 @@ enum { JIT_PPC_CALL, JIT_PPC_BRANCH, JIT_PPC_UBRANCH };
 
 #define jit_emit_fadd_rrr(pc, D, A, B) jit_emit_3a(pc, 63, D, A, B, 0, 21, 0)
 #define jit_emit_fsub_rrr(pc, D, A, B) jit_emit_3a(pc, 63, D, A, B, 0, 20, 0)
-#define jit_emit_fmul(pc, D, A, B) jit_emit_3a(pc, 63, D, A, 0, B, 25, 0)
+#define jit_emit_fmul_rrr(pc, D, A, B) jit_emit_3a(pc, 63, D, A, 0, B, 25, 0)
 #define jit_emit_fdiv_rrr(pc, D, A, B) jit_emit_3a(pc, 63, D, A, B, 0, 18, 0)
 
 #define jit_emit_fabs_rrr(pc, D, A)    jit_emit_3reg_x(pc, 63, D, 0, A, 264, 0)
