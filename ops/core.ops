@@ -841,7 +841,7 @@ inline op set (inout PMC, in KEY, in PMC, in KEY)  {
 
 =item B<clone>(out PMC, in PMC)
 
-Copies a PMC $1 to $2.
+Makes a copy of the PMC in $2 and puts it in $1.
 
 =cut
 
