@@ -98,7 +98,7 @@ sub emit {
 
 print <<'END';
 
-.pcc_sub _substr non_prototyped
+.sub _substr non_prototyped
     .param pmc params
     $P0 = params
 # n paras
@@ -142,17 +142,12 @@ substr_die:
     set $S0, "wrong number of args for substr"
     $P0 = new PerlArray
     $P0[0] = $S0
-    find_lex $P2, "&die"
-    .pcc_begin non_prototyped
-    .arg $P0
-    .pcc_call $P2
-substr_ret_label:
-    .pcc_end
+    _die($P0)
     goto substr_ret
     end
 .end
 
-.pcc_sub _length non_prototyped
+.sub _length non_prototyped
     .param pmc s
     $S0 = s
     length $I0, $S0
@@ -164,7 +159,7 @@ substr_ret_label:
     end
 .end
 
-.pcc_sub _reverse non_prototyped
+.sub _reverse non_prototyped
     .param pmc orig_array
     $I0 = orig_array
     dec $I0
@@ -182,7 +177,7 @@ reverse_loopstart:
     end
 .end
 
-.pcc_sub _join non_prototyped
+.sub _join non_prototyped
     .param pmc params
     .local int num_params
     num_params = params
@@ -214,7 +209,7 @@ join_ret:
     end
 .end
 
-.pcc_sub _index non_prototyped
+.sub _index non_prototyped
     .param pmc params
     $I2 = params
     if $I2 < 2 goto index_numarg_error
@@ -240,44 +235,32 @@ index_numarg_error:
     $S0 = "wrong number of args for index"
     $P0 = new PerlArray
     $P0[0] = $S0
-    find_lex $P2, "&die"
-    .pcc_begin non_prototyped
-    .arg $P0
-    .pcc_call $P2
-pcc_ret_label:
-    .pcc_end
+    _die($P0)
     goto index_end
 .end
 
-.pcc_sub _time non_prototyped
+.sub _time non_prototyped
     $P1 = new PerlNum
     time $N1
     set $P1, $N1
     .pcc_begin_return
     .return $P1
     .pcc_end_return
-    end
 .end
 
-.pcc_sub _sleep non_prototyped
+.sub _sleep non_prototyped
     .param pmc wait
     $I0 = wait
     sleep $I0
-    .pcc_begin_return
-    .pcc_end_return
-    end
 .end
 
-.pcc_sub _print1 non_prototyped
+.sub _print1 non_prototyped
     .param object p
     print p
     print "\n"
-    .pcc_begin_return
-    .pcc_end_return
-    end
 .end
 
-.pcc_sub _print non_prototyped
+.sub _print non_prototyped
     .param pmc params
     .local int num_elem
     .local int counter
@@ -290,19 +273,16 @@ print_loopstart:
     inc counter
     goto print_loopstart
 print_loopend:
-    .pcc_begin_return
-    .pcc_end_return
-    end
 .end
 
-.pcc_sub _exit non_prototyped
+.sub _exit non_prototyped
     .param object message
     print message
     print "\n"
     end
 .end
 
-.pcc_sub _die non_prototyped
+.sub _die non_prototyped
     .param object params
 
     # setup $!: ####################
@@ -344,21 +324,15 @@ die_nohandler:
     end
 .end
 
-.pcc_sub _warn non_prototyped
+.sub _warn non_prototyped
     .param object params
-    find_lex $P0, "&print"
-    .pcc_begin non_prototyped
-    .arg params
-    .pcc_call $P0
-warn_ret_label:
-    .result $P1
-    .pcc_end
+    $P1 = _print(params)
     .pcc_begin_return
     .return $P1
     .pcc_end_return
 .end
 
-.pcc_sub _grep non_prototyped
+.sub _grep non_prototyped
     .param Sub condition
     .param pmc params
     .local int tmp
@@ -377,12 +351,7 @@ __grep_loop_top:
     tmp = params
     ge ii, tmp, __grep_loop_end
     element = params[ii]
-    .pcc_begin non_prototyped
-    .arg element
-    .pcc_call condition
-__grep_closure_return:
-    .result comparison_result
-    .pcc_end
+    comparison_result = condition(element)
     unless comparison_result, __grep_next
     push result_list, element
 __grep_next:
@@ -396,19 +365,17 @@ __grep_die_numargs:
     set S0, "wrong number of args for grep"
     condition = new PerlArray
     set condition[0], S0
-    save condition
-    bsr _die
+    _die(condition)
     branch __grep_loop_end
 __grep_die_arg1:
     set S0, "First argument to grep must be a closure"
     condition = new PerlArray
     set condition[0], S0
-    save condition
-    bsr _die
+    _die(condition)
     branch __grep_loop_end
 .end
 
-.pcc_sub _map non_prototyped
+.sub _map non_prototyped
     .param pmc params
     $P2 = new PerlArray
     set $I3, params
@@ -426,8 +393,7 @@ __map_loop_start:
     $P5 = new PerlArray
     set $P5, 1
     set $P5[0], $P3
-    save $P5
-    bsr __map_closure
+    __map_closure($P5)
 ###    restore $P4
     set $I3, $P4
     lt $I3, 1, __map_check_end
@@ -451,15 +417,13 @@ __map_die_numargs:
     set S0, "wrong number of args for map"
     $P0 = new PerlArray
     set $P0[0], S0
-    save $P0
-    bsr _die
+    _die($P0)
     branch __map_loop_end
 __map_die_arg1:
     set S0, "First argument to map must be a closure"
     $P0 = new PerlArray
     set $P0[0], S0
-    save $P0
-    bsr _die
+    _die($P0)
     branch __map_loop_end
 __map_closure:
     pushp
@@ -507,31 +471,26 @@ __setup_arg_end:
     ret # Only called from top level
 .end
 
-.pcc_sub _install_catch non_prototyped
+.sub _install_catch non_prototyped
     .param pmc continuation
     .local pmc try_stack
     find_global try_stack, "_AV_catchers"
     $I1 = try_stack
     try_stack[$I1] = continuation
     store_global "_AV_catchers", try_stack
-    .pcc_begin_return
-    .pcc_end_return
-    end
 .end
 
-.pcc_sub _pop_catch non_prototyped
+.sub _pop_catch non_prototyped
     .local pmc try_stack
     find_global try_stack, "_AV_catchers"
     $I1 = try_stack
     dec $I1
     try_stack = $I1
     store_global "_AV_catchers", try_stack
-    .pcc_begin_return
-    .pcc_end_return
-    end
 .end
 
 END
 
 }
 1;
+

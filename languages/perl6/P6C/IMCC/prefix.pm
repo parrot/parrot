@@ -197,6 +197,7 @@ context to functions anyways, so this isn't a problem.
 sub gen_sub_call {
     my ($x, %options) = @_;
     my $ctx_of_call = $x->{ctx};
+    my $call_string;
 
     my $func = $P6C::IMCC::funcs{$x->name}; # May not be found
     if (!defined($func)) {
@@ -291,12 +292,12 @@ sub gen_sub_call {
                     if ($am_flattening) {
                         die "ERROR: found non-flattened param after a flattened param\n";
                     }
-                    push @positional_stmts, "\t.arg $val # param ($desc)";
+                    push @positional_stmts, $val; # param ($desc)
                 }
             } else {
                 # Push some sentinel value
                 # FIXME: What if we are flattening?
-                push @positional_stmts, "\t.arg 0 # unfilled (FIXME) param = $desc";
+                push @positional_stmts, 0; # unfilled (FIXME) param = $desc
             }
         } continue {
             $i++;
@@ -306,7 +307,7 @@ sub gen_sub_call {
         while ($i < $params->max_nonslurpy_positional) {
             my $param = $params->indexed_param($i++);
             my $desc = $param->var->name;
-            push(@positional_stmts, "\t.arg $undef # dummy value for unpassed param $desc (FIXME)");
+            push(@positional_stmts, $undef); # dummy value for unpassed param $desc (FIXME)
             # FIXME: At the moment, we only search through the named
             # argument list if we call without a prototype. When the
             # calling code is changed so that it *does* pass through
@@ -344,22 +345,20 @@ sub gen_sub_call {
 
         my $mname = P6C::IMCC::mangled_name($x->name);
         my $call_return = genlabel 'after_call';
+	$call_string = $subpmc;
         if ($cannot_prototype) {
-            code("\t.pcc_begin non_prototyped # IMCC::prefix cannot proto");
-            code("\t.arg $nu_var # named args")
-              unless $params->{no_named};
-            code(@positional_stmts) if @positional_stmts;
-            code("\t.arg $slurpy_array # slurpy array") if $slurpy_array;
+	  my (@args);
+	  push (@args, $nu_var) unless $params->{no_named};
+	  push(@args, @positional_stmts) if @positional_stmts;
+	  push (@args, $slurpy_array) if $slurpy_array;
+	  $call_string .= "(" . join(", ", @args) .")";
         } else {
-            code("\t.pcc_begin prototyped # IMCC::prefix prototyped");
-            code("\t.arg $nu_var # named args")
-              unless $params->{no_named};
-            code(@positional_stmts) if @positional_stmts;
-#             code("\t.arg $nk_var");
-            code("\t.arg $slurpy_array # slurpy array") if $slurpy_array;
+	  my (@args);
+	  push(@args, $nu_var) unless $params->{no_named};
+	  push(@args, @positional_stmts) if @positional_stmts;
+	  push(@args, $slurpy_array) if $slurpy_array;
+	  $call_string .= "(" . join(", ", @args) .")";
         }
-        code("\t.pcc_call $subpmc");
-        code("$call_return:");
     } else {
 	code("\t.pcc_begin non_prototyped # IMCC::prefix nonprototyped");
         use Carp; Carp::cluck "unimplemented";
@@ -374,22 +373,26 @@ sub gen_sub_call {
     }
     if (ref($rettype) eq 'ARRAY') {
 	my @results = map { gentmp $_ } @$rettype;
-	for my $i (0 .. $#results) {
-	    code("\t.result $results[$i]");
+	my $return_string = join(", ", @results);
+	$return_string = "(". $return_string. ")";
+	if (@results) {
+	  code("\t$return_string = $call_string", "");
+	} else {
+	  code("\t$call_string", "");
 	}
-        code("\t.pcc_end # list return", "");
 	return tuple_in_context([@results], $ctx_of_call);
 
     } elsif ($rettype eq 'PerlArray') {
-	my $ret = gentmp 'pmc';
-	code("\t.result $ret");
-	# XXX: this is not nice, but it's more useful than returning
-	# array-lengths.
-	if ($ctx_of_call->is_scalar) {
+      my $ret = gentmp 'pmc';
+      my $return_string = $ret;
+      # XXX: this is not nice, but it's more useful than returning
+      # array-lengths.
+      if ($ctx_of_call->is_scalar) {
 	    my $itmp = gentmp 'int';
 	    my $blech = genlabel;
 	    my $end = genlabel;
 	    code(<<END);
+        $ret  = $call_string
 	$itmp = $ret
 	if $itmp == 0 goto $blech
 	dec $itmp
@@ -398,19 +401,18 @@ sub gen_sub_call {
 $blech:
 	$ret = new PerlUndef
 $end:
-        .pcc_end # array return in scalar context
+        # .pcc_end # array return in scalar context
 
 END
 	    return $ret;
 	} else {
-            code("\t.pcc_end # array return in list context", "");
-	    return array_in_context($ret, $ctx_of_call);
+	  code("\t$return_string = $call_string", "");
+	  return array_in_context($ret, $ctx_of_call);
 	}
 
     } elsif (is_scalar($rettype)) {
 	my $ret = gentmp 'pmc';
-	code("\t.result $ret");
-        code("\t.pcc_end # scalar return", "");
+	code("\t$ret = $call_string", "");
 	return scalar_in_context($ret, $ctx_of_call);
 
     } else {

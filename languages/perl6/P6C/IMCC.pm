@@ -192,11 +192,7 @@ END
 END
     }
     print <<'END';
-	.pcc_begin prototyped # Was non_prototyped
-        .arg P5
-	.pcc_call main_sub
-main_ret_label:
-	.pcc_end
+	main_sub(P5)
 	pop_pad
 	end
 .end
@@ -209,7 +205,7 @@ END
 	    next;
 	}
 	$name = mangled_name($name);
-	print ".pcc_sub $name prototyped\n";
+	print ".sub $name prototyped\n";
 	$sub->emit;
 	print ".end\n";
     }
@@ -1035,13 +1031,7 @@ sub call_closure {
     my $ret_label = genlabel 'ret_label';
     my $ret = gentmp 'pmc';
     code(<<END);
-	.pcc_begin non_prototyped # closure
-	.arg	$dummy_named
-	.arg	$argval
-	.pcc_call $func
-$ret_label:
-	.result $ret
-	.pcc_end
+        $ret = $func($dummy_named, $argval)
 END
     return $ret;
 }
