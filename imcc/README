@@ -34,7 +34,7 @@ it needs to be FAST?
 
 We have other options like having imcc to become an assembler in its
 own right, which is fine by me, but for now, I think Parrot is changing way
-too fast to have another assembler branch).
+too fast to have another assembler branch.
 
 
 Register Allocation
@@ -49,7 +49,7 @@ Spilling
 Optimization
 
   At this level, many optimizations are simple, like register
-  coalescing, redudant copies, and constant expression evaluation.
+  coalescing, redundant copies, and constant expression evaluation.
   This will wait until the compiler is fully featured and well
   designed and works well enough as the backend compiler for languages
   targetting Parrot.
@@ -59,9 +59,129 @@ Why C and Bison?
 
   Until Perl6 compiles itself and is fast, a Bison parser is
 the easiest to maintain. An additional, important benefit, is
-C-based LALR parser are pretty darn fast. Currently assembling
-Parrot assembly on the fly is just too slow with assemble.pl,
-although new things are in the works.
+C-based LALR parsers are pretty darn fast. Currently assembling
+Parrot on the fly is still relatively slow, however this is
+steadily improving.
+
+
+Language Reference
+
+Variables, Registers and Constants
+
+  Variables are simple identifiers, anything that is NOT a register
+  or constant is a legal identifier. The syntax will have to change
+  a bit to support Perl's non-alpha identifiers, which will probably
+  spell renaming the registers.
+
+  You may use an infinite number of typed temporaries.
+  S=String, I=Int, N=Float, P=Object(or PMC)
+
+   $S0 = 1
+   $S1 = $S0 + 2
+   ...
+
+  You may also define lexicals with the .local directive below
+  and use them by name.
+
+   .local i
+   .local j
+   i = 4
+   j = i * i
+
+  Assigning to a constant is illegal syntax.
+
+Directives
+
+  For this reference, I use the following legend:
+    reg = A symbolic temporary ($S0, $I25)
+    var = A named variable or symbol (i, foo, myArray)
+    IDENTIFIER = An optionally quoted name
+    lval = reg | var
+    rval = reg | var | const
+
+    lval is allowed as targets of instructions, but not constants,
+    so we refer to operands on the right side as rvals. lvals
+    are also used on the right hand side to indicate that the
+    item can be a const or non-const token.
+    
+  These are tokens that might not directly translate to a specific
+  opcode, and are intentionly left generic. Some of them aren't
+  ops at all, but instructions to the compiler.
+
+   .class <IDENTIFIER>
+
+   .namespace <IDENTIFIER>
+
+   .sym <type> <IDENTIFIER>
+
+   .sub <IDENTIFIER>
+
+   .local <IDENTIFIER>
+
+   .arg <lval>
+ 
+   .param <type> <lval>
+
+   .emit
+
+   .eom
+
+
+Instructions
+
+  Assignments, calls, branches, etc. Simplified forms of lower
+  level operations. Typically is 1-to-1 or 1-to-2 instruction to
+  Parrot ratio.
+
+
+   lval = rval
+
+   lval = rval + rval
+
+   lval = rval - rval
+
+   lval = rval * rval
+ 
+   lval = rval / rval
+
+   lval = rval % rval
+
+   lval = rval << rval
+
+   lval = rval >> rval
+
+   <S.lval> = <S.rval> . <S.rval>
+
+  For array and string access you can use:
+
+   <S.lval|P.lval> [ rval ] = rval
+
+   lval = <S.lval|P.lval> [ rval ]
+
+   call <IDENTIFIER>
+
+   call <IDENTIFIER> ( <lval> [,<lval>, ...] )
+
+   dec <IDENTIFIER>
+
+   end
+
+   goto <LABEL>
+
+   if <expression> goto <LABEL>
+
+   inc <IDENTIFIER>
+ 
+   lval = new <IDENTIFIER>
+
+   print rval
+
+   restoreall
+
+   ret
+
+   saveall
+
 
 
 Please mail perl6-internals@perl.org with bug-reports or patches.
