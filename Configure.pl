@@ -171,7 +171,7 @@ my(%c)=(
     longsize      => undef,
 
     intvalfmt     => '%ld',
-    numvalfmt     => '%f',
+    floatvalfmt     => '%f',
 
     cc            => $Config{cc},
 
@@ -562,9 +562,9 @@ if ($c{iv} eq "int") {
 }
 
 if ($c{nv} eq "double") {
-    $c{numvalfmt} = "%f";
+    $c{floatvalfmt} = "%f";
 } elsif ($c{nv} eq "long double") {
-    $c{numvalfmt} = "%lf";
+    $c{floatvalfmt} = "%lf";
 } else {
     die "Configure.pl:  Can't find a printf-style format specifier for type \"$c{nv}\"\n";
 }

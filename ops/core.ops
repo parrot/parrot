@@ -258,7 +258,7 @@ inline op print(in INT) {
 }
 
 inline op print(in NUM) {
-  printf(NUMVAL_FMT, $1);
+  printf(FLOATVAL_FMT, $1);
   goto NEXT();
 }
 
@@ -316,7 +316,7 @@ op print(in INT, in NUM) {
                 break;
 	default: file = (FILE *)$1;
   }
-  fprintf(file, NUMVAL_FMT, $2);
+  fprintf(file, FLOATVAL_FMT, $2);
   goto NEXT();
 }
 
