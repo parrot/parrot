@@ -1,16 +1,20 @@
 #
-# life.pasm
+# ncurses_life.imc
 #
 # Play conway's (no, not *him*. The other conway) game
 # of life
+
+# this version can load life.l files (#P format only - x,y are ignored)
+# you get a lot of .l files by installing xlife
 #
-#.emit
-
-
-#.eom
+# parrot examples/assembly/ncurses_life.imc examples/assembly/acorn.l
+#
 
 .sub _MAIN
 .include "library/ncurses.pasm"
+	# get command line
+	.local var argv
+	argv = P5
 	# First the generation count
         .const int MAX_GEN = 5000
 	# kill the space ship
@@ -56,6 +60,7 @@
 
 	# If true, we don't print
 	SUPRESS_PRINT = 0
+	stop = 0
 
 	INITSCR = global "ncurses::initscr"
 	ENDWIN = global "ncurses::endwin"
@@ -94,12 +99,32 @@
 	I5 = 0
 	invoke
 
-	S16 = ""
-	size = 15
-	if sizef <= 1 goto nosize
-	$I0 = sizef - 1
+	if sizef > 0 goto ok_s
+	sizef = 1
+ok_s:
+
 	size = 15 * sizef
+
+	$I0 = argv
+	if $I0 <= 1 goto def_world
+	.sym Sub load
+	newsub load, .Sub, _load_file
+	.pcc_begin prototyped
+	.arg argv
+	.arg size
+	.pcc_call load
+retl:
+	.result S15
+	.pcc_end
+	length $I0, S15
+	unless $I0, getout
+	goto nosize2
+
+def_world:
 	set S17,  "               "
+	$I0 = sizef - 1
+	unless $I0 goto nosize
+	S16 = ""
 	repeat S16, S17, $I0
 nosize:
 
@@ -164,6 +189,8 @@ nocol:
 nosize2:
 	bsr dump
 	GEN_COUNT = 0
+	.sym Sub generate
+	newsub generate, .Sub, _generate
 
 loop:	if GEN_COUNT >= MAX_GEN goto getout
         if stop goto getout
@@ -173,8 +200,14 @@ loop:	if GEN_COUNT >= MAX_GEN goto getout
 	printerr "."
 
 skip:
-
-	bsr generate
+	.pcc_begin prototyped
+	.arg S15
+	.arg size
+	.pcc_call generate
+ret:
+	.result S15
+	.result stop
+	.pcc_end
 
 	bsr dump
 	branch loop
@@ -236,118 +269,6 @@ no_gps:
 
 
 
-# S15 has the incoming string, S0 is scratch, S1 is scratch, S2 is scratch
-#
-# I0 is the length of the string
-# I1 is the current cell we're checking
-# I2 is the count for that cell
-# I3 is the offset to the neighbor
-generate:
-	pushi
-	length I0, S15
-	# allocate new world with all space
-	repeat S1, " ", I0
-	I1 = 0
-genloop:
-	I2 = 0
-NW:
-	I3 = -size
-	dec I3
-	I3 = I3 + I0
-	I3 = I3 + I1
-	I3 = I3 % I0
-	# S0 is always overwritten, so reuse it
-	substr_r S0, S15, I3, 1
-	if S0 != "*" goto North
-	inc I2
-North:
-	I3 = -size
-	I3 = I3 + I0
-	I3 = I3 + I1
-	I3 = I3 % I0
-	substr_r S0, S15, I3, 1
-	if S0 != "*" goto NE
-	inc I2
-NE:
-	I3 = -size
-	inc I3
-	I3 = I3 + I0
-	I3 = I3 + I1
-	I3 = I3 % I0
-	substr_r S0, S15, I3, 1
-	if S0 != "*" goto West
-	inc I2
-West:
-	I3 = -1
-	I3 = I3 + I0
-	I3 = I3 + I1
-	I3 = I3 % I0
-	substr_r S0, S15, I3, 1
-	if S0 != "*" goto East
-	inc I2
-East:
-	I3 = 1
-	I3 = I3 + I0
-	I3 = I3 + I1
-	I3 = I3 % I0
-	substr_r S0, S15, I3, 1
-	if S0 != "*" goto SW
-	inc I2
-SW:
-	I3 = size
-	dec I3
-	I3 = I3 + I0
-	I3 = I3 + I1
-	I3 = I3 % I0
-	substr_r S0, S15, I3, 1
-	if S0 != "*" goto South
-	inc I2
-South:
-	I3 = size
-	I3 = I3 + I0
-	I3 = I3 + I1
-	I3 = I3 % I0
-	substr_r S0, S15, I3, 1
-	if S0 != "*" goto SE
-	inc I2
-SE:
-	I3 = size
-	inc I3
-	I3 = I3 + I0
-	I3 = I3 + I1
-	I3 = I3 % I0
-	substr_r S0, S15, I3, 1
-	if S0 != "*" goto check
-	inc I2
-check:
-	substr_r S0, S15, I1, 1
-	if S0 == "*" goto check_alive
-
-# If eq 3, put a star in else a space
-check_dead:
-	if I2 == 3 goto star
-	branch space
-
-check_alive:
-	if I2 < 2 goto space
-	if I2 > 3 goto space
-	branch star
-
-space:	# is space already
-	branch iter_done
-star:
-	substr S1, I1, 1, "*"
-iter_done:
-	inc I1
-	lt I1, I0, genloop
-done:
-	popi
-	if  S1 != S15 goto dif
-	   sleep 2
-           stop = 1
-dif:
-	S15 = S1
-	ret
 
 # S15 has the incoming string, S0 is scratch
 dump:
@@ -423,3 +344,169 @@ dumpend:
 	ret
 
 .end
+
+# in: world (string)
+#     size
+# out new world
+#     stop
+.pcc_sub _generate prototyped
+	.param string world
+	.param int size
+
+	.sym int len
+	.sym int pos
+	.sym int count
+	.sym int check	# pos in world
+	.sym string new_world
+	length len, world
+	# allocate new world with all space
+	repeat new_world, " ", len
+	pos = 0
+genloop:
+	count = 0
+NW:
+	check = -size
+	dec check
+	check = check + len
+	check = check + pos
+	check = check % len
+	# $S0 is always overwritten, so reuse it
+	substr_r $S0, world, check, 1
+	if $S0 != "*" goto North
+	inc count
+North:
+	check = -size
+	check = check + len
+	check = check + pos
+	check = check % len
+	substr_r $S0, world, check, 1
+	if $S0 != "*" goto NE
+	inc count
+NE:
+	check = -size
+	inc check
+	check = check + len
+	check = check + pos
+	check = check % len
+	substr_r $S0, world, check, 1
+	if $S0 != "*" goto West
+	inc count
+West:
+	check = -1
+	check = check + len
+	check = check + pos
+	check = check % len
+	substr_r $S0, world, check, 1
+	if $S0 != "*" goto East
+	inc count
+East:
+	check = 1
+	check = check + len
+	check = check + pos
+	check = check % len
+	substr_r $S0, world, check, 1
+	if $S0 != "*" goto SW
+	inc count
+SW:
+	check = size
+	dec check
+	check = check + len
+	check = check + pos
+	check = check % len
+	substr_r $S0, world, check, 1
+	if $S0 != "*" goto South
+	inc count
+South:
+	check = size
+	check = check + len
+	check = check + pos
+	check = check % len
+	substr_r $S0, world, check, 1
+	if $S0 != "*" goto SE
+	inc count
+SE:
+	check = size
+	inc check
+	check = check + len
+	check = check + pos
+	check = check % len
+	substr_r $S0, world, check, 1
+	if $S0 != "*" goto checkl
+	inc count
+checkl:
+	substr_r $S0, world, pos, 1
+	if $S0 == "*" goto check_alive
+
+# If eq 3, put a star in else a space
+check_dead:
+	if count == 3 goto star
+	branch space
+
+check_alive:
+	if count < 2 goto space
+	if count > 3 goto space
+	branch star
+
+space:	# is space already
+	branch iter_done
+star:
+	substr new_world, pos, 1, "*"
+iter_done:
+	inc pos
+	lt pos, len, genloop
+done:
+	.sym int stop
+	stop = 0
+	if  new_world != world goto dif
+	   sleep 2
+           stop = 1
+dif:
+	.pcc_begin_return
+	.return new_world
+	.return stop
+	.pcc_end_return
+.end
+
+.pcc_sub _load_file prototyped
+	.param var argv
+	.param int size
+
+	.sym string world
+	null world
+	.sym string file
+	file = argv[1]
+	.sym var io
+	open io, file, "<"
+	$I0 = defined io
+	unless $I0 goto nok
+	.sym string line
+	$I0 = size * size
+	repeat world, " ", $I0
+	.sym int pos
+	$I0 = size / 2
+	$I1 = $I0 * $I0
+	pos = $I0 + $I1
+	.sym int len
+loop:
+	readline line, io
+	length len, line
+	unless len goto out
+	substr $S0, line, 0, 1
+	eq $S0, "#", loop	# ignore, TODO checl P,R ...
+	chopn line, 1		# \n
+	dec len
+	substr world, pos, len, line
+	pos = pos + size
+	goto loop
+
+out:
+	close io
+	print "XXX"
+	print world
+	print "XXX\n"
+nok:
+	.pcc_begin_return
+	.return world
+	.pcc_end_return
+.end
+
