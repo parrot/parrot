@@ -36,7 +36,7 @@ static void make_stat(IMC_Unit *, int *sets, int *cols);
 static void imc_stat_init(IMC_Unit *);
 static void print_stat(Parrot_Interp, IMC_Unit *);
 static void allocate_wanted_regs(IMC_Unit *);
-static void build_reglist(Parrot_Interp, IMC_Unit * unit);
+static void build_reglist(Parrot_Interp, IMC_Unit * unit, int first);
 static void build_interference_graph(Parrot_Interp, IMC_Unit *);
 static void compute_du_chain(IMC_Unit * unit);
 static void compute_one_du_chain(SymReg * r, IMC_Unit * unit);
@@ -50,7 +50,9 @@ static void order_spilling (IMC_Unit *);
 static void spill (struct Parrot_Interp *, IMC_Unit * unit, int);
 static int try_allocate(Parrot_Interp, IMC_Unit *);
 static void restore_interference_graph(IMC_Unit *);
+#if 0
 static int neighbours(int node);
+#endif
 
 extern int pasm_file;
 /* XXX FIXME: Globals: */
@@ -125,7 +127,7 @@ imc_reg_alloc(struct Parrot_Interp *interpreter, IMC_Unit * unit)
         compute_dominators(interpreter, unit);
         find_loops(interpreter, unit);
 
-        build_reglist(interpreter, unit);
+        build_reglist(interpreter, unit, 1);
         life_analysis(interpreter, unit);
         /* optimize, as long as there is something to do */
         if (dont_optimize)
@@ -166,7 +168,7 @@ imc_reg_alloc(struct Parrot_Interp *interpreter, IMC_Unit * unit)
 #if DOIT_AGAIN_SAM
             find_basic_blocks(interpreter, unit, 0);
             build_cfg(interpreter, unit);
-            build_reglist(interpreter, unit);
+            build_reglist(interpreter, unit, 1);
             life_analysis(interpreter);
 #endif
         }
@@ -282,10 +284,74 @@ sort_reglist(SymReg ** reglist)
     qsort(reglist, n_symbols, sizeof(SymReg*), reg_sort_f);
 }
 
-/* make a linear list of IDENTs and VARs, set n_symbols */
+/*
+ * regs are sorted now according to their start line of usage
+ * run through them and allocate all that don't overlap
+ * in one bunch
+ */
+#ifdef ALLOCATE_HACK
+static void
+allocate_non_interfering(Parrot_Interp interpreter, SymReg ** reglist, int n)
+{
+    int i, t;
+    int first_color, last_line;
+    SymReg *r;
+
+    for (t = 0; t < 4; t++) {
+        int typ = "INSP"[t];
+        first_color = 30;
+again:
+        /* scan reglist if this color is unused */
+        while (first_color >= 16) {
+            for (i = 0; i < n; i++) {
+                r = reglist[i];
+                if (r->set != typ || (r->type & VT_REGP) || r->want_regno >= 0)
+                    continue;
+                if (r->color == first_color) {
+                    first_color--;
+                    goto again;
+                }
+            }
+            break;
+        }
+        if (first_color < 16)
+            fatal(1, "allocate_non_interfering",
+                    "couldn't find a color for register type %c", typ);
+        /*
+         * no scan reglist for small ranged non-interfering regs of that typ
+         */
+        last_line = -1;
+        for (i = 0; i < n; i++) {
+            r = reglist[i];
+            if (r->set != typ || (r->type & VT_REGP) || r->want_regno >= 0)
+                continue;
+            if (r->last_ins->index - r->first_ins->index > 10)
+                continue;
+            /* found a short ranged reg
+             *
+             * if this is used before the previous one ended, they overlap
+             */
+            if (r->first_ins->index <= last_line)
+                continue;
+            last_line = r->last_ins->index;
+            r->color = first_color;
+            r->type = VTPASM;
+            debug(interpreter, DEBUG_IMC, "coloring '%s' %d\n",
+                    r->name, r->color);
+        }
+    }
+}
+#endif
+
+/* make a linear list of IDENTs and VARs, set n_symbols
+ * TODO
+ *   split the whole life analysis into 4, one per register kind
+ *   registers of different kind never interfer, but the reglist
+ *   has them all
+ */
 
 static void
-build_reglist(Parrot_Interp interpreter, IMC_Unit * unit)
+build_reglist(Parrot_Interp interpreter, IMC_Unit * unit, int first)
 {
     int i, count, unused;
 
@@ -304,7 +370,7 @@ build_reglist(Parrot_Interp interpreter, IMC_Unit * unit)
         return;
     if (n_symbols >= HASH_SIZE)
         warning(interpreter, "build_reglist", "probably too small HASH_SIZE"
-                " (%d symbols)\n");
+                " (%d symbols)\n", n_symbols);
     unit->reglist = calloc(n_symbols, sizeof(SymReg*));
     if (unit->reglist == NULL) {
         fatal(1, "build_reglist","Out of mem\n");
@@ -342,6 +408,12 @@ build_reglist(Parrot_Interp interpreter, IMC_Unit * unit)
     n_symbols -= unused;
     unit->n_symbols = n_symbols;
     sort_reglist(unit->reglist);
+    if (first) {
+#ifdef ALLOCATE_HACK
+        allocate_non_interfering(interpreter, unit->reglist, n_symbols);
+        build_reglist(interpreter, unit, 0);
+#endif
+    }
 }
 
 /* creates the interference graph between the variables.
@@ -665,7 +737,7 @@ order_spilling (IMC_Unit * unit)
 	      * I have no clue of how good it is
  	     */
 	    if (!(unit->reglist[x]->simplified)) {
-	        total_score = unit->reglist[x]->score - neighbours(x);
+	        total_score = unit->reglist[x]->score /* - neighbours(x) */;
 
                 if ( (min_node == -1) || (min_score > total_score) )  {
     	           min_node  = x;
@@ -1046,6 +1118,7 @@ spill(struct Parrot_Interp *interpreter, IMC_Unit * unit, int spilled)
 
 }
 
+#if 0
 static int
 neighbours(int node)
 {
@@ -1063,6 +1136,7 @@ neighbours(int node)
 
     return cnt;
 }
+#endif
 
 
 /*
