@@ -9,7 +9,7 @@
 #   actually make this the canonical list....
 
 .macro is_space(CHAR,RETVAL)
-   
+
   # For the purposes of this conversation, newline doesn't 
   # count as whitespace.
 
@@ -26,6 +26,4 @@
   .RETVAL = 1  
 
 .local $DONE:
-  noop
-
 .endm
