@@ -78,7 +78,11 @@
 
 .constant WorkTOS	P17
 
-.constant TempPMC	P27
+.constant TempPMC       P6
+.constant TempPMC2	P7
+.constant TempPMC3      P8
+
+.constant PMCStack	P31
 
 VeryBeginning:
 
@@ -162,13 +166,13 @@ DonePromptString:
 #
 #.endm
 
-#.macro PopP
-#    
-#.endm
+.macro PopPMC
+  restore .PMCStack    
+.endm
 
-#.macro PushP
-#    
-#.endm
+.macro PushPMC
+  save .PMCStack    
+.endm
 
 InitializeCoreOps:
     #
@@ -347,20 +351,19 @@ InitializeCoreOps:
 
     .AddCoreOp(Int_Drop,"drop")
     .AddUserOp("nip", "swap drop")
-#    set .UserOps["nip"], "swap drop" # nip
     .AddCoreOp(Int_Dup,"dup")
     .AddCoreOp(Int_Over, "over")
-    set .UserOps["tuck"], "swap over"
+    .AddUserOp("tuck", "swap over")
     .AddCoreOp(Int_Swap,"swap")
     .AddCoreOp(Stack_Depth, "depth")
 # pick
-# rot
+    .AddCoreOp(Rot_Stack, "rot")
 # -rot
 # ?dup
-# roll
-    set .UserOps["2drop"], "drop drop" # 2drop
+    .AddCoreOp(Roll_Stack, "roll")
+    .AddUserOp("2drop", "drop drop")
 # 2nip
-# 2dup
+    .AddUserOp("2dup", "over over")
 # 2over
 # 2tuck
 # 2swap
@@ -594,8 +597,10 @@ InitializeCoreOps:
    #
    # Miscellaneous other stuff
    #
-   set .UserOps["false"], "0"
-   set .UserOps["true"], "0 invert"
+   .AddUserOp("false", "0")
+   .AddUserOp("true", "0 invert")
+   .AddCoreOp(Print_Space, "space")
+   .AddCoreOp(Print_Spaces, "spaces")
 
     ret
 
@@ -689,14 +694,11 @@ UserWord:
     branch DoneInterpretWord
 PushInt:
     .PushInt
-#    save .IntStack
     branch DoneInterpretWord
 
 Int_One_Minus:
     .PopInt
-#    restore .IntStack
     dec .IntStack
-#    save .IntStack
     .PushInt
     branch DoneInterpretWord
 Int_One_Plus:
@@ -705,29 +707,22 @@ Int_One_Plus:
     .PushInt 
     branch DoneInterpretWord
 Int_Dot:
-    .PopInt 
-    print .IntStack
+    .PopPMC
+    print .PMCStack
     print " "
     branch DoneInterpretWord
 Int_Dot_Stack:
     branch DoneInterpretWord
 Int_Dup:
-    .PopInt 
-    .PushInt 
-    .PushInt 
+    .PopPMC 
+    .PushPMC 
+    .PushPMC 
     branch DoneInterpretWord
 Int_Drop:
-    .PopInt 
+    .PopPMC
     branch DoneInterpretWord
 Int_Swap:
-    .PopInt 
-    set .TempInt, .IntStack
-    .PopInt 
-    set .TempInt2, .IntStack
-    set .IntStack, .TempInt
-    .PushInt 
-    set .IntStack, .TempInt2
-    .PushInt 
+    rotate_up 2
     branch DoneInterpretWord
 Quit:
     end
@@ -989,9 +984,32 @@ Int_Over:
     .PushInt 
     branch DoneInterpretWord
 
+Print_Space:
+    print " "
+    branch DoneInterpretWord
+
+Print_Spaces:
+    .PopInt
+    lt .IntStack, 1, DoneInterpretWord
+  spaceloop:
+    print " "
+    dec .IntStack
+    gt .IntStack, 0, spaceloop
+    branch DoneInterpretWord
+
 Stack_Depth:
     depth .IntStack
     .PushInt
+    branch DoneInterpretWord
+
+Rot_Stack:
+    rotate_up -3
+    branch DoneInterpretWord
+
+Roll_Stack:
+    .PopInt
+    sub .IntStack, 0, .IntStack
+    rotate_up .IntStack
     branch DoneInterpretWord
 
 DoneInterpretWord:
@@ -1231,10 +1249,6 @@ AddIntConstant:
     concat .NewBodyString, .CurrentWord
     concat .NewBodyString, "\n"
     concat .NewBodyString, "save P17\n"
-#    concat .NewBodyString, "set I27, "
-#    concat .NewBodyString, .CurrentWord
-#    concat .NewBodyString, "\n"
-#    concat .NewBodyString, "save I27\n"
     ret
 
 AddFloatConstant:
