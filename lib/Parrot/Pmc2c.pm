@@ -247,7 +247,7 @@ sub new {
 =item C<line_directive($self,$line,$file)>
 
 Generates the C pre processor string for a #line directive, or an empty string
-if C<$self->{opt}{nolines}> is true. 
+if C<$self->{opt}{nolines}> is true.
 
 =cut
 
@@ -443,7 +443,7 @@ my %calltype = (
   "int"      => "i",
   "INTVAL"   => "i",
   "float"    => "f",
-  "FLOATVAL" => "f",
+  "FLOATVAL" => "d",
   "double"   => "d",
   "STRING*"  => "t",
   "char*"    => "t",

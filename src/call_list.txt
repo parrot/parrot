@@ -251,3 +251,5 @@ v	Iiiip
 P	IOPP
 P	IOPPP
 
+# Parrot builtins
+d	IOd
