@@ -7,6 +7,9 @@
 #
 # $Id$
 # $Log$
+# Revision 1.4  2002/07/31 15:46:06  clintp
+# Clarified what 'whitespace' is
+#
 # Revision 1.3  2002/06/16 21:23:28  clintp
 # Floating Point BASIC
 #
@@ -62,10 +65,15 @@ ISWHITE:
 	pushs
 	set I1, 1
 	restore S1
-	le S1, " ", LEAVEWHITE
-	eq S1, "\n", LEAVEWHITE
-	eq S1, "\t", LEAVEWHITE
-	eq S1, "\r", LEAVEWHITE
+	eq S1, "\x00", LEAVEWHITE
+	eq S1, "\x07", LEAVEWHITE
+	eq S1, "\x09", LEAVEWHITE
+	eq S1, "\x0A", LEAVEWHITE
+	eq S1, "\x0B", LEAVEWHITE
+	eq S1, "\x0C", LEAVEWHITE
+	eq S1, "\x0D", LEAVEWHITE
+	eq S1, "\x1B", LEAVEWHITE
+	eq S1, "\x20", LEAVEWHITE
 	set I1, 0
 LEAVEWHITE:
 	save I1
@@ -222,7 +230,7 @@ SLSLOOP:
 	substr S0, S0, 1, I0
 	branch SLSLOOP
 SLSEXIT:
-	save S0
+	savec S0
 	popi
 	pops
 	ret
