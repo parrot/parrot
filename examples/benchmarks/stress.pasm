@@ -1,9 +1,20 @@
-# stress.pasm
-#
-# Do some GC stress-testing
-#
+# Copyright (C) 2001-2003 The Perl Foundation.  All rights reserved.
+# $Id$
 
-# Our outer loops, 10+20+20 times
+=head1 NAME
+
+examples/benchmarks/stress.pasm - GC stress-testing
+
+=head1 SYNOPSIS
+
+    % time ./parrot examples/benchmarks/stress.pasm
+
+=head1 DESCRIPTION
+
+Creates 50 arrays with 10000 elements each, and then prints out the
+total number of DOD runs made.
+
+=cut
 
 	set I0, 10
 	new P0, .PerlArray
@@ -53,3 +64,14 @@ loop1:	new P9, .PerlInt
 	dec I1
 	if I1, loop1
 	ret
+
+=head1 SEE ALSO
+
+F<examples/benchmarks/stress.pl>, 
+F<examples/benchmarks/stress1.pasm>, 
+F<examples/benchmarks/stress1.pl>, 
+F<examples/benchmarks/stress2.pasm>, 
+F<examples/benchmarks/stress2.pl>, 
+F<examples/benchmarks/stress3.pasm>.
+
+=cut

@@ -1,3 +1,20 @@
+# Copyright (C) 2001-2003 The Perl Foundation.  All rights reserved.
+# $Id$
+
+=head1 NAME
+
+examples/benchmarks/freeze.pasm - Freeze/Thaw Benchmarks
+
+=head1 SYNOPSIS
+
+    % time ./parrot examples/benchmarks/freeze.pasm
+
+=head1 DESCRIPTION
+
+Freeze/thaw a Perl array.
+
+=cut
+
     new P0, .PerlArray
     set I0, 100000
     time N0
@@ -48,3 +65,9 @@ lp1:
     print I11
     print "\n"
     end
+
+=head1 SEE ALSO
+
+F<examples/benchmarks/freeze.pl>.
+
+=cut

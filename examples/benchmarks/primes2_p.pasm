@@ -1,3 +1,21 @@
+# Copyright (C) 2001-2003 The Perl Foundation.  All rights reserved.
+# $Id$
+
+=head1 NAME
+
+examples/benchmarks/primes2_p.pasm - Calculate prime numbers < 10000
+
+=head1 SYNOPSIS
+
+    % time ./parrot examples/benchmarks/primes2_p.pasm
+
+=head1 DESCRIPTION
+
+Calculates all the prime numbers up to 10000 using C<PerlInt> PMCs, and
+prints out the number of primes and the last one found.
+
+=cut
+
 new P1, .PerlInt
 set P1, 0
 new P3, .PerlInt
@@ -59,3 +77,13 @@ ret0:
   restoreall
   ret
 
+=head1 SEE ALSO
+
+F<examples/benchmarks/primes.c>, 
+F<examples/benchmarks/primes.pasm>,
+F<examples/benchmarks/primes.pl>, 
+F<examples/benchmarks/primes2.c>, 
+F<examples/benchmarks/primes2.pasm>,
+F<examples/benchmarks/primes2.py>.
+
+=cut

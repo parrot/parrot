@@ -1,6 +1,20 @@
+# Copyright (C) 2001-2003 The Perl Foundation.  All rights reserved.
+# $Id$
 
-# Some simple code to print out the primes up to 100
-# Leon Brocard <acme@astray.com>
+=head1 NAME
+
+examples/benchmarks/primes.pasm - Calculate prime numbers < 50000
+
+=head1 SYNOPSIS
+
+    % ./parrot examples/benchmarks/primes.pasm
+
+=head1 DESCRIPTION
+
+Calculates all the prime numbers up to 50000 and prints out the number
+of primes, the last one found, and the time taken.
+
+=cut
 
 # I1 holds the number we're currently checking for primality
 	set     I1, 1
@@ -43,4 +57,14 @@ NEXT:   # Move on to the next number
 	print	"\n"
 	end
 
+=head1 SEE ALSO
+
+F<examples/benchmarks/primes.c>, 
+F<examples/benchmarks/primes.pl>, 
+F<examples/benchmarks/primes2_p.pasm>,
+F<examples/benchmarks/primes2.c>, 
+F<examples/benchmarks/primes2.pasm>,
+F<examples/benchmarks/primes2.py>.
+
+=cut
 

@@ -1,4 +1,20 @@
-# hand crafted PIR code of arriter.pl
+# Copyright (C) 2001-2003 The Perl Foundation.  All rights reserved.
+# $Id$
+
+=head1 NAME
+
+examples/benchmarks/arriter_o1.imc - Iterator Benchmark
+
+=head1 SYNOPSIS
+
+    % time ./parrot examples/benchmarks/arriter_o1.imc
+
+=head1 DESCRIPTION
+
+Hand-crafted PIR code version of F<examples/benchmarks/arriter.pl>.
+
+=cut
+
 # optimizations:
 # - pull somecode out of the inner loop, s. opt below
 
@@ -133,3 +149,10 @@ iter_2_end:
     print "\n"
     end
 .end
+
+=head1 SEE ALSO
+
+F<examples/benchmarks/arriter.imc>,
+F<examples/benchmarks/arriter.pl>.
+
+=cut

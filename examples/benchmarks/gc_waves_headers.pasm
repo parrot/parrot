@@ -1,3 +1,39 @@
+# Copyright (C) 2001-2003 The Perl Foundation.  All rights reserved.
+# $Id$
+
+=head1 NAME
+
+examples/benchmarks/gc_waves_headers.pasm - GC/DOD Benchmark
+
+=head1 SYNOPSIS
+
+    % ./parrot examples/benchmarks/gc_waves_headers.pasm
+
+=head1 DESCRIPTION
+
+Makes some empty strings with C<concat>, then prints out some statistics
+indicating:
+
+=over 4
+
+=item * the time taken
+
+=item * the total number of bytes allocated
+
+=item * the total of DOD runs made
+
+=item * the total number of collection runs made
+
+=item * the total number of bytes copied
+
+=item * the number of active C<Buffer> C<struct>s
+
+=item * the total number of C<Buffer> C<struct>s
+
+=back
+
+=cut
+
 	set I0, 200
 	set I2, 500
 	set S0,  ""
@@ -66,3 +102,16 @@ getout:	time N6
 	print " total Buffer structs\n"
 
 	end
+
+=head1 SEE ALSO
+
+F<examples/benchmarks/bench_newp.pasm>,
+F<examples/benchmarks/gc_alloc_new.pasm>,
+F<examples/benchmarks/gc_alloc_reuse.pasm>,
+F<examples/benchmarks/gc_generations.pasm>,
+F<examples/benchmarks/gc_header_new.pasm>,
+F<examples/benchmarks/gc_header_reuse.pasm>,
+F<examples/benchmarks/gc_waves_sizeable_data.pasm>,
+F<examples/benchmarks/gc_waves_sizeable_headers.pasm>.
+
+=cut

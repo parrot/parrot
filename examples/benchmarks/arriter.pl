@@ -1,4 +1,22 @@
-#!/usr/bin/perl -w
+#! perl -w
+# Copyright (C) 2001-2003 The Perl Foundation.  All rights reserved.
+# $Id$
+
+=head1 NAME
+
+examples/benchmarks/arriter.pl - Iterator Benchmark
+
+=head1 SYNOPSIS
+
+    % time perl examples/benchmarks/arriter.pl
+
+=head1 DESCRIPTION
+
+Sets up an array an then loops over its contents, incrementing a
+variable and setting hash values.
+
+=cut
+
 use strict;
 
 my (%ha, %hb, $i, @k, @nk, $s);
@@ -31,4 +49,11 @@ print $ha{"BBBBB"};
 print $ha{"CCCCC"};
 print $ha{"HHHHH"};
 print $ha{"IIIII"};
-print "\n"
+print "\n";
+
+=head1 SEE ALSO
+
+F<examples/benchmarks/arriter.imc>,
+F<examples/benchmarks/arriter_o1.imc>.
+
+=cut

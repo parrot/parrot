@@ -1,3 +1,21 @@
+# Copyright (C) 2001-2003 The Perl Foundation.  All rights reserved.
+# $Id$
+
+=head1 NAME
+
+examples/benchmarks/fib.imc - Fibonacci Benchmark
+
+=head1 SYNOPSIS
+
+    % time ./parrot examples/benchmarks/fib.imc n
+
+=head1 DESCRIPTION
+
+Calculates the Fibonacci Number for C<n> (defaults to 24 if
+unspecified).
+
+=cut
+
 .pcc_sub _main prototyped
     .param pmc argv
     .sym int argc
@@ -62,3 +80,8 @@ rec:
     .pcc_end_return
 .end
 
+=head1 SEE ALSO
+
+F<examples/benchmarks/fib.pl>.
+
+=cut

@@ -1,11 +1,35 @@
-# stress3.pasm
-#
-# Do some GC stress-testing
-#
+# Copyright (C) 2001-2003 The Perl Foundation.  All rights reserved.
+# $Id$
 
-# first loop, 100 times use 1.000.000 PMCs
-#
-# with a program arg of 1 these are destroyed before the 2. loop
+=head1 NAME
+
+examples/benchmarks/stress3.pasm - GC stress-testing
+
+=head1 SYNOPSIS
+
+    % time ./parrot examples/benchmarks/stress3.pasm
+
+=head1 DESCRIPTION
+
+Creates a lot of PMCs, and then prints out some statistics indicating:
+
+=over 4
+
+=item * the total number of DOD runs made
+
+=item * the number of active PMCs
+
+=item * the total number of PMC created
+
+=back
+
+Note that a command-line argument of 1 is supposed to cause the PMCs to
+be destroyed before a 2nd loop is run. However, this seems to be broken
+at the moment:
+
+    SArray: Entry not an integer!
+
+=cut
 
 	set I10, P5
 	lt I10, 2, noarg
@@ -55,3 +79,15 @@ loop1:	new P9, .PerlInt
 	dec I1
 	if I1, loop1
 	ret
+
+=head1 SEE ALSO
+
+F<examples/benchmarks/stress.pasm>, 
+F<examples/benchmarks/stress.pl>, 
+F<examples/benchmarks/stress1.pasm>, 
+F<examples/benchmarks/stress1.pl>, 
+F<examples/benchmarks/stress2.pasm>, 
+F<examples/benchmarks/stress2.pl>, 
+F<examples/benchmarks/stress3.pasm>.
+
+=cut

@@ -1,4 +1,21 @@
-#!/usr/bin/perl -w
+#! perl -w
+# Copyright (C) 2001-2003 The Perl Foundation.  All rights reserved.
+# $Id$
+
+=head1 NAME
+
+examples/benchmarks/freeze.pl - Freeze/Thaw Benchmarks
+
+=head1 SYNOPSIS
+
+    % time perl examples/benchmarks/freeze.pl
+
+=head1 DESCRIPTION
+
+Freeze/thaw a Perl array. Uses C<Storable> to archive the array.
+
+=cut
+
 use strict;
 use Storable qw( freeze thaw dclone );
 use Time::HiRes qw( time );
@@ -30,3 +47,8 @@ printf "  thaw time %.6f\n", $e-$s;
 print "Image len ", length($image), "\n";
 print "array size ", scalar(@b), "\n";
 
+=head1 SEE ALSO
+
+F<examples/benchmarks/freeze.pasm>.
+
+=cut
