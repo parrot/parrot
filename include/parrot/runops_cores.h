@@ -14,12 +14,11 @@
 #define PARROT_RUNOPS_CORES_H_GUARD
 
 #include "parrot/parrot.h"
-
 #include "parrot/op.h"
 
 typedef opcode_t * (*runops_core_f)(struct Parrot_Interp *, opcode_t *);
 
-runops_core_f   runops_cores[8];
+extern const runops_core_f runops_cores[8];
 
 opcode_t *
 runops_t0p0b0_core(struct Parrot_Interp *, opcode_t *);

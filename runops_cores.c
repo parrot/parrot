@@ -14,7 +14,7 @@
 
 #include "parrot/interp_guts.h"
 
-runops_core_f   runops_cores[] = {
+const runops_core_f runops_cores[8] = {
   runops_t0p0b0_core,
   runops_t0p0b1_core,
   runops_t0p1b0_core,
