@@ -183,11 +183,11 @@ The number of params in integer registers
 
 =item I2
 
-The number of parameters in PMC registers.
+The number of string parameters
 
 =item I3
 
-The number of string parameters
+The number of parameters in PMC registers.
 
 =item I4
 
@@ -198,7 +198,7 @@ The number of numeric parameters
 The following registers, with the exception of P registers, are used
 I<only> when calling a subroutine for which there is a compile-time
 prototype. The first 11 PMC parameters may be passed in registers P5
-through P15. 
+through P15.
 
 =over 4
 
@@ -266,6 +266,6 @@ like:
 If we were calling without prototyping, all five parameters would be
 passed in as PMCs, in registers P5 through P9. If, on the other hand,
 we were calling with prototyping, a would be in I5, b in I6, c in S5,
-d in P5, and e in N5. 
+d in P5, and e in N5.
 
 =head1 REFERENCES
