@@ -32,8 +32,8 @@
   clear_eh
 
   isnull the_array, array_no 
-  typeof $I0, the_array
-  if $I0 != TclArray goto array_no
+  $I99 = does the_array, "hash"
+  if $I99==0 goto array_no
 
   is_array = 1
   goto subcommand
