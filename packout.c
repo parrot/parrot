@@ -237,14 +237,14 @@ PackFile_Constant_pack(struct PackFile_Constant *self, opcode_t *cursor)
 
     case PFC_KEY:
         packed_size = sizeof(opcode_t);
-        for (i = 0, key = self->u.key; key; key = key->data, i++)
+        for (i = 0, key = self->u.key; key; key = PMC_data(key), i++)
             packed_size += 2 * sizeof(opcode_t);
         /* size */
         *cursor++ = packed_size;
         /* number of key components */
         *cursor++ = i;
         /* and now type / value per component */
-        for (key = self->u.key; key; key = key->data) {
+        for (key = self->u.key; key; key = PMC_data(key)) {
             switch (PObj_get_FLAGS(key) & KEY_type_FLAGS) {
             case KEY_integer_FLAG:
                 *cursor++ = PARROT_ARG_IC;

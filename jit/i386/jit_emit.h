@@ -2573,6 +2573,7 @@ Parrot_jit_build_call_func(struct Parrot_Interp *interpreter, PMC *pmc_nci,
                 emitm_pushl_r(pc, emit_EAX);
                 break;
             case 'p':   /* push pmc->data */
+#if ! PMC_DATA_IN_EXT
                 /* mov pmc, %edx
                  * mov 8(%edx), %eax
                  * push %eax
@@ -2581,6 +2582,20 @@ Parrot_jit_build_call_func(struct Parrot_Interp *interpreter, PMC *pmc_nci,
                         &PMC_REG(count_regs(sig, signature->strstart)));
                 emitm_movl_m_r(pc, emit_EAX, emit_EDX, 0, 1,
                         offsetof(struct PMC, data));
+#else
+                /* push pmc->pmc_ext->data
+                 * mov pmc, %edx
+                 * mov pmc_ext(%edx), %eax
+                 * mov data(%eax), %eax
+                 * push %eax
+                 */
+                jit_emit_mov_rm_i(pc, emit_EDX,
+                        &PMC_REG(count_regs(sig, signature->strstart)));
+                emitm_movl_m_r(pc, emit_EAX, emit_EDX, 0, 1,
+                        offsetof(struct PMC, pmc_ext));
+                emitm_movl_m_r(pc, emit_EAX, emit_EAX, 0, 1,
+                        offsetof(struct PMC_EXT, data));
+#endif
                 emitm_pushl_r(pc, emit_EAX);
                 break;
             case 'v':
@@ -2651,8 +2666,15 @@ Parrot_jit_build_call_func(struct Parrot_Interp *interpreter, PMC *pmc_nci,
             /* eax = PMC, get return value into edx */
             emitm_popl_r(pc, emit_EDX);
             /* stuff return value into pmc->data */
+#if ! PMC_DATA_IN_EXT
             emitm_movl_r_m(pc, emit_EDX, emit_EAX, 0, 1,
                     offsetof(struct PMC, data));
+#else
+            emitm_movl_r_m(pc, emit_EDX, emit_EAX, 0, 1,
+                    offsetof(struct PMC, pmc_ext));
+            emitm_movl_r_m(pc, emit_EAX, emit_EAX, 0, 1,
+                    offsetof(struct PMC_EXT, data));
+#endif
             jit_emit_mov_mr_i(pc, &PMC_REG(next_p++), emit_EAX);
             break;
         case 't':   /* string, determine length, make string */

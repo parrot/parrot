@@ -1454,7 +1454,7 @@ void
 list_splice(Interp *interpreter, List *list, PMC *value, INTVAL offset,
         INTVAL count)
 {
-    List *value_list = (List *)value->data;
+    List *value_list = (List *)PMC_data(value);
     INTVAL value_length = value_list->length;
     INTVAL length = list->length;
     INTVAL i, j;

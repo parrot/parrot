@@ -1912,7 +1912,8 @@ PackFile_Constant_pack_size(struct PackFile_Constant *self)
     case PFC_KEY:
         packed_size = 1;
 
-        for (component = self->u.key; component; component = component->data)
+        for (component = self->u.key; component;
+                component = PMC_data(component))
             packed_size += 2;
         break;
 
@@ -2119,8 +2120,9 @@ PackFile_Constant_unpack_key(struct Parrot_Interp *interpreter,
 
     while (components-- > 0) {
         if (tail) {
-            tail->data = constant_pmc_new_noinit(interpreter, enum_class_Key);
-            tail = tail->data;
+            PMC_data(tail)
+                = constant_pmc_new_noinit(interpreter, enum_class_Key);
+            tail = PMC_data(tail);
         }
         else {
             head = tail = constant_pmc_new_noinit(interpreter, enum_class_Key);

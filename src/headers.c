@@ -38,7 +38,9 @@ get_free_pmc(struct Parrot_Interp *interpreter, struct Small_Object_Pool *pool)
 
     /* clear flags, set is_PMC_FLAG */
     PObj_flags_SETTO(pmc, PObj_is_PMC_FLAG);
+#if ! PMC_DATA_IN_EXT
     PMC_data((PMC *)pmc) = NULL;
+#endif
     ((PMC *)pmc)->pmc_ext = NULL;
     /* TODO check PMCs init method, if they clear the cache */
     return pmc;

@@ -45,7 +45,7 @@ new_io_pmc(theINTERP, ParrotIO *io)
 {
     PMC *new_pmc;
     new_pmc = new_pmc_header(interpreter);
-    new_pmc->data = io;
+    PMC_data(new_pmc) = io;
     new_pmc->vtable = YOU_LOSE_VTABLE;
     return new_pmc;
 }

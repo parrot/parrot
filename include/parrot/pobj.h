@@ -79,16 +79,29 @@ struct parrot_string_t {
     /* commonly-accessed data, *not* pointers to */
     /* completely different data.  That's why it's */
     /* referred to as a "cache". */
+
+/* put data into the PMC_EXT structure - not yet */
+#define PMC_DATA_IN_EXT 0
+
 struct PMC {
     pobj_t obj;
     VTABLE *vtable;
+#if ! PMC_DATA_IN_EXT
     DPOINTER *data;
+#endif
     struct PMC_EXT *pmc_ext;
 };
 
-#define PMC_data(pmc) (pmc)->data
+#if PMC_DATA_IN_EXT
+#  define PMC_data(pmc) (pmc)->pmc_ext->data
+#else
+#  define PMC_data(pmc) (pmc)->data
+#endif
 
 struct PMC_EXT {
+#if PMC_DATA_IN_EXT
+    DPOINTER *data;
+#endif
     PMC *metadata;      /* properties */
 
     SYNC *synchronize;
