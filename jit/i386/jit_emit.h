@@ -2135,7 +2135,7 @@ char floatval_map[] = { 1,2,3,4 };
  * if the following is true, registers are always used
  */
 
-#define ALLOCATE_REGISTERS_ALWAYS 1
+#define ALLOCATE_REGISTERS_ALWAYS 0
 
 /* registers are either allocate per section or per basic block
  * set this to 1 or 0 to change allocation scheme
