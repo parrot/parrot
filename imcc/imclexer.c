@@ -3943,6 +3943,8 @@ include_file (void* interp, char *file_name)
     FILE *file = 0;
     char *ext;
 
+    frame = new_frame();
+
 /* XXX: use this code for miniparrot */
 #if !defined(_PARROTLIB)
     extern const char* Parrot_imcc_include_paths[];
@@ -3968,8 +3970,6 @@ include_file (void* interp, char *file_name)
     }
 
 #endif
-
-    frame = new_frame();
 
     if (!file)
         fataly(EX_SOFTWARE, sourcefile, line, strerror(errno));
@@ -3997,6 +3997,7 @@ scan_file (struct macro_frame_t *frame, FILE *file)
     frames = frame;
 
     /* XXX: Switch the filename */
+    sourcefile = frame->file;
     line = 1;
 
     yy_switch_to_buffer(yy_create_buffer(file, YY_BUF_SIZE));
