@@ -8,6 +8,9 @@
 #
 # $Id$
 # $Log$
+# Revision 1.8  2002/06/03 21:45:01  clintp
+# FINALLY runs under new assembler
+#
 # Revision 1.7  2002/06/03 21:17:59  clintp
 # Assembler fixes
 #
@@ -49,34 +52,34 @@
 PUSHOPSTACK:
         pushi
         pushs
-        get_keyed I0, P25, 0
+        set I0, P25, 0
         inc I0
         restore S0
-        set_keyed P25, I0, S0
-        set_keyed P25, 0, I0
+        set P25, I0, S0
+        set P25, 0, I0
         popi
         pops
         ret
 POPOPSTACK:
         pushi
         pushs
-        get_keyed I0, P25, 0
-        get_keyed S0, P25, I0
+        set I0, P25, 0
+        set S0, P25, I0
         save S0
         dec I0
-        set_keyed P25, 0, I0
+        set P25, 0, I0
         popi
         pops
         ret
 OPSTACKDEPTH:
         pushi
-        get_keyed I0, P25, 0
+        set I0, P25, 0
         save I0
         popi
         ret
 INITOPSTACK:
         new P25, .PerlArray
-        set_keyed P25, 0, 0
+        set P25, 0, 0
         ret
 
 # Function Dispatcher and Test

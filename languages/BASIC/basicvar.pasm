@@ -14,6 +14,9 @@
 #
 # $Id$
 # $Log$
+# Revision 1.8  2002/06/03 21:45:01  clintp
+# FINALLY runs under new assembler
+#
 # Revision 1.7  2002/06/03 14:33:05  clintp
 # More assembler changes
 #
@@ -87,7 +90,7 @@ NSTORE:
 	pushs
 	restore I1   # Value
 	restore S0   # Name
-	set_keyed P20[S0], I1
+	set P20[S0], I1
 	popi
 	pops
 	ret
@@ -97,7 +100,7 @@ NFETCH:
 	pushi
 	pushs
 	restore S0   # Name
-	get_keyed I1, P20[S0]
+	set I1, P20[S0]
 	save I1
 	popi
 	pops
@@ -122,7 +125,7 @@ NFETCH:
 SSTORE: pushs
 	restore S1  # Value
 	restore S0  # Name
-	set_keyed P21[S0], S1
+	set P21[S0], S1
 	pops
 	ret
 	
@@ -132,7 +135,7 @@ SSTORE: pushs
 SFETCH: pushs
 	pushi
 	restore S0  # Name
-	get_keyed S1, P21[S0]
+	set S1, P21, S0
 	length I0, S1
 	ne I0, 0, SNOTNULL
 	set S1, ""
@@ -162,31 +165,31 @@ CFETCH: pushi
         restore I0            # Line number to fetch.
         set I2, I0
         eq I0, -1, CFETCHSTART
-        get_keyed S0, P22, I0
+        set S0, P22, I0
         ne S0, "", CFETCHEND
 
         # Not found.  Let's see if this is a +1
         dec I0
-        get_keyed S0, P22, I0
+        set S0, P22, I0
         ne S0, "", CFETCHNEXT
         branch CNOTFOUND
 
 CFETCHNEXT:
-        get_keyed I1, P23, I0  # Okay, got the line before
+        set I1, P23, I0  # Okay, got the line before
         inc I1
         gt I1, I28, COVERFLOW
-        get_keyed I0, P24, I1  # Next line number is...
+        set I0, P24, I1  # Next line number is...
         eq I0, 0, COVERFLOW
-        get_keyed S0, P22, I0  # Fetch it.
+        set S0, P22, I0  # Fetch it.
         ne S0, "", CFETCHEND
         branch CNOTFOUND       # This is a should-not-happen, I think.
 
 CFETCHSTART:
         set I6, 0    # Line position to fetch
         gt I6, I28, COVERFLOW
-        get_keyed I0, P24, I6
+        set I0, P24, I6
         eq I0, 0, COVERFLOW
-        get_keyed S0, P22, I0  # Fetch line
+        set S0, P22, I0  # Fetch line
         ne S0, "", CFETCHEND
         branch CNOTFOUND       # This is a should-not-happen, I think.
 
@@ -236,8 +239,8 @@ ONELNCK:
 
 CLOAD:  set I0, 0
 CNEXT:  gt I0, I28, CEND
-        get_keyed I3, P24, I0   # Get the next line
-        get_keyed S1, P22, I3   # Get the line code itself
+        set I3, P24, I0   # Get the next line
+        set S1, P22, I3   # Get the line code itself
 	inc I0
 	eq I3, I1, CNEXT	# Skip this, it's being replaced.
 	save S1
@@ -267,10 +270,10 @@ STOREC: eq I5, 0, DONEADD
         restore S0              # Code line
         set I1, S0              # Line Number
 
-        set_keyed P22, I1, S0   # The line itself
+        set P22, I1, S0   # The line itself
         inc I28
-        set_keyed P23, I1, I28   # Index back to array
-        set_keyed P24, I28, I1
+        set P23, I1, I28   # Index back to array
+        set P24, I28, I1
         dec I5
         branch STOREC
 
