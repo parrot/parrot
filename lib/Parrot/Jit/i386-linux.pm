@@ -1,5 +1,9 @@
 package Parrot::Jit;
 
+$Push_Inmediate = '\\x68';
+$Push = '\\xff\\x35';
+$Call = '\\xe8';
+
 my %syscall_number = (
     "WRITE"         => 4,
     "GETTIMEOFDAY"  => 78
@@ -31,7 +35,7 @@ sub system_call($$$) {
     $sys_n = $syscall_number{$sys_n};
 
     for ($k = 0; $k < $arg_c; $k++) {
-        $arg_v =~ s/([VA])([\&\*][a-zA-Z]+\d+)//; 
+        $arg_v =~ s/([VA])([\&\*][a-zA-Z_]+\[\d+\])//; 
         $t = $1;
         $j = $2;
         if ($t eq 'V') {

@@ -24,7 +24,7 @@ my ($function, $body, $line);
 
 my ($position, $bytecode, $type, $number, $size, $char, $move, $strflag);
 
-my (%core_ops, %string, $arg, $tmp, $which, $argc, $argv, $syscall, $tmp_bytecode, $nargop);
+my (%core_ops, %string, %lib, $arg, $tmp, $which, $argc, $argv, $syscall, $tmp_bytecode, $nargop);
 
 my (@values);
 my (@value_p);
@@ -33,8 +33,12 @@ my (@value_f);
 
 # Don't know if this should be keep separate per plataform, but that's easy.
 my %Call = (
-    "printf"        => 0,
-    "fflush"        => 1
+    "printf"                => 0,
+    "fflush"                => 1,
+    "string_copy"           => 2,
+    "string_compare"        => 3,
+    "pop_generic_entry"     => 4,
+    "push_generic_entry"    => 5
 );
 
 open (IN,"jit/$cpuarch/core.jit");
@@ -53,39 +57,73 @@ while ($line = <IN>) {
     $string{$function} = $body;
 }
 
+open (IN,"jit/$cpuarch/lib.jit");
+while ($line = <IN>) {
+    next if (($line =~ m/^[#;]/) || ($line =~ m/^\s*$/));
+    ($function, $body) = split(":",$line);
+    $body =~ s/\s+//g;
+    $lib{$function} = $body;
+}
+
 for ($i = 0; $i < $core_numops; $i++) {
-	$body = $core_ops{$core_opfunc[$i]};
+    $body = $core_ops{$core_opfunc[$i]};
     $body = "\\x00" unless defined $body;
 
     my $op = $Parrot::OpLib::core::ops->[$i];
 
-	$bytecode = "";
-	$move     = 0;
-	$position = 0;
-	@value_p  = ();
-	@value_n  = ();
-	@values   = ();
+    $bytecode = "";
+    $move     = 0;
+    $position = 0;
+    @value_p  = ();
+    @value_n  = ();
+    @values   = ();
 
-	while($move != length($body)) {
-		$char = substr($body,$move,1);    
-		if ($char eq '\\') {
-			# Copy the byte
-			$bytecode .= substr($body,$move,4);
-			$move += 4;
-			$position += 1;
-		}
-        if ($char eq 'C') {
+    while($move != length($body)) {
+        $char = substr($body,$move,1);    
+        if ($char eq '\\') {
+            # Copy the byte
+            $bytecode .= substr($body,$move,4);
+            $move += 4;
+            $position += 1;
+        }
+        elsif ($char eq 'J') {
+            # JUMP
+            
+            # Refer to jit.pod for an explanation.
+            
+            $tmp_bytecode = "";
+            $tmp = substr($body,index($body,'(',$move) + 1,index($body,')',$move) - index($body,'(',$move) - 1);
+    
+            $body =~ s/J[a-zA-Z_]*\([^\)]*\)//;
+            if ($tmp eq 'END') {
+                # Jump to the next op.
+                $bytecode .= 'END';
+                $position += 4;
+            } elsif ($tmp =~ m/INT_CONST/) {
+                $tmp =~ m/[\&\*]?[a-zA-Z_]+\[(\d+)\]/;
+                $n = 24;
+                $number = $1; 
+                $values[$n]++;
+                $bytecode .= '\\x00' x 4;
+                $value_p[$n][$values[$n]] = $position;
+                $value_n[$n][$values[$n]] = $number;
+                $position += 4;
+             } else {
+                die "Don't know how to jump to: $tmp\n";
+             }
+        }
+        elsif ($char eq 'C') {
             # call a C function
 
             $tmp_bytecode = "";
-            $tmp = substr($body,$move,index($body,')',$move) + 1);
+            $tmp = substr($body,index($body,'(',$move),index($body,')',$move) + 1);
             $tmp =~ m/(\w+),([^\)]*)\)/;
             $function = $1;
             $k = $argc = $argv = $2;
 
             # Contorned atempt to get argc
-            $k =~ s/([\*][a-zA-Z_]+\d+)//g;
-            $argc =~ s/([\&][a-zA-Z_]+\d+)//g;
+            $k =~ s/([VA][\*][a-zA-Z_]+\[\d+\])//g;
+            $argc =~ s/([VA][\&][a-zA-Z_]+\[\d+\])//g;
             $k =~ s/[^\&]//g;
             $k = length($k);
             $argc =~ s/[^\*]//g;
@@ -96,262 +134,285 @@ for ($i = 0; $i < $core_numops; $i++) {
                 
                 $j = 1;
                 for($k = 0; $k < $argc; $k++) {
-                    $argv =~ s/([\&\*][a-zA-Z_]+\d+)//;
-                    $tmp_bytecode .= '\\x68' . $1;
-                    $j += 5;
+                    $argv =~ s/([VA])([\&\*][a-zA-Z_]+\[\d+\])$//;
+                    if ($1 eq 'V') {
+                        $tmp_bytecode .= $Parrot::Jit::Push_Inmediate . $2;
+                        $j += 5;
+                    } else {
+                        $tmp_bytecode .= $Parrot::Jit::Push . $2;
+                        $j += 6;
+                    }
                 }
-        	    $tmp_bytecode .= '\\xe8' . '\\x00' x 4;
-          	    $values[$n]++;
+                $tmp_bytecode .= $Parrot::Jit::Call . '\\x00' x 4;
+                $values[$n]++;
                 $value_p[$n][$values[$n]] = $position + $j;
                 $value_n[$n][$values[$n]] = $Call{$function};
-                $body =~ s/C\([^\)]*\)/$tmp_bytecode/;
+                $body =~ s/C[a-zA-Z_]*\([^\)]*\)/$tmp_bytecode/;
+            } else {
+                die "Unknown C function: " . $body . "\n";
             }
         }
-		if ($char eq 'F') {
-			# fuction
-			$tmp_bytecode = "";
-			$tmp = substr($body,$move,index($body,')',$move) + 1);
-			$tmp =~ m/(\w+),([^\)]*)\)/;
-			$function = $1;
-			$argv = $2;
-			if (defined($string{$function})) {
-				$argc = $tmp_bytecode = $string{$function};
-				$argc =~ s/[^A]//g;
-				$argc = length($argc);
-				for($k = 0; $k < $argc; $k++) {
-					$argv =~ s/([\&\*][a-zA-Z_]+\d+)//; 
-					$arg = $1;
-					$tmp_bytecode =~ s/A/$arg/;
-				}
-			}
-			$body =~ s/F\([^\)]*\)/$tmp_bytecode/;
-		}
-		if ($char eq 'S') {
-			# system call
-			$tmp = substr($body,$move,index($body,')',$move) + 1);
-			$tmp =~ m/(\w+),(\d+),([^\)]*)\)/;
-			$syscall = $1;
-			$argc = $2;
-			$argv = $3;
+        elsif ($char eq 'F') {
+            # fuction
+            $tmp_bytecode = "";
+            $tmp = substr($body,index($body,'(',$move),index($body,')',$move) + 1);
+            $tmp =~ m/(\w+),([^\)]*)\)/;
+            $function = $1;
+            $k = $argc = $argv = $2;
+            if (defined($string{$function})) {
+                $tmp_bytecode = $string{$function};
+            } elsif (defined($lib{$function})) {
+                $tmp_bytecode = $lib{$function};
+            } else {
+                die "Unknown function: $function called from: $body\n";
+            }
 
-			$tmp_bytecode = Parrot::Jit::system_call($argc,$argv,$syscall);
-			
-			$body =~ s/S\([^\)]*\)/$tmp_bytecode/;
-		}
-		if ($char =~ m/[\&\*]/) {
-			# Copy \x00 * sizeof(INTVAL) to the bytecode and add to the list
-			$tmp = substr($body,$move,length($body) - $move + 1);
-			$tmp =~ m/([\&\*][a-zA-Z_]+)(\d+)/;
-			$type = $1;
-			$number = $2;
-			$strflag = undef;
-			if ($type eq '&IR') {
-				$n = 0;
-			}
-			elsif ($type eq '&NR') {
-				$n = 1;
-			}
-			elsif ($type eq '&SR') {
-				$n = 2;
-				$strflag = 0;
-			}
-			elsif ($type eq '&SRbufstart') {
-				$n = 2;
-				$strflag = 1;
-			}
-			elsif ($type eq '&SRbuflen') {
-				$n = 2;
-				$strflag = 2;
-			}
-			elsif ($type eq '&SRflags') {
-				$n = 2;
-				$strflag = 3;
-			}
-			elsif ($type eq '&SRbufused') {
-				$n = 2;
-				$strflag = 4;
-			}
-			elsif ($type eq '&SRstrlen') {
-				$n = 2;
-				$strflag = 5;
-			}
-			elsif ($type eq '&SRencoding') {
-				$n = 2;
-				$strflag = 6;
-			}
-			elsif ($type eq '&SRtype') {
-				$n = 2;
-				$strflag = 7;
-			}
-			elsif ($type eq '&SRlanguage') {
-				$n = 2;
-				$strflag = 8;
-			}
-			elsif ($type eq '&PR') {
-				$n = 3;
-			}
-			elsif ($type eq '*IC') {
-				$n = 4;
-			}
-			elsif ($type eq '*NC') {
-				$n = 5;
-			}
-			elsif ($type eq '*SC') {
-				$n = 6;
-				$strflag = 0;
-			}
-			elsif ($type eq '*SCbufstart') {
-				$n = 6;
-				$strflag = 1;
-			}
-			elsif ($type eq '*SCbuflen') {
-				$n = 6;
-				$strflag = 2;
-			}
-			elsif ($type eq '*SCflags') {
-				$n = 6;
-				$strflag = 3;
-			}
-			elsif ($type eq '*SCbufused') {
-				$n = 6;
-				$strflag = 4;
-			}
-			elsif ($type eq '*SCstrlen') {
-				$n = 6;
-				$strflag = 5;
-			}
-			elsif ($type eq '*SCencoding') {
-				$n = 6;
-				$strflag = 6;
-			}
-			elsif ($type eq '*SCtype') {
-				$n = 6;
-				$strflag = 7;
-			}
-			elsif ($type eq '*SClanguage') {
-				$n = 6;
-				$strflag = 8;
-			}
-			elsif ($type eq '*PC') {
-				$n = 7;
-			}
-			elsif ($type eq '&IC') {
-				$n = 8;
-			}
-			elsif ($type eq '&NC') {
-				$n = 9;
-			}
-			elsif ($type eq '&SC') {
-				$n = 10;
-				$strflag = 0;
-			}
-			elsif ($type eq '&SCbufstart') {
-				$n = 10;
-				$strflag = 1;
-			}
-			elsif ($type eq '&SCbuflen') {
-				$n = 10;
-				$strflag = 2;
-			}
-			elsif ($type eq '&SCflags') {
-				$n = 10;
-				$strflag = 3;
-			}
-			elsif ($type eq '&SCbufused') {
-				$n = 10;
-				$strflag = 4;
-			}
-			elsif ($type eq '&SCstrlen') {
-				$n = 10;
-				$strflag = 5;
-			}
-			elsif ($type eq '&SCencoding') {
-				$n = 10;
-				$strflag = 6;
-			}
-			elsif ($type eq '&SCtype') {
-				$n = 10;
-				$strflag = 7;
-			}
-			elsif ($type eq '&SClanguage') {
-				$n = 10;
-				$strflag = 8;
-			}
-			elsif ($type eq '&PC') {
-				$n = 11;
-			}
-			elsif ($type eq '&TI') {
-				$n = 12;
-			}
-			elsif ($type eq '&TN') {
-				$n = 13;
-			}
-			elsif ($type eq '&TS') {
-				$n = 14;
-			}
-			elsif ($type eq '&TC') {
-				$n = 15;
-			}
+            # Contorned atempt to get argc
+            $k =~ s/([\*][a-zA-Z_]+\[\d+\])//g;
+            $argc =~ s/([\&][a-zA-Z_]+\[\d+\])//g;
+            $k =~ s/[^\&]//g;
+            $k = length($k);
+            $argc =~ s/[^\*]//g;
+            $argc = length($argc) + $k;
+
+            for($k = 0; $k < $argc; $k++) {
+                $argv =~ s/([\&\*][a-zA-Z_]+\[\d+\])//; 
+                $arg = $1;
+                $tmp_bytecode =~ s/ARG/$arg/;
+            }
+            $body =~ s/F[a-zA-Z_]*\([^\)]*\)/$tmp_bytecode/;
+        }
+        elsif ($char eq 'S') {
+            # system call
+            $tmp = substr($body,index($body,'(',$move),index($body,')',$move) + 1);
+            $tmp =~ m/(\w+),(\d+),([^\)]*)\)/;
+            $syscall = $1;
+            $argc = $2;
+            $argv = $3;
+
+            $tmp_bytecode = Parrot::Jit::system_call($argc,$argv,$syscall);
+            
+            $body =~ s/S[a-zA-Z_]*\([^\)]*\)/$tmp_bytecode/;
+        }
+        elsif ($char =~ m/[\&\*]/) {
+            # Copy \x00 * sizeof(INTVAL) to the bytecode and add to the list
+            $tmp_bytecode = undef;
+
+            $tmp = substr($body,$move,length($body) - $move + 1);
+            $tmp =~ m/([\&\*][a-zA-Z_]+)\[(\d+)\]/;
+            $type = $1;
+            $number = $2;
+            $strflag = undef;
+            if ($type eq '&INT_REG') {
+                $n = 0;
+            }
+            elsif ($type eq '&NUM_REG') {
+                $n = 1;
+            }
+            elsif ($type eq '&STRING_REG') {
+                $n = 2;
+            }
+            elsif ($type eq '&PR') {
+                $n = 3;
+            }
+            elsif ($type eq '*INT_CONST') {
+                $n = 4;
+            }
+            elsif ($type eq '*NUM_CONST') {
+                $n = 5;
+            }
+            elsif ($type eq '*STRING_CONST') {
+                $n = 6;
+                $strflag = 0;
+            }
+            elsif ($type eq '*STRING_CONST_bufstart') {
+                $n = 6;
+                $strflag = 1;
+            }
+            elsif ($type eq '*STRING_CONST_buflen') {
+                $n = 6;
+                $strflag = 2;
+            }
+            elsif ($type eq '*STRING_CONST_flags') {
+                $n = 6;
+                $strflag = 3;
+            }
+            elsif ($type eq '*STRING_CONST_bufused') {
+                $n = 6;
+                $strflag = 4;
+            }
+            elsif ($type eq '*STRING_CONST_strlen') {
+                $n = 6;
+                $strflag = 5;
+            }
+            elsif ($type eq '*STRING_CONST_encoding') {
+                $n = 6;
+                $strflag = 6;
+            }
+            elsif ($type eq '*STRING_CONST_type') {
+                $n = 6;
+                $strflag = 7;
+            }
+            elsif ($type eq '*STRING_CONST_language') {
+                $n = 6;
+                $strflag = 8;
+            }
+            elsif ($type eq '*PC') {
+                $n = 7;
+            }
+            elsif ($type eq '&INT_CONST') {
+                $n = 8;
+            }
+            elsif ($type eq '&NUM_CONST') {
+                $n = 9;
+            }
+            elsif ($type eq '&STRING_CONST') {
+                $n = 10;
+                $strflag = 0;
+            }
+            elsif ($type eq '&STRING_CONST_bufstart') {
+                $n = 10;
+                $strflag = 1;
+            }
+            elsif ($type eq '&STRING_CONST_buflen') {
+                $n = 10;
+                $strflag = 2;
+            }
+            elsif ($type eq '&STRING_CONST_flags') {
+                $n = 10;
+                $strflag = 3;
+            }
+            elsif ($type eq '&STRING_CONST_bufused') {
+                $n = 10;
+                $strflag = 4;
+            }
+            elsif ($type eq '&STRING_CONST_strlen') {
+                $n = 10;
+                $strflag = 5;
+            }
+            elsif ($type eq '&STRING_CONST_encoding') {
+                $n = 10;
+                $strflag = 6;
+            }
+            elsif ($type eq '&STRING_CONST_type') {
+                $n = 10;
+                $strflag = 7;
+            }
+            elsif ($type eq '&STRING_CONST_language') {
+                $n = 10;
+                $strflag = 8;
+            }
+            elsif ($type eq '&PC') {
+                $n = 11;
+            }
+            elsif ($type eq '&TEMP_INT') {
+                $n = 12;
+            }
+            elsif ($type eq '&TEMP_NUM') {
+                $n = 13;
+            }
+            elsif ($type eq '&TS') {
+                $n = 14;
+            }
+            elsif ($type eq '&TEMP_CHAR') {
+                $n = 15;
+            }
             elsif ($type eq '*CONST_INTVAL') {
                 $n = 16;
             }
-			elsif ($type eq '&CF') {
-				$n = 21;
-			}
-			elsif ($type eq '&CC') {
-				$n = 23;
-			}
-			elsif ($type eq '*JIC') {
-				$n = 24;
-			}
-			$bytecode .= '\\x00' x 4;
-			$values[$n]++;
-			$value_p[$n][$values[$n]] = $position;
-			$value_n[$n][$values[$n]] = $number;
-			$value_f[$n][$values[$n]] = $strflag;
-			$move += length($type) + length($number);
-			$position += 4;
-		}
-	}
+            elsif ($type eq '&CONST_INTVAL') {
+                $n = 20;
+            }
+            elsif ($type eq '&CONST_FLOAT') {
+                $n = 21;
+            }
+            elsif ($type eq '&CONST_CHAR') {
+                $n = 23;
+            }
+            elsif ($type eq '*JUMP_INT_CONST') {
+                $n = 24;
+            } 
+            elsif ($type eq '&INTERPRETER') {
+                $n = 28;
+            } 
+            elsif ($type eq '*CUR_OPCODE') {
+                $n = 29;
+            } 
+            else {
+                die "Unknown type: $type\n";
+            }
 
-	$tmp    =  $bytecode;
-	$tmp    =~ s/[^x]//g;
-	$size   =  length($tmp);
+            $values[$n]++;
+            $bytecode .= '\\x00' x 4;
+            $value_p[$n][$values[$n]] = $position;
+            $value_n[$n][$values[$n]] = $number;
+            $value_f[$n][$values[$n]] = $strflag;
+            $move += length($type) + length($number) + 2;
+            $position += 4;
+        }
+        else {
+            die "Syntax wrong: $body\nUnknown identifier: $char at $move\n";
+        }
+    }
+    $tmp_bytecode = "";
+    while ($bytecode =~ m/END/) {
+        $tmp_bytecode="";
+        $tmp = substr($bytecode,index($bytecode,'E'),length($bytecode) - index($bytecode,'N'));
+        $tmp    =~ s/[^x]//g;
+        $tmp   =  length($tmp);
+        $tmp = sprintf("%x",$tmp);
+        for ($k = 1; $k <= 4; $k++) {
+            if ($tmp) {
+                $tmp =~ s/(.?.)$//;
+                $j = $1;
+                $j = "0" . $j if length($j) == 1;
+             } else {
+                $j = "00";
+             }
+             $tmp_bytecode .= "\\x" . $j; 
+        }
+        $bytecode =~ s/END/$tmp_bytecode/;
+    }
+
+    $tmp    =  $bytecode;
+    $tmp    =~ s/[^x]//g;
+    $size   =  length($tmp);
+
     $nargop =  $op->size;
 
 #    print STDERR "Shipping out code for " . $op->func_name . "...\n";
 
-	print <<END;
+    print <<END;
 { /* op $i: $core_opfunc[$i] */
   "$bytecode",
   $size,
   $nargop,
 END
 
-	for ($k = 0; $k < 28; $k++) {
-		print "  {\n";
+    for ($k = 0; $k <= 29; $k++) {
+        print "  {\n";
 
-		if (defined($values[$k])) {
-			print "    ", $values[$k], ",\n";
-			print "    {\n";
+        if (defined($values[$k])) {
+            print "    ", $values[$k], ",\n";
+            print "    {\n";
 
-			for($j = 1; $j <= $values[$k]; $j++) {
-				print("      {", $value_p[$k][$j], ", ", $value_n[$k][$j]);
-				print(", ", $value_f[$k][$j]) if (defined($value_f[$k][$j]));
-				print("},\n");
-			}
+            for($j = 1; $j <= $values[$k]; $j++) {
+                print("      {", $value_p[$k][$j], ", ", $value_n[$k][$j]);
+                print(", ", $value_f[$k][$j]) if (defined($value_f[$k][$j]));
+                print("},\n");
+            }
 
-			print "    }\n";
-		}
+            print "    }\n";
+        }
         else {
             print "    0,\n";
-			print "    {\n";
+            print "    {\n";
             print "      {0, 0},\n";
-			print "    }\n";
+            print "    }\n";
         }
 
-		print "  },\n";
-	}
+        print "  },\n";
+    }
 
     print "},\n";
 }

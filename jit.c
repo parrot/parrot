@@ -18,12 +18,11 @@ char temp_char[100];
 
 /* Constants */
 
-INTVAL const_intval[1]         = { (INTVAL)0 };
+INTVAL const_intval[3]         = { (INTVAL)0,(INTVAL)0,(INTVAL)0 };
 FLOATVAL floatval_constants[1] = { 1000000.0 };
-
-
 char char_constants[] = "%f";
 
+INTVAL *op_real_address; 
 
 /*
 ** build_asm()
@@ -40,12 +39,18 @@ build_asm(struct Parrot_Interp *interpreter,opcode_t *pc, opcode_t *code_start, 
 
     substitution_t v;
     string_substitution_t sv;
+    temp_int_substitution_t tiv;
     STRING *s;
 
-    const_intval[0] = (INTVAL)stdout;
-
     /* how should I allocate memory? */
-    op_address = (INTVAL *)malloc(1024 * sizeof(INTVAL)); 
+    op_address = (INTVAL *)malloc((code_end - code_start + START_SIZE + 3) * sizeof(INTVAL)); 
+
+    op_real_address = (INTVAL *)malloc((code_end - code_start + START_SIZE + 3) * sizeof(INTVAL)); 
+
+    /* intval constants */
+    const_intval[0] = (INTVAL)stdout;
+    const_intval[1] = (INTVAL)STACK_ENTRY_DESTINATION;
+    const_intval[2] = (INTVAL)op_real_address;
 
     k = 0;
 
@@ -90,9 +95,11 @@ build_asm(struct Parrot_Interp *interpreter,opcode_t *pc, opcode_t *code_start, 
         about how many register and of which type 
         the opcode requires.
     */
+
     while (pc < code_end)
     {
         memcpy(arena,op_assembly[*pc].assembly,op_assembly[*pc].size);
+        op_real_address[bytecode_position] = (INTVAL)arena_start + op_address[bytecode_position];
 
         /* Address of a INTVAL register */
         v = op_assembly[*pc].intval_register_address; 
@@ -109,43 +116,13 @@ build_asm(struct Parrot_Interp *interpreter,opcode_t *pc, opcode_t *code_start, 
             memcpy(&arena[v.info[i].position],&address,sizeof(address));
         }
 
-        /* Address of a STRING register or one of it's elements */
-        /* &SR */
-        sv = op_assembly[*pc].string_register_address;
-        for (i = 0; i < sv.amount; i++)
-        {
-            s = interpreter->string_reg->registers[pc[sv.info[i].number]];
-            switch (sv.info[i].flag) {
-                case 0: 
-                        address = (INTVAL *)s;
-                        break;
-                case 1: 
-                        address = (INTVAL *)s->bufstart;
-                        break;
-                case 2: 
-                        address = &s->buflen;
-                        break;
-                case 3: 
-                        address = &s->flags;
-                        break;
-                case 4: 
-                        address = &s->bufused;
-                        break;
-                case 5: 
-                        address = &s->strlen;
-                        break;
-                case 6: 
-                        address = (INTVAL *)&s->encoding;
-                        break;
-                case 7: 
-                        address = (INTVAL *)&s->type;
-                        break;
-                case 8: 
-                        address = &s->language;
-                        break;
-            }
+        /* the address where will be a STRING register */
 
-            memcpy(&arena[sv.info[i].position],&address,sizeof(address));
+        v = op_assembly[*pc].string_register_address;
+        for (i = 0; i < v.amount; i++)
+        {
+            address = (INTVAL *)&interpreter->string_reg->registers[pc[v.info[i].number]];
+            memcpy(&arena[v.info[i].position],&address,sizeof(address));
         }
 
         v = op_assembly[*pc].intval_constant_value;
@@ -242,11 +219,11 @@ build_asm(struct Parrot_Interp *interpreter,opcode_t *pc, opcode_t *code_start, 
             memcpy(&arena[sv.info[i].position],&ivalue,sizeof(ivalue));
         }
 
-        v = op_assembly[*pc].temporary_intval_address;
-        for (i = 0; i < v.amount; i++)
+        tiv = op_assembly[*pc].temporary_intval_address;
+        for (i = 0; i < tiv.amount; i++)
         {
-            address = &temp_intval[v.info[i].number];
-            memcpy(&arena[v.info[i].position],&address,sizeof(address));
+            address = &temp_intval[tiv.info[i].number];
+            memcpy(&arena[tiv.info[i].position],&address,sizeof(address));
         }
         v = op_assembly[*pc].temporary_char_address;
         /* temporary char address */
@@ -256,7 +233,6 @@ build_asm(struct Parrot_Interp *interpreter,opcode_t *pc, opcode_t *code_start, 
             memcpy(&arena[v.info[i].position],&address,sizeof(address));
         }
 
-
         v = op_assembly[*pc].constant_intval_value;
         /* constant_intval_value */
         for (i = 0; i < v.amount; i++)
@@ -264,15 +240,24 @@ build_asm(struct Parrot_Interp *interpreter,opcode_t *pc, opcode_t *code_start, 
             ivalue = const_intval[v.info[i].number];
             memcpy(&arena[v.info[i].position],&ivalue,sizeof(ivalue));
         }
+
+        v = op_assembly[*pc].constant_intval_address;
+        /* constant_intval_address */
+        for (i = 0; i < v.amount; i++)
+        {
+            address = &const_intval[v.info[i].number];
+            memcpy(&arena[v.info[i].position],&address,sizeof(address));
+        }
  
-        v = op_assembly[*pc].c_floatval_a;
+
+        v = op_assembly[*pc].constant_floatval_address;
         /* FLOATVAL CONSTANTS */
         for (i = 0; i < v.amount; i++)
         {
             address = (INTVAL *)&floatval_constants[v.info[i].number];
             memcpy(&arena[v.info[i].position],&address,sizeof(address));
         }
-        v = op_assembly[*pc].c_char_a;
+        v = op_assembly[*pc].constant_char_address;
         /* CHAR CONSTANTS */
         for (i = 0; i < v.amount; i++)
         {
@@ -281,7 +266,7 @@ build_asm(struct Parrot_Interp *interpreter,opcode_t *pc, opcode_t *code_start, 
         }
 
         /* BRANCHES */
-        v = op_assembly[*pc].fixup_v;
+        v = op_assembly[*pc].jump_int_const;
         for (i = 0; i < v.amount; i++)
         {
             address = (INTVAL *)
@@ -291,14 +276,17 @@ build_asm(struct Parrot_Interp *interpreter,opcode_t *pc, opcode_t *code_start, 
                                   pc[v.info[i].number]
                                  ]
                       ); 
+            ivalue = (INTVAL) (arena+v.info[i].position) + 4;
 
-            if (address > (INTVAL *)arena) {
-                address = (INTVAL *)(address - (INTVAL *)arena - 1 );
-            } else {
+            if (address > (INTVAL *)ivalue) {
+                address = (INTVAL *)((char *)address - (char *)ivalue);
+            } else if (address < (INTVAL *)ivalue) {
                 address = (INTVAL *)
                           (-(arena - 
                              (char *)address + 
                              op_assembly[*pc].size));
+            } else {
+                address = 0;
             }
             
             memcpy(&arena[v.info[i].position],&address,sizeof(address));
@@ -315,10 +303,24 @@ build_asm(struct Parrot_Interp *interpreter,opcode_t *pc, opcode_t *code_start, 
                 case 1: 
                         address = (INTVAL *)fflush; 
                         break;
+                case 2: 
+                        address = (INTVAL *)string_copy; 
+                        break;
+                case 3: 
+                        address = (INTVAL *)string_compare; 
+                        break;
+                case 4: 
+                        address = (INTVAL *)pop_generic_entry; 
+                        break;
+                case 5: 
+                        address = (INTVAL *)push_generic_entry; 
+                        break;
             }
 
+            ivalue = (INTVAL) (arena+v.info[i].position) + 4;
+
             if (address > (INTVAL *)arena) {
-                address = (INTVAL *)(address - (INTVAL *)arena - 1);
+                address = (INTVAL *)((char *)address - (char *)ivalue);
             } else {
                 address = (INTVAL *)
                           (-(arena - 
@@ -328,11 +330,33 @@ build_asm(struct Parrot_Interp *interpreter,opcode_t *pc, opcode_t *code_start, 
 
             memcpy(&arena[v.info[i].position],&address,sizeof(address));
         }
+
+        v = op_assembly[*pc].interpreter;
+        for (i = 0; i < v.amount; i++)
+        {
+            switch(v.info[i].number) {
+                case 0: 
+                        address = (INTVAL *)&interpreter; 
+                        break;
+                case 1: 
+                        address = (INTVAL *)&interpreter->control_stack_top; 
+                        break;
+            }
+
+            memcpy(&arena[v.info[i].position],&address,sizeof(address));
+        }
+
+        v = op_assembly[*pc].cur_opcode;;
+        /* cur_opcode */
+        for (i = 0; i < v.amount; i++)
+        {
+            ivalue = (INTVAL)(pc - code_start) + v.info[i].number;
+            memcpy(&arena[v.info[i].position],&ivalue,sizeof(ivalue));
+        }
  
         /* Keep it pointing to "where the code goes" */
         arena += op_assembly[*pc].size;
 
-        /* */
         bytecode_position += op_assembly[*pc].nargop;
         pc += op_assembly[*pc].nargop;
     }
