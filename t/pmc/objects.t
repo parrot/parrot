@@ -16,7 +16,7 @@ Tests the object/class subsystem.
 
 =cut
 
-use Parrot::Test tests => 33;
+use Parrot::Test tests => 36;
 use Test::More;
 
 output_is(<<'CODE', <<'OUTPUT', "findclass (base class)");
@@ -1001,7 +1001,7 @@ output_like(<<'CODE', <<'OUTPUT', "subclassing a non-existant class");
 CODE
 /Class 'Nemo' doesn't exist/
 OUTPUT
-
+# '
 output_like(<<'CODE', <<'OUTPUT', "anon. subclass of non-existant class");
     subclass P1, "Character"
     print "Uh-oh...\n"
@@ -1009,6 +1009,7 @@ output_like(<<'CODE', <<'OUTPUT', "anon. subclass of non-existant class");
 CODE
 /Class 'Character' doesn't exist/
 OUTPUT
+# '
 
 output_like(<<'CODE', <<'OUTPUT', "anon. subclass classname");
     newclass P0, "City"
@@ -1021,4 +1022,73 @@ CODE
 /anonymous/
 OUTPUT
 
+output_is(<<'CODE', <<'OUTPUT', "get attrib by name");
+    newclass P1, "Foo"
+    addattribute P1, "i"
+    find_type I1, "Foo"
+    new P2, I1
+    classoffset I2, P2, "Foo"
+    new P3, .PerlString
+    set P3, "ok\n"
+    setattribute P2, I2, P3
 
+    getattribute P4, P2, "Foo\x0i"
+    print P4
+    end
+CODE
+ok
+OUTPUT
+
+output_is(<<'CODE', <<'OUTPUT', "get attrib by name subclass");
+    loadlib P10, "myops_ops"
+    newclass P0, "Bar"
+    addattribute P0, "j"
+    subclass P1, P0, "Foo"
+    addattribute P1, "i"
+    find_type I1, "Foo"
+    new P2, I1
+    classoffset I2, P2, "Foo"
+    new P3, .PerlString
+    set P3, "foo i\n"
+    setattribute P2, I2, P3
+    classoffset I2, P2, "Bar"
+    new P3, .PerlString
+    set P3, "bar j\n"
+    setattribute P2, I2, P3
+
+    getattribute P4, P2, "Foo\x0i"
+    print P4
+    getattribute P4, P2, "Bar\x0j"
+    print P4
+    end
+CODE
+foo i
+bar j
+OUTPUT
+
+output_is(<<'CODE', <<'OUTPUT', "set attrib by name subclass");
+    loadlib P10, "myops_ops"
+    newclass P0, "Bar"
+    addattribute P0, "j"
+    subclass P1, P0, "Foo"
+    addattribute P1, "i"
+    find_type I1, "Foo"
+    new P2, I1
+    new P3, .PerlString
+    set P3, "foo i\n"
+    setattribute P2, "Foo\x0i", P3
+    new P3, .PerlString
+    set P3, "bar j\n"
+    setattribute P2, "Bar\x0j", P3
+
+    classoffset I2, P2, "Foo"
+    getattribute P4, P2, I2
+    print P4
+    classoffset I2, P2, "Bar"
+    getattribute P4, P2, I2
+    print P4
+    end
+CODE
+foo i
+bar j
+OUTPUT

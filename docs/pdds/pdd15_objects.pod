@@ -263,7 +263,7 @@ Returns the offset of the first attribute for class Sz in object Py.
 Returns attribute Iz of object Py and puts it in Px. Note that the
 attribute number is an absolute offset.
 
-=item getattribute Px, Py, Sz (Unimplemented)
+=item getattribute Px, Py, Sz
 
 Get the attribute with the fully qualified name Sz from object Py and
 put it in Px.
@@ -271,10 +271,10 @@ put it in Px.
 =item setattribute Px, Iy, Pz
 
 Set the attribute Iy of object Px to Pz. Note that this op stores the
-B<actual> PMC rather than a copy, and so if the PMC's value is subsequently 
+B<actual> PMC rather than a copy, and so if the PMC's value is subsequently
 changed, the value of the attribute will also change.
 
-=item setattribute Px, Sy, Pz (Unimplemented)
+=item setattribute Px, Sy, Pz
 
 Set the attribute of object Px with the fully qualified name Sy to Pz
 
@@ -316,7 +316,7 @@ Create a new base class named Sy, and put the PMC for it in Px
 
 =item subclass Px, Py, Sz
 
-Create a new class, named Sz, which has Py as its immediate parent. 
+Create a new class, named Sz, which has Py as its immediate parent.
 
 =item addparent Px, Py
 
@@ -643,7 +643,7 @@ Return the true/false value of the PMC
 
 =item __get_pmc
 
-Return the PMC for this PMC. 
+Return the PMC for this PMC.
 
 =item __get_pmc_keyed
 

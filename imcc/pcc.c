@@ -780,12 +780,13 @@ expand_pcc_sub_call(Parrot_Interp interp, IMC_Unit * unit, Instruction *ins)
     int tail_call;
     int proto;
     int meth_call = 0;
-    SymReg *p2, *s0 = NULL;
+    SymReg *p1, *p2, *s0 = NULL;
 
     /*
-     * we must preserve P2 too
+     * we must preserve P1, P2
      */
     reg = unit->instructions->r[1];   /* the  sub we are in */
+    p1 = reg->pcc_sub->cc_sym;
     p2 = reg->pcc_sub->p2_sym;
 
 #if IMC_TRACE
@@ -963,6 +964,11 @@ move_cc:
         ins = ins->next;
     }
     ins = insINS(interp, unit, ins, "restoretop", regs, 0);
+    if (p1) {
+        regs[0] = get_pasm_reg("P1");
+        regs[1] = p1;
+        ins = insINS(interp, unit, ins, "set", regs, 2);
+    }
     if (p2) {
         regs[0] = get_pasm_reg("P2");
         regs[1] = p2;

@@ -1444,3 +1444,7 @@ mmdvtfind_p_i_ic_ic     1416
 mmdvtfind_p_ic_ic_ic    1417
 isnull_s_ic		1418
 isnull_sc_ic		1419
+getattribute_p_p_s      1420
+getattribute_p_p_sc     1421
+setattribute_p_s_p      1422
+setattribute_p_sc_p     1423

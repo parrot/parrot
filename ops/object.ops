@@ -332,7 +332,10 @@ Remove attribute $2 from class $1, specified either by name or offset.
 
 =item B<getattribute>(out PMC, in PMC, in INT)
 
+=item B<getattribute>(out PMC, in PMC, in STR)
+
 Get attribute number $3 from object $2 and put the result in $1.
+String attribute names have to be fully qualified.
 
 =cut
 
@@ -341,7 +344,14 @@ inline op getattribute(out PMC, in PMC, in INT) :object_classes {
     goto NEXT();
 }
 
+inline op getattribute(out PMC, in PMC, in STR) :object_classes {
+    $1 = Parrot_get_attrib_by_str(interpreter, $2, $3);
+    goto NEXT();
+}
+
 =item B<setattribute>(in PMC, in INT, in PMC)
+
+=item B<setattribute>(in PMC, in STR, in PMC)
 
 Set attribute $2 of object $1 to $3
 
@@ -349,6 +359,11 @@ Set attribute $2 of object $1 to $3
 
 inline op setattribute(in PMC, in INT, in PMC) :object_classes {
     Parrot_set_attrib_by_num(interpreter, $1, $2, $3);
+    goto NEXT();
+}
+
+inline op setattribute(in PMC, in STR, in PMC) :object_classes {
+    Parrot_set_attrib_by_str(interpreter, $1, $2, $3);
     goto NEXT();
 }
 

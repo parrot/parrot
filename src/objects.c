@@ -1014,8 +1014,43 @@ Parrot_get_attrib_by_num(Parrot_Interp interpreter, PMC *object, INTVAL attrib)
     return NULL;
 }
 
+static INTVAL
+attr_str_2_num(Parrot_Interp interpreter, PMC *object, STRING *attr)
+{
+    PMC *class;
+    PMC *attr_hash;
+    SLOTTYPE *class_array;
+    HashBucket *b;
+
+    if (!PObj_is_object_TEST(object))
+        internal_exception(INTERNAL_NOT_IMPLEMENTED,
+                "Can't set non-core object attribs yet");
+
+    class = GET_CLASS((SLOTTYPE *)PMC_data(object), object);
+    class_array = (SLOTTYPE *)PMC_data(class);
+    attr_hash = get_attrib_num(class_array, PCD_ATTRIBUTES);
+    b = hash_get_bucket(interpreter,
+                (Hash*) PMC_struct_val(attr_hash), attr);
+    if (b)
+        return VTABLE_get_integer(interpreter, (PMC*)b->value);
+    /* TODO escape the NUL char(s) */
+    internal_exception(1, "No such attribute '%s'",
+            string_to_cstring(interpreter, attr));
+    return 0;
+}
+
+PMC *
+Parrot_get_attrib_by_str(Parrot_Interp interpreter, PMC *object, STRING *attr)
+{
+    return Parrot_get_attrib_by_num(interpreter, object,
+                POD_FIRST_ATTRIB +
+                attr_str_2_num(interpreter, object, attr));
+}
+
 void
-Parrot_set_attrib_by_num(Parrot_Interp interpreter, PMC *object, INTVAL attrib, PMC *value) {
+Parrot_set_attrib_by_num(Parrot_Interp interpreter, PMC *object,
+        INTVAL attrib, PMC *value)
+{
     SLOTTYPE *attrib_array;
     if (PObj_is_object_TEST(object)) {
         INTVAL attrib_count;
@@ -1027,8 +1062,20 @@ Parrot_set_attrib_by_num(Parrot_Interp interpreter, PMC *object, INTVAL attrib, 
         set_attrib_num(attrib_array, attrib, value);
     }
     else {
-        internal_exception(INTERNAL_NOT_IMPLEMENTED, "Can't set non-core object attribs yet");
+        internal_exception(INTERNAL_NOT_IMPLEMENTED,
+                "Can't set non-core object attribs yet");
     }
+}
+
+void
+Parrot_set_attrib_by_str(Parrot_Interp interpreter, PMC *object,
+        STRING *attr, PMC *value)
+{
+
+    Parrot_set_attrib_by_num(interpreter, object,
+                POD_FIRST_ATTRIB +
+                attr_str_2_num(interpreter, object, attr),
+                value);
 }
 
 INTVAL
