@@ -659,7 +659,7 @@ assignment:
                                            */
                                           $$ = iNEWSUB(interp, cur_unit, NULL, $3,
                                                  mk_address($4, U_add_once),
-                                                 mk_address($5, U_add_once), 1); }
+                                                 mk_address($6, U_add_once), 1); }
     |  target '=' DEFINED var	        { $$ = MK_I(interp, cur_unit, "defined",2, $1,$4); }
     |  target '=' DEFINED var '[' keylist ']' { keyvec=KEY_BIT(2);
                                      $$ = MK_I(interp, cur_unit, "defined", 3, $1, $4, $6); }
