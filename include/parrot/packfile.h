@@ -119,8 +119,6 @@ BOOLVAL PackFile_Constant_unpack_string(struct Parrot_Interp *interpreter,
                                          opcode_t *packed,
                                          opcode_t packed_size);
 
-opcode_t PackFile_Constant_pack_size(struct PackFile_Constant *self);
-
 #endif /* PACKFILE_H */
 
 /*

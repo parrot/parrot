@@ -41,9 +41,6 @@ chartype_lookup_index(INTVAL n);
 
 typedef Parrot_CharType_Transcoder CHARTYPE_TRANSCODER;
 
-CHARTYPE_TRANSCODER
-chartype_lookup_transcoder(const CHARTYPE *from, const CHARTYPE *to);
-
 const Parrot_CharType Parrot_chartype_lookup(const char *name);
 
 #define chartype_lookup Parrot_chartype_lookup

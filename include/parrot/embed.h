@@ -32,8 +32,6 @@ void Parrot_setwarnings(Parrot, Parrot_warnclass);
 
 Parrot_PackFile Parrot_readbc(Parrot, char *);
 
-void Parrot_setwarnings(Parrot, Parrot_warnclass);
-
 void Parrot_loadbc(Parrot, Parrot_PackFile);
 
 void Parrot_runcode(Parrot, int argc, char *argv[]);
