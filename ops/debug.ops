@@ -42,7 +42,7 @@ op debug_init() {
     PDB_t *pdb;
 
     if (!(interpreter->pdb)) {
-        pdb = (PDB_t *)mem_sys_allocate(sizeof(PDB_t));
+        pdb = (PDB_t *)mem_sys_allocate_zeroed(sizeof(PDB_t));
 
         interpreter->pdb = pdb;
         pdb->cur_opcode = interpreter->code->byte_code;
