@@ -112,6 +112,8 @@ find_exception_handler(Parrot_Interp interpreter, PMC *exception)
                 interpreter->ctx.control_stack, 0);
         if (!e)
             break;
+        (void)stack_pop(interpreter, &interpreter->ctx.control_stack,
+                        NULL, e->entry_type);
         if (e->entry_type == STACK_ENTRY_PMC) {
             handler = e->entry.pmc_val;
             if (handler &&
@@ -119,8 +121,6 @@ find_exception_handler(Parrot_Interp interpreter, PMC *exception)
                 return handler;
             }
         }
-        (void)stack_pop(interpreter, &interpreter->ctx.control_stack,
-                        NULL, e->entry_type);
     } while (1);
     m = string_to_cstring(interpreter, message);
     if (m && *m) {
@@ -144,7 +144,7 @@ pop_exception(Parrot_Interp interpreter)
     handler = stack_peek(interpreter, interpreter->ctx.control_stack, &type);
     if (type != STACK_ENTRY_PMC ||
             handler->vtable->base_type != enum_class_Exception_Handler)
-        PANIC("Tried to clear_eh a non Exception_Handler");
+        return; /* no exception on TOS */
     (void)stack_pop(interpreter, &interpreter->ctx.control_stack, NULL,
                     STACK_ENTRY_PMC);
 }
