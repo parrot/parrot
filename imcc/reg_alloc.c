@@ -87,6 +87,7 @@ imc_reg_alloc(struct Parrot_Interp *interpreter, IMC_Unit * unit)
     }
 #endif
 
+    function = unit->instructions->r[0]->name;
     debug(interpreter, DEBUG_IMC, "\n------------------------\n");
     debug(interpreter, DEBUG_IMC, "processing sub %s\n", function);
     debug(interpreter, DEBUG_IMC, "------------------------\n\n");

@@ -249,6 +249,7 @@ run_sub(Parrot_Interp interpreter, PMC* sub_pmc)
      */
     if (interpreter->run_core != PARROT_SWITCH_CORE &&
         interpreter->run_core != PARROT_CGOTO_CORE  &&
+        interpreter->run_core != PARROT_SLOW_CORE  &&
         interpreter->run_core != PARROT_FAST_CORE)
         interpreter->run_core = PARROT_FAST_CORE;
     Parrot_runops_fromc_save(interpreter, sub_pmc);
