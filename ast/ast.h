@@ -5,7 +5,14 @@
 #include "astparser.h"
 
 typedef enum {
-    UNK_CTX		/* unknown context */
+    CTX_UNK,		/* unknown context */
+    CTX_INT,
+    CTX_NUM,
+    CTX_STR,
+    CTX_PMC,
+    CTX_KEY,
+    CTX_BOOL,
+    CTX_VOID
 } context_type;
 
 typedef struct nodeType_t* (*node_opt_t)    (struct nodeType_t*);
@@ -20,7 +27,7 @@ struct _SymReg;
 struct _IMC_Unit;
 
 typedef enum {
-	NODE_HAS_CHILD
+	NODE_HAS_CHILD = 1 << 0
 } node_flags_enum;
 
 typedef struct nodeType_t {
@@ -52,7 +59,7 @@ nodeType * IMCC_append_node(Interp*, nodeType *head, nodeType *tail,
 		YYLTYPE *loc);
 nodeType * IMCC_new_temp_node(Interp*, int set, YYLTYPE *loc);
 
-void IMCC_dump_nodes(nodeType *);
+void IMCC_dump_nodes(Interp *, nodeType *);
 nodeType * IMCC_expand_nodes(Interp*, nodeType *);
 void IMCC_free_nodes(Interp*, nodeType *);
 

@@ -28,6 +28,9 @@ static nodeType* create_0(int nr, nodeType *self, nodeType *p);
 static nodeType* create_1(int nr, nodeType *self, nodeType *p);
 static nodeType* create_Func(int nr, nodeType *self, nodeType *p);
 static nodeType* create_Name(int nr, nodeType *self, nodeType *p);
+static void set_const(nodeType *p);
+
+static int show_context;
 
 /*
  * constant node handling
@@ -51,15 +54,35 @@ exp_Const(Interp* interpreter, nodeType *p)
     return p;
 }
 
-static void
-set_const(nodeType *p)
-{
-    p->expand = exp_Const;
-    /* p->context = const_context; */
-    p->dump = dump_Const;
-    p->description = "Const";
-}
 
+static void dump_context(nodeType *p)
+{
+    int c;
+    fprintf(stderr, "\t[");
+
+    switch (p->up_ctx) {
+        case CTX_UNK: c = ' '; break;
+        case CTX_INT: c = 'I'; break;
+        case CTX_NUM: c = 'N'; break;
+        case CTX_STR: c = 'S'; break;
+        case CTX_PMC: c = 'P'; break;
+        case CTX_KEY: c = 'k'; break;
+        case CTX_BOOL: c = 'b'; break;
+        case CTX_VOID: c = 'v'; break;
+    }
+    fprintf(stderr, "%c] [", c);
+    switch (p->ctx) {
+        case CTX_UNK: c = ' '; break;
+        case CTX_INT: c = 'I'; break;
+        case CTX_NUM: c = 'N'; break;
+        case CTX_STR: c = 'S'; break;
+        case CTX_PMC: c = 'P'; break;
+        case CTX_KEY: c = 'k'; break;
+        case CTX_BOOL: c = 'b'; break;
+        case CTX_VOID: c = 'v'; break;
+    }
+    fprintf(stderr, "%c]", c);
+}
 
 static void
 dump(nodeType *p, int l)
@@ -69,10 +92,11 @@ dump(nodeType *p, int l)
     fprintf(stderr, "%s(", p->description);
     if (p->dump)
 	p->dump(p, l);
-    else {
+    if (show_context)
+        dump_context(p);
+    if (p->flags & NODE_HAS_CHILD) {
 	child = CHILD(p);
-	if (child)
-	    dump(child, l + 1);
+        dump(child, l + 1);
     }
     fprintf(stderr, ")");
     if (p->next )
@@ -82,9 +106,81 @@ dump(nodeType *p, int l)
 static nodeType *
 check_nodes(Interp *interpreter, nodeType *p)
 {
+    /* TODO check node consistency */
     return p;
 }
+/*
+ * node context handling
+ */
 
+/*
+ * promote node context
+ * up and down
+ */
+static context_type
+ctx_default(nodeType *p, context_type outer)
+{
+    context_type inner;
+    nodeType *child, *next;
+
+    for (; p; p = p->next) {
+        p->up_ctx = outer;
+        if (p->context)
+            inner = p->context(p, outer);
+        else if (p->flags & NODE_HAS_CHILD) {
+            child = CHILD(p);
+            ctx_default(child, outer);
+        }
+        else
+            inner = outer;
+        p->ctx = inner;
+    }
+    return inner;
+}
+
+static context_type
+ctx_Const(nodeType *p, context_type ctx)
+{
+    switch (p->u.r->set) {
+        case 'I': ctx = CTX_INT; break;
+        case 'S': ctx = CTX_STR; break;
+        case 'N': ctx = CTX_NUM; break;
+        case 'P': ctx = CTX_PMC; break;
+    }
+    return ctx;
+}
+
+static context_type
+ctx_Var(nodeType *p, context_type ctx)
+{
+    return CTX_PMC;     /* Python - else check options */
+}
+
+static context_type
+ctx_Binary(nodeType *p, context_type ctx)
+{
+    nodeType *op, *left, *right;
+    context_type lc, rc;
+
+    op = CHILD(p);
+    left = op->next;
+    right = left->next;
+
+    lc = ctx_default(left, ctx);
+    rc = ctx_default(right, ctx);
+    if (lc == rc) {
+        p->ctx = CTX_PMC;   /* XXX Python because of overlflow */
+        left->ctx = CTX_PMC;
+    }
+    else
+        p->ctx = left->ctx = right->ctx = CTX_PMC;
+
+    return p->ctx;
+}
+
+/*
+ * node creation
+ */
 static nodeType *
 new_node(YYLTYPE *loc)
 {
@@ -124,6 +220,7 @@ new_temp(YYLTYPE *loc)
     p->expand = exp_Temp;
     p->dump = dump_Var;
     p->description = "Temp";
+    p->context = ctx_Const;
     return p;
 }
 
@@ -256,6 +353,12 @@ exp_Args(Interp* interpreter, nodeType *p)
 static int
 is_symmetric(char *op)
 {
+    /*
+     * Python abuses add as concat and mul as repeat
+     * so only arithmethic PMCs are symmetric
+     */
+    return 0;   /* if python */
+
     return strcmp(op, "add") == 0 ||
            strcmp(op, "mul") == 0
            ? 1 : 0;
@@ -504,6 +607,7 @@ typedef struct {
     node_expand_t expand;
     node_opt_t opt;
     node_dump_t   dump;
+    node_context_t  context;
 } node_names;
 
 /*
@@ -512,31 +616,31 @@ typedef struct {
  */
 
 static node_names ast_list[] = {
-    { "-no-node-", 	NULL, NULL, NULL, NULL },
-    { "Args", 	        create_1, exp_Args, NULL, NULL },
-    { "AssName", 	create_Name, NULL, NULL, NULL },
-    { "Assign", 	create_1, exp_Assign, NULL, NULL },
-    { "Binary", 	create_1, exp_Binary, NULL, NULL },
-    { "Const", 		NULL,     exp_Const, NULL, dump_Const },
-    { "Defaults", 	create_1, exp_Defaults, NULL, NULL },
-    { "Function", 	create_Func, exp_Function, NULL, NULL },
-    { "Line_no",        create_1,  NULL, NULL, NULL },
-    { "Name",           create_Name, NULL, NULL, NULL },
-    { "Op",             create_Name, NULL, NULL, NULL },
-    { "Params", 	create_1, exp_Params, NULL, NULL },
-    { "Parrot_AST", 	create_1, exp_default, NULL, NULL },
-    { "Py_Call", 	create_1, exp_Py_Call, NULL, NULL },
-    { "Py_Local", 	create_Name, exp_Py_Local, NULL, NULL },
-    { "Py_Module", 	create_1, exp_Py_Module, NULL, NULL },
-    { "Py_Print" , 	create_1, exp_Py_Print, NULL, NULL },
-    { "Py_Print_nl",	create_0, exp_Py_Print_nl, NULL, NULL },
-    { "Src_File",    	create_1, NULL, NULL, NULL },
-    { "Src_Line",    	create_1, NULL, NULL, NULL },
-    { "Stmts",          create_1, exp_default, NULL, NULL },
-    { "Void",           create_1, exp_default, NULL, NULL },
-    { "_",              create_0, NULL, NULL, NULL },
-    { "_options",       create_1, NULL, NULL, NULL },
-    { "version",        create_1, exp_default, NULL, NULL }
+    { "-no-node-", 	NULL, NULL, NULL, NULL, NULL },
+    { "Args", 	        create_1, exp_Args, NULL, NULL, NULL },
+    { "AssName", 	create_Name, NULL, NULL, NULL, ctx_Var },
+    { "Assign", 	create_1, exp_Assign, NULL, NULL, NULL },
+    { "Binary", 	create_1, exp_Binary, NULL, NULL, ctx_Binary },
+    { "Const", 		NULL,     exp_Const, NULL, dump_Const, ctx_Const },
+    { "Defaults", 	create_1, exp_Defaults, NULL, NULL, NULL },
+    { "Function", 	create_Func, exp_Function, NULL, NULL, NULL },
+    { "Line_no",        create_1,  NULL, NULL, NULL, NULL },
+    { "Name",           create_Name, NULL, NULL, NULL, ctx_Var },
+    { "Op",             create_Name, NULL, NULL, NULL, NULL },
+    { "Params", 	create_1, exp_Params, NULL, NULL, NULL },
+    { "Parrot_AST", 	create_1, exp_default, NULL, NULL, NULL },
+    { "Py_Call", 	create_1, exp_Py_Call, NULL, NULL, NULL },
+    { "Py_Local", 	create_Name, exp_Py_Local, NULL, NULL, NULL },
+    { "Py_Module", 	create_1, exp_Py_Module, NULL, NULL, NULL },
+    { "Py_Print" , 	create_1, exp_Py_Print, NULL, NULL, NULL },
+    { "Py_Print_nl",	create_0, exp_Py_Print_nl, NULL, NULL, NULL },
+    { "Src_File",    	create_1, NULL, NULL, NULL, NULL },
+    { "Src_Line",    	create_1, NULL, NULL, NULL, NULL },
+    { "Stmts",          create_1, exp_default, NULL, NULL, NULL },
+    { "Void",           create_1, exp_default, NULL, NULL, NULL },
+    { "_",              create_0, NULL, NULL, NULL, NULL },
+    { "_options",       create_1, NULL, NULL, NULL, NULL },
+    { "version",        create_1, exp_default, NULL, NULL, NULL }
 
 #define CONST_NODE 5
 };
@@ -562,6 +666,13 @@ set_fptrs(nodeType *self, int nr)
     self->expand = ast_list[nr].expand;
     self->opt    = ast_list[nr].opt;
     self->dump   = ast_list[nr].dump;
+    self->context =ast_list[nr].context;
+}
+
+static void
+set_const(nodeType *p)
+{
+    set_fptrs(p, CONST_NODE);
 }
 
 /*
@@ -707,6 +818,7 @@ IMCC_new_var_node(Interp* interpreter, char *name, int set, YYLTYPE *loc)
     p->expand = exp_Var;
     p->description = "Var";
     p->dump   = dump_Var;
+    p->context = ctx_Const;
     return p;
 }
 
@@ -790,8 +902,11 @@ Free the nodes.
 */
 
 void
-IMCC_dump_nodes(nodeType *p)
+IMCC_dump_nodes(Interp* interpreter, nodeType *p)
 {
+    if (interpreter->imc_info->debug & (DEBUG_AST << 1)) {
+        show_context = 1;
+    }
     dump(p, 0);
     fprintf(stderr, "\n");
 }
@@ -804,6 +919,7 @@ IMCC_expand_nodes(Interp* interpreter, nodeType *p)
      *      and convert this info to meta info for the node
      */
     p = check_nodes(interpreter, p);
+    ctx_default(p, CTX_VOID);
     return p->expand(interpreter, p);
 }
 
@@ -811,13 +927,14 @@ void
 IMCC_free_nodes(Interp* interpreter, nodeType *p)
 {
     nodeType *child, *next;
-    for (next = p; next; ) {
+    for (; p; ) {
         if (p->flags & NODE_HAS_CHILD) {
             child = CHILD(p);
             IMCC_free_nodes(interpreter, child);
         }
         next = p->next;
         mem_sys_free(p);
+        p = next;
     }
 }
 
