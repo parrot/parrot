@@ -2,8 +2,9 @@ ChangeLog
 Config_pm.in
 Configure.pl
 MANIFEST
-NEWS
 Makefile.in
+NEWS
+README
 Parrot/Assembler.pm
 Parrot/Opcode.pm
 Parrot/PackFile.pm
