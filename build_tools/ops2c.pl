@@ -64,7 +64,7 @@ $base =~ s/\.ops$//;
 my $incdir  = "include/parrot/oplib";
 my $include = "parrot/oplib/${base}_ops${suffix}.h";
 my $header  = "include/$include";
-my $source  = "${base}_ops${suffix}.c";
+my $source  = "src/${base}_ops${suffix}.c";
 
 if ($base =~ m!^dynoplibs/! || $dynamic) {
     $header = "${base}_ops${suffix}.h";

@@ -28,7 +28,7 @@ my $destdir = 'runtime/parrot/include';
 
 sub runstep {
     # need vtable.h now
-    system($^X, "vtable_h.pl");
+    system($^X, "build_tools/vtable_h.pl");
     my @generated = ();
     for my $f (@files) {
 	my $in_def = ''; # in #define='def', in enum='enum'

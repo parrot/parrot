@@ -11,13 +11,12 @@ $description = 'Determining what opcode files should be compiled in...';
 sub runstep {
   my @ops=(
     sort {
-      if($a eq 'core.ops') { return -1 }
-      if($b eq 'core.ops') { return  1 }
+      if($a =~ /core\.ops/) { return -1 }
+      if($b =~ /core\.ops/) { return  1 }
       return               ( $a cmp $b )
     }
     grep { !/vtable\.ops/ }
-    map  { m{\./(.*)}     }
-    glob "./*.ops"
+    glob "ops/*.ops"
   );
   
   

@@ -58,9 +58,9 @@ Usage() unless @ARGV;
 
 my $file = shift @ARGV;
 
-my ($base)  = ($file =~ m{^(.*)\.ops$});
-my $package = "${base}";
-my $module  = "lib/Parrot/OpLib/${package}.pm";
+my ($base)  = ($file =~ m{(\w+)\.ops$});
+my $package = "core";
+my $module  = "lib/Parrot/OpLib/core.pm";
 
 die "$0: Could not find ops file '$file'!\n" unless -e $file;
 my $ops = new Parrot::OpsFile $file;
@@ -163,7 +163,7 @@ sub load_op_map_file {
   my $file = shift;
 
   if (!defined $file) {
-    $file = "ops.num";
+    $file = "ops/ops.num";
   }
 
   my ($name, $number);
