@@ -16,7 +16,7 @@ Tests the object/class subsystem.
 
 =cut
 
-use Parrot::Test tests => 59;
+use Parrot::Test tests => 60;
 use Test::More;
 
 output_is(<<'CODE', <<'OUTPUT', "findclass (base class)");
@@ -1230,7 +1230,7 @@ output_like(<<'CODE', <<'OUTPUT', "anon. subclass classname");
     print "\n"
     end
 CODE
-/anonymous/
+/anon_\d+/
 OUTPUT
 
 output_is(<<'CODE', <<'OUTPUT', "get attrib by name");
@@ -1901,4 +1901,15 @@ output_like(<<'CODE', <<'OUTPUT', "Wrong way to create new objects");
     end
 CODE
 /Can't create new ParrotObject/
+OUTPUT
+
+output_is(<<'CODE', <<'OUTPUT', "multpile anon classes - #33103");
+     newclass P0, "City"
+     subclass P1, P0
+     newclass P2, "State"
+     subclass P3, P2
+     print "ok\n"
+     end
+CODE
+ok
 OUTPUT

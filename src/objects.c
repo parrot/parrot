@@ -315,9 +315,13 @@ Parrot_single_subclass(Parrot_Interp interpreter, PMC *base_class,
         VTABLE_set_string_native(interpreter, classname_pmc, child_class_name);
     }
     else {
-        /* XXX make unique names */
-        child_class_name = string_make(interpreter,
-                "\0\0anonymous", 11, "iso-8859-1", 0);
+        /* XXX not really threadsafe but good enough for now */
+        static int anon_count;
+
+        child_class_name = Parrot_sprintf_c(interpreter, "%c%canon_%d",
+                0, 0, ++anon_count);
+        //child_class_name = string_make(interpreter,
+        //        "\0\0anonymous", 11, "iso-8859-1", 0);
         VTABLE_set_string_native(interpreter, classname_pmc,
                 child_class_name );
     }
