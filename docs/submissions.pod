@@ -21,31 +21,42 @@ then think about submitting a patch.
 
 =head1 How To Submit A Patch
 
-Try to keep your patches specific to a single change.
+Try to keep your patches specific to a single change, and ensure that
+your change does not break any tests.
 
 =over
 
 =item 1
 
-If the change is small it will generally effect only one or two files,
-in which case supply a C<diff> for each file.
+Create the patch.
 
-If the change is more wide-ranging then create two identical copies of
-the latest check-out from CVS, and make your changes in one of them. Run
-a recursive C<diff> on the two directories to create your patch file.
+In the following examples, F<parrot> contains the Parrot distribution,
+and F<parrotdev> contains F<parrot>. The name F<parrotdev> is just a
+placeholder for whatever the distribution's parent directory is called
+on your machine.
 
 =over
 
 =item Single C<diff>
 
-C<diff -u> I<old-file> I<new-file> E<gt> I<patch-name>C<.patch>
+If the change you wish to make is small it will generally effect only
+one or two files, in which case supply a C<diff> for each file. The
+C<diff> should be created in F<parrot>.
+
+    cd parrot
+    diff -u docs/submissions.pod docs/submissions.new > submissions.patch
 
 Win32 users will probably need C<-ub>.
 
 =item Recursive C<diff>
 
-C<diff -ur --exclude=CVS> I<old-directory> I<new-directory> E<gt>
-I<patch-name>C<.patch>
+If the change is more wide-ranging, then create an identical copy of
+F<parrot> in F<parrotdev> and rename it F<parrot.new>. Modify
+F<parrot.new> and run a recursive C<diff> on the two directories to
+create your patch. The C<diff> should be created in F<parrotdev>.
+
+    cd parrotdev
+    diff -ur --exclude=CVS parrot parrot.new > docs.patch
 
 OS X users should also include C<--exclude=.DS_Store>.
 
@@ -86,6 +97,22 @@ B<DO NOT> paste the patch file content into the body of the message.
 Send the mail.
 
 =back
+
+=head2 Applying Patches
+
+You may wish to apply a patch submitted by someone else before the patch
+is incorporated into CVS.
+
+For single C<diff> patches, copy the patch file to F<parrot>, and run:
+
+    cd parrot
+    patch -p0 < single.patch
+
+For recursive C<diff> patches, copy the patch file to F<parrotdev>, and
+run:
+
+    cd parrotdev
+    patch -p0 < recursive.patch
 
 =head1 How To Submit Something New
 
