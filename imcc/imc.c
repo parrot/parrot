@@ -22,6 +22,11 @@ void relop_to_op(int relop, char * op) {
     }
 }
 
+/*
+ * Symbolic Registers manipulation functions
+ */
+
+/* Makes a new SymReg from its varname and type */ 
 SymReg * mk_symreg(const char * name, char t) {
     SymReg * r;
     if((r = get_sym(name)))
@@ -42,12 +47,14 @@ SymReg * mk_symreg(const char * name, char t) {
     return r;
 }
 
+/* Makes a new identifier */
 SymReg * mk_ident(const char * name, char t) {
     SymReg * r = mk_symreg(name, t);
     r->type = VTIDENTIFIER;
     return r;
 }
 
+/* Makes a new constant*/
 SymReg * mk_const(const char * name, char t) {
     SymReg * r;
     if((r = get_sym(name)))
@@ -64,6 +71,7 @@ SymReg * mk_const(const char * name, char t) {
     return r;
 }
 
+/* Makes a new address */
 SymReg * mk_address(const char * name) {
     SymReg * r;
     if((r = get_sym(name)))
@@ -79,6 +87,12 @@ SymReg * mk_address(const char * name) {
     return r;
 }
 
+/* 
+ * IMCC stores the symbols data into a hash, indexed by varname. 
+ * This functions manipulate this hash:
+ */
+
+/* Deletes all symbols */
 void clear_tables() {
     int i;
     for(i = 0; i < HASH_SIZE; i++) {
@@ -87,12 +101,14 @@ void clear_tables() {
     }
 }
 
+/* Stores a symbol into the hash */
 void store_symreg(SymReg * r) {
     int index = hash_str(r->name) % HASH_SIZE;
     r->next = hash[index];
     hash[index] = r;
 }
 
+/* Gets a symbol from the hash */
 SymReg * get_sym(const char * name) {
     SymReg * p;
     int index = hash_str(name) % HASH_SIZE;
@@ -103,6 +119,17 @@ SymReg * get_sym(const char * name) {
     return p;
 }    
 
+/* 
+ * When generating the code, the instructions of the program
+ * are stored in an array. 
+ *
+ * When the register allocation is resolved, the instructions
+ * array is flushed.
+ *  
+ * This functions operate over this array and its contents.
+ */
+
+/* Creates a new instruction */
 Instruction * mk_instruction(const char * fmt, SymReg * r0, SymReg * r1,
 		             SymReg * r2, SymReg * r3)
 {
@@ -123,6 +150,7 @@ Instruction * mk_instruction(const char * fmt, SymReg * r0, SymReg * r1,
     return i;
 }
 
+/* Resizes the array of instructions */
 Instruction ** resize_instructions(Instruction ** i, int num) {
     i = realloc(i, num * sizeof(Instruction *));
     return i;
@@ -183,6 +211,17 @@ void emit_flush() {
 int count;
 int lastbranch;
 
+/* compute_graph creates the interference graph between 
+ * the variables.
+ *
+ * We say that two symbolics interfere unless the last
+ * appareance of one of them happens before the first
+ * one of the other.
+ *
+ * Two symbolics are related in this graph if they 
+ * interfere.
+ */
+
 SymReg ** compute_graph() {
     SymReg ** graph;
     int i;
@@ -242,6 +281,8 @@ SymReg ** compute_graph() {
 }
 
 /* Compute a DU-chain for each symbolic */
+/* Calculates the first and last occurence of each symbolic */
+
 void compute_du_chain(SymReg * r) {
     Instruction * ins;
     int i;
@@ -284,8 +325,13 @@ int interferes(SymReg * r0, SymReg * r1) {
 
 
 /*
- * Color the graph assigning registers to each symbol
+ * Color the graph assigning registers to each symbol:
+ *
+ * We just proceed assigning free colors to the registers.
+ * If we run-out of colors, then we just ignore this
+ * symbol (no spilling yet) 
  */
+
 void color_graph(SymReg ** graph) {
     int x = 0;
     int color, colors[MAX_COLOR];
@@ -306,6 +352,9 @@ void color_graph(SymReg ** graph) {
     }
 }
 
+/*
+ * map_colors: calculates what colors can be assigned to the x-th symbol.
+ */
 int map_colors(int x, SymReg ** graph, int colors[]) {
     int y = 0;
     SymReg * r;
@@ -321,6 +370,9 @@ int map_colors(int x, SymReg ** graph, int colors[]) {
     return free_colors;    
 }
 
+/*
+ * Utility functions
+ */
 
 unsigned int hash_str(const char * str) {
     unsigned long key = 0;

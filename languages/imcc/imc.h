@@ -4,24 +4,26 @@
 #define HASH_SIZE 109
 
 
-enum VARTYPE {
-    VTCONST = 1,
-    VTREG,
-    VTIDENTIFIER,
-    VTADDRESS
+enum VARTYPE {    /*variable type can be      */
+    VTCONST = 1,  /*            constant      */
+    VTREG,        /*            register      */
+    VTIDENTIFIER, /*            identifier    */
+    VTADDRESS     /*            address       */
 };
 
-enum INSTYPE {
-    ITBRANCH = 1,
-    ITOP,
-    ITCALL
+enum INSTYPE {    /*instruction type can be   */
+    ITBRANCH = 1, /*            branch        */
+    ITOP,         /*            normal op     */
+    ITCALL        /*            function call */
 };
 
 /* Ok, this won't scale to architectures like i386, but thats not
  * the goal right now.
  */
 #define MAX_COLOR 32
+
 /*
+
 #define IREG_SET 0
 #define NREG_SET 1
 #define SREG_SET 2
@@ -31,22 +33,24 @@ enum INSTYPE {
 extern int color_map[IREG_SET][MAX_COLOR];
 */
 
-typedef struct _SymReg {
+/* _SymReg holds the info about a symbolic: */
+typedef struct _SymReg {	
     char * name;             /* Symbolic name */
-    char * reg;              /* Real register */
-    char * fmt;              /* I=Int (I%d,...), F=Float, S=String, P=PMC */
-    enum VARTYPE type;
+    char * reg;              /* Real register */    
+    char * fmt;              /* printf style format: I=Int (I%d,...), 
+				F=Float, S=String, P=PMC */    
+    enum VARTYPE type;       /* Variable type */
     char set;                /* Which register set/file it belongs to */
-    int color;
-    int first;
-    int last;
-    struct _SymReg * next;
+    int color;               /* Color: used for the register allocation algorithm */
+    int first;               /* First occurrance of this symbol (in instructions)  */
+    int last;                /* Last ocurrance of this symbol (in instructions) */
+    struct _SymReg * next;   /* ? */
 } SymReg;
 
 typedef struct _Instruction {
-    char * fmt;            /* printf style format string for instruction */
-    SymReg * r0;           /*   uses {r0-r3}->reg                        */
-    SymReg * r1;
+    char * fmt;            /* printf style format string for instruction   */
+    SymReg * r0;           /*   uses {r0-r3}->reg                          */
+    SymReg * r1;           /*   each instruction can use up to 4 registers */
     SymReg * r2;
     SymReg * r3;
     int type;
