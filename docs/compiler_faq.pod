@@ -79,7 +79,7 @@ eleven PMC parameters are passed in P5 through P15, with
 overflow parameters an array-like PMC in P3.
 
 A simpler way is to use the
-foldup opcode, which creates an array of all passed
+C<foldup> opcode, which creates an array of all passed
 PMC arguments.
 
   .sub _mysub non_prototyped
