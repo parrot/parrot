@@ -1462,12 +1462,10 @@ PDB_add_label(PDB_file_t *file, opcode_t *cur_opcode, opcode_t offset)
     PDB_label_t *new, *label = file->label;
 
     /* See if there is already a label at this line */
-    if (label) {
-        while (label) {
-            if (label->opcode == cur_opcode + offset)
-                return label->number;
-            label = label->next;
-        }
+    while (label) {
+        if (label->opcode == cur_opcode + offset)
+            return label->number;
+        label = label->next;
     }
     /* Allocate a new label */
     label = file->label;
