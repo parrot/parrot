@@ -273,6 +273,7 @@ maybe_builtin(Interp *interpreter, IMC_Unit *unit, char *name,
     SymReg *sub, *meth, *rr[10];
 
     assert(n < 15);
+    UNUSED(unit);
     for (i = 0; i < n; ++i) {
         sig[i] = r[i]->set;
         rr[i] = r[i];
@@ -300,7 +301,6 @@ maybe_builtin(Interp *interpreter, IMC_Unit *unit, char *name,
             add_pcc_arg(sub, rr[i]);
         }
         add_pcc_result(sub, rr[0]);
-        emitb(unit, ins);
         return ins;
     }
     else {    /* method y = x."cos"() */
@@ -313,7 +313,6 @@ maybe_builtin(Interp *interpreter, IMC_Unit *unit, char *name,
             add_pcc_arg(sub, rr[i]);
         }
         add_pcc_result(sub, rr[0]);
-        emitb(unit, ins);
         return ins;
     }
     return NULL;
