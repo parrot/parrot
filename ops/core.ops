@@ -229,7 +229,12 @@ Print $1 to standard output.
 
 =item B<print>(in INT, in NUM)
 
+=item B<print>(in INT, in STR)
+
 =item B<print>(in INT, in PMC)
+
+Print $2 to the file specified by file descriptor $1; for $1 equal to
+0, 1 or 2, we use stdin, stdout or stderr respectively.
 
 =cut
 
@@ -2548,8 +2553,13 @@ inline op restore(out STR) {
 
 =item B<rotate_up>(in INT)
 
-Rotate the top $1 entries in the user stack so that the top entry
-becomes the bottom entry in that range.
+Rotate the top $1 entries in the user stack by one. If $1 is positive,
+then the stack rotates upwards: the ($1)th entry becomes the ($1-1)th
+entry and so on, all the way up to the top of the stack, while the
+entry formerly at the top of the stack becomes the new ($1)th entry.
+If $1 is negative, the stack rotates downwards: the top entry becomes
+the second entry, the second becomes the third etc., while the former
+($1)th entry becomes the new top entry.
 
 =cut
 
