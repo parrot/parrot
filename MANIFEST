@@ -75,6 +75,7 @@ config/gen/libparrot_def.pl
 config/gen/libparrot_def/libparrot_def.in
 config/gen/makefiles.pl
 config/gen/makefiles/bf.in
+config/gen/makefiles/befunge.in
 config/gen/makefiles/classes.in
 config/gen/makefiles/docs.in
 config/gen/makefiles/imcc.in
@@ -1578,6 +1579,7 @@ languages/scheme/t/arith/nested.t
 languages/scheme/t/harness
 languages/scheme/t/io/basic.t
 languages/scheme/t/logic/basic.t
+languages/scheme/t/logic/defines.t
 languages/scheme/t/logic/lists.t
 lib/Class/Struct.pm
 lib/Digest/Perl/MD5.pm
