@@ -235,8 +235,10 @@ build_call_func(struct Parrot_Interp *interpreter, PMC *pmc_nci,
     ns = string_make(interpreter, " is an unknown signature type", 30, NULL, 0, NULL);
     message = string_concat(interpreter, signature, ns, 0);
    
-    // I think there may be memory issues with this but if we get to here we are
-    // aborting.
+    /*
+     * I think there may be memory issues with this but if we get to here we are
+     * aborting.
+     */
     c = string_to_cstring(interpreter, message);
     PANIC(c);
     return NULL;
