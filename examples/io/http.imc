@@ -15,7 +15,7 @@
     # Pack a sockaddr_in structure with IP and port
     #sockaddr address, 80, "129.42.18.99"
     sockaddr address, 80, "www.ibm.com"
-    print "Connecting to http://www.parrotcode.org:80\n"
+    print "Connecting to http://www.ibm.com:80\n"
     connect ret, sock, address 
     print "connect returned "
     print ret 
