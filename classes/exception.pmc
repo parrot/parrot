@@ -6,36 +6,105 @@
  *     This is the exception base class
  *  Data Structure and Algorithms:
  *     As we are still lacking objects, this class is based
- *     on a PerlHash. This will probably change.
+ *     on a SArray. This will probably change.
+ *
  *     An exception object has these attributes:
- *     - _message ... textual representation
- *     - _type    ... exception type (s. exceptions.h, except_type.pasm)
- *     - _severity .. exception severity (s. -""-, except_severity.pasm)
- *     - _P5      ... contents of REG_PMC(5)
+ *     - 0 _message ... textual representation
+ *     - 1 _type    ... exception type (s. exceptions.h, except_type.pasm)
+ *     - 2 _severity .. exception severity (s. -""-, except_severity.pasm)
+ *     - 3 _P5      ... contents of REG_PMC(5)
+ *     - 4 _return_cc . return continuation
  *     Optional:
- *     - _C_file ...  origin of exception
- *     - _C_line ...    in C code
- *     - _P_file ...  origin of exception
- *     - _P_line ....   in PASM/PIR/Perl ... source
- *     - _return_cc . return continuation
+ *     - 5 _C_file ...  origin of exception
+ *     - 6 _C_line ...    in C code
+ *     - 7 _P_file ...  origin of exception
+ *     - 8 _P_line ....   in PASM/PIR/Perl ... source
  *     - any information attached by the HL. This shouldn't start
  *       with an underscore (that is reserved for Parrot's internal
- *       usage.
+ *       usage. These are stored as properties.
  *  History:
  *     Initial revision by leo 2003.07.10
  *  Notes:
  *     When an exception handler is called, the exception object is
  *     passed as REG_PMC(5), the original contents of this register
  *     is in the exception object's _P5 attribute.
+ *
+ *     This is experimental code.
+ *     The enum_class of the Exception isn't fixed.
+ *     The interface isn't fixed.
+ *
  *  References:
  */
 
 #include "parrot/parrot.h"
 #include "parrot/method_util.h"
 
-pmclass Exception extends PerlHash {
+pmclass Exception extends SArray {
+
+    void init() {
+
+	SUPER();
+	DYNSELF.set_integer_native(9);
+	DYNSELF.set_string_keyed_int(0, NULL);
+	DYNSELF.set_integer_keyed_int(1, 0);
+	DYNSELF.set_integer_keyed_int(2, 0);
+	DYNSELF.set_pmc_keyed_int(3, NULL);
+	DYNSELF.set_pmc_keyed_int(4, NULL);
+    }
 
     STRING* name() {
         return whoami;
+    }
+
+    STRING* get_string_keyed(PMC* key) {
+	STRING* s = key_string(INTERP, key);
+	if (!string_compare(INTERP, s,
+		    string_from_cstring(INTERP, "_message", 0)))
+	    return DYNSELF.get_string_keyed_int(0);
+	return 0;
+    }
+
+    INTVAL get_integer_keyed(PMC* key) {
+	STRING* s = key_string(INTERP, key);
+	if (!string_compare(INTERP, s,
+		    string_from_cstring(INTERP, "_type", 0)))
+	    return DYNSELF.get_integer_keyed_int(1);
+	if (!string_compare(INTERP, s,
+		    string_from_cstring(INTERP, "_severity", 0)))
+	    return DYNSELF.get_integer_keyed_int(2);
+	return 0;
+    }
+
+    PMC* get_pmc_keyed(PMC* key) {
+	STRING* s = key_string(INTERP, key);
+	if (!string_compare(INTERP, s,
+		    string_from_cstring(INTERP, "_P5", 0)))
+	    return DYNSELF.get_pmc_keyed_int(3);
+	if (!string_compare(INTERP, s,
+		    string_from_cstring(INTERP, "_invoke_cc", 0)))
+	    return DYNSELF.get_pmc_keyed_int(4);
+	return DYNSELF.getprop(s);
+    }
+
+    void set_string_keyed(PMC* key, STRING* value) {
+	STRING* s = key_string(INTERP, key);
+	if (!string_compare(INTERP, s,
+		    string_from_cstring(INTERP, "_message", 0)))
+	    DYNSELF.set_string_keyed_int(0, value);
+    }
+
+    void set_integer_keyed(PMC* key, INTVAL value) {
+	STRING* s = key_string(INTERP, key);
+	if (!string_compare(INTERP, s,
+		    string_from_cstring(INTERP, "_type", 0)))
+	    DYNSELF.set_integer_keyed_int(1, value);
+	if (!string_compare(INTERP, s,
+		    string_from_cstring(INTERP, "_severity", 0)))
+	    DYNSELF.set_integer_keyed_int(2, value);
+    }
+
+    void set_pmc_keyed(PMC *key, PMC *value) {
+	STRING* s = key_string(INTERP, key);
+	DYNSELF.setprop(s, value);
     }
 }

@@ -96,7 +96,6 @@ pmc_new_noinit(struct Parrot_Interp *interpreter, INTVAL base_type)
         case enum_class_PerlUndef:
         case enum_class_Boolean:
         case enum_class_PerlHash:
-        case enum_class_Exception:
             break;
         default:
             add_pmc_ext(interpreter, pmc);
