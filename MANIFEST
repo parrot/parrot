@@ -2487,8 +2487,6 @@ parrot-config.imc    	                          [devel]
 parrot.spec                                       []
 parrotbug					  []
 pf/pf_items.c                                     []
-runtime/parrot/chartypes/8859-1.TXT               []
-runtime/parrot/chartypes/8859-15.TXT              []
 runtime/parrot/dynext/README                      [main]doc
 runtime/parrot/include/DWIM.imc                   [main]doc
 runtime/parrot/include/Getopt_Long.imc            [main]doc
