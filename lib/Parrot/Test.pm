@@ -3,18 +3,19 @@
 
 =head1 NAME
 
-Parrot::Test - Functions for testing Parrot
+Parrot::Test - Functions for testing Parrot and language implementations
 
 =head1 SYNOPSIS
 
 Set the number of tests to be run like this:
 
-        use Parrot::Test tests => 8;
+    use Parrot::Test tests => 8;
 
 Write individual tests like this:
 
     pasm_output_is(<<'CODE', <<'OUTPUT', "description of test");
-    print "this is ok\"
+    print "this is ok\n"
+    end
     CODE
     this is ok
     OUTPUT
@@ -25,7 +26,10 @@ This module provides various Parrot-specific test functions.
 
 =head2 Functions
 
-In the following functions C<$description> should describe the test.
+The parameter C<$code> is the code that should be executed or transformed.
+The parameter C<$expected> is the expected result.
+The parameter C<$unexpected> is the unexpected result.
+The parameter C<$description> should describe the test.
 
 =over 4
 
@@ -41,23 +45,23 @@ of the output with the expected result it true.
 
 =item C<output_like($code, $expected, $description)>
 
-Runs the Parror Assembler code and passes the test if
+Runs the Parrot Assembler code and passes the test if
 the  output matches the expected result.
 
 =item C<pasm_output_like($code, $expected, $description)>
 
-Runs the Parror Assembler code and passes the test if
+Runs the Parrot Assembler code and passes the test if
 the  output matches the expected result.
 
-=item C<output_isnt($code, $expected, $description)>
+=item C<output_isnt($code, $unexpected, $description)>
 
-Runs the Parror Assembler code and passes the test
-if a string comparison of the output with the expected result it false.
+Runs the Parrot Assembler code and passes the test
+if a string comparison of the output with the unexpected result is false.
 
-=item C<pasm_output_isnt($code, $expected, $description)>
+=item C<pasm_output_isnt($code, $unexpected, $description)>
 
-Runs the Parror Assembler code and passes the test
-if a string comparison of the output with the expected result it false.
+Runs the Parrot Assembler code and passes the test
+if a string comparison of the output with the unexpected result is false.
 
 =item C<pir_output_is($code, $expected, $description)>
 
@@ -69,10 +73,10 @@ with the expected result it true.
 Runs the PIR code and passes the test if output matches the expected
 result.
 
-=item C<pir_output_isnt($code, $expected, $description)>
+=item C<pir_output_isnt($code, $unexpected, $description)>
 
-Runs the PIR code and passes the test if a string comparison of output
-with the expected result it false.
+Runs the PIR code and passes the test if a string comparison of the output
+with the unexpected result is false.
 
 =item C<pbc_output_is($code, $expected, $description)>
 
@@ -84,16 +88,20 @@ with the expected result it true.
 Runs the Parrot Bytecode and passes the test if output matches the expected
 result.
 
-=item C<pbc_output_isnt($code, $expected, $description)>
+=item C<pbc_output_isnt($code, $unexpected, $description)>
 
 Runs the Parrot Bytecode and passes the test if a string comparison of output
-with the expected result it false.
+with the unexpected result is false.
 
 =item C<pir_2_pasm_is($code, $expected, $description)>
 
 Compile the Parrot Intermediate Representation and generate Parrot Assembler Code.
 
 =item C<pir_2_pasm_like($code, $expected, $description)>
+
+Compile the Parrot Intermediate Representation and generate Parrot Assembler Code.
+
+=item C<pir_2_pasm_isnt($code, $unexpected, $description)>
 
 Compile the Parrot Intermediate Representation and generate Parrot Assembler Code.
 
@@ -107,15 +115,15 @@ output with the expected result it true.
 Compiles and runs the C code, passing the test if output matches the
 expected result.
 
-=item C<c_output_isnt($code, $expected, $description)>
+=item C<c_output_isnt($code, $unexpected, $description)>
 
 Compiles and runs the C code, passing the test if a string comparison of
-output with the expected result it false.
+output with the unexpected result is false.
 
 =item C<skip($why, $how_many)>
 
 Use within a C<SKIP: { ... }> block to indicate why and how many test
-are being skipped.
+are being skipped. Just like in Test::More.
 
 =back
 
@@ -138,7 +146,7 @@ require Test::More;
               pbc_output_is      pbc_output_like      pbc_output_isnt
               pasm_output_is     pasm_output_like     pasm_output_isnt
               pir_output_is      pir_output_like      pir_output_isnt
-              pir_2_pasm_is      pir_2_pasm_like
+              pir_2_pasm_is      pir_2_pasm_like      pir_2_pasm_isnt
               c_output_is        c_output_like        c_output_isnt
               language_output_is
               skip );
@@ -200,16 +208,16 @@ sub _run_command {
 
 
 sub per_test {
-    my ($ext, $count) = @_;
+    my ($ext, $test_no) = @_;
 
     my $t = $0;  # $0 is name of the test script
-    $t =~ s/\.t$/_$count$ext/;
+    $t =~ s/\.t$/_$test_no$ext/;
 
     return $t;
 }
 
-sub generate_pbc_for {
-    my ($code, $directory, $count, $code_f) = @_;
+sub generate_code {
+    my ($code, $directory, $test_no, $code_f) = @_;
 
     local( *CODE );
     open(CODE, "> $code_f") or die "Unable to open '$code_f'";
@@ -218,10 +226,10 @@ sub generate_pbc_for {
     close( CODE );
 }
 
-my $count = 0;
-
+# Why can't we inherit from Test::More ?
 *skip = \&Test::More::skip;
 
+# What about File::Slurp?
 sub slurp_file {
     my ($file_name) = @_;
 
@@ -235,7 +243,7 @@ sub slurp_file {
 }
 
 sub generate_functions {
-    my ($package, $pbc_generator) = @_;
+    my ($package, $code_generator) = @_;
 
     my $path_to_parrot = $INC{"Parrot/Config.pm"};
     $path_to_parrot =~ s:lib/Parrot/Config.pm$::;        
@@ -255,12 +263,10 @@ sub generate_functions {
         pir_output_is      => 'is_eq',
         pir_output_isnt    => 'isnt_eq',
         pir_output_like    => 'like',
-        pir_2_pasm_like    => 'like',
         pir_2_pasm_is      => 'is_eq',
+        pir_2_pasm_isnt    => 'isnt_eq',
         pir_2_pasm_like    => 'like',
-                   );
-
-
+                          );
 
     foreach my $func ( keys %parrot_test_map ) {
         no strict 'refs';
@@ -268,33 +274,36 @@ sub generate_functions {
         *{$package.'::'.$func} = sub ($$;$) {
             my( $code, $expected, $desc) = @_;
 
-            $count = $builder->current_test() + 1;
-
-            #set up default description
-            (undef, my $file, my $line) = caller;
-            $desc ||= "($file line $line)";
-
             # Strange Win line endings
             $expected =~ s/\cM\cJ/\n/g;
 
-            # First assume that we test Parrot Assembler 
-            my $out_f = per_test('.out', $count);
-            my $code_f;
+            # set up default description
+            unless ( $desc ) {
+               (undef, my $file, my $line) = caller();
+               $desc = "($file line $line)";
+            }
 
-            # we might have to create PASM
-            my $gen_pasm = 0;
+            # $test_no will be part of temporary file
+            my $test_no = $builder->current_test() + 1;
+
+            # Name of the file where output is written.
+            # Switch to a different extension when we are generating code.
+            my $out_f = per_test('.out', $test_no);
+
+            # Name of the file with test code.
+            # This depends on which kind of code we are testing.
+            my $code_f;
             if ( $func =~ /^pir_output/ ) {
-                $code_f = per_test('.imc',$count);
+                $code_f = per_test('.imc', $test_no);
             }
             elsif ( $func =~ m/^output_/ ) {
-                $code_f = per_test('.pasm',$count);
+                $code_f = per_test('.pasm', $test_no);
             }
             elsif ( $func =~ /^pir_2_pasm_/) {
-                $gen_pasm = 1;
-                $code_f = per_test('.imc',$count);
+                $code_f = per_test('.imc', $test_no);
             }
-            elsif ( $func =~ /^pbc_output_/) {
-                $code_f = per_test('.pbc',$count);
+            elsif ( $func =~ /^pbc_output_/ ) {
+                $code_f = per_test('.pbc', $test_no);
             }
             else {
                 die "Unknown test function: $func";
@@ -302,41 +311,41 @@ sub generate_functions {
 
             my $args = $ENV{TEST_PROG_ARGS} || '';
             my $run_exec = 0;
-            if ($args =~ s/--run-exec//) {
+            if ( $args =~ s/--run-exec// ) {
                 $run_exec = 1;
-                my $pbc_f = per_test('.pbc', $count);
+                my $pbc_f = per_test('.pbc', $test_no);
                 my $cmd = qq{(cd $path_to_parrot && $parrot ${args} -o $pbc_f "$code_f")};
                 _run_command($cmd, STDOUT => $out_f, STDERR => $out_f);
 
-                my $o_f = per_test('.o', $count);
+                my $o_f = per_test('.o', $test_no);
                 $cmd = qq{(cd $path_to_parrot && $parrot ${args} -o $o_f "$pbc_f")};
                 _run_command($cmd, STDOUT => $out_f, STDERR => $out_f);
 
-                my $noext_f = per_test('', $count);
+                my $noext_f = per_test('', $test_no);
                 $cmd = qq{(cd $path_to_parrot && make EXEC=$noext_f exec)};
                 _run_command($cmd, STDOUT => $out_f, STDERR => $out_f);
             }
-            # native tests with --run-pbc don't make sense
-            if ($func =~ /^pbc_output_/) {
+            if ( $func =~ /^pbc_output_/ && $args =~ /-r / ) {
+                # native tests with --run-pbc don't make sense
                 return $builder->skip( "no native tests with -r" );
             }
-            elsif ($gen_pasm) {
-                $out_f = per_test('.pasm', $count);
+            elsif ( $func =~ /^pir_2_pasm_/) {
+                $out_f = per_test('.pasm', $test_no);
 	        my $opt = $code_f =~ m!opt(.)! ? "-O$1" : "-O1";
                 $args = "$args $opt --output=$out_f";
             }
             $code_f = File::Spec->rel2abs($code_f);
 
-            # native tests are just run
+            # native tests are just run, others need to write code first
             if ($code_f !~ /\.pbc$/) {
-                $pbc_generator->( $code, $path_to_parrot, $count, $code_f );
+                $code_generator->($code, $path_to_parrot, $test_no, $code_f);
             }
 
             my ( $exit_code, $cmd );
             unless ( $run_exec ) {
-                if ( ! $gen_pasm &&
+                if ( $func !~ /^pir_2_pasm_/ &&
                      ( $args =~ s/--run-pbc// || $args =~ s/-r //) ) {
-                    my $pbc_f = per_test('.pbc', $count);
+                    my $pbc_f = per_test('.pbc', $test_no);
                     $args = qq{$args -o "$pbc_f" -r -r};
                 }
                 $cmd = qq{(cd $path_to_parrot && $parrot $args "$code_f")};
@@ -345,7 +354,7 @@ sub generate_functions {
 
             my $meth = $parrot_test_map{$func};
             my $real_output = slurp_file($out_f); 
-            if ( $gen_pasm ) {
+            if ( $func =~ /^pir_2_pasm_/ ) {
                 # The parrot open '--outfile=file.pasm' seems to create unnecessare whitespace
                 $real_output =~ s/^\s*$//gm;
                 $real_output =~ s/[\t ]+/ /gm;
@@ -413,16 +422,17 @@ sub generate_functions {
         *{$package.'::'.$func} = sub ($$;$ ) {
             my($source, $expected, $desc) = @_;
 
-            $count = $builder->current_test + 1;
+            # $test_no will be part of temporary file
+            my $test_no = $builder->current_test() + 1;
       
             $expected =~ s/\cM\cJ/\n/g;
             local( *SOURCE );
-            my $source_f = per_test('.c',$count);
-            my $obj_f = per_test($PConfig{o},$count);
-            my $exe_f = per_test($PConfig{exe},$count);
+            my $source_f = per_test('.c', $test_no);
+            my $obj_f = per_test($PConfig{o}, $test_no);
+            my $exe_f = per_test($PConfig{exe}, $test_no);
             $exe_f =~ s@[\\/:]@$PConfig{slash}@g;
-            my $out_f = per_test('.out',$count);
-            my $build_f = per_test('.build',$count);
+            my $out_f = per_test('.out', $test_no);
+            my $build_f = per_test('.build', $test_no);
 
             open SOURCE, "> $source_f" or die "Unable to open '$source_f'";
             binmode SOURCE;
@@ -490,7 +500,7 @@ sub generate_functions {
     }
 }
 
-Parrot::Test::generate_functions(__PACKAGE__, \&generate_pbc_for);
+Parrot::Test::generate_functions(__PACKAGE__, \&generate_code );
 
 =head1 SEE ALSO
 
@@ -499,6 +509,10 @@ Parrot::Test::generate_functions(__PACKAGE__, \&generate_pbc_for);
 =item F<t/harness>
 
 =item F<docs/tests.pod>
+
+=item L<Test/More>
+
+=item L<Test/Builder>
 
 =back
 

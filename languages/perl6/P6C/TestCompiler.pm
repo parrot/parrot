@@ -50,7 +50,7 @@ sub import {
 }
 
 sub generate_pbc_for {
-    my ($code,$package,$count) = @_;
+    my ($code, $package, $count) = @_;
 
     my $p6_f = Parrot::Test::per_test('.p6',$count);
     open P6, ">$p6_f";
@@ -71,10 +71,10 @@ sub generate_pbc_for {
       $pasm = <PASM>;
       close PASM;
     }
-    Parrot::Test::generate_pbc_for($pasm,$package,$count,$pbc_f);
+    Parrot::Test::generate_code($pasm, $package, $count, $pbc_f);
 }
 
-Parrot::Test::generate_functions(__PACKAGE__,\&generate_pbc_for,"../../");
+Parrot::Test::generate_functions(__PACKAGE__, \&generate_pbc_for, "../../");
 
 # vim:set sw=4:
 1;

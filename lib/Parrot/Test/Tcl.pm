@@ -36,7 +36,7 @@ sub output_is() {
   # but, always put the test in a tempdir, so we're not cluttering
   $lang_f = File::Spec->catfile(File::Spec->tmpdir(),$lang_f);
   $out_f = File::Spec->catfile(File::Spec->tmpdir(),$out_f);
-  Parrot::Test::generate_pbc_for( $code, $parrotdir, $count, $lang_f );
+  Parrot::Test::generate_code( $code, $parrotdir, $count, $lang_f );
 
   my $cmd;
   my $exit_code = 0;

@@ -53,7 +53,7 @@ sub output_is
 
   # This does nor create byte code, but m4 code
   my $parrotdir       = File::Basename::dirname( $self->{parrot} );
-  Parrot::Test::generate_pbc_for( $code, $parrotdir, $count, $lang_f );
+  Parrot::Test::generate_code( $code, $parrotdir, $count, $lang_f );
 
   # STDERR is written into same output file
   my $parrot_exit_code = Parrot::Test::_run_command( $parrot_m4, STDOUT => $parrot_m4_out_f, STDERR => $parrot_m4_out_f );
