@@ -155,104 +155,104 @@ trace_op_dump(struct Parrot_Interp *interpreter, opcode_t *code_start,
     INTVAL i;
     char *escaped;
     int more = 0;
+    op_info_t *info = &interpreter->op_info_table[*pc];
 
-    PIO_eprintf(interpreter, "%6vu %s",
-                (UINTVAL)(pc - code_start),
-                interpreter->op_info_table[*pc].name);
+    PIO_eprintf(interpreter, "%6vu %s", (UINTVAL)(pc - code_start), info->name);
 
-    if (interpreter->op_info_table[*pc].arg_count > 1) {
+    if (info->arg_count > 1) {
         PIO_eprintf(interpreter, " ");
         /* pass 1 print arguments */
-        for (i = 1; i < interpreter->op_info_table[*pc].arg_count; i++) {
+        for (i = 1; i < info->arg_count; i++) {
             opcode_t o = *(pc + i);
-            if (i > 1) {
+            if (i > 1 &&
+                    info->types[i] != PARROT_ARG_KC &&
+                    info->types[i] != PARROT_ARG_KIC &&
+                    info->types[i] != PARROT_ARG_K
+                    ) {
                 PIO_eprintf(interpreter, ", ");
             }
-            switch (interpreter->op_info_table[*pc].types[i]) {
-            case PARROT_ARG_IC:
-                PIO_eprintf(interpreter, "%vd", o);
-                break;
-            case PARROT_ARG_NC:
-                PIO_eprintf(interpreter, "%vg", interpreter->code->const_table->
-                        constants[o]->u.number);
-                break;
-            case PARROT_ARG_SC:
-                escaped = PDB_escape(interpreter->code->const_table->
-                                     constants[o]->u.string->strstart,
-                                     interpreter->code->const_table->
-                                     constants[o]->u.string->bufused);
-                PIO_eprintf(interpreter, "\"%s\"", escaped ? escaped : "(null)");
-                if (escaped)
-                    mem_sys_free(escaped);
-                break;
-            case PARROT_ARG_KC:
-                trace_key_dump(interpreter, interpreter->code->const_table->
-                        constants[o]->u.key);
-                break;
-            case PARROT_ARG_KIC:
-                PIO_eprintf(interpreter, "[%vd]", o);
-                break;
-            case PARROT_ARG_I:
-                PIO_eprintf(interpreter, "I%vd", o);
-                break;
-            case PARROT_ARG_N:
-                PIO_eprintf(interpreter, "N%vd", o);
-                break;
-            case PARROT_ARG_P:
-                PIO_eprintf(interpreter, "P%vd", o);
-                more = 1;
-                break;
-            case PARROT_ARG_S:
-                PIO_eprintf(interpreter, "S%vd", o);
-                more = 1;
-                break;
-            case PARROT_ARG_K:
-                PIO_eprintf(interpreter, "P%vd=",o);
-                more = 1;
-                break;
-            case PARROT_ARG_KI:
-                PIO_eprintf(interpreter, "I%vd", o);
-                more = 1;
-                break;
-            default:
-                internal_exception(1, "unhandled type in trace");
-                break;
+            switch (info->types[i]) {
+                case PARROT_ARG_IC:
+                    PIO_eprintf(interpreter, "%vd", o);
+                    break;
+                case PARROT_ARG_NC:
+                    PIO_eprintf(interpreter, "%vg", PCONST(o)->u.number);
+                    break;
+                case PARROT_ARG_SC:
+                    escaped = PDB_escape(PCONST(o)->u.string->strstart,
+                            PCONST(o)->u.string->bufused);
+                    PIO_eprintf(interpreter, "\"%s\"",
+                            escaped ? escaped : "(null)");
+                    if (escaped)
+                        mem_sys_free(escaped);
+                    break;
+                case PARROT_ARG_KC:
+                    trace_key_dump(interpreter, PCONST(o)->u.key);
+                    break;
+                case PARROT_ARG_KIC:
+                    PIO_eprintf(interpreter, "[%vd]", o);
+                    break;
+                case PARROT_ARG_K:
+                    PIO_eprintf(interpreter, "[P%vd]",o);
+                    more = 1;
+                    break;
+                case PARROT_ARG_I:
+                    PIO_eprintf(interpreter, "I%vd", o);
+                    break;
+                case PARROT_ARG_N:
+                    PIO_eprintf(interpreter, "N%vd", o);
+                    break;
+                case PARROT_ARG_P:
+                    PIO_eprintf(interpreter, "P%vd", o);
+                    more = 1;
+                    break;
+                case PARROT_ARG_S:
+                    PIO_eprintf(interpreter, "S%vd", o);
+                    more = 1;
+                    break;
+                case PARROT_ARG_KI:
+                    PIO_eprintf(interpreter, "I%vd", o);
+                    more = 1;
+                    break;
+                default:
+                    internal_exception(1, "unhandled type in trace");
+                    break;
             }
         }
         if (!more)
             goto done;
         PIO_eprintf(interpreter, "  \t- ");
         /* pass 2 print argument details if needed */
-        for (i = 1; i < interpreter->op_info_table[*pc].arg_count; i++) {
+        for (i = 1; i < info->arg_count; i++) {
             opcode_t o = *(pc + i);
             if (i > 1) {
                 PIO_eprintf(interpreter, ", ");
             }
-            switch (interpreter->op_info_table[*pc].types[i]) {
-            case PARROT_ARG_P:
-                PIO_eprintf(interpreter, "P%vd=", o);
-                trace_pmc_dump(interpreter, REG_PMC(o));
-                break;
-            case PARROT_ARG_S:
-                if (REG_STR(*(pc+i))) {
-                    escaped = PDB_escape(REG_STR(o)->strstart,
-                                         REG_STR(o)->bufused);
-                    PIO_eprintf(interpreter, "S%vd=\"%s\"", o,
-                            escaped ? escaped : "(null)");
-                    if (escaped)
-                        mem_sys_free(escaped);
-                }
-                break;
-            case PARROT_ARG_K:
-                PIO_eprintf(interpreter, "P%vd=", o);
-                trace_key_dump(interpreter, REG_PMC(*(pc + i)));
-                break;
-            case PARROT_ARG_KI:
-                PIO_eprintf(interpreter, "I%vd=[%vd]", o,
-                        REG_INT(o));
-                break;
-            default:
-                break;
+            switch (info->types[i]) {
+                case PARROT_ARG_P:
+                    PIO_eprintf(interpreter, "P%vd=", o);
+                    trace_pmc_dump(interpreter, REG_PMC(o));
+                    break;
+                case PARROT_ARG_S:
+                    if (REG_STR(*(pc+i))) {
+                        escaped = PDB_escape(REG_STR(o)->strstart,
+                                REG_STR(o)->bufused);
+                        PIO_eprintf(interpreter, "S%vd=\"%s\"", o,
+                                escaped ? escaped : "(null)");
+                        if (escaped)
+                            mem_sys_free(escaped);
+                    }
+                    break;
+                case PARROT_ARG_K:
+                    PIO_eprintf(interpreter, "P%vd=", o);
+                    trace_key_dump(interpreter, REG_PMC(*(pc + i)));
+                    break;
+                case PARROT_ARG_KI:
+                    PIO_eprintf(interpreter, "I%vd=[%vd]", o,
+                            REG_INT(o));
+                    break;
+                default:
+                    break;
             }
         }
     }
