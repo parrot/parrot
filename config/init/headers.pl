@@ -14,7 +14,7 @@ sub runstep {
 
     my @headers=(
 	sort
-	map  { m{$inc/(.*)} }
+	map  { m{$inc/(.*\.h)\z} }
 	keys %{maniread()}
     );
 
