@@ -29,6 +29,20 @@ in as value.
 
 #include "parrot/parrot.h"
 
+static size_t
+key_hash_int(Interp *interp, Hash *hash, void *value)
+{
+    UNUSED(interp);
+    UNUSED(hash);
+    return (size_t) value;
+}
+
+static int
+int_compare(Parrot_Interp interp, void *a, void *b)
+{
+    UNUSED(interp);
+    return a != b;
+}
 static void
 fromkeys(Interp *interpreter, PMC *self, PMC *keys, PMC *value)
 {
@@ -58,6 +72,38 @@ fromkeys(Interp *interpreter, PMC *self, PMC *keys, PMC *value)
             VTABLE_isa(interpreter, keys,
                 const_string(interpreter, "Iterator"))) {
         iter = keys;
+        if (PMC_struct_val(iter)) {
+            PMC *xr = PMC_struct_val(iter);
+            /* check, if we got an xrange iterator */
+            if (PObj_is_PMC_TEST(xr) &&
+                    xr->vtable->base_type == enum_class_Slice &&
+                    PMC_data(xr)) {
+                PMC *range = PMC_data(xr);
+                if (((PObj_get_FLAGS(xr) &
+                                (KEY_inf_slice_FLAG|KEY_start_slice_FLAG)) ==
+                            KEY_start_slice_FLAG &&
+                            ((PObj_get_FLAGS(range) &
+                              (KEY_inf_slice_FLAG|KEY_end_slice_FLAG)) ==
+                             KEY_end_slice_FLAG))) {
+                    INTVAL start, end, step = 1;
+                    Hash* hash;
+                    new_hash_x(interpreter, &hash, enum_type_ptr,
+                                0, Hash_key_type_int,
+                                int_compare, key_hash_int,
+                                (hash_mark_key_fn) NULL);
+                    PMC_struct_val(self) = hash;
+                    start = key_integer(interpreter, xr);
+                    end   = key_integer(interpreter, range);
+                    /* TODO step
+                     * TODO reversed range, negative step
+                     */
+                    for (i = start; i < end; i+= step) {
+                        hash_put(interpreter, hash, (void *)i, value);
+                    }
+                    goto done;
+                }
+            }
+        }
     }
     else
         iter = pmc_new_init(interpreter, enum_class_Iterator, keys);
@@ -66,6 +112,7 @@ fromkeys(Interp *interpreter, PMC *self, PMC *keys, PMC *value)
         STRING *s = VTABLE_shift_string(interpreter, iter);
         VTABLE_set_pmc_keyed_str(interpreter, self, s, value);
     }
+done:
     if (dod_disabled) {
         Parrot_unblock_DOD(interpreter);
         Parrot_unblock_GC(interpreter);
@@ -260,10 +307,27 @@ Returns the integer value for the element at C<*key>.
 
     INTVAL get_integer_keyed (PMC* key) {
         PMC* valpmc;
-        STRING* keystr = make_hash_key(INTERP, key);
-        HashBucket *b = hash_get_bucket(INTERP, (Hash*) PMC_struct_val(SELF),
-                                        keystr);
+        STRING* keystr;
+        Hash *hash = PMC_struct_val(SELF);
+        HashBucket *b;
         PMC* nextkey;
+
+        switch (PObj_get_FLAGS(key) & KEY_type_FLAGS) {
+            case KEY_integer_FLAG:
+                /* called from iterator with an integer idx in key
+                 * check if we really have Hash_key_type_int
+                 */
+                if (hash->key_type == Hash_key_type_int) {
+                    return (INTVAL)hash_get_idx(INTERP, hash, key);
+                }
+                else {
+                    STRING *s = hash_get_idx(INTERP, hash, key);
+                    return string_to_int(interpreter, s);
+                }
+            default:
+                keystr = make_hash_key(INTERP, key);
+        }
+        b = hash_get_bucket(INTERP, hash, keystr);
         if (b == NULL) {
             /* XXX Warning: use of uninitialized value */
             return VTABLE_get_integer(INTERP, undef);
@@ -412,16 +476,21 @@ Returns the big number value for the element at C<*key>.
         PMC* valpmc;
         STRING* keystr;
         HashBucket *b;
+        Hash *hash = PMC_struct_val(SELF);
         PMC* nextkey;
 
         switch (PObj_get_FLAGS(key) & KEY_type_FLAGS) {
             case KEY_integer_FLAG:
                 /* called from iterator with an integer idx in key */
-                return hash_get_idx(INTERP, (Hash*) PMC_struct_val(SELF), key);
+                if (hash->key_type == Hash_key_type_int) {
+                    INTVAL i = (INTVAL)hash_get_idx(INTERP, hash, key);
+                    return string_from_int(interpreter, i);
+                }
+                return hash_get_idx(INTERP, hash, key);
             default:
                 keystr = make_hash_key(INTERP, key);
         }
-        b = hash_get_bucket(INTERP, (Hash*) PMC_struct_val(SELF), keystr);
+        b = hash_get_bucket(INTERP, hash, keystr);
         if (b == NULL) {
             /* XXX Warning: use of uninitialized value */
             return VTABLE_get_string(INTERP, undef);

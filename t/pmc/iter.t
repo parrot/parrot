@@ -16,7 +16,7 @@ Tests the C<Iterator> PMC.
 
 =cut
 
-use Parrot::Test tests => 37;
+use Parrot::Test tests => 38;
 use Test::More qw(skip);
 
 output_is(<<'CODE', <<'OUTPUT', "new iter");
@@ -1216,6 +1216,37 @@ iter_loop:
     unless iter, iter_end		# while (entries) ...
     $S0 = shift iter
     print $S0
+    goto iter_loop
+iter_end:
+    print "ok\n"
+.end
+CODE
+/10 [0123456789]{10}ok/
+OUTPUT
+
+output_like(<<'CODE', <<'OUTPUT', "hash fromkeys - xrange");
+##PIR##
+.sub main @MAIN
+    .include "iterator.pasm"
+    .local pmc hash
+    .local pmc value
+    .local pmc xr
+    xr = new Slice
+    .local pmc sl
+    sl = slice xr[0 .. 10]
+    hash = new PerlHash
+    null value
+    hash."fromkeys"(sl, value)
+    $I0 = hash
+    print $I0
+    print " "
+    .local pmc iter
+    iter = new .Iterator, hash
+    iter = .ITERATE_FROM_START
+iter_loop:
+    unless iter, iter_end		# while (entries) ...
+    $I0 = shift iter
+    print $I0
     goto iter_loop
 iter_end:
     print "ok\n"
