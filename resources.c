@@ -1014,6 +1014,7 @@ Parrot_reallocate(struct Parrot_Interp *interpreter, void *from, size_t tosize)
 
     buffer = from;
     copysize = (buffer->buflen > tosize ? tosize : buffer->buflen);
+    interpreter->arena_base->memory_pool->reclaimable += buffer->buflen;
 
     mem = mem_allocate(interpreter, &alloc_size, 
                        interpreter->arena_base->memory_pool);
@@ -1046,6 +1047,7 @@ Parrot_reallocate_string(struct Parrot_Interp *interpreter, STRING *str,
     pool = (str->flags & BUFFER_constant_FLAG)
          ? interpreter->arena_base->constant_string_pool
          : interpreter->arena_base->string_pool;
+    pool->reclaimable += str->buflen;
 
     mem = mem_allocate(interpreter, &alloc_size, pool);
     if (!mem) {
