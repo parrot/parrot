@@ -92,7 +92,7 @@ my(%c)=(
 	strlow =>	'(~0xfff)',
 	pmclow =>	'(~0xfff)',
 	
-	platform =>	'linux',
+	platform =>	$^O,
 	cp =>		'cp',
 	slash =>	'/',
 );
@@ -118,6 +118,16 @@ prompt("Which libraries would you like your C compiler to include?", 'libs');
 prompt("How big would you like integers to be?", 'iv');
 prompt("And your floats?", 'nv');
 prompt("What is your native opcode type?", 'opcode_t');
+
+# Copy the appropriate platform-specific file over
+if (-e "platforms/$c{platform}.h") {
+    copy("platforms/$c{platform}.h", "include/parrot/platform.h");
+    copy("platforms/$c{platform}.c", "platform.c");
+}
+else {
+    copy("platforms/generic.h", "include/parrot/platform.h");
+    copy("platforms/generic.c", "platform.c");
+}
 
 unless( $c{debugging} ) {
 	$c{ld_debug} = ' ';
@@ -147,7 +157,6 @@ END
 	my %newc;
 
 	buildfile("test_c");
-	copy("platforms/$c{platform}.h", "include/parrot/platform.h");
 	compiletestc();
 	%newc=eval(runtestc()) or die "Can't run the test program: $!";
 

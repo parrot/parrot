@@ -118,12 +118,6 @@ $(INC)/config.h: Configure.pl config_h.in
 $(INC)/vtable.h: vtable.tbl vtable_h.pl
 	$(PERL) vtable_h.pl
 
-$(INC)/platform.h: platforms/${platform}.h
-	${cp} platforms${slash}${platform}.h include${slash}parrot${slash}platform.h
-
-platform.c: platforms/${platform}.c
-	${cp} platforms${slash}${platform}.c platform.c
-
 docs: docs/.dummy
 
 docs/.dummy:

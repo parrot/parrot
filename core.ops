@@ -106,21 +106,6 @@ AUTO_OP err(s) {
 
 ########################################
 
-=item getenv(s, s|sc)
-
-Store the value of environment variable $2 in $1.
-
-=cut
-
-AUTO_OP getenv(s, s|sc) {
-  char *tmp = getenv($2->bufstart);
-  STRING *s = string_make(interpreter, tmp, strlen(tmp), 0, 0, 0);
-  $1 = s;
-}
-
-
-########################################
-
 =item B<open>(i, s|sc)
 
 Open file named $2 with flags for writing and mode 0644 (rw-r--r--), and save
@@ -218,20 +203,6 @@ AUTO_OP read(s, i|ic, i|ic) {
   $1 = s;
   free(tmp);
 }
-
-
-########################################
-
-=item setenv(s|sc, s|sc)
-
-Set the value of environment variable $1 to $2.
-
-=cut
-
-AUTO_OP setenv(s|sc, s|sc) {
-  Parrot_setenv($1->bufstart, $2->bufstart);
-}
-
 
 
 ########################################

@@ -108,6 +108,8 @@ Parrot/Test.pm
 Parrot/Vtable.pm
 pbc2c.pl
 pdump.c
+platforms/generic.c
+platforms/generic.h
 platforms/linux.c
 platforms/linux.h
 platforms/win32.c
