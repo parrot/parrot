@@ -28,7 +28,7 @@ static PMC* intret;
 
 Lookup the PMC type which is used for storing native integers.
 
-TODO: PMCs extending Hash should propably register themselves.
+TODO: PMCs extending Hash should probably register themselves.
 
 =cut
  
@@ -48,10 +48,10 @@ static PMC* get_integer_pmc(Interp* interpreter, INTVAL base_type ) {
 
 =item C<static PMC * get_none_pmc(Interp* interpreter, INTVAL base_type )>
 
-As the PerlUndef and the None PMC are singletons, it is propably
-cheap to call pmc_new.
+As C<PerlUndef> and C<None> are singleton PMCs, it is probably
+cheap to call C<pmc_new>.
 
-TODO: PMCs extending Hash should propably register themselves.
+TODO: PMCs extending Hash should probably register themselves.
 
 =cut
  
@@ -73,7 +73,7 @@ static PMC * get_none_pmc(Interp* interpreter, INTVAL base_type ) {
 
 Lookup the PMC type which is used for floating point numbers.
 
-TODO: PMCs extending Hash should propably register themselves.
+TODO: PMCs extending Hash should probably register themselves.
 
 =cut
  
@@ -95,7 +95,7 @@ static PMC * get_number_pmc(Interp* interpreter, INTVAL base_type ) {
 
 Lookup the PMC type which is used for storing strings.
 
-TODO: PMCs extending Hash should propably register themselves.
+TODO: PMCs extending Hash should probably register themselves.
 
 =cut
  
@@ -143,7 +143,7 @@ pmclass Hash need_ext does hash {
 =item C<void class_init()>
 
 Class initialization. Allocates the memory for the hash.
-Set up some global variables.
+Sets up some global variables.
 
 =cut
 
