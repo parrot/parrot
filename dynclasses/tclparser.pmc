@@ -393,9 +393,9 @@ handle_quote:
   P1 = pmc_new(INTERP, String);
   Parrot_PMC_set_string(INTERP, P1, S0);
   P2 = pmc_new(INTERP, Integer);
-  VTABLE_set_integer_native(INTERP,P2,0);
+  VTABLE_set_integer_native(INTERP,P2,1);
   P3 = pmc_new(INTERP, Integer);
-  VTABLE_set_integer_native(INTERP,P3,1);
+  VTABLE_set_integer_native(INTERP,P3,0);
 
   P0 = Parrot_TclParser_parse(INTERP, SELF, P1, P2, P3);
   P4 = VTABLE_find_method(INTERP, word, ConcatWords);
@@ -506,7 +506,7 @@ inner_done:
   S1 = string_substr(INTERP, buffer, start_word, I1, NULL, NULL);
   start_word = temppos + 1;
   P1 = VTABLE_find_method(INTERP, word, ConcatVariable);
-  Parrot_call_method(INTERP, P1, word, ConcatVariable, "SS", S0, S1);
+  Parrot_call_method(INTERP, P1, word, ConcatVariable, "vSS", S0, S1);
   goto middle_word;
 
 gotword:

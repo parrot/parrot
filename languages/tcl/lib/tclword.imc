@@ -202,6 +202,7 @@ of the var, and an optional index for array variables.
   chunk = new ResizablePMCArray
   chunk[0] = 1
   chunk[1] = var
+
   # I2 == # string params.
   if I2 == 1 goto no_index
   chunk[2] = idx
