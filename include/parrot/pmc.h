@@ -29,6 +29,8 @@ struct PMC {
     /* referred to as a "cache". */
     UnionVal cache;
 
+    PMC *metadata;
+
     SYNC *synchronize;
     /* This flag determines the next PMC in the 'used' list during
        dead object detection in the GC. It is a linked list, which is
