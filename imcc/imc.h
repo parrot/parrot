@@ -152,6 +152,12 @@ EXTERN enum {
 	OPT_J = 	0x200
 } enum_opt;
 
+/*
+ * Optimization statistics -- we track the number of times each of these
+ * optimizations is performed.
+ *
+ * XXX: Should this be part of the imc_info struct?
+ */
 struct imcc_ostat {
 	int deleted_labels;
 	int if_branch;
