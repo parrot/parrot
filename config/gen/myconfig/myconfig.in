@@ -1,0 +1,20 @@
+Summary of my parrot ${VERSION} configuration:
+  configdate='${configdate}'
+  Platform:
+    osname=${osname}, archname=${archname}
+    jitcapable=${jitcapable}, jitarchname=${jitarchname},
+    jitosname=${jitosname}, jitcpuarch=${jitcpuarch}
+    perl=${perl}
+  Compiler:
+    cc='${cc}', ccflags='${ccflags}',
+  Linker and Libraries:
+    ld='${ld}', ldflags='${ldflags}',
+    cc_ldflags='${cc_ldflags}',
+    libs='${libs}'
+  Dynamic Linking:
+    so='${so}', ld_shared='${ld_shared}',
+    ld_shared_flags='${ld_shared_flags}'
+  Types:
+    iv=${iv}, intvalsize=${intvalsize}, intsize=${intsize}, opcode_t=${opcode_t}, opcode_t_size=${opcode_t_size},
+    ptrsize=${ptrsize}, ptr_alignment=${ptr_alignment} byteorder=${byteorder}, 
+    nv=${nv}, numvalsize=${numvalsize}, doublesize=${doublesize}

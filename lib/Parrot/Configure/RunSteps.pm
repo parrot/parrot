@@ -29,6 +29,7 @@ use vars qw(@steps);
 	gen/config_h.pl
 	gen/config_pm.pl
 	gen/makefiles.pl
+	gen/myconfig.pl
 	gen/platform.pl
 	gen/libparrot_def.pl
 );

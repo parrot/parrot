@@ -9,7 +9,6 @@ CVS/[^/]+$
 /Makefile$
 ^lib/Parrot/Config\.pm$
 ^platform\.c$
-^config.opt$
 
 ^include/parrot/vtable\.h$
 ^include/parrot/jit_struct\.h$

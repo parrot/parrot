@@ -67,6 +67,8 @@ config/gen/makefiles/miniperl.in
 config/gen/makefiles/perl6.in
 config/gen/makefiles/root.in
 config/gen/makefiles/scheme.in
+config/gen/myconfig.pl
+config/gen/myconfig/myconfig.in
 config/gen/platform.pl
 config/gen/platform/ansi.c
 config/gen/platform/ansi.h
@@ -585,6 +587,7 @@ t/pmc/sub.t
 t/src/basic.t
 test_main.c
 tools/dev/check_source_standards.pl
+tools/dev/genrpt.pl
 tools/dev/lib_deps.pl
 tools/dev/manicheck.pl
 tools/dev/parrot_coverage.pl

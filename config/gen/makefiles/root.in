@@ -31,7 +31,7 @@ languages/jako/Makefile languages/miniperl/Makefile languages/scheme/Makefile
 GEN_CONFIGS  = include/parrot/config.h include/parrot/platform.h \
 			   lib/Parrot/Config.pm platform.c
 
-STICKY_FILES = $(GEN_CONFIGS) $(GEN_MAKEFILES) config.opt
+STICKY_FILES = $(GEN_CONFIGS) $(GEN_MAKEFILES) myconfig
 
 
 ###############################################################################
@@ -276,7 +276,6 @@ lib/Parrot/OpLib/core.pm : $(OPS_FILES) ops2pm.pl lib/Parrot/OpsFile.pm lib/Parr
 lib/Parrot/PMC.pm : include/parrot/pmc.h pmc_pm.pl
 	$(PERL) pmc_pm.pl 
 
-
 ###############################################################################
 #
 # Examples (Assembly):
@@ -473,6 +472,18 @@ mopstest : $(TEST_PROG) examples/assembly/mops.pbc
 lifetest : $(TEST_PROG) examples/assembly/life.pbc
 	$(TEST_PROG) $(TEST_PROG_ARGS) examples/assembly/life.pbc
 
+# For reporting success or failure with different configurations
+ok:
+	$(PERL) tools/dev/genrpt.pl --ok
+
+okfile:
+	$(PERL) tools/dev/genrpt.pl --ok --File parrot.ok
+
+nok:
+	$(PERL) tools/dev/genrpt.pl --nok
+
+nokfile:
+	$(PERL) tools/dev/genrpt.pl --nok --File parrot.nok
 
 ###############################################################################
 #
