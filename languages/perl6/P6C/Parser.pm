@@ -749,6 +749,7 @@ _closure_args:	  <leftop: comma['variable'] semi_op comma['variable']>
 want_for_for:	  av_seq closure
 want_for_foreach: maybe_decl '(' expr ')' block
 want_for_when:	  comma closure
+want_for_grep:    closure comma
 
 want_for_if:	  scalar_expr closure elsif(s?) else(?)
 elsif:		  /els(?:if|unless)/ scalar_expr closure

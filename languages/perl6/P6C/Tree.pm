@@ -206,6 +206,24 @@ sub P6C::want_for_if::tree {
     return [@conditions];
 }
 
+# ('want_for_grep' closure comma-list)
+sub P6C::want_for_grep::tree {
+    my $x = shift;
+    my (undef, $raw_closure, $raw_comma) = @$x;
+    my $closure = maybe_tree($raw_closure);
+
+    my ($params, $ctx) = P6C::Parser::parse_sig('$_', no_named => 1);
+    $closure->params($params);
+
+    # FIXME! This sets a compile-time constant context for the
+    # condition subroutine -- which is actually the right thing to do,
+    # but will probably need to be adjusted after adding runtime
+    # contexts.
+    $closure->{return_context} = new P6C::Context type => 'PerlUndef';
+
+    return new P6C::ValueList vals => [$closure, $raw_comma->tree];
+}
+
 ##############################
 # Literals
 sub P6C::sv_literal::tree {
