@@ -3,7 +3,7 @@
 use strict;
 use lib '../../lib';
 
-use Parrot::Test tests => 10;
+use Parrot::Test tests => 11;
 
 sub test {
     language_output_is('python', $_[0], '', $_[1]);
@@ -44,6 +44,11 @@ a= 5//3
 print a
 a=77/10
 print a
+CODE
+
+test( <<'CODE', 'assign a,b' );
+a = b = 2
+print a, b
 CODE
 
 SKIP: {

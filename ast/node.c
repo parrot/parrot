@@ -182,24 +182,25 @@ exp_Name(Interp* interpreter, nodeType *p)
 }
 
 static nodeType*
-exp_default(Interp* interpreter, nodeType *p)
+exp_next(Interp* interpreter, nodeType *p)
 {
-    nodeType *child;
-    nodeType *next = p->next;
-    child = NODE0(p);
-    if (child)
-        child->expand(interpreter, child);
-    if (next)
-        next->expand(interpreter, next);
+    nodeType *next;
+    for (next = p->next; next; next = next->next) {
+        if (next->expand)
+            next->expand(interpreter, next);
+    }
     return p;
 }
 
 static nodeType*
-exp_next(Interp* interpreter, nodeType *p)
+exp_default(Interp* interpreter, nodeType *p)
 {
-    nodeType *next = p->next;
-    if (next)
-        next->expand(interpreter, next);
+    nodeType *next;
+    next = NODE0(p);
+    for (; next; next = next->next) {
+        if (next->expand)
+            next->expand(interpreter, next);
+    }
     return p;
 }
 
@@ -218,7 +219,7 @@ exp_Assign(Interp* interpreter, nodeType *p)
     regs[0] = NODE0(var)->u.r;
     regs[1] = rhs->u.r;
     insINS(interpreter, unit, ins, "assign", regs, 2);
-    return exp_next(interpreter, p);
+    return rhs;
 }
 
 static nodeType*
@@ -256,7 +257,7 @@ exp_Py_Local(Interp* interpreter, nodeType *p)
     nodeType *var = NODE0(p);
 
     insert_new(interpreter, var, "Undef");
-    return exp_next(interpreter, p);
+    return NULL;
 }
 
 static nodeType*
@@ -278,8 +279,7 @@ exp_Py_Module(Interp* interpreter, nodeType *p)
     i->r[1] = mk_pcc_sub(str_dup(i->r[0]->name), 0);
     add_namespace(interpreter, i->r[1]);
     i->r[1]->pcc_sub->pragma = P_MAIN|P_PROTOTYPED ;
-    doc = NODE0(p);      /* TODO */
-    return exp_default(interpreter, doc);
+    return exp_default(interpreter, p);
 }
 
 static nodeType*
@@ -303,7 +303,7 @@ exp_Py_Print(Interp* interpreter, nodeType *p)
             fatal(1, "exp_Py_Print", "unknown node to print: '%s'", d->d);
         ins = insINS(interpreter, unit, ins, "print_item", regs, 1);
     }
-    return exp_next(interpreter, p);
+    return NULL;
 }
 
 static nodeType*
@@ -313,19 +313,19 @@ exp_Py_Print_nl(Interp* interpreter, nodeType *p)
     Instruction *ins = unit->last_ins;
     SymReg *regs[IMCC_MAX_REGS];
     insINS(interpreter, unit, ins, "print_newline", regs, 0);
-    return exp_next(interpreter, p);
+    return NULL;
 }
 
 static nodeType*
 exp_Src_File(Interp* interpreter, nodeType *p)
 {
-    return exp_default(interpreter, p);
+    return exp_next(interpreter, p);
 }
 
 static nodeType*
 exp_Src_Lines(Interp* interpreter, nodeType *p)
 {
-    return exp_default(interpreter, p);
+    return exp_next(interpreter, p);
 }
 
 
@@ -358,7 +358,7 @@ static node_names ast_list[] = {
     { "Src_File",    	create_1, exp_Src_File, NULL, NULL },
     { "Src_Line",    	create_1, exp_Src_Lines, NULL, NULL },
     { "Stmts",          create_1, exp_default, NULL, NULL },
-    { "_",              create_0, exp_next, NULL, NULL }
+    { "_",              create_0, NULL, NULL, NULL }
 #define CONST_NODE 4
 };
 
