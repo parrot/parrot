@@ -590,6 +590,42 @@ inline op set(out INT, in PMC) {
   goto NEXT();
 }
 
+########################################
+
+=head2 PMC assignment operations: Px = x
+
+=item B<assign>(out PMC, in INT)
+
+=item B<assign>(out PMC, in NUM)
+
+=item B<assign>(out PMC, in PMC)
+
+=item B<assign>(out PMC, in STR)
+
+=cut
+
+inline op assign(out PMC, in PMC) {
+  $1->vtable->set_pmc(interpreter, $1, $2);
+  goto NEXT();
+}
+
+inline op assign(out PMC, in INT) {
+  $1->vtable->set_integer_native(interpreter, $1, $2);
+  goto NEXT();
+}
+
+inline op assign(out PMC, in NUM) {
+  $1->vtable->set_number_native(interpreter, $1, $2);
+  goto NEXT();
+}
+
+inline op assign(out PMC, in STR) {
+  $1->vtable->set_string_native(interpreter, $1, $2);
+  goto NEXT();
+}
+
+########################################
+
 =head2 Keyed set operations: Px[ INTKEY ] = Bx
 
 =item B<set>(out PMC, in INTKEY, in INT)
