@@ -1,0 +1,11 @@
+=head1 TITLE
+
+extend.pod - Parrot extension system
+
+=head1 SYNOPSIS
+
+This is a rough version of the extension documentation for Parrot. It
+should be cleaned up and made into a PDD before final release.
+
+=head1 DESCRIPTION 
+
