@@ -235,3 +235,6 @@ i	Ii
 p	ti
 p	ptp
 i	pt33
+
+# Random stuff
+P	IO
