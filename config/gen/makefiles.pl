@@ -27,6 +27,8 @@ sub runstep {
           commentType => '#');
   genfile('config/gen/makefiles/imcc.in',      'languages/imcc/Makefile',
           commentType => '#');
-}
+  genfile('config/gen/makefiles/brainfuck.in', 'languages/bf/Makefile',
+            commentType => '#');
+	    }
 
 1;
