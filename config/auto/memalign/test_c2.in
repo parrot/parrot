@@ -20,6 +20,6 @@ int main(int argc, char *argv[])
 	 *      arbitrary allocation size)
 	 */
 	int i = posix_memalign(&p, s, 177);
-	puts(((int)p & 0xff) == 0 && i == 0 ? "ok" : "nix");
+       puts(((${ptrcast})p & 0xff) == 0 && i == 0 ? "ok" : "nix");
 	return i;
 }

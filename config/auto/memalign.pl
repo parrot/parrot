@@ -42,6 +42,13 @@ sub runstep {
 	Configure::Data->set('malloc_header', 'stdlib.h');
     }
 
+    if (Configure::Data->get('ptrsize') == Configure::Data->get('intsize')) {
+       Configure::Data->set('ptrcast','int');
+      }
+    else {
+       Configure::Data->set('ptrcast','long');
+      }
+
     cc_gen('config/auto/memalign/test_c.in');
     eval { cc_build(); };
     unless ($@ || cc_run_capture() !~ /ok/) {

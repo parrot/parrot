@@ -171,9 +171,9 @@ print("-e \"jit/$cpuarch/core.jit\" = ", -e "jit/$cpuarch/core.jit" ? 'yes' : 'n
   else {
     Configure::Data->set(
       jitarchname => 'nojit',
-      jitcpuarch  => 'i386',
-      jitcpu      => 'I386',
-      jitosname   => 'nojit',
+      jitcpuarch  => $cpuarch,
+      jitcpu      => $cpuarch,
+      jitosname   => $osname,
       jitcapable  => 0,
       execcapable => 0,
       cc_hasjit   => '',

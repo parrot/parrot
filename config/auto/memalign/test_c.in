@@ -9,6 +9,6 @@
 
 int main(int argc, char **argv) {
 	void *ptr = memalign(256, 17);
-	puts(ptr && ((int)ptr & 0xff) == 0 ? "ok" : "nix");
+       puts(ptr && ((${ptrcast})ptr & 0xff) == 0 ? "ok" : "nix");
 	return 0;
 }
