@@ -46,11 +46,6 @@ Are the docs in C<docs/> useful? Could use someone to proof them, and
 verify that there are no missing chunks (if missing, write them, or 
 get them added to the C<TODO>), and that they are coherent.
 
-=item TODO
-
-Clean up the TODO formatting, esp. the "given" sections, and come up
-with a list of any other missing features that aren't listed there.
-
 =back 4
 
 =head1 PIR
