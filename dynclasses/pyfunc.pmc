@@ -21,7 +21,7 @@ This class implements a Python Function, i.e. a Parrot Closure.
 #include "parrot/parrot.h"
 #include "pyconsts.h"
 
-pmclass PyFunc extends Closure dynpmc group python_group {
+pmclass PyFunc extends Closure dynpmc group python_group dynext {
 
 /*
 
@@ -146,7 +146,7 @@ Invoke a function.  Defaults are filled in first.
                 INTVAL nd = VTABLE_elements(INTERP, func_defaults);
                 for (j=n-nd; j<n && j<11; j++) {
                     if (j >= REG_INT(3)) {
-                        REG_PMC(5+j) = VTABLE_get_pmc_keyed_int(INTERP, 
+                        REG_PMC(5+j) = VTABLE_get_pmc_keyed_int(INTERP,
                             func_defaults, j+nd-n);
                     }
                 }

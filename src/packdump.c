@@ -106,23 +106,30 @@ PackFile_Constant_dump(Interp *interpreter,
         {
             PMC *pmc = self->u.key;
             parrot_sub_t sub;
-            INTVAL code_start =
-                PTR2INTVAL(interpreter->code->cur_cs->base.data);
+            STRING *a_key = const_string(interpreter, "(keyed)");
+            STRING *null = const_string(interpreter, "(null)");
+            opcode_t *code_start =
+                interpreter->code->cur_cs->base.data;
             switch (pmc->vtable->base_type) {
                 case enum_class_Sub:
-                case enum_class_Closure:
-                case enum_class_Continuation:
                 case enum_class_Coroutine:
                     sub = PMC_sub(pmc);
                     PIO_printf(interpreter,
-                            "\tclass => %s, "
-                            "start_offs => %d, "
-                            "end_offs => %d, "
-                            "packed => '%s'\n",
-                            (char*)pmc->vtable->whoami->strstart,
-                            PTR2INTVAL(PMC_struct_val(pmc)) - code_start,
-                            PTR2INTVAL(sub->end) - code_start,
-                            sub->packed);
+                            "\tclass => %Ss,\n"
+                            "\tstart_offs => %d,\n"
+                            "\tend_offs => %d,\n"
+                            "\tname => '%Ss',\n"
+                            "\tname_space => '%Ss'\n",
+                            pmc->vtable->whoami,
+                            sub->address - code_start,
+                            sub->end - code_start,
+                            sub->name,
+                            sub->name_space ?
+                                (sub->name_space->vtable->base_type ==
+                                    enum_class_String ?
+                                PMC_str_val(sub->name_space) : a_key) :
+                                null
+                            );
                     break;
                 default:
                     PIO_printf(interpreter, "\tunknown PMC\n");

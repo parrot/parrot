@@ -593,7 +593,7 @@ add_const_num(Interp *interpreter, char *buf)
 
 static int
 add_const_pmc_sub(Interp *interpreter, SymReg *r,
-        int offs, int len)
+        int offs, int end)
 {
     int k;
     char buf[256];
@@ -604,7 +604,9 @@ add_const_pmc_sub(Interp *interpreter, SymReg *r,
     char *real_name;
     char *class;
     struct PackFile_ConstTable *ct;
+    struct PackFile *pf;
 
+    pf = interpreter->code;
     if (globals.cs->subs->unit->namespace) {
         ns = globals.cs->subs->unit->namespace->reg;
         if (ns->set == 'K')
@@ -632,15 +634,18 @@ add_const_pmc_sub(Interp *interpreter, SymReg *r,
     {
         INTVAL type;
         PMC *name_space;
-        PMC *sub;
+        PMC *sub_pmc;
+        struct Parrot_sub *sub;
 
         type = (r->pcc_sub->calls_a_sub & ITPCCYIELD) ?
-            enum_class_Sub : enum_class_Coroutine;
+             enum_class_Coroutine : enum_class_Sub;
         /* TODO constant - see also src/packfile.c
         */
-        sub = pmc_new(interpreter, type);
-        PObj_get_FLAGS(sub) |= (r->pcc_sub->pragma & SUB_FLAG_PF_MASK);
-        PMC_sub(sub)->name = const_string(interpreter, real_name);
+        sub_pmc = pmc_new(interpreter, type);
+        PObj_get_FLAGS(sub_pmc) |= (r->pcc_sub->pragma & SUB_FLAG_PF_MASK);
+        sub = PMC_sub(sub_pmc);
+        sub->name = string_from_cstring(interpreter, real_name, 0);
+
         name_space = NULL;
         if (ns_const >= 0 && ns_const < ct->const_count) {
             switch (ct->constants[ns_const]->type) {
@@ -651,16 +656,23 @@ add_const_pmc_sub(Interp *interpreter, SymReg *r,
                     name_space = constant_pmc_new(interpreter,
                             enum_class_String);
                     PMC_str_val(name_space) =
-                        ct->constants[ns_const]->u.string;
+                            ct->constants[ns_const]->u.string;
                     break;
             }
         }
-        PMC_sub(sub)->name_space = name_space;
-        PMC_sub(sub)->address = (void*)offs;
-        PMC_sub(sub)->end = (void*)len;
+        sub->name_space = name_space;
+        sub->address = (opcode_t*)(long)offs;
+        sub->end = (opcode_t*)(long)end;
 
+        if (!(r->pcc_sub->pragma & SUB_FLAG_PF_ANON)) {
+            Parrot_store_sub_in_namespace(interpreter, pf,
+                    sub_pmc, sub->name, name_space);
+        }
         pfc->type = PFC_PMC;
-        pfc->u.key = sub;
+        pfc->u.key = sub_pmc;
+        IMCC_debug(interpreter, DEBUG_PBC_CONST,
+                "add_const_pmc_sub '%s' -> '%s' flags %d color %d\n",
+                r->name, real_name, r->pcc_sub->pragma, k);
     }
 #else
     /*
@@ -671,7 +683,7 @@ add_const_pmc_sub(Interp *interpreter, SymReg *r,
     class = "Sub";
     if (r->pcc_sub->calls_a_sub & ITPCCYIELD)
         class = "Coroutine";
-    sprintf(buf, "%s %s %d %d %d %d", class, real_name, offs, len,
+    sprintf(buf, "%s %s %d %d %d %d", class, real_name, offs, end,
             r->pcc_sub->pragma, ns_const);
     rc = PackFile_Constant_unpack_pmc(interpreter, ct, pfc, (opcode_t*)buf);
     if (!rc)

@@ -661,8 +661,10 @@ PackFile_unpack(Interp *interpreter, struct PackFile *self,
     /*
      * now unpack dir, which unpacks its contents ...
      */
+    Parrot_block_DOD(interpreter);
     cursor = PackFile_Segment_unpack(interpreter,
                                      &self->directory.base, cursor);
+    Parrot_unblock_DOD(interpreter);
     /* shortcut */
     self->byte_code = self->cur_cs->base.data;
     /*
@@ -2983,6 +2985,7 @@ PackFile_Constant_unpack_pmc(Interp *interpreter,
     struct Parrot_sub *sub;
     struct PackFile *pf_save;
     int ns_const;
+    PMC *name_space = NULL;
 
 #if TRACE_PACKFILE_PMC
     fprintf(stderr, "PMC_CONST '%s'\n", (char*)cursor);
@@ -3037,7 +3040,7 @@ PackFile_Constant_unpack_pmc(Interp *interpreter,
      * then set private flags of that PMC
      */
     if (flag) {
-	PObj_get_FLAGS(sub_pmc) |= (flag & SUB_FLAG_PF_MASK);
+        PObj_get_FLAGS(sub_pmc) |= (flag & SUB_FLAG_PF_MASK);
     }
 
     /*
@@ -3048,22 +3051,21 @@ PackFile_Constant_unpack_pmc(Interp *interpreter,
     /*
      * finally place the sub in the global stash
      */
-    if (!(flag & SUB_FLAG_PF_ANON)) {
-        PMC *name_space = NULL;
-        STRING *ns;
-        if (ns_const >= 0 && ns_const < constt->const_count) {
-            switch (constt->constants[ns_const]->type) {
-                case PFC_KEY:
-                    name_space = constt->constants[ns_const]->u.key;
-                    break;
-                case PFC_STRING:
-                    name_space = constant_pmc_new(interpreter,
-                            enum_class_String);
-                    PMC_str_val(name_space) =
-                        constt->constants[ns_const]->u.string;
-                    break;
-            }
+    if (ns_const >= 0 && ns_const < constt->const_count) {
+        switch (constt->constants[ns_const]->type) {
+            case PFC_KEY:
+                name_space = constt->constants[ns_const]->u.key;
+                break;
+            case PFC_STRING:
+                name_space = constant_pmc_new(interpreter,
+                        enum_class_String);
+                PMC_str_val(name_space) =
+                    constt->constants[ns_const]->u.string;
+                break;
         }
+    }
+    sub->name_space = name_space;
+    if (!(flag & SUB_FLAG_PF_ANON)) {
         Parrot_store_sub_in_namespace(interpreter, pf,
                 sub_pmc, sub->name, name_space);
     }

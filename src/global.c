@@ -23,6 +23,7 @@ tdb
 #include "parrot/parrot.h"
 #include "global.str"
 
+#define DEBUG_GLOBAL 0
 /*
 
 =item C<PMC *
@@ -54,8 +55,8 @@ Parrot_find_global(Parrot_Interp interpreter, STRING *class, STRING *globalname)
      * hash lookup duplication
      */
     HashBucket *b;
-#ifdef DEBUG_FIND
-    PIO_printf(interpreter, "find_global class '%Ss' meth '%Ss\n",
+#if DEBUG_GLOBAL
+    PIO_printf(interpreter, "find_global class '%Ss' meth '%Ss'\n",
             class, globalname);
 #endif
     stash = interpreter->globals->stash_hash;
@@ -248,17 +249,17 @@ Parrot_store_sub_in_namespace(Parrot_Interp interpreter, struct PackFile *pf,
     PMC *globals = interpreter->globals->stash_hash;
     INTVAL type, class_type;
 
-#if TRACE_PACKFILE_PMC
+#if DEBUG_GLOBAL
     fprintf(stderr, "PMC_CONST: store_global: name '%s' ns %s\n",
             (char*)sub_name->strstart,
-            name_space ? (char*)name_space->strstart : "(none)");
+            name_space ? (char*)PMC_str_val(name_space)->strstart : "(none)");
 #endif
     /*
      * namespace is either s String or a Key PMC or NULL
      */
-    if (!name_space) {
+    if (PMC_IS_NULL(name_space)) {
 global_ns:
-        VTABLE_set_pmc_keyed_str(interpreter, globals, sub_name, sub_pmc);
+        Parrot_store_global(interpreter, NULL, sub_name, sub_pmc);
     }
     else {
         STRING *names;
@@ -292,7 +293,7 @@ global_ns:
             case enum_class_Key:
                 part = name_space;
                 /*
-                 * TODO handle nested keys too with add_method
+                 * a nested key can't be handled by add_method
                  */
                 for (; part; part = PMC_data(part)) {
                     STRING *s = key_string(interpreter, part);

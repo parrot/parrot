@@ -51,7 +51,7 @@ clear_fixups(Interp* interpreter, PMC* self)
     }
 }
 
-pmclass Eval extends Closure {
+pmclass Eval extends Closure need_ext {
 
     void init() {
         parrot_sub_t sub_data;

@@ -16,8 +16,23 @@ Tests the namespace manipulation.
 
 =cut
 
-use Parrot::Test tests => 10;
+use Parrot::Test tests => 12;
 use Test::More;
+
+pir_output_is(<<'CODE', <<'OUTPUT', "find_global bar");
+.sub main @MAIN
+    $P0 = find_global "bar"
+    print "ok\n"
+    $P0()
+.end
+
+.sub bar
+    print "bar\n"
+.end
+CODE
+ok
+bar
+OUTPUT
 
 pir_output_is(<<'CODE', <<'OUTPUT', "find_global Foo::bar");
 .sub main @MAIN
@@ -33,6 +48,23 @@ pir_output_is(<<'CODE', <<'OUTPUT', "find_global Foo::bar");
 CODE
 ok
 bar
+OUTPUT
+
+pir_output_is(<<'CODE', <<'OUTPUT', "get_name_space Foo::bar");
+.sub main @MAIN
+    $P0 = find_global "Foo", "bar"
+    print "ok\n"
+    $P1 = $P0."get_name_space"()
+    print $P1
+    print "\n"
+.end
+
+.namespace ["Foo"]
+.sub bar
+.end
+CODE
+ok
+Foo
 OUTPUT
 
 pir_output_is(<<'CODE', <<'OUTPUT', "find_global Foo::bar ns");

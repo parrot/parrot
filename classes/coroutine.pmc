@@ -62,7 +62,7 @@ stopped. See the L<Glossary|docs/glossary.pod> for more information.
 	longjmp(exceptions->dest, 1); \
     } while(0)
 
-pmclass Coroutine extends Sub {
+pmclass Coroutine extends Sub need_ext {
 
 /*
 

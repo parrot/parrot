@@ -21,7 +21,7 @@ Extends Parrot's NCI to include attributes, implemented as properties.
 #include "parrot/parrot.h"
 #include "pyconsts.h"
 
-pmclass PyStaticMeth extends PyFunc dynpmc group python_group {
+pmclass PyStaticMeth extends PyFunc dynpmc group python_group need_ext {
 
 /*
 
