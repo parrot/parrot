@@ -1,6 +1,6 @@
 #! perl -w
 
-use Parrot::Test tests => 10;
+use Parrot::Test tests => 11;
 
 output_is( <<'CODE', <<OUTPUT, "set_s_sc" );
 	set	S4, "JAPH\n"
@@ -33,6 +33,27 @@ output_is( <<'CODE', <<OUTPUT, "chopn_s_ic" );
 CODE
 JAPH
 japh
+OUTPUT
+
+output_is(<<'CODE', <<OUTPUT, "chopn, OOB values");
+	set	S1, "A string of length 21"
+	chopn	S1, 0
+	print	S1
+	print	"\n"
+	chopn	S1, 4
+	print	S1
+	print	"\n"
+	chopn	S1, -4
+	print	S1
+	print	"\n"
+	chopn	S1, 1000
+	print	S1
+	print	"** nothing **\n"
+CODE
+A string of length 21
+A string of lengt
+A string of lengt
+** nothing **
 OUTPUT
 
 output_is( <<'CODE', 'JAPH', "substr_s_s_i_i" );

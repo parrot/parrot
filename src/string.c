@@ -143,6 +143,9 @@ string_chopn(STRING* s, INTVAL n) {
     if (n > s->strlen) {
         n = s->strlen;
     }
+    if (n < 0) {
+        n = 0;
+    }
     return (ENC_VTABLE(s)->chopn)(s, n);
 }
 
