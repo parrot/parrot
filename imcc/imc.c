@@ -158,7 +158,6 @@ void compute_du_chain(SymReg * r) {
  */
 
 int interferes(SymReg * r0, SymReg * r1) {
-    int i;
     
     /* Register doesn't interfere with itself, and register sets
      * don't interfere with each other.

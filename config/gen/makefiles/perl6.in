@@ -10,7 +10,7 @@ asm=$(PERL) ..${slash}..${slash}assemble.pl
 all: imcc
 
 test:
-	$(myperl) -MTest::Harness -e 'runtests(@ARGV)' t${slash}*${slash}*.t
+        $(PERL) t/harness
 
 imcc:
 	cd ..${slash}imcc && $(MAKE)

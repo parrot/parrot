@@ -1,19 +1,13 @@
 package P6C::TestCompiler;
+
+use Parrot::Config;
+require Parrot::Test;
+require Test::Builder;
+@EXPORT = ( qw(output_is output_like output_isnt) );
+@ISA = qw(Exporter);
+
+
 $| = 1;
-
-my $PARROT = '../..';
-my $PERL = $ENV{PERL} || 'perl';
-my $ERR = 'a.err';
-my $PARROT_BIN;
-if ($^O eq 'cygwin') {
-    $PARROT_BIN = 'parrot.exe';
-} else {
-    $PARROT_BIN = 'parrot';
-}
-
-my $testno = 0;
-my $code;
-my $out;
 
 sub dumperr {
     my $file = shift;
@@ -35,63 +29,36 @@ sub dumperr {
 }
 
 sub import {
-    my $pkg = caller;
-    no strict 'refs';
-    for (qw(output_is)) {
-	*{$pkg.'::'.$_} = \&$_;
-    }
-    my $class = shift;
-    eval "use Test::More qw(@_)";
+  my( $class, $plan, @args ) = @_;
+  Test::Builder->plan( $plan, @args );
+
+  __PACKAGE__->export_to_level( 2, __PACKAGE__ );
 }
 
-sub mysystem($$) {
-    my ($cmd, $desc) = @_;
-    if (system $cmd) {
-	my ($subcmd) = split ' ', $cmd;
-	ok(0, "$desc: $subcmd: ".($? >> 8));
-	if (($? & 255) == 2) {
-	    die "interrupted";
-	}
-	return 0;
+sub generate_pbc_for {
+    my ($code,$package,$count) = @_;
+    
+    my $p6_f = Parrot::Test::per_test('p6',$count);
+    open P6, ">$p6_f";
+    print P6 $code;
+    close P6;
+    my $imc_f = Parrot::Test::per_test('imc',$count);
+    my $err_f = Parrot::Test::per_test('err',$count);
+    my $pasm_f = Parrot::Test::per_test('pasm',$count);
+
+    Parrot::Test::_run_command("$PConfig{perl} prd-perl6.pl --batch=$p6_f --imc", 'STDOUT' => $imc_f, 'STDERR' => $err_f);
+    Parrot::Test::_run_command("../imcc/imcc $imc_f $pasm_f", 'STDERR' => $err_f);
+    my $pasm;
+    {
+      open PASM, $pasm_f;
+      local $/ = undef;
+      $pasm = <PASM>;
+      close PASM;
     }
-    return 1;
+    Parrot::Test::generate_pbc_for($pasm,$package,$count);
 }
 
-sub output_is {
-    $code = shift;
-    ++$testno;
-    ($out, my $desc) = @_;
-	(undef, my $file, my $line) = caller;
-    unless ($desc) {
-	$desc = "($file line $line)";
-    }
-    open(O, "| perl prd-perl6.pl --batch --imc > a.imc 2>$ERR") or die $!;
-    print O $code;
-    $file =~ s!^t/!!;
-    $file =~ s!/!_!g;
-    $file =~ s!\.t$!!;
-    unless (close O) {
-	ok(0, "$desc: compile error: ".($?>>8));
-	if (($? & 255) == 2) {
-	    die "interrupted";
-	}
-	dumperr($file);
-	return;
-    }
-    unless(mysystem("$PARROT/languages/imcc/imcc a.imc a.pasm 2>$ERR", $desc)
-	   && mysystem("$PERL $PARROT/assemble.pl a.pasm > a.pbc 2>$ERR",$desc)
-	   && mysystem("$PARROT/$PARROT_BIN a.pbc > a.output 2>$ERR", $desc)) {
-	dumperr($file);
-	return;
-    }
-    open(I, 'a.output');
-    my $result = join '', <I>;
-    if ($out eq $result) {
-	ok(1, $desc);
-    } else {
-	ok(0, $desc);
-	dumperr($file);
-    }
-}
+Parrot::Test::generate_functions(__PACKAGE__,\&generate_pbc_for,"../../");
+
 # vim:set sw=4:
 1;

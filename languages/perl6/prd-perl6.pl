@@ -8,7 +8,7 @@ use P6C::Parser;
 my %o;
 (GetOptions(\%o,qw(imc silent
 		   trace no-hitem
-		   batch rule=s grammar=s force help))
+		   batch:s rule=s grammar=s force help))
  && !$o{help})
     || die <<END;
 Usage: $0 [options]
@@ -22,6 +22,7 @@ Usage: $0 [options]
 
     Misc:
 	--batch		read batch on STDIN, write to STDOUT
+	--batch NAME read batch from NAME, write to STDOUT
 	--rule NAME	start with rule NAME (default = 'prog')
 	--grammar NAME	use precompiled grammar NAME (default = Perl6grammar)
 	--force		Rebuild grammar even if it exists.
@@ -68,7 +69,7 @@ sub output_tree {
     if ($o{imc}) {
 	use P6C::IMCC ':external';
 	init();
-	if (!$o{batch}) {
+	if (!defined $o{batch}) {
 	    P6C::IMCC::add_function('main');
 	    P6C::IMCC::set_function('main');
 	}
@@ -80,9 +81,14 @@ sub output_tree {
 }
 
 my $in = '';
-if ($o{batch}) {
+if (defined $o{batch}) {
     local $/ = undef;
-    $in = <STDIN>;
+    if($o{batch}) {
+      open IN, "$o{batch}";
+      $in = <IN>;
+    } else {
+      $in = <STDIN>;
+    }
     my $result = $parser->$::rule($in);
     exit if $o{silent};
     output_tree($result);

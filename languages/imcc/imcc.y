@@ -365,7 +365,7 @@ void relop_to_op(int relop, char * op) {
 %token <i> GLOBAL ADDR CLONE
 %token <s> EMIT LABEL
 %token <s> IREG NREG SREG PREG IDENTIFIER STRINGC INTC FLOATC
-%type <i> type program globals classes class subs sub sub_start relop
+%type <i> type program subs sub sub_start relop
 %type <s> classname
 %type <sr> labels label statements statement
 %type <sr> instruction assignment if_statement
@@ -380,23 +380,9 @@ program:
     { $$ = 0; }
     ;
 
-globals:
-    { $$ = 0; }
-    ;
-
 emit:
     |   EMIT
         { iEMIT($1); }
-    ;
-
-classes:
-        class
-        classes class
-    ;
-
-class:
-        sub
-        subs sub
     ;
 
 subs:
