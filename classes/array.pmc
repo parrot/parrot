@@ -455,7 +455,7 @@ pmclass Array {
 
         if (!key) return;
         ix = atom2int(interpreter, &key->atom);
-        return SELF.set_string_keyed_int(&ix, value);
+        SELF->vtable->set_string_keyed_int(INTERP, SELF, &ix, value);
     }
 
     void set_pmc_keyed_int (INTVAL* dest_key, PMC* src, INTVAL* src_key) {
