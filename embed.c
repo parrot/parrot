@@ -292,7 +292,7 @@ Parrot_runcode(struct Parrot_Interp *interpreter, int argc, char *argv[])
     if (Interp_flags_TEST(interpreter, PARROT_JIT_FLAG)) {
         PIO_fprintf(interpreter, PIO_STDERR(interpreter),
                 "Parrot VM: Platform " JIT_ARCHNAME " is not JIT-capable.\n");
-        exit(1);
+        Parrot_exit(1);
     }
 
 #endif

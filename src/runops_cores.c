@@ -54,7 +54,7 @@ runops_cgoto_core(struct Parrot_Interp *interpreter, opcode_t *pc)
 #else
     PIO_eprintf(interpreter,
             "Computed goto unavailable in this configuration.\n");
-    exit(1);
+    Parrot_exit(1);
     return NULL;
 #endif
 }

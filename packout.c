@@ -228,7 +228,7 @@ find_in_const(PMC *key, int type)
                  key->cache.num_val)
             return i;
     PIO_eprintf(NULL, "find_in_const: couldn't find const for key\n");
-    exit(1);
+    Parrot_exit(1);
     return 0;
 }
 
@@ -368,7 +368,7 @@ PackFile_Constant_pack(struct PackFile_Constant *self, opcode_t *packed)
             default:
                 PIO_eprintf(NULL, "PackFile_Constant_pack: "
                             "unsupported constant type\n");
-                exit(1);
+                Parrot_exit(1);
             }
         }
 
@@ -378,7 +378,7 @@ PackFile_Constant_pack(struct PackFile_Constant *self, opcode_t *packed)
         /* TODO: OK to be silent here? */
         /* ARGH, don't be silent -lt */
         PIO_eprintf(NULL, "PackFile_Constant_pack: unsupported constant\n");
-        exit(1);
+        Parrot_exit(1);
         break;
     }
 

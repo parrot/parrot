@@ -22,7 +22,7 @@
 #  include "parrot/oplib/core_ops_cg.h"
 #endif
 
-/* #define ATEXIT_DESTROY */
+#define ATEXIT_DESTROY
 
 extern op_lib_t *PARROT_CORE_PREDEREF_OPLIB_INIT(void);
 
@@ -561,7 +561,7 @@ make_interpreter(Interp_flags flags)
 
     interpreter->prederef_code = (void **)NULL;
 #ifdef ATEXIT_DESTROY
-    on_exit(Parrot_really_destroy, (void*)interpreter);
+    Parrot_on_exit(Parrot_really_destroy, (void*)interpreter);
 #endif
 
     return interpreter;

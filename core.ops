@@ -129,7 +129,7 @@ inline op open(out INT, in STR) {
   $1 = PTR2OPCODE_T(fopen(string_to_cstring(interpreter, ($2)), "r+"));
   if (!$1) {
     perror("Can't open");
-    exit(1);
+    Parrot_exit(1);
   }
 
   goto NEXT();

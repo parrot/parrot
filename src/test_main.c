@@ -125,7 +125,7 @@ parseflags(Parrot_Interp interpreter, int *argc, char **argv[])
         default:
             fprintf(stderr, "parrot: Invalid flag %c used\n",
                     (*argv)[0][1]);
-            exit(1);
+            Parrot_exit(1);
         }
 
         (*argc)--;
@@ -165,7 +165,7 @@ usage(void)
             cgoto_info
     );
 
-    exit(0);
+    Parrot_exit(0);
 }
 
 static void
@@ -184,7 +184,7 @@ but WITHOUT ANY WARRANTY; without even the implied warranty of\n\
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See either\n\
 the GNU General Public License or the Artistic License for more details.\n\n");
 
-    exit(0);
+    Parrot_exit(0);
 }
 
 /*

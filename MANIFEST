@@ -200,6 +200,7 @@ examples/mops/mops.scheme
 examples/pxs/PQt.C
 examples/pxs/QtHelloWorld.pasm
 exceptions.c
+exit.c
 fingerprint_c.pl
 global_setup.c
 hash.c
@@ -1209,6 +1210,7 @@ include/parrot/embed.h
 include/parrot/encoding.h
 include/parrot/events.h
 include/parrot/exceptions.h
+include/parrot/exit.h
 include/parrot/global_setup.h
 include/parrot/hash.h
 include/parrot/headers.h
@@ -1631,6 +1633,7 @@ t/pmc/perlstring.t
 t/pmc/pmc.t
 t/pmc/sub.t
 t/src/basic.t
+t/src/exit.t
 t/src/intlist.t
 t/src/list.t
 t/src/manifest.t

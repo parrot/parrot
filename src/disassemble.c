@@ -37,7 +37,7 @@ main(int argc, char *argv[])
 
     if (argc != 2) {
         fprintf(stderr, "Usage: disassemble programfile \n");
-        exit(1);
+        Parrot_exit(1);
     }
 
     na(argv[0]);

@@ -23,7 +23,7 @@ internal_exception(int exitcode, const char *format, ...)
     va_start(arglist, format);
     vfprintf(stderr, format, arglist);
     va_end(arglist);
-    exit(exitcode);
+    Parrot_exit(exitcode);
 }
 
 /* Panic handler */

@@ -202,6 +202,7 @@ typedef void (*funcptr_t)(void);
 #include "parrot/debug.h"
 #include "parrot/sub.h"
 #include "parrot/key.h"
+#include "parrot/exit.h"
 #endif
 
 /*
