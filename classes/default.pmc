@@ -341,7 +341,7 @@ found then C<NULL> is returned.
         PMC *meth_hash;
         int type = SELF->vtable->base_type;
 
-        if (type >= (int)INTERP->nci_method_table_size)
+        if (type >= (int)INTERP->nci_method_table_size || type <= 0)
             return NULL;
 
         meth_hash = INTERP->nci_method_table[type];

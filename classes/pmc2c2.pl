@@ -482,10 +482,10 @@ sub read_dump {
             $dump =~ s!^classes/!!;
         }
         elsif ($dump =~ m!^vtable!) {
-            $dump = "../vtable.dump";
+            $dump = "$FindBin::Bin/../vtable.dump";
         }
         unless ( -e $dump) {
-            $dump = "../classes/$dump";
+            $dump = "$FindBin::Bin/../classes/$dump";
         }
     }
     print "Reading $dump\n" if $opt{verbose};
