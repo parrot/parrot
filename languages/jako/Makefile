@@ -17,20 +17,20 @@ default:
 # Compilation:
 #
 
-bench.pasm: bench.jako jako_compiler.pl
-	jako_compiler.pl bench.jako > bench.pasm
+bench.pasm: bench.jako jakoc
+	jakoc bench.jako > bench.pasm
 
-euclid.pasm: euclid.jako jako_compiler.pl
-	jako_compiler.pl euclid.jako > euclid.pasm
+euclid.pasm: euclid.jako jakoc
+	jakoc euclid.jako > euclid.pasm
 
-fact.pasm: fact.jako jako_compiler.pl
-	jako_compiler.pl fact.jako > fact.pasm
+fact.pasm: fact.jako jakoc
+	jakoc fact.jako > fact.pasm
 
-fib.pasm: fib.jako jako_compiler.pl
-	jako_compiler.pl fib.jako > fib.pasm
+fib.pasm: fib.jako jakoc
+	jakoc fib.jako > fib.pasm
 
-hello.pasm: hello.jako jako_compiler.pl
-	jako_compiler.pl hello.jako > hello.pasm
+hello.pasm: hello.jako jakoc
+	jakoc hello.jako > hello.pasm
 
 
 #
