@@ -1,9 +1,8 @@
 #!/usr/bin/perl
 
 use strict;
-use lib qw(../../../lib .);
-use Test::More tests => 3;
-use run_tcl;
+use lib qw(tcl/t t . ../lib ../../lib ../../../lib);
+use Parrot::Test tests => 3;
 
 my($tcl,$expected);
 
@@ -12,14 +11,14 @@ $tcl = <<'EOTCL';
  puts [append a]
 EOTCL
 $expected = "2\n";
-is(output($tcl),$expected,"noarg");
+language_output_is('tcl', $tcl, $expected, 'noarg');
 
 $tcl = <<'EOTCL';
  set a 1
  puts [append a 2 3]
 EOTCL
 $expected = "123\n";
-is(output($tcl),$expected,"multiarg");
+language_output_is('tcl', $tcl, $expected, 'multiarg');
 
 $tcl = <<'EOTCL';
  set a 1
@@ -27,4 +26,4 @@ $tcl = <<'EOTCL';
  puts $b
 EOTCL
 $expected = "12\n";
-is(output($tcl),$expected,"uniarg");
+language_output_is('tcl', $tcl, $expected, 'multiarg');

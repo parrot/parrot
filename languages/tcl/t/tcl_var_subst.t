@@ -1,36 +1,54 @@
 #!/usr/bin/perl
 
 use strict;
-use lib qw(../../../lib .);
-use Test::More tests => 4;
-use run_tcl;
+use lib qw(tcl/t t . ../lib ../../lib ../../../lib);
+use Parrot::Test tests => 7;
 
-my($tcl,$expected);
+language_output_is("tcl",<<'TCL',<<OUT,"middle");
+  set a whee
+  puts "foo $a bar"
+TCL
+foo whee bar
+OUT
 
-$tcl = <<'EOTCL';
- set a whee
- puts "foo $a bar"
-EOTCL
-$expected = "foo whee bar\n";
-is(output($tcl),$expected,"middle");
+language_output_is("tcl",<<'TCL',<<OUT,"left");
+  set a whee
+  puts "$a bar"
+TCL
+whee bar
+OUT
 
-$tcl = <<'EOTCL';
- set a whee
- puts "$a bar"
-EOTCL
-$expected = "whee bar\n";
-is(output($tcl),$expected,"left");
+language_output_is("tcl",<<'TCL',<<OUT,"right");
+  set a whee
+  puts "bar $a"
+TCL
+bar whee
+OUT
 
-$tcl = <<'EOTCL';
- set a whee
- puts "bar $a"
-EOTCL
-$expected = "bar whee\n";
-is(output($tcl),$expected,"right");
+language_output_is("tcl",<<'TCL',<<OUT,"all");
+  set a whee
+  puts $a
+TCL
+whee
+OUT
 
-$tcl = <<'EOTCL';
- set a whee
- puts $a
-EOTCL
-$expected = "whee\n";
-is(output($tcl),$expected,"all");
+language_output_is("tcl",<<'TCL',<<OUT,"array");
+   set a(b) whee
+   puts $a(b)
+TCL
+whee
+OUT
+
+language_output_is("tcl",<<'TCL',<<OUT,"scalar as array");
+  set a 2
+  puts $a(b)
+TCL
+can't read \"a(b)\": variable isn't array
+OUT
+
+language_output_is("tcl",<<'TCL',<<OUT,"array as scalar");
+  set a(b) 2
+  puts $a
+TCL
+can't read \"a\": variable is an array
+OUT

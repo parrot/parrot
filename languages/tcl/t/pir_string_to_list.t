@@ -1,9 +1,8 @@
 #!/usr/bin/perl
 
 use strict;
-use lib qw(../../../lib .);
-use Test::More tests => 1;
-use run_pir;
+use lib qw(tcl/t t . ../lib ../../lib ../../../lib);
+use Parrot::Test tests => 1;
 
 my($pir,$expected);
 
@@ -49,4 +48,4 @@ c
 d
 EOF
 
-is(output($pir),$expected,"simple list");
+pir_output_is($pir,$expected,"simple list");

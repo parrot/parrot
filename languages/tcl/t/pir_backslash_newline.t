@@ -1,9 +1,8 @@
 #!/usr/bin/perl
 
 use strict;
-use lib qw(../../../lib .);
-use Test::More tests => 1;
-use run_pir;
+use lib qw(tcl/t t . ../lib ../../lib ../../../lib);
+use Parrot::Test tests=>1;
 
 my($pir,$expected);
 
@@ -23,4 +22,4 @@ EOPIR
 This is funny
 EOF
 
-is(output($pir),$expected,"backslash_newline_subst");
+pir_output_is($pir,$expected,"backslash_newline_subst");

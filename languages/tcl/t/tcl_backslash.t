@@ -3,9 +3,8 @@
 #XXX need TODO tests for octal, hex, unicode
 
 use strict;
-use lib qw(../../../lib .);
-use Test::More tests => 9;
-use run_tcl;
+use lib qw(tcl/t t . ../lib ../../lib ../../../lib);
+use Parrot::Test tests => 9;
 
 my($tcl,$expected);
 
@@ -13,53 +12,53 @@ $tcl = <<'EOTCL';
  puts -nonewline "\n"
 EOTCL
 $expected = chr(0xa);
-is(output($tcl),$expected,"newline");
+language_output_is("tcl",$tcl,$expected,"newline");
 
 $tcl = <<'EOTCL';
  puts -nonewline "\t"
 EOTCL
 $expected = chr(0x9);
-is(output($tcl),$expected,"tab");
+language_output_is("tcl",$tcl,$expected,"tab");
 
 $tcl = <<'EOTCL';
  puts -nonewline "\b"
 EOTCL
 $expected = chr(0x8);
-is(output($tcl),$expected,"backspace");
+language_output_is("tcl",$tcl,$expected,"backspace");
 
 $tcl = <<'EOTCL';
  puts -nonewline "\f"
 EOTCL
 $expected = chr(0xc);
-is(output($tcl),$expected,"formfeed");
+language_output_is("tcl",$tcl,$expected,"formfeed");
 
 $tcl = <<'EOTCL';
  puts -nonewline "\r"
 EOTCL
 $expected = chr(0xd);
-is(output($tcl),$expected,"carriage return");
+language_output_is("tcl",$tcl,$expected,"carriage return");
 
 $tcl = <<'EOTCL';
  puts -nonewline "\v"
 EOTCL
 $expected = chr(0xb);
-is(output($tcl),$expected,"vertical tab");
+language_output_is("tcl",$tcl,$expected,"vertical tab");
 
 $tcl = <<'EOTCL';
  puts -nonewline "\\"
 EOTCL
 $expected = "\\";
-is(output($tcl),$expected,"backslash");
+language_output_is("tcl",$tcl,$expected,"backslash");
 
 $tcl = <<'EOTCL';
 puts -nonewline "\1"
 EOTCL
 $expected = "1";
-is(output($tcl),$expected,"normal character");
+language_output_is("tcl",$tcl,$expected,"normal character");
 
 $tcl = <<'EOTCL';
 puts "a\
 b"
 EOTCL
 $expected = "a b\n";
-is(output($tcl),$expected,"backslash newline substitution");
+language_output_is("tcl",$tcl,$expected,"backslash newline substitution");

@@ -1,9 +1,8 @@
 #!/usr/bin/perl
 
 use strict;
-use lib qw(../../../lib .);
-use Test::More tests => 5;
-use run_pir;
+use lib qw(tcl/t t . ../lib ../../lib ../../../lib);
+use Parrot::Test tests => 4; #1
 
 my($pir,$expected);
 
@@ -26,18 +25,22 @@ my ($pir) = <<'EOPIR';
   .include "languages/tcl/lib/match_close.imc"
 EOPIR
   $pir =~ s/\$POS/$start_pos/;
-  return output($pir);
+  return $pir;
 }
 
 # Now, keep in mind, this string is being parsed by perl, then by IMCC
 # before ending up in a register.
 
-is(match_close(1),-1,"invalid start char");
-is(match_close(19),-2,"unterminated quote");
-is(match_close(25),-2,"unterminated brace");
+pir_output_is(match_close(1),-1,"invalid start char");
+pir_output_is(match_close(19),-2,"unterminated quote");
+pir_output_is(match_close(25),-2,"unterminated brace");
+
+=for TODO
 
 TODO: {
-  local $TODO = "not sure if this is the right way for these to behave. research tcl.\n";
-  is(match_close(8),19,"matched quote");
-  is(match_close(25),34,"matched brace");
+local $::TODO = "not sure if this is the right way for these to behave. research tcl.\n";
+  pir_output_is(match_close(8),19,"matched quote");
+  pir_output_is(match_close(25),34,"matched brace");
 }
+
+=cut
