@@ -554,6 +554,7 @@ help :
 	@echo "  test<core>:        Run the test suite with a specified core."
 	@echo "                     Valid cores are b, C, f, g, j, r, S."
 	@echo "  src_tests:         Run test in C-file."
+	@echo "  perl_tests:        Test the Perl modules in the distribution."
 	@echo "  testbench:         Run all benchmarks."
 	@echo "  manitest:          Check for new files."
 	@echo ""
@@ -1025,7 +1026,7 @@ html-clean :
 
 dynclasses : dynclasses.dummy
 
-dynclasses.dummy :
+dynclasses.dummy : 
 	$(MAKE_C) dynclasses
 
 dynclasses-test :
@@ -1072,13 +1073,13 @@ compilers-clean :
 # The --running-make-test argument is currently used by long-running tests
 # to disable GC_DEBUG.
 EXTRA_TEST_ARGS = --gc-debug --running-make-test
-IMCC_TEST_FILES = imcc/t/*/*.t
 SRC_TEST_FILES  = t/src/*.t
+PERL_TEST_FILES = t/perl/*.t
 TEST_FILES      = t/library/*.t \
     t/op/*.t \
     t/pmc/*.t \
     t/native_pbc/*.t \
-    $(IMCC_TEST_FILES) \
+    imcc/t/*/*.t \
     t/dynclass/*.t
 
 # Common prep for all test targets.
@@ -1089,12 +1090,13 @@ test_prep : all
 # Users have to look at only one report.
 # Normal core
 test : test_prep
-	$(PERL) t/harness $(EXTRA_TEST_ARGS) $(PARROT_ARGS) $(TEST_FILES) $(SRC_TEST_FILES)
+	$(PERL) t/harness $(EXTRA_TEST_ARGS) $(PARROT_ARGS) $(TEST_FILES) $(SRC_TEST_FILES) $(PERL_TEST_FILES)
 
 # Test various run cores and other stuff
 # 'testC', 'testg' and 'testj' are tested only,
 # when the needed runcores are available
-fulltest : testb \
+fulltest : \
+    testb \
 #CONDITIONED_LINE(cg_flag):    testC \
     testf \
 #CONDITIONED_LINE(cg_flag):    testg \
@@ -1102,6 +1104,7 @@ fulltest : testb \
     testr \
     testS \
     src_tests \
+    perl_tests \
     testbench
 
 # bounds checking, slow core
@@ -1139,6 +1142,10 @@ testexec: test_prep
 # Test that need to be compiled by the C-compiler
 src_tests :
 	$(PERL) t/harness $(SRC_TEST_FILES)
+
+# Test the Perl5 Modules in the Parrot distribution
+perl_tests :
+	$(PERL) t/harness $(PERL_TEST_FILES)
 
 # all benchmarks
 testbench: test_prep
