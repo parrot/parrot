@@ -1,0 +1,26 @@
+# This file provides opcode name->number mapping, so we can nail down
+# the op numbers for the core opcodes and provide
+# backward-compatibility for bytecode.
+#
+# The format of this file is simple:
+#
+# opcode_name (whitespace) opcode_number
+#
+# The opcode name is the full and complete name of the
+# opcode--i.e. for the "add N1, N2, N3" op the name is add_n_n_n, not
+# add.
+#
+# once an opcode is added to this file it should never be
+# removed. Opcodes that are in here but that have no corresponding
+# function backing them (because, for example, they've been deleted,
+# which shouldn't ever happen once we hit production) should be mapped
+# by the ops processing programs to an exception op
+#
+# The numbering of opcodes whose names are *not* in this file begins
+# immediately after the highest-numbered opcode in this file,
+# regardless of what order it is found in. There should be *no* holes
+# in the numbering!
+#
+# Note that end should always be op 0.
+end		0
+print_ic	1

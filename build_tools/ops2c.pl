@@ -32,6 +32,8 @@ _EOF_
 
 Usage() unless @ARGV >= 2;
 
+load_op_map_file();
+
 my $trans_class = "Parrot::OpTrans::" . shift @ARGV;
 
 eval "require $trans_class";
@@ -188,6 +190,9 @@ foreach my $op ($ops->ops) {
     my $args       = "$opsarraytype *cur_opcode, struct Parrot_Interp * interpreter";
     my $definition;
     my $comment = '';
+
+    $index = find_op_number($op->func_name);
+
     $prev_def = '';
     if ($suffix =~ /cg/) {
 	$prev_def = $definition = "PC_$index:";
@@ -224,7 +229,7 @@ END_C
 #   first one and change the op_func_table accordingly
 
     if ($prev_source && $prev_source eq $source) {
-	push @op_func_table, sprintf("  %-50s /* %6ld */\n",
+	$op_func_table[$index] = sprintf("  %-50s /* %6ld */\n",
 	    "$prev_func_name,", $index);
 	push @op_funcs, <<"EOF";
 /*$prev_def	 $func_name => $prev_func_name */
@@ -247,14 +252,13 @@ EOF
 	    push @op_funcs,"\t{\n$source}\n\n";
 	}
 	else {
-	    push @op_func_table, sprintf("  %-50s /* %6ld */\n",
+	    $op_func_table[$index] = sprintf("  %-50s /* %6ld */\n",
 		"$func_name,", $index);
 	    push @op_funcs,      "$definition $comment {\n$source}\n\n";
 	}
 	$prev_source = $source;
 	$prev_func_name = $func_name;
     }
-    $index++;
 }
 
 if ($suffix =~ /cg/) {
@@ -371,7 +375,8 @@ END_C
     $index = 0;
     my (%names, $tot);
 
-    foreach my $op ($ops->ops) {
+    foreach my $op (sort { find_op_number($a->func_name) <=> find_op_number($b->func_name) } $ops->ops) {
+        $index = find_op_number($op->func_name);
 	my $type       = sprintf("PARROT_%s_OP", uc $op->type);
 	my $name       = $op->name;
 	$names{$name} = 1;
@@ -590,6 +595,49 @@ $load_func(Parrot_Interp interpreter)
 }
 END_C
 
+}
+
+sub find_op_number {
+  my $opname = shift;
+  if (exists $ParrotOps::optable{$opname}) {
+    return $ParrotOps::optable{$opname};
+  } else {
+    $ParrotOps::optable{$opname} = ++$ParrotOps::max_op_num;
+    return $ParrotOps::optable{$opname};
+  }
+}
+  
+sub load_op_map_file {
+  my $file = shift;
+
+  if (!defined $file) {
+    $file = "ops.num";
+  }
+
+  my ($name, $number);
+
+  if (!defined $ParrotOps::max_op_num) {
+    $ParrotOps::max_op_num = 0;
+  }
+
+  local *OP;
+  open OP, "< $file" or die "Can't open $file, error $!";
+  
+  while (<OP>) {
+    chomp;
+    s/#.*$//;
+    s/\s*$//;
+    s/^\s*//;
+    next unless $_;
+    ($name, $number) = split(/\s+/, $_);
+    $name = "Parrot_" . $name;
+    $ParrotOps::optable{$name} = $number;
+    if ($number > $ParrotOps::max_op_num) {
+      $ParrotOps::max_op_num = $number;
+    }
+  }
+  close OP;
+  return;
 }
 
 exit 0;
