@@ -79,7 +79,7 @@ sub goto_address
   if ($addr eq '0') {
   	return "return (0);"
   } else { 
-  	return "goto *ops_addr[*(cur_opcode = $addr)]";
+  	return "goto *ops_addr[*(cur_opcode = (opcode_t *)$addr)]";
   }
 }
 
