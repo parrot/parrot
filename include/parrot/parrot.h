@@ -65,6 +65,10 @@
 #  include <sys/stat.h>
 #endif
 
+#ifdef HAS_HEADER_SETJMP
+#	include <setjmp.h>
+typedef jmp_buf Parrot_jump_buff;
+#endif
 
 #define NUM_REGISTERS 32
 #define PARROT_MAGIC 0x13155a1

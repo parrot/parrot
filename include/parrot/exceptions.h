@@ -53,6 +53,26 @@ void do_panic(struct Parrot_Interp *interpreter, const char *message,
 #define JIT_ERROR 1
 #define ILL_INHERIT 2
 
+typedef enum {
+	EXCEPT_normal = 0,
+	EXCEPT_warning = 1,
+	EXCEPT_error = 2,
+	EXCEPT_severe = 3,
+	EXCEPT_fatal = 4,
+	EXCEPT_doomed = 5
+} exception_severity;
+
+/* Right now there's nothing special for the jump buffer, but there might be one later, so we wrap it in a struct so that we can expand it later */
+struct Parrot_exception {
+	Parrot_jump_buff destination;
+	long language;
+	long system;
+	exception_severity severity;
+	long error;
+	};
+	
+typedef struct Parrot_exception Parrot_exception;
+
 #endif
 
 /*
