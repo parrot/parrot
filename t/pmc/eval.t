@@ -16,7 +16,7 @@ Tests on-the-fly PASM compilation and invocation.
 
 =cut
 
-use Parrot::Test tests => 6;
+use Parrot::Test tests => 7;
 use Test::More;
 
 # PASM1 is like PASM but appends an C<end> opcode
@@ -130,3 +130,41 @@ ok 2
 11
 OUTPUT
 }
+output_is(<<'CODE', <<'OUTPUT', "PIR compiler sub");
+##PIR##
+.sub test @MAIN
+    .local NCI compiler
+    find_global compiler, "xcompile"
+    compreg "XPASM", compiler
+    .local pmc my_compiler
+    my_compiler = compreg "XPASM"
+    .local pmc the_sub
+    .local string code
+    code = "print \"ok\\n\"\n"
+    code .= "end\n"
+    the_sub = my_compiler("_foo", code)
+    the_sub()
+    the_sub = global "_foo"
+    the_sub()
+.end
+
+.sub xcompile
+    .param string sub_name
+    .param string code
+    $S0 = ".pcc_sub "
+    $S0 .= sub_name
+    $S0 .= ":\n"
+    $S0 .= code
+    .local NCI pasm_compiler
+    pasm_compiler = compreg "PASM"
+    # print $S0
+    $P0 = compile pasm_compiler, $S0
+    .pcc_begin_return
+	.return $P0
+    .pcc_end_return
+.end
+CODE
+ok
+ok
+OUTPUT
+

@@ -1075,7 +1075,11 @@ unmanagedstruct PMC and stick the address into its data pointer.
 
 =item B<compile>(out PMC, in PMC, in STR)
 
-Compile source code $3 with compiler $2 into PMC $1.
+Compile source code $3 with compiler $2 into PMC $1. The compile opcode
+is just a fancy function call without the overhead of setting
+branch flags. Thus the compiler PMC $2 can be a plain function returning
+a subroutine or a NCI PMC that wraps a compiler implemented in C. The
+result has to be some invocable PMC.
 
 =item B<compreg>(out PMC, in STR)
 
@@ -1143,14 +1147,7 @@ op dlvar (out PMC, in PMC, in STR) {
 }
 
 inline op compile(out PMC, in PMC, in STR) {
-  PMC *compiler = $2;
-  if (compiler->vtable->base_type == enum_class_Compiler ||
-	  compiler->vtable->base_type == enum_class_NCI) {
-      $1 = VTABLE_invoke(interpreter, compiler, $3);
-  }
-  else {
-      $1 = Parrot_runops_fromc_args_save(interpreter, compiler, "PS", $3);
-  }
+  $1 = VTABLE_invoke(interpreter, $2, $3);
   goto NEXT();
 }
 
