@@ -25,6 +25,7 @@ static INTVAL dynclass_PyObject;
 static INTVAL dynclass_PyInt;
 static INTVAL dynclass_PyFloat;
 static INTVAL dynclass_PyList;
+static INTVAL dynclass_PyString;
 
 static STRING *HEX;
 static STRING *OCT;
@@ -49,6 +50,7 @@ they will be used frequently here.
             dynclass_PyInt     = Parrot_PMC_typenum(INTERP, "PyInt");
             dynclass_PyFloat   = Parrot_PMC_typenum(INTERP, "PyFloat");
             dynclass_PyList    = Parrot_PMC_typenum(INTERP, "PyList");
+            dynclass_PyString  = Parrot_PMC_typenum(INTERP, "PyString");
 
             HEX = const_string(INTERP, "__hex__");
             OCT = const_string(INTERP, "__oct__");
@@ -75,10 +77,16 @@ enter_nci_method should create these as locals to begin with.
 */
 
     METHOD void __load__() {
-        STRING *class;
-        PMC *stash, *iter, *pad;
+        STRING *class, *name, *key;
+        PMC *stash, *iter, *item, *pad, *find;
         HashBucket *b;
         INTVAL j, n;
+
+        /* Already init'ed? */
+        pad = scratchpad_get_current(interpreter);
+        name = const_string(INTERP, "__name__");
+        find = scratchpad_find(INTERP, pad, name);
+        if (find && VTABLE_defined(INTERP, find)) return;
 
         /* Find all PyBuiltin "nci" methods */
         class = const_string(INTERP, "PyBuiltin");
@@ -90,13 +98,17 @@ enter_nci_method should create these as locals to begin with.
         stash = b->value;
         iter = Parrot_PerlHash_get_iter(INTERP, stash);
         n = VTABLE_elements(INTERP, stash);
-        pad = scratchpad_get_current(interpreter);
         for (j = 0; j < n; ++j) {
-            STRING *key = VTABLE_shift_string(INTERP, iter);
-            PMC *item = VTABLE_get_pmc_keyed_str(INTERP, stash, key);
+            key = VTABLE_shift_string(INTERP, iter);
+            item = VTABLE_get_pmc_keyed_str(INTERP, stash, key);
             scratchpad_store_by_name(INTERP, pad, 0, key, item);
         }
 
+        /* Begin main! */
+        item = pmc_new(INTERP, dynclass_PyString);
+        VTABLE_set_string_native(INTERP, item,
+            const_string(INTERP, "__main__"));
+        scratchpad_store_by_name(INTERP, pad, 0, name, item);
     }
 
 

@@ -104,6 +104,30 @@ Returns the number of elements in the hash.
 
 /*
 
+=item C<INTVAL exists_keyed(PMC *key)>
+
+Returns whether a key C<*key> exists in the hash.
+
+=cut
+
+*/
+
+    INTVAL exists_keyed(PMC* key) {
+        STRING * sx;
+        Hash * h = (Hash *)PMC_struct_val(SELF);
+        HashBucket *b;
+        sx = key_string(INTERP, key);
+        key = key_next(INTERP, key);
+        b = hash_get_bucket(INTERP, h, sx);
+        if (b == NULL)
+            return 0;       /* no such key */
+        if (key == NULL)
+            return 1;       /* lookup stops here */
+        return VTABLE_exists_keyed(INTERP, (PMC*)b->value, key);
+    }
+
+/*
+
 =item C<PMC* get_iter ()>
 
 Return a new iterator for dictionary

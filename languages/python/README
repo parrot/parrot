@@ -1,3 +1,26 @@
+Python on Parrot is still a work in progress.  It builds upon work
+by Leo, Dan and others (described below), and by Michal Sabren and
+others in the Pirate project.
+
+The ultimate goal is to have a version of Python which is written
+in Python and directly targets Parrot Byte Code.  This final version
+should have no dependencies on CPython, instead it will depend on
+Parrot and a set of Parrot PMCs which will implement the Python
+specific behavior required.
+
+For now, Pirate, its tests, and the tests in this directory and those
+in the t/dynclass directory are being used to flesh out the runtime.
+
+You can get the latest version of Pirate from:
+
+    http://pirate.tangentcode.com/
+
+- Sam Ruby
+
+Below is the previous contents of this README:
+
+ - - -
+
 This directory contains the outcome of the (failed) attempt to
 implement - within five weeks - enough of Python, to run the Pie-thon
 benchmark for OSCON:

@@ -127,9 +127,6 @@ if a is c:
     print "nok"
 CODE
 
-SKIP: {
-   skip("Not yet", 3);
-
 test( <<'CODE', 'subscr' );
 print "abcde"[2]
 i =3
@@ -145,10 +142,10 @@ tests = {
 
 def main():
     for x in range(5):
-	if x in tests:
-	    print 1,
-	else:
-	    print 0,
+        if x in tests:
+            print 1,
+        else:
+            print 0,
     print
 
 if __name__ == '__main__':
@@ -160,4 +157,3 @@ a = 3
 print -a
 print +a - -a
 CODE
-}
