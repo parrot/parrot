@@ -76,30 +76,6 @@ Parrot_exec_restart_op(Parrot_jit_info_t *jit_info,
 {
 }
 
-void
-Parrot_exec_emit_mov_mr(Interp * interpreter, char *mem, int reg)
-{
-    Parrot_jit_emit_mov_mr(interpreter, mem, reg);
-}
-
-void
-Parrot_exec_emit_mov_rm(Interp * interpreter, int reg, char *mem)
-{
-    Parrot_jit_emit_mov_rm(interpreter, reg, mem);
-}
-
-void
-Parrot_exec_emit_mov_mr_n(Interp * interpreter, char *mem,int reg)
-{
-    Parrot_jit_emit_mov_mr_n(interpreter, mem, reg);
-}
-
-void
-Parrot_exec_emit_mov_rm_n(Interp * interpreter, int reg,char *mem)
-{
-    Parrot_jit_emit_mov_rm_n(interpreter, reg, mem);
-}
-
 /* Assign the offset of the progra_code */
 static void
 offset_fixup(Parrot_exec_objfile_t *obj)
@@ -107,7 +83,7 @@ offset_fixup(Parrot_exec_objfile_t *obj)
     int i,j;
 
     for (i = 0; i < obj->data_count; i++) {
-        for (j = 0; j < i; j++) 
+        for (j = 0; j < i; j++)
             obj->symbol_table[i].value += obj->data_size[j];
     }
 }
