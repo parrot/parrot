@@ -1436,6 +1436,7 @@ languages/jako/lib/Jako/Construct/Label.pm
 languages/jako/lib/Jako/Construct/Statement.pm
 languages/jako/lib/Jako/Construct/Statement/Arithmetic.pm
 languages/jako/lib/Jako/Construct/Statement/Assign.pm
+languages/jako/lib/Jako/Construct/Statement/Bitwise.pm
 languages/jako/lib/Jako/Construct/Statement/Call.pm
 languages/jako/lib/Jako/Construct/Statement/Decrement.pm
 languages/jako/lib/Jako/Construct/Statement/Goto.pm
