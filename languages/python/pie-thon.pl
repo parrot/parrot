@@ -915,6 +915,14 @@ EOC
     push @stack, [-1, $p, 'I'];
 }
 
+sub ret_val {
+    my $a = shift;
+    my %rets = (
+	'__repr__' => 'S',
+    );
+    return $rets{$a} if defined $rets{$a};
+    return 'P';
+}
 
 sub CALL_FUNCTION
 {
@@ -966,6 +974,7 @@ EOC
     my $args = join ', ', @args;
     my $t;
     $func = $tos->[1];
+    # create argument tuple
     if ($builtins{$name} && $builtins{$name} eq 'v') {
 	my $ar = temp('P');
 	print <<"EOC";
@@ -987,9 +996,17 @@ EOC
 	$t = $func $args   $cmt
 EOC
     }
-    elsif ($name =~/^obj (\w+) attr (\w+)/) {  # convert to meth call syntax
+    elsif ($name =~/^obj (\S+) attr (\w+)/) {  # convert to meth call syntax
+	my ($obj, $attr) = ($1, $2);
+	my $ret_type = ret_val($attr);
+	my $ret_string = "";
+	if ($ret_type ne 'None') {
+	    $t = temp($ret_type);
+	    $ret_string = "$t = ";
+	}
 	print <<EOC;
-	$1."$2"($args)  $cmt
+	P2 = $1
+	$ret_string$func($args)  $cmt
 EOC
     }
     else {
@@ -1076,7 +1093,10 @@ EOC
 
 sub BUILD_TUPLE
 {
-    my ($n, $c, $cmt) = @_;
+    my ($n, $c, $cmt, $type) = @_;
+    # TODO iter for FixedPMCArray
+    # $type = "FixedPMCArray" unless defined $type;
+    $type = "PerlArray";
     my ($opcode, $rest) = ($code[$code_l]->[2],$code[$code_l]->[4]);
     if ($opcode eq 'UNPACK_SEQUENCE') {
 	$code_l++;
@@ -1092,7 +1112,8 @@ sub BUILD_TUPLE
     }
     my $ar = temp('P');
     print <<EOC;
-	$ar = new PerlArray $cmt
+	$ar = new $type $cmt
+	$ar = $n
 EOC
     for (my $i = $n-1; $i >= 0; $i--) {
 	my $p = pop @stack;
@@ -1105,7 +1126,7 @@ EOC
 
 sub BUILD_LIST
 {
-    BUILD_TUPLE(@_)
+    BUILD_TUPLE(@_,"PerlArray")
 }
 sub BUILD_MAP
 {
@@ -1114,7 +1135,7 @@ sub BUILD_MAP
     print <<EOC;
 	$ar = new PerlHash $cmt
 EOC
-    push @stack, [-1, $ar, 'P'];
+    push @stack, ["hash", $ar, 'P'];
 }
 sub RAISE_VARARGS
 {
@@ -1240,8 +1261,17 @@ sub STORE_SUBSCR
     my $w = pop @stack;
     my $v = pop @stack;
     my $x = pop @stack;
+    my $key = $x->[1];
+    if ($v->[0] eq 'hash') {
+	if ($key =~ /^\d+$/) {
+	    $key = qq!"$key"!;
+	}
+	elsif ($v->[2] eq 'I') {
+	    # ok ?
+	}
+    }
     print <<EOC
-	$v->[1]\[$x->[1]\] = $w->[1] $cmt
+	$v->[1]\[$key\] = $w->[1] $cmt
 EOC
 }
 
@@ -1310,10 +1340,27 @@ sub LOAD_ATTR
     my ($n, $c, $cmt) = @_;
     my $tos = pop @stack;  # object
     my $attr = temp('P');
-    print <<EOC;
-	 $attr = getattribute $tos->[1], "$c" $cmt
+    my $obj = promote $tos;
+    my $o;
+    if ($builtins{$obj}) { # postponed LOAD_ like dict
+	$o = temp('P');
+	my $args = "";
+	if ($builtins{$obj} eq 'v') {
+	    my $arg = temp('P');
+	    print <<EOC;
+	$arg = new FixedPMCArray
 EOC
-    push @stack, ["obj $tos->[1] attr $c", $attr, 'P'];
+	    $args = $arg;
+	}
+	print <<EOC;
+	$o = $obj($args) 		# postponed LOAD_
+EOC
+	$obj = $o;
+    }
+    print <<EOC;
+	$attr = getattribute $obj, "$c" $cmt
+EOC
+    push @stack, ["obj $obj attr $c", $attr, 'P'];
 }
 
 sub Slice

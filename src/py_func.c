@@ -63,13 +63,14 @@ parrot_py_chr(Interp *interpreter, PMC *pmc)
 static PMC *
 dict_from_tuple_array(Interp *interpreter, PMC *ar)
 {
-    INTVAL i;
+    INTVAL i, el;
     PMC *dict;
     /*
      * ar is an array of tuples which are key/value pairs
      */
     dict = pmc_new(interpreter, enum_class_PerlHash);
-    for (i = 0; i < VTABLE_elements(interpreter, ar); ++i) {
+    el = VTABLE_elements(interpreter, ar);
+    for (i = 0; i < el; ++i) {
         PMC *tupl = VTABLE_get_pmc_keyed_int(interpreter, ar, i);
         PMC *key, *value;
         INTVAL n = VTABLE_elements(interpreter, tupl);
@@ -104,6 +105,7 @@ parrot_py_dict(Interp *interpreter, PMC *argv)
     switch (arg->vtable->base_type) {
         case enum_class_PerlHash:
             return arg;
+        case enum_class_FixedPMCArray:  /* sequence from BUILD_TUPLE */
         case enum_class_PerlArray:      /* sequence from BUILD_LIST */
             return dict_from_tuple_array(interpreter, arg);
         default:
@@ -131,6 +133,7 @@ parrot_py_list(Interp *interpreter, PMC *argv)
     arg = VTABLE_get_pmc_keyed_int(interpreter, argv, 0);
     iter = NULL;
     switch (arg->vtable->base_type) {
+        case enum_class_FixedPMCArray:  /* sequence from BUILD_TUPLE */
         case enum_class_PerlArray:      /* sequence from BUILD_LIST */
             /* TODO return copy */
             return arg;

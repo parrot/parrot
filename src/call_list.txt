@@ -201,7 +201,7 @@ v	IOP
 P	Ii
 
 # PerlHash fromkeys
-v	IOPP
+P	IOPP
 
 # Oddball ones for postgres
 p	ptiLTLLi

@@ -44,7 +44,7 @@ int_compare(Parrot_Interp interp, void *a, void *b)
     return a != b;
 }
 
-static void
+static PMC*
 fromkeys(Interp *interpreter, PMC *self, PMC *keys, PMC *value)
 {
     INTVAL elems, dod_disabled, i;
@@ -111,6 +111,7 @@ done:
         Parrot_unblock_DOD(interpreter);
         Parrot_unblock_GC(interpreter);
     }
+    return self;
 }
 
 
@@ -157,7 +158,7 @@ Class initialization. Allocates the memory for the hash.
         make_bufferlike_pool(INTERP, sizeof(struct _hash));
         if (pass) {
             enter_nci_method(INTERP, enum_class_PerlHash,
-                    F2DPTR(fromkeys), "fromkeys", "vIOPP");
+                    F2DPTR(fromkeys), "fromkeys", "PIOPP");
         }
     }
 /*
@@ -430,11 +431,55 @@ Returns the big number value for the element at C<*key>.
 Returns a string representation of the hash, showing its class name and
 memory address.
 
+For Python returns its repr.
+
 =cut
 
 */
 
     STRING* get_string () {
+        if (Interp_flags_TEST(interpreter, PARROT_PYTHON_MODE)) {
+            /* TODO use freeze */
+            PMC *iter = VTABLE_get_iter(INTERP, SELF);
+            STRING *res, *s;
+            INTVAL j, n;
+
+            res = string_from_cstring(INTERP, "{", 0);
+            n = VTABLE_elements(INTERP, SELF);
+            for (j = 0; j < n; ++j) {
+                STRING *key = VTABLE_shift_string(INTERP, iter);
+                int i,all_digit = 1;
+                PMC *val;
+
+                for (i = 0; i < (int)key->strlen; ++i) {
+                    if (!isdigit(((char *)key->strstart)[i])) {
+                        all_digit = 0;
+                        break;
+                    }
+                }
+                if (all_digit) {
+                    res = string_append(INTERP, res, key, 0);
+                }
+                else {
+                    res = string_append(INTERP, res,
+                            const_string(INTERP, "'"), 0);
+                    res = string_append(INTERP, res, key, 0);
+                    res = string_append(INTERP, res,
+                            const_string(INTERP, "'"), 0);
+                }
+                res = string_append(INTERP, res,
+                        const_string(INTERP, ": "), 0);
+                val = SELF.get_pmc_keyed_str(key);
+                res = string_append(INTERP, res,
+                        VTABLE_get_string(INTERP, val), 0);
+                if (j < n - 1)
+                res = string_append(INTERP, res,
+                        const_string(INTERP, ", "), 0);
+            }
+            res = string_append(INTERP, res,
+                        const_string(INTERP, "}"), 0);
+            return res;
+        }
         return Parrot_sprintf_c(INTERP, "PerlHash[0x%x]", SELF);
     }
 
@@ -840,14 +885,32 @@ Sets C<*value> as the value for C<*key>.
 
 The C<==> operation.
 
-Currently just returns false, C<*value> is ignored.
+Check if to hashes hold the same keys and values.
 
 =cut
 
 */
 
     INTVAL is_equal (PMC* value) {
-        return 0;
+        PMC *iter = VTABLE_get_iter(INTERP, SELF);
+        INTVAL j, n;
+
+        if (value->vtable->base_type != enum_class_PerlHash)
+            return 0;
+        n = SELF.elements();
+        if (VTABLE_elements(INTERP, value) != n)
+            return 0;
+        for (j = 0; j < n; ++j) {
+            STRING *key = VTABLE_shift_string(INTERP, iter);
+            PMC *item1, *item2;
+            if (!VTABLE_exists_keyed_str(INTERP, value, key))
+                return 0;
+            item1 = SELF.get_pmc_keyed_str(key);
+            item2 = VTABLE_get_pmc_keyed_str(INTERP, value, key);
+            if (!mmd_dispatch_i_pp(INTERP, item1, item2, MMD_EQ))
+                return 0;
+        }
+        return 1;
     }
 
 /*

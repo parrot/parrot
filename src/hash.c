@@ -626,7 +626,10 @@ new_hash_x(Interp *interpreter, Hash **hptr,
     hash->entry_type = val_type;
     hash->key_type = hkey_type;
     hash->value_size = val_size;       /* extra size */
-    hash->seed = (size_t) Parrot_uint_rand(0);
+    if (Interp_flags_TEST(interpreter, PARROT_PYTHON_MODE))
+        hash->seed = 3793;
+    else
+        hash->seed = (size_t) Parrot_uint_rand(0);
 
     /*      PObj_report_SET(&hash->buffer); */
 
