@@ -1,171 +1,109 @@
 # Test the ability of the register allocator to
-# generate spills. 
+# generate spills.
 #
-.sub _MAIN
-	
-	.local int a
-	.local int b
-	.local int c
-	.local int d
-	.local int e
-	.local int f
-	.local int g
-	.local int h
-	.local int i
-	.local int j
-	.local int k
-	.local int l
-	.local int m
-	.local int n
-	.local int o
-	.local int p
-	.local int q
-	.local int r
-	.local int s
-	.local int t
-	.local int q
-	.local int r
-	.local int s
-	.local int t
-	.local int u
-	.local int v
-	.local int w
-	.local int x
-	.local int y 
-	.local int z
-	.local int aa
-	.local int ab
-	.local int ac
-	.local int ad
-	.local int ae
-	.local int af
-	.local int ag
-	.local int ah
-	.local int ai
-	.local int aj
-	.local int ak
-	.local int al
-	.local int am
 
-        set a,  1
-	set b,  2
-	set c,  3
-	set d,  4
-	set e,  5
-	set f,  6
-	set g,  7
-	set h,  8
-	set i,  9
-	set j,  10
-	set k,  11
-	set l,  12
-	set m,  13
-	set n,  14
-	set o,  15
-	set p,  16
-	set q,  17
-	set r,  18
-	set s,  19
-	set t,  20
-	set u,  21
-	set v,  22
-	set w,  23
-	set x,  24
-	set y,  25
-	set z,  26
-	set aa,  27
-	set ab,  28
-	set ac,  29
-	set ad,  30
-	set ae,  31
-	set af,  32
-	set ag,  33 
-	set ah,  34
-	set ai,  35
-	set aj,  36
-	set ak,  37
-	set al,  38
-	set am,  39
-	
-	print a
-	print "\n"
-	print b
-	print "\n"
-	print c
-	print "\n"
-	print d 
-	print "\n"
-	print e 
-	print "\n"
-	print f 
-	print "\n"
-	print g 
-	print "\n"
-	print h 
-	print "\n"
-	print i
-	print "\n"
-	print j
-	print "\n"
-	print k 
-	print "\n"
-	print l 
-	print "\n"
-	print m 
-	print "\n"
-	print n 
-	print "\n"
-	print o 
-	print "\n"
-	print p 
-	print "\n"
-	print q 
-	print "\n"
-	print r 
-	print "\n"
-	print s 
-	print "\n"
-	print t 
-	print "\n"
-	print u 
-	print "\n"
-	print v
-	print "\n"
-	print w 
-	print "\n"
-	print x 
-	print "\n"
-	print y 
-	print "\n"
-	print z 
-	print "\n"
-	print aa
-	print "\n"
-	print ab 
-	print "\n"
-	print ac 
-	print "\n"
-	print ad 
-	print "\n"
-	print ae 
-	print "\n"
-	print af 
-	print "\n"
-	print ag 
-	print "\n"
-	print ah 
-	print "\n"
-	print ai 
-	print "\n"
-	print aj 
-	print "\n"
-	print ak
-	print "\n"
-	print al
-	print "\n"
-	print am
-	print "\n"
-		
+# currently needed XXX
+.sub main
+ 	bsr _MAIN
 	end
+ret
+
+.sub _MAIN
+	$I0 = 0
+	$I1 = 1
+	$I2 = 2
+	$I3 = 3
+	$I4 = 4
+	$I5 = 5
+	$I6 = 6
+	$I7 = 7
+	$I8 = 8
+	$I9 = 9
+
+	$I10 = 10
+	$I11 = 11
+	$I12 = 12
+	$I13 = 13
+	$I14 = 14
+	$I15 = 15
+	$I16 = 16
+	$I17 = 17
+	$I18 = 18
+	$I19 = 19
+
+	$I20 = 20
+	$I21 = 21
+	$I22 = 22
+	$I23 = 23
+	$I24 = 24
+	$I25 = 25
+	$I26 = 26
+	$I27 = 27
+	$I28 = 28
+	$I29 = 29
+
+	$I30 = 30
+	$I31 = 31
+	$I32 = 32
+	$I33 = 33
+	$I34 = 34
+	$I35 = 35
+	$I36 = 36
+	$I37 = 37
+	$I38 = 38
+	$I39 = 39
+
+	$I40 = 40
+	# XXX if one block holds the whole code
+	# spilling doesn't work because life_analysis is block based
+	# so this statement makes a new basic block
+	eq $I10,1, pri
+pri:
+	print $I0
+	print $I1
+	print $I2
+	print $I3
+	print $I4
+	print $I5
+	print $I6
+	print $I7
+	print $I8
+	print $I9
+	print "\n"
+	print $I10
+	print $I11
+	print $I12
+	print $I13
+	print $I14
+	print $I15
+	print $I16
+	print $I17
+	print $I18
+	print $I19
+	print "\n"
+	print $I20
+	print $I21
+	print $I22
+	print $I23
+	print $I24
+	print $I25
+	print $I26
+	print $I27
+	print $I28
+	print $I29
+	print "\n"
+	print $I30
+	print $I31
+	print $I32
+	print $I33
+	print $I34
+	print $I35
+	print $I36
+	print $I37
+	print $I38
+	print $I39
+	print "\n"
+	print $I40
+	print "\n"
 	ret
 
