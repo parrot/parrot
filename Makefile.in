@@ -152,7 +152,7 @@ clean:
 	$(RM_F) vtable.ops
 	$(RM_F) $(TEST_PROG) $(PDUMP)
 	$(RM_F) t/op/*.pasm t/op/*.pbc t/op/*.out
-	$(RM_F) examples/assembly/mops$(EXE) examples/assembly/mops.c
+	$(RM_F) examples/assembly/mops${exe} examples/assembly/mops.c
 	$(RM_F) examples/assembly/mops$(O) examples/assembly/mops.pbc
 	$(RM_F) Parrot/OpLib/core.pm
 	cd docs && $(MAKE) clean && cd ..
