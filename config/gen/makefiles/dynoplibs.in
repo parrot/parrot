@@ -6,6 +6,7 @@ LD_SHARED = ${ld_shared}
 PERL = ${perl}
 RM_F = ${rm_f}
 SO = ${so}
+OPS2C = -I..${slash}lib ..${slash}ops2c.pl
 
 
 # add your dynamic oplibs here
@@ -19,19 +20,19 @@ all: myops_ops$(SO) myops_ops_cg$(SO) myops_ops_cgp$(SO) \
 .PRECIOUS: %_ops.c %_ops_cgp.c %_ops_cg.c %_ops_prederef.c %_ops_switch.c
 
 %_ops.c  : %.ops
-	cd .. ; $(PERL) ops2c.pl C   dynoplibs${slash}$<
+	$(PERL) $(OPS2C) C --dynamic $<
 
 %_ops_cgp.c  : %.ops
-	cd .. ; $(PERL) ops2c.pl CGP dynoplibs${slash}$<
+	$(PERL) $(OPS2C) CGP --dynamic $<
 
 %_ops_cg.c  : %.ops
-	cd .. ; $(PERL) ops2c.pl CGoto dynoplibs${slash}$<
+	$(PERL) $(OPS2C) CGoto --dynamic $<
 
 %_ops_prederef.c  : %.ops
-	cd .. ; $(PERL) ops2c.pl CPrederef dynoplibs${slash}$<
+	$(PERL) $(OPS2C) CPrederef --dynamic $<
 
 %_ops_switch.c  : %.ops
-	cd .. ; $(PERL) ops2c.pl CSwitch dynoplibs${slash}$<
+	$(PERL) $(OPS2C) CSwitch --dynamic $<
 
 %$(SO) : %.c
 	$(LD) $(LD_SHARED) $(LD_SHARED_FLAGS) $(LDFLAGS) -o $@ \

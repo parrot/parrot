@@ -21,7 +21,8 @@ my %arg_dir_mapping = (
 
 sub Usage {
     print STDERR <<_EOF_;
-usage: $0 trans input.ops [input2.ops ...]
+usage: $0 trans [--dynamic] input.ops [input2.ops ...]
+       trans := C | CGoto | CGP | CSwitch | CPrederef
 _EOF_
     exit 1;
 }
@@ -44,7 +45,12 @@ my $defines = $trans->defines;
 my $opsarraytype = $trans->opsarraytype;
 my $core_type = $trans->core_type;
 
+my $dynamic;
 my $file = shift @ARGV;
+if ($file eq '-d' || $file eq '--dynamic') {
+    $file = shift @ARGV;
+    $dynamic = 1;
+}
 
 my $base = $file;
 $base =~ s/\.ops$//;
@@ -53,11 +59,10 @@ my $incdir  = "include/parrot/oplib";
 my $include = "parrot/oplib/${base}_ops${suffix}.h";
 my $header  = "include/$include";
 my $source  = "${base}_ops${suffix}.c";
-my $dynamic;
 
-if ($base =~ m!^dynoplibs/!) {
+if ($base =~ m!^dynoplibs/! || $dynamic) {
     $header = "${base}_ops${suffix}.h";
-    $base =~ s!^dynoplibs/!!;
+    $base =~ s!^.*[/\\]!!;
     $include = "${base}_ops${suffix}.h";
     $dynamic = 1;
 }
@@ -104,7 +109,7 @@ my $num_entries = $num_ops + 1; # For trailing NULL
 # Open the output files:
 #
 
-if (! -d $incdir) {
+if (!$dynamic && ! -d $incdir) {
     mkdir($incdir, 0755) or die "ops2c.pl: Could not mkdir $incdir $!!\n";
 }
 
@@ -359,9 +364,9 @@ END_C
 
 }
 
+my (%names, $tot);
 if ($suffix eq '') {
     $op_info = "${bs}op_info_table";
-    $getop = 'get_op';
 #
 # Op Info Table:
 #
@@ -375,7 +380,6 @@ static op_info_t $op_info\[$num_entries] = {
 END_C
 
     $index = 0;
-    my (%names, $tot);
 
     foreach my $op ($ops->ops) {
 	my $type       = sprintf("PARROT_%s_OP", uc $op->type);
@@ -405,15 +409,20 @@ END_C
 
 	$index++;
     }
+    print SOURCE <<END_C;
+};
 
+END_C
+}
+
+if ($suffix eq '' && !$dynamic) {
+    $getop = 'get_op';
     my $hash_size = 2011;
     $tot = $index + scalar keys(%names);
     if ($hash_size < $tot * 1.2) {
 	    print STDERR "please increase hash_size ($hash_size) in ops2c.pl\n";
     }
-
     print SOURCE <<END_C;
-};
 
 /*
 ** Op lookup function:
