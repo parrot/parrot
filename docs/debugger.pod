@@ -1,0 +1,416 @@
+=head1 TITLE
+
+pdb - The Parrot Debugger
+
+=head1 HISTORY
+
+=over 4
+
+=item Version 1.0
+
+First version (CVS debug.c revision 1.24), authored by Aldo Calpini
+
+=back
+
+=head1 ABSTRACT
+
+This document describes the Parrot Debugger.
+
+=head1 DESCRIPTION
+
+Starting from version 0.0.6 Parrot has its own debugger, which is
+modeled after Perl's one. Its name is F<pdb>, and is an interactive
+environment that let you step through bytecode, set breakpoints,
+evaluate assembly instructions and peek at the interpreter status.
+
+A good (well, at least some) knowledge of the Parrot internals is 
+obviously required to read this document. Some familiarity with 
+debugging principles is also mandatory beyond this point.
+
+=head1 BUILDING pdb
+
+The debugger is not built with Parrot, but you should make it with its
+specific target:
+
+  make pdb
+
+(where C<make> is the same C<make> incarnation you used to build Parrot).
+
+If everything goes well, you should come up with a F<pbd> executable
+in the same directory as the Parrot program.
+
+=head1 THE DEBUGGER SHELL
+
+To start the debugger type:
+
+  pdb file.pbc
+
+That is, F<pdb> takes exactly one argument, which is the Parrot bytecode
+that you're going to debug.
+
+Note that you can't pass command line arguments to your program when
+you invoke the debugger. See later the C<run (r)> command for this.
+
+After the version banner, you'll see the friendly debugger prompt:
+
+  (pdb)
+
+F<pdb> is ready to receive commands and give output. To list the available 
+commands type 'h'. To quit the debugger type 'q'.
+
+As with the Perl debugger, whenever it halts and shows you a line of code,
+it is always the line it's I<about> to execute, not the one that it has
+just executed.
+
+=head1 DEBUGGER COMMANDS
+
+Always remember that you can enter 'h' to get a list of commands (this document 
+may be outdated in respect to the actual debugger, so let him speak for itself).
+
+Most commands can be shortened to their first letter. When available,
+this is signaled by the letter in parentheses after the command name
+Thus, C<help (h)> means that the command can be given as 'help' or 
+just 'h'. On the other hand, C<load> can only be given as 'load', verbatim.
+And the debugger is case sensitive.
+
+A blank line always repeat the last command entered.
+
+Also note that at this point in the development, F<pdb> has very poor
+error checking on command and their argument, so type carefully or
+something bad will happen. Feel free to report bugs, or better yet
+patch the source code (see L</FILES> below).
+
+=over 4
+
+=item disassemble
+
+Disassemble the bytecode. This will turn the file loaded with
+C<load> into proper bytecode.
+
+=item load
+
+Load a source code (assembler) file. The syntax is:
+
+  load FILE
+
+=item list (l)
+
+List the source code. The syntax is:
+
+  list [FROM] [NUM]
+
+Both arguments are optional. By default C<FROM> is from
+where the last list command ended (or the first line if
+	this is the first invocation) and C<NUM> is 10. That is,
+it lists the source code ten lines at a time.
+
+Note that the disassembled source code is not the same
+as the original source code: labels take the names C<L1 .. Ln>
+and opcodes are fully qualified (eg. C<set_i_ic> instead of just 
+C<set>). See also C<eval (e)>.
+
+Example:
+
+  # lists the first three source code lines
+  (pdb) l 1 3
+  1  set_i_ic I1,0
+  2  L3:  print_sc "fact of "
+  3  print_i I1
+
+=item run (r)
+
+Run (or restarts) the program. The syntax is:
+
+  run [ARGUMENTS]
+
+Any argument you give are passed as command line arguments
+to the program (eg. they populate P0).
+
+After the program has ended, you can run it again with this
+command. See also the C<continue (c)> command.
+
+Example:
+
+  (pdb) r
+  Restating
+  fact of 0 is: 1
+  fact of 1 is: 1
+  fact of 2 is: 2
+  fact of 3 is: 6
+  fact of 4 is: 24
+  fact of 5 is: 120
+  fact of 6 is: 720
+  Program exited.
+
+=item break (b)
+
+Add a breakpoint. The syntax is:
+
+  b LINE
+
+The command returns a number, which is the
+breakpoint identifier. You should note this
+number for the C<delete (d)> command (see below).
+
+Example:
+
+  # sets a breakpoint on line 10 (will be breakpoint 0)
+  (pdb) b 10
+  Breakpoint 0 at line 10
+
+  # another breakpoint on line 11 (will be breakpoint 1)  
+  (pbd) b 11
+  Breakpoint 1 at line 11
+
+=item delete (d)
+
+Delete a breakpoint. The syntax is:
+
+  d NUM
+
+The C<NUM> argument is the breakpoint number (from 0 to N)
+as emitted by the C<break (b)> command. It is NOT the line that has
+the breakpoint.
+
+Example:
+
+  # delete the first breakpoint (was on line 10, see example above)
+  (pdb) d 0
+  
+=item continue (c)
+
+Continue the program execution. The syntax of this command is:
+
+  continue [NUM]
+
+Without arguments, the command just runs the source code until
+a breakpoint is found (or until the end of the program).
+
+If you specify a number, it will skip the next C<NUM>
+breakpoints it encounters.
+
+When the program has ended, continue will do nothing. Use
+C<run (r)> to execute it again.
+
+=item next (n)
+
+Run the next instruction. The syntax is:
+
+  next [NUM]
+
+C<NUM> defaults to 1, but you can give a number of instructions
+to execute before stopping again.
+
+=item eval (e)
+
+Run an instruction. The syntax is:
+
+  eval INSTRUCTION
+
+Remember that the debugger is not the same as the assembler,
+so this will NOT work:
+
+  eval set I0, 1
+
+you have to use the fully qualified opcode names instead, eg:
+
+  eval set_i_ic I0, 1
+
+If this doesn't make sense to you, well, you're out of luck.
+
+Example:
+
+  (pdb) e set_i_ic 0, 42
+  
+  (pdb) e print_i 0
+  42
+
+=item trace (t)
+
+Trace the next instruction. The syntax is:
+
+  trace [NUM]
+
+It executes the next C<NUM> instructions (default is 1)
+just as C<next (n)> does, but printing additional trace 
+information. These are the same you get when starting Parrot 
+with the C<-t> option.
+
+Example:
+
+  # executes 2 instructions and trace them
+  (pdb) t 2
+  PC=0; OP=67 (set_i_ic); ARGS=(I1=0, 0)
+  PC=3; OP=24 (print_sc); ARGS=("fact of ")
+  fact of
+  3  print_i I1
+
+=item print (p)
+
+Print the interpreter registers. The syntax is:
+
+  print TYPE [NUM]
+
+Where C<TYPE> is one of:
+
+=over 4
+
+=item C<i> or C<int>
+
+integer registers
+
+=item C<n> or C<num>
+
+number registers
+
+=item C<s> or C<str>
+
+string registers
+
+=item C<p> or C<pmc>
+
+PMC registers
+
+=back
+
+You can optionally give a register number (C<NUM>) to print a single
+register, otherwise the whole range (0..31) will be printed out.
+
+For PMC registers, the command will print the number, the
+class of the PMC (in square brackets) and its string 
+representation (when available). It prints nothing for 
+unitialized PMC registers.
+
+Example:
+
+  # prints the content of I2
+  (pdb) p i 2
+  Integer Registers:
+   2 =              0
+
+  # prints the content of P0
+  (pdb) p p 0
+  PMC Registers:
+   0 = [PerlArray]
+   
+  # prints the content of all string registers
+  (pdb) p s
+  String Registers:
+   0 = 
+          Buflen  =                  4
+          Flags   =                  0
+          Bufused =                  4
+          Strlen  =                  4
+          String  =       Just
+   1 =
+          Buflen  =                  8
+          Flags   =                  0
+          Bufused =                  7
+          Strlen  =                  7
+          String  =       another
+   2 =
+          Buflen  =                  8
+          Flags   =                  0
+          Bufused =                  6
+          Strlen  =                  6
+          String  =       Parrot
+   3 =
+          Buflen  =                  8
+          Flags   =                  0
+          Bufused =                  6
+          Strlen  =                  6
+          String  =       hacker
+   4 = 
+   5 =
+   6 =
+   7 =
+   8 =  
+   # ... and so on
+
+
+=item stack (s)
+
+Examine the stack. The syntax is:
+
+  stack TYPE [NUM]
+  stack NUM
+
+The first form print entries from the register stacks (eg.
+results from C<push_i>, C<push_n>, C<push_s> and C<push_p>).
+For the meaning of C<TYPE> see the C<print (p)> command.
+The C<NUM> argument is the frame number (defaults to 0).
+The whole frame (0..31) is printed out.
+
+The second form prints a single entry (C<NUM>) from the generic 
+stack (eg. results from C<save>), prepending the type of the 
+entry on output.
+
+Example:
+
+  # prints the value on top of the generic stack
+  (pdb) s 0
+  Integer =             42
+  
+  # prints the first integer register stack frame
+  (pdb) s i
+  Integer stack, frame 0, depth 0
+  Integer Registers:
+   0 =              0
+   1 =              0
+   2 =              0
+   3 =              0
+   4 =              0
+   5 =              0
+   6 =              0
+   7 =              0
+   8 =              0
+   # ... and so on
+
+=item info
+
+Print interpreter information.
+
+Example:
+
+  (pdb) info
+  Total memory allocated = 81936
+  DOD runs = 6
+  Collect runs = 0
+  Active PMCs = 8197
+  Active buffers = 7
+  Total PMCs = 21840
+  Total buffers = 48
+  Header allocations since last collect = 0
+  Memory allocations since last collect = 2
+
+=item quit (q)
+
+Exit the debugger.
+
+=item help (h)
+
+List the available commands.
+
+=back
+
+=head1 FILES
+
+=over 4
+
+=item pdb.c
+
+This is the file that will produce the executable.
+Nothing fancy here, only the C<main> function.
+
+=item debug.c
+
+The most part of the debugger is implemented here.
+You may want to start from the C<PDB_run_command>
+function and go down from there for the real meat.
+
+=item include/parrot/debug.h
+
+This defines all the PDB structures, which hold
+data used by the debugger.
+
+=back
