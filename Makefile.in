@@ -422,6 +422,8 @@ cvsclean:
 reconfig:
 	$(MAKE) clean; $(PERL) Configure.pl --reconfig
 
+manitest:
+	$(PERL) -MExtUtils::Manifest=fullcheck -e fullcheck
 
 ###############################################################################
 #

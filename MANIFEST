@@ -4,6 +4,7 @@ Configure.pl
 KNOWN_ISSUES
 LICENSES/Artistic
 MANIFEST
+MANIFEST.SKIP
 Makefile.in
 NEWS
 README
