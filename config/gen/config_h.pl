@@ -25,16 +25,16 @@ sub runstep {
  */
 );
 
-  for(Configure::Data->keys()) {
+  for(sort(Configure::Data->keys())) {
     next unless /i_(\w+)/;
     if(Configure::Data->get($_)) {
       print HH "#define HAS_HEADER_\U$1 1\n"
     }
     else {
-      print HH "#undef HAS_HEADER_\U$1\n";
+      print HH "#undef  HAS_HEADER_\U$1\n";
     }
   }
-  
+
   print HH "#define BUILD_OS_NAME \"$^O\"\n";
 
   close HH;

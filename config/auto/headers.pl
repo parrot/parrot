@@ -24,12 +24,12 @@ sub runstep {
 	next unless /^i_/;
 	Configure::Data->set($_, $Config{$_});
     }
-    
-    # some headers may not be probed-for by perl 5, or might not be 
+
+    # some headers may not be probed-for by perl 5, or might not be
     # properly reflected in %Config (i_fcntl seems to be wrong on my machine,
     # for instance).
-    my @extra_headers = qw(fcntl.h setjmp.h pthread.h);
-    
+    my @extra_headers = qw(fcntl.h setjmp.h pthread.h signal.h);
+
     foreach my $header (@extra_headers) {
         my $flag = "i_$header";
         $flag =~ s/\.h$//g; $flag =~ s/\///g;
@@ -48,7 +48,7 @@ sub runstep {
             Configure::Data->set($flag, undef);
         }
         cc_clean();
-    }    
+    }
 }
 
 1;
