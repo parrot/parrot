@@ -533,7 +533,7 @@ CVS commit access is given to those who taken
 responsibility for a particular area of Parrot, or who often commit
 high-quality patches.
 
-A useful web page is http://cvs.perl.org, which reminds you how to use CVS,
+A useful web page is L<http://cvs.perl.org>, which reminds you how to use CVS,
 and allows you to browse the CVS repository; the code page is a summary
 of this information and other resources about Parrot. Another good
 resource is http://www.parrotcode.org.
