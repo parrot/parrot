@@ -1077,6 +1077,7 @@ my $macro = Macro->new(@files);
 $macro->preprocess();
 if(exists $args{-E}) {
   print join "\n",@{$macro->contents()};
+  print "\n";
   exit;
 }
 
