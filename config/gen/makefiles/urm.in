@@ -1,0 +1,34 @@
+RM_F = ${rm_f}
+PERL = ${perl}
+
+PARROT = ..${slash}..${slash}parrot
+
+all: build
+
+test: build
+	$(PERL) t${slash}t.pl
+
+examples: build
+	$(PERL) urmc -c examples${slash}biggerzero.urm
+	$(PERL) urmc -c examples${slash}sub.urm
+	$(PERL) urmc -c examples${slash}sim.urm
+	$(PERL) urmc -c examples${slash}mult.urm    
+	$(PERL) urmc -c examples${slash}div.urm
+	$(PERL) urmc -c examples${slash}distance.urm
+
+build: 
+	$(PERL) -c urmc
+
+clean:
+	$(RM_F) core *.pbc *~ foo.p*
+	$(RM_F) *~ *.pasm 
+	$(RM_F) *~
+	$(RM_F) \#*
+	$(RM_F) examples${slash}*.pasm examples${slash}*.pbc
+	$(RM_F) examples${slash}*~
+	$(RM_F) examples${slash}\#*
+	$(RM_F) t${slash}*.pasm t${slash}*.pbc
+
+distclean: clean
+	$(RM_F) Makefile
+	
