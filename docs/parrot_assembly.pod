@@ -9,15 +9,19 @@ Parrot assembly language
     Maintainer: Dan Sugalski
     Class: Internals
     PDD Number: 6
-    Version: 1.4
+    Version: 1.5
     Status: Developing
-    Last Modified: 24 September 2001
+    Last Modified: 12 October 2001
     PDD Format: 1
     Language:English
 
 =head2 HISTORY
 
 =over 4
+
+=item Version 1.5
+
+October 12, 2001
 
 =item Version 1.4
 
@@ -44,6 +48,18 @@ None. First version
 =head1 CHANGES
 
 =over 4
+
+=item Version 1.5
+
+=over 4
+
+=item * Now have a bsr in addition to a jsr
+
+=item * return is now ret
+
+=item * Added save and restore ops for saving and restoring individual registers
+
+=back
 
 =item Version 1.4
 
@@ -206,7 +222,12 @@ either Ix, Nx, or Px) Branch offset may also be an integer constant.
 Jump to the location specified by register X. Push the current
 location onto the call stack for later returning.
 
-=item return
+=item bsr ix
+
+Branch to the location specified by X (either register or label). Push
+the current location onto the call stack for later returning.
+
+=item ret
 
 Pop the location off the top of the stack and go there.
 
@@ -414,6 +435,38 @@ The same as L<push_p_c>, for the floating-point register set.
 =item pop_n
 
 The same as L<pop_p>, for the floating-point register set.
+
+=item save_i Ix
+
+Push register X onto the generic stack
+
+=item save_s Sx
+
+Push register X onto the generic stack
+
+=item save_p Px
+
+Push register X onto the generic stack
+
+=item save_n Nx
+
+Push register X onto the generic stack
+
+=item restore_i Ix
+
+Restore register X from the generic stack
+
+=item restore_s Ix
+
+Restore register X from the generic stack
+
+=item restore_p Px
+
+Restore register X from the generic stack
+
+=item restore_n Nx
+
+Restore register X from the generic stack
 
 =item set_warp string
 
