@@ -1,6 +1,6 @@
 #! perl -w
 
-use Parrot::Test tests => 10;
+use Parrot::Test tests => 11;
 use Parrot::PMC '%pmc_types';
 my $perlint = $pmc_types{'PerlInt'};
 my $ok = '"ok 1\n"';
@@ -205,7 +205,7 @@ output_is(<<'CODE', <<'OUTPUT', "bnot");
 # We use band in these tests to null out the high bits, and make the
 # tests independent of the size of our INTVALs
     bnot P0, P0
-    band P0, 0b01010101 
+    band P0, 0b01010101
     print P0
     print "\n"
 
@@ -335,5 +335,27 @@ output_is(<<'CODE', <<'OUTPUT', "inc/dec a PerlUndef");
     end
 CODE
 12-1-2
+OUTPUT
+
+output_is(<<'CODE', <<'OUTPUT', "divide gives int if possible");
+    new P0, .PerlInt
+    new P1, .PerlInt
+    new P2, .PerlUndef
+    set P0, 12
+    set P1, 2
+    div P2, P0, P1
+    print P2
+    print "\n"
+    div P2, P1
+    print P2
+    print "\n"
+    div P2, 2
+    print P2
+    print "\n"
+    end
+CODE
+6
+3
+1.500000
 OUTPUT
 

@@ -69,9 +69,6 @@ pmclass PerlInt extends perlscalar {
         DYNSELF.set_string_native(value);
     }
 
-    /* XXX -lt: only add done yet, others will follow, when
-     * vtable changes are carved in electrons
-     */
     void add (PMC* value, PMC* dest) {
         INTVAL pmci;
 	int vtype = VTABLE_type(INTERP, value);
@@ -109,26 +106,35 @@ pmclass PerlInt extends perlscalar {
     }
 
     void subtract (PMC* value, PMC* dest) {
-	int type = enum_class_PerlInt;
-	INTVAL i;
+        INTVAL pmci;
+	int vtype = VTABLE_type(INTERP, value);
+	FLOATVAL valf;
+	FLOATVAL diff;
 
-	if(value->vtable == &Parrot_base_vtables[enum_class_PerlNum]) {
-	    type = enum_class_PerlNum;
+	pmci = SELF->cache.int_val;
+	if (vtype == enum_class_PerlUndef) {
+            VTABLE_set_integer_native(INTERP, dest, pmci);
+	    return;
 	}
-	else if(value->vtable == &Parrot_base_vtables[enum_class_PerlString]) {
-	    FLOATVAL f = VTABLE_get_number(INTERP, value);
-	    i = VTABLE_get_integer(INTERP, value);
-	    if(f != i) {
-		type = enum_class_PerlNum;
+
+	valf = VTABLE_get_number(INTERP, value);
+	diff = pmci - valf;
+	if (vtype == enum_class_PerlNum) {
+            VTABLE_set_number_native(INTERP, dest, diff);
+	    return;
+	}
+	{
+	    INTVAL vali = (INTVAL) valf;
+	    INTVAL   difi = pmci - vali;
+	    if (diff == difi)
+		VTABLE_set_integer_native(INTERP, dest, difi);
+	    else {
+		/* TODO BIG* promotion */
+		VTABLE_set_number_native(INTERP, dest, diff);
 	    }
+	    return;
+
 	}
-	i = SELF->cache.int_val;
-	if(type == enum_class_PerlNum)
-            VTABLE_set_number_native(INTERP, dest,
-		i - VTABLE_get_number(INTERP, value));
-	else
-            VTABLE_set_integer_native(INTERP, dest,
-		i - VTABLE_get_integer(INTERP, value));
     }
 
     void subtract_int (INTVAL value, PMC* dest) {
@@ -142,26 +148,35 @@ pmclass PerlInt extends perlscalar {
     }
 
     void multiply (PMC* value, PMC* dest) {
-	int type = enum_class_PerlInt;
-	INTVAL i;
+        INTVAL pmci;
+	int vtype = VTABLE_type(INTERP, value);
+	FLOATVAL valf;
+	FLOATVAL mulf;
 
-	if(value->vtable == &Parrot_base_vtables[enum_class_PerlNum]) {
-	    type = enum_class_PerlNum;
+	pmci = SELF->cache.int_val;
+	if (vtype == enum_class_PerlUndef) {
+            VTABLE_set_integer_native(INTERP, dest, pmci);
+	    return;
 	}
-	else if(value->vtable == &Parrot_base_vtables[enum_class_PerlString]) {
-	    FLOATVAL f = VTABLE_get_number(INTERP, value);
-	    i = VTABLE_get_integer(INTERP, value);
-	    if(f != i) {
-		type = enum_class_PerlNum;
+
+	valf = VTABLE_get_number(INTERP, value);
+	mulf = pmci * valf;
+	if (vtype == enum_class_PerlNum) {
+            VTABLE_set_number_native(INTERP, dest, mulf);
+	    return;
+	}
+	{
+	    INTVAL vali = (INTVAL) valf;
+	    INTVAL   muli = pmci * vali;
+	    if (mulf == muli)
+		VTABLE_set_integer_native(INTERP, dest, muli);
+	    else {
+		/* TODO BIG* promotion */
+		VTABLE_set_number_native(INTERP, dest, mulf);
 	    }
+	    return;
+
 	}
-	i = SELF->cache.int_val;
-	if(type == enum_class_PerlNum)
-            VTABLE_set_number_native(INTERP, dest,
-		i * VTABLE_get_number(INTERP, value));
-	else
-            VTABLE_set_integer_native(INTERP, dest,
-		i * VTABLE_get_integer(INTERP, value));
     }
 
     void multiply_int (INTVAL value, PMC* dest) {
@@ -175,45 +190,59 @@ pmclass PerlInt extends perlscalar {
     }
 
     void divide (PMC* value, PMC* dest) {
-	VTABLE_set_number_native(INTERP, dest,
-		SELF->cache.int_val / VTABLE_get_number(INTERP, value));
+        INTVAL pmci;
+	int vtype = VTABLE_type(INTERP, value);
+	FLOATVAL valf;
+	FLOATVAL divf;
+
+	pmci = SELF->cache.int_val;
+	if (vtype == enum_class_PerlUndef) {
+            VTABLE_set_integer_native(INTERP, dest, pmci);
+	    return;
+	}
+
+	valf = VTABLE_get_number(INTERP, value);
+	divf = pmci / valf;
+	if (vtype == enum_class_PerlNum) {
+            VTABLE_set_number_native(INTERP, dest, divf);
+	    return;
+	}
+	{
+	    INTVAL vali = (INTVAL) valf;
+	    INTVAL   divi = pmci / vali;
+	    /* if result is an integer or zero yield an integer */
+	    if (divf == divi || !pmci)
+		VTABLE_set_integer_native(INTERP, dest, divi);
+	    else {
+		/* TODO BIG* promotion */
+		VTABLE_set_number_native(INTERP, dest, divf);
+	    }
+	    return;
+
+	}
     }
 
     void divide_int (INTVAL value, PMC* dest) {
-        VTABLE_set_number_native(INTERP, dest,
-            (FLOATVAL)SELF->cache.int_val / value
-        );
+	INTVAL pmci, divi;
+	FLOATVAL valf, divf;
+
+	pmci = SELF->cache.int_val;
+	/* TODO exception */
+	divf = (FLOATVAL)pmci / value;
+	divi = pmci / value;
+	if (divf == divi || !pmci)
+	    VTABLE_set_integer_native(INTERP, dest, divi);
+	else {
+	    /* TODO BIG* promotion */
+	    VTABLE_set_number_native(INTERP, dest, divf);
+	}
     }
 
     void divide_same (PMC* value, PMC* dest) {
-        dest->cache.int_val = SELF->cache.int_val / value->cache.int_val;
+        SELF.divide_int(value->cache.int_val, dest);
     }
 
     void cmodulus (PMC* value, PMC* dest) {
-        INTVAL i;
-        FLOATVAL f;
-	/*
-	 * XXX:leo shouldn't that just call get_integer on value
-	 *     and proceed?
-	 */
-        switch(VTABLE_type(INTERP, value)) {
-            case enum_class_PerlNum:
-                internal_exception(INVALID_OPERATION,
-		    "modulus() not implemented for mix of INTs and FLOATs\n");
-                break;
-            case enum_class_PerlString:
-                /* Is the string an integer or a number? */
-                f = VTABLE_get_number(INTERP, value);
-                i = VTABLE_get_integer(INTERP, value);
-                if(f != i) {
-                    internal_exception(INVALID_OPERATION,
-                     "modulus() not implemented for mix of INTs and FLOATs\n");
-                }
-                break;
-        }
-        /* If we're here, then we can assume that get_integer will return
-         *  something sensible
-         */
         VTABLE_set_integer_native(INTERP, dest,
                                   SELF->cache.int_val %
                                   VTABLE_get_integer(INTERP, value));

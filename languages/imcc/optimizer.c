@@ -99,7 +99,7 @@ int optimize(struct Parrot_Interp *interpreter) {
     if (optimizer_level & OPT_CFG) {
         info(interpreter, 2, "optimize\n");
         any = constant_propagation(interpreter);
-        if (clone_remove(interpreter))
+        if (0 && clone_remove(interpreter))
             return 1;
         if (used_once(interpreter))
             return 1;

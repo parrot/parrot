@@ -366,6 +366,11 @@ inline op div(inout NUM, in NUM) {
   goto NEXT();
 }
 
+inline op div (in PMC, in PMC) {
+  $1->vtable->divide(interpreter, $1, $2, $1);
+  goto NEXT();
+}
+
 inline op div (in PMC, in INT) {
   $1->vtable->divide_int(interpreter, $1, $2, $1);
   goto NEXT();
