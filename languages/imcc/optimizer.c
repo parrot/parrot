@@ -70,12 +70,15 @@ void pre_optimize(struct Parrot_Interp *interp) {
         subst_constants_c(interp);
         subst_constants_if(interp);
         strength_reduce(interp);
-        if_branch(interp);
+        if (!dont_optimize)
+            if_branch(interp);
     }
 }
 
 int cfg_optimize(struct Parrot_Interp *interp) {
     UNUSED(interp);
+    if (dont_optimize)
+        return 0;
     if (optimizer_level & OPT_PRE) {
         info(2, "cfg_optimize\n");
         if (branch_branch())
@@ -1004,7 +1007,7 @@ static int
 is_invariant(Instruction *ins)
 {
     int ok = 0;
-    int what;
+    int what = 0;
     if (! strcmp(ins->op, "new") &&
             !strcmp(ins->r[1]->name, "PerlUndef")) {
         ok = 1;
@@ -1022,6 +1025,7 @@ is_invariant(Instruction *ins)
     return 0;
 }
 
+#define MOVE_INS_1_BL
 #ifdef MOVE_INS_1_BL
 static Basic_block *
 find_outer(Basic_block * blk)
@@ -1057,7 +1061,7 @@ move_ins_out(struct Parrot_Interp *interp, Instruction **ins, Basic_block *bb)
         debug(DEBUG_OPT2, "outer loop not found (CFG?)\n");
         return 0;
     }
-    out = pred->end->prev;
+    out = pred->end;
     next = (*ins)->next;
     (*ins)->bbindex = pred->index;
     debug(DEBUG_OPT2, "inserting it in blk %d after %s\n", pred->index,

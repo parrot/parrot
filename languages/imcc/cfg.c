@@ -14,13 +14,14 @@
  * flow of execution between blocks.
  */
 
+static void add_instruc_reads(Instruction *ins, SymReg *r0);
 
 /* Code: */
 
 
 void find_basic_blocks () {
     Basic_block *bb;
-    Instruction *ins, *lab;
+    Instruction *ins;
     int nu = 0;
     int i;
 
@@ -29,7 +30,7 @@ void find_basic_blocks () {
     for(i = 0; i < HASH_SIZE; i++) {
         SymReg * r = hash[i];
         if (r && (r->type & VTADDRESS)) {
-            r->first_ins = r->last_ins = NULL;
+            r->last_ins = NULL;
         }
     }
 
@@ -37,20 +38,27 @@ void find_basic_blocks () {
     ins->index = i = 0;
 
     bb = make_basic_block(ins);
-    if ( (ins->type & ITLABEL)) {
-        /* set the labels address (ins) */
-        ins->r[0]->first_ins = ins;
-    }
-    else if (ins->type & ITBRANCH) {
+    if (ins->type & ITBRANCH) {
         SymReg * addr = get_branch_reg(bb->end);
         if (addr)
             addr->last_ins = ins;
     }
-    for(ins=ins->next; ins; ins = ins->next) {
+    for (ins = ins->next; ins; ins = ins->next) {
         ins->index = ++i;
 
         bb->end = ins;
         ins->bbindex = n_basic_blocks - 1;
+        /* invoke w/o arg implicitly uses P0, so mark it as doing so
+         * XXX but in the parser
+         */
+        if (ins->opsize == 1 && !strcmp(ins->op, "invoke")) {
+            SymReg * p0 = mk_pasm_reg(str_dup("P0"));
+            add_instruc_reads(ins, p0);
+            ins->type |= 1;      /* mark branch register */
+            dont_optimize = 1;  /* too complex, to follow */
+            optimizer_level &= ~OPT_PASM;
+            p0->use_count++;
+        }
         /* a LABEL starts a new basic block, but not, if we have
          * a new one (last was a branch) */
         if ( (ins->type & ITLABEL)) {
@@ -60,6 +68,11 @@ void find_basic_blocks () {
         if (nu)
             nu = 0;
         else if ( (ins->type & ITLABEL)) {
+            /* XXX look at this change bb->end did include the label,
+             * now no more
+             * s. t/rx/basic_6
+             */
+            bb->end = ins->prev;
             bb = make_basic_block(ins);
         }
         /* a branch is the end of a basic block
@@ -77,28 +90,31 @@ void find_basic_blocks () {
             if (!strcmp(ins->op, "bsr") || !strcmp(ins->op, "set_addr")) {
                 char *name =
                     *ins->op == 'b' ? ins->r[0]->name : ins->r[1]->name;
-                found = 0;
-                /* TODO get_sym */
-                for (lab = instructions; lab; lab = lab->next) {
-                    if ((lab->type & ITLABEL) &&
-                            !strcmp(lab->r[0]->name, name)) {
-                        int j = 0;
-                        found = 1;
-                        /* XXX look if first 5 ins have saveall
-                         * this is a ugly but working hack ;-)
-                         */
-                        for (lab = lab->next; j < 5 && lab;
-                                lab = lab->next, j++) {
-                            if (!strcmp(lab->op, "saveall")) {
-                                found = 0;
-                                break;
+                SymReg *r = get_sym(name);
+                if (*ins->op == 'b') {
+                    Instruction * lab;
+                    found = r != NULL && r->first_ins;
+                    debug(DEBUG_CFG, "bsr %s local:%s\n",
+                            name, found ? "yes": "no");
+                    if (r) {
+                        int j;
+                        lab = r->first_ins;
+                        if (lab)
+                            for (j = 0, lab = lab->next; j < 5 && lab;
+                                    lab = lab->next, j++) {
+                                if (!strcmp(lab->op, "saveall")) {
+                                    ins->type |= ITSAVES;
+                                    lab->type |= ITSAVES;
+                                    debug(DEBUG_CFG, "\ttype saveall\n");
+                                    break;
+                                }
                             }
-                        }
-                        break;
                     }
                 }
-                debug(DEBUG_CFG, "bsr %s local:%s\n",
-                        name, found ? "yes": "no");
+                else {
+                    /* treat the set_addr as jump source */
+                    found = 1;
+                }
             }
             if (found) {
                 if (ins->next)
@@ -120,7 +136,7 @@ void find_basic_blocks () {
 void build_cfg() {
     int i, j;
     SymReg * addr;
-    Basic_block *last, *bb;
+    Basic_block *last = NULL, *bb;
     Edge *pred;
 
     info(2, "build_cfg\n");
@@ -135,30 +151,47 @@ void build_cfg() {
         if (addr)
             bb_findadd_edge(bb, addr);
         if (!strcmp(bb->end->op, "ret")) {
+            int found = 0;
             debug(DEBUG_CFG, "found ret in bb %d\n", i);
             /* now go back, find labels and connect these with
              * bsrs
              */
-            for (pred = bb->pred_list; pred; pred=pred->pred_next) {
+            for (pred = bb->pred_list; pred; pred=pred->next) {
                 if (!strcmp(pred->from->end->op, "bsr")) {
+                    Instruction * sub;
+
                     SymReg *r = pred->from->end->r[0];
-                    int found = 0;
 
                     j = pred->from->index;
-                    debug(DEBUG_CFG, "\tcalled from bb %d label '%s'? - ",
-                            j, r->name);
-                    if ((bb->start->type & ITLABEL) &&
-                            (!strcmp(bb->start->r[0]->name, r->name)))
+                    sub = pred->to->start;
+                    if ((sub->type & ITLABEL) &&
+                            (!strcmp(sub->r[0]->name, r->name)))
                         found = 1;
                     if (found) {
-                        debug(DEBUG_CFG, "yep!\n");
-                        bb_add_edge(bb, bb_list[j+1]);
+                        int saves = 0;
+                        debug(DEBUG_CFG, "\tcalled from bb %d '%s'\n",
+                            j, ins_string(pred->from->end));
+                        for (; sub && sub != bb->end; sub = sub->next) {
+                            if (!strcmp(sub->op, "saveall"))
+                                if (!(sub->type & ITSAVES)) {
+                                    break;
+                                }
+                            bb_list[sub->bbindex]->flag |= BB_IS_SUB;
+                            if (!strcmp(sub->op, "restoreall")) {
+                                sub->type |= ITSAVES;
+                                saves = 1;
+                            }
+                        }
+                        if (!saves)
+                            bb_add_edge(bb, bb_list[j+1]);
+                        debug(DEBUG_CFG, "\tand does saevall %s\n",
+                                saves ? "yes" : "no");
+                        break;
                     }
-                    else
-                        debug(DEBUG_CFG, "na!\n");
-
                 }
             }
+            if (!found)
+                debug(DEBUG_CFG, "\tcalled from unknown!\n");
         }
 
         last = bb;
@@ -169,29 +202,23 @@ void build_cfg() {
 /* find the placement of the label, and link the two nodes */
 
 void bb_findadd_edge(Basic_block *from, SymReg *label) {
-#if 0
-    /* ugly slow quadratic search for a label takes ~35 s for
-     * ../../t/op/stacks_33
-     */
     Instruction *ins;
-
-    for (ins = instructions; ins; ins = ins->next) {
-        if ((ins->type & ITLABEL) && label == ins->r[0]){
-
-            bb_add_edge(from, bb_list[ins->bbindex]);
-            return;
-
-            /* a label appears just once */
-
-        }
-    }
-#else
-    SymReg *r = get_sym(label->name);
+    SymReg *r = find_sym(label->name);
 
     if (r && (r->type & VTADDRESS) && r->first_ins)
         bb_add_edge(from, bb_list[r->first_ins->bbindex]);
-
-#endif
+    else {
+        debug(DEBUG_CFG, "register branch %s ",
+                ins_string(from->end));
+        for (ins = from->end; ins; ins = ins->prev) {
+            if ((ins->type & ITBRANCH) && !strcmp(ins->op, "set_addr")) {
+                bb_add_edge(from, bb_list[ins->r[1]->first_ins->bbindex]);
+                debug(DEBUG_CFG, "(%s) ", ins->r[1]->name);
+                break;
+            }
+        }
+        debug(DEBUG_CFG, "\n");
+    }
 }
 
 
@@ -310,12 +337,6 @@ static void propagate_alias(void)
 		ins = curr;
 	    }
 	}
-        /* invoke w/o arg implicitly uses P0, so mark it as doing so */
-        else if (ins->opsize == 1 && !strcmp(ins->op, "invoke")) {
-            SymReg * p0 = mk_pasm_reg(str_dup("P0"));
-            add_instruc_reads(ins, p0);
-            p0->use_count++;
-        }
     }
     if (IMCC_DEBUG & DEBUG_CFG) {
 	debug(DEBUG_CFG, "\nAfter propagate_alias\n");
@@ -367,11 +388,14 @@ void analyse_life_symbol(SymReg* r) {
 void free_life_info(SymReg *r)
 {
     int i;
-    for (i=0; i < n_basic_blocks; i++) {
-	if (r->life_info[i])
-            free(r->life_info[i]);
+    if (r->life_info) {
+        for (i=0; i < n_basic_blocks; i++) {
+            if (r->life_info[i])
+                free(r->life_info[i]);
+        }
+        free(r->life_info);
+        r->life_info = NULL;
     }
-    free(r->life_info);
 }
 
 /* analyse_life_block studies the state of the var r
@@ -569,7 +593,7 @@ sort_loops(void)
      * order of finding loops
      */
     for (i = 0; i < n_loops-1; i++) {
-        int first = -1, last;
+        int first = -1, last = 0;
         loop_info[i]->depth = 1;
         /* we could also take the depth of the first contained
          * block, but below is a check, that a inner loop is fully
@@ -730,10 +754,12 @@ void init_basic_blocks() {
 
 void clear_basic_blocks() {
     int i;
-    for (i=0; i < n_basic_blocks; i++)
-        free(bb_list[i]);
-    free(bb_list);
-    bb_list = NULL;
+    if (bb_list) {
+        for (i=0; i < n_basic_blocks; i++)
+            free(bb_list[i]);
+        free(bb_list);
+        bb_list = NULL;
+    }
     free_edge();
     free_dominators();
     free_loops();

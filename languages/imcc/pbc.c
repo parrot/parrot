@@ -41,6 +41,7 @@
 struct subs {
     size_t size;                        /* code size in ops */
     int ins_line;                       /* line# for debug */
+    int n_basic_blocks;                 /* block count */
     SymReg * labels[HASH_SIZE];         /* label names */
     SymReg * bsrs[HASH_SIZE];           /* bsr, set_addr locations */
     struct subs *prev;
@@ -50,6 +51,7 @@ struct subs {
 /* subs are kept per code segment */
 struct cs_t {
     struct PackFile_ByteCode *seg;      /* bytecode seg */
+    struct PackFile_Segment *jit_info;  /* bblocks, register usage */
     struct subs *subs;                  /* current sub data */
     struct subs *first;                 /* first sub of code seg */
     struct cs_t *prev;                  /* prev cs */
@@ -114,6 +116,7 @@ int e_pbc_open(void *param) {
     cs->next = NULL;
     cs->subs = NULL;
     cs->first = NULL;
+    cs->jit_info = NULL;
     if (!globals.first)
         globals.first = cs;
     else
@@ -123,8 +126,46 @@ int e_pbc_open(void *param) {
     return 0;
 }
 
+/* get size/line of bytecode in ops till now */
+static int
+old_blocks(void)
+{
+    size_t size;
+    struct subs *s;
+
+    size = 0;
+    for (s = globals.cs->subs; s; s = s->prev) {
+        size += s->n_basic_blocks;
+    }
+    return size;
+}
+
+opcode_t *
+make_jit_info(struct Parrot_Interp *interpreter)
+{
+    char *name;
+    size_t size, old;
+
+    if (!globals.cs->jit_info) {
+        name = malloc(strlen(globals.cs->seg->base.name) + 5);
+        sprintf(name, "%s_JIT", globals.cs->seg->base.name);
+        globals.cs->jit_info =
+            PackFile_Segment_new_seg(interpreter->code, PF_UNKNOWN_SEG, name, 1);
+        free(name);
+    }
+    size = n_basic_blocks + (old = old_blocks());
+    /* store current size */
+    globals.cs->subs->n_basic_blocks = n_basic_blocks;
+    /* offset of block start and end, 4 * registers_used */
+    globals.cs->jit_info->data = realloc(globals.cs->jit_info->data,
+            size * sizeof(opcode_t) * 6);
+    globals.cs->jit_info->size = size * 6;
+    return globals.cs->jit_info->data + old * 6;
+}
+
 /* allocate a new globals.cs->subs structure */
-static void make_new_sub(void)
+static void
+make_new_sub(struct Parrot_Interp *interpreter)
 {
     struct subs *s = mem_sys_allocate_zeroed(sizeof(struct subs));
     if (!s)
@@ -136,6 +177,9 @@ static void make_new_sub(void)
     if (!globals.cs->first)
         globals.cs->first = s;
     globals.cs->subs = s;
+    if ((optimizer_level & OPT_J)) {
+        allocate_jit(interpreter);
+    }
 }
 
 
@@ -291,6 +335,8 @@ store_labels(struct Parrot_Interp *interpreter, int *src_lines, int oldsize)
             /* XXX labels should be mangled with current subroutine name
              * they should only be reachable from eval's in current sub
              */
+            debug(DEBUG_PBC_FIXUP, "write fixup '%s' offs %d\n",
+                    ins->r[0]->name, ins->r[0]->color + oldsize);
             PackFile_FixupTable_new_entry_t0(interpreter,
                     ins->r[0]->name, ins->r[0]->color + oldsize);
         }
@@ -568,7 +614,11 @@ build_key(struct Parrot_Interp *interpreter, SymReg *reg)
                     *pc++ = PARROT_ARG_S;
                 else
                     fatal(1, "build_key", "wrong register set\n");
-                *pc++ = r->color;
+                /* don't emit mapped regs in key parts */
+                if (r->color < 0)
+                    *pc++ = -1 - r->color;
+                else
+                    *pc++ = r->color;
                 sprintf(s+strlen(s), "%c%d", r->set, r->color);
                 debug(DEBUG_PBC_CONST, " keypart reg %s %c%d\n",
                         r->name, r->set, r->color);
@@ -664,12 +714,24 @@ constant_folding(struct Parrot_Interp *interpreter)
     }
 }
 
+int
+e_pbc_new_sub(void *param)
+{
+    struct Parrot_Interp *interpreter = (struct Parrot_Interp *)param;
+
+    if (!instructions)
+        return 0;
+    make_new_sub(interpreter);     /* we start a new compilation unit */
+    return 0;
+}
 
 /*
  * now let the fun begin, actually emit code for one ins
  */
 
-int e_pbc_emit(void *param, Instruction * ins) {
+int
+e_pbc_emit(void *param, Instruction * ins)
+{
     struct Parrot_Interp *interpreter = (struct Parrot_Interp *)param;
     int ok = 0;
     static opcode_t * pc, npc;
@@ -684,7 +746,6 @@ int e_pbc_emit(void *param, Instruction * ins) {
         int oldsize;
         int bytes;
 
-        make_new_sub();         /* we start a new compilation unit */
         oldsize = get_old_size(interpreter, &ins_line);
         code_size = store_labels(interpreter, &ins_size, oldsize);
         debug(DEBUG_PBC, "code_size(ops) %d  oldsize %d\n", code_size, oldsize);

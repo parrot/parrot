@@ -121,6 +121,7 @@ Instruction * INS_LABEL(SymReg * r0, int emit)
 static Instruction * iLABEL(SymReg * r0) {
     Instruction *i = _mk_instruction("","%s:", R1(r0), 0);
     i->type = ITLABEL;
+    r0->first_ins = i;
     i = emitb(i);
     clear_state();
     return i;
@@ -356,6 +357,11 @@ iANY(struct Parrot_Interp *interpreter, char * name,
                 ins->type = ITBRANCH | (1 << (nargs-1));
                 if (!strcmp(name, "branch") || !strcmp(name, "end"))
                     ins->type |= IF_goto;
+                if (!strcmp(fullname, "jump_i") ||
+                        !strcmp(fullname, "jsr_i") ||
+                        !strcmp(fullname, "branch_i") ||
+                        !strcmp(fullname, "bsr_i"))
+                    dont_optimize = 1;
             }
         }
         else if (!strcmp(name, "set") && nargs == 2) {

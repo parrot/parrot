@@ -9,7 +9,8 @@ enum INSTYPE {    /*instruction type can be   */
     ITALIAS = 0x100000, /*   set P,P  */
     ITADDR  = 0x200000, /*   set_addr P, addr*/
     ITSPILL = 0x400000, /*   set P31,x ; set x, p31 spilling */
-    ITEXT   = 0x800000  /*   instruction is extcall in JIT */
+    ITEXT   = 0x800000, /*   instruction is extcall in JIT */
+    ITSAVES = 0x1000000  /*   saveall/restoreall in a bsr */
 };
 
 
@@ -103,6 +104,7 @@ EXTERN Instruction* instructions;
 typedef struct _emittert {
 	int (*open)(void *param);
 	int (*emit)(void *param, Instruction *ins);
+	int (*new_sub)(void *param);
 	int (*close)(void *param);
 } Emitter;
 

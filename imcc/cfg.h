@@ -19,7 +19,12 @@ typedef struct _basic_block {
     Edge *succ_list;
     int loop_depth;
     int index;                  /*on bb_list*/
+    int flag;
 } Basic_block;
+
+enum {
+	BB_IS_SUB = 1 << 0
+} block_enum_flags;
 
 /* Globals: */
 EXTERN Basic_block **bb_list;

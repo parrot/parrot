@@ -62,14 +62,17 @@ open_comp_unit(void)
 void
 close_comp_unit(void)
 {
+    free_reglist();
+    clear_basic_blocks();       /* and cfg ... */
     if (!n_comp_units)
         fatal(1, "close_comp_unit", "non existent comp_unit\n");
     n_comp_units--;
     instructions = comp_unit[n_comp_units].instructions;
     last_ins = comp_unit[n_comp_units].last_ins;
     clear_tables();
-    free(comp_unit[n_comp_units].hash[0]);
     if (n_comp_units) {
+        free(comp_unit[n_comp_units].hash[0]);
+        comp_unit[n_comp_units].hash[0] = NULL;
         hash = comp_unit[n_comp_units-1].hash[0];
     }
     else {
@@ -98,7 +101,7 @@ _find_sym(Namespace * nspace, SymReg * hsh[], const char * name) {
                     new->type |= VT_REGP;
                     new->reg = p;
                     /* link in both dirs, so that usage can be determined */
-                    p->reg = new;
+                    /* p->reg = new; */
                     debug(DEBUG_LEXER, "found outer scope sym '%s'\n",
                             p->name);
                     return new;
@@ -158,7 +161,6 @@ init_tables(struct Parrot_Interp * interpreter)
     };
     const char *writes[] = {
         "restoreall",
-        "pushi", "pushn", "pushp", "pushs",
         "popi", "popn", "popp", "pops",
         "cleari", "clearn", "clearp", "clears",
     };
@@ -217,17 +219,23 @@ inline
 int instruction_reads(Instruction* ins, SymReg* r) {
     int f, i;
     SymReg *key;
+    SymReg *ri;
 
     f = ins->flags;
-    for (i = 0; ins->r[i] && i < IMCC_MAX_REGS; i++)
+    for (i = 0; (ri = ins->r[i]) && i < IMCC_MAX_REGS; i++) {
 	if (f & (1<<i)) {
-            if (ins->r[i] == r)
+            if (ri == r)
                 return 1;
-            if ((ins->r[i]->type & VT_REGP) && ins->r[i]->reg == r)
+            if ((ri->type & VT_REGP) && ri->reg == r)
                 return 1;
-            for (key = ins->r[i]->nextkey; key; key = key->nextkey)
+            /* this additional test for _kc ops seems to slow
+             * down instruction_reads by a huge amount compared to the
+             * _writes below
+             */
+            for (key = ri->nextkey; key; key = key->nextkey)
                 if (key->reg && key->reg == r)
                     return 1;
+        }
     }
 
     return 0;
@@ -313,7 +321,8 @@ void insert_ins(Instruction *ins, Instruction * tmp)
         ins->next = tmp;
         tmp->prev = ins;
         tmp->next = next;
-        next->prev = tmp;
+        if (next)
+            next->prev = tmp;
         if (!tmp->line)
             tmp->line = ins->line;
     }
@@ -491,8 +500,8 @@ static int e_file_emit(void *param, Instruction * ins) {
 }
 
 Emitter emitters[2] = {
-    {e_file_open, e_file_emit, e_file_close},
-    {e_pbc_open, e_pbc_emit, e_pbc_close},
+    {e_file_open, e_file_emit, (int (*)(void *))NULLfunc, e_file_close},
+    {e_pbc_open, e_pbc_emit, e_pbc_new_sub, e_pbc_close},
 };
 
 static int emitter;
@@ -501,6 +510,7 @@ int emit_open(int type, void *param)
 {
     emitter = type;
     has_compile = 0;
+    dont_optimize = 0;
     return (emitters[emitter]).open(param);
     return 0;
 }
@@ -526,6 +536,8 @@ int emit_flush(void *param) {
         spill_ins = iNEW(interpreter, p31, str_dup("PerlArray"), 0);
         insert_ins(ins, spill_ins);
     }
+    if (emitters[emitter].new_sub)
+        (emitters[emitter]).new_sub(param);
     for (ins = instructions; ins; ins = ins->next) {
         (emitters[emitter]).emit(param, ins);
     }

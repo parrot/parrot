@@ -345,6 +345,11 @@ void clear_tables() {
 	}
         hash[i] = NULL;
     }
+    for(i = 0; i < HASH_SIZE; i++) {
+        for(p = ghash[i]; p; p = p->next)
+            if (p->type & VTADDRESS)
+                p->first_ins = p->last_ins = NULL;
+    }
 }
 
 /* utility functions: */

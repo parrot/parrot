@@ -2,6 +2,8 @@ blib
 config.opt
 *_ops_cg.h
 core_ops_cg.c
+*_ops_cgp.h
+core_ops_cgp.c
 core_ops.c
 core_ops_prederef.c
 disassemble

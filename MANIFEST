@@ -1389,6 +1389,7 @@ languages/imcc/imcparser.c
 languages/imcc/imcparser.h
 languages/imcc/instructions.c
 languages/imcc/instructions.h
+languages/imcc/jit.c
 languages/imcc/main.c
 languages/imcc/optimizer.c
 languages/imcc/optimizer.h

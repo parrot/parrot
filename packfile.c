@@ -845,7 +845,8 @@ static void default_dump (struct Parrot_Interp *interpreter,
     if (i % 8)
         PIO_printf(interpreter, "\n %04x:  ", (int) i);
 
-    for ( ; i < self->file_offset+self->op_count; i++) {
+    for ( ; i < (self->size ? self->file_offset+self->size + 4 :
+            self->file_offset + self->op_count); i++) {
         if (i % 8 == 0) {
             PIO_printf(interpreter, "\n %04x:  ", (int) i);
         }

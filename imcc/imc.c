@@ -15,14 +15,10 @@
 #include <assert.h>
 #include "imc.h"
 #include "optimizer.h"
-#define JIT_IMCC
-#include "parrot/jit.h"
-#include "parrot/jit_emit.h"
 
 static void make_stat(int *sets, int *cols);
 static void imc_stat_init(void);
 static void print_stat(void);
-static void allocate_jit(struct Parrot_Interp *interpreter);
 
 extern int pasm_file;
 /* Globals: */
@@ -54,7 +50,7 @@ void allocate(struct Parrot_Interp *interpreter) {
         return;
 
     nodeStack = imcstack_new();
-    dont_optimize = n_spilled = 0;
+    n_spilled = 0;
 
     todo = first = 1;
     while (todo) {
@@ -115,15 +111,8 @@ void allocate(struct Parrot_Interp *interpreter) {
     }
     if (IMCC_DEBUG & DEBUG_IMC)
         dump_instructions();
-    if (optimizer_level & OPT_J) {
-        allocate_jit(interpreter);
-        if (IMCC_DEBUG & DEBUG_IMC)
-            dump_instructions();
-    }
     if (IMCC_VERBOSE > 1 || (IMCC_DEBUG & DEBUG_IMC))
         print_stat();
-    free_reglist();
-    clear_basic_blocks();       /* and cfg ... */
     imcstack_free(nodeStack);
 }
 
@@ -133,8 +122,12 @@ void free_reglist() {
         interference_graph = 0;
     }
     if (reglist) {
+        int i;
+        for (i = 0; i < n_symbols; i++)
+            free_life_info(reglist[i]);
         free(reglist);
-        reglist = 0;
+        reglist = NULL;
+        n_symbols = 0;
     }
 }
 
@@ -274,8 +267,11 @@ void build_reglist(void) {
  * same time
  */
 
-void build_interference_graph() {
-	int x, y;
+void
+build_interference_graph()
+{
+    int x, y;
+
     if (!n_symbols)
         return;
 
@@ -287,22 +283,22 @@ void build_interference_graph() {
         fatal(1, "build_interference_graph","Out of mem\n");
 
     /* Calculate interferences between each chain and populate the the Y-axis */
-    	for(x = 0; x < n_symbols; x++) {
+    for (x = 0; x < n_symbols; x++) {
         if (!reglist[x]->first_ins)
-		continue;
-            for(y = x + 1; y < n_symbols; y++) {
+            continue;
+        for (y = x + 1; y < n_symbols; y++) {
             if (!reglist[y]->first_ins)
-		    continue;
+                continue;
             if (interferes(reglist[x], reglist[y])) {
                 interference_graph[x*n_symbols+y] = reglist[y];
                 interference_graph[y*n_symbols+x] = reglist[x];
             }
-	}
+        }
     }
 
     if (IMCC_DEBUG & DEBUG_IMC) {
-	    dump_symreg();
-	    dump_interference_graph();
+        dump_symreg();
+        dump_interference_graph();
     }
 }
 
@@ -458,21 +454,42 @@ int interferes(SymReg * r0, SymReg * r1) {
     }
 
     for (i=0; i < n_basic_blocks; i++) {
-       Life_range *l0, *l1;
+        Life_range *l0, *l1;
 
-       l0 = r0->life_info[i];
-       l1 = r1->life_info[i];
+        l0 = r0->life_info[i];
+        l1 = r1->life_info[i];
 
-       if (!l0->first_ins || !l1->first_ins)
-	    continue;
+        /* one or both are not alive in this block, so we have
+         * no conflict
+         */
+        if (!l0->first_ins || !l1->first_ins)
+            continue;
 
-       if (l0->first_ins->index > l1->last_ins->index)
-	    continue;
+        /* if the registers don't overlap, i.e first_x > last_y
+         * then no interference
+         */
+        if (l0->first_ins->index > l1->last_ins->index)
+            continue;
+        if (l1->first_ins->index > l0->last_ins->index)
+            continue;
 
-       if (l1->first_ins->index > l0->last_ins->index)
-	    continue;
+#if 1
+        /* if they only overlap one instruction and one is used RHS only
+         * and the other LHS, then that's ok
+         */
+        if (l0->first_ins->index == l1->last_ins->index &&
+                instruction_writes(l0->first_ins, r0) &&
+                instruction_reads(l1->last_ins, r1) &&
+                !instruction_reads(l0->first_ins, r0))
+            continue;
+        if (l1->first_ins->index == l0->last_ins->index &&
+                instruction_writes(l1->first_ins, r1) &&
+                instruction_reads(l0->last_ins, r0) &&
+                !instruction_reads(l1->first_ins, r1))
+            continue;
+#endif
 
-       return 1;
+        return 1;
     }
 
     return 0;
@@ -529,7 +546,7 @@ int simplify (){
  */
 
 void order_spilling () {
-    int min_score, total_score;
+    int min_score = 0, total_score;
     int min_node;
     int x;
 
@@ -763,181 +780,6 @@ int neighbours(int node) {
 
     return cnt;
 }
-
-/* PASM registers are already in most used order, so now:
- * - consider the top N registers as processor registers
- * - look at the instruction stream and insert register load/store ins
- *   for e.g. calling out to unJITted functions
- *   This is of course processor dependend
- *
- * NOTE: rx_ ops may have a inout INT parameter for position/mark.
- *       Actually, the either branch or update the inout parameter
- *       so they are save.
- */
-
-#ifndef EXTCALL
-#  define EXTCALL(op) op_jit[*(op)].extcall
-#endif
-
-#ifndef INT_REGISTERS_TO_MAP
-#  define INT_REGISTERS_TO_MAP 0
-#endif
-
-#ifndef FLOAT_REGISTERS_TO_MAP
-#  define FLOAT_REGISTERS_TO_MAP 0
-#endif
-
-#ifndef PRESERVED_INT_REGS
-#  define PRESERVED_INT_REGS MAX_MAPPED
-#endif
-
-#ifndef PRESERVED_FLOAT_REGS
-#  define PRESERVED_FLOAT_REGS MAX_MAPPED
-#endif
-
-static void
-allocate_jit(struct Parrot_Interp *interpreter)
-{
-    int c, j, k, typ;
-    int to_map[4] = {0,0,0,0};
-#define MAX_MAPPED 32
-    int preserved[] =
-    {PRESERVED_INT_REGS, MAX_MAPPED, MAX_MAPPED, PRESERVED_FLOAT_REGS};
-    const char *types = "IPSN";
-    Instruction * ins, *last, *tmp, *prev;
-    SymReg * r;
-    SymReg * regs[IMCC_MAX_REGS];
-    static SymReg  *cpu[4][MAX_MAPPED];
-    static SymReg  *par[4][MAX_MAPPED];
-    int reads[4][MAX_MAPPED], writes[4][MAX_MAPPED], nr, nw;
-    int maxc[4] = {0,0,0,0};
-
-    assert(INT_REGISTERS_TO_MAP < MAX_MAPPED);
-    assert(FLOAT_REGISTERS_TO_MAP < MAX_MAPPED);
-    to_map[0] = INT_REGISTERS_TO_MAP;
-    to_map[3] = FLOAT_REGISTERS_TO_MAP;
-    /* make a list of mapped cpu regs */
-    if (cpu[0][0] == NULL) {
-        for (typ = 0; typ < 4; typ++)
-            for (k = 0; k < to_map[typ]; k++) {
-                char name[16];
-                sprintf(name, "%c%d#c", types[typ], k);
-                cpu[typ][k] = mk_pasm_reg(str_dup(name));
-                cpu[typ][k]->color = -1 - k;
-                sprintf(name, "%c%d#p", types[typ], k);
-                par[typ][k] = mk_pasm_reg(str_dup(name));
-            }
-    }
-    prev = last = NULL;
-    nr = nw = 0;
-    /* change all mappable registers to mapped ones */
-    for (j = 0; j < n_symbols; j++) {
-        r = reglist[j];
-        typ = strchr(types, r->set) - types;
-        if (r->color < to_map[typ]) {
-            if (r->color >= maxc[typ])
-                maxc[typ] = r->color + 1;
-            r->color = -1 - r->color;
-        }
-
-    }
-    to_map[0] = maxc[0];
-    to_map[3] = maxc[3];
-    /* clear all used regs at beginning */
-    for (typ = 0; typ < 4; typ++)
-        for (j = 0; j < to_map[typ]; j++) {
-            regs[0] = cpu[typ][j];
-            regs[1] = par[typ][j];
-            tmp = INS(interpreter, "set", "%s, %s\t# init",
-                    regs, 2, 0, 0);
-            insert_ins(NULL, tmp);
-        }
-    /* TODO restore regs before end if non main */
-    for (ins = instructions; ins; prev = ins, ins = ins->next) {
-        /* clear preserved regs, set rw of non preserved regs */
-        for (typ = 0; ins != instructions && typ < 4; typ++)
-            for (k = 0; k < to_map[typ]; k++) {
-                reads[typ][k] = writes[typ][k] =
-                    k >= preserved[typ];
-            }
-        /* if extern, go through regs and check the usage */
-        if (ins->opnum >= 0 && EXTCALL(&ins->opnum)) {
-            nr = nw = 1;
-            /* TODO stop at basic block end */
-            for (last = ins; ins && ins->opnum >= 0 && EXTCALL(&ins->opnum);
-                    ins = ins->next) {
-                ins->type |= ITEXT;
-                for (j = 0; j < n_symbols; j++) {
-                    r = reglist[j];
-                    if (r->color >= 0)
-                        continue;
-                    typ = strchr(types, r->set) - types;
-                    c = -1 - r->color;
-                    if (instruction_reads(ins, r) &&
-                            instruction_writes(ins, r)) {
-                        reads[typ][c] = 1;
-                        writes[typ][c] = 1;
-                        nr = nw = 1;
-                    }
-                    else if (instruction_reads(ins, r)) {
-                        reads[typ][c] = 1;
-                        nr = 1;
-                    }
-                    else if (instruction_writes(ins, r)) {
-                        writes[typ][c] = 1;
-                        nw = 1;
-                    }
-                }
-                /* changed mapped regs to parrot regs */
-                for (j = 0; (r = ins->r[j]) && j < IMCC_MAX_REGS; j++) {
-                    typ = strchr(types, r->set) - types;
-                    if ((r->type & VTREGISTER) && r->color < 0)
-                        ins->r[j] = par[typ][-1 - r->color];
-                }
-                /* remember last extern opcode, all loads are inserted
-                 * after this instruction
-                 */
-                last = ins;
-                if (ins->type & ITBRANCH) {
-                    break;
-                }
-            }
-        }
-        /* insert load ins after non JIT block */
-        if (last && nw) {
-            for (typ = 0; typ < 4; typ++)
-                for (j = 0; j < to_map[typ]; j++) {
-                    if (!writes[typ][j])
-                        continue;
-                    regs[0] = cpu[typ][j];
-                    regs[1] = par[typ][j];
-                    tmp = INS(interpreter, "set", "%s, %s\t# load",
-                            regs, 2, 0, 0);
-                    insert_ins(last, tmp);
-                }
-            nw = 0;
-        }
-        /* insert save ins before extern op */
-        if (nr) {
-            for (typ = 0; typ < 4; typ++)
-                for (j = 0; j < to_map[typ]; j++) {
-                    if (!reads[typ][j])
-                        continue;
-                    regs[0] = par[typ][j];
-                    regs[1] = cpu[typ][j];
-                    tmp = INS(interpreter, "set", "%s, %s\t# save",
-                            regs, 2, 0, 0);
-                    insert_ins(prev, tmp);
-                }
-            nr = 0;
-        }
-        /* continue with/after last non JIT ins */
-        if (last)
-            ins = last;
-        last = NULL;
-    }
-}
-
 /*
  * Utility functions
  */
