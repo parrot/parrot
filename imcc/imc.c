@@ -158,7 +158,8 @@ void compute_du_chain(SymReg * r) {
  */
 
 int interferes(SymReg * r0, SymReg * r1) {
-    
+   
+    int i;
     /* Register doesn't interfere with itself, and register sets
      * don't interfere with each other.
      */
@@ -181,13 +182,15 @@ int interferes(SymReg * r0, SymReg * r1) {
 
     /* Now: */
     
-    /* XXX This caused core dumps because l0 and l1 are not initialized.
-     * Disabling for now
-     */
-#if 0
     for (i=0; i <n_basic_blocks; i++) {
        Life_range *l0, *l1;
+
+       if (r0->life_info == NULL) return 0;
+       if (r1->life_info == NULL) return 0;
        
+       l0 = r0->life_info[i];
+       l1 = r1->life_info[i];
+
        if (  (l0->flags & LF_lv_all    && l1->flags & LF_lv_inside)
           || (l0->flags & LF_lv_inside && l1->flags & LF_lv_all)	    
           || (l0->flags & LF_lv_in  && l1->flags & LF_lv_in)    
@@ -211,7 +214,6 @@ int interferes(SymReg * r0, SymReg * r1) {
            }		  
        } 
     }	  
-#endif
 
     return 1;
 }

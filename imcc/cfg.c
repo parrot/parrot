@@ -143,7 +143,7 @@ void life_analysis() {
     for(i = 0; i < HASH_SIZE; i++) {
         SymReg * r = hash[i];
     	for(; r; r = r->next) {
-	     if (r->type == VTIDENTIFIER)  
+	     if (r->type == VTIDENTIFIER || r->type == VTREG)  
 		analyse_life_symbol(r);	        
     	}
     }
