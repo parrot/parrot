@@ -1,7 +1,38 @@
 #! perl -w
 
-use Parrot::Test tests => 6;
+use Parrot::Test tests => 8;
 use Test::More;
+
+output_is(<<'CODE', <<'OUTPUT', "PASM subs - newsub");
+    print "main\n"
+    newsub .Sub, .Continuation, _func, _ret
+    invoke
+_ret:
+    print "back\n"
+    end
+_func:
+    print "func\n"
+    invoke P1
+CODE
+main
+func
+back
+OUTPUT
+
+output_is(<<'CODE', <<'OUTPUT', "PASM subs - newsub 2");
+    print "main\n"
+    newsub P0, .Sub, _func
+    invokecc
+    print "back\n"
+    end
+_func:
+    print "func\n"
+    invoke P1
+CODE
+main
+func
+back
+OUTPUT
 
 output_is(<<'CODE', <<'OUTPUT', "PASM subs - invokecc");
     new P0, .Sub
@@ -121,8 +152,8 @@ output_is(<<'CODE', <<'OUTPUT', "definedness of Continuation");
     end
 
 cont:
-    print "I'm a very boring continuation" 
-    end 
+    print "I'm a very boring continuation"
+    end
 
 CODE
 0
@@ -139,55 +170,67 @@ output_is(<<'CODE', <<'OUTPUT', "PASM sub as closure");
     # print &$f(3), "\n";
     # print &$f(3), "\n";
 main:
+
     new P0, .Sub
     set_addr I3, foo
     set P0, I3
 
-    new P11, .PerlInt
-    set P11, 5
+    new P5, .PerlInt
+    set P5, 5
 
     invokecc
-    set P0, P2 # move sub $f to P0 for invokecc
+    set P0, P5	# the closure
 
-    new P11, .PerlInt
-    set P11, 3
+    new P5, .PerlInt
+    set P5, 3
 
-    save P0
+    pushbottomp	# preserve P regs
     invokecc
-    restore P0
+    save P5	# result in P5
+    popbottomp
+    restore P2
 
     print P2
     print "\n"
 
-    save P0
+    pushbottomp	# preserve P regs
     invokecc
-    restore P0
+    save P5	# result in P5
+    popbottomp
+    restore P2
 
     print P2
     print "\n"
 
+    pushbottomp	# preserve P regs
     invokecc
+    save P5	# result in P5
+    popbottomp
+    restore P2
+
     print P2
     print "\n"
 
     end
 
-# foo takes a number n (P11) and returns a sub (in P2) that takes
-# a number i (P11) and returns n incremented by i.
+# foo takes a number n (P5) and returns a sub (in P5) that takes
+# a number i (P5) and returns n incremented by i.
 foo:
     new_pad 0
-    store_lex 0, "n", P11
-    new P2, .Sub	# P2 has now the lexical "n" in the pad
+    store_lex 0, "n", P5
+    new P5, .Sub	# P5 has now the lexical "n" in the pad
     set_addr I3, f
-    set P2, I3
-    invoke P1
+    set P5, I3
+    invoke P1		# ret
 
-# expects arg in P11, returns incremented result in P2
+# expects arg in P5, returns incremented result in P5
 f:
     find_lex P2, "n"	# invoke-ing the Sub pushes the lexical pad
     			# of the closure on the pad stack
-    add P2, P11		# n += shift
-    invoke P1
+    add P2, P5		# n += shift, the lexical is incremented
+    new P5, .PerlInt
+    set P5, P2
+    invoke P1		# ret
 
 CODE
 8
