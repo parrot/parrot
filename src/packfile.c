@@ -1507,11 +1507,12 @@ PackFile_Constant_pack_size(struct PackFile_Constant * self) {
 
     if (!self) {
         /* TODO: OK to gloss over this? */
-        return 0;
+        return (opcode_t) 0;
     }
 
     switch(self->type) {
         case PFC_NONE:
+            packed_size = 0;
             break;
  
         case PFC_INTEGER:
@@ -1533,12 +1534,17 @@ PackFile_Constant_pack_size(struct PackFile_Constant * self) {
             break;
 
         default:
+            packed_size = 0;
             break;
     }
 
     /* Tack on space for the initial type and size fields */
-
-    return packed_size + 2 * sizeof(opcode_t);
+    if (packed_size) {
+        return packed_size + 2 * sizeof(opcode_t);
+    }
+    else {
+        return 0;
+    }
 }
 
 
