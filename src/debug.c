@@ -527,7 +527,7 @@ INV_COND:   fprintf(stderr, "Invalid condition\n");
         for (i = 1; ((command[i] != '"') && (i < 255)); i++)
             str[i - 1] = command[i];
         str[i - 1] = '\0'; 
-        (STRING *)condition->value = string_make(interpreter,
+        condition->value = string_make(interpreter,
             str, i - 1, NULL, BUFFER_external_FLAG, NULL);
         condition->type |= PDB_cond_const;
     }
