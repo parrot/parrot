@@ -248,9 +248,31 @@ END:
     .pcc_end_return
 .end
 
+=item style."pmcPMCArray"( name, array )
+
+Dumps an (PMC) Array.
+
+=cut
+
+.sub pmcPMCArray
+    S0 = "pmcPerlArray"
+    callmethod
+.end
+
+=item style."pmcStringArray"( name, array )
+
+Dumps an (string) Array.
+
+=cut
+
+.sub pmcStringArray
+    S0 = "pmcPerlArray"
+    callmethod
+.end
+
 =item style."pmcPerlArray"( name, array )
 
-Dumps an Array PMC.
+Dumps an (Perl) Array.
 
 =cut
 
@@ -267,7 +289,9 @@ Dumps an Array PMC.
 
     (subindent, indent) = self."newIndent"()
 
-    print "PerlArray (size:"
+    typeof name2, array
+    print name2
+    print " (size:"
     print array
     print ") ["
 
