@@ -648,6 +648,30 @@ inline op get_keyed(out STR, in PMC, in STR) {
   goto NEXT();
 }
 
+inline op get_keyed(out PMC, in PMC, in INT) {
+  KEY_PAIR key_p;
+  KEY key;
+  MAKE_KEY(key, key_p, $3, enum_key_int, int_val);
+  $1 = $2->vtable->get_pmc_keyed(interpreter, $2, &key);
+  goto NEXT();
+}
+
+inline op get_keyed(out PMC, in PMC, in NUM) {
+  KEY_PAIR key_p;
+  KEY key;
+  MAKE_KEY(key, key_p, $3, enum_key_num, num_val);
+  $1 = $2->vtable->get_pmc_keyed(interpreter, $2, &key);
+  goto NEXT();
+}
+
+inline op get_keyed(out PMC, in PMC, in STR) {
+  KEY_PAIR key_p;
+  KEY key;
+  MAKE_KEY(key, key_p, $3, enum_key_string, struct_val);
+  $1 = $2->vtable->get_pmc_keyed(interpreter, $2, &key);
+  goto NEXT();
+}
+
 =item B<set_keyed>(out PMC, out PMC, in PMC, in PMC)
 
     $1[$2] = $3[$4];
@@ -753,6 +777,36 @@ inline op set_keyed (out PMC, in STR, in STR)  {
     MAKE_KEY(key, key_p, $2, enum_key_string, struct_val);
 
     $1->vtable->set_string_keyed(interpreter, $1, &key, $3);
+    goto NEXT();
+}
+
+inline op set_keyed (out PMC, in INT, in PMC)  {
+    KEY_PAIR key_p;
+    KEY key;
+
+    MAKE_KEY(key, key_p, $2, enum_key_int, int_val);
+
+    $1->vtable->set_pmc_keyed(interpreter, $1, &key, $3, NULL);
+    goto NEXT();
+}
+
+inline op set_keyed (out PMC, in NUM, in PMC)  {
+    KEY_PAIR key_p;
+    KEY key;
+
+    MAKE_KEY(key, key_p, $2, enum_key_num, num_val);
+
+    $1->vtable->set_pmc_keyed(interpreter, $1, &key, $3, NULL);
+    goto NEXT();
+}
+
+inline op set_keyed (out PMC, in STR, in PMC)  {
+    KEY_PAIR key_p;
+    KEY key;
+
+    MAKE_KEY(key, key_p, $2, enum_key_string, struct_val);
+
+    $1->vtable->set_pmc_keyed(interpreter, $1, &key, $3, NULL);
     goto NEXT();
 }
 
