@@ -295,7 +295,7 @@ trace_system_stack(struct Parrot_Interp *interpreter, PMC *last)
         return last;
     
     for (cur_var_ptr = lo_var_ptr;
-         cur_var_ptr*direction<hi_var_ptr*direction;
+         (ptrdiff_t)(cur_var_ptr * direction) < (ptrdiff_t)(hi_var_ptr * direction);
          cur_var_ptr = (size_t)( (ptrdiff_t)cur_var_ptr + direction * PARROT_PTR_ALIGNMENT )
          ) {
         size_t ptr = *(size_t *)cur_var_ptr;
