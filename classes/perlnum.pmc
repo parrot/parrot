@@ -318,6 +318,10 @@ fprintf(stderr,"modulus_float not implemented\n");
 fprintf(stderr,"modulus_same not implemented\n");
     }
 
+    void neg (PMC * dest) {
+	dest->vtable->set_number_native(INTERP, dest, -SELF->cache.num_val);
+    }
+
     void bitwise_or (PMC* value, PMC* dest) {
         dest->vtable->set_integer_native(INTERP, dest,
             (INTVAL)SELF->cache.num_val |
@@ -462,4 +466,5 @@ fprintf(stderr,"repeat_int not implemented\n");
     void decrement () {
         SELF->cache.num_val --;
     }
+
 }

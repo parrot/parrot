@@ -590,7 +590,7 @@ fprintf(stderr,"perlint_modulus not implemented for floating point\n");
     }
 
     void logical_not (PMC* value) {
-        SELF->cache.int_val = (INTVAL)(!value->vtable->get_bool(INTERP, value));
+	    value->vtable->set_integer_native(INTERP, value, !SELF->cache.int_val);
     }
 
     void repeat (PMC* value, PMC* dest) {
@@ -606,4 +606,5 @@ fprintf(stderr,"perlint_modulus not implemented for floating point\n");
     void decrement () {
         SELF->cache.int_val --;
     }
+
 }
