@@ -38,7 +38,7 @@ getchr_va(struct Parrot_Interp *interpreter, INTVAL size, SPRINTF_OBJ * obj)
 {
     va_list *arg = (va_list *) (obj->data);
 
-    char ch = va_arg(*arg, char);
+    char ch = (char) (int) va_arg(*arg, int);
     return string_make(interpreter, &ch, 1, NULL, 0, NULL);
 }
 
@@ -114,7 +114,7 @@ getfloat_va(struct Parrot_Interp *interpreter, INTVAL size, SPRINTF_OBJ * obj)
 
     switch (size) {
     case SIZE_SHORT:
-        return (HUGEFLOATVAL) (float)va_arg(*arg, float);
+        return (HUGEFLOATVAL) (double)va_arg(*arg, double);
     case SIZE_REG:
         return (HUGEFLOATVAL) (double)va_arg(*arg, double);
     case SIZE_HUGE:
