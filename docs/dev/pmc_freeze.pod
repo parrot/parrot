@@ -13,39 +13,41 @@ the final implementation.
 =head1 Overview
 
 Freezing or serializing arbitrary PMCs is an interesting problem.
-Aggregates can hold other aggregates nested deeply, so that a
-recursive approach easily could blow the stack especially on embedded
-systems. And aggregates can be self-referential, they can hold
-pointers to the aggregate itself, so that working on such structures
+Aggregates can hold other aggregates and can be deeply nested, so
+so a recursive approach could easily blow the stack, especially on embedded
+systems. Also, aggregates can be self-referential -- they can hold
+pointers to themselves -- so that working on such structures
 could create infinite loops.
 
 =head1 Coverage
 
-Albeit the file is named pmc_freeze.c it finally will deal with all
-kinds of operations, that deeply traverse arbitrary structures, that
-is:
+Although the file is named F<pmc_freeze.c> it ultimately will deal with 
+every kind of operation that deeply traverses an arbitrary data structures.
+For example:
 
 =over 4
 
 =item freeze
 
 Called from user code to serialize the state of a PMC into some
-possibly binary representation held in a STRING.
+(possibly binary) representation held in a STRING.
 
 =item freeze_at_destruct
 
-A variant of above, possibly called from an exception handler or on
+A variant of C<freeze>, possibly called from an exception handler or on
 resource shortage before interpreter shutdown, to save some data
 before dying. It must not consume any additional resources.
 
 =item thaw
 
-The opposite of above: Reconstruct all PMCs to generate an identically
-copy of the original frozen PMC. This is also called from user code.
+The opposite of C<freeze>: reconstruct all PMCs to generate an identical
+copy of the original frozen PMC. As with C<freeze>, can be called from user 
+code.
 
 =item dclone
 
-Deeply clone an aggregate, which is basically thaw(freeze(p)).
+Deeply clone an aggregate. C<dclone(p)> is basically the same as 
+C<thaw(freeze(p))>.
 
 =item dump, pretty_print
 
@@ -53,15 +55,16 @@ Create a visual representation of an aggregate.
 
 =item destruction ordering
 
-Find logical dependencies of PMCs, so that they can get destructed in
-appropriate order. This is also called on interpreter shutdown.
+Find the logical dependencies of a collection of PMCs, so that they can be 
+destroyed in an appropriate order. This is also called on interpreter 
+shutdown.
 
 =item mark
 
-Mark all objects being live by calling B<pobject_lives> called from
+Mark all objects as being live by calling B<pobject_lives> called from
 DOD. While the functionality is the same, it will not be implemented
 on top of this general scheme for performance reasons. This leads to
-some code duplication, but DOD is run permanently and deserves all
+some code duplication, but DOD is run permanently and deserves all the
 speed it can get.
 
 =back
@@ -93,9 +96,9 @@ handle the B<todo_list>.
 =item next_for_GC
 
 All PMCs that can contain other PMCs have the B<next_for_GC> pointer
-in the PMCs extended data area. The B<todo_list> gets built by
+in the PMC's extended data area. The B<todo_list> gets built by
 appending (or prepending) the current PMC to a B<mark_ptr>, which then
-points to the current PMC forming a linked list of items.
+points to the current PMC, forming a linked list of items.
 
 This pointer is also used during DOD's B<mark()> functionality, so
 that DOD has to be turned off during operations using this scheme.
@@ -107,7 +110,7 @@ pointer, so that there can be only one operation at a time.
 =item todo list
 
 A B<List> called B<todo> holds items still to be worked on. This
-method is slower, consumes more resources, but doesn't interfere with
+method is slower and consumes more resources, but doesn't interfere with
 DOD runs and is thread-safe.
 
 =back
@@ -143,7 +146,7 @@ The basic operation is:
 =head2 Avoiding duplicates
 
 As stated in the introduction structures can be self-referential,
-they can contain (at an arbitrary depth) PMCs, that where already
+they can contain (at an arbitrary depth) PMCs, that were already
 processed. Just following these PMCs would lead to endless loops. So
 already B<seen> PMCs have to be remembered.
 
@@ -171,14 +174,14 @@ manage, if a PMC was seen already by checking the live bit. The
 B<next_for_GC> pointer is just set and never cleared to avoid touching
 a PMCs memory and polluting caches when possible.
 
-Finally, generating a PMCs B<id> isn't as simple as just incrementing
+Finally, generating a PMC's B<id> isn't as simple as just incrementing
 a counter used with the B<seen> hash approach.
 
 =item PMC B<id>s
 
-We could of course use the PMCs address as its own B<id>, its for sure
-unique. But then we get a suboptimal operation during thawing. To
-manage duplicates during B<thaw> we basically need a mapping
+We could of course use the PMC's address as its own B<id>, since we know
+it is unique. However, this is suboptimal for thawing.
+To manage duplicates during B<thaw> we basically need a mapping
 B<PMC_in_image =E<gt> newly_constructed_PMC>. When now the
 B<PMC_in_image> (the B<id>) is the address, we have to use a hash
 again, for B<thaw()> with all the negative impact on resources and
@@ -190,7 +193,7 @@ takes less resources.
 
 The B<seen> hash approach just has a counter for PMC B<id>s, the
 B<next_for_GC> approach calculates the B<id> from the address of the
-PMC in its arena, again yielding a small and unique number. The two lo
+PMC in its arena, again yielding a small and unique number. The two low
 bits of PMC B<id>s are used as flags.
 
 =back
@@ -207,7 +210,7 @@ B<visit_action>.
 
 As stated PMCs are currently processed inside the core, PMC-specific
 parts are done by calling the PMCs vtable method. This parts could of
-course be moved to F<default.pmc> too, so that its simpler to override
+course be moved to F<default.pmc> too, so that it's simpler to override
 the functionality.
 
 =head2 Serializer interface
