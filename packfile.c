@@ -779,8 +779,14 @@ PackFile_Constant_unpack_number(struct PackFile * pf, struct PackFile_Constant *
                                 opcode_t *packed, opcode_t packed_size)
 {
     opcode_t *cursor;
-    FLOATVAL value;
+    /* Yuck, we now need a fetch_number... */
+    union F {
+        FLOATVAL value;
+        opcode_t b[sizeof(FLOATVAL)/sizeof(opcode_t)];
+    } f;
 
+    int i;
+    
     UNUSED(packed_size);
 
     if (!self) {
@@ -795,11 +801,18 @@ PackFile_Constant_unpack_number(struct PackFile * pf, struct PackFile_Constant *
      * This could be made contingent upon some preprocessor defines 
      * determined by Configure.
      */
-    
+#if TRACE_PACKFILE
+    if(pf->need_endianize)
+    fprintf(stderr, "FIXME: PackFile_Constant_unpack_number: assuming size of FLOATVAL!\n");
+#endif    
+    for(i = 0; i < (int)(sizeof(FLOATVAL) / sizeof(opcode_t)); i++) {
+        f.b[i] = PackFile_fetch_op(pf, cursor+i);
+    }
+/*    
     mem_sys_memcopy(&value, cursor, sizeof(FLOATVAL));
-
+*/    
     self->type = PFC_NUMBER;
-    self->number = value;
+    self->number = f.value;
 
     return 1;
 }
