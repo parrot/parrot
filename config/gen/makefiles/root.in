@@ -252,6 +252,7 @@ INTERP_O_FILES = \
     $(SRC)/string$(O) \
     $(SRC)/string_primitives$(O) \
     $(SRC)/sub$(O) \
+    $(SRC)/lexical$(O) \
     $(SRC)/runops_cores$(O) \
     $(SRC)/trace$(O) \
     $(SRC)/pmc$(O) \
@@ -732,6 +733,10 @@ $(SRC)/trace$(O) : $(GENERAL_H_FILES)
 $(SRC)/debug$(O) : $(GENERAL_H_FILES) $(INC)/debug.h
 
 $(SRC)/method_util$(O) : $(GENERAL_H_FILES)
+
+$(SRC)/sub$(O) : $(GENERAL_H_FILES)
+
+$(SRC)/lexical$(O) : $(GENERAL_H_FILES)
 
 $(SRC)/string$(O) : $(GENERAL_H_FILES) $(INC)/string_private_cstring.h
 

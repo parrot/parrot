@@ -1,4 +1,4 @@
-/* subroutine.h
+/* sub.h
  *  Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
  *  CVS Info
  *     $Id$
@@ -13,15 +13,9 @@
  */
 
 #if !defined(PARROT_SUB_H_GUARD)
-#define PARROT_SUB_GUARD
+#define PARROT_SUB_H_GUARD
 
 #include "parrot/parrot.h"
-
-/* Used by Scratchpad PMC */
-typedef struct Parrot_Lexicals {
-    List * values;    /* lexicals go here */
-    List * names;     /* names of lexicals go here */
-} * parrot_lexicals_t;
 
 /*
  * Sub, Closure, COntinuation have the same structure
@@ -64,24 +58,6 @@ void swap_context(struct Parrot_Interp *, PMC *);
 void restore_context(struct Parrot_Interp *, struct Parrot_Context *);
 void mark_context(struct Parrot_Interp *, struct Parrot_Context *);
 
-PMC * scratchpad_new(struct Parrot_Interp * interp, PMC * base, INTVAL depth);
-
-PMC * scratchpad_get_current(struct Parrot_Interp * interp);
-
-void scratchpad_store(struct Parrot_Interp * interp, PMC * pad,
-                      STRING * name, INTVAL position, PMC* value);
-
-void scratchpad_store_index(struct Parrot_Interp * interp, PMC * pad, INTVAL pad_index,
-                            STRING * name, INTVAL position, PMC* value);
-
-PMC * scratchpad_get(struct Parrot_Interp * interp, PMC * pad, STRING * name,
-                     INTVAL position);
-
-PMC * scratchpad_get_index(struct Parrot_Interp * interp, PMC * pad, INTVAL pad_index,
-                           STRING * name, INTVAL position);
-
-void lexicals_mark(struct Parrot_Interp * interp, struct Parrot_Lexicals *lex);
-void scratchpad_delete(Parrot_Interp interp, PMC *pad, STRING *name);
 
 #endif /* PARROT_SUB_H_GUARD */
 
