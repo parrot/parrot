@@ -368,7 +368,6 @@ If for some reason the line's longer than 64K you get only 64K
 =cut
 
 inline op readline(out STR, in PMC) {
-  ParrotIO *io;
   size_t len = 0;
   $1 = string_make(interpreter, NULL, 65535, NULL, 0, NULL);
   memset(($1)->strstart, 0, 65535);
