@@ -1,6 +1,6 @@
 #!perl
 use strict;
-use TestCompiler tests => 12;
+use TestCompiler tests => 21;
 
 # macro tests
 
@@ -172,3 +172,114 @@ output_is( <<'CODE', <<OUTPUT, ".newlex" );
 CODE
 10
 OUTPUT
+
+output_like( <<'CODE', <<OUTPUT, "too few params" );
+.sub _main
+.macro M(A, B)
+    print .A
+    print .B
+.endm
+    .M("never")
+    end
+.end
+CODE
+/Macro 'M' requires 2 arguments, but 1 given/
+OUTPUT
+
+output_like( <<'CODE', <<OUTPUT, "too many params" );
+.sub _main
+.macro M(A, B)
+    print .A
+    print .B
+.endm
+    .M("never", "x", "y")
+    end
+.end
+CODE
+/Macro 'M' requires 2 arguments, but 3 given/
+OUTPUT
+
+output_is( <<'CODE', <<OUTPUT, "ok param count" );
+.sub _main
+.macro M(A, B)
+    print .A
+    print .B
+.endm
+    .M("fine", "\n")
+    end
+.end
+CODE
+fine
+OUTPUT
+
+output_like( <<'CODE', <<OUTPUT, "macro name is no ident" );
+.sub _main
+.macro 42(A, B)
+    print .A
+    print .B
+.endm
+    .M("never", "x", "y")
+    end
+.end
+CODE
+/Macro names must be identifiers/
+OUTPUT
+
+output_like( <<'CODE', <<OUTPUT, "unterminated macro" );
+.sub _main
+.macro M(
+
+
+CODE
+/End of file reached/
+OUTPUT
+
+output_like( <<'CODE', <<OUTPUT, "unterminated macro 2" );
+.sub _main
+.macro M(A, B)
+  print .A
+.endm
+  .M(A, B
+.end
+CODE
+/End of file reached/
+OUTPUT
+
+output_like( <<'CODE', <<OUTPUT, "ill param def" );
+.sub _main
+.macro M(A, B
+  print .A
+.endm
+  .M(A, B)
+.end
+CODE
+/Parameter definition in 'M' must be IDENT/
+OUTPUT
+
+output_like( <<'CODE', <<OUTPUT, "no params" );
+.sub _main
+.macro M(A, B)
+    print .A
+    print .B
+.endm
+    .M
+    end
+.end
+CODE
+/Macro 'M' needs 2 arguments/
+OUTPUT
+
+
+output_like( <<'CODE', <<OUTPUT, "unknown macro" );
+.sub _main
+.macro M(A, B)
+    print .A
+    print .B
+.endm
+    .N(1,2)
+    end
+.end
+CODE
+/unknown macro/
+OUTPUT
+

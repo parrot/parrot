@@ -73,7 +73,6 @@ static int prev_state;
 
 %}
 
-%option outfile="imclexer.c"
 %option never-interactive
 %option stack
 
@@ -327,7 +326,7 @@ SP              [ ]
 	    return INTC;
 	}
 	if (!expand_macro(valp, interp, yytext+1))
-            fataly(1, sourcefile, line, "unknown macro '%s'\n", yytext);
+            fataly(1, sourcefile, line, "unknown macro '%s'", yytext);
     }
 
 <emit,INITIAL>{LETTER}{LETTERDIGIT}* {
@@ -527,11 +526,15 @@ read_params (YYSTYPE *valp, void *interp, struct params_t *params,
     c = yylex_skip(&val, interp, " \n");
 
     while(c != ')') {
-	if (c == 0)
+	if (c <= 0)
 	    fataly(EX_SOFTWARE, sourcefile, line,
 		   "End of file reached while reading arguments in '%s'",
                    macro_name);
 	else if (c == ',') {
+            if (params->num_param == MAX_PARAM)
+                fataly(EX_SOFTWARE, sourcefile, line,
+                       "More then %d params in '%s'",
+                       MAX_PARAM, macro_name);
 	    params->name[params->num_param++] = current;
 	    current = str_dup("");
 	    len = 0;
@@ -592,7 +595,7 @@ read_macro (YYSTYPE *valp, void *interp)
     }
 
     while (c != ENDM) {
-	if (c == 0)
+	if (c <= 0)
 	    fataly (EX_SOFTWARE, sourcefile, line,
 		    "File ended before macro '%s' was complete", m->name);
 
@@ -672,7 +675,7 @@ expand_macro (YYSTYPE *valp, void *interp, const char *name)
 	    unput(c);
 	    if (m->params.num_param != 0)
 		fataly (EX_SOFTWARE, sourcefile, line,
-			"macro '%s' needs %d parameters",
+			"Macro '%s' needs %d arguments",
                         m->name, m->params.num_param);
 	    scan_string(frame, m->expansion);
 	    return 1;
@@ -693,7 +696,7 @@ expand_macro (YYSTYPE *valp, void *interp, const char *name)
 	if (frame->expansion.num_param != m->params.num_param) {
 	    fataly(EX_SOFTWARE, sourcefile, line,
 		   "Macro '%s' requires %d arguments, but %d given",
-		   m->name, frame->expansion.num_param, m->params.num_param);
+		   m->name, m->params.num_param, frame->expansion.num_param);
 	}
 
 	line = m->line;

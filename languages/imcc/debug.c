@@ -27,7 +27,7 @@ void fataly(int code, const char *file, int lin, const char *fmt, ...)
     fprintf(stderr, "error:imcc:");
     imcc_vfprintf(stderr, fmt, ap);
     va_end(ap);
-    fprintf(stderr, "in file '%s' line %d\n", file, lin);
+    fprintf(stderr, "\nin file '%s' line %d\n", file, lin);
     print_inc();
     /* TODO through compiler exception */
     exit(code);
