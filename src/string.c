@@ -2588,7 +2588,13 @@ string_to_num(Interp *interpreter, const STRING *s)
         f = atof(p);
         /* Not all atof()s return -0 from "-0" */
         if (*p == '-' && f == 0.0)
+#if defined(_MSC_VER)
+            /* Visual C++ compiles -0.0 to 0.0, so we need to trick
+               the compiler. */
+            f = 0.0 * -1;
+#else
             f = -0.0;
+#endif
         string_cstring_free(cstr);
         return f;
     }
