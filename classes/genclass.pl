@@ -43,7 +43,8 @@ for (@{$vtbl}) {
     }
 
     print "    $retval $methname ($args) {\n";
-    if($retval !~ /void/) {
+    # Keep space after void because of (void*)
+    if($retval !~ /void /) {
 	print "        return ($retval)0;\n";
     }
     print "    }\n\n";
