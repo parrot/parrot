@@ -584,15 +584,7 @@ TODO: Doesn't the Parrot interpreter need to catch the exception?
 
 =cut
 
-AUTO_OP cmod(i, i, i) {
-  $1 = $2 % $3;
-}
-
-AUTO_OP cmod(i, i, ic) {
-  $1 = $2 % $3;
-}
-
-AUTO_OP cmod(i, ic, i) {
+AUTO_OP cmod(i, i|ic, i|ic) {
   $1 = $2 % $3;
 }
 
@@ -632,15 +624,7 @@ TODO: Doesn't the Parrot interpreter need to catch the exception?
 
 =cut
 
-AUTO_OP cmod(n, n, n) {
-  $1 = fmod($2, $3);
-}
-
-AUTO_OP cmod(n, n, nc) {
-  $1 = fmod($2, $3);
-}
-
-AUTO_OP cmod(n, nc, n) {
+AUTO_OP cmod(n, n|nc, n|nc) {
   $1 = fmod($2, $3);
 }
 
@@ -655,12 +639,8 @@ Decrease $1 by one.
 
 =cut
 
-AUTO_OP dec(i) {
+AUTO_OP dec(i|n) {
   $1--;
-}
-
-AUTO_OP dec(n) {
-  $1 -= 1;
 }
 
 
@@ -702,27 +682,11 @@ result is truncated (NOT rounded or floored).
 
 =cut
 
-AUTO_OP div(i, i, i) {
+AUTO_OP div(i, i|ic, i|ic) {
   $1 = $2 / $3;
 }
 
-AUTO_OP div(i, i, ic) {
-  $1 = $2 / $3;
-}
-
-AUTO_OP div(i, ic, i) {
-  $1 = $2 / $3;
-}
-
-AUTO_OP div(n, n, n) {
-  $1 = $2 / $3;
-}
-
-AUTO_OP div(n, n, nc) {
-  $1 = $2 / $3;
-}
-
-AUTO_OP div(n, nc, n) {
+AUTO_OP div(n, n|nc, n|nc) {
   $1 = $2 / $3;
 }
 
@@ -737,12 +701,8 @@ Increase $1 by one.
 
 =cut
 
-AUTO_OP inc(i) {
+AUTO_OP inc(i|n) {
   $1++;
-}
-
-AUTO_OP inc(n) {
-  $1 += 1;
 }
 
 
@@ -793,59 +753,7 @@ References:
 
 =cut
 
-AUTO_OP mod(i, i, i) {
-  INTVAL y = $2;
-  INTVAL z = $3;
-  INTVAL s = 0;
-  INTVAL r;
-
-  if (z == 0) {
-    r = y;
-  }
-  else {
-    if (y < 0) { s += 2; y = -y; }
-    if (z < 0) { s += 1; z = -z; }
-
-    r = y % z;
-
-    switch (s) {
-      case 0 + 0:            break;
-      case 0 + 1: r = r - z; break;
-      case 2 + 0: r = z - r; break;
-      case 2 + 1: r = -r;    break;
-    }
-  }
-
-  $1 = r;
-}
-
-AUTO_OP mod(i, i, ic) {
-  INTVAL y = $2;
-  INTVAL z = $3;
-  INTVAL s = 0;
-  INTVAL r;
-
-  if (z == 0) {
-    r = y;
-  }
-  else {
-    if (y < 0) { s += 2; y = -y; }
-    if (z < 0) { s += 1; z = -z; }
-
-    r = y % z;
-
-    switch (s) {
-      case 0 + 0:            break;
-      case 0 + 1: r = r - z; break;
-      case 2 + 0: r = z - r; break;
-      case 2 + 1: r = -r;    break;
-    }
-  }
-
-  $1 = r;
-}
-
-AUTO_OP mod(i, ic, i) {
+AUTO_OP mod(i, i|ic, i|ic) {
   INTVAL y = $2;
   INTVAL z = $3;
   INTVAL s = 0;
@@ -894,19 +802,7 @@ References:
 
 =cut
 
-AUTO_OP mod(n, n, n) {
-  $1 = $3
-     ? ($2 - $3 * floor($2 / $3))
-     : $2;
-}
-
-AUTO_OP mod(n, n, nc) {
-  $1 = $3
-     ? ($2 - $3 * floor($2 / $3))
-     : $2;
-}
-
-AUTO_OP mod(n, nc, n) {
+AUTO_OP mod(n, n|nc, n|nc) {
   $1 = $3
      ? ($2 - $3 * floor($2 / $3))
      : $2;
@@ -966,52 +862,8 @@ Set $1 to $2 raised to the power $3.
 
 =cut
 
-AUTO_OP pow(n, i, i) {
+AUTO_OP pow(n, i|ic|n|nc, i|ic|n|nc) {
    $1 = pow((FLOATVAL)$2, (FLOATVAL)$3);
-}
-
-AUTO_OP pow(n, i, ic) {
-   $1 = pow((FLOATVAL)$2, (FLOATVAL)$3);
-}
-
-AUTO_OP pow(n, ic, i) {
-   $1 = pow((FLOATVAL)$2, (FLOATVAL)$3);
-}
-
-AUTO_OP pow(n, i, n) {
-   $1 = pow((FLOATVAL)$2, $3);
-}
-
-AUTO_OP pow(n, i, nc) {
-   $1 = pow((FLOATVAL)$2, $3);
-}
-
-AUTO_OP pow(n, ic, n) {
-   $1 = pow((FLOATVAL)$2, $3);
-}
-
-AUTO_OP pow(n, n, i) {
-   $1 = pow($2, (FLOATVAL)$3);
-}
-
-AUTO_OP pow(n, n, ic) {
-   $1 = pow($2, (FLOATVAL)$3);
-}
-
-AUTO_OP pow(n, nc, i) {
-   $1 = pow($2, (FLOATVAL)$3);
-}
-
-AUTO_OP pow(n, n, n) {
-   $1 = pow($2, $3);
-}
-
-AUTO_OP pow(n, n, nc) {
-   $1 = pow($2, $3);
-}
-
-AUTO_OP pow(n, nc, n) {
-   $1 = pow($2, $3);
 }
 
 
@@ -1033,27 +885,11 @@ Set $1 to $2 minus $3.
 
 =cut
 
-AUTO_OP sub(i, i, i) {
+AUTO_OP sub(i, i|ic, i|ic) {
   $1 = $2 - $3;
 }
 
-AUTO_OP sub(i, i, ic) {
-  $1 = $2 - $3;
-}
-
-AUTO_OP sub(i, ic, i) {
-  $1 = $2 - $3;
-}
-
-AUTO_OP sub(n, n, n) {
-  $1 = $2 - $3;
-}
-
-AUTO_OP sub(n, n, nc) {
-  $1 = $2 - $3;
-}
-
-AUTO_OP sub(n, nc, n) {
+AUTO_OP sub(n, n|nc, n|nc) {
   $1 = $2 - $3;
 }
 
@@ -1093,7 +929,7 @@ AUTO_OP chopn(s, i|ic) {
 
 =item B<concat>(s, s)
 
-=item B<concat>(s,sc)
+=item B<concat>(s, sc)
 
 =item B<concat>(s, s, s)
 
@@ -1109,26 +945,12 @@ into $1.
 =cut
 
 AUTO_OP concat(s, s|sc) {
-    STRING *s = string_concat($1, $2, 1);
-    $1 = s;
+    $1 = string_concat($1, $2, 1);
 }
 
-AUTO_OP concat(s, s, s) {
-    STRING *s = string_concat($2, $3, 1);
-    $1 = s;
+AUTO_OP concat(s, s|sc, s|sc) {
+    $1 = string_concat($2, $3, 1);
 }
-
-AUTO_OP concat(s, s, sc) {
-    STRING *s = string_concat($2, $3, 1);
-    $1 = s;
-}
-
-
-AUTO_OP concat(s, sc, s) {
-    STRING *s = string_concat($2, $3, 1);
-    $1 = s;
-}
-
 
 
 ########################################
@@ -1165,24 +987,8 @@ length $4.
 
 =cut
 
-AUTO_OP substr(s, s, i|ic, i|ic) {
-    STRING *s = string_substr($2, $3, $4, &$1);
-    $1 = s;
-}
-
-AUTO_OP substr(s, sc, i, i) {
-    STRING *s = string_substr($2, $3, $4, &$1);
-    $1 = s;
-}
-
-AUTO_OP substr(s, sc, i, ic) {
-    STRING *s = string_substr($2, $3, $4, &$1);
-    $1 = s;
-}
-
-AUTO_OP substr(s, sc, ic, i) {
-    STRING *s = string_substr($2, $3, $4, &$1);
-    $1 = s;
+AUTO_OP substr(s, s|sc, i|ic, i|ic) {
+    $1 = string_substr($2, $3, $4, &$1);
 }
 
 
@@ -1286,60 +1092,12 @@ quadrant of the result.
 
 =cut
 
-AUTO_OP atan(n, i) {
+AUTO_OP atan(n, i|n) {
    $1 = atan((FLOATVAL)$2);
 }
 
-AUTO_OP atan(n, i, i) {
+AUTO_OP atan(n, i|ic|n|nc, i|ic|n|nc) {
    $1 = atan2((FLOATVAL)$2, (FLOATVAL)$3);
-}
-
-AUTO_OP atan(n, i, ic) {
-   $1 = atan2((FLOATVAL)$2, (FLOATVAL)$3);
-}
-
-AUTO_OP atan(n, ic, i) {
-   $1 = atan2((FLOATVAL)$2, (FLOATVAL)$3);
-}
-
-AUTO_OP atan(n, i, n) {
-   $1 = atan2((FLOATVAL)$2, $3);
-}
-
-AUTO_OP atan(n, i, nc) {
-   $1 = atan2((FLOATVAL)$2, $3);
-}
-
-AUTO_OP atan(n, ic, n) {
-   $1 = atan2((FLOATVAL)$2, $3);
-}
-
-AUTO_OP atan(n, n) {
-   $1 = atan($2);
-}
-
-AUTO_OP atan(n, n, i) {
-   $1 = atan2($2, (FLOATVAL)$3);
-}
-
-AUTO_OP atan(n, n, ic) {
-   $1 = atan2($2, (FLOATVAL)$3);
-}
-
-AUTO_OP atan(n, nc, i) {
-   $1 = atan2($2, (FLOATVAL)$3);
-}
-
-AUTO_OP atan(n, n, n) {
-   $1 = atan2($2, $3);
-}
-
-AUTO_OP atan(n, n, nc) {
-   $1 = atan2($2, $3);
-}
-
-AUTO_OP atan(n, nc, n) {
-   $1 = atan2($2, $3);
 }
 
 

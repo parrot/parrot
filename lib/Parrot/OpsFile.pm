@@ -152,7 +152,7 @@ sub read_ops
     #
 
     if (/^}\s*$/) {
-      $count += $self->make_op($count, $type, $short_name, $body, @args);
+      $count += $self->make_op($count, $type, $short_name, $body, \@args);
 
       $seen_op = 0;
 
@@ -186,16 +186,22 @@ sub read_ops
 
 sub make_op
 {
-  my ($self, $code, $type, $short_name, $body, @args) = @_;
+  my ($self, $code, $type, $short_name, $body, $args, $vc, $vcc) = @_;
+  my @args = @$args;
   my @fixedargs;
+
+  $vc ||= 0;
+  $vcc ||= 0;
 
   while (@args) {
     my $arg = shift @args;
     if ($arg =~ /\|/) {
       my $count = 0;
       foreach my $variant (split(/\s*\|\s*/, $arg)) {
+        my $isconstant = ($variant =~ /c$/) ? 1 : 0;
         $count += $self->make_op($code + $count, $type, $short_name, $body,
-        			 @fixedargs, $variant, @args);
+                                 [@fixedargs, $variant, @args], $vc + 1, 
+                                 $vcc + $isconstant);
       }
       return $count;
     }
@@ -204,30 +210,32 @@ sub make_op
     }
   }
 
+  return 0 if $vc > 1 && $vc == $vcc;
+
   my $op = Parrot::Op->new($code, $type, $short_name, 'op', @fixedargs);
   my $op_size = $op->size;
 
   #
-    # Macro substitutions:
-    #
-    # We convert the following notations:
-    #
-    #   .ops file   Op body  Meaning       Comment
-    #   ----------  -------  ------------  -----------------------------------
-    #   HALT        {{=0}}   PC' = 0       Halts run_ops loop, no resume
-    #   RESTART(X)  {{=0}}   PC' = 0       Restarts at PC + X
-    #   RESTART(*)  {{=0}}   PC' = 0       Restarts at PC + S
-    #   RETREL(X)   {{+=X}}  PC' = PC + X  Used for branches
-    #   RETREL(*)   {{+=S}}  PC' = PC + S  Where S is op size; for auto ops
-    #   RETABS(X)   {{=X}}   PC' = X       Used for absolute jumps
-    #   $X          {{@X}}   Argument X    $0 is opcode, $1 is first arg
-    #
-    # Later transformations turn the Op body notations into C code, based
-    # on the mode of operation (function calls, switch statements, gotos
-    # with labels, etc.).
-    #
-    # TODO: Complain about using, e.g. $3 in an op with only 2 args.
-    #
+  # Macro substitutions:
+  #
+  # We convert the following notations:
+  #
+  #   .ops file   Op body  Meaning       Comment
+  #   ----------  -------  ------------  -----------------------------------
+  #   HALT        {{=0}}   PC' = 0       Halts run_ops loop, no resume
+  #   RESTART(X)  {{=0}}   PC' = 0       Restarts at PC + X
+  #   RESTART(*)  {{=0}}   PC' = 0       Restarts at PC + S
+  #   RETREL(X)   {{+=X}}  PC' = PC + X  Used for branches
+  #   RETREL(*)   {{+=S}}  PC' = PC + S  Where S is op size; for auto ops
+  #   RETABS(X)   {{=X}}   PC' = X       Used for absolute jumps
+  #   $X          {{@X}}   Argument X    $0 is opcode, $1 is first arg
+  #
+  # Later transformations turn the Op body notations into C code, based
+  # on the mode of operation (function calls, switch statements, gotos
+  # with labels, etc.).
+  #
+  # TODO: Complain about using, e.g. $3 in an op with only 2 args.
+  #
 
   $body =~ s/HALT/{{=0}}/mg;
 
