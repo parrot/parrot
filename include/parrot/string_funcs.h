@@ -30,7 +30,7 @@ STRING *string_replace(struct Parrot_Interp *, STRING *, INTVAL, INTVAL,
                        STRING *, STRING **);
 STRING *string_nprintf(struct Parrot_Interp *,
                        STRING *, INTVAL, const char *, ...);
-STRING *string_printf(struct Parrot_Interp *interpreter, 
+STRING *string_printf(struct Parrot_Interp *interpreter,
 					  const char *format, ...);
 INTVAL string_compare(struct Parrot_Interp *, STRING *, STRING *);
 INTVAL string_equal(struct Parrot_Interp *, STRING *, STRING *);
@@ -60,9 +60,9 @@ STRING *string_set(struct Parrot_Interp *, STRING *d, STRING *s);
 /* STRING *string_transcode(struct Parrot_Interp *, STRING *src,
                          const ENCODING *, const CHARTYPE *,
                          STRING **dest_ptr); */
-void string_init(void);
+void string_init(Parrot_Interp);
 UINTVAL string_capacity(struct Parrot_Interp *interpreter, STRING *s);
-void *string_pointer_to_index(struct Parrot_Interp *, 
+void *string_pointer_to_index(struct Parrot_Interp *,
 								const STRING *s, UINTVAL idx);
 INTVAL string_index(struct Parrot_Interp *, const STRING *, UINTVAL idx);
 INTVAL string_str_index(struct Parrot_Interp *interpreter, const STRING *s,

@@ -32,7 +32,7 @@ extern void Parrot_register_core_pmcs(Interp *interp, PMC *registry);
 
 =item C<void init_world(Interp *interpreter)>
 
-This is the actual initialization code called by C<Parrot_init()>. 
+This is the actual initialization code called by C<Parrot_init()>.
 
 It sets up the Parrot system, running any platform-specific init code if
 necessary, then initializing the string subsystem, and setting up the
@@ -58,7 +58,6 @@ init_world(Interp *interpreter)
     Parrot_platform_init_code();
 #endif
 
-    string_init();              /* Set up the string subsystem */
 
     /* TODO allocate core vtable table only once - or per interpreter
      *

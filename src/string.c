@@ -245,9 +245,11 @@ Initializes the Parrot string subsystem.
 
 */
 
+#include "parrot/string_private_cstring.h"
 void
-string_init(void)
+string_init(Parrot_Interp interpreter)
 {
+    size_t i;
 /* DEFAULT_ICU_DATA_DIR is configured at build time. Need a way to
     specify this at runtime as well. */
     string_set_data_directory(DEFAULT_ICU_DATA_DIR);
@@ -257,6 +259,22 @@ string_init(void)
     string_native_type = chartype_lookup("usascii");
     string_unicode_type = chartype_lookup("unicode");
 */
+    /*
+     * initialize the constant string table
+     */
+    if (interpreter->parent_interpreter) {
+        interpreter->const_cstring_table =
+            interpreter->parent_interpreter->const_cstring_table;
+        return;
+    }
+    interpreter->const_cstring_table = mem_sys_allocate(sizeof(STRING*) *
+        sizeof(parrot_cstrings)/sizeof(parrot_cstrings[0]));
+    for (i = 0; i < sizeof(parrot_cstrings)/sizeof(parrot_cstrings[0]); ++i) {
+        interpreter->const_cstring_table[i] =
+            const_string(interpreter, parrot_cstrings[i].string);
+        /* TODO construct string here and valid hashval */
+    }
+
 }
 
 /*

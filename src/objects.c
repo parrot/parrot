@@ -21,11 +21,7 @@ Handles class and object manipulation.
 #include "parrot/parrot.h"
 #include <assert.h>
 
-#undef _S
-/* #include "objects.str" */
-#ifndef _S
-#  define _S(s) const_string(interpreter, s)
-#endif
+#include "objects.str"
 
 #define const_cast(b) (__ptr_u.__c_ptr = (b), __ptr_u.__ptr)
 static PMC *
@@ -529,8 +525,8 @@ do_initcall(Parrot_Interp interpreter, PMC* class, PMC *object, PMC *init)
          *
          */
         STRING *meth_str;
-        PMC *meth = get_init_meth(interpreter, class, _S("CONSTRUCT"),
-                &meth_str);
+        PMC *meth = get_init_meth(interpreter, class,
+                CONST_STRING(interpreter, "CONSTRUCT"), &meth_str);
         if (meth) {
             if (init)
                 Parrot_run_meth_fromc_args_save(interpreter, meth,
@@ -547,7 +543,8 @@ do_initcall(Parrot_Interp interpreter, PMC* class, PMC *object, PMC *init)
         for (i = nparents - 1; i >= 0; --i) {
             parent_class = VTABLE_get_pmc_keyed_int(interpreter,
                     classsearch_array, i);
-            meth = get_init_meth(interpreter, parent_class, _S("BUILD"), &meth_str);
+            meth = get_init_meth(interpreter, parent_class,
+                    CONST_STRING(interpreter, "BUILD"), &meth_str);
             if (meth) {
                 if (init)
                     Parrot_run_meth_fromc_args_save(interpreter, meth,
@@ -557,7 +554,8 @@ do_initcall(Parrot_Interp interpreter, PMC* class, PMC *object, PMC *init)
                             object, meth_str);
             }
         }
-        meth = get_init_meth(interpreter, class, _S("BUILD"), &meth_str);
+        meth = get_init_meth(interpreter, class,
+                CONST_STRING(interpreter, "BUILD"), &meth_str);
         if (meth) {
             if (init)
                 Parrot_run_meth_fromc_args_save(interpreter, meth,

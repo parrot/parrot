@@ -272,9 +272,10 @@ typedef struct Parrot_Interp {
                                                    pointers */
     PMC** nci_method_table;     /* Method table PMC for NCI stubs per class */
     struct _Caches * caches;            /* s. caches.h */
+    STRING **const_cstring_table;       /* CONST_STRING(x) items */
     size_t nci_method_table_size;       /* allocated size of this table */
     struct QUEUE* task_queue;           /* per interpreter queue */
-    int sleeping;                       /* used durning sleep in events */
+    int sleeping;                       /* used during sleep in events */
     struct parrot_exception_t *exceptions; /* internal exception stack */
     struct parrot_exception_t *exc_free_list; /* and free list */
     struct _Thread_data *thread_data;   /* thread specific items */

@@ -1703,6 +1703,11 @@ make_interpreter(Parrot_Interp parent, Interp_flags flags)
 
     /* Set up the memory allocation system */
     mem_setup_allocator(interpreter);
+    /*
+     * Set up the string subsystem
+     * This also generates the constant string tables
+     */
+    string_init(interpreter);
 
     /* Set up the MMD struct */
     interpreter->binop_mmd_funcs =

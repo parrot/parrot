@@ -19,6 +19,7 @@ RESPONSIBLE_PARTIES                               [main]doc
 TODO                                              [main]doc
 VERSION                                           [main]doc
 build_tools/build_nativecall.pl                   []
+build_tools/c2str.pl                              []
 build_tools/fingerprint_c.pl                      []
 build_tools/jit2h.pl                              []
 build_tools/list_unjitted.pl			  []

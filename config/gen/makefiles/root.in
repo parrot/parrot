@@ -376,6 +376,16 @@ MAKE_C = ${make_c}
 
 all : flags_dummy $(TEST_PROG) library/config.fpmc docs
 
+# constant string support
+%.str : %.c  build_tools/c2str.pl
+	$(PERL) build_tools/c2str.pl $< > $@
+
+STR_FILES = \
+	$(SRC)/objects.str
+
+$(INC)/string_private_cstring.h: $(STR_FILES)
+	$(PERL) build_tools/c2str.pl --all
+
 # This is a listing of all targets, that are meant to be called by users
 help:
 	@echo ""
@@ -678,7 +688,7 @@ $(SRC)/debug$(O) : $(GENERAL_H_FILES) $(INC)/debug.h
 
 $(SRC)/method_util$(O) : $(GENERAL_H_FILES)
 
-$(SRC)/string$(O) : $(GENERAL_H_FILES)
+$(SRC)/string$(O) : $(GENERAL_H_FILES) $(INC)/string_private_cstring.h
 
 $(SRC)/string_primitives$(O) : $(GENERAL_H_FILES) $(ICU_H_FILES)
 
@@ -714,7 +724,7 @@ $(SRC)/memory$(O) : $(GENERAL_H_FILES)
 
 $(SRC)/mmd$(O) : $(GENERAL_H_FILES) $(INC)/mmd.h
 
-$(SRC)/objects$(O) : $(GENERAL_H_FILES)
+$(SRC)/objects$(O) : $(GENERAL_H_FILES) $(SRC)/objects.str
 
 $(SRC)/packfile$(O) : $(GENERAL_H_FILES)
 
@@ -987,6 +997,8 @@ progclean:
 	        $(DIS) $(SRC)/disassemble$(O)
 	$(RM_F) $(LIBPARROT)
 	$(MAKE_C) classes progclean
+	$(PERL) build_tools/c2str.pl --init
+	$(RM_F) $(STR_FILES) $(INC)/string_private_cstring.h
 
 testclean :
 	$(RM_F) t/op/*.pasm t/op/*.pbc t/op/*.out t/op/*.o t/op/*.stabs.s \
