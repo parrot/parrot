@@ -863,7 +863,7 @@ emit_movb_i_m(char *pc, char imm, int base, int i, int scale, long disp)
 #    define jit_emit_fstore_m_n(pc, address) \
       emitm_fstpl(pc, emit_None, emit_None, emit_None, address)
 
-#  else /* NUMVAL_SIZE */ 
+#  else /* NUMVAL_SIZE */
 
 #    define jit_emit_fload_m_n(pc, address) \
       emitm_fldt(pc, emit_None, emit_None, emit_None, address)
@@ -2033,6 +2033,7 @@ Parrot_jit_build_call_func(struct Parrot_Interp *interpreter,
     Parrot_jit_info_t jit_info;
     char *sig, *pc;
     int next_n = 5;
+    int next_p = 5;
     int next_i = 5;
     int st = 0;
 
@@ -2064,6 +2065,7 @@ Parrot_jit_build_call_func(struct Parrot_Interp *interpreter,
                 emitm_fstpl(pc, emit_ESP, emit_None, 1, 0);
                 st += 4;        /* extra stack for double */
                 break;
+            case 'l':   /* long */
             case 'i':   /* int */
                 jit_emit_mov_rm_i(pc, emit_EAX, &INT_REG(next_i++));
                 emitm_pushl_r(pc, emit_EAX);
@@ -2074,6 +2076,16 @@ Parrot_jit_build_call_func(struct Parrot_Interp *interpreter,
                 break;
             case 'c':   /* char: movsbl intreg, %eax */
                 emitm_movsbl_r_m(pc, emit_EAX, 0, 0, 1, &INT_REG(next_i++));
+                emitm_pushl_r(pc, emit_EAX);
+                break;
+            case 'p':   /* push pmc->data */
+                /* mov pmc, %edx
+                 * mov 8(%edx), %eax
+                 * push %eax
+                 */
+                jit_emit_mov_rm_i(pc, emit_EDX, &PMC_REG(next_p++));
+                emitm_movl_m_r(pc, emit_EAX, emit_EDX, 0, 1,
+                        offsetof(struct PMC, data));
                 emitm_pushl_r(pc, emit_EAX);
                 break;
             case 'v':
@@ -2116,6 +2128,7 @@ Parrot_jit_build_call_func(struct Parrot_Interp *interpreter,
             emitm_movsbl_r_r(pc, emit_EDX, emit_EAX);
             jit_emit_mov_mr_i(pc, &INT_REG(next_i++), emit_EDX);
             break;
+        case 'l':
         case 'i':
             jit_emit_mov_mr_i(pc, &INT_REG(next_i++), emit_EAX);
             /* fall through */
