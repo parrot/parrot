@@ -109,7 +109,7 @@ while(<>) {
 	    }
 	    my($found_op)=0;
 	    foreach my $op (grep($_=~/^$opcode/,keys(%opcodes))) {
-		if($op=~/$test/) {
+		if($op=~/^$test$/) {
 		    $opcode=$op;
 		    $found_op=1;
 		    last;
@@ -118,8 +118,7 @@ while(<>) {
             error("No opcode $opcode in <$_>") if(!$found_op);
         }
         if (@args != $opcodes{$opcode}{ARGS}) {
-            error("Wrong arg count--got ".scalar(@args)." needed
-".$opcodes{$opcode}{ARGS});
+            error("Wrong arg count--got ".scalar(@args)." needed ".$opcodes{$opcode}{ARGS});
         }
         $bytecode .= pack "l", $opcodes{$opcode}{CODE};
         $op_pc=$pc;
@@ -128,8 +127,7 @@ while(<>) {
         foreach (0..$#args) {
             my($rtype)=$opcodes{$opcode}{RTYPES}[$_];
             my($type)=$opcodes{$opcode}{TYPES}[$_];
-            if($rtype eq "I" || $rtype eq "N" || $rtype eq "P" || $rtype eq
-"S") {
+            if($rtype eq "I" || $rtype eq "N" || $rtype eq "P" || $rtype eq "S") {
                 # its a register argument
                 $args[$_]=~s/^[INPS](\d+)$/$1/i;
                 $pc+=$sizeof{$rtype}
@@ -217,7 +215,11 @@ sub error {
 
 sub constantize {
     my $s = shift;
+    # handle \ characters in the constant
+    my %escape = ('a'=>"\a",'n'=>"\n",'r'=>"\r",'t'=>"\t",'\\'=>'\\',);
+    $s=~s/\\([anrt\\])/$escape{$1}/g;
     return $constants{$s} if exists $constants{$s};
     push @constants, $s;
     return $constants{$s} = $#constants;
 }
+
