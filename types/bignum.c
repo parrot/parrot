@@ -95,7 +95,11 @@ typedef struct { /* Used to restore INTENT(IN) arguments to functions */
 } BN_SAVE_PREC;
 
 void
-BN_idivide (PINTD_ BIGNUM* result, BIGNUM *one, BIGNUM *two, BN_CONTEXT *context,
+BN_imultiply (PINTD_ BIGNUM* result, BIGNUM *one, BIGNUM *two,
+	      BN_CONTEXT *context);
+void
+BN_idivide (PINTD_ BIGNUM* result, BIGNUM *one, BIGNUM *two,
+	    BN_CONTEXT *context,
 	    BN_DIV_ENUM operation, BIGNUM* rem);
 INTVAL BN_to_scieng_string(PINTD_ BIGNUM* bn, char **dest, int eng);
 void BN_strip_lead_zeros(PINTD_ BIGNUM* victim);
@@ -1263,10 +1267,26 @@ Multiplies one and two, storing the result in result.
 void 
 BN_multiply (PINTD_ BIGNUM* result, BIGNUM *one, BIGNUM *two,
 	     BN_CONTEXT *context) {
-    INTVAL i,j;
-    int carry, dig;
 
     BN_arith_setup(PINT_ result, one, two, context, NULL);
+
+    BN_imultiply(PINT_ result, one, two, context);
+
+    BN_strip_lead_zeros(PINT_ result);
+    BN_arith_cleanup(PINT_ result, one, two, context, NULL);
+
+}
+
+/*BN_imultiply
+
+Multiplication without the rounding and other set up.
+
+*/
+void
+BN_imultiply (PINTD_ BIGNUM* result, BIGNUM *one, BIGNUM *two,
+	      BN_CONTEXT *context) {
+    INTVAL i,j;
+    int carry, dig;
 
     BN_grow(PINT_ result, one->digits + two->digits + 2);
     /* zero contents of result so that it can be used as intermediate */
@@ -1280,6 +1300,7 @@ BN_multiply (PINTD_ BIGNUM* result, BIGNUM *one, BIGNUM *two,
 	two = temp;
     }
 
+    /* multiply element by element */
     for (i=0; i<two->digits; i++) {
 	dig = BN_getd(two, i);
 	carry = 0;
@@ -1292,6 +1313,8 @@ BN_multiply (PINTD_ BIGNUM* result, BIGNUM *one, BIGNUM *two,
 	    BN_setd(result, i+j, carry);
 	}
     }
+
+    /* extend if there's still stuff to take care of */
     if (carry) {
 	result->digits = one->digits + two->digits + 1;
     }
@@ -1310,10 +1333,7 @@ BN_multiply (PINTD_ BIGNUM* result, BIGNUM *one, BIGNUM *two,
     result->expn = i;
   
     result->sign = 1 & (one->sign ^ two->sign);
-
-    BN_strip_lead_zeros(PINT_ result);
-    BN_arith_cleanup(PINT_ result, one, two, context, NULL);
-
+    return;
 }
 
 /*=head2 BN_divide(result, one, two, context)
@@ -1350,7 +1370,7 @@ BN_divide(PINTD_ BIGNUM* result, BIGNUM *one, BIGNUM *two,
 		BN_round_up(PINT_ result, context);
 	    }
 	    else if (BN_getd(result, 0) == 5) {
-		if (rem->digits == 0 && BN_getd(rem, 0)==0) {
+		if (rem->digits == 1 && BN_getd(rem, 0)==0) {
 		    switch (BN_getd(result, 1)) {
 		    case 0:
 		    case 2:
@@ -1378,7 +1398,9 @@ BN_divide(PINTD_ BIGNUM* result, BIGNUM *one, BIGNUM *two,
 	/* We don't warn on lost digits here, as is after an operation */
 	save_lost = context->lost_digits;
 	context->lost_digits = 0;
+
 	BN_round(PINT_ result, context);
+
 	context->lost_digits = save_lost;
     }
 
@@ -1533,7 +1555,7 @@ BN_idivide (PINT_ BIGNUM* result, BIGNUM *one, BIGNUM *two,
 	for (j=1; j<=10;j++) {
 	    int cmp;
 	    BN_setd(t1, 0, j);
-	    BN_multiply(PINT_ result, t1, two, context);
+	    BN_imultiply(PINT_ result, t1, two, context);
 	    cmp = BN_comp(PINT_ result, div);
 	    if (cmp ==0) {
 		BN_setd(t2, value, j);
@@ -1554,17 +1576,22 @@ BN_idivide (PINT_ BIGNUM* result, BIGNUM *one, BIGNUM *two,
 	}
 	if (divided) {
 	    BN_setd(t1,0,j-1);
-	    BN_multiply(PINT_ result, t1, two, context);
+	    BN_imultiply(PINT_ result, t1, two, context);
 	    BN_isubtract(PINT_ rem, div, result, context);
 	}
+
 	/* Are we done yet? */
-	if (value && rem->digits ==1 && BN_getd(rem, 0)==0) break;
+	if (value && rem->digits ==1 && BN_getd(rem, 0)==0) {
+	    break;
+	}
 
 	/* We collect one more digit than precision requires, then
 	   round in divide, if we're doing divint or rem then we terminate
 	   at the decimal point and return */
 	if (context->precision > 0) {
-	    if (t2->digits == context->precision + 1) break;
+	    if (t2->digits == context->precision + 1) {
+		break;
+	    }
 	}
 	else {
 	    if (t1->expn == context->precision -1) break;
