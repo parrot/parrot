@@ -240,6 +240,7 @@ my(%c)=(
     MAJOR   =>    $parrot_version[0],
     MINOR   =>    $parrot_version[1],
     PATCH   =>    $parrot_version[2],
+    DEVEL   =>    (-e 'DEVELOPING' ? '-devel' : ''),
 
     ops		=>    "",
     

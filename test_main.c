@@ -127,7 +127,7 @@ usage(void) {
 static void
 version(void) {
     fprintf(stderr, 
-"This is parrot version " PARROT_VERSION " (with development patches) built for " PARROT_ARCHNAME "\n\
+"This is parrot version " PARROT_VERSION " built for " PARROT_ARCHNAME "\n\
 Copyright (C) 2001-2002 Yet Another Society.  All Rights Reserved.\n\
 \n\
 Parrot may be copied only under the terms of either the Artistic License or the\n\
