@@ -301,10 +301,6 @@ END:
 
     $P0 = action[status]
     
-    print "raise action "
-    print status
-    print "\n"
-    
     $P0( arg )
 .end
 
