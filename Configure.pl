@@ -88,7 +88,7 @@ my(%c)=(
 );
 
 #copy the things from --define foo=bar
-@c{keys %opt_defines}=@opt_defines{keys %opt_defines};
+@c{keys %opt_defines}=values %opt_defines;
 
 # set up default values
 my $hints = "hints/" . lc($^O) . ".pl";
@@ -133,22 +133,17 @@ Alright, now I'm gonna check some stuff by compiling and running
 a small C program.  This could take a bit...
 END
 
-buildfile("test_c");
-if ($^O eq 'VMS') {
-  system("$c{cc} $c{ccflags} test.c") and die "C compiler died!";
-  system("link/exe=test_siz test") and die "Link failed!";
-} else {
-  system("$c{cc} $c{ccflags} -o test_siz$c{exe} test.c") and die "C compiler died!";
+{
+	my %newc;
+	
+	buildfile("test_c");
+	compiletestc();
+	%newc=eval(runtestc()) or die "Can't run the test program: $!";
+
+	@c{keys %newc}=values %newc;
+
+	unlink('test.c', "test_siz$c{exe}", "test$c{o}");
 }
-if ($^O eq 'VMS') {
-  (@c{qw(intvalsize longsize numvalsize opcode_t_size)})=split('/', `mcr []test_siz`);
-} else {
-  (@c{qw(intvalsize longsize numvalsize opcode_t_size)})=split('/', `./test_siz$c{exe}`);
-}
-die "Something wicked happened!" 
-    unless defined $c{intvalsize} and defined $c{longsize} and 
-	   defined $c{numvalsize} and defined $c{opcode_t_size};
-unlink('test.c', "test_siz$c{exe}", "test$c{o}");
 
 print <<"END";
 
@@ -296,4 +291,12 @@ and you can hit enter to accept them.
 
 END
 	}
+}
+
+sub compiletestc {
+  system("$c{cc} $c{ccflags} -o test_siz$c{exe} test.c") and die "C compiler died!";
+}
+
+sub runtestc {
+	`./test_siz$c{exe}`
 }

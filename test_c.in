@@ -8,8 +8,23 @@
 #include <stdio.h>
 
 int main(int argc, char **argv) {
-	printf("%d/%d/%d/%d", 
-	    sizeof(${iv}), sizeof(long), sizeof(${nv}), sizeof(${opcode_t}));
+	printf("(");
+	
+	printf("\tintvalsize => %d,\n",		sizeof(${iv}));
+	printf("\tnumvalsize => %d,\n",		sizeof(${nv}));
+	printf("\topcode_t_size => %d,\n",	sizeof(${opcode_t}));
+	
+	printf("\tshortsize => %d,\n",		sizeof(short));
+	printf("\tintsize => %d,\n",		sizeof(int));
+	printf("\tlongsize => %d,\n",		sizeof(long));
+	
+	printf("\tptrsize => %d,\n",		sizeof(void*));
+	
+	printf("\tfloatsize => %d,\n",		sizeof(float));
+	printf("\tdoublesize => %d,\n",		sizeof(double));
+	
+	printf(");");
+	
 	return 0;
 }
 
