@@ -1,8 +1,20 @@
-=head1 In no particular order....
+=head1 Administrative Issues
 
 =over 4
 
-=item PMC based parser -
+=item migrate all these issues to RT.
+
+TODO tests would also suffice, where possible.
+
+=back 4
+
+=head1 Programming Issues
+
+=head2 C-level tasks
+
+=over 4
+
+=item PMC based parser
 
 Instead of the current PIR level parsing, we should instead use
 a pmc - not only should this improve speed slightly, but will help
@@ -13,19 +25,21 @@ us implement the [parser] builtin.
 Should be moved to tcllist's set_string method. (but this requires first
 moving the parser into a pmc.)
 
-=item given PGE
-
-[array get] [array names] [array unset] 
-[regexp] [regsub] [switch] [glob]
-
-=item migrate all these issues to RT.
-
-TODO tests would also suffice, where possible.
-
 =item tclword
 
 An object is probably too heavyweight for this. A PMC with a few overloaded
 methods is probably sufficient.
+
+=back 4
+
+=head1 Uncategorized Issues
+
+=over 4
+
+=item given PGE
+
+[array get] [array names] [array unset] 
+[regexp] [regsub] [switch] [glob]
 
 =item From leo - cleanup of tcl objects.
 
