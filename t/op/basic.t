@@ -1,6 +1,6 @@
 #! perl -w
 
-use Parrot::Test tests => 9;
+use Parrot::Test tests => 13;
 
 # It would be very embarrassing if these didn't work...
 output_is(<<'CODE', '', "noop, end");
@@ -27,6 +27,28 @@ output_is(<<'CODE', 'Parrot	flies', "print double-quoted string, tabs");
        print "Parrot\tflies"
        end
 CODE
+
+output_is(<<'CODE', q('Parrot' flies), "print double-quoted string, nested single");
+       print "'Parrot' flies"
+       end
+CODE
+
+output_is(<<'CODE', q("Parrot" flies), "print single-quoted string, nested double");
+       print '"Parrot" flies'
+       end
+CODE
+
+output_is(<<'CODE', q(Parrot flies), "print string with embedded hex escape");
+       print "Parrot\x20flies"
+       end
+CODE
+
+output_is(<<'CODE', <<OUTPUT, "print string with embedded newline");
+       print "Parrot flies\n"
+       end
+CODE
+Parrot flies
+OUTPUT
 
 output_is( <<'CODE', '42', "branch_ic" );
 	set	I4, 42
