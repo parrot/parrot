@@ -1372,3 +1372,9 @@ bind_i_p_sc                    1341
 listen_i_p_i                   1342
 listen_i_p_ic                  1343
 accept_p_p                     1344
+charset_i_s                    1345
+charset_i_sc                   1346
+charsetname_s_i                1347
+charsetname_s_ic               1348
+find_charset_i_s               1349
+find_charset_i_sc              1350

@@ -21,11 +21,32 @@ CHARSET *Parrot_default_charset_ptr;
 CHARSET *Parrot_unicode_charset_ptr;
 CHARSET *Parrot_ascii_charset_ptr;
 
+/*
+ * all registered charsets are collected in one global structure
+ */
+
+typedef struct {
+    CHARSET *charset;
+    STRING  *name;
+} One_charset;
+
+typedef struct {
+    int n_charsets;
+    One_charset *set;
+} All_charsets;
+
+static All_charsets *all_charsets;
+
+
 CHARSET *
 Parrot_new_charset(Interp *interpreter)
 {
-
     return mem_sys_allocate(sizeof(CHARSET));
+}
+
+void
+Parrot_deinit_charsets(Interp *interpreter)
+{
 }
 
 CHARSET *
@@ -50,28 +71,103 @@ Parrot_load_charset(Interp *interpreter, const char *charsetname)
     return NULL;
 }
 
+/*
+
+=item C<INTVAL Parrot_charset_number(Interp *, STRING *charsetname)>
+
+Return the number of the charset or -1 if not found.
+
+=item C<INTVAL Parrot_charset_number_of_str(Interp *, const STRING *src)>
+
+Return the number of the charset of the given string or -1 if not found.
+
+*/
+
+INTVAL
+Parrot_charset_number(Interp *interpreter, STRING *charsetname)
+{
+    int i, n;
+
+    n = all_charsets->n_charsets;
+    for (i = 0; i < n; ++i) {
+        if (!string_equal(interpreter, all_charsets->set[i].name, charsetname))
+            return i;
+    }
+    return -1;
+}
+
+INTVAL
+Parrot_charset_number_of_str(Interp *interpreter, STRING *src)
+{
+    int i, n;
+
+    n = all_charsets->n_charsets;
+    for (i = 0; i < n; ++i) {
+        if (src->charset == all_charsets->set[i].charset)
+            return i;
+    }
+    return -1;
+}
+
+STRING*
+Parrot_charset_name(Interp *interpreter, INTVAL number_of_charset)
+{
+    if (number_of_charset >= all_charsets->n_charsets)
+        return NULL;
+    return all_charsets->set[number_of_charset].name;
+}
+
+static INTVAL
+register_charset(Interp *interpreter, const char *charsetname,
+        CHARSET *charset)
+{
+    int i, n;
+
+    n = all_charsets->n_charsets;
+    for (i = 0; i < n; ++i) {
+        if (!strcmp(all_charsets->set[i].charset->name, charsetname))
+            return 0;
+    }
+    if (!n)
+        all_charsets->set = mem_sys_allocate(sizeof(One_charset));
+    else
+        all_charsets->set = mem_sys_realloc(all_charsets->set, (n + 1) *
+                sizeof(One_charset));
+    all_charsets->n_charsets++;
+    all_charsets->set[n].charset = charset;
+    all_charsets->set[n].name = string_from_cstring(interpreter,
+            charsetname, 0);
+
+    return 1;
+}
+
 INTVAL
 Parrot_register_charset(Interp *interpreter, const char *charsetname,
         CHARSET *charset)
 {
+    if (!all_charsets) {
+        all_charsets = mem_sys_allocate(sizeof(All_charsets));
+        all_charsets->n_charsets = 0;
+        all_charsets->set = NULL;
+    }
     if (!strcmp("binary", charsetname)) {
         Parrot_binary_charset_ptr = charset;
-        return 1;
+        return register_charset(interpreter, charsetname, charset);
     }
     if (!strcmp("iso-8859-1", charsetname)) {
         Parrot_iso_8859_1_charset_ptr = charset;
         if (!Parrot_default_charset_ptr) {
             Parrot_default_charset_ptr = charset;
         }
-        return 1;
+        return register_charset(interpreter, charsetname, charset);
     }
     if (!strcmp("unicode", charsetname)) {
         Parrot_unicode_charset_ptr = charset;
-        return 1;
+        return register_charset(interpreter, charsetname, charset);
     }
     if (!strcmp("ascii", charsetname)) {
         Parrot_ascii_charset_ptr = charset;
-        return 1;
+        return register_charset(interpreter, charsetname, charset);
     }
     return 0;
 }

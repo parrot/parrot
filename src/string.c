@@ -288,11 +288,16 @@ string_init(Parrot_Interp interpreter)
     } __ptr_u;
 
     if (!interpreter->parent_interpreter) {
-        /* Load in the basic encodings and charsets */
+        /* Load in the basic encodings and charsets
+         *
+         * the order is crucial here:
+         * 1) default encoding = fixed_8
+         * 2) default charset  = iso-8859-1
+         */
         Parrot_encoding_fixed_8_init(interpreter);
+        Parrot_charset_iso_8859_1_init(interpreter);
         Parrot_charset_binary_init(interpreter);
         Parrot_charset_ascii_init(interpreter);
-        Parrot_charset_iso_8859_1_init(interpreter);
 
         /* DEFAULT_ICU_DATA_DIR is configured at build time, or it may be
            set through the $PARROT_ICU_DATA_DIR environment variable. Need
@@ -354,6 +359,7 @@ string_deinit(Parrot_Interp interpreter)
 {
     mem_sys_free(interpreter->const_cstring_table);
     interpreter->const_cstring_table = NULL;
+    Parrot_deinit_charsets(interpreter);
 }
 
 /*

@@ -621,6 +621,40 @@ op isnull(in STR, labelconst INT) :base_core {
   goto NEXT();
 }
 
+=item B<charset>(out INT, in STR)
+
+Return the charset number of string $2.
+
+=item B<charsetname>(out STR, in INT)
+
+Return the name of charset numbered $2.
+
+=item B<find_charset>(out INT, in STR)
+
+Return the charset number of the charset named $2. If the charset doesn't
+exit, throw an exception.
+
+=cut
+
+op charset(out INT, in STR) :base_core {
+  $1 = Parrot_charset_number_of_str(interpreter, $2);
+  goto NEXT();
+}
+
+op charsetname(out STR, in INT) :base_core {
+  $1 = string_copy(interpreter, Parrot_charset_name(interpreter, $2));
+  goto NEXT();
+}
+
+op find_charset(out INT, in STR) :base_core {
+  INTVAL n = Parrot_charset_number(interpreter, $2);
+  if (n < 0)
+    real_exception(interpreter, NULL, 1,
+	"charset '%Ss' not found", $2);
+  $1 = n;
+  goto NEXT();
+}
+
 =back
 
 =head1 COPYRIGHT

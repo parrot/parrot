@@ -80,6 +80,11 @@ CHARSET *Parrot_default_charset(Interp *);
 typedef INTVAL (*charset_converter_t)(Interp *, CHARSET *lhs, CHARSET *rhs);
 charset_converter_t Parrot_find_charset_converter(Interp *, CHARSET *lhs, CHARSET *rhs);
 
+void Parrot_deinit_charsets(Interp *);
+INTVAL Parrot_charset_number(Interp *, STRING *charsetname);
+STRING* Parrot_charset_name(Interp *, INTVAL);
+INTVAL Parrot_charset_number_of_str(Interp *, STRING *src);
+
 struct _charset {
     const char *name;
     charset_get_graphemes_t get_graphemes;
