@@ -443,7 +443,7 @@ dataypes$(O) : $(GENERAL_H_FILES) dataypes.c
 
 exit$(O) : $(GENERAL_H_FILES) exit.c
 
-nci$(O) : $(GENERAL_H_FILES) exit.c
+nci$(O) : $(GENERAL_H_FILES) nci.c
 
 cpu_dep$(O) : $(GENERAL_H_FILES)
 
