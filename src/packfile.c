@@ -507,7 +507,7 @@ PackFile_unpack(struct Parrot_Interp *interpreter, struct PackFile *self,
      */
     if (header->magic != PARROT_MAGIC) {
         PIO_eprintf(NULL, "PackFile_unpack: Not a Parrot PackFile!\n");
-        PIO_eprintf(NULL, "Magic number was [%x] not [%x]\n",
+        PIO_eprintf(NULL, "Magic number was [0x%08x] not [0x%08x]\n",
                 header->magic, PARROT_MAGIC);
         return 0;
     }
@@ -527,7 +527,7 @@ PackFile_unpack(struct Parrot_Interp *interpreter, struct PackFile *self,
     /* dir_format 1 use directory */
     if (header->dir_format != PF_DIR_FORMAT ) {
         PIO_eprintf(NULL,
-                "PackFile_unpack: Unknowm dir format found %d!\n",
+                "PackFile_unpack: Unknown dir format found %d!\n",
                 (int)header->dir_format);
         return 0;
     }
