@@ -30,7 +30,7 @@ my @parrot_version = parrot_version();
 # Handle options:
 #
 
-my($opt_debugging, $opt_defaults, $opt_version, $opt_help, $opt_pedantic) = (0, 0, 0, 0, 0);
+my($opt_debugging, $opt_defaults, $opt_version, $opt_help) = (0, 0, 0, 0);
 my(%opt_defines);
 my $result = GetOptions(
     'debugging!' => \$opt_debugging,
@@ -38,7 +38,6 @@ my $result = GetOptions(
     'version'    => \$opt_version,
     'help'       => \$opt_help,
     'define=s'   => \%opt_defines,
-    'pedantic!'  => \$opt_pedantic,
 );
 
 if($opt_version) {
@@ -52,7 +51,6 @@ if($opt_help) {
 $0 - Parrot Configure
 Options:
    --debugging          Enable debugging
-   --pedantic           Add "-ansi -pedantic" if using gcc
    --defaults           Accept all default values
    --define name=value  Defines value name as value
    --help               This text
@@ -183,8 +181,7 @@ if ($^O eq 'VMS' || $^O =~ /MSWin/i) {
 # If using gcc, crank up its warnings as much as possible and make it behave
 # ansi-ish.
 if ($Config{ccname} eq "gcc") {
-   $c{cc_warn} = " -Wall";
-   $c{cc_warn} .= " -ansi -pedantic" if $opt_pedantic;
+   $c{cc_warn} = " -Wall -ansi -pedantic -Wtraditional -Wstrict-prototypes -Wmissing-prototypes -Winline -Wredundant-decls -Wall -Wshadow -Wpointer-arith -Wcast-qual -Wcast-align -Wwrite-strings -Wconversion -Waggregate-return -Winline";
 }
 
 # Add the -DHAS_JIT if we're jitcapable
