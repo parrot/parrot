@@ -187,8 +187,18 @@ operations, with tracing, bounds checking and profiling enabled.
 opcode_t *
 runops_profile_core(struct Parrot_Interp *interpreter, opcode_t *pc)
 {
-    opcode_t cur_op;
+    opcode_t cur_op, old_op;
     RunProfile *profile = interpreter->profile;
+
+    old_op = profile->cur_op;
+    /*
+     * if we are reentering the runloop:
+     * - remember old op and calc time till now
+     */
+    if (old_op) {
+        profile->data[old_op].time +=
+            Parrot_floatval_time() - profile->starttime;
+    }
 
     while (pc) {/* && pc >= code_start && pc < code_end) */
         interpreter->cur_pc = pc;
@@ -201,6 +211,11 @@ runops_profile_core(struct Parrot_Interp *interpreter, opcode_t *pc)
         /* profile->cur_op may be different, if exception was thrown */
         profile->data[profile->cur_op].time +=
             Parrot_floatval_time() - profile->starttime;
+    }
+    if (old_op) {
+        /* old opcode continues */
+        profile->starttime = Parrot_floatval_time();
+        profile->cur_op = old_op;
     }
     return pc;
 }

@@ -230,7 +230,7 @@ allocate_chunk(Interp *interpreter, List *list, UINTVAL items, UINTVAL size)
     List_chunk *chunk;
 
     Parrot_block_DOD(interpreter);
-    Parrot_block_GC(interpreter);
+    /*Parrot_block_GC(interpreter); - why */
     chunk = (List_chunk *)new_bufferlike_header(interpreter, sizeof(*chunk));
     chunk->items = items;
     chunk->n_chunks = 0;
@@ -239,7 +239,7 @@ allocate_chunk(Interp *interpreter, List *list, UINTVAL items, UINTVAL size)
     chunk->prev     = NULL;
     Parrot_allocate_zeroed(interpreter, (Buffer *)chunk, size);
     Parrot_unblock_DOD(interpreter);
-    Parrot_unblock_GC(interpreter);
+    /*Parrot_unblock_GC(interpreter); */
     return chunk;
 }
 
@@ -769,17 +769,17 @@ The scheme of operations is:
          chunk = chunk_list[ idx / MAX_ITEMS ]
          idx =   idx % MAX_ITEMS
          done.
-    
+
     chunk = first
     repeat
          if (index < chunk->items)
              done.
-    
+
      if (index >= items_in_chunk_block)
          index -= items_in_chunk_block
          chunk += chunks_in_chunk_block
          continue
-    
+
      calc chunk and index in this block
      done.
 
@@ -1942,7 +1942,7 @@ Join chunks > C<MAX_ITEMS> (Matt Fowles)
 Greater threshold before C<do_sparse()>. Setting initial size to avoid
 sparse
 
-=item * 1.33 
+=item * 1.33
 
 04.07.2003 Use a SArray for user_data
 

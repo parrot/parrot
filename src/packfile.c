@@ -1358,7 +1358,7 @@ directory_unpack (struct Parrot_Interp *interpreter,
     for (i = 0; cursor && i < dir->num_segments; i++) {
         opcode_t *csave = cursor;
         size_t tmp = PF_fetch_opcode(pf, &cursor); /* check len again */
-        size_t delta;
+        size_t delta = 0;       /* keep gcc -O silent */
 
         cursor = csave;
         pos = PackFile_Segment_unpack (interpreter, dir->segments[i],

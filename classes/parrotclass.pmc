@@ -84,7 +84,7 @@ Returns whether the class is or inherits from C<*classname>.
 
 */
 
-    INTVAL isa(STRING * classname) {
+    INTVAL isa(STRING* classname) {
         PMC *class;
         if (SUPER(classname))
             return 1;

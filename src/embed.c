@@ -512,7 +512,7 @@ calibrate(Parrot_Interp interpreter)
     int i;
     FLOATVAL start, empty;
     opcode_t code[] = {1};      /* noop */
-    opcode_t *pc;
+    opcode_t *pc = code;
 
     for (empty = 0.0, i = 0; i < 1000000; ++i) {
        start = Parrot_floatval_time();
