@@ -1,6 +1,6 @@
 .pcc_sub @LOAD __ncurses_init:
 saveall
-loadlib P1, '/usr/lib/libform.dylib'
+loadlib P1, 'libform'
 dlfunc P2, P1, 'new_field', 'piiiiii'
 store_global 'ncurses::new_field', P2
 dlfunc P2, P1, 'dup_field', 'ppii'
@@ -118,7 +118,7 @@ store_global 'ncurses::data_ahead', P2
 dlfunc P2, P1, 'data_behind', 'lp'
 store_global 'ncurses::data_behind', P2
 
-loadlib P1, '/usr/lib/libncurses.dylib'
+loadlib P1, 'libncurses'
 
 dlfunc P2, P1, 'keybound', 'tii'
 store_global 'ncurses::keybound', P2

@@ -1534,13 +1534,13 @@ PDB_disassemble_op(struct Parrot_Interp *interpreter, char* dest, int space,
                     break;
                 case KEY_integer_FLAG:
                     Parrot_snprintf(interpreter, buf, sizeof(buf),
-                                    INTVAL_FMT, k->cache.int_val);
+                                    INTVAL_FMT, PMC_int_val(k));
                     strcpy(&dest[size], buf);
                     size += strlen(buf);
                     break;
                 case KEY_number_FLAG:
                     Parrot_snprintf(interpreter, buf, sizeof(buf),
-                                    FLOATVAL_FMT, k->cache.num_val);
+                                    FLOATVAL_FMT, PMC_num_val(k));
                     strcpy(&dest[size], buf);
                     size += strlen(buf);
                     break;
@@ -1548,34 +1548,34 @@ PDB_disassemble_op(struct Parrot_Interp *interpreter, char* dest, int space,
                     dest[size++] = '"';
                     {
                         char *temp = string_to_cstring(interpreter,
-                                                       k->cache.string_val);
+                                                       PMC_str_val(k));
                         strcpy(&dest[size], temp);
                         string_cstring_free(temp);
                     }
-                    size += string_length(k->cache.string_val);
+                    size += string_length(PMC_str_val(k));
                     dest[size++] = '"';
                     break;
                 case KEY_integer_FLAG|KEY_register_FLAG:
                     Parrot_snprintf(interpreter, buf, sizeof(buf),
-                                    "I" INTVAL_FMT, k->cache.int_val);
+                                    "I" INTVAL_FMT, PMC_int_val(k));
                     strcpy(&dest[size], buf);
                     size += strlen(buf);
                     break;
                 case KEY_number_FLAG|KEY_register_FLAG:
                     Parrot_snprintf(interpreter, buf, sizeof(buf),
-                                    "N" INTVAL_FMT, k->cache.int_val);
+                                    "N" INTVAL_FMT, PMC_int_val(k));
                     strcpy(&dest[size], buf);
                     size += strlen(buf);
                     break;
                 case KEY_string_FLAG|KEY_register_FLAG:
                     Parrot_snprintf(interpreter, buf, sizeof(buf),
-                                    "S" INTVAL_FMT, k->cache.int_val);
+                                    "S" INTVAL_FMT, PMC_int_val(k));
                     strcpy(&dest[size], buf);
                     size += strlen(buf);
                     break;
                 case KEY_pmc_FLAG|KEY_register_FLAG:
                     Parrot_snprintf(interpreter, buf, sizeof(buf),
-                                    "P" INTVAL_FMT, k->cache.int_val);
+                                    "P" INTVAL_FMT, PMC_int_val(k));
                     strcpy(&dest[size], buf);
                     size += strlen(buf);
                     break;
@@ -2049,7 +2049,7 @@ PDB_compile(struct Parrot_Interp *interpreter, const char *command)
     buf = Parrot_sprintf_c(interpreter, "%s%s", command, end);
 
     code = VTABLE_invoke(interpreter, compiler, buf);
-    return code->cache.struct_val;
+    return PMC_struct_val(code);
 }
 
 /*
@@ -2259,12 +2259,12 @@ static void
 dump_string(struct Parrot_Interp *interpreter, STRING* s)
 {
     if (s) {
-        PIO_eprintf(interpreter, "\tBuflen  =\t%12ld\n",s->buflen);
+        PIO_eprintf(interpreter, "\tBuflen  =\t%12ld\n",PObj_buflen(s));
         PIO_eprintf(interpreter, "\tFlags   =\t%12ld\n", PObj_get_FLAGS(s));
         PIO_eprintf(interpreter, "\tBufused =\t%12ld\n",s->bufused);
         PIO_eprintf(interpreter, "\tStrlen  =\t%12ld\n",s->strlen);
         PIO_eprintf(interpreter, "\tOffset  =\t%12d\n",
-                    (char*) s->strstart - (char*) s->bufstart);
+                    (char*) s->strstart - (char*) PObj_bufstart(s));
         PIO_eprintf(interpreter, "\tString  =\t%S\n", s);
     }
 }
@@ -2301,18 +2301,18 @@ PDB_print_user_stack(struct Parrot_Interp *interpreter, const char *command)
     switch (entry->entry_type) {
         case STACK_ENTRY_INT:
             PIO_eprintf(interpreter, "Integer\t=\t%8vi\n",
-                        entry->entry.int_val);
+                        UVal_int(entry->entry));
             break;
         case STACK_ENTRY_FLOAT:
             PIO_eprintf(interpreter, "Float\t=\t%8.4vf\n",
-                        entry->entry.num_val);
+                        UVal_num(entry->entry));
             break;
         case STACK_ENTRY_STRING:
             PIO_eprintf(interpreter, "String =\n");
-            dump_string(interpreter, entry->entry.string_val);
+            dump_string(interpreter, UVal_str(entry->entry));
             break;
         case STACK_ENTRY_PMC:
-            PIO_eprintf(interpreter, "PMC =\n%PS\n", entry->entry.pmc_val);
+            PIO_eprintf(interpreter, "PMC =\n%PS\n", UVal_ptr(entry->entry));
             break;
         case STACK_ENTRY_POINTER:
             PIO_eprintf(interpreter, "POINTER\n");

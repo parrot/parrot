@@ -334,8 +334,8 @@ inline op pack(inout STR, in INT, in STR) :base_core {
     UINTVAL len = (UINTVAL)$2;
     char buf[3];
 
-    if (s->buflen < len) {
-        t = string_make(interpreter, buf, (UINTVAL)(len - s->buflen), NULL, 0, NULL);
+    if (PObj_buflen(s) < len) {
+        t = string_make(interpreter, buf, (UINTVAL)(len - PObj_buflen(s)), NULL, 0, NULL);
         $1 = string_concat(interpreter, $1, s, 1);
     } else {
         t = string_make(interpreter, s->strstart, (UINTVAL)len, NULL, 0, NULL);
@@ -357,9 +357,9 @@ inline op pack(inout STR, in INT, in INT, in INT) :base_core {
     ln = string_length($1);
     if (ln < $4 + $2)
     {
-       $1->buflen = $1->strlen;
+       PObj_buflen($1) = $1->strlen;
        string_grow(interpreter, $1, $4 + $2 - ln);
-       $1->bufused = $1->strlen = $1->buflen;
+       $1->bufused = $1->strlen = PObj_buflen($1);
     }
 
     /* XXX this is EVIL, use string_replace */
@@ -571,7 +571,7 @@ inline op stringinfo(out INT, in STR, in INT) :base_core {
                               break;
     case STRINGINFO_STRSTART: $1 = PTR2UINTVAL($2->strstart);
                               break;
-    case STRINGINFO_BUFLEN:   $1 = $2->buflen;
+    case STRINGINFO_BUFLEN:   $1 = PObj_buflen($2);
                               break;
     case STRINGINFO_FLAGS:    $1 = PObj_get_FLAGS($2);
                               break;

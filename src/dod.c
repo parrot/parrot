@@ -92,22 +92,22 @@ mark_special(Parrot_Interp interpreter, PMC* obj)
     if (obj->pmc_ext) {
         if (hi_prio) {
             PMC* tptr = interpreter->dod_trace_ptr;
-            if (tptr->next_for_GC == tptr) {
-                obj->next_for_GC = obj;
+            if (PMC_next_for_GC(tptr) == tptr) {
+                PMC_next_for_GC(obj) = obj;
             }
             else {
                 /* put it at the head of the list */
-                obj->next_for_GC = tptr->next_for_GC;
+                PMC_next_for_GC(obj) = PMC_next_for_GC(tptr);
             }
-            tptr->next_for_GC = (PMC*)obj;
+            PMC_next_for_GC(tptr) = (PMC*)obj;
         }
         else {
             /* put it on the end of the list */
-            interpreter->dod_mark_ptr->next_for_GC = obj;
+            PMC_next_for_GC(interpreter->dod_mark_ptr) = obj;
 
             /* Explicitly make the tail of the linked list be
              * self-referential */
-            interpreter->dod_mark_ptr = obj->next_for_GC = obj;
+            interpreter->dod_mark_ptr = PMC_next_for_GC(obj) = obj;
         }
     }
     else if (PObj_custom_mark_TEST(obj))
@@ -185,7 +185,7 @@ void pobject_lives(struct Parrot_Interp *interpreter, PObj *obj)
         fprintf(stderr, "GC Warning! Unanchored %s %p version " INTVAL_FMT
                 " found in system areas \n",
                 PObj_is_PMC_TEST(obj) ? "PMC" : "Buffer",
-                obj, obj->pobj_version);
+                obj, PObj_version(obj));
     }
 #  endif
 #endif
@@ -205,7 +205,7 @@ void pobject_lives(struct Parrot_Interp *interpreter, PObj *obj)
 
     if (PObj_report_TEST(obj)) {
         fprintf(stderr, "GC: buffer %p pointing to %p marked live\n",
-                obj, ((Buffer*)obj)->bufstart);
+                obj, PObj_bufstart((Buffer*) obj));
     }
 #endif
 }
@@ -332,7 +332,7 @@ trace_children(struct Parrot_Interp *interpreter, PMC *current)
      */
     pt_DOD_mark_root_finished(interpreter);
 
-    for (; current != prev; current = current->next_for_GC) {
+    for (; current != prev; current = PMC_next_for_GC(current)) {
         UINTVAL bits = PObj_get_FLAGS(current) & mask;
 
         if (lazy_dod && interpreter->num_early_PMCs_seen >=
@@ -344,8 +344,8 @@ trace_children(struct Parrot_Interp *interpreter, PMC *current)
             PObj_high_priority_DOD_CLEAR(current);
 
         /* mark properties */
-        if (current->metadata) {
-            pobject_lives(interpreter, (PObj *)current->metadata);
+        if (PMC_metadata(current)) {
+            pobject_lives(interpreter, (PObj *)PMC_metadata(current));
         }
         /* Start by checking if there's anything at all. This assumes that the
          * largest percentage of PMCs won't have anything in their data
@@ -366,11 +366,11 @@ trace_children(struct Parrot_Interp *interpreter, PMC *current)
                 Buffer *trace_buf = PMC_data(current);
 
                 if (trace_buf) {
-                    PMC **cur_pmc = trace_buf->bufstart;
+                    PMC **cur_pmc = PObj_bufstart(trace_buf);
 
                     /* Mark the damn buffer as used! */
                     pobject_lives(interpreter, trace_buf);
-                    for (i = 0; i < trace_buf->buflen / sizeof(*cur_pmc); i++) {
+                    for (i = 0; i < PObj_buflen(trace_buf) / sizeof(*cur_pmc); i++) {
                         if (cur_pmc[i]) {
                             pobject_lives(interpreter, (PObj *)cur_pmc[i]);
                         }
@@ -463,9 +463,9 @@ clear_cow(struct Parrot_Interp *interpreter, struct Small_Object_Pool *pool,
                     PObj_live_CLEAR(b);
                 }
 
-                if (PObj_COW_TEST(b) && b->bufstart &&
+                if (PObj_COW_TEST(b) && PObj_bufstart(b) &&
                         !PObj_external_TEST(b)) {
-                    refcount = (int *)b->bufstart - 1;
+                    refcount = (int *) PObj_bufstart(b) - 1;
                     *refcount = 0;
                 }
             }
@@ -502,9 +502,9 @@ used_cow(struct Parrot_Interp *interpreter, struct Small_Object_Pool *pool,
         for (i = 0; i < cur_arena->used; i++) {
             if (!PObj_on_free_list_TEST(b) &&
                     PObj_COW_TEST(b) &&
-                    b->bufstart &&
+                    PObj_bufstart(b) &&
                     !PObj_external_TEST(b)) {
-                refcount = (int *)b->bufstart - 1;
+                refcount = (int *) PObj_bufstart(b) - 1;
                 /* mark users of this bufstart by incrementing refcount */
                 if (PObj_live_TEST(b))
                     *refcount = 1 << 29;        /* ~infinite usage */
@@ -714,26 +714,26 @@ free_unused_pobjects(struct Parrot_Interp *interpreter,
                     }
                 }
                 /* else object is a buffer(like) */
-                else if (PObj_sysmem_TEST(b) && b->bufstart) {
+                else if (PObj_sysmem_TEST(b) && PObj_bufstart(b)) {
                     /* has sysmem allocated, e.g. string_pin */
-                    mem_sys_free(b->bufstart);
-                    b->bufstart = NULL;
-                    b->buflen = 0;
+                    mem_sys_free(PObj_bufstart(b));
+                    PObj_bufstart(b) = NULL;
+                    PObj_buflen(b) = 0;
                 }
                 else {
 #ifdef GC_IS_MALLOC
                     /* free allocated space at (int*)bufstart - 1,
                      * but not if it is used COW or external
                      */
-                    if (b->bufstart && !PObj_is_external_or_free_TESTALL(b)) {
+                    if (PObj_bufstart(b) && !PObj_is_external_or_free_TESTALL(b)) {
                         if (PObj_COW_TEST(b)) {
-                            int *refcount = ((int *)b->bufstart - 1);
+                            int *refcount = ((int *)PObj_bufstart(b) - 1);
 
                             if (!--(*refcount))
                                 free(refcount); /* the actual bufstart */
                         }
                         else
-                            free((int*)b->bufstart - 1);
+                            free((int*)PObj_bufstart(b) - 1);
                     }
 #else
                     /*
@@ -744,13 +744,14 @@ free_unused_pobjects(struct Parrot_Interp *interpreter,
                         if (!PObj_COW_TEST(b)) {
                             ((struct Memory_Pool *)
                              pool->mem_pool)->guaranteed_reclaimable +=
-                                b->buflen;
+                                PObj_buflen(b);
                         }
                         ((struct Memory_Pool *)
-                         pool->mem_pool)->possibly_reclaimable += b->buflen;
+                         pool->mem_pool)->possibly_reclaimable +=
+                            PObj_buflen(b);
                     }
 #endif
-                    b->buflen = 0;
+                    PObj_buflen(b) = 0;
                 }
 #if ARENA_DOD_FLAGS
                 *dod_flags |= PObj_on_free_list_FLAG << nm;

@@ -2968,18 +2968,18 @@ Parrot_jit_build_call_func(struct Parrot_Interp *interpreter, PMC *pmc_nci,
             case 'v':
                 st -= 4;        /* undo default stack usage */
                 break;
-            case 'b':   /* buffer (void*) pass SReg->bufstart */
+            case 'b':   /* buffer (void*) pass PObj_bufstart(SReg) */
                 jit_emit_mov_rm_i(pc, emit_EDX,
                         &STR_REG(count_regs(sig, signature->strstart)));
                 emitm_movl_m_r(pc, emit_EAX, emit_EDX, 0, 1,
-                        offsetof(STRING, bufstart));
+                        (size_t) &PObj_bufstart((STRING *) 0));
                 emitm_pushl_r(pc, emit_EAX);
                 break;
-            case 'B':   /* buffer (void**) pass &SReg->bufstart */
+            case 'B':   /* buffer (void**) pass &PObj_bufstart(SReg) */
                 jit_emit_mov_rm_i(pc, emit_EDX,
                         &STR_REG(count_regs(sig, signature->strstart)));
                 emitm_lea_m_r (pc, emit_EAX, emit_EDX, 0, 1,
-                        offsetof(STRING, bufstart));
+                        (size_t) &PObj_bufstart((STRING *) 0));
                 emitm_pushl_r(pc, emit_EAX);
                 break;
             case 't':   /* string, pass a cstring */
@@ -3007,7 +3007,7 @@ Parrot_jit_build_call_func(struct Parrot_Interp *interpreter, PMC *pmc_nci,
     emitm_movl_m_r(pc, emit_EAX, emit_EBP, 0, 1, 12);
     /* call the thing in struct_val, i.e. offset 12 - call *(12)%eax */
     emitm_callm(pc, emit_EAX, emit_None, emit_None,
-            offsetof(struct PMC, cache.struct_val));
+            (size_t) &PMC_struct_val((PMC *) 0));
     /*
      * TODO
      * if we have strings in the signature, then we are leaking memory
@@ -3078,7 +3078,7 @@ Parrot_jit_build_call_func(struct Parrot_Interp *interpreter, PMC *pmc_nci,
                     offsetof(struct PMC_EXT, data));
 #  endif
             break;
-        case 'b':   /* (void *) = new_buffer_header->bufstart */
+        case 'b':   /* (void *) = PObj_bufstart(new_buffer_header) */
             /* preserve return value */
             jit_emit_mov_rr_i(pc, emit_EDX, emit_EAX);
             emitm_pushl_i(pc, interpreter);

@@ -263,7 +263,7 @@ inline op deref(out PMC, in PMC) :base_ref {
   /* TODO if we have more refs check if $2 does "ref" */
   if (ref->vtable->base_type != enum_class_Ref)
     internal_exception(1, "Not a reference PMC");
-  $1 = PMC_ptr2p($2);
+  $1 = PMC_pmc_val($2);
   goto NEXT();
 }
 
