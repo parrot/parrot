@@ -42,10 +42,10 @@ typedef struct spfinfo_t {
 			break; \
 		case SIZE_SHORT: /* "'short int' is promoted to 'int' when passed through '...'" */ \
 			targ=(HUGEINTVAL)(short)va_arg(*args, int); \
-			break;																			\
-		case SIZE_LONG:																		\
-			targ=(HUGEINTVAL)(long)va_arg(*args, long);										\
-			break;																			\
+			break;\
+        case SIZE_LONG: \
+			targ=(HUGEINTVAL)(long)va_arg(*args, long); \
+			break; \
 		case SIZE_HUGE:																		\
 			targ=(HUGEINTVAL)(long /*long*/)va_arg(*args, long /*long*/);					\
 			break;																			\
@@ -54,13 +54,13 @@ typedef struct spfinfo_t {
 			break;																			\
 	}
 
-#define GetUInt(targ, whichone)																\
-	switch(whichone) {																		\
-		case SIZE_REG:																		\
-			targ=(UHUGEINTVAL)(unsigned int)va_arg(*args, unsigned int);					\
-			break;																			\
-		case SIZE_SHORT:																	\
-			targ=(UHUGEINTVAL)(unsigned short)va_arg(*args, unsigned short);				\
+#define GetUInt(targ, whichone) \
+	switch(whichone) { \
+		case SIZE_REG: \
+			targ=(UHUGEINTVAL)(unsigned int)va_arg(*args, unsigned int); \
+			break; \
+		case SIZE_SHORT: /* short int promoted HLAGHLAGHLAGH. See note above */ \
+			targ=(UHUGEINTVAL)(unsigned short)va_arg(*args, int);				\
 			break;																			\
 		case SIZE_LONG:																		\
 			targ=(UHUGEINTVAL)(unsigned long)va_arg(*args, unsigned long);					\
