@@ -91,12 +91,12 @@ Parrot_exec(Interp *interpreter, opcode_t *pc,
     /* prederef_code */
     j = (int)cgp_core;
     j = (int)((op_func_t*)interpreter->op_lib->op_func_table)[2] - j;
-    k = (int *)interpreter->prederef_code;
+    k = (int *)interpreter->code->cur_cs->prederef.code;
     for (i = 0; i < (int)interpreter->code->cur_cs->base.size; i++) { 
         if (k[i] != j)
             k[i] = 0;
     }
-    add_data_member(obj, interpreter->prederef_code,
+    add_data_member(obj, interpreter->code->cur_cs->prederef.code,
         interpreter->code->cur_cs->base.size * sizeof(void *));
 #endif /* JIT_CGP */
     /* bytecode_offset */

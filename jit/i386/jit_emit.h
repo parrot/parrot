@@ -11,6 +11,8 @@
 
 #include <assert.h>
 
+#define USE_CGP
+
 #if defined HAVE_COMPUTED_GOTO && defined __GNUC__ && defined USE_CGP
 #  define JIT_CGP
 #endif
@@ -2668,7 +2670,7 @@ Parrot_jit_begin(Parrot_jit_info_t *jit_info,
     /* when cur_opcode == 1, cgp_core jumps back here
      * when EAX == 0, the official return from HALT was called */
     jit_emit_test_r_i(jit_info->native_ptr, emit_EAX);
-    emitm_jxs(jit_info->native_ptr, emitm_jnz, 7);
+    emitm_jxs(jit_info->native_ptr, emitm_jnz, 5);
     emitm_popl_r(jit_info->native_ptr, emit_EBX);
     jit_emit_stack_frame_leave(jit_info->native_ptr);
     emitm_ret(jit_info->native_ptr);
@@ -2712,7 +2714,7 @@ Parrot_jit_normal_op(Parrot_jit_info_t *jit_info,
             (INTVAL)cur_section->op_count >= 2 + last_is_branch) {
         int saved = 0;
         offset = (jit_info->cur_op - interpreter->code->byte_code) +
-            interpreter->code->cur_cs->prederef_code;
+            interpreter->code->cur_cs->prederef.code;
 
         jit_emit_mov_ri_i(jit_info->native_ptr, emit_ESI, offset);
         emitm_callm(jit_info->native_ptr, emit_ESI, 0, 0, 0);
@@ -2721,7 +2723,7 @@ Parrot_jit_normal_op(Parrot_jit_info_t *jit_info,
          */
         if (last_is_branch) {
             offset = (cur_section->end - interpreter->code->byte_code) +
-                interpreter->code->cur_cs->prederef_code;
+                interpreter->code->cur_cs->prederef.code;
             cur_section->done = -1;
             /* ins to skip */
             cur_section->ins_count = cur_section->op_count - 1;
@@ -2732,7 +2734,7 @@ Parrot_jit_normal_op(Parrot_jit_info_t *jit_info,
              * when the branch is non JIT, we are in the above case
              */
             offset = (cur_section->next->begin - interpreter->code->byte_code)
-                + interpreter->code->cur_cs->prederef_code;
+                + interpreter->code->cur_cs->prederef.code;
             cur_section->done = 1;
         }
         *offset = ((op_func_t*)interpreter->op_lib->op_func_table)[2];

@@ -50,6 +50,7 @@ have the same number of elements since there is a one-to-one mapping.
 #include "parrot/method_util.h"
 #include "parrot/dynext.h"
 
+#define USE_CGP
 
 static void setup_event_func_ptrs(Parrot_Interp interpreter);
 
