@@ -71,6 +71,8 @@ $(INC)/embed.h $(INC)/warnings.h $(INC)/misc.h $(INC)/debug.h
 
 ALL_H_FILES = $(GENERAL_H_FILES)
 
+O_DIRS = classes
+
 CLASS_O_FILES = ${pmc_classes_o}
 
 ENCODING_O_FILES = encodings/singlebyte$(O) encodings/utf8$(O) \
@@ -154,13 +156,13 @@ all : $(TEST_PROG) docs
 mops : examples/assembly/mops${exe} examples/mops/mops${exe}
 
 # XXX Unix-only for now
-libparrot$(A) : $(O_FILES)
+libparrot$(A) : $(O_DIRS) $(O_FILES)
 	$(AR_CRS) $@ $(O_FILES)
 
-$(TEST_PROG) : test_main$(O) $(GEN_HEADERS) $(O_FILES) lib/Parrot/OpLib/core.pm lib/Parrot/PMC.pm lib/Parrot/.dummy
+$(TEST_PROG) : test_main$(O) $(GEN_HEADERS) $(O_DIRS) $(O_FILES) lib/Parrot/OpLib/core.pm lib/Parrot/PMC.pm lib/Parrot/.dummy
 	$(LD) ${ld_out}$(TEST_PROG) $(LDFLAGS) $(O_FILES) test_main$(O) $(C_LIBS)
 
-lib_deps_object : $(O_FILES)
+lib_deps_object : $(O_DIRS) $(O_FILES)
 	$(PERL) tools/dev/lib_deps.pl object $(O_FILES)
 
 lib_deps_source : $(GENERAL_H_FILES)
@@ -187,7 +189,7 @@ blib_lib :
 
 shared : blib_lib blib/lib/libparrot$(SO) blib/lib/libcore_prederef$(SO) $(TEST_PROG_SO)
 
-blib/lib/libparrot$(SO).${VERSION} : blib_lib $(O_FILES)
+blib/lib/libparrot$(SO).${VERSION} : blib_lib $(O_DIRS) $(O_FILES)
 	$(LD) $(LD_SHARED) -Wl,-soname,libparrot$(SO).${MAJOR} $(LDFLAGS) $(LD_OUT)blib/lib/libparrot$(SO).${VERSION} $(O_FILES)
 
 blib/lib/libparrot$(SO).${MAJOR}.${MINOR} : blib/lib/libparrot$(SO).${VERSION}
@@ -227,7 +229,7 @@ PDB=pdb
 
 pdb$(O) : $(GENERAL_H_FILES)
 
-$(PDB) : pdb$(O) $(O_FILES)
+$(PDB) : pdb$(O) $(O_DIRS) $(O_FILES)
 	$(LD) ${ld_out}$(PDB) pdb$(O) $(O_FILES) $(C_LIBS) $(LDFLAGS)
 
 #
@@ -237,7 +239,7 @@ DIS=disassemble
 
 disassemble$(O) : $(GENERAL_H_FILES)
 
-$(DIS) : disassemble$(O) $(O_FILES)
+$(DIS) : disassemble$(O) $(O_DIRS) $(O_FILES)
 	$(LD) ${ld_out}$(DIS) disassemble$(O) $(O_FILES) $(C_LIBS) $(LDFLAGS)
 
 #
@@ -275,7 +277,7 @@ examples/assembly/mops.pbc : examples/assembly/mops.pasm assemble.pl
 examples/assembly/mops.c : examples/assembly/mops.pbc pbc2c.pl
 	$(PERL) pbc2c.pl examples/assembly/mops.pbc > examples/assembly/mops.c
 
-examples/assembly/mops${exe} : examples/assembly/mops$(O) $(O_FILES)
+examples/assembly/mops${exe} : examples/assembly/mops$(O) $(O_DIRS) $(O_FILES)
 	$(LD) $(LDFLAGS) ${ld_out}examples/assembly/mops${exe} examples/assembly/mops$(O) $(O_FILES) $(C_LIBS)
 
 examples/assembly/life.pbc : examples/assembly/life.pasm assemble.pl
@@ -284,7 +286,7 @@ examples/assembly/life.pbc : examples/assembly/life.pasm assemble.pl
 examples/assembly/life.c : examples/assembly/life.pbc pbc2c.pl
 	$(PERL) pbc2c.pl examples/assembly/life.pbc > examples/assembly/life.c
 
-examples/assembly/life${exe} : examples/assembly/life$(O) $(O_FILES)
+examples/assembly/life${exe} : examples/assembly/life$(O) $(O_DIRS) $(O_FILES)
 	$(LD) $(LDFLAGS) ${ld_out}examples/assembly/life${exe} examples/assembly/life$(O) $(O_FILES) $(C_LIBS)
 
 ###############################################################################
@@ -410,7 +412,9 @@ lib/Parrot/.dummy :
 docs/.dummy :
 	cd docs && $(MAKE) && cd ..
 
-$(CLASS_O_FILES) :
+classes : classes/.dummy
+
+classes/.dummy :
 	cd classes && $(MAKE) && cd ..
 
 languages : languages.dummy
