@@ -59,7 +59,7 @@ Run faster.
 .pcc_sub _MAIN prototyped
 	.param pmc argv
 	# the command line
-.include "library/ncurses.pasm"
+        load_bytecode "library/ncurses.pasm"
 # should autogenerate these
 .globalconst int KEY_DOWN = 258
 .globalconst int KEY_UP   = 259

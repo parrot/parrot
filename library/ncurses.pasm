@@ -650,3 +650,4 @@ store_global 'ncurses::mcprint', P2
 dlfunc P2, P1, 'has_key', 'ii'
 store_global 'ncurses::has_key', P2
 restoreall
+invoke P1
