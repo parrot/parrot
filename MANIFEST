@@ -86,6 +86,7 @@ examples/assembly/queens.pasm
 examples/assembly/stack.pasm
 examples/assembly/substr.pasm
 examples/assembly/trace.pasm
+examples/assembly/xml_parser.pasm
 examples/mops/README
 examples/mops/mops.c
 examples/mops/mops.cs
