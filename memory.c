@@ -14,6 +14,29 @@
 
 /*=for api mem mem_allocate_aligned
    Allocate a chunk of memory aligned on a power-of-2 boundary
+ 
+   This is a boundary for which all the low bits of the address 
+   are zeroes. Basically take the size of an object, round it up to a 
+   power-of-two size (256, 512, 1024, whatever) and make sure that you can 
+   mask out the low bits with no problem. So for an up to 256-byte thing the 
+   low 8 bits are zero, for a thing that's between 257 and 512 the low 9 bits 
+   are zero, and so on. 
+   
+   The reason for this is nasty, and basically speed. If I'm aligned properly, 
+   and I have an address in the middle of one of my aligned structures, I can 
+   mask the low bits off and find the base of the whole structure without 
+   needing embedded pointers or anything. 
+   
+   Register frames work like this, for example. The first chunk of the 
+   register frame is some meta-information (forward and back pointers, frames 
+   used, and so forth) while the rest is sets of register arrays. If I have an 
+   address of one of the register arrays in the frame (which I do) I can find 
+   the base structure by lopping the low bits off. Cheaper in memory terms 
+   than having lots of back pointers. (Time, too, since I don't have to fill 
+   those back-pointers in) 
+   
+   It is a hack that might go if it turns out that having the back pointers is 
+   cheaper, though. 
 */
 void *
 mem_allocate_aligned(IV size) {
