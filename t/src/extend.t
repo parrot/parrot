@@ -189,7 +189,7 @@ the_test(Parrot_Interp interpreter, opcode_t *cur_op, opcode_t *start)
 
     value = 12345;
     key   = 10;
-    Parrot_PMC_set_intval_intkey(interpreter, array, value, key);
+    Parrot_PMC_set_intval_intkey(interpreter, array, key, value);
 
     new_value = Parrot_PMC_get_intval_intkey(interpreter, array, key);
 
