@@ -257,6 +257,10 @@ PDB_run_command(struct Parrot_Interp *interpreter, const char *command)
 {
     PDB_t *pdb = interpreter->pdb;
     unsigned long c;
+    const char* temp;
+
+    /* keep a pointer to the command, in case we need to report an error */
+    temp = command;
 
     /* get a number from what the user typed */
     command = parse_command(command, &c);
@@ -333,7 +337,7 @@ PDB_run_command(struct Parrot_Interp *interpreter, const char *command)
         default:
             PIO_eprintf(interpreter,
                         "Undefined command: \"%s\".  Try \"help\".",
-                        command);
+                        temp);
             break;
     }
 }
