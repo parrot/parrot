@@ -863,8 +863,8 @@ output_is(<<'CODE', <<'OUTPUT', "callmethod - method name");
 .pcc_sub meth:
     print "in meth\n"
     .include "interpinfo.pasm"
-    interpinfo $S0, .INTERPINFO_CURRENT_METHOD
-    print $S0
+    interpinfo S0, .INTERPINFO_CURRENT_METHOD
+    print S0
     print "\n"
     returncc
 CODE
