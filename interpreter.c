@@ -311,12 +311,7 @@ stop_prederef(struct Parrot_Interp *interpreter)
 void
 exec_init_prederef(struct Parrot_Interp *interpreter, void *prederef_arena)
 {
-    int which = PARROT_PREDEREF_CORE;
-#if HAVE_COMPUTED_GOTO
-    which = PARROT_CGP_CORE;
-#endif
-    /* XXX do we need to prederef if no CGP is available */
-    load_prederef(interpreter, which);
+    load_prederef(interpreter, PARROT_CGP_CORE);
 
     if (!interpreter->prederef_code) {
         size_t N = interpreter->code->cur_cs->base.size;
@@ -534,17 +529,25 @@ runops_int(struct Parrot_Interp *interpreter, size_t offset)
                 core = runops_fast_core;
                 break;
             case PARROT_CGOTO_CORE:
-                core = runops_cgoto_core;
+#ifdef HAVE_COMPUTED_GOTO
                 /* clear stacktop, it gets set in runops_cgoto_core beyond the
                  * opfunc table again, if the compiler supports nested funcs
                  */
                 /* #ifdef HAVE_NESTED_FUNC */
-#ifdef __GNUC__
+#  ifdef __GNUC__
                 interpreter->lo_var_ptr = 0;
+#  endif
+                core = runops_cgoto_core;
+#else
+                internal_exception(1, "Error: PARROT_CGOTO_CORE not available");
 #endif
                 break;
             case PARROT_CGP_CORE:
+#ifdef HAVE_COMPUTED_GOTO
                 core = runops_cgp;
+#else
+                internal_exception(1, "Error: PARROT_CGP_CORE not available");
+#endif
                 break;
             case PARROT_SWITCH_CORE:
                 core = runops_switch;

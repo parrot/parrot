@@ -111,7 +111,7 @@ main(int argc, char **argv) {
 #if defined(JIT_CGP)
     exec_init_prederef(interpreter, &exec_prederef_code);
 #endif
-    Parrot_setflag(interpreter, PARROT_EXEC_FLAG, &Parrot_exec_run);
+    Parrot_set_run_core(interpreter, PARROT_EXEC_CORE);
     interpreter->code->byte_code =
         (opcode_t *)&((&program_code)[bytecode_offset]);
     Parrot_exec_run = 0;
