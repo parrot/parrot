@@ -45,7 +45,8 @@ Register allocation is done per I<compilation unit>.
 Imcc I<identifiers> and I<temporary variables> e.g. $I0 are assigned a
 physical parrot register depending on the life range of these
 variables. If the life range of one variable doesn't overlap the range
-of another variable, these might get the same parrot register.
+of another variable, they might get the same parrot register. For 
+instance:
 
    $I0 = 10
    $I1 = 20
@@ -55,13 +56,14 @@ will translate to
    set I0, 10
    set I0, 20
 
-when $I0 is not used after these lines.
-
-The first redundant assignment will be optimized away with B<-O2>.
+provided that $I0 is not used after these lines. In this case, the 
+assignment to $I0 is redundant and will be optimized away if imcc is
+run with optimization level B<-O2>.
 
 I<PASM registers> keep their register. During the usage of a I<PASM
-register> this register will be not get assigned to. So don't use
-these over long code pieces and only when really needed.
+register> this register will be not get assigned to. Therefore, they
+should be used only when absolutely necessary, and you should try to
+avoid using them within long pieces of code.
 
 =head2 Basic blocks
 
@@ -71,7 +73,7 @@ which can get jumped to, and ends at a branch instruction.
 
 =head2 Special case: subroutine calls (bsr)
 
-Currently, imcc assumes, that a subroutine saves all registers on entry,
+Currently, imcc assumes that a subroutine saves all registers on entry,
 as P6C does per B<saveall>, and thus a B<bsr> doesn't count as a branch.
 
 But there is one exception to this rule: when the target of the
@@ -100,11 +102,11 @@ the same register to a different variable.
 Variables used as B<IN> parameters must keep their parrot register
 over their usage range.
 
-When F<imcc> detects a register usage, where the first operation is
-using (reading) a register (and warnings are enabled), F<imcc> emits
+When C<imcc> detects a register usage, where the first operation is
+using (reading) a register (and warnings are enabled), C<imcc> emits
 an appropriate message.
 
-Consider these to code snippets (block numbers are attached):
+Consider these two code snippets (block numbers are attached):
 
   .sub _main
  0      $I0 = 0		# initialized
@@ -141,12 +143,12 @@ The latter of these emits the warning:
 =head2 Interference graph
 
 Once the above information is calculated, the next step is to look at
-which variables interfere with which other. Non-interfering variables can
-be given the same parrot register.
+which variables interfere with which others. Non-interfering variables 
+can be given the same parrot register.
 
 =head2 Register allocation
 
-F<imcc> then starts allocating registers according to a variable's
+C<imcc> then starts allocating registers according to a variable's
 score. Variables deeply nested inside loops have the highest score and
 get a parrot register first. Variables with a long life range (i.e.
 with many interferences) get allocated last.
@@ -220,11 +222,11 @@ and their reverse meanings.
 
 =head2 Branches to branches
 
-Unconditional branch sequences get optimized to jump to the final label.
+Unconditional branch sequences get optimized to jumps to the final label.
 
 =head2 Unused labels
 
-Labels not referenced somewhere get deleted.
+Unreferenced labels are deleted.
 
 =head2 Dead code removal
 
@@ -255,7 +257,7 @@ and inserted in front of the loop entry.
 
 =head1 Code generation
 
-Imcc either generates PASM or else directly generates a PBC file for
+C<imcc> either generates PASM or else directly generates a PBC file for
 running with parrot.
 
 =head1 Running code
