@@ -95,8 +95,9 @@ not take any parameters.
 
 =item C<PARROT_PREDEREF_FLAG>
 
-This flag turns on predereferencing.  Parrot will (???).  This flag does 
-not take any parameters.
+This flag turns on predereferencing.  Parrot will transform many offsets 
+in the opcode stream to absolute pointers.  This flag does not take any 
+parameters.
 
 =item C<PARROT_JIT_FLAG>
 
