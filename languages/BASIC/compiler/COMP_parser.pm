@@ -73,6 +73,7 @@ sub runtime_shutdown {
 .include "RT_aggregates.pasm"
 .include "RT_support.pasm"
 .include "RT_io.pasm"
+.include "RT_platform.pasm"
 	# 
 	# Pull in user-defined functions
 	#
@@ -118,8 +119,7 @@ PARSE_NOFEED:
 	# The "unimplementeds"
 	# Eat tokens until we get to the next statement of some kind.
 	# These are likely to *never* be implemented.
-	if ($syms[CURR] =~ /^( cls |
-			screen | pset | preset | line | circle | draw |
+	if ($syms[CURR] =~ /^(  screen | pset | preset | line | circle | draw |
 			view | window | pmap | color | palette | paint |
 			get | put | pcopy | beep | sound | locate | view |
 			width | resume | pos | poke | peek | rset |
@@ -146,7 +146,7 @@ PARSE_NOFEED:
 		while | wend | dim | type | exit | function | for | next |
 		do | loop | goto | gosub | return  | sub | call | select | case |
 		read | restore | input | open | close | on | randomize | stop | swap |
-		shared
+		shared | cls
 		)$/x) {
 		no strict 'refs';
 		&{"parse_" . $1}();

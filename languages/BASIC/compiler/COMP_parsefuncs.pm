@@ -252,6 +252,15 @@ COMPRND
 		feedme();
 	}
 }
+sub parse_cls {
+	if (! $type[NEXT] =~ /STMT|COMM|COMP/) {  # No arg version
+		@e=EXPRESSION();
+	}
+	print CODE <<CLS;
+	bsr SCREEN_CLEAR
+CLS
+	feedme();
+}
 sub parse_open {
 	my(@filename)=EXPRESSION;
 	feedme();

@@ -5,29 +5,32 @@
 	# Generally, anything above x14 belongs to BASIC for future use.
 	#
 	#
-        # Set up new program space
-        #
+    # Set up new program space
+    #
 	#sweepoff
 	#collectoff
-        set I25, -1		# Current stack frame
-        new P10, .PerlArray	# Variables
-        new P11, .PerlArray	# Loop memory
+    set I25, -1		# Current stack frame
+    new P10, .PerlArray	# Variables
+    new P11, .PerlArray	# Loop memory
+    
+    new P24, .PerlHash	# Platform-specific storage
+	bsr PLATFORM_SETUP
         
-        new P15, .PerlArray	# Read/Data information
-        new P16, .PerlHash	# Index for Read/Data RESTORE
-        set I15, 0		# Current READ pointer.
+    new P15, .PerlArray	# Read/Data information
+    new P16, .PerlHash	# Index for Read/Data RESTORE
+    set I15, 0		# Current READ pointer.
 	set I14, 0		# Column position of cursor 1-80 (for tab())
-				# DO NOT OUTPUT DATA WITHOUT GOING THROUGH DISPLAY EXPRESSION
+					# DO NOT OUTPUT DATA WITHOUT GOING THROUGH DISPLAY EXPRESSION
 
 	new P17, .PerlHash	# File Descriptors, key is BASIC data is FD
-				#		    data is 0 (closed) or Ix FD
+						#		    data is 0 (closed) or Ix FD
 	set I12, 20021107	# Random number generator seed (unfair intentionally)
         
 	bsr DATA_SETUP
-        bsr NEWFRAME
-        branch MAIN
-        # Start a new stack frame
-
+    bsr NEWFRAME
+    branch MAIN
+    
+    # Start a new stack frame
 NEWFRAME:
         inc I25
         new P0, .PerlHash
