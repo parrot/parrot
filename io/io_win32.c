@@ -53,7 +53,7 @@ size_t PIO_win32_write(theINTERP, ParrotIOLayer *layer,
 INTVAL PIO_win32_puts(theINTERP, ParrotIOLayer *l, ParrotIO *io,
                       const char *s);
 INTVAL PIO_win32_seek(theINTERP, ParrotIOLayer *l, ParrotIO *io,
-                      INTVAL hi, INTVAL lo, INTVAL whence);
+                      PIOOFF_T off, INTVAL whence);
 PIOOFF_T PIO_win32_tell(theINTERP, ParrotIOLayer *l, ParrotIO *io);
 
 
