@@ -56,6 +56,7 @@ int    nci_i4i(long * l, int i);
 int    nci_ii3(int a, int *b);
 void * nci_pi(int test);
 void   nci_vP(void *pmc);
+void   nci_dlvar_vv(void);
 
 
 /* Declarations for callback tests */
