@@ -564,7 +564,7 @@ sub rewrite_vtable_method ($$$$$) {
     # Rewrite SELF.other_method(args...)
     s/SELF              # Macro SELF
       \.(\w+)           # other_method
-      \(\s*(.*?)\)      # capture argument list   
+      \(\s*(.*?)\)      # capture argument list
      /"Parrot_${class}_$1(".full_arguments($2).")"/xeg;
 
     # Rewrite SELF -> pmc, INTERP -> interpreter
@@ -813,33 +813,7 @@ EOC
 	which is passed in entry to class_init.
     */
 EOC
-    # declare auxiliary variables for dyncpmc IDs
-    foreach my $dynclass (keys %init_mmds) {
-        next if $dynclass eq $classname;
-        $cout .= <<"EOC";
-    int my_enum_class_$dynclass = Parrot_PMC_typenum(interp, "$dynclass");
-EOC
-    }
-    # init MMD "right" slots with the dynpmc types
-    foreach my $entry (@init_mmds) {
-        if ($entry->[1] eq $classname) {
-            $cout .= <<"EOC";
-    _temp_mmd_init[$entry->[0]].right = entry;
-EOC
-        }
-        else {
-            $cout .= <<"EOC";
-    _temp_mmd_init[$entry->[0]].right = my_enum_class_$entry->[1];
-EOC
-        }
-    }
-    # just to be safe
-    foreach my $dynclass (keys %init_mmds) {
-        next if $dynclass eq $classname;
-        $cout .= <<"EOC";
-    assert(my_enum_class_$dynclass != enum_class_default);
-EOC
-    }
+
     $cout .= <<"EOC";
     if (pass == 0) {
 EOC
@@ -884,13 +858,6 @@ EOC
 
     # declare each nci method for this class
     my $firstnci = 1;
-    my $my_enum_class;
-    if ($self->{flags}{dynpmc}) {
-       $my_enum_class = "my_enum_class_${classname}";
-    }
-    else {
-       $my_enum_class = "enum_class_${classname}";
-    }
     foreach my $method (@{ $self->{methods} }) {
       next unless $method->{loc} eq 'nci';
       my $proto = proto($method->{type}, $method->{parameters});
@@ -898,12 +865,9 @@ EOC
           $cout .= <<"EOC";
     if (pass) {
 EOC
-          $cout .= <<"EOC" if $self->{flags}{dynpmc};
-        int my_enum_class_$classname = Parrot_PMC_typenum(interp, "$classname");
-EOC
       }
       $cout .= <<"EOC";
-        enter_nci_method(interp, $my_enum_class,
+        enter_nci_method(interp, entry,
                 F2DPTR(Parrot_${classname}_$method->{meth}),
                 "$method->{meth}", "$proto");
 EOC
