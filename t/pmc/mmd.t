@@ -16,7 +16,7 @@ Tests the multi-method dispatch.
 
 =cut
 
-use Parrot::Test tests => 8;
+use Parrot::Test tests => 10;
 
 output_is(<<'CODE', <<'OUTPUT', "built in");
     new P0, .Integer
@@ -144,7 +144,7 @@ output_is(<<'CODE', <<'OUTPUT', "INTVAL return numeq");
 
     .local pmc comp
     comp = global "Float_cmp_Integer"
-    mmdvtregister .MMD_NUMCMP, .Float, .Integer, comp
+    mmdvtregister .MMD_CMP, .Float, .Integer, comp
 
     $P1 = new Float
     $P2 = new Integer
@@ -279,4 +279,47 @@ output_is(<<'CODE', <<'OUTPUT', "PASM MMD divide - loaded sub");
 
 CODE
 42
+OUTPUT
+
+output_is(<<'CODE', <<'OUTPUT', "built in INTVAL");
+    new P0, .Integer
+    new P1, .Integer
+    set P1, 3
+    bxor P0, P1, 2
+    print P0
+    print "\n"
+    end
+CODE
+1
+OUTPUT
+
+output_is(<<'CODE', <<'OUTPUT', "PASM INTVAL");
+.include "pmctypes.pasm"
+.include "mmd.pasm"
+    find_global P10, "Integer_bxor_Intval"
+    mmdvtregister .MMD_BXOR_INT, .Integer, 0, P10
+
+    new P0, .Integer
+    new P1, .Integer
+    set P1, 3
+    bxor P0, P1, 2
+    print P0
+    print "\n"
+    new P0, .PerlInt
+    new P1, .PerlInt
+    set P1, 5
+    bxor P0, P1, 2	# should call PerlInts builtin
+    print P0
+    print "\n"
+    end
+.pcc_sub Integer_bxor_Intval:
+    print "ok\n"
+    set I10, P5
+    bxor I11, I10, I5
+    set P6, I11
+    invoke P1
+CODE
+ok
+1
+7
 OUTPUT

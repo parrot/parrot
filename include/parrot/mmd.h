@@ -13,16 +13,15 @@
 #if !defined(PARROT_MMD_H_GUARD)
 #define PARROT_MMD_H_GUARD
 
-void mmd_dispatch_pmc(struct Parrot_Interp *, PMC *, PMC *, PMC *, INTVAL);
-STRING *mmd_dispatch_string(struct Parrot_Interp *, PMC *, PMC *, INTVAL);
-INTVAL mmd_dispatch_intval(struct Parrot_Interp *, PMC *, PMC *, INTVAL);
-FLOATVAL mmd_dispatch_floatval(struct Parrot_Interp *, PMC *, PMC *, INTVAL);
+void mmd_dispatch_v_ppp(Parrot_Interp, PMC *, PMC *, PMC *, INTVAL);
+void mmd_dispatch_v_pip(Parrot_Interp, PMC *, INTVAL, PMC *, INTVAL);
+INTVAL mmd_dispatch_i_pp(Parrot_Interp, PMC *, PMC *, INTVAL);
 
-void mmd_add_by_class(struct Parrot_Interp *, INTVAL, STRING *, STRING *, funcptr_t);
-void mmd_register(struct Parrot_Interp *, INTVAL, INTVAL, INTVAL, funcptr_t);
-void mmd_register_sub(struct Parrot_Interp *, INTVAL, INTVAL, INTVAL, PMC*);
-void mmd_add_function(struct Parrot_Interp *, INTVAL, funcptr_t);
-void mmd_add_function_sub(struct Parrot_Interp *, INTVAL, PMC*);
+void mmd_add_by_class(Parrot_Interp, INTVAL, STRING *, STRING *, funcptr_t);
+void mmd_register(Parrot_Interp, INTVAL, INTVAL, INTVAL, funcptr_t);
+void mmd_register_sub(Parrot_Interp, INTVAL, INTVAL, INTVAL, PMC*);
+void mmd_add_function(Parrot_Interp, INTVAL, funcptr_t);
+void mmd_add_function_sub(Parrot_Interp, INTVAL, PMC*);
 void mmd_destroy(Parrot_Interp);
 PMC *mmd_vtfind(Parrot_Interp, INTVAL, INTVAL, INTVAL);
 
@@ -40,33 +39,62 @@ typedef struct _MMD_table {
    (and, or, xor, lshift, rshift), concat, logical (and, or, xor),
    repeat, eq, cmp */
 
-/* &gen_from_def(mmd.pasm) */
+/* &gen_from_enum(mmd.pasm) */
 
-#define MMD_ADD 0
-#define MMD_SUBTRACT 1
-#define MMD_MULTIPLY 2
-#define MMD_DIVIDE 3
-#define MMD_MOD 4
-#define MMD_CMOD 5
-#define MMD_BAND 6
-#define MMD_BOR 7
-#define MMD_BXOR 8
-#define MMD_BSL 9
-#define MMD_BSR 10
-#define MMD_CONCAT 11
-#define MMD_LAND 12
-#define MMD_LOR 13
-#define MMD_LXOR 14
-#define MMD_REPEAT 15
-#define MMD_NUMEQ 16
-#define MMD_STREQ 17
-#define MMD_NUMCMP 18
-#define MMD_STRCMP 19
-#define MMD_SOR 20
-#define MMD_SAND 21
-#define MMD_SXOR 22
+typedef enum {
+        MMD_ADD,
+        MMD_ADD_INT,
+        MMD_ADD_FLOAT,
+        MMD_ADD_BIGNUM,
+        MMD_SUBTRACT,
+        MMD_SUBTRACT_INT,
+        MMD_SUBTRACT_FLOAT,
+        MMD_SUBTRACT_BIGNUM,
+        MMD_MULTIPLY,
+        MMD_MULTIPLY_INT,
+        MMD_MULTIPLY_FLOAT,
+        MMD_MULTIPLY_BIGNUM,
+        MMD_DIVIDE,
+        MMD_DIVIDE_INT,
+        MMD_DIVIDE_FLOAT,
+        MMD_DIVIDE_BIGNUM,
+        MMD_MOD,
+        MMD_MOD_INT,
+        MMD_MOD_FLOAT,
+        MMD_MOD_BIGNUM,
+        MMD_CMOD,
+        MMD_CMOD_INT,
+        MMD_CMOD_FLOAT,
+        MMD_CMOD_BLIGNUM,
+        MMD_BAND,
+        MMD_BAND_INT,
+        MMD_BOR,
+        MMD_BOR_INT,
+        MMD_BXOR,
+        MMD_BXOR_INT,
+        MMD_BSL,
+        MMD_BSL_INT,
+        MMD_BSR,
+        MMD_BSR_INT,
+        MMD_CONCAT,
+        MMD_CONCAT_STR,
+        MMD_LAND,
+        MMD_LOR,
+        MMD_LXOR,
+        MMD_REPEAT,
+        MMD_REPEAT_INT,
+        MMD_EQ,
+        MMD_NUMEQ,
+        MMD_STREQ,
+        MMD_CMP,
+        MMD_NUMCMP,
+        MMD_STRCMP,
+        MMD_SOR,
+        MMD_SAND,
+        MMD_SXOR,
 
-#define MMD_USER_FIRST 23
+        MMD_USER_FIRST
+} parrot_mmd_func_enum;
 
 /* &end_gen */
 #endif /* PARROT_MMD_H_GUARD */

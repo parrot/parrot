@@ -203,7 +203,10 @@ mmd_fallback_bor_pmc(Parrot_Interp interp, PMC *left, PMC *right, PMC *dest)
 /*
 
 =item C<void
-mmd_fallback_bxor_pmc(Parrot_Interp interp, PMC *left, PMC *right, PMC *dest)>
+mmd_fallback_bxor_pmc(Parrot_Interp, PMC *left, PMC *right, PMC *dest)>
+
+=item C<void
+mmd_fallback_bxor_int(Parrot_Interp, PMC *left, INTVAL right, PMC *dest)>
 
 Gets integers from C<left> and C<right>, performs a binary C<xor> and
 sets the result as an integer in C<dest>.
@@ -220,6 +223,13 @@ mmd_fallback_bxor_pmc(Parrot_Interp interp, PMC *left, PMC *right, PMC *dest)
                               VTABLE_get_integer(interp, right));
 }
 
+static void
+mmd_fallback_bxor_int(Parrot_Interp interp, PMC *left, INTVAL right, PMC *dest)
+{
+    VTABLE_set_integer_native(interp, dest,
+                              VTABLE_get_integer(interp, left) ^
+                              right);
+}
 /*
 
 =item C<void
@@ -394,6 +404,9 @@ mmd_fallback_repeat_pmc(Parrot_Interp interp, PMC *left, PMC *right, PMC *dest)
 =item C<INTVAL
 mmd_fallback_numeq_pmc(Parrot_Interp interp, PMC *left, PMC *right)>
 
+=item C<INTVAL
+mmd_fallback_eq_pmc(Parrot_Interp interp, PMC *left, PMC *right)>
+
 Gets numbers from C<left> and C<right>, performs a numeric equals
 and sets the result as an string in C<dest>.
 
@@ -438,6 +451,9 @@ mmd_fallback_streq_pmc(Parrot_Interp interp, PMC *left, PMC *right)
 
 =item C<INTVAL
 mmd_fallback_numcmp_pmc(Parrot_Interp interp, PMC *left, PMC *right)>
+
+=item C<INTVAL
+mmd_fallback_cmp_pmc(Parrot_Interp interp, PMC *left, PMC *right)>
 
 Gets numbers from C<left> and C<right>, performs a numeric comparison
 and sets the result as an string in C<dest>.
@@ -570,6 +586,7 @@ register_fallback_methods(Parrot_Interp interp) {
     mmd_add_function(interp, MMD_BAND, (funcptr_t)mmd_fallback_band_pmc);
     mmd_add_function(interp, MMD_BOR, (funcptr_t)mmd_fallback_bor_pmc);
     mmd_add_function(interp, MMD_BXOR, (funcptr_t)mmd_fallback_bxor_pmc);
+    mmd_add_function(interp, MMD_BXOR_INT, (funcptr_t)mmd_fallback_bxor_int);
     mmd_add_function(interp, MMD_BSL, (funcptr_t)mmd_fallback_bsl_pmc);
     mmd_add_function(interp, MMD_BSR, (funcptr_t)mmd_fallback_bsr_pmc);
     mmd_add_function(interp, MMD_CONCAT, (funcptr_t)mmd_fallback_concat_pmc);
@@ -577,8 +594,10 @@ register_fallback_methods(Parrot_Interp interp) {
     mmd_add_function(interp, MMD_LOR, (funcptr_t)mmd_fallback_lor_pmc);
     mmd_add_function(interp, MMD_LXOR, (funcptr_t)mmd_fallback_lxor_pmc);
     mmd_add_function(interp, MMD_REPEAT, (funcptr_t)mmd_fallback_repeat_pmc);
+    mmd_add_function(interp, MMD_EQ, (funcptr_t)mmd_fallback_numeq_pmc);
     mmd_add_function(interp, MMD_NUMEQ, (funcptr_t)mmd_fallback_numeq_pmc);
     mmd_add_function(interp, MMD_STREQ, (funcptr_t)mmd_fallback_streq_pmc);
+    mmd_add_function(interp, MMD_CMP, (funcptr_t)mmd_fallback_numcmp_pmc);
     mmd_add_function(interp, MMD_NUMCMP, (funcptr_t)mmd_fallback_numcmp_pmc);
     mmd_add_function(interp, MMD_STRCMP, (funcptr_t)mmd_fallback_strcmp_pmc);
     mmd_add_function(interp, MMD_SOR, (funcptr_t)mmd_fallback_stringor_pmc);

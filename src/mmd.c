@@ -43,10 +43,9 @@ not highest type in table.
 #include "parrot/parrot.h"
 #include <assert.h>
 
-typedef void (*pmc_mmd_f)(Interp *, PMC *, PMC *, PMC *);
-typedef STRING *(*string_mmd_f)(Interp *, PMC *, PMC *);
-typedef INTVAL (*intval_mmd_f)(Interp *, PMC *, PMC *);
-typedef FLOATVAL (*floatval_mmd_f)(Interp *, PMC *, PMC *);
+typedef void    (*mmd_f_v_ppp)(Interp *, PMC *, PMC *, PMC *);
+typedef void    (*mmd_f_v_pip)(Interp *, PMC *, INTVAL, PMC *);
+typedef INTVAL  (*mmd_f_i_pp) (Interp *, PMC *, PMC *);
 
 #ifndef NDEBUG
 static void
@@ -160,7 +159,7 @@ get_mmd_dispatcher(Interp *interpreter, PMC *left, PMC * right,
 /*
 
 =item C<void
-mmd_dispatch_pmc(Interp *interpreter,
+mmd_dispatch_v_ppp(Interp *interpreter,
 		 PMC *left, PMC *right, PMC *dest, INTVAL function)>
 
 Dispatch to a multimethod that "returns" a PMC. C<left>, C<right>, and
@@ -174,19 +173,25 @@ C<right>, and C<dest> like any other binary vtable function.
 This function has a C<void> return type, like all the "take two PMCs,
 return a PMC" vtable functions do.
 
+=item C<void
+mmd_dispatch_v_pip(Interp *interpreter,
+		 PMC *left, INTVAL right, PMC *dest, INTVAL function)>
+
+Like above, right argument is a native INTVAL.
+
 =cut
 
 */
 
 void
-mmd_dispatch_pmc(Interp *interpreter,
+mmd_dispatch_v_ppp(Interp *interpreter,
 		 PMC *left, PMC *right, PMC *dest, INTVAL function)
 {
-    pmc_mmd_f real_function;
+    mmd_f_v_ppp real_function;
     PMC *sub;
     int is_pmc;
 
-    real_function = (pmc_mmd_f)get_mmd_dispatcher(interpreter,
+    real_function = (mmd_f_v_ppp)get_mmd_dispatcher(interpreter,
             left, right, function, &is_pmc);
 
     if (is_pmc) {
@@ -199,115 +204,55 @@ mmd_dispatch_pmc(Interp *interpreter,
     }
 }
 
-/*
-
-=item C<STRING *
-mmd_dispatch_string(Interp *interpreter,
-		 PMC *left, PMC *right, INTVAL function)>
-
-Dispatch to a multimethod that returns a string. left and right are PMC
-pointers, while C<func_num> is the MMD table that should be used to do the
-dispatching. The function is responsible for creating the returned
-string.
-
-=cut
-
-*/
-
-STRING *
-mmd_dispatch_string(Interp *interpreter,
-		 PMC *left, PMC *right, INTVAL function)
+void
+mmd_dispatch_v_pip(Interp *interpreter,
+		 PMC *left, INTVAL right, PMC *dest, INTVAL function)
 {
-    string_mmd_f real_function;
+    mmd_f_v_pip real_function;
     PMC *sub;
     int is_pmc;
-    STRING *ret;
-    /*
-     * XXX actually we don't have a MMD function matching this signature
-     * -leo
-     */
+    UINTVAL left_type;
 
-    real_function = (string_mmd_f)get_mmd_dispatcher(interpreter,
-            left, right, function, &is_pmc);
-
+    left_type = left->vtable->base_type;
+    real_function = (mmd_f_v_pip)get_mmd_dispatch_type(interpreter,
+            left_type, 0, function, &is_pmc);
     if (is_pmc) {
         sub = (PMC*)real_function;
-        ret = Parrot_runops_fromc_args_save(interpreter, sub, "SPP",
-                left, right);
+        Parrot_runops_fromc_args_save(interpreter, sub, "vPIP",
+                left, right, dest);
     }
     else {
-        ret = (*real_function)(interpreter, left, right);
+        (*real_function)(interpreter, left, right, dest);
     }
-    return ret;
 }
 
 /*
 
 =item C<INTVAL
-mmd_dispatch_intval(Interp *interpreter,
+mmd_dispatch_i_pp(Interp *interpreter,
 		 PMC *left, PMC *right, INTVAL function)>
 
-Like C<mmd_dispatch_string()>, only it returns an C<INTVAL>.
+Like C<mmd_dispatch_v_ppp()>, only it returns an C<INTVAL>.
 
 =cut
 
 */
 
 INTVAL
-mmd_dispatch_intval(Interp *interpreter,
+mmd_dispatch_i_pp(Interp *interpreter,
 		 PMC *left, PMC *right, INTVAL function)
 {
-    intval_mmd_f real_function;
+    mmd_f_i_pp real_function;
     PMC *sub;
     int is_pmc;
     INTVAL ret;
 
-    real_function = (intval_mmd_f)get_mmd_dispatcher(interpreter,
+    real_function = (mmd_f_i_pp)get_mmd_dispatcher(interpreter,
             left, right, function, &is_pmc);
 
     if (is_pmc) {
         sub = (PMC*)real_function;
         ret = Parrot_runops_fromc_args_save_reti(interpreter, sub, "IPP",
-                left, right);
-    }
-    else {
-        ret = (*real_function)(interpreter, left, right);
-    }
-    return ret;
-}
-
-/*
-
-=item C<FLOATVAL
-mmd_dispatch_floatval(Interp *interpreter,
-		 PMC *left, PMC *right, INTVAL function)>
-
-Like C<mmd_dispatch_string()>, only it returns a C<FLOATVAL>.
-
-=cut
-
-*/
-
-FLOATVAL
-mmd_dispatch_floatval(Interp *interpreter,
-		 PMC *left, PMC *right, INTVAL function)
-{
-
-    floatval_mmd_f real_function;
-    PMC *sub;
-    int is_pmc;
-    FLOATVAL ret;
-
-    /*
-     * XXX actually we don't have a MMD function matching this signature
-     * -leo
-     */
-    real_function = (floatval_mmd_f)get_mmd_dispatcher(interpreter,
-            left, right, function, &is_pmc);
-
-    if (is_pmc) {
-        sub = (PMC*)real_function;
-        ret = Parrot_runops_fromc_args_save_reti(interpreter, sub, "NPP",
                 left, right);
     }
     else {
