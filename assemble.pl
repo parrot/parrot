@@ -427,10 +427,13 @@ arguments have been appropriately analyzed.
 
 sub _annotate_contents {
   my ($self,$line) = @_;
+  my $str_re = qr(\"(?:[^\\\"]*(?:\\.[^\\\"]*)*)\" |
+                  \'(?:[^\\\']*(?:\\.[^\\\']*)*)\'
+                 )x;
 
   $self->{pc}++;
   return if $line=~/^\s*$/ or $line=~/^\s*#/; # Filter out the comments and blank lines
-  $line=~s/#[^'"]+$//;               # Remove trailing comments
+  $line=~s/^((?:[^'"]+|$str_re)*)#.*$/$1/; # Remove trailing comments
   $line=~s/(^\s+|\s+$)//g;           # Remove leading and trailing whitespace
   #
   # Accumulate lines that only have labels until an instruction is found.
