@@ -47,7 +47,15 @@ sub runstep {
 
   if( !defined $icudatadir )
   {
-	  $icudatadir = 'blib/lib/icu/2.6.1';
+      # XXX Hack:  We need some way to tell parrot where to find the
+      # ICU data files, perhaps with a command-line option something
+      # like perl's -I option.  In the absence of any such option,
+      # this absolute setting at least allows you to run parrot from
+      # within various subdirectories, such as ./t or ./languages,
+      # without having to set any environment variables.
+      # If parrot is ever able to be installed, this will have to change!
+      my $cwd = cwd();
+      $icudatadir = "$cwd/blib/lib/icu/2.6.1";
   }
 
   if( defined $icuplatform )
