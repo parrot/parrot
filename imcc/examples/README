@@ -1,0 +1,10 @@
+For much more examples please just do:
+
+cd ../perl6
+perl6 -k --test
+
+[ wait a bit ]
+
+ls t/*/*.imc
+
+;-)
