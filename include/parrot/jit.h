@@ -197,11 +197,12 @@ typedef void (*jit_fn_t)(Parrot_jit_info_t *jit_info,
  *  jit_fn_t:       A pointer to the function that emits code for the opcode
  *                  or to the C funtion if the opcode is not jitted.
  *  extcall:        If the opcode makes an external call to a C funtion.
+ *                  also used for vtable functions, extcall is #of vtable func
  */
 
 typedef struct {
     jit_fn_t                        fn;
-    char                            extcall;
+    int                            extcall;
 } Parrot_jit_fn_info_t;
 
 extern Parrot_jit_fn_info_t op_jit[];

@@ -45,6 +45,11 @@ Parrot_set_i_i {
     }
 }
 
+Parrot_set_p_p {
+    emit_movl_m_r(NATIVECODE, emit_EAX, &PMC_REG[2]);
+    emit_movl_r_m(NATIVECODE, emit_EAX, &PMC_REG[1]);
+}
+
 Parrot_set_n_nc {
     emit_fldl(NATIVECODE, &NUM_CONST[2]);
     emit_fstpl(NATIVECODE, &NUM_REG[1]);

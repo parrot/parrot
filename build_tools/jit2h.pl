@@ -77,6 +77,21 @@ sub readjit($) {
     return %ops;
 }
 
+use Parrot::Vtable;
+my $vtable;
+sub vtable_num($) {
+    my $meth = shift;
+    unless ($vtable) {
+	$vtable = parse_vtable();
+    }
+    my $i = 0;
+    for my $entry (@{$vtable}) {
+	return $i if ($entry->[1] eq $meth);
+	$i++;
+    }
+    return 1;
+}
+
 open JITCPU, ">$ARGV[0]" or die;
 
 print JITCPU<<END_C;
@@ -93,6 +108,14 @@ print JITCPU<<END_C;
 #include<parrot/parrot.h>
 #include"parrot/jit.h"
 #define JIT_EMIT 1
+
+/*
+ *define default jit_funcs, if architecture doesn't have these optimizations
+ */
+#define Parrot_jit_vtable1_op Parrot_jit_normal_op
+#define Parrot_jit_vtable_ifp_op Parrot_jit_cpcf_op
+#define Parrot_jit_vtable_unlessp_op Parrot_jit_cpcf_op
+
 #include"parrot/jit_emit.h"
 
 #undef CONST
@@ -102,6 +125,7 @@ print JITCPU<<END_C;
 #define SREG(i) interpreter->ctx.string_reg.registers[jit_info->cur_op[i]]
 #define CONST(i) interpreter->code->const_table->constants[jit_info->cur_op[i]]
 END_C
+
 
 %core_ops = readjit("jit/$cpuarch/core.jit");
 
@@ -122,13 +146,42 @@ for ($i = 0; $i < $core_numops; $i++) {
 
     $precompiled = 0;
     if (!defined $body) {
-        $precompiled = 1;
-        $extern = 1;
-        if ($op->jump) {
-            $jit_func = "Parrot_jit_cpcf_op";
-        } else {
-            $jit_func = "Parrot_jit_normal_op";
-        }
+	$precompiled = 1;
+	$extern = 1;
+	my $opbody = $op->body;
+	# jitable vtable funcs:
+	# 1) $1->vtable->{vtable}(interp, $1)
+	if ($opbody =~ /
+	core.ops"\s+
+	{{\@1}}->vtable->
+	(\w+)
+	\(interpreter,
+	\s*
+	{{\@1}}
+	\);
+	\s+{{\+=\d}}/xm) {
+	    $jit_func = "Parrot_jit_vtable1_op";
+	    $extern = vtable_num($1);
+	    print "$jit_func $extern\n";
+	}
+	elsif ($op->full_name eq 'if_p_ic') {
+	    $jit_func = "Parrot_jit_vtable_ifp_op";
+	    $opbody =~ /vtable->(\w+)/;
+	    $extern = vtable_num($1);
+	    print "$jit_func $extern\n";
+	}
+	elsif ($op->full_name eq 'unless_p_ic') {
+	    $jit_func = "Parrot_jit_vtable_unlessp_op";
+	    $opbody =~ /vtable->(\w+)/;
+	    $extern = vtable_num($1);
+	    print "$jit_func $extern\n";
+	}
+
+	elsif ($op->jump) {
+	    $jit_func = "Parrot_jit_cpcf_op";
+	} else {
+	    $jit_func = "Parrot_jit_normal_op";
+	}
     }
     else
     {

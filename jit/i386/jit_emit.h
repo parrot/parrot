@@ -6,6 +6,8 @@
  * $Id$
  */
 
+#include <assert.h>
+
 /* Register codes */
 #define emit_None 0
 
@@ -717,7 +719,7 @@ emit_movb_i_m(char *pc, char imm, int base, int i, int scale, long disp)
 
 /* Short jump - 8 bit disp */
 #define emitm_jxs(pc, code, disp) { \
-  *((pc)++) = 0x70 | code; \
+  *((pc)++) = 0x70 | (code); \
   *((pc)++) = (char)disp; }
 
 /* Long jump - 32 bit disp */
@@ -992,6 +994,93 @@ Parrot_jit_begin(Parrot_jit_info_t *jit_info,
     Parrot_emit_jump_to_eax(jit_info, interpreter);
 }
 
+#undef Parrot_jit_vtable1_op
+#undef Parrot_jit_vtable_ifp_op
+#undef Parrot_jit_vtable_unlessp_op
+
+/* emit a call to a vtable func
+ * $1->vtable(interp, $1)
+ */
+static void
+Parrot_jit_vtable1_op(Parrot_jit_info_t *jit_info,
+                     struct Parrot_Interp * interpreter)
+{
+    int nvtable = op_jit[*jit_info->cur_op].extcall;
+    size_t offset;
+    op_info_t *op_info = &interpreter->op_info_table[*jit_info->cur_op];
+    int p1;
+
+    if (nvtable <= 1) {
+        Parrot_jit_normal_op(jit_info, interpreter);
+        return;
+    }
+    /* get the offset of the first vtable func */
+    offset = offsetof(struct _vtable, init);
+    offset += nvtable * sizeof(void *);
+    /* get first param $1 */
+    assert(op_info->types[1] == PARROT_ARG_P);
+    p1 = *(jit_info->cur_op + 1);
+    assert(p1 >= 0 && p1 < NUM_REGISTERS);
+    /* get $1 to EAX */
+    emit_movl_m_r(jit_info->native_ptr, emit_EAX,
+            &interpreter->ctx.pmc_reg.registers[p1]);
+    /* push $1 */
+    emit_pushl_r(jit_info->native_ptr, emit_EAX);
+    /* push interpreter */
+    emitm_pushl_i(jit_info->native_ptr, interpreter);
+    /* mov (eax), eax i.e. $1->vtable */
+    emitm_movl_m_r(jit_info->native_ptr, emit_EAX, emit_EAX, emit_None, 1, 0);
+    /* call *(offset)eax */
+    emitm_callm(jit_info->native_ptr, emit_EAX, emit_None, emit_None, offset);
+    emitm_addb_i_r(jit_info->native_ptr, 8, emit_ESP);
+}
+
+/* if_p_ic, unless_p_ic */
+static void
+Parrot_jit_vtable_if_unless_op(Parrot_jit_info_t *jit_info,
+                     struct Parrot_Interp * interpreter, int unless)
+{
+    int ic = *(jit_info->cur_op + 2);   /* branch offset */
+    char *jmp_ptr, *sav_ptr;
+
+    /* emit call  vtable function i.e. get_bool, result eax */
+    Parrot_jit_vtable1_op(jit_info, interpreter);
+    /* test result */
+    emit_test_r_r(jit_info->native_ptr, emit_EAX, emit_EAX);
+    /* remember PC */
+    jmp_ptr = jit_info->native_ptr;
+    /* emit jump past code, dummy offset */
+    emitm_jxs(jit_info->native_ptr, unless ? emitm_jnz : emitm_jz, 0);
+    /* get branch offset to eax */
+    emitm_movl_i_r(jit_info->native_ptr,
+             jit_info->cur_op + ic * sizeof(opcode_t), emit_EAX);
+    /* TODO calc directly and jump
+     * (cur_op - code_start) + ic * 4 indexed EBP */
+    Parrot_emit_jump_to_eax(jit_info, interpreter);
+    /* fixup above jump */
+    sav_ptr = jit_info->native_ptr;
+    jit_info->native_ptr = jmp_ptr;
+    emitm_jxs(jit_info->native_ptr, unless ? emitm_jnz : emitm_jz,
+            (long)(sav_ptr - jmp_ptr) - 2);
+    /* restore PC */
+    jit_info->native_ptr = sav_ptr;
+}
+
+/* unless_p_ic */
+static void
+Parrot_jit_vtable_unlessp_op(Parrot_jit_info_t *jit_info,
+                     struct Parrot_Interp * interpreter)
+{
+    Parrot_jit_vtable_if_unless_op(jit_info, interpreter, 1);
+}
+
+/* if_p_ic */
+static void
+Parrot_jit_vtable_ifp_op(Parrot_jit_info_t *jit_info,
+                     struct Parrot_Interp * interpreter)
+{
+    Parrot_jit_vtable_if_unless_op(jit_info, interpreter, 0);
+}
 
 void
 Parrot_jit_normal_op(Parrot_jit_info_t *jit_info,
