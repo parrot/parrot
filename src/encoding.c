@@ -16,6 +16,7 @@ extern const ENCODING singlebyte_encoding;
 extern const ENCODING utf8_encoding;
 extern const ENCODING utf16_encoding;
 extern const ENCODING utf32_encoding;
+extern const ENCODING dbcs_encoding;
 
 static const ENCODING **encoding_array = NULL;
 static int encoding_count = 0;
@@ -29,6 +30,7 @@ encoding_init()
     encoding_array[enum_encoding_utf8] = &utf8_encoding;
     encoding_array[enum_encoding_utf16] = &utf16_encoding;
     encoding_array[enum_encoding_utf32] = &utf32_encoding;
+    encoding_array[enum_encoding_dbcs] = &dbcs_encoding;
 }
 
 void

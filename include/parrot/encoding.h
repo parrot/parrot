@@ -19,6 +19,7 @@ enum {
     enum_encoding_utf8,
     enum_encoding_utf16,
     enum_encoding_utf32,
+    enum_encoding_dbcs,
     enum_encoding_MAX
 };
 

@@ -160,7 +160,7 @@ CLASS_PMC_FILES = ${pmc_classes_pmc}
 CLASS_O_FILES = ${pmc_classes_o}
 
 ENCODING_O_FILES = encodings/singlebyte$(O) encodings/utf8$(O) \
-	encodings/utf16$(O) encodings/utf32$(O)
+	encodings/utf16$(O) encodings/utf32$(O) encodings/dbcs$(O)
 
 CHARTYPE_O_FILES = chartypes/unicode$(O) chartypes/usascii$(O)
 
@@ -502,6 +502,8 @@ encoding/utf8$(O) : $(GENERAL_H_FILES)
 encoding/utf16$(O) : $(GENERAL_H_FILES)
 
 encoding/utf32$(O) : $(GENERAL_H_FILES)
+
+encoding/dbcs$(O) : $(GENERAL_H_FILES)
 
 $(SRC)/events$(O) : $(GENERAL_H_FILES)
 

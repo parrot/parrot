@@ -18,8 +18,8 @@
 struct chartype_unicode_map_t {
     UINTVAL n1;
     INTVAL *cparray;
+    INTVAL *cparray2;
 };
-
 
 extern CHARTYPE usascii_chartype;
 extern CHARTYPE unicode_chartype;
@@ -35,7 +35,8 @@ static int transcoder_count = 0;
 struct chartype_digit_map_t default_digit_map = { 0x30, 0x39, 0 };
 
 /*
- * Register a chartype entry and TODO its transcoders
+ * Register a chartype entry
+ * XXX Register transcode functions
  */
 static void
 chartype_register(CHARTYPE *type)
@@ -77,14 +78,17 @@ malloc_and_strcpy(const char *in)
 }
 
 static UINTVAL
-chartype_to_unicode_cparray(const CHARTYPE *from, const CHARTYPE *to, UINTVAL c)
+chartype_to_unicode_cparray(const CHARTYPE *from, const CHARTYPE *to, 
+                            UINTVAL c)
 {
     const struct chartype_unicode_map_t *map = from->unicode_map;
+
     if (c < map->n1)
         return c;
-    else {
+    else if (c < 256) 
         return map->cparray[c - map->n1];
-    }
+    else
+        return map->cparray2[c - 128*256];
 }
 
 static UINTVAL
@@ -92,14 +96,23 @@ chartype_from_unicode_cparray(const CHARTYPE *from, const CHARTYPE *to,
                               UINTVAL c)
 {
     const struct chartype_unicode_map_t *map = to->unicode_map;
+
     if (c < map->n1) {
         return c;
     }
     else {
         UINTVAL i;
-        for (i = 0; i < 256 - map->n1; i++) {
-            if (map->cparray[i] == (INTVAL)c)
-                return i + map->n1;
+        if (map->cparray) {
+            for (i = 0; i < 256 - map->n1; i++) {
+                if (map->cparray[i] == (INTVAL)c)
+                    return i + map->n1;
+            }
+        }
+        if (map->cparray2) {
+            for (i = 0; i < 128*256; i++) {
+                if (map->cparray2[i] == (INTVAL)c)
+                    return i + 128*256;
+            }
         }
         internal_exception(INVALID_CHARACTER,
                            "Invalid character for chartype\n");
@@ -110,9 +123,9 @@ chartype_from_unicode_cparray(const CHARTYPE *from, const CHARTYPE *to,
 /*
  * Create chartype from mapping file
  * Still TODO:
- *   Handle encodings other than singlebyte
+ *   Handle more encodings (singlebyte & dbcs implemented so far)
  *   Create proper digit mapping table (currently always ascii)
- *   Create other variants of unicode mapping table
+ *   -> this is REQUIRED for DBCS!
  *   Path is hardcoded to "runtime/parrot/chartypes/<name>.TXT"
  *   Does direct file system IO - should probably use Parrot IO
  *   Better parsing code - e.g. handle erroneous input!
@@ -127,6 +140,7 @@ chartype_create_from_mapping(const char *name)
     INTVAL typecode;
     INTVAL unicode;
     INTVAL *cparray = NULL;
+    INTVAL *cparray2 = NULL;
     struct chartype_unicode_map_t *map;
     int one2one = 0;
 
@@ -142,17 +156,28 @@ chartype_create_from_mapping(const char *name)
         char *p = fgets(line, 80, f);
         if (line[0] != '#') {
             int n = sscanf(line, "%li\t%li", &typecode, &unicode);
-            if (n == 2 && typecode >= 0 && typecode < 256) {
-                if (typecode == one2one && unicode == typecode) {
+            if (n == 2 && typecode >= 0) {
+                if (typecode < 256 && typecode == one2one && 
+                    unicode == typecode) 
+                {
                     one2one++;
                 }
-                else {
+                else if (typecode < 256) {
                     if (!cparray) {
                         int size = (256 - one2one) * sizeof(INTVAL);
                         cparray = mem_sys_allocate(size);
                         memset(cparray, 0xFF, size);
                     }
                     cparray[typecode-one2one] = unicode;
+                }
+                /* XXX Should abort loading if invalid value found */
+                else if (typecode >= 128*256) {
+                    if (!cparray2) {
+                        int size = 128 * 256 * sizeof(INTVAL);
+                        cparray2 = mem_sys_allocate(size);
+                        memset(cparray2, 0xFF, size);
+                    }
+                    cparray2[typecode - (128*256)] = unicode;
                 }
             }
         }
@@ -162,16 +187,22 @@ chartype_create_from_mapping(const char *name)
     type = mem_sys_allocate(sizeof(CHARTYPE));
     type->index = -1;    /* will be allocated during registration */
     type->name = malloc_and_strcpy(name);
-    type->default_encoding = malloc_and_strcpy("singlebyte");
+    if (cparray2) {
+        type->default_encoding = malloc_and_strcpy("dbcs");
+    }
+    else {
+        type->default_encoding = malloc_and_strcpy("singlebyte");
+    }
+    type->from_unicode = chartype_from_unicode_cparray;
+    type->to_unicode = chartype_to_unicode_cparray;
     type->is_digit = chartype_is_digit_map1;
     type->get_digit = chartype_get_digit_map1;
     type->digit_map = &default_digit_map;
     map = mem_sys_allocate(sizeof(struct chartype_unicode_map_t));
     map->n1 = one2one;
     map->cparray = cparray;
+    map->cparray2 = cparray2;
     type->unicode_map = map;
-    type->from_unicode = chartype_from_unicode_cparray;
-    type->to_unicode = chartype_to_unicode_cparray;
     type->transcoders = NULL;
     chartype_register(type);
     return type;
