@@ -54,6 +54,7 @@ runops_cgoto_core(struct Parrot_Interp *interpreter, opcode_t *pc)
 #else
     PIO_eprintf(interpreter, "Computed goto unavailable in this configuration.\n");
     exit(1);
+    return NULL;
 #endif
 }
 
@@ -79,7 +80,7 @@ runops_slow_core(struct Parrot_Interp *interpreter, opcode_t *pc)
     code_end = interpreter->code->byte_code + code_size;
 
     if (Interp_flags_TEST(interpreter, PARROT_TRACE_FLAG)) {
-        trace_i = make_interpreter(0);
+        trace_i = make_interpreter(NO_FLAGS);
         Parrot_init(trace_i, (void*)& starttime);
         mem_sys_memcopy(&trace_i->ctx, &interpreter->ctx,
                 sizeof(struct Parrot_Context));
