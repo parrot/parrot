@@ -208,6 +208,7 @@ Parrot_readbc(Interp *interpreter, const char *filename)
 #ifdef PARROT_HAS_HEADER_SYSMMAN
     int fd = -1;
 #endif
+    char *fullname;
 
     if (filename == NULL || strcmp(filename, "-") == 0) {
         /* read from STDIN */
@@ -216,13 +217,16 @@ Parrot_readbc(Interp *interpreter, const char *filename)
         program_size = 0;
     }
     else {
+
         STRING *fs;
 
-        fs = interpreter->current_file = string_make(interpreter, filename,
-                strlen(filename), "iso-8859-1", 0);
+        fullname = Parrot_locate_runtime_file(interpreter, filename,
+                PARROT_RUNTIME_FT_PBC);
+        fs = interpreter->current_file = string_make(interpreter, fullname,
+                strlen(fullname), "iso-8859-1", 0);
         if (!Parrot_stat_info_intval(interpreter, fs, STAT_EXISTS)) {
             PIO_eprintf(interpreter, "Parrot VM: Can't stat %s, code %i.\n",
-                    filename, errno);
+                    fullname, errno);
             return NULL;
         }
         /*
@@ -232,10 +236,10 @@ Parrot_readbc(Interp *interpreter, const char *filename)
         program_size = Parrot_stat_info_intval(interpreter, fs, STAT_FILESIZE);
 
 #ifndef PARROT_HAS_HEADER_SYSMMAN
-        io = fopen(filename, "rb");
+        io = fopen(fullname, "rb");
         if (!io) {
             PIO_eprintf(interpreter, "Parrot VM: Can't open %s, code %i.\n",
-                    filename, errno);
+                    fullname, errno);
             return NULL;
         }
 #endif  /* PARROT_HAS_HEADER_SYSMMAN */
@@ -287,10 +291,10 @@ again:
 
 #ifdef PARROT_HAS_HEADER_SYSMMAN
 
-        fd = open(filename, O_RDONLY | O_BINARY);
+        fd = open(fullname, O_RDONLY | O_BINARY);
         if (!fd) {
             PIO_eprintf(interpreter, "Parrot VM: Can't open %s, code %i.\n",
-                    filename, errno);
+                    fullname, errno);
             return NULL;
         }
 
@@ -300,13 +304,13 @@ again:
         if (program_code == (void *)MAP_FAILED) {
             Parrot_warn(interpreter, PARROT_WARNINGS_IO_FLAG,
                     "Parrot VM: Can't mmap file %s, code %i.\n",
-                    filename, errno);
+                    fullname, errno);
             /* try again, now with IO reading the file */
-            io = fopen(filename, "rb");
+            io = fopen(fullname, "rb");
             if (!io) {
                 PIO_eprintf(interpreter,
                         "Parrot VM: Can't open %s, code %i.\n",
-                        filename, errno);
+                        fullname, errno);
                 return NULL;
             }
             goto again;
@@ -330,7 +334,7 @@ again:
     if (!PackFile_unpack
         (interpreter, pf, (opcode_t *)program_code, program_size)) {
         PIO_eprintf(interpreter, "Parrot VM: Can't unpack packfile %s.\n",
-                filename);
+                fullname);
         return NULL;
     }
 
