@@ -31,8 +31,5 @@ badargs:
  # control passes to the next item in the queue.
 
 done:
-  .pcc_begin_return
-    .return TCL_ERROR
-    .return retval
-  .pcc_end_return
+  .return(TCL_ERROR,retval)
 .end

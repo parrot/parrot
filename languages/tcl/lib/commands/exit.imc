@@ -24,8 +24,5 @@ exit:
 badargs:
   $P1 = new String
   $P1 = "wrong # args: should be \"exit ?returnCode?\"\n"
-  .pcc_begin_return
-    .return TCL_ERROR
-    .return $P1
-  .pcc_end_return
+  .return(TCL_ERROR,$P1)
 .end

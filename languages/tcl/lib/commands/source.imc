@@ -63,8 +63,5 @@ fail:
   retval = new String
   retval =  "bad call to source\n"
 done:
-  .pcc_begin_return
-    .return code
-    .return retval
-  .pcc_end_return
+  .return(code,retval)
 .end

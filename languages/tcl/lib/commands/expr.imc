@@ -47,8 +47,5 @@ loop_done:
   if return_type==TCL_ERROR goto done
   (return_type,retval) = expression_i(retval) 
 done:
-  .pcc_begin_return
-    .return return_type
-    .return retval
-  .pcc_end_return
+  .return(return_type,retval)
 .end

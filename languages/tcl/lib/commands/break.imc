@@ -23,8 +23,5 @@ noargs:
  # control passes to the next item in the queue.
 
 done:
-  .pcc_begin_return
-    .return return_type
-    .return retval
-  .pcc_end_return
+  .return(return_type,retval)
 .end

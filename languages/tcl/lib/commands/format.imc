@@ -21,8 +21,5 @@
   $P0 = $S0
 
 done:
-  .pcc_begin_return
-    .return TCL_OK
-    .return $P0
-  .pcc_end_return
+  .return(TCL_OK,$P0)
 .end

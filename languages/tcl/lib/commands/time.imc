@@ -62,10 +62,5 @@ done:
   retval = retval . " microseconds per iteration"
 
 real_done:
-
-  .pcc_begin_return
-    .return return_type
-    .return retval
-  .pcc_end_return
-
+  .return(return_type,retval)
 .end

@@ -49,8 +49,5 @@ error:
   value = "wrong # args: should be \"append varName ?value value ...?\""
 
 done:
-  .pcc_begin_return
-    .return return_type
-    .return $P1
-  .pcc_end_return
+  .return(return_type,$P1)
 .end

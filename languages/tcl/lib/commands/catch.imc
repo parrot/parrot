@@ -51,8 +51,5 @@ badargs:
   retval = "wrong # args: should be \"catch command ?varName?\"\n"
 
 done:
-  .pcc_begin_return
-    .return return_type
-    .return retval
-  .pcc_end_return
+  .return(return_type,retval)
 .end

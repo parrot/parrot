@@ -147,8 +147,5 @@ error:
   retval = "wrong # args: should be \"set varName ?newValue?\"\n"
 
 done:
-  .pcc_begin_return
-    .return return_type
-    .return retval
-  .pcc_end_return
+  .return(return_type,retval)
 .end

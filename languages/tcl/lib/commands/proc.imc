@@ -82,19 +82,19 @@ arg_loop_done:
   proc_body .= "\"]\nif I3 == "
   $S1 = arg_count
   proc_body .= $S1
-  proc_body .= " goto args_ok\nbad_args:\n.pcc_begin_return\n.return 1\n.return \"wrong # args: should be \\\""
+  proc_body .= " goto args_ok\nbad_args:\n.return(1,\"wrong # args: should be \\\""
   proc_body .= name
   proc_body .= " "
   proc_body .= args
-  proc_body .= "\\\"\"\n.pcc_end_return\nargs_ok:\n"
+  proc_body .= "\\\"\")\nargs_ok:\n"
 
   # XXX Is the pop_pad necessary, or would it be  handled as a side
-  #  effect of the .pcc_return?
+  #  effect of the .return?
  
   # a TCL_RETURN (2) from a sub body should be transformed into a TCL_OK (0)
   # to stop propagation outward.  XXX Should use the real constants here
 
-  proc_body .= "($I0,$P0) = interpret(proc_body)\nif $I0 != 2 goto done\n$I0 = 0\ndone:\npop_pad\n.pcc_begin_return\n.return $I0\n.return $P0\n.pcc_end_return\n.end\n"
+  proc_body .= "($I0,$P0) = interpret(proc_body)\nif $I0 != 2 goto done\n$I0 = 0\ndone:\npop_pad\n.return($I0,$P0)\n.end\n"
 
   #print "PROC_BODY=\n"
   #print proc_body
@@ -111,8 +111,5 @@ error:
   retval = "wrong # args: should be \"proc name args body\"\n"
 
 done:
-  .pcc_begin_return
-    .return return_type
-    .return retval
-  .pcc_end_return
+  .return(return_type,retval)
 .end

@@ -51,7 +51,7 @@ get_elseifs:
   if counter >= argc goto get_final
   temp_str = argv[counter]
   if temp_str != "elseif" goto get_else
-  $P1 = new PerlArray
+  $P1 = new TclList
   inc counter
   $P2 = argv[counter]
   $P1[0] = $P2
@@ -109,8 +109,5 @@ done:
   (return_type,retval) = interpret($P1)
 
 done_final:
-  .pcc_begin_return
-    .return return_type
-    .return retval
-  .pcc_end_return
+  .return(return_type,retval)
 .end

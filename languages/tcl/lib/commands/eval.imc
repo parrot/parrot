@@ -39,8 +39,5 @@ loop_done:
   ($I0,$P0) = interpret($P1) 
 
 done:
-  .pcc_begin_return
-    .return $I0
-    .return $P0
-  .pcc_end_return
+  .return($I0,$P0)
 .end

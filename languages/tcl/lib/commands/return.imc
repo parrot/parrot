@@ -32,8 +32,5 @@ noargs:
  # control passes to the next item in the queue.
 
 done:
-  .pcc_begin_return
-    .return TCL_RETURN
-    .return retval
-  .pcc_end_return
+  .return(TCL_RETURN,retval)
 .end

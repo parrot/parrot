@@ -82,9 +82,5 @@ arg_loop_done:
    retval = $S0
  
 done:
-  .pcc_begin_return
-    .return TCL_OK
-    .return retval
-  .pcc_end_return
-
+  .return(TCL_OK,retval)
 .end

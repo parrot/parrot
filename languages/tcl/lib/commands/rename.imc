@@ -52,8 +52,5 @@ done:
 
   store_global "commands", commands
 
-  .pcc_begin_return
-    .return return_type
-    .return retval
-  .pcc_end_return
+  .return(return_type,retval)
 .end
