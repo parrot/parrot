@@ -39,6 +39,7 @@ use Parrot::Docs::Group;
 
 use Parrot::Docs::Item;
 use Parrot::Docs::Directory;
+use Parrot::Docs::HTMLPage;
 
 =item C<root_section()>
 
@@ -50,9 +51,9 @@ sub root_section
 {
     my $self = shift;
 
-	require Parrot::Docs::Section::Parrot;
-	
-	return Parrot::Docs::Section::Parrot->new;
+    require Parrot::Docs::Section::Parrot;
+    
+    return Parrot::Docs::Section::Parrot->new;
 }
 
 =item C<is_root_section()>
@@ -65,7 +66,7 @@ sub is_root_section
 {
     my $self = shift;
     
-	return $self->isa('Parrot::Docs::Section::Parrot');
+    return $self->isa('Parrot::Docs::Section::Parrot');
 }
 
 =item C<new_section($name, $text, @items)>
@@ -116,19 +117,19 @@ Returns the HTML link for the section.
 
 sub html_link
 {
-	my $self = shift;
-	my $path = shift;
-	
-	if ( $path )
-	{
-		$path = join('/', $path, $self->{INDEX_PATH});
-	}
-	else
-	{
-		$path = $self->{INDEX_PATH};
-	}
-	
-	return '<a href="' . $path . '">' . $self->name . '</a>';
+    my $self = shift;
+    my $path = shift;
+    
+    if ( $path )
+    {
+        $path = join('/', $path, $self->{INDEX_PATH});
+    }
+    else
+    {
+        $path = $self->{INDEX_PATH};
+    }
+    
+    return '<a href="' . $path . '">' . $self->name . '</a>';
 }
 
 =item C<write_html($source, $target, $silent)>
@@ -162,64 +163,13 @@ sub write_html
 
     my $index = $target->file_with_name($self->{INDEX_PATH});
     
-    $index->write($self->html_header);
+    $index->write(
+        Parrot::Docs::HTMLPage->header(
+            $self->name, $self->html_navigation, '../resources'));
     $index->append($index_html);
-    $index->append($self->html_footer);
+    $index->append(Parrot::Docs::HTMLPage->footer);
     
     return $self->html_link . "<br>\n";
-}
-
-=item C<html_header()>
-
-Returns the HTML header.
-
-=cut
-
-sub html_header
-{
-	my $self = shift;
-    my $title = $self->name;
-	my $navigation = $self->html_navigation;
-	
-    <<"HEADER";
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
-    "http://www.w3.org/TR/REC-html40/loose.dtd">
-<html>  
-    <head><title>$title</title>
-        <link rel="stylesheet" href="../resources/perl-styles.css" 
-            type="text/css" />
-    </head>
-<body> 
-    <a name="_top"></a>
-    <table width=100%>
-        <tr>
-            <td align="LEFT" valign="TOP">
-            	$navigation
-            </td>
-            <td align="RIGHT">
-                <img src="../resources/parrot.small.png">
-            </td>
-        </tr>
-    </table>
-    <div class="pod">
-HEADER
-}
-
-=item C<html_footer()>
-
-Returns the HTML footer.
-
-=cut
-
-sub html_footer
-{
-	my $self = shift;
-	
-	<<'FOOTER';
-        </div>
-    </body>
-</html>
-FOOTER
 }
 
 =back
