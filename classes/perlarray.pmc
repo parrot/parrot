@@ -37,6 +37,22 @@ static void resize_array ( struct Parrot_Interp *interpreter, PMC* self, INTVAL 
     self->cache.int_val = size;
 }
 
+static INTVAL kp2int(Interp *interpreter, KEY_PAIR* kp) {
+    switch ((int)kp->type) {
+        case enum_key_undef:
+        default:
+            return 0;
+        case enum_key_int:
+            return kp->cache.int_val;
+        case enum_key_num:
+            return (INTVAL)kp->cache.num_val;
+        case enum_key_pmc:
+            return kp->cache.pmc_val->vtable->get_integer(interpreter, kp->cache.pmc_val);
+        case enum_key_string:
+            return string_to_int(kp->cache.struct_val);
+    }
+}
+
 pmclass PerlArray {
 
     INTVAL type () {
@@ -77,7 +93,6 @@ pmclass PerlArray {
     }
 
     INTVAL get_integer_keyed (KEY * key) {
-        KEY_PAIR* kp;
         INTVAL ix;
         PMC* value;
         PMC** array;
@@ -86,8 +101,7 @@ pmclass PerlArray {
             return 0;
         }
 
-        kp = &key->keys[0];
-        ix = kp->cache.int_val;
+        ix = kp2int(interpreter, &key->keys[0]);
 
         if (ix >= SELF->cache.int_val) {
 	    resize_array(interpreter, SELF, ix+1);
@@ -107,7 +121,6 @@ pmclass PerlArray {
     }
 
     FLOATVAL get_number_keyed (KEY * key) {
-        KEY_PAIR* kp;
         INTVAL ix;
         PMC* value;
         PMC** array;
@@ -116,8 +129,7 @@ pmclass PerlArray {
             return 0;
         }
 
-        kp = &key->keys[0];
-        ix = kp->cache.int_val;
+        ix = kp2int(interpreter, &key->keys[0]);
 
         if (ix >= SELF->cache.int_val) {
 	    resize_array(interpreter, SELF, ix+1);
@@ -137,7 +149,6 @@ pmclass PerlArray {
     }
 
     STRING* get_string_keyed (KEY * key) {
-        KEY_PAIR* kp;
         INTVAL ix;
         PMC* value;
         PMC** array;
@@ -146,8 +157,7 @@ pmclass PerlArray {
             return 0;
         }
 
-        kp = &key->keys[0];
-        ix = kp->cache.int_val;
+        ix = kp2int(interpreter, &key->keys[0]);
 
         if (ix >= SELF->cache.int_val) {
 	    resize_array(interpreter, SELF, ix+1);
@@ -197,7 +207,6 @@ pmclass PerlArray {
     }
 
     void set_integer_keyed (KEY * key, INTVAL value) {
-        KEY_PAIR* kp;
         INTVAL ix;
         PMC* pmc2;
         PMC** array;
@@ -206,8 +215,7 @@ pmclass PerlArray {
             return;
         }
 
-        kp = &key->keys[0];
-        ix = kp->cache.int_val;
+	ix = kp2int(interpreter, &key->keys[0]);
 
         if (ix >= SELF->cache.int_val) {
 	    resize_array(interpreter, SELF, ix+1);
@@ -242,7 +250,6 @@ pmclass PerlArray {
     }
 
     void set_number_keyed (KEY * key, FLOATVAL value) {
-        KEY_PAIR* kp;
         INTVAL ix;
         PMC* pmc2;
         PMC** array;
@@ -251,8 +258,7 @@ pmclass PerlArray {
             return;
         }
 
-        kp = &key->keys[0];
-        ix = kp->cache.int_val;
+	ix = kp2int(interpreter, &key->keys[0]);
 
         if (ix >= SELF->cache.int_val) {
 	    resize_array(interpreter, SELF, ix+1);
@@ -285,7 +291,6 @@ pmclass PerlArray {
     }
 
     void set_string_keyed (KEY * key, STRING * value) {
-        KEY_PAIR* kp;
         INTVAL ix;
         PMC* pmc2;
         PMC** array;
@@ -294,8 +299,7 @@ pmclass PerlArray {
             return;
         }
 
-        kp = &key->keys[0];
-        ix = kp->cache.int_val;
+	ix = kp2int(interpreter, &key->keys[0]);
 
         if (ix >= SELF->cache.int_val) {
 	    resize_array(interpreter, SELF, ix+1);

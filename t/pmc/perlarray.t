@@ -1,6 +1,6 @@
 #! perl -w
 
-use Parrot::Test tests => 5;
+use Parrot::Test tests => 6;
 use Test::More;
 
 output_is(<<'CODE', <<'OUTPUT', "size of the array");
@@ -75,6 +75,37 @@ CODE
 3
 3.700000
 hey
+OUTPUT
+
+output_is(<<'CODE', <<'OUTPUT', "keys of different types");
+        new P0, PerlArray
+        set_keyed P0, 5.0, 3
+        set I0, P0
+        bsr PRINT
+        set_keyed P0, "10", 6
+        set I0, P0
+        bsr PRINT
+        set_keyed P0, 15, 9
+        set I0, P0
+        bsr PRINT
+        get_keyed I0, P0, 5
+        bsr PRINT
+        get_keyed I0, P0, 10
+        bsr PRINT
+        get_keyed I0, P0, 15
+        bsr PRINT
+        end
+PRINT:
+        print I0
+        print "\n"
+        ret
+CODE
+6
+11
+16
+3
+6
+9
 OUTPUT
 
 output_is(<<'CODE', <<'OUTPUT', "If P");
