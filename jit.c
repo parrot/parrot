@@ -912,15 +912,6 @@ build_asm(struct Parrot_Interp *interpreter, opcode_t *pc,
                 Parrot_jit_save_registers(jit_info, interpreter);
             }
 
-#ifdef jit_emit_noop
-            if (map[cur_op - code_start] == JIT_BRANCH_TARGET) {
-                char *opc = jit_info->native_ptr;
-                while ((long)jit_info->native_ptr & ((1<<JUMP_ALIGN) - 1))
-                    jit_emit_noop(jit_info->native_ptr);
-                jit_info->arena.op_map[jit_info->op_i].offset +=
-                    jit_info->native_ptr - opc;
-            }
-#endif
             /* Generate native code for current op */
             (op_jit[cur_opcode_byte].fn) (jit_info, interpreter);
 
@@ -933,6 +924,16 @@ build_asm(struct Parrot_Interp *interpreter, opcode_t *pc,
             jit_info->cur_op +=
                 interpreter->op_info_table[cur_opcode_byte].arg_count;
             cur_op = jit_info->cur_op;
+
+            /* if this is a branch target, align it */
+#ifdef jit_emit_noop
+#  if JUMP_ALIGN
+            if (map[cur_op - code_start] == JIT_BRANCH_TARGET) {
+                while ((long)jit_info->native_ptr & ((1<<JUMP_ALIGN) - 1))
+                    jit_emit_noop(jit_info->native_ptr);
+            }
+#  endif
+#endif
 
             /* set the offset */
             jit_info->arena.op_map[jit_info->op_i].offset =

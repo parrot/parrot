@@ -1671,6 +1671,14 @@ Parrot_jit_emit_finit(Parrot_jit_info_t *jit_info)
 #    define PMC_REG(x) interpreter->ctx.pmc_reg.registers[x]
 #  endif
 
+static void call_func(Parrot_jit_info_t *jit_info, void *addr)
+{
+    Parrot_jit_newfixup(jit_info);
+    jit_info->arena.fixups->type = JIT_X86CALL;
+    jit_info->arena.fixups->param.fptr = addr;
+    emitm_calll(jit_info->native_ptr, 0xdeafc0de);
+}
+
 #  ifndef NO_JIT_VTABLE_OPS
 
 #    undef Parrot_jit_vtable1_op
@@ -1989,10 +1997,7 @@ Parrot_jit_vtable_newp_ic_op(Parrot_jit_info_t *jit_info,
     /* push pmc enum and interpreter */
     emitm_pushl_i(jit_info->native_ptr, i2);
     emitm_pushl_i(jit_info->native_ptr, interpreter);
-    Parrot_jit_newfixup(jit_info);
-    jit_info->arena.fixups->type = JIT_X86CALL;
-    jit_info->arena.fixups->param.fptr = (void (*)(void))pmc_new_noinit;
-    emitm_calll(jit_info->native_ptr, 0xdeafc0de);
+    call_func(jit_info, (void (*)(void))pmc_new_noinit);
     /* result = eax = PMC */
     jit_emit_mov_mr_i(jit_info->native_ptr,
             &interpreter->ctx.pmc_reg.registers[p1], emit_EAX);
@@ -2016,12 +2021,8 @@ Parrot_jit_normal_op(Parrot_jit_info_t *jit_info,
 {
     emitm_pushl_i(jit_info->native_ptr, jit_info->cur_op);
 
-    Parrot_jit_newfixup(jit_info);
-    jit_info->arena.fixups->type = JIT_X86CALL;
-    jit_info->arena.fixups->param.fptr =
-        (void (*)(void))interpreter->op_func_table[*(jit_info->cur_op)];
-
-    emitm_calll(jit_info->native_ptr, 0xdeafc0de);
+    call_func(jit_info,
+        (void (*)(void))interpreter->op_func_table[*(jit_info->cur_op)]);
     emitm_addb_i_r(jit_info->native_ptr, 4, emit_ESP);
 }
 
