@@ -130,7 +130,7 @@ my $nm_ro; # can tell apart read-only (const) data sections
 
 my ($Code, $Data, $Init, $Uninit, $Const, $Mutable,
     $Global, $Local, $Undef, $Def, $File,
-    $ObjectName, $Type, $LongType, $Help, $Version);
+    $ObjectName, $Type, $BSD, $Long, $Help, $Version);
 
 sub show_version {
     print "$ME: $VERSION ( $RCS_DATE)\n";
@@ -155,8 +155,9 @@ They can also be negated with a "no", for example --noconst.
     You can try GNU nm if you want this feature.
 --objectname	prepend the object name before the symbol name
 --t		append the short BSD-style type (in parentheses above)
---type=bsd	same as --t
+--type=bsd	same as --t (also -B works)
 --type=long	append a long type (e.g. "global_const_init_data" versus "R")
+                (also -L works)
 --help		show this help
 --version	show version
 All the options can be shortened to their unique prefixes,
@@ -198,6 +199,8 @@ unless (GetOptions('code!'      => \$Code,
 		   'file!'      => \$File,
 		   'objectname' => \$ObjectName,
 		   't'          => \$Type,
+		   'bsd|B'      => \$BSD,
+		   'long|L'     => \$Long,
 		   'type:s'     => \$Type,
 		   'help'       => \$Help,
 		   'version'    => \$Version,
@@ -240,7 +243,9 @@ warn_if_both($Def,    $Undef,   'def',    'undef');
 $Undef ||= !$Def if defined $Def && !defined $Undef;
 
 my %Type; @Type{qw(bsd long)} = ();
-$Type = 'bsd' if defined $Type && $Type eq '1'; # So they used --t.
+$Type = 'bsd' if $BSD ||
+		 (defined $Type && $Type eq '1'); # So they used --t.
+$Type = 'long' if $Long; 
 die "$ME: --type=$Type unknown\n"
     if defined $Type && $Type ne '' && !exists $Type{$Type};
 
