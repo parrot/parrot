@@ -19,7 +19,10 @@ string.o: $(H_FILES)
 
 strnative.o: $(H_FILES)
 
-interpreter.o: $(H_FILES)
+interp_guts.h: opcode_table
+	perl build_interp_starter.pl
+
+interpreter.o: $(H_FILES) interp_guts.h
 
 memory.o: $(H_FILES)
 
@@ -29,4 +32,7 @@ parrot.o: $(H_FILES)
 
 register.o: $(H_FILES)
 
-basic_opcodes.o: $(H_FILES)
+basic_opcodes.o: $(H_FILES) basic_opcodes.c
+
+basic_opcodes.c: basic_opcodes.ops
+	perl process_opfunc.pl basic_opcodes.ops

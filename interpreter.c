@@ -6,6 +6,7 @@
 
 
 #include "parrot.h"
+#include "interp_guts.h"
 
 void runops (struct Perl_Interp *interpreter, IV *code) {
   while (code) {
@@ -75,37 +76,8 @@ struct Perl_Interp *make_interpreter() {
     void **foo;
     foo = Sys_Allocate(2048 * sizeof(void *));
 
-    foo[0] = set_i_ic;
-    foo[1] = add_i;
-    foo[7] = sub_i;
-    foo[8] = mul_i;
-    foo[9] = div_i;
-    foo[2] = eq_i_ic;
-    foo[3] = time_i;
-    foo[4] = print_i;
-    foo[5] = branch_ic;
-    foo[6] = end;
-    foo[10] = if_i_ic;
-    foo[11] = inc_i;
-    foo[12] = inc_i_ic;
-    foo[13] = dec_i;
-    foo[14] = dec_i_ic;
-    foo[15] = jump_i;
-    foo[16] = set_n_nc;
-    foo[17] = add_n;
-    foo[18] = sub_n;
-    foo[19] = mul_n;
-    foo[20] = div_n;
-    foo[21] = eq_n_ic;
-    foo[22] = time_n;
-    foo[23] = print_n;
-    foo[24] = if_n_ic;
-    foo[25] = inc_n;
-    foo[26] = inc_n_nc;
-    foo[27] = dec_n;
-    foo[28] = dec_n_nc;
-    foo[29] = iton_n_i;
-    foo[30] = ntoi_i_n;
+    BUILD_TABLE(foo);
+
     (void *)interpreter->opcode_funcs = foo;
   }
 
