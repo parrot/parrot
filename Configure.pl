@@ -292,7 +292,7 @@ if ($c{gccversion}) {
 
     
     my @opt_and_vers = 
-        (0 => "-Wall -ansi -pedantic -Wstrict-prototypes -Wmissing-prototypes -Winline -Wredundant-decls -Wshadow -Wpointer-arith -Wcast-qual -Wcast-align -Wwrite-strings -Wconversion -Waggregate-return -Winline -W -Wsign-compare",
+        (0 => "-Wall -ansi -pedantic -Wstrict-prototypes -Wmissing-prototypes -Winline -Wshadow -Wpointer-arith -Wcast-qual -Wcast-align -Wwrite-strings -Wconversion -Waggregate-return -Winline -W -Wsign-compare",
         # others; ones we might like marked with ?
         # ? -Wundef for undefined idenfiers in #if
         # ? -Wbad-function-cast
