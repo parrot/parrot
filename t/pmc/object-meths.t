@@ -268,8 +268,8 @@ in sub
 done
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "methods: self");
-##PIR##
+pir_output_is(<<'CODE', <<'OUTPUT', "methods: self");
+
 .sub _main
     .local pmc A
     .local pmc B
@@ -326,8 +326,8 @@ A::blah
 B::foo
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "methods: self w arg");
-##PIR##
+pir_output_is(<<'CODE', <<'OUTPUT', "methods: self w arg");
+
 .sub _main
     .local pmc A
     .local pmc B
@@ -381,8 +381,8 @@ A::blah
 B::foo
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "methods: self w arg and ret");
-##PIR##
+pir_output_is(<<'CODE', <<'OUTPUT', "methods: self w arg and ret");
+
 .sub _main
     .local pmc A
     .local pmc B
@@ -709,8 +709,8 @@ in sub
 done
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "same method name in two namespaces");
-##PIR##
+pir_output_is(<<'CODE', <<'OUTPUT', "same method name in two namespaces");
+
 .namespace ["A"]
 .sub foo method
     .param int i
@@ -735,8 +735,8 @@ CODE
 ok
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "self - CURRENT_OBJECT");
-##PIR##
+pir_output_is(<<'CODE', <<'OUTPUT', "self - CURRENT_OBJECT");
+
 .sub _main
     .local pmc A
 
@@ -761,8 +761,8 @@ CODE
 ok
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "Bug in method calling with nonconst keys");
-##PIR##
+pir_output_is(<<'CODE', <<'OUTPUT', "Bug in method calling with nonconst keys");
+
 .sub _main
     newclass $P0, "Foo"
 
@@ -791,8 +791,8 @@ Key = foo
 Key = foo
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "Bug in method calling with nonconst keys - clobber");
-##PIR##
+pir_output_is(<<'CODE', <<'OUTPUT', "Bug in method calling with nonconst keys - clobber");
+
 .sub _main
     newclass $P0, "Foo"
 

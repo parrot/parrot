@@ -371,8 +371,8 @@ ok \d
 ok \d/
 OUT
 
-output_is(<< 'CODE', << 'OUTPUT', "OrderedHash in PIR with PMC value");
-##PIR##
+pir_output_is(<< 'CODE', << 'OUTPUT', "OrderedHash in PIR with PMC value");
+
 .sub _main
     .local pmc hash1
     hash1 = new OrderedHash
@@ -393,8 +393,8 @@ U
 OUTPUT
 
 
-output_is(<< 'CODE', << 'OUTPUT', "OrderedHash set_integer_keyed");
-##PIR##
+pir_output_is(<< 'CODE', << 'OUTPUT', "OrderedHash set_integer_keyed");
+
 .sub _main
     .local pmc hash1
     hash1 = new OrderedHash
@@ -411,8 +411,8 @@ CODE
 14
 OUTPUT
 
-output_is(<< 'CODE', << 'OUTPUT', "OrderedHash set_string_keyed");
-##PIR##
+pir_output_is(<< 'CODE', << 'OUTPUT', "OrderedHash set_string_keyed");
+
 .sub _main
     .local pmc hash1
     hash1 = new OrderedHash
@@ -431,8 +431,8 @@ CODE
 U
 OUTPUT
 
-output_is(<< 'CODE', << 'OUTPUT', "OrderedHash set_string_keyed");
-##PIR##
+pir_output_is(<< 'CODE', << 'OUTPUT', "OrderedHash set_string_keyed");
+
 .sub _main
     .local pmc hash1
     hash1 = new OrderedHash
@@ -451,8 +451,8 @@ OUTPUT
 
 
 # actually Parrot_OrderedHash_set_string_keyed is used, why ?
-output_is(<< 'CODE', << 'OUTPUT', "OrderedHash set_string_keyed_str");
-##PIR##
+pir_output_is(<< 'CODE', << 'OUTPUT', "OrderedHash set_string_keyed_str");
+
 .sub _main
     .local pmc hash1
     hash1 = new OrderedHash
@@ -472,8 +472,8 @@ CODE
 15
 OUTPUT
 
-output_is(<< 'CODE', << 'OUTPUT', "OrderedHash set_number_keyed");
-##PIR##
+pir_output_is(<< 'CODE', << 'OUTPUT', "OrderedHash set_number_keyed");
+
 .sub _main
     .local pmc hash1
     hash1 = new OrderedHash
@@ -493,8 +493,8 @@ CODE
 -16.160000
 OUTPUT
 
-output_is(<< 'CODE', << 'OUTPUT', "OrderedHash get_integer");
-##PIR##
+pir_output_is(<< 'CODE', << 'OUTPUT', "OrderedHash get_integer");
+
 .sub _main
     .local pmc hash1
     hash1 = new OrderedHash
@@ -555,8 +555,8 @@ P0["b"]: B
 OUTPUT
 
 
-output_is(<< 'CODE', << 'OUTPUT', "check whether interface is done");
-##PIR##
+pir_output_is(<< 'CODE', << 'OUTPUT', "check whether interface is done");
+
 .sub _main
     .local pmc pmc1
     pmc1 = new OrderedHash

@@ -138,8 +138,8 @@ output_is(<<'CODE', 32, "Predeclared opcodes");
      end
 CODE
 
-output_is(<<'CODE', <<'OUTPUT', "pir syntax with marker - is");
-##PIR##
+pir_output_is(<<'CODE', <<'OUTPUT', "pir syntax with marker - is");
+
 .sub _main
      .const string OK = "ok\n"
      print OK
@@ -150,8 +150,8 @@ CODE
 ok
 OUTPUT
 
-output_isnt(<<'CODE', <<'OUTPUT', "pir syntax with marker - isnt");
-##PIR##
+pir_output_isnt(<<'CODE', <<'OUTPUT', "pir syntax with marker - isnt");
+
 .sub _main
      .const string OK = "ok\n"
      print OK
@@ -162,8 +162,8 @@ CODE
 parrot
 OUTPUT
 
-output_like(<<'CODE', <<'OUTPUT', "pir syntax with marker - like");
-##PIR##
+pir_output_like(<<'CODE', <<'OUTPUT', "pir syntax with marker - like");
+
 .sub _main
      .const string OK = "ok\n"
      print OK
@@ -207,7 +207,7 @@ CODE
 /^\w{2}\s\d\s+$/
 OUTPUT
 
-my $CODE = '##PIR##
+my $CODE = '
 .sub _main
     print "ok\n"
     end
@@ -215,7 +215,7 @@ my $CODE = '##PIR##
 
 #.namespace'; # no \n at end of file
 
-output_like( $CODE, <<'OUTPUT', "end of line handling");
+pir_output_like( $CODE, <<'OUTPUT', "end of line handling");
 /unexpected/
 OUTPUT
 

@@ -1,5 +1,5 @@
 #! perl -w
-# Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+# Copyright: 2001-2005 The Perl Foundation.  All Rights Reserved.
 # $Id$
 
 =head1 NAME
@@ -1069,8 +1069,8 @@ back
 OUTPUT
 
 
-output_like(<<'CODE', <<'OUTPUT', "warn on in main");
-##PIR##
+pir_output_like(<<'CODE', <<'OUTPUT', "warn on in main");
+
 .sub _main @MAIN
 .include "warnings.pasm"
     warningson .PARROT_WARNINGS_UNDEF_FLAG
@@ -1084,8 +1084,8 @@ CODE
 /uninit/
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "warn on in sub");
-##PIR##
+pir_output_is(<<'CODE', <<'OUTPUT', "warn on in sub");
+
 .sub _main @MAIN
 .include "warnings.pasm"
     _f1()
@@ -1100,8 +1100,8 @@ CODE
 ok
 OUTPUT
 
-output_like(<<'CODE', <<'OUTPUT', "warn on in sub, turn off in f2");
-##PIR##
+pir_output_like(<<'CODE', <<'OUTPUT', "warn on in sub, turn off in f2");
+
 .sub _main @MAIN
 .include "warnings.pasm"
     _f1()
@@ -1190,8 +1190,8 @@ ok 1
 ok 2
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "sub names w newsub");
-##PIR##
+pir_output_is(<<'CODE', <<'OUTPUT', "sub names w newsub");
+
 .sub main @MAIN
     .include "interpinfo.pasm"
     $P0 = interpinfo .INTERPINFO_CURRENT_SUB
@@ -1214,8 +1214,8 @@ CODE
 mainfoobarfoo
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "caller introspection");
-##PIR##
+pir_output_is(<<'CODE', <<'OUTPUT', "caller introspection");
+
 .sub main @MAIN
 .include "interpinfo.pasm"
     # this test will fail when run with -Oc
@@ -1278,7 +1278,6 @@ OUTPUT
     # its not captured by the test system
 
     my $code = << 'CODE';
-##PIR##
 .sub optc @IMMEDIATE, @POSTCOMP
     print "initial\n"
 .end
@@ -1299,7 +1298,7 @@ OUTPUT
             output_is( $code, $output, $descr);
         };
     } else {
-        output_is( $code, $output, $descr);
+        pir_output_is( $code, $output, $descr);
     }
 }
 

@@ -18,8 +18,8 @@ Tests the multi-method dispatch.
 
 use Parrot::Test tests => 9;
 
-output_is(<<'CODE', <<'OUTPUT', "PASM divide");
-##PIR##
+pir_output_is(<<'CODE', <<'OUTPUT', "PASM divide");
+
 .sub _main
 
 .include "pmctypes.pasm"
@@ -53,8 +53,8 @@ CODE
 3
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "1+1=3");
-##PIR##
+pir_output_is(<<'CODE', <<'OUTPUT', "1+1=3");
+
 .sub _main
 
 .include "pmctypes.pasm"
@@ -89,8 +89,8 @@ CODE
 3
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "PASM divide - override builtin");
-##PIR##
+pir_output_is(<<'CODE', <<'OUTPUT', "PASM divide - override builtin");
+
 .sub _main
 
 .include "pmctypes.pasm"
@@ -121,8 +121,8 @@ CODE
 42
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "INTVAL return numeq");
-##PIR##
+pir_output_is(<<'CODE', <<'OUTPUT', "INTVAL return numeq");
+
 .sub _main
 
 .include "pmctypes.pasm"
@@ -153,8 +153,8 @@ CODE
 -42
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "mmdvtfind");
-##PIR##
+pir_output_is(<<'CODE', <<'OUTPUT', "mmdvtfind");
+
 .sub _main
 
 .include "pmctypes.pasm"
@@ -186,8 +186,8 @@ ok 1
 ok 2
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "mmdvtfind - invoke it");
-##PIR##
+pir_output_is(<<'CODE', <<'OUTPUT', "mmdvtfind - invoke it");
+
 .sub _main
 
 .include "pmctypes.pasm"
@@ -240,8 +240,8 @@ print S <<'EOF';
 EOF
 close S;
 
-output_is(<<'CODE', <<'OUTPUT', "PASM MMD divide - loaded sub");
-##PIR##
+pir_output_is(<<'CODE', <<'OUTPUT', "PASM MMD divide - loaded sub");
+
 .sub _main
 
 .include "pmctypes.pasm"

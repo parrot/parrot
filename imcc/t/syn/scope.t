@@ -1,10 +1,13 @@
-#!perl
+#!perl -w
+# Copyright: 2001-2005 The Perl Foundation.  All Rights Reserved.
+# $Id$
+
 use strict;
-use TestCompiler tests => 1;
+use Parrot::Test tests => 1;
 
 ##############################
-output_is(<<'CODE', <<'OUT', "global const");
-.sub _main
+pir_output_is(<<'CODE', <<'OUT', "global const");
+.sub test @MAIN
 	.globalconst string ok = "ok\n"
 	print ok
 	bsr _sub

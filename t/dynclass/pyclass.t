@@ -18,8 +18,8 @@ Tests the Python Class PMC.
 
 use Parrot::Test tests => 6;
 
-output_is(<< 'CODE', << 'OUTPUT', "attribute");
-##PIR##
+pir_output_is(<< 'CODE', << 'OUTPUT', "attribute");
+
 .sub main @MAIN
     loadlib $P0, "python_group"
 
@@ -41,8 +41,8 @@ CODE
 1
 OUTPUT
 
-output_is(<< 'CODE', << 'OUTPUT', "method");
-##PIR##
+pir_output_is(<< 'CODE', << 'OUTPUT', "method");
+
 .sub __main__
     loadlib $P0, "python_group"
 
@@ -71,8 +71,8 @@ CODE
 1
 OUTPUT
 
-output_is(<< 'CODE', << 'OUTPUT', "classname");
-##PIR##
+pir_output_is(<< 'CODE', << 'OUTPUT', "classname");
+
 .sub main @MAIN
     loadlib $P0, "python_group"
 
@@ -95,8 +95,8 @@ CODE
 c
 OUTPUT
 
-output_is(<< 'CODE', << 'OUTPUT', "delprop");
-##PIR##
+pir_output_is(<< 'CODE', << 'OUTPUT', "delprop");
+
 .sub main @MAIN
     loadlib $P0, "python_group"
 
@@ -135,8 +135,8 @@ CODE
 AttributeError: c instance has no attribute 'x'
 OUTPUT
 
-output_is(<< 'CODE', << 'OUTPUT', "nested subclasses");
-##PIR##
+pir_output_is(<< 'CODE', << 'OUTPUT', "nested subclasses");
+
 .sub main @MAIN
     loadlib $P0, "python_group"
 
@@ -177,8 +177,8 @@ CODE
 2
 OUTPUT
 
-output_is(<< 'CODE', << 'OUTPUT', "overriding builtins");
-##PIR##
+pir_output_is(<< 'CODE', << 'OUTPUT', "overriding builtins");
+
 .sub __main__ @MAIN
     new_pad 0
     loadlib P1, 'python_group'

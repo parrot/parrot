@@ -613,8 +613,8 @@ CODE
 5
 OUTPUT
 
-output_is(<< 'CODE', << 'OUTPUT', "check whether interface is done");
-##PIR##
+pir_output_is(<< 'CODE', << 'OUTPUT', "check whether interface is done");
+
 .sub _main
     .local pmc pmc1
     pmc1 = new Complex
@@ -649,8 +649,8 @@ CODE
 10+20i
 OUTPUT
 
-output_is(<< 'CODE', << 'OUTPUT', "instantiate, PIR, N");
-##PIR##
+pir_output_is(<< 'CODE', << 'OUTPUT', "instantiate, PIR, N");
+
 .sub main
     $P0 = getclass "Complex"
     $P1 = $P0."instantiate"(2.0, 3.0)
@@ -662,8 +662,8 @@ CODE
 2+3i
 OUTPUT
 
-output_is(<< 'CODE', << 'OUTPUT', "instantiate, PIR, P");
-##PIR##
+pir_output_is(<< 'CODE', << 'OUTPUT', "instantiate, PIR, P");
+
 .sub main
     $P0 = getclass "Complex"
     $P1 = new Float
@@ -679,8 +679,8 @@ CODE
 2+3i
 OUTPUT
 
-output_is(<< 'CODE', << 'OUTPUT', "instantiate, PIR, S");
-##PIR##
+pir_output_is(<< 'CODE', << 'OUTPUT', "instantiate, PIR, S");
+
 .sub main
     $P0 = getclass "Complex"
     $P1 = $P0."instantiate"("2 + 3i")

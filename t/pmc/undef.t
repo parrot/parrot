@@ -32,8 +32,8 @@ foofoo
 OUTPUT
 
 
-output_is(<<'CODE', <<'OUTPUT', "get_bool");
-##PIR##
+pir_output_is(<<'CODE', <<'OUTPUT', "get_bool");
+
 .sub _main
     .local pmc pmc1
     pmc1 = new Undef
@@ -49,8 +49,8 @@ A PMC Undef created by new is not
 OUTPUT
 
 
-output_is(<<'CODE', <<'OUTPUT', "defined");
-##PIR##
+pir_output_is(<<'CODE', <<'OUTPUT', "defined");
+
 .sub _main
     .local pmc pmc1
     pmc1 = new Undef
@@ -68,8 +68,8 @@ A PMC Undef is not defined.
 OUTPUT
 
 
-output_is(<<'CODE', <<'OUTPUT', "get_string");
-##PIR##
+pir_output_is(<<'CODE', <<'OUTPUT', "get_string");
+
 .sub _main
     .local pmc pmc1
     pmc1 = new Undef
@@ -83,8 +83,8 @@ beforeafter
 OUTPUT
 
 
-output_is(<<'CODE', <<'OUTPUT', "morph to integer");
-##PIR##
+pir_output_is(<<'CODE', <<'OUTPUT', "morph to integer");
+
 .sub _main
     .local pmc pmc1
     pmc1 = new Undef
@@ -102,8 +102,8 @@ CODE
 OUTPUT
 
 
-output_is(<<'CODE', <<'OUTPUT', "morph to float");
-##PIR##
+pir_output_is(<<'CODE', <<'OUTPUT', "morph to float");
+
 .sub _main
     .local pmc pmc1
     pmc1 = new Undef
@@ -121,8 +121,8 @@ CODE
 OUTPUT
 
 
-output_is(<<'CODE', <<'OUTPUT', "morph to float");
-##PIR##
+pir_output_is(<<'CODE', <<'OUTPUT', "morph to float");
+
 .sub _main
     .local pmc pmc1
     pmc1 = new Undef
@@ -140,8 +140,8 @@ CODE
 OUTPUT
 
 
-output_is(<<'CODE', <<'OUTPUT', "set_integer_native");
-##PIR##
+pir_output_is(<<'CODE', <<'OUTPUT', "set_integer_native");
+
 .sub _main
     .local pmc pmc1
     pmc1 = new Undef
@@ -165,8 +165,8 @@ After assignment pmc1 is an Integer.
 OUTPUT
 
 
-output_is(<<'CODE', <<'OUTPUT', "isa");
-##PIR##
+pir_output_is(<<'CODE', <<'OUTPUT', "isa");
+
 .sub _main
     .local pmc pmc1
     pmc1 = new Undef
@@ -218,8 +218,8 @@ A Undef PMC is not a Scalar.
 OUTPUT
 
 
-output_is(<< 'CODE', << 'OUTPUT', "check whether interface is done");
-##PIR##
+pir_output_is(<< 'CODE', << 'OUTPUT', "check whether interface is done");
+
 .sub _main
     .local pmc pmc1
     pmc1 = new Undef

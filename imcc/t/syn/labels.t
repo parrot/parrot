@@ -1,10 +1,13 @@
-#!perl
+#!perl -w
+# Copyright: 2001-2005 The Perl Foundation.  All Rights Reserved.
+# $Id$
+
 use strict;
-use TestCompiler tests => 7;
+use Parrot::Test tests => 7;
 
 ##############################
-output_is(<<'CODE', <<'OUT', "goto 1");
-.sub _test
+pir_output_is(<<'CODE', <<'OUT', "goto 1");
+.sub test @MAIN
 	goto foo
 	end
 foo:
@@ -17,8 +20,8 @@ ok 1
 OUT
 
 ##############################
-output_is(<<'CODE', <<'OUT', "goto 2");
-.sub _test
+pir_output_is(<<'CODE', <<'OUT', "goto 2");
+.sub test @MAIN
 	goto foo
 bar:	print "ok 2\n"
 	end
@@ -33,7 +36,7 @@ ok 2
 OUT
 
 ##############################
-output_is(<<'CODE', <<'OUT', "local labels");
+pir_output_is(<<'CODE', <<'OUT', "local labels");
 # this code is illegal for assemble.pl
 .sub __main
 	bsr _sub1
@@ -62,7 +65,7 @@ ok 2
 OUT
 
 ##############################
-output_is(<<'CODE', <<'OUT', "local labels 2");
+pir_output_is(<<'CODE', <<'OUT', "local labels 2");
 .sub _realmain
          bsr FOO
          call _function
@@ -82,7 +85,7 @@ in main
 in function
 OUT
 
-output_is(<<'CODE', <<'OUT', "perlish func label");
+pir_output_is(<<'CODE', <<'OUT', "perlish func label");
 .sub _main::test
 	print "ok 1\n"
 	end
@@ -92,7 +95,7 @@ CODE
 ok 1
 OUT
 
-output_is(<<'CODE', <<'OUT', "perlish func label - .pcc_sub");
+pir_output_is(<<'CODE', <<'OUT', "perlish func label - .pcc_sub");
 .pcc_sub _main::test prototyped
 	print "ok 1\n"
 	end
@@ -102,7 +105,7 @@ CODE
 ok 1
 OUT
 
-output_is(<<'CODE', <<'OUT', "perlish func label - bsr");
+pir_output_is(<<'CODE', <<'OUT', "perlish func label - bsr");
 .sub _main::test
         bsr _main::sub
 	print "ok 2\n"

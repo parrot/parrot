@@ -19,7 +19,7 @@ Tests Python Functions.
 use Parrot::Test tests => 4;
 
 my $base = << 'CODE';
-##PIR##
+
 .sub __main__ @MAIN
     new_pad 0
     loadlib P1, "python_group"
@@ -58,7 +58,7 @@ my $base = << 'CODE';
 
 CODE
 
-output_is($base . << 'CODE', << 'OUTPUT', "full");
+pir_output_is($base . << 'CODE', << 'OUTPUT', "full");
 .sub testcase
     find_lex $P0, "f"
 
@@ -76,7 +76,7 @@ CODE
 one two three
 OUTPUT
 
-output_is($base . << 'CODE', << 'OUTPUT', "defaults");
+pir_output_is($base . << 'CODE', << 'OUTPUT', "defaults");
 .sub testcase
     find_lex $P0, "f"
 
@@ -96,7 +96,7 @@ one dos tres
 uno dos tres
 OUTPUT
 
-output_is($base . << 'CODE', << 'OUTPUT', "positional expression");
+pir_output_is($base . << 'CODE', << 'OUTPUT', "positional expression");
 .sub testcase
     find_lex $P0, "f"
 
@@ -122,7 +122,7 @@ one dos tres
 one two tres
 OUTPUT
 
-output_is($base . << 'CODE', << 'OUTPUT', "keyword expression");
+pir_output_is($base . << 'CODE', << 'OUTPUT', "keyword expression");
 .sub testcase
     find_lex $P0, "f"
 

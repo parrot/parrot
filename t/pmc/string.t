@@ -1120,8 +1120,8 @@ str
 OUTPUT
 
 
-output_is(<< 'CODE', << 'OUTPUT', "check whether interface is done");
-##PIR##
+pir_output_is(<< 'CODE', << 'OUTPUT', "check whether interface is done");
+
 .sub _main
     .local pmc pmc1
     pmc1 = new String

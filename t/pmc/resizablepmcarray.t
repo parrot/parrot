@@ -341,8 +341,8 @@ ok 3
 ok 4
 OUTPUT
 
-output_is(<< 'CODE', << 'OUTPUT', "check wether interface is done");
-##PIR##
+pir_output_is(<< 'CODE', << 'OUTPUT', "check wether interface is done");
+
 .sub test @MAIN
     .local pmc pmc1
     pmc1 = new ResizablePMCArray
@@ -364,8 +364,8 @@ CODE
 0
 OUTPUT
 
-output_is(<< 'CODE', << 'OUTPUT', "append method");
-##PIR##
+pir_output_is(<< 'CODE', << 'OUTPUT', "append method");
+
 .sub test @MAIN
     .local pmc ar
     .local pmc temp
@@ -396,8 +396,8 @@ CODE
 4 2 x
 OUTPUT
 
-output_is(<< 'CODE', << 'OUTPUT', "inherited sort method");
-##PIR##
+pir_output_is(<< 'CODE', << 'OUTPUT', "inherited sort method");
+
 .sub test @MAIN
     .local pmc ar
     ar = new ResizablePMCArray
@@ -429,8 +429,8 @@ CODE
 1 2 5 9 10 x
 OUTPUT
 
-output_is(<< 'CODE', << 'OUTPUT', "push pmc");
-##PIR##
+pir_output_is(<< 'CODE', << 'OUTPUT', "push pmc");
+
 .sub test @MAIN
     .local pmc pmc_arr, pmc_9999, pmc_10000
     pmc_arr = new ResizablePMCArray
@@ -455,8 +455,8 @@ CODE
 123.123
 OUTPUT
 
-output_is(<< 'CODE', << 'OUTPUT', "push integer");
-##PIR##
+pir_output_is(<< 'CODE', << 'OUTPUT', "push integer");
+
 .sub test @MAIN
     .local pmc pmc_arr, pmc_9999
     .local int int_10000
@@ -481,8 +481,8 @@ CODE
 123
 OUTPUT
 
-output_is(<< 'CODE', << 'OUTPUT', "push string");
-##PIR##
+pir_output_is(<< 'CODE', << 'OUTPUT', "push string");
+
 .sub test @MAIN
     .local pmc pmc_arr, pmc_9999
     .local string string_10000

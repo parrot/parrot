@@ -18,8 +18,8 @@ Tests the Integer PMC.
 
 use Parrot::Test tests => 9;
 
-output_is(<< 'CODE', << 'OUTPUT', "basic math");
-##PIR##
+pir_output_is(<< 'CODE', << 'OUTPUT', "basic math");
+
 .sub _main
     .local pmc int_1
     int_1 = new Integer
@@ -57,8 +57,8 @@ CODE
 5
 OUTPUT
 
-output_is(<< 'CODE', << 'OUTPUT', "truth and definedness");
-##PIR##
+pir_output_is(<< 'CODE', << 'OUTPUT', "truth and definedness");
+
 .sub _main
     .local pmc int_1
     int_1 = new Integer
@@ -104,8 +104,8 @@ The Integer -999999999 is true.
 The Integer -999999999 is defined.
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "set_string_native");
-##PIR##
+pir_output_is(<<'CODE', <<'OUTPUT', "set_string_native");
+
 .sub _main
     .local pmc pmc1
     pmc1 = new Integer
@@ -118,8 +118,8 @@ CODE
 -123456789
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "isa");
-##PIR##
+pir_output_is(<<'CODE', <<'OUTPUT', "isa");
+
 .sub _main
     .local pmc pmc1
     pmc1 = new Integer
@@ -138,8 +138,8 @@ CODE
 A newly created Integer is an Integer.
 OUTPUT
 
-output_is(<< 'CODE', << 'OUTPUT', "check whether interface is done");
-##PIR##
+pir_output_is(<< 'CODE', << 'OUTPUT', "check whether interface is done");
+
 .sub _main
     .local pmc pmc1
     pmc1 = new Integer
@@ -157,8 +157,8 @@ CODE
 0
 OUTPUT
 
-output_is(<< 'CODE', << 'OUTPUT', "Comparison ops: ne");
-##PIR##
+pir_output_is(<< 'CODE', << 'OUTPUT', "Comparison ops: ne");
+
 .sub _main
     .local pmc pmc1
     pmc1 = new Integer
@@ -183,8 +183,8 @@ ok 1
 ok 2
 OUTPUT
 
-output_is(<< 'CODE', << 'OUTPUT', "Comparison ops: gt");
-##PIR##
+pir_output_is(<< 'CODE', << 'OUTPUT', "Comparison ops: gt");
+
 .sub _main
     .local pmc pmc1
     pmc1 = new Integer
@@ -217,8 +217,8 @@ ok 2
 ok 3
 OUTPUT
 
-output_is(<< 'CODE', << 'OUTPUT', "Comparison ops: ge");
-##PIR##
+pir_output_is(<< 'CODE', << 'OUTPUT', "Comparison ops: ge");
+
 .sub _main
     .local pmc pmc1
     pmc1 = new Integer
@@ -249,8 +249,8 @@ ok 2
 ok 3
 OUTPUT
 
-output_is(<< 'CODE', << 'OUTPUT', "Logical ops: istrue & isfalse");
-##PIR##
+pir_output_is(<< 'CODE', << 'OUTPUT', "Logical ops: istrue & isfalse");
+
 .sub _main
     .local pmc pmc1
     pmc1 = new Integer

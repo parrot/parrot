@@ -34,8 +34,8 @@ CODE
 OUTPUT
 
 
-output_is(<< 'CODE', << 'OUTPUT', "delegating");
-##PIR##
+pir_output_is(<< 'CODE', << 'OUTPUT', "delegating");
+
 .sub main @MAIN
     new_pad 0
     loadlib $P0, "python_group"
@@ -95,8 +95,8 @@ CODE
 OUTPUT
 
 SKIP: { skip("No BigInt Lib configured", 1) if !$PConfig{gmp};
-output_is(<< 'CODE', << 'OUTPUT', "bigint");
-##PIR##
+pir_output_is(<< 'CODE', << 'OUTPUT', "bigint");
+
 .sub main @MAIN
     new_pad 0
     loadlib $P0, "python_group"
@@ -118,8 +118,8 @@ CODE
 OUTPUT
 }
 
-output_is(<< 'CODE', << 'OUTPUT', "range");
-##PIR##
+pir_output_is(<< 'CODE', << 'OUTPUT', "range");
+
 .sub main @MAIN
     new_pad 0
     loadlib $P0, "python_group"
@@ -173,8 +173,8 @@ CODE
 [0, 1]
 OUTPUT
 
-output_is(<< 'CODE', << 'OUTPUT', "boolean");
-##PIR##
+pir_output_is(<< 'CODE', << 'OUTPUT', "boolean");
+
 .sub main @MAIN
     new_pad 0
     loadlib $P0, "python_group"
@@ -193,8 +193,8 @@ CODE
 False True
 OUTPUT
 
-output_is(<< 'CODE', << 'OUTPUT', "boolean");
-##PIR##
+pir_output_is(<< 'CODE', << 'OUTPUT', "boolean");
+
 .sub main @MAIN
     new_pad 0
     loadlib $P0, "python_group"

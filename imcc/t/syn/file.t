@@ -1,5 +1,5 @@
-#!perl
-
+#!perl -w
+# Copyright: 2001-2005 The Perl Foundation.  All Rights Reserved.
 # $Id$
 
 =head1 NAME
@@ -16,7 +16,7 @@ use strict;
 use 5;
 
 use Parrot::Config;
-use TestCompiler tests => 12;
+use Parrot::Test tests => 12;
 
 # Do not assume that . is in $PATH
 my $PARROT = ".$PConfig{slash}parrot$PConfig{exe}";
@@ -29,8 +29,8 @@ print FOO <<'ENDF';
 ENDF
 close FOO;
 
-output_is(<<'CODE', <<'OUT', "include pasm");
-.sub _main
+pir_output_is(<<'CODE', <<'OUT', "include pasm");
+.sub test @MAIN
     print "before\n"
     .include "temp.pasm"
     print .BAR
@@ -51,8 +51,8 @@ print FOO <<'ENDF';
 ENDF
 close FOO;
 
-output_is(<<'CODE', <<'OUT', "include pir");
-.sub _main
+pir_output_is(<<'CODE', <<'OUT', "include pir");
+.sub test @MAIN
     print "before\n"
     .include "temp.imc"
     print BAR
@@ -73,8 +73,8 @@ print FOO <<'ENDF';
 ENDF
 close FOO;
 
-output_is(<<'CODE', <<'OUT', "include .inc");
-.sub _main
+pir_output_is(<<'CODE', <<'OUT', "include .inc");
+.sub test @MAIN
     print "before\n"
     .include "temp.inc"
     print BAR
@@ -114,8 +114,8 @@ print F <<'EOF';
 EOF
 close F;
 
-output_is(<<'CODE', <<'OUT', "subroutine in external file");
-.sub _main
+pir_output_is(<<'CODE', <<'OUT', "subroutine in external file");
+.sub test @MAIN
    .local int x
    x = 10
    .const int y = 20
@@ -160,7 +160,7 @@ close FOO;
 
 system("$PARROT -o temp.pbc temp.imc");
 
-output_is(<<'CODE', <<'OUT', "call sub in external pbc");
+pir_output_is(<<'CODE', <<'OUT', "call sub in external pbc");
 .pcc_sub _sub1 prototyped
     print "sub1\n"
     load_bytecode "temp.pbc"
@@ -193,7 +193,7 @@ close FOO;
 
 system("$PARROT -o temp.pbc temp.imc");
 
-output_is(<<'CODE', <<'OUT', "call sub in external pbc, return");
+pir_output_is(<<'CODE', <<'OUT', "call sub in external pbc, return");
 .pcc_sub _sub1 prototyped
     print "sub1\n"
     load_bytecode "temp.pbc"
@@ -231,7 +231,7 @@ close FOO;
 
 system("$PARROT -o temp.pbc temp.imc");
 
-output_is(<<'CODE', <<'OUT', "call sub in external pbc with 2 subs");
+pir_output_is(<<'CODE', <<'OUT', "call sub in external pbc with 2 subs");
 .pcc_sub _sub1 prototyped
     print "sub1\n"
     load_bytecode "temp.pbc"
@@ -262,7 +262,7 @@ ENDF
 close FOO;
 # compile it
 
-output_is(<<'CODE', <<'OUT', "call sub in external imc, return");
+pir_output_is(<<'CODE', <<'OUT', "call sub in external imc, return");
 .pcc_sub _sub1 prototyped
     print "sub1\n"
     load_bytecode "temp.imc"
@@ -283,7 +283,7 @@ back
 OUT
 
 
-output_is(<<'CODE', <<'OUT', "call internal sub like external");
+pir_output_is(<<'CODE', <<'OUT', "call internal sub like external");
 .pcc_sub _sub1 prototyped
     print "sub1\n"
     $P0 = global "_sub2"
@@ -349,7 +349,7 @@ OUT
 # Including a non-existent file should produce an error
 .include "non_existent.imc"
 # An error should have been raised
-.sub _main
+.sub test @MAIN
   # dummy, because a main function is expected
   end
 .end
@@ -373,7 +373,7 @@ END_PIR
     my $ENOENT = $! + 0;
     open FOO, ">temp.imc" or die "Can't write temp.imc\n";
     print FOO << "END_PIR";
-.sub _main
+.sub test \@MAIN
   # run a OS command, and get the errmessge for the exit code
   .local string enoent_err_msg
   err enoent_err_msg, $ENOENT
@@ -396,7 +396,7 @@ SKIP:
 {
   skip("multiple loading not speced - failing", 1);
 
-  output_is(<<'CODE', <<'OUT', "twice call sub in external imc, return");
+  pir_output_is(<<'CODE', <<'OUT', "twice call sub in external imc, return");
 .pcc_sub _sub1 prototyped
     print "sub1\n"
     load_bytecode "temp.imc"

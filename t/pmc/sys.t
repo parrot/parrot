@@ -23,8 +23,8 @@ END {
   unlink "temp.imc";
 };
 
-output_is(<<'CODE', <<OUT, "spawnw, _config");
-##PIR##
+pir_output_is(<<'CODE', <<OUT, "spawnw, _config");
+
 .sub _test @MAIN
      .local pmc O
      open O, "temp.imc", ">"

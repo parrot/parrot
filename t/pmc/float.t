@@ -371,8 +371,8 @@ ok 3
 ok 4
 OUTPUT
 
-output_is(<< 'CODE', << 'OUTPUT', "Truth of a positive float");
-##PIR##
+pir_output_is(<< 'CODE', << 'OUTPUT', "Truth of a positive float");
+
 .sub _main
     .local pmc float_1
     float_1 = new Float
@@ -389,8 +389,8 @@ CODE
 123.123 is true
 OUTPUT
 
-output_is(<< 'CODE', << 'OUTPUT', "Truth of a negative float");
-##PIR##
+pir_output_is(<< 'CODE', << 'OUTPUT', "Truth of a negative float");
+
 .sub _main
     .local pmc float_1
     float_1 = new Float
@@ -407,8 +407,8 @@ CODE
 -123.123 is true
 OUTPUT
 
-output_is(<< 'CODE', << 'OUTPUT', "Truth of a positive integer");
-##PIR##
+pir_output_is(<< 'CODE', << 'OUTPUT', "Truth of a positive integer");
+
 .sub _main
     .local pmc float_1
     float_1 = new Float
@@ -425,8 +425,8 @@ CODE
 1 is true
 OUTPUT
 
-output_is(<< 'CODE', << 'OUTPUT', "Truth of a negative integer");
-##PIR##
+pir_output_is(<< 'CODE', << 'OUTPUT', "Truth of a negative integer");
+
 .sub _main
     .local pmc float_1
     float_1 = new Float
@@ -443,8 +443,8 @@ CODE
 -1 is true
 OUTPUT
 
-output_is(<< 'CODE', << 'OUTPUT', "Falseness of 0");
-##PIR##
+pir_output_is(<< 'CODE', << 'OUTPUT', "Falseness of 0");
+
 .sub _main
     .local pmc float_1
     float_1 = new Float
@@ -461,8 +461,8 @@ CODE
 0 is false
 OUTPUT
 
-output_is(<< 'CODE', << 'OUTPUT', "Falseness of 0.000");
-##PIR##
+pir_output_is(<< 'CODE', << 'OUTPUT', "Falseness of 0.000");
+
 .sub _main
     .local pmc float_1
     float_1 = new Float
@@ -773,8 +773,8 @@ ok 7
 ok 8
 OUTPUT
 
-output_is(<< 'CODE', << 'OUTPUT', "check whether interface is done");
-##PIR##
+pir_output_is(<< 'CODE', << 'OUTPUT', "check whether interface is done");
+
 .sub _main
     .local pmc pmc1
     pmc1 = new Float

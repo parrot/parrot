@@ -1,9 +1,12 @@
 #!perl
+# Copyright: 2005 The Perl Foundation.  All Rights Reserved.
+# $Id$
+
 use strict;
-use TestCompiler tests => 11;
+use Parrot::Test tests => 11;
 
 
-output_like(<<'CODE', <<'OUT', 'end in @MAIN');
+pir_2_pasm_like(<<'CODE', <<'OUT', 'end in @MAIN');
 .sub _main @MAIN
      noop
 .end
@@ -20,7 +23,7 @@ OUT
 SKIP: {
     skip("PCC changes", 10);
 
-output_like(<<'CODE', <<'OUT', "proto call, proto sub, invokecc");
+pir_2_pasm_like(<<'CODE', <<'OUT', "proto call, proto sub, invokecc");
 .sub _main
     .local Sub sub
     newsub sub, .Sub, _sub
@@ -57,7 +60,7 @@ _sub:
   end/
 OUT
 
-output_like(<<'CODE', <<'OUT', "basic syntax - constants");
+pir_2_pasm_like(<<'CODE', <<'OUT', "basic syntax - constants");
 .sub _main
     .local Sub sub
     .local Continuation cc
@@ -117,7 +120,7 @@ _sub:
 OUT
 
 #######################
-output_is(<<'CODE', <<'OUT', "basic syntax - sym constants");
+pir_2_pasm_is(<<'CODE', <<'OUT', "basic syntax - sym constants");
 .sub _main
     print "ok 1\n"
     .const int x = 10
@@ -155,7 +158,7 @@ OUT
 #######################
 # initial test with register move
 #
-output_like(<<'CODE', <<'OUT', "basic syntax - vars");
+pir_2_pasm_like(<<'CODE', <<'OUT', "basic syntax - vars");
 .sub _main
     .local int x
     .local int y
@@ -192,7 +195,7 @@ ret:
   end/
 OUT
 
-output_like(<<'CODE', <<'OUT', "non prototyped, I,S");
+pir_2_pasm_like(<<'CODE', <<'OUT', "non prototyped, I,S");
 .sub _main
     .local Sub sub
     newsub sub, .Sub, _sub
@@ -228,7 +231,7 @@ ret:
   end/
 OUT
 
-output_like(<<'CODE', <<'OUT', "non prototyped, P");
+pir_2_pasm_like(<<'CODE', <<'OUT', "non prototyped, P");
 .sub _main
     .local Sub sub
     newsub sub, .Sub, _sub
@@ -262,7 +265,7 @@ ret:
   end/
 OUT
 
-output_like(<<'CODE', <<'OUT', "non proto call, non proto sub, invokecc");
+pir_2_pasm_like(<<'CODE', <<'OUT', "non proto call, non proto sub, invokecc");
 .sub _main
     .local Sub sub
     newsub sub, .Sub, _sub
@@ -306,7 +309,7 @@ _sub:
   end/
 OUT
 
-output_like(<<'CODE', <<'OUT', "proto call, un proto sub, invokecc");
+pir_2_pasm_like(<<'CODE', <<'OUT', "proto call, un proto sub, invokecc");
 .sub _main
     .local Sub sub
     newsub sub, .Sub, _sub
@@ -352,7 +355,7 @@ _sub:
   end/
 OUT
 
-output_like(<<'CODE', <<'OUT', "proto call, un proto sub, invokecc, P param");
+pir_2_pasm_like(<<'CODE', <<'OUT', "proto call, un proto sub, invokecc, P param");
 .sub _main
     .local Sub sub
     newsub sub, .Sub, _sub
@@ -396,7 +399,7 @@ _sub:
 \2:/
 OUT
 
-output_like(<<'CODE', <<'OUT', "proto call, sub multiple returns");
+pir_2_pasm_like(<<'CODE', <<'OUT', "proto call, sub multiple returns");
 .sub _main
     .local Sub sub
     newsub sub, .Sub, _sub

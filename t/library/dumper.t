@@ -22,8 +22,8 @@ use strict;
 use Parrot::Test tests => 16;
 
 # no. 1
-output_is(<<'CODE', <<'OUT', "dumping array of sorted numbers");
-##PIR##
+pir_output_is(<<'CODE', <<'OUT', "dumping array of sorted numbers");
+
 .sub _main
     .local pmc array
 
@@ -59,8 +59,8 @@ CODE
 OUT
 
 # no. 2
-output_is(<<'CODE', <<'OUT', "dumping unsorted numbers");
-##PIR##
+pir_output_is(<<'CODE', <<'OUT', "dumping unsorted numbers");
+
 .sub _main
     .local pmc array
 
@@ -96,8 +96,8 @@ CODE
 OUT
 
 # no. 3
-output_is(<<'CODE', <<'OUT', "dumping sorted strings");
-##PIR##
+pir_output_is(<<'CODE', <<'OUT', "dumping sorted strings");
+
 .sub _main
     .local pmc array
 
@@ -129,8 +129,8 @@ CODE
 OUT
 
 # no. 4
-output_is(<<'CODE', <<'OUT', "sorting unsorted strings");
-##PIR##
+pir_output_is(<<'CODE', <<'OUT', "sorting unsorted strings");
+
 .sub _main
     .local pmc array
 
@@ -162,8 +162,8 @@ CODE
 OUT
 
 # no. 5
-output_is(<<'CODE', <<'OUT', "dumping different types");
-##PIR##
+pir_output_is(<<'CODE', <<'OUT', "dumping different types");
+
 .sub _main
     .local pmc array
 
@@ -219,8 +219,8 @@ CODE
 OUT
 
 # no. 6
-output_is(<<'CODE', <<'OUT', "dumping complex data");
-##PIR##
+pir_output_is(<<'CODE', <<'OUT', "dumping complex data");
+
 .sub _main
     .local pmc hash1
     .local pmc hash2
@@ -323,8 +323,8 @@ CODE
 OUT
 
 # no.7
-output_is(<<'CODE', <<'OUT', "properties");
-##PIR##
+pir_output_is(<<'CODE', <<'OUT', "properties");
+
 .sub _main
     .local pmc str
     .local pmc array
@@ -357,8 +357,8 @@ CODE
 OUT
 
 # no. 8
-output_is(<<'CODE', <<'OUT', "indent string");
-##PIR##
+pir_output_is(<<'CODE', <<'OUT', "indent string");
+
 .sub _main
     .local pmc hash1
     .local pmc hash2
@@ -426,8 +426,8 @@ indent = '|  '
 OUT
 
 # no. 9
-output_is(<<'CODE', <<'OUT', "back-referencing properties");
-##PIR##
+pir_output_is(<<'CODE', <<'OUT', "back-referencing properties");
+
 .sub _main
     .local pmc hash
 
@@ -448,8 +448,8 @@ CODE
 OUT
 
 # no. 10
-output_is(<<'CODE', <<'OUT', "self-referential properties");
-##PIR##
+pir_output_is(<<'CODE', <<'OUT', "self-referential properties");
+
 .sub _main
     .local pmc hash
     .local pmc prop
@@ -472,8 +472,8 @@ CODE
 OUT
 
 # no. 11
-output_is(<<'CODE', <<'OUT', "self-referential properties");
-##PIR##
+pir_output_is(<<'CODE', <<'OUT', "self-referential properties");
+
 .sub _main
     .local pmc array
     .local pmc hash1
@@ -516,8 +516,8 @@ CODE
 OUT
 
 # no. 12
-output_is(<<'CODE', <<'OUT', "dumping objects");
-##PIR##
+pir_output_is(<<'CODE', <<'OUT', "dumping objects");
+
 .sub _main
     .local pmc temp
     .local pmc array
@@ -578,8 +578,8 @@ CODE
 OUT
 
 # no. 13
-output_is(<<'CODE', <<'OUT', "dumping 'null'");
-##PIR##
+pir_output_is(<<'CODE', <<'OUT', "dumping 'null'");
+
 .sub _main
     .local pmc array
     .local pmc temp
@@ -616,8 +616,8 @@ CODE
 OUT
 
 # no. 14
-output_is( << 'CODE', << 'OUT', "dumping strings");
-##PIR##
+pir_output_is( << 'CODE', << 'OUT', "dumping strings");
+
 .include "library/dumper.imc"
 .sub _test @MAIN
     .local pmc array
@@ -649,8 +649,8 @@ CODE
 OUT
 
 # no. 15
-output_is(<<'CODE', <<'OUT', "dumping complex data in Hash");
-##PIR##
+pir_output_is(<<'CODE', <<'OUT', "dumping complex data in Hash");
+
 .sub _main
     .local pmc hash1
     .local pmc hash2
@@ -752,8 +752,8 @@ CODE
 OUT
 
 # no. 16
-output_is(<<'CODE', <<'OUTPUT', "dumping Integer PMC");
-##PIR##
+pir_output_is(<<'CODE', <<'OUTPUT', "dumping Integer PMC");
+
 .sub _main
     .local pmc int1
 

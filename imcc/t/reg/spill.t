@@ -1,14 +1,17 @@
-#!perl
+#!perl -w
+# Copyright: 2001-2005 The Perl Foundation.  All Rights Reserved.
+# $Id$
+
 use strict;
-use TestCompiler tests => 9;
+use Parrot::Test tests => 9;
 
-##############################
 
+pir_output_is(<<'CODE', <<'OUT', "allocate 1");
+#
 # Test the ability of the register allocator to
 # generate spills.
 #
-output_is(<<'CODE', <<'OUT', "allocate 1");
-.sub _MAIN
+.sub test @MAIN
 	$I0 = 0
 	$I1 = 1
 	$I2 = 2
@@ -76,14 +79,13 @@ CODE
 40
 OUT
 
-##############################
-output_is(<<'CODE', <<'OUT', "spill 1");
 
+pir_output_is(<<'CODE', <<'OUT', "spill 1");
+#
 # Test the ability of the register allocator to
 # generate spills.
 #
-
-.sub _MAIN
+.sub test @MAIN
 	$I0 = 0
 	$I1 = 1
 	$I2 = 2
@@ -233,15 +235,14 @@ CODE
 6165697377
 OUT
 
-##############################
-output_is(<<'CODE', <<'OUT', "pcc arg overflow 1");
 
+pir_output_is(<<'CODE', <<'OUT', "pcc arg overflow 1");
+#
 # Test the ability of the register allocator in
 # combination with PCC calling convention and overflow arguments.
 # Slightly redundant with tests in t/syn/pcc.t but please leave.
 #
-
-.sub _MAIN
+.sub test @MAIN
   _foo(1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40)
   end
 .end
@@ -327,9 +328,12 @@ CODE
 40
 OUT
 
-output_is(<<'CODE', <<'OUT', "spill 4");
 
-.sub _MAIN
+pir_output_is(<<'CODE', <<'OUT', "spill 4");
+#
+# Another spill test
+#
+.sub test @MAIN
 	$I0 = 0
 	$I1 = 1
 	$I2 = 2
@@ -425,7 +429,7 @@ CODE
 ok
 OUT
 
-output_is(<<'CODE', <<'OUT', "bug #32996");
+pir_output_is(<<'CODE', <<'OUT', "bug #32996");
 
 .namespace ["Foo"]
 
@@ -664,7 +668,7 @@ my $code = repeat($template2, 18,
                TESTS => "set I0, a<index>\nne I0, <index>, fail",
                TESTS2 => "set I0, a<index>\nne I0, <index>, fail");
 
-output_is($code, <<'OUT', "overflow pmcs 18 spill");
+pir_output_is($code, <<'OUT', "overflow pmcs 18 spill");
 all params ok
 OUT
 
@@ -676,7 +680,7 @@ $code = repeat($template2, 22,
                TESTS => "set I0, a<index>\nne I0, <index>, fail",
                TESTS2 => "set I0, a<index>\nne I0, <index>, fail");
 
-output_is($code, <<'OUT', "overflow pmcs 22 spill");
+pir_output_is($code, <<'OUT', "overflow pmcs 22 spill");
 all params ok
 OUT
 
@@ -688,7 +692,7 @@ $code = repeat($template2, 40,
                TESTS => "set I0, a<index>\nne I0, <index>, fail",
                TESTS2 => "set I0, a<index>\nne I0, <index>, fail");
 
-output_is($code, <<'OUT', "overflow pmcs 40 spill");
+pir_output_is($code, <<'OUT', "overflow pmcs 40 spill");
 all params ok
 OUT
 
@@ -700,6 +704,6 @@ $code = repeat($template2, 60,
                TESTS => "set I0, a<index>\nne I0, <index>, fail",
                TESTS2 => "set I0, a<index>\nne I0, <index>, fail");
 
-output_is($code, <<'OUT', "overflow pmcs 60 spill");
+pir_output_is($code, <<'OUT', "overflow pmcs 60 spill");
 all params ok
 OUT

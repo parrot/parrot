@@ -367,8 +367,8 @@ done
 OUTPUT
 }
 
-output_is(<<'CODE', <<'OUTPUT', "Coroutines - M. Wallace yield example");
-##PIR##
+pir_output_is(<<'CODE', <<'OUTPUT', "Coroutines - M. Wallace yield example");
+
 .sub __main__
     .local Coroutine itr
     .local object return
@@ -584,8 +584,8 @@ catch main
 OUTPUT
 
 
-output_is(<<'CODE', 'Coroutine', "Coro new - type");
-##PIR##
+pir_output_is(<<'CODE', 'Coroutine', "Coro new - type");
+
 .sub main @MAIN
     .local pmc c
     c = global "coro"
@@ -605,8 +605,8 @@ output_is(<<'CODE', 'Coroutine', "Coro new - type");
 .end
 CODE
 
-output_is(<<'CODE', '01234', "Coro new - yield");
-##PIR##
+pir_output_is(<<'CODE', '01234', "Coro new - yield");
+
 .sub main @MAIN
     .local pmc c
     c = global "coro"
@@ -630,8 +630,8 @@ ex:
 .end
 CODE
 
-output_is(<< 'CODE', << 'OUTPUT', "check whether interface is done");
-##PIR##
+pir_output_is(<< 'CODE', << 'OUTPUT', "check whether interface is done");
+
 .sub _main
     .local pmc pmc1
     pmc1 = new Coroutine

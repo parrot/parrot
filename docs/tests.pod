@@ -1,4 +1,4 @@
-# Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+# Copyright: 2001-2005 The Perl Foundation.  All Rights Reserved.
 # $Id$
 
 =head1 NAME
@@ -32,7 +32,7 @@ by:
 
 2. Putting some code in like this:
 
-    output_is(<<'CODE', <<'OUTPUT', "name for test");
+    pasm_output_is(<<'CODE', <<'OUTPUT', "name for test");
         *** a big chunk of assembler, eg:
         print   1
         print   "\n" # you can even comment it if it's obscure
@@ -44,13 +44,7 @@ by:
 
 Tests in F<t/op/> or F<t/pmc/> are considered to be B<PASM> tests.
 Tests in F<imcc/t/> are assumed to be B<PIR> tests. You can put B<PIR>
-tests into F<t/op/> or F<t/pmc/> by inserting the special comment B<##PIR##>
-in the test code:
-
-    output_is(<<'CODE', <<'OUTPUT', "name for test");
-    ##PIR##
-        $P0 = new Integer
-    ...
+tests into F<t/op/> or F<t/pmc/> by using functions like 'pir_output_is'.
 
 =head2 C source tests
 

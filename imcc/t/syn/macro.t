@@ -1,13 +1,14 @@
-#!perl
+#!perl -w
+# Copyright: 2001-2005 The Perl Foundation.  All Rights Reserved.
+# $Id$
+
 use strict;
-use TestCompiler tests => 23;
+use Parrot::Test tests => 23;
 
 # macro tests
 
-##############################
-
-output_is( <<'CODE', <<OUTPUT, "macro, zero parameters" );
-.sub _main
+pir_output_is( <<'CODE', <<OUTPUT, "macro, zero parameters" );
+.sub test @MAIN
 .macro answer()
 	print	42
 	print	"\n"
@@ -19,8 +20,8 @@ CODE
 42
 OUTPUT
 
-output_is( <<'CODE', <<OUTPUT, "macro, one unused parameter, literal term" );
-.sub _main
+pir_output_is( <<'CODE', <<OUTPUT, "macro, one unused parameter, literal term" );
+.sub test @MAIN
 .macro answer(A)
 	print	42
 .endm
@@ -32,8 +33,8 @@ CODE
 42
 OUTPUT
 
-output_is( <<'CODE', <<OUTPUT, "macro, one unused parameter, register term" );
-.sub _main
+pir_output_is( <<'CODE', <<OUTPUT, "macro, one unused parameter, register term" );
+.sub test @MAIN
 .macro answer(A)
 	print	42
 .endm
@@ -46,8 +47,8 @@ CODE
 42
 OUTPUT
 
-output_is( <<'CODE', <<OUTPUT, "macro, one used parameter, literal" );
-.sub _main
+pir_output_is( <<'CODE', <<OUTPUT, "macro, one used parameter, literal" );
+.sub test @MAIN
 .macro answer(A)
 	print	.A
 .endm
@@ -59,8 +60,8 @@ CODE
 42
 OUTPUT
 
-output_is( <<'CODE', <<OUTPUT, "macro, one used parameter, register" );
-.sub _main
+pir_output_is( <<'CODE', <<OUTPUT, "macro, one used parameter, register" );
+.sub test @MAIN
 .macro answer(A)
 	print	.A
 .endm
@@ -73,8 +74,8 @@ CODE
 42
 OUTPUT
 
-output_is( <<'CODE', <<OUTPUT, "macro, one used parameter, called twice" );
-.sub _main
+pir_output_is( <<'CODE', <<OUTPUT, "macro, one used parameter, called twice" );
+.sub test @MAIN
 .macro answer(A)
 	print	.A
 	print	"\n"
@@ -90,8 +91,8 @@ CODE
 43
 OUTPUT
 
-output_is( <<'CODE', <<OUTPUT, "macro, one used parameter, label" );
-.sub _main
+pir_output_is( <<'CODE', <<OUTPUT, "macro, one used parameter, label" );
+.sub test @MAIN
 .macro answer(A)
 	ne	I0,42,.$done
 	print	.A
@@ -106,8 +107,8 @@ CODE
 42
 OUTPUT
 
-output_is( <<'CODE', <<OUTPUT, "macro, one used parameter run twice, label" );
-.sub _main
+pir_output_is( <<'CODE', <<OUTPUT, "macro, one used parameter run twice, label" );
+.sub test @MAIN
 .macro answer(A)
 	ne	I0,42,.$done
 	print	.A
@@ -124,24 +125,24 @@ CODE
 42
 OUTPUT
 
-output_is(<<'CODE', '32', "constant defined and used");
-.sub _main
+pir_output_is(<<'CODE', '32', "constant defined and used");
+.sub test @MAIN
 .const int FOO = 32
   print FOO
   end
 .end
 CODE
 
-output_is(<<'CODE', 'foo', "constant defined and used");
-.sub _main
+pir_output_is(<<'CODE', 'foo', "constant defined and used");
+.sub test @MAIN
 .const string FOO = "foo"
   print FOO
   end
 .end
 CODE
 
-output_is( <<'CODE', <<OUTPUT, ".newid" );
-.sub _main
+pir_output_is( <<'CODE', <<OUTPUT, ".newid" );
+.sub test @MAIN
 .macro newid(ID, CLASS)
     .sym .CLASS .ID
     .ID = new .CLASS
@@ -156,8 +157,8 @@ CODE
 10
 OUTPUT
 
-output_is( <<'CODE', <<OUTPUT, ".newlex" );
-.sub _main
+pir_output_is( <<'CODE', <<OUTPUT, ".newlex" );
+.sub test @MAIN
 .macro newlex(ID, CLASS)
     .sym .CLASS .ID
     .ID = new .CLASS
@@ -173,8 +174,8 @@ CODE
 10
 OUTPUT
 
-output_like( <<'CODE', <<OUTPUT, "too few params" );
-.sub _main
+pir_output_like( <<'CODE', <<OUTPUT, "too few params" );
+.sub test @MAIN
 .macro M(A, B)
     print .A
     print .B
@@ -186,8 +187,8 @@ CODE
 /Macro 'M' requires 2 arguments, but 1 given/
 OUTPUT
 
-output_like( <<'CODE', <<OUTPUT, "too many params" );
-.sub _main
+pir_output_like( <<'CODE', <<OUTPUT, "too many params" );
+.sub test @MAIN
 .macro M(A, B)
     print .A
     print .B
@@ -199,8 +200,8 @@ CODE
 /Macro 'M' requires 2 arguments, but 3 given/
 OUTPUT
 
-output_is( <<'CODE', <<OUTPUT, "ok param count" );
-.sub _main
+pir_output_is( <<'CODE', <<OUTPUT, "ok param count" );
+.sub test @MAIN
 .macro M(A, B)
     print .A
     print .B
@@ -212,8 +213,8 @@ CODE
 fine
 OUTPUT
 
-output_like( <<'CODE', <<OUTPUT, "macro name is no ident" );
-.sub _main
+pir_output_like( <<'CODE', <<OUTPUT, "macro name is no ident" );
+.sub test @MAIN
 .macro 42(A, B)
     print .A
     print .B
@@ -225,8 +226,8 @@ CODE
 /Macro names must be identifiers/
 OUTPUT
 
-output_like( <<'CODE', <<OUTPUT, "unterminated macro" );
-.sub _main
+pir_output_like( <<'CODE', <<OUTPUT, "unterminated macro" );
+.sub test @MAIN
 .macro M(
 
 
@@ -234,8 +235,8 @@ CODE
 /End of file reached/
 OUTPUT
 
-output_like( <<'CODE', <<OUTPUT, "unterminated macro 2" );
-.sub _main
+pir_output_like( <<'CODE', <<OUTPUT, "unterminated macro 2" );
+.sub test @MAIN
 .macro M(A, B)
   print .A
 .endm
@@ -245,8 +246,8 @@ CODE
 /End of file reached/
 OUTPUT
 
-output_like( <<'CODE', <<OUTPUT, "ill param def" );
-.sub _main
+pir_output_like( <<'CODE', <<OUTPUT, "ill param def" );
+.sub test @MAIN
 .macro M(A, B
   print .A
 .endm
@@ -256,8 +257,8 @@ CODE
 /Parameter definition in 'M' must be IDENT/
 OUTPUT
 
-output_like( <<'CODE', <<OUTPUT, "no params" );
-.sub _main
+pir_output_like( <<'CODE', <<OUTPUT, "no params" );
+.sub test @MAIN
 .macro M(A, B)
     print .A
     print .B
@@ -270,8 +271,8 @@ CODE
 OUTPUT
 
 
-output_like( <<'CODE', <<OUTPUT, "unknown macro" );
-.sub _main
+pir_output_like( <<'CODE', <<OUTPUT, "unknown macro" );
+.sub test @MAIN
 .macro M(A, B)
     print .A
     print .B
@@ -283,8 +284,8 @@ CODE
 /(unknown macro|unexpected DOT)/
 OUTPUT
 
-output_like( <<'CODE', <<OUTPUT, "unexpected IDENTIFIER" );
-.sub _main
+pir_output_like( <<'CODE', <<OUTPUT, "unexpected IDENTIFIER" );
+.sub test @MAIN
 .macro M()
     this gives a parse error
 .endm
@@ -295,8 +296,8 @@ CODE
 /error, unexpected IDENTIFIER/
 OUTPUT
 
-output_like( <<'CODE', <<OUTPUT, "unknown macro" );
-.sub _main
+pir_output_like( <<'CODE', <<OUTPUT, "unknown macro" );
+.sub test @MAIN
 .macro M(A)
     .arg .A
 .endm

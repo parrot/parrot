@@ -19,8 +19,8 @@ Tests the Python Integer PMC.
 
 use Parrot::Test tests => 1;
 
-output_is(<< 'CODE', << 'OUTPUT', "eq");
-##PIR##
+pir_output_is(<< 'CODE', << 'OUTPUT', "eq");
+
 .sub main @MAIN
     loadlib P1, "python_group"
     new $P1, "PyComplex"

@@ -1,12 +1,15 @@
-#!perl
+#!perl -w
+# Copyright: 2001-2005 The Perl Foundation.  All Rights Reserved.
+# $Id$
+
 use strict;
-use TestCompiler tests => 41;
+use Parrot::Test tests => 41;
 
 ##############################
 # Parrot Calling Conventions
 
-output_is(<<'CODE', <<'OUT', "basic syntax - invokecc, constants");
-.sub _main
+pir_output_is(<<'CODE', <<'OUT', "basic syntax - invokecc, constants");
+.sub test @MAIN
     .local Sub sub
     newsub sub, .Sub, _sub
     .const int y = 20
@@ -32,7 +35,7 @@ CODE
 20
 OUT
 
-output_is(<<'CODE', <<'OUT', "constants, bug 24667");
+pir_output_is(<<'CODE', <<'OUT', "constants, bug 24667");
 .sub _main prototyped
     .local Sub sub
     newsub sub, .Sub, _sub
@@ -62,8 +65,8 @@ CODE
 7
 OUT
 
-output_is(<<'CODE', <<'OUT', "basic syntax - order of return values");
-.sub _main
+pir_output_is(<<'CODE', <<'OUT', "basic syntax - order of return values");
+.sub test @MAIN
     .local Sub sub
     newsub sub, .Sub, _sub
     .pcc_begin prototyped
@@ -100,8 +103,8 @@ OUT
 
 ##############################
 # tail recursion - caller saves - parrot calling convention
-output_is(<<'CODE', <<'OUT', "tail recursive sub");
-.sub _main
+pir_output_is(<<'CODE', <<'OUT', "tail recursive sub");
+.sub test @MAIN
     .local int count
     count = 5
     .local int product
@@ -140,8 +143,8 @@ CODE
 120
 OUT
 
-output_is(<<'CODE', <<'OUT', "proto call, proto sub, invokecc, P param");
-.sub _main
+pir_output_is(<<'CODE', <<'OUT', "proto call, proto sub, invokecc, P param");
+.sub test @MAIN
     .local Sub sub
     newsub sub, .Sub, _sub
     $P0 = new PerlUndef
@@ -170,8 +173,8 @@ ok 1
 ok 2
 back
 OUT
-output_is(<<'CODE', <<'OUT', "proto call, un proto sub, invokecc, P param");
-.sub _main
+pir_output_is(<<'CODE', <<'OUT', "proto call, un proto sub, invokecc, P param");
+.sub test @MAIN
     .local Sub sub
     newsub sub, .Sub, _sub
     $P0 = new PerlUndef
@@ -201,8 +204,8 @@ ok 2
 back
 OUT
 
-output_is(<<'CODE', <<'OUT', "proto call, proto sub, invokecc, S param");
-.sub _main
+pir_output_is(<<'CODE', <<'OUT', "proto call, proto sub, invokecc, S param");
+.sub test @MAIN
     .local Sub sub
     newsub sub, .Sub, _sub
     $S0 = "ok 1\n"
@@ -230,8 +233,8 @@ ok 2
 back
 OUT
 
-output_is(<<'CODE', <<'OUT', "proto call, nonproto sub, invokecc, S param");
-.sub _main
+pir_output_is(<<'CODE', <<'OUT', "proto call, nonproto sub, invokecc, S param");
+.sub test @MAIN
     .local Sub sub
     newsub sub, .Sub, _sub
     $S0 = "ok 1\n"
@@ -259,8 +262,8 @@ ok 2
 back
 OUT
 
-output_is(<<'CODE', <<'OUT', "proto call, unproto sub, invokecc, S param");
-.sub _main
+pir_output_is(<<'CODE', <<'OUT', "proto call, unproto sub, invokecc, S param");
+.sub test @MAIN
     .local Sub sub
     newsub sub, .Sub, _sub
     $S0 = "ok 1\n"
@@ -288,8 +291,8 @@ ok 2
 back
 OUT
 
-output_is(<<'CODE', <<'OUT', "non_proto call, unproto sub, invokecc, S param");
-.sub _main
+pir_output_is(<<'CODE', <<'OUT', "non_proto call, unproto sub, invokecc, S param");
+.sub test @MAIN
     .local Sub sub
     newsub sub, .Sub, _sub
     $S0 = "ok 1\n"
@@ -339,8 +342,8 @@ OUT
 #	  print "done in coroutine\n";
 #	}
 
-output_is(<<'CODE', <<'OUT', "coroutine iterator");
-.sub _main
+pir_output_is(<<'CODE', <<'OUT', "coroutine iterator");
+.sub test @MAIN
   .local int i
   i=5
   newsub $P0, .Coroutine, _addtwo
@@ -396,8 +399,8 @@ done in coroutine
 done in main
 OUT
 
-output_is(<<'CODE', <<'OUT', "sub calling another sub, SRegs");
-.sub _main
+pir_output_is(<<'CODE', <<'OUT', "sub calling another sub, SRegs");
+.sub test @MAIN
     .local Sub sub
     newsub sub, .Sub, _sub
     $S0 = "ok 1\n"
@@ -449,8 +452,8 @@ ok 2
 back
 OUT
 
-output_is(<<'CODE', <<'OUT', "sub calling another sub, PRegs");
-.sub _main
+pir_output_is(<<'CODE', <<'OUT', "sub calling another sub, PRegs");
+.sub test @MAIN
     .local Sub sub
     newsub sub, .Sub, _sub
     $P0 = new PerlUndef
@@ -506,8 +509,8 @@ ok 2
 back
 OUT
 
-output_is(<<'CODE', <<'OUT', "in, out different P param, 2 subs");
-.sub _main
+pir_output_is(<<'CODE', <<'OUT', "in, out different P param, 2 subs");
+.sub test @MAIN
     .local Sub sub
     .local PerlUndef x
     x = new PerlUndef
@@ -551,7 +554,7 @@ CODE
 43
 OUT
 
-output_is(<<'CODE', <<'OUT', "sub calling another");
+pir_output_is(<<'CODE', <<'OUT', "sub calling another");
 # sub g() { return 42; }
 # sub f() { return g(); }
 # print f(), "\n"
@@ -605,7 +608,7 @@ CODE
 OUT
 
 
-output_is(<<'CODE', <<'OUT', "coroutine generator throwing exception");
+pir_output_is(<<'CODE', <<'OUT', "coroutine generator throwing exception");
 ## this is mainly from Michal Wallace
 ## generator_try_bug.imc
 
@@ -721,7 +724,7 @@ caught it!
 OUT
 
     my $template = <<'TEMPLATE';
-.sub _main
+.sub test @MAIN
     =LOCALS=
     =INITS=
     .local Sub sub
@@ -770,7 +773,7 @@ my $code = repeat($template, 18,
                   PARAMS => '.param int a<index>',
                   TESTS => 'ne a<index>, <index>, fail');
 
-output_is($code, <<'OUT', "overflow integers");
+pir_output_is($code, <<'OUT', "overflow integers");
 all params ok
 OUT
 
@@ -780,7 +783,7 @@ $code = repeat($template, 40,
                ARGS => '.arg a<index>',
                PARAMS => '.param int a<index>',
                TESTS => 'ne a<index>, <index>, fail');
-output_is($code, <<'OUT', "overflowed spilled integers");
+pir_output_is($code, <<'OUT', "overflowed spilled integers");
 all params ok
 OUT
 
@@ -791,7 +794,7 @@ $code = repeat($template, 18,
                PARAMS => '.param PerlInt a<index>',
                TESTS => "set I0, a<index>\nne I0, <index>, fail");
 
-output_is($code, <<'OUT', "overflow pmcs");
+pir_output_is($code, <<'OUT', "overflow pmcs");
 all params ok
 OUT
 
@@ -802,12 +805,12 @@ $code = repeat($template, 40,
                PARAMS => '.param PerlInt a<index>',
                TESTS => "set I0, a<index>\nne I0, <index>, fail");
 
-output_is($code, <<'OUT', "overflow pmcs 40");
+pir_output_is($code, <<'OUT', "overflow pmcs 40");
 all params ok
 OUT
 
 
-output_is(<<'CODE', <<'OUT', ".flatten_arg non-prototyped 1");
+pir_output_is(<<'CODE', <<'OUT', ".flatten_arg non-prototyped 1");
 .pcc_sub _main prototyped
     .local Sub sub
     newsub sub, .Sub, _sub
@@ -834,7 +837,7 @@ ok 1
 ok 2
 OUT
 
-output_is(<<'CODE', <<'OUT', ".flatten_arg non-prototyped 2");
+pir_output_is(<<'CODE', <<'OUT', ".flatten_arg non-prototyped 2");
 .pcc_sub _main prototyped
     .local Sub sub
     newsub sub, .Sub, _sub
@@ -865,7 +868,7 @@ first
 ok 1
 OUT
 
-output_is(<<'CODE', <<'OUT', ".flatten_arg non-prototyped 3");
+pir_output_is(<<'CODE', <<'OUT', ".flatten_arg non-prototyped 3");
 .pcc_sub _main prototyped
     .local Sub sub
     newsub sub, .Sub, _sub
@@ -906,7 +909,7 @@ ok 2
 last
 OUT
 
-output_is(<<'CODE', <<'OUT', ".flatten_arg non-prototyped 4");
+pir_output_is(<<'CODE', <<'OUT', ".flatten_arg non-prototyped 4");
 .pcc_sub _main prototyped
     .local Sub sub
     newsub sub, .Sub, _sub
@@ -973,7 +976,7 @@ ok 5
 last
 OUT
 
-output_is(<<'CODE', <<'OUT', ".flatten_arg prototyped 1");
+pir_output_is(<<'CODE', <<'OUT', ".flatten_arg prototyped 1");
 .pcc_sub _main prototyped
     .local Sub sub
     newsub sub, .Sub, _sub
@@ -1044,7 +1047,7 @@ ok 5
 last
 OUT
 
-output_is(<<'CODE', <<'OUT', ".flatten_arg - overflow");
+pir_output_is(<<'CODE', <<'OUT', ".flatten_arg - overflow");
 .pcc_sub _main prototyped
     .local Sub sub
     newsub sub, .Sub, _sub
@@ -1139,7 +1142,7 @@ ok 12
 last
 OUT
 
-output_is(<<'CODE', <<'OUT', ".flatten_arg multiple instances");
+pir_output_is(<<'CODE', <<'OUT', ".flatten_arg multiple instances");
 .pcc_sub _main prototyped
     .local Sub sub
     newsub sub, .Sub, _sub
@@ -1175,7 +1178,7 @@ ok 1
 ok 2
 OUT
 
-output_is(<<'CODE', <<'OUT', "(regression) comment handling in pcc_params");
+pir_output_is(<<'CODE', <<'OUT', "(regression) comment handling in pcc_params");
 .sub __main
 	.local Sub main_sub
 	newsub main_sub, .Sub, _main
@@ -1200,8 +1203,8 @@ OUT
 
 SKIP: {
   skip("cant do NCI on $^O", 1) unless ($^O =~ /linux/);
-output_is(<<'CODE', <<'OUT', "nci");
-.sub _main
+pir_output_is(<<'CODE', <<'OUT', "nci");
+.sub test @MAIN
     .sym pmc FABS
     .sym pmc NULL
     null NULL
@@ -1226,7 +1229,7 @@ CODE
 OUT
 }
 
-output_is(<<'CODE', <<'OUT', "MAIN pragma, syntax only");
+pir_output_is(<<'CODE', <<'OUT', "MAIN pragma, syntax only");
 .sub _main prototyped, @MAIN
     print "ok\n"
     end
@@ -1236,12 +1239,13 @@ ok
 OUT
 
 {
-  # The result of the code depends on wether we run parrot with the
-  # "-o code.pbc -r -r" command line params
+  # The result of the code should depend on wether we run parrot with the
+  # "-o code.pbc -r -r" command line params.
+  # Strangely, the same output is written
   my $output = $ENV{TEST_PROG_ARGS} =~ m/-r / ?
-                qq{ok\nok\n} :
+                qq{ok\n} :
                 qq{ok\n};
-  output_is(<<'CODE', $output, "more pragmas, syntax only");
+  pir_output_is(<<'CODE', $output, "more pragmas, syntax only");
 .sub _main prototyped, @MAIN, @LOAD, @POSTCOMP
     print "ok\n"
     end
@@ -1249,8 +1253,8 @@ OUT
 CODE
 }
 
-output_is(<<'CODE', <<'OUT', "_func() syntax");
-.sub _main
+pir_output_is(<<'CODE', <<'OUT', "_func() syntax");
+.sub test @MAIN
     _sub(10, 20)
     end
 .end
@@ -1267,8 +1271,8 @@ CODE
 10
 20
 OUT
-output_is(<<'CODE', <<'OUT', "_func() syntax with var");
-.sub _main
+pir_output_is(<<'CODE', <<'OUT', "_func() syntax with var");
+.sub test @MAIN
     .local pmc the_sub
     the_sub = global "_sub"
     the_sub(10, 20)
@@ -1288,8 +1292,8 @@ CODE
 20
 OUT
 
-output_is(<<'CODE', <<'OUT', "P3 is NULL - 11 args");
-.sub _main
+pir_output_is(<<'CODE', <<'OUT', "P3 is NULL - 11 args");
+.sub test @MAIN
     P3 = new .PerlArray
     # call with 11 parameters
     _foo($P1, $P2, $P3, $P4, $P5, $P6, $P7, $P8, $P9, $P10, $P11)
@@ -1308,8 +1312,8 @@ CODE
 P3 is NULL
 OUT
 
-output_is(<<'CODE', <<'OUT', "P3 isnt NULL - 12 args");
-.sub _main
+pir_output_is(<<'CODE', <<'OUT', "P3 isnt NULL - 12 args");
+.sub test @MAIN
     null P3
     # call with 12 parameters
     _foo($P1, $P2, $P3, $P4, $P5, $P6, $P7, $P8, $P9, $P10, $P11, $P12)
@@ -1335,8 +1339,8 @@ P3 is not NULL
 11
 OUT
 
-output_is(<<'CODE', <<'OUT', "P3 isnt NULL - 13 args");
-.sub _main
+pir_output_is(<<'CODE', <<'OUT', "P3 isnt NULL - 13 args");
+.sub test @MAIN
     null P3
     # call with 13 parameters
     _foo($P1, $P2, $P3, $P4, $P5, $P6, $P7, $P8, $P9, $P10, $P11, $P12, $P13)
@@ -1362,8 +1366,8 @@ P3 is not NULL
 11
 OUT
 
-output_is(<<'CODE', <<'OUT', "argcX identifiers");
-.sub _main
+pir_output_is(<<'CODE', <<'OUT', "argcX identifiers");
+.sub test @MAIN
     .local int i
     .local int j
     .local float f
@@ -1408,7 +1412,7 @@ proto 0
 P 0
 OUT
 
-output_is(<<'CODE', "mongueur\nmonger\n", "multiple declaration in a .sym/.local directive");
+pir_output_is(<<'CODE', "mongueur\nmonger\n", "multiple declaration in a .sym/.local directive");
 .sub main
 .sym string s, t
   s = "mongueur\n"
@@ -1419,8 +1423,8 @@ output_is(<<'CODE', "mongueur\nmonger\n", "multiple declaration in a .sym/.local
 .end
 CODE
 
-output_is(<<'CODE', "42\n", "oneliner return");
-.sub _main
+pir_output_is(<<'CODE', "42\n", "oneliner return");
+.sub test @MAIN
 .sym int a, b
   (a, b) = _sub()
   print a
@@ -1439,8 +1443,8 @@ output_is(<<'CODE', "42\n", "oneliner return");
 .end
 CODE
 
-output_is(<<'CODE', <<'OUT', "oneliner yield");
-.sub _main
+pir_output_is(<<'CODE', <<'OUT', "oneliner yield");
+.sub test @MAIN
   .local int i
   i=5
   newsub $P0, .Coroutine, _addtwo
@@ -1494,7 +1498,7 @@ done in coroutine
 done in main
 OUT
 
-output_is(<<'CODE', <<'OUT', "quoted sub names");
+pir_output_is(<<'CODE', <<'OUT', "quoted sub names");
 .sub main @MAIN
     "foo"()
     print "ok\n"

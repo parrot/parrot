@@ -28,10 +28,6 @@ Run the C<CGoto> core.
 
 Run with JIT enabled.
 
-=item C<-P>
-
-Run the C<Prederef> core.
-
 =item C<-C>
 
 Run the C<CGP> core.
@@ -94,22 +90,22 @@ my $gc_debug = grep { $_ eq '--gc-debug' } @ARGV;
 
 # Suck the short options into the TEST_PROG_ARGS evar:
 my %opts;
-getopts('wgjPCSfbvdr?hO:', \%opts);
+getopts('wgjPCSefbvdr?hO:', \%opts);
 if ($opts{'?'} || $opts{h}) {
     print <<"EOF";
 perl t/harness [options] [testfiles]
-    -w ... warnings on
-    -g ... run CGoto
-    -j ... run JIT
-    -P ... run Prederef
-    -C ... run CGP
-    -S ... run Switched
-    -b ... run bounds checked
-    -f ... run fast core
-    -v ... run verbose
-    -d ... run debug
-    -r ... assemble to PBC run PBC
-    -O[012] optimize
+    -w         ... warnings on
+    -g         ... run CGoto
+    -j         ... run JIT
+    -C         ... run CGP
+    -S         ... run Switched
+    -b         ... run bounds checked
+    --run-exec ... run exec core
+    -f         ... run fast core
+    -v         ... run verbose
+    -d         ... run debug
+    -r         ... assemble to PBC run PBC
+    -O[012]    ... optimize
     --running-make-test
     --gc-debug
 EOF
@@ -117,7 +113,7 @@ EOF
 }
 
 my $args = join(' ', map { "-$_" } keys %opts );
-$args =~ s/-O/-O$opts{O}/ if ($opts{O});
+$args =~ s/-O/-O$opts{O}/ if $opts{O};
 $args .= ' --gc-debug'    if $gc_debug;
 $ENV{TEST_PROG_ARGS} = $args;
 

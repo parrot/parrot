@@ -1,13 +1,16 @@
 #!perl
+# Copyright: 2005 The Perl Foundation.  All Rights Reserved.
+# $Id$
+
 use strict;
-use TestCompiler tests => 3;
+use Parrot::Test tests => 3;
 
 ##############################
 # Parrot Calling Conventions:  Tail call optimization.
 
 $ENV{TEST_PROG_ARGS} = '-Oc';
 
-output_is(<<'CODE', <<'OUT', "tail call optimization, final position");
+pir_output_is(<<'CODE', <<'OUT', "tail call optimization, final position");
 
 .sub _main @MAIN
 
@@ -95,7 +98,7 @@ _floor returned 2 values, 6 and 2.
 _fib_step returned 3 values, 23, 20, and 3.
 OUT
 
-output_is(<<'CODE', <<'OUT', "tail call optimization, intermediate position");
+pir_output_is(<<'CODE', <<'OUT', "tail call optimization, intermediate position");
 
 .sub _main @MAIN
 
@@ -183,7 +186,7 @@ _floor returned 2 values, 6 and 2.
 _fib_step returned 3 values, 23, 20, and 3.
 OUT
 
-output_is(<<'CODE', <<'OUT', "tail call optimization, implicit final return");
+pir_output_is(<<'CODE', <<'OUT', "tail call optimization, implicit final return");
 
 .sub _main @MAIN
 

@@ -999,8 +999,8 @@ value for key1
 0
 OUTPUT
 
-output_is(<< 'CODE', << 'OUTPUT', "Hash in PIR");
-##PIR##
+pir_output_is(<< 'CODE', << 'OUTPUT', "Hash in PIR");
+
 .sub _main
     .local pmc hash1
     hash1 = new Hash
@@ -1015,8 +1015,8 @@ CODE
 U
 OUTPUT
 
-output_is(<< 'CODE', << 'OUTPUT', "Setting with compound keys");
-##PIR##
+pir_output_is(<< 'CODE', << 'OUTPUT', "Setting with compound keys");
+
 .sub _main
     .local pmc outer_hash
     outer_hash = new Hash
@@ -1172,8 +1172,8 @@ two
 three
 OUTPUT
 
-output_is(<< 'CODE', << 'OUTPUT', "check whether interface is done");
-##PIR##
+pir_output_is(<< 'CODE', << 'OUTPUT', "check whether interface is done");
+
 .sub _main
     .local pmc pmc1
     pmc1 = new Hash
@@ -1195,8 +1195,8 @@ CODE
 0
 OUTPUT
 
-output_is(<< 'CODE', << 'OUTPUT', "iter");
-##PIR##
+pir_output_is(<< 'CODE', << 'OUTPUT', "iter");
+
 .sub __main__ @MAIN
     new P0, .Hash
     set P0['a'], 'x'

@@ -23,7 +23,7 @@ Most tests are skipped when the F<libnci_test.so> shared library is not found.
 
 =cut
 
-use Parrot::Test tests => 56;
+use Parrot::Test    tests => 56;
 use Parrot::Config;
 
 SKIP: {
@@ -32,8 +32,8 @@ unless ( -e "runtime/parrot/dynext/libnci_test$PConfig{load_ext}" ) {
           Test::Builder->expected_tests() );
 }
 
-output_is( << 'CODE', << "OUTPUT", "nci_c - return a char in an INTEGER register");
-##PIR##
+pir_output_is( << 'CODE', << "OUTPUT", "nci_c - return a char in an INTEGER register");
+
 .include "datatypes.pasm"
 
 .sub test @MAIN
@@ -58,8 +58,8 @@ libnci_test was successfully loaded
 OUTPUT
 
 
-output_is( << 'CODE', << 'OUTPUT', "nci_d and nci_dlvar_double" );
-##PIR##
+pir_output_is( << 'CODE', << 'OUTPUT', "nci_d and nci_dlvar_double" );
+
 .include "datatypes.pasm"
 
 .sub test @MAIN
@@ -120,8 +120,8 @@ libnci_test was successfully loaded
 -5555555555.000000
 OUTPUT
 
-output_is( << 'CODE', << 'OUTPUT', "nci_f and nci_dlvar_float" );
-##PIR##
+pir_output_is( << 'CODE', << 'OUTPUT', "nci_f and nci_dlvar_float" );
+
 .include "datatypes.pasm"
 
 .sub test @MAIN
@@ -182,8 +182,8 @@ libnci_test was successfully loaded
 -33300000.000000
 OUTPUT
 
-output_is( << 'CODE', << "OUTPUT", "nci_l - return a long in an INTEGER register");
-##PIR##
+pir_output_is( << 'CODE', << "OUTPUT", "nci_l - return a long in an INTEGER register");
+
 .include "datatypes.pasm"
 
 .sub test @MAIN
@@ -207,8 +207,8 @@ libnci_test was successfully loaded
 -7777777
 OUTPUT
 
-output_is( << 'CODE', << "OUTPUT", "nci_p - return a pointer to int");
-##PIR##
+pir_output_is( << 'CODE', << "OUTPUT", "nci_p - return a pointer to int");
+
 .include "datatypes.pasm"
 
 .sub test @MAIN
@@ -242,8 +242,8 @@ libnci_test was successfully loaded
 -4444
 OUTPUT
 
-output_is( << 'CODE', << "OUTPUT", "nci_t - return a C-string");
-##PIR##
+pir_output_is( << 'CODE', << "OUTPUT", "nci_t - return a C-string");
+
 .include "datatypes.pasm"
 
 .sub test @MAIN
@@ -266,8 +266,8 @@ libnci_test was successfully loaded
 This is a C-string.
 OUTPUT
 
-output_is( << 'CODE', << "OUTPUT", "nci_s - return a short in an INTEGER register");
-##PIR##
+pir_output_is( << 'CODE', << "OUTPUT", "nci_s - return a short in an INTEGER register");
+
 .include "datatypes.pasm"
 
 .sub test @MAIN
@@ -292,8 +292,8 @@ libnci_test was successfully loaded
 OUTPUT
 
 
-output_is( << 'CODE', << 'OUTPUT', "nci_v and nci_dlvar_int" );
-##PIR##
+pir_output_is( << 'CODE', << 'OUTPUT', "nci_v and nci_dlvar_int" );
+
 .include "datatypes.pasm"
 
 .sub test @MAIN
@@ -383,8 +383,8 @@ ok 2
 OUTPUT
 
 
-output_is( << 'CODE', << 'OUTPUT', "nci_dd - PIR" );
-##PIR##
+pir_output_is( << 'CODE', << 'OUTPUT', "nci_dd - PIR" );
+
 .sub test @MAIN
     .local string library_name
     library_name = 'libnci_test'
@@ -407,8 +407,8 @@ libnci_test was successfully loaded
 OUTPUT
 
 
-output_is( << 'CODE', << "OUTPUT", "get_string()" );
-##PIR##
+pir_output_is( << 'CODE', << "OUTPUT", "get_string()" );
+
 .sub test @MAIN
     .local string library_name
     library_name = 'libnci_test'
@@ -1233,8 +1233,8 @@ CODE
 OUTPUT
 
 
-output_is( << 'CODE', << "OUTPUT", "nci_pi - int");
-##PIR##
+pir_output_is( << 'CODE', << "OUTPUT", "nci_pi - int");
+
 .include "datatypes.pasm"
 
 .sub test @MAIN
@@ -1394,8 +1394,8 @@ done.
 OUTPUT
 
 
-output_is(<<'CODE', <<'OUTPUT', "nci_cb_C1 - PIR");
-##PIR##
+pir_output_is(<<'CODE', <<'OUTPUT', "nci_cb_C1 - PIR");
+
 .sub test @MAIN
 
     # this flag will be set by the callback function
@@ -1527,8 +1527,8 @@ done.
 OUTPUT
 
 
-output_is(<<'CODE', <<'OUTPUT', "nci_cb_C3 - PIR");
-##PIR##
+pir_output_is(<<'CODE', <<'OUTPUT', "nci_cb_C3 - PIR");
+
 
 .include "datatypes.pasm"
 
@@ -1731,8 +1731,8 @@ external data: 88
 done.
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "nci_cb_D2 - PIR");
-##PIR##
+pir_output_is(<<'CODE', <<'OUTPUT', "nci_cb_D2 - PIR");
+
 .sub test @MAIN
 
     # this flag will be set by the callback function
@@ -1805,8 +1805,8 @@ the callback has run
 OUTPUT
 
 
-output_is(<<'CODE', <<'OUTPUT', "nci_cb_D3 - PIR");
-##PIR##
+pir_output_is(<<'CODE', <<'OUTPUT', "nci_cb_D3 - PIR");
+
 
 .include "datatypes.pasm"
 
@@ -1893,8 +1893,8 @@ the callback has run
 OUTPUT
 
 
-output_is(<<'CODE', <<'OUTPUT', "nci_cb_D4 - synchronous callbacks");
-##PIR##
+pir_output_is(<<'CODE', <<'OUTPUT', "nci_cb_D4 - synchronous callbacks");
+
 
 .include "datatypes.pasm"
 
@@ -2242,8 +2242,8 @@ Count: 4
 OUTPUT
 
 
-output_is( << 'CODE', << "OUTPUT", "nci_pii - writing back to libnci_test.so" );
-##PIR##
+pir_output_is( << 'CODE', << "OUTPUT", "nci_pii - writing back to libnci_test.so" );
+
 .include "datatypes.pasm"
 
 .sub test @MAIN
@@ -2296,8 +2296,8 @@ libnci_test was successfully loaded
 OUTPUT
 
 
-output_is( << 'CODE', << 'OUTPUT', "nci_vv and nci_dlvar_int" );
-##PIR##
+pir_output_is( << 'CODE', << 'OUTPUT', "nci_vv and nci_dlvar_int" );
+
 .include "datatypes.pasm"
 
 .sub test @MAIN
@@ -2357,8 +2357,8 @@ libnci_test was successfully loaded
 OUTPUT
 
 
-output_is( << 'CODE', << 'OUTPUT', "dlvar - unknown symbol" );
-##PIR##
+pir_output_is( << 'CODE', << 'OUTPUT', "dlvar - unknown symbol" );
+
 .include "datatypes.pasm"
 
 .sub test @MAIN
@@ -2388,8 +2388,8 @@ libnci_test was successfully loaded
 OUTPUT
 
 
-output_is( << 'CODE', << 'OUTPUT', "dlfunc - unknown symbol" );
-##PIR##
+pir_output_is( << 'CODE', << 'OUTPUT', "dlfunc - unknown symbol" );
+
 .include "datatypes.pasm"
 
 .sub test @MAIN
@@ -2440,8 +2440,8 @@ OUTPUT
 
 } # SKIP
 
-output_is(<< 'CODE', << 'OUTPUT', "opcode 'does'");
-##PIR##
+pir_output_is(<< 'CODE', << 'OUTPUT', "opcode 'does'");
+
 .sub test @MAIN
     .local pmc pmc1
     pmc1 = new ParrotLibrary

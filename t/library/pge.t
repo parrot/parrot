@@ -17,8 +17,8 @@ use strict;
 use Parrot::Test tests => 3;
 
 # 1
-output_is(<<'CODE', <<'OUT', "character class membership");
-##PIR##
+pir_output_is(<<'CODE', <<'OUT', "character class membership");
+
 .sub _main
     load_bytecode "library/PGE/Class.pir"
 
@@ -48,8 +48,8 @@ ok 2
 OUT
 
 # 2
-output_is(<<'CODE', <<'OUT', "character class membership: method form");
-##PIR##
+pir_output_is(<<'CODE', <<'OUT', "character class membership: method form");
+
 .sub _main
     load_bytecode "library/PGE/Class.pir"
 
@@ -78,8 +78,8 @@ ok 2
 OUT
 
 # 3
-output_is(<<'CODE', <<'OUT', "RegCounter");
-##PIR##
+pir_output_is(<<'CODE', <<'OUT', "RegCounter");
+
 .sub _main
     load_bytecode "library/PGE/RegCounter.pir"
     

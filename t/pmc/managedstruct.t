@@ -113,8 +113,8 @@ CODE
 /^ok 12 (513|258)$/
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "named element access int16");
-##PIR##
+pir_output_is(<<'CODE', <<'OUTPUT', "named element access int16");
+
 .include "datatypes.pasm"
 
 .sub _main
@@ -240,8 +240,8 @@ CODE
 8
 OUTPUT
 
-output_is(<< 'CODE', << 'OUTPUT', "check whether interface is done");
-##PIR##
+pir_output_is(<< 'CODE', << 'OUTPUT', "check whether interface is done");
+
 .sub _main
     .local pmc pmc1
     pmc1 = new ManagedStruct

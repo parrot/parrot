@@ -1,14 +1,17 @@
-#!perl
+#!perl -w
+# Copyright: 2001-2005 The Perl Foundation.  All Rights Reserved.
+# $Id$
+
 use strict;
-use TestCompiler tests => 11;
+use Parrot::Test tests => 11;
 
 ##############################
 # Parrot Calling Conventions
 
 
-output_is(<<'CODE', <<'OUT', "meth call syntax");
+pir_output_is(<<'CODE', <<'OUT', "meth call syntax");
 
-.sub _main
+.sub test @MAIN
     .local pmc class
     .local pmc obj
     newclass class, "Foo"
@@ -30,8 +33,8 @@ in meth
 done
 OUT
 
-output_is(<<'CODE', <<'OUT', "meth call syntax m.o(arg)");
-.sub _main
+pir_output_is(<<'CODE', <<'OUT', "meth call syntax m.o(arg)");
+.sub test @MAIN
     .local pmc class
     .local pmc obj
     newclass class, "Foo"
@@ -56,8 +59,8 @@ ok
 done
 OUT
 
-output_is(<<'CODE', <<'OUT', "meth call ret = o.m(arg)");
-.sub _main
+pir_output_is(<<'CODE', <<'OUT', "meth call ret = o.m(arg)");
+.sub test @MAIN
     .local pmc class
     .local pmc obj
     newclass class, "Foo"
@@ -85,8 +88,8 @@ ok
 done
 OUT
 
-output_is(<<'CODE', <<'OUT', "meth call syntax, string");
-.sub _main
+pir_output_is(<<'CODE', <<'OUT', "meth call syntax, string");
+.sub test @MAIN
     .local pmc class
     .local pmc obj
     .local string meth
@@ -115,8 +118,8 @@ in meth
 done
 OUT
 
-output_is(<<'CODE', <<'OUT', "initializer");
-.sub _main
+pir_output_is(<<'CODE', <<'OUT', "initializer");
+.sub test @MAIN
     newclass P1, "Foo"
     subclass P2, P1, "Bar"
     subclass P3, P2, "Baz"
@@ -155,9 +158,9 @@ in sub
 done
 OUT
 
-output_is(<<'CODE', <<'OUT', "meth call syntax - method, self");
+pir_output_is(<<'CODE', <<'OUT', "meth call syntax - method, self");
 
-.sub _main
+.sub test @MAIN
     .local pmc class
     .local pmc obj
     newclass class, "Foo"
@@ -183,9 +186,9 @@ ok
 done
 OUT
 
-output_is(<<'CODE', <<'OUT', "explicit meth call syntax");
+pir_output_is(<<'CODE', <<'OUT', "explicit meth call syntax");
 
-.sub _main
+.sub test @MAIN
     .local pmc class
     .local pmc obj
     newclass class, "Foo"
@@ -208,9 +211,9 @@ in meth
 done
 OUT
 
-output_is(<<'CODE', <<'OUT', "explicit meth call syntax, meth var");
+pir_output_is(<<'CODE', <<'OUT', "explicit meth call syntax, meth var");
 
-.sub _main
+.sub test @MAIN
     .local pmc class
     .local pmc obj
     .local string meth
@@ -235,9 +238,9 @@ CODE
 in meth
 done
 OUT
-output_is(<<'CODE', <<'OUT', "explicit meth call syntax, args");
+pir_output_is(<<'CODE', <<'OUT', "explicit meth call syntax, args");
 
-.sub _main
+.sub test @MAIN
     .local pmc class
     .local pmc obj
     newclass class, "Foo"
@@ -273,9 +276,9 @@ ok
 done
 OUT
 
-output_is(<<'CODE', <<'OUT', "explicit meth call syntax, retcont");
+pir_output_is(<<'CODE', <<'OUT', "explicit meth call syntax, retcont");
 
-.sub _main
+.sub test @MAIN
     .local pmc class
     .local pmc obj
     newclass class, "Foo"
@@ -301,9 +304,9 @@ in meth
 done
 OUT
 
-output_is(<<'CODE', <<'OUT', "meth call syntax - reserved word");
+pir_output_is(<<'CODE', <<'OUT', "meth call syntax - reserved word");
 
-.sub _main
+.sub test @MAIN
     .local pmc class
     .local pmc obj
     newclass class, "Foo"

@@ -1,9 +1,12 @@
-#!perl
+#!perl -w
+# Copyright: 2001-2005 The Perl Foundation.  All Rights Reserved.
+# $Id$
+
 use strict;
-use TestCompiler tests => 3;
+use Parrot::Test tests => 3;
 
 ##############################
-output_is(<<'CODE', <<'OUT', "namespace 1");
+pir_output_is(<<'CODE', <<'OUT', "namespace 1");
 .sub _foo
     .local int x
     x = 5
@@ -23,7 +26,7 @@ CODE
 OUT
 
 ##############################
-output_is(<<'CODE', <<'OUT', "namespace 2");
+pir_output_is(<<'CODE', <<'OUT', "namespace 2");
 .sub _foo
     .local int x
     .local int y
@@ -51,7 +54,7 @@ CODE
 OUT
 
 ##############################
-output_is(<<'CODE', <<'OUT', "namespace 3");
+pir_output_is(<<'CODE', <<'OUT', "namespace 3");
 .sub _foo
     .local int x
     .local int y

@@ -1,12 +1,13 @@
-#!perl
-use strict;
-use TestCompiler tests => 13;
+#!perl -w
+# Copyright: 2001-2005 The Perl Foundation.  All Rights Reserved.
+# $Id$
 
-##############################
+use strict;
+use Parrot::Test tests => 13;
+
+pir_output_is(<<'CODE', <<'OUT', "bsr 1");
 # this tests register allocation/preserving of local bsr calls
-#
-output_is(<<'CODE', <<'OUT', "bsr 1");
-.sub _test
+.sub test @MAIN
    $I0 = 2
    $I1 = 3
    bsr L
@@ -24,8 +25,8 @@ CODE
 OUT
 
 ##############################
-output_is(<<'CODE', <<'OUT', "stack calling conventions");
-.sub _main
+pir_output_is(<<'CODE', <<'OUT', "stack calling conventions");
+.sub test @MAIN
    .local int x
    x = 10
    .const int y = 20
@@ -76,8 +77,8 @@ OUT
 
 ##############################
 #
-output_is(<<'CODE', <<'OUT', "fact with stack calling conventions");
-.sub _main
+pir_output_is(<<'CODE', <<'OUT', "fact with stack calling conventions");
+.sub test @MAIN
     .local int counter
     counter = 5
     .arg counter
@@ -110,8 +111,8 @@ OUT
 ##############################
 # this is considered a non local bsr
 #
-output_is(<<'CODE', <<'OUT', "recursive bsr with saveall");
-.sub _test
+pir_output_is(<<'CODE', <<'OUT', "recursive bsr with saveall");
+.sub test @MAIN
    $I0 = 5	# count
    $I1 = 1	# product
    save $I0
@@ -144,8 +145,8 @@ OUT
 
 ##############################
 # tail recursion - caller saves
-output_is(<<'CODE', <<'OUT', "tail recursive bsr");
-.sub _test
+pir_output_is(<<'CODE', <<'OUT', "tail recursive bsr");
+.sub test @MAIN
    $I0 = 5	# count
    $I1 = 1	# product
    saveall
@@ -175,8 +176,8 @@ OUT
 
 ##############################
 # tail recursion - caller saves
-output_is(<<'CODE', <<'OUT', "tail recursive bsr 2");
-.sub _test
+pir_output_is(<<'CODE', <<'OUT', "tail recursive bsr 2");
+.sub test @MAIN
    $I0 = 5	# count
    $I1 = 1	# product
    saveall
@@ -202,8 +203,8 @@ OUT
 
 ##############################
 # tail recursion - caller saves
-output_is(<<'CODE', <<'OUT', "tail recursive bsr - opt");
-.sub _test
+pir_output_is(<<'CODE', <<'OUT', "tail recursive bsr - opt");
+.sub test @MAIN
    $I0 = 5	# count
    $I1 = 1	# product
    saveall
@@ -229,8 +230,8 @@ OUT
 
 ##############################
 # tail recursion - caller saves - parrot calling convention
-output_is(<<'CODE', <<'OUT', "tail recursive bsr, parrot cc");
-.sub _test
+pir_output_is(<<'CODE', <<'OUT', "tail recursive bsr, parrot cc");
+.sub test @MAIN
    $I0 = _fact(1, 5)
    print $I0
    print "\n"
@@ -257,8 +258,8 @@ OUT
 
 ##############################
 # coroutine
-output_is(<<'CODE', <<'OUT', "coroutine");
-.sub _main
+pir_output_is(<<'CODE', <<'OUT', "coroutine");
+.sub test @MAIN
     .local Coroutine co
     co = new Coroutine
     co = addr _routine
@@ -281,8 +282,8 @@ CODE
 Hello perl6.
 OUT
 
-output_is(<<'CODE', <<'OUT', "newsub");
-    .sub _main
+pir_output_is(<<'CODE', <<'OUT', "newsub");
+    .sub test @MAIN
         newsub P0, .Sub, _foo	# PASM syntax only for now
         invokecc P0
         end
@@ -300,13 +301,13 @@ OUT
 my $head1 = '=head1';
 my $cut = '=cut';
 
-output_is(<<"CODE", <<'OUT', "pod before");
+pir_output_is(<<"CODE", <<'OUT', "pod before");
 $head1 BLA
 
  fasel
 
 $cut
-.sub _main
+.sub test \@MAIN
 	print "ok 1\\n"
 	end
 .end
@@ -314,13 +315,13 @@ CODE
 ok 1
 OUT
 
-output_is(<<"CODE", <<'OUT', "pod before, after");
+pir_output_is(<<"CODE", <<'OUT', "pod before, after");
 $head1 FOO
 
  fasel
 
 $cut
-.sub _main
+.sub test \@MAIN
 	print "ok 1\\n"
 	end
 .end
@@ -332,8 +333,8 @@ CODE
 ok 1
 OUT
 
-output_is(<<'CODE', <<'OUT', "bug #25948");
-.sub _main
+pir_output_is(<<'CODE', <<'OUT', "bug #25948");
+.sub main @MAIN
         goto L1
 test:
         $I1 = 1

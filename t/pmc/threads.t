@@ -194,8 +194,8 @@ in thread
 done
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "join, get retval");
-##PIR##
+pir_output_is(<<'CODE', <<'OUTPUT', "join, get retval");
+
 .sub _main
     .const int MAX = 1000
     .sym pmc kid

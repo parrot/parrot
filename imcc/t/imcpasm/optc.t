@@ -1,6 +1,9 @@
 #!perl
+# Copyright: 2005 The Perl Foundation.  All Rights Reserved.
+# $Id$
+
 use strict;
-use TestCompiler tests => 6;
+use Parrot::Test tests => 6;
 
 # these tests are run with -Oc by TestCompiler and show
 # generated PASM code for call optimization
@@ -8,7 +11,7 @@ use TestCompiler tests => 6;
 
 ##############################
 # prototyped calls, invokecc
-output_like(<<'CODE', <<'OUT', "in P param");
+pir_2_pasm_like(<<'CODE', <<'OUT', "in P param");
 .sub _main
     $P0 = new PerlUndef
     $P0 = 42
@@ -46,7 +49,7 @@ OUT
 
 SKIP: {
     skip("PCC changes", 5);
-output_like(<<'CODE', <<'OUT', "in, out P param");
+pir_2_pasm_like(<<'CODE', <<'OUT', "in, out P param");
 .sub _main
     .local Sub sub
     .local PerlUndef x
@@ -95,7 +98,7 @@ _sub:
   returncc/
 OUT
 
-output_like(<<'CODE', <<'OUT', "in, out P param, P var");
+pir_2_pasm_like(<<'CODE', <<'OUT', "in, out P param, P var");
 .sub _main
     .local Sub sub
     .local PerlUndef x
@@ -151,7 +154,7 @@ _sub:
   returncc/
 OUT
 
-output_like(<<'CODE', <<'OUT', "in, out different P param");
+pir_2_pasm_like(<<'CODE', <<'OUT', "in, out different P param");
 .sub _main
     .local Sub sub
     .local PerlUndef x
@@ -201,7 +204,7 @@ _sub:
   returncc/
 OUT
 
-output_like(<<'CODE', <<'OUT', "in, out different P param, interfer");
+pir_2_pasm_like(<<'CODE', <<'OUT', "in, out different P param, interfer");
 .sub _main
     .local Sub sub
     .local PerlUndef x
@@ -254,7 +257,7 @@ _sub:
   returncc/
 OUT
 
-output_like(<<'CODE', <<'OUT', "tail call");
+pir_2_pasm_like(<<'CODE', <<'OUT', "tail call");
 .sub _main
     .local Sub sub
     newsub sub, .Sub, _sub1

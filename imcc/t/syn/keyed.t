@@ -1,10 +1,13 @@
-#!perl
+#!perl -w
+# Copyright: 2001-2005 The Perl Foundation.  All Rights Reserved.
+# $Id$
+
 use strict;
-use TestCompiler tests => 1;
+use Parrot::Test tests => 1;
 
 ##############################
-output_is(<<'CODE', <<'OUTPUT', "add_keyed");
-.sub _main
+pir_output_is(<<'CODE', <<'OUTPUT', "add_keyed");
+.sub test @MAIN
     new P0, .PerlArray
     new P1, .PerlArray
     new P2, .PerlArray

@@ -389,8 +389,8 @@ ABC
 OUTPUT
 
 
-output_is(<< 'CODE', << 'OUTPUT', "PerlString iterator in PIR");
-##PIR##
+pir_output_is(<< 'CODE', << 'OUTPUT', "PerlString iterator in PIR");
+
 .include "iterator.pasm"
 .sub _main
     .local pmc string_1
@@ -426,8 +426,8 @@ abcdefg
 reached end
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "Index access for Iterator on PerlString");
-##PIR##
+pir_output_is(<<'CODE', <<'OUTPUT', "Index access for Iterator on PerlString");
+
 .include "iterator.pasm"
 .sub _main
     .local pmc string_1
@@ -476,8 +476,8 @@ Iterator get_integer_keyed_int 0: 98
 Iterator get_integer_keyed_int -1: 97
 OUTPUT
 
-output_is(<< 'CODE', << 'OUTPUT', "Index access for Iterator on PerlArray");
-##PIR##
+pir_output_is(<< 'CODE', << 'OUTPUT', "Index access for Iterator on PerlArray");
+
 .include "iterator.pasm"
 .sub _main
     .local pmc array_1
@@ -1099,8 +1099,8 @@ CODE
 ok
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "xrange iterator");
-##PIR##
+pir_output_is(<<'CODE', <<'OUTPUT', "xrange iterator");
+
 .sub main
     .include "iterator.pasm"
         # xrange(10, 14)
@@ -1127,8 +1127,8 @@ CODE
 ok
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "xrange iterator ..n");
-##PIR##
+pir_output_is(<<'CODE', <<'OUTPUT', "xrange iterator ..n");
+
 .sub main
     .include "iterator.pasm"
         # xrange(4)
@@ -1156,8 +1156,8 @@ ok
 OUTPUT
 
 
-output_is(<<'CODE', <<'OUTPUT', "slice, get strings from array");
-##PIR##
+pir_output_is(<<'CODE', <<'OUTPUT', "slice, get strings from array");
+
 .sub main @MAIN
     .include "iterator.pasm"
     .local pmc ar
@@ -1272,8 +1272,8 @@ ok 1
 ok 2
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "xrange iterator, get_iter");
-##PIR##
+pir_output_is(<<'CODE', <<'OUTPUT', "xrange iterator, get_iter");
+
 .sub main
     .include "iterator.pasm"
         # xrange(10, 14)
@@ -1324,8 +1324,8 @@ ok 1
 5 f
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "iter.next method");
-##PIR##
+pir_output_is(<<'CODE', <<'OUTPUT', "iter.next method");
+
 .sub main @MAIN
    new $P0, .PerlString
    set $P0, "abcdef"

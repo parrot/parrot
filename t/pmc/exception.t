@@ -458,8 +458,8 @@ output_is(<<'CODE', '', "exit exception");
     end
 CODE
 
-output_is(<<'CODE', <<'OUTPUT', "set recursion limit, method call ");
-##PIR##
+pir_output_is(<<'CODE', <<'OUTPUT', "set recursion limit, method call ");
+
 # see also t/op/gc_14.imc
 
 .sub main @MAIN

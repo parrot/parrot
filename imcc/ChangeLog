@@ -1,3 +1,9 @@
+# Copyright: 2005 The Perl Foundation.  All Rights Reserved.
+# $Id$
+
+- 2003-11-03	Bernhard Schmalhofer
+	* Migrate TestCompiler.pm to Parrot/Test.pm
+
 - 2003-11-03	melvin
 	* move register allocation and spill related code to reg_alloc.c
 	* cleanup some routine names

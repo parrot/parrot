@@ -1,9 +1,12 @@
 #!perl
+# Copyright: 2005 The Perl Foundation.  All Rights Reserved.
+# $Id$
+
 use strict;
-use TestCompiler tests => 2;
+use Parrot::Test tests => 2;
 
 ##############################
-output_like(<<'CODE', <<'OUT', "non-constant dest bsr, invoke");
+pir_2_pasm_like(<<'CODE', <<'OUT', "non-constant dest bsr, invoke");
 .sub _main
     $P26 = new Sub
     $I15 = addr _sub1
@@ -24,7 +27,7 @@ _sub1:
  ret/
 OUT
 
-output_like(<<'CODE', <<'OUT', "nonlocal bsr");
+pir_2_pasm_like(<<'CODE', <<'OUT', "nonlocal bsr");
 .sub _main
     $P26 = new Sub
     $I15 = addr _f

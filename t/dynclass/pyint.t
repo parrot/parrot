@@ -18,8 +18,8 @@ Tests the Python Integer PMC.
 
 use Parrot::Test tests => 25;
 
-output_is(<< 'CODE', << 'OUTPUT', "abs");
-##PIR##
+pir_output_is(<< 'CODE', << 'OUTPUT', "abs");
+
 .sub main @MAIN
     loadlib P1, "python_group"
     find_type $I0, "PyInt"
@@ -39,8 +39,8 @@ CODE
 13 13
 OUTPUT
 
-output_is(<< 'CODE', << 'OUTPUT', "add");
-##PIR##
+pir_output_is(<< 'CODE', << 'OUTPUT', "add");
+
 .sub main @MAIN
     loadlib P1, "python_group"
     find_type $I0, "PyInt"
@@ -65,8 +65,8 @@ CODE
 18 18 18
 OUTPUT
 
-output_is(<< 'CODE', << 'OUTPUT', "and");
-##PIR##
+pir_output_is(<< 'CODE', << 'OUTPUT', "and");
+
 .sub main @MAIN
     loadlib P1, "python_group"
     find_type $I0, "PyInt"
@@ -94,8 +94,8 @@ CODE
 -13 19 19 19
 OUTPUT
 
-output_is(<< 'CODE', << 'OUTPUT', "cmp");
-##PIR##
+pir_output_is(<< 'CODE', << 'OUTPUT', "cmp");
+
 .sub main @MAIN
     loadlib P1, "python_group"
     find_type $I0, "PyInt"
@@ -122,8 +122,8 @@ CODE
 1 1 1
 OUTPUT
 
-output_is(<< 'CODE', << 'OUTPUT', "div");
-##PIR##
+pir_output_is(<< 'CODE', << 'OUTPUT', "div");
+
 .sub main @MAIN
     loadlib P1, "python_group"
     find_type $I0, "PyInt"
@@ -151,8 +151,8 @@ CODE
 -3 -3 -3 -3
 OUTPUT
 
-output_is(<< 'CODE', << 'OUTPUT', "float");
-##PIR##
+pir_output_is(<< 'CODE', << 'OUTPUT', "float");
+
 .sub main @MAIN
     loadlib P1, "python_group"
     find_type $I0, "PyInt"
@@ -168,8 +168,8 @@ CODE
 -13.0
 OUTPUT
 
-output_is(<< 'CODE', << 'OUTPUT', "floordiv");
-##PIR##
+pir_output_is(<< 'CODE', << 'OUTPUT', "floordiv");
+
 .sub main @MAIN
     loadlib P1, "python_group"
     find_type $I0, "PyInt"
@@ -197,8 +197,8 @@ CODE
 -3 -3 -3 -3
 OUTPUT
 
-output_is(<< 'CODE', << 'OUTPUT', "hex");
-##PIR##
+pir_output_is(<< 'CODE', << 'OUTPUT', "hex");
+
 .sub main @MAIN
     loadlib P1, "python_group"
     find_type $I0, "PyInt"
@@ -213,8 +213,8 @@ CODE
 0x1f
 OUTPUT
 
-output_is(<< 'CODE', << 'OUTPUT', "int");
-##PIR##
+pir_output_is(<< 'CODE', << 'OUTPUT', "int");
+
 .sub main @MAIN
     loadlib P1, "python_group"
     find_type $I0, "PyInt"
@@ -230,8 +230,8 @@ CODE
 -13
 OUTPUT
 
-output_is(<< 'CODE', << 'OUTPUT', "invert");
-##PIR##
+pir_output_is(<< 'CODE', << 'OUTPUT', "invert");
+
 .sub main @MAIN
     loadlib P1, "python_group"
     find_type $I0, "PyInt"
@@ -251,8 +251,8 @@ CODE
 12 12
 OUTPUT
 
-output_is(<< 'CODE', << 'OUTPUT', "is");
-##PIR##
+pir_output_is(<< 'CODE', << 'OUTPUT', "is");
+
 .sub main @MAIN
     loadlib P1, "python_group"
     new $P0, "PyInt"
@@ -271,8 +271,8 @@ CODE
 True
 OUTPUT
 
-output_is(<< 'CODE', << 'OUTPUT', "lshift");
-##PIR##
+pir_output_is(<< 'CODE', << 'OUTPUT', "lshift");
+
 .sub main @MAIN
     loadlib P1, "python_group"
     find_type $I0, "PyInt"
@@ -300,8 +300,8 @@ CODE
 248 248 248 248
 OUTPUT
 
-output_is(<< 'CODE', << 'OUTPUT', "mod");
-##PIR##
+pir_output_is(<< 'CODE', << 'OUTPUT', "mod");
+
 .sub main @MAIN
     loadlib P1, "python_group"
     find_type $I0, "PyInt"
@@ -329,8 +329,8 @@ CODE
 -8 -8 -8 -8
 OUTPUT
 
-output_is(<< 'CODE', << 'OUTPUT', "mul");
-##PIR##
+pir_output_is(<< 'CODE', << 'OUTPUT', "mul");
+
 .sub main @MAIN
     loadlib P1, "python_group"
     find_type $I0, "PyInt"
@@ -358,8 +358,8 @@ CODE
 -403 -403 -403 -403
 OUTPUT
 
-output_is(<< 'CODE', << 'OUTPUT', "neg");
-##PIR##
+pir_output_is(<< 'CODE', << 'OUTPUT', "neg");
+
 .sub main @MAIN
     loadlib P1, "python_group"
     find_type $I0, "PyInt"
@@ -379,8 +379,8 @@ CODE
 13 13
 OUTPUT
 
-output_is(<< 'CODE', << 'OUTPUT', "nonzero");
-##PIR##
+pir_output_is(<< 'CODE', << 'OUTPUT', "nonzero");
+
 .sub main @MAIN
     loadlib P1, "python_group"
     find_type $I0, "PyInt"
@@ -397,8 +397,8 @@ CODE
 True
 OUTPUT
 
-output_is(<< 'CODE', << 'OUTPUT', "oct");
-##PIR##
+pir_output_is(<< 'CODE', << 'OUTPUT', "oct");
+
 .sub main @MAIN
     loadlib P1, "python_group"
     find_type $I0, "PyInt"
@@ -413,8 +413,8 @@ CODE
 037
 OUTPUT
 
-output_is(<< 'CODE', << 'OUTPUT', "or");
-##PIR##
+pir_output_is(<< 'CODE', << 'OUTPUT', "or");
+
 .sub main @MAIN
     loadlib P1, "python_group"
     find_type $I0, "PyInt"
@@ -442,8 +442,8 @@ CODE
 31 -1 -1 -1
 OUTPUT
 
-output_is(<< 'CODE', << 'OUTPUT', "pos");
-##PIR##
+pir_output_is(<< 'CODE', << 'OUTPUT', "pos");
+
 .sub main @MAIN
     loadlib P1, "python_group"
     find_type $I0, "PyInt"
@@ -460,8 +460,8 @@ CODE
 -13
 OUTPUT
 
-output_is(<< 'CODE', << 'OUTPUT', "pow");
-##PIR##
+pir_output_is(<< 'CODE', << 'OUTPUT', "pow");
+
 .sub main @MAIN
     loadlib P1, "python_group"
     find_type $I0, "PyInt"
@@ -494,8 +494,8 @@ CODE
 961 29791 961 0.5 0.5
 OUTPUT
 
-output_is(<< 'CODE', << 'OUTPUT', "repr");
-##PIR##
+pir_output_is(<< 'CODE', << 'OUTPUT', "repr");
+
 .sub main @MAIN
     loadlib P1, "python_group"
     find_type $I0, "PyInt"
@@ -516,8 +516,8 @@ CODE
 -13 -13
 OUTPUT
 
-output_is(<< 'CODE', << 'OUTPUT', "rshift");
-##PIR##
+pir_output_is(<< 'CODE', << 'OUTPUT', "rshift");
+
 .sub main @MAIN
     loadlib P1, "python_group"
     find_type $I0, "PyInt"
@@ -545,8 +545,8 @@ CODE
 3 3 3 3
 OUTPUT
 
-output_is(<< 'CODE', << 'OUTPUT', "sub");
-##PIR##
+pir_output_is(<< 'CODE', << 'OUTPUT', "sub");
+
 .sub main @MAIN
     loadlib P1, "python_group"
     find_type $I0, "PyInt"
@@ -571,8 +571,8 @@ CODE
 44 44 44
 OUTPUT
 
-output_is(<< 'CODE', << 'OUTPUT', "truediv");
-##PIR##
+pir_output_is(<< 'CODE', << 'OUTPUT', "truediv");
+
 .sub main @MAIN
     loadlib P1, "python_group"
     find_type $I0, "PyInt"
@@ -591,8 +591,8 @@ CODE
 -7.75
 OUTPUT
 
-output_is(<< 'CODE', << 'OUTPUT', "xor");
-##PIR##
+pir_output_is(<< 'CODE', << 'OUTPUT', "xor");
+
 .sub main @MAIN
     loadlib P1, "python_group"
     find_type $I0, "PyInt"

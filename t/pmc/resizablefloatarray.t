@@ -409,8 +409,8 @@ CODE
 /ResizableFloatArray: Can't pop from an empty array!/
 OUTPUT
 
-output_is(<< 'CODE', << 'OUTPUT', "check whether interface is done");
-##PIR##
+pir_output_is(<< 'CODE', << 'OUTPUT', "check whether interface is done");
+
 .sub _main
     .local pmc pmc1
     pmc1 = new ResizableFloatArray
@@ -432,8 +432,8 @@ CODE
 0
 OUTPUT
 
-output_is(<< 'CODE', << 'OUTPUT', "push float");
-##PIR##
+pir_output_is(<< 'CODE', << 'OUTPUT', "push float");
+
 .sub _main
     .local pmc pmc1
     pmc1 = new ResizableFloatArray

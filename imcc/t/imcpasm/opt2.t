@@ -1,6 +1,9 @@
 #!perl
+# Copyright: 2005 The Perl Foundation.  All Rights Reserved.
+# $Id$
+
 use strict;
-use TestCompiler tests => 5;
+use Parrot::Test tests => 5;
 
 
 SKIP: {
@@ -10,7 +13,7 @@ SKIP: {
 # generated PASM code for various optimizations at level 2
 
 ##############################
-output_is(<<'CODE', <<'OUT', "used once lhs");
+pir_2_pasm_is(<<'CODE', <<'OUT', "used once lhs");
 .sub _main
 	$I1 = 1
 	$I2 = 2
@@ -24,7 +27,7 @@ _main:
 OUT
 
 ##############################
-output_is(<<'CODE', <<'OUT', "constant propogation and resulting dead code");
+pir_2_pasm_is(<<'CODE', <<'OUT', "constant propogation and resulting dead code");
 .sub _main
        set I0, 5
 loop:
@@ -45,7 +48,7 @@ loop:
 OUT
 
 ##############################
-output_is(<<'CODE', <<'OUT', "don't move constant past a label");
+pir_2_pasm_is(<<'CODE', <<'OUT', "don't move constant past a label");
 .sub _main
   set I1, 10
   set I0, 5
@@ -74,7 +77,7 @@ OUT
 SKIP: {
 skip("loop opt disabled for now", 1);
 
-output_is(<<'CODE', <<'OUT', "remove invariant from loop");
+pir_2_pasm_is(<<'CODE', <<'OUT', "remove invariant from loop");
 .sub _main
        set I0, 5
 loop:
@@ -105,7 +108,7 @@ OUT
 }
 
 ##############################
-output_is(<<'CODE', <<'OUT', "constant prop repeated");
+pir_2_pasm_is(<<'CODE', <<'OUT', "constant prop repeated");
 .sub _main
   .local int a
   .local int b

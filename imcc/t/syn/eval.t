@@ -1,13 +1,16 @@
-#!perl
+#!perl -w
+# Copyright: 2001-2005 The Perl Foundation.  All Rights Reserved.
+# $Id$
+
 use strict;
-use TestCompiler tests => 7;
+use Parrot::Test tests => 7;
 
 SKIP: {
 	skip("changed eval semantics - see t/pmc/eval.t", 7);
 
 ##############################
-output_is(<<'CODE', <<'OUT', "eval pasm");
-.sub _test
+pir_output_is(<<'CODE', <<'OUT', "eval pasm");
+.sub test @MAIN
 	$S0 = 'set S1, "in eval\n"'
 	concat $S0, "\n"
 	concat $S0, "print S1\nend\n"
@@ -22,8 +25,8 @@ in eval
 back
 OUT
 
-output_is(<<'CODE', <<'OUT', "eval pir");
-.sub _test
+pir_output_is(<<'CODE', <<'OUT', "eval pir");
+.sub test @MAIN
 	$S1 = ".sub _foo\n"
 	concat $S1, '$S1 = "42\n"'
 	concat $S1, "\nprint $S1\nend\n"
@@ -39,7 +42,7 @@ CODE
 back
 OUT
 
-output_is(<<'CODE', <<'OUT', "intersegment branch");
+pir_output_is(<<'CODE', <<'OUT', "intersegment branch");
 # #! perl -w
 # my $i= 5;
 # LAB:
@@ -50,7 +53,7 @@ output_is(<<'CODE', <<'OUT', "intersegment branch");
 # 7
 #####
 
-.sub _test
+.sub test @MAIN
     I1 = 5
     $S0 = ".sub _e\nif I1 == 6 goto LAB\nend\n.end\n"
     compreg P2, "PIR"
@@ -66,8 +69,8 @@ CODE
 7
 OUT
 
-output_is(<<'CODE', <<'OUT', "intersegment branch 2");
-.sub _test
+pir_output_is(<<'CODE', <<'OUT', "intersegment branch 2");
+.sub test @MAIN
     I1 = 4
     $S0 = ".sub _e\nif I1 <= 6 goto LAB\nend\n.end\n"
     compreg P2, "PIR"
@@ -83,8 +86,8 @@ CODE
 7
 OUT
 
-output_is(<<'CODE', <<'OUT', "intersegment branch 3");
-.sub _test
+pir_output_is(<<'CODE', <<'OUT', "intersegment branch 3");
+.sub test @MAIN
     I1 = 4
     compreg P2, "PIR"
     $S0 = ".sub _e\nif I1 <= 5 goto LAB\nend\n.end\n"
@@ -104,8 +107,8 @@ CODE
 7
 OUT
 
-output_is(<<'CODE', <<'OUT', "intersegment branch 4");
-.sub _test
+pir_output_is(<<'CODE', <<'OUT', "intersegment branch 4");
+.sub test @MAIN
     I1 = 4
     compreg P2, "PIR"
     $S0 = ".sub _e\nif I1 <= 5 goto LAB\nend\n.end\n"
@@ -126,8 +129,8 @@ CODE
 8
 OUT
 
-output_is(<<'CODE', <<'OUT', "eval - same constants");
-.sub _test
+pir_output_is(<<'CODE', <<'OUT', "eval - same constants");
+.sub test @MAIN
         print "hello"
 	print "\n"
 	$S0 = 'print "hello"'

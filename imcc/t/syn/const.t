@@ -1,12 +1,11 @@
-#!perl
-
-# Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+#!perl -w
+# Copyright: 2001-2005 The Perl Foundation.  All Rights Reserved.
 # $Id$
 
 use strict;
-use TestCompiler tests => 7;
+use Parrot::Test tests => 7;
 
-output_is(<<'CODE', <<'OUT', "globalconst 1");
+pir_output_is(<<'CODE', <<'OUT', "globalconst 1");
 
 .sub __main
 	.globalconst int N = 5
@@ -28,7 +27,7 @@ CODE
 5
 OUT
 
-output_is(<<'CODE', <<'OUT', "globalconst 2");
+pir_output_is(<<'CODE', <<'OUT', "globalconst 2");
 .sub test @MAIN
 	.globalconst int N = 5
 	call _main
@@ -51,7 +50,7 @@ CODE
 15
 OUT
 
-output_is(<<'CODE', <<'OUT', "globalconst 3");
+pir_output_is(<<'CODE', <<'OUT', "globalconst 3");
 
 .sub call_sub1
     sub1()
@@ -72,7 +71,7 @@ CODE
 OUT
 
 
-output_is(<<'CODE', <<'OUT', "array/hash consts");
+pir_output_is(<<'CODE', <<'OUT', "array/hash consts");
 .sub _MAIN
    .local PerlArray ar
    .local pmc ha
@@ -102,7 +101,7 @@ CODE
 OUT
 
 
-output_is(<<'CODE', <<'OUT', "escaped");
+pir_output_is(<<'CODE', <<'OUT', "escaped");
 .sub _MAIN
    $S0 = "\""
    print $S0
@@ -116,7 +115,7 @@ CODE
 OUT
 
 
-output_is(<<'CODE', <<'OUT', "PMC const 1 - Sub");
+pir_output_is(<<'CODE', <<'OUT', "PMC const 1 - Sub");
 .sub main @MAIN
     .const .Sub $P0 = "foo"
     print "ok 1\n"
@@ -133,7 +132,7 @@ ok 3
 OUT
 
 
-output_is(<<'CODE', <<'OUT', "PMC const 2 - Sub ident");
+pir_output_is(<<'CODE', <<'OUT', "PMC const 2 - Sub ident");
 .sub main @MAIN
     .const .Sub func = "foo"
     print "ok 1\n"

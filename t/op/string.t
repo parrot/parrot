@@ -2534,8 +2534,8 @@ a
 a--b
 OUTPUT
 
-output_is( <<'CODE', <<OUTPUT, "join: __get_string returns a null string");
-##PIR##
+pir_output_is( <<'CODE', <<OUTPUT, "join: __get_string returns a null string");
+
 .sub _main
     newclass P0, "Foo"
 

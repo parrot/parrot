@@ -115,8 +115,8 @@ ok 2
 11
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "PIR compiler sub");
-##PIR##
+pir_output_is(<<'CODE', <<'OUTPUT', "PIR compiler sub");
+
 .sub test @MAIN
     .local NCI compiler
     find_global compiler, "xcompile"
@@ -153,8 +153,8 @@ ok
 ok
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "bug #31467");
-##PIR##
+pir_output_is(<<'CODE', <<'OUTPUT', "bug #31467");
+
   .sub main @MAIN
      $P1 = new Hash
      newsub $P0, .Sub, _builtin
@@ -186,8 +186,8 @@ dynamic
 builtin
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "compile PAST in PIR");
-##PIR##
+pir_output_is(<<'CODE', <<'OUTPUT', "compile PAST in PIR");
+
 .sub main @MAIN
     .local pmc past_compiler
     past_compiler = compreg "PAST"
@@ -224,8 +224,8 @@ before
 after
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "compile PAST in PASM in PIR");
-##PIR##
+pir_output_is(<<'CODE', <<'OUTPUT', "compile PAST in PASM in PIR");
+
 .sub test @MAIN
 
     # PIR

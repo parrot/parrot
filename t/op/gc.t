@@ -287,8 +287,8 @@ coro
 done
 OUTPUT
 
-output_is(<<'CODE', <<OUTPUT, "Fun with nondeterministic searches");
-##PIR##
+pir_output_is(<<'CODE', <<OUTPUT, "Fun with nondeterministic searches");
+
 
 # code by Piers Cawley
 =pod
@@ -451,8 +451,8 @@ CODE
 3 * 5 == 15!
 OUTPUT
 
-output_is(<<'CODE', <<OUTPUT, "Recursion and exceptions");
-##PIR##
+pir_output_is(<<'CODE', <<OUTPUT, "Recursion and exceptions");
+
 # this did segfault with GC_DEBUG
 
 .sub main @MAIN

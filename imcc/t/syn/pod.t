@@ -1,11 +1,14 @@
-#!perl
+#!perl -w
+# Copyright: 2001-2005 The Perl Foundation.  All Rights Reserved.
+# $Id$
+
 use strict;
-use TestCompiler tests => 3;
+use Parrot::Test tests => 3;
 
 # POD
 
-output_is(<<'CODE', <<'OUT', "simple pod");
-.sub _main
+pir_output_is(<<'CODE', <<'OUT', "simple pod");
+.sub test @MAIN
     print "pass\n"
     end
 .end
@@ -16,8 +19,8 @@ CODE
 pass
 OUT
 
-output_is(<<'CODE', <<'OUT', "pod with decimal digits");
-.sub _main
+pir_output_is(<<'CODE', <<'OUT', "pod with decimal digits");
+.sub test @MAIN
     print "pass\n"
     end
 .end
@@ -28,8 +31,8 @@ CODE
 pass
 OUT
 
-output_is(<<'CODE', <<'OUT', "pod inside sub");
-.sub _main
+pir_output_is(<<'CODE', <<'OUT', "pod inside sub");
+.sub test @MAIN
      print "pass\n"
      bsr _x
      end

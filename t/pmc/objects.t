@@ -1328,8 +1328,8 @@ ok 2
 Integer
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "PMC as classes - subclass");
-##PIR##
+pir_output_is(<<'CODE', <<'OUTPUT', "PMC as classes - subclass");
+
 .sub main @MAIN
   .local pmc MyInt
   getclass $P0, "Integer"
@@ -1352,8 +1352,8 @@ ParrotClass
 11
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "PMC as classes - instantiate");
-##PIR##
+pir_output_is(<<'CODE', <<'OUTPUT', "PMC as classes - instantiate");
+
 .sub main @MAIN
   .local pmc MyInt
   getclass $P0, "Integer"
@@ -1372,8 +1372,8 @@ ok 2
 ok 3
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "PMC as classes - methods");
-##PIR##
+pir_output_is(<<'CODE', <<'OUTPUT', "PMC as classes - methods");
+
 .sub main @MAIN
   .local pmc MyInt
   getclass $P0, "Integer"
@@ -1424,8 +1424,8 @@ ok 4
 MyInt(42)
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "PMC as classes - mmd methods");
-##PIR##
+pir_output_is(<<'CODE', <<'OUTPUT', "PMC as classes - mmd methods");
+
 
 .sub main @MAIN
   .local pmc MyInt
@@ -1467,8 +1467,8 @@ CODE
 MyInt(42)
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "PMC as classes - overridden mmd methods");
-##PIR##
+pir_output_is(<<'CODE', <<'OUTPUT', "PMC as classes - overridden mmd methods");
+
 .sub main @MAIN
   .local pmc MyInt
   getclass $P0, "Integer"
@@ -1515,8 +1515,8 @@ in add
 106
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "PMC as classes - derived 1");
-##PIR##
+pir_output_is(<<'CODE', <<'OUTPUT', "PMC as classes - derived 1");
+
 .sub main @MAIN
   .local pmc MyInt
   .local pmc MyInt2
@@ -1579,8 +1579,8 @@ ok 4
 MyInt2(42)
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "PMC as classes - derived 2");
-##PIR##
+pir_output_is(<<'CODE', <<'OUTPUT', "PMC as classes - derived 2");
+
 .sub main @MAIN
   .local pmc MyInt
   .local pmc MyInt2
@@ -1657,8 +1657,8 @@ OUTPUT
 
 TODO: {
   local $TODO = "methods can't be overridden in derived class only";
-output_is(<<'CODE', <<'OUTPUT', "PMC as classes - derived 3");
-##PIR##
+pir_output_is(<<'CODE', <<'OUTPUT', "PMC as classes - derived 3");
+
 .sub main @MAIN
   .local pmc MyInt
   .local pmc MyInt2
@@ -1722,8 +1722,8 @@ MyInt2(42)
 OUTPUT
 };
 
-output_is(<<'CODE', <<'OUTPUT', "subclassing ParrotClass");
-##PIR##
+pir_output_is(<<'CODE', <<'OUTPUT', "subclassing ParrotClass");
+
 .sub main @MAIN
     .local pmc cl
     .local pmc parent
@@ -1767,8 +1767,8 @@ CODE
 42
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "instantiate - PIR");
-##PIR##
+pir_output_is(<<'CODE', <<'OUTPUT', "instantiate - PIR");
+
 .sub main @MAIN
     .local pmc cl
     cl = subclass "Integer", "Foo"
@@ -1797,8 +1797,8 @@ CODE
 OUTPUT
 
 { local $TODO = "new Px, Ix: argcP is wrong in __init method";
-output_is(<<'CODE', <<'OUTPUT', "__init argcP");
-##PIR##
+pir_output_is(<<'CODE', <<'OUTPUT', "__init argcP");
+
 .sub main @MAIN
     $P0 = newclass "Foo"
     $I0 = find_type "Foo"

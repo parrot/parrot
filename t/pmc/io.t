@@ -343,8 +343,8 @@ ok 1
 ok 2
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', 'puts method - PIR');
-##PIR##
+pir_output_is(<<'CODE', <<'OUTPUT', 'puts method - PIR');
+
 .sub main @MAIN
        .local string s
        s = "ok 2\n"
@@ -488,8 +488,8 @@ utf8
 buf
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "substr after reading from file");
-##PIR##
+pir_output_is(<<'CODE', <<'OUTPUT', "substr after reading from file");
+
 .sub _main
     # Write something into a file
     .local pmc out
@@ -515,8 +515,8 @@ CODE
 01234
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "multiple substr after reading from file");
-##PIR##
+pir_output_is(<<'CODE', <<'OUTPUT', "multiple substr after reading from file");
+
 .sub _main
     # Write something into a file
     .local pmc out

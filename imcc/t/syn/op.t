@@ -1,10 +1,13 @@
-#!perl
+#!perl -w
+# Copyright: 2001-2005 The Perl Foundation.  All Rights Reserved.
+# $Id$
+
 use strict;
-use TestCompiler tests => 21;
+use Parrot::Test tests => 21;
 
 ##############################
-output_is(<<'CODE', <<'OUT', "+=");
-.sub _test
+pir_output_is(<<'CODE', <<'OUT', "+=");
+.sub test @MAIN
     $I0 = 10
     $I0 += 20
     print $I0
@@ -16,8 +19,8 @@ CODE
 OUT
 
 ##############################
-output_is(<<'CODE', <<'OUT', "-=");
-.sub _test
+pir_output_is(<<'CODE', <<'OUT', "-=");
+.sub test @MAIN
     $I0 = 10
     $I0 -= 20
     print $I0
@@ -28,8 +31,8 @@ CODE
 -10
 OUT
 
-output_is(<<'CODE', <<'OUT', "*=");
-.sub _test
+pir_output_is(<<'CODE', <<'OUT', "*=");
+.sub test @MAIN
     $I0 = 10
     $I0 *= 20
     print $I0
@@ -40,8 +43,8 @@ CODE
 200
 OUT
 
-output_is(<<'CODE', <<'OUT', "/=");
-.sub _test
+pir_output_is(<<'CODE', <<'OUT', "/=");
+.sub test @MAIN
     $I0 = 20
     $I0 /= 2
     print $I0
@@ -52,8 +55,8 @@ CODE
 10
 OUT
 
-output_is(<<'CODE', <<'OUT', "%=");
-.sub _test
+pir_output_is(<<'CODE', <<'OUT', "%=");
+.sub test @MAIN
     $I0 = 20
     $I0 %= 7
     print $I0
@@ -64,8 +67,8 @@ CODE
 6
 OUT
 
-output_is(<<'CODE', <<'OUT', ".=");
-.sub _test
+pir_output_is(<<'CODE', <<'OUT', ".=");
+.sub test @MAIN
     $S0 = "ab"
     $S0 .= "cd"
     print $S0
@@ -75,8 +78,8 @@ output_is(<<'CODE', <<'OUT', ".=");
 CODE
 abcd
 OUT
-output_is(<<'CODE', <<'OUT', "&=");
-.sub _test
+pir_output_is(<<'CODE', <<'OUT', "&=");
+.sub test @MAIN
     $I0 =  0b1011
     $I0 &= 0b1000
     print $I0
@@ -87,8 +90,8 @@ CODE
 8
 OUT
 
-output_is(<<'CODE', <<'OUT', "|=");
-.sub _test
+pir_output_is(<<'CODE', <<'OUT', "|=");
+.sub test @MAIN
     $I0 =  0b1011
     $I0 |= 0b1000
     print $I0
@@ -99,8 +102,8 @@ CODE
 11
 OUT
 
-output_is(<<'CODE', <<'OUT', "~=");
-.sub _test
+pir_output_is(<<'CODE', <<'OUT', "~=");
+.sub test @MAIN
     $I0 =  0b1011
     $I0 ~= 0b1000
     print $I0
@@ -111,8 +114,8 @@ CODE
 3
 OUT
 
-output_is(<<'CODE', <<'OUT', ">>=");
-.sub _test
+pir_output_is(<<'CODE', <<'OUT', ">>=");
+.sub test @MAIN
     $I0 =  0b1011
     $I0 >>= 1
     print $I0
@@ -123,8 +126,8 @@ CODE
 5
 OUT
 
-output_is(<<'CODE', <<'OUT', ">>>=");
-.sub _test
+pir_output_is(<<'CODE', <<'OUT', ">>>=");
+.sub test @MAIN
     $I0 =  0b1011
     $I0 >>>= 1
     print $I0
@@ -135,8 +138,8 @@ CODE
 5
 OUT
 
-output_is(<<'CODE', <<'OUT', "<<=");
-.sub _test
+pir_output_is(<<'CODE', <<'OUT', "<<=");
+.sub test @MAIN
     $I0 =  0b1011
     $I0 <<= 1
     print $I0
@@ -147,8 +150,8 @@ CODE
 22
 OUT
 
-output_is(<<'CODE', <<'OUT', "x = defined");
-.sub _main
+pir_output_is(<<'CODE', <<'OUT', "x = defined");
+.sub test @MAIN
     .local pmc a
     a = new PerlArray
     push a, 10
@@ -165,8 +168,8 @@ CODE
 110
 OUT
 
-output_is(<<'CODE', <<'OUT', "x = clone");
-.sub _main
+pir_output_is(<<'CODE', <<'OUT', "x = clone");
+.sub test @MAIN
     .local pmc a
     a = new PerlInt
     a = 10
@@ -180,8 +183,8 @@ CODE
 10
 OUT
 
-output_is(<<'CODE', <<'OUT', "x = length");
-.sub _main
+pir_output_is(<<'CODE', <<'OUT', "x = length");
+.sub test @MAIN
     .local string s
     s = "abc"
     $I0 = length s
@@ -193,8 +196,8 @@ CODE
 3
 OUT
 
-output_is(<<'CODE', <<'OUT', "x = sin");
-.sub _main
+pir_output_is(<<'CODE', <<'OUT', "x = sin");
+.sub test @MAIN
     $N0 = sin 0
     print $N0
     print "\n"
@@ -204,8 +207,8 @@ CODE
 0.000000
 OUT
 
-output_is(<<'CODE', <<'OUT', "x = can");
-.sub _main
+pir_output_is(<<'CODE', <<'OUT', "x = can");
+.sub test @MAIN
     $P0 = new ParrotIO
     $I0 = can $P0, "puts"
     print $I0
@@ -216,8 +219,8 @@ CODE
 1
 OUT
 
-output_is(<<'CODE', <<'OUT', "x = isa");
-.sub _main
+pir_output_is(<<'CODE', <<'OUT', "x = isa");
+.sub test @MAIN
     $P0 = new PerlInt
     $I0 = isa $P0, "scalar"
     print $I0
@@ -228,8 +231,8 @@ CODE
 1
 OUT
 
-output_is(<<'CODE', <<'OUT', "x = add");
-.sub _main
+pir_output_is(<<'CODE', <<'OUT', "x = add");
+.sub test @MAIN
     $I0 = 10
     $I1 = add $I0, 10
     print $I1
@@ -240,8 +243,8 @@ CODE
 20
 OUT
 
-output_is(<<'CODE', <<'OUT', "x = invoke");
-.sub _main
+pir_output_is(<<'CODE', <<'OUT', "x = invoke");
+.sub test @MAIN
     $P0 = find_global "_s"
     $P0 = invokecc
     $S0 = "done\n"
@@ -258,7 +261,7 @@ done
 OUT
 
 # ticket 32393
-output_is(<<'CODE', '', "empty sub");
+pir_output_is(<<'CODE', '', "empty sub");
 .sub _foo
 .end
 

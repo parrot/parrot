@@ -1,9 +1,11 @@
 #!perl
-use strict;
-use TestCompiler tests => 3;
+# Copyright: 2005 The Perl Foundation.  All Rights Reserved.
+# $Id$
 
-##############################
-output_is(<<'CODE', <<'OUT', "unreachable 1");
+use strict;
+use Parrot::Test tests => 3;
+
+pir_2_pasm_is(<<'CODE', <<'OUT', "unreachable 1");
 .sub _test
    bsr L
    print "ok\n"
@@ -23,7 +25,7 @@ L:
    ret
 OUT
 
-output_is(<<'CODE', <<'OUT', "unreachable 2");
+pir_2_pasm_is(<<'CODE', <<'OUT', "unreachable 2");
 .sub _test
   print "ok\n"
   end
@@ -36,7 +38,7 @@ _test:
   end
 OUT
 
-output_is(<<'CODE', <<'OUT', "unreachable 3");
+pir_2_pasm_is(<<'CODE', <<'OUT', "unreachable 3");
 .sub _test
   goto L
   print "ok\n"

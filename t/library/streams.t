@@ -28,8 +28,8 @@ for my $a ( @streams ) {
 #
 # 1..8
 #
-output_is(<<"CODE", <<"OUT", "load and create a Stream::$a");
-##PIR##
+pir_output_is(<<"CODE", <<"OUT", "load and create a Stream::$a");
+
 .sub _main
     print "loading '$a'...\\n"
     load_bytecode "library/Stream/$a.imc"
@@ -56,8 +56,8 @@ OUT
 #
 # 9
 #
-output_is(<<'CODE', <<'OUT', "Stream::Sub");
-##PIR##
+pir_output_is(<<'CODE', <<'OUT', "Stream::Sub");
+
 .sub _main @MAIN
     .local pmc stream
     .local pmc temp
@@ -104,8 +104,8 @@ OUT
 #
 # 10
 #
-output_is(<<'CODE', <<'OUT', "Stream::read_bytes");
-##PIR##
+pir_output_is(<<'CODE', <<'OUT', "Stream::read_bytes");
+
 .sub _main @MAIN
     .local pmc stream
     .local pmc temp
@@ -182,8 +182,8 @@ OUT
 #
 # 11
 #
-output_is(<<'CODE', <<'OUT', "Stream::Combiner");
-##PIR##
+pir_output_is(<<'CODE', <<'OUT', "Stream::Combiner");
+
 .sub _main
     .local pmc counter
     .local pmc text
@@ -274,8 +274,8 @@ OUT
 #
 # 12
 #
-output_is(<<'CODE', <<'OUT', "Stream::Coroutine");
-##PIR##
+pir_output_is(<<'CODE', <<'OUT', "Stream::Coroutine");
+
 .sub _main
     .local pmc stream
     .local pmc temp
@@ -342,8 +342,8 @@ OUT
 #
 # 13
 #
-output_is(<<'CODE', <<'OUT', "Stream::ParrotIO");
-##PIR##
+pir_output_is(<<'CODE', <<'OUT', "Stream::ParrotIO");
+
 .sub _main
     .local pmc file
     .local pmc lines
@@ -713,8 +713,8 @@ OUT
 #
 # 14
 #
-output_is(<<'CODE', <<'OUT', "Stream::Filter");
-##PIR##
+pir_output_is(<<'CODE', <<'OUT', "Stream::Filter");
+
 .sub _main
     .local pmc stream
     .local pmc filter
@@ -802,8 +802,8 @@ OUT
 #
 # 15
 #
-output_is(<<'CODE', <<'OUT', "Stream::include");
-##PIR##
+pir_output_is(<<'CODE', <<'OUT', "Stream::include");
+
 .sub _main
     .local pmc stream
     .local pmc temp
@@ -914,8 +914,8 @@ OUT
 #
 # 16
 #
-output_is(<<'CODE', <<'OUT', "Stream::Lines");
-##PIR##
+pir_output_is(<<'CODE', <<'OUT', "Stream::Lines");
+
 .sub _main
     .local pmc stream
     .local pmc lines
@@ -964,8 +964,8 @@ OUT
 #
 # 17
 #
-output_is(<<'CODE', <<'OUT', "Stream::ParrotIO");
-##PIR##
+pir_output_is(<<'CODE', <<'OUT', "Stream::ParrotIO");
+
 .sub _main @MAIN
     .local pmc stream
     .local pmc temp
@@ -1276,8 +1276,8 @@ OUT
 #
 # 18
 #
-output_is(<<'CODE', <<'OUT', "Stream::Replay");
-##PIR##
+pir_output_is(<<'CODE', <<'OUT', "Stream::Replay");
+
 .sub _main @MAIN
     .local pmc stream
 
@@ -1378,8 +1378,8 @@ OUT
 #
 # 19
 #
-output_is(<<'CODE', <<'OUT', "Stream::Sub");
-##PIR##
+pir_output_is(<<'CODE', <<'OUT', "Stream::Sub");
+
 .sub _main
     .local pmc stream
     .local pmc temp
@@ -1439,8 +1439,8 @@ OUT
 #
 # 20
 #
-output_is(<<'CODE', <<'OUT', "Stream::Write");
-##PIR##
+pir_output_is(<<'CODE', <<'OUT', "Stream::Write");
+
 .sub _main @MAIN
     .local pmc stream
     .local pmc temp

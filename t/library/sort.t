@@ -20,8 +20,8 @@ use strict;
 
 use Parrot::Test tests => 9;
 
-output_is(<<'CODE', <<'OUT', "sorting already sorted numbers");
-##PIR##
+pir_output_is(<<'CODE', <<'OUT', "sorting already sorted numbers");
+
 .sub _main
     .local pmc array
     .local int i
@@ -65,8 +65,8 @@ CODE
 9
 OUT
 
-output_is(<<'CODE', <<'OUT', "sorting unsorted numbers");
-##PIR##
+pir_output_is(<<'CODE', <<'OUT', "sorting unsorted numbers");
+
 .sub _main
     .local pmc array
     .local int i
@@ -110,8 +110,8 @@ CODE
 9
 OUT
 
-output_is(<<'CODE', <<'OUT', "sorting unsorted numbers (2)");
-##PIR##
+pir_output_is(<<'CODE', <<'OUT', "sorting unsorted numbers (2)");
+
 .sub _main
     .local pmc array
     .local int i
@@ -155,8 +155,8 @@ CODE
 9
 OUT
 
-output_is(<<'CODE', <<'OUT', "sorting sorted strings");
-##PIR##
+pir_output_is(<<'CODE', <<'OUT', "sorting sorted strings");
+
 .sub _main
     .local pmc array
     .local int i
@@ -196,8 +196,8 @@ golf
 hotel
 OUT
 
-output_is(<<'CODE', <<'OUT', "sorting unsorted strings");
-##PIR##
+pir_output_is(<<'CODE', <<'OUT', "sorting unsorted strings");
+
 .sub _main
     .local pmc array
     .local int i
@@ -237,8 +237,8 @@ golf
 hotel
 OUT
 
-output_is(<<'CODE', <<'OUT', "sorting different types");
-##PIR##
+pir_output_is(<<'CODE', <<'OUT', "sorting different types");
+
 .sub _main
     .local pmc array
     .local int i
@@ -302,8 +302,8 @@ golf
 hotel
 OUT
 
-output_is(<<'CODE', <<'OUT', "sorting letters");
-##PIR##
+pir_output_is(<<'CODE', <<'OUT', "sorting letters");
+
 .sub _main
     .local pmc array
     .local int i
@@ -335,8 +335,8 @@ x
 y
 OUT
 
-output_is(<<'CODE', <<'OUT', "sorting PerlString letters");
-##PIR##
+pir_output_is(<<'CODE', <<'OUT', "sorting PerlString letters");
+
 .sub _main
     .local pmc array
     .local int i
@@ -379,8 +379,8 @@ x
 y
 OUT
 
-output_is(<<'CODE', <<'OUT', "sorting strings");
-##PIR##
+pir_output_is(<<'CODE', <<'OUT', "sorting strings");
+
 .sub _main
     .local pmc array
     .local int i

@@ -293,8 +293,8 @@ ok 3
 ok 4
 OUTPUT
 
-output_like(<<'CODE',
-##PIR##
+pir_output_like(<<'CODE',
+
 .sub main @MAIN
      .local pmc compares
      # XXX doesnt work wit prederef of JIT
@@ -365,8 +365,8 @@ ok 1
 1 2 5 9 10 x
 compares: [1-9]\d*/, "sort");
 
-output_is(<< 'CODE', << 'OUTPUT', "check whether interface is done");
-##PIR##
+pir_output_is(<< 'CODE', << 'OUTPUT', "check whether interface is done");
+
 .sub _main
     .local pmc pmc1
     pmc1 = new FixedPMCArray
@@ -388,8 +388,8 @@ CODE
 0
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "Getting unitialized elements");
-##PIR##
+pir_output_is(<<'CODE', <<'OUTPUT', "Getting unitialized elements");
+
 .sub main @MAIN
     .local pmc arr1
     arr1 = new FixedPMCArray

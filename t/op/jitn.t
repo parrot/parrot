@@ -290,8 +290,8 @@ CODE
 OUTPUT
 
 # rounding behavior
-output_is(<<'CODE', <<'OUT', "set_i_n testing");
-##PIR##
+pir_output_is(<<'CODE', <<'OUT', "set_i_n testing");
+
 .sub _main
     .local num n
     .local int i

@@ -25,7 +25,6 @@ use Parrot::Config;
 # Common code in the test files
 
 my $template_top = << 'END_CODE';
-##PIR##
 .sub _main 
 
   load_bytecode 'runtime/parrot/include/parrotlib.pbc'
@@ -44,7 +43,7 @@ END_CODE
 
 # Testing include_file_location 
 
-output_is( << "END_CODE", << 'END_OUT', 'include_file_location' );
+pir_output_is( << "END_CODE", << 'END_OUT', 'include_file_location' );
 $template_top
   location_sub = find_global "_parrotlib", "include_file_location"
   location     = location_sub( 'datatypes.pasm' )
@@ -53,7 +52,7 @@ END_CODE
 runtime/parrot/include/datatypes.pasm
 END_OUT
 
-output_is( << "END_CODE", << 'END_OUT', 'include_file_location, non-existent' );
+pir_output_is( << "END_CODE", << 'END_OUT', 'include_file_location, non-existent' );
 $template_top
   location_sub = find_global "_parrotlib", "include_file_location"
   location     = location_sub( 'nonexistent.pasm' )
@@ -65,7 +64,7 @@ END_OUT
 
 # Testing imcc_compile_file_location
 
-output_is( << "END_CODE", << 'END_OUT', 'imcc_compile_file_location' );
+pir_output_is( << "END_CODE", << 'END_OUT', 'imcc_compile_file_location' );
 $template_top
   location_sub = find_global "_parrotlib", "imcc_compile_file_location"
   location     = location_sub( 'parrotlib.pbc' )
@@ -74,7 +73,7 @@ END_CODE
 runtime/parrot/include/parrotlib.pbc
 END_OUT
 
-output_is( << "END_CODE", << 'END_OUT', 'imcc_compile_file_location, non-existent' );
+pir_output_is( << "END_CODE", << 'END_OUT', 'imcc_compile_file_location, non-existent' );
 $template_top
   location_sub = find_global "_parrotlib", "imcc_compile_file_location"
   location     = location_sub( 'nonexistent.pbc' )
@@ -86,7 +85,7 @@ END_OUT
 
 # Testing dynext_location
 
-output_is( << "END_CODE", << "END_OUT", 'dynext_location' );
+pir_output_is( << "END_CODE", << "END_OUT", 'dynext_location' );
 $template_top
   location_sub = find_global "_parrotlib", "dynext_location"
   location     = location_sub( 'libnci_test', '$PConfig{load_ext}' )
@@ -95,7 +94,7 @@ END_CODE
 runtime/parrot/dynext/libnci_test$PConfig{load_ext}
 END_OUT
 
-output_is( << "END_CODE", << 'END_OUT', 'dynext_location, non-existent' );
+pir_output_is( << "END_CODE", << 'END_OUT', 'dynext_location, non-existent' );
 $template_top
   location_sub = find_global "_parrotlib", "imcc_compile_file_location"
   location     = location_sub( 'nonexistent', '$PConfig{load_ext}' )

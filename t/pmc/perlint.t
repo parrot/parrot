@@ -970,8 +970,8 @@ ok 5
 ok 6
 OUTPUT
 
-output_is(<< 'CODE', << 'OUTPUT', "check whether interface is done");
-##PIR##
+pir_output_is(<< 'CODE', << 'OUTPUT', "check whether interface is done");
+
 .sub _main
     .local pmc pmc1
     pmc1 = new PerlInt
@@ -989,8 +989,8 @@ CODE
 0
 OUTPUT
 
-output_is(<< 'CODE', << 'OUTPUT', "Fix for a minor problem");
-##PIR##
+pir_output_is(<< 'CODE', << 'OUTPUT', "Fix for a minor problem");
+
 .sub main @MAIN
     $P1 = new PerlInt
     $P1 = 5

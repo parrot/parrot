@@ -1050,8 +1050,8 @@ euro
 OUTPUT
 }
 
-output_is(<< 'CODE', << 'OUTPUT', "PerlHash in PIR");
-##PIR##
+pir_output_is(<< 'CODE', << 'OUTPUT', "PerlHash in PIR");
+
 .sub _main
     .local pmc hash1
     hash1 = new PerlHash
@@ -1066,8 +1066,8 @@ CODE
 U
 OUTPUT
 
-output_is(<< 'CODE', << 'OUTPUT', "Setting with compound keys");
-##PIR##
+pir_output_is(<< 'CODE', << 'OUTPUT', "Setting with compound keys");
+
 .sub _main
     .local pmc outer_hash
     outer_hash = new PerlHash
@@ -1223,8 +1223,8 @@ two
 three
 OUTPUT
 
-output_is(<< 'CODE', << 'OUTPUT', "check whether interface is done");
-##PIR##
+pir_output_is(<< 'CODE', << 'OUTPUT', "check whether interface is done");
+
 .sub _main
     .local pmc pmc1
     pmc1 = new PerlHash
@@ -1246,8 +1246,8 @@ CODE
 0
 OUTPUT
 
-output_is(<< 'CODE', << 'OUTPUT', "iter");
-##PIR##
+pir_output_is(<< 'CODE', << 'OUTPUT', "iter");
+
 .sub __main__ @MAIN
     new P0, .PerlHash
     set P0['a'], 'x'

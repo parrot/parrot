@@ -1,10 +1,12 @@
-#!perl
+#!perl -w
+# Copyright: 2001-2005 The Perl Foundation.  All Rights Reserved.
+# $Id$
+
 use strict;
-use TestCompiler tests => 15;
+use Parrot::Test tests => 15;
 
-
-output_is(<<'CODE', <<'OUT', "if/unless");
-.sub _test
+pir_output_is(<<'CODE', <<'OUT', "if/unless");
+.sub test @MAIN
 	$I0 = 0
 	if $I0 goto nok1
 	print "ok 1\n"
@@ -25,8 +27,8 @@ ok 1
 ok 2
 OUT
 
-output_is(<<'CODE', <<'OUT', "if/unless");
-.sub _test
+pir_output_is(<<'CODE', <<'OUT', "if/unless");
+.sub test @MAIN
 	$I0 = 0
 	$I1 = 1
 	if $I0 == $I1 goto nok1
@@ -53,8 +55,8 @@ ok 3
 OUT
 
 
-output_is(<<'CODE', <<'OUT', "new");
-.sub _test
+pir_output_is(<<'CODE', <<'OUT', "new");
+.sub test @MAIN
 	$P1 = new PerlString
 	$P1 = "ok 1\n"
 	new P1, .PerlString
@@ -69,8 +71,8 @@ ok 2
 OUT
 
 
-output_is(<<'CODE', <<'OUT', "clone");
-.sub _test
+pir_output_is(<<'CODE', <<'OUT', "clone");
+.sub test @MAIN
 	$P1 = new PerlString
 	$P1 = "ok 1\n"
 	$P0 = clone $P1
@@ -87,8 +89,8 @@ ok 2
 OUT
 
 
-output_is(<<'CODE', <<'OUT', "defined");
-.sub _test
+pir_output_is(<<'CODE', <<'OUT', "defined");
+.sub test @MAIN
 	$P1 = new Hash
 	$I0 = defined $P1
 	new P1, .Hash
@@ -105,8 +107,8 @@ CODE
 OUT
 
 
-output_is(<<'CODE', <<'OUT', "defined keyed");
-.sub _test
+pir_output_is(<<'CODE', <<'OUT', "defined keyed");
+.sub test @MAIN
 	$P1 = new Hash
 	$P1["a"] = "ok 1\n"
 	$I0 = defined $P1["a"]
@@ -129,8 +131,8 @@ CODE
 OUT
 
 
-output_is(<<'CODE', <<'OUT', "parrot op as identifier");
-.sub _test
+pir_output_is(<<'CODE', <<'OUT', "parrot op as identifier");
+.sub test @MAIN
 	.local int set
 	set = 5
 	print set
@@ -146,8 +148,8 @@ CODE
 OUT
 
 
-output_is(<<'CODE', <<'OUT', "parrot op as label");
-.sub _test
+pir_output_is(<<'CODE', <<'OUT', "parrot op as label");
+.sub test @MAIN
 	goto set
 set:
 	if I0, err
@@ -166,8 +168,8 @@ CODE
 ok
 OUT
 
-output_like(<<'CODE', <<'OUTPUT', "new with a native type");
-.sub _main
+pir_output_like(<<'CODE', <<'OUTPUT', "new with a native type");
+.sub test @MAIN
         $P1 = new INTVAL
 	print "never\n"
 	end
@@ -176,8 +178,8 @@ CODE
 /error:\w+:Unknown PMC type 'INTVAL'/
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "setline w comment");
-.sub _main
+pir_output_is(<<'CODE', <<'OUTPUT', "setline w comment");
+.sub test @MAIN
     setline 1	# comment
     print "ok\n"
     end
@@ -186,8 +188,8 @@ CODE
 ok
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "setfile w comment");
-.sub _main
+pir_output_is(<<'CODE', <<'OUTPUT', "setfile w comment");
+.sub test @MAIN
     setfile "foo"	# comment
     print "ok\n"
     end
@@ -196,8 +198,8 @@ CODE
 ok
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "eq_num => eq");
-.sub _main
+pir_output_is(<<'CODE', <<'OUTPUT', "eq_num => eq");
+.sub test @MAIN
     .local int i
     .local int j
     i = 1
@@ -212,8 +214,8 @@ CODE
 ok 1
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "eq_num => eq mixed => eq_n_n");
-.sub _main
+pir_output_is(<<'CODE', <<'OUTPUT', "eq_num => eq mixed => eq_n_n");
+.sub test @MAIN
     .local int i
     .local float j
     i = 1
@@ -228,16 +230,16 @@ CODE
 ok 1
 OUTPUT
 
-output_like(<<'CODE', <<'OUT', "undefined ident");
-.sub _main @MAIN
+pir_output_like(<<'CODE', <<'OUT', "undefined ident");
+.sub test @MAIN
     print no_such
 .end
 CODE
 /error.*undefined.*'no_such'/
 OUT
 
-output_is(<<'CODE', <<'OUT', "label ident");
-.sub _main @MAIN
+pir_output_is(<<'CODE', <<'OUT', "label ident");
+.sub test @MAIN
     branch no_such
     end
 no_such:
