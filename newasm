@@ -10,6 +10,30 @@ use strict;
 use Parrot::OpLib::core;
 use Parrot::Types;
 
+unless(@ARGV) {
+    Usage();
+}
+Usage() if $ARGV[0] eq '-h';
+Usage() if $ARGV[0] eq '--help';
+
+my %args;
+my @files;
+#
+# The C-style for loop is redundant but necessary when we add argument styles
+# like '-o foo', with whitespace.
+#
+for(my $i=0;$i<@ARGV;$i++) {
+    if($ARGV[$i] =~ /^--output=(.*)/) {
+        $args{output} = $1;
+    }
+    elsif($ARGV[$i] eq '--checksyntax') {
+        $args{checksyntax} = 1;
+    }
+    else {
+        push @files,$ARGV[$i];
+    }
+}
+
 my $ops;
 my $fullops;
 for (@$Parrot::OpLib::core::ops) {
@@ -18,17 +42,25 @@ for (@$Parrot::OpLib::core::ops) {
     $fullops->{$_->{NAME}.($argtype &&"_$argtype") } = $_->{CODE};
 }
 
-# The first pass over the code detaches keys and saves labels
+#
+# Open all of the files in a row and add them to @asm, stripping keys and labels
+#
 my @asm;
 my $pc = 0;
 my $labels;
-while (<>) {
-    next if /^\s*#/;
-    chomp;
-    $_ = detach_key($_);
-    s/,\s*$//; # In case of comments, trailing commas, etc.
-    push @asm, $_;
-    define_labels($labels,$_);
+
+for my $file (@files) {
+    open FILE,"<$file" or
+        die "Couldn't open <$file: $!";
+    while (<FILE>) {
+        next if /^\s*#/;
+        chomp;
+        $_ = detach_key($_);
+        s/,\s*$//; # In case of comments, trailing commas, etc.
+        push @asm, $_;
+        define_labels($labels,$_);
+    }
+    close FILE;
 }
 
 # Reset variables
@@ -51,11 +83,32 @@ my $packfile = {
     constants => \@const_array
 };
 
-print Parrot::PakFile2::output_bytecode($packfile);
+exit if exists $args{checksyntax};
+if(exists $args{output}) {
+    open FILE,">$args{output}"
+      or die "Could not write to $args{output}: $!";
+    print FILE Parrot::PakFile2::output_bytecode($packfile);
+    close FILE;
+}
+else {
+    print Parrot::PakFile2::output_bytecode($packfile);
+}
 
 exit;
 
 #------------------------------------------------------------------------------
+
+sub Usage {
+    print <<_EOF_;
+usage: $0 [-h] [--help] [--checksyntax] [--output=file] file ...
+
+    checksyntax Check syntax only, do not output
+    help        Print this message
+    output      Write bytecode to the file <file>
+    
+_EOF_
+    exit;
+}
 
 sub detach_key {
     local $_ = shift;
