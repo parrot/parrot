@@ -1,0 +1,25 @@
+var int foo1;
+var int foo2 = 5;
+
+var num bar1;
+var num bar2 = 3.14;
+
+var str splee1;
+var str splee2 = "Howdy";
+
+var obj quux1;
+
+var int foo3, bar3;
+var int foo4, bar4 = 5;
+
+var num bar5, splee3;
+var num bar6, splee4 = 3.14;
+
+var str splee5, quux2;
+var str splee6, quux3 = "Howdy";
+
+var obj quux4, baz1;
+
+const int foo5   = 5;
+const num bar7   = 3.14;
+const str splee7 = "Howdy";

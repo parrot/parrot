@@ -40,5 +40,3 @@ pi = 4.0 * cur_frac;
 
 print("PI is (very) approximately: $pi\n");
 
-end
-

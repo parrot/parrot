@@ -1,0 +1,15 @@
+var int a, b, c;
+var num d, e;
+var str f, g;
+
+a = 5;
+a = b = c = 5;
+
+d = 3.14;
+d = e = 3.14;
+
+f = "Howdy";
+f = g = "Howdy";
+
+a = b;
+a = b = c;

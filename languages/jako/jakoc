@@ -15,17 +15,35 @@ use strict;
 
 use Carp;
 
+use Jako::Compiler::Message; # $source_file, $line, $debug
+use Jako::Parser::Block;
+use Jako::Parser::Identifier;
+
+our @CARP_NOT = qw(Jako::Compiler::Message);
+
+use FileHandle;
+
+$debug = 1;
+
+$|++ if $debug;
+
 use Data::Dumper;
 $Data::Dumper::Useqq  = 1;
 $Data::Dumper::Terse  = 1;
 $Data::Dumper::Indent = 0;
 
+use Getopt::Std;
+
+my %opts;
+getopts('t', \%opts);
+
+die "$0: usage: $0 <source>\n" unless @ARGV == 1;
+$source_file = shift @ARGV;
+
 
 #
 # Global variables:
 #
-
-my $line;    # Current source line number
 
 my %ident;   # Identifiers
 
@@ -41,15 +59,387 @@ sub temp_int { return temp_reg('I'); }
 sub temp_num { return temp_reg('N'); }
 sub temp_str { return temp_reg('S'); }
 
-my %types = (
- 'I' => 'int',
- 'N' => 'num',
- 'P' => 'poly',
- 'S' => 'str',
+my %type_name = (
+  'I' => 'int',
+  'N' => 'num',
+  'P' => 'obj',
+  'S' => 'str',
+);
+
+my %type_code = (
+  'int' => 'I',
+  'num' => 'N',
+  'obj' => 'P',
+  'str' => 'S'
+);
+
+my %imcc_type_name = (
+  I => 'int',
+  N => 'float',
+  P => 'PMC',
+  S => 'string'
 );
 
 
-my $anon_block_count = 0;
+###############################################################################
+###############################################################################
+##
+## Tokenizer
+##
+###############################################################################
+###############################################################################
+
+sub tokenize
+{
+  my $source_file = shift;
+
+  my $fh = FileHandle->new($source_file);
+
+  die "$0: IO Error. Unable to open file '$source_file' for reading.\n"
+    unless $fh;
+
+  my @tokens;
+
+  while(<$fh>) {
+    $line = $.;
+
+    if (m{^(\s*([a-zA-Z][a-zA-Z0-9_]*)\s*:)(.*)$}) {
+      push @tokens, {
+        LINE    => $.,
+        CLASS   => 'label',
+        VALUE   => $2
+      };
+  
+      $_ = $3;
+    }
+
+    while (defined $_ and $_ ne '') {
+      next if s{^\s+}{};
+      next if s{^#.*?$}{};
+
+      #
+      # Numeric literals:
+      #
+
+      if (m{^(-?[0-9]+\.[0-9]+)($|\W.*$)}x) {
+        push @tokens, {
+          LINE    => $.,
+          CLASS   => 'literal',
+          TYPE    => 'N',
+          VALUE   => $1
+        };
+
+        $_ = $2;
+        next;
+      }
+
+      #
+      # Integer literals:
+      #
+
+      if (m{^( 0 | (-?[1-9][0-9]*))($|\W.*$)}x) {
+        push @tokens, {
+          LINE    => $.,
+          CLASS   => 'literal',
+          TYPE    => 'I',
+          VARIANT => 'dec',
+          VALUE   => $1
+        };
+
+        $_ = $3;
+        next;
+      }
+
+      if (m{^( 0x[0-9a-fA-F]+ )($|\W.*$)}x) {
+        push @tokens, {
+          LINE    => $.,
+          CLASS   => 'literal',
+          TYPE    => 'I',
+          VARIANT => 'hex',
+          VALUE   => $1
+        };
+
+        $_ = $2;
+        next;
+      }
+
+      #
+      # String literals:
+      #
+
+      if (m{^((?:\'(?:\\\'|(?!\').)*\'))(.*)$}) {
+        push @tokens, {
+          LINE    => $.,
+          CLASS   => 'literal',
+          TYPE    => 'S',
+          VARIANT => 'single',
+          VALUE   => $1
+        };
+
+        $_ = $2;
+        next;
+      }
+
+      if (m{^((?:\"(?:\\\"|(?!\").)*\"))(.*)$}) {
+        push @tokens, {
+          LINE    => $.,
+          CLASS   => 'literal',
+          TYPE    => 'S',
+          VARIANT => 'double',
+          VALUE   => $1
+        };
+
+        $_ = $2;
+        next;
+      }
+
+      #
+      # Declarators:
+      #
+
+      if (m{^(sub)(?!\w)(.*)$}) {
+        push @tokens, {
+          LINE    => $.,
+          CLASS   => 'decl',
+          VARIANT => 'code',
+          VALUE   => $1
+        };
+
+        $_ = $2;
+        next;
+      }
+
+      if (m{^(var|const)(?!\w)(.*)$}) {
+        push @tokens, {
+          LINE    => $.,
+          CLASS   => 'decl',
+          VARIANT => 'data',
+          VALUE   => $1
+        };
+
+        $_ = $2;
+        next;
+      }
+
+      #
+      # Type:
+      #
+
+      if (m{^(int|num|obj|str)(?!\w)(.*)$}) {
+        push @tokens, {
+          LINE    => $.,
+          CLASS   => 'type',
+          VALUE   => $1,
+          TYPE    => $1 eq 'obj' ? 'P' : uc substr($1, 0, 1)
+        };
+
+        $_ = $2;
+        next;
+      }
+
+      #
+      # Separating:
+      #
+
+      if (m{^([,])(.*)$}) {
+        push @tokens, {
+          LINE    => $.,
+          CLASS   => 'sep',
+          VARIANT => 'expr',
+          VALUE   => $1
+        };
+
+        $_ = $2;
+        next;
+      }
+
+      if (m{^([;])(.*)$}) {
+        push @tokens, {
+          LINE    => $.,
+          CLASS   => 'sep',
+          VARIANT => 'stmt',
+          VALUE   => $1
+        };
+
+        $_ = $2;
+        next;
+      }
+
+      #
+      # Grouping:
+      #
+
+      if (m{^([\(\)])(.*)$}) {
+        push @tokens, {
+          LINE    => $.,
+          CLASS   => 'group',
+          VARIANT => 'paren',
+          VALUE   => $1
+        };
+
+        $_ = $2;
+        next;
+      }
+
+      if (m{^([\[\]])(.*)$}) {
+        push @tokens, {
+          LINE    => $.,
+          CLASS   => 'group',
+          VARIANT => 'bracket',
+          VALUE   => $1
+        };
+
+        $_ = $2;
+        next;
+      }
+
+      if (m{^([\{\}])(.*)$}) {
+        push @tokens, {
+          LINE    => $.,
+          CLASS   => 'group',
+          VARIANT => 'brace',
+          VALUE   => $1
+        };
+
+        $_ = $2;
+        next;
+      }
+
+      #
+      # Control:
+      #
+
+      if (m{^(if|else|elsif|unless)(?!\w)(.*)$}) {
+        push @tokens, {
+          LINE    => $.,
+          CLASS   => 'control',
+          VARIANT => 'cond',
+          VALUE   => $1
+        };
+
+        $_ = $2;
+        next;
+      }
+
+      if (m{^(while|until|for|continue)(?!\w)(.*)$}) {
+        push @tokens, {
+          LINE    => $.,
+          CLASS   => 'control',
+          VARIANT => 'iter',
+          VALUE   => $1
+        };
+
+        $_ = $2;
+        next;
+      }
+
+      if (m{^(next|last|redo|goto|return)(?!\w)(.*)$}) {
+        push @tokens, {
+          LINE    => $.,
+          CLASS   => 'control',
+          VARIANT => 'other',
+          VALUE   => $1
+        };
+
+        $_ = $2;
+        next;
+      }
+
+      #
+      # Ops:
+      #
+
+      if (m{^( == | >= | <= | != | < | > )(.*)$}x) {
+        push @tokens, {
+          LINE    => $.,
+          CLASS   => 'op',
+          VARIANT => 'rel',
+          VALUE   => $1
+        };
+
+        $_ = $2;
+        next;
+      }
+
+      if (m{^( = )(.*)$}x) {
+        push @tokens, {
+          LINE    => $.,
+          CLASS   => 'op',
+          VARIANT => 'assign',
+          VALUE   => $1
+        };
+
+        $_ = $2;
+        next;
+      }
+
+      if (m{^( \+= | \*= | -= | /= | %= )(.*)$}x) {
+        push @tokens, {
+          LINE    => $.,
+          CLASS   => 'op',
+          VARIANT => 'arith_assign',
+          VALUE   => $1
+        };
+
+        $_ = $2;
+        next;
+      }
+
+      if (m{^( \+\+ | -- | \+ | - | \* | / | % )(.*)$}x) {
+        push @tokens, {
+          LINE    => $.,
+          CLASS   => 'op',
+          VARIANT => 'arith',
+          VALUE   => $1
+        };
+
+        $_ = $2;
+        next;
+      }
+
+      #
+      # Identifiers:
+      #
+
+      if (m{^([a-zA-Z][a-zA-Z0-9_]*)(.*)$}) {
+        push @tokens, {
+          LINE    => $.,
+          CLASS   => 'ident',
+          VALUE   => $1
+        };
+
+        $_ = $2;
+        next;
+      }
+   
+      #
+      # Anything else is a syntax error:
+      #
+
+      PARSE_ERROR("Unrecognized text '$_'.");
+    }
+  }
+
+  return @tokens;
+}
+
+
+#
+# dump_token()
+#
+
+sub dump_token
+{
+  my $token = shift;
+  return unless $token;
+
+  print STDERR "{\n";
+  foreach my $key (sort keys %$token) {
+    printf STDERR "%10s => %s\n", $key, $token->{$key};
+  }
+  print STDERR "}\n";
+}
+
 
 ###############################################################################
 ###############################################################################
@@ -66,14 +456,18 @@ my $anon_block_count = 0;
 ###############################################################################
 ###############################################################################
 
+my $anon_block_count = 0;
+my $block_count      = 0;
+my @block_stack;
 
-my $block_count = 0;
+my $root_block = Jako::Parser::Block->new(
+  undef,  # No parent
+  'file', # File scope
+  undef,  # No return type
+  undef   # No prefix
+);
 
-my @block_stack = ( {
-    TYPE   => 'file',
-    LINE   => 0,
-    IDENT  => { },
-});
+push @block_stack, $root_block;
 
 
 #
@@ -91,13 +485,16 @@ sub block_depth
 
 
 #
-# top_block()
+# current_block()
 #
 # Returns the block on the top of the block stack.
 #
 
-sub top_block
+sub current_block
 {
+  INTERNAL_ERROR("Attempt to reference top block with empty block stack!")
+    if @block_stack == 0;
+
   return  $block_stack[-1];
 }
 
@@ -123,7 +520,7 @@ sub push_block
 
 sub pop_block
 {
-  confess "jakoc: Internal error! Attempt to pop file-scope block off block stack!"
+  INTERNAL_ERROR("Attempt to pop file-scope block off block stack!")
     if @block_stack == 1;
 
   return pop @block_stack;
@@ -145,8 +542,8 @@ sub find_ident
   my $count = 0;
 
   foreach my $block (reverse @block_stack) {
-    return { LEVELS => $count, IDENT => $block->{IDENT}{$name} }
-      if exists $block->{IDENT}{$name};
+    my $ident = $block->identifier($name);
+    return { LEVELS => $count, IDENT => $ident } if $ident;
     $count++;
   }
 
@@ -158,7 +555,7 @@ sub find_ident
 # find_block()
 #
 # Scans through the block stack, from the top down, looking for a block of
-# the appropriate type (and, if label is given, with a matching label. If
+# the appropriate kind (and, if label is given, with a matching label. If
 # it is found, returns a hashref containing the number of levels away the
 # block was found and the block info hashref. If it is not found, then
 # undef is returned.
@@ -166,13 +563,13 @@ sub find_ident
 
 sub find_block
 {
-  my ($type, $label) = @_;
+  my ($kind, $label) = @_;
 
   my $count = 0;
 
   foreach my $block (reverse @block_stack) {
-    next unless $block->{TYPE} eq $type;
-    next unless !defined($label) or $block->{PREFIX} eq $label;
+    next unless $block->kind eq $kind;
+    next unless !defined($label) or $block->prefix eq $label;
  
     return { LEVELS => $count, BLOCK => $block };
   }
@@ -321,7 +718,7 @@ sub emit_code
   #
 
   if (defined $args and grep { !defined $_ } @$args) {
-    confess "jakoc: Internal error: Undefined arguments to emit_code()!";
+    INTERNAL_ERROR("Undefined arguments to emit_code()!");
     return;
   }
 
@@ -488,10 +885,10 @@ sub num_reg_q
 
 
 #
-# poly_reg_q()
+# obj_reg_q()
 #
 
-sub poly_reg_q
+sub obj_reg_q
 {
   my ($value) = @_;
   return $value =~ m/^(\$\$)?P\d+$/;
@@ -544,7 +941,7 @@ sub class_of
   return 'var' if var_q($value);
   return 'lit' if lit_q($value);
 
-  confess "Cannot determine class of '$value'!";
+  INTERNAL_ERROR("Cannot determine class of '$value'!");
 }
 
 
@@ -566,13 +963,14 @@ sub type_of
   return 'N' if num_lit_q($value);
   return 'I' if int_lit_q($value);
 
-  if ($value =~ m/^\$[^\$]/) { # IMCC VARIABLES ($FOO to jakoc, FOO to imcc)
-    my $ident = find_ident(substr($value, 1, ));
-    confess "Cannot find identifier '$value' to determine type!" unless defined $ident;
-    return $ident->{IDENT}{TYPE};
+  if ($value =~ m/^[a-zA-Z_][a-zA-Z0-9_]*$/) {
+    my $block = current_block();
+    my $ident = $block->find_identifier($value);
+    INTERNAL_ERROR("Cannot find identifier '$value' to determine type!") unless defined $ident;
+    return $ident->type;
   }
 
-  confess "Cannot determine type of '$value'!";
+  INTERNAL_ERROR("Cannot determine type of '$value'!");
 }
 
 sub int_q { return type_of(shift) eq 'I'; }
@@ -696,7 +1094,7 @@ sub op_comp
         emit_code('set', [$temp, $b]);
         $b = $temp;
       } else {
-        confess "jakoc: Internal compiler error. Expected to have to use iton op.";
+        INTERNAL_ERROR("Expected to have to use iton op.");
       }
     }
   }
@@ -714,7 +1112,7 @@ sub op_comp
     if (defined $false) {
       op_comp($type, $comp_ops{"!$op"}, $a, $b, $false, $true);
     } else {
-      confess "jakoc: Internal compiler error: op_comp called without any destinations!";
+      INTERNAL_ERROR("op_comp called without any destinations!");
     }
   }
 }
@@ -867,12 +1265,12 @@ sub op_gt
 #
 # Assign a register to the identifier within the scope of the current block.
 #
-# Class is one of 'const', 'param', 'local'.
+# Access is one of 'const', 'var' or 'arg'.
 #
 
 sub declare_var
 {
-  my ($ident, $type, $class) = @_;
+  my ($name, $type, $access) = @_;
 
   #
   # Check for a few bad conditions.
@@ -881,29 +1279,27 @@ sub declare_var
   # triggered in normal operation, even with bad source code as input.
   #
 
-  my $type_name = $types{$type};
+  my $type_name = $type_name{$type};
 
-  confess "jakoc: Internal error: Variable declaration involves undefined class!"
-    unless defined $class;
+  INTERNAL_ERROR("Variable declaration involves undefined access!")
+    unless defined $access;
 
-  confess "jakoc: Internal error: Variable declaration involves undefined type code!"
+  INTERNAL_ERROR("Variable declaration involves undefined type code!")
     unless defined $type;
 
-  confess "jakoc: Internal error: Variable declaration involves undefined type name!"
+  INTERNAL_ERROR("Variable declaration involves undefined type name!")
     unless defined $type_name;
 
-  confess "jakoc: Internal error: Variable declaration involves undefined variable name!"
-    unless defined $ident;
+  INTERNAL_ERROR("Variable declaration involves undefined variable name!")
+    unless defined $name;
 
   #
   # Lookup the identifier:
   #
-  # NOTE: This lookup doesn't give the info itself, but rather a hashref with
-  # the LEVELS away the definition was found, and IDENT with the actual info
-  # about the identifier.
-  #
 
-  my $ident_info = find_ident($ident);
+  my $block = current_block();
+
+  my $ident = $block->find_identifier($name);
 
   #
   # If the identifier is already defined at this lexical scope, we want to complain
@@ -911,10 +1307,9 @@ sub declare_var
   # previous definition.
   #
 
-  if (defined $ident_info and $ident_info->{LEVELS} == 0) {
-    printf STDERR "jakoc: Redeclaration of identifier '%s' on line %d. Previous declaration on line %d.\n",
-      $ident, $line, $ident_info->{IDENT}{LINE};
-    return 0;
+  if (defined $ident and $ident->block eq $block) {
+    SYNTAX_ERROR("Redeclaration of identifier '%s'. Previous declaration on line %d.",
+      $name, $ident->line);
   }
 
   #
@@ -924,50 +1319,27 @@ sub declare_var
   # and then we link the register to the identifier and the block.
   #
 
-  my $block = top_block();
+  $ident = Jako::Parser::Identifier->new(
+    $block,
+    $access,
+    $type,
+    $name,
+    $source_file,
+    $line,
+    "\$$name"     # IMCC Name
+  );
 
-#  my $num;
-#  my $reg;
-  my $value;
-
-  if ($class eq 'param') {
-#    $num   = undef;
-#    $reg   = undef;
-    $value = "\$$ident";
-  }
-  elsif ($class eq 'local') {
-#    $num   = undef;
-#    $reg   = undef;
-    $value = "\$$ident";
-  }
-  elsif ($class eq 'global') {
-#    $num   = undef;
-#    $reg   = undef;
-    $value = temp_reg($type);
-  }
-  else {
-    confess "Unexpected class '$class'";
-  }
-
-  $block->{IDENT}{$ident}{LINE}  = $line;
-  $block->{IDENT}{$ident}{TYPE}  = $type;
-  $block->{IDENT}{$ident}{CLASS} = $class;
-#  $block->{IDENT}{$ident}{NUM}   = $num;
-#  $block->{IDENT}{$ident}{REG}   = $reg;
-  $block->{IDENT}{$ident}{VALUE} = $value;
+  $block->identifier($name, $ident);
 
   #
   # Push the source comment about the variable declaration.
   #
 
-  push_source "var $types{$type} $ident;";
+  push_source "var $type_name{$type} $name;";
 
-  if ($class eq 'local') {
-    my %var_types = ( I => 'int', N => 'float', P => 'PMC', S => 'string');
-    my $var_type = $var_types{$type};
+  my $imcc_type = $imcc_type_name{$type};
 
-    emit_code(".local", [ "$var_type $ident" ]);
-  }
+  emit_code(".local", [ "$imcc_type $name" ]);
 
   return 1;
 }
@@ -979,7 +1351,7 @@ sub declare_var
 
 sub declare_const
 {
-  my ($ident, $type, $value) = @_;
+  my ($name, $type, $value) = @_;
 
   #
   # Check for a few bad conditions.
@@ -988,18 +1360,18 @@ sub declare_const
   # triggered in normal operation, even with bad source code as input.
   #
 
-  my $type_name = $types{$type};
+  my $type_name = $type_name{$type};
 
-  confess "jakoc: Internal error: Constant definition involves undefined type code!"
+  INTERNAL_ERROR("Constant definition involves undefined type code!")
     unless defined $type;
 
-  confess "jakoc: Internal error: Constant definition involves undefined type name!"
+  INTERNAL_ERROR("Constant definition involves undefined type name!")
     unless defined $type_name;
 
-  confess "jakoc: Internal error: Constant definition involves undefined constant name!"
-    unless defined $ident;
+  INTERNAL_ERROR("Constant definition involves undefined constant name!")
+    unless defined $name;
 
-  confess "jakoc: Internal error: Constant definition involves undefined value!"
+  INTERNAL_ERROR("Constant definition involves undefined value!")
     unless defined $value;
 
   #
@@ -1010,7 +1382,9 @@ sub declare_const
   # about the identifier.
   #
 
-  my $ident_info = find_ident($ident);
+  my $block = current_block();
+
+  my $ident = $block->find_identifier($name);
 
   #
   # If the identifier is already defined at this lexical scope, we want to complain
@@ -1018,10 +1392,9 @@ sub declare_const
   # previous definition.
   #
 
-  if (defined $ident_info and $ident_info->{LEVELS} == 0) {
-    printf STDERR "jakoc: Redeclaration of identifier '%s' on line %d. Previous declaration on line %d.\n",
-      $ident, $line, $ident_info->{IDENT}{LINE};
-    return 0;
+  if (defined $ident and $ident->block eq $block) {
+    SYNTAX_ERROR("Redeclaration of identifier '%s'. Previous declaration on line %d.",
+      $name, $ident->line);
   }
 
   #
@@ -1030,20 +1403,29 @@ sub declare_const
   # IDENT entry within the block.
   #
 
-  my $block = top_block();
+  $ident = Jako::Parser::Identifier->new(
+    $block,
+    'const',
+    $type,
+    $name,
+    $source_file,
+    $line
+  );
 
-  $block->{IDENT}{$ident}{LINE}  = $line;
-  $block->{IDENT}{$ident}{TYPE}  = $type;
-  $block->{IDENT}{$ident}{CLASS} = 'const';
-  $block->{IDENT}{$ident}{NUM}   = undef;
-  $block->{IDENT}{$ident}{REG}   = undef;
-  $block->{IDENT}{$ident}{VALUE} = $value;
+  $block->identifier($name, $ident);
 
   #
-  # Push the source comment about the constant definition.
+  # Push the source comment about the constant definition and
+  # emit the code to assign a value.
   #
 
-  push_source "const $type_name $ident = $value;";
+  push_source "const $type_name $name = $value;";
+
+  my %imcc_types = ( I => 'int', N => 'float', P => 'PMC', S => 'string');
+  my $imcc_type = $imcc_types{$type};
+
+  emit_code(".local", [ "$imcc_type $name" ]);
+  emit_code("$name =", [ $value ]);
 
   return 1;
 }
@@ -1064,7 +1446,105 @@ sub declare_const
 
 sub assign_var
 {
-  my ($ident, $type, $value) = @_;
+  my ($name, $type, $value) = @_;
+
+  #
+  # Lookup the identifier:
+  #
+  # NOTE: This lookup doesn't give the info itself, but rather a hashref with
+  # the LEVELS away the definition was found, and IDENT with the actual info
+  # about the identifier.
+  #
+
+  my $block = current_block();
+
+  my $ident = $block->find_identifier($name);
+
+  #
+  # Reject cases where LHS isn't declared:
+  #
+
+  SYNTAX_ERROR("Assignment to undeclared variable '%s'.", $ident)
+    unless defined $ident;
+
+  #
+  # Now that we've confirmed we could find the identifier, we make sure it is
+  # bound to a variable, not a constant.
+  #
+
+  SYNTAX_ERROR("Cannot assign to constant '%s'.", $name)
+    unless $ident->is_variable;
+
+  #
+  # Remember the source code:
+  #
+
+  push_source "$name = $value;";
+
+  #
+  # Handle var-const (for manifest constants) assignments:
+  #
+  # int_var = 1;
+  # num_var = 2.0;
+  # str_var = "foo";
+  #
+
+  if ($ident->type eq $type) {
+    emit_code("$name =", [ $value ]);
+    return;
+  }
+
+  #
+  # Catch incompatible assigns:
+  #
+
+  SYNTAX_ERROR("Assignment of '%s' variable from '%s' value not allowed.", $ident->type, $type)
+    if $type ne '*';
+
+  #
+  # If what remains is not an identifier we've seen, we've got trouble:
+  #
+
+  my $value_ident = $block->find_identifier($value);
+
+  SYNTAX_ERROR("Assignment from undeclared identifier '%s'.", $value)
+    unless defined $value_ident;
+
+  INTERNAL_ERROR("Undefined name for identifier (%s)!", join(", ", %$value_ident))
+    unless defined $value_ident->name;
+
+  #
+  # Emit code if the types are the same:
+  #
+
+  if ($ident->type eq $value_ident->type) {
+    emit_code("$name =", [ $value_ident->name ]);
+    return;
+  }
+
+  #
+  # Handle conversion cases:
+  #
+
+  if ($ident->type eq "N" and $value_ident->type eq "I") {
+    emit_code("$name =", [ $value_ident->name ]);
+  } elsif ($ident->type eq "I" and $value_ident->type eq "N") {
+    emit_code("$name =", [ $value_ident->name ]);
+  } else {
+    SYNTAX_ERROR("Cannot assign type '%s' to type '%s'.", $value_ident->type, $ident->type);
+  }
+
+  return;
+}
+
+
+#
+# new_obj()
+#
+
+sub new_obj
+{
+  my ($ident, $class) = @_;
 
   #
   # Lookup the identifier:
@@ -1081,9 +1561,7 @@ sub assign_var
   #
 
   unless (defined $ident_info) {
-    printf(STDERR "jakoc: Assignment to undeclared variable '%s' on line %d.\n",
-      $ident, $line);
-    return;
+    SYNTAX_ERROR("Assignment to undeclared variable '%s'.", $ident);
   }
 
   $ident_info = $ident_info->{IDENT};
@@ -1094,77 +1572,29 @@ sub assign_var
   #
 
   if ($ident_info->{CLASS} eq 'const') {
-    printf(STDERR "jakoc: Cannot assign to constant '%s' on line %d.\n",
-      $ident, $line);
-    return;
+    SYNTAX_ERROR("Cannot assign to constant '%s'.", $ident);
+  }
+
+  #
+  # Now that we've confirmed its not a constant, we make sure it is an object
+  # type
+  #
+
+  if ($ident_info->{TYPE} ne 'P') {
+    SYNTAX_ERROR("Cannot store new object in non-object variable '%s'.", $ident);
   }
 
   #
   # Remember the source code:
   #
 
-  push_source "$ident = $value";
+  push_source "$ident = new $class";
 
   #
-  # Handle var-const (for manifest constants) assignments:
-  #
-  # int_var = 1;
-  # num_var = 2.0;
-  # str_var = "foo";
+  # Emit the new code:
   #
 
-  if ($ident_info->{TYPE} eq $type) {
-    emit_code('set', [$ident_info->{VALUE}, $value]);
-    return;
-  }
-
-  #
-  # Catch incompatible assigns:
-  #
-
-  if ($type ne '*') {
-    printf(STDERR "jakoc: Assignment of '%s' variable from '%s' value not allowed on line %d.\n", 
-      $ident_info->{TYPE}, $type, $line);
-  }
-
-  #
-  # If what remains is not an identifier we've seen, we've got trouble:
-  #
-  # NOTE: This lookup doesn't give the info itself, but rather a hashref with
-  # the LEVELS away the definition was found, and IDENT with the actual info
-  # about the identifier.
-  #
-
-  my $value_ident_info = find_ident($value);
-
-  if (! defined $value_ident_info) {
-    printf(STDERR "jakoc: Assignment from undeclared identifier  '%s' on line %d.\n",
-      $value, $line);
-  }
-
-  $value_ident_info = $value_ident_info->{IDENT};
-
-  #
-  # Emit code if the types are the same:
-  #
-
-  if ($ident_info->{TYPE} eq $value_ident_info->{TYPE}) {
-    emit_code('set', [$ident_info->{VALUE}, $value_ident_info->{VALUE}]);
-    return;
-  }
-
-  #
-  # Handle conversion cases:
-  #
-
-  if ($ident_info->{TYPE} eq "N" and $value_ident_info->{TYPE} eq "I") {
-    emit_code('set', [ $ident_info->{VALUE}, $value_ident_info->{VALUE} ]);
-  } elsif ($ident_info->{TYPE} eq "I" and $value_ident_info->{TYPE} eq "N") {
-    emit_code('set', [ $ident_info->{VALUE}, $value_ident_info->{VALUE} ]);
-  } else {
-    printf(STDERR "jakoc: Cannot assign type '%s' to type '%s' on line %d.\n", 
-      $value_ident_info->{TYPE}, $ident_info->{TYPE}, $line);
-  }
+  emit_code('new', [$ident_info->{VALUE}, $class]);
 
   return;
 }
@@ -1189,7 +1619,7 @@ sub map_args
   my @result;
 
   foreach my $arg (@args) {
-    confess "map_args(): Undefined argument in array!\n" unless defined $arg;
+    INTERNAL_ERROR("map_args(): Undefined argument in array!") unless defined $arg;
 
     $arg =~ s/^\s+//;
     $arg =~ s/\s+$//;
@@ -1206,12 +1636,12 @@ sub map_args
       if (defined $arg_ident_info) {
         $arg_ident_info = $arg_ident_info->{IDENT};
 
-        confess "jakoc: Internal compiler error: Unable to fetch value for identifier '$arg'!"
+        INTERNAL_ERROR("Unable to fetch value for identifier '$arg'!")
           unless defined $arg_ident_info->{VALUE};
+
         push @result, $arg_ident_info->{VALUE};
       } else {
-        printf(STDERR "jakoc: Unrecognized argument '%s' on line %d.\n", $arg, $line);
-        push @result, "<err>";
+        INTERNAL_ERROR("Unrecognized argument '%s'.", $arg);
       }
     }
   }
@@ -1239,7 +1669,7 @@ sub void_func
 
   push_source "$name(...);";
 
-  (@args) = map_args(@args);
+  @args = map { str_lit_q($_) ? interpolate_string($_) : $_ } @args;
 
   if ($name eq 'print') {
     foreach my $arg (@args) {
@@ -1252,7 +1682,7 @@ sub void_func
     # First, we make sure everything is in order for the call:
     #
 
-    printf(STDERR "jakoc: Call to non-void function %s in void context on line %d!\n", $name, $line)
+    WARNING("Call to non-void function %s in void context.", $name)
       if defined $subs{$name}{RETURN};
 
     #
@@ -1261,33 +1691,16 @@ sub void_func
     # order, which will be convenient later for handling variable argument
     # subroutines.
     #
-    # Arguments that are already in registers are easy. Constant arguments
-    # have to be placed in the appropriate zero (temporary) register and then
-    # saved.
-    #
 
     foreach my $arg (reverse @args) {
-#    foreach my $arg (@args) {
       emit_code('.arg', [ $arg ]);
-
-#      if (reg_q($arg)) {
-#        emit_code('save', [ $arg ]);
-#      } elsif (int_q($arg)) {
-#        emit_code('save', [ $arg ]);
-#      } elsif (num_q($arg)) {
-#        emit_code('save', [ $arg ]);
-#      } elsif (str_q($arg)) {
-#        emit_code('save', [ $arg ]);
-#      } else {
-#        confess "jakoc: Internal error. Unrecognized argument '$arg' when preparing call to subroutine '$name'!";
-#      }
     }
 
     emit_code "call", [ "_$name" ];
 
   } else {
-    printf(STDERR "jakoc: Call to unrecognized void function '%s' on line %d (Not in {%s}).\n",
-      $name, $line, join(", ", sort keys %subs));
+    SYNTAX_ERROR("Call to unrecognized void function '%s' (Not in {%s}).",
+      $name, join(", ", sort keys %subs));
   }
 }
 
@@ -1302,7 +1715,7 @@ sub assign_func
 
   push_source "$dest = $name(" . join(", ", @args) . ");";
 
-  ($dest, @args) = map_args($dest, @args);
+#  ($dest, @args) = map_args($dest, @args);
 
   if ($assign_funcs{$name}) {
     emit_code($name, [$dest, @args]);
@@ -1311,13 +1724,13 @@ sub assign_func
     # First, we make sure everything is in order for the call:
     #
 
-    printf(STDERR "jakoc: Call to void function %s in non-void context on line %d!\n", $name, $line)
+    WARNING("Call to void function %s in non-void context.", $name)
       unless defined $subs{$name}{RETURN};
 
     my $dest_type   = type_of($dest);
     my $return_type = uc $subs{$name}{RETURN};
 
-    printf(STDERR "jakoc: Type mismatch in destination type (%s) and call to %s (returns %s) on line %d!\n", $dest_type, $name, $return_type, $line)
+    WARNING("Type mismatch in destination type (%s) and call to %s (returns %s).", $dest_type, $name, $return_type)
       if $dest_type ne $return_type;
 
     #
@@ -1332,20 +1745,7 @@ sub assign_func
     #
 
     foreach my $arg (reverse @args) {
-#    foreach my $arg (@args) {
       emit_code('.arg', [ $arg ]);
-
-#      if (reg_q($arg)) {
-#        emit_code('save', [ $arg ]);
-#      } elsif (int_q($arg)) {
-#        emit_code('save', [ $arg ]);
-#      } elsif (num_q($arg)) {
-#        emit_code('save', [ $arg ]);
-#      } elsif (str_q($arg)) {
-#        emit_code('save', [ $arg ]);
-#      } else {
-#        confess "jakoc: Internal error. Unrecognized argument '$arg' when preparing call to subroutine '$name'!";
-#      }
     }
 
     #
@@ -1361,8 +1761,8 @@ sub assign_func
 
     emit_code('.result', [ $dest ]);
   } else {
-    printf(STDERR "jakoc: Call to unrecognized assign function '%s' on line %d (Not in {%s}).\n",
-      $name, $line, join(", ", sort keys %assign_funcs));
+    SYNTAX_ERROR("Call to unrecognized assign function '%s' (Not in {%s}).",
+      $name, join(", ", sort keys %assign_funcs));
   }
 }
 
@@ -1382,47 +1782,39 @@ sub assign_func
 
 sub begin_cond_block
 {
-  my ($block, $name, $type, $cond) = @_;
+  my ($block, $prefix, $type, $left, $relop, $right) = @_;
+
+  DEBUG(0, "Begining cond block '%s'...", $prefix || '');
 
 #  my $next   = $block_types{$type}{NEXT};
 #  my $redo   = $block_types{$type}{REDO};
 #  my $last   = $block_types{$type}{LAST};
 
-  if ($cond =~ m/^(\S+)\s*(==|!=|<=|<|>=|>)\s*(.*)$/) {
-    push_source "$name: $type ($1 $2 $3) {";
+  push_source "$prefix: $type ($left $relop $right) {";
 
-    push_label "${name}_" . uc $type;
+  push_label "${prefix}_" . uc $type;
 
-    if ($type eq 'while') {
-      push_label "${name}_NEXT";
-    } elsif ($type eq 'if') {
-      push_label "${name}_TEST";
-    } else {
-      confess;
-    }
-
-    if ($type eq 'while') {
-      op_comp($type, $2, map_args($1, $3), undef, "${name}_LAST");
-    } elsif ($type eq 'if') {
-      op_comp($type, $2, map_args($1, $3), undef, "${name}_ELSE");
-    }
-
-    push_label "${name}_REDO";
+  if ($type eq 'while') {
+    push_label "${prefix}_NEXT";
+  } elsif ($type eq 'if') {
+    push_label "${prefix}_TEST";
   } else {
-    printf(STDERR "jakoc: Syntax error. Unrecognized condition in '%s' on line %d.\n", $type, $line);
+    INTERNAL_ERROR("Unrecognized conditional block type '$type'");
   }
+
+  if ($type eq 'while') {
+    op_comp($type, $relop, $left, $right, undef, "${prefix}_LAST");
+  } elsif ($type eq 'if') {
+    op_comp($type, $relop, $left, $right, undef, "${prefix}_ELSE");
+  }
+
+  push_label "${prefix}_REDO";
 }
 
 
 #
 # begin_sub_block()
 #
-
-my %type_name = (
-  'i' => 'int',
-  'n' => 'num',
-  's' => 'str',
-);
 
 sub begin_sub_block
 {
@@ -1460,33 +1852,15 @@ sub begin_sub_block
   #
 
   push_label "${name}_BEFORE";
-  emit_code 'branch', [ "__ANON_BLOCK__$anon_block_count" ];
-
-  emit_code(".end");
+  emit_code 'branch', [ "${name}_AFTER" ];
 
   #
   # Here we have the actual subroutine entry point:
   #
 
-  emit_code '.sub', [ "_$name" ];
-#  push_label $name;
+  push_label "_$name";
   push_label "${name}_ENTER";
   emit_code();
-
-  #
-  # As part of the subroutine calling convention, the subroutine is
-  # expected to leave everything except the zero registers as it
-  # was found. Therefore, we start out by cloning all the registers.
-  # In future, we could be smarter about this based on the registers
-  # actually used by the subroutine, but for now this will do.
-  #
-  # TODO: Enable the 'P' regs when we start doing PMCs.
-  #
-
-#  emit_code 'pushi', [ ];
-#  emit_code 'pushn', [ ];
-#  emit_code 'pushp', [ ];
-#  emit_code 'pushs', [ ];
 
   #
   # Record the subroutine information.
@@ -1520,7 +1894,7 @@ sub begin_sub_block
   foreach my $formal_arg (@formal_args) {
     my ($arg_type, $arg_name) = @$formal_arg;
 
-    declare_var($arg_name, uc substr($arg_type, 0, 1), 'param');
+    declare_var($arg_name, uc substr($arg_type, 0, 1), 'arg');
   }
 
   #
@@ -1545,12 +1919,9 @@ sub begin_sub_block
 
     push_comment "(argument " . $arg_name . ")";
 
-#    emit_code 'restore', [ $ident_info->{REG} ];
+    my $param_type = $imcc_type_name{$arg_type};
 
-     my $param_type = $arg_type;
-     $param_type = 'float' if $param_type eq 'num';
-
-     emit_code '.param', [ "$param_type $arg_name" ];
+    emit_code '.param', [ "$param_type $arg_name" ];
   }
 }
 
@@ -1559,8 +1930,6 @@ sub begin_sub_block
 # begin_block()
 #
 # return_type is used by subroutines.
-#
-# TODO: bare, until, unless, elsif
 #
 
 my %block_types = (
@@ -1573,42 +1942,44 @@ my %block_names = ( );
 
 sub begin_block
 {
-  my ($name, $type, $cond, $return_type, @formal_args) = @_;
+  my ($prefix, $kind, $cond, $type, @formal_args) = @_;
+  
+  my ($left, $relop, $right) = @$cond if $cond;
+
   $block_count++;
 
-  my $prefix;
-
-  if (defined $name) {
-    if ($block_names{$name}) {
-      printf STDERR "jakoc: Loop named '%s' already defined at line %d (previously defined at line %d)!\n",
-        $name, $line, $block_names{$name};
+  if (defined $prefix) {
+    if ($block_names{$prefix}) {
+      SYNTAX_ERROR("Loop named '%s' already defined at line %d (previously defined at line %d)!",
+        $prefix, $line, $block_names{$prefix});
     }
-
-    $prefix = $name;
   } else {
-    $prefix = "$block_types{$type}{PREFIX}$block_count";
-    $name   = $prefix;
+    $prefix = "$block_types{$kind}{PREFIX}$block_count";
   }
 
-  $block_names{$name} = $line;
+  $block_names{$prefix} = $line;
 
-  my $block = {
-    TYPE   => $type,
-    NEXT   => $line,
-    PREFIX => $prefix,
-    IDENT  => { },
-  };
+  my $parent = current_block();
+
+  my $block = Jako::Parser::Block->new(
+    $parent,
+    $kind,
+    $type,
+    $prefix
+  );
 
   push_block($block);
 
-  if ($type eq 'if') {
-    begin_cond_block($block, $name, $type, $cond);
-  } elsif ($type eq 'while') {
-    begin_cond_block($block, $name, $type, $cond);
-  } elsif ($type eq 'sub') {
-    begin_sub_block($block, $name, $return_type, @formal_args);
+  emit_code(".namespace", [ (uc $block->kind) . "_BLOCK" ]);
+
+  if ($kind eq 'if') {
+    begin_cond_block($block, $prefix, $kind, $left, $relop, $right);
+  } elsif ($kind eq 'while') {
+    begin_cond_block($block, $prefix, $kind, $left, $relop, $right);
+  } elsif ($kind eq 'sub') {
+    begin_sub_block($block, $prefix, $type, @formal_args);
   } else {
-    confess "jakoc: Internal error: Unknown block type '$type' in begin_block()!\n";
+    INTERNAL_ERROR("Unknown block kind '$kind' in begin_block()!");
   }
 }
 
@@ -1628,10 +1999,8 @@ sub end_block
   # seeing a close-brace.
   #
 
-  unless (block_depth()) {
-    printf(STDERR "jakoc: Syntax error. Closing brace without open block on line %d.\n", $line);
-    return;
-  }
+  SYNTAX_ERROR("Closing brace without open block.")
+    unless block_depth();
 
   #
   # Pop the block info off the block stack and cache its prefix for use
@@ -1661,12 +2030,12 @@ sub end_block
   # in the 'continue' portion.
   #
 
-  if ($block->{TYPE} eq 'while') {
+  if ($block->kind eq 'while') {
     if (defined $continue) {
-      if (defined $block->{CONT}) {
-        printf(STDERR "jakoc: Syntax error. No more than one continue block allowed on line %d.\n", $line);
+      if (defined $block->cont) {
+        SYNTAX_ERROR("No more than one continue block allowed.");
       } else {
-        $block->{CONT} = $line;
+        $block->cont($line);
       }
 
       push_label "${prefix}_CONT";
@@ -1676,7 +2045,7 @@ sub end_block
       undef $block;              # ... and forget about it.
     } else {
       push_source "}";
-      push_label "${prefix}_CONT" unless defined $block->{CONT};
+      push_label "${prefix}_CONT" unless defined $block->cont;
       emit_code('branch', ["${prefix}_NEXT"]);
       push_label "${prefix}_LAST";
     }
@@ -1689,12 +2058,12 @@ sub end_block
   # case, we push the block back on the stack.
   #
 
-  elsif ($block->{TYPE} eq 'if') {
+  elsif ($block->kind eq 'if') {
     if (defined $continue) { # for 'else'
-      if (defined $block->{ELSE}) {
-        printf(STDERR "jakoc: Syntax error. No more than one else block allowed on line %d.\n", $line);
+      if (defined $block->else) {
+        SYNTAX_ERROR("No more than one else block allowed.");
       } else {
-        $block->{ELSE} = $line;
+        $block->else = $line;
       }
 
       emit_code("branch", [ "${prefix}_LAST" ]); # Jump over the 'else'.
@@ -1726,28 +2095,15 @@ sub end_block
   # Handle the ending of subroutine blocks:
   #
 
-  elsif ($block->{TYPE} eq 'sub') {
+  elsif ($block->kind eq 'sub') {
     push_source "}";
     push_label "${prefix}_LEAVE";
 
-    #
-    # On subroutine entry, we cloned the incoming registers.
-    # Now, we push the result count, restore the incoming regs
-    # and return to our caller.
-    #
-    # TODO: Enable the 'P' regs when we start dealing with PMCs.
     #
     # TODO: Complain if we haven't seen 'return' statement in a
     # subroutine that returns results (else we are going to be
     # very unhappy later...)
     #
-
-#    emit_code "save", [ defined($block->{RETURN}) ? 1 : 0 ]; # Push the result count.
-
-#    emit_code 'popi', [ ];
-#    emit_code 'popn', [ ];
-#    emit_code 'popp', [ ];
-#    emit_code 'pops', [ ];
 
     #
     # Now, actually return.
@@ -1756,10 +2112,7 @@ sub end_block
     emit_code "ret", [ ];
 
     push_label "${prefix}_AFTER";
-    emit_code('noop'); # XXX: Needed by IMCC
-
-    emit_code('.end');
-    emit_code('.sub', [ "__ANON_BLOCK__" . $anon_block_count++ ]);
+#    emit_code('noop'); # XXX: Needed by IMCC
   }
 
   #
@@ -1767,36 +2120,16 @@ sub end_block
   #
 
   else {
-    confess "jakoc: Internal compiler error. End of unknown block type " . $block->{TYPE} . "!";
+    INTERNAL_ERROR("End of unknown kind of block " . $block->kind . "!");
   }
 
   #
   # If $block is still defined, then we didn't push it back on the block
-  # stack and we need to 'undeclare' the variables in the block, since
-  # they are going out of scope.
+  # stack and we are ending the scope.
   #
 
   if (defined $block) {
-    foreach my $ident (keys %{$block->{IDENT}}) {
-      my $ident_info = $block->{IDENT}{$ident};
-
-#      if (defined $ident_info->{NUM}) {
-#        undef $regs{$ident_info->{TYPE}}[$ident_info->{NUM}];
-#      }
-    }
-
-#    $regs{'I'} = [ grep { defined } @{$regs{I}} ];
-#    $regs{'N'} = [ grep { defined } @{$regs{N}} ];
-#    $regs{'P'} = [ grep { defined } @{$regs{P}} ];
-#    $regs{'S'} = [ grep { defined } @{$regs{S}} ];
-
-    #
-    # Erase all the identifiers. Since the block might have been pushed
-    # back onto the block stack, we need to forget our block-specific
-    # identifiers.
-    #
-
-    $block->{IDENT} = { };
+    emit_code(".endnamespace", [ (uc $block->kind) . "_BLOCK" ]);
   }
 }
 
@@ -1828,9 +2161,9 @@ sub do_loop_control
 
   unless (defined $block) {
     if (defined $loop_label) {
-      printf STDERR "jakoc: No loop '%s' in loop control on line %d!\n", $loop_label, $line;
+      SYNTAX_ERROR("No loop '%s' in loop control.", $loop_label);
     } else {
-      printf STDERR "jakoc: No loop active in loop control on line %d!\n", $line;
+      SYNTAX_ERROR("No loop active in loop control.");
     }
 
     emit_code('err');
@@ -1860,7 +2193,7 @@ sub do_loop_control
   if (!defined $cond) {
     emit_code('branch', [ $label ]);
   } else {
-    op_comp $cond, $test, map_args($left, $right), $label, undef;
+    op_comp $cond, $test, $left, $right, $label, undef;
   }
 }
 
@@ -1871,15 +2204,15 @@ sub do_loop_control
 
 sub do_return
 {
-  my ($arg_type, $arg) = @_;
+  my ($arg) = @_;
+
+  my $arg_type = defined $arg ? type_of($arg) : undef;
 
   if (defined $arg) {
     push_source "return $arg";
   } else {
     push_source "return";
   }
-
-  ($arg) = map_args($arg);
 
   #
   # Find the enclosing subroutine block:
@@ -1888,28 +2221,24 @@ sub do_return
   my $block = find_block('sub');
 
   unless (defined $block) {
-    emit_code('<err>', []);
-    printf STDERR "jakoc: 'return' outside of subroutine on line %d!\n", $line;
-    return;
+    SYNTAX_ERROR("Cannot use 'return' outside of subroutine.");
   }
 
-  $block = $block->{BLOCK};
+  $block = $block->{BLOCK}; # find_block() returns a hash with LEVELS and BLOCK
 
   #
   # Generate code:
   #
 
-  my $prefix = $block->{PREFIX};
-  my $return = $block->{RETURN};
+  my $prefix = $block->prefix;
+  my $return = $block->type;
 
   if (defined $return and not defined $arg_type) {
-    printf STDERR "jakoc: 'return' without argument in subroutine that returns a value on line %d!\n", $line;
-    return;
+    SYNTAX_ERROR("'return' without argument in subroutine that returns a value.");
   }
 
   if (not defined $return and defined $arg_type) {
-    printf STDERR "jakoc: 'return' with argument in subroutine that does not return a value on line %d!\n", $line;
-    return;
+    SYNTAX_ERROR("'return' with argument in subroutine that does not return a value.");
   }
 
   #
@@ -1925,9 +2254,8 @@ sub do_return
   #
 
   if (defined $return and defined $arg_type and uc $return ne uc $arg_type) {
-    printf STDERR "jakoc: 'return' with argument of incorrect type ('%s') on line %d (expected '%s')!\n",
-      $arg_type, $line, $return;
-    last;
+    SYNTAX_ERROR("'return' with argument of incorrect type (got '%s', but expected '%s').",
+      $arg_type, $return);
   }
 
   #
@@ -1936,7 +2264,6 @@ sub do_return
   #
 
   if (defined $return) {
-#    emit_code('save', [ $arg ]); # Push the result. Result count comes later.
      emit_code('.return', [ $arg ]);
   }
 
@@ -1959,50 +2286,68 @@ sub do_return
 
 
 #
+# do_arith()
+#
+
+sub do_arith
+{
+  my ($dest, $a, $op, $b) = @_;
+
+  push_source "$dest = $a $op $b;";
+
+  #
+  # Determine the type to use to calculate the result:
+  #
+
+  SYNTAX_ERROR("Cannot perform arithmetic on strings")
+    if grep { $_ eq 'S' } map { type_of($_) } ($dest, $a, $b);
+
+  my $calc_type = 'I';
+
+  $calc_type = 'N' if grep { $_ eq 'N' } map { type_of($_) } ($dest, $a, $b);
+  $calc_type = 'P' if grep { $_ eq 'P' } map { type_of($_) } ($dest, $a, $b);
+
+  my $dest_type = type_of($dest);
+
+  #
+  # Convert the operands into the calculation type:
+  #
+  
+  if (type_of($a) ne $calc_type) {
+    my $temp = temp_reg($calc_type);
+    emit_code('set', [$temp, $a]);
+    $a = $temp;
+  }
+  
+  if (type_of($b) ne $calc_type) {
+    my $temp = temp_reg($calc_type);
+    emit_code('set', [$temp, $b]);
+    $b = $temp;
+  }
+
+  #
+  # Perform the calculation:
+  #
+
+  if ($dest_type eq $calc_type) {
+    emit_code("$dest =", [ "$a $op $b" ]);
+  }
+  else {
+    my $temp = temp_reg($calc_type);
+    emit_code("$temp =", [ "$a $op $b" ]);
+    emit_code("$dest =", [ "$temp" ]);
+  }
+}
+
+
+#
 # do_add()
 #
 
 sub do_add
 {
   my ($dest, $a, $b) = @_;
-
-  push_source "$dest = $a + $b;";
-
-  ($dest, $a, $b) = map_args($dest, $a, $b);
-
-  if (int_or_num_lit_q($a)) {
-    if (int_or_num_lit_q($b)) {
-      my $temp = $a + $b;
-      $temp .= ".0" if (num_q($a) or num_q($b)) and not $temp =~ m/\./;
-      emit_code('set', [$dest, $temp]);
-    } elsif (reg_q($b) or var_q($b)) {
-      if ($dest eq $b && int_q($a)) {
-        emit_code('add', [$dest, $a]);
-      } else {
-        my $temp = int_q($a) ? temp_int() : temp_num();
-        emit_code('set', [$temp, $a]);
-        emit_code('add', [$dest, $temp, $b]);
-      }
-    } else {
-      printf(STDERR "jakoc: Syntax error (can't determine type of '$b') in addition on line %d!\n", $line);
-    }
-  } elsif (reg_q($a) or var_q($a)) {
-    if (int_or_num_lit_q($b)) {
-      if ($dest eq $a && int_q($b)) {
-        emit_code('add', [$dest, $b]);
-      } else {
-        my $temp = int_q($b) ? temp_int() : temp_num();
-        emit_code('set', [$temp, $b]);
-        emit_code('add', [$dest, $a, $temp]);
-      }
-    } elsif (reg_q($b) or var_q($b)) {
-      emit_code('add', [$dest, $a, $b]);
-    } else {
-      printf(STDERR "jakoc: Syntax error (can't determine type of '$b') in addition on line %d!\n", $line);
-    }
-  } else {
-    printf(STDERR "jakoc: Syntax error (can't determine type of '$a') in addition on line %d!\n", $line);
-  }
+  do_arith($dest, $a, '+', $b);
 }
 
 
@@ -2014,17 +2359,19 @@ sub do_inc
 {
   my ($dest, $amount) = @_;
 
+  $amount = 1 unless defined $amount;
+
   if (defined $amount) {
     if (int_q($amount)) {
       push_source "$dest += $amount;";
-      ($dest, $amount) = map_args($dest, $amount);
+#      ($dest, $amount) = map_args($dest, $amount);
       emit_code('add', [$dest, $amount]);
     } else {
       do_add($dest, $dest, $amount);
     }
   } else {
     push_source "$dest++;";
-    ($dest, $amount) = map_args($dest);
+#    ($dest, $amount) = map_args($dest);
     emit_code('inc', [$dest]);
   }
 }
@@ -2056,7 +2403,7 @@ sub do_sub
         emit_code('sub', [$dest, $temp, $b]);
       }
     } else {
-      printf(STDERR "jakoc: Syntax error in subtraction on line %d!\n", $line);
+      SYNTAX_ERROR("Can't determine type of '$b' in subtraction.");
     }
   } elsif (reg_q($a) or var_q($a)) {
     if (int_or_num_lit_q($b)) {
@@ -2070,10 +2417,10 @@ sub do_sub
     } elsif (reg_q($b) or var_q($b)) {
       emit_code('sub', [$dest, $a, $b]);
     } else {
-      printf(STDERR "jakoc: Syntax error in subtraction on line %d!\n", $line);
+      SYNTAX_ERROR("Can't determine type of '$b' in subtraction.");
     }
   } else {
-    printf(STDERR "jakoc: Syntax error in subtraction on line %d!\n", $line);
+    SYNTAX_ERROR("Can't determine type of '$a' in subtraction.");
   }
 }
 
@@ -2089,14 +2436,14 @@ sub do_dec
   if (defined $amount) {
     if (int_q($amount)) {
       push_source "$dest -= $amount;";
-      ($dest, $amount) = map_args($dest, $amount);
+#      ($dest, $amount) = map_args($dest, $amount);
       emit_code('sub', [$dest, $amount]);
     } else {
       do_sub($dest, $dest, $amount);
     }
   } else {
     push_source "$dest--;";
-    ($dest, $amount) = map_args($dest);
+#    ($dest, $amount) = map_args($dest);
     emit_code('dec', [$dest]);
   }
 }
@@ -2124,7 +2471,7 @@ sub do_mul
       emit_code('set', [$temp, $a]);
       emit_code('mul', [$dest, $temp, $b]);
     } else {
-      printf(STDERR "jakoc: Syntax error in multiplication on line %d!\n", $line);
+      SYNTAX_ERROR("Can't determine type of '$b' in multiplication.");
     }
   } elsif (reg_q($a) or var_q($a)) {
     if (int_or_num_lit_q($b)) {
@@ -2134,10 +2481,10 @@ sub do_mul
     } elsif (reg_q($b) or var_q($b)) {
       emit_code('mul', [$dest, $a, $b]);
     } else {
-      printf(STDERR "jakoc: Syntax error in multiplication on line %d!\n", $line);
+      SYNTAX_ERROR("Can't determine type of '$b' in multiplication.");
     }
   } else {
-    printf(STDERR "jakoc: Syntax error in multiplication on line %d!\n", $line);
+    SYNTAX_ERROR("Can't determine type of '$a' in multiplication.");
   }
 }
 
@@ -2159,7 +2506,6 @@ sub do_div
   my $b_type    = type_of($b);
 
   if ($dest_type ne $a_type) {
-    warn "Converting a ($a) from $a_type to $dest_type";
     my $temp = temp_reg($dest_type);
     emit_code('set', [$temp, $a]);
     $a = $temp;
@@ -2167,7 +2513,6 @@ sub do_div
   }
 
   if ($dest_type ne $b_type) {
-    warn "Converting b ($b) from $b_type to $dest_type";
     my $temp = int_q($dest) ? temp_int() : temp_num();
     emit_code('set', [$temp, $b]);
     $b = $temp;
@@ -2187,7 +2532,7 @@ sub do_div
     } elsif (reg_q($b) or var_q($b)) {
       emit_code('div', [$dest, $a, $b]);
     } else {
-      printf(STDERR "jakoc: Syntax error in division on line %d!\n", $line);
+      SYNTAX_ERROR("Can't determine type of '$b' in division.");
     }
   } elsif (reg_q($a) or var_q($a)) {
     if (int_or_num_lit_q($b)) {
@@ -2195,10 +2540,10 @@ sub do_div
     } elsif (reg_q($b) or var_q($b)) {
       emit_code('div', [$dest, $a, $b]);
     } else {
-      printf(STDERR "jakoc: Syntax error in division on line %d!\n", $line);
+      SYNTAX_ERROR("Can't determine type of '$b' in division.");
     }
   } else {
-    printf(STDERR "jakoc: Syntax error in division on line %d!\n", $line);
+    SYNTAX_ERROR("Can't determine type of '$a' in division.");
   }
 }
 
@@ -2228,7 +2573,7 @@ sub do_mod
       emit_code('set', [$temp, $a]);
       emit_code('mod', [$dest, $temp, $b]);
     } else {
-      printf(STDERR "jakoc: Syntax error in modulo on line %d!\n", $line);
+      SYNTAX_ERROR("Can't determine type of '$b' in modulo.");
     }
   } elsif (reg_q($a) or var_q($a)) {
     if (int_lit_q($b)) {
@@ -2238,10 +2583,10 @@ sub do_mod
     } elsif (reg_q($b) or var_q($b)) {
       emit_code('mod', [$dest, $a, $b]);
     } else {
-      printf(STDERR "jakoc: Syntax error in modulo on line %d!\n", $line);
+      SYNTAX_ERROR("Can't determine type of '$b' in modulo.");
     }
   } else {
-    printf(STDERR "jakoc: Syntax error in modulo on line %d!\n", $line);
+    SYNTAX_ERROR("Can't determine type of '$a' in modulo.");
   }
 }
 
@@ -2307,11 +2652,38 @@ sub interpolate_string
 {
   my ($string) = @_;
 
-  return $string unless $string =~ m/[^\\]\$/;
+  return $string unless $string =~ m/(^"|^".*?[^\\])\$/; # Double-quote with an unescaped '$'.
 
-  $string =~ s/([^\\])\$((([A-Za-z][A-Za-z0-9_]*)\b)|({[A-Za-z][A-Za-z0-9_]*}))/$1", $2, "/g;
+  $string = substr($string, 1, -1); # Without the surrounding double quotes.
 
-  return parse_args($string);
+  my $temp = temp_str();          # Allocate and clear a temporary string register
+  emit_code("set", [ $temp, '""' ]);
+
+  while (1) {
+    last unless defined $string and
+      $string =~ m/(^|^.*?[^\\])\$((([A-Za-z][A-Za-z0-9_]*)\b)|({[A-Za-z][A-Za-z0-9_]*}))(.*)$/;
+
+    emit_code("concat", [ $temp, '"' . $1 . '"' ])
+      if defined $1 and $1 ne '';
+
+    my $interp = $2;
+    $interp =~ s/^{(.*)}$/$1/; # Strip '{' and '}'.
+
+    if (type_of($interp) ne 'S') {
+      my $temp2 = temp_str();
+      emit_code("set", [ $temp2, $interp ]);
+      $interp = $temp2;
+    }
+
+    emit_code("concat", [ $temp, $interp ]);
+
+    $string = $6;
+  }
+
+  emit_code("concat", [ $temp, '"' . $string . '"' ])
+    if defined $string and $string ne '';
+
+  return $temp;
 }
 
 
@@ -2334,8 +2706,7 @@ sub parse_args
       push @args, $1;
       $args = $3 || '';
     } else {
-      printf(STDERR "jakoc: Syntax error. Cannot parse argument list '$args' on line %d.\n", $line);
-      return ();
+      SYNTAX_ERROR("Cannot parse argument list '$args'");
     }
   }
 
@@ -2348,50 +2719,56 @@ sub parse_args
 ##
 ## MAIN PROGRAM
 ##
-## This is where the parsing happens. We can through the lines of source code
-## one line at a time, recognizing certain patterns and using them to drive
-## calls to the support routines above. This makes the syntax for Jako pretty
-## rigid right now.
-##
-## TODO: Have a real parser so we can be a more free-form language.
-##
 ###############################################################################
 ###############################################################################
 
-print "###############################################################################\n";
-print "# This Parrot intermediate code file was produced by the Jako compiler.       #\n";
-print "# Initial comments from the source code are reproduced below.                 #\n";
-print "###############################################################################\n";
-print "\n";
 
-emit_code('.sub', [ "__ANON_BLOCK__" . $anon_block_count++ ]);
+#
+# Tokenize the input, and possibly dump the tokens.
+#
 
-my $code_lines = 0;
+my @tokens = tokenize($source_file);
 
-while(<>) {
-  $line++;
+if ($opts{t}) {
+  foreach my $tok (@tokens) {
+    printf "%-10s: %1s : %-10s : %s\n",
+      $tok->{CLASS},
+      $tok->{TYPE}    || '',
+      $tok->{VARIANT} || '',
+      $tok->{VALUE};
+  }
 
-  if (m/^\s*#/) { print unless $code_lines; next; } # Pass initial comment-only lines through intact.
-  if (m/^\s*$/) { print unless $code_lines; next; } # Pass initial whitespace-only lines through intact.
+  exit 0;
+}
 
-  chomp;                         # Trim trailing newline
-  s/^\s*//;                      # Trim leading whitespace
-  s/\s*$//;                      # Trim trailing whitespace
+
+#
+# Compile.
+#
+
+emit_code('.sub', [ "__MODULE__" ]);
+
+my $last_token;
+my $token;
+
+while(@tokens) {
+  $last_token = $token;
+  $token = shift @tokens;
+
+  DEBUG(0, "\$last_token is now a label (%s).", $last_token->{VALUE})
+    if $last_token->{CLASS} eq 'label';
+
+  $line = $token->{LINE};
+  $_    = $token->{VALUE};
+
   last if (/^__END__$/);         # Done after __END__ token
-
-  $code_lines++;
-
-  s/\s*;\s*$//; # Remove trailing semicolons
 
   #
   # Labels:
   #
-  # NOTE: While we have this simple parser, we only allow the labels on
-  # lines by themselves (aside from loop labels).
-  #
 
-  if (m|^([A-Za-z][A-Za-z0-9_]*)\s*:$|) {
-    push_label($1);
+  if ($token->{CLASS} eq 'label') {
+    push_label($_);
     next;
   }
 
@@ -2407,18 +2784,7 @@ while(<>) {
   # var str splee;
   # var str splee = "Howdy";
   #
-
-  if ((m/^var\s+(i)nt\s+([A-Za-z][A-Za-z0-9_]*)(\s*=\s*((-?\d+)|(0b[01]+)|(0[0-7]+)|(0x[0-9a-f]+)))?$/) ||
-      (m/^var\s+(n)um\s+([A-Za-z][A-Za-z0-9_]*)(\s*=\s*(-?\d+(\.\d+)))?$/) ||
-      (m/^var\s+(s)tr\s+([A-Za-z][A-Za-z0-9_]*)(\s*=\s*(\"[^\\\"]*(?:\\.[^\\\"]*)*\"))?$/)
-  ) { 
-    declare_var($2, uc($1), $block_count ? 'local' : 'global');
-    assign_var($2, uc($1), $4) if defined $4;
-    next;
-  }
-
-  #
-  # Variable declarations:
+  # var obj quux;
   #
   # var int foo, bar;
   # var int foo, bar = 5;
@@ -2429,159 +2795,103 @@ while(<>) {
   # var str splee, quux;
   # var str splee, quux = "Howdy";
   #
-
-  if ((m/^var\s+(i)nt\s+(([A-Za-z][A-Za-z0-9_]*)(\s*,\s*[A-Za-z][A-Za-z0-9_]*)+)(\s*=\s*((-?\d+)|(0b[01]+)|(0[0-7]+)|(0x[0-9a-f]+)))?$/) ||
-      (m/^var\s+(n)um\s+(([A-Za-z][A-Za-z0-9_]*)(\s*,\s*[A-Za-z][A-Za-z0-9_]*)+)(\s*=\s*(-?\d+(\.\d+)))?$/) ||
-      (m/^var\s+(s)tr\s+(([A-Za-z][A-Za-z0-9_]*)(\s*,\s*[A-Za-z][A-Za-z0-9_]*)+)(\s*=\s*(\"[^\\\"]*(?:\\.[^\\\"]*)*\"))?$/)
-  ) {
-    foreach my $var (split(/\s*,\s*/, $2)) {
-      declare_var($var, uc($1), $block_count ? 'local' : 'global');
-      assign_var($var, uc($1), $6) if defined $6;
-    }
-    next;
-  }
-
-  #
-  # Variable declarations:
-  #
-  # var poly quux;
-  #
-
-  if (m/^var\s+poly\s+([A-Za-z][A-Za-z0-9_]*)$/) {
-    declare_var($2, 'P', $block_count ? 'local' : 'global');
-    next;
-  }
-
-  #
-  # Constant declarations:
+  # var obj quux, baz;
   #
   # const int foo   = 5;
   # const num bar   = 3.14;
   # const str splee = "Howdy";
   #
 
-  if ((m/^const\s+(i)nt\s+([A-Za-z][A-Za-z0-9_]*)(\s*=\s*((-?\d+)|(0b[01]+)|(0[0-7]+)|(0x[0-9a-f]+)))?$/) ||
-      (m/^const\s+(n)um\s+([A-Za-z][A-Za-z0-9_]*)(\s*=\s*(-?\d+(\.\d+)))$/) ||
-      (m/^const\s+(s)tr\s+([A-Za-z][A-Za-z0-9_]*)(\s*=\s*(\"[^\\\"]*(?:\\.[^\\\"]*)*\"))$/)) { 
-    declare_const($2, uc($1), $4);
-    next;
-  }
+  if ($token->{CLASS} eq 'decl' and $token->{VARIANT} eq 'data') {
+    my $access = $_; # 'const' or 'var'.
 
-  #
-  # Variable Assignments:
-  #
-  # a = 5;
-  # a = 3.14;
-  # a = "Howdy";
-  # a = b;
-  #
- 
-  if (m/^([A-Za-z][A-Za-z0-9_]*)\s*=\s*((-?\d+)|(0b[01]+)|(0[0-7]+)|(0x[0-9a-f]+))$/) {
-    assign_var($1, 'I', $2);
-    next;
-  }
- 
-  if (m/^([A-Za-z][A-Za-z0-9_]*)\s*=\s*(-?\d+\.\d+)$/) {
-    assign_var($1, 'N', $2);
-    next;
-  }
+    SYNTAX_ERROR("Expected type name after '$access', but got end of source.")
+      unless @tokens;
 
-  if (m/^([A-Za-z][A-Za-z0-9_]*)\s*=\s*(\"[^\\\"]*(?:\\.[^\\\"]*)*\")$/) {
-    assign_var($1, 'S', $2);
-    next;
-  }
+    SYNTAX_ERROR("Expected type name after '$access', but got '$tokens[0]{VALUE}'.")
+      unless $tokens[0]{CLASS} eq 'type';
 
-  if (m/^([A-Za-z][A-Za-z0-9_]*)\s*=\s*([A-Za-z][A-Za-z0-9_]*)$/) {
-    assign_var($1, '*', $2);
-    next;
-  }
+    my $type_token = shift @tokens;
+    $line = $type_token->{LINE};
+    my $type = $type_token->{VALUE};
+    my $type_code = $type_code{$type};
 
-  #
-  # Multiple Variable Assignments:
-  #
-  # a = b = 5;
-  # a = b = 3.14;
-  # a = b = "Howdy";
-  # a = b = c;
-  #
- 
-  if (m/^(([A-Za-z][A-Za-z0-9_]*)(\s*=\s*[A-Za-z][A-Za-z0-9_]*)+)\s*=\s*((-?\d+)|(0b[01]+)|(0[0-7]+)|(0x[0-9a-f]+))$/) {
-    foreach my $var (split(/\s*=\s*/, $1)) {
-      assign_var($var, 'I', $4);
+    SYNTAX_ERROR("Cannot declare constants of type '$type'.")
+      if ($access eq 'const' and $type eq 'obj');
+
+    my @identifiers = ();
+
+    while (1) {
+      SYNTAX_ERROR("Expected identifier after '$access $type [ <ident>, ]*', but got end of source.")
+        unless @tokens;
+
+      SYNTAX_ERROR("Expected identifier after '$access $type [ <ident>, ]*', but got '$tokens[0]{VALUE}'.")
+        unless $tokens[0]{CLASS} eq 'ident';
+
+      my $ident_token = shift @tokens;
+      $line = $ident_token->{LINE};
+      push @identifiers, $ident_token->{VALUE};
+
+      last unless @tokens and $tokens[0]{CLASS} eq 'sep' and $tokens[0]{VALUE} eq ',';
+
+      my $sep_token = shift @tokens;
+      $line = $sep_token->{LINE};
     }
-    next;
-  }
- 
-  if (m/^(([A-Za-z][A-Za-z0-9_]*)(\s*=\s*[A-Za-z][A-Za-z0-9_]*)+)\s*=\s*(-?\d+\.\d+)$/) {
-    foreach my $var (split(/\s*=\s*/, $1)) {
-      assign_var($var, 'N', $4);
+
+    my $value;
+
+    if (@tokens and $tokens[0]{CLASS} eq 'op' and $tokens[0]{VALUE} eq '=') {
+#      DEBUG(0, "Assigning %s...", join(", ", @identifiers));
+
+      my $op_token = shift @tokens;
+      $line = $op_token->{LINE};
+
+      SYNTAX_ERROR("Expected literal after '$access $type [ <ident>, ]* <ident> =', but got end of source.")
+        unless @tokens;
+
+      SYNTAX_ERROR("Expected literal after '$access $type [ <ident>, ]* <ident> = ', but got '$tokens[0]{VALUE}'.")
+        unless $tokens[0]{CLASS} eq 'literal';
+
+      my $literal_token = shift @tokens;
+      $line = $literal_token->{LINE};
+
+      $value = $literal_token->{VALUE};
+
+      $value = interpolate_string($value)
+        if str_lit_q($value);
+
+#      DEBUG(0, "%s", $value);
     }
-    next;
-  }
-
-  if (m/^(([A-Za-z][A-Za-z0-9_]*)(\s*=\s*[A-Za-z][A-Za-z0-9_]*)+)\s*=\s*(\"[^\\\"]*(?:\\.[^\\\"]*)*\")$/) {
-    foreach my $var (split(/\s*=\s*/, $1)) {
-      assign_var($var, 'S', $4);
+    else {
+#      DEBUG(0, "NOT assigning %s...", join(", ", @identifiers));
     }
-    next;
-  }
+#    dump_token($tokens[0]);
 
-  if (m/^(([A-Za-z][A-Za-z0-9_]*)(\s*=\s*[A-Za-z][A-Za-z0-9_]*)+)\s*=\s*([A-Za-z][A-Za-z0-9_]*)$/) {
-    foreach my $var (split(/\s*=\s*/, $1)) {
-      assign_var($var, '*', $4);
+    SYNTAX_ERROR("Expected ';' after declaration of identifier(s) " . join(', ', @identifiers) . ", but got end of source.")
+      unless @tokens;
+
+    SYNTAX_ERROR("Expected ';' after declaration of identifier(s) " . join(', ', @identifiers) . ", but got '$tokens[0]{VALUE}'.")
+      unless ($tokens[0]{CLASS} eq 'sep' and $tokens[0]{VALUE} eq ';');
+
+    my $sep_token = shift @tokens;
+    $line = $sep_token->{LINE};
+
+    SYNTAX_ERROR("Cannot declare constant without assigning a value.")
+      if ($access eq 'const' and not defined $value);
+
+    foreach my $ident (@identifiers) {
+      if ($access eq 'var') {
+        declare_var($ident, $type_code, $access);
+        assign_var($ident, $type_code, $value) if defined $value;
+      }
+      elsif ($access eq 'const') {
+        declare_const($ident, $type_code, $value);
+      }
+      else {
+        INTERNAL_ERROR("Unexpected data declaration access '$access'.");
+      }
     }
-    next;
-  }
 
-  #
-  # Function Calls:
-  #
-  #     foo(...);
-  # a = foo(...);
-  #
- 
-  if (m/^([A-Za-z][A-Za-z0-9_]*)\((.*)\)$/) {
-    void_func($1, parse_args($2));
-    next;
-  }
-
-  if (m/^([A-Za-z][A-Za-z0-9_]*)\s*=\s*([A-Za-z][A-Za-z0-9_]*)\((.*)\)$/) {
-    assign_func($1, $2, split(/\s*,\s*/, $3));
-    next;
-  }
-
-  #
-  # Conditionals:
-  #
-  #   if     (...) {
-  #   unless (...) {
-  #
-  # } elsif  (...) {
-  #
-
-  if (m/^(if|unless)\s*\(\s*(.*)\s*\)\s*{$/) {
-    begin_block(undef, $1, $2);
-    next;
-  }
-
-  if (m/^}\s*(elsif)\s*\(\s*(.*)\s*\)\s*{$/) {
-    begin_block(undef, $1, $2);
-    # TODO
-    next;
-  }
-
-  #
-  # Loops:
-  #
-  # LABEL: until (...) {
-  #        until (...) {
-  #
-  # LABEL: while (...) {
-  #        while (...) {
-  #
-
-  if (m/^(([A-Za-z][A-Za-z0-9_]*)\s*:\s*)?(until|while)\s*\(\s*(.*)\s*\)\s*{$/) {
-    begin_block($2, $3, $4);
     next;
   }
 
@@ -2592,9 +2902,15 @@ while(<>) {
   #
   # {
   #
+ 
+  if ($token->{CLASS} eq 'group' and $token->{VALUE} eq '{') {
+    my $label;
 
-  if (m/^(([A-Za-z][A-Za-z0-9_]*)\s*:\s*)?{$/) {
-    begin_block($2, 'bare', undef);
+    $label = $last_token->{VALUE}
+      if $last_token->{CLASS} eq 'label';
+    
+    begin_block($label, 'bare', undef);
+
     next;
   }
 
@@ -2607,13 +2923,338 @@ while(<>) {
   # sub str NAME (...) {
   #
 
-  if (m/^sub\s+((int|num|str)\s+)?([A-Za-z][A-Za-z0-9_]*)\s*\((.*)\)\s*{$/) {
-    my $block_label = $3;
-    my $block_type  = 'sub';
-    my $return_type = defined($2) ? substr($2, 0, 1) : undef;
-    my @formal_args = map { [ split(/\s+/, $_) ] } split(/\s*,\s*/, $4);
+  if ($token->{CLASS} eq 'decl' and $token->{VARIANT} eq 'code') {
+    SYNTAX_ERROR("Expected type or identifier after 'sub', but got end of source.")
+      unless @tokens;
 
-    begin_block($block_label, $block_type, undef, $return_type, @formal_args);
+    SYNTAX_ERROR("Expected type or identifier after 'sub', but got '$tokens[0]{VALUE}'.")
+      unless ($tokens[0]{CLASS} eq 'type' or $tokens[0]{CLASS} eq 'ident');
+
+    my $type;
+
+    if ($tokens[0]{CLASS} eq 'type') {
+      my $type_token = shift @tokens;
+      $line = $type_token->{LINE};
+      $type = $type_token->{TYPE};
+
+      SYNTAX_ERROR("Expected type or identifier after 'sub %s', but got end of source.", $type_token->value)
+        unless @tokens;
+
+      SYNTAX_ERROR("Expected type or identifier after 'sub %s', but got '$tokens[0]{VALUE}'.", $type_token->value)
+        unless ($tokens[0]{CLASS} eq 'ident');
+    }
+
+    my $ident_token = shift @tokens;
+    $line = $ident_token->{LINE};
+    my $name = $ident_token->{VALUE};
+
+    #
+    # Open paren of arg list:
+    #
+
+    SYNTAX_ERROR("Expected '(' after '$_', but got end of source.")
+      unless @tokens;
+
+    SYNTAX_ERROR("Expected '(' after '$_', but got '$tokens[0]{VALUE}'.")
+      unless ($tokens[0]{CLASS} eq 'group' and $tokens[0]{VALUE} eq '(');
+
+    my $open_paren = shift @tokens;
+    $line = $open_paren->{LINE};
+
+    #
+    # Formal argument list:
+    #
+
+    my @formal_args;
+
+    while (1) {
+      SYNTAX_ERROR("Expected formal argument or ')', but got end of source.")
+        unless @tokens;
+
+      SYNTAX_ERROR("Expected formal argument or ')', but got '$tokens[0]{VALUE}'.")
+        unless ($tokens[0]{CLASS} eq 'type')
+        or ($tokens[0]{CLASS} eq 'group' and $tokens[0]{VALUE} eq ')');
+
+      last if $tokens[0]{CLASS} eq 'group' and $tokens[0]{VALUE} eq ')';
+
+      my $arg_type_token = shift @tokens;
+      $line = $arg_type_token->{LINE};
+      my $arg_type = $arg_type_token->{TYPE};
+
+      SYNTAX_ERROR("Expected identifier after formal argument type, but got end of source.")
+        unless @tokens;
+
+      SYNTAX_ERROR("Expected identifier after formal argument type, but got '$tokens[0]{VALUE}'.")
+        unless $tokens[0]{CLASS} eq 'ident';
+
+      my $arg_name_token = shift @tokens;
+      $line = $arg_type_token->{LINE};
+      my $arg_name = $arg_name_token->{VALUE};
+
+      push @formal_args, [ $arg_type, $arg_name ];
+
+      SYNTAX_ERROR("Expected ',' or ')' after formal argument, but got end of source.")
+        unless @tokens;
+
+      SYNTAX_ERROR("Expected ',' or ')' after formal argument, but got '$tokens[0]{VALUE}'.")
+        unless ($tokens[0]{CLASS} eq 'sep' and $tokens[0]{VALUE} eq ',')
+        or ($tokens[0]{CLASS} eq 'group' and $tokens[0]{VALUE} eq ')');
+
+      last if $tokens[0]{CLASS} eq 'group' and $tokens[0]{VALUE} eq ')';
+
+      my $sep_token = shift @tokens;
+      $line = $sep_token->{LINE};
+    }
+
+    #
+    # Close paren of arg list:
+    #
+
+    SYNTAX_ERROR("Expected ')' after formal arguments, but got end of source.")
+      unless @tokens;
+
+    SYNTAX_ERROR("Expected ')' after formal arguments, but got '$tokens[0]{VALUE}'.")
+      unless ($tokens[0]{CLASS} eq 'group' and $tokens[0]{VALUE} eq ')');
+
+    my $close_paren = shift @tokens;
+    $line = $close_paren->{LINE};
+
+    #
+    # Open brace of block:
+    #
+
+    SYNTAX_ERROR("Expected '{' after formal argument list, but got end of source.")
+      unless @tokens;
+
+    SYNTAX_ERROR("Expected '{' after formal argument list, but got '$tokens[0]{VALUE}'.")
+      unless ($tokens[0]{CLASS} eq 'group' and $tokens[0]{VALUE} eq '{');
+
+    my $open_brace = shift @tokens;
+    $line = $open_brace->{LINE};
+    
+    #
+    # GOOD TO GO:
+    #
+
+    begin_block($name, 'sub', undef, $type, @formal_args);
+
+    next;
+  }
+
+  #
+  # Loops:
+  #
+  # LABEL: until (...) {
+  #        until (...) {
+  #
+  # LABEL: while (...) {
+  #        while (...) {
+  #
+ 
+  if ($token->{CLASS} eq 'control' and $token->{VARIANT} eq 'iter') {
+    my $prefix;
+
+    DEBUG(0, "Starting $_...");
+
+    if ($last_token->{CLASS} eq 'label') {
+      $prefix = $last_token->{VALUE};
+      DEBUG(0, "... with prefix '$prefix'...");
+    }
+
+    #
+    # Open paren of condition:
+    #
+
+    SYNTAX_ERROR("Expected '(' after '$_', but got end of source.")
+      unless @tokens;
+
+    SYNTAX_ERROR("Expected '(' after '$_', but got '$tokens[0]{VALUE}'.")
+      unless ($tokens[0]{CLASS} eq 'group' and $tokens[0]{VALUE} eq '(');
+
+    my $open_paren = shift @tokens;
+    $line = $open_paren->{LINE};
+
+    #
+    # Left token of condition:
+    #
+
+    SYNTAX_ERROR("Expected identifier or literal after '(', but got end of source.")
+      unless @tokens;
+
+    SYNTAX_ERROR("Expected identifier or literal after '(', but got '$tokens[0]{VALUE}'.")
+      unless ($tokens[0]{CLASS} eq 'ident' or $tokens[0]{CLASS} eq 'literal');
+
+    my $left_token = shift @tokens;
+    $line = $left_token->{LINE};
+    my $left = $left_token->{VALUE};
+
+    #
+    # Relational operator of condition:
+    #
+
+    SYNTAX_ERROR("Expected relational operator after '$left', but got end of source.")
+      unless @tokens;
+
+    SYNTAX_ERROR("Expected relational operator after '$left', but got '$tokens[0]{VALUE}'.")
+      unless ($tokens[0]{CLASS} eq 'op' and $tokens[0]{VARIANT} eq 'rel');
+
+    my $relop_token = shift @tokens;
+    $line = $relop_token->{LINE};
+    my $relop = $relop_token->{VALUE};
+
+    #
+    # Right token of condition:
+    #
+
+    SYNTAX_ERROR("Expected identifier or literal after '$relop', but got end of source.")
+      unless @tokens;
+
+    SYNTAX_ERROR("Expected identifier or literal after '$relop', but got '$tokens[0]{VALUE}'.")
+      unless ($tokens[0]{CLASS} eq 'ident' or $tokens[0]{CLASS} eq 'literal');
+
+    my $right_token = shift @tokens;
+    $line = $right_token->{LINE};
+    my $right = $right_token->{VALUE};
+
+    #
+    # Close paren of condition:
+    #
+
+    SYNTAX_ERROR("Expected ')' after condition, but got end of source.")
+      unless @tokens;
+
+    SYNTAX_ERROR("Expected ')' after condition, but got '$tokens[0]{VALUE}'.")
+      unless ($tokens[0]{CLASS} eq 'group' and $tokens[0]{VALUE} eq ')');
+
+    my $close_paren = shift @tokens;
+    $line = $close_paren->{LINE};
+
+    #
+    # Open brace of block:
+    #
+
+    SYNTAX_ERROR("Expected '{' after condition, but got end of source.")
+      unless @tokens;
+
+    SYNTAX_ERROR("Expected '{' after condition, but got '$tokens[0]{VALUE}'.")
+      unless ($tokens[0]{CLASS} eq 'group' and $tokens[0]{VALUE} eq '{');
+
+    my $open_brace = shift @tokens;
+    $line = $open_brace->{LINE};
+    
+    #
+    # GOOD TO GO:
+    #
+
+    begin_block($prefix, $_, [$left, $relop, $right]);
+    
+    next;
+  }
+
+  #
+  # Increment and Decrement:
+  #
+  #   <sum> ++
+  #   <difference> -- 
+  #
+  # a++
+  # b--
+  #
+
+  if ($token->{CLASS} eq 'ident'
+    and @tokens >= 1
+    and $tokens[0]{CLASS} eq 'op'
+    and ($tokens[0]{VALUE} eq '++' or $tokens[0]{VALUE} eq '--')
+  ) {
+    #
+    # Operator:
+    #
+
+    my $op_token = shift @tokens;
+    $line = $op_token->{LINE};
+    my $op = $op_token->{VALUE};
+
+    #
+    # Statement separator:
+    #
+
+    SYNTAX_ERROR("Expected ';' after '$op', but got end of source.")
+      unless @tokens;
+
+    SYNTAX_ERROR("Expected ';' after '$op', but got '$tokens[0]{VALUE}'.")
+      unless ($tokens[0]{CLASS} eq 'sep' and $tokens[0]{VALUE} eq ';');
+
+    my $sep_token = shift @tokens;
+    $line = $sep_token->{LINE};
+   
+    #
+    # GOOD TO GO:
+    #
+
+    if ($op eq '++') {
+      do_inc($_);
+    }
+    else {
+      do_dec($_);
+    }
+
+    next;
+  }
+
+  #
+  # Arithmetic assigns:
+  #
+  #   <sum> += <incremend>
+  #
+  #   <a> -= <b>
+  #   <a> *= <b>
+  #   <a> /= <b>
+  #   <a> %= <b>
+  #
+  # a += b;
+  # a += 5;
+  # a += 3.14;
+  #
+
+  if ($token->{CLASS} eq 'ident' and @tokens >= 1 and $tokens[0]{CLASS} eq 'op' and $tokens[0]{VARIANT} eq 'arith_assign') {
+    my $op_token = shift @tokens;
+    $line = $op_token->{LINE};
+
+    my $op = substr($op_token->{VALUE}, 0, 1);
+
+    #
+    # Right hand side:
+    #
+
+    SYNTAX_ERROR("Expected literal or identifier after '[ <ident> = ]* <ident> =', but got end of source.")
+      unless @tokens;
+
+    SYNTAX_ERROR("Expected literal or identifier after '[ <ident> = ]* <ident> = ', but got '$tokens[0]{VALUE}'.")
+      unless $tokens[0]{CLASS} eq 'literal' or $tokens[0]{CLASS} eq 'ident';
+
+    my $value_token = shift @tokens;
+    my $line = $value_token->{LINE};
+
+    my $value = $value_token->{VALUE};
+
+    #
+    # Statement separator:
+    #
+
+    SYNTAX_ERROR("Expected ';' after assignment, but got end of source.")
+      unless @tokens;
+
+    SYNTAX_ERROR("Expected ';' after assignment, but got '$tokens[0]{VALUE}'.")
+      unless ($tokens[0]{CLASS} eq 'sep' and $tokens[0]{VALUE} eq ';');
+
+    my $sep_token = shift @tokens;
+    $line = $sep_token->{LINE};
+    
+    #
+    # GOOD TO GO:
+    #
+
+    do_arith($_, $_, $op, $value);
 
     next;
   }
@@ -2625,9 +3266,522 @@ while(<>) {
   # } continue {
   # } else {
   #
+ 
+  if ($token->{CLASS} eq 'group' and $token->{VALUE} eq '}') {
+    my $cont;
+    
+    if (@tokens and $tokens[0]{CLASS} eq 'control' and ($tokens[0]{VALUE} eq 'continue' or $tokens[0]{VALUE} eq 'else')) {
+      my $cont_token = shift @tokens;
+      $line = $cont_token->{LINE};
 
-  if (m/^}(\s*(continue|else)\s*{)?$/) {
-    end_block($2);
+      $cont = $cont_token->{VALUE};
+
+      #
+      # Open brace of block:
+      #
+
+      SYNTAX_ERROR("Expected '{' after '$cont', but got end of source.")
+        unless @tokens;
+
+      SYNTAX_ERROR("Expected '{' after '$cont', but got '$tokens[0]{VALUE}'.")
+        unless ($tokens[0]{CLASS} eq 'group' and $tokens[0]{VALUE} eq '{');
+
+      my $open_brace = shift @tokens;
+      $line = $open_brace->{LINE};
+    }
+
+    end_block($cont);
+
+    next;
+  }
+
+  #
+  # Arithmetic Operators:
+  #
+  # a = b % c;
+  # a = b % 4;
+  # a = 9 % b;
+  # a = 9 % 4;
+  #
+  # a %= b;
+  # a %= 4;
+  #
+  # TODO: Numbers in mod (follow Calendrical calculations definition? Knuth definition?)
+  #
+
+  if (@tokens >= 5
+    and $token->{CLASS} eq 'ident'
+    and ($tokens[0]{CLASS} eq 'op' and $tokens[0]{VALUE} eq '=')
+    and ($tokens[1]{CLASS} eq 'literal' or $tokens[1]{CLASS} eq 'ident')
+    and ($tokens[2]{CLASS} eq 'op' and $tokens[2]{VARIANT} eq 'arith')
+    and ($tokens[3]{CLASS} eq 'literal' or $tokens[3]{CLASS} eq 'ident')
+    and ($tokens[4]{CLASS} eq 'sep' and $tokens[4]{VALUE} eq ';')
+  ) {
+    my $assign_op  = shift @tokens;
+    my $left_expr  = shift @tokens;
+    my $arith_op   = shift @tokens;
+    my $right_expr = shift @tokens;
+    my $sep        = shift @tokens;
+
+    $line = $sep->{LINE};
+
+    do_arith($_, $left_expr->{VALUE}, $arith_op->{VALUE}, $right_expr->{VALUE});
+
+    next;
+  }
+
+  #
+  # Subroutine Calls:
+  #
+  #     foo(...);
+  #
+ 
+  if ($token->{CLASS} eq 'ident'
+    and @tokens 
+    and ($tokens[0]{CLASS} eq 'group' and $tokens[0]{VALUE} eq '(')
+  ) {
+    #
+    # Open paren of call:
+    #
+
+    my $open_paren = shift @tokens;
+    $line = $open_paren->{LINE};
+
+    my @args = ();
+
+    while (1) {
+      SYNTAX_ERROR("Expected expression or ')' after '$_([ <expr>, ]*', but got end of source.")
+        unless @tokens;
+
+      SYNTAX_ERROR("Expected expression or ')' after '$_([ <expr>, ]*', but got '$tokens[0]{VALUE}'.")
+        unless $tokens[0]{CLASS} eq 'literal' or $tokens[0]{CLASS} eq 'ident'
+        or ($tokens[0]{CLASS} eq 'group' and $tokens[0]{VALUE} eq ')');
+
+      last if ($tokens[0]{CLASS} eq 'group' and $tokens[0]{VALUE} eq ')');
+
+      my $expr_token = shift @tokens;
+      $line = $expr_token->{LINE};
+      push @args, $expr_token->{VALUE};
+
+      last unless @tokens and $tokens[0]{CLASS} eq 'sep' and $tokens[0]{VALUE} eq ',';
+
+      SYNTAX_ERROR("Expected ',' or ')' after expression, but got end of source.")
+        unless @tokens;
+
+      SYNTAX_ERROR("Expected ',' or ')' after expression, but got '$tokens[0]{VALUE}'.")
+        unless ($tokens[0]{CLASS} eq 'sep' and $tokens[0]{VALUE} eq ',')
+        or ($tokens[0]{CLASS} eq 'group' and $tokens[0]{VALUE} eq ')');
+
+      last if ($tokens[0]{CLASS} eq 'group' and $tokens[0]{VALUE} eq ')');
+
+      my $sep_token = shift @tokens;
+      $line = $sep_token->{LINE};
+    }
+
+    #
+    # Close paren of call:
+    #
+
+    my $close_paren = shift @tokens;
+    $line = $close_paren->{LINE};
+ 
+    #
+    # Statement separator:
+    #
+
+    SYNTAX_ERROR("Expected ';' after call, but got end of source.")
+      unless @tokens;
+
+    SYNTAX_ERROR("Expected ';' after call, but got '$tokens[0]{VALUE}'.")
+      unless ($tokens[0]{CLASS} eq 'sep' and $tokens[0]{VALUE} eq ';');
+
+    my $sep_token = shift @tokens;
+    $line = $sep_token->{LINE};
+
+    #
+    # GOOD TO GO:
+    #
+
+    void_func($_, @args);
+    
+    next;
+  }
+
+  #
+  # Function Calls:
+  #
+  # a = foo(...);
+  #
+
+  if ($token->{CLASS} eq 'ident'
+    and @tokens >= 3
+    and ($tokens[0]{CLASS} eq 'op' and $tokens[0]{VALUE} eq '=')
+    and $tokens[1]{CLASS} eq 'ident'
+    and ($tokens[2]{CLASS} eq 'group' and $tokens[2]{VALUE} eq '(')
+  ) {
+    #
+    # Assignment operator:
+    #
+
+    my $op_token = shift @tokens;
+    $line = $op_token->{LINE};
+
+    #
+    # Function name:
+    #
+
+    my $func_name_token = shift @tokens;
+    $line = $func_name_token->{LINE};
+    my $func_name = $func_name_token->{VALUE};
+
+    #
+    # Open paren of call:
+    #
+
+    my $open_paren = shift @tokens;
+    $line = $open_paren->{LINE};
+
+    my @args = ();
+
+    while (1) {
+      SYNTAX_ERROR("Expected expression or ')' after '$_([ <expr>, ]*', but got end of source.")
+        unless @tokens;
+
+      SYNTAX_ERROR("Expected expression or ')' after '$_([ <expr>, ]*', but got '$tokens[0]{VALUE}'.")
+        unless $tokens[0]{CLASS} eq 'literal' or $tokens[0]{CLASS} eq 'ident'
+        or ($tokens[0]{CLASS} eq 'group' and $tokens[0]{VALUE} eq ')');
+
+      last if ($tokens[0]{CLASS} eq 'group' and $tokens[0]{VALUE} eq ')');
+
+      my $expr_token = shift @tokens;
+      $line = $expr_token->{LINE};
+      push @args, $expr_token->{VALUE};
+
+      last unless @tokens and $tokens[0]{CLASS} eq 'sep' and $tokens[0]{VALUE} eq ',';
+
+      SYNTAX_ERROR("Expected ',' or ')' after expression, but got end of source.")
+        unless @tokens;
+
+      SYNTAX_ERROR("Expected ',' or ')' after expression, but got '$tokens[0]{VALUE}'.")
+        unless ($tokens[0]{CLASS} eq 'sep' and $tokens[0]{VALUE} eq ',')
+        or ($tokens[0]{CLASS} eq 'group' and $tokens[0]{VALUE} eq ')');
+
+      last if ($tokens[0]{CLASS} eq 'group' and $tokens[0]{VALUE} eq ')');
+
+      my $sep_token = shift @tokens;
+      $line = $sep_token->{LINE};
+    }
+
+    #
+    # Close paren of call:
+    #
+
+    my $close_paren = shift @tokens;
+    $line = $close_paren->{LINE};
+ 
+    #
+    # Statement separator:
+    #
+
+    SYNTAX_ERROR("Expected ';' after call, but got end of source.")
+      unless @tokens;
+
+    SYNTAX_ERROR("Expected ';' after call, but got '$tokens[0]{VALUE}'.")
+      unless ($tokens[0]{CLASS} eq 'sep' and $tokens[0]{VALUE} eq ';');
+
+    my $sep_token = shift @tokens;
+    $line = $sep_token->{LINE};
+
+    assign_func($_, $func_name, @args);
+    next;
+  }
+
+  #
+  # Variable Assignments:
+  #
+  # var int a, b, c;
+  # var num d, e;
+  # var str f, g;
+  #
+  # a = 5;
+  # a = b = c = 5;
+  #
+  # d = 3.14;
+  # d = e = 3.14;
+  #
+  # f = "Howdy";
+  # f = g = "Howdy";
+  #
+  # a = b;
+  # a = b = c;
+  #
+ 
+  if ($token->{CLASS} eq 'ident'
+    and @tokens >= 1
+    and ($tokens[0]{CLASS} eq 'op' and $tokens[0]{VALUE} eq '=')
+  ) {
+    my $op_token = shift @tokens;
+    $line = $op_token->{LINE};
+
+    #
+    # Left hand side:
+    #
+
+    my @identifiers = ($_);
+
+    while (@tokens >= 2 and $tokens[0]{CLASS} eq 'ident' and $tokens[1]{CLASS} eq 'op' and $tokens[1]{VALUE} eq '=') {
+      my $ident_token = shift @tokens;
+      $line = $ident_token->{LINE};
+      my $op_token = shift @tokens;
+      $line = $op_token->{LINE};
+
+      push @identifiers, $ident_token->{VALUE};
+    }
+
+    #
+    # Right hand side:
+    #
+
+    SYNTAX_ERROR("Expected literal or identifier after '[ <ident> = ]* <ident> =', but got end of source.")
+      unless @tokens;
+
+    SYNTAX_ERROR("Expected literal or identifier after '[ <ident> = ]* <ident> = ', but got '$tokens[0]{VALUE}'.")
+      unless $tokens[0]{CLASS} eq 'literal' or $tokens[0]{CLASS} eq 'ident';
+
+    my $value_token = shift @tokens;
+    my $line = $value_token->{LINE};
+
+    my $value = $value_token->{VALUE};
+
+    #
+    # Statement separator:
+    #
+
+    SYNTAX_ERROR("Expected ';' after assignment, but got end of source.")
+      unless @tokens;
+
+    SYNTAX_ERROR("Expected ';' after assignment, but got '%s'.", $tokens[0]{VALUE})
+      unless ($tokens[0]{CLASS} eq 'sep' and $tokens[0]{VALUE} eq ';');
+
+    my $sep_token = shift @tokens;
+    $line = $sep_token->{LINE};
+    
+    #
+    # GOOD TO GO:
+    #
+
+    foreach my $ident (@identifiers) {
+      if ($value_token->{CLASS} eq 'literal') {
+        assign_var($ident, $value_token->{TYPE}, $value_token->{VALUE});
+      }
+      elsif ($value_token->{CLASS} eq 'ident') {
+        assign_var($ident, '*', $value_token->{VALUE}); # TODO: Cloning for 'obj' vars?
+      }
+      else {
+        INTERNAL_ERROR("Unexpected value token class.");
+      }
+    }
+
+    next;
+  }
+
+  #
+  # Subroutine Return Statements:
+  #
+  # return
+  # return 0
+  # return 0.0
+  # return "foo"
+  # return bar
+  #
+
+  if ($token->{CLASS} eq 'control' and $token->{VALUE} eq 'return') {
+    #
+    # Return value:
+    #
+
+#    DEBUG(0, "TOKENS: %s", join(" | ", map { $_->{VALUE} } @tokens[0..10]));
+
+    SYNTAX_ERROR("Expected expression or ';' after 'return' but got end of source.")
+      unless @tokens;
+
+    SYNTAX_ERROR("Expected expression or ';' after 'return' but got '$tokens[0]{VALUE}'.")
+      unless $tokens[0]{CLASS} eq 'ident'
+      or $tokens[0]{CLASS} eq 'literal'
+      or ($tokens[0]{CLASS} eq 'sep' and $tokens[0]{CLASS} eq ';');
+
+    my $value;
+
+    unless ($tokens[0]{CLASS} eq 'sep' and $tokens[0]{CLASS} eq ';') {
+      my $value_token = shift @tokens;
+      $line = $value_token->{LINE};
+      $value = $value_token->{VALUE};
+
+#      DEBUG(0, "Got return value '%s'", $value);
+    }
+
+    #
+    # Statement separator:
+    #
+
+    SYNTAX_ERROR("Expected ';' after return statement, but got end of source.")
+      unless @tokens;
+
+    SYNTAX_ERROR("Expected ';' after return statement, but got '%s'.", $tokens[0]{VALUE})
+      unless ($tokens[0]{CLASS} eq 'sep' and $tokens[0]{VALUE} eq ';');
+
+    my $sep_token = shift @tokens;
+    $line = $sep_token->{LINE};
+    
+    #
+    # GOOD TO GO:
+    #
+
+    do_return($value);
+
+    next;
+  }
+
+  #
+  # Goto Statements:
+  #
+  # goto LABEL
+  # goto LABEL if (...)
+  # goto LABEL unless (...)
+  #
+
+  if ($token->{CLASS} eq 'control' and $token->{VALUE} eq 'goto') {
+    #
+    # Target label:
+    #
+
+    SYNTAX_ERROR("Expected label after 'goto', but got end of source.")
+      unless @tokens;
+
+    SYNTAX_ERROR("Expected label after 'goto', but got '%s'.", $tokens[0]{VALUE})
+      unless $tokens[0]{CLASS} eq 'ident';
+
+    my $target_token = shift @tokens;
+    $line = $target_token->{LINE};
+    my $target = $target_token->{VALUE};
+
+    #
+    # Check for statement modifiers:
+    #
+
+    SYNTAX_ERROR("Expected 'if', 'unless' or ';' after label, but got end of source.")
+      unless @tokens;
+
+    SYNTAX_ERROR("Expected 'if', 'unless' or ';' after label, but got '%s'.", $tokens[0]{VALUE})
+      unless ($tokens[0]{CLASS} eq 'sep' and $tokens[0]{VARIANT} eq 'stmt')
+      or ($tokens[0]{CLASS} eq 'control' and ($tokens[0]{VALUE} eq 'if' or $tokens[0]{VALUE} eq 'unless'));
+    
+    my $cond;
+
+    my $left;
+    my $relop;
+    my $right;
+
+    if ($tokens[0]{CLASS} ne 'sep') {
+      my $cond_token = shift @tokens;
+      $line = $cond_token->{LINE};
+      $cond = $cond_token->{VALUE};
+
+      #
+      # Open paren of condition:
+      #
+
+      SYNTAX_ERROR("Expected '(' after '$cond', but got end of source.")
+        unless @tokens;
+
+      SYNTAX_ERROR("Expected '(' after '$cond', but got '$tokens[0]{VALUE}'.")
+        unless ($tokens[0]{CLASS} eq 'group' and $tokens[0]{VALUE} eq '(');
+
+      my $open_paren = shift @tokens;
+      $line = $open_paren->{LINE};
+
+      #
+      # Left token of condition:
+      #
+
+      SYNTAX_ERROR("Expected identifier or literal after '(', but got end of source.")
+        unless @tokens;
+
+      SYNTAX_ERROR("Expected identifier or literal after '(', but got '$tokens[0]{VALUE}'.")
+        unless ($tokens[0]{CLASS} eq 'ident' or $tokens[0]{CLASS} eq 'literal');
+
+      my $left_token = shift @tokens;
+      $line = $left_token->{LINE};
+      $left = $left_token->{VALUE};
+
+      #
+      # Relational operator of condition:
+      #
+
+      SYNTAX_ERROR("Expected relational operator after '$left', but got end of source.")
+        unless @tokens;
+
+      SYNTAX_ERROR("Expected relational operator after '$left', but got '$tokens[0]{VALUE}'.")
+        unless ($tokens[0]{CLASS} eq 'op' and $tokens[0]{VARIANT} eq 'rel');
+
+      my $relop_token = shift @tokens;
+      $line = $relop_token->{LINE};
+      $relop = $relop_token->{VALUE};
+
+      #
+      # Right token of condition:
+      #
+
+      SYNTAX_ERROR("Expected identifier or literal after '$relop', but got end of source.")
+        unless @tokens;
+
+      SYNTAX_ERROR("Expected identifier or literal after '$relop', but got '$tokens[0]{VALUE}'.")
+        unless ($tokens[0]{CLASS} eq 'ident' or $tokens[0]{CLASS} eq 'literal');
+
+      my $right_token = shift @tokens;
+      $line = $right_token->{LINE};
+      $right = $right_token->{VALUE};
+
+      #
+      # Close paren of condition:
+      #
+
+      SYNTAX_ERROR("Expected ')' after condition, but got end of source.")
+        unless @tokens;
+
+      SYNTAX_ERROR("Expected ')' after condition, but got '$tokens[0]{VALUE}'.")
+        unless ($tokens[0]{CLASS} eq 'group' and $tokens[0]{VALUE} eq ')');
+
+      my $close_paren = shift @tokens;
+      $line = $close_paren->{LINE};
+    }
+ 
+    #
+    # Terminating semicolon:
+    #
+
+    SYNTAX_ERROR("Expected ';' after goto statement, but got end of source.")
+      unless @tokens;
+
+    SYNTAX_ERROR("Expected ';' after goto statement, but got '%s'.", $tokens[0]{VALUE})
+      unless ($tokens[0]{CLASS} eq 'sep' and $tokens[0]{VARIANT} eq 'stmt');
+
+    my $sep_token = shift @tokens;
+    $line = $sep_token->{LINE};
+
+    #
+    # GOOD TO GO:
+    #
+
+    if ($cond) {
+      push_source "goto $target $cond ($left $relop $right);";
+      op_comp $cond, $relop, $left, $right, $target, undef;
+    }
+    else {
+      push_source "goto $target;";
+      emit_code('branch', [ $target ]);
+    }
+    
     next;
   }
 
@@ -2658,72 +3812,190 @@ while(<>) {
   # NOTE: A LOOPNAME is just the label used when introducing a LOOP.
   #
 
-  if (m/^(next|last|redo)(\s+([A-Za-z][A-Za-z0-9_]*))?(\s+(if|unless)\s+\((\S+)\s*(==|!=|<=|<|>=|>)\s*(\S+)\s*\))?$/) {
-    do_loop_control($1, $3, $5, $6, $7, $8);
-    next;
-  }
+  if ($token->{CLASS} eq 'control' and $token->{VARIANT} eq 'other'
+    and ($token->{VALUE} eq 'next' or $token->{VALUE} eq 'last' or $token->{VALUE} eq 'redo')
+  ) {
+    my $control = $_;
 
-  #
-  # Subroutine Return Statements:
-  #
-  # return
-  # return 0
-  # return 0.0
-  # return "foo"
-  # return bar
-  #
+    #
+    # Target label:
+    #
 
-  if (m/^return\s+((-?\d+)|(0b[01]+)|(0[0-7]+)|(0x[0-9a-f]+))$/) {
-    do_return('i', $1);
-    next;
-  }
- 
-  if (m/^return\s+(-?\d+\.\d+)$/) {
-    do_return('n', $1);
-    next;
-  }
+    my $target;
 
-  if (m/^return\s+(\"[^\\\"]*(?:\\.[^\\\"]*)*\")$/) {
-    do_return('s', $1);
-    next;
-  }
-
-  if (m/^return\s+([A-Za-z][A-Za-z0-9_]*)$/) {
-    do_return('*', $1);
-    next;
-  }
-
-  if (m/^return$/) {
-    do_return();
-    next;
-  }
-
-  if (m/^(return)(\s+([A-Za-z][A-Za-z0-9_]*)(\s+(if|unless)\s+\((\S+)\s*(==|!=|<=|<|>=|>)\s*(\S+)\s*\))?)?$/) {
-    do_return('i', $3, $5, $6, $7, $8);
-    next;
-  }
-
-  #
-  # Goto Statements:
-  #
-  # goto LABEL
-  # goto LABEL if (...)
-  # goto LABEL unless (...)
-  #
-
-  if (m/^goto\s+([A-Za-z][A-Za-z0-9_]*)(\s+(if|unless)\s+\((\S+)\s*(==|!=|<=|<|>=|>)\s*(\S+)\s*\))?$/) {
-    if (defined $4) {
-      if ($3 eq 'if') {
-        push_source "goto $1 if ($4 $5 $6);";
-        op_comp 'if', $5, map_args($4, $6), $1, undef;
-      } else {
-        push_source "goto $1 unless ($4 $5 $6);";
-        op_comp 'unless', $5, map_args($4, $6), undef, $1;
-      }
-    } else {
-      push_source "goto $1;";
-      emit_code('branch', [$1]);
+    if (@tokens and $tokens[0]{CLASS} eq 'ident') {
+      my $target_token = shift @tokens;
+      $line = $target_token->{LINE};
+      $target = $target_token->{VALUE};
+      $_ = $target;
     }
+
+    #
+    # Check for statement modifiers:
+    #
+
+    SYNTAX_ERROR("Expected 'if', 'unless' or ';' after '$_', but got end of source.")
+      unless @tokens;
+
+    SYNTAX_ERROR("Expected 'if', 'unless' or ';' after '$_', but got '%s'.", $tokens[0]{VALUE})
+      unless ($tokens[0]{CLASS} eq 'sep' and $tokens[0]{VARIANT} eq 'stmt')
+      or ($tokens[0]{CLASS} eq 'control' and ($tokens[0]{VALUE} eq 'if' or $tokens[0]{VALUE} eq 'unless'));
+    
+    my $cond;
+
+    my $left;
+    my $relop;
+    my $right;
+
+    if ($tokens[0]{CLASS} ne 'sep') {
+      my $cond_token = shift @tokens;
+      $line = $cond_token->{LINE};
+      $cond = $cond_token->{VALUE};
+
+      #
+      # Open paren of condition:
+      #
+
+      SYNTAX_ERROR("Expected '(' after '$cond', but got end of source.")
+        unless @tokens;
+
+      SYNTAX_ERROR("Expected '(' after '$cond', but got '$tokens[0]{VALUE}'.")
+        unless ($tokens[0]{CLASS} eq 'group' and $tokens[0]{VALUE} eq '(');
+
+      my $open_paren = shift @tokens;
+      $line = $open_paren->{LINE};
+
+      #
+      # Left token of condition:
+      #
+
+      SYNTAX_ERROR("Expected identifier or literal after '(', but got end of source.")
+        unless @tokens;
+
+      SYNTAX_ERROR("Expected identifier or literal after '(', but got '$tokens[0]{VALUE}'.")
+        unless ($tokens[0]{CLASS} eq 'ident' or $tokens[0]{CLASS} eq 'literal');
+
+      my $left_token = shift @tokens;
+      $line = $left_token->{LINE};
+      $left = $left_token->{VALUE};
+
+      #
+      # Relational operator of condition:
+      #
+
+      SYNTAX_ERROR("Expected relational operator after '$left', but got end of source.")
+        unless @tokens;
+
+      SYNTAX_ERROR("Expected relational operator after '$left', but got '$tokens[0]{VALUE}'.")
+        unless ($tokens[0]{CLASS} eq 'op' and $tokens[0]{VARIANT} eq 'rel');
+
+      my $relop_token = shift @tokens;
+      $line = $relop_token->{LINE};
+      $relop = $relop_token->{VALUE};
+
+      #
+      # Right token of condition:
+      #
+
+      SYNTAX_ERROR("Expected identifier or literal after '$relop', but got end of source.")
+        unless @tokens;
+
+      SYNTAX_ERROR("Expected identifier or literal after '$relop', but got '$tokens[0]{VALUE}'.")
+        unless ($tokens[0]{CLASS} eq 'ident' or $tokens[0]{CLASS} eq 'literal');
+
+      my $right_token = shift @tokens;
+      $line = $right_token->{LINE};
+      $right = $right_token->{VALUE};
+
+      #
+      # Close paren of condition:
+      #
+
+      SYNTAX_ERROR("Expected ')' after condition, but got end of source.")
+        unless @tokens;
+
+      SYNTAX_ERROR("Expected ')' after condition, but got '$tokens[0]{VALUE}'.")
+        unless ($tokens[0]{CLASS} eq 'group' and $tokens[0]{VALUE} eq ')');
+
+      my $close_paren = shift @tokens;
+      $line = $close_paren->{LINE};
+    }
+ 
+    #
+    # Terminating semicolon:
+    #
+
+    SYNTAX_ERROR("Expected ';' after goto statement, but got end of source.")
+      unless @tokens;
+
+    SYNTAX_ERROR("Expected ';' after goto statement, but got '%s'.", $tokens[0]{VALUE})
+      unless ($tokens[0]{CLASS} eq 'sep' and $tokens[0]{VARIANT} eq 'stmt');
+
+    my $sep_token = shift @tokens;
+    $line = $sep_token->{LINE};
+
+    #
+    # GOOD TO GO:
+    #
+
+    do_loop_control($control, $target, $cond, $left, $relop, $right);
+    
+    next;
+  }
+
+
+
+
+  #
+  # TODO: Implement other stuff and put it before this.
+  #
+
+  SYNTAX_ERROR("Don't know what to do with token '$_'.");
+
+
+
+
+  #
+  # Arithmetic Operators:
+  #
+  # a %= b;
+  # a %= 4;
+  #
+
+  if (m/^([A-Za-z][A-Za-z0-9_]*)\s*[%]=\s*(([A-Za-z][A-Za-z0-9_]*)|(-?\d+))$/) {
+    push_source "$1 \%= $2";
+    do_mod($1, $1, $2);
+    next;
+  }
+
+  #
+  # Object Construction:
+  #
+  # a = new Foo;
+  #
+
+  if (m/^([A-Za-z][A-Za-z0-9_]*)\s*=\s*new\s+([A-Za-z][A-Za-z0-9_]*)$/) {
+    new_obj($1, $2);
+    next;
+  }
+
+  #
+  # Conditionals:
+  #
+  #   if     (...) {
+  #   unless (...) {
+  #
+  # } elsif  (...) {
+  #
+
+  if (m/^(if|unless)\s*\(\s*(.*)\s*\)\s*{$/) {
+    begin_block(undef, $1, $2);
+    next;
+  }
+
+  if (m/^}\s*(elsif)\s*\(\s*(.*)\s*\)\s*{$/) {
+    begin_block(undef, $1, $2);
+    # TODO
     next;
   }
 
@@ -2739,12 +4011,6 @@ while(<>) {
   # a = 3.14 + 0.16;  # set_n (COMPILE-TIME EVALUATION)
   # a = 5    + 0.16;  # set_n (COMPILE-TIME EVALUATION)
   # a = 3.14 + 2;     # set_n (COMPILE-TIME EVALUATION)
-  #
-  # a += b;           # add_[in]
-  # a += 5;           # add_i_ic (pseudo-op)
-  # a += 3.14;        # add_n_nc (pseudo-op)
-  #
-  # a++;              # inc_[in]
   #
 
   if (m!^([A-Za-z][A-Za-z0-9_]*)\s*=\s*(([A-Za-z][A-Za-z0-9_]*)|(-?\d+(\.\d+)?))\s*[+]\s*(([A-Za-z][A-Za-z0-9_]*)|(-?\d+(\.\d+)?))$!) {
@@ -2767,32 +4033,8 @@ while(<>) {
     } elsif (defined $4 and defined $8) {
       assign_var($1, (defined $5 or defined $9 ? 'N' : 'I'), $4 + $8);
     } else {
-      printf(STDERR "jakoc: Syntax error in addition on line %d: '%s'\n", $line, $_);
+      SYNTAX_ERROR("Bad addition '%s'.", $_);
     }
-    next;
-  }
-
-  if (m!^([A-Za-z][A-Za-z0-9_]*)\s*[+]=\s*(([A-Za-z][A-Za-z0-9_]*)|(-?\d+(\.\d+)?))$!) {
-    #
-    # Regexp Captures:
-    #
-    #  1. LHS sum (variable name)
-    #  2. RHS incremend
-    #  3. RHS incremend (variable name)
-    #  4. RHS incremend (number)
-    #  5. RHS incremend (number's decimal places) -- used for grouping, not capture
-    #
-
-    if (defined $3) {
-      do_add($1, $1, $2);
-    } else {
-      do_inc($1, $2);
-    }
-    next;
-  }
-
-  if (m/^([A-Za-z][A-Za-z0-9_]*)\s*[+][+]$/) {
-    do_inc($1);
     next;
   }
 
@@ -2836,7 +4078,7 @@ while(<>) {
     } elsif (defined $4 and defined $8) {
       assign_var($1, (defined $5 or defined $9 ? 'N' : 'I'), $4 - $8);
     } else {
-      printf(STDERR "jakoc: Syntax error in subtraction on line %d: '%s'\n", $line, $_);
+      SYNTAX_ERROR("... in subtraction");
     }
     next;
   }
@@ -2893,7 +4135,7 @@ while(<>) {
     } elsif (defined $4 and defined $8) {
       assign_var($1, (defined $5 or defined $9 ? 'N' : 'I'), $4 * $8);
     } else {
-      printf(STDERR "jakoc: Syntax error in multiplication on line %d: '%s'\n", $line, $_);
+      SYNTAX_ERROR("... in multiplication.");
     }
     next;
   }
@@ -2943,7 +4185,7 @@ while(<>) {
     } elsif (defined $4 and defined $8) {
       assign_var($1, (defined $5 or defined $9 ? 'N' : 'I'), $4 / $8);
     } else {
-      printf(STDERR "jakoc: Syntax error in division on line %d: '%s'\n", $line, $_);
+      SYNTAX_ERROR("... in division.");
     }
 
     next;
@@ -2951,35 +4193,6 @@ while(<>) {
 
   if (m!^([A-Za-z][A-Za-z0-9_]*)\s*[\/]=\s*(([A-Za-z][A-Za-z0-9_]*)|(-?\d+(\.\d+)?))$!) {
     do_div($1, $1, $2);
-    next;
-  }
-
-  #
-  # Modular Arithmetic Operators:
-  #
-  # NOTE: No decimal numbers.
-  #
-  # a = b % c;
-  # a = b % 4;
-  # a = 9 % b;
-  # a = 9 % 4;
-  #
-  # a %= b;
-  # a %= 4;
-  #
-  # TODO: Numbers in mod (follow Calendrical calculations definition? Knuth definition?)
-  # TODO: Does Parrot follow C or mathematical definition?
-  #
-
-  if (m/^([A-Za-z][A-Za-z0-9_]*)\s*=\s*(([A-Za-z][A-Za-z0-9_]*)|(-?\d+))\s*[%]\s*(([A-Za-z][A-Za-z0-9_]*)|(-?\d+))$/) {
-    push_source "$1 = $2 \% $5";
-    do_mod($1, $2, $5);
-    next;
-  }
-
-  if (m/^([A-Za-z][A-Za-z0-9_]*)\s*[%]=\s*(([A-Za-z][A-Za-z0-9_]*)|(-?\d+))$/) {
-    push_source "$1 \%= $2";
-    do_mod($1, $1, $2);
     next;
   }
 
@@ -3039,7 +4252,7 @@ while(<>) {
     next;
   }
 
-  print STDERR "jakoc: Syntax error (unparsable line) on line $line: '$_'.\n";
+  PARSE_ERROR("Unparsable line.");
 }
 
 emit_code('end') unless $last_op eq 'end';
