@@ -130,7 +130,7 @@ sub Parse::RecDescent::set_error_handler {
 # Functions (list operators):
 
 INIT {
-$FUNCTION_ARGS = 'maybe_comma';
+$FUNCTION_ARGS = 'bare_arglist';
 
 # XXX: many of these need their own special want_* rules.  This is
 # just a hack to make the parser swallow the examples from the
@@ -511,8 +511,9 @@ but:		  'but' assign
 comma:		  <leftop: <matchrule:@{[@arg ? $arg[0] : 'scalar_expr']}>
 			comma_op <matchrule:@{[@arg?$arg[0]:'scalar_expr']}> >
 comma_op:	  ','
-maybe_comma:	  ...!'(' comma[@{[@arg ? $arg[0] : ()]}]
-		| ...!'('
+maybe_comma:	  comma[@{[@arg ? $arg[0] : ()]}]
+		|
+bare_arglist:	  ...!'(' maybe_comma
 
 semi:		  <leftop: expr semi_op expr>
 semi_op:	  ';'
@@ -673,6 +674,7 @@ maybe_decl:	  scope_class <commit> variable props['is']
 		| variable <commit> props['is']
 		| # nada
 nothing:	  ''
+no_args:	  ...!'('
 
 ENDGRAMMAR
 
@@ -734,13 +736,13 @@ sub argument_context {
 	    return 1;
 	} elsif ($params->max == 0) {
 	    # no-arg sub
-	    $WANT{$name} = 'nothing';
+	    $WANT{$name} = 'no_args';
 	    return 1;
 	}
     }
-    my $rule;
+    my $rule = "...!'(' ";
     my $rulename = "want_for_$name";
-    my $lastparam = 1;
+    my $lastparam = 2;		# to skip ...!'('
     my $code = '
 sub P6C::'.$rulename.'::tree {
     my $x = shift;
@@ -785,8 +787,8 @@ sub P6C::'.$rulename.'::tree {
 	    # No required, multiple optional.
 	    $rule .= argtype($params->opt(0)->var->type);
 	    $rule .= " (',' scalar_expr)(0..".(@{$params->opt} - 1).')';
-	    $rule .= '
-		| # nothing';
+	    $rule .= "
+		| ...!'(' # nothing";
 	    $code .= '
     die "Internal error" unless @$x == 1 || @$x == 3;
     if (@$x == 3) {

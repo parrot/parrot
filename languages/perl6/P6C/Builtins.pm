@@ -35,14 +35,14 @@ sub declare {
 	$hash->{$_} = new P6C::IMCC::Sub args => [],
 	    rettype => 'PerlInt';
 	$P6C::Context::CONTEXT{$_} = new P6C::Context type => [];
-	$P6C::Parser::WANT{$_} = 'nothing';
+	$P6C::Parser::WANT{$_} = 'no_args';
     }
 
     for (qw(print warn die)) {
 	$P6C::Context::CONTEXT{$_} = $P6C::Context::DEFAULT_ARGUMENT_CONTEXT;
 	$hash->{$_} = new P6C::IMCC::Sub args => [['PerlArray', '_']],
 	    rettype => [];
-	$P6C::Parser::WANT{$_} = 'maybe_comma';
+	$P6C::Parser::WANT{$_} = 'bare_arglist';
     }
 }
 

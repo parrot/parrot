@@ -2,6 +2,7 @@ use Getopt::Long;
 use strict;
 use P6C::Tree;
 use P6C::Parser;
+use P6C::IMCC ':external';
 
 ######################################################################
 # Interaction
@@ -67,8 +68,6 @@ if (!$o{force} && eval("require $o{grammar}")) {
 sub output_tree {
     my $x = shift->tree;
     if ($o{imc}) {
-	use P6C::IMCC ':external';
-	init();
 	if (!defined $o{batch}) {
 	    P6C::IMCC::add_function('main');
 	    P6C::IMCC::set_function('main');
@@ -79,6 +78,8 @@ sub output_tree {
 	print Dumper($x);
     }
 }
+
+P6C::IMCC::init();
 
 my $in = '';
 if (defined $o{batch}) {

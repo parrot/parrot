@@ -777,10 +777,15 @@ sub P6C::maybe_decl::tree {
 ##############################
 sub P6C::maybe_comma::tree {
     my $x = shift;
-    if (@$x == 3) {
-	return $x->[2]->tree;
+    if (@$x == 2) {
+	return $x->[1]->tree;
     }
     return new P6C::ValueList vals => [];
+}
+
+sub P6C::bare_arglist::tree {
+    my $x = shift;
+    return $x->[2]->tree;
 }
 
 ##############################
@@ -796,5 +801,7 @@ sub P6C::maybe_namepart::tree {
 sub P6C::nothing::tree {
     return new P6C::ValueList vals => [];
 }
+
+*P6C::no_args::tree = *P6C::nothing::tree;
 
 1;
