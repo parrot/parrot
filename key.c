@@ -14,6 +14,76 @@
 
 #include "parrot/parrot.h"
 
+struct _bucket {
+  KEY_PAIR pair;
+  STRING*  key;
+  struct _bucket* next;
+};
+
+typedef struct _bucket BUCKET;
+
+static void
+debug_key (struct Parrot_Interp* interpreter, KEY* key) {
+  INTVAL i;
+  fprintf(stderr," *** key %p\n",key);
+  fprintf(stderr," *** size %d\n",key->size);
+  for(i=0;i<key->size;i++) {
+    INTVAL type = key->keys[i].type;
+    if(type == enum_key_bucket) {
+      fprintf(stderr," *** Bucket %d type %d\n",i,type);
+    }
+    else if(type != enum_key_undef) {
+      fprintf(stderr," *** Other %d type %d\n",i,type);
+    }
+  }
+}
+
+static BUCKET*
+new_bucket (struct Parrot_Interp* interpreter, STRING* key, KEY_PAIR* pair) {
+  BUCKET* bucket = mem_sys_allocate(sizeof(BUCKET));
+  if(bucket != NULL) {
+    if(key != NULL) {
+      if(pair != NULL) {
+        bucket->key = string_copy(interpreter,key);
+        memcpy(&bucket->pair,pair,sizeof(KEY_PAIR));
+      }
+      else {
+        fprintf(stderr,"*** new_bucket was given a null pair\n");
+      }
+    }
+    else {
+      fprintf(stderr,"*** new_bucket was given a null key\n");
+    }
+  }
+  else {
+    fprintf(stderr,"*** new_bucket attempted to return a null bucket\n");
+  }
+  return bucket;
+}
+
+static KEY_PAIR*
+find_bucket (struct Parrot_Interp *interpreter, BUCKET* head, STRING* key) {
+  KEY_PAIR* pair = NULL;
+  if(head != NULL) {
+    if(key != NULL) {
+      while(head != NULL) {
+        if(string_compare(interpreter,key,head->key) == 0) {
+          pair = &head->pair;
+          break;
+        }
+        head = head->next;
+      }
+    }
+    else {
+      fprintf(stderr,"*** find_bucket given a null key\n");
+    }
+  }
+  else {
+    fprintf(stderr,"*** find_bucket given a null bucket\n");
+  }
+  return pair;
+}
+
 /*=for api key key_hash
 
 Return the hashed value of the string
@@ -28,6 +98,9 @@ static INTVAL key_hash(struct Parrot_Interp *interpreter, STRING* value) {
 
   while(len--) {
     hash = hash * 33 + *buffptr++;
+  }
+  if(hash < 0) {
+    hash = -hash;
   }
   return hash;
 }
@@ -98,7 +171,11 @@ void key_set_size(struct Parrot_Interp *interpreter, KEY* key, INTVAL size) {
     if(size > key->size) {
       KEY_PAIR* pair = (KEY_PAIR*)realloc(key->keys,sizeof(KEY_PAIR)*size);
       if(pair != NULL) {
+	INTVAL i;
         key->keys = pair;
+	for(i=key->size;i<size;i++) {
+	  key->keys[i].type = enum_key_undef;
+	}
       }
       else {
         fprintf(stderr,"*** key_set_size tried to allocate a NULL pair\n");
@@ -184,25 +261,30 @@ KEY_PAIR* key_element_value_i(struct Parrot_Interp *interpreter, KEY* key,
       fprintf(stderr,"*** key_element_value_i checking out of bounds\n");
     }
   }
-  fprintf(stderr,"*** key_element_value_ checking a NULL key\n");
+  fprintf(stderr,"*** key_element_value_i checking a NULL key\n");
   return NULL;
 }
 
-KEY_PAIR* key_element_value_s(struct Parrot_Interp *interpreter, KEY* key, 
-                              STRING* idx) {
+KEY_PAIR*
+key_element_value_s(struct Parrot_Interp *interpreter, KEY* key, STRING* idx) {
+  KEY_PAIR* pair;
   if(key != NULL) {
-    INTVAL hash = key_hash(interpreter,idx);
-    KEY_PAIR* pair;
-    hash = hash % NUM_BUCKETS;
-    pair = &key->keys[hash];
-    if(pair != NULL) {
-      return pair;
+    if(idx != NULL) {
+      INTVAL hash = key_hash(interpreter,idx);
+      hash = hash % NUM_BUCKETS;
+      pair = find_bucket(interpreter,key->keys[hash].cache.struct_val,idx);
+      if(pair == NULL) {
+        fprintf(stderr,"*** key_element_value_s pair returning a null key\n");
+      }
     }
     else {
-      fprintf(stderr,"*** key_element_value_s pair returning a null key\n");
+      fprintf(stderr,"*** key_element_value_s given a NULL index\n");
     }
   }
-  return NULL;
+  else {
+    fprintf(stderr,"*** key_element_value_s given a NULL key\n");
+  }
+  return pair;
 }
 
 /*=for api key key_set_element_value_i
@@ -238,9 +320,36 @@ Set the value of index <index> of key <key> to string <value>
 void key_set_element_value_s(struct Parrot_Interp *interpreter, KEY* key, 
                              STRING* idx, KEY_PAIR* value) {
   if(key != NULL) {
-    INTVAL hash = key_hash(interpreter,idx);
-    hash = hash % NUM_BUCKETS;
-    memcpy(&key->keys[hash],value,sizeof(KEY_PAIR));
+    if(idx != NULL) {
+      if(value != NULL) {
+        INTVAL  hash   = key_hash(interpreter,idx);
+        BUCKET* bucket = new_bucket(interpreter,idx,value);
+        if(bucket != NULL) {
+          hash = hash % NUM_BUCKETS;
+          /* Resize the hash here rather than set an initial size. */
+          if(hash > key->size) {
+            key_set_size(interpreter,key,hash+1);
+          }
+          if(key->keys[hash].type != enum_key_undef) {
+            STRING* tmp = key->keys[hash].cache.struct_val;
+            bucket->next = (BUCKET*)tmp;
+          }
+          else {
+          }
+          key->keys[hash].cache.struct_val = bucket;
+          key->keys[hash].type = enum_key_bucket;
+        }
+        else {
+          fprintf(stderr,"*** key_set_element_value_s given a NULL bucket\n");
+        }
+      }
+      else {
+        fprintf(stderr,"*** key_set_element_value_s given a NULL value\n");
+      }
+    }
+    else {
+      fprintf(stderr,"*** key_set_element_value_s given a NULL index\n");
+    }
   }
   else {
     fprintf(stderr,"*** key_set_element_value_s given a NULL key\n");

@@ -21,6 +21,7 @@ typedef enum {
   enum_key_num,
   enum_key_string,
   enum_key_pmc,
+  enum_key_bucket,
   enum_key_max
 } KEY_TYPE;
 
