@@ -10,6 +10,11 @@
  *  References:
  */
 
+/* Only parrot core files should include this file.  
+   Extensions should include <parrot/extend.h>.
+   Programs embedding parrot should include <parrot/embed.h>.
+*/
+
 #if !defined(PARROT_PARROT_H_GUARD)
 #define PARROT_PARROT_H_GUARD
 
