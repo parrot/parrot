@@ -3,14 +3,17 @@ PERL = ${perl}
 
 ASSEMBLE=$(PERL) ../../assemble.pl
 PARROT=../../parrot
+IMCC=../imcc/imcc
 
 all: build
 
 test: build
 	$(PARROT) bf.pbc test.bf
+	$(IMCC) -r bfc.pbc test.bf
 
 build: bf.pasm
 	$(ASSEMBLE) bf.pasm > bf.pbc
+	$(IMCC) -o bfc.pbc bfc.pasm
 
 clean:
 	$(RM_F) core *.pbc *~

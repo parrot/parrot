@@ -1318,6 +1318,7 @@ languages/befunge/stack.pasm
 languages/befunge/test.bef
 languages/bf/README
 languages/bf/bf.pasm
+languages/bf/bfc.pasm
 languages/bf/countdown.bf
 languages/bf/helloworld.bf
 languages/bf/test.bf
