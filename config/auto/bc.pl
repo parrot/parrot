@@ -22,7 +22,7 @@ $description = "Determining whether bc is installed...";
 @args = qw(verbose);
 
 sub runstep {
-    my $a = `bc -v`;
+    my $a = `bc -v` || '';
     # This seems to work for GNU bc 1.06
     my $has_bc = ($a =~ m/^bc /) ? 1 : 0;
 
