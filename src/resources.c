@@ -35,6 +35,9 @@ static void add_pmc_to_free(struct Parrot_Interp *interpreter,
     pool->pool_buffer.buflen = (UINTVAL)(pool->pool_buffer.buflen * 1.2);
 
   }
+#ifdef GC_DEBUG
+    Parrot_go_collect(interpreter);
+#endif
 
   /* Okay, so there's space. Add the header on */
   ((PMC *)to_add)->flags = PMC_on_free_list_FLAG;
@@ -119,6 +122,11 @@ PMC *new_pmc_header(struct Parrot_Interp *interpreter) {
   if (!interpreter->arena_base->pmc_pool->entries_in_pool) {
     alloc_more_pmc_headers(interpreter);
   }
+#ifdef GC_DEBUG
+  else {
+    Parrot_do_dod_run(interpreter);
+  }
+#endif
 
     {
     /* A stupid temp variable. Our pointer into the pool */
@@ -221,6 +229,11 @@ new_buffer_header(struct Parrot_Interp *interpreter) {
   if (!interpreter->arena_base->buffer_header_pool->entries_in_pool) {
     alloc_more_buffer_headers(interpreter);
   }
+#ifdef GC_DEBUG
+  else {
+    Parrot_do_dod_run(interpreter);
+  }
+#endif
 
   /* Okay, we do this the long, drawn-out, hard way. Otherwise I get
      really confused and things crash. This, generally, is a Bad
@@ -280,6 +293,9 @@ static void add_header_to_free(struct Parrot_Interp *interpreter,
     pool->pool_buffer.buflen = (UINTVAL)(pool->pool_buffer.buflen * 1.2);
 
   }
+#ifdef GC_DEBUG
+  Parrot_go_collect(interpreter);
+#endif
 
   /* Okay, so there's space. Add the header on */
   ((Buffer *)to_add)->flags = BUFFER_on_free_list_FLAG;
@@ -635,6 +651,11 @@ STRING *new_string_header(struct Parrot_Interp *interpreter) {
   if (!interpreter->arena_base->string_header_pool->entries_in_pool) {
     alloc_more_string_headers(interpreter);
   }
+#ifdef GC_DEBUG
+  else {
+    Parrot_do_dod_run(interpreter);
+  }
+#endif
 
   /* Okay, we do this the long, drawn-out, hard way. Otherwise I get
      really confused and things crash. This, generally, is a Bad
@@ -841,6 +862,9 @@ Parrot_allocate(struct Parrot_Interp *interpreter, size_t size) {
   if (NULL == interpreter) {
     return mem_sys_allocate(size);
   }
+#ifdef GC_DEBUG
+  Parrot_go_collect(interpreter);
+#endif
 
   /* Make sure we round up to a multiple of 16 */
   size += 16;
