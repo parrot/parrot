@@ -51,7 +51,7 @@ Perl6 programs. The Perl6 language definition is currently (December 2001) being
 crafted by Larry Wall. While the true nature of Perl6 is still unknown, it will 
 be substantially similar to Perl as we know it today, and will need a runtime 
 system. For more information on the nascent Perl6 language definition, check out 
-Larry's L<apocolypses|"LINKS">.
+Larry's L<apocalypses|"LINKS">.
 
 =head2 Can I use Parrot today?
 
@@ -123,8 +123,8 @@ that BF is not, strictly speaking, the language's name, merely its initials.
 
 =item *
 
-There is a prototype perl 6 implementation in the langauges directory
-as well, though it's only as complete as the perl 6 spec. (Which, at
+There is a prototype Perl 6 implementation in the languages directory
+as well, though it's only as complete as the Perl 6 spec. (Which, at
 this writing, isn't sufficiently complete)
 
 =back
@@ -368,7 +368,7 @@ with the garbage collector any more.
 =item Cost
 
 For reference counting to work right, you need to twiddle reference
-counts every time an object is references, or unreferenced. This
+counts every time an object is referenced, or unreferenced. This
 generally includes even short-lived objects that will exist only
 briefly before dying. The cost of a reference counting scheme is
 directly linked to the number of times code references, or
@@ -377,11 +377,11 @@ there are many) has an average-case cost that's based on the number
 of live objects. 
 
 There are a number of hidden costs in a reference-counting
-scheme. Since the code to manipiulate the reference counts I<must> be
+scheme. Since the code to manipulate the reference counts I<must> be
 scattered throughout the interpreter, the interpreter code is less
 dense than it would be without reference counts. That means that more
 of the processor's cache is dedicated to reference count code, code
-that is ultimately just interrpeter bookkeeping, and not dedicated to
+that is ultimately just interpreter bookkeeping, and not dedicated to
 running your program. The data is also less dense, as there has to be
 a reference count embedded in it. Once again, that means more cache
 used for each object during normal running, and lower cache density.
@@ -391,7 +391,7 @@ all it's doing is running through active objects in a tight loop. If
 done right, the entire tracing system will fit nicely in a
 processor's L1 cache, which is about as tight as you can get. The
 data being accessed is also done in a linear fashion, at least in
-part, which lends itself well to processor's prefech mechanisms where
+part, which lends itself well to processor's prefetch mechanisms where
 they exist. The garbage collection data can also be put in a separate
 area and designed in a way that's much tighter and more cache-dense.
 
@@ -426,7 +426,7 @@ you might think)
 
 April Fool's Joke: http://www.perl.com/pub/a/2001/04/01/parrot.htm
 
-apocolypses: http://www.panix.com/~ziggy/
+apocalypses: http://www.panix.com/~ziggy/
 
 cool kids: http://use.perl.org/~acme/journal
 
