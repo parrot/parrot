@@ -382,7 +382,6 @@ END
 	push(@streamoff, gentmp 'int') for @streamvals;
 	my $itmp = gentmp 'int';
 	my $loopstart = genlabel 'start_for';
-	my $notless = genlabel;
 	
 	code(<<END);
 	$niters = 2000000000
@@ -390,6 +389,7 @@ END
 	# Figure out how many iterations:
 	for my $i (0 .. $#streamvals) {
 	    my $nvars = @{$vars[$i]};
+	    my $notless = genlabel;
 	    code(<<END);
 	$streamoff[$i] = 0
 	$itmp = $streamvals[$i]
