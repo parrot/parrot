@@ -1,6 +1,6 @@
 #! perl -w
 
-use Parrot::Test tests => 24;
+use Parrot::Test tests => 25;
 
 output_is(<<CODE, <<OUTPUT, "set_n_nc");
 	set	N0, 1.0
@@ -703,10 +703,7 @@ CODE
 -2147483648
 OUTPUT
 
-__END__
-
-
-output_is(<<CODE, <<OUTPUT, "clear_i");
+output_is(<<CODE, <<OUTPUT, "clear_n");
 	set	N0, 547972.0
 	set	N1, 547972.0
 	set	N2, 547972.0
