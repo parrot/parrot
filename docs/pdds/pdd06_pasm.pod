@@ -1105,6 +1105,8 @@ registers that are not explicitly return parameters or calling
 convention metadata parameters. (Such as the number of I reg
 parameters, for example)
 
+=back
+
 =head1 ATTACHMENTS
 
 =head1 REFERENCES
