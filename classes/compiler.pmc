@@ -1,0 +1,56 @@
+/* Compiler.pmc
+ *  Copyright: 2002 Yet Another Society
+ *  CVS Info
+ *     $$
+ *  Overview:
+ *     The vtable functions for implementing assembler/compilers
+ *  Data Structure and Algorithms:
+ *  History:
+ *     Initial revision by leo 2003/01/16
+ *  Notes:
+ *  References:
+ *     pdd06_pasm.pod
+ */
+
+#include "parrot/parrot.h"
+#include "parrot/method_util.h"
+#include "parrot/interp_guts.h"
+
+pmclass Compiler extends NCI {
+
+    STRING* name () {
+        return whoami;
+    }
+
+    void* invoke (void * code_ptr) {
+        Parrot_csub_t func = (Parrot_csub_t)D2FPTR(SELF->data);
+	PMC *code_seg;
+	opcode_t *pc;
+        Parrot_push_i(interpreter);
+        Parrot_push_s(interpreter);
+        Parrot_push_p(interpreter);
+        interpreter->ctx.string_reg.registers[5] = (String*) code_ptr;
+        func(INTERP, SELF);
+	/* return value PMC is in P5 */
+        stack_push(interpreter, &interpreter->ctx.user_stack,
+        interpreter->ctx.pmc_reg.registers[5],
+		STACK_ENTRY_PMC, STACK_CLEANUP_NULL);
+        Parrot_pop_p(interpreter);
+        Parrot_pop_s(interpreter);
+        Parrot_pop_i(interpreter);
+	(void)stack_pop(interpreter, &interpreter->ctx.user_stack, &code_seg,
+                  STACK_ENTRY_PMC);
+	pc = (opcode_t*) code_seg->data;
+	/* test
+	while (pc)
+	    DO_OP(pc, interpreter);
+	*/
+	/* morph the opcode_t *pointer in code_seg to an invokable sub */
+	code_seg->vtable = &Parrot_base_vtables[enum_class_Eval];
+	code_seg->vtable->init(interpreter, code_seg);
+	code_seg->vtable->set_integer_native(interpreter, code_seg,
+		(INTVAL) pc);
+        return code_seg;
+    }
+}
+

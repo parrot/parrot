@@ -1,0 +1,52 @@
+/* Eval.pmc
+ *  Copyright: (When this is determined...it will go here)
+ *  CVS Info
+ *     $$
+ *  Overview:
+ *     These are the vtable functions for evaluating a code segment
+ *  Data Structure and Algorithms:
+ *  History:
+ *     Initial version by leo 2003/01/16
+ *  Notes:
+ *  References:
+ */
+
+#include "parrot/parrot.h"
+#include "parrot/runops_cores.h"
+#include "parrot/interp_guts.h"
+
+pmclass Eval extends Sub {
+
+   STRING* name () {
+	return whoami;
+   }
+
+   void* invoke (void* next) {
+       PMC * pad = ((struct Parrot_Sub *)SELF->data)->lex_pad;
+       opcode_t * pc = ((struct Parrot_Sub *)SELF->data)->init;
+
+       if (pad) {
+	   /* put the correct pad in place */
+	   stack_push(INTERP, &INTERP->ctx.pad_stack, pad,
+		   STACK_ENTRY_PMC, STACK_CLEANUP_NULL);
+       }
+
+       /* return address that the interpreter should jump to */
+       stack_push(INTERP, &(INTERP->ctx.control_stack), next,
+	       STACK_ENTRY_DESTINATION, STACK_CLEANUP_NULL);
+       /* run evaled code with the normal cores */
+#if 0
+       while (pc)
+	   DO_OP(pc, interpreter);
+#else
+       if (Interp_flags_TEST(interpreter, (PARROT_BOUNDS_FLAG |
+		       PARROT_PROFILE_FLAG |
+		       PARROT_TRACE_FLAG)))
+	   runops_slow_core(interpreter, pc);
+       else
+	   runops_fast_core(interpreter, pc);
+#endif
+
+       return next;
+   }
+}

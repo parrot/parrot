@@ -21,10 +21,12 @@ chartypes/unicode.c
 chartypes/usascii.c
 classes/array.pmc
 classes/boolean.pmc
+classes/compiler.pmc
 classes/continuation.pmc
 classes/coroutine.pmc
 classes/csub.pmc
 classes/default.pmc
+classes/eval.pmc
 classes/genclass.pl
 classes/intlist.pmc
 classes/key.pmc
