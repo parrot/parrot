@@ -100,6 +100,8 @@ mem_setup_allocator(struct Parrot_Interp *interpreter)
 {
     size_t temp_len;
     interpreter->arena_base = mem_sys_allocate(sizeof(struct Arenas));
+    interpreter->arena_base->sized_header_pools = NULL;
+    interpreter->arena_base->num_sized = 0;
 
     Parrot_initialize_memory_pools(interpreter);
     Parrot_initialize_resource_pools(interpreter);
