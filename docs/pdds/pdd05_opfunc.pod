@@ -65,7 +65,7 @@ The I<wrapping function> is required, as this is the code that the
 interpreter will call. Normally this is automatically generated.
 
 The I<inner function> is the code that gets directly executed when
-perl gets TIL-ified. If there is no I<inner function> for some reason,
+parrot gets TIL-ified. If there is no I<inner function> for some reason,
 then your opcode will likely run slower (as the interpreter would need
 to set up the registers and other stuff that would normally get
 stripped away for speed)
@@ -137,7 +137,7 @@ Indicates the item is a pointer to a float
 
 =item STRING
 
-Indicates the item is a perl string pointer
+Indicates the item is a parrot string pointer
 
 =item PMC
 

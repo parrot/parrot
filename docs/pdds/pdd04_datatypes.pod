@@ -59,11 +59,11 @@ None. First version
 
 =head1 ABSTRACT
 
-This PDD describes perl's known internal data types.
+This PDD describes parrot's known internal data types.
 
 =head1 DESCRIPTION
 
-This PDD details the primitive datatypes that the perl core knows how
+This PDD details the primitive datatypes that the parrot core knows how
 to deal with. These types are lower-level than what's presented to the
 perl programmer.
 
@@ -78,7 +78,7 @@ conceptual things, and there is no data structure that corresponds to them.
 
 =item Platform-native integer
 
-These are whatever size native integer was chosen at perl
+These are whatever size native integer was chosen at parrot
 configuration time. The C-level typedef C<IV> and C<UV> get you a
 platform-native signed and unsigned integer respectively.
 
@@ -128,7 +128,7 @@ C<INT>s, C<NUM>s are a conceptual things, not a real data structure.
 
 =item Platform native float
 
-These are whatever size float was chosen when perl was configured. The
+These are whatever size float was chosen when parrot was configured. The
 C level typedef C<NV> will get you one of these.
 
 =item Arbitrary precision decimal numbers
@@ -158,7 +158,7 @@ tack the data on the end?
 
 =head2 String data types
 
-Perl has a single internal string form:
+Parrot has a single internal string form:
 
    struct perl_string {
      void *buffer;
@@ -189,7 +189,7 @@ How many bytes are used in the buffer.
 
 =item flags
 
-Flags indicating whatever. Bits 0-15 are reserved for perl, bits 16-23
+Flags indicating whatever. Bits 0-15 are reserved for parrot, bits 16-23
 for the encoding/decoding code, and the rest for the type code.
 
 =item characters

@@ -59,9 +59,9 @@ variables MUST provide.
 
 =head1 DESCRIPTION
 
-All perl variables hide their guts behind a magic perl structure
-generally referred to as a PMC, or Perl Magic Cookie. Nothing outside
-the core of perl (in fact, nothing outside the data type's vtable
+All parrot variables hide their guts behind a magic parrot structure
+generally referred to as a PMC, or Parrot Magic Cookie. Nothing outside
+the core of parrot (in fact, nothing outside the data type's vtable
 routines) should infer anything about a PMC. (hence the Magic part)
 
 The first parameter to all of these should be the current interpreter.
@@ -71,7 +71,7 @@ vtables are neat because they decouple the interface and
 implementation of various object functions. This does mean, though,
 that you need to either know what functions are available and what
 they do, or have some method of finding out. It's faster if you know
-which vtable entry does what, so that's the method perl's using.
+which vtable entry does what, so that's the method parrot's using.
 
 The actual vtable structure contains pointers to functions that
 implement the methods for that particular vtable.  All pointers
