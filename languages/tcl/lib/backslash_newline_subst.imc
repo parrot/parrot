@@ -9,12 +9,6 @@
   .param string buffer
 
   .include "languages/tcl/lib/macros/is_space.imc"
-  .include "languages/tcl/lib/macros/debug.imc"
- 
-  .const int debug = 0
-
-  .debug("PREBUFFER:\n")
-  .debug(buffer)
  
   .local string bs_nl
   .local int marker
@@ -63,12 +57,7 @@ loop_inner:
   goto loop_outer
 
 my_end:
-
-  .debug("POSTBUFFER:\n")
-  .debug(buffer)
-
   .pcc_begin_return
-  .return buffer
+    .return buffer
   .pcc_end_return
-
 .end
