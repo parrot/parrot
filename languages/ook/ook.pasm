@@ -1,128 +1,127 @@
 # First, read the file.
-        set S0, P5[1]      # Name of the Ook source.
-	open P0, S0, "<"   # P0 = file descriptor
-	set S1, ""         # S1 = accumulator
+        set S20, P5[1]      # Name of the Ook source.
+	open P20, S20, "<"  # P20 = file descriptor
+	set S21, ""         # S21 = accumulator
 READ:
-	read S2, P0, 256
-	length I0, S2
-	le I0, 0, EOF
-	concat S1, S2
+	read S22, P20, 256
+	length I20, S22
+	le I20, 0, EOF
+	concat S21, S22
 	branch READ
 EOF:
-        close P0
+        close P20
 
 # Then, parse it to translate it.
-        length I0, S1       # Total length of file.
-        set I1, 0           # Char number in the file.
-        set I2, 1           # Line number (for error reporting).
-        new P1, .PerlArray  # While-level.
-        push P1, 0
-        set S2, ""          # Current char.
-        set S3, ""          # Current instruction.
-        set S4, "\tnew P0,.PerlArray\n\tset I0,0\n"       # Code generated.
+        length I20, S21      # Total length of file.
+        set I21, 0           # Char number in the file.
+        set I22, 1           # Line number (for error reporting).
+        new P21, .PerlArray  # While-level.
+        push P21, 0
+        set S22, ""          # Current char.
+        set S23, ""          # Current instruction.
+        set S24, "\tnew P20,.PerlArray\n\tset I20,0\n"       # Code generated.
         branch LOOP_END
 LOOP:
-        length I4, S3
-        eq I4, 8, LOOP_CHECK_INSTRUCTION
-        substr S2, S1, I1, 1
-        inc I1
-        eq S2, "\n", LOOP_LINEFEED
-        eq S2, "\t", LOOP_END
-        eq S2, " ",  LOOP_END
-        concat S3, S2
+        length I24, S23
+        eq I24, 8, LOOP_CHECK_INSTRUCTION
+        substr S22, S21, I21, 1
+        inc I21
+        eq S22, "\n", LOOP_LINEFEED
+        eq S22, "\t", LOOP_END
+        eq S22, " ",  LOOP_END
+        concat S23, S22
         branch LOOP_END
 
 LOOP_CHECK_INSTRUCTION:
-        ne S3, "Ook.Ook?", LOOP_NOT_MOVER
-        concat S4, "\tinc I0\n"
-        set S3, ""
+        ne S23, "Ook.Ook?", LOOP_NOT_MOVER
+        concat S24, "\tinc I20\n"
+        set S23, ""
         branch LOOP_END
 LOOP_NOT_MOVER:
-        ne S3, "Ook?Ook.", LOOP_NOT_MOVEL
-        concat S4, "\tdec I0\n"
-        set S3, ""
+        ne S23, "Ook?Ook.", LOOP_NOT_MOVEL
+        concat S24, "\tdec I20\n"
+        set S23, ""
         branch LOOP_END
 LOOP_NOT_MOVEL:
-        ne S3, "Ook.Ook.", LOOP_NOT_INC
-        concat S4, "\tset I1,P0[I0]\n\tinc I1\n\tset P0[I0],I1\n"
-        set S3, ""
+        ne S23, "Ook.Ook.", LOOP_NOT_INC
+        concat S24, "\tset I21,P20[I20]\n\tinc I21\n\tset P20[I20],I21\n"
+        set S23, ""
         branch LOOP_END
 LOOP_NOT_INC:
-        ne S3, "Ook!Ook!", LOOP_NOT_DEC
-        concat S4, "\tset I1,P0[I0]\n\tdec I1\n\tset P0[I0],I1\n"
-        set S3, ""
+        ne S23, "Ook!Ook!", LOOP_NOT_DEC
+        concat S24, "\tset I21,P20[I20]\n\tdec I21\n\tset P20[I20],I21\n"
+        set S23, ""
         branch LOOP_END
 LOOP_NOT_DEC:
-        ne S3, "Ook!Ook?", LOOP_NOT_WHILE
+        ne S23, "Ook!Ook?", LOOP_NOT_WHILE
         bsr MAKE_LABEL
-        concat S4, "\tbranch OOK"
-        concat S4, S6
-        concat S4, "\nKOO"
-        concat S4, S6
-        concat S4, ":\n"
-        push P1, 0
-        set S3, ""
+        concat S24, "\tbranch OOK"
+        concat S24, S26
+        concat S24, "\nKOO"
+        concat S24, S26
+        concat S24, ":\n"
+        push P21, 0
+        set S23, ""
         branch LOOP_END
 LOOP_NOT_WHILE:
-        ne S3, "Ook?Ook!", LOOP_NOT_ELIHW
-        pop I10, P1
+        ne S23, "Ook?Ook!", LOOP_NOT_ELIHW
+        pop I25, P21
         bsr MAKE_LABEL
-        concat S4, "OOK"
-        concat S4, S6
-        concat S4, ":\n\tset I1,P0[I0]\n\tne I1,0,KOO"
-        concat S4, S6
-        concat S4, "\n"
-        pop I7, P1
-        inc I7
-        push P1, I7
-        set S3, ""
+        concat S24, "OOK"
+        concat S24, S26
+        concat S24, ":\n\tset I21,P20[I20]\n\tne I21,0,KOO"
+        concat S24, S26
+        concat S24, "\n"
+        pop I27, P21
+        inc I27
+        push P21, I27
+        set S23, ""
         branch LOOP_END
 LOOP_NOT_ELIHW:
-        ne S3, "Ook!Ook.", LOOP_NOT_PRINT
-        concat S4, "\tset I1,P0[I0]\n\tchr S1,I1\n\tprint S1\n"
-        set S3, ""
+        ne S23, "Ook!Ook.", LOOP_NOT_PRINT
+        concat S24, "\tset I21,P20[I20]\n\tchr S21,I21\n\tprint S21\n"
+        set S23, ""
         branch LOOP_END
 LOOP_NOT_PRINT:
-        ne S3, "Ook.Ook!", LOOP_NOT_READ
-        set S3, ""
+        ne S23, "Ook.Ook!", LOOP_NOT_READ
+        set S23, ""
         branch LOOP_END
 LOOP_NOT_READ:
         print "OOK? "
-        print S0
+        print S20
         print ":"
-        print I2
+        print I22
         print " "
-        print S3
+        print S23
         print "\n"
         end
 LOOP_LINEFEED:
-        inc I2
+        inc I22
         # Fallthru.
 LOOP_END:
-        le I1, I0, LOOP
-        concat S4, "\tend\n"
-        #print S4
-	# needs imcc:
-	# ../imcc/imcc -r ook.pasm hello.ook
-	compreg P1, "PASM"
-	compile P0, P1, S4
-	invoke
+        le I21, I20, LOOP
+        concat S24, "\tend\n"
+        print S24
+        #end
+        compreg P22, "PASM"
+	compile P0, P22, S24
+	invokecc
         end
 
-# Given the content of P1, create a label of integers concateneted in S6.
+# Given the content of P21, create a label of integers concateneted in S26.
 MAKE_LABEL:
-        set I10, P1
-        set I11, 0
-        set S6, ""
+        set I25, P21
+        set I26, 0
+        set S26, ""
         branch LABEL_END
 LABEL_LOOP:
-        concat S6, "_"
-        set I12, P1[I11]
-        set S7, I12
-        concat S6, S7
-        inc I11
+        concat S26, "_"
+        set I27, P21[I26]
+        set S27, I27
+        concat S26, S27
+        inc I26
 LABEL_END:
-        lt I11, I10, LABEL_LOOP
+        lt I26, I25, LABEL_LOOP
         ret
 
 
