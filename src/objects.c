@@ -202,6 +202,9 @@ Parrot_single_subclass(Parrot_Interp interpreter, PMC *base_class,
     PMC *child_class_array;
     PMC *classname_pmc;
     PMC *parents, *temp_pmc;
+    PMC *vtable_pmc;
+    VTABLE *new_vtable;
+    INTVAL new_class_number;
 
     if (!PObj_is_class_TEST(base_class)) {
         internal_exception(NO_CLASS, "Can't subclass a non-class!");
@@ -271,7 +274,15 @@ Parrot_single_subclass(Parrot_Interp interpreter, PMC *base_class,
     temp_pmc = pmc_new(interpreter, enum_class_Array);
     VTABLE_set_pmc_keyed_int(interpreter, child_class_array, PCD_CLASS_ATTRIBUTES, temp_pmc);
 
-    Parrot_class_register(interpreter, child_class_name, child_class);
+    /* We do have a vtable, though. */
+    VTABLE_set_pmc_keyed_int(interpreter, child_class_array, PCD_OBJECT_VTABLE,
+            vtable_pmc = pmc_new(interpreter, enum_class_VtableCache));
+
+
+    new_class_number = Parrot_class_register(interpreter, child_class_name, child_class);
+    new_vtable = Parrot_clone_vtable(interpreter, Parrot_base_vtables[enum_class_ParrotObject]);
+    new_vtable->base_type = new_class_number;
+    PMC_struct_val(vtable_pmc) = new_vtable;
 
     rebuild_attrib_stuff(interpreter, child_class);
 
@@ -296,6 +307,7 @@ Parrot_new_class(Parrot_Interp interpreter, PMC *class, STRING *class_name)
     PMC *classname_pmc;
     PMC *vtable_pmc;
     INTVAL new_class_number;
+    VTABLE *new_vtable;
 
     /* Hang an array off the data pointer, empty of course */
     class_array = PMC_data(class) = pmc_new(interpreter, enum_class_SArray);
@@ -324,6 +336,10 @@ Parrot_new_class(Parrot_Interp interpreter, PMC *class, STRING *class_name)
             classname_pmc);
 
     new_class_number = Parrot_class_register(interpreter, class_name, class);
+
+    new_vtable = Parrot_clone_vtable(interpreter, Parrot_base_vtables[enum_class_ParrotObject]);
+    new_vtable->base_type = new_class_number;
+    PMC_struct_val(vtable_pmc) = new_vtable;
     rebuild_attrib_stuff(interpreter, class);
 }
 
@@ -430,6 +446,7 @@ Parrot_instantiate_object(Parrot_Interp interpreter, PMC *object) {
     PMC *class;
     INTVAL class_enum;
     PMC *class_name;
+    PMC *vtable_pmc;
 
     class = object->vtable->data;
     /* * remember PMC type */
@@ -437,11 +454,15 @@ Parrot_instantiate_object(Parrot_Interp interpreter, PMC *object) {
     /* put in the real vtable
      * XXX we are leaking ths vtable
      */
+
+    vtable_pmc = VTABLE_get_pmc_keyed_int(interpreter, (PMC *)PMC_data(class), PCD_OBJECT_VTABLE);
+    object->vtable = PMC_struct_val(vtable_pmc);
+
     /*    object->vtable = Parrot_base_vtables[class_enum];*/
-    object->vtable = Parrot_clone_vtable(interpreter,
-          Parrot_base_vtables[enum_class_ParrotObject]);
+    //    object->vtable = Parrot_clone_vtable(interpreter,
+    //      Parrot_base_vtables[enum_class_ParrotObject]);
     /* and set type of class */
-    object->vtable->base_type = class_enum;
+    //object->vtable->base_type = class_enum;
 
     /* Grab the attribute count from the parent */
     attrib_count = class->cache.int_val;
