@@ -1,8 +1,11 @@
 ###
 # [if]
 
-.sub __cmd_if
-  .param pmc argv
+.namespace [ "Tcl" ]
+
+.sub _if
+  .local pmc argv 
+  argv = foldup
  
   .local int argc 
   argc = argv
@@ -18,7 +21,18 @@
 
   .local int counter
 
-  
+  .local pmc parse
+  .local pmc interpret
+  .local pmc expression
+  .local pmc expr_boolean
+  parse = find_global "_Tcl", "__parse"
+  interpret = find_global "_Tcl", "__interpret"
+  expression = find_global "_Tcl", "__expression"
+  expr_boolean = find_global "_Tcl", "__expr_boolean"
+ 
+  .local string temp_str
+  temp_str ="" 
+
   # XXX each one of this argv[counter] sets should be protected
   # against getting past the end of the input array... 
  
@@ -31,8 +45,9 @@
   body = argv[counter]
   inc counter
 get_elseifs:
-  $S0 = argv[counter]
-  if $S0 != "elseif" goto get_else
+  if counter >= argc goto get_final
+  temp_str = argv[counter]
+  if temp_str != "elseif" goto get_else
   $P1 = new PerlArray
   inc counter
   $P2 = argv[counter]
@@ -44,18 +59,17 @@ get_elseifs:
   inc counter
   goto get_elseifs
 get_else:
-  $S0 = argv[counter]
-  if $S0 != "else" goto get_final
+  temp_str = argv[counter]
+  if temp_str != "else" goto get_final
   inc counter
-  $S0 = argv[counter]
+  temp_str = argv[counter]
 get_final:
-  else = $S0
+  else = temp_str
 
-
-  $P0 = __expression(condition)
+  $P0 = expression(condition)
   # XXX happy case.
-  $S0 = $P0[1]
-  $I0 = __expr_boolean($S0)
+  temp_str = $P0[1]
+  $I0 = expr_boolean(temp_str)
 
   if $I0 == 0 goto do_elseifs 
   code = body 
@@ -69,10 +83,10 @@ elseif_loop:
   if $I2 == $I1 goto do_else
   $P1 = elseifs[$I2]
   condition = $P1[0]
-  $P0 = __expression(condition)
+  $P0 = expression(condition)
   #XXX happy case
-  $S0 = $P0[1]
-  $I0 = __expr_boolean($S0)
+  temp_str = $P0[1]
+  $I0 = expr_boolean(temp_str)
   if $I0 == 1 goto done_elseifs
   inc $I2
   goto elseif_loop  
@@ -85,11 +99,14 @@ do_else:
   code = else
 
 done:
-  $P1 = __parse(code,0)
-  (return_type,retval) = __interpret($P1)
+  #print "CODE='"
+  #print code
+  #print "'\n"
+  $P1 = parse(code,0)
+  (return_type,retval) = interpret($P1)
 
   .pcc_begin_return
-  .return return_type
-  .return retval
+    .return return_type
+    .return retval
   .pcc_end_return
 .end

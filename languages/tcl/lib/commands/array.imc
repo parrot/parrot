@@ -1,8 +1,11 @@
 ###
 # [array]
 
-.sub __cmd_array
-  .param pmc argv
+.namespace [ "Tcl" ]
+
+.sub _array
+  .local pmc argv
+  argv = foldup
 
   .local int argc 
   argc = argv
@@ -87,7 +90,6 @@ set_loop:
   val = argv[loop]
   inc loop
   the_array[key] = val
-  _dumper(the_array)
   if loop >= argc goto set_loop_done
   goto set_loop
 
@@ -106,7 +108,7 @@ error:
 
 done:
   .pcc_begin_return
-  .return return_type
-  .return retval
+    .return return_type
+    .return retval
   .pcc_end_return
 .end

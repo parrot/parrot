@@ -1,9 +1,11 @@
 ###
 # [break]
 
-.sub __cmd_break
-  .param pmc argv
- 
+.namespace [ "Tcl" ]
+
+.sub _break
+  .local pmc argv
+  argv = foldup 
 
   .local int argc 
   argc = argv
@@ -28,7 +30,7 @@ noargs:
 
 done:
   .pcc_begin_return
-  .return return_type
-  .return retval
+    .return return_type
+    .return retval
   .pcc_end_return
 .end

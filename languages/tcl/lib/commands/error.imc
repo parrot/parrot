@@ -6,9 +6,12 @@
 # ready yet.
 # (So, the usage statement lies)
 
-.sub __cmd_error
-  .param pmc argv
- 
+.namespace [ "Tcl" ]
+
+.sub _error
+  .local pmc argv
+  argv = foldup
+
   .local int argc 
   argc = argv
 
@@ -28,7 +31,7 @@ badargs:
 
 done:
   .pcc_begin_return
-  .return TCL_ERROR
-  .return retval
+    .return TCL_ERROR
+    .return retval
   .pcc_end_return
 .end

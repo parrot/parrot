@@ -1,13 +1,17 @@
 ###
 # [global]
 
-.sub __cmd_global
-  .param pmc argv
- 
+.namespace [ "Tcl" ]
+
+.sub _global
+  .local pmc argv 
+  argv = foldup
 
   .local int argc 
   argc = argv
-
+  print "ARGC"
+  print argc
+ print "\n"
   .local string retval
   .local int return_type
 
@@ -24,18 +28,19 @@ loop:
   $S0 = argv[ii]
 
   find_lex $P1, 0, $S0
-  store_lex 0, $S0, $P1
+  store_lex -1, $S0, $P1
 
   inc ii
   goto loop
   
 badargs:
+  print "badargs\n"
   return_type = TCL_ERROR
-  retval = "bad call to global"
+  retval = "wrong # args: should be \"global varName ?varName ...?\""
 
 done:
   .pcc_begin_return
-  .return return_type
-  .return retval
+    .return return_type
+    .return retval
   .pcc_end_return
 .end

@@ -1,12 +1,14 @@
 ###
 # [for]
 
-.sub __cmd_for
-  .param pmc argv
+.namespace [ "Tcl" ]
+
+.sub _for
+  .local pmc argv 
+  argv = foldup
  
   .local int argc 
   argc = argv
-
 
   # XXX no bad arg handling...
 
@@ -19,35 +21,44 @@
   .local pmc body_parsed
   .local int return_type
 
+  .local pmc parse
+  .local pmc interpret
+  .local pmc expression
+  .local pmc expr_boolean
+  parse = find_global "_Tcl", "__parse"
+  interpret = find_global "_Tcl", "__interpret"
+  expression = find_global "_Tcl", "__expression"
+  expr_boolean = find_global "_Tcl", "__expr_boolean"
+
   start = argv[0]
   test  = argv[1]
   next  = argv[2]
   body  = argv[3]
 
   # Parse the bits that are code.
-  start_parsed = __parse(start,0)
-  next_parsed  = __parse(next,0)
-  body_parsed  = __parse(body,0)
+  start_parsed = parse(start,0)
+  next_parsed  = parse(next,0)
+  body_parsed  = parse(body,0)
 
   # first, execute start.
-  (return_type,$S0) = __interpret(start_parsed)
+  (return_type,$S0) = interpret(start_parsed)
   if return_type != TCL_OK goto done
 
 for_loop:
   # then execute body
-  (return_type,$S0) = __interpret(body_parsed)
+  (return_type,$S0) = interpret(body_parsed)
   if return_type == TCL_CONTINUE goto continue
   if return_type != TCL_OK goto done
 
 continue:
   # then execute next
-  (return_type,$S0) = __interpret(next_parsed)
+  (return_type,$S0) = interpret(next_parsed)
   if return_type != TCL_OK goto done
   
   # then check condition
-  $P0 = __expression(test)
+  $P0 = expression(test)
   $S0 = $P0[1]
-  $I0 = __expr_boolean($S0)
+  $I0 = expr_boolean($S0)
   if $I0 == 1 goto for_loop
 
 done:
@@ -60,7 +71,7 @@ done_cleansed:
   # for always returns "", regardless of the code it may have executed
 
   .pcc_begin_return
-  .return return_type
-  .return ""
+    .return return_type
+    .return ""
   .pcc_end_return
 .end

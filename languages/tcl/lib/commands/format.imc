@@ -4,8 +4,11 @@
 #
 # format string arg arg arg
 
-.sub __cmd_format
-  .param pmc argv
+.namespace [ "Tcl" ]
+
+.sub _format
+  .local pmc argv 
+  argv = foldup
   
   .local string format
 
@@ -16,7 +19,7 @@
 
 done:
   .pcc_begin_return
-  .return TCL_OK
-  .return $S0
+    .return TCL_OK
+    .return $S0
   .pcc_end_return
 .end

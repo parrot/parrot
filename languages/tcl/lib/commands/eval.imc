@@ -4,12 +4,20 @@
 #
 # eval arg [... arg arg]
 
-.sub __cmd_eval
-  .param pmc argv
-  
+.namespace [ "Tcl" ]
+
+.sub _eval
+  .local pmc argv
+  argv = foldup  
+ 
   .local string expr
   .local int argc
   .local int looper
+ 
+  .local pmc parse
+  .local pmc interpret 
+  parse = find_global "_Tcl", "__parse"  
+  interpret = find_global "_Tcl", "__interpret"
 
   expr = ""
   looper = 0
@@ -28,12 +36,12 @@ loop:
 loop_done:
  
   # should handle errors here, neh? 
-  $P1 = __parse(expr,0)
-  ($I0,$S0) = __interpret($P1) 
+  $P1 = parse(expr,0)
+  ($I0,$S0) = interpret($P1) 
 
 done:
   .pcc_begin_return
-  .return $I0
-  .return $S0
+    .return $I0
+    .return $S0
   .pcc_end_return
 .end

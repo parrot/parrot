@@ -1,14 +1,23 @@
 ###
 # [time]
 
-.sub __cmd_time
-  .param pmc argv
+.namespace [ "Tcl" ]
+
+.sub _time
+  .local pmc argv 
+  argv = foldup
  
   .local int argc 
   argc = argv
 
   .local string retval
   .local int return_type
+
+  .local pmc parse
+  .local pmc interpret
+  parse = find_global "_Tcl", "__parse"
+  interpret = find_global "_Tcl", "__interpret"
+
 
   .local string script
   .local int count
@@ -30,13 +39,13 @@ run:
   script = argv[0]
 
   # is it cheating to parse it here?
-  $P1 = __parse(script,0)
+  $P1 = parse(script,0)
 
   time $N1 
   $I1 = count
 loop:
   if $I1 == 0 goto done
-  ($I0,$S0) = __interpret($P1)
+  ($I0,$S0) = interpret($P1)
   if $I0 != TCL_OK goto done
   dec $I1
   goto loop
@@ -54,7 +63,7 @@ done:
 real_done:
 
   .pcc_begin_return
-  .return TCL_RETURN
-  .return retval
+    .return TCL_RETURN
+    .return retval
   .pcc_end_return
 .end

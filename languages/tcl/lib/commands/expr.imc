@@ -4,15 +4,20 @@
 #
 # expr arg [... arg arg]
 
-.sub __cmd_expr
-  .param pmc argv
-  
+.namespace [ "Tcl" ]
+
+.sub _expr
+  .local pmc argv 
+  argv = foldup
+ 
   .local string expr
   .local int argc
   .local int looper
 
   .local string retval
   .local int return_type
+  .local pmc expression
+  expression = find_global "_Tcl", "__expression"
 
   expr = ""
   looper = 0
@@ -33,7 +38,7 @@ loop_done:
   # out of __expression. Did an error occur? if it did, then we'd
   # return something other than the TCL_OK
   
-  $P1 = __expression(expr)
+  $P1 = expression(expr)
   $I0 = $P1[0]
   return_type = $I0
   retval = $P1[1] 
@@ -62,7 +67,7 @@ die_horribly:
 
 done:
   .pcc_begin_return
-  .return return_type
-  .return retval
+    .return return_type
+    .return retval
   .pcc_end_return
 .end

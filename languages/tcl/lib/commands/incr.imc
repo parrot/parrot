@@ -5,9 +5,11 @@
 # incr foo
 # incr foo offset
 
-.sub __cmd_incr
-  .param pmc argv
+.namespace [ "Tcl" ]
 
+.sub _incr
+  .local pmc argv 
+  argv = foldup
 
   .local int value
   .local int increment 
@@ -49,7 +51,7 @@ error:
 
 done:
   .pcc_begin_return
-  .return return_type
-  .return retval
+    .return return_type
+    .return retval
   .pcc_end_return
 .end

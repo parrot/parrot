@@ -6,8 +6,11 @@
 # ready yet.
 # (So, the usage statement lies)
 
-.sub __cmd_catch
-  .param pmc argv
+.namespace [ "Tcl" ]
+
+.sub _catch
+  .local pmc argv
+  argv = foldup
  
   .local int argc 
   argc = argv
@@ -16,12 +19,16 @@
   .local string retval
   .local string varname
   .local string code
+  .local pmc parse
+  .local pmc interpret
+  parse = find_global "_Tcl", "__parse"
+  parse = find_global "_Tcl", "__interpret"
 
   if argc ==0 goto badargs
   if argc > 2 goto badargs
   code = argv[0]
-  $P1 = __parse(code,0)
-  ($I0,$S0) = __interpret($P1)
+  $P1 = parse(code,0)
+  ($I0,$S0) = interpret($P1)
   print "script returned value='"
   print $S0
   print "'\n"
@@ -37,7 +44,6 @@
   $P0 = new PerlString
   $P0 = $S0
   store_lex -1, varname, $P0
-  _dumper($P0)
   goto done
 
 badargs:
@@ -46,7 +52,7 @@ badargs:
 
 done:
   .pcc_begin_return
-  .return return_type
-  .return retval
+    .return return_type
+    .return retval
   .pcc_end_return
 .end

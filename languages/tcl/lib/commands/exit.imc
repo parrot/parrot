@@ -1,8 +1,11 @@
 ###
 # [exit]
 
-.sub __cmd_exit
-  .param pmc argv
+.namespace [ "Tcl" ]
+
+.sub _exit
+  .local pmc argv 
+  argv = foldup
 
   .local int argc
   argc = argv

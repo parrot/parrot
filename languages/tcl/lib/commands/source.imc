@@ -1,9 +1,11 @@
 ###
 # [source]
 
-.sub __cmd_source
-  .param pmc argv
- 
+.namespace [ "Tcl" ]
+
+.sub _source
+  .local pmc argv 
+  argv = foldup
 
   .local int argc 
   argc = argv
@@ -17,6 +19,11 @@
   .local string filename
   .local int type
   .local pmc handle
+
+  .local pmc parse
+  .local pmc interpret
+  parse = find_global "_Tcl", "__parse"
+  interpret = find_global "_Tcl", "__interpret"
 
   $P1 = argv[0] 
   typeof type, $P1
@@ -39,8 +46,8 @@ loop:
   goto loop
 
 gotfile:
-  $P1 = __parse(contents,0)
-  (code,retval) = __interpret($P1)
+  $P1 = parse(contents,0)
+  (code,retval) = interpret($P1)
   goto done
  
 badfile:
@@ -55,7 +62,7 @@ fail:
   retval =  "bad call to source\n"
 done:
   .pcc_begin_return
-  .return code
-  .return retval
+    .return code
+    .return retval
   .pcc_end_return
 .end

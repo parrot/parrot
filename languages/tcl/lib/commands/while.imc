@@ -1,13 +1,14 @@
 ###
 # [while]
 
-.sub __cmd_while
-  .param pmc argv
+.namespace [ "Tcl" ]
+
+.sub _while
+  .local pmc argv 
+  argv = foldup
  
   .local int argc 
   argc = argv
-
-  #_dumper("while called with",argv)
 
   # XXX no bad arg handling...
 
@@ -17,18 +18,27 @@
   .local pmc parsed_code
   .local int return_type
 
+  .local pmc parse
+  .local pmc interpret
+  .local pmc expression
+  .local pmc expr_boolean
+  parse = find_global "_Tcl", "__parse"
+  interpret = find_global "_Tcl", "__interpret"
+  expression = find_global "_Tcl", "__expression"
+  expr_boolean = find_global "_Tcl", "__expr_boolean"
+
   retval = "" 
   condition = argv[0]
   code = argv[1]
 
 while_loop:
-  parsed_code = __parse(code,0)
-  $P0 = __expression(condition)
+  parsed_code = parse(code,0)
+  $P0 = expression(condition)
   # XXX Happy case - expression could have failed.
   $S0 = $P0[1]
-  $I0 = __expr_boolean($S0)
+  $I0 = expr_boolean($S0)
   if $I0 == 0 goto done
-  (return_type,$S0) = __interpret(parsed_code)
+  (return_type,$S0) = interpret(parsed_code)
   if return_type == TCL_BREAK goto done
   if return_type == TCL_RETURN goto done
 

@@ -1,11 +1,11 @@
 ###
 # [puts]
 
-.sub __cmd_puts
-  .param pmc argv
+.namespace [ "Tcl" ]
 
-  #_dumper("puts called with",argv)
-
+.sub _puts
+  .local pmc argv 
+  argv = foldup
 
   .local int argc 
   argc = argv
@@ -25,7 +25,7 @@ three_arg:
   $S1 = argv[0]
   if $S1 != "-nonewline" goto bad_option
   .local pmc channels 
-  channels = global "channels"
+  channels = find_global "_Tcl", "channels"
   $S2 = argv[1]
   $P1 = channels[$S2]
   $I0 = typeof $P1
@@ -47,7 +47,7 @@ two_arg_nonewline:
 two_arg_channel:  
   $S3 = argv[1]
   .local pmc channels 
-  channels = global "channels"
+  channels = find_global "_Tcl", "channels"
   $P1 = channels[$S2]
   $I0 = typeof $P1
   if $I0 == .PerlUndef goto bad_channel   
@@ -82,7 +82,7 @@ error:
 
 done:
   .pcc_begin_return
-  .return return_type
-  .return retval
+    .return return_type
+    .return retval
   .pcc_end_return
 .end

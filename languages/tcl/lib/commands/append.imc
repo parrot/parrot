@@ -4,9 +4,12 @@
 #
 # append var [...]
 
-.sub __cmd_append
-  .param pmc argv
-  
+.namespace [ "Tcl" ]
+
+.sub _append
+  .local pmc argv
+  argv = foldup
+
   .local int argc 
   argc = argv
 
@@ -24,7 +27,7 @@
   value = $P1 
 
 loop:
-  if looper > argc goto loop_done
+  if looper == argc goto loop_done
 
   $S2 = argv[looper]
   concat value, $S2
@@ -47,7 +50,7 @@ error:
 
 done:
   .pcc_begin_return
-  .return return_type
-  .return value
+    .return return_type
+    .return value
   .pcc_end_return
 .end

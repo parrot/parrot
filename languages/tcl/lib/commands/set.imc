@@ -1,8 +1,11 @@
 ###
 # [set]
 
-.sub __cmd_set
-  .param pmc argv
+.namespace [ "Tcl" ]
+
+.sub _set
+  .local pmc argv 
+  argv = foldup
 
   .local pmc lexical
   .local int len
@@ -17,6 +20,9 @@
 
   .local string var
   .local string key
+
+  .local pmc get_var
+  get_var = find_global "_Tcl", "__get_var"
 
   .local pmc value
   .local pmc retval
@@ -55,18 +61,17 @@ get_array:
   $P1 = new PerlArray
   $P1[0] = var
   $P1[1] = key
-  (return_type,retval) = __get_var($P1)
+  (return_type,retval) = get_var($P1)
   goto done
 
 get_scalar:
    $P1 = new PerlArray
    $P1[0] = arg0
-   (return_type,retval) = __get_var($P1)
+   (return_type,retval) = get_var($P1)
   goto done
 
 setting:
   value = argv[1]
-
   # Is this an array variable?
   # ends with )
   ord char, arg0, -1
@@ -145,7 +150,7 @@ done:
   # multi-types.
   $S0 = retval
   .pcc_begin_return
-  .return return_type
-  .return $S0
+    .return return_type
+    .return $S0
   .pcc_end_return
 .end
