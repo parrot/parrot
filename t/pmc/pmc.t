@@ -16,7 +16,7 @@ Contains a lot of Perl PMC related tests.
 
 =cut
 
-use Parrot::Test tests => 96;
+use Parrot::Test tests => 97;
 use Test::More;
 use Parrot::PMC qw(%pmc_types);
 my $max_pmc = scalar(keys(%pmc_types)) + 1;
@@ -2634,6 +2634,22 @@ output_is(<<'CODE', '1foo23', "set_p_pc - Sub constant");
     print 3
     end
 CODE
+
+output_is(<<'CODE', <<'OUT', ".const - Sub constant");
+.pcc_sub @MAIN main:
+    print "ok 1\n"
+    .const .Sub P0 = "foo"
+    invokecc
+    print "ok 3\n"
+    end
+.pcc_sub foo:
+    print "ok 2\n"
+    invoke P1
+CODE
+ok 1
+ok 2
+ok 3
+OUT
 
 
 1;

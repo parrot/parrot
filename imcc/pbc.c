@@ -276,6 +276,8 @@ store_bsr(SymReg * r, int pc, int offset)
 {
     SymReg * bsr;
     bsr = _mk_address(globals.cs->subs->bsrs, str_dup(r->name), U_add_all);
+    if (r->set == 'p')
+        bsr->set = 'p';
     bsr->color = pc;
     bsr->score = offset;        /* bsr = 1, set_addr I,x = 2, newsub = 3 */
     /* This is hackish but its better to have it here than in the
@@ -351,6 +353,14 @@ store_labels(Interp *interpreter, IMC_Unit * unit, int *src_lines, int oldsize)
                 store_bsr(ins->r[1], pc, 2);
             else if (!strcmp(ins->op, "newsub"))
                 store_bsr(ins->r[2], pc, 3);
+        }
+        else if (ins->opsize == 3 && ins->r[1]->set == 'p') {
+            /*
+             * set_p_pc opcode
+             */
+            debug(interpreter, DEBUG_PBC_FIXUP, "PMC constant %s\n",
+                    ins->r[1]->name);
+            store_bsr(ins->r[1], pc, 2);
         }
         pc += ins->opsize;
     }
@@ -469,6 +479,28 @@ fixup_bsrs(Interp *interpreter)
 #endif
                     continue;
                 }
+                addr = jumppc + bsr->color;
+                if (bsr->set == 'p') {
+                    struct PackFile_FixupEntry *fe;
+
+                    lab = find_global_label(bsr->name, &pc);
+                    if (!lab) {
+                        fatal(1, "fixup_bsrs", "couldn't find sub 1 '%s'\n",
+                                bsr->name);
+                    }
+                    fe = PackFile_find_fixup_entry(interpreter, enum_fixup_sub,
+                            bsr->name);
+                    if (!fe) {
+                        fatal(1, "fixup_bsrs", "couldn't find sub 2 '%s'\n",
+                                bsr->name);
+                    }
+                    interpreter->code->byte_code[addr+bsr->score] =
+                        fe->offset;
+                    debug(interpreter, DEBUG_PBC_FIXUP, "fixup const PMC"
+                            " sub '%s' const nr: %d\n", bsr->name,
+                            fe->offset);
+                    continue;
+                }
                 lab = find_global_label(bsr->name, &pc);
                 if (!lab) {
                     /* TODO continue; */
@@ -476,7 +508,6 @@ fixup_bsrs(Interp *interpreter)
                     fatal(1, "fixup_bsrs", "couldn't find addr of sub '%s'\n",
                             bsr->name);
                 }
-                addr = jumppc + bsr->color;
                 /* patch the bsr __ instruction */
                 debug(interpreter, DEBUG_PBC_FIXUP, "fixup %s pc %d fix %d\n",
                         bsr->name, addr, pc - addr);
@@ -593,6 +624,7 @@ add_const_pmc_sub(Interp *interpreter, SymReg *r,
     k = PDB_extend_const_table(interpreter);
     interpreter->code->const_table->constants[k]->type = PFC_PMC;
     interpreter->code->const_table->constants[k]->u.key = pfc->u.key;
+    r->color = k;
 
     debug(interpreter, DEBUG_PBC_CONST,
             "add_const_pmc_sub '%s' -> '%s' flags %d color %d\n\t%s\n",

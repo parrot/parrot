@@ -217,7 +217,7 @@ SP              [ ]
 ".method"       return(DOT_METHOD);
 ".local"        return(LOCAL);
 ".global"       return(GLOBAL);
-".const"        return(CONST);
+<emit,INITIAL>".const"        return(CONST);
 ".globalconst"  return(GLOBAL_CONST);
 ".param"        return(PARAM);
 "goto"          return(GOTO);

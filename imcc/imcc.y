@@ -109,6 +109,43 @@ MK_I(Interp *interpreter, IMC_Unit * unit, const char * fmt, int n, ...)
 }
 
 static Instruction*
+mk_pmc_const(Parrot_Interp interp, IMC_Unit *unit,
+        char *type, SymReg *left, char *constant)
+{
+    int type_enum = atoi(type);
+    SymReg *rhs;
+    SymReg *r[IMCC_MAX_REGS];
+    char *name;
+    int len;
+
+    if (left->type == VTADDRESS) {      /* IDENTIFIER */
+        if (pasm_file) {
+            fataly(EX_UNAVAILABLE, sourcefile, line, "Ident as PMC constant",
+                " %s\n", left->name);
+        }
+        left->type = VTIDENTIFIER;
+        left->set = 'P';
+    }
+    r[0] = left;
+    /* strip delimiters */
+    len = strlen(constant);
+    name = mem_sys_allocate(len);
+    constant[len - 1] = '\0';
+    strcpy(name, constant + 1);
+    free(constant);
+    rhs = mk_const(name, 'p');
+    r[1] = rhs;
+    switch (type_enum) {
+        case enum_class_Sub:
+            rhs->usage = U_FIXUP;
+            return INS(interp, unit, "set_p_pc", "", r, 2, 0, 1);
+    }
+    fataly(EX_UNAVAILABLE, sourcefile, line, "Unknown PMC constant",
+        " type %d", type_enum);
+    return NULL;
+}
+
+static Instruction*
 func_ins(Parrot_Interp interp, IMC_Unit *unit, SymReg *lhs, char *op,
            SymReg ** r, int n, int keyv, int emit)
 {
@@ -287,7 +324,7 @@ IMCC_itcall_sub(Interp* interpreter, SymReg* sub)
 %type <i> program class class_body member_decls member_decl field_decl
 %type <i> method_decl class_namespace
 %type <i> global constdef sub emit pcc_sub sub_body pcc_ret pcc_yield
-%type <i> compilation_units compilation_unit
+%type <i> compilation_units compilation_unit pmc_const
 %type <s> classname relop
 %type <i> labels _labels label statements statement sub_call
 %type <i> pcc_sub_call
@@ -362,6 +399,10 @@ constdef:
                                     { mk_const_ident($4, $3, $6, 1);is_def=0; }
    ;
 
+pmc_const:
+     CONST { is_def=1; } INTC var_or_i '=' STRINGC
+                { $$ = mk_pmc_const(interp, cur_unit, $3, $4, $6);is_def=0; }
+   ;
 pasmcode:
      pasmline
    | pasmcode pasmline
@@ -373,6 +414,7 @@ pasmline:
    | FILECOMMENT                       { $$ = 0; }
    | LINECOMMENT                       { $$ = 0; }
    | class_namespace  { $$ = $1; }
+   | pmc_const
    ;
 
 pasm_inst:         { clear_state(); }
@@ -740,16 +782,16 @@ instruction:
                    { $$ = $2; }
     ;
 
-id_list : IDENTIFIER 
+id_list : IDENTIFIER
          {
-            IdList* l = malloc(sizeof(IdList)); 
+            IdList* l = malloc(sizeof(IdList));
             l->next = NULL;
             l->id = $1;
             $$ = l;
          }
-        
+
         | id_list COMMA IDENTIFIER
-        {  IdList* l = malloc(sizeof(IdList)); 
+        {  IdList* l = malloc(sizeof(IdList));
            l->id = $3;
            l->next = $1;
            $$ = l;
@@ -761,21 +803,22 @@ labeled_inst:
    | if_statement
    | NAMESPACE IDENTIFIER            { push_namespace($2); }
    | ENDNAMESPACE IDENTIFIER         { pop_namespace($2); }
-   | LOCAL           { is_def=1; } type id_list 
+   | LOCAL           { is_def=1; } type id_list
      {
         IdList* l = $4;
          while(l) {
              IdList* l1;
-             mk_ident(l->id, $3); 
+             mk_ident(l->id, $3);
              l1 = l;
              l = l->next;
              free(l1);
      }
     is_def=0; $$=0;
-    
+
    }
    | CONST { is_def=1; } type IDENTIFIER '=' const
                                     { mk_const_ident($4, $3, $6, 0);is_def=0; }
+   | pmc_const
    | GLOBAL_CONST { is_def=1; } type IDENTIFIER '=' const
                                     { mk_const_ident($4, $3, $6, 1);is_def=0; }
    | PARAM { is_def=1; } type IDENTIFIER { $$ = MK_I(interp, cur_unit, "restore",

@@ -1,6 +1,6 @@
 #!perl
 use strict;
-use TestCompiler tests => 4;
+use TestCompiler tests => 6;
 
 ##############################
 output_is(<<'CODE', <<'OUT', "const 1");
@@ -93,3 +93,34 @@ CODE
 "\"\"
 OUT
 
+output_is(<<'CODE', <<'OUT', "PMC const 1 - Sub");
+.sub main @MAIN
+    .const .Sub $P0 = "foo"
+    print "ok 1\n"
+    $P0()
+    print "ok 3\n"
+.end
+.sub foo
+    print "ok 2\n"
+.end
+CODE
+ok 1
+ok 2
+ok 3
+OUT
+
+output_is(<<'CODE', <<'OUT', "PMC const 2 - Sub ident");
+.sub main @MAIN
+    .const .Sub func = "foo"
+    print "ok 1\n"
+    func()
+    print "ok 3\n"
+.end
+.sub foo
+    print "ok 2\n"
+.end
+CODE
+ok 1
+ok 2
+ok 3
+OUT

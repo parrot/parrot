@@ -237,6 +237,9 @@ trace_op_dump(Interp *interpreter, opcode_t *code_start,
                 case PARROT_ARG_NC:
                     PIO_eprintf(interpreter, "%vg", PCONST(o)->u.number);
                     break;
+                case PARROT_ARG_PC:
+                    PIO_eprintf(interpreter, "PMC_C[%d]", (int)o);
+                    break;
                 case PARROT_ARG_SC:
                     escaped = PDB_escape(PCONST(o)->u.string->strstart,
                             PCONST(o)->u.string->bufused);
