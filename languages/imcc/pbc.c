@@ -104,10 +104,45 @@ void imcc_globals_destroy(int ex, void *param)
     globals.cs = NULL;
 }
 
+static struct PackFile_Segment *
+create_seg(struct PackFile_Directory *dir, pack_file_types t, const char *name)
+{
+    char *buf;
+    struct PackFile_Segment *seg;
+    size_t len;
+
+    len = strlen(name) + strlen(sourcefile) + 2;
+    buf = malloc(len);
+    sprintf(buf, "%s_%s", name, sourcefile);
+    seg = PackFile_Segment_new_seg(dir, t, buf, 1);
+    free(buf);
+    return seg;
+}
+
+static struct PackFile_ByteCode *
+create_default_segs(Parrot_Interp interpreter)
+{
+    struct PackFile_Segment *seg;
+    struct PackFile *pf = interpreter->code;
+    struct PackFile_ByteCode *cur_cs;
+
+    seg = create_seg(&pf->directory, PF_BYTEC_SEG, BYTE_CODE_SEGMENT_NAME);
+    cur_cs = pf->cur_cs = (struct PackFile_ByteCode*)seg;
+
+    seg = create_seg(&pf->directory, PF_FIXUP_SEG, FIXUP_TABLE_SEGMENT_NAME);
+    cur_cs->fixups = (struct PackFile_FixupTable *)seg;
+    cur_cs->fixups->code = cur_cs;
+
+    seg = create_seg(&pf->directory, PF_CONST_SEG, CONSTANT_SEGMENT_NAME);
+    cur_cs->consts = pf->const_table = (struct PackFile_ConstTable*) seg;
+    cur_cs->consts->code = cur_cs;
+
+    return cur_cs;
+}
+
 int e_pbc_open(void *param) {
     struct cs_t *cs;
     struct Parrot_Interp *interpreter = (struct Parrot_Interp *)param;
-    struct PackFile_Segment *seg;
 
     /* make a new code segment
      */
@@ -129,22 +164,7 @@ int e_pbc_open(void *param) {
      * we need some segments
      */
     if (!interpreter->code->cur_cs) {
-        /* TODO mangle segment names */
-        seg = PackFile_Segment_new_seg(&interpreter->code->directory,
-                PF_BYTEC_SEG,
-                BYTE_CODE_SEGMENT_NAME, 1);
-        cs->seg = interpreter->code->cur_cs = (struct PackFile_ByteCode*)seg;
-        seg = PackFile_Segment_new_seg(&interpreter->code->directory,
-                PF_FIXUP_SEG,
-                FIXUP_TABLE_SEGMENT_NAME , 1);
-        interpreter->code->cur_cs->fixups = (struct PackFile_FixupTable *)seg;
-        ((struct PackFile_FixupTable *)seg)->code = cs->seg;
-
-        seg = PackFile_Segment_new_seg(&interpreter->code->directory,
-                PF_CONST_SEG,
-                CONSTANT_SEGMENT_NAME , 1);
-        interpreter->code->cur_cs->consts =
-        interpreter->code->const_table = (struct PackFile_ConstTable*) seg;
+        cs->seg = create_default_segs(interpreter);
     }
     globals.cs = cs;
     return 0;

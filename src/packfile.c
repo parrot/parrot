@@ -772,7 +772,7 @@ PackFile_remove_segment_by_name (struct PackFile_Directory *dir,
 =item PackFile_new
 
 Allocate a new empty PackFile.
-Setup directory and 2 default segments: CONSTANT, BYTECODE
+Setup directory
 
 Directory segment:
 
@@ -1214,11 +1214,42 @@ directory_destroy (struct PackFile_Segment *self)
     default_destroy (self);
 }
 
+static void
+sort_segs(struct PackFile_Directory *dir)
+{
+    size_t i, j, num_segs;
+
+    struct PackFile_Segment *seg = dir->segments[0], *s2;
+    if (seg->type != PF_BYTEC_SEG) {
+        for (i = 1; i < num_segs; i++) {
+            s2 = dir->segments[i];
+            if (s2->type == PF_BYTEC_SEG) {
+                dir->segments[0] = s2;
+                dir->segments[i] = seg;
+                break;
+            }
+        }
+    }
+    seg = dir->segments[1];
+    if (seg->type != PF_FIXUP_SEG) {
+        for (i = 2; i < num_segs; i++) {
+            s2 = dir->segments[i];
+            if (s2->type == PF_FIXUP_SEG) {
+                dir->segments[1] = s2;
+                dir->segments[i] = seg;
+                break;
+            }
+        }
+    }
+}
 static size_t
 directory_packed_size (struct PackFile_Segment *self)
 {
     struct PackFile_Directory *dir = (struct PackFile_Directory *)self;
     size_t size, i, seg_size;
+
+    /* need bytecode, fixup, other segs ... */
+    sort_segs(dir);
     /* number of segments + default, we need it for the offsets */
     size = 1 + default_packed_size(self);
     for (i = 0; i < dir->num_segments; i++) {
@@ -1240,6 +1271,7 @@ directory_packed_size (struct PackFile_Segment *self)
     return size - default_packed_size(self);
 }
 
+
 static opcode_t *
 directory_pack (struct PackFile_Segment *self, opcode_t *cursor)
 {
@@ -1247,6 +1279,7 @@ directory_pack (struct PackFile_Segment *self, opcode_t *cursor)
     size_t i;
     size_t num_segs;
     opcode_t *ret;
+
 
     num_segs = dir->num_segments;
     *cursor++ = num_segs;

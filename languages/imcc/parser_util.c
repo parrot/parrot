@@ -126,6 +126,8 @@ INS(struct Parrot_Interp *interpreter, char *name, char *fmt, SymReg **r,
  *
  * compile a pasm or imcc string
  *
+ * FIXME compile to a new PackFile - we need separate constants
+ *
  */
 extern void* yy_scan_string(const char *);
 
