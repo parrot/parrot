@@ -1,6 +1,6 @@
 #!perl
 use strict;
-use TestCompiler tests => 29;
+use TestCompiler tests => 30;
 
 ##############################
 # Parrot Calling Conventions
@@ -251,7 +251,7 @@ ok 2
 back
 OUT
 
-output_is(<<'CODE', <<'OUT', "wrong param count exception");
+output_is(<<'CODE', <<'OUT', "wrong param count exception S arg");
 .sub _main
     .local Sub sub
     newsub sub, .Sub, _sub
@@ -267,6 +267,31 @@ output_is(<<'CODE', <<'OUT', "wrong param count exception");
 .pcc_sub _sub
     .param string k
     .param string l
+    print k
+    print l
+   .pcc_begin_return
+   .pcc_end_return
+.end
+CODE
+wrong param count
+OUT
+
+output_is(<<'CODE', <<'OUT', "wrong param count exception P arg");
+.sub _main
+    .local Sub sub
+    newsub sub, .Sub, _sub
+    .pcc_begin non_prototyped
+    .arg $P0
+    .pcc_call sub
+    ret:
+    .pcc_end
+    print "back\n"
+    end
+.end
+
+.pcc_sub _sub
+    .param var k
+    .param var l
     print k
     print l
    .pcc_begin_return

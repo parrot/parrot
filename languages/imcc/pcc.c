@@ -65,6 +65,7 @@ pcc_emit_check_param(Parrot_Interp interpreter, Instruction *ins,
 {
     SymReg *check_sub, *regs[IMCC_MAX_REGS], *check_type, *what, *check_pmc;
     char buf[128];
+    SymReg *err_nparam, *err_type;
 
     /*
      * generate check subroutine if not done yet
@@ -73,7 +74,6 @@ pcc_emit_check_param(Parrot_Interp interpreter, Instruction *ins,
     strcpy(buf, "_#check_params");
     check_sub = _get_sym(ghash, buf);
     if (!check_sub) {
-        SymReg *err_nparam, *err_type;
 
         check_sub = mk_address(str_dup(buf), U_add_uniq_label);
         /* we just append to the current ins stream */
@@ -82,26 +82,41 @@ pcc_emit_check_param(Parrot_Interp interpreter, Instruction *ins,
          * first time check: amount of params, elements in P3
          * we can globber I0
          */
-        if (!i0)
-            i0 = mk_pasm_reg(str_dup("I0"));
-        regs[0] = i0;
-        regs[1] = p3;
-        /* set I0, P3 */
-        INS(interpreter, "set", NULL, regs, 2, 0, 1);
-        /* lt I0, nparam, check_err_nparam */
         err_nparam = mk_address(str_dup("#check_err_nparam"), U_add_uniq_label);
-        /* the param count in passed by the sub in what
-        */
-        regs[0] = i0;
+        if (p3) {
+            if (!i0)
+                i0 = mk_pasm_reg(str_dup("I0"));
+            regs[0] = i0;
+            regs[1] = p3;
+            /* set I0, P3 */
+            INS(interpreter, "set", NULL, regs, 2, 0, 1);
+            /* lt I0, nparam, check_err_nparam */
+            /* the param count in passed by the sub in what
+            */
+            regs[0] = i0;
+        }
+        else {
+            SymReg *i2 = mk_pasm_reg(str_dup("I2"));
+            regs[0] = i2;
+        }
+
         regs[1] = what;
         regs[2] = err_nparam;
         INS(interpreter, "lt", NULL, regs, 3, 0, 1);
         INS(interpreter, "ret", NULL, regs, 0, 0, 1);
+        /* emit err handler routines
+         * param count
+         */
+        pcc_emit_err(interpreter, err_nparam, "\"wrong param count\"");
+    }
+
+    strcpy(buf, "_#check_param_type");
+    check_type = _get_sym(ghash, buf);
+    if (!check_type && type) {
         /*
          * type check entry to check sub
          */
-        check_type = mk_address(str_dup("_#check_param_type"),
-                U_add_uniq_label);
+        check_type = mk_address(str_dup(buf), U_add_uniq_label);
         INS_LABEL(check_type, 1);
         /*
          * param type check, we get the entry type in what
@@ -137,10 +152,6 @@ pcc_emit_check_param(Parrot_Interp interpreter, Instruction *ins,
         regs[2] = check_type;
         INS(interpreter, "lt", NULL, regs, 3, 0, 1);
         INS(interpreter, "ret", NULL, regs, 0, 0, 1);
-        /* emit err handler routines
-         * param count
-         */
-        pcc_emit_err(interpreter, err_nparam, "\"wrong param count\"");
         /*
          * param type
          */
@@ -157,6 +168,8 @@ pcc_emit_check_param(Parrot_Interp interpreter, Instruction *ins,
         regs[0] = check_sub;
         ins = insINS(interpreter, ins, "bsr", regs, 1);
     }
+    if (!type)
+        return ins;
     /* emit type check what is type */
     regs[0] = what;
     sprintf(buf, "%d", type);
@@ -212,6 +225,10 @@ expand_pcc_sub(Parrot_Interp interpreter, Instruction *ins)
 			    next[j]++;
 			    break;
 			}
+                        /* if unprototyped check param count */
+                        if (ps != pe && !proto)
+                            ins = pcc_emit_check_param(interpreter,
+                                    ins, sub, i0, NULL, i == 0, 0);
 			/* assign register to that param
                          *
                          * if this subroutine calls another one,
