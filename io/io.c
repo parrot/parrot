@@ -31,9 +31,13 @@ ParrotIOLayer   * pio_default_stack;
 */
 
 /* The standard streams */
-ParrotIO * pio_stdin;
-ParrotIO * pio_stdout;
-ParrotIO * pio_stderr;
+/*
+  Note: These are now interpreter->piodata->table[PIO_STD*_FILENO].
+
+        ParrotIO * pio_stdin;
+        ParrotIO * pio_stdout;
+        ParrotIO * pio_stderr;
+*/
 
 
 PIOOFF_T        piooffsetzero;
