@@ -2,17 +2,16 @@
  * Qt Native interface for Parrot - Sample for playing with the
  * extension design.
  *
- * compile with:  g++ -fPIC -I$QTDIR/include -L$QTDIR -I./include -c PQt.C -lqt
+ * compile with:  g++ -fPIC -I$QTDIR/include -L$QTDIR -c PQt.C
  *                gcc -shared -o libPQt.so PQt.o $QTDIR/lib/libqt.so
  *
- * Or something like that... 
+ * Or something like that...
  */
 
 
 #include <qapplication.h>
 #include <qlabel.h>
 extern "C" {
-#include "parrot/pxs.h"
 #include <stdio.h>
 #include <dlfcn.h>
 
@@ -22,24 +21,23 @@ QApplication * pApp;
 /*
  * QApplication bindings
  */
-PXSCALL(QApplication_new) {
-    PMC * p;
-    int PQtargc;
+QApplication *QApplication_new(void) {
+    int PQtargc = 0;
     char *PQtargv[2];
     PQtargv[0] = "";
     PQtargv[1] = NULL;
     pApp = new QApplication(PQtargc, PQtargv);
-    p = PXS_pointer(interp, pApp);
-    PXS_retp(interp, p);
+    return pApp;
 }
 
-PXSCALL(QApplication_exec) {
-    ((QApplication *)object)->exec();
+void QApplication_exec(QApplication *app)
+{
+    app->exec();
 }
 
-PXSCALL(QApplication_setMainWidget) {
-    PMC * w = PXS_shiftp(interp);
-    ((QApplication *)object)->setMainWidget((QWidget *)w->data);
+void QApplication_setMainWidget(QApplication *app, QWidget *w)
+{
+    app->setMainWidget(w);
 }
 
 
@@ -47,21 +45,20 @@ PXSCALL(QApplication_setMainWidget) {
  * QLabel bindings
  */
 
-PXSCALL(QLabel_new) {
-    char * arg1 = PXS_shiftcs(interp);
-    QLabel * pLabel = new QLabel(arg1, 0);
-    PMC * p = PXS_pointer(interp, pLabel);
-    PXS_retp(interp, p);
+QLabel * QLabel_new(const char *txt)
+{
+    QLabel * pLabel = new QLabel(txt, 0);
+    return pLabel;
 }
 
-PXSCALL(QLabel_show) {
-    ((QLabel *)object)->show();
+void QLabel_show(QLabel *label)
+{
+    label->show();
 }
 
-PXSCALL(QLabel_resize) {
-    int x = PXS_shifti(interp);
-    int y = PXS_shifti(interp);
-    ((QLabel *)object)->resize(x, y);
+void QLabel_resize(QLabel *label, int x, int y)
+{
+    label->resize(x, y);
 }
 
 
