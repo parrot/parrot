@@ -16,23 +16,36 @@ int
 main(int argc, char **argv) {
     int i;
     int tracing;
+    int bounds_checking;
 
     struct Parrot_Interp *interpreter;
     init_world();
   
     interpreter = make_interpreter();
     
-    /* Look for the '-t' tracing switch. We really should use getopt, but are we allowed? */
+    /*
+    ** Look for the '-t' tracing and '-b' bounds checking switches.
+    ** We really should use getopt, but are we allowed?
+    */
 
-    if (argc > 1 && strcmp(argv[1], "-t") == 0) {
-        tracing = 1;
-        for(i = 2; i < argc; i++) {
-            argv[i-1] = argv[i];
+    tracing         = 0;
+    bounds_checking = 0;
+
+    while (argc > 1 && argv[1][0] == '-') {
+        if (argv[1][1] == 't' && argv[1][2] == '\0') {
+            tracing = 1;
+            for(i = 2; i < argc; i++) {
+                argv[i-1] = argv[i];
+            }
+            argc--;
         }
-        argc--;
-    }
-    else {
-        tracing = 0;
+        else if (argv[1][1] == 'b' && argv[1][2] == '\0') {
+            bounds_checking = 1;
+            for(i = 2; i < argc; i++) {
+                argv[i-1] = argv[i];
+            }
+            argc--;
+        }
     }
 
     /* If we got only the program name, complain */
@@ -101,6 +114,10 @@ main(int argc, char **argv) {
 
         if (tracing) {
             interpreter->flags |= PARROT_TRACE_FLAG;
+        }
+
+        if (bounds_checking) {
+            interpreter->flags |= PARROT_BOUNDS_FLAG;
         }
 
         runops(interpreter, pf);

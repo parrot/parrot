@@ -40,19 +40,37 @@ struct Parrot_Interp {
     INTVAL flags;				  /* Various interpreter flags
                                            that signal that runops
                                            should do something */
-
+    opcode_t * resume_addr;
     struct PackFile * code;               /* The code we are executing */
 };
 
 #define PARROT_DEBUG_FLAG 0x01		/* Bit in the flags that says
                                            we're debugging */
 #define PARROT_TRACE_FLAG 0x02		/* We're tracing execution */
+#define PARROT_BOUNDS_FLAG 0x04		/* We're tracking byte code bounds during execution */
 
 #define PCONST(i) PF_CONST(interpreter->code, (i))
 #define PNCONST   PF_NCONST(interpreter->code)
 
 struct Parrot_Interp *
 make_interpreter();
+
+typedef opcode_t * (*runops_core_f)(struct Parrot_Interp *, opcode_t *);
+
+opcode_t *
+runops_t0b0_core(struct Parrot_Interp *, opcode_t *);
+
+opcode_t *
+runops_t0b1_core(struct Parrot_Interp *, opcode_t *);
+
+opcode_t *
+runops_t1b0_core(struct Parrot_Interp *, opcode_t *);
+
+opcode_t *
+runops_t1b1_core(struct Parrot_Interp *, opcode_t *);
+
+void
+runops_generic();
 
 void
 runops(struct Parrot_Interp *, struct PackFile *);

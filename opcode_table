@@ -181,3 +181,6 @@ shl_i_ic	3	I I i
 shr_i_ic	3	I I i
 xor_i	3	I I I
 
+bounds_ic	1	i
+trace_ic	1	i
+

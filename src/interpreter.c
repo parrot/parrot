@@ -14,9 +14,12 @@
 #include "parrot/interp_guts.h"
 #include "parrot/op_info.h"
 
-
-/* char * op_names[2048]; */
-/* op_t   op_info[2048]; */
+runops_core_f   runops_cores[4] = {
+  runops_t0b0_core,
+  runops_t0b1_core,
+  runops_t1b0_core,
+  runops_t1b1_core
+};
 
 /*=for api interpreter check_fingerprint
  * TODO: Not really part of the API, but here's the docs.
@@ -44,21 +47,33 @@ check_fingerprint(struct Parrot_Interp *interpreter) {
     }
 }
 
-/*=for api interpreter runops
+/*=for api interpreter runops_t0b0_core
  * run parrot operations until the program is complete
+ *
+ * No tracing.
+ * No bounds checking.
  */
 opcode_t *
-runops_notrace_core (struct Parrot_Interp *interpreter) {
+runops_t0b0_core (struct Parrot_Interp *interpreter, opcode_t * pc) {
+    while (*pc) { DO_OP(pc, interpreter); }
+    return pc;
+}
+
+/*=for api interpreter runops_t0b1_core
+ * run parrot operations until the program is complete
+ *
+ * No tracing.
+ * With bounds checking.
+ */
+opcode_t *
+runops_t0b1_core (struct Parrot_Interp *interpreter, opcode_t * pc) {
     opcode_t * code_start;
-    INTVAL         code_size;
+    INTVAL     code_size;
     opcode_t * code_end;
-    opcode_t * pc;
 
     code_start = (opcode_t *)interpreter->code->byte_code;
     code_size  = interpreter->code->byte_code_size;
     code_end   = (opcode_t *)(interpreter->code->byte_code + code_size);
-
-    pc = code_start;
 
     while (pc >= code_start && pc < code_end && *pc) {
         DO_OP(pc, interpreter);
@@ -68,13 +83,68 @@ runops_notrace_core (struct Parrot_Interp *interpreter) {
 }
 
 /*
- *=for api interpreter trace_op
+ *=for api interpreter trace_op_b0
  * TODO: This isn't really part of the API, but here's its documentation. Prints the PC, OP
  * and ARGS. Used by runops_trace.
+ *
+ * No bounds checking.
  */
 void
-trace_op(struct Parrot_Interp * interpreter, opcode_t * code_start, opcode_t * code_end, opcode_t *pc) {
+trace_op_b0(struct Parrot_Interp *interpreter, opcode_t * code_start, opcode_t *pc) {
     int i;
+
+    fflush(NULL); /* Flush *ALL* output before printing trace info */
+
+    fprintf(stderr, "PC=%ld; OP=%ld (%s)", (long)(pc - code_start), *pc,
+        interpreter->opcode_info[*pc].name);
+
+    if (interpreter->opcode_info[*pc].nargs) {
+        fprintf(stderr, "; ARGS=(");
+        for(i = 0; i < interpreter->opcode_info[*pc].nargs; i++) {
+            if (i) { fprintf(stderr, ", "); }
+            fprintf(stderr, "%ld", (long) *(pc + i + 1));
+        }
+        fprintf(stderr, ")");
+    }
+    fprintf(stderr, "\n");
+
+    fflush(stderr); /* Flush *stderr* now that we've output the trace info */
+}
+
+/*=for api interpreter runops_t1b0_core
+ * TODO: Not really part of the API, but here's the docs.
+ * Passed to runops_generic() by runops_trace().
+ *
+ * With tracing.
+ * No bounds checking.
+ */
+opcode_t *
+runops_t1b0_core (struct Parrot_Interp *interpreter, opcode_t * pc) {
+    opcode_t *code_start;
+
+    code_start = (opcode_t *)interpreter->code->byte_code;
+
+    trace_op_b0(interpreter, code_start, pc);
+    while (*pc) {
+        DO_OP(pc, interpreter);
+        trace_op_b0(interpreter, code_start, pc);
+    }
+
+    return pc;
+}
+
+/*
+ *=for api interpreter trace_op_b1
+ * TODO: This isn't really part of the API, but here's its documentation. Prints the PC, OP
+ * and ARGS. Used by runops_trace.
+ *
+ * With bounds checking.
+ */
+void
+trace_op_b1(struct Parrot_Interp *interpreter, opcode_t * code_start, opcode_t * code_end, opcode_t *pc) {
+    int i;
+
+    fflush(NULL); /* Flush *ALL* output before printing trace info */
 
     if (pc >= code_start && pc < code_end) {
         fprintf(stderr, "PC=%ld; OP=%ld (%s)", (long)(pc - code_start), *pc,
@@ -93,30 +163,32 @@ trace_op(struct Parrot_Interp * interpreter, opcode_t * code_start, opcode_t * c
     else {
         fprintf(stderr, "PC=%ld; OP=<err>\n", (long)(pc - code_start));
     }
+
+    fflush(stderr); /* Flush *stderr* now that we've output the trace info */
 }
 
-/*=for api interpreter runops_trace_core
+/*=for api interpreter runops_t1b1_core
  * TODO: Not really part of the API, but here's the docs.
  * Passed to runops_generic() by runops_trace().
+ *
+ * With tracing.
+ * With bounds checking.
  */
 opcode_t *
-runops_trace_core (struct Parrot_Interp *interpreter) {
+runops_t1b1_core (struct Parrot_Interp *interpreter, opcode_t * pc) {
     opcode_t * code_start;
-    INTVAL         code_size;
+    INTVAL     code_size;
     opcode_t * code_end;
-    opcode_t * pc;
 
     code_start = (opcode_t *)interpreter->code->byte_code;
     code_size  = interpreter->code->byte_code_size;
     code_end   = (opcode_t *)(interpreter->code->byte_code + code_size);
 
-    pc = code_start;
-
-    trace_op(interpreter, code_start, code_end, pc);
-
+    trace_op_b1(interpreter, code_start, code_end, pc);
+    
     while (pc >= code_start && pc < code_end && *pc) {
         DO_OP(pc, interpreter);
-        trace_op(interpreter, code_start, code_end, pc);
+        trace_op_b1(interpreter, code_start, code_end, pc);
     }
 
     return pc;
@@ -127,11 +199,10 @@ runops_trace_core (struct Parrot_Interp *interpreter) {
  * Generic runops, which takes a function pointer for the core.
  */
 void
-runops_generic (opcode_t * (*core)(struct Parrot_Interp *), struct Parrot_Interp *interpreter) {
+runops_generic (opcode_t * (*core)(struct Parrot_Interp *, opcode_t *), struct Parrot_Interp *interpreter, opcode_t * pc) {
     opcode_t * code_start;
     INTVAL         code_size;
     opcode_t * code_end;
-    opcode_t *       pc;
 
     check_fingerprint(interpreter);
 
@@ -139,7 +210,7 @@ runops_generic (opcode_t * (*core)(struct Parrot_Interp *), struct Parrot_Interp
     code_size  = interpreter->code->byte_code_size;
     code_end   = (opcode_t *)(interpreter->code->byte_code + code_size);
 
-    pc = core(interpreter);
+    pc = core(interpreter, pc);
 
     if (pc < code_start || pc >= code_end) {
         fprintf(stderr, "Error: Control left bounds of byte-code block (now at location %d)!\n", (int) (pc - code_start));
@@ -153,18 +224,25 @@ runops_generic (opcode_t * (*core)(struct Parrot_Interp *), struct Parrot_Interp
  */
 void
 runops (struct Parrot_Interp *interpreter, struct PackFile * code) {
-    opcode_t * (*core)(struct Parrot_Interp *);
+    opcode_t * (*core)(struct Parrot_Interp *, opcode_t *);
 
-    if (interpreter->flags & PARROT_TRACE_FLAG) {
-        core = runops_trace_core;
+    interpreter->resume_addr = (opcode_t *)code->byte_code;
+
+    while (interpreter->resume_addr) {
+        int        which = 0;
+        opcode_t * pc    = interpreter->resume_addr;
+
+        interpreter->resume_addr = (opcode_t *)NULL;
+
+        which |= interpreter->flags & PARROT_BOUNDS_FLAG ? 0x01 : 0x00;
+        which |= interpreter->flags & PARROT_TRACE_FLAG  ? 0x02 : 0x00;
+
+        core = runops_cores[which];
+
+        interpreter->code = code;
+
+        runops_generic(core, interpreter, pc);
     }
-    else {
-        core = runops_notrace_core;
-    }
-
-    interpreter->code = code;
-
-    runops_generic(core, interpreter);
 }
 
 /*=for api interpreter make_interpreter
@@ -238,6 +316,8 @@ make_interpreter() {
     /* Done. Return and be done with it */
 
     interpreter->code = (struct PackFile *)NULL;
+
+    interpreter->resume_addr = (opcode_t *)NULL;
 
     return interpreter;   
 }

@@ -699,3 +699,20 @@ AUTO_OP shr_i_ic {
 AUTO_OP xor_i {
   INT_REG(P1) = INT_REG(P2) ^ INT_REG(P3);
 }
+
+/* BOUNDS_ic */
+AUTO_OP bounds_ic {
+  if (P1) { interpreter->flags |=  PARROT_BOUNDS_FLAG; }
+  else    { interpreter->flags &= ~PARROT_BOUNDS_FLAG; }
+  RESUME(3); /* After the end op which must follow bounds */
+  RETURN(2);
+}
+
+/* TRACE_ic */
+AUTO_OP trace_ic {
+  if (P1) { interpreter->flags |=  PARROT_TRACE_FLAG; }
+  else    { interpreter->flags &= ~PARROT_TRACE_FLAG; }
+  RESUME(3); /* After the end op which must follow trace */
+  RETURN(2);
+}
+
