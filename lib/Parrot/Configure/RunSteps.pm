@@ -7,6 +7,7 @@ use vars qw(@steps);
 @steps=qw(
 	init/manifest.pl
 	init/data.pl
+        init/miniparrot.pl
 	init/hints.pl
 	inter/progs.pl
 	inter/types.pl
@@ -47,7 +48,7 @@ sub runsteps {
 		}
 
 		print "done." unless m{^inter/} && $args{ask};
-	}
+	}	
 }
 
 1;

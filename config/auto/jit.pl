@@ -7,9 +7,26 @@ use Parrot::Configure::Step;
 
 $description = "Determining architecture, OS and JIT capability...";
 
-@args=qw(jitcapable);
+@args=qw(jitcapable miniparrot);
 
 sub runstep {
+
+    if (defined $_[1]) {
+      Configure::Data->set(
+        archname    => 'miniparrot',
+        cpuarch     => 'unknown',
+        osname      => 'ANSI',
+        jitarchname => 'nojit',
+        jitcpuarch  => 'i386',
+        jitosname   => 'nojit',
+        jitcapable  => 0,
+        cc_hasjit   => '',
+        jit_h       => '',
+        jit_o       => ''
+      );
+      return;
+  }
+
   my $archname                 =  $Config{archname};
   my ($cpuarch, $osname)       =  split('-', $archname);
 

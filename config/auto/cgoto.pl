@@ -6,14 +6,17 @@ use Parrot::Configure::Step ':auto';
 
 $description="Determining if your compiler supports computed goto...";
 
-@args=qw(cgoto);
+@args=qw(cgoto miniparrot);
 
 sub runstep {
   my $test;
+  my ($cgoto, $miniparrot) = @_;
 
-  if(defined $_[0]) {
-    $test=$_[0];
-  }
+  $cgoto = 0 if (defined $miniparrot);
+
+  if (defined $cgoto) {
+    $test = $cgoto;
+  } 
   else {
     cc_gen('config/auto/cgoto/test_c.in');
     $test=eval { cc_build(); 1; } || 0;

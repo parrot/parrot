@@ -6,11 +6,13 @@ use Parrot::Configure::Step ':auto';
 
 $description="Determining if your C compiler is actually gcc...";
 
-@args=();
+@args=qw(miniparrot);
 
 sub runstep {
+  my ($miniparrot) = @_;
+
   my %gnuc;
-  
+
   cc_gen("config/auto/gcc/test_c.in");
   cc_build();
   %gnuc=eval cc_run() or die "Can't run the test program: $!";
@@ -85,6 +87,18 @@ sub runstep {
       next unless $opt; # Ignore blank lines
       $warns .= " $opt";
     }
+  }
+
+  if (defined $miniparrot && $gccversion) {
+      # make the compiler act as ANSIish as possible, and avoid enabling
+      # support for GCC-specific features.
+
+      Configure::Data->set(
+          cc_warn    => "-ansi -pedantic",
+          gccversion => undef
+      );
+
+      return;
   }
 
   Configure::Data->set(

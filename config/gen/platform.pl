@@ -7,12 +7,13 @@ use File::Copy 'copy';
 
 $description="Moving platform files into place...";
 
-@args=();
+@args=qw(miniparrot);
 
 sub runstep {
   my $platform=lc $^O;
   $platform =~ s/^ms//;
-
+    
+  $platform="ansi" if defined($_[0]);
   $platform="generic" unless -e "config/gen/platform/$platform.c";
   
   copy("config/gen/platform/$platform.c", "platform.c");

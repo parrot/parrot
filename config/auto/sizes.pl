@@ -6,9 +6,25 @@ use Parrot::Configure::Step ':auto';
 
 $description = "Determining some sizes...";
 
-@args=();
+@args=qw(miniparrot);
 
 sub runstep {
+
+    if (defined $_[0]) {
+        Configure::Data->set(
+          'doublesize'    => 8,
+          'numvalsize'    => 8,
+          'nvsize'        => 8,
+          'floatsize'     => 4,
+          'opcode_t_size' => 4,
+          'ptrsize'       => 4,
+          'intvalsize'    => 4,
+          'intsize'       => 4,
+          'longsize'      => 4,
+          'shortsize'     => 2);
+        return;
+    }
+
   cc_gen('config/auto/sizes/test_c.in');
   cc_build();
   my %results=eval cc_run();
