@@ -1384,6 +1384,7 @@ languages/imcc/t/syn/clash.t
 languages/imcc/t/syn/labels.t
 languages/imcc/t/syn/namespace.t
 languages/imcc/t/syn/scope.t
+languages/jako/docs/jako.pod
 languages/jako/examples/bench.jako
 languages/jako/examples/euclid.jako
 languages/jako/examples/fact.jako
