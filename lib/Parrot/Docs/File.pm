@@ -202,6 +202,9 @@ sub is_of_type
 Runs C<Pod::Simple::Checker> on the contents of the file. Executable
 files are assumed not to contain POD and therefore not checked.
 
+Note that the results are cached and the POD will only be rechecked
+if the file has been modified since it was checked. 
+
 =cut
 
 sub check_pod
@@ -339,7 +342,7 @@ sub short_description
 	
 	return '' unless $text =~ /\n=head1\s+NAME\n+([^\n]+)/s;
 	
-	my ($path, $desc) = split /\s*-\s*/, $1;
+	my ($path, $desc) = split /\s*-\s*/, $1, 2;
 	
 	return $desc;
 }

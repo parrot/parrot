@@ -225,7 +225,7 @@ sub delete
 	# Use $_[0] so that we can undef the instance.
 
 	delete($instance_for_path{$_[0]->path});
-
+	
 	undef $_[0];
 }
 

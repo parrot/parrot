@@ -70,14 +70,9 @@ sub create_path
 	
 	return undef unless $self->SUPER::create_path;
 	
-	my $path = $self->path;
-	
-	unless ( -e $path )
-	{
-		my $fh = FileHandle->new(">$path") or die "Failed to open $path: $!";	
-		print $fh '';
-		$fh->close;
-	}
+	# Just to touch the file.
+	# Make sure write() doesn't dismiss this as a noop.
+	$self->write('') unless -e $self->path;
 	
 	return -f $self->path;
 }

@@ -9,14 +9,13 @@ Parrot::Docs::Section - Docmentation section
 
 	use Parrot::Docs::Section;
 	
-	my $section = Parrot::Docs::Section->new('Usual Suspects', 'index.html',
-	    Parrot::Docs::Item->new('', 'foo'),
-		Parrot::Docs::Group->new('Bar', '',
-	    	Parrot::Docs::Item->new('', 'bar', 'pub')
-	    )
-	);
+	my $s = Parrot::Docs::Section->new('Usual Suspects', 'index.html',
+		'here they are...',
+	    Parrot::Docs::Item->new('old faithful', 'foo'),
+		Parrot::Docs::Group->new('Bar', 'no jeans',
+	    	Parrot::Docs::Item->new('time please', 'bar', 'pub')));
 	
-	$section->write_html();
+	$s->write_html();
 
 =head1 DESCRIPTION
 
