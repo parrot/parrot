@@ -49,7 +49,7 @@ matching it against another string:
 
     load_bytecode "p6ge.pir"
     .local pmc p6ge_compile
-    p6ge_compile = global "_p6ge_compile"  # get the compiler
+    find_global p6ge_compile, "P6GE", "_p6ge_compile"  # get the compiler
 
     .local string pattern       
     .local pmc rulesub                     
