@@ -23,10 +23,12 @@ examples/*		simple example programs
 Notes
 =====
 
-Before you begin, make sure that imcc (../imcc) is compiled.  Typing
-"make" should do this.  Also, if you have updated from CVS (rather
-than doing a fresh checkout), you should remove Perl6grammar.pm to
-force the compiler to re-compile the grammar file.
+Before you begin, make sure that parrot (../../parrot) is compiled.
+Typing "make" in the root directory should do this.
+
+Also, if you have updated from CVS (rather than doing a fresh checkout), you
+should remove Perl6grammar.pm to force the compiler to re-compile the grammar
+file.
 
 All the compiler test cases pass on my machine (except where noted in
 ChangeLog), and compile in less than five seconds each.
@@ -154,7 +156,7 @@ is, of course, the tests and the code.
     - exit
     - sleep
     - time
-  
+
 
 Contributors
 ============

@@ -21,13 +21,11 @@ For a quick test, if everything is ok, try a one liner:
 You should see the individual compilation steps and finally the output
 of above program.
 
-If that fails, there are currently 3 steps that might be the culprit:
+If that fails, there are currently 2 steps that might be the culprit:
 
 =over 4
 
 =item P6C -- the perl6 compiler
-
-=item imcc -- the intermediate compiler
 
 =item parrot -- the parrot interpreter
 
@@ -51,7 +49,7 @@ If this prints I<ok> at the end, then it should be so.  If not, let's
 look, what is broken.
 
 The B<perl6> compiler spits out PIR files (parrot intermediate language),
-also known as IMCC files, because this is the name of the intermediate
+also known as IMCC files, because this was the name of the intermediate
 code compiler. So, after above test you should have a file named
 F<__eval__.imc> in your current working directory. Have a look into it.
 
@@ -76,92 +74,38 @@ It should look similar to this:
 
 (Comments left out for brevity). If that's ok, we go on to:
 
-=head2 IMCC
+=head2 Parrot
 
-The intermediate code compiler reads above F<.imc> file and  - with
-current default behaviour - spits out parrot assembler files.
+Parrot runs above F<.imc> file directly with the passed options.
 
 Let's try it manually:
 
-	../imcc/imcc -v -o __eval__.pasm __eval__.imc
-	Reading __eval__.imc
-	using optimization '0'
-	assembly module __eval__.pasm written.
-	481 lines compiled.
+	../../parrot -G __eval__.imc
 
-Now you should have a file F<__eval__.pasm>, which starts like so:
-
-	__main:
-		bsr __setup
-		bsr _main
-		end
-		ret
-	_main:
-		saveall
-		new P0, 10	 # .PerlArray
-		set I0, 0
-		set P0[I0], "ok\n"
-		...
-
-If not, B<imcc> is to blame. When it fails, you should see an error
-message, telling, what went wrong.
-
-You could try:
-
-	../imcc/imcc -v  -r __eval__.imc
-	Reading __eval__.imc, executing
-	using optimization '0'
-	481 lines compiled.
-	Running...
-	ok
-
-So running directly is ok, but compiling to PASM is broken, if you get
-above output. Not to bad, you could run perl6 programs through B<imcc>,
-which is B<parrot> plus a small compiler ;-)
-
-	perl6 --test -r
-
-runs all tests through B<imcc>. This will probably be the default run option
-for the next future.
-
-=head2 assembling the pasm
-
-The next step is running above parrot assembly file through the
-assembler (which is again imcc running in a diffrent mode) to generate
-PBC (parrot byte code).
-
-	../imcc/imcc -o ok.pbc __eval__.pasm
-
-This generates the binary file F<ok.pbc>, if the assembler worked.
-
-=head2 and finally running
-
-	../../parrot ok.pbc
-	ok
+This turns off DOD/GC, which might be helpful to verify, that some
+DOD/GC bug is still lurking around.
 
 =head1 Summary
 
 These individual steps are currently run by the B<perl6> driver program.
 Though there are, as already shown above, some short cuts:
 
-	perl6 -r examples/life.p6
+	perl6 examples/life.p6
 
-runs the program F<examples/life.p6> directly through B<imcc>.
+runs the program F<examples/life.p6> directly through B<parrot>.
 
-	perl6 -r -Rc examples/life.p6
+	perl6 -Rj -v examples/life.p6
 
-runs the program and writes F<examples/life.pbc> for later running by
-B<parrot>.
+runs the program with the JIT core.
 
-	perl6 -k -RPd -v examples/life.p6
+	perl6 -RPd -v -k examples/life.p6
 
 Above option I<-k> tells perl6 to keep intermediate files. So you can
 run them with the appropriate command or you can run them with the perl6
-driver. Flags after I<-R> are passed on to the running program: B<imcc>
-or B<parrot>, though the former has some more options.
+driver. Flags after I<-R> are passed on to B<parrot>.
 
 	perl6 ../../examples/assembly/life.pasm
-	perl6 ../../examples/assembly/mops.pasm -Cv
+	perl6 ../../examples/assembly/mops.pasm -Rj
 
 DWIM.
 
