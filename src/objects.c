@@ -445,7 +445,10 @@ Parrot_instantiate_object(Parrot_Interp interpreter, PMC *object) {
     /* We are an object now */
     PObj_is_object_SET(object);
 
-    /* TODO We really ought to call the class init routines here... */
+    /* We really ought to call the class init routines here...
+     * this assumes that an object isa delegate
+     */
+    Parrot_base_vtables[enum_class_delegate]->init(interpreter, object);
 }
 
 /*
