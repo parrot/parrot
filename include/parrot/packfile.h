@@ -1,6 +1,10 @@
 /* packfile.h
 *
 * $Id$
+*
+* History:
+*  Rework by Melvin; new bytecode format, make bytecode portable.
+*   (Do endian conversion and wordsize transforms on the fly.)
 */
 
 #ifndef PACKFILE_H
@@ -23,12 +27,12 @@
 #define PACKFILE_HEADER_BYTES 16
 
 struct PackFile_Header {
-    char wordsize;
-    char major;
-    char minor;
-    char flags;
-    char pad[4];
-    char byteorder[8];
+    unsigned char wordsize;
+    unsigned char major;
+    unsigned char minor;
+    unsigned char flags;
+    unsigned char pad[4];
+    unsigned char byteorder[8];
     /* Start words/opcodes on 8-byte boundary */
     opcode_t magic;
     opcode_t opcodetype; 
@@ -60,10 +64,14 @@ struct PackFile_ConstTable {
 
 
 struct PackFile {
+    struct PackFile_Header     * header;
     struct PackFile_FixupTable * fixup_table;
     struct PackFile_ConstTable * const_table;
     size_t                       byte_code_size;  /* size in bytes */
     opcode_t *                   byte_code;
+    INTVAL                       need_wordsize;
+    INTVAL                       need_endianize;
+    unsigned char              * transform;
 };
 
 
@@ -108,10 +116,15 @@ PackFile_ConstTable_clear(struct PackFile_ConstTable * self);
 opcode_t PackFile_ConstTable_pack_size(struct PackFile_ConstTable * self);
 
 void
-PackFile_ConstTable_pack(struct PackFile_ConstTable * self, opcode_t * packed);
+PackFile_ConstTable_pack(struct PackFile * pf,
+                            struct PackFile_ConstTable * self,
+                            opcode_t * packed);
 
 BOOLVAL
-PackFile_ConstTable_unpack(struct Parrot_Interp *interpreter, struct PackFile_ConstTable * self, opcode_t * packed, opcode_t packed_size);
+PackFile_ConstTable_unpack(struct Parrot_Interp *interpreter,
+                        struct PackFile * pf,
+                        struct PackFile_ConstTable * self,
+                        opcode_t * packed, opcode_t packed_size);
 
 /*
 ** PackFile_Constant Functions:
@@ -129,26 +142,31 @@ void
 PackFile_Constant_destroy(struct PackFile_Constant * self);
 
 BOOLVAL PackFile_Constant_unpack(struct Parrot_Interp *interpreter,
+                                  struct PackFile *packfile,
                                   struct PackFile_Constant *self,
                                   opcode_t *packed, opcode_t packed_size);
 
 BOOLVAL
-PackFile_Constant_unpack_number(struct PackFile_Constant * self, opcode_t * packed, opcode_t packed_size);
+PackFile_Constant_unpack_number(struct PackFile * pf,
+                                struct PackFile_Constant * self,
+                                opcode_t * packed, opcode_t packed_size);
 
 BOOLVAL PackFile_Constant_unpack_string(struct Parrot_Interp *interpreter,
+                                         struct PackFile * pf,
                                          struct PackFile_Constant *self,
                                          opcode_t *packed,
                                          opcode_t packed_size);
+
+opcode_t PackFile_fetch_op(struct PackFile *pf, opcode_t *stream);
 
 /*
 ** Byte Ordering Functions (byteorder.c)
 */
 void endian_matrix(char * buf);
-INTVAL endianize(INTVAL w, unsigned char * o);
-void endianize_buf(unsigned char * rb, unsigned char * b, unsigned char * o,
+INTVAL endian_fetch_intval(INTVAL w, unsigned char * o);
+void endian_fetch_buf(unsigned char * rb, unsigned char * b, unsigned char * o,
                         int wsize);
-INTVAL endianize_fetch_int(char * s, char * o);
-void endianize_put_int(const char * s, char * o);
+void endian_put_intval(unsigned char * rb, INTVAL w, char * o);
 
 
 #endif /* PACKFILE_H */

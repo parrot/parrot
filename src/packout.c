@@ -1,5 +1,5 @@
 /*
-** packfile.c
+** packout.c
 **
 ** Functions for writing out packfiles.
 **
@@ -8,6 +8,9 @@
 ** license as Parrot itself.
 **
 ** $Id$
+** History:
+**  Rework by Melvin; new bytecode format, make bytecode portable.
+**   (Do endian conversion and wordsize transforms on the fly.)
 */
 
 #include "parrot/parrot.h"
@@ -21,12 +24,16 @@ contiguous region of memory.
 opcode_t
 PackFile_pack_size(struct PackFile *self)
 {
+    opcode_t header_size;
     opcode_t magic_size;
+    opcode_t oct_size; /* opcode_type */
     opcode_t segment_length_size;
     opcode_t fixup_table_size;
     opcode_t const_table_size;
 
+    header_size = PACKFILE_HEADER_BYTES;
     magic_size = sizeof(opcode_t);
+    oct_size = sizeof(opcode_t);
     segment_length_size = sizeof(opcode_t);
 
 #if TRACE_PACKFILE
@@ -49,7 +56,7 @@ PackFile_pack_size(struct PackFile *self)
     printf("  ... it is %ld\n", const_table_size);
 #endif
 
-    return magic_size
+    return header_size + magic_size + oct_size
         + segment_length_size + fixup_table_size
         + segment_length_size + const_table_size
         + segment_length_size + self->byte_code_size;
@@ -71,10 +78,24 @@ PackFile_pack(struct PackFile *self, opcode_t *packed)
     opcode_t const_table_size =
         PackFile_ConstTable_pack_size(self->const_table);
 
+    /* Move the header construction elsewhere */
+    self->header->wordsize = sizeof(opcode_t);
+    self->header->minor = PARROT_MINOR_VERSION;
+    self->header->major = PARROT_MAJOR_VERSION;
+    
+    /* Put the native byteorder into the header */
+    endian_matrix(self->header->byteorder);
+    
+    /* Pack the header */
+    mem_sys_memcopy(cursor, self->header, PACKFILE_HEADER_BYTES);
+    cursor += PACKFILE_HEADER_BYTES / sizeof(opcode_t);
+    
     /* Pack the magic */
-
     *cursor++ = PARROT_MAGIC;
 
+    /* Pack opcode type */
+    *cursor++ = OPCODE_TYPE_PERL;
+    
     /* Pack the fixup table size, followed by the packed fixup table */
 
     *cursor++ = fixup_table_size;
@@ -86,7 +107,7 @@ PackFile_pack(struct PackFile *self, opcode_t *packed)
 
     *cursor++ = const_table_size;
 
-    PackFile_ConstTable_pack(self->const_table, cursor);
+    PackFile_ConstTable_pack(self, self->const_table, cursor);
     cursor += const_table_size / sizeof(opcode_t);      /* Sizes are in bytes */
 
     /* Pack the byte code size, followed by the byte code */
@@ -158,7 +179,8 @@ PackFile_ConstTable_pack_size()!
 ***************************************/
 
 void
-PackFile_ConstTable_pack(struct PackFile_ConstTable *self, opcode_t *packed)
+PackFile_ConstTable_pack(struct PackFile * packfile, struct PackFile_ConstTable *self,
+                            opcode_t *packed)
 {
     opcode_t *cursor;
     opcode_t i;

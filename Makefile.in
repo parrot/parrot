@@ -90,7 +90,7 @@ INTERP_O_FILES = exceptions$(O) global_setup$(O) interpreter$(O) parrot$(O) \
 				 chartype$(O) runops_cores$(O) trace$(O) pmc$(O) key$(O) \
 				 platform$(O) ${jit_o} resources$(O) rx$(O) rxstacks$(O) \
 				 embed$(O) warnings$(O) misc$(O) ${cg_o} \
-				 packout$(O)
+				 packout$(O) byteorder$(O)
 
 O_FILES = $(INTERP_O_FILES) \
 	      $(IO_O_FILES) \

@@ -26,6 +26,7 @@ package Parrot::PackFile;
 use Parrot::PackFile::FixupTable;
 use Parrot::PackFile::ConstTable;
 use Parrot::Types;
+use Config;
 
 use FileHandle;
 
@@ -43,11 +44,26 @@ sub new
   my $class = shift;
 
   my $self = bless {
+    WORDSIZE => sizeof("op"),
+    MAJOR => 0,
+    MINOR => 0,
+    FLAGS => 0,
+    PAD => 'PAD ',
+    BYTEORDER => $Config{byteorder},
     MAGIC => $PARROT_MAGIC,
+    OPCODETYPE => 0x5045524c,
     FIXUP => Parrot::PackFile::FixupTable->new(),
     CONST => Parrot::PackFile::ConstTable->new(),
     PROG  => '',
   }, $class;
+
+  # Perl config gives us a string like '1234' for byteorder,
+  # take it and turn it into an unsigned byte array of numerical
+  # values (0,1,2,3)
+  $self->{BYTEORDER} =~ tr/12345678/\000\001\002\003\004\005\006\007/;
+
+  # Pad to 8 bytes
+  $self->{BYTEORDER} = sprintf "%-8s", $self->{BYTEORDER};
 
   return $self;
 }
@@ -61,6 +77,54 @@ sub magic
   return $PARROT_MAGIC;
 }
 
+sub wordsize
+{
+  my $self = shift;
+
+  return $self->{WORDSIZE};
+}
+
+sub major 
+{
+  my $self = shift;
+
+  return $self->{MAJOR};
+}
+
+sub minor 
+{
+  my $self = shift;
+
+  return $self->{MINOR};
+}
+
+sub flags 
+{
+  my $self = shift;
+
+  return $self->{FLAGS};
+}
+
+sub pad 
+{
+  my $self = shift;
+
+  return $self->{PAD};
+}
+
+sub byteorder 
+{
+  my $self = shift;
+
+  return $self->{BYTEORDER};
+}
+
+sub opcodetype 
+{
+  my $self = shift;
+
+  return $self->{OPCODETYPE};
+}
 
 #
 # fixup_table()
@@ -107,6 +171,9 @@ sub byte_code
 # Const: 4-byte length N + N bytes
 # BCode: N bytes
 #
+# FIXME: Now that we have a portable bytecode format,
+# with file specified wordsize, this routine
+# is inherently broken since it uses the native sizes.
 
 sub unpack
 {
@@ -114,11 +181,28 @@ sub unpack
 
 #  printf "Input string is %d bytes long\n", length($string);
 
+  $self->{WORDSIZE} = shift_byte($string);
+  $self->{MAJOR} = shift_byte($string);
+  $self->{MINOR} = shift_byte($string);
+  $self->{FLAGS} = shift_byte($string);
+
+  # Unused pad
+  shift_byte($string);
+  shift_byte($string);
+  shift_byte($string);
+  shift_byte($string);
+
+  $self->{BYTEORDER} = substr($string, 0, 8);
+
+  $string = substr($string, 8);
+
   my $magic = shift_op($string);
 
   $self->{MAGIC} = $magic;
 
   die "Bad PARROT_MAGIC" unless $magic == $PARROT_MAGIC;
+
+  $self->{OPCODETYPE} = shift_op($string);
 
   #
   # Read the fixup table:
@@ -233,7 +317,18 @@ sub pack
 
   my $string = '';
 
+  $string .= pack_byte($self->wordsize);
+  $string .= pack_byte($self->major);
+  $string .= pack_byte($self->minor);
+  $string .= pack_byte($self->flags);
+
+  $string .= $self->pad;
+  $string .= $self->byteorder;
+
+#  print STDERR "sizeof header: ", length($string), "\n";
+
   $string .= pack_op($self->magic);
+  $string .= pack_op($self->opcodetype);
 
   my $fixup = $self->fixup_table->pack;
   my $const = $self->const_table->pack;

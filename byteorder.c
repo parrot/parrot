@@ -21,13 +21,13 @@
 /*
  * The byteorder matrix in parrot is 0 based
  * because it is used as a transformation.
- * Expect the following the generate warning on 32 bit.
  * We should probably move this to Configure
  */
 void
 endian_matrix(char * buf) {
     unsigned long l;
     char * c = (char *)&l;
+    /* Expect the following to generate warning on 32 bit.*/
     if(sizeof(long) > 4)
         l = (0x07060504L << 32) | (0x03020100);    
     else
@@ -54,12 +54,15 @@ endian_matrix(char * buf) {
  */
 
 INTVAL
-endianize(INTVAL w, unsigned char * o) {
+endian_fetch_intval(INTVAL w, unsigned char * o) {
     unsigned char * b = (unsigned char *)&w;
     INTVAL r;
     char * rb = (unsigned char *)&r;
     int nibbles = sizeof(INTVAL) / sizeof(char);
-    
+
+    if(!o)
+        return w;
+        
     rb[0] = b[o[0]];
     /*
      * Optimizer should decide these at compile time;
@@ -90,7 +93,7 @@ endianize(INTVAL w, unsigned char * o) {
  * a platform with different word size.
  */
 void
-endianize_buf(unsigned char * rb, unsigned char * b, unsigned char * o,
+endian_fetch_buf(unsigned char * rb, unsigned char * b, unsigned char * o,
                         int wsize) {
     rb[0] = b[o[0]];
     if(wsize >= 2) {

@@ -582,6 +582,7 @@ AARGH
     $c{$which} = $format;
 }
 
+$c{packtype_b} = 'C';
 $c{packtype_n} = 'd';
 
 #

@@ -8,6 +8,10 @@
 ** license as Parrot itself.
 **
 ** $Id$
+**
+** History:
+**  Rework by Melvin; new bytecode format, make bytecode portable.
+**   (Do endian conversion and wordsize transforms on the fly.)
 */
 
 #include "parrot/parrot.h"
@@ -48,6 +52,14 @@ PackFile_new(void)
         return NULL;
     }
 
+    pf->header =
+        mem_sys_allocate((UINTVAL)sizeof(struct PackFile_Header));
+    if(!pf->header) {
+        fprintf(stderr, "PackFile_new: Unable to allocate header!\n");
+        PackFile_destroy(pf);
+        return NULL;
+    }
+    
     /* Create fixup table */
     pf->fixup_table =
         mem_sys_allocate((UINTVAL)sizeof(struct PackFile_FixupTable));
@@ -78,6 +90,23 @@ PackFile_new(void)
     return pf;
 }
 
+/***************************************
+
+=item fetch_op
+
+Fetch an opcode_t from the stream, converting
+byteorder if needed.
+
+=cut
+
+***************************************/
+
+INLINE opcode_t
+PackFile_fetch_op(struct PackFile *pf, opcode_t *stream) {
+    if(pf->transform == NULL)
+        return *stream;
+    return endian_fetch_intval(*stream, pf->transform);
+}
 
 /***************************************
 
@@ -96,7 +125,15 @@ PackFile_destroy(struct PackFile *pf)
         fprintf(stderr, "PackFile_destroy: pf == NULL!\n");
         return;
     }
+    
+    if (pf->header) {
+        mem_sys_free(pf->header);
+    }
 
+    if (pf->transform) {
+        mem_sys_free(pf->transform);
+    }
+    
     if (pf->fixup_table) {
         mem_sys_free(pf->fixup_table);
     }
@@ -132,7 +169,6 @@ PackFile_check_segment_size(opcode_t segment_size, const char *debug)
     return 1;
 }
 
-
 /***************************************
 
 =item unpack
@@ -163,78 +199,171 @@ opcode_t
 PackFile_unpack(struct Parrot_Interp *interpreter, struct PackFile *self,
                 opcode_t *packed, size_t packed_size)
 {
-    opcode_t segment_size;
+    struct PackFile_Header * header = self->header;
+    unsigned char native_byteorder[64];
     opcode_t *cursor;
-
+    int i;
+    
     if (!self) {
         fprintf(stderr, "PackFile_unpack: self == NULL!\n");
         return 0;
     }
 
-    cursor = packed;
-
     /*
-     * Unpack and verify the magic:
+     * First get our native byteorder matrix
      */
-
-    {
-        opcode_t magic = *cursor++;
-
-        if (magic != PARROT_MAGIC) {
-            fprintf(stderr, "PackFile_unpack: Not a Parrot PackFile!\n");
-            return 0;
+    endian_matrix(native_byteorder);
+    
+    /*
+     * Map the header on top of the buffer later when we are sure
+     * we have alignment done right.
+     */
+    cursor = (opcode_t*)((char*)packed + PACKFILE_HEADER_BYTES);
+    memcpy(header, packed, PACKFILE_HEADER_BYTES);
+    if(header->wordsize != sizeof(opcode_t)) {
+        self->need_wordsize = 1;
+        if(header->wordsize == 0) {
+            fprintf(stderr, "PackFile_unpack: Invalid wordsize %d\n",
+                        header->wordsize);
+            return 0;    
         }
     }
 
 #if TRACE_PACKFILE
-    printf("PackFile_unpack(): Magic verified.\n");
+    fprintf(stderr, "wordsize: %d\n", header->wordsize);
+#endif
+
+    /*
+     * FIXME
+     */
+    if(self->need_wordsize) {
+        fprintf(stderr, "PackFile_unpack: Unimplemented wordsize transform.\n");
+        fprintf(stderr, "File has wordsize: %d (native is %dn", header->wordsize,
+                        sizeof(opcode_t));
+        return 0;    
+    }    
+ 
+    /*
+     * Transform the bytecode byteorder matrix (b) with
+     * our matrix (n), which results in the transform
+     * b -> n
+     * Consider a PDP-11 (2301) reading a Sparc generated (3210).
+     * The transform matrix is (1032).
+     */
+    if(memcmp(header->byteorder, native_byteorder, (size_t)header->wordsize)) {
+        self->transform = mem_sys_allocate(32);
+        endian_fetch_buf(self->transform, header->byteorder, native_byteorder,
+                        header->wordsize);
+#if TRACE_PACKFILE
+        if(header->wordsize == 4) {
+            fprintf(stderr, "Bytecode non-native [%u-%u-%u-%u] order, endianizing.\n",
+            header->byteorder[0], header->byteorder[1], header->byteorder[2],
+            header->byteorder[3]);
+            fprintf(stderr, "Native order [%u-%u-%u-%u].\n",
+            native_byteorder[0], native_byteorder[1], native_byteorder[2],
+            native_byteorder[3]);
+            fprintf(stderr, "Transform matrix [%u-%u-%u-%u].\n",
+            self->transform[0], self->transform[1], self->transform[2],
+            self->transform[3]);
+            
+        }
+        else if(header->wordsize == 8)
+            fprintf(stderr, "Bytecode non-native [%d%d%d%d%d%d%d%d] order, endianizing.\n",
+            header->byteorder[0], header->byteorder[1], header->byteorder[2],
+            header->byteorder[3], header->byteorder[4], header->byteorder[5],
+            header->byteorder[6], header->byteorder[7]);
+        
+#endif
+        self->need_endianize = 1;
+        /*
+         * Verify the range of the byteorder matrix elements
+         * Byteorder comes in as 0123, 01234567, 3210, etc.
+         * because it is used as a transformation matrix by the
+         * endianize routine.
+         */
+        for(i = 0; i < header->wordsize; i++) {
+            /* byteorder elements are unsigned so no check for < 0 */
+            if(header->byteorder[i] > header->wordsize - 1) {
+                fprintf(stderr, "PackFile_unpack: invalid byteorder element ");
+                fprintf(stderr, "or wordsize/byteorder mismatch\n");
+                return 0;
+            }
+        }
+    }
+
+    /*
+     * Unpack and verify the magic which is stored byteorder of the file:
+     */
+    header->magic = PackFile_fetch_op(self, cursor++);
+
+    /*
+     * The magic and byteorder fields must be in standard left-right
+     * (big endian) order. The bytecode file itself may be in any
+     * supported order.
+     */
+    if (header->magic != PARROT_MAGIC) {
+        fprintf(stderr, "PackFile_unpack: Not a Parrot PackFile!\n");
+#if TRACE_PACKFILE
+        fprintf(stderr, "Magic number was [%x] not [%x]\n",
+                            header->magic, PARROT_MAGIC);
+#endif
+        return 0;
+    }
+
+    header->opcodetype = PackFile_fetch_op(self, cursor++);
+    
+#if TRACE_PACKFILE
+    fprintf(stderr, "PackFile_unpack(): Magic verified.\n");
 #endif
 
     /*
      * Unpack the Fixup Table Segment:
      */
 
-    segment_size = *cursor++;
-    if (!PackFile_check_segment_size(segment_size, "fixup")) {
+    header->fixup_ss = PackFile_fetch_op(self, cursor++);
+
+    if (!PackFile_check_segment_size(header->fixup_ss, "fixup")) {
         return 0;
     }
 
-    if (!PackFile_FixupTable_unpack(self->fixup_table, cursor, segment_size)) {
+    if (!PackFile_FixupTable_unpack(self->fixup_table, cursor, header->fixup_ss)) {
         fprintf(stderr,
                 "PackFile_unpack: Error reading fixup table segment!\n");
         return 0;
     }
 
-    cursor += segment_size / sizeof(opcode_t);  /* Segment size is in bytes */
+    cursor += header->fixup_ss / sizeof(opcode_t);  /* Segment size is in bytes */
 
     /*
      * Unpack the Constant Table Segment:
      */
 
-    segment_size = *cursor++;
-    if (!PackFile_check_segment_size(segment_size, "constant")) {
+    header->const_ss = PackFile_fetch_op(self, cursor++);
+
+    if (!PackFile_check_segment_size(header->const_ss, "constant")) {
         return 0;
     }
 
-    if (!PackFile_ConstTable_unpack
-        (interpreter, self->const_table, cursor, segment_size)) {
+    if (!PackFile_ConstTable_unpack(interpreter, self, self->const_table,
+                        cursor, header->const_ss)) {
         fprintf(stderr,
                 "PackFile_unpack: Error reading constant table segment!\n");
         return 0;
     }
 
-    cursor += segment_size / sizeof(opcode_t);  /* Segment size is in bytes */
+    cursor += header->const_ss / sizeof(opcode_t);  /* Segment size is in bytes */
 
     /*
      * Unpack the Byte Code Segment:
      */
 
-    segment_size = *cursor++;
-    if (!PackFile_check_segment_size(segment_size, "bytecode")) {
+    header->bytecode_ss = PackFile_fetch_op(self, cursor++);
+
+    if (!PackFile_check_segment_size(header->bytecode_ss, "bytecode")) {
         return 0;
     }
 
-    self->byte_code_size = segment_size;
+    self->byte_code_size = header->bytecode_ss;
 
     if (self->byte_code_size > 0) {
         self->byte_code = mem_sys_allocate(self->byte_code_size);
@@ -246,10 +375,21 @@ PackFile_unpack(struct Parrot_Interp *interpreter, struct PackFile *self,
             return 0;
         }
 
-        mem_sys_memcopy(self->byte_code, cursor, self->byte_code_size);
+        if(!self->need_endianize) {
+            mem_sys_memcopy(self->byte_code, cursor, self->byte_code_size);
+            /* Segment size is in bytes */
+            cursor += header->bytecode_ss / sizeof(opcode_t);
+        }
+        else {
+            for(i = 0; i < (int)(self->byte_code_size / sizeof(opcode_t)); i++) {
+                self->byte_code[i] = PackFile_fetch_op(self, cursor++);
+#if TRACE_PACKFILE
+                fprintf(stderr, "op[%u]->[%u]\n", *(cursor-1), self->byte_code[i]);
+#endif
+            }    
+        }
+        
     }
-
-    cursor += segment_size / sizeof(opcode_t);  /* Segment size is in bytes */
 
     return ((size_t)(cursor - packed) * sizeof(opcode_t)) == packed_size;
 }
@@ -364,8 +504,9 @@ Returns one (1) if everything is OK, else zero (0).
 
 BOOLVAL
 PackFile_ConstTable_unpack(struct Parrot_Interp *interpreter,
-                           struct PackFile_ConstTable *self, opcode_t *packed,
-                           opcode_t packed_size)
+                            struct PackFile * pf,
+                            struct PackFile_ConstTable *self, opcode_t *packed,
+                            opcode_t packed_size)
 {
     opcode_t *cursor;
     opcode_t i;
@@ -379,7 +520,7 @@ PackFile_ConstTable_unpack(struct Parrot_Interp *interpreter,
 
     cursor = packed;
 
-    self->const_count = *cursor++;
+    self->const_count = PackFile_fetch_op(pf, cursor++);
 
 #if TRACE_PACKFILE
     printf("PackFile_ConstTable_unpack(): Unpacking %ld constants...\n",
@@ -408,8 +549,8 @@ PackFile_ConstTable_unpack(struct Parrot_Interp *interpreter,
 #endif
 
         self->constants[i] = PackFile_Constant_new();
-        rc = PackFile_Constant_unpack(interpreter, self->constants[i], cursor,
-                                      packed_size - (cursor - packed));
+        rc = PackFile_Constant_unpack(interpreter, pf, self->constants[i],
+                                      cursor, packed_size - (cursor - packed));
         if (rc == 0) {
             return 0;
         }
@@ -570,6 +711,7 @@ Returns one (1) if everything is OK, else zero (0).
 
 BOOLVAL
 PackFile_Constant_unpack(struct Parrot_Interp *interpreter,
+                         struct PackFile *pf,
                          struct PackFile_Constant *self, opcode_t *packed,
                          opcode_t packed_size)
 {
@@ -586,9 +728,9 @@ PackFile_Constant_unpack(struct Parrot_Interp *interpreter,
 
     cursor = packed;
 
-    type = *cursor++;
-    size = *cursor++;
-
+    type = PackFile_fetch_op(pf, cursor++);
+    size = PackFile_fetch_op(pf, cursor++);
+    
 #if TRACE_PACKFILE
     printf("PackFile_Constant_unpack(): Type is %ld ('%c')...\n", type,
            (char)type);
@@ -600,11 +742,11 @@ PackFile_Constant_unpack(struct Parrot_Interp *interpreter,
         break;
 
     case PFC_NUMBER:
-        rc = PackFile_Constant_unpack_number(self, cursor, size);
+        rc = PackFile_Constant_unpack_number(pf, self, cursor, size);
         break;
 
     case PFC_STRING:
-        rc = PackFile_Constant_unpack_string(interpreter, self, cursor, size);
+        rc = PackFile_Constant_unpack_string(interpreter, pf, self, cursor, size);
         break;
 
     default:
@@ -633,7 +775,7 @@ Returns one (1) if everything is OK, else zero (0).
 ***************************************/
 
 BOOLVAL
-PackFile_Constant_unpack_number(struct PackFile_Constant *self,
+PackFile_Constant_unpack_number(struct PackFile * pf, struct PackFile_Constant *self,
                                 opcode_t *packed, opcode_t packed_size)
 {
     opcode_t *cursor;
@@ -653,6 +795,7 @@ PackFile_Constant_unpack_number(struct PackFile_Constant *self,
      * This could be made contingent upon some preprocessor defines 
      * determined by Configure.
      */
+    
     mem_sys_memcopy(&value, cursor, sizeof(FLOATVAL));
 
     self->type = PFC_NUMBER;
@@ -685,6 +828,7 @@ Returns one (1) if everything is OK, else zero (0).
 
 BOOLVAL
 PackFile_Constant_unpack_string(struct Parrot_Interp *interpreter,
+                                struct PackFile * pf,
                                 struct PackFile_Constant *self,
                                 opcode_t *packed, opcode_t packed_size)
 {
@@ -702,10 +846,10 @@ PackFile_Constant_unpack_string(struct Parrot_Interp *interpreter,
 
     cursor = packed;
 
-    flags = (UINTVAL)*cursor++;
-    encoding = *cursor++;
-    type = *cursor++;
-    size = (size_t)*cursor++;   /* These may need to be separate */
+    flags = (UINTVAL)PackFile_fetch_op(pf, cursor++);
+    encoding = PackFile_fetch_op(pf, cursor++);
+    type = PackFile_fetch_op(pf, cursor++);
+    size = (size_t)PackFile_fetch_op(pf, cursor++); /* These may need to be separate */
 
 #if TRACE_PACKFILE
     printf("PackFile_Constant_unpack_string(): flags are 0x%04x...\n", flags);
