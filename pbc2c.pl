@@ -222,7 +222,7 @@ main(int argc, char **argv) {
     init_world();
   
     run_native = run_compiled;
-    interpreter = make_interpreter(0);
+    interpreter = make_interpreter(NO_FLAGS);
     pf          = PackFile_new();
 
     if( !PackFile_unpack(interpreter, pf, program_code,

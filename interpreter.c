@@ -474,7 +474,7 @@ runops(struct Parrot_Interp *interpreter, struct PackFile *code, size_t offset)
  *  Create the Parrot interpreter.  Allocate memory and clear the registers.
  */
 struct Parrot_Interp *
-make_interpreter(INTVAL flags)
+make_interpreter(Interp_flags flags)
 {
     struct Parrot_Interp *interpreter;
     /* Get an empty interpreter from system memory */

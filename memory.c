@@ -39,7 +39,7 @@
    cheaper, though. 
 */
 void *
-mem_allocate_aligned(UINTVAL size)
+mem_allocate_aligned(size_t size)
 {
     ptrcast_t max_to_alloc = 0;
     ptrcast_t mask = 0;
@@ -69,7 +69,7 @@ mem_allocate_aligned(UINTVAL size)
    uses malloc to allocate system memory
 */
 void *
-mem_sys_allocate(UINTVAL size)
+mem_sys_allocate(size_t size)
 {
     return malloc((size_t)size);
 }
@@ -78,7 +78,7 @@ mem_sys_allocate(UINTVAL size)
    resize a chunk of system memory
 */
 void *
-mem_sys_realloc(void *from, UINTVAL size)
+mem_sys_realloc(void *from, size_t size)
 {
     return realloc(from, size);
 }
@@ -129,10 +129,10 @@ mem_setup_allocator(struct Parrot_Interp *interpreter)
 }
 
 void *
-mem_realloc(struct Parrot_Interp *interpreter, void *from, UINTVAL fromsize,
-            UINTVAL tosize)
+mem_realloc(struct Parrot_Interp *interpreter, void *from, size_t fromsize,
+            size_t tosize)
 {
-    UINTVAL copysize = (fromsize > tosize ? tosize : fromsize);
+    size_t copysize = (fromsize > tosize ? tosize : fromsize);
     void *mem;
     mem = Parrot_allocate(interpreter, copysize);
     if (!mem) {

@@ -20,7 +20,7 @@ main(int argc, char **argv)
     opcode_t *packed;
     size_t packed_size;
     struct PackFile *pf;
-    struct Parrot_Interp *interpreter = make_interpreter(0);
+    struct Parrot_Interp *interpreter = make_interpreter(NO_FLAGS);
 
     if (argc != 2) {
         fprintf(stderr, "pdump: usage: pdump FILE\n");
@@ -39,7 +39,7 @@ main(int argc, char **argv)
 
     init_world();
 
-    interpreter = make_interpreter(0);
+    interpreter = make_interpreter(NO_FLAGS);
 
     packed_size = file_stat.st_size;
 

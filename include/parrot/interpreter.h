@@ -13,6 +13,19 @@
 #if !defined(PARROT_INTERPRETER_H_GUARD)
 #define PARROT_INTERPRETER_H_GUARD
 
+/* These should be visible to embedders. */
+
+/* General flags */
+typedef enum {
+    NO_FLAGS             = 0x00,
+    PARROT_DEBUG_FLAG    = 0x01,  /* We're debugging */
+    PARROT_TRACE_FLAG    = 0x02,  /* We're tracing execution */
+    PARROT_BOUNDS_FLAG   = 0x04,  /* We're tracking byte code bounds */
+    PARROT_PROFILE_FLAG  = 0x08,  /* We're gathering profile information */
+    PARROT_PREDEREF_FLAG = 0x10,  /* We're using the prederef runops */
+    PARROT_JIT_FLAG      = 0x20,  /* We're using the jit runops */
+} Interp_flags;
+
 #if defined(PARROT_IN_CORE)
 
 #include "parrot/register.h"
@@ -32,7 +45,7 @@ typedef STRING_FUNCS *(**string_funcs)();      /* String function table */
 #endif
 
 typedef struct ProfData {
-    INTVAL numcalls;
+    UINTVAL numcalls;
     FLOATVAL time;
 } ProfData;
 
@@ -61,9 +74,9 @@ struct Parrot_Interp {
                                          * arena */
     void *piodata;                      /* interpreter's IO system */
 
-    op_lib_t *op_lib;          /* Opcode library */
-    UINTVAL op_count;          /* The number of ops */
-    op_info_t *op_info_table;  /* Opcode info table (name, nargs, arg types) */
+    op_lib_t  *op_lib;                  /* Opcode library */
+    size_t     op_count;                /* The number of ops */
+    op_info_t *op_info_table; /* Opcode info table (name, nargs, arg types) */
 
     op_func_t *op_func_table;
 
@@ -71,7 +84,7 @@ struct Parrot_Interp {
     str_func_t *string_funcs;
 #endif
 
-    INTVAL flags;               /* Various interpreter flags that
+    Interp_flags flags;         /* Various interpreter flags that
                                  * signal that runops should do
                                  * something */
 
@@ -86,33 +99,33 @@ struct Parrot_Interp {
 
     struct PackFile *code;      /* The code we are executing */
     void **prederef_code;       /* The predereferenced code */
-    INTVAL current_line;        /* Which line we're executing in the
+    size_t current_line;        /* Which line we're executing in the
                                  * source */
     void *current_file;         /* The file we're currently in */
     void *current_package;      /* The package we're currently in */
 
     /* Some counters for the garbage collector.xs */
-    UINTVAL dod_runs;           /* Number of times we've
+    size_t  dod_runs;           /* Number of times we've
                                  * done a DOD sweep */
-    UINTVAL collect_runs;       /* Number of times we've
+    size_t  collect_runs;       /* Number of times we've
                                  * done a memory compaction
                                  */
-    UINTVAL mem_allocs_since_last_collect;      /* The number of memory
+    size_t  mem_allocs_since_last_collect;      /* The number of memory
                                                  * allocations from the
                                                  * system since the last
                                                  * compaction run */
-    UINTVAL header_allocs_since_last_collect;   /* The number of header
+    size_t  header_allocs_since_last_collect;   /* The number of header
                                                  * allocs from the
                                                  * system since the last
                                                  * DOD run */
-    UINTVAL active_PMCs;        /* The number of live PMCs */
-    UINTVAL active_Buffers;     /* The number of live
+    size_t  active_PMCs;        /* The number of live PMCs */
+    size_t  active_Buffers;     /* The number of live
                                  * Buffers */
-    UINTVAL total_PMCs;         /* The total number of PMCs
+    size_t  total_PMCs;         /* The total number of PMCs
                                  * allocated */
-    UINTVAL total_Buffers;      /* The total number of
+    size_t  total_Buffers;      /* The total number of
                                  * buffers allocated */
-    UINTVAL memory_allocated;   /* The total amount of
+    size_t  memory_allocated;   /* The total amount of
                                  * allocatable memory
                                  * allocated. Doesn't count
                                  * memory for headers or
@@ -123,7 +136,7 @@ struct Parrot_Interp {
 #define PCONST(i) PF_CONST(interpreter->code, (i))
 #define PNCONST   PF_NCONST(interpreter->code)
 
-struct Parrot_Interp *make_interpreter(INTVAL);
+struct Parrot_Interp *make_interpreter(Interp_flags);
 
 #if 0
 void runops_generic();
@@ -135,19 +148,9 @@ VAR_SCOPE opcode_t *(*run_native)(struct Parrot_Interp * interpreter,
                                   opcode_t * cur_opcode,
                                   opcode_t * start_code);
 
-#endif
+#endif   /* Parrot core */
 
-/* These should be visible to embedders. */
-
-/* General flags */
-#define PARROT_DEBUG_FLAG    0x01  /* We're debugging */
-#define PARROT_TRACE_FLAG    0x02  /* We're tracing execution */
-#define PARROT_BOUNDS_FLAG   0x04  /* We're tracking byte code bounds */
-#define PARROT_PROFILE_FLAG  0x08  /* We're gathering profile information */
-#define PARROT_PREDEREF_FLAG 0x10  /* We're using the prederef runops */
-#define PARROT_JIT_FLAG      0x20  /* We're using the jit runops */
-
-#endif
+#endif   /* header guard */
 
 /*
  * Local variables:

@@ -56,7 +56,7 @@ void free_io_header(ParrotIO *io) {
 
 ParrotIOTable alloc_pio_array(int numhandles) {
         ParrotIOTable newhandles;
-        unsigned int size = numhandles * sizeof(ParrotIO *);
+        size_t size = numhandles * sizeof(ParrotIO *);
         newhandles = (ParrotIOTable)mem_sys_allocate(size);
         return newhandles;
 }

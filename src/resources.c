@@ -153,7 +153,7 @@ void free_pmc(PMC *pmc) {
   }
 }
 
-Buffer *new_tracked_header(struct Parrot_Interp *interpreter, UINTVAL size) {
+Buffer *new_tracked_header(struct Parrot_Interp *interpreter, size_t size) {
   UNUSED (interpreter);
   return (Buffer *)mem_sys_allocate(size);
 }
@@ -428,7 +428,6 @@ trace_active_PMCs(struct Parrot_Interp *interpreter) {
                 else {
                     /* The only thing left is "buffer of PMCs" */
                     Buffer *trace_buf = current->data;
-                    UINTVAL i;
                     PMC **cur_pmc = trace_buf->bufstart;
                     for (i = 0; i < trace_buf->buflen; i++) {
                         if (cur_pmc[i]) {
@@ -773,8 +772,8 @@ dead_string_run(struct Parrot_Interp *interpreter) {
    was asked for or the default size, whichever's larger */
 void *
 Parrot_alloc_new_block(struct Parrot_Interp *interpreter,
-		       UINTVAL size, UINTVAL public) {
-  UINTVAL alloc_size = (size > DEFAULT_SIZE) ? size : DEFAULT_SIZE;
+		       size_t size, UINTVAL public) {
+  size_t alloc_size = (size > DEFAULT_SIZE) ? size : DEFAULT_SIZE;
   struct Memory_Pool *new_pool;
   /* Allocate a new block. Header info's on the front, plus a fudge
      factor for good measure */
@@ -808,7 +807,7 @@ Parrot_alloc_new_block(struct Parrot_Interp *interpreter,
 
 
 void *
-Parrot_allocate(struct Parrot_Interp *interpreter, UINTVAL size) {
+Parrot_allocate(struct Parrot_Interp *interpreter, size_t size) {
   char *return_val;
   if (NULL == interpreter) {
     return mem_sys_allocate(size);

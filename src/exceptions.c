@@ -49,7 +49,7 @@ Configured  : " PARROT_CONFIG_DATE "\n\
 Architecture: " PARROT_ARCHNAME    "\n\
 JIT Capable : %s\n\
 \n\
-Interp Flags: 0x%lx\n\
+Interp Flags: 0x%x\n\
 Exceptions  : (missing from core)\n\
 \n\
 Dumping core...\n\

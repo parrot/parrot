@@ -24,7 +24,7 @@ Parrot_new(void) {
         world_inited=1;
         init_world();
     }
-    return make_interpreter(0);
+    return make_interpreter(NO_FLAGS);
 }
 
 void

@@ -59,7 +59,7 @@ NOTE: The PackFile's magic is automatically set to PARROT_MAGIC.
 struct PackFile *
 PackFile_new(void)
 {
-    struct PackFile *self = mem_sys_allocate((UINTVAL)sizeof(struct PackFile));
+    struct PackFile *self = mem_sys_allocate(sizeof(struct PackFile));
 
     if (!self) {
         fprintf(stderr, "PackFile_new: Unable to allocate!\n");
@@ -598,7 +598,7 @@ struct PackFile_FixupTable *
 PackFile_FixupTable_new(void)
 {
     struct PackFile_FixupTable *self =
-        mem_sys_allocate((UINTVAL)sizeof(struct PackFile_FixupTable));
+        mem_sys_allocate(sizeof(struct PackFile_FixupTable));
 
     self->dummy = 0;
 
@@ -770,7 +770,7 @@ struct PackFile_ConstTable *
 PackFile_ConstTable_new(void)
 {
     struct PackFile_ConstTable *self =
-        mem_sys_allocate((UINTVAL)sizeof(struct PackFile_ConstTable));
+        mem_sys_allocate(sizeof(struct PackFile_ConstTable));
 
     self->const_count = 0;
     self->constants = NULL;
@@ -1152,7 +1152,7 @@ struct PackFile_Constant *
 PackFile_Constant_new(void)
 {
     struct PackFile_Constant *self =
-        mem_sys_allocate((UINTVAL)sizeof(struct PackFile_Constant));
+        mem_sys_allocate(sizeof(struct PackFile_Constant));
 
     self->type = PFC_NONE;
 
@@ -1174,7 +1174,7 @@ struct PackFile_Constant *
 PackFile_Constant_new_integer(opcode_t i)
 {
     struct PackFile_Constant *self =
-        mem_sys_allocate((UINTVAL)sizeof(struct PackFile_Constant));
+        mem_sys_allocate(sizeof(struct PackFile_Constant));
 
     self->type = PFC_INTEGER;
     self->integer = i;
@@ -1197,7 +1197,7 @@ struct PackFile_Constant *
 PackFile_Constant_new_number(FLOATVAL n)
 {
     struct PackFile_Constant *self =
-        mem_sys_allocate((UINTVAL)sizeof(struct PackFile_Constant));
+        mem_sys_allocate(sizeof(struct PackFile_Constant));
 
     self->type = PFC_NUMBER;
     self->number = n;
@@ -1220,7 +1220,7 @@ struct PackFile_Constant *
 PackFile_Constant_new_string(struct Parrot_Interp *interpreter, STRING *s)
 {
     struct PackFile_Constant *self =
-        mem_sys_allocate((UINTVAL)sizeof(struct PackFile_Constant));
+        mem_sys_allocate(sizeof(struct PackFile_Constant));
 
     self->type = PFC_STRING;
     self->string = string_copy(interpreter, s);

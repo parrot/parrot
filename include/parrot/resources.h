@@ -19,7 +19,7 @@ PMC *new_pmc_header(struct Parrot_Interp *);
 void free_pmc(PMC *);
 
 STRING *new_string_header(struct Parrot_Interp *);
-Buffer *new_tracked_header(struct Parrot_Interp *, UINTVAL size);
+Buffer *new_tracked_header(struct Parrot_Interp *, size_t size);
 Buffer *new_buffer_header(struct Parrot_Interp *);
 void free_buffer(Buffer *);
 
@@ -29,8 +29,8 @@ void free_bigint(void);
 void *new_bignum_header(struct Parrot_Interp *);
 void free_bignum(void);
 
-void *Parrot_allocate(struct Parrot_Interp *, UINTVAL size);
-void *Parrot_alloc_new_block(struct Parrot_Interp *, UINTVAL, UINTVAL);
+void *Parrot_allocate(struct Parrot_Interp *, size_t size);
+void *Parrot_alloc_new_block(struct Parrot_Interp *, size_t, size_t);
 
 void Parrot_new_pmc_header_arena(struct Parrot_Interp *interpreter);
 
@@ -44,25 +44,25 @@ void buffer_lives(Buffer *);
 #define BUFFER_HEADERS_PER_ALLOC 128
 
 struct PMC_Arena {
-    UINTVAL free;         /* Count of PMCs free in this arena */
-    UINTVAL used;         /* Count of PMCs used in this arena */
+    size_t free;         /* Count of PMCs free in this arena */
+    size_t used;         /* Count of PMCs used in this arena */
     struct PMC_Arena *prev;
     struct PMC_Arena *next;
     PMC *start_PMC;        /* Next PMC in the arena ready to allocate */
-    UINTVAL *GC_data;     /* Actually an array with one element per PMC */
+    size_t *GC_data;     /* Actually an array with one element per PMC */
 };
 
 struct STRING_Arena {
-    UINTVAL free;
-    UINTVAL used;
+    size_t free;
+    size_t used;
     struct STRING_Arena *prev;
     struct STRING_Arena *next;
     STRING *start_STRING;
 };
 
 struct Buffer_Arena {
-    UINTVAL free;
-    UINTVAL used;
+    size_t free;
+    size_t used;
     struct Buffer_Arena *prev;
     struct Buffer_Arena *next;
     Buffer *start_Buffer;
@@ -71,12 +71,12 @@ struct Buffer_Arena {
 /* The free header pool */
 struct free_pool {
     Buffer pool_buffer;
-    UINTVAL entries_in_pool;
+    size_t entries_in_pool;
 };
         
 struct Memory_Pool {
-    UINTVAL free;
-    UINTVAL size;
+    size_t free;
+    size_t size;
     struct Memory_Pool *prev;
     struct Memory_Pool *next;
     char *start;
@@ -91,7 +91,6 @@ struct Arenas {
     struct free_pool *string_header_pool;
     struct free_pool *pmc_pool;
     struct free_pool *buffer_header_pool;
-    UINTVAL collections;
 };
 
 struct Stash {
