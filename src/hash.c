@@ -304,6 +304,45 @@ mark_hash(Interp *interpreter, Hash *hash)
     }
 }
 
+void
+hash_visit(Interp *interpreter, Hash *hash, void* pinfo)
+{
+    visit_info* info = (visit_info*) pinfo;
+    size_t i, n;
+    STRING *key;
+    IMAGE_IO *io = info->image_io;
+    HashBucket *b;
+    int freezing =
+        info->what == VISIT_FREEZE_NORMAL ||
+        info->what == VISIT_FREEZE_AT_DESTRUCT;
+    /*
+     * during thaw info->extra is the key/value count
+     */
+    assert(hash->entry_type == enum_hash_pmc);
+    switch (info->what) {
+        case VISIT_THAW_NORMAL:
+        case VISIT_THAW_CONSTANTS:
+            n = (size_t) info->extra;
+            for (i = 0; i < n; ++i) {
+                key = io->vtable->shift_string(interpreter, io);
+                b = hash_put(interpreter, hash, key, NULL);
+                info->thaw_ptr = (PMC**)&b->value;
+                (info->visit_child_function)(interpreter, NULL, info);
+            }
+            break;
+        default:
+            for (i = 0; i <= hash->max_chain; i++) {
+                b = lookupBucket(hash, i);
+                while (b) {
+                    if (freezing)
+                        io->vtable->push_string(interpreter, io, b->key);
+                    (info->visit_child_function)(interpreter, b->value, info);
+                    b = getBucket(hash, b->next);
+                }
+            }
+    }
+}
+
 /* For a hashtable of size N, we use MAXFULL_PERCENT% of N as the number of
  * buckets. This way, as soon as we run out of buckets on the free list,
  * we know that it's time to resize the hashtable.
@@ -581,7 +620,7 @@ hash_exists(Interp *interpreter, Hash *hash, void *key)
 }
 
 /* The key is *not* copied. */
-void
+HashBucket*
 hash_put(Interp *interpreter, Hash *hash, void *okey, void *value)
 {
     BucketIndex *table;
@@ -617,6 +656,7 @@ hash_put(Interp *interpreter, Hash *hash, void *okey, void *value)
         table[hashval & hash->max_chain] = bucket_index;
     }
     /*      dump_hash(interpreter, hash); */
+    return bucket;
 }
 
 void

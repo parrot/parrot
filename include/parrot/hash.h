@@ -86,9 +86,10 @@ void hash_destroy(Interp * interpreter, Hash *hash);
 HashBucket *hash_get_bucket(Interp * interpreter, Hash *hash, void *key);
 void *hash_get(Interp * interpreter, Hash *hash, void *key);
 INTVAL hash_exists(Interp * interpreter, Hash *hash, void *key);
-void hash_put(Interp * interpreter, Hash *hash, void *key, void *value);
+HashBucket *hash_put(Interp * interpreter, Hash *hash, void *key, void *value);
 void hash_delete(Interp * interpreter, Hash *hash, void *key);
 void mark_hash(Interp * interpreter, Hash *hash);
+void hash_visit(Interp * interpreter, Hash *hash, void*);
 void dump_hash(Interp * interpreter, Hash *hash);
 
 #endif

@@ -1,6 +1,6 @@
 #! perl -w
 
-use Parrot::Test tests => 5;
+use Parrot::Test tests => 6;
 use Test::More;
 
 output_is(<<'CODE', <<'OUTPUT', "freeze/thaw a PerlInt");
@@ -147,6 +147,36 @@ PerlArray 4
 666
 777
 4
+666
+777
+OUTPUT
+
+output_is(<<'CODE', <<'OUTPUT', "freeze/thaw a PerlHash");
+    new P1, .PerlInt
+    set P1, 666
+    new P0, .PerlHash
+    set P0["k1"], P1
+    new P1, .PerlInt
+    set P1, 777
+    set P0["k2"], P1
+    freeze S0, P0
+
+    thaw P10, S0
+    typeof S10, P10
+    print S10
+    print " "
+    set I11, P10
+    print I11
+    print "\n"
+    set P12, P10["k1"]
+    print P12
+    print "\n"
+    set P12, P10["k2"]
+    print P12
+    print "\n"
+    end
+CODE
+PerlHash 2
 666
 777
 OUTPUT

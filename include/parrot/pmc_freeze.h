@@ -31,14 +31,22 @@ struct _image_io;
 #define IMAGE_IO struct _image_io
 typedef void    (*push_integer_f)       (Parrot_Interp, IMAGE_IO*, INTVAL);
 typedef void    (*push_pmc_f)           (Parrot_Interp, IMAGE_IO*, PMC*);
+typedef void    (*push_string_f)        (Parrot_Interp, IMAGE_IO*, STRING*);
+typedef void    (*push_number_f)        (Parrot_Interp, IMAGE_IO*, FLOATVAL);
 typedef INTVAL  (*shift_integer_f)      (Parrot_Interp, IMAGE_IO*);
 typedef PMC*    (*shift_pmc_f)          (Parrot_Interp, IMAGE_IO*);
+typedef STRING* (*shift_string_f)       (Parrot_Interp, IMAGE_IO*);
+typedef FLOATVAL(*shift_number_f)       (Parrot_Interp, IMAGE_IO*);
 
 typedef struct _image_funcs {
     push_integer_f      push_integer;
     push_pmc_f          push_pmc;
+    push_string_f       push_string;
+    push_number_f       push_number;
     shift_integer_f     shift_integer;
     shift_pmc_f         shift_pmc;
+    shift_string_f      shift_string;
+    shift_number_f      shift_number;
 } image_funcs;
 
 typedef struct _image_io {
@@ -58,6 +66,7 @@ typedef struct _visit_info {
     PMC*                todo;           /* todo list */
     PMC*                id_list;        /* used by thaw */
     UINTVAL             id;             /* freze ID of PMC */
+    void*               extra;          /* PMC specific */
     IMAGE_IO            *image_io;
 } visit_info;
 

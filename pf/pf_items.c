@@ -184,7 +184,7 @@ Return size of item in opcode_t units, which is 1 per definitionem.
 opcode_t
 PF_fetch_opcode(struct PackFile *pf, opcode_t **stream) {
     opcode_t o;
-    if (!pf->fetch_op)
+    if (!pf || !pf->fetch_op)
         return *(*stream)++;
 #if TRACE_PACKFILE == 2
     PIO_eprintf(NULL, "PF_fetch_opcode: Reordering.\n");
@@ -231,8 +231,8 @@ Return store size of INTVAL in opcode_t units.
 INTVAL
 PF_fetch_integer(struct PackFile *pf, opcode_t **stream) {
     INTVAL i;
-    if(pf->fetch_iv == NULL)
-        return *(*stream++);
+    if (!pf || pf->fetch_iv == NULL)
+        return *(*stream)++;
     i = (pf->fetch_iv)(**stream);
     /* XXX assume sizeof(opcode_t) == sizeof(INTVAL) on the
      * machine producing this PBC
@@ -283,7 +283,7 @@ PF_fetch_number(struct PackFile *pf, opcode_t **stream) {
      */
     FLOATVAL f;
     double d;
-    if (!pf->fetch_nv) {
+    if (!pf || !pf->fetch_nv) {
 #if TRACE_PACKFILE
         PIO_eprintf(NULL, "PF_fetch_number: Native [%d bytes]..\n",
                 sizeof(FLOATVAL));
@@ -359,7 +359,7 @@ PF_fetch_string(Parrot_Interp interp, struct PackFile *pf, opcode_t **cursor)
     opcode_t type;
     size_t size;
     STRING *s;
-    int wordsize = pf->header->wordsize;
+    int wordsize = pf ? pf->header->wordsize : sizeof(opcode_t);
 
     flags = PF_fetch_opcode(pf, cursor);
     /* don't let PBC mess our internals - only constant or not */

@@ -1160,6 +1160,32 @@ list_mark(Interp *interpreter, List *list)
         pobject_lives(interpreter, (PObj *) list->user_data);
 }
 
+void
+list_visit(Interp *interpreter, List *list, void *pinfo)
+{
+    List_chunk *chunk;
+    visit_info *info = (visit_info*) pinfo;
+    UINTVAL i, idx, n;
+    PMC **pos;
+
+    n = list_length(interpreter, list);
+    assert (list->item_type == enum_type_PMC);
+    /* TODO intlist ... */
+    for (idx = 0, chunk = list->first; chunk; chunk = chunk->next) {
+        /* TODO deleted elements */
+        if (!(chunk->flags & sparse)) {
+            for (i = 0; i < chunk->items && idx < n; i++, idx++) {
+                pos = ((PMC **)chunk->data.bufstart) + i;
+                info->thaw_ptr = pos;
+                (info->visit_child_function)(interpreter, *pos, info);
+            }
+        }
+        /*
+         * TODO handle sparse
+         */
+    }
+}
+
 INTVAL
 list_length(Interp *interpreter, List *list)
 {

@@ -290,4 +290,19 @@ pmclass PerlHash need_ext does hash {
 	return ret;
     }
 
+    void visit(visit_info *info) {
+	SUPER(info);
+        hash_visit(INTERP, (Hash*)PMC_ptr1v(SELF), info);
+    }
+
+    void freeze(visit_info *info) {
+	IMAGE_IO *io = info->image_io;
+	io->vtable->push_integer(INTERP, io, VTABLE_elements(INTERP, SELF));
+    }
+
+    void thaw(visit_info *info) {
+	IMAGE_IO *io = info->image_io;
+	SUPER(info);
+	info->extra = (void *)io->vtable->shift_integer(INTERP, io);
+    }
 }

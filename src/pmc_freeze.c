@@ -73,7 +73,7 @@ static void
 str_append(Parrot_Interp interpreter, STRING *s, const void *b, size_t len)
 {
     size_t used = s->bufused;
-    size_t need_free = s->buflen - used - len;
+    int need_free = (int)s->buflen - used - len;
     /*
      * grow by factor 1.5 or such
      */
@@ -95,6 +95,25 @@ push_ascii_integer(Parrot_Interp interpreter, IMAGE_IO *io, INTVAL v)
     char buffer[128];
     sprintf(buffer, "%d ", (int) v);
     str_append(interpreter, io->image, buffer, strlen(buffer));
+}
+
+static void
+push_ascii_number(Parrot_Interp interpreter, IMAGE_IO *io, FLOATVAL v)
+{
+    char buffer[128];
+    sprintf(buffer, "%g ", (double) v);
+    str_append(interpreter, io->image, buffer, strlen(buffer));
+}
+
+/*
+ * for testing only - no encodings and such
+ * XXX no string delimiters - so no space allowed
+ */
+static void
+push_ascii_string(Parrot_Interp interpreter, IMAGE_IO *io, STRING *s)
+{
+    str_append(interpreter, io->image, s->strstart, s->bufused);
+    str_append(interpreter, io->image, " ", 1);
 }
 
 static void
@@ -121,6 +140,40 @@ shift_ascii_integer(Parrot_Interp interpreter, IMAGE_IO *io)
     return i;
 }
 
+static FLOATVAL
+shift_ascii_number(Parrot_Interp interpreter, IMAGE_IO *io)
+{
+    char *start, *p;
+    FLOATVAL f;
+
+    p = start = (char*)io->image->strstart;
+    f = (FLOATVAL) strtod(p, &p);
+    ++p;
+    assert(p <= start + io->image->bufused);
+    io->image->strstart = p;
+    io->image->bufused -= (p - start);
+    assert((int)io->image->bufused >= 0);
+    return f;
+}
+
+static STRING*
+shift_ascii_string(Parrot_Interp interpreter, IMAGE_IO *io)
+{
+    char *start, *p;
+    STRING *s;
+
+    p = start = (char*)io->image->strstart;
+    while (*p != ' ')
+        ++p;
+    ++p;
+    assert(p <= start + io->image->bufused);
+    io->image->strstart = p;
+    io->image->bufused -= (p - start);
+    assert((int)io->image->bufused >= 0);
+    s = string_make(interpreter, start, p - start - 1, NULL, 0, NULL);
+    return s;
+}
+
 static PMC*
 shift_ascii_pmc(Parrot_Interp interpreter, IMAGE_IO *io)
 {
@@ -141,11 +194,11 @@ shift_ascii_pmc(Parrot_Interp interpreter, IMAGE_IO *io)
  * opcode_t io functions
  */
 
-static void
-op_append(Parrot_Interp interpreter, STRING *s, opcode_t b, size_t len)
+static PARROT_INLINE void
+op_check_size(Parrot_Interp interpreter, STRING *s, size_t len)
 {
     size_t used = s->bufused;
-    size_t need_free = s->buflen - used - len;
+    int need_free = (int)s->buflen - used - len;
     /*
      * grow by factor 1.5 or such
      */
@@ -156,16 +209,52 @@ op_append(Parrot_Interp interpreter, STRING *s, opcode_t b, size_t len)
         Parrot_reallocate_string(interpreter, s, new_size);
         assert(s->buflen - used - len >= 15);
     }
-    *((opcode_t *)((ptrcast_t)s->strstart + used)) = b;
+}
+
+static void
+op_append(Parrot_Interp interpreter, STRING *s, opcode_t b, size_t len)
+{
+    op_check_size(interpreter, s, len);
+    *((opcode_t *)((ptrcast_t)s->strstart + s->bufused)) = b;
     s->bufused += len;
     s->strlen += len;
 }
 
 
+/*
+ * XXX assumes sizeof(opcode_t) == sizeof(INTVAL)
+ */
 static void
 push_opcode_integer(Parrot_Interp interpreter, IMAGE_IO *io, INTVAL v)
 {
+    assert(sizeof(opcode_t) == sizeof(INTVAL));
     op_append(interpreter, io->image, (opcode_t)v, sizeof(opcode_t));
+}
+
+static void
+push_opcode_number(Parrot_Interp interpreter, IMAGE_IO *io, FLOATVAL v)
+{
+    size_t len = PF_size_number() * sizeof(opcode_t);
+    STRING *s = io->image;
+    size_t used = s->bufused;
+
+    op_check_size(interpreter, s, len);
+    PF_store_number( (opcode_t *)((ptrcast_t)s->strstart + used), &v);
+    s->bufused += len;
+    s->strlen += len;
+}
+
+static void
+push_opcode_string(Parrot_Interp interpreter, IMAGE_IO *io, STRING* v)
+{
+    size_t len = PF_size_string(v) * sizeof(opcode_t);
+    STRING *s = io->image;
+    size_t used = s->bufused;
+
+    op_check_size(interpreter, s, len);
+    PF_store_string( (opcode_t *)((ptrcast_t)s->strstart + used), v);
+    s->bufused += len;
+    s->strlen += len;
 }
 
 static void
@@ -174,26 +263,52 @@ push_opcode_pmc(Parrot_Interp interpreter, IMAGE_IO *io, PMC* v)
     op_append(interpreter, io->image, (opcode_t)v, sizeof(opcode_t));
 }
 
+/*
+ * the shift functions aren't portable yet
+ * we need to have a packfile header for wordsize and endianess
+ */
 static INTVAL
 shift_opcode_integer(Parrot_Interp interpreter, IMAGE_IO *io)
 {
-    char *start, *p;
     INTVAL i;
-    p = start = (char*)io->image->strstart;
-    i = *((opcode_t*) p)++;
-    assert(p <= start + io->image->bufused);
-    io->image->strstart = p;
-    io->image->bufused -= (p - start);
+    size_t len = PF_size_integer() * sizeof(opcode_t);
+    i = PF_fetch_integer(NULL, (opcode_t**) &io->image->strstart);
+    io->image->bufused -= len;
     assert((int)io->image->bufused >= 0);
     return i;
 }
 
+/*
+ * shift_pmc actually reads a PMC id, not a PMC
+ */
 static PMC*
 shift_opcode_pmc(Parrot_Interp interpreter, IMAGE_IO *io)
 {
     return (PMC*) shift_opcode_integer(interpreter, io);
 }
 
+static FLOATVAL
+shift_opcode_number(Parrot_Interp interpreter, IMAGE_IO *io)
+{
+    FLOATVAL f;
+    size_t len = PF_size_number() * sizeof(opcode_t);
+    f = PF_fetch_number(NULL, (opcode_t**) &io->image->strstart);
+    io->image->bufused -= len;
+    assert((int)io->image->bufused >= 0);
+    return f;
+}
+
+static STRING*
+shift_opcode_string(Parrot_Interp interpreter, IMAGE_IO *io)
+{
+    char *start;
+    STRING *s;
+    start = (char*)io->image->strstart;
+    s = PF_fetch_string(interpreter, NULL, (opcode_t**) &io->image->strstart);
+    io->image->bufused -= ((char*)io->image->strstart - start);
+    assert((int)io->image->bufused >= 0);
+    return s;
+}
 /*
  * helper functions
  */
@@ -262,14 +377,22 @@ cleanup_next_for_GC(Parrot_Interp interpreter)
 static image_funcs ascii_funcs = {
     push_ascii_integer,
     push_ascii_pmc,
+    push_ascii_string,
+    push_ascii_number,
     shift_ascii_integer,
-    shift_ascii_pmc
+    shift_ascii_pmc,
+    shift_ascii_string,
+    shift_ascii_number
 };
 static image_funcs opcode_funcs = {
     push_opcode_integer,
     push_opcode_pmc,
+    push_opcode_string,
+    push_opcode_number,
     shift_opcode_integer,
-    shift_opcode_pmc
+    shift_opcode_pmc,
+    shift_opcode_string,
+    shift_opcode_number
 };
 static IMAGE_IO io_init;
 
@@ -344,6 +467,7 @@ thaw_pmc(Parrot_Interp interpreter, visit_info *info,
     IMAGE_IO *io = info->image_io;
     int seen = 0;
 
+    info->extra = NULL;
     n = io->vtable->shift_pmc(interpreter, io);
     if ( (UINTVAL) n & 1) {     /* seen PMCs have bit 0 set */
         seen = 1;
@@ -354,7 +478,7 @@ thaw_pmc(Parrot_Interp interpreter, visit_info *info,
     else {                       /* type follows */
         info->last_type = *type = io->vtable->shift_integer(interpreter, io);
         if (*type <= 0 || *type >= enum_class_max)
-            internal_exception(1, "Unknown PMC to thaw %d", (int) *type);
+            internal_exception(1, "Unknown PMC type to thaw %d", (int) *type);
     }
     *id = (UINTVAL) n & ~3;
     return seen;
@@ -379,6 +503,7 @@ do_action(Parrot_Interp interpreter, PMC *pmc, visit_info *info,
             internal_exception(1, "Illegal action %d", info->what);
             break;
     }
+    info->extra = NULL;
 }
 
 PARROT_INLINE static PMC*
