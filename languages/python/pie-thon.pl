@@ -67,7 +67,11 @@ my %type_map = (
     iter  => 'Py_iter',
     xrange => 'Py_xrange',
 );
+my %rev_type_map;
 
+while (my ($k, $v) =  each (%type_map)) {
+    $rev_type_map{$v} = $k;
+};
 
 get_dis($DIS, $file);
 get_source($file);
@@ -268,6 +272,8 @@ sub gen_code {
 .sub $cur_func \@MAIN
     .param pmc sys::argv
     new_pad 0
+    \$P0 = getinterp
+    \$P0."recursion_limit"(998)
     .local pmc __name__
     __name__ = new $DEFVAR
     __name__ = '__main__'
@@ -765,14 +771,14 @@ EOC
 sub JUMP_IF_FALSE
 {
     my ($n, $c, $cmt) = @_;
+    if (!@stack) {
+	print "#XXX\t\t$cmt - stack empty\n";
+	return;
+    }
     my $tos = pop @stack;
     my $targ = "pc_xxx";
     if ($c =~ /to (\d+)/) {
 	$targ = "pc_$1";
-    }
-    if (!@stack) {
-	print "\t\t$cmt - stack empty\n";
-	return;
     }
     print <<EOC;
 	unless $tos->[1] goto $targ $cmt
@@ -841,12 +847,24 @@ sub COMPARE_OP
 	return except_compare($l, $r);
     }
     my %rev_map = (
-	'==' => '!=',
-	'!=' => '==',
-	'>' => '<=',
-	'>=' => '<',
-	'<' => '>=',
-	'<=' => '>',
+	'==' => 'ne',
+	'!=' => 'eq',
+	'>' => 'le',
+	'>=' => 'lt',
+	'<' => 'ge',
+	'<=' => 'gt',
+	'is' => 'ne_addr',
+	'is not' => 'eq_addr',
+    );
+    my %op_map = (
+	'==' => 'eq',
+	'!=' => 'ne',
+	'>' => 'gt',
+	'>=' => 'ge',
+	'<' => 'lt',
+	'<=' => 'le',
+	'is' => 'eq_addr',
+	'is not' => 'ne_addr',
     );
     my $op = $rev_map{$c};
     my ($opcode, $rest) = ($code[$code_l]->[2],$code[$code_l]->[4]);
@@ -875,7 +893,7 @@ sub COMPARE_OP
 	if ($rest =~ /to (\d+)/) {
 	    $targ = "pc_$1";
 	}
-	$op = $c;
+	$op = $op_map{$c};
     }
     elsif ($opcode eq 'UNARY_NOT' && $code[$code_l+1]->[2] eq 'JUMP_IF_FALSE') {
 	$code_l++;
@@ -886,7 +904,7 @@ sub COMPARE_OP
 	}
 	$cmt ="\t\t# $opcode\t $rest";
 	$code_l++;
-	$op = $c;
+	$op = $op_map{$c};
     }
     else {
 plain:
@@ -916,21 +934,23 @@ plain:
 	$pres = new .Boolean
 	$pres = $res # ugly
 EOC
-	push @stack, [-1, $pres, 'I'];
+	push @stack, [-1, $pres, 'P'];
 	return;
 
     }
     # XXX the label may be wrong, if the JUMP_IF_x got rewritten
     if ($r->[2] eq 'I' && $l->[2] eq 'I') {
 	print <<"EOC";
-	if $l->[1] $op $r->[1] goto $targ $cmt
+	$op $l->[1], $r->[1], $targ $cmt
 $label
 EOC
     }
     else {
 	my $nl = promote($l);
+	my $nr = $r->[1];
+	$nr = promote($r) if $op =~ /addr/;
 	print <<"EOC";
-      	if $nl $op $r->[1] goto $targ $cmt
+      	$op $nl, $nr, $targ $cmt
 $label
 EOC
     }
@@ -1073,9 +1093,12 @@ EOC
 	    $t = temp($rett = $ret_type);
 	    $ret_string = "$t = ";
 	}
+	my $internal_pmc;
 	print <<EOC;
+	.local NCI meth\:\:$attr
+	meth\:\:$attr = $func # avoid savetop
 	P2 = $1
-	$ret_string$func($args)  $cmt
+	${ret_string}meth\:\:$attr($args)  $cmt
 EOC
     }
     else {
@@ -1084,6 +1107,13 @@ EOC
 	if ($ret_type ne 'None') {
 	    $t = temp($rett = $ret_type);
 	    $ret_string = "$t = ";
+	}
+	if ($builtins{$name}) {
+	    print <<EOC;
+	.local NCI the::internal
+	the::internal = $func # avoid savetop
+EOC
+	    $func = 'the::internal';
 	}
 	print <<EOC;
 	$ret_string$func($args)  $cmt
@@ -1101,7 +1131,7 @@ EOC
 	$t = P5
 EOC
 	}
-	push @stack, [-1, $t, $rett];
+	push @stack, [$name, $t, $rett];
     }
 }
 
@@ -1221,13 +1251,17 @@ sub RAISE_VARARGS
 	$throw = "throw $x $cmt";
     }
     else {
-	$throw = 'throw P5 # TODO create, args';
-	for (my $i = $n-1; $i >= 0; $i--) {
+	for (my $i = $n-1; $i > 0; $i--) {
 	    my $p = pop @stack;
 	    print <<EOC;
 	# arg $p->[1]
 EOC
 	}
+	my $x = (pop @stack)->[1];
+	print <<EOC;
+	$x\["_message"\] = "Foo"
+EOC
+	$throw = "throw $x # TODO create, args";
     }
     print <<EOC;
 	$throw $cmt
@@ -1254,7 +1288,7 @@ sub GET_ITER
     print <<EOC;
 	$it = iter $var $cmt
 EOC
-    push @stack, [-1, $it, 'P']
+    push @stack, [$tos->[0], $it, 'P']
 }
 sub FOR_ITER
 {
@@ -1266,8 +1300,17 @@ sub FOR_ITER
 	$targ = "pc_$1";
     }
     my $var = temp('P');
+    my $name = $tos->[0];
+    if ($rev_type_map{$name} || $builtins{$name}) {
+	$name =~ s/^Py_//;
+	print <<EOC;
+	.local NCI iter\:\:$name
+	iter\:\:$name = $iter
+EOC
+	$iter = 'iter::' . $name;
+    }
     print <<EOC;
-	unless $iter goto $targ
+	unless $iter goto $targ # $tos->[0]
 	$var = $iter() $cmt
 	eq_addr $var, None, $targ
 EOC

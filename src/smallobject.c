@@ -104,10 +104,12 @@ void
 more_traceable_objects(Interp *interpreter,
         struct Small_Object_Pool *pool)
 {
+    struct Small_Object_Arena *arena;
     if (pool->skip)
         pool->skip = 0;
-    else if (pool->last_Arena) {
-        Parrot_do_dod_run(interpreter, DOD_trace_stack_FLAG);
+    else if ((arena = pool->last_Arena)) {
+        if (arena->used == arena->total_objects)
+            Parrot_do_dod_run(interpreter, DOD_trace_stack_FLAG);
         if (pool->num_free_objects <= pool->replenish_level)
             pool->skip = 1;
     }

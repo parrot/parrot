@@ -249,7 +249,7 @@ Marks the array as live.
         data = (PMC **) PMC_data(SELF);
         end = PMC_int_val(SELF);
         for(i = 0; i < end; i++) {
-            if(data[i] != PMCNULL) {
+            if(data[i] != PMCNULL && data[i] != SELF) {
                 pobject_lives(INTERP, (PObj *) data[i]);
             }
         }
