@@ -7,18 +7,18 @@ tools/dev/install_files.pl - Copy files to their correct locations
 =head1 DESCRIPTION
 
 Use a detailed MANIFEST to install a set of files. The format of the
-MANIFEST.detailed is:
+MANIFEST (currently MANIFEST and MANIFEST.generated are used) is:
 
-    [package]meta1,meta2,... <whitespace> source_path
+    source_path <whitespace> [package]meta1,meta2,...
 
 or you may optionally specify a different destination path:
 
-    [package]meta1,meta2,... <whitespace> source_path <whitespace> destination
+    source_path <whitespace> [package]meta1,meta2,... <whitespace> destination
 
 Additionally, there may be a * in front of the whole line to designate
 a generated file:
 
-    *[package]meta1,meta2,... <whitespace> source_path <whitespace> destination
+    source_path <whitespace> *[package]meta1,meta2,... <whitespace> destination
 
 The square brackets around C<package> are literal. C<package> gives
 the name of the RPM that the given file will be installed for, and is
@@ -91,7 +91,7 @@ my %directories;
 @ARGV = ($manifest);
 while(<>) {
     chomp;
-    my ($meta, $src, $dest) = split(/\s+/, $_);
+    my ($src, $meta, $dest) = split(/\s+/, $_);
     $dest ||= $src;
 
     # Parse out metadata

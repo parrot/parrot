@@ -671,7 +671,7 @@ lint2 : ${test_prog}
 ###############################################################################
 
 install :
-	$(PERL) tools/dev/install_files.pl --buildprefix=$(BUILDPREFIX) --prefix=$(PREFIX) --exec-prefix=$(EXEC_PREFIX) --bindir=$(BINDIR) --libdir=$(LIBDIR) --includedir=$(INCLUDEDIR) MANIFEST.detailed | sh
+	$(PERL) tools/dev/install_files.pl --buildprefix=$(BUILDPREFIX) --prefix=$(PREFIX) --exec-prefix=$(EXEC_PREFIX) --bindir=$(BINDIR) --libdir=$(LIBDIR) --includedir=$(INCLUDEDIR) MANIFEST MANIFEST.generated | sh
 
 ###############################################################################
 #
@@ -679,9 +679,9 @@ install :
 #
 ###############################################################################
 
-release : MANIFEST
+release : MANIFEST MANIFEST.generated
 	[ -d parrot-$(VERSION) ] || ln -s . parrot-$(VERSION)
-	tar zcvf parrot-$(VERSION).tar.gz $$(perl -lne 'print"parrot-$(VERSION)/$$_"' MANIFEST)
+	tar zcvf parrot-$(VERSION).tar.gz $$(perl -lane 'print"parrot-$(VERSION)/$$F[0]"' MANIFEST)
 	rm parrot-$(VERSION)
 
 rpms : release

@@ -2,15 +2,14 @@
 
 =head1 TITLE
 
-tools/dev/mk_manifests.pl - Generate MANIFEST.* files for buildings RPMs
+tools/dev/mk_manifests.pl - Generate MANIFEST.* files for building RPMs
 
 =head1 DESCRIPTION
 
 This file generates a set of MANIFEST.* files that give the final
 locations in the file system for all the installable files listed in
-the detailed MANIFEST (MANIFEST.detailed). It does NOT generate the
-MANIFEST file that Configure.pl checks and the manifest checks use;
-that is done by a rule in the root Makefile.
+MANIFEST and MANIFEST.generated. It does NOT generate the MANIFEST
+file that Configure.pl checks and the manifest checks use.
 
 =head1 SEE ALSO
 
@@ -38,7 +37,7 @@ my %FILES; # { package => file }
 @ARGV = ($manifest);
 while(<>) {
     chomp;
-    my ($meta, $file, $dest) = split(/\s+/, $_);
+    my ($file, $meta, $dest) = split(/\s+/, $_);
     $dest ||= $file;
     my $generated = $meta =~ s/^\*//;
     my ($package) = $meta =~ /^\[(.*?)\]/;
