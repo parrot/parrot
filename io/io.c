@@ -86,6 +86,8 @@ PIO_new(theINTERP, ParrotIO *old, INTVAL iotype, INTVAL flags, INTVAL mode)
     new_io->flags = flags;
     new_io->mode = mode;
     new_io->stack = GET_INTERP_IO(interpreter);
+    new_io->b.flags = 0;
+    new_io->b.size = 0;
     new_io->b.startb = NULL;
     new_io->b.endb = NULL;
     new_io->b.next = NULL;
