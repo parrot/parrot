@@ -17,18 +17,20 @@ i386 and the F<libnci.so> library is found.
 
 =cut
 
-use Parrot::Test tests => 29;
+use Parrot::Test tests => 30;
 use Parrot::Config;
 
 print STDERR $PConfig{jitcpuarch}, " JIT CPU\n";
 print STDERR $PConfig{so}, " SO extension\n";
 
 SKIP: {
-if ($PConfig{jitcpuarch} eq 'i386' && -e "libnci" . $PConfig{so}) {
-    $ENV{LD_LIBRARY_PATH} = '.';
+if (-e "libnci" . $PConfig{so}) {
+    if ($PConfig{jitcpuarch} eq 'i386') {
+	$ENV{LD_LIBRARY_PATH} = '.';
+    }
 }
 else {
-    skip('needs jit/i386 and libnci'.$PConfig{so},
+    skip('Please make libnci'.$PConfig{so},
          Test::Builder->expected_tests());
 }
 
@@ -163,9 +165,10 @@ output_is(<<'CODE', <<'OUTPUT', "nci_c_sc");
   print "dlfunced\n"
   set I0, 1	# prototype used - unchecked
   set I5, 64
-  set I6, 2
+  set I6, 3
   invoke
-  ne I5, -128, nok_1
+  abs I5        # 3 * 64 as char may be signed/unsigned
+  ne I5, 64, nok_1
   print "ok 1\n"
   ne I0, 0, nok_2	# test return value convention
   ne I1, 1, nok_2
@@ -1015,6 +1018,84 @@ user data: 42
 external data: 77
 done.
 OUTPUT
+
+output_is(<<'CODE', <<'OUTPUT', 'array of structs');
+
+.include "datatypes.pasm"
+  new P3, .OrderedHash
+  set  P3["x"], .DATATYPE_INT
+  push P3, 0
+  push P3, 0
+  set  P3["y"], .DATATYPE_INT
+  push P3, 0
+  push P3, 0
+  set  P3["w"], .DATATYPE_INT
+  push P3, 0
+  push P3, 0
+  set  P3["h"], .DATATYPE_INT
+  push P3, 0
+  push P3, 0
+  new P6, .UnManagedStruct, P3
+
+  new P4, .OrderedHash
+  set  P4["Rect"], .DATATYPE_STRUCT
+  set P1, P4[-1]
+  setprop P1, "_struct", P6
+  push P4, 4
+  push P4, 0
+
+  new P5, .ManagedStruct, P4
+  set P5[0;0;'x'], 100
+  set P5[0;0;'y'], 110
+  set P5['Rect';0;'w'], 120
+  set P5[0;0;'h'], 130
+
+  set P5[0;1;'x'], 200
+  set P5[0;1;'y'], 210
+  set P5[0;1;'w'], 220
+  set P5[0;1;'h'], 230
+
+  set P5[0;2;'x'], 300
+  set P5[0;2;'y'], 310
+  set P5[0;2;'w'], 320
+  set P5[0;2;'h'], 330
+
+  set P5[0;3;'x'], 400
+  set P5[0;3;'y'], 410
+  set P5[0;3;'w'], 420
+  set P5[0;3;'h'], 430
+
+
+  set I5, 4
+  set I0, 1
+  set I1, 1
+  set I3, 4
+
+  loadlib P1, "libnci"
+  dlfunc P0, P1, "nci_pip", "pip"
+  invoke
+  end
+
+CODE
+Count: 4
+X: 100
+Y: 110
+W: 120
+H: 130
+X: 200
+Y: 210
+W: 220
+H: 230
+X: 300
+Y: 310
+W: 320
+H: 330
+X: 400
+Y: 410
+W: 420
+H: 430
+OUTPUT
+
 } # SKIP
 
 1;

@@ -209,3 +209,7 @@ i	tpiibi
 # Used by library/sdl.imc
 p	iiil
 i	ppl
+
+# used by t/pmc/nci.t
+v	pP
+p	ip

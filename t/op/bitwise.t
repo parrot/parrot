@@ -16,7 +16,7 @@ Tests various bitwise logical operations.
 
 =cut
 
-use Parrot::Test tests => 23;
+use Parrot::Test tests => 25;
 
 output_is(<<'CODE', <<'OUTPUT', "shr_i_i_i (>>)");
 	set I0, 0b001100
@@ -135,7 +135,7 @@ CODE
 OK
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "lsr_i_i_i (<<)");
+output_is(<<'CODE', <<'OUTPUT', "lsr_i_i_i (>>)");
 	set I0, -40
 	set I1, 1
  	lsr I2, I0, I1
@@ -150,6 +150,34 @@ CODE
 OK
 OUTPUT
 
+# ... and the missing op signature was untested and wrong in JIT/i386
+output_is(<<'CODE', <<'OUTPUT', "lsr_i_i_ic (>>)");
+	set I0, -40
+ 	lsr I2, I0, 1
+ 	lt I2, 0, BAD
+	print "OK\n"
+	end
+BAD:
+	print "Not OK"
+ 	print "\n"
+	end
+CODE
+OK
+OUTPUT
+
+output_is(<<'CODE', <<'OUTPUT', "shr_i_i_ic (>>) negative");
+	set I0, -40
+ 	shr I2, I0, 1
+ 	ge I2, 0, BAD
+	print "OK\n"
+	end
+BAD:
+	print "Not OK"
+ 	print "\n"
+	end
+CODE
+OK
+OUTPUT
 output_is(<<'CODE', <<'OUTPUT', "shl_i_i_i (<<)");
  	set I0, 0b001100
  	set I1, 0b010100

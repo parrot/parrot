@@ -28,6 +28,14 @@ void nci_cb_C2(cb_C2_func, void*);
 typedef void (*cb_D1_func)(void*, const char*);
 void nci_cb_D1(cb_D1_func, void*);
 
+typedef struct
+{
+	int x, y;
+	int w, h;
+} Rect_Like;
+
+void nci_pip (int count, Rect_Like *rects);
+
 double nci_dd(double d) {
     return d * 2.0;
 }
@@ -255,6 +263,15 @@ nci_cb_D1(cb_D1_func cb, void* user_data)
     const char *result = "succeeded";
     /* call the cb synchronously */
     (cb)(user_data, result);
+}
+
+void nci_pip (int count, Rect_Like *rects)
+{
+    int i;
+    printf( "Count: %d\n", count);
+    for (i = 0; i < 4; ++i)
+        printf("X: %d\nY: %d\nW: %d\nH: %d\n",
+		rects[i].x, rects[i].y, rects[i].w, rects[i].h );
 }
 
 #ifdef TEST

@@ -75,6 +75,18 @@ int. An integer type.
 
 long. An integer type. You know the drill.
 
+=item 2
+
+A pointer to a short, taken from an I register.
+
+=item 3
+
+A pointer to an int, taken from an I register.
+
+=item 4
+
+A pointer to a long, taken from an I register.
+
 =item f
 
 float. F register denizen.

@@ -52,7 +52,8 @@ char_offset_int(Parrot_Interp interpreter, PMC *pmc, INTVAL ix, int *type)
         internal_exception(1, "Missing struct initializer");
     n = (size_t)VTABLE_elements(interpreter, PMC_pmc_val(pmc));
     if ((size_t)ix >= n)
-        internal_exception(1, "Non existent elements in struct");
+        internal_exception(1, "Non existent elements in struct "
+                "ix = %d n=%d", (int)ix, (int)n);
     /* use structure init */
     *type = (int) VTABLE_get_integer_keyed_int(interpreter,
         PMC_pmc_val(pmc), ix);
@@ -119,22 +120,30 @@ char_offset_key(Parrot_Interp interpreter, PMC *pmc, PMC *key, int *type)
     int ix;
     char *p;
 
+#ifdef STRUCT_DEBUG
+    trace_key_dump(interpreter, key);
+#endif
     ix = key_2_idx(interpreter, pmc, key);
     next = key_next(interpreter, key);
     p = char_offset_int(interpreter, pmc, ix, type);
     ix *= 3;
     if (!next)
         return p;
+    count = 1;
     if (PObj_get_FLAGS(next) & KEY_integer_FLAG)
         count = key_integer(interpreter, next);
     else
         count = 1;
     outer_init = init = PMC_pmc_val(pmc);
     max = (size_t) VTABLE_get_integer_keyed_int(interpreter, init, ix + 1);
+#ifdef STRUCT_DEBUG
+    PIO_eprintf(interpreter, " count = %d ix = %d max = %d\n",
+            (int)count, (int)ix, (int)max);
+#endif
+
     if (*type == enum_type_struct_ptr || *type == enum_type_struct) {
         PMC *ptr;
-        /* for now ignore count */
-        assert((int)max <= 1);
+
         /* the struct PMC is hanging off the initializer element
          * as property "_struct"
          */
@@ -144,6 +153,16 @@ char_offset_key(Parrot_Interp interpreter, PMC *pmc, PMC *key, int *type)
         assert(init && (init->vtable->base_type == enum_class_UnManagedStruct
             ||  init->vtable->base_type == enum_class_ManagedStruct));
 
+        if (max > 1) {  /* array of structs */
+
+            if (key_next(interpreter, next))
+                next = key_next(interpreter, next);
+            offs = PMC_int_val(init);
+#ifdef STRUCT_DEBUG
+            PIO_eprintf(interpreter, "offs = %d\n", (int)offs);
+#endif
+            p += offs * count;
+        }
         if (init->vtable->base_type == enum_class_UnManagedStruct) {
             /*
              * now point PMC_data of this struct to the real data
@@ -160,7 +179,9 @@ char_offset_key(Parrot_Interp interpreter, PMC *pmc, PMC *key, int *type)
         return char_offset_key(interpreter, init, next, type);
     }
     if (count >= max)
-        internal_exception(1, "Non existent array element in struct");
+        internal_exception(1,
+                "Non existent array element in struct: "
+                "count = %d max=%d", (int)count, (int)max);
     size = data_types[*type - enum_first_type].size;
     return p + count * size;
 }
