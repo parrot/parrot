@@ -259,10 +259,23 @@ Parrot_get_runtime_prefix(Interp *interpreter, STRING **prefix_str)
     if (!*runtime_prefix)
 	return NULL;
     if (!init_done) {
+        /* stat()ing the top level directory doesn't work reliably as often
+           people create it before trying to run parrot, so it's empty
+           prior to install. Check that something has actually been installed
+           before deciding that this is where we're going to find ICU data
+           files etc. Currently we install the "TODO" file. So use that.
+           FIXME - this all needs revisiting, probably when the install is
+           tidied up. Really we should *always* be using the installed prefix,
+           and *always* overriding it during the make process to the local
+           copy. Other options are heuristics, and heuristics go wrong.
+        */
+        STRING *file_we_installed
+            = string_printf(interpreter, "%s/%s", runtime_prefix, "TODO");
+
 	init_done = 1;
 	prefix = runtime_prefix;
-	s = const_string(interpreter, runtime_prefix);
-	if (!Parrot_stat_info_intval(interpreter, s, STAT_EXISTS))
+	if (!Parrot_stat_info_intval(interpreter, file_we_installed,
+                                     STAT_EXISTS))
 	    prefix = NULL;
         env = Parrot_getenv("PARROT_TEST", &free_env);
         if (env) {
@@ -270,8 +283,8 @@ Parrot_get_runtime_prefix(Interp *interpreter, STRING **prefix_str)
             if (free_env)
                 mem_sys_free(env);
         }
-        if (!prefix)
-            s = NULL;
+        if (prefix)
+            s = const_string(interpreter, runtime_prefix);
     }
     if (prefix_str)
 	*prefix_str = s;
