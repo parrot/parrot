@@ -12,6 +12,22 @@
 
 #include "parrot/parrot.h"
 
+static void resize_array ( PMC* self, INTVAL size ) {
+    size++;
+    if(self->data != NULL) {
+	if(size >= 0) {
+	    self->data = (DPOINTER*)mem_realloc(SELF->data,sizeof(PMC*)*size);
+	}
+	else {
+            internal_exception(OUT_OF_BOUNDS,
+                               "Array resize out of bounds!\n");
+	}
+    }
+    else {
+	self->data = mem_sys_allocate(sizeof(PMC*)*size);
+    }
+}
+
 pmclass PerlArray {
 
     INTVAL type () {
@@ -23,8 +39,8 @@ pmclass PerlArray {
     }
 
     void init () {
-	SELF->data = key_new(INTERP);
-	key_set_size(INTERP,SELF->data,0);
+	SELF->data = mem_sys_allocate(sizeof(PMC*)*0);
+	SELF->cache.int_val = 0;
     }
 
     void clone (PMC* dest) { 
@@ -46,7 +62,7 @@ pmclass PerlArray {
     }
 
     INTVAL get_integer () {
-	return key_size(INTERP,SELF->data);
+	return SELF->cache.int_val;
     }
 
     INTVAL get_integer_keyed (KEY * key) {
@@ -62,11 +78,9 @@ pmclass PerlArray {
         ix = kp->cache.int_val;
 
         if (ix > SELF->cache.int_val) {
-            /* XXX I don't think this will work quite yet */
-            /* key_set_size(kp,ix); */
-            internal_exception(OUT_OF_BOUNDS, "Array element out of bounds!\n");
+	    resize_array(SELF,ix);
         }
-        if (ix < 0) {
+        else if (ix < 0) {
             ix += key_size(kp);
         }
 
@@ -75,8 +89,7 @@ pmclass PerlArray {
     }
 
     FLOATVAL get_number () {
-	INTVAL size = key_size(INTERP,SELF->data);
-	return (FLOATVAL)size;
+	return (FLOATVAL)SELF->cache.int_val;
     }
 
     FLOATVAL get_number_keyed (KEY * key) {
@@ -92,11 +105,9 @@ pmclass PerlArray {
         ix = kp->cache.int_val;
 
         if (ix > SELF->cache.int_val) {
-            /* XXX I don't think this will work quite yet */
-            /* key_set_size(kp,ix); */
-            internal_exception(OUT_OF_BOUNDS, "Array element out of bounds!\n");
+	    resize_array(SELF,ix);
         }
-        if (ix < 0) {
+        else if (ix < 0) {
             ix += key_size(kp);
         }
 
@@ -121,11 +132,9 @@ pmclass PerlArray {
         ix = kp->cache.int_val;
 
         if (ix > SELF->cache.int_val) {
-            /* XXX I don't think this will work quite yet */
-            /* key_set_size(kp,ix); */
-            internal_exception(OUT_OF_BOUNDS, "Array element out of bounds!\n");
+	    resize_array(SELF,ix);
         }
-        if (ix < 0) {
+        else if (ix < 0) {
             ix += key_size(kp);
         }
 
@@ -151,11 +160,11 @@ pmclass PerlArray {
 
     void set_integer (PMC* value) {
 	INTVAL size = value->vtable->get_integer(INTERP,value);
-	key_set_size(INTERP,SELF->data,size);
+	resize_array(SELF,size);
     }
 
     void set_integer_native (INTVAL size) {
-	key_set_size(INTERP,SELF->data,size);
+	resize_array(SELF,size);
     }
 
     void set_integer_bigint (BIGINT value) {
@@ -163,7 +172,7 @@ pmclass PerlArray {
 
     void set_integer_same (PMC * value) {
 	INTVAL size = value->cache.int_val;
-	key_set_size(INTERP,SELF->data,size);
+	resize_array(SELF,size);
     }
 
     void set_integer_keyed (KEY * key, INTVAL value) {
@@ -179,11 +188,9 @@ pmclass PerlArray {
         ix = kp->cache.int_val;
 
         if (ix > SELF->cache.int_val) {
-            /* XXX I don't think this will work quite yet */
-            /* key_set_size(kp,ix); */
-            internal_exception(OUT_OF_BOUNDS, "Array element out of bounds!\n");
+	    resize_array(SELF,ix);
         }
-        if (ix < 0) {
+        else if (ix < 0) {
             ix += key_size(kp);
         }
 
@@ -193,11 +200,11 @@ pmclass PerlArray {
 
     void set_number (PMC * value) {
 	INTVAL size = (INTVAL)value->cache.num_val;
-	key_set_size(INTERP,SELF->data,size);
+	resize_array(SELF,size);
     }
 
     void set_number_native (FLOATVAL size) {
-	key_set_size(INTERP,SELF->data,(INTVAL)size);
+	resize_array(SELF,(INTVAL)size);
     }
 
     void set_number_bigfloat (BIGFLOAT value) {
@@ -205,7 +212,7 @@ pmclass PerlArray {
 
     void set_number_same (PMC * value) {
 	INTVAL size = value->cache.int_val;
-	key_set_size(INTERP,SELF->data,size);
+	resize_array(SELF,size);
     }
 
     void set_number_keyed (KEY * key, FLOATVAL value) {
@@ -221,11 +228,9 @@ pmclass PerlArray {
         ix = kp->cache.int_val;
 
         if (ix > SELF->cache.int_val) {
-            /* XXX I don't think this will work quite yet */
-            /* key_set_size(kp,ix); */
-            internal_exception(OUT_OF_BOUNDS, "Array element out of bounds!\n");
+	    resize_array(SELF,ix);
         }
-        if (ix < 0) {
+        else if (ix < 0) {
             ix += key_size(kp);
         }
 
@@ -261,11 +266,9 @@ pmclass PerlArray {
         ix = kp->cache.int_val;
 
         if (ix > SELF->cache.int_val) {
-            /* XXX I don't think this will work quite yet */
-            /* key_set_size(kp,ix); */
-            internal_exception(OUT_OF_BOUNDS, "Array element out of bounds!\n");
+	    resize_array(SELF,ix);
         }
-        if (ix < 0) {
+        else if (ix < 0) {
             ix += key_size(kp);
         }
 
