@@ -16,7 +16,7 @@ Tests the Float PMC.
 
 =cut
 
-use Parrot::Test tests => 27;
+use Parrot::Test tests => 28;
 
 my $fp_equality_macro = <<'ENDOFMACRO';
 .macro fp_eq (	J, K, L )
@@ -790,4 +790,35 @@ output_is(<< 'CODE', << 'OUTPUT', "check whether interface is done");
 CODE
 1
 0
+OUTPUT
+
+output_is(<< "CODE", << 'OUTPUT', "Abs");
+@{[ $fp_equality_macro ]}
+	new P0, .Float
+	set P0, 1.0
+	abs P0
+        eq P0, P0, OK1
+	print P0
+	print "not "
+OK1:	print "ok 1\\n"
+
+        set P0, -1.0
+        abs P0
+	.fp_eq(P0, 1.0, OK2)
+	print P0
+	print "not "
+OK2:	print "ok 2\\n"
+
+        new P1, .Float
+        set P0, -5.0
+        abs P1, P0
+        .fp_eq(P1, 5.0, OK3)
+	print P1
+	print "not "
+OK3:	print "ok 3\\n"
+	end
+CODE
+ok 1
+ok 2
+ok 3
 OUTPUT
