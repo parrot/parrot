@@ -1,11 +1,11 @@
-compile=perl prd-perl6.pl --batch --imc
+compile=perl -I../../lib prd-perl6.pl --batch --imc
 imcc=../imcc/imcc
 asm=perl ../../assemble.pl
 
 all:
 
 test:
-	perl t/*/*.t
+	perl -I../../lib t/*/*.t
 
 %.pasm: %.imc
 	$(imcc) $< $@
