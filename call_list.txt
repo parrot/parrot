@@ -5,3 +5,4 @@ f	is
 d	d
 i	p
 v	v
+p	p

@@ -26,6 +26,8 @@ my (%ret_type) = (p => "void *",
 		  v => "void",
                  );
 
+my (%other_decl) = (p => "PMC *final_destination = pmc_new(interpreter, enum_class_UnManagedStruct);");
+
 my (%ret_type_decl) = (p => "void *",
 		       i => "int",
 		       l => "long",
@@ -37,7 +39,7 @@ my (%ret_type_decl) = (p => "void *",
 		       v => "void *",
                      );
 
-my (%ret_assign) = (p => "",
+my (%ret_assign) = (p => "final_destination->data = return_data;\nPMC_REG(5) = final_destination;",
 		    i => "INT_REG(5) = return_data;",
 		    l => "INT_REG(5) = return_data;",
 		    c => "INT_REG(5) = return_data;",
@@ -117,7 +119,7 @@ while (<>) {
     }
 
     # Header
-    generate_func_header($ret, $args, (join ",", @arg), $ret_type{$ret}, $ret_type_decl{$ret}, $func_call_assign{$ret}, "",  $ret_assign{$ret});
+    generate_func_header($ret, $args, (join ",", @arg), $ret_type{$ret}, $ret_type_decl{$ret}, $func_call_assign{$ret}, $other_decl{$ret},  $ret_assign{$ret});
 
     # Body
 
