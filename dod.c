@@ -186,7 +186,7 @@ trace_active_PMCs(struct Parrot_Interp *interpreter)
                     PMC **cur_pmc = trace_buf->bufstart;
                     /* Mark the damn buffer as used! */
                     buffer_lives(trace_buf);
-                    for (i = 0; i < trace_buf->buflen / sizeof(*cur_pmc); i++) {
+                    for (i = 0; i < trace_buf->buflen / sizeof(*cur_pmc); i++){
                         if (cur_pmc[i]) {
                             last = mark_used(cur_pmc[i], last);
                         }
@@ -318,9 +318,12 @@ free_unused_buffers(struct Parrot_Interp *interpreter,
             {
                 if (pool->mem_pool) {
                     if (!(b->flags & BUFFER_COW_FLAG)) {
-                        ((struct Memory_Pool *)pool->mem_pool)->guaranteed_reclaimable += b->buflen;
+                        ((struct Memory_Pool *)
+                            pool->mem_pool)->guaranteed_reclaimable += 
+                                b->buflen;
                     }
-                    ((struct Memory_Pool *)pool->mem_pool)->possibly_reclaimable += b->buflen;
+                    ((struct Memory_Pool *)
+                        pool->mem_pool)->possibly_reclaimable += b->buflen;
                 }
                 add_free_buffer(interpreter, pool, b);
             } else if (!(b->flags & BUFFER_on_free_list_FLAG)) {
@@ -378,16 +381,23 @@ trace_system_stack(struct Parrot_Interp *interpreter, PMC *last)
         return last;
     
     for (cur_var_ptr = lo_var_ptr;
-         (ptrdiff_t)(cur_var_ptr * PARROT_STACK_DIR) < (ptrdiff_t)(hi_var_ptr * PARROT_STACK_DIR);
-         cur_var_ptr = (size_t)( (ptrdiff_t)cur_var_ptr + PARROT_STACK_DIR * PARROT_PTR_ALIGNMENT )
+        (ptrdiff_t)(cur_var_ptr * PARROT_STACK_DIR) < 
+            (ptrdiff_t)(hi_var_ptr * PARROT_STACK_DIR);
+        cur_var_ptr = (size_t)( (ptrdiff_t)cur_var_ptr + 
+            PARROT_STACK_DIR * PARROT_PTR_ALIGNMENT )
          ) {
         size_t ptr = *(size_t *)cur_var_ptr;
 
         /* Do a quick approximate range check by bit-masking */
         if((ptr & mask) == prefix){
-            if (pmc_min <= ptr && ptr < pmc_max && is_pmc_ptr(interpreter,(void *)ptr)) {
+            if (pmc_min <= ptr && ptr < pmc_max && 
+                is_pmc_ptr(interpreter,(void *)ptr))
+            {
                 last = mark_used((PMC *)ptr, last);
-            } else if (buffer_min <= ptr && ptr < buffer_max && is_buffer_ptr(interpreter,(void *)ptr)) {
+            } 
+            else if (buffer_min <= ptr && ptr < buffer_max && 
+                is_buffer_ptr(interpreter,(void *)ptr))
+            {
                 buffer_lives((Buffer *)ptr);
             }
         }

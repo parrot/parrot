@@ -126,7 +126,8 @@ key_integer(struct Parrot_Interp *interpreter, PMC *key)
     case KEY_integer_FLAG|KEY_register_FLAG:
         return interpreter->ctx.int_reg.registers[key->cache.int_val];
     case KEY_pmc_FLAG:
-        return key->cache.pmc_val->vtable->get_integer(interpreter, key->cache.pmc_val);
+        return key->cache.pmc_val->vtable->get_integer(interpreter,
+            key->cache.pmc_val);
     case KEY_pmc_FLAG|KEY_register_FLAG:
         reg = interpreter->ctx.pmc_reg.registers[key->cache.int_val];
         return reg->vtable->get_integer(interpreter, reg);
@@ -147,7 +148,8 @@ key_number(struct Parrot_Interp *interpreter, PMC *key)
     case KEY_number_FLAG|KEY_register_FLAG:
         return interpreter->ctx.num_reg.registers[key->cache.int_val];
     case KEY_pmc_FLAG:
-        return key->cache.pmc_val->vtable->get_number(interpreter, key->cache.pmc_val);
+        return key->cache.pmc_val->vtable->get_number(interpreter,
+            key->cache.pmc_val);
     case KEY_pmc_FLAG|KEY_register_FLAG:
         reg = interpreter->ctx.pmc_reg.registers[key->cache.int_val];
         return reg->vtable->get_number(interpreter, reg);
@@ -168,7 +170,8 @@ key_string(struct Parrot_Interp *interpreter, PMC *key)
     case KEY_string_FLAG|KEY_register_FLAG:
         return interpreter->ctx.string_reg.registers[key->cache.int_val];
     case KEY_pmc_FLAG:
-        return key->cache.pmc_val->vtable->get_string(interpreter, key->cache.pmc_val);
+        return key->cache.pmc_val->vtable->get_string(interpreter,
+            key->cache.pmc_val);
     case KEY_pmc_FLAG|KEY_register_FLAG:
         reg = interpreter->ctx.pmc_reg.registers[key->cache.int_val];
         return reg->vtable->get_string(interpreter, reg);

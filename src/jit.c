@@ -93,7 +93,7 @@ optimize_jit(struct Parrot_Interp *interpreter, opcode_t *cur_op,
                 branch[cur_op - code_start + cur_op[op_info->arg_count - 1]] = 
                     JIT_BRANCH_TARGET;
             }
-            /* The branch target is absolute, the address is in last argument */
+            /* The branch target is absolute, the address is in last argument*/
             if (op_info->jump & PARROT_JUMP_ADDRESS) {
                 /* Set the branch target */
                 optimizer->branch_list[cur_op - code_start] =
@@ -104,7 +104,8 @@ optimize_jit(struct Parrot_Interp *interpreter, opcode_t *cur_op,
         /* The address of the next opcode */
         if ((op_info->jump & PARROT_JUMP_ENEXT) || 
             (op_info->jump & PARROT_JUMP_GNEXT))
-            branch[cur_op + op_info->arg_count - code_start] = JIT_BRANCH_TARGET;
+            branch[cur_op + op_info->arg_count - code_start] = 
+                JIT_BRANCH_TARGET;
         if (op_info->jump & PARROT_JUMP_UNPREDICTABLE)
             optimizer->has_unpredictable_jump = 1;
         /* Move to the next opcode */
@@ -253,8 +254,9 @@ END_SECTION:cur_section->end = cur_op;
            previous one */
         for (i = 1; i < NUM_REGISTERS; i++) {
             /* If the register is not used continue to the next one */
-            if (!cur_section->int_reg_count[i] && !cur_section->float_reg_count[i])
-                continue;
+            if (!cur_section->int_reg_count[i] && 
+                !cur_section->float_reg_count[i])
+                    continue;
             /* Count the number of hardware registers that is going to be
                used in this section */
             if (cur_section->int_registers_used < INT_REGISTERS_TO_MAP)
@@ -284,7 +286,7 @@ END_SECTION:cur_section->end = cur_op;
                 }
 #if FLOAT_REGISTERS_TO_MAP
                 if (cur_section->float_reg_count[i] > 
-                  cur_section->float_reg_count[cur_section->float_reg_usage[j]])
+                 cur_section->float_reg_count[cur_section->float_reg_usage[j]])
                 {
                     /* Move all the registers from the j'th position to
                        the next one */
@@ -508,8 +510,8 @@ build_asm(struct Parrot_Interp *interpreter, opcode_t *pc,
                the same section, I admit I don't like this, and it should be
                really checking if the target section has the same registers
                mapped too. */
-            if ((jit_info.optimizer->map_branch[jit_info.cur_op - code_start] ==
-                JIT_BRANCH_SOURCE) &&
+            if ((jit_info.optimizer->map_branch[jit_info.cur_op - code_start]
+                == JIT_BRANCH_SOURCE) &&
                     (jit_info.optimizer->cur_section->branch_target !=
                         jit_info.optimizer->cur_section))
                 Parrot_jit_save_registers(&jit_info, interpreter);
