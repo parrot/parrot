@@ -842,8 +842,9 @@ sub call_closure {
     my $ret = gentmp 'pmc';
     code(<<END);
 	.arg	$argval
-	.arg	$func
-	call	__CALL_CLOSURE
+	# .arg	$func
+	# call	__CALL_CLOSURE
+	invoke $func
 	.result $ret
 END
     return $ret;
