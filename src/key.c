@@ -76,6 +76,17 @@ key_set_integer(struct Parrot_Interp *interpreter, PMC *key, INTVAL value)
     return;
 }
 
+void
+key_set_register(struct Parrot_Interp *interpreter, PMC *key, INTVAL value,
+        INTVAL flag)
+{
+    key->flags &= ~KEY_type_FLAGS;
+    key->flags |= KEY_register_FLAG | flag;
+    key->cache.int_val = value;
+
+    return;
+}
+
 
 void
 key_set_number(struct Parrot_Interp *interpreter, PMC *key, FLOATVAL value)

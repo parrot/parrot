@@ -59,7 +59,7 @@ PackFile_new(void)
         PackFile_destroy(pf);
         return NULL;
     }
-    
+
     /* Create fixup table */
     pf->fixup_table =
         mem_sys_allocate(sizeof(struct PackFile_FixupTable));
@@ -148,7 +148,7 @@ PackFile_fetch_nv(struct PackFile *pf, opcode_t *stream) {
     FLOATVAL f;
     if(pf->fetch_nv == NULL) {
 #if TRACE_PACKFILE
-        fprintf(stderr, "PackFile_fetch_nv: Native [%d bytes]..\n", 
+        fprintf(stderr, "PackFile_fetch_nv: Native [%d bytes]..\n",
                 sizeof(FLOATVAL));
 #endif
         memcpy(&f, stream, sizeof(FLOATVAL));
@@ -188,7 +188,7 @@ void PackFile_assign_transforms(struct PackFile *pf) {
             pf->header->byteorder, PARROT_BIGENDIAN);
     }
 #  endif
-#endif    
+#endif
 }
 
 /***************************************
@@ -208,7 +208,7 @@ PackFile_destroy(struct PackFile *pf)
         fprintf(stderr, "PackFile_destroy: pf == NULL!\n");
         return;
     }
-    
+
     if (pf->header) {
         mem_sys_free(pf->header);
     }
@@ -289,7 +289,7 @@ PackFile_unpack(struct Parrot_Interp *interpreter, struct PackFile *self,
     struct PackFile_Header * header = self->header;
     opcode_t *cursor;
     int i;
-    
+
     if (!self) {
         fprintf(stderr, "PackFile_unpack: self == NULL!\n");
         return 0;
@@ -306,12 +306,12 @@ PackFile_unpack(struct Parrot_Interp *interpreter, struct PackFile *self,
         if(header->wordsize == 0) {
             fprintf(stderr, "PackFile_unpack: Invalid wordsize %d\n",
                         header->wordsize);
-            return 0;    
+            return 0;
         }
     }
 
     PackFile_assign_transforms(self);
-    
+
 #if TRACE_PACKFILE
     fprintf(stderr, "wordsize: %d\n", header->wordsize);
     fprintf(stderr, "byteorder: %d\n", header->byteorder);
@@ -321,13 +321,13 @@ PackFile_unpack(struct Parrot_Interp *interpreter, struct PackFile *self,
      * FIXME
      */
     if(self->need_wordsize) {
-        fprintf(stderr, 
+        fprintf(stderr,
                 "PackFile_unpack: Unimplemented wordsize transform.\n");
-        fprintf(stderr, "File has wordsize: %d (native is %d)\n", 
+        fprintf(stderr, "File has wordsize: %d (native is %d)\n",
                 header->wordsize,  sizeof(opcode_t));
-        return 0;    
-    }    
- 
+        return 0;
+    }
+
     /*
      * Unpack and verify the magic which is stored byteorder of the file:
      */
@@ -346,7 +346,7 @@ PackFile_unpack(struct Parrot_Interp *interpreter, struct PackFile *self,
     }
 
     header->opcodetype = PackFile_fetch_op(self, cursor++);
-    
+
 #if TRACE_PACKFILE
     fprintf(stderr, "PackFile_unpack(): Magic verified.\n");
 #endif
@@ -361,7 +361,7 @@ PackFile_unpack(struct Parrot_Interp *interpreter, struct PackFile *self,
         return 0;
     }
 
-    if (!PackFile_FixupTable_unpack(self->fixup_table, cursor, 
+    if (!PackFile_FixupTable_unpack(self->fixup_table, cursor,
                                     header->fixup_ss)) {
         fprintf(stderr,
                 "PackFile_unpack: Error reading fixup table segment!\n");
@@ -369,7 +369,7 @@ PackFile_unpack(struct Parrot_Interp *interpreter, struct PackFile *self,
     }
 
     /* Segment size is in bytes */
-    cursor += header->fixup_ss / sizeof(opcode_t); 
+    cursor += header->fixup_ss / sizeof(opcode_t);
 
     /*
      * Unpack the Constant Table Segment:
@@ -389,7 +389,7 @@ PackFile_unpack(struct Parrot_Interp *interpreter, struct PackFile *self,
     }
 
     /* Segment size is in bytes */
-    cursor += header->const_ss / sizeof(opcode_t); 
+    cursor += header->const_ss / sizeof(opcode_t);
 
     /*
      * Unpack the Byte Code Segment:
@@ -425,9 +425,9 @@ PackFile_unpack(struct Parrot_Interp *interpreter, struct PackFile *self,
                 fprintf(stderr, "op[%u]->[%u]\n", *(cursor-1),
                         self->byte_code[i]);
 #endif
-            }    
+            }
         }
-        
+
     }
 
     return ((size_t)(cursor - packed) * sizeof(opcode_t)) == packed_size;
@@ -684,7 +684,7 @@ PackFile_Constant_destroy(struct PackFile_Constant *self)
 
 =item pack_size
 
-Determine the size of the buffer needed in order to pack the PackFile 
+Determine the size of the buffer needed in order to pack the PackFile
 Constant into a contiguous region of memory.
 
 =cut
@@ -782,7 +782,7 @@ PackFile_Constant_unpack(struct Parrot_Interp *interpreter,
 
     type = PackFile_fetch_op(pf, cursor++);
     size = PackFile_fetch_op(pf, cursor++);
-    
+
 #if TRACE_PACKFILE
     printf("PackFile_Constant_unpack(): Type is %ld ('%c')...\n", type,
            (char)type);
@@ -798,7 +798,7 @@ PackFile_Constant_unpack(struct Parrot_Interp *interpreter,
         break;
 
     case PFC_STRING:
-        rc = PackFile_Constant_unpack_string(interpreter, pf, self, 
+        rc = PackFile_Constant_unpack_string(interpreter, pf, self,
                                              cursor, size);
         break;
 
@@ -832,7 +832,7 @@ Returns one (1) if everything is OK, else zero (0).
 ***************************************/
 
 INTVAL
-PackFile_Constant_unpack_number(struct PackFile * pf, 
+PackFile_Constant_unpack_number(struct PackFile * pf,
                                 struct PackFile_Constant *self,
                                 opcode_t *packed, opcode_t packed_size)
 {
@@ -844,7 +844,7 @@ PackFile_Constant_unpack_number(struct PackFile * pf,
     } f;
 
     int i;
-*/    
+*/
     UNUSED(packed_size);
 
     if (!self) {
@@ -853,10 +853,10 @@ PackFile_Constant_unpack_number(struct PackFile * pf,
 
     cursor = packed;
 
-    /* We need to do a memcpy from the packed area to the value 
-     * because we can't guarantee that the packed area (which is 
+    /* We need to do a memcpy from the packed area to the value
+     * because we can't guarantee that the packed area (which is
      * aligned for an opcode_t) is suitably aligned for a FLOATVAL.
-     * This could be made contingent upon some preprocessor defines 
+     * This could be made contingent upon some preprocessor defines
      * determined by Configure.
      */
 #if TRACE_PACKFILE
@@ -864,7 +864,7 @@ PackFile_Constant_unpack_number(struct PackFile * pf,
             "FIXME: PackFile_Constant_unpack_number: assuming size of FLOATVAL!\n");
 #endif
     self->number = PackFile_fetch_nv(pf, (opcode_t *)cursor);
-     
+
     self->type = PFC_NUMBER;
 /*    self->number = f.value; */
 
@@ -931,7 +931,7 @@ PackFile_Constant_unpack_string(struct Parrot_Interp *interpreter,
     self->type = PFC_STRING;
 
     self->string = string_make(interpreter, cursor, size,
-                               encoding_lookup_index(encoding), 
+                               encoding_lookup_index(encoding),
                                flags | BUFFER_constant_FLAG,
                                chartype_lookup_index(type));
 
@@ -967,11 +967,11 @@ PackFile_Constant_unpack_key(struct Parrot_Interp *interpreter,
 
     UNUSED(packed_size);
 
-    if (!self) 
+    if (!self)
     {
         return 0;
     }
-    
+
     cursor = packed;
 
     components = *cursor++;
@@ -980,43 +980,38 @@ PackFile_Constant_unpack_key(struct Parrot_Interp *interpreter,
 
     while (components-- > 0) {
         if (tail) {
-            tail->data = pmc_new(interpreter, enum_class_Key);
+            tail->data = key_new(interpreter);
             tail = tail->data;
         }
         else {
-            head = tail = pmc_new(interpreter, enum_class_Key);
+            head = tail = key_new(interpreter);
         }
 
         tail->flags |= PMC_constant_FLAG;
-        
+
         switch (*cursor++) {
         case PARROT_ARG_IC:
-            tail->flags |= KEY_integer_FLAG;
-            tail->cache.int_val = *cursor++;
+            key_set_integer(interpreter, tail, *cursor++);
             break;
         case PARROT_ARG_NC:
-            tail->flags |= KEY_number_FLAG;
-            tail->cache.num_val = pf->const_table->constants[*cursor++]->number;
+            key_set_number(interpreter, tail,
+                    pf->const_table->constants[*cursor++]->number);
             break;
         case PARROT_ARG_SC:
-            tail->flags |= KEY_string_FLAG;
-            tail->cache.string_val = pf->const_table->constants[*cursor++]->string;
+            key_set_string(interpreter, tail,
+                pf->const_table->constants[*cursor++]->string);
             break;
         case PARROT_ARG_I:
-            tail->flags |= KEY_integer_FLAG|KEY_register_FLAG;
-            tail->cache.int_val = *cursor++;
+            key_set_register(interpreter, tail, *cursor++, KEY_integer_FLAG);
             break;
         case PARROT_ARG_N:
-            tail->flags |= KEY_number_FLAG|KEY_register_FLAG;
-            tail->cache.int_val = *cursor++;
+            key_set_register(interpreter, tail, *cursor++, KEY_number_FLAG);
             break;
         case PARROT_ARG_S:
-            tail->flags |= KEY_string_FLAG|KEY_register_FLAG;
-            tail->cache.int_val = *cursor++;
+            key_set_register(interpreter, tail, *cursor++, KEY_string_FLAG);
             break;
         case PARROT_ARG_P:
-            tail->flags |= KEY_pmc_FLAG|KEY_register_FLAG;
-            tail->cache.int_val = *cursor++;
+            key_set_register(interpreter, tail, *cursor++, KEY_pmc_FLAG);
             break;
         default:
             return 0;

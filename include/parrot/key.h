@@ -37,6 +37,8 @@ PMC *key_new_pmc(struct Parrot_Interp *interpreter, PMC *value);
 
 void key_set_integer(struct Parrot_Interp *interpreter, PMC *key, INTVAL value);
 void key_set_number(struct Parrot_Interp *interpreter, PMC *key, FLOATVAL value);
+void key_set_register(struct Parrot_Interp *interpreter, PMC *key, INTVAL value,
+        INTVAL flag);
 void key_set_string(struct Parrot_Interp *interpreter, PMC *key, STRING *value);
 void key_set_pmc(struct Parrot_Interp *interpreter, PMC *key, PMC *value);
 
@@ -57,7 +59,7 @@ PMC *key_mark(struct Parrot_Interp *interpreter, PMC *key, PMC *end_of_used_list
  * Local variables:
  * c-indentation-style: bsd
  * c-basic-offset: 4
- * indent-tabs-mode: nil 
+ * indent-tabs-mode: nil
  * End:
  *
  * vim: expandtab shiftwidth=4:
