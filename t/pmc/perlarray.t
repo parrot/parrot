@@ -1,6 +1,6 @@
 #! perl -w
 
-use Parrot::Test tests => 8;
+use Parrot::Test tests => 10;
 use Test::More;
 
 output_is(<<'CODE', <<'OUTPUT', "size of the array");
@@ -719,6 +719,78 @@ OK_3: print "ok 3\n"
       set I1,1
       set I0,P0[I1]
       eq I0,-15,OK_4
+      print "not "
+OK_4: print "ok 4\n"
+
+      end
+CODE
+ok 1
+ok 2
+ok 3
+ok 4
+OUTPUT
+
+output_is(<<'CODE', <<'OUTPUT', "PerlArray string access, two locations");
+      new P0, .PerlArray
+
+      set P0[0],"foo"
+      set P0[1],"bar"
+
+      set S0,P0[0]
+      eq S0,"foo",OK_1
+      print "not "
+OK_1: print "ok 1\n"
+
+      set S0,P0[1]
+      eq S0,"bar",OK_2
+      print "not "
+OK_2: print "ok 2\n"
+
+      set I1,0
+      set S0,P0[I1]
+      eq S0,"foo",OK_3
+      print "not "
+OK_3: print "ok 3\n"
+
+      set I1,1
+      set S0,P0[I1]
+      eq S0,"bar",OK_4
+      print "not "
+OK_4: print "ok 4\n"
+
+      end
+CODE
+ok 1
+ok 2
+ok 3
+ok 4
+OUTPUT
+
+output_is(<<'CODE', <<'OUTPUT', "PerlArray numeric access, two locations");
+      new P0, .PerlArray
+
+      set P0[0],3.100000
+      set P0[1],-7.200000
+
+      set N0,P0[0]
+      eq N0,3.100000,OK_1
+      print "not "
+OK_1: print "ok 1\n"
+
+      set N0,P0[1]
+      eq N0,-7.200000,OK_2
+      print "not "
+OK_2: print "ok 2\n"
+
+      set I1,0
+      set N0,P0[I1]
+      eq N0,3.100000,OK_3
+      print "not "
+OK_3: print "ok 3\n"
+
+      set I1,1
+      set N0,P0[I1]
+      eq N0,-7.200000,OK_4
       print "not "
 OK_4: print "ok 4\n"
 
