@@ -432,7 +432,7 @@ void spill (int spilled) {
 
 	if (needs_fetch && !after_spilled) {
 
-	    sprintf(buf, "set %s, P31[%d], #FETCH", "%s", n_spilled); /*ouch*/
+	    sprintf(buf, "set %s, P31[%d] #FETCH", "%s", n_spilled); /*ouch*/
 	    emitb( mk_instruction(buf, new_symbol, NULL, NULL, NULL, IF_r1_write));
 	}
 
