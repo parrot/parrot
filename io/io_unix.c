@@ -48,8 +48,6 @@ static size_t    PIO_unix_read(theINTERP, ParrotIOLayer *layer,
                                ParrotIO *io, void *buffer, size_t len);
 static size_t    PIO_unix_write(theINTERP, ParrotIOLayer *layer,
                                 ParrotIO *io, const void *buffer, size_t len);
-static INTVAL    PIO_unix_puts(theINTERP, ParrotIOLayer *l, ParrotIO *io,
-                               const char *s);
 static PIOOFF_T  PIO_unix_seek(theINTERP, ParrotIOLayer *l, ParrotIO *io,
                                PIOOFF_T offset, INTVAL whence);
 static PIOOFF_T  PIO_unix_tell(theINTERP, ParrotIOLayer *l, ParrotIO *io);
@@ -122,6 +120,9 @@ PIO_unix_open(theINTERP, ParrotIOLayer *layer,
     INTVAL mode;
     INTVAL oflags, type;
     PIOHANDLE fd;
+
+    UNUSED(layer);
+
     type = PIO_TYPE_FILE;
     mode = DEFAULT_OPEN_MODE;
 
@@ -229,10 +230,12 @@ PIO_unix_fdopen(theINTERP, ParrotIOLayer *layer, PIOHANDLE fd, INTVAL flags)
 #  ifdef PARROT_HAS_HEADER_FCNTL
     INTVAL rflags;
 #  endif
+
+    UNUSED(layer);
+
     mode = 0;
 
     oflags = flags_to_unix(flags);
-    UNUSED(oflags)
 
         /* FIXME - Check file handle flags, validity */
 #  ifdef PARROT_HAS_HEADER_FCNTL
@@ -263,6 +266,9 @@ PIO_unix_fdopen(theINTERP, ParrotIOLayer *layer, PIOHANDLE fd, INTVAL flags)
 static INTVAL
 PIO_unix_close(theINTERP, ParrotIOLayer *layer, ParrotIO *io)
 {
+    UNUSED(interpreter);
+    UNUSED(layer);
+
     if (io->fd >= 0)
         close(io->fd);
     io->fd = -1;
@@ -317,6 +323,9 @@ PIO_unix_getblksize(PIOHANDLE fd)
 static INTVAL
 PIO_unix_flush(theINTERP, ParrotIOLayer *layer, ParrotIO *io)
 {
+    UNUSED(interpreter);
+    UNUSED(layer);
+
     return fsync(io->fd);
 }
 
@@ -397,10 +406,14 @@ PIO_unix_write(theINTERP, ParrotIOLayer *layer, ParrotIO *io,
  * Hard seek
  */
 static PIOOFF_T
-PIO_unix_seek(theINTERP, ParrotIOLayer *l, ParrotIO *io,
+PIO_unix_seek(theINTERP, ParrotIOLayer *layer, ParrotIO *io,
               PIOOFF_T offset, INTVAL whence)
 {
     PIOOFF_T pos;
+
+    UNUSED(interpreter);
+    UNUSED(layer);
+
     if ((pos = lseek(io->fd, offset, whence)) >= 0) {
         io->lpos = io->fpos;
         io->fpos = pos;
@@ -412,9 +425,13 @@ PIO_unix_seek(theINTERP, ParrotIOLayer *l, ParrotIO *io,
 
 
 static PIOOFF_T
-PIO_unix_tell(theINTERP, ParrotIOLayer *l, ParrotIO *io)
+PIO_unix_tell(theINTERP, ParrotIOLayer *layer, ParrotIO *io)
 {
     PIOOFF_T pos;
+
+    UNUSED(interpreter);
+    UNUSED(layer);
+
     pos = lseek(io->fd, (PIOOFF_T)0, SEEK_CUR);
     return pos;
 }

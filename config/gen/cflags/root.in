@@ -8,6 +8,9 @@
 src/spf_render.c -{-Wformat-nonliteral}   # noisy
 src/tsq.c        -{${optimize}}           # never optimize tsq.c!
 
+# io should be -Wunsed clean
+{^io/}              s/-Wno-unused/-Wunused/
+
 # imcc file settings
 {^imcc/}            -{-Wwrite-strings -Wcast-qual} s/-Wno-unused/-Wunused/
 imcc/instructions.c -{-Wformat-nonliteral} # noisy

@@ -158,8 +158,10 @@ void
 PIO_finish(theINTERP)
 {
     ParrotIOLayer *p, *down;
+#if 0
     ParrotIO *io;
     int i;
+#endif
 
     /* XXX is this all correct? */
 
@@ -705,6 +707,8 @@ PIO_eof(theINTERP, PMC *pmc)
 {
     ParrotIO *io = PMC_data(pmc);
 
+    UNUSED(interpreter);
+
     /* io could be null here, but rather than return a negative error
      * we just fake EOF since eof test is usually in a boolean context.
      */
@@ -727,7 +731,6 @@ PIO_puts(theINTERP, PMC *pmc, const char *s)
 INTVAL
 PIO_putps(theINTERP, PMC *pmc, STRING *s)
 {
-    INTVAL retVal;
     return PIO_write(interpreter, pmc, s->strstart, s->strlen);
 }
 
@@ -799,6 +802,8 @@ PIOHANDLE
 PIO_getfd(theINTERP, PMC *pmc)
 {
     ParrotIO *io = PMC_data(pmc);
+
+    UNUSED(interpreter);
 
     if (io) {
         return io->fd;
@@ -937,6 +942,9 @@ INTVAL
 PIO_isatty(theINTERP, PMC *pmc)
 {
     ParrotIO *io = PMC_data(pmc);
+
+    UNUSED(interpreter);
+
     if (!io)
         return 0;
 

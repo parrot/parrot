@@ -46,8 +46,6 @@ static size_t    PIO_buf_read(theINTERP, ParrotIOLayer *l,
                               ParrotIO *io, void *buffer, size_t len);
 static size_t    PIO_buf_write(theINTERP, ParrotIOLayer *l,
                                ParrotIO *io, const void *buffer, size_t len);
-static INTVAL    PIO_buf_puts(theINTERP, ParrotIOLayer *l, ParrotIO *io,
-                              const char *s);
 static PIOOFF_T  PIO_buf_seek(theINTERP, ParrotIOLayer *l, ParrotIO *io,
                               PIOOFF_T offset, INTVAL whence);
 static PIOOFF_T  PIO_buf_tell(theINTERP, ParrotIOLayer *l, ParrotIO *io);
@@ -497,8 +495,11 @@ PIO_buf_seek(theINTERP, ParrotIOLayer *l, ParrotIO *io,
 
 
 static PIOOFF_T
-PIO_buf_tell(theINTERP, ParrotIOLayer *l, ParrotIO *io)
+PIO_buf_tell(theINTERP, ParrotIOLayer *layer, ParrotIO *io)
 {
+    UNUSED(interpreter);
+    UNUSED(layer)
+
     return io->fpos;
 }
 
