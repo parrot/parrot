@@ -59,18 +59,14 @@ Spilling
 
 Optimization
 
-  At this level, many optimizations are simple, like register
-  coalescing, redundant copies, and constant expression evaluation.
-  This will wait until the compiler is fully featured and well
-  designed and works well enough as the backend compiler for languages
-  targetting Parrot.
-
+  We break the instructions into a directed graph of basic blocks.
+  The plan is to translate to SSA form to make optimizations easier.
 
 Why C and Bison?
 
   Until Perl6 compiles itself and is fast, a Bison parser is
 the easiest to maintain. An additional, important benefit, is
-C-based LALR parsers are pretty darn fast. Currently assembling
+C-based parsers are pretty darn fast. Currently assembling
 Parrot on the fly is still relatively slow, however this is
 steadily improving.
 
