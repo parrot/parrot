@@ -32,10 +32,11 @@ string parsing/generating and basic mathematical operations.
 complex_parse_string (Parrot_Interp interp,
         FLOATVAL *re, FLOATVAL *im, STRING *value)>
 
-Parses the string in C<value> to produce a complex number, represented by the real
-(C<*re>) and imaginary (C<*im>) parts. Raises an exception if it cannot understand
-the string.
-The string should be of the form C<a+bi> with optional spaces around C<+> and before C<i>. You can also use C<j> instead of C<i>.
+Parses the string in C<value> to produce a complex number, represented
+by the real (C<*re>) and imaginary (C<*im>) parts. Raises an exception
+if it cannot understand the string.  The string should be of the form
+C<a+bi> with optional spaces around C<+> and before C<i>. You can also
+use C<j> instead of C<i>.
 
 =cut
 
@@ -192,6 +193,55 @@ complex_locate_keyed_num(Parrot_Interp interp, PMC* self, STRING *key) {
 }
 
 pmclass Complex {
+
+/*
+
+=item C<PMC* new_extended()>
+
+Create a new complex PMC with passed arguments according to pdd03.
+
+=cut
+
+*/
+
+    PMC* new_extended() {
+        PMC *res = pmc_new(interpreter, enum_class_Complex);
+        FLOATVAL re = 0.0, im = 0.0;
+        int argcI = REG_INT(1);
+        int argcS = REG_INT(2);
+        int argcP = REG_INT(3);
+        int argcN = REG_INT(4);
+        /*
+         * we can only allow 0..2 arguments of one kind. For
+         * mixed (e.g. N,P) args the order of arguments isn't fixed
+         */
+        if (argcP) {
+            re = VTABLE_get_number(INTERP, REG_PMC(5));
+            if (argcP == 2)
+                im = VTABLE_get_number(INTERP, REG_PMC(6));
+            /*
+             * TODO throw exception if argument mismatch
+             */
+        }
+        else if (argcN) {
+            re = REG_NUM(5);
+            if (argcN == 2)
+                im = REG_NUM(6);
+        }
+        else if (argcI) {
+            re = REG_INT(5);
+            if (argcI == 2)
+                im = REG_INT(6);
+        }
+        else if (argcS == 1) {
+            complex_parse_string(INTERP, &RE(res), &IM(res), REG_STR(5));
+            return res;
+        }
+        RE(res) = re;
+        IM(res) = im;
+        return res;
+    }
+
 /*
 
 =item C<void* invoke(void* next)>

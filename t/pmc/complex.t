@@ -16,7 +16,7 @@ Tests the Complex PMC.
 
 =cut
 
-use Parrot::Test tests => 12;
+use Parrot::Test tests => 16;
 use Test::More;
 
 my $fp_equality_macro = <<'ENDOFMACRO';
@@ -549,3 +549,62 @@ CODE
 0
 OUTPUT
 
+output_is(<< 'CODE', << 'OUTPUT', "new_extended, PASM, I");
+    set I0, 1
+    set I1, 2
+    set I2, 0
+    set I3, 0
+    set I4, 0
+    set I5, 10
+    set I6, 20
+    getclass P2, "Complex"
+    new_extended P1
+    print P1
+    print "\n"
+    end
+CODE
+10+20i
+OUTPUT
+
+output_is(<< 'CODE', << 'OUTPUT', "new_extended, PIR, N");
+##PIR##
+.sub main
+    $P0 = getclass "Complex"
+    $P1 = $P0."new_extended"(2.0, 3.0)
+    print $P1
+    print "\n"
+    end
+.end
+CODE
+2+3i
+OUTPUT
+
+output_is(<< 'CODE', << 'OUTPUT', "new_extended, PIR, P");
+##PIR##
+.sub main
+    $P0 = getclass "Complex"
+    $P1 = new Float
+    $P1 = 2.0
+    $P2 = new Float
+    $P2 = 3.0
+    $P1 = $P0."new_extended"($P1, $P2)
+    print $P1
+    print "\n"
+    end
+.end
+CODE
+2+3i
+OUTPUT
+
+output_is(<< 'CODE', << 'OUTPUT', "new_extended, PIR, S");
+##PIR##
+.sub main
+    $P0 = getclass "Complex"
+    $P1 = $P0."new_extended"("2 + 3i")
+    print $P1
+    print "\n"
+    end
+.end
+CODE
+2+3i
+OUTPUT
