@@ -29,22 +29,41 @@ sub import {
 # redirections ( tested on Linux and Win2k )
 sub _run_command {
   my( $command, %redir ) = @_;
-  my( $redir_string ) = '';
-
-  while( my @dup = each %redir ) {
-    my( $from, $to ) = @dup;
-    if( $to eq 'STDERR' ) { $to = "q{>&STDERR}" }
-    elsif( $to eq 'STDOUT' ) { $to = "q{>&STDOUT}" }
-    elsif( $to eq '/dev/null' ) { $to = ( $^O eq 'MSWin32' ) ?
-                                      'q{> NUL:}' : "q{> $to}" }
-    else { $to = "q{> $to}" }
-
-    $redir_string .= "open $from, $to;"
+  
+  foreach (keys %redir) {
+    /^STD(OUT|ERR)$/ or die "I don't know how to redirect '$_' yet! ";
+  }
+  foreach (values %redir) {
+    $_ = 'NUL:' if $^O eq 'MSWin32' and $_ eq '/dev/null';
   }
 
-  system "$^X -e \"$redir_string;system q{$command};exit (\$?>>8)\"";
+  my $out = $redir{'STDOUT'} || '';
+  my $err = $redir{'STDERR'} || '';
+
+  if ( $out and $err and $out eq $err ) {
+    $err = "&STDOUT";
+  }
+
+  local *OLDOUT if $out;
+  local *OLDERR if $err;
+
+  # Save the old filehandles; we must not let them get closed.
+  open  OLDOUT, ">&STDOUT" or die "Can't save     stdout" if $out;
+  open  OLDERR, ">&STDERR" or die "Can't save     stderr" if $err;
+
+  open  STDOUT, ">$out"    or die "Can't redirect stdout" if $out;
+  open  STDERR, ">$err"    or die "Can't redirect stderr" if $err;
+
+  system $command;
   my $exit_code = $? >> 8;
-  $Builder->diag("'$command' failed with exit code $exit_code") if $exit_code;
+
+  close STDOUT             or die "Can't close    stdout" if $out;
+  close STDERR             or die "Can't close    stderr" if $err;
+                                                                 
+  open  STDOUT, ">&OLDOUT" or die "Can't restore  stdout" if $out;
+  open  STDERR, ">&OLDERR" or die "Can't restore  stderr" if $err;
+
+  return $exit_code;
 }
 
 
@@ -83,9 +102,11 @@ sub generate_pbc_for {
       print ASSEMBLY $assembly;
       close ASSEMBLY;
       unless($ENV{IMCC}) {
-	  _run_command(
-	      "$PConfig{perl} ${directory}assemble.pl $as_f --output $by_f" );
-	  }
+        my $cmd = "$PConfig{perl} ${directory}assemble.pl $as_f --output $by_f";
+        my $exit_code = _run_command($cmd);
+        $Builder->diag("'$cmd' failed with exit code $exit_code") if $exit_code;
+      }
+
   }
 }
 
@@ -132,24 +153,28 @@ sub generate_functions {
 	my $out_f = per_test('.out',$count);
 	$TEST_PROG_ARGS = $ENV{TEST_PROG_ARGS} || '';
 	$pbc_generator->( $assembly, $directory, $count );
+        my $cmd;
 	if (($imcc = $ENV{IMCC})) {
 	    my $as_f = per_test('.pasm',$count);
 
 	    if ($as_f =~ /native_pbc/) {
 		$as_f = per_test('.pbc',$count);
 	    }
-	    _run_command( "$imcc ${TEST_PROG_ARGS} $as_f",
-	    'STDOUT' => $out_f, 'STDERR' => $out_f);
+	    $cmd = "$imcc ${TEST_PROG_ARGS} $as_f";
 	}
 	else {
 
 	    my $by_f = per_test('.pbc',$count);
 
-	    _run_command( "${directory}$PConfig{test_prog} ${TEST_PROG_ARGS} $by_f", 'STDOUT' => $out_f, 'STDERR' => $out_f);
+            $cmd = "${directory}$PConfig{test_prog} ${TEST_PROG_ARGS} $by_f";
 	}
+        my $exit_code = _run_command($cmd, STDOUT => $out_f, STDERR => $out_f);
+
 
 	my $meth = $Test_Map{$func};
 	my $pass = $Builder->$meth( slurp_file($out_f), $output, $desc );
+	$Builder->diag("'$cmd' failed with exit code $exit_code")
+	  if $exit_code and not $pass;
 
 	unless($ENV{POSTMORTEM}) {
 	    unlink $out_f;
@@ -189,8 +214,17 @@ sub generate_functions {
       my $libparrot = $PConfig{blib_lib_libparrot_a};
       $libparrot =~ s/\$\(A\)/$PConfig{a}/;
 
-      _run_command("$PConfig{cc} $PConfig{ccflags} -I./include -c $PConfig{cc_o_out}$obj_f $source_f", 'STDOUT' => $build_f, 'STDERR' => $build_f);
-      _run_command("$PConfig{link} $PConfig{linkflags} $PConfig{ld_debug} $obj_f $PConfig{ld_out}$exe_f $libparrot $PConfig{libs}", 'STDOUT' => $build_f, 'STDERR' => $build_f);
+      my ($cmd, $exit_code);
+      $cmd = "$PConfig{cc} $PConfig{ccflags} -I./include -c " .
+             "$PConfig{cc_o_out}$obj_f $source_f";
+      $exit_code = _run_command($cmd, 'STDOUT' => $build_f, 'STDERR' => $build_f);
+      $Builder->diag("'$cmd' failed with exit code $exit_code") if $exit_code;
+      
+      $cmd = "$PConfig{link} $PConfig{linkflags} $PConfig{ld_debug} $obj_f " .
+             "$PConfig{ld_out}$exe_f $libparrot $PConfig{libs}";
+      $exit_code = _run_command($cmd, 'STDOUT' => $build_f, 'STDERR' => $build_f);
+      $Builder->diag("'$cmd' failed with exit code $exit_code") if $exit_code;
+      
 
       if (! -e $exe_f) {
 	$Builder->diag("Failed to build '$exe_f': " . slurp_file($build_f));
@@ -198,10 +232,13 @@ sub generate_functions {
 	return 0;
       }
 
-      _run_command(".$PConfig{slash}$exe_f", 'STDOUT' => $out_f, 'STDERR' => $out_f);
+      $cmd       = ".$PConfig{slash}$exe_f";
+      $exit_code = _run_command($cmd, 'STDOUT' => $out_f, 'STDERR' => $out_f);
 
       my $meth = $C_Test_Map{$func};
       my $pass = $Builder->$meth( slurp_file($out_f), $output, $desc );
+      $Builder->diag("'$cmd' failed with exit code $exit_code")
+        if $exit_code and not $pass;
 
       unless($ENV{POSTMORTEM}) {
         unlink $out_f;
