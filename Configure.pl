@@ -54,7 +54,7 @@ First, I'm gonna check the manifest, to make sure you got a
 complete Parrot kit.
 END
 
-check_manifest();
+#check_manifest();
 
 #Some versions don't seem to have ivtype or nvtype--provide 
 #defaults for them.

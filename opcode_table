@@ -65,31 +65,31 @@ concat_s	2	S S
 
 # Comparators (TODO: String comparators)
 
-eq_i_ic	4	I I D D
-eq_ic_ic	4	I i D D
-ne_i_ic	4	I I D D
-ne_ic_ic	4	I i D D
-lt_i_ic	4	I I D D
-lt_ic_ic	4	I i D D
-le_i_ic	4	I I D D
-le_ic_ic	4	I i D D
-gt_i_ic	4	I I D D
-gt_ic_ic	4	I i D D
-ge_i_ic	4	I I D D
-ge_ic_ic	4	I i D D
+eq_i_ic	3	I I D
+eq_ic_ic	3	I i D
+ne_i_ic	3	I I D
+ne_ic_ic	3	I i D
+lt_i_ic	3	I I D
+lt_ic_ic	3	I i D
+le_i_ic	3	I I D
+le_ic_ic	3	I i D
+gt_i_ic	3	I I D
+gt_ic_ic	3	I i D
+ge_i_ic	3	I I D
+ge_ic_ic	3	I i D 
 
-eq_n_ic	4	N N D D
-eq_nc_ic	4	N n D D
-ne_n_ic	4	N N D D
-ne_nc_ic	4	N n D D
-lt_n_ic	4	N N D D
-lt_nc_ic	4	N n D D
-le_n_ic	4	N N D D
-le_nc_ic	4	N n D D
-gt_n_ic	4	N N D D
-gt_nc_ic	4	N n D D
-ge_n_ic	4	N N D D
-ge_nc_ic	4	N n D D
+eq_n_ic	3	N N D
+eq_nc_ic	3	N n D
+ne_n_ic	3	N N D
+ne_nc_ic	3	N n D
+lt_n_ic	3	N N D
+lt_nc_ic	3	N n D
+le_n_ic	3	N N D
+le_nc_ic	3	N n D
+gt_n_ic	3 	N N D
+gt_nc_ic	3	N n D
+ge_n_ic	3	N N D 
+ge_nc_ic	3	N n D
 
 # Flow control
 

@@ -162,9 +162,17 @@ sub emit_manual_header {
     my $line = shift;
     my ($name) = $line =~ /MANUAL_OP\s+(\w+)/;
     
+    my $psize=0;
+    foreach (@{$opcodes{$name}{TYPES}}) {
+       $psize+=$psize{$_};
+    }
+    my $return_offset = $psize + 1;
+
+    $opcode{$name}{RETURN_OFFSET} = 1 + $psize;
+    
     print OUTPUT ("opcode_t *$opcodes{$name}{FUNC}".
 		  "(opcode_t cur_opcode[], struct Parrot_Interp *interpreter) {\n");
-    print OUTPUT "  IV return_offset = 1;\n";
+    print OUTPUT "  IV return_offset = $return_offset;\n";
     return($name, "  return cur_opcode + return_offset;\n}\n");
 }
 

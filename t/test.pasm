@@ -2,8 +2,9 @@
         set_i_ic I2, 0
         set_i_ic I3, 1
         set_i_ic I4, 10000000
-REDO:   eq_i_ic I2, I4, DONE, NEXT
-NEXT:   add_i I2, I2, I3
+	print_i I4
+REDO:   eq_i_ic I2, I4, DONE
+        add_i I2, I2, I3
         branch_ic REDO
 DONE:   time_i I5
         print_i I1
