@@ -1,0 +1,75 @@
+O = ${o}
+RM_F = ${rm_f}
+
+INC=../include/parrot
+
+H_FILES = $(INC)/parrot.h
+
+O_FILES = perlint$(O) perlstring$(O) perlnum$(O)
+
+#DO NOT ADD C COMPILER FLAGS HERE
+#Add them in Configure.pl--look for the
+#comment 'ADD C COMPILER FLAGS HERE'
+CFLAGS = ${ccflags} ${cc_debug} -I../include
+
+C_LIBS = ${libs}
+
+CC = ${cc}
+LD = ${ld}
+PERL = ${perl}
+
+.c$(O):
+	$(CC) $(CFLAGS) ${ld_out}$@ -c $<
+
+all : perlint$(O) perlnum$(O) perlstring$(O)
+
+perlint.c: perlint.pmc 
+	$(PERL) pmc2c.pl perlint.pmc
+
+perlint$(O): $(H_FILES)
+
+perlnum.c: perlnum.pmc 
+	$(PERL) pmc2c.pl perlnum.pmc
+
+perlnum$(O): $(H_FILES)
+
+perlstring.c: perlstring.pmc 
+	$(PERL) pmc2c.pl perlstring.pmc
+
+perlstring$(O): $(H_FILES)
+
+interpreter$(O): interpreter.c $(H_FILES)
+
+memory$(O): $(H_FILES)
+
+packfile$(O): $(H_FILES)
+
+parrot$(O): $(H_FILES)
+
+register$(O): $(H_FILES)
+
+stacks$(O): $(H_FILES)
+
+core_ops$(O): $(H_FILES) core_ops.c
+
+core_ops.c $(INC)/oplib/core_ops.h: core.ops vtable.ops ops2c.pl
+	$(PERL) ops2c.pl core.ops vtable.ops
+
+vtable.ops: make_vtable_ops.pl
+	$(PERL) make_vtable_ops.pl > vtable.ops
+
+$(INC)/config.h: Configure.pl config_h.in
+	$(PERL) Configure.pl
+
+$(INC)/vtable.h: vtable.tbl vtable_h.pl
+	$(PERL) vtable_h.pl
+
+clean:
+	$(RM_F) *$(O) *$(O)
+
+distclean:
+	perl -MExtUtils::Manifest=filecheck -le '$$ExtUtils::Manifest::Quiet=1;unlink $$_ for filecheck()'
+
+update:
+	cvs -q update -dP
+
