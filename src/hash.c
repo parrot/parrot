@@ -661,17 +661,18 @@ hash_clone(struct Parrot_Interp *interp, Hash *hash)
             void *key = b->key;
             void *valtmp;
             switch (hash->entry_type) {
-            case enum_hash_undef:
-            case enum_hash_int:
-            case enum_hash_num: /* TODO use value_size */
+            case enum_type_undef:
+            case enum_type_ptr:
+            case enum_type_INTVAL:
+            /* case enum_type_FLOATVAL:  TODO use value_size */
                 valtmp = b->value;
                 break;
 
-            case enum_hash_string:
+            case enum_type_STRING:
                 valtmp = string_copy(interp, b->value);
                 break;
 
-            case enum_hash_pmc:
+            case enum_type_PMC:
                 valtmp = pmc_new_noinit(interp,
                     ((PMC*)b->value)->vtable->base_type);
                 VTABLE_clone(interp, (PMC*)b->value, valtmp);

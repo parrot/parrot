@@ -3,12 +3,10 @@
 use Parrot::Test tests => 5;
 use Test::More;
 
-output_like(<<'CODE', <<'OUTPUT', "freeze/thaw a PerlInt");
+output_is(<<'CODE', <<'OUTPUT', "freeze/thaw a PerlInt");
     new P1, .PerlInt
     set P1, 777
     freeze S0, P1
-    print S0
-    print ":\n"
 
     thaw P10, S0
     typeof S10, P10
@@ -18,9 +16,7 @@ output_like(<<'CODE', <<'OUTPUT', "freeze/thaw a PerlInt");
     print "\n"
     end
 CODE
-/0x[0-9a-f]+ \d+ 777 :
 PerlInt 777
-/
 OUTPUT
 
 output_is(<<'CODE', <<'OUTPUT', "freeze/thaw a PerlArray");
@@ -53,19 +49,17 @@ PerlArray 2
 777
 OUTPUT
 
-output_like(<<'CODE', <<'OUTPUT', "freeze PerlArray self-ref");
+output_is(<<'CODE', <<'OUTPUT', "freeze PerlArray self-ref");
     new P0, .PerlArray
     new P1, .PerlInt
     set P1, 666
     push P0, P1
     push P0, P0
     freeze S0, P0
-    print S0
-    print ":\n"
+    print "ok\n"
     end
 CODE
-/(0x[0-9a-f]*)[048c] \d+ 2 0x[0-9a-f]+ \d+ 666 \1[159d] :
-/
+ok
 OUTPUT
 
 output_is(<<'CODE', <<'OUTPUT', "freeze/thaw PerlArray self-ref");

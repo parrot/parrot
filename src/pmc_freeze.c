@@ -202,8 +202,10 @@ shift_opcode_pmc(Parrot_Interp interpreter, IMAGE_IO *io)
  * custom key_hash and compare functions
  */
 static size_t
-key_hash_int(Interp *interpreter, void *value)
+key_hash_int(Interp *interp, Hash *hash, void *value)
 {
+    UNUSED(interp);
+    UNUSED(hash);
     return (size_t) value;
 }
 
@@ -296,9 +298,8 @@ todo_list_init(Parrot_Interp interpreter, visit_info *info)
     /* we must use PMCs here, so that they get marked properly */
     info->todo = pmc_new(interpreter, enum_class_Array);
     info->seen = pmc_new_noinit(interpreter, enum_class_PerlHash);
-    hash = new_hash_x(interpreter, enum_type_INTVAL, 0, Hash_key_type_int, int_compare, key_hash_int,
-            (hash_mark_key_fn) NULL);
-    hash->entry_type = enum_type_int;
+    hash = new_hash_x(interpreter, enum_type_ptr, 0, Hash_key_type_int,
+            int_compare, key_hash_int, (hash_mark_key_fn) NULL);
     PObj_custom_mark_SET(info->seen);
     PMC_ptr1v(info->seen) = hash;
 
