@@ -20,7 +20,7 @@ use Parrot::Configure::Step ':auto';
 
 $description="Determining if your C compiler is actually gcc...";
 
-@args=qw(miniparrot);
+@args=qw(miniparrot verbose);
 
 sub runstep {
   my ($miniparrot) = @_;
@@ -41,7 +41,7 @@ sub runstep {
   my $major = $gnuc{__GNUC__};
   my $minor = $gnuc{__GNUC_MINOR__};
   unless (defined $major) {
-    print " (no) ";
+    print " (no) " if $_[1];
     return;
   }
   if ($major =~ tr/0-9//c) {
@@ -54,7 +54,7 @@ sub runstep {
     $gccversion = $major;
     $gccversion .= ".$minor" if defined $minor;
   }
-  print " (yep: $gccversion )";
+  print " (yep: $gccversion )" if $_[1];
 
   if ($gccversion) {
     # If using gcc, crank up its warnings as much as possible and make it

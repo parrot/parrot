@@ -20,7 +20,7 @@ use Parrot::Configure::Step ':auto';
 
 $description="Verifying that the compiler supports function pointer casts...";
 
-@args=();
+@args=qw(verbose);
 
 sub runstep {
   my $jitcapable=Configure::Data->get('jitcapable');
@@ -45,7 +45,7 @@ END
       exit(-1);
     }
     cc_clean();
-    print " (yes) ";
+    print " (yes) " if $_[0];
   }
 }
 

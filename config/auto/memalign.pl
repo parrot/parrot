@@ -19,14 +19,14 @@ use Parrot::Configure::Step ':auto';
 
 $description="Determining if your C library supports memalign...";
 
-@args=qw(miniparrot);
+@args=qw(miniparrot verbose);
 
 sub runstep {
-    my ($miniparrot) = @_;
+    my ($miniparrot, $verbose) = @_;
 
     if ($miniparrot) {
         Configure::Data->set(memalign => '');
-	print "(skipped) ";
+	print "(skipped) " if $verbose;
 	return;
     }
 
@@ -60,7 +60,7 @@ sub runstep {
     my $f = $test2 ? 'posix_memalign' :
             $test  ? 'memalign'       : '';
     Configure::Data->set( memalign => $f );
-    print $test ? " (Yep:$f) " : " (no) "
+    print($test ? " (Yep:$f) " : " (no) ") if $verbose;
 }
 
 1;

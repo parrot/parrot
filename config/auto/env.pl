@@ -19,6 +19,7 @@ use vars qw($description @args);
 use Parrot::Configure::Step ':auto';
 
 $description="Determining if your C library has setenv / unsetenv...";
+@args=qw(verbose);
 
 sub runstep {
     my ($setenv, $unsetenv) = (0, 0);
@@ -48,16 +49,16 @@ sub runstep {
     );
 
     if ($setenv && $unsetenv) {
-	print " (both) ";
+	print " (both) " if $_[0];
     }
     elsif ($setenv) {
-	print " (setenv) ";
+	print " (setenv) " if $_[0];
     }
     elsif ($unsetenv) {
-	print " (unsetenv) ";
+	print " (unsetenv) " if $_[0];
     }
     else {
-	print " (no) ";
+	print " (no) " if $_[0];
     }
 }
 

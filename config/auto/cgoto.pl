@@ -20,11 +20,11 @@ use Parrot::Configure::Step ':auto';
 
 $description="Determining if your compiler supports computed goto...";
 
-@args=qw(cgoto miniparrot);
+@args=qw(cgoto miniparrot verbose);
 
 sub runstep {
   my $test;
-  my ($cgoto, $miniparrot) = @_;
+  my ($cgoto, $miniparrot, $verbose) = @_;
 
   $cgoto = 0 if (defined $miniparrot);
 
@@ -54,10 +54,10 @@ EOF
                                 $(INC)/oplib/core_ops_cgp.h $(OPS)/core_ops_cgp.c',
       cg_flag       => '-DHAVE_COMPUTED_GOTO'
     );
-    print " (yes) ";
+    print " (yes) " if $verbose;
   }
   else {
-    print " (no) ";
+    print " (no) " if $verbose;
     Configure::Data->set(
       cg_h    => '',
       cg_c    => '',

@@ -31,6 +31,11 @@ Prints out the version number of Configure.pl and exits.
 Tells Configure.pl to output extra information about the configuration
 data it is setting.
 
+=item C<--verbose=2>
+
+Tells Configure.pl to output information about i<every> setting added or 
+changed.
+
 =item C<--nomanicheck>
 
 Tells Configure.pl not to run the MANIFEST check.
@@ -444,6 +449,7 @@ General Options:
    --help               Show this text
    --version            Show version information
    --verbose            Output extra information
+   --verbose=2          Output every setting change
    --nomanicheck        Don't check the MANIFEST
    --maintainer         Create imcc's parser and lexer files. Needs a working
                         parser and lexer.

@@ -18,14 +18,12 @@ use strict;
 use vars qw($description @args);
 use Parrot::Configure::Step qw(copy_if_diff);
 
-print "\n";
-
 $description = "Determining architecture, OS and JIT capability...";
 
-@args=qw(jitcapable miniparrot execcapable);
+@args=qw(jitcapable miniparrot execcapable verbose);
 
 sub runstep {
-    my ($set_jitcapable, $miniparrot, $set_execcapable) = @_;
+    my ($set_jitcapable, $miniparrot, $set_execcapable, $verbose) = @_;
 
     if (defined $miniparrot) {
       Configure::Data->set(
@@ -90,7 +88,7 @@ sub runstep {
   my $jitcapable               =  0;
   my $execcapable              =  0;
 
-print "-e \"jit/$cpuarch/core.jit\" = ", -e "jit/$cpuarch/core.jit" ? 'yes' : 'no', "\n";
+print("-e \"jit/$cpuarch/core.jit\" = ", -e "jit/$cpuarch/core.jit" ? 'yes' : 'no', "\n") if $verbose;
 
   if (-e "jit/$cpuarch/core.jit") {
     $jitcapable = 1;
@@ -155,21 +153,21 @@ print "-e \"jit/$cpuarch/core.jit\" = ", -e "jit/$cpuarch/core.jit" ? 'yes' : 'n
 
     # test for executable malloced memory
     if (-e "config/auto/jit/test_exec_$osname.in") {
-      print " (has_exec_protect ";
+      print " (has_exec_protect " if $verbose;
       cc_gen("config/auto/jit/test_exec_$osname.in");
       eval { cc_build(); };
       if ($@) {
-	print " $@) ";
+	print " $@) " if $verbose;
       }
       else {
 	if (cc_run(0) !~ /ok/ && cc_run(1) =~ /ok/) {
 	  Configure::Data->set(
 	    has_exec_protect => 1
 	  );
-	  print "yes) ";
+	  print "yes) " if $verbose;
 	}
 	else {
-	  print "no) ";
+	  print "no) " if $verbose;
 	}
       }
       cc_clean();

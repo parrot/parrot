@@ -132,7 +132,7 @@ sub runstep {
     @c{@_};
   };
 
-  *set=$verbose
+  *set=defined($verbose) && $verbose == 2
     ? sub {
       shift;
       return unless (defined ($_[0]));

@@ -20,7 +20,7 @@ use Parrot::Configure::Step qw(copy_if_diff);
 
 $description="Moving platform files into place...";
 
-@args=qw(miniparrot);
+@args=qw(miniparrot verbose);
 
 sub runstep {
   my $platform=lc $^O;
@@ -40,7 +40,7 @@ sub runstep {
 
   open PLATFORM_H, "> include/parrot/platform.h"
       or die "Can't open include/parrot/platform.h: $!";
-  print " platform='$platform' ";
+  print " platform='$platform' " if $_[1];
 
   print PLATFORM_H <<HERE;
 #if !defined(PARROT_PLATFORM_H_GUARD)

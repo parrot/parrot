@@ -19,6 +19,8 @@ use Parrot::Configure::Step ':auto';
 
 $description="Determining if your C library has a working S_ISREG...";
 
+@args=qw(verbose);
+
 sub runstep {
     my $test = 0;
 
@@ -32,7 +34,7 @@ sub runstep {
     Configure::Data->set(
 	isreg  => $test
     );
-    print $test ? " (Yep) " : " (no) "
+    print($test ? " (Yep) " : " (no) ") if $_[0];
 }
 
 1;

@@ -17,15 +17,15 @@ package Configure::Step;
 use strict;
 use vars qw($description @args);
 
-$description="Configuring ICU ...";
+$description="Configuring ICU if requested...";
 
-@args=qw(buildicu);
+@args=qw(buildicu verbose);
 
 sub runstep {
-  my ($buildicu) = @_;
+  my ($buildicu, $verbose) = @_;
 
   unless ($buildicu) {
-    print " [Skipped] ";
+    print " [Skipped] " if $verbose;
     return;
   }
 

@@ -19,10 +19,10 @@ use Parrot::Configure::Step ':auto';
 
 $description = "Determining some signal stuff...";
 
-@args=qw(miniparrot);
+@args=qw(miniparrot verbose);
 
 sub runstep {
-    my ($miniparrot) = @_;
+    my ($miniparrot, $verbose) = @_;
     Configure::Data->set(
 	has___sighandler_t => undef,
 	has_sigatomic_t  => undef,
@@ -39,7 +39,7 @@ sub runstep {
 	Configure::Data->set(
 	    has___sighandler_t => 'define'
 	);
-	print " (__sighandler_t)";
+	print " (__sighandler_t)" if $verbose;
     }
     cc_clean();
 
@@ -49,7 +49,7 @@ sub runstep {
 	Configure::Data->set(
 	    has_sigaction => 'define'
 	);
-	print " (sigaction)";
+	print " (sigaction)" if $verbose;
     }
     cc_clean();
 
@@ -60,7 +60,7 @@ sub runstep {
 	    has_setitimer    => 'define',
 	    has_sig_atomic_t    => 'define'
 	);
-	print " (setitimer) ";
+	print " (setitimer) " if $verbose;
     }
     cc_clean();
 

@@ -19,11 +19,11 @@ use Parrot::Configure::Step ':auto';
 
 $description="Determining if your compiler supports inline...";
 
-@args=qw(inline);
+@args=qw(inline verbose);
 
 sub runstep {
     my $test;
-    my ($inline) = @_;
+    my ($inline, $verbose) = @_;
 
     if (defined $inline) {
 	$test = $inline;
@@ -46,10 +46,10 @@ sub runstep {
 	    cc_clean();
 	}
 	if ($test) {
-	    print " ($test) ";
+	    print " ($test) " if $verbose;
 	}
 	else {
-	    print " no ";
+	    print " no " if $verbose;
 	    $test = '';
 	}
     }

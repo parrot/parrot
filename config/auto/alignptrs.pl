@@ -19,7 +19,7 @@ use Parrot::Configure::Step ':auto';
 
 $description="Determining your minimum pointer alignment...";
 
-@args=qw(miniparrot);
+@args=qw(miniparrot verbose);
 
 sub runstep {
   my ($miniparrot) = @_;
@@ -33,7 +33,7 @@ sub runstep {
   # HP-UX 10.20/32 hangs in this test.
   # We currently don't need this configure setting,
   # so we just do not test and set some value here
-  print(" not tested (4) ");
+  print(" not tested (4) ") if $_[1];
   Configure::Data->set(ptr_alignment => 4);
   return;
 

@@ -41,13 +41,13 @@ use strict;
 use vars qw($description @args);
 use Parrot::Configure::Step ':auto';
 
-$description="Determining what allocator to use ...";
+$description="Determining what allocator to use...";
 
 # valid libc/malloc/malloc-trace/gc
-@args=qw(gc);
+@args=qw(gc verbose);
 
 sub runstep {
-  my ($gc) = @_;
+  my ($gc, $verbose) = @_;
 
   if (!defined($gc)) {
     # default is GC in resources.c
@@ -109,7 +109,7 @@ EOF
       gc_flag  => '',
     );
   }
-  print(" ($gc) ");
+  print(" ($gc) ") if $verbose;
 }
 
 1;

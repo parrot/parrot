@@ -21,7 +21,7 @@ use Parrot::Configure::Step;
 
 $description="Enabling optimization...";
 
-@args=();
+@args=qw(verbose);
 
 sub runstep {
   if (Configure::Data->get('optimize')) {
@@ -34,7 +34,7 @@ sub runstep {
                         );
   }
   else {
-    print "(none requested) ";
+    print "(none requested) " if $_[0];
   }
 }
 

@@ -81,7 +81,8 @@ sub runsteps {
 		die "No config/$_" unless -e "config/$_";
 		require "config/$_";
 		print "\n$Configure::Step::description";
-		print "\n" if $args{verbose};
+		print '.' x (70-length $Configure::Step::description);
+		print "\n" if $args{verbose} && $args{verbose} == 2;
 
         $Configure::Step::result='done';
 
@@ -90,7 +91,7 @@ sub runsteps {
 			Configure::Step::runstep(@args{@Configure::Step::args});
 		}
 
-		print "..." if $args{verbose};
+		print "..." if $args{verbose} && $args{verbose} == 2;
 		print "$Configure::Step::result." unless m{^inter/} && $args{ask};
 	}
 }

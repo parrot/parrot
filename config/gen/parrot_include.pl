@@ -18,7 +18,7 @@ use strict;
 use vars qw($description @args);
 use Parrot::Configure::Step ':gen';
 
-$description="Generating runtime/parrot/include ... ";
+$description="Generating runtime/parrot/include...";
 
 my @files = qw(
     include/parrot/chartype.h
@@ -39,7 +39,7 @@ my @files = qw(
 );
 my $destdir = 'runtime/parrot/include';
 
-@args=();
+@args=qw(verbose);
 
 sub runstep {
     # need vtable.h now
@@ -58,7 +58,7 @@ sub runstep {
 		!x
 	    ) {
 		$inc = $2;
-		print "$2 ";
+		print "$2 " if $_[0];
 		$prefix = ($4 || '');
 		$subst = ($6 || '');
 		$in_def = $1;
