@@ -145,7 +145,7 @@ mem_realloc(struct Parrot_Interp *interpreter, void *from, size_t fromsize,
 {
     size_t copysize = (fromsize > tosize ? tosize : fromsize);
     void *mem;
-    mem = Parrot_allocate(interpreter, copysize);
+    mem = Parrot_allocate(interpreter, tosize);
     if (!mem) {
         return NULL;
     }
