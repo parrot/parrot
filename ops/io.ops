@@ -40,6 +40,29 @@ inline op close(inout PMC) {
 	goto NEXT();
 }
 
+########################################
+
+=item B<fdopen>(out PMC, in INT, in STR)
+
+Create ParrotIO object as $1 as a copy of file descriptor $2.
+
+=cut
+
+inline op fdopen(out PMC, in INT, in STR) {
+  ParrotIO * io;
+  /* These char * need to go away soon */
+  const char * mode;
+  mode = string_to_cstring(interpreter, $3);
+  io = PIO_fdopen(interpreter, $2, mode);
+  if(io) {
+    $1 = new_io_pmc(interpreter, io);
+  }
+  else {
+    $1 = pmc_new(interpreter, enum_class_PerlUndef);
+  }
+  goto NEXT();
+}
+
 #########################################
 
 =item B<open>(out PMC, in STR, in STR)
@@ -51,6 +74,7 @@ Perl style mode string in $3 and create an IO object in $1.
 
 inline op open(out PMC, in STR, in STR) {
   ParrotIO * io;
+  /* These char * need to go away soon */
   const char * path, * mode;
 
   /* FIXME: potential infant mortality problem */
@@ -58,10 +82,12 @@ inline op open(out PMC, in STR, in STR) {
   mode = string_to_cstring(interpreter, $3);
 
   io = PIO_open(interpreter, path, mode);
-  if(!io) {
-    /* FIXME: Handle error */
+  if(io) {
+    $1 = new_io_pmc(interpreter, io);
   }
-  $1 = new_io_pmc(interpreter, io);
+  else {
+    $1 = pmc_new(interpreter, enum_class_PerlUndef);
+  }
   goto NEXT();
 }
 
