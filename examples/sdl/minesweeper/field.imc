@@ -230,7 +230,7 @@ Creates a new level, with the given number as initial seed for the PRNG.
     .local int height
     .local int val
     .local num mines
-    
+
     # get the attributes
     $I0 = classoffset self, 'Mines::Field'
 
@@ -1057,9 +1057,7 @@ END:
 .sub _button_clicked
     .param pmc field
 
-    time $N0
-    $N0 *= 10
-    $I0 = $N0
+    $I0 = time
     field.'newLevel'( $I0 )
     field.'draw'()
 .end
