@@ -45,7 +45,7 @@ Allocate a new empty PackFile.
 struct PackFile *
 PackFile_new(void)
 {
-    struct PackFile *pf = mem_sys_allocate((UINTVAL)sizeof(struct PackFile));
+    struct PackFile *pf = mem_sys_allocate(sizeof(struct PackFile));
 
     if (!pf) {
         fprintf(stderr, "PackFile_new: Unable to allocate!\n");
@@ -53,7 +53,7 @@ PackFile_new(void)
     }
 
     pf->header =
-        mem_sys_allocate((UINTVAL)sizeof(struct PackFile_Header));
+        mem_sys_allocate(sizeof(struct PackFile_Header));
     if(!pf->header) {
         fprintf(stderr, "PackFile_new: Unable to allocate header!\n");
         PackFile_destroy(pf);
@@ -62,7 +62,7 @@ PackFile_new(void)
     
     /* Create fixup table */
     pf->fixup_table =
-        mem_sys_allocate((UINTVAL)sizeof(struct PackFile_FixupTable));
+        mem_sys_allocate(sizeof(struct PackFile_FixupTable));
 
     if (!pf->fixup_table) {
         fprintf(stderr, "PackFile_new: Unable to allocate fixup table!\n");
@@ -73,7 +73,7 @@ PackFile_new(void)
 
     /* Create constant table */
     pf->const_table =
-        mem_sys_allocate((UINTVAL)sizeof(struct PackFile_ConstTable));
+        mem_sys_allocate(sizeof(struct PackFile_ConstTable));
 
     if (!pf->const_table) {
         fprintf(stderr, "PackFile_new: Unable to allocate constant table!\n");
