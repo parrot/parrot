@@ -8,7 +8,7 @@ package Parrot::Jit::i386Generic;
 
 use IO::File;
 
-use constant DEBUG   => 1;
+use constant DEBUG   => 0;
 
 use constant TMP_OBJ => "t.o";
 use constant TMP_AS  => "t.s";
