@@ -571,7 +571,7 @@ trace_system_stack(struct Parrot_Interp *interpreter, PMC *last)
              * destroyed due to the linked list of free headers... */
             if (pmc_min <= ptr && ptr < pmc_max &&
                     is_pmc_ptr(interpreter, (void *)ptr)) {
-                /* ...so ensure that mark_used checks PMC_on_free_list_FLAG
+                /* ...so ensure that mark_used checks PObj_on_free_list_FLAG
                  * before adding it to the next_for_GC list, to have
                  * vtable->mark() called. */
                 last = mark_used((PMC *)ptr, last);

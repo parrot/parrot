@@ -17,11 +17,11 @@
 
 #define CHANGE_TYPE(thing, type) { \
     if ((thing)->vtable == &Parrot_base_vtables[enum_class_PerlString]) { \
-	(thing)->flags &= ~(UINTVAL)PMC_is_buffer_ptr_FLAG; \
+	PObj_is_buffer_ptr_CLEAR(thing); \
     } \
     (thing)->vtable = &Parrot_base_vtables[enum_class_ ## type]; \
     if (enum_class_ ## type == enum_class_PerlString) { \
-         (thing)->flags = PMC_is_buffer_ptr_FLAG; \
+	PObj_is_buffer_ptr_SET(thing); \
     } \
 }
 

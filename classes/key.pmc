@@ -14,7 +14,7 @@
 pmclass Key {
 
     void init () {
-        SELF->flags |= PMC_custom_mark_FLAG;
+        PObj_custom_mark_SET(SELF);
     }
 
     PMC* clone() {

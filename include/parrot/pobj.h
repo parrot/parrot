@@ -137,6 +137,9 @@ typedef enum PObj {
 #define PObj_active_destroy_SET(o) PObj_flag_SET(active_destroy, o)
 #define PObj_active_destroy_CLEAR(o) PObj_flag_CLEAR(active_destroy, o)
 
+#define PObj_custom_mark_SET(o)   PObj_flag_SET(custom_mark, o)
+#define PObj_is_buffer_ptr_SET(o) PObj_flag_SET(is_buffer_ptr, o)
+
 /* some combinations */
 #define PObj_is_cowed_TESTALL(o) ((o)->flags & \
             (PObj_COW_FLAG|PObj_constant_FLAG|PObj_external_FLAG))
@@ -160,6 +163,9 @@ typedef enum PObj {
 #define PObj_is_movable_TESTALL(o) (!((o)->flags & \
         (PObj_immobile_FLAG | PObj_on_free_list_FLAG | \
          PObj_constant_FLAG | PObj_external_FLAG)))
+
+#define PObj_custom_mark_destroy_SETALL(o) ((o)->flags |= \
+        (PObj_custom_mark_FLAG | PObj_active_destroy_FLAG))
 
 /* compat macros */
 
@@ -186,7 +192,6 @@ typedef enum BUFFER_flag {
     BUFFER_bufstart_external_FLAG = PObj_bufstart_external_FLAG,
     BUFFER_strstart_FLAG = PObj_is_string_FLAG
 } BUFFER_flags;
-#endif
 
 typedef enum {
     PMC_private0_FLAG = PObj_private0_FLAG,
@@ -206,6 +211,8 @@ typedef enum {
     PMC_on_free_list_FLAG = PObj_on_free_list_FLAG,
     PMC_constant_FLAG = PObj_constant_FLAG
 } PMC_flags;
+
+#endif
 
 #endif
 

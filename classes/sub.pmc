@@ -29,7 +29,7 @@ pmclass Sub {
                             * parameter, but that's not valid.  So
                             * this is totally broken now. */
        SELF->data = new_sub(INTERP, (opcode_t*)address);
-       SELF->flags |= PMC_custom_mark_FLAG | PMC_active_destroy_FLAG;
+       PObj_custom_mark_destroy_SETALL(SELF);
    }
 
    PMC* mark (PMC *end_of_used_list) {
@@ -59,7 +59,7 @@ pmclass Sub {
 
        if (pad) {
            /* put the correct pad in place */
-           stack_push(INTERP, &INTERP->ctx.pad_stack, pad, 
+           stack_push(INTERP, &INTERP->ctx.pad_stack, pad,
                       STACK_ENTRY_PMC, STACK_CLEANUP_NULL);
        }
 
@@ -72,7 +72,7 @@ pmclass Sub {
 
    PMC* clone () {
 	PMC * ret = new_pmc_header(INTERP);
-        ret->flags |= PMC_active_destroy_FLAG;
+        PObj_custom_mark_destroy_SETALL(ret);
 	ret->vtable = &Parrot_base_vtables[enum_class_Sub];
 	ret->data = mem_sys_allocate(sizeof(struct Parrot_Sub));
 	memcpy(ret->data, SELF->data, sizeof(struct Parrot_Sub));

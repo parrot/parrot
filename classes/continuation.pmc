@@ -20,7 +20,7 @@ pmclass Continuation {
         struct Parrot_Continuation * cc;
         cc = new_continuation(interpreter, 0);
         SELF->data = cc;
-        SELF->flags |= PMC_custom_mark_FLAG | PMC_active_destroy_FLAG;
+        PObj_custom_mark_destroy_SETALL(SELF);
     }
 
     void destroy () {
@@ -60,7 +60,7 @@ pmclass Continuation {
             = mem_sys_allocate(sizeof(struct Parrot_Continuation));
         ret->vtable = &Parrot_base_vtables[enum_class_Continuation];
         ret->data = retc;
-        ret->flags |= PMC_custom_mark_FLAG | PMC_active_destroy_FLAG;
+        PObj_custom_mark_destroy_SETALL(ret);
         memcpy(retc, SELF->data, sizeof(struct Parrot_Continuation));
         /* we may have copied our stack already, so we need to re-COW
          * it */

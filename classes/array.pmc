@@ -83,7 +83,7 @@ pmclass Array {
 
     void init () {
         SELF->data = list_new(INTERP, enum_type_PMC);
-        SELF->flags |= PMC_custom_mark_FLAG;
+        PObj_custom_mark_SET(SELF);
     }
 
     /*
@@ -94,7 +94,7 @@ pmclass Array {
      */
     void init_pmc (PMC *init) {
         SELF->data = list_new_init(INTERP, enum_type_PMC, init);
-        SELF->flags |= PMC_custom_mark_FLAG;
+        PObj_custom_mark_SET(SELF);
     }
 
 
@@ -114,7 +114,7 @@ pmclass Array {
         PMC* dest;
 
 	dest = new_pmc_header(INTERP);
-        dest->flags |= PMC_custom_mark_FLAG;
+        PObj_custom_mark_SET(dest);
         dest->vtable = SELF->vtable;
         dest->data = list_clone(INTERP, (List *) SELF->data);
         return dest;

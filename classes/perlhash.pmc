@@ -33,9 +33,9 @@ pmclass PerlHash {
     void init () {
         if (undef == NULL) {
             undef = pmc_new(INTERP, enum_class_PerlUndef);
-            undef->flags |= PMC_constant_FLAG;
+            PObj_constant_SET(undef);
         }
-        SELF->flags |= PMC_custom_mark_FLAG;
+        PObj_custom_mark_SET(SELF);
         new_hash(INTERP, (HASH **)&SELF->data);
     }
 
@@ -66,7 +66,7 @@ pmclass PerlHash {
 	}
 
 	ret->vtable = &(Parrot_base_vtables[enum_class_PerlHash]);
-        ret->flags |= PMC_custom_mark_FLAG;
+        PObj_custom_mark_SET(ret);
         hash_clone(INTERP, (HASH *)SELF->data, (HASH **)&ret->data);
 	return ret;
     }

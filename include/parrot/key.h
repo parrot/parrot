@@ -16,11 +16,11 @@
 #include "parrot/parrot.h"
 
 typedef enum {
-    KEY_integer_FLAG = PMC_private0_FLAG,
-    KEY_number_FLAG = PMC_private1_FLAG,
-    KEY_string_FLAG = PMC_private2_FLAG,
-    KEY_pmc_FLAG = PMC_private3_FLAG,
-    KEY_register_FLAG = PMC_private4_FLAG,
+    KEY_integer_FLAG = PObj_private0_FLAG,
+    KEY_number_FLAG = PObj_private1_FLAG,
+    KEY_string_FLAG = PObj_private2_FLAG,
+    KEY_pmc_FLAG = PObj_private3_FLAG,
+    KEY_register_FLAG = PObj_private4_FLAG,
 
     KEY_type_FLAGS = KEY_integer_FLAG |
                      KEY_number_FLAG |

@@ -29,7 +29,7 @@ pmclass Coroutine {
                              * parameter, but that's not valid.  So
                              * this is totally broken now. */
         SELF->data = new_coroutine(INTERP, (opcode_t*)address);
-        SELF->flags |= PMC_custom_mark_FLAG | PMC_active_destroy_FLAG;
+        PObj_custom_mark_destroy_SETALL(SELF);
     }
 
     void destroy () {
@@ -83,7 +83,7 @@ pmclass Coroutine {
 
         if (pad) {
            /* put the correct pad in place */
-           stack_push(INTERP, &INTERP->ctx.pad_stack, pad, 
+           stack_push(INTERP, &INTERP->ctx.pad_stack, pad,
                       STACK_ENTRY_PMC, STACK_CLEANUP_NULL);
         }
 
@@ -95,7 +95,7 @@ pmclass Coroutine {
         PMC * ret = new_pmc_header(INTERP);
         ret->vtable = &Parrot_base_vtables[enum_class_Coroutine];
         ret->data = retc = mem_sys_allocate(sizeof(struct Parrot_Coroutine));
-        ret->flags |= PMC_custom_mark_FLAG | PMC_active_destroy_FLAG;
+        PObj_custom_mark_destroy_SETALL(ret);
         memcpy(ret->data, SELF->data, sizeof(struct Parrot_Coroutine));
         stack_mark_cow(retc->ctx.user_stack);
         stack_mark_cow(retc->ctx.control_stack);

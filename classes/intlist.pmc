@@ -28,7 +28,7 @@ pmclass IntList {
         PMC* dest;
 
         dest = pmc_new(INTERP, enum_class_IntList);
-        dest->flags |= PMC_custom_mark_FLAG;
+        PObj_custom_mark_SET(dest);
         dest->vtable = SELF->vtable;
         dest->data = intlist_clone(INTERP, (IntList *) SELF->data);
         return dest;
@@ -37,7 +37,7 @@ pmclass IntList {
     void init () {
         SELF->data = intlist_new(INTERP);
         SELF->cache.int_val = 0;
-        SELF->flags |= PMC_custom_mark_FLAG;
+        PObj_custom_mark_SET(SELF);
     }
 
     /* The end_of_used_list parameter is passed into the mark_used

@@ -16,7 +16,7 @@
 pmclass Scratchpad {
 
     void init () {
-        SELF->flags |= PMC_custom_mark_FLAG | PMC_active_destroy_FLAG;
+        PObj_custom_mark_destroy_SETALL(SELF);
         SELF->cache.int_val = 0;
     }
 

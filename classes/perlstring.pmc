@@ -17,7 +17,7 @@ pmclass PerlString extends scalar {
 
     void init () {
         SELF->data = string_make(INTERP,NULL,0,NULL,0,NULL);
-        SELF->flags = PMC_is_buffer_ptr_FLAG;
+        PObj_is_buffer_ptr_SET(SELF);
     }
 
 
@@ -29,7 +29,7 @@ pmclass PerlString extends scalar {
         PMC* dest;
         dest = pmc_new(INTERP, enum_class_PerlString);
         dest->vtable = SELF->vtable;
-	dest->flags = PMC_is_buffer_ptr_FLAG;
+        PObj_is_buffer_ptr_SET(dest);
         dest->data = string_copy(INTERP,SELF->data);
         return dest;
     }

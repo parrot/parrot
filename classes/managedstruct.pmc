@@ -17,7 +17,7 @@
 pmclass ManagedStruct {
 
     void init () {
-      SELF->flags |= PMC_active_destroy_FLAG;
+      PObj_active_destroy_SET(SELF);
     }
 
     void destroy () {
