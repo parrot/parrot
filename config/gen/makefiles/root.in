@@ -71,11 +71,7 @@ $(INC)/embed.h $(INC)/warnings.h $(INC)/misc.h $(INC)/debug.h
 
 ALL_H_FILES = $(GENERAL_H_FILES)
 
-CLASS_O_FILES = classes/default$(O) classes/array$(O) \
-classes/perlint$(O) classes/perlstring$(O) classes/perlnum$(O) \
-classes/perlarray$(O) classes/perlundef$(O) \
-classes/perlhash$(O) classes/parrotpointer$(O) classes/parrotsub$(O) \
-classes/parrotcoroutine$(O) classes/intqueue$(O)
+CLASS_O_FILES = ${pmc_classes_o}
 
 ENCODING_O_FILES = encodings/singlebyte$(O) encodings/utf8$(O) \
 				   encodings/utf16$(O) \
