@@ -502,7 +502,7 @@ make_interpreter(INTVAL flags) {
     interpreter->op_info_table = interpreter->op_lib->op_info_table;
     
     /* In case the I/O system needs something */
-    Init_IO(interpreter);
+    PIO_init(interpreter);
     
     /* Done. Return and be done with it */
 

@@ -10,6 +10,7 @@
  *  Notes:
  *  References:
  *      Some ideas and goals from Perl5.7 and Nick Ing-Simmons' work
+ *      Some ideas from AT&T SFIO
  */
 
 #if !defined(PARROT_IO_H_GUARD)
@@ -33,12 +34,16 @@
 # define STDERR_FILENO 2
 #endif
 
+#ifndef O_ACCMODE
+# define O_ACCMODE 0003
+#endif
 
 /* Average block size of most systems (usually varies from 2k-8k),
  * later we can add some config to query it from the system at
  * build time (struct stat.st_blksize maybe).
  */
 #define PIO_BLKSIZE 4096 
+#define PIO_BUFSIZE 4096
 #define PIO_LINEBUFSIZE 256 
 
 
@@ -49,13 +54,20 @@ enum {
         PIO_TYPE_MAX
 };
 
-enum {
-        PIO_BUFTYPE_NONE = 0,
-        PIO_BUFTYPE_FULL,
-        PIO_BUFTYPE_LINE,
-        PIO_BUFTYPE_MAX
-};
+#define PIO_F_READ      0000001
+#define PIO_F_WRITE     0000002
+#define PIO_F_APPEND    0000004
+#define PIO_F_FILE      0000100
+#define PIO_F_PIPE      0000200
+#define PIO_F_SOCKET    0000400
+#define PIO_F_LINEBUF   0010000
+#define PIO_F_BUF       0020000
+#define PIO_F_MALLOC    0040000         /* Buffer malloced              */
+#define PIO_F_SHARED    0100000         /* Stream shares a file handle  */
 
+#define PIO_ACCMODE     0000003
+#define PIO_DEFAULTMODE DEFAULT_OPEN_MODE 
+#define PIO_UNBOUND     (size_t)-1
 
 typedef struct _ParrotIOLayerAPI        ParrotIOLayerAPI;
 typedef struct _ParrotIOLayer           ParrotIOLayer;
@@ -68,26 +80,26 @@ typedef void *   DummyCodeRef;
                             
             
 struct _ParrotIOBuf {
-        size_t          bufsize;
-        unsigned char * buf;
-        unsigned char * head;
+        size_t          size;
+        unsigned char * startb;         /* Start of buffer              */
+        unsigned char * endw;           /* End of write buffer          */
+        unsigned char * endr;           /* End of read buffer           */
+        unsigned char * endb;           /* End of buffer                */
+        unsigned char * next;           /* Current read/write pointer   */
 };
 
 struct _ParrotIO {
-        INTVAL          fd;             /* Low level OS descriptor */
-        INTVAL          mode;           /* Read/Write/etc. */
-        INTVAL          flags;
-        INTVAL          iotype;         /* Type of stream is this */
-        off_t           filepos;        /* Current real file pointer */
-        INTVAL          buftype;
-        ParrotIOBuf     in;
-        ParrotIOBuf     out;
+        INTVAL          fd;             /* Low level OS descriptor      */
+        INTVAL          mode;           /* Read/Write/etc.              */
+        INTVAL          flags;          /* Da flags                     */
+        off_t           filepos;        /* Current real file pointer    */
+        ParrotIOBuf     b;              /* Buffer structure             */
         ParrotIOLayer * stack;
         /* ParrotIOFilter * filters; */
 };
 
 struct _ParrotIOLayer {
-        void                    * this; /* Instance specific data */
+        void                    * this; /* Instance specific data       */
         const char              * name;
         INTVAL                    flags;
         ParrotIOLayerAPI        * api;
@@ -110,6 +122,7 @@ struct _ParrotIOLayer {
 
 /* Others to come */
 extern ParrotIOLayer    pio_os_layer;
+extern ParrotIOLayer    pio_stdio_layer;
 #ifdef WIN32
 /*extern ParrotIOLayer  pio_win32_layer; */
 #endif
@@ -172,7 +185,7 @@ struct _ParrotIOLayerAPI {
         off_t           (*Tell)(theINTERP, ParrotIOLayer * layer,
                                 ParrotIO * io);
         INTVAL          (*SetBuf)(theINTERP, ParrotIOLayer * layer,
-                                ParrotIO * io, INTVAL bufsize);
+                                ParrotIO * io, size_t bufsize);
         INTVAL          (*SetLineBuf)(theINTERP, ParrotIOLayer * layer,
                                 ParrotIO * io);
         INTVAL          (*GetCount)(theINTERP, ParrotIOLayer * layer);
@@ -187,15 +200,16 @@ struct _ParrotIOLayerAPI {
 /* io.c - If you add new layers, register them in init_layers() */
 extern void             PIO_init(theINTERP);
 extern INTVAL           PIO_init_stacks(theINTERP);
+extern void             PIO_atexit(theINTERP);
 extern INTVAL           PIO_push_layer(ParrotIOLayer *, ParrotIO *);
 extern ParrotIOLayer *  PIO_pop_layer(ParrotIO *);
 extern ParrotIOLayer *  PIO_copy_stack(ParrotIOLayer *);
 
 
-extern ParrotIO *       new_io_header(struct Parrot_Interp *, INTVAL,
-                                INTVAL, INTVAL);
 extern struct PMC *     new_io_pmc(struct Parrot_Interp *, ParrotIO *);
 extern void             free_io_header(ParrotIO *);
+extern ParrotIO *       PIO_new(struct Parrot_Interp *, ParrotIO *, INTVAL,
+                                INTVAL, INTVAL);
 
 extern INTVAL           PIO_base_init(theINTERP, ParrotIOLayer * proto);
 extern ParrotIOLayer *  PIO_base_new_layer(ParrotIOLayer * proto);
@@ -207,10 +221,8 @@ extern INTVAL           PIO_close(theINTERP, ParrotIO *);
 extern void             PIO_flush(theINTERP, ParrotIO *);
 extern INTVAL           PIO_read(theINTERP, ParrotIO *, void *, size_t);
 extern INTVAL           PIO_write(theINTERP, ParrotIO *, void *, size_t);
-extern INTVAL           PIO_setbuf(theINTERP, ParrotIO *, INTVAL);
+extern INTVAL           PIO_setbuf(theINTERP, ParrotIO *, size_t);
 extern INTVAL           PIO_puts(theINTERP, ParrotIO *, const char *);
-
-#define Init_IO(x)      PIO_init(x)
 
 
 

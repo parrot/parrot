@@ -41,31 +41,34 @@ PMC * new_io_pmc(theINTERP, ParrotIO * io) {
         return new_pmc;
 }
 
-ParrotIO * new_io_header(theINTERP, INTVAL iotype, INTVAL flags,
-                                INTVAL mode) {
-        ParrotIO * new_io;
-        new_io = (ParrotIO *)malloc(sizeof(ParrotIO));
-        new_io->flags = flags;
-        new_io->mode = mode;
-        new_io->iotype = iotype;
-        new_io->stack = pio_default_stack;
-        /*new_io->buftype = PIO_BUFTYPE_FULL;  */
-        /*new_io->filepos = -1;              */
-        new_io->in.buf = NULL;
-        new_io->in.head = NULL;
-        new_io->out.buf = NULL;
-        new_io->out.head = NULL;
-        return new_io;
-}
-
 void free_io_header(ParrotIO *io) {
-        if( io->in.buf )
-                free(io->in.buf);
-        if( io->out.buf )
-                free(io->out.buf);
+        /* Free buffer if it was malloced */
+        if( io->b.startb && (io->flags&PIO_F_MALLOC) )
+                free(io->b.startb);
         free(io);
 }
 
+
+/*
+ * Create a new IO stream, optionally reusing old structure.
+ */
+ParrotIO * PIO_new(theINTERP, ParrotIO * old, INTVAL iotype, INTVAL flags,
+                                INTVAL mode) {
+        ParrotIO * new_io;
+        if( old ) {
+                /* FIXME: Reuse old IO */
+        }
+        new_io = (ParrotIO *)malloc(sizeof(ParrotIO));
+        new_io->flags = flags;
+        new_io->mode = mode;
+        new_io->stack = pio_default_stack;
+        new_io->b.startb = NULL;
+        new_io->b.endw = NULL;
+        new_io->b.endr = NULL;
+        new_io->b.endb = NULL;
+        new_io->b.next = NULL;
+        return new_io;
+}
 
 /*
  * Initialize some stuff.
@@ -98,6 +101,17 @@ void PIO_init(theINTERP) {
                 PIO_puts(interpreter, pio_stderr,
                         "PIO: IO system initialized.\n");
         }
+        pio_initialized = 1;
+}
+
+
+/*
+ * IO system destructor, flush streams, free structures, etc.
+ */
+void PIO_atexit(theINTERP) {
+#if 0
+        PIO_flush(interpreter, pio_stdout);
+#endif
 }
 
 
@@ -108,8 +122,9 @@ INTVAL PIO_init_stacks(theINTERP) {
         ParrotIOLayer * p;
 
         PIO_push_layer(&pio_os_layer, NULL);
-        /*PIO_push_layer(&pio_stdio_layer, NULL);*/
-
+#if 0
+        PIO_push_layer(&pio_stdio_layer, NULL);
+#endif
         for(p=pio_default_stack; p; p=p->down) {
                 if( p->api->Init ) {
                         if((*p->api->Init)(interpreter, p) != 0) {
@@ -124,7 +139,6 @@ INTVAL PIO_init_stacks(theINTERP) {
                 }
         }
 
-        pio_initialized = 1;
         return 0;
 }
 
@@ -133,7 +147,7 @@ INTVAL PIO_init_stacks(theINTERP) {
  * Init routine called once for each layer at interpreter creation
  * time. This is similar to a Perl module INIT {} block.
  */
-INTVAL PIO_base_init(theINTERP, ParrotIOLayer * proto) {
+INTVAL PIO_base_init(theINTERP, ParrotIOLayer * l) {
         return 0;
 }
 
@@ -286,7 +300,7 @@ ParrotIOLayer * PIO_copy_stack( ParrotIOLayer * stack ) {
 /*
  * API for controlling buffering specifics on an IO stream
  */
-INTVAL PIO_setbuf(theINTERP, ParrotIO * io, INTVAL bufsize) {
+INTVAL PIO_setbuf(theINTERP, ParrotIO * io, size_t bufsize) {
         ParrotIOLayer * l = io->stack;
         PIO_flush(interpreter, io);
         while(l) {

@@ -58,7 +58,7 @@ INTVAL          PIO_os_puts(theINTERP, ParrotIOLayer * l, ParrotIO * io,
 ParrotIO * PIO_os_open(theINTERP, ParrotIOLayer * layer,
 			const char * spath, const char * smode) {
         ParrotIO * io;
-        int flags, type, mode, fd;
+        int flags, oflags, type, mode, fd;
         const char * modeptr;
         type = PIO_TYPE_FILE;
         flags = 0;
@@ -74,42 +74,92 @@ ParrotIO * PIO_os_open(theINTERP, ParrotIOLayer * layer,
         /* add ? and ! for block/non-block */
         switch(*modeptr) {
                 case '+':
-                        flags = O_RDWR;
+                        flags |= (PIO_F_WRITE|PIO_F_READ);
+                        oflags = O_RDWR;
                         break;
                 case '<':
-                        flags = O_RDONLY;
+                        flags |= PIO_F_READ;
+                        oflags = O_RDONLY;
                         break;
-                case '>':       
-                        flags = O_WRONLY | O_CREAT;
-                        if( *(++modeptr) == '>')
-                                flags |= O_APPEND;
+                case '>':
+                        flags |= PIO_F_WRITE;
+                        oflags = O_WRONLY | O_CREAT;
+                        if( *(++modeptr) == '>') {
+                                flags |= PIO_F_APPEND;
+                                oflags |= O_APPEND;
+                        }
                         else if(*modeptr != 0)
                                 return 0;
-                        else flags |= O_TRUNC;
+                        else oflags |= O_TRUNC;
                         break;
                 default:
                         return 0;
         }
 
-        if((fd = open((const char *)spath, flags, mode)) != -1 ){
-                io = new_io_header(interpreter, type, flags, mode);
-                io->fd = fd;
-                return io;
+        /* Only files for now */
+        flags |= PIO_F_FILE;
+
+        /* Try open with no create first */
+        while((fd = open(spath, oflags&(O_WRONLY|O_RDWR), mode)) < 0
+                        && errno == EINTR )
+                errno = 0;
+
+        /* File open */
+        if(fd >= 0){
+                /*
+                 * Now check if we specified O_CREAT|O_EXCL or not.
+                 * If so, we must return NULL, else either use the
+                 * descriptor or create the file.
+                 */
+                if((oflags&(O_CREAT|O_EXCL)) == (O_CREAT|O_EXCL)) {
+                        close(fd);
+                        return NULL;
+                }
+                /*
+                 * Check for truncate?
+                 */
+                if(oflags&O_TRUNC) {
+                        int tfd;
+                        while((tfd = creat(spath, PIO_DEFAULTMODE)) < 0
+                                        && errno == EINTR)
+                                errno = 0;
+                        close(tfd);
+                }
+        } else if(oflags&O_CREAT) {
+                /* O_CREAT and file doesn't exist. */
+                while((fd = creat(spath, PIO_DEFAULTMODE)) < 0
+                                && errno == EINTR)
+                        errno = 0;
+                if(!(oflags&O_WRONLY)) {
+                        close(fd);
+                        /*
+                         * File created, reopen with read+write
+                         */
+                        while((fd = open(spath, oflags&(O_WRONLY|O_RDWR),
+                                        mode)) < 0 && errno == EINTR )
+                                errno = 0;
+                }
         } else {
-                /* Error.. */
+#if 0
                 if((interpreter->flags & PARROT_DEBUG_FLAG) != 0) {
                         char * errstr = strerror( errno );
-#if 0
                         fprintf(stderr, "PIO_os_open: %s",
                                 errstr );
-#endif
                 }
-                /* Not Reached */
-                /* No, really it isn't */
+#endif
         }
 
-        return 0;
-}
+        if(fd >= 0) {
+                /*
+                 * Finally we have a descriptor, create an IO stream
+                 */
+                io = PIO_new(interpreter, NULL, type, flags, mode);
+                io->fd = fd;
+                io->flags = flags;
+                return io;
+        }
+        return NULL;
+  }
 
 
 ParrotIO * PIO_os_fdopen(theINTERP, ParrotIOLayer * layer,
@@ -133,9 +183,17 @@ ParrotIO * PIO_os_fdopen(theINTERP, ParrotIOLayer * layer,
                 return NULL;
         } 
 #endif
-        io = new_io_header(interpreter, PIO_TYPE_FILE, flags, mode);
+
+#if 0
+        if((interpreter->flags & PARROT_DEBUG_FLAG) != 0) {
+                fprintf(stderr, "PIO_os_fdopen: %d\n", (int)fd );
+        }
+#endif
+        /* FIXME: Add mode string parser from PIO_os_open() here,
+         * possibly need a seperate function for it.
+         */
+        io = PIO_new(interpreter, NULL, PIO_F_FILE, flags, mode);
         io->fd = fd;
-        io->buftype = PIO_BUFTYPE_NONE;
         return io;
 }
 
@@ -216,7 +274,7 @@ size_t PIO_os_write(theINTERP, ParrotIOLayer * layer, ParrotIO * io,
 #ifdef EAGAIN
                                 case EAGAIN:    return bytes;
 #endif
-                                default:        return -1;
+                                default:        return (size_t)-1;
                         }
                 }
         }
