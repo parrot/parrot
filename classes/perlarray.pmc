@@ -175,7 +175,7 @@ pmclass PerlArray extends Array {
     };
 
     INTVAL get_integer_keyed_int (INTVAL* key) {
-        if (*key >= SELF->cache.int_val) {
+        if (*key >= SELF->cache.int_val || *key < -SELF->cache.int_val) {
             PMC* temp = undef(INTERP);
             return temp->vtable->get_integer(INTERP, temp);
         }
@@ -199,7 +199,7 @@ pmclass PerlArray extends Array {
     }
 
     FLOATVAL get_number_keyed_int (INTVAL* key) {
-        if (*key >= SELF->cache.int_val) {
+        if (*key >= SELF->cache.int_val || *key < -SELF->cache.int_val) {
             PMC* temp = undef(INTERP);
             return temp->vtable->get_number(INTERP, temp);
         }
@@ -221,6 +221,10 @@ pmclass PerlArray extends Array {
         if (box == NULL) box = undef(INTERP);
         return box->vtable->get_number_keyed(INTERP, box, nextkey);
     }
+
+/*     STRING* get_string () { */
+/* 	return string_from_int(INTERP, SELF->cache.int_val); */
+/*     } */
 
     STRING* get_string_keyed_int (INTVAL* key) {
         if (*key >= SELF->cache.int_val) {
@@ -247,7 +251,7 @@ pmclass PerlArray extends Array {
     }
 
     PMC* get_pmc_keyed_int (INTVAL* key) {
-        if (*key >= SELF->cache.int_val)
+        if (*key >= SELF->cache.int_val || *key < -SELF->cache.int_val)
             return undef(INTERP);
         else
             return SUPER(key);

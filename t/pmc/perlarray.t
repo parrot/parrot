@@ -238,6 +238,23 @@ OK_18:	print "ok 18\n"
 	print "not "
 OK_19:	print "ok 19\n"
 
+# Out-of-bounds accesses:
+	set I0, P0
+	set I2, P0[10]
+	eq I2, 0, OK_20
+	print "not "
+OK_20:	print "ok 20\n"
+
+	set I2, P0[-10]
+	eq I2, 0, OK_21
+	print "not "
+OK_21:	print "ok 21\n"
+
+# Make sure it hasn't resized the array:
+	set I2, P0
+	eq I2, I0, OK_22
+	print "not "
+OK_22:	print "ok 22\n"
 	end
 CODE
 ok 1
@@ -259,6 +276,9 @@ ok 16
 ok 17
 ok 18
 ok 19
+ok 20
+ok 21
+ok 22
 OUTPUT
 
 output_is(<<'CODE', <<'OUTPUT', "Bracketed access test suite");
