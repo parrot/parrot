@@ -24,12 +24,11 @@ A Data::Dumper::Default object has the following methods:
 
 =cut
 
-.include "library/sort.imc"
-
 .sub __library_data_dumper_default_onload @LOAD
     find_type I0, "Data::Dumper::Default"
     if I0 > 1 goto END
     load_bytecode "library/Data/Dumper/Base.imc"
+    load_bytecode "library/Data/Sort.imc"
     getclass P0, "Data::Dumper::Base"
     subclass P0, P0, "Data::Dumper::Default"
 END:
@@ -143,7 +142,8 @@ iter_loop:
     branch iter_loop
 
 iter_end:
-    _sort( keys )
+    P0 = find_global "Data::Sort", "simple"
+    P0( keys )
 
 dump_loop:
     unless keys, dump_end
