@@ -34,7 +34,7 @@ constants into their destination register, $1.
 
 =item B<abs>(inout NUM)
 
-Set $1 to it's absolute value.
+Set $1 to its absolute value.
 
 =item B<abs>(out INT, in INT)
 
