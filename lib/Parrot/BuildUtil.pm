@@ -54,10 +54,10 @@ sub parrot_version
   }
 
   if (@parrot_version == 4) {
-    $parrot_version[2] = $parrot_version[2] . "_" . $parrot_version[3];
+#    $parrot_version[2] = $parrot_version[2] . "_" . $parrot_version[3];
     $#parrot_version = 3;
   }
-
+  $parrot_version = join('.', @parrot_version);
   if (wantarray) { return @parrot_version; }
   else           { return $parrot_version; }
 }
