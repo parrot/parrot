@@ -134,6 +134,7 @@ ops2c.pl
 ops2pm.pl
 packfile.c
 Parrot/Assembler.pm
+Parrot/BuildUtil.pm
 parrot.c
 Parrot/Jit/i386-bsd.pm
 Parrot/Jit/i386-linux.pm
