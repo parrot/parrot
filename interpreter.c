@@ -22,7 +22,7 @@
 #  include "parrot/oplib/core_ops_cg.h"
 #endif
 
-#define ATEXIT_DESTROY
+/* #define ATEXIT_DESTROY */
 
 extern op_lib_t *PARROT_CORE_PREDEREF_OPLIB_INIT(void);
 
@@ -407,9 +407,7 @@ env_var_set(const char* var)
     return ! (strcmp(value, "0") == 0);
 }
 
-#ifdef ATEXIT_DESTROY
 void Parrot_really_destroy(int exit_code, void *interpreter);
-#endif
 
 /*=for api interpreter make_interpreter
  *  Create the Parrot interpreter.  Allocate memory and clear the registers.
