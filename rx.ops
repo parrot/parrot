@@ -376,8 +376,8 @@ to indicate where one operation's backtrack information ends and another's begin
 op rx_pushmark(in pmc) {
 	RX_dUNPACK($1);
 
-	/* Don't worry about the const warning from the next line */
-	stack_push(interpreter, rx->stack, &RX_MARK, STACK_ENTRY_INT, NULL);
+ 	/* Don't worry about the const * to void * cast on the next line */
+ 	stack_push(interpreter, rx->stack, (void *)&RX_MARK, STACK_ENTRY_INT, NULL);
 	
 	goto NEXT();
 }
@@ -393,7 +393,7 @@ second parameter.
 
 op rx_popindex(in pmc, in int) {
 	RX_dUNPACK($1);
-	int i;
+	INTVAL i;
 	
 	stack_pop(interpreter, rx->stack, &i, STACK_ENTRY_INT);
 
