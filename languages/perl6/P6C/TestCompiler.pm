@@ -59,7 +59,7 @@ sub generate_pbc_for {
     my $pbc_f  = Parrot::Test::per_test('.pbc',$count);
     my $parrot = "..$PConfig{slash}..$PConfig{slash}parrot$PConfig{exe}";
 
-    Parrot::Test::_run_command("$PConfig{perl} prd-perl6.pl --batch=$p6_f --imc", 'STDOUT' => $imc_f, 'STDERR' => $err_f);
+    Parrot::Test::_run_command("$PConfig{perl} perl6 $p6_f --imc", 'STDERR' => $err_f);
     Parrot::Test::_run_command("$parrot -o $pasm_f $imc_f", 'STDERR' => $err_f);
     my $pasm;
     {
