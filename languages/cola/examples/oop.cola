@@ -1,0 +1,25 @@
+// oop.cola
+//
+// Samples of legal Cola oop constructs 
+//
+// Copyright (C) 2002 Melvin Smith
+
+using System;
+
+class Bar {
+    public void Print() {
+        // class method call
+        Console.WriteLine("Bar.Print\n");
+    }
+}
+
+class Foo {
+    public static void Main() {
+        Bar b = new Bar();
+        Console.WriteLine("Foo.Main()\n");
+        // instance method call
+        b.Print();
+    }
+}
+
+
