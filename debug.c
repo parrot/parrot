@@ -13,6 +13,7 @@
 
 #include "parrot/parrot.h"
 #include "parrot/interp_guts.h"
+#include "parrot/oplib.h"
 #include "parrot/trace.h"
 #include "parrot/debug.h"
 #include <stdio.h>
@@ -140,6 +141,11 @@ PDB_run_command(struct Parrot_Interp *interpreter,
         case c_trace:
             na(command);
             PDB_trace(interpreter,command);
+            break;
+        case c_e:
+        case c_eval:
+            na(command);
+            PDB_eval(interpreter,command);
             break;
         case c_h:
         case c_help:
@@ -539,7 +545,50 @@ PDB_escape(const char *string)
     *fill = '\0';
     return new;
 }
-                
+
+/* PDB_unescape
+ * do inplace unescape of \r \n \t \a and \\
+ */
+int
+PDB_unescape(char *string)
+{
+    char *fill;
+    int i, l = 0;
+
+    for ( ; *string; string++)
+    {
+        l++;
+        if (*string == '\\')
+        {
+            switch (string[1])
+            {
+                case 'n':
+                    *string = '\n';
+                    break;
+                case 'r':
+                    *string = '\r';
+                    break;
+                case 't':
+                    *string = '\t';
+                    break;
+                case 'a':
+                    *string = '\a';
+                    break;
+                case '\\':
+                    *string = '\\';
+                    break;
+                default:
+                    continue;
+            }
+            fill = string;
+            for(i = 1; fill[i + 1]; i++)
+                fill[i] = fill[i + 1];
+            fill[i] = '\0';
+        }
+    }
+    return l;
+}
+
 /* PDB_disassemble
  * Disassemble the bytecode
  */
@@ -593,8 +642,6 @@ PDB_disassemble(struct Parrot_Interp *interpreter,
             neg = i = 0;
             switch(interpreter->op_info_table[*pc].types[j])
             {
-                /* If the argument is a register
-                   or an integer constant */ 
                 case PARROT_ARG_I:
                     pfile->source[pfile->size++] = 'I';
                     goto INTEGER;
@@ -885,6 +932,104 @@ PDB_list(struct Parrot_Interp *interpreter,
         pdb->file->list_line = 0;
     else 
         pdb->file->list_line += n;
+}
+
+/* PDB_eval
+ * evals an instruction with fully qualified opcode name
+ * and valid arguments, NO error checking.
+ */
+void
+PDB_eval(struct Parrot_Interp *interpreter,
+         const char *command)
+{
+    PDB_t *pdb = interpreter->pdb;
+    struct PackFile_ConstTable *const_table;
+    char buf[256];
+    char s[1], *c = buf;
+    op_info_t *op_info;
+    /* Opcodes can't have more that 10 arguments */
+    opcode_t eval[11],*run;
+    int op_number,i,k,l,j = 0;
+
+    /* find_op needs a string with only the opcode name */
+    while (command && !(isspace(*command))) 
+        *(c++) = *(command++);
+    *c = '\0';
+    /* Find the opcode number */
+    op_number = interpreter->op_lib->op_code(buf);
+    /* Start generating the bytecode */
+    eval[j++] = (opcode_t)op_number;
+    /* Get the info for that opcode */
+    op_info = &interpreter->op_info_table[op_number];
+
+    /* handle the arguments */
+    for(i = 1; i < op_info->arg_count; i++)
+    {
+        na(command);
+        switch(op_info->types[i])
+        {
+            /* If it's a register skip the letter that
+               presides the register number */
+            case PARROT_ARG_I:
+            case PARROT_ARG_N:
+            case PARROT_ARG_S:
+            case PARROT_ARG_P:
+                command++;
+            case PARROT_ARG_IC:
+                eval[j++] = (opcode_t)atoi(command);
+                break;
+            case PARROT_ARG_NC:
+                k = PDB_extend_const_table(interpreter);
+
+                interpreter->code->const_table->constants[k]->type =PFC_NUMBER;
+                interpreter->code->const_table->constants[k]->number = 
+                                                       (FLOATVAL)atof(command);
+                eval[j++] = (opcode_t)k;
+                break;
+            case PARROT_ARG_SC:
+                /* Separate the string */
+                *s = *command++;
+                c = buf;
+                while(*command != *s)
+                    *(c++) = *(command++);
+                *c = '\0';
+                l = PDB_unescape(buf);
+
+                k = PDB_extend_const_table(interpreter);
+
+                interpreter->code->const_table->constants[k]->type =PFC_STRING;
+                interpreter->code->const_table->constants[k]->string =
+                    string_make(interpreter, buf, (UINTVAL)l, NULL, 0, NULL);
+
+                /* Add it to the bytecode */
+                eval[j++] = (opcode_t)k;
+                break;
+            default:
+                break;
+        }
+    }
+
+    run = eval;
+    DO_OP(run,interpreter);
+}
+
+/* PDB_extend_const_table
+ * extend the constant table
+ */
+int
+PDB_extend_const_table(struct Parrot_Interp *interpreter)
+{
+    int k;
+
+    /* Update the constant count and reallocate */
+    k = ++interpreter->code->const_table->const_count;
+    interpreter->code->const_table->constants =
+                    mem_sys_realloc(interpreter->code->const_table->constants, 
+                                       k * sizeof(struct PackFile_Constant *));
+
+    /* Allocate a new constant */
+    interpreter->code->const_table->constants[--k] = PackFile_Constant_new();
+    return k;
 }
 
 /* PDB_print_stack
@@ -1255,6 +1400,7 @@ PDB_help(const char *command)
     fprintf(stderr,"\tdelete (d) -- delete a breakpoint\n");
     fprintf(stderr,"\tcontinue (c) -- continue the program execution\n");
     fprintf(stderr,"\tnext (n) -- run the next instruction\n");
+    fprintf(stderr,"\teval (w) -- run an instruction\n");
     fprintf(stderr,"\ttrace (t) -- trace the next instruction\n");
     fprintf(stderr,"\tprint (p) -- print the interpreter registers\n");
     fprintf(stderr,"\tstack (s) -- examine the stack\n");

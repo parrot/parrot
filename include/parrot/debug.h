@@ -111,6 +111,13 @@ PDB_trace(struct Parrot_Interp *,
           const char *);
 
 void
+PDB_eval(struct Parrot_Interp *,
+         const char *);
+
+int
+PDB_extend_const_table(struct Parrot_Interp *);
+
+void
 PDB_init(struct Parrot_Interp *,
          const char *);
 
@@ -131,6 +138,9 @@ PDB_skip_breakpoint(struct Parrot_Interp *interpreter,
 
 char *
 PDB_escape(const char *);
+
+int
+PDB_unescape(char *);
 
 void
 PDB_disassemble(struct Parrot_Interp *,
@@ -207,6 +217,7 @@ PDB_help(const char *);
 #define c_b             25245
 #define c_c             25500
 #define c_d             25755
+#define c_e             26010
 #define c_h             26775
 #define c_i             27030
 #define c_l             27795
@@ -221,6 +232,7 @@ PDB_help(const char *);
 #define c_num           174675
 #define c_str           179265
 #define c_pmc           163455
+#define c_eval          277950
 #define c_help          282540
 #define c_list          295035
 #define c_load          268005
