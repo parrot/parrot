@@ -346,7 +346,7 @@ Set $1 to the value of $2 logically shifted right by $3 bits.
 =cut
 
 inline op lsr(out INT, in INT) {
-  ((UINTVAL)$1) >>= $2;
+  LVALUE_CAST(UINTVAL, $1) >>= $2;
   goto NEXT();
 }
 

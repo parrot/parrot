@@ -141,6 +141,16 @@ typedef void BIGNUM;
 #endif
 #define PTR2OPCODE_T(p)    OPCODE_T2PTR(opcode_t,p)
 
+/*
+ * some compilers don't like lvalue casts
+ */
+
+#ifdef __GCC__
+#define LVALUE_CAST(type, val) ((type)(val))
+#else
+#define LVALUE_CAST(type, val) (*((type *)&(val)))
+#endif
+
 /* define some shortcuts for dealing with function pointers */
 /* according to ANSI C, casting between function and non-function pointers is
  * no good.  So we should use "funcptr_t" in place of void* when dealing with
