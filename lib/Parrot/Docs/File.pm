@@ -328,10 +328,18 @@ sub short_description
 	
 	my $text = $self->read;
 	
-	# TODO - Maybe just look for file path/name - description.
-	return '' unless $text =~ /\n=head1\s+NAME[\n\r]+([^\n\r]+)/s;
+	return '' 
+		unless $text =~ /^=head1\s+(?:NAME|TITLE|TITEL)\s*[\n\r]+([^\n\r]+)/smo;
 	
-	my ($path, $desc) = split /\s*-\s*/, $1, 2;
+	$text = $1;
+	# Tidy it up a bit.
+	$text =~ s/^\s+//o;
+	$text =~ s/\s+$//o;
+	$text =~ s/\s*-$//o;
+	
+	return $text unless $text =~ /-/o;
+	
+	my ($path, $desc) = split /\s*--?\s*/, $text, 2;
 	
 	return $desc;
 }

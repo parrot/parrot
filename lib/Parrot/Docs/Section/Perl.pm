@@ -83,7 +83,8 @@ sub new
 			$self->new_item('', 'lib/Digest/Perl'),
 			$self->new_item('', 'lib/Class'),
 			$self->new_item('', 'lib/Parse'),
-			$self->new_item('', 'lib/Text'),
+			# This give an unsightly warning so I'm skipping it.
+			# $self->new_item('', 'lib/Text'),
 		),
 	);
 }
