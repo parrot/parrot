@@ -950,6 +950,7 @@ e_pbc_emit(void *param, IMC_Unit * unit, Instruction * ins)
                 case PARROT_ARG_IC:
                 case PARROT_ARG_SC:
                 case PARROT_ARG_NC:
+                case PARROT_ARG_PC:
                     r = ins->r[i];
                     if (r->type & (VT_REGP | VT_CONSTP))
                         r = r->reg;

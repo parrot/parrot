@@ -315,6 +315,7 @@ sub read_ops
         #   pc   PMC constant index
         #   sc   String constant index
         #   kc   Key constant index
+        #   kic  Integer Key constant index (in-line)
         #
 
         if (/^(inline\s+)?op\s+([a-zA-Z]\w*)\s*\((.*)\)\s*(\S*)?\s*{/)
@@ -379,9 +380,6 @@ sub read_ops
                 }
                 elsif ($use eq 'inconst')
                 {
-                    die "Parrot::OpsFile: Arg format 'inconst PMC' is not allowed!"
-                        if $type eq 'p';
-
                     push @temp, "${type}c";
                     push @argdirs, 'i';
                 }

@@ -180,7 +180,7 @@ my %arg_maps = (
 
     'ic' => "%ld",
     'nc' => "CONST(%ld)->u.number",
-    'pc' => "%ld /* ERROR: Don't know how to handle PMC constants yet! */",
+    'pc' => "CONST(%ld)->u.key",
     'sc' => "CONST(%ld)->u.string",
     'kc' => "CONST(%ld)->u.key",
     'kic' => "%ld",

@@ -773,7 +773,7 @@ getclass_p_sc	745
 singleton_p	746
 class_p_p	747
 classname_s_p	748
-bogus	749
+set_p_pc	749
 new_p_i	750
 new_p_ic	751
 new_p_i_p	752

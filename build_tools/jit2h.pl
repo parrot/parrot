@@ -29,6 +29,7 @@ my $trans = Parrot::OpTrans::C->new;
 my %type_to_arg = (
     INT_CONST => 'ic',
     NUM_CONST => 'nc',
+    PMC_CONST => 'pc',
     STRING_CONST => 'sc',
     STR_CONST => 'sc',
     INT_REG => 'i',
@@ -95,7 +96,7 @@ else {
 
         'ic' => "cur_opcode[%ld]",
         'nc' => "CONST(%ld)",
-        'pc' => "%ld /* ERROR: Don't know how to handle PMC constants yet! */",
+        'pc' => "CONST(%ld)",
         'sc' => "CONST(%ld)",
         'kc' => "CONST(%ld)",
         'kic' => "cur_opcode[%ld]"

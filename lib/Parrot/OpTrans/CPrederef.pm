@@ -33,7 +33,7 @@ The core type is C<PARROT_PREDEREF_CORE>.
 
 =cut
 
-sub core_type 
+sub core_type
 {
     return 'PARROT_PREDEREF_CORE';
 }
@@ -46,9 +46,9 @@ This is used in C<Parrot::Op>'s C<func_name()>.
 
 =cut
 
-sub prefix 
-{ 
-    return 'Parrot_pred_'; 
+sub prefix
+{
+    return 'Parrot_pred_';
 }
 
 =item C<defines()>
@@ -101,9 +101,9 @@ The ops array type is C<void *>.
 
 =cut
 
-sub opsarraytype 
-{ 
-    return 'void *' 
+sub opsarraytype
+{
+    return 'void *'
 };
 
 =item C<gen_goto($where)>
@@ -188,17 +188,17 @@ sub access_arg
 
     my %arg_maps = (
         'op' => "cur_opcode[%ld]",
-    
+
         'i'  => "(*(INTVAL *)cur_opcode[%ld])",
         'n'  => "(*(FLOATVAL *)cur_opcode[%ld])",
         'p'  => "(*(PMC **)cur_opcode[%ld])",
         's'  => "(*(STRING **)cur_opcode[%ld])",
         'k'  => "(*(PMC **)cur_opcode[%ld])",
         'ki'  => "(*(INTVAL *)cur_opcode[%ld])",
-    
+
         'ic' => "(*(INTVAL *)cur_opcode[%ld])",
         'nc' => "(*(FLOATVAL *)cur_opcode[%ld])",
-        'pc' => "%ld /* ERROR: Don't know how to handle PMC constants yet! */",
+        'pc' => "(*(PMC **)cur_opcode[%ld])",
         'sc' => "(*(STRING **)cur_opcode[%ld])",
         'kc' => "(*(PMC **)cur_opcode[%ld])",
         'kic' => "(*(INTVAL *)cur_opcode[%ld])"

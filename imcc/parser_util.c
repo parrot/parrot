@@ -292,6 +292,8 @@ INS(Interp *interpreter, IMC_Unit * unit, char *name,
         op = interpreter->op_lib->op_code(name, 1);
     if (op < 0)         /* still wrong, try to find an existing op */
         op = try_find_op(interpreter, unit, name, r, n, keyvec, emit);
+    else
+        strcpy(fullname, name);
     if (op >= 0) {
         op_info_t * op_info = &interpreter->op_info_table[op];
         char format[128];

@@ -86,6 +86,8 @@ op exchange(inout STR, inout STR) :base_core {
 
 =item B<set>(out INT, in PMC)
 
+=item B<set>(out INT, inconst PMC)
+
 =item B<set>(out INT, in STR)
 
 =item B<set>(out NUM, in INT)
@@ -177,6 +179,11 @@ inline op set(out STR, in NUM) :base_core {
 }
 
 inline op set(out PMC, in PMC) :base_core {
+  $1 = $2;
+  goto NEXT();
+}
+
+inline op set(out PMC, inconst PMC) :base_core {
   $1 = $2;
   goto NEXT();
 }

@@ -1141,10 +1141,6 @@ inline op compreg(out PMC, in STR) {
   goto NEXT();
 }
 
-inline op bogus() {
-  goto NEXT();
-}
-
 op new_callback(out PMC, in PMC, in PMC, in STR) {
   $1 = Parrot_make_cb(interpreter, $2, $3, $4);
   goto NEXT();
