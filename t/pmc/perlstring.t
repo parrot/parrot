@@ -16,7 +16,7 @@ Tests the C<PerlString> PMC. Checks Perl-specific string behaviour.
 
 =cut
 
-use Parrot::Test tests => 40;
+use Parrot::Test tests => 41;
 use Test::More; # Included for skip().
 
 my $fp_equality_macro = <<'ENDOFMACRO';
@@ -1248,3 +1248,15 @@ CODE
 0
 OUTPUT
 
+output_is(<< 'CODE', << 'OUTPUT', "lower method");
+##PIR##
+.sub _main @MAIN
+    .local pmc pmc1
+    pmc1 = new PerlString
+    pmc1 = "ABCdef\n"
+    $P0 = pmc1."lower"()
+    print $P0
+.end
+CODE
+abcdef
+OUTPUT

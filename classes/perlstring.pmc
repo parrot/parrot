@@ -37,7 +37,7 @@ NCI method: downcase this string
 */
 
     METHOD PMC* lower() {
-        STRING *s = string_downcase(interpreter, PMC_str_val(pmc));
+        STRING *s = string_downcase(interpreter, PMC_str_val(SELF));
         PMC *ret = pmc_new(interpreter, enum_class_PerlString);
         string_set(interpreter, PMC_str_val(ret), s);
         return ret;

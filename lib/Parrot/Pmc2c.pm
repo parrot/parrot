@@ -269,7 +269,8 @@ sub make_const() {
 	    push @{ $const->{methods} }, {
 		meth => "$meth",
 		type => $entry->{type},
-		parameters => $entry->{parameters}
+		parameters => $entry->{parameters},
+                loc => $entry->{loc}
 	    };
 	}
         else {
@@ -449,6 +450,10 @@ nci method bodies (see F<classes/pmc2c.pl>).
 sub rewrite_nci_method ($$$) {
     my ($class, $method) = @_;
     local $_ = $_[2];
+    # Rewrite SELF -> pmc, INTERP -> interpreter
+    s/SELF/pmc/g;
+    s/\bINTERP\b/interpreter/g;
+
     return $_;
 }
 
@@ -899,6 +904,10 @@ sub hdecls() {
         if ($self->implements($meth->{meth})) {
             $hout .= $self->decl($classname, $meth, 1);
         }
+    }
+    foreach my $method (@{ $self->{methods}} ) {
+        next unless $method->{loc} eq 'nci';
+        $hout .= $self->decl($classname, $method, 1);
     }
     # class init decl
     $hout .= <<"EOC";
