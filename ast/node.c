@@ -29,8 +29,8 @@ static nodeType* create_1(int nr, nodeType *self, nodeType *p);
 static nodeType* create_Func(int nr, nodeType *self, nodeType *p);
 static nodeType* create_Name(int nr, nodeType *self, nodeType *p);
 static void set_const(nodeType *p);
-static nodeType* node_to_pmc(Interp*, Instruction **ins, nodeType *p);
-static nodeType* exp_Binary(Interp*, nodeType *p);
+static SymReg* node_to_pmc(Interp*, nodeType *p);
+static SymReg* exp_Binary(Interp*, nodeType *p);
 
 static int show_context;
 
@@ -50,7 +50,7 @@ static int show_context;
 static void
 dump_sym(nodeType *p)
 {
-    fprintf(stderr, "%s", p->u.var.r->name);
+    fprintf(stderr, "%s", p->u.r->name);
 }
 
 static void
@@ -59,14 +59,13 @@ dump_Const(nodeType *p, int l)
     dump_sym(p);
 }
 
-static nodeType*
+static SymReg*
 exp_Const(Interp* interpreter, nodeType *p)
 {
     if (p->ctx == CTX_PMC) {
-        Instruction *ins = cur_unit->last_ins;
-        return node_to_pmc(interpreter, &ins, p);
+        return node_to_pmc(interpreter,  p);
     }
-    return p;
+    return p->u.r;
 }
 
 
@@ -156,7 +155,7 @@ ctx_default(nodeType *p, context_type outer)
 static context_type
 ctx_Const(nodeType *p, context_type ctx)
 {
-    switch (p->u.var.r->set) {
+    switch (p->u.r->set) {
         case 'I': ctx = CTX_INT; break;
         case 'S': ctx = CTX_STR; break;
         case 'N': ctx = CTX_NUM; break;
@@ -273,10 +272,10 @@ new_con(YYLTYPE *loc)
 /*
  * vars and temps
  */
-static nodeType*
+static SymReg*
 exp_Temp(Interp* interpreter, nodeType *p)
 {
-    return p;
+    return p->u.r;
 }
 
 static void
@@ -337,11 +336,23 @@ get_const(const char *name, int type)
         return r;
     return mk_const(str_dup(name), type);
 }
+
+static SymReg *
+new_temp_var(Interp* interp, int set)
+{
+    char buf[128];
+    static int temp;
+
+    UNUSED(interp);
+    sprintf(buf, "$%c%d", set, ++temp);
+    return mk_symreg(str_dup(buf), set);
+}
+
 /*
  * new var, pmc_type  := new P, Ic
  */
 static Instruction *
-insert_new(Interp* interpreter, nodeType *var, const char *pmy_type)
+insert_new(Interp* interpreter, SymReg *var, const char *pmy_type)
 {
     Instruction *ins;
     SymReg *regs[IMCC_MAX_REGS], *r;
@@ -352,7 +363,7 @@ insert_new(Interp* interpreter, nodeType *var, const char *pmy_type)
     sprintf(ireg, "%d", type);
     r = mk_const(str_dup(ireg), 'I');
 
-    regs[0] = var->u.var.r;
+    regs[0] = var;
     regs[1] = r;
     return insINS(interpreter, cur_unit, ins, "new", regs, 2);
 }
@@ -360,7 +371,7 @@ insert_new(Interp* interpreter, nodeType *var, const char *pmy_type)
 /*
  * var = global "var"   := find_global var, "var"
  */
-static Instruction *
+static SymReg *
 insert_find_global(Interp* interpreter, nodeType *var)
 {
     Instruction *ins;
@@ -368,20 +379,21 @@ insert_find_global(Interp* interpreter, nodeType *var)
     char name[128];
 
     ins = cur_unit->last_ins;
-    sprintf(name, "\"%s\"", var->u.var.r->name);
+    sprintf(name, "\"%s\"", var->u.r->name);
     r = mk_const(str_dup(name), 'S');
 
-    regs[0] = var->u.var.r;
-    var->u.var.r->type = VTIDENTIFIER;
+    regs[0] = var->u.r;
+    var->u.r->type = VTIDENTIFIER;
     regs[1] = r;
-    return insINS(interpreter, cur_unit, ins, "find_global", regs, 2);
+    insINS(interpreter, cur_unit, ins, "find_global", regs, 2);
+    return regs[0];
 }
 
 static const char*
 default_pmc_type(nodeType *p)
 {
     const char *pmc;
-    switch (p->u.var.r->set) {
+    switch (p->u.r->set) {
         case 'I': pmc = INT_TYPE; break;
         case 'S': pmc = FLOAT_TYPE; break;
         case 'N': pmc = STRING_TYPE; break;
@@ -390,44 +402,62 @@ default_pmc_type(nodeType *p)
     return pmc;
 }
 /*
- * promote a Const or Var to a PMC node, if it isn't yet a PMC
+ * promote a Const or Var to a PMC sym
  */
-static nodeType*
-node_to_pmc(Interp* interpreter, Instruction **ins, nodeType *p)
+static SymReg*
+node_to_pmc(Interp* interpreter, nodeType *p)
 {
     SymReg *regs[IMCC_MAX_REGS];
     const char *pmc;
-    nodeType *temp;
+    SymReg *temp;
+    Instruction *ins;
+    if (p->u.r->set == 'P')
+        return p->u.r;
 
-    if (p->u.var.r->set == 'P')
-        return p;
     pmc = default_pmc_type(p);
-    temp = IMCC_new_temp_node(interpreter, 'P', &p->loc);
-    *ins = insert_new(interpreter, temp, pmc);
-    regs[0] = temp->u.var.r;
-    regs[1] = p->u.var.r;
-    *ins = insINS(interpreter, cur_unit, *ins, "set", regs, 2);
+    temp = new_temp_var(interpreter, 'P');
+    ins = insert_new(interpreter, temp, pmc);
+    regs[0] = temp;
+    regs[1] = p->u.r;
+    insINS(interpreter, cur_unit, ins, "set", regs, 2);
     return temp;
 }
+
+static SymReg*
+insert_find_lex(Interp* interpreter, nodeType *var)
+{
+    SymReg *regs[IMCC_MAX_REGS];
+    Instruction *ins;
+    char buf[128];
+
+    ins = cur_unit->last_ins;
+    regs[0] = new_temp_var(interpreter, 'P');
+    regs[1] = get_const("-1", 'I');
+    sprintf(buf, "\"%s\"", var->u.r->name);
+    regs[2] = get_const(buf, 'S');
+    insINS(interpreter, cur_unit, ins, "find_lex", regs, 3);
+    return regs[0];
+}
+
 /*
  * node expand aka code creation functions
  */
 
-static nodeType*
+static SymReg*
 exp_Var(Interp* interpreter, nodeType *p)
 {
-    if (p->ctx == CTX_PMC) {
+    if (p->ctx == CTX_PMC && p->u.r->set != 'P') {
         Instruction *ins = cur_unit->last_ins;
-        return node_to_pmc(interpreter, &ins, p);
+        return node_to_pmc(interpreter, p);
     }
-    return p;
+    return insert_find_lex(interpreter, p);;
 }
 
 
 /*
  * create code by expanding child nodes
  */
-static nodeType*
+static SymReg*
 exp_default(Interp* interpreter, nodeType *p)
 {
     nodeType *next;
@@ -436,11 +466,11 @@ exp_default(Interp* interpreter, nodeType *p)
         if (next->expand)
             next->expand(interpreter, next);
     }
-    return p;
+    return NULL;
 }
 /*
  * statement nodes don't have a result
- * expression nodes return the result node
+ * expression nodes return the result SymReg
  *
  * assign returns the lhs so that assigns can get chained together
  * [Python] assign is a statement with possibly multiple LHS
@@ -452,23 +482,24 @@ exp_default(Interp* interpreter, nodeType *p)
 /*
  * set var, rhs
  */
-static nodeType*
+static SymReg*
 exp_Assign(Interp* interpreter, nodeType *p)
 {
     Instruction *ins;
-    SymReg *regs[IMCC_MAX_REGS], *r;
+    SymReg *regs[IMCC_MAX_REGS], *lr, *rr;
     nodeType *var = CHILD(p);
     nodeType *rhs = var->next;
     int assigned = 0;
     char buf[128];
 
+    lr = var->expand(interpreter, var);
     if (rhs->expand == exp_Binary) {
         /*
          * set the destination node, where the binary places
          * the result
          */
         rhs->dest = var;
-        rhs = rhs->expand(interpreter, rhs);
+        rr = rhs->expand(interpreter, rhs);
         assigned = 1;
     }
     else if (rhs->expand == exp_Const) {
@@ -476,31 +507,29 @@ exp_Assign(Interp* interpreter, nodeType *p)
         /* need a new value, because the name might be aliased by
          * a = b
          */
-        ins = cur_unit->last_ins;
-        pmc = default_pmc_type(var);
-        ins = insert_new(interpreter, var, pmc);
+        rr = node_to_pmc(interpreter, rhs);
     }
     else {
-        rhs = rhs->expand(interpreter, rhs);
+        rr = rhs->expand(interpreter, rhs);
     }
     ins = cur_unit->last_ins;
     if (!assigned) {
-        regs[0] = var->u.var.r;
-        regs[1] = rhs->u.var.r;
+        regs[0] = lr;
+        regs[1] = rr;
         ins = insINS(interpreter, cur_unit, ins, "set", regs, 2);
         regs[0] = get_const("-1", 'I');
-        sprintf(buf, "\"%s\"", var->u.var.r->name);
+        sprintf(buf, "\"%s\"", var->u.r->name);
         regs[1] = get_const(buf, 'S');
-        regs[2] = var->u.var.r;
+        regs[2] = lr;
         insINS(interpreter, cur_unit, ins, "store_lex", regs, 3);
     }
-    return var;
+    return lr;
 }
 
 /*
  * TODO
  */
-static nodeType*
+static SymReg*
 exp_Args(Interp* interpreter, nodeType *p)
 {
     return NULL;
@@ -514,13 +543,14 @@ exp_Args(Interp* interpreter, nodeType *p)
  *
  * Op(opocde) has the bare name of the Parrot opcode
  */
-static nodeType*
+static SymReg*
 exp_Binary(Interp* interpreter, nodeType *p)
 {
-    nodeType *op, *left, *right, *dest;
+    nodeType *op, *left, *right;
     Instruction *ins;
     SymReg *regs[IMCC_MAX_REGS];
     char buf[128];
+    SymReg *lr, *rr, *dest;
 
     op = CHILD(p);
     left = op->next;
@@ -528,37 +558,32 @@ exp_Binary(Interp* interpreter, nodeType *p)
     /*
      * first create code for left and right
      */
-    left = left->expand(interpreter, left);
-    right = right->expand(interpreter, right);
+    lr = left->expand(interpreter, left);
+    rr = right->expand(interpreter, right);
     /*
      * then get the current instruction pointer
      * and append the binary operation
      */
-    ins = cur_unit->last_ins;
     /*
      * p->dest holds the var, when the upper node is an assign opcode
      * if NULL, create a new temp
      */
-    dest = p->dest;
-    if (dest) {
+    if (p->dest) {
         /*
          * find the lexical, this is the destination of the binary
          * operation
          */
-        regs[0] = dest->u.var.r;
-        regs[1] = get_const("-1", 'I');
-        sprintf(buf, "\"%s\"", dest->u.var.r->name);
-        regs[2] = get_const(buf, 'S');
-        ins = insINS(interpreter, cur_unit, ins, "find_lex", regs, 3);
+        dest = insert_find_lex(interpreter, p->dest);
     }
     else {
-        dest = IMCC_new_temp_node(interpreter, 'P', &p->loc);
-        ins = insert_new(interpreter, dest, UNDEF_TYPE);
+        dest = new_temp_var(interpreter, 'P');
+        insert_new(interpreter, dest, UNDEF_TYPE);
     }
-    regs[0] = dest->u.var.r;
-    regs[1] = left->u.var.r;
-    regs[2] = right->u.var.r;
-    insINS(interpreter, cur_unit, ins, op->u.var.r->name, regs, 3);
+    ins = cur_unit->last_ins;
+    regs[0] = dest;
+    regs[1] = lr;
+    regs[2] = rr;
+    insINS(interpreter, cur_unit, ins, op->u.r->name, regs, 3);
     return dest;
 }
 
@@ -572,12 +597,12 @@ exp_Binary(Interp* interpreter, nodeType *p)
  * if a < b < c := a < b && b < c   but evaluate b once
  *
  */
-static nodeType*
+static SymReg*
 exp_Compare(Interp* interpreter, nodeType *p)
 {
-    nodeType *op, *left, *right, *dest, *last;
+    nodeType *op, *left, *right, *last;
     Instruction *ins;
-    SymReg *regs[IMCC_MAX_REGS];
+    SymReg *regs[IMCC_MAX_REGS], *lr, *rr;
 
     left = CHILD(p);
     op = left->next;
@@ -585,28 +610,26 @@ exp_Compare(Interp* interpreter, nodeType *p)
     /*
      * first create code for left and right
      */
-    left = left->expand(interpreter, left);
-    right = right->expand(interpreter, right);
+    lr = left->expand(interpreter, left);
+    rr = right->expand(interpreter, right);
     /*
      * then get the current instruction pointer
      * and append the binary operation
      */
     ins = cur_unit->last_ins;
-    dest = IMCC_new_temp_node(interpreter, 'I', &p->loc);
-    p->dest = dest;
-    regs[0] = dest->u.var.r;
-    regs[1] = left->u.var.r;
-    regs[2] = right->u.var.r;
-    insINS(interpreter, cur_unit, ins, op->u.var.r->name, regs, 3);
+    regs[0] = new_temp_var(interpreter, 'I');
+    regs[1] = lr;
+    regs[2] = rr;
+    insINS(interpreter, cur_unit, ins, op->u.r->name, regs, 3);
     if (last->next)
         fatal(1, "ext_Compare", "unimplemented");
-    return dest;
+    return regs[0];
 }
 
 /*
  * TODO
  */
-static nodeType*
+static SymReg*
 exp_Defaults(Interp* interpreter, nodeType *p)
 {
     return NULL;
@@ -624,7 +647,7 @@ exp_Defaults(Interp* interpreter, nodeType *p)
  *     py_kw_args
  *   Body
  */
-static nodeType*
+static SymReg*
 exp_Function(Interp* interpreter, nodeType *p)
 {
     nodeType *name, *params, *body;
@@ -638,7 +661,7 @@ exp_Function(Interp* interpreter, nodeType *p)
     name = CHILD(p);
     params = name->next;
     body = params->next;
-    sub = mk_sub_address(str_dup(name->u.var.r->name));
+    sub = mk_sub_address(str_dup(name->u.r->name));
     ins = INS_LABEL(cur_unit, sub, 1);
 
     ins->r[1] = mk_pcc_sub(str_dup(ins->r[0]->name), 0);
@@ -672,11 +695,11 @@ gen_label(Interp *interpreter, const char *prefix)
  *     ...      else if bar
  *   Else_      else
  */
-static nodeType*
+static SymReg*
 exp_If(Interp* interpreter, nodeType *p)
 {
-    nodeType *tests, *else_, *test, *stmts, *true_;
-    SymReg *else_label, *endif_label;
+    nodeType *tests, *else_, *test, *stmts;
+    SymReg *else_label, *endif_label, *true_;
     Instruction *ins;
     SymReg *regs[IMCC_MAX_REGS];
 
@@ -691,7 +714,7 @@ exp_If(Interp* interpreter, nodeType *p)
          */
         true_ = test->expand(interpreter, test);
         ins = cur_unit->last_ins;
-        regs[0] = true_->u.var.r;
+        regs[0] = true_;
         regs[1] = else_label;
         insINS(interpreter, cur_unit, ins, "unless", regs, 2);
         /*
@@ -721,7 +744,7 @@ exp_If(Interp* interpreter, nodeType *p)
 /*
  * TODO
  */
-static nodeType*
+static SymReg*
 exp_Params(Interp* interpreter, nodeType *p)
 {
     return NULL;
@@ -735,7 +758,7 @@ exp_Params(Interp* interpreter, nodeType *p)
  *   Star_Args
  *   DStar_Args
  */
-static nodeType*
+static SymReg*
 exp_Py_Call(Interp* interpreter, nodeType *p)
 {
     nodeType *name, *args;
@@ -744,10 +767,10 @@ exp_Py_Call(Interp* interpreter, nodeType *p)
 
     name = CHILD(p);
     args = name->next;
-    args = args->expand(interpreter, args);
+    args->expand(interpreter, args);
     /* TODO */
     ins = IMCC_create_itcall_label(interpreter);
-    IMCC_itcall_sub(interpreter, name->u.var.r);
+    IMCC_itcall_sub(interpreter, name->u.r);
     return NULL;
 }
 
@@ -755,25 +778,28 @@ exp_Py_Call(Interp* interpreter, nodeType *p)
  * Py_Local
  *   Name
  */
-static nodeType*
+static SymReg*
 exp_Py_Local(Interp* interpreter, nodeType *var)
 {
     Instruction *ins;
-    SymReg *regs[IMCC_MAX_REGS];
+    SymReg *regs[IMCC_MAX_REGS], *temp;
     char buf[128];
 
-    if (var->u.var.r->type == VTADDRESS)
-        ins = insert_find_global(interpreter, var);
-    else
-        ins = insert_new(interpreter, var, UNDEF_TYPE);
+    if (var->u.r->type == VTADDRESS)
+        temp = insert_find_global(interpreter, var);
+    else {
+        temp = new_temp_var(interpreter, 'P');
+        insert_new(interpreter, temp, UNDEF_TYPE);
+    }
     /*
      * now create a scratchpad slot for this var
      */
+    ins = cur_unit->last_ins;
     regs[0] = get_const("-1", 'I');
-    sprintf(buf, "\"%s\"", var->u.var.r->name);
+    sprintf(buf, "\"%s\"", var->u.r->name);
     regs[1] = get_const(buf, 'S');
-    regs[2] = var->u.var.r;
-    var->u.var.local_nr = cur_unit->local_count++;
+    regs[2] = temp;
+    /* TODO remember locals and idx of local := cur_unit->local_count++; */
     insINS(interpreter, cur_unit, ins, "store_lex", regs, 3);
     return NULL;
 }
@@ -786,7 +812,7 @@ exp_Py_Local(Interp* interpreter, nodeType *var)
  *   ...
  *   Stmts
  */
-static nodeType*
+static SymReg*
 exp_Py_Module(Interp* interpreter, nodeType *p)
 {
     nodeType *doc;
@@ -815,23 +841,19 @@ exp_Py_Module(Interp* interpreter, nodeType *p)
  *    exp
  *    ...
  */
-static nodeType*
+static SymReg*
 exp_Py_Print(Interp* interpreter, nodeType *p)
 {
     Instruction *ins ;
-    SymReg *regs[IMCC_MAX_REGS];
-    nodeType * child = CHILD(p), *d;
+    SymReg *regs[IMCC_MAX_REGS], *d;
+    nodeType * child = CHILD(p);
     if (!child)
         fatal(1, "exp_Py_Print", "nothing to print");
     for (; child; child = child->next) {
         d = child->expand(interpreter, child);
         /* TODO file handle node */
-        if (d->dump == dump_Const || d->dump == dump_Var)
-            regs[0] = d->u.var.r;
-        else
-            fatal(1, "exp_Py_Print", "unknown node to print: '%s'",
-                    d->description);
         ins = cur_unit->last_ins;
+        regs[0] = d;
         insINS(interpreter, cur_unit, ins, "print_item", regs, 1);
     }
     return NULL;
@@ -840,7 +862,7 @@ exp_Py_Print(Interp* interpreter, nodeType *p)
 /*
  * Py_Print_nl
  */
-static nodeType*
+static SymReg*
 exp_Py_Print_nl(Interp* interpreter, nodeType *p)
 {
     Instruction *ins = cur_unit->last_ins;
@@ -963,7 +985,7 @@ create_Func(int nr, nodeType *self, nodeType *child)
     SymReg *r;
     IMC_Unit *last;
     self = create_1(nr, self, child);
-    r = child->u.var.r;
+    r = child->u.r;
     last = cur_unit->prev;      /* XXX  ->caller */
     r = _get_sym(last->hash, r->name);
     if (r) {
@@ -1055,7 +1077,7 @@ IMCC_new_const_node(Interp* interp, char *name, int set, YYLTYPE *loc)
 {
     nodeType *p = new_con(loc);
     SymReg *r = mk_const(name, set);
-    p->u.var.r = r;
+    p->u.r = r;
     return p;
 }
 
@@ -1066,7 +1088,7 @@ IMCC_new_var_node(Interp* interpreter, char *name, int set, YYLTYPE *loc)
     SymReg *r;
     if (!cur_unit)
         fatal(1, "IMCC_new_var_node", "no cur_unit");
-    p->u.var.r = r = mk_symreg(name, set);
+    p->u.r = r = mk_symreg(name, set);
     if (r->type != VTADDRESS)
         r->type = VTIDENTIFIER;
     p->expand = exp_Var;
@@ -1085,7 +1107,7 @@ IMCC_new_temp_node(Interp* interp, int set, YYLTYPE *loc)
     static int temp;
     sprintf(buf, "$%c%d", set, ++temp);
     r = mk_symreg(str_dup(buf), set);
-    p->u.var.r = r;
+    p->u.r = r;
     return p;
 }
 
@@ -1165,7 +1187,7 @@ IMCC_dump_nodes(Interp* interpreter, nodeType *p)
     fprintf(stderr, "\n");
 }
 
-nodeType *
+SymReg *
 IMCC_expand_nodes(Interp* interpreter, nodeType *p)
 {
     /*

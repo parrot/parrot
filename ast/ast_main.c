@@ -47,13 +47,14 @@ void
 IMCC_ast_compile(Interp *interpreter, FILE *fp)
 {
     nodeType *top_node;
+    SymReg *sym;
 
     ASTin = fp;
     ASTparse(interpreter);
 
     top_node = interpreter->imc_info->top_node;
-    top_node = IMCC_expand_nodes(interpreter, top_node);
     if (top_node) {
+        sym = IMCC_expand_nodes(interpreter, top_node);
         if (interpreter->imc_info->debug & DEBUG_AST) {
             IMCC_dump_nodes(interpreter, top_node);
         }

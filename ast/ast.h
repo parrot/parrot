@@ -15,16 +15,17 @@ typedef enum {
     CTX_KEY = 'K'
 } context_type;
 
+/* imcc forward declarations */
+struct _SymReg;
+struct _IMC_Unit;
+
 typedef struct nodeType_t* (*node_opt_t)    (struct nodeType_t*);
-typedef struct nodeType_t* (*node_expand_t) (Interp*, struct nodeType_t*);
+typedef struct _SymReg*    (*node_expand_t) (Interp*, struct nodeType_t*);
 typedef struct nodeType_t* (*node_create_t) (int, struct nodeType_t*,
 					       struct nodeType_t*);
 typedef void               (*node_dump_t)   (struct nodeType_t*, int level);
 typedef context_type       (*node_context_t)(struct nodeType_t*, context_type);
 
-/* imcc forward declarations */
-struct _SymReg;
-struct _IMC_Unit;
 
 typedef enum {
 	NODE_HAS_CHILD = 1 << 0
@@ -45,10 +46,7 @@ typedef struct nodeType_t {
     YYLTYPE loc;		/* yacc/bison code location */
     node_flags_enum flags;	/* NODE_HAS_CHILD ... */
     union {
-	struct {
-	    struct _SymReg *r;	/* var, temp, const node */
-	    int local_nr;		/* local slot nr */
-	} var;
+	struct _SymReg *r;	/* var, temp, const node */
 	struct nodeType_t *child;	/* contained node */
     } u;
 } nodeType;
@@ -63,7 +61,7 @@ nodeType * IMCC_append_node(Interp*, nodeType *head, nodeType *tail,
 nodeType * IMCC_new_temp_node(Interp*, int set, YYLTYPE *loc);
 
 void IMCC_dump_nodes(Interp *, nodeType *);
-nodeType * IMCC_expand_nodes(Interp*, nodeType *);
+struct _SymReg * IMCC_expand_nodes(Interp*, nodeType *);
 void IMCC_free_nodes(Interp*, nodeType *);
 
 int IMCC_find_node_nr(const char *name);
