@@ -409,7 +409,7 @@ CODE
 Value
 OUTPUT
 
-output_like(<<'CODE', <<'OUTPUT', "setting non-existant attribute");
+output_like(<<'CODE', <<'OUTPUT', "setting non-existent attribute");
     newclass P1, "Foo"
     find_type I0, "Foo"
     new P2, I0
@@ -422,7 +422,7 @@ CODE
 /No such attribute/
 OUTPUT
 
-output_like(<<'CODE', <<'OUTPUT', "setting non-existant attribute - 1");
+output_like(<<'CODE', <<'OUTPUT', "setting non-existent attribute - 1");
     newclass P1, "Foo"
     find_type I0, "Foo"
     new P2, I0
@@ -436,7 +436,7 @@ CODE
 /No such attribute/
 OUTPUT
 
-output_like(<<'CODE', <<'OUTPUT', "getting non-existant attribute");
+output_like(<<'CODE', <<'OUTPUT', "getting non-existent attribute");
     newclass P1, "Foo"
     find_type I0, "Foo"
     new P2, I0
@@ -542,7 +542,7 @@ output_is(<<'CODE', <<'OUTPUT', "attribute values and subclassing 2");
     addattribute P2, ".k"
     addattribute P2, ".l"
 
-    # subclass is prefered for the SI case over
+    # subclass is preferred for the SI case over
     #   newclass P2, "Bar"
     #   addattrib ...
     #   addparent P2, P1
@@ -789,7 +789,7 @@ output_is(<<'CODE', <<'OUTPUT', "attribute values, inherited access meths");
     addattribute P2, ".l"
     addattribute P2, ".m"
 
-    # subclass is prefered for the SI case over
+    # subclass is preferred for the SI case over
     #   newclass P2, "Bar"
     #   addattrib ...
     #   addparent P2, P1
@@ -941,7 +941,7 @@ l
 m
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "overriden vtables");
+output_is(<<'CODE', <<'OUTPUT', "overridden vtables");
 .include "pmctypes.pasm"
 .include "mmd.pasm"
     newclass P1, "Foo"
@@ -1147,7 +1147,7 @@ CODE
 City
 OUTPUT
 
-output_like(<<'CODE', <<'OUTPUT', "subclassing a non-existant class");
+output_like(<<'CODE', <<'OUTPUT', "subclassing a non-existent class");
     subclass P1, "Character", "Nemo"
     print "Uh-oh...\n"
     end
@@ -1155,7 +1155,7 @@ CODE
 /Class 'Nemo' doesn't exist/
 OUTPUT
 # '
-output_like(<<'CODE', <<'OUTPUT', "anon. subclass of non-existant class");
+output_like(<<'CODE', <<'OUTPUT', "anon. subclass of non-existent class");
     subclass P1, "Character"
     print "Uh-oh...\n"
     end
@@ -1598,7 +1598,7 @@ MyInt2(42)
 OUTPUT
 
 TODO: {
-  local $TODO = "methods can't be overidden in derived class only";
+  local $TODO = "methods can't be overridden in derived class only";
 output_is(<<'CODE', <<'OUTPUT', "PMC as classes - derived 3");
 ##PIR##
 .sub main @MAIN
