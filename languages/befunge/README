@@ -1,11 +1,12 @@
 DESCRIPTION
 -----------
-This is a Befunge interpreter written in Parrot assembler, version 0.06
+This is a Befunge interpreter written in Parrot assembler, version 0.1.0
 
 This interpreter should be Befunge-93 compliant. This means the
-playfield is limited to 80x25 and can hold *only bytes*. This means
-that you can't fetch/store numbers greater than 255 or less than 0 in
-the torus (even if I do not check for over/underflow - for now).
+playfield is limited to 80x25. This should also mean that the torus
+can hold *only bytes* (that is, you can't store/fetch numbers greater
+than 255 or less than 0), but actually I do not check for over /
+underflow - for now.
 
 You should compile and test the files with:
 
@@ -25,7 +26,7 @@ The files are the following:
         befunge.pasm    the main loop
         debug.pasm      routines for the debugger
         flow.pasm       handles the flow-control instructions
-        io.pasm         handles the io related instructions
+        io.pasm         handles the i/o related instructions
         load.pasm       function to load the code from source file
         maths.pasm      handles all the maths instructions
         stack.pasm      handles the stack instructions
@@ -47,7 +48,6 @@ TODO
 * better rand() methods
 * more tests (with Perl and Test::Harness)
 * debugging options (work in progress)
-* use an array of arrays instead of an array of strings
 * implement Befunge 98
 
 

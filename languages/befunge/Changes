@@ -1,4 +1,11 @@
-Revision history for Befunge-93 interpreter written for Parrot.
+Revision history for a Befunge interpreter written for Parrot.
+
+0.1.0 Sat Dec 21 14:58:24 CET 2002
+        - playfield now is an array of array (of integers) instead of
+          an array of strings.
+        - load, io and debug updated to reflect this.
+        - new versioning scheme, and minor version incrementing since
+          this is a big step for the project.
 
 0.06  Sun Dec  1 10:00:35 CET 2002
         - debugger can now interact with user.

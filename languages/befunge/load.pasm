@@ -1,16 +1,16 @@
 # Load a file given as parameter.
 # Parrot stack:
 #   before:     ... filename
-#   after:      ... PerlArray        
-# The perlarray is filled with the content of the file, 80x25.
+#   after:      ... PerlArray
+# The perlarray is a perlarray of perlarrays filled with the
+# ordinal values of the content of the file, 80x25.
 LOAD:
         pushi
         pushs
         pushp
         restore S0              # Fetch the filename
 	open P0, S0, "<"
-	set S1, ""              # Accumulator
-        new P1, .PerlArray      # The playing field
+	set S1, ""              # S1 = accumulator
 
 # Read the file.  
 LOAD_READ:
@@ -24,42 +24,49 @@ LOAD_READ:
 LOAD_EOF:
         close P0
         concat S1, "\n"         # Add a trailing newline if needed.
-        length I0, S1           # I0 =length of the buffer
-        set I1, 0               # I1 =ranges from 0 to I0
-        set I2, 0               # I2 =beginning of current line
-        set I3, 0               # I3 =current line in the array
+        length I0, S1           # I0 = length of the buffer
+        set I1, -1              # I1 = character offset in the file
+        new P1, .PerlArray      # P1 = the playing field
+        new P2, .PerlArray      # P2 = the current line (array of ints)
 
 LOAD_PARSE_BUFFER:
-        lt I0, I1, LOAD_END_BUFFER
-        substr S2, S1, I1, 1
-        ne S2, "\n", LOAD_NONL
-        sub I4, I1, I2
-        substr S3, S1, I2, I4
-        add I2, I4
-        inc I2                  # Trailing newline
-        set P1[I3], S3
-        inc I3
-
-LOAD_NONL:
         inc I1
+        ge I1, I0, LOAD_END_BUFFER
+        substr S2, S1, I1, 1    # S2 = S1[I1]
+        eq S2, "\n", LOAD_FILL_LINE
+        ord I4, S2
+        push P2, I4
+        branch LOAD_PARSE_BUFFER
+LOAD_FILL_LINE:
+        set I10, P2             # I10 = length of current line
+        ge I10, 80, LOAD_TRUNCATE_LINE
+        push P2, 32
+        branch LOAD_FILL_LINE
+LOAD_TRUNCATE_LINE:
+        set P2, 80              # Truncate the line.
+        push P1, P2             # Store the line.
+        new P2, .PerlArray      # Create a new line.
         branch LOAD_PARSE_BUFFER
 
-# Fill/truncate playfield to 25 rows and 80 columns.
+# Fill playfield to 25 rows.
 LOAD_END_BUFFER:
-        set P1, 25
-        set I0, 0
-        repeat S4, " ", 80
+        set I15, P1
+        ge I15, 25, LOAD_COMPLETE
+        new P2, .PerlArray
+LOAD_FILL_EMPTY_LINE:
+        set I10, P2
+        ge I10, 80, LOAD_STORE_EMPTY_LINE
+        push P2, 32
+        branch LOAD_FILL_EMPTY_LINE
+LOAD_STORE_EMPTY_LINE:
+        push P1, P2
+        new P2, .PerlArray
+        branch LOAD_END_BUFFER
 
-LOAD_TRUNCATE:
-        set S3, P1[I0]
-        concat S3, S4
-        substr S3, S3, 0, 80
-        set P1[I0], S3
-        inc I0
-        lt I0, 25, LOAD_TRUNCATE
-
-# Return the playfield
-        save P1
+# Truncate playfield to 25 rows.
+LOAD_COMPLETE:  
+        set P1, 25              # Truncate at 25 lines.
+        save P1                 # Return the playfield
         popp
         pops
         popi

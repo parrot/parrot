@@ -108,7 +108,6 @@ IO_OUTPUT_CHAR_POP_1:
 # i = value_at(x,y)                                
 IO_GET_VALUE:
         pushi
-        pushs
         set I11, P2
         unless I11, IO_GET_VALUE_POP_1
         pop I11, P2
@@ -116,11 +115,9 @@ IO_GET_VALUE_POP_1:
         set I10, P2
         unless I10, IO_GET_VALUE_POP_2
         pop I10, P2
-IO_GET_VALUE_POP_2:     
-        set S10, P1[I11]
-        ord I12, S10, I10
+IO_GET_VALUE_POP_2:
+        set I12, P1[I11;I10]
         push P2, I12
-        pops
         popi
         branch MOVE_PC
         
@@ -131,12 +128,10 @@ IO_GET_VALUE_POP_2:
 # value_at(x,y) = i                                
 IO_PUT_VALUE:
         pushi
-        pushs
         set I11, P2
         unless I11, IO_PUT_VALUE_POP_1
         pop I11, P2
 IO_PUT_VALUE_POP_1:     
-        set S10, P1[I11]        # original line
         set I10, P2             # offset
         unless I10, IO_PUT_VALUE_POP_2
         pop I10, P2
@@ -144,20 +139,7 @@ IO_PUT_VALUE_POP_2:
         set I20, P2
         unless I20, IO_PUT_VALUE_POP_3
         pop I20, P2
-IO_PUT_VALUE_POP_3:     
-        chr S11, I20            # char to store
-	length I12, S10
-	set S13, ""             # First part
-	set S12, ""             # Second part
-	substr S13, S10, 0, I10
-	inc I10
-	substr S12, S10, I10, I12
-	set S14, ""
-	concat S14, S13
-	concat S14, S11
-	concat S14, S12
-        set P1[I11], S14
-        pops
+IO_PUT_VALUE_POP_3:
+        set P1[I11;I10], I20
         popi
-        set S1, P1[I1]          # Restore line, in case we changed the current line...
         branch MOVE_PC

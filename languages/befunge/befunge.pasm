@@ -25,20 +25,19 @@ ARGV_DONE:
         set S10, P0[I0]
         save S10
         bsr LOAD
-        restore P1              # the playfield
-        new P2, .PerlArray      # the stack
-        set I0, 0               # x coord of the PC
-        set I1, 0               # y coord of the PC
-        set I2, 1               # direction of the PC
-        set I4, 0               # flag (1=string-mode,2=bridge,3=end)
-        time N0                 # random seed
+        restore P1              # P1 = the playfield
+        new P2, .PerlArray      # P2 = the stack
+        set I0, 0               # I0 = x coord of the PC
+        set I1, 0               # I1 = y coord of the PC
+        set I2, 1               # I2 = direction of the PC
+        set I4, 0               # I4 = flag (1=string-mode,2=bridge,3=end)
+        time N0                 # N0 = random seed
         mod N0, N0, .RANDMAX
-        set S0, " "             # current instruction
-        set S1, P1[0]           # current line
-        set S2, ""              # user input
+        set S2, ""              # S2 = user input
         
 TICK:
-        substr S0, S1, I0, 1
+        set I20, P1[I1;I0]
+        chr S0, I20             # S0 = current instruction
         eq I5, 0, TICK_NODEBUG
         bsr DEBUG_CHECK_BREAKPOINT
 TICK_NODEBUG:
@@ -100,7 +99,6 @@ MOVE_PC:
 MOVE_NORTH:
         dec I1
         mod I1, I1, 25
-        set S1, P1[I1]
         branch TICK
 MOVE_EAST:
         inc I0
@@ -109,7 +107,6 @@ MOVE_EAST:
 MOVE_SOUTH:
         inc I1
         mod I1, I1, 25
-        set S1, P1[I1]
         branch TICK
 MOVE_WEST:
         dec I0

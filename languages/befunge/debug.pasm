@@ -162,13 +162,23 @@ DEBUG_DUMP_PLAYFIELD:
         concat S10, "\n"        
         print S10
         set I10, 0
-DEBUG_DUMP_PLAYFIELD_NEXT_LINE: 
-        set S11, P1[I10]
-        print "|"
+DEBUG_DUMP_PLAYFIELD_NEXT_LINE:
+        ge I10, 25, DEBUG_DUMP_PLAYFIELD_END
+        set I11, 0
+        set S11, "|"
+DEBUG_DUMP_PLAYFIELD_NEXT_CHAR:
+        ge I11, 80, DEBUG_DUMP_PLAYFIELD_EOL
+        set I12, P1[I10;I11]
+        chr S12, I12
+        concat S11, S12
+        inc I11
+        branch DEBUG_DUMP_PLAYFIELD_NEXT_CHAR
+DEBUG_DUMP_PLAYFIELD_EOL:
+        concat S11, "|\n"
         print S11
-        print "|\n"
         inc I10
-        lt I10, 25, DEBUG_DUMP_PLAYFIELD_NEXT_LINE
+        branch DEBUG_DUMP_PLAYFIELD_NEXT_LINE
+DEBUG_DUMP_PLAYFIELD_END:
         print S10
         pops
         popi
