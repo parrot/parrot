@@ -2269,6 +2269,10 @@ sub compare_strings {
 
 output_is( <<'CODE', <<OUTPUT, "split");
 _main:
+    split P1, "", ""
+    set I1, P1
+    print I1 
+    print "\n"
     split P0, "", "ab"
     set I0, P0
     print I0
@@ -2280,6 +2284,7 @@ _main:
     print "\n"
     end
 CODE
+0
 2
 ab
 OUTPUT
@@ -2287,6 +2292,9 @@ OUTPUT
 output_is( <<'CODE', <<OUTPUT, "join");
 _main:
     new P0, .PerlArray
+    join S0, "--", P0
+    print S0
+    print "\n"
     push P0, "a"
     join S0, "--", P0
     print S0
@@ -2299,6 +2307,7 @@ _main:
     print "\n"
     end
 CODE
+
 a
 a--b
 OUTPUT
