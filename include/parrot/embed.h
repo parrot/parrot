@@ -1,3 +1,16 @@
+/* embed.h
+ *  Copyright: (When this is determined...it will go here)
+ *  CVS Info
+ *     $Id$
+ *  Overview:
+ *     This is the Parrot embedding system--the only part of Parrot that
+ *     the outside world should see.
+ *  Data Structure and Algorithms:
+ *  History:
+ *  Notes:
+ *  References:
+ */
+
 #if !defined(PARROT_EMBED_H_GUARD)
 #define PARROT_EMBED_H_GUARD
 

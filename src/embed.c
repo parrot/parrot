@@ -1,3 +1,18 @@
+/* embed.c
+ *  Copyright: (When this is determined...it will go here)
+ *  CVS Info
+ *     $Id$
+ *  Overview:
+ *     The Parrot embedding interface.
+ *  Data Structure and Algorithms:
+ *     See include/parrot/embed.h.
+ *  History:
+ *     Initial version by Brent Dax on 2002.1.28
+ *  Notes:
+ *  References:
+ */
+
+
 #include "parrot/parrot.h"
 #include "parrot/embed.h"
 
@@ -70,6 +85,12 @@ Parrot_readbc(struct Parrot_Interp *interpreter, char *filename) {
             fprintf(stderr, "Parrot VM: Can't stat %s, code %i.\n", filename, errno);
             return NULL;
         }
+        
+        if(!S_ISREG(file_stat.st_mode)) {
+            fprintf(stderr, "Parrot VM: %s is not a normal file.\n", filename);
+            return NULL;
+        }
+        
         fd = open(filename, O_RDONLY);
         if (!fd) {
              fprintf(stderr, "Parrot VM: Can't open %s, code %i.\n", filename, errno);
@@ -132,10 +153,12 @@ Parrot_runcode(struct Parrot_Interp *interpreter, int argc, char *argv[]) {
         }
     }
 
-    if(!JIT_CAPABLE && interpreter->flags & PARROT_JIT_FLAG) {
+#if !defined(JIT_CAPABLE) || !JIT_CAPABLE
+    if(interpreter->flags & PARROT_JIT_FLAG) {
         fprintf(stderr, "Parrot VM: Platform " JIT_ARCHNAME " is not JIT-capable.\n");
         exit(1);
     }
+#endif
 
     runops(interpreter, interpreter->code, 0);
 
