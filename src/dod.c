@@ -1121,7 +1121,7 @@ Parrot_dod_ms_run_init(Interp *interpreter)
 }
 
 void
-Parrot_dod_ms_run(Interp *interpreter, UINTVAL flags)
+Parrot_dod_ms_run(Interp *interpreter, int flags)
 {
     struct Arenas *arena_base = interpreter->arena_base;
     struct Small_Object_Pool *header_pool;

@@ -80,7 +80,7 @@ void Parrot_dod_clear_live_bits(Interp*);
 void Parrot_gc_ms_init(Interp* interpreter);
 void Parrot_gc_ims_init(Interp* interpreter);
 /* do_dod_run function for MS */
-void Parrot_dod_ms_run(Interp *interpreter, UINTVAL flags);
+void Parrot_dod_ms_run(Interp *interpreter, int flags);
 
 void Parrot_dod_ims_wb(Interp*, PMC *, PMC *);
 /*
