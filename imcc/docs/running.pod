@@ -64,12 +64,17 @@ it has to start with a number.
 
 =item -h, --help
 
-=item -o outputfile
+=item -o outputfile, --output=outputfile
 
 Act like assembler. Don't run code, unless B<-r> is given too. If the
 outputfile ends with B<.pbc>, a PBC file is written. If it ends with
 B<.pasm>, a PASM output is generated, even from PASM input. This can be
 handy to check various optimizations, including B<-Op>.
+
+=item --output-pbc
+
+Act like assembler, but always output a bytecode even though the outputfile
+does not end in B<.pbc>
 
 =item -r, --run-pbc
 

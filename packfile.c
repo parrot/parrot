@@ -536,52 +536,10 @@ PackFile_unpack(struct Parrot_Interp *interpreter, struct PackFile *self,
 
     header->dir_format = PackFile_fetch_op(self, &cursor);
 
-    /* old compat mode for assemble.pl */
     if (header->dir_format == 0) {
-
-        /*
-         * Unpack the Constant Table Segment:
-         */
-        header->const_ss = PackFile_fetch_op(self, &cursor);
-        self->const_table->base.op_count = header->const_ss /
-            sizeof(opcode_t);
-        if (!PackFile_check_segment_size(header->const_ss,
-                    "constant")) {
-            return 0;
-        }
-
-        if (!PackFile_ConstTable_unpack(interpreter,
-                    (struct PackFile_Segment *)self->const_table,
-                    cursor)) {
-            PIO_eprintf(NULL,
-                    "PackFile_unpack: Error reading constant table segment!\n");
-            return 0;
-        }
-
-        /* Segment size is in bytes => ops */
-        cursor += header->const_ss/sizeof(opcode_t);
-
-        /*
-         * Unpack the Byte Code Segment:
-         * PackFile new did generate already a default code segment
-         */
-
-        header->bytecode_ss = PackFile_fetch_op(self, &cursor);
-
-        if (!PackFile_check_segment_size(header->bytecode_ss,
-                    "bytecode")) {
-            return 0;
-        }
-        else if (header->bytecode_ss == 0) {
-            /* Must have at least one instruction */
-            PIO_eprintf(NULL,
-                "Packfile_unpack: No bytecode present in bytecode segment.\n");
-            return 0;
-        }
-        self->cur_cs->base.size = header->bytecode_ss / sizeof(opcode_t);
-        cursor = default_unpack(interpreter,
-                (struct PackFile_Segment *) self->cur_cs, cursor);
-
+        PIO_eprintf(NULL,
+                    "PackFile_unpack: Dir format 0 no longer supported!\n");
+        return 0;
     }
     else {
         /* new format use directory */
@@ -692,7 +650,7 @@ PackFile_remove_segment_by_name (struct PackFile *pf, const char *name)
             dir->num_segments--;
             if (i != dir->num_segments) {
                 /* We're not the last segment, so we need to move things */
-                memmove(dir->segments[i], dir->segments[i+1],
+                memmove(&dir->segments[i], &dir->segments[i+1],
                        (dir->num_segments - i) *
                        sizeof (struct PackFile_Segment *));
             }

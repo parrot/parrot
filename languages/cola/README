@@ -180,10 +180,7 @@ Using the Compiler
 
         parrot a.pbc
 
-  You can also see the Parrot assembly in "a.pasm" which should be compilable
-  with the reference assembler:
-
-        assemble.pl a.pasm > a.pbc
+  You can also see the Parrot assembly in "a.pasm".
 
   Currently colac is a short Perl pre-processor that includes
   classes for any import statements (using System;)

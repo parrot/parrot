@@ -9,4 +9,4 @@ clean:
 	rm -f *.pbc mops.c mops.o mops
 
 .pasm.pbc:
-	$(PERL) -I../../lib ../../assemble.pl -o $@ $<
+	../../parrot -o $@ $<

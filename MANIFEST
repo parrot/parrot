@@ -13,7 +13,6 @@ RELEASE_INSTRUCTIONS                              []
 RESPONSIBLE_PARTIES                               [main]doc
 TODO                                              [main]doc
 VERSION                                           [main]doc
-assemble.pl                                       [devel]
 bit.ops                                           []
 build_nativecall.pl                               []
 byteorder.c                                       []
@@ -153,7 +152,6 @@ datatypes.c                                       []
 debug.c                                           []
 debug.ops                                         []
 disassemble.c                                     []
-disassemble.pl                                    [devel]
 docs/debug.pod                                    [devel]doc
 docs/debugger.pod                                 [main]doc
 docs/dev/byteorder.dev                            [main]doc

@@ -42,7 +42,6 @@ Tests
 
 Utilities
 
-- assemble.pl rolls its own packfile packing
 - lib/Parrot/PackFile.pm does it's own packing & unpacking, which is
   not capable of reading the dir_format=1 PBC format. Non native floats
   are also not implemented.

@@ -161,7 +161,6 @@ PERL = ${perl}
 # Make directory; do not die if dir exists.
 MKDIR = $(PERL) -e ${PQ}-d or mkdir $$_,0777 or die foreach @ARGV${PQ}
 
-
 ###############################################################################
 #
 # BUILD TARGET CONFIGURATIONS:
@@ -328,7 +327,7 @@ fingerprint.c : fingerprint_c.pl lib/Parrot/OpLib/core.pm
 #
 ###############################################################################
 
-examples/assembly/mops.pbc : examples/assembly/mops.pasm assemble.pl
+examples/assembly/mops.pbc : examples/assembly/mops.pasm
 	cd examples && cd assembly && $(MAKE) mops.pbc PERL=$(PERL) && cd .. && cd ..
 
 examples/assembly/mops.c : examples/assembly/mops.pbc pbc2c.pl
@@ -337,7 +336,7 @@ examples/assembly/mops.c : examples/assembly/mops.pbc pbc2c.pl
 examples/assembly/mops${exe} : examples/assembly/mops$(O) $(LIBPARROT)
 	$(LINK) $(LINKFLAGS) ${ld_out}examples/assembly/mops${exe} examples/assembly/mops$(O) $(LIBPARROT) $(C_LIBS)
 
-examples/assembly/life.pbc : examples/assembly/life.pasm assemble.pl
+examples/assembly/life.pbc : examples/assembly/life.pasm
 	cd examples && cd assembly && $(MAKE) life.pbc PERL=$(PERL) && cd .. && cd ..
 
 examples/assembly/life.c : examples/assembly/life.pbc pbc2c.pl
@@ -583,7 +582,7 @@ quickfulltest_dummy :
 	$(PERL) t/harness $(EXTRA_TEST_ARGS) -b $(TEST_PROG_ARGS) quick
 
 # Common prep for all test targets
-test_prep : $(LIBPARROT) $(IMCC_PROG) assemble.pl
+test_prep : $(LIBPARROT) $(IMCC_PROG)
 
 test_dummy :
 	$(PERL) t/harness $(EXTRA_TEST_ARGS) $(TEST_PROG_ARGS)

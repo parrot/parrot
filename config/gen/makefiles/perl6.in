@@ -5,7 +5,7 @@ PERL = ${perl}
 myperl=$(PERL) -I../../lib
 compile=$(myperl) prd-perl6.pl --batch --imc
 imcc=..${slash}imcc${slash}imcc
-asm=$(PERL) ..${slash}..${slash}assemble.pl
+asm=$(imcc) -a --output-pbc
 
 all: imcc perl6-config
 

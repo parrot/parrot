@@ -75,6 +75,7 @@ static void help(void)
     "    -v --verbose\n"
     "    -E --pre-process-only\n"
     "    -o --output=FILE\n"
+    "       --output-pbc\n"
     "    -O --optimize[=LEVEL]\n"
     "    -a --pasm\n"
     "    -c --pbc\n"
@@ -108,6 +109,7 @@ the GNU General Public License or the Artistic License for more details.\n\n");
 #define OPT_GC_DEBUG     128
 #define OPT_DESTROY_FLAG 129
 #define OPT_HELP_DEBUG   130
+#define OPT_PBC_OUTPUT   131
 static struct longopt_opt_decl options[] = {
     { '.', '.', 0, { "--wait" } },
     { 'E', 'E', 0, { "--pre-precess-only" } },
@@ -127,6 +129,7 @@ static struct longopt_opt_decl options[] = {
     { 'h', 'h', 0, { "--help" } },
     { 'j', 'j', 0, { "--jit" } },
     { 'o', 'o', OPTION_required_FLAG, { "--output" } },
+    { '\0', OPT_PBC_OUTPUT, 0, { "--output-pbc" } },
     { 'p', 'p', 0, { "--profile" } },
     { 'r', 'r', 0, { "--run-pbc" } },
     { 't', 't', 0, { "--trace" } },
@@ -228,6 +231,12 @@ parseflags(Parrot_Interp interp, int *argc, char **argv[])
             case 'o':
                 run_pbc = 0;
                 output = str_dup(opt.opt_arg);
+                break;
+
+            case OPT_PBC_OUTPUT:
+                run_pbc = 0;
+                write_pbc = 1;
+                if (!output) output = str_dup("-");
                 break;
 
             case 'O':

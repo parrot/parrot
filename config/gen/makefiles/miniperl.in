@@ -7,7 +7,8 @@
 PERL=${perl}
 DIR=languages/miniperl
 TOOL_DIR=../..
-ASM=$(PERL) -I ../../lib ../../assemble.pl
+IMCC=../imcc/imcc${exe}
+ASM=$(IMCC) -a --output-pbc
 MINIPERLC=$(PERL) miniperlc
 INTERP=./${test_prog}
 

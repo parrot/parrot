@@ -102,5 +102,5 @@ EOF
 close(T);
 
 unlink "basic.pbc";
-system("perl -I../../../lib ../../../assemble.pl -o basic.pbc merged_basic.pasm");
+system("../../../parrot -o basic.pbc merged_basic.pasm");
 system("../../../parrot basic.pbc");

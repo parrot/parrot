@@ -203,6 +203,14 @@ op print(in PMC) {
   goto NEXT();
 }
 
+op write(in PMC) {
+  PMC *p = $1;
+  STRING *s = (VTABLE_get_string(interpreter, p));
+  if (s) {
+    PIO_write(interpreter, PIO_STDOUT(interpreter), s->strstart, s->bufused);
+  }
+  goto NEXT();
+}
 ##########################################
 
 =item B<printerr>(in INT)
@@ -406,7 +414,7 @@ op seek(in PMC, in INT, in INT, in INT) {
   if ($1) {
     if (PIO_seek(interpreter, $1, PIO_make_offset32($2, $3), $4) < 0) {
       /* XXX: seek error */
-    }    
+    }
   }
   goto NEXT();
 }
@@ -415,7 +423,7 @@ op seek(in PMC, in INT, in INT, in INT) {
 
 tell:
 Get the current file position of stream $2 and store it in $1.
-On systems where INTVAL is 32bit the result will be truncated if the 
+On systems where INTVAL is 32bit the result will be truncated if the
 position is beyond 2 GiB
 
 =item B<tell>(out INT, out INT, in PMC)

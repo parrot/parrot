@@ -1,7 +1,7 @@
 # $Id$
 # uniq - Remove duplicate lines from a sorted file
 #
-#   % ./assemble.pl uniq.pasm -o uniq.pbc
+#   % ./parrot uniq.pasm -o uniq.pbc
 #   % ./parrot uniq.pbc data.txt
 #   % ./parrot uniq.pbc -c data.txt
 #

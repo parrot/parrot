@@ -508,10 +508,9 @@ EOC
      # add the actual code for the .c file
      my $decl = "$type Parrot_${classname}_${methodname} (struct Parrot_Interp *interpreter, PMC* pmc$parameters)";
      $HOUT .= "extern $decl;\n";
-     my $lcor = $lineno + 4;	# line directive correction
 
      $methodbody{ $methodname } =
-		( $suppress_lines ? '' : "\n#line $lcor \"$pmcfile\"\n   " ) .
+		( $suppress_lines ? '' : "\n#line $lineno \"$pmcfile\"\n   " ) .
 		$decl .
 		$methodblock;
 

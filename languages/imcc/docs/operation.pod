@@ -255,9 +255,8 @@ and inserted in front of the loop entry.
 
 =head1 Code generation
 
-Imcc either generates PASM output ready to get assembled by
-F<assemble.pl> or else directly generates a PBC file for running with 
-parrot.
+Imcc either generates PASM or else directly generates a PBC file for
+running with parrot.
 
 =head1 Running code
 

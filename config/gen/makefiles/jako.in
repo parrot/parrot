@@ -9,8 +9,8 @@ RM_F = ${rm_f}
 
 DIR=languages/jako
 TOOL_DIR=../..
-ASM=$(PERL) -I ../../lib ../../assemble.pl
 IMCC=../imcc/imcc${exe}
+ASM=$(IMCC) -a --output-pbc
 JAKOC=$(PERL) -I lib jakoc
 INTERP=../../${test_prog}
 

@@ -187,9 +187,9 @@ END
 
 sub generate_pbc {
     my ($pasm, $pbc) = @_;
-    my $status = system("perl $FindBin::Bin/../../assemble.pl -o $pbc $pasm");
+    my $status = system("$FindBin::Bin/../../parrot -o $pbc $pasm");
     if (! defined($status) || $status) {
-        die "assemble.pl failed: $!";
+        die "assemble failed: $!";
     }
 }
 

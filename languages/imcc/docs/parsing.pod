@@ -107,7 +107,7 @@ I<ghash>.
 This allows for global constant folding beyond subroutine scope.
 
 Local labels in different I<compilation units> with the same name are
-allowed, though running the generated PASM through F<assemble.pl>
+allowed, though assembling the generated PASM
 doesn't work. Running this code inside imcc is ok.
 This will probably change so that local labels are mangled to be unique.
 

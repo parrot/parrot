@@ -18,44 +18,69 @@
 
 pmclass Eval extends Closure {
 
-   STRING* name () {
+    STRING* name () {
 	return whoami;
-   }
+    }
 
-   void* invoke (void* next) {
-       struct PackFile_ByteCode *old_cs;
-       struct PackFile_ByteCode *eval_cs = (struct PackFile_ByteCode *)
-	   SUPER(next);	/* invoke on Sub returns the address */
+    void* invoke (void* next) {
+	struct PackFile_ByteCode *old_cs;
+	struct PackFile_ByteCode *eval_cs = (struct PackFile_ByteCode *)
+	    SUPER(next);	/* invoke on Sub returns the address */
 #if EXEC_CAPABLE
-       extern int Parrot_exec_run;
-       if (Interp_flags_TEST(interpreter, PARROT_EXEC_FLAG)) {
-           Parrot_exec_run = 2;
-       }
+	extern int Parrot_exec_run;
+	if (Interp_flags_TEST(interpreter, PARROT_EXEC_FLAG)) {
+	    Parrot_exec_run = 2;
+	}
 #endif
- 
-       /* return address that the interpreter should jump to */
-       stack_push(INTERP, &(INTERP->ctx.control_stack), next,
-	       STACK_ENTRY_DESTINATION, STACK_CLEANUP_NULL);
-       /* switch to code segment */
-       old_cs = Parrot_switch_to_cs(interpreter, eval_cs);
-       if (Interp_flags_TEST(interpreter, PARROT_TRACE_FLAG)) {
-	   PIO_eprintf(interpreter, "*** invoking %s\n",
-		   eval_cs->base.name);
-       }
-      runops_int(interpreter, 0);
-       if (Interp_flags_TEST(interpreter, PARROT_TRACE_FLAG)) {
-	   PIO_eprintf(interpreter, "*** back from %s\n",
-		   eval_cs->base.name);
-       }
-       /* restore ctx */
-       interpreter->ctx.pad_stack =
-	       ((struct Parrot_Sub*) PMC_data(SELF))->ctx.pad_stack;
-       /* if code jumped to different code segment, go out of runloop
-	* which then actually will switch segments */
-       if (interpreter->resume_flag & 2)
-	   next = 0;
-       else
-	   (void)Parrot_switch_to_cs(interpreter, old_cs);
-       return next;
-   }
+
+	/* return address that the interpreter should jump to */
+	stack_push(INTERP, &(INTERP->ctx.control_stack), next,
+		STACK_ENTRY_DESTINATION, STACK_CLEANUP_NULL);
+	/* switch to code segment */
+	old_cs = Parrot_switch_to_cs(interpreter, eval_cs);
+	if (Interp_flags_TEST(interpreter, PARROT_TRACE_FLAG)) {
+	    PIO_eprintf(interpreter, "*** invoking %s\n",
+		    eval_cs->base.name);
+	}
+	runops_int(interpreter, 0);
+	if (Interp_flags_TEST(interpreter, PARROT_TRACE_FLAG)) {
+	    PIO_eprintf(interpreter, "*** back from %s\n",
+		    eval_cs->base.name);
+	}
+	/* restore ctx */
+	interpreter->ctx.pad_stack =
+	    ((struct Parrot_Sub*) PMC_data(SELF))->ctx.pad_stack;
+	/* if code jumped to different code segment, go out of runloop
+	 * which then actually will switch segments */
+	if (interpreter->resume_flag & 2)
+	    next = 0;
+	else
+	    (void)Parrot_switch_to_cs(interpreter, old_cs);
+	return next;
+    }
+
+    STRING* get_string () {
+	size_t size;
+	opcode_t *packed;
+	struct PackFile_Segment * seg =
+	    (struct PackFile_Segment *) SELF->cache.struct_val;
+	struct PackFile *pf = interpreter->code;
+	STRING *s;
+
+	/* XXX evil hack, until packfile is fixed */
+
+	/* remove bytecode seg from directory */
+	PackFile_remove_segment_by_name(pf, "BYTECODE");
+	/* rename the eval segment to "BYTECODE" */
+	mem_sys_free(seg->name);
+	seg->name = malloc(9);
+	strcpy(seg->name, "BYTECODE");
+
+	size = PackFile_pack_size(pf) * sizeof(opcode_t);
+	packed = (opcode_t*) mem_sys_allocate(size);
+	PackFile_pack(pf, packed);
+	s = string_make(interpreter, packed, size, NULL,0,NULL);
+	mem_sys_free(packed);
+	return s;
+    }
 }
