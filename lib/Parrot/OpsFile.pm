@@ -325,7 +325,11 @@ sub make_op
 
                     $body =~ s/\$(\d+)/{{\@$1}}/mg;
 
-      $op->body(qq{#line $line "$file"\n}.$body) unless $ENV{PARROT_NO_LINE};
+      if ($ENV{PARROT_NO_LINE}) {
+        $op->body($body); 
+      } else {
+        $op->body(qq{#line $line "$file"\n}.$body); 
+      }
 
       $jumps = $branch;
       $jumps |= 2 if ($absolute);
