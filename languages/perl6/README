@@ -1,9 +1,12 @@
 Roadmap
 =======
 
-prd-perl6.pl		old interactive and batch interface
-perl6			new compiler interface
-P6C/Addcontext.pm	Context propagation.
+The following files may be of interest to someone new to the compiler:
+
+perl6			driver program
+ChangeLog		development history, including outstanding
+			issues
+P6C/Addcontext.pm	Context propagation (type checking)
 P6C/Builtins.pm		"built-in" function code and prototypes
 P6C/Context.pm		evaluation context structure
 P6C/IMCC.pm		code generation utilities; generation for
@@ -11,11 +14,10 @@ P6C/IMCC.pm		code generation utilities; generation for
 P6C/IMCC/*.pm		code generation for less common types
 P6C/Nodes.pm		parse tree node types
 P6C/Parser.pm		the grammar
-P6C/Tree.pm		functions translating parser output to tree
-P6C/Util.pm		miscellaneous utility functions
+t/builtins		builtin function tests
 t/compiler		compiler tests
-t/parser		parser tests (unmaintained)
 t/rx			regex tests
+examples/*		simple example programs
 
 Notes
 =====
@@ -48,15 +50,111 @@ by the parrot assembler (parrot/assembler.pl).
 
 If you want to get started in parser development, you should probably
 start by reading overview.pod.  If you're not sure where to go from
-there, you can look for "XXX:" in the code, which I use to mark things
-that need fixing.  If you're interested in getting involved, drop me
+there, you can look for "XXX:" in the code, which is used to mark things
+that need fixing.  If you're interested in getting involved, drop Sean
 an email.
 
-Sean O'Rourke
-seano@cpan.org
+Features
+========
+
+While the following is intended to be a fairly comprehensive list of
+what is and is not implemented, the only fully accurate documentation
+is, of course, the tests and the code.
+
+- control structures
+
+  - control-y functions:
+    - while/until
+    - for
+    - foreach
+    - if/unless
+    - try
+    - given/when
+      - NOT full smart-matching (see =~ operator)
+    - return
+    - next/last/break/redo/skip/continue
+    - NOT exception-safe
+    - NOT using control exceptions
+  - exceptions
+    - NOT exception objects
+  - anonymous subs
+    - NOT closures
+
+- operators
+
+  - smart matching (=~, !~) (see Table 1 in Apocalypse 4)
+    - hash/scalar
+    - array/regex
+    - array/number
+    - expr/{regex, number, string}
+      - NOT boolean, undef, subst, expr
+  - NOT array 'x'
+  - NOT lazy ranges
+  - NOT s///
+  - NOT tr///
+  - single and interpolated quotes
+    - NOT user-defined quotes
+  - simple binary operators
+  - hyper operators
+    - NOT assignment versions (e.g. "^+=")
+
+- (ir)regular expressions
+
+  - alternation
+    - array literal alternation (@array)
+  - repetition
+    - both greedy and stingy
+    - NOT negated
+  - scalar literals
+  - embedded code
+  - '\x' sequences
+    - escaped metacharacters
+    - NOT "\n"-as-logical-newline
+  - <...> assertions
+    - <'literal string'>
+    - <(code assertion)>
+    - call to rules (<$anon_rule>) and (<named_rule>)
+    - call arguments
+      - <rule:string>
+      - <rule(@args)>
+      - NOT <rule pattern>
+      - character classes (<[blah]>)
+	- NOT character-class arithmetic
+	- NOT named character classes
+    - NOT unicode
+  - other assertions
+    - ^ and $
+    - NOT ^^ and $$
+  - cut operators
+    - NOT ':::' or '<cut>'
+  - NOT modifiers
+  - NOT capturing
+  - NOT "match result objects"
+
+- builtin functions
+
+  - string
+    - substr
+    - length
+    - index
+    - join
+  - array
+    - reverse
+  - I/O
+    - print (STDOUT only)
+  - miscellaneous
+    - warn
+    - die
+    - exit
+    - sleep
+    - time
+  
 
 Contributors
 ============
+
+Sean O'Rourke		Initial and ongoing development.  Bugs.
+  seano@cpan.org
 
 John Kingsley		Numerous bug fixes to the parser, parser
 			tests, parse error messages.

@@ -307,6 +307,9 @@
 	      problems.
 	    - quantifiers, stingy and otherwise, made more sane.
 
+	* Additions:
+	    - preliminary list of (un)implemented features in README
+	
 	* Test-failures:
 	    - compiler/1_11: segfault, compiler/3_7: weird stack problem.
 	      These seem to be either memory corruption or use of freed
