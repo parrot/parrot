@@ -234,6 +234,8 @@ sub main() {
     file++;
   }
 
+  print_board(board);
+
   #
   # Scan over the files, placing queens:
   #
