@@ -41,6 +41,7 @@ sub runstep {
     if($osname =~ /darwin/) {
         if( -f "/sw/include/gmp.h") {
             Configure::Data->add(' ', 'linkflags', '-L/sw/lib');
+            Configure::Data->add(' ', 'ldflags', '-L/sw/lib');
             Configure::Data->add(' ', 'ccflags', '-I/sw/include');
         }
     }

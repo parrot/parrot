@@ -431,7 +431,7 @@ ALL_PARROT_LIBS = $(LIBPARROT) $(LIBICUCORE) $(LIBICUDATA) $(C_LIBS)
 
 # dynamic extensions
 DYNEXT_DIR      = runtime/parrot/dynext
-LIBNCI_SO       = $(DYNEXT_DIR)/libnci$(SHARE_EXT)
+LIBNCI_SO       = $(DYNEXT_DIR)/libnci$(LOAD_EXT)
 
 ###############################################################################
 #
@@ -631,7 +631,7 @@ blib/lib/libparrot$(SHARE_EXT) : $(O_FILES)
 	$(LD) $(LD_SHARE_FLAGS) $(LDFLAGS) $(LD_OUT)blib/lib/libparrot$(SHARE_EXT) $(O_FILES) $(C_LIBS) $(LIBICUCORE) $(LIBICUDATA)
 
 $(TEST_PROG_SO) : $(PARROT_MAIN)$(O) blib/lib/libparrot$(SHARE_EXT) lib/Parrot/OpLib/core.pm
-	$(LINK) $(LINKFLAGS) $(LD_OUT)$(TEST_PROG) $(PARROT_MAIN)$(O) $(LIBPARROT) $(C_LIBS)
+	$(LINK) $(LINKFLAGS) $(LD_OUT)$(TEST_PROG) $(PARROT_MAIN)$(O) -Lblib/lib -lparrot $(C_LIBS)
 
 #
 # Parrot Debugger
@@ -1110,6 +1110,7 @@ clean : testclean progclean languages-clean docs-clean
     examples/assembly/mops${exe} examples/assembly/mops.c \
     examples/assembly/mops$(O) examples/assembly/mops.pbc \
     examples/mops/mops$(O) examples/mops/mops${exe}
+	$(MAKE_C) dynclasses clean
 
 progclean :
 	$(RM_F) $(O_FILES) \
@@ -1261,7 +1262,7 @@ exec_so : $(SRC)/exec_start$(O) blib/lib/libparrot$(SHARE_EXT)
 # libnci.so used by t/pmc/nci.t
 
 $(LIBNCI_SO): $(SRC)/nci_test$(O)
-	$(LD) $(LD_SHARE_FLAGS) ${ncilib_link_extra} $(LDFLAGS) \
+	$(LD) $(LD_LOAD_FLAGS) ${ncilib_link_extra} $(LDFLAGS) \
 	    $(LD_OUT)$@ $(SRC)/nci_test$(O)
 
 # vim ctags

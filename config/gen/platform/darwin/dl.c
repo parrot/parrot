@@ -11,26 +11,33 @@
 ** scan_paths()
  */
 
-/* Simple routine to walk a colon separated list of directories in a string 
-   and check for a file in each one, returning the first match. */
+/* Simple routine to walk a colon separated list of directories in a string
+   and check for a file in each one, returning the first match.
+   Note that this returns a static buffer, and so is not thread-safe. */
 static const char *
 scan_paths(const char *filename, const char *libpath)
 {
     static char buf[PATH_MAX];
     struct stat st;
+    char *path_list;
     const char *path;
-    
+
     if(!libpath)
-      return NULL;
-    
-    path = strsep((char**)&libpath, ":");
-  
+	return NULL;
+
+    path_list = strdup(libpath);
+
+    path = strsep(&path_list, ":");
+
     while(path) {
-        snprintf(buf, PATH_MAX, "%s/%s", path, filename);
-        if(stat(buf, &st) == 0)
-          return buf;
-        path = strsep((char**)&libpath, ":");
+	snprintf(buf, PATH_MAX, "%s/%s", path, filename);
+	if(stat(buf, &st) == 0) {
+	    free(path_list);
+	    return buf;
+	}
+	path = strsep(&path_list, ":");
     }
+    free(path_list);
     return NULL;
 }
 
@@ -38,18 +45,18 @@ scan_paths(const char *filename, const char *libpath)
 ** get_lib()
 */
 
-/* Try to expand a filename input into a full file system path following 
-   the behavior described in dyld(1). First looks for the file in 
-   DYLD_LIBRARY_PATH, the DYLD_FALLBACK_LIBRARY_PATH, and lastly uses the 
-   default of /usr/local/lib:/lib:/usr/lib. If the filename cannot be 
+/* Try to expand a filename input into a full file system path following
+   the behavior described in dyld(1). First looks for the file in
+   DYLD_LIBRARY_PATH, the DYLD_FALLBACK_LIBRARY_PATH, and lastly uses the
+   default of /usr/local/lib:/lib:/usr/lib. If the filename cannot be
    expanded, the original value passed to the function is returned. */
 static const char *
-get_lib(const char *filename) 
+get_lib(const char *filename)
 {
     const char *rv;
     char *libpath = getenv("DYLD_LIBRARY_PATH");
     char fallback[PATH_MAX] = "/usr/local/lib:/lib:/usr/lib";
-    
+
     rv = scan_paths(filename, libpath);
     if(rv)
       return rv;

@@ -2,6 +2,7 @@ PERL = ${perl}
 RM_F = ${rm_f}
 LOAD_EXT = ${load_ext}
 DESTDIR = ${build_dir}${slash}runtime${slash}parrot${slash}dynext
+O = ${o}
 
 # add your dynamic pmcs here
 
@@ -19,7 +20,7 @@ all :
 	$(BUILD) copy --destination=$(DESTDIR) $(PMCS)
 
 clean :
-	$(RM_F) *.c *.h *$(LOAD_EXT) *.dump lib-*
+	$(RM_F) *.c *.h *$(LOAD_EXT) *.dump lib-* *$(O)
 
 realclean: clean
 	$(RM_F) Makefile build.pl

@@ -28,8 +28,8 @@ use Parrot::Test tests => 46;
 use Parrot::Config;
 
 SKIP: {
-unless ( -e "runtime/parrot/dynext/libnci" . $PConfig{share_ext} ) {
-    skip( "Please make libnci$PConfig{share_ext}",
+unless ( -e "runtime/parrot/dynext/libnci" . $PConfig{load_ext} ) {
+    skip( "Please make libnci$PConfig{load_ext}",
           Test::Builder->expected_tests() );
 }
 
@@ -110,7 +110,7 @@ output_is( << 'CODE', << "OUTPUT", "get_string()" );
     print "\n"
 .end
 CODE
-libnci$PConfig{share_ext} was successfully loaded
+libnci$PConfig{load_ext} was successfully loaded
 OUTPUT
 
 
