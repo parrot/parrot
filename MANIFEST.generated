@@ -1,5 +1,2 @@
-languages/imcc/imcc                               [main]bin
 parrot                                            [main]bin
-pdb                                               [main]bin
-pdump                                             [main]bin
 blib/lib/libparrot.a                              [devel]lib
