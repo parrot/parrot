@@ -5,6 +5,18 @@
 
 docs/compiler_faq.pod - Parrot FAQ for compiler writers
 
+=head1 General Questions
+
+=head2 Which C compilers can I use with Parrot?
+
+Whoa, there--you're looking at the wrong FAQ.  This document is for people
+writing compilers that target Parrot.
+
+To answer your question, though, Parrot should theoretically work with any
+C89-compliant C compiler, although some features require C<gcc>.  See the
+F<README> files in the root directory for more information about building
+Parrot.
+
 =head1 Subroutines
 
 =head2 How do I generate a sub call in PIR?
