@@ -38,6 +38,7 @@ pmclass ParrotPointer {
         PMC *dest;
         dest = pmc_new(INTERP, enum_class_ParrotPointer);
         dest->data=SELF->data;
+        return dest;
     }
 
     INTVAL get_integer () {

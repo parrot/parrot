@@ -38,6 +38,7 @@ fprintf(stderr,"morph not implemented\n");
         dest = pmc_new(INTERP, enum_class_PerlNum);
         dest->vtable = SELF->vtable;
         dest->cache.num_val = SELF->cache.num_val;
+        return dest;
     }
 
     INTVAL get_integer () {

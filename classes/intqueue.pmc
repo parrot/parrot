@@ -108,6 +108,7 @@ pmclass IntQueue {
         dest = pmc_new(INTERP, enum_class_IntQueue);
         dest->vtable = SELF->vtable;
 	dest->data = SELF->data;
+        return dest;
     }
 
     INTVAL get_integer () {

@@ -35,6 +35,7 @@ pmclass PerlString {
         dest = pmc_new(INTERP, enum_class_PerlString);
         dest->vtable = SELF->vtable;
         dest->data = string_copy(INTERP,SELF->data);
+        return dest;
     }
 
     void destroy () {
