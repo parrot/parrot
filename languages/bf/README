@@ -14,7 +14,16 @@ To check that the compiler is working:
 
 To run an example Brainfuck program:
 
-  $ ../../parrot brainfuck.pbc helloworld.bf
+  $ ../../parrot bf.pasm helloworld.bf
+
+Clifford Wolf <clifford (at) clifford.at> contributed a nice bf
+program:
+
+  $ cat cw.txt
+  $ ../../parrot bf.pasm cw.bf < cw.txt > cw.c
+  $ cc -o cw cw.c
+  $ ./cw
+
 
 AUTHOR
 
