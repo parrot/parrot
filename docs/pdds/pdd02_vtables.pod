@@ -706,9 +706,16 @@ Add the passed in PMC to the beginning of the list.
 Add the passed in PMC to the beginning of the list keyed by B<key>.
 At least one of the two keys is guaranteed not to be NULL.
 
-=item void splice ???
+=item void splice(INTERP, PMC* self, PMC* value, INTVAL offset, INTVAL count)
 
-XXX - Interface undetermined
+=item void splice_keyed(INTERP, PMC* self, KEY* key, PMC* value,
+INTVAL offset, INTVAL count, KEY* value_key)
+
+=item void splice_keyed_int(INTERP, PMC* self, INTVAL* key, PMC*
+value, INTVAL *value_key, INTVAL offset, INTVAL count)
+
+Replace the B<count> PMCs at offset B<offset> from the beginning of
+B<self> with the PMCs in the aggregate B<value>
 
 =item void add(INTERP, PMC* self, PMC* value, PMC* dest)
 
