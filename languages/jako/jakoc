@@ -115,9 +115,16 @@ sub reg_q
 #
 # op_comp()
 #
-# The %comp_ops table is used to look up Perl expressions to optimize
-# all-constant ops to branches. Also there are entries to map the source
-# tokens to the op name (used in parsing conditionals below).
+# There are three kinds of entries in the %comp_ops hash:
+#
+#   * Perl expressions to optimize all-constant ops to branches.
+#
+#   * Entries to map source tokens to the op name. This is used
+#     in parsing conditionals.
+#
+#   * Entries to determine the opposite comparison operator if
+#     we need to reverse the sense of the operator as it appears
+#     in the source.
 #
 
 my %comp_ops = (
@@ -125,8 +132,8 @@ my %comp_ops = (
   'ne' => sub { $_[0] != $_[1] },
   'le' => sub { $_[0] <= $_[1] },
   'lt' => sub { $_[0] <  $_[1] },
-  'ge' => sub { $_[0] >=  $_[1] },
-  'gt' => sub { $_[0] >   $_[1] },
+  'ge' => sub { $_[0] >= $_[1] },
+  'gt' => sub { $_[0] >  $_[1] },
 
   '==' => 'eq',
   '!=' => 'ne',
@@ -134,6 +141,13 @@ my %comp_ops = (
   '<'  => 'lt',
   '>=' => 'ge',
   '>'  => 'gt',
+
+  '!eq' => 'ne',
+  '!ne' => 'eq',
+  '!le' => 'gt',
+  '!lt' => 'ge',
+  '!ge' => 'lt',
+  '!gt' => 'le',
 );
 
 sub op_comp
@@ -151,16 +165,19 @@ sub op_comp
       }
     } elsif (reg_q($a)) {
       emit_code($label, 'set', 'I0', $b);
-      emit_code(undef, $op, $a, 'I0', $true, $false);
+      emit_code(undef, $op, $a, 'I0', $true);
+      emit_code('', 'branch', $false);
     } else {
       printf STDERR "jako: Syntax error on line %d!\n", $line;
     }
   } elsif (reg_q($b)) {
     if (int_q($a)) {
       emit_code($label, 'set', 'I0', $a);
-      emit_code(undef, $op, 'I0', $b, $true, $false);
+      emit_code(undef, $op, 'I0', $b, $true);
+      emit_code('', 'branch', $false);
     } elsif (reg_q($a)) {
-      emit_code($label, $op, $a, $b, $true, $false);
+      emit_code($label, $op, $a, $b, $true);
+      emit_code('', 'branch', $false);
     } else {
       printf STDERR "jako: Syntax error on line %d!\n", $line;
     }
