@@ -8,7 +8,7 @@
 
 #include <assert.h>
 
-#if defined HAVE_COMPUTED_GOTO && defined __GNUC__
+#if defined HAVE_COMPUTED_GOTO && defined __GNUC__ && defined USE_CGP
 #  define JIT_CGP
 #endif
 
@@ -1786,11 +1786,28 @@ Parrot_emit_jump_to_eax(Parrot_jit_info_t *jit_info,
 
     if (!jit_info->objfile) {
         /* This calculates (INDEX into op_map * 4) */
-        emitm_subl_i_r(jit_info->native_ptr,
-            interpreter->code->byte_code,emit_EAX);
-        /* This jumps to the address in op_map[EDX + sizeof(void *) * INDEX] */
-        jit_emit_mov_ri_i(jit_info->native_ptr,emit_EDX,
-            jit_info->arena.op_map);
+
+        /* we have to get the code pointer, which might change
+         * due too intersegment branches
+         */
+        jit_emit_mov_ri_i(jit_info->native_ptr,emit_EDX, interpreter);
+        emitm_movl_m_r(jit_info->native_ptr, emit_EDX, emit_EDX, 0, 1,
+                offsetof(struct Parrot_Interp, code));
+        emitm_movl_m_r(jit_info->native_ptr, emit_EDX, emit_EDX, 0, 1,
+                offsetof(struct PackFile, byte_code));
+        jit_emit_sub_rr_i(jit_info->native_ptr, emit_EAX, emit_EDX);
+        /*
+         * now we have the offset of the ins in EAX
+         *
+         * we have to get the op_map too at runtime
+         */
+        jit_emit_mov_ri_i(jit_info->native_ptr,emit_EDX, interpreter);
+        emitm_movl_m_r(jit_info->native_ptr, emit_EDX, emit_EDX, 0, 1,
+                offsetof(struct Parrot_Interp, jit_info));
+        emitm_lea_m_r(jit_info->native_ptr, emit_EDX, emit_EDX, 0, 1,
+                offsetof(Parrot_jit_info_t, arena));
+        emitm_movl_m_r(jit_info->native_ptr, emit_EDX, emit_EDX, 0, 1,
+                offsetof(Parrot_jit_arena_t, op_map));
     }
 #  if EXEC_CAPABLE
     else {
@@ -1804,6 +1821,7 @@ Parrot_emit_jump_to_eax(Parrot_jit_info_t *jit_info,
     }
 #  endif
 
+    /* This jumps to the address in op_map[EDX + sizeof(void *) * INDEX] */
     emitm_jumpm(jit_info->native_ptr, emit_EDX, emit_EAX,
                         sizeof(*jit_info->arena.op_map) / 4, 0);
 }

@@ -323,19 +323,22 @@ exec_init_prederef(struct Parrot_Interp *interpreter, void *prederef_arena)
 }
 #endif
 
-static opcode_t *
-runops_jit(struct Parrot_Interp *interpreter, opcode_t *pc)
+void *
+init_jit(struct Parrot_Interp *interpreter, opcode_t *pc)
 {
 #if JIT_CAPABLE
     opcode_t *code_start;
     UINTVAL code_size;          /* in opcodes */
     opcode_t *code_end;
     jit_f jit_code;
+    if (interpreter->jit_info)
+        return (jit_f)D2FPTR(
+                ((Parrot_jit_info_t *)interpreter->jit_info)->arena.start);
 
     code_start = interpreter->code->byte_code;
     code_size = interpreter->code->cur_cs->base.size;
     code_end = interpreter->code->byte_code + code_size;
-#  ifdef HAVE_COMPUTED_GOTO
+#  if defined HAVE_COMPUTED_GOTO && defined USE_CGP
 #    ifdef __GNUC__
 #      ifdef PARROT_I386
     init_prederef(interpreter, PARROT_CGP_FLAG);
@@ -345,6 +348,28 @@ runops_jit(struct Parrot_Interp *interpreter, opcode_t *pc)
 
     jit_code = build_asm(interpreter, pc, code_start, code_end, NULL);
     interpreter->code->cur_cs->jit_info = interpreter->jit_info;
+    return jit_code;
+#else
+    return NULL;
+#endif
+}
+
+void
+prepare_for_run(Parrot_Interp interpreter)
+{
+    if (Interp_flags_TEST(interpreter, PARROT_JIT_FLAG))
+        (void) init_jit(interpreter, interpreter->code->byte_code);
+    else if (Interp_flags_TEST(interpreter, PARROT_SWITCH_FLAG))
+        init_prederef(interpreter, PARROT_SWITCH_FLAG);
+    else if (Interp_flags_TEST(interpreter, PARROT_PREDEREF_FLAG))
+        init_prederef(interpreter, interpreter->flags &PARROT_RUN_CORE_FLAGS);
+}
+
+static opcode_t *
+runops_jit(struct Parrot_Interp *interpreter, opcode_t *pc)
+{
+#if JIT_CAPABLE
+    jit_f jit_code = init_jit(interpreter, pc);
     (jit_code) (interpreter, pc);
 #endif
     return NULL;
@@ -362,7 +387,7 @@ runops_exec(struct Parrot_Interp *interpreter, opcode_t *pc)
     code_start = interpreter->code->byte_code;
     code_size = interpreter->code->cur_cs->base.size;
     code_end = interpreter->code->byte_code + code_size;
-#  ifdef HAVE_COMPUTED_GOTO
+#  if defined HAVE_COMPUTED_GOTO && defined USE_CGP
 #    ifdef __GNUC__
 #      ifdef PARROT_I386
     init_prederef(interpreter, PARROT_CGP_FLAG);

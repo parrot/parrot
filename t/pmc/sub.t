@@ -1,6 +1,6 @@
 #! perl -w
 
-use Parrot::Test tests => 41;
+use Parrot::Test tests => 43;
 use Test::More;
 
 output_is(<<'CODE', <<'OUTPUT', "PASM subs - newsub");
@@ -506,4 +506,66 @@ ok 1
 in sub
 back
 OUTPUT
+
+my $temp = "temp.pasm";
+open S, ">$temp" or die "Can't write $temp";
+print S <<'EOF';
+  .pcc_sub _sub1:
+  print "in sub1\n"
+  end
+EOF
+close S;
+
+output_is(<<'CODE', <<'OUTPUT', "load_bytecode call sub");
+.pcc_sub _main:
+    print "main\n"
+    load_bytecode "temp.pasm"
+    print "loaded\n"
+    find_global P0, "_sub1"
+    defined I0, P0
+    if I0, ok1
+    print "not "
+ok1:
+    print "found sub\n"
+    invoke
+    print "never\n"
+    end
+CODE
+main
+loaded
+found sub
+in sub1
+OUTPUT
+
+open S, ">$temp" or die "Can't write $temp";
+print S <<'EOF';
+  .pcc_sub _sub1:
+  print "in sub1\n"
+  invoke P1
+EOF
+close S;
+
+output_is(<<'CODE', <<'OUTPUT', "load_bytecode call sub, ret");
+.pcc_sub _main:
+    print "main\n"
+    load_bytecode "temp.pasm"
+    print "loaded\n"
+    find_global P0, "_sub1"
+    defined I0, P0
+    if I0, ok1
+    print "not "
+ok1:
+    print "found sub\n"
+    invokecc
+    print "back\n"
+    end
+CODE
+main
+loaded
+found sub
+in sub1
+back
+OUTPUT
+
+
 

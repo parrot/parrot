@@ -132,8 +132,9 @@ Parrot_null_s {
     Parrot_null_x s/<_N>/_i/ s/INT_R/STRING_R/ s/<val>/NULL/
 }
 
+; TODO use fldz
 Parrot_null_n {
-    FLOATVAL zero = 0;
+    static FLOATVAL zero = 0;
     if (MAP[1]) {
         jit_emit_mov_ri_n(NATIVECODE, MAP[1], &zero);
     }

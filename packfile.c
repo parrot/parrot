@@ -1569,6 +1569,7 @@ Parrot_switch_to_cs(struct Parrot_Interp *interpreter,
     interpreter->code->byte_code = new_cs->base.data;
     interpreter->prederef_code = new_cs->prederef_code;
     interpreter->jit_info = new_cs->jit_info;
+    prepare_for_run(interpreter);
     return cur_cs;
 }
 

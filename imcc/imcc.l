@@ -798,7 +798,7 @@ print_inc(const char *file, int lin)
 {
     struct macro_frame_t *f;
 
-    if (frames->is_macro)
+    if (frames && frames->is_macro)
         fprintf(stderr, "\nin macro '.%s' line %d\n", file, lin);
     else
         fprintf(stderr, "\nin file '%s' line %d\n", file, lin);

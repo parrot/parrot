@@ -30,7 +30,8 @@ typedef enum {
     PARROT_EXTERN_CODE_FLAG = 0x100,    /* reusing anothers interps code */
     PARROT_SWITCH_FLAG   = 0x200, /* We're using the switched runops */
     PARROT_DESTROY_FLAG  = 0x400, /* the last interpreter shall cleanup */
-    PARROT_EXEC_FLAG  = 0x800  /* We're emiting a native executable */
+    PARROT_EXEC_FLAG     = 0x800, /* We're emiting a native executable */
+    PARROT_RUN_CORE_FLAGS= 0x270  /* flags denoting run core */
 } Parrot_Interp_flag;
 
 /* &end_gen */
@@ -255,6 +256,9 @@ INTVAL sysinfo_i(Parrot_Interp interpreter, INTVAL info_wanted);
 STRING *sysinfo_s(Parrot_Interp interpreter, INTVAL info_wanted);
 void exec_init_prederef(struct Parrot_Interp *interpreter,
     void *prederef_arena);
+
+void prepare_for_run(Parrot_Interp interpreter);
+void *init_jit(Parrot_Interp interpreter, opcode_t *pc);
 
 #else
 
