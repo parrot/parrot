@@ -13,20 +13,33 @@
 #if !defined(PARROT_STACKS_H_GUARD)
 #define PARROT_STACKS_H_GUARD
 
+#include "parrot/parrot.h"
+
+#define STACK_CHUNK_DEPTH 256
+
 struct Stack_Entry {
     IV entry_type;
+    IV flags;
+    void (*cleanup)(struct Stack_Entry *);
     union {
-        NV number;
-        IV int;
-        PMC *pmc;
-        STRING *string;
+        NV num_val;
+        IV int_val;
+        PMC *pmc_val;
+        STRING *string_val;
         void *generic_pointer;
     } entry;
-}
+};
 
 struct Stack {
-    struct *Stack_Entry[];
-}
+  IV used;
+  IV free;
+  struct StackChunk *next;
+  struct StackChunk *prev;
+  struct Stack_Entry entry[STACK_CHUNK_DEPTH];
+};
+
+struct Stack_Entry *push_generic_entry(void *thing, IV type, void *cleanup);
+void pop_generic_entry(void *where, IV type);
 
 #endif
 
