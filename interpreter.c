@@ -12,13 +12,9 @@ void runops (struct Perl_Interp *interpreter, IV *code) {
   /* Move these out of the inner loop. No need to redeclare 'em each
      time through */
   IV *(*func)();
-  void **foo; 
+  void **temp; 
   while (*code) {
-    foo = (void *)interpreter->opcode_funcs;
-    (void *)func = foo[*code];
-    // printf("code %i at %x\n", *code, code);
-    code = func(code, interpreter);
-    CHECK_EVENTS(interpreter);
+    DO_OP(code, temp, func, interpreter);
   }
 }
 

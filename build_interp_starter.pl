@@ -31,3 +31,13 @@ while (<OPCODES>) {
     $count++ unless $name eq 'end';
 }
 print INTERP "} while (0);\n";
+
+# Spit out the DO_OP function
+print INTERP <<EOI;
+
+#define DO_OP(w,x,y,z) do { \\
+    x = (void *)z->opcode_funcs; \\
+    (void *)y = x[*w]; \\
+    w = (y)(w,z); \\
+ } while (0);
+EOI
