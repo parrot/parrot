@@ -78,9 +78,11 @@ runops_generic (opcode_t * (*core)(struct Parrot_Interp *, opcode_t *), struct P
 /*=for api interpreter prederef
  */
 
-prederef_op_func_t
-prederef(opcode_t * pc, void ** pc_prederef, struct Parrot_Interp * interpreter)
+void **
+prederef(void ** pc_prederef, struct Parrot_Interp * interpreter)
 {
+  size_t      offset = pc_prederef - interpreter->prederef_code;
+  opcode_t *  pc     = ((opcode_t *)interpreter->code->byte_code) + offset;
   op_info_t * opinfo = &core_opinfo_prederef[*pc];
   int         i;
 
@@ -135,7 +137,7 @@ prederef(opcode_t * pc, void ** pc_prederef, struct Parrot_Interp * interpreter)
   }
 
 
-  return (prederef_op_func_t)pc_prederef[0];
+  return pc_prederef;
 }
 
 
@@ -144,7 +146,7 @@ prederef(opcode_t * pc, void ** pc_prederef, struct Parrot_Interp * interpreter)
 void
 runops_prederef (struct Parrot_Interp *interpreter, opcode_t * pc, void ** pc_prederef) {
     opcode_t * code_start;
-    INTVAL         code_size;
+    INTVAL     code_size;
     opcode_t * code_end;
     void **    code_start_prederef;
 
@@ -157,14 +159,14 @@ runops_prederef (struct Parrot_Interp *interpreter, opcode_t * pc, void ** pc_pr
     code_start_prederef = pc_prederef;
 
     while (pc_prederef) {
-      DO_OP_PREDEREF(pc, pc_prederef, interpreter);
+      pc_prederef = ((prederef_op_func_t)*pc_prederef)(pc_prederef, interpreter);
+    }
 
-      if (pc_prederef == 0) {
-        pc = 0;
-      }
-      else {
-        pc = code_start + (pc_prederef - code_start_prederef);
-      }
+    if (pc_prederef == 0) {
+      pc = 0;
+    }
+    else {
+      pc = code_start + (pc_prederef - code_start_prederef);
     }
 
     if (pc && (pc < code_start || pc >= code_end)) {
@@ -214,7 +216,15 @@ runops (struct Parrot_Interp *interpreter, struct PackFile * code, size_t offset
           size_t offset = pc - (opcode_t *)interpreter->code->byte_code;
 
           if (!interpreter->prederef_code) {
-            interpreter->prederef_code = (void **)calloc(interpreter->code->byte_code_size, sizeof(void *));
+            size_t N = interpreter->code->byte_code_size;
+            size_t i;
+            void ** temp = (void **)malloc(N * sizeof(void *));
+
+            for (i = 0; i < N; i++) {
+              temp[i] = (void *)prederef;
+            }
+
+            interpreter->prederef_code = temp;
           }
 
           runops_prederef(interpreter, pc, interpreter->prederef_code + offset);
