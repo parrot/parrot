@@ -23,9 +23,9 @@ my $comment = <<'EOC';
 # if your wordsize/floattype/endianess is not covered here
 # please add it:
 
-$ parrot -o n.pbc t/op/number_1.pasm
+$ ./parrot -o n.pbc t/op/number_1.pasm
 $ make pdump
-$ pdump -h n.pbc
+$ ./pdump -h n.pbc
 $ mv n.pbc t/native_pbc/number_$(N).pbc
 
 # then
@@ -39,9 +39,6 @@ EOC
 
 use Parrot::Test tests => 5;
 
-SKIP: {
-    skip("string/icu changes--need to regenerate test files", 2);
-
 output_is(<<CODE, <<OUTPUT, "i386 double float 32 bit opcode_t");
 # number_1.pbc
 # HEADER => [
@@ -52,7 +49,6 @@ output_is(<<CODE, <<OUTPUT, "i386 double float 32 bit opcode_t");
 #        no endianize, no opcode, no numval transform
 #        dirformat = 1
 #]                #
-
 CODE
 1.000000
 4.000000
@@ -83,7 +79,7 @@ CODE
 OUTPUT
 
 output_is(<<CODE, <<OUTPUT, "i386 long double float 32 bit opcode_t");
- # number_2.pbc
+# number_2.pbc
 #HEADER => [
 #        wordsize  = 4   (interpreter's wordsize    = 4)
 #        int_size  = 4   (interpreter's INTVAL size = 4)
@@ -120,7 +116,6 @@ CODE
 281474976710656.000000
 1125899906842620.000000
 OUTPUT
-}
 
 output_is(<<CODE, <<OUTPUT, "PPC double float 32 bit BE opcode_t");
 # number_3.pbc
@@ -161,14 +156,16 @@ CODE
 1125899906842620.000000
 OUTPUT
 
-
-SKIP: {
-    skip("string/icu changes--need to regenerate test files", 2);
 output_is(<<CODE, <<OUTPUT, "little-endian 64-bit tru64");
 # number_4.pbc
-#       wordsize  = 8
-#       byteorder = 0
-#	floattype = 0
+#HEADER => [
+#	wordsize  = 8	(interpreter's wordsize    = 8)
+#	int_size  = 8	(interpreter's INTVAL size = 8)
+#	byteorder = 0	(interpreter's byteorder   = 0)
+#	floattype = 0	(interpreter's NUMVAL_SIZE = 8)
+#	no endianize, no opcode, no numval transform
+#	dirformat = 1
+#]
 CODE
 1.000000
 4.000000
@@ -231,6 +228,5 @@ CODE
 281474976710656.000000
 1125899906842620.000000
 OUTPUT
-}
 
 1;
