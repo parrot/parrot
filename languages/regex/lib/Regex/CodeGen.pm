@@ -26,7 +26,7 @@ sub dbprint {
     my ($self, $what) = @_;
     return () unless $self->{DEBUG};
     my $ctx = $self->{ctx};
-    $what = "\%<$ctx->{rx_pos}>: $what";
+    $what = "\%<<rx_pos>>: $what";
 
     my @ops;
     foreach my $part ($what =~ /((?:\%\<[\<\>\w]+\>)|[^\%]+)/g) {
@@ -128,7 +128,6 @@ sub output_if {
 
 sub output_goto {
     my ($self, $where) = @_;
-    $DB::single = 1 if ! ref($where);
     return "branch ".$self->output_label_use($where);
 }
 
@@ -138,7 +137,7 @@ sub output_terminate {
 
 sub output_label_use {
     my ($self, $label) = @_;
-    $DB::single = 1 if ! ref $label;
+    $DB::single = 1 if ! ref $label || ! $label->{label};
     ($label = $label->{label}) =~ s/^@//; # FIXME: local labels?
     return "$label";
 }
