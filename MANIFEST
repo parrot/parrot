@@ -19,6 +19,7 @@ classes/array.pmc
 classes/default.pmc
 classes/genclass.pl
 classes/intqueue.pmc
+classes/parrotcoroutine.pmc
 classes/parrotpointer.pmc
 classes/parrotsub.pmc
 classes/perlarray.pmc
