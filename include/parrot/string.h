@@ -17,6 +17,10 @@
 #include "parrot/encoding.h"
 #include "parrot/chartype.h"
 
+struct parrot_string_t;
+
+#ifdef PARROT_IN_CORE
+
 struct parrot_string_t {
     void *bufstart;
     UINTVAL buflen;
@@ -29,8 +33,6 @@ struct parrot_string_t {
 };
 
 #define Parrot_String struct parrot_string_t *
-
-#ifdef PARROT_IN_CORE
 
 #include "parrot/parrot.h"
 

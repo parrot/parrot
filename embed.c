@@ -38,8 +38,8 @@ Parrot_init(struct Parrot_Interp *interpreter)
 }
 
 void
-Parrot_setflag(struct Parrot_Interp *interpreter, Parrot_flag flag,
-               Parrot_flag_val value)
+Parrot_setflag(struct Parrot_Interp *interpreter, Parrot_Interp_flag flag,
+               Parrot_Interp_flag_val value)
 {
     if (value) Interp_flags_SET(interpreter, flag);
     else       Interp_flags_CLEAR(interpreter, flag);
@@ -290,6 +290,7 @@ Parrot_runcode(struct Parrot_Interp *interpreter, int argc, char *argv[])
 void
 Parrot_destroy(struct Parrot_Interp *interp)
 {
+    /* XXX Leaks tons of memory. */
     free(interp);
 }
 

@@ -25,13 +25,19 @@ typedef enum {
     PARROT_PREDEREF_FLAG = 0x10,  /* We're using the prederef runops */
     PARROT_JIT_FLAG      = 0x20,  /* We're using the jit runops */
     PARROT_CGOTO_FLAG    = 0x40   /* We're using the computed goto runops */
-} Interp_flags;
+} Parrot_Interp_flag;
+
+struct Parrot_Interp;
+
+typedef struct Parrot_Interp *Parrot_Interp;
+
+#if defined(PARROT_IN_CORE)
+
+typedef Parrot_Interp_flag Interp_flags;
 
 #define Interp_flags_SET(interp, flag)   (/*@i1@*/ (interp)->flags |= (flag))
 #define Interp_flags_CLEAR(interp, flag) (/*@i1@*/ (interp)->flags &= ~(flag))
 #define Interp_flags_TEST(interp, flag)  (/*@i1@*/ (interp)->flags & (flag))
-
-#if defined(PARROT_IN_CORE)
 
 #include "parrot/register.h"
 #include "parrot/parrot.h"

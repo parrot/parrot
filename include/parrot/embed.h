@@ -18,25 +18,24 @@
 #include "parrot/interpreter.h" /* give us the interpreter flags */
 #include "parrot/warnings.h"    /* give us the warnings flags    */
 
-typedef int Parrot_flag;
 typedef int Parrot_warnclass;
-typedef void *Parrot_flag_val;
+typedef void *Parrot_Interp_flag_val;
 
-Parrot Parrot_new(void);
+Parrot_Interp Parrot_new(void);
 
-void Parrot_init(Parrot);
+void Parrot_init(Parrot_Interp);
 
-void Parrot_setflag(Parrot, Parrot_flag, Parrot_flag_val);
+void Parrot_setflag(Parrot_Interp, Parrot_Interp_flag, Parrot_Interp_flag_val);
 
-void Parrot_setwarnings(Parrot, Parrot_warnclass);
+void Parrot_setwarnings(Parrot_Interp, Parrot_warnclass);
 
-Parrot_PackFile Parrot_readbc(Parrot, char *);
+Parrot_PackFile Parrot_readbc(Parrot_Interp, char *);
 
-void Parrot_loadbc(Parrot, Parrot_PackFile);
+void Parrot_loadbc(Parrot_Interp, Parrot_PackFile);
 
-void Parrot_runcode(Parrot, int argc, char *argv[]);
+void Parrot_runcode(Parrot_Interp, int argc, char *argv[]);
 
-void Parrot_destroy(Parrot);
+void Parrot_destroy(Parrot_Interp);
 
 #endif
 

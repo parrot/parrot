@@ -16,7 +16,7 @@
 #define setopt(flag) Parrot_setflag(interpreter, flag, (*argv)[0]+2);
 #define unsetopt(flag) Parrot_setflag(interpreter, flag, 0)
 
-char *parseflags(Parrot interpreter, int *argc, char **argv[]);
+char *parseflags(Parrot_Interp interpreter, int *argc, char **argv[]);
 
 static void usage(void);
 
@@ -25,7 +25,7 @@ static void version(void);
 int
 main(int argc, char *argv[])
 {
-    Parrot interpreter;
+    Parrot_Interp interpreter;
     char *filename;
     Parrot_PackFile pf;
 
@@ -53,7 +53,7 @@ main(int argc, char *argv[])
 }
 
 char *
-parseflags(Parrot interpreter, int *argc, char **argv[])
+parseflags(Parrot_Interp interpreter, int *argc, char **argv[])
 {
     if (*argc == 1) {
         usage();
