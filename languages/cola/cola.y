@@ -41,9 +41,9 @@ Symbol * t_void, * t_string, * t_int, * t_float;
 %token OVERRIDE EXTERN GET SET
 %token IF ELSE WHILE FOR RETURN BREAK CONTINUE GOTO NULLVAL TYPE
 %token <sym> IDENTIFIER LITERAL
-%token INC DEC LOGICAL_AND LOGICAL_OR LOGICAL_EQ LOGICAL_NE
-%token LOGICAL_LT LOGICAL_GT LOGICAL_LTE LOGICAL_GTE
-%token LEFT_SHIFT RIGHT_SHIFT INDEX
+%token <ival> INC DEC LOGICAL_AND LOGICAL_OR LOGICAL_EQ LOGICAL_NE
+%token <ival> LOGICAL_LT LOGICAL_GT LOGICAL_LTE LOGICAL_GTE
+%token <ival> LEFT_SHIFT RIGHT_SHIFT INDEX
 
 %token TYPE METHOD
 
@@ -76,7 +76,7 @@ Symbol * t_void, * t_string, * t_int, * t_float;
 %type <ast> unary_expression add_expression mult_expression
 %type <ast> equality_expression relational_expression
 %type <ast> call element_access arg arg_list
-%type <ival> equality_op relational_op
+%type <ival> relational_op
 %type <ival> rank_specifier rank_specifiers dim_separators
 
 
@@ -495,9 +495,21 @@ dim_separators:
     
 assignment:
     unary_expression '=' expression
-        { $$ = new_expression(ASTT_ASSIGN, $1, $3); }
+    {   $$ = new_expression(ASTT_ASSIGN, $1, $3); }
+    /*
+    |   unary_expression compound_assign_op expression
+        {
+            $$ = new_expression(ASTT_ASSIGN, $1, new_op_expression($1, $2, $3));
+        }
+    */
     ;
 
+/*
+compound_assign_op:
+
+    ;
+*/
+  
 primary_expression:
     LITERAL
         {$$ = new_expression(ASTT_LITERAL, NULL, NULL); $$->sym = $1;}
@@ -603,21 +615,15 @@ mult_expression:
     unary_expression
     |   mult_expression '*' unary_expression
         {
-            AST * ast = new_expression(ASTT_MUL, $1, $3);
-            ast->op = '*';
-            $$ = ast;
+            $$ = new_op_expression($1, '*', $3);
         }
     |   mult_expression '/' unary_expression
         {
-            AST * ast = new_expression(ASTT_MUL, $1, $3);
-            ast->op = '/';
-            $$ = ast;
+            $$ = new_op_expression($1, '/', $3);
         }
     |   mult_expression '%' unary_expression
         {
-            AST * ast = new_expression(ASTT_MUL, $1, $3);
-            ast->op = '%';
-            $$ = ast;
+            $$ = new_op_expression($1, '%', $3);
         }
     ;
 
@@ -625,46 +631,57 @@ add_expression:
     mult_expression
     |   add_expression '+' mult_expression
         {
-            AST * ast = new_expression(ASTT_ADD, $1, $3);
-            ast->op = '+';
-            $$ = ast;
+            $$ = new_op_expression($1, '+', $3);
         }
     |   add_expression '-' mult_expression
         {
-            AST * ast = new_expression(ASTT_ADD, $1, $3);
-            ast->op = '-';
-            $$ = ast;
+            $$ = new_op_expression($1, '-', $3);
         }
     ;
 
 conditional_expression:
     conditional_or_expression
-    |    conditional_or_expression '?' expression ':' expression
+    |   conditional_or_expression '?' expression ':' expression
     ;
 
 conditional_and_expression:
     inclusive_or_expression
-    |    conditional_and_expression LOGICAL_AND inclusive_or_expression
+    |   conditional_and_expression LOGICAL_AND inclusive_or_expression
+    {
+    
+    }
     ;
 
 conditional_or_expression:
     conditional_and_expression
-    |    conditional_or_expression LOGICAL_OR conditional_and_expression
+    |   conditional_or_expression LOGICAL_OR conditional_and_expression
+    {
+    
+    }
     ;
 
 and_expression:
     equality_expression
-    |    and_expression '&' equality_expression
+    |   and_expression '&' equality_expression
+        {
+            $$ = new_op_expression($1, '&', $3);
+        }
     ;
 
 exclusive_or_expression:
     and_expression
-    |    exclusive_or_expression '^' and_expression
+    |   exclusive_or_expression '^' and_expression
+        {
+            $$ = new_op_expression($1, '^', $3);
+        }
     ;
 
 inclusive_or_expression:
     exclusive_or_expression
-    |    inclusive_or_expression '|' exclusive_or_expression
+    |   inclusive_or_expression '|' exclusive_or_expression
+        {
+            $$ = new_op_expression($1, '|', $3);
+        }
     ;
 
 relational_op:
@@ -678,13 +695,6 @@ relational_op:
         {$$ = LOGICAL_GTE;}
     ;
 
-equality_op:
-    LOGICAL_EQ
-        {$$ = LOGICAL_EQ;}
-    |   LOGICAL_NE
-        {$$ = LOGICAL_NE;}
-    ;
-    
 relational_expression:
     shift_expression
     |   relational_expression relational_op shift_expression
@@ -696,17 +706,28 @@ relational_expression:
 
 equality_expression:
     relational_expression
-    |   equality_expression equality_op relational_expression
+    |   equality_expression LOGICAL_EQ relational_expression
         {
             $$ = new_expression(ASTT_COMPARISON, $1, $3);
-            $$->op = $2;
+            $$->op = LOGICAL_EQ;
+        }
+    |   equality_expression LOGICAL_NE relational_expression
+        {
+            $$ = new_expression(ASTT_COMPARISON, $1, $3);
+            $$->op = LOGICAL_NE;
         }
     ;        
 
 shift_expression:
     add_expression
-    |    shift_expression LEFT_SHIFT add_expression    
-    |    shift_expression RIGHT_SHIFT add_expression
+    |   shift_expression LEFT_SHIFT add_expression
+        {
+            $$ = new_op_expression($1, LEFT_SHIFT, $3);
+        }  
+    |   shift_expression RIGHT_SHIFT add_expression
+        {
+            $$ = new_op_expression($1, RIGHT_SHIFT, $3);
+        }  
     ;
 
 element_access:

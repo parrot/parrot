@@ -45,11 +45,17 @@ my $reg;
 my $readsyms = 0;
 
 my %i_ops = (
-    '+'    =>    'add',
-    '-'    =>    'sub',
-    '/'    =>    'div',
-    '*'    =>    'mul',
-    '%'    =>    'mod',
+    '+'     =>  'add',
+    '-'     =>  'sub',
+    '/'     =>  'div',
+    '*'     =>  'mul',
+    '%'     =>  'mod',
+    '<<'    =>  'shl',
+    '>>'    =>  'shr',
+    '~'     =>  'not',
+    '|'     =>  'or',
+    '&'     =>  'and',
+    '^'     =>  'xor',
     'arg'    =>    'save',
     'push'    =>    'save',
     'pop'    =>    'restore_i',
@@ -405,7 +411,7 @@ sub assign_expr {
     # which is easier than doing correct register allocation
     # via graph coloring.
     # FIXME: This regex has outlived its usefulness!
-    if( $right =~ m{^("[^"\n]*["\n]|[^"]+)\s+([-+*/%])\s+("[^"\n"]*["\n]|[^"]+)$} ) {
+    if( $right =~ m{^("[^"\n]*["\n]|[^"]+)\s+([-+*/%<>^|&]+)\s+("[^"\n"]*["\n]|[^"]+)$} ) {
         my ($arg2, $arg3) = (&reg_assign($1, $type), &reg_assign($3, $type));
         $op = &op_to_parrot($targ, $2);
         print "\t$op $targ, $arg2, $arg3\n";

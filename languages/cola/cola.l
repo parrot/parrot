@@ -137,6 +137,10 @@ STRINGCONSTANT    \"[^"\n]*["\n]
 "*"             {    return('*');    }
 "!"             {    return('!');    }
 "%"             {    return('%');    }
+"|"             {    return('|');    }
+"&"             {    return('&');    }
+"^"             {    return('^');    }
+"~"             {    return('~');    }
 [\t\f ]+        ;
 .               { /* ignore */        }
 %%

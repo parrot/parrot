@@ -37,8 +37,8 @@ enum ASTTYPE {
     ASTT_FIXED_PARAM,
     ASTT_PARAM_ARRAY,
     ASTT_ASSIGN,
-    ASTT_ADD,
-    ASTT_MUL,
+    ASTT_OP,
+    /*ASTT_MUL,*/
     ASTT_INDEX,
     ASTT_IF,
     ASTT_WHILE,
@@ -223,6 +223,7 @@ void                unshift_ast(AST ** list, AST * p);
 AST                 *new_ast(enum ASTKIND kind, int type, AST * left, AST * right);
 AST                 *new_statement(int type, AST * left, AST * right);
 AST                 *new_expression(int type, AST * left, AST * right);
+AST                 *new_op_expression(AST * left, int op, AST * right);
 AST                 *new_if(AST * condition, AST * then_part, AST * else_part);
 AST                 *new_while(AST * condition, AST * block);
 AST                 *new_for(AST * init, AST * condition, AST * increment, AST * block);

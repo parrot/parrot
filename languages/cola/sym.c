@@ -208,6 +208,13 @@ AST * new_expression(int exprtype, AST * left, AST * right) {
     return p;    
 }
 
+/* Specific type of expression (A b C) where b is an operator */
+AST * new_op_expression(AST * left, int op, AST * right) {
+    AST * p = new_ast(KIND_EXPRESSION, ASTT_OP, left, right);
+    p->op = op;
+    return p;    
+}
+
 AST * new_if(AST * condition, AST * then_part, AST * else_part) {
     AST * p = new_statement(ASTT_IF, then_part, else_part);
     p->Attr.Conditional.condition = condition;
@@ -435,9 +442,9 @@ AST * get_cur_primary_block() {
     return NULL;
 }
 
-char * str_dup( const char * old ) {
-    char * copy = (char *)malloc( strlen( old ) + 1 );
-    strcpy( copy, old );
+char * str_dup(const char * old) {
+    char * copy = (char *)malloc(strlen(old) + 1);
+    strcpy(copy, old);
     return copy;
 }
 

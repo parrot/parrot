@@ -57,11 +57,11 @@ void gen_bootstrap() {
     const char * saveregs        = "\tpushi\n\tpushn\n\tpushs\n";
     const char * restoreregs    = "\tpops\n\tpopn\n\tpopi\n";
     printf("\nemit<<EOF\n");
-    printf("\n__puts:\n%s\trestore S31\n\tprint S31\n%s\tret\n",
+    printf("\n__puts:\n%s\trestore S31\n\tputs S31\n%s\tret\n",
                 saveregs, restoreregs);
-    printf("\n__puti:\n%s\trestore I31\n\tprint I31\n%s\tret\n",
+    printf("\n__puti:\n%s\trestore I31\n\tputs I31\n%s\tret\n",
                 saveregs, restoreregs);
-    printf("\n__putf:\n%s\trestore N31\n\tprint N31\n%s\tret\n",
+    printf("\n__putf:\n%s\trestore N31\n\tputs N31\n%s\tret\n",
                 saveregs, restoreregs);
     printf("\n__substr:\n%s\trestore I31\n\trestore I30\n\trestore S31\n\tsubstr S30, S31, I30, I31\n\tsave S30\n%s\tret\n",
                 saveregs, restoreregs);
@@ -73,7 +73,7 @@ void gen_bootstrap() {
                 saveregs, restoreregs);
     printf("\n__ord:\n%s\trestore S0\n\tord I0, S0\n\tsave I0\n%s\tret\n",
                 saveregs, restoreregs);
-    printf("\n__gets:\n%s\treadline S0, 0\n\tsave S0\n%s\tret\n",
+    printf("\n__gets:\n%s\tread S0, 512\n\tsave S0\n%s\tret\n",
                 saveregs, restoreregs);
     printf("\n__sleep:\n%s\trestore I0\n\tsleep I0\n%s\tret\n",
                 saveregs, restoreregs);
@@ -353,6 +353,7 @@ void gen_expr(AST * p, Symbol * lval) {
     printf("#gen_expr\n");
 #endif
 
+    /* Expression is a simple identifier or literal */
     if(p->asttype == ASTT_IDENTIFIER ||
         p->asttype == ASTT_LITERAL) {
         p->targ = p->sym;
@@ -361,6 +362,7 @@ void gen_expr(AST * p, Symbol * lval) {
         return;
     }
     
+    /* Expression is a new() expression */
     if(p->asttype == ASTT_NEW_OBJECT) {
         printf("\t# new()\n");
         /*p->targ = make_rval(REFERENCE);*/
@@ -373,17 +375,20 @@ void gen_expr(AST * p, Symbol * lval) {
         return;        
     }
 
-    if(p->arg1 == NULL) {
-        printf("#gen_expr: arg1 null\n");
+    /* Expression has no operands */
+    if(p->arg1 == NULL && p->arg2 == NULL) {
+        printf("#gen_expr: no operands\n");
         exit(0);
     }
 
+    /* Expression is a method call */
     if(p->asttype == ASTT_CALL) {
         if(lval)
             p->targ = lval;
         gen_call(p);
         return;
     }
+    /* Expression is an assignment */
     else if(p->asttype == ASTT_ASSIGN) {
         gen_assign(p);
         return;
@@ -686,7 +691,6 @@ void gen_comparison(AST * p) {
         exit(0);
     }
 }
-
 
 void gen_conditional_expr(AST * p) {
     switch(p->kind) {

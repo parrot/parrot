@@ -69,9 +69,11 @@ public class Calc {
         while(1) {
             puts("Parrot Calculator (type 'quit' to exit)>");
             s = gets();
-            s = strchop(s);
             if(s == "")
+                break;
+            if(s == "\n")
                 continue;
+            s = strchop(s);
 
             puts("You typed: " + s + "\n");
             if(s == "quit")
