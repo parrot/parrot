@@ -282,13 +282,29 @@ sub mark_end {
 
 my $seen_err;
 
+sub getl($) {
+    my $linenum = shift;
+    ref($linenum)? Parse::RecDescent::linenum($linenum) : $linenum;
+}
+
+sub gett($) {
+    my $t = shift;
+    $t =~ s/\A($Parse::RecDescent::skip)//o;
+    my $matched = $1;
+    $::line += $matched =~ s/\n//g;
+    #$::col -= length($matched);
+    $t =~ s/\n.*//s;
+    $t =~ s/\s*$//;
+    return length($t)> 30 ? substr($t,0,30). '...':$t;
+}
+
 sub got_err {
     my ($msg, $text, $linenum) = @_;
 
     $seen_err = 1;
 
     # Take care of the hacked P::RD::linenum, if needed.
-    $linenum = Parse::RecDescent::linenum($linenum) if (ref($linenum));
+    $linenum = getl($linenum);
 
     # Remove whitespace at start of text.
     $text =~ s/\A($Parse::RecDescent::skip)//o;
@@ -526,13 +542,24 @@ initializer:	  assign_op scalar_expr
 ##############################
 # Statements
 
-prog:		  {%since=(); $seen_err=undef} <reject>
+prog:		  {%since=(); $seen_err=undef; $::file = $arg[0] || ''} <reject>
 		| /\A/ stmts[0] /\z/ <commit> {$seen_err ? undef : 1} ''
 		| {got_err("Invalid statement", $text, $thisline); undef;}
 
-# $arg[0] is set to true/false. True == "in block"
+# this rule get's substiuted by »-g« switch in perl6
+# so that __stmt is used.
 stmts:		  _stmt[$arg[0]](s?)
 
+# collect file,line info
+__stmt:		{ $::line = getl($thisline);
+  		  $::col = $thiscolumn;
+                  $::txt = gett($text) } <reject>
+
+__stmt:		  _stmt[$arg[0]] {
+		    bless( [$::file,$::line, $::col,$item[1], $::txt],
+		    	'P6C::debug_info') }
+
+# $arg[0] is set to true/false. True == "in block"
 _stmt:		# Handle valid reason for 'stmt' failing (hit end of block)
 		  { $arg[0] ? 1 : undef } ..."}" <commit> { undef }
 

@@ -629,7 +629,7 @@ sub P6C::closure::ctx_right {
     if ($ctx->type ne 'void') {
 	my @params = get_closure_params($x);
 	if (@params) {
-	    use P6C::Util 'is_array_expr';
+	    use P6C::Util qw(is_array_expr);
 	    my $vals = new P6C::variable(name => '@_',
 					 type => 'PerlArray');
 	    my $paramvar;
@@ -731,5 +731,6 @@ sub P6C::loop::ctx_right {
 
 ##############################
 sub P6C::label::ctx_right { }
+sub P6C::debug_info::ctx_right { }
 
 1;

@@ -1807,4 +1807,11 @@ sub P6C::label::val {
     return undef;
 }
 
+######################################################################
+sub P6C::debug_info::val {
+	my $x = shift;
+	my ($f, $l, $c, $txt) = @$x;
+	code( qq{#line $l "$f"\n#@@@@ $txt\n}) if ($P6C::IMCC::curfunc);
+}
+
 1;

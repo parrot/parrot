@@ -634,10 +634,8 @@ sub P6C::stmts::tree {
     }
     my @ret = ();
     foreach my $c (@{$x->[1]}) {
-        my $child = $c->tree;
-#     for (my $i = 0; $i <= $#{$x->[1]}; $i += 2) {
-# 	my $child = $x->[1][$i]->tree;
-	push @ret, $child if ($child);   # Ignore empty statements
+        my @child = $c->tree;	# stmt return array when -g
+	push @ret, @child if (@child);   # Ignore empty statements
     }
     return [@ret];
 }
@@ -660,6 +658,17 @@ sub stmt_guard {
     }
     return ($x->[1], $x->[3]->tree);
 }
+
+##############################
+# Debugging
+sub P6C::debug_info::tree {
+    my $x = shift;
+    my ($file, $l, $c, $stmt, $txt) = @$x;
+    #print "di: $file $l $c '$txt'\n";
+    my $di = bless [$file, $l, $c, $txt ], 'P6C::debug_info';
+    return ($di, $stmt->tree);
+}
+
 
 ##############################
 sub P6C::stmt::tree {

@@ -10,7 +10,7 @@
 
 2002-07-21
 
-	* Additions: 
+	* Additions:
 	    - anonymous subs (requires hacked IMCC)
 	    - implicit parameters (e.g. "$^a") (requires hacked IMCC)
 	    - hyper-concatenation ("^_")
@@ -111,3 +111,12 @@
 	* Test-failures:
 	    - 8.3 (Exceptions) -- stack is messed up.  Probably a P6C bug,
 	      since the exception stuff is a bit fragile still.
+
+2002-08-01
+
+	* Additions:
+	    - line numbers (Leo Toetsch)
+
+	* Fixes:
+	    - driver cleanup (Toetsch)
+

@@ -26,7 +26,7 @@ use P6C::Tree;
 use P6C::Parser;
 
 use vars qw($IMCC $ASM $PARROT $PBC2C $HERE $CD $VERSION);
-$VERSION = '0.01';
+$VERSION = '0.02';
 
 $HERE   = 'languages/perl6';
 $IMCC   = '../imcc/imcc';
@@ -35,13 +35,14 @@ if ($^O eq 'cygwin') {
     $PARROT = '../../parrot.exe';
 } else {
     $PARROT = '../../parrot';
-    $PBC2C = 'cd ../../; perl pbc2c.pl';
-    $CD = "cd ../..;";
 }
+$PBC2C = 'cd ../../; perl pbc2c.pl';
+$CD = "cd ../..;";
 
-sub usage() {
-        print(<<'EOF'
-usage:  perl6 [ p6c-options ] [ imcc-options ]
+sub usage($) {
+    my $fh = shift;
+    print($fh <<'EOF'
+    usage:  perl6 [ p6c-options ] [ imcc-options ]
               [ asm-options ] [ run-options ]
               [ global-options ] file ...
 
@@ -53,7 +54,9 @@ usage:  perl6 [ p6c-options ] [ imcc-options ]
         -S,--pasm        stop after creating .pasm file
         -I,--imc         stop after creating .imc file
         --tree           stop after creating parse tree
+    --raw-tree       output raw parser tree
         --test-parser    interactive parser-testing mode
+    -g		 generate debug info
 
       Parse::RecDescent control:
         --trace          set $::RD_TRACE
@@ -101,18 +104,21 @@ EOF
 use vars '%o';
 
 Getopt::Long::Configure(qw(bundling));
-(GetOptions(\%o,qw(test-parser
-                   trace no-hitem tree
+GetOptions(\%o,qw{
+    test-parser
+    trace no-hitem tree raw-tree
                    add-main rule=s grammar=s force-grammar
                    debug
+    debug-info|g
                    verbose|v+
                    warnings|w+
                    parrot-options|R=s
                    compile-pbc|C
                    pbc|B pasm|S imc|I 
-                   help|h version|V))
- && !$o{help})
-    || usage();
+    help|h version|V
+}) or usage(\*STDERR);
+
+usage(\*STDOUT) if ($o{help});
 
 $::RD_TRACE = $o{trace};
 $::RD_NO_HITEM = $o{"no-hitem"};
@@ -124,22 +130,10 @@ $o{tree} = 1 if $o{'test-parser'};
 
 my $filebase = 'a';		# basename for output files.
 
-##########################
-# Pass 1 P6C parser
-#        output file.imc [ file.tree ]
-#
+###### run parser
+pass1();
 
-if (defined $o{tree}) {
-    eval <<'END';
-    use Data::Dumper;
-    $Data::Dumper::Terse = 1;
-    $Data::Dumper::Indent = 1;
-END
-    die $@ if $@;
-} else {
-    eval 'use P6C::IMCC qw(:external)';
-    die $@ if $@;
-}
+###### utils
 
 sub verbose($@) {
     my ($level, @t) = @_;
@@ -159,46 +153,38 @@ sub warnings($$) {
         $wn++;
         verbose(1, "Writing warnings to '$file'") if ($wn == 1);
         # redirect STDERR to file
-        open(OERR, ">&STDERR");
+	open(OERR, '>&STDERR');
         open(STDERR, ">>$file");
         select(STDERR); $|=1;
         select(STDOUT); $|=1;
         # and all warn messages too
         $SIG{'__WARN__'} = sub { print STDERR @_; };
+	$SIG{'__DIE__'} = sub { print STDERR @_; die};
     }
 
     my $ret = &$sub;
     if ($wn) {
         # restore above redirects
         close(STDERR);
-        open(STDERR, ">&OERR");
-        close(OERR);
+	open(STDERR, '>&OERR');
+	close(OERR);	# avoid perl warning
         $SIG{'__WARN__'} = sub { warn @_; };
+	$SIG{'__DIE__'} = sub { die @_; };
     }
     $ret;
 }
 
-my $parser;
+##########################
+# Pass 1 P6C parser
+#        output file.imc [ file.tree ]
+#
 
-if (!$o{'force-grammar'} && eval("require $o{grammar}")) {
-    $parser = eval "new $o{grammar}" or die "$o{grammar}: $@";
-} else {
-    warn $@ if $@;
-    verbose(1,"Constructing parser for $o{grammar}...");
-    if ($o{grammar}) {
-        P6C::Parser->Precompile($o{grammar});
-        eval "require $o{grammar}" or die $@;
-        $parser = $o{grammar}->new;
-    } else {
-        $parser = P6C::Parser->new();
-    }
-    verbose(1, "Done");
-}
-
+# dump tree or write imc
+#
 sub output_tree {
-    my $x = shift->tree;
+    my $tree = shift;
+    my $x = $tree->tree;
     my $file = shift;
-    $file = '-' unless defined $file;
     my $fw = shift || 0;
     if ($o{tree}) {
         my $tf;
@@ -209,6 +195,7 @@ sub output_tree {
         }
         verbose(2, "Dump tree to '$tf'");
         open(OUT, ">$tf") or die("Can't write '$tf': $!");
+	print OUT Dumper($tree) if ($o{'raw-tree'});
         print OUT Dumper($x);
         close OUT;
     } else {
@@ -221,17 +208,116 @@ sub output_tree {
         warnings(sub { P6C::IMCC::compile($x) }, $fw);
         my $f = "$filebase.imc";
         verbose(2, "Writing '$f'");
-        open(OOUT, ">&STDOUT");
+	open(OOUT, '>&STDOUT');
         open(STDOUT, ">$f");
         warnings(sub { P6C::IMCC::emit() }, $fw);
         close(STDOUT);
-        open(STDOUT, ">&OOUT");
+	open(STDOUT, '>&OOUT');
         close(OOUT);
         pass2($f, $fw);
     }
 }
 
-sub pass2($) {
+# load Perlgrammar or generate new
+# make new parser
+#
+sub get_parser() {
+    my $parser;
+    if (!$o{'force-grammar'} && eval("require $o{grammar}")) {
+	$parser = eval "new $o{grammar}" or die "$o{grammar}: $@";
+    } else {
+	warn $@ if $@;
+	verbose(1,"Constructing parser for $o{grammar}...");
+	if ($o{grammar}) {
+	    P6C::Parser->Precompile($o{grammar});
+	    eval "require $o{grammar}" or die $@;
+	    $parser = $o{grammar}->new;
+	} else {
+	    $parser = P6C::Parser->new();
+	}
+	verbose(1, "Done");
+    }
+    if (defined $o{'debug-info'}) {
+	$parser->debug_on;
+    }
+    $parser;
+}
+
+sub pass1 {
+    if (defined $o{tree}) {
+	eval <<'END';
+	use Data::Dumper;
+	$Data::Dumper::Terse = 1;
+	$Data::Dumper::Indent = 1;
+END
+	die $@ if $@;
+    } else {
+	eval 'use P6C::IMCC qw(:external)';
+	die $@ if $@;
+    }
+    my $parser = get_parser();
+
+    my $in = '';
+    unless ($o{'test-parser'}) {
+	local $/ = undef;
+	push(@ARGV, "-") unless(@ARGV);
+	for my $f (@ARGV) {
+	    verbose(1, "P6C '$f'");
+	    open(IN, $f) or die("Can't read '$f': $!");
+	    $in = <IN>;
+	    close(IN);
+	    if ($f eq '-') {
+		$filebase = 'a';
+	    } else {
+		($filebase = $f) =~ s/\.[^.]*$//;
+	    }
+	    my $fw = "$filebase.warn";
+	    unlink($fw);
+	    verbose(2, "Parsing");
+	    my $result = warnings(sub {$parser->$::rule($in,0,$f)}, $fw);
+	    output_tree($result, $f, $fw);
+	}
+	exit;
+    }
+
+    # Delay loading Term::ReadLine if we don't need it.
+    eval <<'END';
+    use Term::ReadLine;
+
+    my $term = new Term::ReadLine $0 or die $!;
+    my $prompt = '> ';
+
+    while (defined(my $l = $term->readline($prompt))) {
+	if ($in =~ /^:(.*)/) {
+	    print eval $1, "\n";
+	    $in = '';
+	    next;
+	}
+	unless ($l =~ /^$/) {
+	    $in .= "$l\n";
+	    $prompt = '? ';
+	    next;
+	}
+	print "as $::rule:\n";
+	my $result = $parser->$::rule($in);
+	print STDERR "done\n";
+	if ($result) {
+	    output_tree($result, '-');
+	} else {
+	    print "parse error\n";
+	}
+	print "\n";
+	$in = '';
+	$prompt = '> ';
+    }
+END
+    die $@ if $@;
+}	# pass1
+
+#
+# compil intermediate compile code .imc => .pasm
+#
+sub pass2($$) {
     return if $o{imc};          # stop after generating IMC.
     my $file = shift;
     my $fw = shift;
@@ -247,6 +333,9 @@ sub pass2($) {
     pass3($outfile, $fw);
 }
 
+#
+# assemble byte code .pasm => .pbc
+#
 sub pass3($$) {
     return if $o{pasm};         # stop after generating assembly
     my $file = shift;
@@ -266,6 +355,10 @@ sub pass3($$) {
     pass4($outfile, $fw);
 }
 
+#
+# compile and run
+# or run byte code
+#
 sub pass4($$) {
     return if $o{pbc};          # stop after generating bytecode
     my $file = shift;
@@ -310,11 +403,11 @@ sub pass4($$) {
                 "$PConfig{libs}";
         verbose(1, "linking $cmd");
         if (system($cmd)) {
-            die("failed: return $?");
+	    die("Linking failed: return $?");
         }
         verbose(1, "running $filebase");
         if (system($filebase)) {
-            die("failed: return $?");
+	    die("Running failed: return $?");
         }
 
     }
@@ -327,58 +420,4 @@ sub pass4($$) {
     }
 }
 
-my $in = '';
-unless ($o{'test-parser'}) {
-    local $/ = undef;
-    push(@ARGV, "-") unless(@ARGV);
-    for my $f (@ARGV) {
-        verbose(1, "P6C '$f'");
-        open(IN, $f) or die("Can't read '$f': $!");
-        $in = <IN>;
-        close(IN);
-	if ($f eq '-') {
-	    $filebase = 'a';
-	} else {
-	    ($filebase = $f) =~ s/\.[^.]*$//;
-        }
-        my $fw = "$filebase.warn";
-        unlink($fw);
-        verbose(2, "Parsing");
-        my $result = warnings(sub {$parser->$::rule($in)}, $fw);
-        output_tree($result, $f, $fw);
-    }
-    exit;
-}
-
-# Delay loading Term::ReadLine if we don't need it.
-eval <<'END';
-use Term::ReadLine;
-
-my $term = new Term::ReadLine $0 or die $!;
-my $prompt = '> ';
-
-while (defined(my $l = $term->readline($prompt))) {
-    if ($in =~ /^:(.*)/) {
-        print eval $1, "\n";
-        $in = '';
-        next;
-    }
-    unless ($l =~ /^$/) {
-        $in .= "$l\n";
-        $prompt = '? ';
-        next;
-    }
-    print "as $::rule:\n";
-    my $result = $parser->$::rule($in);
-    print STDERR "done\n";
-    if ($result) {
-        output_tree($result);
-    } else {
-        print "parse error\n";
-    }
-    print "\n";
-    $in = '';
-    $prompt = '> ';
-}
-END
-die $@ if $@;
+# vim: set sw=4:
