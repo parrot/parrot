@@ -153,7 +153,7 @@ main(int argc, char **argv)
         printf("Can't read PBC\n");
         return 1;
     }
-    interpreter->code = pf;
+    Parrot_loadbc(interpreter, pf);
     if (convert) {
         size_t size;
         opcode_t *pack;

@@ -184,8 +184,6 @@ int main(int argc, char * argv[])
     struct Parrot_Interp *interpreter = Parrot_new();
 
     Parrot_init(interpreter, (void*)&stacktop);
-    pf = PackFile_new(0);
-    interpreter->code = pf;
     interpreter->DOD_block_level++;
 
     sourcefile = parseflags(interpreter, &argc, &argv);
@@ -238,7 +236,6 @@ int main(int argc, char * argv[])
             info(1,"\n");
     }
     if (run_pbc == 2) {
-        PackFile_destroy(pf);
         pf = Parrot_readbc(interpreter, sourcefile);
         if (!pf)
             fatal(1, "main", "Packfile loading failed\n");
@@ -248,6 +245,8 @@ int main(int argc, char * argv[])
     else {
         int per_pbc = write_pbc | run_pbc;
         info(1, "using optimization '%s'\n", optimizer_opt);
+        pf = PackFile_new(0);
+        Parrot_loadbc(interpreter, pf);
 
         line = 1;
         emit_open(per_pbc, per_pbc ? (void*)interpreter : (void*)output);

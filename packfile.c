@@ -210,9 +210,9 @@ static void cvt_num12_num8_be(unsigned char *dest, unsigned char *src)
 
 static void cvt_num12_num8_le(unsigned char *dest, unsigned char *src)
 {
-    cvt_num12_num8(dest, src);
-    /* TODO endianize */
-    internal_exception(1, "TODO cvt_num12_num8_le\n");
+    unsigned char b[8];
+    cvt_num12_num8(b, src);
+    fetch_buf_le_8(dest, b);
 }
 /***************************************
 
