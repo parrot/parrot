@@ -2,7 +2,13 @@ use ExtUtils::MakeMaker;
 # See lib/ExtUtils/MakeMaker.pm for details of how to influence
 # the contents of the Makefile that is written.
 
-my $objects = join ' ', map { "../../$_" } split /\s+/,'byteorder.o string.o encoding.o encodings/singlebyte.o encodings/utf16.o encodings/utf32.o encodings/utf8.o chartype.o chartypes/unicode.o chartypes/usascii.o exceptions.o resources.o memory.o packfile.o packout.o';
+#
+# XXX This is probably not as portable as it should be.
+#
+my $ext = $^O =~ /Win/ ? 'obj' : 'o';
+my $objects = join ' ',
+              map { "../../$_.$ext" }
+              qw(byteorder string encoding encodings/singlebyte encodings/utf16 encodings/utf32 encodings/utf8 chartype chartypes/unicode chartypes/usascii exceptions resources memory packfile packout);
 $objects .= ' $(BASEEXT)$(OBJ_EXT)';
 
 WriteMakefile(

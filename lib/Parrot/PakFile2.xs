@@ -18,7 +18,7 @@ SV* output_bytecode(SV* sv) {
     string_init();
 
     if (!SvROK(sv) || SvTYPE(SvRV(sv)) != SVt_PVHV) {
-        Perl_croak("Argument to output_bytecode needs to be a hash ref\n");
+        Perl_croak(aTHX_ "Argument to output_bytecode needs to be a hash ref\n");
     }
 
     pf = malloc(sizeof(struct PackFile));
@@ -29,7 +29,7 @@ SV* output_bytecode(SV* sv) {
 
     tsv = *hv_fetch((HV*)SvRV(sv), "constants", 9, 1);
     if (!SvROK(tsv) || SvTYPE(SvRV(tsv)) != SVt_PVAV) {
-        Perl_croak("Constants table not an array reference\n");
+        Perl_croak(aTHX_ "Constants table not an array reference\n");
     }
 
     const_av = (AV*)(SvRV(tsv));
@@ -45,7 +45,7 @@ SV* output_bytecode(SV* sv) {
         SV* val;
 
         if (!SvROK(tmpsv) || SvTYPE(SvRV(tmpsv)) != SVt_PVAV) {
-            Perl_croak("Index %i of constants table not an array reference\n", i);
+            Perl_croak(aTHX_ "Index %i of constants table not an array reference\n", i);
         }
         
         /* @constants = (..., [ "S", "Hello World" ], ... ); */
@@ -66,7 +66,7 @@ SV* output_bytecode(SV* sv) {
             pf_const->constants[i]->type = PFC_NUMBER;
             pf_const->constants[i]->number = SvNV(val);
         } else {
-            Perl_croak("Don't know what to do with type %s\n", type);
+            Perl_croak(aTHX_ "Don't know what to do with type %s\n", type);
         }
     }
 
