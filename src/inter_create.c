@@ -383,8 +383,9 @@ Parrot_really_destroy(int exit_code, void *vinterp)
     /* intstack */
     intstack_free(interpreter, interpreter->ctx.intstack);
 
-    /* chartype, encodings */
+    /* strings, chartype, encodings */
     if (!interpreter->parent_interpreter) {
+        string_deinit(interpreter);
 /*
         chartype_destroy();
         encoding_destroy();

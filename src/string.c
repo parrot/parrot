@@ -225,15 +225,21 @@ Creation, enlargement, etc.
 =over 4
 
 =item C<void
-string_init(void)>
+string_init(Interp*)>
 
 Initializes the Parrot string subsystem.
+
+=item C<void
+string_deinit(Interp*)>
+
+De-Initializes the Parrot string subsystem.
 
 =cut
 
 */
 
 #include "parrot/string_private_cstring.h"
+
 void
 string_init(Parrot_Interp interpreter)
 {
@@ -276,6 +282,12 @@ string_init(Parrot_Interp interpreter)
         /* TODO construct string here and valid hashval */
     }
 
+}
+
+void
+string_deinit(Parrot_Interp interpreter)
+{
+    mem_sys_free(interpreter->const_cstring_table);
 }
 
 /*

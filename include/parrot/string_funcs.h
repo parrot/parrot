@@ -62,6 +62,7 @@ STRING *string_set(struct Parrot_Interp *, STRING *d, STRING *s);
                          const ENCODING *, const CHARTYPE *,
                          STRING **dest_ptr); */
 void string_init(Parrot_Interp);
+void string_deinit(Parrot_Interp);
 UINTVAL string_capacity(struct Parrot_Interp *interpreter, STRING *s);
 void *string_pointer_to_index(struct Parrot_Interp *,
 								const STRING *s, UINTVAL idx);
