@@ -10,6 +10,9 @@
 #
 # $Id$
 # $Log$
+# Revision 1.5  2002/05/25 01:34:17  clintp
+# Fixed trace
+#
 # Revision 1.4  2002/05/22 17:54:21  clintp
 # Removed unneeded code, refactored
 #
@@ -70,9 +73,6 @@ NOLINE: restore S0
 	set I22, 0 # Error flag
 	eq I25, 0, LOAD_TABLE
 
-	print "Dispatching "	
-	print I4
-	print "\n"
 	trace I25
 
 
