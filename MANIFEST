@@ -122,6 +122,7 @@ disassemble.pl
 docs/debugger.pod
 docs/dev/byteorder.dev
 docs/dev/dod.dev
+docs/dev/infant.dev
 docs/dev/rx.dev
 docs/embed.pod
 docs/faq.pod
