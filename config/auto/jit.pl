@@ -79,10 +79,13 @@ print("-e \"jit/$cpuarch/core.jit\" = ", -e "jit/$cpuarch/core.jit" ? 'yes' : 'n
 	}
   }
 
-  if (-e "config/gen/platform/$cpuarch.s") {
-    copy_if_diff("config/gen/platform/$cpuarch.s", "asmfun.s");
-
-    Configure::Data->set(asmfun_o => 'asmfun$(O)');
+  if (-e "jit/$cpuarch/$jitarchname.s") {
+    copy_if_diff("jit/$cpuarch/$jitarchname.s", "src/asmfun.s");
+    Configure::Data->set(asmfun_o => 'src/asmfun$(O)');
+  }
+  elsif (-e "jit/$cpuarch/asm.s") {
+    copy_if_diff("jit/$cpuarch/asm.s", "src/asmfun.s");
+    Configure::Data->set(asmfun_o => 'src/asmfun$(O)');
   } else {
     Configure::Data->set(asmfun_o => '');
   }

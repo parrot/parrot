@@ -40,24 +40,27 @@
     cal SP,80(SP)
     bcr BO_ALWAYS,CR0_LT
 
-.Parrot_ppc_jit_restore_nonvolatile_registers:
-    .function .Parrot_ppc_jit_restore_nonvolatile_registers,.Parrot_ppc_jit_restore_nonvolatile_registers,2,0
-    lfd 14,-84(SP)
-    lfd 15,-92(SP)
-    lfd 16,-100(SP)
-    lfd 17,-108(SP)
-    lfd 18,-116(SP)
-    lfd 19,-124(SP)
-    lfd 20,-132(SP)
-    lfd 21,-140(SP)
-    lfd 22,-148(SP)
-    lfd 23,-156(SP)
-    lfd 24,-164(SP)
-    lfd 25,-172(SP)
-    lfd 26,-180(SP)
-    lfd 27,-188(SP)
-    lfd 28,-196(SP)
-    lfd 29,-204(SP)
-    lfd 30,-212(SP)
-    lfd 31,-220(SP)
-    bcr BO_ALWAYS,CR0_LT
+#
+# see jit/ppc/asm.s
+
+# .Parrot_ppc_jit_restore_nonvolatile_registers:
+#     .function .Parrot_ppc_jit_restore_nonvolatile_registers,.Parrot_ppc_jit_restore_nonvolatile_registers,2,0
+#     lfd 14,-84(SP)
+#     lfd 15,-92(SP)
+#     lfd 16,-100(SP)
+#     lfd 17,-108(SP)
+#     lfd 18,-116(SP)
+#     lfd 19,-124(SP)
+#     lfd 20,-132(SP)
+#     lfd 21,-140(SP)
+#     lfd 22,-148(SP)
+#     lfd 23,-156(SP)
+#     lfd 24,-164(SP)
+#     lfd 25,-172(SP)
+#     lfd 26,-180(SP)
+#     lfd 27,-188(SP)
+#     lfd 28,-196(SP)
+#     lfd 29,-204(SP)
+#     lfd 30,-212(SP)
+#     lfd 31,-220(SP)
+#     bcr BO_ALWAYS,CR0_LT
