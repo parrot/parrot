@@ -274,27 +274,6 @@ else {
 #define CALL(f) Parrot_exec_add_text_rellocation_func(jit_info->objfile, jit_info->native_ptr, f); \\
     emitm_calll(jit_info->native_ptr, EXEC_CALLDISP);
 
-#define DISP_INTERP_rm_i -4
-#define DISP_INTERP_mr_i -4
-#define DISP_INTERP_mi_i -8
-
-#define DISP_INTERP_rm_n -6
-#define DISP_INTERP_mr_n -4
-#define DISP_INTERP_ri_n -4
-#define DISP_INTERP_mi_n -4
-
-#define DISP_INTERP_ri_ni -6
-#define DISP_INTERP_mi_ni -4
-
-#define DISP_PC_ri_ni -6
-#define DISP_PC_mi_ni -10
-
-#define DISP_CONST_ri_n 2
-#define DISP_CONST_rm_n 2
-#define DISP_CONST_mr_n 4
-#define DISP_CONST_mi_n 2
-
-#define DISP_CONST_push -4
 END_C
 }
 if (($cpuarch eq 'ppc') && ($genfile ne "jit_cpu.c")) {

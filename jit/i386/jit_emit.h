@@ -45,11 +45,7 @@ extern UINTVAL ld(UINTVAL);
 #   define EXEC_RD \
       if (Parrot_exec_rel_addr && Parrot_exec_rel_count) \
         Parrot_exec_rel_count--;
-#  else
-#   define EXEC_RA(addr) {}
-#   define EXEC_RD(addr) {}
 #  endif
-
 
 #  define emit_b00 0
 #  define emit_b01 1
@@ -117,7 +113,9 @@ emit_disp8_32(char *pc, int disp)
     }
     else {
         *(long *)pc = disp;
+#if EXEC_CAPABLE
         EXEC_RA(pc);
+#endif
         return pc + 4;
     }
 }
@@ -188,7 +186,9 @@ emit_r_X(char *pc, int reg_opcode, int base, int i, int scale, long disp)
     if (!base && !(i && scale) && (!emit_is8bit(disp) || 1)) {
         *(pc++) = emit_Mod_b00 | reg_opcode | emit_rm_b101;
         *(long *)pc = disp;
+#if EXEC_CAPABLE
         EXEC_RA(pc);
+#endif
         return pc + 4;
     }
 
@@ -308,12 +308,21 @@ emit_shift_r_m(char *pc, int opcode, int reg,
     *(long *)pc = (long)imm; \
     (pc) += 4; }
 
-#  define emitm_pushl_m(pc, mem) { \
-    *(pc++) = 0xff; \
-    *(pc++) = 0x35; \
-    *(long *)pc = (long)mem; \
-    EXEC_RA(pc); \
-    (pc) += 4; }
+#  if EXEC_CAPABLE
+#    define emitm_pushl_m(pc, mem) { \
+       *(pc++) = 0xff; \
+       *(pc++) = 0x35; \
+       *(long *)pc = (long)mem; \
+       EXEC_RA(pc); \
+       (pc) += 4; }
+#  else /* EXEC_CAPABLE */
+#    define emitm_pushl_m(pc, mem) { \
+       *(pc++) = 0xff; \
+       *(pc++) = 0x35; \
+       *(long *)pc = (long)mem; \
+       (pc) += 4; }
+#  endif /* EXEC_CAPABLE */
+
 
 static char *
 emit_pushl_m(char *pc, int base, int i, int scale, long disp)
@@ -653,7 +662,6 @@ opt_div_rm(Parrot_jit_info_t *jit_info, int dest, void * mem, int is_div)
     jit_emit_mov_rr_i(pc, emit_EDX, emit_EAX);
     pc = emit_shift_i_r(pc, emit_b111, 31, emit_EDX); /* SAR 31 */
 #endif
-    //EXEC_RA(pc);
     emitm_sdivl_m(pc, 0,0,0, (long)(mem));
 
     if (is_div) {
@@ -697,12 +705,20 @@ opt_div_rm(Parrot_jit_info_t *jit_info, int dest, void * mem, int is_div)
     (pc) = emit_r_X((pc), emit_reg(reg1 - 1), b, i, s, (long)d); }
 
 #ifdef NO_MUL_OPT
-#  define jit_emit_mul_rir_i(pc, reg2, imm, reg1) \
-    *(pc++) = 0x69; \
-    *(pc++) = 0xc0 | (reg1 - 1) | (reg2 - 1) << 3; \
-    EXEC_RA(pc); \
-    *(long *)(pc) = (long)imm; \
-    pc += 4
+#  if EXEC_CAPABLE
+#    define jit_emit_mul_rir_i(pc, reg2, imm, reg1) \
+       *(pc++) = 0x69; \
+       *(pc++) = 0xc0 | (reg1 - 1) | (reg2 - 1) << 3; \
+       EXEC_RA(pc); \
+       *(long *)(pc) = (long)imm; \
+       pc += 4
+#  else /* EXEC_CAPABLE */
+#    define jit_emit_mul_rir_i(pc, reg2, imm, reg1) \
+       *(pc++) = 0x69; \
+       *(pc++) = 0xc0 | (reg1 - 1) | (reg2 - 1) << 3; \
+       *(long *)(pc) = (long)imm; \
+       pc += 4
+#  endif /* EXEC_CAPABLE */
 #else
 static char *
 opt_mul(char *pc, int dest, INTVAL imm, int src)
@@ -1330,10 +1346,16 @@ static unsigned char *lastpc;
     *((pc)++) = 0xff; \
     *((pc)++) = 0xd0 | (reg - 1); }
 
-#  define emitm_callm(pc, b, i, s, d) { \
- *((pc)++) = 0xff; \
- (pc) = emit_r_X(pc, emit_reg(emit_b010), b, i, s, d);\
- EXEC_RD }
+#  if EXEC_CAPABLE
+#    define emitm_callm(pc, b, i, s, d) { \
+       *((pc)++) = 0xff; \
+       (pc) = emit_r_X(pc, emit_reg(emit_b010), b, i, s, d);\
+       EXEC_RD }
+#  else /* EXEC_CAPABLE */
+#    define emitm_callm(pc, b, i, s, d) { \
+       *((pc)++) = 0xff; \
+       (pc) = emit_r_X(pc, emit_reg(emit_b010), b, i, s, d); }
+#  endif /* EXEC_CAPABLE */
 
 #  define emitm_jumps(pc, disp) { \
     *((pc)++) = 0xeb; \
@@ -1347,10 +1369,16 @@ static unsigned char *lastpc;
     *((pc)++) = 0xff; \
     *((pc)++) = 0xe0 | (reg - 1); }
 
-#  define emitm_jumpm(pc, b, i, s, d) { \
-    *((pc)++) = 0xff; \
-    (pc) = emit_r_X(pc, emit_reg(emit_b100), b, i, s, d); \
-    EXEC_RD }
+#  if EXEC_CAPABLE
+#    define emitm_jumpm(pc, b, i, s, d) { \
+       *((pc)++) = 0xff; \
+       (pc) = emit_r_X(pc, emit_reg(emit_b100), b, i, s, d); \
+       EXEC_RD }
+#  else /* EXEC_CAPABLE */
+#    define emitm_jumpm(pc, b, i, s, d) { \
+       *((pc)++) = 0xff; \
+       (pc) = emit_r_X(pc, emit_reg(emit_b100), b, i, s, d); }
+#  endif /* EXEC_CAPABLE */
 
 /* Conditional jumps */
 

@@ -31,7 +31,7 @@ setup_argv(struct Parrot_Interp *interpreter, int argc, char ** argv)
 
     if (Interp_flags_TEST(interpreter, PARROT_DEBUG_FLAG)) {
         PIO_eprintf(interpreter,
-                "*** Parrot VM: Setting up ARGV array in P0.  Current argc: %d ***\n",
+        "*** Parrot VM: Setting up ARGV array in P0.  Current argc: %d ***\n",
                 argc);
     }
 
@@ -76,7 +76,6 @@ main(int argc, char **argv) {
     extern struct PackFile_Constant *exec_const_table;
     extern struct PackFile_Constant const_table;
     extern struct Parrot_Interp interpre;
-    extern Parrot_exception the_exception;
 
     Parrot_exec_run = 1;
     exec_const_table = &const_table;
@@ -88,12 +87,13 @@ main(int argc, char **argv) {
 
     run_native = run_compiled;
     /* TODO make also a shared variant of PackFile_new */
-    pf          = PackFile_new(0);
+    pf = PackFile_new(0);
 
-    if( !PackFile_unpack(interpreter, pf, (opcode_t *)(&program_code),
-			    sizeof(&program_code)) ) {
-	printf( "Can't unpack.\n" );
-	return 1;
+    if (!PackFile_unpack(interpreter, pf, (opcode_t *)(&program_code),
+        sizeof(&program_code)))
+    {
+        printf( "Can't unpack.\n" );
+        return 1;
     }
     Parrot_loadbc(interpreter, pf);
     setup_argv(interpreter, argc, argv);
@@ -107,10 +107,14 @@ main(int argc, char **argv) {
     exec_init_prederef(interpreter, &exec_prederef_code);
 #endif
     Parrot_setflag(interpreter, PARROT_EXEC_FLAG, &Parrot_exec_run);
-    interpreter->code->byte_code = (opcode_t *)&((&program_code)[bytecode_offset]);
+    interpreter->code->byte_code =
+        (opcode_t *)&((&program_code)[bytecode_offset]);
     Parrot_exec_run = 0;
     runops(interpreter, 0);
-    /*run_compiled(interpreter, (opcode_t *)&((&program_code)[bytecode_offset])); */
+    /*
+        run_compiled(interpreter,
+            (opcode_t *)&((&program_code)[bytecode_offset]));
+     */
     exit(0);
 }
 
