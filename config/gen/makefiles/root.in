@@ -403,6 +403,7 @@ help:
 	@echo "  fulltest:          Run test suite with various options."
 	@echo "  fulltest_imcc:     Run IMCC test suite with various options."
 	@echo "  src_tests:         Run test in C-file."
+	@echo "  testX:             Run the test suite with core -X"
 	@echo ""
 	@echo "Creating reports:"
 	@echo "  ok:                Print a report."
@@ -866,7 +867,7 @@ ${icu_make}
 # The --running-make-test argument is currently used by long-running tests
 # to disable GC_DEBUG.
 EXTRA_TEST_ARGS = --gc-debug --running-make-test
-IMCC_TEST_FILES = imcc/t/*/*.t 
+IMCC_TEST_FILES = imcc/t/*/*.t
 TEST_FILES      = t/op/*.t t/pmc/*.t t/native_pbc/*.t $(IMCC_TEST_FILES)
 SRC_TEST_FILES  = t/src/*.t
 
@@ -875,7 +876,7 @@ SRC_TEST_FILES  = t/src/*.t
 test : test_prep
 	$(PERL) t/harness $(EXTRA_TEST_ARGS) $(TEST_PROG_ARGS) -b $(TEST_FILES) $(SRC_TEST_FILES)
 
-fulltest :  testg testP testj testS testb testr src_tests
+fulltest :  testg testP testC testj testS testb testr src_tests
 
 # Common prep for all test targets
 test_prep : $(TEST_PROG)
@@ -884,13 +885,17 @@ test_prep : $(TEST_PROG)
 src_tests :
 	$(PERL) t/harness $(SRC_TEST_FILES)
 
-# normal (cgoto) runloop
+# cgoto runloop
 testg : test_prep
 	$(PERL) t/harness $(EXTRA_TEST_ARGS) $(TEST_PROG_ARGS) $(TEST_FILES)
 
-# prederef / CGP runloop
+# prederef runloop
 testP : test_prep
 	$(PERL) t/harness $(EXTRA_TEST_ARGS) $(TEST_PROG_ARGS) -P $(TEST_FILES)
+
+# CGP runloop
+testC : test_prep
+	$(PERL) t/harness $(EXTRA_TEST_ARGS) $(TEST_PROG_ARGS) -C $(TEST_FILES)
 
 # JIT core
 testj : test_prep
@@ -917,7 +922,7 @@ lifetest : test_prep
 	$(TEST_PROG) $(TEST_PROG_ARGS) examples/assembly/life.pasm
 
 # Running the IMCC test suite
-test_imcc : 
+test_imcc :
 	$(PERL) t/harness $(IMCC_TEST_FILES)
 
 testj_imcc:
@@ -925,6 +930,9 @@ testj_imcc:
 
 testP_imcc:
 	$(PERL) t/harness -P $(IMCC_TEST_FILES)
+
+testC_imcc:
+	$(PERL) t/harness -C $(IMCC_TEST_FILES)
 
 testb_imcc:
 	$(PERL) t/harness -b $(IMCC_TEST_FILES)
@@ -936,7 +944,8 @@ testr_imcc:
 	$(PERL) t/harness -r $(IMCC_TEST_FILES)
 
 
-fulltest_imcc : test_imcc testj_imcc testP_imcc testS_imcc testb_imcc testr_imcc
+fulltest_imcc : test_imcc testj_imcc testP_imcc testC_imcc testS_imcc \
+                testb_imcc testr_imcc
 
 # For reporting success or failure with different configurations
 ok:

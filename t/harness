@@ -23,14 +23,15 @@ my $run_pbc = grep { $_ eq '--run-pbc' } @ARGV;
 
 # Suck the short options into the TEST_PROG_ARGS evar:
 my %opts;
-getopts('wgjPSbvdr?hO:', \%opts);
+getopts('wgjPCSbvdr?hO:', \%opts);
 if ($opts{'?'} || $opts{h}) {
 	print <<"EOF";
 perl t/harness [options] [testfiles]
         -w ... warnings on
-	-g ... disable CGoto
+	-g ... run CGoto
 	-j ... run JIT
-	-P ... run Prederef or CGP
+	-P ... run Prederef
+	-P ... run CGP
 	-S ... run Switched
 	-b ... run bounds checked
 	-v ... run verbose
