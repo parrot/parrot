@@ -73,8 +73,7 @@ typedef struct spfinfo_t {
 			break;																			\
 	}
 
-void
-uint_to_str(char *buf1, char *buf2, UHUGEINTVAL num, INTVAL base) {
+static void uint_to_str(char *buf1, char *buf2, UHUGEINTVAL num, INTVAL base) {
 	int i=0, cur;
 
 	do {
@@ -165,7 +164,7 @@ Pad_it(SpfInfo info, char *buf) {
 }
 
 void
-gen_sprintf_call(char *buf, char* buf2, SpfInfo info, char thingy) {
+gen_sprintf_call(char *buf, char* buf2, SpfInfo info, const char thingy) {
 	int i=0;
 	buf[i++]='%';
 
@@ -407,8 +406,6 @@ AGAIN:
 									pmc=va_arg(*args, PMC*);
 									targ=string_concat(interpreter, targ, pmc->vtable->get_string(interpreter, pmc), 0);
 									break;
-
-                                case 'P':
 
 							}
 
