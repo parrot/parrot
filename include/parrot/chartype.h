@@ -13,6 +13,8 @@
 #if !defined(PARROT_CHARTYPE_H_GUARD)
 #define PARROT_CHARTYPE_H_GUARD
 
+#include <parrot/config.h>
+
 struct parrot_chartype_t;
 typedef Parrot_UInt (*Parrot_CharType_Transcoder)
            (const struct parrot_chartype_t *from,
@@ -32,8 +34,8 @@ enum {
  * Character code to digit value translation map
  */
 struct chartype_digit_map_t {
-    UINTVAL first_code;
-    UINTVAL last_code;
+    Parrot_UInt first_code;
+    Parrot_UInt last_code;
     int first_value;
 };
 
@@ -54,7 +56,7 @@ struct chartype_transcoder_entry_t {
 
 
 struct parrot_chartype_t {
-    INTVAL index;
+    Parrot_Int index;
     const char *name;
     const char *default_encoding;
     Parrot_Int (*is_digit)
