@@ -154,6 +154,7 @@ sub source
 
   my $full_body = $self->full_body;
 
+  $full_body =~ s/{{([a-z]+)\@(.*?)}}/ $trans->access_arg($1, $2, $self); /mge;
   $full_body =~ s/{{\@(.*?)}}/ $trans->access_arg($self->arg_type($1), $1, $self); /mge;
 
   $full_body =~ s/{{=0,=(.*?)}}/   $trans->restart_address($1) . "; " . $trans->goto_address(0); /mge;
