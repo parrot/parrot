@@ -11,13 +11,14 @@
  * References:
  */
 
+#include <assert.h>
+#include <stdio.h>
+#include <stdlib.h>
 #include "parrot/parrot.h"
 #include "parrot/interp_guts.h"
 #include "parrot/oplib.h"
 #include "parrot/trace.h"
 #include "parrot/debug.h"
-#include <stdio.h>
-#include <stdlib.h>
 
 /* na(c) [Next Argument (Char pointer)]
  *
