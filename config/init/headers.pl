@@ -5,7 +5,7 @@ use vars qw($description @args);
 use Parrot::Configure::Step;
 use ExtUtils::Manifest qw(maniread);
 
-$description="Determinig nongenerated header files...";
+$description="Determining nongenerated header files...";
 
 @args=();
 
