@@ -1,5 +1,4 @@
 RM_F = ${rm_f}
-PERL = ${perl}
 
 PARROT = ../../parrot
 ASSEMBLE = $(PARROT)
