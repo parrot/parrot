@@ -4,14 +4,14 @@
 # $Id$
 #
 
-DIR=languages/scheme
-TOOL_DIR=../..
-ASM=./assemble.pl
-SCHEMEC=./schemec
-INTERP=./${test_prog}
-
 PERL = ${perl}
 RM_F = ${rm_f}
+
+DIR=languages/scheme
+TOOL_DIR=../..
+ASM= $(PERL) assemble.pl
+SCHEMEC=$(PERL) schemec
+INTERP=./${test_prog}
 
 #
 # Default target:

@@ -40,7 +40,8 @@ sub runstep {
     ld_out        => '-o ',               # ld output file
     ld_debug      => '',                  # include debug info in executable
     ld_shared     => '-shared',
-    ld_shared_flags=> '-Wl,-soname,libparrot$(SO)',
+    ld_shared_flags=> '', # What is this, exactly?  For GNU ld, it was
+    # '-Wl,-soname,libparrot$(SO)'
 
     # should we have a dependancy upon arc to generate .a's?
     blib_lib_libparrot_a => 'blib/lib/libparrot$(A)',

@@ -4,10 +4,11 @@
 # $Id$
 #
 
+PERL=${perl}
 DIR=languages/miniperl
 TOOL_DIR=../..
 ASM=./assemble.pl
-MINIPERLC=./miniperlc
+MINIPERLC=$(PERL) miniperlc
 INTERP=./${test_prog}
 
 #

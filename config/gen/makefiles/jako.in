@@ -4,14 +4,14 @@
 # $Id$
 #
 
-DIR=languages/jako
-TOOL_DIR=../..
-ASM=perl -I ../../lib ../../assemble.pl
-JAKOC=./jakoc
-INTERP=../../${test_prog}
-
 PERL = ${perl}
 RM_F = ${rm_f}
+
+DIR=languages/jako
+TOOL_DIR=../..
+ASM=$(PERL) -I ../../lib ../../assemble.pl
+JAKOC=$(PERL) jakoc
+INTERP=../../${test_prog}
 
 .SUFFIXES: .jako .pasm .pbc
 
