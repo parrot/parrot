@@ -12,7 +12,7 @@ LIBS =
 #LIBS = -lefence
 #LIBS = -ll -ly
 
-HEADERS = imc.h imcparser.h
+HEADERS = imc.h imcparser.h stacks.h cfg.h instructions.h cfg.h debug.h
 
 default :
 	$(MAKE) imcc
@@ -43,7 +43,22 @@ type.o : type.c $(HEADERS)
 
 imc.o : imc.c $(HEADERS)
 	$(CC) $(DEBUG) -c imc.c
+	
+stacks.o: stacks.c $(HEADERS)
+	$(CC) $(DEBUG) -c stacks.c
 
-imcc : imcparser.o imclexer.o imc.o
-	$(CC) $(DEBUG) -o imcc imc.o imcparser.o imclexer.o $(LIBS)
+symreg.o: symreg.c $(HEADERS)
+	$(CC) $(DEBUG) -c symreg.c
+
+instructions.o: instructions.c $(HEADERS)
+	$(CC) $(DEBUG) -c instructions.c
+
+cfg.o: cfg.c $(HEADERS)
+	$(CC) $(DEBUG) -c cfg.c
+
+debug.o: debug.c $(HEADERS)
+	$(CC) $(DEBUG) -c debug.c
+
+imcc : imcparser.o imclexer.o imc.o stacks.o symreg.o instructions.o cfg.o debug.o
+	$(CC) $(DEBUG) -o imcc imc.o imcparser.o imclexer.o stacks.o symreg.o instructions.o cfg.o debug.o $(LIBS)
 

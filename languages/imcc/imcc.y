@@ -1,8 +1,8 @@
 %{
 /*
- * machine.y
+ * imcc.y
  *
- * Cola compiler for Parrot
+ * Intermediate language compiler for Parrot. 
  *
  * Copyright (C) 2002 Melvin Smith <melvin.smith@mindspring.com>
  *
@@ -27,58 +27,58 @@ long        line;
  * many are polymorphic.
  */
 SymReg * iMOVE(SymReg *r0, SymReg*r1) {
-    emitb(mk_instruction("set %s, %s", r0, r1, NULL, NULL, AFF_unary));
+    emitb(mk_instruction("set %s, %s", r0, r1, NULL, NULL, IF_unary));
     return r0;
 }
 
 SymReg * iINC(SymReg *r0) {
-    emitb(mk_instruction("inc %s", r0, NULL, NULL, NULL, AFF_inplace));
+    emitb(mk_instruction("inc %s", r0, NULL, NULL, NULL, IF_inplace));
     return r0;
 }
 
 SymReg * iDEC(SymReg *r0) {
-    emitb(mk_instruction("dec %s", r0, NULL, NULL, NULL, AFF_inplace));
+    emitb(mk_instruction("dec %s", r0, NULL, NULL, NULL, IF_inplace));
     return r0;
 }
 
 SymReg * iADD(SymReg *r0, SymReg*r1, SymReg *r2) {
-    emitb(mk_instruction("add %s, %s, %s", r0, r1, r2, NULL, AFF_binary));
+    emitb(mk_instruction("add %s, %s, %s", r0, r1, r2, NULL, IF_binary));
     return r0;
 }
 
 SymReg * iSUB(SymReg *r0, SymReg*r1, SymReg *r2) {
-    emitb(mk_instruction("sub %s, %s, %s", r0, r1, r2, NULL, AFF_binary));
+    emitb(mk_instruction("sub %s, %s, %s", r0, r1, r2, NULL, IF_binary));
     return r0;
 }
 
 SymReg * iMUL(SymReg *r0, SymReg*r1, SymReg *r2) {
-    emitb(mk_instruction("mul %s, %s, %s", r0, r1, r2, NULL, AFF_binary));
+    emitb(mk_instruction("mul %s, %s, %s", r0, r1, r2, NULL, IF_binary));
     return r0;
 }
 
 SymReg * iDIV(SymReg *r0, SymReg*r1, SymReg *r2) {
-    emitb(mk_instruction("div %s, %s, %s", r0, r1, r2, NULL, AFF_binary));
+    emitb(mk_instruction("div %s, %s, %s", r0, r1, r2, NULL, IF_binary));
     return r0;
 }
 
 SymReg * iMOD(SymReg *r0, SymReg*r1, SymReg *r2) {
-    emitb(mk_instruction("mod %s, %s, %s", r0, r1, r2, NULL, AFF_binary));
+    emitb(mk_instruction("mod %s, %s, %s", r0, r1, r2, NULL, IF_binary));
     return r0;
 }
 
 SymReg * iSHL(SymReg *r0, SymReg*r1, SymReg *r2) {
-    emitb(mk_instruction("shl %s, %s, %s", r0, r1, r2, NULL, AFF_binary));
+    emitb(mk_instruction("shl %s, %s, %s", r0, r1, r2, NULL, IF_binary));
     return r0;
 }
 
 SymReg * iSHR(SymReg *r0, SymReg*r1, SymReg *r2) {
-    emitb(mk_instruction("shr %s, %s, %s", r0, r1, r2, NULL, AFF_binary));
+    emitb(mk_instruction("shr %s, %s, %s", r0, r1, r2, NULL, IF_binary));
     return r0;
 }
 
 SymReg * iCONCAT(SymReg *r0, SymReg*r1, SymReg *r2) {
     if(r0->set == 'S' && r1->set == 'S' && r2->set == 'S') {
-        emitb(mk_instruction("concat %s, %s, %s", r0, r1, r2, NULL, AFF_binary));
+        emitb(mk_instruction("concat %s, %s, %s", r0, r1, r2, NULL, IF_binary));
     }
     else {
         fprintf(stderr, "line %ld: Syntax error, non-string type used with concat operator\n",
@@ -89,34 +89,34 @@ SymReg * iCONCAT(SymReg *r0, SymReg*r1, SymReg *r2) {
 }
 
 SymReg * iCALL(SymReg * r0) {
-    emitb(mk_instruction("bsr %s", r0, NULL, NULL, NULL, AFF_r0_read));
+    emitb(mk_instruction("bsr %s", r0, NULL, NULL, NULL, IF_r0_read));
     return r0;
 }
 
 SymReg * iBRANCH(SymReg * r0) {
-    Instruction * i = emitb(mk_instruction("branch %s", r0, NULL, NULL, NULL, AFF_r0_read));
+    Instruction * i = emitb(mk_instruction("branch %s", r0, NULL, NULL, NULL, IF_r0_branch | IF_goto));
     i->type = ITBRANCH;
     return r0;
 }
 
 SymReg * iLABEL(SymReg * r0) {
-    Instruction *i = emitb(mk_instruction("%s", r0, NULL, NULL, NULL, AFF_r0_read)); /* AFF_r0_read ? */
+    Instruction *i = emitb(mk_instruction("%s:", r0, NULL, NULL, NULL, IF_r0_read)); /* IF_r0_read ? */
     i->type = ITLABEL;
     return r0;
 }
 
 SymReg * iARG(SymReg * r0) {
-    emitb(mk_instruction("save %s", r0, NULL, NULL, NULL, AFF_r0_read));
+    emitb(mk_instruction("save %s", r0, NULL, NULL, NULL, IF_r0_read));
     return r0;
 }
 
 SymReg * iPUSH(SymReg * r0) {
-    emitb(mk_instruction("save %s", r0, NULL, NULL, NULL, AFF_r0_read));
+    emitb(mk_instruction("save %s", r0, NULL, NULL, NULL, IF_r0_read));
     return r0;
 }
 
 SymReg * iPOP(SymReg * r0) {
-    emitb(mk_instruction("restore %s", r0, NULL, NULL, NULL, AFF_r0_write));
+    emitb(mk_instruction("restore %s", r0, NULL, NULL, NULL, IF_r0_write));
     return r0;
 }
 
@@ -131,12 +131,12 @@ SymReg * iRESTOREALL() {
 }
 
 SymReg * iPRINT(SymReg * r0) {
-    emitb(mk_instruction("print %s", r0, NULL, NULL, NULL, AFF_r0_read));
+    emitb(mk_instruction("print %s", r0, NULL, NULL, NULL, IF_r0_read));
     return r0;
 }
 
 SymReg * iSUBROUTINE(SymReg * r0) {
-    emitb(mk_instruction("%s:", r0, NULL, NULL, NULL, AFF_r0_read)); /* AFF_r0_read? */
+    emitb(mk_instruction("%s:", r0, NULL, NULL, NULL, IF_r0_read)); /* IF_r0_read? */
     return r0;
 }
 
@@ -147,7 +147,7 @@ SymReg * iRET() {
 
 SymReg * iINDEXFETCH(SymReg * r0, SymReg * r1, SymReg * r2) {
     if(r0->set == 'S') {
-        emitb(mk_instruction("substr %s, %s, %s, 1", r0, r1, r2, NULL, AFF_binary));
+        emitb(mk_instruction("substr %s, %s, %s, 1", r0, r1, r2, NULL, IF_binary));
     }
     else {
         fprintf(stderr, "FIXME: Internal error, unsupported indexed fetch operation\n");
@@ -161,7 +161,7 @@ SymReg * iINDEXSET(SymReg * r0, SymReg * r1, SymReg * r2) {
         /* Temporaries assigned by IMCC are of form (T.n)
             SymReg * temp = mk_symreg("(S.0)", 'S');
         */
-        emitb(mk_instruction("substr %s, %s, 1, %s", r0, r1, r2, NULL, AFF_binary));
+        emitb(mk_instruction("substr %s, %s, 1, %s", r0, r1, r2, NULL, IF_binary));
     }
     else {
         fprintf(stderr, "FIXME: Internal error, unsupported indexed set operation\n");
@@ -175,7 +175,7 @@ SymReg * iIF(int relop, SymReg * r0, SymReg * r1, SymReg * r2) {
     char op[256];
     relop_to_op(relop, op);
     strcat(op, " %s, %s, %s");
-    i = emitb(mk_instruction(op, r0, r1, r2, NULL, AFF_r0_read || AFF_r1_read || AFF_r2_read));
+    i = emitb(mk_instruction(op, r0, r1, r2, NULL, IF_r0_read | IF_r1_read | IF_r2_branch));
     i->type = ITBRANCH;
     return 0;
 }
@@ -184,7 +184,7 @@ SymReg * iNEW(SymReg * r0, char * type) {
     char op[256];
     strcpy(op, "new %s, ");
     strcat(op, type);
-    emitb(mk_instruction(op, r0, NULL, NULL, NULL, AFF_r0_write ));
+    emitb(mk_instruction(op, r0, NULL, NULL, NULL, IF_r0_write ));
     return r0;
 }
 
@@ -198,6 +198,19 @@ SymReg * iEND() {
     return 0;
 }
 
+void relop_to_op(int relop, char * op) {
+    switch(relop) {
+        case RELOP_EQ:    strcpy(op, "eq"); return;
+        case RELOP_NE:    strcpy(op, "ne"); return;
+        case RELOP_GT:    strcpy(op, "gt"); return;
+        case RELOP_GTE:   strcpy(op, "ge"); return;
+        case RELOP_LT:    strcpy(op, "lt"); return;
+        case RELOP_LTE:   strcpy(op, "le"); return;
+        default:
+            fprintf(stderr, "relop_to_op: Invalid relop [%d]\n", relop);
+	    abort();
+    }
+}
 
 %}
 
@@ -211,7 +224,7 @@ SymReg * iEND() {
 %token <i> SUB NAMESPACE CLASS ENDCLASS SYM LOCAL PARAM PUSH POP INC DEC
 %token <i> SHIFT_LEFT SHIFT_RIGHT INT FLOAT STRING
 %token <i> RELOP_EQ RELOP_NE RELOP_GT RELOP_GTE RELOP_LT RELOP_LTE
-%token <s> LABEL EMIT
+%token <s> EMIT LABEL
 %token <s> IREG NREG SREG PREG IDENTIFIER STRINGC INTC FLOATC
 %type <i> type program globals classes class subs sub sub_start relop
 %type <s> classname
@@ -256,7 +269,9 @@ sub:
         sub_start statements labels RET
         {
           $$ = 0; iRET();
-          allocate();
+	  allocate();
+	  emit_flush();
+	  clear_tables();
         }
     ;
 
@@ -443,4 +458,6 @@ int yyerror(char * s)
     fprintf(stderr, "Didn't create output asm.\n" );
     exit(0);
 }
+
+
 

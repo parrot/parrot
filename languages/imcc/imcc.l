@@ -2,12 +2,13 @@
 /*
  * imc.l
  *
- * Cola compiler for Parrot
+ * Intermediate Language compiler for Parrot
  *
  * Copyright (C) 2002 Melvin Smith
  *
  * Tokenizer for the intermediate compiler/code generator
  */
+
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -89,8 +90,11 @@ RANKSPEC        \[[,]*\]
 "=="            return(RELOP_EQ);
 "!="            return(RELOP_NE);
 
-
 {LETTER}{LETTERDIGIT}*":" {
+	int n = strlen(yytext);
+	yytext[n-1] = 0;  /* trim last ':' (argh, I should learn yacc) */
+	n = strlen(yytext);
+
         yylval.s = str_dup(yytext);
         return(LABEL);
     }
@@ -112,7 +116,6 @@ RANKSPEC        \[[,]*\]
 
 {STRINGCONSTANT} {
         yylval.s = str_dup(yytext);
-        fprintf(stderr, "STRINGC [%s]\n", yytext);
         return(STRINGC);
     }
 
