@@ -552,6 +552,29 @@ Parrot_abs_n_nc {
     Parrot_abs_nx_nx
 }
 
+TEMPLATE Parrot_sqrt_nx_nx {
+    if(MAP[1] && MAP[2]){
+        emitm_fsqrtd(NATIVECODE, MAP[2], MAP[1]);
+    }
+    else if(MAP[1]){
+        jit_emit_load_n(jit_info, interpreter, 2, MAP[1]);
+        emitm_fsqrtd(NATIVECODE, MAP[1], MAP[1]);
+    }
+    else {
+        jit_emit_load_n(jit_info, interpreter, 2, FSR1);
+        emitm_fsqrtd(NATIVECODE, FSR1, FSR1);
+        jit_emit_store_n(jit_info, interpreter, 1, FSR1);
+    }
+}
+
+Parrot_sqrt_n_n {
+    Parrot_sqrt_nx_nx
+}
+
+Parrot_sqrt_n_nc {
+    Parrot_sqrt_nx_nx
+}
+
 
 TEMPLATE Parrot_if_ix_x {
     if(MAP[1]){
