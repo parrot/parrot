@@ -18,6 +18,20 @@ Operations that allow the user to interact with the system.
 
 ###############################################################################
 
+=item B<spawnw>(out INT, in STR)
+
+Spawn a subprocess and wait for it to finish. The return status, which is
+very system-dependent, goes in $1.
+
+=cut
+
+inline op spawnw(out INT, in STR) {
+  $1 = Parrot_Run_OS_Command(interpreter, $2);
+  goto NEXT();
+}
+
+###############################################################################
+
 =item B<err>(out INT)
 
 Store the system error code in $1.

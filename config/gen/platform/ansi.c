@@ -133,6 +133,15 @@ Parrot_dlclose(void *handle)
 }
 
 /*
+ * Spawn a subprocess
+ *
+ */
+INTVAL Parrot_Run_OS_Command(Parrot_Interp interpreter, STRING *command) {
+    Parrot_warn(NULL, PARROT_WARNINGS_PLATFORM_FLAG, "Parrot_dlclose not implemented");
+    return 0;
+}
+
+/*
  * Local variables:
  * c-indentation-style: bsd
  * c-basic-offset: 4
