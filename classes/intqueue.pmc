@@ -68,7 +68,7 @@ static INTVAL dequeue ( CONTAINER* container ) {
 }
 
 static INTVAL queue_length ( CONTAINER* container ) {
-  INTVAL length;
+  INTVAL length = 0;
   if(container->head != NULL) {
     BUCKET* head = container->head;
     while(head != NULL) {
