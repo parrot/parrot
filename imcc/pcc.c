@@ -1016,8 +1016,9 @@ move_cc:
      * locate return label,
      * we must have one or the parser would have failed
      */
-    if (ins->next->type == ITLABEL && sub->pcc_sub->label)
+    if (sub->pcc_sub->label && ins->next->type == ITLABEL) {
         ins = ins->next;
+    }
     ins = insINS(interp, unit, ins, "restoretop", regs, 0);
     /*
      * handle return results
