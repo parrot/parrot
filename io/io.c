@@ -160,7 +160,7 @@ PIO_destroy(theINTERP)
         down = p->down;
         if (p->api->Delete)
             (*p->api->Delete) (p);
-        //mem_sys_free(p);
+        /* mem_sys_free(p); */ /* XXX ??? */
         p = down;
     }
     mem_sys_free(GET_INTERP_IOD(interpreter)->table);
