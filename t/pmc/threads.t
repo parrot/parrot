@@ -257,19 +257,25 @@ output_like(<<'CODE', <<'OUTPUT', "detach");
     find_global P5, "_foo"
     new P2, .ParrotThread
     find_method P0, P2, "thread3"
-    set I3, 1
+    new P6, .TQueue	# need a flag that thread is done
+    set I3, 2
     invoke	# start the thread
 
     set I5, P2
     getinterp P2
     find_method P0, P2, "detach"
     invoke
+wait:
+    defined I0, P6
+    unless I0, wait
     print "done\n"
-    sleep 0.1
     end
 
 .pcc_sub _foo:
     print "thread\n"
+    sleep 0.1
+    new P2, .PerlInt
+    push P6, P2		# push item on queue
     invoke P1
 CODE
 /(done\nthread\n)|(thread\ndone\n)/
