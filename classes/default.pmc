@@ -315,6 +315,15 @@ pmclass default abstract noinit {
 
     INTVAL isa (STRING* method) {
 	return does_isa(INTERP, method, SELF->vtable->isa_str);
+    }
 
+    void visit(visit_info *info) {
+    }
+
+    void freeze(visit_info *info) {
+    }
+
+    void thaw(visit_info *info) {
+	DYNSELF.init();
     }
 }

@@ -284,3 +284,6 @@ INTVAL isa(STRING* method)
 INTVAL isa_keyed(PMC* key, STRING* method)
 INTVAL isa_keyed_int(INTVAL key, STRING* method)
 
+void freeze(visit_info* info)
+void thaw  (visit_info* info)
+void visit (visit_info* info)

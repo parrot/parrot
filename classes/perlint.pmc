@@ -12,6 +12,7 @@
 
 #include "parrot/parrot.h"
 #include "parrot/perltypes.h"
+#include <assert.h>
 
 pmclass PerlInt extends perlscalar {
 
@@ -467,4 +468,14 @@ pmclass PerlInt extends perlscalar {
         SELF->cache.int_val --;
     }
 
+    void freeze(visit_info *info) {
+	IMAGE_IO *io = info->image_io;
+	io->vtable->push_integer(INTERP, io, SELF->cache.int_val);
+    }
+
+    void thaw(visit_info *info) {
+	IMAGE_IO *io = info->image_io;
+	SUPER(info);
+	SELF->cache.int_val = io->vtable->shift_integer(INTERP, io);
+    }
 }

@@ -500,6 +500,40 @@ op prophash(out PMC, in PMC) {
 
 ###############################################################################
 
+=head2 Freeze, thaw and friends
+
+Ops to PMC freeze, thaw
+
+=over 4
+
+=cut
+
+########################################
+
+=item B<freeze>(out STR, in PMC)
+
+Set $1 to the frozen image of $2.
+
+=item B<thaw>(out PMC, in STR)
+
+Set $1 to a newly created PMC from the inage $2.
+
+=cut
+
+op freeze(out STR, in PMC) {
+   $1 = Parrot_freeze(interpreter, $2);
+   goto NEXT();
+}
+
+op thaw(out PMC, in STR) {
+   $1 = Parrot_thaw(interpreter, $2);
+   goto NEXT();
+}
+
+=back
+
+=cut
+
 =head1 COPYRIGHT
 
 Copyright (C) 2001-2003 The Perl Foundation.  All rights reserved.

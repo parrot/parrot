@@ -535,5 +535,38 @@ pmclass Array need_ext does array {
 	}
 	return ret;
     }
+
+    void visit(visit_info *info) {
+	INTVAL i;
+
+	SUPER(info);
+	/* doesn't handle sparse arrays - test only */
+	for (i = 0; i < VTABLE_elements(INTERP, SELF); ++i) {
+	    PMC *child;
+	    void *ret = list_get(INTERP, (List *) PMC_data(pmc), i,
+		    enum_type_PMC);
+	    if (!ret || ret == (void *) -1) {
+		ret = NULL;
+		child = NULL;
+	    }
+	    else
+		child = *(PMC**)ret;
+	    info->thaw_ptr = ret;
+	    (info->visit_child_function)(INTERP, child, info);
+	}
+    }
+
+    void freeze(visit_info *info) {
+	IMAGE_IO *io = info->image_io;
+	io->vtable->push_integer(INTERP, io,
+		VTABLE_elements(INTERP, SELF));
+    }
+
+    void thaw(visit_info *info) {
+	IMAGE_IO *io = info->image_io;
+	SUPER(info);
+	DYNSELF.set_integer_native(
+		io->vtable->shift_integer(INTERP, io));
+    }
 }
 

@@ -1275,3 +1275,6 @@ seti_ind_ic_i   1247
 seti_ind_i_ic   1248
 seti_ind_ic_ic  1249
 get_addr_i_p    1250
+freeze_s_p	1251
+thaw_p_s	1252
+thaw_p_sc	1253
