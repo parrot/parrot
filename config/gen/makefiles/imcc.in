@@ -26,6 +26,8 @@ MAKE_F=${make}
 YACC = bison -v -y
 LEX = flex
 
+LINK = ${link}
+LINKFLAGS = ${linkflags}
 LD = ${ld}
 LD_SHARED = ${ld_shared}
 LD_OUT = ${ld_out}
@@ -54,4 +56,4 @@ realclean: clean
 	$(RM_F) imclexer.*
 
 imcc: $(O_FILES)
-	$(LD) $(LD_OUT)imcc $(LDFLAGS) $(O_FILES) $(C_LIBS)
+	$(LINK) $(LD_OUT)imcc $(LINKFLAGS) $(O_FILES) $(C_LIBS)
