@@ -79,10 +79,6 @@
 #  include <time.h>
 #endif
 
-#ifdef PARROT_HAS_HEADER_MATH
-#  include <math.h>
-#endif
-
 #ifdef PARROT_HAS_HEADER_FCNTL
 #  include <fcntl.h>
 #endif

@@ -16,7 +16,7 @@ Tests the C<PerlNum> PMC. Checks Perl-specific numeric behaviour.
 
 =cut
 
-use Parrot::Test tests => 35;
+use Parrot::Test tests => 36;
 
 my $fp_equality_macro = <<'ENDOFMACRO';
 .macro fp_eq (	J, K, L )
@@ -626,7 +626,7 @@ output_is(<<"CODE", <<OUTPUT, "eq_p_n");
 OK1:    print "ok 1\\n"
 
         eq P0, 25.0, BAD2
-        branch OK2 
+        branch OK2
 BAD2:   print "not "
 OK2:    print "ok 2\\n"
         end
@@ -645,7 +645,7 @@ output_is(<<"CODE", <<OUTPUT, "ne_p_n");
 OK1:    print "ok 1\\n"
 
         ne P0, 12.5, BAD2
-        branch OK2 
+        branch OK2
 BAD2:   print "not "
 OK2:    print "ok 2\\n"
         end
@@ -668,7 +668,7 @@ OK1:    print "ok 1\\n"
 
         inc P1
         eq_num P0, P1, BAD2
-        branch OK2 
+        branch OK2
 BAD2:   print "not "
 OK2:    print "ok 2\\n"
 
@@ -682,4 +682,21 @@ CODE
 ok 1
 ok 2
 ok 3
+OUTPUT
+
+#
+# s. config/gen/platform/generic/math.h
+#
+output_is(<<'CODE', <<'OUTPUT', "+- zero");
+  new P0, .PerlNum
+  set P0, 0.0
+  print P0
+  print "\n"
+  set P0, -0.0
+  print P0
+  print "\n"
+  end
+CODE
+0
+-0.000000
 OUTPUT

@@ -32,6 +32,7 @@ sub runstep {
   # headers are merged into platform.h
   my @headers = qw/
     io.h
+    math.h
     misc.h
     dl.h
     signal.h

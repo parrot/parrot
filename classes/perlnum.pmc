@@ -120,7 +120,7 @@ Evaluates the number as a boolean, i.e. it's true if it's not zero.
 
 =item C<void set_number_native(FLOATVAL value)>
 
-Sets the value of the number to C<value>. 
+Sets the value of the number to C<value>.
 
 Note that if C<value> is an integer the number morphs to a C<PerlInt>.
 
@@ -132,7 +132,8 @@ Note that if C<value> is an integer the number morphs to a C<PerlInt>.
         INTVAL vali = (INTVAL) value;
 
         PMC_num_val(SELF) = value;
-        if (value == vali)
+        /* don't mess around with - 0 */
+        if (value == vali && (vali || !Parrot_is_nzero(value)))
             DYNSELF.set_integer_native(vali);
     }
 
@@ -497,7 +498,7 @@ result in C<*dest>.
         VTABLE_set_number_native(INTERP, dest,
             floatval_mod(PMC_num_val(SELF), value));
     }
-    
+
 /*
 
 =item C<void modulus_int(INTVAL value, PMC *dest)>
