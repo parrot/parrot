@@ -1,30 +1,34 @@
 =head1 NAME
 
-IMCC - running
+Parrot - running
 
 =head1 VERSION
 
 =over 4
 
-=item 0.1 initial
+=item 0.0.1 initial
 
 =item 0.0.9.10 changed run options
 
 =item 0.0.9.12 changed debug options
 
+=item 0.0.10.0 imcc is parrot
+
+=item 0.0.10.1 add -E switch
+
 =back
 
 =head1 OVERVIEW
 
-This document describes imcc's command line options.
+This document describes parrot's command line options.
 
 =head1 SYNOPSIS
 
- imcc [-options] <file> [arguments ...]
+ parrot [-options] <file> [arguments ...]
 
 =head1 OPTIONS
 
-=head2 Imcc options
+=head2 IMCC options
 
 =over 4
 
@@ -88,10 +92,18 @@ Optimize
 
  -O0 no optimization (default)
  -O1 optimizations w/o life info (e.g. branches)
+ -O  same
  -O2 optimizations with life info
  -Op rewrite I and N PASM registers most used first
 
 This will probably change.
+
+=item -E, --pre-process-only
+
+Preprocess sorce file (i.e. expand macros) and print result to stdout. E.g.
+
+  $ parrot -E t/op/macro_10.pasm
+  $ parrot -E t/op/macro_10.pasm | parrot -- -
 
 =back
 
@@ -128,9 +140,9 @@ for running the program.
 
  Command line		Action		Output
  ---------------------------------------------
- imcc x.imc		run
- imcc x.pasm		run
- imcc x.pbc		run
+ parrot x.imc		run
+ parrot x.pasm		run
+ parrot x.pbc		run
  -o x.pasm x.imc	ass		x.pasm
  -o x.pasm y.pasm	ass		x.pasm
  -o x.pbc  x.imc	ass		x.pbc

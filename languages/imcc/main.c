@@ -20,9 +20,9 @@
 #include "pbc.h"
 #include "parser.h"
 
-#define IMCC_VERSION "0.0.10.0"
+#define IMCC_VERSION "0.0.10.1"
 
-static int run_pbc, write_pbc;
+static int run_pbc, write_pbc, pre_process;
 static char optimizer_opt[20];
 extern FILE *yyin;
 
@@ -55,6 +55,7 @@ static void help(void)
     "    -. --wait    Read a keystroke before starting\n"
     "   <Compiler options>\n"
     "    -v --verbose\n"
+    "    -E --pre-process-only\n"
     "    -o --output=FILE\n"
     "    -O --optimize[=LEVEL]\n"
     "    -a --pasm\n"
@@ -89,28 +90,29 @@ the GNU General Public License or the Artistic License for more details.\n\n");
 #define OPT_GC_DEBUG     128
 #define OPT_DESTROY_FLAG 129
 static struct longopt_opt_decl options[] = {
-    { 'b', 'b', 0,       { "--bounds-checks" } },
-    { 'j', 'j', 0, { "--jit" } },
-    { 'p', 'p', 0, { "--profile" } },
+    { '.', '.', 0, { "--wait" } },
+    { 'E', 'E', 0, { "--pre-precess-only" } },
+    { 'G', 'G', 0, { "--no-gc" } },
+    { 'O', 'O', OPTION_optional_FLAG, { "--optimize" } },
     { 'P', 'P', 0, { "--prederefrenced-core" } },
     { 'S', 'S', 0, { "--switched-core" } },
-    { 'g', 'g', 0, { "--no-computed-goto" } },
-    { 't', 't', 0, { "--trace" } },
-    { 'd', 'd', OPTION_optional_FLAG, { "--debug" } },
-    { 'w', 'w', 0, { "--warnings" } },
-    { 'G', 'G', 0, { "--no-gc" } },
-    { '.', '.', 0, { "--wait" } },
-    { 'a', 'a', 0, { "--pasm" } },
-    { 'h', 'h', 0, { "--help" } },
     { 'V', 'V', 0, { "--version" } },
-    { 'r', 'r', 0, { "--run-pbc" } },
-    { 'c', 'c', 0, { "--pbc" } },
-    { 'v', 'v', 0, { "--verbose" } },
-    { 'y', 'y', 0, { "--yydebug" } },
-    { 'o', 'o', OPTION_required_FLAG, { "--output" } },
-    { 'O', 'O', OPTION_optional_FLAG, { "--optimize" } },
+    { '\0', OPT_DESTROY_FLAG, 0,   { "--leak-test", "--destroy-at-end" } },
     { '\0', OPT_GC_DEBUG, 0, { "--gc-debug" } },
-    {'\0', OPT_DESTROY_FLAG, 0,   { "--leak-test", "--destroy-at-end" } },
+    { 'a', 'a', 0, { "--pasm" } },
+    { 'b', 'b', 0, { "--bounds-checks" } },
+    { 'c', 'c', 0, { "--pbc" } },
+    { 'd', 'd', OPTION_optional_FLAG, { "--debug" } },
+    { 'g', 'g', 0, { "--no-computed-goto" } },
+    { 'h', 'h', 0, { "--help" } },
+    { 'j', 'j', 0, { "--jit" } },
+    { 'o', 'o', OPTION_required_FLAG, { "--output" } },
+    { 'p', 'p', 0, { "--profile" } },
+    { 'r', 'r', 0, { "--run-pbc" } },
+    { 't', 't', 0, { "--trace" } },
+    { 'v', 'v', 0, { "--verbose" } },
+    { 'w', 'w', 0, { "--warnings" } },
+    { 'y', 'y', 0, { "--yydebug" } },
     { 0, 0, 0, { NULL } }
 };
 
@@ -196,6 +198,9 @@ parseflags(Parrot_Interp interp, int *argc, char **argv[])
             case 'y':
                 yydebug = 1;
                 break;
+            case 'E':
+                pre_process = 1;
+                break;
             case 'o':
                 run_pbc = 0;
                 output = str_dup(opt.opt_arg);
@@ -251,6 +256,72 @@ parseflags(Parrot_Interp interp, int *argc, char **argv[])
     return (*argv)[0];
 }
 
+static void
+do_pre_process(Parrot_Interp interpreter)
+{
+    int c;
+    YYSTYPE val;
+
+    while ( (c = yylex(&val, interpreter)) ) {
+        switch (c) {
+            case EMIT:          printf(".emit\n"); break;
+            case EOM:           printf(".eom\n"); break;
+            case LOCAL:         printf(".local "); break;
+            case ARG:           printf(".arg "); break;
+            case SUB:           printf(".sub "); break;
+            case ESUB:          printf(".end"); break;
+            case RESULT:        printf(".result "); break;
+            case RETURN:        printf(".return "); break;
+            case CLASS:         printf(".class "); break;
+            case ENDCLASS:      printf(".endclass"); break;
+            case NAMESPACE:     printf(".namespace "); break;
+            case ENDNAMESPACE:  printf(".endnamespace"); break;
+            case CONST:         printf(".const "); break;
+            case PARAM:         printf(".param "); break;
+            case MACRO:         break;
+
+            case END:           printf("end");break;
+            case GOTO:          printf("goto ");break;
+            case IF:            printf("if ");break;
+            case UNLESS:        printf("unless ");break;
+            case INC:           printf("inc ");break;
+            case DEC:           printf("dec ");break;
+            case INTV:          printf("int ");break;
+            case FLOATV:        printf("float ");break;
+            case STRINGV:       printf("string ");break;
+            case NEW:           printf("new ");break;
+            case DEFINED:       printf("defined ");break;
+            case ADDR:          printf("addr ");break;
+            case GLOBAL:        printf("global ");break;
+            case CALL:          printf("call ");break;
+            case SAVEALL:       printf("saveall");break;
+            case RESTOREALL:    printf("restoreall");break;
+            case SHIFT_LEFT:    printf(" << ");break;
+            case SHIFT_RIGHT:   printf(" >> ");break;
+            case SHIFT_RIGHT_U: printf(" >>> ");break;
+            case LOG_AND:       printf(" && ");break;
+            case LOG_OR:        printf(" || ");break;
+            case LOG_XOR:       printf(" ~~ ");break;
+            case RELOP_LT:      printf(" < ");break;
+            case RELOP_LTE:     printf(" <= ");break;
+            case RELOP_GT:      printf(" > ");break;
+            case RELOP_GTE:     printf(" >= ");break;
+            case RELOP_EQ:      printf(" == ");break;
+            case RELOP_NE:      printf(" != ");break;
+            case POW:           printf(" ** ");break;
+            case COMMA:         printf(", ");break;
+            case LABEL:         printf("%s:\t", val.s); break;
+
+            default:
+                     if (c < 255)
+                         printf("%c", c);
+                     else {
+                         printf("%s ", val.s);
+                         break;
+                     }
+        }
+    }
+}
 
 int main(int argc, char * argv[])
 {
@@ -292,6 +363,11 @@ int main(int argc, char * argv[])
             run_pbc = 2;
             write_pbc = 0;
         }
+    }
+    if (pre_process) {
+        do_pre_process(interpreter);
+        Parrot_destroy(interpreter);
+        Parrot_exit(0);
     }
 
     if (output) {
