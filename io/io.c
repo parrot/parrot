@@ -1198,7 +1198,10 @@ Parrot_IOData_mark(theINTERP, ParrotIOData *piodata)
     INTVAL i;
     ParrotIOTable table = piodata->table;
 
-    for (i = 0; i < PIO_NR_OPEN; i++) {
+    /* this was i < PIO_NR_OPEN, but only standard handles 0..2 need
+     * to be kept alive AFAIK -leo
+     */
+    for (i = 0; i < 3; i++) {
         if (table[i]) {
             pobject_lives(interpreter, (PObj *)table[i]);
         }
