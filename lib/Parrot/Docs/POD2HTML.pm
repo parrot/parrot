@@ -393,11 +393,6 @@ sub process_end_token
         $tagname = 'Para_item' 
             if @{$self->{STACK}} and $self->{STACK}->[-1] eq 'text';
     }
-    elsif ( $tagname =~ /Verbatim(?:Formatted)?/o )
-    {
-        # Give the code sections equal space top and bottom.
-        print {$self->{'output_fh'}} "\n\n" 
-    }
     elsif ( $tagname =~ /head[12]/o )
     {
         # Put the up arrow on the end of a heading. 

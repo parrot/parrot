@@ -1,7 +1,5 @@
 /* CSS File for Modern Browsers */
 
-/* also, perl-ns4.css stops ns4 from crashing. */
-
 BODY {
         font-family:helvetica,sans-serif;
         font-size:14px;
@@ -244,4 +242,13 @@ IMG.border {
 .newsitem { 
   width: 80%;
   text-align: justify;
+}
+
+PRE     {
+  background: #dddddd;
+  border: 1px solid black;
+  color: black;
+  padding-top: 1em;
+  padding-bottom: 1em;
+  white-space: pre;
 }
