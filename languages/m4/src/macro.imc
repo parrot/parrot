@@ -11,30 +11,29 @@ References: http://www.gnu.org/software/m4/m4.html
 
 =head1 SUBROUTINES
 
-=head2 void _expand_input( PerlHash state )
+=head2 void expand_input( PerlHash state )
 
 Loop through some input files.
 TODO: read files in next_token()
 
 =cut
 
-.sub _expand_input 
+.sub expand_input 
   .param PerlHash  state    
 
-  .local string token_data  # current token         
-  .local string token_type  # type of current token      
+  .local string token_data, token_type  # current token data and type        
 
   # go through the input, token for token 
-  NEXT_TOKEN:   
-  ( token_type, token_data ) = _next_token( state )
-  _expand_token( state, token_type, token_data )
-  ne token_type, 'TOKEN_EOF', NEXT_TOKEN
+NEXT_TOKEN:   
+  ( token_type, token_data ) = next_token( state )
+  expand_token( state, token_type, token_data )
+  if token_type != 'TOKEN_EOF' goto NEXT_TOKEN
 
-  FINISH_EXPAND_INPUT:
+FINISH_EXPAND_INPUT:
 .end
 
 
-=head2 void _expand_token( PerlHash state, string token_type, string token_data )
+=head2 void expand_token( PerlHash state, string token_type, string token_data )
 
 Expand one token, according to its type.  Potential macro names
 (TOKEN_WORD) are looked up in the symbol table, to see if they have a
@@ -43,7 +42,7 @@ the text are just copied to the output.
 
 =cut
 
-.sub _expand_token 
+.sub expand_token 
   .param PerlHash  state    
   .param string    token_type
   .param string    token_data
@@ -51,50 +50,60 @@ the text are just copied to the output.
   .local pmc symtab
   symtab = state['symtab']
 
-  eq token_type, 'TOKEN_EOF',    FINISH_EXPAND_TOKEN
-  eq token_type, 'TOKEN_MACDEF', FINISH_EXPAND_TOKEN
+  # TOKEN_EOF and TOKEN_MACDEF are not expanded
+  if token_type == 'TOKEN_EOF'    goto FINISH_EXPAND_TOKEN
+  if token_type == 'TOKEN_MACDEF' goto FINISH_EXPAND_TOKEN
 
-  # 'TOKEN_STRING' is the same as 'TOKEN_SIMPLE', 
-  eq token_type, 'TOKEN_STRING', SHIPOUT_TEXT
-  eq token_type, 'TOKEN_SIMPLE', SHIPOUT_TEXT
+  # 'TOKEN_STRING' does the same as 'TOKEN_SIMPLE', 
+  if token_type == 'TOKEN_STRING' goto SHIPOUT_TEXT
+  if token_type == 'TOKEN_SIMPLE' goto SHIPOUT_TEXT
 
-  ne token_type, 'TOKEN_WORD', NO_TOKEN_WORD
+  if token_type != 'TOKEN_WORD' goto NO_TOKEN_WORD
     .local int symbol_exists
-    exists symbol_exists, symtab[token_data] 
+    symbol_exists = exists symtab[token_data] 
     unless symbol_exists goto SHIPOUT_TEXT
       .local pmc symbol
       symbol = symtab[token_data] 
       .local string symbol_type
       symbol_type = symbol['type']
-      eq token_type, 'TOKEN_VOID', SHIPOUT_TEXT
-        ne symbol_type, 'TOKEN_FUNC', EXPAND_MACRO
-          .local string current_file    
-          current_file = state['input_stack';0;'string']
-          .local int first_char
-          first_char = ord current_file
-          .local int open_parenthesis
+      if symbol_type != 'TOKEN_FUNC' goto EXPAND_MACRO
+        # there are two types of macro invocations:
+        # macro
+        # macro( arg1, ... )
+        # Most macros needs a parameter list, but e.g. __file__ has not args
+        .local int blind_no_args 
+        blind_no_args = symbol['blind_no_args'] 
+      #print token_data
+      #print symbol_type
+      #print blind_no_args 
+      #print "\n"
+        unless blind_no_args goto EXPAND_MACRO
+          .local string input_string    
+          input_string = state['input_stack';0;'string']
+          .local int first_char, open_parenthesis
+          first_char = ord input_string
           open_parenthesis = ord '('
-          ne first_char, open_parenthesis, SHIPOUT_TEXT
+          if first_char != open_parenthesis goto SHIPOUT_TEXT
           goto EXPAND_MACRO
 
-  EXPAND_MACRO:
-  _expand_macro( state, symbol )
+EXPAND_MACRO:
+  expand_macro( state, symbol )
   goto FINISH_EXPAND_TOKEN
 
-  NO_TOKEN_WORD:
+NO_TOKEN_WORD:
   printerr "unknown token type: "
   printerr token_type
   end
 
-  SHIPOUT_TEXT:
-  _shipout_text( state, token_data )
+SHIPOUT_TEXT:
+  shipout_text( state, token_data )
   goto FINISH_EXPAND_TOKEN
   
-  FINISH_EXPAND_TOKEN:
+FINISH_EXPAND_TOKEN:
 .end
 
 
-=head2 string processed_token _expand_macro( PerlHash state, PerlHash symbol )
+=head2 string processed_token expand_macro( PerlHash state, PerlHash symbol )
 
 The macro expansion is handled by expand_macro(). It parses the
 arguments, using collect_arguments(), and builds a PerlArray containing 
@@ -106,7 +115,7 @@ which might call expand_token (), which might call expand_macro().
 
 =cut
 
-.sub _expand_macro 
+.sub expand_macro 
   .param PerlHash  state
   .param PerlHash  symbol 
 
@@ -120,19 +129,19 @@ which might call expand_token (), which might call expand_macro().
     printerr nesting_limit
     printerr "exceeded, use -L<N> to change it" 
     end
-  NESTING_LIMIT_NOT_REACHED_YET:
+NESTING_LIMIT_NOT_REACHED_YET:
   state['expansion_level'] = expansion_level
 
   .local pmc arguments
   arguments = new PerlArray
-  _collect_arguments( state, arguments )
+  collect_arguments( state, arguments )
 
   .local string text
-  ( text ) = _call_macro( state, symbol, arguments )
-  .local string current_file    
-  current_file = state['input_stack';0;'string']
-  current_file = text . current_file 
-  state['input_stack';0;'string'] = current_file
+  ( text ) = call_macro( state, symbol, arguments )
+  .local string input_string    
+  input_string = state['input_stack';0;'string']
+  input_string = text . input_string 
+  state['input_stack';0;'string'] = input_string
 
   expansion_level = state['expansion_level']
   dec expansion_level
@@ -141,7 +150,7 @@ which might call expand_token (), which might call expand_macro().
 .end
 
 
-=head2 string processed_token _call_macro( PerlArray macro, string token )
+=head2 string processed_token call_macro( PerlArray macro, string token )
 
 Apply macro to a token.
 
@@ -149,26 +158,25 @@ TODO: distinguish between TOKEN_FUNC and TOKEN_WORD
 
 =cut
 
-.sub _call_macro 
+.sub call_macro 
   .param PerlHash  state
   .param pmc       symbol
   .param PerlArray arguments
 
-  .local string symbol_type
+  .local string symbol_type, symbol_name
   symbol_type = symbol['type']
-  .local string symbol_name
   symbol_name = symbol['name']
 
   .local string    text
-  ne symbol_type, 'TOKEN_TEXT', NO_TOKEN_TEXT
+  if symbol_type != 'TOKEN_TEXT' goto NO_TOKEN_TEXT
     text = symbol['text']
     goto FINISH_CALL_MACRO
-  NO_TOKEN_TEXT:
+NO_TOKEN_TEXT:
 
-  eq symbol_type, 'TOKEN_FUNC', TOKEN_FUNC
+  if symbol_type == 'TOKEN_FUNC' goto TOKEN_FUNC
     printerr "INTERNAL ERROR: Bad symbol type in call_macro"
     end
-  TOKEN_FUNC:
+TOKEN_FUNC:
   .local pmc func
   func = symbol['func']
   .pcc_begin prototyped 
@@ -179,20 +187,20 @@ TODO: distinguish between TOKEN_FUNC and TOKEN_WORD
     .result text
   .pcc_end
 
-  FINISH_CALL_MACRO:
+FINISH_CALL_MACRO:
   .pcc_begin_return
     .return text
   .pcc_end_return
 .end
 
 
-=head2 void _collect_arguments
+=head2 void collect_arguments
 
 Collect all the arguments to a call of a macro.
 
 =cut
 
-.sub _collect_arguments 
+.sub collect_arguments 
   .param PerlHash  state    
   .param PerlArray arguments
 
@@ -201,52 +209,48 @@ Collect all the arguments to a call of a macro.
   # and capture the name 'furcht' and the substitution 'Hallo Welt'.
   # Thus we need to remenber the start and the length of these two captures
   .local int cnt_stack
-  .local string current_file    
-  current_file = state['input_stack';0;'string']
+  .local string input_string    
+  input_string = state['input_stack';0;'string']
 
   # We need a '(' at beginning of string
   .local int index_opening
-  index_opening = index current_file, '('  
-  ne index_opening, 0, NOT_A_ARGUMENT_LIST
+  index_opening = index input_string, '('  
+  if index_opening != 0 goto NOT_A_ARGUMENT_LIST
 
   # expand strings
   .local int start_index
   start_index = 0
   .local int num_args
   num_args = 0
-  .local int index_comma
-  .local int index_closing
-  .local int index_start_string
-  .local int index_end_string
-  .local int len_string
+  .local int index_comma, index_closing, index_start_string, index_end_string, len_string
   .local string arg
-  EXPAND_ARG:
+EXPAND_ARG:
   # find a string before ')'
-  index_closing = index current_file, ')', start_index
+  index_closing = index input_string, ')', start_index
   if index_closing == -1 goto NO_MORE_ARGS
   if num_args == 0 goto SKIP_SKIP_COMMA
-  index_comma = index current_file, ',', start_index
+  index_comma = index input_string, ',', start_index
   if index_comma == -1 goto NO_MORE_ARGS
   if index_closing < index_comma goto NO_MORE_ARGS
   start_index = index_comma
-  SKIP_SKIP_COMMA:
-  index_start_string = index current_file, '`', start_index 
+SKIP_SKIP_COMMA:
+  index_start_string = index input_string, '`', start_index 
   if index_start_string == -1 goto NO_MORE_ARGS
   inc index_start_string
   if index_closing < index_start_string goto NO_MORE_ARGS
-  index_end_string = index current_file, "'", index_start_string 
+  index_end_string = index input_string, "'", index_start_string 
   if index_end_string == -1 goto NO_MORE_ARGS
   len_string = index_end_string - index_start_string
-  substr arg, current_file, index_start_string, len_string
+  substr arg, input_string, index_start_string, len_string
   start_index = index_end_string
   push arguments, arg
   num_args = arguments
   goto EXPAND_ARG
 
-  NO_MORE_ARGS:
+NO_MORE_ARGS:
   inc index_closing
-  substr current_file, 0, index_closing, ''
+  substr input_string, 0, index_closing, ''
   
-  NOT_A_ARGUMENT_LIST:
-  state['input_stack';0;'string'] = current_file
+NOT_A_ARGUMENT_LIST:
+  state['input_stack';0;'string'] = input_string
 .end

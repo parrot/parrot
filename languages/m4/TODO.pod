@@ -185,9 +185,9 @@ by chapters in the GNU m4 documentation.
 
 =over
 
-=item macro translit: add as an op or port from GNU m4
+=item macro b<translit> add as an op or port from GNU m4
 
-=item macros regexp and patsubst POSIX regexes 
+=item macros b<regexp> and b<patsubst> POSIX regexes 
 
 =back
 
@@ -215,7 +215,9 @@ by chapters in the GNU m4 documentation.
 
 =over
 
-=item Implement all of them
+=item Macro b<__file__>
+
+=item Macro b<__line__>
 
 =back
 

@@ -25,7 +25,7 @@ Dump a state file.
 
 =cut
 
-.sub _produce_frozen_state 
+.sub produce_frozen_state 
   .param PerlHash   state
   .param string     frozen_file    
 
@@ -76,7 +76,7 @@ For now we just worry about the flags 'F', 'T' and 'V'.
 
 =cut
 
-.sub _reload_frozen_state 
+.sub reload_frozen_state 
   .param PerlHash   state    
   .param string     frozen_file    
 
@@ -170,7 +170,7 @@ For now we just worry about the flags 'F', 'T' and 'V'.
     substr text, content, 0, substitution_len, '' 
     builtin = builtin_tab[name]
     unless builtin goto BUILTIN_NOT_FOUND
-    _define_builtin( state, name, builtin )
+    define_builtin( state, name, builtin )
     goto BUILTIN_HAS_BEEN_HANDLED
     BUILTIN_NOT_FOUND:
       printerr "`"
@@ -214,7 +214,7 @@ For now we just worry about the flags 'F', 'T' and 'V'.
     substr name, content, 0, name_len, '' 
     substr text, content, 0, substitution_len, '' 
     # We know the length, so we can extract the strings
-    _define_user_macro( state, name, text )
+    define_user_macro( state, name, text )
     pos = 0
     rx_literal content, pos, "\n", UNEXPECTED
     substr content, 0, pos, '' 

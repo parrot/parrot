@@ -20,12 +20,9 @@
 
 #include <stdlib.h>
 #include <stdio.h>
-#ifdef PARROT_HAS_HEADER_ERROR    /* Not tested by Configure.pl yet */
-#  include <error.h>
-#endif
 #include <ctype.h>
+
 typedef int boolean;
-int warning_status;
 typedef int eval_t;
 
 /* Error handling.  */
@@ -34,7 +31,7 @@ typedef int eval_t;
 /* This file contains the functions to evaluate integer expressions for
    the "eval" macro.  It is a little, fairly self-contained module, with
    its own scanner, and a recursive descent parser.  The only entry point
-   is evaluate ().
+   is evaluate().  
 */
 
 

@@ -12,7 +12,7 @@ References: http://www.gnu.org/software/m4/m4.html
 
 =head1 SUBROUTINES
 
-=head2 void _shipout_text( PerlHash state )
+=head2 void shipout_text( PerlHash state )
 
 Does only a simple print rightnow.
 
@@ -20,7 +20,7 @@ TODO: Support for sync lines.
 
 =cut
 
-.sub _shipout_text 
+.sub shipout_text 
   .param PerlHash state 
   .param string   text 
 

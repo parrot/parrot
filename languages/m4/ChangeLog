@@ -1,5 +1,41 @@
 # $Id$
 
+2004-09-31     Bernhard Schmalhofer
+        * yank it up to revision 0.0.9
+        * Added macro 'printerr'
+        * Started with implementing macro '__file__'
+        * Added support for builtin macros without arguments
+        * use the new '.const .Sub func = "foo"' syntax
+        * declare several variable name on a single line of code
+
+2004-09-23     Bernhard Schmalhofer
+        * Explain about 'libpcre' in INSTALL
+
+2004-09-23     Andy Dougherty
+        * Make Solaris make happy, RT#31672
+        * <error.> is not portable, RT#31673
+
+2004-09-20     Bernhard Schmalhofer
+        * Play again with 'm4_eval_compiler'
+        * yank it up to revision 0.0.8
+
+2004-08-09     Bernhard Schmalhofer
+        * Fix failing test basic/012_eval.t
+
+2004-07-06     Bernhard Schmalhofer
+        * Make tests work again
+        * add some tests for 'eval'
+        * yank it up to revision 0.0.7
+
+2004-06-27     Andy Dougherty
+        * Build patches for Solaris, RT#30320
+
+2004-06-21    Bernhard Schmalhofer
+        * Don't write test files into '/tmp'
+
+2004-06-10    Bernhard Schmalhofer
+        * The symbolic link 'blib' isn't needed any more
+
 2004-09-20     Bernhard Schmalhofer
         * Play again with 'm4_eval_compiler'
 

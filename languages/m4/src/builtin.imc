@@ -19,364 +19,379 @@ expansion of user defined macros.
 
 =head1 SUBROUTINES
 
-=head2 void _builtin_tab_init( PerlHash state )
+=head2 void builtin_tab_init( PerlHash state )
 
 Initialise all builtin and predefined macros.
 
 =cut
 
-.sub _builtin_tab_init 
+.sub builtin_tab_init 
   .param PerlHash state
 
+  .local pmc builtin_tab, builtin, func
+
   # Generate a table of Sub
-  .local pmc builtin_tab
   builtin_tab = state['builtin_tab']
 
-  .local pmc builtin
-  .local Sub func
+  .const .Sub func_m4_not_implemented = "m4_not_implemented"
 
-  #   { "__file__",		TRUE,	FALSE,	FALSE,	m4___file__ },
+  #     name                    GNUext  macros  blind   function */
+  #   { "__file__",                TRUE,        FALSE,        FALSE,        m4___file__ },
   builtin = new PerlHash
   builtin['name'] = '__file__'
-  func = newsub _m4_not_implemented
-  builtin['func'] = func 
+  .const .Sub func_m4___file__ = "m4___file__"
+  builtin['func'] = func_m4___file__ 
+  builtin['blind_no_args'] = 0 
   builtin_tab['__file__'] = builtin
 
-  #   { "__line__",		TRUE,	FALSE,	FALSE,	m4___line__ },
+  #   { "__line__",                TRUE,        FALSE,        FALSE,        m4___line__ },
   builtin = new PerlHash
   builtin['name'] = '__line__'
-  func = newsub _m4_not_implemented
-  builtin['func'] = func 
+  builtin['func'] = func_m4_not_implemented 
+  builtin['blind_no_args'] = 0 
   builtin_tab['__line__'] = builtin
 
-  #   { "builtin",		TRUE,	FALSE,	TRUE,	m4_builtin },
+  #   { "builtin",                TRUE,        FALSE,        TRUE,        m4_builtin },
   builtin = new PerlHash
   builtin['name'] = 'builtin'
-  func = newsub _m4_not_implemented
-  builtin['func'] = func 
+  builtin['func'] = func_m4_not_implemented 
+  builtin['blind_no_args'] = 1 
   builtin_tab['builtin'] = builtin
 
-  #   { "changecom",	FALSE,	FALSE,	FALSE,	m4_changecom },
+  #   { "changecom",                FALSE,        FALSE,        FALSE,        m4_changecom },
   builtin = new PerlHash
   builtin['name'] = 'changecom'
-  func = newsub _m4_not_implemented
-  builtin['func'] = func 
+  builtin['func'] = func_m4_not_implemented 
+  builtin['blind_no_args'] = 0 
   builtin_tab['changecom'] = builtin
 
-  #   { "changequote",	FALSE,	FALSE,	FALSE,	m4_changequote },
+  #   { "changequote",	        FALSE,        FALSE,        FALSE,        m4_changequote },
   builtin = new PerlHash
   builtin['name'] = 'changequote'
-  func = newsub _m4_not_implemented
-  builtin['func'] = func 
+  builtin['func'] = func_m4_not_implemented 
+  builtin['blind_no_args'] = 0 
   builtin_tab['changequote'] = builtin
 
-  #   { "changeword",	TRUE,	FALSE,	FALSE,	m4_changeword },
+  #   { "changeword",        TRUE,        FALSE,        FALSE,        m4_changeword },
   builtin = new PerlHash
   builtin['name'] = 'changeword'
-  func = newsub _m4_not_implemented
-  builtin['func'] = func 
+  builtin['func'] = func_m4_not_implemented 
+  builtin['blind_no_args'] = 0 
   builtin_tab['changeword'] = builtin
 
-  #   { "debugmode",	TRUE,	FALSE,	FALSE,	m4_debugmode },
+  #   { "debugmode",        TRUE,        FALSE,        FALSE,        m4_debugmode },
   builtin = new PerlHash
   builtin['name'] = 'debugmode'
-  func = newsub _m4_not_implemented
-  builtin['func'] = func 
+  builtin['func'] = func_m4_not_implemented 
+  builtin['blind_no_args'] = 0 
   builtin_tab['debugmode'] = builtin
 
-  #   { "debugfile",	TRUE,	FALSE,	FALSE,	m4_debugfile },
+  #   { "debugfile",        TRUE,        FALSE,        FALSE,        m4_debugfile },
   builtin = new PerlHash
   builtin['name'] = 'debugfile'
-  func = newsub _m4_not_implemented
-  builtin['func'] = func 
+  builtin['func'] = func_m4_not_implemented 
+  builtin['blind_no_args'] = 0 
   builtin_tab['debugfile'] = builtin
 
-  #   { "decr",		FALSE,	FALSE,	TRUE,	m4_decr },
+  #   { "decr",                FALSE,        FALSE,        TRUE,        m4_decr },
   builtin = new PerlHash
   builtin['name'] = 'decr'
-  func = newsub _m4_decr
-  builtin['func'] = func 
+  .const .Sub func_m4_decr = "m4_decr"
+  builtin['func'] = func_m4_decr
+  builtin['blind_no_args'] = 1 
   builtin_tab['decr'] = builtin
 
-  #   { "define",		FALSE,	TRUE,	TRUE,	m4_define },
+  #   { "define",                FALSE,        TRUE,        TRUE,        m4_define },
   builtin = new PerlHash
   builtin['name'] = 'define'
-  func = newsub _m4_define
-  builtin['func'] = func 
+  .const .Sub func_m4_define = "m4_define"
+  builtin['func'] = func_m4_define
+  builtin['blind_no_args'] = 1 
   builtin_tab['define'] = builtin
 
-  #   { "defn",		FALSE,	FALSE,	TRUE,	m4_defn },
+  #   { "defn",                FALSE,        FALSE,        TRUE,        m4_defn },
   builtin = new PerlHash
   builtin['name'] = 'defn'
-  func = newsub _m4_not_implemented
-  builtin['func'] = func 
+  builtin['func'] = func_m4_not_implemented 
+  builtin['blind_no_args'] = 1 
   builtin_tab['defn'] = builtin
 
-  #   { "divert",		FALSE,	FALSE,	FALSE,	m4_divert },
+  #   { "divert",                FALSE,        FALSE,        FALSE,        m4_divert },
   builtin = new PerlHash
   builtin['name'] = 'divert'
-  func = newsub _m4_not_implemented
-  builtin['func'] = func 
+  builtin['func'] = func_m4_not_implemented 
+  builtin['blind_no_args'] = 0 
   builtin_tab['divert'] = builtin
 
-  #   { "divnum",		FALSE,	FALSE,	FALSE,	m4_divnum },
+  #   { "divnum",                FALSE,        FALSE,        FALSE,        m4_divnum },
   builtin = new PerlHash
   builtin['name'] = 'divnum'
-  func = newsub _m4_not_implemented
-  builtin['func'] = func 
+  builtin['func'] = func_m4_not_implemented 
+  builtin['blind_no_args'] = 0 
   builtin_tab['divnum'] = builtin
 
-  #   { "dnl",		FALSE,	FALSE,	FALSE,	m4_dnl },
+  #   { "dnl",                  FALSE,        FALSE,        FALSE,        m4_dnl },
   builtin = new PerlHash
   builtin['name'] = 'dnl'
-  func = newsub _m4_not_implemented
-  builtin['func'] = func 
+  builtin['func'] = func_m4_not_implemented 
+  builtin['blind_no_args'] = 0 
   builtin_tab['dnl'] = builtin
 
-  #   { "dumpdef",		FALSE,	FALSE,	FALSE,	m4_dumpdef },
+  #   { "dumpdef",                FALSE,        FALSE,        FALSE,        m4_dumpdef },
   builtin = new PerlHash
   builtin['name'] = 'dumpdef'
-  func = newsub _m4_not_implemented
-  builtin['func'] = func 
+  builtin['func'] = func_m4_not_implemented 
+  builtin['blind_no_args'] = 0 
   builtin_tab['dumpdef'] = builtin
 
-  #   { "errprint",		FALSE,	FALSE,	FALSE,	m4_errprint },
+  #   { "errprint",                FALSE,        FALSE,        FALSE,        m4_errprint },
   builtin = new PerlHash
   builtin['name'] = 'errprint'
-  func = newsub _m4_not_implemented
-  builtin['func'] = func 
+  .const .Sub func_m4_errprint = "m4_errprint"
+  builtin['func'] = func_m4_errprint
+  builtin['blind_no_args'] = 0 
   builtin_tab['errprint'] = builtin
 
-  #   { "esyscmd",		TRUE,	FALSE,	TRUE,	m4_esyscmd },
+  #   { "esyscmd",                TRUE,        FALSE,        TRUE,        m4_esyscmd },
   builtin = new PerlHash
   builtin['name'] = 'esyscmd'
-  func = newsub _m4_not_implemented
-  builtin['func'] = func 
+  builtin['func'] = func_m4_not_implemented 
+  builtin['blind_no_args'] = 1 
   builtin_tab['esyscmd'] = builtin
 
   #   { "eval",		FALSE,	FALSE,	TRUE,	m4_eval },
   builtin = new PerlHash
   builtin['name'] = 'eval'
-  func = newsub _m4_eval
-  builtin['func'] = func 
+  .const .Sub func_m4_eval = "m4_eval"
+  builtin['func'] = func_m4_eval
+  builtin['blind_no_args'] = 1 
   builtin_tab['eval'] = builtin
 
   #   { "format",		TRUE,	FALSE,	FALSE,	m4_format },
   builtin = new PerlHash
   builtin['name'] = 'format'
-  func = newsub _m4_format
-  builtin['func'] = func 
+  .const .Sub func_m4_format = "m4_format"
+  builtin['func'] = func_m4_format
+  builtin['blind_no_args'] = 0 
   builtin_tab['format'] = builtin
 
   #   { "ifdef",		FALSE,	FALSE,	TRUE,	m4_ifdef },
   builtin = new PerlHash
   builtin['name'] = 'ifdef'
-  func = newsub _m4_ifdef
-  builtin['func'] = func 
+  .const .Sub func_m4_ifdef = "m4_ifdef"
+  builtin['func'] = func_m4_ifdef
+  builtin['blind_no_args'] = 1 
   builtin_tab['ifdef'] = builtin
 
   #   { "ifelse",		FALSE,	FALSE,	TRUE,	m4_ifelse },
   builtin = new PerlHash
   builtin['name'] = 'ifelse'
-  func = newsub _m4_ifelse
-  builtin['func'] = func 
+  .const .Sub func_m4_ifelse = "m4_ifelse"
+  builtin['func'] = func_m4_ifelse
+  builtin['blind_no_args'] = 1 
   builtin_tab['ifelse'] = builtin
 
   #   { "include",		FALSE,	FALSE,	TRUE,	m4_include },
   builtin = new PerlHash
   builtin['name'] = 'include'
-  func = newsub _m4_not_implemented
-  builtin['func'] = func 
+  builtin['func'] = func_m4_not_implemented 
+  builtin['blind_no_args'] = 1 
   builtin_tab['include'] = builtin
 
-  #   { "incr",		FALSE,	FALSE,	TRUE,	m4_incr },
+  #   { "incr",	        	FALSE,	FALSE,	TRUE,	m4_incr },
   builtin = new PerlHash
   builtin['name'] = 'incr'
-  func = newsub _m4_incr
-  builtin['func'] = func 
+  .const .Sub func_m4_incr = "m4_incr"
+  builtin['func'] = func_m4_incr
+  builtin['blind_no_args'] = 1 
   builtin_tab['incr'] = builtin
 
   #   { "index",		FALSE,	FALSE,	TRUE,	m4_index },
   builtin = new PerlHash
   builtin['name'] = 'index'
-  func = newsub _m4_index
-  builtin['func'] = func 
+  .const .Sub func_m4_index = "m4_index"
+  builtin['func'] = func_m4_index
+  builtin['blind_no_args'] = 1 
   builtin_tab['index'] = builtin
 
   #   { "indir",		TRUE,	FALSE,	FALSE,	m4_indir },
   builtin = new PerlHash
   builtin['name'] = 'indir'
-  func = newsub _m4_not_implemented
-  builtin['func'] = func 
+  builtin['func'] = func_m4_not_implemented 
+  builtin['blind_no_args'] = 0 
   builtin_tab['indir'] = builtin
 
-  #   { "len",		FALSE,	FALSE,	TRUE,	m4_len },
+  #   { "len",	        	FALSE,	FALSE,	TRUE,	m4_len },
   builtin = new PerlHash
   builtin['name'] = 'len'
-  func = newsub _m4_len
-  builtin['func'] = func 
+  .const .Sub func_m4_len = "m4_len"
+  builtin['func'] = func_m4_len
+  builtin['blind_no_args'] = 1 
   builtin_tab['len'] = builtin
 
   #   { "m4exit",		FALSE,	FALSE,	FALSE,	m4_m4exit },
   builtin = new PerlHash
   builtin['name'] = 'm4exit'
-  func = newsub _m4_not_implemented
-  builtin['func'] = func 
+  builtin['func'] = func_m4_not_implemented 
+  builtin['blind_no_args'] = 0 
   builtin_tab['m4exit'] = builtin
 
   #   { "m4wrap",		FALSE,	FALSE,	FALSE,	m4_m4wrap },
   builtin = new PerlHash
   builtin['name'] = 'm4wrap'
-  func = newsub _m4_not_implemented
-  builtin['func'] = func 
+  builtin['func'] = func_m4_not_implemented 
+  builtin['blind_no_args'] = 0 
   builtin_tab['m4wrap'] = builtin
 
   #   { "maketemp",		FALSE,	FALSE,	TRUE,	m4_maketemp },
   builtin = new PerlHash
   builtin['name'] = 'maketemp'
-  func = newsub _m4_not_implemented
-  builtin['func'] = func 
+  builtin['func'] = func_m4_not_implemented 
+  builtin['blind_no_args'] = 1 
   builtin_tab['maketemp'] = builtin
 
   #   { "patsubst",		TRUE,	FALSE,	TRUE,	m4_patsubst },
   builtin = new PerlHash
   builtin['name'] = 'patsubst'
-  func = newsub _m4_not_implemented
-  builtin['func'] = func 
+  builtin['func'] = func_m4_not_implemented 
+  builtin['blind_no_args'] = 1 
   builtin_tab['patsubst'] = builtin
 
   #   { "popdef",		FALSE,	FALSE,	TRUE,	m4_popdef },
   builtin = new PerlHash
   builtin['name'] = 'popdef'
-  func = newsub _m4_not_implemented
-  builtin['func'] = func 
+  builtin['func'] = func_m4_not_implemented 
+  builtin['blind_no_args'] = 1 
   builtin_tab['popdef'] = builtin
 
   #   { "pushdef",		FALSE,	TRUE,	TRUE,	m4_pushdef },
   builtin = new PerlHash
   builtin['name'] = 'pushdef'
-  func = newsub _m4_not_implemented
-  builtin['func'] = func 
+  builtin['func'] = func_m4_not_implemented 
+  builtin['blind_no_args'] = 1 
   builtin_tab['pushdef'] = builtin
 
   #   { "regexp",		TRUE,	FALSE,	TRUE,	m4_regexp },
   builtin = new PerlHash
   builtin['name'] = 'regexp'
-  func = newsub _m4_not_implemented
-  builtin['func'] = func 
+  builtin['func'] = func_m4_not_implemented 
+  builtin['blind_no_args'] = 1 
   builtin_tab['regexp'] = builtin
 
   #   { "shift",		FALSE,	FALSE,	FALSE,	m4_shift },
   builtin = new PerlHash
   builtin['name'] = 'shift'
-  func = newsub _m4_not_implemented
-  builtin['func'] = func 
+  builtin['func'] = func_m4_not_implemented 
+  builtin['blind_no_args'] = 0 
   builtin_tab['shift'] = builtin
 
   #   { "sinclude",		FALSE,	FALSE,	TRUE,	m4_sinclude },
   builtin = new PerlHash
   builtin['name'] = 'sinclude'
-  func = newsub _m4_not_implemented
-  builtin['func'] = func 
+  builtin['func'] = func_m4_not_implemented 
+  builtin['blind_no_args'] = 1 
   builtin_tab['sinclude'] = builtin
 
   #   { "substr",		FALSE,	FALSE,	TRUE,	m4_substr },
   builtin = new PerlHash
   builtin['name'] = 'substr'
-  func = newsub _m4_substr
-  builtin['func'] = func 
+  .const .Sub func_m4_substr = "m4_substr"
+  builtin['func'] = func_m4_substr
+  builtin['blind_no_args'] = 1 
   builtin_tab['substr'] = builtin
 
   #   { "syscmd",		FALSE,	FALSE,	TRUE,	m4_syscmd },
   builtin = new PerlHash
   builtin['name'] = 'syscmd'
-  func = newsub _m4_syscmd
-  builtin['func'] = func 
+  .const .Sub func_m4_syscmd = "m4_syscmd"
+  builtin['func'] = func_m4_syscmd
+  builtin['blind_no_args'] = 1 
   builtin_tab['syscmd'] = builtin
 
   #   { "sysval",		FALSE,	FALSE,	FALSE,	m4_sysval },
   builtin = new PerlHash
   builtin['name'] = 'sysval'
-  func = newsub _m4_sysval
-  builtin['func'] = func 
+  .const .Sub func_m4_sysval = "m4_sysval"
+  builtin['func'] = func_m4_sysval
+  builtin['blind_no_args'] = 0 
   builtin_tab['sysval'] = builtin
 
   #   { "traceoff",		FALSE,	FALSE,	FALSE,	m4_traceoff },
   builtin = new PerlHash
   builtin['name'] = 'traceoff'
-  func = newsub _m4_not_implemented
-  builtin['func'] = func 
+  builtin['func'] = func_m4_not_implemented 
+  builtin['blind_no_args'] = 0 
   builtin_tab['traceoff'] = builtin
 
   #   { "traceon",		FALSE,	FALSE,	FALSE,	m4_traceon },
   builtin = new PerlHash
   builtin['name'] = 'traceon'
-  func = newsub _m4_not_implemented
-  builtin['func'] = func 
+  builtin['func'] = func_m4_not_implemented 
+  builtin['blind_no_args'] = 0 
   builtin_tab['traceon'] = builtin
 
   #   { "translit",		FALSE,	FALSE,	TRUE,	m4_translit },
   builtin = new PerlHash
   builtin['name'] = 'translit'
-  func = newsub _m4_not_implemented
-  builtin['func'] = func 
+  builtin['func'] = func_m4_not_implemented 
+  builtin['blind_no_args'] = 1 
   builtin_tab['translit'] = builtin
 
   #   { "undefine",		FALSE,	FALSE,	TRUE,	m4_undefine },
   builtin = new PerlHash
   builtin['name'] = 'undefine'
-  func = newsub _m4_undefine
-  builtin['func'] = func 
+  .const .Sub func_m4_undefine = "m4_undefine"
+  builtin['func'] = func_m4_undefine
+  builtin['blind_no_args'] = 1 
   builtin_tab['undefine'] = builtin
 
   #   { "undivert",		FALSE,	FALSE,	FALSE,	m4_undivert },
   builtin = new PerlHash
   builtin['name'] = 'undivert'
-  func = newsub _m4_not_implemented
-  builtin['func'] = func 
+  builtin['func'] = func_m4_not_implemented 
+  builtin['blind_no_args'] = 0 
   builtin_tab['undivert'] = builtin
 
 .end
 
 
-=head2 void _builtin_init( PerlHash state )
+=head2 void builtin_init( PerlHash state )
 
 Initialise all builtin and predefined macros.
 
 =cut
 
-.sub _builtin_init 
+.sub builtin_init 
   .param PerlHash state
 
-  .local pmc builtin_tab
-  builtin_tab = state['builtin_tab']
-  .local pmc    builtin
+  .local pmc    iterator, builtin, builtin_tab
   .local string name
   .local int    prefix_all_builtins
+
+  builtin_tab = state['builtin_tab']
   prefix_all_builtins = state['prefix_all_builtins']
-  .local pmc    iterator
   iterator = new Iterator, builtin_tab
   set iterator, .ITERATE_FROM_START
-  ITER_LOOP:
+ITER_LOOP:
   unless iterator, END_ITER
-    builtin = shift iterator
-    name = builtin['name']
-    unless prefix_all_builtins goto DONT_PREFIX_ALL_BUILTINS
-      name = 'm4_' . name
-    DONT_PREFIX_ALL_BUILTINS:
-    _define_builtin( state, name, builtin )
-    goto ITER_LOOP
-  END_ITER:
+  builtin = shift iterator
+  name = builtin['name']
+  unless prefix_all_builtins goto DONT_PREFIX_ALL_BUILTINS
+  name = 'm4_' . name
+DONT_PREFIX_ALL_BUILTINS:
+  define_builtin( state, name, builtin )
+  goto ITER_LOOP
+END_ITER:
 .end
 
 
-=head2 void _define_builtin( PerlHash state, string name, string bp )
+=head2 void define_builtin( PerlHash state, string name, string bp )
 
 Install a builtin macro with name 'name', bound to the function 'bp'.
 
 =cut
 
-.sub _define_builtin 
+.sub define_builtin 
   .param PerlHash  state
   .param string    name
   .param PerlHash  builtin
@@ -394,9 +409,13 @@ Install a builtin macro with name 'name', bound to the function 'bp'.
   text = builtin['name']
   symbol['text'] = text
 
-  .local Sub func
+  .local pmc func
   func = builtin['func']
   symbol['func'] = func
+
+  .local int blind_no_args
+  blind_no_args = builtin['blind_no_args']
+  symbol['blind_no_args'] = blind_no_args
 
   symtab[name] = symbol
 .end
@@ -409,7 +428,7 @@ This function is also called from main().
 
 =cut
 
-.sub _define_user_macro 
+.sub define_user_macro 
   .param PerlHash  state
   .param string    name     
   .param string    text
@@ -428,7 +447,7 @@ This function is also called from main().
 .end
 
 
-=head2 _define_macro
+=head2 define_macro
 
 The function define_macro is common for the builtins "define",
 "undefine", "pushdef" and "popdef".  ARGC and ARGV is as for the caller,
@@ -437,23 +456,43 @@ symbol table.
 
 =cut
 
-.sub _define_macro 
+.sub define_macro 
   .param PerlHash  state
   .param string    name
   .param string    text
 
   # right now we handle only TOKEN_TEXT
-  _define_user_macro( state, name, text )
+  define_user_macro( state, name, text )
 .end
 
 
-=head2 _m4_decr
+=head2 m4___file__
+
+Mostly for debugging.
+TODO: This is broken for multiple input files.
+TODO: This is broken when the path seperator is not '/'
+
+=cut
+
+.sub m4___file__ 
+  .param PerlHash  state
+
+  .local string current_file
+  current_file = state['current_file']
+
+  .pcc_begin_return
+    .return current_file
+  .pcc_end_return
+.end
+
+
+=head2 m4_decr
 
 Decrease a number.
 
 =cut
 
-.sub _m4_decr 
+.sub m4_decr 
   .param PerlHash  state
   .param PerlArray arguments
 
@@ -470,24 +509,23 @@ Decrease a number.
 .end
 
 
-=head2 _m4_define
+=head2 m4_define
 
 Define a user defined macro.
 
 =cut
 
-.sub _m4_define 
+.sub m4_define 
   .param PerlHash  state
   .param PerlArray arguments
 
   # right now we handle only TOKEN_TEXT
 
-  .local string arg0
+  .local string arg0, arg1
   arg0 = arguments[0]
-  .local string arg1
   arg1 = arguments[1]
 
-  _define_macro( state, arg0, arg1 )
+  define_macro( state, arg0, arg1 )
 
   .pcc_begin_return
     .return ''
@@ -495,42 +533,79 @@ Define a user defined macro.
 .end
 
 
-=head2 _m4_eval
+=head2 m4_errprint
+
+Print to standard error.
+The individual arguments are seperated by a blank.
+
+=cut
+
+.sub m4_errprint 
+  .param PerlHash  state
+  .param PerlArray arguments
+
+  # right now we handle only TOKEN_TEXT
+
+  .local pmc    iterator, arg
+  .local int    is_first_arg
+  is_first_arg = 1
+  iterator = new Iterator, arguments
+  set iterator, .ITERATE_FROM_START
+ITER_LOOP:
+  unless iterator, END_ITER
+  if is_first_arg goto FIRST_ARG
+  printerr ' '
+  goto FIRST_OR_OTHER_ARG
+FIRST_ARG:
+  is_first_arg = 0
+FIRST_OR_OTHER_ARG: 
+  arg = shift iterator
+  printerr arg
+  goto ITER_LOOP
+END_ITER:
+
+  .pcc_begin_return
+    .return ''
+  .pcc_end_return
+.end
+
+
+=head2 m4_eval
 
 Integer arithmetics.
 
 =cut
 
-.sub _m4_eval 
-    .param PerlHash  state
-    .param PerlArray arguments
+.sub m4_eval 
+  .param PerlHash  state
+  .param PerlArray arguments
 
-    # get compiler
-    .local pmc m4_eval_compiler
-    m4_eval_compiler = compreg "m4_eval_compiler"
+  # get compiler
+  .local pmc m4_eval_compiler
+  m4_eval_compiler = compreg "m4_eval_compiler"
 
-    # compile code and run it
-    .local string expression
-    expression = arguments[0]
-    .local pmc compiled_code
-    compiled_code = compile m4_eval_compiler, expression
-    .local int evaluated_expression
-    ( evaluated_expression ) = compiled_code()
-    .local string ret
-    ret = evaluated_expression
-    .pcc_begin_return
-      .return ret
-    .pcc_end_return
+  # compile code and run it
+  .local string expression
+  expression = arguments[0]
+  .local pmc compiled_code
+  compiled_code = compile m4_eval_compiler, expression
+  .local int evaluated_expression
+  ( evaluated_expression ) = compiled_code()
+  .local string ret
+  ret = evaluated_expression
+  .pcc_begin_return
+    .return ret
+  .pcc_end_return
 .end
 
 
-=head2 _m4_format
+=head2 m4_format
 
 Frontend for printf like formatting. 
 
 =cut
 
-.sub _m4_format 
+.sub m4_format 
   .param PerlHash  state
   .param PerlArray arguments
 
@@ -538,7 +613,6 @@ Frontend for printf like formatting.
   arg0 = shift arguments
 
   .local string ret
-
   ret = sprintf arg0, arguments
 
   .pcc_begin_return
@@ -547,13 +621,13 @@ Frontend for printf like formatting.
 .end
 
 
-=head2 _m4_ifdef
+=head2 m4_ifdef
 
 A conditional. Check wether a macro is defined.
 
 =cut
 
-.sub _m4_ifdef 
+.sub m4_ifdef 
   .param PerlHash  state
   .param PerlArray arguments
 
@@ -568,26 +642,26 @@ A conditional. Check wether a macro is defined.
   symbol_exists = exists symtab[arg0] 
   
   unless symbol_exists goto SYMBOL_DOES_NOT_EXIST
-    ret = arguments[1]
-    goto FINISH_M4_IFDEF
-  SYMBOL_DOES_NOT_EXIST:
+  ret = arguments[1]
+  goto FINISH_M4_IFDEF
+SYMBOL_DOES_NOT_EXIST:
   ret = arguments[2]
 
-  FINISH_M4_IFDEF:
+FINISH_M4_IFDEF:
   .pcc_begin_return
     .return ret
   .pcc_end_return
 .end
 
 
-=head2 _m4_ifelse
+=head2 m4_ifelse
 
 A conditional. Can also be used a block comment or as a 
 switch statement.
 
 =cut
 
-.sub _m4_ifelse 
+.sub m4_ifelse 
   .param PerlHash  state
   .param PerlArray arguments
 
@@ -597,24 +671,21 @@ switch statement.
   .local int argc
   if argc == 2 goto USED_AS_BLOCK_QUOTE
 
-  .local string arg0
+  .local string arg0, arg1, arg2, arg3
   arg0 = arguments[0]
-  .local string arg1
   arg1 = arguments[1]
-  .local string arg2
   arg2 = arguments[2]
-  .local string arg3
   arg3 = arguments[3]
 
   ne arg0, arg1, IS_NOT_EQUAL
-    ret = arg2
-    goto FINISH_M4_IFELSE
-  IS_NOT_EQUAL:
+  ret = arg2
+  goto FINISH_M4_IFELSE
+IS_NOT_EQUAL:
   ret = arg3
   goto FINISH_M4_IFELSE
 
-  USED_AS_BLOCK_QUOTE:
-  FINISH_M4_IFELSE:
+USED_AS_BLOCK_QUOTE:
+FINISH_M4_IFELSE:
   .pcc_begin_return
     .return ret
   .pcc_end_return
@@ -622,13 +693,13 @@ switch statement.
 
 
 
-=head2 _m4_incr
+=head2 m4_incr
 
 Increase a number.
 
 =cut
 
-.sub _m4_incr 
+.sub m4_incr 
   .param PerlHash  state
   .param PerlArray arguments
 
@@ -645,22 +716,22 @@ Increase a number.
 .end
 
 
-=head2 _m4_index
+=head2 m4_index
 
 The macro expands to the first index of the second argument 
 in the first argument. 
 
 =cut
 
-.sub _m4_index 
+.sub m4_index 
   .param PerlHash  state
   .param PerlArray arguments
 
-  .local int index_int
-  .local string arg0
+  .local string arg0, arg1
   arg0 = arguments[0]
-  .local string arg1
   arg1 = arguments[1]
+
+  .local int index_int
   index_int = index arg0, arg1
 
   # Write integer into a string
@@ -673,18 +744,19 @@ in the first argument.
 .end
 
 
-=head2 _m4_len
+=head2 m4_len
 
 Expand to the length of the first argument. 
 
 =cut
 
-.sub _m4_len 
+.sub m4_len 
   .param PerlHash  state
   .param PerlArray arguments
 
   .local string arg0
   arg0 = arguments[0]
+
   .local int len
   len = length arg0
 
@@ -697,7 +769,7 @@ Expand to the length of the first argument.
 .end
 
 
-=head2 _m4_substr
+=head2 m4_substr
 
 The macro "substr" extracts substrings from the first argument, starting
 from the index given by the second argument, extending for a length
@@ -706,7 +778,7 @@ substring extends to the end of the first argument.
 
 =cut
 
-.sub _m4_substr 
+.sub m4_substr 
 
   .param PerlHash  state
   .param PerlArray arguments
@@ -727,26 +799,26 @@ substring extends to the end of the first argument.
   ret = substr in, start 
   goto FINISH_SUBSTR
 
-  LENGTH_PASSED:
+LENGTH_PASSED:
   .local int len
   len = arguments[2]
   ret = substr in, start, len 
   goto FINISH_SUBSTR
 
-  FINISH_SUBSTR:
+FINISH_SUBSTR:
   .pcc_begin_return
     .return ret
   .pcc_end_return
 .end
 
 
-=head2 _m4_syscmd
+=head2 m4_syscmd
 
 Execute a shell command and don't return the return code.
 
 =cut
 
-.sub _m4_syscmd 
+.sub m4_syscmd 
   .param PerlHash  state
   .param PerlArray arguments
 
@@ -771,13 +843,13 @@ Execute a shell command and don't return the return code.
 .end
 
 
-=head2 _m4_sysval
+=head2 m4_sysval
 
 Return the exit status of the last syscmd.
 
 =cut
 
-.sub _m4_sysval 
+.sub m4_sysval 
   .param PerlHash  state
   .param PerlArray arguments
 
@@ -794,13 +866,13 @@ Return the exit status of the last syscmd.
 .end
 
 
-=head2 _m4_undefine
+=head2 m4_undefine
 
 Define a user defined macro.
 
 =cut
 
-.sub _m4_undefine 
+.sub m4_undefine 
   .param PerlHash  state
   .param PerlArray arguments
 
@@ -811,10 +883,6 @@ Define a user defined macro.
   symtab = state['symtab']
 
   delete symtab[arg0]
-  #print "undefining: "
-  #print arg0
-  #print "\n"
-  #_dumper( 'symtab in undefine', symtab )
  
   .pcc_begin_return
     .return ''
@@ -822,13 +890,13 @@ Define a user defined macro.
 .end
 
 
-=head2 _m4_not_implemented
+=head2 m4_not_implemented
 
 A placeholder for unimplemented functions.
 
 =cut
 
-.sub _m4_not_implemented 
+.sub m4_not_implemented 
   .param PerlHash  state
   .param PerlArray arguments
 

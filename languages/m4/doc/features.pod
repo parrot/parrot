@@ -6,6 +6,50 @@ State of implementation
 
 =head1 What works?
 
+=head2 Chapter 1 Introduction and preliminaries
+
+=over
+
+=item --version
+
+=item --help
+
+=back
+
+=head2 Chapter 10 Macros for text handling
+
+=over
+
+=item Macro b<len>
+
+=item Macro b<index>
+
+=item Macro b<substr>
+
+=item Macro b<format>
+
+=back
+
+=head2 Chapter 11 Macros for doing arithmetic
+
+=over
+
+=item Macro b<incr>
+
+=item Macro b<decr>
+
+=item Macro b<eval>
+
+=back
+
+=head2 Chapter 13 Miscellaneous builtin macros
+
+=over
+
+=item Macro b<printerr>
+
+=back
+
 =head1 What doesn't works?
 
 L<../TODO.pod>

@@ -34,6 +34,6 @@ Get the Parrot distribution. Build parrot.
 
 =head1 AUTHOR
 
-Bernhard.Schmalhofer at gmx.de
+Bernhard Schmalhofer - L<Bernhard.Schmalhofer@gmx.de>
 
 =cut

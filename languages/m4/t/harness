@@ -29,8 +29,10 @@ Otherwise I try to run the list of passed tests.
 # pragmata
 use strict;
 
-use Test::Harness();
+use Cwd();
+use Data::Dumper;
 use File::Spec;
+use Test::Harness();
 
 my $language = 'm4';
 
@@ -42,7 +44,7 @@ if ( grep { m/^-files$/ } @ARGV )
   print join( "\n", @files );
   print "\n" if scalar(@files);
 }
-else
+else 
 { 
   my @files;
   if ( scalar(@ARGV) ) 
@@ -50,12 +52,20 @@ else
     # Someone specified tests for me to run.
     @files = grep { -f $_ } @ARGV
   }
-  else
+  else 
   {
-    # Propably called out of 'parrot/languages'
-    @files = glob( "m4/t/*/*.t" );
+    ( undef, undef, my $current_dir ) = File::Spec->splitpath( Cwd::getcwd() );
+    if ( $current_dir eq 'languages' )
+    {
+      @files = glob( File::Spec->catfile( $language, 't', '*', '*.t' ) );
+    }
+    elsif ( $current_dir eq $language )
+    {
+      @files = glob( File::Spec->catfile( 't', '*', '*.t' ) );
+    }
   }
-  Test::Harness::runtests( @files ) if scalar(@files);
+  # die Dumper( \@files );
+  Test::Harness::runtests( @files ) if scalar( @files );
 }
 
 =head1 HISTORY

@@ -20,6 +20,7 @@ Currently only long options are available.
 Operation modes:
       --help                   display this help and exit
       --version                output version information and exit
+      --prefix-builtins        force a `m4_' prefix to all builtins
 
 Frozen state files:
       --freeze-state=FILE      produce a frozen state on FILE at end
@@ -31,7 +32,7 @@ END_OUT
 #--------------------------------------------
 $real_out     = `$parrot_m4 --version 2>&1`; 
 is( $real_out, << 'END_OUT', '--version' );
-Parrot m4 0.0.8
+Parrot m4 0.0.9
 END_OUT
 
 

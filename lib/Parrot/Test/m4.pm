@@ -55,13 +55,20 @@ sub output_is
   my $parrotdir       = File::Basename::dirname( $self->{parrot} );
   Parrot::Test::generate_pbc_for( $code, $parrotdir, $count, $lang_f );
 
-  # TODO: Don't ignore STDERR
-  my $exit_code = Parrot::Test::_run_command( $parrot_m4, STDOUT => $parrot_m4_out_f );
-  $exit_code    = Parrot::Test::_run_command( $gnu_m4,    STDOUT => $gnu_m4_out_f );
+  # STDERR is written into same output file
+  my $parrot_exit_code = Parrot::Test::_run_command( $parrot_m4, STDOUT => $parrot_m4_out_f, STDERR => $parrot_m4_out_f );
+  my $gnu_exit_code    = Parrot::Test::_run_command( $gnu_m4,    STDOUT => $gnu_m4_out_f,    STDERR => $gnu_m4_out_f );
   
-  my $pass = $self->{builder}->is_eq( Parrot::Test::slurp_file($parrot_m4_out_f) . Parrot::Test::slurp_file($gnu_m4_out_f), , $output . $output, $desc );
-  $self->{builder}->diag( "'$parrot_m4' failed with exit code $exit_code" ) if $exit_code and not $pass;
-  # die Data::Dumper::Dumper( $lang_f, `pwd`, $parrot_m4, $parrotdir,  $parrot_m4_out_f );
+  my $pass = $self->{builder}->is_eq( Parrot::Test::slurp_file($parrot_m4_out_f) . Parrot::Test::slurp_file($gnu_m4_out_f),
+                                      $output . $output,
+                                      $desc );
+  unless ( $pass )
+  {
+    my $diag = '';
+    $diag .= "'$parrot_m4' failed with exit code $parrot_exit_code." if $parrot_exit_code;
+    $diag .= "'$gnu_m4' failed with exit code $gnu_exit_code.";
+    $self->{builder}->diag( $diag ) if $diag;
+  }
 
   # The generated files are left in the t/* directories.
   # Let 'make clean' and '.cvsignore' take care of them.

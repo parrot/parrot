@@ -1,6 +1,6 @@
 =head1 NAME
 
-m4.imc - An implementation of GNU m4 in PIR
+m4.imc - An implementation of GNU m4 in Parrot Immediate Representation
 
 =head1 DESCRIPTION
 
@@ -12,14 +12,14 @@ References: http://www.gnu.org/software/m4/m4.html
 
 =head1 SUBROUTINES
 
-=head2 _main
+=head2 m4
 
 Looks at the command line arguments and acts accordingly.
 
 =cut
 
-.sub _main 
-  .param PerlArray argv
+.sub m4 @MAIN 
+  .param pmc argv
 
   # name of the program
   .local string program_name
@@ -87,16 +87,16 @@ Looks at the command line arguments and acts accordingly.
   # Was '--version' passed ?
   is_defined = defined opt["version"]
   unless is_defined goto NO_VERSION_FLAG
-    print "Parrot m4 0.0.8\n"
+    print "Parrot m4 0.0.9\n"
     end
-  NO_VERSION_FLAG: 
+NO_VERSION_FLAG: 
 
   # Was '--help' passed ?
   is_defined = defined opt["help"]
   unless is_defined goto NO_HELP_FLAG
-    _usage( program_name )
+    usage( program_name )
     end
-  NO_HELP_FLAG: 
+NO_HELP_FLAG: 
 
   # TODO: In near future we propably should use objects here
   # For now let's just just use a hash with all state information
@@ -118,13 +118,13 @@ Looks at the command line arguments and acts accordingly.
     .local int nesting_limit
     nesting_limit = opt['nesting-limit']
     state['nesting_limit'] = nesting_limit
-  NO_NESTING_LIMIT_FLAG: 
+NO_NESTING_LIMIT_FLAG: 
 
   # Was '--prefix-builtins' passed ?
   is_defined = defined opt['prefix-builtins']
   unless is_defined goto NO_PREFIX_BUILTINS_FLAG
     state['prefix_all_builtins'] = 1
-  NO_PREFIX_BUILTINS_FLAG: 
+NO_PREFIX_BUILTINS_FLAG: 
 
   # Was a yet unimplemented option passed?
   # TODO: put names of unimplemented options in an PerlArray
@@ -195,12 +195,12 @@ Looks at the command line arguments and acts accordingly.
   if is_defined goto UNIMPLEMENTED_OPTION
 
   goto NO_UNIMPLEMENTED_OPTION
-  UNIMPLEMENTED_OPTION:
+UNIMPLEMENTED_OPTION:
     printerr "Sorry, the option '--"
     printerr unimplemented_option
     printerr "' is not implemented yet.\n"
     end
-  NO_UNIMPLEMENTED_OPTION:
+NO_UNIMPLEMENTED_OPTION:
 
   # load shared lib
   # There is a init-function in the shared lib,
@@ -209,7 +209,7 @@ Looks at the command line arguments and acts accordingly.
   m4_eval_compiler_lib = loadlib "m4_eval_compiler"
 
   # init of input structures, creates state['input_stack']
-  _input_init( state )
+  input_init( state )
 
   # TODO: init of output structures
 
@@ -229,21 +229,21 @@ Looks at the command line arguments and acts accordingly.
   # TODO: enable changing of quote characters
   # TODO: enable changing of comment delimiters 
   # TODO: error handling
-
   # TODO: handle reading from STDIN, multiple input files
+
   # check argc, we need at least one input file
   .local int argc
   argc = cloned_argv
   if argc >= 1 goto ARGC_IS_OK
-    _usage( program_name )
+    usage( program_name )
     end
-  ARGC_IS_OK:
+ARGC_IS_OK:
 
   # We need the builtin_tab, wether '--reload_state' was passed or not
   .local pmc builtin_tab
   builtin_tab = new OrderedHash
   state['builtin_tab'] = builtin_tab    
-  _builtin_tab_init( state )
+  builtin_tab_init( state )
 
   # Check wether the option --reload-state was passed
   .local string frozen_file
@@ -251,32 +251,32 @@ Looks at the command line arguments and acts accordingly.
   .local int string_len
   string_len = length frozen_file
   unless string_len > 0 goto BUILTIN_MACROS_INIT
-    _reload_frozen_state( state, frozen_file )
+    reload_frozen_state( state, frozen_file )
     goto COMMANDLINE_MACROS_INIT
-  BUILTIN_MACROS_INIT:
-  _builtin_init( state )
+BUILTIN_MACROS_INIT:
+  builtin_init( state )
 
-  COMMANDLINE_MACROS_INIT:
+COMMANDLINE_MACROS_INIT:
   # TODO: initialize list of macros from command line
 
-  INTERACTIVE_MODE_INIT:
+INTERACTIVE_MODE_INIT:
   # TODO: setup buffering for interactive mode
 
-  PATH_SEARCH:
+PATH_SEARCH:
   # TODO: enable reading from STDIN
   # TODO: look for files in M4PATH
   # Name of the input file, usually with extension '.m4'
   .local string filename
-  REDO_FILENAME_LOOP:
+REDO_FILENAME_LOOP:
   argc = cloned_argv
   unless argc > 0 goto LAST_FILENAME_LOOP
     filename = shift cloned_argv
-    _push_file( filename, state )
+    push_file( filename, state )
     goto REDO_FILENAME_LOOP
-  LAST_FILENAME_LOOP:
+LAST_FILENAME_LOOP:
 
   # now we start to do some work
-  _expand_input( state )
+  expand_input( state )
 
 HANDLE_WRAPUP_TEXT:
   # TODO: handle wrapup text, whatever that is
@@ -286,27 +286,27 @@ CHECK_FROZEN_FLAG:
   freeze_file = opt["freeze-state"]
   string_len = length freeze_file
   unless string_len > 0 goto MAKE_DIVERSION
-    _produce_frozen_state( state, freeze_file )
+    produce_frozen_state( state, freeze_file )
     goto FINISH_PROGRAM
-  MAKE_DIVERSION:
+MAKE_DIVERSION:
   # TODO: make_diversion, undiver_all, whatever that does 
 
-  FINISH_PROGRAM:
+FINISH_PROGRAM:
   end
 .end
 
 
-=head2 void _usage( string program_name )
+=head2 void usage( string program_name )
 
 Prints an usage message.
-Pass the program name as the first parameter.
+The program name is passed as the first parameter.
 There are no return values.
 
 TODO: Pass a flag for EXIT_FAILURE and EXIT_SUCCESS
 
 =cut
 
-.sub _usage 
+.sub usage 
   .param string program_name
 
   print "Usage: ../../parrot "
@@ -318,6 +318,7 @@ TODO: Pass a flag for EXIT_FAILURE and EXIT_SUCCESS
   print "Operation modes:\n"
   print "      --help                   display this help and exit\n"
   print "      --version                output version information and exit\n"
+  print "      --prefix-builtins        force a `m4_' prefix to all builtins\n"
   print "\n"
   print "Frozen state files:\n"
   print "      --freeze-state=FILE      produce a frozen state on FILE at end\n"

@@ -11,7 +11,7 @@ References: http://www.gnu.org/software/m4/m4.html
 
 =head1 SUBROUTINES
 
-=head2 void _input_init( PerlHash state )
+=head2 void input_init( PerlHash state )
 
 Initialise the input stack and various regexes.
 
@@ -25,7 +25,7 @@ TODO: recognize nested quoted strings
 
 =cut
 
-.sub _input_init 
+.sub input_init 
   .param PerlHash state 
 
   .local pmc empty_array
@@ -84,16 +84,20 @@ TODO: recognize nested quoted strings
 .end
 
 
-=head2 void _push_file( PerlHash state, string filename )
+=head2 void push_file( PerlHash state, string filename )
 
 Stores a filename on a stack
 TODO: open these files and complain when they don't or pass filehandles
 
 =cut
 
-.sub _push_file 
+.sub push_file 
   .param PerlHash state 
   .param string   filename    
+
+  # This is needed for m4___file__
+  # TODO: this is badly broken, when there are multiple input files
+  state['current_file'] = filename
 
   .local pmc in
   in = open filename, '<'
@@ -102,8 +106,8 @@ TODO: open these files and complain when they don't or pass filehandles
     printerr " not found\n"
     end
   PROCESS_SINGLE_FILE:
-  .local string current_file    # input file handle
-  current_file = read in, 50000
+  .local string input_string    # input file handle
+  input_string = read in, 50000
   close in
 
   # state['input_stack'] has been created in input_init 
@@ -116,14 +120,14 @@ TODO: open these files and complain when they don't or pass filehandles
   if stack_size > 0 goto NOT_FIRST_FILE
     input_block = new PerlHash
     input_block['type'] = 'INPUT_STRING'
-    input_block['string'] = current_file
+    input_block['string'] = input_string
     push input_stack, input_block
     goto FINISH_PUSH_FILE
   NOT_FIRST_FILE:
   input_block = shift input_stack
   .local string file
   file = input_block['string']
-  file = file . current_file
+  file = file . input_string
   input_block['string'] = file
   push input_stack, input_block
   FINISH_PUSH_FILE:
@@ -144,17 +148,17 @@ Uses regular expressions for finding tokens.
 
 =cut
 
-.sub _next_token 
+.sub next_token 
   .param PerlHash state 
 
   .local pmc input_stack    
   input_stack = state['input_stack']
   .local pmc input_block    
   input_block = shift input_stack
-  .local string current_file    
-  current_file = input_block['string']
+  .local string input_string    
+  input_string = input_block['string']
   .local int current_file_len
-  current_file_len = length current_file    
+  current_file_len = length input_string    
   .local pmc pcre_exec    
   pcre_exec = state['pcre_exec']
   .local pmc NULL
@@ -175,14 +179,14 @@ Uses regular expressions for finding tokens.
   # read a whole bunch of non-macro and non-word charcters
   regex = state['simple_regex']
   token_type = 'TOKEN_SIMPLE'
-  is_match = pcre_exec( regex, NULL, current_file, current_file_len, 0, 0, ovector, 10 )
+  is_match = pcre_exec( regex, NULL, input_string, current_file_len, 0, 0, ovector, 10 )
   if is_match ==  1 goto MATCH
   if is_match != -1 goto MATCH_FAILED
 
   # look for comments and return it as 'TOKEN_SIMPLE'
   regex = state['comment_regex']
   token_type = 'TOKEN_SIMPLE'
-  is_match = pcre_exec( regex, NULL, current_file, current_file_len, 0, 0, ovector, 10 )
+  is_match = pcre_exec( regex, NULL, input_string, current_file_len, 0, 0, ovector, 10 )
   if is_match ==  1 goto MATCH
   if is_match != -1 goto MATCH_FAILED
 
@@ -190,7 +194,7 @@ Uses regular expressions for finding tokens.
   regex = state['string_regex']
   token_type = 'TOKEN_STRING'
   is_string_match = 1
-  is_match = pcre_exec( regex, NULL, current_file, current_file_len, 0, 0, ovector, 10 )
+  is_match = pcre_exec( regex, NULL, input_string, current_file_len, 0, 0, ovector, 10 )
   if is_match ==  1 goto MATCH
   if is_match != -1 goto MATCH_FAILED
   is_string_match = 0
@@ -199,7 +203,7 @@ Uses regular expressions for finding tokens.
   # this will be checked for macro substitution
   regex = state['word_regex']
   token_type = 'TOKEN_WORD'
-  is_match = pcre_exec( regex, NULL, current_file, current_file_len, 0, 0, ovector, 10 )
+  is_match = pcre_exec( regex, NULL, input_string, current_file_len, 0, 0, ovector, 10 )
   if is_match ==  1 goto MATCH
   if is_match != -1 goto MATCH_FAILED
 
@@ -210,8 +214,7 @@ Uses regular expressions for finding tokens.
 
   MATCH:
     # ovector is an int arrary containing start stop coords
-    .local int start_line
-    .local int end_line
+    .local int start_line, end_line
     .local pmc struct
     struct = new SArray
     struct = 3
@@ -222,7 +225,7 @@ Uses regular expressions for finding tokens.
     assign ovector, struct
     start_line = ovector[0;0]
     end_line   = ovector[0;1]
-    substr token_data, current_file, start_line, end_line, ''
+    token_data = substr input_string, start_line, end_line, ''
     unless is_string_match goto NO_STRING_MATCH
       substr token_data, 0, 1, ''
       substr token_data, -1, 1, ''
@@ -231,12 +234,12 @@ Uses regular expressions for finding tokens.
 
   MATCH_FAILED:
     printerr "failed to match !"
-    printerr current_file
+    printerr input_string
     printerr "!\n"     
   goto FINISH_NEXT_TOKEN
 
   FINISH_NEXT_TOKEN: 
-  input_block['string'] = current_file
+  input_block['string'] = input_string
   push input_stack, input_block
   .pcc_begin_return
     .return token_type
