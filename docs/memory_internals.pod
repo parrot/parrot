@@ -1,0 +1,254 @@
+=head1 NAME
+
+Parrot - Memory Internals
+
+=head1 VERSION
+
+0.0.8 Oct 2002
+
+=head1 ABSTRACT
+
+This document tries to explain internals of parrot structures related
+to memory management and should give the answer 42, when questions are
+related to the whole and everything and memory management.
+
+=head1 OVERVIEW
+
+All allocated items are managed in memory pools. A memory pools
+holds collections of similar items. These pools can be roughly divided into
+two kinds: pools holding fixed sized items and variable sized items.
+
+A pool is organized as a linked list of big chunks, holding many managed
+items of one kind.
+
+=head2 Abbrevs used here
+
+DOD ... dead object detection, s. e.g. docs/pdds/pdd09_gc.pod for details.
+
+By scanning through all the interpreters registers, stacks and the processor
+stack, all objects, that are detected here, are marked as alive.
+Objects in all pools not alive are considered dead therefore.
+
+=head1 Top down: the interpreter
+
+A overall layout of interpreters memory management looks like so:
+
+    typedef struct Parrot_Interp {
+    	...
+	struct Arenas *arena_base;
+	...
+    } Interp;
+
+All object like things, that get allocated during the execution of
+parrot byte code are managed here. Exceptions currently are objects
+allocated early in startup e.g. the names of the pools themselfes.
+
+=head1 Arenas
+
+I<struct Arenas> holds pointer to different subkinds of managed memory, a
+simplification looks similar to this:
+
+    struct Arenas {
+	struct Memory_Pool *memory_pool;
+	...
+	struct Small_Object_Pool * header_pool;
+    }
+
+I<Memory_pool> and I<header_pool> are variable and fixed sized pool
+pointers respectively.
+
+=head1 Memory_Pool
+
+Here are all variable sized items allocated, managed in linked lists of
+I<Memory_Blocks> - but see below.
+
+=head1 Small_Object_Pool
+
+This pool manages I<Small_Object_Arena>'s, linked together, which provide
+the space for the fixed sized objects.
+
+=head1 Fixed sized items
+
+These items are either objects by them self, like a I<PMC>, or are a
+header structure of a variable sized object like a I<STRING>.
+The general object of this kind is a buffer_like object, which consists
+of a I<Buffer> at the beginning and a variable but fixed sized part after the
+buffer structure. Examples of this are e.g. a I<STRING> or an I<IntList>.
+
+Buffer_like object's of the same size are maintained in the
+I<sized_header_pools>, which manages objects of the same size in one slot.
+
+Actually, with some reorganization, a I<PMC> is not different to the general
+case and will be united in the near future.
+
+All fixed sized objects are allocated with alloc_objects(), and first put
+onto the pool's free_list. When there is need for a new object it's taken
+off the free_list and when it's unused (detected during a DOD run), it
+will be put back on the free list again.
+
+If the free_list is empty, first a DOD run is started, which may put
+dead objects there, or if not, a new pool is allocated to hold more
+objects.
+
+These fixed sized objects are never freed during the lifetime of an
+interpreter, they get just reused or recycled.
+
+=head2 General structure of a buffer_like item
+
+    struct parrot_object_t {
+	struct {
+	    void *bufstart;
+	    size_t buflen;
+	} b;
+	unsigned flags;
+	...
+    } parrot_object;
+
+This does not totally reflect the current implementation, but is the
+spirit of the abstraction of current objects. Above structure including
+I<flags> is the current I<Buffer>. With some additional fields like I<strstart>
+and I<bufused>, inserted at the ellipses, you get a I<STRING>.
+
+I<PMC>s will be reworked to fit into this structure.
+
+=head1 Variable sized items
+
+These items never live alone, they are part of a I<Buffer> structure,
+described above. They are allocated at I<bufstart>. This is e.g. used,
+to manage the buffers free list, where I<bufstart> is used as a next object
+pointer.
+
+These items are managed in two different pools: the I<memory_pool> and the
+I<constant_string_pool>. The former holds all variable sized items, while the
+latter containing the word "string", holds constant strings only, as we
+don't have other variable sized constant items to store.
+
+Here, different memory allocation scemes jump in:
+
+=head2 Copying GC
+
+A I<memory_pool> gets allocated in big blocks, namely a I<Memory_Block>.
+
+When some part is needed, e.g. to store a string, this part is carved out of
+the memory block, until this block is used up. If no more space is available in
+this memory block, a garbage collections (GC) is started.  This copies all
+living items of all used memory blocks into one new block, which holds
+thereafter only used items tightly packed together.
+
+The old memory blocks, containing sparse unused parts and used parts already
+copied to the new place, are then unused alltogether and get free()ed
+thereafter.
+
+When GC doesn't provide enough free space, needed for a new item, a new
+block is added to the memory pool.
+
+This also implies, that buffers are moved around during their life. Users of
+these buffers are therefore not allowed to hold pointers to buffers over pieces
+of code, that might trigger a GC run, like Parrot_allocate() or
+string_compare().
+
+=head2 Defragmentating allocator
+
+An alternative to above is, to use a memory allocator, which is as fast
+as above and does resuse free()ed items in a memory conserving way.
+Actually I<libc> provides this, based on Lea's allocator, and parrot
+includes one, for systems not having such a nice feature.
+
+Using this allocator, all variable sized items are just allocated via a
+plain malloc() call, or resized with realloc(), and after they lost
+there existence, this is, when DOD detected, that the managing buffer
+header is not used anymore, they are free()ed. That's all. The
+underlaying allocator collect's this pieces, does coalesce them to bigger
+parts - if possible, keeps them on free lists, sorted by their sizes, and
+when a new malloc() arrives, eventually gives them back to parrot.
+
+So here, the variable length I<memory_pool> is unused. You can consider this
+pool to live inside the allocator.
+
+Buffers allocated this way don't move around, except when reallocated of
+course.
+
+The B<Configure> options I<--gc> allows to use either method.
+
+=head2 Buffer_Tail and COW
+
+Both implementaions have the same problem to solve: I<STRING>s that get
+copied, or parts of strings as the result of a substr() call, do not
+allocate new space in the memory pool to hold this string or part of
+string. They just use a new_string_header() and set up a pointer
+(I<strstart>) pointing somewhere into the original string and remember the
+used length there in I<bufused>.
+
+This is all ok, as long as the original and the lazy copy of the string
+are not modified. So that's well known and called COW (copy on write).
+
+Now, during GC (or freeing buffers) the problem arises: to whome belongs
+this string. You shouldn't copy the same string to different places,
+thus rendering COW to a noop, nor are you allowed to free this same
+string more then once, B<gdb> i.e. your debugger will tell you why.
+
+Both allocation scemes therefore use a I<Buffer_Tail>. After the end of the
+actual variable length string there is some space for a flag, to remember,
+what to do with such strings.
+
+Copying GC marks such COW strings with I<TAIL_moved> and stores the new
+address in the buffer header, so other users of this string can be
+updated to reuse the same string (XXX one or all other users?).
+
+The malloc()/free() approach stores a usage flag there. Only if all
+users of this string are dead, one and only one buffer header using this
+string, is allowed to free this string. And additionally this header is
+not allowed to free the string immediately, then, if so, the I<Buffer_Tail>
+would be gone too. At best, the last - in terms of detecting - user of
+such a dead COW string should free it, but that would cause more
+overhead as it could be useful, so currently this string will be freed
+during the next DOD run.
+
+=head1 Simplified Figure
+
+=item
+
+                             +--------+
+      +------------------<---| Arenas |<-----------+
+      |                      +--------+-->--+      |
+      |                                     |      |
+      |         +------+    +-----------+   |  +=============+
+      |         | S0   |<---| Registers |<--)--| Interpreter |
+      |         +------+    +-----------+   |  +=============+
+      |     +---| S1   |                    |
+      |     |   +------+                    +----------+
+ +-------+  |                                          |
+ | Blk 1 |--)-->+----------+    +--------------+   +---------+
+ +-------+  |   | Buffer 1 |    | OnestringAno |   | Block 1 |
+ | Blk 2 |  |   +----------+    | therstring.. |   +---------+
+ +-------+  |   | Buffer 2 |    | ..String...  |<--| Block 2 |
+ | .     |  |   +----------+    +--------------+   +---------+
+ +-------+  |   | ...      |        ^    ^         | ...     |
+ Small Obj  |   +----------+        |    |         +---------+
+ Pool       +-->| Buffer N |--------+----+         Memory Pool
+                +----------+
+                 Buffer          Memory Block
+
+
+
+Now consider, that the I<Interpreter> shall be a I<PMC> living in
+I<Buffer X> of the underlaying interpreter and is currently running
+B<perldoc docs/memory_internals.pod>, and then redo this figure, with
+all the blanks filled in ;-)
+
+=head1 FILES
+
+smallobject.[ch], headers.c, resources.[ch], res_lea.c, dod.c, string.[ch]
+
+=head1 BUGS
+
+All spelling errors belong to those, who honestly collected them, as well as
+all errors related to my abuse of the English language - I'm not natively
+speaking it.
+
+To minimize this bugs section - please patch this document and keep it
+up to date - thanks.
+
+=head1 AUTHOR
+
+Leopold Tötsch <lt@toetsch.at>
