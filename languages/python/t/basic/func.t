@@ -3,7 +3,7 @@
 use strict;
 use lib '../../lib';
 
-use Parrot::Test tests => 23;
+use Parrot::Test tests => 26;
 
 sub test {
     language_output_is('python', $_[0], '', $_[1]);
@@ -216,5 +216,28 @@ if __name__ == '__main__':
         if i == 2:
             break
     print "Ok"
+CODE
+
+test(<<'CODE', 'dict(), dict({h})');
+if __name__ == '__main__':
+    h = dict()
+    print "ok"
+    it = iter( dict( { "a": 1, "b" : 2 }))
+    for i, c in enumerate(it):
+        print i, c
+    print "ok"
+CODE
+
+test(<<'CODE', 'dict(seq)');
+if __name__ == '__main__':
+    it = iter( dict( [[ "a", 1] , ["a" , 2 ]]) )
+    for i, c in enumerate(it):
+        print i, c
+CODE
+
+test(<<'CODE', 'list()');
+if __name__ == '__main__':
+    for i in list("abc"):
+        print i
 CODE
 

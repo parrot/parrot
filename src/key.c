@@ -353,15 +353,13 @@ key_string(Interp *interpreter, PMC *key)
         return PMC_str_val(key);
     case KEY_string_FLAG | KEY_register_FLAG:
         return interpreter->string_reg.registers[PMC_int_val(key)];
-    case KEY_pmc_FLAG:
-        return VTABLE_get_string(interpreter, key);
                                                    /*   PMC_pmc_val(key)); */
     case KEY_pmc_FLAG | KEY_register_FLAG:
         reg = interpreter->pmc_reg.registers[PMC_int_val(key)];
         return VTABLE_get_string(interpreter, reg);
     default:
-        internal_exception(INVALID_OPERATION, "Key not a string!\n");
-        return 0;
+    case KEY_pmc_FLAG:
+        return VTABLE_get_string(interpreter, key);
     }
 }
 
@@ -402,6 +400,8 @@ Returns the next key if C<key> is in a sequence of linked keys.
 PMC *
 key_next(Interp *interpreter, PMC *key)
 {
+    if (!key->pmc_ext)
+        return NULL;
     return PMC_data(key);
 }
 

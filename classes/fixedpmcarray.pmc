@@ -23,7 +23,7 @@ TODO currently this uses PerlString instead of String PMCs.
 #include "parrot/parrot.h"
 
 pmclass FixedPMCArray need_ext does array {
-    
+
 /*
 
 =back
@@ -90,12 +90,12 @@ Creates and returns a copy of the array.
     PMC* clone () {
         INTVAL size;
         PMC * dest = pmc_new(INTERP, SELF->vtable->base_type);
-    
+
         if (!PMC_data(SELF))
             return dest;
         size = PMC_int_val(SELF);
         PMC_int_val(dest) = size;
-        
+
         PMC_data(dest) = mem_sys_allocate(size * sizeof(PMC*));
         mem_sys_memcopy(PMC_data(dest), PMC_data(SELF), size*sizeof(PMC*));
         PObj_custom_mark_destroy_SETALL(dest);
@@ -274,9 +274,9 @@ Returns the PMC value of the element at index C<key>.
     PMC* get_pmc_keyed_int (INTVAL key) {
         PMC **data;
         if (key < 0 || key >= PMC_int_val(SELF))
-            internal_exception(OUT_OF_BOUNDS, 
+            internal_exception(OUT_OF_BOUNDS,
                 "FixedPMCArray: index out of bounds!\n");
-        
+
         data = (PMC **)PMC_data(SELF);
         return data[key];
     }
@@ -309,9 +309,11 @@ Resizes the array to C<size> elements.
     void set_integer_native (INTVAL size) {
         int i;
         PMC **data;
-        
-        if (PMC_int_val(SELF) || size < 1)
+
+        if (PMC_int_val(SELF) && size)
             internal_exception(OUT_OF_BOUNDS, "FixedPMCArray: Can't resize!\n");
+        if (!size)
+            return;
         PMC_int_val(SELF) = size;
         data = (PMC**)mem_sys_allocate(size * sizeof(PMC*));
         for(i = 0; i < size; i++)
@@ -389,7 +391,7 @@ C<value>.
         k = key_integer(INTERP, key);
         DYNSELF.set_number_keyed_int(k, value);
     }
-    
+
 /*
 
 =item C<void set_string_keyed_int(INTVAL key, STRING *value)>
@@ -438,7 +440,7 @@ Sets the PMC value of the element at index C<key> to C<*src>.
     void set_pmc_keyed_int (INTVAL key, PMC* src) {
         PMC **data;
         if (key < 0 || key >= PMC_int_val(SELF))
-            internal_exception(OUT_OF_BOUNDS, 
+            internal_exception(OUT_OF_BOUNDS,
                 "FixedPMCArray: index out of bounds!\n");
 
         data = (PMC**)PMC_data(SELF);

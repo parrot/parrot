@@ -61,6 +61,95 @@ parrot_py_chr(Interp *interpreter, PMC *pmc)
 }
 
 static PMC *
+dict_from_tuple_array(Interp *interpreter, PMC *ar)
+{
+    INTVAL i;
+    PMC *dict;
+    /*
+     * ar is an array of tuples which are key/value pairs
+     */
+    dict = pmc_new(interpreter, enum_class_PerlHash);
+    for (i = 0; i < VTABLE_elements(interpreter, ar); ++i) {
+        PMC *tupl = VTABLE_get_pmc_keyed_int(interpreter, ar, i);
+        PMC *key, *value;
+        INTVAL n = VTABLE_elements(interpreter, tupl);
+        if (n != 2)
+            real_exception(interpreter, NULL, E_ValueError,
+                    "dictionary update sequence element #%d "
+                    "has length %d; 2 is required",
+                    (int)i, (int)n);
+        key = VTABLE_get_pmc_keyed_int(interpreter, tupl, 0);
+        value = VTABLE_get_pmc_keyed_int(interpreter, tupl, 1);
+        VTABLE_set_pmc_keyed(interpreter, dict, key, value);
+    }
+    return dict;
+}
+
+static PMC *
+parrot_py_dict(Interp *interpreter, PMC *argv)
+{
+    PMC *arg;
+    INTVAL i;
+    /*
+     * no arguments: return a new hash
+     */
+    if ((i = VTABLE_elements(interpreter, argv)) == 0)
+        return pmc_new(interpreter, enum_class_PerlHash);
+    if (1 > 1) {
+            real_exception(interpreter, NULL, E_TypeError,
+                    "TypeError: dict expected at most 1 arguments, got %d",
+                    (int)i);
+    }
+    arg = VTABLE_get_pmc_keyed_int(interpreter, argv, 0);
+    switch (arg->vtable->base_type) {
+        case enum_class_PerlHash:
+            return arg;
+        case enum_class_PerlArray:      /* sequence from BUILD_LIST */
+            return dict_from_tuple_array(interpreter, arg);
+        default:
+            internal_exception(1, "Unimplemented dict argument");
+    }
+    return NULL;
+}
+
+static PMC *
+parrot_py_list(Interp *interpreter, PMC *argv)
+{
+    PMC *arg;
+    INTVAL i;
+    PMC *iter, *list;
+    /*
+     * no arguments: return a new list
+     */
+    if ((i = VTABLE_elements(interpreter, argv)) == 0)
+        return pmc_new(interpreter, enum_class_PerlArray);
+    if (1 > 1) {
+            real_exception(interpreter, NULL, E_TypeError,
+                    "TypeError: list expected at most 1 arguments, got %d",
+                    (int)i);
+    }
+    arg = VTABLE_get_pmc_keyed_int(interpreter, argv, 0);
+    iter = NULL;
+    switch (arg->vtable->base_type) {
+        case enum_class_PerlArray:      /* sequence from BUILD_LIST */
+            /* TODO return copy */
+            return arg;
+        case enum_class_Iterator:
+            iter = arg;
+    }
+    list = pmc_new(interpreter, enum_class_PerlArray);
+    if (!iter)
+        iter = pmc_new_init(interpreter, enum_class_Iterator, arg);
+    VTABLE_set_integer_native(interpreter, iter, 0);
+    i = 0;
+    while (VTABLE_get_bool(interpreter, iter)) {
+        PMC *item = VTABLE_shift_pmc(interpreter, iter);
+        VTABLE_set_pmc_keyed_int(interpreter, list, i++, item);
+    }
+    return list;
+}
+
+static PMC *
 parrot_py_enumerate(Interp *interpreter, PMC *list)
 {
     PMC *res = pmc_new_init(interpreter, enum_class_Enumerate, list);
@@ -329,15 +418,17 @@ Initialize Python builtin functions.
 static void
 parrot_py_create_funcs(Interp *interpreter)
 {
-    STRING *pip = CONST_STRING(interpreter, "PIP");
-    STRING *pipp = CONST_STRING(interpreter, "PIPP");
-    STRING *pippp = CONST_STRING(interpreter, "PIPPP");
+    STRING *pip   =    CONST_STRING(interpreter, "PIP");
+    STRING *pipp   =   CONST_STRING(interpreter, "PIPP");
+    STRING *pippp   =  CONST_STRING(interpreter, "PIPPP");
 
     STRING *callable = CONST_STRING(interpreter, "callable");
     STRING *chr      = CONST_STRING(interpreter, "chr");
+    STRING *dict     = CONST_STRING(interpreter, "dict");
     STRING *enumerate= CONST_STRING(interpreter, "enumerate");
     STRING *filter   = CONST_STRING(interpreter, "filter");
     STRING *hash     = CONST_STRING(interpreter, "hash");
+    STRING *list     = CONST_STRING(interpreter, "list");
     STRING *map      = CONST_STRING(interpreter, "map");
     STRING *range    = CONST_STRING(interpreter, "range");
     STRING *reduce   = CONST_STRING(interpreter, "reduce");
@@ -345,9 +436,11 @@ parrot_py_create_funcs(Interp *interpreter)
 
     parrot_py_global(interpreter, F2DPTR(parrot_py_callable), callable, pip);
     parrot_py_global(interpreter, F2DPTR(parrot_py_chr), chr, pip);
+    parrot_py_global(interpreter, F2DPTR(parrot_py_dict), dict, pip);
     parrot_py_global(interpreter, F2DPTR(parrot_py_enumerate), enumerate, pip);
     parrot_py_global(interpreter, F2DPTR(parrot_py_filter), filter, pipp);
     parrot_py_global(interpreter, F2DPTR(parrot_py_hash), hash, pip);
+    parrot_py_global(interpreter, F2DPTR(parrot_py_list), list, pip);
     parrot_py_global(interpreter, F2DPTR(parrot_py_map), map, pipp);
     parrot_py_global(interpreter, F2DPTR(parrot_py_range), range, pip);
     parrot_py_global(interpreter, F2DPTR(parrot_py_reduce), reduce, pipp);
