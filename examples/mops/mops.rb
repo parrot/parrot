@@ -1,23 +1,43 @@
-#!/usr/bin/ruby
-#
-# mops.rb
-#
-# Example command line:
-#
-#   ruby mops.rb
-#
-# NOTE: 10,000,000 iterations used instead of 100,000,000
-# to keep things from bogging down too much.
-#
-# A Ruby implementation of the mops.pasm example program,
-# for speed comparisons.
-#
-# Copyright (C) 2001 The Parrot Team. All rights reserved.
-# This program is free software. It is subject to the same
-# license as The Parrot Interpreter.
-#
-# $Id$
-#
+#! ruby
+
+=begin RUBY_COMMENT
+
+Copyright (C) 2001-2003 The Perl Foundation.  All rights reserved.
+$Id$
+
+=head1 NAME
+
+examples/mops/mops.c - Calculate M ops/s
+
+=head1 SYNOPSIS
+
+    % ruby examples/mops/mops.rb
+
+=head1 DESCRIPTION
+
+A Ruby implementation of the F<examples/mops/mops.pasm> example program,
+for speed comparisons.
+
+Calculates a value for M ops/s (million operations per second) using
+integer arithmetic.
+
+Prints out:
+
+=over 4
+
+=item * the number of look iterations, 
+
+=item * the estimated number of ops performed,
+
+=item * the elapsed time, and 
+
+=item * the number of M op/s.
+
+=back
+
+=cut
+
+=end RUBY_COMMENT
 
 i2 = 0                       # set    I2, 0
 i3 = 1                       # set    I3, 1
@@ -60,3 +80,20 @@ puts "M op/s:        #{n1}"  # print  "M op/s:        "
                              #
 exit(0)                      # end
 
+=begin RUBY_COMMENT
+
+=head1 SEE ALSO
+
+F<examples/assembly/mops.pasm>,
+F<examples/mops/mops.c>,
+F<examples/mops/mops.cs>,
+F<examples/mops/mops.il>,
+F<examples/mops/mops.p6>,
+F<examples/mops/mops.pl>,
+F<examples/mops/mops.ps>,
+F<examples/mops/mops.py>,
+F<examples/mops/mops.scheme>.
+
+=cut
+
+=end RUBY_COMMENT

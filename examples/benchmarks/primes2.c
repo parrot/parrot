@@ -8,8 +8,8 @@ examples/benchmarks/primes2.c - Calculate prime numbers < 10000
 
 =head1 SYNOPSIS
 
-    % cc examples/benchmarks/primes2.c -o primes2
-    % time ./primes2
+    % make examples/benchmarks/primes2
+    % time examples/benchmarks/primes2
 
 =head1 DESCRIPTION
 
@@ -20,7 +20,9 @@ of primes and the last one found.
 
 */
 
-int main(){
+int
+main(int argc, char *argv[])
+{
 	int i=0, max=10000;
 	int i6 = 0;
 	int i7;
@@ -38,6 +40,7 @@ int main(){
 
 	printf("N primes calculated to %d is %d\nlast is: %d\n",max,i6,i7);
 
+	return 0;
 }
 
 int isprime1(int input)

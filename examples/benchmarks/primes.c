@@ -8,8 +8,8 @@ examples/benchmarks/primes.c - Calculate prime numbers < 50000
 
 =head1 SYNOPSIS
 
-    % cc examples/benchmarks/primes.c -o primes
-    % time ./primes
+    % make examples/benchmarks/primes
+    % time examples/benchmarks/primes
 
 =head1 DESCRIPTION
 
@@ -22,8 +22,8 @@ of primes and the last one found.
 
 #include <stdio.h>
 
-
-int main()
+int
+main(int argc, char *argv[])
 {
   int I1 = 1;
   int I2 = 50000;
@@ -53,6 +53,8 @@ int main()
   if (I1 <= I2) {goto REDO;}
   printf("%d\n", I6);
   printf("last is: %d\n", I7);
+  
+  return 0;
 }
 
 /*

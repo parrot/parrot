@@ -1,17 +1,29 @@
-# Sample "Hello World" with Qt, via Parrot Native Call API (nci)
-# s. docs/pdds/pdd03_calling_conventions.pod
-#
-# You'll need to build libPQt.so for this to work, see
-# PQt.C for more info.
-# Please note: this will either need JIT/i386 for building the
-#              nci-functions on the fly, or adding missing
-#              signatures to call_list.txt and rebuilding parrot/imcc
-#
-# make
-# cd examples/pni
-# export LD_LIBRARY_PATH=.
-# ../../parrot QtHelloWorld.pasm
+# Copyright (C) 2001-2003 The Perl Foundation.  All rights reserved.
+# $Id$
 
+=head1 NAME
+
+examples/pni/QtHelloWorld.pasm - Qt Example
+
+=head1 SYNOPSIS
+
+    % ./parrot examples/pni/QtHelloWorld.pasm
+
+=head1 DESCRIPTION
+
+Sample "Hello World" with Qt, via Parrot Native Call API (nci). See
+F<docs/pdds/pdd03_calling_conventions.pod>.
+
+Qt is a multiplatform C++ GUI application framework
+(Lhttp://doc.trolltech.com/3.1/aboutqt.html>). You'll need to build
+F<libPQt.so> and install it in F<runtime/parrot/dynext> for this to
+work, see F<examples/pni/PQt.C> for more information.
+
+Note that this will either need JIT for building the NCI-functions on
+the fly. If this is not available try adding missing signatures to
+F<src/call_list.txt> and rebuilding Parrot.
+
+=cut
 
 # load the shared lib
     loadlib P1, "libPQt"
@@ -49,3 +61,9 @@
     set P5, P2	# app
     invoke
     end
+
+=head1 SEE ALSO
+
+F<examples/pni/PQt.C>, F<docs/pdds/pdd03_calling_conventions.pod>.
+
+=cut

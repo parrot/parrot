@@ -1,4 +1,20 @@
-# Simple sub calls with 1 return value
+# Copyright (C) 2001-2003 The Perl Foundation.  All rights reserved.
+# $Id$
+
+=head1 NAME
+
+examples/subs/sub1.imc - Subroutine Example
+
+=head1 SYNOPSIS
+
+    % ./parrot examples/subs/sub1.imc
+
+=head1 DESCRIPTION
+
+Simple sub calls with 1 return value.
+
+=cut
+
 .sub _main
   .local int i
   .local int j
@@ -27,3 +43,10 @@
   .return 10
   .pcc_end_return
 .end
+
+=head2 SEE ALSO
+
+F<examples/subs/sub2.imc>,
+F<examples/subs/sub3.imc>.
+
+=cut

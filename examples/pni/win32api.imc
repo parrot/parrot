@@ -1,12 +1,27 @@
-# This example calls the MessageBoxA Win32 API using the Parrot Native
-# Call Interface.  The function is defined as:-
-# 
-# int MessageBox(
-#     HWND hWnd,
-#     LPCTSTR lpText,
-#     LPCTSTR lpCaption,
-#     UINT uType
-# );
+# Copyright (C) 2001-2003 The Perl Foundation.  All rights reserved.
+# $Id$
+
+=head1 NAME
+
+examples/pni/win32api.imc - Win32 Example
+
+=head1 SYNOPSIS
+
+    % ./parrot examples/pni/win32api.imc
+
+=head1 DESCRIPTION
+
+This example calls the MessageBoxA Win32 API using the Parrot Native
+Call Interface.  The function is defined as:-
+ 
+    int MessageBox(
+        HWND hWnd,
+        LPCTSTR lpText,
+        LPCTSTR lpCaption,
+        UINT uType
+    );
+
+=cut
 
 # This is the entry point.
 .sub _MAIN
@@ -40,3 +55,9 @@
 	# That's all, folks.
 	end
 .end
+
+=head1 SEE ALSO
+
+F<docs/pdds/pdd03_calling_conventions.pod>.
+
+=cut

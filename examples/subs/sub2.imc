@@ -1,4 +1,20 @@
-# Call a sub with multiple return values
+# Copyright (C) 2001-2003 The Perl Foundation.  All rights reserved.
+# $Id$
+
+=head1 NAME
+
+examples/subs/sub2.imc - Subroutine Example
+
+=head1 SYNOPSIS
+
+    % ./parrot examples/subs/sub2.imc
+
+=head1 DESCRIPTION
+
+Call a sub with multiple return values.
+
+=cut
+
 .sub _main
   (I0, I1, $I99) = _foo(7, 8, "nine")
   print "return: "
@@ -18,3 +34,10 @@
   .return 12
   .pcc_end_return
 .end
+
+=head2 SEE ALSO
+
+F<examples/subs/sub1.imc>,
+F<examples/subs/sub3.imc>.
+
+=cut

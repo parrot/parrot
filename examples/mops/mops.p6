@@ -1,13 +1,38 @@
-#
-# mops.p6
-#
-# A Perl 6 implementation of the mops.pasm example program,
-# for speed comparisons.
-#
-# Copyright (C) 2002 The Parrot Team. All rights reserved.
-# This program is free software. It is subject to the same
-# license as The Parrot Interpreter.
-#
+# Copyright (C) 2001-2003 The Perl Foundation.  All rights reserved.
+# $Id$
+
+=head1 NAME
+
+examples/mops/mops.c - Calculate M ops/s
+
+=head1 SYNOPSIS
+
+    % make examples/mops/mops
+    % time examples/mops/mops
+
+=head1 DESCRIPTION
+
+A Perl 6 implementation of the F<examples/mops/mops.pasm> example
+program, for speed comparisons.
+
+Calculates a value for M ops/s (million operations per second) using
+integer arithmetic.
+
+Prints out:
+
+=over 4
+
+=item * the number of look iterations, 
+
+=item * the estimated number of ops performed,
+
+=item * the elapsed time, and 
+
+=item * the number of M op/s.
+
+=back
+
+=cut
 
 sub main() {
 	my ($I1, $I2, $I3, $I4, $I5, $N1, $N2, $N4, $N5);
@@ -50,3 +75,16 @@ print "M op/s:        ",$N1,"\n"; # print  "M op/s:        "
                               #
 }				# end main
 
+=head1 SEE ALSO
+
+F<examples/assembly/mops.pasm>,
+F<examples/mops/mops.c>,
+F<examples/mops/mops.cs>,
+F<examples/mops/mops.il>,
+F<examples/mops/mops.pl>,
+F<examples/mops/mops.ps>,
+F<examples/mops/mops.py>,
+F<examples/mops/mops.rb>,
+F<examples/mops/mops.scheme>.
+
+=cut
