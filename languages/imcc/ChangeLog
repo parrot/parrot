@@ -1,0 +1,232 @@
+- 2002-09-15	leo
+
+	* fixed GC bug, BUFFER_constant_FLAG!
+	  imcc runs now all perl6 tests like parrot
+
+- 2002-09-12	leo
+
+	* pbc.c / packout.c / perl6
+
+	  Write .pbc files.
+
+	* imcc.y / imcc.l
+
+	  Allow mixed usage of $I0, I0, and _Lexicals
+
+	* imcc.y / symreg.[ch] / instruction.c / imc.c
+
+	  Implement key structures P["key"; 0; $I42 ]
+
+- 2002-09-11	leo
+
+	* removed anyop.c/h. If we need more then one lib
+	  the core should provide this functionality.
+
+	* parrot core
+	  proposed changes WRT op_lib, op_code() lookup,
+	  and core_ops organization including patches
+	  for prederefencing (ok now).
+
+- 2002-09-10	leo
+
+	Bigger changes to allow running PBC inside imcc,
+	no external assembler, no parrot{,.exe} needed anymore.
+
+	$ perl6 --test -r -RG
+
+	runs _all_ perl6 tests w/o complaints
+
+	Changes in execution sequence:
+
+	* imcc.l
+
+	- expect_eol is gone
+	- expect_pasm, <emit>
+	- STRINGCONSTANT patch from list
+	- .emit reworked
+
+	* imcc.y
+
+	- infrastructure for parsing key structures
+	- rewrote all instructions to go through iANY
+	  (except some pseudos like labels)
+	- rewrote iNEW + new macro helper
+	- opfullname reworked
+	- iANY implement keyed format P[]
+	- moved branch flags to iANY
+
+	- changed many %types from SymReg * to Instructions *,
+	  what they actually are.
+	- emit is now a sub like token
+	- added pasm* syntax
+	- nls between subs
+	- keylist [ key ; key ]
+
+	- use parrot compatible commandline options
+	  (long options to come later)
+	- additionally:
+	  -G turn off GC
+	  -c write .pbc
+	  -r run PBC
+	  -o outputfile (can't use second file as output,
+	     this is a run argument for the first).
+
+	* symreg.h
+
+	- reorganized VT flags
+	- ->nextkey field
+	- low level hash functions taking a hash as param too
+
+	* symreg.c
+
+	- mk_pasm_reg, + low level funcs
+	- check for uniq labels / subs
+	- keys structures
+
+	* instructions.c / .h
+
+	- abstraction of emit_xx interface throug emitters[]
+	- deprecate _mk_instruction (no opcode lookup!)
+
+	* debug.c
+
+	- add opnum and opsize to dump_instructions
+
+	* imc.c, optimizer.c
+
+	- use iANY
+
+	* NEW pbc.c pbc,h
+
+	- generate PBC in memory (a unpacked packfile)
+	  This uses currently existing structures, like SymReg
+	  to hold various information, so r->color might be e.g.
+	  a index into the constants table.
+
+	  UTSL for more
+
+	* GONE anyop.c / .h
+
+	  Many thanks to Sean, for providing these two files, plus
+	  the first iANY instruction, this was really the kick, to get
+	  above running.
+
+
+2002-09-04	leo
+
+	* pbc.c
+
+	- start coding, first 3 liner get's executed in imcc
+	- link to libparrot$(A)
+
+	* symreg.c
+
+	- data members for parrot ops
+
+	* Makefile, imcc.y, anyop.c
+
+	- use parrot structures for anyop
+
+2002-09-04	leo
+
+	* cfg.c
+
+	- reworked find_basic_blocks
+	- loop_info: remember size, depth...
+	- dead code detection
+
+	* instructions.h
+
+	- removed redundant ->basic_block
+
+	* optimizer.c
+
+	- loop_optimization
+	- branch_branch
+
+	* symreg.c
+
+	- detect duplicate labels
+
+
+2002-09-02	leo
+
+	* overall
+
+	- cleanup, memory freeing
+	- warning/info/fatal code for diagnostics
+	- include file cleanup
+
+	* anyop.c
+
+	- integrated GC patch
+
+	* cfg.c
+
+	- find_basic_blocks() 2. branch of two consecutive
+	- propagate_alias
+	- remember loop_info
+
+	* debug.c
+
+	- fatal(), warning(), info(), ...
+	- more info in dump_instructions()
+	- dump_loops
+	- more info in dump_symreg()
+
+	* imc.c
+
+	- register usage statistic
+	- rearranged alloc() loop
+	- separated reglist out of interference_graph
+	- build_interference_graph() splitted and optimized
+	- use always life_info
+	- much simpler spill(), no additional symbols needed
+
+	* imcc.l
+
+	- {EOL} code for CR/LF systems (untested)
+
+	* imcc.y
+
+	- total rewrite of functions, using anyop where possible
+	- cleanup
+	- commandline switches --help, --version, -O
+
+	* instructions.c
+
+	- use a linked list instead an array of ins
+	- allow 16 registers per instruction
+	- delete_ins()
+	- rewrote emit()
+
+	* instructions.h
+
+	- rearranged INSTYPE flags
+	- ins->op
+
+	* sets.c
+
+	- bugfix und cleanup
+	- set_clear()
+
+	* symreg.c
+
+	- cleanup
+	- free_sym()
+
+	* symreg.h
+
+	- use_count, lhs_use_count
+
+	* optimizer.c (NEW)
+
+	- if_branch(): if x, L1 / branch L2 / L1: => unless x, L2 / L1:
+	- unused_labels() removal
+
+
+
+2002-09-02	leo
+
+	* ChangeLog startet after parrot 0.0.8 release
+	  above summarizes all changes from ~mid 0.07

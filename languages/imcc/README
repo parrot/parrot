@@ -1,4 +1,4 @@
-IMCC 0.0.8.9 
+IMCC 0.0.8.10
 
 imcc is the Intermediate Code Compiler for Parrot.
 The language it compiles is currently termed Parrot
@@ -127,6 +127,10 @@ Directives
 
    .arg <lval>
  
+   .return <lval>
+
+   .result <lval>
+
    .param <type> <lval>
 
    .emit
@@ -165,21 +169,19 @@ Instructions
 
    lval = <S.lval|P.lval> [ rval ]
 
+   <P.lval> = new <TYPE>
+
    call <IDENTIFIER>
 
-   call <IDENTIFIER> ( <lval> [,<lval>, ...] )
+   dec <lval>
 
-   dec <IDENTIFIER>
+   inc <lval>
 
    end
 
    goto <LABEL>
 
    if <expression> goto <LABEL>
-
-   inc <IDENTIFIER>
- 
-   lval = new <IDENTIFIER>
 
    print rval
 
@@ -189,14 +191,30 @@ Instructions
 
    saveall
 
+Instructions not known to imcc are looked up in parrot's
+op_info_table and must have the proper amount and types of
+arguments.
+
 
 The best way to learn PIR quickly is to study the output
-of other compilers that use it (Perl6 and Cola).
+of other compilers that use it (Perl6 and Cola), and
+consult the source file imcc.y.
+
+
 
 Please mail perl6-internals@perl.org with bug-reports or patches.
 
-Maintainer and Author:   Melvin Smith <melvin.smith@mindspring.com>
-                                      <melvins@us.ibm.com>
 
-Contributing Author:     Angel Faus <afaus@corp.vlex.com)
+Original Author and Maintainer:
+
+Melvin Smith <melvin.smith@mindspring.com>, <melvins@us.ibm.com>
+
+Contributing Authors:
+
+Angel Faus <afaus@corp.vlex.com> ... CFG, life analysis
+Sean O'Rourke <seano@cpan.org>   ... anyop, iANY
+Leopold Toetsch <lt@toetsch.at>  ... numerous bugfixes/cleanup/rewrite
+                                     optimizer.c
+				     run parrot code inside imcc
+
 
