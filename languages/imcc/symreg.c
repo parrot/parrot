@@ -7,7 +7,6 @@
 /* Globals: */
 /* Code: */
 
-void delete_sym(const char * name);
 static SymReg * dup_sym(SymReg *r);
 
 
@@ -344,30 +343,31 @@ SymReg * link_keys(int nargs, SymReg * keys[])
 
 
 
-void free_sym(SymReg *r)
+void
+free_sym(Parrot_Interp interpreter, SymReg *r)
 {
     free(r->name);
     if (r->life_info) {
-	free_life_info(r);
+	free_life_info(interpreter, r);
     }
     if (r->pcc_sub) {
         int i;
         for (i = 0; i < r->pcc_sub->nargs; i++)
-            free_sym(r->pcc_sub->args[i]);
+            free_sym(interpreter, r->pcc_sub->args[i]);
         if (r->pcc_sub->args)
             free(r->pcc_sub->args);
         for (i = 0; i < r->pcc_sub->nret; i++)
-            free_sym(r->pcc_sub->ret[i]);
+            free_sym(interpreter, r->pcc_sub->ret[i]);
         if (r->pcc_sub->ret)
             free(r->pcc_sub->ret);
         if (r->pcc_sub->cc)
-            free_sym(r->pcc_sub->cc);
+            free_sym(interpreter, r->pcc_sub->cc);
     /* multilpe freed
         if (r->pcc_sub->cc_sym)
-            free_sym(r->pcc_sub->cc_sym);
+            free_sym(interpreter, r->pcc_sub->cc_sym);
     */
         if (r->pcc_sub->sub)
-            free_sym(r->pcc_sub->sub);
+            free_sym(interpreter, r->pcc_sub->sub);
         free(r->pcc_sub);
     }
     /* TODO free keychain */
@@ -409,14 +409,16 @@ SymReg * find_sym(const char * name) {
     return _find_sym(namespace, hash, name);
 }
 
-static void _delete_sym(SymReg * hsh[], const char * name) {
+
+void
+_delete_sym(Parrot_Interp interpreter, SymReg * hsh[], const char * name) {
     SymReg ** p;
     int i = hash_str(name) % HASH_SIZE;
     for(p = &hsh[i]; *p; p = &(*p)->next) {
         SymReg * deadmeat = *p;
 	if(!strcmp(name, deadmeat->name)) {
             *p = deadmeat->next;
-            free_sym(deadmeat);
+            free_sym(interpreter, deadmeat);
             return;
         }
     }
@@ -424,18 +426,16 @@ static void _delete_sym(SymReg * hsh[], const char * name) {
     fatal(1, "_delete_sym", "Tried to delete nonexistent symbol '%s'\n", name);
 }
 
-void delete_sym(const char * name) {
-    _delete_sym(hash, name);
-}
 
 /* Deletes all symbols */
-void clear_tables() {
+void
+clear_tables(Parrot_Interp interpreter) {
     int i;
     SymReg * p, *next;
     for(i = 0; i < HASH_SIZE; i++) {
 	for(p = hash[i]; p; ) {
 	    next = p->next;
-	    free_sym(p);
+	    free_sym(interpreter, p);
 	    p = next;
 	}
         hash[i] = NULL;

@@ -183,8 +183,8 @@ allocate_jit(struct Parrot_Interp *interpreter)
     /* now run through basic blocks
      * and insert register save/load instructions where needed
      */
-    for (i=0; i < n_basic_blocks; i++) {
-        bb = bb_list[i];
+    for (i=0; i < IMCC_INFO(interpreter)->n_basic_blocks; i++) {
+        bb = IMCC_INFO(interpreter)->bb_list[i];
         /* TODO: set minimum register usage for this block */
 
         for (ins = bb->start; ins; ins = ins->next) {
@@ -298,9 +298,9 @@ allocate_jit(struct Parrot_Interp *interpreter)
      */
     jit_info_ptr = make_jit_info(interpreter);
     /* write out minimal CFG and register_usage */
-    for (i = 0, pc = 0; i < n_basic_blocks; i++) {
+    for (i = 0, pc = 0; i < IMCC_INFO(interpreter)->n_basic_blocks; i++) {
         int branch_target = 0;
-        bb = bb_list[i];
+        bb = IMCC_INFO(interpreter)->bb_list[i];
         ins = bb->start;
         /* mark branch targets with hight bit set */
         if (ins->type & ITLABEL)

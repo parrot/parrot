@@ -335,7 +335,7 @@ iANY(struct Parrot_Interp *interpreter, char * name,
             strcpy(format, fmt);
         memset(r + nargs, 0, sizeof(*r) * (IMCC_MAX_REGS - nargs));
 #if 1
-        debug(DEBUG_PARSER,"%s %s\t%s\n", name, format, fullname);
+        debug(interpreter, DEBUG_PARSER,"%s %s\t%s\n", name, format, fullname);
 #endif
         /* make the instruction */
 
@@ -457,7 +457,7 @@ static char * inv_op(char *op) {
 %%
 
 program:                         { open_comp_unit(); $$ = 0;}
-    compilation_units            { close_comp_unit(); $$ = 0; }
+    compilation_units            { close_comp_unit(interp); $$ = 0; }
     ;
 
 compilation_unit:    sub

@@ -118,4 +118,4 @@ int emit_flush(void *param);
 int emit_close(void *param);
 
 void open_comp_unit(void);
-void close_comp_unit(void);
+void close_comp_unit(Parrot_Interp);

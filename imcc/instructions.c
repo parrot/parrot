@@ -60,16 +60,16 @@ open_comp_unit(void)
 
 
 void
-close_comp_unit(void)
+close_comp_unit(Parrot_Interp interpreter)
 {
-    free_reglist();
-    clear_basic_blocks();       /* and cfg ... */
+    free_reglist(interpreter);
+    clear_basic_blocks(interpreter);       /* and cfg ... */
     if (!n_comp_units)
         fatal(1, "close_comp_unit", "non existent comp_unit\n");
     n_comp_units--;
     instructions = comp_unit[n_comp_units].instructions;
     last_ins = comp_unit[n_comp_units].last_ins;
-    clear_tables();
+    clear_tables(interpreter);
     if (n_comp_units) {
         free(comp_unit[n_comp_units].hash[0]);
         comp_unit[n_comp_units].hash[0] = NULL;
@@ -537,7 +537,7 @@ int emit_flush(void *param) {
         free_ins(ins);
         ins = next;
     }
-    close_comp_unit();
+    close_comp_unit(interpreter);
     return 0;
 }
 int emit_close(void *param)

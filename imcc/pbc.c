@@ -70,11 +70,13 @@ static struct globals {
 
 static int add_const_str(struct Parrot_Interp *, char *str, int dup_sym);
 
-void imcc_globals_destroy(int ex, void *param);
-void imcc_globals_destroy(int ex, void *param)
+static void imcc_globals_destroy(int ex, void *param);
+
+static void imcc_globals_destroy(int ex, void *param)
 {
     struct cs_t *cs, *prev_cs;
     struct subs *s, *prev_s;
+    struct Parrot_Interp *interpreter = (struct Parrot_Interp *)param;
 
     UNUSED(ex);
     UNUSED(param);
@@ -84,9 +86,9 @@ void imcc_globals_destroy(int ex, void *param)
         while (s) {
             prev_s = s->prev;
             hash = s->labels;
-            clear_tables();
+            clear_tables(interpreter);
             hash = s->bsrs;
-            clear_tables();
+            clear_tables(interpreter);
             mem_sys_free(s);
             s = prev_s;
         }
@@ -95,11 +97,11 @@ void imcc_globals_destroy(int ex, void *param)
         cs = prev_cs;
     }
     hash = globals.str_consts;
-    clear_tables();
+    clear_tables(interpreter);
     hash = globals.num_consts;
-    clear_tables();
+    clear_tables(interpreter);
     hash = globals.key_consts;
-    clear_tables();
+    clear_tables(interpreter);
     free(ghash);
     globals.cs = NULL;
 }
@@ -148,7 +150,7 @@ int e_pbc_open(void *param) {
      */
     if (!globals.cs) {
         /* register cleanup code */
-        Parrot_on_exit(imcc_globals_destroy, NULL);
+        Parrot_on_exit(imcc_globals_destroy, interpreter);
     }
     cs = mem_sys_allocate(sizeof(struct cs_t));
     cs->prev = globals.cs;
@@ -199,9 +201,9 @@ make_jit_info(struct Parrot_Interp *interpreter)
                     PF_UNKNOWN_SEG, name, 1);
         free(name);
     }
-    size = n_basic_blocks + (old = old_blocks());
+    size = IMCC_INFO(interpreter)->n_basic_blocks + (old = old_blocks());
     /* store current size */
-    globals.cs->subs->n_basic_blocks = n_basic_blocks;
+    globals.cs->subs->n_basic_blocks = IMCC_INFO(interpreter)->n_basic_blocks;
     /* offset of block start and end, 4 * registers_used */
     globals.cs->jit_info->data = realloc(globals.cs->jit_info->data,
             size * sizeof(opcode_t) * 6);

@@ -841,8 +841,8 @@ static int unused_label(struct Parrot_Interp *interpreter)
     int changed = 0;
 
     info(interpreter, 2, "\tunused_label\n");
-    for (i=1; i < n_basic_blocks; i++) {
-	ins = bb_list[i]->start;
+    for (i=1; i < IMCC_INFO(interpreter)->n_basic_blocks; i++) {
+	ins = IMCC_INFO(interpreter)->bb_list[i]->start;
         if ((ins->type & ITLABEL) && *ins->r[0]->name != '_') {
             SymReg * lab = ins->r[0];
             used = 0;
@@ -858,12 +858,12 @@ static int unused_label(struct Parrot_Interp *interpreter)
                 Instruction *ins2;
                 int j;
                 SymReg * addr;
-                for (j=0; bb_list[j]; j++) {
+                for (j=0; IMCC_INFO(interpreter)->bb_list[j]; j++) {
                     /* a branch can be the first ins in a block
                      * (if prev ins was a label)
                      * or the last ins in a block
                      */
-                    ins2 = bb_list[j]->start;
+                    ins2 = IMCC_INFO(interpreter)->bb_list[j]->start;
                     if ((ins2->type & ITBRANCH) &&
                             (addr = get_branch_reg(ins2)) != 0) {
                         if (addr == lab && addr->type == VTADDRESS) {
@@ -871,7 +871,7 @@ static int unused_label(struct Parrot_Interp *interpreter)
                             break;
                         }
                     }
-                    ins2 = bb_list[j]->end;
+                    ins2 = IMCC_INFO(interpreter)->bb_list[j]->end;
                     if ((ins2->type & ITBRANCH) &&
                             (addr = get_branch_reg(ins2)) != 0) {
                         if (addr == lab && addr->type == VTADDRESS) {
@@ -906,8 +906,8 @@ static int dead_code_remove(struct Parrot_Interp *interpreter)
     if (!(optimizer_level & OPT_PRE))
         return 0;
     info(interpreter, 2, "\tdead_code_remove\n");
-    for (i=1; i < n_basic_blocks; i++) {
-	bb = bb_list[i];
+    for (i=1; i < IMCC_INFO(interpreter)->n_basic_blocks; i++) {
+	bb = IMCC_INFO(interpreter)->bb_list[i];
         if ((bb->start->type & ITLABEL) && *bb->start->r[0]->name == '_')
             continue;
         /* this block isn't entered from anywhere */
@@ -978,13 +978,13 @@ static int used_once(Parrot_Interp interpreter)
 }
 
 static int
-max_loop_depth(void)
+max_loop_depth(Parrot_Interp interpreter)
 {
     int i, d;
     d = 0;
-    for (i = 0; i < n_basic_blocks; i++)
-        if (bb_list[i]->loop_depth > d)
-            d = bb_list[i]->loop_depth;
+    for (i = 0; i < IMCC_INFO(interpreter)->n_basic_blocks; i++)
+        if (IMCC_INFO(interpreter)->bb_list[i]->loop_depth > d)
+            d = IMCC_INFO(interpreter)->bb_list[i]->loop_depth;
     return d;
 }
 
@@ -992,7 +992,8 @@ static int reason;
 enum check_t { CHK_INV_NEW, CHK_INV_SET, CHK_CLONE };
 
 static int
-_is_ins_save(Instruction *check_ins, SymReg *r, int what)
+_is_ins_save(Parrot_Interp interpreter, Instruction *check_ins,
+        SymReg *r, int what)
 {
     Instruction *ins;
     int bb;
@@ -1019,7 +1020,7 @@ _is_ins_save(Instruction *check_ins, SymReg *r, int what)
 
     use_count = r->use_count;
     lhs_use_count = r->lhs_use_count;
-    for (bb = 0; bb < n_basic_blocks; bb++) {
+    for (bb = 0; bb < IMCC_INFO(interpreter)->n_basic_blocks; bb++) {
         Life_range *lr = r->life_info[bb];
 
         for (ins = lr->first_ins; ins; ins = ins->next) {
@@ -1084,7 +1085,7 @@ is_ins_save(Parrot_Interp interpreter, Instruction *ins, SymReg *r, int what) {
     int save;
 
     reason = 0;
-    save = _is_ins_save(ins, r, what);
+    save = _is_ins_save(interpreter, ins, r, what);
     if (!save && reason)
         debug(interpreter, DEBUG_OPT2, "ins not save var %s reason %d %s\n",
                 r->name, reason, ins_string(ins));
@@ -1116,16 +1117,18 @@ is_invariant(Parrot_Interp interpreter, Instruction *ins)
 #define MOVE_INS_1_BL
 #ifdef MOVE_INS_1_BL
 static Basic_block *
-find_outer(Basic_block * blk)
+find_outer(Parrot_Interp interpreter, Basic_block * blk)
 {
     int bb = blk->index;
     int i;
+    int n_loops = IMCC_INFO(interpreter)->n_loops;
+    Loop_info ** loop_info = IMCC_INFO(interpreter)->loop_info;
 
     /* loops are sorted depth last */
     for (i = n_loops-1; i >= 0; i--)
         if (set_contains(loop_info[i]->loop, bb))
             if (loop_info[i]->entry >= 0)
-                return bb_list[loop_info[i]->entry];
+                return IMCC_INFO(interpreter)->bb_list[loop_info[i]->entry];
     return 0;
 }
 #endif
@@ -1140,10 +1143,10 @@ move_ins_out(struct Parrot_Interp *interpreter, Instruction **ins, Basic_block *
     /* check loop_info, where this loop started
      * actually, this moves instruction to block 0 */
 #ifdef MOVE_INS_1_BL
-    pred = find_outer(bb);
+    pred = find_outer(interpreter, bb);
 #else
     UNUSED(bb);
-    pred = bb_list[0];
+    pred = IMCC_INFO(interpreter)->bb_list[0];
 #endif
     if (!pred) {
         debug(interpreter, DEBUG_OPT2, "outer loop not found (CFG?)\n");
@@ -1175,7 +1178,7 @@ move_ins_out(struct Parrot_Interp *interpreter, Instruction **ins, Basic_block *
 static int
 loop_one(struct Parrot_Interp *interpreter, int bnr)
 {
-    Basic_block *bb = bb_list[bnr];
+    Basic_block *bb = IMCC_INFO(interpreter)->bb_list[bnr];
     Instruction *ins;
     int changed = 0;
 
@@ -1207,13 +1210,13 @@ loop_optimization(struct Parrot_Interp *interpreter)
     int changed = 0;
     static int prev_depth;
 
-    loop_depth = prev_depth ? prev_depth : max_loop_depth();
+    loop_depth = prev_depth ? prev_depth : max_loop_depth(interpreter);
     /* work from inside out */
     debug(interpreter, DEBUG_OPT2, "loop_optimization\n");
     for (l = loop_depth; l > 0; l--) {
         debug(interpreter, DEBUG_OPT2, "loop_depth %d\n", l);
-        for (bb = 0; bb < n_basic_blocks; bb++)
-            if (bb_list[bb]->loop_depth == l) {
+        for (bb = 0; bb < IMCC_INFO(interpreter)->n_basic_blocks; bb++)
+            if (IMCC_INFO(interpreter)->bb_list[bb]->loop_depth == l) {
                 changed |= loop_one(interpreter, bb);
             }
         /* currently e.g. mandel.p6 breaks, if not only the most
@@ -1222,7 +1225,7 @@ loop_optimization(struct Parrot_Interp *interpreter)
             prev_depth = l-1;
             debug(interpreter, DEBUG_OPT2,"after loop_opt\n");
             if (IMCC_INFO(interpreter)->debug>1)
-                dump_instructions();
+                dump_instructions(interpreter);
             return changed;
         }
     }

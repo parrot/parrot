@@ -43,7 +43,7 @@
 #define MAX_COLOR NUM_REGISTERS
 
 void allocate(struct Parrot_Interp *);
-void free_reglist(void);
+void free_reglist(struct Parrot_Interp *);
 
 const char * get_neg_op(char *op, int *nargs);
 
@@ -105,6 +105,14 @@ typedef struct {
     int imcc_warn;
     int verbose;
     int debug;
+    /* CFG stuff */
+    int bb_list_size;
+    int n_basic_blocks;
+    Basic_block **bb_list;
+    Set** dominators;
+    int n_loops;
+    Loop_info ** loop_info;
+    Edge * edge_list;
 } imcc_info_t;
 
 #define IMCC_INFO(i) ((imcc_info_t*) (i)->imcc_info)

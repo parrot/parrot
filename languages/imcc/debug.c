@@ -67,7 +67,7 @@ debug(Parrot_Interp interpreter, int level, const char *fmt, ...)
     va_end(ap);
 }
 
-void dump_instructions() {
+void dump_instructions(Parrot_Interp interpreter) {
     Instruction *ins;
     Basic_block *bb;
     int pc;
@@ -76,7 +76,7 @@ void dump_instructions() {
     fprintf(stderr,
             "nins line blck deep flags\t    type opnr size   pc  X ins\n");
     for (pc = 0, ins = instructions; ins; ins = ins->next) {
-	bb = bb_list[ins->bbindex];
+	bb = IMCC_INFO(interpreter)->bb_list[ins->bbindex];
 
 	if (bb) {
 	     fprintf(stderr, "%4i %4d %4d %4d\t%x\t%8x %4d %4d %4d  %c ",
@@ -95,14 +95,14 @@ void dump_instructions() {
     fprintf(stderr, "\n");
 }
 
-void dump_cfg() {
+void dump_cfg(Parrot_Interp interpreter) {
     int i;
     Basic_block *bb;
     Edge *e;
 
     fprintf(stderr, "\nDumping the CFG:\n-------------------------------\n");
-    for (i=0; i < n_basic_blocks; i++) {
-	bb = bb_list[i];
+    for (i=0; i < IMCC_INFO(interpreter)->n_basic_blocks; i++) {
+	bb = IMCC_INFO(interpreter)->bb_list[i];
 	fprintf(stderr, "%d (%d)\t -> ", bb->index, bb->loop_depth);
 	for (e=bb->succ_list; e != NULL; e=e->succ_next) {
 	    fprintf(stderr, "%d ", e->to->index);
@@ -118,18 +118,19 @@ void dump_cfg() {
 
 }
 
-void dump_loops() {
+void dump_loops(Parrot_Interp interpreter) {
     int i, j;
     Set *loop;
+    Loop_info ** loop_info = IMCC_INFO(interpreter)->loop_info;
 
     fprintf(stderr, "Loop info\n---------\n");
-    for (i = 0; i < n_loops; i++) {
+    for (i = 0; i < IMCC_INFO(interpreter)->n_loops; i++) {
         loop = loop_info[i]->loop;
         fprintf(stderr,
                 "loop %d,  depth %d, size %d, entry %d, contains blocks:\n",
                 i, loop_info[i]->depth,
                 loop_info[i]->size, loop_info[i]->entry);
-        for (j = 0; j < n_basic_blocks; j++)
+        for (j = 0; j < IMCC_INFO(interpreter)->n_basic_blocks; j++)
             if (set_contains(loop, j))
                 fprintf(stderr, "%d ", j);
         fprintf(stderr, "\n");
@@ -138,10 +139,11 @@ void dump_loops() {
 }
 
 void
-dump_labels()
+dump_labels(Parrot_Interp interpreter)
 {
     int i;
 
+    UNUSED(interpreter);
     fprintf(stderr, "Labels\n");
     fprintf(stderr, "name\tpos\tlast ref\n"
             "-----------------------\n");
@@ -157,7 +159,7 @@ dump_labels()
 }
 
 extern int n_comp_units;
-void dump_symreg() {
+void dump_symreg(Parrot_Interp interpreter) {
     int i;
 
     if (!reglist)
@@ -187,31 +189,32 @@ void dump_symreg() {
                );
     }
     fprintf(stderr, "\n");
-    dump_liveness_status();
+    dump_liveness_status(interpreter);
 
 }
 
-void dump_liveness_status() {
+void dump_liveness_status(Parrot_Interp interpreter) {
     int i;
 
     fprintf(stderr, "\nSymbols:\n--------------------------------------\n");
     for(i = 0; i <n_symbols; i++) {
         SymReg * r = reglist[i];
         if (r->type & VTREGISTER )
-            dump_liveness_status_var(r);
+            dump_liveness_status_var(interpreter, r);
     }
     fprintf(stderr, "\n");
 
 }
 
 
-void dump_liveness_status_var(SymReg* r) {
+void dump_liveness_status_var(Parrot_Interp interpreter, SymReg* r) {
     int i;
     Life_range *l;
 
+    UNUSED(interpreter);
     fprintf(stderr, "\nSymbol %s:", r->name);
     if (r->life_info==NULL) return;
-    for (i=0; i<n_basic_blocks; i++) {
+    for (i=0; i<IMCC_INFO(interpreter)->n_basic_blocks; i++) {
         l = r->life_info[i];
 
 	if (l->flags & LF_lv_all) {
@@ -242,10 +245,11 @@ void dump_liveness_status_var(SymReg* r) {
     fprintf(stderr, "\n");
 }
 
-void dump_interference_graph() {
+void dump_interference_graph(Parrot_Interp interpreter) {
     int x, y, cnt;
     SymReg *r;
 
+    UNUSED(interpreter);
     fprintf(stderr, "\nDumping the Interf. graph:"
             "\n-------------------------------\n");
     for (x = 0; x < n_symbols; x++) {
@@ -268,16 +272,16 @@ void dump_interference_graph() {
     fprintf(stderr, "\n");
 }
 
-void dump_dominators() {
+void dump_dominators(Parrot_Interp interpreter) {
     int i, j;
 
     fprintf(stderr, "\nDumping the Dominators Tree:"
             "\n-------------------------------\n");
-    for (i=0; i < n_basic_blocks; i++) {
+    for (i=0; i < IMCC_INFO(interpreter)->n_basic_blocks; i++) {
 	fprintf (stderr, "%d <- ", i);
 
-	for(j=0; j < n_basic_blocks; j++) {
-            if (set_contains(dominators[i], j)) {
+	for(j=0; j < IMCC_INFO(interpreter)->n_basic_blocks; j++) {
+            if (set_contains(IMCC_INFO(interpreter)->dominators[i], j)) {
 		fprintf(stderr, " %d", j);
 	    }
 	}

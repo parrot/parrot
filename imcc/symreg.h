@@ -121,7 +121,7 @@ enum uniq_t {
 	U_add_all };
 SymReg * mk_pasm_reg(char *);
 
-void free_sym(SymReg *r);
+void free_sym(Parrot_Interp, SymReg *r);
 void store_symreg(SymReg * r);
 SymReg * find_sym(const char * name);
 SymReg * get_sym(const char * name);
@@ -131,9 +131,10 @@ SymReg * _mk_const(SymReg *hash[], char * name, int t);
 void _store_symreg(SymReg *hash[], SymReg * r);
 SymReg * _mk_address(SymReg *hash[], char * name, int uniq);
 SymReg * link_keys(int nargs, SymReg *keys[]);
-void clear_tables(void);
+void clear_tables(Parrot_Interp);
 unsigned int  hash_str(const char * str);
-void free_life_info(SymReg *r);
+void free_life_info(Parrot_Interp, SymReg *r);
+void _delete_sym(Parrot_Interp , SymReg * hsh[], const char * name);
 
 SymReg * _find_sym(Namespace * ns, SymReg * hash[], const char * name);
 char * _mk_fullname(Namespace * ns, const char * name);
