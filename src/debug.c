@@ -670,19 +670,17 @@ PDB_set_break(struct Parrot_Interp *interpreter, const char *command)
     i = 0;
     sbreak = pdb->breakpoint;
     if (sbreak) {
-        i++;
         while (sbreak->next) {
             sbreak = sbreak->next;
-            i++;
         }
         newbreak->prev = sbreak;
         sbreak->next = newbreak;
-        sbreak->next->id = i;
+        i = sbreak->next->id = sbreak->id + 1;
     }
     else {
         newbreak->prev = NULL;
         pdb->breakpoint = newbreak;
-        pdb->breakpoint->id = i;
+        i = pdb->breakpoint->id = 0;
     }
 
     PIO_eprintf(interpreter, "Breakpoint %li at line %li\n",i,line->number);
@@ -868,11 +866,13 @@ PDB_delete_breakpoint(struct Parrot_Interp *interpreter,
         /* Remove the breakpoint from the list */
         if (breakpoint->prev && breakpoint->next) {
             breakpoint->prev->next = breakpoint->next;
+            breakpoint->next->prev = breakpoint->prev;
         }
         else if (breakpoint->prev && !breakpoint->next) {
             breakpoint->prev->next = NULL;
         }            
         else if (!breakpoint->prev && breakpoint->next) {
+            breakpoint->next->prev = NULL;
             interpreter->pdb->breakpoint = breakpoint->next;
         }
         else {
