@@ -26,6 +26,27 @@ typedef struct _meth_cache_entry {
 } Meth_cache_entry;
 
 /*
+ * register save freelist handling for runops_fromc
+ */
+typedef struct _reg_store {
+    struct IReg int_reg;
+    struct NReg num_reg;
+    struct SReg string_reg;
+    struct PReg pmc_reg;
+} reg_store;
+
+typedef struct _regsave {
+    struct _regsave *prev;       /* free list ptr */
+    struct _regsave *next;       /* mark list ptr */
+    reg_store      regs;
+} regsave;
+
+typedef struct _regs_cache {
+    regsave *reg_save_top;   /* the free list */
+    regsave *reg_save_mark;  /* the mark list */
+} Regs_cache;
+
+/*
  * method cache, continuation freelist, stack chunk freelist, regsave cache
  */
 typedef struct _Caches {
@@ -35,7 +56,7 @@ typedef struct _Caches {
     PMC *retc_free_list;        /* recycled return continuations */
     void *stack_chunk_cache;    /* stack chunk recycling */
 
-    void *regs_cache;           /* runops_fromc reg save cache */
+    Regs_cache regs_cache;      /* runops_fromc reg save cache */
 } Caches;
 
 void init_object_cache(Parrot_Interp interpreter);
@@ -43,6 +64,7 @@ void add_to_retc_free_list(Parrot_Interp, PMC*);
 PMC *get_retc_from_free_list(Parrot_Interp);
 void mark_object_cache(Parrot_Interp);
 void mark_stack_not_reusable(Parrot_Interp, struct Parrot_Context *ctx);
+void mark_saved_regs(Parrot_Interp interpreter);
 
 
 #endif   /* header guard */

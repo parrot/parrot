@@ -101,7 +101,7 @@ sub class_name {
 
 =item C<dynext_load_code($classname, $call_class_init)>
 
-C<$classname> is the name of a PMC. 
+C<$classname> is the name of a PMC.
 
 C<$call_class_init> is the C code for a call to the PMC's class
 initialization method.
@@ -466,7 +466,7 @@ sub lib_load_code() {
 =item C<init_func()>
 
 Returns the C code for the PMC's initialization method, or an empty
-string if the PMC has a C<no_init> flag. 
+string if the PMC has a C<no_init> flag.
 
 =cut
 
@@ -557,7 +557,7 @@ EOC
 
 =item C<gen_c($file)>
 
-Generates the C implementation file code for the PMC. 
+Generates the C implementation file code for the PMC.
 
 C<$file> is the name of the original source F<*.pmc> file.
 
@@ -605,7 +605,7 @@ EOC
 
 =item C<gen_h($file)>
 
-Generates the C header file code for the PMC. 
+Generates the C header file code for the PMC.
 
 C<$file> is the name of the original source F<*.pmc> file.
 
@@ -681,7 +681,7 @@ sub body
 
 =head2 Parrot::Pmc2c::Standard::Const Instance Methods
 
-Returns the C code for the method body. 
+Returns the C code for the method body.
 
 =over 4
 
@@ -1113,10 +1113,10 @@ EOC
 $l
 ${decl} {
     $ret_def
-    struct regsave *data = save_regs(interpreter);
-    PMC *sub = find_or_die(interpreter, pmc, $delegate_meth);
-    ${func_ret}Parrot_runops_fromc_args(interpreter, sub, "$sig"$arg);
-    restore_regs(interpreter, data);
+    STRING *meth = const_string(interpreter, $delegate_meth);
+    PMC *sub = find_or_die(interpreter, pmc, meth);
+    ${func_ret}Parrot_run_meth_fromc_args_save(interpreter, sub,
+        pmc, meth, "$sig"$arg);
     $ret
 }
 

@@ -941,50 +941,92 @@ Parrot_runops_fromc(Parrot_Interp interpreter, PMC *sub)
 
 /*
 
-=item C<PARROT_INLINE static struct regsave *
+=item C<PARROT_INLINE static regsave *
 save_regs(Parrot_Interp interp)>
 
-Duplicated from F<classes/delegates.pmc>.
+=item C<PARROT_INLINE static void
+restore_regs(Parrot_Interp interp, regsave *data)>
+
+Save/restore all registers.
 
 =cut
 
 */
 
-struct regsave {
-    struct IReg int_reg;
-    struct NReg num_reg;
-    struct SReg string_reg;
-    struct PReg pmc_reg;
-} ;
+PARROT_INLINE static regsave *
+save_regs(Parrot_Interp interpreter)
+{
+    regsave *save;
+    Regs_cache * rc = &interpreter->caches->regs_cache;
 
-PARROT_INLINE static struct regsave *
-save_regs(Parrot_Interp interp) {
-    struct regsave *save;
-    save = mem_sys_allocate(sizeof(struct regsave));
-    if (!save) {
-	internal_exception(ALLOCATION_ERROR, "No memory for save struct");
+    if (rc->reg_save_top) {
+        save = rc->reg_save_top;
+        rc->reg_save_top = save->prev;
     }
-    mem_sys_memcopy(save, interp, sizeof(struct regsave));
-    Parrot_block_DOD(interp);
+    else {
+        save = mem_sys_allocate(sizeof(regsave));
+        save->prev = NULL;
+    }
+    save->next = rc->reg_save_mark;
+    rc->reg_save_mark = save;
+    mem_sys_memcopy(&save->regs, interpreter, sizeof(reg_store));
     return save;
 }
 
 /*
 
 =item C<PARROT_INLINE static void
-restore_regs(Parrot_Interp interp, struct regsave *data)>
+restore_regs(Parrot_Interp interp, regsave *data)>
 
-Restores the registers.
+Restores the registers from C<*data>.
 
 =cut
 
 */
 
 PARROT_INLINE static void
-restore_regs(Parrot_Interp interp, struct regsave *data) {
-    mem_sys_memcopy(interp, data, sizeof(struct regsave));
-    mem_sys_free(data);
-    Parrot_unblock_DOD(interp);
+restore_regs(Parrot_Interp interpreter, regsave *data) {
+
+    Regs_cache * rc = &interpreter->caches->regs_cache;
+
+    mem_sys_memcopy(interpreter, &data->regs, sizeof(reg_store));
+    data->prev = rc->reg_save_top;
+    rc->reg_save_top = data;
+    assert(rc->reg_save_mark == data);
+    rc->reg_save_mark = data->next;
+}
+
+/*
+
+=item C<void
+mark_saved_regs(Parrot_Interp interpreter)
+
+
+Mark saved register aread live during DOD
+
+=cut
+
+*/
+
+void
+mark_saved_regs(Parrot_Interp interpreter)
+{
+    regsave *p = interpreter->caches->regs_cache.reg_save_mark;
+    int j;
+    PObj *reg;
+
+    for (; p; p = p->next) {
+        struct PReg *pf = &p->regs.pmc_reg;
+        struct SReg *sf = &p->regs.string_reg;
+        for (j = 0; j < NUM_REGISTERS; j++) {
+            reg = (PObj*) pf->registers[j];
+            if (reg)
+                pobject_lives(interpreter, reg);
+            reg = (PObj*) sf->registers[j];
+            if (reg)
+                pobject_lives(interpreter, reg);
+        }
+    }
 }
 
 /*
@@ -1005,7 +1047,11 @@ Run a method sub from C.
 void
 Parrot_runops_fromc_save(Parrot_Interp interpreter, PMC *sub)
 {
-    struct regsave *data = save_regs(interpreter);
+    regsave *data = save_regs(interpreter);
+    /*
+     * TODO install exception handler in _save variants
+     *      so that we can restore the registers
+     */
     Parrot_runops_fromc(interpreter, sub);
     restore_regs(interpreter, data);
 }
@@ -1014,7 +1060,7 @@ void
 Parrot_run_meth_fromc_save(Parrot_Interp interpreter,
         PMC *sub, PMC *obj, STRING *meth)
 {
-    struct regsave *data = save_regs(interpreter);
+    regsave *data = save_regs(interpreter);
     REG_PMC(2) = obj;
     REG_STR(0) = meth;
     Parrot_runops_fromc(interpreter, sub);
@@ -1141,13 +1187,20 @@ void *
 Parrot_runops_fromc_args_save(Parrot_Interp interpreter, PMC *sub,
         const char *sig, ...)
 {
-    struct regsave *data = save_regs(interpreter);
+    regsave *data = save_regs(interpreter);
     va_list args;
     void *ret;
+    INTVAL ri;
+    FLOATVAL rf;
 
     va_start(args, sig);
     ret = runops_args(interpreter, sub, sig, args);
     va_end(args);
+    /* we have to get retvals around restore_regs */
+    switch (*sig) {
+        case 'I': ri = *(INTVAL*) ret; ret = &ri; break;
+        case 'N': rf = *(FLOATVAL*) ret; ret = &rf; break;
+    }
     restore_regs(interpreter, data);
     return ret;
 }
@@ -1156,15 +1209,22 @@ void*
 Parrot_run_meth_fromc_args_save(Parrot_Interp interpreter,
         PMC *sub, PMC *obj, STRING *meth, const char *sig, ...)
 {
-    struct regsave *data = save_regs(interpreter);
+    regsave *data = save_regs(interpreter);
     va_list args;
     void *ret;
+    INTVAL ri;
+    FLOATVAL rf;
 
     REG_PMC(2) = obj;
     REG_STR(0) = meth;
     va_start(args, sig);
     ret = runops_args(interpreter, sub, sig, args);
     va_end(args);
+    /* we have to get retvals around restore_regs */
+    switch (*sig) {
+        case 'I': ri = *(INTVAL*) ret; ret = &ri; break;
+        case 'N': rf = *(FLOATVAL*) ret; ret = &rf; break;
+    }
     restore_regs(interpreter, data);
     return ret;
 }

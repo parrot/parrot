@@ -37,106 +37,13 @@ string or PMC not otherwise rooted it could be collected too early.
 #include "parrot/parrot.h"
 #include <assert.h>
 
-typedef struct _reg_store {
-    struct IReg int_reg;
-    struct NReg num_reg;
-    struct SReg string_reg;
-    struct PReg pmc_reg;
-} reg_store;
 
-/*
-
-=item C<PARROT_INLINE static struct regsave *
-save_regs(Parrot_Interp interp)>
-
-Saves the registers to the C<regsave struct>.
-
-=cut
-
-*/
-
-typedef struct regsave {
-    struct regsave *prev;       /* free list ptr */
-    struct regsave *next;       /* mark list ptr */
-    reg_store      regs;
-} regsave;
-
-/*
- * TODO move this into interpreter
- */
-
-static regsave *reg_save_top;   /* the free list */
-static regsave *reg_save_mark;  /* the mark list */
-
-PARROT_INLINE static struct regsave *
-save_regs(Parrot_Interp interp) {
-    struct regsave *save;
-    if (reg_save_top) {
-        save = reg_save_top;
-        reg_save_top = save->prev;
-    }
-    else {
-        save = mem_sys_allocate(sizeof(struct regsave));
-        save->prev = NULL;
-    }
-    save->next = reg_save_mark;
-    reg_save_mark = save;
-    mem_sys_memcopy(&save->regs, interp, sizeof(reg_store));
-    return save;
-}
-
-/*
-
-=item C<PARROT_INLINE static void
-restore_regs(Parrot_Interp interp, struct regsave *data)>
-
-Restores the registers from C<*data>.
-
-=cut
-
-*/
-
-PARROT_INLINE static void
-restore_regs(Parrot_Interp interpreter, struct regsave *data) {
-
-    mem_sys_memcopy(interpreter, &data->regs, sizeof(reg_store));
-    data->prev = reg_save_top;
-    reg_save_top = data;
-    assert(reg_save_mark == data);
-    reg_save_mark = data->next;
-
-    if (Interp_flags_TEST(interpreter, PARROT_TRACE_FLAG)) {
-        PIO_eprintf(interpreter, "# return\n");
-    }
-}
-
-
-static void
-mark_regs(Parrot_Interp interpreter)
-{
-    struct regsave *p = reg_save_mark;
-    int j;
-    PObj *reg;
-
-    for (; p; p = p->next) {
-        struct PReg *pf = &p->regs.pmc_reg;
-        struct SReg *sf = &p->regs.string_reg;
-        for (j = 0; j < NUM_REGISTERS; j++) {
-            reg = (PObj*) pf->registers[j];
-            if (reg)
-                pobject_lives(interpreter, reg);
-            reg = (PObj*) sf->registers[j];
-            if (reg)
-                pobject_lives(interpreter, reg);
-        }
-    }
-}
 /*
 
 =item C<PARROT_INLINE static PMC *
-find_meth(Parrot_Interp interpreter, PMC *pmc, const char *name)>
+find_meth(Parrot_Interp interpreter, PMC *pmc, STRING *name)>
 
-Finds and returns the delegated method with C string C<name>.
+Finds and returns the delegated method with string C<name>.
 
 =cut
 
@@ -144,26 +51,25 @@ Finds and returns the delegated method with C string C<name>.
 
 
 PARROT_INLINE static PMC *
-find_meth(Parrot_Interp interpreter, PMC *pmc, const char *name) {
-    STRING *meth = const_string(interpreter, name);
+find_meth(Parrot_Interp interpreter, PMC *pmc, STRING *meth) {
     PMC *class = pmc;
 
     if (Interp_flags_TEST(interpreter, PARROT_TRACE_FLAG)) {
-        PIO_eprintf(interpreter, "# Calling meth '%s'\n#",
-                name);
+        char *name = string_to_cstring(interpreter, meth);
+        PIO_eprintf(interpreter, "# Calling meth '%s'\n#", name);
+        string_cstring_free(name);
         print_pbc_location(interpreter);
     }
     if (PObj_is_object_TEST(pmc)) {
         class = GET_CLASS((Buffer *)PMC_data(pmc), pmc);
     }
-    REG_STR(2) = meth;
     return Parrot_find_method_with_cache(interpreter, class, meth);
 }
 
 /*
 
 =item C<PARROT_INLINE static PMC *
-find_or_die(Parrot_Interp interpreter, PMC *pmc, const char *name)>
+find_or_die(Parrot_Interp interpreter, PMC *pmc, STRING *name)>
 
 Returns the result of calling C<find_meth()> with the arguments, raising
 an exception if no method is found.
@@ -173,13 +79,13 @@ an exception if no method is found.
 */
 
 PARROT_INLINE static PMC *
-find_or_die(Parrot_Interp interpreter, PMC *pmc, const char *name) {
-    PMC *returnPMC = find_meth(interpreter, pmc, name);
+find_or_die(Parrot_Interp interpreter, PMC *pmc, STRING *meth) {
+    PMC *returnPMC = find_meth(interpreter, pmc, meth);
     if (PMC_IS_NULL(returnPMC)) {
         internal_exception(METH_NOT_FOUND,
-            "Can't find method '%s' for object", name);
+            "Can't find method '%s' for object",
+            string_to_cstring(interpreter, meth));
     }
-    REG_PMC(2) = pmc;
     return returnPMC;
 }
 
@@ -206,25 +112,18 @@ is true then an exception will be raised if the method is not found.
 
 PARROT_INLINE static void
 noarg_noreturn(Parrot_Interp interpreter, PMC *obj, PMC* class,
-        const char *meth, int die) {
-    struct regsave *data = save_regs(interpreter);
+        const char *name, int die)
+{
+    STRING *meth = const_string(interpreter, name);
     PMC *method = die ? find_or_die(interpreter, class, meth) :
-        find_meth  (interpreter, class, meth);
+        find_meth(interpreter, class, meth);
     if (PMC_IS_NULL(method)) {
         if (Interp_flags_TEST(interpreter, PARROT_TRACE_FLAG)) {
             PIO_eprintf(interpreter, "# not found\n");
         }
-        goto ret;
+        return;
     }
-    REG_PMC(2) = obj;
-    REG_INT(0) = 1; /* prototyped */
-    REG_INT(1) = 0;
-    REG_INT(2) = 0;
-    REG_INT(3) = 0;
-    REG_INT(4) = 0;
-    Parrot_runops_fromc(interpreter, method);
-ret:
-    restore_regs(interpreter, data);
+    Parrot_run_meth_fromc_save(interpreter, method, obj, meth);
 }
 
 pmclass delegate {
@@ -254,7 +153,7 @@ Calls the delegated C<init()> method.
     }
 
     void mark() {
-        mark_regs(INTERP);
+        /* don't delegate mark */
     }
 }
 

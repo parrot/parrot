@@ -264,8 +264,10 @@ trace_active_PMCs(struct Parrot_Interp *interpreter, int trace_stack)
     /* s. packfile.c */
     mark_const_subs(interpreter);
 
+    /* mark caches and freelists */
     mark_stack_chunk_cache(interpreter);
     mark_object_cache(interpreter);
+    mark_saved_regs(interpreter);
 
     /* mark NCI meth hash */
     for (i = 0; i < interpreter->nci_method_table_size; ++i) {
