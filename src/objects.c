@@ -1077,16 +1077,28 @@ init_object_cache(Parrot_Interp interpreter)
     SET_NULL(mc->retc_cache);
 }
 
+#define TBL_SIZE_MASK 0x1ff   /* x bits 2..10 */
+#define TBL_SIZE (1 + TBL_SIZE_MASK)
+
 static void
 invalidate_type_caches(Interp *interpreter, UINTVAL type)
 {
     Caches *mc = interpreter->caches;
+    Meth_cache_entry *e, *next;
+    INTVAL i;
 
     if (!mc)
         return;
     /* is it a valid entry */
     if (type >= mc->mc_size || !mc->idx[type])
         return;
+    for (i = 0; i < TBL_SIZE; ++i) {
+        for (e = mc->idx[type][i]; e; ) {
+            next = e->next;
+            mem_sys_free(e);
+            e = next;
+        }
+    }
     mem_sys_free(mc->idx[type]);
     mc->idx[type] = NULL;
 }
@@ -1122,8 +1134,6 @@ Parrot_invalidate_method_cache(Interp *interpreter, STRING *class)
     invalidate_type_caches(interpreter, (UINTVAL)type);
 }
 
-#define TBL_SIZE_MASK 0x1ff   /* x bits 2..10 */
-#define TBL_SIZE (1 + TBL_SIZE_MASK)
 /*
  * quick'n'dirty method cache
  * TODO: integrate NCI meth lookup
