@@ -1,0 +1,54 @@
+;
+; mops.scheme
+;
+; A Scheme implementation of the mops.pasm example program,
+; for speed comparisons.
+;
+; Copyright (C) 2001 The Parrot Team. All rights reserved.
+; This program is free software. It is subject to the same
+; license as The Parrot Interpreter.
+;
+; $Id$
+;
+
+(let ((I1 0) (I2 0) (I3 1)   ; set    I2, 0
+      (N1 0) (N2 0) (N4 0)   ; set    I3, 1
+      (N5 0) (I4 1000000)    ; set    I4, 100000000
+      (I5 0))                ;
+(display "Iterations:    ")  ; print  "Iterations:    "
+(display I4)                 ; print  I4
+(newline)                    ; print  "\n"
+                             ;
+(set! I1 2)                  ; set    I1, 2
+(set! I5 (* I4 I1))          ; mul    I5, I4, I1
+                             ;
+(display "Estimated ops: ")  ; print  "Estimated ops: "
+(display I5)                 ; print  I5
+(newline)                    ; print  "\n"
+                             ;
+(set! N1 (time))             ; time N1
+                             ;
+(define (loop n)             ; REDO:
+  (if (not (= n 0))          ; sub    I4, I4, I3
+    (loop (- n 1))))         ; if     I4, REDO
+(loop I4)                    ;
+                             ; DONE:
+(set! N5 (time))             ; time   N5
+                             ;
+(set! N2 (- N5 N1))          ; sub    N2, N5, N1
+                             ;
+(display "Elapsed time:  ")  ; print  "Elapsed time:  "
+(display N2)                 ; print  N2
+(newline)                    ; print  "\n"
+                             ;
+(set! N1 I5)                 ; iton   N1, I5
+(set! N1 (/ N1 N2))          ; div    N1, N1, N2
+(set! N2 1000000.0)          ; set    N2, 1000000.0
+(set! N1 (/ N1 N2))          ; div    N1, N1, N2
+                             ;
+(display "M op/s:        ")  ; print  "M op/s:        "
+(display N1)                 ; print  N1
+(newline)                    ; print  "\n"
+                             ;
+)                            ; end
+
