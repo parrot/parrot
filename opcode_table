@@ -1,0 +1,41 @@
+# opcode function table
+# 
+# format is:
+# number name args arg_types
+#
+# All fields should be whitespace separated
+#
+# The arg_types are the types to be packed (integer, number, whatever) 
+# not the type of the register or anything. So N3 is still an i, since that
+# 3 specifying the register should be packed as an integer.
+0	set_i_ic	2	i i
+1	add_i	3	i i i
+7	sub_i	3	i i i
+8	mul_i	3	i i i
+9	div_i	3	i i i
+2	eq_i_ic	4	i i i i
+3	time_i	1	i
+4	print_i	1	i
+5	branch_ic	1	i
+6	end	0
+10	if_i_ic	3	i i i
+11	inc_i	1	i
+12	inc_i_ic	2	i i
+13	dec_i	1	i
+14	dec_i_ic	2	i i
+15	jump_i	1	i
+16	set_n_nc	2	i n
+17	add_n	3	i i i
+18	sub_n	3	i i i
+19	mul_n	3	i i i
+20	div_n	3	i i i
+21	eq_n_ic	4	i i i i
+22	time_n	1	i
+23	print_n	1	i
+24	if_n_ic	3	i i i
+25	inc_n	1	i
+26	inc_n_nc	2	i n
+27	dec_n	1	i
+28	dec_n_nc	2	i n
+29	iton_n_i	2	i i
+30	ntoi_i_n	2	i i
