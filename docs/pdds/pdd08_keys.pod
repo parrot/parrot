@@ -200,7 +200,7 @@ glance than C<op P1, P2, P3>. Also, is C<op P1, P2, P3> the same as
 C<op P1[P2], P3> or C<op P1, P2[P3]>, or are these three separate PMCs?)
 
 We shall refer to the first three types collectively as "constant keys"
-and the the last as "register keys".
+and the last as "register keys".
 
 =head2 What the assembler did next
 

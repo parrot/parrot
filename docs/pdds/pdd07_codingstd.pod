@@ -39,11 +39,11 @@ code, and so on.  Hence this document.
 We define three classes of conventions. Those that say I<must> are
 mandatory, and code will not be accepted (apart from in exceptional
 circumstances) unless it follows these rules. Those that say I<should>
-are strong guidelines that should normally be be followed unless there
+are strong guidelines that should normally be followed unless there
 is a sensible reason to do otherwise.  Finally, those that say I<may>,
 are tentative suggestions to be used at your discretion.
 
-Note this this particular PDD makes some recommendations that are
+Note this particular PDD makes some recommendations that are
 specific to the C programming language. This does not preclude Perl
 being implemented in other languages, but in this case, additional PDDs
 may need to be authored for the extra language-specific features.
@@ -646,7 +646,7 @@ avoid some poor schmuck trying subsequently to replace it with something
 =item General comments
 
 While there is no need to go mad commenting every line of code, it is
-immensely helpful to to provide a "running commentary" every 10 or so
+immensely helpful to provide a "running commentary" every 10 or so
 lines say; if nothing else, this makes it easy to quickly locate a
 specific chunk of code. Such comments are particularly useful at the top
 of each major branch, eg
@@ -735,7 +735,7 @@ other non-optimized platforms.
 
 Probably the dominant factor (circa 2001) that effects processor
 performance is the cache. Processor clock rates have increased far in
-excess of of main memory access rates, and the only way for the
+excess of main memory access rates, and the only way for the
 processor to proceed without stalling is for most of the data items it
 needs to be found to hand in the cache. It is reckoned that even a 2%
 cache miss rate can cause a slowdown in the region of 50%. It is for
