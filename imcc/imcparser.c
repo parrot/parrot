@@ -326,7 +326,7 @@ iINDEXFETCH(struct Parrot_Interp *interp, SymReg * r0, SymReg * r1,
     SymReg * r2)
 {
     if(r0->set == 'S' && r1->set == 'S' && r2->set == 'I') {
-        SymReg * r3 = mk_const("1", 'I');
+        SymReg * r3 = mk_const(str_dup("1"), 'I');
         return MK_I(interp, "substr %s, %s, %s, 1", R4(r0, r1, r2, r3));
     }
     keyvec |= KEY_BIT(2);
@@ -341,7 +341,7 @@ static Instruction *
 iINDEXSET(struct Parrot_Interp *interp, SymReg * r0, SymReg * r1, SymReg * r2)
 {
     if(r0->set == 'S' && r1->set == 'I' && r2->set == 'S') {
-        SymReg * r3 = mk_const("1", 'I');
+        SymReg * r3 = mk_const(str_dup("1"), 'I');
         MK_I(interp, "substr %s, %s, %s, %s", R4(r0, r1,r3, r2));
     }
     else if (r0->set == 'P') {
@@ -2484,3 +2484,4 @@ int yyerror(char * s)
  * vim: expandtab shiftwidth=4:
 */
 
+/* CHECKSUM: 1315567 */
