@@ -6,8 +6,6 @@ RT web interface.
 Tests
 -----
 
-    Unify t/* and imcc/t/* tests, so that one harness has just one
-    result summary.
     Run different run cores inside Test.pm.
 
 String subsystem

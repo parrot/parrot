@@ -79,6 +79,7 @@ D: HP-UX fixes and smoke tests
 N: Jason Gloudon
 
 N: Jeff Clites
+D: PPC JIT patches
 
 N: Jeff Goff
 D: Release pumpking for 0.0.5-0.0.8
