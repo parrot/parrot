@@ -6,8 +6,8 @@ RT web interface.
 
 String subsystem
 ----------------
-    grep docs/strings.pod for unimplemented functions and implement them
-    Implement transcoding
+
+    Rework string iterators
     Implement character class & properties testing (for regular expressions)
     Automate string vtable generation
     Fill in vtables for non-ASCII encodings: UTF-8, UTF-16, UTF-32, etc.
@@ -15,14 +15,8 @@ String subsystem
     Find a decent way of including Unicode properties tables. (Not for
     the faint of heart.)
 
-    Implement a readline function and move the "EEEEEEEVIL" out of core.ops:
-    String *readline(int fd, String **dest);
-    if (dest)
-	    *dest will be a string, append and reuse it.
-
 Vtables
 -------
-    Fix vtable key support for hashes and arrays
     PythonInteger/String/Object?
 
 JIT

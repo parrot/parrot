@@ -1,11 +1,6 @@
 Here's the list of things that we know are broken, or
 are admittedly hackish stopgap measures or need to be fixed.
 
-Bytecode
-
-- Byteordering works for most stuff except floating point (N regs)
-  Cross platform bytecode doesn't convert floats yet
-
 IO
 
 - Async core isn't there yet, even though it is rumoured to be
@@ -51,12 +46,7 @@ Tests
 
 Utilities
 
-- lib/Parrot/PackFile.pm does it's own packing & unpacking, which is
-  not capable of reading the dir_format=1 PBC format. Non native floats
-  are also not implemented.
-
-- the Parrot debugger pdb: "eval" is b0rken, this needs linking
-  to libimcc (which we don't have yet ;-)
+- lib/Parrot/PackFile.pm is outdated and unused
 
 Classes
 
@@ -66,7 +56,6 @@ Classes
 Undecided stuff
 
 - data type of hashs store
-- string_set - string header reusing
 - multi key opcodes
 
 Unimplemented
