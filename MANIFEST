@@ -38,6 +38,7 @@ chartypes/usascii.c
 classes/Makefile.in
 classes/default.pmc
 classes/genclass.pl
+classes/parrotpointer.pmc
 classes/perlarray.pmc
 classes/perlhash.pmc
 classes/perlint.pmc
