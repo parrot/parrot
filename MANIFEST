@@ -106,6 +106,7 @@ config/inter/pmc.pl
 config/inter/progs.pl
 config/inter/types.pl
 core.ops
+datatypes.c
 debug.c
 debug.ops
 disassemble.c
@@ -1200,6 +1201,7 @@ icu/source/tools/toolutil/uoptions.h
 icu/source/tools/toolutil/uparse.c
 icu/source/tools/toolutil/uparse.h
 include/parrot/chartype.h
+include/parrot/datatypes.h
 include/parrot/debug.h
 include/parrot/dod.h
 include/parrot/embed.h
@@ -1615,6 +1617,7 @@ t/op/stacks.t
 t/op/string.t
 t/op/time.t
 t/op/trans.t
+t/op/types.t
 t/pmc/array.t
 t/pmc/boolean.t
 t/pmc/intlist.t
