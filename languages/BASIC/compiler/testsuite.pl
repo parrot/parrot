@@ -17,8 +17,9 @@ while(1) {
 	open(OF, ">_testsuite.bas") || die;
 	print OF $_;
 	close(OF);
-	system("perl compile.pl _testsuite.bas");	
-	system("perl testrun.pl > _output2");
+	if ( ! system("perl compile.pl _testsuite.bas")) {
+		system("perl testrun.pl > _output2");
+	}
 	open(O, "_output2") || die;
 	print <O>;
 	close(O);
@@ -26,21 +27,66 @@ while(1) {
 }
 
 __DATA__
-' Expect ??
-Dim A(10)
-z=3
-c=c+a(z)
+' For loops.  3..6 nested in 1..3
+function foo
+	for y=3 to 6
+	print y,
+	next y
+	foo=99
+end function
+for t%=1 to 3
+  h=foo()
+  print "    ", t%
+next t%
 
 
 STOPPLEASE
-' Expect -10,11
-Dim Index(10)
-D=5
-Index(D)=-10
-print Index(D)
-print 31 + (Index(D) * 2)
-print 31 + Index(D) * 2
-print 31 + (Index(D)) * 2
+' String function, whoa
+function a$
+	a$="Whoa"
+end function
+print a$
+
+' Expect 7
+t%=7
+print t%*1
+
+' Changed ref'd var from 5 to 12
+function myfunc(a)
+	print a
+	a=12
+        myfunc=80
+end function
+z=5
+T=myfunc(z)
+print z
+
+' Basic Hello
+a$="Hello"
+print a$
+
+' Simplest function, return 10
+function twice(number)
+	twice=2*number
+end function
+a=twice(5)
+print a
+
+
+' Expect -7
+t%=-7
+print t%
+
+' Expect 9
+print (2+3*5-(6+abs(0-3)))+1
+
+' Expect Correct
+DIM A(1,1)
+RO=1
+IF A(RO,5)=0 THEN GOSUB 20: REM GOO
+   end
+20 print "Correct"
+   return
 
 ' Expect a Hello, World!
 print "Hello, ";	' COmment
@@ -54,13 +100,6 @@ IF A(RO,5)=0 THEN GOSUB 20: REM GOO
 20 print "Correct"
    return
 
-' Expect 1,2,-2
-dim s(4)
-s=3
-s(2)=1
-print s(2)
-print s(2)+1
-print s-5
 
 ' Expect Correct
 t=0
@@ -92,9 +131,6 @@ a=0
 b=7
 a=b
 print a
-
-' Expect 9
-print (2+3*5-(6+abs(0-3)))+1
 
 ' Expect rough PI
 print 22/7
