@@ -390,13 +390,13 @@ PackFile_check_segment_size(opcode_t segment_size, const char *debug)
 {
 #if TRACE_PACKFILE
     PIO_eprintf(NULL, "PackFile_unpack(): Unpacking %ld bytes for %s table...\n",
-           segment_size, debug);
+           (long)segment_size, debug);
 #endif
 
     if (segment_size % sizeof(opcode_t)) {
         PIO_eprintf(NULL,
                 "PackFile_unpack: Illegal %s table segment size %ld (must be multiple of %ld)!\n",
-                debug, segment_size, (long)sizeof(opcode_t));
+                debug, (long)segment_size, (long)sizeof(opcode_t));
         return 0;
     }
     return 1;
