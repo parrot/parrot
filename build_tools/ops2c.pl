@@ -12,6 +12,13 @@ use strict;
 use lib 'lib';
 use Parrot::OpsFile;
 
+my %arg_dir_mapping = (
+	''   => 'PARROT_ARGDIR_IGNORED',
+	'i'  => 'PARROT_ARGDIR_IN',
+	'o'  => 'PARROT_ARGDIR_OUT',
+	'io' => 'PARROT_ARGDIR_INOUT'
+);
+
 sub Usage {
     print STDERR <<_EOF_;
 usage: $0 trans input.ops [input2.ops ...]
@@ -233,6 +240,7 @@ foreach my $op ($ops->ops) {
     my $jump       = $op->jump || 0;
     my $arg_count  = $op->size;
     my $arg_types  = "{ " . join(", ", map { sprintf("PARROT_ARG_%s", uc $_) } $op->arg_types) . " }";
+    my $arg_dirs   = "{ " . join(", ", map { $arg_dir_mapping{$_} } $op->arg_dirs) . " }";
 
     print SOURCE <<END_C;
   { /* $index */
@@ -243,7 +251,8 @@ foreach my $op ($ops->ops) {
     "", /* TODO: Put the body here */
     $jump, /* 1 = relative 2 = absolute 4 = pop 8 = next 16 = unpredictable */ 
     $arg_count,
-    $arg_types
+    $arg_types,
+    $arg_dirs
   },
 END_C
 

@@ -36,6 +36,14 @@ typedef enum {
     PARROT_ARG_S
 } arg_type_t;
 
+typedef enum {
+    PARROT_ARGDIR_IGNORED,
+
+    PARROT_ARGDIR_IN,
+    PARROT_ARGDIR_OUT,
+    PARROT_ARGDIR_INOUT
+} arg_dir_t;
+
 #define PARROT_ARG_OP 0
 
 /* NOTE: Sure wish we could put the types here... */
@@ -62,6 +70,7 @@ typedef struct {
     const char jump;
     INTVAL arg_count;           /* Includes opcode as one arg */
     arg_type_t types[PARROT_MAX_ARGS];
+    arg_dir_t dirs[PARROT_MAX_ARGS];
 } op_info_t;
 
 

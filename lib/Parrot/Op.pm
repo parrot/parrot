@@ -18,14 +18,15 @@ package Parrot::Op;
 sub new
 {
   my $class = shift;
-  my ($code, $type, $name, @args) = @_;
+  my ($code, $type, $name, $args, $argdirs) = @_;
 
   my $self = { CODE => $code,
                TYPE => $type,
                NAME => $name,
-               ARGS => [ @args ],
+               ARGS => [ @$args ],
+               ARGDIRS => [ @$argdirs ],
                BODY => '',
-               MAY_JUMP => 0,
+               JUMP => 0,
              };
 
   return bless $self, $class;
@@ -115,6 +116,27 @@ sub arg_type
 {
   my $self = shift;
   return $self->{ARGS}[shift];
+}
+
+#
+# arg_dirs()
+#
+
+sub arg_dirs
+{
+  my $self = shift;
+  return @{$self->{ARGDIRS}};
+}
+
+
+#
+# arg_dir()
+#
+
+sub arg_dir
+{
+  my $self = shift;
+  return $self->{ARGDIRS}[shift];
 }
 
 

@@ -93,6 +93,7 @@ sub read_ops
   my $short_name;
   my $args;
   my @args;
+  my @argdirs;
   my $seen_pod;
   my $seen_op;
   my $line;
@@ -164,6 +165,7 @@ sub read_ops
       $short_name = lc $2;
       $args       = trim(lc $3);
       @args       = split(/\s*,\s*/, $args);
+      @argdirs    = ();
       $body       = '';
       $seen_op    = 1;
       $line	      = $.+1;
@@ -179,17 +181,21 @@ sub read_ops
 
         if ($use eq 'in') {
           push @temp, ($type eq 'p') ? 'p' : "$type|${type}c";
+          push @argdirs, 'i';
         }
         elsif ($use eq 'inconst') {
 	  die "Parrot::OpsFile: Arg format 'inconst PMC' is not allowed!"
 		if $type eq 'p';
           push @temp, "${type}c";
+          push @argdirs, 'i';
         }
         elsif ($use eq 'inout') {
           push @temp, $type;
+          push @argdirs, 'io';
         }
         else {
           push @temp, $type;
+          push @argdirs, 'o';
         }
       }
 
@@ -207,7 +213,8 @@ sub read_ops
     #
 
     if (/^}\s*$/) {
-      $count += $self->make_op($count, $type, $short_name, $body, \@args, $line, $orig);
+      $count += $self->make_op($count, $type, $short_name, $body, \@args,
+		\@argdirs, $line, $orig);
 
       $seen_op = 0;
 
@@ -241,7 +248,8 @@ sub read_ops
 
 sub make_op
 {
-  my ($self, $code, $type, $short_name, $body, $args, $line, $file) = @_;
+  my ($self, $code, $type, $short_name, $body, $args, $argdirs,
+            $line, $file) = @_;
   my $counter = 0;
   my $absolute = 0;
   my $branch = 0;
@@ -251,7 +259,8 @@ sub make_op
 
   foreach my $variant (expand_args(@$args)) {
       my(@fixedargs)=split(/,/,$variant);
-      my $op = Parrot::Op->new($code++, $type, $short_name, 'op', @fixedargs);
+      my $op = Parrot::Op->new($code++, $type, $short_name,
+        [ 'op', @fixedargs ], [ '', @$argdirs ]);
       my $op_size = $op->size;
 
       #
