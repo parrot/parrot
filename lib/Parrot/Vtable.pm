@@ -223,6 +223,7 @@ static const char * const Parrot_vtable_slot_names[] = {
     /* Vtable Functions */
 EOM
     for my $entry (@{$vtable}) {
+	next if ($entry->[4] =~ /MMD_/);
 	$macros .= <<"EOM";
         \"__$entry->[1]\",
 EOM

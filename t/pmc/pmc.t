@@ -1495,6 +1495,7 @@ while (my ($type, $id) = each %pmc_types) {
     next if $type eq "Ref";
     next if $type eq "SharedRef";
     next if $type eq "ParrotObject";
+    next if $type eq "deleg_pmc";
     my $set_ro = ($type =~ /^Const\w+/) ? <<EOPASM : '';
     new P10, .PerlInt
     inc P10

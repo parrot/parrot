@@ -213,6 +213,10 @@ create_deleg_pmc_vtable(Interp *interpreter, PMC *class, STRING *class_name)
         }
     }
     /*
+     * TODO create a MMD name mapping and call mmd_register
+     */
+
+    /*
      * finally if the methods are changed dynamically
      * this vtable must be changed too
      * s. src/global.c:Parrot_store_global()
