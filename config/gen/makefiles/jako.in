@@ -10,7 +10,7 @@ RM_F = ${rm_f}
 DIR=languages/jako
 TOOL_DIR=../..
 ASM=$(PERL) -I ../../lib ../../assemble.pl
-IMCC=imcc
+IMCC=../imcc/imcc${exe}
 JAKOC=$(PERL) -I lib jakoc
 INTERP=../../${test_prog}
 
@@ -65,10 +65,9 @@ examples/sub.imc:        examples/sub.jako        jakoc
 	$(IMCC) -o $@ $< || (rm -f $@ && false)
 
 ../imcc/imcc:
-	@cd ../imcc make
 
-imcc: ../imcc/imcc
-	ln -s ../imcc/imcc imcc
+imcc: ../imcc/imcc${exe}
+	@cd ../imcc make
 
 examples/bench.pasm:      examples/bench.imc      imcc
 examples/euclid.pasm:     examples/euclid.imc     imcc
@@ -110,7 +109,7 @@ examples/sub.pbc:        examples/sub.pasm
 #
 
 clean:
-	$(RM_F) imcc examples/*.imc examples/*.pasm examples/*.list examples/*.pbc
+	$(RM_F) examples/*.imc examples/*.pasm examples/*.list examples/*.pbc
 
 over:
 	@$(MAKE) clean
