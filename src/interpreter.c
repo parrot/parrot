@@ -156,6 +156,9 @@ make_interpreter() {
     interpreter = mem_sys_allocate(sizeof(struct Parrot_Interp));
     /* Set up the memory allocation system */
     mem_setup_allocator(interpreter);
+
+    /* Blank out the interpreter's flags */
+    interpreter->flags = 0;
     
     /* Set up the initial register chunks */
     interpreter->int_reg_base = mem_allocate_aligned(sizeof(struct IRegChunk));
