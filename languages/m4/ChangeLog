@@ -1,5 +1,19 @@
 # $Id$
 
+2004-07-06     Bernhard Schmalhofer
+        * Make tests work again
+        * add some tests for 'eval'
+        * yank it up to revision 0.0.7
+
+2004-06-27     Andy Dougherty
+        * Build patches for Solaris, RT#30320
+
+2004-06-21    Bernhard Schmalhofer
+        * Don't write test files into '/tmp'
+
+2004-06-10    Bernhard Schmalhofer
+        * The symbolic link 'blib' isn't needed any more
+
 2004-06-02    Bernhard Schmalhofer
         * Start to use t/harness and Parrot::Test
         * yank it up to revision 0.0.6

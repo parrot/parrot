@@ -6,14 +6,14 @@ use strict;
 use Test::More tests => 25; 
 
 my $real_out;
-my $parrot_m4    = 'cd ..; ./parrot languages/m4/m4.pbc';
+my $parrot_m4    = 'cd .. && ./parrot languages/m4/m4.pbc';
 my $examples_dir = 'languages/m4/examples'; 
 
 
 #--------------------------------------------
 $real_out     = `$parrot_m4 --help 2>&1`; 
 is( $real_out, << "END_OUT", '--help' );
-Usage: ./parrot languages/m4/m4.pbc [OPTION]... FILE
+Usage: ../../parrot languages/m4/m4.pbc [OPTION]... FILE
 
 Currently only long options are available.
 
@@ -31,7 +31,7 @@ END_OUT
 #--------------------------------------------
 $real_out     = `$parrot_m4 --version 2>&1`; 
 is( $real_out, << 'END_OUT', '--version' );
-Parrot m4 0.0.6
+Parrot m4 0.0.7
 END_OUT
 
 

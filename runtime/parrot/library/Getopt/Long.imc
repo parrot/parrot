@@ -11,15 +11,16 @@ See examples/assembly/getopt_demo.imc
 =head1 DESCRIPTION
 
 This PIR library can be used for parsing command line options. 
-A single subroutine, get_options(), is provided.
+A single subroutine, _get_options(), is provided.
 
 =head1 SUBROUTINES
 
 =head2 _get_options
 
 This should work like the Perl5 module Getopt::Long.
-Takes a format specifier and an argument vector.
-Returns a PerlHash.
+Takes an array of options and an array of specifications.
+
+A PerlHash is returned.
 
 =cut
 
@@ -28,32 +29,33 @@ Returns a PerlHash.
   .param PerlArray spec    
 
   # Loop over the array spec and build up two simple hashes
-  .local PerlHash type               # the type of the option: binary, string, integer 
+  .local pmc type               # the type of the option: binary, string, integer 
   type = new PerlHash
-  .local int cnt_spec                # a counter for looping over the array 'spec'
-  cnt_spec = 0
-  .local int len_spec                # for end condition of loop over 'spec'
-  len_spec = spec
+  .local int curr_spec                # a counter for looping over the array 'spec'
+  curr_spec = 0
+  .local int max_spec                # for end condition of loop over 'spec'
+  max_spec = spec
   .local int    spec_index           # searching for patterns in 'spec'
   .local string opt_name             # name of specified option
   .local string opt_type             # tyep of specified option
   goto CHECK_PARSE_SPEC     
   NEXT_PARSE_SPEC:                   # Look at next element in 'spec'
-    opt_name = spec[cnt_spec]
+    opt_name = spec[curr_spec]
     spec_index = index opt_name, '=' # when '=' is not in 'opt_name' then it's binary
     if spec_index != -1 goto NOT_A_BINARY_OPTION
     opt_type = 'b'
     goto OPTION_TYPE_IS_NOW_KNOWN
   NOT_A_BINARY_OPTION:
-    inc spec_index                   # we know where '=', thus the type is one further 
+    inc spec_index                        # we know where '=', thus the type is one further 
     opt_type = substr opt_name, spec_index, 1 
-    dec spec_index                     # Go back to the '='
-    opt_name = substr spec_index, 2, '' # The stuff before '=' is the option name
+    dec spec_index                        # Go back to the '='
+    # TODO: what if we have something like    name=xy ?
+    opt_name = substr spec_index, 2, ''   # The stuff before '=' is the option name
   OPTION_TYPE_IS_NOW_KNOWN:
     type[opt_name] = opt_type
-    inc cnt_spec  
+    inc curr_spec  
   CHECK_PARSE_SPEC:                    # check wether loop over 'spec' is complete
-  if cnt_spec < len_spec goto NEXT_PARSE_SPEC
+  if curr_spec < max_spec goto NEXT_PARSE_SPEC
 
   # uncomment this if you want debug output
   goto SKIP_DEBUG_OUTPUT 
@@ -64,7 +66,7 @@ Returns a PerlHash.
   # we actually parse the argument vector
   # TODO: do this correctly
   # shift from argv until a non-option is encountered 
-  .local PerlHash opt              # the return PMC
+  .local pmc opt              # the return PMC
   opt = new PerlHash
   .local string arg                 # element of argument array
   .local string value               # element of argument array
@@ -75,12 +77,20 @@ Returns a PerlHash.
   NEXT_PARSE_ARGV:
     # first we take a peek at the first remaining element
     arg = argv[0]
-    # Is arg a option string like '--help'
+
+    # Is arg a long option string like '--help'
+    # TODO: how about asdf--jkl ???
     arg_index = index arg, '--'
-    if arg_index > -1 goto HANDLE_OPTION
+    if arg_index > -1 goto HANDLE_LONG_OPTION
+
+    # Is arg a short option string like '-v'
+    arg_index = index arg, '-'
+    if arg_index > -1 goto HANDLE_SHORT_OPTION
     # We are done, and don't want to loose the nonoption argument
     goto FINISH_PARSE_ARGV
-    HANDLE_OPTION:
+
+    HANDLE_SHORT_OPTION:
+    HANDLE_LONG_OPTION:
     # we take the current option off argv
     arg = shift argv
     # get rid of the leading '--'
@@ -117,6 +127,7 @@ Returns a PerlHash.
   CHECK_PARSE_ARGV:
     num_remaining_args = argv
     if num_remaining_args > 0 goto NEXT_PARSE_ARGV
+
   FINISH_PARSE_ARGV:
   # Nothing to do here
 

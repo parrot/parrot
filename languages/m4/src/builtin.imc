@@ -15,7 +15,7 @@ expansion of user defined macros.
 =cut
 
 # Some named constants
-.include 'iterator.pasm'
+.include '../../runtime/parrot/include/iterator.pasm'
 
 =head1 SUBROUTINES
 

@@ -4,7 +4,7 @@
 
 =head1 NAME
 
-m4_eval.c - Integer arithmetic evaluation for Parrot m4
+eval.imc - Integer arithmetic evaluation for Parrot m4
 
 =head1 DESCRIPTION
 

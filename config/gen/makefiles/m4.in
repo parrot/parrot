@@ -1,10 +1,26 @@
 # $Id$
 
 # Setup of some commands
-LN_SF  = ln -s -f
-PARROT = ..${slash}..${slash}parrot${exe}
-PERL   = ${perl}
-RM_RF  = ${rm_rf}
+LN_SF     = ln -s -f
+PARROT    = ..${slash}..${slash}parrot${exe}
+PERL      = ${perl}
+RM_RF     = ${rm_rf}
+
+# Compile commands and flags
+CC        = ${cc}
+CFLAGS    = ${ccflags} -I../../include
+CC_SHARED = ${cc_shared} # e.g. -fpic
+DEBUG     = ${cc_debug}
+WARN      = ${ccwarn}
+
+# Linker command and flags
+LINK      = ${link}
+LINKFLAGS = ${linkflags}
+
+# Shared-library building
+LD        = ${ld}
+LDFLAGS   = ${ldflags}
+LD_SHARED = ${ld_shared} # e.g. -shared
 
 # some constants
 M4_EVAL_COMPILER_SO = ../../runtime/parrot/dynext/m4_eval_compiler.so
@@ -32,21 +48,21 @@ help:
 	@echo ""
 
 test: build
-	cd ..; $(PERL) -I../lib m4/t/harness
+	cd .. && $(PERL) -I../lib m4/t/harness
 
-build: blib runtime $(M4_EVAL_COMPILER_SO) m4.pbc 
+build: runtime $(M4_EVAL_COMPILER_SO) m4.pbc 
 
-blib: 
-	$(LN_SF) ../../blib
-
-runtime: 
+# TODO: get rid of this, as soon as _PARROTLIB is the default
+runtime:
 	$(LN_SF) ../../runtime
 
 m4.pbc: src/m4.pbc 
 	$(LN_SF) src/m4.pbc 
 
 $(M4_EVAL_COMPILER_SO): src/eval.c
-	$(CC) -shared -fpic src/eval.c -o $@ -g -Wall -I../../include 
+	$(CC) $(CFLAGS) $(CC_SHARED) $(DEBUG) $(WARN) -c $<
+	$(LD) $(LD_SHARED) $(LDFLAGS) -o $@ eval.o
+
 
 src/m4.imc: src/builtin.imc src/freeze.imc src/input.imc src/macro.imc 
 	touch $@ 
@@ -57,8 +73,7 @@ html:
  
 clean:
 	$(RM_RF) \
-*.pbc \
-blib \
+m4.pbc \
 runtime \
 src/*.pbc \
 src/*/*.pbc \
@@ -71,13 +86,9 @@ $(M4_EVAL_COMPILER_SO)
 
 realclean: clean
 	$(RM_RF) \
-  Makefile
+Makefile
 
 distclean: realclean
 
 %.pbc: %.imc
 	$(PARROT) -o $@ $< 
-
-distclean: clean
-
-.PRECIOUS: %.imc 

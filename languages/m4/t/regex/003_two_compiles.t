@@ -220,15 +220,7 @@ OUTPUT
 
   # compile regular expression 'df'
   .local pmc re_df
-  .pcc_begin prototyped
-    .arg 'df'
-    .arg 0
-    .arg error
-    .arg errptr
-    .arg NULL
-  .nci_call pcre_compile
-    .result re_df
-  .pcc_end
+  .PCRE_COMPILE('df', 0, re_df, error, errptr)
 
   # Variables for matching
   .local string s
@@ -254,8 +246,9 @@ OUTPUT
     .result ok
   .pcc_end
   if ok < 0 goto EXEC_FAILED
+  print "ok: "
   print ok
-  print " match(es):\n"
+  print " 'as' matches\n"
 
   # Try another match
   .pcc_begin prototyped
@@ -270,9 +263,10 @@ OUTPUT
   .nci_call pcre_exec
     .result ok
   .pcc_end
+  print "ok: "
   print ok
   if ok < 0 goto NO_MATCH
-  print " match(es):\n"
+  print " 'df' matches\n"
 
   end
 
@@ -290,8 +284,8 @@ COMPILE_FAILED:
 END_PIR
 
   pir_output_is( $pir, << 'OUTPUT', "calling pcre_compile directly two times" );
-1 match(es):
-1 match(es):
+ok: 1 'as' matches
+ok: 1 'df' matches
 OUTPUT
 }
 if ( 0 )
@@ -437,12 +431,8 @@ match_err:
 END_PIR
 
   pir_output_is( $pir, << 'OUTPUT', "calling .PCRE_COMPILE two times" );
-
-1 match(es):
-as
-
-1 match(es):
-df
+ok: 1 'as' match(es):
+ok: 1 'df' match(es):
 OUTPUT
 }
 

@@ -45,6 +45,9 @@ sub runstep {
     cc            => $Config{cc},
     ccflags       => $Config{ccflags},
     ccwarn        => exists($Config{ccwarn}) ? $Config{ccwarn} : '',
+    # Flags used to indicate this object file is to be compiled
+    # with position-independent code suitable for dynamic loading.
+    cc_shared => $Config{cccdlflags}, # e.g. -fpic for GNU cc.
 
     # C++ compiler -- used to compile parts of ICU.  ICU's configure
     # will try to find a suitable compiler, but it prefers GNU c++ over

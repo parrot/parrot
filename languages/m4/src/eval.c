@@ -19,6 +19,7 @@
 */
 
 #include <stdlib.h> 
+#include <stdio.h> 
 #include <error.h> 
 #include <ctype.h> 
 typedef int boolean;
@@ -26,7 +27,6 @@ int warning_status;
 typedef int eval_t;
 
 /* Error handling.  */
-#define M4ERROR(Arglist) ( error Arglist)
 #define CODE_SIZE 128
 
 /* This file contains the functions to evaluate integer expressions for
@@ -282,39 +282,32 @@ evaluate (const char *expr, eval_t *val)
       break;
 
     case MISSING_RIGHT:
-      M4ERROR ((warning_status, 0,
-		"Bad expression in eval (missing right parenthesis): %s",
-		expr));
+      fprintf( stderr, "Bad expression in eval (missing right parenthesis): %s",
+		expr);
       break;
 
     case SYNTAX_ERROR:
-      M4ERROR ((warning_status, 0,
-		"Bad expression in eval: %s", expr));
+      fprintf( stderr, "Bad expression in eval: %s", expr);
       break;
 
     case UNKNOWN_INPUT:
-      M4ERROR ((warning_status, 0,
-		"Bad expression in eval (bad input): %s", expr));
+      fprintf( stderr, "Bad expression in eval (bad input): %s", expr);
       break;
 
     case EXCESS_INPUT:
-      M4ERROR ((warning_status, 0,
-		"Bad expression in eval (excess input): %s", expr));
+      fprintf( stderr, "Bad expression in eval (excess input): %s", expr);
       break;
 
     case DIVIDE_ZERO:
-      M4ERROR ((warning_status, 0,
-		"Divide by zero in eval: %s", expr));
+      fprintf( stderr, "Divide by zero in eval: %s", expr);
       break;
 
     case MODULO_ZERO:
-      M4ERROR ((warning_status, 0,
-		"Modulo by zero in eval: %s", expr));
+      fprintf( stderr, "Modulo by zero in eval: %s", expr);
       break;
 
     default:
-      M4ERROR ((warning_status, 0,
-		"INTERNAL ERROR: Bad error code in evaluate ()"));
+      fprintf( stderr, "INTERNAL ERROR: Bad error code in evaluate ()");
       abort ();
     }
 
@@ -553,8 +546,7 @@ cmp_term (eval_token et, eval_t *v1)
 	  break;
 
 	default:
-	  M4ERROR ((warning_status, 0,
-		    "INTERNAL ERROR: Bad comparison operator in cmp_term ()"));
+	  fprintf( stderr, "INTERNAL ERROR: Bad comparison operator in cmp_term ()");
 	  abort ();
 	}
     }
@@ -596,8 +588,7 @@ shift_term (eval_token et, eval_t *v1)
 	  break;
 
 	default:
-	  M4ERROR ((warning_status, 0,
-		    "INTERNAL ERROR: Bad shift operator in shift_term ()"));
+	  fprintf( stderr, "INTERNAL ERROR: Bad shift operator in shift_term ()");
 	  abort ();
 	}
     }
@@ -679,8 +670,7 @@ mult_term (eval_token et, eval_t *v1)
 	  break;
 
 	default:
-	  M4ERROR ((warning_status, 0,
-		    "INTERNAL ERROR: Bad operator in mult_term ()"));
+	  fprintf( stderr, "INTERNAL ERROR: Bad operator in mult_term ()");
 	  abort ();
 	}
     }

@@ -215,7 +215,7 @@ Uses regular expressions for finding tokens.
     .local pmc struct
     struct = new SArray
     struct = 3
-    .include "datatypes.pasm"
+    .include "../../runtime/parrot/include/datatypes.pasm"
     struct[0] = .DATATYPE_INT
     struct[1] = 2
     struct[2] = 0

@@ -14,7 +14,14 @@ languages/m4/t/harness - A harness for Parrot m4
 
 =head1 SYNOPSIS
 
-  cd languages && perl m4/t/harness -files
+  cd languages && perl -I../lib m4/t/harness -files
+
+  cd languages && perl -I../lib m4/t/harness 
+
+  cd languages && perl -I../lib m4/t/harness \
+                   m4/t/basic/006_define_with_rest \
+                   m4/t/regex/003_two_compiles.t
+
 
 =head1 DESCRIPTION
 
@@ -24,13 +31,13 @@ This list is one per line, and is relative to the languages dir.
 
 If I'm called with no args, I run all tests.
 
-Otherwise I try to run list of passed tests.
+Otherwise I try to run the list of passed tests.
 
 =cut
 
-if ( grep { /^-files$/ } @ARGV ) 
+if ( grep { m/^-files$/ } @ARGV ) 
 {
-  # I must be running out of languages/
+  # Only the Makefile in 'parrot/languages' uses -file
   my $dir = File::Spec->catfile( $language, 't' );
   my @files = glob( File::Spec->catfile( $dir, '*/*.t' ) );
   print join( "\n", @files );
@@ -46,8 +53,7 @@ else
   }
   else
   {
-    # I must be running out of languages/$language
-    # You may want a deeper search than this.
+    # Propably called out of 'parrot/languages'
     @files = glob( "m4/t/*/*.t" );
   }
   runtests( @files ) if scalar(@files);
@@ -59,7 +65,7 @@ Mostly taken from tcl/t/harness.
 
 =head1 SEE ALSO
 
-  L<languages/tcl/t/harness>
+  L<languages/tcl/t/harness>, L<languages/python/t/harness>
 
 =head1 AUTHOR
 

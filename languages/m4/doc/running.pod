@@ -7,12 +7,14 @@ Using Parrot m4
 =head1 What is Parrot m4?
 
 C<Parrot m4> is C<GNU m4> ported to C<Parrot>. It is implemented in the
-Parrot Intermediate Language (C<PIR>).
+Parrot Intermediate Representation (C<PIR>).
 GNU m4, and thus Parrot m4, is a macro processor.
 
 =head2 Installing Parrot m4
 
-Unpack the archive.
+Get the Parrot distribution. Build parrot.
+  cd languages/m4
+  make
 
 =head1 Running the test suite
 
@@ -20,12 +22,18 @@ Unpack the archive.
 
 =head1 Running your own code
 
+  ../../parrot m4.pbc <options> <file.m4>
+
 =head2 Command line arguments
+
+  ../../parrot m4.pbc --help
 
 =head2 A simple example
 
 =head1 SEE ALSO
 
 =head1 AUTHOR
+
+Bernhard.Schmalhofer at gmx.de
 
 =cut
