@@ -5,16 +5,16 @@ all : jako scheme
 jako: jako.dummy
 
 jako.dummy:
-	$(MAKE) -C jako
+	cd jako && $(MAKE) && cd ..
 
 scheme: scheme.dummy
 
 scheme.dummy:
-	$(MAKE) -C scheme
+	cd scheme && $(MAKE) && cd ..
 
 clean:
-	$(MAKE) -C jako clean
-	$(MAKE) -C scheme clean
+	cd jako && $(MAKE) clean && cd ..
+	cd scheme && $(MAKE) clean && cd ..
 
 update:
 	cvs -q update -dP
