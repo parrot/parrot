@@ -13,7 +13,7 @@ sub runstep {
     my ($miniparrot) = @_;
 
     if ($miniparrot) {
-        foreach (qw(assert complex ctyle errno locale math setjmp signal stdarg
+        foreach (qw(assert complex ctype errno locale math setjmp signal stdarg
                     stdio stdlib string time)) {
             Configure::Data->set("i_$_" => 1);
         }
