@@ -6,9 +6,7 @@ INC=../include/parrot
 H_FILES = $(INC)/parrot.h default.h
 
 
-O_FILES = default$(O) array$(O) perlint$(O) perlstring$(O) perlnum$(O) \
-perlarray$(O) perlhash$(O) perlundef$(O) parrotpointer$(O) intqueue$(O) \
-parrotsub$(O) parrotcoroutine$(O)
+O_FILES = ${pmc_o}
 
 #DO NOT ADD C COMPILER FLAGS HERE
 #Add them in Configure.pl--look for the
@@ -27,65 +25,7 @@ PMC2C=$(PERL) pmc2c.pl
 
 all : $(O_FILES)
 
-array.c array.h: array.pmc 
-	$(PMC2C) array.pmc
-
-array$(O): $(H_FILES)
-
-default.c default.h: default.pmc
-	$(PMC2C) default.pmc
-
-default$(O): $(H_FILES)
-
-perlint.c perlint.h: perlint.pmc 
-	$(PMC2C) perlint.pmc
-
-perlint$(O): $(H_FILES)
-
-perlnum.c perlnum.h: perlnum.pmc 
-	$(PMC2C) perlnum.pmc
-
-perlnum$(O): $(H_FILES)
-
-perlstring.c perlstring.h: perlstring.pmc 
-	$(PMC2C) perlstring.pmc
-
-perlstring$(O): $(H_FILES)
-
-perlarray.c perlarray.h: perlarray.pmc 
-	$(PMC2C) perlarray.pmc
-
-perlarray$(O): $(H_FILES)
-
-perlhash.c perlhash.h: perlhash.pmc 
-	$(PMC2C) perlhash.pmc
-
-perlhash$(O): $(H_FILES)
-
-perlundef.c perlundef.h: perlundef.pmc 
-	$(PMC2C) perlundef.pmc
-
-perlundef$(O): $(H_FILES)
-
-parrotpointer.c: parrotpointer.pmc
-	$(PMC2C) parrotpointer.pmc
-
-parrotpointer$(O): $(H_FILES)
-
-parrotsub.c: parrotsub.pmc
-	$(PMC2C) parrotsub.pmc
-
-parrotsub$(O): $(H_FILES)
-
-parrotcoroutine.c: parrotcoroutine.pmc
-	$(PMC2C) parrotcoroutine.pmc
-
-parrotcoroutine$(O): $(H_FILES)
-
-intqueue.c: intqueue.pmc
-	$(PERL) pmc2c.pl intqueue.pmc
-
-intqueue$(O): $(H_FILES)
+${pmc_build}
 
 clean:
 	$(RM_F) *.c *$(O) default.h

@@ -13,6 +13,7 @@ use vars qw(@steps);
 	inter/types.pl
 	inter/ops.pl
 	inter/exp.pl
+	inter/pmc.pl
 	auto/headers.pl
 	auto/sizes.pl
 	auto/byteorder.pl
