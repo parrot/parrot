@@ -60,7 +60,10 @@ it has to start with a number.
 
 =item -o outputfile
 
-Act like assembler. Don't run code, except B<-r> is given too.
+Act like assembler. Don't run code, except B<-r> is given too. If the
+outputfile ends with B<.pbc> a PBC file is written. If it ends with
+B<.pasm> a PASM output is generated, even from PASM input. This canbe
+handy to check various optimizations including B<-Op>.
 
 =item -r, --run-pbc
 
@@ -79,9 +82,10 @@ Turn on yydebug in F<yacc>/F<bison>.
 
 Optimize
 
- -O0 no opimization
+ -O0 no opimization (default)
  -O1 optimizations w/o life info (e.g. branches)
  -O2 optimizations with life info
+ -Op rewrite I and N PASM registers most used first
 
 This will probably change.
 
@@ -120,6 +124,7 @@ for running the program.
  imcc x.pasm		run
  imcc x.pbc		run
  -o x.pasm x.imc	ass		x.pasm
+ -o x.pasm y.pasm	ass		x.pasm
  -o x.pbc  x.imc	ass		x.pbc
  -o x.pbc  x.pasm	ass		x.pbc
  -o x.pbc -r x.pasm	ass/run		x.pbc

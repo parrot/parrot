@@ -59,7 +59,7 @@ static int loop_optimization(struct Parrot_Interp *);
 static int clone_remove(void);
 
 void pre_optimize(struct Parrot_Interp *interp) {
-    if (*optimizer_opt != '0') {      /* XXX */
+    if (optimizer_level & OPT_PRE) {      /* XXX */
         subst_constants_mix(interp);
         subst_constants_umix(interp);
         subst_constants(interp);
@@ -75,7 +75,7 @@ void pre_optimize(struct Parrot_Interp *interp) {
 
 int optimize(struct Parrot_Interp *interp) {
 
-    if (*optimizer_opt > '1') {      /* XXX */
+    if (optimizer_level & OPT_CFG) {
         /* constant_propagation(); N/Y */
         if (clone_remove())
             return 1;
@@ -258,6 +258,7 @@ static void strength_reduce(struct Parrot_Interp *interp)
         for (i = 0; i < 4; i++) {
             if (ins->opsize == 4 &&
                     ins->r[0] == ins->r[1] &&
+                    (ins->r[0]->set == 'I' || ins->r[0]->set == 'N') &&
                     !strcmp(ins->op, ops[i])) {
                 debug(DEBUG_OPT1, "opt1 %s => ", ins_string(ins));
                 ins->r[1] = ins->r[2];
@@ -386,7 +387,7 @@ subst_constants_umix(struct Parrot_Interp *interp)
 {
     Instruction *ins, *tmp;
     const char *ops[] = {
-        "add", "div", "mul", "sub", "set"
+        "add", "div", "mul", "sub"
     };
     size_t i;
     char b[128];
@@ -767,7 +768,8 @@ int dead_code_remove(void)
     int changed = 0;
     Instruction *ins, *last;
 
-    if (*optimizer_opt == '0')       /* XXX */
+    /* this could be a separate level, now it's done with -O1 */
+    if (!(optimizer_level & OPT_PRE))
         return 0;
     for (i=1; bb_list[i]; i++) {
 	bb = bb_list[i];
@@ -775,8 +777,11 @@ int dead_code_remove(void)
             continue;
         /* this block isn't entered from anywhere */
         if (!bb->pred_list) {
+            int bbi = bb->index;
             debug(DEBUG_OPT1, "found dead block %d\n", bb->index);
-            for (ins = bb->start; ins; ) {
+            for (ins = bb->start; ins && ins->index == bbi; ) {
+                debug(DEBUG_OPT1, "unreachable ins deleted %s\n",
+                    ins_string(ins));
                 ins = delete_ins(ins, 1);
                 ostat.deleted_ins++;
                 changed++;
@@ -789,7 +794,7 @@ int dead_code_remove(void)
         return changed;
     for (last = instructions, ins=last->next; last && ins; ins = ins->next) {
         if ((last->type & IF_goto) && !(ins->type & ITLABEL)) {
-            debug(DEBUG_CFG, "unreachable ins deleted %s\n",
+            debug(DEBUG_OPT1, "unreachable ins deleted %s\n",
                     ins_string(ins));
             ins = delete_ins(ins, 1);
             ostat.deleted_ins++;
@@ -799,16 +804,18 @@ int dead_code_remove(void)
          *   branch L1     => --
          * L1: ...            L1:
          */
-        if ((last->type & IF_goto) && (ins->type & ITLABEL) &&
+        if (ins && last && (last->type & IF_goto) && (ins->type & ITLABEL) &&
                 !strcmp(last->op, "branch") &&
                 !strcmp(last->r[0]->name, ins->r[0]->name)) {
-            debug(DEBUG_CFG, "dead branch deleted %s\n",
+            debug(DEBUG_OPT1, "dead branch deleted %s\n",
                     ins_string(ins));
             ins = delete_ins(last, 1);
             ostat.deleted_ins++;
             changed++;
         }
         last = ins;
+        if (!ins)
+            break;
     }
     return changed;
 }
@@ -1013,7 +1020,7 @@ move_ins_out(struct Parrot_Interp *interp, Instruction **ins, Basic_block *bb)
     debug(DEBUG_OPT2, "inserting it in blk %d after %s\n", pred->index,
             ins_string(out));
     *ins = move_ins(*ins, out);
-    if (DEBUG_OPT2 & IMCC_DEBUG) {
+    if (0 && (DEBUG_OPT2 & IMCC_DEBUG)) {
         char buf[256];
         SymReg * regs[IMCC_MAX_REGS];
         Instruction * tmp;

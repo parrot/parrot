@@ -1,3 +1,13 @@
+- 2003-02-20	leo / Juergen Boemmel
+
+	* version 0.0.9.14
+	* macro preprocessor - thanks Juergen Boemmels
+	  s. docs/macros.pod
+
+	* lot of constants optimizations, like add I0, 10, 20
+	* reorganized optimization levels
+	* run allocate for PASM code too, if optimizing
+
 - 2003-02-08 	leo
         * changed branch_branch to optimize a sequence of absolute
 	  branches to branch to the final target

@@ -19,9 +19,10 @@
 #include "pbc.h"
 #include "parser.h"
 
-#define IMCC_VERSION "0.0.9.13"
+#define IMCC_VERSION "0.0.9.14"
 
 static int run_pbc, write_pbc;
+static char optimizer_opt[20];
 extern FILE *yyin;
 
 static void usage(FILE *fp)
@@ -198,9 +199,22 @@ int main(int argc, char * argv[])
     /* register PASM and PIR compilers to parrot core */
     register_compilers(interpreter);
 
-    /* default optimizations, s. optimizer.c */
-    if (!*optimizer_opt)
+    /* default optimizations, s. optimizer.c, imc.h */
+    if (!*optimizer_opt) {
         strcpy(optimizer_opt, "0");
+        optimizer_level = 0;
+    }
+    else {
+        if (strchr(optimizer_opt, '1'))
+            optimizer_level |= OPT_PRE;
+        if (strchr(optimizer_opt, '2'))
+            optimizer_level |= (OPT_CFG | OPT_PRE);
+        if (strchr(optimizer_opt, 'j'))
+            optimizer_level |= OPT_J;
+        if (strchr(optimizer_opt, 'p'))
+            optimizer_level |= OPT_PASM;
+    }
+
 
     if (!sourcefile || !*sourcefile) {
         fatal(EX_NOINPUT, "main", "No source file specified.\n" );
@@ -217,8 +231,6 @@ int main(int argc, char * argv[])
         ext = strrchr(sourcefile, '.');
         if (ext && strcmp (ext, ".pasm") == 0) {
             pasm_file = 1;
-            if (output)
-                write_pbc = 1;
         }
         else if (ext && strcmp (ext, ".pbc") == 0) {
             run_pbc = 2;
@@ -232,6 +244,8 @@ int main(int argc, char * argv[])
         if (ext && strcmp (ext, ".pbc") == 0) {
             write_pbc = 1;
         }
+        if (!strcmp(sourcefile, output))
+            fatal(1, "main", "outputfile is sourcefile\n");
     }
 
     if (IMCC_VERBOSE) {
@@ -253,7 +267,8 @@ int main(int argc, char * argv[])
     }
     else {
         int per_pbc = write_pbc | run_pbc;
-        info(1, "using optimization '%s'\n", optimizer_opt);
+        info(1, "using optimization '%s' (%x) \n", optimizer_opt,
+                optimizer_level);
         pf = PackFile_new(0);
         Parrot_loadbc(interpreter, pf);
 

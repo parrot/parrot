@@ -259,12 +259,14 @@ store_labels(struct Parrot_Interp *interpreter, int *src_lines, int oldsize)
             store_label(ins->r[0], pc);
             ins->r[0]->color = pc;
         }
-        else if (!strcmp(ins->op, "bsr")) {
-            if (!(ins->r[0]->type & VTREGISTER))
-                store_bsr(ins->r[0], pc, 1);
+        else if (ins->type & ITBRANCH) {
+            if (!strcmp(ins->op, "bsr")) {
+                if (!(ins->r[0]->type & VTREGISTER))
+                    store_bsr(ins->r[0], pc, 1);
+            }
+            else if (!strcmp(ins->op, "set_addr"))
+                store_bsr(ins->r[1], pc, 2);
         }
-        else if (!strcmp(ins->op, "set_addr"))
-            store_bsr(ins->r[1], pc, 2);
         else if (!strcmp(ins->op, "compile"))
             ++has_compile;
         pc += ins->opsize;

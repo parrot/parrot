@@ -19,6 +19,7 @@ static void make_stat(int *sets, int *cols);
 static void imc_stat_init(void);
 static void print_stat(void);
 
+extern int pasm_file;
 /* Globals: */
 
 static IMCStack nodeStack;
@@ -41,6 +42,8 @@ void allocate(struct Parrot_Interp *interpreter) {
 
     if (!instructions)
         return;
+    if (!optimizer_level && pasm_file)
+        return;
 
     debug(DEBUG_IMC, "\n------------------------\n");
     debug(DEBUG_IMC, "processing sub %s\n", function);
@@ -48,26 +51,36 @@ void allocate(struct Parrot_Interp *interpreter) {
     if (IMCC_VERBOSE > 1 || (IMCC_DEBUG & DEBUG_IMC))
         imc_stat_init();
 
+    info(2, "pre_optimize\n");
     /* consecutive labels, if_branch, unused_labels ... */
     pre_optimize(interpreter);
+    if (optimizer_level == OPT_PRE && pasm_file)
+        return;
 
     nodeStack = imcstack_new();
     dont_optimize = n_spilled = 0;
 
     todo = 1;
     while (todo) {
+        info(2, "find_basic_blocks\n");
         find_basic_blocks();
+        info(2, "build_cfg\n");
         build_cfg();
 
         if (!dont_optimize && dead_code_remove()) {
+            info(2, "pre_optimize\n");
             pre_optimize(interpreter);
             continue;
         }
 
+        info(2, "compute_dominators\n");
         compute_dominators();
+        info(2, "find_loops\n");
         find_loops();
 
+        info(2, "build_reglist\n");
         build_reglist();
+        info(2, "life_analysis\n");
         life_analysis();
         /* optimize, as long as there is something to do -
          * but not, if we found a set_addr, which means
@@ -76,15 +89,17 @@ void allocate(struct Parrot_Interp *interpreter) {
             dump_symreg();
         if (dont_optimize)
             todo = 0;
-        else
+        else {
+            info(2, "optimize\n");
             todo = optimize(interpreter);
+        }
     }
     todo = 1;
     while (todo) {
         build_interference_graph();
         compute_spilling_costs();
         /* simplify until no changes can be made */
-        while (simplify()) {}
+        /* while (simplify()) {} */
         order_spilling();          /* puts the remaing item on stack */
 
         to_spill = try_allocate();
@@ -99,6 +114,8 @@ void allocate(struct Parrot_Interp *interpreter) {
             todo = 0;
         }
     }
+    if (IMCC_DEBUG & DEBUG_IMC)
+        dump_instructions();
     if (IMCC_VERBOSE > 1 || (IMCC_DEBUG & DEBUG_IMC))
         print_stat();
     free_reglist();
@@ -222,6 +239,11 @@ void build_reglist(void) {
                     reglist[count++] = r->reg;
                 else
                     reglist[count++] = r;
+                /* rearange I registers */
+                if ((optimizer_level & OPT_PASM) && pasm_file &&
+                        (reglist[count-1]->set == 'I' ||
+                        reglist[count-1]->set == 'N'))
+                    reglist[count-1]->color = -1;
             }
         }
     }
@@ -538,7 +560,7 @@ int try_allocate() {
 	for(t = 0; t < 4; t++) {
 	    int typ = "INSP"[t];
 	    memset(colors, 0, sizeof(colors));
-	    if (reglist[x]->set == typ) {
+	    if (reglist[x]->set == typ && reglist[x]->color == -1) {
 		free_colors = map_colors(x, graph, colors, typ);
 		if (free_colors > 0) {
 		    for(color = 0; color < MAX_COLOR - (typ=='P'); color++) {

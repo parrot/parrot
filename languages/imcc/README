@@ -224,5 +224,5 @@ Sean O'Rourke <seano@cpan.org>   ... anyop, iANY
 Leopold Toetsch <lt@toetsch.at>  ... numerous bugfixes/cleanup/rewrite
                                      optimizer.c
 				     run parrot code inside imcc
-
+Juergen Boemmels <boemmels@physik.uni-kl.de> Macro preprocessor
 

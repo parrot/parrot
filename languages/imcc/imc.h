@@ -77,8 +77,16 @@ EXTERN SymReg** reglist;
 EXTERN char * sourcefile;	/* current file */
 EXTERN char * function;	/* current function */
 EXTERN int        line;	/* and line */
-EXTERN char optimizer_opt[20];
+EXTERN int optimizer_level;
 EXTERN int dont_optimize;
+
+enum {
+	OPT_NONE,
+	OPT_PRE,
+	OPT_CFG = 	0x002,
+	OPT_PASM =      0x100,
+	OPT_J = 	0x200
+} enum_opt;
 
 struct imcc_ostat {
 	int deleted_labels;

@@ -270,34 +270,11 @@ Instruction *move_ins(Instruction *ins, Instruction *to)
 /* Emits the instructions buffered in 'instructions' */
 Instruction * emitb(Instruction * i) {
 
-    Instruction *prev;
-
     if (!i)
 	return 0;
     if(!instructions)
         last_ins = instructions = i;
     else {
-        if ((last_ins->type & IF_goto) && !(i->type & ITLABEL)) {
-            debug(DEBUG_CFG, "unreachable ins dropped line %d op %s\n",
-                    line - 1, i->op);
-            return i;
-        }
-        if ((last_ins->type & IF_goto) && (i->type & ITLABEL) &&
-                !strcmp(last_ins->op, "branch") &&
-                !strcmp(last_ins->r[0]->name, i->r[0]->name)) {
-            debug(DEBUG_CFG, "dead branch dropped line %d op %s\n",
-                    line - 1, i->op);
-            prev = last_ins->prev;
-            if (!prev)
-                instructions = i;
-            else
-                prev->next = i;
-            i->prev = prev;
-            free_ins(last_ins);
-            last_ins = i;
-            i->line = line - 1;
-            return i;
-        }
 	last_ins->next = i;
         i->prev = last_ins;
 	last_ins = i;

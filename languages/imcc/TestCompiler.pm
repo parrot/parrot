@@ -61,6 +61,7 @@ sub generate_functions {
 	$gen_pasm = 1 if ($by_f =~ m!/imcpasm/!);
 	my $opt = '';
 	$opt = "-O$1" if ($by_f =~ m!/imcpasm/opt(.)!);
+	$opt = "-O1" if ($by_f =~ m!/imcpasm/cfg!);
 
 	$output =~ s/\cM\cJ/\n/g;
 	if ($gen_pasm) {

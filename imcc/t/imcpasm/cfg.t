@@ -48,6 +48,5 @@ L:
 .end
 CODE
 _test:
-L:
   end
 OUT

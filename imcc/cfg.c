@@ -47,8 +47,9 @@ void find_basic_blocks () {
              * when we have the target here
              * and it doesn't saveall - like P6C recursive bsr's
              */
-            if (!strcmp(ins->op, "bsr")) {
-                char *name = ins->r[0]->name;
+            if (!strcmp(ins->op, "bsr") || !strcmp(ins->op, "set_addr")) {
+                char *name =
+                    *ins->op == 'b' ? ins->r[0]->name : ins->r[1]->name;
                 found = 0;
                 for (lab = instructions; lab; lab = lab->next) {
                     if ((lab->type & ITLABEL) &&
