@@ -119,6 +119,11 @@ get_new_pmc_header(struct Parrot_Interp *interpreter, INTVAL base_type,
         PANIC("Null vtable used");
         return NULL;
     }
+#if 1 /*GC_VERBOSE */
+    if (Interp_flags_TEST(interpreter, PARROT_TRACE_FLAG)) {
+        fprintf(stderr, "\t=> new %p type %d\n", pmc, (int)base_type);
+    }
+#endif
 
     return pmc;
 }
@@ -138,7 +143,7 @@ the C<synchronize> structure and init the mutex.
 static void
 pmc_new_ext(Parrot_Interp interpreter, PMC *pmc, INTVAL base_type)
 {
-    if (pmc->vtable->flags & VTABLE_PMC_NEEDS_EXT)
+    if (pmc->vtable->flags & VTABLE_PMC_NEEDS_EXT) {
         add_pmc_ext(interpreter, pmc);
 
         if (pmc->vtable->flags & VTABLE_IS_SHARED_FLAG) {
@@ -147,6 +152,7 @@ pmc_new_ext(Parrot_Interp interpreter, PMC *pmc, INTVAL base_type)
             MUTEX_INIT(PMC_sync(pmc)->pmc_lock);
             PObj_is_PMC_shared_SET(pmc);
         }
+    }
 }
 
 /*

@@ -210,7 +210,8 @@ trace_op_dump(struct Parrot_Interp *interpreter, opcode_t *code_start,
                             interpreter->pmc_reg.registers[*(pc + i)]);
                 }
                 else
-                    PIO_eprintf(interpreter, "P%vd", *(pc + i));
+                    PIO_eprintf(interpreter, "P%vd=PMC(%#p) ",
+                            *(pc + i), REG_PMC(*(pc + i)));
                 break;
             case PARROT_ARG_S:
                 if (interpreter->string_reg.registers[*(pc + i)]) {

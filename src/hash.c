@@ -253,6 +253,7 @@ promote_hash_key(Interp *interpreter, Hash *hash, void *key, int for_insert)
     const ENCODING * enc;
     const CHARTYPE * typ;
 
+    assert(key);
     switch (hash->key_type) {
         case Hash_key_type_int:
         case Hash_key_type_cstring:
@@ -335,13 +336,21 @@ void
 dump_hash(Interp *interpreter, Hash *hash)
 {
     HashIndex i;
-    PIO_eprintf(interpreter, "Hashtable[%vd/%vd]\n", hash->entries,
-                hash->max_chain + 1);
+    int j;
+
+    /* don't allow bucket to move  - also PIO_printf might cause
+     * DOD runs so turn all off
+     */
+    Parrot_block_DOD(interpreter);
+    Parrot_block_GC(interpreter);
+    PIO_eprintf(interpreter, "Hashtable at %#p[%vd/%vd]\n",
+            hash, hash->entries, hash->max_chain + 1);
 
     /* Iterate one past the end of the hashtable, so we can use the
      * last value as a special case for dumping out the free bucket
      * list. */
-    for (i = 0; i <= hash->max_chain + 1; i++) {
+#define DUMP_FREE_CHAIN 0
+    for (i = 0; i <= hash->max_chain + DUMP_FREE_CHAIN; i++) {
         HashBucket *bucket;
         if (i > hash->max_chain)
             bucket = getBucket(hash, hash->free_list);
@@ -349,17 +358,23 @@ dump_hash(Interp *interpreter, Hash *hash)
             bucket = lookupBucket(hash, i);
         if (bucket == NULL)
             continue;
-        PIO_eprintf(interpreter, "  Bucket %vd: ", i);
+        j = 0;
+        PIO_eprintf(interpreter, " Bucket #%vd ", i);
         while (bucket) {
-            Parrot_block_GC(interpreter); /* don't allow bucket to move */
-            PIO_eprintf(interpreter, "(%p)", bucket->value);
-            Parrot_unblock_GC(interpreter);
+            PIO_eprintf(interpreter, " %#p '%Ss' => %#p",
+                    bucket->key, bucket->key, bucket->value);
             bucket = getBucket(hash, bucket->next);
             if (bucket)
                 PIO_eprintf(interpreter, " -> ");
+            if (++j > 10) {
+                PIO_eprintf(interpreter, "chain too long - stopped\n");
+                break;
+            }
         }
         PIO_eprintf(interpreter, "\n");
     }
+    Parrot_unblock_GC(interpreter);
+    Parrot_unblock_DOD(interpreter);
 }
 
 /*
@@ -377,6 +392,7 @@ void
 mark_hash(Interp *interpreter, Hash *hash)
 {
     HashIndex i;
+    UINTVAL found = 0;
 
     pobject_lives(interpreter, (PObj *)hash);
 
@@ -394,11 +410,15 @@ mark_hash(Interp *interpreter, Hash *hash)
     for (i = 0; i <= hash->max_chain; i++) {
         HashBucket *bucket = lookupBucket(hash, i);
         while (bucket) {
-            if (hash->mark_key)
+            if (++found > hash->entries)
+                internal_exception(1,
+                        "Detected hash corruption at hash %p entries %d",
+                        hash, (int)hash->entries);
+            if (hash->mark_key && (PObj *)bucket->key)
                 (hash->mark_key)(interpreter, (PObj *)bucket->key);
-            if (hash->entry_type == enum_hash_string)
+            if (hash->entry_type == enum_hash_string && (PObj *)bucket->value)
                 pobject_lives(interpreter, (PObj *)bucket->value);
-            else if (hash->entry_type == enum_hash_pmc)
+            else if (hash->entry_type == enum_hash_pmc && (PObj *)bucket->value)
                 pobject_lives(interpreter, (PObj *)bucket->value);
             bucket = getBucket(hash, bucket->next);
         }

@@ -306,6 +306,7 @@ struct PackFile_Debug * Parrot_new_debug_seg(struct Parrot_Interp *,
 ** PackFile_ConstTable Functions:
 */
 
+void mark_const_subs(Parrot_Interp interpreter);
 void PackFile_ConstTable_clear(struct PackFile_ConstTable * self);
 
 void PackFile_ConstTable_dump(struct Parrot_Interp *,

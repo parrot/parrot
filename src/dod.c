@@ -141,14 +141,32 @@ void pobject_lives(struct Parrot_Interp *interpreter, PObj *obj)
     if (*dod_flags & ((PObj_on_free_list_FLAG | PObj_live_FLAG) << nm))
         return;
 
+#ifdef DEBUG_DOD_CONSTS
+    if (PObj_is_PMC_TEST(obj) &&
+            ((PMC*)obj)->vtable->base_type != enum_class_SArray &&
+            ((PMC*)obj)->vtable->base_type != enum_class_Null
+            )
+        assert(!PObj_constant_TEST(obj));
+#endif
+
     ++arena->live_objects;
     *dod_flags |= PObj_live_FLAG << nm;
 
+#if GC_VERBOSE
+        if (PObj_report_TEST(obj)) {
+            fprintf(stderr, "GC: PMC %p live\n", obj);
+        }
+#endif
     if (*dod_flags & (PObj_is_special_PMC_FLAG << nm)) {
         /* all PMCs that need special treatment are handled here
          * for normal PMCs, we don't touch the PMC memory itself
          * so that caches stay clean
          */
+#if GC_VERBOSE
+        if (PObj_report_TEST(obj)) {
+            fprintf(stderr, "GC: PMC %p special\n", obj);
+        }
+#endif
         mark_special(interpreter, (PMC*) obj);
     }
 }
@@ -207,6 +225,7 @@ GC.
 
 */
 
+
 static int
 trace_active_PMCs(struct Parrot_Interp *interpreter, int trace_stack)
 {
@@ -225,7 +244,6 @@ trace_active_PMCs(struct Parrot_Interp *interpreter, int trace_stack)
 
     /* mark it as used  */
     pobject_lives(interpreter, (PObj *)interpreter->iglobals);
-    pobject_lives(interpreter, interpreter->ctx.warns);
     /* Now, go run through the PMC registers and mark them as live */
     /* First mark the current set. */
     for (i = 0; i < NUM_REGISTERS; i++) {
@@ -241,6 +259,8 @@ trace_active_PMCs(struct Parrot_Interp *interpreter, int trace_stack)
         pobject_lives(interpreter, (PObj *)stash->stash_hash);
         stash = stash->parent_stash;
     }
+    /* s. packfile.c */
+    mark_const_subs(interpreter);
 
     /* mark NCI meth hash */
     for (i = 0; i < interpreter->nci_method_table_size; ++i) {
@@ -985,7 +1005,7 @@ Parrot_do_dod_run(struct Parrot_Interp *interpreter, UINTVAL flags)
     Parrot_block_DOD(interpreter);
     if (Interp_flags_TEST(interpreter, PARROT_TRACE_FLAG)) {
         /* no PIO_printf here */
-        fprintf(stderr, "# GC run\n");
+        fprintf(stderr, "# DOD run\n");
     }
     /*
      * tell the threading system that we gonna DOD mark

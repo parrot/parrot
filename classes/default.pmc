@@ -31,7 +31,7 @@ static const char * caller(Parrot_Interp interp, PMC * pmc);
 
 =item C<static const char *caller(Parrot_Interp interp, PMC *pmc)>
 
-Returns a C string for the name of C<*pmc>. 
+Returns a C string for the name of C<*pmc>.
 
 =cut
 
@@ -112,8 +112,8 @@ does_isa (Parrot_Interp interp, STRING *method, STRING *what)
             pos += len;
             continue;
         }
-    
-        if (pos+len < (INTVAL)string_length(what) && 
+
+        if (pos+len < (INTVAL)string_length(what) &&
             string_index(what, pos + len) != 32) {
             pos += len;
             continue;
@@ -238,6 +238,9 @@ Sets the property for C<*key> to C<*value>.
             /* then the key, else it vanishes with --gc-debug */
             VTABLE_set_pmc_keyed_str(interpreter,
                 PMC_metadata(SELF), key, value);
+#if 0
+    PObj_report_SET(PMC_metadata(SELF));
+#endif
         }
         return;
     }
@@ -337,10 +340,10 @@ found then C<NULL> is returned.
     PMC* find_method(STRING* method_name) {
         PMC *meth_hash;
         int type = SELF->vtable->base_type;
-    
+
         if (type >= (int)INTERP->nci_method_table_size)
             return NULL;
-    
+
         meth_hash = INTERP->nci_method_table[type];
         if (!meth_hash)
             return NULL;
@@ -690,10 +693,10 @@ Returns whether the PMC "can" perform C<*method>.
     INTVAL can (STRING* method) {
         PMC *meth_hash;
         int type = SELF->vtable->base_type;
-    
+
         if (type >= (int)INTERP->nci_method_table_size)
             return 0;
-    
+
         meth_hash = INTERP->nci_method_table[type];
         if (!meth_hash)
             return 0;

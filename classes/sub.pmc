@@ -28,7 +28,7 @@ These are the vtable functions for the Sub (subroutine) base class
 Print name and location of suroutine this should finally use the label
 name of the frozen C<Sub> PMC image for now locate the C<Sub> name in
 the globals.
- 
+
 =cut
 
 */
@@ -65,7 +65,7 @@ pmclass Sub {
 =item C<void init()>
 
 Initializes the subroutine.
- 
+
 =cut
 
 */
@@ -85,7 +85,7 @@ Initializes the subroutine.
 =item C<void destroy()>
 
 Destroys the subroutine.
- 
+
 =cut
 
 */
@@ -108,6 +108,7 @@ Marks the subroutine as live.
     void mark () {
         struct Parrot_Sub * sub = (struct Parrot_Sub *)PMC_sub(SELF);
         pobject_lives(INTERP, sub->ctx.warns);
+        pobject_lives(INTERP, sub->ctx.errors);
     }
 
 /*
@@ -115,7 +116,7 @@ Marks the subroutine as live.
 =item C<void set_pointer(void *value)>
 
 Sets the pointer to the actual subroutine.
- 
+
 =cut
 
 */
@@ -130,7 +131,7 @@ Sets the pointer to the actual subroutine.
 =item C<void *get_pointer()>
 
 Returns the pointer to the actual subroutine.
- 
+
 =cut
 
 */
@@ -146,7 +147,7 @@ Returns the pointer to the actual subroutine.
 I<This just unconditionally returns the start of bytecode. It's wrong,
 wrong, wrong, *WRONG*. And there's no other good way, so it's here for
 now.> -DRS
- 
+
 =cut
 
 */
@@ -161,7 +162,7 @@ now.> -DRS
 =item C<INTVAL defined()>
 
 Returns whether the subroutine is defined.
- 
+
 =cut
 
 */
@@ -175,7 +176,7 @@ Returns whether the subroutine is defined.
 =item C<void *invoke(void *next)>
 
 Invokes the subroutine.
- 
+
 =cut
 
 */
@@ -197,7 +198,7 @@ Invokes the subroutine.
 =item C<PMC *clone()>
 
 Creates and returns a clone of the subroutine.
- 
+
 =cut
 
 */
@@ -218,7 +219,7 @@ Creates and returns a clone of the subroutine.
 =item C<void set_same(PMC *value)>
 
 Sets the subroutine to C<*value>.
- 
+
 =cut
 
 */
@@ -232,7 +233,7 @@ Sets the subroutine to C<*value>.
 =item C<INTVAL is_equal(PMC *value)>
 
 Returns whether the two subroutines are equal.
- 
+
 =cut
 
 */
@@ -247,7 +248,7 @@ Returns whether the two subroutines are equal.
 =item C<void freeze(visit_info *info)>
 
 Archives the subroutine.
- 
+
 =cut
 
 */
@@ -256,7 +257,7 @@ Archives the subroutine.
         IMAGE_IO *io = info->image_io;
         struct Parrot_Sub * sub = (struct Parrot_Sub *)PMC_sub(SELF);
         size_t start_offs, end_offs;
-    
+
         SUPER(info);
         /*
          * we currently need to write 3 items
@@ -265,13 +266,13 @@ Archives the subroutine.
          * - end   offset in byte-code segment
          * - segment TODO
          */
-    
+
         /*
          * if sub addresses are absolute, the flag is set
          */
         if (PObj_get_FLAGS(SELF) & PObj_private1_FLAG) {
             ptrdiff_t code = (ptrdiff_t) sub->seg->base.data;
-    
+
             start_offs = ((ptrdiff_t) PMC_struct_val(SELF) - code) /
             sizeof(opcode_t*);
             end_offs = ((ptrdiff_t)sub->end - code) /
@@ -290,7 +291,7 @@ Archives the subroutine.
 =item C<void thaw(visit_info *info)>
 
 Unarchives the subroutine.
- 
+
 =cut
 
 */
@@ -298,7 +299,7 @@ Unarchives the subroutine.
     void thaw(visit_info *info) {
         IMAGE_IO *io = info->image_io;
         SUPER(info);
-    
+
         if (info->extra_flags == EXTRA_IS_NULL) {
             struct Parrot_Sub * sub = (struct Parrot_Sub *)PMC_sub(SELF);
             size_t start_offs, end_offs;
@@ -318,7 +319,7 @@ Unarchives the subroutine.
 =item C<void thawfinish(visit_info *info)>
 
 Called after the subroutine as been unarchived.
- 
+
 =cut
 
 */
@@ -330,7 +331,7 @@ Called after the subroutine as been unarchived.
         opcode_t *code;
         struct Parrot_Sub * sub = (struct Parrot_Sub *)PMC_sub(SELF);
         opcode_t *start_offs, *end_offs;
-    
+
         /* its absolute */
         if (PObj_get_FLAGS(SELF) & PObj_private1_FLAG)
             return;

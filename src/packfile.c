@@ -326,6 +326,41 @@ do_sub_pragmas(Parrot_Interp interpreter, struct PackFile *self, int action)
         }
     }
 }
+
+/*
+ * while the PMCs should be constant, there possible contents like
+ * a property isn't conctructed const so we have to mark them
+ * XXX marks only the 1st PackFile
+ */
+void
+mark_const_subs(Parrot_Interp interpreter)
+{
+    opcode_t i, ci;
+    struct PackFile_FixupTable *ft;
+    struct PackFile_ConstTable *ct;
+    struct PackFile *self;
+    PMC *sub_pmc;
+
+    self = interpreter->code;
+    if (!self || !self->cur_cs)
+        return;
+    ft = self->cur_cs->fixups;
+    if (!ft)
+        return;
+    ct = self->cur_cs->consts;
+    if (!ct)
+        return;
+    for (i = 0; i < ft->fixup_count; i++) {
+        switch (ft->fixups[i]->type) {
+            case enum_fixup_sub:
+                ci = ft->fixups[i]->offset;
+                sub_pmc = ct->constants[ci]->u.key;
+                pobject_lives(interpreter, (PObj *)sub_pmc);
+                break;
+        }
+    }
+}
+
 /*
 
 =item C<static void
@@ -2739,7 +2774,11 @@ PackFile_Constant_unpack_pmc(struct Parrot_Interp *interpreter,
      * make a constant subroutine object of the desired class
      */
     pmc_num = pmc_type(interpreter, string_from_cstring(interpreter, class, 0));
-    sub_pmc = constant_pmc_new_noinit(interpreter, pmc_num);
+    /*
+     * should be constant but that doesn't work, if
+     * properties get attached to the sub
+     */
+    sub_pmc = pmc_new_noinit(interpreter, pmc_num);
     /*
      * this places the current bytecode segment in the Parrot_Sub
      * structure, which needs interpreter->code
@@ -2747,6 +2786,9 @@ PackFile_Constant_unpack_pmc(struct Parrot_Interp *interpreter,
     pf_save = interpreter->code;
     interpreter->code = pf;
     VTABLE_init(interpreter, sub_pmc);
+#if 0
+    PObj_report_SET(sub_pmc);
+#endif
 
     /* both start and end are relative, so are small -
      * cast for 64-bit compilers where sizeof(int)=4, sizeof(long)=8
