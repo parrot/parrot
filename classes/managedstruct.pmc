@@ -34,33 +34,37 @@ pmclass ManagedStruct extends UnManagedStruct {
 
     /* For out of bounds gets, will return -1 */
     INTVAL get_integer_keyed(PMC* key) {
-		INTVAL ix;
-		
-		if (!key) return -1;
+	INTVAL ix;
+
+	if (!key) 
+            return -1;
         ix = key_integer(INTERP, key);
-        if (ix < 0) return -1;
-		if (ix > SELF->cache.int_val) 
-			return -1;
-		return  (unsigned char)((char *)SELF->data)[ix];      
+        if (ix < 0) 
+            return -1;
+	if (ix >= SELF->cache.int_val) 
+	    return -1;
+	return  (unsigned char)((char *)SELF->data)[ix];      
         
     }
     
     /* For out of bounds sets, will do noop */
     void set_integer_keyed (PMC* key, INTVAL value) {
-		INTVAL ix;
-		
-        if (!key) return;
+        INTVAL ix;
+	
+        if (!key) 
+            return;
         ix = key_integer(INTERP, key);
-        if (ix < 0) return;
-		if (ix > SELF->cache.int_val)
-			return;
-		((char *)SELF->data)[ix]=(0xff & value);
-		return;
-	}
+        if (ix < 0) 
+            return;
+        if (ix >= SELF->cache.int_val)
+	    return;
+        ((char *)SELF->data)[ix]=(0xff & value);
+        return;
+    }
    
- 	INTVAL get_integer () {
-		return(SELF->cache.int_val);
-	}
+    INTVAL get_integer () {
+        return(SELF->cache.int_val);
+    }
 
     void set_integer_native (INTVAL value) {
 		if (SELF->data && (! value)) {

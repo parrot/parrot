@@ -73,13 +73,19 @@ OUTPUT
 output_is(<<'CODE', <<'OUTPUT', "Getting out-of-bounds elements");
         new P0, .ManagedStruct
         set P0, 1
-	set I0, P0[2]
-	eq I0, -1, OK_1
+        set I0, P0[1]
+        eq I0, -1, OK_1
 	print "not "
 OK_1:	print "ok 1\n"
+
+	set I0, P0[10]
+	eq I0, -1, OK_2
+	print "not "
+OK_2:	print "ok 2\n"
 	end
 CODE
 ok 1
+ok 2
 OUTPUT
 
 output_is(<<'CODE', <<'OUTPUT', "Re-allocating space (growing)");
@@ -105,9 +111,15 @@ output_is(<<'CODE', <<'OUTPUT', "Re-allocating space (shrinking)");
         eq I0, -1, OK_1
 	print "not "
 OK_1:	print "ok 1\n"
+        set P0, 0
+        set I0, P0
+        eq I0, 0, OK_2
+	print "not "
+OK_2:	print "ok 2\n"
 	end
 CODE
 ok 1
+ok 2
 OUTPUT
 
 1;
