@@ -17,7 +17,7 @@ necessary system-specific files before building Parrot.
 
 =head2 Command-line Options
 
-=head3 General Options
+General Options
 
 =over
 
@@ -49,7 +49,7 @@ This turns on the user prompts.
 
 =back
 
-=head3 Compile Options
+Compile Options
 
 You can add and remove option values with C<< :rem{<opt>} >> and
 C<< :add{<opt>} >>. For example:
@@ -125,7 +125,7 @@ Currently needed to use inet_aton for systems that lack inet_pton:
 
 =back
 
-=head3 Parrot Options
+Parrot Options
 
 =over
 
@@ -169,7 +169,7 @@ C<gc>.
 
 =back
 
-=head3 Other Options (may not be implemented)
+Other Options (may not be implemented)
 
 =over
 
