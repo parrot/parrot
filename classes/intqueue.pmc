@@ -49,20 +49,24 @@ static void enqueue ( CONTAINER* container, INTVAL value ) {
 }
 
 static INTVAL dequeue ( CONTAINER* container ) {
-  INTVAL value = container->tail->value;
+  INTVAL value;
   if(container->head != container->tail) {
     BUCKET* cur = container->tail;
+    value = container->tail->value;
     container->tail = container->tail->prev;
     container->tail->next = NULL;
     free(cur);
   }
   else if(container->head != NULL) {
+    value = container->tail->value;
     free(container->head);
     container->head = NULL;
     container->tail = NULL;
   }
   else {
     fprintf(stderr,"*** dequeue tried to dequeue empty bucket\n");
+    /* XXX: Should raise an exception */
+    return 0;
   }
   return value;
 }

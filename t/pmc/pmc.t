@@ -1,6 +1,6 @@
 #! perl -w
 
-use Parrot::Test tests => 59;
+use Parrot::Test tests => 60;
 use Test::More;
 
 my $fp_equality_macro = <<'ENDOFMACRO';
@@ -1258,6 +1258,15 @@ ok 2
 ok 3
 ok 4
 OUTPUT
+
+output_is(<<CODE, <<OUTPUT, "IntQueue test");
+	new P0,.IntQueue
+        set I0, P0
+        end
+CODE
+*** dequeue tried to dequeue empty bucket
+OUTPUT
+
 
 output_is(<<CODE, <<OUTPUT, "mul_p_p, PerlInt");
 @{[ $fp_equality_macro ]}
