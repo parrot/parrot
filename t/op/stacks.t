@@ -1,6 +1,6 @@
 #! perl -w
 
-use Parrot::Test tests => 33;
+use Parrot::Test tests => 34;
 use Test::More;
 
 # Tests for stack operations, currently push*, push_*_c and pop*
@@ -695,7 +695,6 @@ CODE
 OUTPUT
 
 output_is(<<'CODE', <<'OUTPUT', "saveall/restoreall");
-        new P0,.PerlHash
         set S0,"test ok"
         set N0,4.3
         set I0,6
@@ -717,6 +716,25 @@ CODE
 test ok
 OUTPUT
 
+$code = $fp_equality_macro;
+$output = "";
+for (0..1024) {
+   $code .= "      set N0, $_\n";
+   $code .= "      set N31, " . (1024-$_) . "\n";
+   $code .= "      pushn\n";
+}
+for (0..1024) {
+   $code .= "      popn\n";
+   $code .= "      .fp_ne(N0," . (1024-$_) . ", FAIL)\n";
+   $code .= "      print \"ok$_\\n\"\n";
+   $code .= "      .fp_ne(N31, $_, FAIL)\n";
+   $code .= "      print \"ok$_\\n\"\n";
+   $output .= "ok$_\n";
+   $output .= "ok$_\n";
+}
+$code .= "      end\n";
+$code .= "FAIL: end\n";
+output_is($code, $output, "pushn & popn (deep)" );
 
 ##############################
 
