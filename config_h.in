@@ -7,17 +7,15 @@
 #if !defined(PARROT_CONFIG_H_GUARD)
 #define PARROT_CONFIG_H_GUARD
 
+/* ONLY PUT EMBEDDER-ACCESSIBLE SYMBOLS HERE!!! */
+
 #define PARROT_VERSION         "${VERSION}${DEVEL}"
 #define PARROT_CONFIG_DATE     "${configdate}"
 #define PARROT_MAJOR_VERSION    ${MAJOR}
 #define PARROT_MINOR_VERSION    ${MINOR}
 #define PARROT_PATCH_VERSION    ${PATCH}
 #define PARROT_ARCHNAME        "${jitarchname}"
-#define PARROT_CPU_ARCH        "${jitcpuarch}"
-#define PARROT_OS_NAME         "${jitosname}"
 #define PARROT_JIT_CAPABLE      ${jitcapable}
-#define PARROT_BYTEORDER        ${byteorder}
-#define PARROT_BIGENDIAN        ${bigendian}
 
 typedef ${iv}                   Parrot_Int;
 typedef unsigned ${iv}          Parrot_UInt;
@@ -32,7 +30,14 @@ struct PackFile;      typedef struct PackFile * Parrot_PackFile;
 
 #if defined(PARROT_IN_CORE)
 
+/* Put any other symbols here. */
+
 #include <stddef.h>
+
+#define PARROT_CPU_ARCH        "${jitcpuarch}"
+#define PARROT_OS_NAME         "${jitosname}"
+#define PARROT_BYTEORDER        ${byteorder}
+#define PARROT_BIGENDIAN        ${bigendian}
 
 typedef Parrot_Int INTVAL;
 typedef Parrot_UInt UINTVAL;
