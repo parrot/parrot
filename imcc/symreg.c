@@ -532,10 +532,11 @@ link_keys(int nargs, SymReg * keys[])
     /* first look, if we already have this exact key chain */
     for (i = 0; i < nargs; i++) {
         strcat(key_str, keys[i]->name);
+        /* TODO insert : to compare slices */
         if (i < nargs - 1)
             strcat(key_str, ";");
     }
-    if ( (keychain = _get_sym(h, key_str)) != 0) {
+    if (!any_slice && (keychain = _get_sym(h, key_str)) != 0) {
         free(key_str);
         return keychain;
     }

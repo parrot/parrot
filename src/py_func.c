@@ -719,7 +719,7 @@ Parrot_py_get_slice(Interp *interpreter, PMC *self, PMC *key)
 
     type = self->vtable->base_type;
     /*
-     * key is a keychaing PMC
+     * key is a keychain PMC
      */
     slice = pmc_new_init(interpreter, enum_class_Slice, key);
     range = PMC_struct_val(slice);
@@ -732,6 +732,12 @@ Parrot_py_get_slice(Interp *interpreter, PMC *self, PMC *key)
     /*
      * set_slice_start did already decrement it
      */
+    if ((PObj_get_FLAGS(key) &
+                        (KEY_inf_slice_FLAG|KEY_start_slice_FLAG)) ==
+                    (KEY_inf_slice_FLAG|KEY_start_slice_FLAG)) {
+        /* last range "start .." */
+        RVal_int(range->end) = VTABLE_elements(interpreter, self) - 1;
+    }
     end = RVal_int(range->end) + 1;
     n = VTABLE_elements(interpreter, self);
     if (!n) {

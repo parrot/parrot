@@ -667,7 +667,7 @@ build_key(Interp *interpreter, SymReg *reg)
     char *s;
     int k;
     SymReg * r;
-    int var_type, slice_bits;
+    int var_type, slice_bits, type;
 
     pc = key + 1;       /* 0 is length */
     s = s_key;          /* stringified key */
@@ -680,10 +680,11 @@ build_key(Interp *interpreter, SymReg *reg)
             fatal(1, "build_key", "key too complex increase KEYLEN\n");
         r = reg;
         /* if key is a register, the original sym is in r->reg */
+        type = r->type;
         if (r->reg)
             r = r->reg;
-        var_type = r->type & ~VT_SLICE_BITS;
-        slice_bits = r->type & VT_SLICE_BITS;
+        var_type = type & ~VT_SLICE_BITS;
+        slice_bits = type & VT_SLICE_BITS;
         switch (var_type) {
             case VTIDENTIFIER:       /* P[S0] */
             case VTPASM:       /* P[S0] */

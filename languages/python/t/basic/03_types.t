@@ -3,7 +3,7 @@
 use strict;
 use lib '../../lib';
 
-use Parrot::Test tests => 11;
+use Parrot::Test tests => 13;
 
 sub test {
     language_output_is('python', $_[0], '', $_[1]);
@@ -68,6 +68,33 @@ test(<<'CODE', 'string slice');
 if __name__ == '__main__':
     a = "abcdef" [2:4]
     print a[0], a[1]
+CODE
+
+test(<<'CODE', 'string slice - range w vars');
+if __name__ == '__main__':
+    a = "abcdef" [2:4]
+    print a[0], a[1]
+
+    s = 3
+    e = 5
+    a = "abcdef" [s:e]
+    print a[0], a[1]
+CODE
+
+test(<<'CODE', 'string slice .. ');
+if __name__ == '__main__':
+
+    a = "abcdef" [2:]
+    for c in a:
+	print c,
+    print
+
+    s = 3
+    a = [ 1,2,3,4,5] [s:]
+    for c in a:
+	print c,
+    print
+
 CODE
 
 test(<<'CODE', 'tuple vs list');

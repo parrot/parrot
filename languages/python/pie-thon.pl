@@ -454,7 +454,7 @@ sub STORE_NAME {
     if ($names{$c}) {
 	my $pmc = $names{$c};
 	print <<EOC;
-	assign $pmc, $p $cmt
+	set $pmc, $p $cmt
 EOC
 	$p = $pmc;
     }
@@ -1516,11 +1516,17 @@ EOC
     push @stack, [-1, $a, 'P'];
 }
 
-sub SLICE_plus_3 {
-    return Slice(@_, 3);
-}
 sub SLICE_plus_0 {
     return Slice(@_, 0);
+}
+sub SLICE_plus_1 {
+    return Slice(@_, 1);
+}
+sub SLICE_plus_2 {
+    return Slice(@_, 2);
+}
+sub SLICE_plus_3 {
+    return Slice(@_, 3);
 }
 
 sub DELETE_SLICE_plus_0 {
