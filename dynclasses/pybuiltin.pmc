@@ -43,6 +43,14 @@ extern PMC* Parrot_Hash_get_iter(Interp* interpreter, PMC* pmc);
 
 #define VTABLE_cmp(i,l,r) mmd_dispatch_i_pp(i,l,r,MMD_CMP)
 
+PMC* Parrot_lib_python_group_init(Interp* interpreter, PMC *lib_pmc);
+
+PMC*
+Parrot_lib_python_group_init(Interp* interpreter, PMC *lib_pmc)
+{
+    Parrot_PyBuiltin___load__(interpreter);
+    return lib_pmc;
+}
 pmclass PyBuiltin dynpmc group python_group {
 /*
 
@@ -103,6 +111,11 @@ enter_nci_method should create these as locals to begin with.
 
         /* Already init'ed? */
         pad = scratchpad_get_current(INTERP);
+        if (!pad) {
+            pad = scratchpad_new(interpreter, NULL, 0);
+            stack_push(interpreter, &interpreter->ctx.pad_stack, pad,
+                    STACK_ENTRY_PMC, STACK_CLEANUP_NULL);
+        }
         name = const_string(INTERP, "__name__");
         temp = scratchpad_find(INTERP, pad, name);
         if (temp && VTABLE_defined(INTERP, temp)) return;
@@ -177,7 +190,7 @@ enter_nci_method should create these as locals to begin with.
         /* Begin main! */
         item = pmc_new(INTERP, dynclass_PyString);
         VTABLE_set_string_native(INTERP, item,
-            const_string(INTERP, "__main__"));
+                const_string(INTERP, "__main__"));
         scratchpad_store_by_name(INTERP, pad, 0, name, item);
     }
 

@@ -16,8 +16,23 @@ Tests the Python Builtins.
 
 =cut
 
-use Parrot::Test tests => 4;
+use Parrot::Test tests => 5;
 use Parrot::Config;
+
+pir_output_is(<< 'CODE', << 'OUTPUT', "autoload");
+.sub main @MAIN
+    new_pad 0
+
+    new $P0, "PyInt"
+
+    set $P0, 31
+    print $P0
+    print "\n"
+.end
+CODE
+31
+OUTPUT
+
 
 output_is(<< 'CODE', << 'OUTPUT', "delegating");
 ##PIR##

@@ -27,6 +27,8 @@ typedef enum {
 char* Parrot_locate_runtime_file(Interp *, const char *file_name,
         enum_runtime_ft);
 
+void Parrot_autoload_class(Interp *, STRING *class);
+
 #endif /* PARROT_LIBRARY_H_GUARD */
 
 /*

@@ -400,6 +400,7 @@ INS(Interp *interpreter, IMC_Unit * unit, char *name,
         /* emit a debug seg, if this op is seen */
         PARROT_WARNINGS_on(interpreter, PARROT_WARNINGS_ALL_FLAG);
     }
+#if 0
     else if (!strcmp(name, "loadlib")) {
         SymReg *r1 = r[1];   /* lib name */
         STRING *lib;
@@ -414,6 +415,7 @@ INS(Interp *interpreter, IMC_Unit * unit, char *name,
             Parrot_load_lib(interpreter, lib, NULL);
         }
     }
+#endif
     else if (!memcmp(name, "invoke", 6) ||
             !memcmp(name, "callmethod", 10)) {
         if (cur_unit->type & IMC_PCCSUB)
