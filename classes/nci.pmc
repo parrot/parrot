@@ -23,10 +23,6 @@ pmclass NCI need_ext {
 	SELF->cache.struct_val = NULL;
     }
 
-    STRING* name () {
-        return SELF->vtable->whoami;
-    }
-
     void set_string_keyed (PMC* func, STRING* value) {
 	/* key = func_ptr, value = signature */
 	SELF->cache.struct_val = (DPOINTER *)func;
