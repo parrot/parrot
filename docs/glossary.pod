@@ -11,7 +11,7 @@ $Id$
 =head1 SUMMARY
 
 Short descriptions of words you might need to know that show up in
-parrot development.
+Parrot development.
 
 =head1 GLOSSARY
 
@@ -21,11 +21,14 @@ Please keep me alphabetical!
 =head2 Continuations
 
 Think of continuations as an execution "context". This context includes
-everything local to that execution path, not just stack. It is a
+everything local to that execution path, not just the stack. It is a
 snapshot in time (minus global variables). While it is similar to C's
-setjmp/longjmp, longjmp'ing only works "down" the stack. Jumping "up"
-the stack (ie back to a frame that has returned) is bad. Continuations
-work either way. We can do 2 important things with continuations:
+C<setjmp> (taking the continuation)/C<longjmp> (invoking the continuation),
+C<longjmp>'ing only works "down" the stack; jumping "up"
+the stack (ie, back to a frame that has returned) is bad. Continuations
+can work either way. 
+
+We can do two important things with continuations:
 
 =over 4
 
@@ -38,31 +41,30 @@ computation or return value. This is pretty much tail recursion.
 
 =item 2
 
-Continuations can be taken at arbitrary call depth. This freezes the
+Continuations can be taken at an arbitrary call depth, freezing the
 call chain (context) at that point in time. If we save that
-continuation object into a variable, later we can reinstate the
+continuation object into a variable, we can later reinstate the
 complete context by its "handle". This allows neat things like
-backtracking that isn't easily done in conventional stacked languages,
+backtracking that aren't easily done in conventional stacked languages,
 such as C. Since continuations represent "branches" in context, it
-requires using an environment that uses some combination of heap-based
+requires an environment that uses some combination of heap-based
 stacks, stack trees and/or stack copying.
 
 =back
 
 It is common in a system that supports continuations to implement
-co-routines on top of them.
+L<co-routines|"Co-Routines"> on top of them.
 
-
-A continuation is a sort of super closure. When you take a 
+A continuation is a sort of super-closure. When you take a 
 continuation, it makes a note of the current call stack and lexical 
 scratchpads, along with the current location in the code. When you 
-invoke a continuation, the system drops what it's doing and puts the 
+invoke a continuation, the system drops what it's doing, puts the 
 call stack and scratchpads back, and jumps to the execution point you 
 were at when the continuation was taken. It is, in effect, like you 
 never left that point in your code.
 
 Note that, like with closures, it only puts the *scratchpads* back in 
-scope--it doesn't do anything with the values in the variables that 
+scope - it doesn't do anything with the values in the variables that 
 are in those scratchpads.
 
 =for author
@@ -72,14 +74,14 @@ Dan Sugalski <dan@sidhe.org>
 =head2 Co-Routines 
 
 Co-routines are virtually identical to normal subroutines, except
-while subroutine's execute from start to finish, and return,
-co-routines may suspend themselves, (or be suspended asynchronously if
-the language permits) and resume later. We can implement things like
-"factories" with co-routines. If the co-routine never returns, every
-time we call it we "resume" the routine.
+while subroutines always execute from their starting instruction to where 
+they return, co-routines may suspend themselves (or be suspended asynchronously 
+if the language permits) and resume at that point later. We can implement 
+things like "factories" with co-routines. If the co-routine never returns, 
+every time we call it, we "resume" the routine.
 
-A co-routine is a subroutine that can stop in the middle, but that 
-you can start back up later at the point you stopped. For example:
+A co-routine is a subroutine that can stop in the middle, and start back
+up later at the point you stopped. For example:
 
     sub sample : coroutine {
        print "A\n";
@@ -98,10 +100,10 @@ will print
      Foo!
      B
 
-Basically the yield keyword says "Stop here, but the next time we're 
-called pick up at the next statement." If you return from a 
-coroutine, the next invocation starts back at the beginning. 
-Coroutines remember all their state, local variables, and suchlike 
+Basically, the C<yield> keyword says, "Stop here, but the next time we're 
+called, pick up at the next statement." If you return from a 
+co-routine, the next invocation starts back at the beginning. 
+Co-routines remember all their state, local variables, and suchlike 
 things.
 
 =for author
@@ -117,27 +119,28 @@ absolutely necessary.
 If you have a string A, and make a copy of it to get string B, the two
 strings should be identical, at least to start. With COW, they are,
 because string A and string B aren't actually two separate
-strings--they're the same string, marked COW. If either string A or
+strings - they're the same string, marked COW. If either string A or
 string B are changed, the system notes it and only at that point does
-it make a copy of the string and change the copy.
+it make a copy of the string and change it.
 
-If the program never actually makes a copy, something that's fairly
-common, COW saves both memory and time. 
+If the program never actually changes the string - something that's
+fairly common - the program need never make a copy, saving both 
+memory and time. 
 
 =head2 DOD
 
-Dead Object Detection is the code that sweeps through all the objects,
-variables, and whatnot inside of Parrot and decides which ones are in
+Dead Object Detection is the process of sweeping through all the objects,
+variables, and whatnot inside of Parrot, and deciding which ones are in
 use and which ones aren't. The ones that aren't in use are then freed
-back for later reuse. (After they're destroyed, if active destruction
-is warranted)
+up for later reuse. (After they're destroyed, if active destruction
+is warranted.)
 
-See also: GC
+See also: L<"GC">
 
 =head2 GC
 
-Garbage Collection is when the interpreter sweeps through all the
-active objects, variables, and structures, and marks the memory
+Garbage Collection is the process of sweeping through all the
+active objects, variables, and structures, marking the memory
 they're using as in use, and all other memory is freed up for later
 reuse. 
 
@@ -147,7 +150,7 @@ through objects. (This is a characteristic peculiar to Perl and other
 languages that do string processing. Other languages chew through
 objects faster than memory)
 
-See also: DOD
+See also: L<"DOD">
 
 =head2 PMC
 
@@ -156,17 +159,17 @@ PMC stands for Parrot Magic Cookie. (Or cracker, your choice) It's the
 =head2 Vtable
 
 A table of operations attached to some data types, such as PMCs and
-strings.  Vtables are used to avoid using switches or long if chains to
+strings.  Vtables are used to avoid using switches or long C<if> chains to
 handle different data types.  They're similar to method calls, except
 that their names are pre-selected.
 
 =for author
 From: "Brent Dax" <brentdax@cpan.org>
 
-=head2 Warnock's Dillemma
+=head2 Warnock's Dilemma
 
-The dillemma you face when posting a message to a public forum about
-something and not even getting an acknowledgement of its
+The dilemma you face when posting a message to a public forum about
+something and not even getting an acknowledgment of its
 existence. This leaves you wondering if your problem is unimportant or
 previously addressed, if everyone's waiting on someone else to answer
 you,  or if maybe your mail never actually made it to anyone else in
