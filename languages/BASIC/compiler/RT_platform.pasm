@@ -83,11 +83,9 @@ END:	restoreall
 	ne sys, "MSWin32", NOTWIN
 	call _WIN32_INKEY
 	branch END
+NOTWIN: call _POSIX_INKEY
 END:	restoreall
 	ret
-
-NOTWIN: print "Not supported yet\n"
-	end
 .end
 ## Problem in ANSI
 #SCREEN_GETFORE:
