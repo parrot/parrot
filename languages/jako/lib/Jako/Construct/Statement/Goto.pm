@@ -91,7 +91,11 @@ sub compile
     $left  = $left->compile($fh);
     $right = $right->compile($fh);
 
-    # TODO: Problems with unless?
+    if ($cond eq 'unless') {
+      $op = Jako::Compiler::invert_relop($op);
+      $cond = 'if';
+    }
+
     print $fh "  $cond $left $op $right goto _LABEL_$name\n";
   }
 

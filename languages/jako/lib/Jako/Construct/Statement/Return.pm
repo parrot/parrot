@@ -25,15 +25,21 @@ use base qw(Jako::Construct::Statement);
 sub new
 {
   my $class = shift;
-  my ($block, $value) = @_;
+  my ($block, $value, $cond, $left, $op, $right) = @_;
 
   confess "Block is not!" unless UNIVERSAL::isa($block, 'Jako::Construct::Block');
   confess "Value is not!" if defined $value and not UNIVERSAL::isa($value, 'Jako::Construct::Expression::Value');
+  confess "Left is not Value!" if defined $left and not UNIVERSAL::isa($left, 'Jako::Construct::Expression::Value');
+  confess "Right is not Value!" if defined $right and not UNIVERSAL::isa($right, 'Jako::Construct::Expression::Value');
 
   my $self = bless {
     BLOCK => $block,
 
     VALUE => $value,
+    COND  => $cond,
+    LEFT  => $left,
+    OP    => $op,
+    RIGHT => $right,
 
     DEBUG => 1,
     FILE  => defined $value ? $value->file : undef, # TODO: YUCK!
@@ -47,10 +53,14 @@ sub new
 
 
 #
-# ACCESSOR:
+# ACCESSORS:
 #
 
 sub value { return shift->{VALUE}; }
+sub cond  { return shift->{COND};  }
+sub left  { return shift->{LEFT};  }
+sub op    { return shift->{OP};    }
+sub right { return shift->{RIGHT}; }
 
 
 #
@@ -64,6 +74,10 @@ sub compile
 
   my $block = $self->block;
   my $value = $self->value;
+  my $cond  = $self->cond;
+  my $left  = $self->left;
+  my $op    = $self->op;
+  my $right = $self->right;
 
   #
   # Find the enclosing sub block:
@@ -77,6 +91,24 @@ sub compile
   my $sub_name = $sub_block->name;
 
   my $return_type = $sub_block->type;
+
+  my $anon;
+
+  if (defined $cond) {
+    $left  = $left->compile($fh);
+    $right = $right->compile($fh);
+
+    if ($cond eq 'if') {
+      $op = Jako::Compiler::invert_relop($op);
+    }
+    else {
+      $cond = 'if';
+    }
+
+    $anon = Jako::Compiler::anon_lbl();
+
+    print $fh "  $cond $left $op $right goto $anon\n";
+  }
 
   #
   # Compile the return value, if any:
@@ -103,6 +135,10 @@ sub compile
   #
 
   print $fh "  goto _${sub_name}_LEAVE\n";
+
+  if (defined $cond) {
+    print $fh "$anon:\n";
+  }
 
   return;
 }

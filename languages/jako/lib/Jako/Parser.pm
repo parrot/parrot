@@ -1454,9 +1454,23 @@ sub parse
       my $value_token = $self->skip_value;
       my $value = Jako::Construct::Expression::Value->new($block, $value_token) if defined $value_token;
 
+      my ($cond, $left, $op, $right);
+
+      if ($self->get(1)->is_if or $self->get(1)->is_unless) {
+        $cond = $self->forth->text;
+
+        $self->require_open_paren;
+
+        $left  = Jako::Construct::Expression::Value->new($block, $self->require_value);
+        $op    = $self->require_infix_rel->text;
+        $right = Jako::Construct::Expression::Value->new($block, $self->require_value);
+
+        $self->require_close_paren;
+      }
+
       $self->require_semicolon;
 
-      my $return = Jako::Construct::Statement::Return->new($block, $value);
+      my $return = Jako::Construct::Statement::Return->new($block, $value, $cond, $left, $op, $right);
       next;
     }
 
@@ -1547,7 +1561,7 @@ sub parse
     }
 
     #
-    # Conditionals Blocks:
+    # Conditional Blocks:
     #
     #   if     (<value> <op> <value>) {
     #   unless (<value> <op> <value>) {
@@ -1579,33 +1593,19 @@ sub parse
       next;
     }
 
+=no
+
     #
     # Conditional Continuations:
     #
     #   } elsif (<value> <op> <value>) {
     #
 
-=no
-
     if (m/^}\s*(elsif)\s*\(\s*(.*)\s*\)\s*{$/) {
       $self->begin_block(undef, $1, $2);
       # TODO
       next;
     }
-
-=cut
-
-
-
-
-    #
-    # TODO: Implement other stuff and put it before this.
-    #
-
-    $self->SYNTAX_ERROR("Don't know what to do with token '%s'.", $token->text);
-
-
-
 
     #
     # Object Construction:
@@ -1627,10 +1627,15 @@ sub parse
       next;
     }
 
-    $self->PARSE_ERROR("Unparsable line.");
-  }
+=cut
 
-  #$self->emit_code(".end");
+
+    #
+    # TODO: Implement other stuff and put it before this.
+    #
+
+    $self->SYNTAX_ERROR("Don't know what to do with token '%s'.", $token->text);
+  }
 
   return $root;
 }

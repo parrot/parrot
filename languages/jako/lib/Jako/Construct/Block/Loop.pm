@@ -17,15 +17,6 @@ use Carp;
 
 use base qw(Jako::Construct::Block);
 
-my %inverted_ops = (
-  '==' => '!=',
-  '!=' => '==',
-  '<=' => '>',
-  '<'  => '>=',
-  '>=' => '<',
-  '>'  => '<='
-);
-
 =no
 
 my %comp_ops = (
@@ -80,7 +71,7 @@ sub compile
   }
 
   if ($kind eq 'while') {
-    $op = $inverted_ops{$op}; # Invert the sense for 'while' loops.
+    $op = Jako::Compiler::invert_relop($op); # Invert the sense for 'while' loops.
   }
 
   if ($kind eq 'while' or $kind eq 'until') {
