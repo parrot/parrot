@@ -158,36 +158,6 @@ Sets up some global variables.
 
 /*
 
-=item C<void* invoke(void* next)>
-
-Pythonic object constructor. SELF is a Hash Class object. Return a new
-C<dict> object according to 2.1. Built-in Functions.
-
-=cut
-
-*/
-    void* invoke(void* next) {
-        int argcP = REG_INT(3);
-        PMC *res = pmc_new(INTERP, pmc->vtable->base_type);
-        PMC *arg;
-        if (argcP) {
-            if (argcP > 1) {
-                real_exception(INTERP, NULL, E_TypeError,
-                        "TypeError: dict expected at most 1 arguments, got %d",
-                        (int)argcP);
-            }
-            arg = REG_PMC(5);
-            if (arg->vtable->base_type == enum_class_Hash)
-                res = arg; /* a dict was passed, return it */
-            else
-                Parrot_py_fill_dict(INTERP, res, arg);
-        }
-        REG_PMC(5) = res;
-        return next;
-    }
-
-/*
-
 =item C<void init()>
 
 Initializes the instance. Creates a global C<Undef> if it doesn't
@@ -435,56 +405,59 @@ Returns the floating-point value for the element at C<*key>.
 Returns a string representation of the hash, showing its class name and
 memory address.
 
-For Python returns its repr.
+=item  C<STRING *get_repr()>
+
+Return a representation of the hash contents.
 
 =cut
 
 */
 
     STRING* get_string () {
-        if (Interp_flags_TEST(INTERP, PARROT_PYTHON_MODE)) {
-            /* TODO use freeze */
-            PMC *iter = VTABLE_get_iter(INTERP, SELF);
-            STRING *res, *s;
-            INTVAL j, n;
+        return Parrot_sprintf_c(INTERP, "Hash[0x%x]", SELF);
+    }
 
-            res = string_from_cstring(INTERP, "{", 0);
-            n = VTABLE_elements(INTERP, SELF);
-            for (j = 0; j < n; ++j) {
-                STRING *key = VTABLE_shift_string(INTERP, iter);
-                int i,all_digit = 1;
-                PMC *val;
+    STRING* get_repr () {
+        /* TODO use freeze */
+        PMC *iter = VTABLE_get_iter(INTERP, SELF);
+        STRING *res, *s;
+        INTVAL j, n;
 
-                for (i = 0; i < (int)key->strlen; ++i) {
-                    if (!isdigit(((char *)key->strstart)[i])) {
-                        all_digit = 0;
-                        break;
-                    }
+        res = string_from_cstring(INTERP, "{", 0);
+        n = VTABLE_elements(INTERP, SELF);
+        for (j = 0; j < n; ++j) {
+            STRING *key = VTABLE_shift_string(INTERP, iter);
+            int i,all_digit = 1;
+            PMC *val;
+
+            for (i = 0; i < (int)key->strlen; ++i) {
+                if (!isdigit(((char *)key->strstart)[i])) {
+                    all_digit = 0;
+                    break;
                 }
-                if (all_digit) {
-                    res = string_append(INTERP, res, key, 0);
-                }
-                else {
-                    res = string_append(INTERP, res,
-                            const_string(INTERP, "'"), 0);
-                    res = string_append(INTERP, res, key, 0);
-                    res = string_append(INTERP, res,
-                            const_string(INTERP, "'"), 0);
-                }
+            }
+            if (all_digit) {
+                res = string_append(INTERP, res, key, 0);
+            }
+            else {
                 res = string_append(INTERP, res,
-                        const_string(INTERP, ": "), 0);
-                val = SELF.get_pmc_keyed_str(key);
+                        const_string(INTERP, "'"), 0);
+                res = string_append(INTERP, res, key, 0);
                 res = string_append(INTERP, res,
-                        VTABLE_get_string(INTERP, val), 0);
-                if (j < n - 1)
-                res = string_append(INTERP, res,
-                        const_string(INTERP, ", "), 0);
+                        const_string(INTERP, "'"), 0);
             }
             res = string_append(INTERP, res,
-                        const_string(INTERP, "}"), 0);
-            return res;
+                    const_string(INTERP, ": "), 0);
+            val = SELF.get_pmc_keyed_str(key);
+            res = string_append(INTERP, res,
+                    VTABLE_get_string(INTERP, val), 0);
+            if (j < n - 1)
+                res = string_append(INTERP, res,
+                        const_string(INTERP, ", "), 0);
         }
-        return Parrot_sprintf_c(INTERP, "Hash[0x%x]", SELF);
+        res = string_append(INTERP, res,
+                const_string(INTERP, "}"), 0);
+        return res;
     }
 
 /*
@@ -1043,8 +1016,6 @@ Return a new iterator for the slice PMC C<key>
                     PMC_struct_val(iter) = key;
                     return iter;
                 }
-            case 1:
-                return Parrot_py_get_slice(INTERP, SELF, key);
         }
         internal_exception(1, "Hash: Unknown slice type");
         return NULL;

@@ -89,7 +89,6 @@ Note that if C<value> is an integer the number morphs to a C<PerlInt>.
         PMC_num_val(SELF) = value;
         /* don't mess around with - 0 */
         if (value == vali && (vali || !Parrot_signbit(value)))
-            if (!Interp_flags_TEST(INTERP, PARROT_PYTHON_MODE))
             DYNSELF.set_integer_native(vali);
     }
 

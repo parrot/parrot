@@ -226,7 +226,9 @@ Returns the number of elements in the array.
 
 Returns the number of elements in the array as a Parrot string. (??? -leo)
 
-For Python returns its repr.
+=item C<STRING *get_repr()>
+
+Returns a string representaion of the array contents.
 TODO implement freeze/thaw and use that instead.
 
 =cut
@@ -234,30 +236,31 @@ TODO implement freeze/thaw and use that instead.
 */
 
     STRING* get_string () {
-        if (Interp_flags_TEST(INTERP, PARROT_PYTHON_MODE)) {
-            STRING *res, *s;
-            INTVAL j, n;
-            PMC *val;
-
-            res = string_from_cstring(INTERP, "(", 0);
-            n = VTABLE_elements(INTERP, SELF);
-            for (j = 0; j < n; ++j) {
-                val = SELF.get_pmc_keyed_int(j);
-                res = string_append(INTERP, res,
-                        VTABLE_get_repr(INTERP, val), 0);
-                if (n == 1)
-                    res = string_append(INTERP, res,
-                            const_string(INTERP, ","), 0);
-                else if (j < n - 1)
-                    res = string_append(INTERP, res,
-                            const_string(INTERP, ", "), 0);
-            }
-            res = string_append(INTERP, res,
-                        const_string(INTERP, ")"), 0);
-            return res;
-        }
-
         return string_from_int(INTERP, DYNSELF.elements());
+    }
+
+    STRING* get_repr () {
+        STRING *res, *s;
+        INTVAL j, n;
+        PMC *val;
+
+        res = string_from_cstring(INTERP, "(", 0);
+        n = VTABLE_elements(INTERP, SELF);
+        for (j = 0; j < n; ++j) {
+            val = SELF.get_pmc_keyed_int(j);
+            res = string_append(INTERP, res,
+                    VTABLE_get_repr(INTERP, val), 0);
+            if (n == 1)
+                res = string_append(INTERP, res,
+                        const_string(INTERP, ","), 0);
+            else if (j < n - 1)
+                res = string_append(INTERP, res,
+                        const_string(INTERP, ", "), 0);
+        }
+        res = string_append(INTERP, res,
+                const_string(INTERP, ")"), 0);
+        return res;
+
     }
 
 /*
@@ -658,8 +661,6 @@ Return a new iterator for SELF.
                     PMC_struct_val(iter) = key;
                     return iter;
                 }
-            case 1:
-                return Parrot_py_get_slice(INTERP, SELF, key);
         }
         internal_exception(1, "Array: Unknown slice type");
         return NULL;

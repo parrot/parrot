@@ -1157,8 +1157,6 @@ Return a new iterator for SELF.
                     PMC_struct_val(iter) = key;
                     return iter;
                 }
-            case 1:
-                return Parrot_py_get_slice(INTERP, SELF, key);
         }
         internal_exception(1, "Array: Unknown slice type");
         return NULL;

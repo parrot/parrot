@@ -366,25 +366,12 @@ Returns true if the complex number is non-zero.
 
     STRING* get_string () {
         STRING *s;
-        if (Interp_flags_TEST(INTERP, PARROT_PYTHON_MODE)) {
-            if (RE(SELF) == 0) {
-                s = Parrot_sprintf_c(INTERP, "%.12vgj", IM(SELF));
-            }
-            else if (IM(SELF) >= 0)
-                s = Parrot_sprintf_c(INTERP,
-                        "(%.12vg+%.12vgj)", RE(SELF), IM(SELF));
-            else
-                s = Parrot_sprintf_c(INTERP,
-                        "(%.12vg-%.12vgj)", RE(SELF), -IM(SELF));
-        }
-        else {
-            if (IM(SELF) >= 0)
-                s = Parrot_sprintf_c(INTERP,
-                        "%vg+%vgi", RE(SELF), IM(SELF));
-            else
-                s = Parrot_sprintf_c(INTERP,
-                        "%vg-%vgi", RE(SELF), -IM(SELF));
-        }
+        if (IM(SELF) >= 0)
+            s = Parrot_sprintf_c(INTERP,
+                    "%vg+%vgi", RE(SELF), IM(SELF));
+        else
+            s = Parrot_sprintf_c(INTERP,
+                    "%vg-%vgi", RE(SELF), -IM(SELF));
         return s;
     }
 

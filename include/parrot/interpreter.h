@@ -35,9 +35,8 @@ typedef enum {
     PARROT_THR_TYPE_1 = PARROT_IS_THREAD,
     PARROT_THR_TYPE_2 = PARROT_IS_THREAD | PARROT_THR_COPY_INTERP,
     PARROT_THR_TYPE_3 = PARROT_IS_THREAD | PARROT_THR_COPY_INTERP |
-                        PARROT_THR_THREAD_POOL,
+                        PARROT_THR_THREAD_POOL
 
-    PARROT_PYTHON_MODE =     0x10000    /* more pythonic behavior */
 } Parrot_Interp_flag;
 
 /* &end_gen */

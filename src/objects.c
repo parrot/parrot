@@ -24,13 +24,14 @@ Handles class and object manipulation.
 
 #include "objects.str"
 
-static void* instantiate_py_object(Interp*, PMC*, void*);
-extern void parrot_py_set_vtable(Parrot_Interp interpreter, PMC* class);
 static void parrot_class_register(Interp * , STRING *class_name,
         PMC *new_class, PMC *parent, PMC *mro);
 
+/*
+ * FIXME make array clone shallow
+ */
 static PMC *
-clone_array(Parrot_Interp interpreter, PMC *source_array)
+clone_array(Interp* interpreter, PMC *source_array)
 {
     PMC *new_array;
     INTVAL count;
@@ -55,7 +56,7 @@ clone_array(Parrot_Interp interpreter, PMC *source_array)
    it. Horribly destructive, and definitely not a good thing to do if
    there are instantiated objects for the class */
 static void
-rebuild_attrib_stuff(Parrot_Interp interpreter, PMC *class)
+rebuild_attrib_stuff(Interp* interpreter, PMC *class)
 {
     INTVAL cur_offset = POD_FIRST_ATTRIB;
     SLOTTYPE *class_slots;
@@ -262,7 +263,7 @@ Parrot_MMD_methode_name(Interp* interpreter, INTVAL idx)
 /*
 
 =item C<PMC *
-Parrot_single_subclass(Parrot_Interp ointerpreter, PMC *base_class,
+Parrot_single_subclass(Interp* ointerpreter, PMC *base_class,
                        STRING *child_class_name)>
 
 Subclass a class. Single parent class, nice and straightforward. If
@@ -275,7 +276,7 @@ function.
 */
 
 PMC *
-Parrot_single_subclass(Parrot_Interp interpreter, PMC *base_class,
+Parrot_single_subclass(Interp* interpreter, PMC *base_class,
                        STRING *child_class_name)
 {
     PMC *child_class;
@@ -283,32 +284,12 @@ Parrot_single_subclass(Parrot_Interp interpreter, PMC *base_class,
     PMC *classname_pmc;
     PMC *parents, *temp_pmc, *mro;
     int parent_is_class;
-    int is_python = 0;
-
-    if (base_class->vtable->base_type == enum_class_FixedPMCArray) {
-        PMC *tuple = base_class;
-        /* got a tuple holding parents - Python!
-        */
-        INTVAL n = VTABLE_elements(interpreter, tuple);
-        is_python = 1;
-        if (!n) {
-            PMC* class = pmc_new(interpreter, enum_class_ParrotClass);
-            Parrot_new_class(interpreter, class, child_class_name);
-            parrot_py_set_vtable(interpreter, class);
-            return class;
-        }
-        if (n > 1)
-            internal_exception(1, "subclass: unimp multiple parents");
-        base_class = VTABLE_get_pmc_keyed_int(interpreter, tuple, 0);
-    }
     /*
      * ParrotClass is the baseclass anyway, so build just a new class
      */
     if (base_class == Parrot_base_vtables[enum_class_ParrotClass]->class) {
         PMC* class = pmc_new(interpreter, enum_class_ParrotClass);
         Parrot_new_class(interpreter, class, child_class_name);
-        if (is_python)
-            parrot_py_set_vtable(interpreter, class);
         return class;
     }
     parent_is_class = PObj_is_class_TEST(base_class);
@@ -321,7 +302,7 @@ Parrot_single_subclass(Parrot_Interp interpreter, PMC *base_class,
     /* We will have five entries in this array */
 
     /* We have the same number of attributes as our parent */
-    ATTRIB_COUNT(child_class) = ATTRIB_COUNT(base_class);
+    ATTRIB_COUNT(child_class) = parent_is_class ? ATTRIB_COUNT(base_class) : 0;
 
     /* Our parent class array has a single member in it */
     parents = pmc_new(interpreter, enum_class_Array);
@@ -372,15 +353,13 @@ Parrot_single_subclass(Parrot_Interp interpreter, PMC *base_class,
          */
         create_deleg_pmc_vtable(interpreter, child_class, child_class_name);
     }
-    if (is_python)
-        parrot_py_set_vtable(interpreter, child_class);
     return child_class;
 }
 
 /*
 
 =item C<void
-Parrot_new_class(Parrot_Interp interpreter, PMC *class, STRING *class_name)>
+Parrot_new_class(Interp* interpreter, PMC *class, STRING *class_name)>
 
 Creates a new class, named C<class_name>.
 
@@ -389,7 +368,7 @@ Creates a new class, named C<class_name>.
 */
 
 void
-Parrot_new_class(Parrot_Interp interpreter, PMC *class, STRING *class_name)
+Parrot_new_class(Interp* interpreter, PMC *class, STRING *class_name)
 {
     SLOTTYPE *class_array;
     PMC *classname_pmc, *mro;
@@ -431,7 +410,7 @@ Parrot_new_class(Parrot_Interp interpreter, PMC *class, STRING *class_name)
 /*
 
 =item C<PMC *
-Parrot_class_lookup(Parrot_Interp interpreter, STRING *class_name)>
+Parrot_class_lookup(Interp* interpreter, STRING *class_name)>
 
 Looks for the class named C<class_name> and returns it if it exists.
 Otherwise it returns C<PMCNULL>.
@@ -441,7 +420,7 @@ Otherwise it returns C<PMCNULL>.
 */
 
 PMC *
-Parrot_class_lookup(Parrot_Interp interpreter, STRING *class_name)
+Parrot_class_lookup(Interp* interpreter, STRING *class_name)
 {
     HashBucket *b;
     b = hash_get_bucket(interpreter,
@@ -464,7 +443,7 @@ Parrot_class_lookup(Parrot_Interp interpreter, STRING *class_name)
 /*
 
 =item C<static void
-parrot_class_register(Parrot_Interp interpreter, STRING *class_name,
+parrot_class_register(Interp* interpreter, STRING *class_name,
         PMC *new_class, PMC *mro)>
 
 This is the way to register a new Parrot class as an instantiatable
@@ -478,7 +457,7 @@ you can create a new C<foo> in PASM like this: C<new Px, foo>.
 */
 
 static void
-parrot_class_register(Parrot_Interp interpreter, STRING *class_name,
+parrot_class_register(Interp* interpreter, STRING *class_name,
         PMC *new_class, PMC *parent, PMC *mro)
 {
     INTVAL new_type;
@@ -515,7 +494,6 @@ parrot_class_register(Parrot_Interp interpreter, STRING *class_name,
     /* Reset the init method to our instantiation method */
     new_vtable->init = Parrot_instantiate_object;
     new_vtable->init_pmc = Parrot_instantiate_object_init;
-    new_vtable->invoke  = instantiate_py_object;
     new_class->vtable = new_vtable;
 
     /* Put our new vtable in the global table */
@@ -542,7 +520,7 @@ parrot_class_register(Parrot_Interp interpreter, STRING *class_name,
 }
 
 static PMC*
-get_init_meth(Parrot_Interp interpreter, PMC *class,
+get_init_meth(Interp* interpreter, PMC *class,
           STRING *prop_str , STRING **meth_str)
 {
     STRING *meth;
@@ -571,42 +549,7 @@ get_init_meth(Parrot_Interp interpreter, PMC *class,
 
 
 static void
-do_py_initcall(Parrot_Interp interpreter, PMC* class, PMC *object)
-{
-    SLOTTYPE *class_data = PMC_data(class);
-    PMC *classsearch_array = class->vtable->mro;
-    PMC *parent_class;
-    INTVAL nparents;
-    STRING *meth_str;
-    PMC *meth;
-    PMC *arg = REG_PMC(5);
-
-    nparents = VTABLE_elements(interpreter, classsearch_array);
-    if (nparents >= 1) {
-        parent_class = VTABLE_get_pmc_keyed_int(interpreter,
-                classsearch_array, 1);
-        /* if it's a PMC, we put one PMC of that type into
-         * the attribute slot #0.
-         */
-        if (!PObj_is_class_TEST(parent_class)) {
-            PMC *attr;
-            SLOTTYPE *obj_data = PMC_data(object);
-            if (parent_class->vtable->base_type != enum_class_ParrotClass)
-                VTABLE_invoke(interpreter, parent_class, NULL);
-            attr = REG_PMC(5);
-            set_attrib_num(object, obj_data, POD_FIRST_ATTRIB, attr);
-        }
-    }
-    meth_str = CONST_STRING(interpreter, "__init__");
-    meth = Parrot_find_method_with_cache(interpreter, class, meth_str);
-    if (meth) {
-        /* this passes arguments according to pdd03 */
-        Parrot_run_meth_fromc(interpreter, meth, object, meth_str);
-    }
-}
-
-static void
-do_initcall(Parrot_Interp interpreter, PMC* class, PMC *object, PMC *init)
+do_initcall(Interp* interpreter, PMC* class, PMC *object, PMC *init)
 {
     PMC *classsearch_array = class->vtable->mro;
     PMC *parent_class;
@@ -695,7 +638,7 @@ do_initcall(Parrot_Interp interpreter, PMC* class, PMC *object, PMC *init)
 /*
 
 =item C<void
-Parrot_instantiate_object(Parrot_Interp interpreter, PMC *object, PMC *init)>
+Parrot_instantiate_object(Interp* interpreter, PMC *object, PMC *init)>
 
 Creates a Parrot object. Takes a passed-in class PMC that has sufficient
 information to describe the layout of the object and, well, makes the
@@ -705,54 +648,23 @@ darned object.
 
 */
 
-static void instantiate_object(Parrot_Interp, PMC *object, PMC *init, int);
+static void instantiate_object(Interp*, PMC *object, PMC *init);
 
 void
-Parrot_instantiate_object_init(Parrot_Interp interpreter,
+Parrot_instantiate_object_init(Interp* interpreter,
         PMC *object, PMC *init)
 {
-    instantiate_object(interpreter, object, init, 0);
+    instantiate_object(interpreter, object, init);
 }
 
 void
-Parrot_instantiate_object(Parrot_Interp interpreter, PMC *object)
+Parrot_instantiate_object(Interp* interpreter, PMC *object)
 {
-    instantiate_object(interpreter, object, NULL, 0);
-}
-
-void Parrot_instantiate_py_object(Parrot_Interp, PMC *object);
-void
-Parrot_instantiate_py_object(Parrot_Interp interpreter, PMC *object)
-{
-    instantiate_object(interpreter, object, NULL, 1);
-}
-static void*
-instantiate_py_object(Interp* interpreter, PMC* class, void* next)
-{
-    INTVAL type = class->vtable->base_type;
-    PMC *object = NULL;
-    if (PObj_is_class_TEST(class)) {
-        /* __new__ is a type constructor, it takes a class and
-         * arguments and returns a new object
-         */
-        STRING *meth_str = CONST_STRING(interpreter, "__new__");
-        PMC *meth = Parrot_find_method_with_cache(interpreter, class, meth_str);
-        if (meth) {
-            object = Parrot_run_meth_fromc(interpreter,
-                    meth, class, meth_str);
-        }
-    }
-    if (!object)  {
-        object = pmc_new_noinit(interpreter, type);
-        instantiate_object(interpreter, object, NULL, 1);
-    }
-    REG_PMC(5) = object;
-    return next;
+    instantiate_object(interpreter, object, NULL);
 }
 
 static void
-instantiate_object(Parrot_Interp interpreter, PMC *object,
-        PMC *init, int is_python)
+instantiate_object(Interp* interpreter, PMC *object, PMC *init)
 {
     SLOTTYPE *new_object_array;
     INTVAL attrib_count, i;
@@ -799,21 +711,13 @@ instantiate_object(Parrot_Interp interpreter, PMC *object,
     /* We really ought to call the class init routines here...
      * this assumes that an object isa delegate
      */
-    if (is_python) {
-        /*
-         * we are coming from Python
-         */
-        do_py_initcall(interpreter, class, object);
-
-    }
-    else
-        do_initcall(interpreter, class, object, init);
+    do_initcall(interpreter, class, object, init);
 }
 
 /*
 
 =item C<PMC *
-Parrot_add_parent(Parrot_Interp interpreter, PMC *new_base_class,
+Parrot_add_parent(Interp* interpreter, PMC *new_base_class,
            PMC *existing_class)>
 
 Add the parent class to the current class' parent list. This also
@@ -825,7 +729,7 @@ the parent classes that we're adding in.
 */
 
 PMC *
-Parrot_add_parent(Parrot_Interp interpreter, PMC *current_class_obj,
+Parrot_add_parent(Interp* interpreter, PMC *current_class_obj,
            PMC *add_on_class_obj)
 {
     SLOTTYPE *current_class;
@@ -937,7 +841,7 @@ Parrot_add_parent(Parrot_Interp interpreter, PMC *current_class_obj,
 /*
 
 =item C<PMC *
-Parrot_remove_parent(Parrot_Interp interpreter, PMC *removed_class,
+Parrot_remove_parent(Interp* interpreter, PMC *removed_class,
                      PMC *existing_class)>
 
 This currently does nothing but return C<NULL>.
@@ -947,7 +851,7 @@ This currently does nothing but return C<NULL>.
 */
 
 PMC *
-Parrot_remove_parent(Parrot_Interp interpreter, PMC *removed_class,
+Parrot_remove_parent(Interp* interpreter, PMC *removed_class,
                      PMC *existing_class) {
     return NULL;
 }
@@ -955,7 +859,7 @@ Parrot_remove_parent(Parrot_Interp interpreter, PMC *removed_class,
 /*
 
 =item C<PMC *
-Parrot_multi_subclass(Parrot_Interp interpreter, PMC *base_class_array,
+Parrot_multi_subclass(Interp* interpreter, PMC *base_class_array,
                       STRING *child_class_name)>
 
 This currently does nothing but return C<NULL>.
@@ -965,7 +869,7 @@ This currently does nothing but return C<NULL>.
 */
 
 PMC *
-Parrot_multi_subclass(Parrot_Interp interpreter, PMC *base_class_array,
+Parrot_multi_subclass(Interp* interpreter, PMC *base_class_array,
                       STRING *child_class_name) {
     return NULL;
 }
@@ -973,7 +877,7 @@ Parrot_multi_subclass(Parrot_Interp interpreter, PMC *base_class_array,
 /*
 
 =item C<INTVAL
-Parrot_object_isa(Parrot_Interp interpreter, PMC *pmc, PMC *cl)>
+Parrot_object_isa(Interp* interpreter, PMC *pmc, PMC *cl)>
 
 Return whether the object C<pmc> is an instance of class C<cl>.
 
@@ -982,7 +886,7 @@ Return whether the object C<pmc> is an instance of class C<cl>.
 */
 
 INTVAL
-Parrot_object_isa(Parrot_Interp interpreter, PMC *pmc, PMC *cl)
+Parrot_object_isa(Interp* interpreter, PMC *pmc, PMC *cl)
 {
     PMC *mro;
     INTVAL i, classcount;
@@ -1003,7 +907,7 @@ Parrot_object_isa(Parrot_Interp interpreter, PMC *pmc, PMC *cl)
 /*
 
 =item C<PMC *
-Parrot_new_method_cache(Parrot_Interp interpreter)>
+Parrot_new_method_cache(Interp* interpreter)>
 
 This should create and return a new method cache PMC.
 
@@ -1014,14 +918,14 @@ Currently it does nothing but return C<NULL>.
 */
 
 PMC *
-Parrot_new_method_cache(Parrot_Interp interpreter) {
+Parrot_new_method_cache(Interp* interpreter) {
     return NULL;
 }
 
 /*
 
 =item C<PMC *
-Parrot_find_method_with_cache(Parrot_Interp interpreter, PMC *class,
+Parrot_find_method_with_cache(Interp* interpreter, PMC *class,
                               STRING *method_name)>
 
 Find a method PMC for a named method, given the class PMC, current
@@ -1041,10 +945,10 @@ all classes are invalidated.
 
 */
 
-static PMC* find_method_direct(Parrot_Interp, PMC *, STRING*);
+static PMC* find_method_direct(Interp*, PMC *, STRING*);
 
 void
-mark_object_cache(Parrot_Interp interpreter)
+mark_object_cache(Interp* interpreter)
 {
     /* mark register frame cache */
     Stack_Chunk_t *chunk = interpreter->caches->frame_cache;
@@ -1057,7 +961,7 @@ mark_object_cache(Parrot_Interp interpreter)
 }
 
 void
-init_object_cache(Parrot_Interp interpreter)
+init_object_cache(Interp* interpreter)
 {
     Caches *mc;
 
@@ -1131,7 +1035,7 @@ Parrot_invalidate_method_cache(Interp *interpreter, STRING *class)
  *       If this hash is implemented mark it during DOD
  */
 PMC *
-Parrot_find_method_with_cache(Parrot_Interp interpreter, PMC *class,
+Parrot_find_method_with_cache(Interp* interpreter, PMC *class,
                               STRING *method_name)
 {
 
@@ -1239,7 +1143,7 @@ debug_trace_find_meth(Interp* interpreter, PMC *class, STRING *name, PMC *sub)
 #endif
 
 static PMC *
-find_method_direct_1(Parrot_Interp interpreter, PMC *class,
+find_method_direct_1(Interp* interpreter, PMC *class,
                               STRING *method_name)
 {
     PMC* method, *mro;
@@ -1273,7 +1177,7 @@ find_method_direct_1(Parrot_Interp interpreter, PMC *class,
 }
 
 static PMC *
-find_method_direct(Parrot_Interp interpreter, PMC *class,
+find_method_direct(Interp* interpreter, PMC *class,
                               STRING *method_name)
 {
     PMC *found = find_method_direct_1(interpreter, class, method_name);
@@ -1289,7 +1193,7 @@ find_method_direct(Parrot_Interp interpreter, PMC *class,
 
 /*
 =item C<void
-Parrot_note_method_offset(Parrot_Interp interpreter, UINTVAL offset, PMC *method)>
+Parrot_note_method_offset(Interp* interpreter, UINTVAL offset, PMC *method)>
 
 Notes where in the hierarchy we just found a method. Used so that we
 can do a next and continue the search through the hierarchy for the
@@ -1297,7 +1201,7 @@ next instance of this method.
 
 */
 void
-Parrot_note_method_offset(Parrot_Interp interpreter, UINTVAL offset, PMC *method)
+Parrot_note_method_offset(Interp* interpreter, UINTVAL offset, PMC *method)
 {
     interpreter->ctx.current_class_offset = offset;
 }
@@ -1305,7 +1209,7 @@ Parrot_note_method_offset(Parrot_Interp interpreter, UINTVAL offset, PMC *method
 /*
 
 =item C<INTVAL
-Parrot_add_attribute(Parrot_Interp interpreter, PMC* class, STRING* attr)>
+Parrot_add_attribute(Interp* interpreter, PMC* class, STRING* attr)>
 
 Adds the attribute C<attr> to the class.
 
@@ -1320,7 +1224,7 @@ Adds the attribute C<attr> to the class.
    subclassed, but it'll do for now */
 
 INTVAL
-Parrot_add_attribute(Parrot_Interp interpreter, PMC* class, STRING* attr)
+Parrot_add_attribute(Interp* interpreter, PMC* class, STRING* attr)
 {
     SLOTTYPE *class_array;
     STRING *class_name;
@@ -1374,13 +1278,13 @@ Parrot_add_attribute(Parrot_Interp interpreter, PMC* class, STRING* attr)
 /*
 
 =item C<PMC *
-Parrot_get_attrib_by_num(Parrot_Interp interpreter, PMC *object, INTVAL attrib)>
+Parrot_get_attrib_by_num(Interp* interpreter, PMC *object, INTVAL attrib)>
 
 Returns attribute number C<attrib> from C<object>. Presumably the code
 is asking for the correct attribute number.
 
 =item C<PMC *
-Parrot_get_attrib_by_str(Parrot_Interp interpreter, PMC *object, STRING *attr)>
+Parrot_get_attrib_by_str(Interp* interpreter, PMC *object, STRING *attr)>
 
 Returns attribute with full qualified name C<attr> from C<object>.
 
@@ -1389,7 +1293,7 @@ Returns attribute with full qualified name C<attr> from C<object>.
 */
 
 PMC *
-Parrot_get_attrib_by_num(Parrot_Interp interpreter, PMC *object, INTVAL attrib)
+Parrot_get_attrib_by_num(Interp* interpreter, PMC *object, INTVAL attrib)
 {
     SLOTTYPE *attrib_array;
     INTVAL attrib_count;
@@ -1409,7 +1313,7 @@ Parrot_get_attrib_by_num(Parrot_Interp interpreter, PMC *object, INTVAL attrib)
 }
 
 static INTVAL
-attr_str_2_num(Parrot_Interp interpreter, PMC *object, STRING *attr)
+attr_str_2_num(Interp* interpreter, PMC *object, STRING *attr)
 {
     PMC *class;
     PMC *attr_hash;
@@ -1438,7 +1342,7 @@ attr_str_2_num(Parrot_Interp interpreter, PMC *object, STRING *attr)
 }
 
 PMC *
-Parrot_get_attrib_by_str(Parrot_Interp interpreter, PMC *object, STRING *attr)
+Parrot_get_attrib_by_str(Interp* interpreter, PMC *object, STRING *attr)
 {
     return Parrot_get_attrib_by_num(interpreter, object,
                 POD_FIRST_ATTRIB +
@@ -1448,14 +1352,14 @@ Parrot_get_attrib_by_str(Parrot_Interp interpreter, PMC *object, STRING *attr)
 /*
 
 =item C<PMC *
-Parrot_set_attrib_by_num(Parrot_Interp interpreter, PMC *object,
+Parrot_set_attrib_by_num(Interp* interpreter, PMC *object,
   INTVAL attrib, PMC *value)>
 
 Set attribute number C<attrib> from C<object> to C<value>. Presumably the code
 is asking for the correct attribute number.
 
 =item C<PMC *
-Parrot_set_attrib_by_str(Parrot_Interp interpreter, PMC *object,
+Parrot_set_attrib_by_str(Interp* interpreter, PMC *object,
   STRING *attr, PMC *value)>
 
 Sets attribute with full qualified name C<attr> from C<object> to C<value>.
@@ -1465,7 +1369,7 @@ Sets attribute with full qualified name C<attr> from C<object> to C<value>.
 */
 
 void
-Parrot_set_attrib_by_num(Parrot_Interp interpreter, PMC *object,
+Parrot_set_attrib_by_num(Interp* interpreter, PMC *object,
         INTVAL attrib, PMC *value)
 {
     SLOTTYPE *attrib_array;
@@ -1481,7 +1385,7 @@ Parrot_set_attrib_by_num(Parrot_Interp interpreter, PMC *object,
 }
 
 void
-Parrot_set_attrib_by_str(Parrot_Interp interpreter, PMC *object,
+Parrot_set_attrib_by_str(Interp* interpreter, PMC *object,
         STRING *attr, PMC *value)
 {
 
@@ -1492,7 +1396,7 @@ Parrot_set_attrib_by_str(Parrot_Interp interpreter, PMC *object,
 }
 
 INTVAL
-Parrot_class_offset(Parrot_Interp interpreter, PMC *object, STRING *class) {
+Parrot_class_offset(Interp* interpreter, PMC *object, STRING *class) {
     PMC *offset_hash;
     PMC *class_pmc;
     INTVAL offset;
@@ -1528,7 +1432,7 @@ Parrot_class_offset(Parrot_Interp interpreter, PMC *object, STRING *class) {
 /*
 
 =item C<PMC *
-Parrot_find_class_constructor(Parrot_Interp interpreter, STRING *class, INTVAL classtoken)>
+Parrot_find_class_constructor(Interp* interpreter, STRING *class, INTVAL classtoken)>
 
 Find and return the constructor method PMC for the named sub. The
 classtoken is an identifier for the class used for fast lookup, or 0
@@ -1540,35 +1444,35 @@ undefined, is pretty likely
 */
 
 PMC *
-Parrot_find_class_constructor(Parrot_Interp interpreter, STRING *class, INTVAL classtoken)
+Parrot_find_class_constructor(Interp* interpreter, STRING *class, INTVAL classtoken)
 {
     return NULL;
 }
 
 PMC *
-Parrot_find_class_destructor(Parrot_Interp interpreter, STRING *class, INTVAL classtoken)
+Parrot_find_class_destructor(Interp* interpreter, STRING *class, INTVAL classtoken)
 {
     return NULL;
 }
 
 PMC *
-Parrot_find_class_fallback(Parrot_Interp interpreter, STRING *class, INTVAL classtoken)
+Parrot_find_class_fallback(Interp* interpreter, STRING *class, INTVAL classtoken)
 {
     return NULL;
 }
 
 void
-Parrot_set_class_constructor(Parrot_Interp interpreter, STRING *class, INTVAL classtoken, STRING *method)
+Parrot_set_class_constructor(Interp* interpreter, STRING *class, INTVAL classtoken, STRING *method)
 {
 }
 
 void
-Parrot_set_class_destructor(Parrot_Interp interpreter, STRING *class, INTVAL classtoken, STRING *method)
+Parrot_set_class_destructor(Interp* interpreter, STRING *class, INTVAL classtoken, STRING *method)
 {
 }
 
 void
-Parrot_set_class_fallback(Parrot_Interp interpreter, STRING *class, INTVAL classtoken, STRING *method)
+Parrot_set_class_fallback(Interp* interpreter, STRING *class, INTVAL classtoken, STRING *method)
 {
 }
 

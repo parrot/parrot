@@ -135,26 +135,18 @@ If key is a slice, do a splice as set that item.
     }
 
     void set_pmc_keyed (PMC* key, PMC* src) {
-        if (key->vtable->base_type == enum_class_Slice)
-            Parrot_py_set_slice(INTERP, SELF, key, src);
-        else
-            SUPER(key, src);
+        SUPER(key, src);
     }
 
     void delete_keyed (PMC* key) {
-        if (key->vtable->base_type == enum_class_Slice)
-            Parrot_py_set_slice(INTERP, SELF, key, NULL);
-        else {
-            PMC **data;
-            INTVAL idx = key_integer(INTERP, key);
-            INTVAL i;
-            INTVAL n = PMC_int_val(SELF);
-            data = PMC_data(SELF);
-            for (i = idx; i < n - 1; ++i)
-                data[i] = data[i + 1];
-            PMC_int_val(SELF)--;
-        }
-
+        PMC **data;
+        INTVAL idx = key_integer(INTERP, key);
+        INTVAL i;
+        INTVAL n = PMC_int_val(SELF);
+        data = PMC_data(SELF);
+        for (i = idx; i < n - 1; ++i)
+            data[i] = data[i + 1];
+        PMC_int_val(SELF)--;
     }
 
 /*
@@ -262,35 +254,6 @@ Creates and returns a copy of the array.
         return copy;
     }
 
-    STRING* get_repr () {
-        return SELF.get_string();
-    }
-
-    STRING* get_string () {
-        if (Interp_flags_TEST(INTERP, PARROT_PYTHON_MODE)) {
-            STRING *res, *s;
-            INTVAL j, n;
-            PMC *val;
-
-            res = string_from_cstring(INTERP, "[", 0);
-            n = VTABLE_elements(INTERP, SELF);
-            for (j = 0; j < n; ++j) {
-                STRING *vals;
-                val = SELF.get_pmc_keyed_int(j);
-                REG_INT(3) = 0;
-                vals = VTABLE_get_repr(INTERP, val);
-                res = string_append(INTERP, res, vals, 0);
-                if (j < n - 1)
-                    res = string_append(INTERP, res,
-                            const_string(INTERP, ", "), 0);
-            }
-            res = string_append(INTERP, res,
-                        const_string(INTERP, "]"), 0);
-            return res;
-        }
-
-        return string_from_int(INTERP, DYNSELF.elements());
-    }
 /*
 
 =item C<INTVAL is_equal (PMC* value)>

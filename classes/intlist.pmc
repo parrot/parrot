@@ -226,8 +226,6 @@ Removes and returns the first element in the list.
                     PMC_struct_val(iter) = key;
                     return iter;
                 }
-            case 1:
-                return Parrot_py_get_slice(INTERP, SELF, key);
         }
         internal_exception(1, "IntList: Unknown slice type");
         return NULL;

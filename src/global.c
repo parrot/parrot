@@ -158,8 +158,6 @@ Parrot_get_global(Parrot_Interp interpreter, STRING *class,
         return g;
     if (PARROT_ERRORS_test(interpreter, PARROT_ERRORS_GLOBALS_FLAG))  {
         real_exception(interpreter, next, E_NameError,
-               Interp_flags_TEST(interpreter, PARROT_PYTHON_MODE) ?
-                "global name '%Ss' is not defined" :
                 "Global '%Ss' not found",
                 name);
     }
@@ -174,8 +172,6 @@ Parrot_get_global_p(Parrot_Interp interpreter, PMC *ns, STRING *name)
         return g;
     if (PARROT_ERRORS_test(interpreter, PARROT_ERRORS_GLOBALS_FLAG))  {
         real_exception(interpreter, NULL, E_NameError,
-               Interp_flags_TEST(interpreter, PARROT_PYTHON_MODE) ?
-                "global name '%Ss' is not defined" :
                 "Global '%Ss' not found",
                 name);
     }

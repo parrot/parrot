@@ -404,7 +404,6 @@ INTERP_O_FILES = \
     $(SRC_DIR)/builtin$(O) \
     $(SRC_DIR)/mmd_fallback$(O) \
     $(SRC_DIR)/extend$(O) \
-    $(SRC_DIR)/py_func$(O)  \
     $(PF_DIR)/pf_items$(O) \
     $(OPS_DIR)/core_ops$(O) \
     $(OPS_DIR)/core_ops_switch$(O) \
@@ -504,7 +503,6 @@ STR_FILES = \
     $(SRC_DIR)/library.str \
     $(SRC_DIR)/mmd.str \
     $(SRC_DIR)/pmc.str \
-    $(SRC_DIR)/py_func.str \
     $(SRC_DIR)/objects.str \
     $(CLASS_STR_FILES)
 
@@ -843,9 +841,6 @@ $(SRC_DIR)/inter_misc$(O) : $(SRC_DIR)/inter_misc.c $(GENERAL_H_FILES) \
 $(SRC_DIR)/inter_create$(O) : $(SRC_DIR)/inter_create.c $(GENERAL_H_FILES)
 
 $(SRC_DIR)/inter_run$(O) : $(SRC_DIR)/inter_run.c $(GENERAL_H_FILES)
-
-$(SRC_DIR)/py_func$(O) : $(SRC_DIR)/py_func.c $(GENERAL_H_FILES) \
-    $(SRC_DIR)/py_func.str classes/pmc_default.h
 
 $(IO_DIR)/io$(O) : $(GENERAL_H_FILES) $(IO_DIR)/io_private.h
 

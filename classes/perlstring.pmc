@@ -269,21 +269,6 @@ When Python mode is enabled does sprintf :(
 */
 
     void modulus (PMC* value, PMC* dest) {
-        if (Interp_flags_TEST(INTERP, PARROT_PYTHON_MODE)) {
-            PMC *ar = value;
-            /*
-             * SELF is formatstring, value = argument array or item
-             */
-            if (value->vtable->base_type != enum_class_FixedPMCArray) {
-                /* not a tuple - make one */
-                ar = pmc_new(INTERP, enum_class_FixedPMCArray);
-                VTABLE_set_integer_native(INTERP, ar, 1);
-                VTABLE_set_pmc_keyed_int( INTERP, ar, 0, value);
-            }
-            VTABLE_set_string_native(INTERP, dest,
-                    Parrot_psprintf(INTERP, PMC_str_val(SELF), ar));
-            return;
-        }
         if (value->vtable == Parrot_base_vtables[enum_class_PerlInt]) {
             VTABLE_set_integer_native(INTERP, dest,
                     VTABLE_get_integer(INTERP, SELF) %
@@ -334,8 +319,6 @@ Returns the string value for C<SELF[key]>.
         STRING *s = PMC_str_val(SELF);
         PMC *ret;
 
-        if (key->vtable->base_type == enum_class_Slice)
-            return Parrot_py_get_slice(INTERP, SELF, key);
         ret = pmc_new_noinit(INTERP, enum_class_PerlString);
         PMC_str_val(ret) = string_substr(INTERP, s,
                 key_integer(INTERP,key), 1, NULL, 0);

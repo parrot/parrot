@@ -88,7 +88,6 @@ help(void)
     "    -r --run-pbc\n"
     "    -y --yydebug\n"
     "   <Language options>\n"
-    "       --python\n"
     "see docs/running.pod for more\n");
 }
 
@@ -119,7 +118,6 @@ the GNU General Public License or the Artistic License for more details.\n\n");
 #define OPT_DESTROY_FLAG 129
 #define OPT_HELP_DEBUG   130
 #define OPT_PBC_OUTPUT   131
-#define OPT_PYTHON       132
 static struct longopt_opt_decl options[] = {
     { '.', '.', 0, { "--wait" } },
     { 'C', 'C', 0, { "--CGP-core" } },
@@ -147,7 +145,6 @@ static struct longopt_opt_decl options[] = {
     { 'v', 'v', 0, { "--verbose" } },
     { 'w', 'w', 0, { "--warnings" } },
     { 'y', 'y', 0, { "--yydebug" } },
-    { '\0', OPT_PYTHON, 0, { "--python" } },
     { 0, 0, 0, { NULL } }
 };
 
@@ -304,10 +301,6 @@ parseflags(Parrot_Interp interp, int *argc, char **argv[])
             case OPT_DESTROY_FLAG:
                 setopt(PARROT_DESTROY_FLAG);
                 break;
-            case OPT_PYTHON:
-                setopt(PARROT_PYTHON_MODE);
-                break;
-
             default:
                 IMCC_fatal(interp, 1, "main: Invalid flag '%s' used."
                         "\n\nhelp: parrot -h\n", (*argv)[0]);
@@ -425,9 +418,6 @@ main(int argc, char * argv[])
 
     sourcefile = parseflags(interp, &argc, &argv);
     output = IMCC_INFO(interp)->output;
-
-    if (Interp_flags_TEST(interp, PARROT_PYTHON_MODE))
-        Parrot_py_init(interp);
 
     /* Default optimization level is zero; see optimizer.c, imc.h */
     if (!*optimizer_opt) {

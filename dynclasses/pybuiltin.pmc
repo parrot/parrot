@@ -34,6 +34,49 @@ PMC* Parrot_lib_python_group_init(Interp* interpreter, PMC *lib_pmc) {
     return lib_pmc;
 }
 
+/*
+ * convert a key chain PMC to a range slice with end adjusted to
+ * the aggregate.
+ */
+PMC*
+Parrot_py_make_slice(Interp *interpreter, PMC *self, PMC *key)
+{
+    parrot_range_t *range;
+    PMC *slice;
+    INTVAL start, end, n;
+    /*
+     * key is a keychain PMC
+     */
+    slice = pmc_new_init(interpreter, enum_class_Slice, key);
+    range = PMC_struct_val(slice);
+    start = RVal_int(range->start);
+    if ((PObj_get_FLAGS(key) &
+                        (KEY_inf_slice_FLAG|KEY_start_slice_FLAG)) ==
+                    (KEY_inf_slice_FLAG|KEY_start_slice_FLAG)) {
+        /* last range "start .." */
+        RVal_int(range->end) = VTABLE_elements(interpreter, self) - 1;
+    }
+    /*
+     * set_slice_start did already decrement it
+     */
+    end = RVal_int(range->end) + 1;
+    n = VTABLE_elements(interpreter, self);
+    if (start < 0)
+        start += n;
+    if (end < 0)
+        end += n;
+    if (start < 0)
+        start = 0;
+    else if (start > n)
+        start = n;
+    if (start > end)
+        end = start;
+    else if (end > n)
+        end = n;
+    RVal_int(range->start) = start;
+    RVal_int(range->end)   = end;
+    return slice;
+}
 static PMC*
 make_type(Interp* interpreter, INTVAL class, STRING* name,
           PMC *parent, PMC *pad)

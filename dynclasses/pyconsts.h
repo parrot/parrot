@@ -82,3 +82,5 @@ Parrot_PyClass_runops_fromc(Parrot_Interp interpreter, PMC *sub);
 
 PMC *Parrot_PyClass_call_meth_fromc_P_P(Parrot_Interp interpreter, PMC *obj,
     STRING *meth, PMC* arg1);
+
+PMC* Parrot_py_make_slice(Interp *interpreter, PMC *self, PMC *key);

@@ -44,6 +44,9 @@ not highest type in table.
 #include "mmd.str"
 #include <assert.h>
 
+static void mmd_create_builtin_multi_meth_2(Interp *,
+        INTVAL func_nr, INTVAL type, INTVAL right, funcptr_t func_ptr);
+
 typedef void    (*mmd_f_v_ppp)(Interp *, PMC *, PMC *, PMC *);
 typedef void    (*mmd_f_v_pip)(Interp *, PMC *, INTVAL, PMC *);
 typedef void    (*mmd_f_v_pnp)(Interp *, PMC *, FLOATVAL, PMC *);
@@ -596,12 +599,15 @@ mmd_register(Interp *interpreter,
 
 void
 mmd_register_sub(Interp *interpreter,
-             INTVAL type,
+             INTVAL func_nr,
              INTVAL left_type, INTVAL right_type,
              PMC *sub)
 {
     PMC *fake = (PMC*)((UINTVAL) sub | 1);
-    mmd_register(interpreter, type, left_type, right_type, D2FPTR(fake));
+    mmd_register(interpreter, func_nr, left_type, right_type, D2FPTR(fake));
+
+    mmd_create_builtin_multi_meth_2(interpreter,
+            func_nr, left_type, right_type, D2FPTR(sub));
 }
 
 /*
@@ -1420,8 +1426,8 @@ mmd_create_builtin_multi_stub(Interp *interpreter, INTVAL func_nr)
 }
 
 static void
-mmd_create_builtin_multi_meth(Interp *interpreter, INTVAL type,
-        const MMD_init *entry)
+mmd_create_builtin_multi_meth_2(Interp *interpreter,
+        INTVAL func_nr, INTVAL type, INTVAL right, funcptr_t func_ptr)
 {
     const char *name, *short_name;
     char signature[6], val_sig;
@@ -1429,8 +1435,6 @@ mmd_create_builtin_multi_meth(Interp *interpreter, INTVAL type,
     int len;
     char *p;
     PMC *method, *multi, *class, *multi_sig;
-    INTVAL func_nr;
-
 
     if (type == enum_class_Null || type == enum_class_delegate ||
             type == enum_class_Ref  || type == enum_class_SharedRef ||
@@ -1438,7 +1442,6 @@ mmd_create_builtin_multi_meth(Interp *interpreter, INTVAL type,
             type == enum_class_ParrotObject) {
         return;
     }
-    func_nr = entry->func_nr;
     name = short_name = Parrot_MMD_methode_name(interpreter, func_nr);
     /*
      * _int, _float, _str are just native variants of the base
@@ -1483,7 +1486,7 @@ mmd_create_builtin_multi_meth(Interp *interpreter, INTVAL type,
         method = constant_pmc_new(interpreter, enum_class_NCI);
         VTABLE_set_pointer_keyed_str(interpreter, method,
                 const_string(interpreter, signature),
-                F2DPTR(entry->func_ptr));
+                F2DPTR(func_ptr));
         VTABLE_add_method(interpreter, class, meth_name, method);
     }
     else {
@@ -1501,7 +1504,7 @@ mmd_create_builtin_multi_meth(Interp *interpreter, INTVAL type,
         method = constant_pmc_new(interpreter, enum_class_NCI);
         VTABLE_set_pointer_keyed_str(interpreter, method,
                 const_string(interpreter, signature),
-                F2DPTR(entry->func_ptr));
+                F2DPTR(func_ptr));
         VTABLE_push_pmc(interpreter, multi, method);
     }
     /* mark MMD */
@@ -1512,7 +1515,7 @@ mmd_create_builtin_multi_meth(Interp *interpreter, INTVAL type,
     multi_sig = constant_pmc_new(interpreter, enum_class_FixedIntegerArray);
     VTABLE_set_integer_native(interpreter, multi_sig, 2);
     VTABLE_set_integer_keyed_int(interpreter, multi_sig, 0, type);
-    VTABLE_set_integer_keyed_int(interpreter, multi_sig, 1, entry->right);
+    VTABLE_set_integer_keyed_int(interpreter, multi_sig, 1, right);
     PMC_pmc_val(method) = multi_sig;
 
     /*
@@ -1525,6 +1528,14 @@ mmd_create_builtin_multi_meth(Interp *interpreter, INTVAL type,
     assert(multi);
     VTABLE_push_pmc(interpreter, multi, method);
 
+}
+
+static void
+mmd_create_builtin_multi_meth(Interp *interpreter, INTVAL type,
+        const MMD_init *entry)
+{
+    mmd_create_builtin_multi_meth_2(interpreter,
+            entry->func_nr, type, entry->right, entry->func_ptr);
 }
 
 /*
