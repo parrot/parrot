@@ -2213,6 +2213,124 @@ AUTO_OP new(p, i|ic) {
 
 ########################################
 
+=item B<new_key>(s)
+
+Create a new key structure and put a pointer to it in register $1.
+
+=cut
+
+AUTO_OP new_key(s) {
+  $1 = (STRING*)key_new(interpreter);
+}
+
+=item B<clone_key>(s, s)
+
+Create a copy of $2 and place it into $1
+
+=cut
+
+AUTO_OP clone_key(s, s) {
+  $1 = (STRING*)key_clone(interpreter, (KEY*)$2);
+}
+
+=item B<size_key>(s, i|ic)
+
+Allocate enough space within key $1 to hold $2 members
+
+=cut
+
+AUTO_OP size_key(s, i|ic) {
+  key_set_size(interpreter, (KEY*)$1, $2);
+}
+
+=item B<key_size>(i, s)
+
+Place the number of keys that $2 contains in $1
+
+=cut
+
+AUTO_OP key_size(i, s) {
+  $1 = key_size(interpreter, (KEY*)$2);
+}
+
+=item B<toss_key>(s)
+
+Destroy key $1
+
+=cut
+
+AUTO_OP toss_key(s) {
+  key_destroy(interpreter, (KEY*)$1);
+}
+
+=item B<ke_type>(i, s, i|ic)
+
+Set $1 to the type of index $3 of key $2
+
+=cut
+
+AUTO_OP ke_type(i, s, i|ic) {
+  $1 = key_element_type(interpreter, (KEY*)$2, $3);
+}
+
+=item B<ke_value>(i|n|s, s, i|ic)
+
+Set $1 to the value of index $3 of key $2
+
+=cut
+
+AUTO_OP ke_value(i, s, i|ic) {
+  $1 = key_element_value_i(interpreter, (KEY*)$2, $3);
+}
+
+AUTO_OP ke_value(n, s, i|ic) {
+  $1 = key_element_value_n(interpreter, (KEY*)$2, $3);
+}
+
+AUTO_OP ke_value(s, s, i|ic) {
+  $1 = key_element_value_s(interpreter, (KEY*)$2, $3);
+}
+
+=item B<ke_set_value>(s, i|ic, i|ic|n|nc|s|sc)
+
+Assign value $3 to index $2 of key $1
+
+=cut
+
+AUTO_OP ke_set_value(s, i|ic, i|ic) {
+  key_set_element_value_i(interpreter, (KEY*)$1, $2, $3);
+}
+
+AUTO_OP ke_set_value(s, i|ic, n|nc) {
+  key_set_element_value_n(interpreter, (KEY*)$1, $2, $3);
+}
+
+AUTO_OP ke_set_value(s, i|ic, s|sc) {
+  key_set_element_value_s(interpreter, (KEY*)$1, $2, $3);
+}
+
+=item B<chop_key>(s)
+
+Remove the last index of key $1
+
+=cut
+
+AUTO_OP chop_key(s) {
+  key_chop(interpreter, (KEY*)$1);
+}
+
+=item B<inc_key>(s, i)
+
+Increment index $2 of key $1
+
+=cut
+
+AUTO_OP inc_key(s, i) {
+  key_inc(interpreter, (KEY*)$1, $2);
+}
+
+########################################
+
 =item B<ret>()
 
 Pop the location off the top of the stack and go there.
