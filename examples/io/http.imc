@@ -1,0 +1,37 @@
+# http client, connects to WWW port and grabs a page. 
+# Be sure to set PARROT_NET_DEVEL to 1 in io/io_private.h
+# and rebuld Parrot or the network layer won't exist
+
+.sub _main
+    .local pmc sock
+    .local string address
+    .local string buf
+    .local int ret
+    .local int len
+    print "Creating socket.\n"
+    # create the socket handle 
+    socket sock, 2, 1, 0
+    unless sock goto ERR
+    # Pack a sockaddr_in structure with IP and port
+    #sockaddr address, 80, "129.42.18.99"
+    sockaddr address, 80, "www.ibm.com"
+    print "Connecting to http://www.parrotcode.org:80\n"
+    connect ret, sock, address 
+    print "connect returned "
+    print ret 
+    print "\n"
+    send ret, sock, "GET /us/ HTTP/1.0\nUser-agent: Parrot\n\n" 
+    poll ret, sock, 1, 5, 0
+MORE:
+    recv ret, sock, buf 
+    if ret < 0 goto END
+    print buf 
+    goto MORE 
+ERR:
+    print "Socket error\n"
+    end
+END:
+    close sock 
+    end
+.end
+
