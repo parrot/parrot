@@ -694,9 +694,10 @@ memory.
 
 */
 #if GC_IS_MALLOC
-static void
-parrot_gc_ims_collect(Interp* interpreter)
+static int
+parrot_gc_ims_collect(Interp* interpreter, int check_only)
 {
+    return 0;
 }
 
 #else

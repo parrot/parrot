@@ -166,13 +166,45 @@ get_path(Interp *interpreter, STRING *lib, void **handle)
          * then file.extension w/o prefix
          */
         *handle = Parrot_dlopen(file_w_ext);
-        if (handle) {
+        if (*handle) {
             path = string_from_cstring(interpreter, file_w_ext, 0);
             string_cstring_free(file_name);
             string_cstring_free(file_w_ext);
             return path;
         }
         string_cstring_free(file_w_ext);
+        if (strcmp(PARROT_LOAD_EXT, PARROT_SHARE_EXT)) {
+            file_w_ext = malloc(strlen(file_name) +
+                    strlen(PARROT_SHARE_EXT) + 1);
+            strcpy(file_w_ext, file_name);
+            strcat(file_w_ext, PARROT_SHARE_EXT);
+            full_name = Parrot_locate_runtime_file(interpreter, file_w_ext,
+                    PARROT_RUNTIME_FT_DYNEXT);
+            if (full_name) {
+                *handle = Parrot_dlopen(full_name);
+                if (*handle) {
+                    path = string_from_cstring(interpreter, full_name, 0);
+                    string_cstring_free(file_name);
+                    string_cstring_free(file_w_ext);
+                    return path;
+                }
+                err = Parrot_dlerror();
+                fprintf(stderr, "Couldn't load '%s': %s\n",
+                        full_name, err ? err : "unknown reason");
+                return NULL;
+            }
+            /*
+             * then file.extension w/o prefix
+             */
+            *handle = Parrot_dlopen(file_w_ext);
+            if (*handle) {
+                path = string_from_cstring(interpreter, file_w_ext, 0);
+                string_cstring_free(file_name);
+                string_cstring_free(file_w_ext);
+                return path;
+            }
+            string_cstring_free(file_w_ext);
+        }
     }
     /*
      * then the given file name as is
