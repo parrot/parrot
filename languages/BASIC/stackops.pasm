@@ -4,6 +4,9 @@
 #
 # $Id$
 # $Log$
+# Revision 1.3  2002/06/01 18:23:01  clintp
+# For new assembler
+#
 # Revision 1.2  2002/04/29 01:10:04  clintp
 # Speed changes, new language features
 #
@@ -123,12 +126,12 @@ CLEAREND:
 	pops
 	ret
 
-#
-.const CS_GAP I0
-.const CS_SWAPPED I1
-.const CS_FORI  I2
-.const CS_FORJ       I3
-.const CS_ALENGTH I5
+.constant CS_GAP I0
+.constant CS_SWAPPED I1
+.constant CS_FORI  I2
+.constant CS_FORJ       I3
+.constant CS_ALENGTH I5
+
 # SORTSTACK
 # NSORTSTACK
 #  Inputs: A well-formed stack
@@ -136,50 +139,52 @@ CLEAREND:
 # Ported from suggestions at http://www.perlmonks.org/index.pl?node_id=153974
 #   as an improvement over the bubble sort.
 
-NSORTSTACK:	# Entry point for *numeric* sort
+# Entry point for *numeric* sort
+NSORTSTACK:	
 	pushi
 	pushs
 	set I10, 1
 	branch DOSORT
-SORTSTACK:
 # Now aliased to COMBSORT.... a vast improvement over earlier schemes.
 # Implements a combsort in PASM
 #  Inputs: depth on top of stack, stack of strings under
 # Outputs: Stack, intact but sorted.
 #
+SORTSTACK:
+	noop
 COMBSORT:
 	pushi
 	pushs
 	set I10, 0
 
-DOSORT: restore CS_ALENGTH
-	set CS_GAP, CS_ALENGTH
-COMBTOP:mul CS_GAP, CS_GAP, 10
-	div CS_GAP, CS_GAP 13
-	eq CS_GAP, 9, COMBNEWGAP
-	eq CS_GAP, 10, COMBNEWGAP
+DOSORT: restore .CS_ALENGTH
+	set .CS_GAP, .CS_ALENGTH
+COMBTOP:mul .CS_GAP, .CS_GAP, 10
+	div .CS_GAP, .CS_GAP 13
+	eq .CS_GAP, 9, COMBNEWGAP
+	eq .CS_GAP, 10, COMBNEWGAP
 	branch COMBREST
 COMBNEWGAP:
-	set CS_GAP, 11
+	set .CS_GAP, 11
 COMBREST:
-	lt CS_GAP, 1 COMBNEWGAP2
+	lt .CS_GAP, 1 COMBNEWGAP2
 	branch COMBREST2
 COMBNEWGAP2:
-	set CS_GAP, 1
+	set .CS_GAP, 1
 COMBREST2:
-	set CS_SWAPPED, 0
-	set CS_FORI, 1
+	set .CS_SWAPPED, 0
+	set .CS_FORI, 1
 COMBTOPCS_FOR:
-	set I6, CS_ALENGTH
-	sub I6, I6, CS_GAP
-	gt CS_FORI, I6, AFTERCS_FOR
-	set CS_FORJ, CS_GAP
-	add CS_FORJ, CS_FORJ, CS_FORI
+	set I6, .CS_ALENGTH
+	sub I6, I6, .CS_GAP
+	gt .CS_FORI, I6, AFTERCS_FOR
+	set .CS_FORJ, .CS_GAP
+	add .CS_FORJ, .CS_FORJ, .CS_FORI
 
-	save CS_FORI
+	save .CS_FORI
 	bsr PEEK
 	restore S0
-	save CS_FORJ
+	save .CS_FORJ
 	bsr PEEK
 	restore S1
 	eq I10, 1, COMBNSORT
@@ -193,17 +198,17 @@ COMBNSORT:
 	branch SORTSWAP
 
 SORTSWAP:	
-	save CS_FORI
-	save CS_FORJ
+	save .CS_FORI
+	save .CS_FORJ
 	bsr SWAP
-	set CS_SWAPPED, 1
+	set .CS_SWAPPED, 1
 COMBENDCS_FOR:
-	inc CS_FORI
+	inc .CS_FORI
 	branch COMBTOPCS_FOR
 AFTERCS_FOR:
-	eq CS_SWAPPED, 1, COMBTOP
-	ne CS_GAP, 1, COMBTOP
-	save CS_ALENGTH
+	eq .CS_SWAPPED, 1, COMBTOP
+	ne .CS_GAP, 1, COMBTOP
+	save .CS_ALENGTH
 	pops
 	popi
 	ret

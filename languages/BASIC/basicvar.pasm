@@ -14,6 +14,9 @@
 #
 # $Id$
 # $Log$
+# Revision 1.6  2002/06/01 18:23:01  clintp
+# For new assembler
+#
 # Revision 1.5  2002/05/22 19:59:59  clintp
 # Fixed problem with uninitialized string variables
 #
@@ -59,9 +62,9 @@
 # Revision 1.2  2002/03/31 05:13:48  Clinton
 # Id Keywords
 #
-.const NTYPE 0
-.const STYPE 1
-.const CTYPE 2
+.constant NTYPE 0
+.constant STYPE 1
+.constant CTYPE 2
 
 # All of these routines use, misuse and abuse I0, I1, S0, S1, S2
 #    Should be saved/restored okay though.
@@ -81,7 +84,7 @@ NSTORE:
 	pushs
 	restore I1   # Value
 	restore S0   # Name
-	set_keyed P20, S0, I1
+	set_keyed P20[S0], I1
 	popi
 	pops
 	ret
@@ -91,7 +94,7 @@ NFETCH:
 	pushi
 	pushs
 	restore S0   # Name
-	get_keyed I1, P20, S0
+	get_keyed I1, P20[S0]
 	save I1
 	popi
 	pops
@@ -116,7 +119,7 @@ NFETCH:
 SSTORE: pushs
 	restore S1  # Value
 	restore S0  # Name
-	set_keyed P21, S0, S1
+	set_keyed P21[S0], S1
 	pops
 	ret
 	
@@ -126,7 +129,7 @@ SSTORE: pushs
 SFETCH: pushs
 	pushi
 	restore S0  # Name
-	get_keyed S1, P21, S0
+	get_keyed S1, P21[S0]
 	length I0, S1
 	ne I0, 0, SNOTNULL
 	set S1, ""
@@ -156,31 +159,31 @@ CFETCH: pushi
         restore I0            # Line number to fetch.
         set I2, I0
         eq I0, -1, CFETCHSTART
-        get_keyed S0, P22, I0
+        get_keyed S0, P22[I0]
         ne S0, "", CFETCHEND
 
         # Not found.  Let's see if this is a +1
         dec I0
-        get_keyed S0, P22, I0
+        get_keyed S0, P22[I0]
         ne S0, "", CFETCHNEXT
         branch CNOTFOUND
 
 CFETCHNEXT:
-        get_keyed I1, P23, I0  # Okay, got the line before
+        get_keyed I1, P23[I0]  # Okay, got the line before
         inc I1
         gt I1, I28, COVERFLOW
-        get_keyed I0, P24, I1  # Next line number is...
+        get_keyed I0, P24[I1]  # Next line number is...
         eq I0, 0, COVERFLOW
-        get_keyed S0, P22, I0  # Fetch it.
+        get_keyed S0, P22[I0]  # Fetch it.
         ne S0, "", CFETCHEND
         branch CNOTFOUND       # This is a should-not-happen, I think.
 
 CFETCHSTART:
         set I6, 0    # Line position to fetch
         gt I6, I28, COVERFLOW
-        get_keyed I0, P24, I6
+        get_keyed I0, P24[I6]
         eq I0, 0, COVERFLOW
-        get_keyed S0, P22, I0  # Fetch line
+        get_keyed S0, P22[I0]  # Fetch line
         ne S0, "", CFETCHEND
         branch CNOTFOUND       # This is a should-not-happen, I think.
 
@@ -230,8 +233,8 @@ ONELNCK:
 
 CLOAD:  set I0, 0
 CNEXT:  gt I0, I28, CEND
-        get_keyed I3, P24, I0   # Get the next line
-        get_keyed S1, P22, I3   # Get the line code itself
+        get_keyed I3, P24[I0]   # Get the next line
+        get_keyed S1, P22[I3]   # Get the line code itself
 	inc I0
 	eq I3, I1, CNEXT	# Skip this, it's being replaced.
 	save S1
@@ -245,12 +248,13 @@ CEND:   eq I8, 1, CINIT
 
 CINIT:  save I5
 	# Initialize program area
-        new P22, PerlHash     # The lines themselves  (Keyed on Line #)
-        new P23, PerlHash     # Pointers from the lines to the array  (Keyed on Line #)
-        new P24, PerlArray    # Array of line numbers
+        new P22, .PerlHash     # The lines themselves  (Keyed on Line #)
+        new P23, .PerlHash     # Pointers from the lines to the array  (Keyed on Line #)
+        new P24, .PerlArray    # Array of line numbers
 	set I28, -1
 
-CENDLOAD:		# Entry point for LOAD
+# Entry point for LOAD
+CENDLOAD:
 	bsr REVERSESTACK
 	bsr NSORTSTACK
 
@@ -260,10 +264,10 @@ STOREC: eq I5, 0, DONEADD
         restore S0              # Code line
         set I1, S0              # Line Number
 
-        set_keyed P22, I1, S0   # The line itself
+        set_keyed P22[I1], S0   # The line itself
         inc I28
-        set_keyed P23, I1, I28   # Index back to array
-        set_keyed P24, I28, I1
+        set_keyed P23[I1], I28   # Index back to array
+        set_keyed P24[I28], I1
         dec I5
         branch STOREC
 
@@ -297,7 +301,7 @@ VARDECODE:
 	restore I5  # Depth
 	
 	restore S1	# Variable name
-	set I3, NTYPE	# Numeric (assume)
+	set I3, .NTYPE	# Numeric (assume)
 	dec I5
 
 	set S5, ""	# Check for 1-token string vars.
@@ -313,12 +317,13 @@ VARDECODE:
 	ne S2, "$", FINDEC
 
 DECSTRING:
-	set I3, STYPE
+	set I3, .STYPE
 	eq I5, 0, VARDECODED
 
 	restore S2	# There's something else...
 	dec I5
-FINDEC:			# S2's either the stop, expression, something.
+# S2's either the stop, expression, something.
+FINDEC:
 	save S2
 	inc I5
 	eq S2, "(", VARSUBSCRIPT

@@ -2,6 +2,9 @@
 #
 # $Id$
 # $Log$
+# Revision 1.9  2002/06/01 18:23:01  clintp
+# For new assembler
+#
 # Revision 1.8  2002/05/25 02:36:14  clintp
 # Added autorun.bas, removed LOAD message, renamed intermediate compile files
 #
@@ -20,8 +23,8 @@ $a=<<'EOF';
 
 # I5 Stack Depth?
 
-	new P20, PerlHash     # PerlHash   # Numerics
-	new P21, PerlHash     # Alphabetics.
+	new P20, .PerlHash     # PerlHash   # Numerics
+	new P21, .PerlHash     # Alphabetics.
 	time I24      # Seed the random number generator
 
 	branch MAIN
@@ -92,10 +95,6 @@ EOF
 
 # Includes and constant substitutions
 $a=~s/^\.include (.*)/open(F,$1) and print STDERR "Including $1\n" and join('', <F>)/mge;
-$tab{$2}=$3 while($a=~s/^(\.const\s+([^\s]+)\s+([^\s]+))/#$1/m);
-for (keys %tab) {
-	$a=~s/\b${_}\b/$tab{$_}/g ;
-}
 $b=()=$a=~m/\n/g;
 print "  $b lines\n";
 $a=~s/\bputs\b/print/g;   # puts() breaks things.

@@ -10,6 +10,9 @@
 #
 # $Id$
 # $Log$
+# Revision 1.6  2002/06/01 18:23:01  clintp
+# For new assembler
+#
 # Revision 1.5  2002/05/25 01:34:17  clintp
 # Fixed trace
 #
@@ -175,6 +178,7 @@ NOT_ON: ne S0, "TRACE", NOT_TRACE
 	branch ENDLINE
 
 NOT_TRACE:
+	noop
 	
 
 RUN_ILL_INSTRUCTION:

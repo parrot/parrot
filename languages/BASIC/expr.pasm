@@ -8,6 +8,9 @@
 #
 # $Id$
 # $Log$
+# Revision 1.5  2002/06/01 18:23:01  clintp
+# For new assembler
+#
 # Revision 1.4  2002/05/22 17:22:22  clintp
 # Uses PerlHash for speed
 #
@@ -35,7 +38,7 @@
 #
 
 # Width of things on the pseudo-stack
-.const FUNCMARK "\x0"
+.constant FUNCMARK "\x0"
 # Create an artificial "stack" so that I can shift from one stack to the other.
 PUSHOPSTACK:
         pushi
@@ -43,7 +46,7 @@ PUSHOPSTACK:
         get_keyed I0, P25, 0
         inc I0
         restore S0
-        set_keyed P25, I0, S0
+        set_keyed P25[I0], S0
         set_keyed P25, 0, I0
         popi
         pops
@@ -52,7 +55,7 @@ POPOPSTACK:
         pushi
         pushs
         get_keyed I0, P25, 0
-        get_keyed S0, P25, I0
+        get_keyed S0, P25[I0]
         save S0
         dec I0
         set_keyed P25, 0, I0
@@ -66,7 +69,7 @@ OPSTACKDEPTH:
         popi
         ret
 INITOPSTACK:
-        new P25, PerlArray
+        new P25, .PerlArray
         set_keyed P25, 0, 0
         ret
 
@@ -111,7 +114,7 @@ FUNCDISPATCH:
 	length I0, S0
 	dec I0
 	substr S3, S0, I0, 1
-	ne S3, FUNCMARK, FUNCJUMP
+	ne S3, .FUNCMARK, FUNCJUMP
 	substr S0, S0, 0, I0
 
 # To add a function, add to this jump table.  Follow the rules above.
@@ -134,7 +137,8 @@ FUNCJUMP:
 	#  jump to an evaluator to go lookup the array variable.
 	branch DOSUBSCRIPT
 
-ENDFUNCDISPATCH:	# Answer's on top, remember?
+# Answer's on top, remember?
+ENDFUNCDISPATCH:
 	save I24
 	popi
 	pops
@@ -360,13 +364,13 @@ FUNC_ERR:
 #   *** S0 WILL CONTAIN THE VARIABLE NAME ***
 DOSUBSCRIPT:
 			# S0 has the variable name.
-	set I3, NTYPE	# Numeric
+	set I3, .NTYPE	# Numeric
 	length I0, S0
 	set S1, ""
 	dec I0
 	substr S1, S0, I0, 1  # Peel off last char
 	ne S1, "$", DOSUBNUM
-	set I3, STYPE   # String
+	set I3, .STYPE   # String
 	substr S0, S0, 0, I0
 
 DOSUBNUM:	
@@ -383,7 +387,7 @@ DOSUBSL:
 
 ENDSUBS:
 	save S0
-	eq I3, NTYPE, DOSUBFNUM
+	eq I3, .NTYPE, DOSUBFNUM
 	bsr SFETCH
 	branch DOSUBRET
 
@@ -502,7 +506,7 @@ NOTDOLLAR:
 	eq I7, 0, CHECKUM      #  and the funcflag is set!
 	bsr POPOPSTACK
 	restore S3
-	concat S3, FUNCMARK
+	concat S3, .FUNCMARK
 	savec S3
 	bsr PUSHOPSTACK
 	savec "~"
@@ -561,7 +565,8 @@ ADDUSTACK:
 	bsr PUSHOPSTACK
 	branch FIXUNARY
 
-ENDFIXU:		    # Stack transfer.
+# Stack transfer.
+ENDFIXU:	
 	bsr OPSTACKDEPTH
 	restore I0
 	eq I0, 0, COOKEXIT
@@ -584,7 +589,7 @@ COOKEXIT:
 #
 # Bit-O-Magic, | is used to separate tokens on output stream
 
-.const SEPARATOR "|"
+.constant SEPARATOR "|"
 
 INFIXPOSTFIX:
 	pushi
@@ -614,7 +619,7 @@ GETTOP:
 	eq S7, "AND", SPECIAL
 	eq S7, "OR", SPECIAL
 	concat S0, S7		# An identifier
-	concat S0, SEPARATOR
+	concat S0, .SEPARATOR
 	branch GETTOP
 
 SPECIAL:
@@ -637,7 +642,7 @@ CLOSECOMMA:
 	restore S1
 	eq S1, "(", FINISHCOMMA
 	concat S0, S7
-	concat S0, SEPARATOR
+	concat S0, .SEPARATOR
 	branch CLOSECOMMA
 
 FINISHCOMMA:
@@ -646,7 +651,7 @@ FINISHCOMMA:
 	bsr PUSHOPSTACK
 FC2:
 	concat S0, ",<"
-	concat S0, SEPARATOR
+	concat S0, .SEPARATOR
 	branch GETTOP
 
 CLOSEPAREN:
@@ -658,7 +663,7 @@ CLOSEPAREN:
 	restore S1
 	eq S1, "(", TILDECK
 	concat S0, S1
-	concat S0, SEPARATOR
+	concat S0, .SEPARATOR
 	branch CLOSEPAREN
 
 	# Okay, found an ) went back to (, is the next thing a ~ ?
@@ -675,7 +680,7 @@ TILDECK:
 	branch GETTOP
 GOTTILDE:
 	concat S0, S1	  # Mash that tilde on there.
-	concat S0, SEPARATOR
+	concat S0, .SEPARATOR
 	branch GETTOP
 
 CANPUSH:
@@ -748,7 +753,7 @@ CKPREC:
 
 APPOP:
 	concat S0, S10
-	concat S0, SEPARATOR
+	concat S0, .SEPARATOR
 	branch CANPUSH
 
 FINISH:
@@ -760,7 +765,7 @@ FINISH:
 	concat S0, S7
 	bsr OPSTACKDEPTH
 	restore I0		# Bug fix...
-	concat S0, SEPARATOR
+	concat S0, .SEPARATOR
 	eq I0, 0, ALLDONE
 	branch FINISH
 
@@ -776,7 +781,7 @@ ALLDONE:
 	set I1, 0  # Oldstart
 NEXTTOK:
 	save S0
-	save SEPARATOR
+	save .SEPARATOR
 	save I0
 	bsr STRNCHR
 	set I1, I0
@@ -873,7 +878,7 @@ NOTSTRINGLIT:
 	length I0, S0
 	dec I0
 	substr S3, S0, I0, 1
-	ne S3, FUNCMARK, NORMVAR
+	ne S3, .FUNCMARK, NORMVAR
 	save S0			# A var(...), resolve later.
 	bsr PUSHOPSTACK
 	branch CALCLOOP
@@ -1040,8 +1045,12 @@ UNKOP:  branch DOFUNC
 
 	# Convenience labels
 TRUE:   
+	noop
 FALSE:  
-ENDNOP: save I4	    # Convert result to string again
+	noop
+ENDNOP: 
+# Convert result to string again
+	save I4
 	bsr ITOA
 	set S4, ""
 	restore S4
@@ -1049,7 +1058,9 @@ ENDNOP: save I4	    # Convert result to string again
 	
 	# Do a built-in function or multidimensional 
 	#   variable lookup
-DOFUNC: save I5   # Stack's now kosher
+DOFUNC: 
+# Stack's now kosher
+	save I5   
 	
 	# Pull things from the opstack down to the
 	#   function name.  You should get either 
@@ -1065,7 +1076,7 @@ PULLOP: bsr OPSTACKDEPTH
 	dec I1
 	lt I1, 0, NOTOP
 	substr S2, S1, I1, 1   # Last char
-	eq S2, FUNCMARK, RUNFUNC
+	eq S2, .FUNCMARK, RUNFUNC
 NOTOP:
 	save S1
 	inc I4

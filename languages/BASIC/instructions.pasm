@@ -14,6 +14,9 @@
 #
 # $Id$
 # $Log$
+# Revision 1.6  2002/06/01 18:23:01  clintp
+# For new assembler
+#
 # Revision 1.5  2002/05/25 02:36:14  clintp
 # Added autorun.bas, removed LOAD message, renamed intermediate compile files
 #
@@ -234,7 +237,7 @@ READ_PEEK:
 	inc I27
 	save S0  # Name
 	save S2  # Value
-	eq I3, STYPE, DATA_STR
+	eq I3, .STYPE, DATA_STR
 	bsr ATOI
 	bsr NSTORE
 	branch END_I_READ
@@ -334,7 +337,7 @@ I_LET:  pushi
 	save "REM"
 	bsr EVAL_EXPR
 	restore S0
-	eq I3, NTYPE, LETNUM
+	eq I3, .NTYPE, LETNUM
 	save S1
 	save S0
 	bsr SSTORE
@@ -882,7 +885,7 @@ I_LIST:
 
 
 LIST_ONE_LINE:
-	get_keyed S0, P22, I2
+	get_keyed S0, P22[I2]
 	print S0
 	print "\n"
 	branch END_LIST
@@ -900,8 +903,8 @@ LIST_RANGE:
 	#  If I3 is -1 then no range applies.
 DO_I_LIST:  set I0, 0
 DOLISTL: gt I0, I28, END_LIST
-        get_keyed I1, P24, I0   # Get the next line
-        get_keyed S0, P22, I1   # Get the line code itself
+        get_keyed I1, P24[I0]   # Get the next line
+        get_keyed S0, P22[I1]   # Get the line code itself
 	eq I3, -1, LIST_SHOW
 	lt I2, I1, LIST_NEXT
 	gt I3, I1, LIST_NEXT
@@ -927,8 +930,8 @@ I_RUN:  restore I10   # Line number
 
 	set I20, 1    # Runline mode
         set I23, -1   # Program Counter
-	new P20, 6   # PerlHash  # Clear Numerics
-	new P21, 6   # PerlHash  # Clear Alphas
+	new P20, .PerlHash   # PerlHash  # Clear Numerics
+	new P21, .PerlHash   # PerlHash  # Clear Alphas
 
 	set I26, -1   # Reset READ/DATA line number
 	set I27, 0    # And thingy.
@@ -947,7 +950,9 @@ CODELOOP:
         branch CODELOOP
 
 
-ERROR:  # Okay, it's not actually an error branch anymore.
+# Okay, it's not actually an error branch anymore.
+ERROR:  
+	noop
 
 END:    set I20, 0   # Normal mode
 	ret
@@ -959,9 +964,9 @@ I_NEW:  pushi
 	bsr CLEAR
 	restore I10
 	# Initialize program area
-        new P22, PerlHash     # The lines themselves  (Keyed on Line #)
-        new P23, PerlHash     # Pointers from the lines to the array  (Keyed on Line #)
-        new P24, PerlArray    # Array of line numbers
+        new P22, .PerlHash     # The lines themselves  (Keyed on Line #)
+        new P23, .PerlHash     # Pointers from the lines to the array  (Keyed on Line #)
+        new P24, .PerlArray    # Array of line numbers
         set I28, -1	      # Array length
 	set I22, 1	      # Please stop executing
 	save I28
@@ -1034,9 +1039,9 @@ ENDLINES:
 	eq I20, 1, ENDLINES2
 
 	# Initialize program area
-        new P22, PerlHash     # The lines themselves  (Keyed on Line #)
-        new P23, PerlHash     # Pointers from the lines to the array  (Keyed on Line #)
-        new P24, PerlArray    # Array of line numbers
+        new P22, .PerlHash     # The lines themselves  (Keyed on Line #)
+        new P23, .PerlHash     # Pointers from the lines to the array  (Keyed on Line #)
+        new P24, .PerlArray    # Array of line numbers
         set I28, -1
 
 ENDLINES2:
@@ -1070,7 +1075,7 @@ I_INPUT:
         bsr STRIPSPACE
 	restore S5
 
-	eq I3, STYPE, INPSTRING
+	eq I3, .STYPE, INPSTRING
 
 	save S0
 	save S5
@@ -1157,7 +1162,8 @@ ERR_IO:
 	print "\n"
 	branch ALL_ERR
 
-ERR_I_NEXT_MS:	# This is a Should Not Happen error now.
+# This is a Should Not Happen error now.
+ERR_I_NEXT_MS:	
 	save I5
 	bsr CLEAR
 	restore I0
