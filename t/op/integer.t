@@ -142,12 +142,14 @@ output_is(<<CODE, <<OUTPUT, "eq_i_ic");
 	set	I1, 0x12345678
 	set	I2, 0x76543210
 
-	eq	I0, I1, ONE, ERROR
+	eq	I0, I1, ONE
+        branch  ERROR
 	print	"bad\\n"
 
 ONE:
 	print	"ok 1\\n"
-	eq	I1, I2, ERROR, TWO
+	eq	I1, I2, ERROR
+        branch TWO
 	print	"bad\\n"
 
 TWO:
@@ -165,12 +167,14 @@ OUTPUT
 output_is(<<CODE, <<OUTPUT, "eq_ic_ic");
 	set	I0, -42
 
-	eq	I0, 42, ERROR, ONE
+	eq	I0, 42, ERROR
+        branch  ONE
 	print	"bad\\n"
 
 ONE:
 	print	"ok 1\\n"
-	eq	I0, -42, TWO, ERROR
+	eq	I0, -42, TWO
+        branch ERROR
 	print	"bad\\n"
 
 TWO:
@@ -190,12 +194,14 @@ output_is(<<CODE, <<OUTPUT, "ne_i_ic");
 	set	I1, 0xa0b0c0d0
 	set	I2, 0
 
-	ne	I0, I2, ONE, ERROR
+	ne	I0, I2, ONE
+        branch  ERROR
 	print	"bad\\n"
 
 ONE:
 	print	"ok 1\\n"
-	ne	I0, I1, ERROR, TWO
+	ne	I0, I1, ERROR
+        branch  TWO
 	print	"bad\\n"
 
 TWO:
@@ -213,12 +219,14 @@ OUTPUT
 output_is(<<CODE, <<OUTPUT, "ne_ic_ic");
 	set	I0, 427034409
 
-	ne	I0, 427034409, ERROR, ONE
+	ne	I0, 427034409, ERROR
+        branch  ONE
 	print	"bad\\n"
 
 ONE:
 	print	"ok 1\\n"
-	ne	I0, 427034408, TWO, ERROR
+	ne	I0, 427034408, TWO
+        branch  ERROR
 	print	"bad\\n"
 
 TWO:
@@ -239,17 +247,20 @@ output_is(<<CODE, <<OUTPUT, "lt_i_ic");
 	set	I2, 0
 	set	I3, 0
 
-	lt	I1, I0, ONE, ERROR
+	lt	I1, I0, ONE
+        branch  ERROR
 	print	"bad\\n"
 
 ONE:
 	print	"ok 1\\n"
-	lt	I0, I1, ERROR, TWO
+	lt	I0, I1, ERROR
+        branch  TWO
 	print	"bad\\n"
 
 TWO:
 	print	"ok 2\\n"
-	lt	I2, I3, ERROR, THREE
+	lt	I2, I3, ERROR
+        branch  THREE
 	print	"bad\\n"
 
 THREE:
@@ -270,17 +281,20 @@ output_is(<<CODE, <<OUTPUT, "lt_ic_ic");
 	set	I1, -2147483648
 	set	I2, 0
 
-	lt	I0, -2147483648, ERROR, ONE
+	lt	I0, -2147483648, ERROR
+        branch  ONE
 	print	"bad\\n"
 
 ONE:
 	print	"ok 1\\n"
-	lt	I1, 2147483647, TWO, ERROR
+	lt	I1, 2147483647, TWO
+        branch  ERROR
 	print	"bad\\n"
 
 TWO:
 	print	"ok 2\\n"
-	lt	I0, 0, ERROR, THREE
+	lt	I0, 0, ERROR
+        branch  THREE
 	print	"bad\\n"
 
 THREE:
@@ -302,17 +316,20 @@ output_is(<<CODE, <<OUTPUT, "le_i_ic");
 	set	I2, 0
 	set	I3, 0
 
-	le	I1, I0, ONE, ERROR
+	le	I1, I0, ONE
+        branch  ERROR
 	print	"bad\\n"
 
 ONE:
 	print	"ok 1\\n"
-	le	I0, I1, ERROR, TWO
+	le	I0, I1, ERROR
+        branch  TWO
 	print	"bad\\n"
 
 TWO:
 	print	"ok 2\\n"
-	le	I2, I3, THREE, ERROR
+	le	I2, I3, THREE
+        branch  ERROR
 	print	"bad\\n"
 
 THREE:
@@ -333,17 +350,20 @@ output_is(<<CODE, <<OUTPUT, "le_ic_ic");
 	set	I1, -2147483648
 	set	I2, 0
 
-	le	I0, -2147483648, ERROR, ONE
+	le	I0, -2147483648, ERROR
+        branch  ONE
 	print	"bad\\n"
 
 ONE:
 	print	"ok 1\\n"
-	le	I1, 2147483647, TWO, ERROR
+	le	I1, 2147483647, TWO
+        branch  ERROR
 	print	"bad\\n"
 
 TWO:
 	print	"ok 2\\n"
-	le	I2, 0, THREE, ERROR
+	le	I2, 0, THREE
+        branch  ERROR
 	print	"bad\\n"
 
 THREE:
@@ -365,17 +385,20 @@ output_is(<<CODE, <<OUTPUT, "gt_i_ic");
 	set	I2, 0
 	set	I3, 0
 
-	gt	I1, I0, ONE, ERROR
+	gt	I1, I0, ONE
+        branch  ERROR
 	print	"bad\\n"
 
 ONE:
 	print	"ok 1\\n"
-	gt	I0, I1, ERROR, TWO
+	gt	I0, I1, ERROR
+        branch  TWO
 	print	"bad\\n"
 
 TWO:
 	print	"ok 2\\n"
-	gt	I2, I3, ERROR, THREE
+	gt	I2, I3, ERROR
+        branch  THREE
 	print	"bad\\n"
 
 THREE:
@@ -396,17 +419,20 @@ output_is(<<CODE, <<OUTPUT, "gt_ic_ic");
 	set	I1, 2147483647
 	set	I2, 0
 
-	gt	I0, 2147483647, ERROR, ONE
+	gt	I0, 2147483647, ERROR
+        branch  ONE
 	print	"bad\\n"
 
 ONE:
 	print	"ok 1\\n"
-	gt	I1, -2147483648, TWO, ERROR
+	gt	I1, -2147483648, TWO
+        branch  ERROR
 	print	"bad\\n"
 
 TWO:
 	print	"ok 2\\n"
-	gt	I0, 0, ERROR, THREE
+	gt	I0, 0, ERROR
+        branch  THREE
 	print	"bad\\n"
 
 THREE:
@@ -428,17 +454,20 @@ output_is(<<CODE, <<OUTPUT, "ge_i_ic");
 	set	I2, 0
 	set	I3, 0
 
-	ge	I1, I0, ONE, ERROR
+	ge	I1, I0, ONE
+        branch  ERROR
 	print	"bad\\n"
 
 ONE:
 	print	"ok 1\\n"
-	ge	I0, I1, ERROR, TWO
+	ge	I0, I1, ERROR
+        branch  TWO
 	print	"bad\\n"
 
 TWO:
 	print	"ok 2\\n"
-	ge	I2, I3, THREE, ERROR
+	ge	I2, I3, THREE
+        branch  ERROR
 	print	"bad\\n"
 
 THREE:
@@ -459,17 +488,20 @@ output_is(<<CODE, <<OUTPUT, "ge_ic_ic");
 	set	I1, 2147483647
 	set	I2, 0
 
-	ge	I0, 2147483647, ERROR, ONE
+	ge	I0, 2147483647, ERROR
+        branch  ONE
 	print	"bad\\n"
 
 ONE:
 	print	"ok 1\\n"
-	ge	I1, -2147483648, TWO, ERROR
+	ge	I1, -2147483648, TWO
+        branch  ERROR
 	print	"bad\\n"
 
 TWO:
 	print	"ok 2\\n"
-	ge	I2, 0, THREE, ERROR
+	ge	I2, 0, THREE
+        branch  ERROR
 	print	"bad\\n"
 
 THREE:
@@ -490,17 +522,20 @@ output_is(<<CODE, <<OUTPUT, "if_i_ic");
 	set	I1, -2147483648
 	set	I2, 0
 
-	if_i_ic	I0, ONE, ERROR
+	if_i_ic	I0, ONE
+        branch  ERROR
 	print	"bad\\n"
 
 ONE:
 	print	"ok 1\\n"
-	if_i_ic	I1, TWO, ERROR
+	if_i_ic	I1, TWO
+        branch ERROR
 	print	"bad\\n"
 
 TWO:
 	print	"ok 2\\n"
-	if_i_ic	I2, ERROR, THREE
+	if_i_ic	I2, ERROR
+        branch  THREE
 	print	"bad\\n"
 
 THREE:

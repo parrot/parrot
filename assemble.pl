@@ -50,6 +50,10 @@ my(%real_type)=('I'=>'i','i'=>'i',
                 'N'=>'i','n'=>'n',
                 'S'=>'i','s'=>'i',
                 'D'=>'i');
+my(%type_swap)=('I'=>'i',  'N'=>'n',
+                'S'=>'s',  'P'=>'p',
+                'i'=>'ic', 'n'=>'nc',
+                's'=>'sc', 'D'=>'ic');
 
 # compute sizes
 my(%sizeof);
@@ -182,34 +186,66 @@ while(<>) {
 	    }
 	}
 	
-	my $found_op = 0;
+	my ($found_op, $ambiguous) = (0,0);
+        my $match_level_2;
+        my ($old_op) = $opcode;
 	my @tests;
-	my $test;
-	
-	#
-	# For many-arg ops, if first two arg types have the same basic type (like 'i' and 'ic'),
-	# shift off the first one.
-	#
-	
-	shift @arg_t if (@arg_t > 2) and (substr($arg_t[0],0,1) eq substr($arg_t[1],0,1));
-	
-	while (@arg_t) {
-	    $test = $opcode . '_' . join('_', @arg_t);
-	    push @tests, $test;
-	    $found_op++, last if $opcodes{$test};
-	    pop @arg_t;
-	}
-	
+
+        # grep for operators that match the OP_ic_nc format where ic and nc can be any
+        # of (i n s ic nc sc p).
+        foreach my $op ( grep ( $_ =~ /^${opcode}(?:_(?:(?:[ins]c?)|p))+$/, keys(%opcodes) ) ) {
+          # remember what you have examined.
+          push( @tests, $op );
+          # make sure the argcount is the same
+          next unless @args == $opcodes{$op}{ARGS};
+          # assume a match
+          my ($match) = 1;
+          foreach my $idx ( 0 .. $#{ $opcodes{$op}{TYPES} } ) {
+            # check each arg type.  assume ic can be used for nc, but prefer
+            # ic match to ic.
+            if( $type_swap{ $opcodes{$op}{TYPES}[$idx] } ne $arg_t[$idx] ) {
+              # if they are not the same check ic/nc
+              if( $type_swap{ $opcodes{$op}{TYPES}[$idx] } eq "nc" &&
+                  $arg_t[$idx] eq "ic" ) {
+                # got ic/nc level 2 match
+                $match = 2;
+              }
+              else {
+                # no match...next operator attempt...
+                $match = 0;
+                last;
+              }
+            }
+          }
+          if( $match == 1 ) {
+            # exact match...remember what you found and exit the loop
+            $ambiguous = 0;
+            $opcode = $op;
+            $found_op = 1;
+            last;
+          }
+          if( $match == 2 ) {
+            # level two match...if there has been another level two match, it
+            # is ambiguous and no operator can be chosen (unless there is an exact match).
+            $ambiguous = 1 if $match_level_2;
+            $match_level_2 = $op if !$ambiguous;
+            $opcode = $op;
+            $found_op = 1;
+          }
+        }
+
+        if ($ambiguous) {
+          error( "Ambiguous operator $old_op matches $opcode and $match_level_2\n" );
+        }
+    
 	if ($found_op) {
-	    pop @tests;
-	    log_message("substituting $test for $opcode" . (scalar(@tests) ? (" (tried " . join(', ', @tests) . ")") : ''));
-	    $opcode = $test;
+	    log_message("substituting $opcode for $old_op" . (scalar(@tests) ? (" ( tried " . join(', ', @tests) . ")") : ''));
 	} else {
-	    error("No opcode $opcode (tried " . join(', ', @tests) . ") in <$_>");
+	    error("No opcode $opcode ( tried " . join(', ', @tests) . ") in <$_>");
 	}
     }
     if (@args != $opcodes{$opcode}{ARGS}) {
-	error("Wrong arg count--got ".scalar(@args)." needed ".$opcodes{$opcode}{ARGS});
+      error("Wrong arg count--got ".scalar(@args)." needed ".$opcodes{$opcode}{ARGS}." in <$_>" );
     }
     $bytecode .= pack $pack_type{'i'}, $opcodes{$opcode}{CODE};
     $op_pc=$pc;

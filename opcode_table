@@ -95,8 +95,8 @@ ge_nc_ic	3	N n D
 
 jump_i	1	I
 branch_ic	1	D
-if_i_ic	3	I D D
-if_n_ic	3	N D D
+if_i_ic	2	I D
+if_n_ic	2	N D
 
 # Convertors
 
