@@ -1,6 +1,6 @@
 #! perl -w
 
-use Parrot::Test tests => 6;
+use Parrot::Test tests => 7;
 use Parrot::PMC '%pmc_types';
 my $perlint = $pmc_types{'PerlInt'};
 my $ok = '"ok 1\n"';
@@ -105,6 +105,50 @@ CODE
 15
 129
 28
+OUTPUT
+
+output_is(<<'CODE', <<'OUTPUT', "bxor");
+    new P0, .PerlInt
+    set P0, 0b11111000
+    bxor P0, 0b00011111
+    print P0
+    print "\n"
+
+    new P1, .PerlInt
+    set P0, 16
+    set P1, 31
+    bxor P0, P1
+    print P0
+    print "\n"
+
+    new P1, .PerlNum
+    set P1, 47.11
+    set P0, 7
+    bxor P1, P0, 7
+    print P1
+    print "\n"
+
+    new P2, .PerlString
+    set P2, "String"
+    set P0, 127
+    set P1, 1
+    bxor P2, P0, P1
+    print P2
+    print "\n"
+
+    new P4, .PerlUndef
+    set P0, 200
+    set P1, 100
+    bxor P4, P0, P1
+    print P4
+    print "\n"
+    end
+CODE
+231
+15
+0
+126
+172
 OUTPUT
 
 output_is(<<'CODE', <<'OUTPUT', "band");
