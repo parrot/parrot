@@ -485,6 +485,7 @@ output_is( <<'CODE', 'PH', "3-arg substr" );
   set S0, "JAPH"
   substr S1, S0, 2
   print S1
+  end
 CODE
 
 output_is( <<'CODE', '<><', "concat_s_s|sc, null onto null" );
@@ -2052,8 +2053,8 @@ OUTPUT
 output_is(<<'CODE', <<OUTPUT, "string_chartype");
     set S0, "Test String"
     find_chartype I0, "usascii"
-    set_chartype S0, I0  
-    string_chartype I1, S0  
+    set_chartype S0, I0
+    string_chartype I1, S0
     eq I1, I0, OK
     print I0
     print "\n"

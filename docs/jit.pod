@@ -535,11 +535,6 @@ attaches the symbol file, after it got built in F<build_asm>.
 	echo "b runops_jit
 	r -d -j $1.pbc
 	n
-	n
-	n
-	n
-	n
-	n
 	add-symbol-file $1.o 0
 	s
 	" > .ddd
@@ -548,9 +543,7 @@ attaches the symbol file, after it got built in F<build_asm>.
 
 Run this with e.g. I<dddp t/op/jit_2>, then turn on the register status,
 I<step> or I<nexti> through the source, or set break points as with any
-other language. Though - as we don't have line number info currently -
-you might delete empty lines and join labels with ops in the pasm file
-before.
+other language.
 
 You can examine parrot registers via the debugger or even set them and
 you can always step into external opcode and look at I<*interpreter>.
