@@ -1299,10 +1299,10 @@ PDB_disassemble_op(struct Parrot_Interp *interpreter, char* dest, int space,
                 case KEY_string_FLAG:
                     dest[size++] = '"';
                     {
-                    	char *temp = string_to_cstring(
-                    		interpreter,k->cache.string_val);
-	                    strcpy(&dest[size], temp);
-	                    string_cstring_free(temp);
+                        char *temp = string_to_cstring(interpreter, 
+                                                       k->cache.string_val);
+                        strcpy(&dest[size], temp);
+                        string_cstring_free(temp);
                     }
                     size += string_length(k->cache.string_val);
                     dest[size++] = '"';
@@ -1433,7 +1433,8 @@ PDB_disassemble(struct Parrot_Interp *interpreter, const char *command)
             pline = pline->next;
 
         if (!(pline)) {
-            PIO_eprintf(interpreter, "Label number %li out of bounds.\n",label->number);
+            PIO_eprintf(interpreter, 
+                        "Label number %li out of bounds.\n", label->number);
             return;
         }
 
@@ -1846,7 +1847,8 @@ PDB_print_stack(struct Parrot_Interp *interpreter, const char *command)
                 PDB_print_stack_pmc(interpreter, command);
                 break;
             default:
-                PIO_eprintf(interpreter, "Unknown argument \"%s\" to 'stack'\n", command);
+                PIO_eprintf(interpreter, 
+                            "Unknown argument \"%s\" to 'stack'\n", command);
                 break;
         }
     }
@@ -2064,7 +2066,8 @@ PDB_print(struct Parrot_Interp *interpreter, const char *command)
             PDB_print_pmc(interpreter,&interpreter->pmc_reg, regnum, key);
             break;
         default:
-            PIO_eprintf(interpreter, "Unrecognized print option: must be 'int', 'num', 'str', 'pmc', or a register\n");
+            PIO_eprintf(interpreter, "Unrecognized print option: "
+                        "must be 'int', 'num', 'str', 'pmc', or a register\n");
     }
 
     Parrot_unblock_DOD(interpreter);
