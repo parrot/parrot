@@ -196,6 +196,7 @@ examples/assembly/stack.pasm
 examples/assembly/sub.pasm
 examples/assembly/substr.pasm
 examples/assembly/trace.pasm
+examples/assembly/uniq.pasm
 examples/assembly/xml_parser.pasm
 examples/benchmarks/bench_newp.pasm
 examples/benchmarks/gc_alloc_new.pasm
