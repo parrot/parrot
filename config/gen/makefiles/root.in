@@ -399,6 +399,8 @@ help:
 	@echo ""
 	@echo "Documentation:"
 	@echo "  docs:              Generate documentation from POD in the sources."
+	@echo "  html:              Generate HTML documentation from POD in the sources."
+	@echo "  html-clean:        Remove the HTML documentation."
 	@echo ""
 	@echo "Testing:"
 	@echo "  test:              Run the test suite."
