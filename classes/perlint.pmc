@@ -49,9 +49,7 @@ pmclass PerlInt {
     }
 
     FLOATVAL get_number () {
-        /* We're a float now */
-        SELF->vtable = &(Parrot_base_vtables[enum_class_PerlNum]);
-        return SELF->cache.num_val = (FLOATVAL)SELF->cache.int_val;
+        return (FLOATVAL)SELF->cache.int_val;
     }
 
     STRING* get_string () {
@@ -72,12 +70,10 @@ pmclass PerlInt {
     }
 
     void set_integer (PMC* value) {
-	SELF->vtable = &(Parrot_base_vtables[enum_class_PerlInt]);
         SELF->cache.int_val = (INTVAL)value->vtable->get_integer(INTERP, value);
     }
 
     void set_integer_native (INTVAL value) {
-	SELF->vtable = &(Parrot_base_vtables[enum_class_PerlInt]);
         SELF->cache.int_val = value;
     }
 
@@ -87,7 +83,6 @@ pmclass PerlInt {
     }
 
     void set_integer_same (PMC * value) {
-	SELF->vtable = &(Parrot_base_vtables[enum_class_PerlInt]);
         SELF->cache.int_val = value->cache.int_val;
     }
 
@@ -107,7 +102,7 @@ pmclass PerlInt {
 
     void set_number_same (PMC * value) {
 	SELF->vtable = &(Parrot_base_vtables[enum_class_PerlNum]);
-	SELF->cache.num_val = value->cache.num_val;
+	SELF->cache.num_val = (FLOATVAL)value->cache.int_val;
     }
 
     void set_string (PMC * value) {
