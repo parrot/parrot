@@ -62,7 +62,7 @@ parrot_PIC_prederef(Interp *interpreter, opcode_t op, void **pc_pred, int core)
                 if (type <= 0)
                     real_exception(interpreter, NULL, NO_CLASS,
                             "Class '%Ss' not found", class);
-                if (type > N_STATIC_TYPES)
+                if (type >= N_STATIC_TYPES)
                     internal_exception(1, "Unimp: too many classes");
                 /*
                  * the prederef bytecode needs the address of
