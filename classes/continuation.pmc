@@ -52,8 +52,10 @@ Marks the continuation as live.
 */
 
     void mark () {
+#if 0
         struct Parrot_Sub * cc = (struct Parrot_Sub*)PMC_sub(SELF);
         mark_context(INTERP, &cc->ctx);
+#endif
     }
 
 /*
