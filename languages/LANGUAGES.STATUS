@@ -40,7 +40,9 @@ Perl6
 
 plot
 
-Python
+Python		Mostly working except for classes/exec/import. For licensing 
+		reasons, not in parrot's cvs tree. See http://pirate.tangentcode.com/
+		Parrot Version: 0.0.11
 
 regex
 
