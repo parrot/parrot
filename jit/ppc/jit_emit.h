@@ -777,6 +777,12 @@ Parrot_jit_emit_mov_mr(Interp * interpreter, char *mem, int reg)
 {
     jit_emit_mov_mr_i(
         ((Parrot_jit_info_t *)(interpreter->jit_info))->native_ptr, mem, reg);
+    /*
+     * if we save registers, the last instruction isn't the ins that
+     * sets condition codes, so the speed hack in Parrot_ifunless_i_ic
+     * doesn't work.
+     */
+    ((Parrot_jit_info_t *)(interpreter->jit_info))->prev_op = 0;
 }
 
 /* move mem (i.e. intreg) to reg */
@@ -793,6 +799,7 @@ Parrot_jit_emit_mov_mr_n(Interp * interpreter, char *mem,int reg)
 {
     jit_emit_mov_mr_n(
         ((Parrot_jit_info_t *)(interpreter->jit_info))->native_ptr, mem, reg);
+    ((Parrot_jit_info_t *)(interpreter->jit_info))->prev_op = 0;
 }
 
 /* move mem (i.e. numreg) to reg */

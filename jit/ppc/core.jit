@@ -5,6 +5,8 @@
 ; $Id$
 ;
 
+# TODO complete this
+#define P_ARITH ((PREV_OP == dec_i) || (PREV_OP == inc_i) || (PREV_OP == sub_i_i_i))
 Parrot_end {
     jit_emit_lwz(NATIVECODE, r1, 0, r1);
     jit_emit_lwz(NATIVECODE, r0, 8, r1);
@@ -558,7 +560,11 @@ Parrot_abs_n_n {
 }
 
 TEMPLATE Parrot_ifunless_i_ic {
-    if (MAP[1]) {
+    if (P_ARITH && MAP[1]) {
+        /* set the Rc bit of prev for the sake of +50% more MOPS  */
+        NATIVECODE[-1] |= 1;
+    }
+    else if (MAP[1]) {
         jit_emit_cmp_ri(NATIVECODE, MAP[1], 0);
     }
     else {
