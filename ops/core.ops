@@ -1957,11 +1957,20 @@ inline op pack(inout STR, in INT, in STR) {
 inline op pack(inout STR, in INT, in INT, in INT) {
     char *c = (char *)&$3, *n;
     STRING *s;
+    INTVAL ln;
     const char *t;
     int i;
     
     s = string_make(interpreter, c, (UINTVAL)$2, NULL, 0, NULL);
     s->flags |= BUFFER_neonate_FLAG;
+    ln = string_length($1);
+    if (ln < $4 + $2)
+    {
+       $1->buflen = $1->strlen;
+       string_grow(interpreter, $1, $4 + $2 - ln);
+       $1->bufused = $1->strlen = $1->buflen;
+    }
+
     /* XXX this is EVIL, use string_replace */
     n = $1->bufstart;
     t = string_to_cstring(interpreter, (s));
