@@ -14,7 +14,17 @@
 # we don't have »is rw« or call string by refs, so
 # input / output are int arrays - slooow
 #
-sub Generate(@input, @output) {
+sub Print(@world) {
+    my ($i, $j);
+    for 0..15 -> $i {
+	for 0..15 -> $j {
+	    print( @world[$i * 16 + $j] ?? '*' :: ' ');
+	}
+	print "\n" ;
+    }
+    print "----------------\n";
+}
+sub Generate(@input) {
     my ($cell, $neighbours, $i);
     my $len = 256; #@input;
     my ($pos, $offset);
@@ -22,7 +32,7 @@ sub Generate(@input, @output) {
     #my str $death = "  **     ";
     my @death = (0,0,1,1,0,0,0,0,0);
 
-    @output = @input;
+    my @output = @input;
 
     loop ($cell = 0; $cell < $len; $cell++) {
 	$neighbours = 0;
@@ -42,19 +52,9 @@ sub Generate(@input, @output) {
 	    @output[$cell] = 1;
 	}
     }
-    #return output;
+    return @output;
 }
 
-sub Print(@world) {
-    my ($i, $j);
-    for 0..15 -> $i {
-	for 0..15 -> $j {
-	    print( @world[$i * 16 + $j] ?? '*' :: ' ');
-	}
-	print "\n" ;
-    }
-    print "----------------\n";
-}
 #static void Main()
 
 sub main() {
@@ -78,14 +78,15 @@ sub main() {
     );
 
     my ($i, $j, @new);
-    my $gen = @ARGS[0] || 512;
+    my $gen = @ARGS[0] || 100;
     print "Running ", $gen, " generations\n";
     Print(@world);
     my $ts = time;
     loop( $j= 0 ; $j < $gen; $j++) {
-	Generate(@world, @new);
-	@world = @new;
+	@world = Generate(@world);
     }
+    my $te = time();
     Print(@world);
+    print "Gens/s ", $gen/($te-$ts), "\n";
 }
 

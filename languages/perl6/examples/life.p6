@@ -32,9 +32,9 @@ sub Generate($input) {
 	$neighbours++ if(substr($input, ($i - 17) % $len, 1) eq "*");
 	$neighbours++ if(substr($input, ($i + 17) % $len, 1) eq "*");
 	$neighbours++ if(substr($input, ($i - 16) % $len, 1) eq "*");
-	$neighbours++ if(substr($input, ($i - 16) % $len, 1) eq "*");
+	$neighbours++ if(substr($input, ($i + 16) % $len, 1) eq "*");
+	$neighbours++ if(substr($input, ($i - 15) % $len, 1) eq "*");
 	$neighbours++ if(substr($input, ($i + 15) % $len, 1) eq "*");
-	$neighbours++ if(substr($input, ($i + 17) % $len, 1) eq "*");
 	if(substr($input, $cell, 1) eq "*") {
 	    my $n = substr($death, $neighbours, 1);
 	    substr($output, $cell, 1, $n);
@@ -76,13 +76,15 @@ sub main() {
     ;
 
     my $j;
-    my $gen = @ARGS[0] || 518;
-    # for $j (0 .. 499) => imcc error releated to closure?
-    print "Running " _ $gen _ " generations\n";
+    my $gen = @ARGS[0] || 100;
+    print "Running " , $gen , " generations\n";
     Print($world);
+    my $ts = time();
     loop( $j= 0 ; $j < $gen; $j++) {
 	$world = Generate($world)[0];
     }
+    my $te = time();
     Print($world);
+    print "Gens/s ", $gen/($te-$ts), "\n";
 }
 
