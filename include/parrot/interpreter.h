@@ -98,7 +98,11 @@ typedef STRING_FUNCS *(**string_funcs)();      /* String function table */
  */
 
 typedef enum {
-     PARROT_PROF_DOD,
+     PARROT_PROF_DOD_p1,        /* pass 1 mark root set */
+     PARROT_PROF_DOD_p2,        /* pass 2 mark next_for_GC */
+     PARROT_PROF_DOD_cp,        /* collect PMCs */
+     PARROT_PROF_DOD_cb,        /* collect buffers */
+     /* DOD must be 0..3 */
      PARROT_PROF_GC,
      PARROT_PROF_EXCEPTION,
      PARROT_PROF_EXTRA

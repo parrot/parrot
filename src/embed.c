@@ -482,8 +482,14 @@ static const char *
 op_name(Parrot_Interp interpreter, int k)
 {
     switch (k) {
-        case PARROT_PROF_DOD:
-            return "DOD";
+        case PARROT_PROF_DOD_p1:
+            return "DOD_mark_root";
+        case PARROT_PROF_DOD_p2:
+            return "DOD_mark_next";
+        case PARROT_PROF_DOD_cp:
+            return "DOD_collect_PMC";
+        case PARROT_PROF_DOD_cb:
+            return "DOD_collect_buffers";
         case PARROT_PROF_GC:
             return "GC";
         case PARROT_PROF_EXCEPTION:

@@ -40,7 +40,8 @@ int CONSERVATIVE_POINTER_CHASING = 0;
 #endif
 
 static size_t find_common_mask(size_t val1, size_t val2);
-static int trace_children(struct Parrot_Interp *interpreter, PMC *current);
+static int trace_children(Parrot_Interp , PMC *current);
+static PARROT_INLINE void profile_dod_end(Parrot_Interp, int what);
 
 /*
 
@@ -332,6 +333,8 @@ trace_children(struct Parrot_Interp *interpreter, PMC *current)
      * If there is a count of shared PMCs and we have already seen
      * all these, we could skip that
      */
+    if (interpreter->profile)
+        profile_dod_end(interpreter, PARROT_PROF_DOD_p1);
     pt_DOD_mark_root_finished(interpreter);
 
     for (; current != prev; current = PMC_next_for_GC(current)) {
@@ -972,15 +975,16 @@ Records the end time of a DOD run when porfiling is enabled.
 */
 
 static PARROT_INLINE void
-profile_dod_end(Parrot_Interp interpreter)
+profile_dod_end(Parrot_Interp interpreter, int what)
 {
     if (Interp_flags_TEST(interpreter, PARROT_PROFILE_FLAG)) {
         RunProfile *profile = interpreter->profile;
         FLOATVAL now = Parrot_floatval_time();
 
-        profile->data[PARROT_PROF_DOD].numcalls++;
-        profile->data[PARROT_PROF_DOD].time += now - profile->dod_time;
+        profile->data[what].numcalls++;
+        profile->data[what].time += now - profile->dod_time;
         profile->starttime += now - profile->dod_time;
+        interpreter->profile->dod_time = now;
     }
 }
 
@@ -1035,11 +1039,15 @@ Parrot_do_dod_run(struct Parrot_Interp *interpreter, UINTVAL flags)
         /*
          * mark is now finished
          */
+        if (interpreter->profile)
+            profile_dod_end(interpreter, PARROT_PROF_DOD_p2);
         pt_DOD_stop_mark(interpreter);
         /* Now put unused PMCs on the free list */
         header_pool = interpreter->arena_base->pmc_pool;
         free_unused_pobjects(interpreter, header_pool);
         total_free += header_pool->num_free_objects;
+        if (interpreter->profile)
+            profile_dod_end(interpreter, PARROT_PROF_DOD_cp);
 
         /* And unused buffers on the free list */
         for (j = 0; j < (INTVAL)interpreter->arena_base->num_sized; j++) {
@@ -1055,21 +1063,23 @@ Parrot_do_dod_run(struct Parrot_Interp *interpreter, UINTVAL flags)
 #endif
             }
         }
+        if (interpreter->profile)
+            profile_dod_end(interpreter, PARROT_PROF_DOD_cb);
     }
     else {
         /* it was an aborted lazy dod run - we should clear
          * the live bits, but e.g. t/pmc/timer_7 succeeds w/o this
          */
-        pt_DOD_stop_mark(interpreter);
 #if 1
         clear_live_bits(interpreter);
 #endif
+        pt_DOD_stop_mark(interpreter);
+        if (interpreter->profile)
+            profile_dod_end(interpreter, PARROT_PROF_DOD_p2);
     }
     /* Note it */
     interpreter->dod_runs++;
     interpreter->dod_trace_ptr = NULL;
-    if (interpreter->profile)
-        profile_dod_end(interpreter);
     Parrot_unblock_DOD(interpreter);
     return;
 }
