@@ -778,8 +778,13 @@ typedef struct {
 /*
  * XXX RetContinution free_list handling is currently here
  */
+
 #define DISABLE_METH_CACHE 0
+/*
+ * s. also src/stack_common.c:200
+ */
 #define DISBALE_RETC_RECYCLING 0
+
 void add_to_retc_free_list(Parrot_Interp, PMC*);
 void disable_retc_free_list(Parrot_Interp);
 PMC *get_retc_from_free_list(Parrot_Interp);

@@ -196,10 +196,14 @@ stack_prepare_pop(Parrot_Interp interpreter, Stack_Chunk_t **stack_p)
     }
     *stack_p = chunk->prev;
 
+    /*
+     * turn this off for correct behavior with continuations
+     */
+#if 1
     assert(s < MAX_CACHED_STACKS);
     chunk->free_p = e->free_list;
     e->free_list = chunk;
-
+#endif
     return STACK_DATAP(chunk);
 }
 
