@@ -79,7 +79,7 @@ HERE
 /*
 ** $header_file:
 */
-
+#line 1 "$header_file"
 HERE
           print PLATFORM_H <IN_H>, "\n\n";
           close IN_H;
@@ -103,7 +103,7 @@ HERE
 /*
 ** $_
 */
-
+#line 1 "$_"
 HERE
           print PLATFORM_H <IN_H>, "\n\n";
           close IN_H;
@@ -155,7 +155,7 @@ HERE
 /*
 ** begin.c
 */
-
+#line 1 "config/gen/platform/$platform/begin.c"
 HERE
       print PLATFORM_C <IN_C>, "\n\n";
       close IN_C;
@@ -181,7 +181,7 @@ HERE
 /*
 ** $impl_file:
 */
-
+#line 1 "$impl_file"
 HERE
           print PLATFORM_C <IN_C>, "\n\n";
           close IN_C;
@@ -199,7 +199,7 @@ HERE
 /*
 ** $_:
 */
-
+#line 1 "$_"
 HERE
           print PLATFORM_C <IN_C>, "\n\n";
           close IN_C;
