@@ -18,79 +18,80 @@
 # Allocate registers
 #
 
-.constant CommandLength I0
-.constant WordStart     I1
-.constant WordEnd       I2
-.constant WordLength    I3
-.constant Mode          I4
+.constant CommandLength I23
+.constant WordStart     I24
+.constant WordEnd       I25
+.constant WordLength    I26
+.constant Mode          I28
 
-.constant TempInt       I5
-.constant TempInt2	I6
-.constant TempInt3      I7
+.constant TempInt       I20
+.constant TempInt2	I21
+.constant TempInt3      I22
 
 .constant InternalInt	I27
 
-.constant Status	I12
+.constant Status	I19
 
 # This may move elsewhere, hence the indirection
-.constant NestLevel	I14
-.constant PendingElse   I15
+.constant NestLevel	I18
+.constant PendingElse   I17
 .constant LastCellUsed	I16
 
-.macro GetNestLevel
-  noop
+.macro NewNestLevel
+  inc .NestLevel
 .endm
 
-.macro IncNestLevel
-  inc I14
-.endm
+#.macro IncNestLevel
+#  inc .NestLevel
+#.endm
 
-.macro DecNestLevel
-  dec I14
-.endm
+#.macro DecNestLevel
+#  dec .NestLevel
+#.endm
 
 .constant IntStack      I31
 
-.constant TempNum	N5
-.constant TempNum2	N6
-.constant TempNum3	N7
+.constant TempNum	N16
+.constant TempNum2	N17
+.constant TempNum3	N18
 
 .constant NumStack	N31
 
 #
 
-.constant Commands      S0
-.constant CurrentWord   S1
-.constant CompileWord   S2
-.constant CompileBuffer S3
-.constant TempString    S4
-.constant WordBody	S5
+.constant Commands      S16
+.constant CurrentWord   S17
+.constant CompileWord   S18
+.constant CompileBuffer S19
+.constant TempString    S20
+.constant WordBody	S21
 
-.constant NewBodyString	S6
+.constant NewBodyString	S22
 
-.constant TempStr    	S7
+.constant TempStr    	S23
 
 #
 
-.constant CoreOps       P0
-.constant UserOps       P1
-.constant SpecialWords	P5
+.constant CoreOps       P16
+.constant UserOps       P18
+.constant SpecialWords	P19
 
-.constant CompiledWordPMC P3
-.constant PASMCompiler	P4
-.constant LinePMC	P2
+.constant CompiledWordPMC P20
+.constant PASMCompiler	P21
+.constant LinePMC	P22
 
 .constant WorkTOS	P17
 
-.constant TempPMC       P6
-.constant TempPMC2	P7
-.constant TempPMC3      P8
+.constant TempPMC       P23
+.constant TempPMC2	P24
+.constant TempPMC3      P25
 
+.constant LabelStack	P27
 .constant TruePMC	P29
 .constant FalsePMC	P28
 .constant ReturnStack	P30
 .constant PMCStack	P31
-.constant CellPMC	P28
+.constant CellPMC	P26
 
 VeryBeginning:
 
@@ -205,6 +206,7 @@ InitializeCoreOps:
     new .CellPMC, .Array
     set .CellPMC, .CellSize   # Our cell area is 64K by default
     set .LastCellUsed, 0
+    new .LabelStack, .PerlArray
 
     set .SpecialWords["if"], 1
     set .SpecialWords["then"], 2
@@ -284,7 +286,6 @@ InitializeCoreOps:
     .AddCoreOp(Int_GT,"u>")
     .AddCoreOp(Int_GE,"u>=")
     .AddCoreOp(Within, "within")
-# within
 # d<
 # d<=
 # d<>
@@ -375,16 +376,16 @@ InitializeCoreOps:
     .AddCoreOp(Stack_Depth, "depth")
     .AddCoreOp(Pick_Stack, "pick")
     .AddCoreOp(Rot_Stack, "rot")
-# -rot
+    .AddCoreOp(Not_Rot_Stack, "-rot")
     .AddCoreOp(Maybe_Dup, "?dup")
     .AddCoreOp(Roll_Stack, "roll")
     .AddUserOp("2drop", "drop drop")
-# 2nip
     .AddUserOp("2dup", "over over")
     .AddCoreOp(Two_Over, "2over")
-# 2tuck
     .AddCoreOp(Two_Swap, "2swap")
-# 2rot
+    .AddUserOp("2tuck", "2swap 2over")
+    .AddUserOp("2nip", "2swap 2drop")
+    .AddCoreOp(Two_Rot_Stack, "2rot")
 
     #
     # Stack Manipulation, Floating point stack
@@ -426,7 +427,6 @@ InitializeCoreOps:
   .AddCoreOp(Two_To_R, "2>r")
   .AddCoreOp(Two_From_R, "2r>")
   .AddCoreOp(Two_R_Fetch, "2r@")
-# 2r@
   .AddCoreOp(Two_RDrop, "2rdrop")
 
     #
@@ -1052,6 +1052,15 @@ Rot_Stack:
     rotate_up -3
     branch DoneInterpretWord
 
+Two_Rot_Stack:
+    rotate_up -6
+    rotate_up -6
+    branch DoneInterpretWord
+
+Not_Rot_Stack:
+    rotate_up 3
+    branch DoneInterpretWord
+
 Roll_Stack:
     .PopInt
     sub .IntStack, 0, .IntStack
@@ -1364,22 +1373,20 @@ CheckForString:
 # Control flow and such, where a simple substitution won't do
 AddSpecialWord:
     ne .CurrentWord, "if", NotIf
-    .IncNestLevel
-    .GetNestLevel
+    .NewNestLevel
     concat .NewBodyString, "restore P17\n"
     concat .NewBodyString, "unless P17, endif"
     set .TempString, .NestLevel
     concat .NewBodyString, .TempString
     concat .NewBodyString, "\n" 
+    concat .TempString, "endif", .TempString
+    push .LabelStack, .TempString
     branch EndSpecWord
   NotIf:
     ne .CurrentWord, "then", NotThen
-    .GetNestLevel
-    concat .NewBodyString, "endif"
-    set .TempString, .NestLevel
+    pop .TempString, .LabelStack
     concat .NewBodyString, .TempString
     concat .NewBodyString, ":\n" 
-    .DecNestLevel
     branch EndSpecWord
   NotThen:
     ne .CurrentWord, "else", NotElse
@@ -1390,70 +1397,65 @@ AddSpecialWord:
     branch EndSpecWord    
   NotExit:
     ne .CurrentWord, "begin", NotBegin
-    .IncNestLevel
-    .GetNestLevel
+    .NewNestLevel
     concat .NewBodyString, "begin"
     set .TempString, .NestLevel
     concat .NewBodyString, .TempString
     concat .NewBodyString, ":\n" 
+    concat .TempString, "begin", .TempString
+    push .LabelStack, .TempString
     branch EndSpecWord    
   NotBegin:
     ne .CurrentWord, "again", NotAgain
-    .GetNestLevel
-    concat .NewBodyString, "branch begin"
-    set .TempString, .NestLevel
-    .DecNestLevel
+    concat .NewBodyString, "branch "
+    pop .TempString, .LabelStack
     concat .NewBodyString, .TempString
     concat .NewBodyString, "\n"
     branch EndSpecWord    
   NotAgain:
     ne .CurrentWord, "until", NotUntil
-    .GetNestLevel
     concat .NewBodyString, "restore P17\n"
-    concat .NewBodyString, "unless P17, begin"
-    set .TempString, .NestLevel
-    .DecNestLevel
+    concat .NewBodyString, "unless P17, "
+    pop .TempString, .LabelStack
     concat .NewBodyString, .TempString
     concat .NewBodyString, "\n"
     branch EndSpecWord    
   NotUntil:
     ne .CurrentWord, "do", NotDo
-    .IncNestLevel
-    .GetNestLevel
+    .NewNestLevel
     concat .NewBodyString, "restore P31\n"
-    concat .NewBodyString, "restore P6\n"
-    concat .NewBodyString, "push P30, P6\n"
+    concat .NewBodyString, "restore P23\n"
+    concat .NewBodyString, "push P30, P23\n"
     concat .NewBodyString, "push P30, P31\n"
-    concat .NewBodyString, "dolabel"
     set .TempString, .NestLevel
+    concat .TempString, "dolabel", .TempString
+    push .LabelStack, .TempString
     concat .NewBodyString, .TempString
     concat .NewBodyString, ":\n"    
     branch EndSpecWord    
   NotDo:
     ne .CurrentWord, "loop", NotLoop
-    concat .NewBodyString, "pop P6, P30\n"
-    concat .NewBodyString, "inc P6\n"
+    concat .NewBodyString, "pop P23, P30\n"
+    concat .NewBodyString, "inc P23\n"
     concat .NewBodyString, "pop P31, P30\n"
     concat .NewBodyString, "push P30, P31\n"
-    concat .NewBodyString, "push P30, P6\n"
-    concat .NewBodyString, "ne P6, P31, dolabel"
-    .GetNestLevel
-    set .TempString, .NestLevel
+    concat .NewBodyString, "push P30, P23\n"
+    concat .NewBodyString, "ne P23, P31, "
+    pop .TempString, .LabelStack
     concat .NewBodyString, .TempString
     concat .NewBodyString, "\n"
     concat .NewBodyString, "pop P31, P30\npop P31, P30\n"
     branch EndSpecWord    
   NotLoop:
     ne .CurrentWord, "+loop", NotPlusLoop
-    concat .NewBodyString, "pop P6, P30\n"
-    concat .NewBodyString, "restore P7\n"
-    concat .NewBodyString, "add P6, P6, P7\n"
+    concat .NewBodyString, "pop P23, P30\n"
+    concat .NewBodyString, "restore P24\n"
+    concat .NewBodyString, "add P23, P23, P24\n"
     concat .NewBodyString, "pop P31, P30\n"
     concat .NewBodyString, "push P30, P31\n"
-    concat .NewBodyString, "push P30, P6\n"
-    concat .NewBodyString, "ne P6, P31, dolabel"
-    .GetNestLevel
-    set .TempString, .NestLevel
+    concat .NewBodyString, "push P30, P23\n"
+    concat .NewBodyString, "ne P23, P31, "
+    pop .TempString, .LabelStack
     concat .NewBodyString, .TempString
     concat .NewBodyString, "\n"
     concat .NewBodyString, "pop P31, P30\npop P31, P30\n"
