@@ -622,7 +622,7 @@ PDB_set_break(struct Parrot_Interp *interpreter, const char *command)
     }
 
     /* Allocate the new break point */
-    newbreak = (PDB_breakpoint_t *)mem_sys_allocate(PDB_breakpoint_t));
+    newbreak = (PDB_breakpoint_t *)mem_sys_allocate(sizeof(PDB_breakpoint_t));
 
     na(command);
 
