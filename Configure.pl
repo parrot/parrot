@@ -328,7 +328,7 @@ e.g. : --ccflags="rem{-g} :add{-O2}"
    --ld=(linker)        Use the given loader for shared libraries
    --ldflags=(flags)    Use the given loader flags for shared libraries
    --lex=(lexer)        Use the given lexical analyzer generator
-   --yacc=(parser)       Use the given parser generator
+   --yacc=(parser)      Use the given parser generator
 
    --define=inet_aton   Quick hack to use inet_aton instead of inet_pton
 
@@ -348,14 +348,28 @@ Parrot Options:
 
 ICU Options:
 
+   For using a system ICU, these options can be used:
+
+   --icu-config=/path/to/icu-config
+                        Location of the script used for ICU autodetection.
+                        You just need to specify this option if icu-config
+                        is not in you PATH.
+
+   --icu-config=none    can be used to disable the autodetection feature.
+                        It will also be disabled if you specify any other
+                        of the following ICU options.
+
+   If you do not have a full ICU installation:
+
+   --icuheaders=(path)  Location of ICU headers without /unicode
+   --icushared=(flags)  Full linker command to create shared libraries
+   --icudatadir=(path)  Directory to locate ICU's data file(s)
+
+   If you want to use the ICU version bundled with parrot:
+
    --icuplatform=(platform)   Platform name to pass to ICU's runConfigureICU
    --icuconfigureargs=(args)  Arguments to pass to ICU's configuration script
    --icudatadir=(path)        Directory to locate ICU's data file(s)
-
-                       For using a system ICU, these options can be used
-
-   --icuheaders=(header_dir)  Location of headers w/o /unicode
-   --icushared=(linkeroption)>  Full linker command
 
 Other Options (may not be implemented):
 
