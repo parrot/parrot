@@ -48,6 +48,7 @@ typedef Parrot_Float FLOATVAL;
 #define INTVAL_SIZE ${intvalsize}
 #define NUMVAL_SIZE ${nvsize}
 #define OPCODE_T_SIZE ${opcode_t_size}
+#define ALIGNED_POINTERS ${aligned_ptrs}
 
 typedef Parrot_Opcode opcode_t;
 typedef size_t ptrcast_t;

@@ -285,20 +285,24 @@ trace_system_stack(struct Parrot_Interp *interpreter, PMC *last)
 {
     size_t lo_var_ptr = (size_t)interpreter->lo_var_ptr;
     size_t hi_var_ptr = (size_t)&lo_var_ptr;
-    size_t cur_var_ptr;
-    size_t direction = (hi_var_ptr > lo_var_ptr) ? 1 : -1;
+    ptrdiff_t cur_var_ptr;
+    ptrdiff_t direction = (hi_var_ptr > lo_var_ptr) ? 1 : -1;
 
     size_t buffer_min = get_min_buffer_address(interpreter);
     size_t buffer_max = get_max_buffer_address(interpreter);
     size_t pmc_min = get_min_pmc_address(interpreter);
     size_t pmc_max = get_max_pmc_address(interpreter);
 
+#if ALIGNED_POINTERS
+    direction *= sizeof(void*);
+#endif
+
     if (!lo_var_ptr)
         return last;
     
     for (cur_var_ptr = lo_var_ptr;
          cur_var_ptr*direction<hi_var_ptr*direction;
-         cur_var_ptr += direction
+         cur_var_ptr = (size_t)( (ptrdiff_t)cur_var_ptr + direction )
          ) {
         size_t ptr = *(size_t *)cur_var_ptr;
         if (pmc_min < ptr && ptr < pmc_max && is_pmc_ptr(interpreter,(void *)ptr)) {

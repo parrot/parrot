@@ -7,7 +7,7 @@ use vars qw(@steps);
 @steps=qw(
 	init/manifest.pl
 	init/data.pl
-        init/miniparrot.pl
+	init/miniparrot.pl
 	init/hints.pl
 	inter/progs.pl
 	inter/types.pl
@@ -23,6 +23,7 @@ use vars qw(@steps);
 	auto/jit.pl
 	auto/funcptr.pl
 	auto/cgoto.pl
+	auto/alignptrs.pl
 	gen/config_h.pl
 	gen/config_pm.pl
 	gen/makefiles.pl
