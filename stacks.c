@@ -126,31 +126,21 @@ stack_entry(Interp *interpreter, Stack_Chunk_t *stack, Intval depth)
 
     /* For negative depths, look from the bottom of the stack up. */
     if (depth < 0) {
-        /* FIXME: Non-circular stack makes this rare case slow */
-        for (chunk = stack; chunk->prev; chunk = chunk->prev);
-        offset = (size_t)-depth;
-        while (chunk != NULL && offset >= chunk->used) {
-            offset -= chunk->used;
-            chunk = chunk->next;
-        }
-        if (chunk == NULL)
+        depth = stack_height(interpreter, interpreter->ctx.user_stack) + depth;
+        if (depth < 0)
             return NULL;
-        if (offset < chunk->used) {
-            entry = (Stack_Entry_t *)chunk->buffer->bufstart + offset - 1;
-        }
+        offset = (size_t)depth;
     }
-    else {
-        chunk = stack;          /* Start at top */
-        while (chunk != NULL && offset >= chunk->used) {
-            offset -= chunk->used;
-            chunk = chunk->prev;
-        }
-        if (chunk == NULL)
-            return NULL;
-        if (offset < chunk->used) {
-            entry = (Stack_Entry_t *)chunk->buffer->bufstart +
-                chunk->used - offset - 1;
-        }
+    chunk = stack;          /* Start at top */
+    while (chunk != NULL && offset >= chunk->used) {
+        offset -= chunk->used;
+        chunk = chunk->prev;
+    }
+    if (chunk == NULL)
+        return NULL;
+    if (offset < chunk->used) {
+        entry = (Stack_Entry_t *)chunk->buffer->bufstart +
+            chunk->used - offset - 1;
     }
     return entry;
 }
