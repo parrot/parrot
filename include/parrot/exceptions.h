@@ -16,6 +16,7 @@
 #define INTERNAL_EXCEPTION(x,y) {fprintf(stderr, y); exit(x);}
 
 #define NO_REG_FRAMES 1
+#define SUBSTR_OUT_OF_STRING 1
 
 #endif
 

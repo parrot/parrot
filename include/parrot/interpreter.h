@@ -30,9 +30,8 @@ struct Parrot_Interp {
                                           /* variable area */
     struct Arenas *arena_base;            /* Pointer to this */
                                           /* interpreter's arena */
-    opcode_t *(*(*opcode_funcs)[2048])(); /* Opcode */
-                                          /* function table */
-    STRING_FUNCS *(*(*string_funcs)[64])();  /* String function table */
+    opcode_t     *(**opcode_funcs)();     /* Opcode function table */
+    STRING_FUNCS *(**string_funcs)();     /* String function table */
     IV flags;				  /* Various interpreter flags
                                            that signal that runops
                                            should do something */

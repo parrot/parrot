@@ -48,8 +48,8 @@ opcode_t *
 runops_notrace_core (struct Parrot_Interp *interpreter, opcode_t *code, IV code_size) {
     /* Move these out of the inner loop. No need to redeclare 'em each
        time through */
-    opcode_t *(*func)();
-    void **temp; 
+    opcode_t *(* func)();
+    opcode_t *(**temp)();
     opcode_t *code_start;
 
     code_start = code;
@@ -95,8 +95,8 @@ opcode_t *
 runops_trace_core (struct Parrot_Interp *interpreter, opcode_t *code, IV code_size) {
     /* Move these out of the inner loop. No need to redeclare 'em each
        time through */
-    opcode_t *(*func)();
-    void **temp; 
+    opcode_t *( *func)();
+    opcode_t *(**temp)();
     opcode_t *code_start;
 
     code_start = code;
@@ -213,7 +213,7 @@ make_interpreter() {
     
     /* The default opcode function table would be a good thing here... */
     {
-        void **foo;
+        opcode_t *(**foo)();
         foo = mem_sys_allocate(2048 * sizeof(void *));
         
         BUILD_TABLE(foo);

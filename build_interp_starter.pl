@@ -21,7 +21,7 @@ my %opcodes            = Parrot::Opcode::read_ops();
 my $opcode_fingerprint = Parrot::Opcode::fingerprint();
 
 for my $name (sort {$opcodes{$a}{CODE} <=> $opcodes{$b}{CODE}} keys %opcodes) {
-    print INTERP "\tx[$opcodes{$name}{CODE}] = (void*)$name; \\\n";
+    print INTERP "\tx[$opcodes{$name}{CODE}] = $name; \\\n";
 }
 print INTERP "} while (0);\n";
 
@@ -61,8 +61,8 @@ print INTERP "} while (0);\n";
 print INTERP <<EOI;
 
 #define DO_OP(w,x,y,z) do { \\
-    x = (void *)z->opcode_funcs; \\
-    y = (opcode_t* (*)())x[*w]; \\
+    x = z->opcode_funcs; \\
+    y = x[*w]; \\
     w = (y)(w,z); \\
  } while (0);
 EOI

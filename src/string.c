@@ -114,10 +114,17 @@ STRING*
 string_substr(STRING* src, IV offset, IV length, STRING** d) {
     STRING *dest;
     if (offset < 0) {
-        offset = src->strlen - offset;
+        offset = src->strlen + offset;
+    }
+    if (offset < 0 || offset > src->strlen-1) { /* 0 based... */
+        INTERNAL_EXCEPTION(SUBSTR_OUT_OF_STRING,
+                           "Cannot take substr outside string")
     }
     if (length < 0) {
         length = 0;
+    }
+    if (length > (src->strlen - offset) ) {
+        length = src->strlen - offset;
     }
     if (!d || !*d) {
         dest = string_make(NULL, 0, src->encoding->which, 0, 0);
@@ -148,3 +155,8 @@ string_chopn(STRING* s, IV n) {
  *
  * vim: expandtab shiftwidth=4:
 */
+
+
+
+
+

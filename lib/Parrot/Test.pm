@@ -9,7 +9,7 @@ use Parrot::Config;
 require Exporter;
 require Test::More;
 
-@EXPORT = ( qw(output_is), @Test::More::EXPORT );
+@EXPORT = ( qw(output_is output_like output_isnt), @Test::More::EXPORT );
 @ISA = qw(Exporter Test::More);
 
 sub import {
@@ -59,7 +59,7 @@ foreach my $i ( qw(is isnt like) ) {
     close ASSEMBLY;
 
     _run_command( "$PConfig{perl} assemble.pl $as_f --output $by_f" );
-    _run_command( "./test_prog $by_f", 'STDOUT' => $out_f );
+    _run_command( "./test_prog $by_f", 'STDOUT' => $out_f, 'STDERR' => $out_f);
 
     my $prog_output;
     open OUTPUT, "< $out_f";
@@ -77,4 +77,6 @@ foreach my $i ( qw(is isnt like) ) {
 }
 
 1;
+
+
 
