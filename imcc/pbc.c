@@ -790,10 +790,23 @@ e_pbc_emit(void *param, Instruction * ins)
                         npc, label->color, addr->name,addr->color);
             }
             else if (strcmp(ins->op, "bsr") && strcmp(ins->op, "set_addr") &&
-                strcmp(ins->op, "branch_cs")) {
+                    strcmp(ins->op, "branch_cs")) {
                 /* TODO make intersegment branch */
                 fatal(1, "e_pbc_emit", "label not found for '%s'\n",
-                            addr->name);
+                        addr->name);
+            }
+            if (ins->opsize == 5 && !strcmp(ins->op, "newsub")) {
+                /* this only fixes local branches,
+                 * TOTO globals
+                 */
+                addr = ins->r[2];
+                label = _get_sym(globals.cs->subs->labels, addr->name);
+                /* maybe global */
+                if (label) {
+                    addr->color = label->color - npc;
+                    debug(DEBUG_PBC_FIXUP, "branch label %d jump %d %s %d\n",
+                            npc, label->color, addr->name,addr->color);
+                }
             }
         }
         /* add debug line info */

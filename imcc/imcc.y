@@ -373,6 +373,12 @@ iANY(struct Parrot_Interp *interpreter, char * name,
             /* mark this as branch, because it needs fixup */
             ins->type = ITADDR | IF_r1_branch | ITBRANCH;
         }
+        else if (!strcmp(name, "newsub")) {
+            if (ins->opsize == 4)
+                ins->type = ITADDR | IF_r2_branch | ITBRANCH;
+            else
+                ins->type = ITADDR | IF_r2_branch | IF_r3_branch | ITBRANCH;
+        }
         else if (!strcmp(name, "compile"))
             ++has_compile;
 

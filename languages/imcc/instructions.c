@@ -264,7 +264,7 @@ int instruction_writes(Instruction* ins, SymReg* r) {
 int get_branch_regno(Instruction * ins)
 {
     int j;
-    for (j = 0; ins->r[j] && j < IMCC_MAX_REGS-1; j++)
+    for (j = ins->opsize - 2;  j >= 0 && ins->r[j] ; --j)
         if (ins->type & (1<<j))
             return j;
     return -1;

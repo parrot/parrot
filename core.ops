@@ -1195,7 +1195,7 @@ inline op newsub(out PMC, in INT, inconst INT) {
   $1 = pmc_new_noinit(interpreter, $2);
   $1->vtable->init(interpreter, $1);
   VTABLE_set_integer_native(interpreter, $1,
-  	PTR2OPCODE_T(CUR_OPCODE + $3 - REL_PC));
+  	PTR2OPCODE_T(CUR_OPCODE + $3));
   goto NEXT();
 }
 
@@ -1211,11 +1211,11 @@ inline op newsub(in INT, in INT, inconst INT, inconst INT) {
   interpreter->pmc_reg.registers[0] = pmc_new_noinit(interpreter, $1);
   VTABLE_init(interpreter, interpreter->pmc_reg.registers[0]);
   VTABLE_set_integer_native(interpreter, interpreter->pmc_reg.registers[0],
-      PTR2OPCODE_T(CUR_OPCODE + $3 - REL_PC));
+      PTR2OPCODE_T(CUR_OPCODE + $3));
   interpreter->pmc_reg.registers[1] = pmc_new_noinit(interpreter, $2);
   VTABLE_init(interpreter, interpreter->pmc_reg.registers[1]);
   VTABLE_set_integer_native(interpreter, interpreter->pmc_reg.registers[1],
-      PTR2OPCODE_T(CUR_OPCODE + $4 - REL_PC));
+      PTR2OPCODE_T(CUR_OPCODE + $4));
   goto NEXT();
 }
 
