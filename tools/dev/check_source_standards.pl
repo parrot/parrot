@@ -333,8 +333,8 @@ sub check_manifest {
 
         chomp;
 
-        if (/([^A-Za-z0-9\.\-_\/])/) {
-            error("MANIFEST", $line, "invalid character '$1' in filename ($_)");
+        unless (/[A-Za-z0-9\.\-_\/]+\s+\[\w*\]\w*/) {
+            error("MANIFEST", $line, "malformed entry for filename ($_)");
         }
 
         my ($filename, $dirname) = fileparse($_);
