@@ -169,7 +169,7 @@ static void cvt_num12_num8(unsigned char *dest, unsigned char *src)
     int expo, i, s;
 #ifdef __LCC__
     int expo2;
-#endif   
+#endif
 
     memset (dest, 0, 8);
     /* exponents 15 -> 11 bits */
@@ -182,13 +182,13 @@ nul:
         return;
     }
 #ifdef __LCC__
-    /* Yet again, LCC blows up mysteriously until a temporary variable is 
+    /* Yet again, LCC blows up mysteriously until a temporary variable is
      * added. */
     expo2 = expo - 16383;
     expo  = expo2;
-#else   
+#else
     expo -= 16383;       /* - bias */
-#endif   
+#endif
     expo += 1023;       /* + bias 8byte */
     if (expo <= 0)       /* underflow */
         goto nul;
@@ -864,7 +864,7 @@ static void default_dump (struct Parrot_Interp *interpreter,
             PIO_printf(interpreter, "\n %04x:  ", (int) i);
         }
         PIO_printf(interpreter, "%08lx ", (unsigned long)
-                self->pf->src[i]);
+                self->data[i]);
     }
     PIO_printf(interpreter, "\n]\n");
 }
@@ -1128,7 +1128,9 @@ directory_unpack (struct Parrot_Interp *interpreter,
         cursor += 4 - (cursor - self->src) % 4;
     /* and now unpack contents of dir */
     for (i = 0; cursor && i < dir->num_segments; i++) {
-        size_t tmp = *cursor;       /* check len again */
+        opcode_t *csave = cursor;
+        size_t tmp = PackFile_fetch_op(self, &cursor); /* check len again */
+        cursor = csave;
         pos = PackFile_Segment_unpack (interpreter, dir->segments[i],
                 cursor);
         if (!pos) {
@@ -2111,7 +2113,7 @@ PackFile_Constant_unpack_key(struct Parrot_Interp *interpreter,
             head = tail = constant_pmc_new_noinit(interpreter, enum_class_Key);
         }
 
-        tail->vtable->init(interpreter, tail);
+        VTABLE_init(interpreter, tail);
 
         type = PackFile_fetch_op(pf, &cursor);
         op = PackFile_fetch_op(pf, &cursor);
