@@ -16,7 +16,7 @@ Tests the use of Parrot's floating-point number registers.
 
 =cut
 
-use Parrot::Test tests => 38;
+use Parrot::Test tests => 39;
 use Test::More;
 
 output_is(<<CODE, <<OUTPUT, "set_n_nc");
@@ -1065,6 +1065,15 @@ output_is(<<'CODE', <<OUTPUT, "null");
 CODE
 12.500000
 0.000000
+OUTPUT
+
+output_is(<<'CODE', <<OUTPUT, ".dig parsing");
+   set N0, .5
+   print N0
+   print "\n"
+   end
+CODE
+0.500000
 OUTPUT
 
 1;

@@ -84,7 +84,7 @@ HEX		0x[0-9A-Fa-f]+
 BIN             0b[01]+
 DOT		[.]
 SIGN            [-+]
-FLOATNUM        {SIGN}?{DIGITS}{DOT}{DIGIT}*([eE]{SIGN}?{DIGITS})?
+FLOATNUM        {SIGN}?({DIGITS}{DOT}{DIGIT}*|{DOT}{DIGITS})([eE]{SIGN}?{DIGITS})?
 LETTERDIGIT     [a-zA-Z0-9_]
 LABELLETTERDIGIT     ([a-zA-Z0-9_@]|"::")
 ID              {LETTER}{LABELLETTERDIGIT}*
