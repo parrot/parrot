@@ -149,13 +149,6 @@ typedef struct Parrot_Interp {
                                                  * blocks allocated from
                                                  * the system since the last
                                                  * DOD run */
-    size_t  active_PMCs;        /* The number of live PMCs */
-    size_t  active_Buffers;     /* The number of live
-                                 * Buffers */
-    size_t  total_PMCs;         /* The total number of PMCs
-                                 * allocated */
-    size_t  total_Buffers;      /* The total number of
-                                 * buffers allocated */
     size_t  memory_allocated;   /* The total amount of
                                  * allocatable memory
                                  * allocated. Doesn't count
@@ -184,6 +177,8 @@ typedef struct Parrot_Interp {
 struct Parrot_Interp *make_interpreter(Interp_flags);
 void Parrot_init(Parrot_Interp, void*);
 void Parrot_destroy(Parrot_Interp);
+INTVAL interpinfo(struct Parrot_Interp *interpreter, INTVAL what);
+
 
 #if 0
 void runops_generic();

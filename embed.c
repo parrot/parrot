@@ -351,32 +351,8 @@ Parrot_runcode(struct Parrot_Interp *interpreter, int argc, char *argv[])
         /* Give the souls brave enough to activate debugging an earful
          * about GC. */
 
-        interpreter->active_PMCs =
-            interpreter->arena_base->pmc_pool->total_objects -
-            interpreter->arena_base->pmc_pool->num_free_objects;
-        PIO_eprintf(interpreter, "\
-*** Parrot VM: Dumping GC info ***\n\
-\tTotal memory allocated: %d\n\
-\tTotal DOD runs:         %d\n\
-\tTotal collector runs:   %d\n\
-\tActive PMCs:            %d\n\
-\tActive buffers:         %d\n\
-\tTotal PMCs:             %d\n\
-\tTotal buffers:          %d\n\
-\tSince last collection:\n\
-\t\tHeader allocations:   %d\n\
-\t\tMemory allocations:   %d\n\
-\n",
-            interpreter->memory_allocated,
-            interpreter->dod_runs,
-            interpreter->collect_runs,
-            interpreter->active_PMCs,
-            interpreter->active_Buffers,
-            interpreter->total_PMCs,
-            interpreter->total_Buffers,
-            interpreter->header_allocs_since_last_collect,
-            interpreter->mem_allocs_since_last_collect
-        );
+        PIO_eprintf(interpreter, "*** Parrot VM: Dumping GC info ***\n");
+        PDB_info(interpreter);
     }
 }
 

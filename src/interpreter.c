@@ -613,7 +613,78 @@ Parrot_really_destroy(int exit_code, void *vinterp)
     mem_sys_free(interpreter);
 }
 
+#ifdef GC_IS_MALLOC
+struct mallinfo {
+    int arena;                  /* non-mmapped space allocated from system */
+    int ordblks;                /* number of free chunks */
+    int smblks;                 /* number of fastbin blocks */
+    int hblks;                  /* number of mmapped regions */
+    int hblkhd;                 /* space in mmapped regions */
+    int usmblks;                /* maximum total allocated space */
+    int fsmblks;                /* space available in freed fastbin blocks */
+    int uordblks;               /* total allocated space */
+    int fordblks;               /* total free space */
+    int keepcost;               /* top-most, releasable (via malloc_trim)
+                                 * space */
+};
+extern struct mallinfo mallinfo(void);
+#endif /* GC_IS_MALLOC */
+INTVAL
+interpinfo(struct Parrot_Interp *interpreter, INTVAL what)
+{
+    INTVAL ret;
+    struct Small_Object_Pool *header_pool;
+    int j;
 
+    switch (what) {
+        case TOTAL_MEM_ALLOC:
+#ifdef GC_IS_MALLOC
+            interpreter->memory_allocated = mallinfo().uordblks;
+#endif
+            ret = interpreter->memory_allocated;
+            break;
+        case DOD_RUNS:
+            ret = interpreter->dod_runs;
+            break;
+        case COLLECT_RUNS:
+            ret = interpreter->collect_runs;
+            break;
+        case ACTIVE_PMCS:
+            ret = interpreter->arena_base->pmc_pool->total_objects -
+                interpreter->arena_base->pmc_pool->num_free_objects;
+            break;
+        case ACTIVE_BUFFERS:
+            ret = 0;
+            for (j = 0; j < (INTVAL)interpreter->arena_base->num_sized; j++) {
+                header_pool = interpreter->arena_base->sized_header_pools[j];
+                if (header_pool)
+                    ret += header_pool->total_objects -
+                        header_pool->num_free_objects;
+            }
+            break;
+        case TOTAL_PMCS:
+            ret = interpreter->arena_base->pmc_pool->total_objects;
+            break;
+        case TOTAL_BUFFERS:
+            ret = 0;
+            for (j = 0; j < (INTVAL)interpreter->arena_base->num_sized; j++) {
+                header_pool = interpreter->arena_base->sized_header_pools[j];
+                if (header_pool)
+                    ret += header_pool->total_objects;
+            }
+            break;
+        case HEADER_ALLOCS_SINCE_COLLECT:
+            ret = interpreter->header_allocs_since_last_collect;
+            break;
+        case MEM_ALLOCS_SINCE_COLLECT:
+            ret = interpreter->mem_allocs_since_last_collect;
+            break;
+        case TOTAL_COPIED:
+            ret = interpreter->memory_collected;
+            break;
+    }
+    return ret;
+}
 /*
  * Local variables:
  * c-indentation-style: bsd

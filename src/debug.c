@@ -1954,17 +1954,25 @@ void
 PDB_info(struct Parrot_Interp *interpreter)
 {
     PIO_eprintf(interpreter, "Total memory allocated = %d\n",
-            interpreter->memory_allocated);
-    PIO_eprintf(interpreter, "DOD runs = %d\n", interpreter->dod_runs);
-    PIO_eprintf(interpreter, "Collect runs = %d\n", interpreter->collect_runs);
-    PIO_eprintf(interpreter, "Active PMCs = %d\n", interpreter->active_PMCs);
-    PIO_eprintf(interpreter, "Active buffers = %d\n", interpreter->active_Buffers);
-    PIO_eprintf(interpreter, "Total PMCs = %d\n", interpreter->total_PMCs);
-    PIO_eprintf(interpreter, "Total buffers = %d\n", interpreter->total_Buffers);
+            interpinfo(interpreter, TOTAL_MEM_ALLOC));
+    PIO_eprintf(interpreter, "DOD runs = %d\n",
+            interpinfo(interpreter, DOD_RUNS));
+    PIO_eprintf(interpreter, "Collect runs = %d\n",
+            interpinfo(interpreter, COLLECT_RUNS));
+    PIO_eprintf(interpreter, "Collect memory = %d\n",
+            interpinfo(interpreter, TOTAL_COPIED));
+    PIO_eprintf(interpreter, "Active PMCs = %d\n",
+            interpinfo(interpreter, ACTIVE_PMCS));
+    PIO_eprintf(interpreter, "Active buffers = %d\n",
+            interpinfo(interpreter, ACTIVE_BUFFERS));
+    PIO_eprintf(interpreter, "Total PMCs = %d\n",
+            interpinfo(interpreter, TOTAL_PMCS));
+    PIO_eprintf(interpreter, "Total buffers = %d\n",
+            interpinfo(interpreter, TOTAL_BUFFERS));
     PIO_eprintf(interpreter, "Header allocations since last collect = %d\n",
-            interpreter->header_allocs_since_last_collect);
+            interpinfo(interpreter, HEADER_ALLOCS_SINCE_COLLECT));
     PIO_eprintf(interpreter, "Memory allocations since last collect = %d\n",
-            interpreter->mem_allocs_since_last_collect);
+            interpinfo(interpreter, MEM_ALLOCS_SINCE_COLLECT));
 }
 
 /* PDB_help

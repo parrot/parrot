@@ -463,22 +463,6 @@ trace_mem_block(struct Parrot_Interp *interpreter,
 }
 #endif
 
-#ifdef GC_IS_MALLOC
-struct mallinfo {
-    int arena;                  /* non-mmapped space allocated from system */
-    int ordblks;                /* number of free chunks */
-    int smblks;                 /* number of fastbin blocks */
-    int hblks;                  /* number of mmapped regions */
-    int hblkhd;                 /* space in mmapped regions */
-    int usmblks;                /* maximum total allocated space */
-    int fsmblks;                /* space available in freed fastbin blocks */
-    int uordblks;               /* total allocated space */
-    int fordblks;               /* total free space */
-    int keepcost;               /* top-most, releasable (via malloc_trim)
-                                 * space */
-};
-extern struct mallinfo mallinfo(void);
-#endif /* GC_IS_MALLOC */
 
 /* See if we can find some unused headers */
 void
@@ -500,8 +484,6 @@ Parrot_do_dod_run(struct Parrot_Interp *interpreter)
     }
     Parrot_block_DOD(interpreter);
 
-    interpreter->active_Buffers = 0;
-
     /* Now go trace the PMCs */
     trace_active_PMCs(interpreter);
 
@@ -511,8 +493,6 @@ Parrot_do_dod_run(struct Parrot_Interp *interpreter)
     /* Now put unused PMCs on the free list */
     header_pool = interpreter->arena_base->pmc_pool;
     free_unused_pobjects(interpreter, header_pool);
-    interpreter->active_PMCs =
-        header_pool->total_objects - header_pool->num_free_objects;
     total_free += header_pool->num_free_objects;
 
     /* And unused buffers on the free list */
@@ -523,22 +503,12 @@ Parrot_do_dod_run(struct Parrot_Interp *interpreter)
             used_cow(interpreter, header_pool, 0);
 #endif
             free_unused_pobjects(interpreter, header_pool);
-            interpreter->active_Buffers +=
-                header_pool->total_objects - header_pool->num_free_objects;
             total_free += header_pool->num_free_objects;
 #ifdef GC_IS_MALLOC
             clear_cow(interpreter, header_pool, 0);
 #endif
         }
     }
-#ifdef GC_IS_MALLOC
-    /* update mem stats - not, it's time consuming, this should
-     * be done on demand, i.e. before using/printing it
-     */
-#  if 0
-    interpreter->memory_allocated = mallinfo().uordblks;
-#  endif
-#endif
     /* Note it */
     interpreter->dod_runs++;
     /* if we don't have more free objects then last, skip next DOD run */

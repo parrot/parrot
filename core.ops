@@ -4041,30 +4041,7 @@ since the last DOD run.
 =cut
 
 op interpinfo(out INT, in INT) {
-  switch ($2) {
-    case TOTAL_MEM_ALLOC: $1 = interpreter->memory_allocated;
-                          break;
-    case DOD_RUNS:        $1 = interpreter->dod_runs;
-                          break;
-    case COLLECT_RUNS:    $1 = interpreter->collect_runs;
-                          break;
-    case ACTIVE_PMCS:     $1 = interpreter->active_PMCs;
-                          break;
-    case ACTIVE_BUFFERS:  $1 = interpreter->active_Buffers;
-                          break;
-    case TOTAL_PMCS:      $1 = interpreter->total_PMCs;
-                          break;
-    case TOTAL_BUFFERS:   $1 = interpreter->total_Buffers;
-                          break;
-    case HEADER_ALLOCS_SINCE_COLLECT:
-    $1 = interpreter->header_allocs_since_last_collect;
-    break;
-    case MEM_ALLOCS_SINCE_COLLECT:
-    $1 = interpreter->mem_allocs_since_last_collect;
-    break;
-    case TOTAL_COPIED: $1 = interpreter->memory_collected;
-               break;
-  }
+  $1 = interpinfo(interpreter, $2);
   goto NEXT();
 }
 

@@ -73,7 +73,6 @@ get_free_pmc(struct Parrot_Interp *interpreter, struct Small_Object_Pool *pool)
 void
 alloc_pmcs(struct Parrot_Interp *interpreter, struct Small_Object_Pool *pool)
 {
-    interpreter->total_PMCs += pool->objects_per_alloc;
     interpreter->header_allocs_since_last_collect++;
     alloc_objects(interpreter, pool);
 }
@@ -110,7 +109,6 @@ void
 alloc_buffers(struct Parrot_Interp *interpreter,
         struct Small_Object_Pool *pool)
 {
-    interpreter->total_Buffers += pool->objects_per_alloc;
     interpreter->header_allocs_since_last_collect++;
     alloc_objects(interpreter, pool);
 }
