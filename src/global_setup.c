@@ -15,6 +15,7 @@
 #include "parrot/parrot.h"
 
 /* Needed because this might get compiled before pmcs have been built */
+void Parrot_PerlUndef_class_init(void);
 void Parrot_PerlInt_class_init(void);
 void Parrot_PerlNum_class_init(void);
 void Parrot_PerlString_class_init(void);
