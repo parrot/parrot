@@ -513,7 +513,7 @@ int e_pbc_emit(Instruction * ins) {
     }
     if (ins->op && *ins->op) {
         /* fixup local jumps */
-        SymReg *addr;
+        SymReg *addr, *r;
         if ((addr = get_branch_reg(ins)) != 0) {
             SymReg *label = _get_sym(globals.subs[nsubs-1]->labels, addr->name);
             /* maybe global */
@@ -539,8 +539,11 @@ int e_pbc_emit(Instruction * ins) {
                 case PARROT_ARG_IC:
                 case PARROT_ARG_SC:
                 case PARROT_ARG_NC:
-                    *pc++ = (opcode_t) ins->r[i]->color;
-                    debug(1," %d", ins->r[i]->color);
+                    r = ins->r[i];
+                    if (r->type & VT_REGP)
+                        r = r->reg;
+                    *pc++ = (opcode_t) r->color;
+                    debug(1," %d", r->color);
                     break;
                 case PARROT_ARG_KC:
                     *pc++ = build_key(ins->r[i]);

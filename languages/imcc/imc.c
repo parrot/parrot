@@ -185,7 +185,7 @@ void build_reglist() {
         for(; r; r = r->next)
             if(r->type & VTREGISTER)
                 count++;
-    	}
+    }
     n_symbols = count;
     if (count == 0)
         return;
@@ -198,13 +198,17 @@ void build_reglist() {
     }
 
     for(i = count = 0; i < HASH_SIZE; i++) {
-            SymReg * r = hash[i];
+        SymReg * r = hash[i];
         /* Add each symbol to reglist  */
-    	    for(; r; r = r->next) {
-            if(r->type & VTREGISTER)
-                reglist[count++] = r;
-	    }
+        for(; r; r = r->next) {
+            if(r->type & VTREGISTER) {
+                if (r->type & VT_REGP)
+                    reglist[count++] = r->reg;
+                else
+                    reglist[count++] = r;
+            }
         }
+    }
     compute_du_chain();
     /* we might have unused symbols here, from spilling */
     for (i = count = unused = 0; i < n_symbols; i++) {

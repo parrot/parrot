@@ -9,22 +9,6 @@
 
 void delete_sym(const char * name);
 
-/* namespaces */
-
-typedef struct ident_t Identifier;
-struct ident_t {
-    char * name;
-    Identifier * next;
-};
-
-typedef struct namespace_t Namespace;
-struct namespace_t {
-    Namespace * parent;
-    char * name;
-    Identifier * idents;
-};
-
-static Namespace * namespace = NULL;
 
 void push_namespace(char * name) {
     Namespace * ns = (Namespace *) malloc(sizeof(*ns));
@@ -99,7 +83,7 @@ SymReg * mk_pasm_reg(char * name) {
     return r;
 }
 
-static char * _mk_fullname(Namespace * ns, const char * name) {
+char * _mk_fullname(Namespace * ns, const char * name) {
     char * result;
 
     if (ns == NULL) return strdup(name);
@@ -312,18 +296,6 @@ SymReg * get_sym(const char * name) {
     return _get_sym(hash, name);
 }
 
-SymReg * _find_sym(Namespace * namespace, SymReg * hash[], const char * name) {
-    Namespace * ns;
-
-    for (ns = namespace; ns; ns = ns->parent) {
-        char * fullname = _mk_fullname(ns, name);
-        SymReg * p = _get_sym(hash, fullname);
-        free(fullname);
-        if (p) return p;
-    }
-
-    return _get_sym(hash, name);
-}
 
 SymReg * find_sym(const char * name) {
     return _find_sym(namespace, hash, name);

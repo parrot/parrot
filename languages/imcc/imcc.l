@@ -140,10 +140,12 @@ EOL		\r?\n
     }
 
 <emit,INITIAL>{LETTER}{LETTERDIGIT}* {
-	SymReg *r = find_sym(yytext);
-	if (r && (r->type & VTIDENTIFIER) && !is_def) {
-	    yylval.sr = r;
-	    return VAR;
+	if (!is_def) {
+		SymReg *r = find_sym(yytext);
+		if (r && (r->type & VTIDENTIFIER)) {
+		    yylval.sr = r;
+		    return VAR;
+		}
 	}
         yylval.s = str_dup(yytext);
         return(is_op(yylval.s) ? PARROT_OP : IDENTIFIER);

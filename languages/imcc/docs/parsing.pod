@@ -8,6 +8,8 @@ IMCC - parsing
 
 =item 0.1 intital
 
+=item 0.2 lexicals
+
 =back
 
 =head1 OVERVIEW
@@ -19,8 +21,8 @@ This document describes the basic parsing functionality of imcc.
 Imcc parses and generates code in terms of I<compilation units>. These
 are self contained blocks of code very similar to subroutines.
 
-Code for a compilation unit is created as soon as the end of the unit
-is reached.
+Code for a compilation unit is created as soon (or not earlier) as the
+end of the unit is reached.
 
 =head1 General imcc syntax
 
@@ -129,9 +131,11 @@ generates code like this:
 
 I<Compilation units> maintain their own symbol table containing local
 labels and variable symbols. This symbol table I<hash> is not visible
-to code in different units. So lexicals (e.g. for nested subs) have to
-be managed by means of PASM statements. This might change in future if
-needed.
+to code in different units.
+
+Lexicals declared in an outer scope are visible and used, when not
+overridden by a C<.local> directive with the same name.
+S. F<t/syn/scope.t> for examples for this.
 
 Global labels and constants are kept in the global symbol table
 I<ghash>, which is the symbol table of the outmost compilation unit.
@@ -141,10 +145,12 @@ This allows for global constant folding beyond subroutine scope.
 Local labels in different I<compilation units> with the same name are
 allowed, though running the generated PASM through F<assemble.pl>
 doesn't work. Running this code inside imcc is ok.
+This will probably change so that local labels are mangled to be uniq.
 
 =head1 FILES
 
-F<imcc.y>, F<instructions.c>, F<t/syn/sub.t>, F<t/imcpasm/sub.t>
+F<imcc.y>, F<instructions.c>, F<t/syn/sub.t>, F<t/imcpasm/sub.t>,
+F<t/syn/scope.t>
 
 =head1 AUTHOR
 

@@ -12,11 +12,12 @@ enum VARTYPE {		/* variable type can be */
     VTIDENTIFIER= 1 << 2,	/* identifier */
     VTADDRESS	= 1 << 3,	/* address */
     VTREGKEY	= 1 << 4,	/* parrot [key;key..], including registers */
-    VTPASM	= 1 << 5	/* parrot register, colored from .emit */
+    VTPASM	= 1 << 5,	/* parrot register, colored from .emit */
+    VT_REGP	= 1 << 6	/* pointer to register */
 };
 
 /* this VARTYPE needs register allocation and such */
-#define VTREGISTER (VTREG | VTIDENTIFIER | VTREGKEY | VTPASM)
+#define VTREGISTER (VTREG | VTIDENTIFIER | VTREGKEY | VTPASM | VT_REGP)
 
 enum LIFEFLAG {    /* The status of a var inside a basic block can be */
     LF_use       = 1 << 0, /* block uses the the var before defining it */
@@ -61,6 +62,22 @@ typedef struct _SymReg {
 } SymReg;
 
 
+/* namespaces */
+
+typedef struct ident_t Identifier;
+struct ident_t {
+    char * name;
+    Identifier * next;
+};
+
+typedef struct namespace_t Namespace;
+struct namespace_t {
+    Namespace * parent;
+    char * name;
+    Identifier * idents;
+};
+
+EXTERN Namespace * namespace;
 /* functions */
 
 SymReg * mk_symreg(char *, char t);
@@ -88,6 +105,8 @@ void clear_tables();
 unsigned int  hash_str(const char * str);
 void free_life_info(SymReg *r);
 
+SymReg * _find_sym(Namespace * namespace, SymReg * hash[], const char * name);
+char * _mk_fullname(Namespace * ns, const char * name);
 char * mk_fullname(const char * name);
 void push_namespace(char * name);
 void pop_namespace(char * name);

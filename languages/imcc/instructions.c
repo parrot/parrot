@@ -63,8 +63,41 @@ close_comp_unit(void)
     instructions = comp_unit[n_comp_units].instructions;
     last_ins = comp_unit[n_comp_units].last_ins;
     clear_tables();
-    hash = comp_unit[n_comp_units].hash;
+    if (n_comp_units)
+        hash = comp_unit[n_comp_units-1].hash;
 }
+
+/* find a symbol on all hashes */
+SymReg *
+_find_sym(Namespace * namespace, SymReg * hash[], const char * name) {
+    Namespace * ns;
+    int n;
+    SymReg *p;
+
+    for (n = n_comp_units - 1; n >= 0; n--) {
+        for (ns = namespace; ns; ns = ns->parent) {
+            char * fullname = _mk_fullname(ns, name);
+            p = _get_sym(comp_unit[n].hash, fullname);
+            free(fullname);
+            if (p) {
+        ret_p:
+                /* outer scope symbol */
+                if (hash != comp_unit[n].hash && (p->type & VTIDENTIFIER)) {
+                    SymReg *new = mk_ident(str_dup(p->name), p->set);
+                    new->type |= VT_REGP;
+                    new->reg = p;
+                    return new;
+                }
+                return p;
+            }
+        }
+        p = _get_sym(comp_unit[n].hash, name);
+        if (p)
+            goto ret_p;
+    }
+    return 0;
+}
+
 
 /* Creates a new instruction */
 
@@ -105,6 +138,8 @@ int instruction_reads(Instruction* ins, SymReg* r) {
 	if (f & (1<<i)) {
             if (ins->r[i] == r)
                 return 1;
+            if ((ins->r[i]->type & VT_REGP) && ins->r[i]->reg == r)
+                return 1;
             for (key = ins->r[i]->nextkey; key; key = key->nextkey)
                 if (key->reg && key->reg == r)
                     return 1;
@@ -124,6 +159,8 @@ int instruction_writes(Instruction* ins, SymReg* r) {
     for (i = 0; ins->r[i] && i < IMCC_MAX_REGS; i++)
 	if (f & (1<<(16+i))) {
             if (ins->r[i] == r)
+                return 1;
+            if ((ins->r[i]->type & VT_REGP) && ins->r[i]->reg == r)
                 return 1;
     }
 
@@ -219,21 +256,28 @@ static char * ins_fmt(Instruction * ins) {
     static char s[512]; /* XXX */
     char regb[IMCC_MAX_REGS][256];      /* XXX */
     char *regstr[IMCC_MAX_REGS];
+    SymReg *p;
     int i;
     *s = 0;
     if (!ins->r[0] || !strchr(ins->fmt, '%')) {	/* comments, labels and such */
 	return ins->fmt;
     }
-    for (i = 0; i < IMCC_MAX_REGS ; i++)
-	if (!ins->r[i])
+    for (i = 0; i < IMCC_MAX_REGS ; i++) {
+	if (!ins->r[i]) {
 	    regstr[i] = 0;
-	else if (ins->r[i]->color >= 0 &&
-		(ins->r[i]->type & VTREGISTER)) {
-	    sprintf(regb[i], "%c%d", ins->r[i]->set, ins->r[i]->color);
+            continue;
+        }
+        p = ins->r[i];
+        if (!p)
+            continue;
+        if (p->type & VT_REGP)
+            p = p->reg;
+	if (p->color >= 0 && (p->type & VTREGISTER)) {
+	    sprintf(regb[i], "%c%d", p->set, p->color);
 	    regstr[i] = regb[i];
 	}
-        else if (ins->r[i]->type & VTREGKEY) {
-            SymReg * k = ins->r[i]->nextkey;
+        else if (p->type & VTREGKEY) {
+            SymReg * k = p->nextkey;
             for (*regb[i] = '\0'; k; k = k->nextkey) {
                 if (k->reg && k->reg->color >= 0)
                     sprintf(regb[i]+strlen(regb[i]), "%c%d",
@@ -246,7 +290,8 @@ static char * ins_fmt(Instruction * ins) {
             regstr[i] = regb[i];
         }
 	else
-	    regstr[i] = ins->r[i]->name;
+	    regstr[i] = p->name;
+    }
 
     switch (ins->opsize-1) {
         case -1:        /* labels */
