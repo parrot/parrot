@@ -307,7 +307,121 @@ void propagate_need(Basic_block *bb, SymReg* r) {
     }	   
 }	
 
+/*
+ * Computes the dominators tree of the CFG.
+ * Basick block A dominates B, if each path to B passes trough A
+ */
 
+void compute_dominators () {
+    int i, change, pred_index;
+    Edge *edge;
+    
+    dominators = malloc(sizeof(Set*) * n_basic_blocks);
+
+    for (i=0; i < n_basic_blocks; i++) {
+	if (i == 0) {
+	    dominators[i] = set_make (n_basic_blocks);
+	    set_add(dominators[i], 0);
+	}
+	else {
+	    dominators[i] = set_make_full (n_basic_blocks);
+	}
+    }
+
+    change = 1;
+    while (change) {
+	change = 0;
+
+	/* TODO: This 'for' should be a breadth-first search for speed  */
+	for (i = 0; i < n_basic_blocks; i++) {
+	    Set *s = set_copy (dominators[i]);
+	    
+	    for (edge=bb_list[i]->pred_list; edge!=NULL; edge=edge->pred_next) {
+		pred_index = edge->from->index;
+		
+		set_intersec_inplace(s, dominators[pred_index]);
+	    }
+
+	    set_add(s, i);
+
+	    if (! set_equal(dominators[i], s) ) {
+	        change = 1;
+		set_free (dominators[i]);
+		dominators[i] = s;
+	    }
+	}
+    }
+
+    if (IMCC_DEBUG) 
+	dump_dominators();
+
+}
+
+/*
+ * Searches for loops in the CFG. We search for edges that go from a node to one
+ * of its dominators.
+ */
+
+void find_loops () {
+    int i, succ_index;
+    Set* dom;
+    Edge* edge;
+    
+    for (i = 0; i < n_basic_blocks; i++) {
+	dom = dominators[i];
+
+	for (edge=bb_list[i]->succ_list; edge != NULL; edge=edge->succ_next) {
+	    succ_index = edge->to->index;
+		
+	    if (set_contains(dom, succ_index) ) {
+		mark_loop(edge);	
+	    }
+        }
+    }
+
+    if (IMCC_DEBUG) 
+	dump_cfg();
+}
+
+/* Incresases the loop_depth of all the nodes in a loop */ 
+void mark_loop (Edge* e){
+   Set* loop;
+   Basic_block *header, *footer;
+
+   header =  e->to;
+   footer =  e->from;
+   
+   if (IMCC_DEBUG) 
+	fprintf (stderr, "loop from %d to %d\n", footer->index, header->index );
+   
+   loop = set_make(n_basic_blocks); 
+   set_add(loop, footer->index);
+   set_add(loop, header->index);
+   
+   footer->loop_depth++;
+   header->loop_depth++;
+   
+   search_predecessors_not_in (footer, loop);
+
+   /* now 'loop' contains the set of nodes inside the loop. We should probably save this
+    * for later use */
+}
+
+void search_predecessors_not_in(Basic_block *node, Set* s) {
+   Edge *edge;
+   Basic_block *pred;
+	
+   for (edge = node->pred_list; edge != NULL; edge = edge->pred_next) {
+	pred = edge->from;
+	
+	if (! set_contains(s, pred->index) ) {
+	   set_add(s, pred->index);
+	   pred->loop_depth++;
+	   search_predecessors_not_in (pred, s);
+	}
+   }
+   
+}
 /*** Utility functions ***/ 
 
 void init_basic_blocks() {
@@ -344,6 +458,7 @@ Basic_block* make_basic_block(Instruction* ins) {
    bb->pred_list = NULL;
    bb->succ_list = NULL;
    bb->index = n_basic_blocks;
+   bb->loop_depth = 0;
    
    bb_list[n_basic_blocks] = bb;
    ins->basic_block = bb;

@@ -33,7 +33,7 @@ void dump_cfg() {
     fprintf(stderr, "\nDumping the CFG:\n-------------------------------\n");
     for (i=0; bb_list[i]; i++) {
 	bb = bb_list[i];
-	fprintf(stderr, "%d\t -> ", bb->index);
+	fprintf(stderr, "%d (%d)\t -> ", bb->index, bb->loop_depth);
 	for (e=bb->succ_list; e != NULL; e=e->succ_next) {
 	    fprintf(stderr, "%d ", e->to->index);
 	}
@@ -47,14 +47,14 @@ void dump_cfg() {
 void dump_symreg() {
     int i;
 
-    fprintf(stderr, "\nSymbols:\n--------------------------------------\n");
-    fprintf(stderr, "name\tfirst\tlast\tset\tcolor\n-------------------------------------\n");
+    fprintf(stderr, "\nSymbols:\n----------------------------------------------\n");
+    fprintf(stderr, "name\tfirst\tlast\tset\tcolor\tscore\n----------------------------------------------\n");
     for(i = 0; i < HASH_SIZE; i++) {
         SymReg * r = hash[i];
     	for(; r; r = r->next) {
             if(r->type != VTREG && r->type != VTIDENTIFIER) continue;
 	    if(r->first < 0) continue;
-	    fprintf(stderr, "%s\t%d\t%d\t%c\t%d\n", r->name, r->first, r->last, r->set, r->color);
+	    fprintf(stderr, "%s\t%d\t%d\t%c\t%d\t%d\n", r->name, r->first, r->last, r->set, r->color, r->score);
     	}
     }
     fprintf(stderr, "\n");
@@ -129,4 +129,22 @@ void dump_interference_graph() {
     fprintf(stderr, "\n");
 }
 
+void dump_dominators() {
+    int i, j;
+    
+    fprintf(stderr, "\nDumping the Dominators Tree:\n-------------------------------\n");
+    for (i=0; i < n_basic_blocks; i++) {
+	fprintf (stderr, "%d <- ", i);
+
+	for(j=0; j < n_basic_blocks; j++) {
+            if (set_contains(dominators[i], j)) {
+		fprintf(stderr, " %d ", j);
+	    }
+	}
+
+	fprintf(stderr, "\n");
+    }
+
+    fprintf(stderr, "\n");
+}
 	

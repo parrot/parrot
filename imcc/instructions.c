@@ -45,10 +45,10 @@ Instruction * mk_instruction(const char * fmt, SymReg * r0, SymReg * r1,
     i->basic_block = NULL;
     i->flags = flags;
 
-    if(!i->r0) {i->r0 = nullreg;} else {i->r0->score++;}
-    if(!i->r1) {i->r1 = nullreg;} else {i->r1->score++;}
-    if(!i->r2) {i->r2 = nullreg;} else {i->r2->score++;}
-    if(!i->r3) {i->r3 = nullreg;} else {i->r3->score++;}
+    if(!i->r0) {i->r0 = nullreg;} 
+    if(!i->r1) {i->r1 = nullreg;} 
+    if(!i->r2) {i->r2 = nullreg;} 
+    if(!i->r3) {i->r3 = nullreg;} 
     
     return i;
 }
@@ -101,6 +101,32 @@ Instruction ** resize_instructions(Instruction ** i, int num) {
     return i;
 }
 
+
+/* Computes the cost of spilling each symbol. This is estimated by the number 
+ * of times the symbol appears, weighted by 8**loop_depth */
+
+void compute_spilling_costs () {
+    int i, depth;
+    Instruction *ins;
+    Basic_block *bb;
+    
+    for (i = 0; i < n_instructions; i++) {
+	ins = instructions[i];
+	bb = ins->basic_block;
+	
+	depth = bb->loop_depth;
+	
+	ins->r0->score += 1 << (depth * 3);
+	ins->r1->score += 1 << (depth * 3);
+	ins->r2->score += 1 << (depth * 3); 
+	ins->r3->score += 1 << (depth * 3); 
+
+    }
+
+     if (IMCC_DEBUG) 
+	    dump_symreg();
+   
+}
 
 /* Emits the instructions buffered in 'instructions' */
 

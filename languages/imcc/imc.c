@@ -38,10 +38,13 @@ void allocate() {
 
         find_basic_blocks();	
 	build_cfg();
+	compute_dominators();
+	find_loops();
+
+	compute_spilling_costs();
+	build_interference_graph();  
 	life_analysis();
-
-        build_interference_graph();  
-
+	
         while (simplify()) {}      /* simplify until no changes can be made */
         order_spilling();          /* puts the remaing item on stack */
         
@@ -126,7 +129,7 @@ void build_interference_graph() {
    
     if (IMCC_DEBUG) {
 	    dump_symreg();
-	    /*dump_interference_graph();*/
+	    dump_interference_graph();
     }	   
 }
 
@@ -189,8 +192,8 @@ int interferes(SymReg * r0, SymReg * r1) {
     for (i=0; i <n_basic_blocks; i++) {
        Life_range *l0, *l1;
 
-       if (r0->life_info == NULL) return 0;
-       if (r1->life_info == NULL) return 0;
+       if (r0->life_info == NULL) continue;
+       if (r1->life_info == NULL) continue;
        
        l0 = r0->life_info[i];
        l1 = r1->life_info[i];

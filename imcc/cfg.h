@@ -16,14 +16,14 @@ typedef struct _basic_block {
     Instruction *end;
     Edge *pred_list;
     Edge *succ_list;
-
-    int index;                  /*on bb_list*/
+    int loop_depth;
+    int index;                  /*on bb_list*/   
 } Basic_block;
 
 /* Globals: */
 Basic_block **bb_list;
 int n_basic_blocks;
-
+Set** dominators;
 
 /* Functions: */
 
@@ -31,6 +31,11 @@ void find_basic_blocks ();
 void build_cfg();
 void bb_findadd_edge(Basic_block*, SymReg*);
 void bb_add_edge();
+
+void compute_dominators();
+void find_loops();
+void mark_loop(Edge*);
+void search_predecessors_not_in(Basic_block*, Set*);
 
 void life_analysis();
 void analyse_life_symbol(SymReg*);

@@ -2,8 +2,10 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+
 #include "symreg.h"
 #include "instructions.h"
+#include "sets.h"
 #include "cfg.h"
 #include "stacks.h"
 #include "debug.h"

@@ -12,7 +12,7 @@ LIBS =
 #LIBS = -lefence
 #LIBS = -ll -ly
 
-HEADERS = imc.h imcparser.h stacks.h cfg.h instructions.h cfg.h debug.h
+HEADERS = imc.h imcparser.h stacks.h cfg.h instructions.h cfg.h debug.h sets.h
 
 default :
 	$(MAKE) imcc
@@ -23,6 +23,14 @@ clean :
 	rm -f imcparser.output
 	rm -f imcc
 
+realclean:
+	rm -f core
+	rm -f *.o
+	rm -f imcc
+	rm -f a.pasm
+	rm -f imcparser.*
+	rm -f imclexer.*
+	
 imcparser.c : imcc.y
 	$(YACC) -d -o imcparser.c imcc.y
 
@@ -56,9 +64,12 @@ instructions.o: instructions.c $(HEADERS)
 cfg.o: cfg.c $(HEADERS)
 	$(CC) $(DEBUG) -c cfg.c
 
+sets.o: sets.c $(HEADERS)
+	$(CC) $(DEBUG) -c sets.c
+
 debug.o: debug.c $(HEADERS)
 	$(CC) $(DEBUG) -c debug.c
 
-imcc : imcparser.o imclexer.o imc.o stacks.o symreg.o instructions.o cfg.o debug.o
-	$(CC) $(DEBUG) -o imcc imc.o imcparser.o imclexer.o stacks.o symreg.o instructions.o cfg.o debug.o $(LIBS)
+imcc : imcparser.o imclexer.o imc.o stacks.o symreg.o instructions.o cfg.o sets.o debug.o
+	$(CC) $(DEBUG) -o imcc imc.o imcparser.o imclexer.o stacks.o symreg.o instructions.o cfg.o sets.o debug.o $(LIBS)
 

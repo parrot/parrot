@@ -8,6 +8,7 @@ enum INSTYPE {    /*instruction type can be   */
     ITLABEL       /*            label         */	
 };
 
+
 typedef struct _Instruction {
     char * fmt;            /* printf style format string for instruction   */
     SymReg * r0;           /*   uses {r0-r3}->reg                          */
@@ -51,7 +52,7 @@ Instruction * emit(Instruction *);
 void emit_flush();
 int instruction_reads(Instruction *, SymReg *);
 int instruction_writes(Instruction *, SymReg *);
-
+void compute_spilling_costs();
 
 /* Globals */
 
