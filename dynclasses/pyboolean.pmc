@@ -23,7 +23,27 @@ types, its value is changed only.
 
 #include "parrot/parrot.h"
 
+static STRING *TRUE;
+static STRING *FALSE;
+
 pmclass PyBoolean extends PyObject dynpmc group python_group {
+
+/*
+
+=item C<void class_init()>
+
+Class initialization. Caches constant strings that will be used later.
+
+=cut
+
+*/
+
+    void class_init() {
+        if (pass) {
+            TRUE = const_string(INTERP, "True");
+            FALSE = const_string(INTERP, "False");
+        }
+    }
 
 /*
 
@@ -50,9 +70,7 @@ Return "True" or "False" if python_mode is true.
 */
 
     STRING* get_string () {
-        return PMC_int_val(SELF) ?
-            const_string(INTERP, "True") :
-            const_string(INTERP, "False");
+        return PMC_int_val(SELF) ? TRUE : FALSE;
     }
 
 /*

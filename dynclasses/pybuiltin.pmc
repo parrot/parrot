@@ -50,8 +50,8 @@ they will be used frequently here.
             dynclass_PyFloat   = Parrot_PMC_typenum(INTERP, "PyFloat");
             dynclass_PyList    = Parrot_PMC_typenum(INTERP, "PyList");
 
-            HEX = string_from_cstring(INTERP, "__hex__", 0);
-            OCT = string_from_cstring(INTERP, "__oct__", 0);
+            HEX = const_string(INTERP, "__hex__");
+            OCT = const_string(INTERP, "__oct__");
         }
     }
 
@@ -81,7 +81,7 @@ enter_nci_method should create these as locals to begin with.
         INTVAL j, n;
 
         /* Find all PyBuiltin "nci" methods */
-        class = string_from_cstring(INTERP, "PyBuiltin", 0);
+        class = const_string(INTERP, "PyBuiltin");
         stash = interpreter->globals->stash_hash;
         b = hash_get_bucket(INTERP, (Hash*) PMC_struct_val(stash), class);
         if (!b) internal_exception(1, "Can't find PyBuiltins");

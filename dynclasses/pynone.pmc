@@ -21,7 +21,39 @@ the Python C<None> value.
 
 #include "parrot/parrot.h"
 
+static STRING *NONE;
+
 pmclass PyNone extends PyObject dynpmc group python_group {
+
+/*
+
+=item C<void class_init()>
+
+Class initialization. Caches constant strings that will be used later.
+
+=cut
+
+*/
+
+    void class_init() {
+        if (pass) {
+            NONE = const_string(INTERP, "None");
+        }
+    }
+
+/*
+
+=item C<STRING* get_string ()>
+
+Return "None"
+
+=cut
+
+*/
+
+    STRING* get_string () {
+        return NONE;
+    }
 
 /*
 
