@@ -325,6 +325,8 @@ examples/benchmarks/primes2.c                     [main]doc
 examples/benchmarks/primes2.pasm                  [main]doc
 examples/benchmarks/primes2.py                    [main]doc
 examples/benchmarks/primes2_p.pasm                [main]doc
+examples/benchmarks/shared_ref.pasm               [main]doc
+examples/benchmarks/shared_ref.pl                 [main]doc
 examples/benchmarks/stress.pasm                   [main]doc
 examples/benchmarks/stress.pl                     [main]doc
 examples/benchmarks/stress1.pasm                  [main]doc
