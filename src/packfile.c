@@ -222,6 +222,8 @@ fixup_subs(struct Parrot_Interp *interpreter, struct PackFile *self)
                     case enum_class_Closure:
                     case enum_class_Continuation:
                     case enum_class_Coroutine:
+                        if (PObj_get_FLAGS(sub_pmc) & PObj_private1_FLAG)
+                            continue;
                         rel = (INTVAL) sub_pmc->cache.struct_val *
                             sizeof(opcode_t);
                         rel += (INTVAL) self->cur_cs->base.data;
@@ -1385,7 +1387,7 @@ PackFile_Segment_new (struct PackFile *pf, const char *name, int add)
 
 The default functions are called before the segment specific functions
 and can read a block of C<opcode_t> data.
- 
+
 =over 4
 
 =item C<static void

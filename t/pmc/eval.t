@@ -1,6 +1,6 @@
 #! perl -w
 
-use Parrot::Test tests => 3;
+use Parrot::Test tests => 5;
 use Test::More;
 
 # PASM1 is like PASM but appends an C<end> opcode
@@ -42,3 +42,42 @@ output_is(<<'CODE', <<'OUTPUT', "eval_s - check nci param S5 ");
 CODE
 hello parrot
 OUTPUT
+
+output_is(<<'CODE', <<'OUTPUT', "call subs in evaled code ");
+    set S5, ".pcc_sub _foo:\n"
+    concat S5, "print \"foo\\n\"\n"
+    concat S5, "invoke P1\n"
+    compreg P1, "PASM"
+    compile P0, P1, S5
+    find_global P0, "_foo"
+    invokecc
+    print "back\n"
+    end
+CODE
+foo
+back
+OUTPUT
+
+output_is(<<'CODE', <<'OUTPUT', "call 2 subs in evaled code ");
+    set S5, ".pcc_sub _foo:\n"
+    concat S5, "print \"foo\\n\"\n"
+    concat S5, "invoke P1\n"
+    concat S5, ".pcc_sub _bar:\n"
+    concat S5, "print \"bar\\n\"\n"
+    concat S5, "invoke P1\n"
+    compreg P1, "PASM"
+    compile P0, P1, S5
+    find_global P0, "_foo"
+    invokecc
+    print "back\n"
+    find_global P0, "_bar"
+    invokecc
+    print "fin\n"
+    end
+CODE
+foo
+back
+bar
+fin
+OUTPUT
+

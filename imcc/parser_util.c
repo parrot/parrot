@@ -454,6 +454,7 @@ imcc_compile(Parrot_Interp interp, const char *s)
         DO_OP(pc, interp);
     }
 #endif
+    PackFile_fixup_subs(interp);
     /* restore old byte_code, */
     (void)Parrot_switch_to_cs(interp, pf_save->cur_cs);
     sourcefile = source;
