@@ -23,7 +23,7 @@
 
 
 
-pmclass TclFloat extends tclobject dynpmc group tclgroup {
+pmclass TclFloat extends TclObject dynpmc group tcl_group {
 
     void init () {
         PMC_num_val(SELF) = 0.0;

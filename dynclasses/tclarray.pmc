@@ -47,7 +47,7 @@ static STRING* make_hash_key(Interp* interpreter, PMC * key)
 /* Albeit TclArray doesn't use PMC_data, it needs the next_for_GC pointer
  * We would get recursive marking of a deeply nested HoHoH...
  */
-pmclass TclArray need_ext does hash dynpmc group tclgroup {
+pmclass TclArray need_ext does hash dynpmc group tcl_group {
 
 /*
 

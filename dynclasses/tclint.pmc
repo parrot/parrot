@@ -13,15 +13,20 @@
 
 #include "parrot/parrot.h"
 
-/* This shouldn't be necessary, IMO */
-#define enum_class_TclInt -1
+static INTVAL dynclass_TclString;
+static INTVAL dynclass_TclFloat;
+static INTVAL dynclass_TclInt;
 
-/* this is, I'm sure, terribly inefficient. */
-#define TclString_type (pmc_type(interpreter, string_from_cstring(interpreter, "TclString", 9)))
-#define TclInt_type (pmc_type(interpreter, string_from_cstring(interpreter, "TclInt", 6)))
-#define TclFloat_type (pmc_type(interpreter, string_from_cstring(interpreter, "TclFloat", 8)))
+pmclass TclInt extends TclObject dynpmc group tcl_group {
 
-pmclass TclInt extends tclobject dynpmc group tclgroup {
+    void class_init() {
+      if (pass) {
+        dynclass_TclString = Parrot_PMC_typenum(INTERP,"TclString");
+        dynclass_TclInt    = Parrot_PMC_typenum(INTERP,"TclInt");
+        dynclass_TclFloat  = Parrot_PMC_typenum(INTERP,"TclFloat");
+      }
+    }
+
 
     void init () {
       PMC_int_val(SELF) = 0;
@@ -59,12 +64,12 @@ pmclass TclInt extends tclobject dynpmc group tclgroup {
     }
 
     void set_number (PMC* value) {
-        DYNSELF.morph(TclFloat_type);
+        DYNSELF.morph(dynclass_TclFloat);
         DYNSELF.set_number(value);
     }
 
     void set_number_native (FLOATVAL value) {
-        DYNSELF.morph(TclFloat_type);
+        DYNSELF.morph(dynclass_TclFloat);
         DYNSELF.set_number_native(value);
     }
 
@@ -79,12 +84,12 @@ pmclass TclInt extends tclobject dynpmc group tclgroup {
     }
 
     void set_string (PMC* value) {
-        DYNSELF.morph(TclString_type);
+        DYNSELF.morph(dynclass_TclString);
         DYNSELF.set_string(value);
     }
 
     void set_string_native (STRING* value) {
-        DYNSELF.morph(TclString_type);
+        DYNSELF.morph(dynclass_TclString);
         DYNSELF.set_string_native(value);
     }
 
@@ -97,7 +102,7 @@ pmclass TclInt extends tclobject dynpmc group tclgroup {
         pmci = PMC_int_val(SELF);
         valf = VTABLE_get_number(INTERP, value);
         sumf = pmci + valf;
-        if (vtype == TclFloat_type) {
+        if (vtype == dynclass_TclFloat) {
             VTABLE_set_number_native(INTERP, dest, sumf);
             return;
         }
@@ -126,7 +131,7 @@ pmclass TclInt extends tclobject dynpmc group tclgroup {
         valf = VTABLE_get_number(INTERP, value);
         diff = pmci - valf;
 
-        if (vtype == TclFloat_type) {
+        if (vtype == dynclass_TclFloat) {
             VTABLE_set_number_native(INTERP, dest, diff);
             return;
         }
@@ -164,7 +169,7 @@ pmclass TclInt extends tclobject dynpmc group tclgroup {
         valf = VTABLE_get_number(INTERP, value);
         mulf = pmci * valf;
 
-        if (vtype == TclFloat_type) {
+        if (vtype == dynclass_TclFloat) {
             VTABLE_set_number_native(INTERP, dest, mulf);
             return;
         }
@@ -205,7 +210,7 @@ pmclass TclInt extends tclobject dynpmc group tclgroup {
         }
 
         divf = pmci / valf;
-        if (vtype == TclFloat_type) {
+        if (vtype == dynclass_TclFloat) {
             VTABLE_set_number_native(INTERP, dest, divf);
             return;
         }
@@ -344,7 +349,7 @@ pmclass TclInt extends tclobject dynpmc group tclgroup {
     }
 
     INTVAL cmp(PMC* value) {
-        if (value->vtable == Parrot_base_vtables[TclString_type]) {
+        if (value->vtable == Parrot_base_vtables[dynclass_TclString]) {
             FLOATVAL fdiff = PMC_int_val(SELF)
                 - VTABLE_get_number(INTERP, value);
             if (fdiff == 0) {
@@ -355,7 +360,7 @@ pmclass TclInt extends tclobject dynpmc group tclgroup {
                 return fdiff > 0 ? 1 : -1;
             }
         }
-        else if (value->vtable == Parrot_base_vtables[TclFloat_type]) {
+        else if (value->vtable == Parrot_base_vtables[dynclass_TclFloat]) {
             FLOATVAL diff;
             diff = (FLOATVAL)PMC_int_val(SELF)
                 - VTABLE_get_number(INTERP, value);
@@ -370,7 +375,7 @@ pmclass TclInt extends tclobject dynpmc group tclgroup {
     }
 
     INTVAL cmp_num(PMC* value) {
-        if (value->vtable == Parrot_base_vtables[TclString_type]) {
+        if (value->vtable == Parrot_base_vtables[dynclass_TclString]) {
             FLOATVAL fdiff = PMC_int_val(SELF)
                 - VTABLE_get_number(INTERP, value);
             if (fdiff == 0) {
@@ -381,7 +386,7 @@ pmclass TclInt extends tclobject dynpmc group tclgroup {
                 return fdiff > 0 ? 1 : -1;
             }
         }
-        else if (value->vtable == Parrot_base_vtables[TclFloat_type]) {
+        else if (value->vtable == Parrot_base_vtables[dynclass_TclFloat]) {
             FLOATVAL diff;
             diff = (FLOATVAL)PMC_int_val(SELF)
                 - VTABLE_get_number(INTERP, value);

@@ -32,7 +32,7 @@
 #define TclInt_type (pmc_type(interpreter, string_from_cstring(interpreter, "TclInt", 6)))
 #define TclFloat_type (pmc_type(interpreter, string_from_cstring(interpreter, "TclFloat", 8)))
 
-pmclass tclobject abstract noinit dynpmc group tclgroup {
+pmclass TclObject abstract noinit dynpmc group tcl_group {
 
     void morph (INTVAL type) {
         if (SELF->vtable->base_type == type)
