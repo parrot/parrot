@@ -34,4 +34,7 @@ CVS/[^/]+$
 
 ^parrot$
 ^pdump$
+^pdb$
 ^blib/
+
+^t/.*/.*_\d+\.
