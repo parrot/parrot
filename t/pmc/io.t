@@ -18,6 +18,7 @@ OUTPUT
 output_is(<<'CODE', <<'OUTPUT', "timely destruction");
 	interpinfo I0, 2	# DOD runs
 	open P0, "temp.file", ">"
+        needs_destroy P0
 	print P0, "a line\n"
 	null P0			# kill it
 	sweep 0			# a lazy DOD has to close the PIO

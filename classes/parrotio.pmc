@@ -75,8 +75,6 @@ pmclass ParrotIO {
 
     void init () {
 	PObj_active_destroy_SET(SELF);
-	PObj_needs_early_DOD_SET(SELF);
-	interpreter->has_early_DOD_PMCs = 1;
     }
 
     void destroy () {
