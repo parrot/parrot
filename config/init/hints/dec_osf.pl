@@ -22,3 +22,8 @@ if ( $linkflags !~ /-expect_unresolved/ ) {
 Configure::Data->set(
     linkflags => $linkflags,
 );
+
+# Required because of ICU using c++.
+Configure::Data->set(
+    link => "cxx",
+);
