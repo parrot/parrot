@@ -33,7 +33,7 @@ win32-bcc
 win32-cygwin                 Y    Y                     Y       Y
 win32-icl_8.0.48             -    Y    -     -   -      Y       Y/2
 win32-mingw
-win32-ms-cl_13.00.9466       -    Y/2  -     -   -      Y       Y/2
+win32-ms-cl_13.10.3077       -    Y    -     -   -      Y       Y
 
 -   ... no
 Y   ... yes

@@ -515,7 +515,6 @@ imcc_compile_file (Parrot_Interp interp, const char *s)
         const void * __c_ptr;
         void * __ptr;
     } __ptr_u;
-#define const_cast(b) (__ptr_u.__c_ptr = (b), __ptr_u.__ptr)
 
     if (!(new = fopen(s, "r"))) {
         fatal(1, "imcc_compile_file", "couldn't open '%s'\n", s);

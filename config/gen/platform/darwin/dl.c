@@ -42,7 +42,9 @@ Parrot_dlopen(const char *filename)
                 const void * __c_ptr;
                 void * __ptr;
             } __ptr_u;
-#define const_cast(b) (__ptr_u.__c_ptr = (b), __ptr_u.__ptr)
+#ifndef const_cast
+#  define const_cast(b) (__ptr_u.__c_ptr = (b), __ptr_u.__ptr)
+#endif
 
             return const_cast(header);
         }

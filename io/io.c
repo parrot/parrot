@@ -766,12 +766,17 @@ PIO_write(theINTERP, PMC *pmc, const void *buffer, size_t len)
     ParrotIOLayer *l = PMC_struct_val(pmc);
     ParrotIO *io = PMC_data(pmc);
     STRING fake;
+    union {
+        const void * __c_ptr;
+        void * __ptr;
+    } __ptr_u;
+
     if(!io)
         return -1;
 
     if (io->flags & PIO_F_WRITE) {
         /* TODO skip utf8 translation layers if any */
-        fake.strstart = buffer;
+        fake.strstart = const_cast(buffer);
         fake.bufused = len;
         return PIO_write_down(interpreter, l, io, &fake);
     }
@@ -886,29 +891,9 @@ Writes C<*s> tp C<*pmc>. Parrot string version.
 INTVAL
 PIO_putps(theINTERP, PMC *pmc, STRING *s)
 {
-#if 1
     ParrotIOLayer *l = PMC_struct_val(pmc);
     ParrotIO *io = PMC_data(pmc);
     return PIO_write_down(interpreter, l, io, s);
-#else
-    UINTVAL length = string_length(interpreter, s);
-    char *buffer = malloc(4*length);
-    char *cursor = buffer;
-    UINTVAL idx = 0;
-    INTVAL temp = 0;
-
-    /* temporary--write out in UTF-8 */
-    for( idx = 0; idx < length; ++idx )
-    {
-        cursor = Parrot_utf8_encode(cursor, string_index(interpreter, s, idx));
-    }
-
-    temp = PIO_write(interpreter, pmc, buffer, cursor - buffer);
-
-    free(buffer);
-
-    return temp;
-#endif
 }
 
 /*

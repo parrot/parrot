@@ -178,6 +178,15 @@ typedef void BIGNUM;
 #define LVALUE_CAST(type, val) (*((type *)&(val)))
 #endif /* __GCC__ */
 
+
+/* work around warning:
+ * cast discards qualifiers from pointer target type
+ * for usage grep e.g. in string.c
+ */
+
+#define const_cast(b) (__ptr_u.__c_ptr = (b), __ptr_u.__ptr)
+
+
 /* define some shortcuts for dealing with function pointers */
 /* according to ANSI C, casting between function and non-function pointers is
  * no good.  So we should use "funcptr_t" in place of void* when dealing with

@@ -731,7 +731,6 @@ expand_macro (YYSTYPE *valp, void *interp, const char *name)
         const void * __c_ptr;
         void * __ptr;
     } __ptr_u;
-#define const_cast(b) (__ptr_u.__c_ptr = (b), __ptr_u.__ptr)
 
     UNUSED(valp);
     frame = new_frame();
@@ -824,14 +823,14 @@ open_file (char *file_name, const char **incl)
     int length = 0;
     int i;
 
-    /* calculate the length of the largest include directory */    
+    /* calculate the length of the largest include directory */
     for( ptr = incl; *ptr != 0; ++ptr ) {
 	i = strlen(*ptr);
 	length = (i > length) ? i : length;
     }
-    
+
     s = malloc(strlen(file_name) + length + 1);
-    
+
     for( ptr = incl; (file == 0) && (*ptr != 0); ++ptr ) {
 	strcpy(s, *ptr);
 	strcat(s, file_name);
@@ -850,7 +849,7 @@ open_file (char *file_name, const char **incl)
         sourcefile = strdup(s); /* FIXME: leak */
 
     free(s);
-    
+
     return file;
 }
 #endif
@@ -873,20 +872,20 @@ include_file (void* interp, char *file_name)
 #else
     STRING* name = string_from_cstring(interp, file_name, strlen(file_name));
     STRING* result = Parrot_library_query(interp, "include_file_location", name);
-    
+
     if (result) {
 	 /* FIXME: leak */
 	sourcefile = strdup(string_to_cstring(interp, result));
 	file = fopen( sourcefile, "r" );
     }
-    
+
 #endif
 
     frame = new_frame();
 
     if (!file)
         fataly(EX_SOFTWARE, sourcefile, line, strerror(errno));
-    
+
     ext = strrchr(file_name, '.');
     if (ext) {
         if (strcmp (ext, ".pasm") == 0) {

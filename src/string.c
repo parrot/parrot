@@ -41,13 +41,6 @@ strings.
 
 #define EXTRA_SIZE 256
 
-/* work around warning:
- * cast discards qualifiers from pointer target type
- * s. usage below
- */
-
-#define const_cast(b) (__ptr_u.__c_ptr = (b), __ptr_u.__ptr)
-
 /* statics */
 static void _string_upscale(Interp *interpreter, STRING *s,
     parrot_string_representation_t representation, UINTVAL capacity);

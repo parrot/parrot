@@ -21,7 +21,6 @@ C<PerlString> extends C<perlscalar> to provide Perl string behaviour.
 #include "parrot/parrot.h"
 #include "parrot/perltypes.h"
 
-#define const_cast(b) (__ptr_u.__c_ptr = (b), __ptr_u.__ptr)
 
 pmclass PerlString extends perlscalar {
 
