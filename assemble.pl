@@ -296,7 +296,7 @@ while(my $l=shift(@program)) {
     }
     $bytecode .= pack_op($opcodes{$opcode}{CODE});
     $op_pc=$pc;
-    $pc+=sizeof('i');
+    $pc+=sizeof('op');
     
     foreach (0..$#args) {
 	my($rtype)=$opcodes{$opcode}{TYPES}[$_];

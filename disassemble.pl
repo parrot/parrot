@@ -84,7 +84,7 @@ sub disassemble_byte_code {
 	my $op_start = $offset;
 	my $op_code = shift_op($bytecode);
 	printf "%08x: %-15s", $op_start, $opcodes[$op_code]{NAME};
-	$offset += 4;
+	$offset += sizeof("op");
 
 	my $arg_count = $opcodes[$op_code]{ARGS};
 	my @args = ();
@@ -109,7 +109,7 @@ sub disassemble_byte_code {
 	    if($type =~ m/^[INPS]$/) { # Register
 		push @args, $type . $arg;
 	    } elsif($type eq "D") { # destination address
-		push @args, sprintf("%08x",$op_start + (4 * $arg));
+		push @args, sprintf("%08x",$op_start + (sizeof("op") * $arg));
 	    } elsif($type eq "s") { # string constant
 		push @args, sprintf("[string %04x]", $arg);
 	    } else { # constant
