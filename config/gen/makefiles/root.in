@@ -656,7 +656,7 @@ EXTRA_TEST_ARGS = --gc-debug --running-make-test
 TEST_FILES = t/op/*.t t/pmc/*.t t/native_pbc/*.t
 SRC_TEST_FILES = t/src/*.t
 
-test : $(TEST_PROG) test_prep src_tests testg test_imcc
+test : $(TEST_PROG) test_prep testb test_imcc src_tests
 
 fulltest : $(TEST_PROG) test_prep fulltest_dummy fulltest_imcc
 

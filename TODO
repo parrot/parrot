@@ -3,6 +3,12 @@ http://www.parrotcode.org/todo, send them in to
 bugs-parrot@bugs6.perl.org. They then need to be tagged as todo in the
 RT web interface.
 
+Tests
+-----
+
+    Unify t/* and imcc/t/* tests, so that one harness has just one
+    result summary.
+    Run different run cores inside Test.pm.
 
 String subsystem
 ----------------
