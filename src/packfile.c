@@ -458,7 +458,7 @@ opcode_t
 PackFile_unpack(struct Parrot_Interp *interpreter, struct PackFile *self,
                 opcode_t *packed, size_t packed_size)
 {
-    struct PackFile_Header * header = self->header;
+    struct PackFile_Header *header = self->header;
     opcode_t *cursor;
 
     if (!self) {
@@ -477,20 +477,21 @@ PackFile_unpack(struct Parrot_Interp *interpreter, struct PackFile *self,
 
     if (header->wordsize != 4 && header->wordsize != 8) {
         PIO_eprintf(NULL, "PackFile_unpack: Invalid wordsize %d\n",
-                header->wordsize);
+                    header->wordsize);
         return 0;
     }
     if (header->floattype != 0 && header->floattype != 1) {
         PIO_eprintf(NULL, "PackFile_unpack: Invalid floattype %d\n",
-                header->floattype);
+                    header->floattype);
         return 0;
     }
 
     PackFile_assign_transforms(self);
 
 #if TRACE_PACKFILE
-    PIO_eprintf(NULL, "wordsize: %d\n", header->wordsize);
-    PIO_eprintf(NULL, "byteorder: %d\n", header->byteorder);
+    PIO_eprintf(NULL, "PackFile_unpack: Wordsize %d.\n", header->wordsize);
+    PIO_eprintf(NULL, "PackFile_unpack: Byteorder %d (%sendian).\n",
+                header->byteorder, header->byteorder ? "big " : "little-");
 #endif
 
 #if 0
@@ -509,7 +510,7 @@ PackFile_unpack(struct Parrot_Interp *interpreter, struct PackFile *self,
     /* check the fingerprint */
     if (!PackFile_check_fingerprint (header->pad)) {
         PIO_eprintf(NULL, "PackFile_unpack: Bytecode not valid for this "
-                "interpreter: fingerprint mismatch\n");
+                    "interpreter: fingerprint mismatch\n");
         return 0;
     }
     /*
@@ -522,37 +523,56 @@ PackFile_unpack(struct Parrot_Interp *interpreter, struct PackFile *self,
      */
     if (header->magic != PARROT_MAGIC) {
         PIO_eprintf(NULL, "PackFile_unpack: Not a Parrot PackFile!\n");
-        PIO_eprintf(NULL, "Magic number was [0x%08x] not [0x%08x]\n",
-                header->magic, PARROT_MAGIC);
+        PIO_eprintf(NULL, "Magic number was 0x%08x not 0x%08x\n",
+                    header->magic, PARROT_MAGIC);
         return 0;
     }
+
+#if TRACE_PACKFILE
+    PIO_eprintf(NULL, "PackFile_unpack: Magic 0x%08x.\n",
+                header->magic);
+#endif
 
     header->opcodetype = PF_fetch_opcode(self, &cursor);
 
 #if TRACE_PACKFILE
-    PIO_eprintf(NULL, "PackFile_unpack(): Magic verified.\n");
+    PIO_eprintf(NULL, "PackFile_unpack: Opcodetype 0x%x.\n",
+                header->opcodetype);
 #endif
 
     /*
      * Unpack the dir_format
      */
 
+#if TRACE_PACKFILE
+    PIO_eprintf(NULL, "PackFile_unpack: Directory, offset %d.\n",
+                (INTVAL)cursor - (INTVAL)packed);
+#endif
     header->dir_format = PF_fetch_opcode(self, &cursor);
 
     /* dir_format 1 use directory */
-    if (header->dir_format != PF_DIR_FORMAT ) {
+    if (header->dir_format != PF_DIR_FORMAT) {
         PIO_eprintf(NULL,
-                "PackFile_unpack: Unknown dir format found %d!\n",
-                (int)header->dir_format);
+                "PackFile_unpack: Dir format was %d not %d\n",
+                    header->dir_format, PF_DIR_FORMAT);
         return 0;
     }
-    (void)PF_fetch_opcode(self, &cursor); /* pad */
-    self->directory.base.file_offset = (size_t)(cursor - self->src);
+#if TRACE_PACKFILE
+    PIO_eprintf(NULL, "PackFile_unpack: Dirformat %d.\n", header->dir_format);
+#endif
+
+    (void)PF_fetch_opcode(self, &cursor); /* padding */
+#if TRACE_PACKFILE
+    PIO_eprintf(NULL, "PackFile_unpack: Directory read, offset %d.\n",
+                (INTVAL)cursor - (INTVAL)packed);
+#endif
+
+    self->directory.base.file_offset = (INTVAL)cursor - (INTVAL)self->src;
     /*
      * now unpack dir, which unpacks its contents ...
      */
     cursor = PackFile_Segment_unpack(interpreter,
-            &self->directory.base, cursor);
+                                     &self->directory.base, cursor);
     /* shortcut */
     self->byte_code = self->cur_cs->base.data;
     /*
@@ -1277,12 +1297,20 @@ directory_unpack (struct Parrot_Interp *interpreter,
         size_t tmp;
         UINTVAL type;
         char *name;
-        type = PF_fetch_opcode (pf, &cursor);
-        /* get name */
-        name = PF_fetch_cstring(pf, &cursor);
 
+        /* get type */
+        type = PF_fetch_opcode (pf, &cursor);
         if (type >= PF_MAX_SEG)
             type = PF_UNKNOWN_SEG;
+#if TRACE_PACKFILE
+        PIO_eprintf(NULL, "Segment type %d.\n", type);
+#endif
+        /* get name */
+        name = PF_fetch_cstring(pf, &cursor);
+#if TRACE_PACKFILE
+        PIO_eprintf(NULL, "Segment name \"%s\".\n", name);
+#endif
+
         /* create it */
         seg = PackFile_Segment_new_seg(dir, type, name, 0);
         mem_sys_free(name);

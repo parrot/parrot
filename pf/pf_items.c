@@ -431,18 +431,18 @@ PF_fetch_string(Parrot_Interp interp, struct PackFile *pf, opcode_t **cursor)
 #if TRACE_PACKFILE
     PIO_eprintf(NULL, "Constant_unpack_string(): flags are 0x%04x...\n", flags);
     PIO_eprintf(NULL, "Constant_unpack_string(): encoding is %ld...\n",
-           encoding);
+            encoding);
     PIO_eprintf(NULL, "Constant_unpack_string(): type is %ld...\n", type);
     PIO_eprintf(NULL, "Constant_unpack_string(): size is %ld...\n", size);
 #endif
 
     s = string_make(interp, *cursor, size,
-                               encoding_lookup_index(encoding),
-                               flags,
-                               chartype_lookup_index(type));
+            encoding_lookup_index(encoding),
+            flags,
+            chartype_lookup_index(type));
 
-    size = ROUND_UP_B(size, wordsize) / sizeof(opcode_t);
-    *cursor += size;
+    size = ROUND_UP_B(size, wordsize);
+    *((unsigned char **) (cursor)) += size;
     return s;
 }
 
@@ -536,7 +536,7 @@ PF_fetch_cstring(struct PackFile *pf, opcode_t **cursor)
     int wordsize = pf->header->wordsize;
 
     strcpy(p, (char*) (*cursor));
-    (*cursor) += ROUND_UP_B(str_len, wordsize) / sizeof(opcode_t);
+    *((unsigned char **) (cursor)) += ROUND_UP_B(str_len, wordsize);
     return p;
 }
 
