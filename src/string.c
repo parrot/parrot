@@ -2527,9 +2527,14 @@ string_to_num(Interp *interpreter, const STRING *s)
     if (s) {
         /*
          * XXX C99 atof interpreters 0x prefix
+         * XXX would strtod() be better for detecting malformed input?
          */
         char *cstr = string_to_cstring(interpreter, const_cast(s));
+        while (isspace(*cstr)) cstr++;
         f = atof(cstr);
+        /* Not all atof()s return -0 from "-0" */
+        if (*cstr == '-' && f == 0.0)
+            f = -0.0;
         string_cstring_free(cstr);
         return f;
     }
