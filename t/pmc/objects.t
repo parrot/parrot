@@ -16,7 +16,7 @@ Tests the object/class subsystem.
 
 =cut
 
-use Parrot::Test tests => 23;
+use Parrot::Test tests => 24;
 use Test::More;
 
 output_is(<<'CODE', <<'OUTPUT', "findclass (base class)");
@@ -603,4 +603,115 @@ l
 Bar
 OUTPUT
 
+output_is(<<'CODE', <<'OUTPUT', "attribute values, subclassing access meths ");
+    newclass P1, "Foo"
+    # must add attributes before object instantiation
+    addattribute P1, ".i"
+    addattribute P1, ".j"
+    # define attrib access functions in Foo namespace
+    find_global P5, "Foo::set"
+    store_global "Foo", "Foo::set", P5
+    find_global P5, "Foo::get"
+    store_global "Foo", "Foo::get", P5
 
+
+    subclass P2, P1, "Bar"
+    addattribute P2, ".k"
+    addattribute P2, ".l"
+    find_global P5, "Bar::set"
+    store_global "Bar", "Bar::set", P5
+    find_global P5, "Bar::get"
+    store_global "Bar", "Bar::get", P5
+
+    # instantiate a Bar object
+    find_type I1, "Bar"
+    new P3, I1
+
+    # Foo and Bar have attribute accessor methods
+    set S0, "Foo::set"		# the meth   s. pdd03
+    set P2, P3			# the object s. pdd03
+    new P5, .PerlString		# set attribute values
+    set P5, "i\n"		# attribute slots have reference semantics
+    set I5, 0			# set first attrib
+    # register preserving is optimized away :)
+    callmethodcc
+    set S0, "Foo::set"
+    new P5, .PerlString
+    set P5, "j\n"
+    set I5, 1			# set 2nd attrib
+    callmethodcc
+
+    set S0, "Bar::set"
+    new P5, .PerlString
+    set P5, "k\n"
+    set I5, 0			# set first attrib
+    callmethodcc
+    set S0, "Bar::set"
+    new P5, .PerlString
+    set P5, "l\n"
+    set I5, 1			# set 2nd attrib
+    callmethodcc
+
+    # now retrieve attributes
+    set S0, "Foo::get"
+    set I5, 0			# get first attrib
+    callmethodcc
+    print P5			# return result
+    set S0, "Foo::get"
+    set I5, 1			# get 2nd attrib
+    callmethodcc
+    print P5			# return result
+
+    set S0, "Bar::get"
+    set I5, 0			# get first attrib
+    callmethodcc
+    print P5			# return result
+    set S0, "Bar::get"
+    set I5, 1			# get 2nd attrib
+    callmethodcc
+    print P5			# return result
+    end
+
+# set(obj: Pvalue, Iattr_idx)
+.pcc_sub Foo::set:
+    print "in Foo::set\n"
+    classoffset I3, P2, "Foo"
+    add I4, I3, I5
+    setattribute P2, I4, P5	# so always put new PMCs in
+    invoke P1
+
+# Pattr = get(obj: Iattr_idx)
+.pcc_sub Foo::get:
+    print "in Foo::get\n"
+    classoffset I3, P2, "Foo"
+    add I4, I3, I5
+    getattribute P5, P2, I4
+    invoke P1
+
+.pcc_sub Bar::set:
+    print "in Bar::set\n"
+    classoffset I3, P2, "Bar"
+    add I4, I3, I5
+    setattribute P2, I4, P5	# so always put new PMCs in
+    invoke P1
+
+.pcc_sub Bar::get:
+    print "in Bar::get\n"
+    classoffset I3, P2, "Bar"
+    add I4, I3, I5
+    getattribute P5, P2, I4
+    invoke P1
+CODE
+in Foo::set
+in Foo::set
+in Bar::set
+in Bar::set
+in Foo::get
+i
+in Foo::get
+j
+in Bar::get
+k
+in Bar::get
+l
+OUTPUT
