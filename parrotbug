@@ -1,79 +1,9 @@
 #!/usr/bin/perl -w
+#
 # Copyright: 2004 The Perl Foundation.  All Rights Reserved.
 # $Id$
+#
 
-=head1 NAME
-
-parrotbug - Parrot Bug Reporter
-
-=head1 SYNOPSIS
-
-    % ./parrotbug [options]
-
-=head1 DESCRIPTION
-
-A program to help generate bug reports about parrot, and mail them.
-It is designed to be used interactively. Normally no arguments will
-be needed.
-
-=head2 Command-line Options
-
-=over 4
-
-=item C<-A>
-
-Don't send a bug received acknowledgement to the return address.
-
-=item C<-b>
-
-Body of the report. If not included on the command line, or in a file
-with C<-f>, you will get a chance to edit the message.
-
-=item C<-d>
-
-Dump mode. This prints out your configuration data, without mailing
-anything.
-
-=item C<-e>
-
-Editor to use.
-
-=item C<-f>
-
-File containing the body of the report. Use this to quickly send a
-prepared message.
-
-=item C<-h>
-
-Print this help message and exit.
-
-=item C<-nok>
-
-Report unsuccessful build on this system to parrot developpers
-
-=item C<-ok>
-
-Report successful build on this system to parrot developpers Only use
-C<-ok> if B<everything> was ok; if there were B<any> problems at all,
-use C<-nok>.
-
-=item C<-r>
-
-Your return address. The program will ask you to confirm this if you
-don't give it here.
-
-=item C<-s>
-
-Subject to include with the message. You will be prompted if you don't
-supply one on the command line.
-
-=item C<-V>
-
-Print version information and exit.
-
-=cut
-
-#'
 eval 'exec perl -w -S $0 ${1+"$@"}'
   if $running_under_some_shell;
 
@@ -656,6 +586,78 @@ EOT
 	}
 }
 
+__END__
+
+=head1 NAME
+
+parrotbug - Parrot Bug Reporter
+
+
+=head1 SYNOPSIS
+
+    % ./parrotbug [options]
+
+=head1 DESCRIPTION
+
+A program to help generate bug reports about parrot, and mail them.
+It is designed to be used interactively. Normally no arguments will
+be needed.
+
+=head2 Command-line Options
+
+=over 4
+
+=item C<-A>
+
+Don't send a bug received acknowledgement to the return address.
+
+=item C<-b>
+
+Body of the report. If not included on the command line, or in a file
+with C<-f>, you will get a chance to edit the message.
+
+=item C<-d>
+
+Dump mode. This prints out your configuration data, without mailing
+anything.
+
+=item C<-e>
+
+Editor to use.
+
+=item C<-f>
+
+File containing the body of the report. Use this to quickly send a
+prepared message.
+
+=item C<-h>
+
+Print this help message and exit.
+
+=item C<-nok>
+
+Report unsuccessful build on this system to parrot developpers
+
+=item C<-ok>
+
+Report successful build on this system to parrot developpers Only use
+C<-ok> if B<everything> was ok; if there were B<any> problems at all,
+use C<-nok>.
+
+=item C<-r>
+
+Your return address. The program will ask you to confirm this if you
+don't give it here.
+
+=item C<-s>
+
+Subject to include with the message. You will be prompted if you don't
+supply one on the command line.
+
+=item C<-V>
+
+Print version information and exit.
+
 =back
 
 =head1 HISTORY
@@ -664,4 +666,4 @@ This utility borrows heavily from perlbug.
 
 =cut
 
-__END__
+
