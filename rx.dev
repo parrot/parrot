@@ -1,0 +1,175 @@
+=head1 NAME
+
+rx.c / rx.h
+
+=head1 SUMMARY
+
+rx.c and rx.h set up functions to be used by the regular expression engine.  
+They also define internal helper functions that add a layer of abstraction to
+the rx_is_X family of functions.  Please also see C<rx.ops>, C<rxstacks.c>, 
+and C<rxstacks.h>.
+
+=head2 rx.c
+
+=over 4
+
+=item B<rx_alloacate_info>
+
+Initializes a regular expression object and allocates the memory.
+
+=back
+
+B<rx_is_word_character>
+
+B<rx_is_number_character>
+
+B<rx_is_whitespace_character>
+
+=item B<rx_is_newline>
+
+These functions check if the character passed as an argument is a 
+word_character, number_character, whitespace_character, or a newline, 
+respectively.  They each use bitmaps to add a layer of abstraction.  All a 
+bitmap is in this case is a collection of characters.  Instead of manually 
+looking at a string these functions create a bitmap of allowable characters 
+(using predefined constants, like RX_WORDCHARS), and call the function 
+C<bitmap_match>, which checks if the supplied character is in the 
+bitmap.  Not only do bitmaps add abstraction, but they provide a significant 
+increase in speed over a linear search.
+
+
+NOTE: The C<rx_is_number_character> function breaks the abstraction and 
+uses the following expression to test the argument:
+
+	if (ch >= '0' && ch <= '9')
+
+It explains that it is "faster to do less-than/greater-than"
+Basically, this is just a speed hack for now, it will change when it needs to 
+be changed (to add different encoding/language support).
+
+=item B<bitmap_make>
+
+This function makes a bitmap from its argument (of type STRING*).  Let us 
+examine two cases, one is a character is one byte, the other is it is more.
+
+=over 1
+
+=item B<One byte>
+
+First of all, (255 >> 3) = 31.  The code uses this for a little efficiency in 
+storage/speed.  An internal array is created with 32 elements (each byte-sized).
+If you take the input character and right shift it by 3, you will get a number
+between 0 and 31, it just so happens that exactly 8 numbers between 0 and 
+255 map to the same number between 0 and 31.  Then, each element in this array
+is a bitfield, with a 1 or 0 in each bit to indicate if a particular character
+is in the bitmap or not.  So, (ch >> 3) takes us to the right element in the
+array for ch, but how do we get to the right element in the bitfield?  The 
+code is 1 << (ch & 7).  This will give us a unique power of two for each
+character that maps to that particular bitfield in the array.
+
+=item More than one byte
+
+Here each character is appended to the internal string bigchars (of type
+STRING*).
+
+=back
+
+=item B<bitmap_make_cstr>
+
+This is the same thing at bitmap_make, except it is called with a const char*
+argument.  Because of this, it knows there will be no bigchars, so it is only
+concerned with byte-sized characters.
+
+=item B<bitmap_add>
+
+This function takes a bitmap and a single character, and adds that character
+to the bitmap.  The code for adding the character is the same as in bitmap_make.
+
+=item B<bitmap_match>
+
+This functions takes a bitmap and a single character, and checks to see if that
+character is in the bitmap.  If the character is more than one byte, then the
+function searches the bigchars string linearly (one by one).  If it is a
+byte-sized character than it checks the appropriate bitfield, as specified in
+bitmap_make.
+
+=item B<bitmap_destroy>
+
+This deallocates the memory for the bitmap.
+
+=back
+
+=head1 rx.h
+
+=over 4
+
+Here is the definition for rxinfo (all comments are mine)
+
+typedef struct rxinfo {
+    STRING *string;	//This is the string the regex tests to see if it matches or not
+    INTVAL index;	//This is the current spot in string we are checking
+    INTVAL startindex;	//This is where the regex started checking
+    INTVAL success;	//This is just a flag to see if the regex matched or not
+
+    rxflags flags;	//This is a set of flags to see what modifiers were used in the regex
+    UINTVAL minlength;  //The minumum length string can be and still be able to match
+    rxdirection whichway; //Is the regex going forwards or backwards?
+
+    PMC *groupstart;	//Indexes for where each group starts
+    PMC *groupend;	//Indexes for where each gruop ends
+			//Groups here are capturing groups, ie. $1,$2, etc.
+
+    opcode_t *substfunc; //This is unused.  Originally regexes were going to
+		 	 //handle their own substitutions (s///).  Now this
+			 //is not the case.  This can probably be removed.
+
+    IntStack stack;	//Sets up an intstack for internal use (backtrackig purposes)
+} rxinfo;
+
+
+rx.h also sets up a series of macros for setting/unsetting flags in each regex,
+advancing the regex one char (or a given number of chars), and finding the
+current index.  Here is the list of the macros, check the rx.h file for their
+definitions.
+
+=item B<RX_dUNPACK(pmc)>
+
+=item B<RxCurChar(rx)>
+
+=item B<RxAdvance(rx)>
+
+=item B<RxAdvanceX(rx, x)>
+
+=item B<RxCaseInsensitive_on(rx)>
+
+=item B<RxCaseInsensitive_off(rx)>
+
+=item B<RxCaseInsensitive_test(rx)>
+
+=item B<RxSingleLine_on(rx)>
+
+=item B<RxSingleLine_off(rx)>
+
+=item B<RxSingleLine_test(rx)>
+
+=item B<RxMultiline_on(rx)>
+
+=item B<RxMultiline_off(rx)>
+
+=item B<RxMultiline_test(rx)>
+
+=item B<RxReverse_on(rx)>
+
+=item B<RxReverse_off(rx)>
+
+=item B<RxReverse_test(rx)>
+
+=item B<RxFlagOn(rx, flag)>
+
+=item B<RxFlagOff(rx, flag)>
+
+=item B<RxFlagTest(rx, flag)>
+
+=item B<RxFlagsOff(rx)>
+
+=back
