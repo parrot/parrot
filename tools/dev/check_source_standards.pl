@@ -78,8 +78,8 @@ sub check_dev {
 
     my $dev_file = $file; $dev_file =~ s/(.*)\.c$/docs\/dev\/$1.dev/g;
     return if -f $dev_file;
-    
-    warning($file, 0, ".dev file not found for $file.");
+
+    info($file, 0, ".dev file not found for $file.");
 }
 
 # ignore any leading or trailing whitespace on the file 
@@ -96,12 +96,10 @@ sub check_returns {
 
     my $line = 0;
     foreach (@$source) {
+        $line++;
         if (/return\(/) {
             warning($file, $line, "possible use of return(foo); rather than return foo;");
         }
-
-
-        $line++;
     }
 }
 
@@ -111,10 +109,14 @@ sub check_line_length {
 
     my $line = 0;
     foreach (@$source) {
+        $line++;
+
+        # ignore the line if it looks like it's basically all string.
+        next if /^\s*\".*\"(\);|,)?$/;
+
         if (length($_) > 79) {
             warning($file, $line, "line more than 79 columns. (" . length($_) . ")");
         }
-        $line++;
     }
 }
 
@@ -130,6 +132,8 @@ sub check_comments {
 
     my $line = 0;
     foreach (@$source) {
+        $line++;
+
         if (/\/\//) {
             error($file, $line, "C++ comment detected.");
         }
@@ -137,7 +141,6 @@ sub check_comments {
         if (/XXX/) {
             info($file, $line, "To-Do (XXX) noticed.");
         }
-        $line++;
     }
 }
 
@@ -147,10 +150,11 @@ sub check_cuddled_else {
 
     my $line = 0;
     foreach (@$source) {
+        $line++;
+
         if (/\}\s*else\s*\{/) {
             error($file, $line, "Cuddled else (\"} else {\") found.");
         }
-        $line++;
     }
 }
 
@@ -166,6 +170,7 @@ sub check_code_indents {
     my $line = 0;
     foreach (@$source) {
         $line++;
+
         if (/^(\s*).*\{\s*$/) {
             # note the beginning of a block, and its indent depth.
             $f=length($1);
@@ -203,6 +208,7 @@ sub check_tabs {
     my $line = 0;
     foreach (@$source) {
         $line++;
+
         if (/\t/) {
             s/\t/\[TAB\]/g;
             warning($file, $line, "Tab character in source: $_\n");
@@ -225,6 +231,7 @@ sub check_cpp_indents {
     my $line = 0;
     foreach (@$source) {
         $line++;
+
         if (/^\s*\#(\s*)(ifndef|ifdef|if)\s+(.*)/) {
             next if (/PARROT_IN_CORE|_GUARD/);
 
@@ -315,6 +322,8 @@ sub check_manifest {
     my %files_in_dir_8dot3;
     my $line = 0;
     while (<F>) {
+        $line++;
+
         chomp;
 
         if (/([^A-Za-z0-9\.\-_\/])/) {
@@ -341,8 +350,6 @@ sub check_manifest {
             error("MANIFEST", $line, "$_: case-insensitive collision with " . $files_in_dir_nocase{$dirname}{lc($filename)});
         }
         $files_in_dir_nocase{$dirname}{lc($filename)}=$_;
-
-        $line++;
     }
 
     close(F);
