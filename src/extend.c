@@ -145,6 +145,70 @@ void Parrot_free_cstring(char *string) {
     string_cstring_free(string);
 }
 
+/*=for api extend Parrot_get_intreg
+ *
+ * Return the value of an integer register
+ */
+Parrot_Int Parrot_get_intreg(Parrot_INTERP interpreter, Parrot_Int regnum) {
+    return REG_INT(regnum);
+}
+
+/*=for api extend Parrot_get_numreg
+ *
+ * Return the value of a numeric register
+ */
+Parrot_Float Parrot_get_numreg(Parrot_INTERP interpreter, Parrot_Int regnum) {
+    return REG_NUM(regnum);
+}
+
+/*=for api extend Parrot_get_strreg
+ *
+ * Return the value of a string register
+ */
+Parrot_STRING Parrot_get_strreg(Parrot_INTERP interpreter, Parrot_Int regnum) {
+    return REG_STR(regnum);
+}
+
+/*=for api extend Parrot_get_intreg
+ *
+ * Return the value of a PMC register
+ */
+Parrot_PMC Parrot_get_pmcreg(Parrot_INTERP interpreter, Parrot_Int regnum) {
+    return REG_PMC(regnum);
+}
+
+/*=for api extend Parrot_set_intreg
+ *
+ * Set the value of a  register
+ */
+void Parrot_set_intreg(Parrot_INTERP interpreter, Parrot_Int regnum, Parrot_Int value) {
+    REG_INT(regnum) = value;
+}
+
+/*=for api extend Parrot_set_numreg
+ *
+ * Set the value of a  register
+ */
+void Parrot_set_numreg(Parrot_INTERP interpreter, Parrot_Int regnum, Parrot_Float value) {
+    REG_NUM(regnum) = value;
+}
+
+/*=for api extend Parrot_set_strreg
+ *
+ * Set the value of a  register
+ */
+void Parrot_set_strreg(Parrot_INTERP interpreter, Parrot_Int regnum, Parrot_STRING value) {
+    REG_STR(regnum) = value;
+}
+
+/*=for api extend Parrot_set_pmcreg
+ *
+ * Set the value of a  register
+ */
+void Parrot_set_pmcreg(Parrot_INTERP interpreter, Parrot_Int regnum, Parrot_PMC value) {
+    REG_PMC(regnum) = value;
+}
+
 /*
  * Local variables:
  * c-indentation-style: bsd

@@ -54,6 +54,16 @@ Parrot_Int Parrot_PMC_typenum(Parrot_INTERP, char *);
 
 void Parrot_free_cstring(char *);
 
+Parrot_Int    Parrot_get_intreg(Parrot_INTERP, Parrot_Int);
+Parrot_Float  Parrot_get_numreg(Parrot_INTERP, Parrot_Int);
+Parrot_STRING Parrot_get_strreg(Parrot_INTERP, Parrot_Int);
+Parrot_PMC    Parrot_get_pmcreg(Parrot_INTERP, Parrot_Int);
+
+void Parrot_set_intreg(Parrot_INTERP, Parrot_Int, Parrot_Int);
+void Parrot_set_numreg(Parrot_INTERP, Parrot_Int, Parrot_Float);
+void Parrot_set_strreg(Parrot_INTERP, Parrot_Int, Parrot_STRING);
+void Parrot_set_pmcreg(Parrot_INTERP, Parrot_Int, Parrot_PMC);
+
 #endif
 
 /*

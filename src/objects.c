@@ -125,6 +125,24 @@ Parrot_new_class(Parrot_Interp interpreter, STRING *class_name)
   return new_class;
 }
 
+PMC *
+Parrot_add_parent(Parrot_Interp interpreter, PMC *new_base_class,
+           PMC *existing_class) {
+    return NULL;
+}
+
+PMC *
+Parrot_remove_parent(Parrot_Interp interpreter, PMC *removed_class,
+                     PMC *existing_class) {
+    return NULL;
+}
+
+PMC *
+Parrot_multi_subclass(Parrot_Interp interpreter, PMC *base_class_array,
+                      STRING *child_class_name) {
+    return NULL;
+}
+
 /*
  * Local variables:
  * c-indentation-style: bsd
