@@ -258,7 +258,8 @@ my %equate=('*'=>sub { return $pc },
 	    '__DATE__'=>'"'.scalar(localtime).'"',
 	    '__VERSION__'=>'" $Revision$ "',
 	    '__LINE__' => sub { return $line },
-	    '__FILE__' => sub { return "\"$file\"" });
+	    '__FILE__' => sub { return "\"$file\"" }
+);
 
 
 ###############################################################################
@@ -573,6 +574,11 @@ sub process_program_lines {
 
     next if( is_comment($code) );
 
+    $code = handle_pragma($code) if( has_pragma( $code ) );
+
+    next if( !defined( $code ) || $code eq "" );
+    $pline = $code;
+
     $code = handle_label($code) if( has_label( $code ) );
 
     next if( !defined( $code ) || $code eq "" );
@@ -629,6 +635,20 @@ first character is a '#' or the line is empty; otherwise it returns false.
 
 sub is_comment {
   return $_[0] =~ /^\#/ || $_[0] eq "";
+}
+
+
+###############################################################################
+
+=head2 has_pragma
+
+Determines whether or not the line begins with a pragma. Returns true if the 
+line begins with a . followed by a word; otherwise returns false.
+
+=cut
+
+sub has_pragma {
+  return $_[0] =~ /^\./;
 }
 
 
@@ -729,6 +749,26 @@ sub handle_asm_directive {
   }
 }
 
+
+###############################################################################
+
+=head2 handle_label
+
+This function handles a label definition by storing the PC where the label was
+found and backpatching all previous instances of that label with the correct
+offset.  This function handles both local labels and global labels.
+
+=cut
+
+sub handle_pragma {
+  my ($pragma, $code) = $pline =~ /^.(\S+)\s*(.+)?/;
+  if($pragma eq 'sub') {
+    $code =~ s/^(\S+)/$1\:/;
+  } else {
+    $code = '';
+  }
+  return $code;
+}
 
 ###############################################################################
 
@@ -1147,7 +1187,7 @@ sub handle_arguments {
       #
 
       elsif ($args[$_] =~ m/^[A-Za-z_][A-Za-z0-9_]+$/) {
-        if ($opcode eq "new_p_ic") {
+        if ($opcode =~ m/^new_p_ic/) {
             my $type = $pmc_types{lc $args[$_]};
             defined $type
                 or error("Unknown PMC type '$args[$_]'!", $file, $line);
