@@ -17,6 +17,8 @@ L1:	noop
 L2:	end
 .end
 CODE
+# IMCC does produce b0rken PASM files
+# see http://guest@rt.perl.org/rt3/Ticket/Display.html?id=32392
 _main:
 	unless I0, L2
 	noop
@@ -33,6 +35,8 @@ L1:	noop
 L2:	end
 .end
 CODE
+# IMCC does produce b0rken PASM files
+# see http://guest@rt.perl.org/rt3/Ticket/Display.html?id=32392
 _main:
 	le I0, 1, L2
 	noop
@@ -51,6 +55,8 @@ L:
   noop
 .end
 CODE
+# IMCC does produce b0rken PASM files
+# see http://guest@rt.perl.org/rt3/Ticket/Display.html?id=32392
 _test:
   end
 OUT
@@ -62,6 +68,8 @@ pir_2_pasm_is(<<'CODE', <<'OUT', "unused local label");
 L2:	end
 .end
 CODE
+# IMCC does produce b0rken PASM files
+# see http://guest@rt.perl.org/rt3/Ticket/Display.html?id=32392
 _main:
 	end
 OUT
@@ -73,6 +81,8 @@ pir_2_pasm_is(<<'CODE', <<'OUT', "unused global label");
 _L2:	end
 .end
 CODE
+# IMCC does produce b0rken PASM files
+# see http://guest@rt.perl.org/rt3/Ticket/Display.html?id=32392
 _main:
 _L2:
 	end
@@ -94,6 +104,8 @@ l3:
    goto l2
 .end
 CODE
+# IMCC does produce b0rken PASM files
+# see http://guest@rt.perl.org/rt3/Ticket/Display.html?id=32392
 _test:
    noop
    print "ok\n"
@@ -108,6 +120,8 @@ pir_2_pasm_is(<<'CODE', <<'OUT', "constant add");
    end
 .end
 CODE
+# IMCC does produce b0rken PASM files
+# see http://guest@rt.perl.org/rt3/Ticket/Display.html?id=32392
 _main:
    set I0, 25
    set N0, 25
@@ -122,6 +136,8 @@ pir_2_pasm_is(<<'CODE', <<'OUT', "constant sub");
    end
 .end
 CODE
+# IMCC does produce b0rken PASM files
+# see http://guest@rt.perl.org/rt3/Ticket/Display.html?id=32392
 _main:
    set I0, -5
    set N0, -5
@@ -136,6 +152,8 @@ pir_2_pasm_is(<<'CODE', <<'OUT', "constant mul");
    end
 .end
 CODE
+# IMCC does produce b0rken PASM files
+# see http://guest@rt.perl.org/rt3/Ticket/Display.html?id=32392
 _main:
    set I0, 150
    set N0, 150
@@ -150,6 +168,8 @@ pir_2_pasm_is(<<'CODE', <<'OUT', "constant div");
    end
 .end
 CODE
+# IMCC does produce b0rken PASM files
+# see http://guest@rt.perl.org/rt3/Ticket/Display.html?id=32392
 _main:
    set I0, 2
    set N0, 2
@@ -164,6 +184,8 @@ pir_2_pasm_is(<<'CODE', <<'OUT', "constant cmod");
    end
 .end
 CODE
+# IMCC does produce b0rken PASM files
+# see http://guest@rt.perl.org/rt3/Ticket/Display.html?id=32392
 _main:
    set I0, 3
    set N0, 3
@@ -178,6 +200,8 @@ pir_2_pasm_is(<<'CODE', <<'OUT', "constant mod");
    end
 .end
 CODE
+# IMCC does produce b0rken PASM files
+# see http://guest@rt.perl.org/rt3/Ticket/Display.html?id=32392
 _main:
    set I0, 3
    set N0, 3
@@ -192,6 +216,8 @@ pir_2_pasm_is(<<'CODE', <<'OUT', "constant eq taken");
 L1:end
 .end
 CODE
+# IMCC does produce b0rken PASM files
+# see http://guest@rt.perl.org/rt3/Ticket/Display.html?id=32392
 _main:
    end
 OUT
@@ -204,6 +230,8 @@ pir_2_pasm_is(<<'CODE', <<'OUT', "constant eq not taken");
 L1:end
 .end
 CODE
+# IMCC does produce b0rken PASM files
+# see http://guest@rt.perl.org/rt3/Ticket/Display.html?id=32392
 _main:
    set I0, 5
    end
@@ -217,6 +245,8 @@ pir_2_pasm_is(<<'CODE', <<'OUT', "constant eq taken");
 L1:end
 .end
 CODE
+# IMCC does produce b0rken PASM files
+# see http://guest@rt.perl.org/rt3/Ticket/Display.html?id=32392
 _main:
    end
 OUT
@@ -229,6 +259,8 @@ pir_2_pasm_is(<<'CODE', <<'OUT', "constant eq not taken");
 L1:end
 .end
 CODE
+# IMCC does produce b0rken PASM files
+# see http://guest@rt.perl.org/rt3/Ticket/Display.html?id=32392
 _main:
    set I0, 5
    end
@@ -242,6 +274,8 @@ pir_2_pasm_is(<<'CODE', <<'OUT', "constant eq taken");
 L1:end
 .end
 CODE
+# IMCC does produce b0rken PASM files
+# see http://guest@rt.perl.org/rt3/Ticket/Display.html?id=32392
 _main:
    end
 OUT
@@ -254,6 +288,8 @@ pir_2_pasm_is(<<'CODE', <<'OUT', "constant eq not taken");
 L1:end
 .end
 CODE
+# IMCC does produce b0rken PASM files
+# see http://guest@rt.perl.org/rt3/Ticket/Display.html?id=32392
 _main:
    set I0, 5
    end
@@ -267,6 +303,8 @@ pir_2_pasm_is(<<'CODE', <<'OUT', "constant ne taken");
 L1:end
 .end
 CODE
+# IMCC does produce b0rken PASM files
+# see http://guest@rt.perl.org/rt3/Ticket/Display.html?id=32392
 _main:
    end
 OUT
@@ -279,6 +317,8 @@ pir_2_pasm_is(<<'CODE', <<'OUT', "constant ne not taken");
 L1:end
 .end
 CODE
+# IMCC does produce b0rken PASM files
+# see http://guest@rt.perl.org/rt3/Ticket/Display.html?id=32392
 _main:
    set I0, 5
    end
@@ -292,6 +332,8 @@ pir_2_pasm_is(<<'CODE', <<'OUT', "constant gt taken");
 L1:end
 .end
 CODE
+# IMCC does produce b0rken PASM files
+# see http://guest@rt.perl.org/rt3/Ticket/Display.html?id=32392
 _main:
    end
 OUT
@@ -304,6 +346,8 @@ pir_2_pasm_is(<<'CODE', <<'OUT', "constant gt not taken");
 L1:end
 .end
 CODE
+# IMCC does produce b0rken PASM files
+# see http://guest@rt.perl.org/rt3/Ticket/Display.html?id=32392
 _main:
    set I0, 5
    end
@@ -317,6 +361,8 @@ pir_2_pasm_is(<<'CODE', <<'OUT', "constant ge taken");
 L1:end
 .end
 CODE
+# IMCC does produce b0rken PASM files
+# see http://guest@rt.perl.org/rt3/Ticket/Display.html?id=32392
 _main:
    end
 OUT
@@ -329,6 +375,8 @@ pir_2_pasm_is(<<'CODE', <<'OUT', "constant ge not taken");
 L1:end
 .end
 CODE
+# IMCC does produce b0rken PASM files
+# see http://guest@rt.perl.org/rt3/Ticket/Display.html?id=32392
 _main:
    set I0, 5
    end
@@ -342,6 +390,8 @@ pir_2_pasm_is(<<'CODE', <<'OUT', "constant lt taken");
 L1:end
 .end
 CODE
+# IMCC does produce b0rken PASM files
+# see http://guest@rt.perl.org/rt3/Ticket/Display.html?id=32392
 _main:
    end
 OUT
@@ -354,6 +404,8 @@ pir_2_pasm_is(<<'CODE', <<'OUT', "constant lt not taken");
 L1:end
 .end
 CODE
+# IMCC does produce b0rken PASM files
+# see http://guest@rt.perl.org/rt3/Ticket/Display.html?id=32392
 _main:
    set I0, 5
    end
@@ -367,6 +419,8 @@ pir_2_pasm_is(<<'CODE', <<'OUT', "constant le taken");
 L1:end
 .end
 CODE
+# IMCC does produce b0rken PASM files
+# see http://guest@rt.perl.org/rt3/Ticket/Display.html?id=32392
 _main:
    end
 OUT
@@ -379,6 +433,8 @@ pir_2_pasm_is(<<'CODE', <<'OUT', "constant le not taken");
 L1:end
 .end
 CODE
+# IMCC does produce b0rken PASM files
+# see http://guest@rt.perl.org/rt3/Ticket/Display.html?id=32392
 _main:
    set I0, 5
    end
@@ -392,6 +448,8 @@ pir_2_pasm_is(<<'CODE', <<'OUT', "constant if taken");
 L1:end
 .end
 CODE
+# IMCC does produce b0rken PASM files
+# see http://guest@rt.perl.org/rt3/Ticket/Display.html?id=32392
 _main:
    end
 OUT
@@ -404,6 +462,8 @@ pir_2_pasm_is(<<'CODE', <<'OUT', "constant if not taken");
 L1:end
 .end
 CODE
+# IMCC does produce b0rken PASM files
+# see http://guest@rt.perl.org/rt3/Ticket/Display.html?id=32392
 _main:
    set I0, 5
    end
@@ -417,6 +477,8 @@ pir_2_pasm_is(<<'CODE', <<'OUT', "constant unless taken");
 L1:end
 .end
 CODE
+# IMCC does produce b0rken PASM files
+# see http://guest@rt.perl.org/rt3/Ticket/Display.html?id=32392
 _main:
    end
 OUT
@@ -429,6 +491,8 @@ pir_2_pasm_is(<<'CODE', <<'OUT', "constant unless not taken");
 L1:end
 .end
 CODE
+# IMCC does produce b0rken PASM files
+# see http://guest@rt.perl.org/rt3/Ticket/Display.html?id=32392
 _main:
    set I0, 5
    end
@@ -441,6 +505,8 @@ pir_2_pasm_is(<<'CODE', <<'OUT', "constant mix add");
    end
 .end
 CODE
+# IMCC does produce b0rken PASM files
+# see http://guest@rt.perl.org/rt3/Ticket/Display.html?id=32392
 _main:
    set N0, 25
    end
@@ -453,6 +519,8 @@ pir_2_pasm_is(<<'CODE', <<'OUT', "constant unary abs");
    end
 .end
 CODE
+# IMCC does produce b0rken PASM files
+# see http://guest@rt.perl.org/rt3/Ticket/Display.html?id=32392
 _main:
    set I0, 10
    end
@@ -465,6 +533,8 @@ pir_2_pasm_is(<<'CODE', <<'OUT', "constant set");
    end
 .end
 CODE
+# IMCC does produce b0rken PASM files
+# see http://guest@rt.perl.org/rt3/Ticket/Display.html?id=32392
 _main:
    set N0, 5
    end
@@ -477,6 +547,8 @@ pir_2_pasm_is(<<'CODE', <<'OUT', "strength mul I, 0");
    end
 .end
 CODE
+# IMCC does produce b0rken PASM files
+# see http://guest@rt.perl.org/rt3/Ticket/Display.html?id=32392
 _main:
    set I0, 0
    end
@@ -489,6 +561,8 @@ pir_2_pasm_is(<<'CODE', <<'OUT', "strength mul I, I, 0");
    end
 .end
 CODE
+# IMCC does produce b0rken PASM files
+# see http://guest@rt.perl.org/rt3/Ticket/Display.html?id=32392
 _main:
    set I0, 0
    end
@@ -501,6 +575,8 @@ pir_2_pasm_is(<<'CODE', <<'OUT', "strength mul I, 0, I");
    end
 .end
 CODE
+# IMCC does produce b0rken PASM files
+# see http://guest@rt.perl.org/rt3/Ticket/Display.html?id=32392
 _main:
    set I0, 0
    end
@@ -513,6 +589,8 @@ pir_2_pasm_is(<<'CODE', <<'OUT', "strength mul N, 0, N");
    end
 .end
 CODE
+# IMCC does produce b0rken PASM files
+# see http://guest@rt.perl.org/rt3/Ticket/Display.html?id=32392
 _main:
    set N0, 0
    end
@@ -525,6 +603,8 @@ pir_2_pasm_is(<<'CODE', <<'OUT', "strength mul I, 1");
    end
 .end
 CODE
+# IMCC does produce b0rken PASM files
+# see http://guest@rt.perl.org/rt3/Ticket/Display.html?id=32392
 _main:
    end
 OUT
@@ -536,6 +616,8 @@ pir_2_pasm_is(<<'CODE', <<'OUT', "strength mul I, I, 1");
    end
 .end
 CODE
+# IMCC does produce b0rken PASM files
+# see http://guest@rt.perl.org/rt3/Ticket/Display.html?id=32392
 _main:
    set I0, I1
    end
@@ -548,6 +630,8 @@ pir_2_pasm_is(<<'CODE', <<'OUT', "strength mul I, 1, I");
    end
 .end
 CODE
+# IMCC does produce b0rken PASM files
+# see http://guest@rt.perl.org/rt3/Ticket/Display.html?id=32392
 _main:
    set I0,  I1
    end
@@ -560,6 +644,8 @@ pir_2_pasm_is(<<'CODE', <<'OUT', "strength mul N, 1, N");
    end
 .end
 CODE
+# IMCC does produce b0rken PASM files
+# see http://guest@rt.perl.org/rt3/Ticket/Display.html?id=32392
 _main:
    set N0, N1
    end
@@ -572,6 +658,8 @@ pir_2_pasm_is(<<'CODE', <<'OUT', "strength div I, 1");
    end
 .end
 CODE
+# IMCC does produce b0rken PASM files
+# see http://guest@rt.perl.org/rt3/Ticket/Display.html?id=32392
 _main:
    end
 OUT
@@ -583,6 +671,8 @@ pir_2_pasm_is(<<'CODE', <<'OUT', "strength div I, I, 1");
    end
 .end
 CODE
+# IMCC does produce b0rken PASM files
+# see http://guest@rt.perl.org/rt3/Ticket/Display.html?id=32392
 _main:
    set I0, I1
    end
@@ -595,6 +685,8 @@ pir_2_pasm_is(<<'CODE', <<'OUT', "strength div N, N, 1");
    end
 .end
 CODE
+# IMCC does produce b0rken PASM files
+# see http://guest@rt.perl.org/rt3/Ticket/Display.html?id=32392
 _main:
    set N0, N1
    end
@@ -611,6 +703,8 @@ pir_2_pasm_is(<<'CODE', <<'OUT', "multiple const syms");
    end
 .end
 CODE
+# IMCC does produce b0rken PASM files
+# see http://guest@rt.perl.org/rt3/Ticket/Display.html?id=32392
 _main:
    set I0, 0
    set I1, 1
@@ -628,7 +722,9 @@ pir_2_pasm_like(<<'CODE', <<'OUT', "constant add big nums");
    end
 .end
 CODE
-/^_main:
+/^# IMCC does produce b0rken PASM files
+# see http://guest@rt.perl.org/rt3/Ticket/Display.html\?id=32392
+_main:
    set N0, 1\.6e\+0?22
    end$/
 OUT
@@ -642,6 +738,8 @@ pir_2_pasm_is(<<'CODE', <<'OUT', "constant concat");
    end
 .end
 CODE
+# IMCC does produce b0rken PASM files
+# see http://guest@rt.perl.org/rt3/Ticket/Display.html?id=32392
 _main:
    set S0, "Parrot rocks"
    end

@@ -26,6 +26,8 @@ pir_2_pasm_is(<<'CODE', <<'OUT', "sub_n_ic_n");
    div N0, 2, N1
 .eom
 CODE
+# IMCC does produce b0rken PASM files
+# see http://guest@rt.perl.org/rt3/Ticket/Display.html?id=32392
   sub N0, 2, N1
   div N0, 2, N1
 OUT
@@ -54,6 +56,8 @@ pir_2_pasm_is(<<'CODE', <<'OUT', "added return - end");
    end
 .end
 CODE
+# IMCC does produce b0rken PASM files
+# see http://guest@rt.perl.org/rt3/Ticket/Display.html?id=32392
 _test:
   noop
   end
@@ -66,6 +70,8 @@ pir_2_pasm_is(<<'CODE', <<'OUT', "added return - exit");
    exit 0
 .end
 CODE
+# IMCC does produce b0rken PASM files
+# see http://guest@rt.perl.org/rt3/Ticket/Display.html?id=32392
 _test:
   noop
   exit 0
@@ -77,6 +83,8 @@ pir_2_pasm_is(<<'CODE', <<'OUT', "added return - nil");
    noop
 .end
 CODE
+# IMCC does produce b0rken PASM files
+# see http://guest@rt.perl.org/rt3/Ticket/Display.html?id=32392
 _test:
   noop
   null I0

@@ -17,7 +17,9 @@ _sub1:
     ret
 .end
 CODE
-/^_main:
+/^# IMCC does produce b0rken PASM files
+# see http://guest@rt.perl.org/rt3/Ticket/Display.html\?id=32392
+_main:
  new P(\d+), \d+ # \.Sub
  set_addr I(\d+), _sub1
  set P\1, I\2
@@ -39,7 +41,9 @@ pir_2_pasm_like(<<'CODE', <<'OUT', "nonlocal bsr");
     ret
 .end
 CODE
-/^_main:
+/^# IMCC does produce b0rken PASM files
+# see http://guest@rt.perl.org/rt3/Ticket/Display.html\?id=32392
+_main:
  new P(\d+), \d+ # \.Sub
  set_addr I(\d+), _f
  set P\1, I\2

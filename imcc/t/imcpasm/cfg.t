@@ -16,6 +16,8 @@ L: print "sub\n"
    ret
 .end
 CODE
+# IMCC does produce b0rken PASM files
+# see http://guest@rt.perl.org/rt3/Ticket/Display.html?id=32392
 _test:
    bsr L
    print "ok\n"
@@ -33,6 +35,8 @@ pir_2_pasm_is(<<'CODE', <<'OUT', "unreachable 2");
   noop
 .end
 CODE
+# IMCC does produce b0rken PASM files
+# see http://guest@rt.perl.org/rt3/Ticket/Display.html?id=32392
 _test:
   print "ok\n"
   end
@@ -48,6 +52,8 @@ L:
   noop
 .end
 CODE
+# IMCC does produce b0rken PASM files
+# see http://guest@rt.perl.org/rt3/Ticket/Display.html?id=32392
 _test:
   end
 OUT
