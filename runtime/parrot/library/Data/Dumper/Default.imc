@@ -546,6 +546,21 @@ Dumps an Array.
     callmethod
 .end
 
+=item style."pmcInteger"( name, val )
+
+Dumps an Integer PMC.
+
+=cut
+
+.sub pmcInteger method
+    .param string name
+    .param pmc val
+
+    print val
+
+    .return ( 1 )
+.end
+
 =back
 
 =head1 AUTHOR

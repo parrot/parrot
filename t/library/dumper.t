@@ -19,7 +19,7 @@ Tests data dumping.
 
 use strict;
 
-use Parrot::Test tests => 15;
+use Parrot::Test tests => 16;
 
 # no. 1
 output_is(<<'CODE', <<'OUT', "dumping array of sorted numbers");
@@ -751,3 +751,18 @@ CODE
 }
 OUT
 
+# no. 16
+output_is(<<'CODE', <<'OUTPUT', "dumping Integer PMC");
+##PIR##
+.sub _main
+    .local pmc int1
+
+    new int1, .Integer
+    int1 = 12345
+    _dumper( "Int:", int1 )
+    end
+.end
+.include "library/dumper.imc"
+CODE
+"Int:" => 12345
+OUTPUT
