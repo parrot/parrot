@@ -2910,7 +2910,7 @@ yyreduce:
 
   case 198:
 #line 900 "imcc/imcc.y"
-    { yyval.i = MK_I(interp, cur_unit, "mod", 3, yyvsp[-2].sr, yyvsp[-2].sr, yyvsp[0].sr); }
+    { yyval.i = MK_I(interp, cur_unit, "mod", 2, yyvsp[-2].sr, yyvsp[0].sr); }
     break;
 
   case 199:
