@@ -18,6 +18,12 @@ sub runstep {
   }
   elsif ($gc eq 'libc') {
     # tests mallinfo after allocation of 128 bytes
+    if (Configure::Data->get('i_malloc')) {
+        Configure::Data->set('malloc_header', 'malloc.h');
+    }
+    else {
+        Configure::Data->set('malloc_header', 'stdlib.h');
+    }
     cc_gen('config/auto/gc/test_c.in');
     eval { cc_build(); };
     my $test = 0;
@@ -38,7 +44,7 @@ sub runstep {
 \$(SRC)/$gc\$(O):	\$(GENERAL_H_FILES) \$(SRC)/$gc.c
 \$(SRC)/res_lea\$(O):	\$(GENERAL_H_FILES) \$(SRC)/res_lea.c
 EOF
-      gc_o          => "\$(SRC).\/$gc\$(O) \$(SRC)/res_lea\$(O)",
+      gc_o          => "\$(SRC)\/$gc\$(O) \$(SRC)/res_lea\$(O)",
       gc_flag  => '-DGC_IS_MALLOC',
     );
   }
