@@ -1,0 +1,93 @@
+=head1 TITLE
+
+Object and Class semantics for Parrot
+
+=head1 VERSION
+
+=head2 CURRENT
+
+    Maintainer: Dan Sugalski
+    Class: Internals
+    PDD Number: 15
+    Version: 1.0
+    Status: Developing
+    Last Modified: March 10, 2003
+    PDD Format: 1
+    Language: English
+
+=head2 HISTORY
+
+=over 4
+
+=item version 1
+
+None. First version
+
+=back
+
+=head1 CHANGES
+
+=over 4
+
+=item Version 1.0
+
+None. First version
+
+=back
+
+=head1 ABSTRACT
+
+This PDD describes the semantics of Parrot's object and class
+systems. The PDD is divided into two parts, the semantics expressed
+to user programs through PMCs, and the default back-end class scheme.
+
+Note that the class system is I<not> the single mandated class
+scheme, merely the one designed to express the semantics needed for
+perl 6, ruby, and python. Alternate class systems are certainly
+possible, and direct compatibility with the system as described here
+isn't strictly necessary.
+
+=head1 DESCRIPTION
+
+=head1 IMPLEMENTATION
+
+=head2 Objects
+
+The interface that objects present to user code is very
+
+=head2 Classes
+
+=head1 TRANSLATION AND GLOSSARY
+
+Since every object system on the planet shares a common set of terms
+but uses them completely differently, this section defines
+
+=head2 Glossary
+
+=over 4
+
+=item Property
+
+=item Attribute
+
+=item Method
+
+=item Delegate
+
+=item Parent class
+
+=item Child class
+
+=back
+
+=head2 Translation
+
+
+
+=head1 ATTACHMENTS
+
+None
+
+=head1 FOOTNOTES
+
+=head1 REFERENCES
