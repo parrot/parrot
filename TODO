@@ -1,4 +1,4 @@
-Note: To add things to the web-visible TOOD list, living at
+Note: To add things to the web-visible TODO list, living at
 http://www.parrotcode.org/todo, send them in to
 bugs-parrot@bugs6.perl.org. They then need to be tagged as todo in the
 RT web interface.
@@ -22,7 +22,9 @@ Vtables
 
 JIT
 ---
-    More instructions needed! (currently on hold, waiting for JIT v2)
+    More instructions needed!
+    Finish the register allocator
+    Make it work on more architectures
 
 Configure system
 ----------------
