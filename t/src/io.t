@@ -317,29 +317,24 @@ int main(int argc, char* argv[]) {
 		return 1;
 	}
 	
-	for (i = 0; i < 4; i++)
-	{
+    for (i = 0; i < 4; i++)	{
+        /* alloc enough space including '\0' */
         buffer = malloc((len[i] + 1) * sizeof(char));
-        buffer[len[i]] = '\0';
-        
-        /* 
-         * What's the expected relationship between 
-         * buffer and len[i]?
-         */
-         
+
         n = PIO_read(interpreter, io, buffer, len[i]);
-        
-        if ( n != strlen(str[i]) )
-        {
+        buffer[n] = '\0';
+
+        if ( n != strlen(str[i]) ) {
             printf("read: %i expected: %i\n", n, strlen(str[i]));
         }
         
-        if ( strcmp(buffer, str[i]) ) 
-        {
-            printf("should have read \"%s\" not \"%s\"", 
-                str[i], buffer);
+        if ( strcmp(buffer, str[i]) ) {
+            printf("should have read \"%s\" not \"%s\"", str[i], buffer);
         }
-	}
+
+        /* buffer no longer needed */
+        free(buffer);
+    }
 	
     printf("done\n");
 
