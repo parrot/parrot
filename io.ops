@@ -471,6 +471,55 @@ op tell(out INT, out INT, in PMC) {
 
 ########################################
 
+=item B<socket>(out PMC, in INT, in INT, in INT)
+
+=item B<sockaddr>(out STR, in INT, in STR)
+
+=item B<connect>(out INT, in PMC, in STR)
+
+=item B<recv>(out INT, in PMC, in STR)
+
+=item B<send>(out INT, in PMC, in STR)
+
+=item B<poll>(out INT, in PMC, in INT, in INT, in INT)
+
+=cut
+
+op socket(out PMC, in INT, in INT, in INT) {
+  $1 = PIO_socket(interpreter, $2, $3, $4);
+  if(!$1) {
+    $1 = pmc_new(interpreter, enum_class_PerlUndef);
+  }
+  goto NEXT();
+}
+
+op sockaddr(out STR, in INT, in STR) {
+    $1 = PIO_sockaddr_in(interpreter, $2, $3);
+    goto NEXT();
+}
+
+op connect(out INT, in PMC, in STR) {
+    $1 = (INTVAL)PIO_connect(interpreter, $2, $3);
+    goto NEXT();
+}
+
+op recv(out INT, in PMC, in STR) {
+    $1 = (INTVAL)PIO_recv(interpreter, $2, &($3));
+    goto NEXT();
+}
+
+op send(out INT, in PMC, in STR) {
+    $1 = (INTVAL)PIO_send(interpreter, $2, $3);
+    goto NEXT();
+}
+
+op poll(out INT, in PMC, in INT, in INT, in INT) {
+    $1 = (INTVAL)PIO_poll(interpreter, $2, $3, $4, $5);
+    goto NEXT();
+}
+
+########################################
+
 =back
 
 =cut
