@@ -12,9 +12,10 @@ sub new {
   my $self = { };
   if(defined $_[0]) {
     unless(open FILE,"< $_[0]") {
-      $self->{text} = join '',<FILE>;
+      print STDERR "Could not open < $_[0]: $!\n";
       return undef;
     }
+    $self->{text} = join '',<FILE>;
     close FILE;
   }
   bless $self,$class;
@@ -24,7 +25,7 @@ sub new {
 
 sub tokenize {
   my $self = shift;
-  $self->{text} = $_[0] if defined $_[0];
+  $self->{text} = $_[0] if $_[0] and $_[0] ne '';
 
   my $tokref = [];
   my $in_quote = 0;

@@ -14,4 +14,5 @@ _EOF_
 defined $ARGV[0] or Usage();
 $ARGV[0]=~/.mpl$/i or Usage();
 
-Miniperl->new($ARGV[0])->compile();
+my $miniperl = Miniperl->new($ARGV[0]);
+$miniperl->compile();

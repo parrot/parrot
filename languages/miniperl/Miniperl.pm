@@ -14,11 +14,11 @@ sub new {
 
 sub compile {
   my $self = shift;
-  my $tokenizer = Tokenizer->new();
+  my $tokenizer = Tokenizer->new($self->{file});
   my $parser    = Parser->new();
   my $generator = Generator->new();
 
-  my $tokenized = $tokenizer->tokenize('$a = 5');
+  my $tokenized = $tokenizer->tokenize();
   my $parsed    = $parser->parse($tokenized);
   $self->{code} = $generator->generate($parsed);
   $self->emit;
@@ -33,7 +33,9 @@ sub emit {
     print "$label: " if $label ne '';
     my $inst = shift @$_;
     print "$inst ";
-    print join ", ", @$_;
+    my $str = join ", ", @$_;
+    $str =~ s/, #/ #/;
+    print $str;
     print "\n";
   }
 }
