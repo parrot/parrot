@@ -187,6 +187,6 @@ while (i < N) {
   print_mandel(WIDTH, HEIGHT, cx, cy, sx, sy);
 
   i++;
-#  sleep(1);
+  sleep(1);
 }
 
