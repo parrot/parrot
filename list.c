@@ -25,6 +25,9 @@
  *    - 1.18               fixes
  *      1.19    08.11.2002 arbitrary sized items (enum_type_sized)
  *      1.26    08.01.2003 move Chunk_list flags out of buffer header
+ *      1.29               join chunks > MAX_ITEMS (Matt Fowles)
+ *      1.30               greater threshold befor do_sparse
+ *                         setting initial size to avoid sparse
  *
  *  Data Structure and Algorithms:
  *  ==============================
@@ -70,7 +73,17 @@
  *
  *    enum_grow_fixed:
  *    All chunks are of MAX_ITEMS size, chosen, when the first access to
- *    the array is indexed and beyond MIN_ITEMS
+ *    the array is indexed and beyond MIN_ITEMS and below 10 *
+ *    MAX_ITEMS
+ *    If the first access is beyond 10 * MAX_ITEMS a sparse chunk will
+ *    be created.
+ *    To avoid this - and the performance penalty - set the array size
+ *    before setting elements.
+ *
+ *      new P0, .PerlArray
+ *      set P0, 100000  # sets fixed sized, no sparse
+ *
+ *    This is only meaningful, if a lot of the entries are used too
  *
  *    enum_grow_growing:
  *    chunk sizes grow from MIN_ITEMS to MAX_ITEMS, this will be selected
@@ -82,7 +95,7 @@
  *
  *    The chunks hold the information, how many chunks are of the same
  *    type, beginning from the current, and how many items are
- *    included in this range. s. get_chunk below for detais.
+ *    included in this range. s. get_chunk below for details.
  *
  *    Sparse lists
  *    ------------
@@ -312,10 +325,10 @@ rebuild_other(Interp *interpreter, List *list)
         if (prev && (prev->flags & no_power_2) &&
                 (chunk->flags & no_power_2)) {
             /* DONE don't make chunks bigger then MAX_ITEMS, no - make then
-             * but: if bigger, split them in a next pass 
+             * but: if bigger, split them in a next pass
              * TODO test the logic that solves the above problem */
             if(prev->items + chunk->items > MAX_ITEMS) {
-                Parrot_reallocate(interpreter, (Buffer *)prev, 
+                Parrot_reallocate(interpreter, (Buffer *)prev,
                     MAX_ITEMS * list->item_size);
                 mem_sys_memmove(
                         (char *)prev->data.bufstart +
@@ -475,7 +488,7 @@ alloc_next_size(Interp *interpreter, List *list, int where, UINTVAL idx)
     UINTVAL items, size;
     List_chunk *new_chunk;
     int much = idx - list->cap >= MIN_ITEMS;
-    int do_sparse = (INTVAL)idx - (INTVAL)list->cap >= 2 * MAX_ITEMS;
+    int do_sparse = (INTVAL)idx - (INTVAL)list->cap >= 10 * MAX_ITEMS;
 
     if (list->item_type == enum_type_sized) {
         items = list->items_per_chunk;
@@ -1142,16 +1155,16 @@ list_mark(Interp *interpreter, List *list)
 
     for (chunk = list->first; chunk; chunk = chunk->next) {
         pobject_lives(interpreter, (PObj *)chunk);
-        if (!(chunk->flags & sparse))
-            for (i = 0; i < chunk->items; i++) {
-                if (list->item_type == enum_type_PMC ||
-                    list->item_type == enum_type_STRING) {
+        if (list->item_type == enum_type_PMC ||
+                list->item_type == enum_type_STRING) {
+            if (!(chunk->flags & sparse))
+                for (i = 0; i < chunk->items; i++) {
                     p = ((PObj **)chunk->data.bufstart)[i];
                     if (p)
                         pobject_lives(interpreter, p);
                 }
 
-            }
+        }
     }
     pobject_lives(interpreter, (PObj *)list);
     if (list->user_data)
@@ -1176,6 +1189,16 @@ list_set_length(Interp *interpreter, List *list, INTVAL len)
         idx = list->start + (UINTVAL)len;
         list->length = len;
         if (idx >= list->cap) {
+            /* assume user will fill it, so don't generate sparse
+             * chunks
+             */
+            if (!list->cap && idx > MAX_ITEMS) {
+                while (idx - MAX_ITEMS >= list->cap) {
+                    add_chunk(interpreter, list, enum_add_at_end,
+                            list->cap + MAX_ITEMS);
+                }
+            }
+
             list_append(interpreter, list, 0, list->item_type, idx);
         }
         else {

@@ -229,8 +229,11 @@
 [main]doc	examples/benchmarks/primes2.py
 [main]doc	examples/benchmarks/stress.pasm
 [main]doc	examples/benchmarks/stress.pl
+[main]doc	examples/benchmarks/stress1.pasm
+[main]doc	examples/benchmarks/stress1.pl
 [main]doc	examples/benchmarks/stress2.pasm
 [main]doc	examples/benchmarks/stress2.pl
+[main]doc	examples/benchmarks/stress3.pasm
 [main]doc	examples/mops/README
 [main]doc	examples/mops/mops.c
 [main]doc	examples/mops/mops.cs
