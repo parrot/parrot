@@ -13,7 +13,7 @@
 #include "parrot/parrot.h"
 #include <assert.h>
 
-/* A synchronized entry popper */
+/* A synchronized entry popper - actuall shift from front */
 QUEUE_ENTRY *
 pop_entry(QUEUE *queue) {
     QUEUE_ENTRY *returnval;
@@ -78,6 +78,25 @@ push_entry(QUEUE *queue, QUEUE_ENTRY *entry) {
         queue->tail = entry;
     }
     queue_signal(queue);        /* assumes only one waiter */
+    queue_unlock(queue);
+}
+
+void
+unshift_entry(QUEUE *queue, QUEUE_ENTRY *entry) {
+    QUEUE_ENTRY *cur;
+
+    queue_lock(queue);
+    cur = queue->head;
+    if (!cur) {
+        /* empty just set head */
+        queue->head = entry;
+        queue->tail = entry;
+    }
+    else {
+        queue->head = entry;
+        entry->next = cur;
+    }
+    queue_signal(queue);
     queue_unlock(queue);
 }
 
