@@ -164,7 +164,7 @@ mark_hash(Interp *interpreter, HASH *hash)
         HASHBUCKET *bucket = lookupBucket(hash, i);
         while (bucket) {
             if (hash->mark_key)
-            (hash->mark_key)(interpreter, (PObj *)bucket->key);
+                (hash->mark_key)(interpreter, (PObj *)bucket->key);
             if (bucket->value.type == enum_hash_string)
                 pobject_lives(interpreter,
                              (PObj *)bucket->value.val.string_val);
@@ -518,7 +518,7 @@ hash_clone(struct Parrot_Interp *interp, HASH *hash, HASH **dest)
 {
     HashIndex i;
 
-    new_hash(interp, dest);
+    new_hash_x(interp, dest, hash->compare, hash->hash_val, hash->mark_key);
     for (i = 0; i <= hash->max_chain; i++) {
         BucketIndex bi = lookupBucketIndex(hash, i);
         while (bi != NULLBucketIndex) {
