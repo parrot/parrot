@@ -12,7 +12,9 @@ TDB
 
 =head1 DESCRIPTION
 
-This module provides the default output style of C<Data::Dumper>.
+This is a baseclass that provides some essential functions necessary
+for dumping data structures. It is subclassed by C<Data::Dumper::Default>,
+which implements the methods that are finally doing the output.
 
 =head1 METHODS
 
@@ -36,8 +38,7 @@ A Data::Dumper::Base object has the following methods:
     addattribute $P0, "indention"
     addattribute $P0, "cache"
 END:
-    .pcc_begin_return
-    .pcc_end_return
+    .return ()
 .end
 
 .namespace ["Data::Dumper::Base"]
@@ -74,8 +75,7 @@ END:
     add $I0, attrCache
     setattribute self, $I0, temp
 
-    .pcc_begin_return
-    .pcc_end_return
+    .return ()
 .end
 
 =item (pos, name) = style."cache"( find, defname ) B<(internal)>
@@ -107,19 +107,13 @@ LOOP:
     inc i
     name = _cache[i]
     dec i
-    .pcc_begin_return
-    .return i
-    .return name
-    .pcc_end_return
+    .return ( i, name )
 
 NOTFOUND:
     set name, defname
     push _cache, find
     push _cache, name
-    .pcc_begin_return
-    .return -1
-    .return name
-    .pcc_end_return
+    .return ( -1, name )
 .end
 
 =item indent = style."createIndent"() B<(internal)>
@@ -138,9 +132,7 @@ NOTFOUND:
     clone indent, indent
     repeat indent, indent, level
 
-    .pcc_begin_return
-    .return indent
-    .pcc_end_return
+    .return ( indent )
 .end
 
 =item indent = style."indent"()
@@ -159,9 +151,7 @@ NOTFOUND:
 
     _indent = self."createIndent"( level )
 
-    .pcc_begin_return
-    .return _indent
-    .pcc_end_return
+    .return ( _indent )
 .end
 
 =item (subindent,indent) = style."newIndent"()
@@ -184,10 +174,7 @@ NOTFOUND:
     inc level
     indent2 = self."createIndent"( level )
 
-    .pcc_begin_return
-    .return indent2
-    .return indent1
-    .pcc_end_return
+    .return ( indent2, indent1 )
 .end
 
 =item indent = style."deleteIndent"()
@@ -207,9 +194,7 @@ NOTFOUND:
 
     indent = self."createIndent"( level )
 
-    .pcc_begin_return
-    .return indent
-    .pcc_end_return
+    .return ( indent )
 .end
 
 =item style."dump"( name, dump )
@@ -253,9 +238,7 @@ DUMP:
     self."dumpProperties"( name, _dump )
 
 END:
-    .pcc_begin_return
-    .return 1
-    .pcc_end_return
+    .return ( 1 )
 .end
 
 =back

@@ -330,6 +330,8 @@ SP              [ ]
 	    YYCHOP();
             YYCHOP();
 
+            if (!frames || !frames->label)
+                fataly(EX_SOFTWARE, sourcefile, line, "missing space?");
 	    label = mem_sys_allocate(yyleng+10);
 	    sprintf(label, "%s%d", yytext, frames->label);
 
@@ -344,6 +346,10 @@ SP              [ ]
 
 	if (valp) {
 	    YYCHOP();
+
+            /* #32421   if$I0 is parsed as if$ I0 */
+            if (!frames || !frames->label)
+                fataly(EX_SOFTWARE, sourcefile, line, "missing space?");
 
 	    label = mem_sys_allocate(yyleng+10);
 	    sprintf(label, "%s%d", yytext, frames->label);

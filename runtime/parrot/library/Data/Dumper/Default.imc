@@ -12,9 +12,7 @@ TDB
 
 =head1 DESCRIPTION
 
-This is a baseclass that provides some essential functions necessary
-for dumping data structures. It is subclassed by C<Data::Dumper::Default>,
-which implements the methods that are finally doing the output.
+This module provides the default output style of C<Data::Dumper>.
 
 =cut
 
@@ -27,8 +25,7 @@ which implements the methods that are finally doing the output.
     getclass $P0, "Data::Dumper::Base"
     subclass $P0, $P0, "Data::Dumper::Default"
 END:
-    .pcc_begin_return
-    .pcc_end_return
+    .return ()
 .end
 
 .namespace ["Data::Dumper::Default"]
@@ -55,9 +52,7 @@ A Data::Dumper::Default object has the following methods:
 
     ret = self."dump"( name, dump )
 
-    .pcc_begin_return
-    .return ret
-    .pcc_end_return
+    .return ( ret )
 .end
 
 =item style."dumpCached"( name, dump )
@@ -71,9 +66,7 @@ A Data::Dumper::Default object has the following methods:
     print "\\"
     print name
 
-    .pcc_begin_return
-    .return 1
-    .pcc_end_return
+    .return ( 1 )
 .end
 
 
@@ -99,9 +92,7 @@ A Data::Dumper::Default object has the following methods:
     ret = self."dump"( name, prop )
 
 END:
-    .pcc_begin_return
-    .return ret
-    .pcc_end_return
+    .return ( ret )
 .end
 
 =item style.dumpHash( name, hash )
@@ -168,9 +159,7 @@ dump_end:
     print "}"
     self."deleteIndent"()
 
-    .pcc_begin_return
-    .return 1
-    .pcc_end_return
+    .return ( 1 )
 .end
 
 =item style."dumpStringEscaped"( string, escapeChar )
@@ -190,9 +179,7 @@ Escape any characters in a string so we can re-use it as a literal.
     str = escape( str, char )
     print str
 
-    .pcc_begin_return
-    .return 1
-    .pcc_end_return
+    .return ( 1 )
 .end
 
 =item style."pmcDefault"( name, dump )
@@ -216,9 +203,7 @@ Escape any characters in a string so we can re-use it as a literal.
 CAN_DUMP:
     dump."__dump"( self, name )
 END:
-    .pcc_begin_return
-    .return 1
-    .pcc_end_return
+    .return ( 1 )
 .end
 
 =item style."pmcPMCArray"( name, array )
@@ -294,9 +279,7 @@ iter_end:
 
     self."deleteIndent"()
 
-    .pcc_begin_return
-    .return 1
-    .pcc_end_return
+    .return ( 1 )
 .end
 
 =item style."pmcStringArray"( name, array )
@@ -373,9 +356,7 @@ iter_end:
 
     self."deleteIndent"()
 
-    .pcc_begin_return
-    .return 1
-    .pcc_end_return
+    .return ( 1 )
 .end
 
 =item style."pmcPerlHash"( name, hash )
@@ -393,10 +374,27 @@ Dumps a PerlHash PMC.
 
     self."dumpHash"( name, hash )
 
-    .pcc_begin_return
-    .return 1
-    .pcc_end_return
+    .return ( 1 )
 .end
+
+
+=item style."pmcString"( name, str )
+
+Dumps a String PMC.
+
+=cut
+
+.sub pmcString method
+    .param string name
+    .param pmc str
+
+    print "\""
+    self."dumpStringEscaped"( str, "\"" )
+    print "\""
+
+    .return ( 1 )
+.end
+
 
 =item style."pmcPerlString"( name, str )
 
@@ -412,9 +410,7 @@ Dumps a PerlString PMC.
     self."dumpStringEscaped"( str, "\"" )
     print "\""
 
-    .pcc_begin_return
-    .return 1
-    .pcc_end_return
+    .return ( 1 )
 .end
 
 
@@ -430,9 +426,7 @@ Dumps a PerlInt PMC.
 
     print val
 
-    .pcc_begin_return
-    .return 1
-    .pcc_end_return
+    .return ( 1 )
 .end
 
 =item style."pmcPerlNum"( name, val )
@@ -447,9 +441,7 @@ Dumps a PerlNum PMC.
 
     print val
 
-    .pcc_begin_return
-    .return 1
-    .pcc_end_return
+    .return ( 1 )
 .end
 
 =item style."pmcPerlUndef"( name, val )
@@ -461,9 +453,7 @@ Dumps a PerlUndef PMC.
 .sub pmcPerlUndef method
     print "undef"
 
-    .pcc_begin_return
-    .return 1
-    .pcc_end_return
+    .return ( 1 )
 .end
 
 =item style."pmcSub"( name, val )
@@ -475,9 +465,7 @@ Dumps a Sub pmc
 .sub pmcSub method
     print "sub { ... }"
 
-    .pcc_begin_return
-    .return 1
-    .pcc_end_return
+    .return ( 1 )
 .end
 
 =item style."pmcNull"( name, val )
@@ -489,9 +477,7 @@ Dumps a Null PMC.
 .sub pmcNull method
     print "null"
 
-    .pcc_begin_return
-    .return 1
-    .pcc_end_return
+    .return ( 1 )
 .end
 
 =item style."pmcOrderedHash"( name, val )
@@ -503,9 +489,7 @@ Dumps a OrderedHash PMC.
 .sub pmcOrderedHash method
     print "OrderedHash { ... }"
 
-    .pcc_begin_return
-    .return 1
-    .pcc_end_return
+    .return ( 1 )
 .end
 
 =item style."pmcManagedStruct"( name, val )
@@ -517,9 +501,7 @@ Dumps a ManagedStruct PMC.
 .sub pmcManagedStruct method
     print "ManagedStruct { ... }"
 
-    .pcc_begin_return
-    .return 1
-    .pcc_end_return
+    .return ( 1 )
 .end
 
 =item style."pmcUnManagedStruct"( name, val )
@@ -531,9 +513,7 @@ Dumps a UnManagedStruct PMC.
 .sub pmcUnManagedStruct method
     print "UnManagedStruct { ... }"
 
-    .pcc_begin_return
-    .return 1
-    .pcc_end_return
+    .return ( 1 )
 .end
 
 =item style."pmcArray"( name, array )

@@ -18,7 +18,7 @@ Tests data dumping.
 
 use strict;
 
-use Parrot::Test tests => 13;
+use Parrot::Test tests => 14;
 
 # no. 1
 output_is(<<'CODE', <<'OUT', "dumping array of sorted numbers");
@@ -614,3 +614,35 @@ CODE
 ]
 OUT
 
+# no. 14
+output_is( << 'CODE', << 'OUT', "dumping strings");
+##PIR##
+.include "library/dumper.imc"
+.sub _test @MAIN
+    .local pmc array
+    array = new PerlArray
+
+    .local pmc pmc_string, pmc_perl_string
+    .local string string_1
+    
+    pmc_string = new .String
+    pmc_string = "This is a String PMC"
+    push array, pmc_string
+    
+    pmc_perl_string = new .PerlString
+    pmc_perl_string = "This is a PerlString PMC"
+    push array, pmc_perl_string
+
+    string_1 = "This is a String"
+    push array, string_1
+
+    _dumper( "array of various strings", array )
+    end
+.end
+CODE
+"array of various strings" => PerlArray (size:3) [
+    "This is a String PMC",
+    "This is a PerlString PMC",
+    "This is a String"
+]
+OUT
