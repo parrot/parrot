@@ -15,7 +15,7 @@ use Config;
 use File::Spec;
 use Getopt::Std;
 
-my $VERSION = "0.0.4";
+my $VERSION = "0.1.0";
 
 my %std_to = 
   ( bug => 'parrotbug@parrotcode.org',
@@ -39,6 +39,7 @@ my ( $parrot_version, $parrot_myconfig ) ;
 init();
 help()    if $opts{h};
 version() if $opts{V};
+if ( $opts{d} ) { dump_info(*STDOUT); exit; }
 explain_parrotbug();
 query_info();
 
@@ -212,7 +213,7 @@ sub init {
     @ARGV = split m/\s+/,
         MacPerl::Ask("Provide command-line args here (-h for help):")
         if $is_macos && $MacPerl::Version =~ /App/;
-    help() unless getopts("AVhb:e:f:n:o:r:s:", \%opts);
+    help() unless getopts("AVhb:de:f:n:o:r:s:", \%opts);
 
 
     ##
@@ -490,7 +491,37 @@ EOF
 
 
 #------------------------------------------------------------#
-#                        Sending subs.                       #
+#                        Action subs.                        #
+
+#----
+# Dump everything collected on the specified glob.
+sub dump_info {
+    local (*OUT) = @_;
+
+    # Flags...
+    print OUT <<EOF;
+---
+Flags:
+    category=$category
+    severity=$severity
+EOF
+    print OUT "    ack=no\n" if $opts{A};
+
+    # ... myconfig ...
+    print OUT "---\n$parrot_myconfig\n---\n";
+
+    # ... and environment.
+    print OUT "Environment:\n";
+    my @env = qw[ PATH LD_LIBRARY_PATH LANG SHELL HOME LOGDIR LANGUAGE ];
+    push @env, $Config{ldlibpthname} if $Config{ldlibpthname} ne '';
+    push @env, grep /^(?:PERL|LC_|LANG|CYGWIN)/, keys %ENV;
+    my %env; @env{@env} = @env;
+    for my $env (sort keys %env) {
+	print OUT "    $env",
+          exists $ENV{$env} ? "=$ENV{$env}\n" : " (unset)\n";
+    }
+}
+
 
 sub send_msg {
 
