@@ -89,26 +89,27 @@ Parrot_set_n_i {
     }
 }
 
-Parrot_set_i_n {
-    if (MAP[2]) {
-        jit_emit_mov_mr_in(NATIVECODE, &INT_REG[1], MAP[2]);
-    }
-    else {
-        jit_emit_mov_rm_n(NATIVECODE, FSR1, &NUM_REG[2]);
-        jit_emit_mov_mr_in(NATIVECODE, &INT_REG[1], FSR1);
-    }
-    if (MAP[1]) {
-        jit_emit_mov_rm_i(NATIVECODE, MAP[1], &INT_REG[1]);
-    }
-}
-
-Parrot_set_i_nc {
-    jit_emit_mov_rm_n(NATIVECODE, FSR1, &NUM_CONST[2]);
-    jit_emit_mov_mr_in(NATIVECODE, &INT_REG[1], FSR1);
-    if (MAP[1]) {
-        jit_emit_mov_rm_i(NATIVECODE, MAP[1], &INT_REG[1]);
-    }
-}
+; these are wrong: fist does rounding, but we should truncate
+;Parrot_set_i_n {
+;    if (MAP[2]) {
+;        jit_emit_mov_mr_in(NATIVECODE, &INT_REG[1], MAP[2]);
+;    }
+;    else {
+;        jit_emit_mov_rm_n(NATIVECODE, FSR1, &NUM_REG[2]);
+;        jit_emit_mov_mr_in(NATIVECODE, &INT_REG[1], FSR1);
+;    }
+;    if (MAP[1]) {
+;        jit_emit_mov_rm_i(NATIVECODE, MAP[1], &INT_REG[1]);
+;    }
+;}
+;
+;Parrot_set_i_nc {
+;    jit_emit_mov_rm_n(NATIVECODE, FSR1, &NUM_CONST[2]);
+;    jit_emit_mov_mr_in(NATIVECODE, &INT_REG[1], FSR1);
+;    if (MAP[1]) {
+;        jit_emit_mov_rm_i(NATIVECODE, MAP[1], &INT_REG[1]);
+;    }
+;}
 
 ; -- null op.
 TEMPLATE Parrot_null_x {

@@ -17,7 +17,7 @@ Tests JIT register allocation.
 
 =cut
 
-use Parrot::Test tests => 9;
+use Parrot::Test tests => 10;
 
 output_is(<<'CODE', <<'OUTPUT', "sub_i_i_i 1,2,3 mapped");
 set N0,0
@@ -225,3 +225,30 @@ CODE
 0.000000
 -10.000000
 OUTPUT
+
+# rounding behavior
+output_is(<<'CODE', <<'OUT', "set_i_n testing");
+##PIR##
+.sub _main
+    .local num n
+    .local int i
+
+    n = 1.4
+    i = n
+    print i
+
+    n = 2.5
+    i = n
+    print i
+
+    n = 3.6
+    i = n
+    print i
+
+    print "\n"
+    end
+.end
+CODE
+123
+OUT
+
