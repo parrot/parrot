@@ -46,7 +46,8 @@ To start the debugger type:
   pdb file.pbc
 
 That is, F<pdb> takes exactly one argument, which is the Parrot bytecode
-that you're going to debug.
+that you're going to debug. F<pdb> will automatically load and disassemble
+the bytecode file for you.
 
 Note that you can't pass command line arguments to your program when
 you invoke the debugger. See the C<run (r)> command below for this.
@@ -85,8 +86,8 @@ patch the source code (see L</FILES> below).
 
 =item disassemble
 
-Disassemble the bytecode. This will turn the file loaded with
-C<load> into proper bytecode.
+Disassemble a loaded bytecode file. This will turn a file loaded with
+C<load> into proper Parrot assembler. 
 
 =item load
 
@@ -433,6 +434,11 @@ Nothing fancy here, only the C<main> function.
 Most of the debugger is implemented here.
 You may want to start from the C<PDB_run_command>
 function and go down from there for the real meat.
+
+=item embed.c
+
+C<Parrot_debug>, the function which launches the debugger, is
+implemented here.
 
 =item include/parrot/debug.h
 
