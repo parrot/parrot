@@ -80,7 +80,7 @@ int optimize() {
 }
 
 /* get negated opterator for op */
-static char * get_neg_op(char *op, int *nargs)
+static const char * get_neg_op(char *op, int *nargs)
 {
     static struct br_pairs {
         const char *op;
@@ -127,7 +127,7 @@ static void if_branch()
             if (ins->next &&
                     (ins->next->type & ITLABEL) &&    /* Lx */
                     ins->next->r[0] == br_dest) {
-                char * neg_op;
+                const char * neg_op;
                 SymReg * go = get_branch_reg(ins);
                 int args;
 

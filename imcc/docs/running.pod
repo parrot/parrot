@@ -62,6 +62,7 @@ imcc.
 
 =head1 <file>
 
+If the file ends in B<.pbc> it will be interpreted.
 If the file ends in B<.pasm> it is parsed as PASM code else as PIR
 code.
 
@@ -78,7 +79,7 @@ for the B<-r> option.
 
 =head1 BUGS
 
-The long options are unimplemented.
+The long imcc options are unimplemented.
 
 =head1 FILES
 
