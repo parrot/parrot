@@ -52,6 +52,7 @@ SymbolTable global_sym_tab;
 static Class * current_class;
 static Instruction * current_call;
 static SymReg *cur_obj;
+int cur_pmc_type;      /* used in mk_ident */
 IMC_Unit * cur_unit;
 SymReg *cur_namespace; /* ugly hack for mk_address */
 
@@ -235,7 +236,9 @@ itcall_sub(SymReg* sub)
    }
    /* FIXME use the default settings from .pragma */
    current_call->r[0]->pcc_sub->pragma = P_PROTOTYPED;
-   if(cur_unit->type == IMC_PCCSUB)
+   if (current_call->r[0]->pcc_sub->sub->pmc_type == enum_class_NCI)
+       current_call->r[0]->pcc_sub->nci = 1;
+   if (cur_unit->type == IMC_PCCSUB)
         cur_unit->instructions->r[1]->pcc_sub->calls_a_sub = 1;
 }
 
@@ -782,7 +785,8 @@ type:
 classname:
    IDENTIFIER
          {
-            if((pmc_type(interp, string_from_cstring(interp, $1, 0))) <= 0) {
+            if (( cur_pmc_type = pmc_type(interp,
+                  string_from_cstring(interp, $1, 0))) <= 0) {
                fataly(1, sourcefile, line, "Unknown PMC type '%s'\n", $1);
             }
          }

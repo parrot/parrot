@@ -930,7 +930,8 @@ move_cc:
     /*
      * emit a savetop for now
      */
-    ins = insINS(interp, unit, ins, "savetop", regs, 0);
+    if (!sub->pcc_sub->nci)
+        ins = insINS(interp, unit, ins, "savetop", regs, 0);
     /*
      * if we reuse the continuation, update it
      */
@@ -963,7 +964,8 @@ move_cc:
     if (sub->pcc_sub->label && ins->next->type == ITLABEL) {
         ins = ins->next;
     }
-    ins = insINS(interp, unit, ins, "restoretop", regs, 0);
+    if (!sub->pcc_sub->nci)
+        ins = insINS(interp, unit, ins, "restoretop", regs, 0);
     if (p1) {
         regs[0] = get_pasm_reg("P1");
         regs[1] = p1;

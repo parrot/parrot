@@ -273,6 +273,7 @@ mk_fullname(const char * name)
     return _mk_fullname(namespace, name);
 }
 
+extern int cur_pmc_type;
 /* Makes a new identifier */
 SymReg *
 mk_ident(char * name, int t)
@@ -289,6 +290,10 @@ mk_ident(char * name, int t)
     r = mk_symreg(fullname, t);
     r->type = VTIDENTIFIER;
     free(name);
+    if (t == 'P') {
+        r->pmc_type = cur_pmc_type;
+        cur_pmc_type = 0;
+    }
     return r;
 }
 

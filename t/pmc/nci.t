@@ -17,12 +17,12 @@ i386 and the F<libnci.so> library is found.
 
 =cut
 
-use Parrot::Test tests => 32;
+use Parrot::Test tests => 33;
 use Parrot::Config;
 
 SKIP: {
 unless ( -e "runtime/parrot/dynext/libnci" . $PConfig{so} ) {
-    skip( "Please make libnci$PConfig{so}", 
+    skip( "Please make libnci$PConfig{so}",
           Test::Builder->expected_tests() );
 }
 
@@ -54,6 +54,24 @@ loaded
 dlfunced
 ok 1
 ok 2
+OUTPUT
+
+output_is(<<'CODE', <<'OUTPUT', "nci_d_d - PIR");
+##PIR##
+.sub _test @MAIN
+  .local pmc lib
+  .local NCI dd
+  lib = loadlib  "libnci"
+  print "loaded\n"
+  dd = dlfunc lib, "nci_dd", "dd"
+  .local float r
+  r = dd(4.0)
+  print r
+  print "\n"
+.end
+CODE
+loaded
+8.000000
 OUTPUT
 
 output_is(<<'CODE', <<'OUTPUT', "nci_f_ff");

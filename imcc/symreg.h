@@ -72,6 +72,7 @@ typedef struct _SymReg {
     struct _SymReg * reg;	/* key->register for VTREGKEYs */
     struct pcc_sub_t *pcc_sub;  /* PCC subroutine */
     struct _SymReg * used;	/* used register in invoke */
+    int pmc_type;               /* class enum */
 } SymReg;
 
 
