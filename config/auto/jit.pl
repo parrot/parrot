@@ -93,6 +93,7 @@ sub runstep {
 	  jit_i386 => 'fcomip'
 	);
       }
+      cc_clean();
     }
   }
   else {
