@@ -135,7 +135,7 @@ END
 buildfile("test_c");
 system("$c{cc} $c{ccflags} -o test$c{exe} test.c") and die "C compiler died!";
 (@c{qw(ivsize longsize nvsize)})=split('/', `./test$c{exe}`);
-unlink('test.c', "test$c{exe}");
+unlink('test.c', "test$c{exe}", "test$c{o}");
 
 print <<"END";
 
