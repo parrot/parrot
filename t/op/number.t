@@ -415,23 +415,19 @@ OUTPUT
 
 output_is(<<CODE, <<OUTPUT, "ne_n_nc_ic");
 	set	N0, 1073741824.0
-
-	ne	N0, 1073741824.0, ERROR
-        branch  ONE
-	print	"bad\\n"
-
-ONE:
+	ne	N0, 1073741824.0, nok1
 	print	"ok 1\\n"
+        branch  ONE
+nok1:
+	print	"bad 1\\n"
+ONE:
 	ne	N0, 0.0, TWO
         branch  ERROR
-	print	"bad\\n"
-
 TWO:
 	print	"ok 2\\n"
 	end
-
 ERROR:
-	print	"bad\\n"
+	print	"bad 2\\n"
         end
 CODE
 ok 1
@@ -956,7 +952,7 @@ output_is(<<'CODE', <<OUTPUT, "exchange");
     print "\n"
     print N2
     print "\n"
-  
+
     set N3, -100.200300
     exchange N3, N3
     print N3

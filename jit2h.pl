@@ -111,12 +111,14 @@ sub readjit($) {
 
 use Parrot::Vtable;
 my $vtable;
+my $vjit = 0;
 sub vtable_num($) {
     my $meth = shift;
     unless ($vtable) {
 	$vtable = parse_vtable();
     }
     my $i = 0;
+    $vjit++;
     for my $entry (@{$vtable}) {
 	return $i if ($entry->[1] eq $meth);
 	$i++;
@@ -169,6 +171,8 @@ print JITCPU $header if ($header);
 
 my @jit_funcs;
 push @jit_funcs, "Parrot_jit_fn_info_t op_jit[$core_numops] = {\n";
+
+my $njit = scalar keys(%core_ops);
 
 my $jit_fn_retn = "void";
 my $jit_fn_params = "(Parrot_jit_info_t *jit_info, struct Parrot_Interp * interpreter)";
@@ -297,6 +301,7 @@ for ($i = 0; $i < $core_numops; $i++) {
 
 print JITCPU @jit_funcs, "};\n";
 
+print("jit2h: $njit (+ $vjit vtable) of $core_numops ops are JITed.\n");
 sub make_subs {
     my ($ptr, $type, $index) = @_;
     return(($ptr eq '&' ? '&' : '') . sprintf($Parrot::OpTrans::C::arg_maps{$type_to_arg{$type}}, $index));
