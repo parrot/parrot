@@ -389,6 +389,7 @@ t/op/debuginfo.t
 t/op/globals.t
 t/op/hacks.t
 t/op/ifunless.t
+t/op/info.t
 t/op/integer.t
 t/op/interp.t
 t/op/macro.t

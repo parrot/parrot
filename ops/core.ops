@@ -3299,8 +3299,118 @@ Puts the depth of the user stack in $1.
 
 =cut
 
-op depth(out INT) {
+inline op depth(out INT) {
   $1 = stack_height(interpreter, interpreter->user_stack);
+  goto NEXT();
+}
+
+
+#######################################
+
+=item B<lookback>(out INT, in INT)
+
+=item B<lookback>(out STR, in INT)
+
+=item B<lookback>(out NUM, in INT)
+
+=item B<lookback>(out PMC, in INT)
+
+Finds the entry in the user stack at offset $2 from the top and put it
+in register $1. Positive numbers count down from the top of the stack,
+negative numbers count up from the bottom. (0 is the topmost entry, -1
+is the bottom-most)
+
+=cut
+
+op lookback(out INT, in INT) {
+  Stack_Entry_t *entry;
+  INTVAL depth = $2;
+  INTVAL total_depth;
+  /* If they're counting up from the bottom, figure out where we'd be
+     if we counted down from the top */
+  if (depth < 0) {
+    depth += 1;
+    total_depth = stack_height(interpreter, interpreter->user_stack);
+    depth = total_depth - depth;
+    if (depth < 0) {
+      internal_exception(99, "Stack depth wrong");
+    }
+  }
+  entry = stack_entry(interpreter, interpreter->user_stack, depth);
+  if (entry->entry_type != STACK_ENTRY_INT) {
+    internal_exception(ERROR_BAD_STACK_TYPE, "Wrong type on stack!");
+  }
+
+  $1 = entry->entry.int_val;
+  goto NEXT();
+}
+
+op lookback(out STR, in INT) {
+  Stack_Entry_t *entry;
+  INTVAL depth = $2;
+  INTVAL total_depth;
+  /* If they're counting up from the bottom, figure out where we'd be
+     if we counted down from the top */
+  if (depth < 0) {
+    depth += 1;
+    total_depth = stack_height(interpreter, interpreter->user_stack);
+    depth = total_depth - depth;
+    if (depth < 0) {
+      internal_exception(99, "Stack depth wrong");
+    }
+  }
+  entry = stack_entry(interpreter, interpreter->user_stack, depth);
+  if (entry->entry_type != STACK_ENTRY_STRING) {
+    internal_exception(ERROR_BAD_STACK_TYPE, "Wrong type on stack!");
+  }
+
+  $1 = entry->entry.string_val;
+  goto NEXT();
+}
+
+op lookback(out NUM, in INT) {
+  Stack_Entry_t *entry;
+  INTVAL depth = $2;
+  INTVAL total_depth;
+  /* If they're counting up from the bottom, figure out where we'd be
+     if we counted down from the top */
+  if (depth < 0) {
+    depth += 1;
+    total_depth = stack_height(interpreter, interpreter->user_stack);
+    depth = total_depth - depth;
+    if (depth < 0) {
+      internal_exception(99, "Stack depth wrong");
+    }
+  }
+  entry = stack_entry(interpreter, interpreter->user_stack, depth);
+  if (entry->entry_type != STACK_ENTRY_FLOAT) {
+    internal_exception(ERROR_BAD_STACK_TYPE, "Wrong type on stack!");
+  }
+
+  $1 = entry->entry.num_val;
+  goto NEXT();
+}
+
+op lookback(out PMC, in INT) {
+  Stack_Entry_t *entry;
+  INTVAL depth = $2;
+  INTVAL total_depth;
+  /* If they're counting up from the bottom, figure out where we'd be
+     if we counted down from the top */
+  if (depth < 0) {
+    depth += 1;
+    total_depth = stack_height(interpreter, interpreter->user_stack);
+    depth = total_depth - depth;
+    if (depth < 0) {
+      internal_exception(99, "Stack depth wrong");
+    }
+  }
+  entry = stack_entry(interpreter, interpreter->user_stack, depth);
+  if (entry->entry_type != STACK_ENTRY_PMC) {
+    internal_exception(ERROR_BAD_STACK_TYPE, "Wrong type on stack!");
+  }
+
+  $1 = entry->entry.pmc_val;
   goto NEXT();
 }
 
@@ -3890,14 +4000,13 @@ op destroy(in PMC) {
 
 Find the PMC type by name.
 
-TODO: Implement this! (or remove the op).
-
 =cut
 
 op find_type(out INT, in STR) {
-/*
-    $1 = Parrot_base_classname_hash->vtable->get_integer_index_s(interpreter, Parrot_base_classname_hash, $2);
-*/
+    KEY key;
+    MAKE_KEY(key, $2, enum_key_string, string_val);
+    $1 = Parrot_base_classname_hash->vtable->get_integer_keyed(interpreter, Parrot_base_classname_hash, &key);
+
     goto NEXT();
 }
 
@@ -4231,4 +4340,3 @@ This program is free software. It is subject to the same license
 as the Parrot interpreter itself.
 
 =cut
-

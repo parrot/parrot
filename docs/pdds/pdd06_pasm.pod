@@ -512,6 +512,17 @@ Put the type of stack entry Y into integer register X
 
 Sets a named marker for the stacks for later use.
 
+=item lookback tx, Iy
+
+Fetch the entry that's at position Y from the top of the stack. This
+does not remove an entry from the stack, merely fetches the entry off
+it.
+
+0 is the entry from the top of the stack, 1 is the entry immediately
+previous to that, and so on. Entry -1 is the very bottom-most entry in
+the stack. (While the stack may be a tree when looked at from the bottom up, you
+don't have access to any other branches when looking this way)
+
 =item warp [string]
 
 Reset the current register stacks to the state they were in when the
