@@ -75,7 +75,6 @@ Debugger
     Add commands history and completion
     Load the commands from a file
     Make breakpoints at labels
-    Watchpoints
     Read core dumps
     Attach to a running program
     List breakpoints.
