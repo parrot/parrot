@@ -15,9 +15,12 @@
 #include "parrot/parrot.h"
 #include "assert.h"
 
+static void add_header_to_free(struct Parrot_Interp *interpreter,
+                               struct free_pool *pool, void *to_add);
+
 /* Add a string header to the free string header pool */
 static void add_pmc_to_free(struct Parrot_Interp *interpreter,
-			    struct PMC_free_pool *pool, void
+			    struct free_pool *pool, void
 			    *to_add) {
   PMC **temp_ptr;
   /* First, check and see if there's enough space in the free pool. If
@@ -155,15 +158,115 @@ Buffer *new_tracked_header(struct Parrot_Interp *interpreter, UINTVAL size) {
   return (Buffer *)mem_sys_allocate(size);
 }
 
-void free_tracked(Buffer *thing) {
-  mem_sys_free(thing);
+
+/* We have no more headers on the free header pool. Go allocate more
+   and put them on */
+static void
+alloc_more_buffer_headers(struct Parrot_Interp *interpreter) {
+  struct Buffer_Arena *new_arena, *old_arena;
+  Buffer *cur_buffer;
+  int i;
+
+  /* First, try and find some unused headers */
+  Parrot_do_dod_run(interpreter);
+
+  /* If we found some, then bail as we don't need to do anything */
+  if (interpreter->arena_base->buffer_header_pool->entries_in_pool) {
+    return;
+  }
+  
+  new_arena = mem_sys_allocate(sizeof(struct Buffer_Arena));
+  new_arena->start_Buffer = mem_sys_allocate(sizeof(Buffer) * BUFFER_HEADERS_PER_ALLOC);
+  memset(new_arena->start_Buffer, 0, sizeof(Buffer) * BUFFER_HEADERS_PER_ALLOC);
+  new_arena->free = 0;
+  new_arena->used = BUFFER_HEADERS_PER_ALLOC; /* Need to rethink the whole arena free/used
+			     thing, as the headers go into a single
+			     allocation pool */
+  new_arena->next = NULL;
+  new_arena->prev = interpreter->arena_base->last_Buffer_Arena;
+  /* Is there a previous arena */
+  if (new_arena->prev) {
+    new_arena->prev->next = new_arena;
+  }
+
+  interpreter->arena_base->last_Buffer_Arena = new_arena;
+
+  /* Note it in our stats */
+  interpreter->total_Buffers += BUFFER_HEADERS_PER_ALLOC;
+  /* Yeah, this is skanky. They're not really active, but
+     add_header_to_free assumes that it's adding an active header to
+     the free list */
+  interpreter->active_Buffers += BUFFER_HEADERS_PER_ALLOC;
+
+  cur_buffer = new_arena->start_Buffer;
+  for (i = 0; i < BUFFER_HEADERS_PER_ALLOC; i++) {
+    add_header_to_free(interpreter,
+		       interpreter->arena_base->buffer_header_pool,
+		       cur_buffer++);
+  }
 }
 
-/* Add a string header to the free string header pool */
+/* Get a buffer out of our free pool */
+Buffer *
+new_buffer_header(struct Parrot_Interp *interpreter) {
+  Buffer *return_me;
+
+  /* Icky special case. Grab system memory if there's no interpreter
+     yet */
+  if (interpreter == NULL) {
+    return_me = mem_sys_allocate(sizeof(Buffer));
+    return_me->flags = BUFFER_live_FLAG;
+    return return_me;
+  }
+
+  if (!interpreter->arena_base->buffer_header_pool->entries_in_pool) {
+    alloc_more_buffer_headers(interpreter);
+  }
+
+  /* Okay, we do this the long, drawn-out, hard way. Otherwise I get
+     really confused and things crash. This, generally, is a Bad
+     Thing. */
+  {
+    /* A stupid temp variable. Our pointer into the pool */
+    Buffer **foo;
+    /* Set the pointer to the beginning of the pool */
+    foo =
+      interpreter->arena_base->buffer_header_pool->pool_buffer.bufstart;
+    /* Decrement the count of entries in the pool */
+    interpreter->arena_base->buffer_header_pool->entries_in_pool--;
+    /* Add the count of entries in the pool to the base
+       pointer. Conveniently this is both the offset into a zero-based
+       array and the count for the next time */
+    foo +=
+      interpreter->arena_base->buffer_header_pool->entries_in_pool;
+    /* Dereference the buffer pointer to get the real string pointer */
+    return_me = *foo;
+    /* Count that we've allocated it */
+    interpreter->active_Buffers++;
+    /* Mark it live */
+    return_me->flags = BUFFER_live_FLAG;
+    /* Return it */
+    return return_me;
+  }
+}
+
+void free_buffer(Buffer *thing) {
+  if (thing) {
+    if (thing->bufstart && (thing->flags & BUFFER_sysmem_FLAG)) {
+      mem_sys_free(thing->bufstart);
+    }
+    thing->bufstart = NULL;
+    thing->buflen = 0;
+    thing->flags = 0;
+  }
+
+}
+
+/* Add a buffer header to a free buffer header pool */
 static void add_header_to_free(struct Parrot_Interp *interpreter,
-			       struct STRING_free_pool *pool, void
+			       struct free_pool *pool, void
 			       *to_add) {
-  STRING **temp_ptr;
+  Buffer **temp_ptr;
   /* First, check and see if there's enough space in the free pool. If
    we're within the size of a STRING pointer, we make it bigger */
   if (pool->entries_in_pool * sizeof(STRING *) >=
@@ -550,19 +653,6 @@ STRING *new_string_header(struct Parrot_Interp *interpreter) {
     return_me->flags = BUFFER_live_FLAG;
     /* Return it */
     return return_me;
-  }
-}
-
-/* Mark the string as unused. The GC will later find it and put it on
-   the free list */
-void free_string(STRING *string) {
-  if (string) {
-    if (string->bufstart && (string->flags & BUFFER_sysmem_FLAG)) {
-      mem_sys_free(string->bufstart);
-    }
-    string->bufstart = NULL;
-    string->buflen = 0;
-    string->flags = 0;
   }
 }
 

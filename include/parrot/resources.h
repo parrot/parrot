@@ -19,10 +19,9 @@ PMC *new_pmc_header(struct Parrot_Interp *);
 void free_pmc(PMC *);
 
 STRING *new_string_header(struct Parrot_Interp *);
-void free_string(STRING *);
-
 Buffer *new_tracked_header(struct Parrot_Interp *, UINTVAL size);
-void free_tracked(Buffer *);
+Buffer *new_buffer_header(struct Parrot_Interp *);
+void free_buffer(Buffer *);
 
 void *new_bigint_header(struct Parrot_Interp *);
 void free_bigint(void);
@@ -42,6 +41,7 @@ void buffer_lives(Buffer *);
 
 #define STRING_HEADERS_PER_ALLOC 128
 #define PMC_HEADERS_PER_ALLOC 128
+#define BUFFER_HEADERS_PER_ALLOC 128
 
 struct PMC_Arena {
     UINTVAL free;         /* Count of PMCs free in this arena */
@@ -60,18 +60,20 @@ struct STRING_Arena {
     STRING *start_STRING;
 };
 
-/* The free string header pool */
-struct STRING_free_pool {
+struct Buffer_Arena {
+    UINTVAL free;
+    UINTVAL used;
+    struct Buffer_Arena *prev;
+    struct Buffer_Arena *next;
+    Buffer *start_Buffer;
+};
+
+/* The free header pool */
+struct free_pool {
     Buffer pool_buffer;
     UINTVAL entries_in_pool;
 };
-    
-/* The free PMC header pool */
-struct PMC_free_pool {
-    Buffer pool_buffer;
-    UINTVAL entries_in_pool;
-};
-    
+        
 struct Memory_Pool {
     UINTVAL free;
     UINTVAL size;
@@ -84,9 +86,11 @@ struct Memory_Pool {
 struct Arenas {
     struct PMC_Arena *last_PMC_Arena;
     struct STRING_Arena *last_STRING_Arena;
+    struct Buffer_Arena *last_Buffer_Arena;
     struct Memory_Pool *memory_pool;
-    struct STRING_free_pool *string_header_pool;
-    struct PMC_free_pool *pmc_pool;
+    struct free_pool *string_header_pool;
+    struct free_pool *pmc_pool;
+    struct free_pool *buffer_header_pool;
     UINTVAL collections;
 };
 

@@ -73,7 +73,7 @@ string_make(struct Parrot_Interp *interpreter, const void *buffer,
 void
 string_destroy(STRING *s)
 {
-    free_string(s);
+    free_buffer((Buffer *)s);
 }
 
 /* Ordinary user-visible string operations */

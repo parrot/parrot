@@ -108,7 +108,7 @@ mem_setup_allocator(struct Parrot_Interp *interpreter)
 
     /* Init the string header pool */
     interpreter->arena_base->string_header_pool =
-        mem_sys_allocate(sizeof(struct STRING_free_pool));
+        mem_sys_allocate(sizeof(struct free_pool));
     interpreter->arena_base->string_header_pool->pool_buffer.bufstart =
         Parrot_allocate(interpreter, 1024);
     interpreter->arena_base->string_header_pool->pool_buffer.flags =
@@ -119,7 +119,7 @@ mem_setup_allocator(struct Parrot_Interp *interpreter)
 
     /* Init the PMC header pool */
     interpreter->arena_base->pmc_pool =
-        mem_sys_allocate(sizeof(struct PMC_free_pool));
+        mem_sys_allocate(sizeof(struct free_pool));
     interpreter->arena_base->pmc_pool->pool_buffer.bufstart =
         Parrot_allocate(interpreter, 1024);
     interpreter->arena_base->pmc_pool->pool_buffer.flags = BUFFER_live_FLAG;
