@@ -162,7 +162,13 @@ pmclass Array {
         }
 
         value = ((PMC**)(((Buffer *)SELF->data)->bufstart))[ix];
-        return value->vtable->get_integer(INTERP, value);
+
+        if(key->next != NULL) {
+            return value->vtable->get_integer_keyed(INTERP, value, key->next);
+        }
+        else {
+            return value->vtable->get_integer(INTERP, value);
+        }
     }
 
     INTVAL get_integer_keyed_int (INTVAL* key) {
@@ -204,7 +210,13 @@ pmclass Array {
         }
 
         value = ((PMC**)(((Buffer *)SELF->data)->bufstart))[ix];
-        return value->vtable->get_number(INTERP, value);
+
+        if(key->next != NULL) {
+            return value->vtable->get_number_keyed(INTERP, value, key->next);
+        }
+        else {
+            return value->vtable->get_number(INTERP, value);
+        }
     }
 
     FLOATVAL get_number_keyed_int (INTVAL* key) {
@@ -247,7 +259,13 @@ pmclass Array {
         }
 
         value = ((PMC**)(((Buffer *)SELF->data)->bufstart))[ix];
-        return value->vtable->get_bignum(INTERP, value);
+
+        if(key->next != NULL) {
+            return value->vtable->get_bignum_keyed(INTERP, value, key->next);
+        }
+        else {
+            return value->vtable->get_bignum(INTERP, value);
+        }
     }
 
     BIGNUM* get_bignum_keyed_int (INTVAL* key) {
@@ -289,7 +307,13 @@ pmclass Array {
         }
 
         value = ((PMC**)(((Buffer *)SELF->data)->bufstart))[ix];
-        return value->vtable->get_string(INTERP, value);
+
+        if(key->next != NULL) {
+            return value->vtable->get_string_keyed(INTERP, value, key->next);
+        }
+        else {
+            return value->vtable->get_string(INTERP, value);
+        }
     }
 
     STRING* get_string_keyed_int (INTVAL * key) {
@@ -331,7 +355,13 @@ pmclass Array {
         }
 
         value = ((PMC**)(((Buffer *)SELF->data)->bufstart))[ix];
-        return value->vtable->get_bool(INTERP, value);
+
+        if(key->next != NULL) {
+            return value->vtable->get_bool_keyed(INTERP, value, key->next);
+        }
+        else {
+            return value->vtable->get_bool(INTERP, value);
+        }
     }
 
     INTVAL get_bool_keyed_int (INTVAL* key) {
@@ -374,7 +404,13 @@ pmclass Array {
         }
 
         value = ((PMC**)(((Buffer *)SELF->data)->bufstart))[ix];
-        return value->vtable->elements(INTERP, value);
+
+        if(key->next != NULL) {
+            return value->vtable->elements_keyed(INTERP, value, key->next);
+        }
+        else {
+            return value->vtable->elements(INTERP, value);
+        }
     }        
 
     INTVAL elements_keyed_int (INTVAL* key) {
@@ -412,8 +448,14 @@ pmclass Array {
         }
 
         value = ((PMC**)(((Buffer *)SELF->data)->bufstart))[ix];
-        /* XXX - should this be value->get_pmc? */
-        return value;
+
+        if(key->next != NULL) {
+            return value->vtable->get_pmc_keyed(INTERP, value, key->next);
+        }
+        else {
+            /* XXX - should this be value->get_pmc? */
+            return value;
+        }
     }
 
     PMC* get_pmc_keyed_int (INTVAL* key) {
@@ -488,7 +530,13 @@ pmclass Array {
         }
 
         mypmc = ((PMC**)(((Buffer *)SELF->data)->bufstart))[ix];
-        mypmc->vtable->set_integer_native(INTERP, mypmc, value);
+
+        if(key->next != NULL) {
+            mypmc->vtable->set_integer_keyed(INTERP, mypmc, key->next, value);
+        }
+        else {
+            mypmc->vtable->set_integer_native(INTERP, mypmc, value);
+        }
     }
 
     void set_integer_keyed_int (INTVAL* key, INTVAL value) {
@@ -544,7 +592,12 @@ pmclass Array {
         }
 
         mypmc = ((PMC**)(((Buffer *)SELF->data)->bufstart))[ix];
-        mypmc->vtable->set_number_native(INTERP, mypmc, value);
+        if(key->next != NULL) {
+            mypmc->vtable->set_number_keyed(INTERP, mypmc, key->next, value);
+        }
+        else {
+            mypmc->vtable->set_number_native(INTERP, mypmc, value);
+        }
     }
 
     void set_number_keyed_int (INTVAL * key, FLOATVAL value) {
@@ -582,7 +635,12 @@ pmclass Array {
         }
 
         mypmc = ((PMC**)(((Buffer *)SELF->data)->bufstart))[ix];
-        mypmc->vtable->set_string_native(INTERP, mypmc, value);
+        if(key->next != NULL) {
+            mypmc->vtable->set_string_keyed(INTERP, mypmc, key->next, value);
+        }
+        else {
+            mypmc->vtable->set_string_native(INTERP, mypmc, value);
+        }
     }
 
     void set_string_keyed_int (INTVAL * key, STRING * value) {
