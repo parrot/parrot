@@ -52,10 +52,15 @@ static void
 PackFile_header_dump(struct Parrot_Interp *interpreter, struct PackFile *pf)
 {
     PIO_printf(interpreter, "HEADER => [\n");
-    PIO_printf(interpreter, "\twordsize  = %d\n", pf->header->wordsize);
-    PIO_printf(interpreter, "\tbyteorder = %d\n", pf->header->byteorder);
+    PIO_printf(interpreter, "\twordsize  = %d", pf->header->wordsize);
+    PIO_printf(interpreter, "\t(interpreter's wordsize    = %d)\n",
+            sizeof(opcode_t));
+    PIO_printf(interpreter, "\tbyteorder = %d", pf->header->byteorder);
+    PIO_printf(interpreter, "\t(interpreter's byteorder   = %d)\n",
+            PARROT_BIGENDIAN);
     PIO_printf(interpreter, "\tfloattype = %d", pf->header->floattype);
     PIO_printf(interpreter, "\t(interpreter's NUMVAL_SIZE = %d)\n",NUMVAL_SIZE);
+    PIO_printf(interpreter, "\tdirformat = %d\n", pf->header->dir_format);
     PIO_printf(interpreter, "]\n");
 }
 
