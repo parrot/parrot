@@ -1083,7 +1083,7 @@ There is not a convenient way of doing case-insensitive matches.
 
 =item *
 
-The implementation of perl6 advanced features such as subrules, or hipotetical
+The implementation of perl6 advanced features such as subrules, or hypothetical
 variables has not been resolved.
 
 =item *
