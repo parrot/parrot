@@ -39,8 +39,25 @@ sub runstep {
     print "specified a icu config parameter,\nICU autodetection disabled.\n"
        if $verbose;
   } elsif (!defined $icuconfig || !$icuconfig) {
-    `icu-config --exists`;
-    if (($? == -1) || ($? >> 8) != 0 ) {
+    my $notfound = 1;
+    
+    {
+	# disable STDERR
+        open OLDERR, ">&", \*STDERR;
+	open STDERR, ">d8e622ad2.log";
+	
+	# check if ICU is installed
+        system("icu-config", "--exists");
+	$notfound = ($? == -1);
+	$notfound ||= ($? >> 8) != 0;
+	
+	# reenable STDERR
+	close STDERR;
+        unlink "d8e622ad2.log";
+	open STDERR, ">&", \*OLDERR;
+    }
+    
+    if ($notfound) {
       undef $icuconfig;
       print "icu-config not found.\n" if $verbose;
     } else {
