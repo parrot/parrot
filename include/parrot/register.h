@@ -59,6 +59,9 @@ void mark_pmc_register_stack(Interp* interpreter,
 void mark_string_register_stack(Interp* interpreter,
                                 struct Stack_Chunk* stack);
 
+void add_to_fp_cache(Interp*, struct Stack_Chunk *stack_p);
+void* new_register_frame(Interp* interpreter, struct Stack_Chunk **stack_p);
+
 #endif /* PARROT_REGISTER_H_GUARD */
 
 /*

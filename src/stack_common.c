@@ -112,6 +112,53 @@ stack_prepare_push(Parrot_Interp interpreter, Stack_Chunk_t **stack_p)
     return STACK_DATAP(new_chunk);
 }
 
+
+/*
+
+=item C<void*
+new_register_frame(Parrot_Interp interpreter, Stack_Chunk_t **stack_p)>
+
+Like above for the register frame stack. If possible get new chunk from
+the frame stack cache.
+
+=item <void
+add_to_fp_cache(Interp* interpreter, Stack_Chunk_t *stack_p)>
+
+Add a register frame to to the register frame stack cache.
+
+=cut
+
+*/
+
+void*
+new_register_frame(Interp* interpreter, Stack_Chunk_t **stack_p)
+{
+    Stack_Chunk_t *chunk = *stack_p, *new_chunk;
+    Caches *ic = interpreter->caches;
+
+    if (ic->frame_cache) {
+        /*
+         * frame_cache holds the stack top, next in chain is in bufstart
+         */
+        new_chunk = ic->frame_cache;
+        ic->frame_cache = PObj_bufstart(ic->frame_cache);
+    }
+    else
+        new_chunk = cst_new_stack_chunk(interpreter, chunk);
+    new_chunk->prev = chunk;
+    *stack_p = new_chunk;
+    return STACK_DATAP(new_chunk);
+}
+
+void
+add_to_fp_cache(Interp* interpreter, Stack_Chunk_t *stack_p)
+{
+    Caches *ic = interpreter->caches;
+    if (ic->frame_cache)
+        PObj_bufstart(ic->frame_cache) = ic->frame_cache;
+    ic->frame_cache = stack_p;
+}
+
 /*
 
 =item C<void*

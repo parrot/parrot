@@ -1051,7 +1051,12 @@ static PMC* find_method_direct(Parrot_Interp, PMC *, STRING*);
 void
 mark_object_cache(Parrot_Interp interpreter)
 {
-    /* nothing for now */
+    /* mark register frame cache */
+    Stack_Chunk_t *chunk = interpreter->caches->frame_cache;
+    while (chunk) {
+        pobject_lives(interpreter, (PObj*)chunk);
+        chunk = PObj_bufstart(chunk);
+    }
 }
 
 void
@@ -1060,7 +1065,8 @@ init_object_cache(Parrot_Interp interpreter)
     Caches *mc;
 
     mc = interpreter->caches = mem_sys_allocate_zeroed(sizeof(*mc));
-    SET_NULL(mc->idx)
+    SET_NULL(mc->idx);
+    SET_NULL(mc->frame_cache);
 }
 
 

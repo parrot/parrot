@@ -174,6 +174,10 @@ swap_context(Interp *interpreter, struct PMC *sub)
             interpreter->ctx.current_cont = ctx->bp->pmc_reg.registers[1];
             REG_PMC(0) = sub;
             REG_PMC(1) = interpreter->ctx.current_cont;
+            /*
+             * invalidate return continuations
+             */
+            invalidate_retc_context(interpreter, sub);
         }
         /*
          * construct stacks that have the interpreterreter stack
@@ -395,6 +399,29 @@ copy_regs(Interp *interpreter, struct parrot_regs_t *caller_regs)
         REG_PMC(3) = caller_regs->pmc_reg.registers[3];
 }
 
+/*
+
+=item C< void invalidate_retc_context(Interp *, PMC* self)>
+
+Make true Continuation from all RetContinuations up the call chain.
+
+=cut
+
+*/
+void
+invalidate_retc_context(Interp *interpreter, PMC* self)
+{
+    struct Parrot_cont * cc;
+    PMC *cont;
+
+    cont = interpreter->ctx.current_cont;
+    while (!PMC_IS_NULL(cont) && PMC_struct_val(cont)) {
+        cont->vtable = Parrot_base_vtables[enum_class_Continuation];
+        cc = PMC_cont(cont);
+        cont = cc->ctx.current_cont;
+    }
+
+}
 
 /*
 

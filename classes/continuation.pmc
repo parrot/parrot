@@ -8,9 +8,25 @@ classes/continuation.pmc - Continuation PMC
 
 =head1 DESCRIPTION
 
-C<Continuation> extends C<Closure> to provide a subroutine with
-associated "context". See the L<Glossary|docs/glossary.pod> for more
-information.
+A C<Continuation> has a copy of the interpreter's context at the location,
+where the Continuation was constructed.
+See the L<Glossary|docs/glossary.pod> for more information.
+
+=head2 Functions
+
+=over 4
+
+=cut
+
+*/
+
+
+#include "parrot/parrot.h"
+
+
+/*
+
+=back
 
 =head2 Methods
 
@@ -19,10 +35,6 @@ information.
 =cut
 
 */
-
-#include "parrot/parrot.h"
-#include "parrot/method_util.h"
-#include <assert.h>
 
 pmclass Continuation {
 
@@ -90,6 +102,7 @@ Creates and returns a clone of the continuation.
         memcpy(sub, cc_self, sizeof(struct Parrot_cont));
 
         PMC_struct_val(ret) = PMC_struct_val(SELF);
+        invalidate_retc_context(INTERP, SELF);
         return ret;
     }
 
@@ -161,7 +174,8 @@ Returns whether the subroutine is defined.
 
 =item C<void *invoke(void *next)>
 
-Restores the "context" and calls the superclass's C<invoke()>.
+Restores the "context" of the interpreter and returns the branch
+destination to continue execution.
 
 =cut
 

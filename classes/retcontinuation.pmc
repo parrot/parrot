@@ -37,14 +37,51 @@ Initializes the continuation.
 */
 
     void init () {
-        /*
-         * Use Continuation init. This implies that RetContinuations
-         * now mark their context too. This is needed in the presence of
-         * Coroutines and other Continuations, because the RetContinuation
-         * can be the only visible part of the root-set that marks the
-         * context i.e. the register backing stacks.
-         */
-        SUPER();
+        PMC_cont(SELF) = new_continuation(INTERP);
+        PMC_struct_val(SELF) = NULL;
+        PObj_custom_mark_destroy_SETALL(SELF);
+    }
+
+/*
+
+=item C<PMC* clone>
+
+Return a new Continuation PMC with the context of SELF. Note: the
+returned object is not a RetContinuation and creating a real
+Continuation invalidates all RetContinuation all the way up the call
+chain that is, these can't be recycled, they get persistent until
+the GC gets at them.
+
+=cut
+
+*/
+    PMC* clone() {
+        PMC *ret = pmc_new(INTERP, enum_class_Continuation);
+        struct Parrot_cont * sub;
+        struct Parrot_cont *cc_self = PMC_cont(SELF);
+        sub = PMC_cont(ret);
+        memcpy(sub, cc_self, sizeof(struct Parrot_cont));
+        PMC_struct_val(ret) = PMC_struct_val(SELF);
+        return ret;
+    }
+/*
+
+=item C<void *invoke(void *next)>
+
+Restores the "context" by calling the superclass's C<invoke()> and places
+the frame pointer in the stack frame cache.
+
+=cut
+
+*/
+
+    void* invoke (void* next) {
+        Stack_Chunk_t *stack_p;
+
+        stack_p = interpreter->ctx.reg_stack;
+        next = SUPER(next);
+        add_to_fp_cache(INTERP, stack_p);
+        return next;
     }
 
 }

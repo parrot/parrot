@@ -78,6 +78,8 @@ void mark_context(Interp *, struct Parrot_Context *);
 void copy_regs(Interp *, struct parrot_regs_t *caller_regs);
 void mark_reg_stack(Interp *, Stack_Chunk_t *);
 
+void invalidate_retc_context(Interp *interpreter, PMC* self);
+
 #endif /* PARROT_SUB_H_GUARD */
 
 /*

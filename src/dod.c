@@ -256,9 +256,6 @@ C<trace_stack> can have these values:
 
 */
 
-/* XXX . objects.c */
-void mark_object_cache(Parrot_Interp);
-
 int
 Parrot_dod_trace_root(Interp *interpreter, int trace_stack)
 {

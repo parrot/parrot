@@ -246,7 +246,7 @@ Invokes the subroutine.
          * create new register frame, remember old
          */
         caller_regs = interpreter->ctx.bp;
-        interpreter->ctx.bp = stack_prepare_push(interpreter,
+        interpreter->ctx.bp = new_register_frame(interpreter,
                 &interpreter->ctx.reg_stack);
         /*
          * when next == NULL the call creates args in the
