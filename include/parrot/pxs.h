@@ -14,19 +14,19 @@
 #include "parrot.h"
 
 
-void PXS_reti(Parrot_Interp_t, INTVAL);
-void PXS_retn(Parrot_Interp_t, FLOATVAL);
-void PXS_rets(Parrot_Interp_t, STRING *);
-void PXS_retp(Parrot_Interp_t, PMC *);
-INTVAL PXS_shifti(Parrot_Interp_t);
-FLOATVAL PXS_shiftn(Parrot_Interp_t);
-STRING * PXS_shifts(Parrot_Interp_t);
-char * PXS_shiftcs(Parrot_Interp_t);
-PMC * PXS_shiftp(Parrot_Interp_t);
-PMC * PXS_pointer(Parrot_Interp_t, void *);
-INTVAL PXS_findop(Parrot_Interp_t, const char *);
+void PXS_reti(parrot_interp_t, INTVAL);
+void PXS_retn(parrot_interp_t, FLOATVAL);
+void PXS_rets(parrot_interp_t, STRING *);
+void PXS_retp(parrot_interp_t, PMC *);
+INTVAL PXS_shifti(parrot_interp_t);
+FLOATVAL PXS_shiftn(parrot_interp_t);
+STRING * PXS_shifts(parrot_interp_t);
+char * PXS_shiftcs(parrot_interp_t);
+PMC * PXS_shiftp(parrot_interp_t);
+PMC * PXS_pointer(parrot_interp_t, void *);
+INTVAL PXS_findop(parrot_interp_t, const char *);
 
-#define PXSCALL(f) void f(Parrot_Interp_t interp, void * object) 
+#define PXSCALL(f) void f(parrot_interp_t interp, void * object) 
 
 
 /*
