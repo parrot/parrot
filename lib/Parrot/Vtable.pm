@@ -21,10 +21,16 @@ my (%types)  = (
 );
 
 #
-# Handle the special argument names 'value', 'src_value', and 'dst_value'.
+# Handle the special argument name 'value' and with keyed functions
 #
 sub munge_arguments {
     my ($vtable,$func_name,$cur_param,$arg_ref) = @_;
+    if ($func_name =~ /keyed/) {
+        push @{$vtable->{$func_name}{args}}, {
+            type => "KEY *",
+            name => "key"
+        };
+    }
     for(@$arg_ref) {
 	my $type = $_->{type};
 	if($_->{name} eq 'value') {
@@ -36,12 +42,12 @@ sub munge_arguments {
 	    name => $_->{name}
 	};
 
-	if($_->{name} =~ /_value/) {
+	if ($type =~ /PMC/ and $func_name =~ /keyed/) {
 	    my $key_name;
-	    ($key_name = $_->{name}) =~ s/^(.*)_value/${1}_key/;
+	    $key_name = $_->{name}."_key";
 	    push @{$vtable->{$func_name}{args}}, {
 		type => 'KEY *',
-		name => 'src_key',
+		name => $key_name
 	    };
 	}
     }
@@ -71,6 +77,7 @@ sub parse_vtable {
 	my $function     = $names[-1];
 	my $return_value = @names>1?$names[-2]:'void'; # Default to 'void'
 	my $signature    = @names>2?$names[-3]:'unique'; # Default to 'unique'
+	my $keyed        = @names>3?$names[-4]:'';       # Default to unkeyed
 	my @args;
 	if($args=~/\S/) {
 	    for (split /,/,$args) {
@@ -86,33 +93,44 @@ sub parse_vtable {
 	    my $cur_param;
 	    $cur_param = $types{$signature}[$_] if
 	      defined $types{$signature}[$_];
+            $vtable = expand($vtable, $function, $return_value, $cur_sig, $cur_param, @args);
 
-	    if($cur_sig ne 'object' and $cur_sig ne '') {
-		$func_name .= "_$cur_sig";
-	    }
-	    my $proto =
-"$return_value (*$func_name)(struct Parrot_Interp* interpreter, PMC* pmc";
-	    $vtable->{$func_name} = {
-	        type  => $return_value,
-	        proto => $proto,
-            };
-	    push @{$vtable->{order}},$func_name;
-	    if(@args>0) {
-		#
-		# Hnadle the special 'value' and '{src,dst}_value' tags.
-		#
-		munge_arguments($vtable,$func_name,$cur_param,\@args);
-	        my $params = join ", ",
-	    		       map { "$_->{type} $_->{name}" }
-	    		       @{$vtable->{$func_name}{args}};
-	        $vtable->{$func_name}{proto} .= ", $params";
-	    }
-	    $vtable->{$func_name}{proto} .= ')';
 	}
+        if ($keyed) {
+            $_->{name} =~ s/^value$/src_value/ for @args;
+            $_->{name} =~ s/^dest$/dest_value/ for @args;
+            $vtable = expand($vtable, $function, $return_value, "keyed", "PMC*", @args);
+        }
     }
     close INPUT;
 
     return %$vtable;
+}
+
+sub expand {
+    my ($vtable, $func_name, $return_value, $cur_sig, $cur_param, @args) = @_;
+    if($cur_sig ne 'object' and $cur_sig ne '') {
+        $func_name .= "_$cur_sig";
+    }
+    my $proto =
+"$return_value (*$func_name)(struct Parrot_Interp* interpreter, PMC* pmc";
+    $vtable->{$func_name} = {
+        type  => $return_value,
+        proto => $proto,
+    };
+    push @{$vtable->{order}},$func_name;
+    if(@args>0) {
+        #
+        # Hnadle the special 'value' and '{src,dst}_value' tags.
+        #
+        munge_arguments($vtable,$func_name,$cur_param,\@args);
+        my $params = join ", ",
+                       map { "$_->{type} $_->{name}" }
+                       @{$vtable->{$func_name}{args}};
+        $vtable->{$func_name}{proto} .= ", $params";
+    }
+    $vtable->{$func_name}{proto} .= ')';
+    return $vtable;
 }
 
 sub vtbl_struct {
