@@ -8,6 +8,7 @@
 #
 
 use strict;
+use lib 'lib';
 
 use Config;
 use Getopt::Long;
