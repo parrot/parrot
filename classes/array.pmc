@@ -186,7 +186,7 @@ pmclass Array {
     void set_integer_keyed (KEY * key, INTVAL value) {
         KEY_PAIR* kp;
         INTVAL ix;
-        PMC* pmc;
+        PMC* mypmc;
 
         if (!key) {
             return 0;
@@ -199,8 +199,8 @@ pmclass Array {
             internal_exception(OUT_OF_BOUNDS, "Array element out of bounds!\n");
         }
 
-        pmc = ((PMC**)(SELF->data))[ix];
-        pmc->vtable->set_integer_native(INTERP, pmc, value);
+        mypmc = ((PMC**)(SELF->data))[ix];
+        mypmc->vtable->set_integer_native(INTERP, mypmc, value);
     }
 
     void set_number (PMC * value) {
@@ -223,7 +223,7 @@ pmclass Array {
     void set_number_keyed (KEY * key, FLOATVAL value) {
         KEY_PAIR* kp;
         INTVAL ix;
-        PMC* pmc;
+        PMC* mypmc;
 
         if (!key) {
             return 0;
@@ -236,8 +236,8 @@ pmclass Array {
             internal_exception(OUT_OF_BOUNDS, "Array element out of bounds!\n");
         }
 
-        pmc = ((PMC**)(SELF->data))[ix];
-        pmc->vtable->set_number_native(INTERP, pmc, value);
+        mypmc = ((PMC**)(SELF->data))[ix];
+        mypmc->vtable->set_number_native(INTERP, mypmc, value);
     }
 
     void set_string (PMC * value) {
@@ -258,7 +258,7 @@ pmclass Array {
     void set_string_keyed (KEY * key, STRING * value) {
         KEY_PAIR* kp;
         INTVAL ix;
-        PMC* pmc;
+        PMC* mypmc;
 
         if (!key) {
             return 0;
@@ -271,11 +271,25 @@ pmclass Array {
             internal_exception(OUT_OF_BOUNDS, "Array element out of bounds!\n");
         }
 
-        pmc = ((PMC**)(SELF->data))[ix];
-        pmc->vtable->set_string_native(INTERP, pmc, value);
+        mypmc = ((PMC**)(SELF->data))[ix];
+        mypmc->vtable->set_string_native(INTERP, mypmc, value);
     }
 
     void set_value (void* value) {
+    }
+
+    void set_pmc_keyed(KEY * dest_key, PMC* src, KEY* src_key) {
+        if (src_key) {
+            src = src->vtable->get_pmc_keyed(INTERP, src, src_key);
+        }
+        if (dest_key) {
+            INTVAL ix = kp2int(INTERP, *((dest_key->keys)[0]));
+            PMC* dest = ((PMC**)(SELF->data))[ix];
+            dest->vtable->set_pmc(INTERP, dest, src);
+        } else {
+            /* $#array = $foo[$bar] */
+            resize_array(SELF, src->vtable->get_integer(INTERP, src));
+        }       
     }
 
     void add (PMC * value, PMC* dest) {
