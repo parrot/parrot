@@ -76,7 +76,7 @@ STRING *rxP_get_substr(struct Parrot_Interp *interpreter, STRING * source, INTVA
 	
 	/*printf("rxP_get_substr(%p, %p(%d), %d, %d)", interpreter, source, -1, startindex, length);*/
 
-	ret=string_make(interpreter, "", 0, 0, 0, 0);
+	ret=string_make(interpreter, NULL, 0, NULL, 0, NULL);
 
 	string_substr(interpreter, source, startindex, length, &ret);
 
