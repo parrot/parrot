@@ -11,15 +11,19 @@ Parrot Calling Conventions
     Maintainer: Dan Sugalski
     Class: Internals
     PDD Number: 03
-    Version: 1
+    Version: 1.1
     Status: Developing
-    Last Modified: 26 April 2002
+    Last Modified: 16 September 2002
     PDD Format: 1
     Language: English
 
 =head2 HISTORY
 
 =over 4
+
+=item Version 1.1
+
+16 September 2002
 
 =item version 1
 
@@ -30,6 +34,12 @@ None. First version
 =head1 CHANGES
 
 =over 4
+
+=item Version 1.1
+
+We now call with a frame, rather than pushing on the stack, and we
+return frames, rather than returning a stack. We also pass in context
+information for the return.
 
 =item Version 1.0
 
@@ -83,6 +93,14 @@ The number of items pushed onto the stack.
 =item I2
 
 The number of parameters in PMC registers.
+
+=item I3
+
+The return type expected. This is the identifier number for the
+class. A return type of 0 is void context, -1 is unknown, and -2 and
+down are the number of expected return variables, negated, minus
+one. (So -2 means we expect 1 variable, -3 means we expect 2, -4
+means we expect 3, and so forth)
 
 =back
 
