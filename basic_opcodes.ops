@@ -351,6 +351,11 @@ AUTO_OP substr_s_s_i {
     STR_REG(P1) = s;
 }
 
+AUTO_OP concat_s {
+    STRING *s = string_concat(STR_REG(P1), STR_REG(P2), 1);
+    STR_REG(P1) = s;
+}
+
 /* NOOP */
 AUTO_OP noop {
 }

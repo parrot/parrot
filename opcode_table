@@ -61,6 +61,7 @@ print_sc	1	s
 length_i_s     2       I S
 chopn_s_ic     2       S i
 substr_s_s_i   4       S S I I
+concat_s       2       S S
 
 # Comparators
 

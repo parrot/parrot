@@ -246,6 +246,14 @@ omitted, increment is 1.
 Decrement register x by nn. nn is an integer constant. If nn is
 omitted, decrement by 1.
 
+=item length Ix, Sy
+
+Put the length of string y into integer register x.
+
+=item concat Sx, Sy
+
+Add string y to the end of string x.
+
 =back
 
 =head2 Transcendental operations
