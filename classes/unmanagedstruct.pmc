@@ -170,7 +170,7 @@ pmclass UnManagedStruct extends default need_ext {
 	    else
 		toff = offs;
 	    toff += count * (data_types[type - enum_first_type].size);
-	    if (i == n - 3)
+	    if (i == n - 3 && pmc->vtable->base_type == enum_class_ManagedStruct)
 		DYNSELF.set_integer_native(toff);
 	}
 	PObj_custom_mark_SET(SELF);
