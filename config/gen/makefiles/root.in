@@ -438,7 +438,7 @@ languages.dummy :
 #
 ###############################################################################
 
-test : $(TEST_PROG) assemble.pl test_dummy
+test : $(TEST_PROG) libparrot.a assemble.pl test_dummy
 
 test_dummy :
 	$(PERL) t/harness $(TEST_PROG_ARGS)

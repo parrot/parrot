@@ -468,6 +468,7 @@ t/pmc/perlhash.t
 t/pmc/perlstring.t
 t/pmc/pmc.t
 t/pmc/sub.t
+t/src/basic.t
 test_main.c
 tools/dev/check_source_standards.pl
 tools/dev/lib_deps.pl

@@ -11,7 +11,8 @@ require Exporter;
 require Test::Builder;
 my $Builder = Test::Builder->new;
 
-@EXPORT = ( qw(output_is output_like output_isnt) );
+@EXPORT = ( qw(output_is   output_like   output_isnt),
+            qw(c_output_is c_output_like c_output_isnt) );
 @ISA = qw(Exporter);
 
 sub import {
@@ -135,11 +136,55 @@ sub generate_functions {
       return $pass;
     }
   }
+
+  my %C_Test_Map = ( c_output_is   => 'is_eq', 
+                     c_output_isnt => 'isnt_eq', 
+                     c_output_like => 'like' 
+                   );
+
+  foreach my $func ( keys %C_Test_Map ) {
+    no strict 'refs';
+
+    *{'Parrot::Test::'.$func} = sub ($$;$) {
+      ++$count;
+      my( $source, $output, $desc ) = @_;
+      $output =~ s/\cM\cJ/\n/g;
+      local( *SOURCE );
+      my( $source_f, $obj_f, $exe_f, $out_f ) = map {
+        my $t = $0; $t =~ s/\.t$/$count$_/; $t
+      } ('.c', $PConfig{o}, $PConfig{exe}, '.out');
+
+      open SOURCE, "> $source_f" or die "Unable to open '$source_f'";
+      binmode SOURCE;
+      print SOURCE $source;
+      close SOURCE;
+
+      _run_command("$PConfig{cc} $PConfig{ccflags} -I./include -c $PConfig{ld_out}$obj_f $source_f");
+      _run_command("$PConfig{ld} $PConfig{ldflags} $obj_f $PConfig{cc_exe_out}$exe_f $PConfig{libs} -L. -lparrot");
+
+      _run_command("./$exe_f", 'STDOUT' => $out_f, 'STDERR' => $out_f);
+
+      my $prog_output;
+      open OUTPUT, "< $out_f";
+      {
+        local $/ = undef;
+        $prog_output = <OUTPUT> . '';
+        $prog_output =~ s/\cM\cJ/\n/g;
+      }
+      close OUTPUT;
+
+      my $meth = $C_Test_Map{$func};
+      my $pass = $Builder->$meth( $prog_output, $output, $desc );
+
+      unless($ENV{POSTMORTEM}) {
+        unlink $source_f, $obj_f, $exe_f, $out_f;
+      }
+ 
+      return $pass;
+    }
+  }
 }
 
 Parrot::Test::generate_functions(__PACKAGE__,\&generate_pbc_for,"./");
 
 1;
-
-
-
