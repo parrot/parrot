@@ -4,7 +4,7 @@
 	works.  It is sorted by name and formatted to allow easy
 	grepping and beautification by scripts.
 	The fields are: name (N), email (E), web-address (W),
-	description (D), and snail-mail address (S).
+	description (D) and snail-mail address (S).
 
         Thanks,
 
