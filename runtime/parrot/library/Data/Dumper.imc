@@ -1,8 +1,8 @@
 .sub __library_data_dumper_onload @LOAD
-    find_type I0, "Data::Dumper"
-    if I0 > 1 goto END
+    find_type $I0, "Data::Dumper"
+    if $I0 > 1 goto END
     load_bytecode "library/Data/Dumper/Default.imc"
-    newclass P0, "Data::Dumper"
+    newclass $P0, "Data::Dumper"
 END:
     .pcc_begin_return
     .pcc_end_return
@@ -41,15 +41,15 @@ END:
 
 GO:
     # XXX: support different output styles
-    find_type I0, "Data::Dumper::Default"
-    if I0 < 1 goto ERROR2
-    new style, I0
-    
+    find_type $I0, "Data::Dumper::Default"
+    if $I0 < 1 goto ERROR2
+    new style, $I0
+
     style."prepare"( self, indent )
     style."dumpWithName"( name, name, dump )
 
     print "\n"
-    
+
     .pcc_begin_return
     .return 1
     .pcc_end_return

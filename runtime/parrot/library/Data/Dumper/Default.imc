@@ -19,13 +19,13 @@ which implements the methods that are finally doing the output.
 =cut
 
 .sub __library_data_dumper_default_onload @LOAD
-    find_type I0, "Data::Dumper::Default"
-    if I0 > 1 goto END
+    find_type $I0, "Data::Dumper::Default"
+    if $I0 > 1 goto END
     load_bytecode "library/Data/Dumper/Base.imc"
     load_bytecode "library/Data/Sort.imc"
     load_bytecode "library/Data/Escape.imc"
-    getclass P0, "Data::Dumper::Base"
-    subclass P0, P0, "Data::Dumper::Default"
+    getclass $P0, "Data::Dumper::Base"
+    subclass $P0, $P0, "Data::Dumper::Default"
 END:
     .pcc_begin_return
     .pcc_end_return
@@ -48,7 +48,7 @@ A Data::Dumper::Default object has the following methods:
     .param string name
     .param pmc dump
     .local int ret
-            
+
     print "\""
     print shortname
     print "\" => "
@@ -67,10 +67,10 @@ A Data::Dumper::Default object has the following methods:
 .sub dumpCached method
     .param string name
     .param pmc dump
-    
+
     print "\\"
     print name
-    
+
     .pcc_begin_return
     .return 1
     .pcc_end_return
@@ -87,7 +87,7 @@ A Data::Dumper::Default object has the following methods:
     .local string name
     .local pmc prop
     .local int ret
-    
+
     ret = 1
     isnull dump, END
     prophash prop, dump
@@ -97,7 +97,7 @@ A Data::Dumper::Default object has the following methods:
     clone name, paramName
     concat name, ".properties()"
     ret = self."dump"( name, prop )
-    
+
 END:
     .pcc_begin_return
     .return ret
@@ -184,12 +184,12 @@ Escape any characters in a string so we can re-use it as a literal.
     .param string char
     .local string str
     .local pmc escape
-    
+
     escape = find_global "Data::Escape", "String"
     str = var
     str = escape( str, char )
     print str
-    
+
     .pcc_begin_return
     .return 1
     .pcc_end_return
@@ -203,14 +203,14 @@ Escape any characters in a string so we can re-use it as a literal.
     .param string name
     .param pmc dump
     .local string type
-    
+
     typeof type, dump
     print "PMC '"
     print type
     print "' "
-    
-    can I0, dump, "__dump"
-    if I0 goto CAN_DUMP
+
+    can $I0, dump, "__dump"
+    if $I0 goto CAN_DUMP
     print "{ ... }"
     branch END
 CAN_DUMP:
@@ -275,7 +275,7 @@ iter_loop:
 
     $I0 = array[pos]
     print $I0
-    
+
     # next array member
     inc pos
 
@@ -392,7 +392,7 @@ Dumps a PerlHash PMC.
     print "PerlHash "
 
     self."dumpHash"( name, hash )
-    
+
     .pcc_begin_return
     .return 1
     .pcc_end_return
@@ -516,7 +516,7 @@ Dumps a ManagedStruct PMC.
 
 .sub pmcManagedStruct method
     print "ManagedStruct { ... }"
-    
+
     .pcc_begin_return
     .return 1
     .pcc_end_return
@@ -530,7 +530,7 @@ Dumps a UnManagedStruct PMC.
 
 .sub pmcUnManagedStruct method
     print "UnManagedStruct { ... }"
-    
+
     .pcc_begin_return
     .return 1
     .pcc_end_return

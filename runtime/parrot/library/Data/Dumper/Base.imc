@@ -28,13 +28,13 @@ A Data::Dumper::Base object has the following methods:
 .const int attrCache = 3
 
 .sub __library_data_dumper_base_onload @LOAD
-    find_type I0, "Data::Dumper::Base"
-    if I0 > 1 goto END
-    newclass P0, "Data::Dumper::Base"
-    addattribute P0, "dumper"
-    addattribute P0, "level"
-    addattribute P0, "indention"
-    addattribute P0, "cache"
+    find_type $I0, "Data::Dumper::Base"
+    if $I0 > 1 goto END
+    newclass $P0, "Data::Dumper::Base"
+    addattribute $P0, "dumper"
+    addattribute $P0, "level"
+    addattribute $P0, "indention"
+    addattribute $P0, "cache"
 END:
     .pcc_begin_return
     .pcc_end_return
@@ -52,27 +52,27 @@ END:
     .local string stemp
     .local pmc temp
 
-    classoffset I0, self, "Data::Dumper::Base"
-    add I0, attrDumper
-    setattribute self, I0, dumper
+    classoffset $I0, self, "Data::Dumper::Base"
+    add $I0, attrDumper
+    setattribute self, $I0, dumper
 
     new temp, .PerlInt
     set temp, 0
-    classoffset I0, self, "Data::Dumper::Base"
-    add I0, attrLevel
-    setattribute self, I0, temp
-    
+    classoffset $I0, self, "Data::Dumper::Base"
+    add $I0, attrLevel
+    setattribute self, $I0, temp
+
     new temp, .PerlString
     clone stemp, indent
     set temp, stemp
-    classoffset I0, self, "Data::Dumper::Base"
-    add I0, attrIndention
-    setattribute self, I0, temp
+    classoffset $I0, self, "Data::Dumper::Base"
+    add $I0, attrIndention
+    setattribute self, $I0, temp
 
     new temp, .PerlArray
-    classoffset I0, self, "Data::Dumper::Base"
-    add I0, attrCache
-    setattribute self, I0, temp
+    classoffset $I0, self, "Data::Dumper::Base"
+    add $I0, attrCache
+    setattribute self, $I0, temp
 
     .pcc_begin_return
     .pcc_end_return
@@ -91,9 +91,9 @@ END:
     .local string name
     .local pmc pname
 
-    classoffset I0, self, "Data::Dumper::Base"
-    add I0, attrCache
-    getattribute _cache, self, I0
+    classoffset $I0, self, "Data::Dumper::Base"
+    add $I0, attrCache
+    getattribute _cache, self, $I0
 
     set i, _cache
 LOOP:
@@ -131,13 +131,13 @@ NOTFOUND:
     .local pmc temp
     .local string indent
 
-    classoffset I0, self, "Data::Dumper::Base"
-    add I0, attrIndention
-    getattribute temp, self, I0
+    classoffset $I0, self, "Data::Dumper::Base"
+    add $I0, attrIndention
+    getattribute temp, self, $I0
     set indent, temp
     clone indent, indent
     repeat indent, indent, level
-    
+
     .pcc_begin_return
     .return indent
     .pcc_end_return
@@ -151,10 +151,10 @@ NOTFOUND:
     .local pmc temp
     .local string _indent
     .local int level
-        
-    classoffset I0, self, "Data::Dumper::Base"
-    add I0, attrLevel
-    getattribute temp, self, I0
+
+    classoffset $I0, self, "Data::Dumper::Base"
+    add $I0, attrLevel
+    getattribute temp, self, $I0
     set level, temp
 
     _indent = self."createIndent"( level )
@@ -173,10 +173,10 @@ NOTFOUND:
     .local string indent1
     .local string indent2
     .local int level
-        
-    classoffset I0, self, "Data::Dumper::Base"
-    add I0, attrLevel
-    getattribute temp, self, I0
+
+    classoffset $I0, self, "Data::Dumper::Base"
+    add $I0, attrLevel
+    getattribute temp, self, $I0
     set level, temp
     inc temp
 
@@ -198,10 +198,10 @@ NOTFOUND:
     .local pmc temp
     .local string indent
     .local int level
-        
-    classoffset I0, self, "Data::Dumper::Base"
-    add I0, attrLevel
-    getattribute temp, self, I0
+
+    classoffset $I0, self, "Data::Dumper::Base"
+    add $I0, attrLevel
+    getattribute temp, self, $I0
     dec temp
     set level, temp
 

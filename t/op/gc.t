@@ -481,7 +481,7 @@ catch:
 .end
 CODE
 ok 1
-10
+9
 OUTPUT
 
 output_is(<<'CODE', <<OUTPUT, "write barrier 1");

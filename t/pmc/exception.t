@@ -555,7 +555,7 @@ catch:
 .end
 CODE
 ok 1
-100
+99
 OUTPUT
 
 1;

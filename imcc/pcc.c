@@ -127,6 +127,7 @@ pcc_get_args(Parrot_Interp interpreter, IMC_Unit * unit, Instruction *ins,
     char buf[128];
 
     p3 = NULL;
+    UNUSED(pcc_sub);
     for (i = 0; i < REGSET_MAX; i++)
         next[i] = FIRST_PARAM_REG;
     /* insert params */
@@ -172,25 +173,19 @@ pcc_get_args(Parrot_Interp interpreter, IMC_Unit * unit, Instruction *ins,
              * if this subroutine calls another subroutine
              * new registers are assigned so that
              * they don't interfer with this sub's params
+             *
+             * And in a return sequence too, as the usage of
+             * returns and args might conflict.
              */
             if (call) {
-                if (pcc_sub->calls_a_sub) {
+                /* arg->reg->want_regno = next[set]; */
 move_reg:
-                    regs[0] = arg;
-                    arg->reg->want_regno = next[set];
-                    sprintf(buf, "%c%d", arg->set, next[set]++);
-                    regs[1] = get_pasm_reg(buf);
-                    arg->used = regs[1];
-                    /* e.g. set $I0, I5 */
-                    ins = insINS(interpreter, unit, ins, "set", regs, 2);
-                }
-                else {
-                    /*
-                     * if no sub is called from here
-                     * just use the passed register numbers
-                     */
-                    arg->reg->color = next[set]++;
-                }
+                regs[0] = arg;
+                sprintf(buf, "%c%d", arg->set, next[set]++);
+                regs[1] = get_pasm_reg(buf);
+                arg->used = regs[1];
+                /* e.g. set $I0, I5 */
+                ins = insINS(interpreter, unit, ins, "set", regs, 2);
             }
             else
                 goto move_reg;
@@ -282,7 +277,34 @@ pcc_put_args(Parrot_Interp interpreter, IMC_Unit * unit, Instruction *ins,
                 if (set == REGSET_P &&
                         (flatten || (arg_reg->type & VT_FLATTEN)))
                     goto flatten;
-                arg_reg->want_regno = next[set];
+                /*
+                 * a remark WRT want_regno
+                 *
+                 * It should eventually designate the register
+                 * number used during calls and returns according
+                 * to parrot calling conventions.
+                 *
+                 * Currently these assigned colors are used if
+                 * allocate_wante_regs() is turned on with -Oc.
+                 *
+                 * But with allocate regs a call that doesn't
+                 * want return results breaks:
+                 *
+                 * P5 = arg1          # P5 is pre-assigned
+                 * func1()
+                 * func2(P5)
+                 * ...
+                 * func1:
+                 *    .return(Px)     # P5
+                 *
+                 * The return sequence of func1 copies P5 and clobbers
+                 * the caller's P5, because the caller thinks P5 is save
+                 * to use over the call to func1()
+                 *
+                 * So currently want_regno isn't assigned at all.
+                 */
+
+                /* arg_reg->want_regno = next[set]; */
             }
             sprintf(buf, "%c%d", arg_reg->set, next[set]++);
             reg = get_pasm_reg(buf);
@@ -396,7 +418,6 @@ expand_pcc_sub(Parrot_Interp interpreter, IMC_Unit * unit, Instruction *ins)
         sprintf(buf, "%csub_%s_p1", IMCC_INTERNAL_CHAR, sub->name);
         regs[1] = label1 = mk_address(str_dup(buf), U_add_uniq_label);
         ins = insINS(interpreter, unit, ins, "if", regs, 2);
-
     }
     for (proto = ps; proto <= pe; ++proto) {
         nargs = sub->pcc_sub->nargs;
