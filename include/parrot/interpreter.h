@@ -42,23 +42,27 @@ struct Parrot_Interp {
     struct NReg num_reg;
     struct SReg string_reg;
     struct PReg pmc_reg;
-    struct IRegChunk *int_reg_top;      /* Current top chunk of int reg stack */
-    struct NRegChunk *num_reg_top;      /* Current top chunk of the float reg stack */
-    struct SRegChunk *string_reg_top;   /* Current top chunk of the string stack */
-    struct PRegChunk *pmc_reg_top;      /* Current top chunk of the PMC stack */
+    struct IRegChunk *int_reg_top;    /* Current top chunk of int reg stack */
+    struct NRegChunk *num_reg_top;    /* Current top chunk of the float reg
+                                       * stack */
+    struct SRegChunk *string_reg_top; /* Current top chunk of the string 
+                                       * stack */
+    struct PRegChunk *pmc_reg_top;    /* Current top chunk of the PMC stack */
     struct IRegChunk *int_reg_base;     /* base of the int reg stack */
     struct NRegChunk *num_reg_base;     /* Base of the float reg stack */
     struct SRegChunk *string_reg_base;  /* Base of the string stack */
     struct PRegChunk *pmc_reg_base;     /* Base of the PMC stack */
     struct Stack_chunk_t *user_stack;   /* Base of the scratch stack */
     struct Stack_chunk_t *control_stack;/* Base of the flow control stack */
-    struct Stash *perl_stash;           /* Pointer to the global variable area */
-    struct Arenas *arena_base;          /* Pointer to this interpreter's arena */
+    struct Stash *perl_stash;           /* Pointer to the global variable
+                                         * area */
+    struct Arenas *arena_base;          /* Pointer to this interpreter's 
+                                         * arena */
     void *piodata;                      /* interpreter's IO system */
 
-    op_lib_t *op_lib;                   /* Opcode library */
-    UINTVAL op_count;                   /* The number of ops */
-    op_info_t *op_info_table;           /* Opcode info table (name, nargs, arg types) */
+    op_lib_t *op_lib;          /* Opcode library */
+    UINTVAL op_count;          /* The number of ops */
+    op_info_t *op_info_table;  /* Opcode info table (name, nargs, arg types) */
 
     op_func_t *op_func_table;
 

@@ -35,7 +35,8 @@ typedef Parrot_CharType_Transcoder CHARTYPE_TRANSCODER;
 
 #define chartype_lookup Parrot_chartype_lookup
 
-CHARTYPE_TRANSCODER chartype_lookup_transcoder(const CHARTYPE *from, const CHARTYPE *to);
+CHARTYPE_TRANSCODER chartype_lookup_transcoder(const CHARTYPE *from, 
+                                               const CHARTYPE *to);
 
 #endif
 

@@ -144,9 +144,9 @@ struct _ParrotIOData {
 #define PIO_UPLAYER(x)     x->up
 #define GET_INTERP_IO(i)   (((ParrotIOData*)i->piodata)->default_stack)
 #define GET_INTERP_IOD(i)  ((ParrotIOData *)i->piodata)
-#define PIO_STDIN(i)     (((ParrotIOData*)i->piodata)->table[PIO_STDIN_FILENO])
-#define PIO_STDOUT(i)    (((ParrotIOData*)i->piodata)->table[PIO_STDOUT_FILENO])
-#define PIO_STDERR(i)    (((ParrotIOData*)i->piodata)->table[PIO_STDERR_FILENO])
+#define PIO_STDIN(i)   (((ParrotIOData*)i->piodata)->table[PIO_STDIN_FILENO])
+#define PIO_STDOUT(i)  (((ParrotIOData*)i->piodata)->table[PIO_STDOUT_FILENO])
+#define PIO_STDERR(i)  (((ParrotIOData*)i->piodata)->table[PIO_STDERR_FILENO])
 
 /*
  * Terminal layer can't be pushed on top of other layers;

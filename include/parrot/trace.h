@@ -16,13 +16,13 @@
 #include "parrot/parrot.h"
 
 void trace_op_dump(struct Parrot_Interp *interpreter, opcode_t *code_start,
-		   opcode_t *pc);
+                   opcode_t *pc);
 
 void trace_op(struct Parrot_Interp *interpreter, opcode_t *code_start,
               opcode_t *code_end, opcode_t *pc);
 
 void trace_op_b0(struct Parrot_Interp *interpreter, opcode_t *code_start,
-		 opcode_t *pc);
+                 opcode_t *pc);
 
 void trace_op_b1(struct Parrot_Interp *interpreter, opcode_t *code_start, 
                  opcode_t *code_end, code_t *pc);

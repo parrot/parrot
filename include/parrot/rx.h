@@ -5,8 +5,9 @@
  *  Overview:
  *     Supporting file for the regular expression engine
  *  Data Structure and Algorithms:
- *     rxinfo is the main structure involved in regular expressions; it's stuffed 
- *     into a Handle PMC and passed to all regular expression opcodes.
+ *     rxinfo is the main structure involved in regular expressions; it's
+ *     stuffed into a Handle PMC and passed to all regular expression 
+ *     opcodes.
  *  History:
  *  Notes:
  *  References:
@@ -80,7 +81,8 @@ BOOLVAL bitmap_match(Bitmap, INTVAL);
 void bitmap_destroy(Bitmap);
 
 #define RX_dUNPACK(pmc)            rxinfo *rx=(rxinfo *)(pmc)->data
-#define RxCurChar(rx)              ((char)string_ord((rx)->string, (rx)->index))
+#define RxCurChar(rx)              ((char)string_ord((rx)->string, \
+                                                     (rx)->index))
 
 #define RxAdvance(rx)              RxAdvanceX((rx), 1)
 #define RxAdvanceX(rx, x)          ((rx)->index += (x) * (rx)->whichway)
