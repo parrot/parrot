@@ -8,20 +8,20 @@ version 0.07
 
 =head1 SYNOPSIS
 
-	...	
-	
+	...
+
 	# dump the P0 register
 	_dumper( "P0", P0 )
-	
+
 	...
-	
+
 	END
 	.include "library/dumper.imc"
 
 =head1 DESCRIPTION
-    
+
     PIR implementation of Perl's Data::Dumper module.
-    
+
 =cut
 
 .include "datatypes.pasm"
@@ -46,7 +46,7 @@ This function returns the helper array.
     .local pmc helper
     .local pmc sub
     .local int type
-    
+
     errorsoff 1 # .PARROT_ERRORS_GLOBALS_FLAG
     helper = global "Data::Dumper::helper"
     typeof type, helper
@@ -117,7 +117,7 @@ For example:
 This function returns nothing.
 
 =cut
-	
+
 .sub _register_dumper
     .param int id
     .param pmc sub
@@ -125,7 +125,7 @@ This function returns nothing.
 
     helper = global "Data::Dumper::helper"
     set helper[id], sub
-    
+
     .pcc_begin_return
     .pcc_end_return
 .end
@@ -171,7 +171,7 @@ B<Note: #2> PerlHash keys are now sorted using C<_sort()> (library/sort.imc)
     # check the number of STR args
     if I2 > 2 goto ERROR
     if I2 < 0 goto ERROR
-    
+
     if I2 == 2 goto NAMED
     # I2 <= 1; no indent specified
     set indent, ""
@@ -179,9 +179,9 @@ B<Note: #2> PerlHash keys are now sorted using C<_sort()> (library/sort.imc)
     # I2 == 0; no indent and no name
     # use a default name
     set name, "VAR1"
-    
+
 NAMED:
-    _helper()    
+    _helper()
     new cache, .PerlArray
     _do_dumper_showname( name, name, dump, cache, indent )
     print "\n"
@@ -210,7 +210,7 @@ ERROR:
     .local pmc entry
     .local string name
     .local pmc pname
-    
+
     set i, cache
 LOOP:
     dec i
@@ -252,7 +252,7 @@ NOTFOUND:
     print "\""
     print shortname
     print "\" => "
-    
+
     # use tail calling instead of
     # _do_dumper( name, dump, cache, indent )
     newsub P0, .Sub, _do_dumper
@@ -278,11 +278,12 @@ NOTFOUND:
     .param string indent
     .local pmc helper
     .local int type
+    .local string type_str
     .local int exist
     .local pmc cb
     .local string name2
     .local pmc ret
-    
+
     ret = P1
     newsub helper, .Sub, _dumper_cache
     .pcc_begin prototyped
@@ -311,11 +312,14 @@ ISNULL:
     exists exist, helper[type]
     if exist, CALL_HELPER
 
+    typeof type_str, dump
     print "unknown-type(pmc #"
+    print ":"
+    print type_str
     print type
-    print ")"    
+    print ")"
     branch DONE
-        
+
 CALL_HELPER:
     cb = helper[type]
     .pcc_begin prototyped
@@ -325,7 +329,7 @@ CALL_HELPER:
     .arg cache
     .pcc_call cb
     .pcc_end
-    
+
 DONE:
     isnull dump, END
     prophash cb, dump
@@ -334,10 +338,10 @@ DONE:
     print " with-properties: "
     clone name2, name
     concat name2, ".properties()"
-    
+
     # XXX: use tail calling
      _do_dumper( name2, cb, cache, indent )
-    
+
 END:
     .pcc_begin_return
     .pcc_end_return
@@ -357,10 +361,10 @@ END:
     .local pmc val
     .local string name2
     .local int tmp
-    
+
     subindent = "    "
     concat subindent, indent
-    
+
     print "PerlArray (size:"
     print array
     print ") ["
@@ -369,31 +373,31 @@ END:
     set pos, 0
 
     unless size, iter_end
-    
+
 iter_loop:
     print "\n"
-    
+
     print subindent
-    
+
     new val, .PerlArray
     push val, name
     push val, pos
     sprintf name2, "%s[%d]", val
-    
+
     set val, array[pos]
-    
+
     _do_dumper( name2, val, cache, subindent )
-    
+
     # next array member
     inc pos
-    
+
     # skip the ',' after the last element
     if pos >= size goto iter_end
-    
+
     print ","
 
     # elements left?
-    branch iter_loop    
+    branch iter_loop
 
 iter_end:
     print "\n"
@@ -412,7 +416,7 @@ iter_end:
     .param pmc hash
     .param pmc cache
     .param string indent
-    
+
     print "PerlHash "
 
     # use tail calling instead of
@@ -444,10 +448,10 @@ iter_end:
     .local pmc val
     .local pmc keys
     .local string name2
-    
+
     subindent = "    "
     concat subindent, indent
-    
+
     print "{"
 
     new keys, .PerlArray
@@ -460,29 +464,29 @@ iter_loop:
     shift key, iter
     push keys, key
     branch iter_loop
-    
+
 iter_end:
     _sort( keys )
-    
+
 dump_loop:
     unless keys, dump_end
-    
+
     print "\n"
-    
+
     shift key, keys
-    
+
     new val, .PerlArray
     push val, name
     push val, key
     sprintf name2, "%s[\"%s\"]", val
 
     set val, hash[key]
-    
+
     _do_dumper_showname( key, name2, val, cache, subindent )
-    
+
     unless keys, dump_end
     print ","
-        
+
     branch dump_loop
 
 dump_end:
@@ -502,11 +506,11 @@ dump_end:
     .param pmc str
     .param pmc cache
     .param string indent
-    
+
     print "\""
     _dump_escape_string(str,"\"")
     print "\""
-    
+
     .pcc_begin_return
     .pcc_end_return
 .end
@@ -546,7 +550,7 @@ escape_next:
 
     inc position
     goto escape_loop
- 
+
 escape_done:
     .pcc_begin_return
     .pcc_end_return
@@ -562,9 +566,9 @@ escape_done:
     .param pmc val
     .param pmc cache
     .param string indent
-    
+
     print val
-    
+
     .pcc_begin_return
     .pcc_end_return
 .end
@@ -577,9 +581,9 @@ escape_done:
     .param pmc val
     .param pmc cache
     .param string indent
-    
+
     print "undef"
-    
+
     .pcc_begin_return
     .pcc_end_return
 .end
@@ -592,9 +596,9 @@ escape_done:
     .param pmc val
     .param pmc cache
     .param string indent
-    
+
     print "sub { ... }"
-    
+
     .pcc_begin_return
     .pcc_end_return
 .end
@@ -607,9 +611,9 @@ escape_done:
     .param pmc val
     .param pmc cache
     .param string indent
-    
+
     print "null"
-    
+
     .pcc_begin_return
     .pcc_end_return
 .end
