@@ -578,6 +578,8 @@ Parrot_sprintf_format(struct Parrot_Interp *interpreter, STRING *pat,
                         case 'G':
                             thefloat = obj->getfloat
                                 (interpreter, info.type, obj);
+                            /* turn -0.0 into 0.0 */
+                            if( thefloat == 0.0 ) { thefloat = 0.0; }
                             gen_sprintf_call(interpreter, tc, &info, ch);
                             ts = cstr2pstr(tc);
                             /* XXX lost precision if %Hg or whatever

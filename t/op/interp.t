@@ -242,7 +242,7 @@ from 1 interp
 OUTPUT
 
 SKIP: {
-  skip("No thread config yet", 5) unless $^O eq 'linux';
+  skip("No thread config yet", 5) unless ($^O eq 'linux' or $^O eq 'darwin');
 
 output_is(<<'CODE', <<'OUTPUT', "interp identity");
     getinterp P2

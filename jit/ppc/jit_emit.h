@@ -564,6 +564,22 @@ jit_emit_bx(Parrot_jit_info_t *jit_info, char type, opcode_t disp)
     jit_emit_mov_ri_i(pc, ISR1, disp); \
     jit_emit_add_rrr(pc, D, r15, ISR1)
 
+#  define jit_emit_load_op_map(pc) \
+    jit_emit_lwz(pc, ISR1, offsetof(struct Parrot_Interp, jit_info), r13); \
+    jit_emit_lwz(pc, r14, (offsetof(Parrot_jit_arena_t, op_map) + \
+                           offsetof(Parrot_jit_info_t, arena)), ISR1)
+
+#  define jit_emit_load_code_start(pc) \
+    jit_emit_lwz(pc, ISR1, offsetof(struct Parrot_Interp, code), r13); \
+    jit_emit_lwz(pc, r15,  offsetof(struct PackFile, byte_code), ISR1)
+
+#  define jit_emit_branch_to_opcode(pc, D) \
+    jit_emit_sub_rrr(jit_info->native_ptr, ISR1, D, r15); \
+    jit_emit_add_rrr(jit_info->native_ptr, ISR1, r14, ISR1); \
+    jit_emit_lwz(jit_info->native_ptr, ISR1, 0, ISR1); \
+    jit_emit_mtctr(jit_info->native_ptr, ISR1); \
+    jit_emit_bctrl(jit_info->native_ptr)
+
 
 #  if EXEC_CAPABLE
 #   define load_nc(pc, D, disp) \
@@ -593,7 +609,7 @@ Parrot_jit_begin(Parrot_jit_info_t *jit_info,
     jit_emit_xor_rrr(jit_info->native_ptr, r31, r31, r31);
     jit_emit_mov_rr(jit_info->native_ptr, r13, r3);
     if (!jit_info->objfile) {
-        jit_emit_mov_ri_i(jit_info->native_ptr, r14, jit_info->arena.op_map);
+        jit_emit_load_op_map(jit_info->native_ptr);
     }
 #  if EXEC_CAPABLE
     else {
@@ -605,8 +621,12 @@ Parrot_jit_begin(Parrot_jit_info_t *jit_info,
             jit_info->native_ptr, RTYPE_DATA1, "opcode_map", -2);
     }
 #  endif
-    jit_emit_mov_rr(jit_info->native_ptr, r15, r4);
-    /* TODO jit_emit restart code s. i386 */
+
+    jit_emit_load_code_start(jit_info->native_ptr);
+
+    /* jit_emit restart code: branch to the program counter passed into 
+       the JIT invocation as the second parameter, which is r4 */
+    jit_emit_branch_to_opcode(jit_info->native_ptr, r4);
 }
 
 void
@@ -638,11 +658,46 @@ Parrot_jit_cpcf_op(Parrot_jit_info_t *jit_info,
                    struct Parrot_Interp * interpreter)
 {
     Parrot_jit_normal_op(jit_info, interpreter);
-    jit_emit_sub_rrr(jit_info->native_ptr, r3, r3, r15);
-    jit_emit_add_rrr(jit_info->native_ptr, r3, r14, r3);
-    jit_emit_lwz(jit_info->native_ptr, r3, 0, r3);
-    jit_emit_mtlr(jit_info->native_ptr, r3);
-    jit_emit_blr(jit_info->native_ptr);
+
+    /* fix our reserved registers, in case we are branching to a new segment */
+    jit_emit_load_op_map(jit_info->native_ptr);
+    jit_emit_load_code_start(jit_info->native_ptr);
+
+    /* branch to the opcode just returned from the normal_op call, in r3 */
+    jit_emit_branch_to_opcode(jit_info->native_ptr, r3);
+}
+
+static void Parrot_end_jit(Parrot_jit_info_t *, struct Parrot_Interp * );
+
+#undef Parrot_jit_restart_op
+/* Parrot_jit_restart_op is based on the i386 version */
+void
+Parrot_jit_restart_op(Parrot_jit_info_t *jit_info,
+                      struct Parrot_Interp * interpreter)
+{
+    char *jmp_ptr, *sav_ptr;
+
+    Parrot_jit_normal_op(jit_info, interpreter);
+    /* test return value; if zero (e.g after trace), return from JIT */
+    jit_emit_cmp_ri(jit_info->native_ptr, r3, 0);
+     /* remember PC */
+    jmp_ptr = jit_info->native_ptr;
+    /* emit jump past exit code, dummy offset */
+    _emit_bc(jit_info->native_ptr, BNE, 0, 0, 0);
+    Parrot_end_jit(jit_info, interpreter);
+    /* fixup above jump */
+    sav_ptr = jit_info->native_ptr;
+    jit_info->native_ptr = jmp_ptr;
+    _emit_bc(jit_info->native_ptr, BNE, ((long)(sav_ptr - jmp_ptr)), 0, 0);
+    /* restore PC */
+    jit_info->native_ptr = sav_ptr;
+
+    /* fix our reserved registers, in case we are branching to a new segment */
+    jit_emit_load_op_map(jit_info->native_ptr);
+    jit_emit_load_code_start(jit_info->native_ptr);
+
+    /* branch to the opcode just returned from the normal_op call, in r3 */
+    jit_emit_branch_to_opcode(jit_info->native_ptr, r3);
 }
 
 void
