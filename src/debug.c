@@ -1402,8 +1402,8 @@ PDB_load_source(struct Parrot_Interp *interpreter, const char *command)
         return;
     }
 
-    pfile = (PDB_file_t *)mem_sys_allocate(sizeof(PDB_file_t));
-    pline = (PDB_line_t *)mem_sys_allocate(sizeof(PDB_line_t));
+    pfile = (PDB_file_t *)mem_sys_allocate_zeroed(sizeof(PDB_file_t));
+    pline = (PDB_line_t *)mem_sys_allocate_zeroed(sizeof(PDB_line_t));
 
     pfile->source = (char *)mem_sys_allocate(1024);
     pfile->line = pline;
@@ -1428,7 +1428,8 @@ PDB_load_source(struct Parrot_Interp *interpreter, const char *command)
                 pline->opcode = pc;
                 pc += interpreter->op_info_table[*pc].arg_count;
             }
-            newline = (PDB_line_t *)mem_sys_allocate(sizeof(PDB_line_t));
+            newline = 
+                    (PDB_line_t *)mem_sys_allocate_zeroed(sizeof(PDB_line_t));
             newline->number = pline->number + 1;
             pline->next = newline;
             pline = newline;
