@@ -13,7 +13,7 @@ understand what is causing it, then submit a bug report using
 the F<parrotbug> utility. The simplest way to use it is to run 
 
     % ./parrotbug
-    
+
 in the distribution's root directory, and follow the prompts.
 
 However, if you do know how to fix the problem you encountered,
@@ -68,8 +68,7 @@ Create a plain text email.
 
 =item 3
 
-Set the recipient to B<bugs-parrot> I<at> B<bugs6> I<dot> B<perl> I<dot>
-B<org>.
+Set the recipient to B<parrotbug> I<at> B<parrotcode> I<dot> B<org>.
 
 =item 4
 
@@ -79,7 +78,7 @@ Prefix it with a C<[PATCH]> identifier.
 
 =item 5
 
-The message body should contain an explaination of the purpose of the
+The message body should contain an explanation of the purpose of the
 patch, and a list of all files affected with summary of the changes made
 in each file.
 
@@ -126,8 +125,7 @@ Create a plain text email.
 
 =item 2
 
-Set the recipient to B<bugs-parrot> I<at> B<bugs6> I<dot> B<perl> I<dot>
-B<org>.
+Set the recipient to B<parrotbug> I<at> B<parrotcode> I<dot> B<org>.
 
 =item 3
 
@@ -137,7 +135,7 @@ Prefix it with a C<[NEW]> identifier.
 
 =item 4
 
-The message body should contain an explaination of the purpose of the
+The message body should contain an explanation of the purpose of the
 feature you are adding.
 
 =item 5
@@ -158,7 +156,7 @@ Send the mail.
 
 =head1 What Happens Next?
 
-RT creates a ticket for the submission, and you will receive an auto
+RT creates a ticket for the submission, and you will receive an automatic
 reply with details of the ticket identifier. This identifier should be
 used in all further correspondence concerning the submission.
 
@@ -174,12 +172,10 @@ You can check the progress of your submission at the Parrot bugs page
 L<http://bugs6.perl.org/>. If you have trouble logging in try username
 C<guest> with password C<guest>.
 
-
 A list of all the unresolved patches is at
-L<http://www.parrotcode.org/openpatches/>.
+L<http://www.parrotcode.org/openpatches.html>
 
 =head1 HISTORY
 
 Adapted by Michael Scott from a tutorial submitted by Aldo Calpini, with
 some additional remarks from Bruce Gray.
-
