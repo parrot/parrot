@@ -464,7 +464,7 @@ CODE
 OUTPUT
 
 TODO: {
-  #local $TODO = "wrong init order?";
+  local $TODO = "wrong init order?";
 
 output_is(<<'CODE', <<'OUTPUT', "constructor - diamond parents");
 #

@@ -2869,6 +2869,7 @@ Parrot_jit_build_call_func(struct Parrot_Interp *interpreter, PMC *pmc_nci,
     int size = 100 + signature->bufused * 20;
     extern char **Parrot_exec_rel_addr;
     extern int Parrot_exec_rel_count;
+    const char *encoding = "iso-8859-1";
 
     /* this ought to be enough - the caller of this function
      * should free the function pointer returned here
@@ -3100,14 +3101,17 @@ preg:
 
             break;
         case 't':   /* string, determine length, make string */
-            emitm_pushl_i(pc, 0);
-            emitm_pushl_i(pc, 0);
-            emitm_pushl_i(pc, 0);
+            /* EAX is char */
+            /* save it */
+            jit_emit_mov_rr_i(pc, emit_EBX, emit_EAX);
+            /* strlen(s) */
             emitm_pushl_r(pc, emit_EAX);
             emitm_calll(pc, (char*)strlen - pc - 4);
-            emitm_popl_r(pc, emit_EDX);
-            emitm_pushl_r(pc, emit_EAX);
-            emitm_pushl_r(pc, emit_EDX);
+
+            emitm_pushl_i(pc, 0);   /* flags */
+            emitm_pushl_i(pc, encoding);
+            emitm_pushl_r(pc, emit_EAX);  /* len */
+            emitm_pushl_r(pc, emit_EBX);  /* string */
             emitm_pushl_i(pc, interpreter);
             emitm_calll(pc, (char*)string_make - pc - 4);
             emitm_addb_i_r(pc, 24, emit_ESP);

@@ -1332,8 +1332,9 @@ TEMPLATE Parrot_ifunless_sx_ic {
 # define push_c(i) emitm_pushl_i(NATIVECODE, CONST(i)->u.string)
 
     push_<typ>(1);
+    emitm_pushl_i(NATIVECODE, interpreter);
     call_func(jit_info, (void*)string_bool);
-    emitm_addb_i_r(NATIVECODE, 4, emit_ESP);
+    emitm_addb_i_r(NATIVECODE, 8, emit_ESP);
     jit_emit_test_r_i(NATIVECODE, emit_EAX);
     jit_emit_jcc(jit_info, <op>, *INT_CONST[2]);
 
