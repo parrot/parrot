@@ -16,7 +16,7 @@ Tests the C<Iterator> PMC.
 
 =cut
 
-use Parrot::Test tests => 29;
+use Parrot::Test tests => 31;
 use Test::More qw(skip);
 
 output_is(<<'CODE', <<'OUTPUT', "new iter");
@@ -980,5 +980,60 @@ CODE
 41
 51
 11
+ok
+OUTPUT
+output_is(<<'CODE', <<'OUTPUT', "xrange iterator");
+##PIR##
+.sub main
+    .include "iterator.pasm"
+        # xrange(10, 14)
+	new P2, .Slice
+	slice P1, P2[10 .. 14]
+
+	set P1, .ITERATE_FROM_START
+#	I0 = P1."len"()
+iter_loop:
+        unless P1, iter_end
+	shift I1, P1
+	print I1
+	print "\n"
+	branch iter_loop
+iter_end:
+	print "ok\n"
+	end
+.end
+CODE
+10
+11
+12
+13
+ok
+OUTPUT
+
+output_is(<<'CODE', <<'OUTPUT', "xrange iterator ..n");
+##PIR##
+.sub main
+    .include "iterator.pasm"
+        # xrange(4)
+	new P2, .Slice
+	slice P1, P2[ .. 4]
+
+	set P1, .ITERATE_FROM_START
+#	I0 = P1."len"()
+iter_loop:
+        unless P1, iter_end
+	shift I1, P1
+	print I1
+	print "\n"
+	branch iter_loop
+iter_end:
+	print "ok\n"
+	end
+.end
+CODE
+0
+1
+2
+3
 ok
 OUTPUT

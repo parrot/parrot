@@ -16,11 +16,23 @@ PerlHash values should probably only be allowed to be PMCs.
 
 =over 4
 
+=item C<static void
+fromkeys(Interp *interpreter, PMC *self, PMC *keys, PMC *value)>
+
+Fill the hash with keys from the aggregate keys and with the
+optional value. If value isn't given, a None object is filled
+in as value.
+
 =cut
 
 */
 
 #include "parrot/parrot.h"
+
+static void
+fromkeys(Interp *interpreter, PMC *self, PMC *keys, PMC *value)
+{
+}
 
 
 static PMC* undef = NULL;

@@ -36,6 +36,7 @@ to see slice constant flags.
 
 #include "parrot/parrot.h"
 
+
 /*
  * set the Slice iter state to initial, first position
  * no backwards iterations for now
@@ -105,6 +106,8 @@ set_slice_next(Interp *interpreter, PMC *self, PMC *agg)
             /* first range is ".. end" */
             cur = (INTVAL)PMC_struct_val(self);
             end = key_integer(interpreter, range);
+            if (agg->vtable->base_type == enum_class_Slice)
+                --end;
             if (cur < end) {
                 ++cur;
                 PMC_struct_val(self) = (void *)cur;
@@ -136,6 +139,8 @@ set_slice_next(Interp *interpreter, PMC *self, PMC *agg)
                 internal_exception(1, "No end range found");
             cur = (INTVAL)PMC_struct_val(self);
             end = key_integer(interpreter, end_range);
+            if (agg->vtable->base_type == enum_class_Slice)
+                --end;
             if (cur < end) {
                 ++cur;
                 PMC_struct_val(self) = (void *)cur;
@@ -256,6 +261,37 @@ Get the next string key from the current slice range.
 
 /*
 
+=item C<PMC* slice(PMC *key)>
+
+A slice can serve as its own iterator, yielding values [start .. end-1].
+This is used for implementing Pythons xrange()
+
+=cut
+
+*/
+
+    PMC* slice(PMC *key) {
+	PMC *iter = pmc_new_init(interpreter, enum_class_Iterator, SELF);
+        PMC_struct_val(iter) = key;
+        return iter;
+    }
+
+    INTVAL elements () {
+        /* only start .. end supported so:
+         * TODO check flags somewhere
+         * */
+        PMC* range = PMC_pmc_val(SELF);
+        PMC *end = PMC_data(range);
+        INTVAL n = PMC_int_val(end) - PMC_int_val(range);
+        return n;
+    }
+
+    INTVAL get_integer_keyed(PMC* key) {
+        return VTABLE_get_integer(INTERP, key);
+    }
+
+/*
+
 =item C<PMC* nextkey_keyed (PMC* agg, INTVAL what)>
 
 Prepate slice PMC SELF for iteration over the passed aggregate or
@@ -266,6 +302,15 @@ advance to next position in the range, dpending on what.
 */
     PMC* nextkey_keyed (PMC* agg, INTVAL what) {
         PMC *ret = SELF;
+        if (agg->vtable->base_type == enum_class_Slice) {
+            /* xrange implementation - the slice PMC
+             * itself serves as the aggregate. We
+             * are called with params swapped then
+             */
+            PMC *temp = SELF;
+            SELF = ret = agg;
+            agg = temp;
+        }
 
         switch (what) {
             case ITERATE_FROM_START:
@@ -278,7 +323,6 @@ advance to next position in the range, dpending on what.
                  * PMC, because it's marked being a Key PMC
                  */
                 ret = pmc_new(INTERP, enum_class_Slice);
-                PObj_get_FLAGS(ret) &= ~KEY_type_FLAGS;
                 PObj_get_FLAGS(ret) |= KEY_pmc_FLAG;
 
                 PMC_data(ret) = NULL;
@@ -291,9 +335,9 @@ advance to next position in the range, dpending on what.
                  */
                 set_slice_start(INTERP, ret);
                 break;
-            /*
-             * we are passed now the new PMC, we had created above
-             */
+                /*
+                 * we are passed now the new PMC, we had created above
+                 */
             case ITERATE_GET_NEXT:
                 set_slice_next(INTERP, ret, agg);
                 break;
