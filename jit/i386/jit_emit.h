@@ -393,8 +393,8 @@ static char *emit_movb_i_m(char *pc, char imm, int base, int i, int scale,
 
 /* Integer comparisions */
 #define emitm_cmpl_r_r(pc, reg1, reg2) emitm_alul_r_r(pc, 0x39, reg1, reg2)
-#define emitm_cmpl_r_m(pc, reg, b, i, s, d) emitm_alul_r_m(pc, 0x3b, reg1, reg2, b, i, s, d)
-#define emitm_cmpl_m_r(pc, reg, b, i, s, d) emitm_alul_r_m(pc, 0x39, reg1, reg2, b, i, s, d)
+#define emitm_cmpl_r_m(pc, reg, b, i, s, d) emitm_alul_r_m(pc, 0x3b, reg, b, i, s, d)
+#define emitm_cmpl_m_r(pc, reg, b, i, s, d) emitm_alul_r_m(pc, 0x39, reg, b, i, s, d)
 
 #define emitm_cmpl_i_r(pc, imm, reg) emitm_alul_i_r(pc, 0x81, emit_b111, imm, reg)
 
