@@ -196,6 +196,8 @@ op unpin(inout STR) {
 
 ########################################
 
+=item B<substr>(out STR, in STR, in INT)
+
 =item B<substr>(out STR, in STR, in INT, in INT)
 
 =item B<substr>(out STR, in STR, in INT, in INT, in STR)
@@ -205,7 +207,8 @@ op unpin(inout STR) {
 =item B<substr>(out STR, in PMC, in INT, in INT)
 
 Set $1 to the portion of $2 starting at (zero-based) character position
-$3 and having length $4.
+$3 and having length $4. If no length ($4) is provided, it is equivalent to
+passing in the length of $2.
 
 Optionally pass in string $5 for replacement. If the length of $5 is
 different from the length specified in $4, then $2 will grow or shrink
@@ -226,6 +229,13 @@ The B<_r> variants reuse an existing string header and therefore normally
 do not create a new string in the destination register.
 
 =cut
+
+inline op substr(out STR, in STR, in INT) {
+  INTVAL len;
+  len = string_length($2);
+  $1 = string_substr(interpreter, $2, $3, len, &$1, 0);
+  goto NEXT();
+}
 
 inline op substr(out STR, in STR, in INT, in INT) {
   $1 = string_substr(interpreter, $2, $3, $4, &$1, 0);

@@ -1,6 +1,6 @@
 #! perl -w
 
-use Parrot::Test tests => 120;
+use Parrot::Test tests => 121;
 use Test::More;
 
 output_is( <<'CODE', <<OUTPUT, "set_s_s|sc" );
@@ -480,6 +480,12 @@ CODE
 abcxyzghijk
 xyz
 OUTPUT
+
+output_is( <<'CODE', 'PH', "3-arg substr" );
+  set S0, "JAPH"
+  substr S1, S0, 2
+  print S1
+CODE
 
 output_is( <<'CODE', '<><', "concat_s_s|sc, null onto null" );
  print "<>"
