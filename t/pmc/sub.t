@@ -1,6 +1,6 @@
 #! perl -w
 
-use Parrot::Test tests => 4;
+use Parrot::Test tests => 5;
 use Test::More;
 
 output_is(<<'CODE', <<'OUTPUT', "PASM subs");
@@ -128,6 +128,26 @@ here 0
 done
 OUTPUT
 
+output_is(<<'CODE', <<'OUTPUT', "definedness of continuations");
+    new P1, .Continuation
+    defined I1, P1
+    print I1
+    print "\n"
+    set_addr I0, cont
+    set P1, I0
+    defined I1, P1
+    print I1
+    print "\n"
+    end
+
+cont:
+    print "I'm a very boring continuation" 
+    end 
+
+CODE
+0
+1
+OUTPUT
 
 output_is(<<'CODE', <<'OUTPUT', "PASM sub as closure");
     # sub foo {
