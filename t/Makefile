@@ -4,4 +4,4 @@
 .SUFFIXES: .pbc .pasm
 
 .pasm.pbc:
-	perl ../assemble.pl $< > $@
+	perl -I.. ../assemble.pl $< > $@
