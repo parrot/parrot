@@ -30,3 +30,14 @@
 	* updated to use new test suite.
 	* refactored parser/interpreter (slight speed improvement,
 	  needed for upcoming compiler)
+
+2004-05-28
+        * put all user-visible procs into "Tcl" namespace, especially
+          user-defined procedures.
+        * put all interpreter-only procs into "_Tcl" namespace
+        * factor out non-tclsh-specific setup into lib/tcllib.imc
+        * first cut at: $P1 = compreg "TCL"
+        * switch all procs in the "Tcl" namespace to use normal calling
+          conventions. (That is, don't foldup arguments before calling,
+          pass in variable arguments where necessary for interoperability)
+        * [expr sqrt()] now uses the (new) sqrt op.
