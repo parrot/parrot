@@ -75,12 +75,12 @@ char*
 pge_glob_pir(const unsigned char* s)
 {
     PGE_Exp* e = 0;
-    PGE_Exp* dot0 = 0;
     char* pir = 0;
 
     e = pge_parse_new(PGE_PATTERN_END, 0, 0);
     e = pge_parse_new(PGE_CONCAT, pge_parse_new(PGE_ANCHOR_EOS, 0, 0), e);
     e = pge_parse_new(PGE_CONCAT, pge_parseglob(s), e);
+    e = pge_parse_new(PGE_CONCAT, pge_parse_new(PGE_ANCHOR_BOS, 0, 0), e);
 
     pir = pge_gen(e);
     pge_parse_free(e);

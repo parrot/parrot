@@ -227,19 +227,11 @@ char*
 pge_p5re_pir(const unsigned char* s)
 {
     PGE_Exp* e = 0;
-    PGE_Exp* dot0 = 0;
     char* pir = 0;
 
     e = pge_parse_new(PGE_CONCAT,
                            pge_parse_new(PGE_GROUP, p5re_parse(s), 0),
                            pge_parse_new(PGE_PATTERN_END, 0, 0));
-
-    if (!pge_is_bos_anchored(e)) {
-        dot0 = pge_parse_new(PGE_DOT, 0, 0);
-        dot0->min = 0; dot0->max = PGE_INF; dot0->isgreedy = 0;
-        e = pge_parse_new(PGE_CONCAT, dot0, e);
-    }
-
     pir = pge_gen(e);
     pge_parse_free(e);
     return pir;

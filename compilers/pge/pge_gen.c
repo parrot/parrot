@@ -195,6 +195,12 @@ pge_gen_dot(PGE_Exp* e, const char* succ)
 }
 
 
+/*  pge_gen_string() handles cases where we have a repeating string
+    value that won't change over the course of the repeat-- e.g.,
+    literals and backreferences.  By the time we get here, the Rnnnn
+    subroutine has already been started, and the PMC variables
+    "str" and "strlen" have been set with the string to be (repeatedly)
+    matched.  */
 static void
 pge_gen_string(PGE_Exp* e, const char* succ)
 {
@@ -483,7 +489,7 @@ pge_gen_cut(PGE_Exp* e, const char* succ)
     }
     if (e->type == PGE_CUT_RULE) {
         trace("::cut rule");
-        emit("    .yield(-1)\n");
+        emit("    .yield(-2)\n");
         emit("    goto fail\n");
     }
 }
@@ -520,6 +526,8 @@ pge_gen(PGE_Exp* e)
     pge_cbuf_len = 0;
     pge_cbuf_lcount = 0;
 
+    sprintf(r1sub, "R%d", e->id);
+
     if (pge_istraced) {
         emit(".macro trace(POS, LABEL)\n");
         emit("    $S31 = repeat ' ', .POS\n");
@@ -534,7 +542,6 @@ pge_gen(PGE_Exp* e)
     emit("    .local pmc match\n");
     emit("    .local pmc rulecor\n");
     emit("    .local pmc newmeth\n");
-    emit("  class_loaded:\n");
     emit("    newsub rulecor, .Coroutine, _PGE_Rule_cor\n");
     emit("    find_global newmeth, \"PGE::Match\", \"new\"\n");
     emit("    match = newmeth(target, rulecor)\n");
@@ -554,10 +561,19 @@ pge_gen(PGE_Exp* e)
     emit("    .local int cutgrp\n");
     emit("    .local string str\n");
     emit("    .local int strlen\n");
-    sprintf(r1sub, "R%d", e->id);
+    emit("    if pos >= 0 goto try_once_at_pos\n");
+    emit("    pos = 0\n");
+    if (!pge_is_bos_anchored(e)) {
+        emit("  try_match:\n");
+        emit("    if pos > lastpos goto fail_forever\n");
+        emitsub(r1sub, "pos", 0);
+        emit("    inc pos\n");
+        emit("    goto try_match\n");
+    }
+    emit("  try_once_at_pos:\n");
     emitsub(r1sub, 0);
     emit("  fail_forever:\n");
-    emit("    .yield(-1)\n");
+    emit("    .yield(-2)\n");
     emit("    goto fail_forever\n\n");
 
     pge_gen_exp(e, 0);
