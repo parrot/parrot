@@ -238,6 +238,73 @@ Dumps an (PMC) Array.
     callmethod
 .end
 
+=item style."pmcIntList"( name, array )
+
+Dumps an IntList PMC.
+
+=cut
+
+.sub pmcIntList method
+    .param string name
+    .param pmc array
+    .local string indent
+    .local string subindent
+    .local int size
+    .local int pos
+    .local pmc val
+    .local string name2
+    .local int tmp
+
+    (subindent, indent) = self."newIndent"()
+
+    typeof name2, array
+    print name2
+    print " (size:"
+    $I0 = array
+    print $I0
+    print ") ["
+
+    set size, array
+    set pos, 0
+
+    unless size, iter_end
+
+iter_loop:
+    print "\n"
+
+    print subindent
+
+    new val, .PerlArray
+    push val, name
+    push val, pos
+    sprintf name2, "%s[%d]", val
+
+    $I0 = array[pos]
+    print $I0
+    
+    # next array member
+    inc pos
+
+    # skip the ',' after the last element
+    if pos >= size goto iter_end
+
+    print ","
+
+    # elements left?
+    branch iter_loop
+
+iter_end:
+    print "\n"
+    print indent
+    print "]"
+
+    self."deleteIndent"()
+
+    .pcc_begin_return
+    .return 1
+    .pcc_end_return
+.end
+
 =item style."pmcStringArray"( name, array )
 
 Dumps an (string) Array.
@@ -271,7 +338,8 @@ Dumps an (Perl) Array.
     typeof name2, array
     print name2
     print " (size:"
-    print array
+    $I0 = array
+    print $I0
     print ") ["
 
     set size, array
