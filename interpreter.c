@@ -1025,13 +1025,13 @@ sysinfo_s(Parrot_Interp interpreter, INTVAL info_wanted)
 {
     switch (info_wanted) {
     case PARROT_OS:
-        return string_from_c_string(interpreter, BUILD_OS_NAME, 0);
+        return string_from_cstring(interpreter, BUILD_OS_NAME, 0);
     case PARROT_OS_VERSION:
     case PARROT_OS_VERSION_NUMBER:
     case CPU_ARCH:
     case CPU_TYPE:
     default:
-        return string_from_c_string(interpreter, "", 0);
+        return string_from_cstring(interpreter, "", 0);
     }
 }
 

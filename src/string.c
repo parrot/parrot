@@ -199,11 +199,11 @@ string_append(struct Parrot_Interp *interpreter, STRING *a,
     return string_copy(interpreter, b);
 }
 
-/*=for api string string_from_c_string
+/*=for api string string_from_cstring
  * Make a String from a passed in C string
  */
 STRING *
-string_from_c_string(struct Parrot_Interp *interpreter, const void *buffer,
+string_from_cstring(struct Parrot_Interp *interpreter, const void *buffer,
                      UINTVAL len) {
     return string_make(interpreter, buffer, len ? len : strlen(buffer),
                        NULL, 0, NULL);
