@@ -858,6 +858,12 @@ Parrot_unless_nc_ic {
 }
 
 TEMPLATE Parrot_ifunless_x_ic {
+ /*
+  * FIXME
+  * dec I1
+  * inc I0
+  * if I1, boom
+  */
     if (P_ARITH) {
         jit_emit_jcc(jit_info, <jnz>, *INT_CONST[2]);
     }
