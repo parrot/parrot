@@ -86,7 +86,11 @@ PackFile_new(void)
     /* Other fields empty for now */
     pf->byte_code = NULL;
     pf->byte_code_size = 0;
-
+    pf->need_wordsize = 0;
+    pf->need_endianize = 0;
+    pf->fetch_op = NULL;
+    pf->fetch_iv = NULL;
+    pf->fetch_nv = NULL;
     return pf;
 }
 
