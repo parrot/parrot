@@ -200,20 +200,11 @@ Read in a bytecode, unpack it into a C<PackFile> structure and do fixups.
 struct PackFile *
 Parrot_readbc(Interp *interpreter, const char *filename)
 {
-#if PARROT_HAS_HEADER_UNISTD
-    off_t program_size, wanted;
-#else
-    size_t program_size, wanted;
-#endif
+    INTVAL program_size, wanted;
     char *program_code;
     struct PackFile *pf;
     PMC * io = NULL;
     INTVAL is_mapped = 0;
-
-#ifdef PARROT_HAS_HEADER_SYSSTAT
-    struct stat file_stat;
-#endif
-
 #ifdef PARROT_HAS_HEADER_SYSMMAN
     int fd = -1;
 #endif
@@ -225,34 +216,20 @@ Parrot_readbc(Interp *interpreter, const char *filename)
         program_size = 0;
     }
     else {
+        STRING *fs;
 
-#ifdef PARROT_HAS_HEADER_SYSSTAT
-        /* if we have stat(), get the actual file size so we can read it
-         * in one chunk. */
-        if (stat(filename, &file_stat)) {
+        fs = interpreter->current_file = string_make(interpreter, filename,
+                strlen(filename), "iso-8859-1", 0);
+        if (!Parrot_stat_info_intval(interpreter, fs, STAT_EXISTS)) {
             PIO_eprintf(interpreter, "Parrot VM: Can't stat %s, code %i.\n",
                     filename, errno);
             return NULL;
         }
+        /*
+         * TODO check for regular file
+         */
 
-#  ifndef PARROT_HAS_BROKEN_ISREG
-        /* S_ISREG is strangely broken my lcc/linux install (though it did
-	 * once work */
-        if (!S_ISREG(file_stat.st_mode)) {
-            PIO_eprintf(interpreter, "Parrot VM: %s is not a normal file.\n",
-                    filename);
-            return NULL;
-        }
-#  endif /* PARROT_HAS_BROKEN_ISREG */
-
-        program_size = file_stat.st_size;
-
-#else   /* PARROT_HAS_HEADER_SYSSTAT */
-
-        /* otherwise, we will read it 1k at a time */
-        program_size = 0;
-
-#endif  /* PARROT_HAS_HEADER_SYSSTAT */
+        program_size = Parrot_stat_info_intval(interpreter, fs, STAT_FILESIZE);
 
 #ifndef PARROT_HAS_HEADER_SYSMMAN
         io = PIO_open(interpreter, NULL, filename, "<");
@@ -269,8 +246,6 @@ Parrot_readbc(Interp *interpreter, const char *filename)
 
 #endif  /* PARROT_HAS_HEADER_SYSMMAN */
 
-        interpreter->current_file = string_make(interpreter, filename,
-                strlen(filename), "iso-8859-1", 0);
     }
 #ifdef PARROT_HAS_HEADER_SYSMMAN
 again:
@@ -285,16 +260,6 @@ again:
         program_code = (char *)mem_sys_allocate(chunk_size);
         wanted = program_size;
         program_size = 0;
-
-        if (!program_code) {
-            /* Whoops, out of memory. */
-
-            PIO_eprintf(interpreter,
-                    "Parrot VM: Could not allocate buffer to read packfile from PIO.\n");
-
-            return NULL;
-        }
-
         cursor = (char *)program_code;
 
         while ((read_result =

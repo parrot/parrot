@@ -435,17 +435,19 @@ main(int argc, char * argv[])
     }
     else {
         char *ext;
-        if (!(yyin = fopen(sourcefile, "r")))    {
-            fatal(EX_IOERR, "main", "Error reading source file %s.\n",
-                    sourcefile);
-        }
         ext = strrchr(sourcefile, '.');
-        if (ext && strcmp (ext, ".pasm") == 0) {
-            pasm_file = 1;
-        }
-        else if (ext && strcmp (ext, ".pbc") == 0) {
+        if (ext && strcmp (ext, ".pbc") == 0) {
             load_pbc = 1;
             write_pbc = 0;
+        }
+        else if (!load_pbc) {
+            if (!(yyin = fopen(sourcefile, "r")))    {
+                fatal(EX_IOERR, "main", "Error reading source file %s.\n",
+                        sourcefile);
+            }
+            if (ext && strcmp (ext, ".pasm") == 0) {
+                pasm_file = 1;
+            }
         }
     }
     if (pre_process) {
@@ -482,7 +484,6 @@ main(int argc, char * argv[])
         info(interpreter, 1,"Reading %s\n", yyin == stdin ? "stdin":sourcefile);
     }
     if (load_pbc) {
-        fclose(yyin);
         pf = Parrot_readbc(interpreter, sourcefile);
         if (!pf)
             fatal(1, "main", "Packfile loading failed\n");
