@@ -198,7 +198,8 @@ lp:
 	mod I9, I0, 100
 	ne I9, 0, lp1
 	# force GC => 124 DOD + 124 collects / 10^5 accesses
-	new P1, .IntList
+	# need .PerlArray here - it auto extends - intlist doesnt
+	new P1, .PerlArray
 	set P1[I0], I0
 	concat S0, S1, S1
 	set S2, S0
