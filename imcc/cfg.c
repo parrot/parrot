@@ -358,7 +358,7 @@ bb_add_edge(IMC_Unit * unit, Basic_block *from, Basic_block *to)
 
     e = malloc(sizeof(Edge));
     if (e==NULL) {
-        fatal(1, "bb_add_edge", "Out of mem");
+        fatal(1, "bb_add_edge", "Out of mem looking for %i bytes", sizeof(Edge));
     }
 
     e->succ_next = from->succ_list;
@@ -512,7 +512,7 @@ analyse_life_symbol(Parrot_Interp interpreter, IMC_Unit * unit, SymReg* r)
     r->life_info = calloc(unit->n_basic_blocks,
             sizeof(Life_range*));
     if (r->life_info == NULL) {
-        fatal(1, "analyse_life_symbol","Out of mem");
+        fatal(1, "analyse_life_symbol","Out of mem trying for %i basic blocks (%i bytes)", unit->n_basic_blocks, unit->n_basic_blocks * sizeof(Life_range*));
     }
 
     /* First we make a pass to each block to gather the information
@@ -941,10 +941,10 @@ mark_loop (Parrot_Interp interpreter, IMC_Unit * unit, Edge* e)
     loop_info = unit->loop_info;
     loop_info = unit->loop_info = realloc(loop_info, (n_loops+1)*sizeof(Loop_info *));
     if (!loop_info)
-        fatal(1, "mark_loop", "Out of mem\n");
+        fatal(1, "mark_loop", "Out of mem reallocing %i bytes\n", (n_loops+1)*sizeof(Loop_info *));
     loop_info[n_loops] = malloc(sizeof(Loop_info));
     if (!loop_info[n_loops])
-        fatal(1, "mark_loop", "Out of mem\n");
+        fatal(1, "mark_loop", "Out of mem trying for %i bytes\n", sizeof(Loop_info));
     loop_info[n_loops]->loop = loop;
     loop_info[n_loops]->depth = footer->loop_depth;
     loop_info[n_loops]->n_entries = i;
@@ -1024,7 +1024,7 @@ make_basic_block(IMC_Unit * unit, Instruction* ins)
 
     bb = malloc(sizeof(Basic_block));
     if (bb==NULL) {
-        fatal(1, "make_basic_block","Out of mem\n");
+        fatal(1, "make_basic_block","Out of mem getting a basic block, %i bytes\n", sizeof(Basic_block));
     }
 
     bb->start = ins;
@@ -1041,7 +1041,7 @@ make_basic_block(IMC_Unit * unit, Instruction* ins)
             realloc(unit->bb_list,
                 unit->bb_list_size*sizeof(Basic_block*) );
         if (unit->bb_list == 0) {
-            fatal(1, "make_basic_block","Out of mem\n");
+            fatal(1, "make_basic_block","Out of mem reallocating bb_list to %i bytes\n",  unit->bb_list_size*sizeof(Basic_block*));
         }
     }
     unit->bb_list[n] = bb;
@@ -1057,7 +1057,7 @@ make_life_range(SymReg *r, int idx)
 
    l = calloc(1, sizeof(Life_range));
    if (l == NULL) {
-        fatal(1, "make_life_range","Out of mem\n");
+       fatal(1, "make_life_range","Out of mem calloc-ing %i bytes\n", sizeof(Life_range));
    }
    r->life_info[idx] = l;
    return l;
