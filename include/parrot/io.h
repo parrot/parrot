@@ -124,7 +124,7 @@ struct _ParrotIO {
 };
 
 struct _ParrotIOLayer {
-    void *this;                 /* Instance specific data       */
+    void *self;                 /* Instance specific data       */
     const char *name;
     INTVAL flags;
     ParrotIOLayerAPI *api;

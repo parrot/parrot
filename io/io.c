@@ -216,7 +216,7 @@ PIO_base_new_layer(ParrotIOLayer *proto)
         new_layer->flags = 0;
         new_layer->api = NULL;
     }
-    new_layer->this = 0;
+    new_layer->self = 0;
     new_layer->up = NULL;
     new_layer->down = NULL;
     return new_layer;
