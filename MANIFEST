@@ -445,6 +445,7 @@ examples/assembly/life.pasm                       [main]doc
 examples/assembly/local_label.pasm                [main]doc
 examples/assembly/mandel.imc                      [main]doc
 examples/assembly/mandel.pasm                     [main]doc
+examples/assembly/md5sum.imc                      [main]doc
 examples/assembly/mops.pasm                       [main]doc
 examples/assembly/mops_p.pasm                     [main]doc
 examples/assembly/nanoforth.pasm                  [main]doc
@@ -2673,6 +2674,7 @@ runtime/parrot/library/Data/Replace.imc           [library]
 runtime/parrot/library/Data/Dumper.imc            [library]
 runtime/parrot/library/Data/Dumper/Base.imc       [library]
 runtime/parrot/library/Data/Dumper/Default.imc    [library]
+runtime/parrot/library/Digest/MD5.imc             [library]
 runtime/parrot/library/PGE/Class.pir              [library]
 runtime/parrot/library/PGE/RegCounter.pir         [library]
 runtime/parrot/library/PGE.pir                    [library]
@@ -2940,6 +2942,7 @@ t/pmc/tqueue.t                                    []
 t/pmc/undef.t                                     []
 t/library/dumper.t                                []
 t/library/getopt_long.t                           []
+t/library/md5.t                                   []
 t/library/parrotlib.t                             []
 t/library/perlhist.txt                            []
 t/library/pge.t                                   []

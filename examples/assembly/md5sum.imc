@@ -1,0 +1,85 @@
+# Parrot md5sum; Nick Glencross <nickg@glencros.demon.co.uk>
+#
+# Based on md5.c, from md5sum
+#           written by Ulrich Drepper <drepper@gnu.ai.mit.edu>, 1995.
+
+=head1 NAME
+
+examples/assembly/md5sum.imc - calculate MD5 checksums
+
+=head1 SYNOPSIS
+
+    % ./parrot examples/assembly/md5sum.imc filename [filename ...]
+
+=head1 DESCRIPTION
+
+Behave very much like md5sum(1).
+
+=cut
+
+###########################################################################
+
+
+# Main Harness to show that it works
+
+.sub _main @MAIN
+    .param pmc args
+
+    .local int   size
+    load_bytecode "library/Digest/MD5.imc"
+    # Argument count
+    $I0 = args
+    $I0 = $I0 - 1
+    if $I0 > 0 goto has_args
+    $S0 = args[0]
+    printerr "(parrot) "
+    printerr $S0
+    printerr " filename [filename ...]\n"
+    exit 1
+
+has_args:
+
+    $I1 = 1
+
+next_iter:
+
+    if $I1 > $I0 goto iter_done
+    $S0 = args[$I1]
+    .include "stat.pasm"
+    # get size of file
+    stat size, $S0, .STAT_FILESIZE
+    open $P0, $S0, "<"
+    defined $I2, $P0
+    if $I2 goto found
+    printerr $S0
+    printerr ": Cannot find\n"
+    goto iter_cont
+found:
+    read $S1, $P0, size
+    close $P0
+
+    $I2 = length $S1
+    if $I2 == size goto size_ok
+
+    printerr $S0
+    printerr ": size mismatch\n"
+    goto iter_cont
+
+size_ok:
+
+    $P0 = _md5sum ($S1)
+    _md5_print ($P0)
+    print "\t"
+    print $S0
+    print "\n"
+
+iter_cont:
+
+    $I1 = $I1 + 1
+    goto next_iter
+
+iter_done:
+
+     end
+.end
+
