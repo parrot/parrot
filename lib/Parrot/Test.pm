@@ -54,6 +54,10 @@ sub _run_command {
   open  STDOUT, ">$out"    or die "Can't redirect stdout" if $out;
   open  STDERR, ">$err"    or die "Can't redirect stderr" if $err;
 
+  if (defined $ENV{VALGRIND}) {
+    $command = "$ENV{VALGRIND} $command";
+  }
+
   system $command;
   my $exit_code = $? >> 8;
 
