@@ -619,6 +619,18 @@ lint2 : ${test_prog}
 
 ###############################################################################
 #
+# release targets (probably unix only)
+#
+###############################################################################
+
+release :
+	@if [ -z "$(VERSION)" ]; then echo "You must specify a version when building a release"; echo "Example: make release VERSION=0.1.3"; exit 1; fi
+	[ -d parrot-$(VERSION) ] || ln -s . parrot-$(VERSION)
+	tar zcvf ../parrot-$(VERSION).tar.gz $$(perl -lne 'print"parrot-$(VERSION)/$$_"' MANIFEST)
+	rm parrot-$(VERSION)
+
+###############################################################################
+#
 # miniparrot targets:
 #
 ###############################################################################
