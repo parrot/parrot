@@ -48,6 +48,7 @@ typedef struct
 void nci_pip (int count, Rect_Like *rects);
 int nci_i_33 (int *double_me, int *triple_me);
 void nci_v_pii (Outer *my_data, int my_x, int my_y);
+void * nci_p_iiii (int alpha, int beta, int gamma, int delta);
 
 double nci_dd(double d) {
     return d * 2.0;
@@ -318,8 +319,28 @@ int nci_i_33 (int *double_me, int *triple_me)
 
 void nci_v_pii (Outer *my_data, int my_x, int my_y)
 {
-	my_data->x         = my_x;
-	my_data->nested->y = my_y;
+	my_data->x            = my_x;
+	my_data->nested->y    = my_y;
+}
+
+static int my_array[4];
+void * nci_p_iiii (int alpha, int beta, int gamma, int delta)
+{
+
+	static struct array_container
+	{
+		int   x;
+		int *array;
+	} container;
+
+	my_array[0] = alpha;
+	my_array[1] = beta;
+	my_array[2] = gamma;
+	my_array[3] = delta;
+
+        container.x = 4;
+        container.array = my_array;
+	return &container;
 }
 
 #ifdef TEST

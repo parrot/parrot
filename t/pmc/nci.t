@@ -17,7 +17,7 @@ i386 and the F<libnci.so> library is found.
 
 =cut
 
-use Parrot::Test tests => 33;
+use Parrot::Test tests => 34;
 use Parrot::Config;
 
 SKIP: {
@@ -1256,6 +1256,74 @@ Old Y: 200
 X: 1
 Y: 2
 2
+OUTPUT
+
+output_is(<<'CODE', <<'OUTPUT', 'nested array in a struct');
+.include "datatypes.pasm"
+  set I0, 1
+  set I1, 4
+  set I2, 0
+  set I3, 0
+  set I4, 0
+  set I5, 100
+  set I6, 200
+  set I7, 400
+  set I8, 800
+
+  loadlib P1, "libnci"
+  dlfunc P0, P1, "nci_p_iiii", "piiii"
+  invoke
+
+  new  P6, .OrderedHash
+  set  P6[ 'count' ], .DATATYPE_INT
+  push P6, 0
+  push P6, 0
+
+  new  P7, .OrderedHash
+  set  P7[ 'array' ], .DATATYPE_INT
+  push P7, 0
+  push P7, 0
+  new P8, .UnManagedStruct, P7
+  # yes, the array within the struct has _4_ elements
+  # but with an UnManagedStruct, you can't always know the amount beforehand
+  set  P6[ 'array' ], .DATATYPE_STRUCT_PTR
+  set P9, P6[-1]
+  setprop P9, "_struct", P8
+  push P6, 0
+  push P6, 0
+
+  assign P5, P6
+  set    I0, P5[ 'count' ]
+
+  print "Count: "
+  print I0
+  print "\n"
+
+  # now that we do know, update the UnManagedStruct appropriately
+  set    P7[ 1 ], I0
+  assign P5, P6
+
+  set I0, P5[1; 'array'; 0 ]
+  set I1, P5[ 1;'array'; 1 ]
+  set I2, P5[ 1;'array'; 2 ]
+  set I3, P5[ 1;'array'; 3 ]
+  print "0: "
+  print I0
+  print "\n1: "
+  print I1
+  print "\n2: "
+  print I2
+  print "\n3: "
+  print I3
+  print "\n"
+
+  end
+CODE
+Count: 4
+0: 100
+1: 200
+2: 400
+3: 800
 OUTPUT
 
 } # SKIP
