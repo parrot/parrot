@@ -28,6 +28,7 @@ Handles class and object manipulation.
 #define new_attrib_array() pmc_new(interpreter, enum_class_Array)
 #define set_attrib_array_size(x, y) VTABLE_set_integer_native(interpreter, (x), (y))
 #define resize_attrib_array(x, y)  VTABLE_set_integer_native(interpreter, (x), (y))
+#define set_attrib_flags(x)
 #define SLOTTYPE PMC
 
 /* These are the new way, which isn't in yet
@@ -35,6 +36,7 @@ Handles class and object manipulation.
 #define set_attrib_num(x, y, z) ((PMC *)PObj_bufstart(x))+y = z
 #define get_attrib_count(x) (PObj_buflen(x) / sizeof(PMC *))
 #define new_attrib_array() new_buffer_header(interpreter)
+#define set_attrib_flags(x) PObj_is_buffer_of_PMCs_ptr_set(x)
 #define set_attrib_array_size(x, y) Parrot_allocate_zeroed(interpreter, x, (sizeof(PMC *)*(y)))
 #define resize_attrib_array(x, y) Parrot_reallocate(interpreter, x, (sizeof(PMC *)*(y)))
 #define SLOTTYPE Buffer
@@ -261,6 +263,7 @@ Parrot_single_subclass(Parrot_Interp interpreter, PMC *base_class,
     /* Hang an array off the data pointer */
     child_class_array = PMC_data(child_class) =
         new_attrib_array();
+    set_attrib_flags(child_class_array);
     /* We will have five entries in this array */
     set_attrib_array_size(child_class_array, PCD_MAX);
 
@@ -344,6 +347,7 @@ Parrot_new_class(Parrot_Interp interpreter, PMC *class, STRING *class_name)
 
     /* Hang an array off the data pointer, empty of course */
     class_array = PMC_data(class) = new_attrib_array();
+    set_attrib_flags(class_array);
     /* We will have five entries in this array */
     set_attrib_array_size(class_array, PCD_MAX);
     /* Our parent class array has nothing in it */
@@ -521,6 +525,7 @@ Parrot_instantiate_object(Parrot_Interp interpreter, PMC *object) {
 
     /* Build the array that hangs off the new object */
     new_object_array = new_attrib_array();
+    set_attrib_flags(new_object_array);
     /* Presize it */
     set_attrib_array_size(new_object_array,
                           attrib_count + POD_FIRST_ATTRIB);
