@@ -22,7 +22,7 @@ int do_test(struct Parrot_Interp* interpreter) {
     char *fmt;
     char dest[20];
     char *temp;
-    
+
     Parrot_snprintf(interpreter, dest, 2, "%s", "CERT");
     printf("%s\n",dest);
 
@@ -63,7 +63,7 @@ int do_test(struct Parrot_Interp* interpreter) {
     uval = 256;
     S = Parrot_sprintf_c(interpreter, "== %vu\n", uval);
     printf("%u %s", (unsigned) uval, string_to_cstring(interpreter, S));
-    
+
     fval = 0.5;
     S = Parrot_sprintf_c(interpreter, "== %f\n", fval);
     printf("%f %s", fval, string_to_cstring(interpreter, S));
@@ -102,15 +102,15 @@ int do_test(struct Parrot_Interp* interpreter) {
     S = Parrot_sprintf_c(interpreter, "== %2d\n", ival);
     printf("%2d %s", (int) ival,
            string_to_cstring(interpreter, S));
-    
+
     ival = -1;
     S = Parrot_sprintf_c(interpreter, "== %#vx\n", ival);
-    printf("0x%vx %s", (int) ival,
+    printf("0x%x %s", (int) ival,
            string_to_cstring(interpreter, S));
     S = Parrot_sprintf_c(interpreter, "== %08vd\n", ival);
     printf("%08d %s", (int) ival,
            string_to_cstring(interpreter, S));
- 
+
     /* Test we've not left junk behind on the stack */
     S = Parrot_sprintf_c(interpreter, "That's all, %s\n", "folks!");
     fputs(string_to_cstring(interpreter, S), stdout);
@@ -121,7 +121,7 @@ int do_test(struct Parrot_Interp* interpreter) {
 int main(int argc, char* argv[]) {
     int dummy_var;
     struct Parrot_Interp * interpreter;
-    
+
     interpreter = Parrot_new();
     Parrot_init(interpreter, (void*) &dummy_var);
     do_test(interpreter);
