@@ -123,7 +123,7 @@ OUTPUT
 }
 
 SKIP: {
-skip("core ops changes", 1);
+skip("outdated", 1);
 output_is(<<CODE, <<OUTPUT, "SPARC double float 32 bit opcode_t");
 # number_3.pbc
 #HEADER => [

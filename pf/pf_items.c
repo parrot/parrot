@@ -201,7 +201,7 @@ PF_fetch_opcode(struct PackFile *pf, opcode_t **stream) {
 #if TRACE_PACKFILE == 2
     PIO_eprintf(NULL, "PF_fetch_opcode: Reordering.\n");
 #endif
-    o = (pf->fetch_op)(*((unsigned char **)stream));
+    o = (pf->fetch_op)(**((unsigned char ***)stream));
     *((unsigned char **) (stream)) += pf->header->wordsize;
     return o;
 }
@@ -604,26 +604,10 @@ PackFile_assign_transforms(struct PackFile *pf)
      */
     if (need_endianize || need_wordsize) {
         if (need_wordsize)
-            pf->fetch_op = fetch_op_mixed_be;
-        else {
-            pf->fetch_op = (opcode_t (*)(unsigned char*))fetch_op_be;
-        }
-    }
-    if (need_endianize) {
-        if (pf->header->floattype == 0)
-            pf->fetch_nv = fetch_buf_be_8;
-        else if (pf->header->floattype == 1)
-            pf->fetch_nv = cvt_num12_num8_be;
-    }
-#else
-    /*
-     * this Parrot is on a LITTLE ENDIAN machine
-     */
-    if (need_endianize || need_wordsize) {
-        if (need_wordsize)
             pf->fetch_op = fetch_op_mixed_le;
-        else
+        else {
             pf->fetch_op = (opcode_t (*)(unsigned char*))fetch_op_le;
+        }
     }
     if (need_endianize) {
         if (pf->header->floattype == 0)
@@ -631,11 +615,27 @@ PackFile_assign_transforms(struct PackFile *pf)
         else if (pf->header->floattype == 1)
             pf->fetch_nv = cvt_num12_num8_le;
     }
+#else
+    /*
+     * this Parrot is on a LITTLE ENDIAN machine
+     */
+    if (need_endianize || need_wordsize) {
+        if (need_wordsize)
+            pf->fetch_op = fetch_op_mixed_be;
+        else
+            pf->fetch_op = (opcode_t (*)(unsigned char*))fetch_op_be;
+    }
+    if (need_endianize) {
+        if (pf->header->floattype == 0)
+            pf->fetch_nv = fetch_buf_be_8;
+        else if (pf->header->floattype == 1)
+            pf->fetch_nv = cvt_num12_num8_be;
+    }
     else {
         if (NUMVAL_SIZE == 8 && pf->header->floattype == 1)
             pf->fetch_nv = cvt_num12_num8;
         else if (NUMVAL_SIZE != 8 && pf->header->floattype == 0)
-            pf->fetch_nv = fetch_buf_le_8;
+            pf->fetch_nv = fetch_buf_be_8;
     }
 #endif
 }

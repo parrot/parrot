@@ -512,7 +512,6 @@ PackFile_unpack(struct Parrot_Interp *interpreter, struct PackFile *self,
                 "interpreter: fingerprint mismatch\n");
         return 0;
     }
-
     /*
      * Unpack and verify the magic which is stored byteorder of the file:
      */
