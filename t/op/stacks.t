@@ -678,7 +678,8 @@ sub set_num_regs {
 sub cgt_num_regs {
   my $rt;
   for (0..31) {
-    $rt .= "\tlt_n_nc_ic N$_, 0.0, ERROR\n";
+#    $rt .= "\tlt_n_nc_ic N$_, 0.0, ERROR\n";
+    $rt .= "\tlt N$_, 0.0, ERROR\n";
   }
   return $rt;
 }
@@ -686,7 +687,8 @@ sub cgt_num_regs {
 sub clt_num_regs {
   my $rt;
   for (0..31) {
-    $rt .= "\tgt_n_nc_ic N$_, 0.0, ERROR\n";
+#    $rt .= "\tgt_n_nc_ic N$_, 0.0, ERROR\n";
+    $rt .= "\tgt N$_, 0.0, ERROR\n";
   }
   return $rt;
 }
