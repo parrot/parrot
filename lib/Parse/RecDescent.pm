@@ -90,7 +90,7 @@ sub Precompile
 			     "to class $class in module file '$modulefile'\n"
 					if $grammar && $sourcefile;
 
-		local $::RD_HINT = 1;
+#		local $::RD_HINT = 1;
 		$self = Parse::RecDescent->new($grammar,1)
 			|| croak("Can't compile bad grammar")
 				if $grammar;
@@ -385,13 +385,13 @@ sub ' . $namespace . '::' . $self->{"name"} .  '
 	my $thisparser = $_[0];
 	$ERRORS = 0;
 	my $thisrule = $thisparser->{"rules"}{"' . $self->{"name"} . '"};
-	
+	'.($::RD_NO_TRACE?'':'
 	Parse::RecDescent::_trace(q{Trying rule: [' . $self->{"name"} . ']},
 				  Parse::RecDescent::_tracefirst($_[1]),
 				  q{' . $self->{"name"} . '})
 					if defined $::RD_TRACE;
 
-	' . ($parser->{deferrable}
+	') . ($parser->{deferrable}
 		? 'my $def_at = @{$thisparser->{deferred}};'
 		: '') .
 	'
@@ -467,21 +467,22 @@ sub ' . $namespace . '::' . $self->{"name"} .  '
 			: '') . '
 
 		$_[1] = $text;	# NOT SURE THIS IS NEEDED
+'.($::RD_NO_TRACE? '':'
 		Parse::RecDescent::_trace(q{<<Didn\'t match rule>>},
 					 Parse::RecDescent::_tracefirst($_[1]),
 					 q{' . $self->{"name"} .'})
-					if defined $::RD_TRACE;
+					if defined $::RD_TRACE;').'
 		return undef;
 	}
 	if (!defined($return) && defined($score))
-	{
+	{'.($::RD_NO_TRACE?'':'
 		Parse::RecDescent::_trace(q{>>Accepted scored production<<}, "",
 					  q{' . $self->{"name"} .'})
-						if defined $::RD_TRACE;
+						if defined $::RD_TRACE;').'
 		$return = $score_return;
 	}
 	splice @{$thisparser->{errors}}, $err_at;
-	$return = $item[$#item] unless defined $return;
+	$return = $item[$#item] unless defined $return;'.($::RD_NO_TRACE?'':'
 	if (defined $::RD_TRACE)
 	{
 		Parse::RecDescent::_trace(q{>>Matched rule<< (return value: [} .
@@ -491,7 +492,7 @@ sub ' . $namespace . '::' . $self->{"name"} .  '
 					  Parse::RecDescent::_tracemax(substr($_[1],0,-length($text))) . q{])}, 
 					  Parse::RecDescent::_tracefirst($text),
 					  , q{' . $self->{"name"} .'})
-	}
+	}').'
 	$_[1] = $text;
 	return $return;
 }
@@ -779,12 +780,12 @@ sub code($$$$)
 		' .
 		($self->changesskip()
 			? 'local $skip = defined($skip) ? $skip : $Parse::RecDescent::skip;'
-			: '') .'
+			: '') .($::RD_NO_TRACE?'':'
 		Parse::RecDescent::_trace(q{Trying production: ['
 					  . $self->describe . ']},
 					  Parse::RecDescent::_tracefirst($_[1]),
 					  q{' . $rule ->{name}. '})
-						if defined $::RD_TRACE;
+						if defined $::RD_TRACE;').'
 		my $thisprod = $thisrule->{"prods"}[' . $self->{"number"} . '];
 		' . (defined $self->{"error"} ? '' : '$text = $_[1];' ) . '
 		my $_savetext;
@@ -853,7 +854,10 @@ sub code($$$$)
 					  . $self->describe . ']<<},
 					  Parse::RecDescent::_tracefirst($text),
 					  q{' . $rule->{name} . '})
-						if defined $::RD_TRACE;
+						if defined $::RD_TRACE;'
+					      unless $::RD_NO_TRACE;
+	$code .=
+'
 		$_matched = 1;
 		last;
 	}
@@ -888,23 +892,23 @@ sub code($$$$)
 {
 	my ($self, $namespace, $rule) = @_;
 	
-'
+''.($::RD_NO_TRACE?'':'
 		Parse::RecDescent::_trace(q{Trying action},
 					  Parse::RecDescent::_tracefirst($text),
 					  q{' . $rule->{name} . '})
-						if defined $::RD_TRACE;
+						if defined $::RD_TRACE;').'
 		' . ($self->{"lookahead"} ? '$_savetext = $text;' : '' ) .'
 
 		$_tok = ($_noactions) ? 0 : do ' . $self->{"code"} . ';
 		' . ($self->{"lookahead"}<0?'if':'unless') . ' (defined $_tok)
-		{
+		{'.($::RD_NO_TRACE?'':'
 			Parse::RecDescent::_trace(q{<<Didn\'t match action>> (return value: [undef])})
-					if defined $::RD_TRACE;
+					if defined $::RD_TRACE;').'
 			last;
-		}
+		}'.($::RD_NO_TRACE?'':'
 		Parse::RecDescent::_trace(q{>>Matched action<< (return value: [}
 					  . $_tok . q{])}, $text)
-						if defined $::RD_TRACE;
+						if defined $::RD_TRACE;').'
 		push @item, $_tok;
 		' . (($self->{line}>=0 && !$::RD_NO_HITEM) ? '$item{'. $self->{hashname} .'}=$_tok;' : '' ) .'
 		' . ($self->{"lookahead"} ? '$text = $_savetext;' : '' ) .'
@@ -939,14 +943,15 @@ sub code($$$$)
 	my ($self, $namespace, $rule) = @_;
 	
 '
-		' . ($self->{"lookahead"} ? '$_savetext = $text;' : '' ) .'
+		' . ($self->{"lookahead"} ? '$_savetext = $text;' : '' )
+		    .($::RD_NO_TRACE?'':'
 
 		Parse::RecDescent::_trace(q{Trying directive: ['
 					. $self->describe . ']},
 					Parse::RecDescent::_tracefirst($text),
 					  q{' . $rule->{name} . '})
-						if defined $::RD_TRACE; ' .'
-		$_tok = do { ' . $self->{"code"} . ' };
+						if defined $::RD_TRACE; ') .'
+		$_tok = do { ' . $self->{"code"} . ' };'.($::RD_NO_TRACE?'':'
 		if (defined($_tok))
 		{
 			Parse::RecDescent::_trace(q{>>Matched directive<< (return value: [}
@@ -960,7 +965,7 @@ sub code($$$$)
 						Parse::RecDescent::_tracefirst($text))
 							if defined $::RD_TRACE;
 		}
-		' . ($self->{"lookahead"} ? '$text = $_savetext and ' : '' ) .'
+		') . ($self->{"lookahead"} ? '$text = $_savetext and ' : '' ) .'
 		last '
 		. ($self->{"lookahead"}<0?'if':'unless') . ' defined $_tok;
 		push @item, '.($::RD_NO_HITEM ? ''
@@ -996,13 +1001,13 @@ sub code($$$$)
 {
 	my ($self, $namespace, $rule) = @_;
 	
-'
+''.($::RD_NO_TRACE?'':'
 		Parse::RecDescent::_trace(q{>>Rejecting production<< (found '
 					 . $self->describe . ')},
 					 Parse::RecDescent::_tracefirst($text),
 					  q{' . $rule->{name} . '})
 						if defined $::RD_TRACE;
-		' . ($self->{"lookahead"} ? '$_savetext = $text;' : '' ) .'
+		') . ($self->{"lookahead"} ? '$_savetext = $text;' : '' ) .'
 
 		$_tok = undef;
 		' . ($self->{"lookahead"} ? '$text = $_savetext and ' : '' ) .'
@@ -1136,15 +1141,14 @@ sub code($$$$)
 
 	$sdel =~ s/[[{(<]/{}/;
 	
-my $code = '
+my $code = ''.($::RD_NO_TRACE?'':'
 		Parse::RecDescent::_trace(q{Trying terminal: [' . $self->describe
 					  . ']}, Parse::RecDescent::_tracefirst($text),
 					  q{' . $rule->{name} . '})
-						if defined $::RD_TRACE;
+						if defined $::RD_TRACE;').'
 		$lastsep = "";
 		$Parse::RecDescent::lastexpected = q{' . ($rule->hasleftmost($self) ? ''
 				: $self->describe ) . '};
-		$Parse::RecDescent::lastunexpected = $text;
 		' . ($self->{"lookahead"} ? '$_savetext = $text;' : '' ) . '
 
 		' . ($self->{"lookahead"}<0?'if':'unless')
@@ -1159,18 +1163,18 @@ my $code = '
 				$Parse::RecDescent::expected
 				   = $Parse::RecDescent::lastexpected;
 				$Parse::RecDescent::unexpected
-				   = $Parse::RecDescent::lastunexpected;
-			}
+				   = ($lastsep||"").$text;
+			}'.($::RD_NO_TRACE?'':'
 			Parse::RecDescent::_trace(q{<<Didn\'t match terminal>>},
 						  Parse::RecDescent::_tracefirst($text))
-					if defined $::RD_TRACE;
+					if defined $::RD_TRACE;').'
 
 			last;
-		}
+		}'.($::RD_NO_TRACE?'':'
 		Parse::RecDescent::_trace(q{>>Matched terminal<< (return value: [}
 						. $& . q{])},
 						  Parse::RecDescent::_tracefirst($text))
-					if defined $::RD_TRACE;
+					if defined $::RD_TRACE;').'
 		push @item, '.($::RD_NO_HITEM ? ''
 			       : '$item{'.$self->{hashname}.'}=') . '$&;
 		' . ($self->{"lookahead"} ? '$text = $_savetext;' : '' ) .'
@@ -1214,16 +1218,15 @@ sub code($$$$)
 {
 	my ($self, $namespace, $rule, $check) = @_;
 	
-my $code = '
+my $code = ''.($::RD_NO_TRACE?'':'
 		Parse::RecDescent::_trace(q{Trying terminal: [' . $self->describe
 					  . ']},
 					  Parse::RecDescent::_tracefirst($text),
 					  q{' . $rule->{name} . '})
-						if defined $::RD_TRACE;
+						if defined $::RD_TRACE;').'
 		$lastsep = "";
 		$Parse::RecDescent::lastexpected = q{' . ($rule->hasleftmost($self) ? ''
 				: $self->describe ) . '};
-		$Parse::RecDescent::lastunexpected = $text;
 		' . ($self->{"lookahead"} ? '$_savetext = $text;' : '' ) . '
 
 		' . ($self->{"lookahead"}<0?'if':'unless')
@@ -1237,17 +1240,17 @@ my $code = '
 				$Parse::RecDescent::expected
 				   = $Parse::RecDescent::lastexpected;
 				$Parse::RecDescent::unexpected
-				   = $Parse::RecDescent::lastunexpected;
-			}
+				   = ($lastsep||"").$text;
+			}'.($::RD_NO_TRACE?'':'
 			Parse::RecDescent::_trace(qq{<<Didn\'t match terminal>>},
 						  Parse::RecDescent::_tracefirst($text))
-							if defined $::RD_TRACE;
+							if defined $::RD_TRACE;').'
 			last;
-		}
+		}'.($::RD_NO_TRACE?'':'
 		Parse::RecDescent::_trace(q{>>Matched terminal<< (return value: [}
 						. $& . q{])},
 						  Parse::RecDescent::_tracefirst($text))
-							if defined $::RD_TRACE;
+							if defined $::RD_TRACE;').'
 		push @item, '.($::RD_NO_HITEM ? ''
 			       : '$item{'.$self->{hashname}.'}=') . '$&;
 		' . ($self->{"lookahead"} ? '$text = $_savetext;' : '' ) .'
@@ -1291,16 +1294,15 @@ sub code($$$$)
 {
 	my ($self, $namespace, $rule, $check) = @_;
 	
-my $code = '
+my $code = ''.($::RD_NO_TRACE?'':'
 		Parse::RecDescent::_trace(q{Trying terminal: [' . $self->describe
 					  . ']},
 					  Parse::RecDescent::_tracefirst($text),
 					  q{' . $rule->{name} . '})
-						if defined $::RD_TRACE;
+						if defined $::RD_TRACE;').'
 		$lastsep = "";
 		$Parse::RecDescent::lastexpected = q{' . ($rule->hasleftmost($self) ? ''
 				: $self->describe ) . '};
-		$Parse::RecDescent::lastunexpected = $text;
 		' . ($self->{"lookahead"} ? '$_savetext = $text;' : '' ) . '
 
 		' . ($self->{"lookahead"}<0?'if':'unless')
@@ -1317,17 +1319,17 @@ my $code = '
 				$Parse::RecDescent::expected
 				   = $Parse::RecDescent::lastexpected;
 				$Parse::RecDescent::unexpected
-				   = $Parse::RecDescent::lastunexpected;
-			}
+				   = ($lastsep||"").$text;
+			}'.($::RD_NO_TRACE?'':'
 			Parse::RecDescent::_trace(q{<<Didn\'t match terminal>>},
 						  Parse::RecDescent::_tracefirst($text))
-							if defined $::RD_TRACE;
+							if defined $::RD_TRACE;').'
 			last;
-		}
+		}'.($::RD_NO_TRACE?'':'
 		Parse::RecDescent::_trace(q{>>Matched terminal<< (return value: [}
 						. $_tok . q{])},
 						  Parse::RecDescent::_tracefirst($text))
-							if defined $::RD_TRACE;
+							if defined $::RD_TRACE;').'
 		push @item, ' . ($::RD_NO_HITEM ? ''
 				 : '$item{'.$self->{hashname}.'}=') . '$_tok;
 		' . ($self->{"lookahead"} ? '$text = $_savetext;' : '' ) .'
@@ -1382,11 +1384,11 @@ sub code($$$$)
 {
 	my ($self, $namespace, $rule) = @_;
 	
-'
+''.($::RD_NO_TRACE?'':'
 		Parse::RecDescent::_trace(q{Trying subrule: [' . $self->{"subrule"} . ']},
 				  Parse::RecDescent::_tracefirst($text),
 				  q{' . $rule->{"name"} . '})
-					if defined $::RD_TRACE;
+					if defined $::RD_TRACE;').'
 		if (1) { no strict qw{refs};
 		$Parse::RecDescent::lastexpected = ' . ($rule->hasleftmost($self) ? 'q{}'
 				# WAS : 'qq{'.$self->describe.'}' ) . ')->($text);
@@ -1402,12 +1404,13 @@ sub code($$$$)
 				   : ',undef')
 		. ')))
 		{
-			'.($self->{"lookahead"} ? '$text = $_savetext;' : '').'
+			'.($self->{"lookahead"} ? '$text = $_savetext;' : '')
+			    .($::RD_NO_TRACE?'':'
 			Parse::RecDescent::_trace(q{<<Didn\'t match subrule: ['
-			. $self->{subrule} . ']>>},
+			    . $self->{subrule} . ']>>},
 						  Parse::RecDescent::_tracefirst($text),
 						  q{' . $rule->{"name"} .'})
-							if defined $::RD_TRACE;
+							if defined $::RD_TRACE;').'
 			if ($Parse::RecDescent::lastexpected
 			    && !$Parse::RecDescent::failed++) {
 				$Parse::RecDescent::expected
@@ -1416,14 +1419,14 @@ sub code($$$$)
 				   = $Parse::RecDescent::lastunexpected;
 			}
 			last;
-		}
+		}'.($::RD_NO_TRACE?'':'
 		Parse::RecDescent::_trace(q{>>Matched subrule: ['
 					. $self->{subrule} . ']<< (return value: [}
 					. $_tok . q{]},
 					  
 					  Parse::RecDescent::_tracefirst($text),
 					  q{' . $rule->{"name"} .'})
-						if defined $::RD_TRACE;
+						if defined $::RD_TRACE;').'
 		' . ($::RD_NO_HITEM ? ''
 		     : '$item{q{' . $self->{subrule} . '}} = $_tok;') . '
 		push @item, $_tok;
@@ -1504,11 +1507,11 @@ sub code($$$$)
 	my ($subrule, $repspec, $min, $max, $lookahead) =
 		@{$self}{ qw{subrule repspec min max lookahead} };
 
-'
+''.($::RD_NO_TRACE?'':'
 		Parse::RecDescent::_trace(q{Trying repeated subrule: [' . $self->describe . ']},
 				  Parse::RecDescent::_tracefirst($text),
 				  q{' . $rule->{"name"} . '})
-					if defined $::RD_TRACE;
+					if defined $::RD_TRACE;').'
 		$Parse::RecDescent::lastexpected = ' . ($rule->hasleftmost($self) ? 'q{}'
 				: 'q{'.$self->describe.'}' ) . ';
 		$Parse::RecDescent::lastunexpected = $text;
@@ -1520,14 +1523,14 @@ sub code($$$$)
 		. ($self->{argcode} ? ", sub { return $self->{argcode} }"
 				   : ', undef')
 		. '))) 
-		{
+		{'.($::RD_NO_TRACE?'':'
 			Parse::RecDescent::_trace(q{<<Didn\'t match repeated subrule: ['
 			. $self->describe . ']>>},
 						  Parse::RecDescent::_tracefirst($text),
 						  q{' . $rule->{"name"} .'})
-							if defined $::RD_TRACE;
+							if defined $::RD_TRACE;').'
 			last;
-		}
+		}'.($::RD_NO_TRACE?'':'
 		Parse::RecDescent::_trace(q{>>Matched repeated subrule: ['
 					. $self->{subrule} . ']<< (}
 					. @$_tok . q{ times)},
@@ -1535,7 +1538,7 @@ sub code($$$$)
 					  Parse::RecDescent::_tracefirst($text),
 					  q{' . $rule->{"name"} .'})
 						if defined $::RD_TRACE;
-		' . ($::RD_NO_HITEM ? ''
+		') . ($::RD_NO_HITEM ? ''
 		     : '$item{q{' . $self->describe . '}} = $_tok;'). '
 		push @item, $_tok;
 		' . ($self->{"lookahead"} ? '$text = $_savetext;' : '' ) .'
@@ -1599,11 +1602,11 @@ sub code($$$$)
 	my ($leftarg, $op, $rightarg) =
 		@{$self}{ qw{leftarg op rightarg} };
 
-	my $code = '
+	my $code = ''.($::RD_NO_TRACE?'':'
 		Parse::RecDescent::_trace(q{Trying operator: [' . $self->describe . ']},
 				  Parse::RecDescent::_tracefirst($text),
 				  q{' . $rule->{"name"} . '})
-					if defined $::RD_TRACE;
+					if defined $::RD_TRACE;').'
 		$Parse::RecDescent::lastexpected = ' . ($rule->hasleftmost($self) ? 'q{}'
 				: 'q{'.$self->describe.'}' ) . ';
 		$Parse::RecDescent::lastunexpected = $text;
@@ -1683,13 +1686,13 @@ sub code($$$$)
 		} 
 
 		unless ($repcount>='.$self->{min}.')
-		{
+		{'.($::RD_NO_TRACE?'':'
 			Parse::RecDescent::_trace(q{<<Didn\'t match operator: ['
 						  . $self->describe
 						  . ']>>},
 						  Parse::RecDescent::_tracefirst($text),
 						  q{' . $rule->{"name"} .'})
-							if defined $::RD_TRACE;
+							if defined $::RD_TRACE;').'
 			if ($Parse::RecDescent::lastexpected
 			    && !$Parse::RecDescent::failed++) {
 				$Parse::RecDescent::expected
@@ -1698,14 +1701,14 @@ sub code($$$$)
 				   = $Parse::RecDescent::lastunexpected;
 			}
 			last;
-		}
+		}'.($::RD_NO_TRACE?'':'
 		Parse::RecDescent::_trace(q{>>Matched operator: ['
 					  . $self->describe
 					  . ']<< (return value: [}
 					  . qq{@{$_tok||[]}} . q{]},
 					  Parse::RecDescent::_tracefirst($text),
 					  q{' . $rule->{"name"} .'})
-						if defined $::RD_TRACE;
+						if defined $::RD_TRACE;').'
 
 		push @item, '.($::RD_NO_HITEM ? ''
 			       : '$item{'.$self->{hashname}.'}=') . '$_tok||[];
@@ -2802,10 +2805,10 @@ sub _parserepeat($$$$$$$$$)	# RETURNS A REF TO AN ARRAY OF MATCHES
 
 	my @tokens = ();
 	my $reps;
+	my $_savetext;
 	for ($reps=0; $reps<$max;)
 	{
-		$Parse::RecDescent::lastunexpected = $text;
-		my $_savetext = $text;
+		$_savetext = $text;
 		my $prevtextlen = length $text;
 		my $_tok;
 		if (! defined ($_tok = &$prod($parser,$text,1,$_noactions,$argcode)))
@@ -2823,7 +2826,7 @@ sub _parserepeat($$$$$$$$$)	# RETURNS A REF TO AN ARRAY OF MATCHES
 			$Parse::RecDescent::expected
 			    = $Parse::RecDescent::lastexpected;
 			$Parse::RecDescent::unexpected
-			    = $Parse::RecDescent::lastunexpected;
+			    = $_savetext || $Parse::RecDescent::lastunexpected;
 		}
 		return undef;
 	}
