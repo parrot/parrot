@@ -18,47 +18,23 @@
 
 #define MAX_PARAM 16
 
-struct params_t {
-    char *name[MAX_PARAM];
-    int num_param;
-};
-
-struct macro_t {
-    char *name;
-    struct params_t params;
-    char *expansion;
-    int line;
-};
-
-/* XXX: boe: rework this hack to use a hash */
-struct macro_t macros[256];
-int num_macros = 0;
-
-char temp_buffer[4096];
-
-struct macro_frame_t {
-    struct macro_frame_t *next;
+struct include_frame_t {
+    struct include_frame_t *next;
     YY_BUFFER_STATE buffer;
-    struct params_t *params;
-    struct params_t expansion;
     int label;
-    char *file;
+    const char *file;
     int line;
     int pasm_file;      /* pasm_file mode of previous frame */
-    int is_macro;
-};
+}; 
 
-struct macro_frame_t *frames = NULL;
+struct include_frame_t *frames = NULL;
+
 
 /* static function declariations */
-static struct macro_frame_t *new_frame (void);
-static void scan_string (struct macro_frame_t *frame, const char *expansion);
-static void scan_file (struct macro_frame_t *frame, FILE *);
-static void destroy_frame (struct macro_frame_t *frame);
+static struct include_frame_t *new_frame (void);
+static void destroy_frame (struct include_frame_t *frame);
 static int yylex_skip (YYSTYPE *valp, void *interp, const char *skip);
 
-static int read_macro (YYSTYPE *valp, void *interp);
-static int expand_macro (YYSTYPE *valp, void *interp, const char *name);
 static void include_file (char *file_name);
 static int in_pod;
 static int prev_state;
@@ -96,7 +72,6 @@ WS              [\t\f\r\x1a ]
 SP              [ ]
 
 %x emit
-%x macro
 %x pod
 %x cmt1
 %x cmt2
@@ -173,7 +148,7 @@ SP              [ ]
 	return REG;
 	}
 
-<INITIAL,emit,macro>^"="            { in_pod = 1; yy_push_state(pod); }
+<INITIAL,emit>^"="            { in_pod = 1; yy_push_state(pod); }
 <pod>^"=cut"{EOL}    { in_pod = 0; yy_pop_state(); ++line; }
 <pod>.*         { /*ignore*/ }
 <pod>{EOL}      { ++line; }
@@ -188,12 +163,22 @@ SP              [ ]
 ".pcc_call"     return(PCC_CALL);
 ".nci_call"     return(NCI_CALL);
 <emit,INITIAL>".pcc_sub"      return(PCC_SUB);
+
 ".pcc_begin_return"    return(PCC_BEGIN_RETURN);
 ".pcc_end_return"      return(PCC_END_RETURN);
 ".pcc_begin_yield"    return(PCC_BEGIN_YIELD);
 ".pcc_end_yield"      return(PCC_END_YIELD);
+
+".begin_return"    return(PCC_BEGIN_RETURN);
+".end_return"      return(PCC_END_RETURN);
+".begin_yield"    return(PCC_BEGIN_YIELD);
+".end_yield"      return(PCC_END_YIELD);
+
 "prototyped"    return(PROTOTYPED);
 "non_prototyped"    return(NON_PROTOTYPED);
+
+"proto"         return(PROTOTYPED);
+"noproto"       return(NON_PROTOTYPED);
 
 ".result"       return(RESULT);
 ".return"       return(RETURN);
@@ -206,7 +191,6 @@ SP              [ ]
 ".local"        return(LOCAL);
 ".global"       return(GLOBAL);
 ".const"        return(CONST);
-".globalconst"  return(GLOBAL_CONST);
 ".param"        return(PARAM);
 "end"           return(END);
 "goto"          return(GOTO);
@@ -246,38 +230,6 @@ SP              [ ]
 "!="            return(RELOP_NE);
 "**"            return(POW);
 
-<emit,INITIAL>".macro" {
-        return read_macro(valp, interp);
-    }
-
-<emit>".constant" {
-        int c;
-	char *name;
-	struct macro_t *m;
-
-	BEGIN(macro);
-	c = yylex_skip(valp, interp, " ");
-	if (c != IDENTIFIER)
-	    fataly(EX_SOFTWARE, sourcefile, line,
-		   "Constant names must be identifiers");
-
-	name = str_dup(valp->s);
-
-	c = yylex_skip(valp, interp, " ");
-        if (c != INTC && c != FLOATC && c != STRINGC && c != REG)
-        fataly(EX_SOFTWARE, sourcefile, line,
-        "Constant '%s' value must be a number, "
-            "stringliteral or register", name);
-
-	m = macros + num_macros++;
-	m->name = name;
-	m->expansion = str_dup (valp->s);
-	m->params.num_param = 0;
-
-	BEGIN (emit);
-	return MACRO;
-    }
-
 <*>".pragma" {
         int tok = yylex(valp, interp);
         if(tok == STRINGC) {
@@ -299,37 +251,6 @@ SP              [ ]
 	include_file(str_dup(yytext + 1));
     }
 
-<emit,INITIAL>{ID}"$:" {
-        char *label;
-
-	if (valp) {
-	    YYCHOP();
-            YYCHOP();
-
-	    label = mem_sys_allocate(yyleng+10);
-	    sprintf(label, "%s%d", yytext, frames->label);
-
-	    valp->s = label;
-	}
-
-        return LABEL;
-    }
-
-<emit,INITIAL>{ID}"$" {
-        char *label;
-
-	if (valp) {
-	    YYCHOP();
-
-	    label = mem_sys_allocate(yyleng+10);
-	    sprintf(label, "%s%d", yytext, frames->label);
-
-	    valp->s = label;
-	}
-
-	return IDENTIFIER;
-    }
-
 <emit,INITIAL>","             return(COMMA);
 
 <emit,INITIAL>{ID}":" {
@@ -346,8 +267,7 @@ SP              [ ]
 	    valp->s = buf;
 	    return INTC;
 	}
-	if (!expand_macro(valp, interp, yytext+1))
-            fataly(1, sourcefile, line, "unknown macro '%s'", yytext);
+        fataly(1, sourcefile, line, "unknown directive or pmc '%s'", yytext);
     }
 
 <emit,INITIAL>{ID} {
@@ -399,54 +319,6 @@ SP              [ ]
 
 <INITIAL><<EOF>> yyterminate();
 
-<macro>".endm"         DUP_AND_RET(valp, ENDM);
-
-<macro>{WS}*{EOL} {
-        line++;
-        DUP_AND_RET(valp, '\n');
-    }
-
-<macro>"$"{ID}":"  return LABEL;
-<macro>".local"{WS}+ {
-        char *label;
-	char *name = macros[num_macros].name;
-
-	if (yylex(valp, interp) != LABEL)
-	    fataly(EX_SOFTWARE, sourcefile, line, "LABEL expected");
-
-	if (valp) {
-	    YYCHOP();
-
-	    label = mem_sys_allocate(strlen(name) + yyleng + 15);
-	    sprintf(label, "local__%s__%s__$:", name, yytext+1);
-
-	    valp->s = label;
-	}
-
-	return LABEL;
-    }
-
-<macro>".$"{ID} {
-        char *label;
-	char *name = macros[num_macros].name;
-
-	if (valp) {
-	    label = mem_sys_allocate(strlen(name) + yyleng + 15);
-	    sprintf(label, "local__%s__%s__$", name, yytext+2);
-
-	    valp->s = label;
-	}
-
-	return IDENTIFIER;
-    }
-
-<macro>^{WS}+                       /* skip leading ws */;
-<macro>{WS}+                        DUP_AND_RET(valp, ' ');
-<macro>{ID}                         DUP_AND_RET(valp, IDENTIFIER);
-<macro>{DOT}{ID}                    DUP_AND_RET(valp, MACRO);
-<macro>.                            DUP_AND_RET(valp, yytext[0]);
-<macro><<EOF>>                      yyterminate();
-
 %%
 
 #ifdef yywrap
@@ -461,7 +333,7 @@ int yywrap() {
 
     /* pop old frame */
     if (frames) {
-	struct macro_frame_t *tmp;
+	struct include_frame_t *tmp;
 	tmp = frames;
         pasm_file = frames->pasm_file;
         if (YYSTATE == INITIAL || YYSTATE == emit)
@@ -474,42 +346,25 @@ int yywrap() {
     return 1;
 }
 
-static struct macro_frame_t *
+static struct include_frame_t *
 new_frame (void)
 {
     static int label = 0;
-    struct macro_frame_t *tmp;
-
-    tmp = mem_sys_allocate_zeroed(sizeof(struct macro_frame_t));
+    struct include_frame_t *tmp;
+    tmp = mem_sys_allocate_zeroed(sizeof(struct include_frame_t));
     tmp->label = ++label;
     tmp->line = line;
     tmp->file = sourcefile;
     tmp->pasm_file = pasm_file;
-
     return tmp;
 }
 
 static void
-scan_string (struct macro_frame_t *frame, const char *expansion)
-{
-    frame->buffer = YY_CURRENT_BUFFER;
-    frame->next = frames;
-    frames = frame;
-
-    yy_scan_string(expansion);
-}
-
-static void
-destroy_frame (struct macro_frame_t *frame)
+destroy_frame (struct include_frame_t *frame)
 {
     YY_BUFFER_STATE buffer;
-    int i;
 
     buffer = frame->buffer;
-
-    for (i = 0; i < frame->expansion.num_param; i++) {
-	free(frame->expansion.name[i]);
-    }
 
     line = frame->line;
     sourcefile = frame->file; /* FIXME, if file was allocated free it */
@@ -536,214 +391,23 @@ yylex_skip (YYSTYPE *valp, void *interp, const char *skip)
         return c;
 }
 
-static int
-read_params (YYSTYPE *valp, void *interp, struct params_t *params,
-	     const char *macro_name, int need_id)
+static void
+scan_file (struct include_frame_t *frame, FILE *file)
 {
-    int c;
-    YYSTYPE val;
-    char *current = str_dup("");
-    int len = 0;
+    frame->buffer = YY_CURRENT_BUFFER;
+    frame->next = frames;
+    frames = frame;
 
-    params->num_param = 0;
-    c = yylex_skip(&val, interp, " \n");
+    /* XXX: Switch the filename */
+    line = 1;
 
-    while(c != ')') {
-	if (c <= 0)
-	    fataly(EX_SOFTWARE, sourcefile, line,
-		   "End of file reached while reading arguments in '%s'",
-                   macro_name);
-	else if (c == ',') {
-            if (params->num_param == MAX_PARAM)
-                fataly(EX_SOFTWARE, sourcefile, line,
-                       "More then %d params in '%s'",
-                       MAX_PARAM, macro_name);
-	    params->name[params->num_param++] = current;
-	    current = str_dup("");
-	    len = 0;
-	    c = yylex_skip(&val, interp, " \n");
-	}
-	else if (need_id && (*current || c != IDENTIFIER) && c != ' ') {
-	    fataly(EX_SOFTWARE, sourcefile, line,
-		   "Parameter definition in '%s' must be IDENTIFIER",
-                   macro_name);
-	}
-	else {
-	    if (!need_id || c != ' ') {
-		len += strlen(val.s);
-		current = realloc(current, len + 1);
-		strcat(current,val.s);
-	    }
-	    free(val.s);
-	    c = yylex(&val,interp);
-	}
-    }
-    params->name[params->num_param++] = current;
-
-    if (valp) *valp = val;
-    else free(val.s);
-
-    return c;
-}
-
-static int
-read_macro (YYSTYPE *valp, void *interp)
-{
-    int c;
-    struct macro_t *m = macros + num_macros;
-    int start_cond;
-
-    temp_buffer[0]='\0';
-
-    start_cond = YY_START;
-    BEGIN(macro);
-
-    c = yylex_skip(valp, interp, " ");
-    if (c != IDENTIFIER)
-	fataly(EX_SOFTWARE, sourcefile, line,
-            "Macro names must be identifiers");
-
-    m->name = valp->s;
-    m->line = line;
-
-    /* white space is allowed between macro and opening paren) */
-    c = yylex_skip(valp, interp, " ");
-
-    if (c == '(') {
-	free(valp->s);
-
-	c = read_params(NULL, interp, &m->params, m->name, 1);
-
-	c = yylex(valp, interp);
-    }
-
-    while (c != ENDM) {
-	if (c <= 0)
-	    fataly (EX_SOFTWARE, sourcefile, line,
-		    "File ended before macro '%s' was complete", m->name);
-
-	strcat(temp_buffer, valp->s);
-	free(valp->s);
-
-        c = yylex(valp, interp);
-    }
-    free(valp->s);
-
-    BEGIN(start_cond);
-
-    macros[num_macros].expansion = str_dup(temp_buffer);
-
-    num_macros++;
-    return MACRO;
-}
-
-static char *
-find_macro_param (const char *name)
-{
-    struct macro_frame_t *f;
-    int i;
-
-    for (f = frames; f; f = f->next) {
-	if (f->params) {
-	    for (i = 0; i < f->params->num_param; i++) {
-		if (strcmp(f->params->name[i], name) == 0) {
-		    return f->expansion.name[i];
-		}
-	    }
-	}
-    }
-
-    return NULL;
-}
-
-static struct macro_t *
-find_macro (const char* name)
-{
-    int i;
-
-    for (i = 0; i < num_macros; i++) {
-	if (strcmp(name, macros[i].name) == 0) return macros + i;
-    }
-
-    return NULL;
-}
-
-static int
-expand_macro (YYSTYPE *valp, void *interp, const char *name)
-{
-    int c;
-    struct macro_frame_t *frame;
-    struct macro_t *m;
-    const char *expansion;
-    int start_cond;
-    union {
-        const void * __c_ptr;
-        void * __ptr;
-    } __ptr_u;
-#define const_cast(b) (__ptr_u.__c_ptr = (b), __ptr_u.__ptr)
-
-    UNUSED(valp);
-    frame = new_frame();
-    /* When an error occurs, then report it as being in a macro */
-    frame->is_macro = 1;
-
-    expansion = find_macro_param(name);
-    if (expansion) {
-	scan_string(frame, expansion);
-	return 1;
-    }
-
-    m = find_macro(name);
-    frame->params = &m->params;
-    if (m) {
-        /* remember macro name for error reporting
-         */
-        sourcefile = const_cast(name);
-	/* whitespace can be savely ignored */
-	do {
-	    c = input();
-	} while (c == ' ' || c == '\t');
-
-	if (c != '(') {
-	    unput(c);
-	    if (m->params.num_param != 0)
-		fataly (EX_SOFTWARE, sourcefile, line,
-			"Macro '%s' needs %d arguments",
-                        m->name, m->params.num_param);
-	    scan_string(frame, m->expansion);
-	    return 1;
-	}
-
-	start_cond = YY_START;
-	BEGIN(macro);
-
-	read_params (NULL, interp, &frame->expansion, m->name, 0);
-
-	BEGIN(start_cond);
-
-	if (frame->expansion.num_param == 0 && m->params.num_param == 1) {
-	    frame->expansion.name[0] = str_dup("");
-	    frame->expansion.num_param = 1;
-	}
-
-	if (frame->expansion.num_param != m->params.num_param) {
-	    fataly(EX_SOFTWARE, sourcefile, line,
-		   "Macro '%s' requires %d arguments, but %d given",
-		   m->name, m->params.num_param, frame->expansion.num_param);
-	}
-
-	line = m->line;
-	scan_string(frame, m->expansion);
-	return 1;
-    }
-
-    return 0;
+    yy_switch_to_buffer(yy_create_buffer(file, YY_BUF_SIZE));
 }
 
 static void
 include_file (char *file_name)
 {
-    struct macro_frame_t *frame;
+    struct include_frame_t *frame;
     FILE *file;
     char *ext;
 
@@ -789,19 +453,6 @@ include_file (char *file_name)
     scan_file (frame, file);
 }
 
-static void
-scan_file (struct macro_frame_t *frame, FILE *file)
-{
-    frame->buffer = YY_CURRENT_BUFFER;
-    frame->next = frames;
-    frames = frame;
-
-    /* XXX: Switch the filename */
-    line = 1;
-
-    yy_switch_to_buffer(yy_create_buffer(file, YY_BUF_SIZE));
-}
-
 void
 compile_file(Interp *interp, FILE *file)
 {
@@ -826,12 +477,9 @@ compile_file(Interp *interp, FILE *file)
 void
 print_inc(const char *file, int lin)
 {
-    struct macro_frame_t *f;
+    struct include_frame_t *f;
 
-    if (frames && frames->is_macro)
-        fprintf(stderr, "\nin macro '.%s' line %d\n", file, lin);
-    else
-        fprintf(stderr, "\nin file '%s' line %d\n", file, lin);
+    fprintf(stderr, "\nin file '%s' line %d\n", file, lin);
     for (f = frames; f; f = f->next) {
         if (f->file && strcmp(f->file, sourcefile))
             f->next ?
