@@ -1,6 +1,5 @@
 package TestCompiler;
 use strict;
-use lib '../lib';	# XXX
 use vars qw(@EXPORT @ISA);
 use Parrot::Config;
 require Exporter;
