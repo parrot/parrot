@@ -311,7 +311,7 @@ ISNULL:
     exists exist, helper[type]
     if exist, CALL_HELPER
 
-    print "unkown-type(pmc #"
+    print "unknown-type(pmc #"
     print type
     print ")"    
     branch DONE
