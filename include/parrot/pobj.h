@@ -101,7 +101,7 @@ typedef Buffer PObj;
 #  define PObj_version(pobj)  (pobj)->obj._pobj_version
 #endif
 
-typedef enum { 
+typedef enum {
 		enum_stringrep_unknown = 0,
 		enum_stringrep_one = 1,
 		enum_stringrep_two = 2,

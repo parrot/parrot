@@ -601,7 +601,7 @@ pt_DOD_start_mark(Parrot_Interp interpreter)>
 
 DOD is gonna start the mark phase. In the presence of shared PMCs, we
 can only run one DOD run at a time because
-C<< interpreter->dod_mark_ptr >> may be changed.
+C<< PMC->next_for_GC >> may be changed.
 
 TODO - Have a count of shared PMCs and check it during DOD.
 
@@ -626,6 +626,13 @@ pt_DOD_start_mark(Parrot_Interp interpreter)
      * - return and continue the mark phase
      * - then s. comments below
      */
+
+
+    /*
+     * we can't allow parallel running DODs both would mess with shared PMCs
+     * next_for_GC pointers
+     */
+    LOCK(interpreter_array_mutex);
 }
 
 /*
@@ -674,6 +681,7 @@ pt_DOD_stop_mark(Parrot_Interp interpreter)
      *   - other threads may or not free unused objects then,
      *     depending on their resource statistics
      */
+    UNLOCK(interpreter_array_mutex);
 }
 
 /*

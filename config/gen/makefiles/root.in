@@ -985,7 +985,7 @@ progclean:
 	        $(PDUMP) $(SRC)/pdump$(O) $(SRC)/packdump$(O) $(SRC)/pbc_info$(O) $(PINFO) \
 	        $(PDB) $(SRC)/pdb$(O) \
 	        $(DIS) $(SRC)/disassemble$(O)
-	$(RM_RF) blib
+	$(RM_F) $(LIBPARROT)
 	$(MAKE_C) classes progclean
 
 testclean :
@@ -998,6 +998,7 @@ testclean :
 
 realclean : clean
 	$(RM_F) $(STICKY_FILES)
+	$(RM_RF) blib
 
 distclean :
 	$(PERL) "-MExtUtils::Manifest=filecheck" -le ${PQ}sub ExtUtils::Manifest::_maniskip{sub{0}};$$ExtUtils::Manifest::Quiet=1;unlink $$_ for filecheck()${PQ}

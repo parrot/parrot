@@ -1679,9 +1679,9 @@ make_interpreter(Parrot_Interp parent, Interp_flags flags)
         interpreter->lo_var_ptr = parent->lo_var_ptr;
     }
     else {
-        interpreter->resume_flag = RESUME_INITIAL;
         SET_NULL(interpreter->parent_interpreter);
     }
+    interpreter->resume_flag = RESUME_INITIAL;
 
     interpreter->DOD_block_level = 1;
     interpreter->GC_block_level = 1;

@@ -1010,11 +1010,11 @@ Parrot_do_dod_run(struct Parrot_Interp *interpreter, UINTVAL flags)
     if (interpreter->DOD_block_level) {
         return;
     }
+    pt_DOD_start_mark(interpreter);
     Parrot_block_DOD(interpreter);
     /*
      * tell the threading system that we gonna DOD mark
      */
-    pt_DOD_start_mark(interpreter);
 
     interpreter->lazy_dod = flags & DOD_lazy_FLAG;
     interpreter->dod_trace_ptr = NULL;
@@ -1041,7 +1041,7 @@ Parrot_do_dod_run(struct Parrot_Interp *interpreter, UINTVAL flags)
          */
         if (interpreter->profile)
             profile_dod_end(interpreter, PARROT_PROF_DOD_p2);
-        pt_DOD_stop_mark(interpreter);
+        /* pt_DOD_stop_mark(interpreter); */
         /* Now put unused PMCs on the free list */
         header_pool = interpreter->arena_base->pmc_pool;
         free_unused_pobjects(interpreter, header_pool);
@@ -1073,10 +1073,10 @@ Parrot_do_dod_run(struct Parrot_Interp *interpreter, UINTVAL flags)
 #if 1
         clear_live_bits(interpreter);
 #endif
-        pt_DOD_stop_mark(interpreter);
         if (interpreter->profile)
             profile_dod_end(interpreter, PARROT_PROF_DOD_p2);
     }
+    pt_DOD_stop_mark(interpreter);
     /* Note it */
     interpreter->dod_runs++;
     interpreter->dod_trace_ptr = NULL;
