@@ -240,6 +240,8 @@ jit/arm/core.jit
 jit/arm/jit_emit.h
 jit/i386/core.jit
 jit/i386/jit_emit.h
+jit/ppc/core.jit
+jit/ppc/jit_emit.h
 jit/sun4/core.jit
 jit/sun4/jit_emit.h
 jit2h.pl
