@@ -29,8 +29,14 @@
  *      that must be available for reclamation before a compaction run will
  *      be initiated. This parameter is stored in the per-pool structure,
  *      and can therefore be modified for each pool if required.
+ *    MINIMUM_MEMPOOL_SIZE is applied to the estimated non-reclaimable
+ *      size to give the smallest size for the 'after' pool.
+ *    MAXIMUM_MEMPOOL_SIZE is applied to the estimated non-reclaimable
+ *      size to give the largest size for the 'after' pool.
  */
 #define RECLAMATION_FACTOR 0.20
+#define MINIMUM_MEMPOOL_SIZE  1
+#define MAXIMUM_MEMPOOL_SIZE  8
 
 /* Function prototypes for static functions */
 static void *mem_allocate(struct Parrot_Interp *interpreter, size_t *req_size,
@@ -799,6 +805,7 @@ static void
 compact_string_pool(struct Parrot_Interp *interpreter,
                     struct Memory_Pool *pool)
 {
+    UINTVAL estimated_size, min_size, max_size;
     UINTVAL total_size;
     struct Memory_Block *new_block;        /* A pointer to our working block */
     char *cur_spot;               /* Where we're currently copying to */
@@ -818,6 +825,18 @@ compact_string_pool(struct Parrot_Interp *interpreter,
     /* Find out how much memory we've used so far. We're guaranteed to
        use no more than this in our collection run */
     total_size = pool->total_allocated;
+    estimated_size = pool->total_allocated - pool->reclaimable;
+    min_size = ((UINTVAL)(estimated_size * MINIMUM_MEMPOOL_SIZE) +
+                  pool->minimum_block_size-1);
+    max_size = ((UINTVAL)(estimated_size * MAXIMUM_MEMPOOL_SIZE) +
+                  pool->minimum_block_size-1);
+    if (total_size < min_size) {
+        total_size = min_size;
+    }
+    if (total_size > max_size) {
+        total_size = max_size;
+    }
+
     /* Snag a block big enough for everything */
     new_block = alloc_new_block(interpreter, total_size, NULL);
 
