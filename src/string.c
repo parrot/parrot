@@ -2526,10 +2526,12 @@ string_to_num(Interp *interpreter, const STRING *s)
 {
     FLOATVAL f = 0.0;
 
-    char *cstr = string_to_cstring(interpreter, s);
-    f = atof(cstr);
-    string_cstring_free(cstr);
-    return f;
+    if (s) {
+        char *cstr = string_to_cstring(interpreter, s);
+        f = atof(cstr);
+        string_cstring_free(cstr);
+        return f;
+    }
     /*
      * results from that code below aren't really exact:
      * float("1e100") != 10**100

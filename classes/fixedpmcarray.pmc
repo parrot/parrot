@@ -22,8 +22,42 @@ TODO currently this uses PerlString instead of String PMCs.
 
 #include "parrot/parrot.h"
 
+static Interp* the_interp;
+
+static int
+sort_compare(void *a, void *b)
+{
+    PMC *pa = *(PMC**)a;
+    PMC *pb = *(PMC**)b;
+    return mmd_dispatch_i_pp(the_interp, pa, pb, MMD_CMP);
+}
+
+static void array_sort(Interp *interpreter, PMC *self, PMC *cmp_func)
+{
+    if (REG_INT(3) == 0) {
+        int (*func)(const void*, const void*) = sort_compare;
+        the_interp = interpreter;
+        qsort(PMC_data(self), PMC_int_val(self), sizeof(PMC *), func);
+    }
+    else {
+        /*
+         * cmp_func is an invokable PMC
+         *
+         * VTABLE_invoke(interpreter, cmp_func, NULL);
+         * sort_result = REG_INT(5)
+         */
+    }
+}
+
 pmclass FixedPMCArray need_ext does array {
 
+    void class_init () {
+        if (pass) {
+            enter_nci_method(INTERP, enum_class_FixedPMCArray,
+                    F2DPTR(array_sort),
+                    "sort", "vIOP");
+        }
+    }
 /*
 
 =back
