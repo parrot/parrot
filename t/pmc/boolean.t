@@ -211,22 +211,38 @@ OUTPUT
 
 output_is(<<'CODE', <<'OUTPUT', "neg");
 	new P0, .Boolean
+        new P1, .Boolean
+
         set P0, 1
-        neg P0
-        if P0, OK1
+        neg P1, P0
+        if P1, OK1
         print "not "
 OK1:    print "ok 1\n"
 
         set P0, 0
-        neg P0
-        unless P0, OK2
+        neg P1, P0
+        unless P1, OK2
         print "not "
 OK2:    print "ok 2\n"
+
+        set P0, 1
+        neg P0
+        if P0, OK3
+        print "not "
+OK3:    print "ok 3\n"
+
+        set P0, 0
+        neg P0
+        unless P0, OK4
+        print "not "
+OK4:    print "ok 4\n"
 
         end
 CODE
 ok 1
 ok 2
+ok 3
+ok 4
 OUTPUT
 
 1;
