@@ -1,7 +1,24 @@
-# A sample of the network ops. Doesn't work very well
-# but at least shows the idea.
-# Be sure to set PARROT_NET_DEVEL to 1 in io/io_private.h
-# and rebuld Parrot or the network layer won't exist
+# Copyright (C) 2001-2003 The Perl Foundation.  All rights reserved.
+# $Id$
+
+=head1 NAME
+
+examples/io/net_smtp.pasm - SMTP Example
+
+=head1 SYNOPSIS
+
+    % ./parrot examples/io/net_smtp.pasm
+
+=head1 DESCRIPTION
+
+A sample of the network ops. Connects to SMTP (port 25). Doesn't work
+very well but at least shows the idea.
+
+You should be running the echo service on your box (port 7). Be sure to
+set C<PARROT_NET_DEVEL> to 1 in F<io/io_private.h> and rebuld Parrot or
+the network layer won't exist.
+
+=cut
 
     print "Creating socket.\n"
     # create the socket handle 

@@ -1,9 +1,26 @@
-# echo client, connects to echo service and echoes what you type
-# You should be running the echo service on your box (port 7)
-# Be sure to set PARROT_NET_DEVEL to 1 in io/io_private.h
-# and rebuld Parrot or the network layer won't exist
-# Shortly we will create an echo server in Parrot and
-# combine these 2 into a test suite.
+# Copyright (C) 2001-2003 The Perl Foundation.  All rights reserved.
+# $Id$
+
+=head1 NAME
+
+examples/io/echo_client.imc - Echo client
+
+=head1 SYNOPSIS
+
+    % ./parrot examples/io/echo_client.imc
+
+=head1 DESCRIPTION
+
+C<echo> client, connects to C<echo> service and echoes what you type.
+
+You should be running the echo service on your box (port 7). Be sure to
+set C<PARROT_NET_DEVEL> to 1 in F<io/io_private.h> and rebuld Parrot or
+the network layer won't exist.
+
+Shortly we will create an echo server in Parrot and combine these 2 into
+a test suite.
+
+=cut
 
 .sub _main
     .local pmc sock
@@ -42,4 +59,10 @@ END:
     close sock 
     end
 .end
+
+=head1 SEE ALSO
+
+F<io/io_private.h>.
+
+=cut
 
