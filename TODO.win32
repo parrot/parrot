@@ -1,63 +1,11 @@
-This file is best viewed with "perldoc TODO.win32".
+All TODO items should be documented in RT. (http://rt.perl.org/)
 
-=head1 NAME
+A listing of all TODO items is available at:
 
-TODO.win32 - TODO List for Windows
+ http://www.parrotcode.org/todo
 
-=head1 SYNOPSIS
+To add TODOs to this list (which is powered by RT), send an email to 
 
-These are open issues of the "native" port to the Win32 platforms.
+ bugs-parrot@bugs6.perl.org
 
-=head1 DESCRIPTION
-
-=head2 Open Issues
-
-=over 4
-
-=item Automatically Export Symbols
-
-Annotate the declarations with something like
-
-	 PARROT_API
-	 Parrot_some_func
-
-and define PARROT_API, eg for cl, as
-
-    #ifdef PARROT_EXPORTS
-    #define PARROT_API __declspec(dllexport)
-    #else
-    #define PARROT_API __declspec(dllimport)
-    #endif
-
-and be compiled with PARROT_EXPORTS defined.  At least cl will then
-know to automatically export the symbol, without additional
-module-definition file (.def).
-
-=item Event Model
-
-Leo says:
-"Parrot on unixish systems is running two threads: the event thread
-handles all kind of events (timers, notifications, signals). The IO
-thread converts signals to events and is intended to run async I/O
-(which would arrive as signals too). This scheme isn't carved in stone,
-but it will look somehow like that.
-
-"Win32 is internally already event based and a lot of these events like a
-SIGINT (program termination signal) are messages in Win32. So I think
-that Win32 needs a message loop that handles this kind of stuff. WRT
-threading there are emulation layers for POSIX threads, but I doubt that
-these are as efficient as Win32 functions. (Disclaimer: I really don't
-know much about Win32)."
-
-=item Threads, Events, Signals, Sockets
-
-Anyone?
-
-=item Microsoft Visual C++ Toolkit 2003
-
-Provide setup and build instructions for Microsoft Visual C++ Toolkit 2003
-(L<http://msdn.microsoft.com/visualc/vctoolkit2003/>).
-
-=back
-
-=cut
+Begin your subject with '[TODO]'.
