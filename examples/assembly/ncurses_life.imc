@@ -3,7 +3,7 @@
 #
 # Play conway's (no, not *him*. The other conway) game of life
 
-# this version can load life.l files (#P format only - x,y are ignored)
+# this version can load life.l files (#P, #A, #R formats only)
 # you get a lot of .l files by installing xlife
 #
 # parrot examples/assembly/ncurses_life.imc examples/assembly/acorn.l
@@ -57,7 +57,7 @@
 
 
 	# 15 * sizef is real size of world
-	.const int sizef = 5
+	.const int sizef = 8
 	# if sizef > sleep_lim then sleep
 	sleep_lim = 1
 	# if sleeping then that long usec
@@ -70,7 +70,7 @@
 
 	# If true, we don't print
 	SUPRESS_PRINT = 0
-	stop = 0
+	stop = -1
 	x_offs = 0
 	y_offs = 0
 
@@ -124,6 +124,8 @@
 	invoke
 
 	size = 15 * sizef
+	.local string err
+	null err
 
 	$I0 = argv
 	if $I0 <= 1 goto def_world
@@ -135,10 +137,11 @@
 	.pcc_call load
 retl:
 	.result S15
+	.result err
 	.pcc_end
-	length $I0, S15
-	unless $I0, getout
-	goto nosize2
+	length $I0, err
+	if $I0, getout
+	goto dump1
 
 def_world:
 	.sym Sub default
@@ -151,7 +154,7 @@ def_world:
 retd:
 	.result S15
 	.pcc_end
-nosize2:
+dump1:
 	bsr dump
 	GEN_COUNT = 0
 	.sym Sub generate
@@ -207,6 +210,8 @@ getout:
 	invoke
 	time CUR_TIME
 	TIME_DIFF = CUR_TIME - START_TIME
+	length $I0, err
+	if $I0 goto print_err
 
 	# sleeping invalidates these data
 	if sizef > sleep_lim goto no_gps
@@ -251,10 +256,13 @@ no_gps:
 	print I1
 	print " total Buffer structs\n"
 
-
 	end
 
-
+print_err:
+	printerr "ERROR: "
+	printerr err
+	printerr "\n"
+	exit 1
 
 
 # S15 has the incoming string, S0 is scratch
@@ -289,16 +297,26 @@ dump:
 	CHAR_POS = 0
 	.sym int total
 	total = size * size
+	.sym int cols
+	.sym int rows
+	.sym var ENV
+	ENV = new Env
+	$S0 = ENV["COLUMNS"]
+	cols = $S0
+	$S0 = ENV["LINES"]
+	rows = $S0
 
 printloop:
-	if CHARACTER_OFFSET < 0 goto incit
+        # TODO skip unprintable out of screen
 	if CHARACTER_OFFSET >= total goto dumpend
 
 	substr_r S0, S15, CHARACTER_OFFSET, 1
 	if S0 != "*" goto incit
 	X_COORD = CHAR_POS % size
+	if X_COORD > cols goto incit
 	Y_COORD = CHAR_POS / size
 	Y_COORD = Y_COORD + 2
+	if Y_COORD > rows goto dumpend
 	I5 = Y_COORD
 	I6 = X_COORD
 	I7 = 42				# Behold, the lowly star
@@ -537,13 +555,16 @@ nocol:
 	.param int size
 
 	.sym string world
-	null world
+	.sym string err
+	world = ""
 	.sym string file
 	file = argv[1]
+	err = "File not found " . file
 	.sym var io
 	open io, file, "<"
 	$I0 = defined io
 	unless $I0 goto nok
+	null err
 	.sym string line
 	$I0 = size * size
 	repeat world, " ", $I0
@@ -552,26 +573,176 @@ nocol:
 	$I1 = $I0 * $I0
 	pos = $I0 + $I1
 	.sym int len
+	.sym int format
+	format = 0
+	.const int PICTURE = 1
+	.const int ABS     = 2
+	.const int REL     = 3
+	.sym   var points
+
 loop:
 	readline line, io
 	length len, line
 	unless len goto out
-	substr $S0, line, 0, 1
-	eq $S0, "#", loop	# ignore, TODO checl P,R ...
+	$S0 = line[0]
+	eq $S0, "#", check_format
 	chopn line, 1		# \n
 	dec len
+	if format != PICTURE goto not_pic
 	substr world, pos, len, line
 	pos = pos + size
+	goto loop
+not_pic:
+	if format != ABS goto not_abs
+	goto do_rel
+not_abs:
+	if format != REL goto not_rel
+do_rel:
+	# parse \s(\d+) (\d+)
+	# I really want PCRE or better inside Parrot :)
+	.sym int s
+	.sym int start
+	.sym int in_digit
+	in_digit = 0
+	s = 0
+get_d:
+        if s >= len goto space
+	$S0 = line[s]
+	ord $I0, $S0
+	if $I0 == 32 goto space
+	if $I0 == 9  goto space
+	if $I0 == 43 goto cont_d	# ignore +
+	if $I0 == 45 goto dig		# sing, start dig
+	if $I0 >= 0x30 goto dig1
+	err = "Found junk at " . $S0
+	goto out
+
+dig1:
+        if $I0 <= 0x39 goto dig
+	err = "Found junk at " . $S0
+	goto out
+
+dig:	if in_digit == 1 goto cont_d
+        if in_digit == 3 goto cont_d
+	start = s
+	inc in_digit
+
+cont_d:
+	inc s
+	goto get_d
+space:
+        if in_digit == 0 goto cont_d
+	if in_digit == 2 goto cont_d
+	inc in_digit
+	$I1 = s - start
+	substr $S1, line, start, $I1
+	$I2 = $S1
+	push points, $I2
+        if s >= len goto loop
+	inc s
+	goto get_d
+
+end_d:
+	goto loop
+
+not_rel:
+        err = "Unhandled file format"
+	goto out
+
+check_format:
+	$S0 = line[1]
+	if $S0 == "C" goto loop	# comment
+	if $S0 == "#" goto loop	# comment
+	if $S0 == "N" goto loop	# name of pattern
+	if $S0 == "O" goto loop	# owner
+	if $S0 == "U" goto loop	# use format
+	unless format goto f1
+	err = "Mixed formats found"
+	goto out
+f1:
+	if $S0 != "P" goto not_P	# picture
+	format = PICTURE
+not_P:
+	if $S0 != "A" goto not_A	# absolute
+	format = ABS
+	points = new PerlArray
+not_A:
+	if $S0 != "R" goto not_R	# relative
+	format = REL
+	points = new PerlArray
+not_R:
 	goto loop
 
 out:
 	close io
-	print "XXX"
-	print world
-	print "XXX\n"
+	if format == PICTURE goto done
+	# we have an array of x,y pairs now
+	# find min, max
+	.sym int min_x
+	.sym int min_y
+	.sym int max_x
+	.sym int max_y
+	min_x = 99999
+	min_y = 99999
+	max_x = -99999
+	max_y = -99999
+	.sym int x
+	.sym int y
+	.sym int len
+	len = points
+	s = 0
+lp:
+	x = points[s]
+	inc s
+	y = points[s]
+	inc s
+	if x >= min_x goto no_min_x
+	min_x = x
+no_min_x:
+	if x <= max_x goto no_max_x
+	max_x = x
+no_max_x:
+	if y >= min_y goto no_min_y
+	min_y = y
+no_min_y:
+	if y <= max_y goto no_max_y
+	max_y = y
+no_max_y:
+	if s < len goto lp
+
+#	printerr min_x
+#	printerr ", "
+#	printerr min_y
+#	printerr ", "
+#	printerr max_x
+#	printerr ", "
+#	printerr max_y
+#	printerr "\n\n"
+
+	# now fill world
+	s = 0
+lp2:
+	x = points[s]
+	inc s
+	y = points[s]
+	inc s
+	x = x - min_x
+	y = y - min_y
+#	printerr x
+#	printerr ", "
+#	printerr y
+#	printerr "\n"
+	.sym int c
+	c = y * size
+	c = x + c
+	# TODO abs/rel and bounds checking
+	world[c] = "*"
+	if s < len goto lp2
+done:
 nok:
 	.pcc_begin_return
 	.return world
+	.return err
 	.pcc_end_return
 .end
 
@@ -608,6 +779,7 @@ is_8:
 no_8:
 	if key != 0x32 goto no_2
 is_2:
+	if y_offs < 10 goto key_done
 	y_offs = y_offs - 10
 	goto key_done
 no_2:
@@ -618,6 +790,7 @@ is_4:
 no_4:
 	if key != 0x36 goto no_6
 is_6:
+	if x_offs < 10 goto key_done
 	x_offs = x_offs - 10
 	goto key_done
 no_6:
