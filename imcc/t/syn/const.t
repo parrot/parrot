@@ -1,6 +1,6 @@
 #!perl
 use strict;
-use TestCompiler tests => 2;
+use TestCompiler tests => 3;
 use Test::More qw(skip);
 
 ##############################
@@ -53,4 +53,17 @@ CODE
 15
 OUT
 
+##############################
+output_is(<<'CODE', <<'OUT', "escaped");
+.sub MAIN
+   $S0 = "\""
+   print $S0
+   print "\\"
+   $S0 = "\"\\\"\n"
+   print $S0
+  end
+.end
+CODE
+"\"\"
+OUT
 

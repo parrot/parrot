@@ -33,7 +33,7 @@ DOT		[.]
 SIGN            [-+]
 FLOATNUM        {SIGN}?{DIGIT}+{DOT}{DIGIT}*([eE]{SIGN}?{DIGIT}+)?
 LETTERDIGIT     [a-zA-Z0-9_]
-STRINGCONSTANT  \"(\\.|[^"\n]*)*["\n]
+STRINGCONSTANT  \"(\\\"|[^"\n]*)*\"
 CHARCONSTANT    \'[^'\n]*\'
 RANKSPEC        \[[,]*\]
 EOL		\r?\n
