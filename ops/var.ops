@@ -264,7 +264,7 @@ op store_global(in STR, in STR, in PMC) {
     goto NEXT();
 }
 
-op store_global(in PMC, in str, in PMC) {
+op store_global(in PMC, in STR, in PMC) {
     /* XXX: All globals should go through an API */
     PMC * globals = interpreter->globals->stash_hash;
     PMC * stash;

@@ -181,7 +181,7 @@ PMC *
 pmc_new_noinit(struct Parrot_Interp *interpreter, INTVAL base_type)
 {
     PMC *pmc;
-    /* we only have one global Env object, livin in the interpreter */
+    /* we only have one global Env object, living in the interpreter */
     if (Parrot_base_vtables[base_type]->flags & VTABLE_PMC_IS_SINGLETON) {
         if (base_type == enum_class_Env) {
             /* XXX need probably a lock around this code
