@@ -1,2 +1,3 @@
 Makefile
 *.c
+default.h
