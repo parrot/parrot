@@ -532,12 +532,14 @@ apply to all source files.
 =item Developer files
 
 For each source file (eg a F<foo.c> F<foo.h> pair), there should be an
-accompanying developer file called F<foo.dev>. This text file contains
-documentation on all the implementation decisions associated with the
-source file. (Note that this is in contrast to PDDs, which describe
-design decisions). This is the place for mini-essays on how to avoid
-overflows in unsigned arithmetic, or on the pros and cons of differing
-hash algorithms, and why the current one was chosen, and how it works.
+accompanying developer file called F<foo.dev>, in the source
+directory.  This text file contains documentation on all the
+implementation decisions associated with the source file. (Note that
+this is in contrast to PDDs, which describe design decisions). This is
+the place for mini-essays on how to avoid overflows in unsigned
+arithmetic, or on the pros and cons of differing hash algorithms, and
+why the current one was chosen, and how it works. 
+
 In principle, someone coming to a particular source file for the first
 time should be able to read the F<.dev> file and gain an immediate
 overview of what the source file is for, the algorithms it implements,

@@ -33,14 +33,14 @@ foreach my $file (@files) {
     my @lines = <F>;
     close(F);
     chomp @lines;
-    
+
     for (@lines[0..10]) {
 	if (/DO NOT EDIT/) {
 	    print "Skipping $file (automatically generated)\n";
 	    next FILE;
 	}
     }
-    
+
     check_source($file, \@lines);
 }
 
@@ -68,8 +68,19 @@ sub check_source {
     # The following SHOULD apply.
     check_line_length($file, $source);
     check_returns($file, $source);
+    check_dev($file);
 }
 
+sub check_dev {
+    my ($file) = @_;
+
+    return unless ($file =~ /^[^\/]*\.c$/);
+
+    my $dev_file = $file; $dev_file =~ s/\.c$/.dev/g;
+    return if -f $dev_file;
+    
+    warning($file, 0, ".dev file not found for $file.");
+}
 
 # ignore any leading or trailing whitespace on the file 
 sub trim_whitespace {
