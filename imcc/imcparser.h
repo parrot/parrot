@@ -125,19 +125,20 @@
      SREG = 348,
      PREG = 349,
      IDENTIFIER = 350,
-     STRINGC = 351,
-     INTC = 352,
-     FLOATC = 353,
-     REG = 354,
-     MACRO = 355,
-     ENDM = 356,
-     PARROT_OP = 357,
-     VAR = 358,
-     LINECOMMENT = 359,
-     FILECOMMENT = 360,
-     DOT = 361,
-     CONCAT = 362,
-     POINTY = 363
+     REG = 351,
+     MACRO = 352,
+     ENDM = 353,
+     STRINGC = 354,
+     INTC = 355,
+     FLOATC = 356,
+     USTRINGC = 357,
+     PARROT_OP = 358,
+     VAR = 359,
+     LINECOMMENT = 360,
+     FILECOMMENT = 361,
+     DOT = 362,
+     CONCAT = 363,
+     POINTY = 364
    };
 #endif
 #define LOW_PREC 258
@@ -233,19 +234,20 @@
 #define SREG 348
 #define PREG 349
 #define IDENTIFIER 350
-#define STRINGC 351
-#define INTC 352
-#define FLOATC 353
-#define REG 354
-#define MACRO 355
-#define ENDM 356
-#define PARROT_OP 357
-#define VAR 358
-#define LINECOMMENT 359
-#define FILECOMMENT 360
-#define DOT 361
-#define CONCAT 362
-#define POINTY 363
+#define REG 351
+#define MACRO 352
+#define ENDM 353
+#define STRINGC 354
+#define INTC 355
+#define FLOATC 356
+#define USTRINGC 357
+#define PARROT_OP 358
+#define VAR 359
+#define LINECOMMENT 360
+#define FILECOMMENT 361
+#define DOT 362
+#define CONCAT 363
+#define POINTY 364
 
 
 
@@ -262,7 +264,7 @@ typedef union {
     SymbolTable * symtab;
 } yystype;
 /* Line 1281 of /usr/share/bison/yacc.c.  */
-#line 266 "imcc/imcparser.h"
+#line 268 "imcc/imcparser.h"
 # define YYSTYPE yystype
 #endif
 
