@@ -53,7 +53,7 @@ exit 0;
 sub check_source {
     my ($file, $source) = @_;
 
-    info($file, 0, "Checking $file");
+    print "Checking $file..\n";
     trim_whitespace($file, $source);
 
     # The following MUST apply.
