@@ -55,7 +55,7 @@ do_panic(struct Parrot_Interp *interpreter, const char *message,
                    interpreter->current_file &&
                    interpreter->current_file->strstart ?
                    (char *)interpreter->current_file->strstart : "(null)",
-                   interpreter->current_line);
+                   (int)interpreter->current_line);
     }
     else {
         fprintf(stderr, "Parrot file (not available), ");
