@@ -3,50 +3,36 @@
 #
 #use warnings;
 
-.sub _main
+.sub main
 
-# my $big;
-   .sym pmc big
-   big = new PerlUndef
-# my $string="just another perl hacker";
-   .sym pmc String
-   String = new PerlUndef
-   String = "just another perl hacker"
+$S0 = "just another perl hacker"
 
-# for (0 .. 99999) {
-   $P0 = new PerlUndef
-   $P0 = 0
-loop:
-#    $big++;
-   inc big
-#   my @str=split(//,$string);
-   .sym pmc str
-   $S0 = String
-   split str, "", $S0
-#    my $f=shift(@str);
-   .sym pmc f
-   f = new PerlUndef
-   shift $P2, str
-   assign f, $P2
-#    push(@str,$f);
-   push str, f
-#    $string=join('',@str);
-   join $S2, "", str
-   String = $S2
-#}
-  inc $P0
-  if  $P0 <= 99999 goto loop
+$I0 = 0
+loop0:
 
-#print "$big;
-   print big
-   print "\n"
-#$string
-#";
-   print String
-   print "\n"
-   end
-# ende
+	.sym pmc str
+	split str, "", $S0
+
+	$I1 = 0
+	$S1 = str[$I1]
+	loop1:
+		$I2 = $I1 + 1
+		$S2 = str[$I2]
+		str[$I1] = $S2
+		inc $I1
+	if $I1 < 23 goto loop1
+	str[$I1] = $S1
+
+	join $S0, "", str
+
+	inc $I0
+if  $I0 <= 99999 goto loop0
+
+print $I0
+print "\n"
+
+print $S0
+print "\n"
+
+end
 .end
-
-
-

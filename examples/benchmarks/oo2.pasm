@@ -44,6 +44,8 @@ loop:
     end
 
 .pcc_sub init:
+.include "interpinfo.pasm"
+    interpinfo P2, .INTERPINFO_CURRENT_OBJECT
     classoffset I0, P2, "Foo"
     new P10, .PerlInt
     set P10, 10
