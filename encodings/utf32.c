@@ -18,22 +18,25 @@ typedef unsigned long utf32_t;
 #endif
 
 static UINTVAL
-utf32_characters (const void *ptr, UINTVAL bytes) {
-    UNUSED (ptr); 
+utf32_characters(const void *ptr, UINTVAL bytes)
+{
+    UNUSED(ptr);
 
     return bytes / 4;
 }
 
 static UINTVAL
-utf32_decode (const void *ptr) {
+utf32_decode(const void *ptr)
+{
     const utf32_t *u32ptr = ptr;
 
     return *u32ptr;
 }
 
 static void *
-utf32_encode (void *ptr, UINTVAL c) {
-    utf32_t *u32ptr = (utf32_t*)ptr;
+utf32_encode(void *ptr, UINTVAL c)
+{
+    utf32_t *u32ptr = (utf32_t *)ptr;
 
     if (c > 0x10FFFF || UNICODE_IS_SURROGATE(c)) {
         internal_exception(INVALID_CHARACTER,
@@ -46,15 +49,17 @@ utf32_encode (void *ptr, UINTVAL c) {
 }
 
 static void *
-utf32_skip_forward (const void *ptr, UINTVAL n) {
-    utf32_t *u32ptr = (utf32_t*)ptr;
+utf32_skip_forward(const void *ptr, UINTVAL n)
+{
+    utf32_t *u32ptr = (utf32_t *)ptr;
 
     return u32ptr + n;
 }
 
 static void *
-utf32_skip_backward (const void *ptr, UINTVAL n) {
-    utf32_t *u32ptr = (utf32_t*)ptr;
+utf32_skip_backward(const void *ptr, UINTVAL n)
+{
+    utf32_t *u32ptr = (utf32_t *)ptr;
 
     return u32ptr - n;
 }

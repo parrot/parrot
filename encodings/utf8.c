@@ -14,14 +14,22 @@
 #include "parrot/unicode.h"
 
 const char Parrot_utf8skip[256] = {
-1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1, /* ascii */
-1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1, /* ascii */
-1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1, /* ascii */
-1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1, /* ascii */
-1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1, /* bogus */
-1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1, /* bogus */
-2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2, /* scripts */
-3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,4,4,4,4,4,4,4,4,5,5,5,5,6,6,6,6, /* cjk etc. */
+    1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,     /* ascii */
+    1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,     /* ascii */
+    1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,     /* ascii */
+    1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,     /* ascii */
+    1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,     /* ascii */
+    1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,     /* ascii */
+    1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,     /* ascii */
+    1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,     /* ascii */
+    1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,     /* bogus */
+    1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,     /* bogus */
+    1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,     /* bogus */
+    1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,     /* bogus */
+    2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,     /* scripts */
+    2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,     /* scripts */
+    3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3,     /* cjk etc. */
+    4, 4, 4, 4, 4, 4, 4, 4, 5, 5, 5, 5, 6, 6, 6, 6      /* cjk etc. */
 };
 
 #if 0
@@ -29,7 +37,8 @@ typedef unsigned char utf8_t;
 #endif
 
 static UINTVAL
-utf8_characters (const void *ptr, UINTVAL bytes) {
+utf8_characters(const void *ptr, UINTVAL bytes)
+{
     const utf8_t *u8ptr = ptr;
     const utf8_t *u8end = u8ptr + bytes;
     UINTVAL characters = 0;
@@ -47,7 +56,8 @@ utf8_characters (const void *ptr, UINTVAL bytes) {
 }
 
 static UINTVAL
-utf8_decode (const void *ptr) {
+utf8_decode(const void *ptr)
+{
     const utf8_t *u8ptr = ptr;
     UINTVAL c = *u8ptr;
 
@@ -59,8 +69,7 @@ utf8_decode (const void *ptr) {
         for (count = 1; count < len; count++) {
             u8ptr++;
             if (!UTF8_IS_CONTINUATION(*u8ptr)) {
-                internal_exception(MALFORMED_UTF8,
-                                   "Malformed UTF-8 string\n");
+                internal_exception(MALFORMED_UTF8, "Malformed UTF-8 string\n");
             }
             c = UTF8_ACCUMULATE(c, *u8ptr);
         }
@@ -77,8 +86,9 @@ utf8_decode (const void *ptr) {
 }
 
 static void *
-utf8_encode (void *ptr, UINTVAL c) {
-    utf8_t *u8ptr = (utf8_t*)ptr;
+utf8_encode(void *ptr, UINTVAL c)
+{
+    utf8_t *u8ptr = (utf8_t *)ptr;
     UINTVAL len = UNISKIP(c);
     utf8_t *u8end = u8ptr + len - 1;
 
@@ -88,17 +98,19 @@ utf8_encode (void *ptr, UINTVAL c) {
     }
 
     while (u8end > u8ptr) {
-        *u8end-- = (utf8_t)( (c & UTF8_CONTINUATION_MASK) | UTF8_CONTINUATION_MARK );
+        *u8end-- =
+            (utf8_t)((c & UTF8_CONTINUATION_MASK) | UTF8_CONTINUATION_MARK);
         c >>= UTF8_ACCUMULATION_SHIFT;
     }
-    *u8end = (utf8_t)( (c & UTF8_START_MASK(len)) | UTF8_START_MARK(len) );
+    *u8end = (utf8_t)((c & UTF8_START_MASK(len)) | UTF8_START_MARK(len));
 
     return u8ptr + len;
 }
 
 static void *
-utf8_skip_forward (const void *ptr, UINTVAL n) {
-    utf8_t *u8ptr = (utf8_t*)ptr;
+utf8_skip_forward(const void *ptr, UINTVAL n)
+{
+    utf8_t *u8ptr = (utf8_t *)ptr;
 
     while (n-- > 0) {
         u8ptr += UTF8SKIP(u8ptr);
@@ -108,12 +120,14 @@ utf8_skip_forward (const void *ptr, UINTVAL n) {
 }
 
 static void *
-utf8_skip_backward (const void *ptr, UINTVAL n) {
-    utf8_t *u8ptr = (utf8_t*)ptr;
+utf8_skip_backward(const void *ptr, UINTVAL n)
+{
+    utf8_t *u8ptr = (utf8_t *)ptr;
 
     while (n-- > 0) {
         u8ptr--;
-        while (UTF8_IS_CONTINUATION(*u8ptr)) u8ptr--;
+        while (UTF8_IS_CONTINUATION(*u8ptr))
+            u8ptr--;
     }
 
     return u8ptr;

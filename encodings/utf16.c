@@ -18,7 +18,8 @@ typedef unsigned short utf16_t;
 #endif
 
 static UINTVAL
-utf16_characters (const void *ptr, UINTVAL bytes) {
+utf16_characters(const void *ptr, UINTVAL bytes)
+{
     const utf16_t *u16ptr = ptr;
     const utf16_t *u16end = u16ptr + bytes / sizeof(utf16_t);
     UINTVAL characters = 0;
@@ -29,14 +30,16 @@ utf16_characters (const void *ptr, UINTVAL bytes) {
     }
 
     if (u16ptr > u16end) {
-        internal_exception(MALFORMED_UTF16, "Unaligned end in UTF-16 string\n");
+        internal_exception(MALFORMED_UTF16,
+                           "Unaligned end in UTF-16 string\n");
     }
 
     return characters;
 }
 
 static UINTVAL
-utf16_decode (const void *ptr) {
+utf16_decode(const void *ptr)
+{
     const utf16_t *u16ptr = ptr;
     UINTVAL c = *u16ptr++;
 
@@ -44,7 +47,8 @@ utf16_decode (const void *ptr) {
         utf16_t low = *u16ptr++;
 
         if (!UNICODE_IS_LOW_SURROGATE(low)) {
-            internal_exception(MALFORMED_UTF16, "Malformed UTF-16 surrogate\n");
+            internal_exception(MALFORMED_UTF16,
+                               "Malformed UTF-16 surrogate\n");
         }
 
         c = UNICODE_DECODE_SURROGATE(c, low);
@@ -57,8 +61,9 @@ utf16_decode (const void *ptr) {
 }
 
 static void *
-utf16_encode (void *ptr, UINTVAL c) {
-    utf16_t *u16ptr = (utf16_t*)ptr;
+utf16_encode(void *ptr, UINTVAL c)
+{
+    utf16_t *u16ptr = (utf16_t *)ptr;
 
     if (c > 0x10FFFF || UNICODE_IS_SURROGATE(c)) {
         internal_exception(INVALID_CHARACTER,
@@ -77,33 +82,36 @@ utf16_encode (void *ptr, UINTVAL c) {
 }
 
 static void *
-utf16_skip_forward (const void *ptr, UINTVAL n) {
-    utf16_t *u16ptr = (utf16_t*)ptr;
+utf16_skip_forward(const void *ptr, UINTVAL n)
+{
+    utf16_t *u16ptr = (utf16_t *)ptr;
 
     while (n-- > 0) {
-      if (UNICODE_IS_HIGH_SURROGATE(*u16ptr)) {
-          u16ptr++;
+        if (UNICODE_IS_HIGH_SURROGATE(*u16ptr)) {
+            u16ptr++;
 
-          if (!UNICODE_IS_LOW_SURROGATE(*u16ptr)) {
-              internal_exception(MALFORMED_UTF16,
-                                 "Malformed UTF-16 surrogate\n");
-          }
-      }
-      else if (UNICODE_IS_LOW_SURROGATE(*u16ptr)) {
-          internal_exception(MALFORMED_UTF16, "Malformed UTF-16 surrogate\n");
-      }
+            if (!UNICODE_IS_LOW_SURROGATE(*u16ptr)) {
+                internal_exception(MALFORMED_UTF16,
+                                   "Malformed UTF-16 surrogate\n");
+            }
+        }
+        else if (UNICODE_IS_LOW_SURROGATE(*u16ptr)) {
+            internal_exception(MALFORMED_UTF16,
+                               "Malformed UTF-16 surrogate\n");
+        }
 
-      u16ptr++;
+        u16ptr++;
     }
 
     return u16ptr;
 }
 
 static void *
-utf16_skip_backward (const void *ptr, UINTVAL n) {
-    utf16_t *u16ptr = (utf16_t*)ptr;
+utf16_skip_backward(const void *ptr, UINTVAL n)
+{
+    utf16_t *u16ptr = (utf16_t *)ptr;
 
-    while (n--> 0) {
+    while (n-- > 0) {
         u16ptr--;
 
         if (UNICODE_IS_LOW_SURROGATE(*u16ptr)) {
@@ -115,7 +123,8 @@ utf16_skip_backward (const void *ptr, UINTVAL n) {
             }
         }
         else if (UNICODE_IS_HIGH_SURROGATE(*u16ptr)) {
-            internal_exception(MALFORMED_UTF16, "Malformed UTF-16 surrogate\n");
+            internal_exception(MALFORMED_UTF16,
+                               "Malformed UTF-16 surrogate\n");
         }
     }
 

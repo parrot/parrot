@@ -15,20 +15,23 @@
 typedef unsigned char byte_t;
 
 static UINTVAL
-singlebyte_characters (const void *ptr, UINTVAL bytes) {
-    UNUSED (ptr); 
+singlebyte_characters(const void *ptr, UINTVAL bytes)
+{
+    UNUSED(ptr);
 
     return bytes;
 }
 
 static UINTVAL
-singlebyte_decode (const void *ptr) {
+singlebyte_decode(const void *ptr)
+{
     return *(const byte_t *)ptr;
 }
 
 static void *
-singlebyte_encode (void *ptr, UINTVAL c) {
-    byte_t *bptr = (byte_t*)ptr;
+singlebyte_encode(void *ptr, UINTVAL c)
+{
+    byte_t *bptr = (byte_t *)ptr;
 
     if (c > 255) {
         internal_exception(INVALID_CHARACTER,
@@ -41,15 +44,17 @@ singlebyte_encode (void *ptr, UINTVAL c) {
 }
 
 static void *
-singlebyte_skip_forward (const void *ptr, UINTVAL n) {
-    byte_t *bptr = (byte_t*)ptr;
+singlebyte_skip_forward(const void *ptr, UINTVAL n)
+{
+    byte_t *bptr = (byte_t *)ptr;
 
     return bptr + n;
 }
 
 static void *
-singlebyte_skip_backward (const void *ptr, UINTVAL n) {
-    byte_t *bptr = (byte_t*)ptr;
+singlebyte_skip_backward(const void *ptr, UINTVAL n)
+{
+    byte_t *bptr = (byte_t *)ptr;
 
     return bptr - n;
 }
