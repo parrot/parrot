@@ -534,6 +534,9 @@ languages : languages.dummy
 languages.dummy :
 	cd languages && $(MAKE) && cd ..
 
+languages-test :
+        cd languages && $(MAKE) test && cd ..
+
 # If anything in the classes directory is out of date,
 # then run `make` in sub-dir to rebuild only the out of date files.
 $(CLASS_O_FILES) : $(CLASS_PMC_FILES) $(NONGEN_HEADERS)

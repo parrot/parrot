@@ -1,11 +1,18 @@
 MAKE = ${make}
 
-all : imcc jako scheme
+all : imcc jako scheme befunge bf cola ook perl6
 
+test : imcc.test regex.test befunge.test bf.test ook.test perl6.test
+
+# Could someone please comment on the reason for all these *.dummy
+# targets?
 imcc: imcc.dummy
 
 imcc.dummy:
 	cd imcc && $(MAKE) && cd ..
+
+imcc.test:
+	cd imcc && $(MAKE) test && cd ..
 
 jako: jako.dummy imcc.dummy
 
@@ -17,6 +24,51 @@ scheme: scheme.dummy
 scheme.dummy:
 	cd scheme && $(MAKE) && cd ..
 
+regex: regex.dummy
+
+regex.dummy:
+	cd regex && $(MAKE) && cd ..
+
+regex.test :
+	cd regex && $(MAKE) test && cd ..
+
+befunge : befunge.dummy
+
+befunge.dummy:
+	cd befunge && $(MAKE) && cd ..
+
+befunge.test:
+	cd befunge && $(MAKE) test && cd ..
+
+bf : bf.dummy
+
+bf.dummy:
+	cd bf && $(MAKE) && cd ..
+
+bf.test:
+	cd bf && $(MAKE) test && cd ..
+
+cola : cola.dummy
+
+cola.dummy:
+	cd cola && $(MAKE) && cd ..
+
+ook : ook.dummy
+
+ook.dummy:
+	cd ook && $(MAKE) && cd ..
+
+ook.test:
+	cd ook && $(MAKE) test && cd ..
+
+perl6 : perl6.dummy
+
+perl6.dummy:
+	cd perl6 && $(MAKE) && cd ..
+
+perl6.test:
+	cd perl6 && $(MAKE) test && cd ..
+
 clean:
 	cd imcc && $(MAKE) clean && cd ..
 	cd jako && $(MAKE) clean && cd ..
@@ -24,4 +76,3 @@ clean:
 
 update:
 	cvs -q update -dP
-
