@@ -1278,7 +1278,11 @@ IV
 PackFile_Constant_pack_size(PackFile_Constant * self) {
     IV padded_size;
 
-    padded_size = self->size + (self->size % sizeof(IV));
+    padded_size = self->size;
+
+    if (padded_size % sizeof(IV)) {
+        padded_size += sizeof(IV) - (padded_size % sizeof(IV));
+    }
 
     return 4 * sizeof(IV) + padded_size;
 }
@@ -1325,8 +1329,11 @@ PackFile_Constant_pack(PackFile_Constant * self, char * packed) {
     if (self->data) {
         mem_sys_memcopy(cursor, self->data, self->size);
         cursor += self->size;
-        for(i = 0; i < (self->size % sizeof(IV)); i++) {
-            cursor[i] = 0;
+
+        if (self->size % sizeof(IV)) {
+            for(i = 0; i < (sizeof(IV) - (self->size % sizeof(IV))); i++) {
+                cursor[i] = 0;
+            }
         }
     }
 
