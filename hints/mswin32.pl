@@ -14,6 +14,8 @@
 		$c{cc_ldflags} = '/link';
 		$c{cc_debug} = '-Zi';
 		$c{ld_debug} = '-debug';
+		$c{ld_shard} = '-dll';
+		$c{ld_out}   = '-out:';
 		$c{platform} = 'win32';
 		$c{cp} = 'copy';
 		$c{slash} = '\\';

@@ -204,6 +204,7 @@ my(%c)=(
     ldflags	  => $Config{ldflags},
     ld_out        => '-o ',               # ld output file
     ld_debug      => '',                  # include debug info in executable
+    ld_shared     => '-shared',
 
     perl          => $^X,
     test_prog     => 'test_parrot',

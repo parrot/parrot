@@ -4,6 +4,9 @@ A = .a
 RM_F = ${rm_f}
 RM_RF = ${rm_rf}
 AR_CRS = ar crs
+LD = ${ld}
+LD_SHARED = ${ld_shared}
+LD_OUT = ${ld_out}
 
 INC=include/parrot
 
@@ -161,7 +164,7 @@ blib_lib:
 shared: blib_lib blib/lib/libparrot$(SO) blib/lib/libcore_prederef$(SO) $(TEST_PROG_SO)
 
 blib/lib/libparrot$(SO).${VERSION}: blib_lib $(O_FILES)
-	$(LD) -shared -Wl,-soname,libparrot$(SO).${MAJOR} $(LDFLAGS) -o blib/lib/libparrot$(SO).${VERSION} $(O_FILES)
+	$(LD) $(LD_SHARED) -Wl,-soname,libparrot$(SO).${MAJOR} $(LDFLAGS) $(LD_OUT)blib/lib/libparrot$(SO).${VERSION} $(O_FILES)
 
 blib/lib/libparrot$(SO).${MAJOR}.${MINOR}: blib/lib/libparrot$(SO).${VERSION}
 	rm -f $@
@@ -176,7 +179,7 @@ blib/lib/libparrot$(SO): blib/lib/libparrot$(SO).${MAJOR}
 	cd blib/lib; ln -s libparrot$(SO).${MAJOR} libparrot$(SO)
 
 blib/lib/libcore_prederef$(SO).${VERSION}: blib_lib core_ops_prederef$(O)
-	$(LD) -shared -Wl,-soname,libparrot$(SO).${MAJOR} $(LDFLAGS) -o blib/lib/libcore_prederef$(SO).${VERSION} core_ops_prederef$(O)
+	$(LD) $(LD_SHARED) -Wl,-soname,libparrot$(SO).${MAJOR} $(LDFLAGS) $(LD_OUT)blib/lib/libcore_prederef$(SO).${VERSION} core_ops_prederef$(O)
 
 blib/lib/libcore_prederef$(SO).${MAJOR}.${MINOR}: blib/lib/libcore_prederef$(SO).${VERSION}
 	rm -f $@
@@ -191,7 +194,7 @@ blib/lib/libcore_prederef$(SO): blib/lib/libcore_prederef$(SO).${MAJOR}
 	cd blib/lib; ln -s libcore_prederef$(SO).${MAJOR} libcore_prederef$(SO)
 
 $(TEST_PROG_SO): test_main$(O) blib/lib/libparrot$(SO) lib/Parrot/OpLib/core.pm lib/Parrot/PMC.pm
-	$(LD) ${ld_out}$(TEST_PROG) test_main$(O) $(LDFLAGS) $(C_LIBS) -L blib/lib -lparrot
+	$(LD) $(LD_OUT)$(TEST_PROG) test_main$(O) $(LDFLAGS) $(C_LIBS) -L blib/lib -lparrot
 
 
 #
@@ -367,7 +370,7 @@ test: $(TEST_PROG) assemble.pl .test_dummy
 .test_dummy:
 	$(PERL) t/harness
 
-testp: $(TEST_PROG) assemble.pl blib/lib/libcore_prederef$(SO) $(TEST_PROG_SO) .test_dummy_p
+testp: $(TEST_PROG) assemble.pl blib/lib/libcore_prederef$(SO) blib/lib/libparrot$(SO) $(TEST_PROG_SO) .test_dummy_p
 
 .test_dummy_p:
 	$(PERL) t/harness -P
