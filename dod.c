@@ -16,6 +16,14 @@
 #include "parrot/method_util.h"
 #include <assert.h>
 
+/* set this to 1 for tracing the system stack and processor registers */
+#define TRACE_SYSTEM_AREAS 0
+
+/* set this to 1 and above to zero to see if unanchored objects
+ * are found in system areas. Please note: these objects might be bogus
+ */
+#define GC_VERBOSE 0
+
 #if ! DISABLE_GC_DEBUG
 /* Set when walking the system stack */
 int CONSERVATIVE_POINTER_CHASING = 0;
@@ -32,6 +40,16 @@ void pobject_lives(struct Parrot_Interp *interpreter, PObj *obj)
     if (PObj_is_live_or_free_TESTALL(obj)) {
         return;
     }
+#if ! DISABLE_GC_DEBUG
+#  if GC_VERBOSE
+    if (CONSERVATIVE_POINTER_CHASING) {
+        fprintf(stderr, "GC Warning! Unanchored %s %p version " INTVAL_FMT
+                " found in system areas \n",
+                PObj_is_PMC_TEST(obj) ? "PMC" : "Buffer",
+                obj, obj->version);
+    }
+#  endif
+#endif
     /* mark it live */
     PObj_live_SET(obj);
     /* if object is a PMC and contains buffers or PMCs, then attach
@@ -86,15 +104,6 @@ trace_active_PMCs(struct Parrot_Interp *interpreter)
     /* mark it as used  */
     pobject_lives(interpreter, (PObj *)current);
 
-    /* Find important stuff on the system stack */
-#if ! DISABLE_GC_DEBUG
-    CONSERVATIVE_POINTER_CHASING = 1;
-#endif
-    /* trace_system_areas(interpreter); */
-#if ! DISABLE_GC_DEBUG
-    CONSERVATIVE_POINTER_CHASING = 0;
-#endif
-
     /* Now, go run through the PMC registers and mark them as live */
     /* First mark the current set. */
     for (i = 0; i < NUM_REGISTERS; i++) {
@@ -136,6 +145,11 @@ trace_active_PMCs(struct Parrot_Interp *interpreter)
             mark_stack(interpreter, stacks[j]);
 
     }
+    /* Find important stuff on the system stack */
+#if TRACE_SYSTEM_AREAS
+    trace_system_areas(interpreter);
+#endif
+
     /* Okay, we've marked the whole root set, and should have a good-sized
      * list 'o things to look at. Run through it */
     for (; current != prev; current = current->next_for_GC) {
@@ -489,6 +503,19 @@ Parrot_do_dod_run(struct Parrot_Interp *interpreter)
 
     /* And the buffers */
     trace_active_buffers(interpreter);
+#if !TRACE_SYSTEM_AREAS
+    /* whe, we don't trace stack and registers, we check after
+     * marking everything, if something was missed
+     * not - these could also be stale objects
+     */
+#if ! DISABLE_GC_DEBUG
+    CONSERVATIVE_POINTER_CHASING = 1;
+#endif
+    trace_system_areas(interpreter);
+#if ! DISABLE_GC_DEBUG
+    CONSERVATIVE_POINTER_CHASING = 0;
+#endif
+#endif
 
     /* Now put unused PMCs on the free list */
     header_pool = interpreter->arena_base->pmc_pool;
