@@ -1,0 +1,286 @@
+
+=head1 TITLE
+
+Indexing Aggregate PMCs
+
+=head1 VERSION
+
+1
+
+=head2 CURRENT
+
+   Maintainer: Simon Cozens <simon@netthink.co.uk>
+   Class: Internals
+   PDD Number: TBD 
+   Version: 1
+   Status: Developing
+   Last Modified: 17 February, 2001
+   PDD Format: 1
+   Language: English
+
+=head2 HISTORY
+
+First edition.
+
+=head1 ABSTRACT
+
+This PDD aims to clear up the confusion regarding the implementation of
+keyed access to PMCs in Parrot. 
+
+=head1 DESCRIPTION
+
+First, let's define some terminology. An B<aggregate PMC> is one which
+allows indexed access to sub-element that it stores or references, by
+supporting and implementing the C<_keyed> variants of vtable methods.
+These variants are B<indexing> operations, as they act on a specific
+indexed element of an aggregate PMC. 
+
+Non-aggregates also support C<_keyed> variants of the vtable methods,
+but they may not do anything particularly clever - for instance,
+PMC types implementing Perl references will merely pass the index on to
+the referent. These aren't aggregates because they don't directly store
+or reference sub-elements.
+
+Indexing operations take one or more aggregate-B<key> pairs. At runtime,
+these operations will index the key into the aggregate returning a
+B<value>. Here is a well-known indexing operation in Perl 6:
+
+    @a[12] = $b;
+
+The key here is the constant integer C<12>, and the aggregate is the
+C<PerlArray> C<@a>. In the process of this assignment, Parrot will have
+to extract the PMC in element 12 of the array, producing a value. C<$b>
+is then assigned to this value. 
+
+Now, how does this all get implemented?
+
+=head1 IMPLEMENTATION
+
+=head2 The key structure
+
+The key structure has to have the following features: it must bundle up
+multiple keys so that multidimensional aggregates can be indexed; keys
+may be specified as integer, string, number or PMC. 
+
+Hence, the following structure was produced. First, the individual keys
+as we think of them from a language level are stored in a structure
+called a C<KEY_PAIR>. 
+
+=over 3
+
+=item Todo 
+
+This is a singularly bad name, and needs to change. Probably C<KEY_PART>
+is better. It's a shame C<KEY_ELEMENT> is so confusing, since it's accurate.
+
+=back
+
+So, for instance, indexing the multidimensional array
+C<@foo[$a;12;"hi"]> produces three C<KEY_PAIRS>, one with a PMC type,
+one with an integer type and one with a string type. Since C<KEY_PAIRS>
+need to store the type as well as the value, they end up looking like
+this:
+
+    struct _key_pair {
+      KEY_TYPE type;
+      union {
+        INTVAL int_val;
+        FLOATVAL num_val;
+        STRING* struct_val;
+        PMC* pmc_val;
+      } cache;
+    };
+
+The next issue is to combine these things into a single key. Hence,
+the developer-facing C<KEY> structure looks like this:
+
+    struct _key {
+      INTVAL size;
+      KEY_PAIR** keys;
+    };
+
+=over 3
+
+=item Todo
+
+This needs to turn into a linked list, so that it can support nested
+data structures. When this is done, update this with the explanation
+of why we made this choice.
+
+=back
+
+These structures can be found in F<include/parrot/key.h>
+
+=head2 Aggregate and non-aggregate PMCs
+
+We've already said that what separates the aggregate PMCs from the
+non-aggregates is their implementation of the C<_keyed> vtable methods.
+So it is Hereby Decreed that the default vtable which everyone inherits
+from defines the C<_keyed> forms to throw an exception. 
+
+=over 3
+
+=item Todo
+
+Need discussion on whether C<OUT_OF_BOUNDS> is a good exception for
+this, or whether something else should be used. It's really a compiler
+screw-up, since code which indexes a non-aggregate shouldn't be
+generated.
+
+=back
+
+=head2 C<_keyed> vtable methods
+
+So what of these magical C<_keyed> vtable methods? They are generated
+when you add the C<keyed> tag to the appropriate entry in F<vtable.tbl>.
+They are constructed by following B<every> C<PMC> argument with a C<KEY>
+argument; the name of the C<KEY> argument is formed by adding C<_key>
+onto the end of the C<PMC> argument. 
+
+The reason why every PMC argument has an associated key is twofold.
+Firstly, it means that 
+
+    @a[$b] = $c
+
+and
+
+    $a = @b[$c]
+
+use the same vtable method, reducing the multiplicity of methods. 
+Secondly, a three-argument C<assign> as suggested by the code above
+would be ambiguous - the code above uses 3 PMCs in different ways. 
+
+Also, operations which take an aggregate-key pair for one of its
+arguments should take aggregate-key pairs for B<all> of its arguments.
+This is to avoid the following:
+
+    void foo_keyed_i(PMC x, KEY y, INT a)
+    void foo_keyed_n(PMC x, KEY y, NUM a)
+    void foo_keyed_p(PMC x, KEY y, PMC a)
+    void foo_keyed_p_keyed(PMC x, KEY y, PMC a, KEY b)
+
+These are all replaced with the single entry
+
+    void foo_keyed(PMC x, KEY y, PMC a, KEY b)
+
+(Think how much worse it gets when there are three or more PMCs in an
+entry...)
+
+Yes. This means that you may need to turn some things into C<PMC>s that
+you didn't want to. Since the alternative is mega pollution and
+duplication in the vtable table, and since the majority of things that
+you'll deal with in a real world situation are expected to be PMCs
+anyway, this shouldn't be too much of a problem.
+
+So, if you have a PMC in a C<_keyed> method which you don't want to
+index, pass in C<NULL> instead of a real key. Code implementing these
+methods should understand C<PMC* foo, KEY* NULL> as meaning the entirety
+of C<foo> in some sense; this is trivial to understand if C<foo> is
+non-aggregate, and implementation-defined if C<foo> is aggregate.
+
+Similarly, non-C<_keyed> methods on aggregates are implementation
+defined; for instance, a C<set_integer> on a C<PerlArray> may be
+understood as setting C<@array.length>.
+
+Historically, we first implemented keys as two separate keyed methods
+per applicable method - C<..._index> and C<..._index_s> for integer and
+string indexing respectively. However, this didn't give us the
+flexibility and scalability that key structures give us.
+
+=head2 Input to the assembler
+
+There are several different valid specifications of an aggregate-key
+pair to the assembler. These are:
+
+    op arg, P1[1234]  # Constant integer key
+    op arg, P1[12.34] # Constant number key
+    op arg, P1["foo"] # Constant string key
+    op arg, P1[S1]    # Register key
+
+(Rationale: fits programmer's expectation, easier to understand at a
+glance than C<op P1, P2, P3>. Also, is C<op P1, P2, P3> the same as
+C<op P1[P2], P3> or C<op P1, P2[P3]>, or are these three separate PMCs?)
+
+We shall refer to the first three types collectively as "constant keys"
+and the the last as "register keys".
+
+=head2 What the assembler did next
+
+When the assembler sees an aggregate-key pair, it "detaches" the key to
+form a separate argument. It then decides whether or not it is a
+constant key or a register key. If it is a constant key, the data is
+temporarily munged in the same way as string constants. The constant
+itself is added to the constant integer/number/string list, much like
+any other constant, and an entry is added to the list of constant keys.
+
+Next it selects the appropriate op. Register keys have the signature
+C<r> and constant keys have the signature C<kc>. For example:
+
+    set P1["hi"], 1234
+
+finds an op named C<set_p_kc_i>. On the other hand,
+
+    set P1[S1], 1234
+
+produces an op named C<set_p_r_i>.
+
+=over 3
+
+=item C<Todo>
+
+This is only half implemented. The C<r> business may need to be
+documented in another PDD somewhere. This is also not going to scale
+to keys like C<P1;S1;123>, and I don't know how to do that.
+
+=back
+
+Keys with multiple key-pairs may need to be classed as constant keys.
+
+=head2 Bytecode representation
+
+The bytecode representation of these keys are as follows: constant keys
+are treated just like another constant, and are an index into the "key"
+section of the packfile's constant table. 
+
+Each key in that constant table consists of one byte specifying its
+length in terms of number of key-pairs. For instance, C<["hi"]> has
+length 1; C<["hi";P1;S1;123]> has length 4. Next, each key-pair is
+specified using two bytes. The first byte is a type specifier:
+
+    0 - Integer
+    1 - Number
+    2 - String
+    3 - PMC
+    4 - Register
+    5 - Key
+
+and the second byte is an index into the appropriate constant table, (in
+the first 4 cases and the last case) or a register specifier. (see below) 
+
+Register arguments (The C<_r> bit) are specified as a single byte. The
+top two bits are the type specifier:
+
+    00 - Integer
+    01 - Number
+    10 - String
+    11 - PMC
+
+and the bottom six bits are the register number. 
+
+=over 3 
+
+=item Todo
+
+The register specification stuff may need to move to another PDD.
+
+=back
+
+=head2 The interpreter's interpretation
+
+Delayed until we have bytecode that produces what we want.
+
+=head1 CHANGES
+
+Fri Mar  8 18:47:34 GMT 2002 - updated to reflect Dan's comments that
+non-aggregates also support C<_keyed> variant vtable methods.
+
