@@ -1,4 +1,4 @@
-=head1 NAME
+=head1 TITLE
 
 rx.c / rx.h
 
@@ -67,7 +67,7 @@ array for ch, but how do we get to the right element in the bitfield?  The
 code is 1 << (ch & 7).  This will give us a unique power of two for each
 character that maps to that particular bitfield in the array.
 
-=item More than one byte
+=item B<More than one byte>
 
 Here each character is appended to the internal string bigchars (of type
 STRING*).
@@ -105,26 +105,26 @@ This deallocates the memory for the bitmap.
 
 Here is the definition for rxinfo (all comments are mine)
 
-typedef struct rxinfo {
-    STRING *string;	//This is the string the regex tests to see if it matches or not
-    INTVAL index;	//This is the current spot in string we are checking
-    INTVAL startindex;	//This is where the regex started checking
-    INTVAL success;	//This is just a flag to see if the regex matched or not
+	typedef struct rxinfo {
+	    STRING *string;	//This is the string the regex tests to see if it matches or not
+	    INTVAL index;	//This is the current spot in string we are checking
+	    INTVAL startindex;	//This is where the regex started checking
+	    INTVAL success;	//This is just a flag to see if the regex matched or not
 
-    rxflags flags;	//This is a set of flags to see what modifiers were used in the regex
-    UINTVAL minlength;  //The minumum length string can be and still be able to match
-    rxdirection whichway; //Is the regex going forwards or backwards?
+	    rxflags flags;	//This is a set of flags to see what modifiers were used in the regex
+	    UINTVAL minlength;  //The minumum length string can be and still be able to match
+	    rxdirection whichway; //Is the regex going forwards or backwards?
 
-    PMC *groupstart;	//Indexes for where each group starts
-    PMC *groupend;	//Indexes for where each gruop ends
-			//Groups here are capturing groups, ie. $1,$2, etc.
+	    PMC *groupstart;	//Indexes for where each group starts
+	    PMC *groupend;	//Indexes for where each gruop ends
+				//Groups here are capturing groups, ie. $1,$2, etc.
 
-    opcode_t *substfunc; //This is unused.  Originally regexes were going to
-		 	 //handle their own substitutions (s///).  Now this
-			 //is not the case.  This can probably be removed.
+	    opcode_t *substfunc; //This is unused.  Originally regexes were going to
+			 	 //handle their own substitutions (s///).  Now this
+				 //is not the case.  This can probably be removed.
 
-    IntStack stack;	//Sets up an intstack for internal use (backtrackig purposes)
-} rxinfo;
+	    IntStack stack;	//Sets up an intstack for internal use (backtrackig purposes)
+	} rxinfo;
 
 
 rx.h also sets up a series of macros for setting/unsetting flags in each regex,
@@ -241,6 +241,6 @@ a power of 2 using them.  Thus, the code for the right bit given C<ch> is
 together, we are given a character (C<ch>) and an array (C<bmp>), how do we
 "store" that this character is in the bitmap?  Here's the code:
 
-bmp[ch >> 3] = 1 << (ch & 7)
+	bmp[ch >> 3] = 1 << (ch & 7)
 
 =back
