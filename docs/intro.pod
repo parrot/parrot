@@ -23,7 +23,7 @@ interpreter.
 Parrot is related to Perl 6, but it is not Perl 6. To find out
 what it actually is, we need to know a little about how Perl works.
 When you feed your program into C<perl>, it is first compiled into an
-internal representation, or bytecode; then this bytecode is fed to
+internal representation, or bytecode; then this bytecode is fed to an
 almost separate subsystem inside C<perl> to be interpreted. So there
 are two distinct phases of C<perl>'s operation - compilation to
 bytecode, and interpretation of bytecode. This is not unique to Perl;
@@ -164,7 +164,7 @@ An abstracted, encoding-independent string type.
 
 =item C<PMC>
 
-Other types lile a (perl) scalar or an array.
+Other types like a (perl) scalar or an array.
 
 =back
 
@@ -425,8 +425,8 @@ perl6-internals mailing list, (C<perl6-internals@perl.org>), where all
 the development takes place. You should also keep up to date with the CVS
 version of Parrot; if you want to be alerted to CVS commits,
 you can subscribe to the cvs-parrot mailing list (C<cvs-parrot@perl.org>).
-CVS commit access is given to those who taken
-responsibility for a particular area of Parrot, or who often commit
+CVS commit access is given to those who take
+responsibility for a particular area of Parrot, or who often submit
 high-quality patches.
 
 A useful web page is L<http://cvs.perl.org>, which reminds you how to use CVS,
