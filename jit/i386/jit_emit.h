@@ -2423,6 +2423,7 @@ Parrot_jit_vtable_newp_ic_op(Parrot_jit_info_t *jit_info,
 
 #  endif /* NO_JIT_VTABLE_OPS */
 
+# if EXEC_CAPABLE
 #  ifdef JIT_CGP
 #    ifdef EXEC_SHARED
 #      define exec_emit_end(pc) { \
@@ -2447,14 +2448,21 @@ Parrot_jit_vtable_newp_ic_op(Parrot_jit_info_t *jit_info,
          emitm_jumpr(pc, emit_ESI); \
        }
 #    endif /* EXEC_SHARED */
+
+#  else /* JIT_CGP */
+
+#    define exec_emit_end(pc) jit_emit_end(pc)
+
+#  endif /* JIT_CGP */
+# endif /* EXEC_CAPABLE */
+
+#  ifdef JIT_CGP
 #    define jit_emit_end(pc) { \
        jit_emit_mov_ri_i(pc, emit_ESI, \
          (ptrcast_t)((op_func_t*)interpreter->op_lib->op_func_table) [0]); \
        emitm_jumpr(pc, emit_ESI); \
      }
-
 #  else /* JIT_CGP */
-
 #    define jit_emit_end(pc) { \
        jit_emit_add_ri_i(pc, emit_ESP, 4); \
        emitm_popl_r(pc, emit_EDI); \
@@ -2464,10 +2472,7 @@ Parrot_jit_vtable_newp_ic_op(Parrot_jit_info_t *jit_info,
        emitm_ret(pc); \
      }
 
-#    define exec_emit_end(pc) jit_emit_end(pc)
-
 #  endif /* JIT_CGP */
-
 #endif /* JIT_EMIT */
 
 #if JIT_EMIT > 1
