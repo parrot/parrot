@@ -157,7 +157,7 @@ sub readjit($) {
                 $asm =~ s/jit_emit_end/exec_emit_end/;
             }
             if (($cpuarch eq 'ppc') && ($genfile ne "jit_cpu.c")) {
-                $asm =~ s/jit_emit_mov_ri_i\(jit_info->native_ptr, ISR([12]), &CONST\((\d)\)\);/load_nc(jit_info->native_ptr, ISR$1, ECONST($2);/g;
+                $asm =~ s/jit_emit_mov_ri_i\(jit_info->native_ptr, ISR([12]), &CONST\((\d)\)\);/load_nc(jit_info->native_ptr, ISR$1, ECONST($2));/g;
             }
 
             $asm =~ s/PUSH_MAPPED_REG\((\d)\)/Parrot_jit_push_registers(jit_info,$1)/g;
