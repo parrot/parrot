@@ -238,3 +238,9 @@
 	    - disabled parser tests
 	    - escaped char parsing
 	    - misc regex compiling bugs
+
+2002-08-26
+
+	* Fixes:
+	    - driver tidying and doc-update (Leo).
+	
