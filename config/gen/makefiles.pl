@@ -53,6 +53,8 @@ sub makefiles {
           commentType => '#', replace_slashes => 1, conditioned_lines => 1);
   genfile('config/gen/makefiles/imcc.in',      'imcc/Makefile',
           commentType => '#', replace_slashes => 1);
+  genfile('config/gen/makefiles/p6ge.in',      'compilers/p6ge/Makefile',
+          commentType => '#', replace_slashes => 1);
   genfile('config/gen/makefiles/languages.in', 'languages/Makefile',
           commentType => '#', replace_slashes => 1);
   genfile('config/gen/makefiles/jako.in',      'languages/jako/Makefile',
