@@ -46,6 +46,7 @@ all : imcc
 	cd ../.. && $(MAKE) $(PARROTLIB)
 
 .PHONY : FORCE
+FORCE :
 
 imcparser.c imcparser.h : imcc.y FORCE
 	$(PERL) rebuild.pl ${PQ}$(YACC) imcc.y -d -o imcparser.c${PQ} imcc.y imcparser.h imcparser.c
