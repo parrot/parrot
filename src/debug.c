@@ -2013,11 +2013,6 @@ PDB_print_user_stack(struct Parrot_Interp *interpreter, const char *command)
     }
 }
 
-static STRING* cstring_to_string(struct Parrot_Interp *interpreter, char* str)
-{
-    return string_make(interpreter, str, strlen(str), NULL, 0, NULL);
-}
-
 /* PDB_print
  * print interpreter registers
  */
