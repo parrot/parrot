@@ -67,15 +67,15 @@ static void
 add_timer(Parrot_Interp interpreter, PMC *pmc)
 {
     parrot_timer_event *t = pmc->cache.struct_val;
-    /* TODO handle interval, repeat count */
     if (!PMC_IS_NULL(t->sub))
-	Parrot_new_timer_event(interpreter, t->abs_time, 0, t->sub);
+	Parrot_new_timer_event(interpreter, pmc, t->abs_time,
+			t->interval, t->repeat, t->sub);
 }
 
 static void
 del_timer(Parrot_Interp interpreter, PMC *pmc)
 {
-    /* TODO find timer in queue, set inactive flag */
+   Parrot_del_timer_event(interpreter, pmc);
 }
 
 
@@ -141,14 +141,12 @@ pmclass Timer does event {
 	switch(key) {
 	    case PARROT_TIMER_SEC:
 		return (INTVAL)t->abs_time;
-		break;
 	    case PARROT_TIMER_USEC:
 		return (t->abs_time - (INTVAL)t->abs_time) *1000000.0;
-		break;
 	    case PARROT_TIMER_REPEAT:
+		return (INTVAL) t->repeat;
 	    case PARROT_TIMER_RUNNING:
 		return 0;
-		break;
 	}
 	return -1;
     }
@@ -187,7 +185,7 @@ pmclass Timer does event {
 		t->abs_time += value / 1000000.0;
 		break;
 	    case PARROT_TIMER_REPEAT:
-		/* t->repeat = value; */
+		t->repeat = value;
 		break;
 	    case PARROT_TIMER_RUNNING:
 		if (value) {

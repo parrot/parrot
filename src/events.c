@@ -147,17 +147,43 @@ Parrot_schedule_event(Parrot_Interp interpreter, parrot_event* ev)
  * interval running the passed sub
  */
 void
-Parrot_new_timer_event(Parrot_Interp interpreter, FLOATVAL diff,
-        FLOATVAL interval, PMC* sub)
+Parrot_new_timer_event(Parrot_Interp interpreter, PMC* timer, FLOATVAL diff,
+        FLOATVAL interval, int repeat, PMC* sub)
 {
     parrot_event* ev = mem_sys_allocate(sizeof(parrot_event));
     FLOATVAL now = Parrot_floatval_time();
     ev->type = EVENT_TYPE_TIMER;
-    ev->data = NULL;
+    ev->data = timer;
     ev->u.timer_event.abs_time = now + diff;
     ev->u.timer_event.interval = interval;
+    ev->u.timer_event.repeat   = repeat;
+    if (repeat && !interval)
+        ev->u.timer_event.interval = diff;
     ev->u.timer_event.sub = sub;
     Parrot_schedule_event(interpreter, ev);
+}
+
+/*
+ * deactivate timer identified by timer PMC
+ */
+void
+Parrot_del_timer_event(Parrot_Interp interpreter, PMC* timer)
+{
+    QUEUE_ENTRY *entry;
+    parrot_event* event;
+
+    LOCK(event_queue->queue_mutex);
+    for (entry = event_queue->head; entry; entry = entry->next) {
+        if (entry->type == QUEUE_ENTRY_TYPE_TIMED_EVENT) {
+            event = entry->data;
+            if (event->interp == interpreter && event->data == timer) {
+                event->u.timer_event.interval = 0.0;
+                event->type = EVENT_TYPE_NONE;
+                break;
+            }
+        }
+    }
+    UNLOCK(event_queue->queue_mutex);
 }
 
 /*
@@ -258,8 +284,12 @@ event_thread(void *data)
                      * if event is repeated dup and reinsert it
                      */
                     if (event->u.timer_event.interval) {
-                        nosync_insert_entry(event_q,
-                                dup_entry_interval(entry, now));
+                        if (event->u.timer_event.repeat) {
+                            if (event->u.timer_event.repeat != -1)
+                                event->u.timer_event.repeat--;
+                            nosync_insert_entry(event_q,
+                                    dup_entry_interval(entry, now));
+                        }
                     }
                     break;
                 default:
@@ -268,10 +298,14 @@ event_thread(void *data)
             /*
              * TODO check for a stop event to do cleanup
              */
+            assert(event);
+            if (event->type == EVENT_TYPE_NONE) {
+                mem_sys_free(entry);
+                continue;
+            }
             /*
              * now insert entry in interpreter task queue
              */
-            assert(event);
             if (event->interp) {
                 Parrot_schedule_interp_qentry(event->interp, entry);
             }

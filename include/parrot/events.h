@@ -33,6 +33,7 @@ typedef enum {
 typedef struct {
     FLOATVAL                    abs_time;
     FLOATVAL                    interval;
+    int                         repeat; /* 0 = once, -1 = forever */
     PMC*                        sub;    /* handler sub */
 } parrot_timer_event;
 
@@ -61,10 +62,12 @@ void Parrot_init_events(Parrot_Interp);
 void* Parrot_do_check_events(Parrot_Interp, void*);
 void* Parrot_do_handle_events(Parrot_Interp, int, void*);
 
-void Parrot_new_timer_event(Parrot_Interp, FLOATVAL, FLOATVAL,PMC*);
+void Parrot_new_timer_event(Parrot_Interp, PMC*, FLOATVAL, FLOATVAL, int, PMC*);
+void Parrot_del_timer_event(Parrot_Interp, PMC* timer);
 void Parrot_new_terminate_event(Parrot_Interp);
 void disable_event_checking(Parrot_Interp);
 void enable_event_checking(Parrot_Interp);
+
 #endif
 
 /*
