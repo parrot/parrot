@@ -17,13 +17,19 @@ sub init {
 sub init_context {
 }
 
+# Convert "x%<foo>y" to
+#   print "x"
+#   print foo
+#   print "y"
+#
 sub dbprint {
-    my ($self, $ctx, $what) = @_;
+    my ($self, $what) = @_;
     return () unless $self->{DEBUG};
-    $what = "\$($ctx->{rx_pos}): $what";
+    my $ctx = $self->{ctx};
+    $what = "\%<$ctx->{rx_pos}>: $what";
 
     my @ops;
-    foreach my $part ($what =~ /(<\w+>|[^<]+)/g) {
+    foreach my $part ($what =~ /((?:\%\<[\<\>\w]+\>)|[^\%]+)/g) {
         if ($part =~ /^\%/) {
             push @ops, $self->output_print(substr($part, 2, -1));
         } else {
