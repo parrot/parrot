@@ -149,7 +149,7 @@ BIGNUM* BN_copy(PINTD_ BIGNUM*, BIGNUM*);
 BIGNUM* BN_new_from_int(PINTD_ INTVAL value);
 INTVAL BN_to_scientific_string(PINTD_ BIGNUM* bn, char **dest);
 INTVAL BN_to_engineering_string(PINTD_ BIGNUM*bn, char **dest);
-int BN_round (PINTD_ BIGNUM *victim, BN_CONTEXT *context);
+void BN_round (PINTD_ BIGNUM *victim, BN_CONTEXT *context);
 void BN_round_as_integer(PINTD_ BIGNUM *, BN_CONTEXT* );
 void BN_EXCEPT(PINTD_ BN_EXCEPTIONS, char*);
 void BN_add(PINTD_ BIGNUM* result, BIGNUM *one, BIGNUM *two, BN_CONTEXT *context);

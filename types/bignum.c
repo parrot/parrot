@@ -139,6 +139,7 @@ int
 BN_idivide (PINTD_ BIGNUM* result, BIGNUM *one, BIGNUM *two,
             BN_CONTEXT *context,
             BN_DIV_ENUM operation, BIGNUM* rem);
+int BN_iround (PINTD_ BIGNUM *bn, BN_CONTEXT* context);
 INTVAL BN_to_scieng_string(PINTD_ BIGNUM* bn, char **dest, int eng);
 int BN_strip_lead_zeros(PINTD_ BIGNUM* victim);
 int BN_strip_tail_zeros(PINTD_ BIGNUM* victim);
@@ -925,6 +926,8 @@ int
 BN_strip_lead_zeros(PINTD_ BIGNUM* bn) {
     INTVAL msd, i;
   
+    if (bn->digits == 0) return 0; /* Cannot "fail" with special nums */
+
     msd = bn->digits-1;
 
     while (0==BN_getd(bn, msd) && msd > 0) {
@@ -1013,7 +1016,7 @@ BN_really_zero(PINTD_ BIGNUM* bn, int allow_neg_zero) {
     return;
 }
 
-/*=for api bignum BN_round(BIGNUM *victim, BN_CONTEXT* context)
+/*=for api bignum BN_iround(BIGNUM *victim, BN_CONTEXT* context)
 
 Rounds victim according to context.
 
@@ -1037,10 +1040,29 @@ precision: -1 =>  1.2345E+3     1234.5
 precision: -9 =>  1.234567E+3   1234.567
 
 =cut*/
+void
+BN_round(PINTD_ BIGNUM *bn, BN_CONTEXT* context) {
+    /* In exported version, must check for sNAN */
+    if (bn->digits == 0 && am_sNaN(bn)) {
+        BN_nonfatal(PINT_ context, BN_INVALID_OPERATION,
+                    "sNaN in round");
+        BN_set_sNAN(PINT_ bn);
+        return;
+    }
+    else {
+        BN_iround(PINT_ bn, context);
+        return;
+    }
+}
+
 int
-BN_round (PINTD_ BIGNUM *bn, BN_CONTEXT* context) {
+BN_iround (PINTD_ BIGNUM *bn, BN_CONTEXT* context) {
     assert(bn!= NULL);
     assert(context != NULL);
+
+    if (bn->digits == 0) {
+        return 0; /* rounding special values always works */
+    }
 
     if (context->precision < 1) { /* Rounding a BigInt or fixed */
         BN_round_as_integer(PINT_ bn, context);
@@ -1160,7 +1182,7 @@ BN_round_up(PINTD_ BIGNUM *bn, BN_CONTEXT* context) {
         }
         bn->expn += extra;
         bn->digits = context->precision +1;
-        return BN_round(PINT_ bn, context);
+        return BN_iround(PINT_ bn, context);
     }
     else {
         INTVAL extra = bn->digits - context->precision;
@@ -1232,10 +1254,10 @@ BN_round_as_integer(PINTD_ BIGNUM *bn, BN_CONTEXT *context) {
             BN_grow(bn, bn->digits + 1);
             BN_setd(bn, bn->digits, 0);
             bn->digits++;
-            BN_round(PINT_ bn, &temp_context);
+            BN_iround(PINT_ bn, &temp_context);
         }
         else {
-            BN_round(PINT_ bn, &temp_context);
+            BN_iround(PINT_ bn, &temp_context);
         }
         BN_really_zero(PINT_ bn, context->extended);
 
@@ -1303,8 +1325,8 @@ BN_arith_setup(PINTD_ BIGNUM* result, BIGNUM *one, BIGNUM *two,
                BN_CONTEXT *context, BN_SAVE_PREC* restore) {
     BN_strip_lead_zeros(PINT_ one);
     BN_strip_lead_zeros(PINT_ two);
-    BN_round(PINT_ one, context);
-    BN_round(PINT_ two, context);
+    BN_iround(PINT_ one, context);
+    BN_iround(PINT_ two, context);
     if (restore) {
         restore->one = *one;
         restore->two = *two;
@@ -1345,7 +1367,7 @@ BN_arith_cleanup(PINTD_ BIGNUM* result, BIGNUM *one, BIGNUM *two,
     traps_save = context->traps;
     flags_save = context->flags;
     context->traps &= ~(unsigned char)BN_F_LOST_DIGITS;
-    BN_round(PINT_ result, context);
+    BN_iround(PINT_ result, context);
     context->traps = traps_save;
     context->flags =  (context->flags & ~(unsigned char)BN_F_LOST_DIGITS)
                     | (flags_save & BN_F_LOST_DIGITS);
@@ -2126,7 +2148,7 @@ BN_divide(PINTD_ BIGNUM* result, BIGNUM *one, BIGNUM *two,
         save_lost = context->traps;
         context->traps &= ~(unsigned char)BN_F_LOST_DIGITS;
         flags_save = context->flags;
-        BN_round(PINT_ result, context);
+        BN_iround(PINT_ result, context);
 
         /* We need to check the remainder here, as we might have
            passed "[digits we want]0[digits we've kept a secret]" into
