@@ -208,14 +208,12 @@ PIO_copy_stack(ParrotIOLayer *stack)
 {
     ParrotIOLayer *ptr_new;
     ParrotIOLayer **ptr_ptr_new;
-    ParrotIOLayer *ptr_proto;
     ParrotIOLayer *ptr_last = NULL;
     ptr_ptr_new = &ptr_new;
-    ptr_proto = stack;
-    while (ptr_proto) {
-        *ptr_ptr_new = PIO_base_new_layer(ptr_proto);
+    while (stack) {
+        *ptr_ptr_new = PIO_base_new_layer(stack);
         (*ptr_ptr_new)->up = ptr_last;
-        ptr_proto = ptr_proto->down;
+        stack = stack->down;
         ptr_last = *ptr_ptr_new;
         ptr_ptr_new = &((*ptr_ptr_new)->down);
     }
