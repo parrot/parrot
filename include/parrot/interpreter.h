@@ -174,6 +174,14 @@ typedef struct Parrot_Interp {
     int has_early_DOD_PMCs;   /* Flag that some want immediate destruction */
 } Interp;
 
+/*
+ * Macros to make accessing registers more convenient/readable.
+ */
+#define REG_INT(x) interpreter->int_reg.registers[x]
+#define REG_NUM(x) interpreter->num_reg.registers[x]
+#define REG_STR(x) interpreter->string_reg.registers[x]
+#define REG_PMC(x) interpreter->pmc_reg.registers[x]
+
 #define PCONST(i) PF_CONST(interpreter->code, (i))
 #define PNCONST   PF_NCONST(interpreter->code)
 
