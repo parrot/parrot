@@ -854,7 +854,7 @@ tags:
 testexec: hello-parrot hello-clean
 
 hello-clean:
-	@$(RM_F) hello.pasm hello$(P) hello
+	@$(RM_F) hello.pasm hello$(O) hello
 
 hello-parrot: hello
 
