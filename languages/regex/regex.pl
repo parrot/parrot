@@ -1,4 +1,4 @@
-#! perl -w
+#!/usr/bin/perl -w
 
 use lib 'lib';
 use Regex;
@@ -9,7 +9,10 @@ my $expr;
 my $tree_opt = 1;
 my $list_opt = 1;
 my $debug = 0;
-foreach (@ARGV) {
+my $output;
+my $subname;
+while (@ARGV) {
+    $_ = shift;
     if (/--no(-?)optimize/) {
         $tree_opt = 0;
         $list_opt = 0;
@@ -19,6 +22,12 @@ foreach (@ARGV) {
         $list_opt = ($opts =~ /l/i);
     } elsif (/--debug/ || $_ eq '-d') {
         $debug = 1;
+    } elsif (/--output-file=(.*)/) {
+        $output = $1;
+    } elsif (/--sub-name=(.*)/) {
+        $subname = $1;
+    } elsif ($_ eq '-o') {
+        $output = shift;
     } elsif (! defined $expr) {
         $expr = $_;
     } elsif (! defined $operation) {
@@ -46,8 +55,49 @@ if ($operation eq 'unparse' || $operation eq 'render') {
     exit;
 }
 
-my $code = Regex::tree_to_list($tree, %options);
+my $ctx = { };
+my $code = Regex::tree_to_list($tree, $ctx, 'regex_done', 'regex_done',
+                               %options);
 
 my @asm = Regex::list_to_pasm($code, %options);
 
-print join("\n", @asm), "\n";
+local *OUTPUT;
+if (! defined $output || $output eq '-') {
+    open(OUTPUT, ">&STDOUT");
+} else {
+    open(OUTPUT, ">$output") or die "create $output: $!";
+}
+
+if ($subname) {
+    print OUTPUT <<"END";
+.sub $subname
+  .param string rx_input
+  .local pmc rx_match
+  .local pmc rx_ptmp
+  .local int rx_tmp
+  .local int rx_len
+  .local pmc rx_stack
+  .local int rx_pos
+  new rx_stack, .PerlArray
+  rx_pos = 0
+END
+}
+print OUTPUT join("\n", @asm), "\n";
+if ($subname) {
+    print OUTPUT <<"END";
+  regex_done:
+#    P5 = rx_match
+#    end
+#    P1 = find_global "_do_end_op"
+    .pcc_begin_return
+    .return rx_match
+    .pcc_end_return
+.end
+
+.sub _do_end_op
+  print "Ending, dude!\\n"
+  end
+.end
+
+END
+}
