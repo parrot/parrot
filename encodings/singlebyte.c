@@ -27,13 +27,13 @@ singlebyte_decode (const void *ptr) {
 }
 
 static INTVAL
-singlebyte_extract_int (const void *ptr) {
+singlebyte_extract_int (const void *ptr, INTVAL length) {
     char *s = (char*)ptr;
     return (INTVAL)strtol(s, NULL, 10); /* XXX: Fixme! */
 }
 
 static FLOATVAL
-singlebyte_extract_num (const void*ptr) {
+singlebyte_extract_num (const void*ptr, INTVAL length) {
     char *s = (char*)ptr;
     return strtod(s, NULL); /* XXX: Fixme! */
 }

@@ -77,12 +77,12 @@ utf8_decode (const void *ptr) {
 }
 
 static INTVAL
-utf8_extract_int (const void *ptr) {
+utf8_extract_int (const void *ptr, INTVAL length) {
     return 0;/* XXX: write me! */
 }
 
 static FLOATVAL
-utf8_extract_num (const void *ptr) {
+utf8_extract_num (const void *ptr, INTVAL length) {
     return 0.0; /* XXX: write me! */
 }
 

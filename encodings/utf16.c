@@ -57,12 +57,12 @@ utf16_decode (const void *ptr) {
 }
 
 static INTVAL
-utf16_extract_int (const void *ptr) {
+utf16_extract_int (const void *ptr, INTVAL length) {
     return 0; /* XXX: Write me! */
 }
 
 static FLOATVAL
-utf16_extract_num (const void *ptr) {
+utf16_extract_num (const void *ptr, INTVAL length) {
     return 0.0; /* XXX: Write me! */
 }
 

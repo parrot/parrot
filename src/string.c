@@ -337,7 +337,7 @@ INTVAL string_to_int (struct Parrot_Interp *interpreter, STRING *s) {
         return 0;
     }
     else {
-        return s->encoding->extract_int(s->bufstart);
+        return s->encoding->extract_int(s->bufstart, s->bufused);
     }
 }
 
@@ -346,7 +346,7 @@ FLOATVAL string_to_num (struct Parrot_Interp *interpreter, STRING *s) {
         return 0.0;
     }
     else {
-        return s->encoding->extract_num(s->bufstart);
+        return s->encoding->extract_num(s->bufstart, s->bufused);
     }
 }
 
