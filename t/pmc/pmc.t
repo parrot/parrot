@@ -151,17 +151,22 @@ CODE
 39483
 OUTPUT
 
-output_is(<<'CODE', <<OUTPUT, "divide integer by other");
+output_is(<<"CODE", <<OUTPUT, "divide integer by other");
+@{[ $fp_equality_macro ]}
 	new P0, PerlInt
 	new P1, PerlInt
 	set P0, 123
 	set P1, 246
 	div P1, P1, P0
+
+	fp_eq P1, 2.0, EQ1
 	print P1
-	print "\n"
+	print "not "
+EQ1:	print "ok 1"
+	print "\\n"
 	end
 CODE
-2.000000
+ok 1
 OUTPUT
 
 #
@@ -516,11 +521,22 @@ output_is(<<CODE, <<OUTPUT, "string to int");
 	print	P0
 	print	"\\n"
 
+	set	P0, "dull and void"
+	set	I0, P0
+	print	I0
+	print	"\\n"
+
+	set	P0, ""
+	set	I0, P0
+	print	I0
+	print	"\\n"
 	end
 CODE
 11
 1 1
 -1-1
+0
+0
 OUTPUT
 
 SKIP: { skip("string->int not finished yet", 1);
@@ -536,9 +552,15 @@ output_is(<<CODE, <<OUTPUT, "nasty string -> int");
 	set	I0, P0
 	print	I0
 	print	"\\n"
+
+	set	P0, "1.23e2"
+	set	I0, P0
+	print	I0
+	print	"\\n"
 CODE
 1Z1
 1
+123
 OUTPUT
 }
 
@@ -609,6 +631,27 @@ EQ8:	print	"ok 8\\n"
 	print	"not "
 EQ9:	print	"ok 9\\n"
 
+	set	P0, "this is empty!"
+	set	N0, P0
+	fp_eq	N0, 0.0, EQ10
+	print	N0
+	print	" not "
+EQ10:	print	"ok 10\\n"
+
+	set	P0, "0e123"
+	set	N0, P0
+	fp_eq	N0, 0, EQ11
+	print	N0
+	print	" not "
+EQ11:	print	"ok 11\\n"
+
+	set	P0, "000000000000000000000000000000000000000001e-0"
+	set	N0, P0
+	fp_eq	N0, 1, EQ12
+	print	N0
+	print	" not "
+EQ12:	print	"ok 12\\n"
+
 	end
 CODE
 ok 1
@@ -620,6 +663,9 @@ ok 6
 ok 7
 ok 8
 ok 9
+ok 10
+ok 11
+ok 12
 OUTPUT
 
 #
@@ -730,17 +776,20 @@ CODE
 OUTPUT
 
 output_is(<<CODE, <<OUTPUT, "(int / int) -> float");
+@{[ $fp_equality_macro ]}
 	new 	P0, PerlInt
 	new	P1, PerlInt
 	new	P2, PerlInt
 	set	P0, 1
 	set	P1, 2
 	div		P2, P0, P1
-	print	P2
-	print	"\\n"
+	fp_eq	P2, 0.5, EQ1
+	print 	P2
+	print	" not "
+EQ1:	print 	"ok 1\\n"
 	end
 CODE
-0.500000
+ok 1
 OUTPUT
 
 output_is(<<'CODE', <<'OUTPUT', "copy");
