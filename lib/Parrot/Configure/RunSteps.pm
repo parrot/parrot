@@ -60,6 +60,7 @@ use vars qw(@steps);
     auto/gdbm.pl
     auto/snprintf.pl
     auto/perldoc.pl
+    auto/python.pl
     auto/antlr.pl
     auto/bc.pl
     gen/icu.pl
