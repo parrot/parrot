@@ -26,7 +26,9 @@ pmclass MultiSub extends ResizablePMCArray need_ext does array {
 
     void push_pmc(PMC* value) {
 	STRING *_sub = CONST_STRING(interpreter, "Sub");
-	if (!VTABLE_isa(interpreter, value, _sub))
+	STRING *_nci = CONST_STRING(interpreter, "NCI");
+	if (!VTABLE_isa(interpreter, value, _sub) &&
+            !VTABLE_isa(interpreter, value, _nci))
 	    internal_exception(1, "attempt to push non Sub PMC");
 	SUPER(value);
     }

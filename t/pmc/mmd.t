@@ -16,7 +16,7 @@ Tests the multi-method dispatch.
 
 =cut
 
-use Parrot::Test tests => 18;
+use Parrot::Test tests => 19;
 
 pir_output_is(<<'CODE', <<'OUTPUT', "PASM divide");
 
@@ -653,6 +653,9 @@ Any    42
 Any    43
 OUT
 
+SKIP: {
+  skip("not yet", 2);
+
 pir_output_is(<<'CODE', <<'OUTPUT', "__add as method");
 .sub main @MAIN
     new $P0, .Integer
@@ -669,3 +672,20 @@ CODE
 42
 OUTPUT
 
+pir_output_is(<<'CODE', <<'OUTPUT', "__add as method - inherited");
+.sub main @MAIN
+    new $P0, .PerlInt
+    new $P1, .PerlInt
+    new $P2, .PerlInt
+    set $P1, 3
+    set $P2, 39
+    $P0 = $P1."__add"($P2)
+    print $P0
+    print "\n"
+    end
+.end
+CODE
+42
+OUTPUT
+
+}

@@ -1354,7 +1354,8 @@ mmd_create_builtin_multi_stub(Interp *interpreter, INTVAL func_nr)
 }
 
 static void
-mmd_create_builtin_multi_meth(Interp *interpreter, const MMD_init *entry)
+mmd_create_builtin_multi_meth(Interp *interpreter, INTVAL type,
+        const MMD_init *entry)
 {
     const char *name, *short_name;
     char signature[6], val_sig;
@@ -1408,9 +1409,9 @@ mmd_create_builtin_multi_meth(Interp *interpreter, const MMD_init *entry)
             const_string(interpreter, signature),
             F2DPTR(entry->func_ptr));
     Parrot_store_global(interpreter,
-        Parrot_base_vtables[entry->left]->whoami,
-        const_string(interpreter, name),
-        method);
+            Parrot_base_vtables[type]->whoami,
+            const_string(interpreter, name),
+            method);
 
     /*
      * push method on multi_sub
@@ -1468,7 +1469,7 @@ Parrot_mmd_register_table(Interp* interpreter, INTVAL type,
                     mmd_table[i].func_nr, type,
                     type, mmd_table[i].func_ptr);
         }
-        mmd_create_builtin_multi_meth(interpreter, mmd_table + i);
+        mmd_create_builtin_multi_meth(interpreter, type, mmd_table + i);
     }
     /*
      * register specific mmds for this type
