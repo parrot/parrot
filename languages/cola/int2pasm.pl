@@ -173,7 +173,7 @@ sub reg_assign {
 		die "Don't know how to assign register to type $type\n";
 	}
 	# Literal
-	if($lexical =~ /^(\d|[.]|\"|\')/) {return $lexical;}
+	if($lexical =~ /^(\d|[.+-]|\"|\')/) {return $lexical;}
 
 	die("Use of undeclared lexical [$lexical]");
 }

@@ -24,6 +24,7 @@ int yyerror( char * );
 LETTER		[a-zA-Z_]
 DIGIT		[0-9]
 LETTERDIGIT	[a-zA-Z0-9_]
+SIGN		[-+]
 STRINGCONSTANT	\"[^"\n]*["\n]
 
 %%
@@ -86,14 +87,14 @@ STRINGCONSTANT	\"[^"\n]*["\n]
                 				return(IDENTIFIER);
                 			}
 
-{DIGIT}+"."{DIGIT}+         {	
+{SIGN}?{DIGIT}+"."{DIGIT}+         {	
                 				Symbol * s = new_symbol(LITERAL, yytext);
                 				s->type = t_float;
                 				yylval.sym = s; 
                 				return(LITERAL);
                 			}
 
-{DIGIT}+                    {	
+{SIGN}?{DIGIT}+                    {	
                 				Symbol * s = new_symbol(LITERAL, yytext);
                 				s->type = t_int;
                 				yylval.sym = s; 
