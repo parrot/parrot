@@ -208,7 +208,7 @@ $(PDUMP): pdump$(O) $(O_FILES)
 
 test_main$(O): test_main.c $(H_FILES)
 
-Parrot/Jit.pm: Parrot/Jit/${jitarchname}.pm Parrot/Jit/${cpuarch}Generic.pm
+Parrot/Jit.pm: Parrot/Jit/${jitarchname}.pm Parrot/Jit/${jitcpuarch}Generic.pm
 	$(PERL) -MFile::Copy=cp -e ${PQ}cp q|Parrot/Jit/${jitarchname}.pm|, q|Parrot/Jit.pm|${PQ}
 
 Parrot/OpLib/core.pm: $(OPS_FILES) ops2pm.pl Parrot/OpsFile.pm Parrot/Op.pm
