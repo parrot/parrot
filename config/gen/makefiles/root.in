@@ -722,7 +722,10 @@ install :
 
 release : MANIFEST MANIFEST.generated
 	[ -d parrot-$(VERSION) ] || ln -s . parrot-$(VERSION)
-	tar zcvf parrot-$(VERSION).tar.gz $$(perl -lane '/DEVELOPING/&&next;print"parrot-$(VERSION)/$$F[0]"unless!length||/#/' MANIFEST)
+	cp MANIFEST MANIFEST.real
+	grep -v DEVELOPING MANIFEST.real > MANIFEST
+	tar zcvf parrot-$(VERSION).tar.gz $$(perl -lane 'print"parrot-$(VERSION)/$$F[0]"unless!length||/#/' MANIFEST)
+	mv MANIFEST.real MANIFEST
 	rm parrot-$(VERSION)
 
 rpms : release
