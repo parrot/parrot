@@ -302,10 +302,9 @@ string_init(Parrot_Interp interpreter)
             if (!*data_dir)
                 goto no_set;
             prefix = Parrot_get_runtime_prefix(interpreter, NULL);
-            if (prefix) {
-                p = strstr(build_path, "blib");        /* .../blib/lib/... */
-                assert(p);
-                --p;        /* slash or backslash */
+            if (prefix && (p = strstr(build_path, "blib"))) {
+                /* .../blib/lib/... */
+                --p;        /* slash or backslash - XXX FIXME - assumes single char */
                 data_dir = mem_sys_allocate(strlen(prefix) + strlen(p) + 1);
                 strcpy(data_dir, prefix);
                 strcat(data_dir, p);
@@ -315,7 +314,7 @@ string_init(Parrot_Interp interpreter)
         string_set_data_directory(data_dir);
 no_set:
         if (free_data_dir)
-            mem_sys_free((void*)data_dir); /* cast away the constness */
+            mem_sys_free(const_cast(data_dir));
     }
 
     /*
