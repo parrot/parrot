@@ -70,7 +70,11 @@ Parrot_setenv(const char *name, const char *value)
 void *
 Parrot_dlopen(const char *filename)
 {
+#ifdef HAS_DLOPEN
     return dlopen(filename, PARROT_DLOPEN_FLAGS);
+#else
+    return 0;
+#endif
 }
 
 
@@ -81,7 +85,11 @@ Parrot_dlopen(const char *filename)
 const char *
 Parrot_dlerror(void)
 {
+#ifdef HAS_DLOPEN
     return dlerror();
+#else
+    return 0;
+#endif
 }
 
 
@@ -92,7 +100,11 @@ Parrot_dlerror(void)
 void *
 Parrot_dlsym(void *handle, const char *symbol)
 {
+#ifdef HAS_DLOPEN
     return dlsym(handle, symbol);
+#else
+    return 0;
+#endif
 }
 
 
@@ -103,7 +115,11 @@ Parrot_dlsym(void *handle, const char *symbol)
 int
 Parrot_dlclose(void *handle)
 {
+#ifdef HAS_DLOPEN
     return dlclose(handle);
+#else
+    return -1;
+#endif
 }
 
 /*

@@ -330,6 +330,7 @@ ctanl       complex.h
 ctime       time.h
 difftime    time.h
 div         stdlib.h
+dlopen      dlfcn.h
 erf         math.h
 erfc        math.h
 erfcf       math.h
