@@ -23,12 +23,12 @@ use vars qw(@steps);
 	auto/jit.pl
 	auto/funcptr.pl
 	auto/cgoto.pl
-	auto/alignptrs.pl
 	gen/config_h.pl
 	gen/config_pm.pl
 	gen/makefiles.pl
 	gen/platform.pl
 );
+#	auto/alignptrs.pl
 
 sub runsteps {
 	shift;

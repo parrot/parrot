@@ -293,10 +293,6 @@ trace_system_stack(struct Parrot_Interp *interpreter, PMC *last)
     size_t pmc_min = get_min_pmc_address(interpreter);
     size_t pmc_max = get_max_pmc_address(interpreter);
 
-#if ALIGNED_POINTERS
-    direction *= sizeof(void*);
-#endif
-
     if (!lo_var_ptr)
         return last;
     

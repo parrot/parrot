@@ -8,13 +8,9 @@
 #include <stdio.h>
 
 int main(int argc, char **argv) {
-	void *ptr1, *ptr2;
-	size_t lo_var_ptr = (size_t)&ptr1;
-	size_t hi_var_ptr = (size_t)&ptr2;
-	size_t cur_var_ptr;
-	size_t direction = (hi_var_ptr > lo_var_ptr) ? 1 : -1;
+	void *ptr1, *ptr2, *ptr3;
 
-	printf("%i",*(void **)(lo_var_ptr+1));
+	printf("%i",*(void **)( (char*)&ptr2 + 1 ));
 	printf("OK");
 
 	return 0;
