@@ -451,4 +451,5 @@
 	      moving tests to the new hierarchy.
 	    - 4 new test files.
 	* Test Failures:
-	    - none 
+	    - t/rx/call.t     1   256     2    1  50.00%  2
+	    - same old memory corruption bug in parrot
