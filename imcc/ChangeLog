@@ -1,3 +1,7 @@
+- 2003-08-08	leo
+
+	* try_find_op: e.g. add_n_i_n => add_n_n_i
+
 - 2003-08-02	leo
 
 	* DEPRECATE NESTED SUBROUTINES and CODE OUTSIDE OF SUBS
