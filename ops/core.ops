@@ -381,7 +381,7 @@ continuations.
 
 =item B<invoke>()
 
-Call the subroutine in P0, with parrot calling convention as
+Call the subroutine in P0, with Parrot calling convention as
 described in PDD03.
 
 =item B<invoke>(in PMC)

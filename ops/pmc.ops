@@ -145,7 +145,7 @@ inline op typeof (out INT, in PMC, in INTKEY) {
 
 =item B<typeof>(out STR, in INT)
 
-Return the (native) parrot type of datatype $2.
+Return the (native) Parrot type of datatype $2.
 
 =cut
 
@@ -161,7 +161,7 @@ inline op typeof(out STR, in INT) {
 
 =item B<find_type>(out INT, in STR)
 
-Find the PMC type or parrot data type by name.
+Find the PMC type or Parrot datatype by name.
 
 =cut
 
@@ -174,7 +174,7 @@ op find_type(out INT, in STR) {
 
 =item B<valid_type>(out INT, in INT)
 
-Check if the PMC type or parrot data type $2 is valid.
+Check if the PMC type or Parrot datatype $2 is valid.
 
 =cut
 

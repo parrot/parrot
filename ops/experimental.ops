@@ -14,9 +14,8 @@ experimental.ops - Experimental Operations
 
 This file contains operations that are in an experimental state. Do not
 rely upon the existence of the ops in this file when writing production code.
-There is no decision yet whether they are accepted as regular parrot ops or not.
-They are included here for testing purposes only!
-
+No decision has yet been made as to whether they are accepted as regular 
+Parrot ops or not. They are included here for testing purposes only!
 
 =cut
 

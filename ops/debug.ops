@@ -34,7 +34,7 @@ Initial version by Daniel Grunblatt on 2002.5.19
 
 =item B<debug_init>()
 
-Init the parrot debugger, must be called before any other debug op.
+Init the Parrot debugger, must be called before any other debug op.
 
 =cut
 
@@ -113,7 +113,7 @@ op debug_break() :base_debug {
 
 =item B<debug_print>()
 
-Print all the parrot registers at once.
+Print all the Parrot registers at once.
 
 =cut
 
