@@ -15,7 +15,6 @@ CFLAGS = ${ccflags} ${cc_debug} -I../include
 C_LIBS = ${libs}
 
 CC = ${cc}
-LD = ${ld}
 PERL = ${perl}
 
 .c$(O):
@@ -37,32 +36,6 @@ perlstring.c: perlstring.pmc
 	$(PERL) pmc2c.pl perlstring.pmc
 
 perlstring$(O): $(H_FILES)
-
-interpreter$(O): interpreter.c $(H_FILES)
-
-memory$(O): $(H_FILES)
-
-packfile$(O): $(H_FILES)
-
-parrot$(O): $(H_FILES)
-
-register$(O): $(H_FILES)
-
-stacks$(O): $(H_FILES)
-
-core_ops$(O): $(H_FILES) core_ops.c
-
-core_ops.c $(INC)/oplib/core_ops.h: core.ops vtable.ops ops2c.pl
-	$(PERL) ops2c.pl core.ops vtable.ops
-
-vtable.ops: make_vtable_ops.pl
-	$(PERL) make_vtable_ops.pl > vtable.ops
-
-$(INC)/config.h: Configure.pl config_h.in
-	$(PERL) Configure.pl
-
-$(INC)/vtable.h: vtable.tbl vtable_h.pl
-	$(PERL) vtable_h.pl
 
 clean:
 	$(RM_F) *.c *$(O)
