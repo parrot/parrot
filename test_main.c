@@ -51,6 +51,7 @@ main(int argc, char *argv[])
     Parrot_runcode(interpreter, argc, argv);
     Parrot_destroy(interpreter);
 
+    Parrot_exit(0);
     return 0;
 }
 
@@ -102,7 +103,7 @@ parseflags(Parrot_Interp interpreter, int *argc, char **argv[])
             Parrot_setwarnings(interpreter, PARROT_WARNINGS_ALL_FLAG);
             break;
 
-        case '.':  /* Give Windows Parrot hackers an opportunity to 
+        case '.':  /* Give Windows Parrot hackers an opportunity to
                     * attach a debuggger. */
             fgetc(stdin);
             break;
@@ -191,7 +192,7 @@ the GNU General Public License or the Artistic License for more details.\n\n");
  * Local variables:
  * c-indentation-style: bsd
  * c-basic-offset: 4
- * indent-tabs-mode: nil 
+ * indent-tabs-mode: nil
  * End:
  *
  * vim: expandtab shiftwidth=4:

@@ -44,6 +44,8 @@ void Parrot_debug(Parrot_Interp, int argc, char ** argv);
 
 void Parrot_disassemble(Parrot_Interp);
 
+void Parrot_exit(int status);
+
 #endif
 
 /*
