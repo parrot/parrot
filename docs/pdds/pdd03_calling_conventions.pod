@@ -67,13 +67,13 @@ makes no guarantees here.
 
 The return continuation PMC type, used to create return continuations
 used for call/return style programming, guarantees that registers
-16-31 will be set such that the contents of those registers are
-identical to the content of the registers when the return continuation
-was I<created>. Note that if a return continuation object is created
-explicitly, rather than by an invocation op, the preserved registers
-will be in the state they were at the time the continuation was made,
-rather than the state they were at the time the continuation was
-passed into an invocation.
+16-31 for all types (P, N, S, and I) will be set such that the
+contents of those registers are identical to the content of the
+registers when the return continuation was I<created>. Note that if a
+return continuation object is created explicitly, rather than by an
+invocation op, the preserved registers will be in the state they were
+at the time the continuation was made, rather than the state they were
+at the time the continuation was passed into an invocation.
 
 =head2 Calling conventions
 
