@@ -110,7 +110,7 @@ AUTO_OP time_i {
 
 // PRINT Ix
 AUTO_OP print_i {
-  printf("I reg %i is %i\n", P1, INT_REG(P1));
+  printf("I reg %li is %li\n", P1, INT_REG(P1));
 }
  
 // BRANCH CONSTANT
@@ -202,7 +202,7 @@ AUTO_OP time_n {
 
 // PRINT Nx
 AUTO_OP print_n {
-  printf("N reg %i is %Lf\n", P1, NUM_REG(P1));
+  printf("N reg %li is %Lf\n", P1, NUM_REG(P1));
 }
  
 // INC Nx
@@ -307,7 +307,7 @@ AUTO_OP set_s_sc {
 // PRINT Sx
 AUTO_OP print_s {
   STRING *s = STR_REG(P1); 
-   printf("S reg %i is %.*s\n", P1, string_length(s), s->bufstart);
+   printf("S reg %li is %.*s\n", P1, (int) string_length(s), (char *) s->bufstart);
 }
 
 // LEN Ix, Sx

@@ -93,7 +93,7 @@ read_constants_table(void** program_code)
         }
         num--;
         if (len < 0 || (len > 0 && num == 0)) {
-            printf("Bytecode error: string constant segment corrupted: %i, %i\n", len, num);
+            printf("Bytecode error: string constant segment corrupted: %i, %i\n", (int) len, (int) num);
             exit(1);
         }
     }
