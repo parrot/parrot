@@ -161,7 +161,7 @@ TEST_PROG_SO = ${test_prog}_so${exe}
 LIBPARROT = ${blib_lib_libparrot_a}
 PDUMP = pdump${exe}
 
-# lclint has changed name to split at v3.0
+# lclint has changed name to splint at v3.0
 LINT = splint
 
 # note: +distinctinternalnames with +externalnamelen at 8 characters
