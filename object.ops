@@ -53,6 +53,23 @@ op callmeth() {
   goto ADDRESS(dest);
 }
 
+op callmethcc() {
+  opcode_t *dest;
+  PMC *method_pmc;
+  opcode_t *next = expr NEXT();
+
+  REG_PMC(1) = new_ret_continuation_pmc(interpreter, next);
+
+  method_pmc = VTABLE_find_method(interpreter, REG_PMC(2), REG_STR(0));
+  if (NULL == method_pmc) {
+    /* Pitch a fit */
+  }
+  REG_PMC(0) = method_pmc;
+  dest = (opcode_t *)REG_PMC(0)->vtable->invoke(interpreter, REG_PMC(0), next);
+  goto ADDRESS(dest);
+}
+=cut
+
 
 =item B<can>(out INT, in PMC, in STR)
 
