@@ -63,7 +63,7 @@ typedef enum {
 } exception_severity;
 
 /* Right now there's nothing special for the jump buffer, but there might be one later, so we wrap it in a struct so that we can expand it later */
-struct Parrot_exception {
+struct parrot_exception_t {
 	Parrot_jump_buff destination;
 	long language;
 	long system;
@@ -71,7 +71,7 @@ struct Parrot_exception {
 	long error;
 	};
 	
-typedef struct Parrot_exception Parrot_exception;
+typedef struct parrot_exception_t Parrot_exception;
 
 #endif
 
