@@ -94,13 +94,13 @@ IV *inc_i_ic(IV cur_opcode[], struct Perl_Interp *interpreter) {
 
 // DEC Ix
 IV *dec_i(IV cur_opcode[], struct Perl_Interp *interpreter) {
-  INT_REG(cur_opcode[1]);
+  INT_REG(cur_opcode[1])--;
   return cur_opcode + 2;
 }
 
 // DEC Ix, nnn
 IV *dec_i_ic(IV cur_opcode[], struct Perl_Interp *interpreter) {
-  INT_REG(cur_opcode[1]) += cur_opcode[2];
+  INT_REG(cur_opcode[1]) -= cur_opcode[2];
   return cur_opcode + 3;
 }
 
@@ -189,7 +189,7 @@ IV *inc_n_nc(IV cur_opcode[], struct Perl_Interp *interpreter) {
 
 // DEC Nx
 IV *dec_n(IV cur_opcode[], struct Perl_Interp *interpreter) {
-  NUM_REG(cur_opcode[1]);
+  NUM_REG(cur_opcode[1]) -= 1;
   return cur_opcode + 2;
 }
 
