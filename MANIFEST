@@ -55,6 +55,7 @@ docs/running.pod
 docs/strings.pod
 docs/tests.pod
 docs/vtables.pod
+editor/pasm.vim
 embed.c
 encoding.c
 encodings/singlebyte.c
