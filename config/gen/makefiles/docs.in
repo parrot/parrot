@@ -1,9 +1,15 @@
 PERL = ${perl}
 RM_F = ${rm_f}
 
+# Make directory; do not die if dir exists.
+MKDIR = $(PERL) -e ${PQ}-d or mkdir $$_,0777 or die foreach @ARGV${PQ}
+
 POD = ${pod}
 
-all: packfile-c.pod packfile-perl.pod $(POD)
+all: doc-prep packfile-c.pod packfile-perl.pod $(POD)
+
+doc-prep:
+	$(MKDIR) ops
 
 packfile-c.pod: ../packfile.c
 	perldoc -u ../packfile.c > packfile-c.pod
