@@ -1,0 +1,307 @@
+=head1 TITLE
+
+Stream::Base - Stream library base class
+
+=head1 VERSION
+
+version 0.1
+
+=head1 SYNOPSIS
+
+This is an abstract baseclass that is not supposed to be used directly.
+
+=head1 DESCRIPTION
+
+TBD
+
+=head1 METHODS
+
+=over 4
+
+=cut
+
+.sub __stream_base_onload prototyped, @LOAD
+    .local int i
+    .local pmc base
+
+    find_type i, "Stream::Base"
+    if i > 1 goto END
+
+    load_bytecode "library/Data/Escape.imc"
+    
+    newclass base, "Stream::Base"
+    addattribute base, 'source'
+    addattribute base, 'includes'
+END:
+    .pcc_begin_return
+    .pcc_end_return
+.end
+
+
+.namespace ["Stream::Base"]
+
+.sub __init method
+    .local pmc close
+
+    close = find_global "Stream::Base", "close"
+    close()
+.end
+
+=item assign stream, source
+
+=cut
+
+.sub __set_pmc method
+    .param pmc source
+
+#    print "base::assign '"
+#    typeof S0, source
+#    print S0
+#    print "'\n"
+    classoffset I0, self, "Stream::Base"
+    setattribute self, I0, source
+    null source
+    .pcc_begin_return
+    .pcc_end_return
+.end
+
+.sub setSource method
+#    print "base::setSource\n"
+    newsub P0, .Sub, __set_pmc
+    invoke
+.end
+
+.sub close method
+    .local pmc temp
+
+    # reset source    
+    classoffset I0, self, "Stream::Base"
+    new temp, .PerlUndef
+    setattribute self, I0, temp
+
+    # reset includes
+    inc I0
+    new temp, .PMCArray
+    setattribute self, I0, temp
+.end
+
+=item stream."dump"() (debug aid)
+
+Dumps the content of the stream.
+
+Returns nothing.
+
+=cut
+
+.sub dump method
+    .local string str
+    .local int i
+    .local pmc escape
+    
+    escape = find_global "Data::Escape", "String"
+LOOP:
+    i = self."connected"()
+    unless i goto END
+    str = self."read"()
+    isnull str, END
+    print "read:["
+    str = escape( str )
+    print str
+    print "]\n"
+    branch LOOP
+END:
+    .pcc_begin_return
+    .pcc_end_return
+.end
+
+.sub copyTo method
+    .param pmc to
+    .local string str
+    .local int i
+    
+LOOP:
+    i = self."connected"()
+    unless i goto END
+    str = self."read"()
+    isnull str, END
+    print to, str
+    branch LOOP
+END:
+    .pcc_begin_return
+    .pcc_end_return
+.end
+
+=item source = stream."source"()
+
+Returns the currently set source.
+
+=cut
+
+.sub source method
+    .local pmc ret
+
+    if argcP != 0 goto ERROR
+    if argcI != 0 goto ERROR
+    if argcS != 0 goto ERROR
+    if argcN != 0 goto ERROR
+    classoffset I0, self, "Stream::Base"
+    getattribute ret, self, I0
+
+#    print "base::source '"
+#    typeof S0, ret
+#    print S0
+#    print "'\n"
+    
+    .pcc_begin_return
+    .return ret
+    .pcc_end_return
+ERROR:
+    print "Stream::Base::source(): parameters passed\n"
+    end
+.end
+
+=item is = stream."connected"()
+
+Returns 1 if the stream is connected, 0 otherwise.
+
+It is connected until the source sub returns.
+
+=cut
+
+.sub connected method
+    .local pmc stream
+
+    classoffset I0, self, "Stream::Base"
+    getattribute P0, self, I0
+    typeof I0, P0
+    if I0 == .PerlUndef goto NOT
+
+    can I0, P0, "connected"
+    unless I0 goto SKIP
+    I0 = P0."connected"()
+    unless I0 goto NOT
+SKIP:
+    .pcc_begin_return
+    .return 1
+    .pcc_end_return
+NOT:
+    .pcc_begin_return
+    .return 0
+    .pcc_end_return
+.end
+
+=item str = stream."read"()
+
+Returns the read string, or a null string if the stream end has been reached.
+
+=cut
+
+.sub read method
+    .local string ret
+    .local pmc includes
+
+    classoffset I0, self, "Stream::Base"
+    inc I0
+    getattribute includes, self, I0
+
+    I0 = includes
+    if I0 > 0 goto INCLUDE
+    
+SELF:
+    ret = self."rawRead"()
+
+    isnull ret, INCLUDE_CHECK
+
+DONE:
+    .pcc_begin_return
+    .return ret
+    .pcc_end_return
+
+INCLUDE_CHECK:
+    I0 = includes
+    if I0 == 0 goto DONE
+    
+INCLUDE:
+    .local pmc stream
+    
+    stream = includes[0]
+    
+    ret = stream."read"()
+    
+    isnull ret, INCLUDE_DEL
+    branch DONE
+    
+INCLUDE_DEL:
+    shift P0, includes
+    I0 = includes
+    if I0 > 0 goto INCLUDE
+    branch SELF
+.end
+
+=item stream."include"( stream2 )
+
+Include stream2 in this stream. The next read on this stream will
+act on the included stream.
+
+Please have a look at F<examples/streams/Include.imc> to see how it works.
+
+=cut
+
+.sub include method
+    .param pmc stream
+    .local pmc includes
+
+    classoffset I0, self, "Stream::Base"
+    inc I0
+    getattribute includes, self, I0
+    push includes, stream
+
+    self."flush"()
+        
+    .pcc_begin_return
+    .pcc_end_return
+.end
+
+=item stream."flush"() (B<internal>)
+
+Used to flush the stream when including another stream.
+
+=cut
+
+.sub flush method
+    .local int i
+    .local string str
+    .local pmc includes
+    
+    can i, self, "write"
+    unless i goto CANT
+    
+    classoffset I0, self, "Stream::Base"
+    inc I0
+    getattribute includes, self, I0
+    
+    i = includes
+    if i == 0 goto CANT
+    
+    null str
+    i = self."write"( str )
+    
+CANT:
+    .pcc_begin_return
+    .return i
+    .pcc_end_return
+.end
+
+=back
+
+=head1 AUTHOR
+
+Jens Rieks E<lt>parrot at jensbeimsurfen dot deE<gt> is the author
+and maintainer.
+Please send patches and suggestions to the Perl 6 Internals mailing list.
+
+=head1 COPYRIGHT
+
+Copyright (c) 2004, the Perl Foundation.
+
+=cut

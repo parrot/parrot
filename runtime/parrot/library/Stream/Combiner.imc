@@ -1,0 +1,221 @@
+=head1 TITLE
+
+Stream::Combiner - combines different streams to a single stream.
+
+=head1 VERSION
+
+version 0.1
+
+=head1 SYNOPSIS
+
+Please have a look at the examples
+F<examples/streams/Combiner.imc> and
+F<examples/streams/FileLines.imc>.
+
+=head1 DESCRIPTION
+
+TBD
+
+=head1 METHODS
+
+=over 4
+
+=cut
+
+.sub __stream_combiner_onload @LOAD
+    .local int i
+    .local pmc base
+    .local pmc comb
+    
+    find_type i, "Stream::Combiner"
+    if i > 1 goto END
+    
+    getclass base, "Stream::Base"
+    subclass comb, base, "Stream::Combiner"
+    
+    addattribute comb, "combiner"
+END:
+    .pcc_begin_return
+    .pcc_end_return
+.end
+
+.sub _default_combiner
+    .param pmc args
+    .local string ret
+
+    join ret, "", args
+
+    .pcc_begin_return
+    .return ret
+    .pcc_end_return
+.end
+
+.include "iterator.pasm"
+
+.namespace ["Stream::Combiner"]
+
+.sub __init method
+    .local pmc temp
+    
+    newsub temp, .Sub, _default_combiner
+    self."combiner"( temp )
+    
+    temp = new .PMCArray
+    self."setSource"( temp )
+.end
+
+=item combiner = stream."combiner"( sub )
+
+Sets (or just returns) the combiner sub.
+
+=cut
+
+.sub combiner method
+    .param pmc combiner
+    .local pmc ret
+    
+    classoffset I0, self, "Stream::Combiner"
+    if argcP == 0 goto GET    
+    setattribute self, I0, combiner
+    ret = combiner
+    branch END
+GET:
+    getattribute ret, self, I0
+END:
+    .pcc_begin_return
+    .return ret
+    .pcc_end_return
+.end
+
+=item assign stream, source
+
+Assign a source to this stream.
+You can call assign several times to assign several sources to the stream.
+
+=cut
+
+.sub __set_pmc method
+    .param pmc arg
+    .local pmc source
+    
+    source = self."source"()
+    push source, arg
+.end
+
+=item is = stream."connected"()
+
+Returns 1 if all assigned sources are connected, 0 otherwise.
+
+=cut
+
+.sub connected method
+    .local pmc sources
+    .local pmc source
+    .local int i
+
+    # get the sources
+    sources = self."source"()
+    
+    # check if at least one sources is defined
+    i = sources
+    if i == 0 goto NOT_CONNECTED
+
+    # create an iterator for the sources
+    new sources, .Iterator, sources
+    set sources, .ITERATE_FROM_START
+
+LOOP:
+    # stream is connected if no sources are left
+    unless sources goto IS_CONNECTED
+    
+    # check the next source
+    source = shift sources
+    i = source."connected"()
+        
+    # proceed with the next source if connected
+    if i goto LOOP
+    
+NOT_CONNECTED:
+    .pcc_begin_return
+    .return 0
+    .pcc_end_return
+    
+IS_CONNECTED:
+    .pcc_begin_return
+    .return 1
+    .pcc_end_return
+.end
+
+=item source."rawRead"() (B<internal>)
+
+Reads from all assigned sources and calls the combiner.
+
+=cut
+
+.sub rawRead method
+    .local pmc sources
+    .local pmc source
+    .local pmc combiner
+    .local pmc args
+    .local string str
+    .local string ret
+    .local int i
+
+    # get the sources
+    sources = self."source"()
+    
+    # check if at least one sources is defined
+    i = sources
+    if i == 0 goto END_OF_STREAM
+
+    # create an iterator for the sources
+    new sources, .Iterator, sources
+    set sources, .ITERATE_FROM_START
+    
+    # create the string array
+    new args, .StringArray
+    
+READ_LOOP:
+    unless sources goto CALL
+    
+    # read from next stream
+    source = shift sources
+    str = source."read"()
+    
+    # end of stream?
+    isnull str, END_OF_STREAM
+    
+    # push onto array
+    push args, str
+    branch READ_LOOP
+
+CALL:    
+    classoffset i, self, "Stream::Combiner"
+    getattribute combiner, self, i
+
+    ret = combiner( args )
+    .pcc_begin_return
+    .return ret
+    .pcc_end_return
+
+END_OF_STREAM:
+    self."close"()
+    null ret
+    .pcc_begin_return
+    .return ret
+    .pcc_end_return
+.end
+
+=back
+
+=head1 AUTHOR
+
+Jens Rieks E<lt>parrot at jensbeimsurfen dot deE<gt> is the author
+and maintainer.
+Please send patches and suggestions to the Perl 6 Internals mailing list.
+
+=head1 COPYRIGHT
+
+Copyright (c) 2004, the Perl Foundation.
+
+=cut

@@ -1,0 +1,137 @@
+=head1 TITLE
+
+Data::Escape - simple string escaping implemented in PIR
+
+=head1 SYNOPSIS
+
+    ...
+
+    load_bytecode "library/Data/Escape.imc"
+
+    .local pmc escape
+
+    escape = find_global "Data::Escape", "String"
+
+    str = escape( str, "'" )
+
+    ...
+
+
+=head1 DESCRIPTION
+
+This library escapes data to make it usable in PIR and C code.
+
+=cut
+
+=head1 FUNCTIONS
+
+This library provides the following function:
+
+=over 4
+
+=item str = String( str, char )
+
+A simple string escaping function.
+
+=over 4
+
+=item C<string>
+
+The string to escape.
+
+=item C<char>
+
+The quote character used for printing, either ' or ".
+
+=back
+
+This function returns the quoted string.
+
+=cut
+
+.namespace ["Data::Escape"]
+
+.sub String
+    .param string str
+    .param string char
+    .param string ret
+    .local int i
+    .local int j
+    .local int c
+    .local string tmp
+
+    i = 0
+    j = length str
+    null ret
+LOOP:
+    if i >= j goto END
+    tmp = str[i]
+    ord c, tmp
+
+    if c > 40 goto gt40
+    if c > 30 goto gt30
+
+    if c > 0 goto n00
+    set tmp, "\\0"
+    branch DONE
+n00:
+
+    # \t
+    if c != 9 goto n09
+    set tmp, "\\t"
+    branch DONE
+n09:
+
+    # \n
+    if c != 10 goto n10
+    set tmp, "\\n"
+    branch DONE
+n10:
+
+    # \n
+    if c != 10 goto n13
+    set tmp, "\\n"
+    branch DONE
+n13:
+
+gt30: # ascii codes greater than 30 below
+
+    # "
+    ne char, '"', n34
+    if c != 34 goto n34
+    set tmp, '\\"'
+    branch DONE
+n34:
+
+    # '
+    ne char, "'", n39
+    if c != 34 goto n39
+    set tmp, "\\'"
+    branch DONE
+n39:
+
+gt40: # ascii codes greater than 40 below
+
+DONE:
+    concat ret, tmp
+    inc i
+    branch LOOP
+END:
+    .pcc_begin_return
+    .return ret
+    .pcc_end_return
+.end
+
+=back
+
+=head1 AUTHOR
+
+Jens Rieks E<lt>parrot at jensbeimsurfen dot deE<gt> is the author
+and maintainer.
+Please send patches and suggestions to the Perl 6 Internals mailing list.
+
+=head1 COPYRIGHT
+
+Copyright (c) 2004, the Perl Foundation.
+
+=cut

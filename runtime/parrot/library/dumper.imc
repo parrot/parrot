@@ -1,0 +1,167 @@
+=head1 TITLE
+
+dumper.imc - PIR version of Data::Dumper
+
+=head1 VERSION
+
+version 0.10
+
+=head1 SYNOPSIS
+
+	...
+
+	# dump the P0 register
+	_dumper( "P0", P0 )
+
+	...
+
+	END
+	.include "library/dumper.imc"
+
+
+=head1 DESCRIPTION
+
+    PIR implementation of Perl's Data::Dumper module.
+
+=cut
+
+# first method prints usage information
+.sub __library_dumper_onload
+    print "usage:"
+    print "\tload_bytecode \"library/Data/Dumper.imc\"\n"
+    print "\t...\n"
+    print "\tnew dumper, \"Data::Dumper\"\n"
+    print "\tdumper.\"dumper\"( \"foo\", foo )\n\n"
+    end
+.end
+
+.include "errors.pasm"
+
+=head1 FUNCTIONS
+
+This library provides the following functions:
+
+=over 4
+
+=item _dumper( name, pmc[, indent] )
+
+This is the public (non object) interface to the dumper library.
+
+=over 4
+
+=item name
+
+Required. The name of the PMC.
+
+=item pmc
+
+Required. The PMC to dump.
+
+=item indent
+
+Optional. The indent used at the start of each line printed.
+
+=back
+
+B<Note:> This function currently returns nothing. It should return
+the dumped data as a string, like Perl's Data::Dumper. Instead,
+everything is printed out using C<print>.
+
+B<Note: #2> PerlHash keys are now sorted using C<_sort()> (library/sort.imc)
+
+=cut
+
+.sub _dumper
+    saveall
+    _global_dumper()
+    restoreall
+    find_global P2, "Data::Dumper", "global"
+    S0 = "dumper"
+    callmethod
+.end
+
+=item _register_dumper( id, sub )
+
+Registers a dumper for new PMC type.
+
+=over 4
+
+=item id
+
+the PMC id, as returned by the C<typeof> op.
+
+=item sub
+
+a Sub pmc, that gets called in order to dump the content of the given PMC
+
+=back
+
+For example:
+
+	newsub sub, .Sub, _dump_PerlArray
+	_register_dumper( .PerlArray, sub )
+
+This function returns nothing.
+
+=cut
+
+.sub _register_dumper
+    saveall
+    _global_dumper()
+    restoreall
+    find_global P2, "Data::Dumper", "global"
+    S0 = "registerDumper"
+    callmethod
+.end
+
+=item dumper =_global_dumper() B<(internal)>
+
+Internal helper function.
+
+Returns the global dumper instance used by the non object interface.
+
+=cut
+
+.sub _global_dumper
+    .local pmc self
+    .local int mytype
+    .local int type
+
+    find_type mytype, "Data::Dumper"
+    if mytype != 0 goto TYPE_OK
+    load_bytecode "library/Data/Dumper.imc"
+    find_type mytype, "Data::Dumper"
+    if mytype != 0 goto TYPE_OK
+    print "fatal error: failure while loading library/Data/Dumper.imc\n"
+    end
+TYPE_OK:
+
+    errorsoff .PARROT_ERRORS_GLOBALS_FLAG
+    find_global self, "Data::Dumper", "global"
+    errorson .PARROT_ERRORS_GLOBALS_FLAG
+
+    typeof type, self
+    if type == mytype goto END
+
+    new self, mytype
+    store_global "Data::Dumper", "global", self
+
+END:
+    .pcc_begin_return
+    .return self
+    .pcc_end_return
+.end
+
+=back
+
+=head1 AUTHOR
+
+Jens Rieks E<lt>parrot at jensbeimsurfen dot deE<gt> is the author
+and maintainer.
+Please send patches and suggestions to the Perl 6 Internals mailing list.
+
+=head1 COPYRIGHT
+
+Copyright (c) 2004, the Perl Foundation.
+
+=cut

@@ -1,0 +1,369 @@
+[package]
+ncurses
+
+[lib]
+libform.so
+
+[defs]
+# from forms.h
+p new_field i i i i i i
+p dup_field p i i
+p link_field p i i
+i free_field p
+i field_info p 3 3 3 3 3 3
+i dynamic_field_info p 3 3 3
+i set_max_field p i
+i move_field p i i
+# i set_field_type p p ...
+i set_new_page p l
+i set_field_just p i
+i field_just p
+i set_field_fore p l
+i set_field_back p l
+i set_field_pad p i
+i field_pad p
+i set_field_buffer p i t
+i set_field_status p l
+i set_field_userptr p p
+i set_field_opts p i
+i field_opts_on p i
+i field_opts_off p i
+l field_fore p
+i field_back p
+l new_page p
+l field_status p
+p field_arg p
+p field_userptr p
+p field_type p
+t field_buffer p i
+l field_opts p
+
+p new_form b
+#b form_fields p
+p current_field p
+p form_win p 
+p form_sub p
+i free_form p
+i set_form_fields p b
+i field_count p
+i set_form_win p p
+i set_form_sub p p
+i set_current_field p p
+i field_index p
+i set_form_page p i
+i form_page p
+i scale_form p 3 3
+
+i post_form p
+i unpost_form p
+i pos_form_cursor p
+i form_driver p i
+i set_form_userptr p p
+i set_form_opts p i
+i form_opts_on p i
+i form_opts_off p i
+i form_request_by_name t
+t form_request_name i
+p form_userptr p
+i form_opts p
+l data_ahead p
+l data_behind p
+
+
+[lib]
+libncurses.so
+
+[defs]
+# Main ncurses.h
+
+#i is_term_resized i i
+t keybound i i
+t curses_version
+i assume_default_colors i i
+i define_key t i
+#i key_defined t
+i keyok i i
+#i resize_term i i
+i resizeterm i i
+i use_default_colors
+i use_extended_names i
+i wresize p i i
+
+#i wgetch_events p p
+#i wgetnstr_events p t i p
+
+i addch l
+i addchnstr 4 i
+i addchstr 4
+i addnstr t i
+i addstr t
+i attroff l
+i attron l
+i attrset l
+i attr_get 4 2 p
+i attr_off l p
+i attr_on l p
+i attr_set l s p
+i baudrate
+i beep
+i bkgd l
+v bkgdset l
+vi border l l l l l l l l
+i box p l l
+l can_change_color
+i cbreak
+i chgat i l s p
+i clear
+i clearok p l
+i clrtobot
+i clrtoeol
+i color_content s 2 2 2
+i color_set s p
+i COLOR_PAIR i
+i copywin p p i i i i i i i i
+i curs_set i
+i def_prog_mode
+i def_shell_mode
+i delay_output i
+i delch
+v delscreen p
+i delwin p
+i deleteln
+p derwin p i i i i
+i doupdate
+p dupwin p
+i echo
+i echochar l
+i erase
+i endwin
+c erasechar
+v filter
+i flash
+i flushinp
+l getbkgd p
+i getch
+i getnstr t i
+i getstr t
+p getwin p
+i halfdelay i
+i has_colors
+i has_ic
+i has_il
+i hline l i
+v idcok p l
+i idlok p l
+v immedok p l
+l inch
+i inchnstr 4 i
+i inchstr 4
+p initscr
+i init_color s s s s
+i init_pair s s s
+i innstr t i
+i insstr t
+i instr t
+i intrflush p l
+l isendwin
+l is_linetouched p i
+l is_wintouched p
+t keyname i
+i keypad p l
+c killchar
+i leaveok p l
+t longname
+i meta p l
+i move i i
+i mvaddch i i l
+i mvaddchnstr i i 4 i
+i mvaddchstr i i 4
+i mvaddnstr i i t i
+i mvaddstr i i t
+i mvchgat i i i l s p
+i mvcur i i i i
+i mvdelch i i
+i mvderwin p i i
+i mvgetch i i
+i mvgetnstr i i t i
+i mvgetstr i i t
+i mvhline i i l i
+l mvinch i i
+i mvinchnstr i i t i
+i mvinchstr i i 4
+i mvinnstr i i t i
+i mvinsch i i l
+i mvinsnstr i i t i
+i mvinsstr i i t
+# i mvprintw i i ... # This is a varargs thing. They're nasty, so we don't
+# i mvscanw i i t ...
+i mvvline i i l i
+i mvwaddch p i i l
+i mvwaddchnstr p i i 4 i
+i mvwaddchstr p i i 4
+i mvwaddnstr p i i t i
+i mvwaddstr p i i t
+i mvwchgat p i i i l s p
+i mvwdelch p i i
+i mvwgetch p i i
+i mvwgetnstr p i i t i
+i mvwgetstr p i i t
+i mvwhline p i i l i
+i mvwin p i i
+l mvwinch p i i
+i mvwinchnstr p i i 4 i
+i mvwinchstr p i i 4
+i mvwinnstr p i i t i
+i mvwinsch p i i l
+i mvwinsnstr p i i t i
+i mvwinsstr p i i t
+i mvwinstr p i i t
+# i mvwprintw p i i t ...
+# i mvwscanw p i i t ...
+i mvwvline p i i l i
+i napms i
+p newpad i i
+p newterm t p p
+p newwin i i i i
+i nl
+i nocbreak
+i nodelay p l
+i noecho
+i nonl
+v noqiflush
+i noraw
+i notimeout p l
+i overlay p p
+i overwrite p p
+i pair_content s 2 2
+i PAIR_NUMBER i
+i pechochar p l
+i pnoutrefresh p i i i i i i
+i prefresh p i i i i i i
+# i printw t ...
+i putp t
+i putwin p p
+v qiflush
+i raw
+i redrawwin p
+i refresh
+i resetty
+i reset_prog_mode
+i reset_shell_mode
+i ripoffline i i p
+i savetty
+# i scanw t ...
+i scr_dump t
+i scr_init t
+i scrl i
+i scroll p
+i scrollok p l
+i scr_restore t
+i scr_set t
+i setscrreg i i
+p set_term p
+i slk_attroff l
+# i slk_attr_off t p
+i slk_attron l
+# i slk_attr_on l p
+i slk_attrset l
+l slk_attr
+i slk_attr_set l s p
+i slk_clear
+i slk_color s
+i slk_init i
+t slk_label i
+i slk_noutrefresh
+i slk_refresh
+i slk_restore
+i slk_set i t i
+i slk_touch
+i standout
+i standend
+i start_color
+p subpad p i i i i
+p subwin p i i i i
+i syncok p l
+l termattrs
+t termname
+i tigetflag t
+i tigetnum t
+t tigetstr t
+v timeout i
+#i touchline p i i
+#i touchwin p
+# t tparm t ...
+i typeahead i
+i ungetch i
+i untouchwin p
+v use_env l
+i vidattr l
+i vidputs l p
+i vline l i
+# i vwprintw p t ...
+# i vw_printw p t ...
+# i vwscanw p t ...
+# i vw_scanw p t ...
+i waddch p l
+i waddchnstr p 4 i
+i waddchstr p 4
+i waddnstr p t i
+i waddstr p t
+i wattron p i
+i wattroff p i
+i wattrset p i
+i wattr_get p 4 2 p
+i wattr_on p l p
+i wattr_off p l p
+i wattr_set p l s p
+i wbkgd p l
+v wbkgdset p l
+i wborder p l l l l l l l l
+i wchgat p i l s p
+i wclear p
+i wclrtobot p
+i wclrtoeol p
+i wcolor_set p s p
+v wcursyncup p
+i wdelch p
+i wdeleteln p
+i wechochar p l
+i werase p
+i wgetch p
+i wgetnstr p t i
+i wgetstr p t
+i whline p l i
+l winch p
+i winchnstr p 4 i
+i winnstr p t i
+i winsch p l
+i winsdelln p i
+i winsertln p
+i winsnstr p t i
+i winsstr p t
+i winstr p t
+i wmove p i i
+i wnoutrefresh p
+# i wprintw p t ...
+i wredrawln p i i
+i wrefresh p
+# i wscanw p t ...
+i wscrl p i
+i wsetscrreg p i i
+i wstandout p
+i wstandend p
+v wsyncdown p
+v wsyncup p
+v wtimeout p i
+i wtouchln p i i i
+i wvline p l i
+
+i getmouse p
+i ungetmouse p
+l mousemask l 4
+l wenclose p i i
+i mouseinterval i
+l wmouse_trafo p 3 3 l
+l mouse_trafo 3 3 l
+
+i mcprint t i
+i has_key i
+#v trace i
