@@ -74,6 +74,7 @@ emitsub(const char* sub, ...)
         if (!s[i]) break;
         emit("    save %s\n", s[i]);
     }
+    va_end(ap);
     emit("    bsr %s\n", sub);
     while (i > 0) emit("    restore %s\n", s[--i]);
 }
@@ -102,7 +103,23 @@ str_con(const unsigned char* s, int len)
     *t = 0;
     return esc;
 }
-   
+
+
+static void
+trace(const char* fmt, ...)
+{
+    char s[128];
+    va_list ap;
+
+    va_start(ap, fmt);
+    vsprintf(s, fmt, ap);
+    va_end(ap);
+    emit("    print %s\n", str_con(s, strlen(s)));
+    emit("    print \" at \"\n");
+    emit("    print pos\n");
+    emit("    print \"\\n\"\n");
+}
+
  
 static void
 p6ge_gen_pattern_end(P6GE_Exp* e, const char* succ)
@@ -361,7 +378,7 @@ p6ge_gen_anchor(P6GE_Exp* e, const char* succ)
         emit("R%d:                               # ^^anchor\n", e->id);
         emit("    if pos == 0 goto %s\n", succ);
         emit("    if pos == lastpos goto fail\n");
-        emit("    $I0 = lastpos - 1\n");
+        emit("    $I0 = pos - 1\n");
         emit("    substr $S0, target, $I0, 1\n");
         emit("    if $S0 == \"\\n\" goto %s\n", succ);
         emit("    goto fail\n\n");
@@ -388,7 +405,7 @@ p6ge_gen_exp(P6GE_Exp* e, const char* succ)
 {
     emitlcount();
     switch (e->type) {
-    case P6GE_NULL_PATTERN: emit("R%d:\n", e->id); break;
+    case P6GE_NULL_PATTERN: emit("R%d: goto %s\n", e->id, succ); break;
     case P6GE_PATTERN_END: p6ge_gen_pattern_end(e, succ); break;
     case P6GE_DOT: p6ge_gen_dot(e, succ); break;
     case P6GE_LITERAL: p6ge_gen_literal(e, succ); break;
