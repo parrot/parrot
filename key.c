@@ -93,7 +93,7 @@ Return the hashed value of the string
 
 static INTVAL key_hash(struct Parrot_Interp *interpreter, STRING* value) {
   char* buffptr = value->bufstart;
-  INTVAL len    = value->buflen;
+  INTVAL len    = value->bufused;
   INTVAL hash   = 5893;
 
   while(len--) {
