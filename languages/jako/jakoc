@@ -37,7 +37,7 @@ $compiler->debug(1);
 use Getopt::Std;
 
 my %opts;
-getopts('ctT', \%opts);
+getopts('ctTx', \%opts);
 
 die "$0: usage: $0 <source>\n" unless @ARGV == 1;
 $compiler->file(shift @ARGV);
@@ -61,7 +61,27 @@ if ($opts{T}) {
   exit 0;
 }
 
-unless ($opts{c}) { # -c means "Check", like with Perl.
+if ($opts{x}) { # -x means "XML"
+  eval "use XML::Handler::YAWriter";
+  die "Could not find XML::Handler::YAWriter!" if $@;
+  my $handler = XML::Handler::YAWriter->new(
+    Output => IO::File->new('>-'),
+    Pretty => {
+      PrettyWhiteIndent  => 1,
+      PrettyWhiteNewline => 1,
+      CatchEmptyElement  => 1,
+      CompactAttrIndent  => 1
+    }
+  );
+
+  $handler->start_document;
+  $root->sax($handler);
+  $handler->end_document;
+}
+elsif ($opts{c}) { # -c means "Check", like with Perl.
+  # DO NOTHING
+}
+else {
   my $fh = FileHandle->new('>-');
   $compiler->compile($root, $fh);
 }

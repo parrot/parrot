@@ -129,4 +129,47 @@ sub compile
 }
 
 
+#
+# sax()
+#
+
+sub sax
+{
+  my $self = shift;
+  my ($handler) = @_;
+
+  my $block = $self->block;
+  my $kind  = $self->kind;
+  my $name  = $self->ident ? $self->ident->value : undef;
+  my $cond  = $self->cond;
+  my $left  = $self->left;
+  my $op    = $self->op;
+  my $right = $self->right;
+
+  if (defined $cond) {
+    $handler->start_element({ Name => 'cond', Attributes => { kind => $kind } });
+    $handler->start_element({ Name => 'block', Attributes => { kind => 'test' } });
+    $handler->start_element({ Name => 'op', Attributes => { kind => 'infix', name => $op } });
+    $left->sax($handler);
+    $right->sax($handler);
+    $handler->end_element({ Name => 'op' });
+    $handler->end_element({ Name => 'block' });
+    $handler->start_element({ Name => 'block', Attributes => { kind => 'then' } });
+  }
+
+  if ($name) {
+    $handler->start_element({ Name => $kind, Attributes => { loop => $name } });
+  }
+  else {
+    $handler->start_element({ Name => $kind });
+  }
+  $handler->end_element({ Name => $kind });
+
+  if (defined $cond) {
+    $handler->end_element({ Name => 'block' });
+    $handler->end_element({ Name => 'cond' });
+  }
+}
+
+
 1;

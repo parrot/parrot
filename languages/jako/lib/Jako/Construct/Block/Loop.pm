@@ -93,4 +93,42 @@ sub compile
 }
 
 
+#
+# sax()
+#
+
+sub sax
+{
+  my $self = shift;
+  my ($handler) = @_;
+
+  if (not $self->prefix and $self->peer and $self->peer->prefix) {
+    $self->prefix($self->peer->prefix);
+  }
+
+  if ($self->prefix) {
+    $handler->start_element({ Name => 'loop', Attributes => { kind => $self->kind, name => $self->prefix } });
+  }
+  else {
+    $handler->start_element({ Name => 'loop', Attributes => { kind => $self->kind } });
+  }
+
+  if ($self->op) {
+    $handler->start_element({ Name => 'block', Attributes => { kind => 'test' } });
+    $handler->start_element({ Name => 'op', Attributes => { kind => 'infix', name => $self->op } });
+    $self->left->sax($handler);
+    $self->right->sax($handler);
+    $handler->end_element({ Name => 'op' });
+    $handler->end_element({ Name => 'block' });
+  }
+
+  $handler->start_element({ Name => 'block', Attributes => { kind => $self->kind } });
+  $_->sax($handler) foreach $self->content;
+  $handler->end_element({ Name => 'block' });
+
+  $handler->end_element({ Name => $self->kind });
+}
+
+
+
 1;

@@ -58,4 +58,21 @@ sub compile
   return 1;
 }
 
+
+#
+# sax()
+#
+
+sub sax
+{
+  my $self = shift;
+  my ($handler) = @_;
+
+  $handler->start_element({ Name => 'assign' });
+  $self->left->sax($handler);
+  $self->right->sax($handler);
+  $handler->end_element({ Name => 'assign' });
+}
+
+
 1;

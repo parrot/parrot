@@ -32,6 +32,11 @@ use Jako::Construct::Type::String;
 
 my %types = ( 'I' => 'int', 'N' => 'num', 'P' => 'obj', 'S' => 'str');
 
+sub CODE_TO_NAME {
+  my ($class, $code) = @_;
+  return $types{uc $code};
+}
+
 sub new
 {
   my $class = shift;
@@ -74,6 +79,7 @@ sub imcc
 {
   return shift->{IMCC};
 }
+
 
 1;
 

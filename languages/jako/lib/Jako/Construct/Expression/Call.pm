@@ -136,4 +136,25 @@ sub compile
   return 1;
 }
 
+
+#
+# sax()
+#
+
+sub sax
+{
+  my $self = shift;
+  my ($handler) = @_;
+
+  $handler->start_element({ Name => 'assign' });
+  $self->dest->sax($handler);
+
+  $handler->start_element({ Name => 'call', Attributes => { name => $self->name->value } });
+  $_->sax($handler) foreach $self->args;
+  $handler->end_element({ Name => 'call' });
+
+  $handler->end_element({ Name => 'assign' });
+}
+
+
 1;

@@ -10,16 +10,45 @@
 # $Id$
 #
 
-sub print {op} (str s);
-sub int not {op} (int i);
+sub     print  {op} (str s);
+sub str substr {op} (str s, int i, int l);
+sub str concat {op} (str s, str t);
+sub int length {op} (str s);
 
-# 4 bits per file, represent the rank of the queen, 0xf for none
+const int NUM_FILES = 8;
+const int NUM_RANKS = 8;
 
-const int BITS_PER_FILE = 4;
-const int NO_QUEEN      = 0xf;
 
-const int NUM_FILES     = 8;
-const int NUM_RANKS     = 8;
+#
+# remove_queen()
+#
+
+sub str remove_queen (str board, int rank, int file)
+{
+  board = clear_file(board, file);
+
+  var int i;
+  i  = rank * NUM_FILES;
+  i += file;
+
+  var int x;
+  x = i - 1;
+
+  var int y;
+  y = i + 1;
+
+  var str prefix;
+  prefix = substr(board, 0, x);
+  var str suffix;
+  suffix = substr(board, y, -1);
+
+  var str temp;
+  temp = prefix;
+  temp = concat(temp, " ");
+  temp = concat(temp, suffix);
+
+  return temp;
+}
 
 
 #
@@ -29,13 +58,14 @@ const int NUM_RANKS     = 8;
 # nybble contents.
 #
 
-sub int clear_file (int board, int file) {
-  var int amount;
-  var int temp;
+sub str clear_file (str board, int file)
+{
+  var int rank = 0;
 
-  amount = BITS_PER_FILE * file;
-  temp   = NO_QUEEN << amount;
-  board  = board | temp;
+  while (rank < NUM_RANKS) {
+    board = remove_queen(board, rank, file);
+    rank++;
+  }
 
   return board;
 }
@@ -44,22 +74,35 @@ sub int clear_file (int board, int file) {
 #
 # place_queen()
 #
-# Places a queen at the current rank of the current file. Assumes no queen for
-# the file yet (which means its nybble is 0xf).
+# Places a queen at the given rank and file, removing any other queen from the
+# file.
 #
 
-sub int place_queen (int board, int rank, int file) {
-  var int amount;
-  var int temp;
+sub str place_queen (str board, int rank, int file)
+{
+  board = clear_file(board, file);
 
-  amount = BITS_PER_FILE * file;
-  temp   = NO_QUEEN << amount;
-  temp   = not(temp);
-  board  = board & temp;
-  temp   = rank << amount;
-  board  = board | temp;
+  var int i;
+  i  = rank * NUM_FILES;
+  i += file;
 
-  return board;
+  var int x;
+  x = i - 1;
+
+  var int y;
+  y = i + 1;
+
+  var str prefix;
+  prefix = substr(board, 0, x);
+  var str suffix;
+  suffix = substr(board, y, -1);
+
+  var str temp;
+  temp = prefix;
+  temp = concat(temp, "Q");
+  temp = concat(temp, suffix);
+
+  return temp;
 }
 
 
@@ -72,18 +115,50 @@ sub int place_queen (int board, int rank, int file) {
 # Ouptut: rank = queen's rank in that file
 #
 
-sub int queen_rank (int board, int file) {
-  var int amount;
-  var int temp;
+sub int queen_rank (str board, int file)
+{
+  var int rank = 0;
 
+  while (rank < NUM_RANKS) {
+    var int temp;
+    temp = queen_at(board, rank, file);
+    return rank if (temp == 1);
+    rank++;
+  }
+ 
+  return -1;
+}
+
+
+#
+# at()
+#
+# Determines whether or not there is a queen at a given location.
+#
+# Input:  rank, file
+# Output: 1 (queen) or 0 (empty)
+#
+
+sub str at (str board, int rank, int file) {
+  var str temp;
+
+  print("Fetching contents of square at $rank, $file...\n");
+
+  return 0 if (rank < 0);
+  return 0 if (rank >= NUM_RANKS);
   return 0 if (file < 0);
   return 0 if (file >= NUM_FILES);
 
-  amount = BITS_PER_FILE *  file;
-  temp   = NO_QUEEN      << amount;
-  temp   = temp          &  board;
-  temp   = temp          >> amount;
-  temp   = temp          |  NO_QUEEN;
+  var int i;
+  i  = rank * NUM_FILES;
+  i += file;
+ 
+  var int l;
+  l = length(board);
+
+  print("Board is $l characters long. Fetching character at index $i.\n");
+
+  temp = substr(board, i, 1);
 
   return temp;
 }
@@ -95,22 +170,17 @@ sub int queen_rank (int board, int file) {
 # Determines whether or not there is a queen at a given location.
 #
 # Input:  rank, file
-# Ouptut: queen
+# Output: 1 (queen) or 0 (empty)
 #
 
-sub int queen_at (int board, int rank, int file) {
-  var int temp;
+sub int queen_at (str board, int rank, int file) {
+  var str temp;
 
-  return 0 if (rank < 0);
-  return 0 if (rank >= NUM_RANKS);
-  return 0 if (file < 0);
-  return 0 if (file >= NUM_FILES);
+  print("Looking for queen at $rank, $file...\n");
 
-  temp = queen_rank(board, file);
- 
-  return 0 if (temp < 0);
-  return 0 if (temp >= NUM_RANKS);
-  return 1 if (temp == rank);
+  temp = at(board, rank, file);
+
+  return 1 if (temp == "Q");
   return 0;
 }
 
@@ -118,10 +188,10 @@ sub int queen_at (int board, int rank, int file) {
 #
 # free_space()
 #
-# Determines whether or not the current space is free for placing a queen.
+# Determines whether or not a space is free for placing a queen.
 #
 
-sub int free_space (int board, int rank, int file) {
+sub int free_space (str board, int rank, int file) {
   var int i = 1;
 
   while (i <= file) {
@@ -154,7 +224,7 @@ sub int free_space (int board, int rank, int file) {
 # print_board()
 #
 
-sub print_board (int board) {
+sub print_board (str board) {
   var int rank, file;
   var int temp;
 
@@ -198,25 +268,46 @@ sub print_board (int board) {
 
 
 #
+# new_board()
+#
+
+sub str new_board()
+{
+  var str board = "";
+  var int rank = 0;
+  var int file = 0;
+
+  print("Making new board with $NUM_RANKS ranks and $NUM_FILES files...\n");
+
+  while (rank < NUM_RANKS) {
+    while (file < NUM_FILES) {
+      board = concat(board, " ");
+      file++;
+    }
+    rank++;
+  }
+
+  var int l;
+  l = length(board);
+  print("Board length is $l.\n");
+
+  return board;
+}
+
+
+#
 # main()
 #
 
 sub main() {
-  var int board;
+  var str board;
   var int rank;
   var int file;
 
-  #
-  # Clear the files:
-  #
+  board = new_board();
 
-  file = 0;
-
-  while(file < NUM_FILES) {
-    board = clear_file(board, file);
-    file++;
-  }
-
+  print_board(board);
+  place_queen(board, 3, 3);
   print_board(board);
 
   #

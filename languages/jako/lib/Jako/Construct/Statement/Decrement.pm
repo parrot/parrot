@@ -54,4 +54,20 @@ sub compile
   return 1;
 }
 
+
+#
+# sax()
+#
+
+sub sax
+{
+  my $self = shift;
+  my ($handler) = @_;
+
+  $handler->start_element({ Name => 'op', Attributes => { kind => 'postfix', name => '--' } });
+  $self->ident->sax($handler);
+  $handler->end_element({ Name => 'op' });
+}
+
+
 1;

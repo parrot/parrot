@@ -136,5 +136,20 @@ sub compile
   return 1;
 }
 
+
+#
+# sax()
+#
+
+sub sax
+{
+  my $self = shift;
+  my ($handler) = @_;
+
+  $handler->start_element({ Name => 'var', Attributes => { type => $self->type->name, name => $self->name } });
+  $handler->end_element({ Name => 'var' });
+}
+
+
 1;
 

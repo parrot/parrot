@@ -88,21 +88,21 @@ sub compile
       $compiler->emit("  concat $temp, \"$1\"")
         if defined $1 and $1 ne '';
 
-      my $interp = $2;
-      $interp =~ s/^{(.*)}$/$1/; # Strip '{' and '}'.
+      my $ident = $2;
+      $ident =~ s/^{(.*)}$/$1/; # Strip '{' and '}'.
 
-      my $sym = $self->block->find_symbol($interp);
+      my $sym = $self->block->find_symbol($ident);
 
-      $self->SYNTAX_ERROR("Cannot interpolate '%s': symbol not found!", $interp)
+      $self->SYNTAX_ERROR("Cannot interpolate '%s': symbol not found!", $ident)
         unless $sym;
 
       if (not UNIVERSAL::isa($sym->type, 'Jako::Construct::Type::String')) {
         my $temp2 = $compiler->temp_str();
-        $compiler->emit("  $temp2 = $interp");
-        $interp = $temp2;
+        $compiler->emit("  $temp2 = $ident");
+        $ident = $temp2;
       }
 
-      $compiler->emit("  concat $temp, $interp");
+      $compiler->emit("  concat $temp, $ident");
 
       $string = $6;
     }
@@ -118,6 +118,71 @@ sub compile
     return $self->value;
   }
 }
+
+
+#
+# sax()
+#
+# TODO: Convert escapes. For example, "\n" should be an actual newline.
+#
+
+sub sax
+{
+  my $self = shift;
+  my ($handler) = @_;
+
+  my $type = $self->type;
+
+  if (UNIVERSAL::isa($type, 'Jako::Construct::Type::String')) {
+    my $string = $self->value;
+
+    if ($string =~ m/(^"|^".*?[^\\])\$/) { # Double-quote with an unescaped '$'.
+      $string = substr($string, 1, -1); # Without the surrounding double quotes.
+
+      $handler->start_element({ Name => 'concat' });
+
+      while (1) {
+        last unless defined $string and
+          $string =~ m/(^|^.*?[^\\])\$((([A-Za-z][A-Za-z0-9_]*)\b)|({[A-Za-z][A-Za-z0-9_]*}))(.*)$/;
+
+        if (defined $1 and $1 ne '') {
+          $handler->start_element({ Name => 'literal', Attributes => { type => $type->name } });
+          $handler->characters({ Data => $1 });
+          $handler->end_element({ Name => 'literal' });
+        }
+
+        my $ident = $2;
+        $ident =~ s/^{(.*)}$/$1/; # Strip '{' and '}'.
+
+        $handler->start_element({ Name => 'ident', Attributes => { name => $ident } });
+        $handler->end_element({ Name => 'ident' });
+
+        $string = $6;
+      }
+
+      if (defined $string and $string ne '') {
+        $handler->start_element({ Name => 'literal', Attributes => { type => $type->name } });
+        $handler->characters({ Data => $string });
+        $handler->end_element({ Name => 'literal' });
+      }
+
+      $handler->end_element({ Name => 'concat' });
+    }
+    else {
+      $string = substr($string, 1, -1); # Without the surrounding quotes.
+
+      $handler->start_element({ Name => 'literal', Attributes => { type => $type->name } });
+      $handler->characters({ Data => $string });
+      $handler->end_element({ Name => 'literal' });
+    }
+  }
+  else {
+    $handler->start_element({ Name => 'literal', Attributes => { type => $type->name } });
+    $handler->characters({ Data => $self->value });
+    $handler->end_element({ Name => 'literal' });
+  }
+}
+
 
 1;
 

@@ -110,5 +110,40 @@ sub compile
 }
 
 
+#
+# sax()
+#
+
+sub sax
+{
+  my $self = shift;
+  my ($handler) = @_;
+
+  my $type  = $self->type;
+  my $name  = $self->name;
+  my @args  = $self->args;
+
+  if ($type) {
+    $handler->start_element({ Name => 'sub', Attributes => { name => $name, type => $type } });
+  }
+  else {
+    $handler->start_element({ Name => 'sub', Attributes => { name => $name } });
+  }
+
+  foreach my $arg (@args) {
+    my ($arg_type, $arg_name) = @$arg;
+
+    $handler->start_element({ Name => 'arg', Attributes => { name => $arg_name, type => $arg_type } });
+    $handler->end_element({ Name => 'arg' });
+  }
+
+  foreach my $content ($self->content) {
+    $content->sax($handler);
+  }
+
+  $handler->end_element({ Name => 'sub' });
+}
+
+
 1;
 

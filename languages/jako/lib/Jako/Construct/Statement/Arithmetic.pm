@@ -147,4 +147,30 @@ sub compile
   return 1;
 }
 
+
+#
+# sax()
+#
+
+sub sax
+{
+  my $self = shift;
+  my ($handler) = @_;
+
+  my $block = $self->block;
+  my $dest  = $self->dest;
+  my $left  = $self->left;
+  my $op    = $self->op;
+  my $right = $self->right;
+
+  $handler->start_element({ Name => 'assign' });
+  $dest->sax($handler);
+  $handler->start_element({ Name => 'op', Attributes => { kind => 'infix', name => $op } });
+  $left->sax($handler);
+  $right->sax($handler);
+  $handler->end_element({ Name => 'op' });
+  $handler->end_element({ Name => 'assign' });
+}
+
+
 1;

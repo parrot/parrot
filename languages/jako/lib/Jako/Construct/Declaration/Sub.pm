@@ -186,5 +186,101 @@ sub compile
   return 1;
 }
 
+
+#
+# sax()
+#
+
+sub sax
+{
+  my $self = shift;
+  my ($handler) = @_;
+
+  my $name  = $self->name;
+  my $type  = $self->type;
+
+  my %reg = ('int' => 5, 'num' => 5, 'obj' => 5, 'str' => 5);
+
+  my $sym = $self->block->find_symbol($name);
+
+  my %props = $sym->props;
+
+  if (exists $props{op}) {
+    my $oplib = $props{oplib} ? $props{oplib}->value : 'CORE'; # TODO: We should make sure its a string, somewhere.
+    my $op    = $props{op}    ? $props{op}->value    : $name;
+
+    if ($type) {
+      $handler->start_element({
+        Name       => 'sub',
+        Attributes => {
+          name  => $name,
+          type  => $type,
+          kind  => 'op',
+          oplib => $oplib,
+          op    => $op
+        }
+      });
+    }
+    else {
+      $handler->start_element({
+        Name       => 'sub',
+        Attributes => {
+          name  => $name,
+          kind  => 'op',
+          oplib => $oplib,
+          op    => $op
+        }
+      });
+    }
+  }
+  elsif (exists $props{fnlib}) {
+    my $fnlib = $props{fnlib}->value; # TODO: We should make sure its a string, somewhere.
+    my $fn    = $props{fn} ? $props{fn}->value : $name;
+
+    if ($type) {
+      $handler->start_element({
+        Name       => 'sub',
+        Attributes => {
+          name  => $name,
+          type  => $type,
+          kind  => 'fn',
+          fnlib => $fnlib,
+          fn    => $fn
+        }
+      });
+    }
+    else {
+      $handler->start_element({
+        Name       => 'sub',
+        Attributes => {
+          name  => $name,
+          kind  => 'fn',
+          fnlib => $fnlib,
+          fn    => $fn
+        }
+      });
+    }
+  }
+  else {
+    return;
+  }
+
+  foreach my $arg ($self->args) {
+    my ($arg_type_name, $arg_name) = @$arg;
+
+    $handler->start_element({
+      Name       => 'arg',
+      Attributes => {
+        type => $arg_type_name,
+        name => $arg_name
+      }
+    });
+    $handler->end_element({ Name => 'arg' });
+  }
+
+  $handler->end_element({ Name => 'sub' });
+}
+
+
 1;
 

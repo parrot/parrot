@@ -18,6 +18,7 @@ use Carp;
 use base qw(Jako::Processor);
 
 use Jako::Construct::Block;
+use Jako::Construct::Block::Bare;
 use Jako::Construct::Block::Conditional::Else;
 use Jako::Construct::Block::Conditional::If;
 use Jako::Construct::Block::Conditional::Unless;
@@ -55,7 +56,7 @@ sub new
 {
   my $class = shift;
 
-  my $root = Jako::Construct::Block->new(
+  my $root = Jako::Construct::Block::Bare->new(
     undef,  # No parent
     'file', # File scope
     undef,  # No return type

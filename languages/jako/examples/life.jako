@@ -20,7 +20,7 @@ sub int initscr  {fnlib = "libcurses.so"} ();
 sub int endwin   {fnlib = "libcurses.so"} ();
 sub int curs_set {fnlib = "libcurses.so"} (int x);
 sub int addstr   {fnlib = "libcurses.so"} (str s);
-#sub int refresh  {fnlib = "libcurses.so"} ();
+sub int refresh  {fnlib = "libcurses.so"} ();
 sub int move     {fnlib = "libcurses.so"} (int x, int y);
 
 var int foo; # Store result from above functions here.
@@ -67,20 +67,17 @@ sub int at (str cells, int row, int col)
   offset = row * WIDTH;
   offset += col;
 
-#  var int len;
-#  len = length(cells);
-#  foo = move(0, 19);
-#  foo = addstr("length(cells) == $len");
+  var int len;
+  len = length(cells);
+  foo = move(0, 19);
+  foo = addstr("length(cells) == $len");
   foo = move(0, 20);
-  foo = addstr("substr(cells, $offset, 1");
-#  foo = refresh();
-
+  foo = addstr("substr(cells, $offset, 1)");
+  foo = move(0, 25);
+  foo = refresh();
   temp = substr(cells, offset, 1);
 
-  if (temp == "*") {
-    return 1;
-  }
-
+  return 1 if (temp == "*");
   return 0;
 }
 
@@ -117,28 +114,22 @@ sub str generate (str cells)
       var int current;
       current = at(cells, row, col);
 
+      var str ch;
       if (current != 0) {
-        if (count == 3) {
-          concat(temp, "*");
-        }
-        else {
-          concat(temp, " ");
-        }
+        foo = move(0, 21);
+        foo = addstr("substr(\"   *     \", $count, 1)");
+        foo = move(0, 25);
+        foo = refresh();
+        ch = substr("   *     ", count, 1);
       }
       else {
-        if (count < 2) {
-          concat(temp, " ");
-        }
-        if (count == 2) {
-          concat(temp, "*");
-        }
-        if (count == 3) {
-          concat(temp, "*");
-        }
-        if (count > 3) {
-          concat(temp, " ");
-        }
+        foo = move(0, 21);
+        foo = addstr("substr(\"  **     \", $count, 1)");
+        foo = move(0, 25);
+        foo = refresh();
+        ch = substr("  **     ", count, 1);
       }
+      concat(temp, ch);
 
       col++;
     }
@@ -157,25 +148,27 @@ sub str generate (str cells)
 sub dump(str cells, int g)
 {
   foo = move(0, 0);
-  foo = addstr("Generation: ");
-  foo = addstr(g);
-#  foo = refresh();
+  foo = addstr("Generation $g of $G:");
 
-  var int offset = 0;
-  var int row;
-  row = HEIGHT - 1;
+  var int row = 0;
+  while (row < HEIGHT) {
+    var int col = 0;
+    while (col < WIDTH) {
+      var int current;
+      current = at(cells, row, col);
 
-  while (row >= 0) {
-    var str temp;
-
-    temp = substr(cells, offset, 15);
-
-    foo = addstr(temp);
-    foo = addstr("\n");
-
-    offset += 15;
-    row--;
+      if (current == 1) {
+        addstr("*");
+      }
+      else {
+        addstr(" ");
+      }
+    }
+    addstr("\n");
   }
+
+  foo = move(0, 25);
+  foo = refresh();
 }
 
 

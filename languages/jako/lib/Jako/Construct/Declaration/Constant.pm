@@ -143,5 +143,21 @@ sub compile
   return 1;
 }
 
+
+#
+# sax()
+#
+
+sub sax
+{
+  my $self = shift;
+  my ($handler) = @_;
+
+  $handler->start_element({ Name => 'const', Attributes => { type => $self->type->name, name => $self->name } });
+  $self->value->sax($handler);
+  $handler->end_element({ Name => 'const' });
+}
+
+
 1;
 

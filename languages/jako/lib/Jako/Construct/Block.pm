@@ -17,6 +17,8 @@ package Jako::Construct::Block;
 
 use base qw(Jako::Construct);
 
+use Carp;
+
 
 #
 # CONSTRUCTOR:
@@ -26,6 +28,9 @@ sub new
 {
   my $class = shift;
   my ($block, $kind, $type, $prefix) = @_;
+
+  confess "Use Jako::Construct::Block::Bare, not Jako::Construct::Block"
+    if $class eq 'Jako::Construct::Block';
 
   return bless {
     BLOCK   => $block,  # Parent block

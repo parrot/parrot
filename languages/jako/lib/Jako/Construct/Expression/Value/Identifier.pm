@@ -41,5 +41,20 @@ sub new
   }, $class;
 }
 
+
+#
+# sax()
+#
+
+sub sax
+{
+  my $self = shift;
+  my ($handler) = @_;
+
+  $handler->start_element({ Name => 'ident', Attributes => { name => $self->value } });
+  $handler->end_element({ Name => 'ident' });
+}
+
+
 1;
 

@@ -72,4 +72,18 @@ sub compile
 }
 
 
+#
+# sax()
+#
+
+sub sax
+{
+  my $self = shift;
+  my ($handler) = @_;
+  
+  $handler->start_element({ Name => 'label', Attributes => { name => $self->ident->value } });
+  $handler->end_element({ Name => 'label' });
+}
+
+
 1;
