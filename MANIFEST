@@ -1348,6 +1348,7 @@ include/parrot/thread.h                           [devel]include
 include/parrot/trace.h                            [devel]include
 include/parrot/tsq.h                              [devel]include
 include/parrot/unicode.h                          [devel]include
+include/parrot/vtables.h			  [devel]include
 include/parrot/warnings.h                         [devel]include
 interpreter.c                                     []
 intlist.c                                         []
@@ -1956,5 +1957,6 @@ utils.c                                           []
 var.ops                                           []
 vtable.tbl                                        []
 vtable_h.pl                                       []
+vtables.c					  []
 warnings.c                                        []
 cpu_dep.c                                         []
