@@ -3,7 +3,7 @@
 use strict;
 use lib '../../lib';
 
-use Parrot::Test tests => 2;
+use Parrot::Test tests => 3;
 
 sub test {
     language_output_is('python', $_[0], '', $_[1]);
@@ -35,4 +35,31 @@ def main():
 
 if __name__ == '__main__':
     main()
+CODE
+
+test(<<'CODE', 'methods as properties');
+class one: 
+  def __str__(self): return "one"
+
+class two(one):
+  def __str__(self): return "two"
+  def alternate(self): return "dos"
+
+class three(one):
+  def __str__(self): return "three"
+  def alternate(self): return "tres"
+
+list = [one(), two(), three()]
+
+for item in list:
+  print item.__class__.__name__, ":", item
+
+print
+
+list[0].__class__ = two
+list[1].__str__ = list[1].alternate
+three.__str__ = three.alternate
+
+for item in list:
+  print item.__class__.__name__, ":", item 
 CODE

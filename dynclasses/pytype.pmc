@@ -162,6 +162,20 @@ need to be filled in.
 
 /*
 
+=item C<STRING *name()>
+
+Returns the name of this class.
+
+*/
+
+
+    STRING* name() {
+        PMC *name = VTABLE_getprop(INTERP, SELF, NAME);
+        return VTABLE_get_string(INTERP, name);
+    }
+
+/*
+
 =back
 
 =cut

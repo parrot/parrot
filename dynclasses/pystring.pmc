@@ -48,9 +48,7 @@ they will be used frequently here.
 
 =item C<void add(PMC *value, PMC *dest)>
 
-Adds C<*value> to the string and returns the result in C<*dest>.
-
-When Python mode is enabled does concat :(
+Concatenates C<*value> to the string and returns the result in C<*dest>.
 
 =cut
 

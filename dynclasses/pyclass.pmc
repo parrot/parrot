@@ -27,6 +27,7 @@ static STRING *CLASS;
 static STRING *ITER;
 static STRING *NAME;
 static STRING *REPR;
+static STRING *STR;
 
 pmclass PyClass dynpmc group python_group {
 
@@ -48,6 +49,7 @@ they will be used frequently here.
             ITER = const_string(INTERP, "__iter__");
             NAME = const_string(INTERP, "__name__");
             REPR = const_string(INTERP, "__repr__");
+            STR  = const_string(INTERP, "__str__");
         }
     }
 
@@ -156,7 +158,7 @@ Return an iterator for this object.
 
 /*
 
-=item C<PMC *get_repr()>
+=item C<STRING *get_repr()>
 
 Return the representation of this object.
 
@@ -166,10 +168,45 @@ Return the representation of this object.
 
     STRING* get_repr() {
         PMC *repr = VTABLE_find_method(INTERP, SELF, REPR);
-        if (!repr || !VTABLE_defined(INTERP, repr))
-            return VTABLE_get_string(INTERP, SELF);
-        return (STRING*) Parrot_run_meth_fromc_args(INTERP, repr, SELF,
-            REPR, "S");
+
+        if (repr)
+            return (STRING*) Parrot_run_meth_fromc_args(INTERP, repr, SELF,
+                REPR, "S");
+        else {
+            STRING *res;
+
+            res = string_from_cstring(INTERP, "<", 0);
+            res = string_append(INTERP, res,
+                VTABLE_name(INTERP, VTABLE_get_class(INTERP, SELF)), 0);
+            res = string_append(INTERP, res,
+                const_string(INTERP, " instance at "), 0);
+            res = string_append(INTERP, res,
+                Parrot_sprintf_c(INTERP, "%#x", (INTVAL) SELF), 0);
+            res = string_append(INTERP, res,
+                const_string(INTERP, ">"), 0);
+
+            return res;
+        }
+    }
+
+/*
+
+=item C<STRING *get_string()>
+
+Return the object in string form.
+
+=cut
+
+*/
+
+    STRING* get_string() {
+        PMC *repr = VTABLE_find_method(INTERP, SELF, STR);
+        if (repr)
+            return (STRING*) Parrot_run_meth_fromc_args(INTERP, repr, SELF,
+                REPR, "S");
+        else {
+            return VTABLE_get_repr(INTERP, SELF);
+        }
     }
 
 /*
@@ -182,10 +219,7 @@ Returns the name of this class.
 
 
     STRING* name() {
-        PMC *class = VTABLE_get_class(INTERP, SELF);
-        PMC *name = VTABLE_getprop(INTERP, class, NAME);
-        if (!name) return CLASS;
-        return VTABLE_get_string(INTERP, name);
+        return VTABLE_name(INTERP, VTABLE_get_class(INTERP, SELF));
     }
 
 /*

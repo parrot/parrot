@@ -37,6 +37,7 @@ static INTVAL dynclass_PyTuple;
 static STRING *HEX;
 static STRING *OCT;
 static STRING *PYOBJECT;
+static STRING *BASES;
 
 extern PMC* Parrot_PerlHash_get_iter(Interp* interpreter, PMC* pmc);
 
@@ -69,6 +70,7 @@ they will be used frequently here.
             dynclass_PyString    = Parrot_PMC_typenum(INTERP, "PyString");
             dynclass_PyTuple     = Parrot_PMC_typenum(INTERP, "PyTuple");
 
+            BASES = const_string(INTERP, "__bases__");
             HEX = const_string(INTERP, "__hex__");
             OCT = const_string(INTERP, "__oct__");
             PYOBJECT = const_string(INTERP, "PyObject");
@@ -425,6 +427,36 @@ Returns the "identity" of C<value>.
     METHOD PMC* id(PMC *value) {
         PMC * ret = pmc_new(INTERP, dynclass_PyInt);
         VTABLE_set_integer_native(INTERP, ret, (INTVAL)value);
+        return ret;
+    }
+
+/*
+
+=item C<PMC* "isinstance"(PMC *object, PMC* class)>
+
+Returns the "identity" of C<value>.
+
+=cut
+
+TODO: for this to be interoperable across languages, we will need
+a C<isinstance> VTABLE entry.
+
+TODO: bases should be a tuple
+*/
+
+    METHOD PMC* isinstance(PMC *object, PMC* class) {
+        PMC *ret = pmc_new(INTERP, dynclass_PyBoolean);
+        PMC * test = VTABLE_get_class(INTERP, object);
+        VTABLE_set_integer_native(INTERP, ret, 0);
+
+        while (test && VTABLE_defined(INTERP, test)) {
+            if (test == class) {
+                VTABLE_set_integer_native(INTERP, ret, 1);
+                break;
+            }
+            test = VTABLE_getprop(INTERP, test, BASES);
+        }
+
         return ret;
     }
 
