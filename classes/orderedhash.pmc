@@ -30,6 +30,8 @@
 
 pmclass OrderedHash extends PerlArray need_ext does array does hash {
     void init () {
+        /* clear the Hash ptr - its not yet existing */
+        PMC_ptr1v(SELF) = NULL;
 	SUPER();
 	PerlHash.SUPER();
     }
