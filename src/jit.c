@@ -665,10 +665,10 @@ build_asm(struct Parrot_Interp *interpreter, opcode_t *pc,
     }
 
 #ifdef ARM
-    arm_sync_d_i_cache(jit_info->arena.start, jit_info.native_ptr);
+    arm_sync_d_i_cache(jit_info->arena.start, jit_inf->.native_ptr);
 #endif
 #ifdef PPC
-    ppc_sync_cache(jit_info->arena.start, jit_info.native_ptr);
+    ppc_sync_cache(jit_info->arena.start, jit_info->native_ptr);
 #endif
 
     /* assume gdb is available */
