@@ -13,7 +13,6 @@
   .local int return_type
   return_type = TCL_OK
   .local pmc retval
-  retval = new Undef
   .local string command
 
   .local pmc string_index
@@ -45,11 +44,14 @@ first:
   $I0 = retval
 
 first_do:
-  $I1 = index $S2, $S1, $I0
-  retval = $I1
+  .local int index_1
+  index_1 = index $S2, $S1, $I0
+  retval = new Integer
+  retval = index_1
   goto done
 
 bad_first:
+  retval = new String
   retval = "wrong # args: should be \"string first subString string ?startIndex?\""
   return_type = TCL_ERROR
   goto done
@@ -57,25 +59,28 @@ bad_first:
 index:
   # XXX without this new String, we get a test failure.
   #     Shouldn't be necessary.
-  retval = new String
+  #retval = new String
   if argv != 3 goto bad_index
   $S1 = argv[1]
   $S2 = argv[2]
   (return_type,retval) = string_index($S2,$S1)
   if return_type == TCL_ERROR goto done
   $I0 = retval
-
-  inc $I1
-  if $I0 > $I1 goto index_null
+  index_1 = length $S1
+  inc index_1 
+  if $I0 > index_1 goto index_null
   if $I0 < 0 goto index_null
   $S0 = substr $S1, $I0, 1 
+  retval = new String
   retval = $S0
   goto done
 index_null:
+  retval = new String
   retval = ""
   goto done
 
 bad_index:
+  retval = new String
   retval = "wrong # args: should be \"string index string charIndex\""
   return_type = TCL_ERROR
   goto done
@@ -84,10 +89,12 @@ length:
   if argv != 2 goto bad_length
   $S1 = argv[1]
   $I0 = length $S1
+  retval = new Integer
   retval = $I0
   goto done
 
 bad_length:
+  retval = new String
   retval = "wrong # args: should be \"string length string\""
   return_type = TCL_ERROR
   goto done
@@ -133,29 +140,31 @@ range:
  
   (return_type,retval) = string_index($S2,$S1)
   if return_type == TCL_ERROR goto done
-  $I1 = retval
+  index_1 = retval
 
   (return_type,retval) = string_index($S3,$S1)
   if return_type == TCL_ERROR goto done
   $I2 = retval
   
 range_do:
-  if $I1 > $I2 goto range_null
-  if $I1 >= 0  goto range_top
-  $I1 = 0
+  if index_1 > $I2 goto range_null
+  if index_1 >= 0  goto range_top
+  index_1 = 0
 range_top:
   if $I2 <= $I0 goto range_doo
   $I2 = $I0
 range_doo:
-  $I3 = $I2 - $I1
+  $I3 = $I2 - index_1
   inc $I3
-  $S9 = substr $S1, $I1, $I3 
+  $S9 = substr $S1, index_1, $I3 
+  retval = new String
   retval = $S9
   goto done
 range_null:
   goto done
 
 bad_range:
+  retval = new String
   retval = "wrong # args: should be \"string range string first last\""
   return_type = TCL_ERROR
   goto done
@@ -169,16 +178,18 @@ repeat:
   
   $I0 = length $S2 
   # XXX - uncomment this, need to setup the sub call
-  #($I1,$I2,$P1) = __expr_get_number(the_repeat,0)
+  #(index_1,$I2,$P1) = __expr_get_number(the_repeat,0)
   #if $I2 != INTEGER goto bad_arg
-  #if $I1 != $I0 goto bad_arg
+  #if index_1 != $I0 goto bad_arg
   $I3 = $P1
   $S0 = repeat the_string, $I3
+  retval = new String
   retval = $S0
   goto done
 
 bad_repeat:
   return_type = TCL_ERROR
+  retval = new String
   retval = "wrong # args: should be \"string repeat string count\""
   goto done
 
@@ -188,19 +199,18 @@ badargs:
   $S9 = "bad option \""
   $S9 .= command
   $S9 .= "\": must be bytelength, compare, equal, first, index, is, last, length, map, match, range, repeat, replace, tolower, toupper, totitle, trim, trimleft, trimright, wordend, or wordstart"
+  retval = new String
   retval = $S9
   return_type = TCL_ERROR
   goto done
 
 noargs:
+  retval = new String
   retval = "wrong # args: should be \"string option arg ?arg ...?\""
   return_type = TCL_ERROR
 
 done:
-  .pcc_begin_return
-    .return return_type
-    .return retval
-  .pcc_end_return
+  .return(return_type,retval)
 .end
 
 #
@@ -228,8 +238,10 @@ done:
   .local int number_type
   .local pmc number_result
 
+  .local int index_1
+
   if position == "end" goto my_end
- 
+
   $S0 = substr position, 0, 4
   if $S0 == "end-" goto has_end
   index_length = length $S0
@@ -265,13 +277,13 @@ has_end:
   $I0 = number_result[1]
   # say, 2 if -2
   inc $I0
-
  
   # say, length is 6
-  $I1 = length the_string
+  index_1 = length the_string
   # so, if we had end-1, then we'd be at position 4. (end is 5, -1)
-  $I1 = $I1 - $I0
-  retval = $I1
+  index_1 = index_1 - $I0
+  retval = new Integer
+  retval = index_1
 
   goto done
 
@@ -279,14 +291,11 @@ has_end:
 my_end:
   $I0 = length the_string
   dec $I0
+  retval = new Integer
   retval = $I0
 
 done:
- .pcc_begin_return
-   .return return_type
-   .return retval
- .pcc_end_return
-
+ .return(return_type,retval)
 .end
 
 # Imagine how much easier this would be to do with regular
