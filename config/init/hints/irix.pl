@@ -23,7 +23,7 @@ my $ld   = Configure::Data->get('ld');
 my $link = Configure::Data->get('link');
 if ( $cc =~ /cc -64/ ) {
     $cxx  = 'CC -64';
-    $ld   = 'ld -64';
+    $ld   = 'CC -64';
     $link = 'CC -64';
     Configure::Data->set(
         cxx  => $cxx,
