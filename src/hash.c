@@ -30,7 +30,7 @@
  *                     to Hash and HashBucket
  *     2003.11.11 leo randomize key_hash seed
  *                    extend new_hash_x() init call by value_type and _size.
- *     2003.11.14 leo USE_STRING_COMPARE define, s. comment below
+ *     2003.11.14 leo USE_STRING_EQUAL define, s. comment below
  *
  *  Notes:
  *     Future optimizations:
@@ -53,7 +53,7 @@
  * hash keys.
  * 1 ... Original code. Keys are stored as is. Each compare (which can happen
  *       more then once per lookup) possibly transcodes keys and then
- *       compare these keys.
+ *       compares these keys.
  * 0 ... Ascii keys are stored as is. As soon as the first non-ASCII key is
  *       stored in the Hash, all keys are converted to utf8 and the key is
  *       stored in that encoding too.
@@ -62,17 +62,17 @@
  *       or (after transcoding) a copy of a key is stored. This could
  *       probably be solved by transcoding the string in place.
  *
- * Timing of
+ * Timing of (string, hash -O3, Athlon-800)
  * $ parrot -C examples/benchmarks/hash-utf8.pasm
- * #define USE_STRING_COMPARE 1
- * 0.479678
- * 9.243186
- * #define USE_STRING_COMPARE 0
- * 0.485383
- * 0.650183
+ * #define USE_STRING_EQUAL 1
+ * 0.35
+ * 8.2
+ * #define USE_STRING_EQUAL 0
+ * 0.36
+ * 0.54
  */
 
-#define USE_STRING_COMPARE 0
+#define USE_STRING_EQUAL 0
 
 
 /* Assumes 2's complement? */
@@ -136,14 +136,14 @@ key_hash_STRING(Interp *interpreter, Hash *hash, void *value)
 static int
 STRING_compare(Parrot_Interp interp, void *a, void *b)
 {
-#if USE_STRING_COMPARE
-    return string_compare(interp, (STRING *)a, (STRING *) b);
+#if USE_STRING_EQUAL
+    return string_equal(interp, (STRING *)a, (STRING *) b);
 #else
     return hash_string_equal(interp, (STRING *)a, (STRING *) b);
 #endif
 }
 
-#if USE_STRING_COMPARE
+#if USE_STRING_EQUAL
 #  define promote_hash_key(i,h,k,f) (k)
 #else
 
