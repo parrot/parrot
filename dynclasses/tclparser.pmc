@@ -96,8 +96,6 @@ XXX: Skip the evaluate step, and just return an invokable.
       STRING *S0, *S1;
       PMC *P0,*P1,*P2,*P3,*P4;
 
-      //printf ("ENTERING PARSER\n");
- 
       /* backslash/newline substitution */
       buffer_length = string_length(INTERP, buffer);
       bs_pos = string_str_index(INTERP, buffer, bs_nl, bs_marker);
@@ -126,13 +124,15 @@ XXX: Skip the evaluate step, and just return an invokable.
         bs_pos = string_str_index(INTERP, buffer, bs_nl, bs_marker);
       }
 
-  // Keep track of the position of the current word
+  /* Keep track of the position of the current word */
   start_word = 0;
 
   commands = pmc_new(INTERP,TclList);
 
-  //# (Do this after the newline_subst since this could change the
-  //#  size of the buffer.)  ... don't fall off the end
+  /* 
+   * (Do this after the newline_subst since this could change the
+   *  size of the buffer.)  ... don't fall off the end
+   */
 
   buffer_length = string_length(INTERP, buffer);
 
@@ -192,7 +192,6 @@ space_loop_end:
   }
 
 pre_middle:
-  //printf("PRE_MIDDLE\n");
   word_length = 0;
   word_trailing_length = 0;
   last_character = -1;
@@ -218,7 +217,7 @@ middle_word_0:
     goto end_word;
   }
 
-  //# if this isn't a newline, skip
+  /* if this isn't a newline, skip */
   if (character != 10) {
     goto middle_word_2;
   }
@@ -228,17 +227,17 @@ middle_word_1:
   goto end_command;
 
 middle_word_2:
-  //# wait, this was a semicolon - go back and deal with it.
+  /* wait, this was a semicolon - go back and deal with it.*/
   if (character == 59) {
     goto middle_word_1;
   }
 
-  //# If we've gotten this far and we're in a "" or brace-block, barf.
+  /* If we've gotten this far and we're in a "" or brace-block, barf. */
   if (end_of_word == 1) {
     goto invalid_word;
   }
 
-  //# [ ] 
+  /* [ ] */
   if (block_interpolation) {
     goto check_bs;
   }
@@ -246,13 +245,13 @@ middle_word_2:
     goto handle_command_block;
   }
 
-  //# $
+  /* $ */
   if (character == 36) {
     goto handle_variable;
   }
 
 check_bs: 
-  //# backslash
+  /* backslash */
   if (character == 92) {
     goto handle_backslash;
   }
@@ -263,7 +262,7 @@ middle_continue:
   goto middle_word;
 
 end_word:
-  //# save the word and put it into the command array
+  /*  save the word and put it into the command array */
 
   S0 = string_substr(INTERP, buffer, start_word, word_length, NULL, NULL);
   P1 = VTABLE_find_method(INTERP, word, ConcatConst);
@@ -278,40 +277,46 @@ end_word:
   goto begin_word;
 
 handle_comment:
-  //# If the comment is all that's left, quit.
+  /* If the comment is all that's left, quit. */
   I0 = string_str_index(INTERP, buffer, nl, start_word);
   if (I0 == -1) {
     goto end_command;
   }
 
-  //# otherwise, stop at the next newline.
+  /*  otherwise, stop at the next newline. */
   start_word = I0 + 1;
   goto begin_command;
   
 end_command:
-  //# if we're preserving whitespace and we're at the end of the command,
-  //# we must really be done.
+  /*
+   * if we're preserving whitespace and we're at the end of the command,
+   * we must really be done.
+   */
   if (preserve_whitespace==1) {
     goto end_command_0;
   }
 
-  //# If this was an empty line, we'll have a 0 word length but
-  //# a trailing length of 1. skip the newline
+  /*
+   * If this was an empty line, we'll have a 0 word length but
+   * a trailing length of 1. skip the newline
+   */
 
-  //# unless we finished the word, in which case 
+  /* unless we finished the word, in which case... */
   if (end_of_word == 1) {
     goto end_command_0;
   }
 
-  //# Because of how we grabbed the command, we could have a word_length
-  //# of zero, but have a word object in process.
+  /*
+   * Because of how we grabbed the command, we could have a word_length
+   * of zero, but have a word object in process.
+   */
   I0 = Parrot_PMC_get_intval(INTERP, word);
   if (I0 != 0) {
     goto end_command_0;
   }
 
-  //# If word_length is zero now, don't bother adding the word.
-  //# (unless we're preserving whitespace...)
+  /* If word_length is zero now, don't bother adding the word. */
+  /* (unless we're preserving whitespace...) */
   if (word_length == 0) {
     goto end_command_1;
   }
@@ -326,7 +331,7 @@ end_command_0:
   }
  
 end_command_1:
-  //# go to the next word
+  /* go to the next word*/
 
   I0 = Parrot_PMC_get_intval(INTERP, command);
   if (I0 == 0) {
@@ -346,10 +351,10 @@ handle_brace:
   }
   end_of_word = 1;
 
-  //#figure out where the new word is going to start.
+  /* figure out where the new word is going to start.*/
   I1 = start_word + word_length;
 
-  //# This gets added as a constant.
+  /* This gets added as a constant.*/
   start_word++;
   word_length-=2;
 
@@ -360,7 +365,6 @@ handle_brace:
   word_length = 0;
   goto middle_word;
 
-//# This looks very much like handle_brace, eh?
 handle_quote:
   word_length = Parrot_TclParser_match_close(INTERP, SELF, buffer,start_word);
 
@@ -369,13 +373,15 @@ handle_quote:
   }
   end_of_word = 1 ;
 
-  //#figure out where the new word is going to start.
+  /*figure out where the new word is going to start.*/
   I1 = start_word + word_length;
 
-  //# Since we could have embedded things in our string,
-  //# recall the parser, but tell it to preserve the whitespace in
-  //# this quote.
-  //# (There could be embedded vars, commands, etc.)
+  /*
+   * Since we could have embedded things in our string,
+   * recall the parser, but tell it to preserve the whitespace in
+   * this quote.
+   * (There could be embedded vars, commands, etc.)
+   */
 
   start_word++;
   word_length-=2;
@@ -400,12 +406,12 @@ handle_quote:
   goto middle_word;
 
 handle_variable:
-  //# First, save off anything we've gotten so far as a constant.
+  /* First, save off anything we've gotten so far as a constant.*/
   old_length = word_length;
   chunk_start = start_word + word_length;
   word_length = Parrot_TclParser_match_close(INTERP, SELF, buffer,chunk_start);
 
-  //# if there's any word so far, save it
+  /* if there's any word so far, save it*/
   if (old_length == 0) {
     goto handle_variable_1;
   }
@@ -425,12 +431,12 @@ handle_variable_brace:
   if (I1 > buffer_length) {
     goto invalid_variable;
   }
-  //# Save the new start word for when we go to middle word.
+  /* Save the new start word for when we go to middle word.*/
   I1++;
   start_word = I1;
   word_length = 0;
 
-  //# Name of variable is between the braces..
+  /* Name of variable is between the braces..*/
   chunk_start++;
   I2 = I1 - chunk_start - 1;
   S0 = string_substr(INTERP, buffer, chunk_start, I2, NULL, NULL);
@@ -447,34 +453,34 @@ inner:
   }
     
   I0 = string_index(INTERP, buffer, temppos);
-  //#A
+  /* A */
   if (I0 < 65) {
     goto check2;
   }
-  //#Z
+  /* Z */
   if (I0 <= 90) {
     goto inner;
   }
 check2:
-  //#a
+  /* a */
   if (I0 < 97) {
     goto check3;
   }
-  //#z
+  /* z */
   if (I0 <=122) {
     goto inner;
   }
 check3:
-  //#0
+  /* 0 */
   if (I0 <48) {
     goto check4;
   }
-  //#9
+  /* 9 */
   if (I0 <=57) {
     goto inner;
   }
 check4:
-  //# _
+  /* _ */
   if (I0 == 95) {
     goto inner;
   }
@@ -504,15 +510,14 @@ inner_done:
   goto middle_word;
 
 gotword:
-  //# $S0 was set to the name of the variable above.
+  /* $S0 was set to the name of the variable above. */
   P1 = VTABLE_find_method(INTERP, word, ConcatVariable);
   Parrot_call_method(INTERP, P1, word, ConcatVariable, "vS", S0);
 
   goto middle_word;
 
 handle_backslash:
-  //printf ("handling backslash?\n");
-  //# dump anything so far as a constant.
+  /* dump anything so far as a constant.*/
   if (word_length == 0)  {
     goto backslash_escape;
   }
@@ -533,8 +538,7 @@ backslash_escape:
   start_word++;
   escape_length = 1;
   I0 = string_index(INTERP, buffer, start_word);
-  //# add this escape as a sequence.
-  //# \a
+  /* add this escape as a sequence.*/
   P1 = VTABLE_find_method(INTERP, word, ConcatChar);
   if (I0 != 97) {
     goto backslash_escape_b;
@@ -578,14 +582,14 @@ backslash_escape_v:
   Parrot_call_method(INTERP, P1, word, ConcatChar, "vI", 11);
   goto escape_done;
 
-//# XXX - here is where the \o, \x, \u escapes would go.
-//#     - You have to twiddle escape_length 
+/* XXX - here is where the \o, \x, \u escapes would go.
+     - You have to twiddle escape_length */
 
 backslash_escape_not:
   Parrot_call_method(INTERP, P1, word, ConcatChar, "vI", I0);
 
 escape_done:
-  //# skip the escaped char
+  /* skip the escaped char*/
   start_word = start_word + escape_length;
   goto middle_word;
 
@@ -598,7 +602,7 @@ handle_command_block:
     goto bad_block;
   }
 
-  //# if there's any word so far, save it
+  /* if there's any word so far, save it*/
   if (old_length == 0) {
     goto command_save;
   }
@@ -607,7 +611,7 @@ handle_command_block:
   Parrot_call_method(INTERP, P1, word, ConcatConst, "vS", S0);
 
 command_save:
-  //# Save this as a command (skip the []'s)
+  /* Save this as a command (skip the []'s)*/
   I0 = chunk_start + 1;
   I1 = word_length - 2;
   S0 = string_substr(INTERP, buffer, I0, I1, NULL, NULL);
@@ -619,22 +623,20 @@ command_save:
 
   goto middle_word;
 
-//# if we're preserving whitespace, just
-//# return the single command
+  /* if we're preserving whitespace, just return the single command */
 
 preserve_end_scope:
   return(command);
 
 end_scope:
-  //# If we have a command in progress, save it!
+  /* If we have a command in progress, save it!*/
   I0 = Parrot_PMC_get_intval(INTERP, command);
   if (I0 == 0) {
     goto end_scope_2;
   }
   VTABLE_push_pmc(INTERP, commands, command);
 
-  //# At this point, we have parsed the string into an array of commands.
-  //# return it.
+  /* At this point, we have parsed the string into an array of commands.*/
 
 end_scope_2:
   return(commands);
@@ -642,9 +644,11 @@ end_scope_2:
 end:
   exit(1); /* XXX this needs to go away. */
 
- //# XXX these really should generate compile-time tcl errors.
- //# (perhaps even compile to code that generates an [error]?)
- //# (redo this once "error" is working.)
+ /*
+  * XXX these really should generate compile-time tcl errors.
+  * (perhaps even compile to code that generates an [error]?)
+  * (redo this once "error" is working.)
+  */
 
 bad_array:
   printf("XXX - invalid array, no close ) found\n");
