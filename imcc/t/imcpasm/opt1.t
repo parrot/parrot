@@ -1,7 +1,10 @@
 #!perl
 use strict;
-use TestCompiler tests => 5;
+use TestCompiler tests => 6;
 use Test::More qw(skip);
+
+# these tests are run with -O1 by TestCompiler and show
+# generated PASM code for various optimizations at level 1
 
 ##############################
 output_is(<<'CODE', <<'OUT', "branch opt if");
@@ -72,3 +75,26 @@ _main:
 _L2:
 	end
 OUT
+
+##############################
+output_is(<<'CODE', <<'OUT', "branch_branch and dead code");
+.sub _test
+   goto l1
+l2:
+   noop
+   print "ok\n"
+   end
+l1:
+   goto l3
+l4:
+   eq I1, 0, l2
+l3:
+   goto l2
+.end
+CODE
+_test:
+   noop
+   print "ok\n"
+   end
+OUT
+

@@ -45,11 +45,11 @@ all : imcc
 ../../$(PARROTLIB): ../../parrot$(EXE)
 	cd ../.. && $(MAKE) $(PARROTLIB)
 
-imcparser.c : imcc.y $(H_FILES)
+imcparser.c : imcc.y
 	$(YACC) -d -o imcparser.c imcc.y
 
 imcparser.h : imcc.y
-imclexer.c : imcc.l $(H_FILES)
+imclexer.c : imcc.l
 	$(LEX) imcc.l
 
 .c$(O):

@@ -31,11 +31,11 @@ output_is(<<'CODE', <<'OUT', "recursive bsr with saveall");
 .sub _test
    $I0 = 5
    $I1 = $I0
-   bsr fact
+   bsr _fact
    print $I1
    print "\n"
    end
-fact:
+_fact:
    save $I0
    save $I1
    saveall
@@ -44,7 +44,7 @@ fact:
    if $I0 <= 1 goto fin
    dec $I0
    $I1 = $I1 * $I0
-   bsr fact
+   bsr _fact
 fin:
    save $I1
    restoreall

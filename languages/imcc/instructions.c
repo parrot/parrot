@@ -213,7 +213,8 @@ Instruction * delete_ins(Instruction *ins, int needs_freeing)
     next = ins->next;
     prev = ins->prev;
     prev->next = next;
-    next->prev = prev;
+    if (next)
+        next->prev = prev;
     if (needs_freeing)
         free_ins(ins);
     return next;

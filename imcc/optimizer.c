@@ -156,29 +156,38 @@ static void if_branch(struct Parrot_Interp *interp)
 }
 
 /*
- * branch L1
- * branch L2  <- not reached
+ * branch L1  => branch L2
+ * ...
+ * L1:
+ * branch L2
+ *
  */
 static void branch_branch()
 {
-    Instruction *ins, *last;
+    Instruction *ins1, *ins2, *next;
 
     /* reset statistic globals */
     ostat.branch_branch = 0;
-
-    last = instructions;
-    if (!last->next)
-        return;
-    for (ins = last->next; ins; ) {
-        if ((last->type & IF_goto) &&           /* branch Lx */
-                (ins->type & IF_goto)) {        /* branch Ly*/
-            ostat.deleted_ins++;
-            ins = delete_ins(ins, 1);
-            ostat.branch_branch++;
+    for (ins1 = 0, ins1 = instructions; ins1; ins1 = ins1->next) {
+        if ((ins1->type & IF_goto) && !strcmp(ins1->op, "branch")) {
+            for (ins2 = 0, ins2 = instructions; ins2; ins2 = ins2->next) {
+                if ((ins2->type & ITLABEL) &&
+                        !strcmp(ins1->r[0]->name, ins2->r[0]->name)) {
+                    next = ins2->next;
+                    if (!next)
+                        break;
+                    if ((next->type & IF_goto) &&
+                            !strcmp(next->op, "branch")) {
+                        debug(DEBUG_OPT1, "found branch to branch '%s' %s\n",
+                                ins2->r[0]->name, ins_string(next));
+                        ostat.branch_branch++;
+                        ins1->r[0] = next->r[0];
+                    }
+                }
+            }
         }
-        last = ins;
-        ins = ins->next;
     }
+
 }
 
 static void unused_label()
@@ -220,6 +229,61 @@ static void unused_label()
     }
 }
 
+/* optimizations with CFG built */
+int dead_code_remove(void)
+{
+    Basic_block *bb;
+    int i;
+    int changed = 0;
+    Instruction *ins, *last;
+
+    if (*optimizer_opt == '0')       /* XXX */
+        return 0;
+    for (i=1; bb_list[i]; i++) {
+	bb = bb_list[i];
+        if ((bb->start->type & ITLABEL) && *bb->start->r[0]->name == '_')
+            continue;
+        /* this block isn't entered from anywhere */
+        if (!bb->pred_list) {
+            debug(DEBUG_OPT1, "found dead block %d\n", bb->index);
+            for (ins = bb->start; ins; ) {
+                ins = delete_ins(ins, 1);
+                ostat.deleted_ins++;
+                changed++;
+                if (!ins || ins == bb->end->next)
+                    break;
+            }
+        }
+    }
+    if (changed)
+        return changed;
+    for (last = instructions, ins=last->next; last && ins; ins = ins->next) {
+        if ((last->type & IF_goto) && !(ins->type & ITLABEL)) {
+            debug(DEBUG_CFG, "unreachable ins deleted %s\n",
+                    ins_string(ins));
+            ins = delete_ins(ins, 1);
+            ostat.deleted_ins++;
+            changed++;
+        }
+        /*
+         *   branch L1     => --
+         * L1: ...            L1:
+         */
+        if ((last->type & IF_goto) && (ins->type & ITLABEL) &&
+                !strcmp(last->op, "branch") &&
+                !strcmp(last->r[0]->name, ins->r[0]->name)) {
+            debug(DEBUG_CFG, "dead branch deleted %s\n",
+                    ins_string(ins));
+            ins = delete_ins(last, 1);
+            ostat.deleted_ins++;
+            changed++;
+        }
+        last = ins;
+    }
+    return changed;
+}
+
+/* optimizations with CFG & life info built */
 static int used_once()
 {
     Instruction *ins;
@@ -481,7 +545,7 @@ loop_optimization(struct Parrot_Interp *interp)
                 changed |= loop_one(interp, bb);
             }
         /* currently e.g. mandel.p6 breaks, if not only the most
-         * inner loop is changed, but outer loops to */
+         * inner loop is changed, but outer loops too */
         if (changed) {
             prev_depth = l-1;
             debug(DEBUG_OPT2,"after loop_opt\n");

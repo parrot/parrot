@@ -1,4 +1,18 @@
 - 2003-02-08 	leo
+        * changed branch_branch to optimize a sequence of absolute
+	  branches to branch to the final target
+	* dead blocks removal
+	* unreachable lines removal
+
+	  *****************************************************
+	  make the long announced rule fix:
+	  o global labels MUST start with an underscore
+	  o labels of bsr calls are global
+	  o labels of set_addr op are global
+	  o local labels SHOULD NOT start with an underscore
+	  *****************************************************
+
+- 2003-02-08 	leo
 	* version 0.0.9.13
 	* pass -Ox on to tests
 	* remove dead code

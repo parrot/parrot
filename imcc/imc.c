@@ -45,13 +45,18 @@ void allocate(struct Parrot_Interp *interpreter) {
 
     todo = 1;
     while (todo) {
-        build_reglist();
         find_basic_blocks();
         build_cfg();
+
+        if (!dont_optimize && dead_code_remove()) {
+            pre_optimize(interpreter);
+            continue;
+        }
 
         compute_dominators();
         find_loops();
 
+        build_reglist();
         life_analysis();
         /* optimize, as long as there is something to do -
          * but not, if we found a set_addr, which means
