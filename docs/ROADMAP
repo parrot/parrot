@@ -3,7 +3,7 @@
 
 =head1 NAME
 
-ROADMAP
+ROADMAP - A plan for Parrot
 
 =head1 PURPOSE
 
@@ -22,13 +22,32 @@ Strictly speaking, this document is not a roadmap - that requires input from
 the Architect and the Pumpking. However, its goal is to help improve project
 management for parrot, and enable an actual roadmap.
 
-=head1 NEXT RELEASE (0.1.2)
+=head1 CURRENT RELEASE (0.1.2)
 
-This release has a ticket opened as [perl #33916].
+Parrot 0.1.2 has been released on March 7th 2005. For a list of new and
+fixed feature see L<ChangeLog>.
 
- https://rt.perl.org/rt3/Ticket/ModifyLinks.html?id=33916
+There is also a closed ticket [perl #33916] for this release.
 
-has a list of all the open issues which must be completed for this release.
+ https://rt.perl.org/rt3/Ticket/Display.html?id=33916 
+
+contains a list of tickets which had to be completed for Parrot 0.1.2.
+
+=head1 NEXT RELEASE (0.1.3)
+
+This release has a ticket opened as [perl #34324].
+
+ https://rt.perl.org/rt3/Ticket/Display.html?id=34324
+
+will have a list of all the open issues which must be completed for Parrot 0.1.3.
+
+=head1 NEXT RELEASE (0.2.0)
+
+This release has a ticket opened as [perl #34325].
+
+ https://rt.perl.org/rt3/Ticket/Display.html?id=34325
+
+will have a list of all the open issues which must be completed for Parrot 0.2.0.
 
 =head1 OVERVIEW
 
@@ -43,7 +62,7 @@ Eventually all metadata should be stored in RT at http://rt.perl.org/rt3/
 =head2 DESIGN
 
 These are pending design decisions which must be made before any code can
-be written to implement them. Note - DESIGN is a special kind of documenation
+be written to implement them. Note - DESIGN is a special kind of documentation
 task. Due to the nature of this kind of documentation, it deserves to be
 broken out into its own category.
 
@@ -419,3 +438,5 @@ Pass the pie-thon test suite.
 This document should eventually be obsoleted by use of the RT ticketing
 system. Every task that is to be done should be documented in the system, and
 reports generated based on that information. 
+
+=cut
