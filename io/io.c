@@ -100,8 +100,11 @@ PIO_destroy(theINTERP, PMC *pmc)
     ParrotIO *io = PMC_data(pmc);
     UNUSED(interpreter);
 
-    if (io->b.startb && (io->b.flags & PIO_BF_MALLOC))
+    if (io->b.startb && (io->b.flags & PIO_BF_MALLOC)) {
         mem_sys_free(io->b.startb);
+        io->b.startb = NULL;
+        io->b.flags &= ~PIO_BF_MALLOC;
+    }
     mem_sys_free(io);
     PMC_data(pmc) = NULL;
     pmc->cache.struct_val = NULL;
