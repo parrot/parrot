@@ -224,13 +224,13 @@ void Parrot_jit_normal_op(Parrot_jit_info_t *jit_info,
 Parrot_jit_optimizer_t *optimize_jit(struct Parrot_Interp *interpreter,
             opcode_t *pc, opcode_t *code_start, opcode_t *code_end);
 
-void Parrot_jit_emit_mov_mr_n(Parrot_jit_info_t *, 
+void Parrot_jit_emit_mov_mr_n(
     struct Parrot_Interp *interpreter, char *mem, int);
-void Parrot_jit_emit_mov_mr(Parrot_jit_info_t *,
+void Parrot_jit_emit_mov_mr(
     struct Parrot_Interp *interpreter, char *mem, int);
-void Parrot_jit_emit_mov_rm_n(Parrot_jit_info_t *,
+void Parrot_jit_emit_mov_rm_n(
     struct Parrot_Interp *interpreter, int reg, char *mem);
-void Parrot_jit_emit_mov_rm(Parrot_jit_info_t *,
+void Parrot_jit_emit_mov_rm(
     struct Parrot_Interp *interpreter, int reg, char *mem);
 
 #endif /* JIT_H_GUARD */

@@ -465,13 +465,13 @@ Parrot_jit_load_registers(Parrot_jit_info_t *jit_info,
 
     for (i = sect->int_registers_used-1; i >= 0; --i)
         if (sect->int_reg_dir[sect->int_reg_usage[i]] & PARROT_ARGDIR_IN)
-          Parrot_jit_emit_mov_rm(jit_info, interpreter, jit_info->intval_map[i],
+          Parrot_jit_emit_mov_rm(interpreter, jit_info->intval_map[i],
             (char*)&interpreter->ctx.int_reg.registers[sect->int_reg_usage[i]]);
                
 #if FLOAT_REGISTERS_TO_MAP
     for (i = sect->float_registers_used-1; i >= 0; --i)
         if (sect->float_reg_dir[sect->float_reg_usage[i]] & PARROT_ARGDIR_IN)
-          Parrot_jit_emit_mov_rm_n(jit_info, interpreter,
+          Parrot_jit_emit_mov_rm_n(interpreter,
             jit_info->floatval_map[i],
               (char*) &interpreter->ctx.num_reg.registers[
                 sect->float_reg_usage[i]]);
@@ -496,13 +496,13 @@ Parrot_jit_save_registers(Parrot_jit_info_t *jit_info,
 
     for (i = 0; i < sect->int_registers_used; ++i)
         if (sect->int_reg_dir[sect->int_reg_usage[i]] & PARROT_ARGDIR_OUT)
-            Parrot_jit_emit_mov_mr(jit_info, interpreter,
+            Parrot_jit_emit_mov_mr(interpreter,
                 (char*)&interpreter->ctx.int_reg.registers[
                 sect->int_reg_usage[i]], jit_info->intval_map[i]);
 #if FLOAT_REGISTERS_TO_MAP
     for (i = 0; i < sect->float_registers_used; ++i)
         if (sect->float_reg_dir[sect->float_reg_usage[i]] & PARROT_ARGDIR_OUT)
-            Parrot_jit_emit_mov_mr_n(jit_info, interpreter,
+            Parrot_jit_emit_mov_mr_n(interpreter,
                 (char*)&interpreter->ctx.num_reg.registers[
                 sect->float_reg_usage[i]], jit_info->floatval_map[i]);
 #endif
