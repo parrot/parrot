@@ -1,6 +1,6 @@
 =head1 TITLE
 
-Conventions and Guidelines for Perl Source Code
+Conventions and Guidelines for Parrot Source Code
 
 =head1 VERSION
 
@@ -26,7 +26,7 @@ None. First version
 =head1 ABSTRACT
 
 This document describes the various rules, guidelines and advice for
-those wishing to contribute to the source code of Perl, in such areas
+those wishing to contribute to the source code of Parrot, in such areas
 as code structure, naming conventions, comments etc.
 
 =head1 DESCRIPTION
@@ -34,7 +34,8 @@ as code structure, naming conventions, comments etc.
 One of the criticisms of Perl 5 is that its source code is
 impenetrable to newcomers, due to such things as inconsistent or
 obscure variable naming conventions, lack of comments in the source
-code, and so on.  Hence this document.
+code, and so on.  We don't intend to make the same mistake when writing
+Parrot. Hence this document.
 
 We define three classes of conventions. Those that say I<must> are
 mandatory, and code will not be accepted (apart from in exceptional
@@ -44,9 +45,10 @@ is a sensible reason to do otherwise.  Finally, those that say I<may>,
 are tentative suggestions to be used at your discretion.
 
 Note this particular PDD makes some recommendations that are
-specific to the C programming language. This does not preclude Perl
-being implemented in other languages, but in this case, additional PDDs
-may need to be authored for the extra language-specific features.
+specific to the C programming language. This does not preclude Parrot 
+(or Perl 6) being implemented in other languages, but in this case, 
+additional PDDs may need to be authored for the extra language-specific 
+features.
 
 =head1 IMPLEMENTATION
 
@@ -234,8 +236,8 @@ This expands out to:
 Please note that it is also necessary to include all typedef types
 with the "-T" option to ensure that everything is formatted properly.
 
-A script (F<run_indent.pl>) is provided which runs F<indent> properly 
-automatically.
+A script (F<tools/dev/run_indent.pl>) is provided which runs F<indent> 
+properly automatically.
 
 =head2 Naming conventions
 
@@ -243,7 +245,7 @@ automatically.
 
 =item Subsystems and APIs
 
-Perl core will be split into a number of subsystems, each with an
+The Parrot core will be split into a number of subsystems, each with an
 associated API. For the purposes of naming files, data structures, etc,
 each subsystem will be assigned a short nickname, eg I<pmc>, I<gc>, I<io>.
 All code within the core will belong to a subsystem; miscellaneous code
@@ -318,7 +320,7 @@ foo_
 =back
 
 
-The top-level structure of the Perl source tarball should be as follows:
+The top-level structure of the Parrot source tarball should be as follows:
 
     /README, etc    a few top-level documents
     /docs/          Assorted miscellaneous documentation
