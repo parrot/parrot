@@ -431,6 +431,31 @@ the previous one.
         return ret;
     }
 
+    void* invoke(void *next) {
+        PMC *agg, *key, *res;
+        INTVAL ires;
+
+        REG_INT(1) = REG_INT(2) = REG_INT(3) = REG_INT(3) = 0;
+        if (!key)
+            return next;
+        if (PMC_int_val(key) == -1)
+            return next;
+        key = PMC_struct_val(SELF);
+        agg = PMC_pmc_val(SELF);
+        switch (agg->vtable->base_type) {
+            case enum_class_IntList:
+                ires = SELF.shift_integer();
+                REG_INT(1) = 1;
+                REG_INT(5) = ires;
+                return next;
+            default:
+                res = SELF.shift_pmc();
+                REG_INT(3) = 1;
+                REG_PMC(5) = res;
+                return next;
+        }
+    }
+
 /*
 
 =item C<FLOATVAL shift_float()>

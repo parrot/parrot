@@ -16,7 +16,8 @@ getopts('dnD', \%opt);
 $file = $ARGV[0];
 
 my %builtins = (
-    abs => 1
+    abs => 1,
+    iter =>1,
 );
 
 get_dis($DIS, $file);
@@ -112,7 +113,7 @@ sub get_source {
 }
 
 my ($code_l, %params, %lexicals, %names, %def_args, %arg_count,
-    @code, %classes);
+    @code, %globals, %classes);
 
 sub decode_line {
     my $l = shift;
@@ -173,7 +174,11 @@ sub New_func {
 
 .sub $arg prototyped
 	new_pad 0
+	.local pmc None
+	None = new .None
 EOC
+    $names{None} = 1;
+    $globals{None} = 1;
     if ($def_args{$arg}) {
 	my ($i, $n, $defs);
 	$n = $arg_count{$arg};
@@ -205,7 +210,7 @@ sub ARG_count {
 	# $c($n)
 EOC
 }
-my (@stack, $temp, %globals, $make_f, %pir_functions);
+my (@stack, $temp, $make_f, %pir_functions);
 
 sub gen_code {
     $cur_func = 'test::main';
@@ -215,6 +220,8 @@ sub gen_code {
     .local pmc __name__
     __name__ = new $DEFVAR
     __name__ = '__main__'
+    .local pmc None
+    None = new .None
 EOC
     $globals{'__name__'} = 1;
     $code_l = 0;
@@ -992,8 +999,7 @@ sub GET_ITER
     my $tos = pop @stack;
     my $var = promote($tos);
     print <<EOC;
-	$it = new .Iterator, $var $cmt
-	$it = 0 # .ITERATE_FROM_START
+	$it = iter $var $cmt
 EOC
     push @stack, [-1, $it, 'P']
 }
@@ -1008,8 +1014,9 @@ sub FOR_ITER
     }
     my $var = temp('P');
     print <<EOC;
-	unless $iter goto $targ $cmt
-	$var = shift $iter
+	unless $iter goto $targ
+	$var = $iter() $cmt
+	eq_addr $var, None, $targ
 EOC
     push @stack, [-1, $var, 'P']
 }

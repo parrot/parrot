@@ -12,6 +12,16 @@ C<Coroutine> extends C<Continuation> to provide a subroutine that can
 stop in the middle, and start back up later at the point at which it
 stopped. See the L<Glossary|docs/glossary.pod> for more information.
 
+=head2 Flags
+
+=over 4
+
+=item private0 call flip flop
+
+=item private3 called first time, used for python
+
+=back
+
 =head2 Methods
 
 =over 4
@@ -39,7 +49,9 @@ Initializes the co-routine.
         PMC_sub(SELF) = new_coroutine(INTERP);
         PMC_struct_val(SELF) = NULL;
         PObj_custom_mark_destroy_SETALL(SELF);
-        PObj_get_FLAGS(SELF) &= ~PObj_private0_FLAG;
+
+        if (Interp_flags_TEST(INTERP, PARROT_PYTHON_MODE))
+           PObj_get_FLAGS(SELF) |= PObj_private3_FLAG;
     }
 
 /*
@@ -55,6 +67,15 @@ Swaps the "context".
     void* invoke (void* next) {
         struct Parrot_Sub * sub = (struct Parrot_Sub *)PMC_sub(SELF);
         void * dest = PMC_struct_val(SELF);
+        /* python calls the coroutine initially during
+         * setup
+         */
+        if (PObj_get_FLAGS(SELF) & PObj_private3_FLAG) {
+            PObj_get_FLAGS(SELF) &= ~PObj_private3_FLAG;
+            /* this should return an iterator */
+            REG_PMC(5) = SELF;
+            return next;
+        }
         PMC_struct_val(SELF) = next;
         swap_context(interpreter, SELF);
 
@@ -62,6 +83,28 @@ Swaps the "context".
             Parrot_switch_to_cs(interpreter, sub->seg, 1);
         }
         return dest;
+    }
+
+/*
+
+Iterator interface
+
+=item C<INTVAL elements ()>
+
+Return much, we don't know.
+
+*/
+
+    INTVAL elements () {
+        return (2^31) - 1;
+    }
+
+    PMC* get_iter () {
+        return SELF;
+    }
+
+    INTVAL get_bool () {
+        return 1;
     }
 
 /*
