@@ -22,6 +22,15 @@ EOP
 EOP
 }
 
+	print OUT <<EOP;
+/* from config/auto/isreg */
+EOP
+unless (${isreg}) {
+	print OUT <<EOP;
+#define BROKEN_ISREG 1
+EOP
+}
+
 if (${jit_i386} && ${jit_i386} eq 'fcomip') {
     print OUT <<'END';
 
