@@ -1,3 +1,8 @@
+- 2003-07-03	leo
+
+	* switch to PASM/PIR mode, when reading .pasm/.imc include files
+	* search runtime/parrot/include too for includes
+
 - 2003-07-02	leo
 
 	* build imcc as parrot
