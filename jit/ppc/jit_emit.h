@@ -1,11 +1,11 @@
 /*
  * jit_emit.h
- * 
+ *
  * PPC
  *
  * $Id$
  */
- 
+
 #include <unistd.h>
 #include <sys/mman.h>
 #include <limits.h>
@@ -100,7 +100,7 @@ enum { JIT_PPC_CALL, JIT_PPC_BRANCH, JIT_PPC_UBRANCH };
  *  +-----------------------------------+
  *  | 31 |
  *  +-----------------------------------+
- * 0    5 6                     29 30 31 
+ * 0    5 6                     29 30 31
  * */
 #define emit_mr(pc, dst, src) \
   *(pc++) = emit_op(31) | emit_r3(src); \
@@ -115,8 +115,8 @@ enum { JIT_PPC_CALL, JIT_PPC_BRANCH, JIT_PPC_UBRANCH };
  *  +--------------------------------------------------------------------+
  *  |    31    |     D-S    |         spr            |      type     | 0 |
  *  +--------------------------------------------------------------------+
- * 0          5 6         10 11                    20 21           30  31 
- * 
+ * 0          5 6         10 11                    20 21           30  31
+ *
  * spr = 8 == LR
  * spr = 9 == CTR
  *
@@ -152,7 +152,7 @@ enum { JIT_PPC_CALL, JIT_PPC_BRANCH, JIT_PPC_UBRANCH };
  *  +--------------------------------------------------------------------+
  *  |    18    |                      LI                       | AA | LK |
  *  +--------------------------------------------------------------------+
- * 0          5 6                                            29   30   31 
+ * 0          5 6                                            29   30   31
  *
  * If AA = 0, the branch target address is the sum of LI and the address of
  * this instruction.
@@ -162,7 +162,7 @@ enum { JIT_PPC_CALL, JIT_PPC_BRANCH, JIT_PPC_UBRANCH };
  *
  */
 
-  
+
 #define _emit_bx(pc, type, disp) \
   *(pc++) = (char)(18 << 2 | disp >> 24); \
   *(pc++) = (char)(disp >> 16); \
@@ -186,9 +186,9 @@ enum { JIT_PPC_CALL, JIT_PPC_BRANCH, JIT_PPC_UBRANCH };
  *  +--------------------------------------------------------------------+
  *  |    19    |     BO     |     BI     |     0     |     type     | LK |
  *  +--------------------------------------------------------------------+
- * 0          5 6         10 11        15 16       20 21          30   31 
+ * 0          5 6         10 11        15 16       20 21          30   31
  *
- * cr [type = 528] 
+ * cr [type = 528]
  * lr [type = 16]
  */
 
@@ -217,12 +217,12 @@ enum { JIT_PPC_CALL, JIT_PPC_BRANCH, JIT_PPC_UBRANCH };
   emit_bcctrx(pc, bo, bi, 16, 1)
 
 /* 3 register operation.
- * 
+ *
  *  +--------------------------------------------------------------------+
  *  |  Opcode  |     D     |     A     |     B     |OE|     type      |Rc|
  *  +--------------------------------------------------------------------+
  * 0          5 6        10 11       15 16       20 21 22           30 31
- * 
+ *
  */
 
 #define emit_3reg(pc, opcode, D, A, B, OE, type, Rc) \
@@ -284,8 +284,8 @@ enum { JIT_PPC_CALL, JIT_PPC_BRANCH, JIT_PPC_UBRANCH };
  *  +--------------------------------------------------------------------+
  * 0          5 6         10 11        15 16                           31
  *
- * addi  [opcode = 14] Adds rA to Immediate and place the result in rD. 
- *                  
+ * addi  [opcode = 14] Adds rA to Immediate and place the result in rD.
+ *
  * addis [opcode = 15] Adds rA to Immediate shifted 16 bits and place the
  *                     result in rD.
  *
@@ -390,7 +390,7 @@ enum { JIT_PPC_CALL, JIT_PPC_BRANCH, JIT_PPC_UBRANCH };
 #define emit_lwz_r(pc, reg, addr) \
   emit_lwz(pc, reg, (((char *)addr) - \
     ((char *)&interpreter->ctx.int_reg.registers[0])), r13)
-  
+
 #define emit_lfd_r(pc, reg, addr) \
   emit_lfd(pc, reg, (((char *)addr) - \
     ((char *)&interpreter->ctx.int_reg.registers[0])), r13)
@@ -405,7 +405,7 @@ enum { JIT_PPC_CALL, JIT_PPC_BRANCH, JIT_PPC_UBRANCH };
  * opcode = 31 for integer, 63 for floating point
  * bf is the comparison result field to use (we just always use 0)
  */
- 
+
 #define _emit_cmp(pc, t, bf, ra, rb) \
   *(pc++) = t << 2 | ((int)bf) >> 1; \
   *(pc++) = (char)(bf << 7 | ra); \
@@ -480,7 +480,7 @@ emit_bc(Parrot_jit_info_t *jit_info, branch_t cond, opcode_t disp) {
                     jit_info->optimizer->cur_section->branch_target->load_size;
     } else {
         offset = 0;
-        Parrot_jit_newfixup(jit_info); 
+        Parrot_jit_newfixup(jit_info);
         jit_info->arena.fixups->type = JIT_PPC_BRANCH;
         jit_info->arena.fixups->param.opcode = opcode;
 
@@ -488,7 +488,7 @@ emit_bc(Parrot_jit_info_t *jit_info, branch_t cond, opcode_t disp) {
             jit_info->optimizer->cur_section)
                 jit_info->arena.fixups->skip =
                     jit_info->optimizer->cur_section->branch_target->load_size;
-    
+
     }
     _emit_bc(jit_info->native_ptr, cond, offset, 0, 0);
 }
@@ -508,7 +508,7 @@ emit_bx(Parrot_jit_info_t *jit_info, char type, opcode_t disp)
                     jit_info->optimizer->cur_section->branch_target->load_size;
     } else {
         offset = 0;
-        Parrot_jit_newfixup(jit_info); 
+        Parrot_jit_newfixup(jit_info);
         jit_info->arena.fixups->type = JIT_PPC_UBRANCH;
         jit_info->arena.fixups->param.opcode = opcode;
 
@@ -516,11 +516,11 @@ emit_bx(Parrot_jit_info_t *jit_info, char type, opcode_t disp)
             jit_info->optimizer->cur_section)
                 jit_info->arena.fixups->skip =
                     jit_info->optimizer->cur_section->branch_target->load_size;
-    
+
     }
     _emit_bx(jit_info->native_ptr, type, offset);
 }
- 
+
 
 /* Store a CPU register back to a Parrot register. */
 
@@ -557,6 +557,12 @@ Parrot_jit_begin(Parrot_jit_info_t *jit_info,
     emit_imm32(jit_info->native_ptr, r15, interpreter->code->byte_code);
 }
 
+jit_f
+Parrot_jit_restart(struct Parrot_Interp * interpreter, opcode_t pc)
+{
+}
+
+
 void
 Parrot_jit_normal_op(Parrot_jit_info_t *jit_info,
                      struct Parrot_Interp * interpreter)
@@ -572,16 +578,16 @@ Parrot_jit_normal_op(Parrot_jit_info_t *jit_info,
 
     _emit_bx(jit_info->native_ptr, 1, 0);
 }
-   
+
 void
 Parrot_jit_cpcf_op(Parrot_jit_info_t *jit_info,
                    struct Parrot_Interp * interpreter)
 {
     Parrot_jit_normal_op(jit_info, interpreter);
-    emit_sub(jit_info->native_ptr, r3, r3, r15); 
+    emit_sub(jit_info->native_ptr, r3, r3, r15);
     emit_add(jit_info->native_ptr, r3, r14, r3);
     emit_lwz(jit_info->native_ptr, r3, 0, r3);
-    emit_mtlr(jit_info->native_ptr, r3);    
+    emit_mtlr(jit_info->native_ptr, r3);
     emit_blr(jit_info->native_ptr);
 }
 
@@ -650,7 +656,7 @@ Parrot_jit_load_registers(Parrot_jit_info_t *jit_info,
 
     i = cur_se->float_registers_used;
     while (i--)
-      if (cur_se->float_reg_dir[cur_se->float_reg_usage[i]] & 
+      if (cur_se->float_reg_dir[cur_se->float_reg_usage[i]] &
         PARROT_ARGDIR_IN) {
             emit_lfd_r(jit_info->native_ptr, jit_info->floatval_map[i],
               &interpreter->ctx.num_reg.registers[cur_se->float_reg_usage[i]]);
@@ -659,8 +665,8 @@ Parrot_jit_load_registers(Parrot_jit_info_t *jit_info,
     /* The total size of the loads */
     if (!jit_info->optimizer->cur_section->load_size)
         jit_info->optimizer->cur_section->load_size = jit_info->native_ptr -
-            (jit_info->arena.start + 
-                jit_info->arena.op_map[jit_info->op_i].offset); 
+            (jit_info->arena.start +
+                jit_info->arena.op_map[jit_info->op_i].offset);
 }
 
 /* Save registers for the current section */
@@ -679,7 +685,7 @@ Parrot_jit_save_registers(Parrot_jit_info_t *jit_info,
 
     i = cur_se->float_registers_used;
     while (i--)
-      if (cur_se->float_reg_dir[cur_se->float_reg_usage[i]] & 
+      if (cur_se->float_reg_dir[cur_se->float_reg_usage[i]] &
         PARROT_ARGDIR_OUT) {
             emit_stfd_r(jit_info->native_ptr, jit_info->floatval_map[i],
               &interpreter->ctx.num_reg.registers[cur_se->float_reg_usage[i]]);
@@ -699,10 +705,10 @@ Parrot_jit_save_registers(Parrot_jit_info_t *jit_info,
  */
 
 char intval_map[INT_REGISTERS_TO_MAP] =
-    { r16, r17, r18, r19, r20, r21, r22, r23, 
+    { r16, r17, r18, r19, r20, r21, r22, r23,
       r24, r25, r26, r27, r28, r29, r30, r31,
       r2, r3, r4, r5, r6, r7, r8, r9, r10 };
-      
+
 char floatval_map[FLOAT_REGISTERS_TO_MAP] =
     { r13, r14, r15, r16, r17, r18, r19, r20, r21,
       r22, r23, r24, r25, r26, r27, r28, r29, r30,
@@ -710,17 +716,17 @@ char floatval_map[FLOAT_REGISTERS_TO_MAP] =
 
 static void
 ppc_sync_cache (void *_start, void *_end)
-{   
+{
     char *start = (char*)(((int)_start) &~(CACHELINESIZE - 1));
     char *end = (char *)((((int)_end)+CACHELINESIZE-1) &~(CACHELINESIZE - 1));
     char *_sync;
-    
+
     for (_sync = start; _sync < end; _sync += CACHELINESIZE) {
         __asm__ __volatile__ (
         "dcbf 0,%0"
         :
         : "r" ((long)_sync)
-        );  
+        );
     }
     __asm__ __volatile__ ("sync");
 }
@@ -731,7 +737,7 @@ ppc_sync_cache (void *_start, void *_end)
  * Local variables:
  * c-indentation-style: bsd
  * c-basic-offset: 4
- * indent-tabs-mode: nil 
+ * indent-tabs-mode: nil
  * End:
  *
  * vim: expandtab shiftwidth=4:

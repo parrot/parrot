@@ -1,6 +1,6 @@
 /*
  * jit_emit.h
- * 
+ *
  * ARM (I think this is all ARM2 or later, although it is APCS-32)
  *
  * $Id$
@@ -25,7 +25,7 @@
  *  r8  Variable register 5.
  *  r9  ARM State variable register 6. Static Base in PID, re-entrant
  *      shared-library variants.
- *  r10 ARM State variable register 7. Stack limit pointer in stack-checked 
+ *  r10 ARM State variable register 7. Stack limit pointer in stack-checked
  *      variants.
  *  r11 ARM State variable register 8. ARM state frame pointer.
  *  r12 The Intra-Procedure call scratch register.
@@ -138,7 +138,7 @@ typedef enum {
  *
  *
  * The L bit
- * 
+ *
  * If L == 1 the instruction will store a return address in the link
  * register (R14). Otherwise L == 0, the instruction will simply branch without
  * storing a return address.
@@ -278,7 +278,7 @@ emit_ldmstm_x(char *pc,
  * from the base (U == 0).
  *
  * The B bit
- * 
+ *
  * Distinguishes between an unsigned byte (B == 1) and a word (B == 0) access.
  *
  * The W bit
@@ -289,7 +289,7 @@ emit_ldmstm_x(char *pc,
  *        performed.
  *
  * P == 1 If W == 0, the base register is not updated (offset addressing). If
- *        W == 1, the calculated memory address is written back to the base 
+ *        W == 1, the calculated memory address is written back to the base
  *        register (pre-indexed addressing).
  *
  * The L bit
@@ -324,7 +324,7 @@ emit_ldrstr(char *pc,
             ldr_str_dir_t direction,
             int pre,
             int writeback,
-            int byte, 
+            int byte,
             arm_register_t dest,
             arm_register_t base,
             int offset_type,
@@ -370,7 +370,7 @@ emit_ldrstr_offset (char *pc,
  *
  *
  * The S bit
- * 
+ *
  * Indicates if the CPSR will be updated (S == 1) or not (S == 0).
  *
  * Two types of CPSR updates can occur:
@@ -504,8 +504,8 @@ constant_neg (int value,  struct constant *result) {
             "mov     %0, %1, ror #30\n"
             : "=r" (value)
             : "r" (value));
-        
-    } 
+
+    }
     result->state = doesnt_fit;
     return;
 }
@@ -536,8 +536,8 @@ constant_not (int value,  struct constant *result) {
             "mov     %0, %1, ror #30\n"
             : "=r" (value)
             : "r" (value));
-        
-    } 
+
+    }
     result->state = doesnt_fit;
     return;
 }
@@ -584,7 +584,7 @@ static void emit_jump_to_op(Parrot_jit_info_t *jit_info, arm_cond_t cond,
         offset = jit_info->arena.op_map[opcode].offset -
             (jit_info->native_ptr - jit_info->arena.start);
     } else {
-        Parrot_jit_newfixup(jit_info); 
+        Parrot_jit_newfixup(jit_info);
         jit_info->arena.fixups->type = JIT_ARMBRANCH;
         jit_info->arena.fixups->param.opcode = opcode;
     }
@@ -616,7 +616,7 @@ emit_load_constant_from_pool (char *pc,
     pc = emit_b(pc, cond_AL, 0);
     pc = emit_word (pc, value);
     return pc;
-}   
+}
 
 static char *
 emit_load_constant (char *pc,
@@ -638,7 +638,7 @@ emit_load_constant (char *pc,
         pc = emit_load_constant_from_pool (pc, interpreter, cond, value, hwreg);
     }
     return pc;
-}   
+}
 
 static void Parrot_jit_int_load(Parrot_jit_info_t *jit_info,
                                 struct Parrot_Interp *interpreter,
@@ -722,7 +722,7 @@ static void Parrot_jit_int_store(Parrot_jit_info_t *jit_info,
 }
 
 static void
-Parrot_jit_arith_const_alternate (Parrot_jit_info_t *jit_info, 
+Parrot_jit_arith_const_alternate (Parrot_jit_info_t *jit_info,
                                   struct Parrot_Interp *interpreter,
                                   arm_cond_t cond,
                                   enum constant_state alternate_on,
@@ -781,7 +781,7 @@ Parrot_jit_arith_const_alternate (Parrot_jit_info_t *jit_info,
    registers, and v4 can do some things conditionally)
 */
 static void
-Parrot_jit_jumpif_const (Parrot_jit_info_t *jit_info, 
+Parrot_jit_jumpif_const (Parrot_jit_info_t *jit_info,
                          struct Parrot_Interp *interpreter,
                          int src, int const_val, int where_to,
                          arm_cond_t when) {
@@ -821,9 +821,9 @@ void Parrot_jit_dofixup(Parrot_jit_info_t *jit_info,
                 int offset = jit_info->arena.op_map[fixup->param.opcode].offset
                     - fixup->native_offset;
                 int disp = (offset >> 2) - 2;
-                *(fixup_ptr++) = disp; 
-                *(fixup_ptr++) = disp >> 8; 
-                *(fixup_ptr) = disp >> 16; 
+                *(fixup_ptr++) = disp;
+                *(fixup_ptr++) = disp >> 8;
+                *(fixup_ptr) = disp >> 16;
                 break;
             }
             default:
@@ -861,6 +861,11 @@ Parrot_jit_begin(Parrot_jit_info_t *jit_info,
     jit_info->native_ptr = emit_mov (jit_info->native_ptr, 4, 0);
 }
 
+jit_f
+Parrot_jit_restart(struct Parrot_Interp * interpreter, opcode_t pc)
+{
+}
+
 /* I'm going to load registers to call functions in general like this:
     adr     r14,  .L1
     ldmia   r14!,  {r0, r1, r2, pc} ; register list built by jit
@@ -870,7 +875,7 @@ Parrot_jit_begin(Parrot_jit_info_t *jit_info,
            <where ever>	; address of function.
     .L2:                      ; next instruction - return point from func.
 
-    # here I'm going to do 
+    # here I'm going to do
 
     mov	    r1, r4	; current interpreter is arg 1
     adr     r14,  .L1
@@ -1003,7 +1008,7 @@ arm_sync_d_i_cache (void *start, void *end) {
        verbatim:  */
     /*
      * Flush a region from virtual address 'r0' to virtual address 'r1'
-     * _inclusive_.  There is no alignment requirement on either address;   
+     * _inclusive_.  There is no alignment requirement on either address;
      * user space does not need to know the hardware cache layout.
      *
      * r2 contains flags.  It should ALWAYS be passed as ZERO until it
@@ -1052,7 +1057,7 @@ arm_sync_d_i_cache (void *start, void *end) {
  * Local variables:
  * c-indentation-style: bsd
  * c-basic-offset: 4
- * indent-tabs-mode: nil 
+ * indent-tabs-mode: nil
  * End:
  *
  * vim: expandtab shiftwidth=4:

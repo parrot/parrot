@@ -215,8 +215,6 @@ prederef(void **pc_prederef, struct Parrot_Interp *interpreter)
 }
 
 
-/*=for api interpreter runops_jit
- */
 static void
 runops_jit(struct Parrot_Interp *interpreter, opcode_t *pc)
 {
@@ -237,7 +235,7 @@ runops_jit(struct Parrot_Interp *interpreter, opcode_t *pc)
      *
      * This is borken too, but better as endless loops
      */
-    Interp_flags_CLEAR(interpreter, PARROT_JIT_FLAG);
+/*    Interp_flags_CLEAR(interpreter, PARROT_JIT_FLAG); */
 #endif
 }
 
@@ -370,7 +368,7 @@ runops(struct Parrot_Interp *interpreter, struct PackFile *code, size_t offset)
             runops_prederef(interpreter, pc,
                     interpreter->prederef_code + offset);
         }
-        else if (Interp_flags_TEST(interpreter, PARROT_JIT_FLAG)) {
+        else if (!slow && Interp_flags_TEST(interpreter, PARROT_JIT_FLAG)) {
 #if !JIT_CAPABLE
             internal_exception(JIT_UNAVAILABLE,
                     "Error: PARROT_JIT_FLAG is set, but interpreter is not JIT_CAPABLE!\n");
@@ -518,6 +516,7 @@ make_interpreter(Interp_flags flags)
     SET_NULL_P(interpreter->code, struct PackFile *);
     SET_NULL_P(interpreter->profile, ProfData *);
     SET_NULL_P(interpreter->predref_code, void **);
+    SET_NULL(interpreter->jit_info);
 
     /* Done. Return and be done with it */
 

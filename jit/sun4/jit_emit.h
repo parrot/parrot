@@ -6,9 +6,9 @@
 ** $Id$
 **/
 
-/* 
+/*
  * SPARC JIT overview:
- * 
+ *
  * The interpreter pointer is kept in i0.
  * The address of register I0 is stored in i1, with all parrot register access
  * performed relative to this register.
@@ -277,12 +277,12 @@ void main(){
 /* Fixup types */
 enum  {JIT_BRANCH, JIT_CALL30 };
 
-/* 
+/*
  *
  * IMPORTANT SHORTCUTS
  *
- * */ 
-    
+ * */
+
 /* The register holding the interpreter pointer */
 #define Parrot_jit_intrp emitm_i(0)
 
@@ -314,7 +314,7 @@ static void Parrot_jit_bicc(Parrot_jit_info_t *jit_info, int cond, int annul,
 
         if((offset > emitm_branch_max) || (offset < emitm_branch_min))
             internal_exception(JIT_ERROR,
-                           "Branches beyond 8 Megabytes not yet supported\n"); 
+                           "Branches beyond 8 Megabytes not yet supported\n");
         offset /= 4;
         emitm_bicc(jit_info->native_ptr, annul, cond, offset);
         return;
@@ -534,6 +534,11 @@ void Parrot_jit_begin(Parrot_jit_info_t *jit_info,
         emitm_i(3), emitm_lo10(jit_info->arena.op_map), Parrot_jit_opmap);
 }
 
+jit_f
+Parrot_jit_restart(struct Parrot_Interp * interpreter, opcode_t pc)
+{
+}
+
 void Parrot_jit_normal_op(Parrot_jit_info_t *jit_info,
                           struct Parrot_Interp * interpreter)
 {
@@ -591,7 +596,7 @@ Parrot_jit_save_registers(Parrot_jit_info_t *jit_info,
 #  define INT_REGISTERS_TO_MAP 1
 #  define FLOAT_REGISTERS_TO_MAP 0
 
-char intval_map[INT_REGISTERS_TO_MAP] = { emitm_l(0) }; 
+char intval_map[INT_REGISTERS_TO_MAP] = { emitm_l(0) };
 
 #endif
 
@@ -599,7 +604,7 @@ char intval_map[INT_REGISTERS_TO_MAP] = { emitm_l(0) };
  * Local variables:
  * c-indentation-style: bsd
  * c-basic-offset: 4
- * indent-tabs-mode: nil 
+ * indent-tabs-mode: nil
  * End:
  *
  * vim: expandtab shiftwidth=4:

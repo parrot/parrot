@@ -900,7 +900,7 @@ void
 Parrot_jit_dofixup(Parrot_jit_info_t *jit_info,
                    struct Parrot_Interp * interpreter)
 {
-    Parrot_jit_fixup_t *fixup;
+    Parrot_jit_fixup_t *fixup, *next;
     char *fixup_ptr;
 
     fixup = jit_info->arena.fixups;
@@ -931,14 +931,19 @@ Parrot_jit_dofixup(Parrot_jit_info_t *jit_info,
                     fixup->type);
             break;
         }
-        fixup = fixup->next;
+        next = fixup->next;
+        free(fixup);
+        fixup = next;
     }
+    jit_info->arena.fixups = NULL;
 }
 
 void
 Parrot_jit_begin(Parrot_jit_info_t *jit_info,
                  struct Parrot_Interp * interpreter)
 {
+    int i;
+
     /* Maintain the stack frame pointer for the sake of gdb */
     emit_pushl_r(jit_info->native_ptr, emit_EBP);
     emitm_movl_r_r(jit_info->native_ptr, emit_ESP, emit_EBP);
@@ -959,6 +964,32 @@ Parrot_jit_begin(Parrot_jit_info_t *jit_info,
 
     /* Point ESI to the opcode-native code map array */
     emitm_movl_i_r(jit_info->native_ptr, jit_info->arena.op_map, emit_ESI);
+
+    /* emit 5 noops. when JIT restarts a long jump will be patched in here */
+    for (i = 0; i < 5; i++)
+        emit_nop(jit_info->native_ptr);
+}
+
+jit_f
+Parrot_jit_restart(struct Parrot_Interp * interpreter, opcode_t pc)
+{
+    char *ptr;
+    Parrot_jit_info_t *jit_info = (Parrot_jit_info_t *) interpreter->jit_info;
+
+    /* the 5 nops above are at native_ptr -5 of 1. instruction */
+    jit_info->native_ptr = (char*)jit_info->arena.op_map[0].ptr - 5;
+    /* pretend, we are at pc */
+    jit_info->op_i = pc;
+    /* op_map.ptr & op_map.offset are a union, which are absolute adr's
+     * now -- fake offset */
+    ptr = jit_info->arena.op_map[pc].ptr;
+    jit_info->arena.op_map[pc].offset = ptr - jit_info->arena.start;
+    /* emit jump with offset 0 */
+    emit_jump(jit_info, 0);
+    /* restore ptr */
+    jit_info->arena.op_map[pc].ptr = ptr;
+    /* return start of JIT code */
+    return (jit_f)D2FPTR(jit_info->arena.start);
 }
 
 void
@@ -976,7 +1007,7 @@ Parrot_jit_normal_op(Parrot_jit_info_t *jit_info,
     emitm_addb_i_r(jit_info->native_ptr, 4, emit_ESP);
 }
 
-extern void Parrot_end_jit(Parrot_jit_info_t *, struct Parrot_Interp * );
+static void Parrot_end_jit(Parrot_jit_info_t *, struct Parrot_Interp * );
 void
 Parrot_jit_cpcf_op(Parrot_jit_info_t *jit_info,
                    struct Parrot_Interp * interpreter)

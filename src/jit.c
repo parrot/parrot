@@ -421,9 +421,15 @@ build_asm(struct Parrot_Interp *interpreter, opcode_t *pc,
     UINTVAL i;
     char *new_arena;
     void *prev_address;
-    Parrot_jit_info_t jit_info;
+    /* FIXME allocate this for multiple interpreters */
+    static Parrot_jit_info_t jit_info;
     opcode_t cur_opcode_byte;
 
+
+    if (pc != code_start && interpreter->jit_info)
+        return Parrot_jit_restart(interpreter, pc - code_start);
+
+    interpreter->jit_info = &jit_info;
     jit_info.optimizer = optimize_jit(interpreter, pc, code_start, code_end);
 
     /* Attach the register map to the jit_info structure */
