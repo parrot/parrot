@@ -275,19 +275,18 @@ new_bucket(Interp *interpreter, HASH *hash, STRING *key, HASH_ENTRY *value)
 static HASHBUCKET *
 find_bucket(Interp *interpreter, HASH* hash, BucketIndex head, STRING *key)
 {
-    if (head == NULLBucketIndex) return NULL;
+    BucketIndex next;
 
-    if (key != NULL) {
+    if (head != NULLBucketIndex && key == NULL)
+        PANIC("find_bucket given a null key");
+
+    while (head != NULLBucketIndex) {
         HASHBUCKET* bucket = getBucket(hash, head);
-        while (bucket != NULL) {
-            if (string_compare(interpreter, key, bucket->key) == 0) {
-                return bucket;
-            }
-            bucket = getBucket(hash, bucket->next);
+        next = bucket->next;
+        if (string_compare(interpreter, key, bucket->key) == 0) {
+            return getBucket(hash, head);
         }
-    }
-    else {
-        fprintf(stderr, "*** find_bucket given a null key\n");
+        head = next;
     }
 
     return NULL;
