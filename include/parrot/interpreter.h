@@ -237,12 +237,6 @@ typedef struct Parrot_Interp {
 /* 3:   PMC *Env;                    hash_like Env PMC */
 /* 4:   PMC *ParrotInterpreter       that's me */
 /* 5:   PMC *Dyn_libs           Array of dynamically loaded ParrotLibrary  */
-    UINTVAL num_early_DOD_PMCs;         /* how many PMCs want immediate destruction */
-    UINTVAL num_early_PMCs_seen;        /* how many such PMCs has DOD seen */
-    PMC* dod_mark_ptr;                  /* last PMC marked during a DOD run */
-    PMC* dod_trace_ptr;                 /* last PMC trace_children was called on */
-    int lazy_dod;                       /* flag that indicates whether we should stop
-                                           when we've seen all impatient PMCs */
     PMC* DOD_registry;          /* registered PMCs added to the root set */
     MMD_table *binop_mmd_funcs; /* Table of MMD functions */
     UINTVAL n_binop_mmd_funcs;   /* function count */

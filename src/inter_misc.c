@@ -213,7 +213,7 @@ interpinfo(Interp *interpreter, INTVAL what)
             ret = arena_base->memory_collected;
             break;
         case IMPATIENT_PMCS:
-            ret = interpreter->num_early_DOD_PMCs;
+            ret = arena_base->num_early_DOD_PMCs;
             break;
     }
     return ret;

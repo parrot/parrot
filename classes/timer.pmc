@@ -130,7 +130,7 @@ Initializes the timer.
             mem_sys_allocate_zeroed(sizeof(parrot_timer_event));
         PMC_struct_val(SELF) = t;
         PObj_active_destroy_SET(SELF);
-        ++interpreter->num_early_DOD_PMCs;
+        ++interpreter->arena_base->num_early_DOD_PMCs;
     }
 
 /*

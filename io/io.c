@@ -1194,23 +1194,11 @@ Parrot_IOData_mark(theINTERP, ParrotIOData *piodata)
     INTVAL i;
     ParrotIOTable table = piodata->table;
 
-    /* XXX boe: Parrot_really_destroy might call us with dod_mark_ptr not
-     *          set. This is neccessary until destruction ordering prevents
-     *          the premature destruction of the standardhandles
-     */
-    if (!interpreter->dod_mark_ptr)
-        interpreter->dod_mark_ptr = table[0];
-
     for (i = 0; i < PIO_NR_OPEN; i++) {
         if (table[i]) {
             pobject_lives(interpreter, (PObj *)table[i]);
         }
     }
-
-    /* XXX boe: If piodata has children which needs marking too,
-     *          we have to call
-     * trace_children(interpreter, interpreter->piodata->table[0]);
-     */
 }
 
 /*

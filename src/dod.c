@@ -62,6 +62,7 @@ static void
 mark_special(Parrot_Interp interpreter, PMC* obj)
 {
     int hi_prio;
+    struct Arenas *arena_base;
 
     /*
      * If the object is shared, we have to use the arena and dod
@@ -79,20 +80,31 @@ mark_special(Parrot_Interp interpreter, PMC* obj)
         interpreter = PMC_sync(obj)->owner;
         assert(interpreter);
     }
+    arena_base = interpreter->arena_base;
 
     if (PObj_needs_early_DOD_TEST(obj))
-        ++interpreter->num_early_PMCs_seen;
-    if (PObj_high_priority_DOD_TEST(obj) && interpreter->dod_trace_ptr) {
+        ++arena_base->num_early_PMCs_seen;
+    if (PObj_high_priority_DOD_TEST(obj) && arena_base->dod_trace_ptr) {
         /* set obj's parent to high priority */
-        PObj_high_priority_DOD_SET(interpreter->dod_trace_ptr);
+        PObj_high_priority_DOD_SET(arena_base->dod_trace_ptr);
         hi_prio = 1;
     }
     else
         hi_prio = 0;
 
     if (obj->pmc_ext) {
+        /*
+         * XXX this basically invalidates the high-priority marking
+         *     of PMCs by putting all PMCs onto the front of the list
+         *     The reason for this is the by far better cache locality
+         *     when aggregates and their contents are marked "together"
+         *
+         *     To enable high priority marking again we should probably
+         *     use a second pointer chain, which is, when not empty,
+         *     processed first
+         */
         if (1 || hi_prio) {
-            PMC* tptr = interpreter->dod_trace_ptr;
+            PMC* tptr = arena_base->dod_trace_ptr;
             if (PMC_next_for_GC(tptr) == tptr) {
                 PMC_next_for_GC(obj) = obj;
             }
@@ -104,11 +116,11 @@ mark_special(Parrot_Interp interpreter, PMC* obj)
         }
         else {
             /* put it on the end of the list */
-            PMC_next_for_GC(interpreter->dod_mark_ptr) = obj;
+            PMC_next_for_GC(arena_base->dod_mark_ptr) = obj;
 
             /* Explicitly make the tail of the linked list be
              * self-referential */
-            interpreter->dod_mark_ptr = PMC_next_for_GC(obj) = obj;
+            arena_base->dod_mark_ptr = PMC_next_for_GC(obj) = obj;
         }
     }
     else if (PObj_custom_mark_TEST(obj))
@@ -232,6 +244,7 @@ void mark_object_cache(Parrot_Interp);
 static int
 trace_active_PMCs(Interp *interpreter, int trace_stack)
 {
+    struct Arenas *arena_base = interpreter->arena_base;
     PMC *current;
     /* Pointer to the currently being processed PMC
      *
@@ -243,7 +256,7 @@ trace_active_PMCs(Interp *interpreter, int trace_stack)
     struct Stash *stash = 0;
 
     /* We have to start somewhere, the interpreter globals is a good place */
-    interpreter->dod_trace_ptr = interpreter->dod_mark_ptr = current =
+    arena_base->dod_trace_ptr = arena_base->dod_mark_ptr = current =
         interpreter->iglobals;
 
     /* mark it as used  */
@@ -303,8 +316,8 @@ trace_active_PMCs(Interp *interpreter, int trace_stack)
     Parrot_IOData_mark(interpreter, interpreter->piodata);
 
     /* quick check, if we can already bail out */
-    if (interpreter->lazy_dod && interpreter->num_early_PMCs_seen >=
-            interpreter->num_early_DOD_PMCs) {
+    if (arena_base->lazy_dod && arena_base->num_early_PMCs_seen >=
+            arena_base->num_early_DOD_PMCs) {
         return 0;
     }
 
@@ -331,10 +344,11 @@ static int
 trace_children(Interp *interpreter, PMC *current)
 {
     PMC *prev = NULL, *next;
+    struct Arenas *arena_base = interpreter->arena_base;
     INTVAL i = 0;
     UINTVAL mask = PObj_data_is_PMC_array_FLAG | PObj_custom_mark_FLAG;
 
-    int lazy_dod = interpreter->lazy_dod;
+    int lazy_dod = arena_base->lazy_dod;
 
     /*
      * First phase of mark is finished. Now if we are the owner
@@ -352,11 +366,11 @@ trace_children(Interp *interpreter, PMC *current)
     for (; current != prev; current = PMC_next_for_GC(current)) {
         UINTVAL bits = PObj_get_FLAGS(current) & mask;
 
-        if (lazy_dod && interpreter->num_early_PMCs_seen >=
-                interpreter->num_early_DOD_PMCs) {
+        if (lazy_dod && arena_base->num_early_PMCs_seen >=
+                arena_base->num_early_DOD_PMCs) {
             return 0;
         }
-        interpreter->dod_trace_ptr = current;
+        arena_base->dod_trace_ptr = current;
         if (!PObj_needs_early_DOD_TEST(current))
             PObj_high_priority_DOD_CLEAR(current);
 
@@ -714,7 +728,7 @@ free_unused_pobjects(Interp *interpreter,
                     /* then destroy it here
                     */
                     if (PObj_needs_early_DOD_TEST(b))
-                        --interpreter->num_early_DOD_PMCs;
+                        --arena_base->num_early_DOD_PMCs;
                     if (PObj_active_destroy_TEST(b))
                         VTABLE_destroy(interpreter, (PMC *)b);
 
@@ -1032,9 +1046,9 @@ Parrot_do_dod_run(Interp *interpreter, UINTVAL flags)
      * tell the threading system that we gonna DOD mark
      */
 
-    interpreter->lazy_dod = flags & DOD_lazy_FLAG;
-    interpreter->dod_trace_ptr = NULL;
-    interpreter->num_early_PMCs_seen = 0;
+    arena_base->lazy_dod = flags & DOD_lazy_FLAG;
+    arena_base->dod_trace_ptr = NULL;
+    arena_base->num_early_PMCs_seen = 0;
 
     if (interpreter->profile)
         profile_dod_start(interpreter);
@@ -1095,7 +1109,7 @@ Parrot_do_dod_run(Interp *interpreter, UINTVAL flags)
     pt_DOD_stop_mark(interpreter);
     /* Note it */
     arena_base->dod_runs++;
-    interpreter->dod_trace_ptr = NULL;
+    arena_base->dod_trace_ptr = NULL;
     --arena_base->DOD_block_level;
     return;
 }
