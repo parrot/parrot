@@ -7,16 +7,17 @@
 #
 ###############################################################################
 
-VERSION     = ${VERSION}${DEVEL}
+DEVEL       = ${DEVEL}
+VERSION     = ${VERSION}$(DEVEL)
 
 # Override at least PREFIX with the install location if you're going
 # to be using this outside of your build area.
 BUILDPREFIX =
 PREFIX      = ${prefix}
 EXEC_PREFIX = $(PREFIX)
-BINDIR      = $(EXEC_PREFIX)/bin
-LIBDIR      = $(EXEC_PREFIX)/lib
-INCLUDEDIR  = $(EXEC_PREFIX)/include
+BIN_DIR      = $(EXEC_PREFIX)/bin
+LIB_DIR      = $(EXEC_PREFIX)/lib
+INCLUDE_DIR  = $(EXEC_PREFIX)/include
 
 
 ###############################################################################
@@ -33,20 +34,20 @@ AST_DIR         = ast
 # directory for Build tools
 BUILD_TOOLS_DIR = build_tools
 
+# current directory
+CUR_DIR         = .
+ 
 # directory for the intermediate code compiler
 IMCC_DIR        = imcc
 
 # directory for header files
-INC_DIR         = ./${inc}
+INC_DIR         = ${inc}
 
 # directory for the IO subsystem
 IO_DIR          = io
 
 # directory for *.ops file
 OPS_DIR         = ops
-
-# file containing the main() function
-PARROT_MAIN     = $(IMCC_DIR)/main
 
 # directory for packfile files
 PF_DIR          = pf
@@ -76,7 +77,8 @@ LEX       = ${lex}
 # do not die when dir already exits
 MKDIR     = $(PERL) -e ${PQ}-d or mkdir $$_,0777 or die foreach @ARGV${PQ}
 CC        = ${cc}
-CFLAGS    = ${ccflags} ${cc_debug} ${ccwarn} ${cc_inc} ${cc_hasjit} ${cg_flag} ${gc_flag}
+CC_INC    = ${cc_inc}
+CFLAGS    = ${ccflags} ${cc_debug} ${ccwarn} $(CC_INC) ${cc_hasjit} ${cg_flag} ${gc_flag}
 C_LIBS    = ${libs}
 LINK      = ${link}
 LINKFLAGS = ${linkflags} ${link_debug} ${ld_debug}
@@ -428,8 +430,8 @@ OPS_FILES = ${ops} $(GEN_OPSFILES)
 ###############################################################################
 
 # Executables
-PARROT          = ${test_prog}$(EXE)
-PARROT_SO       = ${test_prog}_so$(EXE)
+PARROT          = $(CUR_DIR)/${test_prog}$(EXE)
+PARROT_SO       = $(CUR_DIR)/${test_prog}_so$(EXE)
 DIS             = disassemble$(EXE)
 PDUMP           = pdump$(EXE)
 PINFO           = pbc_info$(EXE)
@@ -467,16 +469,16 @@ MAKE_C = ${make_c}
 # arguments (etc) injected in the middle.
 # There is probably a better way to do this, but I can't work it out right now.
 .c$(O) :
-	@$(PERL) tools/dev/cc_flags.pl ./CFLAGS $(CC) "" $(CFLAGS) -I$(@D) ${cc_o_out}$@ -c $<
+	@$(PERL) tools/dev/cc_flags.pl $(CUR_DIR)/CFLAGS $(CC) "" $(CFLAGS) -I$(@D) ${cc_o_out}$@ -c $<
 
 .imc.pbc :
-	.${slash}$(PARROT) -o $@ $<
+	$(PARROT) -o $@ $<
 
 .pir.pbc :
-	.${slash}$(PARROT) -o $@ $<
+	$(PARROT) -o $@ $<
 
 .pbc$(O) :
-	.${slash}$(PARROT) -o $@ $<
+	$(PARROT) -o $@ $<
 
 
 ###############################################################################
@@ -613,19 +615,19 @@ parrot_utils : $(PDUMP) $(DIS) $(PINFO) $(PDB)
 
 flags_dummy :
 	@echo Compiling with:
-	@$(PERL) tools/dev/cc_flags.pl ./CFLAGS echo $(CC) $(CFLAGS) -I$(@D) ${cc_o_out} xx$(O) -c xx.c
+	@$(PERL) tools/dev/cc_flags.pl $(CUR_DIR)/CFLAGS echo $(CC) $(CFLAGS) -I$(@D) ${cc_o_out} xx$(O) -c xx.c
 
 runtime/parrot/include/parrotlib.pbc: runtime/parrot/library/parrotlib.imc $(PARROT)
-	./parrot -o $@ runtime/parrot/library/parrotlib.imc
+	$(PARROT) -o $@ runtime/parrot/library/parrotlib.imc
 
 runtime/parrot/include/config.fpmc : myconfig config_lib.pasm $(PARROT)
 	@echo Invoking Parrot to generate runtime/parrot/include/config.fpmc --cross your fingers
-	./parrot config_lib.pasm
+	$(PARROT) config_lib.pasm
 	@echo If the next line prints $(VERSION), it did help.
-	./parrot parrot-config.imc VERSION DEVEL
+	$(PARROT) parrot-config.imc VERSION DEVEL
 
-$(PARROT) : $(PARROT_MAIN)$(O) $(GEN_HEADERS) $(LIBPARROT) lib/Parrot/OpLib/core.pm $(LIBICUCORE) $(LIBICUDATA)
-	$(LINK) $(LD_OUT)$(PARROT) $(LINKFLAGS) $(PARROT_MAIN)$(O) $(ALL_PARROT_LIBS)
+$(PARROT) : $(IMCC_DIR)/main$(O) $(GEN_HEADERS) $(LIBPARROT) lib/Parrot/OpLib/core.pm $(LIBICUCORE) $(LIBICUDATA)
+	$(LINK) $(LD_OUT)$(PARROT) $(LINKFLAGS) $(IMCC_DIR)/main$(O) $(ALL_PARROT_LIBS)
 
 lib_deps_object : $(O_FILES)
 	$(PERL) tools/dev/lib_deps.pl object $(O_FILES)
@@ -662,8 +664,8 @@ blib/lib/libparrot$(SHARE_EXT) : $(O_FILES)
 	$(MKDIR) blib blib/lib
 	$(LD) $(LD_SHARE_FLAGS) $(LDFLAGS) $(LD_OUT)blib/lib/libparrot$(SHARE_EXT) $(O_FILES) $(C_LIBS) $(LIBICUCORE) $(LIBICUDATA)
 
-$(PARROT_SO) : $(PARROT_MAIN)$(O) blib/lib/libparrot$(SHARE_EXT) lib/Parrot/OpLib/core.pm
-	$(LINK) $(LINKFLAGS) $(LD_OUT)$(PARROT) $(PARROT_MAIN)$(O) -Lblib/lib -lparrot $(C_LIBS)
+$(PARROT_SO) : $(IMCC_DIR)/main$(O) blib/lib/libparrot$(SHARE_EXT) lib/Parrot/OpLib/core.pm
+	$(LINK) $(LINKFLAGS) $(LD_OUT)$(PARROT) $(IMCC_DIR)/main$(O) -Lblib/lib -lparrot $(C_LIBS)
 
 #
 # Parrot Debugger
@@ -701,7 +703,7 @@ $(PINFO) : $(SRC_DIR)/pbc_info$(O) $(LIBPARROT)
 #
 ###############################################################################
 
-$(PARROT_MAIN)$(O) : $(PARROT_MAIN).c $(GENERAL_H_FILES)
+$(IMCC_DIR)/main$(O) : $(IMCC_DIR)/main.c $(GENERAL_H_FILES)
 
 lib/Parrot/OpLib/core.pm : $(OPS_FILES) $(BUILD_TOOLS_DIR)/ops2pm.pl \
     lib/Parrot/OpsFile.pm lib/Parrot/Op.pm $(OPS_DIR)/ops.num
@@ -723,13 +725,13 @@ examples-clean: hello-clean
 
 # hello
 hello:	test_prep examples/assembly/hello$(EXE)
-	./examples/assembly/hello$(EXE)
+	$(CUR_DIR)/examples/assembly/hello$(EXE)
 
 examples/assembly/hello.pbc: examples/assembly/hello.pasm
-	./$(PARROT) -o examples/assembly/hello.pbc examples/assembly/hello.pasm
+	$(PARROT) -o examples/assembly/hello.pbc examples/assembly/hello.pasm
 
 examples/assembly/hello$(O): examples/assembly/hello.pbc
-	./$(PARROT) -o examples/assembly/hello$(O) examples/assembly/hello.pbc
+	$(PARROT) -o examples/assembly/hello$(O) examples/assembly/hello.pbc
 
 examples/assembly/hello$(EXE):	examples/assembly/hello$(O)
 	$(MAKE) EXEC=examples/assembly/hello exec
@@ -1126,11 +1128,11 @@ testbench: test_prep
 
 # Running a benchmark
 mopsbench : test_prep
-	./$(PARROT) $(PARROT_ARGS) examples/assembly/mops.pasm
+	$(PARROT) $(PARROT_ARGS) examples/assembly/mops.pasm
 
 # Running the game of live
 lifetest : test_prep
-	./$(PARROT) $(PARROT_ARGS) examples/assembly/life.pasm
+	$(PARROT) $(PARROT_ARGS) examples/assembly/life.pasm
 
 # Running the IMCC test suite
 # normal core
@@ -1208,7 +1210,7 @@ clean : test-clean progclean languages-clean docs-clean dynclasses-clean \
 
 progclean :
 	$(RM_F) $(O_FILES) \
-    $(PARROT) $(PARROT_MAIN)$(O) \
+    $(PARROT) $(IMCC_DIR)/main$(O) \
     $(PDUMP) $(SRC_DIR)/pdump$(O) $(SRC_DIR)/packdump$(O) \
     $(SRC_DIR)/pbc_info$(O) $(PINFO) \
     $(PDB) $(SRC_DIR)/pdb$(O) \
@@ -1293,7 +1295,7 @@ update :
 	cvs -q update -dP
 
 rsync :
-	rsync -av cvs.perl.org::parrot-HEAD .
+	rsync -av cvs.perl.org::parrot-HEAD $(CUR_DIR)
 
 status :
 	cvs -n -q upd -dP
@@ -1303,12 +1305,12 @@ patch :
 
 
 lint : $(PARROT)
-	$(LINT) ${cc_inc} ${cc_hasjit} "-Iclasses" $(LINTFLAGS) $(LINTOPTS) `echo $(O_FILES) | sed ${PQ}s/\.o/\.c/g${PQ}`
-	$(LINT) ${cc_inc} $(LINTFLAGS) $(LINTOPTS) $(PARROT_MAIN).c
+	$(LINT) $(CC_INC) ${cc_hasjit} "-Iclasses" $(LINTFLAGS) $(LINTOPTS) `echo $(O_FILES) | sed ${PQ}s/\.o/\.c/g${PQ}`
+	$(LINT) $(CC_INC) $(LINTFLAGS) $(LINTOPTS) $(IMCC_DIR)/main.c
 
 lint2 : $(PARROT)
-	$(LINT) ${cc_inc} ${cc_hasjit} "-Iclasses" $(LINTFLAGS2) $(LINTOPTS) `echo $(O_FILES) | sed ${PQ}s/\.o/\.c/g${PQ}`
-	$(LINT) ${cc_inc} $(LINTFLAGS2) $(LINTOPTS) $(PARROT_MAIN).c
+	$(LINT) $(CC_INC) ${cc_hasjit} "-Iclasses" $(LINTFLAGS2) $(LINTOPTS) `echo $(O_FILES) | sed ${PQ}s/\.o/\.c/g${PQ}`
+	$(LINT) $(CC_INC) $(LINTFLAGS2) $(LINTOPTS) $(IMCC_DIR)/main.c
 
 
 ###############################################################################
@@ -1318,7 +1320,7 @@ lint2 : $(PARROT)
 ###############################################################################
 
 install :
-	$(PERL) tools/dev/install_files.pl --buildprefix=$(BUILDPREFIX) --prefix=$(PREFIX) --exec-prefix=$(EXEC_PREFIX) --bindir=$(BINDIR) --libdir=$(LIBDIR) --includedir=$(INCLUDEDIR) MANIFEST MANIFEST.generated
+	$(PERL) tools/dev/install_files.pl --buildprefix=$(BUILDPREFIX) --prefix=$(PREFIX) --exec-prefix=$(EXEC_PREFIX) --bindir=$(BIN_DIR) --libdir=$(LIB_DIR) --includedir=$(INCLUDE_DIR) MANIFEST MANIFEST.generated
 
 ###############################################################################
 #
@@ -1327,7 +1329,7 @@ install :
 ###############################################################################
 
 release : MANIFEST MANIFEST.generated
-	[ -d parrot-$(VERSION) ] || ln -s . parrot-$(VERSION)
+	[ -d parrot-$(VERSION) ] || ln -s $(CUR_DIR) parrot-$(VERSION)
 	cp MANIFEST MANIFEST.real
 	grep -v DEVELOPING MANIFEST.real > MANIFEST
 	tar zcvf parrot-$(VERSION).tar.gz $$(perl -lane 'print"parrot-$(VERSION)/$$F[0]"unless!length||/#/' MANIFEST)
@@ -1349,9 +1351,9 @@ miniparrot-prebuild : $(GEN_CONFIGS) $(FLUID_FILES)
 	@tools/dev/rebuild_miniparrot.pl --action=clean
 	@tools/dev/rebuild_miniparrot.pl --action=prebuild_classes $(CLASS_O_FILES)
 	@tools/dev/rebuild_miniparrot.pl --action=copy_src $(GEN_CONFIGS) $(FLUID_FILES) $(ALL_H_FILES)
-	@tools/dev/rebuild_miniparrot.pl --action=copy_src classes/*.h $(PARROT_MAIN).c $(INC_DIR)/debug.h
+	@tools/dev/rebuild_miniparrot.pl --action=copy_src classes/*.h $(IMCC_DIR)/main.c $(INC_DIR)/debug.h
 	@tools/dev/rebuild_miniparrot.pl --action=copy_src_from_obj $(O_FILES)
-	@tools/dev/rebuild_miniparrot.pl --action=write_buildscripts --executable=parrot $(O_FILES) $(PARROT_MAIN)$(O)
+	@tools/dev/rebuild_miniparrot.pl --action=write_buildscripts --executable=parrot $(O_FILES) $(IMCC_DIR)/main$(O)
 
 miniparrot-update :
 	tools/dev/rebuild_miniparrot.pl
@@ -1380,7 +1382,7 @@ $(LIBNCI_SO): $(SRC_DIR)/nci_test$(O)
 
 tags:	tags.dummy
 	$(RM_F) tags
-	ctags -R --links=no .
+	ctags -R --links=no $(CUR_DIR)
 	$(PERL) editor/addtags ops/*.ops
 
 tags.dummy:
