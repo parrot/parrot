@@ -106,6 +106,42 @@ Returns the number of elements in the array.
 
 /*
 
+=item C<PMC* get_iter ()>
+
+Return a new iterator for SELF.
+
+=cut
+
+*/
+
+    PMC* get_iter () {
+        PMC *iter = pmc_new_init(interpreter, enum_class_Iterator, SELF);
+        PMC *key =  pmc_new(interpreter, enum_class_Key);
+        PMC_struct_val(iter) = key;
+        PObj_get_FLAGS(key) |= KEY_integer_FLAG;
+        PMC_int_val(key) = 0;
+        if (!((List *) PMC_data(SELF))->length)
+            PMC_int_val(key) = -1;
+        return iter;
+    }
+
+/*
+
+=item C<PMC* get_pmc_keyed(PMC* key)>
+
+Returns the PMC value of the element at index C<key>.
+
+=cut
+
+*/
+
+    PMC* get_pmc_keyed (PMC* key) {
+        INTVAL ix = key_integer(INTERP, key);
+        return SELF.get_pmc_keyed_int(ix);
+    }
+
+/*
+
 =item C<PMC* get_pmc_keyed_int(INTVAL key)>
 
 Returns the PMC value of the element at index C<key>.

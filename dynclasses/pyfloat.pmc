@@ -51,6 +51,20 @@ Returns the number as a Parrot string.
 
 /*
 
+=item C<FLOATVAL get_number()>
+
+Returns the value of the number.
+
+=cut
+
+*/
+
+    FLOATVAL get_number() {
+        return PMC_num_val(SELF);
+    }
+
+/*
+
 =item C<void set_number_native(FLOATVAL value)>
 
 Sets the value of the number to C<value>.
@@ -63,6 +77,20 @@ Note that if C<value> is an integer the number morphs to a C<PerlInt>.
 
     void set_number_native (FLOATVAL value) {
         PMC_num_val(SELF) = value;
+    }
+
+/*
+
+=item C<void set_string_native(STRING* value)>
+
+Sets the value of the number by converting C<*value> to a number.
+
+=cut
+
+*/
+
+    void set_string_native(STRING* value) {
+        PMC_num_val(SELF) = string_to_num(INTERP, value);
     }
 
 /*

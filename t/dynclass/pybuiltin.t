@@ -43,6 +43,11 @@ output_is(<< 'CODE', << 'OUTPUT', "delegating");
     print $P3
     print "\n"
 
+    find_lex $P2, "complex"
+    $P3 = $P2($P0,$P1)
+    print $P3
+    print "\n"
+
     find_lex $P2, "float"
     $P3 = $P2($P0)
     print $P3
@@ -58,6 +63,11 @@ output_is(<< 'CODE', << 'OUTPUT', "delegating");
     print $P3
     print "\n"
 
+    find_lex $P2, "long"
+    $P3 = $P2($P0)
+    print $P3
+    print "\n"
+
     find_lex $P2, "oct"
     $P3 = $P2($P0)
     print $P3
@@ -66,9 +76,11 @@ output_is(<< 'CODE', << 'OUTPUT', "delegating");
 CODE
 13
 1
+(31-13j)
 31.0
 0x1f
 31
+31L
 037
 OUTPUT
 

@@ -23,10 +23,13 @@ This class implements the Python "builtin" Functions.
 /* cache of classes referenced */
 static INTVAL dynclass_PyObject;
 static INTVAL dynclass_PyBoolean;
+static INTVAL dynclass_PyComplex;
 static INTVAL dynclass_PyInt;
 static INTVAL dynclass_PyFloat;
 static INTVAL dynclass_PyList;
+static INTVAL dynclass_PyLong;
 static INTVAL dynclass_PyString;
+static INTVAL dynclass_PyTuple;
 
 static STRING *HEX;
 static STRING *OCT;
@@ -49,10 +52,13 @@ they will be used frequently here.
         if (pass) {
             dynclass_PyObject  = Parrot_PMC_typenum(INTERP, "PyObject");
             dynclass_PyBoolean = Parrot_PMC_typenum(INTERP, "PyBoolean");
+            dynclass_PyComplex = Parrot_PMC_typenum(INTERP, "PyComplex");
             dynclass_PyInt     = Parrot_PMC_typenum(INTERP, "PyInt");
             dynclass_PyFloat   = Parrot_PMC_typenum(INTERP, "PyFloat");
             dynclass_PyList    = Parrot_PMC_typenum(INTERP, "PyList");
+            dynclass_PyLong    = Parrot_PMC_typenum(INTERP, "PyLong");
             dynclass_PyString  = Parrot_PMC_typenum(INTERP, "PyString");
+            dynclass_PyTuple   = Parrot_PMC_typenum(INTERP, "PyTuple");
 
             HEX = const_string(INTERP, "__hex__");
             OCT = const_string(INTERP, "__oct__");
@@ -160,6 +166,26 @@ Returns the result of comparing C<*value1> with C<*value2).
 
 /*
 
+=item C<PMC* "complex"()>
+
+Combines a real and imaginary number and returns the result.
+
+=cut
+
+*/
+
+    METHOD PMC* complex(PMC *real, PMC *imag) {
+        FLOATVAL fvalue;
+        PMC * ret = pmc_new(INTERP, dynclass_PyComplex);
+        fvalue = VTABLE_get_number(INTERP, real);
+        VTABLE_set_number_keyed_int(INTERP, ret, 0, fvalue);
+        fvalue = VTABLE_get_number(INTERP, imag);
+        VTABLE_set_number_keyed_int(INTERP, ret, 1, fvalue);
+        return ret;
+    }
+
+/*
+
 =item C<PMC* "float"()>
 
 Returns the float value of C<value>.
@@ -169,9 +195,21 @@ Returns the float value of C<value>.
 */
 
     METHOD PMC* float(PMC *value) {
-        PMC * ret = pmc_new(INTERP, dynclass_PyFloat);
-        FLOATVAL fvalue = VTABLE_get_number(INTERP, value);
-        VTABLE_set_number_native(INTERP, ret, fvalue);
+        PMC * ret;
+
+        if (value->vtable->base_type == dynclass_PyFloat)
+            return value;
+
+        ret = pmc_new(INTERP, dynclass_PyFloat);
+        if (value->vtable->base_type == dynclass_PyInt) {
+            FLOATVAL fvalue = VTABLE_get_number(INTERP, value);
+            VTABLE_set_number_native(INTERP, ret, fvalue);
+        }
+        else {
+            STRING *svalue = VTABLE_get_string(INTERP, value);
+            VTABLE_set_string_native(INTERP, ret, svalue);
+        }
+
         return ret;
     }
 
@@ -212,6 +250,65 @@ Returns the integer value of C<value>.
 
 /*
 
+=item C<PMC* "list"(PMC *value)>
+
+Returns the list value of C<value>.
+
+=cut
+
+*/
+
+    METHOD PMC* list(PMC *value) {
+        PMC *ret = pmc_new(INTERP, dynclass_PyList);
+        INTVAL n = VTABLE_elements(INTERP, value);
+        INTVAL j;
+
+        for (j=0; j<n; j++) {
+            PMC *item = VTABLE_get_pmc_keyed_int(INTERP, value, j);
+            VTABLE_set_pmc_keyed_int(INTERP, ret, j, item);
+        }
+
+        VTABLE_set_integer_native(INTERP, ret, n);
+        return ret;
+    }
+
+/*
+
+=item C<PMC* "long"(PMC *value)>
+
+Returns the long value of C<value>.
+
+=cut
+
+*/
+
+    METHOD PMC* long(PMC *value, PMC *base) {
+        PMC *ret;
+
+        if (value->vtable->base_type == dynclass_PyLong)
+            return value;
+
+        ret = pmc_new(INTERP, dynclass_PyLong);
+        if (value->vtable->base_type == dynclass_PyInt) {
+            INTVAL ivalue = VTABLE_get_integer(INTERP, value);
+            VTABLE_set_integer_native(INTERP, ret, ivalue);
+        }
+        else {
+            INTVAL argcP = REG_INT(3);
+            STRING *svalue = VTABLE_get_string(INTERP, value);
+            if (argcP == 1)
+                VTABLE_set_string_native(INTERP, ret, svalue);
+            else {
+                INTVAL key = VTABLE_get_integer(INTERP, base);
+                VTABLE_set_string_keyed_int(INTERP, ret, key, svalue);
+            }
+        }
+
+        return ret;
+    }
+
+/*
+
 =item C<PMC* "oct"(PMC *value)>
 
 Returns the octal representation of C<value>.
@@ -226,6 +323,31 @@ Returns the octal representation of C<value>.
         REG_PMC(2) = value;
         VTABLE_invoke(INTERP, meth, REG_PMC(1));
         return REG_PMC(5);
+    }
+
+/*
+
+=item C<PMC* "tuple"(PMC *value)>
+
+Returns the tuple value of C<value>.
+
+=cut
+
+*/
+
+    METHOD PMC* tuple(PMC *value) {
+        PMC *ret = pmc_new(INTERP, dynclass_PyTuple);
+        INTVAL n = VTABLE_elements(INTERP, value);
+        INTVAL j;
+
+        VTABLE_set_integer_native(INTERP, ret, n);
+
+        for (j=0; j<n; j++) {
+            PMC *item = VTABLE_get_pmc_keyed_int(INTERP, value, j);
+            VTABLE_set_pmc_keyed_int(INTERP, ret, j, item);
+        }
+
+        return ret;
     }
 
 /*

@@ -14,12 +14,14 @@ pybuiltin \
 pyobject \
   pyboolean \
   pyclass \
+  pycomplex \
   pydict \
   pyfloat \
   pyfunc \
   pygen \
   pyint \
   pylist \
+  pylong \
   pymodule \
   pynone \
   pytype \

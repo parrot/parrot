@@ -20,8 +20,11 @@ These are the vtable functions for the PyList base class
 
 #include "parrot/parrot.h"
 
+extern PMC* parrot_py_make_slice(Interp *interpreter, PMC *self, PMC *key);
+
 /* cache of classes referenced */
 static INTVAL dynclass_PyInt;
+static INTVAL dynclass_PyList;
 static INTVAL dynclass_PyNone;
 static INTVAL dynclass_PyString;
 
@@ -41,6 +44,7 @@ they will be used frequently here.
     void class_init() {
         if (pass) {
             dynclass_PyInt     = Parrot_PMC_typenum(INTERP, "PyInt");
+            dynclass_PyList    = Parrot_PMC_typenum(INTERP, "PyList");
             dynclass_PyNone    = Parrot_PMC_typenum(INTERP, "PyNone");
             dynclass_PyString  = Parrot_PMC_typenum(INTERP, "PyString");
         }
@@ -59,6 +63,31 @@ Initializes the PMC by calling the underlying C<list_new()> function.
     void init () {
         list_pmc_new(INTERP, SELF);
         PObj_custom_mark_SET(SELF);
+    }
+
+/*
+
+=item C<void delete_keyed(PMC *key)>
+
+Delete a (range of) elements from the list
+
+=cut
+
+*/
+
+    void delete_keyed (PMC* key) {
+        if (key->vtable->base_type == enum_class_Slice) {
+            List *list = (List *)PMC_data(SELF);
+            PMC *slice = parrot_py_make_slice(INTERP, SELF, key);
+            parrot_range_t *range = PMC_struct_val(slice);
+            INTVAL start = RVal_int(range->start);
+            INTVAL end   = RVal_int(range->end);
+
+            list_delete(INTERP, list, start, end-start);
+        }
+        else
+            internal_exception(OUT_OF_BOUNDS,
+                "PyList: unimplemented delete!\n");
     }
 
 /*
@@ -91,6 +120,27 @@ Returns the number of elements in the array.
 
 /*
 
+=item C<PMC* get_iter ()>
+
+Return a new iterator for SELF.
+
+=cut
+
+*/
+
+    PMC* get_iter () {
+        PMC *iter = pmc_new_init(interpreter, enum_class_Iterator, SELF);
+        PMC *key =  pmc_new(interpreter, enum_class_Key);
+        PMC_struct_val(iter) = key;
+        PObj_get_FLAGS(key) |= KEY_integer_FLAG;
+        PMC_int_val(key) = 0;
+        if (!((List *) PMC_data(SELF))->length)
+            PMC_int_val(key) = -1;
+        return iter;
+    }
+
+/*
+
 =item C<PMC* get_pmc_keyed(PMC* key)>
 
 Returns the PMC value of the element at index C<key>.
@@ -100,8 +150,27 @@ Returns the PMC value of the element at index C<key>.
 */
 
     PMC* get_pmc_keyed (PMC* key) {
-        INTVAL ix = key_integer(INTERP, key);
-        return SELF.get_pmc_keyed_int(ix);
+        if (key->vtable->base_type == enum_class_Slice) {
+            PMC *slice = parrot_py_make_slice(INTERP, SELF, key);
+            parrot_range_t *range = PMC_struct_val(slice);
+            INTVAL start = RVal_int(range->start);
+            INTVAL end   = RVal_int(range->end);
+            PMC * ret = pmc_new(INTERP, dynclass_PyList);
+            INTVAL n = end-start;
+            INTVAL j;
+    
+            for (j=0; j<n; j++) {
+                PMC *item = VTABLE_get_pmc_keyed_int(INTERP, SELF, start+j);
+                VTABLE_set_pmc_keyed_int(INTERP, ret, j, item);
+            }
+    
+            VTABLE_set_integer_native(INTERP, ret, n);
+            return ret;
+        }
+        else {
+            INTVAL ix = key_integer(INTERP, key);
+            return SELF.get_pmc_keyed_int(ix);
+        }
     }
 
 /*
@@ -250,8 +319,19 @@ Sets the PMC at element C<key> to C<*value>.
 */
 
     void set_pmc_keyed (PMC* key, PMC* value) {
-        INTVAL ix = key_integer(INTERP, key);
-        SELF.set_pmc_keyed_int(ix, value);
+        if (key->vtable->base_type == enum_class_Slice) {
+            List *list = (List *)PMC_data(SELF);
+            PMC *slice = parrot_py_make_slice(INTERP, SELF, key);
+            parrot_range_t *range = PMC_struct_val(slice);
+            INTVAL start = RVal_int(range->start);
+            INTVAL end   = RVal_int(range->end);
+
+            list_splice(INTERP, list, value, start, end-start);
+        }
+        else {
+            INTVAL ix = key_integer(INTERP, key);
+            SELF.set_pmc_keyed_int(ix, value);
+        }
     }
 
 /*

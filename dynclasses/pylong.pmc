@@ -1,0 +1,727 @@
+/*
+Copyright: 2004 The Perl Foundation.  All Rights Reserved.
+$Id$
+
+=head1 NAME
+
+classes/pylong.pmc - Python BigInt PMC class
+
+=head1 DESCRIPTION
+
+C<PyLong> provides arbitray precision integer mathematic functions.
+
+=head2 Functions
+
+=over 4
+
+=item C<static void bigint_set_long(Interp*, PMC*, long value)>
+
+=item C<static void bigint_set_double(Interp*, PMC*, double value)>
+
+=cut
+
+*/
+
+#include "parrot/parrot.h"
+
+/*
+ * TODO split that out into a separate file
+ */
+
+/* cache of classes referenced */
+static INTVAL dynclass_PyLong;
+
+#ifdef PARROT_HAS_GMP
+#include <gmp.h>
+typedef struct {
+    mpz_t b;
+} BIGINT;
+
+#define BN(x) ((BIGINT*)PMC_struct_val(x))->b
+
+static void
+bigint_init(Interp *interpreter, PMC *self) {
+    PMC_struct_val(self) = malloc(sizeof(BIGINT));
+    mpz_init(BN(self));
+}
+
+static void
+bigint_set_long(Interp *interpreter, PMC *self, long value) {
+    mpz_set_si(BN(self), value);
+}
+
+static void
+bigint_set_double(Interp *interpreter, PMC *self, double value) {
+    mpz_set_d(BN(self), value);
+}
+
+static void
+bigint_set_str(Interp *interpreter, PMC *self, char* value, int base) {
+    mpz_set_str(BN(self), value, base);
+}
+
+static BIGNUM*
+bigint_get_self(Interp *interpreter, PMC *self) {
+    return PMC_struct_val(self);
+}
+
+static void
+bigint_set_self(Interp *interpreter, PMC *self, BIGNUM *value) {
+    mpz_set(BN(self), value);
+}
+
+static long
+bigint_get_long(Interp *interpreter, PMC *self) {
+    if (mpz_fits_slong_p(BN(self)))
+        return mpz_get_si(BN(self));
+    real_exception(interpreter, NULL, 1, "bigint_get_long: number too big");
+    return 0;
+}
+
+static int
+bigint_get_bool(Interp *interpreter, PMC *self) {
+    if (mpz_fits_slong_p(BN(self)))
+        return mpz_get_si(BN(self)) != 0;
+    return 0;
+}
+static char *
+bigint_get_string(Interp *interpreter, PMC *self, int base) {
+    return mpz_get_str(NULL, base, BN(self));
+}
+
+static double
+bigint_get_double(Interp *interpreter, PMC *self) {
+    return mpz_get_d( BN(self));
+}
+
+static void
+bigint_add_bigint(Interp *interpreter, PMC* self, PMC *value, PMC *dest)
+{
+    VTABLE_morph(interpreter, dest, dynclass_PyLong);
+    mpz_add(BN(dest), BN(self), BN(value));
+}
+
+static void
+bigint_add_bigint_int(Interp *interpreter, PMC* self, INTVAL value,
+        PMC *dest)
+{
+    VTABLE_morph(interpreter, dest, dynclass_PyLong);
+    mpz_add_ui(BN(dest), BN(self), (long)value);
+}
+static void
+bigint_mul_bigint(Interp *interpreter, PMC* self, PMC *value, PMC *dest)
+{
+    VTABLE_morph(interpreter, dest, dynclass_PyLong);
+    mpz_mul(BN(dest), BN(self), BN(value));
+}
+
+static void
+bigint_mul_bigint_int(Interp *interpreter, PMC* self, INTVAL value,
+        PMC *dest)
+{
+    VTABLE_morph(interpreter, dest, dynclass_PyLong);
+    mpz_mul_ui(BN(dest), BN(self), value);
+}
+
+static void
+bigint_div_bigint(Interp *interpreter, PMC* self, PMC *value, PMC *dest)
+{
+    VTABLE_morph(interpreter, dest, dynclass_PyLong);
+    /* this is mpz_fdiv_q */
+    mpz_div(BN(dest), BN(self), BN(value));
+    if (mpz_fits_slong_p(BN(dest))) {
+        VTABLE_morph(interpreter, dest, enum_class_PerlInt);
+        VTABLE_set_integer_native(interpreter, dest,
+             mpz_get_si(BN(dest)));
+    }
+}
+static void
+bigint_div_bigint_int(Interp *interpreter, PMC* self, INTVAL value, PMC *dest)
+{
+    VTABLE_morph(interpreter, dest, dynclass_PyLong);
+    /* this is mpz_fdiv_q */
+    mpz_div_ui(BN(dest), BN(self), value);
+    if (mpz_fits_slong_p(BN(dest))) {
+        VTABLE_morph(interpreter, dest, enum_class_PerlInt);
+        VTABLE_set_integer_native(interpreter, dest,
+             mpz_get_si(BN(dest)));
+    }
+}
+static void
+bigint_fdiv_bigint(Interp *interpreter, PMC* self, PMC *value, PMC *dest)
+{
+    VTABLE_morph(interpreter, dest, dynclass_PyLong);
+    /* this is mpz_fdiv_q */
+    mpz_fdiv_q(BN(dest), BN(self), BN(value));
+    if (mpz_fits_slong_p(BN(dest))) {
+        VTABLE_morph(interpreter, dest, enum_class_PerlInt);
+        VTABLE_set_integer_native(interpreter, dest,
+             mpz_get_si(BN(dest)));
+    }
+}
+static void
+bigint_fdiv_bigint_int(Interp *interpreter, PMC* self, INTVAL value, PMC *dest)
+{
+    VTABLE_morph(interpreter, dest, dynclass_PyLong);
+    /* this is mpz_fdiv_q */
+    mpz_fdiv_q_ui(BN(dest), BN(self), value);
+    if (mpz_fits_slong_p(BN(dest))) {
+        VTABLE_morph(interpreter, dest, enum_class_PerlInt);
+        VTABLE_set_integer_native(interpreter, dest,
+             mpz_get_si(BN(dest)));
+    }
+}
+static void
+bigint_mod_bigint(Interp *interpreter, PMC* self, PMC *value, PMC *dest)
+{
+    VTABLE_morph(interpreter, dest, dynclass_PyLong);
+    mpz_mod(BN(dest), BN(self), BN(value));
+    if (mpz_fits_slong_p(BN(dest))) {
+        VTABLE_morph(interpreter, dest, enum_class_PerlInt);
+        VTABLE_set_integer_native(interpreter, dest,
+             mpz_get_si(BN(dest)));
+    }
+}
+
+static INTVAL
+bigint_cmp(Interp *interpreter, PMC* self, PMC *value)
+{
+    return mpz_cmp(BN(self), BN(value));
+}
+
+static INTVAL
+bigint_cmp_int(Interp *interpreter, PMC* self, INTVAL value)
+{
+    return mpz_cmp_ui(BN(self), value);
+}
+
+static void
+bigint_abs(Interp *interpreter, PMC* self, PMC *dest)
+{
+    VTABLE_morph(interpreter, dest, dynclass_PyLong);
+    mpz_abs(BN(dest), BN(self));
+}
+#else
+
+static void
+bigint_init(Interp *interpreter, PMC *self) {
+    internal_exception(1, "no bigint lib loaded");
+}
+static void
+bigint_set_long(Interp *interpreter, PMC *self, long value) {
+    internal_exception(1, "no bigint lib loaded");
+}
+static void
+bigint_set_double(Interp *interpreter, PMC *self, double value) {
+    internal_exception(1, "no bigint lib loaded");
+}
+static void
+bigint_set_str(Interp *interpreter, PMC *self, char* value, int base) {
+    internal_exception(1, "no bigint lib loaded");
+}
+static void
+bigint_set_self(Interp *interpreter, PMC *self, BIGNUM *value) {
+    internal_exception(1, "no bigint lib loaded");
+}
+static BIGNUM*
+bigint_get_self(Interp *interpreter, PMC *self) {
+    internal_exception(1, "no bigint lib loaded");
+    return NULL;
+}
+
+static char *
+bigint_get_string(Interp *interpreter, PMC *self, int base) {
+    internal_exception(1, "no bigint lib loaded");
+    return NULL;
+}
+
+static long
+bigint_get_long(Interp *interpreter, PMC *self) {
+    internal_exception(1, "no bigint lib loaded");
+    return 0L;
+}
+static long
+bigint_get_bool(Interp *interpreter, PMC *self) {
+    internal_exception(1, "no bigint lib loaded");
+    return 0L;
+}
+static double
+bigint_get_double(Interp *interpreter, PMC *self) {
+    internal_exception(1, "no bigint lib loaded");
+    return 0.0;
+}
+static void
+bigint_add_bigint(Interp *interpreter, PMC* self, PMC *value, PMC *dest)
+{
+    internal_exception(1, "no bigint lib loaded");
+}
+static void
+bigint_add_bigint_int(Interp *interpreter, PMC* self, INTVAL value, PMC *dest)
+{
+    internal_exception(1, "no bigint lib loaded");
+}
+static void
+bigint_mul_bigint(Interp *interpreter, PMC* self, PMC *value, PMC *dest)
+{
+    internal_exception(1, "no bigint lib loaded");
+}
+static void
+bigint_mul_bigint_int(Interp *interpreter, PMC* self, INTVAL value,
+        PMC *dest)
+{
+    internal_exception(1, "no bigint lib loaded");
+}
+static void
+bigint_div_bigint(Interp *interpreter, PMC* self, PMC *value, PMC *dest)
+{
+    internal_exception(1, "no bigint lib loaded");
+}
+static void
+bigint_div_bigint_int(Interp *interpreter, PMC* self, INTVAL value, PMC *dest)
+{
+    internal_exception(1, "no bigint lib loaded");
+}
+static void
+bigint_fdiv_bigint(Interp *interpreter, PMC* self, PMC *value, PMC *dest)
+{
+    internal_exception(1, "no bigint lib loaded");
+}
+static void
+bigint_fdiv_bigint_int(Interp *interpreter, PMC* self, INTVAL value, PMC *dest)
+{
+    internal_exception(1, "no bigint lib loaded");
+}
+static void
+bigint_mod_bigint(Interp *interpreter, PMC* self, PMC *value, PMC *dest)
+{
+    internal_exception(1, "no bigint lib loaded");
+}
+static INTVAL
+bigint_cmp(Interp *interpreter, PMC* self, PMC *value)
+{
+    internal_exception(1, "no bigint lib loaded");
+    return 0;
+}
+static INTVAL
+bigint_cmp_int(Interp *interpreter, PMC* self, INTVAL value)
+{
+    internal_exception(1, "no bigint lib loaded");
+    return 0;
+}
+static void
+bigint_abs(Interp *interpreter, PMC* self, PMC *dest)
+{
+    internal_exception(1, "no bigint lib loaded");
+}
+#endif
+
+pmclass PyLong extends PyObject dynpmc group python_group {
+
+/*
+
+=item C<void class_init()>
+
+Class initialization. Caches the type id of various PMCs because
+they will be used frequently here.
+
+=cut
+
+*/
+
+    void class_init() {
+        if (pass) {
+            dynclass_PyLong = Parrot_PMC_typenum(INTERP, "PyLong");
+        }
+    }
+
+/*
+
+=item C<void* invoke(void* next)>
+
+Pythonic object constructor. SELF is a BigInt Class object. Return a new
+C<long> object according to 2.1. Built-in Functions.
+
+=cut
+
+*/
+    void* invoke(void* next) {
+        int argcP = REG_INT(3);
+        int base;
+        PMC *res;
+        STRING *num;
+
+        if (!argcP) {
+            REG_PMC(5) = pmc_new(INTERP, dynclass_PyLong);
+            return next;
+        }
+        base = 10;
+        if (argcP == 2)
+            base = VTABLE_get_integer(INTERP, REG_PMC(6));
+        res = pmc_new(interpreter, dynclass_PyLong);
+        num = VTABLE_get_string(interpreter, REG_PMC(5));
+        VTABLE_set_string_keyed_int(interpreter, res, base, num);
+        REG_PMC(5) = res;
+        return next;
+    }
+
+    void class_init () {
+        /* this should be autmatically done - probably */
+        if (pass) {
+        }
+    }
+
+/*
+
+=back
+
+=head2 Methods
+
+=over 4
+
+*/
+
+    void init () {
+        bigint_init(INTERP, SELF);
+    }
+
+/*
+
+=item C<void set_integer_native(INTVAL value)>
+
+=cut
+
+*/
+
+    void set_integer_native(INTVAL value) {
+        bigint_set_long(INTERP, SELF, (long)value);
+    }
+
+/*
+
+=item C<void set_number_native(FLOATVAL value)>
+
+Sets the value of the bigint to C<value>.
+
+=cut
+
+*/
+
+    void set_number_native(FLOATVAL value) {
+        bigint_set_double(INTERP, SELF, (double)value);
+    }
+
+/*
+
+=item C<void set_string_native(STRING* value)>
+
+Sets the value of the integer to the result of converting C<*value> to a
+number.
+
+=item C<void set_string_keyed_int(INTVAL base, STRING* value)>
+
+Same assume number base C<base>.
+
+=cut
+
+*/
+
+    void set_string_native(STRING* value) {
+        char *s = string_to_cstring(INTERP, value);
+        bigint_set_str(INTERP, SELF, s, 10);
+        string_cstring_free(s);
+    }
+
+    void set_string_keyed_int(INTVAL base, STRING* value) {
+        char *s = string_to_cstring(INTERP, value);
+        bigint_set_str(INTERP, SELF, s, base);
+        string_cstring_free(s);
+    }
+/*
+
+=item C<void set_pmc(PMC *value)>
+
+Sets the value of the integer to the integer value of C<*value>.
+
+=cut
+
+*/
+
+    void set_pmc(PMC *value) {
+        bigint_set_self(INTERP, SELF, bigint_get_self(INTERP, value));
+    }
+
+/*
+
+=item C<FLOATVAL get_number()>
+
+Returns the value of the integer as a floating point number.
+
+=cut
+
+*/
+
+    FLOATVAL get_number() {
+        return bigint_get_double(INTERP, SELF);
+    }
+
+/*
+
+=item C<INTVAL get_integer()>
+
+Returns the value of the integer.
+
+=cut
+
+*/
+
+    INTVAL get_integer() {
+        return bigint_get_long(INTERP, SELF);
+    }
+
+/*
+
+=item C<BIGNUM* get_bignum()>
+
+Returns the BIGNUM.
+
+=cut
+
+*/
+
+    BIGNUM* get_bignum() {
+        return bigint_get_self(INTERP, SELF);
+    }
+
+/*
+
+=item C<INTVAL get_bool()>
+
+Returns the boolean value of the integer.
+
+=cut
+
+*/
+
+    INTVAL get_bool() {
+        return bigint_get_bool(INTERP, SELF);
+    }
+
+/*
+
+=item C<STRING* get_string()>
+
+Returns the string representation of the integer.
+
+=item C<STRING* get_string_keyed_int(INTVAL base)>
+
+Returns the string representation of the integer in base C<base>.
+
+=item C<STRING* get_repr()>
+
+Returns the string representation of the integer with the letter 'L'
+appended.
+
+=cut
+
+*/
+
+    STRING* get_string() {
+        char *s = bigint_get_string(INTERP, SELF, 10);
+        STRING *ps = string_from_cstring(INTERP, s, 0);
+        free(s);
+        return string_append(INTERP, ps, const_string(INTERP, "L"), 0);
+    }
+
+    STRING* get_string_keyed_int(INTVAL base) {
+        char *s = bigint_get_string(INTERP, SELF, base);
+        STRING *ps = string_from_cstring(INTERP, s, 0);
+        free(s);
+        return string_append(INTERP, ps, const_string(INTERP, "L"), 0);
+    }
+
+    STRING* get_repr() {
+        return SELF.get_string();
+    }
+/*
+
+=item C<void increment()>
+
+Increments the integer.
+
+=cut
+
+*/
+
+    void increment() {
+        internal_exception(1, "unimp inc");
+    }
+
+/*
+
+=item C<void decrement()>
+
+Decrements the integer.
+
+=cut
+
+*/
+
+    void decrement() {
+        internal_exception(1, "unimp dec");
+    }
+
+    void add(PMC* value, PMC* dest) {
+MMD_PyLong: {
+                bigint_add_bigint(INTERP, SELF, value, dest);
+            }
+MMD_PyInt: {
+                bigint_add_bigint_int(INTERP, SELF, PMC_int_val(value), dest);
+            }
+MMD_Integer: {
+                bigint_add_bigint_int(INTERP, SELF, PMC_int_val(value), dest);
+            }
+MMD_DEFAULT: {
+                 internal_exception(1, "unimp add");
+             }
+    }
+
+    void add_int(INTVAL value, PMC* dest) {
+        bigint_add_bigint_int(INTERP, SELF, value, dest);
+    }
+
+    void multiply(PMC* value, PMC* dest) {
+MMD_PyLong: {
+                bigint_mul_bigint(INTERP, SELF, value, dest);
+            }
+MMD_PyInt: {
+            bigint_mul_bigint_int(INTERP, SELF, PMC_int_val(value), dest);
+             }
+MMD_Integer: {
+            bigint_mul_bigint_int(INTERP, SELF, PMC_int_val(value), dest);
+             }
+MMD_DEFAULT: {
+                 internal_exception(1, "unimp mul");
+             }
+    }
+
+    void multiply_int(INTVAL value, PMC* dest) {
+        bigint_mul_bigint_int(INTERP, SELF, value, dest);
+    }
+
+    void divide(PMC* value, PMC* dest) {
+MMD_PyLong: {
+                bigint_div_bigint(INTERP, SELF, value, dest);
+            }
+MMD_PyInt: {
+                bigint_div_bigint_int(INTERP, SELF, PMC_int_val(value), dest);
+            }
+MMD_Integer: {
+                bigint_div_bigint_int(INTERP, SELF, PMC_int_val(value), dest);
+            }
+MMD_DEFAULT: {
+                 internal_exception(1, "unimp fdiv");
+             }
+    }
+
+    void divide_int(INTVAL value, PMC* dest) {
+        bigint_div_bigint_int(INTERP, SELF, value, dest);
+    }
+    void floor_divide(PMC* value, PMC* dest) {
+MMD_PyLong: {
+                bigint_fdiv_bigint(INTERP, SELF, value, dest);
+            }
+MMD_PyInt: {
+                bigint_fdiv_bigint_int(INTERP, SELF, PMC_int_val(value), dest);
+            }
+MMD_Integer: {
+                bigint_fdiv_bigint_int(INTERP, SELF, PMC_int_val(value), dest);
+            }
+MMD_DEFAULT: {
+                 internal_exception(1, "unimp fdiv");
+             }
+    }
+    void floor_divide_int(INTVAL value, PMC* dest) {
+        bigint_fdiv_bigint_int(INTERP, SELF, value, dest);
+    }
+
+    void modulus(PMC* value, PMC* dest) {
+MMD_PyLong: {
+                bigint_mod_bigint(INTERP, SELF, value, dest);
+            }
+MMD_DEFAULT: {
+                 internal_exception(1, "unimp mod");
+             }
+    }
+
+    void cmodulus(PMC* value, PMC* dest) {
+MMD_PyLong: {
+                bigint_mod_bigint(INTERP, SELF, value, dest);
+            }
+MMD_DEFAULT: {
+                 internal_exception(1, "unimp cmod");
+             }
+    }
+
+
+    void divide_int(INTVAL value, PMC* dest) {
+        bigint_div_bigint_int(INTERP, SELF, value, dest);
+    }
+
+    INTVAL cmp(PMC* value) {
+MMD_PyLong: {
+        return bigint_cmp(INTERP, SELF, value);
+            }
+MMD_PyInt: {
+        return bigint_cmp_int(INTERP, SELF, PMC_int_val(value));
+            }
+MMD_DEFAULT: {
+                 internal_exception(1, "unimp cmp");
+                 return 0;
+             }
+    }
+
+    INTVAL is_equal(PMC* value) {
+MMD_PyLong: {
+        return bigint_cmp(INTERP, SELF, value) == 0;
+            }
+MMD_PyInt: {
+        return bigint_cmp_int(INTERP, SELF, PMC_int_val(value)) == 0;
+            }
+MMD_DEFAULT: {
+                 internal_exception(1, "unimp eq");
+                 return 0;
+             }
+    }
+
+/*
+
+=item C<void absolute()>
+
+Sets C<dest> to the absolute value of SELF.
+
+=cut
+
+*/
+
+    void absolute(PMC *dest) {
+        bigint_abs(INTERP, SELF, dest);
+    }
+}
+
+/*
+
+=back
+
+=cut
+
+*/
+
+/*
+ * Local variables:
+ * c-indentation-style: bsd
+ * c-basic-offset: 4
+ * indent-tabs-mode: nil
+ * End:
+ *
+ * vim: expandtab shiftwidth=4:
+*/

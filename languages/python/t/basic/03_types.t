@@ -86,13 +86,13 @@ if __name__ == '__main__':
 
     a = "abcdef" [2:]
     for c in a:
-	print c,
+        print c,
     print
 
     s = 3
     a = [ 1,2,3,4,5] [s:]
     for c in a:
-	print c,
+        print c,
     print
 
 CODE

@@ -836,7 +836,7 @@ Parrot_py_exit(Interp *interpreter)
  * convert a key chain PMC to a range slice with end adjusted to
  * the aggregate.
  */
-static PMC*
+PMC*
 parrot_py_make_slice(Interp *interpreter, PMC *self, PMC *key)
 {
     parrot_range_t *range;
