@@ -126,7 +126,7 @@ void $initname (void) {
         };
     
    whoami = string_make(NULL, /* DIRTY HACK */
-       "PerlInt", 7, 0, 0, 0);
+       "$classname", 7, 0, 0, 0);
 
    Parrot_base_vtables[enum_class_$classname] = temp_base_vtable;
 }
