@@ -338,7 +338,8 @@ constant_propagation(struct Parrot_Interp *interpreter)
                                     ins_string(ins2), i);
                             old = ins2->r[i];
                             ins2->r[i] = c;
-                            op = check_op(interpreter, fullname, ins2->op, ins2->r);
+                            op = check_op(interpreter, fullname, ins2->op,
+                                    ins2->r, ins2->opsize, ins2->keys);
                             if (op < 0) {
                                 ins2->r[i] = old;
                                 debug(interpreter, DEBUG_OPT2," - no %s\n", fullname);

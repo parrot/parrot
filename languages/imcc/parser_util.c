@@ -19,6 +19,7 @@
 #include "imc.h"
 #include "parrot/method_util.h"
 #include "parrot/interp_guts.h"
+#include "parrot/dynext.h"
 #include "pbc.h"
 #include "parser.h"
 
@@ -61,12 +62,12 @@ iNEW(struct Parrot_Interp *interpreter, SymReg * r0, char * type,
     i = nargs;
     while (i < IMCC_MAX_REGS)
 	regs[i++] = NULL;
-    return iANY(interpreter, "new", fmt, nargs, regs, emit);
+    return INS(interpreter, "new", fmt, regs, nargs,0, emit);
 }
 
-/* TODO get rid of nargs */
 void
-op_fullname(char * dest, const char * name, SymReg * args[], int narg) {
+op_fullname(char * dest, const char * name, SymReg * args[],
+        int narg, int keyvec) {
     int i;
 
     strcpy(dest, name);
@@ -97,13 +98,26 @@ op_fullname(char * dest, const char * name, SymReg * args[], int narg) {
 }
 
 int
-check_op(struct Parrot_Interp *interpreter, char *fullname,
-        char *name, SymReg *r[])
+get_keyvec(Parrot_Interp interpreter, int op)
 {
-    int op, narg;
-    for (narg = 0; r[narg]; narg++)
-        ;
-    op_fullname(fullname, name, r, narg);
+    int i, k;
+    op_info_t * op_info = &interpreter->op_info_table[op];
+    for (i = k = 0; i < op_info->arg_count - 1; i++)
+        if (op_info->types[i+1] == PARROT_ARG_K ||
+            op_info->types[i+1] == PARROT_ARG_KC ||
+            op_info->types[i+1] == PARROT_ARG_KI ||
+            op_info->types[i+1] == PARROT_ARG_KIC)
+            k |= KEY_BIT(i);
+    return k;
+}
+
+int
+check_op(struct Parrot_Interp *interpreter, char *fullname,
+        char *name, SymReg *r[], int narg, int keyvec)
+{
+    int op;
+
+    op_fullname(fullname, name, r, narg, keyvec);
     op = interpreter->op_lib->op_code(fullname, 1);
     return op;
 
@@ -120,17 +134,140 @@ int is_op(struct Parrot_Interp *interpreter, char *name)
  * fmt ... optional format
  * regs ... SymReg **
  * n ... # of params
- * keys ... keyvec bits
+ * keyvec ... s. KEY_BIT()
  * emit ... if true, append to instructions
  *
  * s. e.g. imc.c for usage
  */
 Instruction *
-INS(struct Parrot_Interp *interpreter, char *name, char *fmt, SymReg **r,
-        int n, int keys, int emit)
+INS(struct Parrot_Interp *interpreter, char *name, const char *fmt, SymReg **r,
+        int n, int keyvec, int emit)
 {
-    keyvec = keys;
-    return iANY(interpreter, name, fmt, n, r, emit);
+    char fullname[64];
+    int i;
+    int dirs = 0;
+    int op;
+    Instruction * ins;
+
+#if 1
+    ins = multi_keyed(interpreter, name, r, n, keyvec, emit);
+    if (ins)
+        return ins;
+#endif
+    op_fullname(fullname, name, r, n, keyvec);
+    op = interpreter->op_lib->op_code(fullname, 1);
+    if (op < 0)         /* maybe we got a fullname */
+        op = interpreter->op_lib->op_code(name, 1);
+    if (op < 0)         /* still wrong, try to find an existing op */
+        op = try_find_op(interpreter, name, r, n, keyvec, emit);
+    if (op >= 0) {
+        op_info_t * op_info = &interpreter->op_info_table[op];
+	char format[128];
+	int len;
+
+        *format = '\0';
+        /* info->arg_count is offset by one, first is opcode
+         * build instruction format
+         * set LV_in / out flags */
+        for (i = 0; i < op_info->arg_count-1; i++) {
+            switch (op_info->dirs[i+1]) {
+                case PARROT_ARGDIR_INOUT:
+                    dirs |= 1 << (16 + i);
+                    /* goon */
+                case PARROT_ARGDIR_IN:
+                    dirs |= 1 << i ;
+                    break;
+
+                case PARROT_ARGDIR_OUT:
+                    dirs |= 1 << (16 + i);
+                    break;
+
+                default:
+                    assert(0);
+            };
+            if (keyvec & KEY_BIT(i)) {
+                len = strlen(format);
+                len -= 2;
+                format[len] = '\0';
+                strcat(format, "[%s], ");
+	}
+            else
+                strcat(format, "%s, ");
+	}
+	len = strlen(format);
+	if (len >= 2)
+	    len -= 2;
+	format[len] = '\0';
+        if (fmt && *fmt)
+            strcpy(format, fmt);
+        memset(r + n, 0, sizeof(*r) * (IMCC_MAX_REGS - n));
+#if 1
+        debug(interpreter, DEBUG_PARSER,"%s %s\t%s\n", name, format, fullname);
+#endif
+        /* make the instruction */
+
+        ins = _mk_instruction(name, format, r, dirs);
+        ins->keys |= keyvec;
+        /* fill iin oplib's info */
+        ins->opnum = op;
+        ins->opsize = op_info->arg_count;
+        /* mark end as absolute branch */
+        if (!strcmp(name, "end")) {
+            ins->type |= ITBRANCH | IF_goto;
+        }
+        else if (!strcmp(name, "warningson")) {
+            /* emit a debug seg, if this op is seen */
+            PARROT_WARNINGS_on(interpreter, PARROT_WARNINGS_ALL_FLAG);
+        }
+        if (!strcmp(name, "load_pmc")) {
+            SymReg *r0 = r[0];   /* lib name */
+            STRING *lib = string_from_cstring(interpreter, r0->name + 1,
+                strlen(r0->name) - 2);
+            Parrot_load_pmc(interpreter, lib, NULL);
+        }
+        /* set up branch flags */
+        if (op_info->jump) {
+
+            /* XXX: assume the jump is relative and to the last arg.
+             * usually true.
+             */
+            if (op_info->jump & PARROT_JUMP_RESTART)
+                ins->type = ITBRANCH;
+            else
+                ins->type = ITBRANCH | (1 << (n-1));
+            if (!strcmp(name, "branch"))
+                ins->type |= IF_goto;
+            if (!strcmp(fullname, "jump_i") ||
+                    !strcmp(fullname, "jsr_i") ||
+                    !strcmp(fullname, "branch_i") ||
+                    !strcmp(fullname, "bsr_i"))
+                dont_optimize = 1;
+        }
+        else if (!strcmp(name, "set") && n == 2) {
+            /* set Px, Py: both PMCs have the same address */
+            if (r[0]->set == 'P' && r[1]->set == 'P')
+                ins->type |= ITALIAS;
+        }
+        else if (!strcmp(name, "set_addr")) {
+            /* mark this as branch, because it needs fixup */
+            ins->type = ITADDR | IF_r1_branch | ITBRANCH;
+        }
+        else if (!strcmp(name, "newsub")) {
+            if (ins->opsize == 4)
+                ins->type = ITADDR | IF_r2_branch | ITBRANCH;
+            else
+                ins->type = ITADDR | IF_r2_branch | IF_r3_branch | ITBRANCH;
+        }
+        else if (!strcmp(name, "compile"))
+            ++has_compile;
+
+        if (emit)
+             emitb(ins);
+    } else {
+        fataly(EX_SOFTWARE, sourcefile, line,"op not found '%s' (%s<%d>)\n",
+                fullname, name, n);
+    }
+    return ins;
 }
 
 /* imcc_compile(interp*, const char*)
@@ -278,7 +415,8 @@ void register_compilers(Parrot_Interp interp)
  *      div_n_i_n => set_n_i ; div_n_n_n
  */
 int
-try_find_op(Parrot_Interp interpreter, char *name, SymReg ** r, int n, int emit)
+try_find_op(Parrot_Interp interpreter, char *name, SymReg ** r,
+        int n, int keyvec, int emit)
 {
     char fullname[64];
     SymReg *s;
@@ -314,7 +452,7 @@ try_find_op(Parrot_Interp interpreter, char *name, SymReg ** r, int n, int emit)
         }
     }
     if (changed) {
-        op_fullname(fullname, name, r, n);
+        op_fullname(fullname, name, r, n, keyvec);
         return interpreter->op_lib->op_code(fullname, 1);
     }
     return -1;
@@ -322,7 +460,7 @@ try_find_op(Parrot_Interp interpreter, char *name, SymReg ** r, int n, int emit)
 
 Instruction *
 multi_keyed(struct Parrot_Interp *interpreter,char *name,
-SymReg ** r, int nr, int emit)
+SymReg ** r, int nr, int keyvec, int emit)
 {
     int i, keyf, kv, n;
     char buf[16];
@@ -368,45 +506,41 @@ SymReg ** r, int nr, int emit)
             }
             /* don't emit LHS yet */
             if (i == 0) {
-                keyvec = 1 << 1;
                 nreg[0] = r[i];
                 nreg[1] = r[i+1];
                 nreg[2] = preg[n];
                 /* set p_k px */
-                ins = iANY(interpreter, str_dup("set"), 0, 3, nreg, 0);
+                ins = INS(interpreter, str_dup("set"), 0, nreg, 3,KEY_BIT(1),0);
             }
             else {
-                keyvec = 1 << 2;
                 nreg[0] = preg[n];
                 nreg[1] = r[i];
                 nreg[2] = r[i+1];
                 /* set py|z p_k */
-                iANY(interpreter, str_dup("set"), 0, 3, nreg, 1);
+                INS(interpreter, str_dup("set"), 0, nreg, 3, KEY_BIT(2), 1);
             }
             i++;
         }
         /* non keyed */
         else {
-            keyvec = 0;
             if (i == 0) {
                 nreg[0] = r[i];
                 nreg[1] = preg[n];
                 /* set n, px */
-                ins = iANY(interpreter, str_dup("set"), 0, 3, nreg, 0);
+                ins = INS(interpreter, str_dup("set"), 0, nreg, 2, 0, 0);
             }
             else {
                 nreg[0] = preg[n];
                 nreg[1] = r[i];
                 /* set px, n */
-                iANY(interpreter, str_dup("set"), 0, 2, nreg, 1);
+                INS(interpreter, str_dup("set"), 0, nreg, 2, 0, 1);
             }
         }
     }
     /* make a new undef */
     iNEW(interpreter, preg[0], str_dup("PerlUndef"), NULL, 1);
     /* emit the operand */
-    keyvec = 0;
-    iANY(interpreter, name, 0, 3, preg, 1);
+    INS(interpreter, name, 0, preg, 3, 0, 1);
     /* emit the LHS op */
     emitb(ins);
     return ins;

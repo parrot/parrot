@@ -20,7 +20,6 @@
 #include "imc.h"
 #include "pbc.h"
 #include "parser.h"
-#include "parrot/dynext.h"
 
 #define YYDEBUG 1
 #define YYERROR_VERBOSE 1
@@ -46,12 +45,13 @@
  */
 static SymReg *keys[IMCC_MAX_REGS];
 static int nkeys;
+static int keyvec;
 static SymReg *regs[IMCC_MAX_REGS];
 static int nargs;
 
 
 /*
- * MK_I: build and emitb instruction by iANY
+ * MK_I: build and emitb instruction by INS
  *
  * fmt may contain:
  *   op %s, %s # comment
@@ -87,7 +87,7 @@ MK_I(struct Parrot_Interp *interpreter, const char * fmt, int n, ...)
     va_end(ap);
     while (i < IMCC_MAX_REGS)
 	r[i++] = NULL;
-    return iANY(interpreter, opname, fmt, n, r, 1);
+    return INS(interpreter, opname, fmt, r, n, keyvec, 1);
 }
 
 /*
@@ -181,137 +181,6 @@ iINDEXSET(struct Parrot_Interp *interp, SymReg * r0, SymReg * r1, SymReg * r2)
 }
 
 
-Instruction *
-iANY(struct Parrot_Interp *interpreter, char * name,
-    const char *fmt, int n, SymReg **r, int emit)
-{
-    char fullname[64];
-    int i;
-    int dirs = 0;
-    int op;
-    Instruction * ins;
-
-#if 1
-    ins = multi_keyed(interpreter, name, r, n, emit);
-    if (ins)
-        return ins;
-#endif
-    op_fullname(fullname, name, r, n);
-    op = interpreter->op_lib->op_code(fullname, 1);
-    if (op < 0)         /* maybe we got a fullname */
-        op = interpreter->op_lib->op_code(name, 1);
-    if (op < 0)         /* still wrong, try to find an existing op */
-        op = try_find_op(interpreter, name, r, n, emit);
-    if (op >= 0) {
-        op_info_t * op_info = &interpreter->op_info_table[op];
-	char format[128];
-	int len;
-
-        *format = '\0';
-        /* info->arg_count is offset by one, first is opcode
-         * build instruction format
-         * set LV_in / out flags */
-        for (i = 0; i < op_info->arg_count-1; i++) {
-            switch (op_info->dirs[i+1]) {
-                case PARROT_ARGDIR_INOUT:
-                    dirs |= 1 << (16 + i);
-                    /* goon */
-                case PARROT_ARGDIR_IN:
-                    dirs |= 1 << i ;
-                    break;
-
-                case PARROT_ARGDIR_OUT:
-                    dirs |= 1 << (16 + i);
-                    break;
-
-                default:
-                    assert(0);
-            };
-            if (keyvec & KEY_BIT(i)) {
-                len = strlen(format);
-                len -= 2;
-                format[len] = '\0';
-                strcat(format, "[%s], ");
-	}
-            else
-                strcat(format, "%s, ");
-	}
-	len = strlen(format);
-	if (len >= 2)
-	    len -= 2;
-	format[len] = '\0';
-        if (fmt && *fmt)
-            strcpy(format, fmt);
-        memset(r + n, 0, sizeof(*r) * (IMCC_MAX_REGS - n));
-#if 1
-        debug(interpreter, DEBUG_PARSER,"%s %s\t%s\n", name, format, fullname);
-#endif
-        /* make the instruction */
-
-        ins = _mk_instruction(name, format, r, dirs);
-        ins->keys |= keyvec;
-        /* fill iin oplib's info */
-        ins->opnum = op;
-        ins->opsize = op_info->arg_count;
-        /* mark end as absolute branch */
-        if (!strcmp(name, "end")) {
-            ins->type |= ITBRANCH | IF_goto;
-        }
-        else if (!strcmp(name, "warningson")) {
-            /* emit a debug seg, if this op is seen */
-            PARROT_WARNINGS_on(interpreter, PARROT_WARNINGS_ALL_FLAG);
-        }
-        if (!strcmp(name, "load_pmc")) {
-            SymReg *r0 = r[0];   /* lib name */
-            STRING *lib = string_from_cstring(interpreter, r0->name + 1,
-                strlen(r0->name) - 2);
-            Parrot_load_pmc(interpreter, lib, NULL);
-        }
-        /* set up branch flags */
-        if (op_info->jump) {
-
-            /* XXX: assume the jump is relative and to the last arg.
-             * usually true.
-             */
-            if (op_info->jump & PARROT_JUMP_RESTART)
-                ins->type = ITBRANCH;
-            else
-                ins->type = ITBRANCH | (1 << (n-1));
-            if (!strcmp(name, "branch"))
-                ins->type |= IF_goto;
-            if (!strcmp(fullname, "jump_i") ||
-                    !strcmp(fullname, "jsr_i") ||
-                    !strcmp(fullname, "branch_i") ||
-                    !strcmp(fullname, "bsr_i"))
-                dont_optimize = 1;
-        }
-        else if (!strcmp(name, "set") && n == 2) {
-            /* set Px, Py: both PMCs have the same address */
-            if (r[0]->set == 'P' && r[1]->set == 'P')
-                ins->type |= ITALIAS;
-        }
-        else if (!strcmp(name, "set_addr")) {
-            /* mark this as branch, because it needs fixup */
-            ins->type = ITADDR | IF_r1_branch | ITBRANCH;
-        }
-        else if (!strcmp(name, "newsub")) {
-            if (ins->opsize == 4)
-                ins->type = ITADDR | IF_r2_branch | ITBRANCH;
-            else
-                ins->type = ITADDR | IF_r2_branch | IF_r3_branch | ITBRANCH;
-        }
-        else if (!strcmp(name, "compile"))
-            ++has_compile;
-
-        if (emit)
-             emitb(ins);
-    } else {
-        fataly(EX_SOFTWARE, sourcefile, line,"op not found '%s' (%s<%d>)\n",
-                fullname, name, n);
-    }
-    return ins;
-}
-
 static char * inv_op(char *op) {
     int n;
     return (char *) get_neg_op(op, &n);
@@ -392,7 +261,7 @@ pasmline: labels  pasm_inst '\n'  { $$ = 0; }
     ;
 
 pasm_inst: {clear_state();}
-       PARROT_OP pasm_args	        { $$ = iANY(interp, $2,0,nargs, regs,1);
+       PARROT_OP pasm_args	 { $$ = INS(interp, $2,0,regs,nargs,keyvec,1);
                                           free($2); }
     | /* none */                        { $$ = 0;}
     ;
@@ -601,7 +470,7 @@ labeled_inst:
     |   SAVEALL				{ $$ = MK_I(interp, "saveall" ,0); }
     |   RESTOREALL			{ $$ = MK_I(interp, "restoreall" ,0); }
     |   END				{ $$ = MK_I(interp, "end" ,0); }
-    |  PARROT_OP vars                   { $$ = iANY(interp, $1,0,nargs,regs, 1);
+    |  PARROT_OP vars           { $$ = INS(interp, $1,0,regs,nargs,keyvec, 1);
                                           free($1); }
     | /* none */                        { $$ = 0;}
     ;
@@ -652,11 +521,11 @@ assignment:
     |  target '=' GLOBAL string	{ $$ = MK_I(interp, "find_global",2, $1,$4); }
     |  GLOBAL string '=' var	{ $$ = MK_I(interp, "store_global",2, $2,$4); }
     |  NEW                              { expect_pasm = 1; }
-          pasm_args	        { $$ = iANY(interp, "new",0,nargs,regs,1);  }
-    |  DEFINED target COMMA var         { $$ = MK_I(interp, "defined", 2, $2, $4); }
+          pasm_args	    { $$ = INS(interp, "new",0,regs,nargs,keyvec,1); }
+    |  DEFINED target COMMA var   { $$ = MK_I(interp, "defined", 2, $2, $4); }
     |  DEFINED target COMMA var '[' keylist ']'  { keyvec=KEY_BIT(2);
-                                       $$ = MK_I(interp, "defined", 3, $2, $4, $6);}
-    |  CLONE target COMMA var           { $$ = MK_I(interp, "clone", 2, $2, $4); }
+                                  $$ = MK_I(interp, "defined", 3, $2, $4, $6);}
+    |  CLONE target COMMA var     { $$ = MK_I(interp, "clone", 2, $2, $4); }
     ;
 
 if_statement:

@@ -47,7 +47,9 @@ void free_reglist(struct Parrot_Interp *);
 
 const char * get_neg_op(char *op, int *nargs);
 
-int check_op(struct Parrot_Interp *, char * fullname, char *op, SymReg *r[]);
+int check_op(struct Parrot_Interp *, char * fullname, char *op, SymReg *r[],
+    int narg, int keyvec);
+int get_keyvec(Parrot_Interp, int opnum);
 int is_op(struct Parrot_Interp *, char *);
 void init_tables(struct Parrot_Interp * interp);
 
