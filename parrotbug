@@ -10,6 +10,7 @@ eval 'exec perl -w -S $0 ${1+"$@"}'
 # This utility borrows heavily from perlbug.
 #
 
+use strict;
 use Config;
 use File::Spec;
 use Getopt::Std;
@@ -24,6 +25,7 @@ my %std_to =
 
 my $parrotdir = File::Spec->curdir();
 
+my %opts;
 my ( $user, $domain, $editor, $use_file, $report_file );
 my ( $to, $cc, $from, $subject, $msgid, $body );
 my ( $category, $severity );
@@ -33,20 +35,15 @@ my ( $parrot_version, $parrot_myconfig ) ;
 
 #------------------------------------------------------------#
 #                       Main program.                        #
-BEGIN {
-    eval "use Mail::Send;";
-    $have_send = ($@ eq "");
-}
 
 init();
-help()    if $opt_h;
-version() if $opt_V;
+help()    if $opts{h};
+version() if $opts{V};
 explain_parrotbug();
 query_info();
 
 die "work in progress... nothing ready yet!\n";
 
-edit_info();
 ask_for_action();
 send_msg();
 exit;
@@ -157,7 +154,7 @@ sub generate_filename {
 sub trivial_subject {
     my $subject = shift;
 
-    return 0 if $opt_o || $opt_n;
+    return 0 if $opts{o} || $opts{n};
     if ( $subject =~
          /^(y(es)?|no?|help|parrot( (bug|problem))?|bug|problem)$/i ||
          length($subject) < 4 ||
@@ -215,7 +212,7 @@ sub init {
     @ARGV = split m/\s+/,
         MacPerl::Ask("Provide command-line args here (-h for help):")
         if $is_macos && $MacPerl::Version =~ /App/;
-    help() unless getopts("AVhb:e:f:n:o:r:s:");
+    help() unless getopts("AVhb:e:f:n:o:r:s:", \%opts);
 
 
     ##
@@ -223,8 +220,8 @@ sub init {
     ##
   sw: {
       opt_o: {
-            last opt_o unless defined $opt_o;
-            help()     unless $opt_o eq "k";
+            last opt_o unless defined $opts{o};
+            help()     unless $opts{o} eq "k";
 
             # This is an ok report, woohoo!
             $to = $std_to{ok};
@@ -238,18 +235,18 @@ sub init {
 
         # Ok reports do not need body, but nok and bug reports do need
         # a body. It can be done with either -f or -b flag.
-        if ( $opt_f ) {
+        if ( $opts{f} ) {
             $use_file = 1;
         } else {
             # No file provided...
             $use_file = 0;
-            $body = $opt_b || "";
+            $body = $opts{b} || "";
         }
             
 
       opt_n: {
-            last opt_n unless defined $opt_n;
-            help()     unless $opt_n eq "ok";
+            last opt_n unless defined $opts{n};
+            help()     unless $opts{n} eq "ok";
 
             # This a nok report, how sad... :-(
             $to = $std_to{nok};
@@ -262,7 +259,7 @@ sub init {
 
         # Neither an ok nor a nok.
         $to = $std_to{bug};
-        $subject  = $opt_s || "";
+        $subject  = $opts{s} || "";
         $category = "";
         $severity = "";
     };
@@ -279,7 +276,7 @@ sub init {
 	    : eval { getpwuid($<) };	# May be missing
 
     # User address, used in message and in Reply-To header.
-    $from = $opt_r || "";
+    $from = $opts{r} || "";
 
    # Editor
     $editor = $ENV{VISUAL} || $ENV{EDITOR} || $ENV{EDIT}
@@ -303,7 +300,7 @@ sub init {
         require Sys::Hostname;
         $domain = Sys::Hostname::hostname();
     }
-    $msgid = "<parrotbug_$VERSION_$$_".time."\@$domain>";
+    $msgid = "<parrotbug_${VERSION}_${$}_".time."\@$domain>";
 }
 
 
@@ -347,7 +344,7 @@ EOF
     my $alt;
     my $err = 0;
     do {
-        die "Invalid $name: aborting.\n" if $err++ > 5;
+        die "Invalid $alt: aborting.\n" if $err++ > 5;
         print "Please enter a $what [$default]: ";
         $alt = <>;
         chomp $alt;
@@ -376,13 +373,13 @@ versions are relevant.
 EOF
 
     # Prompt for editor to use if none supplied.
-    if ( $opt_e ) {
-        $editor = $opt_e;
+    if ( $opts{e} ) {
+        $editor = $opts{e};
         print "Press 'Enter' to continue...\n";
         scalar <>;
 
     } else {
-        ask_for_editor(<<EOF) unless $opt_e;
+        ask_for_editor(<<EOF) unless $opts{e};
 You will probably want to use an editor to enter the report. If the
 default editor proposed below is the editor you want to use, then just
 press the 'Enter' key, otherwise type in the name of the editor you
@@ -423,7 +420,7 @@ EOF
                    Mac::InternetConfig::kICEmail()
                  };
     } else {
-        $guess = $ENV{REPLY-TO} || $ENV{REPLYTO} || "";
+        $guess = $ENV{'REPLY-TO'} || $ENV{REPLYTO} || "";
     }
 
     if ( ! $guess ) {
@@ -496,6 +493,9 @@ EOF
 #                        Sending subs.                       #
 
 sub send_msg {
+
+=pod
+
     # Message has been accepted for transmission -- Send the message
     if ($outfile) {
 	open SENDMAIL, ">$outfile" or die "Couldn't open '$outfile': $!\n";
@@ -505,7 +505,7 @@ sub send_msg {
     # on linux certain mail implementations won't accept the subject
     # as "~s subject" and thus the Subject header will be corrupted
     # so don't use Mail::Send to be safe
-    if ($have_send && !$is_linux) {
+    if ( $@ eq "" && !$is_linux) {
 	my $msg = new Mail::Send Subject => $subject, To => $address;
 	$msg->add("Reply-To",$from) if $from;
 
@@ -545,6 +545,9 @@ EOF
 	    warn "\nSendmail returned status '", $? >> 8, "'\n";
 	}
     }
+
+=cut
+
 }
 
 __END__
