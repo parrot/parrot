@@ -58,8 +58,6 @@ extern int pasm_file;
 /* XXX FIXME: Globals: */
 
 static IMCStack nodeStack;
-static unsigned int* interference_graph;
-static int n_symbols;
 
 static unsigned int* ig_get_word(int i, int j, int N, unsigned int* graph,
                                  int* bit_ofs)
@@ -238,17 +236,17 @@ free_reglist(IMC_Unit * unit)
 #if IMC_TRACE
     fprintf(stderr, "reg_alloc.c: free_reglist\n");
 #endif
-    if (interference_graph) {
-        free(interference_graph);
-        unit->interference_graph = interference_graph = 0;
+    if (unit->interference_graph) {
+        free(unit->interference_graph);
+        unit->interference_graph =  0;
     }
     if (unit->reglist) {
         int i;
-        for (i = 0; i < n_symbols; i++)
+        for (i = 0; i < unit->n_symbols; i++)
             free_life_info(unit, unit->reglist[i]);
         free(unit->reglist);
         unit->reglist = NULL;
-        unit->n_symbols = n_symbols = 0;
+        unit->n_symbols = 0;
     }
 }
 
@@ -324,9 +322,9 @@ reg_sort_f(const void *a, const void *b)
 }
 
 static void
-sort_reglist(SymReg ** reglist)
+sort_reglist(IMC_Unit *unit)
 {
-    qsort(reglist, n_symbols, sizeof(SymReg*), reg_sort_f);
+    qsort(unit->reglist, unit->n_symbols, sizeof(SymReg*), reg_sort_f);
 }
 
 /*
@@ -339,7 +337,7 @@ sort_reglist(SymReg ** reglist)
  */
 
 
-/* #define ALLOCATE_HACK */
+#define ALLOCATE_HACK
 
 #ifdef ALLOCATE_HACK
 
@@ -380,6 +378,9 @@ allocate_non_interfering(Parrot_Interp interpreter, SymReg ** reglist, int n)
                     continue;
                 if (r->last_ins->index - r->first_ins->index > SHORT_RANGE)
                     continue;
+                /*
+                 * if reg is used outside of this basic block continue
+                 */
                 if (r->first_ins->bbindex != r->last_ins->bbindex)
                     continue;
                 /* found a short ranged reg
@@ -389,7 +390,7 @@ allocate_non_interfering(Parrot_Interp interpreter, SymReg ** reglist, int n)
                 if (r->first_ins->index <= last_line)
                     continue;
                 /*
-                 * if this is not the same basic block, the might interfer
+                 * if this is not the same basic block, they might interfer
                  * due to a branch
                  */
                 if (r->first_ins->bbindex != bb_index && bb_index >= 0)
@@ -419,7 +420,7 @@ out:
 static void
 build_reglist(Parrot_Interp interpreter, IMC_Unit * unit, int first)
 {
-    int i, count, unused;
+    int i, count, unused, n_symbols;
 
     info(interpreter, 2, "build_reglist\n");
     /* count symbols */
@@ -438,13 +439,12 @@ build_reglist(Parrot_Interp interpreter, IMC_Unit * unit, int first)
                 count++;
         }
     }
-    n_symbols = count;
     if (count == 0)
         return;
-    if (n_symbols >= HASH_SIZE)
+    if (count >= HASH_SIZE)
         warning(interpreter, "build_reglist", "probably too small HASH_SIZE"
-                " (%d symbols)\n", n_symbols);
-    unit->reglist = calloc(n_symbols, sizeof(SymReg*));
+                " (%d symbols)\n", count);
+    unit->reglist = calloc(count, sizeof(SymReg*));
     if (unit->reglist == NULL) {
         fatal(1, "build_reglist","Out of mem\n");
     }
@@ -471,6 +471,7 @@ build_reglist(Parrot_Interp interpreter, IMC_Unit * unit, int first)
             }
         }
     }
+    unit->n_symbols = n_symbols = count;
     compute_du_chain(unit);
     /* we might have unused symbols here, from spilling */
     for (i = count = unused = 0; i < n_symbols; i++) {
@@ -483,11 +484,14 @@ build_reglist(Parrot_Interp interpreter, IMC_Unit * unit, int first)
     }
     n_symbols -= unused;
     unit->n_symbols = n_symbols;
-    sort_reglist(unit->reglist);
+    sort_reglist(unit);
     if (first) {
 #ifdef ALLOCATE_HACK
+        info(interpreter, 1, "build_reglist: %d symbols\n", n_symbols);
         allocate_non_interfering(interpreter, unit->reglist, n_symbols);
         build_reglist(interpreter, unit, 0);
+        info(interpreter, 1, "allocate_non_interfering, now: %d symbols\n",
+                unit->n_symbols);
 #endif
     }
 }
@@ -505,8 +509,10 @@ build_reglist(Parrot_Interp interpreter, IMC_Unit * unit, int first)
 static void
 build_interference_graph(Parrot_Interp interpreter, IMC_Unit * unit)
 {
-    int x, y;
+    int x, y, n_symbols;
+    unsigned int* interference_graph;
 
+    n_symbols = unit->n_symbols;
     if (!n_symbols)
         return;
 
@@ -556,7 +562,7 @@ compute_du_chain(IMC_Unit * unit)
     }
 
     /* Compute du-chains for all symbolics */
-    for (i = 0; i < n_symbols; i++) {
+    for (i = 0; i < unit->n_symbols; i++) {
         SymReg * r = unit->reglist[i];
         compute_one_du_chain(r, unit);
         /* what is this used for? -lt */
@@ -613,7 +619,7 @@ compute_spilling_costs (Parrot_Interp interpreter, IMC_Unit * unit)
     SymReg *r;
     Instruction * ins;
 
-    for (i = 0; i < n_symbols; i++) {
+    for (i = 0; i < unit->n_symbols; i++) {
         r = unit->reglist[i];
         r->score = r->use_count + (r->lhs_use_count << 2);
         /* TODO score high if -Oj and register is used in
@@ -802,7 +808,7 @@ order_spilling (IMC_Unit * unit)
 
 	min_node = -1;
 
-        for (x = 0; x < n_symbols; x++) {
+        for (x = 0; x < unit->n_symbols; x++) {
             /* if its spilled skip it */
             if (unit->reglist[x]->usage & U_SPILL)
                 continue;
@@ -839,7 +845,7 @@ order_spilling (IMC_Unit * unit)
      * now put all spilled regs on top of stack so that they
      * get their register first
      */
-    for (x = 0; x < n_symbols; x++) {
+    for (x = 0; x < unit->n_symbols; x++) {
         if (unit->reglist[x]->usage & U_SPILL)
             imcstack_push(nodeStack, x);
     }
@@ -850,7 +856,7 @@ static void
 restore_interference_graph(IMC_Unit * unit)
 {
     int i;
-    for (i=0; i < n_symbols; i++) {
+    for (i=0; i < unit->n_symbols; i++) {
         if ((unit->reglist[i]->type & VTPASM) && !(optimizer_level & OPT_PASM))
             continue;
 	unit->reglist[i]->color = -1;
@@ -864,9 +870,10 @@ restore_interference_graph(IMC_Unit * unit)
 static void
 allocate_wanted_regs(IMC_Unit * unit)
 {
-    int i, y, interf;
+    int i, y, interf, n_symbols;
     SymReg *r;
 
+    n_symbols = unit->n_symbols;
     for (i = 0; i < n_symbols; i++) {
         r = unit->reglist[i];
         if (r->color >= 0 || r->want_regno == -1)
@@ -874,7 +881,7 @@ allocate_wanted_regs(IMC_Unit * unit)
         interf = 0;
         for (y = 0; y < n_symbols; y++) {
             SymReg *s;
-            if (! ig_test(i, y, n_symbols, interference_graph))
+            if (! ig_test(i, y, n_symbols, unit->interference_graph))
                 continue;
             s = unit->reglist[y];
             if (   s
@@ -902,7 +909,7 @@ try_allocate(Parrot_Interp interpreter, IMC_Unit * unit)
     int x = 0;
     int color, colors[MAX_COLOR];
     int free_colors, t;
-    unsigned int *graph = interference_graph;
+    unsigned int *graph = unit->interference_graph;
     SymReg ** reglist = unit->reglist;
 
     while ((imcstack_depth(nodeStack) > 0) ) {
@@ -956,9 +963,11 @@ try_allocate(Parrot_Interp interpreter, IMC_Unit * unit)
 static int
 map_colors(IMC_Unit* unit, int x, unsigned int *graph, int colors[], int typ)
 {
-    int y = 0;
+    int y = 0, n_symbols;
     SymReg * r;
     int color, free_colors;
+
+    n_symbols = unit->n_symbols;
     memset(colors, 0, sizeof(colors[0]) * MAX_COLOR);
     /* reserved for spilling */
     if (typ == 'P')
@@ -1009,10 +1018,9 @@ update_life(Parrot_Interp interpreter, IMC_Unit * unit, Instruction *ins,
     }
     /* add this sym to reglist, if not there */
     if (add) {
-        unit->reglist = realloc(unit->reglist, (n_symbols + 1) *
+        unit->reglist = realloc(unit->reglist, (unit->n_symbols + 1) *
                 sizeof(SymReg *));
-        unit->reglist[n_symbols++] = r;
-        unit->n_symbols = n_symbols;
+        unit->reglist[unit->n_symbols++] = r;
     }
 
     r->first_ins = r->last_ins = ins;
@@ -1054,8 +1062,11 @@ static void
 update_interference(Parrot_Interp interpreter, IMC_Unit * unit,
         SymReg *old, SymReg *new)
 {
-    int x, y;
+    int x, y, n_symbols;
     SymReg ** reglist = unit->reglist;
+    unsigned int *interference_graph = unit->interference_graph;
+
+    n_symbols = unit->n_symbols;
     if (old != new) {
         /* n_symbols is already increased */
         unsigned int *new_graph = ig_allocate(n_symbols);
