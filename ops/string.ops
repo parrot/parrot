@@ -634,6 +634,16 @@ Return the name of charset numbered $2.
 Return the charset number of the charset named $2. If the charset doesn't
 exit, throw an exception.
 
+=item B<trans_charset>(inout STR, in INT)
+
+Change the string to have the specified charset.
+
+=item B<trans_charset>(out STR, in STR, in INT)
+
+Create a string $1 from $2 with the specified charset.
+
+Both functions may throw an exception on information loss.
+
 =cut
 
 op charset(out INT, in STR) :base_core {
@@ -652,6 +662,17 @@ op find_charset(out INT, in STR) :base_core {
     real_exception(interpreter, NULL, 1,
 	"charset '%Ss' not found", $2);
   $1 = n;
+  goto NEXT();
+}
+
+op trans_charset(inout STR, in INT) {
+  $1 = Parrot_string_trans_charset(interpreter, $1, $2, NULL);
+  goto NEXT();
+}
+
+op trans_charset(out STR, in STR, in INT) {
+  STRING *dest = new_string_header(interpreter, 0);
+  $1 = Parrot_string_trans_charset(interpreter, $2, $3, dest);
   goto NEXT();
 }
 

@@ -13,9 +13,6 @@
 #if !defined(PARROT_CHARSET_BINARY_H_GUARD)
 #define PARROT_CHARSET_BINARY_H_GUARD
 
-static void to_charset(Interp *, STRING *source_string, CHARSET *new_charset);
-static STRING *copy_to_charset(Interp *, STRING *source_string, CHARSET *new_charset);
-static void to_unicode(Interp *, STRING *source_string);
 static void compose(Interp *, STRING *source_string);
 static void decompose(Interp *, STRING *source_string);
 static void upcase(Interp *, STRING *source_string);

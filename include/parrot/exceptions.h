@@ -119,7 +119,8 @@ typedef enum {
         WRITE_TO_CONSTCLASS,
         NOSPAWN,
         INTERNAL_NOT_IMPLEMENTED,
-        ERR_OVERFLOW
+        ERR_OVERFLOW,
+        LOSSY_CONVERSION
 } exception_type_enum;
 
 /* &end_gen */

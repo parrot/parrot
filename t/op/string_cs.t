@@ -16,7 +16,7 @@ Tests charset support.
 
 =cut
 
-use Parrot::Test tests => 16;
+use Parrot::Test tests => 20;
 use Test::More;
 
 output_is( <<'CODE', <<OUTPUT, "basic syntax" );
@@ -245,3 +245,63 @@ done:
 CODE
 0 2 3 6 -1 ok
 OUTPUT
+
+output_is( <<'CODE', <<OUTPUT, "trans_charset_s_s_i");
+    set S0, "abc"
+    find_charset I0, "ascii"
+    trans_charset S1, S0, I0
+    print S1
+    print "\n"
+    charset I0, S1
+    charsetname S2, I0
+    print S2
+    print "\n"
+    end
+CODE
+abc
+ascii
+OUTPUT
+
+output_is( <<'CODE', <<OUTPUT, "trans_charset_s_i");
+    set S1, "abc"
+    find_charset I0, "ascii"
+    trans_charset S1, I0
+    print S1
+    print "\n"
+    charset I0, S1
+    charsetname S2, I0
+    print S2
+    print "\n"
+    end
+CODE
+abc
+ascii
+OUTPUT
+
+
+output_like( <<'CODE', <<OUTPUT, "trans_charset_s_i - lossy");
+    set S1, "abcä"
+    find_charset I0, "ascii"
+    trans_charset S1, I0
+    print "never\n"
+    end
+CODE
+/lossy conversion to ascii/
+OUTPUT
+
+output_is( <<'CODE', <<OUTPUT, "trans_charset_s_i - same");
+    set S1, ascii:"abc"
+    find_charset I0, "ascii"
+    trans_charset S1, I0
+    print S1
+    print "\n"
+    charset I0, S1
+    charsetname S2, I0
+    print S2
+    print "\n"
+    end
+CODE
+abc
+ascii
+OUTPUT
+

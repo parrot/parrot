@@ -115,6 +115,8 @@ INTVAL Parrot_string_find_punctuation(Interp *, STRING *, INTVAL offset);
 INTVAL Parrot_string_find_newline(Interp *, STRING *, INTVAL offset);
 INTVAL Parrot_string_find_word_boundary(Interp *, STRING *, INTVAL offset);
 
+STRING* Parrot_string_trans_charset(Interp *, STRING *src,
+        INTVAL charset_nr, STRING *dest);
 
 #endif /* PARROT_IN_CORE */
 #endif /* PARROT_STRING_FUNCS_H_GUARD */

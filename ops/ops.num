@@ -1422,3 +1422,9 @@ find_word_boundary_i_s_i       1391
 find_word_boundary_i_s_ic      1392
 find_word_boundary_i_sc_i      1393
 find_word_boundary_i_sc_ic     1394
+trans_charset_s_i              1395
+trans_charset_s_ic             1396
+trans_charset_s_s_i            1397
+trans_charset_s_s_ic           1398
+trans_charset_s_sc_i           1399
+trans_charset_s_sc_ic          1400

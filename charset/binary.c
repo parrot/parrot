@@ -36,38 +36,32 @@ set_graphemes(Interp *interpreter, STRING *source_string,
             replace_count, insert_string);
 }
 
-static void
-to_charset(Interp *interpreter, STRING *source_string, CHARSET *new_charset)
+static STRING*
+to_charset(Interp *interpreter, STRING *src, CHARSET *new_charset, STRING *dest)
 {
     internal_exception(UNIMPLEMENTED, "to_charset for binary not implemented");
+    return NULL;
+}
+
+static STRING*
+to_unicode(Interp *interpreter, STRING *source_string, STRING *dest)
+{
+    internal_exception(UNIMPLEMENTED, "to_unicode for binary not implemented");
+    return NULL;
+}
+
+static STRING*
+from_charset(Interp *interpreter, STRING *source_string, STRING *dest)
+{
+    internal_exception(UNIMPLEMENTED, "Can't do this yet");
+    return NULL;
 }
 
 static STRING *
-copy_to_charset(Interp *interpreter, STRING *source_string,
-        CHARSET *new_charset)
-{
-    STRING *return_string = NULL;
-    internal_exception(UNIMPLEMENTED,
-            "copy_to_charset for binary not implemented");
-    return return_string;
-}
-
-static void
-to_unicode(Interp *interpreter, STRING *source_string)
-{
-    internal_exception(UNIMPLEMENTED, "to_unicode for binary not implemented");
-}
-
-static void
-from_charset(Interp *interpreter, STRING *source_string)
+from_unicode(Interp *interpreter, STRING *source_string, STRING *dest)
 {
     internal_exception(UNIMPLEMENTED, "Can't do this yet");
-}
-
-static void
-from_unicode(Interp *interpreter, STRING *source_string)
-{
-    internal_exception(UNIMPLEMENTED, "Can't do this yet");
+    return NULL;
 }
 
 /* A noop. can't compose binary */
@@ -262,7 +256,6 @@ Parrot_charset_binary_init(Interp *interpreter)
       ascii_get_graphemes_inplace,
       set_graphemes,
       to_charset,
-      copy_to_charset,
       to_unicode,
       from_charset,
       from_unicode,

@@ -18,6 +18,17 @@ This file implements the charset functions for iso-8859-1 data
 #include "iso-8859-1.h"
 #include "ascii.h"
 
+#ifdef EXCEPTION
+#  undef EXCEPTION
+#endif
+
+/*
+ * TODO check interpreter error and warnings setting
+ */
+
+#define EXCEPTION(err, str) \
+    real_exception(interpreter, NULL, err, str)
+
 /* The encoding we prefer, given a choice */
 static ENCODING *preferred_encoding;
 
@@ -55,51 +66,43 @@ set_graphemes(Interp *interpreter, STRING *source_string,
             replace_count, insert_string);
 }
 
-static void
-from_charset(Interp *interpreter, STRING *source_string)
+static STRING *
+from_charset(Interp *interpreter, STRING *source_string, STRING *dest)
 {
     internal_exception(UNIMPLEMENTED, "Can't do this yet");
-}
-
-static void
-from_unicode(Interp *interpreter, STRING *source_string)
-{
-    internal_exception(UNIMPLEMENTED, "Can't do this yet");
-}
-
-
-static void
-to_charset(Interp *interpreter, STRING *source_string, CHARSET *new_charset)
-{
-    charset_converter_t conversion_func;
-    if ((conversion_func = Parrot_find_charset_converter(interpreter,
-                    source_string->charset, new_charset))) {
-        /*
-         * XXX conversion_func has wrong signature ?
-         *
-         * conversion_func(interpreter, new_charset, source_string);
-         */
-    }
-    else {
-        to_unicode(interpreter, source_string);
-        new_charset->from_charset(interpreter, source_string);
-    }
+    return NULL;
 }
 
 static STRING *
-copy_to_charset(Interp *interpreter, STRING *source_string,
-        CHARSET *new_charset)
+from_unicode(Interp *interpreter, STRING *source_string, STRING *dest)
 {
-  STRING *return_string = NULL;
-
-  return return_string;
+    internal_exception(UNIMPLEMENTED, "Can't do this yet");
+    return NULL;
 }
 
-static void
-to_unicode(Interp *interpreter, STRING *source_string)
+
+static STRING *
+to_unicode(Interp *interpreter, STRING *source_string, STRING *dest)
 {
     internal_exception(UNIMPLEMENTED,
             "to_unicode for iso-8859-1 not implemented");
+    return NULL;
+}
+
+static STRING *
+to_charset(Interp *interpreter, STRING *src, CHARSET *new_charset, STRING *dest)
+{
+    charset_converter_t conversion_func;
+
+    if ((conversion_func = Parrot_find_charset_converter(interpreter,
+                    src->charset, new_charset))) {
+         return conversion_func(interpreter, src, dest);
+    }
+    else {
+        STRING *res = to_unicode(interpreter, src, dest);
+        return new_charset->from_charset(interpreter, res, dest);
+
+    }
 }
 
 /* A noop. can't compose iso-8859-1 */
@@ -367,7 +370,6 @@ Parrot_charset_iso_8859_1_init(Interp *interpreter)
         ascii_get_graphemes_inplace,
         set_graphemes,
         to_charset,
-        copy_to_charset,
         to_unicode,
         from_charset,
         from_unicode,
@@ -415,6 +417,29 @@ Parrot_charset_iso_8859_1_init(Interp *interpreter)
     memcpy(return_set, &base_set, sizeof(CHARSET));
     Parrot_register_charset(interpreter, "iso-8859-1", return_set);
     return return_set;
+}
+
+STRING *
+charset_cvt_iso_8859_1_to_ascii(Interp *interpreter, STRING *src, STRING *dest)
+{
+    UINTVAL offs, c;
+    if (dest) {
+        Parrot_reallocate_string(interpreter, dest, src->strlen);
+        dest->bufused = src->bufused;
+        dest->strlen  = src->strlen;
+    }
+    for (offs = 0; offs < src->strlen; ++offs) {
+        c = ENCODING_GET_BYTE(interpreter, src, offs);
+        if (c >= 0x80) {
+            EXCEPTION(LOSSY_CONVERSION, "lossy conversion to ascii");
+        }
+        if (dest)
+            ENCODING_SET_BYTE(interpreter, dest, offs, c);
+    }
+    if (dest)
+        return dest;
+    src->charset = Parrot_ascii_charset_ptr;
+    return src;
 }
 
 /*

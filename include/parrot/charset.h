@@ -35,11 +35,14 @@ extern CHARSET *Parrot_ascii_charset_ptr;
 typedef STRING *(*charset_get_graphemes_t)(Interp *, STRING *source_string, UINTVAL offset, UINTVAL count);
 typedef STRING *(*charset_get_graphemes_inplace_t)(Interp *, STRING *source_string, STRING *dest_string, UINTVAL offset, UINTVAL count);
 typedef void (*charset_set_graphemes_t)(Interp *, STRING *source_string, UINTVAL offset, UINTVAL replace_count, STRING *insert_string);
-typedef void (*charset_to_charset_t)(Interp *, STRING *source_string, CHARSET *new_charset);
-typedef STRING *(*charset_copy_to_charset_t)(Interp *, STRING *source_string, CHARSET *new_charset);
-typedef void (*charset_to_unicode_t)(Interp *, STRING *source_string);
-typedef void (*charset_from_charset_t)(Interp *, STRING *source_string);
-typedef void (*charset_from_unicode_t)(Interp *, STRING *source_string);
+
+typedef STRING * (*charset_to_charset_t)(Interp *, STRING *source_string,
+        CHARSET *new_charset, STRING *dest);
+typedef STRING * (*charset_to_unicode_t)(Interp *, STRING *src, STRING *dest);
+typedef STRING * (*charset_from_charset_t)(Interp *, STRING *source_string,
+        STRING *dest);
+typedef STRING * (*charset_from_unicode_t)(Interp *, STRING *source_string,
+        STRING *dest);
 typedef void (*charset_compose_t)(Interp *, STRING *source_string);
 typedef void (*charset_decompose_t)(Interp *, STRING *source_string);
 typedef void (*charset_upcase_t)(Interp *, STRING *source_string);
@@ -77,14 +80,17 @@ CHARSET *Parrot_find_charset(Interp *, const char *charsetname);
 INTVAL Parrot_register_charset(Interp *, const char *charsetname, CHARSET *charset);
 INTVAL Parrot_make_default_charset(Interp *, const char *charsetname, CHARSET *charset);
 CHARSET *Parrot_default_charset(Interp *);
-typedef INTVAL (*charset_converter_t)(Interp *, CHARSET *lhs, CHARSET *rhs);
+typedef STRING* (*charset_converter_t)(Interp *, STRING *src, STRING *dst);
 charset_converter_t Parrot_find_charset_converter(Interp *, CHARSET *lhs, CHARSET *rhs);
+void Parrot_register_charset_converter(Interp *,
+        CHARSET *lhs, CHARSET *rhs, charset_converter_t func);
 
 void Parrot_deinit_charsets(Interp *);
 INTVAL Parrot_charset_number(Interp *, STRING *charsetname);
 STRING* Parrot_charset_name(Interp *, INTVAL);
 const char* Parrot_charset_c_name(Interp *, INTVAL);
 INTVAL Parrot_charset_number_of_str(Interp *, STRING *src);
+CHARSET* Parrot_get_charset(Interp *, INTVAL number_of_charset);
 
 struct _charset {
     const char *name;
@@ -92,7 +98,6 @@ struct _charset {
     charset_get_graphemes_inplace_t get_graphemes_inplace;
     charset_set_graphemes_t set_graphemes;
     charset_to_charset_t to_charset;
-    charset_copy_to_charset_t copy_to_charset;
     charset_to_unicode_t to_unicode;
     charset_from_charset_t from_charset;
     charset_from_unicode_t from_unicode;
@@ -132,9 +137,8 @@ struct _charset {
 #define CHARSET_GET_GRAPEMES(interp, source, offset, count) ((CHARSET *)source->charset)->get_graphemes(interpreter, source, offset, count)
 #define CHARSET_GET_GRAPHEMES_INPLACE(interp, source, dest, offset, count) ((CHARSET *)source->charset)->get_graphemes(interpreter, source, dest, offset, count)
 #define CHARSET_SET_GRAPHEMES(interp, source, offset, replace_count, insert) ((CHARSET *)source->charset)->set_graphemes(interpreter, source, offset, replace_count, insert)
-#define CHARSET_TO_CHARSET(interp, source, new_charset) ((CHARSET *)source->charset)->to_charset(interpreter, source, new_charset)
-#define CHARSET_COPY_TO_CHARSET(interp, source, new_charset) ((CHARSET *)source->charset)->copy_to_charset(interpreter, source, new_charset)
-#define CHARSET_TO_UNICODE(interp, source) ((CHARSET *)source->charset)->to_unicode(interpreter, source)
+#define CHARSET_TO_CHARSET(interp, source, new_charset, dest) ((CHARSET *)source->charset)->to_charset(interpreter, source, new_charset, dest)
+#define CHARSET_TO_UNICODE(interp, source, dest) ((CHARSET *)source->charset)->to_unicode(interpreter, source, dest)
 #define CHARSET_COMPOSE(interp, source) ((CHARSET *)source->charset)->compose(interpreter, source)
 #define CHARSET_DECOMPOSE(interp, source) ((CHARSET *)source->charset)->decompose(interpreter, source)
 #define CHARSET_UPCASE(interp, source) ((CHARSET *)source->charset)->upcase(interpreter, source)

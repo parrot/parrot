@@ -2591,6 +2591,41 @@ Parrot_string_find_word_boundary(Interp *interpreter, STRING *s, INTVAL offset)
     return CHARSET_FIND_WORD_BOUNDARY(interpreter, s, offset);
 }
 
+STRING*
+Parrot_string_trans_charset(Interp *interpreter, STRING *src,
+        INTVAL charset_nr, STRING *dest)
+{
+    CHARSET *new_charset;
+
+    if (!src)
+        return NULL;
+    new_charset = Parrot_get_charset(interpreter, charset_nr);
+    if (!new_charset)
+        real_exception(interpreter, NULL, INVALID_CHARTYPE,
+                "charset #%d not found", (int) charset_nr);
+    /*
+     * dest is an empty string header or NULL, if an inplace
+     * operation is desired
+     */
+    if (dest) {
+        if (new_charset == src->charset) {
+            Parrot_reuse_COW_reference(interpreter, src, dest);
+            dest->charset = new_charset;
+            /* keep encoding */
+            return dest;
+        }
+        dest->charset = new_charset;
+        /* XXX prefered encoding for charset */
+        dest->encoding = PARROT_DEFAULT_ENCODING;
+    }
+    else {
+        if (new_charset == src->charset) {
+            return src;
+        }
+    }
+    return CHARSET_TO_CHARSET(interpreter, src, new_charset, dest);
+}
+
 /*
 
 =back

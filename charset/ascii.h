@@ -40,10 +40,6 @@ INTVAL ascii_cs_rindex(Interp *, const STRING *source_string,
         const STRING *search_string, UINTVAL offset);
 size_t ascii_compute_hash(Interp *, STRING *source_string);
 
-static void set_graphemes(Interp *, STRING *source_string, UINTVAL offset, UINTVAL replace_count, STRING *insert_string);
-static void to_charset(Interp *, STRING *source_string, CHARSET *new_charset);
-static STRING *copy_to_charset(Interp *, STRING *source_string, CHARSET *new_charset);
-static void to_unicode(Interp *, STRING *source_string);
 static void compose(Interp *, STRING *source_string);
 static void decompose(Interp *, STRING *source_string);
 static void upcase(Interp *, STRING *source_string);

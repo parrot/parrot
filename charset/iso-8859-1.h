@@ -14,9 +14,6 @@
 #define PARROT_CHARSET_ISO_8859_1_H_GUARD
 
 static void set_graphemes(Interp *, STRING *source_string, UINTVAL offset, UINTVAL replace_count, STRING *insert_string);
-static void to_charset(Interp *, STRING *source_string, CHARSET *new_charset);
-static STRING *copy_to_charset(Interp *, STRING *source_string, CHARSET *new_charset);
-static void to_unicode(Interp *, STRING *source_string);
 static void compose(Interp *, STRING *source_string);
 static void decompose(Interp *, STRING *source_string);
 static void upcase(Interp *, STRING *source_string);
@@ -38,6 +35,8 @@ static INTVAL find_not_digit(Interp *, STRING *source_string, UINTVAL offset);
 static INTVAL is_punctuation(Interp *, STRING *source_string, UINTVAL offset);
 static INTVAL find_punctuation(Interp *, STRING *source_string, UINTVAL offset);
 static INTVAL find_not_punctuation(Interp *, STRING *source_string, UINTVAL offset);
+
+STRING *charset_cvt_iso_8859_1_to_ascii(Interp *, STRING *src, STRING *dest);
 
 CHARSET *Parrot_charset_iso_8859_1_init(Interp *);
 
