@@ -199,12 +199,8 @@ WS              [\t\f\r ]
 "!="            return(RELOP_NE);
 "**"            return(POW);
 
-<emit>".macro" {
+<emit,INITIAL>".macro" {
         return read_macro(valp, interp);
-    }
-
-<INITIAL>".macro" {
-        fataly (EX_SOFTWARE, "", line, "Macros only allowed in assembly mode");
     }
 
 <emit>".constant" {
@@ -244,11 +240,12 @@ WS              [\t\f\r ]
 	include_file(str_dup(yytext + 1));
     }
 
-<emit>{ID}"$:" {
+<emit,INITIAL>{ID}"$:" {
         char *label;
 
 	if (valp) {
-	    YYCHOP(); YYCHOP();
+	    YYCHOP();
+            YYCHOP();
 
 	    label = mem_sys_allocate(yyleng+10);
 	    sprintf(label, "%s%d", yytext, frames->label);
@@ -259,7 +256,7 @@ WS              [\t\f\r ]
         return LABEL;
     }
 
-<emit>{ID}"$" {
+<emit,INITIAL>{ID}"$" {
         char *label;
 
 	if (valp) {

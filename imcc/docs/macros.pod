@@ -8,11 +8,12 @@ This document describes the macro layer of imcc
 
 =head1 DESCRIPTION
 
-The macro support for IMCC was designed to be a drop in replacement
-for the original F<assemble.pl> macro layer. There for the the macro
-expansion at the moment only works in assembly mode, except for the
-B<.include "file"> feature.  Furthermore this documentation is in
-large parts copied literally from there.
+The macro support for IMCC was designed to be a drop in replacement for
+the original F<assemble.pl> macro layer.
+
+One exception is B<.constant> which is PASM mode only. Please use the
+B<.const> directive for PIR mode. Also note that you have to use B<.sym>
+inside macros to define symbols, B<.local> is used for local labels.
 
 The addition of the '.' preface will hopefully make things easier to
 parse, inasmuch as everything within an assembler file that needs to

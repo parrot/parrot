@@ -1,3 +1,7 @@
+- 2003-08-12	leo
+
+	* lexer: enable macros for PIR parsing mode
+
 - 2003-08-11	leo
 
 	* PCC: approaching life analysis for subroutine in/out variables
