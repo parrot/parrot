@@ -6,7 +6,22 @@
 #
 
 use strict;
-use Text::Balanced 'extract_bracketed';
+
+sub extract_balanced {
+    my $balance = 0;
+    for(shift) {
+        s/^\s+//;
+        /^\{/ or die "bad block open"; # }
+        while(/(\{)|(\})/g) {
+            if($1) {
+                $balance++;
+            } else { # $2
+                --$balance or return (substr($_, 0, pos, ""),  $_);
+            }
+        }
+        die "Badly balanced" if $balance;
+    }
+}
 
 sub Usage {
     print STDERR <<_EOF_;
@@ -47,7 +62,7 @@ sub filter {
   $contents =~ s/^([^{]*)pmclass ([\w]*)//s; 
   my ($pre, $classname) = ($1, $2); 
 
-  my ($classblock, $post) = extract_bracketed($contents, "{}", );
+  my ($classblock, $post) = extract_balanced($contents,);
   $classblock = substr($classblock, 2,-1); # trim out the { }
 
   my $signature_re = qr{
@@ -74,7 +89,7 @@ sub filter {
 
      $parameters = ", $parameters" if $parameters =~ /\w/;
      
-     my ($methodblock, $rema) = extract_bracketed($classblock, "{}");
+     my ($methodblock, $rema) = extract_balanced($classblock);
   
      $methodblock =~ s/SELF/pmc/g;
      $methodblock =~ s/INTERP/interpreter/g;
