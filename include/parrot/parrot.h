@@ -53,10 +53,10 @@ typedef void STRING_FUNCS;
 typedef void REGEX;
 
 #include "parrot/global_setup.h"
+#include "parrot/interpreter.h"
 #include "parrot/string.h"
 #include "parrot/transcode.h"
 #include "parrot/vtable.h"
-#include "parrot/interpreter.h"
 #include "parrot/register.h"
 #include "parrot/exceptions.h"
 #include "parrot/memory.h"
@@ -66,7 +66,7 @@ typedef void REGEX;
 #include "parrot/pmc.h"
 #include "parrot/events.h"
 #include "parrot/stacks.h"
-
+#include "parrot/resources.h"
 #endif
 
 /*

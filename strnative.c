@@ -38,11 +38,11 @@ string_native_max_bytes (INTVAL x) {
    concatenate two strings
 */
 static STRING*
-string_native_concat(STRING* a, STRING* b, INTVAL flags) {
+string_native_concat(struct Parrot_Interp *interpreter, STRING* a, STRING* b, INTVAL flags) {
     if (flags && a->encoding != b->encoding) {
 	/* Transcode */
 	STRING* t = b;
-	b = string_make(NULL, 0, enc_native, 0, 0);
+	b = string_make(interpreter, NULL, 0, enc_native, 0, 0);
 	(Parrot_transcode_table[t->encoding->which][enc_native])(t, b);
     }
     /* b is now in native format */

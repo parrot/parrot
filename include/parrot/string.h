@@ -13,6 +13,8 @@
 #if !defined(PARROT_STRING_H_GUARD)
 #define PARROT_STRING_H_GUARD
 
+#include "parrot/parrot.h"
+
 typedef struct parrot_string STRING;
 typedef struct string_vtable STRING_VTABLE;
 
@@ -30,7 +32,7 @@ typedef enum {
 
 typedef INTVAL (*string_to_iv_t)(STRING *);
 typedef STRING* (*string_iv_to_string_t)(STRING *, INTVAL);
-typedef STRING* (*two_strings_iv_to_string_t)(STRING *, STRING *, INTVAL);
+typedef STRING* (*two_strings_iv_to_string_t)(struct Parrot_Interp *, STRING *, STRING *, INTVAL);
 typedef STRING* (*substr_t)(STRING*, INTVAL, INTVAL, STRING*);
 typedef INTVAL (*iv_to_iv_t)(INTVAL);
 typedef INTVAL (*two_strings_to_iv_t)(STRING*, STRING*);
@@ -64,11 +66,11 @@ string_compute_strlen(STRING*);
 INTVAL
 string_max_bytes(STRING*, INTVAL);
 STRING*
-string_concat(STRING*, STRING*, INTVAL);
+string_concat(struct Parrot_Interp *, STRING*, STRING*, INTVAL);
 STRING*
 string_chopn(STRING*, INTVAL);
 STRING*
-string_substr(STRING*, INTVAL, INTVAL, STRING**);
+string_substr(struct Parrot_Interp *interpreter, STRING*, INTVAL, INTVAL, STRING**);
 INTVAL
 string_compare(STRING*, STRING*);
 
@@ -80,9 +82,9 @@ string_grow(STRING* s, INTVAL newsize);
 void
 string_destroy(STRING* s);
 STRING*
-string_make(void *buffer, INTVAL buflen, INTVAL encoding, INTVAL flags, INTVAL type);
+string_make(struct Parrot_Interp *interpreter, void *buffer, INTVAL buflen, INTVAL encoding, INTVAL flags, INTVAL type);
 STRING*
-string_copy(STRING *i);
+string_copy(struct Parrot_Interp *interpreter, STRING *i);
 void
 string_init(void);
 

@@ -77,7 +77,7 @@ void
 PackFile_set_byte_code(struct PackFile * self, opcode_t byte_code_size, char * byte_code);
 
 opcode_t
-PackFile_unpack(struct PackFile * self, char * packed, opcode_t packed_size);
+PackFile_unpack(struct Parrot_Interp *interpreter, struct PackFile * self, char * packed, opcode_t packed_size);
 
 opcode_t
 PackFile_pack_size(struct PackFile * self);
@@ -138,7 +138,7 @@ struct PackFile_Constant *
 PackFile_ConstTable_constant(struct PackFile_ConstTable * self, opcode_t index);
 
 opcode_t
-PackFile_ConstTable_unpack(struct PackFile_ConstTable * self, char * packed, opcode_t packed_size);
+PackFile_ConstTable_unpack(struct Parrot_Interp *interpreter, struct PackFile_ConstTable * self, char * packed, opcode_t packed_size);
 
 opcode_t
 PackFile_ConstTable_pack_size(struct PackFile_ConstTable * self);
@@ -164,7 +164,7 @@ struct PackFile_Constant *
 PackFile_Constant_new_number(FLOATVAL n);
 
 struct PackFile_Constant *
-PackFile_Constant_new_string(STRING * s);
+PackFile_Constant_new_string(struct Parrot_Interp *interpreter, STRING * s);
 
 void
 PackFile_Constant_DELETE(struct PackFile_Constant * self);
@@ -185,7 +185,7 @@ void
 PackFile_Constant_set_string(struct PackFile_Constant * self, STRING * s);
 
 opcode_t
-PackFile_Constant_unpack(struct PackFile_Constant * self, char * packed, opcode_t packed_size);
+PackFile_Constant_unpack(struct Parrot_Interp *interpreter, struct PackFile_Constant * self, char * packed, opcode_t packed_size);
 
 opcode_t
 PackFile_Constant_unpack_integer(struct PackFile_Constant * self, char * packed, opcode_t packed_size);
@@ -194,7 +194,7 @@ opcode_t
 PackFile_Constant_unpack_number(struct PackFile_Constant * self, char * packed, opcode_t packed_size);
 
 opcode_t
-PackFile_Constant_unpack_string(struct PackFile_Constant * self, char * packed, opcode_t packed_size);
+PackFile_Constant_unpack_string(struct Parrot_Interp *interpreter, struct PackFile_Constant * self, char * packed, opcode_t packed_size);
 
 opcode_t
 PackFile_Constant_pack_size(struct PackFile_Constant * self);

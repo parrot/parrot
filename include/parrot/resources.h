@@ -19,15 +19,13 @@ PMC *new_pmc_header(struct Parrot_Interp *);
 void free_pmc(PMC *);
 
 STRING *new_string_header(struct Parrot_Interp *);
-void free_string(void);
+void free_string(STRING *);
 
 void *new_bigint_header(struct Parrot_Interp *);
 void free_bigint(void);
 
 void *new_bignum_header(struct Parrot_Interp *);
 void free_bignum(void);
-
-/* 
 
 #endif /* PARROT_RESOURCES_H */
 

@@ -13,7 +13,9 @@
 #if !defined(PARROT_TRANSCODE_H_GUARD)
 #define PARROT_TRANSCODE_H_GUARD
 
-typedef STRING* (*transcode_t)(STRING* from, STRING* to);
+#include "parrot/parrot.h"
+
+typedef STRING* (*transcode_t)(struct Parrot_Interp *interpreter, STRING* from, STRING* to);
 
 VAR_SCOPE transcode_t Parrot_transcode_table[enc_max][enc_max];
 

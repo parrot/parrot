@@ -30,8 +30,8 @@ string_init(void) {
  * and compute its string length
  */
 STRING *
-string_make(void *buffer, INTVAL buflen, INTVAL encoding, INTVAL flags, INTVAL type) {
-    STRING *s = mem_sys_allocate(sizeof(STRING));
+string_make(struct Parrot_Interp *interpreter, void *buffer, INTVAL buflen, INTVAL encoding, INTVAL flags, INTVAL type) {
+    STRING *s = new_string_header(interpreter);
     s->bufstart = mem_sys_allocate(buflen);
     mem_sys_memcopy(s->bufstart, buffer, buflen);
     s->encoding = &(Parrot_string_vtable[encoding]);
@@ -59,8 +59,7 @@ string_grow(STRING* s, INTVAL newsize) {
  */
 void
 string_destroy(STRING *s) {
-    mem_sys_free(s->bufstart);
-    mem_sys_free(s);
+    free_string(s);
 }
 
 /* Ordinary user-visible string operations */
@@ -77,8 +76,8 @@ string_length(STRING* s) {
  * create a copy of the argument passed in
  */
 STRING*
-string_copy(STRING *s) {
-    return string_make(s->bufstart, s->buflen, s->encoding->which, s->flags, s->type);
+string_copy(struct Parrot_Interp *interpreter, STRING *s) {
+    return string_make(interpreter, s->bufstart, s->buflen, s->encoding->which, s->flags, s->type);
 }
 
 /* vtable despatch functions */
@@ -105,8 +104,8 @@ string_max_bytes(STRING* s, INTVAL iv) {
  * concatenate two strings
  */
 STRING* 
-string_concat(STRING* a, STRING* b, INTVAL flags) {
-    return (ENC_VTABLE(a)->concat)(a, b, flags);
+string_concat(struct Parrot_Interp *interpreter, STRING* a, STRING* b, INTVAL flags) {
+    return (ENC_VTABLE(a)->concat)(interpreter, a, b, flags);
 }
 
 /*=for api string string_substr
@@ -114,7 +113,7 @@ string_concat(STRING* a, STRING* b, INTVAL flags) {
  * Allocate memory for d if necessary.
  */
 STRING*
-string_substr(STRING* src, INTVAL offset, INTVAL length, STRING** d) {
+string_substr(struct Parrot_Interp *interpreter, STRING* src, INTVAL offset, INTVAL length, STRING** d) {
     STRING *dest;
     if (offset < 0) {
         offset = src->strlen + offset;
@@ -130,7 +129,7 @@ string_substr(STRING* src, INTVAL offset, INTVAL length, STRING** d) {
         length = src->strlen - offset;
     }
     if (!d || !*d) {
-        dest = string_make(NULL, 0, src->encoding->which, 0, 0);
+        dest = string_make(interpreter, NULL, 0, src->encoding->which, 0, 0);
     }
     else {
         dest = *d;

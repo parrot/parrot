@@ -288,7 +288,7 @@ Returns one (1) if everything is OK, else zero (0).
 ***************************************/
 
 opcode_t
-PackFile_unpack(struct PackFile * self, char * packed, opcode_t packed_size) {
+PackFile_unpack(struct Parrot_Interp *interpreter, struct PackFile * self, char * packed, opcode_t packed_size) {
     opcode_t     segment_size;
     char * cursor;
     opcode_t *   op_ptr;
@@ -362,7 +362,7 @@ PackFile_unpack(struct PackFile * self, char * packed, opcode_t packed_size) {
         return 0;
     }
     
-    if (!PackFile_ConstTable_unpack(self->const_table, cursor, segment_size)) {
+    if (!PackFile_ConstTable_unpack(interpreter, self->const_table, cursor, segment_size)) {
         fprintf(stderr, "PackFile_unpack: Error reading constant table segment!\n");
         return 0;
     }
@@ -911,7 +911,7 @@ Returns one (1) if everything is OK, else zero (0).
 ***************************************/
 
 opcode_t
-PackFile_ConstTable_unpack(struct PackFile_ConstTable * self, char * packed, opcode_t packed_size) {
+PackFile_ConstTable_unpack(struct Parrot_Interp *interpreter, struct PackFile_ConstTable * self, char * packed, opcode_t packed_size) {
     char * cursor;
     opcode_t *   op_ptr;
     opcode_t     i;
@@ -951,7 +951,7 @@ PackFile_ConstTable_unpack(struct PackFile_ConstTable * self, char * packed, opc
 #endif
 
         self->constants[i] = PackFile_Constant_new();
-        PackFile_Constant_unpack(self->constants[i], cursor, packed_size - (cursor - packed));
+        PackFile_Constant_unpack(interpreter, self->constants[i], cursor, packed_size - (cursor - packed));
         /* NOTE: It would be nice if each of these had its own length first */
 
         cursor += PackFile_Constant_pack_size(self->constants[i]);
@@ -1155,11 +1155,11 @@ Allocate a new PackFile Constant containing a string.
 ***************************************/
 
 struct PackFile_Constant *
-PackFile_Constant_new_string(STRING * s) {
+PackFile_Constant_new_string(struct Parrot_Interp *interpreter, STRING * s) {
     struct PackFile_Constant * self = mem_sys_allocate((INTVAL)sizeof(struct PackFile_Constant));
 
     self->type   = PFC_STRING;
-    self->string = string_copy(s);
+    self->string = string_copy(interpreter, s);
 
     return self;
 }
@@ -1276,7 +1276,7 @@ Returns one (1) if everything is OK, else zero (0).
 ***************************************/
 
 opcode_t
-PackFile_Constant_unpack(struct PackFile_Constant * self, char * packed, opcode_t packed_size) {
+PackFile_Constant_unpack(struct Parrot_Interp *interpreter, struct PackFile_Constant * self, char * packed, opcode_t packed_size) {
     char * cursor;
     opcode_t     type;
     opcode_t     size;
@@ -1326,7 +1326,7 @@ PackFile_Constant_unpack(struct PackFile_Constant * self, char * packed, opcode_
 #if TRACE_PACKFILE
             printf("PackFile_Constant_unpack(): Unpacking string constant...\n");
 #endif
-            PackFile_Constant_unpack_string(self, cursor, size);
+            PackFile_Constant_unpack_string(interpreter, self, cursor, size);
             break;
 
         default:
@@ -1439,7 +1439,7 @@ Returns one (1) if everything is OK, else zero (0).
 ***************************************/
 
 opcode_t
-PackFile_Constant_unpack_string(struct PackFile_Constant * self, char * packed, opcode_t packed_size) {
+PackFile_Constant_unpack_string(struct Parrot_Interp *interpreter, struct PackFile_Constant * self, char * packed, opcode_t packed_size) {
     char * cursor;
     opcode_t     flags;
     opcode_t     encoding;
@@ -1483,7 +1483,7 @@ PackFile_Constant_unpack_string(struct PackFile_Constant * self, char * packed, 
 #endif
 
     self->type   = PFC_STRING;
-    self->string = string_make(cursor, size, encoding, flags, type);
+    self->string = string_make(interpreter, cursor, size, encoding, flags, type);
 
     return 1;
 }

@@ -17,7 +17,7 @@
    transcode UTF-8 to UTF-16
  */
 static STRING*
-transcode_utf8_to_utf16(STRING* from, STRING* to)
+transcode_utf8_to_utf16(struct Parrot_Interp *interpreter, STRING* from, STRING* to)
 {
     utf8_t *fp;
     utf16_t *tp;
@@ -26,7 +26,7 @@ transcode_utf8_to_utf16(STRING* from, STRING* to)
         to->encoding = &Parrot_string_vtable[enc_utf16];
     }
     else {
-        to = string_make(NULL, 0, enc_utf16, 0, 0);
+        to = string_make(interpreter, NULL, 0, enc_utf16, 0, 0);
     }
 
     string_grow(to, from->strlen);
@@ -83,7 +83,7 @@ transcode_utf8_to_utf16(STRING* from, STRING* to)
    transcode UTF-8 to UTF-32
  */
 static STRING*
-transcode_utf8_to_utf32(STRING* from, STRING* to)
+transcode_utf8_to_utf32(struct Parrot_Interp *interpreter, STRING* from, STRING* to)
 {
     utf8_t *fp;
     utf32_t *tp;
@@ -92,7 +92,7 @@ transcode_utf8_to_utf32(STRING* from, STRING* to)
         to->encoding = &Parrot_string_vtable[enc_utf32];
     }
     else {
-        to = string_make(NULL, 0, enc_utf32, 0, 0);
+        to = string_make(interpreter, NULL, 0, enc_utf32, 0, 0);
     }
 
     string_grow(to, from->strlen);
@@ -137,7 +137,7 @@ transcode_utf8_to_utf32(STRING* from, STRING* to)
    transcode UTF-16 to UTF-8
  */
 static STRING*
-transcode_utf16_to_utf8(STRING* from, STRING* to)
+transcode_utf16_to_utf8(struct Parrot_Interp *interpreter, STRING* from, STRING* to)
 {
     utf16_t *fp;
     utf8_t *tp;
@@ -146,7 +146,7 @@ transcode_utf16_to_utf8(STRING* from, STRING* to)
         to->encoding = &Parrot_string_vtable[enc_utf8];
     }
     else {
-        to = string_make(NULL, 0, enc_utf8, 0, 0);
+        to = string_make(interpreter, NULL, 0, enc_utf8, 0, 0);
     }
 
     string_grow(to, from->strlen);
@@ -202,7 +202,7 @@ transcode_utf16_to_utf8(STRING* from, STRING* to)
    transcode UTF-16 to UTF-32
  */
 static STRING*
-transcode_utf16_to_utf32(STRING* from, STRING* to)
+transcode_utf16_to_utf32(struct Parrot_Interp *interpreter, STRING* from, STRING* to)
 {
     utf16_t *fp;
     utf32_t *tp;
@@ -211,7 +211,7 @@ transcode_utf16_to_utf32(STRING* from, STRING* to)
         to->encoding = &Parrot_string_vtable[enc_utf32];
     }
     else {
-        to = string_make(NULL, 0, enc_utf32, 0, 0);
+        to = string_make(interpreter, NULL, 0, enc_utf32, 0, 0);
     }
 
     string_grow(to, from->strlen);
@@ -258,7 +258,7 @@ transcode_utf16_to_utf32(STRING* from, STRING* to)
    transcode UTF-32 to UTF-8
  */
 static STRING*
-transcode_utf32_to_utf8(STRING* from, STRING* to)
+transcode_utf32_to_utf8(struct Parrot_Interp *interpreter, STRING* from, STRING* to)
 {
     utf32_t *fp;
     utf8_t *tp;
@@ -267,7 +267,7 @@ transcode_utf32_to_utf8(STRING* from, STRING* to)
         to->encoding = &Parrot_string_vtable[enc_utf8];
     }
     else {
-        to = string_make(NULL, 0, enc_utf8, 0, 0);
+        to = string_make(interpreter, NULL, 0, enc_utf8, 0, 0);
     }
 
     string_grow(to, from->strlen);
@@ -305,7 +305,7 @@ transcode_utf32_to_utf8(STRING* from, STRING* to)
    transcode UTF-32 to UTF-16
  */
 static STRING*
-transcode_utf32_to_utf16(STRING* from, STRING* to)
+transcode_utf32_to_utf16(struct Parrot_Interp *interpreter, STRING* from, STRING* to)
 {
     utf32_t *fp;
     utf16_t *tp;
@@ -314,7 +314,7 @@ transcode_utf32_to_utf16(STRING* from, STRING* to)
         to->encoding = &Parrot_string_vtable[enc_utf16];
     }
     else {
-        to = string_make(NULL, 0, enc_utf16, 0, 0);
+        to = string_make(interpreter, NULL, 0, enc_utf16, 0, 0);
     }
 
     string_grow(to, from->strlen);

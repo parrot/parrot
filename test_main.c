@@ -67,36 +67,6 @@ main(int argc, char **argv) {
         fprintf(stderr, "%s: usage: %s prog\n", argv[0], argv[0]);
         exit(1);
     }
-    else if (argc == 2 && !strcmp(argv[1], "-s")) { /* String tests */
-        STRING *s = string_make("foo", 3, enc_native, 0, 0);
-        STRING *t = string_make("quux", 4, enc_native, 0, 0);
-        int i;
-        time_t foo;
-        
-        printf("String %p has length %i: %.*s\n", (void *) s, 
-                (int) string_length(s), s->bufused,
-                (char *) s->bufstart);
-        string_concat(s, t, 0);
-        printf("String %p has length %i: %.*s\n", (void *) s, 
-                (int) string_length(s), s->bufused,
-                (char *) s->bufstart);
-        string_chopn(s, 4);
-        printf("String %p has length %i: %.*s\n", (void *) s, 
-                (int) string_length(s), s->bufused,
-                (char *) s->bufstart);
-        string_chopn(s, 4);
-        printf("String %p has length %i: %.*s\n", (void *) s, 
-                (int) string_length(s), s->bufused,
-                (char *) s->bufstart);
-
-        foo = time(0);
-        for (i = 0; i < 100000000; i++) {
-            string_concat(s, t, 0);
-            string_chopn(s, 4);
-        }
-        printf("10000000 concats and chops took %li seconds.\n", time(0)-foo);
-        string_destroy(s);
-    }
     /* Otherwise load in the program they gave and try that */
     else {
         opcode_t *program_code;        
@@ -130,7 +100,7 @@ main(int argc, char **argv) {
         }
         
         pf = PackFile_new();
-        if( !PackFile_unpack(pf, (char *)program_code, program_size) ) {
+        if( !PackFile_unpack(interpreter, pf, (char *)program_code, program_size) ) {
             printf( "Can't unpack.\n" );
             return 1;
         }

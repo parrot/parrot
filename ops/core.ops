@@ -145,7 +145,7 @@ AUTO_OP set(n, n|nc) {
 }
 
 AUTO_OP set(s, s|sc) {
-  $1 = string_copy($2);
+  $1 = string_copy(interpreter, $2);
 }
 
 =back
@@ -945,11 +945,11 @@ into $1.
 =cut
 
 AUTO_OP concat(s, s|sc) {
-    $1 = string_concat($1, $2, 1);
+    $1 = string_concat(interpreter, $1, $2, 1);
 }
 
 AUTO_OP concat(s, s|sc, s|sc) {
-    $1 = string_concat($2, $3, 1);
+    $1 = string_concat(interpreter, $2, $3, 1);
 }
 
 
@@ -988,7 +988,7 @@ length $4.
 =cut
 
 AUTO_OP substr(s, s|sc, i|ic, i|ic) {
-    $1 = string_substr($2, $3, $4, &$1);
+    $1 = string_substr(interpreter, $2, $3, $4, &$1);
 }
 
 

@@ -59,11 +59,11 @@ string_utf8_max_bytes (INTVAL x) {
    concatenate two strings
 */
 static STRING*
-string_utf8_concat(STRING* a, STRING* b, INTVAL flags) {
+string_utf8_concat(struct Parrot_Interp *interpreter, STRING* a, STRING* b, INTVAL flags) {
     if (flags && a->encoding != b->encoding) {
 	/* Transcode */
 	STRING* t = b;
-	b = string_make(NULL, 0, enc_utf8, 0, 0);
+	b = string_make(interpreter, NULL, 0, enc_utf8, 0, 0);
 	(Parrot_transcode_table[t->encoding->which][enc_utf8])(t, b);
     }
     /* b is now in UTF-8 format */
