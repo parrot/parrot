@@ -16,6 +16,7 @@ pyobject \
   pyclass \
   pycomplex \
   pydict \
+  pyexception \
   pyfloat \
   pyfunc \
   pygen \

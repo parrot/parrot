@@ -1,0 +1,84 @@
+/*
+Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+$Id$
+
+=head1 NAME
+
+classes/pyexception.pmc - Python Exception
+
+=head1 DESCRIPTION
+
+These are the vtable functions for the Python Exception base class
+
+=head2 Methods
+
+=over 4
+
+=cut
+
+*/
+
+#include "parrot/parrot.h"
+
+pmclass PyException dynpmc group python_group {
+
+/*
+
+=item C<void set_integer_native(INTVAL value)>
+
+Sets the value of the integer to the value of the C<PyInt> C<*value>.
+
+=cut
+
+*/
+
+    void set_integer_native (INTVAL value) {
+        PMC_int_val(SELF) = value;
+        PObj_get_FLAGS(SELF) |= KEY_integer_FLAG;
+    }
+
+/*
+
+=item C<PMC* "__match__"(PMC *exception)>
+
+If this PMC matches the given exception, return an exception
+object.  Else, rethrow.
+
+=cut
+
+*/
+
+    METHOD PMC* __match__(PMC *exception) {
+        if (exception->vtable->base_type == enum_class_Exception) {
+            INTVAL extype = VTABLE_get_integer_keyed_int(INTERP, exception, 1);
+            if (PMC_int_val(SELF) != extype) {
+                rethrow_exception(INTERP, exception);
+            }
+        }
+        else {
+            /* TODO: match PyException objects */
+            rethrow_exception(INTERP, exception);
+        }
+
+        return exception;
+    }
+
+/*
+
+=back
+
+=cut
+
+*/
+
+}
+
+/*
+ * Local variables:
+ * c-indentation-style: bsd
+ * c-basic-offset: 4
+ * indent-tabs-mode: nil
+ * End:
+ *
+ * vim: expandtab shiftwidth=4:
+*/

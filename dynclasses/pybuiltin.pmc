@@ -25,6 +25,7 @@ static INTVAL dynclass_PyObject;
 static INTVAL dynclass_PyBoolean;
 static INTVAL dynclass_PyComplex;
 static INTVAL dynclass_PyDict;
+static INTVAL dynclass_PyException;
 static INTVAL dynclass_PyInt;
 static INTVAL dynclass_PyFloat;
 static INTVAL dynclass_PyList;
@@ -54,17 +55,18 @@ they will be used frequently here.
 
     void class_init() {
         if (pass) {
-            dynclass_PyObject  = Parrot_PMC_typenum(INTERP, "PyObject");
-            dynclass_PyBoolean = Parrot_PMC_typenum(INTERP, "PyBoolean");
-            dynclass_PyComplex = Parrot_PMC_typenum(INTERP, "PyComplex");
-            dynclass_PyDict    = Parrot_PMC_typenum(INTERP, "PyDict");
-            dynclass_PyInt     = Parrot_PMC_typenum(INTERP, "PyInt");
-            dynclass_PyFloat   = Parrot_PMC_typenum(INTERP, "PyFloat");
-            dynclass_PyList    = Parrot_PMC_typenum(INTERP, "PyList");
-            dynclass_PyLong    = Parrot_PMC_typenum(INTERP, "PyLong");
-            dynclass_PyNone    = Parrot_PMC_typenum(INTERP, "PyNone");
-            dynclass_PyString  = Parrot_PMC_typenum(INTERP, "PyString");
-            dynclass_PyTuple   = Parrot_PMC_typenum(INTERP, "PyTuple");
+            dynclass_PyObject    = Parrot_PMC_typenum(INTERP, "PyObject");
+            dynclass_PyBoolean   = Parrot_PMC_typenum(INTERP, "PyBoolean");
+            dynclass_PyComplex   = Parrot_PMC_typenum(INTERP, "PyComplex");
+            dynclass_PyDict      = Parrot_PMC_typenum(INTERP, "PyDict");
+            dynclass_PyException = Parrot_PMC_typenum(INTERP, "PyException");
+            dynclass_PyInt       = Parrot_PMC_typenum(INTERP, "PyInt");
+            dynclass_PyFloat     = Parrot_PMC_typenum(INTERP, "PyFloat");
+            dynclass_PyList      = Parrot_PMC_typenum(INTERP, "PyList");
+            dynclass_PyLong      = Parrot_PMC_typenum(INTERP, "PyLong");
+            dynclass_PyNone      = Parrot_PMC_typenum(INTERP, "PyNone");
+            dynclass_PyString    = Parrot_PMC_typenum(INTERP, "PyString");
+            dynclass_PyTuple     = Parrot_PMC_typenum(INTERP, "PyTuple");
 
             HEX = const_string(INTERP, "__hex__");
             OCT = const_string(INTERP, "__oct__");
@@ -129,6 +131,12 @@ enter_nci_method should create these as locals to begin with.
 
         key = const_string(INTERP, "None");
         item = pmc_new(INTERP, dynclass_PyNone);
+        scratchpad_store_by_name(INTERP, pad, 0, key, item);
+
+        /* exceptions */
+        key = const_string(INTERP, "ValueError");
+        item = pmc_new(INTERP, dynclass_PyException);
+        VTABLE_set_integer_native(INTERP, item, E_ValueError);
         scratchpad_store_by_name(INTERP, pad, 0, key, item);
 
         /* Begin main! */
