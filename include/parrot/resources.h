@@ -44,6 +44,8 @@ void *Parrot_reallocate_about(struct Parrot_Interp *interpreter, void *from, siz
 
 void buffer_lives(Buffer *);
 
+void Parrot_initialize_free_pools(struct Parrot_Interp *);
+
 #define STRING_HEADERS_PER_ALLOC 128
 #define PMC_HEADERS_PER_ALLOC 128
 #define BUFFER_HEADERS_PER_ALLOC 128
@@ -77,6 +79,7 @@ struct Buffer_Arena {
 struct free_pool {
     Buffer pool_buffer;
     size_t entries_in_pool;
+    void (*replenish)(struct Parrot_Interp *, struct free_pool *);
 };
         
 struct Memory_Pool {
