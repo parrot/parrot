@@ -96,23 +96,22 @@ SymReg * mk_address(char * name, int uniq) {
     return _mk_address(hash, name, uniq);
 }
 
-/* link keys to a keys structure = SymReg VTKEY
+/* link keys to a keys structure = SymReg
  *
- * whe might have
+ * we might have
  *
  * what         op      type                    pbc.c:build_key()
- * --------------------------------------------------------------
- *  int const   _kic    VTCONST | VTKEY         no
- *  int reg     _ki     VTREG   | VTKEY         no
- *  str const   _kc     VTCONST | VTKEY         yes
- *  str reg     _kc     VTREG   | VTKEY         yes
+ * --------------------------------------------------
+ *  int const   _kic    VTCONST     no
+ *  int reg     _ki     VTREG       no
+ *  str const   _kc     VTCONST     yes
+ *  str reg     _kc     VTREG       yes
  *
- *  "key" ';' "key" _kc     VTKEY -> (list of above)   yes
- *  "key" ';' $I0   _kc     VTREGKEY ->(list of above)   yes
+ *  "key" ';' "key" _kc           -> (list of above)   yes
+ *  "key" ';' $I0   _kc  VTREGKEY -> (list of above)   yes
  *
- *  actually, the VTKEY flag lives only shortly, until the
- *  instruction is built. Then the information, which reg should
- *  be passed to build_key(), is in instruction.
+ *  The information about which reg should be passed to build_key() is
+ *  in the instruction.
  *
  *  A key containing a variable has a special flag VTREGKEY
  *  because this key must be considered for life analysis for
@@ -154,10 +153,8 @@ SymReg * link_keys(int nargs, SymReg * keys[])
     if (nargs == 0)
         fatal(1, "link_keys", "hu? no keys\n");
     first = keys[0];
-    if (nargs == 1) {
-        first->type |= VTKEY;
+    if (nargs == 1)
         return first;
-    }
     *key_str = 0;
     /* first look, if we already have this exact key chain */
     for (i = 0; i < nargs && strlen(key_str)<200; i++) {
@@ -171,7 +168,7 @@ SymReg * link_keys(int nargs, SymReg * keys[])
     keychain = calloc(1, sizeof(SymReg));
     if (!keychain)
         fatal(1, "link_keys", "Out of mem\n");
-    keychain->type = VTKEY | VTCONST;
+    keychain->type = VTCONST;
     key = keychain;
     for (i = 0; i < nargs; i++) {
         /* if any component is a variable, we need to track it in

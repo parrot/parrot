@@ -35,9 +35,12 @@ int         expect_pasm;
 
 
 static SymReg *regs[IMCC_MAX_REGS];
+/* Bit vector saying whether argument i is a key */
+static int keyvec = 0;
 static int nargs = 0;
 static SymReg *keys[IMCC_MAX_REGS];
 static int nkeys = 0;
+#define KEY_BIT(argnum) (1 << argnum)
 
 static SymReg ** RR(int n, ...)
 {
@@ -94,10 +97,17 @@ static Instruction * MK_I(char * fmt, SymReg ** r) {
  */
 
 
+static void clear_state()
+{
+    nargs = 0;
+    keyvec = 0;
+    memset(regs, 0, sizeof(regs));
+}
 
 static Instruction * iLABEL(SymReg * r0) {
     Instruction *i = emitb(_mk_instruction("","%s:", R1(r0), 0));
     i->type = ITLABEL;
+    clear_state();
     return i;
 }
 
@@ -113,8 +123,10 @@ static Instruction * iSUBROUTINE(SymReg * r0) {
  */
 static Instruction * iINDEXFETCH(SymReg * r0, SymReg * r1, SymReg * r2) {
     if(r0->set == 'S' && r1->set == 'S' && r2->set == 'I') {
-        return MK_I("substr %s, %s, %s, 1", R3(r0, r1, r2));
+        SymReg * r3 = mk_const("1", 'I');
+        return MK_I("substr %s, %s, %s, 1", R4(r0, r1, r2, r3));
     }
+    keyvec |= KEY_BIT(2);
     return MK_I("set %s, %s[%s]", R3(r0,r1,r2));
 }
 
@@ -124,9 +136,11 @@ static Instruction * iINDEXFETCH(SymReg * r0, SymReg * r1, SymReg * r2) {
 
 static Instruction * iINDEXSET(SymReg * r0, SymReg * r1, SymReg * r2) {
     if(r0->set == 'S' && r1->set == 'I' && r2->set == 'S') {
-        MK_I("substr %s, %s, 1, %s", R3(r0, r1, r2));
+        SymReg * r3 = mk_const("1", 'I');
+        MK_I("substr %s, %s, 1, %s", R4(r0, r1,r3, r2));
     }
     else if (r0->set == 'P') {
+        keyvec |= KEY_BIT(1);
 	MK_I("set %s[%s], %s", R3(r0,r1,r2));
     }
     else {
@@ -187,7 +201,7 @@ op_fullname(char * dest, const char * name, SymReg * args[], int nargs) {
             continue;
     }
         /* if one ever wants num keys, they go with 'S' */
-        if (args[i]->type & VTKEY) {
+        if (keyvec & KEY_BIT(i)) {
             *dest++ = 'k';
             if (args[i]->set == 'S' || args[i]->set == 'N' ||
                 args[i]->set == 'K') {
@@ -307,7 +321,7 @@ Instruction * iANY(char * name, char *fmt, SymReg **regs, int emit) {
 	    default:
 		assert(0);
 	    };
-            if (regs[i]->type & VTKEY) {
+            if (keyvec & KEY_BIT(i)) {
                 len = strlen(format);
                 len -= 2;
                 format[len] = '\0';
@@ -321,22 +335,16 @@ Instruction * iANY(char * name, char *fmt, SymReg **regs, int emit) {
 	format[len] = '\0';
         if (fmt && *fmt)
             strcpy(format, fmt);
-        for (i = nargs; i < IMCC_MAX_REGS; i++)
-            regs[i] = 0;
+        memset(regs + nargs, 0, sizeof(*regs) * (IMCC_MAX_REGS - nargs));
 #if 1
         debug(1,"%s %s\t%s\n", name, format, fullname);
 #endif
         /* make the instruction */
         ins = emitb(_mk_instruction(name, format, regs, dirs));
+        ins->keys |= keyvec;
         /* fill iin oplib's info */
         ins->opnum = op;
         ins->opsize = info->arg_count;
-        /* reset the VTKEY flag and remeber the info in ins->keys */
-        for (i = 0; ins->r[i]; i++)
-            if (ins->r[i]->type & VTKEY) {
-                ins->r[i]->type &= ~VTKEY;
-                ins->keys |= (1<<i);
-            }
         /* set up branch flags */
         if (info->jump) {
             if (!strcmp(name, "bsr") || !strcmp(name, "ret")) {
@@ -366,6 +374,7 @@ Instruction * iANY(char * name, char *fmt, SymReg **regs, int emit) {
         fataly(EX_SOFTWARE, "iANY", line,"op not found '%s' (%s<%d>)\n",
                 fullname, name, nargs);
     }
+    clear_state();
     return NULL;
 }
 
@@ -378,7 +387,7 @@ Instruction * iANY(char * name, char *fmt, SymReg **regs, int emit) {
     Instruction *i;
 }
 
-%token <t> CALL GOTO BRANCH ARG RET PRINT IF UNLESS NEW END SAVEALL RESTOREALL
+%token <t> CALL GOTO ARG RET PRINT IF UNLESS NEW END SAVEALL RESTOREALL
 %token <t> SUB NAMESPACE CLASS ENDCLASS SYM LOCAL PARAM PUSH POP INC DEC
 %token <t> SHIFT_LEFT SHIFT_RIGHT INTV FLOATV STRINGV DEFINED LOG_XOR
 %token <t> RELOP_EQ RELOP_NE RELOP_GT RELOP_GTE RELOP_LT RELOP_LTE
@@ -417,9 +426,7 @@ pasmcode: pasmline
 
 pasmline: labels  pasm_inst '\n'  { $$ = 0; }
     ;
-pasm_inst: PARROT_OP                       { nargs = 0;
-                                        memset(regs, 0, sizeof(regs)); }
-       pasm_args	                { $$ = iANY($1,0,regs,1); free($1); }
+pasm_inst: PARROT_OP pasm_args	        { $$ = iANY($1,0,regs,1); free($1); }
     | /* none */                               { $$ = 0;}
 
     ;
@@ -428,13 +435,14 @@ pasm_args:
     ;
 
 emit:
-      EMIT   pasmcode                    { $$ = 0 }
-       EOM '\n'				{ emit_flush(); clear_tables();$$=0 }
+      EMIT   pasmcode                    { $$ = 0;}
+       EOM '\n'				{ emit_flush(); clear_tables();$$=0;}
     ;
 
 nls:
     '\n'
     | nls '\n'
+    ;
 
 subs:	subs sub
     |   sub
@@ -447,8 +455,8 @@ sub:	sub_start statements RET
 	  emit_flush();
 	  clear_tables();
         }
-        | emit{ $$=0 }
-        | nls { $$=0 }
+        | emit{ $$=0; }
+        | nls { $$=0; }
     ;
 
 sub_start: SUB IDENTIFIER '\n'
@@ -505,10 +513,7 @@ labeled_inst:
     |   SAVEALL				{ $$ = MK_I("saveall" ,R0()); }
     |   RESTOREALL			{ $$ = MK_I("restoreall" ,R0()); }
     |   END				{ $$ = MK_I("end" ,R0()); }
-    |  PARROT_OP				{ nargs = 0;
-    					  memset(regs, 0, sizeof(regs));
-					}
-       vars 				{ $$ = iANY($1,0,regs, 1); free($1); }
+    |  PARROT_OP vars                   { $$ = iANY($1,0,regs, 1); free($1); }
     | /* none */                               { $$ = 0;}
     ;
 
@@ -540,7 +545,7 @@ assignment:
     |  target '=' var '&' var		{ $$ = MK_I("band", R3($1, $3, $5)); }
     |  target '=' var '|' var		{ $$ = MK_I("bor", R3($1, $3, $5)); }
     |  target '=' var '~' var		{ $$ = MK_I("bxor", R3($1, $3, $5)); }
-    |  target '=' var '[' keylist ']'{ $$ = iINDEXFETCH($1, $3, $5); }
+    |  target '=' var '[' keylist ']'   { $$ = iINDEXFETCH($1, $3, $5); }
     |  var '[' keylist ']' '=' var	{ $$ = iINDEXSET($1, $3, $6); }
     |  target '=' NEW classname		{ $$ = iNEW($1, $4); }
     |  target '=' DEFINED var	{ $$ = MK_I("defined %s, %s",R2($1,$4)); }
@@ -586,29 +591,31 @@ _vars: _vars COMMA _var_or_i		{ $$ = regs[0]; }
     |  _var_or_i
     ;
 
-_var_or_i: var_or_i                     { regs[nargs++] = $1 }
+_var_or_i: var_or_i                     { regs[nargs++] = $1; }
     | lhs '[' keylist ']'               { regs[nargs++] = $1;
-                                          regs[nargs++] = $3; $$= $1; }
+                                          keyvec |= KEY_BIT(nargs);
+                                          regs[nargs++] = $3; $$ = $1; }
     ;
 var_or_i:
        IDENTIFIER			{ $$ = mk_address($1, U_add_once); }
     |  var
-    | MACRO                             { $$ = macro($1+1); free($1)}
+    | MACRO                             { $$ = macro($1+1); free($1); }
     ;
 
 var:   VAR
     |  rc
     ;
 
-keylist:                                { nkeys=0 }
+keylist:                                { nkeys=0; }
        _keylist                         { $$ = link_keys(nkeys, keys); }
     ;
 
 _keylist: key                            { keys[nkeys++] = $1; }
-     | _keylist ';' key                  { keys[nkeys++] = $3; $$ =  keys[0] }
+     | _keylist ';' key                  { keys[nkeys++] = $3; $$ =  keys[0]; }
     ;
 
 key:  var
+    ;
 
 rc:	reg
     |	const
@@ -656,7 +663,7 @@ static void version()
     exit(0);
 }
 
-#define setopt(flag) Parrot_setflag(interpreter, flag, (*argv)[0]+2);
+#define setopt(flag) Parrot_setflag(interpreter, flag, (*argv)[0]+2)
 #define unsetopt(flag) Parrot_setflag(interpreter, flag, 0)
 
 /* most stolen from test_main.c */
@@ -696,7 +703,9 @@ parseflags(Parrot_Interp interpreter, int *argc, char **argv[])
             setopt(PARROT_TRACE_FLAG);
             break;
         case 'd':
+            if (!Interp_flags_TEST(interpreter, PARROT_DEBUG_FLAG))
             setopt(PARROT_DEBUG_FLAG);
+            else
             IMCC_DEBUG++;
             break;
         case 'w':
@@ -847,11 +856,11 @@ static void test_ops()
 
 int main(int argc, char * argv[])
 {
-    void * stacktop;
+    int stacktop;
     struct PackFile *pf;
 
     interpreter = Parrot_new();
-    Parrot_init(interpreter, stacktop);
+    Parrot_init(interpreter, (void*)&stacktop);
     pf = PackFile_new();
     interpreter->code = pf;
 #ifdef OPTEST

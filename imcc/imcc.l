@@ -27,6 +27,7 @@ int yyerror(char *);
 
 LETTER          [a-zA-Z_]
 DIGIT           [0-9]
+HEX		0x[0-9A-Fa-f]+
 DOT		[.]
 LETTERDIGIT     [a-zA-Z0-9_]
 SIGN            [-+]
@@ -85,7 +86,6 @@ EOL		\r?\n
 ".namespace"    return(NAMESPACE);
 ".local"        return(LOCAL);
 ".param"        return(PARAM);
-"branch"        return(BRANCH);
 "end"           return(END);
 "goto"          return(GOTO);
 "if"            return(IF);
@@ -158,7 +158,10 @@ EOL		\r?\n
         yylval.s = str_dup(yytext);
         return(INTC);
     }
-
+<emit,INITIAL>{HEX} {
+        yylval.s = str_dup(yytext);
+        return(INTC);
+    }
 <emit,INITIAL>{STRINGCONSTANT} {
         yylval.s = str_dup(yytext); /* XXX delete quotes, -> emit, pbc */
         return(STRINGC);

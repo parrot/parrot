@@ -11,9 +11,8 @@ enum VARTYPE {		/* variable type can be */
     VTREG	= 1 << 1,	/* register */
     VTIDENTIFIER= 1 << 2,	/* identifier */
     VTADDRESS	= 1 << 3,	/* address */
-    VTKEY	= 1 << 4,	/* parrot key, one key*/
-    VTREGKEY	= 1 << 5,	/* parrot [key;key..], including registers */
-    VTPASM	= 1 << 7	/* parrot register, colored from .emit */
+    VTREGKEY	= 1 << 4,	/* parrot [key;key..], including registers */
+    VTPASM	= 1 << 5	/* parrot register, colored from .emit */
 };
 
 /* this VARTYPE needs register allocation and such */

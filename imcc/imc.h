@@ -1,7 +1,7 @@
 #ifndef __IMC_H
 #define __IMC_H
 
-#define IMCC_VERSION "0.0.9.0"
+#define IMCC_VERSION "0.0.9.3"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -82,7 +82,7 @@ EXTERN long        line;	/* and line */
 EXTERN char optimizer_opt[20];
 EXTERN int dont_optimize;
 
-struct ostat {
+struct imcc_ostat {
 	int deleted_labels;
 	int if_branch;
 	int branch_branch;
@@ -90,7 +90,7 @@ struct ostat {
 	int deleted_ins;
 } ;
 
-EXTERN struct ostat ostat;
+EXTERN struct imcc_ostat ostat;
 
 
 #endif

@@ -49,7 +49,10 @@ Instruction * _mk_instruction(const char *op, const char * fmt,
 /* next 2 functions are called very often, says gprof
  * theys should be fast
  */
-inline int instruction_reads(Instruction* ins, SymReg* r) {
+#ifdef HAS_INLINE
+inline
+#endif
+int instruction_reads(Instruction* ins, SymReg* r) {
     int f, i;
     SymReg *key;
 
@@ -66,7 +69,10 @@ inline int instruction_reads(Instruction* ins, SymReg* r) {
     return 0;
 }
 
-inline int instruction_writes(Instruction* ins, SymReg* r) {
+#ifdef HAS_INLINE
+inline
+#endif
+int instruction_writes(Instruction* ins, SymReg* r) {
     int f, i;
     SymReg *key;
 
@@ -202,7 +208,33 @@ static char * ins_fmt(Instruction * ins) {
 	else
 	    regstr[i] = ins->r[i]->name;
 
-    vsprintf(s, ins->fmt, regstr);      /* XXX */
+    switch (ins->opsize-1) {
+        case -1:        /* labels */
+        case 1:
+            sprintf(s, ins->fmt, regstr[0]);
+            break;
+        case 2:
+            sprintf(s, ins->fmt, regstr[0], regstr[1]);
+            break;
+        case 3:
+            sprintf(s, ins->fmt, regstr[0], regstr[1], regstr[2]);
+            break;
+        case 4:
+            sprintf(s, ins->fmt, regstr[0], regstr[1], regstr[2], regstr[3]);
+            break;
+        case 5:
+            sprintf(s, ins->fmt, regstr[0], regstr[1], regstr[2], regstr[3],
+                    regstr[4]);
+            break;
+        case 6:
+            sprintf(s, ins->fmt, regstr[0], regstr[1], regstr[2], regstr[3],
+                    regstr[4], regstr[5]);
+            break;
+        default:
+            fatal(1, "ins_fmt", "unhandled: opsize (%d), op %s, fmt %s\n",
+                    ins->opsize, ins->op, ins->fmt);
+            break;
+    }
     return s;
 }
 

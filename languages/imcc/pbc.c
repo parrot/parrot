@@ -437,6 +437,9 @@ static void add_1_const(SymReg *r)
 {
     switch (r->set) {
         case 'I':
+            if (r->name[0] == '0' && r->name[1] == 'x')
+                r->color = strtoul(r->name+2, 0, 16);
+            else
             r->color = atoi(r->name);
             break;
         case 'S':
