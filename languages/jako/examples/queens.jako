@@ -10,6 +10,8 @@
 # $Id$
 #
 
+sub print {op} (str s);
+sub int not {op} (int i);
 
 # 4 bits per file, represent the rank of the queen, 0xf for none
 

@@ -28,6 +28,9 @@
 # license as the Parrot interpreter.
 #
 
+sub print {op} (str s);
+sub str substr {op} (str s, int i, int l);
+
 var str b = " .:,;!/>)|&IH%*#";
 
 var int x, y, k;

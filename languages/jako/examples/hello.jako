@@ -10,4 +10,6 @@
 # $Id$
 #
 
+sub print {op} (str s);
+
 print("Hello, world!\n");

@@ -11,6 +11,8 @@
 # $Id$
 #
 
+sub print {op} (str s);
+
 var int x;
 
 sub printit (int x) {

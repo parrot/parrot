@@ -10,6 +10,8 @@
 # $Id$
 #
 
+sub print {op} (str s);
+
 const int n = 24;
 
 var   int a =  1;

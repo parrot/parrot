@@ -12,6 +12,8 @@
 # $Id$
 #
 
+sub print {op} (str s);
+
 const int N = 15;
 
 

@@ -1,0 +1,6 @@
+#
+# string.jako
+#
+
+sub str substr {op} (str s, int i, int l);
+

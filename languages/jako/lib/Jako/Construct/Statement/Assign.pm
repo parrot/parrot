@@ -1,0 +1,61 @@
+#
+# Assign.pm
+#
+# Copyright (C) 2002-2003 Gregor N. Purdy. All rights reserved.
+# This program is free software. It is subject to the same license
+# as the Parrot interpreter.
+#
+# $Id$
+#
+
+use strict;
+use warnings;
+
+package Jako::Construct::Statement::Assign;
+
+use Carp;
+
+use base qw(Jako::Construct::Statement);
+
+sub new
+{
+  my $class = shift;
+  my ($block, $left, $right) = @_;
+
+  confess("Block (" . ref($block) . ") not!") unless UNIVERSAL::isa($block, 'Jako::Construct::Block');
+  confess("Left (" . ref($left) . ") is not Value") unless UNIVERSAL::isa($left, 'Jako::Construct::Expression::Value');
+  confess("Right (" . ref($right) . ") is not Value") unless UNIVERSAL::isa($right, 'Jako::Construct::Expression::Value');
+
+  my $self = bless {
+    BLOCK => $block,
+    LEFT  => $left,
+    RIGHT => $right
+  }, $class;
+
+  $block->push_content($self);
+
+  return $self;
+}
+
+sub left  { return shift->{LEFT};  }
+sub right { return shift->{RIGHT}; }
+
+
+#
+# compile()
+#
+
+sub compile
+{
+  my $self = shift;
+  my ($fh) = @_;
+
+  my $left  = $self->left->value;
+  my $right = $self->right->compile($fh);
+
+  print $fh "  $left = $right\n";
+
+  return 1;
+}
+
+1;

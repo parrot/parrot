@@ -28,6 +28,9 @@
 # license as the Parrot interpreter.
 #
 
+sub print {op} (str s);
+sub sleep {op} (int n);
+sub str substr {op} (str s, int i, int l);
 
 const str CHARS = " .:,;!/>)|&IH%*#";
 const int DEPTH = 112;

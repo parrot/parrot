@@ -8,6 +8,9 @@
 # $Id$
 #
 
+sub print {op} (str s);
+sub num time {op} ();
+
 var num start_time;
 var num end_time;
 var num elapsed_time;

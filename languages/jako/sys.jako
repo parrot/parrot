@@ -1,0 +1,10 @@
+#
+# sys.jako
+#
+# System ops.
+#
+
+sub     print {op} (str a)
+sub int time  {op} ();
+sub num time  {op} ();
+

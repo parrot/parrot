@@ -17,6 +17,8 @@
 # $Id$
 #
 
+sub print {op} (str a);
+
 var int m, n, r;
 
 m = 96;

@@ -12,6 +12,8 @@
 # $Id$
 #
 
+sub print {op} (str s);
+
 const int n = 100;
 
 var   int i =   2;

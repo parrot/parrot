@@ -109,14 +109,49 @@ a list of identifiers, optionally followed by "B<=>" and an expression.
 
 =item * Subroutines
 
-B<sub> introduces a subroutine declaration (and definition). What follows
-is an optional type, and identifier (the name of the subroutine), and a
-list of formal arguments in parenthesis. The formal arguments are written
-as a comma-separated list of type-name pairs. Finally, there must be a
-block which contains the implementation of the subroutine.
+B<sub> introduces a subroutine declaration (and possibly definition). What
+follows is an optional type, and identifier (the name of the subroutine), an
+optional set of properties, and a list of formal arguments in parenthesis.
+The formal arguments are written as a comma-separated list of type-name pairs.
+Finally, there must be a block which contains the implementation of the
+subroutine.
+
+Simple cases of subroutine definitions are:
 
         sub foo() { ... }
         sub int bar(int x, int y) { ... }
+
+NOTE: This assumes some sort of Jako include mechanism.
+
+NOTE: The below requires C<jakoc> to be able to determine the best match among
+a number of alternatives with the same name, but different signatures.
+
+The B<op> property can have a string value that gives the op name, if it is
+different from the sub name. There is also an B<oplib> property that gives
+the oplib, if the op is not core.
+
+Presumably, there would be an implicit "use 'core'", that would pull in
+the definitions of the core ops as subs (if any).
+
+One wonders if this mechanism could be expanded to account for the
+arithmetic operators, etc.
+
+Also, if the Parrot .ops files could be processed to automatically
+produce the include files for the various categories of ops and subs.
+
+  sub num coversine { oplib = "obscure", op = "covers" } (num);
+
+  sub int BlitSurface { fnlib = "libsdl", fn = "SDL_BlitSurface" } (
+    obj { nat = "p" } src,
+    obj { nat = "p" } srcrect,
+    obj { nat = "p" } dst,
+    obj { nat = "p" } dstrect
+  );
+
+NOTE: The B<oplib>, B<fnlib> and B<fn> sub properties are not implemented yet.
+
+NOTE: Type properties are not impelmented yet.
+
 
 =item * Assignments
 

@@ -12,7 +12,7 @@
 use strict;
 use warnings;
 
-package Jako::Lexer::Token;
+package Jako::Token;
 
 
 #
@@ -49,10 +49,10 @@ sub new_eof
   return $class->new($file, $line, 'eof', undef, '__EOF__');
 }
 
-my $BOF = Jako::Lexer::Token->new_bof(undef, undef);
+my $BOF = Jako::Token->new_bof(undef, undef);
 sub BOF { return $BOF }
 
-my $EOF = Jako::Lexer::Token->new_eof(undef, undef);
+my $EOF = Jako::Token->new_eof(undef, undef);
 sub EOF { return $EOF }
 
 
@@ -60,8 +60,18 @@ sub EOF { return $EOF }
 # ACCESSORS:
 #
 
-sub file { return shift->{FILE}; }
-sub line { return shift->{LINE}; }
+sub file
+{
+  my $self = shift;
+  return defined $self->{FILE} ? $self->{FILE} : '<NO FILE>';
+}
+
+sub line
+{
+  my $self = shift;
+  return defined $self->{LINE} ? $self->{LINE} : '';
+}
+
 sub kind { return shift->{KIND}; }
 sub type { return shift->{TYPE}; }
 sub text { return shift->{TEXT}; }

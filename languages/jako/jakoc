@@ -14,32 +14,37 @@
 use strict;
 
 use Carp;
+use Data::Dumper;
 
-use Jako::Compiler::Message; # $file, $line, $debug
-use Jako::Parser::Block;
-use Jako::Parser::Identifier;
+$Data::Dumper::Terse = 1;
+$Data::Dumper::Indent = 1;
+$Data::Dumper::Quotekeys = 0;
+
+#use Jako::Construct::Block;
+#use Jako::Construct::Identifier;
+#use Jako::Construct::Declaration::Constant;
+
 use Jako::Lexer;
-
-our @CARP_NOT = qw(Jako::Compiler::Message);
+use Jako::Parser;
+use Jako::Compiler;
 
 use FileHandle;
 
-$debug = 1;
+my $lexer    = Jako::Lexer->new;
+my $parser   = Jako::Parser->new;
+my $compiler = Jako::Compiler->new;
 
-$|++ if $debug;
-
-use Data::Dumper;
-$Data::Dumper::Useqq  = 1;
-$Data::Dumper::Terse  = 1;
-$Data::Dumper::Indent = 0;
+$lexer->debug(1);
+$parser->debug(1);
+$compiler->debug(1);
 
 use Getopt::Std;
 
 my %opts;
-getopts('t', \%opts);
+getopts('ctT', \%opts);
 
 die "$0: usage: $0 <source>\n" unless @ARGV == 1;
-$file = shift @ARGV;
+$compiler->file(shift @ARGV);
 
 
 #
@@ -101,7 +106,7 @@ my $anon_block_count = 0;
 my $block_count      = 0;
 my @block_stack;
 
-my $root_block = Jako::Parser::Block->new(
+my $root_block = Jako::Construct::Block->new(
   undef,  # No parent
   'file', # File scope
   undef,  # No return type
@@ -271,172 +276,6 @@ my $t_ident   = qr{[A-Za-z][A-Za-z0-9_]*};
 my $t_integer = qr{-?\d+};
 my $t_string  = qr{\"[^\\\"]*(?:\\.[^\\\"]*)*\"};
 my $t_number  = qr{-?\d+\.\d+};
-
-
-###############################################################################
-###############################################################################
-##
-## Assembly Code Output
-##
-###############################################################################
-###############################################################################
-
-
-#
-# push_label()
-#
-# Used to push a label onto a stack of labels that will get
-# printed at the beginning of the next emit_code() call.
-#
-# Actually, pushes as many labels as there are arguments.
-#
-
-my @label_stack = ( );
-
-sub push_label
-{
-  push @label_stack, grep { defined $_ and $_ ne '' } @_;
-}
-
-
-#
-# push_comment()
-#
-# Used to push a comment onto a stack of comments that will get
-# printed at the beginning of the next emit_code() call.
-#
-# Actually, pushes as many comments as there are arguments.
-#
-
-my @comment_stack = ( );
-
-sub push_comment
-{
-  push @comment_stack, grep { defined $_ and $_ ne '' } @_;
-}
-
-
-#
-# push_source()
-#
-# Used to push source code comments. This allows them to be
-# indented.
-#
-
-sub push_source
-{
-  my $block_indent = '  ' x block_depth();
-  push_comment map { $block_indent . $_ } @_;
-}
-
-
-#
-# emit_code()
-#
-# emit_code LABEL
-# emit_code LABEL OP
-# emit_code LABEL OP ARGS
-# emit_code LABEL OP ARGS COMMENT
-#
-# Label can be undef.
-#
-
-my $last_op = 'noop';
-
-sub emit_code
-{
-  my ($op, $args, $comment) = @_;
-
-  #
-  # Incorporate any comments into the comment stack:
-  #
-
-  push_comment($comment) if defined $comment and $comment ne '';
-  $comment = undef;
-
-  #
-  # Complain about any undefined arguments:
-  #
-
-  if (defined $args and grep { !defined $_ } @$args) {
-    INTERNAL_ERROR("Undefined arguments to emit_code()!");
-    return;
-  }
-
-  #
-  # Print out all but the last comment, each on a line by itself:
-  #
-  # NOTE: As of 2001-09-20, the assembler doesn't handle lines with
-  # only a label and a comment. So, we write these out separately.
-  #
-
-  $comment = pop @comment_stack if @comment_stack;
-
-  foreach my $comment (@comment_stack) {
-    printf "%-16s %-8s %-25s # %s\n", '', '', '', $comment;
-  }
-
-  @comment_stack = ( );
-
-  #
-  # Print out all but the last label, each on a line by itself:
-  #
-
-#  my $label = pop @label_stack if @label_stack;
-  my $label = undef;
-
-  foreach my $label (@label_stack) {
-    print "$label:\n";
-  }
-
-  @label_stack = ( );
-
-  #
-  # Print out the label for the actual code line (if any):
-  #
-
-  if (defined $label and $label ne '') {
-    printf "%-16s ", "$label:";
-  } else {
-    printf "%-16s ", '';
-  }
-
-  #
-  # Print out the op mnemonic, if any:
-  #
-
-  if (defined $op) {
-    printf "%-8s", $op;
-    $last_op = $op;
-  } else {
-    printf "%-8s", '';
-  }
-
-  #
-  # Print out the arguments, if any:
-  #
-
-  if (defined $args and @$args) {
-    printf " %-25s", join(", ", map { s/^\$//; $_ } @$args);
-  } else {
-    printf " %-25s", '';
-  }
-
-  #
-  # Print out the comment, if any:
-  #
-
-  if (defined $comment) {
-    printf(" # %s", $comment) if defined $comment;
-  }
-
-  #
-  # End the line like a good text generator:
-  #
-
-  print "\n";
-}
-
 
 ###############################################################################
 ###############################################################################
@@ -689,9 +528,9 @@ sub op_comp
 
   if (int_or_num_lit_q($a) and int_or_num_lit_q($b)) {
     if (&{$comp_ops{$op}}($a, $b)) {
-      emit_code('branch', [$true]);
+      $compiler->emit_code('branch', [$true]);
     } else {
-      emit_code('branch', [$false]);
+      $compiler->emit_code('branch', [$false]);
     }
 
     return;
@@ -724,7 +563,7 @@ sub op_comp
 
     if ($a_type eq 'I' and num_q($b)) {
       my $temp = temp_num();
-      emit_code('set', [$temp, $a]);
+      $compiler->emit_code('set', [$temp, $a]);
       $a = $temp;
     }
   } else {
@@ -735,11 +574,11 @@ sub op_comp
     if ($a_type ne $b_type) {
       if ($a_type eq 'I') {
         my $temp = temp_num();
-        emit_code('set', [$temp, $a]);
+        $compiler->emit_code('set', [$temp, $a]);
         $a = $temp;
       } elsif ($b_type eq 'I') {
         my $temp = temp_num();
-        emit_code('set', [$temp, $b]);
+        $compiler->emit_code('set', [$temp, $b]);
         $b = $temp;
       } else {
         INTERNAL_ERROR("Expected to have to use iton op.");
@@ -752,9 +591,9 @@ sub op_comp
   #
 
   if (defined $true) {
-    emit_code($op, [$a, $b, $true]);
+    $compiler->emit_code($op, [$a, $b, $true]);
     if (defined $false) {
-      emit_code('branch', [$false]);
+      $compiler->emit_code('branch', [$false]);
     }
   } else {
     if (defined $false) {
@@ -763,138 +602,6 @@ sub op_comp
       INTERNAL_ERROR("op_comp called without any destinations!");
     }
   }
-}
-
-
-#
-# op_eq()
-#
-# Handle a 'eq' op. This includes pseudo-ops for cases that aren't covered in
-# by Parrot, such as comparing a register to constant.
-#
-# eq_i_i    # TRUE op
-# eq_i_ic   # PSEUDO op
-# eq_ic_i   # PSEUDO op
-# eq_ic_ic  # OPTIMIZED to non-conditional branch
-#
-# TODO: Handle numeric and string comparisons
-#
-
-sub op_eq
-{
-  my ($label, $a, $b, $le, $gt) = @_;
-  push_label($label);
-  op_comp(undef, 'eq', $a, $b, $le, $gt);
-}
-
-
-#
-# op_ne()
-#
-# Handle a 'ne' op. This includes pseudo-ops for cases that aren't covered in
-# by Parrot, such as comparing a register to constant.
-#
-# ne_i_i    # TRUE op
-# ne_i_ic   # PSEUDO op
-# ne_ic_i   # PSEUDO op
-# ne_ic_ic  # OPTIMIZED to non-conditional branch
-#
-# TODO: Handle numeric and string comparisons
-#
-
-sub op_ne
-{
-  my ($label, $a, $b, $le, $gt) = @_;
-  push_label($label);
-  op_comp(undef, 'ne', $a, $b, $le, $gt);
-}
-
-
-#
-# op_le()
-#
-# Handle a 'le' op. This includes pseudo-ops for cases that aren't covered in
-# by Parrot, such as comparing a register to constant.
-#
-# le_i_i    # TRUE op
-# le_i_ic   # PSEUDO op
-# le_ic_i   # PSEUDO op
-# le_ic_ic  # OPTIMIZED to non-conditional branch
-#
-# TODO: Handle numeric and string comparisons
-#
-
-sub op_le
-{
-  my ($label, $a, $b, $le, $gt) = @_;
-  push_label($label);
-  op_comp(undef, 'le', $a, $b, $le, $gt);
-}
-
-
-#
-# op_lt()
-#
-# Handle a 'lt' op. This includes pseudo-ops for cases that aren't covered in
-# by Parrot, such as comparing a register to constant.
-#
-# lt_i_i    # TRUE op
-# lt_i_ic   # PSEUDO op
-# lt_ic_i   # PSEUDO op
-# lt_ic_ic  # OPTIMIZED to non-conditional branch
-#
-# TODO: Handle numeric and string comparisons
-#
-
-sub op_lt
-{
-  my ($label, $a, $b, $le, $gt) = @_;
-  push_label($label);
-  op_comp(undef, 'lt', $a, $b, $le, $gt);
-}
-
-
-#
-# op_ge()
-#
-# Handle a 'ge' op. This includes pseudo-ops for cases that aren't covered in
-# by Parrot, such as comparing a register to constant.
-#
-# ge_i_i    # TRUE op
-# ge_i_ic   # PSEUDO op
-# ge_ic_i   # PSEUDO op
-# ge_ic_ic  # OPTIMIZED to non-conditional branch
-#
-# TODO: Handle numeric and string comparisons
-#
-
-sub op_ge
-{
-  my ($label, $a, $b, $le, $gt) = @_;
-  push_label($label);
-  op_comp(undef, 'ge', $a, $b, $le, $gt);
-}
-
-
-#
-# op_gt()
-#
-# Handle a 'gt' op. This includes pseudo-ops for cases that aren't covered in
-# by Parrot, such as comparing a register to constant.
-#
-# gt_i_i    # TRUE op
-# gt_i_ic   # PSEUDO op
-# gt_ic_i   # PSEUDO op
-# gt_ic_ic  # OPTIMIZED to non-conditional branch
-#
-# TODO: Handle numeric and string comparisons
-#
-
-sub op_gt
-{
-  my ($label, $a, $b, $le, $gt) = @_;
-  push_label($label);
-  op_comp(undef, 'gt', $a, $b, $le, $gt);
 }
 
 
@@ -967,13 +674,13 @@ sub declare_var
   # and then we link the register to the identifier and the block.
   #
 
-  $ident = Jako::Parser::Identifier->new(
+  $ident = Jako::Construct::Identifier->new(
     $block,
     $access,
     $type,
     $name,
-    $file,
-    $line,
+    $compiler->file,
+    $compiler->line,
     "\$$name"     # IMCC Name
   );
 
@@ -986,106 +693,20 @@ sub declare_var
   my $imcc_type = $imcc_type_name{$type};
 
   if ($access eq 'arg') {
-    push_comment "(argument " . $name . ")";
-    emit_code '.param', [ "$imcc_type $name" ];
+    $compiler->push_comment("(argument " . $name . ")");
+    $compiler->emit_code('.param', [ "$imcc_type $name" ]);
   }
   elsif ($access eq 'const') {
-    push_source "const $type_name{$type} $name = ...";
-    emit_code(".local", [ "$imcc_type $name" ]); # TODO: A better IMCC way?
+    $compiler->push_source("const $type_name{$type} $name = ...");
+    $compiler->emit_code(".local", [ "$imcc_type $name" ]); # TODO: A better IMCC way?
   }
   elsif ($access eq 'var') {
-    push_source "var $type_name{$type} $name;";
-    emit_code(".local", [ "$imcc_type $name" ]);
+    $compiler->push_source("var $type_name{$type} $name;");
+    $compiler->emit_code(".local", [ "$imcc_type $name" ]);
   }
   else {
     INTERNAL_ERROR("Unrecognized access '$access' for identifier '$name'");
   }
-
-  return 1;
-}
-
-
-#
-# declare_const()
-#
-
-sub declare_const
-{
-  my ($name, $type, $value) = @_;
-
-  #
-  # Check for a few bad conditions.
-  #
-  # NOTE: These are compiler internal consistency checks. They really should not be
-  # triggered in normal operation, even with bad source code as input.
-  #
-
-  my $type_name = $type_name{$type};
-
-  INTERNAL_ERROR("Constant definition involves undefined type code!")
-    unless defined $type;
-
-  INTERNAL_ERROR("Constant definition involves undefined type name!")
-    unless defined $type_name;
-
-  INTERNAL_ERROR("Constant definition involves undefined constant name!")
-    unless defined $name;
-
-  INTERNAL_ERROR("Constant definition involves undefined value!")
-    unless defined $value;
-
-  #
-  # Lookup the identifier:
-  #
-  # NOTE: This lookup doesn't give the info itself, but rather a hashref with
-  # the LEVELS away the definition was found, and IDENT with the actual info
-  # about the identifier.
-  #
-
-  my $block = current_block();
-
-  my $ident = $block->find_identifier($name);
-
-  #
-  # If the identifier is already defined at this lexical scope, we want to complain
-  # about the redefinition. Otherwise, we assume the programmer wanted to shadow the
-  # previous definition.
-  #
-
-  if (defined $ident and $ident->block eq $block) {
-    SYNTAX_ERROR("Redeclaration of identifier '%s'. Previous declaration on line %d.",
-      $name, $ident->line);
-  }
-
-  #
-  # Now that we've decided to actually declare the constant, we will place its
-  # definition into the block at the top of the block stack. We fill in the
-  # IDENT entry within the block.
-  #
-
-  $ident = Jako::Parser::Identifier->new(
-    $block,
-    'const',
-    $type,
-    $name,
-    $file,
-    $line
-  );
-
-  $block->identifier($name, $ident);
-
-  #
-  # Push the source comment about the constant definition and
-  # emit the code to assign a value.
-  #
-
-  push_source "const $type_name $name = $value;";
-
-  my %imcc_types = ( I => 'int', N => 'float', P => 'PMC', S => 'string');
-  my $imcc_type = $imcc_types{$type};
-
-  emit_code(".local", [ "$imcc_type $name" ]);
-  emit_code("$name =", [ $value ]);
 
   return 1;
 }
@@ -1139,7 +760,7 @@ sub assign_var
   # Remember the source code:
   #
 
-  push_source "$name = $value;";
+  $compiler->push_source("$name = $value;");
 
   #
   # Handle var-const (for manifest constants) assignments:
@@ -1150,7 +771,7 @@ sub assign_var
   #
 
   if ($ident->type eq $type or (($ident->type eq 'N' or $ident->type eq 'I') and ($type eq 'N' or $type = 'I'))) {
-    emit_code("$name =", [ $value ]);
+    $compiler->emit_code("$name =", [ $value ]);
     return;
   }
 
@@ -1178,7 +799,7 @@ sub assign_var
   #
 
   if ($ident->type eq $value_ident->type) {
-    emit_code("$name =", [ $value_ident->name ]);
+    $compiler->emit_code("$name =", [ $value_ident->name ]);
     return;
   }
 
@@ -1187,9 +808,9 @@ sub assign_var
   #
 
   if ($ident->type eq "N" and $value_ident->type eq "I") {
-    emit_code("$name =", [ $value_ident->name ]);
+    $compiler->emit_code("$name =", [ $value_ident->name ]);
   } elsif ($ident->type eq "I" and $value_ident->type eq "N") {
-    emit_code("$name =", [ $value_ident->name ]);
+    $compiler->emit_code("$name =", [ $value_ident->name ]);
   } else {
     SYNTAX_ERROR("Cannot assign type '%s' to type '%s'.", $value_ident->type, $ident->type);
   }
@@ -1248,13 +869,13 @@ sub new_obj
   # Remember the source code:
   #
 
-  push_source "$ident = new $class";
+  $compiler->push_source("$ident = new $class");
 
   #
   # Emit the new code:
   #
 
-  emit_code('new', [$ident_info->{VALUE}, $class]);
+  $compiler->emit_code('new', [$ident_info->{VALUE}, $class]);
 
   return;
 }
@@ -1327,16 +948,16 @@ sub void_func
 {
   my ($name, @args) = @_;
 
-  push_source "$name(...);";
+  $compiler->push_source("$name(...);");
 
   @args = map { str_lit_q($_) ? interpolate_string($_) : $_ } @args;
 
   if ($name eq 'print') {
     foreach my $arg (@args) {
-      emit_code('print', [$arg]);
+      $compiler->emit_code('print', [$arg]);
     }
   } elsif ($name eq 'sleep') {
-    emit_code('sleep', [ shift @args ]); # TODO: Really need to complain if > 1 arg.
+    $compiler->emit_code('sleep', [ shift @args ]); # TODO: Really need to complain if > 1 arg.
   } elsif (exists $subs{$name}) {
     #
     # First, we make sure everything is in order for the call:
@@ -1353,10 +974,10 @@ sub void_func
     #
 
     foreach my $arg (reverse @args) {
-      emit_code('.arg', [ $arg ]);
+      $compiler->emit_code('.arg', [ $arg ]);
     }
 
-    emit_code "call", [ "_$name" ];
+    $compiler->emit_code("call", [ "_$name" ]);
 
   } else {
     SYNTAX_ERROR("Call to unrecognized void function '%s' (Not in {%s}).",
@@ -1373,12 +994,12 @@ sub assign_func
 {
   my ($dest, $name, @args) = @_;
 
-  push_source "$dest = $name(" . join(", ", @args) . ");";
+  $compiler->push_source("$dest = $name(" . join(", ", @args) . ");");
 
 #  ($dest, @args) = map_args($dest, @args);
 
   if ($assign_funcs{$name}) {
-    emit_code($name, [$dest, @args]);
+    $compiler->emit_code($name, [$dest, @args]);
   } elsif (exists $subs{$name}) {
     #
     # First, we make sure everything is in order for the call:
@@ -1405,21 +1026,21 @@ sub assign_func
     #
 
     foreach my $arg (reverse @args) {
-      emit_code('.arg', [ $arg ]);
+      $compiler->emit_code('.arg', [ $arg ]);
     }
 
     #
     # Now, we can jump to the subroutine's entry point:
     #
 
-    emit_code('call', [ "_$name" ]);
+    $compiler->emit_code('call', [ "_$name" ]);
 
     #
     # Our calling convention dictates that upon return from the subroutine,
     # the result will be on the top of the stack.
     #
 
-    emit_code('.result', [ $dest ]);
+    $compiler->emit_code('.result', [ $dest ]);
   } else {
     SYNTAX_ERROR("Call to unrecognized assign function '%s' (Not in {%s}).",
       $name, join(", ", sort keys %assign_funcs));
@@ -1448,14 +1069,14 @@ sub begin_cond_block
 #  my $redo   = $block_types{$type}{REDO};
 #  my $last   = $block_types{$type}{LAST};
 
-  push_source "$prefix: $type ($left $op $right) {";
+  $compiler->push_source("$prefix: $type ($left $op $right) {");
 
-  push_label "${prefix}_" . uc $type;
+  $compiler->push_label("${prefix}_" . uc $type);
 
   if ($type eq 'while') {
-    push_label "${prefix}_NEXT";
+    $compiler->push_label("${prefix}_NEXT");
   } elsif ($type eq 'if') {
-    push_label "${prefix}_TEST";
+    $compiler->push_label("${prefix}_TEST");
   } else {
     INTERNAL_ERROR("Unrecognized conditional block type '$type'");
   }
@@ -1466,7 +1087,7 @@ sub begin_cond_block
     op_comp($type, $op, $left, $right, undef, "${prefix}_ELSE");
   }
 
-  push_label "${prefix}_REDO";
+  $compiler->push_label("${prefix}_REDO");
 }
 
 
@@ -1482,7 +1103,7 @@ sub begin_sub_block
   # Flush any pending comments or labels.
   #
 
-  emit_code();
+  $compiler->emit_code();
 
   #
   # Generate the source code comment for the assembly listing.
@@ -1491,9 +1112,9 @@ sub begin_sub_block
   my $arg_source = join(', ', map({ join(' ', @$_) } @formal_args));
 
   if (defined $return_type) {
-    push_source "sub $type_name{$return_type} $name ($arg_source) {";
+    $compiler->push_source("sub $type_name{$return_type} $name ($arg_source) {");
   } else {
-    push_source "sub $name ($arg_source) {";
+    $compiler->push_source("sub $name ($arg_source) {");
   }
 
   #
@@ -1509,16 +1130,18 @@ sub begin_sub_block
   # subroutine definitions just like Perl.
   #
 
-  push_label "${name}_BEFORE";
-  emit_code 'branch', [ "${name}_AFTER" ];
+#  $compiler->push_label("${name}_BEFORE");
+#  $compiler->emit_code('branch', [ "${name}_AFTER" ]);
+
+  $compiler->emit_code('.sub', [ "_$name" ]);
 
   #
   # Here we have the actual subroutine entry point:
   #
 
-  push_label "_$name";
-  push_label "${name}_ENTER";
-  emit_code();
+#  $compiler->push_label("_$name");
+  $compiler->push_label("${name}_ENTER");
+  $compiler->emit_code("saveall");
 
   #
   # Record the subroutine information.
@@ -1528,7 +1151,7 @@ sub begin_sub_block
   #
 
   $subs{$name} = {
-    LINE   => $line,
+    LINE   => $compiler->line,
     RETURN => $return_type,
     ARGS   => \@formal_args
   };
@@ -1582,7 +1205,7 @@ sub begin_block
   if (defined $prefix) {
     if ($block_names{$prefix} and $kind ne 'sub') {
       SYNTAX_ERROR("Loop named '%s' already defined at line %d (previously defined at line %d)!",
-        $prefix, $line, $block_names{$prefix});
+        $prefix, $compiler->line, $block_names{$prefix});
     }
   } else {
     INTERNAL_ERROR("Undefined prefix for $kind blocks")
@@ -1591,11 +1214,11 @@ sub begin_block
     $prefix = $block_types{$kind}{PREFIX} . "$block_count";
   }
 
-  $block_names{$prefix} = $line;
+  $block_names{$prefix} = $compiler->line;
 
   my $parent = current_block();
 
-  my $block = Jako::Parser::Block->new(
+  my $block = Jako::Construct::Block->new(
     $parent,
     $kind,
     $type,
@@ -1604,7 +1227,7 @@ sub begin_block
 
   push_block($block);
 
-  emit_code(".namespace", [ $kind eq 'sub' ? "_$prefix" : $prefix ]);
+  $compiler->emit_code(".namespace", [ $kind eq 'sub' ? "_$prefix" : $prefix ]);
 
   if ($kind eq 'if') {
     begin_cond_block($block, $prefix, $kind, $left, $op, $right);
@@ -1669,19 +1292,19 @@ sub end_block
       if (defined $block->cont) {
         SYNTAX_ERROR("No more than one continue block allowed.");
       } else {
-        $block->cont($line);
+        $block->cont($compiler->line);
       }
 
-      push_label "${prefix}_CONT";
-      push_source "} continue {";
+      $compiler->push_label("${prefix}_CONT");
+      $compiler->push_source("} continue {");
 
       push_block($block);        # Push it back on for a minute...
       undef $block;              # ... and forget about it.
     } else {
-      push_source "}";
-      push_label "${prefix}_CONT" unless defined $block->cont;
-      emit_code('branch', ["${prefix}_NEXT"]);
-      push_label "${prefix}_LAST";
+      $compiler->push_source("}");
+      $compiler->push_label("${prefix}_CONT") unless defined $block->cont;
+      $compiler->emit_code('branch', ["${prefix}_NEXT"]);
+      $compiler->push_label("${prefix}_LAST");
     }
   }
 
@@ -1697,12 +1320,12 @@ sub end_block
       if (defined $block->else) {
         SYNTAX_ERROR("No more than one else block allowed.");
       } else {
-        $block->else($line);
+        $block->else($compiler->line);
       }
 
-      emit_code("branch", [ "${prefix}_LAST" ]); # Jump over the 'else'.
-      push_label "${prefix}_ELSE";
-      push_source "} else {";
+      $compiler->emit_code("branch", [ "${prefix}_LAST" ]); # Jump over the 'else'.
+      $compiler->push_label("${prefix}_ELSE");
+      $compiler->push_source("} else {");
 
       #
       # We push the block back onto the block stack, since we are
@@ -1718,10 +1341,10 @@ sub end_block
 
       push_block($block);
     } else {
-      push_source "}";
-      emit_code();
-      push_label "${prefix}_ELSE" unless defined $block->{ELSE};
-      push_label "${prefix}_LAST";
+      $compiler->push_source("}");
+      $compiler->emit_code();
+      $compiler->push_label("${prefix}_ELSE") unless defined $block->{ELSE};
+      $compiler->push_label("${prefix}_LAST");
     }
   }
 
@@ -1730,8 +1353,8 @@ sub end_block
   #
 
   elsif ($block->kind eq 'sub') {
-    push_source "}";
-    push_label "${prefix}_LEAVE";
+    $compiler->push_source("}");
+    $compiler->push_label("${prefix}_LEAVE");
 
     #
     # TODO: Complain if we haven't seen 'return' statement in a
@@ -1743,10 +1366,12 @@ sub end_block
     # Now, actually return.
     #
 
-    emit_code "ret", [ ];
+    $compiler->emit_code("restoreall");
+    $compiler->emit_code("ret", [ ]);
 
-    push_label "${prefix}_AFTER";
-#    emit_code('noop'); # XXX: Needed by IMCC
+    $compiler->push_label("${prefix}_AFTER");
+#    $compiler->emit_code('noop'); # XXX: Needed by IMCC
+    $compiler->emit_code('.end');
   }
 
   #
@@ -1763,10 +1388,10 @@ sub end_block
   #
 
   if (defined $block) {
-    emit_code(".endnamespace", [ $block->kind eq 'sub' ? "_$prefix" : $prefix ]);
+    $compiler->emit_code(".endnamespace", [ $block->kind eq 'sub' ? "_$prefix" : $prefix ]);
  
     if ($continue) { # Reopen the namespace for 'else'
-      emit_code(".namespace", [ $block->kind eq 'sub' ? "_$prefix" : $prefix ]);
+      $compiler->emit_code(".namespace", [ $block->kind eq 'sub' ? "_$prefix" : $prefix ]);
     }
   }
 }
@@ -1804,7 +1429,7 @@ sub do_loop_control
       SYNTAX_ERROR("No loop active in loop control.");
     }
 
-    emit_code('err');
+    $compiler->emit_code('err');
   }
 
   $block = $block->{BLOCK};
@@ -1817,9 +1442,9 @@ sub do_loop_control
   my $which  = $block_types{$type}{uc $control_op};
 
   if (defined $cond) {
-    push_source "$control_op ${prefix} $cond ($left $test $right)";
+    $compiler->push_source("$control_op ${prefix} $cond ($left $test $right)");
   } else {
-    push_source "$control_op ${prefix}";
+    $compiler->push_source("$control_op ${prefix}");
   }
 
   if (defined $block->{CONT} and $control_op eq 'next') {
@@ -1829,7 +1454,7 @@ sub do_loop_control
   my $label = "${prefix}_$which";
 
   if (!defined $cond) {
-    emit_code('branch', [ $label ]);
+    $compiler->emit_code('branch', [ $label ]);
   } else {
     op_comp $cond, $test, $left, $right, $label, undef;
   }
@@ -1847,9 +1472,9 @@ sub do_return
   my $arg_type = defined $arg ? type_of($arg) : undef;
 
   if (defined $arg) {
-    push_source "return $arg";
+    $compiler->push_source("return $arg");
   } else {
-    push_source "return";
+    $compiler->push_source("return");
   }
 
   #
@@ -1902,7 +1527,7 @@ sub do_return
   #
 
   if (defined $return) {
-     emit_code('.return', [ $arg ]);
+     $compiler->emit_code('.return', [ $arg ]);
   }
 
   #
@@ -1910,7 +1535,7 @@ sub do_return
   # actually complete the return portion of the calling convention lives.
   #
 
-  emit_code('branch', ["${prefix}_LEAVE"]);
+  $compiler->emit_code('branch', ["${prefix}_LEAVE"]);
 }
 
 
@@ -1931,7 +1556,7 @@ sub do_arith
 {
   my ($dest, $a, $op, $b) = @_;
 
-  push_source "$dest = $a $op $b;";
+  $compiler->push_source("$dest = $a $op $b;");
 
   #
   # Determine the type to use to calculate the result:
@@ -1953,13 +1578,13 @@ sub do_arith
   
   if (type_of($a) ne $calc_type) {
     my $temp = temp_reg($calc_type);
-    emit_code('set', [$temp, $a]);
+    $compiler->emit_code('set', [$temp, $a]);
     $a = $temp;
   }
   
   if (type_of($b) ne $calc_type) {
     my $temp = temp_reg($calc_type);
-    emit_code('set', [$temp, $b]);
+    $compiler->emit_code('set', [$temp, $b]);
     $b = $temp;
   }
 
@@ -1968,12 +1593,12 @@ sub do_arith
   #
 
   if ($dest_type eq $calc_type) {
-    emit_code("$dest =", [ "$a $op $b" ]);
+    $compiler->emit_code("$dest =", [ "$a $op $b" ]);
   }
   else {
     my $temp = temp_reg($calc_type);
-    emit_code("$temp =", [ "$a $op $b" ]);
-    emit_code("$dest =", [ "$temp" ]);
+    $compiler->emit_code("$temp =", [ "$a $op $b" ]);
+    $compiler->emit_code("$dest =", [ "$temp" ]);
   }
 }
 
@@ -2001,64 +1626,14 @@ sub do_inc
 
   if (defined $amount) {
     if (int_q($amount)) {
-      push_source "$dest += $amount;";
-#      ($dest, $amount) = map_args($dest, $amount);
-      emit_code('add', [$dest, $amount]);
+      $compiler->push_source("$dest += $amount;");
+      $compiler->emit_code('add', [$dest, $amount]);
     } else {
       do_add($dest, $dest, $amount);
     }
   } else {
-    push_source "$dest++;";
-#    ($dest, $amount) = map_args($dest);
-    emit_code('inc', [$dest]);
-  }
-}
-
-
-#
-# do_sub()
-#
-
-sub do_sub
-{
-  my ($dest, $a, $b) = @_;
-
-  push_source "$dest = $a - $b;";
-
-  ($dest, $a, $b) = map_args($dest, $a, $b);
-
-  if (int_or_num_lit_q($a)) {
-    if (int_or_num_lit_q($b)) {
-      my $temp = $a - $b;
-      $temp .= ".0" if (num_q($a) or num_q($b)) and not $temp =~ m/\./;
-      emit_code('set', [$dest, $temp]);
-    } elsif (reg_q($b) or var_q($b)) {
-      if ($dest eq $b && int_q($a)) {
-        emit_code('sub', [$dest, $a]);
-      } else {
-        my $temp = int_q($a) ? temp_int() : temp_num();
-        emit_code('set', [$temp, $a]);
-        emit_code('sub', [$dest, $temp, $b]);
-      }
-    } else {
-      SYNTAX_ERROR("Can't determine type of '$b' in subtraction.");
-    }
-  } elsif (reg_q($a) or var_q($a)) {
-    if (int_or_num_lit_q($b)) {
-      if ($dest eq $a && int_q($b)) {
-        emit_code('sub', [$dest, $b]);
-      } else {
-        my $temp = int_q($b) ? temp_int() : temp_num();
-        emit_code('set', [$temp, $b]);
-        emit_code('sub', [$dest, $a, $temp]);
-      }
-    } elsif (reg_q($b) or var_q($b)) {
-      emit_code('sub', [$dest, $a, $b]);
-    } else {
-      SYNTAX_ERROR("Can't determine type of '$b' in subtraction.");
-    }
-  } else {
-    SYNTAX_ERROR("Can't determine type of '$a' in subtraction.");
+    $compiler->push_source("$dest++;");
+    $compiler->emit_code('inc', [$dest]);
   }
 }
 
@@ -2073,158 +1648,14 @@ sub do_dec
 
   if (defined $amount) {
     if (int_q($amount)) {
-      push_source "$dest -= $amount;";
-#      ($dest, $amount) = map_args($dest, $amount);
-      emit_code('sub', [$dest, $amount]);
+      $compiler->push_source("$dest -= $amount;");
+      $compiler->emit_code('sub', [$dest, $amount]);
     } else {
-      do_sub($dest, $dest, $amount);
+      do_arith($dest, $dest, '-', $amount);
     }
   } else {
-    push_source "$dest--;";
-#    ($dest, $amount) = map_args($dest);
-    emit_code('dec', [$dest]);
-  }
-}
-
-
-#
-# do_mul()
-#
-
-sub do_mul
-{
-  my ($dest, $a, $b) = @_;
-
-  push_source "$dest = $a * $b;";
-
-  ($dest, $a, $b) = map_args($dest, $a, $b);
-
-  if (int_or_num_lit_q($a)) {
-    if (int_or_num_lit_q($b)) {
-      my $temp = $a * $b;
-      $temp .= ".0" if (num_q($a) or num_q($b)) and not $temp =~ m/\./;
-      emit_code('set', [$dest, $temp]);
-    } elsif (reg_q($b) or var_q($b)) {
-      my $temp = int_q($a) ? temp_int() : temp_num();
-      emit_code('set', [$temp, $a]);
-      emit_code('mul', [$dest, $temp, $b]);
-    } else {
-      SYNTAX_ERROR("Can't determine type of '$b' in multiplication.");
-    }
-  } elsif (reg_q($a) or var_q($a)) {
-    if (int_or_num_lit_q($b)) {
-      my $temp = int_q($b) ? temp_int() : temp_num();
-      emit_code('set', [$temp, $b]);
-      emit_code('mul', [$dest, $a, $temp]);
-    } elsif (reg_q($b) or var_q($b)) {
-      emit_code('mul', [$dest, $a, $b]);
-    } else {
-      SYNTAX_ERROR("Can't determine type of '$b' in multiplication.");
-    }
-  } else {
-    SYNTAX_ERROR("Can't determine type of '$a' in multiplication.");
-  }
-}
-
-
-#
-# do_div()
-#
-
-sub do_div
-{
-  my ($dest, $a, $b) = @_;
-
-  push_source "$dest = $a / $b;";
-
-  ($dest, $a, $b) = map_args($dest, $a, $b);
-
-  my $dest_type = type_of($dest);
-  my $a_type    = type_of($a);
-  my $b_type    = type_of($b);
-
-  if ($dest_type ne $a_type) {
-    my $temp = temp_reg($dest_type);
-    emit_code('set', [$temp, $a]);
-    $a = $temp;
-    $a_type = $dest_type;
-  }
-
-  if ($dest_type ne $b_type) {
-    my $temp = int_q($dest) ? temp_int() : temp_num();
-    emit_code('set', [$temp, $b]);
-    $b = $temp;
-    $b_type = $dest_type;
-  }
-
-  #
-  # TODO: Should we really do the calculation in N if a or b is N,
-  # then convert that to I if dest is I?
-  #
-
-  if (int_or_num_lit_q($a)) {
-    if (int_or_num_lit_q($b)) {
-      my $temp = $a / $b;
-      $temp .= ".0" if (num_q($dest) and not $temp =~ m/\./);
-      emit_code('set', [$dest, $temp]);
-    } elsif (reg_q($b) or var_q($b)) {
-      emit_code('div', [$dest, $a, $b]);
-    } else {
-      SYNTAX_ERROR("Can't determine type of '$b' in division.");
-    }
-  } elsif (reg_q($a) or var_q($a)) {
-    if (int_or_num_lit_q($b)) {
-      emit_code('div', [$dest, $a, $b]);
-    } elsif (reg_q($b) or var_q($b)) {
-      emit_code('div', [$dest, $a, $b]);
-    } else {
-      SYNTAX_ERROR("Can't determine type of '$b' in division.");
-    }
-  } else {
-    SYNTAX_ERROR("Can't determine type of '$a' in division.");
-  }
-}
-
-
-#
-# do_mod()
-#
-# a =  b % c
-# a =  b % 4
-# a = 17 % c
-# a = 17 % 4
-#
-
-sub do_mod
-{
-  my ($dest, $a, $b) = @_;
-
-  push_source "$dest = $a % $b;";
-
-  ($dest, $a, $b) = map_args($dest, $a, $b);
-
-  if (int_lit_q($a)) {
-    if (int_lit_q($b)) {
-      emit_code('set', [$dest, $a % $b]);
-    } elsif (reg_q($b) or var_q($b)) {
-      my $temp = temp_int();
-      emit_code('set', [$temp, $a]);
-      emit_code('mod', [$dest, $temp, $b]);
-    } else {
-      SYNTAX_ERROR("Can't determine type of '$b' in modulo.");
-    }
-  } elsif (reg_q($a) or var_q($a)) {
-    if (int_lit_q($b)) {
-      my $temp = temp_int();
-      emit_code('set', [$temp, $b]);
-      emit_code('mod', [$dest, $a, $temp]);
-    } elsif (reg_q($b) or var_q($b)) {
-      emit_code('mod', [$dest, $a, $b]);
-    } else {
-      SYNTAX_ERROR("Can't determine type of '$b' in modulo.");
-    }
-  } else {
-    SYNTAX_ERROR("Can't determine type of '$a' in modulo.");
+    $compiler->push_source("$dest--;");
+    $compiler->emit_code('dec', [$dest]);
   }
 }
 
@@ -2236,7 +1667,7 @@ sub do_mod
 sub do_bit_and
 {
   my ($dest, $a, $b) = @_;
-  emit_code("band", [$dest, $a, $b]);
+  $compiler->emit_code("band", [$dest, $a, $b]);
 }
 
 
@@ -2247,7 +1678,7 @@ sub do_bit_and
 sub do_bit_or
 {
   my ($dest, $a, $b) = @_;
-  emit_code("bor", [$dest, $a, $b]);
+  $compiler->emit_code("bor", [$dest, $a, $b]);
 }
 
 
@@ -2259,7 +1690,7 @@ sub do_shift
 {
   my $dir = shift;
   my ($dest, $a, $amount) = @_;
-  emit_code("sh$dir", [$dest, $a, $amount]);
+  $compiler->emit_code("sh$dir", [$dest, $a, $amount]);
 }
 
 
@@ -2295,13 +1726,13 @@ sub interpolate_string
   $string = substr($string, 1, -1); # Without the surrounding double quotes.
 
   my $temp = temp_str();          # Allocate and clear a temporary string register
-  emit_code("set", [ $temp, '""' ]);
+  $compiler->emit_code("set", [ $temp, '""' ]);
 
   while (1) {
     last unless defined $string and
       $string =~ m/(^|^.*?[^\\])\$((([A-Za-z][A-Za-z0-9_]*)\b)|({[A-Za-z][A-Za-z0-9_]*}))(.*)$/;
 
-    emit_code("concat", [ $temp, '"' . $1 . '"' ])
+    $compiler->emit_code("concat", [ $temp, '"' . $1 . '"' ])
       if defined $1 and $1 ne '';
 
     my $interp = $2;
@@ -2309,46 +1740,19 @@ sub interpolate_string
 
     if (type_of($interp) ne 'S') {
       my $temp2 = temp_str();
-      emit_code("set", [ $temp2, $interp ]);
+      $compiler->emit_code("set", [ $temp2, $interp ]);
       $interp = $temp2;
     }
 
-    emit_code("concat", [ $temp, $interp ]);
+    $compiler->emit_code("concat", [ $temp, $interp ]);
 
     $string = $6;
   }
 
-  emit_code("concat", [ $temp, '"' . $string . '"' ])
+  $compiler->emit_code("concat", [ $temp, '"' . $string . '"' ])
     if defined $string and $string ne '';
 
   return $temp;
-}
-
-
-#
-# parse_args()
-#
-
-sub parse_args
-{
-  my ($args) = @_;
-  my @args;
-
-  while ($args ne '') {
-    $args =~ s/^\s+//;
-
-    if ($args =~ m/^(\"[^\\\"]*(?:\\.[^\\\"]*)*\")\s*(,\s*(.*))?$/) {
-      $args = $3 || '';
-      push @args, interpolate_string($1);
-    } elsif ($args =~ m/^([^,]+)\s*(,\s*(.*))?$/) {
-      push @args, $1;
-      $args = $3 || '';
-    } else {
-      SYNTAX_ERROR("Cannot parse argument list '$args'");
-    }
-  }
-
-  return @args;
 }
 
 
@@ -2365,9 +1769,7 @@ sub parse_args
 # Tokenize the input, and possibly dump the tokens.
 #
 
-my $lexer = Jako::Lexer->new;
-
-$lexer->scan_file($file);
+$lexer->scan_file($compiler->file);
 
 if ($opts{t}) {
   $lexer->dump;
@@ -2375,12 +1777,26 @@ if ($opts{t}) {
   exit 0;
 }
 
+$parser->tokens($lexer->tokens);
+my $root = $parser->parse();
+
+if ($opts{T}) {
+  print Dumper $root;
+  exit 0;
+}
+
+unless ($opts{c}) { # -c means "Check", like with Perl.
+  my $fh = FileHandle->new('>-');
+  $root->compile($fh);
+}
+
+exit 0;
 
 #
 # Compile.
 #
 
-emit_code('.sub', [ "__MODULE__" ]);
+#emit_code('.sub', [ "__MODULE__" ]);
 
 my $last_token = $lexer->at(-1);
 my $token      = $lexer->at(-1);
@@ -2398,7 +1814,7 @@ while(1) {
   #
 
   if ($token->is_label) {
-    push_label($token->text);
+    $compiler->push_label($token->text);
     next;
   }
 
@@ -2456,7 +1872,9 @@ while(1) {
         assign_var($ident, $type_code, $value) if defined $value;
       }
       elsif ($access eq 'const') {
-        declare_const($ident, $type_code, $value);
+        my $block = current_block();
+        my $const = Jako::Construct::Declaration::Constant->new($block, $ident, $type_code, $value);
+        $const->compile($compiler);
       }
       else {
         INTERNAL_ERROR("Unexpected data declaration access '$access'.");
@@ -2609,15 +2027,15 @@ while(1) {
     $lexer->require_semicolon;
 
     if ($op eq '<<=' or $op eq '>>=') {
-      push_source "$ident $op $value";
+      $compiler->push_source("$ident $op $value");
       do_bit_shift($op eq '<<=' ? 'l' : 'r', $ident, $ident, $value);
     }
     elsif ($op eq '|=') {
-      push_source "$ident |= $value";
+      $compiler->push_source("$ident |= $value");
       do_bit_or($ident, $ident, $value);
     }
     elsif ($op eq '&=') {
-      push_source "$ident |= $value";
+      $compiler->push_source("$ident |= $value");
       do_bit_and($ident, $ident, $value);
     }
     else {
@@ -2705,11 +2123,11 @@ while(1) {
       do_shift($op eq '<<' ? 'l' : 'r', $ident, $left, $right);
     }
     elsif ($op eq '&') {
-      push_source "$ident = $left \& $right";
+      $compiler->push_source("$ident = $left \& $right");
       do_bit_and($ident, $left, $right);
     }
     elsif ($op eq '|') {
-      push_source "$ident = $left | $right";
+      $compiler->push_source("$ident = $left | $right");
       do_bit_or($ident, $left, $right);
     }
     else {
@@ -2854,12 +2272,12 @@ while(1) {
     $lexer->require_semicolon;
 
     if ($cond) {
-      push_source "goto $target $cond ($left $op $right);";
+      $compiler->push_source("goto $target $cond ($left $op $right);");
       op_comp $cond, $op, $left, $right, $target, undef;
     }
     else {
-      push_source "goto $target;";
-      emit_code('branch', [ $target ]);
+      $compiler->push_source("goto $target;");
+      $compiler->emit_code('branch', [ $target ]);
     }
     
     next;
@@ -2986,16 +2404,16 @@ while(1) {
   #
 
   if (m/^end$/) {
-    emit_code('end');
+    $compiler->emit_code('end');
     next;
   }
 
   PARSE_ERROR("Unparsable line.");
 }
 
-emit_code('end') unless $last_op eq 'end';
+$compiler->emit_code('end') unless $compiler->last_op eq 'end';
 
-emit_code(".end");
+#$compiler->emit_code(".end");
 
 exit 0;
 

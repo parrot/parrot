@@ -16,6 +16,8 @@
 # license as the Parrot interpreter.
 #
 
+sub print {op} (str s);
+
 const num first_den =       1.0;
 const num last_den  = 1000000.0;
 

@@ -13,3 +13,9 @@ f = g = "Howdy";
 
 a = b;
 a = b = c;
+
+var int w, x, y, z;
+y = 42;
+z = 137;
+w, x = y, z;
+
