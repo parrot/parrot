@@ -80,7 +80,7 @@ GENERAL_H_FILES = $(INC)/config.h $(INC)/exceptions.h $(INC)/io.h $(INC)/op.h \
 	$(INC)/method_util.h $(INC)/list.h $(INC)/datatypes.h \
 	$(INC)/regfuncs.h $(INC)/string_funcs.h $(INC)/encoding.h \
 	$(INC)/chartype.h $(INC)/oplib.h $(INC)/sub.h $(INC)/unicode.h \
-	$(INC)/perltypes.h $(INC)/exit.h
+	$(INC)/perltypes.h $(INC)/exit.h $(INC)/nci.h
 
 ALL_H_FILES = $(GENERAL_H_FILES)
 
@@ -424,6 +424,9 @@ dataypes$(O) : $(GENERAL_H_FILES) dataypes.c
 exit$(O) : $(GENERAL_H_FILES) exit.c
 
 nci$(O) : $(GENERAL_H_FILES) exit.c
+
+nci.c : call_list.txt build_nativecall.pl
+	perl build_nativecall.pl call_list.txt
 
 #core_ops depends upon config.h so that it gets updated along with updates to config.h's version numbers
 core_ops.c $(INC)/oplib/core_ops.h : $(OPS_FILES) ops2c.pl lib/Parrot/OpsFile.pm lib/Parrot/Op.pm $(INC)/config.h

@@ -13,7 +13,9 @@ RESPONSIBLE_PARTIES
 TODO
 VERSION
 assemble.pl
+build_nativecall.pl
 byteorder.c
+call_list.txt
 chartype.c
 chartypes/unicode.c
 chartypes/usascii.c
