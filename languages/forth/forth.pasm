@@ -41,14 +41,6 @@
   inc .NestLevel
 .endm
 
-#.macro IncNestLevel
-#  inc .NestLevel
-#.endm
-
-#.macro DecNestLevel
-#  dec .NestLevel
-#.endm
-
 .constant IntStack      I31
 
 .constant TempNum	N16
@@ -307,12 +299,12 @@ InitializeCoreOps:
     # Arithmetic, Floating Point
     #
 
-# d>f
-# f>d
-# f+
-# f-
-# f*
-# f/
+    .AddCoreOp(D_to_F, "d>f")
+    .AddCoreOp(F_to_D, "f>d")
+    .AddCoreOp(Float_Add, "f+")
+    .AddCoreOp(Float_Sub, "f-")
+    .AddCoreOp(Float_Mul, "f*")
+    .AddCoreOp(Float_Div, "f/")
 # fnegate
 # fabs
 # fmax
@@ -1198,6 +1190,53 @@ Add_Cell:
     set .TempPMC, .TempInt
     set .CellPMC[.IntStack], .TempPMC
     branch DoneInterpretWord
+
+D_to_F:
+    .PopInt
+    set .NumStack, .IntStack
+    .PushNum
+    branch DoneInterpretWord
+
+F_to_D:
+    .PopNum
+    set .IntStack, .NumStack
+    .PushInt
+    branch DoneInterpretWord
+
+Float_Add:
+    .PopNum
+    set .TempNum, .NumStack
+    .PopNum
+    add .NumStack, .TempNum
+    .PushNum
+    branch DoneInterpretWord
+
+Float_Sub:
+    .PopNum
+    set .TempNum, .NumStack
+    .PopNum
+    sub .NumStack, .NumStack, .TempNum
+    .PushNum
+    branch DoneInterpretWord
+
+Float_Mul:
+    .PopNum
+    set .TempNum, .NumStack
+    .PopNum
+    mul .NumStack, .NumStack, .TempNum
+    .PushNum
+    branch DoneInterpretWord
+
+Float_Div:
+    .PopNum
+    set .TempNum, .NumStack
+    .PopNum
+    div .NumStack, .NumStack, .TempNum
+    .PushNum
+    branch DoneInterpretWord
+
+
+
 
 DoneInterpretWord:
     ret
