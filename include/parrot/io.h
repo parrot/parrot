@@ -17,15 +17,20 @@
 #if !defined(PARROT_IO_H_GUARD)
 #define PARROT_IO_H_GUARD
 
+#include <stdio.h>
+
 /* which OS are we on? (this should be moved into Configure-land) */
-#ifdef WIN32
-#  define PIO_OS_WIN32
+#ifdef MINIPARROT
+#  define PIO_OS_STDIO
 #else
-#  ifdef HAS_HEADER_UNISTD
-#    define PIO_OS_UNIX
+#  ifdef WIN32
+#    define PIO_OS_WIN32
 #  else
-#    define PIO_OS_STDIO
-#    include <stdio.h>
+#    ifdef HAS_HEADER_UNISTD
+#      define PIO_OS_UNIX
+#    else
+#      define PIO_OS_STDIO
+#    endif
 #  endif
 #endif
 
