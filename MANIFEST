@@ -1411,9 +1411,11 @@ languages/jako/lib/Jako/Compiler.pm
 languages/jako/lib/Jako/Construct.pm
 languages/jako/lib/Jako/Construct/Block.pm
 languages/jako/lib/Jako/Construct/Block/Conditional.pm
+languages/jako/lib/Jako/Construct/Block/Conditional/Else.pm
 languages/jako/lib/Jako/Construct/Block/Conditional/If.pm
 languages/jako/lib/Jako/Construct/Block/Conditional/Unless.pm
 languages/jako/lib/Jako/Construct/Block/Loop.pm
+languages/jako/lib/Jako/Construct/Block/Loop/Continue.pm
 languages/jako/lib/Jako/Construct/Block/Loop/Until.pm
 languages/jako/lib/Jako/Construct/Block/Loop/While.pm
 languages/jako/lib/Jako/Construct/Block/Sub.pm

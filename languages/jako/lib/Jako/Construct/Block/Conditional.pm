@@ -48,19 +48,30 @@ sub compile
 
   if ($kind eq 'unless') {
     $op = $inverted_ops{$op}; # Invert the sense for 'unless' conditionals.
+    $kind = 'if';
   }
 
-  print $fh "${prefix}_TEST:\n";
-  print $fh ".namespace $namespace\n";
-  print $fh "  if $left $op $right goto ${prefix}_ELSE\n";
-  print $fh "${prefix}_THEN:\n";
+  if ($kind eq 'if') {
+    print $fh "${prefix}_TEST:\n";
+    print $fh ".namespace $namespace\n";
+    print $fh "  if $left $op $right goto ${prefix}_ELSE\n";
+    print $fh "${prefix}_THEN:\n";
 
-  $self->SUPER::compile($fh);
+    $self->SUPER::compile($fh);
 
-  print $fh "  goto ${prefix}_LAST\n";
-  print $fh ".endnamespace $namespace\n";
-  print $fh "${prefix}_ELSE:\n"; # TODO: Handle else.
-  print $fh "${prefix}_LAST:\n";
+    print $fh "  goto ${prefix}_LAST\n";
+    print $fh ".endnamespace $namespace\n";
+    print $fh "${prefix}_ELSE:\n";
+  }
+  elsif ($kind eq 'else') {
+    print $fh ".namespace $namespace\n";
+
+    $self->SUPER::compile($fh);
+
+    print $fh "  goto ${prefix}_LAST\n";
+    print $fh ".endnamespace $namespace\n";
+    print $fh "${prefix}_LAST:\n";
+  }
 
   return 1;
 }

@@ -69,25 +69,43 @@ sub compile
   my $prefix    = $self->prefix;
   my $kind      = $self->kind;
 
-  my $left  = $self->left->value;
-  my $op    = $self->op;
-  my $right = $self->right->value;
+  my $left;
+  my $op;
+  my $right;
+
+  if ($kind eq 'while' or $kind eq 'until') {
+    $left  = $self->left->value;
+    $op    = $self->op;
+    $right = $self->right->value;
+  }
 
   if ($kind eq 'while') {
     $op = $inverted_ops{$op}; # Invert the sense for 'while' loops.
   }
 
-  print $fh "${prefix}_NEXT:\n";
-  print $fh ".namespace $namespace\n";
-  print $fh "  if $left $op $right goto ${prefix}_LAST\n";
-  print $fh "${prefix}_REDO:\n";
+  if ($kind eq 'while' or $kind eq 'until') {
+    print $fh "${prefix}_NEXT:\n";
+    print $fh ".namespace $namespace\n";
+    print $fh "  if $left $op $right goto ${prefix}_LAST\n";
+    print $fh "${prefix}_REDO:\n";
 
-  $self->SUPER::compile($fh);
+    $self->SUPER::compile($fh);
 
-  print $fh "${prefix}_CONT:\n";
-  print $fh "  goto ${prefix}_NEXT\n";
-  print $fh ".endnamespace $namespace\n";
-  print $fh "${prefix}_LAST:\n";
+    print $fh ".endnamespace $namespace\n";
+  }
+  elsif ($kind eq 'continue') {
+    print $fh "${prefix}_CONT:\n";
+    print $fh ".namespace $namespace\n";
+
+    $self->SUPER::compile($fh);
+
+    print $fh ".endnamespace $namespace\n";
+    print $fh "  goto ${prefix}_NEXT\n";
+    print $fh "${prefix}_LAST:\n";
+  }
+  else {
+    $self->INTERNAL_ERROR("Unrecognized kind of block '%s'", $kind);
+  }
 
   return 1;
 }

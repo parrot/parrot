@@ -18,9 +18,11 @@ use Carp;
 use base qw(Jako::Processor);
 
 use Jako::Construct::Block;
+use Jako::Construct::Block::Conditional::Else;
 use Jako::Construct::Block::Conditional::If;
 use Jako::Construct::Block::Conditional::Unless;
 use Jako::Construct::Block::Sub;
+use Jako::Construct::Block::Loop::Continue;
 use Jako::Construct::Block::Loop::Until;
 use Jako::Construct::Block::Loop::While;
 
@@ -236,32 +238,6 @@ sub find_block
 
   return undef;
 }
-
-
-###############################################################################
-###############################################################################
-##
-## Miscellany
-##
-###############################################################################
-###############################################################################
-
-=no
-
-my %subs;
-
-my %void_functions = (
-
-);
-
-
-my %assign_funcs = (
-  pow    => [ 'N',    2, '[IN][IN]' ],
-  substr => [ 'S',    3, 'SII'      ],
-);
-
-=cut
-
 
 =no
 
@@ -1109,6 +1085,8 @@ sub begin_sub_block
 }
 
 
+=no
+
 #
 # begin_block()
 #
@@ -1151,11 +1129,7 @@ sub begin_block
 
   $self->push_block($block);
 
-=no 
-
   $self->emit_code(".namespace", [ $kind eq 'sub' ? "_$prefix" : $prefix ]);
-
-=cut
 
   if ($kind eq 'if') {
     $self->begin_cond_block($block, $prefix, $kind, $left, $op, $right);
@@ -1168,343 +1142,17 @@ sub begin_block
   }
 }
 
-
-#
-# end_block()
-#
-# TODO: else (and elsif?) blocks.
-#
-
-sub end_block
-{
-  my $self = shift;
-  my ($continue) = @_;
-
-  #
-  # If we are not currently 'inside' a block, then we've got no business
-  # seeing a close-brace.
-  #
-
-  $self->SYNTAX_ERROR("Closing brace without open block.")
-    unless $self->block_depth();
-
-  #
-  # Pop the block info off the block stack and cache its prefix for use
-  # in what follows. At this point we are no longer 'inside' a block.
-  # Although, we may re-enter the block in certain cases (see below).
-  #
-
-  my $block  = $self->pop_block();
-  my $prefix = $block->{PREFIX};
-
-  #
-  # 'while' blocks:
-  #
-  # When we are ending the 'while' block, we might be beginning the
-  # 'continue' block, so we check for that case. The while block and
-  # the continue block form one logical block, with the identifiers
-  # delcared in the former available in the latter. This means that
-  # semantically, the 'continue' block is really like a 'continue'
-  # label, since control falls through the 'while' block into the
-  # 'continue' block by default, and we get to the 'continue' block
-  # via a 'next' statement in the 'while' block's body, which is
-  # essentially a 'goto my_continue' statement.
-  #
-  # NOTE: This is different from some languages. Some languages
-  # treat the continue block as a truly separate block, and the
-  # identifiers declared in the 'while' portion are *not* available
-  # in the 'continue' portion.
-  #
-
-  if ($block->kind eq 'while') {
-    if (defined $continue) {
-      if (defined $block->cont) {
-        $self->SYNTAX_ERROR("No more than one continue block allowed.");
-      } else {
-        $block->cont($self->line);
-      }
-
-=no
-      $self->push_label("${prefix}_CONT");
-      $self->push_source("} continue {");
 =cut
 
-      $self->push_block($block);        # Push it back on for a minute...
-      undef $block;              # ... and forget about it.
-    } else {
-=no
-      $self->push_source("}");
-      $self->push_label("${prefix}_CONT") unless defined $block->cont;
-      $self->emit_code('branch', ["${prefix}_NEXT"]);
-      $self->push_label("${prefix}_LAST");
-=cut
-    }
-  }
 
-  #
-  # 'if' blocks:
-  #
-  # Continuation of 'if' blocks happens by $continue being 'else'. In that
-  # case, we push the block back on the stack.
-  #
-
-  elsif ($block->kind eq 'if') {
-    if (defined $continue) { # for 'else'
-      if (defined $block->else) {
-        $self->SYNTAX_ERROR("No more than one else block allowed.");
-      } else {
-        $block->else($self->line);
-      }
-
-=no
-      $self->emit_code("branch", [ "${prefix}_LAST" ]); # Jump over the 'else'.
-      $self->push_label("${prefix}_ELSE");
-      $self->push_source("} else {");
-=cut
-
-      #
-      # We push the block back onto the block stack, since we are
-      # ending up still in a block.
-      #
-      # NOTE: We are not doing 'undef $block' here because we want
-      # the code below to undeclare the variables from the 'if' block.
-      #
-      # TODO: Should we really be allocating a whole new block? Its
-      # nice to reuse this one (and we set ELSE in it to know we
-      # can't have *another* else continuation).
-      #
-
-      $self->push_block($block);
-    } else {
-=no
-      $self->push_source("}");
-      $self->emit_code();
-      $self->push_label("${prefix}_ELSE") unless defined $block->{ELSE};
-      $self->push_label("${prefix}_LAST");
-=cut
-    }
-  }
-
-  #
-  # Handle the ending of subroutine blocks:
-  #
-
-  elsif ($block->kind eq 'sub') {
-=no
-    $self->push_source("}");
-    $self->push_label("${prefix}_LEAVE");
-=cut
-
-    #
-    # TODO: Complain if we haven't seen 'return' statement in a
-    # subroutine that returns results (else we are going to be
-    # very unhappy later...)
-    #
-
-    #
-    # Now, actually return.
-    #
-
-=no
-    $self->emit_code("restoreall");
-    $self->emit_code("ret", [ ]);
-
-    $self->push_label("${prefix}_AFTER");
-#    $self->emit_code('noop'); # XXX: Needed by IMCC
-    $self->emit_code('.end');
-=cut
-  }
-
-  #
-  # If there is any other kind of block, we have an internal compiler error.
-  #
-
-  else {
-    $self->INTERNAL_ERROR("End of unknown kind of block " . $block->kind . "!");
-  }
-
-  #
-  # If $block is still defined, then we didn't push it back on the block
-  # stack and we are ending the scope.
-  #
-
-  if (defined $block) {
-=no
-    $self->emit_code(".endnamespace", [ $block->kind eq 'sub' ? "_$prefix" : $prefix ]);
-=cut
- 
-    if ($continue) { # Reopen the namespace for 'else'
-=no
-      $self->emit_code(".namespace", [ $block->kind eq 'sub' ? "_$prefix" : $prefix ]);
-=cut
-    }
-  }
-}
 
 ###############################################################################
 ###############################################################################
 ##
-## Arithmetic Operations
+## Bitwise Operations
 ##
 ###############################################################################
 ###############################################################################
-
-
-#
-# do_arith()
-#
-
-sub do_arith
-{
-  my $self = shift;
-  my ($dest, $a, $op, $b) = @_;
-
-  $self->INTERNAL_ERROR("Dest is not Jako Identifier")
-    unless UNIVERSAL::isa($dest, 'Jako::Construct::Expression::Value::Identifier');
-
-  $self->INTERNAL_ERROR("A is not Jako Value")
-    unless UNIVERSAL::isa($a, 'Jako::Construct::Expression::Value');
-
-  $self->INTERNAL_ERROR("B is not Jako Value")
-    unless UNIVERSAL::isa($b, 'Jako::Construct::Expression::Value');
-
-=no
-  $self->push_source("$dest = $a $op $b;");
-=cut
-
-  #
-  # Determine the type to use to calculate the result:
-  #
-
-  $self->SYNTAX_ERROR("Cannot perform arithmetic on strings")
-    if grep { ref($_) eq 'Jako::Construct::Type::String' } map { $_->type } ($dest, $a, $b);
-
-  my $calc_type = Jako::Construct::Type::Integer->new;
-
-  $calc_type = Jako::Construct::Type::Number->new if grep { ref($_) eq 'Jako::Construct::Type::Number' } map { $_->type } ($dest, $a, $b);
-  $calc_type = Jako::Construct::Type::Object->new if grep { ref($_) eq 'Jako::Construct::Type::Object' } map { $_->type } ($dest, $a, $b);
-
-  my $dest_type = $dest->type;
-
-  #
-  # Convert the operands into the calculation type:
-  #
-  
-  if ($a->type ne $calc_type) {
-=no
-    my $temp = temp_reg($calc_type);
-    $self->emit_code('set', [$temp, $a]);
-    $a = $temp;
-=cut
-  }
-  
-  if ($b->type ne $calc_type) {
-=no
-    my $temp = temp_reg($calc_type);
-    $self->emit_code('set', [$temp, $b]);
-    $b = $temp;
-=cut
-  }
-
-  #
-  # Perform the calculation:
-  #
-
-  if ($dest_type eq $calc_type) {
-=no
-    $self->emit_code("$dest =", [ "$a $op $b" ]);
-=cut
-  }
-  else {
-=no
-    my $temp = temp_reg($calc_type);
-    $self->emit_code("$temp =", [ "$a $op $b" ]);
-    $self->emit_code("$dest =", [ "$temp" ]);
-=cut
-  }
-}
-
-
-#
-# do_add()
-#
-
-sub do_add
-{
-  my $self = shift;
-  my ($dest, $a, $b) = @_;
-  $self->do_arith($dest, $a, '+', $b);
-}
-
-
-#
-# do_inc()
-#
-
-sub do_inc
-{
-  my $self = shift;
-  my ($dest, $amount) = @_;
-
-  $self->INTERNAL_ERROR("Dest is not a Jako Identifier!")
-    unless UNIVERSAL::isa($dest, "Jako::Construct::Expression::Value::Identifier");
-
-  $self->INTERNAL_ERROR("Amount is not a Jako Value!")
-    if defined $amount and not UNIVERSAL::isa($amount, "Jako::Construct::Expression::Value");
-
-  $amount = 1 unless defined $amount;
-
-  if (ref $amount) {
-    if (ref($amount->type) eq 'Jako::Construct::Type::Integer') {
-
-=no
-      $self->push_source("$dest += $amount;");
-      $self->emit_code('add', [$dest, $amount]);
-=cut
-
-    } else {
-      $self->do_add($dest, $dest, $amount);
-    }
-  } else {
-
-=no
-    $self->push_source("$dest++;");
-    $self->emit_code('inc', [$dest]);
-=cut
-
-  }
-}
-
-
-#
-# do_dec()
-#
-
-sub do_dec
-{
-  my $self = shift;
-  my ($dest, $amount) = @_;
-
-  if (defined $amount) {
-    if (ref $amount->type eq 'Jako::Construct::Type::Integer') {
-
-=no
-      $self->push_source("$dest -= $amount;");
-      $self->emit_code('sub', [$dest, $amount]);
-=cut
-
-    } else {
-      $self->do_arith($dest, $dest, '-', $amount);
-    }
-  } else {
-
-=no
-    $self->push_source("$dest--;");
-    $self->emit_code('dec', [$dest]);
-=cut
-
-  }
-}
 
 
 #
@@ -1515,6 +1163,8 @@ sub do_bit_and
 {
   my $self = shift;
   my ($dest, $a, $b) = @_;
+
+  confess "TODO: Implement bitwise and";
 
 =no
   $self->emit_code("band", [$dest, $a, $b]);
@@ -1530,6 +1180,9 @@ sub do_bit_or
 {
   my $self = shift;
   my ($dest, $a, $b) = @_;
+
+  confess "TODO: Implement bitwise or";
+
 =no
   $self->emit_code("bor", [$dest, $a, $b]);
 =cut
@@ -1545,72 +1198,12 @@ sub do_shift
   my $self = shift;
   my $dir = shift;
   my ($dest, $a, $amount) = @_;
+
+  confess "TODO: Implement bitwise shift";
+
 =no
   $self->emit_code("sh$dir", [$dest, $a, $amount]);
 =cut
-}
-
-
-###############################################################################
-###############################################################################
-##
-## Argument Handling
-##
-###############################################################################
-###############################################################################
-
-
-#
-# interpolate_string()
-#
-# Converts a single string argument:
-#
-#     "Foo $a ${b}ar\n"
-#
-# to multiple arguments:
-#
-#     "Foo ", a, " ", b, "ar ", b, "\n"
-#
-# to effect string interpolation.
-#
-
-sub interpolate_string
-{
-  my $self = shift;
-  my ($string) = @_;
-
-  return $string unless $string =~ m/(^"|^".*?[^\\])\$/; # Double-quote with an unescaped '$'.
-
-  $string = substr($string, 1, -1); # Without the surrounding double quotes.
-
-  my $temp = temp_str();          # Allocate and clear a temporary string register
-  $self->emit_code("set", [ $temp, '""' ]);
-
-  while (1) {
-    last unless defined $string and
-      $string =~ m/(^|^.*?[^\\])\$((([A-Za-z][A-Za-z0-9_]*)\b)|({[A-Za-z][A-Za-z0-9_]*}))(.*)$/;
-
-    $self->emit_code("concat", [ $temp, '"' . $1 . '"' ])
-      if defined $1 and $1 ne '';
-
-    my $interp = $2;
-    $interp =~ s/^{(.*)}$/$1/; # Strip '{' and '}'.
-
-    if (type_of($interp) ne 'S') {
-      my $temp2 = temp_str();
-      $self->emit_code("set", [ $temp2, $interp ]);
-      $interp = $temp2;
-    }
-
-    $self->emit_code("concat", [ $temp, $interp ]);
-
-    $string = $6;
-  }
-
-  $self->emit_code("concat", [ $temp, '"' . $string . '"' ])
-    if defined $string and $string ne '';
-
-  return $temp;
 }
 
 
@@ -1691,12 +1284,6 @@ sub parse
 
       if ($self->skip_assign) {
         $value = Jako::Construct::Expression::Value->new($block, $self->require_literal);
-
-=no
-        $value = interpolate_string($value) # TODO: This should happen at compile time.
-          if type_of($value) eq 'S';
-=cut
-
       }
 
       $self->require_semicolon;
@@ -1961,7 +1548,79 @@ sub parse
         $self->require_open_brace;
       }
 
-      $self->end_block($cont);
+      #
+      # If we are not currently 'inside' a block, then we've got no business
+      # seeing a close-brace.
+      #
+
+      $self->SYNTAX_ERROR("Closing brace without open block.")
+        unless $self->block_depth();
+
+      #
+      # Remember the block we just closed, in case its the peer of a continuation
+      # we are about to introduce.
+      #
+
+      my $peer_block = $self->pop_block;
+
+      #
+      # 'while' blocks:
+      #
+      # When we are ending the 'while' block, we might be beginning the 'continue'
+      # block, so we check for that case.
+      #
+      # We *always* create a continue block, even when there is none in the source,
+      # so that upon compilation all the appropriate labels can be generated for
+      # the loop control statements to function properly.
+      #
+      # Put on an empty continue block and then pop it back off. It will be in the
+      # parent block's content array, and it will have gotten its prefix, etc.
+      # correct by virtue of initializing itself based on its peer block's info
+      # (available by passing $block in as an argument).
+      #
+
+      if ($peer_block->kind eq 'while') {
+        my $parent_block = $peer_block->block;
+        my $loop = Jako::Construct::Block::Loop::Continue->new($parent_block, $peer_block);
+        $self->push_block($loop) if defined $cont;
+      }
+      elsif ($peer_block->kind eq 'continue') {
+        if (defined $cont) {
+          $self->SYNTAX_ERROR("No more than one continue block allowed.");
+        }
+      }
+
+      #
+      # 'if' blocks:
+      #
+      # Continuation of 'if' blocks happens by $continue being 'else'.
+      #
+
+      elsif ($peer_block->kind eq 'if') {
+        my $parent_block = $peer_block->block;
+        my $cond = Jako::Construct::Block::Conditional::Else->new($parent_block, $peer_block);
+        $self->push_block($cond) if defined $cont;;
+      }
+      elsif ($peer_block->kind eq 'else') {
+        if (defined $cont) {
+          $self->SYNTAX_ERROR("No more than one else block allowed.");
+        }
+      }
+
+      #
+      # Handle the ending of subroutine blocks:
+      #
+
+      elsif ($peer_block->kind eq 'sub') {
+      }
+
+      #
+      # If there is any other kind of block, we have an internal compiler error.
+      #
+
+      else {
+        $self->INTERNAL_ERROR("End of unknown kind of block '%s'!", $peer_block->kind);
+      }
 
       next;
     }
