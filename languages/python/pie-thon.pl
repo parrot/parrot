@@ -54,6 +54,8 @@ my %type_map = (
     int   => 'Py_int',
     long  => 'Py_long',
     str   => 'Py_str',
+    tuple => 'Py_tuple',
+    list  => 'Py_list',
 );
 
 
@@ -1147,7 +1149,6 @@ sub BUILD_TUPLE
     my ($n, $c, $cmt, $type) = @_;
     # TODO iter for FixedPMCArray
     $type = "FixedPMCArray" unless defined $type;
-    # $type = "PerlArray";
     my ($opcode, $rest) = ($code[$code_l]->[2],$code[$code_l]->[4]);
     if ($opcode eq 'UNPACK_SEQUENCE') {
 	$code_l++;
@@ -1177,7 +1178,7 @@ EOC
 
 sub BUILD_LIST
 {
-    BUILD_TUPLE(@_,"PerlArray")
+    BUILD_TUPLE(@_,"ResizablePMCArray")
 }
 sub BUILD_MAP
 {

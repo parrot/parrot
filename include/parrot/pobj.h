@@ -39,14 +39,18 @@ typedef union UnionVal {
         DPOINTER* _struct_val;   /* two ptrs, both are defines */
         PMC* _pmc_val;
     } _ptrs;
-    INTVAL _int_val;
+    struct {
+        INTVAL _int_val;        /* or 2 intvals */
+        INTVAL _int_val2;
+    } _i;
     FLOATVAL _num_val;
     struct parrot_string_t * _string_val;
 } UnionVal;
 
 #define UVal_ptr(u)       (u)._ptrs._struct_val
 #define UVal_pmc(u)       (u)._ptrs._pmc_val
-#define UVal_int(u)       (u)._int_val
+#define UVal_int(u)       (u)._i._int_val
+#define UVal_int2(u)       (u)._i._int_val2
 #define UVal_num(u)       (u)._num_val
 #define UVal_str(u)       (u)._string_val
 #define UVal_bufstart(u)  (u)._b._bufstart
@@ -54,7 +58,7 @@ typedef union UnionVal {
 
 /* BEGIN DEPRECATED UVAL ACCESSOR MACROS */
 #define num_val _num_val
-#define int_val _int_val
+#define int_val _i._int_val
 #define string_val _string_val
 #define struct_val _ptrs._struct_val
 #define pmc_val _ptrs._pmc_val
@@ -79,11 +83,12 @@ typedef struct Buffer {
 
 typedef Buffer PObj;
 
-#define PObj_bufstart(pmc)     (pmc)->obj.u._b._bufstart
-#define PObj_buflen(pmc)       (pmc)->obj.u._b._buflen
+#define PObj_bufstart(pmc)    (pmc)->obj.u._b._bufstart
+#define PObj_buflen(pmc)      (pmc)->obj.u._b._buflen
 #define PMC_struct_val(pmc)   (pmc)->obj.u._ptrs._struct_val
 #define PMC_pmc_val(pmc)      (pmc)->obj.u._ptrs._pmc_val
-#define PMC_int_val(pmc)      (pmc)->obj.u._int_val
+#define PMC_int_val(pmc)      (pmc)->obj.u._i._int_val
+#define PMC_int_val2(pmc)     (pmc)->obj.u._i._int_val2
 #define PMC_num_val(pmc)      (pmc)->obj.u._num_val
 #define PMC_str_val(pmc)      (pmc)->obj.u._string_val
 

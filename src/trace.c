@@ -42,7 +42,11 @@ trace_pmc_dump(Interp *interpreter, PMC* pmc)
     char *escaped;
     if (pmc && pmc != PMCNULL) {
         if(pmc->vtable) {
-            if (pmc->vtable->base_type == enum_class_PerlString) {
+            if (pmc->vtable->data == pmc) {
+                PIO_eprintf(interpreter, "%S=Class:PMC(%#p)",
+                        VTABLE_name(interpreter, pmc), pmc);
+            }
+            else if (pmc->vtable->base_type == enum_class_PerlString) {
                 STRING *s = VTABLE_get_string(interpreter, pmc);
                 if (!s)
                     PIO_eprintf(interpreter, "%S=PMC(%#p Str:(NULL))",

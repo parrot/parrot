@@ -8,8 +8,10 @@ classes/resizablepmcarray.pmc - resizable size array for PMCs only
 
 =head1 DESCRIPTION
 
-This class, ResizablePMCArray, implements an array of resizable size, which stores PMCs,
-it puts things into Integer, Float, or String PMCs as appropriate
+This class, ResizablePMCArray, implements an array of resizable size,
+which stores PMCs, it puts things into Integer, Float, or String PMCs
+as appropriate
+
 TODO currently this uses PerlString instead of String PMCs.
 
 =head2 Functions
@@ -22,14 +24,87 @@ TODO currently this uses PerlString instead of String PMCs.
 
 #include "parrot/parrot.h"
 
-typedef struct _SizePMCData {
-    INTVAL size;
-    PMC* data[1];
-} SizePMCData;
-#define NEEDED_SIZE(n) ((n-1)*sizeof(PMC*) + sizeof(SizePMCData))
-
 pmclass ResizablePMCArray extends FixedPMCArray need_ext does array {
+    void class_init () {
+        /* this should be autmatically done - probably */
+        if (pass) {
+            enter_nci_method(INTERP, enum_class_ResizablePMCArray,
+                    F2DPTR(Parrot_ResizablePMCArray_get_string),
+                    "__repr__", "SIO");
+        }
+    }
 
+/*
+
+=item C<void* invoke(void* next)>
+
+Pythonic object constructor. SELF is a ResizeablePMCArray Class object.
+Return a new C<list> object according to 2.1. Built-in Functions.
+
+=cut
+
+*/
+    void* invoke(void* next) {
+        int argcP = REG_INT(3);
+        PMC *res = pmc_new(interpreter, enum_class_ResizablePMCArray);
+        PMC *arg;
+        if (argcP) {
+            if (argcP > 1) {
+                real_exception(interpreter, NULL, E_TypeError,
+                        "TypeError: list expected at most 1 arguments, got %d",
+                        (int)argcP);
+            }
+            arg = REG_PMC(5);
+            Parrot_py_fill(interpreter, res, arg);
+        }
+        REG_PMC(5) = res;
+        return next;
+    }
+
+/*
+
+=item C<void set_integer_native(INTVAL size)>
+
+Resizes the array to C<size> elements.
+
+=cut
+
+*/
+
+    void set_integer_native (INTVAL size) {
+
+        if (size < 0)
+            internal_exception(OUT_OF_BOUNDS,
+                    "ResizablePMCArray: Can't resize!\n");
+
+        if (!PMC_data(SELF)) {
+            /* empty - used fixed routine */
+            SUPER(size);
+            PMC_int_val2(SELF) = size;
+        }
+        else if (size <= PMC_int_val2(SELF)) {
+            PMC_int_val(SELF) = size;
+            /* we could shrink here if necessary */
+            return;
+        }
+        else {
+            INTVAL i, cur, needed;
+            i = cur = PMC_int_val2(SELF);
+            if (cur < 8192)
+                cur = size < 2 * cur ? 2 * cur : size;
+            else {
+                needed = size - cur;
+                cur += needed + 4096;
+                cur &= 0xfff;
+            }
+            PMC_data(SELF) = mem_sys_realloc(PMC_data(SELF),
+                    cur * sizeof(PMC*));
+            for (; i < cur; i++)
+                ((PMC**)PMC_data(SELF))[i] = PMCNULL;
+            PMC_int_val2(SELF) = cur;
+            PMC_int_val(SELF) = size;
+        }
+    }
 /*
 
 =item C<PMC *get_pmc_keyed_int(INTVAL key)>
@@ -41,17 +116,16 @@ Returns the PMC value of the element at index C<key>.
 */
 
     PMC* get_pmc_keyed_int (INTVAL key) {
-        SizePMCData *sd;
+        PMC **data;
         if (key < 0)
             internal_exception(OUT_OF_BOUNDS,
                 "ResizablePMCArray: index out of bounds!\n");
-        if(key >= PMC_int_val(SELF))
+        if (key >= PMC_int_val(SELF))
             DYNSELF.set_integer_native(key+1);
-
-        sd = (SizePMCData *)PMC_data(SELF);
-        if(sd->data[key] == PMCNULL)
-            sd->data[key] = pmc_new(INTERP, enum_class_Undef);
-        return sd->data[key];
+        data = PMC_data(SELF);
+        if (data[key] == PMCNULL)
+            data[key] = pmc_new(INTERP, enum_class_Undef);
+        return data[key];
     }
 
 /*
@@ -65,54 +139,15 @@ Sets the PMC value of the element at index C<key> to C<*src>.
 */
 
     void set_pmc_keyed_int (INTVAL key, PMC* src) {
-        SizePMCData *sd;
         if (key < 0)
             internal_exception(OUT_OF_BOUNDS,
                 "ResizablePMCArray: index out of bounds!\n");
-        if(key >= PMC_int_val(SELF))
+        /*
+         * TODO in python mode, only .append is allowed
+         */
+        if (key >= PMC_int_val(SELF))
             DYNSELF.set_integer_native(key+1);
-
-        sd = (SizePMCData *)PMC_data(SELF);
-        sd->data[key] = src;
-    }
-
-
-/*
-
-=item C<void set_integer_native(INTVAL size)>
-
-Resizes the array to C<size> elements.
-
-=cut
-
-*/
-
-    void set_integer_native (INTVAL size) {
-        int i;
-        SizePMCData *sd;
-
-        if (size < 0)
-            internal_exception(OUT_OF_BOUNDS,
-                    "ResizablePMCArray: Can't resize!\n");
-
-        sd = (SizePMCData *)PMC_data(SELF);
-        PMC_int_val(SELF) = size;
-        if(sd == NULL) {
-            i = 0;
-            sd = mem_sys_allocate(NEEDED_SIZE(size));
-            sd->size = size;
-        } else if(size >= sd->size) {
-            i = sd->size;
-            sd->size =  size < 2*sd->size ? sd->size*2 : size;
-            sd = mem_sys_realloc(sd, NEEDED_SIZE(sd->size));
-        } else {
-            return;
-        }
-        for(; i < sd->size; i++)
-            sd->data[i] = PMCNULL;
-
-        PMC_data(SELF) = sd;
-        PObj_custom_mark_destroy_SETALL(SELF);
+        ((PMC**)PMC_data(SELF))[key] = src;
     }
 
 /*
@@ -126,44 +161,62 @@ Creates and returns a copy of the array.
 */
 
     PMC* clone () {
-        SizePMCData *sd;
-        PMC * dest = pmc_new(INTERP, SELF->vtable->base_type);
-
-        if (!PMC_data(SELF))
-            return dest;
-        PMC_int_val(dest) = PMC_int_val(SELF);
-        sd = (SizePMCData *)PMC_data(SELF);
-
-        PMC_data(dest) = mem_sys_allocate(NEEDED_SIZE(sd->size));
-        mem_sys_memcopy(PMC_data(dest), PMC_data(SELF), NEEDED_SIZE(sd->size));
-        PObj_custom_mark_destroy_SETALL(SELF);
-        return dest;
+        PMC *copy = SUPER();
+        PMC_int_val2(copy) = PMC_int_val(SELF);
+        return copy;
     }
 
+    STRING* get_string () {
+        if (Interp_flags_TEST(interpreter, PARROT_PYTHON_MODE)) {
+            STRING *res, *s;
+            INTVAL j, n;
+            PMC *val;
+
+            res = string_from_cstring(INTERP, "[", 0);
+            n = VTABLE_elements(INTERP, SELF);
+            for (j = 0; j < n; ++j) {
+                val = SELF.get_pmc_keyed_int(j);
+                res = string_append(INTERP, res,
+                        VTABLE_get_repr(INTERP, val), 0);
+                if (j < n - 1)
+                    res = string_append(INTERP, res,
+                            const_string(INTERP, ", "), 0);
+            }
+            res = string_append(INTERP, res,
+                        const_string(INTERP, "]"), 0);
+            return res;
+        }
+
+        return string_from_int(INTERP, DYNSELF.elements());
+    }
 /*
 
-=item C<void mark()>
+=item C<INTVAL is_equal (PMC* value)>
 
-Marks the array as live.
+The C<==> operation. Compares two array to hold equal elements.
 
 =cut
 
 */
 
-    void mark () {
-        SizePMCData *sd;
-        int i, end;
-        PMC **data;
-        if (!PMC_data(SELF))
-            return;
-        sd = (SizePMCData *)PMC_data(SELF);
-        data = sd->data;
-        end = PMC_int_val(SELF);
-        for(i = 0; i < end; i++) {
-            if(data[i]) {
-                pobject_lives(INTERP, (PObj *) data[i]);
-            }
+    INTVAL is_equal (PMC* value) {
+        INTVAL j, n;
+
+        if (value->vtable->base_type != enum_class_ResizablePMCArray)
+            return 0;
+        n = DYNSELF.elements();
+        if (VTABLE_elements(INTERP, value) != n)
+            return 0;
+        for (j = 0; j < n; ++j) {
+            PMC *item1, *item2;
+            item1 = DYNSELF.get_pmc_keyed_int(j);
+            item2 = VTABLE_get_pmc_keyed_int(INTERP, value, j);
+            if (item1 == item2)
+                continue;
+            if (!mmd_dispatch_i_pp(INTERP, item1, item2, MMD_EQ))
+                return 0;
         }
+        return 1;
     }
 
 }

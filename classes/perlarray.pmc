@@ -63,14 +63,6 @@ Parrot_PerlArray_set_pmc_ptr(Interp *interp, List *list, INTVAL key)
 }
 
 pmclass PerlArray extends Array need_ext does array {
-    void class_init () {
-        /* this should be autmatically done - probably */
-        if (pass) {
-            enter_nci_method(INTERP, enum_class_PerlArray,
-                    F2DPTR(Parrot_PerlArray_get_string),
-                    "__repr__", "SIO");
-        }
-    }
 
 /*
 
@@ -269,33 +261,11 @@ Returns the floating-point value of the element at index C<key>.
 
 Returns the number of elements in the array as a Parrot string.
 
-For Python returns its repr.
-
 =cut
 
 */
 
     STRING* get_string () {
-        if (Interp_flags_TEST(interpreter, PARROT_PYTHON_MODE)) {
-            STRING *res, *s;
-            INTVAL j, n;
-            PMC *val;
-
-            res = string_from_cstring(INTERP, "[", 0);
-            n = VTABLE_elements(INTERP, SELF);
-            for (j = 0; j < n; ++j) {
-                val = SELF.get_pmc_keyed_int(j);
-                res = string_append(INTERP, res,
-                        VTABLE_get_repr(INTERP, val), 0);
-                if (j < n - 1)
-                    res = string_append(INTERP, res,
-                            const_string(INTERP, ", "), 0);
-            }
-            res = string_append(INTERP, res,
-                        const_string(INTERP, "]"), 0);
-            return res;
-        }
-
         return string_from_int(INTERP, DYNSELF.elements());
     }
 

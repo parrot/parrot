@@ -10,7 +10,7 @@ classes/fixedpmcarray.pmc - fixed size array for PMCs only
 
 This class, FixedPMCArray, implements an array of fixed size, which stores PMCs,
 it puts things into Integer, Float, or String PMCs as appropriate
-TODO currently this uses PerlString instead of String PMCs.
+TODO currently this uses Perl types.
 
 =head2 Functions
 
@@ -127,6 +127,35 @@ pmclass FixedPMCArray need_ext does array {
     }
 /*
 
+=item C<void* invoke(void* next)>
+
+Pythonic object constructor. SELF is a FixedPMCArray Class object. Return a new
+C<tuple> object according to 2.1. Built-in Functions.
+
+=cut
+
+*/
+    void* invoke(void* next) {
+        int argcP = REG_INT(3);
+        PMC *res = pmc_new(interpreter, enum_class_FixedPMCArray);
+        PMC *arg;
+        if (argcP) {
+            if (argcP > 1) {
+                real_exception(interpreter, NULL, E_TypeError,
+                        "TypeError: tuple expected at most 1 arguments, got %d",
+                        (int)argcP);
+            }
+            arg = REG_PMC(5);
+            if (arg->vtable->base_type == enum_class_FixedPMCArray)
+                res = arg; /* if a tuple is passed, return it */
+            else
+                Parrot_py_fill(interpreter, res, arg);
+        }
+        REG_PMC(5) = res;
+        return next;
+    }
+/*
+
 =back
 
 =head2 Methods
@@ -143,7 +172,6 @@ Initializes the array.
 
     void init () {
         PMC_int_val(SELF) = 0;
-        PMC_data(SELF) = NULL;
     }
 
 /*
@@ -238,7 +266,7 @@ fixed sized array).
 
 */
     INTVAL get_bool () {
-        INTVAL size = DYNDYNSELF.elements();
+        INTVAL size = DYNSELF.elements();
         return (INTVAL)(size != 0);
     }
 
@@ -265,16 +293,17 @@ Returns the number of elements in the array.
 */
 
     INTVAL get_integer () {
-        return DYNDYNSELF.elements();
+        return DYNSELF.elements();
     }
 
 /*
 
 =item C<STRING *get_string()>
 
-Returns the number of elements in the array as a Parrot string.
+Returns the number of elements in the array as a Parrot string. (??? -leo)
 
 For Python returns its repr.
+TODO implement freeze/thaw and use that instead.
 
 =cut
 
@@ -471,7 +500,7 @@ Sets the integer value of the element at index C<key> to C<value>.
     void set_integer_keyed_int (INTVAL key, INTVAL value) {
         PMC *val;
 
-        val = pmc_new(INTERP, enum_class_Integer);
+        val = pmc_new(INTERP, enum_class_PerlInt);
         VTABLE_set_integer_native(INTERP, val, value);
         DYNSELF.set_pmc_keyed_int(key, val);
     }
@@ -506,7 +535,7 @@ C<value>.
     void set_number_keyed_int (INTVAL key, FLOATVAL value) {
         PMC *val;
 
-        val = pmc_new(INTERP, enum_class_Float);
+        val = pmc_new(INTERP, enum_class_PerlNum);
         VTABLE_set_number_native(INTERP, val, value);
         DYNSELF.set_pmc_keyed_int(key, val);
     }
@@ -668,7 +697,7 @@ Return a new iterator for SELF.
         PMC_struct_val(iter) = key;
         PObj_get_FLAGS(key) |= KEY_integer_FLAG;
         PMC_int_val(key) = 0;
-        if (!((List *) PMC_data(SELF))->length)
+        if (PMC_int_val(SELF) == 0)
             PMC_int_val(key) = -1;
         return iter;
     }

@@ -105,6 +105,7 @@ parrot_py_dict(Interp *interpreter, PMC *arg)
             return arg;
         case enum_class_FixedPMCArray:  /* sequence from BUILD_TUPLE */
         case enum_class_PerlArray:      /* sequence from BUILD_LIST */
+        case enum_class_ResizablePMCArray:
             return dict_from_tuple_array(interpreter, arg);
         default:
             internal_exception(1, "Unimplemented dict argument");
@@ -128,48 +129,6 @@ parrot_py_divmod(Interp *interpreter, PMC *nom, PMC *denom)
     VTABLE_set_pmc_keyed_int( interpreter, tupl, 0, pdiv);
     VTABLE_set_pmc_keyed_int( interpreter, tupl, 1, pmod);
     return tupl;
-}
-
-static PMC *
-parrot_py_list(Interp *interpreter, PMC *arg)
-{
-    INTVAL i, argcP;
-    PMC *iter, *list;
-    /*
-     * no arguments: return a new list
-     */
-    if ((argcP = REG_INT(3)) == 0)
-        return pmc_new(interpreter, enum_class_PerlArray);
-    if (argcP > 1) {
-            real_exception(interpreter, NULL, E_TypeError,
-                    "TypeError: list expected at most 1 arguments, got %d",
-                    (int)argcP);
-    }
-    iter = NULL;
-    switch (arg->vtable->base_type) {
-        case enum_class_FixedPMCArray:  /* sequence from BUILD_TUPLE */
-            list = pmc_new(interpreter, enum_class_PerlArray);
-            for (i = 0; i < VTABLE_elements(interpreter, arg); ++i) {
-                PMC *item = VTABLE_get_pmc_keyed_int(interpreter, arg, i);
-                VTABLE_set_pmc_keyed_int(interpreter, list, i, item);
-            }
-            return list;
-        case enum_class_PerlArray:      /* sequence from BUILD_LIST */
-            /* TODO return copy */
-            return arg;
-        case enum_class_Iterator:
-            iter = arg;
-    }
-    list = pmc_new(interpreter, enum_class_PerlArray);
-    if (!iter)
-        iter = pmc_new_init(interpreter, enum_class_Iterator, arg);
-    VTABLE_set_integer_native(interpreter, iter, 0);
-    i = 0;
-    while (VTABLE_get_bool(interpreter, iter)) {
-        PMC *item = VTABLE_shift_pmc(interpreter, iter);
-        VTABLE_set_pmc_keyed_int(interpreter, list, i++, item);
-    }
-    return list;
 }
 
 
@@ -276,7 +235,7 @@ parrot_py_filter(Interp *interpreter, PMC *func, PMC *list)
             iter = list;
             /* fall through */
         default:
-            res = pmc_new(interpreter, enum_class_PerlArray);
+            res = pmc_new(interpreter, enum_class_ResizablePMCArray);
             break;
     }
     if (!iter)
@@ -325,7 +284,7 @@ parrot_py_map(Interp *interpreter, PMC *func, PMC *list)
             iter = list;
             /* fall through */
         default:
-            res = pmc_new(interpreter, enum_class_PerlArray);
+            res = pmc_new(interpreter, enum_class_ResizablePMCArray);
             break;
     }
     if (!iter)
@@ -467,7 +426,7 @@ parrot_py_iter(Interp *interpreter, PMC *pmc)
 static PMC *
 parrot_py_range(Interp *interpreter, PMC *pstart, PMC *pend, PMC *pstep)
 {
-    PMC *ar = pmc_new(interpreter, enum_class_PerlArray);
+    PMC *ar = pmc_new(interpreter, enum_class_ResizablePMCArray);
     INTVAL start = 0, end = 0, step = 1;
     int i, k, argcP;
 
@@ -501,51 +460,53 @@ parrot_py_range(Interp *interpreter, PMC *pstart, PMC *pend, PMC *pstep)
     return ar;
 }
 
-
-static PMC *
-parrot_py_tuple(Interp *interpreter, PMC *pmc)
+/*
+ * fill the pmc (tuple or list) with items from sequence
+ */
+void
+Parrot_py_fill(Interp *interpreter, PMC *ar, PMC *seq)
 {
-    PMC *ar;
     INTVAL i, n;
     STRING *s;
 
-    switch (pmc->vtable->base_type) {
-        case enum_class_FixedPMCArray:
-            return pmc;  /* XXX copy ? */
+    switch (seq->vtable->base_type) {
         case enum_class_PerlArray:
-            ar = pmc_new(interpreter, enum_class_FixedPMCArray);
-            n = VTABLE_elements(interpreter, pmc);
+        case enum_class_FixedPMCArray:
+        case enum_class_ResizablePMCArray:
+            n = VTABLE_elements(interpreter, seq);
             VTABLE_set_integer_native(interpreter, ar, n);
             for (i = 0; i < n; ++i) {
                 VTABLE_set_pmc_keyed_int(interpreter, ar, i,
-                        VTABLE_get_pmc_keyed_int(interpreter, pmc, i));
+                        VTABLE_get_pmc_keyed_int(interpreter, seq, i));
             }
-            return ar;
+            break;
         case enum_class_String:
         case enum_class_PerlString:
-            ar = pmc_new(interpreter, enum_class_FixedPMCArray);
-            s = PMC_str_val(pmc);
+            s = PMC_str_val(seq);
             n = string_length(interpreter, s);
             VTABLE_set_integer_native(interpreter, ar, n);
             for (i = 0; i < n; ++i) {
                 VTABLE_set_string_keyed_int(interpreter, ar, i,
                     string_substr(interpreter, s, i, 1, NULL, 0));
             }
-            return ar;
+            break;
         case enum_class_Iterator:
-            ar = pmc_new(interpreter, enum_class_PerlArray);
             /* reset iterator */
-            VTABLE_set_integer_native(interpreter, pmc, 0);
+            VTABLE_set_integer_native(interpreter, seq, 0);
+            n = VTABLE_elements(interpreter, seq);
+            VTABLE_set_integer_native(interpreter, ar, n);
+            /* TODO morph to resizeable first else this will break
+             * with generators - if that's possible
+             */
             i = 0;
-            while (VTABLE_get_bool(interpreter, pmc)) {
-                PMC *item = VTABLE_shift_pmc(interpreter, pmc);
+            while (VTABLE_get_bool(interpreter, seq)) {
+                PMC *item = VTABLE_shift_pmc(interpreter, seq);
                 VTABLE_set_pmc_keyed_int(interpreter, ar, i++, item);
             }
-            return ar;
+            break;
         default:
             internal_exception(1, "unimplemented tuple type\n");
     }
-    return NULL;
 }
 
 static PMC *
@@ -605,14 +566,12 @@ parrot_py_create_funcs(Interp *interpreter)
     STRING *id       = CONST_STRING(interpreter, "id");
     STRING *isa      = CONST_STRING(interpreter, "isinstance");
     STRING *list     = CONST_STRING(interpreter, "list");
-    STRING *longf    = CONST_STRING(interpreter, "long");
     STRING *map      = CONST_STRING(interpreter, "map");
     STRING *max      = CONST_STRING(interpreter, "max");
     STRING *min      = CONST_STRING(interpreter, "min");
     STRING *range    = CONST_STRING(interpreter, "range");
     STRING *reduce   = CONST_STRING(interpreter, "reduce");
     STRING *repr   =   CONST_STRING(interpreter, "repr");
-    STRING *tuple    = CONST_STRING(interpreter, "tuple");
 
     /* types */
     STRING *Py_bool  = CONST_STRING(interpreter, "Py_bool");
@@ -620,6 +579,8 @@ parrot_py_create_funcs(Interp *interpreter)
     STRING *Py_int   = CONST_STRING(interpreter, "Py_int");
     STRING *Py_long  = CONST_STRING(interpreter, "Py_long");
     STRING *Py_str   = CONST_STRING(interpreter, "Py_str");
+    STRING *Py_tuple = CONST_STRING(interpreter, "Py_tuple");
+    STRING *Py_list  = CONST_STRING(interpreter, "Py_list");
     PMC* class;
     /*
      * new types interface, just place a class object as global
@@ -635,6 +596,10 @@ parrot_py_create_funcs(Interp *interpreter)
     Parrot_store_global(interpreter, NULL, Py_long, class);
     class = Parrot_base_vtables[enum_class_PerlString]->data;
     Parrot_store_global(interpreter, NULL, Py_str, class);
+    class = Parrot_base_vtables[enum_class_FixedPMCArray]->data;
+    Parrot_store_global(interpreter, NULL, Py_tuple, class);
+    class = Parrot_base_vtables[enum_class_ResizablePMCArray]->data;
+    Parrot_store_global(interpreter, NULL, Py_list, class);
 
 
     parrot_py_global(interpreter, F2DPTR(parrot_py_assert_e), assert_e, pip);
@@ -648,14 +613,12 @@ parrot_py_create_funcs(Interp *interpreter)
     parrot_py_global(interpreter, F2DPTR(parrot_py_hex), hex, pip);
     parrot_py_global(interpreter, F2DPTR(parrot_py_id), id, ip);
     parrot_py_global(interpreter, F2DPTR(parrot_py_isa), isa, pipp);
-    parrot_py_global(interpreter, F2DPTR(parrot_py_list), list, pip);
     parrot_py_global(interpreter, F2DPTR(parrot_py_map), map, pipp);
     parrot_py_global(interpreter, F2DPTR(parrot_py_max), max, pip);
     parrot_py_global(interpreter, F2DPTR(parrot_py_min), min, pip);
     parrot_py_global(interpreter, F2DPTR(parrot_py_range), range, pippp);
     parrot_py_global(interpreter, F2DPTR(parrot_py_reduce), reduce, pipp);
     parrot_py_global(interpreter, F2DPTR(parrot_py_repr), repr, pip);
-    parrot_py_global(interpreter, F2DPTR(parrot_py_tuple), tuple, pipp);
 }
 
 /*
@@ -796,6 +759,7 @@ Parrot_py_get_slice(Interp *interpreter, PMC *self, PMC *key)
             case enum_class_Array:
             case enum_class_PerlArray:
             case enum_class_FixedPMCArray:
+            case enum_class_ResizablePMCArray:
                 item = VTABLE_get_pmc_keyed_int(interpreter, self, i);
                 VTABLE_set_pmc_keyed_int(interpreter, res, i-start, item);
                 break;

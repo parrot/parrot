@@ -1839,6 +1839,7 @@ include/parrot/perltypes.h                        [devel]include
 include/parrot/pmc.h                              [devel]include
 include/parrot/pmc_freeze.h                       [devel]include
 include/parrot/pobj.h                             [devel]include
+include/parrot/py_func.h                          [devel]include
 include/parrot/regfuncs.h                         [devel]include
 include/parrot/register.h                         [devel]include
 include/parrot/resources.h                        [devel]include

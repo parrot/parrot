@@ -282,6 +282,7 @@ typedef void (*funcptr_t)(void);
 #include "parrot/global.h"
 #include "parrot/stat.h"
 #include "parrot/slice.h"
+#include "parrot/py_func.h"
 
 #endif /* PARROT_PARROT_H_GUARD */
 
