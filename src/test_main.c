@@ -17,11 +17,11 @@
 char *
 parseflags(struct Parrot_Interp *interpreter, int *argc, char **argv[]);
 
-void
-usage();
+static void
+usage(void);
 
-void
-version();
+static void
+version(void);
 
 int
 main(int argc, char *argv[]) {
@@ -100,7 +100,8 @@ OUT:
     return (*(argv++))[0];
 }
 
-void usage() {
+static void
+usage(void) {
     fprintf(stderr,
 "Usage: test_parrot [switches] [--] programfile [arguments]\n\
   -b	Activate bounds checks\n\
@@ -115,7 +116,8 @@ void usage() {
     exit(0);
 }
 
-void version() {
+static void
+version(void) {
     fprintf(stderr, 
 "This is parrot version " PARROT_VERSION " (with development patches) built for " PARROT_ARCHNAME "\n\
 Copyright (C) 2001-2002 Yet Another Society.  All Rights Reserved.\n\

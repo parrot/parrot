@@ -31,7 +31,7 @@ typedef void * Parrot_flag_val;
 struct Parrot_Interp;
 struct PackFile;
 
-struct Parrot_Interp *Parrot_new();
+struct Parrot_Interp *Parrot_new(void);
 
 void Parrot_init(struct Parrot_Interp *);
 
