@@ -1,6 +1,6 @@
 #! perl -w
 
-use Parrot::Test tests => 2;
+use Parrot::Test tests => 3;
 
 output_is(<<CODE, <<OUTPUT, "simple store and fetch");
 	new_pad
@@ -15,6 +15,33 @@ output_is(<<CODE, <<OUTPUT, "simple store and fetch");
 	end
 CODE
 12
+OUTPUT
+
+output_is(<<CODE, <<OUTPUT, "Repeated stores with the same key");
+	new_pad
+	new P0, .PerlInt
+	new P1, .PerlInt
+        set I0, 0
+LOOP:
+	set P0, I0
+	store_lex "a", P0
+	find_lex P1, "a"
+	print P1
+        print "\\n"
+        inc I0
+        lt I0, 10, LOOP
+	end
+CODE
+0
+1
+2
+3
+4
+5
+6
+7
+8
+9
 OUTPUT
 
 output_is(<<CODE, <<OUTPUT, "nested scopes");
@@ -43,6 +70,10 @@ output_is(<<CODE, <<OUTPUT, "nested scopes");
       print "\\n"
       pop_pad
 
+    find_lex P3, "a"
+    print P3
+    print "\\n"
+
     pop_pad
 
   find_lex P3, "a"
@@ -52,6 +83,7 @@ output_is(<<CODE, <<OUTPUT, "nested scopes");
 CODE
 0
 2
+1
 0
 OUTPUT
 

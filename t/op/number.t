@@ -1,6 +1,6 @@
 #! perl -w
 
-use Parrot::Test tests => 33;
+use Parrot::Test tests => 34;
 use Test::More;
 
 output_is(<<CODE, <<OUTPUT, "set_n_nc");
@@ -489,6 +489,50 @@ ERROR:
 CODE
 ok 1
 ok 2
+OUTPUT
+
+output_is(<<'CODE', <<OUTPUT, "ne_n");
+        set     N0, 1.234567
+        set     N1, -1.234567
+
+        bsr     BR1
+        print   "ok 1\n"
+        bsr     BR2
+        print   "ok 2\n"
+        bsr     BR3
+        print   "ok 3\n"
+        bsr     BR4
+        print   "ok 4\n"
+        bsr     BR5
+        print   "Shouldn't get here\n"
+        end
+
+BR1:    ne N0, N1
+        print "not ok 1\n"
+        ret
+
+BR2:    ne 2.54, N0
+        print "not ok 2\n"
+        ret
+
+BR3:    ne N0, 0.00
+        print "not ok 3\n"
+        ret
+
+BR4:    ne 1.0, 2.0
+        print "not ok 4\n"
+        ret
+
+BR5:    ne N0, N0
+        print "ok 5\n"
+        end
+
+CODE
+ok 1
+ok 2
+ok 3
+ok 4
+ok 5
 OUTPUT
 
 output_is(<<CODE, <<OUTPUT, "lt_n_ic");
