@@ -428,7 +428,8 @@ inline op new(out STR, in INT, in INT) {
 }
 
 inline op new(out STR, in INT, in INT, in INT) {
-  internal_exception(INVALID_CHARTYPE, "We don't do this yet\n");
+  internal_exception(INVALID_CHARTYPE, 
+                     "new_s_i_i_i op not yet implemented\n");
   $1 = string_make(interpreter, NULL, $2, encoding_lookup_index($3), 0, NULL);
   goto NEXT();
 }
