@@ -70,6 +70,9 @@ Parrot_exec_save(Parrot_exec_objfile_t *obj, const char *file)
                 rellocation.r_extern = 1;
                 break;
             default:
+                internal_exception(EXEC_ERROR,
+                    "Unknown text rellocation type: %d\n",
+                        obj->text_rellocation_table[i].type);
                 break;
         }
         save_struct(fp, &rellocation, sizeof(struct relocation_info));
@@ -96,6 +99,8 @@ Parrot_exec_save(Parrot_exec_objfile_t *obj, const char *file)
                 symlst.n_type = N_EXT;
                 break;
             default:
+                internal_exception(EXEC_ERROR, "Unknown symbol type: %d\n",
+                    obj->symbol_table[i].type);
                 break;
         }
         save_struct(fp, &symlst, sizeof(struct nlist));
@@ -119,6 +124,17 @@ Parrot_exec_save(Parrot_exec_objfile_t *obj, const char *file)
 
 #  include <elf.h>
 
+/* Add a section to the file 
+ *
+ * n = Name
+ * t = Type
+ * f = Flags
+ * s = Size
+ * l = Link
+ * i = Info
+ * a = Align
+ * e = Entry size
+ */
 #  define sh_add(n,t,f,s,l,i,a,e) { \
     bzero(&sechdr, sizeof(Elf32_Ehdr)); \
     sechdr.sh_name = shste - shst; \
@@ -139,8 +155,11 @@ Parrot_exec_save(Parrot_exec_objfile_t *obj, const char *file)
       current_offset += (4 - s % 4); \
    }
 
+/* Sizeof the section header string table */
 #  define SHSTRTABSIZE  0x48
+/* Previously defined symbols (zero, text, data, bss) */
 #  define PDFS          4
+/* Number of sections */
 #  define NSECTIONS     8
 
 void
@@ -276,6 +295,9 @@ Parrot_exec_save(Parrot_exec_objfile_t *obj, const char *file)
                             R_386_32);
                 break;
             default:
+                internal_exception(EXEC_ERROR,
+                    "Unknown text rellocation type: %d\n",
+                        obj->text_rellocation_table[i].type);
                 break;
         }
         save_struct(fp, &rellocation, sizeof(Elf32_Rel));
@@ -315,6 +337,9 @@ Parrot_exec_save(Parrot_exec_objfile_t *obj, const char *file)
                         obj->text_rellocation_table[i].offset - 4])) << 16;
                 break;
             default:
+                internal_exception(EXEC_ERROR,
+                    "Unknown text rellocation type: %d\n",
+                        obj->text_rellocation_table[i].type);
                 break;
         }
         save_struct(fp, &rel_addend, sizeof(Elf32_Rela));
@@ -336,6 +361,9 @@ Parrot_exec_save(Parrot_exec_objfile_t *obj, const char *file)
                             R_ARM_ABS32);
                 break;
             default:
+                internal_exception(EXEC_ERROR,
+                    "Unknown text rellocation type: %d\n",
+                        obj->text_rellocation_table[i].type);
                 break;
         }
         save_struct(fp, &rellocation, sizeof(Elf32_Rel));
@@ -386,6 +414,8 @@ Parrot_exec_save(Parrot_exec_objfile_t *obj, const char *file)
                 symlst.st_info = ELF32_ST_INFO(STB_GLOBAL, STT_NOTYPE);
                 break;
             default:
+                internal_exception(EXEC_ERROR, "Unknown symbol type: %d\n",
+                    obj->symbol_table[i].type);
                 break;
         }
         save_struct(fp, &symlst, sizeof(Elf32_Sym));

@@ -56,6 +56,7 @@ void do_panic(struct Parrot_Interp *interpreter, const char *message,
 #define INTERNAL_PANIC 1
 #define OUT_OF_BOUNDS 1
 #define JIT_ERROR 1
+#define EXEC_ERROR 1
 #define ILL_INHERIT 2
 #define NO_PREV_CS 3
 #define NO_CLASS 2
