@@ -315,12 +315,14 @@ allocate_non_interfering(Parrot_Interp interpreter, SymReg ** reglist, int n)
                     continue;
                 if (r->color == first_color) {
                     warning(interpreter, "allocate_non_interfering",
-                            "couldn't find a color for register type %c", typ);
+                            "color %d for register type %c in use",
+                            first_color, typ);
                     goto out;
                 }
             }
             /*
-             * no scan reglist for small ranged non-interfering regs of that typ
+             * now scan reglist for small ranged non-interfering regs
+             * of that typ
              */
             bb_index = last_line = -1;
             for (i = 0; i < n; i++) {
@@ -354,6 +356,7 @@ allocate_non_interfering(Parrot_Interp interpreter, SymReg ** reglist, int n)
             first_color--;
         }
 out:
+        ;
     }
 }
 #endif
