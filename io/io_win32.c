@@ -201,7 +201,16 @@ PIO_win32_isatty(PIOHANDLE fd)
 void
 PIO_win32_flush(theINTERP, ParrotIOLayer *layer, ParrotIO *io)
 {
-    /* No op */
+    /*
+     * FlushFileBuffers won't work for console handles. From the MS help file:
+     *
+     * Windows NT: The function fails if hFile is a handle to console output. That is because console output is not buffered.
+     * The function returns FALSE, and GetLastError returns ERROR_INVALID_HANDLE.
+     * 
+     * Windows 9x: The function does nothing if hFile is a handle to console output. That is because console output is not buffered.
+     * The function returns TRUE, but it does nothing.
+     */
+    FlushFileBuffers(io->fd);
 }
 
 
@@ -268,7 +277,7 @@ PIO_win32_seek(theINTERP, ParrotIOLayer *l, ParrotIO *io,
     offset.LowPart = lo;
     offset.HighPart = hi;
     p.LowPart = SetFilePointer(io->fd, offset.LowPart,
-                               &offset.HighPart, FILE_CURRENT);
+                               &offset.HighPart, whence);
     if (p.LowPart == 0xFFFFFFFF && (GetLastError() != NO_ERROR)) {
         /* Error - exception */
         return -1;
