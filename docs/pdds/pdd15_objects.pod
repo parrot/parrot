@@ -9,15 +9,19 @@ Object and Class semantics for Parrot
     Maintainer: Dan Sugalski
     Class: Internals
     PDD Number: 15
-    Version: 1.0
+    Version: 1.1
     Status: Developing
-    Last Modified: March 10, 2003
+    Last Modified: March 11, 2003
     PDD Format: 1
     Language: English
 
 =head2 HISTORY
 
 =over 4
+
+=item Version 1.1
+
+March 11, 2002
 
 =item version 1
 
@@ -28,6 +32,11 @@ None. First version
 =head1 CHANGES
 
 =over 4
+
+=item Version 1.1
+
+Removed attributes from the object interface and put them in the
+class interface section, where they belong.
 
 =item Version 1.0
 
@@ -86,9 +95,15 @@ rather than an object thing, as PMCs are
 
 =item Get a property hash
 
-=item Get and set attributes
+=item Call a method
 
-=item
+=item Get a method PMC
+
+=item Check if a PMC can perform a method
+
+=item Check if a PMC implements an interface
+
+=item Check if a PMC is a member of or child of a class
 
 =back
 
