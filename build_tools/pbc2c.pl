@@ -47,9 +47,10 @@ sub dump_const_table {
 	return;
     }
 
-=no
+=for COMMENT
     die "Cannot compile (differing opcode table)!"
         if $pf->const_table->constant(0)->data ne $opcode_fingerprint;
+
 =cut
 
     print "# Constants: $count entries\n";
@@ -312,15 +313,15 @@ __END__
 
 =head1 NAME
 
-pbcc - Parrot byte code compiler
+pbc2c - Parrot byte code compiler
 
 =head1 SYNOPSIS
 
-  pbcc foo.pbc > foo.c
+  pbc2c foo.pbc > foo.c
 
 =head1 DESCRIPTION
 
-Compile the Parrot Pack File listed on the command line, or
+Compile the Parrot PackFile listed on the command line, or
 from standard input if no file is named.
 
 =head1 AUTHOR

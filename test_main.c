@@ -120,16 +120,17 @@ static void
 usage(void)
 {
     fprintf(stderr,
-            "Usage: test_parrot [switches] [--] programfile [arguments]\n\
-  -b    Activate bounds checks\n\
-  -d    Activate debugging\n\
-  -h    Display this message\n\
-  -j    Activate Just-In-Time compiler\n\
-  -p    Activate profiling\n\
-  -P    Activate predereferencing\n\
-  -t    Activate tracing\n\
-  -v    Display version information\n\
-  -.    Wait for a keypress (gives Windows users time to attach a debugger)\n\n");
+"Usage: parrot [switches] [--] programfile [arguments]\n\
+  -b	Activate bounds checks\n\
+  -d	Activate debugging\n\
+  -h	Display this message\n\
+  -j	Activate Just-In-Time compiler\n\
+  -p	Activate profiling\n\
+  -P	Activate predereferencing\n\
+  -t	Activate tracing\n\
+  -v	Display version information\n\
+  -.	Wait for a keypress (gives Windows users time to attach a debugger)\n\n"
+    );
 
     exit(0);
 }
