@@ -239,7 +239,7 @@ Dump config keys.
 
   # Data::Dumper supports Sortkeys since 2.12
   # older versions will work but obviously not sorted
-  if ($Data::Dumper::VERSION >= 2.12) {
+  if (+$Data::Dumper::VERSION >= 2.12) {
     *dump=sub {
       Data::Dumper->new([\%c], ['*PConfig'])->Sortkeys(1)->Dump();
     };
