@@ -90,8 +90,8 @@ Variables, Registers and Constants
   You may also define lexicals with the .local directive below
   and use them by name.
 
-   .local i
-   .local j
+   .local int i
+   .local int j
    i = 4
    j = i * i
 
@@ -125,7 +125,7 @@ Directives
 
    .end
 
-   .local <IDENTIFIER>
+   .local <type> <IDENTIFIER>
 
    .arg <lval>
 

@@ -92,6 +92,7 @@ EOL		\r?\n
 ".class"        return(CLASS);
 ".endclass"     return(ENDCLASS);
 ".namespace"    return(NAMESPACE);
+".endnamespace" return(ENDNAMESPACE);
 ".local"        return(LOCAL);
 ".param"        return(PARAM);
 "end"           return(END);
@@ -134,21 +135,13 @@ EOL		\r?\n
         return(LABEL);
     }
 
-<emit>{DOT}{LETTER}{LETTERDIGIT}* {	/* XXX */
-        yylval.s = str_dup(yytext);
+<emit>{DOT}{LETTER}{LETTERDIGIT}* {
+        yylval.s = str_dup(yytext+1);
         return(MACRO);
     }
-<INITIAL>{DOT}?{LETTER}{LETTERDIGIT}* {
-	SymReg *r = get_sym(yytext);
-	if (r && r->type & VTIDENTIFIER) {
-	    yylval.sr = r;
-	    return VAR;
-	}
-        yylval.s = str_dup(yytext);
-        return(is_op(yylval.s) ? PARROT_OP : IDENTIFIER);
-    }
+
 <emit,INITIAL>{LETTER}{LETTERDIGIT}* {
-	SymReg *r = get_sym(yytext);
+	SymReg *r = find_sym(yytext);
 	if (r && r->type & VTIDENTIFIER) {
 	    yylval.sr = r;
 	    return VAR;

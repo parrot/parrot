@@ -7,6 +7,59 @@
 /* Globals: */
 /* Code: */
 
+static void delete_sym(const char * name);
+
+/* namespaces */
+
+typedef struct ident_t Identifier;
+struct ident_t {
+    char * name;
+    Identifier * next;
+};
+
+typedef struct namespace_t Namespace;
+struct namespace_t {
+    Namespace * parent;
+    char * name;
+    Identifier * idents;
+};
+
+static Namespace * namespace = NULL;
+
+void push_namespace(char * name) {
+    Namespace * ns = (Namespace *) malloc(sizeof(*ns));
+    ns->parent = namespace;
+    ns->name = name;
+    ns->idents = NULL;
+    namespace = ns;
+}
+
+void pop_namespace(char * name) {
+    Namespace * ns = namespace;
+    if (ns == NULL) {
+        fprintf(stderr, "pop() on empty namespace stack\n");
+        abort();
+    }
+
+    if (name && strcmp(name, ns->name) != 0) {
+        fprintf(stderr, "tried to pop namespace(%s), "
+                "but top of stack is namespace(%s)\n", name, ns->name);
+        abort();
+    }
+
+    while (ns->idents) {
+        Identifier * ident = ns->idents;
+        delete_sym(ident->name);
+        ns->idents = ident->next;
+        free(ident);
+    }
+
+    namespace = ns->parent;
+    free(ns);
+}
+
+/* symbolic registers */
+
 /* Makes a new SymReg from its varname and type */
 SymReg * _mk_symreg(SymReg*hash[],char * name, char t) {
     SymReg * r;
@@ -28,6 +81,7 @@ SymReg * _mk_symreg(SymReg*hash[],char * name, char t) {
         _store_symreg(hash,r);
     return r;
 }
+
 SymReg * mk_symreg(char * name, char t) {
     return _mk_symreg(hash, name, t);
 }
@@ -45,10 +99,21 @@ SymReg * mk_pasm_reg(char * name) {
             name, r->set, r->color, r->type);
     return r;
 }
+
+static char * _mk_fullname(Namespace * ns, const char * name) {
+    char * result;
+    if (ns == NULL) return strdup(name);
+    result = (char *) malloc(strlen(name) + strlen(ns->name) + 3);
+    sprintf(result, "%s::%s", ns->name, name);
+    return result;
+}
+
 /* Makes a new identifier */
 SymReg * mk_ident(char * name, char t) {
-    SymReg * r = mk_symreg(name, t);
+    char * fullname = _mk_fullname(namespace, name);
+    SymReg * r = mk_symreg(fullname, t);
     r->type = VTIDENTIFIER;
+    free(name);
     return r;
 }
 
@@ -92,6 +157,7 @@ SymReg * _mk_address(SymReg *hash[], char * name, int uniq) {
         r->lhs_use_count++;
     return r;
 }
+
 SymReg * mk_address(char * name, int uniq) {
     return _mk_address(hash, name, uniq);
 }
@@ -100,7 +166,7 @@ SymReg * mk_address(char * name, int uniq) {
  *
  * we might have
  *
- * what         op      type                    pbc.c:build_key()
+ * what         op      type        pbc.c:build_key()
  * --------------------------------------------------
  *  int const   _kic    VTCONST     no
  *  int reg     _ki     VTREG       no
@@ -229,15 +295,52 @@ SymReg * _get_sym(SymReg * hash[], const char * name) {
     }
     return 0;
 }
-
 SymReg * get_sym(const char * name) {
     return _get_sym(hash, name);
+}
+
+SymReg * _find_sym(Namespace * namespace, SymReg * hash[], const char * name) {
+    Namespace * ns;
+
+    for (ns = namespace; ns; ns = ns->parent) {
+        char * fullname = _mk_fullname(ns, name);
+        SymReg * p = _get_sym(hash, fullname);
+        free(fullname);
+        if (p) return p;
+    }
+
+    return _get_sym(hash, name);
+}
+
+SymReg * find_sym(const char * name) {
+    return _find_sym(namespace, hash, name);
+}
+
+static void _delete_sym(SymReg * hash[], const char * name) {
+    SymReg ** p;
+    int index = hash_str(name) % HASH_SIZE;
+    for(p = &hash[index]; *p; p = &(*p)->next) {
+        SymReg * deadmeat = *p;
+	if(!strcmp(name, deadmeat->name)) {
+            *p = deadmeat->next;
+            free_sym(deadmeat);
+            return;
+        }
+    }
+
+    fprintf(stderr, "Tried to delete nonexistent symbol '%s'\n", name);
+    abort();
+}
+
+static void delete_sym(const char * name) {
+    return _delete_sym(hash, name);
 }
 
 /* Deletes all symbols */
 void clear_tables() {
     int i;
     SymReg * p, *next;
+    while (namespace) pop_namespace(NULL);
     for(i = 0; i < HASH_SIZE; i++) {
 	for(p = hash[i]; p; ) {
 	    next = p->next;
@@ -247,7 +350,6 @@ void clear_tables() {
         hash[i] = NULL;
     }
 }
-
 
 /* utility functions: */
 

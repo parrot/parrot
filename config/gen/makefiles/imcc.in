@@ -61,6 +61,7 @@ clean:
 	$(RM_F) $(IMCC_O_FILES)
 	$(RM_F) imcparser.output
 	$(RM_F) imcc
+	$(RM_F) t/*/*.out t/*/*.imc
 
 realclean: clean
 	$(RM_F) a.pasm
@@ -69,3 +70,7 @@ realclean: clean
 
 imcc: $(O_FILES)
 	$(LINK) $(LD_OUT)imcc $(LINKFLAGS) $(O_FILES) $(C_LIBS)
+
+test:
+	$(PERL) t/harness
+

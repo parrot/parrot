@@ -41,7 +41,7 @@ static int keyvec = 0;
 static int nargs = 0;
 static SymReg *keys[IMCC_MAX_REGS];
 static int nkeys = 0;
-#define KEY_BIT(argnum) (1 << argnum)
+#define KEY_BIT(argnum) (1 << (argnum))
 
 static SymReg ** RR(int n, ...)
 {
@@ -52,6 +52,7 @@ static SymReg ** RR(int n, ...)
     while (n--) {
 	regs[i++] = va_arg(ap, SymReg *);
     }
+    va_end(ap);
     while (i < IMCC_MAX_REGS)
 	regs[i++] = 0;
     return regs;
@@ -178,7 +179,7 @@ Instruction * iNEW(SymReg * r0, char * type, int emit) {
     SymReg *pmc = macro(type);
     /* XXX check, if type exists, but aove keyed search
      * gives 0 for non existing  PMCs */
-    sprintf(fmt, "new %%s, %d\t # .%s", atoi(pmc->name), type);
+    sprintf(fmt, "%%s, %d\t # .%s", atoi(pmc->name), type);
     r0->usage = U_NEW;
     if (!strcmp(type, "PerlArray") || !strcmp(type, "PerlHash"))
         r0->usage |= U_KEYED;
@@ -186,7 +187,7 @@ Instruction * iNEW(SymReg * r0, char * type, int emit) {
     regs[0] = r0;
     regs[1] = pmc;
     nargs = 2;
-    return iANY("new", fmt+4, regs, emit);
+    return iANY("new", fmt, regs, emit);
 }
 
 /* TODO get rid of nargs */
@@ -425,7 +426,7 @@ Instruction * iANY(char * name, char *fmt, SymReg **regs, int emit) {
                 ins->type |= ITALIAS;
         }
         else if (!strcmp(name, "set_addr")) {
-            /* XXX propably a CATCH block */
+            /* XXX probably a CATCH block */
             ins->type = ITADDR | IF_r1_branch | ITBRANCH;
         }
     } else {
@@ -445,7 +446,8 @@ Instruction * iANY(char * name, char *fmt, SymReg **regs, int emit) {
 }
 
 %token <t> CALL GOTO ARG PRINT IF UNLESS NEW END SAVEALL RESTOREALL
-%token <t> SUB NAMESPACE CLASS ENDCLASS SYM LOCAL PARAM INC DEC
+%token <t> SUB NAMESPACE ENDNAMESPACE CLASS ENDCLASS SYM LOCAL PARAM
+%token <t> INC DEC
 %token <t> SHIFT_LEFT SHIFT_RIGHT INTV FLOATV STRINGV DEFINED LOG_XOR
 %token <t> RELOP_EQ RELOP_NE RELOP_GT RELOP_GTE RELOP_LT RELOP_LTE
 %token <t> GLOBAL ADDR CLONE RESULT RETURN POW SHIFT_RIGHT_U LOG_AND LOG_OR
@@ -550,6 +552,8 @@ labeled_inst:
 	assignment
     |   if_statement
     |   SYM type IDENTIFIER		{ mk_ident($3, $2); }
+    |   NAMESPACE IDENTIFIER            { push_namespace($2); }
+    |   ENDNAMESPACE IDENTIFIER         { pop_namespace($2); }
     |   LOCAL type IDENTIFIER		{ mk_ident($3, $2); }
     |   LOCAL type VAR  		{ $$ = 0;
             warning("parser", "file %s line %d: %s already defined\n",
@@ -609,20 +613,24 @@ assignment:
     |  target '=' var '[' keylist ']'   { $$ = iINDEXFETCH($1, $3, $5); }
     |  var '[' keylist ']' '=' var	{ $$ = iINDEXSET($1, $3, $6); }
     |  target '=' NEW classname		{ $$ = iNEW($1, $4, 1); }
-    |  target '=' DEFINED var	{ $$ = MK_I("defined %s, %s",R2($1,$4)); }
-    |  target '=' CLONE var		{ $$ = MK_I("clone %s, %s",R2($1, $4));
+    |  target '=' DEFINED var	        { $$ = MK_I("defined",R2($1,$4)); }
+    |  target '=' DEFINED var '[' keylist ']' { keyvec=KEY_BIT(2);
+                                     $$ = MK_I("defined", R3($1, $4, $6));}
+    |  target '=' CLONE var		{ $$ = MK_I("clone",R2($1, $4));
     }
     |  target '=' ADDR IDENTIFIER	{ $$ = MK_I("set_addr",
                                           R2($1, mk_address($4,U_add_once))); }
     |  target '=' GLOBAL string	{ $$ = MK_I("find_global",R2($1,$4)); }
     |  GLOBAL string '=' var	{ $$ = MK_I("store_global",R2($2,$4)); }
-    |  NEW                      { expect_pasm = 1; }
-        target COMMA newtype    { $$ = iNEW($3, $5, 1); }
-    |  DEFINED target COMMA var { $$ = MK_I("defined", R2($2, $4)); }
-    |  CLONE target COMMA var   { $$ = MK_I("clone", R2($2, $4)); }
+    |  NEW                              { expect_pasm = 1; }
+        target COMMA newtype            { $$ = iNEW($3, $5, 1); }
+    |  DEFINED target COMMA var         { $$ = MK_I("defined", R2($2, $4)); }
+    |  DEFINED target COMMA var '[' keylist ']'  { keyvec=KEY_BIT(2);
+                                       $$ = MK_I("defined", R3($2, $4, $6));}
+    |  CLONE target COMMA var           { $$ = MK_I("clone", R2($2, $4)); }
     ;
 
-newtype: MACRO                 { $$ = str_dup($1+1); free($1); }
+newtype: MACRO
     ;
 
 if_statement:
@@ -672,7 +680,7 @@ _var_or_i: var_or_i                     { regs[nargs++] = $1; }
 var_or_i:
        IDENTIFIER			{ $$ = mk_address($1, U_add_once); }
     |  var
-    | MACRO                             { $$ = macro($1+1); free($1); }
+    | MACRO                             { $$ = macro($1); free($1); }
     ;
 
 var:   VAR

@@ -1339,6 +1339,7 @@ languages/forth/forth.pasm
 languages/imcc/BUGS
 languages/imcc/ChangeLog
 languages/imcc/README
+languages/imcc/TestCompiler.pm
 languages/imcc/cfg.c
 languages/imcc/cfg.h
 languages/imcc/debug.c
@@ -1366,6 +1367,8 @@ languages/imcc/stacks.c
 languages/imcc/stacks.h
 languages/imcc/symreg.c
 languages/imcc/symreg.h
+languages/imcc/t/harness
+languages/imcc/t/syn/clash.t
 languages/jako/MAINTAINER
 languages/jako/bench.jako
 languages/jako/euclid.jako

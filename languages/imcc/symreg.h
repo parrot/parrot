@@ -76,16 +76,20 @@ SymReg * mk_pasm_reg(char *);
 
 void free_sym(SymReg *r);
 void store_symreg(SymReg * r);
+SymReg * find_sym(const char * name);
 SymReg * get_sym(const char * name);
 SymReg * _get_sym(SymReg * hash[], const char * name);
 SymReg * _mk_symreg(SymReg* hash[],char * name, char t);
 SymReg * _mk_const(SymReg *hash[], char * name, char t);
-SymReg * _mk_address(SymReg *hash[], char * name, int uniq);
 void _store_symreg(SymReg *hash[], SymReg * r);
+SymReg * _mk_address(SymReg *hash[], char * name, int uniq);
 SymReg * link_keys(int nargs, SymReg *keys[]);
 void clear_tables();
 unsigned int  hash_str(const char * str);
 void free_life_info(SymReg *r);
+
+void push_namespace(char * name);
+void pop_namespace(char * name);
 
 /* globals */
 
