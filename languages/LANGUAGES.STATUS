@@ -141,9 +141,9 @@ S: but many functions are missing implementation.
 M: Yes
 V: 0.0.11
 
-N: tcl
+N: tcl ("partcl")
 A: Will Coleda
-S: most tests pass, though still not feature-complete
+S: all tests pass, but not feature-complete
 S: under active development
 M: Yes
 V: 0.1.0
