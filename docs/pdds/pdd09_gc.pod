@@ -3,112 +3,248 @@
 
 =head1 NAME
 
-docs/pdds/pdd09_gc.pod - Garbage Collection and Dead Object Detection
+docs/pdds/pdd09_gc.pod - Garbage Collection Subsystems
 
 =head1 ABSTRACT
 
-This PDD describes how the GC and DOD systems work, and what's
-required of PMC classes.
+This PDD describes how DOD/GC systems work, and what's required of PMC
+classes.
 
 =head1 DESCRIPTION
 
-Doing GC takes a bit of work--we need to make sure that everything is
+Doing DOD takes a bit of work--we need to make sure that everything is
 findable from the root set, and that we don't go messing up data
-shared between interpreters. 
+shared between interpreters.
 
-=head2 DOD Steps
+=head1 GC TERMS
 
-=over 4
+=head2 GC Schemes
 
-=item All PMCs have their live bit unset
-
-=item All Buffers have their live bit unset
-
-=item All PMCs in the root set are put on the trace list
-
-=item Walk the trace list
-
-=item The Buffer root set (stack and S registers) is walked, and any referred to buffers are marked as live
-
-=back
-
-For each PMC on the trace list we:
+There are basically three general schemes to achieve garbage
+collection.
 
 =over 4
 
-=item Check its live bit. If set, we skip it
+=item Reference counting
 
-=item Set its live bit
+All objects have a count, how often they are refered to by other
+objects. If that count reaches zero, the object's space can be
+reclaimed. This scheme can't cope with reference loops, i.e, a loop
+of dead objects, all referencing one another but not reachable from
+elsewhere, never gets collected.
 
-=item Check its flags. If it has a custom DOD routine, we call it
+=item Mark and Sweep
 
-=item If there's no custom DOD routine, we check the flags for one of the following:
+Starting from the root set (Parrot registers, stacks, internal
+structures) all reachable objects (and objects reachable from these)
+are marked being alive.
+
+Ojbects not reached are considered being dead and get collected by a
+sweep through the objects arenas.
+
+=item Copying collection
+
+Live objects are copied into a new memory region. The old memory space
+can then be reclaimed.
+
+=back
+
+=head2 GC Variants
 
 =over 4
 
-=item Points to a PMC. We put that PMC on the trace list
+=item stop-the-world
 
-=item Points to a Buffer. We mark the buffer as live
+During a GC cycle the processing of user code is stopped. Normal
+operation continues only after the whole GC cycle is performed. This
+can lead to arbitrary long pauses during program execution.
 
-=item Points to a Buffer of PMCs. We put all the PMCs on the trace list
+=item incremental
 
-=item Points to a Buffer of Buffers. We mark those buffers as live
+GC is done in small increments intermittent with normal program
+operation.
 
-=item Anything else we ignore
+=item real-time
+
+The pauses caused by GC don't exceed a certain limit.
+
+=item concurrent
+
+The GC system runs as a separate thread and really concurrently on a
+multi-processor machine.
+
+=item parallel
+
+Multiple threads are participating in GC.
+
+=item generational
+
+The object space is divided between a young generation (short-lived
+temporaries) and one or more old generations. By not scanning the old
+generation this can considerably speed up GC.
 
 =back
 
-=item We take the PMC off the trace list
+=head1 GC SUBSYSTEMS
 
-=back
+=head2 Fix-sized Headers
 
-Once we're done, we scan the PMC list twice. In the first scan, dead
-PMCs (i.e no live bit and no free bit) with a destructor have that
-destructor called. In the second scan, dead PMCs are put on the free
-list for later reallocation.
+All managed objects (PMCs, Strings, Buffers) inside Parrot are subject
+to garbage collection. As these objects aren't allowed to move after
+creation, garbage collection is done by a non-copying scheme. Further:
+as we have to cope with pointers to objects on the C stack and in CPU
+registers, the garbage collection scheme is a conservative one.
 
-Then we scan the Buffer list. Any dead buffers (no live bit and no
-free bit) are put on the free buffer list.
+DOD/GC is normally triggered by allocation of new objects, which happens
+usually from some stack nesting below the run-loop. There is a small
+chance that an integer on the C stack is misinterpreted as a pointer
+to an object. This object would kept alive in such a case.
 
+The live-ness information gained by dead object detection (DOD) is also the
+base for collecting variable sized-data that may hang off buffers.
 
-=head2 GC Steps
+=head2 Variable-sized Buffer Memory
 
-These are the steps that the GC takes:
+Variable-sized memory like string memory gets collected, when the
+associated header isn't found to be alive during DOD. While a copying
+collection could basically[1] be done at any time, its inefficient to
+copy buffers of objects that are non yet detected being dead. This
+implies that before a collection in the memory pools is run, a DOD run
+for fixed-sized headers is triggered.
+
+[1] Dead objects stay dead, there is no possibility of a reusal of
+dead objects.
+
+=head1 IMPLEMENTATION OF FIXED-SIZED HEADER GC
+
+=head2 General Notes
+
+GC subsystems are rather independent. The goal for Parrot is just to
+provide new object headers in the fasted possible way. How that is
+achieved can be considered as an implementation detail.
+
+While GC subsystems are independent they may share some code to reduce
+Parrot memory footprint. E.g. stop-the-world mark and sweep and
+incremental mark and sweep use the same arena structures and share
+arena creation and DOD routines.
+
+=head2 Initialization
+
+Currently only one GC system is active (selected at configure or
+compile time). But future versions might support switching GC systems
+during runtime to accomodate for different work loads.
 
 =over 4
 
-=item Mark all PMCs with the needs_GC flag
+=item C<void Parrot_gc_XXX_init(Interp *)>
 
-=item Mark all Buffers with the needs_GC flag
+Initialize GC system named C<XXX>.
 
-=item Sweep through all the PMCs with the custom_GC flag set
-
-=item Sweep through all buffers
-
-=item Any Buffer with needs_GC and live flags set, but without immobile set, gets copied
-
-=item Any buffer with needs_GC set and sysmem set, but *not* with live set, gets the system free called on its contents
-
-=item needs_GC flag is unset after copying
+Called from F<src/memory.c:mem_setup_allocator()> after creating
+C<arena_base>. The initialization code is responsible for the creation
+of the header pools and has to fill the following function pointer
+slots in C<arena_base>:
 
 =back
 
-PMCs should only have a custom GC routine if there's really a need for
-the PMC to keep track of the location of the ultimate buffered data. 
-
-For PMCs that need to hand data back to a library when their objects
-are destroyed, a custom DOD routine is in order, *not* a custom GC routine.
-
-=head2 Important safety tips
+=head2 Arena_base function pointers
 
 =over 4
 
-=item Never mark PMCs or Buffers owned by other interpreters as
-needing GC. Bad, very very bad.
+=item C<void (*do_dod_run) (Interp *, int flags)>
+
+Trigger or perform a DOD/GC run.
+
+Flags is one of:
+
+=over 4
+
+=item DOD_trace_normal | DOD_trace_stack_FLAG
+
+Run a normal GC cycle. This is normally called by resource shortage in
+the buffer memory pools before a collection is run. The bit named
+C<DOD_trace_stack_FLAG> indicates that the C-stack (and other system
+areas like the processor registers) have to be traced too.
+
+The implementation might or might not actually run a full GC cycle. If
+e.g an incremental GC system just has finished the mark phase, it
+would do nothing. OTOH if no objects are currently marked live, the
+implementation should run the mark phase, so that copying of dead
+objects is avoided.
+
+=item DOD_lazy_FLAG
+
+Do a timely destruction run. The goal is to either detect all objects
+that need timely destruction or to do a full collection. In the former
+case the collection can be interrupted or postponed. This is called
+from the Parrot run-loop. No system areas have to be traced.
+
+=item DOD_finish_FLAG
+
+Called during interpreter destruction. The GC subsystem must clear the
+live state of all objects and perform a sweep in the PMC header pool,
+so that destructors and finalizers get called.
 
 =back
 
-=head1 IMPLEMENTATION
+=item C<void (*de_init_gc_system) (Interp*)>
+
+Called during interpreter destruction. Free used resources and memory
+pools.
+
+=item C<void (*mark_object) (Interp*, Pobj*)>
+
+Mark the object being live. This function gets invoked by the
+following macro:
+
+=item C<Parrot_pobj_lives(Interp*, PObj *)>
+
+which might do nothing if the object is already marked live.
+
+=back
+
+=head2 Object allocation
+
+Each header pool provides one function pointer to get a new object
+from that pool.
+
+=over 4
+
+=item C<PObj * (*get_free_object) (Interp*, struct Small_Object_Pool*)>
+
+It should return one free object from the given pool. Object flags are
+returned clear, except flags that are used by the garbage collector
+itself. If the pool is a buffer header pool, all other object memory
+is zeroed.
+
+=back
+
+=head2 Write Barrier
+
+The GC subsystem has to provide these (possibly empty) macros:
+
+=over 4
+
+=item C<DOD_WRITE_BARRIER(Interp*, PMC *agg, PMC *old, PMC *new)>
+
+This macro is invoked when in aggregate C<agg> the element C<old> is
+getting overritten by C<new>. Both C<old> and C<new> may be NULL.
+
+=item C<DOD_WRITE_BARRIER_KEY(Interp*, PMC *agg, PMC *old, PObj *old_key, PMC *new, PObj *new_key)>
+
+Like above. Invoked when a hash key is inserted, possibly replacing
+and old key.
+
+=back
+
+=head2 The Arena_base structure
+
+The C<arena_base> holds the mentioned function pointers, pointers to
+the header pools, some statistic counters, and a pointer C<void *gc_private>
+reserved for the GC subsystem.
+
+The GC subsystem is responsible for updating the appropriate statistic
+fields of the structure.
 
 =head2 Blocking GC
 
@@ -145,99 +281,62 @@ times to re-enable DOD.
 For PMCs and Buffers to be collected properly, you B<must> get the
 flags set on them properly. Otherwise Bad Things Will Happen.
 
-For PMCs:
+Note: don't manipulate these flags directly. Always use the macros
+defined in F<include/parrot/pobj.h>.
 
 =over 4
 
-=item PMC_active_destroy_FLAG
+=item PObj_active_destroy_FLAG
 
 The PMC has some sort of active destructor, and will have that
 destructor called when the PMC is destroyed.
 
-=item PMC_is_buffer_ptr_FLAG
+=item PObj_custom_mark_FLAG
 
-Set if the data pointer points to a Buffer struct, or something like
-it. If you point to a buffer and don't set this flag, it'll end up
-getting collected.
+The C<mark> vtable slot will be called during DOD. The mark function
+must call C<Parrot_pobj_lives> for all non-NULL objects that PMC
+refers too.
 
-=item PMC_is_PMC_ptr_FLAG
+Please note that C<Parrot_pobj_lives> may be a macro.
 
-Set if the data pointer points to a PMC. Set this if it does, or
-you'll find your PMC collected.
+=item PObj_data_is_PMC_array_FLAG
 
-If both PMC_is_PMC_ptr_FLAG and PMC_is_buffer_ptr_FLAG are set, we
-assume the pointer is to a Buffer holding PMC pointers. (Like, say,
-the standard array, hash, and list PMC types do) We'll run through the
-Buffer and mark all the non-NULL pointers as live PMCs.
+Set if the data pointer points to an array of objects. The length of
+the array is C<PMC_int_val(SELF)>.
 
-=item PMC_private_GC_FLAG
-
-Set if you've got your own private GC, either for marking or
-collecting. The collector will call your vtable collection routine,
-and the DOD sweep will call your vtable mark routine.
-
-=item PMC_live_FLAG
-
-Set if the system considers the PMC alive.
-
-=item PMC_on_free_list_FLAG
-
-Set if the PMC is on the free list.
-
-=item PMC_constant_FLAG
-
-Set if this is a constant PMC. Constants never die.
-
-=back
-
-For Buffers (and STRINGs)
-
-=over 4
-
-=item BUFFER_constant_FLAG
-
-Set if the buffer is a constant. Constants never die.
-
-=item BUFFER_immobile_FLAG
-
-Set if the contents of the buffer can't move. Do not B<ever> set this
-on a buffer pointing to memory allocated with C<Parrot_allocate>. Your
-memory will be scrozzled all over.
-
-=item BUFFER_external_FLAG
+=item PObj_external_FLAG
 
 Set if the buffer points to memory that came from outside Parrot's
 memory system.
 
-=item BUFFER_sysmem_FLAG
+=item PObj_sysmem_FLAG
 
 Set if the memory came from the system malloc. When the buffer is
 considered dead, the memory will be freed back to the system.
 
-=item BUFFER_COW_FLAG
+=item PObj_COW_FLAG
 
 The buffer's memory is copy on write. Any changes to the buffer must
 first have the buffer's memory copied. The COW flag should then be
 removed.
 
-=item BUFFER_live_FLAG
-
-The system considers the buffer to be alive for collection purposes.
-
-=item BUFFER_on_free_list_FLAG
-
-The buffer is unused, and on the free list for later allocation. 
-
 =back
 
-=head2 Internal routines
+The following flags can be used by the GC subsystem:
 
 =over 4
 
-=item go_collect
+=item PObj_live_FLAG
 
-Scans the Buffer header pools and compacts the used memory. Doesn't
-check for string liveness or anything of the sort, just does a compaction.
+The system considers the object to be alive for collection purposes.
+
+=item PObj_on_free_list_FLAG
+
+The object is unused, and on the free list for later allocation.
+
+=item PObj_custom_GC_FLAG
+
+DWIM.
 
 =back
 
@@ -260,15 +359,19 @@ None.
     Maintainer: Dan Sugalski
     Class: Internals
     PDD Number: 9
-    Version: 1.1
+    Version: 1.2
     Status: Developing
-    Last Modified: 26 February, 2002
+    Last Modified: 26 August 2004
     PDD Format: 1
     Language: English
 
 =head2 HISTORY
 
 =over 4
+
+=item Version 1.2
+
+26 August 2004
 
 =item Version 1.1
 
@@ -283,6 +386,10 @@ None. First version
 =head1 CHANGES
 
 =over 4
+
+=item Version 1.2
+
+Removed old flags. Documented GC schemes and subsystem interface.
 
 =item Version 1.1
 
