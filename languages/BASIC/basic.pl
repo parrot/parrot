@@ -3,6 +3,9 @@
 #
 # $Id$
 # $Log$
+# Revision 1.2  2002/04/11 02:21:15  jgoff
+# Altered system() calls to point to the correct directory.
+#
 # Revision 1.1  2002/04/11 01:25:59  jgoff
 # Adding clintp's BASIC interpreter.
 #
@@ -23,6 +26,9 @@
 #
 # $Id$
 # $Log$
+# Revision 1.2  2002/04/11 02:21:15  jgoff
+# Altered system() calls to point to the correct directory.
+#
 # Revision 1.1  2002/04/11 01:25:59  jgoff
 # Adding clintp's BASIC interpreter.
 #
@@ -126,8 +132,8 @@ print T $a;
 
 close(T);
 unlink "out.pbc";
-system("perl assemble.pl test.pasm > out.pbc");
+system("perl -I../../lib ../../assemble.pl test.pasm > out.pbc");
 
-system("parrot out.pbc");
+system("../../parrot out.pbc");
 
 
