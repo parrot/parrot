@@ -64,9 +64,11 @@
 .constant TempStr    	S23
 
 .constant PendingConstant S24
+.constant StringStack      S31
 
 #
 
+.constant PIRCompiler	P14
 .constant StringConstants P15
 .constant CoreOps       P16
 .constant UserOps       P18
@@ -93,6 +95,7 @@ VeryBeginning:
 
     # We need a PMC for the compiler
     compreg .PASMCompiler, "PASM"
+    compreg .PIRCompiler, "PIR"
 
     bsr InitializeCoreOps
 
@@ -163,13 +166,16 @@ DonePromptString:
     save .WorkTOS
 .endm
 
-#.macro PopStr
-#
-#.endm
+.macro PopStr
+    restore .WorkTOS
+    set .StringStack, .WorkTOS        
+.endm
 
-#.macro PushStr
-#
-#.endm
+.macro PushStr
+    new .WorkTOS, .PerlString
+    set .WorkTOS, .StringStack
+    save .WorkTOS
+.endm
 
 .macro PopPMC
   restore .PMCStack    
@@ -218,9 +224,9 @@ InitializeCoreOps:
     set .SpecialWords["compile,"], 10
     set .SpecialWords['p"'], 11
 
-    .AddCoreOp(Int_Dot,".")
-    .AddCoreOp(Int_Dot, "u.")
-    .AddCoreOp(Int_Dot_Stack,".s")
+    .AddCoreOp(Thing_Dot,".")
+    .AddCoreOp(Thing_Dot, "u.")
+    .AddCoreOp(Thing_Dot_Stack,".s")
     .AddCoreOp(Quit,"quit")
     .AddCoreOp(Int_Add,"+")
     .AddCoreOp(Int_One_Plus,"1+")
@@ -366,12 +372,12 @@ InitializeCoreOps:
     # Stack Manipulation, Data stack
     #
 
-    .AddCoreOp(Int_Drop,"drop")
+    .AddCoreOp(Thing_Drop,"drop")
     .AddUserOp("nip", "swap drop")
-    .AddCoreOp(Int_Dup,"dup")
-    .AddCoreOp(Int_Over, "over")
+    .AddCoreOp(Thing_Dup,"dup")
+    .AddCoreOp(Thing_Over, "over")
     .AddUserOp("tuck", "swap over")
-    .AddCoreOp(Int_Swap,"swap")
+    .AddCoreOp(Thing_Swap,"swap")
     .AddCoreOp(Stack_Depth, "depth")
     .AddCoreOp(Pick_Stack, "pick")
     .AddCoreOp(Rot_Stack, "rot")
@@ -638,6 +644,23 @@ InitializeCoreOps:
    .AddCoreOp(Emit, "emit")
    .AddCoreOp(Execute, "execute")
 
+
+   #
+   # Parrot extension words
+   #
+   .AddCoreOp(IntReg, "ireg")
+   .AddCoreOp(PMCReg, "preg")
+   .AddCoreOp(NReg, "nreg")
+   .AddCoreOp(SReg, "sreg")
+   .AddCoreOp(Invoke, "invoke")
+   .AddCoreOp(FindGlobal, "findglobal")
+   .AddCoreOp(LoadAssembly, "loadpasm")  
+   .AddCoreOp(LoadPIR, "loadpir")
+   .AddCoreOp(SingleReturnP, "resultP")
+   .AddCoreOp(SingleReturnI, "resultI")
+   .AddCoreOp(SingleReturnS, "resultS")
+   .AddCoreOp(SingleReturnN, "resultN")
+
     ret
 
 #------------------------------------------------------------------------------
@@ -751,22 +774,22 @@ Int_One_Plus:
     inc .IntStack
     .PushInt 
     branch DoneInterpretWord
-Int_Dot:
+Thing_Dot:
     .PopPMC
     print .PMCStack
     print " "
     branch DoneInterpretWord
-Int_Dot_Stack:
+Thing_Dot_Stack:
     branch DoneInterpretWord
-Int_Dup:
+Thing_Dup:
     .PopPMC 
     .PushPMC 
     .PushPMC 
     branch DoneInterpretWord
-Int_Drop:
+Thing_Drop:
     .PopPMC
     branch DoneInterpretWord
-Int_Swap:
+Thing_Swap:
     rotate_up 2
     branch DoneInterpretWord
 Quit:
@@ -1242,6 +1265,73 @@ Float_Div:
     .PushNum
     branch DoneInterpretWord
 
+IntReg:
+    .PopInt
+    set .TempInt, .IntStack
+    .PopInt
+    seti_ind .TempInt, .IntStack
+    branch DoneInterpretWord
+
+NReg:
+    .PopInt
+    .PopNum
+    setn_ind .IntStack, .NumStack
+    branch DoneInterpretWord
+
+SReg:
+    .PopInt
+    .PopStr
+    sets_ind .IntStack, .StringStack
+    branch DoneInterpretWord
+
+PMCReg:
+    .PopInt
+    .PopPMC
+    setp_ind .IntStack, .PMCStack
+    branch DoneInterpretWord
+
+Invoke:
+    savetop
+    invoke
+    restoretop
+    branch DoneInterpretWord
+
+FindGlobal:
+    .PopStr
+    find_global .PMCStack, .StringStack
+    .PushPMC
+    branch DoneInterpretWord
+
+LoadAssembly:
+    .PopStr
+    set .TempStr, ".pcc_sub _MAIN prototyped\n"
+    concat .TempStr, '.include "'
+    concat .TempStr, .StringStack
+    concat .TempStr, '"'
+    concat .TempStr, "\n.end\n"
+    compile .CompiledWordPMC, .PIRCompiler, .TempStr
+    invoke .CompiledWordPMC
+    branch DoneInterpretWord
+
+SingleReturnP:
+    set .PMCStack, P5
+    .PushPMC
+    branch DoneInterpretWord
+
+SingleReturnN:
+    set .NumStack, N5
+    .PushNum
+    branch DoneInterpretWord
+
+SingleReturnI:
+    set .IntStack, I5
+    .PushInt
+    branch DoneInterpretWord
+
+SingleReturnS:
+    set .StringStack, S5
+    .PushStr
+    branch DoneInterpretWord
 
 DoneInterpretWord:
     ret

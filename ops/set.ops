@@ -252,7 +252,7 @@ inline op assign(out STR, in STR) {
 
 =back
 
-=head2 Indirect PMC register set
+=head2 Indirect register set
 
 =over 4
 
@@ -266,6 +266,51 @@ affected register - handle with care.
 
 inline op setp_ind(in INT, in PMC) {
     REG_PMC($1) = $2;
+    goto NEXT();
+}
+
+=back
+
+=item B<seti_ind>(in INT, in INT)
+
+Set the Int register in register $1 to $2.
+Please note, that the register allocator doesn't track the usage of the
+affected register - handle with care.
+
+=cut
+
+inline op seti_ind(in INT, in INT) {
+    REG_INT($1) = $2;
+    goto NEXT();
+}
+
+=back
+
+=item B<setn_ind>(in INT, in NUM)
+
+Set the Num register whose register number is in $1 to $2.
+Please note, that the register allocator doesn't track the usage of the
+affected register - handle with care.
+
+=cut
+
+inline op setn_ind(in INT, in NUM) {
+    REG_NUM($1) = $2;
+    goto NEXT();
+}
+
+=back
+
+=item B<sets_ind>(in INT, in STR)
+
+Set the string register whose register number is in register $1 to $2.
+Please note, that the register allocator doesn't track the usage of the
+affected register - handle with care.
+
+=cut
+
+inline op sets_ind(in INT, in STR) {
+    REG_STR($1) = $2;
     goto NEXT();
 }
 
