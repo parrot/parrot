@@ -50,11 +50,11 @@ runops_cgoto_core(struct Parrot_Interp *interpreter, opcode_t *pc)
 {
 #ifdef HAVE_COMPUTED_GOTO
     pc = cg_core(pc, interpreter);
+    return pc;
 #else
     fprintf(stderr, "Computed goto unavailable in this configuration.\n");
     exit(1);
 #endif
-    return pc;
 }
 
 /*=for api interpreter runops_slow_core

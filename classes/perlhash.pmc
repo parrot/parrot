@@ -154,7 +154,6 @@ pmclass PerlHash {
     }
 
     PMC* get_pmc_keyed (KEY * key) {
-        PMC* valpmc;
         STRING* key_string = make_hash_key(INTERP, key);
         KEY_ATOM* atom = hash_get(INTERP, (HASH*) SELF->data, key_string);
         if (atom == NULL) {

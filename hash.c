@@ -211,7 +211,6 @@ expand_hash(Interp *interpreter, HASH* hash)
     UINTVAL i;
     UINTVAL old_pool_size = hash->bucket_pool->buflen / sizeof(HASHBUCKET);
     UINTVAL new_pool_size = new_size * MAXFULL_PERCENT / 100;
-    HASHBUCKET* old_pool = (HASHBUCKET*) hash->bucket_pool->bufstart;
 
     Parrot_reallocate(interpreter, hash, new_size * sizeof(HASHBUCKET*));
     Parrot_reallocate(interpreter, hash->bucket_pool,
@@ -282,7 +281,6 @@ new_bucket(Interp *interpreter, HASH* hash, STRING *key, KEY_ATOM *value)
 static HASHBUCKET *
 find_bucket(Interp *interpreter, HASHBUCKET *head, STRING *key)
 {
-    KEY_ATOM *pair = NULL;
     if (head != NULL) {
         if (key != NULL) {
             while (head != NULL) {

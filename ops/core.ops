@@ -1936,7 +1936,6 @@ inline op pack(inout STR, in INT, in NUM) {
 inline op pack(inout STR, in INT, in STR) {
     STRING *t,*s = $3;
     UINTVAL len = (UINTVAL)$2;
-    char *c = s->bufstart;
     char buf[3];
 
     if (s->buflen < len) {
@@ -1955,9 +1954,9 @@ inline op pack(inout STR, in INT, in STR) {
 inline op pack(inout STR, in INT, in INT, in INT) {
     char *c = (char *)&$3, *n;
     STRING *s;
-    const char *t,*f;
+    const char *t;
     int i;
-
+    
     s = string_make(interpreter, c, (UINTVAL)$2, NULL, 0, NULL);
     /* XXX this is EVIL, use string_replace */
     n = $1->bufstart;
@@ -3205,6 +3204,7 @@ op destroy(in PMC) {
   /* Should just assign undef, but we don't have one yet */
   $1->vtable = YOU_LOSE_VTABLE;
   $1->flags = PMC_live_FLAG;
+  goto NEXT();
 }
 
 ########################################

@@ -52,10 +52,10 @@ fetch_iv_be(INTVAL w) {
 #if PARROT_BIGENDIAN
     return w;
 #else
-    INTVAL r;
 # if INTVAL_SIZE == 4
     return (w << 24) | ((w & 0xff00) << 8) | ((w & 0xff0000) >> 8) | (w>>24); 
 # else
+    INTVAL r;
     r = w << 56;
     r |= (w & 0xff00) << 40;
     r |= (w & 0xff0000) << 24;
@@ -77,11 +77,11 @@ fetch_op_be(opcode_t w) {
 #if PARROT_BIGENDIAN
     return w;
 #else
-    opcode_t r;
 # if OPCODE_T_SIZE == 4
     return  (w << 24) | ((w & 0x0000ff00) << 8) | ((w & 0x00ff0000) >> 8) |
             ((w & 0xff000000) >>24); 
 # else
+    opcode_t r;
     r = w << 56;
     r |= (w & 0xff00) << 40;
     r |= (w & 0xff0000) << 24;

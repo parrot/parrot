@@ -353,7 +353,6 @@ pmclass PerlArray {
 
     void set_pmc_keyed (KEY* dest_key, PMC* src, KEY* src_key) {
         INTVAL ix;
-        PMC* pmc2;
         PMC** array;
 
         if (!dest_key) {
