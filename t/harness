@@ -32,7 +32,7 @@ Run with JIT enabled.
 
 Run the C<Prederef> core.
 
-=item C<-P> (sic)
+=item C<-C>
 
 Run the C<CGP> core.
 
@@ -86,7 +86,7 @@ perl t/harness [options] [testfiles]
     -g ... run CGoto
     -j ... run JIT
     -P ... run Prederef
-    -P ... run CGP
+    -C ... run CGP
     -S ... run Switched
     -b ... run bounds checked
     -v ... run verbose
