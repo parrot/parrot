@@ -27,7 +27,9 @@ foreach $op (@$Parrot::OpLib::core::ops) {
     $fix = undef;
     $size = scalar($op->size) - 1;
     print FILE uc($op->full_name) . ":\n";
-    $load .= $op->full_name . '#' . $opnum . '#';
+    $load .= "    set_keyed P2,\"" . $op->full_name . '",' . $opnum . "\n";
+    $load .= "    set_addr I1," . uc($op->full_name) . "\n";
+    $load .= "    set_keyed P7," . $opnum++ . ",I1\n";
     if (($op->jump) && ($op->arg_type($size) eq 'ic')) {
         $size--;
         $fix = "    bsr HANDLE_ARG_LABEL\n";
@@ -36,19 +38,18 @@ foreach $op (@$Parrot::OpLib::core::ops) {
         print FILE "    bsr HANDLE_ARG_" . $map{$op->arg_type($i)} . "\n";  
     }
     print FILE $fix if ($fix);
-    print FILE "    branch BACK_FROM_OPARGS\n";
-    $opargs = "    eq I3," . $opnum++ . "," . uc($op->full_name) . "\n";
-    push @handle_opcode, $opargs; 
+    print FILE "    branch READ\n";
 }
 
-print FILE "LOAD:\n    set S31, \"" . $load . "\"\n    ret\n\n";
-
-print FILE "HANDLE_OPCODE_ARGS:\n";
-print FILE @handle_opcode;
-print FILE "BACK_FROM_OPARGS:\n    ret\n";
+print FILE "LOAD:\n" . $load . "\n    ret\n\n";
 
 #
 # $Log$
+# Revision 1.2  2002/06/01 08:15:03  grunblatt
+# * Use and abuse of array and hashes.
+# * Gets the input and output file names from the command line:
+# 	./parrot pc.pbc <input> <output>
+#
 # Revision 1.1  2002/05/16 18:31:04  grunblatt
 # The first version of the Parrot compiler written in Parrot.
 # You must provide fully qualified opcode names.

@@ -6,137 +6,118 @@
 # $Id$
 #
 
+# It will compile any Parrot program written with fully qualified 
+# opcode names, opcode arguments without their type (no I/N/S/P), 
+# no spaces between arguments, no spaces between labels and opcode
+# names, no empty lines, no comments and no lines without an opcode.
+
+
+# Registers usage:
+# I0  the position in the input line.
+# I20 input file descriptor.
+# I22 the size of the current opcode.
+# I23 sizeof floats.
+# I24 sizeof opcode_t.
+# I29 the last label identifier.
+# S28 the bytecode.
+# S30 the constant table.
+# P2  is a hash with the opcode full names as keys 
+#     and opcode numbers as values.
+# XXX This should be done using a hash of arrays, or something like that.
+#     I31 is the label references count.
+#     P3  is an array with labels.
+#     P4  is an array with the labels positions (the address of the opcode).
+#     P5  is an array with the position to apply the label within the opcode.
+#     P6  is a hash with the labels as keys and the position they mark as values.
+# P7  is an array with the addresses of the labels of each opcode handler.
+# P31 escape secuences.
+
 MAIN:
     set I23,8
     set I24,4
 
-    new P31,PerlHash
+    new P2,.PerlHash
+    new P3,.PerlArray
+    new P4,.PerlArray
+    new P5,.PerlArray
+    new P6,.PerlHash
+    new P7,.PerlArray
+    new P31,.PerlHash
     set_keyed P31,"a",0x7
     set_keyed P31,"n",0xa
     set_keyed P31,"r",0xd
     set_keyed P31,"t",0x9
-    set_keyed P31,"\",0x5c
+    set_keyed P31,"\\",0x5c
 
     bsr LOAD
-    print "Input file: "
-    readline S15,0
-    chopn S15,1
+    # Get the name of the input file
+    get_keyed S15,P0,1
     open I20,S15
-    print "Output file: "
-    readline S15,0
-    chopn S15,1
-    open P0,S15, ">"
+    # Get the name of the output file
+    get_keyed S15,P0,2
+    open P1,S15,">"
     bsr READ
     end
-
+ 
 READ:
     readline S0,I20
     set I0, 0
     length I0,S0
     unless I0, FINISH
     index I0, S0, ":"
-    eq I0, -1, HANDLE_OPCODE
-    bsr HANDLE_LABEL 
+    chopn S0,1
+    concat S0,","
+    ne I0, -1, HANDLE_LABEL
     branch HANDLE_OPCODE
-
-END_HO:    
-    branch READ
 
 FINISH:
     bsr OUTPUT
     ret
 
-# Make from the line something I can understand
-LINE:
-    index I6, S0, " ", I0
-    eq I0, I6, INCI0
-    length I6, S0
-    dec I6
-    eq I0, I6, NEXTLINE
-    index I6, S0, "#", I0
-    eq I6, -1, RETURN
-    eq I0, I6, DISCARD
-RETURN:
-    chopn S0, 1
-    concat S0, ","
-    ret
-
-DISCARD:
-    set I0,-1
-    ret
-
-INCI0:
-    inc I0
-    branch LINE
-
-NEXTLINE:
-    readline S6, I20
-    chopn S0,1
-    concat S0, S6
-    branch LINE
-    
-# Get the opcode name.
+HANDLE_LABEL:
+    # get the label
+    substr S1, S0, 0, I0
+    # set the label position
+    length I30,S28
+    set_keyed P6,S1,I30
 
 HANDLE_OPCODE:
     inc I0
-    bsr LINE
-    # There are better ways but ...
-    eq I0, -1, READ
     index I1, S0, " ", I0
     sub I1,I1,I0
     substr S1, S0, I0, I1
     add I0, I0, I1
     inc I0
-    bsr GET_OPCODE_NUMBER
-    bsr HANDLE_OPCODE_ARGS
-
-    length I3,S1
-    branch END_HO
-
-HANDLE_LABEL:
-    substr S1, S0, 0, I0
-    concat S29, S1
-    concat S29, "#"
-    length I30, S28
-    set S2, I30 
-    concat S29, S2
-    concat S29, "#"
-    ret
-
-GET_OPCODE_NUMBER:
-    index I2, S31, S1
-    index I2, S31, "#", I2
-    inc I2
-    index I3, S31, "#", I2
-    sub I3, I3, I2
-    substr S2, S31, I2, I3 
-    set I3, S2
+    get_keyed I3,P2,S1
+    # pack the opcode number
     pack S28,I24,I3
-    set I22,I24
-    ret
+    set I22,4
+    # handle opcode arguments
+    get_keyed I3,P7,I3
+    jsr I3
 
 HANDLE_ARG_LABEL:
+    # get the label
     index I4, S0, ",", I0
     sub I4, I4, I0
     substr S2, S0, I0, I4
     add I0, I0, I4
     inc I0
-    concat S2, "#"
-    concat S27, S2
-    length I4, S28
-    sub I4,I4,I22
-    set S2, I4
-    concat S2, "#"
-    concat S27,S2
-    set S2, I22
-    concat S2, "#"
-    concat S27,S2
+    # update the label count
+    inc I31
+    # save the label
+    set_keyed P3,I31,S2
+    length I30,S28
+    dec I30,I22
+    # save the address of the opcode
+    set_keyed P4,I31,I30
+    # save the address of label 
+    set_keyed P5,I31,I22
+    # add a noop
     pack S28,I24,0
-    add I22,I22,I24
     ret
-    
+   
 HANDLE_ARG_REG:
-HANDLE_ARG_INT:
     index I4, S0, ",", I0
     sub I4, I4, I0
     substr S2, S0, I0, I4
@@ -144,7 +125,7 @@ HANDLE_ARG_INT:
     inc I0
     set I4, S2
     pack S28,I24,I4
-    add I22,I22,I24
+    inc I22,I24
     ret 
 
 HANDLE_ARG_NUM:
@@ -161,7 +142,7 @@ HANDLE_ARG_NUM:
     # size
     pack S30,I24,I23
     pack S30,I23,N5
-    add I22,I22,I24
+    inc I22,I24
     ret
     
 HANDLE_ARG_STR:
@@ -195,11 +176,11 @@ DONTFILL:
     pack S30,I24,I5
     # string
     pack S30,I8,S2
-    add I22,I22,I24
+    inc I22,I24
     ret
 
 ESCAPE:
-    index I4,S2,"\",I2
+    index I4,S2,"\\",I2
     eq I4,-1,FINISH_ESCAPE
     add I7,I4,1
     index I6,S2,"a",I4
@@ -230,46 +211,32 @@ ESCAPE_IT:
     sub I2,I7,1
     branch ESCAPE
 
-
 FINISH_ESCAPE:
     ret
 
 FIXUP:
-    index I12,S27,"#",I11 
-    eq I12,-1,ENDFIXUP
-    sub I17,I12,I11
-    substr S11,S27,I11,I17
-    bsr GET_LABEL_ADDRESS
-    inc I12
-    index I14, S27, "#", I12
-    sub I18,I14,I12
-    substr S11,S27,I12,I18
-    set I15,S11
-    inc I14
-    index I16, S27, "#", I14
-    set I11,I16
-    inc I11
-    sub I16,I16,I14
-    substr S11,S27,I14,I16
-    set I16,S11
-    add I16,I16,I15
-    sub I15,I13,I15
-    div I15,I15,I24
-    pack S28, 4, I15, I16
-    branch FIXUP
+    # get the last label found
+    get_keyed S11,P3,I31
+    # if the length is 0 return
+    length I15,S11
+    eq 0,I15,ENDFIXUP
+    # get the address of the opcode to apply the fixup
+    get_keyed I15,P4,I31
+    # get the address within the opcode to apply the fixup
+    get_keyed I16,P5,I31
+    # get the position marked by the label
+    get_keyed I17,P6,S11
+    # calculate the offset
+    sub I18,I17,I15
+    div I18,I18,I24
+    # calculate the address to apply the fixup
+    inc I15,I16
+    pack S28,4,I18,I15
+    dec I31
+    if I31,FIXUP
 ENDFIXUP:
     ret
-    
-GET_LABEL_ADDRESS:
-    index I2, S29, S11
-    index I2, S29, "#", I2
-    inc I2
-    index I13, S29, "#", I2
-    sub I13, I13, I2
-    substr S2, S29, I2, I13 
-    set I13, S2
-    ret
- 
+
 OUTPUT:
     # This is not portable, yet.
     pack S24,I24,I24
@@ -286,19 +253,24 @@ OUTPUT:
     add I10,I10,I24
     pack S24,I24,I10
     pack S24,I24,I25
-    print P0, S24
+    print P1,S24
 
     length I10,S28
     pack S30,I24,I10 
-    print P0, S30
+    print P1,S30
 
     bsr FIXUP
-    print P0, S28
-    close P0
+    print P1,S28
+    close P1
     ret
 
 #
 # $Log$
+# Revision 1.2  2002/06/01 08:15:03  grunblatt
+# * Use and abuse of array and hashes.
+# * Gets the input and output file names from the command line:
+# 	./parrot pc.pbc <input> <output>
+#
 # Revision 1.1  2002/05/16 18:31:04  grunblatt
 # The first version of the Parrot compiler written in Parrot.
 # You must provide fully qualified opcode names.
