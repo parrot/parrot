@@ -40,9 +40,6 @@ sub _load {
 	$opcode{$name}{TYPES} = \@params;
 	$opcode{$name}{CODE}  = ($name eq "end") ? 0 : $count++;
 	$opcode{$name}{FUNC}  = $name;
-
-	my $num_i = () = grep {/i/} @params;
-	my $num_n = () = grep {/n/} @params;
 	$opcode{$name}{RETURN_OFFSET} = 1 + scalar(@params);
     }
 }
