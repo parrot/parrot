@@ -43,8 +43,8 @@ struct PackFile {
     opcode_t                     magic;
     struct PackFile_FixupTable * fixup_table;
     struct PackFile_ConstTable * const_table;
-    size_t                       byte_code_size;
-    char *                       byte_code;
+    size_t                       byte_code_size;  /* size in bytes */
+    opcode_t *                   byte_code;
 };
 
 
@@ -70,20 +70,20 @@ PackFile_set_magic(struct PackFile * self, opcode_t magic);
 opcode_t
 PackFile_get_byte_code_size(struct PackFile * self);
 
-char *
+opcode_t *
 PackFile_get_byte_code(struct PackFile * self);
 
 void
-PackFile_set_byte_code(struct PackFile * self, size_t byte_code_size, char * byte_code);
+PackFile_set_byte_code(struct PackFile * self, size_t byte_code_size, opcode_t * byte_code);
 
 opcode_t
-PackFile_unpack(struct Parrot_Interp *interpreter, struct PackFile * self, char * packed, size_t packed_size);
+PackFile_unpack(struct Parrot_Interp *interpreter, struct PackFile * self, opcode_t * packed, size_t packed_size);
 
 opcode_t
 PackFile_pack_size(struct PackFile * self);
 
 void
-PackFile_pack(struct PackFile * self, char * packed);
+PackFile_pack(struct PackFile * self, opcode_t * packed);
 
 void
 PackFile_dump(struct PackFile * self);
@@ -103,13 +103,13 @@ void
 PackFile_FixupTable_clear(struct PackFile_FixupTable * self);
 
 opcode_t
-PackFile_FixupTable_unpack(struct PackFile_FixupTable * self, char * packed, opcode_t packed_size);
+PackFile_FixupTable_unpack(struct PackFile_FixupTable * self, opcode_t * packed, opcode_t packed_size);
 
 opcode_t
 PackFile_FixupTable_pack_size(struct PackFile_FixupTable * self);
 
 void
-PackFile_FixupTable_pack(struct PackFile_FixupTable * self, char * packed);
+PackFile_FixupTable_pack(struct PackFile_FixupTable * self, opcode_t * packed);
 
 void
 PackFile_FixupTable_dump(struct PackFile_FixupTable * self);
@@ -138,13 +138,13 @@ struct PackFile_Constant *
 PackFile_ConstTable_constant(struct PackFile_ConstTable * self, opcode_t idx);
 
 opcode_t
-PackFile_ConstTable_unpack(struct Parrot_Interp *interpreter, struct PackFile_ConstTable * self, char * packed, opcode_t packed_size);
+PackFile_ConstTable_unpack(struct Parrot_Interp *interpreter, struct PackFile_ConstTable * self, opcode_t * packed, opcode_t packed_size);
 
 opcode_t
 PackFile_ConstTable_pack_size(struct PackFile_ConstTable * self);
 
 void
-PackFile_ConstTable_pack(struct PackFile_ConstTable * self, char * packed);
+PackFile_ConstTable_pack(struct PackFile_ConstTable * self, opcode_t * packed);
 
 void
 PackFile_ConstTable_dump(struct PackFile_ConstTable * self);
@@ -185,22 +185,22 @@ void
 PackFile_Constant_set_string(struct PackFile_Constant * self, STRING * s);
 
 opcode_t
-PackFile_Constant_unpack(struct Parrot_Interp *interpreter, struct PackFile_Constant * self, char * packed, opcode_t packed_size);
+PackFile_Constant_unpack(struct Parrot_Interp *interpreter, struct PackFile_Constant * self, opcode_t * packed, opcode_t packed_size);
 
 opcode_t
-PackFile_Constant_unpack_integer(struct PackFile_Constant * self, char * packed, opcode_t packed_size);
+PackFile_Constant_unpack_integer(struct PackFile_Constant * self, opcode_t * packed, opcode_t packed_size);
 
 opcode_t
-PackFile_Constant_unpack_number(struct PackFile_Constant * self, char * packed, opcode_t packed_size);
+PackFile_Constant_unpack_number(struct PackFile_Constant * self, opcode_t * packed, opcode_t packed_size);
 
 opcode_t
-PackFile_Constant_unpack_string(struct Parrot_Interp *interpreter, struct PackFile_Constant * self, char * packed, opcode_t packed_size);
+PackFile_Constant_unpack_string(struct Parrot_Interp *interpreter, struct PackFile_Constant * self, opcode_t * packed, opcode_t packed_size);
 
 opcode_t
 PackFile_Constant_pack_size(struct PackFile_Constant * self);
 
 void
-PackFile_Constant_pack(struct PackFile_Constant * self, char * packed);
+PackFile_Constant_pack(struct PackFile_Constant * self, opcode_t * packed);
 
 void
 PackFile_Constant_dump(struct PackFile_Constant * self);
