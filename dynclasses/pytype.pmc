@@ -59,6 +59,30 @@ they will be used frequently here.
 
 /*
 
+=item C<PMC *find_method(STRING *method_name)>
+
+Looks up the method for C<*method_name> and returns it.
+
+=cut
+
+*/
+
+    PMC* find_method(STRING* method_name) {
+        PMC *parent;
+
+        PMC *method = VTABLE_getprop(INTERP, SELF, method_name);
+        if (method && VTABLE_defined(INTERP, method)) return method;
+
+        parent = VTABLE_getprop(INTERP, SELF, BASES);
+        if (parent) {
+            return VTABLE_find_method(INTERP, parent, method_name);
+        }
+
+        return 0;
+    }
+
+/*
+
 =item C<PMC* get_attr_str(STRING *name)>
 
 Return attribute named C<name>.
@@ -68,47 +92,25 @@ Return attribute named C<name>.
 */
 
     PMC* get_attr_str(STRING* idx) {
-        STRING *message;
-
-        /* XXX: should test SUPER(idx) first, but for now we receive a
-           SIGSEGV Segmentation fault in hash_get_bucket
-        PMC *attr = SUPER(idx);
-        if (attr && VTABLE_defined(INTERP, attr)) return attr;
-        */
+        PMC *parent;
 
         PMC *attr = VTABLE_getprop(INTERP, SELF, idx);
         if (attr && VTABLE_defined(INTERP, attr)) return attr;
 
-        message = Parrot_sprintf_c(INTERP, "AttributeError: %s",
-            string_to_cstring(INTERP, idx));
-        real_exception(INTERP, NULL, E_AttributeError,
-            string_to_cstring(INTERP, message));
-        return attr;
-    }
-
-/*
-
-=item C<PMC *getprop(STRING *key)>
-
-Returns the property for C<*key>. If the property is not defined then for
-the instance, try the class.  If still no luck, return None.
-
-=cut
-
-*/
-
-    PMC* getprop(STRING* key) {
-        PMC * prop = SUPER(key);
-        PMC * parent;
-
-        if (prop && VTABLE_defined(INTERP, prop)) return prop;
-
-        parent = SUPER(BASES);
-        if (parent && VTABLE_defined(INTERP, parent)) {
-            prop = VTABLE_getprop(INTERP, parent, key);
+        parent = VTABLE_getprop(INTERP, SELF, BASES);
+        if (parent) {
+            attr = VTABLE_get_attr_str(INTERP, parent, idx);
         }
 
-        return prop;
+        if (!attr || !VTABLE_defined(INTERP, attr)) {
+            STRING *message;
+            message = Parrot_sprintf_c(INTERP, "AttributeError: %s",
+                string_to_cstring(INTERP, idx));
+            real_exception(INTERP, NULL, E_AttributeError,
+                string_to_cstring(INTERP, message));
+        }
+
+        return attr;
     }
 
 /*

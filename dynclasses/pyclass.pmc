@@ -75,8 +75,16 @@ Looks up the method for C<*method_name> and returns it.
 */
 
     PMC* find_method(STRING* method_name) {
+        PMC *class;
+
         PMC *method = VTABLE_getprop(INTERP, SELF, method_name);
         if (method && VTABLE_defined(INTERP, method)) return method;
+
+        class = VTABLE_getprop(INTERP, SELF, CLASS);
+        if (class) {
+            return VTABLE_find_method(INTERP, class, method_name);
+        }
+
         return 0;
     }
 
@@ -91,12 +99,18 @@ Return attribute named C<name>.
 */
 
     PMC* get_attr_str(STRING* idx) {
-        PMC *parent;
-        STRING *message;
+        PMC *class;
 
         PMC *attr = VTABLE_getprop(INTERP, SELF, idx);
+        if (attr && VTABLE_defined(INTERP, attr)) return attr;
+
+        class = VTABLE_getprop(INTERP, SELF, CLASS);
+        if (class) {
+            attr = VTABLE_get_attr_str(INTERP, class, idx);
+        }
 
         if (!attr || !VTABLE_defined(INTERP, attr)) {
+            STRING *message;
             message = Parrot_sprintf_c(INTERP, "AttributeError: %s",
                 string_to_cstring(INTERP, idx));
             real_exception(INTERP, NULL, E_AttributeError,
@@ -156,32 +170,6 @@ Return the representation of this object.
             return VTABLE_get_string(INTERP, SELF);
         return (STRING*) Parrot_run_meth_fromc_args(INTERP, repr, SELF,
             REPR, "S");
-    }
-
-/*
-
-=item C<PMC *getprop(STRING *key)>
-
-Returns the property for C<*key>. If the property is not defined then for
-the instance, try the class.  If still no luck, return None.
-
-=cut
-
-*/
-
-    PMC* getprop(STRING* key) {
-        PMC * prop = SUPER(key);
-        PMC * class;
-
-        if (prop && VTABLE_defined(INTERP, prop)) return prop;
-
-        class = SUPER(CLASS);
-        if (class) {
-            prop = VTABLE_getprop(INTERP, class, key);
-            if (prop && VTABLE_defined(INTERP, prop)) return prop;
-        }
-
-        return prop;
     }
 
 /*
