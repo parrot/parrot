@@ -178,8 +178,12 @@ char_offset_key(Parrot_Interp interpreter, PMC *pmc, PMC *key, int *type)
         }
         else if (init->vtable->base_type == enum_class_ManagedStruct &&
             *type == enum_type_struct_ptr) {
-            /* a nested struct pointer belonging to us */
-            printf("here\n");
+            /* a nested struct pointer belonging to us
+             * p is the location of the struct pointer in the
+             * outer struct, the inner is at PMC_data(init)
+             */
+            *(void**)p = PMC_data(init);
+
         }
         return char_offset_key(interpreter, init, next, type);
     }
