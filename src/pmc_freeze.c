@@ -42,7 +42,7 @@ C<STRING> with a vtable.
 /*
  * normal freeze can use next_for_GC ptrs or a seen hash
  */
-#define FREEZE_USE_NEXT_FOR_GC 1
+#define FREEZE_USE_NEXT_FOR_GC 0
 
 /*
  * when thawing a string longer then this size, we first do a
@@ -731,6 +731,7 @@ ft_init(Parrot_Interp interpreter, visit_info *info)
     info->id_list = pmc_new(interpreter, enum_class_Array);
     info->id = 0;
     info->extra_flags = EXTRA_IS_NULL;
+    info->container = NULL;
 }
 
 static void visit_todo_list(Parrot_Interp, PMC*, visit_info* info);
@@ -924,9 +925,9 @@ thaw_create_pmc(Parrot_Interp interpreter, PMC *pmc, visit_info *info,
                 break;
         }
         assert(info->thaw_ptr);
-        /*TODO
-         * DOD_WRITE_BARRIER(interpreter, info->container, NULL, pmc);
-         */
+        if (info->container) {
+            DOD_WRITE_BARRIER(interpreter, info->container, NULL, pmc);
+        }
         *info->thaw_ptr = pmc;
     }
     return pmc;
@@ -991,6 +992,11 @@ do_thaw(Parrot_Interp interpreter, PMC* pmc, visit_info *info, int *seen)
 #else
         assert(must_have_seen);
 #endif
+        /*
+         * that's a duplicate
+          if (info->container)
+              DOD_WRITE_BARRIER(interpreter, info->container, NULL, pmc);
+        */
         *info->thaw_ptr = pmc;
         return pmc;
     }
@@ -1251,7 +1257,14 @@ static void
 visit_todo_list(Parrot_Interp interpreter, PMC* pmc, visit_info* info)
 {
     UINTVAL id;
-    int seen = todo_list_seen(interpreter, pmc, info, &id);
+    int seen;
+
+    if (PMC_IS_NULL(pmc)) {
+        seen = 1;
+        id = 0;
+    }
+    else
+        seen = todo_list_seen(interpreter, pmc, info, &id);
     do_action(interpreter, pmc, info, seen, id);
     if (!seen)
         (info->visit_action)(interpreter, pmc, info);

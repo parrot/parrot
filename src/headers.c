@@ -322,6 +322,15 @@ add_pmc_ext(Interp *interpreter, PMC *pmc)
 {
     pmc->pmc_ext = new_pmc_ext(interpreter);
     PObj_is_PMC_EXT_SET(pmc);
+#ifdef PARROT_GC_IMS
+    /*
+     * preserve DDD color: a simple PMC  live = black
+     *                     an aggregate  live = grey
+     * set'em black
+     */
+    if (PObj_live_TEST(pmc))
+        PObj_get_FLAGS(pmc) |= PObj_custom_GC_FLAG;
+#endif
 }
 
 /*

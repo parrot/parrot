@@ -1036,6 +1036,7 @@ Used during archiving to visit the elements in the hash.
 */
 
     void visit(visit_info *info) {
+        info->container = SELF;
         hash_visit(INTERP, (Hash*)PMC_struct_val(SELF), info);
         SUPER(info);
     }

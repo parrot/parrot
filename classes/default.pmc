@@ -190,6 +190,7 @@ C<initializer> if it is supplied, otherwise C<init()> is called.
     void init_pmc_props (PMC* initializer, PMC* properties) {
         if (!SELF->pmc_ext)
             add_pmc_ext(INTERP, SELF);
+        DOD_WRITE_BARRIER(interpreter, SELF, NULL, properties);
         PMC_metadata(SELF) = properties;
         if (initializer)
             DYNSELF.init_pmc(initializer);
@@ -829,8 +830,9 @@ Initializes the PMC during unarchiving.
         /* default - initialize the PMC */
         if (info->extra_flags == EXTRA_IS_PROP_HASH) {
             if (!SELF->pmc_ext)
-            add_pmc_ext(INTERP, SELF);
+                add_pmc_ext(INTERP, SELF);
             info->thaw_ptr = &PMC_metadata(SELF);
+            info->container = SELF;
             (info->visit_pmc_now)(interpreter, PMC_metadata(SELF), info);
         }
         else
