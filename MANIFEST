@@ -318,12 +318,16 @@ languages/imcc/README
 languages/imcc/ChangeLog
 languages/imcc/cfg.c
 languages/imcc/cfg.h
+languages/imcc/ChangeLog
 languages/imcc/debug.c
 languages/imcc/debug.h
 languages/imcc/examples/sample.imc
 languages/imcc/examples/test_spilling.imc
 languages/imcc/imc.c
 languages/imcc/imc.h
+languages/imcc/imcparser.c
+languages/imcc/imcparser.h
+languages/imcc/imclexer.c
 languages/imcc/imcc.l
 languages/imcc/imcc.y
 languages/imcc/instructions.c
@@ -605,6 +609,7 @@ t/pmc/pmc.t
 t/pmc/sub.t
 t/src/basic.t
 t/src/intlist.t
+t/src/sprintf.t
 test_main.c
 tools/dev/check_source_standards.pl
 tools/dev/genrpt.pl
