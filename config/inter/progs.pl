@@ -32,7 +32,7 @@ sub runstep {
   $linkflags=$args{linkflags} if defined $args{linkflags};
   $ldflags=$args{ldflags} if defined $args{ldflags};
   $libs=$args{libs}       if defined $args{libs};
-  $debug=$args{debugging} if defined $args{debugging};
+  $debug='y'              if defined $args{debugging};
   $cc_warn=$args{ccwarn}  if defined $args{ccwarn};
   
   if($args{ask}) {
