@@ -220,39 +220,41 @@ callback_CD(Parrot_Interp interpreter, void *external_data, PMC *callback_info)
 /*
 
 =item C<void
-Parrot_run_callback(Parrot_Interp interpreter, PMC* cbi, void* ext)>
 
-Run a callback function. The PMC* cbi (callback_info) holds all
-necessary items in its props.
+Parrot_run_callback(Parrot_Interp interpreter, PMC* user_data, void* ext)>
+
+Run a callback function. The PMC* user_data holds all
+necessary items in its properties.
 
 =cut
 
 */
 
 void
-Parrot_run_callback(Parrot_Interp interpreter, PMC* cbi, void* ext)
+Parrot_run_callback(Parrot_Interp interpreter, PMC* user_data, void* ext)
 {
-    PMC* user_data, *sig, *sub;
-    STRING* sig_str;
-    char *p;
-    char pasm_sig[4];
+    PMC *    signature;
+    PMC *    sub;
+    STRING * sig_str;
+    char *   p;
+    char     pasm_sig[4];
     INTVAL   i_param;
+    PMC *    p_param;
     void*    param = NULL;      /* avoid -Ox warning */
-    STRING *sc;
+    STRING * sc;
 
     sc = CONST_STRING(interpreter, "_sub");
-    sub = VTABLE_getprop(interpreter, cbi, sc);
+    sub = VTABLE_getprop(interpreter, user_data, sc);
     sc = CONST_STRING(interpreter, "_signature");
-    sig = VTABLE_getprop(interpreter, cbi, sc);
-    user_data = cbi;
+    signature = VTABLE_getprop(interpreter, user_data, sc);
 
-    sig_str = VTABLE_get_string(interpreter, sig);
+    sig_str = VTABLE_get_string(interpreter, signature);
     p = sig_str->strstart;
 
     pasm_sig[0] = 'v';  /* no return value supported yet */
     pasm_sig[1] = 'P';
     if (*p == 'U') /* user_data Z in pdd16 */
-        ++p;    /* p is now type of external data */
+        ++p;       /* p is now type of external data */
     switch (*p) {
         case 'v':
             pasm_sig[2] = 'v';
@@ -284,8 +286,15 @@ case_I:
              * work
              */
             break;
+#endif
         case 'p':
-            /* TODO created UnManagedStruct */
+            /* created a UnManagedStruct */
+            p_param = pmc_new(interpreter, enum_class_UnManagedStruct);
+            PMC_data(p_param) = ext;
+            pasm_sig[2] = 'P';
+            param = (void*) p_param;
+            break;
+#if 0
         case 'P':
             pasm_sig[2] = 'P';
             break;
@@ -295,7 +304,7 @@ case_I:
             param = string_from_cstring(interpreter, ext, 0);
             break;
         default:
-            internal_exception(1, "unhandled sig char '%c' in run_cb");
+            internal_exception(1, "unhandled signature char '%c' in run_cb", *p);
     }
     pasm_sig[3] = '\0';
     Parrot_runops_fromc_args_save(interpreter, sub, pasm_sig,

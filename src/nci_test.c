@@ -56,14 +56,26 @@ int    nci_ii3(int a, int *b);
 void * nci_pi(int test);
 void   nci_vP(void *pmc);
 
+
+/* Declarations for callback tests */
+
 typedef void (*cb_C1_func)(const char*, void*);
 void nci_cb_C1(cb_C1_func, void*);
 
 typedef void (*cb_C2_func)(int, void*);
 void nci_cb_C2(cb_C2_func, void*);
 
+typedef void (*cb_C3_func)(void*, void*);
+void nci_cb_C3(cb_C3_func, void*);
+
 typedef void (*cb_D1_func)(void*, const char*);
 void nci_cb_D1(cb_D1_func, void*);
+
+typedef void (*cb_D2_func)(void*, int);
+void nci_cb_D2(cb_D2_func, void*);
+
+typedef void (*cb_D3_func)(void*, void*);
+void nci_cb_D3(cb_D3_func, void*);
 
 typedef struct {
     int y;
@@ -366,6 +378,12 @@ nci_cb_C2(cb_C2_func cb, void* user_data) {
     (cb)(77, user_data);
 }
 
+static int int_cb_C3 = 99;
+void
+nci_cb_C3(cb_C3_func cb, void* user_data) {
+    /* call the cb synchronously */
+    (cb)(&int_cb_C3, user_data);
+}
 
 void
 nci_cb_D1(cb_D1_func cb, void* user_data) {
@@ -373,6 +391,20 @@ nci_cb_D1(cb_D1_func cb, void* user_data) {
     /* call the cb synchronously */
     (cb)(user_data, result);
 }
+
+void
+nci_cb_D2(cb_D2_func cb, void* user_data) {
+    /* call the cb synchronously */
+    (cb)(user_data, 88);
+}
+
+static int int_cb_D3 = 111;
+void
+nci_cb_D3(cb_D3_func cb, void* user_data) {
+    /* call the cb synchronously */
+    (cb)(user_data, &int_cb_D3);
+}
+
 
 void 
 nci_pip (int count, Rect_Like *rects) {

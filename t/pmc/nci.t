@@ -1,4 +1,5 @@
 #! perl -w
+
 # Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
 # $Id$
 
@@ -23,7 +24,7 @@ Most tests are skipped when the F<libnci.so> library is not found.
 
 =cut
 
-use Parrot::Test tests => 39;
+use Parrot::Test tests => 43;
 use Parrot::Config;
 
 SKIP: {
@@ -62,6 +63,7 @@ ok 1
 ok 2
 OUTPUT
 
+
 output_is( << 'CODE', << 'OUTPUT', "nci_dd - PIR" );
 ##PIR##
 .sub _test @MAIN
@@ -84,6 +86,7 @@ CODE
 libnci was successfully loaded
 -8.256000
 OUTPUT
+
 
 output_is( << 'CODE', << "OUTPUT", "get_string()" );
 ##PIR##
@@ -109,6 +112,7 @@ output_is( << 'CODE', << "OUTPUT", "get_string()" );
 CODE
 libnci$PConfig{so} was successfully loaded
 OUTPUT
+
 
 output_is(<<'CODE', <<'OUTPUT', "nci_fff");
   loadlib P1, "libnci"
@@ -140,6 +144,7 @@ dlfunced
 ok 1
 ok 2
 OUTPUT
+
 
 output_is(<<'CODE', <<'OUTPUT', "nci_isc");
   loadlib P1, "libnci"
@@ -203,6 +208,7 @@ dlfunced
 ok 1
 ok 2
 OUTPUT
+
 
 output_is(<<'CODE', <<'OUTPUT', "nci_csc");
   loadlib P1, "libnci"
@@ -275,6 +281,7 @@ ok
 ok 2
 OUTPUT
 
+
 output_is(<<'CODE', <<'OUTPUT', "nci_tt");
   loadlib P1, "libnci"
   print "loaded\n"
@@ -303,6 +310,7 @@ dlfunced
 ok worked
 ok 2
 OUTPUT
+
 
 output_is(<<'CODE', <<'OUTPUT', "nci_dd - stress test");
   loadlib P1, "libnci"
@@ -337,6 +345,7 @@ dlfunced
 ok 1
 ok 2
 OUTPUT
+
 
 output_is(<<'CODE', <<'OUTPUT', "nci_dd - clone");
   loadlib P1, "libnci"
@@ -379,6 +388,7 @@ ok 3
 ok 4
 OUTPUT
 
+
 output_is(<<'CODE', <<'OUTPUT', "nci_iiii");
   loadlib P1, "libnci"
   dlfunc P0, P1, "nci_iiii", "iiii"
@@ -395,6 +405,7 @@ CODE
 2
 OUTPUT
 
+
 output_is(<<'CODE', <<'OUTPUT', "nci_i4i");
   loadlib P1, "libnci"
   dlfunc P0, P1, "nci_i4i", "i4i"
@@ -408,6 +419,7 @@ output_is(<<'CODE', <<'OUTPUT', "nci_i4i");
 CODE
 42
 OUTPUT
+
 
 output_is(<<'CODE', <<'OUTPUT', "nci_ii3");
 .include "datatypes.pasm"
@@ -433,6 +445,7 @@ CODE
 4711
 OUTPUT
 
+
 output_is(<<'CODE', <<'OUTPUT', "nci_tb");
   loadlib P1, "libnci"
   dlfunc P0, P1, "nci_tb", "tb"
@@ -444,6 +457,7 @@ CODE
 ok worked
 OUTPUT
 
+
 output_is(<<'CODE', <<'OUTPUT', "nci_tB");
   loadlib P1, "libnci"
   dlfunc P0, P1, "nci_tB", "tB"
@@ -454,6 +468,7 @@ output_is(<<'CODE', <<'OUTPUT', "nci_tB");
 CODE
 ok done
 OUTPUT
+
 
 output_is(<<'CODE', <<'OUTPUT', "nci_pi - struct with ints");
   loadlib P1, "libnci"
@@ -486,6 +501,7 @@ CODE
 66
 OUTPUT
 
+
 output_is(<<'CODE', <<'OUTPUT', "nci_pi - struct with floats");
   loadlib P1, "libnci"
   dlfunc P0, P1, "nci_pi", "pi"
@@ -516,6 +532,7 @@ CODE
 100.000000
 47.110000
 OUTPUT
+
 
 output_like(<<'CODE', <<'OUTPUT', "nci_pi - align");
   loadlib P1, "libnci"
@@ -550,6 +567,7 @@ CODE
 /
 OUTPUT
 
+
 output_is(<<'CODE', <<'OUTPUT', "nci_pi - char*");
   loadlib P1, "libnci"
   dlfunc P0, P1, "nci_pi", "pi"
@@ -576,6 +594,7 @@ CODE
 hello
 20
 OUTPUT
+
 
 output_is(<<'CODE', <<'OUTPUT', "nci_pi - nested struct *");
   loadlib P1, "libnci"
@@ -630,6 +649,7 @@ CODE
 77
 200.000000
 OUTPUT
+
 
 output_is(<<'CODE', <<'OUTPUT', "nci_pi - nested struct * w named access");
   loadlib P1, "libnci"
@@ -700,6 +720,7 @@ CODE
 77
 OUTPUT
 
+
 output_is(<<'CODE', <<'OUTPUT', "nci_pi - func_ptr* with signature");
   loadlib P1, "libnci"
   dlfunc P0, P1, "nci_pi", "pi"
@@ -728,6 +749,7 @@ CODE
 hello call_back
 4711
 OUTPUT
+
 
 output_is(<<'CODE', <<'OUTPUT', "nci_pi - nested struct aligned");
   loadlib P1, "libnci"
@@ -783,6 +805,7 @@ CODE
 33
 OUTPUT
 
+
 output_is(<<'CODE', <<'OUTPUT', "nci_pi - nested struct unaligned");
   loadlib P1, "libnci"
   dlfunc P0, P1, "nci_pi", "pi"
@@ -836,6 +859,7 @@ CODE
 12345
 33
 OUTPUT
+
 
 output_is(<<'CODE', <<'OUTPUT', "nci_pi - nested, unaligned, named");
   loadlib P1, "libnci"
@@ -891,6 +915,7 @@ CODE
 33
 OUTPUT
 
+
 output_is( << 'CODE', << "OUTPUT", "nci_pi - int");
 ##PIR##
 .include "datatypes.pasm"
@@ -928,6 +953,7 @@ CODE
 libnci was successfully loaded
 55555
 OUTPUT
+
 
 output_is(<<'CODE', <<'OUTPUT', "nci_ip");
   loadlib P1, "libnci"
@@ -989,6 +1015,9 @@ ok
 got null
 OUTPUT
 
+
+# Tests with callback functions
+
 output_is(<<'CODE', <<'OUTPUT', "nci_cb_C1 - PASM");
 
   # we need a flag if the call_back is already done
@@ -1046,6 +1075,7 @@ user data: 42
 external data: succeeded
 done.
 OUTPUT
+
 
 output_is(<<'CODE', <<'OUTPUT', "nci_cb_C1 - PIR");
 ##PIR##
@@ -1120,7 +1150,154 @@ external data: succeeded
 the callback has run
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "nci_cb_D1");
+
+output_is(<<'CODE', <<'OUTPUT', "nci_cb_C2 - PASM");
+  # we need a flag if the call_back is already done
+  new P10, .PerlInt
+  store_global "cb_done", P10
+  # first attempt - create cb manually (this step will be hidden later)
+  newsub P6, .Sub, _call_back
+  # prepare user data
+  new P7, .PerlInt
+  set P7, 42
+  new_callback P5, P6, P7, "iU"	# Z in pdd16
+  print "ok 1\n"
+  # now call the external sub, that takes a call_back and user_data
+  loadlib P1, "libnci"
+  dlfunc P0, P1, "nci_cb_C2", "vpP"
+  print "ok 2\n"
+  # P5 is the cb
+  # P6 is user_data
+  set P6, P7
+  invoke
+  # call_back will be called at any time
+  # so spin a bit
+  set I20, 0
+loop:
+  inc I20
+  sleep 0.01
+  find_global P11, "cb_done"
+  if P11, fin
+  gt I20, 10, err
+  branch loop
+fin:
+  print "done.\n"
+  end
+err:
+  print "cb didnt run\n"
+  end
+
+_call_back:
+  print "in callback\n"
+  print "user data: "
+  print P5
+  print "\n"
+  print "external data: "
+  print I5
+  print "\n"
+  find_global P12, "cb_done"
+  inc P12
+  invoke P1
+
+
+CODE
+ok 1
+ok 2
+in callback
+user data: 42
+external data: 77
+done.
+OUTPUT
+
+
+output_is(<<'CODE', <<'OUTPUT', "nci_cb_C3 - PIR");
+##PIR##
+
+.include "datatypes.pasm"
+
+.sub _test @MAIN
+
+    # this flag will be set by the callback function
+    .local pmc cb_done
+    cb_done = new Integer
+    cb_done = 0
+    store_global "cb_done", cb_done
+
+    # prepare user data
+    .local pmc user_data
+    user_data = new Integer
+    user_data = 42
+
+    # A Sub that can be given to the library
+    # this callback function will eventually by called by the library
+    .local pmc cb
+    cb = newsub _call_back 
+    .local pmc cb_wrapped
+    cb_wrapped = new_callback cb, user_data, "pU"	# Z in pdd16
+    print "created a callback sub\n"
+
+    # now call the external sub, that takes a callback and user data
+    .local pmc libnci
+    libnci = loadlib "libnci"
+    .local pmc nci_cb_C3
+    nci_cb_C3 = dlfunc libnci, "nci_cb_C3", "vpP"
+    print "loaded a function that takes a callback\n"
+    nci_cb_C3( cb_wrapped, user_data ) 
+
+    # callback will be called at any time
+    # so spin a bit
+    .local int sleep_cnt
+    sleep_cnt = 0
+LOOP:
+    sleep_cnt += 1
+    sleep 0.01
+    .local pmc callback_has_run
+    callback_has_run = find_global "cb_done"
+    if callback_has_run goto FINISHED
+    if sleep_cnt > 10 goto ERROR 
+    goto LOOP
+FINISHED:
+    print "the callback has run\n"
+    end
+ERROR:
+    print "the callback didnt run\n"
+    end
+.end
+
+.sub _call_back
+  print "in callback\n"
+  print "user data: "
+  print P5
+  print "\n"
+
+  # P6 is a UnManagedStruct PMC containing a pointer to an integer
+  new P2, .PerlArray
+  push P2, .DATATYPE_INT
+  push P2, 0
+  push P2, 0
+  assign P6, P2
+
+  # print referenced integer in libnci.so
+  I17 = P6[0]
+  print "external data: "
+  print I17
+  print "\n"
+
+  find_global P12, "cb_done"
+  inc P12
+  invoke P1
+.end
+
+CODE
+created a callback sub
+loaded a function that takes a callback
+in callback
+user data: 42
+external data: 99
+the callback has run
+OUTPUT
+
+output_is(<<'CODE', <<'OUTPUT', "nci_cb_D1 - PASM");
 
   # we need a flag if the call_back is already done
   new P10, .PerlInt
@@ -1178,7 +1355,8 @@ external data: succeeded
 done.
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "nci_cb_C2");
+
+output_is(<<'CODE', <<'OUTPUT', "nci_cb_D2 - PASM");
   # we need a flag if the call_back is already done
   new P10, .PerlInt
   store_global "cb_done", P10
@@ -1187,11 +1365,11 @@ output_is(<<'CODE', <<'OUTPUT', "nci_cb_C2");
   # prepare user data
   new P7, .PerlInt
   set P7, 42
-  new_callback P5, P6, P7, "iU"	# Z in pdd16
+  new_callback P5, P6, P7, "Ui"	# Z in pdd16
   print "ok 1\n"
   # now call the external sub, that takes a call_back and user_data
   loadlib P1, "libnci"
-  dlfunc P0, P1, "nci_cb_C2", "vpP"
+  dlfunc P0, P1, "nci_cb_D2", "vpP"
   print "ok 2\n"
   # P5 is the cb
   # P6 is user_data
@@ -1232,9 +1410,171 @@ ok 1
 ok 2
 in callback
 user data: 42
-external data: 77
+external data: 88
 done.
 OUTPUT
+
+output_is(<<'CODE', <<'OUTPUT', "nci_cb_D2 - PIR");
+##PIR##
+.sub _test @MAIN
+
+    # this flag will be set by the callback function
+    .local pmc cb_done
+    cb_done = new Integer
+    cb_done = 0
+    store_global "cb_done", cb_done
+
+    # prepare user data
+    .local pmc user_data
+    user_data = new Integer
+    user_data = 42
+
+    # A Sub that can be given to the library
+    # this callback function will eventually by called by the library
+    .local pmc cb
+    cb = newsub _call_back 
+    .local pmc cb_wrapped
+    cb_wrapped = new_callback cb, user_data, "Ui"	# Z in pdd16
+    print "created a callback sub\n"
+
+    # now call the external sub, that takes a callback and user data
+    .local pmc libnci
+    libnci = loadlib "libnci"
+    .local pmc nci_cb_D2
+    nci_cb_D2 = dlfunc libnci, "nci_cb_D2", "vpP"
+    print "loaded a function that takes a callback\n"
+    nci_cb_D2( cb_wrapped, user_data ) 
+
+    # callback will be called at any time
+    # so spin a bit
+    .local int sleep_cnt
+    sleep_cnt = 0
+LOOP:
+    sleep_cnt += 1
+    sleep 0.01
+    .local pmc callback_has_run
+    callback_has_run = find_global "cb_done"
+    if callback_has_run goto FINISHED
+    if sleep_cnt > 10 goto ERROR 
+    goto LOOP
+FINISHED:
+    print "the callback has run\n"
+    end
+ERROR:
+    print "the callback didnt run\n"
+    end
+.end
+
+.sub _call_back
+  print "in callback\n"
+  print "user data: "
+  print P5
+  print "\n"
+  print "external data: "
+  print I5
+  print "\n"
+  find_global P12, "cb_done"
+  inc P12
+  invoke P1
+.end
+
+CODE
+created a callback sub
+loaded a function that takes a callback
+in callback
+user data: 42
+external data: 88
+the callback has run
+OUTPUT
+
+
+output_is(<<'CODE', <<'OUTPUT', "nci_cb_D3 - PIR");
+##PIR##
+
+.include "datatypes.pasm"
+
+.sub _test @MAIN
+
+    # this flag will be set by the callback function
+    .local pmc cb_done
+    cb_done = new Integer
+    cb_done = 0
+    store_global "cb_done", cb_done
+
+    # prepare user data
+    .local pmc user_data
+    user_data = new Integer
+    user_data = 42
+
+    # A Sub that can be given to the library
+    # this callback function will eventually by called by the library
+    .local pmc cb
+    cb = newsub _call_back 
+    .local pmc cb_wrapped
+    cb_wrapped = new_callback cb, user_data, "Up"	# Z in pdd16
+    print "created a callback sub\n"
+
+    # now call the external sub, that takes a callback and user data
+    .local pmc libnci
+    libnci = loadlib "libnci"
+    .local pmc nci_cb_D3
+    nci_cb_D3 = dlfunc libnci, "nci_cb_D3", "vpP"
+    print "loaded a function that takes a callback\n"
+    nci_cb_D3( cb_wrapped, user_data ) 
+
+    # callback will be called at any time
+    # so spin a bit
+    .local int sleep_cnt
+    sleep_cnt = 0
+LOOP:
+    sleep_cnt += 1
+    sleep 0.01
+    .local pmc callback_has_run
+    callback_has_run = find_global "cb_done"
+    if callback_has_run goto FINISHED
+    if sleep_cnt > 10 goto ERROR 
+    goto LOOP
+FINISHED:
+    print "the callback has run\n"
+    end
+ERROR:
+    print "the callback didnt run\n"
+    end
+.end
+
+.sub _call_back
+  print "in callback\n"
+  print "user data: "
+  print P5
+  print "\n"
+
+  # P6 is a UnManagedStruct PMC containing a pointer to an integer
+  new P2, .PerlArray
+  push P2, .DATATYPE_INT
+  push P2, 0
+  push P2, 0
+  assign P6, P2
+
+  # print referenced integer in libnci.so
+  I17 = P6[0]
+  print "external data: "
+  print I17
+  print "\n"
+
+  find_global P12, "cb_done"
+  inc P12
+  invoke P1
+.end
+
+CODE
+created a callback sub
+loaded a function that takes a callback
+in callback
+user data: 42
+external data: 111
+the callback has run
+OUTPUT
+
 
 output_is(<<'CODE', <<'OUTPUT', 'nci_pip - array of structs');
 
@@ -1313,6 +1653,7 @@ W: 420
 H: 430
 OUTPUT
 
+
 output_is(<<'CODE', <<'OUTPUT', 'nci_i33 - out parameters and return values');
 
 .include "datatypes.pasm"
@@ -1346,6 +1687,7 @@ Double: 6
 Triple: 6
 Sum: 12
 OUTPUT
+
 
 output_is(<<'CODE', <<'OUTPUT', 'nci_vpii - nested structs');
 
@@ -1415,6 +1757,7 @@ Y: 2
 2
 OUTPUT
 
+
 output_is(<<'CODE', <<'OUTPUT', 'nci_piiii - nested array in a struct');
 .include "datatypes.pasm"
   set I0, 1
@@ -1483,6 +1826,7 @@ Count: 4
 3: 800
 OUTPUT
 
+
 output_is( << 'CODE', << "OUTPUT", "nci_pii - writing back to libnci.so" );
 ##PIR##
 .include "datatypes.pasm"
@@ -1535,6 +1879,7 @@ libnci was successfully loaded
 4444
 333
 OUTPUT
+
 
 } # SKIP
 
