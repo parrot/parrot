@@ -184,6 +184,7 @@ docs/debug.pod                                    [devel]doc
 docs/debugger.pod                                 [main]doc
 docs/dev/byteorder.dev                            [main]doc
 docs/dev/dod.dev                                  [devel]doc
+docs/dev/events.pod                               [devel]doc
 docs/dev/pmc_freeze.pod                           [devel]doc
 docs/dev/infant.dev                               [devel]doc
 docs/dev/jit_i386.dev                             [main]doc
@@ -235,6 +236,7 @@ dynclasses/foo.pmc                                [devel]
 dynclasses/main.pasm                              [devel]
 dynclasses/subproxy.pmc                           [devel]
 dynoplibs/README                                  [devel]
+dynoplibs/alarm.pasm                              [devel]
 dynoplibs/myops.ops                               [devel]
 dynoplibs/test.pasm                               [devel]
 editor/Makefile                                   [devel]

@@ -11,7 +11,6 @@
  */
 
 #include "parrot/parrot.h"
-static QUEUE_ENTRY * nosync_pop_entry(QUEUE *queue);
 
 /* A synchronized entry popper */
 QUEUE_ENTRY *
@@ -36,7 +35,7 @@ peek_entry(QUEUE *queue) {
 /* Grab an entry off the queue with no synchronization. Internal only,
    because it's darned evil and shouldn't be used outside the
    module. It's in here so we don't have to duplicate pop code */
-static QUEUE_ENTRY *
+QUEUE_ENTRY *
 nosync_pop_entry(QUEUE *queue) {
     QUEUE_ENTRY *returnval;
     if (!queue->head) {
@@ -93,13 +92,23 @@ queue_unlock(QUEUE *queue) {
 
 /* This function wakes up *every* thread waiting on the queue */
 void
-queue_signal(QUEUE *queue) {
+queue_broadcast(QUEUE *queue) {
     COND_BROADCAST(queue->queue_condition);
+}
+
+void
+queue_signal(QUEUE *queue) {
+    COND_SIGNAL(queue->queue_condition);
 }
 
 void
 queue_wait(QUEUE *queue) {
     COND_WAIT(queue->queue_condition, queue->queue_mutex);
+}
+
+void
+queue_timedwait(QUEUE *queue, struct timespec *abs_time) {
+    COND_TIMED_WAIT(queue->queue_condition, queue->queue_mutex, abs_time);
 }
 
 QUEUE*

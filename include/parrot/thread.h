@@ -33,6 +33,14 @@
 #  define Parrot_mutex int
 #  define Parrot_cond int
 
+#  ifndef _STRUCT_TIMESPEC
+#  define _STRUCT_TIMESPEC
+struct timespec {
+    time_t tv_sec;
+    long tv_nsec;
+};
+#  endif
+
 #endif
 
 #endif

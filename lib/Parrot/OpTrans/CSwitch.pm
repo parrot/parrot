@@ -105,6 +105,7 @@ sub run_core_func_start {
 SWITCH_AGAIN:
     if (!cur_opcode)
         break;
+    CHECK_EVENTS(interpreter);
     switch (*cur_opcode) {
 END_C
 }

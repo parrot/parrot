@@ -35,6 +35,7 @@ struct Parrot_Interp interpre;
 #endif
 
 static void setup_default_compreg(Parrot_Interp interpreter);
+static void setup_event_func_ptrs(Parrot_Interp interpreter);
 
 /*=for api interpreter prederef
  *
@@ -202,7 +203,7 @@ get_op_lib_init(int core_op, int which, PMC *lib)
                 break;
         }
         if (!init_func)
-            internal_exception(1, "Couldn't find init_func");
+            internal_exception(1, "Couldn't find init_func for core %d", which);
         return init_func;
     }
     return (oplib_init_f) D2FPTR(lib->cache.struct_val);
@@ -482,6 +483,7 @@ runops_int(struct Parrot_Interp *interpreter, size_t offset)
      * if we are entering the run-loop first-time, set the stack limit
      */
     if (interpreter->resume_flag & RESUME_INITIAL) {
+        setup_event_func_ptrs(interpreter);
         interpreter->lo_var_ptr = (void *)&lo_var_ptr;
     }
     interpreter->resume_offset = offset;
@@ -778,6 +780,33 @@ is_env_var_set(const char* var)
     return retval;
 }
 
+/*
+ * setup a func_table containing ptrs (or addresses) of the
+ * check_event__ opcode
+ * TODO free it at destroy
+ * TODO handle run-core changes
+ */
+static void
+setup_event_func_ptrs(Parrot_Interp interpreter)
+{
+    size_t i, n = interpreter->op_count;
+    oplib_init_f init_func = get_op_lib_init(1, interpreter->run_core, NULL);
+    op_lib_t *lib = init_func(1);
+    /*
+     * remember op_func_table
+     */
+    interpreter->save_func_table = lib->op_func_table;
+    if (!lib->op_func_table)
+        return;
+    /* function or CG core - prepare func_table */
+    if (!interpreter->evc_func_table) {
+        interpreter->evc_func_table = mem_sys_allocate(sizeof(void *) * n);
+        for (i = 0; i < n; ++i)
+            interpreter->evc_func_table[i] =
+                ((void**)lib->op_func_table)[CORE_OPS_check_events__];
+    }
+}
+
 void Parrot_really_destroy(int exit_code, void *interpreter);
 
 /*=for api interpreter make_interpreter
@@ -912,6 +941,8 @@ make_interpreter(Parrot_Interp parent, Interp_flags flags)
     interpreter->op_func_table = interpreter->op_lib->op_func_table;
     interpreter->op_info_table = interpreter->op_lib->op_info_table;
     SET_NULL_P(interpreter->all_op_libs, op_lib_t **);
+    SET_NULL_P(interpreter->evc_func_table, op_func_t *);
+    SET_NULL_P(interpreter->save_func_table, op_func_t *);
 
     /* Set up defaults for line/package/file */
     interpreter->current_file =
@@ -944,8 +975,12 @@ make_interpreter(Parrot_Interp parent, Interp_flags flags)
     Parrot_unblock_DOD(interpreter);
     Parrot_unblock_GC(interpreter);
 
-    /* all sys running, init the signal stuff */
-    Parrot_init_signals();
+    /* all sys running, init the event and signal stuff
+     * the first or "master" interpreter is handling events and signals
+     */
+    SET_NULL_P(interpreter->task_queue, QUEUE*);
+
+    Parrot_init_events(interpreter);
 
 #ifdef ATEXIT_DESTROY
     Parrot_on_exit(Parrot_really_destroy, (void*)interpreter);
@@ -953,6 +988,7 @@ make_interpreter(Parrot_Interp parent, Interp_flags flags)
 
     return interpreter;
 }
+
 void
 Parrot_destroy(struct Parrot_Interp *interpreter)
 {
@@ -1217,7 +1253,7 @@ dynop_register(Parrot_Interp interpreter, PMC* lib_pmc)
 {
     op_lib_t *lib, *core;
     oplib_init_f init_func;
-    op_func_t *new_func_table;
+    op_func_t *new_func_table, *new_evc_func_table;
     op_info_t *new_info_table;
     size_t i, n_old, n_new, n_tot;
 
@@ -1233,17 +1269,24 @@ dynop_register(Parrot_Interp interpreter, PMC* lib_pmc)
      * the base names of this lib and the previous one are the same
      */
     if (interpreter->n_libs >= 2 &&
-        !strcmp(interpreter->all_op_libs[interpreter->n_libs-2]->name,
-            lib->name)) {
+            !strcmp(interpreter->all_op_libs[interpreter->n_libs-2]->name,
+                lib->name)) {
         /* registering is handled below */
         return;
     }
+    /*
+     * when called from yyparse, we have to set up the evc_func_table
+     */
+    setup_event_func_ptrs(interpreter);
+
     n_old = interpreter->op_count;
     n_new = lib->op_count;
     n_tot = n_old + n_new;
     core = PARROT_CORE_OPLIB_INIT(1);
 
     assert(interpreter->op_count == core->op_count);
+    new_evc_func_table = mem_sys_realloc(interpreter->evc_func_table,
+            sizeof (void *) * n_tot);
     if (core->flags & OP_FUNC_IS_ALLOCATED) {
         new_func_table = mem_sys_realloc(core->op_func_table,
                 sizeof (void *) * n_tot);
@@ -1266,7 +1309,16 @@ dynop_register(Parrot_Interp interpreter, PMC* lib_pmc)
     for (i = n_old; i < n_tot; ++i) {
         new_func_table[i] = ((op_func_t*)lib->op_func_table)[i - n_old];
         new_info_table[i] = lib->op_info_table[i - n_old];
+        /*
+         * fill new ops of event checker func table
+         * if we are running a different core, entries are
+         * changed below
+         */
+        new_evc_func_table[i] =
+            interpreter->op_func_table[CORE_OPS_check_events__];
     }
+    interpreter->evc_func_table = new_evc_func_table;
+    interpreter->save_func_table = new_func_table;
     /*
      * deinit core, so that it gets rehashed
      */
@@ -1279,12 +1331,12 @@ dynop_register(Parrot_Interp interpreter, PMC* lib_pmc)
     /* done for plain core */
 #if defined HAVE_COMPUTED_GOTO
     dynop_register_xx(interpreter, lib_pmc, n_old, n_new,
-                      PARROT_CORE_CGP_OPLIB_INIT);
+            PARROT_CORE_CGP_OPLIB_INIT);
     dynop_register_xx(interpreter, lib_pmc, n_old, n_new,
-                      PARROT_CORE_CG_OPLIB_INIT);
+            PARROT_CORE_CG_OPLIB_INIT);
 #endif
     dynop_register_xx(interpreter, lib_pmc, n_old, n_new,
-                      PARROT_CORE_PREDEREF_OPLIB_INIT);
+            PARROT_CORE_PREDEREF_OPLIB_INIT);
     dynop_register_switch(interpreter, lib_pmc, n_old, n_new);
 }
 
@@ -1337,6 +1389,14 @@ dynop_register_xx(Parrot_Interp interpreter, PMC* lib_pmc,
             ops_addr[i] = ((void **)cg_lib->op_func_table)[CORE_OPS_wrapper__];
     }
     /*
+     * if we are running this core, update event check ops
+     */
+    if ((int)interpreter->run_core == cg_lib->core_type) {
+        for (i = n_old; i < n_tot; ++i)
+            interpreter->evc_func_table[i] = ops_addr[CORE_OPS_check_events__];
+        interpreter->save_func_table = (void *) ops_addr;
+    }
+    /*
      * tell the cg_core about the new jump table
      */
     cg_lib->op_func_table = (void *) ops_addr;
@@ -1350,6 +1410,52 @@ dynop_register_switch(Parrot_Interp interpreter, PMC* lib_pmc,
 {
     op_lib_t *lib = PARROT_CORE_SWITCH_OPLIB_INIT(1);
     lib->op_count = n_old + n_new;
+}
+
+/*
+ * tell running core about new func table
+ */
+static void
+notify_func_table(Parrot_Interp interpreter, void* table)
+{
+    oplib_init_f init_func = get_op_lib_init(1, interpreter->run_core, NULL);
+    op_lib_t *lib = init_func(1);
+    init_func((int) table);
+    switch (interpreter->run_core) {
+        case PARROT_SLOW_CORE:      /* normal func core */
+        case PARROT_FAST_CORE:      /* normal func core */
+            interpreter->op_func_table = table;
+            break;
+        default:
+            break;
+    }
+}
+
+/*
+ * restore old func table
+ * XXX function core only by now
+ */
+void
+disable_event_checking(Parrot_Interp interpreter)
+{
+    /*
+     * restore func table
+     */
+    notify_func_table(interpreter, interpreter->save_func_table);
+}
+
+/*
+ * replace func table with one that does event checking for all
+ * opcodes
+ * XXX plain core only
+ */
+void
+enable_event_checking(Parrot_Interp interpreter)
+{
+    /*
+     * put table in place
+     */
+    notify_func_table(interpreter, interpreter->evc_func_table);
 }
 
 /*

@@ -22,7 +22,7 @@
 #  define LOCK(m) pthread_mutex_lock(&m)
 #  define UNLOCK(m) pthread_mutex_unlock(&m)
 #  define COND_WAIT(c,m) pthread_cond_wait(&c, &m)
-#  define COND_TIMED_WAIT(c,m,t) pthread_cond_timed_wait(&c, &m, t)
+#  define COND_TIMED_WAIT(c,m,t) pthread_cond_timedwait(&c, &m, t)
 #  define COND_SIGNAL(c) pthread_cond_signal(&c)
 #  define COND_BROADCAST(c) pthread_cond_broadcast(&c)
 

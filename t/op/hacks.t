@@ -3,10 +3,18 @@
 use Parrot::Test tests => 2;
 use Test::More;
 use Parrot::Config;
+use Config;
 
+sub has_signal {
+  my $sig = shift;
+  foreach my $name (split(' ', $Config{sig_name})) {
+    return 1 if ("SIG$name" eq $sig);
+  }
+  return 0;
+}
 
 SKIP: {
-skip("no events yet", 2);
+  skip("no SIGFPE", 2) unless has_signal('SIGFPE');
 
 output_is(<<'CODE', <<OUT, "catch a SIGFPE");
     newsub P0, .Exception_Handler, _handler

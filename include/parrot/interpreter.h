@@ -232,6 +232,7 @@ typedef struct Parrot_Interp {
 /* 5:   PMC *Dyn_libs           Array of dynamically loaded ParrotLibrary  */
     int has_early_DOD_PMCs;   /* Flag that some want immediate destruction */
     struct MMD_table *binop_mmd_funcs; /* Table of MMD function pointers */
+    struct QUEUE* task_queue;       /* per interpreter queue */
 } Interp;
 
 typedef enum {
