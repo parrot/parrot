@@ -13,16 +13,12 @@ p6rule_like('abcd', '(a(b(c))(d))', qr/2: <bc @ 1>/, 'nested match');
 p6rule_like('abcd', '(a(b(c))(d))', qr/3: <c @ 2>/, 'nested match');
 p6rule_like('abcd', '(a(b(c))(d))', qr/4: <d @ 3>/, 'nested match');
 
-TODO: {
-    local $TODO = 'backreference not implemented';
-
-    p6rule_is  ('bookkeeper', '(((.)$3)+)', 'backreference');
-    p6rule_like('bookkeeper', '(((.)$3)+)', 
-                qr/0: <ookkee @ 1>/, 'backref $0');
-    p6rule_like('bookkeeper', '(((.)$3)+)', 
-                qr/1: <ookkee @ 1>/, 'backref $1');
-    p6rule_like('bookkeeper', '(((.)$3)+)', 
-                qr/2: <oo @ 1> <kk @ 3> <ee @ 5>/, 'backref $2');
-    p6rule_like('bookkeeper', '(((.)$3)+)', 
-                qr/3: <o @ 1> <k @ 3> <e @ 5>/, 'backref $2');
-}
+p6rule_is  ('bookkeeper', '(((.)$3)+)', 'backreference');
+p6rule_like('bookkeeper', '(((.)$3)+)', 
+            qr/0: <ookkee @ 1>/, 'backref $0');
+p6rule_like('bookkeeper', '(((.)$3)+)', 
+            qr/1: <ookkee @ 1>/, 'backref $1');
+p6rule_like('bookkeeper', '(((.)$3)+)', 
+            qr/2: <oo @ 1> <kk @ 3> <ee @ 5>/, 'backref $2');
+p6rule_like('bookkeeper', '(((.)$3)+)', 
+            qr/3: <o @ 1> <k @ 3> <e @ 5>/, 'backref $2');

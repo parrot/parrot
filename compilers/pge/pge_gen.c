@@ -483,7 +483,7 @@ pge_gen_cut(PGE_Exp* e, const char* succ)
     }
     if (e->type == PGE_CUT_RULE) {
         trace("::cut rule");
-        emit("    .yield(-1)");
+        emit("    .yield(-1)\n");
         emit("    goto fail\n");
     }
 }
