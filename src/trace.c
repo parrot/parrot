@@ -85,21 +85,21 @@ trace_pmc_dump(Interp *interpreter, PMC* pmc)
         }
     }
     else if (pmc->vtable->base_type == enum_class_Boolean) {
-        PIO_eprintf(interpreter, "Boolean=PMC(%#p: %d",
+        PIO_eprintf(interpreter, "Boolean=PMC(%#p: %d)",
                 pmc, PMC_int_val(pmc));
     }
     else if (pmc->vtable->base_type == enum_class_Integer) {
-        PIO_eprintf(interpreter, "Integer=PMC(%#p: %d",
+        PIO_eprintf(interpreter, "Integer=PMC(%#p: %d)",
                 pmc, PMC_int_val(pmc));
     }
     else if (pmc->vtable->base_type == enum_class_BigInt) {
         STRING *s = VTABLE_get_string(interpreter, pmc);
-        PIO_eprintf(interpreter, "BigInt=PMC(%#p: %Ss",
+        PIO_eprintf(interpreter, "BigInt=PMC(%#p: %Ss)",
                 pmc, s);
     }
     else if (pmc->vtable->base_type == enum_class_Complex) {
         STRING *s = VTABLE_get_string(interpreter, pmc);
-        PIO_eprintf(interpreter, "Complex=PMC(%#p: (%Ss)",
+        PIO_eprintf(interpreter, "Complex=PMC(%#p: %Ss)",
                 pmc, s);
     }
     else if (pmc->vtable->base_type == enum_class_PerlUndef
