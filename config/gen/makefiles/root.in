@@ -480,7 +480,7 @@ nci$(O) : $(GENERAL_H_FILES) nci.c
 cpu_dep$(O) : $(GENERAL_H_FILES)
 
 nci.c : call_list.txt build_nativecall.pl
-	perl build_nativecall.pl call_list.txt
+	$(PERL) build_nativecall.pl call_list.txt
 
 #core_ops depends upon config.h so that it gets updated along with updates to config.h's version numbers
 core_ops.c $(INC)/oplib/core_ops.h : $(OPS_FILES) ops2c.pl lib/Parrot/OpsFile.pm lib/Parrot/Op.pm $(INC)/config.h
