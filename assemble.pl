@@ -635,7 +635,7 @@ sub add_line_to_listing {
 sub error {
     my($message,$file,$line)=@_;
     print STDERR "Error ($file:$line): $message\n";
-    exit;
+    exit 1;
 }
 
 # log_message
