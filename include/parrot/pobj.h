@@ -139,6 +139,7 @@ typedef enum PObj {
 
 #define PObj_custom_mark_SET(o)   PObj_flag_SET(custom_mark, o)
 #define PObj_is_buffer_ptr_SET(o) PObj_flag_SET(is_buffer_ptr, o)
+#define PObj_is_buffer_ptr_CLEAR(o) PObj_flag_CLEAR(is_buffer_ptr, o)
 
 /* some combinations */
 #define PObj_is_cowed_TESTALL(o) ((o)->flags & \
