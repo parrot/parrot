@@ -1,4 +1,4 @@
-/* io.h
+/* io_private.h
  *  Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
  *  CVS Info
  *     $Id$
@@ -82,6 +82,39 @@ extern int realloc_pio_array(ParrotIOTable *, int);
 #define PIO_STDIN(i)   (((ParrotIOData*)i->piodata)->table[PIO_STDIN_FILENO])
 #define PIO_STDOUT(i)  (((ParrotIOData*)i->piodata)->table[PIO_STDOUT_FILENO])
 #define PIO_STDERR(i)  (((ParrotIOData*)i->piodata)->table[PIO_STDERR_FILENO])
+
+/* 
+ * These function walk down the layerstack starting at l 
+ * and calling the first non-null function it finds.
+ */
+ParrotIO *PIO_open_down(theINTERP, ParrotIOLayer * layer, const char * name,
+                        INTVAL flags);
+ParrotIO *PIO_open_async_down(theINTERP, ParrotIOLayer * layer, 
+                              const char * name, const char * mode,
+                              DummyCodeRef *);
+ParrotIO *PIO_fdopen_down(theINTERP, ParrotIOLayer * layer, PIOHANDLE fd,
+                          INTVAL flags);
+INTVAL    PIO_close_down(theINTERP, ParrotIOLayer * layer, ParrotIO * io);
+size_t    PIO_write_down(theINTERP, ParrotIOLayer * layer, ParrotIO * io,
+                         const void * buf, size_t len);
+size_t    PIO_write_async_down(theINTERP, ParrotIOLayer * layer, ParrotIO * io,
+                               void * buf, size_t len, DummyCodeRef *);
+size_t    PIO_read_down(theINTERP, ParrotIOLayer * layer, ParrotIO * io,
+                        void * buf, size_t len);
+size_t    PIO_read_async_down(theINTERP, ParrotIOLayer * layer, ParrotIO * io,
+                              void * buf, size_t len, DummyCodeRef *);
+INTVAL    PIO_flush_down(theINTERP, ParrotIOLayer * layer, ParrotIO * io);
+INTVAL    PIO_seek_down(theINTERP, ParrotIOLayer * layer, ParrotIO * io,
+                        PIOOFF_T offset, INTVAL whence);
+PIOOFF_T  PIO_tell_down(theINTERP, ParrotIOLayer * layer, ParrotIO * io);
+INTVAL    PIO_setbuf_down(theINTERP, ParrotIOLayer * layer, ParrotIO * io,
+                          size_t bufsize);
+INTVAL    PIO_setlinebuf_down(theINTERP, ParrotIOLayer * layer, ParrotIO * io);
+INTVAL    PIO_puts_down(theINTERP, ParrotIOLayer * layer, ParrotIO * io,
+                        const char * s);
+INTVAL    PIO_gets_down(theINTERP, ParrotIOLayer * layer, ParrotIO * io,
+                        char * s, INTVAL maxlen);
+INTVAL    PIO_eof_down(theINTERP, ParrotIOLayer * layer, ParrotIO * io);
 
 #endif /* !defined(PARROT_IO_PRIVATE_H_GUARD) */
 

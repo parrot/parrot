@@ -456,18 +456,11 @@ PIO_parse_open_flags(const char *flagstr)
 INTVAL
 PIO_setbuf(theINTERP, PMC *pmc, size_t bufsize)
 {
-    ParrotIOLayer *l = pmc->cache.struct_val;
+    ParrotIOLayer *layer = pmc->cache.struct_val;
+    ParrotIO *io = PMC_data(pmc);
 
     PIO_flush(interpreter, pmc);
-    while (l) {
-        if (l->api->SetBuf) {
-            ParrotIO *io = PMC_data(pmc);
-            return (*l->api->SetBuf) (interpreter, l, io, bufsize);
-        }
-        l = PIO_DOWNLAYER(l);
-    }
-
-    return 0;
+    return PIO_setbuf_down(interpreter, layer, io, bufsize);
 }
 
 
@@ -475,16 +468,9 @@ INTVAL
 PIO_setlinebuf(theINTERP, PMC *pmc)
 {
     ParrotIOLayer *l = pmc->cache.struct_val;
+    ParrotIO *io = PMC_data(pmc);
 
-    while (l) {
-        if (l->api->SetLineBuf) {
-            ParrotIO *io = PMC_data(pmc);
-            return (*l->api->SetLineBuf) (interpreter, l, io);
-        }
-        l = PIO_DOWNLAYER(l);
-    }
-
-    return 0;
+    return PIO_setlinebuf_down(interpreter, l, io);
 }
 
 
@@ -495,20 +481,14 @@ PIO_open(theINTERP, const char *spath, const char *sflags)
     ParrotIOLayer *l = GET_INTERP_IO(interpreter);
     INTVAL flags = PIO_parse_open_flags(sflags);
 
-    while (l) {
-        if (l->api->Open) {
-            io = (*l->api->Open) (interpreter, l, spath, flags);
-            if (io) {
-                io->stack = GET_INTERP_IO(interpreter);
-                return new_io_pmc(interpreter, io);
-            }
-            else {
-                return NULL;
-            }
-        }
-        l = PIO_DOWNLAYER(l);
+    io = PIO_open_down(interpreter, l, spath, flags);
+    if (io) {
+        io->stack = l;
+        return new_io_pmc(interpreter, io);
     }
-    return NULL;
+    else {
+        return NULL;
+    }
 }
 
 
@@ -525,20 +505,14 @@ PIO_fdopen(theINTERP, PIOHANDLE fd, const char *sflags)
     ParrotIOLayer *l = GET_INTERP_IO(interpreter);
 
     flags = PIO_parse_open_flags(sflags);
-    while (l) {
-        if (l->api->FDOpen) {
-            io = (*l->api->FDOpen) (interpreter, l, fd, flags);
-            if (io) {
-                io->stack = GET_INTERP_IO(interpreter);
-                return new_io_pmc(interpreter, io);
-            }
-            else {
-                return NULL;
-            }
-        }
-        l = PIO_DOWNLAYER(l);
+    io = PIO_fdopen_down(interpreter, l, fd, flags);
+    if (io) {
+        io->stack = l;
+        return new_io_pmc(interpreter, io);
     }
-    return NULL;
+    else {
+        return NULL;
+    }
 }
 
 
@@ -547,19 +521,13 @@ PIO_close(theINTERP, PMC *pmc)
 {
     INTVAL res;
     ParrotIOLayer *l = pmc->cache.struct_val;
+    ParrotIO *io = PMC_data(pmc);
 
-    while (l) {
-        if (l->api->Close) {
-            ParrotIO *io = PMC_data(pmc);
-            PIO_flush(interpreter, pmc);
-            res =  (*l->api->Close) (interpreter, l, io);
-            PIO_destroy(interpreter, pmc);
-            return res;
-        }
-        l = PIO_DOWNLAYER(l);
-    }
+    PIO_flush(interpreter, pmc); /* XXX boe: is this neccessary here? */
+    res =  PIO_close_down(interpreter, l, io);
+    PIO_destroy(interpreter, pmc);
 
-    return 0;
+    return res;
 }
 
 
@@ -567,15 +535,9 @@ void
 PIO_flush(theINTERP, PMC *pmc)
 {
     ParrotIOLayer *l = pmc->cache.struct_val;
+    ParrotIO *io = PMC_data(pmc);
 
-    while (l) {
-        if (l->api->Flush) {
-            ParrotIO *io = PMC_data(pmc);
-            (*l->api->Flush) (interpreter, l, io);
-            return;
-        }
-        l = PIO_DOWNLAYER(l);
-    }
+    PIO_flush_down(interpreter, l, io);
 }
 
 
@@ -586,16 +548,9 @@ INTVAL
 PIO_read(theINTERP, PMC *pmc, void *buffer, size_t len)
 {
     ParrotIOLayer *l = pmc->cache.struct_val;
+    ParrotIO *io = PMC_data(pmc);
 
-    while (l) {
-        if (l->api->Read) {
-            ParrotIO *io = PMC_data(pmc);
-            return (*l->api->Read) (interpreter, l, io, buffer, len);
-        }
-        l = PIO_DOWNLAYER(l);
-    }
-
-    return 0;
+    return PIO_read_down(interpreter, l, io, buffer, len);
 }
 
 
@@ -609,14 +564,9 @@ PIO_write(theINTERP, PMC *pmc, void *buffer, size_t len)
     ParrotIO *io = PMC_data(pmc);
 
     if (io->flags & PIO_F_WRITE)
-        while (l) {
-            if (l->api->Write) {
-                return (*l->api->Write) (interpreter, l, io, buffer, len);
-            }
-            l = PIO_DOWNLAYER(l);
-        }
-
-    return 0;
+        return PIO_write_down(interpreter, l, io, buffer, len);
+    else
+        return 0;
 }
 
 
@@ -627,16 +577,9 @@ INTVAL
 PIO_seek(theINTERP, PMC *pmc, PIOOFF_T offset, INTVAL w)
 {
     ParrotIOLayer *l = pmc->cache.struct_val;
+    ParrotIO *io = PMC_data(pmc);
 
-    while (l) {
-        if (l->api->Seek) {
-            ParrotIO *io = PMC_data(pmc);
-            return (*l->api->Seek) (interpreter, l, io, offset, w);
-        }
-        l = PIO_DOWNLAYER(l);
-    }
-
-    return -1;
+    return PIO_seek_down(interpreter, l, io, offset, w);
 }
 
 
@@ -647,16 +590,9 @@ PIOOFF_T
 PIO_tell(theINTERP, PMC *pmc)
 {
     ParrotIOLayer *l = pmc->cache.struct_val;
+    ParrotIO *io = PMC_data(pmc);
 
-    while (l) {
-        if (l->api->Tell) {
-            ParrotIO *io = PMC_data(pmc);
-            return (*l->api->Tell) (interpreter, l, io);
-        }
-        l = PIO_DOWNLAYER(l);
-    }
-
-    return -1;
+    return PIO_tell_down(interpreter, l, io);
 }
 
 
@@ -685,14 +621,9 @@ PIO_puts(theINTERP, PMC *pmc, const char *s)
     ParrotIO *io = PMC_data(pmc);
 
     if (io->flags & PIO_F_WRITE)
-        while (l) {
-            if (l->api->PutS) {
-                return (*l->api->PutS) (interpreter, l, io, s);
-            }
-            l = PIO_DOWNLAYER(l);
-        }
-
-    return -1;
+        return PIO_puts_down(interpreter, l, io, s);
+    else
+        return -1;
 }
 
 INTVAL

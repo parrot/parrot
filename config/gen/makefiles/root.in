@@ -100,7 +100,7 @@ ENCODING_O_FILES = encodings/singlebyte$(O) encodings/utf8$(O) \
 CHARTYPE_O_FILES = chartypes/unicode$(O) chartypes/usascii$(O)
 
 IO_O_FILES = io/io$(O) io/io_buf$(O) io/io_unix$(O) io/io_win32$(O) \
-	io/io_stdio$(O)
+	io/io_stdio$(O) io/io_passdown$(O)
 
 INTERP_O_FILES = exceptions$(O) global_setup$(O) interpreter$(O) parrot$(O) \
 	register$(O) core_ops$(O) core_ops_prederef$(O) core_ops_switch$(O) \
@@ -437,6 +437,8 @@ io/io_unix$(O) : $(GENERAL_H_FILES) io/io_private.h
 io/io_win32$(O) : $(GENERAL_H_FILES) io/io_private.h
 
 io/io_stdio$(O) : $(GENERAL_H_FILES) io/io_private.h
+
+io/io_passdown$(O) : $(GENERAL_H_FILES) io/io_private.h
 
 memory$(O) : $(GENERAL_H_FILES)
 
