@@ -4,13 +4,13 @@
 # Play conway's (no, not *him*. The other conway) game
 # of life
 #
-.emit
+#.emit
 
-.include "library/ncurses.pasm"
 
-.eom
+#.eom
 
 .sub _MAIN
+.include "library/ncurses.pasm"
         .local int MAX_GEN
 	.local int GEN_COUNT
 	.local float START_TIME
@@ -19,6 +19,7 @@
 	.local float GPS
 	.local int SUPRESS_PRINT
 	.local pmc INITSCR
+	.local pmc ENDWIN
 	.local pmc DISPLAY
 	.local pmc STDSCR
 	.local pmc WCLEAR
@@ -43,9 +44,10 @@
 	SUPRESS_PRINT = 0
 
 	INITSCR = global "ncurses::initscr"
+	ENDWIN = global "ncurses::endwin"
 	WCLEAR = global "ncurses::wclear"
-	WREFRESH = global "ncurses::wrefresh"	
-	MVWADDCH = global "ncurses::mvwaddch"	
+	WREFRESH = global "ncurses::wrefresh"
+	MVWADDCH = global "ncurses::mvwaddch"
 	WATTRON = global "ncurses::wattron"
 	COLOR_PAIR = global "ncurses::COLOR_PAIR"
 	START_COLOR = global "ncurses::start_color"
@@ -63,7 +65,7 @@
 	I5 = 1		# Color pair 1
 	I6 = 5 		# Pink foreground
 	I7 = 0		# Black background
-	invoke 
+	invoke
 
 	P0 = COLOR_PAIR
 	I5 = 1
@@ -77,15 +79,15 @@
 	set S1,  "               "
 	set S2,  "               "
         set S3,  "               "
-	set S4,  "               "
-	set S5,  "               "
-	set S6,  "    *          "
-	set S7,  "  ***          "
-	set S8,  "    *          "
+	set S4,  "   **          "
+	set S5,  " *    *        "
+	set S6,  "       *       "
+	set S7,  " *     *       "
+	set S8,  "  ******       "
 	set S9,  "               "
 	set S10, "               "
-	set S11, "       *       "
-	set S12, "      ***      "
+	set S11, "               "
+	set S12, "               "
 	set S13, "               "
 	set S14, "               "
 	set S15, ""
@@ -107,7 +109,7 @@
 	bsr dump
 	GEN_COUNT = 0
 
-loop:	if GEN_COUNT > MAX_GEN goto getout
+loop:	if GEN_COUNT >= MAX_GEN goto getout
 	inc GEN_COUNT
 	I31 = GEN_COUNT % 100
 	if I31 goto skip
@@ -120,17 +122,20 @@ skip:
 	bsr dump
 	branch loop
 
-getout:	time CUR_TIME
+getout:
+	P0 = ENDWIN
+	invoke
+	time CUR_TIME
 	TIME_DIFF = CUR_TIME - START_TIME
 
 	print "\n"
-	print I2
+	print GEN_COUNT
 	print " generations in "
 	print TIME_DIFF
  	print " seconds. "
 	GPS = TIME_DIFF / MAX_GEN
 
-	print MAX_GEN
+	print GPS
 	print " generations/sec\n"
 
 	interpinfo I1, 1
@@ -278,11 +283,11 @@ dump:
 	if SUPRESS_PRINT goto dumpend
 
 	saveall
-	
+
 	P0 = WCLEAR
 	P5 = STDSCR
 	invoke
-	
+
 	P0 = MVWADDSTR
 	S5 = "Generation: "
 	I5 = 0
@@ -300,7 +305,7 @@ dump:
 	CHARACTER_OFFSET = 0
 
 printloop:
-	
+
 	substr_r S0, S15, CHARACTER_OFFSET, 1
 	if S0 != "*" goto incit
 	X_COORD = CHARACTER_OFFSET % 15
@@ -319,10 +324,10 @@ incit:	CHARACTER_OFFSET = CHARACTER_OFFSET + 1
 	P0 = WREFRESH
 	P5 = STDSCR
 	invoke
-	
+
 	restoreall
 
-	sleep 1
+	#sleep 1
 dumpend:
 	ret
 

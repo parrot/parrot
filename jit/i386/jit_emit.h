@@ -2790,7 +2790,7 @@ count_regs(char *sig, char *sig_start)
 {
     const char *typs[] = {
         "lisc234", /* I */
-        "t",    /* S */
+        "tbB",    /* S */
         "pP",   /* P */
         "fd"   /* N */
     };
@@ -2917,6 +2917,12 @@ Parrot_jit_build_call_func(struct Parrot_Interp *interpreter, PMC *pmc_nci,
             case 'v':
                 st -= 4;        /* undo default stack usage */
                 break;
+            case 'b':   /* buffer (void*) pass SReg->bufstart */
+                jit_emit_mov_rm_i(pc, emit_EDX,
+                        &STR_REG(count_regs(sig, signature->strstart)));
+                emitm_movl_m_r(pc, emit_EAX, emit_EDX, 0, 1,
+                        offsetof(STRING, bufstart));
+                break;
             case 't':   /* string, pass a cstring */
                 jit_emit_mov_rm_i(pc, emit_EAX,
                         &STR_REG(count_regs(sig, signature->strstart)));
@@ -3009,6 +3015,23 @@ Parrot_jit_build_call_func(struct Parrot_Interp *interpreter, PMC *pmc_nci,
             emitm_movl_r_m(pc, emit_EDX, emit_EAX, 0, 1,
                     offsetof(struct PMC_EXT, data));
 #  endif
+            break;
+        case 'b':   /* (void *) = new_buffer_header->bufstart */
+            /* preserve return value */
+            jit_emit_mov_rr_i(pc, emit_EBX, emit_EAX);
+            emitm_pushl_i(pc, interpreter);
+            emitm_calll(pc, (char*)new_buffer_header - pc - 4);
+            emitm_addb_i_r(pc, 4, emit_ESP);
+            /* *eax = buffer_header */
+            /* set external flag */
+            emitm_orl_i_m(pc, PObj_external_FLAG, emit_EAX, 0, 1,
+                    offsetof(pobj_t, flags));
+            /* mov %ebx, (bufstart) %eax */
+            emitm_movl_r_m(pc, emit_EBX, emit_EAX, 0, 1,
+                    offsetof(Buffer, bufstart));
+            /* place result in SReg */
+            jit_emit_mov_mr_i(pc, &STR_REG(next_s++), emit_EAX);
+
             break;
         case 't':   /* string, determine length, make string */
             emitm_pushl_i(pc, 0);
