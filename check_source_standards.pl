@@ -36,7 +36,7 @@ foreach my $file (@files) {
     
     for (@lines[0..10]) {
 	if (/DO NOT EDIT/) {
-	    info($file, 0, "$file is automatically generated.  Skipping");
+	    print "Skipping $file (automatically generated)\n";
 	    next FILE;
 	}
     }
