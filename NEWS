@@ -1,4 +1,28 @@
-VERSION 0.0.2
+VERSION 0.0.3
+
+New in 0.0.3
+
+- PMCs!
+- Perl base scalar types implemented
+- A new minilanguage, Scheme
+- Much improved documentation
+- Register stacks pushing and popping
+- User stack pushing, popping and rotating
+- Jako updates: subroutines, more example programs, optimizations
+- test_prog renamed to 'parrot'
+
+- Added fatures to the assembler: @ for current location, and global
+  labels
+- Build tweaks for VMS
+- Bytecode typing clean-ups
+- More platforms: OS X, HPUX, OS/2
+- The proliferation of runops cores reduced to one fast and one slow one
+- Opcode tracing, bounds checking, profiling
+- Vastly improved string support, with separation of encoding and
+  charset
+- Lots more tests
+- Multiple interpreter creation support - the beginnings of threading
+- Much better resource handling - the beginnings of GC
 
 New in 0.0.2
 
