@@ -167,9 +167,17 @@ throw_exception(Parrot_Interp interpreter, PMC *exception, void *dest)
 #endif
     /* generate and place return continuation */
     if (dest) {
+        PMC *sub;
+        struct Parrot_Sub *rcc;
+        sub = new_continuation_pmc(interpreter, dest);
         key = key_new_cstring(interpreter, "_invoke_cc");
-        VTABLE_set_pmc_keyed(interpreter, exception, key,
-                new_continuation_pmc(interpreter, dest));
+        VTABLE_set_pmc_keyed(interpreter, exception, key, sub);
+        rcc = (struct Parrot_Sub *)PMC_data(sub);
+        /* XXX intermediate hack to speed up return continuation
+         * better is:
+         * - a return continuation doesn't get COWed stacks */
+        PObj_COW_CLEAR( (Buffer *) interpreter->ctx.control_stack);
+        rcc->ctx.control_stack = interpreter->ctx.control_stack;
     }
     /* put the continuation ctx in the interpreter */
     restore_context(interpreter, &cc->ctx);
