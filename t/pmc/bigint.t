@@ -53,7 +53,7 @@ output_is(<<'CODE', <<'OUT', "set double, get str");
    print "\n"
    end
 CODE
-1230000000000L
+1230000000000
 OUT
 
 output_is(<<'CODE', <<'OUT', "set str, get str");
@@ -63,7 +63,7 @@ output_is(<<'CODE', <<'OUT', "set str, get str");
    print "\n"
    end
 CODE
-1230000000000L
+1230000000000
 OUT
 
 output_is(<<'CODE', <<'OUT', "add");
@@ -78,7 +78,7 @@ output_is(<<'CODE', <<'OUT', "add");
    print "\n"
    end
 CODE
-1999999L
+1999999
 OUT
 
 output_is(<<'CODE', <<'OUT', "add_int");
@@ -91,7 +91,7 @@ output_is(<<'CODE', <<'OUT', "add_int");
    print "\n"
    end
 CODE
-1999999L
+1999999
 OUT
 
 output_is(<<'CODE', <<'OUT', "mul");
@@ -106,7 +106,7 @@ output_is(<<'CODE', <<'OUT', "mul");
    print "\n"
    end
 CODE
-999999000000L
+999999000000
 OUT
 
 output_is(<<'CODE', <<'OUT', "mul_int");
@@ -118,7 +118,7 @@ output_is(<<'CODE', <<'OUT', "mul_int");
    print "\n"
    end
 CODE
-999999000000L
+999999000000
 OUT
 
 output_is(<<'CODE', <<'OUT', "add overflow");
@@ -145,8 +145,8 @@ ex:
    end
 CODE
 2100000000 PerlInt
-2200000000L BigInt
-2300000000L BigInt
+2200000000 BigInt
+2300000000 BigInt
 ok
 OUT
 
@@ -164,7 +164,7 @@ output_is(<<'CODE', <<'OUT', "abs");
    print "\n"
    end
 CODE
-1230000000000L
--1230000000000L
-1230000000000L
+1230000000000
+-1230000000000
+1230000000000
 OUT
