@@ -145,11 +145,11 @@ Finds the method for C<*name>.
     }
 
     void set_attr(INTVAL idx, PMC* value) {
-        return Parrot_set_attrib_by_num(interpreter, SELF, idx, value);
+        Parrot_set_attrib_by_num(interpreter, SELF, idx, value);
     }
 
     void set_attr_str(STRING* idx, PMC* value) {
-        return Parrot_set_attrib_by_str(interpreter, SELF, idx, value);
+        Parrot_set_attrib_by_str(interpreter, SELF, idx, value);
     }
 
     PMC* get_class() {

@@ -100,7 +100,6 @@ use strict;
 use lib 'lib';
 use Parrot::OpsFile;
 use Parrot::OpLib::core;
-use warnings;
 
 my %arg_dir_mapping = (
 	''   => 'PARROT_ARGDIR_IGNORED',
