@@ -183,10 +183,10 @@ ParrotIO * PIO_unix_fdopen(theINTERP, ParrotIOLayer * layer,
 		        PIOHANDLE fd, UINTVAL flags) {
         ParrotIO * io;
         UINTVAL oflags, mode;   
-        mode = 0;
 #ifdef HAS_HEADER_FCNTL
-        UNITVAL rflags;
+        UINTVAL rflags;
 #endif   
+        mode = 0;
 
         oflags = flags_to_unix(flags);
 
