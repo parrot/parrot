@@ -312,6 +312,7 @@ new_hash(Interp *interpreter)
 /*      hash->bucket_pool->flags |= BUFFER_report_FLAG; */
     hash->free_list = NULL;
     hash->former_base = NULL;
+    expand_hash(interpreter, hash);
     return hash;
 }
 
