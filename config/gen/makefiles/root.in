@@ -241,6 +241,7 @@ INTERP_O_FILES = \
     $(SRC)/objects$(O) \
     $(SRC)/packfile$(O) \
     $(SRC)/stacks$(O) \
+    $(SRC)/stack_common$(O) \
     $(SRC)/string$(O) \
     $(SRC)/sub$(O) \
     $(SRC)/encoding$(O) \
@@ -738,6 +739,8 @@ $(SRC)/rx$(O) : $(GENERAL_H_FILES)
 $(SRC)/rxstacks$(O) : $(GENERAL_H_FILES)
 
 $(SRC)/stacks$(O) : $(GENERAL_H_FILES)
+
+$(SRC)/stack_common$(O) : $(GENERAL_H_FILES)
 
 $(SRC)/tsq$(O) : $(GENERAL_H_FILES)
 

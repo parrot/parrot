@@ -75,28 +75,13 @@ Stack_Chunk_t *
 new_stack(Interp *interpreter, const char *name)
 {
 
-    Stack_Chunk_t *chunk = new_bufferlike_header(interpreter,
-            sizeof(Stack_Chunk_t));
-
-    SET_NULL(chunk->items);
-    SET_NULL(chunk->next);
-    SET_NULL(chunk->prev);
-    chunk->n_chunks = 1;
-    chunk->chunk_limit = STACK_CHUNK_LIMIT;
-    chunk->name = name;
-
-    /* Block DOD from murdering our newly allocated stack buffer. */
-    Parrot_block_DOD(interpreter);
-    Parrot_allocate(interpreter, (Buffer *)chunk,
-                    sizeof(Stack_Entry_t) * STACK_CHUNK_DEPTH);
-    Parrot_unblock_DOD(interpreter);
-
-    return chunk;
+    return cst_new_stack(interpreter, name,
+            sizeof(Stack_Entry_t), STACK_CHUNK_DEPTH);
 }
 
 /*
 
-=item C<void 
+=item C<void
 stack_destroy(Stack_Chunk_t * top)>
 
 GC does it all.
@@ -113,7 +98,7 @@ stack_destroy(Stack_Chunk_t * top)
 
 /*
 
-=item C<void 
+=item C<void
 stack_mark_cow(Stack_Chunk_t *top)>
 
 Mark a stack COW.
@@ -249,7 +234,7 @@ stack_entry(Interp *interpreter, Stack_Chunk_t *stack, Intval depth)
 /*
 
 =item C<void
-rotate_entries(Interp *interpreter, Stack_Chunk_t **stack_p, 
+rotate_entries(Interp *interpreter, Stack_Chunk_t **stack_p,
                Intval num_entries)>
 
 Rotate the top N entries by one.  If C<N > 0>, the rotation is bubble

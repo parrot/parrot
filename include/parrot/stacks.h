@@ -29,6 +29,8 @@ typedef struct Stack_Chunk {
     size_t used;
     int n_chunks;
     int chunk_limit;
+    size_t item_size;
+    size_t items_per_chunk;
     const char * name;
     struct Stack_Chunk *next;
     struct Stack_Chunk *prev;
@@ -40,8 +42,22 @@ typedef void (*Stack_cleanup_method)(Stack_Entry_t *);
 #define STACK_CLEANUP_NULL ((Stack_cleanup_method)NULLfunc)
 
 void stack_system_init(Interp *interpreter);
-Stack_Chunk_t * new_stack(Interp *interpreter, const char *name);
 void stack_destroy(Stack_Chunk_t * top);
+
+/*
+ * stack_common functions
+ */
+Stack_Chunk_t * cst_new_stack(Parrot_Interp, const char *name, size_t, size_t);
+Stack_Chunk_t * stack_copy(Parrot_Interp, Stack_Chunk_t *stack);
+void stack_unmake_COW(Parrot_Interp, Stack_Chunk_t *stack);
+void* stack_prepare_push(Parrot_Interp, Stack_Chunk_t **stack_p);
+void* stack_prepare_pop(Parrot_Interp, Stack_Chunk_t **stack_p);
+
+/*
+ * pad, user, control stacks
+ */
+
+Stack_Chunk_t * new_stack(Interp *interpreter, const char *name);
 
 void stack_mark_cow(Stack_Chunk_t *stack_base);
 
