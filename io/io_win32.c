@@ -14,7 +14,7 @@
 
 #include "parrot/parrot.h"
 
-#ifdef WIN32
+#ifdef PIO_OS_WIN32
 
 #  include <tchar.h>
 
@@ -321,7 +321,7 @@ ParrotIOLayerAPI pio_win32_layer_api = {
 
 
 
-#endif /* WIN32 */
+#endif /* PIO_OS_WIN32 */
 
 
 /*

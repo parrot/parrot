@@ -160,11 +160,15 @@ PIO_init_stacks(theINTERP)
     /* Optimize this to keep a default stack and just
      * call copy stack.
      */
-#ifndef WIN32
+#ifdef PIO_OS_UNIX
     PIO_push_layer(interpreter, PIO_base_new_layer(&pio_unix_layer), NULL);
-#else
+#endif
+#ifdef PIO_OS_WIN32
     PIO_push_layer(interpreter, PIO_base_new_layer(&pio_win32_layer), NULL);
 #endif
+#ifdef PIO_OS_STDIO
+    PIO_push_layer(interpreter, PIO_base_new_layer(&pio_stdio_layer), NULL);
+#endif  
 #if 0
     PIO_push_layer(interpreter, PIO_base_new_layer(&pio_buf_layer), NULL);
 #endif

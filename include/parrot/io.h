@@ -17,6 +17,17 @@
 #if !defined(PARROT_IO_H_GUARD)
 #define PARROT_IO_H_GUARD
 
+/* which OS are we on? (this should be moved into Configure-land) */
+#ifdef WIN32
+#  define PIO_OS_WIN32
+#else
+#  ifdef HAS_UNISTD
+#    define PIO_OS_UNIX
+#  else
+#    define PIO_OS_STDIO
+#    include <stdio.h>
+#  endif
+#endif
 
 #ifndef STDIN_FILENO
 # define STDIN_FILENO 0
@@ -93,12 +104,17 @@ struct _ParrotIOBuf {
 };
 
 
-#ifdef WIN32
+#ifdef PIO_OS_WIN32
 typedef HANDLE PIOHANDLE;
 typedef LARGE_INTEGER PIOOFF_T;
-#else
+#endif
+#ifdef PIO_OS_UNIX
 typedef int PIOHANDLE;
 typedef off_t PIOOFF_T;
+#endif
+#ifdef PIO_OS_STDIO
+typedef FILE* PIOHANDLE;
+typedef long PIOOFF_T;
 #endif
 
 extern PIOOFF_T piooffsetzero;
@@ -159,10 +175,14 @@ struct _ParrotIOData {
 
 
 /* Others to come */
-#ifndef WIN32
+#ifdef PIO_OS_UNIX
 extern ParrotIOLayer pio_unix_layer;
-#else
+#endif
+#ifdef PIO_OS_WIN32
 extern ParrotIOLayer pio_win32_layer;
+#endif
+#ifdef PIO_OS_STDIO
+extern ParrotIOLayer pio_stdio_layer;
 #endif
 extern ParrotIOLayer pio_buf_layer;
 
@@ -295,16 +315,23 @@ extern INTVAL PIO_eof(theINTERP, ParrotIO *);
 
 
 /* Put platform specific macros here if you must */
-#ifdef WIN32
+#ifdef PIO_OS_WIN32
 extern INTVAL           PIO_win32_isatty(PIOHANDLE fd);
 #  define PIO_isatty(x)   PIO_win32_isatty(x)
 extern INTVAL           PIO_win32_getblksize(PIOHANDLE fd);
 #  define PIO_getblksize(x)   PIO_win32_getblksize(x)
-#else
+#endif
+#ifdef PIO_OS_UNIX
 extern INTVAL           PIO_unix_isatty(PIOHANDLE fd);
 #  define PIO_isatty(x)   PIO_unix_isatty(x)
 extern INTVAL           PIO_unix_getblksize(PIOHANDLE fd);
 #  define PIO_getblksize(x)   PIO_unix_getblksize(x)
+#endif
+#ifdef PIO_OS_STDIO
+extern INTVAL           PIO_stdio_isatty(PIOHANDLE fd);
+#  define PIO_isatty(x)   PIO_stdio_isatty(x)
+extern INTVAL           PIO_stdio_getblksize(PIOHANDLE fd);
+#  define PIO_getblksize(x)   PIO_stdio_getblksize(x)
 #endif
 
 

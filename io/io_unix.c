@@ -17,8 +17,7 @@
 
 #include "parrot/parrot.h"
 
-/* Configure doesn't generate a generic UNIX define yet */
-#ifndef WIN32
+#ifdef PIO_OS_UNIX
 
 /* Defined at bottom */
 extern ParrotIOLayerAPI pio_unix_layer_api;
@@ -438,7 +437,7 @@ ParrotIOLayerAPI pio_unix_layer_api = {
 };
 
 
-#endif /* WIN32 */
+#endif /* PIO_OS_UNIX */
 
 /*
  * Local variables:

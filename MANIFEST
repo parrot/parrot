@@ -191,6 +191,7 @@ io/TODO
 io/io.c
 io/io_buf.c
 io/io_unix.c
+io/io_stdio.c
 io/io_win32.c
 jit.c
 jit/alpha/core.jit
