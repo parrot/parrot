@@ -29,8 +29,7 @@ three_arg:
   channels = find_global "_Tcl", "channels"
   $S2 = argv[1]
   $P1 = channels[$S2]
-  $I0 = typeof $P1
-  if $I0 == .PerlUndef goto bad_channel   
+  isnull $P1, bad_channel
   $S3 = argv[2]
   print $P1, $S3
   goto done
@@ -50,8 +49,7 @@ two_arg_channel:
   .local pmc channels 
   channels = find_global "_Tcl", "channels"
   $P1 = channels[$S2]
-  $I0 = typeof $P1
-  if $I0 == .PerlUndef goto bad_channel   
+  isnull $P1, bad_channel
   print $P1, $S3
   print $P1, "\n"
   goto done

@@ -3,7 +3,6 @@
 
 .namespace [ "Tcl" ]
 
-
 .sub _concat
   .local pmc argv 
   argv = foldup
@@ -16,14 +15,13 @@
 
   .local int arg_num
   arg_num = 0
-  .local string current_arg
-  .local int start_pos
-  .local int end_pos
-  .local int str_length
-  .local string trimmed_string
-  .local int current_char
+  .local string current_arg, trimmed_string
+  .local int start_pos,end_pos,str_length,current_char
   .local pmc results
-  results  = new PerlArray
+
+  .local int TclList
+  TclList = find_type "TclList"
+  results  = new TclList
 
 arg_loop:
   if arg_num == argc goto arg_loop_done

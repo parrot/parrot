@@ -101,8 +101,7 @@ get_parenthetical:
   (return_type,retval) = __expression_interpret(retval)
   if return_type == TCL_ERROR goto die_horribly
 
-  chunk = new FixedPMCArray
-  chunk = 2 
+  chunk = new TclList
   chunk[0] = INTEGER
   chunk[1] = retval
 
@@ -124,8 +123,7 @@ get_variable:
   #error_S = retval
   #if return_type == TCL_ERROR goto die_horribly
   # Temporarily pump this out to the array.
-  chunk = new FixedPMCArray
-  chunk = 2
+  chunk = new TclList
   chunk[0] = INTEGER
   chunk[1] = retval
   push chunks, chunk
@@ -143,8 +141,7 @@ get_function:
 
   (op_length,func,result) = __expr_get_function(expr,chunk_start)
   if op_length == 0 goto get_number
-  chunk = new FixedPMCArray
-  chunk = 3 
+  chunk = new TclList
   chunk[0] = FUNC
   chunk[1] = func
   chunk[2] = -1 # functions trump operands, for now.
@@ -212,8 +209,7 @@ op_done:
 
   $I6 = ops[test_op]
 
-  chunk = new FixedPMCArray
-  chunk= 3
+  chunk = new TclList
   chunk[0] = OP
   chunk[1] = $I6 # op lookup
   chunk[2] = $I5 # precedence
@@ -592,8 +588,7 @@ done_op:
   #print "DID OP:"
   #print func
   #print "\n"
-  $P5 = new FixedPMCArray
-  $P5 = 2
+  $P5 = new TclList
   $P5[0] = INTEGER
   $P5[1] = op_result
   push result_stack, $P5
@@ -644,6 +639,9 @@ evaluation_return:
   .local pmc value
   value = new Integer
 
+  .local int TclList
+  TclList = find_type "TclList"
+
   pos = start
   if pos >= len goto failure
   
@@ -679,8 +677,7 @@ octal_finish_up:
   dec pos
 
   substr $S0, expr, start,pos
-  $P1 = new FixedPMCArray
-  $P1 = 2
+  $P1 = new TclList
   $P1[0] = $S0
 
   sprintf $S0, "%o", $P1
@@ -710,8 +707,7 @@ failure:
 finish_up:
    substr $S0, expr, start,pos
    $I0 = $S0
-   value = new FixedPMCArray
-   value = 2
+   value = new TclList
    value[0] = INTEGER
    value[1] = $I0 
 
