@@ -33,7 +33,7 @@ PMC* pmc_new(struct Parrot_Interp *interpreter, INTVAL base_type) {
 
     if(!pmc) {
         internal_exception(ALLOCATION_ERROR, "Parrot VM: PMC allocation failed!");
-        return NULL:
+        return NULL;
     }
     
     pmc->flags = 0;
