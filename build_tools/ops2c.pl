@@ -117,7 +117,7 @@ my $preamble = <<END_C;
  * This file is generated automatically from '$file' (and possibly other
  * .ops files). by $0.
  *
- * Any changes made here will be lost!  
+ * Any changes made here will be lost!
  *
  */
 
@@ -272,7 +272,7 @@ foreach my $op ($ops->ops) {
     "$full_name",
     "$func_name",
     "", /* TODO: Put the body here */
-    $jump, /* 1 = relative 2 = absolute 4 = pop 8 = next 16 = unpredictable */ 
+    $jump, /* 1 = rel 2 = abs 4 = pop 8 = enext 16 = gnext 32 = unpredict */
     $arg_count,
     $arg_types,
     $arg_dirs
