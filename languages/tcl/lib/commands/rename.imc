@@ -1,0 +1,55 @@
+###
+# [rename]
+# Copyright (c) 2002-2003 by William J. Coleda
+
+.pcc_sub __cmd_rename prototyped
+  .param PerlArray argv
+  
+  .include "lib/macros/debug.imc"
+  .local int debug
+  debug = 0
+
+  .local int argc 
+  argc = argv
+
+  .local string oldName
+  .local string newName
+  .local PerlHash commands
+ 
+  if argc != 2 goto error
+  oldName = argv[0]
+  newName = argv[1]
+ 
+  find_global commands, "commands"
+
+  $P1 = commands[oldName]
+
+  length $I1, newName
+  if $I1 == 0 goto delete
+
+add:
+  .debug("Adding proc:")
+  .debug(S1)
+  .debug("\n")
+  commands[newName] = $P1
+
+delete:
+  .debug("Removing proc:")
+  .debug(S1)
+  .debug("\n")
+  delete commands[oldName]
+
+  goto done 
+
+  # fall through to a bad call.
+
+error:
+  print "wrong # args: should be \"rename oldName newName\""
+
+done:
+
+  store_global "commands", commands
+  .pcc_begin_return
+  .return ""
+  .pcc_end_return
+.end

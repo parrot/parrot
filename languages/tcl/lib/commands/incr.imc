@@ -1,0 +1,60 @@
+###
+# [incr]
+# Copyright (c) 2002-2003 by William J. Coleda
+
+#
+# incr foo
+# incr foo offset
+
+.pcc_sub __cmd_incr prototyped
+  .param PerlArray argv
+  .include "lib/macros/debug.imc"
+  .local int debug
+  debug = 0
+
+  .local int value
+  .local int increment 
+  increment = 1
+  
+  .local int argc 
+  argc = argv
+
+  .local string retval
+ 
+  if argc == 0 goto error
+
+  $S1 = argv[0] 
+  find_lex $P1, $S1
+  value = $P1 
+  if argc == 1 goto incr
+  if argc == 2 goto offset
+  if argc > 2 goto error
+
+offset:
+  $S1 = argv[1]
+  increment = $S1
+incr:
+  value = value + increment
+  $P1 = new PerlString
+  $P1 = value
+  store_lex 0, $S1, $P1
+  retval = value
+  # XXX we're failing some tests in incr.t - we setup the right
+  # return value here, but it doesn't seem to work. It appears to
+  # be returning the original value of the variable rather than
+  # the incremented value, but only if we passed in an increment value.
+  # print "retval is:"
+  # print retval
+  # print "\n"
+  goto done 
+
+  # fall through to a bad call.
+
+error:
+  print "wrong # args: should be \"incr varName ?increment?\"\n"
+
+done:
+  .pcc_begin_return
+  .return retval
+  .pcc_end_return
+.end

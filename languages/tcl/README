@@ -1,0 +1,11 @@
+To build the tcl interpreter, type "make" in this directory. (though we
+ship tcl.imc and tcl.pbc prebuilt for you, you can modify one of the .imc
+files and regen if you like.)
+
+To run an example, cd to examples, and type "make" for instructions
+
+To run the test suite, type "make test".
+
+To run the test suite with TODOs failing, type "make devtest"
+
+Look in the docs directory.

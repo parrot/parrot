@@ -1,0 +1,38 @@
+RM_F = ${rm_f}
+PERL = ${perl}
+PARROT = ..${slash}..${slash}parrot
+
+DEPS = $(PARROT) \
+lib/parse.imc \
+lib/backslash_newline_subst.imc \
+lib/backslash_subst.imc \
+lib/match_close.imc \
+lib/var_subst.imc \
+lib/macros/debug.imc \
+lib/macros/is_space.imc \
+lib/macros/substitution.imc \
+lib/commands/exit.imc \
+lib/commands/puts.imc \
+lib/commands/set.imc \
+lib/commands/incr.imc \
+lib/commands/append.imc \
+lib/commands/rename.imc
+
+tcl.pbc: tcl.imc
+	$(PARROT) --output=tcl.pbc tcl.imc
+
+tcl.imc: tcl.pl $(DEPS)
+	$(PERL) tcl.pl > tcl.imc
+
+test:	tcl.pbc
+	cd t && $(PERL) -MTest::Harness -e 'runtests(glob("*.t"))' && cd ..
+
+devtest:
+	cd t && $(PERL) -e 'use Test::Harness qw($$verbose runtests) ; $$Test::Harness::verbose=1;runtests(glob("*.t"))' && cd ..
+
+clean:
+	$(RM_F) tcl.imc tcl.pbc
+
+distclean: clean
+	$(RM_F) Makefile
+

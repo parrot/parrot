@@ -1,0 +1,137 @@
+###
+# var_subst
+#
+# Given a string, return the starting point of the substitution,
+# the length of the string being removed, and a string containing
+# the replacement string, where the original string is:
+#
+# $var
+#
+# and the replacement string is the value of $var
+#
+# A len of -1 indicates that there was nothing to do.
+#
+# TODO:
+#   support $array(foo)
+#   support lexical scopes
+#   support ${variable} syntax
+#   remove ords, just use raw ascii
+# Copyright (c) 2002-2003 by William J. Coleda
+
+
+.pcc_sub __var_subst prototyped 
+  .param string word
+
+  .local int start_pos
+  .local int replace_len
+  .local string replace_str
+
+  .local int temppos
+  .local string varname
+
+  # .local string varindex  -- not currently used
+  start_pos = 0
+  replace_len = -1
+  replace_str = ""
+
+outer:
+  #print "VAR_SUBST\n"
+
+  $S1 = "$"
+  index start_pos, word, $S1
+  if start_pos == -1 goto done
+  temppos = start_pos
+
+inner:
+  inc temppos
+
+  # get last index pos
+  length $I0, word
+  $I0 = $I0 - 1
+
+  if temppos > $I0 goto inner_done
+
+  ord $I0, word, temppos
+
+  ord $I1, "A"
+  ord $I2, "Z"
+  if $I0 < $I1  goto check2
+  if $I0 <= $I2 goto inner
+
+check2:
+
+  ord $I1, "a"
+  ord $I2, "z"
+  if $I0 < $I1  goto check3
+  if $I0 <= $I2 goto inner
+
+check3:
+
+  ord $I1, "0"
+  ord $I2, "9"
+  if $I0 < $I1  goto check4
+  if $I0 <= $I2 goto inner
+
+check4:
+
+  ord $I1, "_"
+  if I0 == $I1  goto inner
+
+inner_done:
+
+#  # copy pre var string
+#  print "VARSUBSTR1\n" 
+#  substr $S1, word, 0, search, ""
+#  concat output, $S1
+#
+#  # delete the $
+#
+#  print "VARSUBSTR2\n" 
+#  substr word, 0, 1, ""
+#
+  # get the varname
+
+
+  replace_len = temppos - start_pos
+
+  # the name of the var is one shorter than the $...
+  dec replace_len 
+  inc start_pos
+
+#
+#  print "VARSUBSTR3\n" 
+   substr $S1, word, start_pos, replace_len, ""
+
+  # XXX If the find lex fails, then we need to catch the exception.
+  # (when did this start excepting?)
+
+  find_lex $P1, $S1
+
+  replace_str = $P1
+
+#  concat output, $S2
+#
+#  goto outer
+
+  # now fixup the replace_len/start_pos to include the extra chars.
+  dec start_pos
+  inc replace_len
+done:
+
+  #concat output, word
+
+  #print "start_pos = "
+  #print start_pos
+  #print "\nreplace_len = "
+  #print replace_len
+  #print "\nreplace_str = "
+  #print replace_str
+  #print "\n"
+
+  .pcc_begin_return
+  .return start_pos
+  .return replace_len
+  .return replace_str
+  .pcc_end_return
+
+.end

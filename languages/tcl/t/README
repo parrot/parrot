@@ -1,0 +1,5 @@
+A measly set of tests. Should eventually try to run the tcl test suite, ja?
+
+It occurs to me that the "expected" output should be driven by running through
+the tcl through tclsh until we start using the tcl test suite.
+(Except that not everyone is going to have a copy of tcl lying around)

@@ -1,0 +1,135 @@
+#
+# match_close
+#
+# given a string and a starting position,
+# return the position at which the leading { or " 
+# closes, including the last character.
+# Copyright (c) 2002-2003 by William J. Coleda
+
+.sub __match_close
+  .param int start_pos
+  .param string buffer
+
+  .local int debug
+  debug=0
+  .include "lib/macros/debug.imc"
+
+  .local int opener
+  .local int closer
+  .local int peekchar
+
+  .local int count
+  .local int state
+  .local int position
+  .local int bufferlen
+  .local int position
+
+  position = start_pos
+
+  .debug("position=")
+  .debug(position)
+  .debug("\n")
+
+  length bufferlen, buffer
+  .debug("bufferlen=")
+  .debug(bufferlen)
+  .debug("\n")
+  ord opener, buffer, start_pos
+  .debug("opener=")
+  .debug("\n")
+  closer = -1
+
+  # {}
+  if opener != 123 goto trycommand
+  closer = 125
+  goto gotcloser 
+
+  # []
+trycommand:
+  .debug("match_close:trycommand")
+  if opener != 91 goto tryquote
+  closer = 93
+  goto gotcloser 
+
+  # ""
+tryquote: 
+  .debug("match_close:tryquote:\n")
+  if opener != 34 goto gotcloser
+  closer = 34
+
+gotcloser: 
+  .debug("match_close:gotcloser:\n")
+  if closer == -1 goto die1 
+
+  count = 1
+  state = 1
+  # 1 == normal, 2 == saw a \
+
+outer:
+  .debug("match_close:outer:\n")
+
+  if count == 0 goto outer_done
+
+  inc position 
+
+  .debug("position=")
+  .debug(position)
+  .debug("\n")
+
+  if position == bufferlen goto die2
+
+  ord peekchar,buffer,position
+
+  .debug("peekchar =")
+  .debug(peekchar)
+  .debug("\n")
+
+  if state==2 goto state2
+
+  if peekchar == closer goto decr
+  if peekchar == opener goto incr
+
+  # backslash
+  if peekchar != 92 goto outer
+
+  state = 2
+  goto outer
+
+# a \ is only special the first time...
+state2:
+  .debug("match_close:state2:\n")
+  state = 1
+  goto outer
+
+# found a closer
+decr:
+  .debug("match_close:decr:\n")
+  if opener == closer goto outer_done 
+  count = count - 1
+  goto outer
+
+# found another opener
+incr:
+  #debug("match_close:incr:\n")
+  count = count + 1
+  goto outer
+
+outer_done:
+  .debug("match_close:outer_done:\n")
+
+  $I1 = position - start_pos
+  # off by two?
+  inc $I1
+  .return $I1
+  ret
+
+die1:
+  .debug("match_close:die1\n")
+  .return -1
+  ret
+
+die2:
+  .debug("match_close:die2\n")
+  .return -2
+  ret
+.end

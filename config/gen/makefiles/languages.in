@@ -2,17 +2,18 @@ PERL = ${perl}
 ${make_set_make}
 MAKE_C = ${make_c}
 
-all : regex befunge bf cola ook perl6 urm
+all : regex befunge bf cola ook perl6 tcl urm
 	@echo "SKIPPED: scheme (nothing to make, but should not default to make test)"
 	@echo "SKIPPED: jako (fallen behind imcc changes)"
 
-complete-all : jako regex scheme befunge bf cola ook perl6 urm
+complete-all : jako regex scheme befunge bf cola ook perl6 tcl urm
 
-test: regex.test scheme.test befunge.test bf.test ook.test perl6.test urm.test
+test: regex.test scheme.test befunge.test bf.test ook.test perl6.test tcl.test urm.test
 	@echo "SKIPPED: jako (fallen behind imcc changes)"
 	@echo "SKIPPED: cola (no make test)"
 
-complete-test: jako.test regex.test scheme.test befunge.test bf.test cola.test ook.test perl6.test
+complete-test: jako.test regex.test scheme.test befunge.test bf.test cola.test \
+        ook.test perl6.test tcl.test urm.test
 
 # Could someone please comment on the reason for all these *.dummy
 # targets?
@@ -80,13 +81,19 @@ perl6.dummy:
 perl6.test:
 	$(MAKE_C) perl6 test
 
+tcl:
+	$(MAKE_C) tcl
+
+tcl.test:
+	$(MAKE_C) tcl test
+
 urm: urm.dummy
 
 urm.dummy:
 	$(MAKE_C) urm
 
 urm.test:
-	$(MAKE_C) test
+	$(MAKE_C) urm test
 
 clean:
 	$(MAKE_C) jako clean

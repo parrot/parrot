@@ -1,0 +1,53 @@
+###
+# [append]
+# Copyright (c) 2002-2003 by William J. Coleda
+
+#
+# append var [...]
+
+.pcc_sub __cmd_append prototyped
+  .param PerlArray argv
+  
+  .include "lib/macros/debug.imc"
+  .local int debug
+  debug = 0
+
+  .local int argc 
+  argc = argv
+
+  .local string value
+  .local int looper
+ 
+  if argc == 0 goto error
+  looper = 1
+
+  $S1 = argv[0] 
+  find_lex $P1, $S1
+  value = $P1 
+
+loop:
+  if looper > argc goto loop_done
+
+  $S2 = argv[looper]
+  concat value, $S2
+  inc looper
+  goto loop
+
+loop_done:
+
+  $P1 = new PerlString
+  $P1 = value
+  store_lex 0, $S1, $P1
+
+  goto done 
+
+  # fall through to a bad call.
+
+error:
+  print "wrong # args: should be \"append varName ?value value ...?\""
+
+done:
+  .pcc_begin_return
+  .return value
+  .pcc_end_return
+.end

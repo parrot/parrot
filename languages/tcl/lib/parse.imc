@@ -1,0 +1,505 @@
+# Copyright (c) 2002-2003 by William J. Coleda
+
+.sub __parse
+  # buffer contains the string we are working on.
+  .param string buffer
+
+  # Are we debugging (development)?
+  .local int debug
+  debug = 0
+
+  .debug("Called with buffer of {")
+  .debug(buffer)
+  .debug("}")
+
+  # Keep track of the position of the current word
+  .local int start_word
+  .local int word_length
+  .local int word_trailing_length
+  start_word = 0
+
+  # Keep track of the position of the current command
+  .local int start_command
+  .local int command_length
+  start_command = 0
+
+  # don't fall off the end
+  .local int buffer_length
+  length buffer_length, buffer
+
+  # Keep track of a particular character
+  .local int character
+  .local int last_character
+
+  # Should the word be over?
+  .local int end_of_word
+
+  # An array of commands, the current command
+  .local PerlArray commands
+  commands = new PerlArray
+  .local PerlArray command
+
+  # our running return value
+  # XXX really need to support more than a string
+  .local string retval
+  retval = ""
+
+  # Various places we need to jump to/return from
+  .local Sub func_variable_subst
+  newsub func_variable_subst, .Sub, __var_subst
+
+  # Define any macros we use.
+  .include "lib/macros/is_space.imc"
+  .include "lib/macros/debug.imc"
+  .include "lib/macros/substitution.imc"
+
+  # XXX: This would probably be a good point to create a lexical scope
+  # to store variables in.
+
+  .debug("Backslash newline substitution\n")
+
+  .arg buffer
+  saveall
+  call __backslash_newline_subst
+  restoreall
+  .result buffer
+
+BEGIN_COMMAND:
+  .debug("BEGIN COMMAND:\n")
+  .debug("start_word=")
+  .debug(start_word)
+  .debug("\n")
+
+  command = new PerlArray
+
+BEGIN_WORD:
+  .debug("BEGIN WORD:\n")
+
+  end_of_word = 0
+  # Skip any leading whitespace.
+
+space_loop:
+  .debug("space_loop:\n")
+  if start_word >= buffer_length goto END_SCOPE
+
+space_loop_cont:
+  ord $I0, buffer, start_word
+  .is_space($I0,$I1)
+  if $I1 == 0 goto space_loop_end
+  inc start_word
+
+space_loop_end:
+  .debug("space_loop_done:\n")
+  # at this point, we know start_word is correct. Now to figure out where
+  # the word ends.
+
+  # If the first character is special, then DTRT
+  ord character, buffer, start_word
+
+  # {block}
+  if character == 123 goto block_begin
+  
+  # "string"
+  if character == 34 goto block_begin
+
+  # #comment
+  if character != 35 goto pre_middle
+  if command == 0 goto handle_comment
+
+pre_middle:
+  word_length = 0
+  word_trailing_length = 0
+  last_character = -1
+
+MIDDLE_WORD:
+  .debug("MIDDLE_WORD:\n")
+
+  $I0 = start_word + word_length
+  if $I0 != buffer_length goto middle_word_0
+  .debug("premature end of word, stopping...\n")
+  goto END_COMMAND
+
+middle_word_0:
+  .debug("checking character at: ")
+  .debug($I0)
+  .debug("\n")
+
+
+  ord character, buffer, $I0
+
+  .is_space(character,$I0)
+  if $I0 == 1 goto END_WORD
+
+  # if this isn't a newline, skip
+  if character != 10 goto middle_word_2
+
+middle_word_1:
+  .debug("middle_word_1:\n")
+  word_trailing_length=1 
+  goto END_COMMAND
+
+middle_word_2:
+  .debug("middle_word_2:\n")
+  # wait, this was a semicolon - go back and deal with it.
+  if character == 59 goto middle_word_1
+
+  # If we've gotten this far and we're in a "" or {} block, barf.
+  if end_of_word == 1 goto invalid_word
+
+  # XXX We may have to be more clever than this... what if the first [ 
+  # in a word is really a \[  ??
+  if character == 91 goto handle_command_block
+  
+  if character != 123 goto middle_continue
+  if character == 36 goto handle_variable_block
+
+middle_continue:
+  .debug("middle_continue:\n")
+  last_character = character
+  inc word_length
+  goto MIDDLE_WORD
+
+END_WORD:
+  .debug("END_WORD:\n")
+
+  # XXX from start_word to end_word is a word.
+  # save the word and put it into the command array
+  substr $S0, buffer, start_word, word_length
+  push command, $S0
+  .debug("WORD: '")
+  .debug($S0)
+  .debug("'\n")
+
+  start_word = start_word + word_length
+  start_word = start_word + word_trailing_length
+  inc start_word
+  .debug("start_word=")
+  .debug(start_word)
+  .debug("\n")
+
+  goto BEGIN_WORD  
+
+handle_comment:
+  .debug("handle_comment:\n")
+  index $I0, buffer, "\n", start_word
+  if $I0 == -1 goto comment_remainder
+
+  start_word = $I0 + 1
+  goto BEGIN_COMMAND
+  
+comment_remainer:
+  .debug("comment_remainder:\n")
+  # There's nothing left to process, the comment ends the string.
+  goto END_COMMAND
+
+END_COMMAND:
+  .debug("END_COMMAND:\n")
+  # XXX we should do SOMETHING with the command we've been building up.
+  # We may have a word in progress 
+  if word_length != 0 goto end_command_1
+  # If this was an empty line, we'll have a 0 word length but
+  # a trailing length of 1. skip the newline
+  .debug("(nearly?) empty line\n")
+  start_word = start_word + word_trailing_length  
+  goto BEGIN_COMMAND
+
+end_command_1:
+  substr $S0, buffer, start_word, word_length
+  push command, $S0
+  .debug("WORD: '")
+  .debug($S0)
+  .debug("'\n")
+
+  .debug("word_trailing_length=")
+  .debug(word_trailing_length)
+  .debug("\nword_length=")
+  .debug(word_length)
+  .debug("\nstart_word=")
+  .debug(start_word)
+  .debug("\n")
+
+  push commands, command
+
+  # go to the next word
+  start_word = start_word + word_length
+  start_word = start_word + word_trailing_length
+  goto BEGIN_COMMAND
+
+block_begin:
+  # This handles both { and " style blocks.
+
+  .debug("block_begin:\n")
+  .arg buffer
+  .arg start_word
+  saveall
+  call __match_close
+  restoreall
+  .result word_length
+  .debug("word_length = ")
+  .debug(word_length)
+  .debug("\n")
+
+  if word_length < 0 goto bad_block
+  end_of_word = 1 
+  goto MIDDLE_WORD
+
+
+END_SCOPE:
+  .debug("END_SCOPE:\n")
+
+  $I0 = commands
+  if $I0 == 0 goto DONE
+
+  shift command, commands
+
+  .local PerlArray cooked_command
+  cooked_command = new PerlArray
+
+cooking:
+  .debug("cooking:\n")
+  $I0 = command 
+  if $I0 == 0 goto cooked
+
+  shift $S0, command
+  # foreach word, perform all substitutions.
+  # XXX
+
+  # If the word starts with a " or a {, then it was a block -
+  # strip off the first/last chars
+  # There is undoubtedly a better way to do this.
+
+  ord $I0, $S0
+  $I1 = 0
+  if $I0 != 123 goto baste
+  $I1 = 1 
+
+braise:
+  .debug("braise:\n")
+  substr $S2,$S0,0,1,""
+  substr $S2,$S0,-1,1,""
+  # Don't do any substitutions on a {} block
+  if $I1 == 1 goto done_subst
+  goto subst
+
+baste:
+  .debug("baste:\n")
+  if $I0 == 34 goto braise
+
+subst:
+  .debug("subst:\n")
+  # First, initialize our variables that manage the broken up string
+  .substitution_init($S0)
+
+command_subst:
+  .debug("command_subst:\n")
+  .substitution_iter_reset()
+
+command_subst_loop:
+  .debug("command_subst_loop:\n")
+  .substitution_iter_next($I0)
+  if $I0 == 1 goto variable_subst
+
+  # If so, split the word at the boundaries, replace the [...] with the
+  # result of a call to parse on the ...
+  # Should be a macro so we can use it again where we need to.
+
+  #XXX Now, we already found this once when we figured out how
+  # big the word was. We should probably build this word then, rather
+  # than constructing it by hand.
+
+  $S0 = string_array[current_pointer]
+  index $I2, $S0, "["
+  if $I2 == -1 goto command_subst_loop
+
+  .arg $S0
+  .arg $I2
+  saveall
+  call __match_close
+  restoreall
+  .result $I3
+
+  # Ok. we know the [] goes from $I2 to $I3. now, get the output of
+  # That parse, and use it to replace...
+
+  $I4 = $I3 - $I2
+  inc $I2
+  dec $I4 
+  dec $I4 
+
+  substr $S1,$S0,$I2,$I4
+  .debug("command of [")
+  .debug($S1)
+  .debug("]\n")
+
+  $S2 = ""
+
+  .arg $S1
+  saveall
+  call __parse
+  restoreall
+  .result $S2
+
+  .debug("gives output of \"")
+  .debug($S2)
+  .debug("\"\n")
+
+  dec $I2
+  inc $I4
+  inc $I4
+  inc $I4
+  .substitution_replace($S2,$I2,$I4)
+
+  goto command_subst_loop
+
+
+variable_subst:
+  # XXX for all raw segments, is there a $ ? (loop)
+  # If so, find the boundaries of the variable name, split the word at the
+  # boundaries, replace the varname with the value of the variable
+  # note that the $index(name) syntax requires name to have a few subst.
+  # passes done on it before we know the real index name - This can be delayed
+  # until we actually support arrays.
+  
+  .debug("variable_subst:\n")
+
+  .substitution_iter_reset()
+variable_subst_loop:  
+  .substitution_iter_next($I0)
+
+  if $I0 == 1 goto backslash_subst 
+  $S1 = string_array[current_pointer]
+
+  .pcc_begin prototyped
+  .arg $S1
+  .pcc_call func_variable_subst
+  sillyrequiredret1:
+  .result $S1
+  .result $I1
+  .result $I2
+  .pcc_end
+
+  #print "String is "
+  #print $S1
+  #print "\nReplace Len is "
+  #print $I2
+  #print "\nStart pos is "
+  #print $I1
+  #print "\n"
+
+  if $I2 == -1 goto variable_subst_loop 
+  .substitution_replace($S1,$I1,$I2)
+  $S1 = string_array[current_pointer]
+  #print "CURRENT_P: '"
+  #print $S1
+  #print "'\n"
+  goto variable_subst_loop
+
+backslash_subst:
+  .debug("backslash_subst:\n")
+
+  .substitution_iter_reset()
+
+backslash_subst_loop:
+  # For all raw segments, is there a \ ? (loop)
+  # If so, replace the raw \code with the cooked value, splitting the raw
+  # into raw/cooked.
+  # Since we know this is the last level of substitution, we can just fixup
+  # everything in this chunk, and move on to the next chunk.
+
+  .substitution_iter_next($I0)
+  if $I0 == 1 goto reintegrate
+  $S1 = string_array[current_pointer]
+  .arg $S1
+  saveall
+  call __backslash_subst
+  restoreall
+  .result $S1
+  string_array[current_pointer] = $S1 
+  goto backslash_subst_loop
+
+reintegrate:
+  .debug("reintegrate:\n")
+  # XXX walk the list of raw/cooked segments. Everything is done to crispy
+  # perfection now, so simply shove everything back into $S0 by appending it
+  # I'm sure this is inefficient, patches welcome. =-)
+
+  .substitution_integrate($S0)
+
+done_subst:
+  .debug("done_subst:\n")
+
+  push cooked_command, $S0
+  goto cooking
+
+cooked:
+  .debug("cooked:\n")
+
+  shift $S0, cooked_command
+
+  .debug("command: ")
+  .debug($S0)
+  .debug(" has ") 
+  $I0 = cooked_command
+  .debug($I0)
+  .debug(" arguments\n")
+
+  # get the sub we need..
+  find_global $P0, "commands"
+  $P1 = $P0[$S0]
+
+  typeof $S1, $P1
+  if $S1 == "PerlUndef" goto no_command
+
+  .pcc_begin prototyped
+  .arg cooked_command
+  .pcc_call $P1
+  shouldntneedtodothis:
+  .result retval
+  .pcc_end
+  .debug("retval of '")
+  .debug(retval)
+  .debug("'\n")
+
+  goto END_SCOPE
+
+bad_block:
+  print "XXX -invalid word, no closing <mumble> found\n"
+  goto END
+invalid_word:
+  print "XXX - invalid word, should have ended after block\n"
+  goto END
+
+handle_variable_block:
+  # All this needs to do is find the ending } and goto
+  # MIDDLE Word to keep accumulating word fragments...
+  .debug("XXX - handle_variable_block\n")
+  goto END
+handle_command_block:
+  # All this needs to do is find the ending ] and goto
+  # MIDDLE Word to keep accumulating word fragments...
+  # XXX this can probably be combined with block_begin...
+  .debug("handle_command_block:\n")
+  .arg buffer
+  .arg start_word
+  saveall
+  call __match_close
+  restoreall
+  .result word_length
+  .debug("word_length = ")
+  .debug(word_length)
+  .debug("\n")
+  if word_length < 0 goto bad_block
+  
+  goto MIDDLE_WORD
+
+DONE:
+  .debug("final retval is '")
+  .debug(retval)
+  .debug("'\n")
+  .return retval
+  ret
+
+END:
+  end
+
+.end

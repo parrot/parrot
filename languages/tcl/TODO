@@ -1,0 +1,99 @@
+=head1 TODO
+
+=over 4
+
+=item *
+
+Fix the makefiles in examples/ and t/ so that they are nicely generated like
+the primary makefile.
+
+=item *
+
+scalar variables - (new_pad, find_lex, store_lex) - for global (tcl, not imc) variables, we only need one pad for now. I think. need to know how static depth pads interacted with the #@#$ stack.
+
+=item *
+
+return, stacktraces, errors...
+
+=item *
+
+array variables (this is going to require writing PMCs, I think.)
+
+=item *
+
+list variables (non fast, we can just use strings. A real implmementation will
+use an array type PMC under the hood, I think.)
+
+=item *
+
+Here's a list of commands from the 7.3 Ousterhout book that have yet to be
+implemented. Just because something is implemented doesn't mean it's a full
+implementation, either. That's what the test suite is for. =-) I've tried
+to group them so that any procs that depend on another proc to really work
+are so listed, and that related procs are grouped together. Some are SMOPs
+at this point, others require me to add features, or refactor. Many will
+require updating after features are added - "unset", for example, will need
+to be fixed when arrays are supported.
+
+a partial version of "expr" and "proc" must happen RSN.
+
+  eval source
+  unset
+  array 
+  proc -> upvar uplevel global trace
+  expr -> if while for foreach
+  list -> concat llength linsert lreplace lrange lappend
+          lsearch lsort split join
+  regexp regsub -> switch
+  cd file glob pwd pid
+  seek tell open close eof flush read gets
+  format string scan
+  catch error return break continue
+  info time trace* exec
+  auto_mkindex*
+  unknown history
+
+  * isn't a recent distro of tcl
+  
+  And, here are more from a more recent tcl in no order.
+
+  after bgerror binary case clock dde
+  encoding fblocked fconfigure fcopy fileevent filename
+  http interp library
+  lindex load lset memory
+  msgcat namespace package packagens
+  pkgMkIndex re_syntax registry resource
+  safe socket subst tcltest
+  tclvars update variable vwait
+
+=item *
+
+Long term goal: Run the tcl test suite. Preferably an older one, it'll probably be easier to pass. (I wonder how much of the test suite is tied up to the implementation - I'm ok with failing tests that suck. =-)
+
+=item *
+
+Get imcc to report on where the error is pre-macro expansion.
+(if you introduce an error into the is_space macro, for example,
+ the error is reported in a completely
+different location -  presumably the error checking occurs post macro-subst.)
+
+=item *
+
+Get imcc to complain if you call a macro without passing all the arguments.
+
+=item *
+
+Get imcc to complain if you try to define the same .local symbol twice.
+
+=item *
+
+Optimizations... I'm primarily concerned about functionality at this point,
+and have probably got some brain dead stuff that can be optimized now. There are
+more clever things, like keeping track of where a [ ] pair is - I have to find
+it twice (once for determining where the word ends, once for finding it so I 
+can execute it.) Could save a bit of time, I'm sure, if someone clued up the
+parser.
+
+=back 4
+
+=cut

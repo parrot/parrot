@@ -1,0 +1,29 @@
+=head1 OVERVIEW
+
+This was originally written as a perl5 script. Rather than doing bootstrapping,
+I foolishly decided it would be fun to write the parser IN parrot assembly,
+esp. as this would help implementing "eval" and "proc" (Of course, in
+retrospect, I really wish I had kept with the bootstrapping effort, as I think
+it would have generated usable results sooner. Ah well, I now know more than
+I want to about IMCC. =-)
+
+This is a from-scratch implementation, based on the tcl man page(s). Another
+interesting project would have been to modify the tcl source and have it
+generate parrot directly. For some reason, I thought this would be more fun.
+
+This may explain the several months between each time I poked my head out 
+on the p6i list.
+
+=head1 RUNNING TCL
+
+A perl script called C<tcl.pl> grabs all the various PIR source files and
+generates a single PIR file, C<tcl.imc>. We then compile this to C<tcl.pbc>.
+
+To run the test suite, C<make test>. If you want to also get output from the
+TODO tests, C<make devtest> instead. This is NOT the tcl test suite, it's
+a very small subset of features that I was sick of fixing everytime I made
+a small change to the parser.
+
+There are examples in the C<examples> directory that are vaguely more
+interesting. To run one of the C<foo.tcl> files in that directory, type
+C<make foo>. 

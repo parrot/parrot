@@ -33,6 +33,8 @@ sub runstep {
           commentType => '#', replace_slashes => 1);
   genfile('config/gen/makefiles/urm.in',       'languages/urm/Makefile',
           commentType => '#', replace_slashes => 1);
+  genfile('config/gen/makefiles/tcl.in',       'languages/tcl/Makefile',
+          commentType => '#', replace_slashes => 1);
 
 
   # set up docs/Makefile, partly based on the .ops in the root dir
