@@ -130,7 +130,7 @@ Returns the PMC value of the element at index C<key>.
             ret = *(PMC**) ret;
 /*
             if (ret == NULL)
-                ret = pmc_new(interpreter, dynclass_PyNone);
+                ret = pmc_new(INTERP, dynclass_PyNone);
 */
         }
 

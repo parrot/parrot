@@ -43,7 +43,7 @@ key_hash_object(Interp *interpreter, Hash *hash, void *value)
 /*
 
 =item C<static int
-object_compare(Parrot_Interp interp, void *a, void *b)>
+object_compare(Interp* interp, void *a, void *b)>
 
 Compares the two objects, return 0 if they are identical.
 
@@ -54,7 +54,7 @@ C<a> is the search key, C<b> is the bucket key.
 */
 
 static int
-object_compare(Parrot_Interp interp, void *a, void *b)
+object_compare(Interp* interp, void *a, void *b)
 {
     return !mmd_dispatch_i_pp(interp, (PMC *)a, (PMC *)b, MMD_EQ);
 }
@@ -237,8 +237,8 @@ Return a new iterator for dictionary
 */
 
     PMC* get_iter () {
-        PMC *iter = pmc_new_init(interpreter, enum_class_Iterator, SELF);
-        PMC *key =  pmc_new(interpreter, enum_class_Key);
+        PMC *iter = pmc_new_init(INTERP, enum_class_Iterator, SELF);
+        PMC *key =  pmc_new(INTERP, enum_class_Key);
         PMC_struct_val(iter) = key;
         PObj_get_FLAGS(key) |= KEY_hash_iterator_FLAGS;
         PMC_int_val(key) = 0;

@@ -74,11 +74,11 @@ Create a new integer
 */
 
     METHOD PMC* __new__(PMC *class) {
-        PMC *exception = pmc_new(interpreter, enum_class_Exception);
+        PMC *exception = pmc_new(INTERP, enum_class_Exception);
 
         /* set type, severity */
-        VTABLE_set_integer_keyed_int(interpreter, exception, 1, 1);
-        VTABLE_set_integer_keyed_int(interpreter, exception, 2, 2);
+        VTABLE_set_integer_keyed_int(INTERP, exception, 1, 1);
+        VTABLE_set_integer_keyed_int(INTERP, exception, 2, 2);
 
         return  exception;
     }

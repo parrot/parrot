@@ -41,7 +41,7 @@ int MatchRange_type_id = -1;
 /*
 
 =item C<static INTVAL*
-matchrange_locate_keyed_int(Parrot_Interp interp, PMC* self, STRING *key)>
+matchrange_locate_keyed_int(Interp* interp, PMC* self, STRING *key)>
 
 Interpret the string C<key>; valid keys are C<start> and C<end>,
 representing the offsets of the first and last characters of the
@@ -52,7 +52,7 @@ matching range.
 */
 
 static INTVAL*
-matchrange_locate_keyed_int(Parrot_Interp interp, PMC* self, STRING *key)
+matchrange_locate_keyed_int(Interp* interp, PMC* self, STRING *key)
 {
     STRING *start = string_from_cstring(interp, "start", 5);
     STRING *end;

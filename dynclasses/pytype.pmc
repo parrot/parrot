@@ -56,8 +56,8 @@ Looks up the method for C<*method_name> and returns it.
             PMC *object = INTERP->ctx.current_object;
             if (!object) object = SELF;
 
-            if (Interp_flags_TEST(interpreter, PARROT_TRACE_FLAG)) {
-                PIO_eprintf(interpreter, "# Found %Ss method %Ss on %Ss\n",
+            if (Interp_flags_TEST(INTERP, PARROT_TRACE_FLAG)) {
+                PIO_eprintf(INTERP, "# Found %Ss method %Ss on %Ss\n",
                    method->vtable->whoami, method_name, 
                    VTABLE_name(INTERP, object));
             }
@@ -115,7 +115,7 @@ Return attribute named C<name>.
             PMC *object = INTERP->ctx.current_object;
             if (!object) object = SELF;
             INTERP->ctx.current_object = 0;
-            real_exception(interpreter, NULL, E_AttributeError,
+            real_exception(INTERP, NULL, E_AttributeError,
                 "AttributeError: %Ss instance has no attribute '%Ss'",
                 VTABLE_name(INTERP, object), idx);
         }
@@ -155,22 +155,21 @@ Pythonic object constructor.
 
         if (new) {
             int i = REG_INT(3);
-            struct parrot_regs_t *bp = interpreter->ctx.bp;
+            struct parrot_regs_t *bp = INTERP->ctx.bp;
             struct Parrot_Context ctx;
-            save_context(interpreter, &ctx);
-            interpreter->ctx.bp = new_register_frame(interpreter,
-                &interpreter->ctx.reg_stack);
-            copy_regs(interpreter, bp);
+            save_context(INTERP, &ctx);
+            INTERP->ctx.bp = new_register_frame(INTERP, &INTERP->ctx.reg_stack);
+            copy_regs(INTERP, bp);
             if (new->vtable->base_type != PyBuiltin_PyBoundMeth)
                 internal_exception(1, "Non-bound method encountered in proxy");
             VTABLE_set_pmc(INTERP, new, SELF);
             REG_STR(0) = PyString_new;
             bp = Parrot_PyClass_runops_fromc(INTERP, new);
             object = BP_REG_PMC(bp,5);
-            restore_context(interpreter, &ctx);
+            restore_context(INTERP, &ctx);
         }
         else {
-            object = pmc_new(interpreter, PyBuiltin_PyClass);
+            object = pmc_new(INTERP, PyBuiltin_PyClass);
         }
 
         VTABLE_setprop(INTERP, object, PyString_class, REG_PMC(0));
@@ -178,10 +177,10 @@ Pythonic object constructor.
         init = VTABLE_find_method(INTERP, object, PyString_init);
         if (init) {
             struct Parrot_Context ctx;
-            save_context(interpreter, &ctx);
+            save_context(INTERP, &ctx);
             REG_STR(0) = PyString_init;
             Parrot_PyClass_runops_fromc(INTERP, init);
-            restore_context(interpreter, &ctx);
+            restore_context(INTERP, &ctx);
         }
 
         REG_INT(0) = REG_INT(3) = 1;

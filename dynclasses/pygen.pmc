@@ -23,7 +23,7 @@ These are the vtable functions for the Python Generator class
 
 static STRING *STOPITERATION;
 
-static PMC* PyGen_next(Parrot_Interp interpreter, PMC *self) {
+static PMC* PyGen_next(Interp* interpreter, PMC *self) {
     PMC *ret;
     PMC *iter = PMC_pmc_val(self);
     PMC *next = VTABLE_find_method(interpreter, iter, PyString_next);

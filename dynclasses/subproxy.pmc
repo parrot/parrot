@@ -41,10 +41,10 @@ pmclass SubProxy dynpmc need_ext extends Sub {
 	    s = string_to_cstring(INTERP, file);
 	    Parrot_load_bytecode(INTERP, s);
 	    string_cstring_free(s);
-	    rsub = VTABLE_get_pmc_keyed(interpreter,
-		    interpreter->globals->stash_hash, sub);
+	    rsub = VTABLE_get_pmc_keyed(INTERP,
+		    INTERP->globals->stash_hash, sub);
 
-	    if (!VTABLE_defined(interpreter, rsub))
+	    if (!VTABLE_defined(INTERP, rsub))
 		internal_exception(1, "SubProxy: sub not found");
 
 	    PObj_get_FLAGS(SELF) &= ~PObj_private0_FLAG;

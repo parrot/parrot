@@ -146,7 +146,7 @@ Returns a unique hash for this value
 */
 
     INTVAL hash () {
-        return string_hash(interpreter, PMC_str_val(pmc));
+        return string_hash(INTERP, PMC_str_val(pmc));
     }
 
 /*
@@ -188,8 +188,8 @@ Return a new iterator for this string.
 */
 
     PMC* get_iter () {
-        PMC *iter = pmc_new_init(interpreter, PyBuiltin_PyIter, SELF);
-        PMC *key =  pmc_new(interpreter, enum_class_Key);
+        PMC *iter = pmc_new_init(INTERP, PyBuiltin_PyIter, SELF);
+        PMC *key =  pmc_new(INTERP, enum_class_Key);
         PMC_struct_val(iter) = key;
         PObj_get_FLAGS(key) |= KEY_integer_FLAG;
         PMC_int_val(key) = 0;
@@ -383,7 +383,7 @@ character in S, False otherwise.
         if (!length) return ret;
 
         for (idx=0; idx<length; idx++) {
-            UINTVAL c = string_index(interpreter, s, idx);
+            UINTVAL c = string_index(INTERP, s, idx);
             if (!Parrot_char_is_alpha(INTERP, c)) return ret;
         }
 
@@ -413,7 +413,7 @@ least one character in S, False otherwise.
         if (!length) return ret;
 
         for (idx=0; idx<length; idx++) {
-            UINTVAL c = string_index(interpreter, s, idx);
+            UINTVAL c = string_index(INTERP, s, idx);
             if (!Parrot_char_is_alnum(INTERP, c)) return ret;
         }
 
@@ -443,7 +443,7 @@ least one character in S, False otherwise.
         if (!length) return ret;
 
         for (idx=0; idx<length; idx++) {
-            UINTVAL c = string_index(interpreter, s, idx);
+            UINTVAL c = string_index(INTERP, s, idx);
             if (!Parrot_char_is_digit(INTERP, c)) return ret;
         }
 
@@ -473,7 +473,7 @@ character in S, False otherwise.
         if (!length) return ret;
 
         for (idx=0; idx<length; idx++) {
-            UINTVAL c = string_index(interpreter, s, idx);
+            UINTVAL c = string_index(INTERP, s, idx);
             if (!Parrot_char_is_space(INTERP, c)) return ret;
         }
 

@@ -57,7 +57,7 @@ Create a new slice
             RVal_int(range->end) = VTABLE_get_integer(INTERP, stop);
             RVal_int(range->step) = VTABLE_get_integer(INTERP, step);
             if (RVal_int(range->step) == 0)
-                real_exception(interpreter, NULL, E_ValueError,
+                real_exception(INTERP, NULL, E_ValueError,
                         "xrange() step argument must not be zero");
         }
         else

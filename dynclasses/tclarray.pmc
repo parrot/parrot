@@ -485,7 +485,7 @@ Returns whether the hash is the same as C<*other>.
         keystr = make_hash_key(INTERP, key);
         nextkey = key_next(INTERP, key);
         if (nextkey == NULL) {
-            val = pmc_new(interpreter, TclInt_type);
+            val = pmc_new(INTERP, TclInt_type);
             VTABLE_set_integer_native(INTERP, val, value);
             hash_put(INTERP, PMC_struct_val(SELF), keystr, val);
             return;
@@ -507,7 +507,7 @@ Returns whether the hash is the same as C<*other>.
 */
 
     void set_integer_keyed_str (STRING* key, INTVAL value) {
-        PMC *val = pmc_new(interpreter, TclInt_type);
+        PMC *val = pmc_new(INTERP, TclInt_type);
         PMC_int_val(val) = value;
         hash_put(INTERP, PMC_struct_val(SELF), key, val);
     }
@@ -530,7 +530,7 @@ Returns whether the hash is the same as C<*other>.
         keystr = make_hash_key(INTERP, key);
         nextkey = key_next(INTERP, key);
         if (nextkey == NULL) {
-            val = pmc_new(interpreter, TclFloat_type);
+            val = pmc_new(INTERP, TclFloat_type);
             PMC_num_val(val) = value;
             hash_put(INTERP, PMC_struct_val(SELF), keystr, val);
             return;
@@ -554,7 +554,7 @@ Sets C<value> as the value for C<*key>.
 */
 
     void set_number_keyed_str (STRING* key, FLOATVAL value) {
-        PMC *val = pmc_new(interpreter, TclFloat_type);
+        PMC *val = pmc_new(INTERP, TclFloat_type);
         PMC_num_val(val) = value;
         hash_put(INTERP, PMC_struct_val(SELF), key, val);
     }
@@ -603,7 +603,7 @@ These two methods are unimplemented.
         keystr = make_hash_key(INTERP, key);
         nextkey = key_next(INTERP, key);
         if (nextkey == NULL) {
-            val = pmc_new(interpreter, TclString_type);
+            val = pmc_new(INTERP, TclString_type);
             VTABLE_set_string_native(INTERP, val, value);
             hash_put(INTERP, PMC_struct_val(SELF), keystr, val);
             return;
@@ -625,7 +625,7 @@ These two methods are unimplemented.
 */
 
     void set_string_keyed_str (STRING* key, STRING* value) {
-        PMC *val = pmc_new(interpreter, TclString_type);
+        PMC *val = pmc_new(INTERP, TclString_type);
         VTABLE_set_string_native(INTERP, val, value);
         hash_put(INTERP, PMC_struct_val(SELF), key, val);
     }

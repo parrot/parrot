@@ -160,8 +160,8 @@ enter_nci_method should create these as locals to begin with.
         /* Already init'ed? */
         pad = scratchpad_get_current(INTERP);
         if (!pad) {
-            pad = scratchpad_new(interpreter, NULL, 0);
-            stack_push(interpreter, &interpreter->ctx.pad_stack, pad,
+            pad = scratchpad_new(INTERP, NULL, 0);
+            stack_push(interpreter, &INTERP->ctx.pad_stack, pad,
                     STACK_ENTRY_PMC, STACK_CLEANUP_NULL);
         }
         name = const_string(INTERP, "__name__");
@@ -182,9 +182,9 @@ enter_nci_method should create these as locals to begin with.
             item = VTABLE_get_pmc_keyed_str(INTERP, stash, key);
 
             if (item->vtable->base_type == enum_class_NCI) {
-                PMC *nameprop = pmc_new(interpreter, PyBuiltin_PyString);
-                VTABLE_set_string_native(interpreter, nameprop, key);
-                VTABLE_setprop(interpreter, item, PyString_name, nameprop);
+                PMC *nameprop = pmc_new(INTERP, PyBuiltin_PyString);
+                VTABLE_set_string_native(INTERP, nameprop, key);
+                VTABLE_setprop(INTERP, item, PyString_name, nameprop);
                 item->vtable = Parrot_base_vtables[PyBuiltin_PyNCI];
             }
 
@@ -618,7 +618,7 @@ Todo: obtain the Python class name for the exception
     METHOD PMC* hex(PMC *value) {
         PMC * meth = VTABLE_find_method(INTERP, value, PyString_hex);
         if (!meth)
-            real_exception(interpreter, NULL, E_AttributeError,
+            real_exception(INTERP, NULL, E_AttributeError,
                 "AttributeError: %Ss instance has no attribute '%Ss'",
                 value->vtable->whoami, PyString_hex);
         REG_INT(0) = 1;

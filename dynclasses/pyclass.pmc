@@ -23,7 +23,7 @@ methods you would expect to see on python objects).
 #include "pyconsts.h"
 
 struct parrot_regs_t *
-Parrot_PyClass_runops_fromc(Parrot_Interp interpreter, PMC *sub)
+Parrot_PyClass_runops_fromc(Interp* interpreter, PMC *sub)
 {
     opcode_t offset, *dest;
     struct parrot_regs_t *bp_save, *bp_new;
@@ -60,7 +60,7 @@ Parrot_PyClass_runops_fromc(Parrot_Interp interpreter, PMC *sub)
 }
 
 static PMC *
-Parrot_PyClass_call_meth_fromc_P(Parrot_Interp interpreter, PMC *obj,
+Parrot_PyClass_call_meth_fromc_P(Interp* interpreter, PMC *obj,
     STRING *meth)
 {
     struct parrot_regs_t *bp;
@@ -90,7 +90,7 @@ Parrot_PyClass_call_meth_fromc_P(Parrot_Interp interpreter, PMC *obj,
 }
 
 PMC *
-Parrot_PyClass_call_meth_fromc_P_P(Parrot_Interp interpreter, PMC *obj,
+Parrot_PyClass_call_meth_fromc_P_P(Interp* interpreter, PMC *obj,
     STRING *meth, PMC* arg1)
 {
     struct parrot_regs_t *bp;
@@ -196,7 +196,7 @@ Return attribute named C<name>.
 
         if (!attr || !VTABLE_defined(INTERP, attr)) {
             STRING *message;
-            real_exception(interpreter, NULL, E_AttributeError,
+            real_exception(INTERP, NULL, E_AttributeError,
                 "AttributeError: %Ss instance has no attribute '%Ss'",
                 VTABLE_name(INTERP, SELF), idx);
         }

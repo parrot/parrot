@@ -148,7 +148,7 @@ Returns the string value for the element at C<*key>.
                  * well as all of the real values. */
                 if (hash->key_type == Hash_key_type_int) {
                     INTVAL i = (INTVAL)hash_get_idx(INTERP, hash, key);
-                    return string_from_int(interpreter, i);
+                    return string_from_int(INTERP, i);
                 }
                 return hash_get_idx(INTERP, hash, key);
             default:
@@ -182,7 +182,7 @@ Returns the string value for the element at C<*key>.
                 }
                 else {
                     STRING *s = hash_get_idx(INTERP, hash, key);
-                    return string_to_int(interpreter, s);
+                    return string_to_int(INTERP, s);
                 }
             default:
                 keystr = make_hash_key(INTERP, key);

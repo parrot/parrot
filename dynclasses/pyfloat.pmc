@@ -115,11 +115,11 @@ Returns the number as a Parrot string.
             sign = "";
         d = fabs(d);
         /* XXX make a Python format string */
-        s = Parrot_sprintf_c(interpreter, "%s%.17g", sign, d);
-        if (string_str_index(interpreter, s,
-                    const_string(interpreter, "."), 0) == -1 &&
-                string_str_index(interpreter, s,
-                    const_string(interpreter, "e"), 0) == -1)
+        s = Parrot_sprintf_c(INTERP, "%s%.17g", sign, d);
+        if (string_str_index(INTERP, s,
+                    const_string(INTERP, "."), 0) == -1 &&
+                string_str_index(INTERP, s,
+                    const_string(INTERP, "e"), 0) == -1)
             string_append(INTERP, s, const_string(INTERP, ".0"), 0);
         return s;
     }
@@ -142,11 +142,11 @@ Returns the number as a Parrot string.
             sign = "";
         d = fabs(d);
         /* XXX make a Python format string */
-        s = Parrot_sprintf_c(interpreter, "%s%.12g", sign, d);
-        if (string_str_index(interpreter, s,
-                    const_string(interpreter, "."), 0) == -1 &&
-                string_str_index(interpreter, s,
-                    const_string(interpreter, "e"), 0) == -1)
+        s = Parrot_sprintf_c(INTERP, "%s%.12g", sign, d);
+        if (string_str_index(INTERP, s,
+                    const_string(INTERP, "."), 0) == -1 &&
+                string_str_index(INTERP, s,
+                    const_string(INTERP, "e"), 0) == -1)
             string_append(INTERP, s, const_string(INTERP, ".0"), 0);
         return s;
     }

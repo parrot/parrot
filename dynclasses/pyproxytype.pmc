@@ -88,19 +88,18 @@ initializers with arguments to be run.
         new = VTABLE_find_method(INTERP, SELF, PyString_new);
 
         if (new) {
-            struct parrot_regs_t *bp = interpreter->ctx.bp;
+            struct parrot_regs_t *bp = INTERP->ctx.bp;
             struct Parrot_Context ctx;
-            save_context(interpreter, &ctx);
-            interpreter->ctx.bp = new_register_frame(interpreter,
-                &interpreter->ctx.reg_stack);
-            copy_regs(interpreter, bp);
+            save_context(INTERP, &ctx);
+            INTERP->ctx.bp = new_register_frame(INTERP, &INTERP->ctx.reg_stack);
+            copy_regs(INTERP, bp);
             if (new->vtable->base_type != PyBuiltin_PyBoundMeth)
                 internal_exception(1, "Non-bound method encountered in proxy");
             VTABLE_set_pmc(INTERP, new, SELF);
             REG_STR(0) = PyString_new;
             bp = Parrot_PyClass_runops_fromc(INTERP, new);
             object = BP_REG_PMC(bp,5);
-            restore_context(interpreter, &ctx);
+            restore_context(INTERP, &ctx);
         }
         else {
             object = pmc_new(INTERP, object_class->vtable->base_type);
@@ -109,7 +108,7 @@ initializers with arguments to be run.
         proxy = object;
 
         if (object_class != SELF) {
-            object = VTABLE_clone(interpreter, proxy);
+            object = VTABLE_clone(INTERP, proxy);
             pmc_reuse(INTERP, proxy, PyBuiltin_PyClass, 0);
             VTABLE_setprop(INTERP, proxy, PyString_class, REG_PMC(0));
             VTABLE_setprop(INTERP, proxy, PyString_proxy, object);
@@ -118,10 +117,10 @@ initializers with arguments to be run.
         init = VTABLE_find_method(INTERP, proxy, PyString_init);
         if (init) {
             struct Parrot_Context ctx;
-            save_context(interpreter, &ctx);
+            save_context(INTERP, &ctx);
             REG_STR(0) = PyString_init;
             Parrot_PyClass_runops_fromc(INTERP, init);
-            restore_context(interpreter, &ctx);
+            restore_context(INTERP, &ctx);
         }
 
         REG_INT(0) = REG_INT(3) = 1;
