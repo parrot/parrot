@@ -582,12 +582,12 @@ inline op rethrow(in PMC) {
 }
 
 inline op die_hard(in INT, in INT) {
-  do_exception($1, $2);
+  do_exception(interpreter, $1, $2);
   restart NEXT();
 }
 
 inline op exit(in INT) {
-  do_exception(EXCEPT_exit, $1);
+  do_exception(interpreter, EXCEPT_exit, $1);
   restart NEXT();
 }
 

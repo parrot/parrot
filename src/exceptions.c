@@ -232,8 +232,6 @@ rethrow_exception(Parrot_Interp interpreter, PMC *exception)
     return handler->cache.struct_val;
 }
 
-Parrot_exception the_exception;
-
 /*
  * return back to runloop, assumes exception is still in REG_PMC(5)
  * and that this is called from within a handler setup with
@@ -243,6 +241,7 @@ void
 rethrow_c_exception(Parrot_Interp interpreter)
 {
     PMC *exception, *handler, *p5;
+    Parrot_exception *the_exception = interpreter->exceptions;
 
     p5 = VTABLE_get_pmc_keyed_int(interpreter, REG_PMC(5), 3);
     exception = REG_PMC(5);
@@ -253,13 +252,13 @@ rethrow_c_exception(Parrot_Interp interpreter)
     /*
      * if there was no user handler, interpreter is already shutdown
      */
-    the_exception.resume = handler->cache.struct_val;
-    the_exception.error = VTABLE_get_integer_keyed_int(interpreter,
+    the_exception->resume = handler->cache.struct_val;
+    the_exception->error = VTABLE_get_integer_keyed_int(interpreter,
             exception, 1);
-    the_exception.severity = VTABLE_get_integer_keyed_int(interpreter,
+    the_exception->severity = VTABLE_get_integer_keyed_int(interpreter,
             exception, 2);
-    the_exception.msg = VTABLE_get_string_keyed_int(interpreter, exception, 0);
-    longjmp(the_exception.destination, 1);
+    the_exception->msg = VTABLE_get_string_keyed_int(interpreter, exception, 0);
+    longjmp(the_exception->destination, 1);
 }
 
 static size_t
@@ -285,24 +284,24 @@ create_exception(Parrot_Interp interpreter)
 {
     PMC *exception;     /* exception object */
     opcode_t *dest;     /* absolute address of handler */
-
+    Parrot_exception *the_exception = interpreter->exceptions;
 
     /* create an exception object */
     exception = pmc_new(interpreter, enum_class_Exception);
     /* exception type */
     VTABLE_set_integer_keyed_int(interpreter, exception, 1,
-            the_exception.error);
+            the_exception->error);
     /* exception severity */
     VTABLE_set_integer_keyed_int(interpreter, exception, 2,
-            (INTVAL)the_exception.severity);
-    if (the_exception.msg) {
+            (INTVAL)the_exception->severity);
+    if (the_exception->msg) {
         VTABLE_set_string_keyed_int(interpreter, exception, 0,
-                the_exception.msg);
+                the_exception->msg);
     }
     /* now fill rest of exception, locate handler and get
      * destination of handler
      */
-    dest = throw_exception(interpreter, exception, the_exception.resume);
+    dest = throw_exception(interpreter, exception, the_exception->resume);
     return dest;
 }
 
@@ -316,20 +315,43 @@ handle_exception(Parrot_Interp interpreter)
 }
 
 /*
+ * create a new internal exception buffer, either by allocating
+ * it or by getting one from the free_list
+ */
+void
+new_internal_exception(Parrot_Interp interpreter)
+{
+    Parrot_exception *the_exception;
+
+    if (interpreter->exc_free_list) {
+        the_exception = interpreter->exc_free_list;
+        interpreter->exc_free_list = the_exception->prev;
+    }
+    else
+        the_exception = mem_sys_allocate(sizeof(*the_exception));
+    the_exception->prev = interpreter->exceptions;
+    the_exception->resume = NULL;
+    the_exception->msg = NULL;
+    interpreter->exceptions = the_exception;
+}
+
+/*
  * do_exception:
- * - called from interrupt code
  * - does a longjmp in front of the runloop, which calls
  * - handle_exception(): returning the handler address
  * - where execution then resumes
  */
 void
-do_exception(exception_severity severity, long error)
+do_exception(Parrot_Interp interpreter,
+        exception_severity severity, long error)
 {
-    the_exception.error = error;
-    the_exception.severity = severity;
-    the_exception.msg = NULL;
-    the_exception.resume = NULL;
-    longjmp(the_exception.destination, 1);
+    Parrot_exception *the_exception = interpreter->exceptions;
+
+    the_exception->error = error;
+    the_exception->severity = severity;
+    the_exception->msg = NULL;
+    the_exception->resume = NULL;
+    longjmp(the_exception->destination, 1);
 }
 
 /*
@@ -340,7 +362,7 @@ real_exception(struct Parrot_Interp *interpreter, void *ret_addr,
         int exitcode,  const char *format, ...)
 {
     STRING *msg;
-
+    Parrot_exception *the_exception = interpreter->exceptions;
 
     /*
      * if profiling remember end time of lastop and
@@ -371,14 +393,13 @@ real_exception(struct Parrot_Interp *interpreter, void *ret_addr,
     /*
      * FIXME classify errors
      */
-    the_exception.error = exitcode;
-    the_exception.severity = EXCEPT_error;
-    the_exception.msg = msg;
-    the_exception.resume = ret_addr;
+    the_exception->severity = EXCEPT_error;
+    the_exception->msg = msg;
+    the_exception->resume = ret_addr;
     /*
      * reenter runloop
      */
-    longjmp(the_exception.destination, 1);
+    longjmp(the_exception->destination, 1);
 }
 
 /*

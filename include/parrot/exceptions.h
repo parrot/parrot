@@ -85,28 +85,36 @@ typedef enum {
 
 /* Right now there's nothing special for the jump buffer, but there might be one later, so we wrap it in a struct so that we can expand it later */
 struct parrot_exception_t {
-    Parrot_jump_buff destination;
-    long language;
-    long system;
-    exception_severity severity;
-    long error;
-    STRING *msg;
-    void *resume;
+    Parrot_jump_buff destination;       /* jmp_buf */
+    exception_severity severity;        /* s. above */
+    long error;                         /* s. above */
+    STRING *msg;                        /* may be NULL */
+    void *resume;                       /* opcode_t* for resume or NULL */
+    struct parrot_exception_t *prev;    /* interpreters handler stack */
+    long language;                      /* what is this? */
+    long system;                        /* what is this? */
 };
 
 typedef struct parrot_exception_t Parrot_exception;
-
+/*
+ * user level exception handling
+ */
 void push_exception(Parrot_Interp, PMC *);
 void pop_exception(Parrot_Interp);
 void * throw_exception(Parrot_Interp, PMC *, void *);
 void * rethrow_exception(Parrot_Interp, PMC *);
 
 size_t handle_exception(Parrot_Interp);
-void do_exception(exception_severity severity, long error);
 
 PMC* new_c_exception_handler(Parrot_Interp, Parrot_exception *jb);
 void push_new_c_exception_handler(Parrot_Interp, Parrot_exception *jb);
 void rethrow_c_exception(Parrot_Interp interpreter);
+
+/*
+ * internal exception handling
+ */
+void do_exception(Parrot_Interp, exception_severity severity, long error);
+void new_internal_exception(Parrot_Interp);
 
 #endif
 

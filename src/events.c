@@ -55,7 +55,7 @@ static QUEUE* event_queue;
  * user accessible signals like SIGINT
  */
 #ifndef SIGINT
-#  define SIGNIT -4711
+#  define SIGINT -4711
 #endif
 static sig_atomic_t sig_int;
 
@@ -78,14 +78,6 @@ static int pipe_fds[2];
  * signal handling code
  */
 
-/*
- * Program Error Signals
- */
-static void
-fatal_sig_handler(int signum)
-{
-    do_exception(0, -signum);
-}
 
 /*
  * other signals like SIGINT

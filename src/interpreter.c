@@ -691,11 +691,11 @@ runops_ex(struct Parrot_Interp *interpreter, size_t offset)
  * run parrot ops
  * set exception handler and/or resume after exception
  */
-extern Parrot_exception the_exception;
 void
 runops(struct Parrot_Interp *interpreter, size_t offset)
 {
-    if (setjmp(the_exception.destination)) {
+    new_internal_exception(interpreter);
+    if (setjmp(interpreter->exceptions->destination)) {
         /* an exception was thrown */
         offset = handle_exception(interpreter);
     }
@@ -713,7 +713,7 @@ runops(struct Parrot_Interp *interpreter, size_t offset)
      * so that only an exit handler does catch this exception
      */
 #if 0
-    do_exception(EXCEPT_exit, 0);
+    do_exception(interpreter, EXCEPT_exit, 0);
 #endif
 }
 
