@@ -17,7 +17,7 @@ out-of-bounds test. Checks INT and PMC keys.
 
 =cut
 
-use Parrot::Test tests => 9;
+use Parrot::Test tests => 13;
 use Test::More;
 
 my $fp_equality_macro = <<'ENDOFMACRO';
@@ -286,4 +286,84 @@ CODE
 0
 OUTPUT
 
+output_is(<<'CODE', <<'OUTPUT', "Clone");
+     new P0, .FixedStringArray
+     set P0, 3
+     set P0[0], "abcde"
+     set P0[1], "fghi"
+     set P0[2], "jkl"
+     clone P1, P0
+     set P0[0], ""
+     set P0[1], ""
+     set P0[2], ""
+     set S0, P1[0]
+     print S0
+     set S0, P1[1]
+     print S0
+     set S0, P1[2]
+     print S0
+     print "\n"
+CODE
+abcdefghijkl
+OUTPUT
+
+output_is(<<'CODE', <<'OUTPUT', "Cloning before size is set");
+     new P0, .FixedStringArray
+     clone P1, P0
+     set P0, 10
+     set P1, 20
+     print "ok\n"
+     clone P2, P0
+     set P2, 30
+     end
+CODE
+ok
+FixedStringArray: Can't resize!
+OUTPUT
+#VIM's syntax highlighter needs this line
+
+output_is(<<'CODE', <<'OUTPUT', "Truth");
+     new P0, .FixedStringArray
+     unless P0, OK1
+     print "not "
+OK1: print "ok 1\n"
+     set P0, 10
+     if P0, OK2
+     print "not "
+OK2: print "ok 2\n"
+     end
+CODE
+ok 1
+ok 2
+OUTPUT
+
+output_is(<<'CODE', <<'OUTPUT', "Garbage collection");
+     new P0, .FixedStringArray
+     set P0, 8192
+     set I0, 0
+L1:  set P0[I0], I0     
+     inc I0
+     lt I0, 8192, L1
+     sweep 1
+     set S0, P0[1000]
+     print S0
+     print "\n"
+     set S0, P0[2000]
+     print S0
+     print "\n"
+     set S0, P0[4000]
+     print S0
+     print "\n"
+     set S0, P0[8000]
+     print S0
+     print "\n"
+     end
+CODE
+1000
+2000
+4000
+8000
+OUTPUT
+
 1;
+
