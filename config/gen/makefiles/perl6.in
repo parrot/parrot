@@ -30,6 +30,10 @@ test-fast:
 
 clean:
 	$(RM_RF) t/*/*.p6 t/*/*.imc t/*/*.pasm t/*/*.err t/*/*.pbc t/*/*.out
+	$(RM_RF) t/*/*/*.p6 t/*/*/*.imc t/*/*/*.pasm t/*/*/*.err
+	$(RM_RF) t/*/*/*.pbc t/*/*/*.out t/*/*/*.warn t/*/*/*.test
+	$(RM_RF) t/*/*/*/*.p6 t/*/*/*/*.imc t/*/*/*/*.pasm t/*/*/*/*.err
+	$(RM_RF) t/*/*/*/*.pbc t/*/*/*/*.out t/*/*/*/*.warn t/*/*/*/*.test
 	$(RM_RF) a.err a.imc a.output a.pasm a.pbc t/*/*.warn t/*/*.test
 	$(RM_RF) core
 

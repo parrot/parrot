@@ -579,7 +579,8 @@ sub output_is($$;$);
 sub output_like($$;$);
 
 sub run_tests {
-    my @testfiles = @ARGV ? @ARGV : grep !m{t/parser/}, glob 't/*/*.t';
+    my @testfiles = @ARGV ? @ARGV : grep !m{t/parser/}, 
+      glob 't/*/*.t t/*/*/*.t t/*/*/*/*.t';
     my %map = ( 'output_is' => 'is', 'output_like' => 'like' );
     undef $/;
     my ($ntot, $len);

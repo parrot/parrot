@@ -442,3 +442,13 @@
 	* Test Failures:
 	    - none (a previous checkin to make builtin subs not have named
 	      args was enough to perturb the memory corruption bug away)
+
+2004-02-20    (Allison Randal)
+
+	* Additions:
+	    - t/harness, perl6, and Makefile now support up to 3 levels
+	      of hierarchy in test files. This is the first step in
+	      moving tests to the new hierarchy.
+	    - 4 new test files.
+	* Test Failures:
+	    - none 

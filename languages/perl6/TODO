@@ -4,8 +4,6 @@ A short-term list of todo items:
 
 - Move tests to match planned hierarchy.
   http://p6stories.kwiki.org/index.cgi?ProposedTestHierarchy
-  (modify t/harness, Makefile and run_tests in perl6 to handle
-  multiple levels of hierarchy in t/)
 
 - Switch to using real parrot lexical and global variables.
 
