@@ -151,8 +151,8 @@ typedef struct Parrot_Interp {
                                                  * system since the last
                                                  * compaction run */
     size_t  header_allocs_since_last_collect;   /* The number of header
-                                                 * allocs from the
-                                                 * system since the last
+                                                 * blocks allocated from 
+                                                 * the system since the last
                                                  * DOD run */
     size_t  active_PMCs;        /* The number of live PMCs */
     size_t  active_Buffers;     /* The number of live

@@ -3797,7 +3797,7 @@ structures.
 =item 8 The number of headers (PMC or buffer) that have been allocated
 since the last DOD run.
 
-=item 9 The amount of memory allocated since the last GC run.
+=item 9 The number of new blocks of memory allocated since the last GC run.
 
 =item 10 The total amount of memory copied during garbage collections.
 
@@ -3821,7 +3821,7 @@ op interpinfo(out INT, in INT) {
                           break;
     case TOTAL_BUFFERS:   $1 = interpreter->total_Buffers;
                           break;
-    case HEADERS_ALLOC_SINCE_COLLECT:
+    case HEADER_ALLOCS_SINCE_COLLECT:
     $1 = interpreter->header_allocs_since_last_collect;
     break;
     case MEM_ALLOCS_SINCE_COLLECT:

@@ -146,6 +146,7 @@ static void compact_pool(struct Parrot_Interp *interpreter,
 
     /* We're collecting */
     interpreter->mem_allocs_since_last_collect = 0;
+    interpreter->header_allocs_since_last_collect = 0;
     interpreter->collect_runs++;
 
     /* total-reclaimable == currently used. Add a minimum block to the
