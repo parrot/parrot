@@ -377,7 +377,6 @@ void
 mark_const_subs(Parrot_Interp interpreter)
 {
     struct PackFile *self;
-    struct PackFile_ByteCode   * cur_cs;
     struct PackFile_Directory *dir;
 
     self = interpreter->code;

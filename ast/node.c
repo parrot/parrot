@@ -31,6 +31,7 @@ static nodeType* create_Name(int nr, nodeType *self, nodeType *p);
 static void set_const(nodeType *p);
 static SymReg* node_to_pmc(Interp*, nodeType *p);
 static SymReg* exp_Binary(Interp*, nodeType *p);
+static SymReg* exp_Unary(Interp*, nodeType *p);
 
 static int show_context;
 
@@ -57,15 +58,6 @@ static void
 dump_Const(nodeType *p, int l)
 {
     dump_sym(p);
-}
-
-static SymReg*
-exp_Const(Interp* interpreter, nodeType *p)
-{
-    if (p->ctx == CTX_PMC) {
-        return node_to_pmc(interpreter,  p);
-    }
-    return p->u.r;
 }
 
 
@@ -213,6 +205,23 @@ ctx_Binary(nodeType *p, context_type ctx)
          */
         p->ctx = left->ctx = right->ctx = CTX_PMC;
     }
+    return p->ctx;
+}
+
+static context_type
+ctx_Unary(nodeType *p, context_type ctx)
+{
+    nodeType *op, *arg;
+    context_type c;
+
+    op = CHILD(p);
+    arg = op->next;
+
+    c = ctx_default(arg, ctx);
+    /*
+     * TODO neg can onverflow
+     */
+    p->ctx = c;
     return p->ctx;
 }
 
@@ -444,12 +453,29 @@ insert_find_lex(Interp* interpreter, nodeType *var)
  */
 
 static SymReg*
+exp_Const(Interp* interpreter, nodeType *p)
+{
+    if (p->ctx == CTX_PMC) {
+        return node_to_pmc(interpreter,  p);
+    }
+    return p->u.r;
+}
+
+static SymReg*
 exp_Var(Interp* interpreter, nodeType *p)
 {
     if (p->ctx == CTX_PMC && p->u.r->set != 'P') {
         Instruction *ins = cur_unit->last_ins;
         return node_to_pmc(interpreter, p);
     }
+    /*
+     * TODO
+     * - create lists of known locals and current register
+     * - for know locals:
+     *   - in a leaf function just use the register
+     *   - else use the idx form of find_lex, if at all
+     * - else use find_global
+     */
     return insert_find_lex(interpreter, p);;
 }
 
@@ -492,7 +518,7 @@ exp_Assign(Interp* interpreter, nodeType *p)
     int need_assign = 0, need_store = 0;
     char buf[128];
 
-    if (rhs->expand == exp_Binary) {
+    if (rhs->expand == exp_Binary || rhs->expand == exp_Unary) {
         /*
          * set the destination node, where the binary places
          * the result
@@ -589,6 +615,46 @@ exp_Binary(Interp* interpreter, nodeType *p)
     regs[1] = lr;
     regs[2] = rr;
     insINS(interpreter, cur_unit, ins, op->u.r->name, regs, 3);
+    return dest;
+}
+
+/*
+ * Op
+ * Arg
+ *
+ * Op(opocde) has the bare name of the Parrot opcode
+ */
+static SymReg*
+exp_Unary(Interp* interpreter, nodeType *p)
+{
+    nodeType *op, *arg;
+    Instruction *ins;
+    SymReg *regs[IMCC_MAX_REGS];
+    char buf[128];
+    SymReg *rr, *dest;
+
+    op = CHILD(p);
+    arg = op->next;
+    rr = arg->expand(interpreter, arg);
+    /*
+     * p->dest holds the var, when the upper node is an assign opcode
+     * if NULL, create a new temp
+     */
+    if (p->dest) {
+        /*
+         * find the lexical, this is the destination of the binary
+         * operation
+         */
+        dest = insert_find_lex(interpreter, p->dest);
+    }
+    else {
+        dest = new_temp_var(interpreter, 'P');
+        insert_new(interpreter, dest, UNDEF_TYPE);
+    }
+    ins = cur_unit->last_ins;
+    regs[0] = dest;
+    regs[1] = rr;
+    insINS(interpreter, cur_unit, ins, op->u.r->name, regs, 2);
     return dest;
 }
 
@@ -916,6 +982,7 @@ static node_names ast_list[] = {
     { "Src_Line",    	create_1, NULL, NULL, NULL, NULL },
     { "Stmts",          create_1, exp_default, NULL, NULL, NULL },
     { "Tests",          create_1, NULL, NULL, NULL, NULL },
+    { "Unary", 	        create_1, exp_Unary, NULL, NULL, ctx_Unary },
     { "Void",           create_1, exp_default, NULL, NULL, NULL },
     { "_",              create_0, NULL, NULL, NULL, NULL },
     { "_options",       create_1, NULL, NULL, NULL, NULL },

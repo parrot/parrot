@@ -1359,10 +1359,6 @@ string_substr(Interp *interpreter, STRING *src,
     INTVAL offset, INTVAL length, STRING **d, int replace_dest)
 {
     STRING *dest;
-    UINTVAL substart_off;       /* Offset from start of string to our
-                                 * piece */
-    UINTVAL subend_off;         /* Offset from start of string to the
-                                 * end of our piece */
     UINTVAL true_offset;
     UINTVAL true_length;
 
@@ -1581,7 +1577,6 @@ STRING *
 string_chopn(Interp *interpreter, STRING *s, INTVAL n)
 {
     UINTVAL new_length;
-    struct string_iterator_t it;
 
     if (n < 0) {
         new_length = -n;

@@ -59,7 +59,6 @@ mark_stack(Interp *interpreter,
            Stack_Chunk_t *chunk)
 {
     Stack_Entry_t *entry;
-    size_t i;
 
     for (; ; chunk = chunk->prev) {
 

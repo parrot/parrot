@@ -210,7 +210,7 @@ do_prederef(void **pc_prederef, Parrot_Interp interpreter, int type)
         if (!pi->branches) {
             size_t nb = interpreter->code->cur_cs->base.size / 16;
             if (nb < 8)
-                nb = 8;
+                nb = (size_t)8;
             pi->branches = mem_sys_allocate( sizeof(Prederef_branch) * nb);
             pi->n_allocated = nb;
             pi->n_branches = 0;
@@ -433,8 +433,6 @@ exec_init_prederef(Interp *interpreter, void *prederef_arena)
 
     if (!interpreter->prederef.code) {
         size_t N = interpreter->code->cur_cs->base.size;
-        size_t i;
-        size_t n;
         void **temp = prederef_arena;
         opcode_t *pc = interpreter->code->cur_cs->base.data;
 
