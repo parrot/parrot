@@ -1,0 +1,286 @@
+=head1 tcllib
+
+This file contains all the PIR necessary to setup the basic C<Tcl>,
+C<_Tcl>, and C<_TclWord> namespaces. These namespaces can then be used
+by our own C<tcl.imc> to setup a tclsh-like interpreter, or to allow
+other PIR programs to access procedures in our own namespaces, also
+providing a compreg-compatible method.
+
+=cut
+
+# don't pollute the global namespaces with our utility functions.
+
+
+# setup some global constants (a bit TOO global, we should confine these
+# to at least the _Tcl namespace)
+
+# return codes
+ .const int TCL_OK = 0
+ .const int TCL_ERROR = 1
+ .const int TCL_RETURN = 2
+ .const int TCL_BREAK = 3
+ .const int TCL_CONTINUE = 4
+
+# expression codes - we use TCL_OK there, so move these out high enough
+# so there's no conflict.
+  .const int OPFUNC = 10
+
+  # 
+  .const int INTEGER = 11
+
+  # 
+  .const int FLOAT   = 12
+  .const int STRING  = 13
+
+  # 
+  .const int BLOCK   = 14
+  .const int CHUNK   = 15
+  .const int COMMAND = 16
+
+  # misc
+  .const int MAX_PRECEDENCE = 9
+
+.namespace [ "_Tcl" ]
+
+.sub __prepare_lib @LOAD
+
+  # Load any dependant libraries.
+  load_bytecode "languages/tcl/lib/tclword.imc"
+  load_bytecode "library/Data/Escape.imc"
+
+  .local string mode
+  .local string chunk
+  .local string contents
+  .local pmc operands
+  .local pmc math_funcs
+  .local pmc precedence
+  .local Sub a_sub
+  .local int argc
+  .local int retcode
+  .local string retval
+
+  # Keep track of math functions
+  math_funcs = new PerlHash
+
+  newsub a_sub, .Sub, __math_abs
+  math_funcs["abs"] = a_sub
+  newsub a_sub, .Sub, __math_acos
+  math_funcs["acos"] = a_sub
+  newsub a_sub, .Sub, __math_asin
+  math_funcs["asin"] = a_sub
+  newsub a_sub, .Sub, __math_atan
+  math_funcs["atan"] = a_sub
+  newsub a_sub, .Sub, __math_cos
+  math_funcs["cos"] = a_sub
+  newsub a_sub, .Sub, __math_cosh
+  math_funcs["cosh"] = a_sub
+  newsub a_sub, .Sub, __math_exp
+  math_funcs["exp"] = a_sub
+  newsub a_sub, .Sub, __math_log
+  math_funcs["log"] = a_sub
+  newsub a_sub, .Sub, __math_log10
+  math_funcs["log10"] = a_sub
+  newsub a_sub, .Sub, __math_sin
+  math_funcs["sin"] = a_sub
+  newsub a_sub, .Sub, __math_sinh
+  math_funcs["sinh"] = a_sub
+  newsub a_sub, .Sub, __math_sqrt
+  math_funcs["sqrt"] = a_sub
+  newsub a_sub, .Sub, __math_tan
+  math_funcs["tan"] = a_sub
+  newsub a_sub, .Sub, __math_tanh
+  math_funcs["tanh"] = a_sub
+
+  operands = new PerlHash
+  precedence = new PerlHash
+
+  newsub a_sub, .Sub, __operand_mul
+  operands["*"] = a_sub
+  precedence["*"] = 1 
+  newsub a_sub, .Sub, __operand_div
+  operands["/"] = a_sub
+  precedence["/"] = 1 
+  newsub a_sub, .Sub, __operand_mod
+  operands["%"] = a_sub
+  precedence["%"] = 1 
+  newsub a_sub, .Sub, __operand_plus
+  operands["+"] = a_sub
+  precedence["+"] = 2
+  newsub a_sub, .Sub, __operand_minus
+  operands["-"] = a_sub
+  precedence["-"] = 2 
+  newsub a_sub, .Sub, __operand_shl
+  operands["<<"] = a_sub
+  precedence["<<"] = 3 
+  newsub a_sub, .Sub, __operand_shr
+  operands[">>"] = a_sub
+  precedence[">>"] = 3 
+  newsub a_sub, .Sub, __operand_lt
+  operands["<"] = a_sub
+  precedence["<"] = 4
+  newsub a_sub, .Sub, __operand_gt
+  operands[">"] = a_sub
+  precedence[">"] = 4
+  newsub a_sub, .Sub, __operand_lte
+  operands["<="] = a_sub
+  precedence["<="] = 4 
+  newsub a_sub, .Sub, __operand_gte
+  operands[">="] = a_sub
+  precedence[">="] = 4
+  newsub a_sub, .Sub, __operand_equal
+  operands["=="] = a_sub
+  precedence["=="] = 5
+  newsub a_sub, .Sub, __operand_unequal
+  operands["!="] = a_sub
+  precedence["!="] = 5 
+  newsub a_sub, .Sub, __operand_bitand
+  operands["&"] = a_sub
+  precedence["&"] = 7
+  newsub a_sub, .Sub, __operand_bitxor
+  operands["^"] = a_sub
+  precedence["^"] =  8
+  newsub a_sub, .Sub, __operand_bitor
+  operands["|"] = a_sub
+  precedence["|"] = 9
+
+  store_global "_Tcl", "operands", operands
+  store_global "_Tcl", "functions", math_funcs
+  store_global "_Tcl", "precedence", precedence
+
+  # XXX These go away when [proc] is a little smarter.
+  $P1 = new PerlHash
+  store_global "_Tcl", "proc_body", $P1
+  $P1 = new PerlHash
+  store_global "_Tcl", "proc_args", $P1
+
+  # Global variable initialization
+  # XXX Are outer level tcl scopes true globals, or are they merely top
+  # level lexicals?
+  #$P0 = new PerlString
+  #$P0 = "0.1"
+  #store_lex 0, "tcl_patchLevel", $P0
+  #$P0 = new PerlString
+  #$P0 = "0.1"
+  #store_lex 0, "tcl_version", $P0
+ 
+  # Setup the default channelIds
+  $P1 = new PerlHash
+  $P2 = getstdin
+  $P1["stdin"] = $P2
+  $P2 = getstdout
+  $P1["stdout"] = $P2
+  $P2 = getstderr
+  $P1["stderr"] = $P2
+  store_global "_Tcl", "channels", $P1
+  
+  # Setup the id # for channels..
+  $P1 = new PerlInt
+  $P1 = 1
+  store_global "_Tcl", "next_channel_id", $P1
+
+  $P1 = find_global "_Tcl", "_tcl_compile"
+  compreg "TCL", $P1
+
+.end
+
+
+.sub _tcl_compile 
+  .param string tcl_code
+
+  .local pmc pir_compiler
+  .local string pir_code
+
+  .local pmc escaper
+  escaper = find_global "Data::Escape", "String" 
+ 
+  pir_compiler = compreg "PIR"
+
+  # should generate a new sub each time, or no?
+  pir_code = ".namespace [ \"_Tcl\" ]\n.sub _throwaway_sub\n.local string code\ncode = \""
+  tcl_code = escaper(tcl_code,"\"")
+  pir_code .= tcl_code
+  pir_code .= "\"\n.local pmc tcl_parse\n.local pmc tcl_interpret\ntcl_parse = find_global \"_Tcl\", \"__parse\"\ntcl_interpret = find_global \"_Tcl\", \"__interpret\"\n$P1 = tcl_parse(code)\n($I0,$S0) = tcl_interpret($P1)\n.pcc_begin_return\n .return $I0\n .return $S0\n .pcc_end_return\n .end\n"
+
+  .local pmc compiled_sub
+  compiled_sub = compile pir_compiler, pir_code
+
+  .pcc_begin_return
+    .return compiled_sub
+  .pcc_end_return
+.end
+
+
+# This handler is just supposed to get us back to the next
+# instruction. It's our job to deal with it in the calling
+# code, then.
+
+.namespace [ "_Tcl"]
+.emit
+__default_handler:
+  set P4, P5["_invoke_cc"]
+  set P5, P5["_P5"]
+  invoke P4
+.eom
+
+  .include "languages/tcl/lib/backslash_newline_subst.imc"
+  .include "languages/tcl/lib/commands/append.imc"
+  .include "languages/tcl/lib/commands/array.imc"
+  .include "languages/tcl/lib/commands/break.imc"
+  .include "languages/tcl/lib/commands/catch.imc"
+  .include "languages/tcl/lib/commands/continue.imc"
+  .include "languages/tcl/lib/commands/error.imc"
+  .include "languages/tcl/lib/commands/eval.imc"
+  .include "languages/tcl/lib/commands/exit.imc"
+  .include "languages/tcl/lib/commands/expr.imc"
+  .include "languages/tcl/lib/commands/for.imc"
+  .include "languages/tcl/lib/commands/format.imc"
+  .include "languages/tcl/lib/commands/global.imc"
+  .include "languages/tcl/lib/commands/if.imc"
+  .include "languages/tcl/lib/commands/incr.imc"
+  .include "languages/tcl/lib/commands/open.imc"
+  .include "languages/tcl/lib/commands/proc.imc"
+  .include "languages/tcl/lib/commands/puts.imc"
+  .include "languages/tcl/lib/commands/rename.imc"
+  .include "languages/tcl/lib/commands/return.imc"
+  .include "languages/tcl/lib/commands/set.imc"
+  .include "languages/tcl/lib/commands/source.imc"
+  .include "languages/tcl/lib/commands/string.imc"
+  .include "languages/tcl/lib/commands/time.imc"
+  .include "languages/tcl/lib/commands/while.imc"
+  .include "languages/tcl/lib/expression.imc"
+  .include "languages/tcl/lib/functions/abs.imc"
+  .include "languages/tcl/lib/functions/acos.imc"
+  .include "languages/tcl/lib/functions/asin.imc"
+  .include "languages/tcl/lib/functions/atan.imc"
+  .include "languages/tcl/lib/functions/cos.imc"
+  .include "languages/tcl/lib/functions/cosh.imc"
+  .include "languages/tcl/lib/functions/exp.imc"
+  .include "languages/tcl/lib/functions/log.imc"
+  .include "languages/tcl/lib/functions/log10.imc"
+  .include "languages/tcl/lib/functions/sin.imc"
+  .include "languages/tcl/lib/functions/sinh.imc"
+  .include "languages/tcl/lib/functions/sqrt.imc"
+  .include "languages/tcl/lib/functions/tan.imc"
+  .include "languages/tcl/lib/functions/tanh.imc"
+  .include "languages/tcl/lib/get_var.imc"
+  .include "languages/tcl/lib/interpret.imc"
+  .include "languages/tcl/lib/match_close.imc"
+  .include "languages/tcl/lib/ops/bitand.imc"
+  .include "languages/tcl/lib/ops/bitor.imc"
+  .include "languages/tcl/lib/ops/bitxor.imc"
+  .include "languages/tcl/lib/ops/div.imc"
+  .include "languages/tcl/lib/ops/equal.imc"
+  .include "languages/tcl/lib/ops/gt.imc"
+  .include "languages/tcl/lib/ops/gte.imc"
+  .include "languages/tcl/lib/ops/lt.imc"
+  .include "languages/tcl/lib/ops/lte.imc"
+  .include "languages/tcl/lib/ops/minus.imc"
+  .include "languages/tcl/lib/ops/mod.imc"
+  .include "languages/tcl/lib/ops/mul.imc"
+  .include "languages/tcl/lib/ops/plus.imc"
+  .include "languages/tcl/lib/ops/shl.imc"
+  .include "languages/tcl/lib/ops/shr.imc"
+  .include "languages/tcl/lib/ops/unequal.imc"
+  .include "languages/tcl/lib/parse.imc"
+  .include "languages/tcl/lib/string_to_list.imc"
+
