@@ -52,7 +52,7 @@ MAIN:
     bsr LOAD
     # Get the name of the input file
     set S15,P0[1]
-    open I20,S15
+    open P20,S15
     # Get the name of the output file
     set S15,P0[2]
     open P1,S15,">"
@@ -60,7 +60,7 @@ MAIN:
     end
  
 READ:
-    readline S0,I20
+    readline S0,P20
     set I0, 0
     length I0,S0
     unless I0, FINISH
@@ -266,6 +266,9 @@ OUTPUT:
 
 #
 # $Log$
+# Revision 1.5  2003/08/11 15:17:31  scog
+# Get it to compile
+#
 # Revision 1.4  2002/08/26 14:31:46  grunblatt
 # # New Ticket Created by  Mike Lambert
 # # Please include the string:  [perl #16741]
