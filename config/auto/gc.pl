@@ -24,6 +24,8 @@ sub runstep {
     else {
         Configure::Data->set('malloc_header', 'stdlib.h');
     }
+=for nothing
+
     cc_gen('config/auto/gc/test_c.in');
     eval { cc_build(); };
     my $test = 0;
@@ -36,6 +38,9 @@ sub runstep {
       # if not, use own copy of malloc
       $gc = 'malloc';
     }
+
+=cut
+
   }
 
   if ($gc =~ /^malloc(?:-trace)?$/) {

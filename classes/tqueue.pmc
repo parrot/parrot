@@ -3,7 +3,9 @@
  *  CVS Info
  *     $Id$
  *  Overview:
- *     Threadsafe queue class
+ *     Threadsafe queue class for inter thread communication
+ *     If you have an unthreaded program then please
+ *     use a PerlArray
  *  Data Structure and Algorithms:
  *  History:
  *     2003.12.19 leo initial rev
@@ -17,6 +19,9 @@
  *     and in other thread (at least, when shared PMCs work :)
  *
  *     shift P1, P0
+ *
+ *     Note: The TQueue must always be emptied before program
+ *           exit.
  *
  *  References:
  */
@@ -55,7 +60,20 @@ pmclass TQueue need_ext {
 
     void destroy () {
         if (PMC_data(SELF)) {
-            mem_sys_free(PMC_data(SELF));
+            QUEUE *queue = PMC_data(SELF);
+#if 0
+            /*
+             * wait til queue is empty
+             * XXX implement a time wait and PANIC if queue
+             * isn't empty after some TIMEOUT
+             */
+            while (SELF.elements()) {
+                queue_lock(queue);
+                queue_wait(queue);
+                queue_unlock(queue);
+            }
+#endif
+            mem_sys_free(queue);
             PMC_data(SELF) = NULL;
         }
     }
@@ -68,16 +86,22 @@ pmclass TQueue need_ext {
         INTVAL items;
         QUEUE *queue = PMC_data(SELF);
 
-        queue_lock(queue);
         items = SELF->cache.int_val;
-        queue_unlock(queue);
         return items;
+    }
+
+    INTVAL elements () {
+        return SELF.get_integer();
     }
 
     void push_pmc(PMC *item) {
         QUEUE_ENTRY* entry = mem_sys_allocate(sizeof(QUEUE_ENTRY));
         QUEUE *queue = PMC_data(SELF);
 
+        /*
+         * TODO: if item isn't shared nor const, then make
+         *       a shared item
+         */
         entry->data = item;
         entry->type = QUEUE_ENTRY_TYPE_NONE;
         /* s. tsq.c:quene_push */
@@ -95,13 +119,6 @@ pmclass TQueue need_ext {
         queue_unlock(queue);
     }
 
-    /*
-     * XXX we just take out the PMCs that possibly another thread
-     *     has created - that's wrong
-     * idea: remember push()ing interpreter in entry
-     *       if shift()ing interpreter is different and data aren't shared
-     *       then return clone()ed copies
-     */
     PMC* shift_pmc() {
         QUEUE_ENTRY *entry;
         QUEUE *queue = PMC_data(SELF);
@@ -117,7 +134,6 @@ pmclass TQueue need_ext {
         ret = entry->data;
         mem_sys_free(entry);
         return ret;
-        /* return VTABLE_clone(INTERP, ret);         XXX */
     }
 
 

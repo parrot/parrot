@@ -218,6 +218,8 @@ pt_thread_join(Parrot_Interp parent, UINTVAL tid)
 
     LOCK(interpreter_array_mutex);
     interpreter = pt_check_tid(tid, "join");
+    if (interpreter == parent)
+        do_panic(parent, "Can't join self", __FILE__, __LINE__);
     if (interpreter->thread_data->state == THREAD_STATE_JOINABLE ||
             interpreter->thread_data->state == THREAD_STATE_FINISHED) {
         void *retval;
@@ -233,6 +235,7 @@ pt_thread_join(Parrot_Interp parent, UINTVAL tid)
          *      non-trivial tasks
          *      -leo
          */
+        LOCK(interpreter_array_mutex);
         CLEANUP_PUSH(mutex_unlock, &interpreter_array_mutex);
 
         if (retval) {
@@ -245,11 +248,11 @@ pt_thread_join(Parrot_Interp parent, UINTVAL tid)
              */
             Parrot_block_DOD(parent);
             parent_ret = VTABLE_clone(parent, (PMC*)retval);
-            Parrot_unblock_DOD(parent);
             /* this PMC is living only in the stack of this currently
              * dying interpreter, so register it in parents DOD registry
              */
             dod_register_pmc(parent, parent_ret);
+            Parrot_unblock_DOD(parent);
             retval = parent_ret;
         }
         interpreter_array[tid] = NULL;
@@ -285,16 +288,18 @@ pt_join_threads(Parrot_Interp interpreter)
     /*
      * if no threads where started - fine
      */
+    LOCK(interpreter_array_mutex);
     if (!n_interpreters) {
+        UNLOCK(interpreter_array_mutex);
         return;
     }
     /*
      * only the first interpreter waits for other threads
      */
     if (interpreter != interpreter_array[0]) {
+        UNLOCK(interpreter_array_mutex);
         return;
     }
-    LOCK(interpreter_array_mutex);
 
     for (i = 1; i < n_interpreters; ++i) {
         Parrot_Interp thread_interp = interpreter_array[i];

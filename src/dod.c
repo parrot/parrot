@@ -186,6 +186,12 @@ trace_active_PMCs(struct Parrot_Interp *interpreter, int trace_stack)
         stash = stash->parent_stash;
     }
 
+    /* mark NCI meth hash */
+    for (i = 0; i < interpreter->nci_method_table_size; ++i) {
+        PMC *h = interpreter->nci_method_table[i];
+        if (h)
+            pobject_lives(interpreter, (PObj*)h);
+    }
     /* Now mark the class hash */
     pobject_lives(interpreter, (PObj *)interpreter->class_hash);
 

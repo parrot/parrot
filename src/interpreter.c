@@ -1122,7 +1122,8 @@ Parrot_really_destroy(int exit_code, void *vinterp)
     /*
      * wait for threads to complete if needed
      */
-    pt_join_threads(interpreter);
+    if (!interpreter->parent_interpreter)
+        pt_join_threads(interpreter);
     /* if something needs destruction (e.g. closing PIOs)
      * we must destroy it now:
      * no DOD run, so everything is considered dead
@@ -1191,8 +1192,11 @@ Parrot_really_destroy(int exit_code, void *vinterp)
         /* don't free a thread interpreter, if it isn't joined yet */
         if (!interpreter->thread_data || (
                     interpreter->thread_data &&
-                    interpreter->thread_data->state == THREAD_STATE_JOINED))
+                    (interpreter->thread_data->state & THREAD_STATE_JOINED))) {
+            if (interpreter->thread_data )
+                mem_sys_free(interpreter->thread_data);
             mem_sys_free(interpreter);
+        }
     }
 }
 
@@ -1603,10 +1607,10 @@ enter_nci_method(Parrot_Interp interpreter, int type,
     else
         table = interpreter->nci_method_table;
     if (!table[type])
-        table[type] = constant_pmc_new(interpreter, enum_class_PerlHash);
+        table[type] = pmc_new(interpreter, enum_class_PerlHash);
     method_table = table[type];
 
-    method = constant_pmc_new(interpreter, enum_class_NCI);
+    method = pmc_new(interpreter, enum_class_NCI);
     VTABLE_set_string_keyed(interpreter, method, func,
             string_make(interpreter, proto, strlen(proto),
                 NULL, PObj_constant_FLAG|PObj_external_FLAG, NULL));

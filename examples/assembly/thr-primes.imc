@@ -45,11 +45,21 @@ From perldoc perlthrtut
 #  ARENA_DOD_FLAGS = 0    MAX=1000  (~ 168 threads)
 
 
-.sub _main
+.sub _main prototyped
+    .param pmc argv
     .const int MAX = 500
+    .sym int max
     .sym pmc kid
     .sym pmc Check_num
     .sym pmc stream
+    .sym int argc
+    argc = argv
+    max = MAX
+    if argc < 2 goto no_arg
+      $S0 = argv[1]
+      max = $S0
+no_arg:
+
     #sweepoff
 #       9  my $stream = new Thread::Queue;
     stream = new TQueue
@@ -77,7 +87,7 @@ lp:
     $P3 = i
     push stream, $P3
     inc i
-    if i <= MAX goto lp
+    if i <= max goto lp
 #       14 }
 
 #       16 $stream->enqueue(undef);
