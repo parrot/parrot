@@ -9,14 +9,14 @@ N: BASIC/compiler
 A: Clint Pierce
 A: Will Coleda (work with parrot 0.1.0+)
 D: BASIC Compiler
-S: Cautiously Optimistic - wumpus example seems to work again.
+S: Cautiously Optimistic - wumpus & screen examples seem to work again.
 M: Yes
 V: 0.0.11
 
 N: BASIC/interpreter
 A: Clint Pierce
 D: BASIC Interpreter written in pure Parrot
-S: Functional, includes samples such as Eliza and Hunt the Wumpus
+S: Broken - probably due to changes in PIR syntax.
 M: Yes
 V: 0.0.11
 
