@@ -8,7 +8,7 @@
 #define P_ARITH ((PREV_OP == dec_i) || (PREV_OP == inc_i) || (PREV_OP == sub_i_i_i))
 
 Parrot_end {
-    emitm_addl_i_r(jit_info->native_ptr, 4, emit_ESP);
+    jit_emit_add_ri_i(jit_info->native_ptr, emit_ESP, 4);
     emitm_popl_r(NATIVECODE, emit_EDI);
     emitm_popl_r(NATIVECODE, emit_EBX);
     emitm_popl_r(NATIVECODE, emit_ESI);
@@ -51,41 +51,41 @@ Parrot_set_p_p {
 }
 
 Parrot_set_n_nc {
-    emit_fldl(NATIVECODE, &NUM_CONST[2]);
-    emit_fstpl(NATIVECODE, &NUM_REG[1]);
+    jit_emit_fload_m_n(NATIVECODE, &NUM_CONST[2]);
+    jit_emit_fstore_m_n(NATIVECODE, &NUM_REG[1]);
 }
 
 Parrot_set_n_n {
-    emit_fldl(NATIVECODE, &NUM_REG[2]);
-    emit_fstpl(NATIVECODE, &NUM_REG[1]);
+    jit_emit_fload_m_n(NATIVECODE, &NUM_REG[2]);
+    jit_emit_fstore_m_n(NATIVECODE, &NUM_REG[1]);
 }
 
 Parrot_mul_i_i {
     if (MAP[1] && MAP[2]) {
-        emitm_smull_r_r(NATIVECODE, MAP[2], MAP[1]);
+        jit_emit_mul_rr(NATIVECODE, MAP[1], MAP[2]);
     }
     else if (MAP[1]) {
-        emit_smull_r_m(NATIVECODE, MAP[1], &INT_REG[2]);
+        jit_emit_mul_rm_i(NATIVECODE, MAP[1], &INT_REG[2]);
     }
     else if (MAP[2]) {
         jit_emit_mov_rm_i(NATIVECODE, emit_EAX, &INT_REG[1]);
-        emitm_smull_r_r(NATIVECODE, MAP[2], emit_EAX);
+        jit_emit_mul_rr(NATIVECODE, emit_EAX, MAP[2]);
         jit_emit_mov_mr_i(NATIVECODE, &INT_REG[1], emit_EAX);
     }
     else {
         jit_emit_mov_rm_i(NATIVECODE, emit_EAX, &INT_REG[1]);
-        emit_smull_r_m(NATIVECODE, emit_EAX, &INT_REG[2]);
+        jit_emit_mul_rm_i(NATIVECODE, emit_EAX, &INT_REG[2]);
         jit_emit_mov_mr_i(NATIVECODE, &INT_REG[1], emit_EAX);
     }
 }
 
 Parrot_mul_i_ic {
     if (MAP[1]) {
-        emit_smull_i_r_r(NATIVECODE, *INT_CONST[2], MAP[1], MAP[1]);
+        jit_emit_mul_rir_i(NATIVECODE, MAP[1], *INT_CONST[2], MAP[1]);
     }
     else {
         jit_emit_mov_rm_i(NATIVECODE, emit_EAX, &INT_REG[1]);
-        emit_smull_i_r_r(NATIVECODE, *INT_CONST[2], emit_EAX, emit_EAX);
+        jit_emit_mul_rir_i(NATIVECODE, emit_EAX, *INT_CONST[2], emit_EAX);
         jit_emit_mov_mr_i(NATIVECODE, &INT_REG[1], emit_EAX);
     }
 }
@@ -101,36 +101,36 @@ Parrot_mul_i_ic_ic {
 
 Parrot_mul_i_i_ic {
     if (MAP[1] && MAP[2]) {
-        emit_smull_i_r_r(NATIVECODE, *INT_CONST[3], MAP[2], MAP[1]);
+        jit_emit_mul_rir_i(NATIVECODE, MAP[1], *INT_CONST[3], MAP[2]);
     }
     else if (MAP[1]) {
-        emit_smull_i_m_r(NATIVECODE, *INT_CONST[3], &INT_REG[2], MAP[1]);
+        jit_emit_mul_rim_ii(NATIVECODE, MAP[1], *INT_CONST[3], &INT_REG[2]);
     }
     else if (MAP[2]) {
-        emit_smull_i_r_r(NATIVECODE, *INT_CONST[3], MAP[2], emit_EAX);
+        jit_emit_mul_rir_i(NATIVECODE, emit_EAX, *INT_CONST[3], MAP[2]);
         jit_emit_mov_mr_i(NATIVECODE, &INT_REG[1], emit_EAX);
     }
     else {
         jit_emit_mov_rm_i(NATIVECODE, emit_EAX, &INT_REG[2]);
-        emit_smull_i_r_r(NATIVECODE, *INT_CONST[3], emit_EAX, emit_EAX);
+        jit_emit_mul_rir_i(NATIVECODE, emit_EAX, *INT_CONST[3], emit_EAX);
         jit_emit_mov_mr_i(NATIVECODE, &INT_REG[1], emit_EAX);
     }
 }
 
 Parrot_mul_i_ic_i {
     if (MAP[1] && MAP[3]) {
-        emit_smull_i_r_r(NATIVECODE, *INT_CONST[2], MAP[3], MAP[1]);
+        jit_emit_mul_rir_i(NATIVECODE, MAP[1], *INT_CONST[2], MAP[3]);
     }
     else if (MAP[1]) {
-        emit_smull_i_m_r(NATIVECODE, *INT_CONST[2], &INT_REG[3], MAP[1]);
+        jit_emit_mul_rim_ii(NATIVECODE, MAP[1], *INT_CONST[2], &INT_REG[3]);
     }
     else if (MAP[3]) {
-        emit_smull_i_r_r(NATIVECODE, *INT_CONST[2], MAP[3], emit_EAX);
+        jit_emit_mul_rir_i(NATIVECODE, emit_EAX, *INT_CONST[2], MAP[3]);
         jit_emit_mov_mr_i(NATIVECODE, &INT_REG[1], emit_EAX);
     }
     else {
         jit_emit_mov_rm_i(NATIVECODE, emit_EAX, &INT_REG[3]);
-        emit_smull_i_r_r(NATIVECODE, *INT_CONST[2], emit_EAX, emit_EAX);
+        jit_emit_mul_rir_i(NATIVECODE, emit_EAX, *INT_CONST[2], emit_EAX);
         jit_emit_mov_mr_i(NATIVECODE, &INT_REG[1], emit_EAX);
     }
 }
@@ -138,48 +138,48 @@ Parrot_mul_i_ic_i {
 Parrot_mul_i_i_i {
     if (MAP[1] && MAP[2] && MAP[3]) {
         jit_emit_mov_rr(NATIVECODE, MAP[1], MAP[2]);
-        emitm_smull_r_r(NATIVECODE, MAP[3], MAP[1]);
+        jit_emit_mul_rr(NATIVECODE, MAP[1], MAP[3]);
     }
     else if (MAP[1] && MAP[2]) {
         jit_emit_mov_rr(NATIVECODE, MAP[1], MAP[2]);
-        emit_smull_r_m(NATIVECODE, MAP[1], &INT_REG[3]);
+        jit_emit_mul_rm_i(NATIVECODE, MAP[1], &INT_REG[3]);
     }
     else if (MAP[1] && MAP[3]) {
         jit_emit_mov_rr(NATIVECODE, MAP[1], MAP[3]);
-        emit_smull_r_m(NATIVECODE, MAP[1], &INT_REG[2]);
+        jit_emit_mul_rm_i(NATIVECODE, MAP[1], &INT_REG[2]);
     }
     else if (MAP[2] && MAP[3]) {
         jit_emit_mov_rr(NATIVECODE, emit_EAX, MAP[3]);
-        emitm_smull_r_r(NATIVECODE, MAP[2], emit_EAX);
+        jit_emit_mul_rr(NATIVECODE, emit_EAX, MAP[2]);
         jit_emit_mov_mr_i(NATIVECODE, &INT_REG[1], emit_EAX);
     }
     else if (MAP[1]) {
         jit_emit_mov_rm_i(NATIVECODE, MAP[1], &INT_REG[2]);
-        emit_smull_r_m(NATIVECODE, MAP[1], &INT_REG[3]);
+        jit_emit_mul_rm_i(NATIVECODE, MAP[1], &INT_REG[3]);
     }
     else if (MAP[2]) {
         jit_emit_mov_rr(NATIVECODE, emit_EAX, MAP[2]);
-        emit_smull_r_m(NATIVECODE, emit_EAX, &INT_REG[3]);
+        jit_emit_mul_rm_i(NATIVECODE, emit_EAX, &INT_REG[3]);
         jit_emit_mov_mr_i(NATIVECODE, &INT_REG[1], emit_EAX);
     }
     else if (MAP[3]) {
         jit_emit_mov_rr(NATIVECODE, emit_EAX, MAP[3]);
-        emit_smull_r_m(NATIVECODE, emit_EAX, &INT_REG[2]);
+        jit_emit_mul_rm_i(NATIVECODE, emit_EAX, &INT_REG[2]);
         jit_emit_mov_mr_i(NATIVECODE, &INT_REG[1], emit_EAX);
     }
     else {
         jit_emit_mov_rm_i(NATIVECODE, emit_EAX, &INT_REG[2]);
-        emit_smull_r_m(NATIVECODE, emit_EAX, &INT_REG[3]);
+        jit_emit_mul_rm_i(NATIVECODE, emit_EAX, &INT_REG[3]);
         jit_emit_mov_mr_i(NATIVECODE, &INT_REG[1], emit_EAX);
     }
 }
 
 Parrot_neg_i {
     if (MAP[1]) {
-        emit_negl_r(NATIVECODE, MAP[1]);
+        jit_emit_neg_r(NATIVECODE, MAP[1]);
     }
     else {
-        emit_negl_m(NATIVECODE, &INT_REG[1]);
+        jit_emit_neg_m_i(NATIVECODE, &INT_REG[1]);
     }
 }
 
@@ -195,20 +195,20 @@ Parrot_neg_i_ic {
 Parrot_neg_i_i {
     if (MAP[1] && MAP[2]) {
         jit_emit_mov_rr(NATIVECODE, MAP[1], MAP[2]);
-        emit_negl_r(NATIVECODE, MAP[1]);
+        jit_emit_neg_r(NATIVECODE, MAP[1]);
     }
     else if (MAP[1]) {
         jit_emit_mov_rm_i(NATIVECODE, MAP[1], &INT_REG[1]);
-        emit_negl_r(NATIVECODE, MAP[1]);
+        jit_emit_neg_r(NATIVECODE, MAP[1]);
     }
     else if (MAP[2]) {
         jit_emit_mov_rr(NATIVECODE, emit_EAX, MAP[2]);
-        emit_negl_r(NATIVECODE, emit_EAX);
+        jit_emit_neg_r(NATIVECODE, emit_EAX);
         jit_emit_mov_mr_i(NATIVECODE, &INT_REG[1], emit_EAX);
     }
     else {
         jit_emit_mov_rm_i(NATIVECODE, emit_EAX, &INT_REG[2]);
-        emit_negl_r(NATIVECODE, emit_EAX);
+        jit_emit_neg_r(NATIVECODE, emit_EAX);
         jit_emit_mov_mr_i(NATIVECODE, &INT_REG[1], emit_EAX);
     }
 }
@@ -218,21 +218,21 @@ Parrot_set_n_i {
         jit_emit_mov_mr_i(NATIVECODE, &INT_REG[2], MAP[2]);
     }
     emit_fildl(NATIVECODE, &INT_REG[2]);
-    emit_fstpl(NATIVECODE, &NUM_REG[1]);
+    jit_emit_fstore_m_n(NATIVECODE, &NUM_REG[1]);
 }
 
 Parrot_div_n_n_n {
-    emit_fldl(NATIVECODE, &NUM_REG[2]);
-    emit_fldl(NATIVECODE, &NUM_REG[3]);
+    jit_emit_fload_m_n(NATIVECODE, &NUM_REG[2]);
+    jit_emit_fload_m_n(NATIVECODE, &NUM_REG[3]);
     emitm_fdivp(NATIVECODE, 1);
-    emit_fstpl(NATIVECODE, &NUM_REG[1]);
+    jit_emit_fstore_m_n(NATIVECODE, &NUM_REG[1]);
 }
 
 Parrot_sub_n_n_n {
-    emit_fldl(NATIVECODE, &NUM_REG[2]);
-    emit_fldl(NATIVECODE, &NUM_REG[3]);
+    jit_emit_fload_m_n(NATIVECODE, &NUM_REG[2]);
+    jit_emit_fload_m_n(NATIVECODE, &NUM_REG[3]);
     emitm_fsubp(NATIVECODE, 1);
-    emit_fstpl(NATIVECODE, &NUM_REG[1]);
+    jit_emit_fstore_m_n(NATIVECODE, &NUM_REG[1]);
 }
 
 Parrot_if_ic_ic {
@@ -307,11 +307,11 @@ Parrot_add_i_i {
 
 Parrot_add_i_ic {
     if (MAP[1]) {
-        emitm_addl_i_r(NATIVECODE, *INT_CONST[2], MAP[1]);
+        jit_emit_add_ri_i(NATIVECODE, MAP[1], *INT_CONST[2]);
     }
     else {
         jit_emit_mov_rm_i(NATIVECODE, emit_EAX, &INT_REG[1]);
-        emitm_addl_i_r(NATIVECODE, *INT_CONST[2], emit_EAX);
+        jit_emit_add_ri_i(NATIVECODE, emit_EAX, *INT_CONST[2]);
         jit_emit_mov_mr_i(NATIVECODE, &INT_REG[1], emit_EAX)
     }
 }
@@ -328,20 +328,20 @@ Parrot_add_i_ic_ic {
 Parrot_add_i_i_ic {
     if (MAP[1] && MAP[2]) {
         jit_emit_mov_rr(NATIVECODE, MAP[1], MAP[2]);
-        emitm_addl_i_r(NATIVECODE, *INT_CONST[3], MAP[1]);
+        jit_emit_add_ri_i(NATIVECODE, MAP[1], *INT_CONST[3]);
     }
     else if (MAP[1]) {
         jit_emit_mov_rm_i(NATIVECODE, MAP[1], &INT_REG[2]);
-        emitm_addl_i_r(NATIVECODE, *INT_CONST[3], MAP[1]);
+        jit_emit_add_ri_i(NATIVECODE, MAP[1], *INT_CONST[3]);
     }
     else if (MAP[2]) {
         jit_emit_mov_rr(NATIVECODE, emit_EAX, MAP[2]);
-        emitm_addl_i_r(NATIVECODE, *INT_CONST[3], emit_EAX);
+        jit_emit_add_ri_i(NATIVECODE, emit_EAX, *INT_CONST[3]);
         jit_emit_mov_mr_i(NATIVECODE, &INT_REG[1], emit_EAX)
     }
     else {
         jit_emit_mov_rm_i(NATIVECODE, emit_EAX, &INT_REG[2]);
-        emitm_addl_i_r(NATIVECODE, *INT_CONST[3], emit_EAX);
+        jit_emit_add_ri_i(NATIVECODE, emit_EAX, *INT_CONST[3]);
         jit_emit_mov_mr_i(NATIVECODE, &INT_REG[1], emit_EAX)
     }
 }
@@ -349,20 +349,20 @@ Parrot_add_i_i_ic {
 Parrot_add_i_ic_i {
     if (MAP[1] && MAP[3]) {
         jit_emit_mov_rr(NATIVECODE, MAP[1], MAP[3]);
-        emitm_addl_i_r(NATIVECODE, *INT_CONST[2], MAP[1]);
+        jit_emit_add_ri_i(NATIVECODE, MAP[1], *INT_CONST[2]);
     }
     else if (MAP[1]) {
         jit_emit_mov_rm_i(NATIVECODE, MAP[1], &INT_REG[3]);
-        emitm_addl_i_r(NATIVECODE, *INT_CONST[2], MAP[1]);
+        jit_emit_add_ri_i(NATIVECODE, MAP[1], *INT_CONST[2]);
     }
     else if (MAP[3]) {
         jit_emit_mov_rr(NATIVECODE, emit_EAX, MAP[3]);
-        emitm_addl_i_r(NATIVECODE, *INT_CONST[2], emit_EAX);
+        jit_emit_add_ri_i(NATIVECODE, emit_EAX, *INT_CONST[2]);
         jit_emit_mov_mr_i(NATIVECODE, &INT_REG[1], emit_EAX)
     }
     else {
         jit_emit_mov_rm_i(NATIVECODE, emit_EAX, &INT_REG[3]);
-        emitm_addl_i_r(NATIVECODE, *INT_CONST[2], emit_EAX);
+        jit_emit_add_ri_i(NATIVECODE, emit_EAX, *INT_CONST[2]);
         jit_emit_mov_mr_i(NATIVECODE, &INT_REG[1], emit_EAX)
     }
 }
@@ -636,8 +636,8 @@ Parrot_gt_i_i_ic {
 
 Parrot_gt_n_n_ic {
     /* s. Pentium4.pdf 8.1 */
-    emit_fldl(NATIVECODE, &NUM_REG[1]);
-/*    emit_fldl(NATIVECODE, &NUM_REG[2]); */
+    jit_emit_fload_m_n(NATIVECODE, &NUM_REG[1]);
+/*    jit_emit_fload_m_n(NATIVECODE, &NUM_REG[2]); */
 /*    emitm_fcompp(NATIVECODE); */
     emitm_fcomp_m(NATIVECODE, emit_None, emit_None, emit_None, &NUM_REG[2]);
     emitm_fstw(NATIVECODE);

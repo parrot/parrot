@@ -385,7 +385,7 @@ emit_movb_i_m(char *pc, char imm, int base, int i, int scale, long disp)
 #define emitm_addl_r_r(pc, reg1, reg2) \
   emitm_alul_r_r(pc, 0x01, reg1, reg2)
 
-#define emitm_addl_i_r(pc, imm, reg)   \
+#define jit_emit_add_ri_i(pc, reg, imm)   \
   emitm_alul_i_r(pc, 0x81, emit_b000, imm, reg)
 
 #define emitm_addl_i_m(pc, imm, b, i, s, d) \
@@ -447,8 +447,7 @@ emit_movb_i_m(char *pc, char imm, int base, int i, int scale, long disp)
 
 #define emitm_smull_r(pc, reg2) emitm_alu_imp_r((pc), emit_b101, (reg2))
 
-/* The arguments are swapped here so that the destination is put second */
-#define emitm_smull_r_r(pc, reg2, reg1) { \
+#define jit_emit_mul_rr(pc, reg1, reg2) { \
   emitm_smull_op(pc); \
   *((pc)++) = emit_alu_r_r(reg1, reg2); }
 
@@ -456,13 +455,13 @@ emit_movb_i_m(char *pc, char imm, int base, int i, int scale, long disp)
   emitm_smull_op(pc); \
   (pc) = emit_r_X((pc), emit_reg(reg1 - 1), b, i, s, (long)d); }
 
-#define emit_smull_i_r_r(pc, imm, reg1, reg2) \
+#define jit_emit_mul_rir_i(pc, reg2, imm, reg1) \
   *(pc++) = 0x69; \
   *(pc++) = 0xc0 | (reg1 - 1) | (reg2 - 1) << 3; \
   *(long *)(pc) = (long)imm; \
   pc += 4
 
-#define emit_smull_i_m_r(pc, imm, add, dst) \
+#define jit_emit_mul_rim_ii(pc, dst, imm, add) \
   *(pc++) = 0x69; \
   *(pc++) = 0x05 | (dst - 1) << 3; \
   *(long *)(pc) = (long)add; \
@@ -472,7 +471,7 @@ emit_movb_i_m(char *pc, char imm, int base, int i, int scale, long disp)
 
 /* NEG */
 
-#define emit_negl_r(pc, reg) emitm_alu_imp_r(pc, emit_b011, reg)
+#define jit_emit_neg_r(pc, reg) emitm_alu_imp_r(pc, emit_b011, reg)
 
 #define emitm_negl_m(pc, b, i, s, d) emitm_alu_imp_m(pc, emit_b011, b, i, s, d)
 
@@ -757,7 +756,7 @@ emit_movb_i_m(char *pc, char imm, int base, int i, int scale, long disp)
 #define jit_emit_mov_mr_i(pc, address, reg) \
   emitm_movl_r_m(pc, reg, emit_None, emit_None, emit_None, address)
 
-#define emit_smull_r_m(pc, reg, address) \
+#define jit_emit_mul_rm_i(pc, reg, address) \
   emitm_smull_r_m(pc, reg, emit_None, emit_None, emit_None, address)
 
 #define emit_subl_r_m(pc, reg, address) \
@@ -778,16 +777,16 @@ emit_movb_i_m(char *pc, char imm, int base, int i, int scale, long disp)
 #define emit_cmpl_m_r(pc, reg, address) \
   emitm_cmpl_m_r(pc, reg, emit_None, emit_None, emit_None, address)
 
-#define emit_fldl(pc, address) \
+#define jit_emit_fload_m_n(pc, address) \
   emitm_fldl(pc, emit_None, emit_None, emit_None, address)
 
 #define emit_fildl(pc, address) \
   emitm_fildl(pc, emit_None, emit_None, emit_None, address)
 
-#define emit_fstpl(pc, address) \
+#define jit_emit_fstore_m_n(pc, address) \
   emitm_fstpl(pc, emit_None, emit_None, emit_None, address)
 
-#define emit_negl_m(pc, address) \
+#define jit_emit_neg_m_i(pc, address) \
   emitm_negl_m(pc, emit_None, emit_None, emit_None, (long)address)
 
 #define emit_shrl_r_m(pc, reg, d) \
@@ -1073,7 +1072,7 @@ Parrot_jit_vtable_n_op(Parrot_jit_info_t *jit_info,
                 break;
             case PARROT_ARG_N:
                 /* push num on st(0) */
-                emit_fldl(jit_info->native_ptr,
+                jit_emit_fload_m_n(jit_info->native_ptr,
                         &interpreter->ctx.num_reg.registers[p[i]]);
                 /* make room for double */
                 emitm_addb_i_r(jit_info->native_ptr, -8, emit_ESP);
@@ -1083,7 +1082,7 @@ Parrot_jit_vtable_n_op(Parrot_jit_info_t *jit_info,
                 st += 4;
                 break;
             case PARROT_ARG_NC:
-                emit_fldl(jit_info->native_ptr,
+                jit_emit_fload_m_n(jit_info->native_ptr,
                         &interpreter->code->const_table->
                         constants[p[i]]->number);
                 emitm_addb_i_r(jit_info->native_ptr, -8, emit_ESP);
@@ -1154,7 +1153,7 @@ Parrot_jit_vtable1r_op(Parrot_jit_info_t *jit_info,
             break;
         case PARROT_ARG_N:
             /* pop num from st(0) and mov to reg */
-            emit_fstpl(jit_info->native_ptr,
+            jit_emit_fstore_m_n(jit_info->native_ptr,
                     &interpreter->ctx.num_reg.registers[p1]);
             break;
         default:
