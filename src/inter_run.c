@@ -100,36 +100,16 @@ is an invocable C<Sub> PMC.
 
 */
 
-#define DO_DOD_REGISTER 0
 void
 Parrot_runops_fromc(Parrot_Interp interpreter, PMC *sub)
 {
     PMC *ret_c, *old_c;
     opcode_t offset, *dest;
 
-    /*
-     * the caller doesn't know, that a subroutine is called
-     * so P1 isn't copied up to the upper half of the register
-     * frames and isn't stored with savetop - it's totally unachored
-     *
-     * we have to dod_register the caller's return continuation
-     * to prevent it from sudden death
-     */
-    old_c = REG_PMC(1);
-#if DO_DOD_REGISTER
-    /* XXX it should be visible on the stack here */
-    dod_register_pmc(interpreter, old_c);
-#endif
     /* we need one return continuation with a NULL offset */
     REG_PMC(1) = ret_c = new_ret_continuation_pmc(interpreter, NULL);
 #if GC_VERBOSE
     PObj_report_SET(ret_c);     /* s. also dod.c */
-#endif
-    /*
-     * also be sure that this continuation isn't destroyed
-     */
-#if DO_DOD_REGISTER
-    dod_register_pmc(interpreter, ret_c);
 #endif
     /* invoke the sub, which places the context of the sub in the
      * interpreter, and switches code segments if needed
@@ -139,11 +119,6 @@ Parrot_runops_fromc(Parrot_Interp interpreter, PMC *sub)
         offset = dest - interpreter->code->byte_code;
         runops(interpreter, offset);
     }
-    REG_PMC(1) = old_c;
-#if DO_DOD_REGISTER
-    dod_unregister_pmc(interpreter, ret_c);
-    dod_unregister_pmc(interpreter, old_c);
-#endif
 }
 
 /*
@@ -172,6 +147,9 @@ Save/restore all registers.
 PARROT_INLINE static regsave *
 save_regs(Parrot_Interp interpreter, PMC *sub)
 {
+#if INDIRECT_REGS
+    return NULL;
+#else
     regsave *save;
     size_t size = used_size(interpreter, sub);
     Regs_cache * rc = &interpreter->caches->regs_cache;
@@ -189,6 +167,7 @@ save_regs(Parrot_Interp interpreter, PMC *sub)
     save->size = size;
     Parrot_memcpy_aligned(&save->regs, interpreter, size);
     return save;
+#endif
 }
 
 void *
@@ -201,6 +180,9 @@ PARROT_INLINE static void
 restore_regs(Parrot_Interp interpreter, regsave *data)
 {
 
+#if INDIRECT_REGS
+    return;
+#else
     Regs_cache * rc = &interpreter->caches->regs_cache;
 
     Parrot_memcpy_aligned(interpreter, &data->regs, data->size);
@@ -208,6 +190,7 @@ restore_regs(Parrot_Interp interpreter, regsave *data)
     rc->reg_save_top = data;
     assert(rc->reg_save_mark == data);
     rc->reg_save_mark = data->next;
+#endif
 }
 
 void

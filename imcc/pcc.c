@@ -518,7 +518,9 @@ expand_pcc_sub_ret(Parrot_Interp interpreter, IMC_Unit * unit, Instruction *ins)
         regs[0] = get_pasm_reg("P0");
         regs[1] = unit->instructions->r[1]->pcc_sub->p0_sym;
         ins = insINS(interpreter, unit, ins, "set", regs, 2);
+#if !INDIRECT_REGS
         ins = insINS(interpreter, unit, ins, "savetop", regs, 0);
+#endif
     }
     /*
      * insert return invoke
@@ -542,10 +544,12 @@ expand_pcc_sub_ret(Parrot_Interp interpreter, IMC_Unit * unit, Instruction *ins)
      * mark the invoke instruction's PCC sub type
      */
     ins->type |= arg_count == 0 ? ITPCCYIELD : (ITPCCRET|ITPCCSUB);
+#if !INDIRECT_REGS
     if (arg_count == 0) {
         /* optimize this later */
         ins = insINS(interpreter, unit, ins, "restoretop", regs, 0);
     }
+#endif
 }
 
 #ifdef CREATE_TAIL_CALLS
@@ -972,8 +976,10 @@ move_cc:
         /*
          * emit a savetop for now
          */
+#if !INDIRECT_REGS
         if (!sub->pcc_sub->nci)
             ins = insINS(interp, unit, ins, "savetop", regs, 0);
+#endif
         /*
          * if we reuse the continuation, update it
          */
@@ -1006,8 +1012,10 @@ move_cc:
         if (sub->pcc_sub->label && ins->next->type == ITLABEL) {
             ins = ins->next;
         }
+#if !INDIRECT_REGS
         if (!sub->pcc_sub->nci)
             ins = insINS(interp, unit, ins, "restoretop", regs, 0);
+#endif
         if (p1) {
             regs[0] = get_pasm_reg("P1");
             regs[1] = p1;
@@ -1231,6 +1239,7 @@ pcc_sub_optimize(Parrot_Interp interpreter, IMC_Unit * unit)
                 ostat.deleted_ins++;
             }
         }
+#if !INDIRECT_REGS
         else if (ins->type & (ITPCCSUB | ITPCCYIELD) ) {
             tmp = ins;
             tmp = tmp->prev;
@@ -1242,6 +1251,7 @@ pcc_sub_optimize(Parrot_Interp interpreter, IMC_Unit * unit)
                     optc_savetop(interpreter, unit, tmp);
             }
         }
+#endif
     }
 }
 

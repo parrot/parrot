@@ -57,6 +57,14 @@ setup_register_stacks(Parrot_Interp interpreter, struct Parrot_Context *ctx)
 
     ctx->pmc_reg_stack = register_new_stack(interpreter,
             "PMCReg_", sizeof(struct PRegFrame));
+
+#if INDIRECT_REGS
+    ctx->reg_stack = register_new_stack(interpreter,
+            "Register_", sizeof(struct parrot_regs_t));
+
+    ctx->bp = (struct parrot_regs_t *)STACK_DATAP(ctx->reg_stack);
+#endif
+
 }
 
 
@@ -104,6 +112,32 @@ mark_pmc_register_stack(Parrot_Interp interpreter, Stack_Chunk_t* chunk)
         }
     }
 }
+
+#if INDIRECT_REGS
+void
+mark_reg_stack(Parrot_Interp interpreter, Stack_Chunk_t* chunk)
+{
+    UINTVAL j;
+    PObj *obj;
+
+    for ( ; ; chunk = chunk->prev) {
+        struct parrot_regs_t *regs = (struct parrot_regs_t *)STACK_DATAP(chunk);
+
+        pobject_lives(interpreter, (PObj*)chunk);
+        if (chunk == chunk->prev)
+            break;
+        for (j = 0; j < NUM_REGISTERS; j++) {
+            obj = (PObj*) regs->pmc_reg.registers[j];
+            if (obj)
+                pobject_lives(interpreter, obj);
+            obj = (PObj*) regs->string_reg.registers[j];
+            if (obj)
+                pobject_lives(interpreter, obj);
+        }
+    }
+}
+
+#endif
 
 /*
 

@@ -45,20 +45,24 @@ done
 OUTPUT
 
 output_is(<<'CODE', <<'OUTPUT', "Coroutines");
+    null I0
+    null I3
     new P0, .Coroutine
     set_addr P0, co2
 co1:
-    set I1, 4
+    set I10, 4
     print "start 1\n"
 co1_loop:
     invoke
     print "back  1\n"
-    dec I1
-    ne I1, 0, co1_loop
+    dec I10
+    ne I10, 0, co1_loop
     print "done\n"
     end
 
 co2:
+    null I0
+    null I3
     print "start 2\n"
     new P5, .Coroutine
     set_addr P5, co3
@@ -73,6 +77,8 @@ co2_loop:
     branch co2_loop
 
 co3:
+    null I0
+    null I3
     print "start 3\n"
     new P7, .Coroutine
     set_addr P7, co2_loop
@@ -152,13 +158,16 @@ output_is(<<'CODE', <<'OUTPUT', "Coroutines and lexicals 2");
     store_lex -1, "a", P20
     store_lex -2, "b", P21
 
-    new P1, .Coroutine
-    set_addr P1, co1
 
-    new P2, .Coroutine
-    set_addr P2, co2
+    new P5, .Coroutine
+    set_addr P5, co1
 
-    set P0, P1
+    new P6, .Coroutine
+    set_addr P6, co2
+
+    null I0
+    set I3, 2
+    set P0, P5
     invoke
 
     find_lex P10, "b"
@@ -194,11 +203,11 @@ co1:
     store_lex "a", P22      # replaces
 
     # invoke c02
-    set P0, P2
+    set P0, P6
     invoke
 
     # return
-    set P0, P1
+    set P0, P5
     invoke
 
     find_lex P10, "b"
@@ -210,7 +219,7 @@ co1:
     print "\n"
 
     # return again
-    set P0, P1
+    set P0, P5
     invoke
 
     find_lex P10, "b"
@@ -222,7 +231,7 @@ co1:
     print "\n"
 
     # return again
-    set P0, P1
+    set P0, P5
     invoke
 
 co2:

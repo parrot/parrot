@@ -217,6 +217,10 @@ Invokes the subroutine.
 
     void* invoke (void* next) {
         struct Parrot_sub * sub = PMC_sub(SELF);
+#if INDIRECT_REGS
+        struct parrot_regs_t *caller_regs;
+#endif
+
         if (++interpreter->ctx.recursion_depth >
                 interpreter->recursion_limit) {
             real_exception(interpreter, next, E_RuntimeError,
@@ -239,6 +243,19 @@ Invokes the subroutine.
         interpreter->ctx.current_sub = REG_PMC(0);
         interpreter->ctx.current_cont = REG_PMC(1);
         interpreter->ctx.current_object = REG_PMC(2);
+#if INDIRECT_REGS
+        caller_regs = interpreter->ctx.bp;
+        interpreter->ctx.bp = stack_prepare_push(interpreter,
+                &interpreter->ctx.reg_stack);
+        copy_regs(interpreter, caller_regs);
+        /*
+         * for now copy P0..P2, S0
+         */
+        REG_PMC(0) = caller_regs->pmc_reg.registers[0];
+        REG_PMC(1) = caller_regs->pmc_reg.registers[1];
+        REG_PMC(2) = caller_regs->pmc_reg.registers[2];
+        REG_STR(0) = caller_regs->string_reg.registers[0];
+#endif
         return sub->address;
     }
 

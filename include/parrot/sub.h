@@ -76,6 +76,11 @@ void restore_context(Interp *, struct Parrot_Context *);
 void mark_context(Interp *, struct Parrot_Context *);
 
 
+#if INDIRECT_REGS
+void copy_regs(Interp *, struct parrot_regs_t *caller_regs);
+void mark_reg_stack(Interp *, Stack_Chunk_t *);
+#endif
+
 #endif /* PARROT_SUB_H_GUARD */
 
 /*

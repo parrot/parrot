@@ -57,6 +57,11 @@ output_is(<<'CODE', <<'OUTPUT', "PASM subs - invokecc");
     set_addr P0, func
 
     set I5, 3
+    set I0, 1
+    set I1, 1
+    null I2
+    null I3
+    null I4
     save I5
 
     invokecc
@@ -92,6 +97,11 @@ output_is(<<'CODE', <<'OUTPUT', "PASM subs - invokecc_p");
     set_addr P0, func
 
     set I5, 3
+    set I0, 1
+    set I1, 1
+    null I2
+    null I3
+    null I4
     save I5
 
     invokecc P0

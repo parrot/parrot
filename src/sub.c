@@ -76,6 +76,9 @@ mark_context(Interp* interpreter, struct Parrot_Context* ctx)
     mark_register_stack(interpreter, ctx->num_reg_stack);
     mark_string_register_stack(interpreter, ctx->string_reg_stack);
     mark_pmc_register_stack(interpreter, ctx->pmc_reg_stack);
+#if INDIRECT_REGS
+    mark_reg_stack(interpreter, ctx->reg_stack);
+#endif
 }
 
 /*
@@ -86,8 +89,8 @@ prepend_stack( struct Stack_Chunk **interp_stack,
                 struct Stack_Chunk *saved_stack,
                 struct Stack_Chunk *saved_base)>
 
-The final C<ctx_stack> = C<interp_stack> + C<saved_stack>, which
-gets swapped with the C<interp_stack> during the prepend.
+The final C<ctx_stack> = C<interp_stack> + C<saved_stack>.
+C<interp_stack> and C<ctx_stack> are already swapped here.
 
 =cut
 
@@ -100,14 +103,10 @@ prepend_stack( struct Stack_Chunk **interp_stack,
                 struct Stack_Chunk *saved_base)
 {
     /*
-     * the coroutines context gets the interpreter stack
-     */
-    *ctx_stack = *interp_stack;
-    /*
      * new interpreter stack is the saved coroutine stack top
      * with the base pointing to the old top
      */
-    saved_base->prev = *interp_stack;
+    saved_base->prev = *ctx_stack;
 
     *interp_stack = saved_stack;
 }
@@ -120,9 +119,8 @@ restore_stack( struct Stack_Chunk **interp_stack,
                 struct Stack_Chunk **saved_stack,
                 struct Stack_Chunk *saved_base)>
 
-Swap C<**interp_stack> and C<**ctx_stack> and save the coroutine only
-parts of the stack in C<**saved_stack>, so effectively undoing
-C<prepend_stack()>.
+Undo C<prepend_stack()>.
+C<interp_stack> and C<ctx_stack> are already swapped here.
 
 =cut
 
@@ -134,23 +132,11 @@ restore_stack( struct Stack_Chunk **interp_stack,
                 struct Stack_Chunk **saved_stack,
                 struct Stack_Chunk *saved_base)
 {
-    /*
-     * swap stacks back
-     */
-    *saved_stack = *interp_stack;
-    *interp_stack = *ctx_stack;
+    *saved_stack = *ctx_stack;
     /*
      * the coroutine stack ends here
      */
     saved_base->prev = saved_base;
-}
-
-static void
-swap_pmcs(PMC *a, PMC *b)
-{
-    PMC *t = a;
-    a = b;
-    b = t;
 }
 
 /*
@@ -167,41 +153,19 @@ Swaps the context.
 void
 swap_context(Interp *interpreter, struct PMC *sub)
 {
-    struct Stack_Chunk * tmp_stack = NULL;
-    UINTVAL warns;
     struct Parrot_coro* co = PMC_coro(sub);
     struct Parrot_Context *ctx = &co->ctx;
-    Stack_Chunk_t *reg_top;
+    struct Parrot_Context temp;
+#if INDIRECT_REGS
+    struct parrot_regs_t *reg_p;
+#endif
 
     /*
-     * Swap user stacks and warnings
+     * Swap context structures
      */
-
-    tmp_stack = interpreter->ctx.user_stack;
-    interpreter->ctx.user_stack = ctx->user_stack;
-    ctx->user_stack = tmp_stack;
-
-    warns = interpreter->ctx.warns;
-    interpreter->ctx.warns = ctx->warns;
-    ctx->warns = warns;
-
-    warns = interpreter->ctx.errors;
-    interpreter->ctx.errors = ctx->errors;
-    ctx->errors = warns;
-
-    /* swap register frame tops */
-    reg_top = interpreter->ctx.int_reg_stack;
-    interpreter->ctx.int_reg_stack = ctx->int_reg_stack;
-    ctx->int_reg_stack = reg_top;
-    reg_top = interpreter->ctx.num_reg_stack;
-    interpreter->ctx.num_reg_stack = ctx->num_reg_stack;
-    ctx->num_reg_stack = reg_top;
-    reg_top = interpreter->ctx.string_reg_stack;
-    interpreter->ctx.string_reg_stack = ctx->string_reg_stack;
-    ctx->string_reg_stack = reg_top;
-    reg_top = interpreter->ctx.pmc_reg_stack;
-    interpreter->ctx.pmc_reg_stack = ctx->pmc_reg_stack;
-    ctx->pmc_reg_stack = reg_top;
+    memcpy(&temp, &interpreter->ctx, sizeof(temp));
+    memcpy(&interpreter->ctx, ctx,   sizeof(temp));
+    memcpy(ctx, &temp,               sizeof(temp));
 
     /* if calling the coroutine */
     if (!(PObj_get_FLAGS(sub) & PObj_private0_FLAG)) {
@@ -209,14 +173,15 @@ swap_context(Interp *interpreter, struct PMC *sub)
          * first time set current sub, cont, object
          */
         if (!interpreter->ctx.current_sub) {
+#if INDIRECT_REGS
+            copy_regs(interpreter, ctx->bp);
+            ctx->current_sub = interpreter->ctx.current_sub = sub;
+            interpreter->ctx.current_cont = ctx->bp->pmc_reg.registers[1];
+#else
             interpreter->ctx.current_sub = REG_PMC(0);
             interpreter->ctx.current_cont = REG_PMC(1);
             interpreter->ctx.current_object = REG_PMC(2);
-        }
-        else {
-            swap_pmcs(interpreter->ctx.current_sub, ctx->current_sub);
-            swap_pmcs(interpreter->ctx.current_cont, ctx->current_cont);
-            swap_pmcs(interpreter->ctx.current_object, ctx->current_object);
+#endif
         }
         /*
          * construct stacks that have the interpreterreter stack
@@ -230,17 +195,13 @@ swap_context(Interp *interpreter, struct PMC *sub)
         PObj_get_FLAGS(sub) &= ~PObj_private0_FLAG;
         restore_stack(&interpreter->ctx.control_stack, &ctx->control_stack,
                 &co->co_control_stack, co->co_control_base);
-        swap_pmcs(interpreter->ctx.current_sub, ctx->current_sub);
-        swap_pmcs(interpreter->ctx.current_cont, ctx->current_cont);
-        swap_pmcs(interpreter->ctx.current_object, ctx->current_object);
+#if INDIRECT_REGS
+        copy_regs(interpreter, ctx->bp);
+#endif
     }
-    /*
-     * TODO FIXME swap the pad_stack or act like the control_stack
-     */
-#if 1
-    tmp_stack = interpreter->ctx.pad_stack;
-    interpreter->ctx.pad_stack = ctx->pad_stack;
-    ctx->pad_stack = tmp_stack;
+#if INDIRECT_REGS
+    REG_PMC(0) = interpreter->ctx.current_sub;
+    REG_PMC(1) = interpreter->ctx.current_cont;
 #endif
 }
 
@@ -354,6 +315,7 @@ new_coroutine(Interp *interp)
     co->seg = interp->code->cur_cs;
     ctx = &co->ctx;
     save_context(interp, ctx);
+    ctx->current_sub = NULL;
 
     /* we have separate register stacks
      * - or not, with our single item stack
@@ -400,6 +362,44 @@ new_ret_continuation_pmc(Interp * interpreter, opcode_t * address)
     return continuation;
 }
 
+
+#if INDIRECT_REGS
+/*
+
+=item C<void copy_regs(Interp *, struct parrot_regs_t *caller_regs)>
+
+Copy function arguments or return values from C<caller_regs> to interpreter.
+
+=cut
+
+*/
+
+void
+copy_regs(Interp *interpreter, struct parrot_regs_t *caller_regs)
+{
+    int i, n, proto;
+
+    proto = caller_regs->int_reg.registers[0];
+    if (proto) {
+        for (i = 0; i < 5 + caller_regs->int_reg.registers[1]; ++i)
+            REG_INT(i) = caller_regs->int_reg.registers[i];
+        for (i = 0; i < caller_regs->int_reg.registers[2]; ++i)
+            REG_STR(i + 5) = caller_regs->string_reg.registers[i + 5];
+        for (i = 0; i < caller_regs->int_reg.registers[3]; ++i)
+            REG_PMC(i + 5) = caller_regs->pmc_reg.registers[i + 5];
+        for (i = 0; i < caller_regs->int_reg.registers[4]; ++i)
+            REG_NUM(i + 5) = caller_regs->num_reg.registers[i + 5];
+    }
+    else {
+        REG_INT(0) = 0;
+        REG_INT(3) = n = caller_regs->int_reg.registers[3];
+        for (i = 0; i < n; ++i)
+            REG_PMC(i + 5) = caller_regs->pmc_reg.registers[i + 5];
+    }
+    REG_PMC(3) = caller_regs->pmc_reg.registers[3];
+}
+
+#endif
 
 /*
 

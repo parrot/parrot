@@ -241,6 +241,11 @@ output_is(<<'CODE', <<OUTPUT, "failing if regsave is not marked");
     setprop P12, "buf", P14
     setprop P2, "buffer", P12
 buffer_ok:
+    set I0, 1
+    null I1
+    set I2, 1
+    null I3
+    null I4
     set S5, P12
     invoke P1
 
@@ -250,6 +255,11 @@ buffer_ok:
     getprop P12, "buf", P2
     set S16, P12
     set S5, S16
+    set I0, 1
+    null I1
+    set I2, 1
+    null I3
+    null I4
     invoke P1
 CODE
 hello
