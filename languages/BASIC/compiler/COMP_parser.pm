@@ -140,7 +140,7 @@ PARSE_NOFEED:
 		while | wend | dim | type | exit | function | for | next |
 		do | loop | goto | gosub | return  | sub | call | select | case |
 		read | restore | input | open | close | on | randomize | stop | swap |
-		shared | cls | locate | color
+		common | cls | locate | color
 		)$/x) {
 		no strict 'refs';
 		&{"parse_" . $1}();

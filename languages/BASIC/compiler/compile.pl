@@ -7,7 +7,7 @@
 use strict;
 use Getopt::Std;
 use vars qw( @tokens @tokdsc);
-use vars qw(%code %options @basic);
+use vars qw(%code %options @basic %common);
 use vars qw( @syms @type );
 use vars qw( %labels $runtime_jump $debug  $sourceline);
 use COMP_toker;
@@ -46,18 +46,46 @@ parse(@ARGV);
 open(CODE, ">TARG_test.imc") || die;
 
 print CODE qq{.include "RT_initialize.pasm"\n};
+#
+# Take care of the COMMON declarations
+#
+if (keys %common) {
+	my %code_copy=%code;
+	print CODE "# Declarations of common variables\n";
+	foreach my $seg ("_main", "_basicmain", keys %code) {
+		next unless exists $code{$seg};
+		if (exists $code{$seg}->{declarations}) {
+			foreach my $var (sort keys %{$code{$seg}->{declarations}}) {
+				next unless $code{$seg}->{declarations}->{$var} eq "COMMON";
+				if ($var=~/_string$/) {
+					print CODE ".local string $var\n";
+				} else {
+					print CODE ".local float $var\n";
+				}
+				delete $code{$seg}->{declarations}->{$var};
+			}
+		}
+		delete $code{$seg};
+	}
+	%code=%code_copy;
+}
+
+
 foreach my $seg ("_main", "_basicmain", keys %code) {
 	next unless exists $code{$seg};
 	my @debdecl=();
+	my @init=();
 
 	print CODE ".sub $seg\n";
 	if (exists $code{$seg}->{declarations}) {
 		foreach my $var (sort keys %{$code{$seg}->{declarations}}) {
 			if ($var=~/_string$/) {
 				print CODE "\t.local string $var\n";
+				push @init, qq{\t\tset $var, ""\n};
 				push @debdecl, "\t\tset \$P1[\"$var\"], $var\n";
 			} else {
 				print CODE "\t.local float $var\n";
+				push @init, qq{\t\tset $var, 0.0\n};
 				push @debdecl, "\t\tset \$S0, $var\n\t\tset \$P1[\"$var\"], \$S0\n";
 			}
 
@@ -65,7 +93,7 @@ foreach my $seg ("_main", "_basicmain", keys %code) {
 	}
 	print CODE<<INIT;
 	.sub ${seg}_run			# Always jump here.
-		call ${seg}_main
+@init		call ${seg}_main
 		ret
 	.end
 INIT

@@ -32,6 +32,22 @@ while(1) {
 }
 
 __DATA__
+' Expect 5, 0, "Hello"
+common i, a$
+sub mysub
+	print "In the sub\n"
+	print i
+	print j
+	print a$
+	print c$
+end sub
+j=2
+i=5
+a$="Hello"
+c$="WRONG"
+call mysub()
+
+STOPPLEASE
 ' Passing string arrays, expect 99 and "Hello"
 function foo(i, thing$())
 	print i

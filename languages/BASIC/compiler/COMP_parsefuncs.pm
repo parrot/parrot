@@ -7,7 +7,7 @@ use vars qw( %usertypes );
 use vars qw( %arrays );
 use vars qw( $funcname $subname );
 use vars qw( %labels $branchseq @selects);
-use vars qw( @data $sourceline );
+use vars qw( @data $sourceline %common );
 use vars qw( %code $debug $runtime_jump);
 
 
@@ -17,6 +17,29 @@ my @dos=();
 @selects=();
 my $scopes=0;
 my @data=();
+sub parse_common {
+	feedme();
+	while($type[CURR] !~ /COMP|COMM|STMT/) {
+		$var=$syms[CURR];
+		feedme();
+		next if $var eq ",";
+		my $array=0;
+		if ($syms[CURR] eq "(") {
+			$array=1;
+			while($syms[CURR] ne ")") {
+				feedme;
+			}
+			feedme;
+		}
+		$var=~s/\$$/_string/;
+		push @{$code{$seg}->{code}}, "\t# $var was declared COMMON\n"; 
+		if (! $array) {
+			$main::code{$main::seg}->{declarations}->{$var}="COMMON";
+			$common{$var}=1;
+		}
+
+	}
+}
 
 sub parse_shared {		# Keyword only
 	feedme();

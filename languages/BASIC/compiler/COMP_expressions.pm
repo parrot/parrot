@@ -455,8 +455,8 @@ sub pushthing {
 				} else {
 					$$optype="N";
 				}
-				#print "Registering $sym\n";
-				$main::code{$main::seg}->{declarations}->{$sym}=1;
+				$main::code{$main::seg}->{declarations}->{$sym}=1
+					unless $main::code{$main::seg}->{declarations}->{$sym} or $main::common{$sym};
 			}
 			return $sym;
 		} elsif ($type eq "STARTARG") {
