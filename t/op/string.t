@@ -1,6 +1,6 @@
 #! perl -w
 
-use Parrot::Test tests => 24;
+use Parrot::Test tests => 43;
 
 output_is( <<'CODE', <<OUTPUT, "set_s_sc" );
 	set	S4, "JAPH\n"
@@ -127,6 +127,29 @@ A string of length 21
 length 21
 OUTPUT
 
+output_is( <<'CODE', '', "2-param concat, null onto null" );
+    concat S0,S0
+    end
+CODE
+
+output_is( <<'CODE', <<OUTPUT, '2-param concat, "foo1" onto null' );
+    concat S0,"foo1"
+    print S0
+    print "\n"
+    end
+CODE
+foo1
+OUTPUT
+
+output_is( <<'CODE', <<OUTPUT, '2-param concat, "foo2" onto null' );
+    set S1,"foo2"
+    concat S0,S1
+    print S0
+    print "\n"
+    end
+CODE
+foo2
+OUTPUT
 
 output_is( <<'CODE', <<OUTPUT, "concat" );
     set S1, "fish"
@@ -139,6 +162,7 @@ output_is( <<'CODE', <<OUTPUT, "concat" );
 CODE
 fishbone
 OUTPUT
+
 
 output_is(<<"CODE", <<'OUTPUT', "clears");
 @{[ set_str_regs( sub {"BOO $_[0]\\n"} ) ]}
@@ -309,7 +333,107 @@ CODE
 foo
 OUTPUT
 
+output_is(<<'CODE','Cannot get character of empty string','2-param ord, empty string');
+	ord I0,""
+	print I0
+	end
+CODE
 
+output_is(<<'CODE','Cannot get character of empty string','2-param ord, empty string register');
+	ord I0,S0
+	print I0
+	end
+CODE
+
+output_is(<<'CODE','Cannot get character of empty string','3-param ord, empty string');
+	ord I0,"",0
+	print I0
+	end
+CODE
+
+output_is(<<'CODE','Cannot get character of empty string','3-param ord, empty string register');
+	ord I0,S0,0
+	print I0
+	end
+CODE
+
+output_is(<<'CODE',ord('a'),'2-param ord, one-character string');
+	ord I0,"a"
+	print I0
+	end
+CODE
+
+output_is(<<'CODE',ord('a'),'2-param ord, one-character string register');
+	set S0,"a"
+	ord I0,S0
+	print I0
+	end
+CODE
+
+output_is(<<'CODE',ord('a'),'3-param ord, one-character string');
+	ord I0,"a",0
+	print I0
+	end
+CODE
+
+output_is(<<'CODE',ord('a'),'3-param ord, one-character string register');
+	set S0,"a"
+	ord I0,S0,0
+	print I0
+	end
+CODE
+
+output_is(<<'CODE',ord('b'),'3-param ord, multi-character string');
+	ord I0,"ab",1
+	print I0
+	end
+CODE
+
+output_is(<<'CODE',ord('b'),'3-param ord, multi-character string register');
+	set S0,"ab"
+	ord I0,S0,1
+	print I0
+	end
+CODE
+
+output_is(<<'CODE', 'Cannot get character past end of string','3-param ord, multi-character string');
+	ord I0,"ab",2
+	print I0
+	end
+CODE
+
+output_is(<<'CODE', 'Cannot get character past end of string','3-param ord, multi-character string');
+	set S0,"ab"
+	ord I0,S0,2
+	print I0
+	end
+CODE
+
+output_is(<<'CODE',ord('a'),'3-param ord, one-character string, from end');
+	ord I0,"a",-1
+	print I0
+	end
+CODE
+
+output_is(<<'CODE',ord('a'),'3-param ord, one-character string register, from end');
+	set S0,"a"
+	ord I0,S0,-1
+	print I0
+	end
+CODE
+
+output_is(<<'CODE',ord('b'),'3-param ord, multi-character string, from end');
+	ord I0,"ab",-1
+	print I0
+	end
+CODE
+
+output_is(<<'CODE',ord('b'),'3-param ord, multi-character string register, from end');
+	set S0,"ab"
+	ord I0,S0,-1
+	print I0
+	end
+CODE
 
 # Set all string registers to values given by &$_[0](reg num)
 sub set_str_regs {

@@ -89,6 +89,19 @@ The result will be placed in C<dest>.
 C<*dest> is a null pointer, a new string structure is created with the
 same encoding as C<src>.)
 
+To retrieve a single character of the string, call
+
+    INTVAL string_ord(STRING* s, INTVAL n)
+
+The result will be returned from the function. It checks for the existence of
+C<s>, and tests for C<n> being out of range. Currently it applies the method
+that perl uses on arrays to handle negative indices. That is to say, negative
+values count backwards from the end of the string. For example, index -1 is
+the last character in the string, -2 is the next-to-last, and so on.
+
+If C<s> is null or C<s> is zero-length, it throws an exception. If C<n> is out
+of range, it also throws an exception.
+
 To compare two strings, use:
 
     INTVAL string_compare(STRING* s1, STRING* s2)

@@ -45,6 +45,8 @@ string_compare(struct Parrot_Interp *, STRING*, STRING*);
 /* Declarations of other functions */
 INTVAL
 string_length(STRING*);
+INTVAL
+string_ord(STRING* s, INTVAL index);
 void
 string_grow(STRING* s, INTVAL newsize);
 void
