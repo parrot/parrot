@@ -145,6 +145,7 @@ The most common issues are:
 
 =item *
 License compatibility.
+
 Parrot has an odd license -- it currently uses the same license as
 Perl 5, which is the disjunction of the GNU GPL and the Artistic
 License, which can be written (Artistic|GPL) for short.  Thus,
