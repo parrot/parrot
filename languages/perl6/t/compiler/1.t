@@ -1,6 +1,6 @@
 #!perl
 use strict;
-use P6C::TestCompiler tests => 11;
+use P6C::TestCompiler tests => 12;
 
 ##############################
 output_is(<<'CODE', <<'OUT', "Basic hello.");
@@ -33,11 +33,35 @@ CODE
 OUT
 
 ##############################
-output_is(<<'CODE', <<'OUT', "Binary bit ops");
+output_is(<<'CODE', <<'OUT', "Prae & post incr 1");
+sub main() {
+    my $x = 2;
+    print1 "ok 1" if ($x++ == 2);
+    print1 "ok 2" if ($x == 3);
+    print1 "ok 3" if (--$x == 2);
+    my $y = $x++;
+    print1 "ok 4" if ($x == 3 && $y == 2);
+    print1 ("ok "_ ($x++ + $y++));
+    print1 "ok 6" if ($x == 4 && $y == 3);
+}
+CODE
+ok 1
+ok 2
+ok 3
+ok 4
+ok 5
+ok 6
+OUT
+
+##############################
+output_is(<<'CODE', <<'OUT', "Prae & post incr 2");
 sub main() {
     my $x = 2;
     my $y = $x;
     my @z = ($x, $y);
+    # actually above statement makes next fail -lt
+    print1 (++$x _ ' ' _ $y);
+    $x--;
     print ++$x _ ' ' _ $y _ "\n";
     print $x++ _ ' ' _ $y _ "\n";
     print $x _ ' ' _ $y++ _ "\n";
@@ -47,6 +71,7 @@ sub main() {
     print @z[0] _ ' ' _ @z[1] _ "\n";
 }
 CODE
+3 2
 3 2
 3 2
 4 2

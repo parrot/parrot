@@ -36,12 +36,17 @@ sub main() {
     print1(@b[0] _ ', ' _ @b[1]);
     print1(@a[0] _ ', ' _ @a[2]);
     print1(@a[1] _ ', ' _ @a[3]);
+    my @c = @a;
+    @a[2] = 5;
+    @c[0] = 6;
+    print @a, @c, "\n"
 }
 
 CODE
 1, 3
 1, 3
 2, 4
+12546234
 OUT
 
 ##############################
@@ -71,10 +76,17 @@ sub main() {
     %x{$x} = 'twenty-three';
     my @x = %x{'b', 'a', $x};
     print1(@x[0] _@x[1] _@x[2]);
+    my %y = %x;
+    %y{a} = 'ay!';
+    %x{b} = 'be?';
+    print %x{'b', 'a', $x}, "\n";
+    print %y{'b', 'a', $x}, "\n";
 }
 
 CODE
 be!ay?twenty-three
+be?ay?twenty-three
+be!ay!twenty-three
 OUT
 
 ##############################
