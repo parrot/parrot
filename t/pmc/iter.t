@@ -16,7 +16,7 @@ Tests the C<Iterator> PMC.
 
 =cut
 
-use Parrot::Test tests => 23;
+use Parrot::Test tests => 26;
 use Test::More qw(skip);
 
 output_is(<<'CODE', <<'OUTPUT', "new iter");
@@ -805,4 +805,81 @@ iter_end:
 CODE
 parrtocks
 parrot rocks
+OUTPUT
+
+output_is(<<'CODE', <<OUTPUT, "slice iter string variable range");
+    .include "iterator.pasm"
+	new P2, .PerlString
+	set P2, "parrot rocks"
+	set I0, 1
+	set I1, 3
+	set I2, 8
+	set I3, 9
+	slice P1, P2[I0 ..I1 ,5, I2 ..I3]
+	set P1, .ITERATE_FROM_START
+iter_loop:
+        unless P1, iter_end
+	shift S1, P1
+	print S1
+	branch iter_loop
+iter_end:
+	print "\n"
+	print P2
+	print "\n"
+	end
+CODE
+arrtoc
+parrot rocks
+OUTPUT
+
+output_is(<<'CODE', <<OUTPUT, "slice iter hash values");
+    .include "iterator.pasm"
+	new P2, .PerlHash
+	set P2["a"], 100
+	set P2["b"], 200
+	set P2["c"], 300
+	set P2["d"], 400
+	slice P1, P2["b", "c"]
+	set P1, .ITERATE_FROM_START
+iter_loop:
+        unless P1, iter_end
+	shift S1, P1
+	print S1
+	print "\n"
+	branch iter_loop
+iter_end:
+	print "ok\n"
+	end
+CODE
+200
+300
+ok
+OUTPUT
+
+output_is(<<'CODE', <<OUTPUT, "slice iter hash values 2");
+    .include "iterator.pasm"
+	new P2, .PerlHash
+	set P2["a"], 100
+	set P2["b"], 200
+	set P2["c"], 300
+	set P2["d"], 400
+	set P2["e"], 500
+	slice P1, P2["b", "c", "a", "a", "e"]
+	set P1, .ITERATE_FROM_START
+iter_loop:
+        unless P1, iter_end
+	shift S1, P1
+	print S1
+	print "\n"
+	branch iter_loop
+iter_end:
+	print "ok\n"
+	end
+CODE
+200
+300
+100
+100
+500
+ok
 OUTPUT

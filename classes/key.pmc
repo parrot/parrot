@@ -20,6 +20,17 @@ These are the vtable functions for the Key PMC class.
 
 #include "parrot/parrot.h"
 
+static int
+is_hash_iter(PMC *agg)
+{
+    if (agg->vtable->base_type == enum_class_PerlHash)
+        return 1;
+    if (agg->vtable->base_type == enum_class_OrderedHash &&
+            (PObj_get_FLAGS(agg) & PObj_private0_FLAG))
+        return 1;
+    return 0;
+}
+
 pmclass Key need_ext {
 
 /*
@@ -276,15 +287,21 @@ Returns the next key relative to the location specified in C<what>.
         PObj_get_FLAGS(ret) |= KEY_integer_FLAG;
         switch (what) {
             case ITERATE_FROM_START:    /* reset key */
+            case ITERATE_FROM_START_KEYS:
                 PMC_int_val(ret) = 0;
                 if (!n)
                     PMC_int_val(ret) = -1;
+                if (is_hash_iter(agg))
+                    PMC_data(ret) = (void *)INITBucketIndex;
                 break;
             case ITERATE_GET_NEXT:
-                if (PMC_int_val(ret) < n - 1)
-                    ++PMC_int_val(ret);
-                else
-                    PMC_int_val(ret) = -1;
+                /* src/hash.c:hash_get_idx() advances to next */
+                if (!is_hash_iter(agg)) {
+                    if (PMC_int_val(ret) < n - 1)
+                        ++PMC_int_val(ret);
+                    else
+                        PMC_int_val(ret) = -1;
+                }
                 break;
             case ITERATE_GET_PREV:
                 if (PMC_int_val(ret) >= 0)

@@ -39,8 +39,7 @@ set_slice_start(Interp *interpreter, PMC *self)
         }
     }
     else {
-        /* TODO string */
-
+        PMC_struct_val(self) = key_string(interpreter, range);
     }
 }
 
@@ -108,6 +107,21 @@ next_range:
         else
             PMC_struct_val(self) = (void *)key_integer(interpreter, range);
     }
+    else {
+        if ((PObj_get_FLAGS(range) &
+                    (KEY_start_slice_FLAG|KEY_end_slice_FLAG)) ==
+                (KEY_start_slice_FLAG|KEY_end_slice_FLAG)) {
+
+            range = PMC_pmc_val(self) = PMC_data(range);
+            if (!PMC_pmc_val(self))
+                PMC_int_val(self) = -1;
+            else
+                PMC_struct_val(self) = key_string(interpreter, range);
+        }
+        else {
+            internal_exception(1, "slices ranges for hash not implemented");
+        }
+    }
 }
 
 pmclass Slice need_ext extends Key {
@@ -118,11 +132,15 @@ pmclass Slice need_ext extends Key {
         return v;
     }
 
+    STRING* get_string() {
+        STRING *s  = (STRING *)PMC_struct_val(SELF);
+        return s;
+    }
+
     PMC* nextkey_keyed (PMC* agg, INTVAL what) {
         PMC *ret = SELF;
         PMC *current_key;
 
-        /* printf("Slice_next what = %d\n", (int)what) */;
         switch (what) {
             case ITERATE_FROM_START:
             case ITERATE_FROM_START_KEYS:    /* reset key */

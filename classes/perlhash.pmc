@@ -815,6 +815,10 @@ Deletes the element associated with C<*key>.
 
 /*
 
+=item C<PMC* slice (PMC *key)>
+
+Return a new iterator for the slice PMC C<key>
+
 =item C<PMC *nextkey_keyed(PMC *key, INTVAL what)>
 
 Returns the next key relative to the location specified in C<what>.
@@ -823,28 +827,24 @@ Returns the next key relative to the location specified in C<what>.
 
 */
 
-    PMC* nextkey_keyed (PMC* key, INTVAL what) {
-        PMC *ret = key;
+    PMC* slice (PMC* key) {
+	PMC *iter = pmc_new_init(interpreter, enum_class_Iterator, SELF);
+        PMC_struct_val(iter) = key;
+        return iter;
+    }
 
-        INTVAL n = SELF.elements();
-        PObj_get_FLAGS(ret) &= ~KEY_type_FLAGS;
-        PObj_get_FLAGS(ret) |= KEY_integer_FLAG;
+    PMC* nextkey_keyed (PMC* key, INTVAL what) {
+
         switch (what) {
             case ITERATE_FROM_START:    /* reset key */
             case ITERATE_FROM_START_KEYS:
-                PMC_int_val(ret) = 0;
-                if (!n)
-                    PMC_int_val(ret) = -1;
-                PMC_data(ret) = (void *)INITBucketIndex;
-                break;
             case ITERATE_GET_NEXT:
-                /* do nothing: hash_get_idx does increment the idx */
-                break;
+                return VTABLE_nextkey_keyed(interpreter, key, SELF, what);
             default:
                 internal_exception(1, "Can't iterate from end\n");
                 break;
         }
-        return ret;
+        return key;
     }
 
 /*
