@@ -1063,7 +1063,7 @@ Generate the C code for a C<return> statement.
 sub gen_ret
 {
     my ($self, $type) = @_;
-    return "ret_val = *($1*) " if ($type =~ /((?:INT|FLOAT)VAL)/);
+    #return "ret_val = *($1*) " if ($type =~ /((?:INT|FLOAT)VAL)/);
     return "ret_val = ($type) ";
 }
 
@@ -1096,11 +1096,16 @@ sub body
     my $ret = '';
     my $ret_def = '';
     my $func_ret = '(void) ';
+    my $ret_type = '';
     if ($method->{type} ne 'void') {
         my $type = $method->{type};
         $ret_def = "$type ret_val;";
         $func_ret = $self->gen_ret($method->{type});
         $ret = "return ret_val;";
+        if ($type !~ /\*/) {
+            $ret_type = "_ret" . lc substr $type, 0, 1;
+            $ret_type = "_reti" if $ret_type eq '_retu';
+        }
     }
     my $umeth = uc $meth;
     my $delegate_meth = "PARROT_VTABLE_${umeth}_METHNAME";
@@ -1115,7 +1120,7 @@ ${decl} {
     $ret_def
     STRING *meth = const_string(interpreter, $delegate_meth);
     PMC *sub = find_or_die(interpreter, pmc, meth);
-    ${func_ret}Parrot_run_meth_fromc_args_save(interpreter, sub,
+    ${func_ret}Parrot_run_meth_fromc_args_save$ret_type(interpreter, sub,
         pmc, meth, "$sig"$arg);
     $ret
 }

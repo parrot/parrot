@@ -1078,7 +1078,15 @@ Parrot_runops_fromc_args_save(Parrot_Interp interpreter, PMC *sub,
         const char *sig, ...)>
 
 =item C<void *
-Parrot_runmeth_fromc_args_save(Parrot_Interp interpreter, PMC *sub,
+Parrot_run_meth_fromc_args_save(Parrot_Interp interpreter, PMC *sub,
+        PMC* obj, STRING* meth, const char *sig, ...)>
+
+=item C<INTVAL
+Parrot_run_meth_fromc_args_save_reti(Parrot_Interp interpreter, PMC *sub,
+        PMC* obj, STRING* meth, const char *sig, ...)>
+
+=item C<FLOATVAL
+Parrot_run_meth_fromc_args_save_retf(Parrot_Interp interpreter, PMC *sub,
         PMC* obj, STRING* meth, const char *sig, ...)>
 
 Run parrot ops, called from C code, function arguments are passed as
@@ -1093,20 +1101,19 @@ Signatures are similar to NCI:
     S ... STRING*
     P ... PMC*
 
-Return value, if any is passed as C<(void *)ptr> or C<(void *)&val>.
-
 =cut
 
 */
 
-static void *
+static void* set_retval(Parrot_Interp interpreter, int seg_ret);
+
+static void
 runops_args(Parrot_Interp interpreter, PMC *sub, const char* sig, va_list ap)
 {
     /* *sig is retval like in NCI */
     int ret;
     int next[4];
     int i;
-    void *retval;
 
     for (i = 0; i < 4; i++)
         next[i] = 5;
@@ -1147,25 +1154,33 @@ runops_args(Parrot_Interp interpreter, PMC *sub, const char* sig, va_list ap)
     }
 
     Parrot_runops_fromc(interpreter, sub);
-    /*
-     * TODO check, if return is prototyped, for now, assume yes
-     */
+}
+
+static void*
+set_retval(Parrot_Interp interpreter, int sig_ret)
+{
+    void *retval;
     retval = NULL;
     /*
      * XXX should we trust the signature or the registers set
      *     by the subroutine or both if possible, i.e. extract
      *     e.g. an INTVAL from a returned PMC?
      */
-    switch (ret) {
+    REG_INT(0) = 1;     /* prototyped */
+    REG_INT(1) = 0;     /* I */
+    REG_INT(2) = 0;     /* S */
+    REG_INT(3) = 0;     /* P */
+    REG_INT(4) = 0;     /* N */
+    switch (sig_ret) {
         case 'v': break;
-        case 'I': retval = (void* )&REG_INT(5); break;
-        case 'S': retval = (void* ) REG_STR(5); break;
-        case 'P': retval = (void* ) REG_PMC(5); break;
-        case 'N': retval = (void* )&REG_NUM(5); break;
+        case 'I': retval = (void* )&REG_INT(5); REG_INT(1) = 1; break;
+        case 'S': retval = (void* ) REG_STR(5); REG_INT(2) = 1; break;
+        case 'P': retval = (void* ) REG_PMC(5); REG_INT(3) = 1; break;
+        case 'N': retval = (void* )&REG_NUM(5); REG_INT(4) = 1; break;
         default:
             internal_exception(1,
                     "unhandle signature '%c' in Parrot_runops_fromc_args",
-                    ret);
+                    sig_ret);
     }
     return retval;
 }
@@ -1178,11 +1193,14 @@ Parrot_runops_fromc_args(Parrot_Interp interpreter, PMC *sub,
     void *ret;
 
     va_start(args, sig);
-    ret = runops_args(interpreter, sub, sig, args);
+    runops_args(interpreter, sub, sig, args);
     va_end(args);
-    return ret;
+    return set_retval(interpreter, *sig);
 }
 
+/*
+ * generic return pointer or void
+ */
 void *
 Parrot_runops_fromc_args_save(Parrot_Interp interpreter, PMC *sub,
         const char *sig, ...)
@@ -1194,13 +1212,9 @@ Parrot_runops_fromc_args_save(Parrot_Interp interpreter, PMC *sub,
     FLOATVAL rf;
 
     va_start(args, sig);
-    ret = runops_args(interpreter, sub, sig, args);
+    runops_args(interpreter, sub, sig, args);
     va_end(args);
-    /* we have to get retvals around restore_regs */
-    switch (*sig) {
-        case 'I': ri = *(INTVAL*) ret; ret = &ri; break;
-        case 'N': rf = *(FLOATVAL*) ret; ret = &rf; break;
-    }
+    ret = set_retval(interpreter, *sig);
     restore_regs(interpreter, data);
     return ret;
 }
@@ -1218,16 +1232,53 @@ Parrot_run_meth_fromc_args_save(Parrot_Interp interpreter,
     REG_PMC(2) = obj;
     REG_STR(0) = meth;
     va_start(args, sig);
-    ret = runops_args(interpreter, sub, sig, args);
+    runops_args(interpreter, sub, sig, args);
     va_end(args);
-    /* we have to get retvals around restore_regs */
-    switch (*sig) {
-        case 'I': ri = *(INTVAL*) ret; ret = &ri; break;
-        case 'N': rf = *(FLOATVAL*) ret; ret = &rf; break;
-    }
+    ret = set_retval(interpreter, *sig);
     restore_regs(interpreter, data);
     return ret;
 }
+
+INTVAL
+Parrot_run_meth_fromc_args_save_reti(Parrot_Interp interpreter,
+        PMC *sub, PMC *obj, STRING *meth, const char *sig, ...)
+{
+    regsave *data = save_regs(interpreter);
+    va_list args;
+    void *ret;
+    INTVAL ri;
+
+    REG_PMC(2) = obj;
+    REG_STR(0) = meth;
+    va_start(args, sig);
+    runops_args(interpreter, sub, sig, args);
+    va_end(args);
+    ret = set_retval(interpreter, *sig);
+    ri = *(INTVAL*) ret;
+    restore_regs(interpreter, data);
+    return ri;
+}
+
+FLOATVAL
+Parrot_run_meth_fromc_args_save_retf(Parrot_Interp interpreter,
+        PMC *sub, PMC *obj, STRING *meth, const char *sig, ...)
+{
+    regsave *data = save_regs(interpreter);
+    va_list args;
+    void *ret;
+    FLOATVAL rf;
+
+    REG_PMC(2) = obj;
+    REG_STR(0) = meth;
+    va_start(args, sig);
+    runops_args(interpreter, sub, sig, args);
+    va_end(args);
+    ret = set_retval(interpreter, *sig);
+    rf = *(FLOATVAL*) ret;
+    restore_regs(interpreter, data);
+    return rf;
+}
+
 /*
 
 =item C<PMC* Parrot_make_cb(Parrot_Interp interpreter, PMC* sub, PMC* user

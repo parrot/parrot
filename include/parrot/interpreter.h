@@ -347,6 +347,10 @@ void Parrot_run_meth_fromc_save(Parrot_Interp, PMC *sub,
         PMC* obj, STRING *meth);
 void* Parrot_run_meth_fromc_args_save(Parrot_Interp, PMC *sub,
         PMC* obj, STRING *meth, const char *signature, ...);
+INTVAL Parrot_run_meth_fromc_args_save_reti(Parrot_Interp, PMC *sub,
+        PMC* obj, STRING *meth, const char *signature, ...);
+FLOATVAL Parrot_run_meth_fromc_args_save_retf(Parrot_Interp, PMC *sub,
+        PMC* obj, STRING *meth, const char *signature, ...);
 
 void Parrot_callback_C(void *external_data, PMC *callback_info);
 void Parrot_callback_D(PMC *callback_info, void *external_data);
