@@ -3,27 +3,19 @@ providing the Foo pmc class.
 
 1) edit/create your foo.pmc source (s. also classes/genclass.pl)
 
-2) edit Makefile (or much better provide a script that generates
-   a platform independent Makefile ;-)
+2) edit Makefile and append your pmc
 
+$ export LD_LIBRARY_PATH=.:blib/lib
 $ make -s
 $ make shared
 $ make -C dynclasses
 
-3) copy/link your extension to the runtime dir
-
-$ cd runtime/parrot/dynext/
-$ ln -s ../../../dynclasses/foo_pmc.so
-$ cd -
-
 $ ./parrot dynclasses/dynfoo.pasm
 ok 1
-34
+41
 ok 2
 42
 
 4) If anything changes inside parrot don't forget:
 
 $ make -C dynclasses clean
-
-and repeat above steps.

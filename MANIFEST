@@ -218,7 +218,6 @@ docs/tests.pod                                    [main]doc
 docs/vtables.pod                                  [main]doc
 dod.c                                             []
 dotgnu.ops                                        []
-dynclasses/Makefile                               [devel]
 dynclasses/README                                 [devel]
 dynclasses/dynfoo.pasm                            [devel]
 dynclasses/ext.imc                                [devel]

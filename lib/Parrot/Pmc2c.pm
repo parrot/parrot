@@ -251,7 +251,7 @@ sub lib_load_code() {
     my $lc_classname = lc $classname;
     # TODO multiple (e.g. Const subclasses
     my $call_class_init =
-        "Parrot_${classname}_class_init(interpreter,  entry);\n";
+        "Parrot_${classname}_class_init(interpreter, type);\n";
     $cout = <<"EOC";
 /*
 * This load function will be called to do global (once) setup
