@@ -76,10 +76,6 @@ typedef struct Parrot_Context {
     struct SRegChunk *string_reg_top; /* Current top chunk of the string
                                        * stack */
     struct PRegChunk *pmc_reg_top;    /* Current top chunk of the PMC stack */
-    struct IRegChunk *int_reg_base;     /* base of the int reg stack */
-    struct NRegChunk *num_reg_base;     /* Base of the float reg stack */
-    struct SRegChunk *string_reg_base;  /* Base of the string stack */
-    struct PRegChunk *pmc_reg_base;     /* Base of the PMC stack */
 
     struct Stack_Chunk *pad_stack;      /* Base of the lex pad stack */
     struct Stack_Chunk *user_stack;     /* Base of the scratch stack */

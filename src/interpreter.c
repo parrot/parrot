@@ -517,31 +517,27 @@ make_interpreter(Interp_flags flags)
     PARROT_WARNINGS_off(interpreter, PARROT_WARNINGS_ALL_FLAG);
 
     /* Set up the initial register chunks */
-    interpreter->ctx.int_reg_base =
+    interpreter->ctx.int_reg_top =
         mem_sys_allocate_zeroed(sizeof(struct IRegChunk));
-    interpreter->ctx.num_reg_base =
+    interpreter->ctx.num_reg_top =
         mem_sys_allocate_zeroed(sizeof(struct NRegChunk));
-    interpreter->ctx.string_reg_base =
+    interpreter->ctx.string_reg_top =
         mem_sys_allocate_zeroed(sizeof(struct SRegChunk));
-    interpreter->ctx.pmc_reg_base =
+    interpreter->ctx.pmc_reg_top =
         mem_sys_allocate_zeroed(sizeof(struct PRegChunk));
-    interpreter->ctx.int_reg_top = interpreter->ctx.int_reg_base;
-    interpreter->ctx.num_reg_top = interpreter->ctx.num_reg_base;
-    interpreter->ctx.string_reg_top = interpreter->ctx.string_reg_base;
-    interpreter->ctx.pmc_reg_top = interpreter->ctx.pmc_reg_base;
 
     /* the SET_NULL macros are only for systems where a NULL pointer
      * isn't represented by zeroes, so don't use these for resetting
      * non-null pointers
      */
-    SET_NULL(interpreter->ctx.int_reg_base->next);
-    SET_NULL(interpreter->ctx.int_reg_base->prev);
-    SET_NULL(interpreter->ctx.num_reg_base->next);
-    SET_NULL(interpreter->ctx.num_reg_base->prev);
-    SET_NULL(interpreter->ctx.string_reg_base->next);
-    SET_NULL(interpreter->ctx.string_reg_base->prev);
-    SET_NULL(interpreter->ctx.pmc_reg_base->next);
-    SET_NULL(interpreter->ctx.pmc_reg_base->prev);
+    SET_NULL(interpreter->ctx.int_reg_top->next);
+    SET_NULL(interpreter->ctx.int_reg_top->prev);
+    SET_NULL(interpreter->ctx.num_reg_top->next);
+    SET_NULL(interpreter->ctx.num_reg_top->prev);
+    SET_NULL(interpreter->ctx.string_reg_top->next);
+    SET_NULL(interpreter->ctx.string_reg_top->prev);
+    SET_NULL(interpreter->ctx.pmc_reg_top->next);
+    SET_NULL(interpreter->ctx.pmc_reg_top->prev);
 
     Parrot_clear_s(interpreter);
     Parrot_clear_p(interpreter);
