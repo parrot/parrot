@@ -66,6 +66,7 @@ static void
 bigint_set_self(Interp *interpreter, PMC *self, BIGNUM *value) {
     mpz_set(BN(self), value);
 }
+
 static long
 bigint_get_long(Interp *interpreter, PMC *self) {
     if (mpz_fits_slong_p(BN(self)))
@@ -74,6 +75,12 @@ bigint_get_long(Interp *interpreter, PMC *self) {
     return 0;
 }
 
+static int
+bigint_get_bool(Interp *interpreter, PMC *self) {
+    if (mpz_fits_slong_p(BN(self)))
+        return mpz_get_si(BN(self)) != 0;
+    return 0;
+}
 static char *
 bigint_get_string(Interp *interpreter, PMC *self) {
     return mpz_get_str(NULL, 10, BN(self));
@@ -198,6 +205,11 @@ bigint_get_string(Interp *interpreter, PMC *self) {
 
 static long
 bigint_get_long(Interp *interpreter, PMC *self) {
+    internal_exception(1, "no bigint lib loaded");
+    return 0L;
+}
+static long
+bigint_get_bool(Interp *interpreter, PMC *self) {
     internal_exception(1, "no bigint lib loaded");
     return 0L;
 }
@@ -407,7 +419,7 @@ Returns the boolean value of the integer.
 */
 
     INTVAL get_bool() {
-        return 0;
+        return bigint_get_bool(INTERP, SELF);
     }
 
 /*
@@ -447,6 +459,7 @@ Increments the integer.
 */
 
     void increment() {
+        internal_exception(1, "unimp inc");
     }
 
 /*
@@ -460,6 +473,7 @@ Decrements the integer.
 */
 
     void decrement() {
+        internal_exception(1, "unimp dec");
     }
 
     void add(PMC* value, PMC* dest) {

@@ -18,6 +18,7 @@ $file = $ARGV[0];
 my %builtin_ops = (
     abs => 1,
     iter =>1,
+    bool => 's',   # special
 );
 
 my %builtins = (
@@ -490,6 +491,7 @@ EOC
     # print_stack();
 }
 
+
 sub LOAD_NAME() {
     my ($n, $c, $cmt) = @_;
     if (is_opcode($c)) {
@@ -855,6 +857,20 @@ sub print_stack {
 	print "# st $_->[2] : $_->[1]\n";
     }
 }
+# python func to opcode translations
+sub OPC_bool() {
+    my ($c, $args, $cmt) = @_;
+    my $b = temp('I');
+    my $p = temp('P');
+    print <<EOC;
+	$b = istrue $args $cmt
+	# TODO create true P, false P opcodes
+	$p = new .Boolean
+	$p = $b
+EOC
+    push @stack, [-1, $p, 'I'];
+}
+
 sub CALL_FUNCTION
 {
     my ($n, $c, $cmt) = @_;
@@ -890,7 +906,8 @@ EOC
 	# func $name named arg $j name $arg_name val $val->[1]
 EOC
 	$args[$pushed_args + $j] = promote($val);
-    $n = $nfix + $nk/2;}
+    }
+    $n = $nfix + $nk/2;
     my $tos = pop @stack;
     my $args = join ', ', @args;
     my $t;
@@ -910,6 +927,12 @@ EOC
 	$args = $ar;
     }
     if ($tos->[2] eq 'F') {	# builtin opcode
+	if ($builtin_ops{$func} eq 's') {
+	    no strict "refs";
+	    my $opcode = "OPC_$func";
+	    &$opcode($func, $args, $cmt);
+	    return;
+	}
 	$t = temp('P');
 	print <<EOC;
 	$t = new $DEFVAR

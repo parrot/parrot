@@ -56,6 +56,10 @@ trace_pmc_dump(Interp *interpreter, PMC* pmc)
                         mem_sys_free(escaped);
                 }
             }
+            else if (pmc->vtable->base_type == enum_class_Boolean) {
+                    PIO_eprintf(interpreter, "Boolean=PMC(%#p: %d",
+                            pmc, PMC_int_val(pmc));
+            }
             else if (pmc->vtable->base_type == enum_class_BigInt) {
                 STRING *s = VTABLE_get_string(interpreter, pmc);
                     PIO_eprintf(interpreter, "BigInt=PMC(%#p: %Ss",
