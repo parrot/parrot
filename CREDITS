@@ -3,9 +3,8 @@
 	of people who have contributed to Parrot and its supporting
 	works.  It is sorted by name and formatted to allow easy
 	grepping and beautification by scripts.
-	The fields are: name (N), email (E), web-address
-        (W), PGP key ID and fingerprint (P), description (D), and
-        snail-mail address (S).
+	The fields are: name (N), email (E), web-address (W),
+	description (D), and snail-mail address (S).
 
         Thanks,
 
@@ -13,14 +12,23 @@
 		PS: Yes, this looks remarkably like the Linux CREDITS format
 
 ----------
+N: Aaron Sherman
+D: rand and srand ops
+
+N: Abhijit A. Mahabal
+D: P6C update
 
 N: Adam Thomason
 D: Building on various platforms.
 
 N: Aldo Calpini
+D: Debugging tutorial
 
 N: Alex Gough
 D: bignum
+
+N: Allison Randal
+D: P6C
 
 A: Andrew Rodland
 D: vim syntax files and editor doc
@@ -45,6 +53,9 @@ D: Numerous improvements and proposals.
 N: Bernhard Schmalhofer
 D: Bugfixes, Getopt_Long.imc
 
+N: Bob Diertens
+D: patch regarding macro argument expansion
+
 N: Brent Royal-Gordon
 D: Configure, Parrot_sprintf, embedding, early regex engine.
 D: Early contributions under the name Brent Dax.
@@ -54,16 +65,24 @@ W: http://www.brentdax.com/
 N: Brian Wheeler
 
 N: Bruce Gray
+D: debugging tutorial remarks
 
 N: Bryan C. Warnock
+D: The Second Perl 6 Summarizer
 
 N: Chip Salzenberg
 
 N: chromatic
 D: SDL library and examples
 
+N: Clayton O'Neill
+D: Fix for parrot linking issue on Solaris 8
+
 N: Clinton A. Pierce
 D: Many PIR tests and fixes
+
+N: Cory Spencer
+D: Peek opcode and PIO implementation
 
 N: Dan Sugalski
 D: The big cheese
@@ -73,13 +92,28 @@ W: http://www.sidhe.org/~dan/blog/
 N: Daniel Grunblatt
 D: JIT and EXEC subsystems
 
+N: Danny Werner
+D: Test for literals
+
 N: David M. Loyd
 
 N: Dennis Rieks
 D: Win32 config and build
 
+N: Eirik Berg Hanssen
+D: Use unix98 ps option in signal.t
+
+N: Felix Gallo
+D: delegate.pmc patch
+
+N: Garrett Rooney
+D: Fix typo in PARROT_BIGENDIAN case
+
 N: Goplat
 D: Win98 and other fixes.
+
+N: Gordon Henriksen
+D: Unified PMC/PObj accessors
 
 N: Gregor N. Purdy
 D: Early Parrot core, including packfile and op processing code,
@@ -91,6 +125,13 @@ S: Seattle, WA
 
 N: H.Merijn Brand
 D: HP-UX fixes and smoke tests
+
+N: Ibotty
+D: parrotbench ruby benchmarks
+
+N: Ilya Martynov
+D: Patch to let pmc2c2.pl run from any directory
+D: Minor documentation updates
 
 N: Ion Alexandru Morega
 D: string.pmc, complex.pmc
@@ -111,12 +152,17 @@ N: Jeffrey Dik
 D: Test system fixes
 
 N: Jens Rieks
-D: dumper and sort library
+D: Several libraries, examples and patches.
+E: parrot@jensbeimsurfen.de
+S: Wuppertal, Germany
 
 N: Jerome Quelin
 D: parrotbug, befunge interpreter, ook compiler.
 E: jquelin@cpan.org
 S: Lyon, France
+
+N: John Paul Wallington
+D: pir-mode.el: fix for xemacs plus bugfixes and cleanups
 
 N: Jonathan Sillito
 D: Lexical pads, CPS.
@@ -131,6 +177,9 @@ D: fortytwo opcode
 
 N: Joseph Ryan
 D: PIR tests and fixes
+
+N: Joshua Gatcomb
+D: updated version of parrotbench.pl
 
 N: Josh Wilmes
 
@@ -158,8 +207,16 @@ D: Many fixes
 N: Marcus Thiesen
 D: URM language, bugfixes
 
+N: Matt Diephouse
+D: Turn off buffering layer in forth.pasm
+
+N: Matt Fowles
+D: Resizable*Array classes
+
 N: Mattia Barbon
 D: Win32 fixes, dynamic PMC creation and loading
+
+N: Matt Kennedy
 
 N: Melvin Smith
 D: Parrot core, various ops, IO, subs, continuations, COW stacks
@@ -181,6 +238,10 @@ N: Michal J Wallace
 D: Pie-thon hammering PIR
 
 N: Mike Lambert
+
+N: Mitchell N Charity
+
+N: Neil Conway
 
 N: Nicholas Clark
 D: Building and platform compat and more.
@@ -207,11 +268,13 @@ N: Ritz Daniel
 N: Robert Spier
 D: Keeps us running
 
+N: Ron Blaschke
+D: Win32 patches
+
 N: Sean O'Rourke
 D: Original Perl6 compiler
 
-N: Ron Blaschke
-D: Win32 patches
+N: Sebastian Riedel
 
 N: Simon Cozens
 D: Release pumpking for 0.0.1-0.0.4
@@ -221,14 +284,20 @@ D: Tests, docs and misc. bugfixes
 E: scog@amnh.org
 S: New York, NY
 
+N: Skip Livingston
+D: Fix for string_to_num
+
 N: Stefan Lidman
 D: sqrt ops
 
-N: Stéphane Payrard
+N: Stï¿½hane Payrard
 D: Various code fixes and improvements
 
-N: Stéphane Peiry
+N: Stï¿½hane Peiry
 D: Lot of JIT/sun patches
+
+N: Sterling Hughes
+D: Questions for the FAQ
 
 N: Steve Clark
 D: Bugfixes
@@ -238,15 +307,24 @@ D: Release pumpking for 0.0.9-0.0.11
 E: steve@fink.com
 S: San Carlos, CA, USA
 
-N: Tom Hughes
+N: Steve Peters
+D: Patch for unreferenced variable warnings on Win32
 
-N: Will Coleda
-D: Tcl language and misc fixes
+N: TOGoS
+D: Some FAQ questions and answers
+
+N: Tom Hughes
 
 N: Uri Guttman
 D: Lot of general Parrot design hints
 
 N: Vladimir Lipsky
 D: Win32, IO fixes
+
+N: Will Coleda
+D: Tcl language and misc fixes
+
+N: OOLLEY kj
+D: Miscellaneous cleanup and PDD07-conformance
 
 N: Zach Lipton
