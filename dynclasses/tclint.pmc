@@ -17,14 +17,7 @@ static INTVAL dynclass_TclString;
 static INTVAL dynclass_TclFloat;
 static INTVAL dynclass_TclInt;
 
-
-/* Non vtable methods. */
-INTVAL Parrot_TclInt_get_bent(Interp* interpreter,PMC* pmc) {
-  return 1; 
-}
-
 pmclass TclInt extends TclObject dynpmc group tcl_group {
-
 
     void class_init() {
       if (pass) {
@@ -61,6 +54,9 @@ pmclass TclInt extends TclObject dynpmc group tcl_group {
         return NULL;
     }
 
+    INTVAL get_bool() {
+      return (PMC_int_val(SELF))?1:0;
+    } 
 
     STRING* get_string () {
         return string_from_int(INTERP, PMC_int_val(SELF));
