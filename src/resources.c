@@ -152,7 +152,7 @@ mem_allocate(struct Parrot_Interp *interpreter, size_t *req_size,
 
 /** Compaction Code **/
 
-static int
+static INTVAL
 buffer_movable(UINTVAL flags)
 {
     UINTVAL mask = BUFFER_on_free_list_FLAG
@@ -222,12 +222,7 @@ static void compact_pool(struct Parrot_Interp *interpreter,
             Buffer *b = cur_buffer_arena->start_objects;
             UINTVAL i;
             for (i = 0; i < cur_buffer_arena->used; i++) {
-                if (b->bufstart && 
-                    !(b->flags & ( BUFFER_on_free_list_FLAG
-                                 | BUFFER_constant_FLAG
-                                 | BUFFER_immobile_FLAG
-                                 | BUFFER_external_FLAG
-                                 ))) {
+                if (b->bufstart && buffer_movable(b->flags)) {
                     struct Buffer_Tail *tail = 
                         (struct Buffer_Tail *)((char *)b->bufstart +b->buflen);
                     ptrdiff_t offset = 0;
@@ -303,30 +298,25 @@ static void compact_pool(struct Parrot_Interp *interpreter,
         Buffer** buffers = 
             interpreter->arena_base->extra_buffer_headers.bufstart;
         Buffer* b = buffers[j];
-        if (b->bufstart) {
-            if (!(b->flags & (BUFFER_on_free_list_FLAG | 
-                              BUFFER_constant_FLAG | 
-                              BUFFER_immobile_FLAG)))
-            {
-                struct Buffer_Tail *new_tail = 
-                       (struct Buffer_Tail *)((char *)cur_spot + b->buflen);
-                /* we can't perform the math all the time, 
-                 * because strstart might be in unallocated memory */
-                ptrdiff_t offset = 0;
-                if (b->flags & BUFFER_strstart_FLAG) {
-                    offset = (ptrdiff_t)((STRING*)b)->strstart - 
-                        (ptrdiff_t)b->bufstart;
-                }
-                memcpy(cur_spot, b->bufstart, b->buflen);
-                new_tail->flags = 0;
-                b->bufstart = cur_spot;
-                cur_size = b->buflen;
-                cur_size = (cur_size + BUFFER_ALIGNMENT - 1) & 
-                    ~(BUFFER_ALIGNMENT - 1);
-                cur_spot += cur_size;
-                if (b->flags & BUFFER_strstart_FLAG) {
-                    ((STRING*)b)->strstart = (char *)b->bufstart + offset;
-                }
+        if (b->bufstart && buffer_movable(b->flags)) {
+            struct Buffer_Tail *new_tail = 
+                   (struct Buffer_Tail *)((char *)cur_spot + b->buflen);
+            /* we can't perform the math all the time, 
+             * because strstart might be in unallocated memory */
+            ptrdiff_t offset = 0;
+            if (b->flags & BUFFER_strstart_FLAG) {
+                offset = (ptrdiff_t)((STRING*)b)->strstart - 
+                    (ptrdiff_t)b->bufstart;
+            }
+            memcpy(cur_spot, b->bufstart, b->buflen);
+            new_tail->flags = 0;
+            b->bufstart = cur_spot;
+            cur_size = b->buflen;
+            cur_size = (cur_size + BUFFER_ALIGNMENT - 1) & 
+                ~(BUFFER_ALIGNMENT - 1);
+            cur_spot += cur_size;
+            if (b->flags & BUFFER_strstart_FLAG) {
+                ((STRING*)b)->strstart = (char *)b->bufstart + offset;
             }
         }
     }
