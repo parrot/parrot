@@ -38,13 +38,13 @@ sub import {
 sub generate_pbc_for {
     my ($code,$package,$count) = @_;
     
-    my $p6_f = Parrot::Test::per_test('p6',$count);
+    my $p6_f = Parrot::Test::per_test('.p6',$count);
     open P6, ">$p6_f";
     print P6 $code;
     close P6;
-    my $imc_f = Parrot::Test::per_test('imc',$count);
-    my $err_f = Parrot::Test::per_test('err',$count);
-    my $pasm_f = Parrot::Test::per_test('pasm',$count);
+    my $imc_f = Parrot::Test::per_test('.imc',$count);
+    my $err_f = Parrot::Test::per_test('.err',$count);
+    my $pasm_f = Parrot::Test::per_test('.pasm',$count);
 
     Parrot::Test::_run_command("$PConfig{perl} prd-perl6.pl --batch=$p6_f --imc", 'STDOUT' => $imc_f, 'STDERR' => $err_f);
     Parrot::Test::_run_command("../imcc/imcc $imc_f $pasm_f", 'STDERR' => $err_f);

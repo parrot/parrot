@@ -48,17 +48,16 @@ sub _run_command {
 
 sub per_test {
   my ($ext,$count) = @_;
-  $ext =~ s/^\.//;
   my $t = $0;
-  $t =~ s/\.t$/_$count\.$ext/;
+  $t =~ s/\.t$/_$count$ext/;
   return $t;
 }
 
 sub generate_pbc_for {
   my ($assembly,$directory,$count) = @_;
   local( *ASSEMBLY, *OUTPUT );
-  my $as_f = per_test('pasm',$count);
-  my $by_f = per_test('pbc',$count);
+  my $as_f = per_test('.pasm',$count);
+  my $by_f = per_test('.pbc',$count);
 
   my $can_skip_compile = $ENV{PARROT_QUICKTEST};
   if ($can_skip_compile)
@@ -112,8 +111,8 @@ sub generate_functions {
       #generate pbc for this test (may be overriden)
       $pbc_generator->( $assembly, $directory, $count );
 
-      my $by_f = per_test('pbc',$count);
-      my $out_f = per_test('out',$count);
+      my $by_f = per_test('.pbc',$count);
+      my $out_f = per_test('.out',$count);
 
       $TEST_PROG_ARGS = "" unless defined $TEST_PROG_ARGS;
       _run_command( "${directory}$PConfig{test_prog} ${TEST_PROG_ARGS} $by_f", 'STDOUT' => $out_f, 'STDERR' => $out_f);
@@ -153,11 +152,11 @@ sub generate_functions {
 
       $output =~ s/\cM\cJ/\n/g;
       local( *SOURCE );
-      my $source_f = per_test('c',$count);
+      my $source_f = per_test('.c',$count);
       my $obj_f = per_test($PConfig{o},$count);
       my $exe_f = per_test($PConfig{exe},$count);
       $exe_f =~ s@[\\/:]@$PConfig{slash}@g;
-      my $out_f = per_test('out',$count);
+      my $out_f = per_test('.out',$count);
 
       open SOURCE, "> $source_f" or die "Unable to open '$source_f'";
       binmode SOURCE;
