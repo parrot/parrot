@@ -25,7 +25,7 @@
 #define YYERROR_VERBOSE 1
 
 /*
- * we use a pure parser wtih the interpreter as a parameter
+ * we use a pure parser with the interpreter as a parameter
  * this still doesn't make the parser reentrant, there are too
  * many globals around.
  * These globals should go into one structure, which could be
@@ -195,8 +195,13 @@ static char * inv_op(char *op) {
     Instruction *i;
 }
 
+/* We need precedence for a few tokens to resolve a couple of conflicts */
+%nonassoc LOW_PREC
+%nonassoc '\n'
+%nonassoc <t> PARAM
+
 %token <t> CALL GOTO ARG FLATTEN_ARG IF UNLESS NEW END SAVEALL RESTOREALL
-%token <t> SUB NAMESPACE ENDNAMESPACE CLASS ENDCLASS SYM LOCAL CONST PARAM
+%token <t> SUB NAMESPACE ENDNAMESPACE CLASS ENDCLASS SYM LOCAL CONST
 %token <t> INC DEC GLOBAL_CONST
 %token <t> SHIFT_LEFT SHIFT_RIGHT INTV FLOATV STRINGV DEFINED LOG_XOR
 %token <t> RELOP_EQ RELOP_NE RELOP_GT RELOP_GTE RELOP_LT RELOP_LTE
@@ -227,7 +232,6 @@ static char * inv_op(char *op) {
 %token <sr> VAR
 %token <t> LINECOMMENT
 %token <s> FILECOMMENT
-%expect 1 /* s/r between empty PARAM and $default in sub_body -> statemen */
 
 %pure_parser
 
@@ -315,7 +319,8 @@ pcc_sub: PCC_SUB   { open_comp_unit(); }
        sub_body { $$ = 0; }
     ;
 
-pcc_params: /* empty */                   { $$ = 0; }
+pcc_params: /* empty */                   { $$ = 0; } %prec LOW_PREC
+    | '\n'                                { $$ = 0; }
     | pcc_params pcc_param '\n'           { add_pcc_param($<sr>0, $2);}
     ;
 
@@ -430,7 +435,17 @@ statements: statement
     |   statements statement
     ;
 
-statement:  { clear_state(); }
+/* This is ugly. Because 'instruction' can start with PARAM and in the
+ * 'pcc_sub' rule, 'pcc_params' is followed by 'statement', we get a
+ * shift/reduce conflict on PARAM between reducing to the dummy
+ * { clear_state(); } rule and shifting the PARAM to be used as part
+ * of the 'pcc_params' (which is what we want). However, yacc syntax
+ * doesn't propagate precedence to the dummy rules, so we have to
+ * split out the action just so that we can assign it a precedence. */
+helper_clear_state: { clear_state(); } %prec LOW_PREC
+    ;
+
+statement:  helper_clear_state
         instruction                   { $$ = $2; }
         | MACRO '\n'                  { $$ = 0; }
         | pcc_sub_call                { $$ = 0; }

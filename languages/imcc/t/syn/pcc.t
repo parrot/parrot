@@ -1,6 +1,6 @@
 #!perl
 use strict;
-use TestCompiler tests => 28;
+use TestCompiler tests => 29;
 
 ##############################
 # Parrot Calling Conventions
@@ -1174,4 +1174,27 @@ ok 1
 ok 2
 ok 1
 ok 2
+OUT
+
+output_is(<<'CODE', <<'OUT', "(regression) comment handling in pcc_params");
+.sub __main
+	.local Sub main_sub
+	newsub main_sub, .Sub, _main
+	.pcc_begin non_prototyped
+        .arg P5
+	.pcc_call main_sub
+ret:
+	.pcc_end
+        print "ok\n"
+	end
+.end
+
+.pcc_sub _main non_prototyped
+#Positional parameters:
+	.param PerlArray command_line
+        .pcc_begin_return
+        .pcc_end_return
+.end
+CODE
+ok
 OUT
