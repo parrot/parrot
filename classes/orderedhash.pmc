@@ -76,7 +76,7 @@ pmclass OrderedHash extends PerlArray {
 
     void delete_keyed(PMC* key) {
         if (PObj_get_FLAGS(key) & KEY_integer_FLAG) {
-            return SUPER(key);
+            SUPER(key);
         }
         else {
             INTVAL n = Parrot_PerlHash_get_integer_keyed(INTERP, SELF, key);
