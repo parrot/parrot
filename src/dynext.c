@@ -125,9 +125,6 @@ get_path(Interp *interpreter, STRING *lib, void **handle)
         const char * err = Parrot_dlerror();
         fprintf(stderr, "Couldn't load '%s': %s\n",
                 cpath, err ? err : "unknow reason");
-        /*
-         * XXX internal_exception? return a PerlUndef?
-         */
         string_cstring_free(cpath);
         return NULL;
     }
@@ -156,6 +153,12 @@ Parrot_load_lib(Interp *interpreter, STRING *lib, PMC *initializer)
 
     UNUSED(initializer);
     path = get_path(interpreter, lib, &handle);
+    if (!path) {
+        /*
+         * XXX internal_exception? return a PerlUndef?
+         */
+        return PMCNULL;
+    }
     /*
      * TODO move the class_count_mutex here
      *
@@ -184,10 +187,17 @@ Parrot_load_lib(Interp *interpreter, STRING *lib, PMC *initializer)
          */
         type = string_from_cstring(interpreter,
                 lib_pmc->cache.struct_val ? "Ops" : "PMC", 0);
-        /*
-         * TODO call init, if it exists
-         */
     }
+    /*
+     *  call init, if it exists
+     */
+    init_func_name = Parrot_sprintf_c(interpreter, "Parrot_lib_%Ss_init", lib);
+    cinit_func_name = string_to_cstring(interpreter, init_func_name);
+    init_func = (void (*)(Interp *, PMC *))D2FPTR(Parrot_dlsym(handle,
+                cinit_func_name));
+    string_cstring_free(cinit_func_name);
+    if (init_func)
+        (init_func)(interpreter, lib_pmc);
     PMC_data(lib_pmc) = handle;
     /*
      * remember lib_pmc in iglobals
