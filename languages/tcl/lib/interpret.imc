@@ -49,102 +49,62 @@ end_scope:
   if return_type != TCL_OK goto done
   proc = retval 
 
-  # XXX Can probably ditch PerlArray here.
-  args = new PerlArray
   .local int num_args 
   num_args = command
   .local int arg_num
   arg_num = 1
-   
-  # XXX Originally, we constructed a PerlArray to pass it to the command.
-  # instead, we now dynamically generate a call to the sub (the only way
-  # to use a dynamic # of arguments to a function, SFAIK.
-  # For most compilers, this isn't a big deal, since they're not written
-  # IN pir. For our PIR-based interpreter, however, it's kind of kludgey.
+  
+  # The subs we're calling expect flattened args. There's no opcode to
+  # flatten args, so instead we use the PIR directive C<.flatten_arg> 
 
-  # XXX It appears that for the PIR compiler, we can only define .sub's
-  #  This means that we'll need to write the text for a sub that will return
-  #  the appropriate values, compile it, then run it, then use the return
-  #  value of that execution to proceed. 
-
-  # So, to dynamically generate a sub call that uses a dynamic # of arguments,
-  # We have to go through an extra sub call. This seems suboptimal - perhaps
-  # there's a better way to abuse parrot. (Though this is only temporary
-  # as we move towards the tcl compiler, so perhaps we can not worry about it)
-
-  #The sub we'll use to drive the calls to the foldup'd subs.
-  # XXX We should NOT be reusing the same sub over and over.
   .local string caller_sub_text
   .local Exception_Handler ignore
   newsub ignore, .Exception_Handler, __default_handler
-  $S0 = "_"
-  $S0 .= proc
-  # evil. this should actually occur inside _driver
+  .local string fixup_proc
+  fixup_proc  = "_"
+  fixup_proc .= proc
+
+  null my_cmd
   set_eh ignore
-    $P1 = find_global "Tcl", $S0
+    my_cmd = find_global "Tcl", fixup_proc
   clear_eh 
-  isnull $P1, no_command
+  isnull my_cmd, no_command
 
-  caller_sub_text=".namespace [ \"_Tcl\"]\n.sub _driver\n.local pmc sub\nsub = find_global \"Tcl\", \"_"
-  proc = escaper(proc,"\"")
-  caller_sub_text .= proc
-  caller_sub_text .= "\"\n"
-  .local string caller_sub_args
-  caller_sub_args = ""
-
+  .local pmc folded_args
+  folded_args = new PerlArray
+  .local pmc current_word
+  .local pmc current_arg
 
 loop:
   if arg_num == num_args goto loop_done
-  $I0 = arg_num - 1
-  $P0 = command[arg_num]
-  (return_type,retval) = $P0.__get_string()
+
+  current_word = command[arg_num]
+  (return_type,retval) = current_word.__get_string()
   if return_type != TCL_OK goto done
-  caller_sub_text .= "$P"
-  $S1 = arg_num
-  caller_sub_text .= $S1
-  caller_sub_text .= " = new PerlString\n"
-  caller_sub_text .= "$P"
-  caller_sub_text .= $S1
-  caller_sub_text .= "= \"" 
-  retval = escaper(retval,"\"")
-  caller_sub_text .= retval
-  caller_sub_text .= "\"\n"
-  caller_sub_args .= "$P"
-  caller_sub_args .= $S1
+  current_arg = new PerlString
+  current_arg = retval
+  push folded_args, current_arg
   inc arg_num
   if arg_num == num_args goto loop_done
-  caller_sub_args .= ", "
   goto loop
 
 loop_done: 
-  caller_sub_text .= "($I0,$S0) = sub("
-  caller_sub_text .= caller_sub_args
-  caller_sub_text .= ")\n.pcc_begin_return\n.return $I0\n.return $S0\n.pcc_end_return\n.end\n"
-  #print "CALLER_SUB_TEXT:\n"
-  #print caller_sub_text
- 
-  # get the sub we need..
-  # XXX need to specify procs with a leading _. There a way around this?
-  proc = "_" . proc
+  # Have to use the old style syntax to take advantage of C<.flatten_arg>
+  .pcc_begin prototyped
+    .flatten_arg folded_args
+    .pcc_call my_cmd
+requiredlabelusedbyIMCC:
+    .result return_type
+    .result retval
+  .pcc_end
 
-  .local pmc pir_compiler
-  pir_compiler = compreg "PIR"
-  $P1 = compile pir_compiler, caller_sub_text
-  $P2 = find_global "_Tcl", "_driver"
-  (return_type,retval) = $P2(args)
-  #print "interpret: got return type " 
-  #print return_type
-  #print ", got retval "
-  #print retval
-  #print "\n"
   goto end_scope
 
 no_command:
   return_type = TCL_ERROR
   retval = "invalid command name \""
-  # Right now, $S0 begins with a _, remove it.
-  $S0 = substr 0, 1, ""
-  retval = retval . $S0
+  # Right now, procname begins with a _, remove it.
+  retval = retval . proc
   retval = retval . "\"\n"
 
 done:
