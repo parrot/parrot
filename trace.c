@@ -14,8 +14,8 @@
 
 
 /*
- *=for api interpreter trace_key_dump
- * Prints a key to stderr.
+ *=for api interpreter dump_pmc
+ * Prints a PMC to stderr
  */
  
 void
@@ -34,6 +34,11 @@ dump_pmc(struct Parrot_Interp *interpreter, PMC* pmc) {
     }
 }
 
+/*
+ *=for api interpreter trace_key_dump
+ * Prints a key to stderr.
+ */
+ 
 void
 trace_key_dump(struct Parrot_Interp *interpreter, PMC *key)
 {
