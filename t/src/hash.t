@@ -1,7 +1,7 @@
 #! perl -w
 # Tests the hash.h API without reference to PMCs.
 
-use Parrot::Test tests => 12;
+use Parrot::Test tests => 10;
 
 c_output_is(<<'CODE', <<'OUTPUT', "new_hash");
 
@@ -36,45 +36,6 @@ int main(int argc, char* argv[]) {
 CODE
 ok
 OUTPUT
-
-SKIP: {
-skip "hash_destroy not implemented", 1;
-c_output_is(<<'CODE', <<'OUTPUT', "hash_destroy");
-
-#include <stdio.h>
-#include "parrot/parrot.h"
-#include "parrot/embed.h"
-
-int main(int argc, char* argv[]) {
-    Interp* interpreter;
-    Hash *hash;
-    STRING *key;
-    HashEntry value;
-
-    interpreter = Parrot_new();
-
-    if ( interpreter == NULL ) return 1;
-
-    Parrot_init(interpreter);
-
-    hash = new_hash(interpreter);
-
-    if ( hash == NULL ) {
-	printf("hash creation failed\n");
-	return 1;
-    }
-
-    hash_destroy(interpreter, hash);
-
-    printf("ok\n");
-
-    return 0;
-}
-
-CODE
-ok
-OUTPUT
-}
 
 c_output_is(<<'CODE', <<'OUTPUT', "hash_put");
 
@@ -349,45 +310,6 @@ CODE
 3
 OUTPUT
 
-SKIP: {
-skip "hash_set_size not implemented", 1;
-c_output_is(<<'CODE', <<'OUTPUT', "hash_set_size");
-
-#include <stdio.h>
-#include "parrot/parrot.h"
-#include "parrot/embed.h"
-
-int main(int argc, char* argv[]) {
-    Interp* interpreter;
-    Hash *hash;
-    STRING *key;
-    HashEntry value;
-
-    interpreter = Parrot_new();
-
-    if ( interpreter == NULL ) return 1;
-
-    Parrot_init(interpreter);
-
-    hash = new_hash(interpreter);
-
-    if ( hash == NULL ) {
-	printf("hash creation failed\n");
-	return 1;
-    }
-
-    hash_set_size(interpreter, hash, 10);
-
-    printf("%i\n", hash_size(interpreter, hash));
-
-    return 0;
-}
-
-CODE
-10
-OUTPUT
-}
-
 c_output_is(<<'CODE', <<'OUTPUT', "hash_delete");
 
 #include <stdio.h>
@@ -398,7 +320,7 @@ int main(int argc, char* argv[]) {
     Interp* interpreter;
     Hash *hash;
     STRING *key;
-    HashEntry value;
+    PMC *value;
 
     interpreter = Parrot_new();
 
@@ -414,19 +336,19 @@ int main(int argc, char* argv[]) {
     }
 
     key = string_from_cstring(interpreter, "fortytwo", 0);
-    value.type = enum_hash_int;
-    value.val.int_val = 42;
-    hash_put(interpreter, hash, key, &value);
+    value = pmc_new(interpreter, enum_class_PerlInt);
+    VTABLE_set_integer_native(interpreter, value, 42);
+    hash_put(interpreter, hash, key, value);
 
     key = string_from_cstring(interpreter, "twocents", 0);
-    value.type = enum_hash_num;
-    value.val.num_val = 0.02;
-    hash_put(interpreter, hash, key, &value);
+    value = pmc_new(interpreter, enum_class_PerlNum);
+    VTABLE_set_number_native(interpreter, value, 0.02);
+    hash_put(interpreter, hash, key, value);
 
     key = string_from_cstring(interpreter, "blurb", 0);
-    value.type = enum_hash_string;
-    value.val.string_val = key;
-    hash_put(interpreter, hash, key, &value);
+    value = pmc_new(interpreter, enum_class_PerlString);
+    VTABLE_set_string_native(interpreter, value, key);
+    hash_put(interpreter, hash, key, value);
 
     printf("%i\n", hash_size(interpreter, hash));
 
@@ -453,8 +375,7 @@ int main(int argc, char* argv[]) {
     Hash *hash;
     Hash *hash2;
     STRING *key;
-    HashEntry _value;
-    HashEntry *value = &_value;
+    PMC *value;
 
     interpreter = Parrot_new();
 
@@ -470,19 +391,19 @@ int main(int argc, char* argv[]) {
     }
 
     key = string_from_cstring(interpreter, "fortytwo", 0);
-    value->type = enum_hash_int;
-    value->val.int_val = 42;
+    value = pmc_new(interpreter, enum_class_PerlInt);
+    VTABLE_set_integer_native(interpreter, value, 42);
     hash_put(interpreter, hash, key, value);
 
     value = hash_get(interpreter, hash, key);
 
-    printf("%i\n", value->val.int_val);
+    printf("%i\n", (int)VTABLE_get_integer(interpreter, value));
 
     hash2 = hash_clone(interpreter, hash);
 
     value = hash_get(interpreter, hash2, key);
 
-    printf("%i\n", value->val.int_val);
+    printf("%i\n", (int)VTABLE_get_integer(interpreter, value));
 
     return 0;
 }
