@@ -55,32 +55,6 @@ struct Parrot_Interp {
 struct Parrot_Interp *
 make_interpreter();
 
-typedef opcode_t * (*runops_core_f)(struct Parrot_Interp *, opcode_t *);
-
-opcode_t *
-runops_t0p0b0_core(struct Parrot_Interp *, opcode_t *);
-
-opcode_t *
-runops_t0p0b1_core(struct Parrot_Interp *, opcode_t *);
-
-opcode_t *
-runops_t0p1b0_core(struct Parrot_Interp *, opcode_t *);
-
-opcode_t *
-runops_t0p1b1_core(struct Parrot_Interp *, opcode_t *);
-
-opcode_t *
-runops_t1p0b0_core(struct Parrot_Interp *, opcode_t *);
-
-opcode_t *
-runops_t1p0b1_core(struct Parrot_Interp *, opcode_t *);
-
-opcode_t *
-runops_t1p1b0_core(struct Parrot_Interp *, opcode_t *);
-
-opcode_t *
-runops_t1p1b1_core(struct Parrot_Interp *, opcode_t *);
-
 void
 runops_generic();
 

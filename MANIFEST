@@ -36,6 +36,7 @@ include/parrot/op.h
 include/parrot/packfile.h
 include/parrot/parrot.h
 include/parrot/register.h
+include/parrot/runops_cores.h
 include/parrot/stacks.h
 include/parrot/string.h
 include/parrot/strnative.h
@@ -43,6 +44,7 @@ include/parrot/strutf16.h
 include/parrot/strutf32.h
 include/parrot/strutf8.h
 include/parrot/transcode.h
+include/parrot/trace.h
 include/parrot/unicode.h
 interpreter.c
 languages/jako/bench.jako
@@ -80,6 +82,7 @@ pbc2c.pl
 pdump.c
 README
 register.c
+runops_cores.c
 stacks.c
 string.c
 strnative.c
@@ -102,6 +105,7 @@ t/op/stacks.t
 t/op/string.t
 t/op/time.t
 t/op/trans.t
+trace.c
 transcode.c
 Types_pm.in
 vtable_h.pl

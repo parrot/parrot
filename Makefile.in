@@ -2,9 +2,16 @@ O = ${o}
 RM_F = ${rm_f}
 
 INC=include/parrot
-H_FILES = $(INC)/config.h $(INC)/exceptions.h $(INC)/io.h $(INC)/op.h $(INC)/register.h $(INC)/string.h $(INC)/events.h $(INC)/interpreter.h $(INC)/memory.h $(INC)/parrot.h $(INC)/stacks.h $(INC)/packfile.h $(INC)/global_setup.h $(INC)/vtable.h $(INC)/oplib/core_ops.h
 
-O_FILES = global_setup$(O) interpreter$(O) parrot$(O) register$(O) core_ops$(O) memory$(O) packfile$(O) stacks$(O) string$(O) strnative$(O) strutf8$(O) strutf16$(O) strutf32$(O) transcode$(O)
+H_FILES = $(INC)/config.h $(INC)/exceptions.h $(INC)/io.h $(INC)/op.h \
+$(INC)/register.h $(INC)/string.h $(INC)/events.h $(INC)/interpreter.h \
+$(INC)/memory.h $(INC)/parrot.h $(INC)/stacks.h $(INC)/packfile.h \
+$(INC)/global_setup.h $(INC)/vtable.h $(INC)/oplib/core_ops.h \
+$(INC)/runops_cores.h $(INC)/trace.h
+
+O_FILES = global_setup$(O) interpreter$(O) parrot$(O) register$(O) \
+core_ops$(O) memory$(O) packfile$(O) stacks$(O) string$(O) strnative$(O) \
+strutf8$(O) strutf16$(O) strutf32$(O) transcode$(O) runops_cores$(O) trace$(O)
 
 #DO NOT ADD C COMPILER FLAGS HERE
 #Add them in Configure.pl--look for the
@@ -34,7 +41,7 @@ libparrot.so: $(O_FILES)
 $(TEST_PROG): test_main$(O) $(O_FILES) Parrot/OpLib/core.pm 
 	$(CC) $(CFLAGS) -o $(TEST_PROG) $(O_FILES) test_main$(O) $(C_LIBS)
 
-$(PDUMP): pdump$(O) packfile$(O) memory$(O) global_setup$(O) string$(O) strnative$(O) strutf8$(O) strutf16$(O) strutf32$(O) transcode$(O)
+$(PDUMP): pdump$(O) packfile$(O) memory$(O) global_setup$(O) string$(O) strnative$(O) strutf8$(O) strutf16$(O) strutf32$(O) transcode$(O) 
 	$(CC) $(CFLAGS) -o $(PDUMP) pdump$(O) packfile$(O) memory$(O) global_setup$(O) string$(O) strnative$(O) strutf8$(O) strutf16$(O) strutf32$(O) transcode$(O) $(C_LIBS)
 
 test_main$(O): $(H_FILES)
