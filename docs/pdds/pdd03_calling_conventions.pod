@@ -13,13 +13,17 @@ Parrot Calling Conventions
     PDD Number: 03
     Version: 1.1
     Status: Developing
-    Last Modified: 16 September 2002
+    Last Modified: 11 March 2003
     PDD Format: 1
     Language: English
 
 =head2 HISTORY
 
 =over 4
+
+=item Version 1,2
+
+11 March 2003
 
 =item Version 1.1
 
@@ -34,6 +38,10 @@ None. First version
 =head1 CHANGES
 
 =over 4
+
+=item Version 1.2
+
+Dropped the number of registers passed in and out of subs.
 
 =item Version 1.1
 
@@ -143,21 +151,21 @@ through P31.
 
 =over 4
 
-=item I5 through I31
+=item I5 through I15
 
-The first 26 integer parameters.
+The first 11 integer parameters.
 
-=item S5 through S31
+=item S5 through S15
 
-The first 27 string parameters.
+The first 11 string parameters.
 
-=item N5 through N31
+=item N5 through N15
 
-The first 27 numeric parameters.
+The first 11 numeric parameters.
 
-=item P5 through P31
+=item P5 through P15
 
-The first 27 PMC parameters.
+The first 11 PMC parameters.
 
 =back
 
@@ -205,19 +213,19 @@ Holds the number of return values in PMC registers.
 
 Holds the number of return valies in numeric registers.
 
-=item P5-P31
+=item P5-P15
 
 PMC return values
 
-=item I5-I31
+=item I5-I15
 
 Integer return values
 
-=item S5-S31
+=item S5-S15
 
 String return values
 
-=item N5-N31
+=item N5-N15
 
 Numeric return values
 
