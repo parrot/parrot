@@ -20,13 +20,13 @@ void PXS_rets(parrot_interp_t, STRING *);
 void PXS_retp(parrot_interp_t, PMC *);
 INTVAL PXS_shifti(parrot_interp_t);
 FLOATVAL PXS_shiftn(parrot_interp_t);
-STRING * PXS_shifts(parrot_interp_t);
-char * PXS_shiftcs(parrot_interp_t);
-PMC * PXS_shiftp(parrot_interp_t);
-PMC * PXS_pointer(parrot_interp_t, void *);
+STRING *PXS_shifts(parrot_interp_t);
+char *PXS_shiftcs(parrot_interp_t);
+PMC *PXS_shiftp(parrot_interp_t);
+PMC *PXS_pointer(parrot_interp_t, void *);
 INTVAL PXS_findop(parrot_interp_t, const char *);
 
-#define PXSCALL(f) void f(parrot_interp_t interp, void * object) 
+#define PXSCALL(f) void f(parrot_interp_t interp, void * object)
 
 
 /*

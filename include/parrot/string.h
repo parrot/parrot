@@ -48,14 +48,14 @@ typedef struct parrot_string_t String;
 /* Buffer flags */
 typedef enum BUFFER_flag {
     /* bits the GC can keep its dirty mitts off of */
-    BUFFER_private0_FLAG = 1<< 0,
-    BUFFER_private1_FLAG = 1<< 1,
-    BUFFER_private2_FLAG = 1<< 2,
-    BUFFER_private3_FLAG = 1<< 3,
-    BUFFER_private4_FLAG = 1<< 4,
-    BUFFER_private5_FLAG = 1<< 5,
-    BUFFER_private6_FLAG = 1<< 6,
-    BUFFER_private7_FLAG = 1<< 7,
+    BUFFER_private0_FLAG = 1 << 0,
+    BUFFER_private1_FLAG = 1 << 1,
+    BUFFER_private2_FLAG = 1 << 2,
+    BUFFER_private3_FLAG = 1 << 3,
+    BUFFER_private4_FLAG = 1 << 4,
+    BUFFER_private5_FLAG = 1 << 5,
+    BUFFER_private6_FLAG = 1 << 6,
+    BUFFER_private7_FLAG = 1 << 7,
     /* The contents of the buffer can't be moved by the GC */
     BUFFER_immobile_FLAG = 1 << 8,
     /* Marks the contents as coming from a non-Parrot source */

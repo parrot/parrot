@@ -23,7 +23,7 @@ typedef enum {
 } op_type_t;
 
 typedef enum {
-    PARROT_ARG_OP=0,
+    PARROT_ARG_OP = 0,
 
     PARROT_ARG_IC,
     PARROT_ARG_NC,

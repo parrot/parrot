@@ -38,8 +38,8 @@ typedef struct Parrot_Coroutine {
     opcode_t            *entry;
 } * parrot_coroutine_t;
 
-struct Parrot_Sub * new_sub(struct Parrot_Interp * interp, opcode_t * address);
-struct Parrot_Coroutine * new_coroutine(struct Parrot_Interp * interp, opcode_t * address);
+struct Parrot_Sub *new_sub(struct Parrot_Interp * interp, opcode_t * address);
+struct Parrot_Coroutine *new_coroutine(struct Parrot_Interp * interp, opcode_t * address);
 
 
 #endif /* PARROT_SUB_H_GUARD */

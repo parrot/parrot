@@ -32,14 +32,14 @@ struct _key_atom {
 typedef struct _key KEY;
 
 struct _key {
-    KEY* next;
+    KEY *next;
     INTVAL pad;
     UINTVAL flags;
     KEY_ATOM atom;
 };
 
-KEY * key_new(Interp *interpreter);
-KEY * key_clone(Interp *interpreter, KEY *key);
+KEY *key_new(Interp * interpreter);
+KEY *key_clone(Interp * interpreter, KEY *key);
 
 #endif
 
