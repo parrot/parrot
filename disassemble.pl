@@ -221,10 +221,10 @@ sub disassemble_file {
     printf "#\n";
     printf "# Segments:\n";
     printf "#\n";
-    printf "#   * Magic Number: %8d bytes\n", sizeof('intval');
+    printf "#   * Magic Number: %8d bytes\n", sizeof('op');
     printf "#   * Fixup Table:  %8d bytes\n", $pf->fixup_table->packed_size;
     printf "#   * Const Table:  %8d bytes\n", $pf->const_table->packed_size;
-    printf "#   * Byte Code:    %8d bytes (%d IVs)\n", length($pf->byte_code), length($pf->byte_code) / sizeof('intval');
+    printf "#   * Byte Code:    %8d bytes (%d opcode_ts)\n", length($pf->byte_code), length($pf->byte_code) / sizeof('op');
 
     dump_const_table($pf);
     disassemble_byte_code($pf);
