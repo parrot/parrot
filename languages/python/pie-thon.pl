@@ -15,9 +15,20 @@ $DEFVAR = 'PerlInt';
 getopts('dnD', \%opt);
 $file = $ARGV[0];
 
-my %builtins = (
+my %builtin_ops = (
     abs => 1,
     iter =>1,
+);
+
+my %builtins = (
+    callable => 1,
+    chr => 1,
+    hash => 1,
+    filter => 1,
+    map => 1,
+    range => 'v', # var args
+    reduce => 1,
+    tuple => 1,
 );
 
 get_dis($DIS, $file);
@@ -405,43 +416,32 @@ EOC
 }
 
 
-sub is_builtin {
+sub is_opcode {
     my $f = shift;
-    return $builtins{$f};
+    return $builtin_ops{$f};
 }
 
 sub LOAD_GLOBAL {
     my ($n, $c, $cmt) = @_;
+    if (is_opcode($c) || $builtins{$c}) {
+	return LOAD_NAME(@_);
+    }
     my $p = temp('P');
-    if ($c eq 'range') {
-    	$c = 'range_1';
-    }
-    if (is_builtin($c)) {
-    print <<EOC;
-	# builtin $c $cmt
-EOC
-	push @stack, [-1, $c, 'F'];
-    }
-    else {
-	print <<EOC;
+    print <<"EOC";
 	$p = global "$c" $cmt
 EOC
-	push @stack, [$c, $p, 'P'];
-    }
+    push @stack, [$c, $p, 'P'];
     # print_stack();
 }
 
 sub LOAD_NAME() {
     my ($n, $c, $cmt) = @_;
-    if (is_builtin($c)) {
+    if (is_opcode($c)) {
 	print <<EOC;
 	# builtin $c $cmt
 EOC
 	push @stack, [-1, $c, 'F'];
 	return;
-    }
-    if ($c eq 'range') {
-    	$c = 'range_1';
     }
     if ($globals{$c}) {
 	print <<"EOC";
@@ -450,8 +450,10 @@ EOC
     }
     else {
 	$globals{$c} = 1;
+	my $type = 'pmc';
+	$type = 'NCI' if ($builtins{$c});
 	print <<"EOC";
-	.local pmc $c $cmt
+	.local $type $c $cmt
 	$c = global "$c"
 EOC
     }
@@ -810,7 +812,7 @@ EOC
 	return;
     }
     # arguments = $n & 0xff
-    # named args: = $n >> 8 # ???
+    # named args: = $n >> 8 *2 TODO
     $n =  ($n & 0xff) + 2*($n >> 8);	# XXX ???
     for (my $i = 0; $i < $n; $i++) {
 	my $arg = pop @stack;
@@ -821,20 +823,21 @@ EOC
     my $t;
     my $func = $tos->[1];
     my $name = $tos->[0];
-    if ($name =~ /^range/) {
-	$func = $name;
-	if ($func =~ s/^(range)_\d+/$1/) {
-	    $func = "${func}_$n";	# range_1 .. range_3
-	    unless ($globals{$func}) {
-		$globals{$func} = 1;
-		print <<"EOC";
-	.local NCI $func
-	$func = global "$func"
+    if ($builtins{$name} && $builtins{$name} eq 'v') {
+	my $ar = temp('P');
+	print <<"EOC";
+	$ar = new .FixedPMCArray
+	$ar = $n
 EOC
-	    }
+	$cmt .= "   $name";
+	for (my $i = 0; $i < $n; $i++) {
+	    print <<"EOC";
+	$ar\[$i\] = $args[$i]
+EOC
 	}
+	$args = $ar;
     }
-    if ($tos->[2] eq 'F') {	# builtin
+    if ($tos->[2] eq 'F') {	# builtin opcode
 	$t = temp('P');
 	print <<EOC;
 	$t = new $DEFVAR

@@ -228,10 +228,30 @@ parrot_py_iter(Interp *interpreter, PMC *pmc)
 }
 
 static PMC *
-parrot_py_range(Interp *interpreter, int start, int end, int step)
+parrot_py_range(Interp *interpreter, PMC *args)
 {
     PMC *ar = pmc_new(interpreter, enum_class_PerlArray);
+    INTVAL start = 0, end, step = 1;
     int i, k;
+    i = VTABLE_elements(interpreter, args);
+    if (i == 1) {
+        end = VTABLE_get_integer_keyed_int(interpreter, args, 0);
+    }
+    else if (i == 2) {
+        start = VTABLE_get_integer_keyed_int(interpreter, args, 0);
+        end = VTABLE_get_integer_keyed_int(interpreter, args, 1);
+    }
+    else if (i == 3) {
+        start = VTABLE_get_integer_keyed_int(interpreter, args, 0);
+        end = VTABLE_get_integer_keyed_int(interpreter, args, 1);
+        step = VTABLE_get_integer_keyed_int(interpreter, args, 2);
+        if (step == 0)
+            real_exception(interpreter, NULL, E_ValueError,
+                    "range() step argument must not be zero");
+    }
+    else {
+        /* TODO err */
+    }
     if (step < 0) {
         for (i = start, k = 0; i > end; i += step, ++k)
             VTABLE_set_integer_keyed_int(interpreter, ar, k, i);
@@ -243,35 +263,6 @@ parrot_py_range(Interp *interpreter, int start, int end, int step)
     return ar;
 }
 
-static PMC *
-parrot_py_range_1(Interp *interpreter, PMC *pmc)
-{
-
-    INTVAL end = VTABLE_get_integer(interpreter, pmc);
-    return parrot_py_range(interpreter, 0, end, 1);
-}
-
-static PMC *
-parrot_py_range_2(Interp *interpreter, PMC *st, PMC *pmc)
-{
-
-    INTVAL start = VTABLE_get_integer(interpreter, st);
-    INTVAL end = VTABLE_get_integer(interpreter, pmc);
-    return parrot_py_range(interpreter, start, end, 1);
-}
-
-static PMC *
-parrot_py_range_3(Interp *interpreter, PMC *sta, PMC *pmc, PMC *ste)
-{
-
-    INTVAL start = VTABLE_get_integer(interpreter, sta);
-    INTVAL end = VTABLE_get_integer(interpreter, pmc);
-    INTVAL step = VTABLE_get_integer(interpreter, ste);
-    if (step == 0)
-        real_exception(interpreter, NULL, E_ValueError,
-                "range() step argument must not be zero");
-    return parrot_py_range(interpreter, start, end, step);
-}
 
 static PMC *
 parrot_py_tuple(Interp *interpreter, PMC *pmc)
@@ -338,16 +329,12 @@ parrot_py_create_funcs(Interp *interpreter)
     STRING *callable     = CONST_STRING(interpreter, "callable");
     STRING *chr     = CONST_STRING(interpreter, "chr");
     STRING *hash     = CONST_STRING(interpreter, "hash");
-    STRING *iter     = CONST_STRING(interpreter, "iter");
+    STRING *iter     = CONST_STRING(interpreter, "iter");  /* XXX op */
     STRING *iter_sig = CONST_STRING(interpreter, "PIP");
     STRING *filter     = CONST_STRING(interpreter, "filter");
 
     STRING *map     = CONST_STRING(interpreter, "map");
-    /* TODO vararg stuff :( */
-    STRING *range_1     = CONST_STRING(interpreter, "range_1");
-    STRING *range_2     = CONST_STRING(interpreter, "range_2");
-    STRING *range_3     = CONST_STRING(interpreter, "range_3");
-
+    STRING *range     = CONST_STRING(interpreter, "range");
     STRING *reduce     = CONST_STRING(interpreter, "reduce");
     STRING *tuple     = CONST_STRING(interpreter, "tuple");
 
@@ -357,9 +344,7 @@ parrot_py_create_funcs(Interp *interpreter)
     parrot_py_global(interpreter, F2DPTR(parrot_py_iter), iter, pip);
     parrot_py_global(interpreter, F2DPTR(parrot_py_filter), filter, pipp);
     parrot_py_global(interpreter, F2DPTR(parrot_py_map), map, pipp);
-    parrot_py_global(interpreter, F2DPTR(parrot_py_range_1), range_1, pip);
-    parrot_py_global(interpreter, F2DPTR(parrot_py_range_2), range_2, pipp);
-    parrot_py_global(interpreter, F2DPTR(parrot_py_range_3), range_3, pippp);
+    parrot_py_global(interpreter, F2DPTR(parrot_py_range), range, pip);
     parrot_py_global(interpreter, F2DPTR(parrot_py_reduce), reduce, pipp);
     parrot_py_global(interpreter, F2DPTR(parrot_py_tuple), tuple, pipp);
 }

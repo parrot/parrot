@@ -418,6 +418,9 @@ the previous one.
 
 =item C<INTVAL shift_integer()>
 
+Returns the element for the current idx/key and sets the idx/key to
+the next one.
+
 =cut
 
 */
@@ -431,6 +434,19 @@ the previous one.
         return ret;
     }
 
+/*
+
+=item C<void* invoke(void* next)>
+
+Return the next element of the aggregate. The return type may depend on
+the aggregate. If there are no more items in the aggregate I1 .. I4 are
+zero.
+
+See F<docs/pdds/pdd03_calling_conventions.pod>.
+
+=cut
+
+*/
     void* invoke(void *next) {
         PMC *agg, *key, *res;
         INTVAL ires;
