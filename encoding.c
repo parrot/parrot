@@ -17,7 +17,7 @@ extern const ENCODING utf8_encoding;
 extern const ENCODING utf16_encoding;
 extern const ENCODING utf32_encoding;
 
-static const ENCODING* encoding_array[enum_encoding_MAX]; 
+static const ENCODING *encoding_array[enum_encoding_MAX];
 
 const ENCODING *
 encoding_lookup(const char *name)
@@ -40,7 +40,8 @@ encoding_lookup(const char *name)
 }
 
 const ENCODING *
-encoding_lookup_index(INTVAL n) {
+encoding_lookup_index(INTVAL n)
+{
     if (!encoding_array[0]) {
         encoding_array[enum_encoding_singlebyte] = &singlebyte_encoding;
         encoding_array[enum_encoding_utf8]       = &utf8_encoding;

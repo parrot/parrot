@@ -442,8 +442,7 @@ Parrot_vsprintf_s(struct Parrot_Interp *interpreter, STRING *pat,
 
                         case 'S':
                             string = va_arg(*args, STRING *);
-                            targ = string_concat(interpreter, targ,
-                                                 string, 0);
+                            targ = string_concat(interpreter, targ, string, 0);
                             break;
 
                         case 'P':

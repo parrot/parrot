@@ -39,8 +39,9 @@ Allocate a new empty PackFile.
 ***************************************/
 
 struct PackFile *
-PackFile_new(void) {
-    struct PackFile * pf = mem_sys_allocate((UINTVAL)sizeof(struct PackFile));
+PackFile_new(void)
+{
+    struct PackFile *pf = mem_sys_allocate((UINTVAL)sizeof(struct PackFile));
 
     if (!pf) {
         fprintf(stderr, "PackFile_new: Unable to allocate!\n");
@@ -48,7 +49,8 @@ PackFile_new(void) {
     }
 
     /* Create fixup table */
-    pf->fixup_table = mem_sys_allocate((UINTVAL)sizeof(struct PackFile_FixupTable));
+    pf->fixup_table =
+        mem_sys_allocate((UINTVAL)sizeof(struct PackFile_FixupTable));
 
     if (!pf->fixup_table) {
         fprintf(stderr, "PackFile_new: Unable to allocate fixup table!\n");
@@ -58,7 +60,8 @@ PackFile_new(void) {
     pf->fixup_table->dummy = 0;
 
     /* Create constant table */
-    pf->const_table = mem_sys_allocate((UINTVAL)sizeof(struct PackFile_ConstTable));
+    pf->const_table =
+        mem_sys_allocate((UINTVAL)sizeof(struct PackFile_ConstTable));
 
     if (!pf->const_table) {
         fprintf(stderr, "PackFile_new: Unable to allocate constant table!\n");
@@ -66,10 +69,10 @@ PackFile_new(void) {
         return NULL;
     }
     pf->const_table->const_count = 0;
-    pf->const_table->constants   = NULL;
+    pf->const_table->constants = NULL;
 
     /* Other fields empty for now */
-    pf->byte_code      = NULL;
+    pf->byte_code = NULL;
     pf->byte_code_size = 0;
 
     return pf;
@@ -87,7 +90,8 @@ Delete a PackFile.
 ***************************************/
 
 void
-PackFile_destroy(struct PackFile * pf) {
+PackFile_destroy(struct PackFile *pf)
+{
     if (!pf) {
         fprintf(stderr, "PackFile_destroy: pf == NULL!\n");
         return;
@@ -96,7 +100,7 @@ PackFile_destroy(struct PackFile * pf) {
     if (pf->fixup_table) {
         mem_sys_free(pf->fixup_table);
     }
-    
+
     if (pf->const_table) {
         PackFile_ConstTable_clear(pf->const_table);
         mem_sys_free(pf->const_table);
@@ -112,15 +116,17 @@ PackFile_destroy(struct PackFile * pf) {
 
 /* Internal function to check segment_size % sizeof(opcode_t) */
 static BOOLVAL
-PackFile_check_segment_size(opcode_t segment_size, const char* debug) {
+PackFile_check_segment_size(opcode_t segment_size, const char *debug)
+{
 #if TRACE_PACKFILE
-    printf("PackFile_unpack(): Unpacking %ld bytes for %s table...\n", 
-        segment_size, debug);
+    printf("PackFile_unpack(): Unpacking %ld bytes for %s table...\n",
+           segment_size, debug);
 #endif
 
     if (segment_size % sizeof(opcode_t)) {
-        fprintf(stderr, "PackFile_unpack: Illegal %s table segment size %ld (must be multiple of %ld)!\n",
-            debug, segment_size, sizeof(opcode_t));
+        fprintf(stderr,
+                "PackFile_unpack: Illegal %s table segment size %ld (must be multiple of %ld)!\n",
+                debug, segment_size, sizeof(opcode_t));
         return 0;
     }
     return 1;
@@ -172,7 +178,7 @@ PackFile_unpack(struct Parrot_Interp *interpreter, struct PackFile *self,
      */
 
     {
-        opcode_t magic  = *cursor++;
+        opcode_t magic = *cursor++;
 
         if (magic != PARROT_MAGIC) {
             fprintf(stderr, "PackFile_unpack: Not a Parrot PackFile!\n");
@@ -265,7 +271,8 @@ Clear a PackFile FixupTable.
 ***************************************/
 
 void
-PackFile_FixupTable_clear(struct PackFile_FixupTable * self) {
+PackFile_FixupTable_clear(struct PackFile_FixupTable *self)
+{
     if (!self) {
         fprintf(stderr, "PackFile_FixupTable_clear: self == NULL!\n");
         return;
@@ -290,8 +297,12 @@ Returns one (1) if everything is OK, else zero (0).
 ***************************************/
 
 BOOLVAL
-PackFile_FixupTable_unpack(struct PackFile_FixupTable * self, opcode_t * packed, opcode_t packed_size) {
-    UNUSED (self); UNUSED (packed); UNUSED (packed_size);
+PackFile_FixupTable_unpack(struct PackFile_FixupTable *self, opcode_t *packed,
+                           opcode_t packed_size)
+{
+    UNUSED(self);
+    UNUSED(packed);
+    UNUSED(packed_size);
     return 1;
 }
 
@@ -312,7 +323,8 @@ Clear a PackFile ConstTable.
 ***************************************/
 
 void
-PackFile_ConstTable_clear(struct PackFile_ConstTable * self) {
+PackFile_ConstTable_clear(struct PackFile_ConstTable *self)
+{
     opcode_t i;
 
     if (!self) {
@@ -320,7 +332,7 @@ PackFile_ConstTable_clear(struct PackFile_ConstTable * self) {
         return;
     }
 
-    for(i = 0; i < self->const_count; i++) {
+    for (i = 0; i < self->const_count; i++) {
         PackFile_Constant_destroy(self->constants[i]);
         self->constants[i] = NULL;
     }
@@ -329,7 +341,7 @@ PackFile_ConstTable_clear(struct PackFile_ConstTable * self) {
         mem_sys_free(self->constants);
     }
 
-    self->constants   = NULL;
+    self->constants = NULL;
     self->const_count = 0;
 
     return;
@@ -351,9 +363,12 @@ Returns one (1) if everything is OK, else zero (0).
 ***************************************/
 
 BOOLVAL
-PackFile_ConstTable_unpack(struct Parrot_Interp *interpreter, struct PackFile_ConstTable * self, opcode_t * packed, opcode_t packed_size) {
-    opcode_t * cursor;
-    opcode_t   i;
+PackFile_ConstTable_unpack(struct Parrot_Interp *interpreter,
+                           struct PackFile_ConstTable *self, opcode_t *packed,
+                           opcode_t packed_size)
+{
+    opcode_t *cursor;
+    opcode_t i;
 
     if (!self) {
         fprintf(stderr, "PackFile_ConstTable_unpack: self == NULL!\n");
@@ -367,36 +382,41 @@ PackFile_ConstTable_unpack(struct Parrot_Interp *interpreter, struct PackFile_Co
     self->const_count = *cursor++;
 
 #if TRACE_PACKFILE
-    printf("PackFile_ConstTable_unpack(): Unpacking %ld constants...\n", self->const_count);
+    printf("PackFile_ConstTable_unpack(): Unpacking %ld constants...\n",
+           self->const_count);
 #endif
 
     if (self->const_count == 0) {
         return 1;
     }
 
-    self->constants = mem_sys_allocate(self->const_count * sizeof(struct PackFile_Constant *));
+    self->constants =
+        mem_sys_allocate(self->const_count *
+                         sizeof(struct PackFile_Constant *));
 
     if (!self->constants) {
-        fprintf(stderr, "PackFile_ConstTable_unpack: Could not allocate memory for array!\n");
+        fprintf(stderr,
+                "PackFile_ConstTable_unpack: Could not allocate memory for array!\n");
         self->const_count = 0;
         return 0;
     }
 
-    for(i = 0; i < self->const_count; i++) {
-        BOOLVAL   rc;
+    for (i = 0; i < self->const_count; i++) {
+        BOOLVAL rc;
 #if TRACE_PACKFILE
         printf("PackFile_ConstTable_unpack(): Unpacking constant %ld...\n", i);
 #endif
 
         self->constants[i] = PackFile_Constant_new();
-        rc = PackFile_Constant_unpack(interpreter, self->constants[i], cursor, packed_size - (cursor - packed));
+        rc = PackFile_Constant_unpack(interpreter, self->constants[i], cursor,
+                                      packed_size - (cursor - packed));
         if (rc == 0) {
             return 0;
         }
         /* NOTE: It would be nice if each of these had its own length first */
 
-        cursor += 
-            PackFile_Constant_pack_size(self->constants[i])/sizeof(opcode_t);
+        cursor +=
+            PackFile_Constant_pack_size(self->constants[i]) / sizeof(opcode_t);
     }
 
     return 1;
@@ -441,7 +461,8 @@ Delete a PackFile Constant.
 ***************************************/
 
 void
-PackFile_Constant_destroy(struct PackFile_Constant * self) {
+PackFile_Constant_destroy(struct PackFile_Constant *self)
+{
     if (!self) {
         fprintf(stderr, "PackFile_Constant_destroy: self == NULL!\n");
         return;
@@ -451,16 +472,16 @@ PackFile_Constant_destroy(struct PackFile_Constant * self) {
     case PFC_NONE:
         break;
 
-        case PFC_NUMBER:
-            self->number = 0.0;
-            break;
+    case PFC_NUMBER:
+        self->number = 0.0;
+        break;
 
-        case PFC_STRING:
-            if (self->string) {
-                string_destroy(self->string);
-                self->string = NULL;
-            }
-            break;
+    case PFC_STRING:
+        if (self->string) {
+            string_destroy(self->string);
+            self->string = NULL;
+        }
+        break;
 
     default:
         fprintf(stderr,
@@ -487,38 +508,39 @@ contiguous region of memory.
 ***************************************/
 
 opcode_t
-PackFile_Constant_pack_size(struct PackFile_Constant * self) {
+PackFile_Constant_pack_size(struct PackFile_Constant *self)
+{
     opcode_t packed_size;
     opcode_t padded_size;
 
     if (!self) {
         /* TODO: OK to gloss over this? */
-        return (opcode_t) 0;
+        return (opcode_t)0;
     }
 
-    switch(self->type) {
-        case PFC_NONE:
-            packed_size = 0;
-            break;
+    switch (self->type) {
+    case PFC_NONE:
+        packed_size = 0;
+        break;
 
-        case PFC_NUMBER:
-            packed_size = sizeof(FLOATVAL); /* XXX need to pad this? */
-            break;
+    case PFC_NUMBER:
+        packed_size = sizeof(FLOATVAL); /* XXX need to pad this? */
+        break;
 
-        case PFC_STRING:
-            padded_size = self->string->bufused;
+    case PFC_STRING:
+        padded_size = self->string->bufused;
 
-            if (padded_size % sizeof(opcode_t)) {
-                padded_size += sizeof(opcode_t) - (padded_size % sizeof(opcode_t));
-            }
+        if (padded_size % sizeof(opcode_t)) {
+            padded_size += sizeof(opcode_t) - (padded_size % sizeof(opcode_t));
+        }
 
-            /* Include space for flags, encoding, type, and size fields.  */
-            packed_size = 4 * sizeof(opcode_t) + padded_size;
-            break;
+        /* Include space for flags, encoding, type, and size fields.  */
+        packed_size = 4 * sizeof(opcode_t) + padded_size;
+        break;
 
-        default:
-            packed_size = 0;
-            break;
+    default:
+        packed_size = 0;
+        break;
     }
 
     /* Tack on space for the initial type and size fields */
@@ -564,25 +586,26 @@ PackFile_Constant_unpack(struct Parrot_Interp *interpreter,
 
     cursor = packed;
 
-    type      = *cursor++;
-    size      = *cursor++;
+    type = *cursor++;
+    size = *cursor++;
 
 #if TRACE_PACKFILE
-    printf("PackFile_Constant_unpack(): Type is %ld ('%c')...\n", type, (char)type);
+    printf("PackFile_Constant_unpack(): Type is %ld ('%c')...\n", type,
+           (char)type);
     printf("PackFile_Constant_unpack(): Size is %ld...\n", size);
 #endif
 
     switch (type) {
-        case PFC_NONE:
-            break;
+    case PFC_NONE:
+        break;
 
-        case PFC_NUMBER:
-            rc = PackFile_Constant_unpack_number(self, cursor, size);
-            break;
+    case PFC_NUMBER:
+        rc = PackFile_Constant_unpack_number(self, cursor, size);
+        break;
 
-        case PFC_STRING:
-            rc = PackFile_Constant_unpack_string(interpreter, self, cursor, size);
-            break;
+    case PFC_STRING:
+        rc = PackFile_Constant_unpack_string(interpreter, self, cursor, size);
+        break;
 
     default:
         fprintf(stderr,
@@ -622,7 +645,7 @@ PackFile_Constant_unpack_number(struct PackFile_Constant *self,
         return 0;
     }
 
-    cursor    = packed;
+    cursor = packed;
 
     /* We need to do a memcpy from the packed area to the value 
      * because we can't guarantee that the packed area (which is 
@@ -677,25 +700,26 @@ PackFile_Constant_unpack_string(struct Parrot_Interp *interpreter,
         return 0;
     }
 
-    cursor    = packed;
+    cursor = packed;
 
-    flags     = (UINTVAL) *cursor++; 
-    encoding  = *cursor++;
-    type      = *cursor++;
-    size      = (size_t) *cursor++; /* These may need to be separate */
+    flags = (UINTVAL)*cursor++;
+    encoding = *cursor++;
+    type = *cursor++;
+    size = (size_t)*cursor++;   /* These may need to be separate */
 
 #if TRACE_PACKFILE
     printf("PackFile_Constant_unpack_string(): flags are 0x%04x...\n", flags);
-    printf("PackFile_Constant_unpack_string(): encoding is %ld...\n", encoding);
+    printf("PackFile_Constant_unpack_string(): encoding is %ld...\n",
+           encoding);
     printf("PackFile_Constant_unpack_string(): type is %ld...\n", type);
     printf("PackFile_Constant_unpack_string(): size is %ld...\n", size);
 #endif
 
-    self->type   = PFC_STRING;
+    self->type = PFC_STRING;
 
     self->string = string_make(interpreter, cursor, size,
-        encoding_lookup_index(encoding), flags,
-        chartype_lookup_index(type));
+                               encoding_lookup_index(encoding), flags,
+                               chartype_lookup_index(type));
 
     self->string->flags |= BUFFER_constant_FLAG;
 

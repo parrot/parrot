@@ -19,21 +19,28 @@ static void add_header_to_free(struct Parrot_Interp *interpreter,
                                struct free_pool *pool, void *to_add);
 
 void
-Parrot_block_DOD(struct Parrot_Interp *interpreter) {
+Parrot_block_DOD(struct Parrot_Interp *interpreter)
+{
     interpreter->DOD_block_level++;
 }
 
-void Parrot_block_GC(struct Parrot_Interp *interpreter) {
+void
+Parrot_block_GC(struct Parrot_Interp *interpreter)
+{
     interpreter->GC_block_level++;
 }
 
-void Parrot_unblock_DOD(struct Parrot_Interp *interpreter) {
+void
+Parrot_unblock_DOD(struct Parrot_Interp *interpreter)
+{
     if (interpreter->DOD_block_level) {
         interpreter->DOD_block_level--;
     }
 }
 
-void Parrot_unblock_GC(struct Parrot_Interp *interpreter) {
+void
+Parrot_unblock_GC(struct Parrot_Interp *interpreter)
+{
     if (interpreter->GC_block_level) {
         interpreter->GC_block_level--;
     }
@@ -370,7 +377,9 @@ mark_buffers_unused(struct Parrot_Interp *interpreter)
 }
 
 PMC *
-mark_used(struct Parrot_Interp *interpreter, PMC *used_pmc, PMC *current_end_of_list) {
+mark_used(struct Parrot_Interp *interpreter, PMC *used_pmc,
+          PMC *current_end_of_list)
+{
 
     /* If the PMC we've been handed has already been marked as live
      * (ie we put it on the list already) we just return. Otherwise we
@@ -387,7 +396,7 @@ mark_used(struct Parrot_Interp *interpreter, PMC *used_pmc, PMC *current_end_of_
         used_pmc->vtable->mark(interpreter, used_pmc, current_end_of_list);
         return used_pmc;
     }
-        
+
     /* OK, mark the PMC itself as used */
     used_pmc->flags |= PMC_live_FLAG;
 
@@ -455,7 +464,7 @@ trace_active_PMCs(struct Parrot_Interp *interpreter)
         UINTVAL mask = PMC_is_PMC_ptr_FLAG | PMC_is_buffer_ptr_FLAG;
         UINTVAL bits = current->flags & mask;
 
-        /* Private mark? If so, do it and bail*/
+        /* Private mark? If so, do it and bail */
         if (current->flags & PMC_custom_mark_FLAG) {
             mark_used(interpreter, current->data, last);
             continue;

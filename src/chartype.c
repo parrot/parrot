@@ -15,7 +15,7 @@
 extern const CHARTYPE usascii_chartype;
 extern const CHARTYPE unicode_chartype;
 
-static const CHARTYPE* chartype_array[enum_chartype_MAX];
+static const CHARTYPE *chartype_array[enum_chartype_MAX];
 
 const CHARTYPE *
 chartype_lookup(const char *name)
@@ -32,10 +32,11 @@ chartype_lookup(const char *name)
 }
 
 const CHARTYPE *
-chartype_lookup_index(INTVAL n) {
+chartype_lookup_index(INTVAL n)
+{
     if (!chartype_array[0]) {
-        chartype_array[enum_chartype_unicode] = &unicode_chartype; 
-        chartype_array[enum_chartype_usascii] = &usascii_chartype; 
+        chartype_array[enum_chartype_unicode] = &unicode_chartype;
+        chartype_array[enum_chartype_usascii] = &usascii_chartype;
     }
     return chartype_array[n];
 }

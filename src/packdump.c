@@ -14,7 +14,8 @@
 #include "parrot/packfile.h"
 
 void
-PackFile_dump(struct PackFile * self) {
+PackFile_dump(struct PackFile *self)
+{
     size_t i;
 
     printf("FIXUP => {\n");
@@ -33,9 +34,9 @@ PackFile_dump(struct PackFile * self) {
 
     for (i = 0; i < self->byte_code_size / sizeof(opcode_t); i++) {
         if (i % 8 == 0) {
-            printf("\n    %08lx:  ", (unsigned long) i * sizeof(opcode_t));
+            printf("\n    %08lx:  ", (unsigned long)i * sizeof(opcode_t));
         }
-        printf("%08lx ", (unsigned long) self->byte_code[i]);
+        printf("%08lx ", (unsigned long)self->byte_code[i]);
     }
 
     printf("\n]\n");
@@ -44,22 +45,24 @@ PackFile_dump(struct PackFile * self) {
 }
 
 void
-PackFile_FixupTable_dump(struct PackFile_FixupTable * self) {
-    UNUSED (self);
+PackFile_FixupTable_dump(struct PackFile_FixupTable *self)
+{
+    UNUSED(self);
     return;
 }
 
 void
-PackFile_ConstTable_dump(struct PackFile_ConstTable * self) {
-    opcode_t     i;
+PackFile_ConstTable_dump(struct PackFile_ConstTable *self)
+{
+    opcode_t i;
 
     if (!self) {
         fprintf(stderr, "PackFile_ConstTable_dump: self == NULL!\n");
         return;
     }
 
-    for(i = 0; i < self->const_count; i++) {
-        printf("    # %ld:\n", (long) i);
+    for (i = 0; i < self->const_count; i++) {
+        printf("    # %ld:\n", (long)i);
         PackFile_Constant_dump(self->constants[i]);
     }
 
@@ -67,41 +70,38 @@ PackFile_ConstTable_dump(struct PackFile_ConstTable * self) {
 }
 
 void
-PackFile_Constant_dump(struct PackFile_Constant * self) {
+PackFile_Constant_dump(struct PackFile_Constant *self)
+{
     if (!self) {
         /* TODO: OK to be silent here? */
         return;
     }
 
     switch (self->type) {
-        case PFC_NONE:
-            /* TODO: OK to be silent here? */
-            printf("    [ 'PFC_NONE', undef ],\n");
-            break;
+    case PFC_NONE:
+        /* TODO: OK to be silent here? */
+        printf("    [ 'PFC_NONE', undef ],\n");
+        break;
 
-        case PFC_NUMBER:
-            printf("    [ 'PFC_NUMBER', %g ],\n", self->number);
-            break;
+    case PFC_NUMBER:
+        printf("    [ 'PFC_NUMBER', %g ],\n", self->number);
+        break;
 
-        case PFC_STRING:
-            printf("    [ 'PFC_STRING', {\n");
-            printf("        FLAGS    => 0x%04lx,\n", (long) self->string->flags);
-            printf("        ENCODING => %s,\n",
-                    self->string->encoding->name);
-            printf("        TYPE     => %s,\n",
-                    self->string->type->name);
-            printf("        SIZE     => %ld,\n",
-                    (long) self->string->bufused);
-            /* TODO: Won't do anything reasonable for most encodings */
-            printf("        DATA     => '%.*s'\n",
-                   (int)self->string->bufused,
-                   (char *) self->string->bufstart);
-            printf("    } ],\n");
-            break;
+    case PFC_STRING:
+        printf("    [ 'PFC_STRING', {\n");
+        printf("        FLAGS    => 0x%04lx,\n", (long)self->string->flags);
+        printf("        ENCODING => %s,\n", self->string->encoding->name);
+        printf("        TYPE     => %s,\n", self->string->type->name);
+        printf("        SIZE     => %ld,\n", (long)self->string->bufused);
+        /* TODO: Won't do anything reasonable for most encodings */
+        printf("        DATA     => '%.*s'\n",
+               (int)self->string->bufused, (char *)self->string->bufstart);
+        printf("    } ],\n");
+        break;
 
-        default:
-            /* TODO: OK to be silent here? */
-            break;
+    default:
+        /* TODO: OK to be silent here? */
+        break;
     }
 
     return;

@@ -115,7 +115,7 @@ mem_setup_allocator(struct Parrot_Interp *interpreter)
         BUFFER_live_FLAG;
     interpreter->arena_base->string_header_pool->pool_buffer.buflen = 1024;
     interpreter->arena_base->string_header_pool->entries_in_pool = 0;
-    
+
 
     /* Init the PMC header pool */
     interpreter->arena_base->pmc_pool =
