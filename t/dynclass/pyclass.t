@@ -50,7 +50,7 @@ output_is(<< 'CODE', << 'OUTPUT', "method");
     subclass $P2, $P1, 'c'
 
     find_type $I2, "PyFunc"
-    newsub $P3, $I0, _m
+    newsub $P3, $I2, _m
     setprop $P2, 'm', $P3
 
     $P4=$P2()
