@@ -1,0 +1,44 @@
+// mandelbrot.cola
+//
+using System;
+
+// The Reference C version snagged from Jako sample
+// main(){
+//  int x, y, k;
+//  char *b = " .:,;!/>)|&IH%*#";
+//  float r, i, z, Z, t, c, C;
+//
+//  for (y=30; puts(""), C = y*0.1 - 1.5, y--;){
+//     for (x=0; c = x*0.04 - 2, z=0, Z=0, x++ < 75;){
+//        for (r=c, i=C, k=0; t = z*z - Z*Z + r, Z = 2*z*Z + i, z=t, k<112; k++)
+//           if (z*z + Z*Z > 10) break;
+//        printf ("%c", b[k%16]);
+//     }
+//  }
+// }
+
+public class Mandelbrot {
+    public static void Main() {
+        string b = " .:,;!/>)|&IH%*#";
+        int x, y, k;
+        float r, i, z, Z, t, c, C;
+
+        for(y=30; y>0; y--) {
+            C = y * 0.1 - 1.5;
+            for(x=0; x<75; x++) {
+                c = x * 0.04 - 2;
+                z = 0.0; Z = 0.0;
+                r = c; i = C;
+                for(k=0; k<112; k++) {
+                    t = z*z - Z*Z + r;
+                    Z = 2.0*z*Z + i;
+                    z = t;
+                    if((z*z + Z*Z) > 10.0)
+                        break;
+                }
+                puts( b[ k % 16 ] );
+            }
+            puts("\n");
+        }
+    }
+}

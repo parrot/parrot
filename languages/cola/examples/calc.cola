@@ -1,0 +1,123 @@
+// calc.cola
+//
+// Toy calculator (simple 2 argument expressions: 1 + 2, 1 * 2, 2 / 1, 2 - 1) 
+// Demonstrates subroutines, strings, string indexed access with [], etc.
+// NOTE: Cola doesn't yet support assignment to dereferences,
+// so you can only use the [] operator as rvalues (read-only) for now
+// Example:
+//         if(s[i] == 'a')      <-- OK
+//         s[i] = 'a';          <-- Not yet
+//
+// Copyright (C) 2002 Melvin Smith
+
+using System;
+
+public class Hello {
+
+	// Get a numbered item out of a string
+	public string GetArgN(string s, int n) {
+		int i = 0, start = 0, len = 0, count=1;
+
+		// Skip leading space
+		while(s[i] == " ")
+			i++;
+
+		if(s[i] == "")
+			return "";
+
+		start = i;
+		while(s[i] != "") {
+			if(s[i] == " ") {
+				if(count == n)
+					return substr(s, start, len);
+				else {
+					i++;
+					// Skip more space
+					while(s[i] == " ")
+						i++;
+					start = i;
+					len = 0;
+					count++;
+				}
+			}
+			else {
+				len++;
+				i++;
+			}
+		}
+
+		if(count < n)
+		    return "";
+		return substr(s, start, len);
+	}
+
+	// Implement string to int conversion in Parrot
+	// just for fun.
+	public int StrToInt(string str) {
+		int i, len, val = 0;
+		int base = ord("0");
+		len = strlen(str);
+		if(str[0] == "")
+			return 0;
+		i = 0;
+		while(str[i] != "") {
+			val = val * 10 + ord(str[i++]) - base;
+		}
+		return val;
+	}
+
+    // Main program
+	static void Main() {
+		string s, arg1, arg2, op;
+		int i1, i2;
+		while(1) {
+			puts("Parrot Calculator (type 'quit' to exit)>");
+			s = gets();
+			s = strchop(s);
+			if(s == "")
+				continue;
+
+			puts("You typed: " + s + "\n");
+			if(s == "quit")
+				break;
+
+			arg1 = GetArgN(s, 1);
+			op = GetArgN(s, 2);
+			arg2 = GetArgN(s, 3);
+
+			if(arg1 == "") {
+				puts("Not enough arguments.\n");
+				continue;
+			}
+			if(op == "") {
+				puts("Not enough arguments.\n");
+				continue;
+			}
+			if(arg2 == "") {
+				puts("Not enough arguments.\n");
+				continue;
+			}
+			i1 = StrToInt(arg1);
+			i2 = StrToInt(arg2);
+			if(op == "+") {
+				puts("Adding...\n= ");
+				puti(i1 + i2);
+			} else if(op == "-") {
+				puts("Subtracting...\n= ");
+				puti(i1 - i2);
+			} else if(op == "*") {
+				puts("Multiplying...\n= ");
+				puti(i1 * i2);
+			} else if(op == "/") {
+				puts("Dividing...\n= ");
+				if(i2 == 0) {
+					puts("Divide by zero illegal.\n");
+					continue;
+				}
+				puti(i1 / i2);
+			}
+
+			puts("\n");
+		}
+	}
+}
