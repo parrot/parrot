@@ -72,19 +72,19 @@ Parrot_jit_debug_stabs(struct Parrot_Interp *interpreter)
     file = string_chopn(file, 3);
     pasmfile = string_copy(interpreter, file);
     pasmfile = string_append(interpreter, pasmfile,
-            string_make(interpreter, "pasm", 4, 0, BUFFER_external_FLAG, 0),
+            string_make(interpreter, "pasm", 4, 0, PObj_external_FLAG, 0),
             0);
     stabsfile = string_copy(interpreter, file);
     stabsfile = string_append(interpreter, stabsfile,
-            string_make(interpreter, "stabs.s", 7, 0, BUFFER_external_FLAG, 0),
+            string_make(interpreter, "stabs.s", 7, 0, PObj_external_FLAG, 0),
             0);
     ofile = string_copy(interpreter, file);
     ofile = string_append(interpreter, ofile,
-            string_make(interpreter, "o", 4, 0, BUFFER_external_FLAG, 0),
+            string_make(interpreter, "o", 4, 0, PObj_external_FLAG, 0),
             0);
     stabsfile = string_copy(interpreter, file);
     stabsfile = string_append(interpreter, stabsfile,
-            string_make(interpreter, "stabs.s", 7, 0, BUFFER_external_FLAG, 0),
+            string_make(interpreter, "stabs.s", 7, 0, PObj_external_FLAG, 0),
             0);
     stabs = fopen(string_to_cstring(interpreter,stabsfile), "w");
     if (stabs == NULL)

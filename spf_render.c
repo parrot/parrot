@@ -81,7 +81,7 @@ handle_flags(struct Parrot_Interp *interpreter,
         }
         /* XXX
          * cstr2pstr mostly uses literal chars, which should generate a
-         * string with BUFFER_external_FLAG
+         * string with PObj_external_FLAG
          * TODO make 2 versions of this if needed
          */
 

@@ -236,7 +236,7 @@ string_make(struct Parrot_Interp *interpreter, const void *buffer,
     if (flags & PObj_external_FLAG) {
         /* The following cast discards the 'const'.  That raises
            a warning with gcc, but is ok since the caller indicated
-           it was safe by setting BUFFER_external_FLAG.
+           it was safe by setting PObj_external_FLAG.
            (The cast is necessary to pacify TenDRA's tcc.)
            */
         s->bufstart = const_cast(buffer);
@@ -1067,14 +1067,14 @@ string_to_cstring(struct Parrot_Interp * interpreter, STRING * s)
     else
         unmake_COW(interpreter, s);
 
-    /* s->flags |= BUFFER_immobile_FLAG;
+    /* PObj_immobile_SET(s);
      *
      * XXX we don't know, how this cstring gets used by external code
      * so setting the string to immobile would be the best thing, but
      * immobile strings don't get moved - yes - but they get freed in
      * compact_pool :-(
      * The correct way to handle this is probably to malloc the memory
-     * and set the BUFFER_sysmem_FLAG
+     * and set the PObj_sysmem_FLAG
      * -leo
      */
 

@@ -146,6 +146,7 @@ typedef enum PObj {
 #define PObj_is_external_TESTALL(o) ((o)->flags & \
             (UINTVAL)(PObj_COW_FLAG|PObj_bufstart_external_FLAG| \
 		    PObj_external_FLAG|PObj_immobile_FLAG))
+
 #define PObj_is_external_or_free_TESTALL(o) ((o)->flags & \
             (UINTVAL)(PObj_external_FLAG|PObj_on_free_list_FLAG))
 
@@ -154,11 +155,16 @@ typedef enum PObj {
 		    PObj_external_FLAG|PObj_immobile_FLAG))
 
 #define PObj_is_live_or_free_TESTALL(o) ((o)->flags & \
-        (PMC_live_FLAG | PMC_on_free_list_FLAG | PMC_constant_FLAG))
+        (PObj_live_FLAG | PObj_on_free_list_FLAG | PObj_constant_FLAG))
+
+#define PObj_is_movable_TESTALL(o) (!((o)->flags & \
+        (PObj_immobile_FLAG | PObj_on_free_list_FLAG | \
+         PObj_constant_FLAG | PObj_external_FLAG)))
 
 /* compat macros */
 
 /* Buffer flags */
+#if 0
 typedef enum BUFFER_flag {
     BUFFER_private0_FLAG = PObj_private0_FLAG,
     BUFFER_private1_FLAG = PObj_private1_FLAG,
@@ -180,7 +186,7 @@ typedef enum BUFFER_flag {
     BUFFER_bufstart_external_FLAG = PObj_bufstart_external_FLAG,
     BUFFER_strstart_FLAG = PObj_is_string_FLAG
 } BUFFER_flags;
-
+#endif
 
 typedef enum {
     PMC_private0_FLAG = PObj_private0_FLAG,

@@ -23,10 +23,10 @@ typedef struct List_chunk {
     struct List_chunk *prev;
 } List_chunk;
 
-#define sparse BUFFER_private0_FLAG
-#define no_power_2  BUFFER_private1_FLAG
-#define fixed_items BUFFER_private2_FLAG
-#define grow_items BUFFER_private3_FLAG
+#define sparse PObj_private0_FLAG
+#define no_power_2  PObj_private1_FLAG
+#define fixed_items PObj_private2_FLAG
+#define grow_items PObj_private3_FLAG
 
 typedef struct List {
     Buffer chunk_list;          /* pointers to chunks */

@@ -146,15 +146,6 @@ mem_allocate(struct Parrot_Interp *interpreter, size_t *req_size,
 
 /** Compaction Code **/
 
-static INTVAL
-buffer_movable(UINTVAL flags)
-{
-    UINTVAL mask = BUFFER_on_free_list_FLAG
-            | BUFFER_constant_FLAG
-            | BUFFER_immobile_FLAG | BUFFER_external_FLAG;
-    return !(flags & mask);
-}
-
 /* Compact the buffer pool */
 static void
 compact_pool(struct Parrot_Interp *interpreter, struct Memory_Pool *pool)
@@ -222,7 +213,8 @@ compact_pool(struct Parrot_Interp *interpreter, struct Memory_Pool *pool)
             UINTVAL i;
 
             for (i = 0; i < cur_buffer_arena->used; i++) {
-                if (b->bufstart && buffer_movable(b->flags)) {
+                /* ! (immobile | on_free_list | constant | external) */
+                if (b->bufstart && PObj_is_movable_TESTALL(b)) {
                     struct Buffer_Tail *tail =
                             (struct Buffer_Tail *)((char *)b->bufstart +
                             b->buflen);
@@ -230,29 +222,28 @@ compact_pool(struct Parrot_Interp *interpreter, struct Memory_Pool *pool)
 
                     /* we can't perform the math all the time, because
                      * strstart might be in unallocated memory */
-                    if (b->flags & BUFFER_strstart_FLAG) {
+                    if (PObj_is_string_TEST(b)) {
                         offset = (ptrdiff_t)((STRING *)b)->strstart -
                                 (ptrdiff_t)b->bufstart;
                     }
                     /* buffer has already been moved; just change the header */
-                    if (b->flags & BUFFER_COW_FLAG
-                            && tail->flags & TAIL_moved_FLAG) {
+                    if (PObj_COW_TEST(b) && tail->flags & TAIL_moved_FLAG) {
                         /* Find out who else references our data */
                         Buffer *hdr = *(Buffer **)(b->bufstart);
 
                         /* Make sure they know that we own it too */
-                        hdr->flags |= BUFFER_COW_FLAG;
+                        PObj_COW_SET(hdr);
                         /* Now make sure we point to where the other guy does */
                         b->bufstart = hdr->bufstart;
                         /* And if we're a string, update strstart */
                         /* Somewhat of a hack, but if we get per-pool
                          * collections, it should help ease the pain */
-                        if (b->flags & BUFFER_strstart_FLAG) {
+                        if (PObj_is_string_TEST(b)) {
                             ((STRING *)b)->strstart = (char *)b->bufstart +
                                     offset;
                         }
                     }
-                    else if (!(b->flags & BUFFER_external_FLAG)) {
+                    else if (!PObj_external_TEST(b)) {
                         struct Buffer_Tail *new_tail =
                                 (struct Buffer_Tail *)((char *)cur_spot +
                                 b->buflen);
@@ -260,19 +251,19 @@ compact_pool(struct Parrot_Interp *interpreter, struct Memory_Pool *pool)
                         memcpy(cur_spot, b->bufstart, b->buflen);
                         new_tail->flags = 0;
                         /* If we're COW */
-                        if (b->flags & BUFFER_COW_FLAG) {
+                        if (PObj_COW_TEST(b)) {
                             /* Let the old buffer know how to find us */
                             *(Buffer **)(b->bufstart) = b;
                             /* No guaranatees that our data is still COW, so
                              * assume not, and let the above code fix-up */
-                            b->flags &= ~BUFFER_COW_FLAG;
+                            PObj_COW_CLEAR(b);
                             /* Finally, let the tail know that we've moved, so
                              * that any other references can know to look for
                              * us and not re-copy */
                             tail->flags |= TAIL_moved_FLAG;
                         }
                         b->bufstart = cur_spot;
-                        if (b->flags & BUFFER_strstart_FLAG) {
+                        if (PObj_is_string_TEST(b)) {
                             ((STRING *)b)->strstart = (char *)b->bufstart +
                                     offset;
                         }
@@ -298,14 +289,15 @@ compact_pool(struct Parrot_Interp *interpreter, struct Memory_Pool *pool)
                 interpreter->arena_base->extra_buffer_headers.bufstart;
         Buffer *b = buffers[j];
 
-        if (b->bufstart && buffer_movable(b->flags)) {
+        /* ! (immobile | on_free_list | constant | external) */
+        if (b->bufstart && PObj_is_movable_TESTALL(b)) {
             struct Buffer_Tail *new_tail =
                     (struct Buffer_Tail *)((char *)cur_spot + b->buflen);
             /* we can't perform the math all the time, because strstart might
              * be in unallocated memory */
             ptrdiff_t offset = 0;
 
-            if (b->flags & BUFFER_strstart_FLAG) {
+            if (PObj_is_string_TEST(b)) {
                 offset = (ptrdiff_t)((STRING *)b)->strstart -
                         (ptrdiff_t)b->bufstart;
             }
@@ -316,7 +308,7 @@ compact_pool(struct Parrot_Interp *interpreter, struct Memory_Pool *pool)
             cur_size = (cur_size + BUFFER_ALIGNMENT - 1) &
                     ~(BUFFER_ALIGNMENT - 1);
             cur_spot += cur_size;
-            if (b->flags & BUFFER_strstart_FLAG) {
+            if (PObj_is_string_TEST(b)) {
                 ((STRING *)b)->strstart = (char *)b->bufstart + offset;
             }
         }
@@ -388,7 +380,7 @@ Parrot_reallocate(struct Parrot_Interp *interpreter, void *from, size_t tosize)
 
     buffer = from;
     copysize = (buffer->buflen > tosize ? tosize : buffer->buflen);
-    if (!(buffer->flags & BUFFER_COW_FLAG)) {
+    if (!PObj_COW_TEST(buffer)) {
         interpreter->arena_base->memory_pool->guaranteed_reclaimable +=
                 buffer->buflen;
     }
@@ -423,10 +415,10 @@ Parrot_reallocate_string(struct Parrot_Interp *interpreter, STRING *str,
 
     copysize = (str->buflen > tosize ? tosize : str->buflen);
 
-    pool = (str->flags & BUFFER_constant_FLAG)
+    pool = PObj_constant_TEST(str)
             ? interpreter->arena_base->constant_string_pool
             : interpreter->arena_base->memory_pool;
-    if (!(str->flags & BUFFER_COW_FLAG)) {
+    if (!PObj_COW_TEST(str)) {
         pool->guaranteed_reclaimable += str->buflen;
     }
     pool->possibly_reclaimable += str->buflen;
@@ -480,7 +472,7 @@ Parrot_allocate_string(struct Parrot_Interp *interpreter, STRING *str,
     str->bufstart = NULL;
     str->strstart = NULL;
 
-    pool = (str->flags & BUFFER_constant_FLAG)
+    pool = PObj_constant_TEST(str)
             ? interpreter->arena_base->constant_string_pool
             : interpreter->arena_base->memory_pool;
     str->bufstart = mem_allocate(interpreter, &req_size, pool,

@@ -311,7 +311,7 @@ add_const_str(char *str) {
         PFC_STRING;
     interpreter->code->const_table->constants[k]->string =
         string_make(interpreter, buf, (UINTVAL) l, NULL,
-                BUFFER_constant_FLAG, NULL);
+                PObj_constant_FLAG, NULL);
     store_str_const(buf, k);
     free(o);
     return k;

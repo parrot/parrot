@@ -923,7 +923,7 @@ PackFile_Constant_unpack_string(struct Parrot_Interp *interpreter,
 
     self->string = string_make(interpreter, cursor, size,
                                encoding_lookup_index(encoding),
-                               flags | BUFFER_constant_FLAG,
+                               flags | PObj_constant_FLAG,
                                chartype_lookup_index(type));
 
     return 1;
@@ -978,7 +978,7 @@ PackFile_Constant_unpack_key(struct Parrot_Interp *interpreter,
             head = tail = key_new(interpreter);
         }
 
-        tail->flags |= PMC_constant_FLAG;
+        PObj_constant_SET(tail);
 
         switch (*cursor++) {
         case PARROT_ARG_IC:
