@@ -75,16 +75,16 @@ ready for this yet) in C<lib/parser.imc>
 [array nextelement] [array startsearch] [bgerror] [binary] 
 [case] [clock] [close] [cd] [dde] [encoding] [eof] [exec]
 [fblocked] [fconfigure] [fcopy] [file] [fileevent]
-[flush] [foreach] [gets] [glob] [http] [info] [interp] [library]
+[flush] [gets] [glob] [http] [info] [interp] [library]
 [lindex] [load] [lreplace] [lsearch] [lset] [lsort] 
 [memory] [msgcat] [namespace] [open] [package] [pid] [pwd]
 [read] [registry] [regexp] [regsub] [resource] 
 [safe] [scan] [seek] [socket] [subst]
-[string repeat] [string replace] [string tolower]
-[string totitle] [string toupper] [string trim] [string trimleft]
-[string trimright] [string compare] [string equal] [string last]
+[string replace] [string tolower] [string totitle] [string toupper]
+[string trim] [string trimleft] [string trimright]
+[string compare] [string equal] [string last]
 [string bytelength] [string is] [string map]
-[string wordstart] [string wordend] [string map] [switch] [tcltest]
+[string wordstart] [string wordend] [switch] [tcltest]
 [tell] [update] [variable] [vwait]
 
 * - assigned
@@ -105,7 +105,7 @@ tests so they're consistent.
 tclword.imc, PMCs, the macros, expr's precedence and parens,
 [puts]'s ability to write to other channels, the C<compreg> compiler.
 
-[uplevel] [upvar] [lrange] [inline]
+[uplevel] [upvar] [lrange] [inline] [string repeat] 
 
 =item pass tcl test suite
 

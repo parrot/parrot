@@ -17,6 +17,7 @@ lib${slash}commands${slash}eval.imc \
 lib${slash}commands${slash}exit.imc \
 lib${slash}commands${slash}expr.imc \
 lib${slash}commands${slash}for.imc \
+lib${slash}commands${slash}foreach.imc \
 lib${slash}commands${slash}format.imc \
 lib${slash}commands${slash}global.imc \
 lib${slash}commands${slash}if.imc \
