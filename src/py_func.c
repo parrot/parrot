@@ -29,6 +29,9 @@ Python Library Reference 2.1 Built-in Functions
 */
 
 static PMC* parrot_py_get_attr_str(Interp*, PMC *object, STRING *name);
+static PMC* parrot_py_get_attr_num(Interp*, PMC *object, INTVAL nr);
+static void parrot_py_set_attr_str(Interp*, PMC *object, STRING *name, PMC*);
+static void parrot_py_set_attr_num(Interp*, PMC *object, INTVAL nr, PMC*);
 
 static PMC *
 parrot_py_callable(Interp *interpreter, PMC *pmc)
@@ -751,14 +754,17 @@ integer_divide_int(Interp* interp, PMC* self, INTVAL value, PMC* destination)
  * We shift down arguments by one and instantiate the object
  */
 
+void Parrot_instantiate_py_object(Parrot_Interp, PMC *object);
 static PMC*
 parrot_py_instantiate_new(Parrot_Interp interpreter, PMC *class, PMC*arg)
 {
     REG_PMC(5) = arg;   /* XXX shift down more */
     --REG_INT(3);
     if (PObj_is_class_TEST(class)) {
+
+        class->vtable->init = Parrot_instantiate_py_object;
         /* init calls instantiate */
-        return pmc_new_init(interpreter, class->vtable->base_type, (void*) -1);
+        return pmc_new(interpreter, class->vtable->base_type);
     }
     else {
         VTABLE_invoke(interpreter, class, NULL);
@@ -795,6 +801,10 @@ parrot_py_create_default_meths(Interp *interpreter)
      * Sub PMCs have an atribute __name__ - redirect __get_attr
      */
     Parrot_base_vtables[enum_class_Sub]->get_attr_str = parrot_py_get_attr_str;
+    /*
+     * b3.py icmp uses the __cmp__ attr of int
+     */
+    Parrot_base_vtables[enum_class_PerlInt]->get_attr = parrot_py_get_attr_num;
 }
 /*
 
@@ -1061,13 +1071,61 @@ parrot_py_set_attr_str(Interp* interpreter, PMC *obj, STRING *name, PMC *v)
 static PMC*
 parrot_py_get_attr_num(Interp* interpreter, PMC *object, INTVAL nr)
 {
+    PMC *sub, *nci;
+    INTVAL type;
+    STRING *iIPP = CONST_STRING(interpreter, "iIPP");
+
+    if (nr <= 0) {
+        type = object->vtable->base_type;
+        /* this is the fallback - don't know, which types are compared */
+        sub = mmd_vtfind(interpreter, -nr, 0, 0);
+        if (!sub)
+            internal_exception(1, "NULL MMD attribute nr %d", (int)nr);
+        if (sub->vtable->base_type != enum_class_CSub)
+            return sub;
+        switch (nr) {
+            case -41:       /* MMD_CMP */
+                nci = pmc_new(interpreter, enum_class_NCI);
+                VTABLE_set_pointer_keyed_str(interpreter, nci,
+                        iIPP, PMC_struct_val(sub));
+                return nci;
+            default:
+                break;
+        }
+    }
+    internal_exception(1, "unknown attribute nr %d", (int)nr);
+
     return PMCNULL;
 }
+
 static void
 parrot_py_set_attr_num(Interp* interpreter, PMC *obj, INTVAL nr, PMC *v)
 {
+    INTVAL type;
 
+    funcptr_t f;
+    if (nr <= 0) {
+        type = obj->vtable->base_type;
+        switch (nr) {
+            case -41:       /* MMD_CMP */
+                f = NULL;
+                if (v->vtable->base_type == enum_class_NCI) {
+                    f = PMC_struct_val(v);
+                    mmd_register(interpreter, -nr, type, type, f);
+                    mmd_register(interpreter, -nr, type, 0, f);
+                    return;
+                }
+                else if (v->vtable->base_type == enum_class_Sub) {
+                    mmd_register_sub(interpreter, -nr, type, type, v);
+                    mmd_register_sub(interpreter, -nr, type, 0, v);
+                    return;
+                }
+                break;
+        }
+    }
+    internal_exception(1, "unknown attribute nr %d", (int)nr);
 }
+
 /*
  * TODO self.super()
  * for now use delegate directly
@@ -1106,9 +1164,13 @@ parrot_py_set_vtable(Parrot_Interp interpreter, PMC* class)
     vtable->set_attr_str = parrot_py_set_attr_str;
     vtable->get_attr     = parrot_py_get_attr_num;
     vtable->set_attr     = parrot_py_set_attr_num;
+
     vtable->get_iter     = parrot_py_get_iter;
 
     class->vtable->get_attr_str = parrot_py_get_attr_str;
+    class->vtable->get_attr = parrot_py_get_attr_num;
+    class->vtable->set_attr_str = parrot_py_set_attr_str;
+    class->vtable->set_attr = parrot_py_set_attr_num;
 
 }
 /*

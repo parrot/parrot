@@ -697,21 +697,27 @@ darned object.
 
 */
 
-static void instantiate_object(Parrot_Interp, PMC *object, PMC *init);
+static void instantiate_object(Parrot_Interp, PMC *object, PMC *init, int);
 
 void
 Parrot_instantiate_object_init(Parrot_Interp interpreter,
         PMC *object, PMC *init)
 {
-    instantiate_object(interpreter, object, init);
+    instantiate_object(interpreter, object, init, 0);
 }
 
 void
 Parrot_instantiate_object(Parrot_Interp interpreter, PMC *object)
 {
-    instantiate_object(interpreter, object, NULL);
+    instantiate_object(interpreter, object, NULL, 0);
 }
 
+void Parrot_instantiate_py_object(Parrot_Interp, PMC *object);
+void
+Parrot_instantiate_py_object(Parrot_Interp interpreter, PMC *object)
+{
+    instantiate_object(interpreter, object, NULL, 1);
+}
 static void*
 instantiate_py_object(Interp* interpreter, PMC* class, void* next)
 {
@@ -740,14 +746,15 @@ instantiate_py_object(Interp* interpreter, PMC* class, void* next)
     }
     if (!object)  {
         object = pmc_new_noinit(interpreter, type);
-        instantiate_object(interpreter, object, (void*)-1);
+        instantiate_object(interpreter, object, NULL, 1);
     }
     REG_PMC(5) = object;
     return next;
 }
 
 static void
-instantiate_object(Parrot_Interp interpreter, PMC *object, PMC *init)
+instantiate_object(Parrot_Interp interpreter, PMC *object,
+        PMC *init, int is_python)
 {
     SLOTTYPE *new_object_array;
     INTVAL attrib_count;
@@ -790,7 +797,7 @@ instantiate_object(Parrot_Interp interpreter, PMC *object, PMC *init)
     /* We really ought to call the class init routines here...
      * this assumes that an object isa delegate
      */
-    if (init == (void*)-1) {
+    if (is_python) {
         /*
          * we are coming from Python
          */

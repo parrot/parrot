@@ -18,15 +18,22 @@ This class has been superceeded by C<NCI>.
 #include "parrot/method_util.h"
 
 pmclass CSub {
+    void init () {
+        PMC_struct_val(SELF) = PMC_pmc_val(SELF) = NULL;
+    }
 
     PMC* clone () {
-        PMC* dest = pmc_new_noinit(INTERP, SELF->vtable->base_type);
+        PMC* dest = pmc_new(INTERP, SELF->vtable->base_type);
         PMC_struct_val(dest) = PMC_struct_val(SELF);
         return dest;
     }
 
-    PMC* get_pmc () {
-        return SELF;
+    void* get_pointer() {
+        return PMC_struct_val(SELF);
+    }
+
+    void set_pointer(void* p) {
+        PMC_struct_val(SELF) = p;
     }
 
     INTVAL is_same (PMC* value) {

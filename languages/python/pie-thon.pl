@@ -101,6 +101,7 @@ sub nci_method {
     my $m = shift;
     return 1 if $vtables{$m};
     return 1 if $nci_methods{$m};
+    return 1 if $m =~ /^\d+$/;	# MMD nr
     return 0;
 }
 
@@ -1265,7 +1266,7 @@ EOC
 	}
 	if (!nci_method($attr)) {	# a method function
 	    print <<EOC;
-	P2 = $1
+	P2 = $1   # obj '$obj' attr '$attr'
 	${ret_string}$func($args)  $cmt
 EOC
 	}
@@ -1668,6 +1669,7 @@ EOC
 EOC
 	$obj = $o;
     }
+    my $a = $c;
     if ($vtables{$c}) {
 	$c = $vtables{$c};
     }
@@ -1681,7 +1683,7 @@ EOC
     print <<EOC;
 	$attr = getattribute $obj, $cc $cmt
 EOC
-    push @stack, ["obj $obj attr $c", $attr, 'P'];
+    push @stack, ["obj $obj attr $a", $attr, 'P'];
 }
 
 sub STORE_ATTR

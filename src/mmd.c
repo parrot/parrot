@@ -613,15 +613,31 @@ mmd_destroy(Parrot_Interp interpreter)
     mem_sys_free(interpreter->binop_mmd_funcs);
 }
 
+/*
+
+=item C<PMC *
+mmd_vtfind(Parrot_Interp interpreter, INTVAL type, INTVAL left, INTVAL right)>
+
+Return an MMD PMC function for the given data types. The return result is
+either a Sub PMC (for PASM MMD functions) or a CSub PMC holding the
+C function pointer in PMC_struct_val. This CSub is not invocable, you have to
+wrap it into an NCI function to get the required function arguments passed.
+
+=cut
+
+*/
 
 PMC *
 mmd_vtfind(Parrot_Interp interpreter, INTVAL type, INTVAL left, INTVAL right) {
     int is_pmc;
+    PMC *f;
     funcptr_t func = get_mmd_dispatch_type(interpreter,
             left, right, type, &is_pmc);
     if (func && is_pmc)
         return (PMC*)F2DPTR(func);
-    return PMCNULL;
+    f = pmc_new(interpreter, enum_class_CSub);
+    PMC_struct_val(f) = F2DPTR(func);
+    return f;
 }
 
 /*

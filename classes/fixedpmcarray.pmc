@@ -67,6 +67,14 @@ static void array_sort(Interp *interpreter, PMC *self, PMC *cmp_func)
     int (*func)(void*, void*);
 
     if (REG_INT(3) == 0) {
+        PMC *first = ((PMC**)PMC_data(self))[0];
+        INTVAL type = first->vtable->base_type;
+        PMC *s = mmd_vtfind(interpreter, MMD_CMP, type, 0);
+        /* cmp was overriden ? */
+        if (s->vtable->base_type == enum_class_Sub) {
+            cmp_func = s;
+            goto use_sub;
+        }
 default_sort:
         func = sort_compare;
 use_func:
@@ -76,11 +84,13 @@ use_func:
     }
     else {
         void *regs;
-        int run_core = interpreter->run_core;
+        int run_core;
         /*
          * cmp_func is a PASM PMC
          * TODO check, if it's NCI
          */
+use_sub:
+        run_core = interpreter->run_core;
         if (PMC_IS_NULL(cmp_func) ||
                 cmp_func == Parrot_base_vtables[enum_class_None]->data) {
             /* a NULL or None PMC was passed
