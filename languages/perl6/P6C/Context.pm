@@ -91,8 +91,7 @@ C<P6C::Context> also defines the following variables:
 
 =item B<$DEFAULT_ARGUMENT_CONTEXT>
 
-Flattening array context corresponding to C<@_> arguments to subs with
-no parameter declaration.
+Flattening array context for subs with no parameter declaration.
 
 =item B<%CONTEXT>
 
@@ -127,8 +126,9 @@ use Class::Struct 'P6C::SigContext' => { qw(positional @
 use vars qw(%CONTEXT $DEFAULT_ARGUMENT_CONTEXT);
 
 sub default_arg_context {
-    return $DEFAULT_ARGUMENT_CONTEXT ||=
-      new P6C::Context type => 'PerlArray', flatten => 1;
+    return $DEFAULT_ARGUMENT_CONTEXT if $DEFAULT_ARGUMENT_CONTEXT;
+    my ($sig, $ctx) = P6C::Parser::parse_sig('*@_');
+    return $DEFAULT_ARGUMENT_CONTEXT = $ctx;
 }
 
 sub nelem {
