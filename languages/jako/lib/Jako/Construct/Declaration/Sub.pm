@@ -202,7 +202,7 @@ sub compile
 
     $fn_name =~ s/^.*::/"/;
 
-    $compiler->emit("  .local obj lib");
+    $compiler->emit("  .local pmc lib");
     $compiler->emit("  loadlib lib, $fnlib");
     $compiler->emit("  dlfunc P0, lib, $fn_name, \"$sig\"");
     $compiler->emit("  invoke");

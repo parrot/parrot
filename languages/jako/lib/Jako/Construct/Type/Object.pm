@@ -24,7 +24,7 @@ sub new
     TOKEN => $token,
     CODE  => 'P',
     NAME  => 'obj',
-    IMCC  => 'PMC'
+    IMCC  => 'pmc'
   }, $class;
 }
 
