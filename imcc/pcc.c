@@ -800,7 +800,7 @@ pcc_optimize(Parrot_Interp interpreter)
     for (ins = instructions; ins; ins = ins->next) {
         if (ins->opsize == 3 &&
                 ins->r[1]->type == VTCONST &&
-                (ins->r[1]->set == 'I' || ins->r[1]->set == 'N') &&
+                (ins->r[0]->set == 'I' || ins->r[0]->set == 'N') &&
                 atof(ins->r[1]->name) == 0.0 &&
                 !strcmp(ins->op, "set")) {
             debug(DEBUG_OPT1, "opt1 %s => ", ins_string(ins));
