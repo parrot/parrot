@@ -58,7 +58,7 @@ Notes:
 
 =item * B<prototyped>, B<non_rototyped>
 
-If a subroutine doesn't have any prototyped specifier, code gets
+If a subroutine definition has no prototyped specifier, code gets
 emitted to receive parameters by both flavors.
 
 =item * B<newsub>
