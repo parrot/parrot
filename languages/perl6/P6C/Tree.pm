@@ -374,7 +374,7 @@ sub P6C::hv_indices::tree {
 sub P6C::arglist::tree {
     my $x = shift;
     if (@{$x->[2]} > 0) {
-	return $x->[2][0]->tree; # P6C::ValueList
+	return $x->[2][0]->tree; # P6C::ValueList or Binop ','
     }
     return undef;		# XXX: probably bad
 }
@@ -495,6 +495,11 @@ sub P6C::incr::tree {
 }
 
 ##############################
+# The arguments can come in a variety of flavors: for if/then
+# statements, they will end up as a tuple (fixed-length array) of
+# <sense,test,block>. For anything else, at the moment, they will be
+# forced to be a ValueList, since that's the only thing that properly
+# handles a SigContext-flavored context.
 sub P6C::prefix::tree {
     my $x = shift;
     if (@$x == 2) {
@@ -757,7 +762,7 @@ sub P6C::signature::tree {
 sub P6C::sigparam::tree {
     my ($sigparam) = @_;
     my ($selfname, $class, $zone, $variable, $traits, $init) = @$sigparam;
-    if (@$traits == 1) {
+    if (! ref $traits->[0]) {
         # Empty optional list
         $traits = [];
     }
@@ -862,42 +867,47 @@ sub P6C::debug_info::tree {
 sub P6C::stmt::tree {
     my $x = shift;
     if (@$x == 3) {		# expr
-	if (@{$x->[2]} > 0) {	# with guard.
-	    my ($name, $test) = stmt_guard($x->[2][0][2]);
+        my ($expr, $guard) = @$x[1,2];
+	if (@$guard > 0) {	# with guard.
+	    my ($name, $test) = stmt_guard($guard->[0][2]);
 	    return P6C::guard->new(name => $name,
 				   test => $test,
-				   expr => $x->[1]->tree);
+				   expr => $expr->tree);
 	}
-	return $x->[1]->tree;	# no guard.
+	return $expr->tree;	# no guard.
 
     } elsif (@$x == 2) {       # empty statement
         return undef;
 
     } elsif ($x->[1] eq 'method') {
-	my $sc = P6C::closure->new(params => maybe_tree($x->[4]),
-				   block => $x->[6]->tree);
+        my ($name, $signature, $props, $block) = @$x[3,4,5,6];
+	my $sc = P6C::closure->new(params => maybe_tree($signature),
+				   block => $block);
 	return P6C::sub_def->new(qual => 'method', # XXX: fixme
-				 name => $x->[3]->tree,
-				 props => maybe_tree($x->[5]),
+				 name => $name,
+				 props => maybe_tree($props),
 				 closure => $sc);
 
     } elsif ($x->[1] eq 'loop') {
-	return P6C::loop->new(init =>  maybe_tree($x->[4]),
-			     test =>  maybe_tree($x->[6]),
-			     incr =>  maybe_tree($x->[8]),
-			     block => maybe_tree($x->[10]));
+        my ($init, $test, $incr, $block) = @$x[4,6,8,10];
+	return P6C::loop->new(init =>  maybe_tree($init),
+			     test =>  maybe_tree($test),
+			     incr =>  maybe_tree($incr),
+			     block => maybe_tree($block));
 
     } elsif ($x->[2] eq 'class') {
-	return P6C::class_def->new(qual => maybe_tree($x->[1]),
-				   name => $x->[4]->tree,
-				   props => maybe_tree($x->[6]),
-				   block => $x->[7]->tree);
+        my ($scope, $name, $props, $block) = @$x[1,4,6,7];
+	return P6C::class_def->new(qual => maybe_tree($scope),
+				   name => $name->tree,
+				   props => maybe_tree($props),
+				   block => $block->tree);
 
     } elsif ($x->[2] =~ /^(?:sub|rule)$/) {
+        my ($scope, $keyword, $raw_name, $signature, $props) = @$x[1,2,4,5,7];
 	# Make sure we take care of declarations as well as definitions:
 	my $block = $x->[-1][1];
-        my $name = $x->[4]->tree;
-        my $params = maybe_tree($x->[5]);
+        my $name = $raw_name->tree;
+        my $params = maybe_tree($signature);
         if (! $params) {
             ($params, $P6C::Context::CONTEXT{$name}) =
               P6C::Parser::parse_sig('*@_');
@@ -905,7 +915,7 @@ sub P6C::stmt::tree {
 	my $sc = P6C::closure->new(params => $params,
 				   block => ($block eq ';' ? undef
 					     : $block->tree),
-                                   is_rule => $x->[2] eq 'rule');
+                                   is_rule => $keyword eq 'rule');
 
         # If using the external regex library, adjust the rule by
         # adding the state-tracking parameters
@@ -913,18 +923,20 @@ sub P6C::stmt::tree {
             if $sc->is_rule;
         $sc->{comment} = 'constructed from "sub" or "rule"';
 
-	return P6C::sub_def->new(qual => maybe_tree($x->[1]),
+	return P6C::sub_def->new(qual => maybe_tree($scope),
 				 name => $name,
-				 props => maybe_tree($x->[7]),
+				 props => maybe_tree($props),
 				 closure => $sc);
 	
     } elsif ($x->[2] eq ':') {	# label
-	return new P6C::label name => $x->[1]->tree;
+        my ($label_name) = @$x[1];
+	return new P6C::label name => $label_name->tree;
 
     } else {			# use/module/package directive
-	return P6C::directive->new(name => $x->[1]->tree,
-				   thing => $x->[3]->tree,
-				   args => maybe_tree($x->[5]));
+        my ($directive, $name, $args) = @$x[1,3,5];
+	return P6C::directive->new(name => $directive->tree,
+				   thing => $name->tree,
+				   args => maybe_tree($args));
     }
 }
 
