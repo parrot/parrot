@@ -16,8 +16,51 @@ Tests the C<SArray> PMC, which is used for parameter-passing.
 
 =cut
 
-use Parrot::Test tests => 15;
+use Parrot::Test tests => 16;
 use Test::More;
+
+my $fp_equality_macro = <<'ENDOFMACRO';
+.macro fp_eq (	J, K, L )
+	save	N0
+	save	N1
+	save	N2
+
+	set	N0, .J
+	set	N1, .K
+	sub	N2, N1,N0
+	abs	N2, N2
+	gt	N2, 0.000001, .$FPEQNOK
+
+	restore N2
+	restore	N1
+	restore	N0
+	branch	.L
+.local $FPEQNOK:
+	restore N2
+	restore	N1
+	restore	N0
+.endm
+.macro fp_ne(	J,K,L)
+	save	N0
+	save	N1
+	save	N2
+
+	set	N0, .J
+	set	N1, .K
+	sub	N2, N1,N0
+	abs	N2, N2
+	lt	N2, 0.000001, .$FPNENOK
+
+	restore	N2
+	restore	N1
+	restore	N0
+	branch	.L
+.local $FPNENOK:
+	restore	N2
+	restore	N1
+	restore	N0
+.endm
+ENDOFMACRO
 
 output_is(<<'CODE', <<'OUTPUT', "Setting sarray size");
 	new P0, .SArray
@@ -497,3 +540,45 @@ CODE
 0
 OUTPUT
 
+output_is(<< "CODE", << 'OUTPUT', "Access via Key PMC");
+@{[ $fp_equality_macro ]}
+	new P0, .SArray
+	set P0, 4
+	set P0[0], 100
+	set P0[1], 12.298
+	set P0[2], "yarrAS"
+        new P31, .Hash
+        set P31["Test"], "ok"
+        set P0[3], P31
+        new P1, .Key
+        set P1, 0
+	set I0, P0[P1]
+	eq I0, 100, ok1
+	print "not "
+ok1:	print "ok 1\\n"
+        new P2, .Key
+        set P2, 1
+	set N0, P0[P2]
+	.fp_eq(N0, 12.298, ok2)
+	print "not "
+ok2:	print "ok 2\\n"
+        new P3, .Key
+        set P3, 2
+	set S0, P0[P3]
+	eq S0, "yarrAS", ok3
+	print "not "
+ok3:	print "ok 3\\n"
+        new P4, .Key
+        set P4, 3
+	set P5, P0[P4]
+        set S1, P5["Test"]
+	eq S1, "ok", ok4
+	print "not "
+ok4:	print "ok 4\\n"
+	end
+CODE
+ok 1
+ok 2
+ok 3
+ok 4
+OUTPUT
