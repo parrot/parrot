@@ -42,8 +42,8 @@ output_is(<<'CODE', <<OUTPUT, "foldup");
     push P3,P23
     set I0,1
     set I1,4
-    set I2,11
-    set I3,0
+    set I2,0
+    set I3,11
     savetop
     invokecc
     restoretop
@@ -106,8 +106,8 @@ output_is(<<'CODE', <<OUTPUT, "foldup_p_i w. skip");
     push P3,P23
     set I0,1
     set I1,4
-    set I2,11
-    set I3,0
+    set I2,0
+    set I3,11
     savetop
     invokecc
     restoretop
