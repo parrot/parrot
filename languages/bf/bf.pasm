@@ -8,6 +8,7 @@
   # Get the brainfuck source file into S0
   set S0, P5[1]
   if S0, SOURCE
+usage:
   set S0, P5[0]
   print "usage: ./parrot "
   print S0
@@ -16,7 +17,14 @@
 
   # Read the file into S1
 SOURCE:
+  null I3
+  ne S0, "-O", no_o
+  set I3, 1		# optimize switch
+  set S0, P5[2]
+no_o:
   open P1, S0, "<"
+  defined I0, P1
+  unless I0, usage
 SOURCE_LOOP:
   readline S2, P1
   concat S1, S2
@@ -30,6 +38,7 @@ SOURCE_LOOP:
   set I0, 0          # Our PC
   new P0, .PerlArray # Our memory
   set I1, 0          # Our pointer
+  getstdin P30
 
   # The main interpreter loop
 INTERP:
@@ -37,6 +46,7 @@ INTERP:
   ne S0, "+", NOTPLUS
   set I2, P0[I1]
   inc I2
+  band I2, 0xff
   set P0[I1], I2
   branch NEXT
 
@@ -44,6 +54,7 @@ NOTPLUS:
   ne S0, "-", NOTMINUS
   set I2, P0[I1]
   dec I2
+  band I2, 0xff
   set P0[I1], I2
   branch NEXT
 
@@ -78,6 +89,10 @@ OPEN_NOTOPEN:
 
 NOTOPEN:
   ne S0, "]", NOTCLOSE
+  unless I3, no_opt
+  set I2, P0[I1]
+  unless I2, NEXT
+no_opt:
   set I2, 0 # "height"
 
 CLOSE_LOOP:
@@ -101,15 +116,19 @@ NOTCLOSE:
 
 NOTDOT:
   ne S0, ",", NEXT
-  getstdin P30
-  readline S31, P30
+  read S31, P30, 1
+  if S31, no_eof
+  null I2	# some return -1, some don't change data
+  branch eof
+no_eof:
   ord I2, S31
+eof:
   set P0[I1], I2
   branch NEXT
 
 NEXT:
   inc I0
-  le I0, I30, INTERP
+  lt I0, I30, INTERP
   end
 
 

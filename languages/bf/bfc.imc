@@ -47,43 +47,46 @@ SOURCE_LOOP:
 
   # Initialise
   code =      "set I0, 0          # pc\n"
-  code = code . "new P0, .PerlArray # memory\n"
-  code = code . "set I1, 0          # pointer\n"
+  concat code,  "new P0, .PerlArray # memory\n"
+  concat code,  "set I1, 0          # pointer\n"
+  concat code,  "getstdin P30\n"
 
   pc    = 0    # pc
   label = 0    # label count
 
-  # The main interpreter loop
+  # The main compiler loop
 INTERP:
-  char = file[pc]
-  code = code . "\nSTEP"
+  substr_r char, file, pc, 1
+  concat code,  "\nSTEP"
   labelstr = pc
-  code = code . labelstr
-  code = code . ": # "
-  code = code . char
-  code = code . "\n"
+  concat code,  labelstr
+  concat code,  ": # "
+  concat code,  char
+  concat code,  "\n"
 
   if char != "+" goto NOTPLUS
-  code = code . "set I2, P0[I1]\n"
-  code = code . "inc I2\n"
-  code = code . "set P0[I1], I2\n"
+  concat code,  "set I2, P0[I1]\n"
+  concat code,  "inc I2\n"
+  concat code,  "band I2, 0xff\n"
+  concat code,  "set P0[I1], I2\n"
   goto NEXT
 
 NOTPLUS:
   if char != "-" goto NOTMINUS
-  code = code . "set I2, P0[I1]\n"
-  code = code . "dec I2\n"
-  code = code . "set P0[I1], I2\n"
+  concat code,  "set I2, P0[I1]\n"
+  concat code,  "dec I2\n"
+  concat code,  "band I2, 0xff\n"
+  concat code,  "set P0[I1], I2\n"
   goto NEXT
 
 NOTMINUS:
   if char != ">" goto NOTGT
-  code = code . "inc I1\n"
+  concat code,  "inc I1\n"
   goto NEXT
 
 NOTGT:
   if char != "<" goto NOTLT
-  code = code . "dec I1\n"
+  concat code,  "dec I1\n"
   goto NEXT
 
 NOTLT:
@@ -106,10 +109,10 @@ OPEN_NOTOPEN:
 OPEN_NEXT:
   inc label
   labelstr = label
-  code = code . "set I2, P0[I1]\n"
-  code = code . "unless I2, STEP"
-  code = code . labelstr
-  code = code . "\n"
+  concat code,  "set I2, P0[I1]\n"
+  concat code,  "unless I2, STEP"
+  concat code,  labelstr
+  concat code,  "\n"
 
   goto NEXT
 
@@ -133,32 +136,45 @@ CLOSE_NOTCLOSE:
 
 CLOSE_NEXT:
   labelstr = label
-  code = code . "branch STEP"
-  code = code . labelstr
-  code = code . "\n"
+  concat code,  "branch STEP"
+  concat code,  labelstr
+  concat code,  "\n"
 
   goto NEXT
 
 NOTCLOSE:
   if char != "." goto NOTDOT
-  code = code . "set I2, P0[I1]\n"
-  code = code . "chr S31, I2\n"
-  code = code . "print S31\n"
+  concat code,  "set I2, P0[I1]\n"
+  concat code,  "chr S31, I2\n"
+  concat code,  "print S31\n"
   goto NEXT
 
 NOTDOT:
   if char != "," goto NEXT
-  code = code . "getstdin P30\n"
-  code = code . "readline S31, P30\n"
-  code = code . "ord I2, S31\n"
-  code = code . "set P0[I1], I2\n"
+  labelstr = pc
+  concat code,  "read S31, P30, 1\n"
+  concat code,  "if S31, no_eof"
+  concat code,  labelstr
+  concat code,  "\n"
+  concat code,  "null I2\n"
+  concat code,  "branch eof"
+  concat code,  labelstr
+  concat code,  "\n"
+  concat code,  "no_eof"
+  concat code,  labelstr
+  concat code,  ":\n"
+  concat code,  "ord I2, S31\n"
+  concat code,  "eof"
+  concat code,  labelstr
+  concat code,  ":\n"
+  concat code,  "set P0[I1], I2\n"
   goto NEXT
 
 NEXT:
   inc pc
 
   if pc < maxpc goto INTERP
-  code = code . "end\n"
+  concat code,  "end\n"
 
 #  print code
 #  print "\n"
@@ -166,6 +182,6 @@ NEXT:
   # Now actually run it
   compreg P1, "PASM"
   compile P0, P1, code
-  invoke
+ # invoke
   end
 .end
