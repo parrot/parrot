@@ -30,7 +30,10 @@ static STRING *NAME;
 static STRING *REPR;
 static STRING *STR;
 
-static struct parrot_regs_t *
+struct parrot_regs_t *
+Parrot_PyClass_runops_fromc(Parrot_Interp interpreter, PMC *sub);
+
+struct parrot_regs_t *
 Parrot_PyClass_runops_fromc(Parrot_Interp interpreter, PMC *sub)
 {
     opcode_t offset, *dest;

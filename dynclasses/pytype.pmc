@@ -25,11 +25,14 @@ methods you would expect to see on Python Classes
 static INTVAL dynclass_PyClass;
 static INTVAL dynclass_PyString;
 static INTVAL dynclass_PyType;
+static STRING *BASES;
 static STRING *CLASS;
 static STRING *INIT;
 static STRING *NAME;
-static STRING *BASES;
-static STRING *PYTYPE;
+static STRING *NEW;
+
+struct parrot_regs_t *
+Parrot_PyClass_runops_fromc(Parrot_Interp interpreter, PMC *sub);
 
 pmclass PyType dynpmc group python_group {
 
@@ -49,12 +52,26 @@ they will be used frequently here.
             dynclass_PyClass = Parrot_PMC_typenum(INTERP, "PyClass");
             dynclass_PyString = Parrot_PMC_typenum(INTERP, "PyString");
             dynclass_PyType = Parrot_PMC_typenum(INTERP, "PyType");
-            CLASS = const_string(INTERP, "__class__");
-            INIT = const_string(INTERP, "__init__");
-            NAME = const_string(INTERP, "__name__");
             BASES = const_string(INTERP, "__bases__");
-            PYTYPE = const_string(INTERP, "PyType");
+            CLASS = const_string(INTERP, "__class__");
+            INIT  = const_string(INTERP, "__init__");
+            NAME  = const_string(INTERP, "__name__");
+            NEW   = const_string(INTERP, "__new__");
         }
+    }
+
+/*
+
+=item C<void add_method(STRING *method_name, PMC *sub)>
+
+Store the method as a property of this class.
+
+=cut
+
+*/
+
+    void add_method(STRING *method_name, PMC *sub_pmc) {
+        VTABLE_setprop(INTERP, SELF, method_name, sub_pmc);
     }
 
 /*
@@ -74,7 +91,7 @@ Looks up the method for C<*method_name> and returns it.
         if (method && VTABLE_defined(INTERP, method)) return method;
 
         parent = VTABLE_getprop(INTERP, SELF, BASES);
-        if (parent) {
+        if (parent && VTABLE_defined(INTERP, parent)) {
             return VTABLE_find_method(INTERP, parent, method_name);
         }
 
@@ -98,7 +115,7 @@ Return attribute named C<name>.
         if (attr && VTABLE_defined(INTERP, attr)) return attr;
 
         parent = VTABLE_getprop(INTERP, SELF, BASES);
-        if (parent) {
+        if (parent && VTABLE_defined(INTERP, parent)) {
             attr = VTABLE_get_attr_str(INTERP, parent, idx);
         }
 
@@ -124,21 +141,43 @@ Pythonic object constructor.
 */
 
     void* invoke(void* next) {
-        PMC *object, *init;
+        PMC *object, *init, *new;
 
-        object = pmc_new(interpreter, dynclass_PyClass);
-        VTABLE_setprop(INTERP, object, CLASS, REG_PMC(0));
+        new = VTABLE_find_method(INTERP, SELF, NEW);
+        init = VTABLE_find_method(INTERP, SELF, INIT);
 
-        init = VTABLE_find_method(INTERP, object, INIT);
-        if (init) {
+        if (new || init) {
             int i = REG_INT(3)++;
-            for (i=REG_INT(3); i>0; i--)
-               REG_PMC(5+i)=REG_PMC(4+i);
-            REG_PMC(5) = object;
-            INTERP->ctx.current_object = object;
-            Parrot_runops_fromc(INTERP, init);
+            while (i--) 
+                REG_PMC(6+i)=REG_PMC(5+i);
         }
 
+        if (new) {
+            struct parrot_regs_t *bp;
+            struct Parrot_Context ctx;
+            save_context(interpreter, &ctx);
+            INTERP->ctx.current_object = SELF;
+            REG_PMC(5) = SELF;
+            bp = Parrot_PyClass_runops_fromc(INTERP, new);
+            object = BP_REG_PMC(bp,5);
+            restore_context(interpreter, &ctx);
+        }
+        else {
+            object = pmc_new(interpreter, dynclass_PyClass);
+        }
+
+        VTABLE_setprop(INTERP, object, CLASS, REG_PMC(0));
+
+        if (init) {
+            struct Parrot_Context ctx;
+            save_context(interpreter, &ctx);
+            INTERP->ctx.current_object = object;
+            REG_PMC(5) = object;
+            Parrot_PyClass_runops_fromc(INTERP, init);
+            restore_context(interpreter, &ctx);
+        }
+
+        REG_INT(3) = 1;
         REG_PMC(5) = object;
         return next;
     }

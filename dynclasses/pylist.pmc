@@ -68,7 +68,7 @@ Initializes the PMC by calling the underlying C<list_new()> function.
 
 /*
 
-=item C<void "append" (PMC* value)>
+=item C<void "append" (PMC* self, PMC* value)>
 
 Extends the array by adding an element of value C<*value> to the end of
 the array.
@@ -77,8 +77,8 @@ the array.
 
 */
 
-    METHOD void append (PMC* value) {
-        VTABLE_push_pmc(INTERP, SELF, value);
+    METHOD void append (PMC* self, PMC* value) {
+        VTABLE_push_pmc(INTERP, self, value);
     }
 
 /*

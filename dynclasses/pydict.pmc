@@ -375,27 +375,20 @@ Returns the big number value for the element at C<*key>.
 
 /*
 
-=item C<void* invoke(void *next)>
+=item C<PMC* "__new__"(PMC *cls, PMC *source)>
 
 Create a new dictionary from a sequence
 
 =cut
 
-TODO: move this to the dict type as this is meant to be a class method
-not an instance method.
-
 */
 
-    void* invoke(void *next) {
+    METHOD PMC* __new__(PMC *cls, PMC *source) {
         PMC *dict = pmc_new(INTERP, dynclass_PyDict);
-        PMC *source = REG_PMC(5);
         PMC *iter;
         INTVAL argc = REG_INT(3);
 
-        REG_INT(3) = 1;
-        REG_PMC(5) = dict;
-
-        if (argc == 0) return next;
+        if (argc == 1) return dict;
 
         if (source->vtable->base_type == dynclass_PyDict) {
             iter = VTABLE_get_iter(INTERP, source);
@@ -426,8 +419,7 @@ not an instance method.
             }
         }
 
-
-        return next;
+        return dict;
     }
 
 /*

@@ -762,67 +762,6 @@ according to the type of C<*value>.
 
 /*
 
-=item C<PMC *find_method(STRING *method_name)>
-
-Looks up the method for C<*method_name> and returns it. If no method is
-found then lookup an attribute by this name, and return it.  If all else
-fails, return null.
-
-=cut
-
-TODO: create separate type objects for each builtin type which has
-direct pointer to the global hash for this particular class.
-
-*/
-
-    PMC* find_method(STRING* method_name) {
-        return Parrot_default_find_method(INTERP, SELF, method_name);
-    }
-
-/*
-
-=item C<PMC* subclass(STRING *name)>
-
-Create a subclass of the builtin class.  In additon to creating a
-new class (of type PyProxyType), an instance of PyProxyClass is also
-created and defined as the base class for the new class.
-
-See the description of PyProxyType and PyProxyClass to see how
-new instances are created and how methods are forwarded respectively.
-
-=cut
-
-TODO: create separate type objects for each builtin type and replace
-this logic with a TypeError.
-
-*/
-
-    PMC* subclass(STRING* name) {
-        INTVAL dynclass_PyProxyType, dynclass_PyProxyClass;
-        PMC *proxy_type, *proxy_class, *nameprop;
-        STRING *NAME, *BASES;
-
-        dynclass_PyProxyClass = Parrot_PMC_typenum(INTERP, "PyProxyClass");
-        proxy_class = pmc_new(INTERP, dynclass_PyProxyClass);
-
-        BASES = const_string(INTERP, "__bases__");
-        VTABLE_setprop(INTERP, proxy_class, BASES, SELF);
-
-        dynclass_PyProxyType = Parrot_PMC_typenum(INTERP, "PyProxyType");
-        proxy_type = pmc_new(INTERP, dynclass_PyProxyType);
-
-        NAME  = const_string(INTERP, "__name__");
-        nameprop = pmc_new(INTERP, dynclass_PyString);
-        VTABLE_setprop(INTERP, proxy_type, NAME, nameprop);
-        VTABLE_set_string_native(INTERP, nameprop, name);
-
-        VTABLE_setprop(INTERP, proxy_type, BASES, proxy_class);
-
-        return proxy_type;
-    }
-
-/*
-
 =back
 
 =cut

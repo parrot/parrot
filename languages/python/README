@@ -23,7 +23,7 @@ Benchmark status/issues:
 
   b1: passes.
   b2: passes.
-  b3: need to implement __new__
+  b3: need to implement list.sort
   b4: there is no b4!
   b5: awaiting completion of float, complex, ...
   b6: requires a dictionary with integer keys.

@@ -65,12 +65,17 @@ While this seems like a lot of work, lets consider all the cases:
 
 static INTVAL dynclass_PyClass;
 static INTVAL dynclass_PyString;
+static INTVAL dynclass_PyProxyClass;
 static INTVAL dynclass_PyProxyType;
 static STRING *BASES;
 static STRING *CLASS;
 static STRING *INIT;
 static STRING *NAME;
+static STRING *NEW;
 static STRING *PROXY;
+
+struct parrot_regs_t *
+Parrot_PyClass_runops_fromc(Parrot_Interp interpreter, PMC *sub);
 
 pmclass PyProxyType extends PyType dynpmc group python_group {
 
@@ -87,6 +92,7 @@ they will be used frequently here.
 
     void class_init() {
         if (pass) {
+            dynclass_PyProxyClass = Parrot_PMC_typenum(INTERP, "PyProxyClass");
             dynclass_PyProxyType = Parrot_PMC_typenum(INTERP, "PyProxyType");
             dynclass_PyClass = Parrot_PMC_typenum(INTERP, "PyClass");
             dynclass_PyString = Parrot_PMC_typenum(INTERP, "PyString");
@@ -94,6 +100,7 @@ they will be used frequently here.
             CLASS = const_string(INTERP, "__class__");
             INIT  = const_string(INTERP, "__init__");
             NAME  = const_string(INTERP, "__name__");
+            NEW   = const_string(INTERP, "__new__");
             PROXY = const_string(INTERP, "__proxy__");
         }
     }
@@ -109,39 +116,55 @@ initializers with arguments to be run.
 
 =cut
 
-TODO: reconcile this with Parrot's instantiate VTABLE entry.
-
 */
 
     void* invoke(void *next) {
-        PMC *proxy_class, *object_class, *proxy, *object, *init;
+        PMC *object_class, *proxy, *object, *init, *new;
 
-        proxy_class = VTABLE_getprop(INTERP, SELF, BASES);
-        object_class = VTABLE_getprop(INTERP, proxy_class, BASES);
-        while (1) {
-            PMC *parent_class = VTABLE_getprop(INTERP, object_class, BASES);
-            if (!parent_class || !VTABLE_defined(INTERP, parent_class))
-                break;
-            object_class = parent_class;
+        object_class = VTABLE_getprop(INTERP, SELF, PROXY);
+        if (!object_class || !VTABLE_defined(INTERP, object_class))
+            object_class = SELF;
+
+        new = VTABLE_find_method(INTERP, SELF, NEW);
+        init = VTABLE_find_method(INTERP, SELF, INIT);
+        if (new || init) {
+            int i = REG_INT(3)++;
+            while (i--)
+                REG_PMC(6+i)=REG_PMC(5+i);
         }
 
-        object = pmc_new(INTERP, object_class->vtable->base_type);
-
-        proxy = pmc_new(interpreter, dynclass_PyClass);
-        VTABLE_setprop(INTERP, proxy, CLASS, REG_PMC(0));
-
-        init = VTABLE_find_method(INTERP, proxy, INIT);
-        if (init) {
-            INTERP->ctx.current_object = proxy;
-            Parrot_runops_fromc(INTERP, init);
+        if (new) {
+            struct parrot_regs_t *bp;
+            struct Parrot_Context ctx;
+            save_context(interpreter, &ctx);
+            INTERP->ctx.current_object = SELF;
+            REG_PMC(5) = SELF;
+            bp = Parrot_PyClass_runops_fromc(INTERP, new);
+            object = BP_REG_PMC(bp,5);
+            restore_context(interpreter, &ctx);
         }
         else {
-            VTABLE_invoke(INTERP, object, next);
-            object = REG_PMC(5);
+            object = pmc_new(INTERP, object_class->vtable->base_type);
         }
 
-        VTABLE_setprop(INTERP, proxy, PROXY, object);
+        if (object_class == SELF)
+            proxy = object;
+        else {
+            proxy = pmc_new(interpreter, dynclass_PyClass);
+            VTABLE_setprop(INTERP, proxy, CLASS, REG_PMC(0));
+            VTABLE_setprop(INTERP, proxy, PROXY, object);
+        }
 
+        if (init) {
+            struct Parrot_Context ctx;
+            save_context(interpreter, &ctx);
+            INTERP->ctx.current_object = proxy;
+            REG_PMC(5) = proxy;
+            Parrot_PyClass_runops_fromc(INTERP, init);
+            restore_context(interpreter, &ctx);
+        }
+
+        REG_INT(3) = 1;
         REG_PMC(5) = proxy;
         return next;
     }
@@ -159,12 +182,27 @@ need to be filled in.
 */
 
     PMC* subclass(STRING* name) {
-        PMC *ret = pmc_new(INTERP, dynclass_PyProxyType);
+        PMC *newclass = pmc_new(INTERP, dynclass_PyProxyType);
+        PMC *proxy = VTABLE_getprop(INTERP, SELF, PROXY);
         PMC *nameprop = pmc_new(INTERP, dynclass_PyString);
+
+        if (proxy && VTABLE_defined(INTERP, proxy)) {
+            /* proxy is already set up */
+            VTABLE_setprop(INTERP, newclass, BASES, SELF);
+            VTABLE_setprop(INTERP, newclass, PROXY, proxy);
+        }
+        else {
+            /* need to create a proxy class */
+            PMC *proxy_class = pmc_new(INTERP, dynclass_PyProxyClass);
+            VTABLE_setprop(INTERP, proxy_class, BASES, SELF);
+            VTABLE_setprop(INTERP, newclass, BASES, proxy_class);
+            VTABLE_setprop(INTERP, newclass, PROXY, SELF);
+        }
+
         VTABLE_set_string_native(INTERP, nameprop, name);
-        VTABLE_setprop(INTERP, ret, NAME, nameprop);
-        VTABLE_setprop(INTERP, ret, BASES, SELF);
-        return ret;
+        VTABLE_setprop(INTERP, newclass, NAME, nameprop);
+
+        return newclass;
     }
 
 /*

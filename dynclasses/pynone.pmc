@@ -57,6 +57,25 @@ Return "None"
 
 /*
 
+=item C<INTVAL is_equal (PMC* value)>
+
+The C<==> operation.
+
+=cut
+
+*/
+
+    INTVAL is_equal (PMC* value) {
+MMD_PyNone: {
+            return 1;
+        }
+MMD_DEFAULT: {
+            return 0;
+        }
+    }
+
+/*
+
 =back
 
 =cut

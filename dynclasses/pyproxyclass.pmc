@@ -26,7 +26,7 @@ TODO: handle attributes.
 static INTVAL dynclass_PyProxyClass;
 static STRING *PROXY;
 
-pmclass PyProxyClass extends PyObject dynpmc group python_group {
+pmclass PyProxyClass extends PyType dynpmc group python_group {
 
 /*
 

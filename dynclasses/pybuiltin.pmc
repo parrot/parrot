@@ -31,13 +31,15 @@ static INTVAL dynclass_PyFloat;
 static INTVAL dynclass_PyList;
 static INTVAL dynclass_PyLong;
 static INTVAL dynclass_PyNone;
+static INTVAL dynclass_PyProxyType;
 static INTVAL dynclass_PyString;
 static INTVAL dynclass_PyTuple;
 
+static STRING *BASES;
 static STRING *HEX;
+static STRING *NAME;
 static STRING *OCT;
 static STRING *PYOBJECT;
-static STRING *BASES;
 
 extern PMC* Parrot_Hash_get_iter(Interp* interpreter, PMC* pmc);
 
@@ -46,12 +48,37 @@ extern PMC* Parrot_Hash_get_iter(Interp* interpreter, PMC* pmc);
 PMC* Parrot_lib_python_group_init(Interp* interpreter, PMC *lib_pmc);
 void Parrot_PyBuiltin___load__(Interp* interpreter, PMC* pmc);
 
-PMC*
-Parrot_lib_python_group_init(Interp* interpreter, PMC *lib_pmc)
-{
+PMC* Parrot_lib_python_group_init(Interp* interpreter, PMC *lib_pmc) {
     Parrot_PyBuiltin___load__(interpreter, NULL);
     return lib_pmc;
 }
+
+static PMC* make_type(Interp* interpreter, INTVAL class, STRING* name) {
+    STRING *pmcname = Parrot_base_vtables[class]->whoami;
+    PMC *type = pmc_new(interpreter, dynclass_PyProxyType);
+    PMC *nameprop = pmc_new(interpreter, dynclass_PyString);
+    PMC *stash, *iter, *item;
+    STRING *key;
+    INTVAL n, j;
+
+    stash = Parrot_find_global(interpreter, pmcname, NULL);
+    if (!stash) internal_exception(1, "Can't find methods");
+
+    /* For each, extract the key and item, and store in the scratchpad */
+    iter = Parrot_Hash_get_iter(interpreter, stash);
+    n = VTABLE_elements(interpreter, stash);
+    for (j = 0; j < n; ++j) {
+        key = VTABLE_shift_string(interpreter, iter);
+        item = VTABLE_get_pmc_keyed_str(interpreter, stash, key);
+        VTABLE_add_method(interpreter, type, key, item);
+    }
+
+    VTABLE_set_string_native(interpreter, nameprop, name);
+    VTABLE_setprop(interpreter, type, NAME, nameprop);
+
+    return type;
+}
+
 pmclass PyBuiltin dynpmc group python_group {
 /*
 
@@ -76,11 +103,13 @@ they will be used frequently here.
             dynclass_PyList      = Parrot_PMC_typenum(INTERP, "PyList");
             dynclass_PyLong      = Parrot_PMC_typenum(INTERP, "PyLong");
             dynclass_PyNone      = Parrot_PMC_typenum(INTERP, "PyNone");
+            dynclass_PyProxyType = Parrot_PMC_typenum(INTERP, "PyProxyType");
             dynclass_PyString    = Parrot_PMC_typenum(INTERP, "PyString");
             dynclass_PyTuple     = Parrot_PMC_typenum(INTERP, "PyTuple");
 
             BASES = const_string(INTERP, "__bases__");
             HEX = const_string(INTERP, "__hex__");
+            NAME = const_string(INTERP, "__name__");
             OCT = const_string(INTERP, "__oct__");
             PYOBJECT = const_string(INTERP, "PyObject");
         }
@@ -107,7 +136,7 @@ enter_nci_method should create these as locals to begin with.
 
     METHOD void __load__() {
         STRING *name, *key;
-        PMC *stash, *iter, *item, *pad, *temp;
+        PMC *stash, *iter, *item, *pad, *temp, *parent;
         INTVAL j, n;
 
         /* Already init'ed? */
@@ -173,15 +202,17 @@ enter_nci_method should create these as locals to begin with.
         scratchpad_store_by_name(INTERP, pad, 0, key, item);
 
         /* Class objects */
-        /* TODO: convert this to instances of <type> */
+        key = const_string(INTERP, "object");
+        parent = make_type(INTERP, dynclass_PyObject, key);
+
         key = const_string(INTERP, "dict");
-        item = pmc_new(INTERP, dynclass_PyDict);
+        item = make_type(INTERP, dynclass_PyDict, key);
+        VTABLE_setprop(INTERP, item, BASES, parent);
         scratchpad_store_by_name(INTERP, pad, 0, key, item);
 
-        /* TODO: convert this to instances of <type> */
         key = const_string(INTERP, "int");
-        item = pmc_new(INTERP, dynclass_PyInt);
-        VTABLE_set_integer_native(INTERP, item, 15);
+        item = make_type(INTERP, dynclass_PyInt, key);
+        VTABLE_setprop(INTERP, item, BASES, parent);
         scratchpad_store_by_name(INTERP, pad, 0, key, item);
 
         /* TODO: convert this to instances of <type> */

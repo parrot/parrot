@@ -27,8 +27,6 @@ static INTVAL dynclass_PyFloat;
 static INTVAL dynclass_PyLong;
 static INTVAL dynclass_PyString;
 
-static PMC* base_class;
-
 static void
 overflow(Interp *interpreter, PMC *self, INTVAL b, PMC *dest, int mmd)
 {
@@ -82,9 +80,6 @@ they will be used frequently here.
             dynclass_PyFloat   = Parrot_PMC_typenum(INTERP, "PyFloat");
             dynclass_PyLong    = Parrot_PMC_typenum(INTERP, "PyLong");
             dynclass_PyString  = Parrot_PMC_typenum(INTERP, "PyString");
-
-            /* TODO: make Int have a real base class */
-            base_class = pmc_new(INTERP, dynclass_PyInt);
         }
     }
 
@@ -584,20 +579,6 @@ Returns the boolean value of the integer.
 
 /*
 
-=item C<PMC *get_class()>
-
-Return the class of this object.
-
-=cut
-
-*/
-
-    PMC* get_class() {
-        return base_class;
-    }
-
-/*
-
 =item C<INTVAL get_integer()>
 
 Returns the integer value of the integer.
@@ -654,32 +635,28 @@ Returns a unique hash for this value
 
 /*
 
-=item C<void* invoke(void *next)>
+=item C<PMC* "__new__"(PMC *class, PMC *source)>
 
 Create a new integer
 
 =cut
 
-TODO: move this to the int type as this is meant to be a class method
-not an instance method.
-
 */
 
-    void* invoke(void *next) {
+    METHOD PMC* __new__(PMC *class, PMC *source) {
         INTVAL argc = REG_INT(3);
-        PMC *source = REG_PMC(5);
 
         PMC * ret = pmc_new(INTERP, dynclass_PyInt);
 
-        REG_INT(3) = 1;
-        REG_PMC(5) = ret;
+        /* XXX: quick hack: class method called directly */
+        if (argc == 3 && class == SELF) source = REG_PMC(7);
 
-        if (argc > 0) {
+        if (argc > 1) {
             INTVAL ivalue = VTABLE_get_integer(INTERP, source);
             VTABLE_set_integer_native(INTERP, ret, ivalue);
         }
 
-        return next;
+        return ret;
     }
 
 /*
@@ -693,8 +670,13 @@ The C<==> operation.
 */
 
     INTVAL is_equal (PMC* value) {
-        return (INTVAL)(PMC_int_val(SELF) ==
-            VTABLE_get_integer(INTERP, value));
+MMD_PyNone: {
+            return 0;
+        }
+MMD_DEFAULT: {
+            return (INTVAL)(PMC_int_val(SELF) ==
+                VTABLE_get_integer(INTERP, value));
+        }
     }
 
 /*
