@@ -7,6 +7,11 @@ BINDIR = $(EXEC_PREFIX)/bin
 LIBDIR = $(EXEC_PREFIX)/lib
 INCLUDEDIR = $(EXEC_PREFIX)/include
 
+# imcc dir
+IMCC_DIR = languages/imcc
+# file containing main
+PARROT_MAIN = test_main
+
 O = ${o}
 SO = ${so}
 A = ${a}
@@ -52,7 +57,11 @@ GEN_CONFIGS  = include/parrot/config.h include/parrot/platform.h \
 	CFLAGS languages/imcc/CFLAGS \
 	libparrot.def
 
-GEN_PASM_INCLUDES = ${gen_pasm_includes}
+# most of these are generatey by config/gen/parrot_include.pl
+
+GEN_PASM_INCLUDES = \
+	runtime/parrot/include/signal.pasm	\
+	${gen_pasm_includes}
 
 STICKY_FILES = $(GEN_CONFIGS) $(GEN_MAKEFILES) myconfig $(GEN_PASM_INCLUDES)
 
@@ -205,8 +214,8 @@ flags_dummy:
 
 mops : examples/assembly/mops${exe} examples/mops/mops${exe}
 
-$(TEST_PROG) : test_main$(O) $(GEN_HEADERS) $(LIBPARROT) lib/Parrot/OpLib/core.pm
-	$(LINK) ${ld_out}$(TEST_PROG) $(LINKFLAGS) test_main$(O) $(LIBPARROT) $(C_LIBS)
+$(TEST_PROG) : $(PARROT_MAIN)$(O) $(GEN_HEADERS) $(LIBPARROT) lib/Parrot/OpLib/core.pm
+	$(LINK) ${ld_out}$(TEST_PROG) $(LINKFLAGS) $(PARROT_MAIN)$(O) $(LIBPARROT) $(C_LIBS)
 	$(PERL) -MExtUtils::Command -e mv $(TEST_PROG) test_main$(EXE)
 
 lib_deps_object : $(O_FILES)
@@ -238,8 +247,8 @@ blib/lib/libparrot$(SO) : $(O_FILES)
 	$(MKDIR) blib blib/lib
 	$(LD) $(LD_SHARED) $(LD_SHARED_FLAGS) $(LDFLAGS) $(LD_OUT)blib/lib/libparrot$(SO) $(O_FILES) $(C_LIBS)
 
-$(TEST_PROG_SO) : test_main$(O) blib/lib/libparrot$(SO) lib/Parrot/OpLib/core.pm
-	$(LINK) $(LINKFLAGS) $(LD_OUT)$(TEST_PROG) test_main$(O) $(LIBPARROT) $(C_LIBS)
+$(TEST_PROG_SO) : $(PARROT_MAIN)$(O) blib/lib/libparrot$(SO) lib/Parrot/OpLib/core.pm
+	$(LINK) $(LINKFLAGS) $(LD_OUT)$(TEST_PROG) $(PARROT_MAIN)$(O) $(LIBPARROT) $(C_LIBS)
 
 # XXX The dependancies on SO.MAJOR.MINOR and SO.VERSION are removed
 #     because those should be done at "make install" and not "make shared"
@@ -313,7 +322,7 @@ $(PINFO) : pbc_info$(O) $(LIBPARROT)
 #
 ###############################################################################
 
-test_main$(O) : test_main.c $(GENERAL_H_FILES)
+$(PARROT_MAIN)$(O) : $(PARROT_MAIN).c $(GENERAL_H_FILES)
 
 lib/Parrot/OpLib/core.pm : $(OPS_FILES) ops2pm.pl lib/Parrot/OpsFile.pm lib/Parrot/Op.pm
 	$(PERL) ops2pm.pl $(OPS_FILES)
@@ -659,7 +668,7 @@ clean : testclean progclean
 
 progclean:
 	$(RM_F) $(O_FILES) \
-	        $(TEST_PROG) test_main$(O) test_main$(EXE) \
+	        $(TEST_PROG) $(PARROT_MAIN)$(O) $(PARROT_MAIN)$(EXE) \
 	        $(PDUMP) pdump$(O) packdump$(O) pbc_info$(O) $(PINFO) \
 	        $(PDB) pdb$(O) \
 	        $(DIS) disassemble$(O)
@@ -704,11 +713,11 @@ status :
 
 lint : ${test_prog}
 	$(LINT) ${cc_inc} ${cc_hasjit} "-Iclasses" $(LINTFLAGS) $(LINTOPTS) `echo $(O_FILES) | sed ${PQ}s/\.o/\.c/g${PQ}`
-	$(LINT) ${cc_inc} $(LINTFLAGS) $(LINTOPTS) test_main.c
+	$(LINT) ${cc_inc} $(LINTFLAGS) $(LINTOPTS) $(PARROT_MAIN).c
 
 lint2 : ${test_prog}
 	$(LINT) ${cc_inc} ${cc_hasjit} "-Iclasses" $(LINTFLAGS2) $(LINTOPTS) `echo $(O_FILES) | sed ${PQ}s/\.o/\.c/g${PQ}`
-	$(LINT) ${cc_inc} $(LINTFLAGS2) $(LINTOPTS) test_main.c
+	$(LINT) ${cc_inc} $(LINTFLAGS2) $(LINTOPTS) $(PARROT_MAIN).c
 
 
 ###############################################################################
@@ -749,9 +758,9 @@ miniparrot-prebuild : $(GEN_CONFIGS) $(FLUID_FILES)
 	@tools/dev/rebuild_miniparrot.pl --action=clean
 	@tools/dev/rebuild_miniparrot.pl --action=prebuild_classes $(CLASS_O_FILES)
 	@tools/dev/rebuild_miniparrot.pl --action=copy_src $(GEN_CONFIGS) $(FLUID_FILES) $(ALL_H_FILES)
-	@tools/dev/rebuild_miniparrot.pl --action=copy_src classes/*.h test_main.c $(INC)/debug.h
+	@tools/dev/rebuild_miniparrot.pl --action=copy_src classes/*.h $(PARROT_MAIN).c $(INC)/debug.h
 	@tools/dev/rebuild_miniparrot.pl --action=copy_src_from_obj $(O_FILES)
-	@tools/dev/rebuild_miniparrot.pl --action=write_buildscripts --executable=parrot $(O_FILES) test_main$(O)
+	@tools/dev/rebuild_miniparrot.pl --action=write_buildscripts --executable=parrot $(O_FILES) $(PARROT_MAIN)$(O)
 
 miniparrot-update :
 	tools/dev/rebuild_miniparrot.pl
