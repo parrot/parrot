@@ -269,7 +269,7 @@ maybe_builtin(Interp *interpreter, IMC_Unit *unit, char *name,
 {
     Instruction *ins;
     char sig[16];
-    int i, bi;
+    int i, bi, is_class_meth;
     SymReg *sub, *meth, *rr[10];
 
     assert(n < 15);
@@ -285,7 +285,25 @@ maybe_builtin(Interp *interpreter, IMC_Unit *unit, char *name,
      * create a method see imcc.y target = sub_call
      * cos Px, Py  => Px = Py.cos()
      */
-    if (1) {    /* method */
+    is_class_meth = Parrot_builtin_is_class_method(interpreter, bi);
+    if (is_class_meth) {    /* ParrotIO.open() */
+        const char *ns = Parrot_builtin_get_c_namespace(interpreter, bi);
+        SymReg *ns_sym;
+
+        ns_sym = mk_const(interpreter, str_dup(ns), 'S');
+        meth = mk_sub_address(interpreter, str_dup(name));
+        ins = IMCC_create_itcall_label(interpreter);
+        sub = ins->r[0];
+        IMCC_itcall_sub(interpreter, meth);
+        sub->pcc_sub->object = ns_sym;
+        for (i = 1; i < n; ++i) {
+            add_pcc_arg(sub, rr[i]);
+        }
+        add_pcc_result(sub, rr[0]);
+        emitb(unit, ins);
+        return ins;
+    }
+    else {    /* method y = x."cos"() */
         meth = mk_sub_address(interpreter, str_dup(name));
         ins = IMCC_create_itcall_label(interpreter);
         sub = ins->r[0];
@@ -308,7 +326,8 @@ int
 is_op(Interp *interpreter, char *name)
 {
     return interpreter->op_lib->op_code(name, 0) >= 0
-        || interpreter->op_lib->op_code(name, 1) >= 0;
+        || interpreter->op_lib->op_code(name, 1) >= 0
+        || Parrot_is_builtin(interpreter, name, NULL) >= 0;
 }
 
 /* make a instruction

@@ -33,7 +33,9 @@ typedef struct _builtin {
 
 static Builtins builtins[] = {
     { "cos", 	"P!O", 		"Float", 	0, 0 },
-    { "open", 	"P!S.S",	"ParrotIO", 	0, 0 }
+    { "lower", 	"P!O",	        "String", 	0, 0 },
+    { "open", 	"P!S.S",	"ParrotIO", 	0, 0 },
+    { "puts", 	"I!OS",         "ParrotIO", 	0, 0 }
 };
 
 /*
@@ -142,7 +144,7 @@ Parrot_is_builtin(Interp *interpreter, char *func, char *sig)
     i = find_builtin(interpreter, func);
     if (i < 0)
         return -1;
-    if (!check_builtin_sig(interpreter, i, sig))
+    if (sig && !check_builtin_sig(interpreter, i, sig))
         return -1;
     return i;
 }
@@ -161,6 +163,27 @@ Parrot_find_builtin(Interp *interpreter, STRING *func)
             builtins[i].meth_name);
     return m;
 }
+
+const char *
+Parrot_builtin_get_c_namespace(Interp *interpreter, int bi)
+{
+    int n;
+
+    n = sizeof(builtins) / sizeof(builtins[0]);
+    assert(bi >= 0 && bi < n);
+    return builtins[bi].c_ns;
+}
+
+int
+Parrot_builtin_is_class_method(Interp *interpreter, int bi)
+{
+    int n;
+
+    n = sizeof(builtins) / sizeof(builtins[0]);
+    assert(bi >= 0 && bi < n);
+    return builtins[bi].signature[2] != 'O';
+}
+
 /*
 
 =back

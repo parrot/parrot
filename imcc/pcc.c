@@ -905,7 +905,10 @@ expand_pcc_sub_call(Parrot_Interp interp, IMC_Unit * unit, Instruction *ins)
         if (sub->pcc_sub->object->color != 2) {
             regs[0] = get_pasm_reg(interp, "P2");
             regs[1] = sub->pcc_sub->object;
-            ins = insINS(interp, unit, ins, "set", regs, 2);
+            if (regs[1]->set == 'S')
+                ins = insINS(interp, unit, ins, "getclass", regs, 2);
+            else
+                ins = insINS(interp, unit, ins, "set", regs, 2);
         }
         if (sub->pcc_sub->nci)
             goto move_sub;
