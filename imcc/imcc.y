@@ -50,7 +50,7 @@ SymbolTable global_sym_tab;
  * No nested classes for now.
  */
 static Class * current_class;
-static IMC_Unit * cur_unit;
+IMC_Unit * cur_unit;
 
 /*
  * these are used for constructing one INS
@@ -258,16 +258,16 @@ static char * inv_op(char *op) {
 
 %%
 
-program:                         { /*imc_open_unit();*/ $$ = 0;}
-    compilation_units            { /*imc_close_unit(interp);*/ $$ = 0; }
+program:                         { $$ = 0;}
+    compilation_units            { $$ = 0; }
     ;
 
 compilation_unit:
           class                  { $$ = $1; cur_unit = 0; }
-        | sub                    { $$ = $1; /*imc_close_unit(interp);*/ cur_unit = 0; }
-        | pcc_sub                { $$ = $1; /*imc_close_unit(interp);*/ cur_unit = 0; }
-        | emit                   { $$ = $1; /*imc_close_unit(interp);*/ cur_unit = 0; }
-        | MACRO '\n'             { $$ = 0;  /*imc_close_unit(interp);*/ cur_unit = 0; }
+        | sub                    { $$ = $1; imc_close_unit(interp, cur_unit); cur_unit = 0; }
+        | pcc_sub                { $$ = $1; imc_close_unit(interp, cur_unit); cur_unit = 0; }
+        | emit                   { $$ = $1; imc_close_unit(interp, cur_unit); cur_unit = 0; }
+        | MACRO '\n'             { $$ = 0;  imc_close_unit(interp, cur_unit); cur_unit = 0; }
         | '\n'                   { $$ = 0; }
     ;
 
@@ -328,60 +328,8 @@ class:
         }
         '\n' class_body ENDCLASS
         {
-           /* XXX EVIL XXX
-            * Don't look behind the curtain, the wizard is fat and ugly.
-            * After 0.0.12 IMCC gets a long overdue rewrite. I
-            * just want a quick hack for 0.0.12 for "fake" classes
-            * We are using SymReg where we should be using Symbols
-            * and the APIs are done all wrong and we are doing all sorts
-            * of backflips. (And its my fault -Melvin)
-            */
-           SymbolList * list;
-           char buf[256];
-           SymReg * t1;
-           SymReg * p0;
-           p0 = mk_pasm_reg(str_dup("P0"));
-           sprintf(buf, "\"%s\"", $2);
-           t1 = mk_const(str_dup(buf), 'S');
-
-           /* make class and store PMC globally */
-           iNEW(interp, cur_unit, p0, str_dup("PerlHash"), NULL, 1);
-           MK_I(interp, cur_unit, "store_global", 2, t1, p0); 
-
-           /* foreach class.members generate */
-           list = symtab_to_symlist(current_class->members);
-           { 
-             Symbol * s;
-             SymReg * t2;
-             for(s = list->head; s; s = s->nextinlist) {
-                if(s->symtype == SYMTYPE_FIELD) {
-                   sprintf(buf, "\"%s\"", s->name);
-                   t1 = mk_const(str_dup(buf), 'S');
-                   if(s->type == 'I' || s->type == 'N') {
-                      t2 = mk_const(str_dup("0"), s->type);
-                      iINDEXSET(interp, cur_unit, p0, t1, t2);
-                   }
-                   else if(s->type == 'S') {
-                      t2 = mk_const(str_dup("\"\""), s->type);
-                      iINDEXSET(interp, cur_unit, p0, t1, t2);
-                   }
-                   else {
-
-                   }
-                }
-                else if(s->symtype == SYMTYPE_METHOD) {
-                   SymReg * p1;
-                   sprintf(buf, "\"%s\"", s->name);
-                   t1 = mk_const(str_dup(buf), 'S');
-                   p1 = mk_pasm_reg(str_dup("P1"));
-                   iNEWSUB(interp, cur_unit, p1, NEWSUB,
-                        mk_address(((Method*)s->p)->label->name, U_add_once), NULL, 1);
-                   iINDEXSET(interp, cur_unit, p0, t1, p1);
-                }
-             }
-           }
-           MK_I(interp, cur_unit, "end" ,0); 
-           emit_flush(interp, cur_unit);
+           /* Do nothing for now. Need to parse metadata for
+            * PBC creation. */
            current_class = NULL;
            $$ = 0;
         }
@@ -499,7 +447,6 @@ pcc_sub_call: PCC_BEGIN pcc_proto '\n' {
                */
               if (cur_unit->instructions->r[1] && cur_unit->instructions->r[1]->pcc_sub)
                   cur_unit->instructions->r[1]->pcc_sub->calls_a_sub = 1;
-
            }
            pcc_args
            pcc_call

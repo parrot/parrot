@@ -795,8 +795,14 @@ compile_file(Interp *interp, FILE *file)
     buffer = YY_CURRENT_BUFFER;
     yy_switch_to_buffer(yy_create_buffer(file, YY_BUF_SIZE));
 
+#if IMC_TRACE
+    fprintf(stderr, "imcc.l: compile_file\n");
+#endif
+
     emit_open(1, interp);
     yyparse((void *) interp);
+    imc_compile_all_units(interp);
+    imc_cleanup(interp);
     emit_close(interp);
 
     yy_switch_to_buffer(buffer);
