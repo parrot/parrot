@@ -2420,7 +2420,7 @@ These operations effect individual registers.
 
 =item B<entrytype>(out INT, in INT)
 
-Gets the type of entry $2 of the stack and puts in in $1
+Gets the type of entry $2 of the stack and puts it in $1
 
 =cut
 
@@ -2432,6 +2432,19 @@ op entrytype(out INT, in INT) {
     internal_exception(99, "Stack Depth wrong");
   }
   $1 = get_entry_type(interpreter, entry);
+  goto NEXT();
+}
+
+########################################
+
+=item B<depth>(out INT)
+
+Puts the depth of the user stack in $1.
+
+=cut
+
+op depth(out INT) {
+  $1 = stack_height(interpreter, interpreter->user_stack);
   goto NEXT();
 }
 
