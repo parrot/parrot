@@ -18,6 +18,8 @@
 
 #include "parrot/parrot.h"
 
+INTVAL key_2_idx(Parrot_Interp interpreter, PMC *pmc, PMC *key);
+
 static char *
 char_offset_int(Parrot_Interp interpreter, PMC *pmc, INTVAL ix, int *type)
 {
@@ -33,14 +35,38 @@ char_offset_int(Parrot_Interp interpreter, PMC *pmc, INTVAL ix, int *type)
     return ((char *)PMC_data(pmc)) + offs;
 }
 
+INTVAL
+key_2_idx(Parrot_Interp interpreter, PMC *pmc, PMC *key)
+{
+    int ix;
+    if (PObj_get_FLAGS(key) & KEY_string_FLAG) {
+	PMC *types = PMC_pmc_val(pmc);
+	if (types->vtable->base_type == enum_class_OrderedHash) {
+	    Hash *hash = (Hash*)PMC_struct_val(types);
+	    HashBucket *b = hash_get_bucket(interpreter, hash,
+		    key_string(interpreter, key));
+	    if (!b)
+		internal_exception(1, "key doesn't exist");
+	    ix = VTABLE_get_integer(interpreter, (PMC*) b->value);
+	}
+	else
+	    internal_exception(1, "unhandled type aggregate");
+	ix /= 3;
+    }
+    else
+	ix = key_integer(interpreter, key);
+    return ix;
+}
+
 static char *
 char_offset_key(Parrot_Interp interpreter, PMC *pmc, PMC *key, int *type)
 {
     size_t offs, n, count, size, max;
     PMC *next;
-    int ix = key_integer(interpreter, key);
+    int ix;
     char *p;
 
+    ix = key_2_idx(interpreter, pmc, key);
     next = key_next(interpreter, key);
     p = char_offset_int(interpreter, pmc, ix, type);
     ix *= 3;
@@ -61,6 +87,8 @@ ret_int(char *p, int type)
 	case enum_type_INTVAL:
 	case enum_type_int:
 	    return *(INTVAL*) p;
+	case enum_type_int16:
+	case enum_type_uint16:
 	case enum_type_short:
 	    return *(short*) p;
 	case enum_type_char:
@@ -102,6 +130,8 @@ set_int(char *p, int type, INTVAL value)
 	case enum_type_int:
 	    *(int*) p = value;
 	    break;
+	case enum_type_int16:
+	case enum_type_uint16:
 	case enum_type_short:
 	    *(short*)p = (short)value;
 	    break;

@@ -66,9 +66,19 @@ pmclass OrderedHash extends PerlArray need_ext does array does hash {
         return DYNSELF.get_integer_keyed_int(n);
     }
 
+    INTVAL get_integer_keyed (PMC* key) {
+        INTVAL n = PerlHash.SELF.get_integer_keyed(key);
+        return DYNSELF.get_integer_keyed_int(n);
+    }
     void set_pmc_keyed (PMC* key, PMC* value) {
 	INTVAL n = DYNSELF.elements();
 	DYNSELF.set_pmc_keyed_int(n, value);
+	PerlHash.SELF.set_integer_keyed(key, n);
+    }
+
+    void set_integer_keyed (PMC* key, INTVAL value) {
+	INTVAL n = DYNSELF.elements();
+	DYNSELF.set_integer_keyed_int(n, value);
 	PerlHash.SELF.set_integer_keyed(key, n);
     }
 

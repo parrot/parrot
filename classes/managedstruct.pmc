@@ -14,6 +14,9 @@
 #include "parrot/parrot.h"
 #include "parrot/method_util.h"
 
+
+INTVAL key_2_idx(Parrot_Interp interpreter, PMC *pmc, PMC *key);
+
 pmclass ManagedStruct extends UnManagedStruct need_ext {
 
     void init () {
@@ -40,7 +43,7 @@ pmclass ManagedStruct extends UnManagedStruct need_ext {
 
 	if (!key)
             return -1;
-        ix = key_integer(INTERP, key);
+        ix = key_2_idx(INTERP, SELF, key);
         if (!PMC_pmc_val(SELF) && (ix < 0 || ix >= PMC_int_val(SELF)))
 	    return -1;
 	return SUPER(key);
@@ -59,7 +62,7 @@ pmclass ManagedStruct extends UnManagedStruct need_ext {
 
         if (!key)
             return;
-        ix = key_integer(INTERP, key);
+        ix = key_2_idx(INTERP, SELF, key);
         if (!PMC_pmc_val(SELF) && (ix < 0 || ix >= PMC_int_val(SELF)))
             return;
         SUPER(key, value);
