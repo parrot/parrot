@@ -1,5 +1,5 @@
 # Parrot md5sum; Nick Glencross <nickg@glencros.demon.co.uk>
-#                Improvements from Leo
+#                Improvements from Leo and Jens Rieks
 #
 # Based on md5.c, from md5sum
 #           written by Ulrich Drepper <drepper@gnu.ai.mit.edu>, 1995.
@@ -14,6 +14,12 @@ MD5.imc - calculate MD5 checksums
   $P0 = _md5sum("foo")
   _md5_print($P0)
 
+or
+
+  load_bytecode "library/Digest/MD5.imc"
+  $P0 = _md5sum("bar")
+  $S0 = _md5_hex($P0)
+
 =head1 DESCRIPTION
 
 This is a pure Parrot MD5 hash routine. Therefore you should run it
@@ -25,13 +31,13 @@ with the JIT core if possible.
 
 Pass in a string, returns an Integer array with the result
 
-=head2 _md5_print
-
-Pass it the Integer array to print the checksum.
-
 =head2 _md5_hex
 
 Pass it the Integer array to get the checksum as string.
+
+=head2 _md5_print
+
+Pass it the Integer array to print the checksum.
 
 =head1 BUGS
 
@@ -47,14 +53,13 @@ Only tested so far on i386.
 
 =cut
 
-####################################
-# export function entries to globals
+###########################################################################
+# Export function entries to globals
 
 .sub onload @LOAD
     .local pmc endian
     endian = new Integer
     endian = 0
-    store_global "Digest", "_md5_swap_endian", endian
     
     $P0 = _config()
 
@@ -74,13 +79,15 @@ is_4byte_word:
 
 is_little_endian:
 
+    store_global "Digest", "_md5_swap_endian", endian
+
     .local pmc f
     f = find_global "Digest", "_md5sum"
     global "_md5sum" = f
-    f = find_global "Digest", "_md5_print"
-    global "_md5_print" = f
     f = find_global "Digest", "_md5_hex"
     global "_md5_hex" = f
+    f = find_global "Digest", "_md5_print"
+    global "_md5_print" = f
 .end
 
 .include "library/config.imc"
@@ -102,8 +109,6 @@ is_little_endian:
     $P0 = find_global "Digest", "_md5_swap_endian"
     $I0 = $P0
     _md5_create_buffer (str, buffer, $I0)
-
-    # _print_buffer (buffer, 8)
 
     _md5_init (context)
     _md5_process_buffer (context, buffer)
@@ -132,7 +137,7 @@ is_little_endian:
 .endm
 
 .macro FH (b,c,d)
-    tmp = .b ~ .c
+    tmp = .b  ~ .c
     tmp = tmp ~ .d
 .endm
 
@@ -215,7 +220,6 @@ is_little_endian:
 .end
 
 ###########################################################################
-
 # Create a buffer from the requested buffer
 
 .sub _md5_create_buffer
@@ -267,7 +271,7 @@ string_char:
      inc subcounter
      if subcounter != 4 goto md5_create_buffer_loop
      if endian goto endian_ok
-	 .swap (word)
+     .swap (word)
 endian_ok:
 
 
@@ -421,7 +425,7 @@ md5_loop:
     context[2] = C
     context[3] = D
 
-    # $S0 = _format_vals (A,B,C,D)
+    # $S0 = _md5_format_vals (A,B,C,D)
     # print $S0
     # print "\n"
 
@@ -429,9 +433,9 @@ md5_loop:
 
 ###########################################################################
 
-# format four hex values
+# Format four hex values
 
-.sub _format_vals
+.sub _md5_format_vals
     .param int A
     .param int B
     .param int C
@@ -450,42 +454,12 @@ md5_loop:
 
 ###########################################################################
 
-# Print the final checksum
-
-.sub _md5_print
-    .param pmc context
-
-    .local int A
-    .local int B
-    .local int C
-    .local int D
-
-    A = context[0]
-    B = context[1]
-    C = context[2]
-    D = context[3]
-
-    $P0 = find_global "Digest", "_md5_swap_endian"
-    if $P0 goto dont_swap
-
-    .swap (A)
-    .swap (B)
-    .swap (C)
-    .swap (D)
-
-dont_swap:
-
-    $S0 = _format_vals (A,B,C,D)
-    print $S0
-.end
+# Retrieve the final checksum
 
 .sub _md5_hex
     .param pmc context
 
-    .local int A
-    .local int B
-    .local int C
-    .local int D
+    .local int A, B, C, D
 
     A = context[0]
     B = context[1]
@@ -502,15 +476,24 @@ dont_swap:
 
 dont_swap:
 
-    $S0 = _format_vals (A,B,C,D)
+    $S0 = _md5_format_vals (A,B,C,D)
     .return($S0)
+.end
+
+# Convenience subroutine
+
+.sub _md5_print
+    .param pmc context
+
+    $S0 = _md5_hex (context)
+    print $S0
 .end
 
 ###########################################################################
 
 # For debugging
 
-.sub _print_buffer
+.sub _md5_print_buffer
     .param pmc buffer
     .param int word_size
 
@@ -526,7 +509,7 @@ dont_swap:
 print_buffer_loop:
     if counter >= size goto print_buffer_done
     value = buffer[counter]
-    $S0 = _number_as_hex (value, word_size)
+    $S0 = _md5_number_as_hex (value, word_size)
     print $S0
     print " | "
     counter = counter + 1
@@ -542,7 +525,7 @@ print_buffer_done:
 
 # Also for debugging
 
-.sub _number_as_hex
+.sub _md5_number_as_hex
     .param int number
     .param int word_size
 

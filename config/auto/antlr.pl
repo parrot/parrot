@@ -30,20 +30,21 @@ $description = "Determining whether antlr is installed...";
 
 sub runstep {
     my $a = `antlr -h 2>&1`;
+    $a = 'nada' unless defined $a;
     my $has_antlr = ($a =~ m/ANTLR Parser Generator/) ? 1 : 0;
 
     Configure::Data->set(has_antlr => $has_antlr);
 
     my $has_antlr_with_python = 0;
     if ( $has_antlr ) {
-        unlink <config/auto/antlr/*.py>; 
+        unlink <config/auto/antlr/*.py>;
         my $a = `antlr -o config/auto/antlr config/auto/antlr/test_python.g 2>&1`;
         $has_antlr_with_python = 1 if -e 'config/auto/antlr/test_python_l.py';
         $Configure::Step::result = $has_antlr_with_python ?
                                        'yes, with python' :
                                        'yes, no python';
     } else {
-        $Configure::Step::result = ($a =~ m/NoClassDefFoundError/) ? 
+        $Configure::Step::result = ($a =~ m/NoClassDefFoundError/) ?
                                      'no, NoClassDefFoundError' :
                                      'no';
     }
