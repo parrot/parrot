@@ -70,8 +70,8 @@ typedef struct Parrot_Interp {
     struct NRegChunk *num_reg_base;     /* Base of the float reg stack */
     struct SRegChunk *string_reg_base;  /* Base of the string stack */
     struct PRegChunk *pmc_reg_base;     /* Base of the PMC stack */
-    struct stack_chunk *user_stack;            /* Base of the scratch stack */
-    struct stack_chunk *control_stack;         /* Base of the flow control stack */
+    struct stack_chunk *user_stack;     /* Base of the scratch stack */
+    struct stack_chunk *control_stack;  /* Base of the flow control stack */
     struct Stash *perl_stash;           /* Pointer to the global variable
                                          * area */
     struct Scratchpad *cur_pad;         /* The current scratchpad */
