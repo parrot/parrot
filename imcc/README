@@ -1,8 +1,10 @@
-IMCC 0.0.3.0 
+IMCC 0.0.7.9 
 
-imcc is the intermediate compiler for Parrot.
+imcc is the Intermediate Code Compiler for Parrot.
+The language it compiles is currently termed Parrot
+Intermediate Language (PIR).
 
-Why? Writing a compiler is a large undertaking. I'm trying
+Why? Writing a compiler is a large undertaking. We are trying
 to take some of the load off of potential language designers,
 including the Perl6 compiler itself. We can provide a
 common back-end for Parrot that does:
@@ -10,24 +12,24 @@ common back-end for Parrot that does:
    Register Allocation and Spillage
    Constant folding and expression evaluation
    Instruction selection.
-   Coalescing, instruction scheduling, etc.
+   Optimization.
    
 This way, language designers can get right to work on
 
    Tokenizing, parsing, type checking AST/DAG production
 
-Then they can simply feed IR to imcc which will compile
+Then they can simply feed PIR to imcc which will compile
 directly to Parrot bytecode, potentially skipping the
 assembler altogether.
 
-So far, all the compiler does (besides translating the IR to pasm) is
-register allocation. I like Steve Muchnick's MIR language, and I'm
-taking a few things from it.
+So far, all the compiler does (besides translating the PIR to pasm) is
+register allocation and spilling. I like Steve Muchnick's MIR language,
+and I'm taking a few things from it.
 
 Presently you can write code with unlimited symbolics or named
 locals and imcc will translate to pasm.
 
-I expect the IR compiler to focus on staying FAST, simple and
+I expect the IR compiler to focus on staying FAST, simple, and
 maintainable, and never develop featuritis, however I want it to be
 adequate for all languages targetting parrot. Did I mention that
 it needs to be FAST?
@@ -66,8 +68,7 @@ Why C and Bison?
   Until Perl6 compiles itself and is fast, a Bison parser is
 the easiest to maintain. An additional, important benefit, is
 C-based parsers are pretty darn fast. Currently assembling
-Parrot on the fly is still relatively slow, however this is
-steadily improving.
+Parrot on the fly is still relatively slow.
 
 
 Language Reference
@@ -189,6 +190,8 @@ Instructions
    saveall
 
 
+The best way to learn PIR quickly is to study the output
+of other compilers that use it (Perl6 and Cola).
 
 Please mail perl6-internals@perl.org with bug-reports or patches.
 
