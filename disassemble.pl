@@ -13,6 +13,7 @@
 
 use strict;
 
+use Parrot::Config;
 use Parrot::Opcode;
 use Parrot::PackFile;
 use Parrot::PackFile::ConstTable;
@@ -22,22 +23,34 @@ use Parrot::PackFile::ConstTable;
 # GLOBAL VARIABLES:
 #
 
-my %unpack_type = (i => 'l',
-		   I => 'l',
-		   n => 'd',
-		   N => 'l',
-		   D => 'l',
-		   S => 'l',
-		   s => 'l',
-                  );
-my %unpack_size = (i => 4,
-		   n => 8,
-		   I => 4,
-		   N => 4,
-		   D => 4,
-		   S => 4,
-		   s => 4,
-		   );
+my %unpack_type;
+if (($] >= 5.006) && ($PConfig{ivsize} == $PConfig{longsize}) ) {
+    %unpack_type = ('i'=>'l!','n'=>'d');
+}
+elsif ($PConfig{ivsize} == 4) {
+    %unpack_type = ('i'=>'l','n'=>'d');
+}
+elsif ($PConfig{ivsize} == 8) {
+    %unpack_type = ('i'=>'q','n'=>'d');
+}
+else {
+    die("I don't know how to pack an IV!\n");
+}
+ 
+my(%real_type)=('I'=>'i','i'=>'i',
+                'N'=>'i','n'=>'n',
+                'S'=>'i','s'=>'i',
+                'D'=>'i');
+my(%type_swap)=('I'=>'i',  'N'=>'n',
+                'S'=>'s',  'P'=>'p',
+                'i'=>'ic', 'n'=>'nc',
+                's'=>'sc', 'D'=>'ic');
+
+my %unpack_size;
+foreach (keys(%real_type)) {
+    $unpack_size{$_}=length(pack($unpack_type{$real_type{$_}},0));
+    $unpack_type{$_} = $unpack_type{$real_type{$_}};
+}
 
 my %opcodes            = Parrot::Opcode::read_ops();
 my $opcode_fingerprint = Parrot::Opcode::fingerprint();
