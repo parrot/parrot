@@ -190,7 +190,8 @@ inline op bor(in PMC, in INT) :base_core {
 }
 
 inline op bor(in PMC, in PMC) :base_core {
-  $1->vtable->bitwise_or(interpreter, $1, $2, $1);
+  mmd_dispatch_v_ppp(interpreter, $1, $2, $1, MMD_BOR);
+/*  $1->vtable->bitwise_or(interpreter, $1, $2, $1);*/
   goto NEXT();
 }
 
@@ -205,7 +206,8 @@ inline op bor(in PMC, in PMC, in INT) :base_core {
 }
 
 inline op bor(in PMC, in PMC, in PMC) :base_core {
-  $2->vtable->bitwise_or(interpreter, $2, $3, $1);
+  mmd_dispatch_v_ppp(interpreter, $2, $3, $1, MMD_BOR);
+/*  $2->vtable->bitwise_or(interpreter, $2, $3, $1);*/
   goto NEXT();
 }
 

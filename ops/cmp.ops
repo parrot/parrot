@@ -740,7 +740,8 @@ inline op and(out INT, in INT, in INT) :base_core {
 }
 
 inline op and(in PMC, in PMC, in PMC) :base_core {
-  $2->vtable->logical_and(interpreter, $2, $3, $1);
+  mmd_dispatch_v_ppp(interpreter, $2, $3, $1, MMD_LAND);
+/*  $2->vtable->logical_and(interpreter, $2, $3, $1);*/
   goto NEXT();
 }
 
@@ -780,7 +781,8 @@ inline op or(out INT, in INT, in INT) :base_core {
 }
 
 inline op or(in PMC, in PMC, in PMC) :base_core {
-  $2->vtable->logical_or(interpreter, $2, $3, $1);
+  mmd_dispatch_v_ppp(interpreter, $2, $3, $1, MMD_LOR);
+/*  $2->vtable->logical_or(interpreter, $2, $3, $1);*/
   goto NEXT();
 }
 
@@ -801,7 +803,8 @@ inline op xor(out INT, in INT, in INT) :base_core {
 }
 
 inline op xor(in PMC, in PMC, in PMC) :base_core {
-  $2->vtable->logical_xor(interpreter, $2, $3, $1);
+  mmd_dispatch_v_ppp(interpreter, $2, $3, $1, MMD_LXOR);
+/*  $2->vtable->logical_xor(interpreter, $2, $3, $1);*/
   goto NEXT();
 }
 

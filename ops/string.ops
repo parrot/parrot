@@ -111,7 +111,8 @@ inline op concat(out STR, in STR, in STR) :base_mem {
 }
 
 inline op concat (in PMC, in PMC, in PMC) :base_mem {
-  $2->vtable->concatenate(interpreter, $2, $3, $1);
+  mmd_dispatch_v_ppp(interpreter, $2, $3, $1, MMD_CONCAT);
+/*  $2->vtable->concatenate(interpreter, $2, $3, $1);*/
   goto NEXT();
 }
 
@@ -140,7 +141,8 @@ inline op repeat(out STR, in STR, in INT) :base_mem {
 }
 
 inline op repeat (in PMC, in PMC, in PMC) :base_mem {
-  $2->vtable->repeat(interpreter, $2, $3, $1);
+  mmd_dispatch_v_ppp(interpreter, $2, $3, $1, MMD_REPEAT);
+/*  $2->vtable->repeat(interpreter, $2, $3, $1);*/
   goto NEXT();
 }
 

@@ -42,6 +42,13 @@ C<Parrot::Pmc2c>.
 #define VTABLE_bitwise_xors(i,l,r,d) mmd_dispatch_v_ppp(i,l,r,d,MMD_SXOR)
 #define VTABLE_bitwise_shl(i,l,r,d) mmd_dispatch_v_ppp(i,l,r,d,MMD_BSL)
 #define VTABLE_bitwise_shr(i,l,r,d) mmd_dispatch_v_ppp(i,l,r,d,MMD_BSR)
+#define VTABLE_bitwise_or(i,l,r,d) mmd_dispatch_v_ppp(i,l,r,d,MMD_BOR)
+#define VTABLE_concatenate(i,l,r,d) mmd_dispatch_v_ppp(i,l,r,d,MMD_CONCAT)
+#define VTABLE_logical_or(i,l,r,d) mmd_dispatch_v_ppp(i,l,r,d,MMD_LOR)
+#define VTABLE_logical_and(i,l,r,d) mmd_dispatch_v_ppp(i,l,r,d,MMD_LAND)
+#define VTABLE_logical_xor(i,l,r,d) mmd_dispatch_v_ppp(i,l,r,d,MMD_LXOR)
+#define VTABLE_repeat(i,l,r,d) mmd_dispatch_v_ppp(i,l,r,d,MMD_REPEAT)
+
 
 pmclass Ref does ref {
 
