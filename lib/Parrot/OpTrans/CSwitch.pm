@@ -195,6 +195,23 @@ SWITCH_AGAIN:
 END_C
 }
 
+=item C<run_core_split($base)>
+
+If defined return code to split e.g. a switch.
+
+=cut
+
+sub run_core_split
+{
+    my ($self) = @_;
+    $self->{split_count}++;
+
+    return <<END_C;
+    default:
+    switch (*cur_opcode) {
+END_C
+}
+
 =item C<run_core_finish($base)>
 
 Returns the C code following the run core function.
@@ -214,6 +231,13 @@ sub run_core_finish
 	    internal_exception(1, "illegal opcode\\n");
 	    break;
 	} /* switch */
+END_C
+    for (my $i = 0; $i < $self->{split_count}; $i++) {
+	$c .= <<END_C;
+    } /* switch $i */
+END_C
+    }
+	$c .= <<END_C;
     } while (1);
     return NULL;
 }

@@ -303,13 +303,14 @@ foreach my $op ($ops->ops) {
     my $definition;
     my $comment = '';
     $prev_def = '';
+    my $one_op = "";
     if ($suffix =~ /cg/) {
 	$prev_def = $definition = "PC_$index:";
 	$comment =  "/* ". $op->func_name($trans) ." */";
 	push @cg_jump_table, "        &&PC_$index,\n";
     } elsif ($suffix =~ /switch/) {
 	$comment =  "/* ". $op->func_name($trans) ." */";
-	push @op_funcs, <<END_C;
+	$one_op = <<END_C;
 	case $index:	$comment
 END_C
     }
@@ -324,57 +325,15 @@ END_C
     $source =~ s/\bop_lib\b/${bs}op_lib/;
     $source =~ s/\bops_addr\b/${bs}ops_addr/g;
 
-#    print HEADER "$prototype;\n";
-#
-#   for predereferenced code all variants of one op with or without
-#   "c" suffix generate the same function body
-#
-#   e.g.
-#
-#   set i,i,i
-#   set i,ic,i
-#   set i,i,ic
-#   set i,ic,ic
-#
-#   have all the same function body, and thus we generate only the
-#   first one and change the op_func_table accordingly
-#
-#   Err, above was true when absolute addresses were used, now
-#   with frame-pointer relative addressing, this doesn't work
-#   any more. Anyway, the compare of prev_source and source makes
-#   sure that correct code is produced.
-
-    if ($prev_source && $prev_source eq $source) {
-	push @op_func_table, sprintf("  %-50s /* %6ld */\n",
-	    "$prev_func_name,", $index);
-	push @op_funcs, <<"EOF";
-/*$prev_def	 $func_name => $prev_func_name */
-EOF
-	# pop off  label and duplicate previous
-	if ($suffix =~ /cg/) {
-	    pop @cg_jump_table;
-	    push @cg_jump_table, $cg_jump_table[-1];
-	}
-	if ($suffix =~ /switch/) {
-	    my $bdy = pop @op_funcs;
-	    my $cas = pop @op_funcs;
-	    $bdy = pop @op_funcs;
-	    push @op_funcs, $cas;
-	    push @op_funcs, $bdy;
-	}
+    if ($suffix =~ /switch/) {
+	$one_op .= "\t{\n$source}\n\n";
     }
     else {
-	if ($suffix =~ /switch/) {
-	    push @op_funcs,"\t{\n$source}\n\n";
-	}
-	else {
-	    push @op_func_table, sprintf("  %-50s /* %6ld */\n",
-		"$func_name,", $index);
-	    push @op_funcs,      "$definition $comment {\n$source}\n\n";
-	}
-	$prev_source = $source;
-	$prev_func_name = $func_name;
+	push @op_func_table, sprintf("  %-50s /* %6ld */\n",
+	    "$func_name,", $index);
+	$one_op .= "$definition $comment {\n$source}\n\n";
     }
+    push @op_funcs, $one_op;
     $index++;
 }
 
@@ -424,7 +383,13 @@ END_C
 #
 # Finish the SOURCE file's array initializer:
 #
-print SOURCE @op_funcs;
+my $CORE_SPLIT = 300;
+for (my $i = 0; $i < @op_funcs; $i++) {
+    if ($i && $i % $CORE_SPLIT == 0 && $trans->can("run_core_split")) {
+	print SOURCE $trans->run_core_split($base);
+    }
+    print SOURCE $op_funcs[$i];
+}
 
 if ($trans->can("run_core_finish")) {
     print SOURCE $trans->run_core_finish($base);
