@@ -1,3 +1,8 @@
+Note: To add things to the web-visible TOOD list, living at
+http://www.parrotcode.org/todo, send them in to
+bugs-parrot@bugs6.perl.org. They then need to be tagged as todo in the
+RT web interface.
+
 
 String subsystem
 ----------------
