@@ -32,6 +32,8 @@ struct PMC {
   SYNC *synchronize;
 };
 
+#define PMC_USER_FLAG 9 /* Unreserved flags start here */
+
 #endif
 
 /*
