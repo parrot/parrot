@@ -1,5 +1,5 @@
 Configure::Data->set(
-    cc => 'xlc_r',
-    link => 'xlc_r',
+    cc => 'cc_r',
+    link => 'cc_r',
     platform_asm => 1,
 );
