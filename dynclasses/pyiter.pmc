@@ -1,0 +1,58 @@
+/*
+Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+$Id$
+
+=head1 NAME
+
+classes/pyiter.pmc - Python Iterator
+
+=head1 DESCRIPTION
+
+These are the vtable functions for the Python Iterator class
+
+=head2 Methods
+
+=over 4
+
+=cut
+
+*/
+
+#include "parrot/parrot.h"
+
+pmclass PyIter extends Iterator dynpmc group python_group {
+
+/*
+
+=item C<PMC* "next"(PMC *self)>
+
+Returns the element for the current idx/key and sets the idx/key to
+the next one.
+
+=cut
+
+*/
+
+    METHOD PMC* next(PMC *self) {
+        return VTABLE_shift_pmc(INTERP, self);
+    }
+
+/*
+
+=back
+
+=cut
+
+*/
+
+}
+
+/*
+ * Local variables:
+ * c-indentation-style: bsd
+ * c-basic-offset: 4
+ * indent-tabs-mode: nil
+ * End:
+ *
+ * vim: expandtab shiftwidth=4:
+*/

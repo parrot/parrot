@@ -90,43 +90,43 @@ they will be used frequently here.
 
 /*
 
-=item C<PMC* "__hex__"()>
+=item C<PMC* "__hex__"(PMC *self)>
 
-Returns the hex representation of C<SELF>.
+Returns the hex representation of C<self>.
 
 =cut
 
 */
 
-    METHOD PMC* __hex__() {
+    METHOD PMC* __hex__(PMC *self) {
         PMC * ret = pmc_new(INTERP, dynclass_PyString);
         STRING *s = Parrot_sprintf_c(INTERP, "%#x",
-            VTABLE_get_integer(INTERP, SELF));
+            VTABLE_get_integer(INTERP, self));
         VTABLE_set_string_native(INTERP, ret, s);
         return ret;
     }
 
 /*
 
-=item C<PMC* "__oct__"()>
+=item C<PMC* "__oct__"(PMC *self)>
 
-Returns the octal representation of C<SELF>.
+Returns the octal representation of C<self>.
 
 =cut
 
 */
 
-    METHOD PMC* __oct__() {
+    METHOD PMC* __oct__(PMC *self) {
         PMC * ret = pmc_new(INTERP, dynclass_PyString);
         STRING *s = Parrot_sprintf_c(INTERP, "%#o",
-            VTABLE_get_integer(INTERP, SELF));
+            VTABLE_get_integer(INTERP, self));
         VTABLE_set_string_native(INTERP, ret, s);
         return ret;
     }
 
 /*
 
-=item C<PMC* "__pos__"()>
+=item C<PMC* "__pos__"(PMC *self)>
 
 Returns the value of the prefix operator C<+>.
 
@@ -134,24 +134,24 @@ Returns the value of the prefix operator C<+>.
 
 */
 
-    METHOD PMC* __pos__() {
+    METHOD PMC* __pos__(PMC *self) {
         PMC * ret = pmc_new(INTERP, dynclass_PyInt);
-        PMC_int_val(ret) = PMC_int_val(SELF);
+        PMC_int_val(ret) = PMC_int_val(self);
         return ret;
     }
 /*
 
-=item C<PMC* "__truediv__"(PMC *value)>
+=item C<PMC* "__truediv__"(PMC *self, PMC *value)>
 
-Divides C<SELF> by C<*value> and returns the result.
+Divides C<self> by C<*value> and returns the result.
 
 =cut
 
 */
 
-    METHOD PMC* __truediv__(PMC *value) {
+    METHOD PMC* __truediv__(PMC *self, PMC *value) {
         FLOATVAL valf = VTABLE_get_number(INTERP, value);
-        FLOATVAL d = PMC_int_val(SELF)/valf;
+        FLOATVAL d = PMC_int_val(self)/valf;
         INTVAL i = (INTVAL) d;
         PMC * ret;
         if ( (FLOATVAL)i != d ) {

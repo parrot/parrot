@@ -39,7 +39,7 @@ Sets the value of the integer to the value of the C<PyInt> C<*value>.
 
 /*
 
-=item C<PMC* "__match__"(PMC *exception)>
+=item C<PMC* "__match__"(PMC *self, PMC *exception)>
 
 If this PMC matches the given exception, return an exception
 object.  Else, rethrow.
@@ -48,10 +48,10 @@ object.  Else, rethrow.
 
 */
 
-    METHOD PMC* __match__(PMC *exception) {
+    METHOD PMC* __match__(PMC *self, PMC *exception) {
         if (exception->vtable->base_type == enum_class_Exception) {
             INTVAL extype = VTABLE_get_integer_keyed_int(INTERP, exception, 1);
-            if (PMC_int_val(SELF) != extype) {
+            if (PMC_int_val(self) != extype) {
                 rethrow_exception(INTERP, exception);
             }
         }

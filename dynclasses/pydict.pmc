@@ -147,7 +147,7 @@ Returns whether a key C<*key> exists in the hash.
 
 /*
 
-=item C<PMC* "fromkeys" (PMC* keys, PMC* value)>
+=item C<PMC* "fromkeys" (PMC* self, PMC* keys, PMC* value)>
 
 Create a new dict with the specified C<keys> and C<value>.  If C<value>
 is not specified, it defaults to C<None>.
@@ -156,11 +156,11 @@ is not specified, it defaults to C<None>.
 
 */
 
-    METHOD PMC* fromkeys (PMC *keys, PMC* value) {
+    METHOD PMC* fromkeys (PMC *self, PMC *keys, PMC* value) {
         PMC *iter = VTABLE_get_iter(INTERP, keys);
         PMC *ret = pmc_new(INTERP, dynclass_PyDict);
 
-        if (REG_INT(3) < 2) value = pmc_new(INTERP, dynclass_PyNone);
+        if (REG_INT(3) < 3) value = pmc_new(INTERP, dynclass_PyNone);
 
         while (VTABLE_get_bool(INTERP, iter)) {       
             PMC *key = VTABLE_shift_pmc(INTERP, iter);

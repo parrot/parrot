@@ -212,7 +212,7 @@ output_is(<< 'CODE', << 'OUTPUT', "overriding builtins");
     find_type $I1, 'PyString'
     new $P1, $I1
     $P1 = "T(%d)"
-    $P2 = self
+    $P2 = P5
     $P0 = $P1 % $P2
     .return ($P0)
 .end

@@ -131,6 +131,10 @@ Pythonic object constructor.
 
         init = VTABLE_find_method(INTERP, object, INIT);
         if (init) {
+            int i = REG_INT(3)++;
+            for (i=REG_INT(3); i>0; i--)
+               REG_PMC(5+i)=REG_PMC(4+i);
+            REG_PMC(5) = object;
             INTERP->ctx.current_object = object;
             Parrot_runops_fromc(INTERP, init);
         }

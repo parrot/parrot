@@ -29,7 +29,8 @@ pyobject \
   pystring \
   pytuple \
 pyproxytype \
-pyproxyclass
+pyproxyclass \
+pyiter
 
 BUILD = ${perl} build.pl
 

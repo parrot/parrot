@@ -22,6 +22,7 @@ These are the vtable functions for the PyList base class
 
 /* cache of classes referenced */
 static INTVAL dynclass_PyInt;
+static INTVAL dynclass_PyIter;
 static INTVAL dynclass_PyList;
 static INTVAL dynclass_PyNone;
 static INTVAL dynclass_PyString;
@@ -42,6 +43,7 @@ they will be used frequently here.
     void class_init() {
         if (pass) {
             dynclass_PyInt     = Parrot_PMC_typenum(INTERP, "PyInt");
+            dynclass_PyIter    = Parrot_PMC_typenum(INTERP, "PyIter");
             dynclass_PyList    = Parrot_PMC_typenum(INTERP, "PyList");
             dynclass_PyNone    = Parrot_PMC_typenum(INTERP, "PyNone");
             dynclass_PyString  = Parrot_PMC_typenum(INTERP, "PyString");
@@ -171,7 +173,7 @@ Return a new iterator for SELF.
 */
 
     PMC* get_iter () {
-        PMC *iter = pmc_new_init(interpreter, enum_class_Iterator, SELF);
+        PMC *iter = pmc_new_init(interpreter, dynclass_PyIter, SELF);
         PMC *key =  pmc_new(interpreter, enum_class_Key);
         PMC_struct_val(iter) = key;
         PObj_get_FLAGS(key) |= KEY_integer_FLAG;

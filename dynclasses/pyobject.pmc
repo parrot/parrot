@@ -46,10 +46,9 @@ static STRING* __xor__;
         PMC * method_pmc; \
         if (!OP) OP = string_from_cstring(INTERP, #OP, 0); \
         method_pmc = VTABLE_find_method(interpreter, VALUE, OP); \
-        REG_PMC(2) = VALUE; \
-        REG_PMC(5) = SELF; \
+        REG_PMC(5) = VALUE; \
+        REG_PMC(6) = SELF; \
         VTABLE_invoke(interpreter, method_pmc, next); \
-        REG_PMC(2) = SELF; \
         return REG_PMC(5);
 
 pmclass PyObject dynpmc group python_group {
@@ -91,154 +90,154 @@ Destroys the object.
 
 /*
 
-=item C<PMC* "__abs__"()>
+=item C<PMC* "__abs__"(PMC *self)>
 
-Returns the absolute value of C<SELF>.
+Returns the absolute value of C<self>.
 
 =cut
 
 */
 
-    METHOD PMC* __abs__() {
+    METHOD PMC* __abs__(PMC *self) {
         PMC * ret = pmc_new(INTERP, dynclass_PyObject);
-        VTABLE_absolute(INTERP, SELF, ret);
+        VTABLE_absolute(INTERP, self, ret);
         return ret;
     }
 
 /*
 
-=item C<PMC* "__add__"(PMC *value)>
+=item C<PMC* "__add__"(PMC *self, PMC *value)>
 
-Adds C<*value> to C<SELF> and returns the result.
+Adds C<*value> to C<self> and returns the result.
 
 =cut
 
 */
 
-    METHOD PMC* __add__(PMC *value) {
+    METHOD PMC* __add__(PMC *self, PMC *value) {
         PMC * ret = pmc_new(INTERP, dynclass_PyObject);
-        mmd_dispatch_v_ppp(INTERP, SELF, value, ret, MMD_ADD);
+        mmd_dispatch_v_ppp(INTERP, self, value, ret, MMD_ADD);
         return ret;
     }
 
 /*
 
-=item C<PMC* "__and__"(PMC *value)>
+=item C<PMC* "__and__"(PMC *self, PMC *value)>
 
-Returns the result of the logical C<AND> of C<SELF> and C<*value>.
+Returns the result of the logical C<AND> of C<self> and C<*value>.
 
 =cut
 
 */
 
-    METHOD PMC* __and__(PMC *value) {
+    METHOD PMC* __and__(PMC *self, PMC *value) {
         PMC * ret = pmc_new(INTERP, dynclass_PyObject);
-        mmd_dispatch_v_ppp(INTERP, SELF, value, ret, MMD_BAND);
+        mmd_dispatch_v_ppp(INTERP, self, value, ret, MMD_BAND);
         return ret;
     }
 
 /*
 
-=item C<PMC* "__cmp__"(PMC *value)>
+=item C<PMC* "__cmp__"(PMC *self, PMC *value)>
 
-Returns the result of comparing C<SELF> with C<*value>.
+Returns the result of comparing C<self> with C<*value>.
 
 =cut
 
 */
 
-    METHOD PMC* __cmp__(PMC *value) {
+    METHOD PMC* __cmp__(PMC *self, PMC *value) {
         PMC * ret = pmc_new(INTERP, dynclass_PyInt);
         VTABLE_set_integer_native(INTERP, ret,
-            mmd_dispatch_i_pp(INTERP, SELF, value, MMD_CMP));
+            mmd_dispatch_i_pp(INTERP, self, value, MMD_CMP));
         return ret;
     }
 
 /*
 
-=item C<PMC* "__div__"(PMC *value)>
+=item C<PMC* "__div__"(PMC *self, PMC *value)>
 
-Divides C<SELF> by C<*value> and returns the result.
+Divides C<self> by C<*value> and returns the result.
 
 =cut
 
 */
 
-    METHOD PMC* __div__(PMC *value) {
+    METHOD PMC* __div__(PMC *self, PMC *value) {
         PMC * ret = pmc_new(INTERP, dynclass_PyObject);
-        mmd_dispatch_v_ppp(INTERP, SELF, value, ret, MMD_DIVIDE);
+        mmd_dispatch_v_ppp(INTERP, self, value, ret, MMD_DIVIDE);
         return ret;
     }
 
 /*
 
-=item C<PMC* "__divmod__"(PMC *value)>
+=item C<PMC* "__divmod__"(PMC *self, PMC *value)>
 
-Divides C<SELF> by C<*value> and returns the remainder.
+Divides C<self> by C<*value> and returns the remainder.
 
 =cut
 
 */
 
-    METHOD PMC* __divmod__(PMC *value) {
+    METHOD PMC* __divmod__(PMC *self, PMC *value) {
         PMC * ret = pmc_new(INTERP, dynclass_PyObject);
-        mmd_dispatch_v_ppp(INTERP, SELF, value, ret, MMD_MOD);
+        mmd_dispatch_v_ppp(INTERP, self, value, ret, MMD_MOD);
         return ret;
     }
 
 /*
 
-=item C<PMC* "__float__"()>
+=item C<PMC* "__float__"(PMC *self)>
 
-Returns the float value of C<SELF>.
+Returns the float value of C<self>.
 
 =cut
 
 */
 
-    METHOD PMC* __float__() {
+    METHOD PMC* __float__(PMC *self) {
         PMC * ret = pmc_new(INTERP, dynclass_PyFloat);
-        FLOATVAL value = VTABLE_get_number(INTERP, SELF);
+        FLOATVAL value = VTABLE_get_number(INTERP, self);
         VTABLE_set_number_native(INTERP, ret, value);
         return ret;
     }
 
 /*
 
-=item C<PMC* "__floordiv__"(PMC *value)>
+=item C<PMC* "__floordiv__"(PMC *self, PMC *value)>
 
-Floor divides C<SELF> by C<*value> and returns the result.
+Floor divides C<self> by C<*value> and returns the result.
 
 =cut
 
 */
 
-    METHOD PMC* __floordiv__(PMC *value) {
+    METHOD PMC* __floordiv__(PMC *self, PMC *value) {
         PMC * ret = pmc_new(INTERP, dynclass_PyObject);
-        mmd_dispatch_v_ppp(INTERP, SELF, value, ret, MMD_DIVIDE);
+        mmd_dispatch_v_ppp(INTERP, self, value, ret, MMD_DIVIDE);
         return ret;
     }
 
 /*
 
-=item C<PMC* "__int__"()>
+=item C<PMC* "__int__"(PMC *self)>
 
-Returns the integer value of C<SELF>.
+Returns the integer value of C<self>.
 
 =cut
 
 */
 
-    METHOD PMC* __int__() {
+    METHOD PMC* __int__(PMC *self) {
         PMC * ret = pmc_new(INTERP, dynclass_PyInt);
-        INTVAL value = VTABLE_get_integer(INTERP, SELF);
+        INTVAL value = VTABLE_get_integer(INTERP, self);
         VTABLE_set_integer_native(INTERP, ret, value);
         return ret;
     }
 
 /*
 
-=item C<void "__invert__"(PMC *value)>
+=item C<void "__invert__"(PMC *self, PMC *value)>
 
 Calculates the bitwise negation and return the result.
 
@@ -246,15 +245,15 @@ Calculates the bitwise negation and return the result.
 
 */
 
-    METHOD PMC* __invert__() {
+    METHOD PMC* __invert__(PMC *self) {
         PMC * ret = pmc_new(INTERP, dynclass_PyObject);
-        VTABLE_bitwise_not(INTERP, SELF, ret);
+        VTABLE_bitwise_not(INTERP, self, ret);
         return ret;
     }
 
 /*
 
-=item C<PMC* "__lshift__"(PMC *value)>
+=item C<PMC* "__lshift__"(PMC *self, PMC *value)>
 
 Bitwise shift left (C<<<<<>>>) of the integer by C<*value> and
 returns the result.
@@ -263,47 +262,47 @@ returns the result.
 
 */
 
-    METHOD PMC* __lshift__(PMC *value) {
+    METHOD PMC* __lshift__(PMC *self, PMC *value) {
         PMC * ret = pmc_new(INTERP, dynclass_PyObject);
-        mmd_dispatch_v_ppp(INTERP, SELF, value, ret, MMD_BSL);
+        mmd_dispatch_v_ppp(INTERP, self, value, ret, MMD_BSL);
         return ret;
     }
 
 /*
 
-=item C<PMC* "__mod__"(PMC *value)>
+=item C<PMC* "__mod__"(PMC *self, PMC *value)>
 
-Return the modulus of C<SELF> with C<*value>.
+Return the modulus of C<self> with C<*value>.
 
 =cut
 
 */
 
-    METHOD PMC* __mod__(PMC *value) {
+    METHOD PMC* __mod__(PMC *self, PMC *value) {
         PMC * ret = pmc_new(INTERP, dynclass_PyObject);
-        mmd_dispatch_v_ppp(INTERP, SELF, value, ret, MMD_MOD);
+        mmd_dispatch_v_ppp(INTERP, self, value, ret, MMD_MOD);
         return ret;
     }
 
 /*
 
-=item C<PMC* "__mul__"(PMC *value)>
+=item C<PMC* "__mul__"(PMC *self, PMC *value)>
 
-Return the value of C<SELF> multiplied by C<*value>.
+Return the value of C<self> multiplied by C<*value>.
 
 =cut
 
 */
 
-    METHOD PMC* __mul__(PMC *value) {
+    METHOD PMC* __mul__(PMC *self, PMC *value) {
         PMC * ret = pmc_new(INTERP, dynclass_PyObject);
-        mmd_dispatch_v_ppp(INTERP, SELF, value, ret, MMD_MULTIPLY);
+        mmd_dispatch_v_ppp(INTERP, self, value, ret, MMD_MULTIPLY);
         return ret;
     }
 
 /*
 
-=item C<void "__neg__"(PMC *value)>
+=item C<void "__neg__"(PMC *self, PMC *value)>
 
 Calculates the negation and return the result.
 
@@ -311,15 +310,15 @@ Calculates the negation and return the result.
 
 */
 
-    METHOD PMC* __neg__() {
+    METHOD PMC* __neg__(PMC *self) {
         PMC * ret = pmc_new(INTERP, dynclass_PyObject);
-        VTABLE_neg(INTERP, SELF, ret);
+        VTABLE_neg(INTERP, self, ret);
         return ret;
     }
 
 /*
 
-=item C<void "__nonzero__"(PMC *value)>
+=item C<void "__nonzero__"(PMC *self, PMC *value)>
 
 Determine if a given value is "True" or "False"
 
@@ -327,32 +326,32 @@ Determine if a given value is "True" or "False"
 
 */
 
-    METHOD PMC* __nonzero__() {
+    METHOD PMC* __nonzero__(PMC *self) {
         PMC * ret = pmc_new(INTERP, dynclass_PyBoolean);
         VTABLE_set_integer_native(INTERP, ret,
-            VTABLE_get_bool(INTERP, SELF));
+            VTABLE_get_bool(INTERP, self));
         return ret;
     }
 
 /*
 
-=item C<PMC* "__or__"(PMC *value)>
+=item C<PMC* "__or__"(PMC *self, PMC *value)>
 
-Returns the result of the logical C<OR> of C<SELF> and C<*value>.
+Returns the result of the logical C<OR> of C<self> and C<*value>.
 
 =cut
 
 */
 
-    METHOD PMC* __or__(PMC *value) {
+    METHOD PMC* __or__(PMC *self, PMC *value) {
         PMC * ret = pmc_new(INTERP, dynclass_PyObject);
-        mmd_dispatch_v_ppp(INTERP, SELF, value, ret, MMD_BOR);
+        mmd_dispatch_v_ppp(INTERP, self, value, ret, MMD_BOR);
         return ret;
     }
 
 /*
 
-=item C<PMC* "__pow__"(PMC *value)>
+=item C<PMC* "__pow__"(PMC *self, PMC *value)>
 
 Raise the number to the specified power and return the result.
 
@@ -360,57 +359,57 @@ Raise the number to the specified power and return the result.
 
 */
 
-    METHOD PMC* __pow__(PMC *value) {
+    METHOD PMC* __pow__(PMC *self, PMC *value) {
         PMC * ret = pmc_new(INTERP, dynclass_PyObject);
-        mmd_dispatch_v_ppp(INTERP, SELF, value, ret, MMD_POW);
+        mmd_dispatch_v_ppp(INTERP, self, value, ret, MMD_POW);
         return ret;
     }
 
 /*
 
-=item C<PMC* "__radd__"(PMC *value)>
+=item C<PMC* "__radd__"(PMC *self, PMC *value)>
 
-Adds C<*value> to C<SELF> and returns the result.
-
-=cut
-
-*/
-
-    METHOD PMC* __radd__(PMC *value) {
-        RIGHT(INTERP, SELF, __add__, value);
-    }
-
-/*
-
-=item C<PMC* "__rand__"(PMC *value)>
-
-Returns the result of the logical C<AND> of C<*value> and C<SELF>.
+Adds C<*value> to C<self> and returns the result.
 
 =cut
 
 */
 
-    METHOD PMC* __rand__(PMC *value) {
-        RIGHT(INTERP, SELF, __and__, value);
+    METHOD PMC* __radd__(PMC *self, PMC *value) {
+        RIGHT(INTERP, self, __add__, value);
     }
 
 /*
 
-=item C<PMC* "__rdiv__"(PMC *value)>
+=item C<PMC* "__rand__"(PMC *self, PMC *value)>
 
-Divides C<*value> by C<SELF> and returns the result.
+Returns the result of the logical C<AND> of C<*value> and C<self>.
 
 =cut
 
 */
 
-    METHOD PMC* __rdiv__(PMC *value) {
-        RIGHT(INTERP, SELF, __div__, value);
+    METHOD PMC* __rand__(PMC *self, PMC *value) {
+        RIGHT(INTERP, self, __and__, value);
     }
 
 /*
 
-=item C<PMC* "__repr__"(PMC *value)>
+=item C<PMC* "__rdiv__"(PMC *self, PMC *value)>
+
+Divides C<*value> by C<self> and returns the result.
+
+=cut
+
+*/
+
+    METHOD PMC* __rdiv__(PMC *self, PMC *value) {
+        RIGHT(INTERP, self, __div__, value);
+    }
+
+/*
+
+=item C<PMC* "__repr__"(PMC *self, PMC *value)>
 
 Return the string representation of this PMC.
 
@@ -418,30 +417,30 @@ Return the string representation of this PMC.
 
 */
 
-    METHOD PMC* __repr__() {
+    METHOD PMC* __repr__(PMC *self) {
         PMC * ret = pmc_new(INTERP, dynclass_PyString);
         VTABLE_set_string_native(INTERP, ret,
-            VTABLE_get_repr(INTERP, SELF));
+            VTABLE_get_repr(INTERP, self));
         return ret;
     }
 
 /*
 
-=item C<PMC* "__rfloordiv__"(PMC *value)>
+=item C<PMC* "__rfloordiv__"(PMC *self, PMC *value)>
 
-Floor divides C<*value> by C<SELF> and returns the result.
+Floor divides C<*value> by C<self> and returns the result.
 
 =cut
 
 */
 
-    METHOD PMC* __rfloordiv__(PMC *value) {
-        RIGHT(INTERP, SELF, __floordiv__, value);
+    METHOD PMC* __rfloordiv__(PMC *self, PMC *value) {
+        RIGHT(INTERP, self, __floordiv__, value);
     }
 
 /*
 
-=item C<PMC* "__rlshift__"(PMC *value)>
+=item C<PMC* "__rlshift__"(PMC *self, PMC *value)>
 
 Bitwise shift left (C<<<<<>>>) of C<*value> by the integer and
 returns the result.
@@ -450,55 +449,55 @@ returns the result.
 
 */
 
-    METHOD PMC* __rlshift__(PMC *value) {
-        RIGHT(INTERP, SELF, __lshift__, value);
+    METHOD PMC* __rlshift__(PMC *self, PMC *value) {
+        RIGHT(INTERP, self, __lshift__, value);
     }
 
 /*
 
-=item C<PMC* "__rmod__"(PMC *value)>
+=item C<PMC* "__rmod__"(PMC *self, PMC *value)>
 
-Return the modulus of C<*value> with C<SELF>.
+Return the modulus of C<*value> with C<self>.
 
 =cut
 
 */
 
-    METHOD PMC* __rmod__(PMC *value) {
-        RIGHT(INTERP, SELF, __mod__, value);
+    METHOD PMC* __rmod__(PMC *self, PMC *value) {
+        RIGHT(INTERP, self, __mod__, value);
     }
 
 /*
 
-=item C<PMC* "__rmul__"(PMC *value)>
+=item C<PMC* "__rmul__"(PMC *self, PMC *value)>
 
-Return the value of C<*value> multiplied by C<SELF>.
+Return the value of C<*value> multiplied by C<self>.
 
 =cut
 
 */
 
-    METHOD PMC* __rmul__(PMC *value) {
-        RIGHT(INTERP, SELF, __mul__, value);
+    METHOD PMC* __rmul__(PMC *self, PMC *value) {
+        RIGHT(INTERP, self, __mul__, value);
     }
 
 /*
 
-=item C<PMC* "__ror__"(PMC *value)>
+=item C<PMC* "__ror__"(PMC *self, PMC *value)>
 
-Returns the result of the logical C<OR> of C<*value> and C<SELF>.
+Returns the result of the logical C<OR> of C<*value> and C<self>.
 
 =cut
 
 */
 
-    METHOD PMC* __ror__(PMC *value) {
-        RIGHT(INTERP, SELF, __or__, value);
+    METHOD PMC* __ror__(PMC *self, PMC *value) {
+        RIGHT(INTERP, self, __or__, value);
     }
 
 /*
 
-=item C<PMC* "__rpow__"(PMC *value)>
+=item C<PMC* "__rpow__"(PMC *self, PMC *value)>
 
 Raise the number to the specified power and return the result.
 
@@ -506,13 +505,13 @@ Raise the number to the specified power and return the result.
 
 */
 
-    METHOD PMC* __rpow__(PMC *value) {
-        RIGHT(INTERP, SELF, __pow__, value);
+    METHOD PMC* __rpow__(PMC *self, PMC *value) {
+        RIGHT(INTERP, self, __pow__, value);
     }
 
 /*
 
-=item C<PMC* "__rrshift__"(PMC *value)>
+=item C<PMC* "__rrshift__"(PMC *self, PMC *value)>
 
 Bitwise shift right (C<<<>>>>>) of C<*value> by the integer and
 returns the result.
@@ -521,13 +520,13 @@ returns the result.
 
 */
 
-    METHOD PMC* __rrshift__(PMC *value) {
-        RIGHT(INTERP, SELF, __rshift__, value);
+    METHOD PMC* __rrshift__(PMC *self, PMC *value) {
+        RIGHT(INTERP, self, __rshift__, value);
     }
 
 /*
 
-=item C<PMC* "__rshift__"(PMC *value)>
+=item C<PMC* "__rshift__"(PMC *self, PMC *value)>
 
 Bitwise shift right (C<<<>>>>>) of the integer by C<*value> and
 returns the result.
@@ -536,43 +535,43 @@ returns the result.
 
 */
 
-    METHOD PMC* __rshift__(PMC *value) {
+    METHOD PMC* __rshift__(PMC *self, PMC *value) {
         PMC * ret = pmc_new(INTERP, dynclass_PyObject);
-        mmd_dispatch_v_ppp(INTERP, SELF, value, ret, MMD_BSR);
+        mmd_dispatch_v_ppp(INTERP, self, value, ret, MMD_BSR);
         return ret;
     }
 
 /*
 
-=item C<PMC* "__rsub__"(PMC *value)>
+=item C<PMC* "__rsub__"(PMC *self, PMC *value)>
 
-Subtracts C<SELF> from C<*value> and returns the result.
-
-=cut
-
-*/
-
-    METHOD PMC* __rsub__(PMC *value) {
-        RIGHT(INTERP, SELF, __sub__, value);
-    }
-
-/*
-
-=item C<PMC* "__rxor__"(PMC *value)>
-
-Returns the result of the bitwise C<XOR> of C<*value> and C<SELF>.
+Subtracts C<self> from C<*value> and returns the result.
 
 =cut
 
 */
 
-    METHOD PMC* __rxor__(PMC *value) {
-        RIGHT(INTERP, SELF, __xor__, value);
+    METHOD PMC* __rsub__(PMC *self, PMC *value) {
+        RIGHT(INTERP, self, __sub__, value);
     }
 
 /*
 
-=item C<void "__str__"(PMC *value)>
+=item C<PMC* "__rxor__"(PMC *self, PMC *value)>
+
+Returns the result of the bitwise C<XOR> of C<*value> and C<self>.
+
+=cut
+
+*/
+
+    METHOD PMC* __rxor__(PMC *self, PMC *value) {
+        RIGHT(INTERP, self, __xor__, value);
+    }
+
+/*
+
+=item C<void "__str__"(PMC *self, PMC *value)>
 
 Return the string representation of this PMC.
 
@@ -580,42 +579,42 @@ Return the string representation of this PMC.
 
 */
 
-    METHOD PMC* __str__() {
+    METHOD PMC* __str__(PMC *self) {
         PMC * ret = pmc_new(INTERP, dynclass_PyString);
         VTABLE_set_string_native(INTERP, ret,
-            VTABLE_get_string(INTERP, SELF));
+            VTABLE_get_string(INTERP, self));
         return ret;
     }
 
 /*
 
-=item C<PMC* "__sub__"(PMC *value)>
+=item C<PMC* "__sub__"(PMC *self, PMC *value)>
 
-Subtracts C<*value> from C<SELF> and returns the result.
+Subtracts C<*value> from C<self> and returns the result.
 
 =cut
 
 */
 
-    METHOD PMC* __sub__(PMC *value) {
+    METHOD PMC* __sub__(PMC *self, PMC *value) {
         PMC * ret = pmc_new(INTERP, dynclass_PyObject);
-        mmd_dispatch_v_ppp(INTERP, SELF, value, ret, MMD_SUBTRACT);
+        mmd_dispatch_v_ppp(INTERP, self, value, ret, MMD_SUBTRACT);
         return ret;
     }
 
 /*
 
-=item C<PMC* "__xor__"(PMC *value)>
+=item C<PMC* "__xor__"(PMC *self, PMC *value)>
 
-Returns the result of the bitwise C<XOR> of C<SELF> and C<*value>.
+Returns the result of the bitwise C<XOR> of C<self> and C<*value>.
 
 =cut
 
 */
 
-    METHOD PMC* __xor__(PMC *value) {
+    METHOD PMC* __xor__(PMC *self, PMC *value) {
         PMC * ret = pmc_new(INTERP, dynclass_PyObject);
-        mmd_dispatch_v_ppp(INTERP, SELF, value, ret, MMD_BXOR);
+        mmd_dispatch_v_ppp(INTERP, self, value, ret, MMD_BXOR);
         return ret;
     }
 

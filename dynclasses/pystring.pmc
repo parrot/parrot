@@ -21,6 +21,7 @@ C<PyString> extends C<PyObject> to provide Python string behaviour.
 #include "parrot/parrot.h"
 
 /* cache of classes referenced */
+static INTVAL dynclass_PyIter;
 static INTVAL dynclass_PyString;
 static INTVAL dynclass_PyTuple;
 
@@ -39,6 +40,7 @@ they will be used frequently here.
 
     void class_init() {
         if (pass) {
+            dynclass_PyIter    = Parrot_PMC_typenum(INTERP, "PyIter");
             dynclass_PyString  = Parrot_PMC_typenum(INTERP, "PyString");
             dynclass_PyTuple   = Parrot_PMC_typenum(INTERP, "PyTuple");
         }
@@ -130,7 +132,7 @@ Return a new iterator for this string.
 */
 
     PMC* get_iter () {
-        PMC *iter = pmc_new_init(interpreter, enum_class_Iterator, SELF);
+        PMC *iter = pmc_new_init(interpreter, dynclass_PyIter, SELF);
         PMC *key =  pmc_new(interpreter, enum_class_Key);
         PMC_struct_val(iter) = key;
         PObj_get_FLAGS(key) |= KEY_integer_FLAG;

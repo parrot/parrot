@@ -100,7 +100,7 @@ Invoke the real method
         if (!PMC_struct_val(SELF))
             internal_exception(1, "Invoke() called on a PyProxyClass object");
 
-        INTERP->ctx.current_object = REG_PMC(2) = 
+        INTERP->ctx.current_object = REG_PMC(2) =  REG_PMC(5) = 
             VTABLE_getprop(INTERP, proxy, PROXY);
 
         return VTABLE_invoke(INTERP, (PMC*)PMC_struct_val(SELF), next);
