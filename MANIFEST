@@ -58,6 +58,7 @@ docs/Makefile.in
 docs/intro.pod
 docs/jit.pod
 docs/overview.pod
+docs/ParrotFAQ.htm
 docs/parrot.pod
 docs/parrot_assembly.pod
 docs/parrotbyte.pod
