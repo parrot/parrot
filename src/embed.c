@@ -41,7 +41,8 @@ void
 Parrot_setflag(struct Parrot_Interp *interpreter, Parrot_flag flag,
                Parrot_flag_val value)
 {
-    interpreter->flags |= flag;
+    if (value) Interp_flags_SET(interpreter, flag);
+    else       Interp_flags_CLEAR(interpreter, flag);
 }
 
 void
@@ -166,29 +167,29 @@ Parrot_runcode(struct Parrot_Interp *interpreter, int argc, char *argv[])
     INTVAL i;
     PMC *userargv;
 
-    if (interpreter->flags & PARROT_DEBUG_FLAG) {
+    if (Interp_flags_TEST(interpreter, PARROT_DEBUG_FLAG)) {
         fprintf(stderr, "*** Parrot VM: Debugging enabled. ***\n");
 
-        if (interpreter->flags & PARROT_BOUNDS_FLAG) {
+        if (Interp_flags_TEST(interpreter, PARROT_BOUNDS_FLAG)) {
             fprintf(stderr, "*** Parrot VM: Bounds checking enabled. ***\n");
         }
-        if (interpreter->flags & PARROT_PREDEREF_FLAG) {
+        if (Interp_flags_TEST(interpreter, PARROT_PREDEREF_FLAG)) {
             fprintf(stderr, "*** Parrot VM: Predereferencing enabled. ***\n");
         }
-        if (interpreter->flags & PARROT_JIT_FLAG) {
+        if (Interp_flags_TEST(interpreter, PARROT_JIT_FLAG)) {
             fprintf(stderr, "*** Parrot VM: JIT enabled. ***\n");
         }
     }
 
 #if !defined(JIT_CAPABLE) || !JIT_CAPABLE
-    if (interpreter->flags & PARROT_JIT_FLAG) {
+    if (Interp_flags_TEST(interpreter, PARROT_JIT_FLAG)) {
         fprintf(stderr,
                 "Parrot VM: Platform " JIT_ARCHNAME " is not JIT-capable.\n");
         exit(1);
     }
 #endif
 
-    if (interpreter->flags & PARROT_DEBUG_FLAG) {
+    if (Interp_flags_TEST(interpreter, PARROT_DEBUG_FLAG)) {
         fprintf(stderr,
                 "*** Parrot VM: Setting up ARGV array in P0.  Current argc: %d ***\n",
                 argc);
@@ -197,7 +198,7 @@ Parrot_runcode(struct Parrot_Interp *interpreter, int argc, char *argv[])
     userargv = pmc_new(interpreter, enum_class_PerlArray);
 
     for (i = 0; i < argc; i++) {
-        if (interpreter->flags & PARROT_DEBUG_FLAG) {
+        if (Interp_flags_TEST(interpreter, PARROT_DEBUG_FLAG)) {
             fprintf(stderr, "\t" INTVAL_FMT ": %s\n", i, argv[i]);
         }
 
@@ -252,7 +253,7 @@ Parrot_runcode(struct Parrot_Interp *interpreter, int argc, char *argv[])
         );
     }
 
-    if (interpreter->flags & PARROT_DEBUG_FLAG) {
+    if (Interp_flags_TEST(interpreter, PARROT_DEBUG_FLAG)) {
         fprintf(stderr, "\
 *** Parrot VM: Dumping GC info ***\n\
 \tTotal memory allocated: %u\n\

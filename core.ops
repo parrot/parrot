@@ -2063,8 +2063,8 @@ If $1 is zero, turn off debugging. Otherwise turn it on.
 =cut
 
 inline op debug(in INT) {
-  if ($1 != 0) { interpreter->flags |=  PARROT_DEBUG_FLAG; }
-  else         { interpreter->flags &= ~PARROT_DEBUG_FLAG; }
+  if ($1 != 0) { Interp_flags_SET(interpreter,   PARROT_DEBUG_FLAG); }
+  else         { Interp_flags_CLEAR(interpreter, PARROT_DEBUG_FLAG); }
   restart NEXT();
 }
 
@@ -2078,8 +2078,8 @@ If $1 is zero, turn off byte code bounds checking. Otherwise turn it on.
 =cut
 
 inline op bounds(in INT) {
-  if ($1 != 0) { interpreter->flags |=  PARROT_BOUNDS_FLAG; }
-  else         { interpreter->flags &= ~PARROT_BOUNDS_FLAG; }
+  if ($1 != 0) { Interp_flags_SET(interpreter,   PARROT_BOUNDS_FLAG); }
+  else         { Interp_flags_CLEAR(interpreter, PARROT_BOUNDS_FLAG); }
   restart NEXT();
 }
 
@@ -2093,8 +2093,8 @@ If $1 is zero, turn off profiling. Otherwise turn it on.
 =cut
 
 inline op profile(in INT) {
-  if ($1 != 0) { interpreter->flags |=  PARROT_PROFILE_FLAG; }
-  else         { interpreter->flags &= ~PARROT_PROFILE_FLAG; }
+  if ($1 != 0) { Interp_flags_SET(interpreter,   PARROT_PROFILE_FLAG); }
+  else         { Interp_flags_CLEAR(interpreter, PARROT_PROFILE_FLAG); }
   restart NEXT();
 }
 
@@ -2108,8 +2108,8 @@ If $1 is zero, turn off tracing. Otherwise turn it on.
 =cut
 
 inline op trace(in INT) {
-  if ($1 != 0) { interpreter->flags |=  PARROT_TRACE_FLAG; }
-  else         { interpreter->flags &= ~PARROT_TRACE_FLAG; }
+  if ($1 != 0) { Interp_flags_SET(interpreter,   PARROT_TRACE_FLAG); }
+  else         { Interp_flags_CLEAR(interpreter, PARROT_TRACE_FLAG); }
   restart NEXT();
 }
 

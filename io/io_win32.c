@@ -132,7 +132,7 @@ PIO_win32_open(theINTERP, ParrotIOLayer *layer,
     PIOHANDLE fd;
     type = PIO_TYPE_FILE;
 #  if 0
-    if ((interpreter->flags & PARROT_DEBUG_FLAG) != 0) {
+    if ((Interp_flags_TEST(interpreter, PARROT_DEBUG_FLAG)) != 0) {
         fprintf(stderr, "PIO_win32_open: %s\n", spath);
     }
 #  endif

@@ -26,6 +26,10 @@ typedef enum {
     PARROT_JIT_FLAG      = 0x20   /* We're using the jit runops */
 } Interp_flags;
 
+#define Interp_flags_SET(interp, flag)   (/*@i1@*/ (interp)->flags |= (flag))
+#define Interp_flags_CLEAR(interp, flag) (/*@i1@*/ (interp)->flags &= ~(flag))
+#define Interp_flags_TEST(interp, flag)  (/*@i1@*/ (interp)->flags & (flag))
+
 #if defined(PARROT_IN_CORE)
 
 #include "parrot/register.h"

@@ -128,7 +128,7 @@ PIO_init(theINTERP)
         internal_exception(PIO_ERROR, "PIO init std handles failed.");
     }
 
-    if ((interpreter->flags & PARROT_DEBUG_FLAG) != 0) {
+    if (Interp_flags_TEST(interpreter, PARROT_DEBUG_FLAG)) {
         PIO_puts(interpreter, PIO_STDERR(interpreter),
                  "PIO: IO system initialized.\n");
     }

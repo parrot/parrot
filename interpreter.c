@@ -409,20 +409,20 @@ runops(struct Parrot_Interp *interpreter, struct PackFile *code, size_t offset)
     interpreter->resume_flag = 1;
 
     while (interpreter->resume_flag) {
-        int which = 0;
+        unsigned int which = 0;
         opcode_t *pc = (opcode_t *)
             interpreter->code->byte_code + interpreter->resume_offset;
 
         interpreter->resume_offset = 0;
         interpreter->resume_flag = 0;
 
-        which |= interpreter->flags & PARROT_BOUNDS_FLAG ? 0x01 : 0x00;
-        which |= interpreter->flags & PARROT_PROFILE_FLAG ? 0x02 : 0x00;
-        which |= interpreter->flags & PARROT_TRACE_FLAG ? 0x04 : 0x00;
+        which |= (Interp_flags_TEST(interpreter, PARROT_BOUNDS_FLAG))  ? 0x01 : 0x00;
+        which |= (Interp_flags_TEST(interpreter, PARROT_PROFILE_FLAG)) ? 0x02 : 0x00;
+        which |= (Interp_flags_TEST(interpreter, PARROT_TRACE_FLAG))   ? 0x04 : 0x00;
 
         core = which ? runops_slow_core : runops_fast_core;
 
-        if ((interpreter->flags & PARROT_PROFILE_FLAG) != 0) {
+        if (Interp_flags_TEST(interpreter, PARROT_PROFILE_FLAG)) {
             unsigned int i;
 
             if (interpreter->profile == NULL) {
@@ -436,7 +436,7 @@ runops(struct Parrot_Interp *interpreter, struct PackFile *code, size_t offset)
             }
         }
 
-        if ((interpreter->flags & PARROT_PREDEREF_FLAG) != 0) {
+        if (Interp_flags_TEST(interpreter, PARROT_PREDEREF_FLAG)) {
             offset = pc - (opcode_t *)interpreter->code->byte_code;
 
             if (!interpreter->prederef_code) {
@@ -454,7 +454,7 @@ runops(struct Parrot_Interp *interpreter, struct PackFile *code, size_t offset)
             runops_prederef(interpreter, pc,
                             interpreter->prederef_code + offset);
         }
-        else if ((interpreter->flags & PARROT_JIT_FLAG) != 0) {
+        else if (Interp_flags_TEST(interpreter, PARROT_JIT_FLAG)) {
 #if !JIT_CAPABLE
             internal_exception(JIT_UNAVAILABLE,
                                "Error: PARROT_JIT_FLAG is set, but interpreter is not JIT_CAPABLE!\n");
