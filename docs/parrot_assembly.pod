@@ -543,6 +543,10 @@ Find the lexical of name sy and store the PMC pointer in register Px.
 Find the PMC for the global variable sy from the table sz and store it
 in register X
 
+=item find_global Px, sy
+
+Find the PMC for the global in the default table and put it in X.
+
 =item find_global_table Px, sy
 
 Find the global symbol table Y and store its PMC in X
@@ -561,6 +565,10 @@ outermost pad. Put the resulting PMC pointer in register x
 =item fetch_global Px, Py, iz
 
 Fetch the global in slot Z of the symbol table pointed to by Y
+
+=item store_global Px, sy
+
+Store X in the default global symbol table with a name of Y.
 
 =item newpad pad_descriptor
 

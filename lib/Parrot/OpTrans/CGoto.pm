@@ -111,10 +111,10 @@ sub goto_pop
 #
 
 my %arg_maps = (
-  'i'  => "interpreter->int_reg->registers[%ld]",
-  'n'  => "interpreter->num_reg->registers[%ld]",
-  'p'  => "interpreter->pmc_reg->registers[%ld]",
-  's'  => "interpreter->string_reg->registers[%ld]",
+  'i'  => "interpreter->int_reg.registers[%ld]",
+  'n'  => "interpreter->num_reg.registers[%ld]",
+  'p'  => "interpreter->pmc_reg.registers[%ld]",
+  's'  => "interpreter->string_reg.registers[%ld]",
 
   'ic' => "%ld",
   'nc' => "interpreter->code->const_table->constants[%ld]->number",

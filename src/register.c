@@ -17,58 +17,28 @@
 */
 void
 Parrot_push_i(struct Parrot_Interp *interpreter) {
-    struct IRegChunk *chunk_base;
-    
-    chunk_base = INT_CHUNK_BASE(interpreter->int_reg);
-    /* Do we have any slots left in the current chunk? */
-    if (chunk_base->free) {
-        interpreter->int_reg = &chunk_base->IReg[chunk_base->used++];
-        chunk_base->free--;
+    /* Do we have any space in the current savestack? If so, memcpy
+       down */
+    if (interpreter->int_reg_top->free) {
+        memcpy(&interpreter->int_reg_top->IReg[interpreter->int_reg_top->used],
+               &interpreter->int_reg, sizeof(struct IReg));
+        interpreter->int_reg_top->free--;
+        interpreter->int_reg_top->used++;
     }
     /* Nope, so plan B time. Allocate a new chunk of integer register frames */
     else {
         struct IRegChunk *new_chunk;
-        new_chunk = mem_allocate_aligned(sizeof(struct IRegChunk));
+        new_chunk = mem_sys_allocate(sizeof(struct IRegChunk));
+        memcpy(&interpreter->int_reg_top->IReg[0],
+               &interpreter->int_reg, sizeof(struct IReg));
         new_chunk->used = 1;
         new_chunk->free = FRAMES_PER_INT_REG_CHUNK - 1;
         new_chunk->next = NULL;
-        new_chunk->prev = chunk_base;
-        chunk_base->next = new_chunk;
-        interpreter->int_reg = &new_chunk->IReg[0];
+        new_chunk->prev = interpreter->int_reg_top;
+        interpreter->int_reg_top->next = new_chunk;
+        interpreter->int_reg_top = new_chunk;
     }
-}
-
-/*=for api register Parrot_clone_i
-  pushes a new integer register frame on the frame stack and
-  copies the last frame to the current frame
-*/
-void
-Parrot_clone_i(struct Parrot_Interp *interpreter) {
-    struct IRegChunk *chunk_base;
-    
-    chunk_base = INT_CHUNK_BASE(interpreter->int_reg);
-    /* Do we have any slots left in the current chunk? */
-    if (chunk_base->free) {
-        interpreter->int_reg = &chunk_base->IReg[chunk_base->used++];
-        chunk_base->free--;
-        mem_sys_memcopy(&chunk_base->IReg[chunk_base->used-1],
-                        &chunk_base->IReg[chunk_base->used-2],
-                        sizeof(struct IReg));
-    }
-    /* Nope, so plan B time. Allocate a new chunk of integer register frames */
-    else {
-        struct IRegChunk *new_chunk;
-        new_chunk = mem_allocate_aligned(sizeof(struct IRegChunk));
-        new_chunk->used = 1;
-        new_chunk->free = FRAMES_PER_INT_REG_CHUNK - 1;
-        new_chunk->next = NULL;
-        new_chunk->prev = chunk_base;
-        chunk_base->next = new_chunk;
-        mem_sys_memcopy(&new_chunk->IReg[0],
-                        &chunk_base->IReg[chunk_base->used-1],
-                        sizeof(struct IReg));
-        interpreter->int_reg = &new_chunk->IReg[0];
-    }
+    Parrot_clear_i(interpreter);
 }
 
 /*=for api register Parrot_pop_i
@@ -76,28 +46,28 @@ Parrot_clone_i(struct Parrot_Interp *interpreter) {
 */
 void
 Parrot_pop_i(struct Parrot_Interp *interpreter) {
-    struct IRegChunk *chunk_base;
-    chunk_base = INT_CHUNK_BASE(interpreter->int_reg);
-    /* Is there more than one register frame in use? */
-    if (chunk_base->used > 1) {
-        chunk_base->used--;
-        chunk_base->free++;
-        interpreter->int_reg = &chunk_base->IReg[chunk_base->used - 1];
+    struct IRegChunk *top = interpreter->int_reg_top;
+    /* Do we even have anything? */
+    if (top->used > 0) {
+        top->used--;
+        memcpy(&interpreter->int_reg,
+               &top->IReg[top->used],
+               sizeof(struct IReg));
+        top->free++;
+        /* Empty? */
+        if (!top->used) {
+            /* Yep, drop down a frame. Maybe */
+            if (top->prev) {
+                top->prev->next = NULL;
+                interpreter->int_reg_top = top->prev;
+                mem_sys_free(top);
+            }
+        }
     }
-    /* nope. Walk back */
+    /* Nope. So pitch a fit */
     else {
-        /* Can we even walk back? */
-        if (chunk_base->prev) {
-            /* Do so. We don't need to adjust used/free, since they're
-               already OK for the "We're full" case */
-            chunk_base = chunk_base->prev;
-            interpreter->int_reg = &chunk_base->IReg[chunk_base->used - 1];
-        }
-        /* Nope. So pitch a fit */
-        else {
-            internal_exception(NO_REG_FRAMES, 
-                               "No more I register frames to pop!");
-        }
+        internal_exception(NO_REG_FRAMES, 
+                           "No more I register frames to pop!");
     }
 }
 
@@ -108,7 +78,7 @@ void
 Parrot_clear_i(struct Parrot_Interp *interpreter) {
     int i;
     for (i=0; i<NUM_REGISTERS; i++) {
-        interpreter->int_reg->registers[i] = 0;
+        interpreter->int_reg.registers[i] = 0;
     }
 }
 
@@ -117,64 +87,28 @@ Parrot_clear_i(struct Parrot_Interp *interpreter) {
 */
 void
 Parrot_push_s(struct Parrot_Interp *interpreter) {
-    struct SRegChunk *chunk_base;
-    
-    chunk_base = STR_CHUNK_BASE(interpreter->string_reg);
-    /* Do we have any slots left in the current chunk? */
-    if (chunk_base->free) {
-        interpreter->string_reg = &chunk_base->SReg[chunk_base->used++];
-        chunk_base->free--;
+    /* Do we have any space in the current savestack? If so, memcpy
+       down */
+    if (interpreter->string_reg_top->free) {
+        memcpy(&interpreter->string_reg_top->SReg[interpreter->string_reg_top->used],
+               &interpreter->string_reg, sizeof(struct SReg));
+        interpreter->string_reg_top->free--;
+        interpreter->string_reg_top->used++;
     }
     /* Nope, so plan B time. Allocate a new chunk of string register frames */
     else {
         struct SRegChunk *new_chunk;
-        new_chunk = mem_allocate_aligned(sizeof(struct SRegChunk));
+        new_chunk = mem_sys_allocate(sizeof(struct SRegChunk));
+        memcpy(&interpreter->string_reg_top->SReg[0],
+               &interpreter->string_reg, sizeof(struct SReg));
         new_chunk->used = 1;
         new_chunk->free = FRAMES_PER_STR_REG_CHUNK - 1;
         new_chunk->next = NULL;
-        new_chunk->prev = chunk_base;
-        chunk_base->next = new_chunk;
-        interpreter->string_reg = &new_chunk->SReg[0];
-        /* Gotta NULL them out as some string
-           functions depend on NULL strings */
-        Parrot_clear_s(interpreter);
+        new_chunk->prev = interpreter->string_reg_top;
+        interpreter->string_reg_top->next = new_chunk;
+        interpreter->string_reg_top = new_chunk;
     }
-}
-
-/*=for api register Parrot_clone_s
-  pushes a new string register frame on the frame stack and
-  copies the last frame to the current frame
-*/
-void
-Parrot_clone_s(struct Parrot_Interp *interpreter) {
-    struct SRegChunk *chunk_base;
-    
-    chunk_base = STR_CHUNK_BASE(interpreter->string_reg);
-    /* Do we have any slots left in the current chunk? */
-    if (chunk_base->free) {
-        interpreter->string_reg = &chunk_base->SReg[chunk_base->used++];
-        chunk_base->free--;
-        mem_sys_memcopy(&chunk_base->SReg[chunk_base->used-1],
-                        &chunk_base->SReg[chunk_base->used-2],
-                        sizeof(struct SReg));
-    }
-    /* Nope, so plan B time. Allocate a new chunk of string register frames */
-    else {
-        struct SRegChunk *new_chunk;
-        new_chunk = mem_allocate_aligned(sizeof(struct SRegChunk));
-        new_chunk->used = 1;
-        new_chunk->free = FRAMES_PER_STR_REG_CHUNK - 1;
-        new_chunk->next = NULL;
-        new_chunk->prev = chunk_base;
-        chunk_base->next = new_chunk;
-        mem_sys_memcopy(&new_chunk->SReg[0],
-                        &chunk_base->SReg[chunk_base->used-1],
-                        sizeof(struct SReg));
-        interpreter->string_reg = &new_chunk->SReg[0];
-        /* Gotta NULL them out as some string
-           functions depend on NULL strings */
-        Parrot_clear_s(interpreter);
-    }
+    Parrot_clear_s(interpreter);
 }
 
 /*=for api register Parrot_pop_s
@@ -182,28 +116,28 @@ Parrot_clone_s(struct Parrot_Interp *interpreter) {
 */
 void
 Parrot_pop_s(struct Parrot_Interp *interpreter) {
-    struct SRegChunk *chunk_base;
-    chunk_base = STR_CHUNK_BASE(interpreter->string_reg);
-    /* Is there more than one register frame in use? */
-    if (chunk_base->used > 1) {
-        chunk_base->used--;
-        chunk_base->free++;
-        interpreter->string_reg = &chunk_base->SReg[chunk_base->used - 1];
+    struct SRegChunk *top = interpreter->string_reg_top;
+    /* Do we even have anything? */
+    if (top->used > 0) {
+        top->used--;
+        memcpy(&interpreter->string_reg,
+               &top->SReg[top->used],
+               sizeof(struct SReg));
+        top->free++;
+        /* Empty? */
+        if (!top->used) {
+            /* Yep, drop down a frame. Maybe */
+            if (top->prev) {
+                top->prev->next = NULL;
+                interpreter->string_reg_top = top->prev;
+                mem_sys_free(top);
+            }
+        }
     }
-    /* nope. Walk back */
+    /* Nope. So pitch a fit */
     else {
-        /* Can we even walk back? */
-        if (chunk_base->prev) {
-            /* Do so. We don't need to adjust used/free, since they're
-               already OK for the "We're full" case */
-            chunk_base = chunk_base->prev;
-            interpreter->string_reg = &chunk_base->SReg[chunk_base->used - 1];
-        }
-        /* Nope. So pitch a fit */
-        else {
-            internal_exception(NO_REG_FRAMES, 
-                               "No more S register frames to pop!");
-        }
+        internal_exception(NO_REG_FRAMES, 
+                           "No more S register frames to pop!");
     }
 }
 
@@ -214,7 +148,7 @@ void
 Parrot_clear_s(struct Parrot_Interp *interpreter) {
     int i;
     for (i=0; i<NUM_REGISTERS; i++) {
-        interpreter->string_reg->registers[i] = NULL;
+        interpreter->string_reg.registers[i] = NULL;
     }
 }
 
@@ -223,58 +157,28 @@ Parrot_clear_s(struct Parrot_Interp *interpreter) {
 */
 void
 Parrot_push_n(struct Parrot_Interp *interpreter) {
-    struct NRegChunk *chunk_base;
-    
-    chunk_base = NUM_CHUNK_BASE(interpreter->num_reg);
-    /* Do we have any slots left in the current chunk? */
-    if (chunk_base->free) {
-        interpreter->num_reg = &chunk_base->NReg[chunk_base->used++];
-        chunk_base->free--;
+    /* Do we have any space in the current savestack? If so, memcpy
+       down */
+    if (interpreter->num_reg_top->free) {
+        memcpy(&interpreter->num_reg_top->NReg[interpreter->num_reg_top->used],
+               &interpreter->num_reg, sizeof(struct NReg));
+        interpreter->num_reg_top->free--;
+        interpreter->num_reg_top->used++;
     }
-    /* Nope, so plan B time. Allocate a new chunk of float register frames */
+    /* Nope, so plan B time. Allocate a new chunk of num register frames */
     else {
         struct NRegChunk *new_chunk;
-        new_chunk = mem_allocate_aligned(sizeof(struct NRegChunk));
+        new_chunk = mem_sys_allocate(sizeof(struct NRegChunk));
+        memcpy(&interpreter->num_reg_top->NReg[0],
+               &interpreter->num_reg, sizeof(struct NReg));
         new_chunk->used = 1;
         new_chunk->free = FRAMES_PER_NUM_REG_CHUNK - 1;
         new_chunk->next = NULL;
-        new_chunk->prev = chunk_base;
-        chunk_base->next = new_chunk;
-        interpreter->num_reg = &new_chunk->NReg[0];
+        new_chunk->prev = interpreter->num_reg_top;
+        interpreter->num_reg_top->next = new_chunk;
+        interpreter->num_reg_top = new_chunk;
     }
-}
-
-/*=for api register Parrot_clone_n
-  pushes a new numeric register frame on the frame stack and copy the
-  previous frame to the current frame
-*/
-void
-Parrot_clone_n(struct Parrot_Interp *interpreter) {
-    struct NRegChunk *chunk_base;
-    
-    chunk_base = NUM_CHUNK_BASE(interpreter->num_reg);
-    /* Do we have any slots left in the current chunk? */
-    if (chunk_base->free) {
-        interpreter->num_reg = &chunk_base->NReg[chunk_base->used++];
-        chunk_base->free--;
-        mem_sys_memcopy(&chunk_base->NReg[chunk_base->used-1],
-                        &chunk_base->NReg[chunk_base->used-2],
-                        sizeof(struct NReg));
-    }
-    /* Nope, so plan B time. Allocate a new chunk of float register frames */
-    else {
-        struct NRegChunk *new_chunk;
-        new_chunk = mem_allocate_aligned(sizeof(struct NRegChunk));
-        new_chunk->used = 1;
-        new_chunk->free = FRAMES_PER_NUM_REG_CHUNK - 1;
-        new_chunk->next = NULL;
-        new_chunk->prev = chunk_base;
-        chunk_base->next = new_chunk;
-        mem_sys_memcopy(&new_chunk->NReg[0],
-                        &chunk_base->NReg[chunk_base->used-1],
-                        sizeof(struct NReg));
-        interpreter->num_reg = &new_chunk->NReg[0];
-    }
+    Parrot_clear_n(interpreter);
 }
 
 /*=for api register Parrot_pop_n
@@ -282,28 +186,28 @@ Parrot_clone_n(struct Parrot_Interp *interpreter) {
 */
 void
 Parrot_pop_n(struct Parrot_Interp *interpreter) {
-    struct NRegChunk *chunk_base;
-    chunk_base = NUM_CHUNK_BASE(interpreter->num_reg);
-    /* Is there more than one register frame in use? */
-    if (chunk_base->used > 1) {
-        chunk_base->used--;
-        chunk_base->free++;
-        interpreter->num_reg = &chunk_base->NReg[chunk_base->used - 1];
+    struct NRegChunk *top = interpreter->num_reg_top;
+    /* Do we even have anything? */
+    if (top->used > 0) {
+        top->used--;
+        memcpy(&interpreter->num_reg,
+               &top->NReg[top->used],
+               sizeof(struct NReg));
+        top->free++;
+        /* Empty? */
+        if (!top->used) {
+            /* Yep, drop down a frame. Maybe */
+            if (top->prev) {
+                top->prev->next = NULL;
+                interpreter->num_reg_top = top->prev;
+                mem_sys_free(top);
+            }
+        }
     }
-    /* nope. Walk back */
+    /* Nope. So pitch a fit */
     else {
-        /* Can we even walk back? */
-        if (chunk_base->prev) {
-            /* Do so. We don't need to adjust used/free, since they're
-               already OK for the "We're full" case */
-            chunk_base = chunk_base->prev;
-            interpreter->num_reg = &chunk_base->NReg[chunk_base->used - 1];
-        }
-        /* Nope. So pitch a fit */
-        else {
-            internal_exception(NO_REG_FRAMES, 
-                               "No more N register frames to pop!");
-        }
+        internal_exception(NO_REG_FRAMES, 
+                           "No more N register frames to pop!");
     }
 }
 
@@ -314,7 +218,7 @@ void
 Parrot_clear_n(struct Parrot_Interp *interpreter) {
     int i;
     for (i=0; i<NUM_REGISTERS; i++) {
-        interpreter->num_reg->registers[i] = 0.0;
+        interpreter->num_reg.registers[i] = 0.0;
     }
 }
 
@@ -323,62 +227,28 @@ Parrot_clear_n(struct Parrot_Interp *interpreter) {
 */
 void
 Parrot_push_p(struct Parrot_Interp *interpreter) {
-    struct PRegChunk *chunk_base;
-    
-    chunk_base = PMC_CHUNK_BASE(interpreter->pmc_reg);
-    /* Do we have any slots left in the current chunk? */
-    if (chunk_base->free) {
-        interpreter->pmc_reg = &chunk_base->PReg[chunk_base->used++];
-        chunk_base->free--;
+    /* Do we have any space in the current savestack? If so, memcpy
+       down */
+    if (interpreter->pmc_reg_top->free) {
+        memcpy(&interpreter->pmc_reg_top->PReg[interpreter->pmc_reg_top->used],
+               &interpreter->pmc_reg, sizeof(struct PReg));
+        interpreter->pmc_reg_top->free--;
+        interpreter->pmc_reg_top->used++;
     }
-    /* Nope, so plan B time. Allocate a new chunk of float register frames */
+    /* Nope, so plan B time. Allocate a new chunk of pmc register frames */
     else {
         struct PRegChunk *new_chunk;
-        new_chunk = mem_allocate_aligned(sizeof(struct PRegChunk));
+        new_chunk = mem_sys_allocate(sizeof(struct PRegChunk));
+        memcpy(&interpreter->pmc_reg_top->PReg[0],
+               &interpreter->pmc_reg, sizeof(struct PReg));
         new_chunk->used = 1;
         new_chunk->free = FRAMES_PER_PMC_REG_CHUNK - 1;
         new_chunk->next = NULL;
-        new_chunk->prev = chunk_base;
-        chunk_base->next = new_chunk;
-        interpreter->pmc_reg = &new_chunk->PReg[0];
-        /* Gotta NULL them out or we might GC Wrong things later */
-        Parrot_clear_p(interpreter);
+        new_chunk->prev = interpreter->pmc_reg_top;
+        interpreter->pmc_reg_top->next = new_chunk;
+        interpreter->pmc_reg_top = new_chunk;
     }
-}
-
-/*=for api register Parrot_clone_p
-  pushes a new PMC register frame on the frame stack and copy the
-  previous frame to the current frame
-*/
-void
-Parrot_clone_p(struct Parrot_Interp *interpreter) {
-    struct PRegChunk *chunk_base;
-    
-    chunk_base = PMC_CHUNK_BASE(interpreter->pmc_reg);
-    /* Do we have any slots left in the current chunk? */
-    if (chunk_base->free) {
-        interpreter->pmc_reg = &chunk_base->PReg[chunk_base->used++];
-        chunk_base->free--;
-        mem_sys_memcopy(&chunk_base->PReg[chunk_base->used-1],
-                        &chunk_base->PReg[chunk_base->used-2],
-                        sizeof(struct PReg));
-    }
-    /* Nope, so plan B time. Allocate a new chunk of float register frames */
-    else {
-        struct PRegChunk *new_chunk;
-        new_chunk = mem_allocate_aligned(sizeof(struct PRegChunk));
-        new_chunk->used = 1;
-        new_chunk->free = FRAMES_PER_PMC_REG_CHUNK - 1;
-        new_chunk->next = NULL;
-        new_chunk->prev = chunk_base;
-        chunk_base->next = new_chunk;
-        mem_sys_memcopy(&new_chunk->PReg[0],
-                        &chunk_base->PReg[chunk_base->used-1],
-                        sizeof(struct PReg));
-        interpreter->pmc_reg = &new_chunk->PReg[0];
-        /* Gotta NULL them out or we might GC Wrong things later */
-        Parrot_clear_p(interpreter);
-    }
+    Parrot_clear_p(interpreter);
 }
 
 /*=for api register Parrot_pop_p
@@ -386,28 +256,28 @@ Parrot_clone_p(struct Parrot_Interp *interpreter) {
 */
 void
 Parrot_pop_p(struct Parrot_Interp *interpreter) {
-    struct PRegChunk *chunk_base;
-    chunk_base = PMC_CHUNK_BASE(interpreter->pmc_reg);
-    /* Is there more than one register frame in use? */
-    if (chunk_base->used > 1) {
-        chunk_base->used--;
-        chunk_base->free++;
-        interpreter->pmc_reg = &chunk_base->PReg[chunk_base->used - 1];
+    struct PRegChunk *top = interpreter->pmc_reg_top;
+    /* Do we even have anything? */
+    if (top->used > 0) {
+        top->used--;
+        memcpy(&interpreter->pmc_reg,
+               &top->PReg[top->used],
+               sizeof(struct PReg));
+        top->free++;
+        /* Empty? */
+        if (!top->used) {
+            /* Yep, drop down a frame. Maybe */
+            if (top->prev) {
+                top->prev->next = NULL;
+                interpreter->pmc_reg_top = top->prev;
+                mem_sys_free(top);
+            }
+        }
     }
-    /* nope. Walk back */
+    /* Nope. So pitch a fit */
     else {
-        /* Can we even walk back? */
-        if (chunk_base->prev) {
-            /* Do so. We don't need to adjust used/free, since they're
-               already OK for the "We're full" case */
-            chunk_base = chunk_base->prev;
-            interpreter->pmc_reg = &chunk_base->PReg[chunk_base->used - 1];
-        }
-        /* Nope. So pitch a fit */
-        else {
-            internal_exception(NO_REG_FRAMES, 
-                               "No more P register frames to pop!");
-        }
+        internal_exception(NO_REG_FRAMES, 
+                           "No more P register frames to pop!");
     }
 }
 
@@ -418,7 +288,7 @@ void
 Parrot_clear_p(struct Parrot_Interp *interpreter) {
     int i;
     for (i=0; i<NUM_REGISTERS; i++) {
-        interpreter->pmc_reg->registers[i] = NULL;
+        interpreter->pmc_reg.registers[i] = NULL;
     }
 }
 

@@ -49,21 +49,21 @@ trace_op_dump(struct Parrot_Interp *interpreter, opcode_t *code_start,
                 break;
             case PARROT_ARG_I:
                 fprintf(stderr, "I%ld=%ld", (long) *(pc + i), 
-                    (long) interpreter->int_reg->registers[*(pc + i)]);
+                    (long) interpreter->int_reg.registers[*(pc + i)]);
                 break;
             case PARROT_ARG_N:
                 fprintf(stderr, "N%ld=%f", (long) *(pc + i), 
-                    interpreter->num_reg->registers[*(pc + i)]);
+                    interpreter->num_reg.registers[*(pc + i)]);
                 break;
             case PARROT_ARG_P:
                 /* what does a PMC constant look like? */
                 fprintf(stderr, "P%ld=???", (long) *(pc + i));
                 break;
             case PARROT_ARG_S:
-                if(interpreter->string_reg->registers[*(pc + i)]) {
+                if(interpreter->string_reg.registers[*(pc + i)]) {
                     fprintf(stderr, "S%ld=\"%s\"", (long) *(pc + i), 
-                        (char *) interpreter->string_reg->
-                                  registers[*(pc + i)]->bufstart);
+                        (char *) interpreter->string_reg.
+                            registers[*(pc + i)]->bufstart);
                 } else {
                     fprintf(stderr, "S%ld=(null)", (long) *(pc + i));
                 }

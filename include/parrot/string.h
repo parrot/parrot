@@ -17,7 +17,6 @@
 #include "parrot/encoding.h"
 #include "parrot/chartype.h"
 #include "parrot/parrot.h"
-
 typedef struct {
     void *bufstart;
     UINTVAL buflen;
@@ -28,7 +27,6 @@ typedef struct {
     const CHARTYPE *type;
     INTVAL language;
 } STRING;
-
 
 /* Generic buffer header. Enough to GC */
 typedef struct {
@@ -49,51 +47,6 @@ typedef enum BUFFER_flag {
     /* Mark the contents as Copy on write */
     BUFFER_COW_FLAG		= 2 << 3
 } BUFFER_flags;
-
-/* Declarations of accessors */
-
-INTVAL
-string_compute_strlen(STRING*);
-STRING*
-string_concat(struct Parrot_Interp *interpreter, const STRING*, const STRING*,
-              UINTVAL);
-STRING*
-string_repeat(struct Parrot_Interp *interpreter, const STRING* , UINTVAL,
-              STRING**);
-STRING*
-string_chopn(STRING*, INTVAL);
-STRING*
-string_substr(struct Parrot_Interp *interpreter, const STRING*, INTVAL,
-              INTVAL, STRING**);
-INTVAL
-string_compare(struct Parrot_Interp *interpreter, const STRING*, const STRING*);
-BOOLVAL
-string_bool(const STRING*);
-
-/* Declarations of other functions */
-UINTVAL
-string_length(const STRING*);
-INTVAL
-string_ord(const STRING* s, INTVAL idx);
-FLOATVAL
-string_to_num (const STRING *s);
-INTVAL
-string_to_int (const STRING *s);
-void
-string_destroy(STRING* s);
-STRING*
-string_make(struct Parrot_Interp *interpreter, const void *buffer,
-            UINTVAL buflen, const ENCODING *encoding, UINTVAL flags,
-            const CHARTYPE *type);
-STRING*
-string_copy(struct Parrot_Interp *interpreter, const STRING *i);
-STRING*
-string_transcode(struct Parrot_Interp *interpreter, const STRING *src,
-                 const ENCODING *encoding, const CHARTYPE *type, STRING **d);
-void
-string_init(void);
-INTVAL
-string_index(const STRING* s, UINTVAL idx);
 
 #endif
 

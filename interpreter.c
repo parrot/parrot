@@ -232,19 +232,19 @@ prederef(void ** pc_prederef, struct Parrot_Interp * interpreter)
         break;
   
       case PARROT_ARG_I:
-        pc_prederef[i] = (void *)&interpreter->int_reg->registers[pc[i]];
+        pc_prederef[i] = (void *)&interpreter->int_reg.registers[pc[i]];
         break;
     
       case PARROT_ARG_N:
-        pc_prederef[i] = (void *)&interpreter->num_reg->registers[pc[i]];
+        pc_prederef[i] = (void *)&interpreter->num_reg.registers[pc[i]];
         break;
     
       case PARROT_ARG_P:
-        pc_prederef[i] = (void *)&interpreter->pmc_reg->registers[pc[i]];
+        pc_prederef[i] = (void *)&interpreter->pmc_reg.registers[pc[i]];
         break;
     
       case PARROT_ARG_S:
-        pc_prederef[i] = (void *)&interpreter->string_reg->registers[pc[i]];
+        pc_prederef[i] = (void *)&interpreter->string_reg.registers[pc[i]];
         break;
 
       case PARROT_ARG_IC:
@@ -298,7 +298,7 @@ runops_jit (struct Parrot_Interp *interpreter, opcode_t * pc) {
 
     jit_code = build_asm(interpreter, pc, code_start, code_end);
 #ifdef ALPHA
-    (jit_code)((void *)(((char *)&interpreter->int_reg->registers[0]) + 0x7fff));
+    (jit_code)((void *)(((char *)&interpreter->int_reg.registers[0]) + 0x7fff));
 #endif
 #ifdef I386
     (jit_code)();
@@ -475,38 +475,42 @@ make_interpreter(INTVAL flags) {
     interpreter->string_reg_base =
             mem_allocate_aligned(sizeof(struct SRegChunk));
     interpreter->pmc_reg_base = mem_allocate_aligned(sizeof(struct PRegChunk));
-    
-    /* Set up the initial register frame pointers */
-    interpreter->int_reg = &interpreter->int_reg_base->IReg[0];
-    interpreter->num_reg = &interpreter->num_reg_base->NReg[0];
-    interpreter->string_reg = &interpreter->string_reg_base->SReg[0];
-    interpreter->pmc_reg = &interpreter->pmc_reg_base->PReg[0];
+    interpreter->int_reg_top = interpreter->int_reg_base;
+    interpreter->num_reg_top = interpreter->num_reg_base;
+    interpreter->string_reg_top = interpreter->string_reg_base;
+    interpreter->pmc_reg_top = interpreter->pmc_reg_base;
+
+    /* Set up the initial registers */
+    memset(&interpreter->int_reg, 0, sizeof(struct IReg));
+    memset(&interpreter->num_reg, 0, sizeof(struct NReg));
+    memset(&interpreter->string_reg, 0, sizeof(struct SReg));
+    memset(&interpreter->pmc_reg, 0, sizeof(struct PReg));
     
     /* Initialize the integer register chunk */
-    interpreter->int_reg_base->used = 1;
-    interpreter->int_reg_base->free = FRAMES_PER_INT_REG_CHUNK - 1;
+    interpreter->int_reg_base->used = 0;
+    interpreter->int_reg_base->free = FRAMES_PER_INT_REG_CHUNK;
     interpreter->int_reg_base->next = NULL;
     interpreter->int_reg_base->prev = NULL;
     
     /* Initialize the initial numeric register chunk */
-    interpreter->num_reg_base->used = 1;
-    interpreter->num_reg_base->free = FRAMES_PER_NUM_REG_CHUNK - 1;
+    interpreter->num_reg_base->used = 0;
+    interpreter->num_reg_base->free = FRAMES_PER_NUM_REG_CHUNK;
     interpreter->num_reg_base->next = NULL;
     interpreter->num_reg_base->prev = NULL;
     
     /* Initialize the inital string register chunk, be sure to
        NULL out the strings because string functions rely
        on NULL strings */
-    interpreter->string_reg_base->used = 1;
-    interpreter->string_reg_base->free = FRAMES_PER_STR_REG_CHUNK - 1;
+    interpreter->string_reg_base->used = 0;
+    interpreter->string_reg_base->free = FRAMES_PER_STR_REG_CHUNK;
     interpreter->string_reg_base->next = NULL;
     interpreter->string_reg_base->prev = NULL;
     Parrot_clear_s(interpreter);
     
     /* Initialize the initial PMC register chunk. Gotta NULL them out,
        too, otherwise we might GC Wrong Things later */
-    interpreter->pmc_reg_base->used = 1;
-    interpreter->pmc_reg_base->free = FRAMES_PER_PMC_REG_CHUNK - 1;
+    interpreter->pmc_reg_base->used = 0;
+    interpreter->pmc_reg_base->free = FRAMES_PER_PMC_REG_CHUNK;
     interpreter->pmc_reg_base->next = NULL;
     interpreter->pmc_reg_base->prev = NULL;
     Parrot_clear_p(interpreter);

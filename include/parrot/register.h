@@ -13,7 +13,8 @@
 #if !defined(PARROT_REGISTER_H_GUARD)
 #define PARROT_REGISTER_H_GUARD
 
-#include "parrot/parrot.h"
+//#include "parrot/parrot.h"
+#include "parrot/string.h"
 
 struct IReg {
     INTVAL registers[NUM_REGISTERS];
@@ -24,7 +25,10 @@ struct NReg {
 };
 
 struct SReg {
-    STRING *registers[NUM_REGISTERS];
+    STRING *registers[NUM_REGISTERS]; /* Yes, this lame, but a STRING *
+                                       here throws undeclared struct
+                                       errors or something. That needs
+                                       fixing */
 };
 
 struct PReg {
@@ -63,35 +67,6 @@ struct PRegChunk {
     struct PReg PReg[FRAMES_PER_CHUNK];
 };
 
-/* These macros masks off the low bits of a register chunk address,
-   since we're guaranteed to be aligned */
-#define INT_CHUNK_BASE(x) (void *)(MASK_INT_CHUNK_LOW_BITS & (ptrcast_t)x)
-#define NUM_CHUNK_BASE(x) (void *)(MASK_NUM_CHUNK_LOW_BITS & (ptrcast_t)x)
-#define STR_CHUNK_BASE(x) (void *)(MASK_STR_CHUNK_LOW_BITS & (ptrcast_t)x)
-#define PMC_CHUNK_BASE(x) (void *)(MASK_PMC_CHUNK_LOW_BITS & (ptrcast_t)x)
-
-void Parrot_clear_i(struct Parrot_Interp *);
-void Parrot_clear_s(struct Parrot_Interp *);
-void Parrot_clear_p(struct Parrot_Interp *);
-void Parrot_clear_n(struct Parrot_Interp *);
-
-void Parrot_push_i(struct Parrot_Interp *);
-void Parrot_push_n(struct Parrot_Interp *);
-void Parrot_push_s(struct Parrot_Interp *);
-void Parrot_push_p(struct Parrot_Interp *);
-
-void Parrot_clone_i(struct Parrot_Interp *);
-void Parrot_clone_n(struct Parrot_Interp *);
-void Parrot_clone_s(struct Parrot_Interp *);
-void Parrot_clone_p(struct Parrot_Interp *);
-
-void Parrot_pop_i(struct Parrot_Interp *);
-void Parrot_pop_n(struct Parrot_Interp *);
-void Parrot_pop_s(struct Parrot_Interp *);
-void Parrot_pop_p(struct Parrot_Interp *);
-
-void Parrot_push_on_stack(void *thing, INTVAL size, INTVAL type);
-void Parrot_pop_off_stack(void *thing, INTVAL type);
 
 #endif /* PARROT_REGISTER_H */
 

@@ -118,12 +118,14 @@ include/parrot/packfile.h
 include/parrot/parrot.h
 include/parrot/pmc.h
 include/parrot/register.h
+include/parrot/register_funcs.h
 include/parrot/resources.h
 include/parrot/runops_cores.h
 include/parrot/rx.h
 include/parrot/rxstacks.h
 include/parrot/stacks.h
 include/parrot/string.h
+include/parrot/string_funcs.h
 include/parrot/trace.h
 include/parrot/unicode.h
 interpreter.c

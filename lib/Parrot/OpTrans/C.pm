@@ -53,10 +53,10 @@ sub expr_pop {
 my %arg_maps = (
   'op' => "cur_opcode[%ld]",
 
-  'i'  => "interpreter->int_reg->registers[cur_opcode[%ld]]",
-  'n'  => "interpreter->num_reg->registers[cur_opcode[%ld]]",
-  'p'  => "interpreter->pmc_reg->registers[cur_opcode[%ld]]",
-  's'  => "interpreter->string_reg->registers[cur_opcode[%ld]]",
+  'i'  => "interpreter->int_reg.registers[cur_opcode[%ld]]",
+  'n'  => "interpreter->num_reg.registers[cur_opcode[%ld]]",
+  'p'  => "interpreter->pmc_reg.registers[cur_opcode[%ld]]",
+  's'  => "interpreter->string_reg.registers[cur_opcode[%ld]]",
   
   'ic' => "cur_opcode[%ld]",
   'nc' => "interpreter->code->const_table->constants[cur_opcode[%ld]]->number",

@@ -428,3 +428,12 @@ void key_inc(struct Parrot_Interp *interpreter, KEY* key, INTVAL idx) {
     fprintf(stderr,"*** key_inc working on a NULL key\n");
   }
 }
+
+/* PMC-KEY
+
+Keyed bits for PMC access. Separate from the hash key stuff but
+sharing a file for the moment, until the hash key bits get moved
+elsewhere.
+
+*/
+
