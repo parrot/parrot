@@ -10,7 +10,7 @@ output_is(<<'CODE', <<'OUT', "basic syntax - invokecc, constants");
     .local Sub sub
     newsub sub, .Sub, _sub
     .const int y = 20
-    .pcc_begin
+    .pcc_begin prototyped
     .arg 10
     .arg y
     .pcc_call sub
@@ -44,7 +44,7 @@ output_is(<<'CODE', <<'OUT', "tail recursive sub");
     .local Continuation cc
     newsub sub, .Sub, _fact
     newsub cc, .Continuation, ret
-   .pcc_begin
+   .pcc_begin prototyped
    .arg product
    .arg count
    .pcc_call sub, cc

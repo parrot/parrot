@@ -113,7 +113,7 @@ branch from the B<ret> statement back is ignored in the CFG.
   .result r
   .pcc_end
 
-  .pcc_sub _sub_label prototyped|non_prototyped
+  .pcc_sub _sub_label   # prototyped|non_prototyped
    .param int a # I5
    .param int b # I6
    .param int c # I7
@@ -130,7 +130,8 @@ Notes:
 
 =item * B<prototyped>, B<pnon_rototyped>
 
-Specifying these is unimplemented. They must currently be empty.
+Specifying these in the B<subroutine> is unimplemented.
+This must currently be empty.
 
 =item * B<newsub>
 

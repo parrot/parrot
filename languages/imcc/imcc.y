@@ -409,6 +409,7 @@ iANY(struct Parrot_Interp *interpreter, char * name,
 %token <t> GLOBAL ADDR CLONE RESULT RETURN POW SHIFT_RIGHT_U LOG_AND LOG_OR
 %token <t> COMMA ESUB
 %token <t> PCC_BEGIN PCC_END PCC_CALL PCC_SUB PCC_BEGIN_RETURN PCC_END_RETURN
+%token <t> PROTOTYPED NON_PROTOTYPED
 %token <s> LABEL
 %token <t> EMIT EOM
 %token <s> IREG NREG SREG PREG IDENTIFIER STRINGC INTC FLOATC REG MACRO ENDM
@@ -518,6 +519,7 @@ pcc_sub_call: PCC_BEGIN pcc_proto '\n' {
 
               sprintf(name, "#pcc_sub_call_%d", line - 1);
               $<sr>$ = r = mk_pcc_sub(str_dup(name), 0);
+              r->pcc_sub->prototyped = $2;
               /* this mid rule action has the semantic value of the
                  sub SymReg.
                  This is used below to append args & results
@@ -533,7 +535,8 @@ pcc_sub_call: PCC_BEGIN pcc_proto '\n' {
            PCC_END  '\n' { $$ = 0; }
     ;
 
-pcc_proto: /* empty */                  { $$ = 0; }
+pcc_proto: PROTOTYPED           { $$ = 1; }
+         | NON_PROTOTYPED       { $$ = 0; }
     ;
 
 pcc_call: PCC_CALL var COMMA var '\n' {

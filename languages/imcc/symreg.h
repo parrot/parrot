@@ -106,6 +106,7 @@ struct pcc_sub_t {
     SymReg *cc;
     SymReg ** ret;
     int nret;
+    int prototyped;
 };
 
 
