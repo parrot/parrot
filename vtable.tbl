@@ -35,5 +35,5 @@ void is_equal		PMC* left
 void logical_or		PMC* left	 PMC* right 
 void logical_and	PMC* left	 PMC* right 
 void logical_not	PMC* left 
-void match		PMC* left	 REGEX re
+void match		PMC* left	 REGEX* re
 void repeat		PMC* left	 PMC* right 
