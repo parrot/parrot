@@ -357,6 +357,8 @@ Parrot_really_destroy(int exit_code, void *vinterp)
     /* mem subsystem is dead now */
     mem_sys_free(interpreter->arena_base);
     interpreter->arena_base = NULL;
+    /* cache structure */
+    mem_sys_free(interpreter->caches);
     /* packfile */
 
     if (!Interp_flags_TEST(interpreter, PARROT_EXTERN_CODE_FLAG))  {
@@ -411,6 +413,8 @@ Parrot_really_destroy(int exit_code, void *vinterp)
          */
         mem_sys_free(Parrot_base_vtables);
         Parrot_base_vtables = NULL;
+        mem_sys_free(interpreter_array);
+        interpreter_array = NULL;
     }
 
     else {
