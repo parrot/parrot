@@ -31,7 +31,7 @@ the types you wish to support in Parrot.  (Parrot will
 make, but you'll be unable to assemble anything.)  You can find
 what types are support by typing 'perl -V', and examining the
 values for ivtype and nvtype.  Parrot should work with INTVALs
-and NUMVALs up to those types.
+and FLOATVALs up to those types.
 
 For most of the platforms that we are supporting initially,
 Parrot should build out of the box.  We do not have,
