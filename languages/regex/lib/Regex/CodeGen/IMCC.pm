@@ -213,7 +213,7 @@ sub output_classmatch {
 
 sub output_initgroup {
     my ($self, $group) = @_;
-    return ("new <rx_ptmp>, .MatchRange # new group \"$group\"",
+    return ("new <rx_ptmp>, \"MatchRange\" # new group \"$group\"",
             "set <rx_match>[\"$group\"], <rx_ptmp>");
 }
 
@@ -423,7 +423,7 @@ sub output_rule_def {
   .local pmc <rx_ptmp>
   .local int <rx_tmp>
   .local int <rx_len>
-  <rx_match> = new Match
+  <rx_match> = new "Match"
   <rx_match>["!INPUT"] = <rx_input>
   <rx_match>["!GROUPS"] = $num_groups
   length <rx_len>, <rx_input> # cache the length in <rx_len>
