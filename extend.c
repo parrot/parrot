@@ -6,7 +6,7 @@
  *     The Parrot extension interface. These are the functions that
  *     parrot extensions (i.e. parrot subroutines written in C, or
  *     some other compiled language, rather than in parrot bytecode)
- *     may access. 
+ *     may access.
  *
  *     There is a deliberate distancing from the internals here. Don't
  *     go peeking inside -- you've as much access as bytecode does,
@@ -153,9 +153,11 @@ void Parrot_call(Parrot_INTERP interpreter, Parrot_PMC sub,
                  Parrot_Int argcount, ...) {
     Parrot_Int inreg = 0;
     va_list ap;
+    static PMC *ret_c = NULL;
+    opcode_t offset, *dest;
 
     va_start(ap, argcount);
-    
+
     /* Will all the arguments fit into registers? */
     if (argcount < 12) {
         for (inreg = 0; inreg < argcount; inreg++) {
@@ -181,6 +183,19 @@ void Parrot_call(Parrot_INTERP interpreter, Parrot_PMC sub,
 
     /* Actually make the call, which turns out to be somewhat
        problematic */
+
+    /* we ever need one return continuation with a NULL offset */
+    if (!ret_c) {
+        ret_c = pmc_new(interpreter, enum_class_RetContinuation);
+    }
+    REG_PMC(1) = ret_c;
+    /* invoke the sub, which places the context of the sub in the
+     * interpreter, and switches code segments if needed
+     */
+    dest = VTABLE_invoke(interpreter, sub, NULL);
+
+    offset = dest - interpreter->code->byte_code;
+    runops(interpreter, offset);
 
 }
 
