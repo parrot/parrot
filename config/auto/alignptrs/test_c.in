@@ -5,28 +5,35 @@
  * from config/auto/alignptrs/test_c.in.
  */
 
-
-
 #include <stdio.h>
-
-#define CHECK_ALIGNMENT(x) ptr = (long *)((char *)space + x); if (*ptr == 0) printf( #x "\n" ); fflush(stdout);
 
 int main(int argc, char **argv) {
 
     int i;
+    char *c;
 
     long space[32];
-    long *ptr;
+    void **ptr;
+    
+    int align = 0;
 
     for (i = 0; i < 32; i ++) space[i] = 0;
 
-    CHECK_ALIGNMENT(64)
-    CHECK_ALIGNMENT(32)
-    CHECK_ALIGNMENT(16)
-    CHECK_ALIGNMENT(8)
-    CHECK_ALIGNMENT(4)
-    CHECK_ALIGNMENT(2)
-    CHECK_ALIGNMENT(1)
+    for (c = argv[1]; *c; c++) align = align * 10 + ((int)*c - '0');
+    
+#if defined(__alpha)
+    if (align < 8) {
+        printf("Soft failure hack for systems that simulate unaligned access\n");
+        return 1;
+    }
+#endif
+    
+    ptr = (void **)((char *)space + align);
+    
+    if (*ptr == (void *)0)
+        printf("%d OK\n", align);
+    else
+        printf("%d OK but didnt equal zero\n", align);
 
     return 0;
 }

@@ -8,11 +8,11 @@ use vars qw(@ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
 
 @EXPORT=();
 
-@EXPORT_OK=qw(prompt genfile cc_gen cc_build cc_run cc_clean);
+@EXPORT_OK=qw(prompt genfile cc_gen cc_build cc_run cc_clean cc_run_capture);
 
 %EXPORT_TAGS=(
 	inter => ['prompt'],
-	auto  => [qw(cc_gen cc_build cc_run cc_clean)],
+	auto  => [qw(cc_gen cc_build cc_run cc_clean cc_run_capture)],
 	gen   => ['genfile']
 );
 	
@@ -78,7 +78,22 @@ sub cc_build {
 
 sub cc_run {
 	my $exe=Configure::Data->get('exe');
-	`./test$exe`
+    if (defined($_[0]) && length($_[0])) {
+	    `./test$exe $_[0]`;
+    }
+    else {
+	    `./test$exe`;
+    }
+}
+
+sub cc_run_capture {
+	my $exe=Configure::Data->get('exe');
+    if (defined($_[0]) && length($_[0])) {
+	    `./test$exe $_[0] 2>&1`;
+    }
+    else {
+	    `./test$exe 2>&1`;
+    }
 }
 
 sub cc_clean {

@@ -12,17 +12,18 @@ sub runstep {
   return if (defined(Configure::Data->get('ptr_alignment')));
   cc_gen('config/auto/alignptrs/test_c.in');
   cc_build();
-  my $results=cc_run();
+
+  my $align = 999999;
+
+  for my $try_align (64, 32, 16, 8, 4, 2, 1) {
+      my $results=cc_run_capture($try_align);
+      if ($results =~ /OK/ && $results !~ /align/i) {
+        $align = $try_align;
+      }
+  }
+
   cc_clean();
 
-  #if there are warnings, they are in $results
-  
-  my $align = 999999;
-  
-  for my $result (split /\n/, $results) {
-    $align = $result if ($result =~ /^\d+$/ &&$result < $align);
-  }
-  
   if ($align == 999999) {
     die "Can't determine alignment!\n";
   }
