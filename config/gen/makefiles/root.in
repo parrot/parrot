@@ -235,6 +235,10 @@ INTERP_O_FILES = \
     $(SRC)/exceptions$(O) \
     $(SRC)/global_setup$(O) \
     $(SRC)/interpreter$(O)  \
+    $(SRC)/inter_cb$(O)  \
+    $(SRC)/inter_create$(O)  \
+    $(SRC)/inter_misc$(O)  \
+    $(SRC)/inter_run$(O)  \
     $(SRC)/register$(O) \
     $(SRC)/memory$(O) \
     $(SRC)/objects$(O) \
@@ -392,7 +396,7 @@ all : flags_dummy $(TEST_PROG) library/config.fpmc docs $(LIBNCI_SO)
 	$(PERL) build_tools/c2str.pl $< > $@
 
 STR_FILES = \
-    $(SRC)/interpreter.str \
+    $(SRC)/inter_cb.str \
     $(SRC)/objects.str
 
 $(INC)/string_private_cstring.h : $(STR_FILES) build_tools/c2str.pl
@@ -738,7 +742,16 @@ $(SRC)/thread$(O) : $(GENERAL_H_FILES)
 $(SRC)/extend$(O) : $(GENERAL_H_FILES) $(INC)/extend.h
 
 $(SRC)/interpreter$(O) : $(SRC)/interpreter.c $(GENERAL_H_FILES) \
-    ${TEMP_jit_h} $(SRC)/interpreter.str
+    ${TEMP_jit_h}
+
+$(SRC)/inter_cb$(O) : $(SRC)/inter_cb.c $(GENERAL_H_FILES) \
+    $(SRC)/inter_cb.str
+
+$(SRC)/inter_misc$(O) : $(SRC)/inter_misc.c $(GENERAL_H_FILES)
+
+$(SRC)/inter_create$(O) : $(SRC)/inter_create.c $(GENERAL_H_FILES)
+
+$(SRC)/inter_run$(O) : $(SRC)/inter_run.c $(GENERAL_H_FILES)
 
 io/io$(O) : $(GENERAL_H_FILES) io/io_private.h
 
