@@ -20,6 +20,7 @@
 int CONSERVATIVE_POINTER_CHASING = 0;
 #endif
 
+extern flush_register_windows(void);
 static size_t find_common_mask(size_t val1, size_t val2);
 
 PMC *
@@ -502,6 +503,9 @@ trace_system_stack(struct Parrot_Interp *interpreter, PMC *last)
 
     size_t mask = find_common_mask(buffer_min < pmc_min ? buffer_min : pmc_min,
             buffer_max > pmc_max ? buffer_max : pmc_max);
+
+    /* Flush register windows if needed */
+    flush_register_windows();
 
     if (!lo_var_ptr)
         return last;
