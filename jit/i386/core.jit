@@ -1,5 +1,5 @@
 ;
-; i386/core.jit 
+; i386/core.jit
 ;
 ; $Id$
 ;
@@ -23,10 +23,10 @@ Parrot_noop {
 Parrot_set_i_ic {
     if (MAP[1]) {
         emitm_movl_i_r(NATIVECODE, *INT_CONST[2], MAP[1]);
-    } 
+    }
     else {
         emit_movl_i_m(NATIVECODE, *INT_CONST[2], &INT_REG[1]);
-    }	    
+    }
 }
 
 Parrot_set_i_i {
@@ -35,10 +35,10 @@ Parrot_set_i_i {
     }
     else if (MAP[1]) {
         emit_movl_m_r(NATIVECODE, MAP[1], &INT_REG[2]);
-    } 
+    }
     else if (MAP[2]) {
         emit_movl_r_m(NATIVECODE, MAP[2], &INT_REG[1]);
-    } 
+    }
     else {
         emit_movl_m_r(NATIVECODE, emit_EAX, &INT_REG[2]);
         emit_movl_r_m(NATIVECODE, emit_EAX, &INT_REG[1]);
@@ -207,7 +207,7 @@ Parrot_neg_i_i {
         emit_movl_r_m(NATIVECODE, emit_EAX, &INT_REG[1]);
     }
 }
-        
+
 Parrot_set_n_i {
     if (MAP[2]) {
         emit_movl_r_m(NATIVECODE, MAP[2], &INT_REG[2]);
@@ -244,8 +244,8 @@ Parrot_if_i_ic {
             emitm_cmpl_i_r(NATIVECODE, 0, MAP[1]);
             emit_jcc(jit_info, emitm_jne, *INT_CONST[2]);
         }
-    } 
-    else { 
+    }
+    else {
         emit_movl_m_r(NATIVECODE, emit_EAX, &INT_REG[1]);
         emitm_cmpl_i_r(NATIVECODE, 0, emit_EAX);
         emit_jcc(jit_info, emitm_jne, *INT_CONST[2]);
@@ -261,8 +261,8 @@ Parrot_unless_i_ic {
     if (MAP[1]) {
         emitm_cmpl_i_r(NATIVECODE, 0, MAP[1]);
         emit_jcc(jit_info, emitm_je, *INT_CONST[2]);
-    } 
-    else { 
+    }
+    else {
         emit_movl_m_r(NATIVECODE, emit_EAX, &INT_REG[1]);
         emitm_cmpl_i_r(NATIVECODE, 0, emit_EAX);
         emit_jcc(jit_info, emitm_je, *INT_CONST[2]);
@@ -296,7 +296,7 @@ Parrot_add_i_i {
     }
     else {
         emit_movl_m_r(NATIVECODE, emit_EAX, &INT_REG[2]);
-        emit_addl_r_m(NATIVECODE, emit_EAX, &INT_REG[1]); 
+        emit_addl_r_m(NATIVECODE, emit_EAX, &INT_REG[1]);
     }
 }
 
@@ -424,7 +424,7 @@ Parrot_sub_i_i {
     }
     else {
         emit_movl_m_r(NATIVECODE, emit_EAX, &INT_REG[2]);
-        emit_subl_r_m(NATIVECODE, emit_EAX, &INT_REG[1]); 
+        emit_subl_r_m(NATIVECODE, emit_EAX, &INT_REG[1]);
     }
 }
 
@@ -560,12 +560,12 @@ Parrot_lt_i_ic_ic {
 }
 
 Parrot_lt_ic_i_ic {
+    emitm_movl_i_r(NATIVECODE, *INT_CONST[1], emit_EAX);
     if (MAP[2]) {
-        emitm_cmpl_i_r(NATIVECODE, *INT_CONST[1], MAP[2]);
+        emitm_cmpl_r_r(NATIVECODE, MAP[2], emit_EAX);
     }
     else {
-        emit_movl_m_r(NATIVECODE, emit_EAX, &INT_REG[2]);
-        emitm_cmpl_i_r(NATIVECODE, *INT_CONST[1], emit_EAX);
+        emit_cmpl_m_r(NATIVECODE, emit_EAX, &INT_REG[2]);
     }
     emit_jcc(jit_info, emitm_jl, *INT_CONST[3]);
 }
@@ -637,12 +637,12 @@ Parrot_ge_ic_ic_ic {
 }
 
 Parrot_ge_ic_i_ic {
+    emitm_movl_i_r(NATIVECODE, *INT_CONST[1], emit_EAX);
     if (MAP[2]) {
-        emitm_cmpl_i_r(NATIVECODE, *INT_CONST[1], MAP[2]);
+        emitm_cmpl_r_r(NATIVECODE, MAP[2], emit_EAX);
     }
     else {
-        emit_movl_m_r(NATIVECODE, emit_EAX, &INT_REG[2]);
-        emitm_cmpl_i_r(NATIVECODE, *INT_CONST[1], emit_EAX);
+        emit_cmpl_m_r(NATIVECODE, emit_EAX, &INT_REG[2]);
     }
     emit_jcc(jit_info, emitm_jnl, *INT_CONST[3]);
 }
@@ -681,12 +681,12 @@ Parrot_le_ic_ic_ic {
 }
 
 Parrot_le_ic_i_ic {
+    emitm_movl_i_r(NATIVECODE, *INT_CONST[1], emit_EAX);
     if (MAP[2]) {
-        emitm_cmpl_i_r(NATIVECODE, *INT_CONST[1], MAP[2]);
+        emitm_cmpl_r_r(NATIVECODE, MAP[2], emit_EAX);
     }
     else {
-        emit_movl_m_r(NATIVECODE, emit_EAX, &INT_REG[2]);
-        emitm_cmpl_i_r(NATIVECODE, *INT_CONST[1], emit_EAX);
+        emit_cmpl_m_r(NATIVECODE, emit_EAX, &INT_REG[2]);
     }
     emit_jcc(jit_info, emitm_jle, *INT_CONST[3]);
 }
@@ -1162,7 +1162,7 @@ Parrot_bnot_i_ic {
 Parrot_shl_i_i_i {
 ; TODO check if we really needs this.
     emit_pushl_r(NATIVECODE,emit_ECX);
-    if (MAP[1] && MAP[2] && MAP[3]) { 
+    if (MAP[1] && MAP[2] && MAP[3]) {
         emitm_movl_r_r(NATIVECODE, MAP[3], emit_ECX);
         emitm_movl_r_r(NATIVECODE, MAP[2], MAP[1]);
         emitm_shll_r_r(NATIVECODE, emit_ECX, MAP[1]);
@@ -1277,7 +1277,7 @@ Parrot_shl_i_ic_ic {
 Parrot_shr_i_i_i {
 ; TODO check if we really needs this.
     emit_pushl_r(NATIVECODE,emit_ECX);
-    if (MAP[1] && MAP[2] && MAP[3]) { 
+    if (MAP[1] && MAP[2] && MAP[3]) {
         emitm_movl_r_r(NATIVECODE, MAP[3], emit_ECX);
         emitm_movl_r_r(NATIVECODE, MAP[2], MAP[1]);
         emitm_shrl_r_r(NATIVECODE, emit_ECX, MAP[1]);
@@ -1386,7 +1386,7 @@ Parrot_shr_i_ic_ic {
  * Local variables:
  * c-indentation-style: bsd
  * c-basic-offset: 4
- * indent-tabs-mode: nil 
+ * indent-tabs-mode: nil
  * End:
  *
  * vim: expandtab shiftwidth=4:

@@ -1604,6 +1604,7 @@ testyamd
 t/harness
 t/op/basic.t
 t/op/bitwise.t
+t/op/comp.t
 t/op/debuginfo.t
 t/op/gc.t
 t/op/globals.t
