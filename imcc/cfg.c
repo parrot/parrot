@@ -55,7 +55,7 @@ void find_basic_blocks () {
             dont_optimize = 1;
     }
 
-    if (IMCC_DEBUG>2)
+    if (IMCC_DEBUG & DEBUG_CFG)
 	dump_instructions();
 }
 
@@ -68,20 +68,20 @@ void build_cfg() {
     Basic_block *last, *bb;
 
     for (i = 0; bb_list[i]; i++) {
-	bb = bb_list[i];
+        bb = bb_list[i];
 
-	/* if the block can fall-through */
-	if (i > 0 && ! (last->end->type & IF_goto) )
-	    bb_add_edge(last, bb);
-	/* look if instruction is a branch */
+        /* if the block can fall-through */
+        if (i > 0 && ! (last->end->type & IF_goto) )
+            bb_add_edge(last, bb);
+        /* look if instruction is a branch */
         addr = get_branch_reg(bb->end);
         if (addr)
             bb_findadd_edge(bb, addr);
 
-	last = bb;
+        last = bb;
     }
 
-   if (IMCC_DEBUG>1)
+    if (IMCC_DEBUG & DEBUG_CFG)
         dump_cfg();
 }
 
@@ -220,8 +220,8 @@ static void propagate_alias(void)
 	    }
 	}
     }
-    if (IMCC_DEBUG>2) {
-	debug(2, "\nAfter propagate_alias\n");
+    if (IMCC_DEBUG & DEBUG_CFG) {
+	debug(DEBUG_CFG, "\nAfter propagate_alias\n");
 	dump_instructions();
     }
 }
@@ -409,7 +409,7 @@ void compute_dominators () {
 	}
     }
 
-    if (IMCC_DEBUG>1)
+    if (IMCC_DEBUG & DEBUG_CFG)
 	dump_dominators();
 
 }
@@ -477,7 +477,7 @@ void find_loops () {
     }
 
     sort_loops();
-    if (IMCC_DEBUG>1) {
+    if (IMCC_DEBUG & DEBUG_CFG) {
         dump_instructions();
 	dump_cfg();
         dump_loops();
@@ -506,13 +506,13 @@ void mark_loop (Edge* e){
             i++;
         }
 
-    debug (2, "loop from %d to %d, entered from %d\n", footer->index,
+    debug (DEBUG_CFG, "loop from %d to %d, entered from %d\n", footer->index,
             header->index, enter ? enter->index : -1 );
     if (i != 1) {
         if (i==0)
-            debug(2,"\tdead code\n");
+            debug(DEBUG_CFG,"\tdead code\n");
         else
-            debug(2,"\tcan't determine loop entry block (%d found)\n" ,i);
+            debug(DEBUG_CFG,"\tcan't determine loop entry block (%d found)\n" ,i);
     }
 
    loop = set_make(n_basic_blocks);

@@ -57,7 +57,7 @@ void debug(int level, const char *fmt, ...)
 {
     va_list ap;
 
-    if(level > IMCC_DEBUG)
+    if ( !(level & IMCC_DEBUG))
 	return;
 
     va_start(ap, fmt);
@@ -118,16 +118,17 @@ void dump_loops() {
     int i, j;
     Set *loop;
 
-    debug(2, "Loop info\n---------\n");
+    fprintf(stderr, "Loop info\n---------\n");
     for (i = 0; i < n_loops; i++) {
         loop = loop_info[i]->loop;
-        debug(2, "loop %d,  depth %d, size %d, entry %d, contains blocks:\n",
+        fprintf(stderr,
+                "loop %d,  depth %d, size %d, entry %d, contains blocks:\n",
                 i, loop_info[i]->depth,
                 loop_info[i]->size, loop_info[i]->entry);
         for (j = 0; j < n_basic_blocks; j++)
             if (set_contains(loop, j))
-                debug(2, "%d ", j);
-        debug(2, "\n");
+                fprintf(stderr, "%d ", j);
+        fprintf(stderr, "\n");
     }
 }
 
@@ -137,8 +138,9 @@ void dump_symreg() {
 
     if (!reglist)
         return;
-    debug(2, "\nSymbols:\n----------------------------------------------\n");
-    debug(2, "name\tfirst\tlast\t1.blk\t-blk\tset col tscore\t"
+    fprintf(stderr,
+            "\nSymbols:\n----------------------------------------------\n");
+    fprintf(stderr, "name\tfirst\tlast\t1.blk\t-blk\tset col tscore\t"
             "used\tlhs_use\tus flgs\n"
             "----------------------------------------------\n");
     for(i = 0; i <n_symbols; i++) {

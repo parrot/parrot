@@ -10,6 +10,8 @@ IMCC - running
 
 =item 0.0.9.10 changed run options
 
+=item 0.0.9.12 changed debug options
+
 =back
 
 =head1 OVERVIEW
@@ -32,9 +34,27 @@ Assume PASM input on stdin.
 
 Assume PBC file on stdin, run it.
 
-=item -d, --debug
+=item -d, --debug [hexbits]
 
-More I<-d> give more debug output. One I<-d> turns on parrot debugging.
+Tbe B<-d> switch takes an optional argument, which is considered to hold
+a hex value of debug bits. Without a value, debug is set to 1.
+
+The individual bits are:
+
+ DEBUG_PARROT 0x0001
+ DEBUG_LEXER  0x0002
+ DEBUG_PARSER 0x0004
+ DEBUG_IMC    0x0008
+ DEBUG_CFG    0x0010
+ DEBUG_OPT1   0x0020
+ DEBUG_OPT2   0x0040
+ DEBUG_PBC    0x1000
+ DEBUG_PBC_CONST    0x2000
+ DEBUG_PBC_FIXUP    0x4000
+
+To produce really huge output on F<stderr> run "imcc B<-d 0ffff> ...".
+Note: if the argument is separated by whitespace from the B<-d> switch,
+it has to start with a number.
 
 =item -h --help
 
@@ -67,7 +87,7 @@ This will probably change.
 
 =head2 Parrot Options
 
-s. parrot -h for description, used, when running a program inside
+s. parrot B<-h> for description, used, when running a program inside
 imcc.
 
 =head1 <file>

@@ -131,7 +131,7 @@ static void if_branch(struct Parrot_Interp *interp)
                 SymReg * go = get_branch_reg(ins);
                 int args;
 
-                debug(1,"if_branch %s ... %s\n", last->op, br_dest->name);
+                debug(DEBUG_OPT1,"if_branch %s ... %s\n", last->op, br_dest->name);
                 /* find the negated op (e.g if->unless, ne->eq ... */
                 if ((neg_op = get_neg_op(last->op, &args)) != 0) {
                     Instruction * tmp;
@@ -201,7 +201,7 @@ static void unused_label()
             }
             if (!used && last) {
                 ostat.deleted_labels++;
-                debug(1, "label %s deleted\n", lab->name);
+                debug(DEBUG_OPT1, "label %s deleted\n", lab->name);
                 ostat.deleted_ins++;
                 delete_ins(ins, 1);
                 last = ins;
@@ -343,7 +343,7 @@ static int is_ins_save(Instruction *ins, SymReg *r, int what) {
     reason = 0;
     save = _is_ins_save(ins, r, what);
     if (!save && reason)
-        debug(2, "ins not save var %s reason %d %s\n",
+        debug(DEBUG_OPT2, "ins not save var %s reason %d %s\n",
                 r->name, reason, ins_string(ins));
     return save;
 }
@@ -402,16 +402,16 @@ move_ins_out(struct Parrot_Interp *interp, Instruction **ins, Basic_block *bb)
     pred = bb_list[0];
 #endif
     if (!pred) {
-        debug(1, "outer loop not found (CFG?)\n");
+        debug(DEBUG_OPT2, "outer loop not found (CFG?)\n");
         return 0;
     }
     out = pred->end->prev;
     next = (*ins)->next;
     (*ins)->bbindex = pred->index;
-    debug(2, "inserting it in blk %d after %s\n", pred->index,
+    debug(DEBUG_OPT2, "inserting it in blk %d after %s\n", pred->index,
             ins_string(out));
     *ins = move_ins(*ins, out);
-    if (IMCC_DEBUG>1) {
+    if (DEBUG_OPT2 & IMCC_DEBUG) {
         char buf[256];
         SymReg * regs[IMCC_MAX_REGS];
         Instruction * tmp;
@@ -439,11 +439,11 @@ loop_one(struct Parrot_Interp *interp, int bnr)
         warning("loop_one", "wrong loop depth in block 0\n");
         return 0;
     }
-    debug(2, "loop_one blk %d\n", bnr);
+    debug(DEBUG_OPT2, "loop_one blk %d\n", bnr);
     for (ins = bb->start ; ins ; ins = ins->next) {
         reason = 0;
         if (is_invariant(ins)) {
-            debug(2, "found invariant %s\n", ins_string(ins));
+            debug(DEBUG_OPT2, "found invariant %s\n", ins_string(ins));
             if (move_ins_out(interp, &ins, bb)) {
                 changed++;
                 ins = ins->prev;
@@ -465,9 +465,9 @@ loop_optimization(struct Parrot_Interp *interp)
 
     loop_depth = prev_depth ? prev_depth : max_loop_depth();
     /* work from inside out */
-    debug(1, "loop_optimization\n");
+    debug(DEBUG_OPT2, "loop_optimization\n");
     for (l = loop_depth; l > 0; l--) {
-        debug(2, "loop_depth %d\n", l);
+        debug(DEBUG_OPT2, "loop_depth %d\n", l);
         for (bb = 0; bb < n_basic_blocks; bb++)
             if (bb_list[bb]->loop_depth == l) {
                 changed |= loop_one(interp, bb);
@@ -476,7 +476,7 @@ loop_optimization(struct Parrot_Interp *interp)
          * inner loop is changed, but outer loops to */
         if (changed) {
             prev_depth = l-1;
-            debug(2,"after loop_opt\n");
+            debug(DEBUG_OPT2,"after loop_opt\n");
             if (IMCC_DEBUG>1)
                 dump_instructions();
             return changed;
@@ -492,7 +492,7 @@ static int check_clone(Instruction *ins)
     SymReg * rr = ins->r[1];
     if (0 && is_ins_save(ins, rl, CHK_CLONE) &&
         is_ins_save(ins, rr, CHK_CLONE)) {
-        debug(1, "clone %s removed\n", ins_string(ins));
+        debug(DEBUG_OPT2, "clone %s removed\n", ins_string(ins));
         free(ins->op);
         ins->op = strdup("set");
         return 1;
@@ -505,7 +505,7 @@ clone_remove()
 {
     Instruction *ins;
     int changes = 0;
-    debug(1, "clone_remove\n");
+    debug(DEBUG_OPT2, "clone_remove\n");
     for (ins = instructions; ins; ins = ins->next)
         if (!strcmp(ins->op, "clone"))
             changes |= check_clone(ins);

@@ -31,10 +31,10 @@ void allocate(struct Parrot_Interp *interpreter) {
     if (!instructions)
         return;
 
-    debug(2, "\n------------------------\n");
-    debug(1, "processing sub %s\n", function);
-    debug(2, "------------------------\n\n");
-    if (IMCC_VERBOSE > 1 || IMCC_DEBUG)
+    debug(DEBUG_IMC, "\n------------------------\n");
+    debug(DEBUG_IMC, "processing sub %s\n", function);
+    debug(DEBUG_IMC, "------------------------\n\n");
+    if (IMCC_VERBOSE > 1 || (IMCC_DEBUG & DEBUG_IMC))
         imc_stat_init();
 
     /* consecutive labels, if_branch, unused_labels ... */
@@ -56,7 +56,7 @@ void allocate(struct Parrot_Interp *interpreter) {
         /* optimize, as long as there is something to do -
          * but not, if we found a set_addr, which means
          * we have probably a CATCH handler */
-        if (IMCC_DEBUG==2)
+        if (IMCC_DEBUG & DEBUG_IMC)
             dump_symreg();
         if (dont_optimize)
             todo = 0;
@@ -83,7 +83,7 @@ void allocate(struct Parrot_Interp *interpreter) {
             todo = 0;
         }
     }
-    if (IMCC_VERBOSE > 1 || IMCC_DEBUG)
+    if (IMCC_VERBOSE > 1 || (IMCC_DEBUG & DEBUG_IMC))
         print_stat();
     free_reglist();
     clear_basic_blocks();       /* and cfg ... */
@@ -255,7 +255,7 @@ void build_interference_graph() {
 	}
     }
 
-    if (IMCC_DEBUG>2) {
+    if (IMCC_DEBUG & DEBUG_IMC) {
 	    dump_symreg();
 	    dump_interference_graph();
     }
@@ -329,15 +329,15 @@ void compute_spilling_costs () {
 
     for (ins = instructions; ins; ins = ins->next) {
 
-	depth = bb_list[ins->bbindex]->loop_depth;
+        depth = bb_list[ins->bbindex]->loop_depth;
 
-    	for (i = 0; ins->r[i] && i < IMCC_MAX_REGS; i++)
-	    ins->r[i]->score += 1 << (depth * 3);
+        for (i = 0; ins->r[i] && i < IMCC_MAX_REGS; i++)
+            ins->r[i]->score += 1 << (depth * 3);
 
-	}
+    }
 
-     if (IMCC_DEBUG>2)
-	    dump_symreg();
+    if (IMCC_DEBUG & DEBUG_IMC)
+        dump_symreg();
 
 }
 /* See if r0's chain interferes with r1. */
@@ -421,7 +421,7 @@ int simplify (){
 	}
 
 	if ( neighbours(x) < MAX_COLOR) {
-            debug(1, "#simplifying [%s]\n", g[x]->name);
+            debug(DEBUG_IMC, "#simplifying [%s]\n", g[x]->name);
 
 	    imcstack_push(nodeStack, x);
 
@@ -522,7 +522,7 @@ int try_allocate() {
 			if(!colors[color]) {
 			    reglist[x]->color = color;
 
-                            debug(2, "#[%s] provisionally gets color [%d]"
+                            debug(DEBUG_IMC, "#[%s] provisionally gets color [%d]"
                                      "(%d free colors, score %d)\n",
 					reglist[x]->name, color,
                                         free_colors, reglist[x]->score);
@@ -532,7 +532,7 @@ int try_allocate() {
 		}
 
 		if (reglist[x]->color == -1) {
-                    debug(1, "# no more colors free = %d\n", free_colors);
+                    debug(DEBUG_IMC, "# no more colors free = %d\n", free_colors);
 
 		    /* It has been impossible to assign a color
                      * to this node, return it so it gets spilled
@@ -591,7 +591,7 @@ void spill(struct Parrot_Interp *interpreter, int spilled) {
 	fatal(1, "spill","Out of mem\n");
     }
 
-    debug(1, "#Spilling [%s]:\n", reglist[spilled]->name);
+    debug(DEBUG_IMC, "#Spilling [%s]:\n", reglist[spilled]->name);
 
     new_symbol = old_symbol = reglist[spilled];
     p31 = mk_pasm_reg(str_dup("P31"));
@@ -657,7 +657,7 @@ void spill(struct Parrot_Interp *interpreter, int spilled) {
     for(i = 0, ins = instructions; ins; ins = ins->next) {
 	ins->index = i++;
     }
-    if(IMCC_DEBUG>2)
+    if (IMCC_DEBUG & DEBUG_IMC)
         dump_instructions();
 
 }

@@ -27,16 +27,17 @@ static void usage(FILE *fp)
 {
     fprintf(fp, "imcc\t[-h|--help] [-V|--version] [-v|--verbose] "
 	    "[-<parrot-switch>] \n"
-	    "\t[-d|--debug] [-y|--yydebug] [-a|--pasm]\n"
-	    "\t[-c|--create-pbc] [-r|--run-pbc] [-O[012]]\n"
+	    "\t[-d|--debug [hexlevel]] [-y|--yydebug] [-a|--pasm]\n"
+	    "\t[-c|--pbc] [-r|--run-pbc] [-O[012]]\n"
 	    "\t[-o outfile] infile [arguments ...]\n");
+    fprintf(fp, "\n\tlong options N/Y\n");
+    fprintf(fp, "\n\ts. docs/running.pod for more.\n");
 }
 
 
 static void help(void)
 {
     usage(stdout);
-    fprintf(stdout, "\n\tlong options N/Y\n");
     exit(0);
 }
 
@@ -88,10 +89,16 @@ parseflags(Parrot_Interp interp, int *argc, char **argv[])
                 setopt(PARROT_TRACE_FLAG);
                 break;
             case 'd':
-                if (!Interp_flags_TEST(interp, PARROT_DEBUG_FLAG))
+                IMCC_DEBUG++;
+                if ((*argv)[0][2])
+                    IMCC_DEBUG = strtoul((*argv)[0] + 2, 0, 16);
+                else if (*argc > 1 && isdigit(*(*argv)[1])) {
+                    (*argc)--;
+                    (*argv)++;
+                    IMCC_DEBUG = strtoul((*argv)[0], 0, 16);
+                }
+                if (IMCC_DEBUG & 1)
                     setopt(PARROT_DEBUG_FLAG);
-                else
-                    IMCC_DEBUG++;
                 break;
             case 'w':
                 Parrot_setwarnings(interp, PARROT_WARNINGS_ALL_FLAG);
@@ -163,7 +170,7 @@ parseflags(Parrot_Interp interp, int *argc, char **argv[])
                 goto DONE;
             default:
                 fatal(1, "main", "Invalid flag '%s' used."
-                        "\n\ns. imcc -h\n", (*argv)[0]);
+                        "\n\nhelp: imcc -h\n", (*argv)[0]);
 	}
 
 	(*argc)--;
@@ -227,6 +234,7 @@ int main(int argc, char * argv[])
     }
 
     if (IMCC_VERBOSE) {
+        info(1,"debug = 0x%x\n", IMCC_DEBUG);
         info(1,"Reading %s", yyin == stdin ? "stdin":sourcefile);
         if (run_pbc)
             info(1, ", executing");

@@ -78,7 +78,7 @@ SymReg * mk_pasm_reg(char * name) {
     r = mk_symreg(name, *name);
     r->type = VTPASM;
     r->color = atoi(name+1);
-    debug(1, "mk_pasm_reg: name %s set %c color %d type 0x%x\n",
+    debug(DEBUG_PARSER, "mk_pasm_reg: name %s set %c color %d type 0x%x\n",
             name, r->set, r->color, r->type);
     return r;
 }

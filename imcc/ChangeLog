@@ -1,3 +1,8 @@
+- 2003-02-07 	leo
+	* version 0.0.9.12
+	* changed -d (--debug) options and made more granular
+	  debug output. s. docs/running.pod
+
 - 2003-01-31 	leo
 	* version 0.0.9.11
 	* changed the until now global Parrot_Interp * to

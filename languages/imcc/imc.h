@@ -1,7 +1,7 @@
 #ifndef __IMC_H
 #define __IMC_H
 
-#define IMCC_VERSION "0.0.9.11"
+#define IMCC_VERSION "0.0.9.12"
 
 #include <stdio.h>
 #include <stdlib.h>
