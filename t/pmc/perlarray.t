@@ -1,6 +1,6 @@
 #! perl -w
 
-use Parrot::Test tests => 18;
+use Parrot::Test tests => 19;
 use Test::More;
 
 output_is(<<'CODE', <<'OUTPUT', "size of the array");
@@ -932,6 +932,138 @@ ok:
     end
 CODE
 ok
+OUTPUT
+
+output_is(<<'CODE', <<'OUTPUT', "splice");
+    new P0, .PerlArray
+    new P1, .PerlArray
+    push P0, 100
+    push P1, 200
+    push P1, 300
+    # append i.e. push 2 elements
+    splice P0, P1, 1, 0
+    set I0, P0[0]
+    eq I0, 100, ok_1
+    print "nok 11\n"
+ok_1:
+    set I0, P0[1]
+    eq I0, 200, ok_2
+    print "nok 12\n"
+ok_2:
+    set I0, P0[2]
+    eq I0, 300, ok_3
+    print "nok 13\n"
+ok_3:
+    set I0, P0
+    eq I0, 3, ok_4
+    print "nok 14\n"
+ok_4:
+    print "ok 1\n"
+    # pop one value
+    set P1, 0
+    splice P0, P1, -1, 1
+    set I0, P0
+    eq I0, 2, ok_5
+    print "nok 2\n"
+ok_5:
+    print "ok 2\n"
+    # shift one value
+    splice P0, P1, 0, 1
+    set I0, P0
+    eq I0, 1, ok_6
+    print "nok 31\n"
+ok_6:
+    set I0, P0[0]
+    eq I0, 200, ok_7
+    print "nok 32\n"
+ok_7:
+    print "ok 3\n"
+    # unshift 2 values
+    set P1[0], 50
+    set P1[1], 100
+    splice P0, P1, 0, 0
+    set I0, P0
+    eq I0, 3, ok_8
+    print "nok 41\n"
+ok_8:
+    set I0, P0[0]
+    eq I0, 50, ok_9
+    print "nok 42\n"
+ok_9:
+    set I0, P0[1]
+    eq I0, 100, ok_10
+    print "nok 43\n"
+ok_10:
+    set I0, P0[2]
+    eq I0, 200, ok_11
+    print "nok 44\n"
+ok_11:
+    print "ok 4\n"
+    push P0, 300
+    # replace 3 values
+    splice P0, P1, 1 3
+    set I0, P0
+    eq I0, 3, ok_12
+    print "nok 51\n"
+ok_12:
+    set I0, P0[0]
+    eq I0, 50, ok_13
+    print "nok 52\n"
+ok_13:
+    set I0, P0[1]
+    eq I0, 50, ok_14
+    print "nok 53\n"
+ok_14:
+    set I0, P0[2]
+    eq I0, 100, ok_15
+    print "nok 54\n"
+ok_15:
+    print "ok 5\n"
+    # replace 3 values with nothing
+    set P1, 0
+    splice P0, P1, 0, 3
+    set I0, P0
+    eq I0, 0, ok_16
+    print "nok 6\n"
+ok_16:
+    print "ok 6\n"
+    # append 2 values at offset 1
+    set P1[0], 50
+    set P1[1], 100
+    splice P0, P1, 1, 0
+    set I0, P0
+    eq I0, 3, ok_17
+    print "nok 71\n"
+ok_17:
+    set P0[0], 25
+    pop I0, P0
+    eq I0, 100, ok_18
+    print "nok 72\n"
+ok_18:
+    # replace last 2 values
+    splice P0, P1, -2, 2
+    set I0, P0
+    eq I0, 2, ok_19
+    print "nok 73\n"
+ok_19:
+    set I0, P0[0]
+    eq I0, 50, ok_20
+    print "nok 74\n"
+ok_20:
+    set I0, P0[1]
+    eq I0, 100, ok_21
+    print "nok 75\n"
+ok_21:
+    print "ok 7\n"
+    end
+CODE
+ok 1
+ok 2
+ok 3
+ok 4
+ok 5
+ok 6
+ok 7
 OUTPUT
 
 1;

@@ -6,7 +6,7 @@ void morph(INTVAL type)
 PMC* mark(PMC* tail)
 void destroy()
 
-INTVAL type() 
+INTVAL type()
 INTVAL type_keyed(PMC* key)
 INTVAL type_keyed_int(INTVAL* key)
 
@@ -14,7 +14,7 @@ UINTVAL subtype(INTVAL type)
 UINTVAL subtype_keyed(PMC* key, INTVAL type)
 UINTVAL subtype_keyed_int(INTVAL* key, INTVAL type)
 
-STRING* name() 
+STRING* name()
 STRING* name_keyed(PMC* key)
 STRING* name_keyed_int(INTVAL* key)
 
@@ -22,7 +22,7 @@ PMC* clone()
 PMC* clone_keyed(PMC* key)
 PMC* clone_keyed_int(INTVAL* key)
 
-PMC* find_method(STRING* method_name) 
+PMC* find_method(STRING* method_name)
 PMC* find_method_keyed(PMC* key, STRING* method_name)
 PMC* find_method_keyed_int(INTVAL* key, STRING* method_name)
 
@@ -171,6 +171,8 @@ void unshift_pmc_keyed(PMC* key, PMC* value, PMC* value_key)
 void unshift_pmc_keyed_int(INTVAL* key, PMC* value, INTVAL* value_key)
 
 ## void splice ???
+
+void splice(PMC* value, INTVAL offset, INTVAL count)
 
 void add(PMC* value, PMC* dest)
 void add_int(INTVAL value, PMC* dest)

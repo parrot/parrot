@@ -3534,6 +3534,17 @@ inline op shift (out PMC, inout PMC) {
     goto NEXT();
 }
 
+=item B<splice>(inout PMC, in PMC, in INT, in INT)
+
+Replace $4 values at offset $3 in aggregate $1 with the PMCs in aggregate $2.
+
+=cut
+
+inline op splice(inout PMC, in PMC, in INT, in INT) {
+    $1->vtable->splice(interpreter, $1, $2, $3, $4);
+    goto NEXT();
+}
+
 =back
 
 =cut

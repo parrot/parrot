@@ -17,6 +17,9 @@
  *      1.4     16.10.2002 integrated list in parrot/arrays
  *      1.5     17.10.2002 clone integral data (intlist)
  *      1.6     18.10.2002 moved tests to t/src/list.t
+ *      1.7     19.10.2002 set intial length (new_init)
+ *      1.8     21.10.2002 gc_debug stuff
+ *      1.9     21.10.2002 splice
  *
  *  Data Structure and Algorithms:
  *  ==============================
@@ -922,8 +925,7 @@ List *
 list_new_init(Interp *interpreter, INTVAL type, PMC * init)
 {
     List * list = list_new(interpreter, type);
-    INTVAL i, len, key;
-    INTVAL size = 0;
+    INTVAL i, len, size, key;
 
     if (!init->vtable || init->vtable != Parrot_base_vtables +
             enum_class_PerlArray)
@@ -931,7 +933,7 @@ list_new_init(Interp *interpreter, INTVAL type, PMC * init)
     len = init->vtable->elements(interpreter, init);
     if (len & 1)
         internal_exception(1, "Illegal initializer for init: odd elements\n");
-    for (i = 0; i < len; i+= 2) {
+    for (i = size = 0; i < len; i+= 2) {
         key = init->vtable->get_integer_keyed_int(interpreter, init, &i);
         if (key == 0) {
             INTVAL val = i+1;
@@ -1274,6 +1276,61 @@ list_get(Interp *interpreter, List *list, INTVAL idx, int type)
     if (idx < 0) idx += length;
     idx +=  list->start;
     return list_item( interpreter, list, type, idx);
+}
+
+void
+list_splice(Interp *interpreter, List *list, PMC* value, INTVAL offset,
+	INTVAL count)
+{
+    List * value_list = (List*) value->data;
+    INTVAL value_length = value_list->length;
+    INTVAL length = list->length;
+    INTVAL i, j;
+    int type = list->item_type;
+
+    if (type != value_list->item_type)
+        internal_exception(1, "Item type mismatch in splice\n");
+
+    /* start from end */
+    if (offset < 0)
+        offset += length;
+    if (offset < 0)
+        internal_exception(OUT_OF_BOUNDS, "illegal splice offset\n");
+    /* "leave that many elements off the end of the array" */
+    if (count < 0)
+        count += length - offset + 1;
+    if (count < 0)
+        count = 0;
+
+    /* replace count items at offset with values */
+    for (i = j = 0; i < count && j < value_length; i++, j++) {
+        void * val = list_get(interpreter, value_list, j, type);
+        /* XXX should we clone PMC's here? */
+        if (type == enum_type_PMC)
+            val = *(PMC**) val;
+        /* and string_copy here? */
+        else if (type == enum_type_STRING)
+            val = *(STRING**) val;
+        list_assign(interpreter, list, offset + i, val, type);
+    }
+    /* if we still have values in value_list, insert them */
+    if (j < value_length) {
+        /* make room for the remaining values */
+        list_insert(interpreter, list, offset + i, value_length - j);
+        for (; j < value_length; i++, j++) {
+            void * val = list_get(interpreter, value_list, j, type);
+            /* XXX s. above */
+            if (type == enum_type_PMC)
+                val = *(PMC**) val;
+            else if (type == enum_type_STRING)
+                val = *(STRING**) val;
+            list_assign(interpreter, list, offset + i, val, type);
+        }
+    }
+    else {
+        /* else delete the rest */
+        list_delete(interpreter, list, offset + i, count - i);
+    }
 }
 
 /*

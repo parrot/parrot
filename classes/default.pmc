@@ -806,6 +806,12 @@ pmclass default abstract noinit {
         DYNSELF.unshift_pmc_keyed(r_key, value, r_value_key);
     }
 
+    void splice(PMC* value, INTVAL offset, INTVAL count) {
+	internal_exception(ILL_INHERIT,
+		"splice() not implemented in class '%s'\n",
+		caller(INTERP, SELF));
+    }
+
     void add (PMC* value, PMC* dest) {
 	internal_exception(ILL_INHERIT,
 		"add() not implemented in class '%s'\n",
