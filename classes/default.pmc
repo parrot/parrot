@@ -149,24 +149,8 @@ pmclass default abstract noinit {
         return DYNSELF.type_keyed(r_key);
     }
 
-
-    UINTVAL subtype_keyed_int (INTVAL key, INTVAL type) {
-        PMC* r_key = INT2KEY(INTERP, key);
-        return DYNSELF.subtype_keyed(r_key, type);
-    }
-
     STRING* name () {
         return SELF->vtable->whoami;
-    }
-
-    STRING* name_keyed_int (INTVAL key) {
-        PMC* r_key = INT2KEY(INTERP, key);
-        return DYNSELF.name_keyed(r_key);
-    }
-
-    void clone_keyed_int (INTVAL key, PMC *dest) {
-        PMC* r_key = INT2KEY(INTERP, key);
-        DYNSELF.clone_keyed(r_key, dest);
     }
 
     PMC* find_method(STRING* method_name) {
@@ -174,11 +158,6 @@ pmclass default abstract noinit {
 	    return VTABLE_get_pmc_keyed(INTERP, SELF->vtable->method_table,
 		    key_new_string(INTERP, method_name));
         return NULL;
-    }
-
-    PMC* find_method_keyed_int(INTVAL key, STRING* method_name) {
-        PMC* r_key = INT2KEY(INTERP, key);
-        return DYNSELF.find_method_keyed(r_key, method_name);
     }
 
     INTVAL get_integer_keyed_int (INTVAL key) {
@@ -225,16 +204,10 @@ pmclass default abstract noinit {
         return SELF == value;
     }
 
-    INTVAL is_same_keyed_int (INTVAL key, PMC* value) {
-        PMC* r_key = INT2KEY(INTERP, key);
-        return DYNSELF.is_same_keyed(r_key, value);
-    }
-
     void set_integer_keyed_int (INTVAL key, INTVAL value) {
         PMC* r_key = INT2KEY(INTERP, key);
         DYNSELF.set_integer_keyed(r_key, value);
     }
-
 
     void set_number_keyed_int (INTVAL key, FLOATVAL value) {
         PMC* r_key = INT2KEY(INTERP, key);
@@ -261,18 +234,11 @@ pmclass default abstract noinit {
         DYNSELF.set_pmc_keyed(r_key, value);
     }
 
-    void set_same_keyed_int (INTVAL key, PMC* value) {
-        PMC* r_key = INT2KEY(INTERP, key);
-        DYNSELF.set_same_keyed(r_key, value);
-    }
-
-
     INTVAL is_equal (PMC* value) {
         return (SELF->vtable == value->vtable
                 && SELF->cache.struct_val == value->cache.struct_val
 		&& PMC_data(SELF) == PMC_data(value));
     }
-
 
     INTVAL exists_keyed_int (INTVAL key) {
         PMC* r_key = INT2KEY(INTERP, key);

@@ -102,10 +102,6 @@ pmclass PerlInt extends perlscalar {
 	}
     }
 
-    void add_same (PMC* value, PMC* dest) {
-        dest->cache.int_val = SELF->cache.int_val + value->cache.int_val;
-    }
-
     void subtract (PMC* value, PMC* dest) {
         INTVAL pmci;
 	int vtype = VTABLE_type(INTERP, value);
@@ -144,10 +140,6 @@ pmclass PerlInt extends perlscalar {
         );
     }
 
-    void subtract_same (PMC* value, PMC* dest) {
-        dest->cache.int_val = SELF->cache.int_val - value->cache.int_val;
-    }
-
     void multiply (PMC* value, PMC* dest) {
         INTVAL pmci;
 	int vtype = VTABLE_type(INTERP, value);
@@ -184,10 +176,6 @@ pmclass PerlInt extends perlscalar {
         VTABLE_set_integer_native(INTERP, dest,
             SELF->cache.int_val * value
         );
-    }
-
-    void multiply_same (PMC* value, PMC* dest) {
-        dest->cache.int_val = SELF->cache.int_val * value->cache.int_val;
     }
 
     void divide (PMC* value, PMC* dest) {
@@ -246,10 +234,6 @@ pmclass PerlInt extends perlscalar {
 	}
     }
 
-    void divide_same (PMC* value, PMC* dest) {
-        SELF.divide_int(value->cache.int_val, dest);
-    }
-
     void cmodulus (PMC* value, PMC* dest) {
         VTABLE_set_integer_native(INTERP, dest,
                                   SELF->cache.int_val %
@@ -272,10 +256,6 @@ pmclass PerlInt extends perlscalar {
 		intval_mod(SELF->cache.int_val, value));
     }
 
-    void modulus_same (PMC* value, PMC* dest) {
-        dest->cache.int_val = SELF->cache.int_val % value->cache.int_val;
-    }
-
     void neg (PMC* dest) {
 	if (!dest)
 	    SELF->cache.int_val = -SELF->cache.int_val;
@@ -296,13 +276,6 @@ pmclass PerlInt extends perlscalar {
         );
     }
 
-    void bitwise_or_same (PMC* value, PMC* dest) {
-        VTABLE_set_integer_native(INTERP, dest,
-            SELF->cache.int_val |
-            value->cache.int_val
-        );
-    }
-
     void bitwise_and (PMC* value, PMC* dest) {
         VTABLE_set_integer_native(INTERP, dest,
             SELF->cache.int_val &
@@ -316,13 +289,6 @@ pmclass PerlInt extends perlscalar {
         );
     }
 
-    void bitwise_and_same (PMC* value, PMC* dest) {
-        VTABLE_set_integer_native(INTERP, dest,
-            SELF->cache.int_val &
-            value->cache.int_val
-        );
-    }
-
     void bitwise_xor (PMC* value, PMC* dest) {
         VTABLE_set_integer_native(INTERP, dest,
             SELF->cache.int_val ^
@@ -333,13 +299,6 @@ pmclass PerlInt extends perlscalar {
     void bitwise_xor_int (INTVAL value, PMC* dest) {
         VTABLE_set_integer_native(INTERP, dest,
             SELF->cache.int_val ^ value
-        );
-    }
-
-    void bitwise_xor_same (PMC* value, PMC* dest) {
-        VTABLE_set_integer_native(INTERP, dest,
-            SELF->cache.int_val ^
-            value->cache.int_val
         );
     }
 
@@ -360,12 +319,6 @@ pmclass PerlInt extends perlscalar {
         );
     }
 
-    void bitwise_shr_same (PMC* value, PMC* dest) {
-        VTABLE_set_integer_native(INTERP, dest,
-            SELF->cache.int_val >> value->cache.int_val
-        );
-    }
-
     void bitwise_shl (PMC* value, PMC* dest) {
         VTABLE_set_integer_native(INTERP, dest,
             SELF->cache.int_val <<
@@ -378,13 +331,6 @@ pmclass PerlInt extends perlscalar {
             SELF->cache.int_val << value
         );
     }
-
-    void bitwise_shl_same (PMC* value, PMC* dest) {
-        VTABLE_set_integer_native(INTERP, dest,
-            SELF->cache.int_val << value->cache.int_val
-        );
-    }
-
 
     /* == operation */
     INTVAL is_equal (PMC* value) {

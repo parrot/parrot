@@ -324,11 +324,6 @@ pmclass SArray const_too need_ext does array {
         return ret->val.pmc_val;
     }
 
-    void set_integer (PMC* value) {
-        INTVAL size = VTABLE_get_integer(INTERP,value);
-        SELF.set_integer_native(size);
-    }
-
     void set_integer_native (INTVAL size) {
 	if (SELF->cache.int_val)
 	    internal_exception(OUT_OF_BOUNDS, "SArray: Can't resize!\n");

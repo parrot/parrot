@@ -226,11 +226,6 @@ pmclass Array need_ext does array {
         return VTABLE_get_pmc_keyed(INTERP, box, nextkey);
     }
 
-    void set_integer (PMC* value) {
-        INTVAL size = VTABLE_get_integer(INTERP,value);
-        list_set_length(INTERP, (List *) PMC_data(SELF) ,size);
-    }
-
     void set_integer_native (INTVAL size) {
         list_set_length(INTERP, (List *) PMC_data(SELF) ,size);
     }

@@ -46,18 +46,9 @@ pmclass PerlNum extends perlscalar {
         return (INTVAL)(SELF->cache.num_val != 0.0);
     }
 
-    void set_integer (PMC* value) {
-	DYNSELF.morph(enum_class_PerlInt);
-        DYNSELF.set_integer(value);
-    }
-
     void set_integer_native (INTVAL value) {
 	DYNSELF.morph(enum_class_PerlInt);
         DYNSELF.set_integer_native(value);
-    }
-
-    void set_number (PMC* value) {
-        SELF->cache.num_val = (FLOATVAL)VTABLE_get_number(INTERP, value);
     }
 
     void set_number_native (FLOATVAL value) {
@@ -72,18 +63,10 @@ pmclass PerlNum extends perlscalar {
         SELF->cache.num_val = value->cache.num_val;
     }
 
-    void set_bignum (PMC* value) {
-    }
-
     void set_bignum_native (BIGNUM* value) {
     }
 
     void set_bignum_same (PMC* value) {
-    }
-
-    void set_string (PMC* value) {
-	DYNSELF.morph(enum_class_PerlString);
-        DYNSELF.set_string(value);
     }
 
     void set_string_native (STRING * value) {
@@ -111,10 +94,6 @@ pmclass PerlNum extends perlscalar {
 	SELF->cache.num_val + value);
     }
 
-    void add_same (PMC* value, PMC* dest) {
-        dest->cache.num_val = SELF->cache.num_val + value->cache.num_val;
-    }
-
     void subtract (PMC* value, PMC* dest) {
 	VTABLE_set_number_native(INTERP, dest,
 	    SELF->cache.num_val -
@@ -134,10 +113,6 @@ pmclass PerlNum extends perlscalar {
     void subtract_float (FLOATVAL value, PMC* dest) {
         VTABLE_set_number_native(INTERP, dest,
 	SELF->cache.num_val - value);
-    }
-
-    void subtract_same (PMC* value, PMC* dest) {
-        dest->cache.num_val = SELF->cache.num_val - value->cache.num_val;
     }
 
     void multiply (PMC* value, PMC* dest) {
@@ -161,10 +136,6 @@ pmclass PerlNum extends perlscalar {
 	SELF->cache.num_val * value);
     }
 
-    void multiply_same (PMC* value, PMC* dest) {
-        dest->cache.num_val = SELF->cache.num_val * value->cache.num_val;
-    }
-
     void divide (PMC* value, PMC* dest) {
 	VTABLE_set_number_native(INTERP, dest,
 	    SELF->cache.num_val /
@@ -182,10 +153,6 @@ pmclass PerlNum extends perlscalar {
         VTABLE_set_number_native(INTERP, dest,
             SELF->cache.num_val / value
         );
-    }
-
-    void divide_same (PMC* value, PMC* dest) {
-        dest->cache.num_val = SELF->cache.num_val / value->cache.num_val;
     }
 
     void cmodulus (PMC* value, PMC* dest) {

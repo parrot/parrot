@@ -46,32 +46,16 @@ pmclass scalar abstract noinit {
       be what it should be, more complex behaviour is left as an
       exercise for the inheriting class. */
 
-    void set_integer (PMC* value) {
-        SELF->cache.int_val = VTABLE_get_integer(INTERP, value);
-    }
-
     void set_integer_native (INTVAL value) {
         SELF->cache.int_val = value;
-    }
-
-    void set_number (PMC* value) {
-        SELF->cache.num_val = VTABLE_get_number(INTERP, value);
     }
 
     void set_number_native (FLOATVAL value) {
         SELF->cache.num_val = value;
     }
 
-    void set_bignum (PMC* value) {
-        SELF->cache.struct_val = (DPOINTER*)VTABLE_get_bignum(INTERP, value);
-    }
-
     void set_bignum_native (BIGNUM* value) {
         SELF->cache.struct_val = (DPOINTER*)value;
-    }
-
-    void set_string (PMC* value) {
-        SELF->cache.string_val = VTABLE_get_string(INTERP, value);
     }
 
     void set_string_native (STRING* value) {
@@ -101,10 +85,6 @@ pmclass scalar abstract noinit {
         result = DYNSELF.get_number() + value;
 
         VTABLE_set_number_native(INTERP, dest, result);
-    }
-
-    void add_same (PMC* value,  PMC* dest) {
-        DYNSELF.add(value, dest);
     }
 
     void subtract (PMC* value,  PMC* dest) {
@@ -146,18 +126,6 @@ pmclass scalar abstract noinit {
         VTABLE_set_number_native(INTERP, dest, result);
     }
 
-    void subtract_same (PMC* value,  PMC* dest) {
-        /* XXX: overflow detection, bignum promotion? */
-
-        FLOATVAL result;
-
-        result = DYNSELF.get_number()
-            - VTABLE_get_number(INTERP, value);
-
-        VTABLE_set_number_native(INTERP, dest, result);
-    }
-
-
     void multiply (PMC* value,  PMC* dest) {
         /* XXX: overflow detection, bignum promotion? */
 
@@ -195,16 +163,6 @@ pmclass scalar abstract noinit {
         VTABLE_set_number_native(INTERP, dest, result);
     }
 
-    void multiply_same (PMC* value,  PMC* dest) {
-        /* XXX: overflow detection, bignum promotion? */
-
-        FLOATVAL result;
-
-        result = DYNSELF.get_number()
-            * VTABLE_get_number(INTERP, value);
-
-        VTABLE_set_number_native(INTERP, dest, result);
-    }
 
     void divide (PMC* value,  PMC* dest) {
         /* XXX: overflow detection, bignum promotion? */
@@ -247,17 +205,6 @@ pmclass scalar abstract noinit {
         VTABLE_set_number_native(INTERP, dest, result);
     }
 
-    void divide_same (PMC* value,  PMC* dest) {
-        /* XXX: overflow detection, bignum promotion? */
-
-        FLOATVAL result;
-
-        result = DYNSELF.get_number()
-            / VTABLE_get_number(INTERP, value);
-
-        VTABLE_set_number_native(INTERP, dest, result);
-    }
-
     void modulus (PMC* value,  PMC* dest) {
         /* This does perl-like modulus */
 
@@ -286,16 +233,6 @@ pmclass scalar abstract noinit {
         SUPER(value, dest);
     }
 
-    void modulus_same (PMC* value,  PMC* dest) {
-        /* This does perl-like modulus */
-        INTVAL result;
-
-        result = DYNSELF.get_integer()
-            % VTABLE_get_integer(INTERP, value);
-
-        VTABLE_set_integer_native(INTERP, dest, result);
-    }
-
     void neg (PMC* dest) {
 	if (!dest)
 	    SELF->cache.int_val = -DYNSELF.get_integer();
@@ -321,15 +258,6 @@ pmclass scalar abstract noinit {
         VTABLE_set_integer_native(INTERP, dest, result);
     }
 
-    void bitwise_or_same (PMC* value, PMC* dest) {
-        INTVAL result;
-
-        result = DYNSELF.get_integer()
-            | VTABLE_get_integer(INTERP, value);
-
-        VTABLE_set_integer_native(INTERP, dest, result);
-    }
-
     void bitwise_and (PMC* value, PMC* dest) {
         INTVAL result;
 
@@ -344,15 +272,6 @@ pmclass scalar abstract noinit {
 
         result = DYNSELF.get_integer()
             & value;
-
-        VTABLE_set_integer_native(INTERP, dest, result);
-    }
-
-    void bitwise_and_same (PMC* value, PMC* dest) {
-        INTVAL result;
-
-        result = DYNSELF.get_integer()
-            & VTABLE_get_integer(INTERP, value);
 
         VTABLE_set_integer_native(INTERP, dest, result);
     }
@@ -374,16 +293,6 @@ pmclass scalar abstract noinit {
 
         VTABLE_set_integer_native(INTERP, dest, result);
     }
-
-    void bitwise_xor_same (PMC* value, PMC* dest) {
-        INTVAL result;
-
-        result = DYNSELF.get_integer()
-            ^ VTABLE_get_integer(INTERP, value);
-
-        VTABLE_set_integer_native(INTERP, dest, result);
-    }
-
 
     void bitwise_not (PMC* dest) {
         VTABLE_set_integer_native(INTERP, dest, ~DYNSELF.get_integer());
@@ -408,15 +317,6 @@ pmclass scalar abstract noinit {
         VTABLE_set_integer_native(INTERP, dest, result);
     }
 
-    void bitwise_shr_same (PMC* value, PMC* dest) {
-        INTVAL result;
-
-        result = DYNSELF.get_integer()
-            >> VTABLE_get_integer(INTERP, value);
-
-        VTABLE_set_integer_native(INTERP, dest, result);
-    }
-
     void bitwise_shl (PMC* value, PMC* dest) {
         INTVAL result;
 
@@ -435,16 +335,6 @@ pmclass scalar abstract noinit {
         VTABLE_set_integer_native(INTERP, dest, result);
     }
 
-    void bitwise_shl_same (PMC* value, PMC* dest) {
-        INTVAL result;
-
-        result = DYNSELF.get_integer()
-            << VTABLE_get_integer(INTERP, value);
-
-        VTABLE_set_integer_native(INTERP, dest, result);
-    }
-
-
     void concatenate (PMC* value,  PMC* dest) {
         STRING* s = string_concat(INTERP,
             DYNSELF.get_string(),
@@ -461,15 +351,6 @@ pmclass scalar abstract noinit {
 
         VTABLE_set_string_native(INTERP, dest, s);
     }
-
-    void concatenate_same (PMC* value,  PMC* dest) {
-        STRING* s = string_concat(INTERP,
-            DYNSELF.get_string(),
-            VTABLE_get_string(INTERP, value), 0);
-
-        VTABLE_set_string_native(INTERP, dest, s);
-    }
-
 
     INTVAL is_equal (PMC* value) {
         /* I think we need to check everything, do the easiest first... */

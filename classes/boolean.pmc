@@ -18,25 +18,12 @@
 pmclass Boolean extends PerlInt {
 
 
-    void set_integer (PMC* value) {
-    /* XXX change type on set_xx? */
-        SELF->cache.int_val = (VTABLE_get_integer(INTERP, value) != 0);
-    }
-
     void set_integer_native (INTVAL value) {
         SELF->cache.int_val = (value != 0);
     }
 
-    void set_number (PMC * value) {
-	SELF->cache.int_val = (value!=0);
-    }
-
     void set_number_native (FLOATVAL value) {
 	SELF->cache.int_val = (value!=0);
-    }
-
-    void set_string (PMC* value) {
-	SELF->cache.int_val = string_bool(value->cache.string_val);
     }
 
     void set_string_native (STRING* value) {

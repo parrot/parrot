@@ -11,6 +11,7 @@ BEGIN {
 
 sub does_write($$) {
     my ($meth, $section) = @_;
+    warn "no $meth\n" unless $section;
     exists $writes{$section} || $meth eq 'morph';
 }
 
@@ -72,7 +73,8 @@ sub init() {
 
 sub class_name {
     my ($self, $class) = @_;
-    my %special = ( 'Ref' => 1, 'default' => 1, 'Null' => 1 );
+    my %special = ( 'Ref' => 1, 'default' => 1, 'Null' => 1,
+                    'delegate' => 1 );
     my $classname = $self->{class};
     my $nclass = $class;
     # bless object into different classes inheriting from
@@ -611,6 +613,88 @@ ${decl} {
 	internal_exception(NULL_REG_ACCESS,
 		"Null PMC access in $meth()");
         $ret
+}
+
+EOC
+}
+
+# delegate.pmc redirects all methods to bytecode
+package Parrot::Pmc2c::delegate;
+use base 'Parrot::Pmc2c';
+
+sub implements
+{
+    1;
+}
+
+sub trans
+{
+    my ($self, $type) = @_;
+    my $char = substr $type, 0, 1;
+    return $1 if ($char =~ /([ISP])/);
+    return 'N' if ($char eq 'F');
+    return 'v' if ($type eq 'void');
+    return '?';
+}
+
+sub signature
+{
+    my ($self, $params) = @_;
+    my $n=1;
+    my @types = grep {$n++ & 1 ? $_ : 0} split / /, $params;
+    @types = map { $self->trans($_) } @types;
+    return join '', @types;
+}
+
+sub gen_ret
+{
+    my ($self, $type) = @_;
+    return "return *($1*) ret_val;" if ($type =~ /((?:INT|FLOAT)VAL)/);
+    return "return ($type) ret_val;";
+}
+
+sub body
+{
+    my ($self, $method, $line) = @_;
+    my $meth = $method->{meth};
+    # existing methods get emitted
+    if ($self->SUPER::implements($meth)) {
+        my $n = $self->{has_method}{$meth};
+        return $self->SUPER::body($self->{methods}[$n]);
+    }
+    my $decl = $self->decl($self->{class}, $method, 0);
+    my $parameters = $method->{parameters};
+    my $n=0;
+    my @args = grep {$n++ & 1 ? $_ : 0} split / /, $parameters;
+    my $arg = '';
+    $arg = ", ". join(' ', @args) if @args;
+    my $sig = $self->signature($parameters);
+    $sig = $self->trans($method->{type}) . $sig;
+    my $l = "";
+    my $ret = '';
+    my $ret_def = '';
+    my $func_ret = '(void) ';
+    if ($method->{type} ne 'void') {
+        $ret_def = "void *ret_val;";
+        $func_ret = 'ret_val = ';
+        $ret = $self->gen_ret($method->{type});
+    }
+    my $umeth = uc $meth;
+    my $delegate_meth = "PARROT_VTABLE_${umeth}_METHNAME";
+    unless ($self->{opt}{nolines}) {
+        $l = <<"EOC";
+#line $line "delegate.c"
+EOC
+    }
+    return <<EOC;
+$l
+${decl} {
+    $ret_def
+    PMC *sub = find_or_die(interpreter, pmc, $delegate_meth);
+    struct regsave *data = save_regs(interpreter);
+    ${func_ret}Parrot_runops_fromc_args(interpreter, sub, "$sig"$arg);
+    restore_regs(interpreter, data);
+    $ret
 }
 
 EOC

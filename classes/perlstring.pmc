@@ -58,29 +58,14 @@ pmclass PerlString extends perlscalar {
             (memcmp(s1->strstart,s2->bufstart,(size_t)s1->bufused)==0));
     }
 
-    void set_integer (PMC* value) {
-	DYNSELF.morph(enum_class_PerlInt);
-        DYNSELF.set_integer(value);
-    }
-
     void set_integer_native (INTVAL value) {
 	DYNSELF.morph(enum_class_PerlInt);
         DYNSELF.set_integer_native(value);
     }
 
-    void set_number (PMC * value) {
-	DYNSELF.morph(enum_class_PerlNum);
-        DYNSELF.set_number(value);
-    }
-
     void set_number_native (FLOATVAL value) {
 	DYNSELF.morph(enum_class_PerlNum);
         DYNSELF.set_number_native(value);
-    }
-
-    void set_string (PMC * value) {
-        SELF->cache.string_val = string_set(INTERP, SELF->cache.string_val,
-		VTABLE_get_string(INTERP, value));
     }
 
     void set_string_native (STRING * value) {
@@ -258,13 +243,6 @@ pmclass PerlString extends perlscalar {
         STRING* s = SELF->cache.string_val;
 	VTABLE_morph(INTERP, dest, enum_class_PerlString);
         dest->cache.string_val = string_concat(INTERP, s, value, 0);
-    }
-
-    void concatenate_same (PMC* value, PMC* dest) {
-	VTABLE_morph(INTERP, dest, enum_class_PerlString);
-        dest->cache.string_val =
-            string_concat(INTERP, SELF->cache.string_val,
-                          value->cache.string_val, 0);
     }
 
     /* == operation */

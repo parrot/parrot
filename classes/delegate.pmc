@@ -6,6 +6,7 @@
  *  Data Structure and Algorithms:
  *  History:
  *  Notes:
+ *     Almost all methods are auto-generated in lib/Parrot/Pmc2c.pm
  *  References:
  */
 
@@ -197,26 +198,6 @@ pmclass delegate {
 
     void init () {
 	noarg_noreturn(INTERP, SELF, PARROT_VTABLE_INIT_METHNAME, 0);
-    }
-
-    void set_integer(PMC* value) {
-	pmcarg_noreturn(INTERP, SELF,
-		PARROT_VTABLE_SET_INTEGER_METHNAME, value);
-    }
-
-    void set_number(PMC* value) {
-	pmcarg_noreturn(INTERP, SELF,
-		PARROT_VTABLE_SET_NUMBER_METHNAME, value);
-    }
-
-    void set_pmc(PMC* value) {
-	pmcarg_noreturn(INTERP, SELF,
-		PARROT_VTABLE_SET_PMC_METHNAME, value);
-    }
-
-    void set_string(PMC* value) {
-	pmcarg_noreturn(INTERP, SELF,
-		PARROT_VTABLE_SET_STRING_METHNAME, value);
     }
 
 

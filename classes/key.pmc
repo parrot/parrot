@@ -76,24 +76,12 @@ pmclass Key need_ext {
         return key_pmc(INTERP, SELF);
     }
 
-    void set_integer (PMC* value) {
-        key_set_integer(INTERP, SELF, VTABLE_get_integer(INTERP, value));
-    }
-
     void set_integer_native (INTVAL value) {
         key_set_integer(INTERP, SELF, value);
     }
 
-    void set_number (PMC* value) {
-        key_set_number(INTERP, SELF, VTABLE_get_number(INTERP, value));
-    }
-
     void set_number_native (FLOATVAL value) {
         key_set_number(INTERP, SELF, value);
-    }
-
-    void set_string (PMC* value) {
-        key_set_string(INTERP, SELF, VTABLE_get_string(INTERP, value));
     }
 
     void set_string_native (STRING* value) {
