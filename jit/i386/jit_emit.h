@@ -1806,6 +1806,13 @@ emit_jump(Parrot_jit_info_t *jit_info, opcode_t disp)
     emitm_jumpl(jit_info->native_ptr, 0xc0def00d);
 }
 
+/* see jit_begin */
+#  ifdef JIT_CGP
+#    define INTERP_BP_OFFS todo
+#  else
+#    define INTERP_BP_OFFS -16
+#  endif
+
 static void
 Parrot_emit_jump_to_eax(Parrot_jit_info_t *jit_info,
                    Interp * interpreter)
@@ -1813,46 +1820,38 @@ Parrot_emit_jump_to_eax(Parrot_jit_info_t *jit_info,
     extern char **Parrot_exec_rel_addr;
     extern int Parrot_exec_rel_count;
 
-    if (!jit_info->objfile) {
-        /* This calculates (INDEX into op_map * 4) */
+    /* we have to get the code pointer, which might change
+     * due too intersegment branches
+     */
 
-        /* we have to get the code pointer, which might change
-         * due too intersegment branches
-         */
-        jit_emit_mov_ri_i(jit_info->native_ptr,emit_EDX, interpreter);
-        emitm_movl_m_r(jit_info->native_ptr, emit_EDX, emit_EDX, 0, 1,
-                offsetof(struct Parrot_Interp, code));
-        emitm_movl_m_r(jit_info->native_ptr, emit_EDX, emit_EDX, 0, 1,
-                offsetof(struct PackFile, byte_code));
-        jit_emit_sub_rr_i(jit_info->native_ptr, emit_EAX, emit_EDX);
-        /*
-         * now we have the offset of the ins in EAX
-         *
-         * we have to get the op_map too at runtime
-         */
-        jit_emit_mov_ri_i(jit_info->native_ptr,emit_EDX, interpreter);
-        emitm_movl_m_r(jit_info->native_ptr, emit_EDX, emit_EDX, 0, 1,
-                offsetof(struct Parrot_Interp, jit_info));
-        emitm_lea_m_r(jit_info->native_ptr, emit_EDX, emit_EDX, 0, 1,
-                offsetof(Parrot_jit_info_t, arena));
-        emitm_movl_m_r(jit_info->native_ptr, emit_EDX, emit_EDX, 0, 1,
-                offsetof(Parrot_jit_arena_t, op_map));
-    }
-#  if EXEC_CAPABLE
-    else {
-        emitm_subl_i_r(jit_info->native_ptr,
-            jit_info->objfile->bytecode_header_size, emit_EAX);
-        Parrot_exec_add_text_rellocation(jit_info->objfile,
-            jit_info->native_ptr, RTYPE_DATA, "program_code", -4);
-        jit_emit_mov_ri_i(jit_info->native_ptr,emit_EDX,
-            Parrot_exec_add_text_rellocation_reg(jit_info->objfile,
-                jit_info->native_ptr, "opcode_map", 0, 0));
-    }
-#  endif
+    /* get interpreter
+     * emit interpreter->code->byte_code
+     */
+    emitm_movl_m_r(jit_info->native_ptr,
+            emit_EDX, emit_EBP, emit_None, 1, INTERP_BP_OFFS);
+    jit_emit_mov_rr_i(jit_info->native_ptr, emit_ECX, emit_EDX);
+    emitm_movl_m_r(jit_info->native_ptr, emit_EDX, emit_EDX, 0, 1,
+            offsetof(struct Parrot_Interp, code));
+    emitm_movl_m_r(jit_info->native_ptr, emit_EDX, emit_EDX, 0, 1,
+            offsetof(struct PackFile, byte_code));
+    jit_emit_sub_rr_i(jit_info->native_ptr, emit_EAX, emit_EDX);
+    /*
+     * now we have the offset of the ins in EAX
+     *
+     * interpreter->jit_info->arena->op_map
+     *
+     * TODO interleave these 2 calculations
+     */
+    emitm_movl_m_r(jit_info->native_ptr, emit_EDX, emit_ECX, 0, 1,
+            offsetof(struct Parrot_Interp, jit_info));
+    emitm_lea_m_r(jit_info->native_ptr, emit_EDX, emit_EDX, 0, 1,
+            offsetof(Parrot_jit_info_t, arena));
+    emitm_movl_m_r(jit_info->native_ptr, emit_EDX, emit_EDX, 0, 1,
+            offsetof(Parrot_jit_arena_t, op_map));
 
     /* This jumps to the address in op_map[EDX + sizeof(void *) * INDEX] */
     emitm_jumpm(jit_info->native_ptr, emit_EDX, emit_EAX,
-                        sizeof(*jit_info->arena.op_map) / 4, 0);
+            sizeof(*jit_info->arena.op_map) / 4, 0);
 }
 
 #  define jit_emit_stack_frame_enter(pc) do { \
@@ -1923,13 +1922,6 @@ static void call_func(Parrot_jit_info_t *jit_info, void *addr)
  * $X->vtable(interp, $X [, $Y...] )
  */
 #    define MAP(i) jit_info->optimizer->map_branch[jit_info->op_i + (i)]
-
-/* see jit_begin */
-#  ifdef JIT_CGP
-#    define INTERP_BP_OFFS todo
-#  else
-#    define INTERP_BP_OFFS -16
-#  endif
 
 static void
 Parrot_jit_vtable_n_op(Parrot_jit_info_t *jit_info,

@@ -1030,7 +1030,7 @@ Parrot_jit_load_registers(Parrot_jit_info_t *jit_info,
     int lasts[] = { PRESERVED_INT_REGS, 0,0,  PRESERVED_FLOAT_REGS };
     char * maps[] = {0, 0, 0, 0};
     int first = 1;
-    int base_reg;
+    int base_reg = 0;   /* -O3 warning */
     size_t offs;
 
     maps[0] = jit_info->intval_map;
@@ -1086,7 +1086,7 @@ Parrot_jit_save_registers(Parrot_jit_info_t *jit_info,
     int lasts[] = { PRESERVED_INT_REGS, 0,0,  PRESERVED_FLOAT_REGS };
     char * maps[] = {0, 0, 0, 0};
     int first = 1;
-    int base_reg;
+    int base_reg = 0; /* -O3 warning */
     size_t offs;
 
     maps[0] = jit_info->intval_map;
