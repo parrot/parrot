@@ -13,7 +13,6 @@
  */
 
 #include "parrot/parrot.h"
-#include "assert.h"
 
 static void add_header_to_free(struct Parrot_Interp *interpreter,
                                struct free_pool *pool, void *to_add);

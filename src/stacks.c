@@ -14,7 +14,6 @@
  *  Notes:
  * References: */
 
-#include <assert.h>
 #include "parrot/parrot.h"
 
 #define STACK_CHUNK_BASE(x) (void *)(MASK_STACK_CHUNK_LOW_BITS & (ptrcast_t)x)

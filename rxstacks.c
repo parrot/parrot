@@ -11,7 +11,6 @@
  *  Notes:
  * References: */
 
-#include <assert.h>
 #include "parrot/parrot.h"
 #include "parrot/rxstacks.h"
 
