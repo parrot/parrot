@@ -1,6 +1,6 @@
 #! perl -w
 
-use Parrot::Test tests => 3;
+use Parrot::Test tests => 4;
 
 output_is(<<'CODE', <<'OUTPUT', "time_i");
 	time	I0
@@ -64,4 +64,10 @@ CODE
 start
 done
 OUTPUT
+
+output_is(<<CODE, 'Cannot go back in time', "sleep");
+	sleep	-1
+	end
+CODE
+
 1;
