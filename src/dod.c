@@ -9,7 +9,7 @@ src/dod.c - Dead object destruction of the various headers
 =head1 DESCRIPTION
 
 This file implements I<dead object destruction>. This is documented in
-PPD 9 with suplementary notes in F<docs/dev/dod.dev>.
+PDD 9 with supplementary notes in F<docs/dev/dod.dev>.
 
 It's possible to turn on/off the checking of the system stack and
 processor registers. The actual checking is implemented in F<src/cpu_dep.c>.
@@ -29,8 +29,8 @@ There's also a verbose mode for garbage collection.
 #include "parrot/method_util.h"
 #include <assert.h>
 
-/* set this to 1 and above to zero to see if unanchored objects
- * are found in system areas. Please note: these objects might be bogus
+/* Set this to 1 to see if unanchored objects are found in system areas. 
+ * Please note: these objects might be bogus
  */
 #define GC_VERBOSE 0
 
@@ -48,8 +48,8 @@ static PARROT_INLINE void profile_dod_end(Parrot_Interp, int what);
 =item C<static PARROT_INLINE void
 mark_special(Parrot_Interp interpreter, PMC* obj)>
 
-Mark a special PMC, if it has a C<PMC_ECT> structure append or prepend
-the C<next_for_GC pointer>, else do custom mark directly.
+Mark a special PMC. If it has a C<PMC_EXT> structure, append or prepend
+the C<next_for_GC> pointer; otherwise, do the custom mark directly.
 
 This should really be inline, so if inline isn't available, it would
 be better if it was a macro.
@@ -67,10 +67,10 @@ mark_special(Parrot_Interp interpreter, PMC* obj)
      * If the object is shared, we have to use the arena and dod
      * pointers of the originating interpreter.
      *
-     * We are possibly changing other interpreters data here, so
+     * We are possibly changing other interpreter's data here, so
      * the mark phase of DOD must run only on one interpreter of a pool
-     * at a time. Freeing unused objects could run as parallel
-     * operations then.
+     * at a time. However, freeing of unused objects can be done in 
+     * parallel. 
      * And: to be sure that a shared object is dead, we have to finish
      * the mark phase of all interpreters in a pool that might reference
      * the object.
@@ -159,8 +159,8 @@ void pobject_lives(struct Parrot_Interp *interpreter, PObj *obj)
         }
 #endif
     if (*dod_flags & (PObj_is_special_PMC_FLAG << nm)) {
-        /* all PMCs that need special treatment are handled here
-         * for normal PMCs, we don't touch the PMC memory itself
+        /* All PMCs that need special treatment are handled here.
+         * For normal PMCs, we don't touch the PMC memory itself
          * so that caches stay clean
          */
 #if GC_VERBOSE
@@ -289,7 +289,7 @@ trace_active_PMCs(struct Parrot_Interp *interpreter, int trace_stack)
     /* Walk the iodata */
     Parrot_IOData_mark(interpreter, interpreter->piodata);
 
-    /* quich check, if we can already bail out */
+    /* quick check, if we can already bail out */
     if (interpreter->lazy_dod && interpreter->num_early_PMCs_seen >=
             interpreter->num_early_DOD_PMCs) {
         return 0;
@@ -299,7 +299,7 @@ trace_active_PMCs(struct Parrot_Interp *interpreter, int trace_stack)
     if (trace_stack)
         trace_system_areas(interpreter);
     /* Okay, we've marked the whole root set, and should have a good-sized
-     * list 'o things to look at. Run through it */
+     * list of things to look at. Run through it */
     return trace_children(interpreter, current);
 }
 
@@ -623,9 +623,9 @@ reduce_arenas(struct Parrot_Interp *interpreter,
 free_unused_pobjects(struct Parrot_Interp *interpreter,
         struct Small_Object_Pool *pool)>
 
-Put any buffers/PMCs that are now unused, on to the pools free list. If
-C<GC_IS_MALLOC> bufstart gets freed too if possible. Avoid buffers that
-are immune from collection (ie, constant).
+Put any buffers/PMCs that are now unused onto the pool's free list. If
+C<GC_IS_MALLOC>, bufstart gets freed too, if possible. Avoid buffers that
+are immune from collection (i.e. constant).
 
 =cut
 
@@ -889,9 +889,9 @@ trace_mem_block(struct Parrot_Interp *interpreter,
         /* Do a quick approximate range check by bit-masking */
         if ((ptr & mask) == prefix || !prefix) {
             /* Note that what we find via the stack or registers are not
-             * guaranteed to be live pmcs/buffers, and could very well their
-             * bufstart/vtable destroyed due to the linked list of free
-             * headers... */
+             * guaranteed to be live pmcs/buffers, and could very well have
+             * had their bufstart/vtable destroyed due to the linked list of 
+             * free headers... */
             if (pmc_min <= ptr && ptr < pmc_max &&
                     is_pmc_ptr(interpreter, (void *)ptr)) {
                 /* ...so ensure that pobject_lives checks PObj_on_free_list_FLAG
