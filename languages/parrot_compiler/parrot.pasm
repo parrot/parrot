@@ -43,18 +43,18 @@ MAIN:
     new P6,.PerlHash
     new P7,.PerlArray
     new P31,.PerlHash
-    set P31,"a",0x7
-    set P31,"n",0xa
-    set P31,"r",0xd
-    set P31,"t",0x9
-    set P31,"\\",0x5c
+    set P31["a"],0x7
+    set P31["n"],0xa
+    set P31["r"],0xd
+    set P31["t"],0x9
+    set P31["\\"],0x5c
 
     bsr LOAD
     # Get the name of the input file
-    set S15,P0,1
+    set S15,P0[1]
     open I20,S15
     # Get the name of the output file
-    set S15,P0,2
+    set S15,P0[2]
     open P1,S15,">"
     bsr READ
     end
@@ -79,7 +79,7 @@ HANDLE_LABEL:
     substr S1, S0, 0, I0
     # set the label position
     length I30,S28
-    set P6,S1,I30
+    set P6[S1],I30
 
 HANDLE_OPCODE:
     inc I0
@@ -88,12 +88,12 @@ HANDLE_OPCODE:
     substr S1, S0, I0, I1
     add I0, I0, I1
     inc I0
-    set I3,P2,S1
+    set I3,P2[S1]
     # pack the opcode number
     pack S28,I24,I3
     set I22,4
     # handle opcode arguments
-    set I3,P7,I3
+    set I3,P7[I3]
     jsr I3
 
 HANDLE_ARG_LABEL:
@@ -106,13 +106,13 @@ HANDLE_ARG_LABEL:
     # update the label count
     inc I31
     # save the label
-    set P3,I31,S2
+    set P3[I31],S2
     length I30,S28
-    dec I30,I22
+    sub I30,I22
     # save the address of the opcode
-    set P4,I31,I30
+    set P4[I31],I30
     # save the address of label 
-    set P5,I31,I22
+    set P5[I31],I22
     # add a noop
     pack S28,I24,0
     ret
@@ -125,7 +125,7 @@ HANDLE_ARG_REG:
     inc I0
     set I4, S2
     pack S28,I24,I4
-    inc I22,I24
+    add I22,I24
     ret 
 
 HANDLE_ARG_NUM:
@@ -142,7 +142,7 @@ HANDLE_ARG_NUM:
     # size
     pack S30,I24,I23
     pack S30,I23,N5
-    inc I22,I24
+    add I22,I24
     ret
     
 HANDLE_ARG_STR:
@@ -176,7 +176,7 @@ DONTFILL:
     pack S30,I24,I5
     # string
     pack S30,I8,S2
-    inc I22,I24
+    add I22,I24
     ret
 
 ESCAPE:
@@ -198,7 +198,7 @@ ESCAPE:
 
 ESCAPE_IT:
     substr S12,S2,I7,1
-    set I6, P31, S12
+    set I6, P31[S12]
     pack S2,1,I6,I4
     inc I4
     substr S12,S2,0,I4
@@ -216,21 +216,21 @@ FINISH_ESCAPE:
 
 FIXUP:
     # get the last label found
-    set S11,P3,I31
+    set S11,P3[I31]
     # if the length is 0 return
     length I15,S11
     eq 0,I15,ENDFIXUP
     # get the address of the opcode to apply the fixup
-    set I15,P4,I31
+    set I15,P4[I31]
     # get the address within the opcode to apply the fixup
-    set I16,P5,I31
+    set I16,P5[I31]
     # get the position marked by the label
-    set I17,P6,S11
+    set I17,P6[S11]
     # calculate the offset
     sub I18,I17,I15
     div I18,I18,I24
     # calculate the address to apply the fixup
-    inc I15,I16
+    add I15,I16
     pack S28,4,I18,I15
     dec I31
     if I31,FIXUP
@@ -266,6 +266,24 @@ OUTPUT:
 
 #
 # $Log$
+# Revision 1.4  2002/08/26 14:31:46  grunblatt
+# # New Ticket Created by  Mike Lambert
+# # Please include the string:  [perl #16741]
+# # in the subject line of all future correspondence about this issue.
+# # <URL: http://rt.perl.org/rt2/Ticket/Display.html?id=16741 >
+#
+#
+# The below patch fixes the languages/parrot_compiler/ code to work again
+# with the new keyed syntax. It correctly compiles
+# languages/parrot_compiler/sample.pasm and parrot executes it fine.
+#
+# The only change I'm unsure about it is the use of -e"" instead of -e'' to
+# make activestate perl happy. ie, I'm not sure if it breaks other
+# platforms.
+#
+# Thanks,
+# Mike Lambert
+#
 # Revision 1.3  2002/06/03 20:25:07  grunblatt
 # s/[gs]et_keyed/set/
 #
