@@ -643,7 +643,9 @@ tm_to_array(Parrot_Interp interpreter, struct tm *tm)
 }
 
 INTVAL
-Parrot_byte_index(Interp *interpreter, STRING *base, STRING *search, UINTVAL start_offset) {
+Parrot_byte_index(Interp *interpreter, const STRING *base,
+        const STRING *search, UINTVAL start_offset)
+{
     INTVAL pos = -1;
     char *base_start, *search_start, *current_pos;
     INTVAL current_offset;
@@ -654,14 +656,15 @@ Parrot_byte_index(Interp *interpreter, STRING *base, STRING *search, UINTVAL sta
     max_possible_offset = (base->strlen - search->strlen);
 
  checkloop:
-    for (current_offset = start_offset; current_offset <= max_possible_offset; current_offset++) {
+    for (current_offset = start_offset; current_offset <= max_possible_offset;
+            current_offset++) {
         base_start = (char *)base->strstart + current_offset;
         if (!memcmp(base_start, search_start, searchlen)) {
             found = 1;
             break;
         }
     }
-        
+
     if (found) {
         pos = current_offset;
     }
@@ -669,7 +672,9 @@ Parrot_byte_index(Interp *interpreter, STRING *base, STRING *search, UINTVAL sta
 }
 
 INTVAL
-Parrot_byte_rindex(Interp *interpreter, STRING *base, STRING *search, UINTVAL start_offset) {
+Parrot_byte_rindex(Interp *interpreter, const STRING *base,
+        const STRING *search, UINTVAL start_offset)
+{
     INTVAL pos = -1;
     char *base_start, *search_start, *current_pos;
     INTVAL current_offset;
@@ -682,14 +687,15 @@ Parrot_byte_rindex(Interp *interpreter, STRING *base, STRING *search, UINTVAL st
         max_possible_offset = start_offset;
     }
  checkloop:
-    for (current_offset = max_possible_offset; current_offset >= 0; current_offset--) {
+    for (current_offset = max_possible_offset; current_offset >= 0;
+            current_offset--) {
         base_start = (char *)base->strstart + current_offset;
         if (!memcmp(base_start, search_start, searchlen)) {
             found = 1;
             break;
         }
     }
-        
+
     if (found) {
         pos = current_offset;
     }

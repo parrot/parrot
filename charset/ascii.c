@@ -40,50 +40,78 @@ static char typetable[256] = {
 };
 
 
-static STRING *get_graphemes(Interp *interpreter, STRING *source_string, UINTVAL offset, UINTVAL count) {
+static STRING *
+get_graphemes(Interp *interpreter, STRING *source_string,
+        UINTVAL offset, UINTVAL count)
+{
     return ENCODING_GET_BYTES(interpreter, source_string, offset, count);
 }
 
-static void set_graphemes(Interp *interpreter, STRING *source_string, UINTVAL offset, UINTVAL replace_count, STRING *insert_string) {
-    ENCODING_SET_BYTES(interpreter, source_string, offset, replace_count, insert_string);
+static void
+set_graphemes(Interp *interpreter, STRING *source_string,
+        UINTVAL offset, UINTVAL replace_count, STRING *insert_string)
+{
+    ENCODING_SET_BYTES(interpreter, source_string, offset,
+            replace_count, insert_string);
 
 }
 
-static STRING *get_graphemes_inplace(Interp *interpreter, STRING *source_string, STRING *dest_string, UINTVAL offset, UINTVAL count) {
-    return ENCODING_GET_BYTES_INPLACE(interpreter, source_string, offset, count, dest_string);
+static STRING *
+get_graphemes_inplace(Interp *interpreter, STRING *source_string,
+        STRING *dest_string, UINTVAL offset, UINTVAL count)
+{
+    return ENCODING_GET_BYTES_INPLACE(interpreter, source_string,
+            offset, count, dest_string);
 }
 
-static void to_charset(Interp *interpreter, STRING *source_string, CHARSET *new_charset) {
+static void
+to_charset(Interp *interpreter, STRING *source_string, CHARSET *new_charset)
+{
     internal_exception(UNIMPLEMENTED, "to_charset for ascii not implemented");
 }
 
-static STRING *copy_to_charset(Interp *interpreter, STRING *source_string, CHARSET *new_charset) {
+static STRING *
+copy_to_charset(Interp *interpreter, STRING *source_string,
+        CHARSET *new_charset)
+{
   STRING *return_string = NULL;
 
   return return_string;
 }
 
-static void to_unicode(Interp *interpreter, STRING *source_string) {
+static void
+to_unicode(Interp *interpreter, STRING *source_string)
+{
     internal_exception(UNIMPLEMENTED, "to_unicode for ascii not implemented");
 }
 
-static void from_charset(Interp *interpreter, STRING *source_string) {
+static void
+from_charset(Interp *interpreter, STRING *source_string)
+{
     internal_exception(UNIMPLEMENTED, "Can't do this yet");
 }
 
-static void from_unicode(Interp *interpreter, STRING *source_string) {
+static void
+from_unicode(Interp *interpreter, STRING *source_string)
+{
     internal_exception(UNIMPLEMENTED, "Can't do this yet");
 }
 
 /* A noop. can't compose ascii */
-static void compose(Interp *interpreter, STRING *source_string) {
+static void
+compose(Interp *interpreter, STRING *source_string)
+{
 }
 
 /* A noop. can't decompose ascii */
-static void decompose(Interp *interpreter, STRING *source_string) {
+static void
+decompose(Interp *interpreter, STRING *source_string)
+{
 }
 
-static void upcase(Interp *interpreter, STRING *source_string) {
+static void
+upcase(Interp *interpreter, STRING *source_string)
+{
     char *buffer;
     UINTVAL offset = 0;
 
@@ -98,7 +126,9 @@ static void upcase(Interp *interpreter, STRING *source_string) {
     }
 }
 
-static void downcase(Interp *interpreter, STRING *source_string) {
+static void
+downcase(Interp *interpreter, STRING *source_string)
+{
     UINTVAL offset = 0;
     char *buffer;
     if (!source_string->strlen) {
@@ -111,7 +141,9 @@ static void downcase(Interp *interpreter, STRING *source_string) {
     }
 }
 
-static void titlecase(Interp *interpreter, STRING *source_string) {
+static void
+titlecase(Interp *interpreter, STRING *source_string)
+{
     char *buffer;
     UINTVAL offset = 0;
     if (!source_string->strlen) {
@@ -125,7 +157,9 @@ static void titlecase(Interp *interpreter, STRING *source_string) {
     }
 }
 
-static void upcase_first(Interp *interpreter, STRING *source_string) {
+static void
+upcase_first(Interp *interpreter, STRING *source_string)
+{
     char *buffer;
     if (!source_string->strlen) {
         return;
@@ -135,7 +169,9 @@ static void upcase_first(Interp *interpreter, STRING *source_string) {
     buffer[0] = toupper(buffer[0]);
 }
 
-static void downcase_first(Interp *interpreter, STRING *source_string) {
+static void
+downcase_first(Interp *interpreter, STRING *source_string)
+{
     char *buffer;
     if (!source_string->strlen) {
         return;
@@ -145,7 +181,9 @@ static void downcase_first(Interp *interpreter, STRING *source_string) {
     buffer[0] = toupper(buffer[0]);
 }
 
-static void titlecase_first(Interp *interpreter, STRING *source_string) {
+static void
+titlecase_first(Interp *interpreter, STRING *source_string)
+{
     char *buffer;
     if (!source_string->strlen) {
         return;
@@ -155,109 +193,159 @@ static void titlecase_first(Interp *interpreter, STRING *source_string) {
     buffer[0] = toupper(buffer[0]);
 }
 
-static INTVAL compare(Interp *interpreter, STRING *lhs, STRING *rhs) {
-  return 0;
+static INTVAL
+compare(Interp *interpreter, STRING *lhs, STRING *rhs)
+{
+    return 0;
 }
 
-static INTVAL cs_index(Interp *interpreter, const STRING *source_string, const STRING *search_string, UINTVAL offset) {
-  return -1;
+static INTVAL
+cs_index(Interp *interpreter, const STRING *source_string,
+        const STRING *search_string, UINTVAL offset)
+{
+    return -1;
 }
 
-static INTVAL cs_rindex(Interp *interpreter, STRING *source_string, STRING *search_string, UINTVAL offset) {
-  return -1;
+static INTVAL
+cs_rindex(Interp *interpreter, const STRING *source_string,
+        const STRING *search_string, UINTVAL offset)
+{
+    return -1;
 }
 
 /* Binary's always valid */
-static UINTVAL validate(Interp *interpreter, STRING *source_string) {
+static UINTVAL
+validate(Interp *interpreter, STRING *source_string)
+{
     return 1;
 }
 
 /* No word chars in binary data */
-static INTVAL is_wordchar(Interp *interpreter, STRING *source_string, UINTVAL offset) {
-  return 0;
+static INTVAL
+is_wordchar(Interp *interpreter, STRING *source_string, UINTVAL offset)
+{
+    return 0;
 }
 
-static INTVAL find_wordchar(Interp *interpreter, STRING *source_string, UINTVAL offset) {
-  return -1;
+static INTVAL
+find_wordchar(Interp *interpreter, STRING *source_string, UINTVAL offset)
+{
+    return -1;
 }
 
-static INTVAL find_not_wordchar(Interp *interpreter, STRING *source_string, UINTVAL offset) {
-  return offset;
+static INTVAL
+find_not_wordchar(Interp *interpreter, STRING *source_string, UINTVAL offset)
+{
+    return offset;
 }
 
-static INTVAL is_whitespace(Interp *interpreter, STRING *source_string, UINTVAL offset) {
-  return 0;
+static INTVAL
+is_whitespace(Interp *interpreter, STRING *source_string, UINTVAL offset)
+{
+    return 0;
 }
 
-static INTVAL find_whitespace(Interp *interpreter, STRING *source_string, UINTVAL offset) {
-  return -1;
+static INTVAL
+find_whitespace(Interp *interpreter, STRING *source_string, UINTVAL offset)
+{
+    return -1;
 }
 
-static INTVAL find_not_whitespace(Interp *interpreter, STRING *source_string, UINTVAL offset) {
-  return offset;
+static INTVAL
+find_not_whitespace(Interp *interpreter, STRING *source_string,
+        UINTVAL offset)
+{
+    return offset;
 }
 
-static INTVAL is_digit(Interp *interpreter, STRING *source_string, UINTVAL offset) {
-  return 0;
+static INTVAL
+is_digit(Interp *interpreter, STRING *source_string, UINTVAL offset)
+{
+    return 0;
 }
 
-static INTVAL find_digit(Interp *interpreter, STRING *source_string, UINTVAL offset) {
-  return -1;
+static INTVAL
+find_digit(Interp *interpreter, STRING *source_string, UINTVAL offset)
+{
+    return -1;
 }
 
-static INTVAL find_not_digit(Interp *interpreter, STRING *source_string, UINTVAL offset) {
-  return offset;
+static INTVAL
+find_not_digit(Interp *interpreter, STRING *source_string, UINTVAL offset)
+{
+    return offset;
 }
 
-static INTVAL is_punctuation(Interp *interpreter, STRING *source_string, UINTVAL offset) {
-  return 0;
+static INTVAL
+is_punctuation(Interp *interpreter, STRING *source_string, UINTVAL offset)
+{
+    return 0;
 }
 
-static INTVAL find_punctuation(Interp *interpreter, STRING *source_string, UINTVAL offset) {
-  return -1;
+static INTVAL
+find_punctuation(Interp *interpreter, STRING *source_string, UINTVAL offset)
+{
+    return -1;
 }
 
-static INTVAL find_not_punctuation(Interp *interpreter, STRING *source_string, UINTVAL offset) {
-  return offset;
+static INTVAL
+find_not_punctuation(Interp *interpreter, STRING *source_string,
+        UINTVAL offset)
+{
+    return offset;
 }
 
-static INTVAL is_newline(Interp *interpreter, STRING *source_string, UINTVAL offset) {
-  return 0;
+static INTVAL
+is_newline(Interp *interpreter, STRING *source_string, UINTVAL offset)
+{
+    return 0;
 }
 
-static INTVAL find_newline(Interp *interpreter, STRING *source_string, UINTVAL offset) {
-  return -1;
+static INTVAL
+find_newline(Interp *interpreter, STRING *source_string, UINTVAL offset)
+{
+    return -1;
 }
 
-static INTVAL find_not_newline(Interp *interpreter, STRING *source_string, UINTVAL offset) {
-  return offset;
+static INTVAL
+find_not_newline(Interp *interpreter, STRING *source_string, UINTVAL offset)
+{
+    return offset;
 }
 
-static INTVAL find_word_boundary(Interp *interpreter, STRING *source_string, UINTVAL offset) {
-  return -1;
+static INTVAL
+find_word_boundary(Interp *interpreter, STRING *source_string, UINTVAL offset)
+{
+    return -1;
 }
 
-static STRING *string_from_codepoint(Interp *interpreter, UINTVAL codepoint) {
+static STRING *
+string_from_codepoint(Interp *interpreter, UINTVAL codepoint)
+{
     STRING *return_string = NULL;
     char real_codepoint = codepoint;
     return_string = string_make(interpreter, &real_codepoint, 1, "ascii", 0);
     return return_string;
 }
 
-static size_t compute_hash(Interp *interpreter, STRING *source_string) {
+static size_t
+compute_hash(Interp *interpreter, STRING *source_string)
+{
     size_t hashval;
 
     char *buffptr = (char *)source_string->strstart;
-    UINTVAL len = source_string->strlen; 
+    UINTVAL len = source_string->strlen;
 
-    while (len--) { 
+    while (len--) {
         hashval += hashval << 5;
         hashval += *buffptr++;
     }
     return hashval;
 }
 
-CHARSET *Parrot_charset_ascii_init(Interp *interpreter) {
+CHARSET *
+Parrot_charset_ascii_init(Interp *interpreter)
+{
   CHARSET *return_set = Parrot_new_charset(interpreter);
   CHARSET base_set = {
       "ascii",
@@ -299,7 +387,8 @@ CHARSET *Parrot_charset_ascii_init(Interp *interpreter) {
       find_word_boundary,
       string_from_codepoint,
       compute_hash,
-      {NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL}
+      {NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
+          NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL}
   };
 
   /* Snag the global. This is... bad. Should be properly fixed at some
@@ -311,7 +400,6 @@ CHARSET *Parrot_charset_ascii_init(Interp *interpreter) {
   memcpy(return_set, &base_set, sizeof(CHARSET));
   Parrot_register_charset(interpreter, "ascii", return_set);
   return return_set;
-
 }
 
 /*
