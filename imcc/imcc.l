@@ -215,13 +215,10 @@ SP              [ ]
 ".const"        return(CONST);
 ".globalconst"  return(GLOBAL_CONST);
 ".param"        return(PARAM);
-"end"           return(END);
 "goto"          return(GOTO);
 "if"            return(IF);
 "unless"        return(UNLESS);
 "int"           return(INTV);
-"inc"           return(INC);
-"dec"           return(DEC);
 "num"           return(FLOATV);
 "float"         return(FLOATV);
 "new"           return(NEW);
@@ -235,8 +232,6 @@ SP              [ ]
 "pmc"           return(PMCV);
 "string"        return(STRINGV);
 "call"          return(CALL);
-"saveall"       return(SAVEALL);
-"restoreall"    return(RESTOREALL);
 "<<"            return(SHIFT_LEFT);
 ">>"            return(SHIFT_RIGHT);
 ">>>"           return(SHIFT_RIGHT_U);

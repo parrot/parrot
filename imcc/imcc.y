@@ -750,11 +750,6 @@ labeled_inst:
    | RETURN var                       { $$ = MK_I(interp, cur_unit, "save", 1, $2); }
    | CALL label_op                    { $$ = MK_I(interp, cur_unit, "bsr",  1, $2); }
    | GOTO label_op                    { $$ = MK_I(interp, cur_unit, "branch",1, $2); }
-   | INC var                          { $$ = MK_I(interp, cur_unit, "inc",1, $2); }
-   | DEC var                          { $$ = MK_I(interp, cur_unit, "dec",1, $2); }
-   | SAVEALL                          { $$ = MK_I(interp, cur_unit, "saveall" ,0); }
-   | RESTOREALL                       { $$ = MK_I(interp, cur_unit, "restoreall" ,0); }
-   | END                              { $$ = MK_I(interp, cur_unit, "end" ,0); }
    | NEWSUB                           { expect_pasm = 1; }
      pasm_args
                    { $$ = INS(interp, cur_unit, "newsub",0,regs,nargs,keyvec,1); }
