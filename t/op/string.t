@@ -54,6 +54,7 @@ output_is( <<'CODE', <<OUTPUT, "concat" );
     print S1
     set S2, "\n"
     print S2
+    end
 CODE
 fishbone
 OUTPUT
