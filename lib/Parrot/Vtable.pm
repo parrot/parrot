@@ -29,6 +29,7 @@ sub parse_vtable {
     my $vtable = [];
     my $fh = new FileHandle ($file, O_RDONLY) or
         die "Can't open $file for reading: $!\n";
+    my $section = 'MAIN';
 
     while(<$fh>) {
 
@@ -36,8 +37,11 @@ sub parse_vtable {
 
         next if /^\s*#/ or /^\s*$/;
 
-        if (/^\s*($type_re)\s+($ident_re)\s*\(($arglist_re)\)\s*$/) {
-            push @{$vtable}, [ $1, $2, $3 ];
+	if (/^\[(\w+)\]/) {
+	    $section = $1;
+	}
+        elsif (/^\s*($type_re)\s+($ident_re)\s*\(($arglist_re)\)\s*$/) {
+            push @{$vtable}, [ $1, $2, $3, $section ];
         } else {
             die "Syntax error at $file line ".$fh->input_line_number()."\n";
         }
@@ -117,4 +121,15 @@ Parrot::Vtable - Internal functions for manipulating vtables
 
 =head1 DESCRIPTION
 
-No user-serviceable parts inside.
+=over 4
+
+=item parse_vtable
+
+Returns a ref to an array containing
+
+  [ return_type method_name parameters section ]
+
+per vtable method defined in vtable.tbl
+
+=back
+

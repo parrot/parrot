@@ -420,6 +420,14 @@ sub rewrite_method ($$$$$) {
     return $_;
 }
 
+sub is_const($$) {
+    my ($meth, $section) = @_;
+    my @consts = qw(STORE PUSH POP SHIFT UNSHIFT DELETE);
+    my %consts;
+    @consts{@consts} = (1) x @consts;
+    exists $consts{$section};
+}
+
 =head2 filter
 
 The filter function choreographs the previous functions actions on the
@@ -569,12 +577,45 @@ EOC
   # vtable.tbl file.
 
   @methods = ();
+  my @cmethods;
   for (@$default)
   {
       my $methodname = $_->[1];
+      my $isconst;
       push @methods, "Parrot_$methodloc->{$methodname}_$methodname";
+      if ($flags{const_too}) {
+	  if (is_const($methodname, $_->[3]) &&
+	      exists $methodbody{ $methodname }) {
+ 	      $isconst = 1;
+	      push @cmethods,
+		    "Parrot_Const$methodloc->{$methodname}_$methodname";
+	  }
+	  else {
+	      push @cmethods, "Parrot_$methodloc->{$methodname}_$methodname";
+	  }
+
+      }
       if (exists $methodbody{ $methodname }) {
-	    $OUT .= $methodbody{ $methodname } . "\n\n"
+	    $OUT .= $methodbody{ $methodname } . "\n\n";
+	  if ($isconst) {
+	    my $type = $_->[0];
+	    my $parameters = $_->[2];
+	    $parameters = ", $parameters" if $parameters;
+	    my $retval = "($type) 0";
+	    my $ret = $type eq 'void' ? '' : "return $retval;" ;
+	    my $ln = 1 + ($OUT =~ tr/\n/\n/);
+	    my $line = $suppress_lines ? '' : "#line $ln \"$cfile\"\n";
+	    my $decl = "$type Parrot_Const${classname}_${methodname} (struct Parrot_Interp *interpreter, PMC* pmc$parameters)";
+	    $HOUT .= "extern $decl;\n";
+	    $OUT .= <<EOC;
+$line
+    $decl {
+	internal_exception(WRITE_TO_CONSTCLASS,
+		"$methodname() in Const$classname");
+	$ret
+    }
+EOC
+	  }
       }
       elsif ($classname eq 'default') {
 	# generate default body
@@ -603,6 +644,7 @@ EOC
   # this collapses the array and makes sure the spacing is right for
   # the vtable
   my $methodlist = join (",\n        ", @methods);
+  my $cmethodlist = join (",\n        ", @cmethods);
   my $initname = "Parrot_$classname" . "_class_init";
 
   unless (exists $flags{noinit}) {
@@ -634,6 +676,35 @@ void $initname (Interp * interp, int entry) {
 EOC
   }
 
+  if (exists $flags{const_too}) {
+      my $initline = 1+count_newlines($OUT)+1;
+      $initname = "Parrot_Const$classname" . "_class_init";
+      $OUT .= qq(#line $initline "$cfile"\n) unless $suppress_lines;
+      $HOUT .= <<EOH;
+void $initname (Interp *, int);
+EOH
+      $OUT .= <<EOC;
+void $initname (Interp * interp, int entry) {
+
+    struct _vtable temp_base_vtable = {
+        NULL,	/* package */
+        enum_class_Const$classname,
+        NULL,	/* whoami */
+        NULL,	/* method_table */
+        0, /* reserved */
+        0, /* reserved */
+        $cmethodlist
+        };
+
+   if (!temp_base_vtable.whoami)
+       temp_base_vtable.whoami = string_make(interp,
+	   "Const$classname", @{[length("Const$classname")]}, 0, PObj_constant_FLAG, 0);
+
+   Parrot_base_vtables[entry] = temp_base_vtable;
+   $class_init_code
+}
+EOC
+  }
   if (exists $flags{dynpmc}) {
       my $lc_classname = lc $classname;
       $OUT .= <<EOC;

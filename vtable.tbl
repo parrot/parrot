@@ -1,4 +1,5 @@
 # $Id$
+# [MAIN] #default section name
 
 void init()
 void init_pmc(PMC* initializer)
@@ -32,6 +33,7 @@ PMC* find_method(STRING* method_name)
 PMC* find_method_keyed(PMC* key, STRING* method_name)
 PMC* find_method_keyed_int(INTVAL key, STRING* method_name)
 
+[FETCH]
 INTVAL get_integer()
 INTVAL get_integer_keyed(PMC* key)
 INTVAL get_integer_keyed_int(INTVAL key)
@@ -52,18 +54,11 @@ INTVAL get_bool()
 INTVAL get_bool_keyed(PMC* key)
 INTVAL get_bool_keyed_int(INTVAL key)
 
-INTVAL elements()
-INTVAL elements_keyed(PMC* key)
-INTVAL elements_keyed_int(INTVAL key)
-
 PMC* get_pmc()
 PMC* get_pmc_keyed(PMC* key)
 PMC* get_pmc_keyed_int(INTVAL key)
 
-INTVAL is_same(PMC* value)
-INTVAL is_same_keyed(PMC* key, PMC* value)
-INTVAL is_same_keyed_int(INTVAL key, PMC* value)
-
+[STORE]
 void set_integer(PMC* value)
 void set_integer_native(INTVAL value)
 void set_integer_same(PMC* value)
@@ -96,50 +91,45 @@ void set_same(PMC* value)
 void set_same_keyed(PMC* key, PMC* value)
 void set_same_keyed_int(INTVAL key, PMC* value)
 
+[FETCHSIZE]
+INTVAL elements()
+INTVAL elements_keyed(PMC* key)
+INTVAL elements_keyed_int(INTVAL key)
+
+[POP]
 INTVAL pop_integer()
-
 FLOATVAL pop_float()
-
 BIGNUM* pop_bignum()
-
 STRING* pop_string()
-
 PMC* pop_pmc()
 
+[PUSH]
 void push_integer(INTVAL value)
-
 void push_float(FLOATVAL value)
-
 void push_bignum(BIGNUM* value)
-
 void push_string(STRING* value)
-
 void push_pmc(PMC* value)
 
+[SHIFT]
 INTVAL shift_integer()
-
 FLOATVAL shift_float()
-
 BIGNUM* shift_bignum()
-
 STRING* shift_string()
-
 PMC* shift_pmc()
 
+[UNSHIFT]
 void unshift_integer(INTVAL value)
-
 void unshift_float(FLOATVAL value)
-
 void unshift_bignum(BIGNUM* value)
-
 void unshift_string(STRING* value)
-
 void unshift_pmc(PMC* value)
 
 ## void splice ???
 
+[SPLICE]
 void splice(PMC* value, INTVAL offset, INTVAL count)
 
+[MATH]
 void add(PMC* value, PMC* dest)
 void add_int(INTVAL value, PMC* dest)
 void add_bignum(BIGNUM* value, PMC* dest)
@@ -172,6 +162,7 @@ void modulus_same(PMC* value, PMC* dest)
 
 void neg(PMC* dest)
 
+[BITWISE]
 void bitwise_or(PMC* value, PMC* dest)
 void bitwise_or_int(INTVAL value, PMC* dest)
 void bitwise_or_same(PMC* value, PMC* dest)
@@ -206,11 +197,17 @@ void bitwise_shr(PMC* value, PMC* dest)
 void bitwise_shr_int(INTVAL value, PMC* dest)
 void bitwise_shr_same(PMC* value, PMC* dest)
 
+[STRING]
 void concatenate(PMC* value, PMC* dest)
 void concatenate_native(STRING* value, PMC* dest)
 void concatenate_same(PMC* value, PMC* dest)
 
+[CMP]
 INTVAL is_equal(PMC* value)
+
+INTVAL is_same(PMC* value)
+INTVAL is_same_keyed(PMC* key, PMC* value)
+INTVAL is_same_keyed_int(INTVAL key, PMC* value)
 
 INTVAL cmp(PMC* value)
 INTVAL cmp_num(PMC* value)
@@ -227,27 +224,32 @@ void logical_not(PMC* dest)
 void repeat(PMC* value, PMC* dest)
 void repeat_int(INTVAL value, PMC* dest)
 
+[MATH]
 void increment()
-
 void decrement()
 
+[EXISTS]
 INTVAL exists_keyed(PMC* key)
 INTVAL exists_keyed_int(INTVAL key)
 
+[MAIN]
 INTVAL defined()
 INTVAL defined_keyed(PMC* key)
 INTVAL defined_keyed_int(INTVAL key)
 
+[DELETE]
 void delete_keyed(PMC* key)
 void delete_keyed_int(INTVAL key)
 
+[MAIN]
 PMC* nextkey_keyed(PMC* key, INTVAL what)
 PMC* nextkey_keyed_int(INTVAL key, INTVAL what)
 
+[STRING]
 void substr(INTVAL offset, INTVAL length, PMC* dest)
-
 STRING* substr_str(INTVAL offset, INTVAL length)
 
+[MAIN]
 void* invoke(void* next)
 void* invoke_pmc(PMC* sub, void* next)
 

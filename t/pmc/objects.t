@@ -1,6 +1,6 @@
 #! perl -w
 
-use Parrot::Test tests => 3;
+use Parrot::Test tests => 4;
 use Test::More;
 
 output_is(<<'CODE', <<'OUTPUT', "findclass (base class)");
@@ -63,3 +63,15 @@ Foo
 Bar
 Baz
 OUTPUT
+
+output_like(<<'CODE', <<'OUTPUT', "getclass");
+    newclass P1, "Foo"
+    getclass P2, "Foo"
+    printerr "ok 1\n"
+    getclass P3, "NoSuch"
+    end
+CODE
+/ok 1
+Class doesn't exist/
+OUTPUT
+

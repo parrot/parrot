@@ -1,6 +1,6 @@
 #! perl -w
 
-use Parrot::Test tests => 11;
+use Parrot::Test tests => 13;
 use Test::More;
 
 output_is(<<'CODE', <<'OUTPUT', "Setting sarray size");
@@ -410,3 +410,18 @@ ok 11
 ok 12
 OUTPUT
 
+output_like(<<'CODE', <<'OUTPUT', "const SArray");
+    new P0, .ConstSArray
+    set P0, 10
+    end
+CODE
+/set_integer_native\(\) in ConstSArray/
+OUTPUT
+
+output_like(<<'CODE', <<'OUTPUT', "const SArray");
+    new P0, .ConstSArray
+    push P0, 10
+    end
+CODE
+/push_integer\(\) in ConstSArray/
+OUTPUT

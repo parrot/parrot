@@ -91,11 +91,13 @@ END
   PMC: foreach my $pmc_file (split(/\s+/, $pmc_list)) {
       my $name;
       open(PMC, "classes/$pmc_file") or die "open classes/$pmc_file: $!";
+      my $const;
       while (<PMC>) {
           if (/^pmclass (\w+)(.*)/) {
               $name = $1;
               my $decl = $2;
               $decl .= <PMC> until ($decl =~ s/\{.*//);
+	      $const = 1 if $decl =~ /\bconst_too\b/;
               next PMC if $decl =~ /\babstract\b/;
               next PMC if $decl =~ /\bextension\b/;
               last;
@@ -105,6 +107,7 @@ END
       die "No pmclass declaration found in $pmc_file"
         if ! defined $name;
       push @names, $name;
+      push @names, "Const$name" if $const;
   }
 
   Configure::Data->set(

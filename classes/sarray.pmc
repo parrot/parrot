@@ -23,7 +23,7 @@
 
 #include "parrot/parrot.h"
 
-pmclass SArray {
+pmclass SArray const_too {
     void init () {
 	SELF->cache.int_val = 0;
         PMC_data(SELF) = NULL;
