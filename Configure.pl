@@ -213,7 +213,7 @@ if(-f $hints) {
     open HINT, "< $hints" or die "Unable to open hints file '$hints'";
     my $hint = <HINT>;
     close HINT;
-    eval $hint or die "Error in hints file $hints: '$@/$!'" if $@;
+    eval $hint; die "Error in hints file $hints: '$@/$!'" if $@;
 }
 
 
