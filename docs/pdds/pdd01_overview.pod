@@ -33,17 +33,17 @@ This PDD provides a high-level overview of the perl system.
 
 The perl system generally looks like this:
 
-+----------------------------------------------------+
-|                   Embedding App                    |
-+----------+------------+-------------+--------------+
-|          |            |             |              |
-|  parser <-> compiler <-> optimizer <-> interpreter |
-|          |            |             |              |
-+----------+------------+-------------+--------------+
-|                Extensions to perl                  |
-+----------------------------------------------------+
+ +----------------------------------------------------+
+ |                   Embedding App                    |
+ +----------+------------+-------------+--------------+
+ |          |            |             |              |
+ |  parser <-> compiler <-> optimizer <-> interpreter |
+ |          |            |             |              |
+ +----------+------------+-------------+--------------+
+ |                Extensions to perl                  |
+ +----------------------------------------------------+ 
 
-
+=over 4
 
 =item Parser
 
@@ -85,10 +85,14 @@ for example, for programs that produced Java bytecode, where one of
 the interpreter modules would take the bytecode stream and spit out
 java bytecode instead of interpreting it.
 
+=back
+
 =head2 Independent subsystems
 
 Perl also has a number of subsystems that are independent of any
 single module.
+
+=over 4
 
 =item PerlIO subsystem
 
@@ -108,7 +112,11 @@ The regular expression engine's somewhat decoupled from the guts of
 perl. Its job is to turn regexes into objects, and apply those regex
 objects to strings. 
 
+=back
+
 =head2 API levels
+
+=over 4
 
 =item Embedding
 
@@ -147,11 +155,15 @@ call any of the parser's internal routines)
 No binary compatibility is guaranteed, and routines here may be
 changed without notice.
 
+=back
+
 =head1 VARIATIONS ON A THEME
 
 One of the explicit goals of perl 6 is to generate Java bytecode and
 .NET code, as well as to run on small devices such as the Palm. The
 modular nature of perl 6 makes this reasonably straightforward.
+
+=over 4
 
 =item Perl for small platforms
 
@@ -206,4 +218,4 @@ a full parser built yet, though that's more an issue of initial
 implementation than anything else)
 
 
-
+=back
