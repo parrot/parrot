@@ -23,8 +23,8 @@ INC=include/parrot
 GEN_MAKEFILES = Makefile classes/Makefile languages/Makefile docs/Makefile \
 languages/jako/Makefile languages/miniperl/Makefile languages/scheme/Makefile
 
-GEN_CONFIGS  = include/parrot/config.h include/parrot/platform.h Parrot/Config.pm \
-Parrot/Types.pm platform.c
+GEN_CONFIGS  = include/parrot/config.h include/parrot/platform.h lib/Parrot/Config.pm \
+lib/Parrot/Types.pm platform.c
 
 STICKY_FILES = $(GEN_CONFIGS) $(GEN_MAKEFILES) config.opt
 
@@ -46,7 +46,7 @@ $(INC)/oplib/core_ops_prederef.h
 
 GEN_SOURCES = core_ops.c core_ops_prederef.c vtable_ops.c
 
-GEN_MODULES = Parrot/Jit.pm Parrot/PMC.pm Parrot/OpLib/core.pm
+GEN_MODULES = lib/Parrot/Jit.pm lib/Parrot/PMC.pm lib/Parrot/OpLib/core.pm
 
 FLUID_FILES = $(GEN_OPSFILES) $(GEN_HEADERS) $(GEN_SOURCES) $(GEN_MODULES)
 
@@ -139,7 +139,7 @@ all : $(TEST_PROG) $(PDUMP) docs
 
 mops: examples/assembly/mops${exe} examples/mops/mops${exe}
 
-$(TEST_PROG): test_main$(O) $(GEN_HEADERS) $(O_FILES) Parrot/OpLib/core.pm Parrot/PMC.pm
+$(TEST_PROG): test_main$(O) $(GEN_HEADERS) $(O_FILES) lib/Parrot/OpLib/core.pm lib/Parrot/PMC.pm
 	$(LD) ${ld_out}$(TEST_PROG) $(LDFLAGS) $(O_FILES) test_main$(O) $(C_LIBS)
 
 
@@ -189,7 +189,7 @@ blib/lib/libcore_prederef$(SO): blib/lib/libcore_prederef$(SO).${MAJOR}
 	rm -f $@
 	cd blib/lib; ln -s libcore_prederef$(SO).${MAJOR} libcore_prederef$(SO)
 
-$(TEST_PROG_SO): test_main$(O) blib/lib/libparrot$(SO) Parrot/OpLib/core.pm Parrot/PMC.pm
+$(TEST_PROG_SO): test_main$(O) blib/lib/libparrot$(SO) lib/Parrot/OpLib/core.pm lib/Parrot/PMC.pm
 	$(LD) ${ld_out}$(TEST_PROG) test_main$(O) $(LDFLAGS) $(C_LIBS) -L blib/lib -lparrot
 
 
@@ -209,13 +209,13 @@ $(PDUMP): pdump$(O) $(O_FILES)
 
 test_main$(O): test_main.c $(H_FILES)
 
-Parrot/Jit.pm: Parrot/Jit/${jitarchname}.pm Parrot/Jit/${jitcpuarch}Generic.pm
-	$(PERL) -MFile::Copy=cp -e ${PQ}cp q|Parrot/Jit/${jitarchname}.pm|, q|Parrot/Jit.pm|${PQ}
+lib/Parrot/Jit.pm: lib/Parrot/Jit/${jitarchname}.pm lib/Parrot/Jit/${jitcpuarch}Generic.pm
+	$(PERL) -MFile::Copy=cp -e ${PQ}cp q|lib/Parrot/Jit/${jitarchname}.pm|, q|lib/Parrot/Jit.pm|${PQ}
 
-Parrot/OpLib/core.pm: $(OPS_FILES) ops2pm.pl Parrot/OpsFile.pm Parrot/Op.pm
+lib/Parrot/OpLib/core.pm: $(OPS_FILES) ops2pm.pl lib/Parrot/OpsFile.pm lib/Parrot/Op.pm
 	$(PERL) ops2pm.pl $(OPS_FILES)
 
-Parrot/PMC.pm: include/parrot/pmc.h pmc_pm.pl
+lib/Parrot/PMC.pm: include/parrot/pmc.h pmc_pm.pl
 	$(PERL) pmc_pm.pl 
 
 
@@ -321,12 +321,12 @@ embed$(O): $(H_FILES)
 
 core_ops$(O): $(H_FILES) core_ops.c
 
-core_ops.c $(INC)/oplib/core_ops.h: $(OPS_FILES) ops2c.pl Parrot/OpsFile.pm Parrot/Op.pm
+core_ops.c $(INC)/oplib/core_ops.h: $(OPS_FILES) ops2c.pl lib/Parrot/OpsFile.pm lib/Parrot/Op.pm
 	$(PERL) ops2c.pl C $(OPS_FILES)
 
 core_ops_prederef$(O): $(H_FILES) core_ops_prederef.c
 
-core_ops_prederef.c $(INC)/oplib/core_ops_prederef.h: $(OPS_FILES) ops2c.pl Parrot/OpsFile.pm Parrot/Op.pm
+core_ops_prederef.c $(INC)/oplib/core_ops_prederef.h: $(OPS_FILES) ops2c.pl lib/Parrot/OpsFile.pm lib/Parrot/Op.pm
 	$(PERL) ops2c.pl CPrederef $(OPS_FILES)
 
 vtable.ops: make_vtable_ops.pl
@@ -338,7 +338,7 @@ $(STICKY_FILES): Configure.pl config_h.in
 $(INC)/vtable.h: vtable.tbl vtable_h.pl
 	$(PERL) vtable_h.pl
 
-$(INC)/jit_struct.h: jit2h.pl Parrot/OpLib/core.pm Parrot/Jit.pm jit/${jitcpuarch}/core.jit jit/${jitcpuarch}/string.jit
+$(INC)/jit_struct.h: jit2h.pl lib/Parrot/OpLib/core.pm lib/Parrot/Jit.pm jit/${jitcpuarch}/core.jit jit/${jitcpuarch}/string.jit
 	$(PERL) jit2h.pl ${jitcpuarch} > $(INC)/jit_struct.h
 
 docs: docs/.dummy
