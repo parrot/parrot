@@ -140,7 +140,7 @@ no_such_variable:
   return_type =TCL_ERROR
   $S0 = "can't read \""
   $S0 .= name
-  $S0 .= "\": no such variable"
+  $S0 .= "\": no such variable\n"
   retval = new String
   retval = $S0
   # goto done            
