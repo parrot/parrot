@@ -4,6 +4,13 @@
  *     $Id$
  *  Overview:
  *     PMC class to hold structs that parrot's not responsible for disposing of
+ *     If a number is assigned to a PMC, creates a buffer of that size suitable for
+ *			passing to external programs in NCI.  Buffer can be resized by re-assignment.
+ *			If set to 0, or the PMC is destroyed, buffer is free()'d.
+ *	   Buffer can be accessed using keyed assignments to PMC.  Out of bounds (on a 
+ *			"managed" UnManagedStruct) will return -1 on a get.
+ *	   If the PMC is assigned to an Ix register, returns the size of the managed, UnManagedStruct
+ *			or 0 if completely unmanaged.
  *  Data Structure and Algorithms:
  *  History:
  *     Initial revision by sean 2002/08/04
@@ -13,6 +20,11 @@
 
 #include "parrot/parrot.h"
 #include "parrot/method_util.h"
+#include "parrot/pobj.h"
+
+enum {
+    PObj_UnManagedStruct_my_memory_FLAG = PObj_private0_FLAG
+};
 
 pmclass UnManagedStruct {
 
@@ -28,5 +40,72 @@ pmclass UnManagedStruct {
     INTVAL defined () {
         return SELF->data != NULL;
     }
-
+    
+    void destroy () {
+	   if (PObj_flag_TEST(UnManagedStruct_my_memory, SELF))
+			mem_sys_free(SELF->data);
+    }
+    
+    /* For out of bounds gets, will return -1 */
+    INTVAL get_integer_keyed(PMC* key) {
+		INTVAL ix, max;
+		
+		if (!key) return -1;
+        ix = key_integer(INTERP, key);
+        if (ix < 0) return -1;
+        if (PObj_flag_TEST(UnManagedStruct_my_memory, SELF)) {
+			memcpy(&max, SELF->data, sizeof(max));
+			if (ix > max) 
+				return -1;
+			ix+=sizeof(max);
+		} 
+		return  (unsigned char)((char *)SELF->data)[ix];      
+        
+    }
+    
+    /* For out of bounds sets, will do noop */
+    void set_integer_keyed (PMC* key, INTVAL value) {
+        INTVAL ix, max;
+        
+        if (!key) return;
+        ix = key_integer(INTERP, key);
+        if (ix < 0) return;
+        if (PObj_flag_TEST(UnManagedStruct_my_memory, SELF)) {
+			memcpy(&max, SELF->data, sizeof(max));
+			if (ix > max)
+				return;
+			ix+=sizeof(max);
+		}
+		((char *)SELF->data)[ix]=(0xff & value);
+		return;
+	}
+	INTVAL get_integer () {
+		INTVAL max;
+		
+		if (PObj_flag_TEST(UnManagedStruct_my_memory, SELF)) {
+			memcpy(&max, SELF->data, sizeof(max));
+			return(max);
+		}
+		return(0);
+	}
+    
+    void set_integer_native (INTVAL value) {
+		if (SELF->data && (! value)) {
+			free(SELF->data);
+			SELF->data=NULL;
+			PObj_flag_CLEAR(UnManagedStruct_my_memory, SELF);
+			PObj_active_destroy_CLEAR(SELF);
+		} else if (value && (! SELF->data)) {
+			SELF->data=mem_sys_allocate_zeroed(sizeof(value) + value);
+			memcpy(SELF->data, &value, sizeof(value));
+			PObj_flag_SET(UnManagedStruct_my_memory, SELF);
+			PObj_active_destroy_SET(SELF);
+		} else if (value && SELF->data) {
+			SELF->data=mem_sys_realloc(SELF->data, value);
+			memcpy(SELF->data, &value, sizeof(value));
+			PObj_flag_SET(UnManagedStruct_my_memory, SELF);
+			PObj_active_destroy_SET(SELF);
+		}	
+		return;
+	}
 }
