@@ -589,10 +589,10 @@ labeled_inst:
     ;
 
 newsub:
-    NEWSUB
-    | NEWCLOSURE
-    | NEWCOR
-    | NEWCONT
+    NEWSUB { $$ = NEWSUB; }
+    | NEWCLOSURE { $$ = NEWCLOSURE; }
+    | NEWCOR { $$ = NEWCOR; }
+    | NEWCONT { $$ = NEWCONT; }
     ;
 
 type:

@@ -90,10 +90,10 @@ iNEWSUB(struct Parrot_Interp *interpreter, SymReg * r0, int type,
     int pmc_num;
     const char * classnm;
     switch(type) {
-       case NEWSUB: classnm = "Sub";
-       case NEWCLOSURE: classnm = "Closure";
-       case NEWCOR: classnm = "Coroutine";
-       case NEWCONT: classnm = "Continuation";
+       case NEWSUB: classnm = "Sub"; break;
+       case NEWCLOSURE: classnm = "Closure"; break;
+       case NEWCOR: classnm = "Coroutine"; break;
+       case NEWCONT: classnm = "Continuation"; break;
        default:
           fataly(1, sourcefile, line,
              "iNEWSUB: unimplemented classtype '%d'\n", type);

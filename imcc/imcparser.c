@@ -2213,6 +2213,26 @@ yyreduce:
     { yyval.i = 0;}
     break;
 
+  case 119:
+#line 592 "imcc/imcc.y"
+    { yyval.t = NEWSUB; }
+    break;
+
+  case 120:
+#line 593 "imcc/imcc.y"
+    { yyval.t = NEWCLOSURE; }
+    break;
+
+  case 121:
+#line 594 "imcc/imcc.y"
+    { yyval.t = NEWCOR; }
+    break;
+
+  case 122:
+#line 595 "imcc/imcc.y"
+    { yyval.t = NEWCONT; }
+    break;
+
   case 123:
 #line 599 "imcc/imcc.y"
     { yyval.t = 'I'; }
@@ -2589,7 +2609,7 @@ yyreduce:
     }
 
 /* Line 1016 of /usr/local/share/bison/yacc.c.  */
-#line 2593 "imcc/imcparser.c"
+#line 2613 "imcc/imcparser.c"
 
   yyvsp -= yylen;
   yyssp -= yylen;
