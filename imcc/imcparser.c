@@ -1728,7 +1728,7 @@ yyreduce:
   case 24:
 #line 307 "imcc/imcc.y"
     { if (optimizer_level & OPT_PASM)
-                                                allocate(interp);
+                                                imc_compile_unit(interp, instructions);
                                           emit_flush(interp); yyval.i=0;}
     break;
 
@@ -1792,7 +1792,7 @@ yyreduce:
 #line 377 "imcc/imcc.y"
     {
           yyval.i = 0;
-	  allocate(interp);
+	  imc_compile_unit(interp, instructions);
 	  emit_flush(interp);
         }
     break;
