@@ -16,7 +16,7 @@ DEBUG_INITIALIZE:
         popi
         ret
 
-        
+
 # Check wether we should stop the interpreter at the current
 # moment, allowing user to play with the debugger.
 DEBUG_CHECK_BREAKPOINT:
@@ -50,7 +50,7 @@ DEBUG_CHECK_BREAKPOINT_ROW:
         eq 0, I10, DEBUG_CHECK_BREAKPOINT_COL
         bsr DEBUG_INTERACT
         branch DEBUG_CHECK_BREAKPOINT_END
-DEBUG_CHECK_BREAKPOINT_COL:     
+DEBUG_CHECK_BREAKPOINT_COL:
         set S10, "c:"
         set S11, I0
         concat S10, S11
@@ -65,13 +65,14 @@ DEBUG_CHECK_BREAKPOINT_END:
         popi
         ret
 
-        
+
 # The interpreter has reached a breakpoint. Let's
 # stop and interact with user.
 DEBUG_INTERACT:
         bsr DEBUG_PRINT_STATUS
         print "bef> "
-        readline S10, 0
+	getstdin P5
+        readline S10, P5
         chopn S10, 1
         length I10, S10
         eq I10, 0, DEBUG_INTERACT_NEXT
@@ -94,7 +95,7 @@ DEBUG_INTERACT:
 DEBUG_INTERACT_BREAK:
         substr S11, S10, 0, 6, ""
         pushp
-        set P4, P3[1]    
+        set P4, P3[1]
         set P4[S10], 1      # stop at specified breakpoint
         popp
         branch DEBUG_INTERACT
@@ -135,14 +136,14 @@ DEBUG_INTERACT_RESTART:
 DEBUG_INTERACT_STATUS:
         bsr DEBUG_PRINT_STATUS
         branch DEBUG_INTERACT
-DEBUG_INTERACT_END:     
+DEBUG_INTERACT_END:
         ret
 
-                
-        
+
+
 # Print the status of the instruction pointer:
 # coordinates, current char, direction, flags and stack.
-DEBUG_PRINT_STATUS:     
+DEBUG_PRINT_STATUS:
         # Coordinates.
         print "("
         print I0
@@ -159,7 +160,7 @@ DEBUG_PRINT_STATUS:
         # Direction.
         print " dir="
         print I2
-        # Flags:        
+        # Flags:
         set S10, " \""
         eq I4, 1, DEBUG_PRINT_STATUS_FLAG
         set S10, " #"
@@ -174,7 +175,7 @@ DEBUG_PRINT_STATUS_FLAG:
         set I11, P2
         set I10, 0
         ge  I10, I11, DEBUG_PRINT_STATUS_STACK_END
-DEBUG_PRINT_STATUS_STACK_LOOP:       
+DEBUG_PRINT_STATUS_STACK_LOOP:
         set I12, P2[I10]
         print I12
         inc I10
@@ -191,7 +192,7 @@ DEBUG_DUMP_PLAYFIELD:
         pushi
         pushs
         repeat S10, "-", 82
-        concat S10, "\n"        
+        concat S10, "\n"
         print S10
         set I10, 0
 DEBUG_DUMP_PLAYFIELD_NEXT_LINE:

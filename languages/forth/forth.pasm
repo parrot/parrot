@@ -9,7 +9,7 @@
 .constant InterpretMode 0
 .constant CompileMode 1
 .constant CommentMode 2
-    
+
 .constant Space 32
 .constant Tab 9
 
@@ -47,6 +47,7 @@
     bsr InitializeCoreOps
 
     set .Mode, .InterpretMode
+    getstdin P2
 
 Prompt:
     eq .Mode, .InterpretMode, InterpretPrompt
@@ -55,7 +56,7 @@ Prompt:
 InterpretPrompt:
     print .InterpretPrompt
 DonePromptString:
-    readline .Commands, .STDIN
+    readline .Commands, P2
     bsr Chop
     bsr Interpret
     branch Prompt
