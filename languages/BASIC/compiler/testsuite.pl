@@ -47,7 +47,6 @@ a$="Hello"
 c$="WRONG"
 call mysub()
 
-STOPPLEASE
 ' Passing string arrays, expect 99 and "Hello"
 function foo(i, thing$())
 	print i

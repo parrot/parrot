@@ -409,11 +409,20 @@ sub fdprint {
 		print CODE qq{\tset I1, P17["$fd"]\n};
 		print CODE qq{\tbsr PRINTLINE\n};
 	} else {
-		push @{$code{$seg}->{code}}, <<PRINT;
+		if ($string ne "\\n") {
+			push @{$code{$seg}->{code}}, <<PRINT;
 	.arg "$string"
 	.arg 1
 	call _BUILTIN_DISPLAY
 PRINT
+		} else {
+			push @{$code{$seg}->{code}}, <<PRINT;
+	find_global \$P0, "PRINTCOL"
+	\$P0["value"]=0
+	store_global "PRINTCOL", \$P0
+	print "\\n"
+PRINT
+		}
 	}
 
 }
