@@ -1047,35 +1047,33 @@ Only legal and sane arguments and files should get past this point.
 sub process_args {
   my ($args,$files) = @_;
 
-  for (my $count = 0; $count < @ARGV; $count++) {
-    my $arg = $ARGV[$count];
-
+  while (my $arg = shift @ARGV) {
     if($arg =~ /^-(c|-checksyntax)$/) { $args->{-c} = 1; }
     elsif($arg =~ /^-E$/)             { $args->{-E} = 1; }
-    elsif($arg =~ /^-(o|-output)$/)   { $args->{-o} = $ARGV[++$count]; }
-    elsif($arg =~ /^-(h|-help)$/)     { Usage(); }
-    else {
-      push @$files,$arg;
-    }
+    elsif($arg =~ /^-(o|-output)$/)   { $args->{-o} = shift @ARGV; }
+    elsif($arg =~ /^-(h|-help)$/)     { Usage(); exit 0; }
+    elsif($arg =~ /^-./)              { Fail("Invalid option '$arg'\n"); }
+    else                              { push @$files,$arg; }
   }
-  unless(@$files) {
-    print STDERR "No files to process.\n";
+  Fail("No files to process.\n") unless(@$files);
+  Fail("File '$_' does not exist.\n") for grep { not (-e or /^-$/) } @$files;
+}
+
+sub Fail {
+    print STDERR @_;
     Usage();
-  }
-  for(@$files) {
-    next if -e $_;
-    print STDERR "File '$_' does not exist.\n";
-    Usage();
-  }
+    exit 1;
 }
 
 sub Usage {
   print <<"  _EOF_";
+
 usage: $0 [options] file [file...]
 
     -E              Preprocess input files and terminate processing
     -h,--help       Print this message
     -o,--output     Write file 
     -c,-checksyntax Check syntax only, do not generate bytecode
+
   _EOF_
 }
