@@ -65,9 +65,35 @@ output_is(<<'CODE', <<'OUTPUT', "Setting out-of-bounds elements");
         set P0, 1
 	set P0[1], 99
 	print "ok 1\n"
+        set I0, P0[1]
+        eq I0, -1, OK_2
+        print "not "
+OK_2:   print "ok 2\n"
+
+	set P0[-1], 100
+	print "ok 3\n"
+        set I0, P0[-1]
+        eq I0, -1, OK_4
+        print "not "
+OK_4:   print "ok 4\n"
+
+# How about something _really_ out-of-bounds?
+
+        set P0[2100000000], 42
+	print "ok 5\n"
+        set I0, P0[2100000000]
+        eq I0, -1, OK_6
+        print "not "
+OK_6:   print "ok 6\n"
+
 	end
 CODE
 ok 1
+ok 2
+ok 3
+ok 4
+ok 5
+ok 6
 OUTPUT
 
 output_is(<<'CODE', <<'OUTPUT', "Getting out-of-bounds elements");
