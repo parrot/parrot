@@ -1,0 +1,16 @@
+RM_F = ${rm_f}
+PERL = ${perl}
+
+ASSEMBLE=$(PERL) ../../assemble.pl
+PARROT=../../parrot
+
+all: build
+
+test: build
+	$(PARROT) befunge.pbc test.bef
+
+build: befunge.pasm debug.pasm flow.pasm io.pasm load.pasm maths.pasm stack.pasm
+	$(ASSEMBLE) befunge.pasm > befunge.pbc
+
+clean:
+	$(RM_F) core *.pbc *~
