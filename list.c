@@ -22,6 +22,8 @@
  *      1.9     21.10.2002 splice
  *      1.10    22.10.2002 update comment WRT clone in splice
  *      1.11    26.10.2002 user_data
+ *    - 1.18               fixes
+ *      1.19    08.11.2002 arbitrary sized items (enum_type_sized)
  *
  *  Data Structure and Algorithms:
  *  ==============================
@@ -86,7 +88,7 @@
  *
  *    To save memory, List can handle sparse arrays. This code snippet:
  *
- *      new P0, .List
+ *      new P0, .IntList
  *      set P0[1000000], 42
  *
  *    generates 3 List_chunks, one at the beginning of the array, a
@@ -104,6 +106,23 @@
  *    no_power_2   ... have allocated space but any size
  *    sparse       ... only dummy allocation, chunk->items holds
  *                     the items of this sparse hole
+ *
+ *    Data types
+ *    ----------
+ *    A List can hold various datatypes. See datatypes.h for the enumeration
+ *    of types.
+ *    Not all are yet implemented in list_set/list_item, s. the switch().
+ *
+ *    Arbitrary length data:
+ *    construct initializer with:
+ *     - enum_type_sized
+ *     - item_size (in bytes)
+ *     - items_per_chunk (rounded up to power of 2, default MAX_ITEMS)
+ *
+ *    In list_assign the values are copied into the array, list_get returns
+ *    a pointer as for all other data types.
+ *    s. src/list_2.t and list_new_init()
+ *
  *
  *    Return value
  *    ------------
@@ -123,16 +142,8 @@
  *
  *    Testing:
  *    --------
- *    If INTLIST_EMUL is defined, this code may be linked to parrot
- *    instead of intlist and can then run all intlist.t tests, which
- *    are pretty thorough.
- *
- *    There are also some tests included at the bottom. This file can
- *    be linked against libparrot and run standalone when
- *    LIST_TEST is defined:
- *
- *    cc -g -DLIST_TEST -Wall -Iinclude -o list list.c \
- *              blib/lib/libparrot.a -lm -ldl && ./list
+ *    s. t/src/{int,}list.c and t/pmc/{int,}list.t
+ *    also all array usage depends on list
  *
  */
 
@@ -399,7 +410,11 @@ rebuild_chunk_list(Interp *interpreter, List *list)
                 first->n_chunks++;
                 first->n_items += chunk->items;
                 first->data.flags = fixed_items;
-                list->grow_policy |= enum_grow_fixed;
+                /* TODO optimize for fixed but non MAX_ITEMS lists */
+                if (first->items == MAX_ITEMS)
+                    list->grow_policy |= enum_grow_fixed;
+                else
+                    list->grow_policy |= enum_grow_mixed;
             }
             /* growing chunk block could optimize small growing blocks, they
              * are probably not worth the effort. */
@@ -434,7 +449,14 @@ alloc_next_size(Interp *interpreter, List *list, int where, UINTVAL idx)
     int much = idx - list->cap >= MIN_ITEMS;
     int do_sparse = (INTVAL)idx - (INTVAL)list->cap >= 2 * MAX_ITEMS;
 
-    if (do_sparse) {
+    if (list->item_type == enum_type_sized) {
+        items = list->items_per_chunk;
+        size = items * list->item_size;
+        list->grow_policy = items == MAX_ITEMS ?
+            enum_grow_fixed : enum_grow_mixed;
+        do_sparse = 0;
+    }
+    else if (do_sparse) {
         assert(where);
         /* don't add sparse chunk at start of list */
         if (!list->n_chunks) {
@@ -683,13 +705,8 @@ get_chunk(Interp *interpreter, List *list, UINTVAL *idx)
         if (chunk->data.flags & grow_items) {
             /* the next chunks are growing from chunk->items ... last->items */
             UINTVAL ld_first, slot;
-            List_chunk *last;
-
-            last = chunk_list_ptr(list, i + chunk->n_chunks - 1);
-            UNUSED(last);
 
             ld_first = ld(chunk->items);
-
             slot = ld(*idx + chunk->items) - ld_first;
             /* we are in this growing area, so we are done */
             assert(slot < chunk->n_chunks);
@@ -787,6 +804,11 @@ list_set(Interp *interpreter, List *list, void *item, INTVAL type, INTVAL idx)
     }
 
     switch (type) {
+    case enum_type_sized:
+        /* copy data into list */
+        memcpy(&((char *)chunk->data.bufstart)[idx * list->item_size],
+                item, list->item_size);
+        break;
     case enum_type_char:
         ((char *)chunk->data.bufstart)[idx] = (char)PTR2INTVAL(item);
         break;
@@ -834,6 +856,9 @@ list_item(Interp *interpreter, List *list, int type, INTVAL idx)
     }
 
     switch (type) {
+    case enum_type_sized:
+        return (void *)&((char *)chunk->data.bufstart)[idx * list->item_size];
+        break;
     case enum_type_char:
         return (void *)&((char *)chunk->data.bufstart)[idx];
         break;
@@ -886,6 +911,7 @@ list_new(Interp *interpreter, INTVAL type)
     list = (List *)new_bufferlike_header(interpreter, sizeof(*list));
     list->item_type = type;
     switch (type) {
+    case enum_type_sized:       /* get's overridden below */
     case enum_type_char:
         list->item_size = sizeof(char);
         break;
@@ -919,10 +945,11 @@ list_new(Interp *interpreter, INTVAL type)
  * 0 ... size (set initial size of list)
  * 1 ... array dimensions (multiarray)
  * 2 ... type (overriding type parameter)
- * 3 ... itemsize for type_size (N/Y)
+ * 3 ... item_size for enum_type_sized
+ * 4 ... items_per_chunk
  *
  * after getting these values out of the key/value pairs, a new
- * array with this values is stored in user_data, where the keys
+ * array with these values is stored in user_data, where the keys
  * are explicit.
  *
  */
@@ -931,7 +958,7 @@ list_new_init(Interp *interpreter, INTVAL type, PMC *init)
 {
     List *list;
     PMC * user_array, *multi_key;
-    INTVAL i, len, size, key, val;
+    INTVAL i, len, size, key, val, item_size, items_per_chunk;
 
     if (!init->vtable ||
             ((init->vtable->base_type != enum_class_PerlArray) &&
@@ -940,7 +967,9 @@ list_new_init(Interp *interpreter, INTVAL type, PMC *init)
     len = init->vtable->elements(interpreter, init);
     if (len & 1)
         internal_exception(1, "Illegal initializer for init: odd elements\n");
-    for (i = size = 0; i < len; i += 2) {
+
+    size = item_size = items_per_chunk = 0;
+    for (i = 0; i < len; i += 2) {
         key = init->vtable->get_integer_keyed_int(interpreter, init, &i);
         val = i + 1;
         switch (key) {
@@ -956,10 +985,29 @@ list_new_init(Interp *interpreter, INTVAL type, PMC *init)
                 type = init->vtable->get_integer_keyed_int(interpreter,
                         init, &val);
                 break;
-            /* case 3: reserved item_size */
+            case 3:
+                item_size = init->vtable->get_integer_keyed_int(interpreter,
+                        init, &val);
+                break;
+            case 4:
+                items_per_chunk = init->vtable->get_integer_keyed_int(
+                        interpreter, init, &val);
+                break;
         }
     }
     list = list_new(interpreter, type);
+    if (list->item_type == enum_type_sized) { /* overridde item_size */
+        if (!item_size)
+            internal_exception(1, "No item_size for type_sized list\n");
+        list->item_size = item_size;
+        if (items_per_chunk) {
+            /* make power of 2 */
+            items_per_chunk = 1 << (ld(items_per_chunk) + 1);
+            list->items_per_chunk = items_per_chunk;
+        }
+        else
+            list->items_per_chunk = MAX_ITEMS;
+    }
     if (size)
         list_set_length(interpreter, list, size);
     /* make a private copy of init data */
@@ -973,9 +1021,15 @@ list_new_init(Interp *interpreter, INTVAL type, PMC *init)
     key = 1;
     user_array->vtable->set_pmc_keyed_int(interpreter, user_array,
             &key, multi_key, NULL);
+#if 0
+    /* don't need these, they are stored in the List structure */
     key = 2;
     user_array->vtable->set_integer_keyed_int(interpreter, user_array,
             &key, type);
+    key = 3;
+    user_array->vtable->set_integer_keyed_int(interpreter, user_array,
+            &key, item_size);
+#endif
     list->user_data = user_array;
     return list;
 }

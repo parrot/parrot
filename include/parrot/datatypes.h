@@ -58,6 +58,8 @@ typedef enum {
 
     enum_type_ptr,              /* native pointer */
     enum_type_cstr,             /* c string */
+
+    enum_type_sized,            /* arbitrary size type for list_new */
     enum_last_type              /* + one */
 
 } PARROT_DATA_TYPES;
@@ -103,6 +105,8 @@ const char *datatype_names[] = {
     "ptr",
     "cstr",
 
+    "sized",
+
     "illegal"
 };
 #else
@@ -119,7 +123,7 @@ STRING * Parrot_get_datatype_name(Interp * interpreter, INTVAL type);
  * Local variables:
  * c-indentation-style: bsd
  * c-basic-offset: 4
- * indent-tabs-mode: nil 
+ * indent-tabs-mode: nil
  * End:
  *
  * vim: expandtab shiftwidth=4:

@@ -18,7 +18,7 @@ typedef struct List_chunk {
     Buffer data;                /* item store */
     UINTVAL items;              /* items in this chunk */
     UINTVAL n_chunks;           /* # of chunks with grow policy in flags */
-    UINTVAL n_items;            /* # of itemks with grow policy in flags */
+    UINTVAL n_items;            /* # of items with grow policy in flags */
     struct List_chunk *next;
     struct List_chunk *prev;
 } List_chunk;
@@ -34,6 +34,7 @@ typedef struct List {
     UINTVAL start;		/* offset, where array[0] is */
     int item_type;	        /* item type */
     int item_size;		/* item size */
+    int items_per_chunk;	/* override defaults */
     UINTVAL cap;                /* list capacity in items */
     int grow_policy;            /* fixed / variable len */
     UINTVAL collect_runs;       /* counter, when chunklist was built */

@@ -1,6 +1,6 @@
 #! perl -w
 
-use Parrot::Test tests => 1;
+use Parrot::Test tests => 2;
 
 TODO: {
     local $TODO="t/src doesn't work on Windows" if $^O =~ /Win32/;
@@ -271,4 +271,75 @@ OUTPUT
 
 }
 
+TODO: {
+    local $TODO="t/src doesn't work on Windows" if $^O =~ /Win32/;
+    $TODO=$TODO;  #warnings
+
+    c_output_is(<<'CODE', <<'OUTPUT', "arbitrary sized");
+
+#include <stdio.h>
+#include "parrot/parrot.h"
+#include "parrot/embed.h"
+
+int main(int argc, char* argv[]) {
+    int x;
+    List* list;
+    PMC *p;
+    INTVAL key;
+    char buf[100];
+    int i, j, ok;
+
+    Interp* interpreter = Parrot_new();
+    if (interpreter == NULL) return 1;
+    Parrot_init(interpreter, (void*) &x);
+
+    p = pmc_new(interpreter, enum_class_Array);
+
+    p->vtable->set_integer_native(interpreter, p, 6);
+    /* set data type */
+    key = 0;
+    p->vtable->set_integer_keyed_int(interpreter, p, &key, 2);
+    key++;
+    p->vtable->set_integer_keyed_int(interpreter, p, &key, enum_type_sized);
+    /* set item_size to 100 */
+    key++;
+    p->vtable->set_integer_keyed_int(interpreter, p, &key, 3);
+    key++;
+    p->vtable->set_integer_keyed_int(interpreter, p, &key, 100);
+    /* set item_per_chunk to 3 */
+    key++;
+    p->vtable->set_integer_keyed_int(interpreter, p, &key, 4);
+    key++;
+    p->vtable->set_integer_keyed_int(interpreter, p, &key, 3);
+
+    list = list_new_init(interpreter, enum_type_sized, p);
+    printf("ok 1\n");
+
+    for (j = 0; j < 5; j++) {
+	for (i = 0; i < 100; i++)
+	    buf[i] = j;
+	list_assign(interpreter, list, j, buf, enum_type_sized);
+    }
+    for (j = 4; j >= 0; j--) {
+	char *p = (char *) list_get(interpreter, list, j, enum_type_sized);
+	ok = 1;
+	for (i = 0; i < 100; i++)
+	    if (p[i] != j) {
+		ok = 0;
+		break;
+	    }
+    }
+    if (ok)
+	printf("ok 2\n");
+    else
+	printf("failed 2: i=%d j=%d\n", i, j);
+    Parrot_exit(0);
+    return 0;
+}
+CODE
+ok 1
+ok 2
+OUTPUT
+# TODO
+}
 1;
