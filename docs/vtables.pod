@@ -135,6 +135,7 @@ more meaningful within your class:
 
 You're quite at liberty to declare these in a separate header file, but I
 find it more convenient to keep everything together in F<foobynumber.c>.
+To manipulate the flags, use the macros listed in F<pobj.h>.
 
 You may also use the C<cache> union in the PMC structure to remove
 some extraneous dereferences in your code if that would help.
