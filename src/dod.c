@@ -451,7 +451,7 @@ find_common_mask(size_t val1, size_t val2){
     }
 
     internal_exception(INTERP_ERROR,
-                       "Unexpected condition in find_common_prefix()!\n");
+                       "Unexpected condition in find_common_mask()!\n");
     return 0;
 }
 
