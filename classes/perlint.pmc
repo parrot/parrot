@@ -388,7 +388,7 @@ MMD_PerlInt: {
         INTVAL a = PMC_int_val(SELF);
         INTVAL b = PMC_int_val(value);
         INTVAL c = a - b;
-        if ((c^a) >= 0 || (c^b) >= 0)
+        if ((c^a) >= 0 || (c^~b) >= 0)
             VTABLE_set_integer_native(INTERP, dest, c);
         else
             overflow(INTERP, SELF, b, dest, MMD_SUBTRACT_INT);
@@ -397,7 +397,7 @@ MMD_Integer: {
         INTVAL a = PMC_int_val(SELF);
         INTVAL b = PMC_int_val(value);
         INTVAL c = a - b;
-        if ((c^a) >= 0 || (c^b) >= 0)
+        if ((c^a) >= 0 || (c^~b) >= 0)
             VTABLE_set_integer_native(INTERP, dest, c);
         else
             overflow(INTERP, SELF, b, dest, MMD_SUBTRACT_INT);
@@ -444,9 +444,12 @@ Subtracts C<value> from the integer and returns the result in C<*dest>.
 
 */
     void subtract_int (INTVAL value, PMC* dest) {
-        VTABLE_set_integer_native(INTERP, dest,
-            PMC_int_val(SELF) - value
-        );
+        INTVAL a = PMC_int_val(SELF);
+        INTVAL c = a - b;
+        if ((c^a) >= 0 || (c^~b) >= 0)
+            VTABLE_set_integer_native(INTERP, dest, c);
+        else
+            overflow(INTERP, SELF, b, dest, MMD_SUBTRACT_INT);
     }
 
 /*
