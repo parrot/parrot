@@ -76,14 +76,6 @@ op new(out PMC, in INT, in PMC) {
   goto NEXT();
 }
 
-op new(out PMC, in INT, in KEY) {
-  if ($2 <= 0 || $2 >= enum_class_max) {
-    internal_exception(1, "Illegal PMC enum (%d) in new\n", (int)$2);
-  }
-  $1 = pmc_new_init(interpreter, $2, $3);
-  goto NEXT();
-}
-
 op new(out PMC, in INT, in PMC, in PMC) {
   if ($2 <= 0 || $2 >= enum_class_max) {
     internal_exception(1, "Illegal PMC enum (%d) in new\n", (int)$2);
@@ -108,18 +100,6 @@ inline op new_extended(out PMC) {
   goto NEXT();
 }
 
-########################################
-
-=item B<morph>(in PMC, in INT)
-
-Have $1 turn itself into a PMC of type $2.
-
-=cut
-
-inline op morph(in PMC, in INT) {
-  VTABLE_morph(interpreter, $1, $2);
-  goto NEXT();
-}
 
 ########################################
 
@@ -475,20 +455,6 @@ inline op shift (out PMC, in PMC) {
     goto NEXT();
 }
 
-########################################
-
-=item B<splice>(in PMC, in PMC, in INT, in INT)
-
-Replace $4 values at offset $3 in aggregate $1 with the PMCs in aggregate $2.
-The values are put into the aggregate by a shallow copy. If the values would
-be reused, they have to be B<clone>d.
-
-=cut
-
-inline op splice(in PMC, in PMC, in INT, in INT) {
-    $1->vtable->splice(interpreter, $1, $2, $3, $4);
-    goto NEXT();
-}
 
 =back
 

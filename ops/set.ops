@@ -511,37 +511,6 @@ inline op set (out PMC, in PMC, in KEY) :base_core {
     goto NEXT();
 }
 
-=item B<slice>(out PMC, in PMC, in KEY)
-
-Return a new Iterator PMC $1 for aggregate $2 and Slice PMC $3.
-
-=item B<slice>(out PMC, in PMC, in KEY, inconst INT)
-
-Return a new list PMC $1 for aggregate $2 and Slice PMC $3.
-
-This is a Python opcode. Range is i <= k < j. $4 must be 1.
-May change and move to python.ops.
-
-=item B<iter>(out PMC, in PMC)
-
-Return a new Iterator PMC $1 for aggregate $2.
-
-=cut
-
-inline op slice (out PMC, in PMC, in KEY) :base_core {
-    $1 = $2->vtable->slice(interpreter, $2, $3, 0);
-    goto NEXT();
-}
-
-inline op slice (out PMC, in PMC, in KEY, inconst INT) :python {
-    $1 = $2->vtable->slice(interpreter, $2, $3, $4);
-    goto NEXT();
-}
-
-inline op iter (out PMC, in PMC) :base_core {
-    $1 = $2->vtable->get_iter(interpreter, $2);
-    goto NEXT();
-}
 
 =item B<clone>(out PMC, in PMC)
 

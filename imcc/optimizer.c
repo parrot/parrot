@@ -391,9 +391,6 @@ IMCC_subst_constants_umix(Interp *interpreter, IMC_Unit * unit, char *name,
 
     tmp = NULL;
     for (i = 0; i < sizeof(ops)/sizeof(ops[0]); i++) {
-        /* TODO compare ins->opnum with a list of opcodes
-         * containing add_n_ic, ...
-         */
         if (n == 3 &&
                 r[0]->set == 'N' &&
                 r[1]->type == VTCONST &&
@@ -402,7 +399,7 @@ IMCC_subst_constants_umix(Interp *interpreter, IMC_Unit * unit, char *name,
             debug(interpreter, DEBUG_OPT1, "opt1 %s_nc_ic => ", name);
             strcpy(b, r[1]->name);
             r[1] = mk_const(str_dup(b), 'N');
-            tmp = INS(interpreter, unit, name, "", r, 2, -1, 0);
+            tmp = INS(interpreter, unit, name, "", r, 2, 0, 0);
             debug(interpreter, DEBUG_OPT1, "%I\n", tmp);
         }
     }
@@ -446,7 +443,7 @@ eval_ins(Interp *interpreter, char *op, size_t ops, SymReg **r)
                     switch (r[i-1]->set) {
                         case 'I':
                             REG_INT(i-1) =
-                                (INTVAL)strtol(r[i-1]->name, 0, 10);
+                                IMCC_int_from_reg(interpreter, r[i-1]);
                             break;
                         case 'N':
                             s = string_from_cstring(interpreter,
@@ -490,14 +487,17 @@ IMCC_subst_constants(Interp *interpreter, IMC_Unit * unit, char *name,
     Instruction *tmp;
     const char *ops[] = {
         "add", "sub", "mul", "div", "fdiv", "pow",
-        "cmod", "mod", "atan"
-            "shr", "srl", "lsr",
+        "cmod", "mod", "atan",
+        "shr", "shl", "lsr",
+        "gcd", "lcm",
         "band", "bor", "bxor",
+        "bands", "bors", "bxors",
         "and", "or", "xor",
         "iseq", "isne", "islt", "isle", "isgt", "isge", "cmp"
     };
     const char *ops2[] = {
-        "abs", "neg", "acos", "asec", "asin",
+        "abs", "neg", "not", "fact", "sqrt",
+        "acos", "asec", "asin",
         "atan", "cos", "cosh", "exp", "ln", "log10", "log2", "sec",
         "sech", "sin", "sinh", "tan", "tanh", "fact"
     };
@@ -534,12 +534,9 @@ IMCC_subst_constants(Interp *interpreter, IMC_Unit * unit, char *name,
     tmp = NULL;
     found = 0;
     for (i = 0; i < sizeof(ops)/sizeof(ops[0]); i++) {
-        /* TODO compare ins->opnum with a list of opcodes
-         * containing add_i_ic_ic, add_n_nc_nc ...
-         */
         if (n == 4 &&
-                r[1]->type == VTCONST &&
-                r[2]->type == VTCONST &&
+                r[1]->type & (VTCONST|VT_CONSTP) &&
+                r[2]->type & (VTCONST|VT_CONSTP) &&
                 !strcmp(name, ops[i])) {
             found = 4;
             /*
@@ -556,7 +553,7 @@ IMCC_subst_constants(Interp *interpreter, IMC_Unit * unit, char *name,
          * abs_i_ic ...
          */
         if (n == 3 &&
-                r[1]->type == VTCONST &&
+                r[1]->type & (VTCONST|VT_CONSTP) &&
                 !strcmp(name, ops2[i])) {
             found = 3;
             sprintf(op, "%s_%c_%c", name, tolower(r[0]->set),
@@ -570,8 +567,8 @@ IMCC_subst_constants(Interp *interpreter, IMC_Unit * unit, char *name,
          * eq_xc_xc_labelc ...
          */
         if (n == 4 &&
-                r[0]->type == VTCONST &&
-                r[1]->type == VTCONST &&
+                r[0]->type & (VTCONST|VT_CONSTP) &&
+                r[1]->type & (VTCONST|VT_CONSTP)  &&
                 !strcmp(name, ops3[i])) {
             found = 2;
             sprintf(op, "%s_%c_%c_ic", name, tolower(r[0]->set),
@@ -585,7 +582,7 @@ IMCC_subst_constants(Interp *interpreter, IMC_Unit * unit, char *name,
          * if_xc_labelc, unless
          */
         if (n == 3 &&
-                r[0]->type == VTCONST &&
+                r[0]->type & (VTCONST|VT_CONSTP) &&
                 !strcmp(name, ops4[i])) {
             found = 1;
             sprintf(op, "%s_%c_ic", name, tolower(r[0]->set));
@@ -623,7 +620,7 @@ IMCC_subst_constants(Interp *interpreter, IMC_Unit * unit, char *name,
         if (branched) {
             r[0] = r[found];
             tmp = INS(interpreter, unit, "branch", "", r,
-                    1, -1, 0);
+                    1, 0, 0);
         }
         else {
             debug(interpreter, DEBUG_OPT1, "deleted\n");
@@ -643,7 +640,7 @@ IMCC_subst_constants(Interp *interpreter, IMC_Unit * unit, char *name,
         }
         r[1] = mk_const(str_dup(b), r[0]->set);
         tmp = INS(interpreter, unit, "set", "", r,
-                    2, -1, 0);
+                    2, 0, 0);
     }
     if (tmp) {
         debug(interpreter, DEBUG_OPT1, "%I\n", tmp);

@@ -1,0 +1,36 @@
+This document describes changes to the Parrot ABI.
+
+2004.11.27 leo
+
+Removed oppodes:
+
+  abs I, N		- irregular operand mix
+  lcm N, I, I		- duplicate of lcm I,I,I with float result
+  rand *		- deprecated before 0.1.1
+
+Internally handled opcodes:
+
+All binary, unary, compare, and branch opcodes with evaluable constant
+arguments are replaced with equivalent results of the opcode, e.g.
+
+  add I0, 10, 20      => set I0, 30
+  eq 10, 10, L1       => branch L1
+  ne 10, 10, L1       => gets deleted
+  iseq I0, "a", "a"   => set I0, 1
+
+Opcodes with mixed I and N source arguments are replaced to take
+either a FLOATVAL constant or with a sequence of opcodes, e.g.:
+
+  add N0, N1, 1       => add N0, N1, 1.0
+  add N0, N1, I2      => set $N0, I2
+                         add N0, N1, $N0
+  sin N0, 2           => sin N0, 2.0
+
+While these opcodes are valid to use, these are no more listed in
+ops/ops.num nor generated. Compilers shouldn't emit these opcodes, as
+it's slightly inefficient to create the equivalent opcodes.
+
+2004.11.15 leo
+
+The variables P0, P1, P2, S0 aren't visible in the called subroutine
+anymore.  See docs/ppds/pdd03_calling_conventions.pod.

@@ -2,7 +2,7 @@
 ** math.ops
 */
 
-#define DEPRECATED internal_exception(UNIMPLEMENTED, "you should't see this")
+#define DEPRECATED internal_exception(UNIMPLEMENTED, "you shouldn't see this")
 
 
 VERSION = PARROT_VERSION;
@@ -989,11 +989,6 @@ FLOATVAL argument instead.
 
 =cut
 
-inline op sqrt(out NUM, in INT) :base_core {
-  DEPRECATED;
-  goto NEXT();
-}
-
 inline op sqrt(out NUM, in NUM) :base_core {
   $1 = sqrt((FLOATVAL)$2);
   goto NEXT();
@@ -1026,11 +1021,6 @@ Set $1 to the arc cosine (in radians) of $2.
 
 =cut
 
-inline op acos(out NUM, in INT) :base_math {
-  DEPRECATED;
-  goto NEXT();
-}
-
 inline op acos(out NUM, in NUM) :base_math {
   $1 = acos((FLOATVAL)$2);
   goto NEXT();
@@ -1046,11 +1036,6 @@ Set $1 to the arc secant (in radians) of $2.
 
 =cut
 
-inline op asec(out NUM, in INT) :base_math {
-  DEPRECATED;
-  goto NEXT();
-}
-
 inline op asec(out NUM, in NUM) :base_math {
   $1 = acos(((FLOATVAL)1) / ((FLOATVAL)$2));
   goto NEXT();
@@ -1065,11 +1050,6 @@ inline op asec(out NUM, in NUM) :base_math {
 Set $1 to the arc sine (in radians) of $2.
 
 =cut
-
-inline op asin(out NUM, in INT) :base_math {
-  DEPRECATED;
-  goto NEXT();
-}
 
 inline op asin(out NUM, in NUM) :base_math {
   $1 = asin((FLOATVAL)$2);
@@ -1098,28 +1078,8 @@ quadrant of the result.
 
 =cut
 
-inline op atan(out NUM, in INT) :base_math {
-  DEPRECATED;
-  goto NEXT();
-}
-
 inline op atan(out NUM, in NUM) :base_math {
   $1 = atan((FLOATVAL)$2);
-  goto NEXT();
-}
-
-inline op atan(out NUM, in INT, in INT) :base_math {
-  DEPRECATED;
-  goto NEXT();
-}
-
-inline op atan(out NUM, in INT, in NUM) :base_math {
-  DEPRECATED;
-  goto NEXT();
-}
-
-inline op atan(out NUM, in NUM, in INT) :base_math {
-  DEPRECATED;
   goto NEXT();
 }
 
@@ -1138,11 +1098,6 @@ Set $1 to the cosine of $2 (given in radians).
 
 =cut
 
-inline op cos(out NUM, in INT) :base_math {
-  DEPRECATED;
-  goto NEXT();
-}
-
 inline op cos(out NUM, in NUM) :base_math {
   $1 = cos((FLOATVAL)$2);
   goto NEXT();
@@ -1157,11 +1112,6 @@ inline op cos(out NUM, in NUM) :base_math {
 Set $1 to the hyperbolic cosine of $2 (given in radians).
 
 =cut
-
-inline op cosh(out NUM, in INT) :base_math {
-  DEPRECATED;
-  goto NEXT();
-}
 
 inline op cosh(out NUM, in NUM) :base_math {
   $1 = cosh((FLOATVAL)$2);
@@ -1178,11 +1128,6 @@ Set $1 to I<e> raised to the power $2. I<e> is the base of the natural logarithm
 
 =cut
 
-inline op exp(out NUM, in INT) :base_math {
-  DEPRECATED;
-  goto NEXT();
-}
-
 inline op exp(out NUM, in NUM) :base_math {
   $1 = exp((FLOATVAL)$2);
   goto NEXT();
@@ -1197,11 +1142,6 @@ inline op exp(out NUM, in NUM) :base_math {
 Set $1 to the natural (base I<e>) logarithm of $2.
 
 =cut
-
-inline op ln(out NUM, in INT) :base_math {
-  DEPRECATED;
-  goto NEXT();
-}
 
 inline op ln(out NUM, in NUM) :base_math {
   $1 = log((FLOATVAL)$2);
@@ -1218,11 +1158,6 @@ Set $1 to the base 10 logarithm of $2.
 
 =cut
 
-inline op log10(out NUM, in INT) :base_math {
-  DEPRECATED;
-  goto NEXT();
-}
-
 inline op log10(out NUM, in NUM) :base_math {
   $1 = log10((FLOATVAL)$2);
   goto NEXT();
@@ -1237,11 +1172,6 @@ inline op log10(out NUM, in NUM) :base_math {
 Set $1 to the base 2 logarithm of $2.
 
 =cut
-
-op log2(out NUM, in INT) :base_math {
-  DEPRECATED;
-  goto NEXT();
-}
 
 op log2(out NUM, in NUM) :base_math {
    FLOATVAL temp = log((FLOATVAL)2.0);
@@ -1259,11 +1189,6 @@ Set $1 to the secant of $2 (given in radians).
 
 =cut
 
-inline op sec(out NUM, in INT) :base_math {
-  DEPRECATED;
-  goto NEXT();
-}
-
 inline op sec(out NUM, in NUM) :base_math {
   $1 = ((FLOATVAL)1) / cos((FLOATVAL)$2);
   goto NEXT();
@@ -1278,11 +1203,6 @@ inline op sec(out NUM, in NUM) :base_math {
 Set $1 to the hyperbolic secant of $2 (given in radians).
 
 =cut
-
-inline op sech(out NUM, in INT) :base_math {
-  DEPRECATED;
-  goto NEXT();
-}
 
 inline op sech(out NUM, in NUM) :base_math {
   $1 = ((FLOATVAL)1) / cosh((FLOATVAL)$2);
@@ -1299,11 +1219,6 @@ Set $1 to the sine of $2 (given in radians).
 
 =cut
 
-inline op sin(out NUM, in INT) :base_math {
-  DEPRECATED;
-  goto NEXT();
-}
-
 inline op sin(out NUM, in NUM) :base_math {
   $1 = sin((FLOATVAL)$2);
   goto NEXT();
@@ -1318,11 +1233,6 @@ inline op sin(out NUM, in NUM) :base_math {
 Set $1 to the hyperbolic sine of $2 (given in radians).
 
 =cut
-
-inline op sinh(out NUM, in INT) :base_math {
-  DEPRECATED;
-  goto NEXT();
-}
 
 inline op sinh(out NUM, in NUM) :base_math {
   $1 = sinh((FLOATVAL)$2);
@@ -1339,11 +1249,6 @@ Set $1 to the tangent of $2 (given in radians).
 
 =cut
 
-inline op tan(out NUM, in INT) :base_math {
-  DEPRECATED;
-  goto NEXT();
-}
-
 inline op tan(out NUM, in NUM) :base_math {
   $1 = tan((FLOATVAL)$2);
   goto NEXT();
@@ -1358,11 +1263,6 @@ inline op tan(out NUM, in NUM) :base_math {
 Set $1 to the hyperbolic tangent of $2 (given in radians).
 
 =cut
-
-inline op tanh(out NUM, in INT) :base_math {
-  DEPRECATED;
-  goto NEXT();
-}
 
 inline op tanh(out NUM, in NUM) :base_math {
   $1 = tanh((FLOATVAL)$2);
@@ -1411,8 +1311,6 @@ inline op gcd(out INT, in INT, in INT) :advanced_math {
 
 =item B<lcm>(out INT, in INT, in INT)
 
-=item B<lcm>(out NUM, in INT, in INT)
-
 Least Common Multiple of $2 and $3
 
 =cut
@@ -1436,29 +1334,6 @@ inline op lcm(out INT, in INT, in INT) :advanced_math {
   else {
     saved_var2 = saved_var2 / temp2;
     $1 = saved_var2*saved_var3;
-  }
-  goto NEXT();
-}
-
-inline op lcm(out NUM, in INT, in INT) :advanced_math {
-  UINTVAL q = 0;
-  UINTVAL c = 0;
-  INTVAL temp2 = $2;
-  INTVAL temp3 = $3;
-  INTVAL saved_var2 = temp2;
-  INTVAL saved_var3 = temp3;
-  while (temp3 != 0) {
-    q = (UINTVAL)floor( (FLOATVAL)temp2/temp3 );
-    c = temp2 - temp3*q;
-    temp2 = temp3;
-    temp3 = c;
-  }
-  if (saved_var2 == 0) {
-    $1 = 0.0;
-  }
-  else {
-    saved_var2 = saved_var2 / temp2;
-    $1 = (FLOATVAL)saved_var2*saved_var3;
   }
   goto NEXT();
 }

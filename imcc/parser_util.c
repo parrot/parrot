@@ -289,33 +289,17 @@ INS(Interp *interpreter, IMC_Unit * unit, char *name,
     int len;
 
 #if 1
-    if (keyvec >= 0) {  /* XXX see below */
     ins = multi_keyed(interpreter, unit, name, r, n, keyvec, emit);
     if (ins)
         return ins;
-    }
 #endif
-    if (keyvec == -1)
-        op_fullname(fullname, name, r, n, 0);   /* XXX */
-    else
-        op_fullname(fullname, name, r, n, keyvec);
+    op_fullname(fullname, name, r, n, keyvec);
     op = interpreter->op_lib->op_code(fullname, 1);
     if (op < 0)         /* maybe we got a fullname */
         op = interpreter->op_lib->op_code(name, 1);
     if (op < 0)         /* still wrong, try to find an existing op */
         op = try_find_op(interpreter, unit, name, r, n, keyvec, emit);
-    /*
-     * XXX the opcodes still exists, so the op number is >= 0
-     *     but we want to replace the ops and sub_constants is using
-     *     INS which gives nice recursion.
-     *     If coming from subst_constants keyvec := -1 therefore
-     * XXX
-     */
-    if (keyvec == -1)
-        keyvec = 0;
-    else
-
-    if (1 || op < 0) {
+    if (op < 0) {
         int ok;
         /* check mixed constants */
         ins = IMCC_subst_constants_umix(interpreter, unit, name, r, n + 1);
@@ -329,8 +313,7 @@ INS(Interp *interpreter, IMC_Unit * unit, char *name,
             else
                 return NULL;
         }
-        if (op < 0)
-            strcpy(fullname, name);
+        strcpy(fullname, name);
     }
     else
         strcpy(fullname, name);
@@ -401,7 +384,7 @@ INS(Interp *interpreter, IMC_Unit * unit, char *name,
     else if (!strcmp(name, "loadlib")) {
         SymReg *r1 = r[1];   /* lib name */
         STRING *lib;
-        if (r1->type == VTCONST) {
+        if (r1->type & VTCONST) {
             /*
              * XXX we should not read in dynamic PMC classes
              *     OTOH we have to load dynamic opcodes
@@ -637,7 +620,7 @@ change_op(Interp *interpreter, IMC_Unit *unit, SymReg **r, int num, int emit)
     int changed = 0;
     SymReg *s;
 
-    if (r[num]->type & VTCONST) {
+    if (r[num]->type & (VTCONST|VT_CONSTP)) {
         /* make a number const */
         s = mk_const(str_dup(r[num]->name), 'N');
         r[num] = s;
@@ -677,7 +660,6 @@ try_find_op(Parrot_Interp interpreter, IMC_Unit * unit, char *name,
         SymReg ** r, int n, int keyvec, int emit)
 {
     char fullname[64];
-    SymReg *s;
     int changed = 0;
     /*
      * eq_str, eq_num => eq
@@ -724,34 +706,20 @@ try_find_op(Parrot_Interp interpreter, IMC_Unit * unit, char *name,
     /*
      * TODO handle eq_i_n_ic too
      */
-    if (n == 3 && !strcmp(name, "atan")) {
-        if (r[1]->set == 'I')
+    if (n == 3 && r[0]->set == 'N') {
+        if (r[1]->set == 'I') {
             changed |= change_op(interpreter, unit, r, 1, emit);
-        if (r[2]->set == 'I')
+        }
+        if (r[2]->set == 'I' && r[2]->type != VTADDRESS) {
             changed |= change_op(interpreter, unit, r, 2, emit);
-    }
-    else if (n == 3 && r[0]->set == 'N') {
-        if (r[1]->set == 'I' && (r[2]->set == 'N' ||
-                    (r[2]->type == VTADDRESS))) {
-            if (!strcmp(name, "add") ||
-                    !strcmp(name, "mul")
-               ) {
-                /*
-                 * symmetric ops, swap args */
-                s = r[1];
-                r[1] = r[2];
-                r[2] = s;
-                changed = 1;
-            }
-            else
-                changed = change_op(interpreter, unit, r, 1, emit);
         }
     }
     else if (n == 2 && r[0]->set == 'N' && r[1]->set == 'I') {
         /*
          * transcendentals  e.g. acos N, I
          */
-        changed = change_op(interpreter, unit, r, 1, emit);
+        if (strcmp(name, "fact"))
+            changed = change_op(interpreter, unit, r, 1, emit);
     }
     if (changed) {
         op_fullname(fullname, name, r, n, keyvec);

@@ -1,5 +1,6 @@
 # See tools/dev/install_files.pl for documentation on the
 # format of this file.
+ABI_CHANGES                                       []
 CREDITS                                           []
 ChangeLog                                         []
 Configure.pl                                      []

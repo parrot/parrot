@@ -17,7 +17,7 @@ number types and C<PerlInt> and C<PerlNum>.
 
 =cut
 
-use Parrot::Test tests => 27;
+use Parrot::Test tests => 26;
 use Test::More;
 
 my $fp_equality_macro = <<'ENDOFMACRO';
@@ -634,53 +634,6 @@ ok 4
 ok 5
 OUTPUT
 
-output_is(<<"CODE", <<OUTPUT, "lcm_N_I_I");
-@{[ $fp_equality_macro ]}
-        set I0, 10
-        set I1, 10
-        lcm N2, I1, I0
-        .fp_eq (N2, 10.0, OK1)
-        print "not "
-OK1:    print "ok 1\\n"
-
-        set I1, 17
-        lcm N2, I1, I0
-        .fp_eq(N2, 170.0, OK2)
-        print N2
-        print "not "
-OK2:    print "ok 2\\n"
-
-        set I0, 17
-        set I1, 10
-        lcm N2, I1, I0
-        .fp_eq(N2, 170.0, OK3)
-        print "not "
-OK3:    print "ok 3\\n"
-
-        set I0, 10
-        set I1, 0
-        lcm N2, I1, I0
-        .fp_eq(N2, 0.0, OK4)
-        print "not "
-OK4:    print "ok 4\\n"
-
-        set I0, 0
-        set I1, 10
-        lcm N2, I1, I0
-        .fp_eq(N2, 0.0, OK5)
-        print "not "
-OK5:    print "ok 5\\n"
-
-        end
-CODE
-ok 1
-ok 2
-ok 3
-ok 4
-ok 5
-OUTPUT
-
-
 output_is(<<'CODE', <<OUTPUT, "gcd(int,int,int)");
         set I0, 125
         set I1, 15
@@ -697,7 +650,7 @@ output_is(<<'CODE', <<OUTPUT, "is gcd(int,int,int) transitive?");
         set I0, 125
         set I1, 15
         gcd I2, I1, I0
-	
+
 	neg I0
         gcd I3, I1, I0
         eq I2, I3, OK1
@@ -758,7 +711,7 @@ output_is(<<'CODE', <<OUTPUT, "is gcd(int,num,num) transitive?");
         set N0, 125
         set N1, 15
         gcd I2, N1, N0
-	
+
 	neg N0
         gcd I3, N1, N0
         eq I2, I3, OK1
@@ -796,7 +749,7 @@ output_is(<<'CODE', <<OUTPUT, "gcd - 5 args version");
         set I4,  +35
         gcd I0, I1, I2, I3, I4
 	bsr output
-	
+
         set I3, +100
         set I4,  -35
         gcd I0, I1, I2, I3, I4
@@ -816,7 +769,7 @@ output_is(<<'CODE', <<OUTPUT, "gcd - 5 args version");
         set I3,  +35
         gcd I0, I1, I2, I3, I4
 	bsr output
-	
+
         set I4, +100
         set I3,  -35
         gcd I0, I1, I2, I3, I4
@@ -831,16 +784,16 @@ output_is(<<'CODE', <<OUTPUT, "gcd - 5 args version");
         set I3,  +35
         gcd I0, I1, I2, I3, I4
 	bsr output
-	
+
 	print "done\n"
 	end
-		
+
 output:
 	#I5 = I1*I3 + I2*I4
 	mul I5, I1, I3
 	mul I6, I2, I4
 	add I5, I6
-	
+
 	print I0
         print " = "
 	print I5
@@ -870,7 +823,7 @@ output_is(<<'CODE', <<OUTPUT, "is gcd(int,int,int,int,int) transitive?");
         set I0, 130
         set I1, -35
 	gcd I7, I0, I1
-	
+
 	# +, +
         gcd I2, I3, I4, I0, I1
 	mul I5, I3, I0

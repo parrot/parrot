@@ -6,14 +6,16 @@ use TestCompiler tests => 6;
 # generated PASM code for various optimizations at level 0
 
 ##############################
-output_is(<<'CODE', <<'OUT', "add_n_i_n");
+output_like(<<'CODE', <<'OUT', "add_n_i_n");
 .emit
    add N0, I0, N1
    mul N0, I0, N1
 .eom
 CODE
-  add N0, N1, I0
-  mul N0, N1, I0
+/set (N\d+), I0
+  add N0, \1, N1
+  set (N\d+), I0
+  mul N0, \2, N1/
 OUT
 
 ##############################

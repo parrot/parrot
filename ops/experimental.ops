@@ -127,9 +127,7 @@ inline op gcd(out INT, out INT, out INT, in INT, in INT) :advanced_math {
 
 ###############################################################################
 
-=head2 random number operations
-
-Implementations of various random number operations
+=head2 Misc other ops
 
 =over 4
 
@@ -137,59 +135,118 @@ Implementations of various random number operations
 
 ########################################
 
-=item B<rand>(out NUM, in NUM)
+inline op set_eh(in PMC) {
+  /* use push_eh */
+  push_exception(interpreter, $1);
+  goto NEXT();
+}
 
-=item B<rand>(out NUM)
 
-=item B<rand>(out INT, in INT)
+########################################
 
-=item B<rand>(out INT)
+=item B<die>()
 
-=item B<srand>(in NUM)
+Die. Hard. Calls _exit, and won't do any process cleanup
 
-Generate random numbers based on the Random PMC.
+TODO encode in existing die_hard opcode.
 
 =cut
 
-inline op rand(out NUM, in NUM) {
-  FLOATVAL n = $2;
-  PMC * r = pmc_new_noinit(interpreter, enum_class_Random);
-  $1 = VTABLE_get_number(interpreter,r);
-  $1 *= $2;
+op die() :base_debug {
+  _exit(0);
   goto NEXT();
 }
 
-inline op rand(out INT, in INT) {
-  INTVAL n = $2;
-  PMC * r = pmc_new_noinit(interpreter, enum_class_Random);
-  FLOATVAL resultnum;
-  resultnum = VTABLE_get_number(interpreter,r);
-  $1 = (INTVAL)(resultnum * (FLOATVAL)n);
+op die(in INT) :base_debug {
+  _exit($1);
   goto NEXT();
 }
 
-inline op rand(out NUM) {
-  PMC * r = pmc_new_noinit(interpreter, enum_class_Random);
-  $1 = VTABLE_get_number(interpreter,r);
+op new(out PMC, in INT, in KEY) {
+  if ($2 <= 0 || $2 >= enum_class_max) {
+    internal_exception(1, "Illegal PMC enum (%d) in new\n", (int)$2);
+  }
+  $1 = pmc_new_init(interpreter, $2, $3);
   goto NEXT();
 }
 
-inline op rand(out INT) {
-  PMC *r = pmc_new_noinit(interpreter, enum_class_Random);
-  $1 = VTABLE_get_integer(interpreter,r);
-  goto NEXT();
+########################################
+
+=item B<splice>(in PMC, in PMC, in INT, in INT)
+
+Replace $4 values at offset $3 in aggregate $1 with the PMCs in aggregate $2.
+The values are put into the aggregate by a shallow copy. If the values would
+be reused, they have to be B<clone>d.
+
+=cut
+
+inline op splice(in PMC, in PMC, in INT, in INT) {
+    $1->vtable->splice(interpreter, $1, $2, $3, $4);
+    goto NEXT();
 }
 
-inline op srand(in INT) {
-  INTVAL i = $1;
-  PMC * r = pmc_new_noinit(interpreter, enum_class_Random);
-  VTABLE_set_integer_native(interpreter,r,i);
+
+=item B<slice>(out PMC, in PMC, in KEY)
+
+Return a new Iterator PMC $1 for aggregate $2 and Slice PMC $3.
+
+=item B<slice>(out PMC, in PMC, in KEY, inconst INT)
+
+Return a new list PMC $1 for aggregate $2 and Slice PMC $3.
+
+This is a Python opcode. Range is i <= k < j. $4 must be 1.
+May change and move to python.ops.
+
+=item B<iter>(out PMC, in PMC)
+
+Return a new Iterator PMC $1 for aggregate $2.
+
+=cut
+
+inline op slice (out PMC, in PMC, in KEY) :base_core {
+    $1 = $2->vtable->slice(interpreter, $2, $3, 0);
+    goto NEXT();
+}
+
+inline op slice (out PMC, in PMC, in KEY, inconst INT) :python {
+    $1 = $2->vtable->slice(interpreter, $2, $3, $4);
+    goto NEXT();
+}
+
+inline op iter (out PMC, in PMC) :base_core {
+    $1 = $2->vtable->get_iter(interpreter, $2);
+    goto NEXT();
+}
+
+########################################
+
+=item B<morph>(in PMC, in INT)
+
+Have $1 turn itself into a PMC of type $2.
+
+=cut
+
+inline op morph(in PMC, in INT) {
+  VTABLE_morph(interpreter, $1, $2);
+  goto NEXT();
+}
+=cut
+
+=item B<exec>(in STR)
+
+Execute the passed-in command. Completely tosses the current process
+image and replaces it with the command. Doesn't exit (the program
+ends, after all), though it does throw an exception if something goes
+wrong.
+
+=cut
+
+inline op exec(in STR) {
+  Parrot_Exec_OS_Command(interpreter, $1);
   goto NEXT();
 }
 
 =back
-
-=cut
 
 ###############################################################################
 

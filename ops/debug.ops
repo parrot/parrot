@@ -134,24 +134,6 @@ op debug_print() :base_debug {
     goto NEXT();
 }
 
-########################################
-
-=item B<die>()
-
-Die. Hard. Calls _exit, and won't do any process cleanup
-
-=cut
-
-op die() :base_debug {
-  _exit(0);
-  goto NEXT();
-}
-
-op die(in INT) :base_debug {
-  _exit($1);
-  goto NEXT();
-}
-
 
 =back
 

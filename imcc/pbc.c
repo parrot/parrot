@@ -764,6 +764,32 @@ build_key(Interp *interpreter, SymReg *reg)
     return k;
 }
 
+INTVAL
+IMCC_int_from_reg(Interp *interpreter, SymReg *r)
+{
+    INTVAL i;
+
+    UNUSED(interpreter);
+    if (r->type & VT_CONSTP)
+        r = r->reg;
+    if (r->name[0] == '0' && (r->name[1] == 'x' || r->name[1] == 'X'))
+        i = strtoul(r->name+2, 0, 16);
+    else if (r->name[0] == '0' &&
+            (r->name[1] == 'b' || r->name[1] == 'B'))
+        i = strtoul(r->name+2, 0, 2);
+    else
+        i = strtol(r->name, 0, 10);
+    /*
+     * TODO
+     * - is this portable?
+     * - reset errnor first?
+     * - there are some more atol()s in this file
+     */
+    if (errno == ERANGE)
+        fatal(1, "add_1_const", "Integer overflow '%s'", r->name);
+    return i;
+}
+
 static void
 add_1_const(Interp *interpreter, SymReg *r)
 {
@@ -773,21 +799,7 @@ add_1_const(Interp *interpreter, SymReg *r)
         return;
     switch (r->set) {
         case 'I':
-            if (r->name[0] == '0' && (r->name[1] == 'x' || r->name[1] == 'X'))
-                r->color = strtoul(r->name+2, 0, 16);
-            else if (r->name[0] == '0' &&
-                    (r->name[1] == 'b' || r->name[1] == 'B'))
-                r->color = strtoul(r->name+2, 0, 2);
-            else
-                r->color = strtol(r->name, 0, 10);
-            /*
-             * TODO
-             * - is this portable?
-             * - reset errnor first?
-             * - there are some more atol()s in this file
-             */
-            if (errno == ERANGE)
-                fatal(1, "add_1_const", "Integer overflow '%s'", r->name);
+            r->color = IMCC_int_from_reg(interpreter, r);
             break;
         case 'S':
             r->color = add_const_str(interpreter, r);
@@ -819,11 +831,8 @@ constant_folding(Interp *interpreter, IMC_Unit * unit)
     for (i = 0; i < HASH_SIZE; i++) {
         /* normally constants are in ghash ... */
         for (r = ghash[i]; r; r = r->next) {
-            if (r->type & VTCONST) {
+            if (r->type & (VTCONST|VT_CONSTP)) {
                 add_1_const(interpreter, r);
-            }
-            else if (r->type & VT_CONSTP) {
-                add_1_const(interpreter, r->reg);
             }
         }
         /* ... but keychains 'K' are in local hash, they may contain

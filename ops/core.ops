@@ -569,11 +569,6 @@ inline op newsub(in INT, in INT, labelconst INT, labelconst INT) {
 
 =over 4
 
-=item B<set_eh>(in PMC)
-
-Push the exception handler in $1 on the control stack. This opcode is
-deprecrated. Please use B<push_eh>.
-
 =item B<push_eh>(labelconst INT)
 
 Create an exception handler for the given catch label and push it onto
@@ -602,11 +597,6 @@ extended exit status, create an exception with severity B<EXCEPT_exit>
 and throw it.
 
 =cut
-
-inline op set_eh(in PMC) {
-  push_exception(interpreter, $1);
-  goto NEXT();
-}
 
 inline op push_eh(labelconst INT) {
   PMC *eh = pmc_new(interpreter, enum_class_Exception_Handler);

@@ -195,9 +195,11 @@ sub new
 
     $self->read_ops($_) for @files;
 
-    # What's going on here?
-    $self->{FILE}=~s/, $//;
-    $self->{FILE}=~s/, $//;
+    # FILE holds a space separated list of opsfile name
+    if ($self->{FILE}) {
+	$self->{FILE}=~s/, $//;
+	$self->{FILE}=~s/, $//;
+    }
 
     return $self;
 }

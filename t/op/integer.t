@@ -172,7 +172,7 @@ output_is(<<CODE, <<OUTPUT, "add_i");
 	print	I1
 	print	"\\n"
 
-	add	I2, I0, I1	
+	add	I2, I0, I1
 	print	I2
 	print	"\\n"
 
@@ -194,33 +194,17 @@ output_is(<<'CODE', <<'OUTPUT', "abs(i, i|ic|n|nc)");
 	set	I2, -1
 	abs	I2, I2
 	print	I0
-	print	"\n"	
-	print	I1
-	print	"\n"	
-	print	I2
-	print	"\n"	
-
-	set	N0, 1.001
-	abs	I0, N0
-	abs	I1, 1.001
-	print	I0
+	print	"\n"
 	print	I1
 	print	"\n"
-
-        set     N0, -1.001
-        abs     I0, N0
-        abs     I1, -1.001
-	print	I0
-	print	I1
-	print	"\n"        
+	print	I2
+	print	"\n"
 
 	end
 CODE
 1
 1
 1
-11
-11
 OUTPUT
 
 output_is(<<CODE, <<OUTPUT, "sub_(i|ic, i|ic)");
@@ -985,7 +969,7 @@ output_is(<<CODE, <<OUTPUT, "sub_i_i");
 	set	I0, 0
         set     I1, 3
         set     I2, -3
- 
+
 	sub	I0, I1
 	print	I0
 	print	"\\n"
