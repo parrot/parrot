@@ -19,7 +19,8 @@
 static BOOLVAL world_inited=0;
 
 struct Parrot_Interp *
-Parrot_new(void) {
+Parrot_new(void)
+{
     if(!world_inited) {
         world_inited=1;
         init_world();
@@ -28,7 +29,8 @@ Parrot_new(void) {
 }
 
 void
-Parrot_init(struct Parrot_Interp *interpreter) {
+Parrot_init(struct Parrot_Interp *interpreter)
+{
     if(!world_inited) {
         world_inited=1;
         init_world();
@@ -36,17 +38,20 @@ Parrot_init(struct Parrot_Interp *interpreter) {
 }
 
 void
-Parrot_setflag(struct Parrot_Interp *interpreter, Parrot_flag flag, Parrot_flag_val value) {
+Parrot_setflag(struct Parrot_Interp *interpreter, Parrot_flag flag, Parrot_flag_val value)
+{
     interpreter->flags |= flag;
 }
 
 void
-Parrot_setwarnings(struct Parrot_Interp *interpreter, Parrot_warnclass wc) {
+Parrot_setwarnings(struct Parrot_Interp *interpreter, Parrot_warnclass wc)
+{
 	PARROT_WARNINGS_on(interpreter, wc);
 }
 
 struct PackFile *
-Parrot_readbc(struct Parrot_Interp *interpreter, char *filename) {
+Parrot_readbc(struct Parrot_Interp *interpreter, char *filename)
+{
     /* XXX This ugly mess ought to be cleanupable. */
     int fd;
     struct stat file_stat;
@@ -138,12 +143,14 @@ Parrot_readbc(struct Parrot_Interp *interpreter, char *filename) {
 }
 
 void
-Parrot_loadbc(struct Parrot_Interp *interpreter, struct PackFile *pf) {
+Parrot_loadbc(struct Parrot_Interp *interpreter, struct PackFile *pf)
+{
     interpreter->code=pf;
 }
 
 void
-Parrot_runcode(struct Parrot_Interp *interpreter, int argc, char *argv[]) {
+Parrot_runcode(struct Parrot_Interp *interpreter, int argc, char *argv[])
+{
     INTVAL i;
     PMC* userargv;
     
@@ -258,7 +265,8 @@ Parrot_runcode(struct Parrot_Interp *interpreter, int argc, char *argv[]) {
 }
 
 void
-Parrot_destroy(struct Parrot_Interp *interp) {
+Parrot_destroy(struct Parrot_Interp *interp)
+{
     free(interp);
 }
 
