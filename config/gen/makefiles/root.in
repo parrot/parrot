@@ -1173,9 +1173,9 @@ exec_so : $(SRC)/exec_start$(O) blib/lib/libparrot$(SO)
 ###### OS depend targets ##########
 # libnci.so used by t/pmc/nci.t
 
-$(LIBNCI_SO): $(SRC)/nci_test.c
+$(LIBNCI_SO): $(SRC)/nci_test$(O)
 	$(LD) $(LD_SHARED) ${ncilib_link_extra} $(LDFLAGS) \
-	    $(LD_OUT)$@ $(SRC)/nci_test.c
+	    $(LD_OUT)$@ $(SRC)/nci_test$(O)
 
 # vim ctags
 # this needs exuberant-ctags
