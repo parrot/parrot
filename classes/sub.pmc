@@ -36,33 +36,37 @@ the globals.
 static STRING*
 sub_name(Parrot_Interp interpreter, PMC* sub)
 {
-    opcode_t i, ci;
-    struct PackFile *pf;
-    struct PackFile_FixupTable *ft;
-    struct PackFile_ConstTable *ct;
     struct Parrot_sub * s = PMC_sub(sub);
-    struct Parrot_sub * c;
 
     if (s->name) {
-        /* sub was located via globals */
         return s->name;
     }
-    else {
-        /* sub was created via new_sub and offset, probably */
-        pf = interpreter->code;
-        ft = pf->cur_cs->fixups;
-        ct = pf->cur_cs->consts;
-        for (i = 0; i < ft->fixup_count; i++) {
-            switch (ft->fixups[i]->type) {
-                case enum_fixup_sub:
-                    ci = ft->fixups[i]->offset;
-                    c = PMC_sub(ct->constants[ci]->u.key);
-                    if (c->address == s->address)
-                        return c->name;
-            }
+    return NULL;
+}
+
+static void
+clear_fixup(Parrot_Interp interpreter, PMC* self)
+{
+    opcode_t i, ci;
+    struct PackFile_ByteCode *seg;
+    struct PackFile_FixupTable *ft;
+    struct PackFile_ConstTable *ct;
+
+    seg = PMC_sub(self)->seg;
+    ft = seg->fixups;
+    ct = seg->consts;
+    for (i = 0; i < ft->fixup_count; i++) {
+        switch (ft->fixups[i]->type) {
+            case enum_fixup_sub:
+                ci = ft->fixups[i]->offset;
+                if (ct->constants[ci]->u.key == self) {
+                    ct->constants[ci]->u.key = NULL;
+                    ft->fixups[i]->type = 0;
+                    break;
+                }
+
         }
     }
-    return NULL;
 }
 
 static void
@@ -127,6 +131,12 @@ Destroys the subroutine.
 
     void destroy () {
         struct Parrot_sub * sub = PMC_sub(SELF);
+#if 0
+        STRING *n = sub_name(INTERP, SELF);
+        fprintf(stderr, "DESTROY sub %p %s\n", SELF,
+            n && n->strstart ? (char*)n->strstart : "???");
+#endif
+        clear_fixup(INTERP, SELF);
         mem_sys_free(sub);
     }
 
