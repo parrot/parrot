@@ -30,15 +30,16 @@ sub runstep {
         return;
     }
 
+
   cc_gen('config/auto/sizes/test_c.in');
   cc_build();
   my %results=eval cc_run();
   cc_clean();
-  
+
   for(keys %results) {
     Configure::Data->set($_ => $results{$_});
   }
-  
+
   if($results{ptrsize} != $results{intvalsize}) {
     print <<"END";
 
@@ -46,7 +47,60 @@ Hmm, I see your chosen INTVAL isn't the same size as your pointers.  Parrot shou
 still compile and run, but you may see a ton of warnings.
 END
   }
-  
+
+  # set fixed sized types
+  if ($results{shortsize} == 2) {
+    Configure::Data->set('int2_t' => 'short');
+  }
+  else {
+    Configure::Data->set('int2_t' => 'int');
+    print <<'END';
+
+Can't find a int type with size 2, conversion ops might fail!
+
+END
+  }
+  if ($results{shortsize} == 4) {
+    Configure::Data->set('int4_t' => 'short');
+  }
+  elsif ($results{intsize} == 4) {
+    Configure::Data->set('int4_t' => 'int');
+  }
+  elsif ($results{longsize} == 4) {
+    Configure::Data->set('int4_t' => 'long');
+  }
+  else {
+    Configure::Data->set('int4_t' => 'int');
+    print <<'END';
+
+Can't find a int type with size 4, conversion ops might fail!
+
+END
+  }
+
+  if ($results{floatsize} == 4) {
+    Configure::Data->set('float4_t' => 'float');
+  }
+  else {
+    Configure::Data->set('float4_t' => 'double');
+    print <<'END';
+
+Can't find a float type with size 4, conversion ops might fail!
+
+END
+  }
+  if ($results{doublesize} == 8) {
+    Configure::Data->set('float8_t' => 'double');
+  }
+  else {
+    Configure::Data->set('float8_t' => 'double');
+    print <<'END';
+
+Can't find a float type with size 8, conversion ops might fail!
+
+END
+  }
+
   #Get HUGEINTVAL
   if(my $size=eval {
     open(TEST, ">test.c") or die "Can't open test.c: $!";
@@ -60,7 +114,7 @@ int main() {
 }
 END
     close TEST;
-    
+
     cc_build();
     cc_run();
   }) {
@@ -75,9 +129,9 @@ END
         'hugeintvalsize' => Configure::Data->get('longsize')
     );
   }
-  
+
   cc_clean();
-  
+
   #get HUGEFLOATVAL
   if(my $size=eval {
     open(TEST, ">test.c") or die "Can't open test.c: $!";
@@ -91,7 +145,7 @@ int main() {
 }
 END
     close TEST;
-    
+
     cc_build();
     cc_run();
   }) {
@@ -106,7 +160,7 @@ END
         'hugefloatvalsize'  => Configure::Data->get('doublesize')
     );
   }
-  
+
   cc_clean();
 }
 

@@ -28,6 +28,14 @@ typedef ${opcode_t}             Parrot_Opcode;
 typedef void *                  Parrot_Pointer;
 typedef void *                  Parrot_Sync;
 
+typedef ${int2_t}               Parrot_Int2;
+typedef unsigned ${int2_t}      Parrot_UInt2;
+typedef ${int4_t}               Parrot_Int4;
+typedef unsigned ${int4_t}      Parrot_UInt4;
+
+typedef ${float4_t}             Parrot_Float4;
+typedef ${float8_t}             Parrot_Float8;
+
 /* Temporary until we find a way to make it work in the right place. */
 struct PackFile;      typedef struct PackFile * Parrot_PackFile;
 
