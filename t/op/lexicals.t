@@ -16,7 +16,7 @@ Tests various lexical scratchpad operations.
 
 =cut
 
-use Parrot::Test tests => 7;
+use Parrot::Test tests => 12;
 
 output_is(<<CODE, <<OUTPUT, "simple store and fetch");
 	new_pad 0
@@ -349,5 +349,59 @@ ok 1
 ok 2
 ok 3
 OUTPUT
+
+output_like(<<'CODE', <<OUTPUT, "accessing non-existent pad, +ve index");
+       new_pad 0
+       new P0, .Integer
+       store_lex 2, "foo", P0
+       end
+CODE
+/Pad index out of range/
+OUTPUT
+
+output_like(<<'CODE', <<OUTPUT, "accessing non-existent pad, -ve index");
+       new_pad 0
+       new P0, .Integer
+       store_lex -2, "foo", P0
+       end
+CODE
+/Pad index out of range/
+OUTPUT
+
+output_is(<<'CODE', <<OUTPUT, "store with unspecified pad");
+       new_pad 0
+       new P0, .Integer
+       set P0, 10
+       store_lex 0, "abc", P0
+       new P1, .Integer
+       set P1, 20
+       store_lex "abc", P1
+       new P2, .Integer
+       find_lex P2, "abc"
+       print P2
+       print "\n"
+       end
+CODE
+20
+OUTPUT
+
+output_like(<<'CODE', <<OUTPUT, "invalid store with unspecified pad");
+       new_pad 0
+       new P0, .Integer
+       store_lex "abc", P0
+       end
+CODE
+/Lexical 'abc' not found/
+OUTPUT
+
+output_like(<<'CODE', <<'OUTPUT', "Fetch invalid var. from specific pad");
+       new_pad 0
+       new P0, .Integer
+       find_lex P0, 0, "Wibble"
+       end
+CODE
+/Lexical 'Wibble' not found/
+OUTPUT
+
 1;
 
