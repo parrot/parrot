@@ -13,7 +13,7 @@ tools/dev/genrpt.pl - Generate reports for parrot builds
 To make an 'OK' report:
 
     % perl tools/dev/genrpt.pl --ok --File parrot.ok
-    
+
 To make an 'Not OK' report:
 
     % perl tools/dev/genrpt.pl --nok --File parrot.nok

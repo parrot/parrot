@@ -709,11 +709,9 @@ __END__
 
 parrotbug - Parrot Bug Reporter
 
-
 =head1 SYNOPSIS
 
     % ./parrotbug [options] [actions]
-
 
 =head1 DESCRIPTION
 

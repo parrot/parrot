@@ -67,6 +67,8 @@ This function calls pge_parseglob() to build an expression tree from
 the string in s, then calls pge_gen() to generate a PIR subroutine
 from the expression tree.
 
+=back
+
 =cut
 
 */

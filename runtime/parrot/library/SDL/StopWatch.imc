@@ -7,14 +7,14 @@ SDL::StopWatch - A stopwatch using SDL::LCD
     # create the stopwatch
     $I0 = find_type 'SDL::StopWatch'
     watch = new $I0, screen
-    
+
     # set its position
     watch.'xpos'( 5 )
     watch.'ypos'( 5 )
 
     # start it
     watch.'start'()
-    
+
 =head1 DESCRIPTION
 
 You can start, stop and reset this stopwatch. You do not need

@@ -9,6 +9,21 @@
  *  Notes:
  *     Please remove unneeded entries.
  *  References:
+
+=head1 NAME
+
+dynclasses/tclarray.pmc - Tcl Array PMC
+
+=head1 DESCRIPTION
+
+This is the Array PMC for the Tcl implementation.
+
+=head2 Functions
+
+=over 4
+
+=cut
+
  */
 
 #include "parrot/parrot.h"

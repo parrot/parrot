@@ -24,7 +24,7 @@ one PMC, which is the case used by the Parrot core. See L<Parrot::Pmc2c>
 package Parrot::Pmc2c::Library;
 use Parrot::Pmc2c qw(dynext_load_code dont_edit);
 
-=item C<new($opt, $vtable_dump, %pmcs)
+=item C<new($opt, $vtable_dump, %pmcs)>
 
     $library = Parrot::Pmc2c::Library->new
         ( $options,     # hash refernce, the same passet to other constructors

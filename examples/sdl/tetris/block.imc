@@ -8,7 +8,7 @@ block.imc - a tetris block class
     find_type $I0, "Tetris::Block"
     new block, $I0
     block."init"( board )
-    
+
     # let the block fall down fast
     block."fall"()
 

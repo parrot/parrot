@@ -15,6 +15,7 @@ t/op/stringu.t - Unicode String Test
 Tests Parrot's unicode string system.
 
 =cut
+
 #'
 
 use Parrot::Test tests => 14;

@@ -10,7 +10,7 @@ Parrot::PakFile2 - XS interface to writing Parrot bytecode files
 
     use Parrot::PakFile2;
     open (OUT, ">foo.pbc") or die $!;
-  
+
     Parrot::PakFile2::output_bytecode(
     {
         bytecode => $gibberish,

@@ -246,6 +246,8 @@ sub restart_offset
 
 =item C<Parrot::OpTrans::CSwitch>
 
+=back
+
 =cut
 
 1;

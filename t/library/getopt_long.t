@@ -138,8 +138,6 @@ You have passed the additional argument: 'thing'.
 All args have been parsed.
 OUT
 
-=back
-
 =head1 AUTHOR
 
 Bernhard Schmalhofer <Bernhard.Schmalhofer@gmx.de>

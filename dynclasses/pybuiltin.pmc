@@ -311,7 +311,7 @@ Return a string of one character with ordinal C<*value>.
 
 =item C<PMC* "cmp"(PMC *value1, PMC *value2)>
 
-Returns the result of comparing C<*value1> with C<*value2).
+Returns the result of comparing C<*value1> with C<*value2>).
 
 =cut
 

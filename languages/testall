@@ -27,6 +27,8 @@ e.g., C<cd languages/tcl && make test>
 
 e.g., C<cd languages/tcl && t/joe_test.t>
 
+=back
+
 =for comment
 
 We are assuming that we are running out of parrot/languages; we are being

@@ -8,13 +8,13 @@ B<Note:> The Tetris::App class is implemented as a singleton.
 
     find_type $I0, "Tetris::App"
     new app, $I0
-    
+
     app."run"()
     app."shutdown"()
     end
-    
+
     ...
-    
+
     # create a new random C<next block> on board 3
     app = find_global "Tetris::App", "app"
     app."nextBlock"( 3 )

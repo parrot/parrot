@@ -8,23 +8,21 @@ version 0.1
 
 =head1 SYNOPSIS
 
-
     load_bytecode "library/Stream/Replay.imc"
-    
+
     $I0 = find_type "Stream::Replay"
     $P0 = new $I0
     assign $P0, other_stream
-    
+
     # .. read from $P0 ..
 
     $P1 = clone $P0
-    
+
     # .. read further ..
-    
+
     $P0 = $P1
     # now, if you read from $P0, you get the same data as after the clone
-    
-    
+
 =head1 DESCRIPTION
 
 By using C<clone>, you can read data from a stream as often as you want.

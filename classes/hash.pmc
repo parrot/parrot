@@ -609,8 +609,6 @@ Returns the number of elements in the hash.
 
 /*
 
-=item C<PMC* slice (PMC *key)>
-
 Return a new iterator for the slice PMC C<key>
 
 =item C<PMC *get_pmc_keyed(PMC *key)>

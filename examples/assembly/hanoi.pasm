@@ -58,21 +58,21 @@ In pseudocode:
         # move all but the largest disk from storage to target
         move_stack(array, size, num-1, storage, target, start)
     }
-    
+
     move(array, size, start, target) {
         /* okay, so it's not pseudocode... */
         # find the first non-empty slot on the start column (smallest disk)
         for(i=0; i<size; i++) if(array[start_col][i]) break;
         start_row = i;
-        
+
         # find the last empty slot on the target column
         for(i=1; i<size; i++) if(array[dest_col][i]) break;
         dest_row  = i - 1;
-        
+
         # do the move
         array[dest_col][dest_row] = array[start_col][start_row];
         array[start_col][start_row] = 0;
-        
+
         #print the results
         print(array, size);
     }

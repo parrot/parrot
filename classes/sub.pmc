@@ -23,7 +23,7 @@ These are the vtable functions for the Sub (subroutine) base class
 
 /*
 
-=item C<>
+=item C<sub_name>
 
 Print name and location of subroutine, This should finally use the label
 name of the frozen C<Sub> PMC image for now locate the C<Sub> name in

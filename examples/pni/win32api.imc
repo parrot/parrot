@@ -13,7 +13,7 @@ examples/pni/win32api.imc - Win32 Example
 
 This example calls the MessageBoxA Win32 API using the Parrot Native
 Call Interface.  The function is defined as:-
- 
+
     int MessageBox(
         HWND hWnd,
         LPCTSTR lpText,

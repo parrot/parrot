@@ -18,7 +18,7 @@ Properties:
 
     _filename               full path/file of lib
     _ro                     true after init
- 
+
 All ParrotLibrary PMCs are in interpreter->iglobals.
 
 When a dynamic library (pmc or ops) is loaded, the load function returns

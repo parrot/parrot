@@ -32,7 +32,7 @@ C<parrot demo.pir>.  The demo understands the following commands:
     print             - display the PIR cod generated for current rule
     trace             - toggle pattern execution tracing
     next              - repeat last match on target string
-    
+
 If you get errors about "cannot open shared object file", that usually
 means that Parrot was unable to locate the pge.so object file.
 

@@ -230,6 +230,8 @@ sub access_arg
 
 =item C<Parrot::OpTrans::Compiled>
 
+=back
+
 =cut
 
 1;

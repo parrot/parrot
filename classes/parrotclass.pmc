@@ -312,6 +312,7 @@ Create the class from the thawed parents and attributes array.
 }
 
 /*
+
 =back
 
 =cut

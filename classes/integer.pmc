@@ -640,8 +640,6 @@ MMD_DEFAULT: {
 
 =item C<void divide_int(INTVAL value, PMC *dest)>
 
-=item C<void floor_divide_int(INTVAL value, PMC *dest)>
-
 Divides the integer by C<value> and returns the result in C<*dest>.
 
 =cut

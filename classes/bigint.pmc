@@ -359,9 +359,6 @@ pmclass BigInt extends perlscalar {
 
 =over 4
 
-*/
-/*
-
 =item C<PMC* instantiate()>
 
 Object constructor. SELF is a BigInt Class object. Return a new

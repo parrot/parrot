@@ -7,14 +7,14 @@ SDL::LCD - A LCD object
     # create an LCD
     $I0 = find_type 'SDL::LCD'
     lcd = new $I0
-    
+
     # set the LCD position
     lcd."xpos"( 10 )
     lcd."ypos"( 10 )
-    
+
     # set the LCD content
     lcd = "-01:23.4"
-    
+
     # draw the LCD
     lcd."draw"( screen )
 
@@ -25,7 +25,7 @@ number of digits. Supported are 0-9, a-f, ".", ":", "-" and blanks.
 
 Each digit is 10 pixels width, plus 2 pixels space between the digits.
 The height of each digit is 21 pixels.
-    
+
 =head1 METHODS
 
 An SDL::LCD object has the following methods:
@@ -289,7 +289,7 @@ Sets the y position of the LCD.
 Jens Rieks E<lt>parrot at jensbeimsurfen dot deE<gt> is the author
 and maintainer.
 Please send patches and suggestions to the Perl 6 Internals mailing list.
-  
+
 =head1 COPYRIGHT
 
 Copyright (c) 2004, The Perl Foundation.

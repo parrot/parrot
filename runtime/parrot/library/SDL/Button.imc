@@ -7,7 +7,7 @@ SDL::Button - A multi state SDL Button
     # the image to use for the button
     $P0 = new PerlString
     $P0 = "filename/to/image.png"
-    
+
     # create the button
     $I0 = find_type 'SDL::Button'
     button = new $I0, $P0
@@ -15,13 +15,13 @@ SDL::Button - A multi state SDL Button
     # set the position
     button.'xpos'( 10 )
     button.'ypos'( 10 )
-    
+
     # set the number of states    
     button.'states'( 2 )
 
     # activate the second status (first is 0)
     button = 1
-    
+
     # draw the button
     button."draw"( screen )
 

@@ -12,12 +12,12 @@ examples/assembly/xml_parser.pasm - Simple XML Parser
 Note that this example currently seems to be broken:
 
     Couldn't open small.xml
-    
+
 =head1 DESCRIPTION
 
 This is a rudimentary XML-ish parser in PASM. It currently handles only
 well-formed XML, doesn't throw errors, etc...
- 
+
 Limitations:
 
 =over 4
@@ -59,7 +59,7 @@ Register Usage:
 The stack is used all to hell.  :)
 
 Data is stored on the stack in type/value pairs:
- 
+
       -1 ""  (uninitialized slot)
        0 Element Name
        1 Attribute Name

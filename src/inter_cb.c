@@ -232,7 +232,6 @@ callback_CD(Parrot_Interp interpreter, void *external_data, PMC *user_data)
 /*
 
 =item C<void
-
 Parrot_run_callback(Parrot_Interp interpreter, PMC* user_data, void* external_data)>
 
 Run a callback function. The PMC* user_data holds all
@@ -352,7 +351,7 @@ Parrot_callback_D(PMC *user_data, void *external_data)
 
 =head1 SEE ALSO
 
-F<include/parrot/interpreter.h>, L<docs/pdds/pdd16_native_call.pod>.
+F<include/parrot/interpreter.h>, F<docs/pdds/pdd16_native_call.pod>.
 
 =cut
 

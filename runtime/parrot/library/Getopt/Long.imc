@@ -181,12 +181,12 @@ error reporting, more options
 
 =head1 AUTHOR
 
-Bernhard Schmalhofer - L<Bernhard.Schmalhofer@biomax.de>
+Bernhard Schmalhofer - C<Bernhard.Schmalhofer@biomax.de>
 
 =head1 SEE ALSO
 
 The Perl5 module L<Getopt::Long>.
-F<examples/assembly/getopt_demo.imc
+F<examples/assembly/getopt_demo.imc>
 
 =head1 COPYRIGHT
 

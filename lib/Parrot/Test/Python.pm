@@ -2,7 +2,7 @@ package Parrot::Test::Python;
 
 use File::Basename;
 
-=head1
+=head1 Parrot::Test::Python
 
 Provide language specific testing routines here...
 

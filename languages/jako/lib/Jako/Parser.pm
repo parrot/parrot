@@ -949,11 +949,11 @@ sub parse
     #   <label>: {
     #   {
     #
- 
+
     if ($token->is_open_brace) {
       my $label = $last_token->text
         if $last_token->is_label;
-    
+
       $self->begin_block($label, 'bare', undef);
 
       next;

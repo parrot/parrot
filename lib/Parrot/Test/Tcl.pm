@@ -2,7 +2,7 @@ package Parrot::Test::Tcl;
 
 use File::Basename;
 
-=head1
+=head1 Parrot::Test::Tcl
 
 Provide language specific testing routines here...
 

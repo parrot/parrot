@@ -8,7 +8,7 @@ TODO tests would also suffice, where possible.
 
 =item update docs/* 
 
-=back 4
+=back
 
 =head1 Programming Issues
 
@@ -38,7 +38,7 @@ not the pir routines we now have. Verify that [expr 2a + 2b] behaves
 appropriately when doing this. Include proper numififcation of octal and
 hex
 
-=back 4
+=back
 
 =head2 PIR-level tasks
 
@@ -88,7 +88,7 @@ If the return type of the outermost script is not OK, return the
 I<appropriate> code to the system.
 
 
-=back 4
+=back
 
 =head2 Tests
 
@@ -108,7 +108,7 @@ tclword.imc, PMCs, the macros, expr's precedence and parens,
 
 =item pass tcl test suite
 
-=back 4
+=back
 
 =head1 Uncategorized Issues
 
@@ -185,7 +185,7 @@ would be:
 	# Note this a change from _parse's current signature 
 	(parsed_data_structure,tcl_status,error) = _parse(tcl_code)
 	(pir_code,tcl_status,error) = _compile(parsed_data_structure)
-	
+
 And now that we have the pir_code, we can either emit the necessary
 PIR (ala parrot's -o option) or we can compile and run it.
 
@@ -238,6 +238,6 @@ PMCs and putting the logic in there hidden under MMD}
 
 complete [error] (need global var support)
 
-=back 4
+=back
 
 =cut

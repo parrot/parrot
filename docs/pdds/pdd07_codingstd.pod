@@ -417,12 +417,12 @@ All .h files should include the following "guards" to prevent
 multiple-inclusion: 
 
     /* file header comments */
-    
+
     #if !defined(PARROT_<FILENAME>_H_GUARD)
     #define PARROT_<FILENAME>_H_GUARD
-    
+
     /* body of file */
-    
+
     #endif /* PARROT_<FILENAME>_H_GUARD */
 
 =item Names of code entities
@@ -688,13 +688,13 @@ function C<del_I_foo()>
 Each comment should be of the form
 
     /*
-    
+
     =item C<function(arguments)>
-    
+
     Description.
-    
+
     =cut
-    
+
     */
 
 This inline POD documentation is parsed to HTML by running:
@@ -823,9 +823,9 @@ the following pathological code ran four times faster on my machine by
 simply swapping C<i> and C<j>.
 
     int a[1000][1000];
-    
+
     ... (a gets populated) ...
-    
+
     int i,j,k;
     for (i=0; i<1000; i++) {
         for (j=0; j<1000; j++) {

@@ -6,11 +6,11 @@ board.imc - a tetris board class.
 
     # get the application singleton
     app = global "Tetris::App"
-    
+
     # create a new board
     find_type $I0, "Tetris::Board"
     board = new $I0, app
-    
+
     # let the current block of the board fall down fast
     board."fall"()
 

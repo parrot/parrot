@@ -229,10 +229,6 @@ END:
     .pcc_end_return
 .end
 
-=item
-
-=cut
-
 .sub __set_pmc method
     .param pmc data
     

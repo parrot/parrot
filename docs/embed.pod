@@ -8,14 +8,14 @@ embed.pod - Parrot embedding system
 =head1 SYNOPSIS
 
     #include "parrot/embed.h"
-    
+
     int main(int argc, char *argv[]) {
         Parrot_Interp interp;
         Parrot_PackFile pf;
         char *bcfile="program.pbc";
 
         argc--; argv++; /* skip the program name */
-        
+
         interp=Parrot_new(0);
         Parrot_init(interp);
 
@@ -29,7 +29,7 @@ embed.pod - Parrot embedding system
         Parrot_runcode(interp, argc, argv); /* argc and argv as seen by the bytecode file */
 
         Parrot_destroy(interp);
-        
+
         return 0;
     }
 
@@ -93,6 +93,7 @@ B<interpreter core setting> is done by a call of C<Parrot_set_run_core()> like:
 See F</include/parrot/interpreter.h> for a list of available cores
 beside PARROT_PREDEREF_CORE, PARROT_JIT_CORE.
 
+=over
 
 =item C<PARROT_PREDEREF_CORE>
 

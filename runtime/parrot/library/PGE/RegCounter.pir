@@ -1,6 +1,6 @@
 =head1 NAME
 
-    PGE::RegCounter - A register naming manager
+PGE::RegCounter - A register naming manager
 
 =head1 SYNOPSIS
 
@@ -9,7 +9,7 @@
     .local pmc rc
     find_global new_rc, "PGE::RegCounter", "new"
     rc = new_rc()
-    
+
     # declare the registers you're going to use
     rc.declare("answer", "$I")
 

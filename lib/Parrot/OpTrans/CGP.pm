@@ -175,6 +175,8 @@ END_C
 
 =item C<Parrot::OpTrans::Compiled>
 
+=back
+
 =cut
 
 1;

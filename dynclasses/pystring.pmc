@@ -174,7 +174,7 @@ Returns the floating-point representation of the string.
 
 /*
 
-=item C<PMC *get_pmc_keyed_int(INTVAL key)>
+=item C<PMC *get_pmc_keyed(INTVAL key)>
 
 Extracts a given character from the string.
 
@@ -277,9 +277,11 @@ Returns pythons string repr (w/o any escaping, just single quotes around)
     }
 
 /*
+
 =item C<STRING *get_string()>
 
 =cut
+
 */
 
     STRING* get_string () {

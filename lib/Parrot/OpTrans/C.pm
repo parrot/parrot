@@ -198,6 +198,8 @@ sub restart_address
 
 =item C<Parrot::OpTrans::Compiled>
 
+=back
+
 =cut
 
 1;

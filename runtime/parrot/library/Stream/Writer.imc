@@ -28,6 +28,7 @@ version 0.1
 =head1 DESCRIPTION
 
 =cut
+
 .include "interpinfo.pasm"
 .namespace ["Stream::Writer"]
 

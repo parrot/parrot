@@ -1,4 +1,4 @@
-=head2 P6C::IMCC::Sub
+=head1 P6C::IMCC::Sub
 
 The object representing the current compilation state, at least with
 respect to the subroutine being currently compiled. Includes the

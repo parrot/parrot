@@ -178,16 +178,16 @@ This module is only usefull for
 
 =over 4
 
-=item
+=item *
 
 computers where you cannot install C<Digest::MD5> (e.g. lack of a C-Compiler)
 
-=item
+=item *
 
 encrypting only small amounts of data (less than one million bytes). I use it to
 hash passwords.
 
-=item
+=item *
 
 educational purposes
 
@@ -201,7 +201,7 @@ educational purposes
  $hash = md5 $data;
  $hash = md5_hex $data;
  $hash = md5_base64 $data;
-    
+
 
  # OO style
  use Digest::MD5;
@@ -256,12 +256,12 @@ provided that the implementation is working correctly.  The same
 checksum can also be calculated in OO style:
 
     use Digest::MD5;
-    
+
     $md5 = Digest::MD5->new;
     $md5->add('foo', 'bar');
     $md5->add('baz');
     $digest = $md5->hexdigest;
-    
+
     print "Digest is $digest\n";
 
 =head1 LIMITATIONS
@@ -270,18 +270,18 @@ This implementation of the MD5 algorithm has some limitations:
 
 =over 4
 
-=item
+=item *
 
 It's slow, very slow. I've done my very best but Digest::MD5 is still about 135 times faster.
 You can only encrypt Data up to one million bytes in an acceptable time. But it's very usefull
 for encrypting small amounts of data like passwords.
 
-=item
+=item *
 
 You can only encrypt up to 2^32 bits = 512 MB on 32bit archs. You should use C<Digest::MD5>
 for those amounts of data.
 
-=item
+=item *
 
 C<Digest::Perl::MD5> loads all data to encrypt into memory. This is a todo.
 
@@ -311,7 +311,7 @@ covered by the following copyright:
 
 =over 4
 
-=item
+=item *
 
 Copyright (C) 1991-2, RSA Data Security, Inc. Created 1991. All
 rights reserved.

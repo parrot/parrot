@@ -8,7 +8,7 @@ Parrot::Docs::Section::Parrot - Root documentation section
 =head1 SYNOPSIS
 
 	use Parrot::Docs::Section::Parrot;
-	
+
 	Parrot::Docs::Section::Parrot->new->write_html;
 
 =head1 DESCRIPTION

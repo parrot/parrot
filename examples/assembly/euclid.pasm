@@ -24,7 +24,7 @@ Page 2:
     I1: m
     I2: n
     I4: r
-    
+
     E1: Find remainder.
     E2: Is it zero?
     E3: Reduce.

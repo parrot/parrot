@@ -9,7 +9,7 @@ classes/genclass.pl - Create a template PMC file
 =head1 SYNOPSIS
 
     % perl classes/genclass.pl Foo > Foo.pmc
-    
+
 =head1 DESCRIPTION
 
 Use this script to generate a template PMC file with stubs for all the
@@ -18,7 +18,7 @@ information on adding a new PMC to Parrot.
 
 To see what a minimal PMC looks like, create a PMC template and compile
 it to C.
-    
+
     cd classes
     perl genclass.pl Foo > foo.pmc
     perl pmc2c.pl foo.pmc

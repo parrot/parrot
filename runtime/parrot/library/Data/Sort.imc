@@ -7,16 +7,15 @@ Data::Sort - simple sort algorithm implemented in PIR
     ...
 
     load_bytecode "library/Data/Sort.imc"
-    
+
     .local pmc sort
-    
+
     sort = find_global "Data::Sort", "simple"
-    
+
     sort( array_pmc )
-    
+
     ...
-    
-    
+
 =head1 DESCRIPTION
 
 Sort the specified array.

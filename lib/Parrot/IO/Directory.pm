@@ -168,7 +168,7 @@ sub relative_path
 
 Returns the directory's parent directory. The root directory returns
 C<undef>.
-	
+
 =cut
 
 sub parent

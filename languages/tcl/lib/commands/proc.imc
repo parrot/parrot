@@ -1,4 +1,4 @@
-=head2 [proc]
+=head1 [proc]
 
 Create a PIR sub on the fly for this user defined proc.
 

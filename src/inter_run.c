@@ -163,10 +163,6 @@ If registers a PMC return values, it is returned.
 Parrot_runops_fromc_args(Parrot_Interp interpreter, PMC *sub,
         const char *sig, ...)>
 
-=item C<void *
-Parrot_runops_fromc_args(Parrot_Interp interpreter, PMC *sub,
-        const char *sig, ...)>
-
 =item C<INTVAL
 Parrot_runops_fromc_args_reti(Parrot_Interp interpreter, PMC *sub,
         const char *sig, ...)>

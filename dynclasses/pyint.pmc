@@ -238,9 +238,9 @@ Adds C<b> to the integer and returns the result in C<*dest>.
 
 /*
 
-=item C<void bitwise_and_int(INTVAL value, PMC *dest)>
+=item C<void bitwise_and(INTVAL value, PMC *dest)>
 
-Calculates the bitwise C<AN> of the integer and C<*value> and returns
+Calculates the bitwise C<AND> of the integer and C<*value> and returns
 the result in C<*dest>.
 
 =cut
@@ -257,7 +257,7 @@ the result in C<*dest>.
 
 =item C<void bitwise_and_int(INTVAL value, PMC *dest)>
 
-Calculates the bitwise C<AN> of the integer and C<*value> and returns
+Calculates the bitwise C<AND> of the integer and C<*value> and returns
 the result in C<*dest>.
 
 =cut

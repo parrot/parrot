@@ -29,7 +29,7 @@ before we can continue, like Unicode for the C<\u> escapes. I've tried to
 start documenting these in the TODO with sections like C<given Unicode>, 
 then listing the things that we can do once we have that. 
 
-=back 4
+=back
 
 =head1 DOCUMENTATION
 
@@ -46,7 +46,7 @@ Are the docs in C<docs/> useful? Could use someone to proof them, and
 verify that there are no missing chunks (if missing, write them, or 
 get them added to the C<TODO>), and that they are coherent.
 
-=back 4
+=back
 
 =head1 PIR
 
@@ -78,7 +78,7 @@ on our own in the meantime.
 To find a command to work on, just check out the TODO - several commands
 are currently not implemented, and others are missing various subcommands.
 
-=back 4
+=back
 
 =cut
 
