@@ -1,49 +1,146 @@
-/* float.pmc
- *  Copyright: 2003 The Perl Foundation.  All Rights Reserved.
- *  CVS Info $Id$
- *  Overview:
- *	Float PMC class
- *  Data Structure and Algorithms:
- *  History:
- *  Notes:
- *      This class is for languages that want a value-restricted
- *      float type without going to an N register.
- *  References:
- */
+/*
+Copyright: 2003 The Perl Foundation.  All Rights Reserved.
+$Id$
+
+=head1 NAME
+
+classes/float.pmc - Floating-point number
+
+=head1 DESCRIPTION
+
+C<Float> extends C<mmd_default> to provide a floating-point number for
+languages that want a value-restricted C<float> type without going to an
+N register.
+
+=head2 Methods
+
+=over 4
+
+=cut
+
+*/
 
 #include "parrot/parrot.h"
 
 pmclass Float extends mmd_default {
 
-    void init() {	/* pmc2c doesn't like empty classes */
-	SUPER();
+/*
+
+=item C<void init()>
+
+Initializes the number.
+
+=cut
+
+*/
+
+    void init() {   /* pmc2c doesn't like empty classes */
+        SUPER();
     }
+
+/*
+
+=item C<void set_integer_native(INTVAL value)>
+
+Sets the value of the number to C<value>.
+
+=cut
+
+*/
 
     void set_integer_native(INTVAL value) {
-      PMC_num_val(SELF) = value;
+        PMC_num_val(SELF) = value;
     } 
 
+/*
+
+=item C<void set_number_native(FLOATVAL value)>
+
+Sets the value of the number to C<value>.
+
+=cut
+
+*/
+
     void set_number_native(FLOATVAL value) {
-      PMC_num_val(SELF) = value;
+        PMC_num_val(SELF) = value;
     }
+
+/*
+
+=item C<void set_string_native(STRING* value)>
+
+Sets the value of the number by converting C<*value> to a number.
+
+=cut
+
+*/
 
     void set_string_native(STRING* value) {
-      PMC_num_val(SELF) = string_to_num(value);
+        PMC_num_val(SELF) = string_to_num(value);
     }
+
+/*
+
+=item C<void set_pmc(PMC *value)>
+
+Sets the value of the number to the value in C<*value>.
+
+=cut
+
+*/
 
     void set_pmc(PMC *value) {
-      PMC_num_val(SELF) = VTABLE_get_number(INTERP, value);
+        PMC_num_val(SELF) = VTABLE_get_number(INTERP, value);
     }
+
+/*
+
+=item C<FLOATVAL get_number()>
+
+Returns the value of the number.
+
+=cut
+
+*/
 
     FLOATVAL get_number() {
-      return PMC_num_val(SELF);
+        return PMC_num_val(SELF);
     }
 
+/*
+
+=item C<INTVAL get_integer()>
+
+Returns an integer representation of the number (by casting).
+
+=cut
+
+*/
+
    INTVAL get_integer() {
-      return (INTVAL) PMC_num_val(SELF);
+        return (INTVAL) PMC_num_val(SELF);
    }
 
+/*
+
+=item C<STRING* get_string()>
+
+Returns a Parrot string representation of the number.
+
+=cut
+
+*/
+
    STRING* get_string() {
-      return string_from_num(INTERP, PMC_num_val(SELF));
+        return string_from_num(INTERP, PMC_num_val(SELF));
    }
 }
+
+/*
+
+=back
+
+=cut
+
+*/

@@ -1,14 +1,22 @@
-/* intlist.pmc
- *  Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
- *  CVS Info
- *     $Id$
- *  Overview:
- *     These are the vtable functions for the IntList class
- *  Data Structure and Algorithms:
- *  History:
- *  Notes:
- *  References:
- */
+/*
+Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+$Id$
+
+=head1 NAME
+
+classes/intlist.pmc - Array of integers
+
+=head1 DESCRIPTION
+
+C<IntList> provides an integer-only array.
+
+=head2 Methods
+
+=over 4
+
+=cut
+
+*/
 
 #include "parrot/parrot.h"
 
@@ -16,12 +24,32 @@
 
 pmclass IntList need_ext {
 
-    PMC* clone () {
-	PMC* dest = pmc_new_noinit(INTERP, SELF->vtable->base_type);
+/*
+
+=item C<PMC *clone()>
+
+Creates and returns a clone of the list.
+
+=cut
+
+*/
+
+	PMC* clone () {
+		PMC* dest = pmc_new_noinit(INTERP, SELF->vtable->base_type);
         PObj_custom_mark_SET(dest);
         PMC_data(dest) = intlist_clone(INTERP, (IntList *) PMC_data(SELF));
-	return dest;
+		return dest;
     }
+
+/*
+
+=item C<void init()>
+
+Initializes the list.
+
+=cut
+
+*/
 
     void init () {
         PMC_data(SELF) = intlist_new(INTERP);
@@ -29,13 +57,43 @@ pmclass IntList need_ext {
         PObj_custom_mark_SET(SELF);
     }
 
+/*
+
+=item C<void mark()>
+
+Marks the list as live.
+
+=cut
+
+*/
+
     void mark () {
         intlist_mark(INTERP, (IntList *) PMC_data(SELF));
     }
 
+/*
+
+=item C<void set_integer_keyed_int(INTVAL key, INTVAL value)>
+
+Sets C<value> at index C<key>.
+
+=cut
+
+*/
+
     void set_integer_keyed_int (INTVAL key, INTVAL value) {
         intlist_assign(INTERP, (IntList*) PMC_data(SELF), key, value);
     }
+
+/*
+
+=item C<void set_integer_keyed (PMC *key, INTVAL value)>
+
+Sets C<value> at index C<*key>.
+
+=cut
+
+*/
 
     void set_integer_keyed (PMC* key, INTVAL value) {
         INTVAL ix;
@@ -46,13 +104,43 @@ pmclass IntList need_ext {
         intlist_assign(INTERP, (IntList*) PMC_data(SELF), ix, value);
     }
 
+/*
+
+=item C<INTVAL get_integer()>
+
+Returns the number of elements in the list.
+
+=cut
+
+*/
+
     INTVAL get_integer () {
         return intlist_length(INTERP, (IntList*) PMC_data(SELF));
     }
 
+/*
+
+=item C<INTVAL get_integer_keyed_int(INTVAL key)>
+
+Returns the value of the element at index C<key>.
+
+=cut
+
+*/
+
     INTVAL get_integer_keyed_int (INTVAL key) {
         return intlist_get(INTERP, (IntList*) PMC_data(SELF), key);
     }
+
+/*
+
+=item C<INTVAL get_integer_keyed(PMC *key)>
+
+Returns the value of the element at index C<*key>.
+
+=cut
+
+*/
 
     INTVAL get_integer_keyed (PMC* key) {
         INTVAL ix;
@@ -61,20 +149,68 @@ pmclass IntList need_ext {
         return intlist_get(INTERP, (IntList*) PMC_data(SELF), ix);
     }
 
+/*
+
+=item C<void push_integer(INTVAL value)>
+
+Adds C<value> to the end of the list.
+
+=cut
+
+*/
+
     void push_integer (INTVAL value) {
         intlist_push(INTERP, (IntList*) PMC_data(SELF), value);
     }
+
+/*
+
+=item C<INTVAL pop_integer()>
+
+Removes and returns the last element in the list.
+
+=cut
+
+*/
 
     INTVAL pop_integer() {
         return intlist_pop(INTERP, (IntList*) PMC_data(SELF));
     }
 
+/*
+
+=item C<void unshift_integer(INTVAL value)>
+
+Adds C<value> to the start of the list.
+
+=cut
+
+*/
+
     void unshift_integer (INTVAL value) {
         intlist_unshift(INTERP, (IntList**) &PMC_data(SELF), value);
     }
+
+/*
+
+=item C<INTVAL shift_integer()>
+
+Removes and returns the first element in the list.
+
+=cut
+
+*/
 
     INTVAL shift_integer() {
         return intlist_shift(INTERP, (IntList**) &PMC_data(SELF));
     }
 
 }
+
+/*
+
+=back
+
+=cut
+
+*/

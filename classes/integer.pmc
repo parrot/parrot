@@ -1,17 +1,38 @@
-/* integer.pmc
- *  Copyright: 2003 The Perl Foundation.  All Rights Reserved.
- *  CVS Info $Id$
- *  Overview:
- *	Integer PMC class
- *  Data Structure and Algorithms:
- *  History:
- *  Notes:
- *      This class is for languages that want a value-restricted
- *      integer type without going to an I register.
- *  References:
- */
+/*
+Copyright: 2003 The Perl Foundation.  All Rights Reserved.
+$Id$
+
+=head1 NAME
+
+classes/integer.pmc - Integer PMC class
+
+=head1 DESCRIPTION
+
+C<Integer> extends C<mmd_default> to provide an integer for languages
+that want a value-restricted integer type without going to an I
+register.
+
+=head2 Functions
+
+=over 4
+
+=cut
+
+*/
 
 #include "parrot/parrot.h"
+
+/*
+
+=item C<static void
+integer_divide(Parrot_Interp interp, PMC* self, PMC* value, PMC* destination)>
+
+Performs integer division of C<*self> by C<*value>, placing the result
+in C<*destination>.
+
+=cut
+
+*/
 
 static void
 integer_divide(Parrot_Interp interp, PMC* self, PMC* value, PMC* destination) {
@@ -23,54 +44,174 @@ integer_divide(Parrot_Interp interp, PMC* self, PMC* value, PMC* destination) {
 
 pmclass Integer extends mmd_default {
 
-    /*
-     * class_init() code is run during Parrot_<class>_class_init()
-     */
+/*
+
+=back
+
+=head2 Methods
+
+=over 4
+
+=item C<void class_init()>
+
+C<class_init()> code is run during C<<Parrot_<class>_class_init()>>.
+
+Replaces multi-method C<divide()> with C<integer_divide()>.
+
+=cut
+
+*/
+
     void class_init() {
-	/*
-	 * override divide to do integer division
-	 */
-	mmd_register(INTERP, MMD_DIVIDE,
-		enum_class_Integer, enum_class_Integer,
-		(funcptr_t)integer_divide);
+        mmd_register(INTERP, MMD_DIVIDE,
+            enum_class_Integer, enum_class_Integer,
+            (funcptr_t)integer_divide);
     }
+
+/*
+
+=item C<void set_integer_native(INTVAL value)>
+
+=cut
+
+*/
 
     void set_integer_native(INTVAL value) {
-      PMC_int_val(SELF) = value;
+        PMC_int_val(SELF) = value;
     }
+
+/*
+
+=item C<void set_number_native(FLOATVAL value)>
+
+Sets the value of the integer to C<value>.
+
+=cut
+
+*/
 
     void set_number_native(FLOATVAL value) {
-      PMC_int_val(SELF) = value;
+        PMC_int_val(SELF) = value;
     }
+
+/*
+
+=item C<void set_string_native(STRING* value)>
+
+Sets the value of the integer to the result of converting C<*value> to a
+number.
+
+=cut
+
+*/
 
     void set_string_native(STRING* value) {
-      PMC_int_val(SELF) = string_to_num(value);
+        PMC_int_val(SELF) = string_to_num(value);
     }
+
+/*
+
+=item C<void set_pmc(PMC *value)>
+
+Sets the value of the integer to the integer value of C<*value>.
+
+=cut
+
+*/
 
     void set_pmc(PMC *value) {
-      PMC_int_val(SELF) = VTABLE_get_integer(INTERP, value);
+        PMC_int_val(SELF) = VTABLE_get_integer(INTERP, value);
     }
+
+/*
+
+=item C<FLOATVAL get_number()>
+
+Returns the value of the integer as a floating point number.
+
+=cut
+
+*/
 
     FLOATVAL get_number() {
-      return PMC_int_val(SELF);
+        return PMC_int_val(SELF);
     }
+
+/*
+
+=item C<INTVAL get_integer()>
+
+Returns the value of the integer.
+
+=cut
+
+*/
 
     INTVAL get_integer() {
-      return (INTVAL)PMC_int_val(SELF);
+        return (INTVAL)PMC_int_val(SELF);
     }
+
+/*
+
+=item C<INTVAL get_bool()>
+
+Returns the boolean value of the integer.
+
+=cut
+
+*/
 
     INTVAL get_bool() {
-      return(PMC_int_val(SELF) != 0);
+        return(PMC_int_val(SELF) != 0);
     }
+
+/*
+
+=item C<STRING* get_string()>
+
+Returns the string representation of the integer.
+
+=cut
+
+*/
 
     STRING* get_string() {
-      return string_from_num(INTERP, PMC_int_val(SELF));
+        return string_from_num(INTERP, PMC_int_val(SELF));
     }
 
+/*
+
+=item C<void increment()>
+
+Increments the integer.
+
+=cut
+
+*/
+
     void increment() {
-      PMC_int_val(SELF)++;
+        PMC_int_val(SELF)++;
     }
+
+/*
+
+=item C<void decrement()>
+
+Decrements the integer.
+
+=cut
+
+*/
+
     void decrement() {
-      PMC_int_val(SELF)--;
+        PMC_int_val(SELF)--;
     }
 }
+
+/*
+
+=back
+
+=cut
+
+*/

@@ -1,27 +1,55 @@
-/* exception_handler.pmc
- *  Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
- *  CVS Info
- *     $Id$
- *  Overview:
- *     This is the exception_handler class
- *  Data Structure and Algorithms:
- *  History:
- *     Initial revision by leo 2003.07.10
- *  Notes:
- *     When an exception handler is called, the exception object is
- *     passed as REG_PMC(5), the original contents of this register
- *     is in the exception object's _P5 attribute.
- *  References:
- */
+/*
+Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+$Id$
+
+=head1 NAME
+
+classes/exception_handler.pmc - Exception Handler PMC
+
+=head1 DESCRIPTION
+
+When an exception handler is called, the exception object is passed as
+C<REG_PMC(5)>, the original contents of this register is in the
+exception object's C<_P5> attribute.
+
+=head2 Methods
+
+=over 4
+
+=cut
+
+*/
 
 #include "parrot/parrot.h"
 #include "parrot/method_util.h"
 
 pmclass Exception_Handler extends Continuation {
 
+/*
+
+=item C<void init()>
+
+Initializes the exception handler.
+
+=cut
+
+*/
+
     void init() {
-	PObj_get_FLAGS(SELF) &= ~PObj_private0_FLAG;
-	SUPER();
+        PObj_get_FLAGS(SELF) &= ~PObj_private0_FLAG;
+        SUPER();
     }
 
 }
+
+/*
+
+=back
+
+=head1 HISTORY
+
+Initial revision by leo 2003.07.10.
+
+=cut
+
+*/

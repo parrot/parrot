@@ -1,106 +1,234 @@
-/* exception.pmc
- *  Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
- *  CVS Info
- *     $Id$
- *  Overview:
- *     This is the exception base class
- *  Data Structure and Algorithms:
- *     As we are still lacking objects, this class is based
- *     on a SArray. This will probably change.
- *
- *     An exception object has these attributes:
- *     - 0 _message ... textual representation
- *     - 1 _type    ... exception type (s. exceptions.h, except_type.pasm)
- *     - 2 _severity .. exception severity (s. -""-, except_severity.pasm)
- *     - 3 _P5      ... contents of REG_PMC(5)
- *     - 4 _return_cc . return continuation
- *     Optional:
- *     - 5 _C_file ...  origin of exception
- *     - 6 _C_line ...    in C code
- *     - 7 _P_file ...  origin of exception
- *     - 8 _P_line ....   in PASM/PIR/Perl ... source
- *     - any information attached by the HL. This shouldn't start
- *       with an underscore (that is reserved for Parrot's internal
- *       usage. These are stored as properties.
- *  History:
- *     Initial revision by leo 2003.07.10
- *  Notes:
- *     When an exception handler is called, the exception object is
- *     passed as REG_PMC(5), the original contents of this register
- *     is in the exception object's _P5 attribute.
- *
- *     This is experimental code.
- *     The enum_class of the Exception isn't fixed.
- *     The interface isn't fixed.
- *
- *  References:
- */
+/*
+Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+$Id$
+
+=head1 NAME
+
+classes/exception.pmc - Exception PMC
+
+=head1 DESCRIPTION
+
+This is the exception base class.
+
+As we are still lacking objects, this class is based on a C<SArray>.
+This will probably change.
+
+An exception object has these attributes:
+
+=over 4
+
+=item 0 C<_message>
+
+Textual representation of the exception.
+
+=item 1 C<_type>
+
+The exception type, (see F<src/exceptions.h>, F<except_type.pasm>).
+
+=item 2 C<_severity>
+
+The severity of the exception, (see F<src/exceptions.h>,
+F<except_severity.pasm>).
+
+=item 3 C<_P5>
+
+The contents of C<REG_PMC(5)>.
+
+=item 4 C<_return_cc>
+
+The return continuation.
+
+=back
+
+Optional:
+
+=over 4
+
+=item 5 C<_C_file>
+
+The C code file in which the exception was raised.
+
+=item 6 C<_C_line>
+
+The line of C code on which the exception was raised.
+
+=item 7 C<_P_file>
+
+The PASM/PIR/Perl file in which the exception was raised.
+
+=item 8 C<_P_line>
+
+The line of PASM/PIR/Perl code on which the exception was raised.
+    
+=item ...
+
+Any information attached by the HL. This shouldn't start with an
+underscore (that is reserved for Parrot's internal usage. These are
+stored as properties.
+
+=back
+
+When an exception handler is called, the exception object is passed as
+C<REG_PMC(5)>, the original contents of this register is in the
+exception object's C<_P5> attribute.
+
+This is experimental code. The C<enum_class> of the C<Exception> isn't
+fixed. The interface isn't fixed.
+
+=head2 Methods
+
+=over 4
+
+=cut
+
+*/
 
 #include "parrot/parrot.h"
 #include "parrot/method_util.h"
 
 pmclass Exception extends SArray need_ext {
 
-    void init() {
+/*
 
-	SUPER();
-	DYNSELF.set_integer_native(9);
-	DYNSELF.set_string_keyed_int(0, NULL);
-	DYNSELF.set_integer_keyed_int(1, 0);
-	DYNSELF.set_integer_keyed_int(2, 0);
-	DYNSELF.set_pmc_keyed_int(3, NULL);
-	DYNSELF.set_pmc_keyed_int(4, NULL);
+=item C<void init()>
+
+Initializes the exception with default values.
+
+=cut
+
+*/
+
+    void init() {
+        SUPER();
+        DYNSELF.set_integer_native(9);
+        DYNSELF.set_string_keyed_int(0, NULL);
+        DYNSELF.set_integer_keyed_int(1, 0);
+        DYNSELF.set_integer_keyed_int(2, 0);
+        DYNSELF.set_pmc_keyed_int(3, NULL);
+        DYNSELF.set_pmc_keyed_int(4, NULL);
     }
+
+/*
+
+=item C<STRING* get_string_keyed(PMC* key)>
+
+Returns the Parrot string value for C<*key>.
+
+=cut
+
+*/
 
     STRING* get_string_keyed(PMC* key) {
-	STRING* s = key_string(INTERP, key);
-	if (!string_compare(INTERP, s,
-		    string_from_cstring(INTERP, "_message", 0)))
-	    return DYNSELF.get_string_keyed_int(0);
-	return 0;
+        STRING* s = key_string(INTERP, key);
+        if (!string_compare(INTERP, s,
+            string_from_cstring(INTERP, "_message", 0)))
+            return DYNSELF.get_string_keyed_int(0);
+        return 0;
     }
+
+/*
+
+=item C<INTVAL get_integer_keyed(PMC *key)>
+
+Returns the integer value for C<*key>.
+
+=cut
+
+*/
 
     INTVAL get_integer_keyed(PMC* key) {
-	STRING* s = key_string(INTERP, key);
-	if (!string_compare(INTERP, s,
-		    string_from_cstring(INTERP, "_type", 0)))
-	    return DYNSELF.get_integer_keyed_int(1);
-	if (!string_compare(INTERP, s,
-		    string_from_cstring(INTERP, "_severity", 0)))
-	    return DYNSELF.get_integer_keyed_int(2);
-	return 0;
+        STRING* s = key_string(INTERP, key);
+        if (!string_compare(INTERP, s,
+            string_from_cstring(INTERP, "_type", 0)))
+            return DYNSELF.get_integer_keyed_int(1);
+        if (!string_compare(INTERP, s,
+            string_from_cstring(INTERP, "_severity", 0)))
+            return DYNSELF.get_integer_keyed_int(2);
+        return 0;
     }
+
+/*
+
+=item C<PMC* get_pmc_keyed(PMC* key)>
+
+Returns the PMC value for C<*key>.
+
+=cut
+
+*/
 
     PMC* get_pmc_keyed(PMC* key) {
-	STRING* s = key_string(INTERP, key);
-	if (!string_compare(INTERP, s,
-		    string_from_cstring(INTERP, "_P5", 0)))
-	    return DYNSELF.get_pmc_keyed_int(3);
-	if (!string_compare(INTERP, s,
-		    string_from_cstring(INTERP, "_invoke_cc", 0)))
-	    return DYNSELF.get_pmc_keyed_int(4);
-	return DYNSELF.getprop(s);
+        STRING* s = key_string(INTERP, key);
+        if (!string_compare(INTERP, s,
+            string_from_cstring(INTERP, "_P5", 0)))
+            return DYNSELF.get_pmc_keyed_int(3);
+        if (!string_compare(INTERP, s,
+            string_from_cstring(INTERP, "_invoke_cc", 0)))
+            return DYNSELF.get_pmc_keyed_int(4);
+        return DYNSELF.getprop(s);
     }
+
+/*
+
+=item C<void set_string_keyed(PMC *key, STRING *value)>
+
+Sets the Parrot string value for C<*key>.
+
+=cut
+
+*/
 
     void set_string_keyed(PMC* key, STRING* value) {
-	STRING* s = key_string(INTERP, key);
-	if (!string_compare(INTERP, s,
-		    string_from_cstring(INTERP, "_message", 0)))
-	    DYNSELF.set_string_keyed_int(0, value);
+        STRING* s = key_string(INTERP, key);
+        if (!string_compare(INTERP, s,
+            string_from_cstring(INTERP, "_message", 0)))
+            DYNSELF.set_string_keyed_int(0, value);
     }
+
+/*
+
+=item C<void set_integer_keyed(PMC* key, INTVAL value) >
+
+Sets the integer value for C<*key>.
+
+=cut
+
+*/
 
     void set_integer_keyed(PMC* key, INTVAL value) {
-	STRING* s = key_string(INTERP, key);
-	if (!string_compare(INTERP, s,
-		    string_from_cstring(INTERP, "_type", 0)))
-	    DYNSELF.set_integer_keyed_int(1, value);
-	if (!string_compare(INTERP, s,
-		    string_from_cstring(INTERP, "_severity", 0)))
-	    DYNSELF.set_integer_keyed_int(2, value);
+        STRING* s = key_string(INTERP, key);
+        if (!string_compare(INTERP, s,
+            string_from_cstring(INTERP, "_type", 0)))
+            DYNSELF.set_integer_keyed_int(1, value);
+        if (!string_compare(INTERP, s,
+            string_from_cstring(INTERP, "_severity", 0)))
+            DYNSELF.set_integer_keyed_int(2, value);
     }
 
+/*
+
+=item C<void set_pmc_keyed(PMC *key, PMC *value)>
+
+Sets the PMC value for C<*key>.
+
+=cut
+
+*/
+
     void set_pmc_keyed(PMC *key, PMC *value) {
-	STRING* s = key_string(INTERP, key);
-	DYNSELF.setprop(s, value);
+        STRING* s = key_string(INTERP, key);
+        DYNSELF.setprop(s, value);
     }
 }
+
+/*
+
+=back
+
+=head1 HISTORY
+
+Initial revision by leo 2003.07.10.
+
+=cut
+
+*/
