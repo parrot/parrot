@@ -31,6 +31,9 @@
 
 .constant Status	I12
 
+# This may move elsewhere, hence the indirection
+.constant NestLevel	I14
+
 .constant IntStack      I31
 
 .constant TempNum	N5
@@ -622,7 +625,12 @@ MaybeCompileWord:
     eq .CurrentWord, ":", DoneInterpretWord
     ne .CurrentWord, ";", DoCompileStuff
     set .Mode, .InterpretMode
-    set .UserOps[.CompileWord], .CompileBuffer
+
+    set .WordBody, .CompileBuffer
+    bsr CompileString
+    set .TempInt, .CompiledWordPMC[1]
+    set .CoreOps[.CompileWord], .TempInt
+
     set .CompileWord, ""
     set .CompileBuffer, ""
     branch DoneInterpretWord
@@ -671,293 +679,293 @@ Int_One_Minus:
     .PushInt
     branch DoneInterpretWord
 Int_One_Plus:
-    .PopInt # was a restore
+    .PopInt 
     inc .IntStack
-    .PushInt # was a save intstack
+    .PushInt 
     branch DoneInterpretWord
 Int_Dot:
-    .PopInt # was a restore
+    .PopInt 
     print .IntStack
     print " "
     branch DoneInterpretWord
 Int_Dot_Stack:
     branch DoneInterpretWord
 Int_Dup:
-    .PopInt # was a restore
-    .PushInt # was a save intstack
-    .PushInt # was a save intstack
+    .PopInt 
+    .PushInt 
+    .PushInt 
     branch DoneInterpretWord
 Int_Drop:
-    .PopInt # was a restore
+    .PopInt 
     branch DoneInterpretWord
 Int_Swap:
-    .PopInt # was a restore
+    .PopInt 
     set .TempInt, .IntStack
-    .PopInt # was a restore
+    .PopInt 
     set .TempInt2, .IntStack
     set .IntStack, .TempInt
-    .PushInt # was a save intstack
+    .PushInt 
     set .IntStack, .TempInt2
-    .PushInt # was a save intstack
+    .PushInt 
     branch DoneInterpretWord
 Quit:
     end
 Int_Abs:
-    .PopInt # was a restore
+    .PopInt 
     ge .IntStack, 0, DoneIntAbs
     mul .IntStack, .IntStack, -1
 DoneIntAbs:
-    .PushInt # was a save intstack
+    .PushInt 
     branch DoneInterpretWord
 Int_Max:
-    .PopInt # was a restore
+    .PopInt 
     set .TempInt, .IntStack
-    .PopInt # was a restore
+    .PopInt 
     ge .IntStack, .TempInt, Done_IntMax
     set .IntStack, .TempInt
 Done_IntMax:
-    .PushInt # was a save intstack
+    .PushInt 
     branch DoneInterpretWord
 Int_Min:
-    .PopInt # was a restore
+    .PopInt 
     set .TempInt, .IntStack
-    .PopInt # was a restore
+    .PopInt 
     le .IntStack, .TempInt, Done_IntMin
-    .PushInt # was a save intstack
+    .PushInt 
     set .IntStack, .TempInt
 Done_IntMin:
-    .PushInt # was a save intstack
+    .PushInt 
     branch DoneInterpretWord
 Int_Add:
-    .PopInt # was a restore
+    .PopInt 
     set .TempInt, .IntStack
-    .PopInt # was a restore
+    .PopInt 
     add .IntStack, .IntStack, .TempInt
-    .PushInt # was a save intstack
+    .PushInt 
     branch DoneInterpretWord
 Int_Sub:
-    .PopInt # was a restore
+    .PopInt 
     set .TempInt, .IntStack
-    .PopInt # was a restore
+    .PopInt 
     sub .IntStack, .IntStack, .TempInt
-    .PushInt # was a save intstack
+    .PushInt 
     branch DoneInterpretWord
 Int_Negate:
-    .PopInt # was a restore
+    .PopInt 
     mul .IntStack, .IntStack, -1
-    .PushInt # was a save intstack
+    .PushInt 
     branch DoneInterpretWord
 Int_Mul:
-    .PopInt # was a restore
+    .PopInt 
     set .TempInt, .IntStack
-    .PopInt # was a restore
+    .PopInt 
     mul .IntStack, .IntStack, .TempInt
-    .PushInt # was a save intstack
+    .PushInt 
     branch DoneInterpretWord
 Int_Div:
-    .PopInt # was a restore
+    .PopInt 
     set .TempInt, .IntStack
-    .PopInt # was a restore
+    .PopInt 
     div .IntStack, .IntStack, .TempInt
-    .PushInt # was a save intstack
+    .PushInt 
     branch DoneInterpretWord
 Int_Mod:
-    .PopInt # was a restore
+    .PopInt 
     set .TempInt, .IntStack
-    .PopInt # was a restore
+    .PopInt 
     mod .IntStack, .IntStack, .TempInt
-    .PushInt # was a save intstack
+    .PushInt 
     branch DoneInterpretWord
 Int_Slash_Mod:
-    .PopInt # was a restore
+    .PopInt 
     set .TempInt, .IntStack
-    .PopInt # was a restore
+    .PopInt 
     set .TempInt2, .IntStack
     mod .IntStack, .TempInt2, .TempInt
-    .PushInt # was a save intstack
+    .PushInt 
     div .IntStack, .TempInt2, .TempInt
-    .PushInt # was a save intstack
+    .PushInt 
     branch DoneInterpretWord
 Int_GT:
-    .PopInt # was a restore
+    .PopInt 
     set .TempInt, .IntStack
-    .PopInt # was a restore
+    .PopInt 
     gt .TempInt, .IntStack, Int_is_GT
     set .IntStack, 0
     branch Int_GT_end
  Int_is_GT:
     set .IntStack, 1
  Int_GT_end:
-    .PushInt # was a save intstack
+    .PushInt 
     branch DoneInterpretWord
 Int_GE:
-    .PopInt # was a restore
+    .PopInt 
     set .TempInt, .IntStack
-    .PopInt # was a restore
+    .PopInt 
     ge .TempInt, .IntStack, Int_is_GE
     set .IntStack, 0
     branch Int_GE_end
  Int_is_GE:
     set .IntStack, 1
  Int_GE_end:
-    .PushInt # was a save intstack
+    .PushInt 
     branch DoneInterpretWord
 Int_NE:
-    .PopInt # was a restore
+    .PopInt 
     set .TempInt, .IntStack
-    .PopInt # was a restore
+    .PopInt 
     ne .TempInt, .IntStack, Int_is_NE
     set .IntStack, 0
     branch Int_NE_end
  Int_is_NE:
     set .IntStack, 1
  Int_NE_end:
-    .PushInt # was a save intstack
+    .PushInt 
     branch DoneInterpretWord
 Int_EQ:
-    .PopInt # was a restore
+    .PopInt 
     set .TempInt, .IntStack
-    .PopInt # was a restore
+    .PopInt 
     eq .TempInt, .IntStack, Int_is_EQ
     set .IntStack, 0
     branch Int_EQ_end
  Int_is_EQ:
     set .IntStack, 1
  Int_EQ_end:
-    .PushInt # was a save intstack
+    .PushInt 
     branch DoneInterpretWord
 Int_LT:
-    .PopInt # was a restore
+    .PopInt 
     set .TempInt, .IntStack
-    .PopInt # was a restore
+    .PopInt 
     lt .TempInt, .IntStack, Int_is_LT
     set .IntStack, 0
     branch Int_LT_end
  Int_is_LT:
     set .IntStack, 1
  Int_LT_end:
-    .PushInt # was a save intstack
+    .PushInt 
     branch DoneInterpretWord
 Int_LE:
-    .PopInt # was a restore
+    .PopInt 
     set .TempInt, .IntStack
-    .PopInt # was a restore
+    .PopInt 
     le .TempInt, .IntStack, Int_is_LE
     set .IntStack, 0
     branch Int_LE_end
  Int_is_LE:
     set .IntStack, 1
  Int_LE_end:
-    .PushInt # was a save intstack
+    .PushInt 
     branch DoneInterpretWord
 Int_LT0:
-    .PopInt # was a restore
+    .PopInt 
     lt .IntStack, 0, Int_is_LT0
     set .IntStack, 0
     branch Int_LT0_end
  Int_is_LT0:
     set .IntStack, 1
  Int_LT0_end:
-    .PushInt # was a save intstack
+    .PushInt 
     branch DoneInterpretWord
 Int_LE0:
-    .PopInt # was a restore
+    .PopInt 
     le .IntStack, 0, Int_is_LE0
     set .IntStack, 0
     branch Int_LE0_end
  Int_is_LE0:
     set .IntStack, 1
  Int_LE0_end:
-    .PushInt # was a save intstack
+    .PushInt 
     branch DoneInterpretWord
 Int_NE0:
-    .PopInt # was a restore
+    .PopInt 
     ne .IntStack, 0, Int_is_NE0
     set .IntStack, 0
     branch Int_NE0_end
  Int_is_NE0:
     set .IntStack, 1
  Int_NE0_end:
-    .PushInt # was a save intstack
+    .PushInt 
     branch DoneInterpretWord
 Int_EQ0:
-    .PopInt # was a restore
+    .PopInt 
     eq .IntStack, 0, Int_is_EQ0
     set .IntStack, 0
     branch Int_EQ0_end
  Int_is_EQ0:
     set .IntStack, 1
  Int_EQ0_end:
-    .PushInt # was a save intstack
+    .PushInt 
     branch DoneInterpretWord
 Int_GT0:
-    .PopInt # was a restore
+    .PopInt 
     gt .IntStack, 0, Int_is_GT0
     set .IntStack, 0
     branch Int_GT0_end
  Int_is_GT0:
     set .IntStack, 1
  Int_GT0_end:
-    .PushInt # was a save intstack
+    .PushInt 
     branch DoneInterpretWord
 Int_GE0:
-    .PopInt # was a restore
+    .PopInt 
     ge .IntStack, 0, Int_is_GE0
     set .IntStack, 0
     branch Int_GE0_end
  Int_is_GE0:
     set .IntStack, 1
  Int_GE0_end:
-    .PushInt # was a save intstack
+    .PushInt 
     branch DoneInterpretWord
 
 Int_And:
-    .PopInt # was a restore
+    .PopInt 
     set .TempInt, .IntStack
-    .PopInt # was a restore
+    .PopInt 
     band .IntStack, .TempInt
-    .PushInt # was a save intstack
+    .PushInt 
     branch DoneInterpretWord
 Int_Or:
-    .PopInt # was a restore
+    .PopInt 
     set .TempInt, .IntStack
-    .PopInt # was a restore
+    .PopInt 
     bor .IntStack, .TempInt
-    .PushInt # was a save intstack
+    .PushInt 
     branch DoneInterpretWord
 Int_XOr:
-    .PopInt # was a restore
+    .PopInt 
     set .TempInt, .IntStack
-    .PopInt # was a restore
+    .PopInt 
     bxor .IntStack, .TempInt
-    .PushInt # was a save intstack
+    .PushInt 
     branch DoneInterpretWord
 Int_Invert:
-    .PopInt # was a restore
+    .PopInt 
     bnot .IntStack, .IntStack
-    .PushInt # was a save intstack
+    .PushInt 
     branch DoneInterpretWord
 Int_LShift:
-    .PopInt # was a restore
+    .PopInt 
     set .TempInt, .IntStack
-    .PopInt # was a restore
+    .PopInt 
     shl .IntStack, .IntStack, .TempInt
-    .PushInt # was a save intstack
+    .PushInt 
     branch DoneInterpretWord
 Int_RShift:
-    .PopInt # was a restore
+    .PopInt 
     set .TempInt, .IntStack
-    .PopInt # was a restore
+    .PopInt 
     shr .IntStack, .IntStack, .TempInt
-    .PushInt # was a save intstack
+    .PushInt 
     branch DoneInterpretWord
 Int_Over:
-    .PopInt # was a restore
+    .PopInt 
     set .TempInt, .IntStack
-    .PopInt # was a restore
-    .PushInt # was a save intstack
+    .PopInt 
+    .PushInt 
     .PushTempInt
-    .PushInt # was a save intstack
+    .PushInt 
     branch DoneInterpretWord
 
 DoneInterpretWord:
@@ -1031,9 +1039,16 @@ CompileString:
     set .Commands, .WordBody
     set .NewBodyString, ""
 
+#    print "Being asked to compile:"
+#    print .WordBody
+#    print ":\n"
+
 CompileWord:
     # No space!
     bsr EatLeadingWhitespace
+
+    # If we're out of stuff, just leave
+    eq .Commands, "", DoTheCompile
 
     # Get the next word in the command buffer
     bsr CollectWord
@@ -1045,10 +1060,13 @@ CompileWord:
     length .TempInt, .Commands    
     if .TempInt, CompileWord
 
+ DoTheCompile:
     # Add in the return
     concat .NewBodyString, "ret\n"
 
     # Compile the string
+#    print "Compiling:\n"
+#    print .NewBodyString
     compile .CompiledWordPMC, .PASMCompiler, .NewBodyString
 
     # And we're done
@@ -1123,6 +1141,12 @@ CheckForString:
 
 # Control flow and such, where a simple substitution won't do
 AddSpecialWord:
+    ne .CurrentWord, "if", NotIf
+  NotIf:
+    ne .CurrentWord, "then", NotThen
+  NotThen:
+    ne .CurrentWord, "else", NotElse
+  NotElse:
     ret
 
 AddIntConstant:
