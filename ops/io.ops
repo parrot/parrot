@@ -100,6 +100,40 @@ op printerr(in STR) {
   goto NEXT();
 }
 
+##########################################
+
+=item B<seek>(out INT, in PMC, in INT, in INT)
+
+32bit seek:
+Set file position to offset $3 on IO stream $2. 'whence' is
+indicated by the value in $4.
+
+=item B<seek>(out INT, in PMC, in INT, in INT, in INT)
+
+64bit seek:
+Set file position to offset ($3 << 32 | $4) on IO stream $2. 'whence' is
+indicated by the value in $4.
+
+=cut
+
+op seek(out INT, in PMC, in INT, in INT) {
+  ParrotIO * io;
+  io = (ParrotIO*)($2->data);
+  if (io) {
+    $1 = (INTVAL)PIO_seek(interpreter, io, 0, $3, $4);
+  }
+  goto NEXT();
+}
+
+op seek(out INT, in PMC, in INT, in INT, in INT) {
+  ParrotIO * io;
+  io = (ParrotIO*)($2->data);
+  if (io) {
+    $1 = (INTVAL)PIO_seek(interpreter, io, $3, $4, $5);
+  }
+  goto NEXT();
+}
+
 
 ########################################
 
