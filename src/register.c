@@ -173,193 +173,6 @@ regstack_pop_entry(Parrot_Interp interpreter, struct RegStack* stack)
     }
 }
 
-/*=for api register Parrot_push_i
-  pushes a new integer register frame onto the corresponding frame stack
-*/
-void
-Parrot_push_i(struct Parrot_Interp *interpreter, void *where)
-{
-    struct RegisterChunkBuf* top;
-    top = regstack_push_entry(interpreter, &interpreter->ctx.int_reg_stack);
-    memcpy(&((struct IRegChunkBuf*)top->data.bufstart)->
-            IRegFrame[top->used-1].registers,
-            where, sizeof(struct IRegFrame));
-}
-
-/*=for api register Parrot_pop_i
-  pops an integer register frame from the corresponding frame stack
-*/
-void
-Parrot_pop_i(struct Parrot_Interp *interpreter, void *where)
-{
-    struct RegisterChunkBuf* top = interpreter->ctx.int_reg_stack.top;
-    /* Do we even have anything? */
-    if (top->used > 0) {
-        memcpy(where,
-                &((struct IRegChunkBuf*)top->data.bufstart)->
-                IRegFrame[top->used-1],
-                sizeof(struct IRegFrame));
-        regstack_pop_entry(interpreter, &interpreter->ctx.int_reg_stack);
-    }
-    /* Nope. So pitch a fit */
-    else {
-        internal_exception(NO_REG_FRAMES, "No more I register frames to pop!");
-    }
-}
-
-/*=for api register Parrot_clear_i
-  sets each integer register in the current set to 0
-*/
-void
-Parrot_clear_i(struct Parrot_Interp *interpreter)
-{
-    int i;
-    for (i = 0; i < NUM_REGISTERS; i++) {
-        interpreter->int_reg.registers[i] = 0;
-    }
-}
-
-/*=for api register Parrot_push_s
-  pushes a new string register frame onto the corresponding frame stack
-*/
-void
-Parrot_push_s(struct Parrot_Interp *interpreter, void *where)
-{
-    struct RegisterChunkBuf* top;
-    top = regstack_push_entry(interpreter, &interpreter->ctx.string_reg_stack);
-    memcpy(&((struct SRegChunkBuf*)top->data.bufstart)->
-            SRegFrame[top->used-1].registers,
-            where, sizeof(struct SRegFrame));
-}
-
-/*=for api register Parrot_pop_s
-  pops a string register frame from the corresponding frame stack
-*/
-void
-Parrot_pop_s(struct Parrot_Interp *interpreter, void *where)
-{
-    struct RegisterChunkBuf* top = interpreter->ctx.string_reg_stack.top;
-    /* Do we even have anything? */
-    if (top->used > 0) {
-        struct SRegFrame* irf = &((struct SRegChunkBuf*)top->data.bufstart)->
-            SRegFrame[top->used-1];
-        memcpy(where,
-                &irf->registers,
-                sizeof(struct SRegFrame));
-        regstack_pop_entry(interpreter, &interpreter->ctx.string_reg_stack);
-    }
-    /* Nope. So pitch a fit */
-    else {
-        internal_exception(NO_REG_FRAMES, "No more S register frames to pop!");
-    }
-}
-
-/*=for api register Parrot_clear_s
-  sets each string register in the current set to NULL
-*/
-void
-Parrot_clear_s(struct Parrot_Interp *interpreter)
-{
-    int i;
-    for (i = 0; i < NUM_REGISTERS; i++) {
-        interpreter->string_reg.registers[i] = NULL;
-    }
-}
-
-/*=for api register Parrot_push_n
-  pushes a new numeric register frame onto the corresponding frame stack
-*/
-void
-Parrot_push_n(struct Parrot_Interp *interpreter, void *where)
-{
-    struct RegisterChunkBuf* top;
-    top = regstack_push_entry(interpreter, &interpreter->ctx.num_reg_stack);
-    memcpy(&((struct NRegChunkBuf*)top->data.bufstart)->
-            NRegFrame[top->used-1].registers,
-            where, sizeof(struct NRegFrame));
-}
-
-/*=for api register Parrot_pop_n
-  pops a numeric register frame from the corresponding frame stack
-*/
-void
-Parrot_pop_n(struct Parrot_Interp *interpreter, void *where)
-{
-    struct RegisterChunkBuf* top = interpreter->ctx.num_reg_stack.top;
-    /* Do we even have anything? */
-    if (top->used > 0) {
-        struct NRegFrame* irf = &((struct NRegChunkBuf*)top->data.bufstart)->
-            NRegFrame[top->used-1];
-        memcpy(where,
-                &irf->registers,
-                sizeof(struct NRegFrame));
-        regstack_pop_entry(interpreter, &interpreter->ctx.num_reg_stack);
-    }
-    /* Nope. So pitch a fit */
-    else {
-        internal_exception(NO_REG_FRAMES, "No more N register frames to pop!");
-    }
-}
-
-/*=for api register Parrot_clear_n
-  sets each numeric register in the current set to 0.0
-*/
-void
-Parrot_clear_n(struct Parrot_Interp *interpreter)
-{
-    int i;
-    for (i = 0; i < NUM_REGISTERS; i++) {
-        interpreter->num_reg.registers[i] = 0.0;
-    }
-}
-
-/*=for api register Parrot_push_p
-  pushes a new PMC register frame onto the corresponding frame stack
-*/
-void
-Parrot_push_p(struct Parrot_Interp *interpreter, void *where)
-{
-    struct RegisterChunkBuf* top;
-    top = regstack_push_entry(interpreter, &interpreter->ctx.pmc_reg_stack);
-    memcpy(&((struct PRegChunkBuf*)top->data.bufstart)->
-            PRegFrame[top->used-1].registers,
-            where, sizeof(struct PRegFrame));
-}
-
-/*=for api register Parrot_pop_p
-  pops a PMC register frame from the corresponding frame stack
-*/
-void
-Parrot_pop_p(struct Parrot_Interp *interpreter, void *where)
-{
-    struct RegisterChunkBuf* top = interpreter->ctx.pmc_reg_stack.top;
-    /* Do we even have anything? */
-    if (top->used > 0) {
-        struct PRegFrame* irf = &((struct PRegChunkBuf*)top->data.bufstart)->
-            PRegFrame[top->used-1];
-        memcpy(where,
-                &irf->registers,
-                sizeof(struct PRegFrame));
-        regstack_pop_entry(interpreter, &interpreter->ctx.pmc_reg_stack);
-    }
-    /* Nope. So pitch a fit */
-    else {
-        internal_exception(NO_REG_FRAMES, "No more P register frames to pop!");
-    }
-}
-
-/*=for api register Parrot_clear_p
-  sets each pmc register in the current set to NULL
-*/
-void
-Parrot_clear_p(struct Parrot_Interp *interpreter)
-{
-    int i;
-    for (i = 0; i < NUM_REGISTERS; i++) {
-        interpreter->pmc_reg.registers[i] = PMCNULL;
-    }
-}
-
 /*=for api register Parrot_push_on_stack
    pushes something on the parrot stack
 */
@@ -380,6 +193,51 @@ Parrot_pop_off_stack(void *thing, INTVAL type)
     UNUSED(thing);
     UNUSED(type);
 }
+
+#define REG_PUSH Parrot_push_i
+#define REG_POP Parrot_pop_i
+#define REG_CLEAR Parrot_clear_i
+#define REG_STACK int_reg_stack
+#define REG_TYPE int_reg
+#define REG_CHUNK_BUF IRegChunkBuf
+#define REG_FRAME IRegFrame
+#define REG_EXCEPTION_STRING "No more I register frames to pop!"
+#define REG_NULL 0
+#include "generic_register.c"
+
+#define REG_PUSH Parrot_push_s
+#define REG_POP Parrot_pop_s
+#define REG_CLEAR Parrot_clear_s
+#define REG_STACK string_reg_stack
+#define REG_TYPE string_reg
+#define REG_CHUNK_BUF SRegChunkBuf
+#define REG_FRAME SRegFrame
+#define REG_EXCEPTION_STRING "No more S register frames to pop!"
+#define REG_NULL NULL
+#include "generic_register.c"
+
+#define REG_PUSH Parrot_push_n
+#define REG_POP Parrot_pop_n
+#define REG_CLEAR Parrot_clear_n
+#define REG_STACK num_reg_stack
+#define REG_TYPE num_reg
+#define REG_CHUNK_BUF NRegChunkBuf
+#define REG_FRAME NRegFrame
+#define REG_EXCEPTION_STRING "No more N register frames to pop!"
+#define REG_NULL 0.0
+#include "generic_register.c"
+
+#define REG_PUSH Parrot_push_p
+#define REG_POP Parrot_pop_p
+#define REG_CLEAR Parrot_clear_p
+#define REG_STACK pmc_reg_stack
+#define REG_TYPE pmc_reg
+#define REG_CHUNK_BUF PRegChunkBuf
+#define REG_FRAME PRegFrame
+#define REG_EXCEPTION_STRING "No more P register frames to pop!"
+#define REG_NULL PMCNULL
+#include "generic_register.c"
+
 
 /*
  * Local variables:
