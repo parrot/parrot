@@ -1276,8 +1276,8 @@ sub void_func
     # saved.
     #
 
-#    foreach my $arg (reverse @args) {
-    foreach my $arg (@args) {
+    foreach my $arg (reverse @args) {
+#    foreach my $arg (@args) {
       emit_code('.arg', [ $arg ]);
 
 #      if (reg_q($arg)) {
@@ -1345,8 +1345,8 @@ sub assign_func
     # saved.
     #
 
-#    foreach my $arg (reverse @args) {
-    foreach my $arg (@args) {
+    foreach my $arg (reverse @args) {
+#    foreach my $arg (@args) {
       emit_code('.arg', [ $arg ]);
 
 #      if (reg_q($arg)) {
