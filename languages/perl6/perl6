@@ -42,89 +42,113 @@ $TEST_IMPORT = 'skip is';
 # glob pattern for test to run
 $TEST_GLOB = 't/{compiler,rx}/*.t';
 
+use vars '%o';
+
 sub usage($) {
     my $fh = shift;
-    print($fh <<'EOF'
-    usage:  perl6 [ p6c-options ] [ imcc-options ]
-    [ asm-options ] [ run-options ]
-    [ global-options ] file [arguments ... ]
-	    perl6 --clean *.p6
-	    perl6 --test [testfiles]
-
-    p6c-options:
-
-    Output options:
-    -C,--compile-pbc compile to executable
-    -B,--pbc         stop after creating .pbc file
-    -S,--pasm        stop after creating .pasm file
-    -I,--imc         stop after creating .imc file
+    if ($o{'help-imcc'}) {
+	print $fh <<'END';
+IMCC options:
+    --debug          write various debug messages to STDERR'
+    --yydebug        debug bison
+END
+    } elsif ($o{'help-parrot'}) {
+	print $fh <<'END';
+Parrot options:
+    --shared         use dynamic parrot lib
+    -Rx|--parrot-options=bdhjpPgtv.
+                     pass option(s) to parrot
+END
+	system("$PARROT -h");
+    } elsif ($o{'help-global'}) {
+	print $fh <<'END';
+Global options:
+    -h|--help        Print this message and exit
+    --help-(imcc|parrot|test|parser|global|output)
+                     Print detailed help for one subpart
+    -v|--verbose     Print mesages about compile stages (repeat for
+                         more verbosity)
+    -V|--version     Print versions and exit
+    -w|--warnings    Print warnings (repeat for more warnings)
+    --test           run tests like "make test"
+    --test-parser    interactive parser-testing mode
+    --ignore-exitcode don't report non zero exit codes
+    -c|--checksyntax Check syntax only, do not generate bytecode
+    --clean          delete all possible produced files for all mentioned
+END
+    } elsif ($o{'help-output'}) {
+	print $fh <<'END';
+Output options:
+    -o|--output F    Write output to file F
+    -C|--compile-pbc compile to executable
+    -B|--pbc         stop after creating .pbc file
+    -S|--pasm        stop after creating .pasm file
+    -I|--imc         stop after creating .imc file'
+    -E               Preprocess input files and terminate processing
     --tree           stop after creating parse tree
-    --raw-tree       output raw parser tree
-    --keep-xxx       keep intermediate file .xxx
-    -k,--keep-all    keep all intermediate files
-    --rm-exe         remove executable (mainly for testnative)
+    --raw-tree       stop after creating raw parse tree
+    --keep-X         keep intermediate ".X" file (X = imc|pasm|pbc)
+    -k|--keep-all    keep all intermediate files
+    -g|--debug-info  generate debug info, i.e. produce and keep #line comments
+    -Ox              optimize flag (currently only gcc)
+                     Note: these does not optimize parrot's obj file
+END
+    } elsif ($o{'help-test'}) {
+	print $fh <<'END';
+Test options:
+    --test           run tests like "make test"
+                         .p6 source files
+      --rm-exe       remove executable (mainly for testnative)
+      -q|--quick     run .pbc directly, if present and newer then .p6
+END
+    } elsif ($o{'help-parser'}) {
+	print $fh <<'END';
+Parser options:
     --test-parser    interactive parser-testing mode
 
-    -g,--debug-info  generate debug info, i.e. produce and keep #line comments
-    -Ox		     optimize flag (currently only gcc)
-                     Note: these does not optimize parrot's obj file.
+      Parse::RecDescent control:
+        --trace      set $::RD_TRACE (or construct trace-enabled parser)
+        --grammar NAME
+                     use precompiled grammar NAME (default = Perl6grammar)
+  
+          only useful when constructing parser:
+        --hitem      keep track of %item hash
+        --force-grammar
+                     Rebuild grammar even if it exists.
+      Misc:
+        --add-main     suround code by the main() function
+        --rule NAME    start with rule NAME (default = "prog")
+                           (only useful in interactive mode)
+END
+    } else {
+	print $fh <<'END';
+usage:  perl6 [options] file.p6
+        perl6 --clean *.p6
+        perl6 --test  *.t
 
+Global options:
+    -h|--help        Print this message and exit
+    --help-(imcc|parrot|test|parser|output|global)
+                     Print detailed help for one subpart
+    -v|--verbose     Print mesages about compile stages (repeat for
+                         more verbosity)
+    -V|--version     Print versions and exit
+    -w|--warnings    Print warnings (repeat for more warnings)
+    --test           run tests like "make test"
     --clean          delete all possible produced files for all mentioned
-    		     .p6 source file
-
-    --test	     run tests like "make test"
-
-    Parse::RecDescent control:
-    --trace          set $::RD_TRACE (or construct trace-enabled parser)
-    --grammar NAME   use precompiled grammar NAME (default = Perl6grammar)
-
-        only useful when constructing parser:
-    --hitem          keep track of %item hash
-    --force-grammar  Rebuild grammar even if it exists.
-
-    Misc:
-    --add-main       suround code by the main() function
-    --rule NAME      start with rule NAME (default = 'prog')
-    (only useful in interactive mode)
-
-    imcc-options:
-
-    --debug          write various debug messages to STDERR
-    --yydebug        debug bison
-    --verbose	     shows count of lines compiled
-
-    asm-options:
-
-    -E               Preprocess input files and terminate processing
-    -h,--help        Print this message
-    -o,--output F    Write output to file F
-    -c,--checksyntax Check syntax only, do not generate bytecode
-
-    run-options:
-
-    -Rx,--parrot-options=bdhjpPgtv.
-    pass option(s) to parrot, s. parrot -h
-    -Rb.           e.g. call parrot -b -.
-    -C,--compile-pbc compile and run C executable
-    --shared         use dynamic parrot lib
-    --ignore-exitcode don't report non zero exit codes
-    -q,--quick       run .pbc directly, if present and newer then .p6
-
-    global-options:
-
-    -h --help        Print this message and exit
-    -v --verbose     Print mesages about compile stages
-    -vv            be more verbose
-    -V --version     Print versions and exit
-    -w --warnings    Print warnings
-    -ww            Print diagnostics (N/Y)
-
-EOF
-    );
+    --test-parser    interactive parser-testing mode
+Parrot options:
+    -R|--parrot-options=[bdhjpPgtv.]
+                     pass option(s) to parrot
+Output options:
+    -o|--output F    Write output to file F
+    -B|--pbc         stop after creating .pbc file
+    -I|--imc         stop after creating .imc file
+    -k|--keep-all    keep all intermediate files
+END
+    }
     exit(1);
 }
-
-use vars '%o';
 
 Getopt::Long::Configure(qw(bundling));
 GetOptions(\%o,qw{
@@ -141,7 +165,8 @@ GetOptions(\%o,qw{
     pbc|B pasm|S imc|I
     keep-imc keep-pasm keep-pbc keep-c keep-o keep-all|k keep-warn
     keep-tree clean
-    help|h version|V
+    help|h version|V help-imcc help-parrot help-test help-parser help-output
+    help-global
 }) or usage(\*STDERR);
 
 # print version of parts and exit
@@ -152,7 +177,7 @@ sub version {
 }
 
 ################
-usage(\*STDOUT) if ($o{help});
+usage(\*STDOUT) if grep /^help/, keys %o;
 version() if ($o{version});
 
 $::RD_TRACE = $o{trace};
@@ -702,19 +727,19 @@ These options are for the parser P6C and for output generation.
 
 =over 4
 
-=item -C,--compile-pbc
+=item -C|--compile-pbc
 
 Compile to executable and run native. s. also Run options below
 
-=item -B,--pbc
+=item -B|--pbc
 
 Stop after creating .pbc file.
 
-=item -S,--pasm
+=item -S|--pasm
 
 Stop after creating .pasm file.
 
-=item -I,--imc
+=item -I|--imc
 
 Stop after creating .imc file.
 
@@ -732,7 +757,7 @@ Keep intermediate file.ext. If perl6 stops with an error or with above
 options, temp files are always kept.
 The last output step (.pmc or executable) is of course kept.
 
-=item -k,--keep-all
+=item -k|--keep-all
 
 Keep all intermediate files.
 
@@ -754,7 +779,7 @@ Interactive parser-testing mode. The parser enter an interaktive mode, an
 empty line sends input to the parser. Additionally this sets »--add-main«,
 so you don't have to provide a sub main().
 
-=item -g,--debug-info
+=item -g|--debug-info
 
 Generate debug info. This adds #line n "file" and source comments to the
 .imc file.
@@ -821,15 +846,15 @@ Show bison's debug output
 
 Preprocess input files and terminate processing.
 
-=item -h,--help
+=item -h|--help
 
 Print this message.
 
-=item -o,--output F
+=item -o|--output F
 
 Write output to file F.
 
-=item -c,--checksyntax
+=item -c|--checksyntax
 
 Check syntax only, do not generate bytecode.
 
@@ -839,12 +864,12 @@ Check syntax only, do not generate bytecode.
 
 =over 4
 
-=item -q, --quick
+=item -q|--quick
 
 Run the .pbc file directly if it does exist and is not older then the
 .p6 source file.
 
-=item -R.. --parrot-options=bdhjpPgtv.
+=item -R..|--parrot-options=bdhjpPgtv.
 
 pass option(s) to parrot, s. parrot -h
 
@@ -879,11 +904,11 @@ Remove executables after running. This is useful for testnative.
 
 =over 4
 
-=item -h --help
+=item -h|--help
 
 Print this message and exit
 
-=item -v --verbose
+=item -v|--verbose
 
 Print mesages about compile stages
 
@@ -891,11 +916,11 @@ Print mesages about compile stages
 
 Be more verbose, print intermediate stages.
 
-=item -V --version
+=item -V|--version
 
 Print versions to STDOUT and exit
 
-=item -w --warnings
+=item -w|--warnings
 
 Print warnings. If »-w« is off, warnings are collected in file.warn.
 
