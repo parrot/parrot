@@ -1,159 +1,9 @@
-=head1 TITLE
+# Copyright: 2001-2004 The Perl Foundation.  All Rights Reserved.
+# $Id$
 
-Parrot Assembly Language
+=head1 NAME
 
-=head1 VERSION
-
-=head2 CURRENT
-
-    Maintainer: Dan Sugalski
-    Class: Internals
-    PDD Number: 6
-    Version: 1.8
-    Status: Developing
-    Last Modified: 02 December 2002
-    PDD Format: 1
-    Language: English
-
-=head2 HISTORY
-
-=over 4
-
-=item Version 1.8
-
-December 11, 2002
-
-=item Version 1.7
-
-December 02, 2002
-
-=item Version 1.6
-
-November 05, 2001
-
-=item Version 1.5
-
-October 12, 2001
-
-=item Version 1.4
-
-September 24, 2001
-
-=item Version 1.3
-
-September 12, 2001
-
-=item Version 1.2
-
-August 25, 2001
-
-=item Version 1.1
-
-August 8, 2001
-
-=item version 1
-
-None. First version
-
-=back
-
-=head1 CHANGES
-
-=over 4
-
-=item Version 1.8
-
-=over 4
-
-=item * Added property ops
-
-=item * Fixed some bad register designations
-
-=item * Opened up opcode name character list to include numbers
-
-=back
-
-=item Version 1.7
-
-=over 4
-
-=item * Fixed stack ops
-
-push, pop, and clear properly documented according to the engine's
-behaviour now.
-
-=back
-
-=item Version 1.6
-
-=over 4
-
-=item * Added GC opcodes
-
-=back
-
-=item Version 1.5
-
-=over 4
-
-=item * Now have a bsr in addition to a jsr
-
-=item * return is now ret
-
-=item * Added save and restore ops for saving and restoring individual registers
-
-=back
-
-=item Version 1.4
-
-=over 4
-
-=item * Conditional branches have just a true destination now
-
-=item * Added the I/O ops
-
-=item * Added in the threading ops
-
-=item * Added in the interpreter ops
-
-=back
-
-=item Version 1.3
-
-=over 4
-
-=item * Added in the low-level module loading ops
-
-=item * Added in transcendental functions and modulo
-
-=item * Finished the pad/global variable fetching bits
-
-=back
-
-=item Version 1.2
-
-We have an interpreter now! Yay! (Okay, a simple one, but still...)
-Changes made to reflect that.
-
-=item Version 1.1
-
-=over 4
-
-=item * Added in object
-
-=item * Changed remnants of "perl" to "Parrot"
-
-=item * Branch destination may be integer constant
-
-=item * Added L<Assembly Syntax> section
-
-=back
-
-=item Version 1.0
-
-None. First version
-
-=back
+docs/pdds/pdd06_pasm.pod - Parrot Assembly Language
 
 =head1 ABSTRACT
 
@@ -1243,5 +1093,164 @@ called whenever anyone invokes the compile op with the name X.
 
 =head1 ATTACHMENTS
 
+None.
+
 =head1 REFERENCES
+
+None.
+
+=head1 VERSION
+
+None.
+
+=head2 CURRENT
+
+    Maintainer: Dan Sugalski
+    Class: Internals
+    PDD Number: 6
+    Version: 1.8
+    Status: Developing
+    Last Modified: 02 December 2002
+    PDD Format: 1
+    Language: English
+
+=head2 HISTORY
+
+=over 4
+
+=item Version 1.8
+
+December 11, 2002
+
+=item Version 1.7
+
+December 02, 2002
+
+=item Version 1.6
+
+November 05, 2001
+
+=item Version 1.5
+
+October 12, 2001
+
+=item Version 1.4
+
+September 24, 2001
+
+=item Version 1.3
+
+September 12, 2001
+
+=item Version 1.2
+
+August 25, 2001
+
+=item Version 1.1
+
+August 8, 2001
+
+=item version 1
+
+None. First version
+
+=back
+
+=head1 CHANGES
+
+=over 4
+
+=item Version 1.8
+
+=over 4
+
+=item * Added property ops
+
+=item * Fixed some bad register designations
+
+=item * Opened up opcode name character list to include numbers
+
+=back
+
+=item Version 1.7
+
+=over 4
+
+=item * Fixed stack ops
+
+push, pop, and clear properly documented according to the engine's
+behaviour now.
+
+=back
+
+=item Version 1.6
+
+=over 4
+
+=item * Added GC opcodes
+
+=back
+
+=item Version 1.5
+
+=over 4
+
+=item * Now have a bsr in addition to a jsr
+
+=item * return is now ret
+
+=item * Added save and restore ops for saving and restoring individual registers
+
+=back
+
+=item Version 1.4
+
+=over 4
+
+=item * Conditional branches have just a true destination now
+
+=item * Added the I/O ops
+
+=item * Added in the threading ops
+
+=item * Added in the interpreter ops
+
+=back
+
+=item Version 1.3
+
+=over 4
+
+=item * Added in the low-level module loading ops
+
+=item * Added in transcendental functions and modulo
+
+=item * Finished the pad/global variable fetching bits
+
+=back
+
+=item Version 1.2
+
+We have an interpreter now! Yay! (Okay, a simple one, but still...)
+Changes made to reflect that.
+
+=item Version 1.1
+
+=over 4
+
+=item * Added in object
+
+=item * Changed remnants of "perl" to "Parrot"
+
+=item * Branch destination may be integer constant
+
+=item * Added L<Assembly Syntax> section
+
+=back
+
+=item Version 1.0
+
+None. First version
+
+=back
 

@@ -1,73 +1,9 @@
-=head1 TITLE
+# Copyright: 2001-2004 The Perl Foundation.  All Rights Reserved.
+# $Id$
 
-Common vtable format for all variables
+=head1 NAME
 
-=head1 VERSION
-
-=head2 CURRENT
-
-   Maintainer: Dan Sugalski <dan@sidhe.org>
-   Class: Internals
-   PDD Number: 2
-   Version: 1.3
-   Status: Developing
-   Last Modified: 27 July 2003
-   PDD Format: 1
-   Language: English
-
-=head2 HISTORY
-
-=over 4
-
-=item 1.4
-
-1 Nov 2003
-
-=item 1.3
-
-27 July 2003
-
-=item 1.2
-
-22 June 2002
-
-=item 1.1
-
-13 May 2002
-
-=item 1.0
-
-None. First version
-
-=back
-
-=head1 CHANGES
-
-=over 4
-
-=item 1.4
-
- * Add set/get_pointer vtables.
- * Change s/KEY/PMC/ and s/INTVAL* key/INTVAL key/
-
-=item 1.3
-
-Added a number of missing method definitions. Many other minor cleanups.
-
-=item 1.2
-
-Many cleanups and clarifications.  Much detail added.  Many missing
-methods added.
-
-=item 1.1
-
-Cleaned up the definition. It was a mess.
-
-=item 1.0
-
-None. First version
-
-=back
+docs/pdds/pdd02_vtables.pod - Common vtable format for all variables
 
 =head1 ABSTRACT
 
@@ -1305,3 +1241,72 @@ XXX: needs documenting
 =back
 
 =cut
+
+=head1 VERSION
+
+=head2 CURRENT
+
+   Maintainer: Dan Sugalski <dan@sidhe.org>
+   Class: Internals
+   PDD Number: 2
+   Version: 1.3
+   Status: Developing
+   Last Modified: 27 July 2003
+   PDD Format: 1
+   Language: English
+
+=head2 HISTORY
+
+=over 4
+
+=item 1.4
+
+1 Nov 2003
+
+=item 1.3
+
+27 July 2003
+
+=item 1.2
+
+22 June 2002
+
+=item 1.1
+
+13 May 2002
+
+=item 1.0
+
+None. First version
+
+=back
+
+=head1 CHANGES
+
+=over 4
+
+=item 1.4
+
+ * Add set/get_pointer vtables.
+ * Change s/KEY/PMC/ and s/INTVAL* key/INTVAL key/
+
+=item 1.3
+
+Added a number of missing method definitions. Many other minor cleanups.
+
+=item 1.2
+
+Many cleanups and clarifications.  Much detail added.  Many missing
+methods added.
+
+=item 1.1
+
+Cleaned up the definition. It was a mess.
+
+=item 1.0
+
+None. First version
+
+=back
+
+

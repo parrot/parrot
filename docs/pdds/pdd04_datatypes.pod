@@ -1,69 +1,9 @@
-=head1 TITLE
+# Copyright: 2001-2004 The Perl Foundation.  All Rights Reserved.
+# $Id$
 
-Parrot's internal data types
+=head1 NAME
 
-=head1 VERSION
-
-1.4
-
-=head2 CURRENT
-
-     Maintainer: Dan Sugalski <dan@sidhe.org>
-     Class: Internals
-     PDD Number: 4
-     Version: 1.4
-     Status: Developing
-     Last Modified: 20 February 2004
-     PDD Format: 1
-     Language: English
-
-=head2 HISTORY
-
-=over 4
-
-=item Version 1.4, 20 February 2004
-
-=item Version 1.3, 2 July 2001
-
-=item Version 1.2, 2 July 2001
-
-=item Version 1.1, 2 March 2001
-
-=item Version 1, 1 March 2001
-
-=back
-
-=head1 CHANGES
-
-=over 4
-
-=item Version 1.4
-
-Document basic PMC internals. Make clear the fact that the bigint/bignum
-description is still provisional. Other minor fixups to make the 
-documentation match reality.
-
-=item Version 1.3
-
-Fixed some silly typos and dropped phrases.
-
-Took all the underscores out of the field names.
-
-=item Version 1.2
-
-The string header format has changed some to allow for type
-tagging. The flags information for strings has changed as well.
-
-=item Version 1.1
-
-INT and NUM are now concepts rather than data structures, as making
-them data structures was a Bad Idea.
-
-=item Version 1
-
-None. First version
-
-=back
+docs/pdds/pdd04_datatypes.pod - Parrot's internal data types
 
 =head1 ABSTRACT
 
@@ -80,7 +20,7 @@ Parrot; only the most basic aspects are described here.
 Note that PMC and string internals are volatile and may be changed in the
 future (although this will become increasingly unlikely as we near v1.0).
 Access from external code to the internals of particular datatypes should
-be via the extension mechanism (see L<docs/pdds/pdd11_extending.pod>, 
+be via the extension mechanism (see F<docs/pdds/pdd11_extending.pod>, 
 which has more explicit guarantees of stability.
 
 =head1 IMPLEMENTATION
@@ -108,7 +48,7 @@ digits, which ought to be far more than enough for anyone.
 
 The internal representation of a bigint has not yet been determined.
 One possible implementation is described below; for an alternative
-implementation, see L<docs/pdds/pdd14_bignum.pod>.
+implementation, see F<docs/pdds/pdd14_bignum.pod>.
 
 =item A possible bigint implementation
 
@@ -155,7 +95,7 @@ of digits before and after the decimal point.
 
 The internal representation of a bigint has not yet been determined.
 One possible implementation is described below; for an alternative
-implementation, see L<docs/pdds/pdd14_bignum.pod>.
+implementation, see F<docs/pdds/pdd14_bignum.pod>.
 
 =item A possible bignum implementation
 
@@ -305,7 +245,7 @@ doing that...).
 
 C<vtable> holds a pointer to the B<vtable> associated with the PMC.
 This points to a set of functions, with interfaces described in
-L<docs/pdds/pdd02_vtables.pod> that implement the basic behaviour of
+F<docs/pdds/pdd02_vtables.pod> that implement the basic behaviour of
 the PMC (i.e. how it behaves under addition, subtraction, cloning etc.)
 
 C<data> (if present) holds a pointer to any additional data associated 
@@ -346,7 +286,7 @@ None.
 =head1 REFERENCES
 
 The perl modules Math::BigInt and Math::BigFloat. Alex Gough's suggestions
-for bigint/bignum implementation, outlined in L<docs/pdds/pdd14_bignum.pod>.
+for bigint/bignum implementation, outlined in F<docs/pdds/pdd14_bignum.pod>.
 The Unicode standard at http://www.unicode.org.
 
 =head1 GLOSSARY
@@ -358,6 +298,69 @@ The Unicode standard at http://www.unicode.org.
 Type refers to a basic Parrot data type. There are four such: integers,
 floating point numbers (often just numbers), strings and Parrot Magic
 Cookies (PMCs). 
+
+=back
+
+=head1 VERSION
+
+1.4
+
+=head2 CURRENT
+
+     Maintainer: Dan Sugalski <dan@sidhe.org>
+     Class: Internals
+     PDD Number: 4
+     Version: 1.4
+     Status: Developing
+     Last Modified: 20 February 2004
+     PDD Format: 1
+     Language: English
+
+=head2 HISTORY
+
+=over 4
+
+=item Version 1.4, 20 February 2004
+
+=item Version 1.3, 2 July 2001
+
+=item Version 1.2, 2 July 2001
+
+=item Version 1.1, 2 March 2001
+
+=item Version 1, 1 March 2001
+
+=back
+
+=head1 CHANGES
+
+=over 4
+
+=item Version 1.4
+
+Document basic PMC internals. Make clear the fact that the bigint/bignum
+description is still provisional. Other minor fixups to make the 
+documentation match reality.
+
+=item Version 1.3
+
+Fixed some silly typos and dropped phrases.
+
+Took all the underscores out of the field names.
+
+=item Version 1.2
+
+The string header format has changed some to allow for type
+tagging. The flags information for strings has changed as well.
+
+=item Version 1.1
+
+INT and NUM are now concepts rather than data structures, as making
+them data structures was a Bad Idea.
+
+=item Version 1
+
+None. First version
 
 =back
 

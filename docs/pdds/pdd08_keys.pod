@@ -1,42 +1,9 @@
+# Copyright: 2001-2004 The Perl Foundation.  All Rights Reserved.
+# $Id$
 
-=head1 TITLE
+=head1 NAME
 
-Indexing Aggregate PMCs
-
-=head1 VERSION
-
-=head2 CURRENT
-
-   Maintainer: Simon Cozens <simon@netthink.co.uk>
-   Class: Internals
-   PDD Number: 8
-   Version: 1.3
-   Status: Developing
-   Last Modified: 25 August, 2002
-   PDD Format: 1
-   Language: English
-
-=head2 HISTORY
-
-=over 4
-
-=item Sun Aug 25 11:14:43 GMT 2002 : Version 1.3
-
-Updated to reflect Dan's decision to change keys to use PMCs instead
-of a custom data structure. Also corrects documentation of multi-level
-keys and how they are compiled and work. tom@compton.nu.
-
-=item Thu Apr 25 18:30:36 UTC 2002 : Version 1.2
-
-Renamed C<KEY_PAIR> to C<KEY_ATOM>, updated to reflect changeover to
-linked list. - steve@fink.com
-
-=item Fri Mar  8 18:47:34 GMT 2002 : Version 1.1
-
-updated to reflect Dan's comments that non-aggregates also support
-C<_keyed> variant vtable methods.
-
-=back
+docs/pdds/pdd08_keys.pod - Indexing Aggregate PMCs
 
 =head1 ABSTRACT
 
@@ -279,3 +246,38 @@ number (for registers) or an index into the appropriate constant table.
 
 The type values shown above are actually the C<PARROT_ARG_*> values taken
 from F<include/parrot/op.h>.
+
+=head1 VERSION
+
+=head2 CURRENT
+
+   Maintainer: Simon Cozens <simon@netthink.co.uk>
+   Class: Internals
+   PDD Number: 8
+   Version: 1.3
+   Status: Developing
+   Last Modified: 25 August, 2002
+   PDD Format: 1
+   Language: English
+
+=head2 HISTORY
+
+=over 4
+
+=item Sun Aug 25 11:14:43 GMT 2002 : Version 1.3
+
+Updated to reflect Dan's decision to change keys to use PMCs instead
+of a custom data structure. Also corrects documentation of multi-level
+keys and how they are compiled and work. tom@compton.nu.
+
+=item Thu Apr 25 18:30:36 UTC 2002 : Version 1.2
+
+Renamed C<KEY_PAIR> to C<KEY_ATOM>, updated to reflect changeover to
+linked list. - steve@fink.com
+
+=item Fri Mar  8 18:47:34 GMT 2002 : Version 1.1
+
+updated to reflect Dan's comments that non-aggregates also support
+C<_keyed> variant vtable methods.
+
+=back

@@ -1,47 +1,9 @@
-=head1 TITLE
+# Copyright: 2001-2004 The Perl Foundation.  All Rights Reserved.
+# $Id$
 
-Garbage Collection and Dead Object Detection
+=head1 NAME
 
-=head1 VERSION
-
-=head2 CURRENT
-
-    Maintainer: Dan Sugalski
-    Class: Internals
-    PDD Number: 9
-    Version: 1.1
-    Status: Developing
-    Last Modified: 26 February, 2002
-    PDD Format: 1
-    Language: English
-
-=head2 HISTORY
-
-=over 4
-
-=item Version 1.1
-
-26 February 2002
-
-=item version 1
-
-None. First version
-
-=back
-
-=head1 CHANGES
-
-=over 4
-
-=item Version 1.1
-
-Started documenting the internal routines
-
-=item Version 1.0
-
-None. First version
-
-=back
+docs/pdds/pdd09_gc.pod - Garbage Collection and Dead Object Detection
 
 =head1 ABSTRACT
 
@@ -281,6 +243,53 @@ check for string liveness or anything of the sort, just does a compaction.
 
 =head1 ATTACHMENTS
 
+None.
+
 =head1 FOOTNOTES
 
+None.
+
 =head1 REFERENCES
+
+None.
+
+=head1 VERSION
+
+=head2 CURRENT
+
+    Maintainer: Dan Sugalski
+    Class: Internals
+    PDD Number: 9
+    Version: 1.1
+    Status: Developing
+    Last Modified: 26 February, 2002
+    PDD Format: 1
+    Language: English
+
+=head2 HISTORY
+
+=over 4
+
+=item Version 1.1
+
+26 February 2002
+
+=item version 1
+
+None. First version
+
+=back
+
+=head1 CHANGES
+
+=over 4
+
+=item Version 1.1
+
+Started documenting the internal routines
+
+=item Version 1.0
+
+None. First version
+
+=back

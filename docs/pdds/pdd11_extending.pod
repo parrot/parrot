@@ -1,39 +1,9 @@
-=head1 TITLE
+# Copyright: 2001-2004 The Perl Foundation.  All Rights Reserved.
+# $Id$
 
-The Parrot Extension System
+=head1 NAME
 
-=head1 VERSION
-
-=head2 CURRENT
-
-    Maintainer: 
-    Class: Internals
-    PDD Number: 11
-    Version: 1.0
-    Status: Developing
-    Last Modified: February 20, 2004 
-    PDD Format: 1
-    Language: English
-
-=head2 HISTORY
-
-=over 4
-
-=item version 1
-
-None. First version
-
-=back
-
-=head1 CHANGES
-
-=over 4
-
-=item Version 1.0
-
-None. First version
-
-=back
+docs/pdds/pdd11_extending.pod - The Parrot Extension System
 
 =head1 ABSTRACT
 
@@ -361,3 +331,38 @@ None.
 =head1 REFERENCES
 
 L<docs/glossary.pod>
+
+=head1 VERSION
+
+=head2 CURRENT
+
+    Maintainer: 
+    Class: Internals
+    PDD Number: 11
+    Version: 1.0
+    Status: Developing
+    Last Modified: February 20, 2004 
+    PDD Format: 1
+    Language: English
+
+=head2 HISTORY
+
+=over 4
+
+=item version 1
+
+None. First version
+
+=back
+
+=head1 CHANGES
+
+=over 4
+
+=item Version 1.0
+
+None. First version
+
+=back
+
+=cut

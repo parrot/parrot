@@ -1,49 +1,9 @@
-=head1 TITLE
+# Copyright: 2001-2004 The Perl Foundation.  All Rights Reserved.
+# $Id$
 
-Big Numbers
+=head1 NAME
 
-=head1 VERSION
-
-$Id$
-
-=head2 CURRENT
-
-    Maintainer: Alex Gough (alex@earth.li)
-    Class: Internals
-    PDD Number: 14
-    Version: $Id$
-    Status: Informational
-    Last Modified: $Id$
-    PDD Format: 1
-    Language: English
-
-=head2 HISTORY
-
-=over 4
-
-=item version 1.1
-
-The first version is more a description of the state of the art than a
-plan for the future.  The author believes this is akin to learning how
-to crawl before trying to run.  Leaving the ground is considered Right
-Out with attempts being left as an exercise for the interested reader.
-
-=back
-
-=head1 CHANGES
-
-=over 4
-
-=item Version 1.0
-
-None. First version
-
-=item Version 1.1
-
-Special values added, exception handling updated to suit EDA,
-more rounding types added, TODO added.  PDD number bagged.
-
-=back
+docs/pdds/pdd14_bignum.pod - Big Numbers
 
 =head1 ABSTRACT
 
@@ -434,3 +394,43 @@ http://www2.hursley.ibm.com/decimal/
 
 Perl's Math::Big* modules.
 
+=head1 VERSION
+
+=head2 CURRENT
+
+    Maintainer: Alex Gough (alex@earth.li)
+    Class: Internals
+    PDD Number: 14
+    Version: $Id$
+    Status: Informational
+    Last Modified: $Id$
+    PDD Format: 1
+    Language: English
+
+=head2 HISTORY
+
+=over 4
+
+=item version 1.1
+
+The first version is more a description of the state of the art than a
+plan for the future.  The author believes this is akin to learning how
+to crawl before trying to run.  Leaving the ground is considered Right
+Out with attempts being left as an exercise for the interested reader.
+
+=back
+
+=head1 CHANGES
+
+=over 4
+
+=item Version 1.0
+
+None. First version
+
+=item Version 1.1
+
+Special values added, exception handling updated to suit EDA,
+more rounding types added, TODO added.  PDD number bagged.
+
+=back

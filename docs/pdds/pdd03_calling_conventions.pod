@@ -1,77 +1,9 @@
-=head1 TITLE
+# Copyright: 2001-2004 The Perl Foundation.  All Rights Reserved.
+# $Id$
 
-Parrot Calling Conventions
+=head1 NAME
 
-=head1 VERSION
-
-1.4
-
-=head2 CURRENT
-
-    Maintainer: Dan Sugalski
-    Class: Internals
-    PDD Number: 03
-    Version: 1.4
-    Status: Developing
-    Last Modified: 17 November 2003
-    PDD Format: 1
-    Language: English
-
-=head2 HISTORY
-
-=over 4
-
-=item Version 1.4
-
-17 November 2003
-
-=item Version 1.3
-
-2 May 2003
-
-=item Version 1,2
-
-11 March 2003
-
-=item Version 1.1
-
-16 September 2002
-
-=item version 1
-
-None. First version
-
-=back
-
-=head1 CHANGES
-
-=over 4
-
-=item Version 1.4
-
-Unified call and return, tossed useless stuff
-
-=item Version 1.3
-
-No longer use the stack, with overflow going into the array in P3.
-
-Clarified some muddy language.
-
-=item Version 1.2
-
-Dropped the number of registers passed in and out of subs.
-
-=item Version 1.1
-
-We now call with a frame, rather than pushing on the stack, and we
-return frames, rather than returning a stack. We also pass in context
-information for the return.
-
-=item Version 1.0
-
-None. First version
-
-=back
+docs/pdds/pdd03_calling_conventions.pod - Parrot Calling Conventions
 
 =head1 ABSTRACT
 
@@ -271,3 +203,77 @@ we were calling with prototyping, a would be in I5, b in I6, c in S5,
 d in P5, and e in N5.
 
 =head1 REFERENCES
+
+None.
+
+=head1 VERSION
+
+1.4
+
+=head2 CURRENT
+
+    Maintainer: Dan Sugalski
+    Class: Internals
+    PDD Number: 03
+    Version: 1.4
+    Status: Developing
+    Last Modified: 17 November 2003
+    PDD Format: 1
+    Language: English
+
+=head2 HISTORY
+
+=over 4
+
+=item Version 1.4
+
+17 November 2003
+
+=item Version 1.3
+
+2 May 2003
+
+=item Version 1,2
+
+11 March 2003
+
+=item Version 1.1
+
+16 September 2002
+
+=item version 1
+
+None. First version
+
+=back
+
+=head1 CHANGES
+
+=over 4
+
+=item Version 1.4
+
+Unified call and return, tossed useless stuff
+
+=item Version 1.3
+
+No longer use the stack, with overflow going into the array in P3.
+
+Clarified some muddy language.
+
+=item Version 1.2
+
+Dropped the number of registers passed in and out of subs.
+
+=item Version 1.1
+
+We now call with a frame, rather than pushing on the stack, and we
+return frames, rather than returning a stack. We also pass in context
+information for the return.
+
+=item Version 1.0
+
+None. First version
+
+=back
+

@@ -1,56 +1,9 @@
-=head1 TITLE
+# Copyright: 2001-2004 The Perl Foundation.  All Rights Reserved.
+# $Id$
 
-Object and Class semantics for Parrot
+=head1 NAME
 
-=head1 VERSION
-
-=head2 CURRENT
-
-    Maintainer: Dan Sugalski
-    Class: Internals
-    PDD Number: 15
-    Version: 1.2
-    Status: Developing
-    Last Modified: February 09, 2004
-    PDD Format: 1
-    Language: English
-
-=head2 HISTORY
-
-=over 4
-
-=item Version 1.2
-
-February 9, 2004
-
-=item Version 1.1
-
-March 11, 2002
-
-=item version 1
-
-None. First version
-
-=back
-
-=head1 CHANGES
-
-=over 4
-
-=item Version 1.2
-
-A complete overhaul from the original spec.
-
-=item Version 1.1
-
-Removed attributes from the object interface and put them in the
-class interface section, where they belong.
-
-=item Version 1.0
-
-None. First version
-
-=back
+docs/pdds/pdd15_objects.pod - Object and Class semantics for Parrot
 
 =head1 ABSTRACT
 
@@ -694,8 +647,62 @@ Instance Variables map to what we call attributes
 
 =head1 ATTACHMENTS
 
-None
+None.
 
 =head1 FOOTNOTES
 
+None.
+
 =head1 REFERENCES
+
+None.
+
+=head1 VERSION
+
+=head2 CURRENT
+
+    Maintainer: Dan Sugalski
+    Class: Internals
+    PDD Number: 15
+    Version: 1.2
+    Status: Developing
+    Last Modified: February 09, 2004
+    PDD Format: 1
+    Language: English
+
+=head2 HISTORY
+
+=over 4
+
+=item Version 1.2
+
+February 9, 2004
+
+=item Version 1.1
+
+March 11, 2002
+
+=item version 1
+
+None. First version
+
+=back
+
+=head1 CHANGES
+
+=over 4
+
+=item Version 1.2
+
+A complete overhaul from the original spec.
+
+=item Version 1.1
+
+Removed attributes from the object interface and put them in the
+class interface section, where they belong.
+
+=item Version 1.0
+
+None. First version
+
+=back

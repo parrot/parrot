@@ -1,27 +1,9 @@
-=head1 TITLE
+# Copyright: 2001-2004 The Perl Foundation.  All Rights Reserved.
+# $Id$
 
-Conventions and Guidelines for Parrot Source Code
+=head1 NAME
 
-=head1 VERSION
-
-=head2 CURRENT
-
-   Maintainer: Dave Mitchell <davem@fdgroup.com>
-   Class: Internals
-   PDD Number: 7
-   Version: 1
-   Status: Developing
-   Last Modified: 6 August 2001
-   PDD Format: 1
-   Language: English
-
-=head2 HISTORY
-
-Based on an earlier draft which covered only code comments.
-
-=head1 CHANGES
-
-None. First version
+docs/pdds/pdd07_codingstd.pod - Conventions and Guidelines for Parrot Source Code
 
 =head1 ABSTRACT
 
@@ -429,24 +411,6 @@ foo_
 
 =back
 
-
-The top-level structure of the Parrot source tarball should be as follows:
-
-    /README, etc    a few top-level documents
-    /docs/          Assorted miscellaneous documentation
-    /docs/pdds/     The current PDDs
-    /perl/          The source code for Perl itself
-    /perl/os/foo/   OS-specific source code for operating system foo
-    /foo/           The source code for other families of binaries (eg /x2p/)
-    /hints/         per-OS build hints files
-    /scripts/       scripts needed during the building process
-    /t/             scripts used by make test
-    /lib/           perl modules ready for installation
-    /ext/           perl modules that need compiling
-    /pod/           src of the Perl man pages etc
-
-plus others as it becomes necessary.
-
 =item Header Files
 
 All .h files should include the following "guards" to prevent
@@ -643,63 +607,61 @@ apply to all source files.
 
 =item Developer files
 
-For each source file (eg a F<foo.c> F<foo.h> pair), there should be an
-accompanying developer file called F<foo.dev>, in the source
-directory.  This text file contains documentation on all the
+Each source file (eg a F<foo.c> F<foo.h> pair), should contain inline
+POD documentation containing information on the
 implementation decisions associated with the source file. (Note that
-this is in contrast to PDDs, which describe design decisions). This is
+this is in contrast to PDDs, which describe design decisions). In addition,
+more discussive documentation can be placed in F<*.dev> files in the
+F<docs/dev> directory. This is
 the place for mini-essays on how to avoid overflows in unsigned
 arithmetic, or on the pros and cons of differing hash algorithms, and
 why the current one was chosen, and how it works. 
 
 In principle, someone coming to a particular source file for the first
-time should be able to read the F<.dev> file and gain an immediate
+time should be able to read the inline documentation file and gain an immediate
 overview of what the source file is for, the algorithms it implements,
 etc.
 
-Currently no particular format or structure is imposed on the developer
-file, but it should have as a minimum the following sections:
+The POD documentation should follow the standard POD layout:
 
 =over 4
 
-=item Overview
+=item Copyright
 
-Explain the purpose of the source file.
+The Parrot copyright statement.
 
-=item Data structures and algorithms
+=item CVS
 
-Explain how it all works.
+A CVS id string.
 
-=item History
+=item NAME
+
+src/foo.c - Foo
+
+=item SYNOPSIS
+
+When appropriate, some simple examples of usage.
+
+=item DESCRIPTION
+
+A description of the contents of the file, how the implementation works,
+data structures and algorithms, and anything that may be of interest to
+your successors, eg benchmarks of differing hash algorithms, essays on
+how to do integer arithmetic.
+
+=item HISTORY
 
 Record major changes to the file, eg "we moved from a linked list to a
 hash table implementation for storing Foos, as it was found to be much
 faster".
 
-=item Notes
-
-Anything that may be of interest to your successors, eg benchmarks of
-differing hash algorithms, essays on how to do integer arithmetic.
-
-=item References
+=item SEE ALSO
 
 Links to pages and books that may contain useful info relevant to the
 stuff going on in the code - eg the book you stole the hash function
 from.
 
 =back
-
-=item Top-of-file comments
-
-In addition to the copyright message and optional quote, each source
-file must have a short comment at the top explaining the basic purpose
-of the file, eg
-
-	/* pp_hot.c - like pp.c, this file contains functions that operate
-	 * on the contents of the stack (pp == 'push & pop'), but in this
-	 * case, frequently used ('hot') functions have been moved here
-	 * from pp.c to (hopefully) improve CPU cache hit rates.
-	 */
 
 =item Per-section comments
 
@@ -709,13 +671,6 @@ general comment at the start of the section briefly explaining their
 overall purpose. (Detailed essays should be left to the developer
 file). If there is really only one section, then the top-of-file
 comment already satisfies this requirement.
-
-	/* This section deals with 'arenas', which are chunks of PMCs of
-	 * a particular type that are allocated in one go. Individual
-	 * requests can then be made to grab or release individual PMCs.
-	 * For each type foo, there is a pointer called GLOBAL_arena_foo
-	 * which blah blah....
-	 */
 
 =item Per-entity comments
 
@@ -732,17 +687,19 @@ function C<del_I_foo()>
 
 Each comment should be of the form
 
-    /*=for api apiname entityname[,entityname..] flags ....(TBC)....
-    comments....
+    /*
+    
+    =item C<function(arguments)>
+    
+    Description.
+    
+    =cut
+    
     */
 
-where I<apiname> is the API the entity belongs to, eg I<pmc>, and entity
-name is the actual name of the function or macro or whatever. Where
-there is a whole family of entities that have the same properties and
-can be collectively described with a single comment, a list of
-entity names can be provided.
+This inline POD documentation is parsed to HTML by running:
 
-TBC ...
+	% perl tools/docs/write_docs.pl -s
 
 =item Optimizations
 
@@ -904,5 +861,26 @@ The section on coding style is based on Perl5's F<Porting/patching.pod>
 by Daniel Grisinger. The section on naming conventions grew from some
 suggestions by Paolo Molaro <lupus@lettere.unipd.it>. Other snippets
 came from various P5Pers. The rest of it is probably my fault.
+
+=head1 VERSION
+
+=head2 CURRENT
+
+   Maintainer: Dave Mitchell <davem@fdgroup.com>
+   Class: Internals
+   PDD Number: 7
+   Version: 1
+   Status: Developing
+   Last Modified: 6 August 2001
+   PDD Format: 1
+   Language: English
+
+=head2 HISTORY
+
+Based on an earlier draft which covered only code comments.
+
+=head1 CHANGES
+
+None. First version
 
 

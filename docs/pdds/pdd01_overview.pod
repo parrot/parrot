@@ -1,48 +1,9 @@
-=head1 TITLE
+# Copyright: 2001-2004 The Perl Foundation.  All Rights Reserved.
+# $Id$
 
-A high-level overview of the Parrot system
+=head1 NAME
 
-=head1 VERSION
-
-=head2 CURRENT
-
-    Maintainer: Dan Sugalski
-    Class: Meta
-    PDD Number: 1
-    Version: 1
-    Status: Developing
-    Last Modified: 12 August 2003
-    PDD Format: 1
-    Language: English
-
-=head2 HISTORY
-
-=over
-
-=item 1.1
-
-12 Aug 2003
-
-=item 1.0
-
-02 Jan 2001
-
-=back
-
-=head1 CHANGES
-
-=over
-
-=item 1.1
-
-Changed perl to Parrot where appropriate. Rewrote some sections to 
-reflect the language agnostic nature of the project.
-
-=item 1.0
-
-None. First version
-
-=back
+docs/pdds/pdd01_overview.pod - A high-level overview of the Parrot system
 
 =head1 ABSTRACT
 
@@ -225,5 +186,47 @@ embedded interpreter. It also means we can have a standalone optimizer
 which can spend a lot of time groveling over bytecode, far more than
 you might want to devote to optimizing one-liners or code that'll run
 only once or twice.
+
+=back
+
+=head1 VERSION
+
+=head2 CURRENT
+
+    Maintainer: Dan Sugalski
+    Class: Meta
+    PDD Number: 1
+    Version: 1
+    Status: Developing
+    Last Modified: 12 August 2003
+    PDD Format: 1
+    Language: English
+
+=head2 HISTORY
+
+=over
+
+=item 1.1
+
+12 Aug 2003
+
+=item 1.0
+
+02 Jan 2001
+
+=back
+
+=head1 CHANGES
+
+=over
+
+=item 1.1
+
+Changed perl to Parrot where appropriate. Rewrote some sections to 
+reflect the language agnostic nature of the project.
+
+=item 1.0
+
+None. First version
 
 =back

@@ -1,30 +1,9 @@
-=head1 TITLE
+# Copyright: 2001-2004 The Perl Foundation.  All Rights Reserved.
+# $Id$
 
-Parrot Design Documents
+=head1 NAME
 
-=head1 VERSION
-
-=head2 CURRENT
-
-    Maintainer: Simon Glover <scog@amnh.org>
-    Class: Meta
-    PDD Number: 0 
-    Version: 2
-    Status: Developing
-    Last Modified:  20 February 2004
-    PDD Format: 1
-    Language: English
-
-=head2 HISTORY
-
-    v2 substantially rewritten on 20 Feb 2004 by Simon Glover
-    v1 created on 7 Dec 2000 by BCWarnock <bwarnock@capita.com>
-    v1 promoted to Developing as PDD 0 on 20 February 2001 by Dan Sugalski.
-
-=head1 CHANGES
-
-    Substantially rewritten to reflect what the PDDs actually are (rather
-    than what we hoped they would be 3+ years ago). 
+docs/pdds/pdd00_pdd.pod - Parrot Design Documents
 
 =head1 ABSTRACT
 
@@ -295,3 +274,28 @@ None.
 
 Dan Sugalski's original PDD guidelines at
 http://www.mail-archive.com/perl6-internals@perl.org/msg01766.html
+
+=head1 VERSION
+
+=head2 CURRENT
+
+    Maintainer: Simon Glover <scog@amnh.org>
+    Class: Meta
+    PDD Number: 0 
+    Version: 2
+    Status: Developing
+    Last Modified:  20 February 2004
+    PDD Format: 1
+    Language: English
+
+=head2 HISTORY
+
+    v2 substantially rewritten on 20 Feb 2004 by Simon Glover
+    v1 created on 7 Dec 2000 by BCWarnock <bwarnock@capita.com>
+    v1 promoted to Developing as PDD 0 on 20 February 2001 by Dan Sugalski.
+
+=head1 CHANGES
+
+    Substantially rewritten to reflect what the PDDs actually are (rather
+    than what we hoped they would be 3+ years ago). 
+

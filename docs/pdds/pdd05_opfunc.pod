@@ -1,29 +1,9 @@
-=head1 TITLE
+# Copyright: 2001-2004 The Perl Foundation.  All Rights Reserved.
+# $Id$
 
-Opcode Function specs
+=head1 NAME
 
-=head1 VERSION
-
-1.0
-
-=head2 CURRENT
-
-    Maintainer: Dan Sugalski <dan@sidhe.org>
-    Class: Internals
-    PDD Number: 5
-    Version: 1.0
-    Status: Developing
-    Last Modified: 16 Jul 2001
-    PDD Format: 1
-    Language: English
-
-=head2 HISTORY
-
-None. First version
-
-=head1 CHANGES
-
-None. First version
+docs/pdds/pdd05_opfunc.pod - Opcode Function specs
 
 =head1 ABSTRACT
 
@@ -195,4 +175,30 @@ opcode.
 Oploop PDD, PDD 4 (Internal types)
 
 =head1 FOOTNOTES
+
+None.
+
+=head1 VERSION
+
+1.0
+
+=head2 CURRENT
+
+    Maintainer: Dan Sugalski <dan@sidhe.org>
+    Class: Internals
+    PDD Number: 5
+    Version: 1.0
+    Status: Developing
+    Last Modified: 16 Jul 2001
+    PDD Format: 1
+    Language: English
+
+=head2 HISTORY
+
+None. First version
+
+=head1 CHANGES
+
+None. First version
+
 
