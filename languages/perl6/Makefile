@@ -2,10 +2,13 @@ compile=perl -I../../lib prd-perl6.pl --batch --imc
 imcc=../imcc/imcc
 asm=perl ../../assemble.pl
 
-all:
+all: imcc
 
 test:
-	perl -I../../lib t/*/*.t
+	for t in t/compiler/*.t; do perl -I../../lib $$t; done
+
+imcc:
+	cd ../imcc; $(MAKE)
 
 %.pasm: %.imc
 	$(imcc) $< $@
