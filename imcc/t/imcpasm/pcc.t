@@ -137,9 +137,8 @@ OUT
 #######################
 # initial test with register move
 #
-output_is(<<'CODE', <<'OUT', "basic syntax - vars");
+output_like(<<'CODE', <<'OUT', "basic syntax - vars");
 .sub _main
-    print "ok 1\n"
     .local int x
     .local int y
     x = 10
@@ -152,17 +151,15 @@ output_is(<<'CODE', <<'OUT', "basic syntax - vars");
     .local int res
     .result res
     .pcc_end
-    print "ok 2\n"
     end
 .end
 CODE
-_main:
-  print "ok 1\n"
-  set I17, 10
-  set I16, 20
-#pcc_sub_call_7:
-  set I5, I17
-  set I6, I16
+/_main:
+  set I(\d+), 10
+  set I(\d+), 20
+#pcc_sub_call_\d:
+  set I5, I\1
+  set I6, I\2
   set I0, 1
   set I1, 0
   set I2, 0
@@ -173,8 +170,7 @@ _main:
 ret:
   restoretop
   set I16, I5
-  print "ok 2\n"
-  end
+  end/
 OUT
 
 output_like(<<'CODE', <<'OUT', "non prototyped, I,S");

@@ -32,6 +32,7 @@
 static void make_stat(int *sets, int *cols);
 static void imc_stat_init(void);
 static void print_stat(void);
+static void allocate_wanted_regs(void);
 
 extern int pasm_file;
 /* Globals: */
@@ -106,6 +107,8 @@ void allocate(struct Parrot_Interp *interpreter) {
 #if DOIT_AGAIN_SAM
         build_interference_graph();
 #endif
+        if (optimizer_level & OPT_SUB)
+            allocate_wanted_regs();
         compute_spilling_costs();
         /* simplify until no changes can be made */
         /* while (simplify()) {} */
@@ -133,6 +136,8 @@ void allocate(struct Parrot_Interp *interpreter) {
             todo = 0;
         }
     }
+    if (optimizer_level & OPT_SUB)
+        pcc_optimize(interpreter);
     if (IMCC_DEBUG & DEBUG_IMC)
         dump_instructions();
     if (IMCC_VERBOSE  || (IMCC_DEBUG & DEBUG_IMC))
@@ -499,16 +504,19 @@ int interferes(SymReg * r0, SymReg * r1) {
 #if 1
         /* if they only overlap one instruction and one is used RHS only
          * and the other LHS, then that's ok
+         * same if both are LHS
          */
         if (l0->first_ins->index == l1->last_ins->index &&
                 instruction_writes(l0->first_ins, r0) &&
-                instruction_reads(l1->last_ins, r1) &&
-                !instruction_reads(l0->first_ins, r0))
+                ((instruction_reads(l1->last_ins, r1) &&
+                !instruction_reads(l0->first_ins, r0)) ||
+                instruction_writes(l1->first_ins, r1)))
             continue;
         if (l1->first_ins->index == l0->last_ins->index &&
                 instruction_writes(l1->first_ins, r1) &&
-                instruction_reads(l0->last_ins, r0) &&
-                !instruction_reads(l1->first_ins, r1))
+                ((instruction_reads(l0->last_ins, r0) &&
+                !instruction_reads(l1->first_ins, r1)) ||
+                instruction_writes(l0->first_ins, r0)))
             continue;
 #endif
 
@@ -619,7 +627,32 @@ void restore_interference_graph() {
     }
 }
 
+/*
+ * try to allocate as much as possible
+ */
+static void
+allocate_wanted_regs(void)
+{
+    int i, y, interf;
+    SymReg *r, *s;
+    SymReg ** graph = interference_graph;
 
+    for (i = 0; i < n_symbols; i++) {
+        r = reglist[i];
+        if (r->color >= 0 || r->want_regno == -1)
+            continue;
+        interf = 0;
+        for (y = 0; y < n_symbols; y++) {
+            if ((s = graph[i*n_symbols+y])
+                    && s->color == r->want_regno
+                    && s->set == r->set) {
+                interf = 1;
+            }
+        }
+        if (!interf)
+            r->color = r->want_regno;
+    }
+}
 /*
  * Color the graph assigning registers to each symbol:
  *

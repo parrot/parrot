@@ -35,7 +35,7 @@
  * loop_optimization ... pull invariants out of loops
  * TODO e.g. constant_propagation
  *
- * TODO post_optimizer
+ * post_optimizer: currently pcc_optimize in pcc.c
  * ---------------
  *
  *  runs after register alloocation
@@ -224,9 +224,9 @@ static void strength_reduce(struct Parrot_Interp *interp)
          * mul Ix, 0, Iy => set Ix, 0
          * mul Ix, 0     => set Ix, 0
          */
-        if ( ( ( ins->opsize >= 3 &&
-                        ins->r[1]->type == VTCONST &&
-                        atof(ins->r[1]->name) == 0.0) ||
+    if ( ( ( ins->opsize >= 3 &&
+                    ins->r[1]->type == VTCONST &&
+                    atof(ins->r[1]->name) == 0.0) ||
                     (ins->opsize == 4 &&
                      ins->r[2]->type == VTCONST &&
                      atof(ins->r[2]->name) == 0.0)) &&

@@ -66,6 +66,7 @@ void init_tables(struct Parrot_Interp * interp);
 void expand_pcc_sub(Parrot_Interp interpreter, Instruction *ins);
 void expand_pcc_sub_call(Parrot_Interp interpreter, Instruction *ins);
 void expand_pcc_sub_ret(Parrot_Interp interpreter, Instruction *ins);
+void pcc_optimize(Parrot_Interp interpreter);
 
 /* This should be common with Cola */
 
@@ -95,6 +96,7 @@ EXTERN enum {
 	OPT_NONE,
 	OPT_PRE,
 	OPT_CFG = 	0x002,
+	OPT_SUB = 	0x004,
 	OPT_PASM =      0x100,
 	OPT_J = 	0x200
 } enum_opt;

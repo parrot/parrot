@@ -197,6 +197,7 @@ expand_pcc_sub(Parrot_Interp interpreter, Instruction *ins)
                          */
                         if (sub->pcc_sub->calls_a_sub) {
                             regs[0] = arg;
+                            arg->reg->want_regno = next[j];
                             sprintf(buf, "%c%d", arg->set, next[j]++);
                             regs[1] = mk_pasm_reg(str_dup(buf));
                             /* e.g. set $I0, I5 */
@@ -312,8 +313,13 @@ lazy:
                     break;
                 default:
                     if (arg->type & VTREGISTER) {
-                        /* TODO for now just emit a register move */
-                        goto lazy;
+                        for (j = 0; j < 4; j++)
+                            if (arg->set == types[j]) {
+                                arg->reg->want_regno = next[j];
+                                break;
+                            }
+                            /* TODO for now just emit a register move */
+                            goto lazy;
                     }
             }
         }
@@ -361,6 +367,10 @@ overflow:
     reg = mk_pasm_reg(str_dup("P1"));
     regs[0] = reg;
     ins = insINS(interpreter, ins, "invoke", regs, arg_count);
+    /*
+     * mark the invoke instruction's PCC sub type
+     */
+    ins->type |= arg_count == 0 ? ITPCCYIELD : ITPCCSUB;
     if (arg_count == 0) {
         /* TODO optimize this later */
         ins = insINS(interpreter, ins, "restoretop", regs, 0);
@@ -421,6 +431,11 @@ lazy:
                 default:
                     if (arg->type & VTREGISTER) {
                         /* TODO for now just emit a register move */
+                        for (j = 0; j < 4; j++)
+                            if (arg->set == types[j]) {
+                                arg->reg->want_regno = next[j];
+                                break;
+                            }
                         goto lazy;
                     }
             }
@@ -454,6 +469,7 @@ move_sub:
             reg = mk_pasm_reg(str_dup("P0"));
             regs[0] = reg;
             regs[1] = arg;
+            arg->reg->want_regno = 0;
             ins = insINS(interpreter, ins, "set", regs, 2);
         }
     }
@@ -471,6 +487,7 @@ move_cc:
                 reg = mk_pasm_reg(str_dup("P1"));
                 regs[0] = reg;
                 regs[1] = arg;
+                arg->reg->want_regno = 1;
                 ins = insINS(interpreter, ins, "set", regs, 2);
             }
         }
@@ -507,6 +524,7 @@ move_cc:
      */
     ins = insINS(interpreter, ins, "savetop", regs, 0);
     ins = insINS(interpreter, ins, need_cc ? "invokecc" : "invoke", regs, 0);
+    ins->type |= ITPCCSUB;
     /*
      * locate return label,
      * we must have one or the parser would have failed
@@ -531,11 +549,17 @@ move_cc:
                         next[j]++;
                         break;
                     }
+                    arg->reg->want_regno = next[j];
                     sprintf(buf, "%c%d", arg->set, next[j]++);
                     reg = mk_pasm_reg(str_dup(buf));
                     regs[0] = arg;
                     regs[1] = reg;
                     ins = insINS(interpreter, ins, "set", regs, 2);
+                    /* the register is coming out of the sub,
+                     * so mark it as so
+                     */
+                    ins->flags |= 1 << (16 + 1);
+                    ins->flags &= ~(1 << 1);
                     break;
                 }
             }
@@ -546,6 +570,46 @@ move_cc:
             regs[0] = arg;
             regs[1] = p3;
             ins = insINS(interpreter, ins, "shift", regs, 2);
+        }
+    }
+}
+/*
+ * special peephole optimizer for code generated mainly by
+ * above functions
+ * TODO register save/restore ops
+ */
+void
+pcc_optimize(Parrot_Interp interpreter)
+{
+    Instruction *ins, *tmp;
+    info(2, "\tpcc_optimize\n");
+    for (ins = instructions; ins; ins = ins->next) {
+        if (ins->opsize == 3 &&
+                ins->r[1]->type == VTCONST &&
+                (ins->r[1]->set == 'I' || ins->r[1]->set == 'N') &&
+                atof(ins->r[1]->name) == 0.0 &&
+                !strcmp(ins->op, "set")) {
+            debug(DEBUG_OPT1, "opt1 %s => ", ins_string(ins));
+            tmp = INS(interpreter, "null", NULL, ins->r, 1, 0, 0);
+            debug(DEBUG_OPT1, "%s\n", ins_string(tmp));
+            subst_ins(ins, tmp, 1);
+            ins = tmp;
+        }
+        else if (ins->opsize == 3 &&
+                !strcmp(ins->op, "set")) {
+            SymReg *r0 = ins->r[0];
+            SymReg *r1 = ins->r[1];
+            if (r0->type & VT_REGP)
+                r0 = r0->reg;
+            if (r1->type & VT_REGP)
+                r1 = r1->reg;
+            if (r0->set == r1->set && r0->color == r1->color) {
+                debug(DEBUG_OPT1, "opt1 %s => ", ins_string(ins));
+                ins = delete_ins(ins, 1);
+                ins = ins->prev ? ins->prev : instructions;
+                debug(DEBUG_OPT1, "deleted\n");
+                ostat.deleted_ins++;
+            }
         }
     }
 }

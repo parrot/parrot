@@ -20,6 +20,34 @@ static void propagate_need(Basic_block *bb, SymReg* r, int i);
 
 /* Code: */
 
+#define INVOKE_SUB_CALL 1
+#define INVOKE_SUB_RET  2
+#define INVOKE_SUB_LOOP 3
+#define INVOKE_SUB_OTHER 4
+static int
+check_invoke_type(Instruction *ins)
+{
+    /*
+     * 1) pcc sub call or yield
+     */
+    if (ins->type & (ITPCCSUB | ITPCCYIELD))
+        return INVOKE_SUB_CALL;
+    /*
+     * inside another pcc_sub
+     * 2) invoke = loop to begin
+     */
+    if (instructions->r[1] && instructions->r[1]->pcc_sub)
+        return INVOKE_SUB_LOOP;
+    /* 3) invoke P1 returns */
+    if (ins->opsize == 2)
+        return INVOKE_SUB_RET;
+    /* 4) other usage */
+
+    dont_optimize = 1;  /* too complex, to follow */
+    optimizer_level &= ~OPT_PASM;
+    return INVOKE_SUB_OTHER;
+}
+
 void find_basic_blocks (Parrot_Interp interpreter, int first) {
     Basic_block *bb;
     Instruction *ins;
@@ -61,9 +89,7 @@ void find_basic_blocks (Parrot_Interp interpreter, int first) {
             if (ins->opsize == 1) {
                 SymReg * p0 = mk_pasm_reg(str_dup("P0"));
                 add_instruc_reads(ins, p0);
-                ins->type |= 1;      /* mark branch register */
-                dont_optimize = 1;  /* too complex, to follow */
-                optimizer_level &= ~OPT_PASM;
+                check_invoke_type(ins);
                 p0->use_count++;
             }
             ins->type |= IF_r0_branch | ITBRANCH;
@@ -74,7 +100,7 @@ void find_basic_blocks (Parrot_Interp interpreter, int first) {
             add_instruc_writes(ins, p0);
             add_instruc_writes(ins, p1);
         }
-        if (ins->type & ITPCCSUB) {
+        if (ins->opnum == -1 && (ins->type & ITPCCSUB)) {
             if (first) {
                 if (ins->type & ITLABEL) {
                     expand_pcc_sub_ret(interpreter, ins);
@@ -84,6 +110,7 @@ void find_basic_blocks (Parrot_Interp interpreter, int first) {
                     /* if this is a pcc_sub_call expand it */
                     expand_pcc_sub_call(interpreter, ins);
                 }
+                ins->type &= ~ITPCCSUB;
             }
         }
         else if (ins->type & ITLABEL) {
@@ -176,6 +203,11 @@ void build_cfg() {
         addr = get_branch_reg(bb->end);
         if (addr)
             bb_findadd_edge(bb, addr);
+        else if (!strcmp(bb->start->op, "invoke") ||
+                !strcmp(bb->start->op, "invokecc")) {
+            if (check_invoke_type(bb->start) == INVOKE_SUB_LOOP)
+                bb_add_edge(bb, bb_list[0]);
+        }
         if (!strcmp(bb->end->op, "ret")) {
             Instruction * sub;
             debug(DEBUG_CFG, "found ret in bb %d\n", i);
@@ -794,8 +826,12 @@ void mark_loop (Edge* e){
     debug (DEBUG_CFG, "loop from %d to %d, entered from %d\n", footer->index,
             header->index, enter ? enter->index : -1 );
     if (i != 1) {
-        if (i==0)
-            debug(DEBUG_CFG,"\tdead code\n");
+        if (i==0) {
+            if (header->index)
+                debug(DEBUG_CFG,"\tdead code\n");
+            else
+                debug(DEBUG_CFG, "\tsub start\n");
+        }
         else
             debug(DEBUG_CFG,
                     "\tcan't determine loop entry block (%d found)\n" ,i);

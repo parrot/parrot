@@ -166,7 +166,7 @@ void dump_symreg() {
             "\nSymbols: n_comp_units %d"
             "\n----------------------------------------------\n",
             n_comp_units);
-    fprintf(stderr, "name\tfirst\tlast\t1.blk\t-blk\tset col tscore\t"
+    fprintf(stderr, "name\tfirst\tlast\t1.blk\t-blk\tset col     \tscore\t"
             "used\tlhs_use\tregp\tus flgs\n"
             "----------------------------------------------\n");
     for(i = 0; i <n_symbols; i++) {
@@ -175,12 +175,12 @@ void dump_symreg() {
             continue;
         if(!r->first_ins)
             continue;
-        fprintf(stderr, "%s\t%d\t%d\t%d\t%d\t%c   %2d  %d\t%d\t%d\t%s\t%x\n",
+        fprintf(stderr, "%s\t%d\t%d\t%d\t%d\t%c   %2d %2d\t%d\t%d\t%d\t%s\t%x\n",
                 r->name,
 		    r->first_ins->index, r->last_ins->index,
 		    r->first_ins->bbindex, r->last_ins->bbindex,
 		    r->set,
-                r->color, r->score,
+                r->color, r->want_regno, r->score,
                 r->use_count, r->lhs_use_count,
                 r->reg ? r->reg->name : "",
                 r->usage

@@ -2,6 +2,10 @@
 
 	* DEPRECATE NESTED SUBROUTINES and CODE OUTSIDE OF SUBS
 
+	* fix CFG for pcc invoke
+	* use want_regno in register assignments for -Oc
+	* pcc_optimize() experimental post_optimizer -Oc
+
 - 2003-08-01	leo
 
 	* version 0.0.10.3
