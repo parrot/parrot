@@ -1,7 +1,7 @@
 core_ops.c
 Makefile
-test_prog
 pdump
+parrot
 Makefile
 *.patch
 vtable.ops
