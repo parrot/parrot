@@ -565,12 +565,16 @@ sub STORE_GLOBAL {
     my ($n, $c, $cmt) = @_;
     my $tos = pop @stack;
     my $p = $tos->[1];
-    if ($globals{$c}) {
-	print <<EOC;
-	assign $c, $p;
+    my $t;
+    if ($t=$globals{$c}) {
+	if ($t ne $p) {
+	    print <<EOC;
+	assign $t, $p
 EOC
+	}
     }
     else {
+	$p = promote($tos);
 	print <<EOC;
 	global "$c" = $p $cmt
 EOC
@@ -908,6 +912,30 @@ EOC
 	push @stack, [-1, $n, $tos->[2]];
 
     }
+}
+
+sub UNARY_POSITIVE
+{
+    my (undef, $c, $cmt) = @_;
+    my $t = pop @stack;
+    my $p = $t->[1];
+    print <<EOC;
+    \t $cmt
+EOC
+    push @stack, [-1, $p, 'P'];
+}
+
+sub UNARY_NEGATIVE
+{
+    my (undef, $c, $cmt) = @_;
+    my $t = pop @stack;
+    my $n = temp('P');
+    my $p = $t->[1];
+    print <<EOC;
+	$n = new $DEFVAR
+	neg $n, $p $cmt
+EOC
+    push @stack, [-1, $n, 'P'];
 }
 
 sub except_compare

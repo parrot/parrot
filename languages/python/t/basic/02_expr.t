@@ -3,7 +3,7 @@
 use strict;
 use lib '../../lib';
 
-use Parrot::Test tests => 8;
+use Parrot::Test tests => 9;
 
 sub test {
     language_output_is('python', $_[0], '', $_[1]);
@@ -63,4 +63,10 @@ def main():
 
 if __name__ == '__main__':
     main()
+CODE
+
+test( <<'CODE', 'neg' );
+a = 3
+print -a
+print +a - -a
 CODE

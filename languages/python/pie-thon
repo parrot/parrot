@@ -1,0 +1,9 @@
+# pie-thon x.py [ parrot-options ]
+
+f=${1%%".py"}
+[ $f.py -nt $f.pbc ] && rm -f $f.pbc
+[ -e $f.pbc ] || (
+	perl pie-thon.pl $1 > $f.pir
+	../../parrot -o $f.pbc -Oc $f.pir
+)
+../../parrot -j --python "${@:2}" $f.pbc
