@@ -66,8 +66,8 @@ if performance doesn't matter:
     print I5			# do something with parameters
     invoke P1			# return
 
-If a subroutine is called several times, for instance inside a loop, 
-the creation of the return continuation can be done outside the loop if 
+If a subroutine is called several times, for instance inside a loop,
+the creation of the return continuation can be done outside the loop if
 performance is an issue:
 
     newsub .Sub, .Continuation, _sub_label, ret_label
@@ -99,6 +99,8 @@ should be used:
 
 =head1 FILES
 
+F<classes/sub.pmc>, F<classes/closure.pmc>, F<classes/continuation.pmc>,
+F<classes/coroutine.pmc>,
 F<docs/pdds/pdd03_calling_conventions.pod>, F<t/pmc/sub.t>
 
 =head1 AUTHOR

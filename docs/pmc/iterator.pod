@@ -1,0 +1,54 @@
+=head1 NAME
+
+Iterator - Parrot Iterator Class
+
+=head1 DESCRIPTION
+
+Iterators are used in combination with other classes (mainly
+aggregates) to visit all entries in that aggregate.
+
+=head1 SYNOPSIS
+
+Iterate from the beginning of the aggregate:
+
+    new P0, .Iterator, P1	# setup iterator for aggregate P1
+    set P0, 0			# reset iterator, begin at start
+  iter_loop:
+    unless P0, iter_end		# while (entries) ...
+      shift P2, P0		# get entry
+      ...
+      branch iter_loop
+
+Iterate from the end of the aggregate (Array like classes only):
+
+    new P0, .Iterator, P1	# setup iterator for aggregate P1
+    set P0, 3			# reset iterator, begin at end
+  iter_loop:
+    unless P0, iter_end		# while (entries) ...
+      pop P2, P0		# get entry
+      ...
+      branch iter_loop
+
+=head2 Iterating over hashes
+
+    .include "datatypes.pasm"	# type constants
+    new P0, .Iterator, P1	# setup iterator for hash P1
+    set P0, 0			# reset iterator, begin at start
+  iter_loop:
+    unless P0, iter_end		# while (entries) ...
+      shift S2, P0		# get key for next entry
+      typeof I0, P0[S2]		# get type of entry at key S2
+      ne I0, .DATATYPE_INTVAL, no_int
+      set I1, P0[S2]            # extract integer
+    no_int:
+
+      ...
+      branch iter_loop
+
+=head1 FILES
+
+F<classes/iterator.pmc>, F<t/pmc/iter.t>
+
+=head1 AUTHOR
+
+Leopold Toetsch <lt@toetsch.at>
