@@ -7,7 +7,7 @@ See also languages/LANGUAGES.STATUS for language authors/maintainers.
 Design				Dan Sugalski
 Release pumpking		Leopold "leo" Toetsch
 JIT				Daniel Grunblatt, Leopold Toetsch
-Configure			Brent Dax
+Configure			Brent Royal-Gordon
 Garbage Collector               ** volunteers?? **
 I/O				Melvin Smith, Juergen Boemmels
 IMCC & PIR                      Melvin Smith, Leopold Toetsch
