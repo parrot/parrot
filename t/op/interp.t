@@ -256,8 +256,7 @@ output_is(<<'CODE', <<'OUTPUT', "thread 1");
     print "ok 1\n"
     find_global P6, "_foo"
     print "ok 2\n"
-    # create thread from interp P2
-    new P5, .ParrotThread, P2
+    new P5, .ParrotThread
     find_method P0, P5, "thread"
     invoke	# start the thread
 
@@ -268,6 +267,11 @@ output_is(<<'CODE', <<'OUTPUT', "thread 1");
     print P7
     print I5
     print S5
+    # get tid of thread
+    set I5, P5
+    # wait for it
+    find_method P0, P2, "join"
+    invoke
     end
 
 .pcc_sub _foo:

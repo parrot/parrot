@@ -199,7 +199,7 @@ sub rewrite_method ($$$$$) {
 
     # Rewrite SELF -> pmc, INTERP -> interpreter
     s/SELF/pmc/g;
-    s/INTERP/interpreter/g;
+    s/\bINTERP\b/interpreter/g;
 
     # now use macros for all rewritten stuff
     s/\b(?:\w+)->vtable->(\w+)\(/ VTABLE_$1(/g;

@@ -89,9 +89,10 @@ pt_thread_run(Parrot_Interp interp, PMC* dest_interp, PMC* sub)
     REG_PMC(0) = sub;
     REG_PMC(2) = dest_interp;
     /*
-     * for now create a detached thread - enough for testing
+     * create a joinable thread
      */
-    THREAD_CREATE_DETACHED(interpreter->thread_data->thread,
+    interpreter->thread_data->state = THREAD_STATE_JOINABLE;
+    THREAD_CREATE_JOINABLE(interpreter->thread_data->thread,
             thread_func, dest_interp);
     return 0;
 }
@@ -113,6 +114,34 @@ pt_thread_yield(void)
 void*
 pt_thread_join(UINTVAL tid)
 {
+    Parrot_Interp interpreter;
+    int state;
+
+    LOCK(interpreter_array_mutex);
+    if (tid >= n_interpreters) {
+        UNLOCK(interpreter_array_mutex);
+        internal_exception(1, "join: illegal thread tid %d", tid);
+    }
+    if (!interpreter_array[tid]) {
+        UNLOCK(interpreter_array_mutex);
+        internal_exception(1, "join: illegal thread tid %d - empty", tid);
+    }
+    interpreter = interpreter_array[tid];
+    if (interpreter->thread_data->state == THREAD_STATE_JOINABLE) {
+        void *retval;
+        UNLOCK(interpreter_array_mutex);
+        JOIN(interpreter->thread_data->thread, retval);
+        LOCK(interpreter_array_mutex);
+        interpreter->thread_data->state = THREAD_STATE_JOINED;
+        UNLOCK(interpreter_array_mutex);
+        return retval;
+    }
+    /*
+     * when here thread was in wrong state
+     */
+    state = interpreter->thread_data->state;
+    UNLOCK(interpreter_array_mutex);
+    internal_exception(1, "join: illegal thread state %d tid %d", state, tid);
     return NULL;
 }
 
@@ -131,6 +160,7 @@ pt_thread_detach(UINTVAL tid)
 
 /*
  * all threaded interpreters are stored in an array
+ * assumens that called with LOCK hold
  */
 void
 pt_add_to_interpreters(Parrot_Interp interpreter, Parrot_Interp new_interp)

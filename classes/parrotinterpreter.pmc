@@ -43,8 +43,7 @@ clone_regs(Parrot_Interp d, Parrot_Interp s, PMC *dest)
 	    PMC *sp = s->pmc_reg.registers[i];
 	    /* special case, dont clone SELF again - ugly */
 	    if ((sp->vtable->base_type == enum_class_ParrotInterpreter ||
-                 sp->vtable->base_type == enum_class_ParrotThread)     &&
-		    PMC_data(sp) == s)
+                 sp->vtable->base_type == enum_class_ParrotThread))
 		d->pmc_reg.registers[i] = dest;
 	    else {
 		PMC *dp = pmc_new_noinit(d, sp->vtable->base_type);
@@ -55,28 +54,74 @@ clone_regs(Parrot_Interp d, Parrot_Interp s, PMC *dest)
     }
 }
 
+/*
+ * copied from parrotio.pmc - this ought to be a global
+ * helper function
+ */
+static void
+enter_nci_method(struct Parrot_Interp *interpreter, PMC *method_table,
+		 void *func, const char *name, const char *proto)
+{
+    PMC *method;
+
+    method = pmc_new(interpreter, enum_class_NCI);
+    VTABLE_set_string_keyed(interpreter, method, func,
+	    string_make(interpreter, proto, strlen(proto),
+		NULL, PObj_constant_FLAG|PObj_external_FLAG, NULL));
+    VTABLE_set_pmc_keyed_str(interpreter, method_table,
+	    string_make(interpreter, name,
+		strlen(name), NULL,
+		PObj_constant_FLAG|PObj_external_FLAG, NULL),
+	    method);
+}
+
+void Parrot_NCI_class_init(Parrot_Interp, int);
+void Parrot_PerlHash_class_init(Parrot_Interp, int);
+void Parrot_PerlUndef_class_init(Parrot_Interp, int);
 
 pmclass ParrotInterpreter need_ext {
 
+    void class_init () {
+        PMC *method_table;
+
+        /* These classes are needed now so make sure they are inited */
+        Parrot_NCI_class_init(interp, enum_class_NCI);
+        Parrot_PerlHash_class_init(interp, enum_class_PerlHash);
+        Parrot_PerlUndef_class_init(interp, enum_class_PerlUndef);
+
+        method_table = pmc_new(INTERP, enum_class_PerlHash);
+
+        enter_nci_method(INTERP, method_table,
+                         F2DPTR(pt_thread_run), "thread", "vIPP");
+        enter_nci_method(INTERP, method_table,
+                         F2DPTR(pt_thread_yield), "yield", "v");
+        enter_nci_method(INTERP, method_table,
+                         F2DPTR(pt_thread_join), "join", "vi");
+        enter_nci_method(INTERP, method_table,
+                         F2DPTR(pt_thread_detach), "detach", "vi");
+
+        Parrot_base_vtables[enum_class_ParrotInterpreter]->method_table =
+	    method_table;
+    }
+
     void init () {
-	struct Parrot_Interp *new_interp;
         /*
-         * init/init_pmc may be called internally (from thread reation in
+         * init/init_pmc may be called internally (from thread creation in
          * ParrotThread::init_pmc() or stand-alone
          * so we check, if the interpreter is already setup
          */
         if (!PMC_data(SELF)) {
-            new_interp = make_interpreter(INTERP, 0);
+            Parrot_Interp new_interp = make_interpreter(INTERP, 0);
             PMC_data(SELF) = new_interp;
         }
 	SELF->cache.struct_val = NULL;
     }
 
-    void init_pmc (PMC *src) {
-	struct Parrot_Interp *new_interp;
-        struct Parrot_Interp *s = PMC_data(src);
+    void init_pmc (PMC *parent) {
+        Parrot_Interp p = PMC_data(parent);
+
         if (!PMC_data(SELF)) {
-            new_interp = make_interpreter(s, 0);
+            Parrot_Interp new_interp = make_interpreter(p, 0);
             PMC_data(SELF) = new_interp;
         }
 	SELF->cache.struct_val = NULL;
@@ -159,7 +204,7 @@ pmclass ParrotInterpreter need_ext {
 	Parrot_Interp d;
 
         /*
-         * clone may be called internally (from thread reation in
+         * clone may be called internally (from thread creation in
          * ParrotThread::init_pmc() or stand-alone
          * so we check, if the interpreter is already setup
          */
