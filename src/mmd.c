@@ -29,7 +29,7 @@ mmd_dispatch_pmc(struct Parrot_Interp *interpreter,
     offset = interpreter->binop_mmd_funcs->x[function] * right_type + left_type;
     real_function = (pmc_mmd_f)(interpreter->binop_mmd_funcs->mmd_funcs[
             function] + offset);
-    return (*real_function)(interpreter, left, right, dest);
+    (*real_function)(interpreter, left, right, dest);
 }
 
 STRING *
