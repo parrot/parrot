@@ -12,7 +12,15 @@
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h> 
-#include <sysexits.h>
+#ifndef _MSC_VER
+#  include <sysexits.h>
+#else
+#  define EX_DATAERR 1
+#  define EX_SOFTWARE 1
+#  define EX_NOINPUT 1
+#  define EX_IOERR 1
+#  define EX_UNAVAILABLE 1
+#endif
 #include <assert.h>
 #include "imc.h"
 #include "anyop.h"
@@ -467,7 +475,7 @@ void relop_to_op(int relop, char * op) {
 
 %token <i> CALL GOTO BRANCH ARG RET PRINT IF UNLESS NEW END SAVEALL RESTOREALL
 %token <i> SUB NAMESPACE CLASS ENDCLASS SYM LOCAL PARAM PUSH POP INC DEC
-%token <i> SHIFT_LEFT SHIFT_RIGHT INT FLOAT STRINGV DEFINED LOG_XOR
+%token <i> SHIFT_LEFT SHIFT_RIGHT INTV FLOATV STRINGV DEFINED LOG_XOR
 %token <i> RELOP_EQ RELOP_NE RELOP_GT RELOP_GTE RELOP_LT RELOP_LTE
 %token <i> GLOBAL ADDR CLONE RESULT RETURN POW
 %token <i> COMMA
@@ -558,8 +566,8 @@ instruction:
     ;
 
 type:
-        INT { $$ = 'I'; }
-    |   FLOAT { $$ = 'N'; }
+        INTV { $$ = 'I'; }
+    |   FLOATV { $$ = 'N'; }
     |   STRINGV { $$ = 'S'; }
     |   classname { $$ = 'P'; }
     ;
@@ -702,8 +710,13 @@ int main(int argc, char * argv[])
    
     if (IMCC_DEBUG)
 	fprintf(stderr, "loading libs...");
+#ifdef _MSC_VER
+    op_load_file("../../blib/lib/libparrot.dll");
+#else
     op_load_file("../../blib/lib/libparrot.so");
-    op_load_lib("core", 0, 0, 7);
+#endif
+    op_load_lib("core", PARROT_MAJOR_VERSION, PARROT_MINOR_VERSION,
+                        PARROT_PATCH_VERSION);
     if (IMCC_DEBUG)
 	fprintf(stderr, "done\n");
 

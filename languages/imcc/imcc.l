@@ -72,10 +72,10 @@ RANKSPEC        \[[,]*\]
 "goto"          return(GOTO);
 "if"            return(IF);
 "unless"        return(UNLESS);
-"int"           return(INT);
+"int"           return(INTV);
 "inc"           return(INC);
 "dec"           return(DEC);
-"float"         return(FLOAT);
+"float"         return(FLOATV);
 "new"           return(NEW);
 "defined"       return(DEFINED);
 "addr"          return(ADDR);

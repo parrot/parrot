@@ -4,11 +4,12 @@
 
 #include <time.h>
 #include <sys/time.h>
+
+#include "parrot/parrot.h"
+
 #ifdef HAS_HEADER_DLFCN
 #   include <dlfcn.h>
 #endif
-
-#include "parrot/parrot.h"
 
 #define PARROT_DLOPEN_FLAGS RTLD_LAZY
 
@@ -72,7 +73,7 @@ Parrot_setenv(const char *name, const char *value)
 void *
 Parrot_dlopen(const char *filename)
 {
-#ifdef HAS_DLOPEN
+#ifdef HAS_HEADER_DLFCN
     return dlopen(filename, PARROT_DLOPEN_FLAGS);
 #else
     return 0;
@@ -87,7 +88,7 @@ Parrot_dlopen(const char *filename)
 const char *
 Parrot_dlerror(void)
 {
-#ifdef HAS_DLOPEN
+#ifdef HAS_HEADER_DLFCN
     return dlerror();
 #else
     return 0;
@@ -102,7 +103,7 @@ Parrot_dlerror(void)
 void *
 Parrot_dlsym(void *handle, const char *symbol)
 {
-#ifdef HAS_DLOPEN
+#ifdef HAS_HEADER_DLFCN
     return dlsym(handle, symbol);
 #else
     return 0;
@@ -117,7 +118,7 @@ Parrot_dlsym(void *handle, const char *symbol)
 int
 Parrot_dlclose(void *handle)
 {
-#ifdef HAS_DLOPEN
+#ifdef HAS_HEADER_DLFCN
     return dlclose(handle);
 #else
     return -1;

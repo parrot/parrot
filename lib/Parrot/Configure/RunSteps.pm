@@ -30,6 +30,7 @@ use vars qw(@steps);
 	gen/config_pm.pl
 	gen/makefiles.pl
 	gen/platform.pl
+	gen/libparrot_def.pl
 );
 #	auto/alignptrs.pl
 

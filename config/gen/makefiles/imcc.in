@@ -1,0 +1,57 @@
+O = ${o}
+RM_F = ${rm_f}
+
+INC=../../include/parrot
+
+H_FILES = $(INC)/parrot.h imc.h imcparser.h stacks.h cfg.h \
+	instructions.h cfg.h debug.h sets.h anyop.h
+
+
+IMCC_O_FILES = imcparser$(O) imclexer$(O) imc$(O) stacks$(O) symreg$(O) \
+	instructions$(O) cfg$(O) sets$(O) debug$(O) anyop$(O) \
+
+O_FILES = $(IMCC_O_FILES) \
+	../../platform$(O)
+
+#DO NOT ADD C COMPILER FLAGS HERE
+#Add them in Configure.pl--look for the
+#comment 'ADD C COMPILER FLAGS HERE'
+CFLAGS = ${ccflags} -I../../include
+
+C_LIBS = ${libs}
+
+CC = ${cc}
+PERL = ${perl}
+MAKE_F=${make}
+YACC = bison -v -y
+LEX = flex
+
+LD = ${ld}
+LD_SHARED = ${ld_shared}
+LD_OUT = ${ld_out}
+
+all : imcc
+	cd ../.. && $(MAKE) shared && $(RM_F) parrot${exe} && $(MAKE)
+
+imcparser.c imcparser.h : imcc.y
+	$(YACC) -d -o imcparser.c imcc.y
+
+imclexer.c : imcc.l $(HEADERS)
+	$(LEX) imcc.l
+
+.c$(O):
+	$(CC) $(CFLAGS) ${cc_exe_out}$@ -c $<
+
+clean:
+	$(RM_F) core
+	$(RM_F) $(IMCC_O_FILES)
+	$(RM_F) imcparser.output
+	$(RM_F) imcc
+
+realclean: clean
+	$(RM_F) a.pasm
+	$(RM_F) imcparser.*
+	$(RM_F) imclexer.*
+
+imcc: $(O_FILES)
+	$(LD) $(LD_OUT)imcc $(LDFLAGS) $(O_FILES) $(C_LIBS)

@@ -1,12 +1,13 @@
 O = ${o}
-SO = .so
-A = .a
+SO = ${so}
+A = ${a}
 RM_F = ${rm_f}
 RM_RF = ${rm_rf}
 AR_CRS = ar crs
 LD = ${ld}
 LD_SHARED = ${ld_shared}
 LD_OUT = ${ld_out}
+LD_SHARED_FLAGS=${ld_shared_flags}
 
 INC=include/parrot
 
@@ -158,10 +159,6 @@ all : $(TEST_PROG) docs
 
 mops : examples/assembly/mops${exe} examples/mops/mops${exe}
 
-# XXX Unix-only for now
-libparrot$(A) : $(O_DIRS) $(O_FILES)
-	$(AR_CRS) $@ $(O_FILES)
-
 $(TEST_PROG) : test_main$(O) $(GEN_HEADERS) $(O_DIRS) $(O_FILES) lib/Parrot/OpLib/core.pm lib/Parrot/PMC.pm
 	$(LD) ${ld_out}$(TEST_PROG) $(LDFLAGS) $(O_FILES) test_main$(O) $(C_LIBS)
 
@@ -180,50 +177,60 @@ check_source : $(GENERAL_H_FILES)
 #
 # Shared Library Targets:
 #
-# XXX This target is not portable to Win32
-#
 ###############################################################################
 
 blib :
-	mkdir -p blib
+	-mkdir blib
 
-blib_lib :
-	mkdir -p blib/lib
+blib_lib : blib
+	-mkdir blib${slash}lib
 
-shared : blib_lib blib/lib/libparrot$(SO) blib/lib/libcore_prederef$(SO) $(TEST_PROG_SO)
+shared : blib_lib blib/lib/libparrot$(SO) ${blib_lib_libparrot_a} $(TEST_PROG_SO)
 
-blib/lib/libparrot$(SO).${VERSION} : blib_lib $(O_DIRS) $(O_FILES)
-	$(LD) $(LD_SHARED) -Wl,-soname,libparrot$(SO).${MAJOR} $(LDFLAGS) $(LD_OUT)blib/lib/libparrot$(SO).${VERSION} $(O_FILES)
+# XXX Unix-only for now
+blib/lib/libparrot$(A) : $(O_DIRS) $(O_FILES)
+	$(AR_CRS) $@ $(O_FILES)
 
-blib/lib/libparrot$(SO).${MAJOR}.${MINOR} : blib/lib/libparrot$(SO).${VERSION}
-	$(RM_F) $@
-	cd blib/lib; ln -s libparrot$(SO).${VERSION} libparrot$(SO).${MAJOR}.${MINOR}
-
-blib/lib/libparrot$(SO).${MAJOR} : blib/lib/libparrot$(SO).${MAJOR}.${MINOR}
-	$(RM_F) $@
-	cd blib/lib; ln -s libparrot$(SO).${MAJOR}.${MINOR} libparrot$(SO).${MAJOR}
-
-blib/lib/libparrot$(SO) : blib/lib/libparrot$(SO).${MAJOR}
-	$(RM_F) $@
-	cd blib/lib; ln -s libparrot$(SO).${MAJOR} libparrot$(SO)
-
-blib/lib/libcore_prederef$(SO).${VERSION} : blib_lib core_ops_prederef$(O)
-	$(LD) $(LD_SHARED) -Wl,-soname,libparrot$(SO).${MAJOR} $(LDFLAGS) $(LD_OUT)blib/lib/libcore_prederef$(SO).${VERSION} core_ops_prederef$(O)
-
-blib/lib/libcore_prederef$(SO).${MAJOR}.${MINOR} : blib/lib/libcore_prederef$(SO).${VERSION}
-	$(RM_F) $@
-	cd blib/lib; ln -s libcore_prederef$(SO).${VERSION} libcore_prederef$(SO).${MAJOR}.${MINOR}
-
-blib/lib/libcore_prederef$(SO).${MAJOR} : blib/lib/libcore_prederef$(SO).${MAJOR}.${MINOR}
-	$(RM_F) $@
-	cd blib/lib; ln -s libcore_prederef$(SO).${MAJOR}.${MINOR} libcore_prederef$(SO).${MAJOR}
-
-blib/lib/libcore_prederef$(SO) : blib/lib/libcore_prederef$(SO).${MAJOR}
-	$(RM_F) $@
-	cd blib/lib; ln -s libcore_prederef$(SO).${MAJOR} libcore_prederef$(SO)
+blib/lib/libparrot$(SO) : blib_lib $(O_DIRS) $(O_FILES)
+	$(LD) $(LD_SHARED) $(LD_SHARED_FLAGS) $(LDFLAGS) $(LD_OUT)blib/lib/libparrot$(SO) $(O_FILES) $(C_LIBS)
 
 $(TEST_PROG_SO) : test_main$(O) blib/lib/libparrot$(SO) lib/Parrot/OpLib/core.pm lib/Parrot/PMC.pm
-	$(LD) $(LD_OUT)$(TEST_PROG) test_main$(O) $(LDFLAGS) $(C_LIBS) -L blib/lib -lparrot
+	$(LD) $(LD_OUT)$(TEST_PROG) test_main$(O) blib/lib/libparrot$(A) $(LDFLAGS) $(C_LIBS)
+
+# XXX The dependancies on SO.MAJOR.MINOR and SO.VERSION are removed 
+#     because those should be done at "make install" and not "make shared"
+#     It also makes the task of getting this working on win32 much easier. :)
+#
+#blib/lib/libparrot$(SO).${VERSION} : blib_lib $(O_DIRS) $(O_FILES)
+#	$(LD) $(LD_SHARED) -Wl,-soname,libparrot$(SO).${MAJOR} $(LDFLAGS) $(LD_OUT)blib/lib/libparrot$(SO).${VERSION} $(O_FILES)
+#
+#blib/lib/libparrot$(SO).${MAJOR}.${MINOR} : blib/lib/libparrot$(SO).${VERSION}
+#	$(RM_F) $@
+#	cd blib/lib; ln -s libparrot$(SO).${VERSION} libparrot$(SO).${MAJOR}.${MINOR}
+#
+#blib/lib/libparrot$(SO).${MAJOR} : blib/lib/libparrot$(SO).${MAJOR}.${MINOR}
+#	$(RM_F) $@
+#	cd blib/lib; ln -s libparrot$(SO).${MAJOR}.${MINOR} libparrot$(SO).${MAJOR}
+#
+#blib/lib/libparrot$(SO) : blib/lib/libparrot$(SO).${MAJOR}
+#	$(RM_F) $@
+#	cd blib/lib; ln -s libparrot$(SO).${MAJOR} libparrot$(SO)
+#
+#blib/lib/libcore_prederef$(SO).${VERSION} : blib_lib core_ops_prederef$(O)
+#	$(LD) $(LD_SHARED) -Wl,-soname,libparrot$(SO).${MAJOR} $(LDFLAGS) $(LD_OUT)blib/lib/libcore_prederef$(SO).${VERSION} core_ops_prederef$(O)
+#
+#blib/lib/libcore_prederef$(SO).${MAJOR}.${MINOR} : blib/lib/libcore_prederef$(SO).${VERSION}
+#	$(RM_F) $@
+#	cd blib/lib; ln -s libcore_prederef$(SO).${VERSION} libcore_prederef$(SO).${MAJOR}.${MINOR}
+#
+#blib/lib/libcore_prederef$(SO).${MAJOR} : blib/lib/libcore_prederef$(SO).${MAJOR}.${MINOR}
+#	$(RM_F) $@
+#	cd blib/lib; ln -s libcore_prederef$(SO).${MAJOR}.${MINOR} libcore_prederef$(SO).${MAJOR}
+#
+#blib/lib/libcore_prederef$(SO) : blib/lib/libcore_prederef$(SO).${MAJOR}
+#	$(RM_F) $@
+#	cd blib/lib; ln -s libcore_prederef$(SO).${MAJOR} libcore_prederef$(SO)
+
 
 #
 # Parrot Debugger

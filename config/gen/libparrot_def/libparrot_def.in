@@ -1,0 +1,14 @@
+LIBRARY libparrot
+DESCRIPTION 'Parrot Interpreter'
+EXPORTS
+	Parrot_new
+	Parrot_init
+	Parrot_setflag
+	Parrot_setwarnings
+	Parrot_readbc
+	Parrot_loadbc
+	Parrot_runcode
+	Parrot_destroy
+	Parrot_debug
+	Parrot_disassemble
+	Parrot_DynOp_core_${MAJOR}_${MINOR}_${PATCH}

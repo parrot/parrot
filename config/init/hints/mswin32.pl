@@ -20,6 +20,8 @@
 		$ccflags =~ s/-O1 // if $cc_output =~ m/Standard/;
 
 		Configure::Data->set(
+      so         => '.dll',
+      a          => '.lib',
 			o          => '.obj',
 			cc_o_out   => '-Fo',
 			cc_exe_out => '-Fe',
@@ -27,7 +29,9 @@
 			cc_debug   => '-Zi',
 			ld_debug   => '-debug',
 			ld_shared  => '-dll',
+      ld_shared_flags=> '-def:libparrot.def',
 			ld_out     => '-out:',
+      blib_lib_libparrot_a => '',
 			cp         => 'copy',
 			slash      => '\\',
 			ccflags    => $ccflags
@@ -46,7 +50,7 @@
 			ld_out => '-e',
 			cc_ldflags => '',
 			ld_debug => '-v',
-			ld_shard => '-WD',
+			ld_shared => '-WD',
 			libs => 'import32.lib cw32.lib',
 			
 			cp => 'copy',

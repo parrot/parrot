@@ -1,4 +1,12 @@
-#include <sysexits.h>
+#ifndef _MSC_VER
+#  include <sysexits.h>
+#else
+#  define EX_DATAERR 1
+#  define EX_SOFTWARE 1
+#  define EX_NOINPUT 1
+#  define EX_IOERR 1
+#  define EX_UNAVAILABLE 1
+#endif
 #include <stdarg.h>
 
 #include "anyop.h"
@@ -18,7 +26,8 @@ same_op(op_t a, op_t b) {
 
 void
 op_load_file(const char * file) {
-    void * handle = Parrot_dlopen(file);
+    void * handle;
+    handle = Parrot_dlopen(file);
     if (handle == NULL) {
 	fprintf(stderr, "Can't open %s: %s\n", file, Parrot_dlerror());
 	exit(EX_SOFTWARE);

@@ -17,6 +17,7 @@ sub runstep {
   genfile('config/gen/makefiles/miniperl.in',  'languages/miniperl/Makefile');
   genfile('config/gen/makefiles/scheme.in',    'languages/scheme/Makefile');
   genfile('config/gen/makefiles/perl6.in',     'languages/perl6/Makefile');
+  genfile('config/gen/makefiles/imcc.in',      'languages/imcc/Makefile');
 }
 
 1;

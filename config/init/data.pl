@@ -29,6 +29,8 @@ sub runstep {
     cc_debug      => '-g',
     cc_warn       => '',
     o             => '.o',                # object files extension
+    so            => '.so',               # dynamic link library or shared object extension
+    a             => '.a',                # library or archive extension
     exe           => $Config{_exe},       # executable files extension
     cc_o_out      => '-o ',               # cc object output file
     cc_exe_out    => '-o ',               # cc executable output file (different on Win32)
@@ -38,6 +40,10 @@ sub runstep {
     ld_out        => '-o ',               # ld output file
     ld_debug      => '',                  # include debug info in executable
     ld_shared     => '-shared',
+    ld_shared_flags=> '-Wl,-soname,libparrot$(SO)',
+
+    # should we have a dependancy upon arc to generate .a's?
+    blib_lib_libparrot_a => 'blib/lib/libparrot$(A)',
     
     perl          => $^X,
     test_prog     => 'parrot',
