@@ -631,7 +631,7 @@ sub prompt {
     print "$message [$c{$field}] ";
     chomp($input=<STDIN>);
 
-    if($input =~ /^\+/) {
+    if($input =~ s/^\+//) {
 		$input="$c{$field} $input";
 	}
 
