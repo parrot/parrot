@@ -364,26 +364,6 @@ PIO_unix_write(theINTERP, ParrotIOLayer *layer, ParrotIO *io,
 }
 
 
-static INTVAL
-PIO_unix_puts(theINTERP, ParrotIOLayer *l, ParrotIO *io, const char *s)
-{
-    size_t len;
-    len = strlen(s);
-    if (len > 0) {
-        size_t sz;
-        sz = PIO_unix_write(interpreter, l, io, s, len);
-        if (sz < len) {
-            return -1;
-        }
-        else {
-            return len;
-        }
-    }
-
-    return -1;
-}
-
-
 /*
  * Hard seek
  */
@@ -435,8 +415,6 @@ ParrotIOLayerAPI pio_unix_layer_api = {
     PIO_null_setlinebuf,
     PIO_null_getcount,
     PIO_null_fill,
-    PIO_unix_puts,
-    PIO_null_gets,
     PIO_null_eof
 };
 

@@ -686,13 +686,7 @@ PIO_eof(theINTERP, PMC *pmc)
 INTVAL
 PIO_puts(theINTERP, PMC *pmc, const char *s)
 {
-    ParrotIOLayer *l = pmc->cache.struct_val;
-    ParrotIO *io = PMC_data(pmc);
-
-    if (io->flags & PIO_F_WRITE)
-        return PIO_puts_down(interpreter, l, io, s);
-    else
-        return -1;
+    return PIO_write(interpreter, pmc, s, strlen(s));
 }
 
 INTVAL

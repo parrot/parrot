@@ -344,6 +344,9 @@ ok 1
 ok 2
 OUTPUT
 
+SKIP:{
+  skip 'seek errors in io_buf', 1;
+
 output_is(<<'CODE', <<'OUTPUT', 'seek/tell');
        open P0, "temp.file", ">"
        print P0, "Hello "
@@ -361,5 +364,6 @@ CODE
 ok 1
 Hello Parrot!
 OUTPUT
+}
 
 unlink "temp.file";

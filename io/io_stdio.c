@@ -234,13 +234,6 @@ PIO_stdio_write(theINTERP, ParrotIOLayer *layer, ParrotIO *io,
 }
 
 
-static INTVAL
-PIO_stdio_puts(theINTERP, ParrotIOLayer *l, ParrotIO *io, const char *s)
-{
-    return(fputs(s, io->fd));
-}
-
-
 /*
  * Hard seek
  */
@@ -293,8 +286,6 @@ ParrotIOLayerAPI pio_stdio_layer_api = {
     PIO_null_setlinebuf,
     PIO_null_getcount,
     PIO_null_fill,
-    PIO_stdio_puts,
-    PIO_null_gets,
     PIO_null_eof
 };
 

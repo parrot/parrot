@@ -201,10 +201,6 @@ struct _ParrotIOLayerAPI {
                                   ParrotIO * io);
     INTVAL          (*GetCount)(theINTERP, ParrotIOLayer * layer);
     INTVAL          (*Fill)(theINTERP, ParrotIOLayer * layer);
-    INTVAL          (*PutS)(theINTERP, ParrotIOLayer * l,
-                            ParrotIO * io, const char * s);
-    INTVAL          (*GetS)(theINTERP, ParrotIOLayer * layer,
-                            ParrotIO * io, char * s, INTVAL maxlen);
     INTVAL          (*Eof)(theINTERP, ParrotIOLayer * l,
                            ParrotIO * io);
 };

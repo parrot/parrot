@@ -112,10 +112,6 @@ PIOOFF_T  PIO_tell_down(theINTERP, ParrotIOLayer * layer, ParrotIO * io);
 INTVAL    PIO_setbuf_down(theINTERP, ParrotIOLayer * layer, ParrotIO * io,
                           size_t bufsize);
 INTVAL    PIO_setlinebuf_down(theINTERP, ParrotIOLayer * layer, ParrotIO * io);
-INTVAL    PIO_puts_down(theINTERP, ParrotIOLayer * layer, ParrotIO * io,
-                        const char * s);
-INTVAL    PIO_gets_down(theINTERP, ParrotIOLayer * layer, ParrotIO * io,
-                        char * s, INTVAL maxlen);
 INTVAL    PIO_eof_down(theINTERP, ParrotIOLayer * layer, ParrotIO * io);
 
 

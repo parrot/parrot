@@ -216,35 +216,6 @@ PIO_setlinebuf_down(theINTERP, ParrotIOLayer * layer, ParrotIO * io)
 
 
 INTVAL
-PIO_puts_down(theINTERP, ParrotIOLayer * layer, ParrotIO * io, const char * s)
-{
-    while (layer) {
-        if (layer->api->PutS) {
-            return layer->api->PutS(interpreter, layer, io, s);
-        }
-        layer = PIO_DOWNLAYER(layer);
-    }
-    /* No layer found */
-    return -1;
-}
-
-
-INTVAL
-PIO_gets_down(theINTERP, ParrotIOLayer * layer, ParrotIO * io,
-              char * s, INTVAL maxlen)
-{
-    while (layer) {
-        if (layer->api->GetS) {
-            return layer->api->GetS(interpreter, layer, io, s, maxlen);
-        }
-        layer = PIO_DOWNLAYER(layer);
-    }
-    /* No layer found */
-    return -1;
-}
-
-
-INTVAL
 PIO_eof_down(theINTERP, ParrotIOLayer * layer, ParrotIO * io)
 {
     while (layer) {

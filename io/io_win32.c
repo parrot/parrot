@@ -364,8 +364,6 @@ ParrotIOLayerAPI pio_win32_layer_api = {
     PIO_null_setlinebuf,
     PIO_null_getcount,
     PIO_null_fill,
-    PIO_win32_puts,
-    PIO_null_gets,
     PIO_null_eof
 };
 

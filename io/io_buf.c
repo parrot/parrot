@@ -444,19 +444,6 @@ PIO_buf_write(theINTERP, ParrotIOLayer *layer, ParrotIO *io,
 
 
 static INTVAL
-PIO_buf_puts(theINTERP, ParrotIOLayer *layer, ParrotIO *io, const char *s)
-{
-    ParrotIOLayer *l = layer;
-    while ((l = PIO_DOWNLAYER(l)) != NULL) {
-        if (l->api->PutS) {
-            return (*l->api->PutS) (interpreter, l, io, s);
-        }
-    }
-    return 0;
-}
-
-
-static INTVAL
 PIO_buf_seek(theINTERP, ParrotIOLayer *l, ParrotIO *io,
                INTVAL hi, INTVAL lo, INTVAL whence)
 {
@@ -513,8 +500,6 @@ ParrotIOLayerAPI pio_buf_layer_api = {
     PIO_buf_setlinebuf,
     PIO_null_getcount,
     PIO_null_fill,
-    PIO_buf_puts,
-    PIO_null_gets,
     PIO_null_eof
 };
 
