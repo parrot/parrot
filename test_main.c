@@ -227,7 +227,7 @@ main(int argc, char **argv) {
         
         pf = PackFile_new();
         if( !PackFile_unpack(interpreter, pf, (char *)program_code, 
-                             (opcode_t)program_size) ) {
+                             (size_t)program_size) ) {
             printf( "Can't unpack.\n" );
             return 1;
         }
@@ -246,7 +246,7 @@ main(int argc, char **argv) {
             unsigned int j;
             int op_count   = 0;
             int call_count = 0;
-            FLOATVAL time = 0.0;
+            FLOATVAL sum_time = 0.0;
 
             printf("Operation profile:\n\n");
 
@@ -257,7 +257,7 @@ main(int argc, char **argv) {
                 if(interpreter->profile[j].numcalls > 0) {
                     op_count++;
                     call_count += interpreter->profile[j].numcalls;
-                    time += interpreter->profile[j].time;
+                    sum_time += interpreter->profile[j].time;
 
                     printf("  %5d  %-12s  %12ld  %5.6f  %5.6f\n", j, 
                            interpreter->op_info_table[j].full_name,
@@ -274,8 +274,8 @@ main(int argc, char **argv) {
                 op_count,
                 "",
                 call_count,
-                time,
-                time / (FLOATVAL)call_count
+                sum_time,
+                sum_time / (FLOATVAL)call_count
             );
         }
     }
