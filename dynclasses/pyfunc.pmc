@@ -19,15 +19,11 @@ This class implements a Python Function, i.e. a Parrot Closure.
 */
 
 #include "parrot/parrot.h"
+#include "pyconsts.h"
 
-static INTVAL dynclass_PyList;
-static INTVAL dynclass_PyTuple;
-static INTVAL dynclass_PyString;
 static STRING *FUNC_ARGS;
 static STRING *FUNC_DEFAULTS;
 static STRING *FUNC_VARARGS;
-static STRING *__CALL__;
-static STRING *__NAME__;
 
 pmclass PyFunc extends Closure dynpmc group python_group {
 
@@ -44,14 +40,9 @@ they will be used frequently here.
 
     void class_init() {
         if (pass) {
-            dynclass_PyList = Parrot_PMC_typenum(INTERP, "PyList");
-            dynclass_PyTuple = Parrot_PMC_typenum(INTERP, "PyTuple");
-            dynclass_PyString = Parrot_PMC_typenum(INTERP, "PyString");
             FUNC_ARGS = const_string(INTERP, "func_args");
             FUNC_VARARGS = const_string(INTERP, "func_varargs");
             FUNC_DEFAULTS = const_string(INTERP, "func_defaults");
-            __CALL__ = const_string(INTERP, "__call__");
-            __NAME__ = const_string(INTERP, "__name__");
         }
     }
 
@@ -69,7 +60,7 @@ Create an (empty) list of function arguments
     void init () {
         PMC *func_args;
         SUPER();
-        func_args = pmc_new(INTERP, dynclass_PyList);
+        func_args = pmc_new(INTERP, PyBuiltin_PyList);
         VTABLE_setprop(INTERP, SELF, FUNC_ARGS, func_args);
     }
 
@@ -88,7 +79,7 @@ TODO: error checking (e.g., missing, duplicate or extra arguments)
 */
 
     PMC* find_method(STRING* method_name) {
-        if (0 == string_compare(INTERP, method_name, __CALL__)) {
+        if (0 == string_compare(INTERP, method_name, PyString_call)) {
             PMC *args = REG_PMC(5);
             PMC *keywords = REG_PMC(6);
             PMC *func_args = VTABLE_getprop(INTERP, SELF, FUNC_ARGS);
@@ -160,7 +151,7 @@ Return the representation of this object.
         STRING *res;
 
         STRING *name = const_string(INTERP, "(unnamed)");
-        PMC *ret = VTABLE_getprop(INTERP, SELF, __NAME__);
+        PMC *ret = VTABLE_getprop(INTERP, SELF, PyString_name);
         if (ret && VTABLE_defined(INTERP, ret))
             name = VTABLE_get_string(INTERP, ret);
 
@@ -207,7 +198,7 @@ Invoke a function.  Defaults are filled in first.
         }
 
         if (func_varargs && VTABLE_defined(INTERP, func_varargs)) {
-            PMC *varargs = pmc_new(INTERP, dynclass_PyTuple);
+            PMC *varargs = pmc_new(INTERP, PyBuiltin_PyTuple);
             VTABLE_set_integer_native(INTERP, varargs, REG_INT(3)+1-n);
             for (j=n-1; j<REG_INT(3) && j<11; j++) {
                 VTABLE_set_pmc_keyed_int(INTERP,varargs,j+1-n,REG_PMC(5+j));
@@ -263,9 +254,9 @@ Set the function name.
 */
 
     void set_string_native (STRING * value) {
-        PMC *nameprop = pmc_new(INTERP, dynclass_PyString);
+        PMC *nameprop = pmc_new(INTERP, PyBuiltin_PyString);
         VTABLE_set_string_native(INTERP, nameprop, value);
-        VTABLE_setprop(INTERP, SELF, __NAME__, nameprop);
+        VTABLE_setprop(INTERP, SELF, PyString_name, nameprop);
     }
 
 /*

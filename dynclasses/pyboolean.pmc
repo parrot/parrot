@@ -22,12 +22,10 @@ types, its value is changed only.
 */
 
 #include "parrot/parrot.h"
+#include "pyconsts.h"
 
 static STRING *_TRUE;
 static STRING *_FALSE;
-
-/* cache of classes referenced */
-static INTVAL dynclass_PyBoolean;
 
 pmclass PyBoolean extends PyObject dynpmc group python_group {
 
@@ -43,7 +41,6 @@ Class initialization. Caches constant strings that will be used later.
 
     void class_init() {
         if (pass) {
-            dynclass_PyBoolean = Parrot_PMC_typenum(INTERP, "PyBoolean");
             _TRUE = const_string(INTERP, "True");
             _FALSE = const_string(INTERP, "False");
         }
@@ -62,7 +59,7 @@ Create a new boolean
     METHOD PMC* __new__(PMC *class, PMC *source) {
         INTVAL argc = REG_INT(3);
 
-        PMC * ret = pmc_new(INTERP, dynclass_PyBoolean);
+        PMC * ret = pmc_new(INTERP, PyBuiltin_PyBoolean);
 
         if (argc > 1) {
             INTVAL ivalue = VTABLE_get_bool(INTERP, source);
@@ -84,6 +81,20 @@ Returns the boolean value.
 
     INTVAL get_bool () {
         return PMC_int_val(SELF) != 0;
+    }
+
+/*
+
+=item C<PMC *get_class()>
+
+Return the class of this object.
+
+=cut
+
+*/
+
+    PMC* get_class() {
+        return PyBuiltin_PyBoolean_class;
     }
 
 /*
@@ -131,7 +142,7 @@ Returns the negated value of the boolean.
 */
 
     void logical_not (PMC *dest) {
-        VTABLE_morph(INTERP, dest, dynclass_PyBoolean);
+        VTABLE_morph(INTERP, dest, PyBuiltin_PyBoolean);
         VTABLE_set_integer_native(INTERP, dest, PMC_int_val(SELF) == 0);
     }
 

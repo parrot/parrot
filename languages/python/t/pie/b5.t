@@ -378,8 +378,6 @@ if __name__ == '__main__':
     main()
 CODE
 
-SKIP: {
-  skip("isinstance of primitive types", 1);
 test(<<'CODE', 'check isinstance');
 show = True
 
@@ -407,4 +405,3 @@ if __name__ == '__main__':
     main()
 
 CODE
-}

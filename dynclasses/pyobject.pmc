@@ -19,15 +19,7 @@ Abstract base class for Python objects.
 */
 
 #include "parrot/parrot.h"
-
-/* cache of classes referenced */
-static INTVAL dynclass_PyObject;
-static INTVAL dynclass_PyClass;
-static INTVAL dynclass_PyBoolean;
-static INTVAL dynclass_PyInt;
-static INTVAL dynclass_PyFloat;
-static INTVAL dynclass_PyLong;
-static INTVAL dynclass_PyString;
+#include "pyconsts.h"
 
 static STRING* __add__;
 static STRING* __and__;
@@ -42,8 +34,6 @@ static STRING* __rshift__;
 static STRING* __sub__;
 static STRING* __xor__;
 
-static STRING* __proxy__;
-
 #define RIGHT(INTERP, SELF, OP, VALUE) \
         opcode_t *next = INTERP->code->byte_code; \
         PMC * method_pmc; \
@@ -55,29 +45,6 @@ static STRING* __proxy__;
         return REG_PMC(5);
 
 pmclass PyObject dynpmc group python_group {
-
-/*
-
-=item C<void class_init()>
-
-Class initialization. Caches the type id of various PMCs because
-they will be used frequently here.
-
-=cut
-
-*/
-
-    void class_init() {
-        if (pass) {
-            dynclass_PyClass   = Parrot_PMC_typenum(INTERP, "PyClass");
-            dynclass_PyObject  = Parrot_PMC_typenum(INTERP, "PyObject");
-            dynclass_PyBoolean = Parrot_PMC_typenum(INTERP, "PyBoolean");
-            dynclass_PyInt     = Parrot_PMC_typenum(INTERP, "PyInt");
-            dynclass_PyFloat   = Parrot_PMC_typenum(INTERP, "PyFloat");
-            dynclass_PyLong    = Parrot_PMC_typenum(INTERP, "PyLong");
-            dynclass_PyString  = Parrot_PMC_typenum(INTERP, "PyString");
-        }
-    }
 
 /*
 
@@ -103,7 +70,7 @@ Returns the absolute value of C<self>.
 */
 
     METHOD PMC* __abs__(PMC *self) {
-        PMC * ret = pmc_new(INTERP, dynclass_PyObject);
+        PMC * ret = pmc_new(INTERP, PyBuiltin_PyObject);
         VTABLE_absolute(INTERP, self, ret);
         return ret;
     }
@@ -119,7 +86,7 @@ Adds C<*value> to C<self> and returns the result.
 */
 
     METHOD PMC* __add__(PMC *self, PMC *value) {
-        PMC * ret = pmc_new(INTERP, dynclass_PyObject);
+        PMC * ret = pmc_new(INTERP, PyBuiltin_PyObject);
         mmd_dispatch_v_ppp(INTERP, self, value, ret, MMD_ADD);
         return ret;
     }
@@ -135,7 +102,7 @@ Returns the result of the logical C<AND> of C<self> and C<*value>.
 */
 
     METHOD PMC* __and__(PMC *self, PMC *value) {
-        PMC * ret = pmc_new(INTERP, dynclass_PyObject);
+        PMC * ret = pmc_new(INTERP, PyBuiltin_PyObject);
         mmd_dispatch_v_ppp(INTERP, self, value, ret, MMD_BAND);
         return ret;
     }
@@ -151,7 +118,7 @@ Returns the result of comparing C<self> with C<*value>.
 */
 
     METHOD PMC* __cmp__(PMC *self, PMC *value) {
-        PMC * ret = pmc_new(INTERP, dynclass_PyInt);
+        PMC * ret = pmc_new(INTERP, PyBuiltin_PyInt);
 
         /* XXX: quick hack: class method called directly */
         if (REG_INT(3)>2) {
@@ -159,9 +126,8 @@ Returns the result of comparing C<self> with C<*value>.
             value = REG_PMC(7);
         }
 
-        if (self->vtable->base_type == dynclass_PyClass) {
-            if (!__proxy__) __proxy__ = const_string(INTERP, "__proxy__");
-            self = VTABLE_getprop(INTERP, self, __proxy__);
+        if (self->vtable->base_type == PyBuiltin_PyClass) {
+            self = VTABLE_getprop(INTERP, self, PyString_proxy);
             if (!self || !VTABLE_defined(INTERP, self)) {
                 internal_exception(1, "can't locate __cmp__ method");
             }
@@ -183,7 +149,7 @@ Divides C<self> by C<*value> and returns the result.
 */
 
     METHOD PMC* __div__(PMC *self, PMC *value) {
-        PMC * ret = pmc_new(INTERP, dynclass_PyObject);
+        PMC * ret = pmc_new(INTERP, PyBuiltin_PyObject);
         mmd_dispatch_v_ppp(INTERP, self, value, ret, MMD_DIVIDE);
         return ret;
     }
@@ -199,7 +165,7 @@ Divides C<self> by C<*value> and returns the remainder.
 */
 
     METHOD PMC* __divmod__(PMC *self, PMC *value) {
-        PMC * ret = pmc_new(INTERP, dynclass_PyObject);
+        PMC * ret = pmc_new(INTERP, PyBuiltin_PyObject);
         mmd_dispatch_v_ppp(INTERP, self, value, ret, MMD_MOD);
         return ret;
     }
@@ -215,7 +181,7 @@ Returns the float value of C<self>.
 */
 
     METHOD PMC* __float__(PMC *self) {
-        PMC * ret = pmc_new(INTERP, dynclass_PyFloat);
+        PMC * ret = pmc_new(INTERP, PyBuiltin_PyFloat);
         FLOATVAL value = VTABLE_get_number(INTERP, self);
         VTABLE_set_number_native(INTERP, ret, value);
         return ret;
@@ -232,7 +198,7 @@ Floor divides C<self> by C<*value> and returns the result.
 */
 
     METHOD PMC* __floordiv__(PMC *self, PMC *value) {
-        PMC * ret = pmc_new(INTERP, dynclass_PyObject);
+        PMC * ret = pmc_new(INTERP, PyBuiltin_PyObject);
         mmd_dispatch_v_ppp(INTERP, self, value, ret, MMD_DIVIDE);
         return ret;
     }
@@ -248,7 +214,7 @@ Returns the integer value of C<self>.
 */
 
     METHOD PMC* __int__(PMC *self) {
-        PMC * ret = pmc_new(INTERP, dynclass_PyInt);
+        PMC * ret = pmc_new(INTERP, PyBuiltin_PyInt);
         INTVAL value = VTABLE_get_integer(INTERP, self);
         VTABLE_set_integer_native(INTERP, ret, value);
         return ret;
@@ -265,7 +231,7 @@ Calculates the bitwise negation and return the result.
 */
 
     METHOD PMC* __invert__(PMC *self) {
-        PMC * ret = pmc_new(INTERP, dynclass_PyObject);
+        PMC * ret = pmc_new(INTERP, PyBuiltin_PyObject);
         VTABLE_bitwise_not(INTERP, self, ret);
         return ret;
     }
@@ -282,7 +248,7 @@ returns the result.
 */
 
     METHOD PMC* __lshift__(PMC *self, PMC *value) {
-        PMC * ret = pmc_new(INTERP, dynclass_PyObject);
+        PMC * ret = pmc_new(INTERP, PyBuiltin_PyObject);
         mmd_dispatch_v_ppp(INTERP, self, value, ret, MMD_BSL);
         return ret;
     }
@@ -298,7 +264,7 @@ Return the modulus of C<self> with C<*value>.
 */
 
     METHOD PMC* __mod__(PMC *self, PMC *value) {
-        PMC * ret = pmc_new(INTERP, dynclass_PyObject);
+        PMC * ret = pmc_new(INTERP, PyBuiltin_PyObject);
         mmd_dispatch_v_ppp(INTERP, self, value, ret, MMD_MOD);
         return ret;
     }
@@ -314,7 +280,7 @@ Return the value of C<self> multiplied by C<*value>.
 */
 
     METHOD PMC* __mul__(PMC *self, PMC *value) {
-        PMC * ret = pmc_new(INTERP, dynclass_PyObject);
+        PMC * ret = pmc_new(INTERP, PyBuiltin_PyObject);
         mmd_dispatch_v_ppp(INTERP, self, value, ret, MMD_MULTIPLY);
         return ret;
     }
@@ -330,7 +296,7 @@ Calculates the negation and return the result.
 */
 
     METHOD PMC* __neg__(PMC *self) {
-        PMC * ret = pmc_new(INTERP, dynclass_PyObject);
+        PMC * ret = pmc_new(INTERP, PyBuiltin_PyObject);
         VTABLE_neg(INTERP, self, ret);
         return ret;
     }
@@ -346,7 +312,7 @@ Determine if a given value is "True" or "False"
 */
 
     METHOD PMC* __nonzero__(PMC *self) {
-        PMC * ret = pmc_new(INTERP, dynclass_PyBoolean);
+        PMC * ret = pmc_new(INTERP, PyBuiltin_PyBoolean);
         VTABLE_set_integer_native(INTERP, ret,
             VTABLE_get_bool(INTERP, self));
         return ret;
@@ -363,7 +329,7 @@ Returns the result of the logical C<OR> of C<self> and C<*value>.
 */
 
     METHOD PMC* __or__(PMC *self, PMC *value) {
-        PMC * ret = pmc_new(INTERP, dynclass_PyObject);
+        PMC * ret = pmc_new(INTERP, PyBuiltin_PyObject);
         mmd_dispatch_v_ppp(INTERP, self, value, ret, MMD_BOR);
         return ret;
     }
@@ -379,7 +345,7 @@ Raise the number to the specified power and return the result.
 */
 
     METHOD PMC* __pow__(PMC *self, PMC *value) {
-        PMC * ret = pmc_new(INTERP, dynclass_PyObject);
+        PMC * ret = pmc_new(INTERP, PyBuiltin_PyObject);
         mmd_dispatch_v_ppp(INTERP, self, value, ret, MMD_POW);
         return ret;
     }
@@ -437,7 +403,7 @@ Return the string representation of this PMC.
 */
 
     METHOD PMC* __repr__(PMC *self) {
-        PMC * ret = pmc_new(INTERP, dynclass_PyString);
+        PMC * ret = pmc_new(INTERP, PyBuiltin_PyString);
         VTABLE_set_string_native(INTERP, ret,
             VTABLE_get_repr(INTERP, self));
         return ret;
@@ -555,7 +521,7 @@ returns the result.
 */
 
     METHOD PMC* __rshift__(PMC *self, PMC *value) {
-        PMC * ret = pmc_new(INTERP, dynclass_PyObject);
+        PMC * ret = pmc_new(INTERP, PyBuiltin_PyObject);
         mmd_dispatch_v_ppp(INTERP, self, value, ret, MMD_BSR);
         return ret;
     }
@@ -599,7 +565,7 @@ Return the string representation of this PMC.
 */
 
     METHOD PMC* __str__(PMC *self) {
-        PMC * ret = pmc_new(INTERP, dynclass_PyString);
+        PMC * ret = pmc_new(INTERP, PyBuiltin_PyString);
         VTABLE_set_string_native(INTERP, ret,
             VTABLE_get_string(INTERP, self));
         return ret;
@@ -616,7 +582,7 @@ Subtracts C<*value> from C<self> and returns the result.
 */
 
     METHOD PMC* __sub__(PMC *self, PMC *value) {
-        PMC * ret = pmc_new(INTERP, dynclass_PyObject);
+        PMC * ret = pmc_new(INTERP, PyBuiltin_PyObject);
         mmd_dispatch_v_ppp(INTERP, self, value, ret, MMD_SUBTRACT);
         return ret;
     }
@@ -632,7 +598,7 @@ Returns the result of the bitwise C<XOR> of C<self> and C<*value>.
 */
 
     METHOD PMC* __xor__(PMC *self, PMC *value) {
-        PMC * ret = pmc_new(INTERP, dynclass_PyObject);
+        PMC * ret = pmc_new(INTERP, PyBuiltin_PyObject);
         mmd_dispatch_v_ppp(INTERP, self, value, ret, MMD_BXOR);
         return ret;
     }
@@ -702,7 +668,7 @@ Morphs the scalar to the specified type.
 */
 
     void morph (INTVAL type) {
-        if (type == enum_class_BigInt) type = dynclass_PyLong;
+        if (type == enum_class_BigInt) type = PyBuiltin_PyLong;
         pmc_reuse(INTERP, SELF, type, 0);
     }
 
@@ -715,8 +681,8 @@ Morphs the scalar to the specified type.
 */
 
     void set_integer_native (INTVAL value) {
-        if (SELF->vtable->base_type != dynclass_PyInt) {
-            DYNSELF.morph(dynclass_PyInt);
+        if (SELF->vtable->base_type != PyBuiltin_PyInt) {
+            DYNSELF.morph(PyBuiltin_PyInt);
         }
         DYNSELF.set_integer_native(value);
     }
@@ -732,8 +698,8 @@ Sets the floating-point value.
 */
 
     void set_number_native (FLOATVAL value) {
-        if (SELF->vtable->base_type != dynclass_PyFloat) {
-            DYNSELF.morph(dynclass_PyFloat);
+        if (SELF->vtable->base_type != PyBuiltin_PyFloat) {
+            DYNSELF.morph(PyBuiltin_PyFloat);
         }
         DYNSELF.set_number_native(value);
     }
@@ -749,8 +715,8 @@ Sets the string value.
 */
 
     void set_string_native (STRING* value) {
-        if (SELF->vtable->base_type != dynclass_PyString) {
-            DYNSELF.morph(dynclass_PyString);
+        if (SELF->vtable->base_type != PyBuiltin_PyString) {
+            DYNSELF.morph(PyBuiltin_PyString);
         }
         DYNSELF.set_string_native(value);
     }
@@ -767,7 +733,7 @@ according to the type of C<*value>.
 */
 
     void set_pmc (PMC* value) {
-        if (SELF->vtable->base_type == dynclass_PyObject) {
+        if (SELF->vtable->base_type == PyBuiltin_PyObject) {
             DYNSELF.morph(value->vtable->base_type);
             DYNSELF.set_pmc(value);
         }

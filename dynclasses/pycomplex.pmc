@@ -20,28 +20,10 @@ string parsing/generating and basic mathematical operations.
 */
 
 #include "parrot/parrot.h"
+#include "pyconsts.h"
 
-/* cache of classes referenced */
-static INTVAL dynclass_PyComplex;
 
 pmclass PyComplex extends Complex dynpmc group python_group {
-
-/*
-
-=item C<void class_init()>
-
-Class initialization. Caches the type id of various PMCs because
-they will be used frequently here.
-
-=cut
-
-*/
-
-    void class_init() {
-        if (pass) {
-            dynclass_PyComplex   = Parrot_PMC_typenum(INTERP, "PyComplex");
-        }
-    }
 
 /*
 
@@ -56,7 +38,7 @@ Create a new complex number
     METHOD PMC* __new__(PMC *class, PMC *real, PMC *imag) {
         INTVAL argc = REG_INT(3);
 
-        PMC * ret = pmc_new(INTERP, dynclass_PyComplex);
+        PMC * ret = pmc_new(INTERP, PyBuiltin_PyComplex);
 
         if (argc > 1) {
             FLOATVAL fvalue = VTABLE_get_number(INTERP, real);
@@ -69,6 +51,20 @@ Create a new complex number
         }
 
         return ret;
+    }
+
+/*
+
+=item C<PMC *get_class()>
+
+Return the class of this object.
+
+=cut
+
+*/
+
+    PMC* get_class() {
+        return PyBuiltin_PyComplex_class;
     }
 
 /*

@@ -20,32 +20,9 @@ it puts things into Integer, Float, or String PMCs as appropriate
 */
 
 #include "parrot/parrot.h"
-
-/* cache of classes referenced */
-static INTVAL dynclass_PyInt;
-static INTVAL dynclass_PyFloat;
-static INTVAL dynclass_PyTuple;
+#include "pyconsts.h"
 
 pmclass PyTuple extends PyObject need_ext does array dynpmc group python_group {
-
-/*
-
-=item C<void class_init()>
-
-Class initialization. Caches the type id of various PMCs because
-they will be used frequently here.
-
-=cut
-
-*/
-
-    void class_init() {
-        if (pass) {
-            dynclass_PyInt     = Parrot_PMC_typenum(INTERP, "PyInt");
-            dynclass_PyFloat   = Parrot_PMC_typenum(INTERP, "PyFloat");
-            dynclass_PyTuple   = Parrot_PMC_typenum(INTERP, "PyTuple");
-        }
-    }
 
 /*
 
@@ -93,7 +70,7 @@ Create a new long.
     METHOD PMC* __new__(PMC *class, PMC *value) {
         INTVAL argc = REG_INT(3);
 
-        PMC * ret = pmc_new(INTERP, dynclass_PyTuple);
+        PMC * ret = pmc_new(INTERP, PyBuiltin_PyTuple);
 
         if (argc > 1) {
             INTVAL n = VTABLE_elements(INTERP, value);
@@ -137,6 +114,20 @@ Returns the number of elements in the array.
     INTVAL elements () {
         if (PMC_int_val(SELF) < 0)  PMC_int_val(SELF) = 0;
         return PMC_int_val(SELF);
+    }
+
+/*
+
+=item C<PMC *get_class()>
+
+Return the class of this object.
+
+=cut
+
+*/
+
+    PMC* get_class() {
+        return PyBuiltin_PyTuple_class;
     }
 
 /*
@@ -255,10 +246,10 @@ The C<==> operation. Compares two array to hold equal elements.
     INTVAL is_equal (PMC* value) {
         INTVAL j, n;
 
-        if (SELF->vtable->base_type != dynclass_PyTuple)
+        if (SELF->vtable->base_type != PyBuiltin_PyTuple)
             internal_exception(OUT_OF_BOUNDS,
                 "PyTuple: is_equal on a non-tuple");
-        if (value->vtable->base_type != dynclass_PyTuple)
+        if (value->vtable->base_type != PyBuiltin_PyTuple)
             return 0;
         if (SELF == value)
             return 1;
@@ -288,7 +279,7 @@ Sets the integer value of the element at index C<key> to C<value>.
 */
 
     void set_integer_keyed (PMC *key, INTVAL value) {
-        PMC *val = pmc_new(INTERP, dynclass_PyInt);
+        PMC *val = pmc_new(INTERP, PyBuiltin_PyInt);
         VTABLE_set_integer_native(INTERP, val, value);
         DYNSELF.set_pmc_keyed_int(PMC_int_val(key), val);
     }
@@ -330,7 +321,7 @@ Sets the number value of the element at index C<key> to C<value>.
 */
 
     void set_number_keyed (PMC *key, FLOATVAL value) {
-        PMC *val = pmc_new(INTERP, dynclass_PyFloat);
+        PMC *val = pmc_new(INTERP, PyBuiltin_PyFloat);
         VTABLE_set_number_native(INTERP, val, value);
         DYNSELF.set_pmc_keyed_int(PMC_int_val(key), val);
     }

@@ -19,32 +19,9 @@ C<PyString> extends C<PyObject> to provide Python string behaviour.
 */
 
 #include "parrot/parrot.h"
-
-/* cache of classes referenced */
-static INTVAL dynclass_PyIter;
-static INTVAL dynclass_PyString;
-static INTVAL dynclass_PyTuple;
+#include "pyconsts.h"
 
 pmclass PyString extends PyObject dynpmc group python_group {
-
-/*
-
-=item C<void class_init()>
-
-Class initialization. Caches the type id of various PMCs because
-they will be used frequently here.
-
-=cut
-
-*/
-
-    void class_init() {
-        if (pass) {
-            dynclass_PyIter    = Parrot_PMC_typenum(INTERP, "PyIter");
-            dynclass_PyString  = Parrot_PMC_typenum(INTERP, "PyString");
-            dynclass_PyTuple   = Parrot_PMC_typenum(INTERP, "PyTuple");
-        }
-    }
 
 /*
 
@@ -88,7 +65,7 @@ return the result in C<*dest>, morphing it to a PyString if required.
 
     void concatenate (PMC* value, PMC* dest) {
         STRING* s = PMC_str_val(SELF);
-        VTABLE_morph(INTERP, dest, dynclass_PyString);
+        VTABLE_morph(INTERP, dest, PyBuiltin_PyString);
         PMC_str_val(dest) =
             string_concat(INTERP, s, VTABLE_get_string(INTERP, value), 0);
     }
@@ -146,7 +123,7 @@ Return a new iterator for this string.
 */
 
     PMC* get_iter () {
-        PMC *iter = pmc_new_init(interpreter, dynclass_PyIter, SELF);
+        PMC *iter = pmc_new_init(interpreter, PyBuiltin_PyIter, SELF);
         PMC *key =  pmc_new(interpreter, enum_class_Key);
         PMC_struct_val(iter) = key;
         PObj_get_FLAGS(key) |= KEY_integer_FLAG;
@@ -202,7 +179,7 @@ Extracts a given character from the string.
             parrot_range_t *range = PMC_struct_val(slice);
             INTVAL start = RVal_int(range->start);
             INTVAL end   = RVal_int(range->end);
-            PMC * ret = pmc_new(INTERP, dynclass_PyString);
+            PMC * ret = pmc_new(INTERP, PyBuiltin_PyString);
             PMC_str_val(ret) = string_substr(INTERP, PMC_str_val(SELF), 
                 start, end-start, NULL, 0);
             return ret;
@@ -222,7 +199,7 @@ Extracts a given character from the string.
 */
 
     PMC* get_pmc_keyed_int (INTVAL key) {
-        PMC * ret = pmc_new(INTERP, dynclass_PyString);
+        PMC * ret = pmc_new(INTERP, PyBuiltin_PyString);
         PMC_str_val(ret) =
             string_substr(INTERP, PMC_str_val(SELF), key, 1, NULL, 0);
         return ret;
@@ -331,7 +308,7 @@ downcase this string
 
     METHOD PMC* lower() {
         STRING *s = string_downcase(INTERP, PMC_str_val(SELF));
-        PMC *ret = pmc_new(INTERP, dynclass_PyString);
+        PMC *ret = pmc_new(INTERP, PyBuiltin_PyString);
         VTABLE_set_string_native(INTERP, ret, s);
         return ret;
     }
@@ -354,7 +331,7 @@ Interpolates a formatstring with a set of values.
         /* TODO: figure out why C<DOES> doesn't work for dynclasses */
         if (value->vtable->base_type != enum_class_FixedPMCArray) {
             /* not a tuple - make one */
-            ar = pmc_new(INTERP, dynclass_PyTuple);
+            ar = pmc_new(INTERP, PyBuiltin_PyTuple);
             VTABLE_set_integer_native(INTERP, ar, 1);
             VTABLE_set_pmc_keyed_int( INTERP, ar, 0, value);
         }

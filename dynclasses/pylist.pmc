@@ -19,16 +19,7 @@ These are the vtable functions for the PyList base class
 */
 
 #include "parrot/parrot.h"
-
-/* cache of classes referenced */
-static INTVAL dynclass_PyInt;
-static INTVAL dynclass_PyIter;
-static INTVAL dynclass_PyList;
-static INTVAL dynclass_PyNone;
-static INTVAL dynclass_PyString;
-
-struct parrot_regs_t *
-Parrot_PyClass_runops_fromc(Parrot_Interp interpreter, PMC *sub);
+#include "pyconsts.h"
 
 static void quicksort(Interp* interpreter, List *list, PMC *cmpsub, 
     INTVAL left, INTVAL right) 
@@ -99,27 +90,6 @@ pmclass PyList extends PyObject need_ext does array dynpmc group python_group {
 
 /*
 
-=item C<void class_init()>
-
-Class initialization. Caches the type id of various PMCs because
-they will be used frequently here.
-
-=cut
-
-*/
-
-    void class_init() {
-        if (pass) {
-            dynclass_PyInt     = Parrot_PMC_typenum(INTERP, "PyInt");
-            dynclass_PyIter    = Parrot_PMC_typenum(INTERP, "PyIter");
-            dynclass_PyList    = Parrot_PMC_typenum(INTERP, "PyList");
-            dynclass_PyNone    = Parrot_PMC_typenum(INTERP, "PyNone");
-            dynclass_PyString  = Parrot_PMC_typenum(INTERP, "PyString");
-        }
-    }
-
-/*
-
 =item C<void init()>
 
 Initializes the PMC by calling the underlying C<list_new()> function.
@@ -147,7 +117,7 @@ Create a new list.
     METHOD PMC* __new__(PMC *class, PMC *value) {
         INTVAL argc = REG_INT(3);
 
-        PMC * ret = pmc_new(INTERP, dynclass_PyList);
+        PMC * ret = pmc_new(INTERP, PyBuiltin_PyList);
 
         if (argc > 1) {
             INTVAL n = VTABLE_elements(INTERP, value);
@@ -248,6 +218,20 @@ Returns true iff there are elements in the list.
 
 /*
 
+=item C<PMC *get_class()>
+
+Return the class of this object.
+
+=cut
+
+*/
+
+    PMC* get_class() {
+        return PyBuiltin_PyList_class;
+    }
+
+/*
+
 =item C<INTVAL get_integer()>
 
 Returns the number of elements in the array.
@@ -271,7 +255,7 @@ Return a new iterator for SELF.
 */
 
     PMC* get_iter () {
-        PMC *iter = pmc_new_init(interpreter, dynclass_PyIter, SELF);
+        PMC *iter = pmc_new_init(interpreter, PyBuiltin_PyIter, SELF);
         PMC *key =  pmc_new(interpreter, enum_class_Key);
         PMC_struct_val(iter) = key;
         PObj_get_FLAGS(key) |= KEY_integer_FLAG;
@@ -297,7 +281,7 @@ Returns the PMC value of the element at index C<key>.
             parrot_range_t *range = PMC_struct_val(slice);
             INTVAL start = RVal_int(range->start);
             INTVAL end   = RVal_int(range->end);
-            PMC * ret = pmc_new(INTERP, dynclass_PyList);
+            PMC * ret = pmc_new(INTERP, PyBuiltin_PyList);
             INTVAL n = end-start;
             INTVAL j;
     
@@ -334,7 +318,7 @@ Returns the PMC value of the element at index C<key>.
         else {
             ret = *(PMC**) ret;
             if (ret == NULL)
-                ret = pmc_new(interpreter, dynclass_PyNone);
+                ret = pmc_new(interpreter, PyBuiltin_PyNone);
         }
 
         return ret;
@@ -384,7 +368,7 @@ The C<==> operation. Compares two array to hold equal elements.
     INTVAL is_equal (PMC* value) {
         INTVAL j, n;
 
-        if (value->vtable->base_type != dynclass_PyList)
+        if (value->vtable->base_type != PyBuiltin_PyList)
             return 0;
         n = SELF.elements();
         if (VTABLE_elements(INTERP, value) != n)
@@ -419,7 +403,7 @@ Build a list by duplicating the passed list N times.
 
         if (k == 1) {
             elem = VTABLE_get_pmc_keyed_int(INTERP, SELF, 0);
-            VTABLE_morph(INTERP, dest, dynclass_PyList);
+            VTABLE_morph(INTERP, dest, PyBuiltin_PyList);
             list = PMC_data(dest);
             list_set_length(INTERP, list, value);
             for (i = 0; i < value; ++i)
@@ -489,7 +473,7 @@ Sets the integer value of the PMC at element C<key> to C<value>.
 */
 
     void set_integer_keyed_int (INTVAL key, INTVAL value) {
-        PMC *src = pmc_new_noinit(INTERP, dynclass_PyInt);
+        PMC *src = pmc_new_noinit(INTERP, PyBuiltin_PyInt);
         PMC_int_val(src) = value;
         list_assign(INTERP, (List *) PMC_data(SELF), key, src, enum_type_PMC);
     }
@@ -559,7 +543,7 @@ Sets the string value of the PMC at element C<key> to C<value>.
 */
 
     void set_string_keyed_int (INTVAL key, STRING* value) {
-        PMC *src = pmc_new_noinit(INTERP, dynclass_PyString);
+        PMC *src = pmc_new_noinit(INTERP, PyBuiltin_PyString);
         VTABLE_set_string_native(INTERP, src, value);
         list_assign(INTERP, (List *) PMC_data(SELF), key, src, enum_type_PMC);
     }

@@ -15,18 +15,17 @@ You can get the latest version of Pirate from:
 
     http://pirate.tangentcode.com/
 
-Outstanding Parrot archicture/design issues:
+Outstanding Parrot archicture/design issues/major todos:
 
   Keyword/Default arguments
-
-Benchmark status/issues:
-
-  b1: passes.
-  b2: passes.
-  b3: passes, performance is an issue
-  b4: there is no b4!
-  b5: awaiting completion of float, complex, ...
-  b6: requires a dictionary with integer keys.
+  Multiple inheritance (Python)
+  Multiple inheritance (Parrot)
+  MMD
+  Bound vs Unbound methods
+  Dictionaries with non-string keys
+  isinstance VTABLE entry?
+  DOES
+  bounds checking
 
 - Sam Ruby
 

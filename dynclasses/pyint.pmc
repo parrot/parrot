@@ -19,13 +19,7 @@ C<PyInt> extends C<PyObject> to provide a Python integer.
 */
 
 #include "parrot/parrot.h"
-
-/* cache of classes referenced */
-static INTVAL dynclass_PyInt;
-static INTVAL dynclass_PyComplex;
-static INTVAL dynclass_PyFloat;
-static INTVAL dynclass_PyLong;
-static INTVAL dynclass_PyString;
+#include "pyconsts.h"
 
 static void
 overflow(Interp *interpreter, PMC *self, INTVAL b, PMC *dest, int mmd)
@@ -34,12 +28,12 @@ overflow(Interp *interpreter, PMC *self, INTVAL b, PMC *dest, int mmd)
     INTVAL a = PMC_int_val(self);
 
     if (self == dest) {
-        VTABLE_morph(interpreter, self, dynclass_PyLong);
+        VTABLE_morph(interpreter, self, PyBuiltin_PyLong);
         VTABLE_set_integer_native(interpreter, self, a);
         mmd_dispatch_v_pip(interpreter, self, b, dest, mmd);
     }
     else {
-        temp = pmc_new(interpreter, dynclass_PyLong);
+        temp = pmc_new(interpreter, PyBuiltin_PyLong);
         VTABLE_set_integer_native(interpreter, temp, a);
         mmd_dispatch_v_pip(interpreter, temp, b, dest, mmd);
     }
@@ -50,33 +44,12 @@ promote(Interp *interpreter, PMC *self, PMC *b, PMC *dest, int mmd)
 {
     PMC *temp;
     INTVAL a = PMC_int_val(self);
-    temp = pmc_new(interpreter, dynclass_PyLong);
+    temp = pmc_new(interpreter, PyBuiltin_PyLong);
     VTABLE_set_integer_native(interpreter, temp, a);
     mmd_dispatch_v_ppp(interpreter, temp, b, dest, mmd);
 }
 
 pmclass PyInt extends PyObject dynpmc group python_group {
-
-/*
-
-=item C<void class_init()>
-
-Class initialization. Caches the type id of various PMCs because
-they will be used frequently here.
-
-=cut
-
-*/
-
-    void class_init() {
-        if (pass) {
-            dynclass_PyInt     = Parrot_PMC_typenum(INTERP, "PyInt");
-            dynclass_PyComplex = Parrot_PMC_typenum(INTERP, "PyComplex");
-            dynclass_PyFloat   = Parrot_PMC_typenum(INTERP, "PyFloat");
-            dynclass_PyLong    = Parrot_PMC_typenum(INTERP, "PyLong");
-            dynclass_PyString  = Parrot_PMC_typenum(INTERP, "PyString");
-        }
-    }
 
 /*
 
@@ -89,7 +62,7 @@ Returns the hex representation of C<self>.
 */
 
     METHOD PMC* __hex__(PMC *self) {
-        PMC * ret = pmc_new(INTERP, dynclass_PyString);
+        PMC * ret = pmc_new(INTERP, PyBuiltin_PyString);
         STRING *s = Parrot_sprintf_c(INTERP, "%#x",
             VTABLE_get_integer(INTERP, self));
         VTABLE_set_string_native(INTERP, ret, s);
@@ -107,7 +80,7 @@ Returns the octal representation of C<self>.
 */
 
     METHOD PMC* __oct__(PMC *self) {
-        PMC * ret = pmc_new(INTERP, dynclass_PyString);
+        PMC * ret = pmc_new(INTERP, PyBuiltin_PyString);
         STRING *s = Parrot_sprintf_c(INTERP, "%#o",
             VTABLE_get_integer(INTERP, self));
         VTABLE_set_string_native(INTERP, ret, s);
@@ -125,7 +98,7 @@ Returns the value of the prefix operator C<+>.
 */
 
     METHOD PMC* __pos__(PMC *self) {
-        PMC * ret = pmc_new(INTERP, dynclass_PyInt);
+        PMC * ret = pmc_new(INTERP, PyBuiltin_PyInt);
         PMC_int_val(ret) = PMC_int_val(self);
         return ret;
     }
@@ -145,11 +118,11 @@ Divides C<self> by C<*value> and returns the result.
         INTVAL i = (INTVAL) d;
         PMC * ret;
         if ( (FLOATVAL)i != d ) {
-            ret = pmc_new(INTERP, dynclass_PyFloat);
+            ret = pmc_new(INTERP, PyBuiltin_PyFloat);
             VTABLE_set_number_native(INTERP, ret, d);
         }
         else {
-            ret = pmc_new(INTERP, dynclass_PyInt);
+            ret = pmc_new(INTERP, PyBuiltin_PyInt);
             PMC_int_val(ret) = i;
         }
         return ret;
@@ -192,7 +165,7 @@ MMD_PyInt: {
 MMD_PyFloat: {
             INTVAL pmci = PMC_int_val(SELF);
             FLOATVAL valf = VTABLE_get_number(INTERP, value);
-            VTABLE_morph(INTERP, dest, dynclass_PyFloat);
+            VTABLE_morph(INTERP, dest, PyBuiltin_PyFloat);
             VTABLE_set_number_native(INTERP, dest, pmci + valf);
         }
 MMD_PyLong: {
@@ -201,7 +174,7 @@ MMD_PyLong: {
 MMD_PyComplex: {
             INTVAL pmci = PMC_int_val(SELF);
             FLOATVAL valf = VTABLE_get_number_keyed_int(INTERP, value, 0);
-            VTABLE_morph(INTERP, dest, dynclass_PyComplex);
+            VTABLE_morph(INTERP, dest, PyBuiltin_PyComplex);
             VTABLE_set_number_keyed_int(INTERP, dest, 0, pmci + valf);
             valf = VTABLE_get_number_keyed_int(INTERP, value, 1);
             VTABLE_set_number_keyed_int(INTERP, dest, 1, valf);
@@ -451,7 +424,7 @@ MMD_PyClass: {
 MMD_PyLong: {
             PMC *temp;
             INTVAL a = PMC_int_val(SELF);
-            temp = pmc_new(INTERP, dynclass_PyLong);
+            temp = pmc_new(INTERP, PyBuiltin_PyLong);
             VTABLE_set_integer_native(INTERP, temp, a);
             return mmd_dispatch_i_pp(INTERP, temp, value, MMD_CMP);
         }
@@ -504,7 +477,7 @@ Divides the integer by C<value> and returns the result in C<*dest>.
 
     void divide_float (FLOATVAL value, PMC* dest) {
         FLOATVAL pmcn = VTABLE_get_number(INTERP, SELF);
-        VTABLE_morph(INTERP, dest, dynclass_PyFloat);
+        VTABLE_morph(INTERP, dest, PyBuiltin_PyFloat);
         VTABLE_set_number_native(INTERP, dest, pmcn / value);
     }
 
@@ -579,6 +552,20 @@ Returns the boolean value of the integer.
 
 /*
 
+=item C<PMC *get_class()>
+
+Return the class of this object.
+
+=cut
+
+*/
+
+    PMC* get_class() {
+        return PyBuiltin_PyInt_class;
+    }
+
+/*
+
 =item C<INTVAL get_integer()>
 
 Returns the integer value of the integer.
@@ -646,18 +633,17 @@ Create a new integer
     METHOD PMC* __new__(PMC *class, PMC *source, PMC *base) {
         INTVAL argc = REG_INT(3);
 
-        PMC * ret = pmc_new(INTERP, dynclass_PyInt);
+        PMC * ret = pmc_new(INTERP, PyBuiltin_PyInt);
 
         /* XXX: quick hack: class method called directly */
-        INTVAL dynclass_PyProxyType = Parrot_PMC_typenum(INTERP, "PyProxyType");
-        if (argc == 3 && source->vtable->base_type == dynclass_PyProxyType)
+        if (argc == 3 && source->vtable->base_type == PyBuiltin_PyProxyType)
             source = REG_PMC(7);
 
         if (argc > 1) {
-            if (source->vtable->base_type == dynclass_PyString) {
+            if (source->vtable->base_type == PyBuiltin_PyString) {
                 INTVAL key = 0;
                 if (argc > 2) key = VTABLE_get_integer(INTERP, base);
-                VTABLE_morph(INTERP, ret, dynclass_PyLong);
+                VTABLE_morph(INTERP, ret, PyBuiltin_PyLong);
                 VTABLE_set_string_keyed_int(INTERP, ret, key,
                     VTABLE_get_string(INTERP, source));
                 mmd_dispatch_v_pip(INTERP, ret, 1, ret, MMD_DIVIDE_INT);
@@ -702,7 +688,7 @@ MMD_PyNone: {
             return 0;
         }
 MMD_PyLong: {
-            PMC *temp = pmc_new(INTERP, dynclass_PyLong);
+            PMC *temp = pmc_new(INTERP, PyBuiltin_PyLong);
             VTABLE_set_integer_native(INTERP, temp, PMC_int_val(SELF));
             return mmd_dispatch_i_pp(INTERP, temp, value, MMD_EQ);
         }
@@ -877,7 +863,7 @@ Raises C<SELF> to the power of C<*value> and returns the result.
 
     void pow_float (FLOATVAL value, PMC *dest) {
         FLOATVAL pmcf = VTABLE_get_number(INTERP, SELF);
-        VTABLE_morph(INTERP, dest, dynclass_PyFloat);
+        VTABLE_morph(INTERP, dest, PyBuiltin_PyFloat);
         VTABLE_set_number_native(INTERP, dest, (FLOATVAL) pow(pmcf, value) );
     }
 
@@ -898,7 +884,7 @@ Raises C<SELF> to the power of C<*value> and returns the result.
         else {
             int i;
             INTVAL pmci = PMC_int_val(SELF);
-            VTABLE_morph(INTERP, dest, dynclass_PyInt);
+            VTABLE_morph(INTERP, dest, PyBuiltin_PyInt);
             PMC_int_val(dest) = 1;
             for (i=1; i<=value; i++) {
                 mmd_dispatch_v_pip(INTERP, dest, pmci, dest, MMD_MULTIPLY_INT);

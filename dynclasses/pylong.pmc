@@ -23,32 +23,9 @@ C<PyLong> provides arbitray precision integer mathematic functions.
 */
 
 #include "parrot/parrot.h"
-
-/* cache of classes referenced */
-static INTVAL dynclass_PyInt;
-static INTVAL dynclass_PyLong;
-static INTVAL dynclass_PyString;
+#include "pyconsts.h"
 
 pmclass PyLong extends BigInt dynpmc group python_group {
-
-/*
-
-=item C<void class_init()>
-
-Class initialization. Caches the type id of various PMCs because
-they will be used frequently here.
-
-=cut
-
-*/
-
-    void class_init() {
-        if (pass) {
-            dynclass_PyInt     = Parrot_PMC_typenum(INTERP, "PyInt");
-            dynclass_PyLong    = Parrot_PMC_typenum(INTERP, "PyLong");
-            dynclass_PyString  = Parrot_PMC_typenum(INTERP, "PyString");
-        }
-    }
 
 /*
 
@@ -61,7 +38,7 @@ Returns the hex representation of C<self>.
 */
 
     METHOD PMC* __hex__(PMC *self) {
-        PMC * ret = pmc_new(INTERP, dynclass_PyString);
+        PMC * ret = pmc_new(INTERP, PyBuiltin_PyString);
 
         STRING *res = string_from_cstring(INTERP, "0x", 0);
         STRING *s = VTABLE_get_string_keyed_int(INTERP, self, 16);
@@ -85,10 +62,10 @@ Create a new long.
     METHOD PMC* __new__(PMC *class, PMC *value, PMC *base) {
         INTVAL argc = REG_INT(3);
 
-        PMC * ret = pmc_new(INTERP, dynclass_PyLong);
+        PMC * ret = pmc_new(INTERP, PyBuiltin_PyLong);
 
         if (argc > 1) {
-            if (value->vtable->base_type == dynclass_PyInt) {
+            if (value->vtable->base_type == PyBuiltin_PyInt) {
                 INTVAL ivalue = VTABLE_get_integer(INTERP, value);
                 VTABLE_set_integer_native(INTERP, ret, ivalue);
             }
@@ -125,6 +102,20 @@ MMD_PyInt: {
 
 /*
 
+=item C<PMC *get_class()>
+
+Return the class of this object.
+
+=cut
+
+*/
+
+    PMC* get_class() {
+        return PyBuiltin_PyLong_class;
+    }
+
+/*
+
 =item C<INTVAL is_equal (PMC* value)>
 
 The C<==> operation.
@@ -135,7 +126,7 @@ The C<==> operation.
 
     INTVAL is_equal (PMC* value) {
 MMD_PyInt: {
-            PMC *temp = pmc_new(INTERP, dynclass_PyLong);
+            PMC *temp = pmc_new(INTERP, PyBuiltin_PyLong);
             VTABLE_set_integer_native(INTERP, temp, PMC_int_val(value));
             return mmd_dispatch_i_pp(INTERP, SELF, temp, MMD_EQ);
         }
@@ -157,7 +148,7 @@ Morphs the scalar to the specified type.
 
     void morph (INTVAL type) {
         if (type == enum_class_BigInt) return;
-        if (type == enum_class_Integer) type = dynclass_PyInt;
+        if (type == enum_class_Integer) type = PyBuiltin_PyInt;
         pmc_reuse(INTERP, SELF, type, 0);
     }
 

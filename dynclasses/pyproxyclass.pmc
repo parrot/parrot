@@ -22,30 +22,9 @@ TODO: handle attributes.
 */
 
 #include "parrot/parrot.h"
-
-static INTVAL dynclass_PyProxyClass;
-static STRING *PROXY;
+#include "pyconsts.h"
 
 pmclass PyProxyClass extends PyType dynpmc group python_group {
-
-/*
-
-=item C<void class_init()>
-
-Class initialization. Caches the type id of various PMCs because
-they will be used frequently here.
-
-=cut
-
-*/
-
-    void class_init() {
-        if (pass) {
-            dynclass_PyProxyClass = Parrot_PMC_typenum(INTERP, "PyProxyClass");
-
-            PROXY = const_string(INTERP, "__proxy__");
-        }
-    }
 
 /*
 
@@ -76,7 +55,7 @@ Looks up the method for C<*method_name> and returns it.
         PMC *method = SUPER(method_name);
 
         if (method) {
-            PMC *forwarder = pmc_new(INTERP, dynclass_PyProxyClass);
+            PMC *forwarder = pmc_new(INTERP, PyBuiltin_PyProxyClass);
             PMC_struct_val(forwarder) = method;
             method = forwarder;
         }
@@ -101,7 +80,7 @@ Invoke the real method
             internal_exception(1, "Invoke() called on a PyProxyClass object");
 
         INTERP->ctx.current_object = REG_PMC(2) =  REG_PMC(5) = 
-            VTABLE_getprop(INTERP, proxy, PROXY);
+            VTABLE_getprop(INTERP, proxy, PyString_proxy);
 
         if (Interp_flags_TEST(interpreter, PARROT_TRACE_FLAG)) {
             PIO_eprintf(interpreter, "# Invoking %Ss on %Ss via proxy\n",

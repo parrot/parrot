@@ -20,45 +20,9 @@ methods you would expect to see on Python Classes
 */
 
 #include "parrot/parrot.h"
-
-/* cache of classes referenced */
-static INTVAL dynclass_PyClass;
-static INTVAL dynclass_PyString;
-static INTVAL dynclass_PyType;
-static STRING *BASES;
-static STRING *CLASS;
-static STRING *INIT;
-static STRING *NAME;
-static STRING *NEW;
-
-struct parrot_regs_t *
-Parrot_PyClass_runops_fromc(Parrot_Interp interpreter, PMC *sub);
+#include "pyconsts.h"
 
 pmclass PyType dynpmc group python_group {
-
-/*
-
-=item C<void class_init()>
-
-Class initialization. Caches the type id of various PMCs because
-they will be used frequently here.
-
-=cut
-
-*/
-
-    void class_init() {
-        if (pass) {
-            dynclass_PyClass = Parrot_PMC_typenum(INTERP, "PyClass");
-            dynclass_PyString = Parrot_PMC_typenum(INTERP, "PyString");
-            dynclass_PyType = Parrot_PMC_typenum(INTERP, "PyType");
-            BASES = const_string(INTERP, "__bases__");
-            CLASS = const_string(INTERP, "__class__");
-            INIT  = const_string(INTERP, "__init__");
-            NAME  = const_string(INTERP, "__name__");
-            NEW   = const_string(INTERP, "__new__");
-        }
-    }
 
 /*
 
@@ -98,7 +62,7 @@ Looks up the method for C<*method_name> and returns it.
             return method;
         }
 
-        parent = VTABLE_getprop(INTERP, SELF, BASES);
+        parent = VTABLE_getprop(INTERP, SELF, PyString_bases);
         if (parent && VTABLE_defined(INTERP, parent)) {
             return VTABLE_find_method(INTERP, parent, method_name);
         }
@@ -122,7 +86,7 @@ Return attribute named C<name>.
         PMC *attr = VTABLE_getprop(INTERP, SELF, idx);
         if (attr && VTABLE_defined(INTERP, attr)) return attr;
 
-        parent = VTABLE_getprop(INTERP, SELF, BASES);
+        parent = VTABLE_getprop(INTERP, SELF, PyString_bases);
         if (parent && VTABLE_defined(INTERP, parent)) {
             attr = VTABLE_get_attr_str(INTERP, parent, idx);
         }
@@ -151,8 +115,8 @@ Pythonic object constructor.
     void* invoke(void* next) {
         PMC *object, *init, *new;
 
-        new = VTABLE_find_method(INTERP, SELF, NEW);
-        init = VTABLE_find_method(INTERP, SELF, INIT);
+        new = VTABLE_find_method(INTERP, SELF, PyString_new);
+        init = VTABLE_find_method(INTERP, SELF, PyString_init);
 
         if (new || init) {
             int i = REG_INT(3)++;
@@ -166,23 +130,23 @@ Pythonic object constructor.
             save_context(interpreter, &ctx);
             INTERP->ctx.current_object = SELF;
             REG_PMC(2) = REG_PMC(5) = SELF;
-            REG_STR(0) = NEW;
+            REG_STR(0) = PyString_new;
             bp = Parrot_PyClass_runops_fromc(INTERP, new);
             object = BP_REG_PMC(bp,5);
             restore_context(interpreter, &ctx);
         }
         else {
-            object = pmc_new(interpreter, dynclass_PyClass);
+            object = pmc_new(interpreter, PyBuiltin_PyClass);
         }
 
-        VTABLE_setprop(INTERP, object, CLASS, REG_PMC(0));
+        VTABLE_setprop(INTERP, object, PyString_class, REG_PMC(0));
 
         if (init) {
             struct Parrot_Context ctx;
             save_context(interpreter, &ctx);
             INTERP->ctx.current_object = object;
             REG_PMC(2) = REG_PMC(5) = object;
-            REG_STR(0) = INIT;
+            REG_STR(0) = PyString_init;
             Parrot_PyClass_runops_fromc(INTERP, init);
             restore_context(interpreter, &ctx);
         }
@@ -206,11 +170,11 @@ need to be filled in.
 */
 
     PMC* subclass(STRING* name) {
-        PMC *ret = pmc_new(INTERP, dynclass_PyType);
-        PMC *nameprop = pmc_new(INTERP, dynclass_PyString);
+        PMC *ret = pmc_new(INTERP, PyBuiltin_PyType);
+        PMC *nameprop = pmc_new(INTERP, PyBuiltin_PyString);
         VTABLE_set_string_native(INTERP, nameprop, name);
-        VTABLE_setprop(INTERP, ret, NAME, nameprop);
-        VTABLE_setprop(INTERP, ret, BASES, SELF);
+        VTABLE_setprop(INTERP, ret, PyString_name, nameprop);
+        VTABLE_setprop(INTERP, ret, PyString_bases, SELF);
         return ret;
     }
 
@@ -224,7 +188,7 @@ Returns the name of this class.
 
 
     STRING* name() {
-        PMC *name = VTABLE_getprop(INTERP, SELF, NAME);
+        PMC *name = VTABLE_getprop(INTERP, SELF, PyString_name);
         return VTABLE_get_string(INTERP, name);
     }
 

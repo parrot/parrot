@@ -19,30 +19,9 @@ These are the vtable functions for the PyFloat base class
 */
 
 #include "parrot/parrot.h"
-
-/* cache of classes referenced */
-static INTVAL dynclass_PyFloat;
-static INTVAL dynclass_PyInt;
+#include "pyconsts.h"
 
 pmclass PyFloat extends Float extends PyObject dynpmc group python_group {
-
-/*
-
-=item C<void class_init()>
-
-Class initialization. Caches the type id of various PMCs because
-they will be used frequently here.
-
-=cut
-
-*/
-
-    void class_init() {
-        if (pass) {
-            dynclass_PyInt   = Parrot_PMC_typenum(INTERP, "PyInt");
-            dynclass_PyFloat = Parrot_PMC_typenum(INTERP, "PyFloat");
-        }
-    }
 
 /*
 
@@ -57,10 +36,10 @@ Create a new floating point number
     METHOD PMC* __new__(PMC *class, PMC *value) {
         INTVAL argc = REG_INT(3);
 
-        PMC * ret = pmc_new(INTERP, dynclass_PyFloat);
+        PMC * ret = pmc_new(INTERP, PyBuiltin_PyFloat);
 
         if (argc > 1) {
-            if (value->vtable->base_type == dynclass_PyInt) {
+            if (value->vtable->base_type == PyBuiltin_PyInt) {
                 FLOATVAL fvalue = VTABLE_get_number(INTERP, value);
                 VTABLE_set_number_native(INTERP, ret, fvalue);
             }
@@ -103,6 +82,20 @@ Returns an integer representation of the number (by casting).
    INTVAL get_integer() {
         return (INTVAL) PMC_num_val(SELF);
    }
+
+/*
+
+=item C<PMC *get_class()>
+
+Return the class of this object.
+
+=cut
+
+*/
+
+    PMC* get_class() {
+        return PyBuiltin_PyFloat_class;
+    }
 
 /*
 

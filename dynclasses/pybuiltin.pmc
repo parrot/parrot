@@ -19,28 +19,7 @@ This class implements the Python "builtin" Functions.
 */
 
 #include "parrot/parrot.h"
-
-/* cache of classes referenced */
-static INTVAL dynclass_PyObject;
-static INTVAL dynclass_PyBoolean;
-static INTVAL dynclass_PyComplex;
-static INTVAL dynclass_PyDict;
-static INTVAL dynclass_PyException;
-static INTVAL dynclass_PyInt;
-static INTVAL dynclass_PyFloat;
-static INTVAL dynclass_PyList;
-static INTVAL dynclass_PyLong;
-static INTVAL dynclass_PyNCI;
-static INTVAL dynclass_PyNone;
-static INTVAL dynclass_PyProxyType;
-static INTVAL dynclass_PyString;
-static INTVAL dynclass_PyTuple;
-
-static STRING *BASES;
-static STRING *HEX;
-static STRING *NAME;
-static STRING *OCT;
-static STRING *PYOBJECT;
+#include "pyconsts.h"
 
 extern PMC* Parrot_Hash_get_iter(Interp* interpreter, PMC* pmc);
 
@@ -56,7 +35,7 @@ PMC* Parrot_lib_python_group_init(Interp* interpreter, PMC *lib_pmc) {
 
 static PMC* make_type(Interp* interpreter, INTVAL class, STRING* name) {
     STRING *pmcname = Parrot_base_vtables[class]->whoami;
-    PMC *type = pmc_new(interpreter, dynclass_PyProxyType);
+    PMC *type = pmc_new(interpreter, PyBuiltin_PyProxyType);
     PMC *stash, *iter, *item, *nameprop;
     STRING *key;
     INTVAL n, j;
@@ -72,18 +51,18 @@ static PMC* make_type(Interp* interpreter, INTVAL class, STRING* name) {
         item = VTABLE_get_pmc_keyed_str(interpreter, stash, key);
 
         if (item->vtable->base_type == enum_class_NCI) {
-            nameprop = pmc_new(interpreter, dynclass_PyString);
+            nameprop = pmc_new(interpreter, PyBuiltin_PyString);
             VTABLE_set_string_native(interpreter, nameprop, key);
-            VTABLE_setprop(interpreter, item, NAME, nameprop);
-            item->vtable = Parrot_base_vtables[dynclass_PyNCI];
+            VTABLE_setprop(interpreter, item, PyString_name, nameprop);
+            item->vtable = Parrot_base_vtables[PyBuiltin_PyNCI];
         }
 
         VTABLE_add_method(interpreter, type, key, item);
     }
 
-    nameprop = pmc_new(interpreter, dynclass_PyString);
+    nameprop = pmc_new(interpreter, PyBuiltin_PyString);
     VTABLE_set_string_native(interpreter, nameprop, name);
-    VTABLE_setprop(interpreter, type, NAME, nameprop);
+    VTABLE_setprop(interpreter, type, PyString_name, nameprop);
 
     return type;
 }
@@ -102,26 +81,39 @@ they will be used frequently here.
 
     void class_init() {
         if (pass) {
-            dynclass_PyObject    = Parrot_PMC_typenum(INTERP, "PyObject");
-            dynclass_PyBoolean   = Parrot_PMC_typenum(INTERP, "PyBoolean");
-            dynclass_PyComplex   = Parrot_PMC_typenum(INTERP, "PyComplex");
-            dynclass_PyDict      = Parrot_PMC_typenum(INTERP, "PyDict");
-            dynclass_PyException = Parrot_PMC_typenum(INTERP, "PyException");
-            dynclass_PyInt       = Parrot_PMC_typenum(INTERP, "PyInt");
-            dynclass_PyFloat     = Parrot_PMC_typenum(INTERP, "PyFloat");
-            dynclass_PyList      = Parrot_PMC_typenum(INTERP, "PyList");
-            dynclass_PyLong      = Parrot_PMC_typenum(INTERP, "PyLong");
-            dynclass_PyNCI       = Parrot_PMC_typenum(INTERP, "PyNCI");
-            dynclass_PyNone      = Parrot_PMC_typenum(INTERP, "PyNone");
-            dynclass_PyProxyType = Parrot_PMC_typenum(INTERP, "PyProxyType");
-            dynclass_PyString    = Parrot_PMC_typenum(INTERP, "PyString");
-            dynclass_PyTuple     = Parrot_PMC_typenum(INTERP, "PyTuple");
+            PyBuiltin_PyBoolean    = Parrot_PMC_typenum(INTERP, "PyBoolean");
+            PyBuiltin_PyClass      = Parrot_PMC_typenum(INTERP, "PyClass");
+            PyBuiltin_PyComplex    = Parrot_PMC_typenum(INTERP, "PyComplex");
+            PyBuiltin_PyDict       = Parrot_PMC_typenum(INTERP, "PyDict");
+            PyBuiltin_PyException  = Parrot_PMC_typenum(INTERP, "PyException");
+            PyBuiltin_PyFloat      = Parrot_PMC_typenum(INTERP, "PyFloat");
+            PyBuiltin_PyInt        = Parrot_PMC_typenum(INTERP, "PyInt");
+            PyBuiltin_PyIter       = Parrot_PMC_typenum(INTERP, "PyIter");
+            PyBuiltin_PyList       = Parrot_PMC_typenum(INTERP, "PyList");
+            PyBuiltin_PyLong       = Parrot_PMC_typenum(INTERP, "PyLong");
+            PyBuiltin_PyNCI        = Parrot_PMC_typenum(INTERP, "PyNCI");
+            PyBuiltin_PyNone       = Parrot_PMC_typenum(INTERP, "PyNone");
+            PyBuiltin_PyObject     = Parrot_PMC_typenum(INTERP, "PyObject");
+            PyBuiltin_PyProxyClass = Parrot_PMC_typenum(INTERP, "PyProxyClass");
+            PyBuiltin_PyProxyType  = Parrot_PMC_typenum(INTERP, "PyProxyType");
+            PyBuiltin_PyString     = Parrot_PMC_typenum(INTERP, "PyString");
+            PyBuiltin_PyTuple      = Parrot_PMC_typenum(INTERP, "PyTuple");
+            PyBuiltin_PyType       = Parrot_PMC_typenum(INTERP, "PyType");
 
-            BASES = const_string(INTERP, "__bases__");
-            HEX = const_string(INTERP, "__hex__");
-            NAME = const_string(INTERP, "__name__");
-            OCT = const_string(INTERP, "__oct__");
-            PYOBJECT = const_string(INTERP, "PyObject");
+            PyString_bases = const_string(INTERP, "__bases__");
+            PyString_class = const_string(INTERP, "__class__");
+            PyString_call  = const_string(INTERP, "__call__");
+            PyString_cmp   = const_string(INTERP, "__cmp__");
+            PyString_hex   = const_string(INTERP, "__hex__");
+            PyString_init  = const_string(INTERP, "__init__");
+            PyString_int   = const_string(INTERP, "__int__");
+            PyString_iter  = const_string(INTERP, "__iter__");
+            PyString_name  = const_string(INTERP, "__name__");
+            PyString_new   = const_string(INTERP, "__new__");
+            PyString_oct   = const_string(INTERP, "__oct__");
+            PyString_proxy = const_string(INTERP, "__proxy__");
+            PyString_repr  = const_string(INTERP, "__repr__");
+            PyString_str   = const_string(INTERP, "__str__");
         }
     }
 
@@ -174,10 +166,10 @@ enter_nci_method should create these as locals to begin with.
             item = VTABLE_get_pmc_keyed_str(INTERP, stash, key);
 
             if (item->vtable->base_type == enum_class_NCI) {
-                PMC *nameprop = pmc_new(interpreter, dynclass_PyString);
+                PMC *nameprop = pmc_new(interpreter, PyBuiltin_PyString);
                 VTABLE_set_string_native(interpreter, nameprop, key);
-                VTABLE_setprop(interpreter, item, NAME, nameprop);
-                item->vtable = Parrot_base_vtables[dynclass_PyNCI];
+                VTABLE_setprop(interpreter, item, PyString_name, nameprop);
+                item->vtable = Parrot_base_vtables[PyBuiltin_PyNCI];
             }
 
             scratchpad_store_by_name(INTERP, pad, 0, key, item);
@@ -185,95 +177,101 @@ enter_nci_method should create these as locals to begin with.
 
         /* constants */
         key = const_string(INTERP, "__debug__");
-        item = pmc_new(INTERP, dynclass_PyBoolean);
+        item = pmc_new(INTERP, PyBuiltin_PyBoolean);
         VTABLE_set_integer_native(INTERP, item, 1);
         scratchpad_store_by_name(INTERP, pad, 0, key, item);
 
         key = const_string(INTERP, "False");
-        item = pmc_new(INTERP, dynclass_PyBoolean);
+        item = pmc_new(INTERP, PyBuiltin_PyBoolean);
         VTABLE_set_integer_native(INTERP, item, 0);
         scratchpad_store_by_name(INTERP, pad, 0, key, item);
 
         key = const_string(INTERP, "True");
-        item = pmc_new(INTERP, dynclass_PyBoolean);
+        item = pmc_new(INTERP, PyBuiltin_PyBoolean);
         VTABLE_set_integer_native(INTERP, item, 1);
         scratchpad_store_by_name(INTERP, pad, 0, key, item);
 
         key = const_string(INTERP, "None");
-        item = pmc_new(INTERP, dynclass_PyNone);
+        item = pmc_new(INTERP, PyBuiltin_PyNone);
         scratchpad_store_by_name(INTERP, pad, 0, key, item);
 
         /* exceptions */
         key = const_string(INTERP, "RuntimeError");
-        item = pmc_new(INTERP, dynclass_PyException);
+        item = pmc_new(INTERP, PyBuiltin_PyException);
         VTABLE_set_integer_native(INTERP, item, E_RuntimeError);
         scratchpad_store_by_name(INTERP, pad, 0, key, item);
 
         key = const_string(INTERP, "StopIteration");
-        item = pmc_new(INTERP, dynclass_PyException);
+        item = pmc_new(INTERP, PyBuiltin_PyException);
         VTABLE_set_integer_native(INTERP, item, E_StopIteration);
         scratchpad_store_by_name(INTERP, pad, 0, key, item);
 
         key = const_string(INTERP, "ValueError");
-        item = pmc_new(INTERP, dynclass_PyException);
+        item = pmc_new(INTERP, PyBuiltin_PyException);
         VTABLE_set_integer_native(INTERP, item, E_ValueError);
         scratchpad_store_by_name(INTERP, pad, 0, key, item);
 
         /* Class objects */
         key = const_string(INTERP, "object");
-        parent = make_type(INTERP, dynclass_PyObject, key);
+        parent = make_type(INTERP, PyBuiltin_PyObject, key);
+        parent->vtable = Parrot_base_vtables[PyBuiltin_PyType];
+        scratchpad_store_by_name(INTERP, pad, 0, key, parent);
 
         key = const_string(INTERP, "bool");
-        item = make_type(INTERP, dynclass_PyBoolean, key);
-        VTABLE_setprop(INTERP, item, BASES, parent);
+        item = make_type(INTERP, PyBuiltin_PyBoolean, key);
+        VTABLE_setprop(INTERP, item, PyString_bases, parent);
         scratchpad_store_by_name(INTERP, pad, 0, key, item);
+        PyBuiltin_PyBoolean_class = item;
 
         key = const_string(INTERP, "complex");
-        item = make_type(INTERP, dynclass_PyComplex, key);
-        VTABLE_setprop(INTERP, item, BASES, parent);
+        item = make_type(INTERP, PyBuiltin_PyComplex, key);
+        VTABLE_setprop(INTERP, item, PyString_bases, parent);
         scratchpad_store_by_name(INTERP, pad, 0, key, item);
+        PyBuiltin_PyComplex_class = item;
 
         key = const_string(INTERP, "dict");
-        item = make_type(INTERP, dynclass_PyDict, key);
-        VTABLE_setprop(INTERP, item, BASES, parent);
+        item = make_type(INTERP, PyBuiltin_PyDict, key);
+        VTABLE_setprop(INTERP, item, PyString_bases, parent);
         scratchpad_store_by_name(INTERP, pad, 0, key, item);
+        PyBuiltin_PyDict_class = item;
 
         key = const_string(INTERP, "int");
-        item = make_type(INTERP, dynclass_PyInt, key);
-        VTABLE_setprop(INTERP, item, BASES, parent);
+        item = make_type(INTERP, PyBuiltin_PyInt, key);
+        VTABLE_setprop(INTERP, item, PyString_bases, parent);
         scratchpad_store_by_name(INTERP, pad, 0, key, item);
+        PyBuiltin_PyInt_class = item;
 
         key = const_string(INTERP, "float");
-        item = make_type(INTERP, dynclass_PyFloat, key);
-        VTABLE_setprop(INTERP, item, BASES, parent);
+        item = make_type(INTERP, PyBuiltin_PyFloat, key);
+        VTABLE_setprop(INTERP, item, PyString_bases, parent);
         scratchpad_store_by_name(INTERP, pad, 0, key, item);
+        PyBuiltin_PyFloat_class = item;
 
         key = const_string(INTERP, "list");
-        item = make_type(INTERP, dynclass_PyList, key);
-        VTABLE_setprop(INTERP, item, BASES, parent);
+        item = make_type(INTERP, PyBuiltin_PyList, key);
+        VTABLE_setprop(INTERP, item, PyString_bases, parent);
         scratchpad_store_by_name(INTERP, pad, 0, key, item);
+        PyBuiltin_PyList_class = item;
 
         key = const_string(INTERP, "long");
-        item = make_type(INTERP, dynclass_PyLong, key);
-        VTABLE_setprop(INTERP, item, BASES, parent);
+        item = make_type(INTERP, PyBuiltin_PyLong, key);
+        VTABLE_setprop(INTERP, item, PyString_bases, parent);
         scratchpad_store_by_name(INTERP, pad, 0, key, item);
+        PyBuiltin_PyLong_class = item;
 
         key = const_string(INTERP, "tuple");
-        item = make_type(INTERP, dynclass_PyTuple, key);
-        VTABLE_setprop(INTERP, item, BASES, parent);
+        item = make_type(INTERP, PyBuiltin_PyTuple, key);
+        VTABLE_setprop(INTERP, item, PyString_bases, parent);
         scratchpad_store_by_name(INTERP, pad, 0, key, item);
+        PyBuiltin_PyTuple_class = item;
 
         /* TODO: convert this to instances of <type> */
         key = const_string(INTERP, "xrange");
         item = pmc_new(INTERP, enum_class_Slice);
         scratchpad_store_by_name(INTERP, pad, 0, key, item);
 
-        key = const_string(INTERP, "object");
-        item = Parrot_class_lookup(interpreter, const_string(INTERP, "PyType"));
-        scratchpad_store_by_name(INTERP, pad, 0, key, item);
-
         /* Begin main! */
-        item = pmc_new(INTERP, dynclass_PyString);
+        item = pmc_new(INTERP, PyBuiltin_PyString);
         VTABLE_set_string_native(INTERP, item,
                 const_string(INTERP, "__main__"));
         scratchpad_store_by_name(INTERP, pad, 0, name, item);
@@ -290,7 +288,7 @@ Returns the absolute value of an object
 */
 
     METHOD PMC* abs(PMC *object) {
-        PMC * ret = pmc_new(INTERP, dynclass_PyObject);
+        PMC * ret = pmc_new(INTERP, PyBuiltin_PyObject);
         VTABLE_absolute(INTERP, object, ret);
         return ret;
     }
@@ -307,7 +305,7 @@ Returns the absolute value of an object
 */
 
     METHOD PMC* callable(PMC *object) {
-        PMC * ret = pmc_new(INTERP, dynclass_PyBoolean);
+        PMC * ret = pmc_new(INTERP, PyBuiltin_PyBoolean);
         STRING *sub = Parrot_base_vtables[enum_class_Sub]->whoami;
         STRING *nci = Parrot_base_vtables[enum_class_NCI]->whoami;
         INTVAL isa = VTABLE_isa(INTERP, object, sub) ||
@@ -327,10 +325,10 @@ Return a string of one character with ordinal C<*value>.
 */
 
     METHOD PMC* chr(PMC *value) {
-        PMC *s = pmc_new_noinit(INTERP, dynclass_PyString);
+        PMC *s = pmc_new_noinit(INTERP, PyBuiltin_PyString);
         INTVAL i = VTABLE_get_integer(INTERP, value);
         /*
-         * TODO if i < 0 || > 255 throgh ValueError
+         * TODO if i < 0 || > 255 throw ValueError
          */
         PMC_str_val(s) = string_chr(INTERP, (UINTVAL)i);
         PObj_custom_mark_SET(s);
@@ -348,7 +346,7 @@ Returns the result of comparing C<*value1> with C<*value2>).
 */
 
     METHOD PMC* cmp(PMC *value1, PMC *value2) {
-        PMC * ret = pmc_new(INTERP, dynclass_PyInt);
+        PMC * ret = pmc_new(INTERP, PyBuiltin_PyInt);
         VTABLE_set_integer_native(INTERP, ret,
             mmd_dispatch_i_pp(INTERP, value1, value2, MMD_CMP));
         return ret;
@@ -367,14 +365,14 @@ Returns both the floordiv and mod of C<*value1> with C<*value2>).
     METHOD PMC* divmod(PMC *value1, PMC *value2) {
         PMC *ret, *temp;
 
-        ret = pmc_new(INTERP, dynclass_PyTuple);
+        ret = pmc_new(INTERP, PyBuiltin_PyTuple);
         VTABLE_set_integer_native(INTERP, ret, 2);
 
-        temp = pmc_new(INTERP, dynclass_PyObject);
+        temp = pmc_new(INTERP, PyBuiltin_PyObject);
         mmd_dispatch_v_ppp(INTERP, value1, value2, temp, MMD_FLOOR_DIVIDE);
         VTABLE_set_pmc_keyed_int(INTERP, ret, 0, temp);
 
-        temp = pmc_new(INTERP, dynclass_PyObject);
+        temp = pmc_new(INTERP, PyBuiltin_PyObject);
         mmd_dispatch_v_ppp(INTERP, value1, value2, temp, MMD_MOD);
         VTABLE_set_pmc_keyed_int(INTERP, ret, 1, temp);
         return ret;
@@ -418,12 +416,12 @@ is a tuple or string, return the same type, else return a list.
         type = list->vtable->base_type;
         iter = NULL;
 
-        if (type == dynclass_PyString) {
+        if (type == PyBuiltin_PyString) {
             res = pmc_new(INTERP, type);
         }
         else {
             if (type == enum_class_Iterator) iter = list;
-            res = pmc_new(INTERP, dynclass_PyList);
+            res = pmc_new(INTERP, PyBuiltin_PyList);
         }
 
         if (!iter)
@@ -431,7 +429,7 @@ is a tuple or string, return the same type, else return a list.
         VTABLE_set_integer_native(INTERP, iter, 0);
         i = 0;
         none_func = PMC_IS_NULL(func) ||
-            func->vtable->base_type == dynclass_PyNone;
+            func->vtable->base_type == PyBuiltin_PyNone;
         while (VTABLE_get_bool(INTERP, iter)) {
             PMC *item = VTABLE_shift_pmc(INTERP, iter);
             if (none_func) {
@@ -468,7 +466,7 @@ Returns the hash of C<value>.
 */
 
     METHOD PMC* hash(PMC *value) {
-        PMC *ret = pmc_new_noinit(INTERP, dynclass_PyInt);
+        PMC *ret = pmc_new_noinit(INTERP, PyBuiltin_PyInt);
         VTABLE_set_integer_native(INTERP, ret, VTABLE_hash(INTERP, value));
         return ret;
     }
@@ -486,11 +484,11 @@ Todo: obtain the Python class name for the exception
 */
 
     METHOD PMC* hex(PMC *value) {
-        PMC * meth = VTABLE_find_method(INTERP, value, HEX);
+        PMC * meth = VTABLE_find_method(INTERP, value, PyString_hex);
         if (!meth)
             real_exception(interpreter, NULL, E_AttributeError,
                 "AttributeError: %Ss instance has no attribute '%Ss'",
-                value->vtable->whoami, HEX);
+                value->vtable->whoami, PyString_hex);
         REG_INT(0) = 1;
         REG_INT(1) = REG_INT(2) = REG_INT(3) = REG_INT(4) = 0;
         REG_PMC(2) = value;
@@ -509,7 +507,7 @@ Returns the "identity" of C<value>.
 */
 
     METHOD PMC* id(PMC *value) {
-        PMC * ret = pmc_new(INTERP, dynclass_PyInt);
+        PMC * ret = pmc_new(INTERP, PyBuiltin_PyInt);
         VTABLE_set_integer_native(INTERP, ret, (INTVAL)value);
         return ret;
     }
@@ -529,7 +527,7 @@ TODO: bases should be a tuple
 */
 
     METHOD PMC* isinstance(PMC *object, PMC* class) {
-        PMC *ret = pmc_new(INTERP, dynclass_PyBoolean);
+        PMC *ret = pmc_new(INTERP, PyBuiltin_PyBoolean);
         PMC * test = VTABLE_get_class(INTERP, object);
         VTABLE_set_integer_native(INTERP, ret, 0);
 
@@ -538,7 +536,7 @@ TODO: bases should be a tuple
                 VTABLE_set_integer_native(INTERP, ret, 1);
                 break;
             }
-            test = VTABLE_getprop(INTERP, test, BASES);
+            test = VTABLE_getprop(INTERP, test, PyString_bases);
         }
 
         return ret;
@@ -625,12 +623,12 @@ the argument sequence(s).
         type = list->vtable->base_type;
         iter = NULL;
 
-        if (type == dynclass_PyString) {
+        if (type == PyBuiltin_PyString) {
             res = pmc_new(INTERP, type);
         }
         else {
             if (type == enum_class_Iterator) iter = list;
-            res = pmc_new(INTERP, dynclass_PyList);
+            res = pmc_new(INTERP, PyBuiltin_PyList);
         }
 
         if (!iter)
@@ -639,7 +637,7 @@ the argument sequence(s).
 
         i = 0;
         none_func = PMC_IS_NULL(func) ||
-            func->vtable->base_type == dynclass_PyNone;
+            func->vtable->base_type == PyBuiltin_PyNone;
         while (VTABLE_get_bool(INTERP, iter)) {
             PMC *item = VTABLE_shift_pmc(INTERP, iter);
             if (!none_func) {
@@ -710,7 +708,7 @@ Returns the octal representation of C<value>.
 */
 
     METHOD PMC* oct(PMC *value) {
-        PMC * meth = VTABLE_find_method(INTERP, value, OCT);
+        PMC * meth = VTABLE_find_method(INTERP, value, PyString_oct);
         REG_INT(0) = 1;
         REG_INT(1) = REG_INT(2) = REG_INT(3) = REG_INT(4) = 0;
         REG_PMC(2) = value;
@@ -729,7 +727,7 @@ Return the integer ordinal of a one-character string.
 */
 
     METHOD PMC* ord(PMC *value) {
-        PMC * ret = pmc_new(INTERP, dynclass_PyInt);
+        PMC * ret = pmc_new(INTERP, PyBuiltin_PyInt);
         STRING *svalue = VTABLE_get_string(INTERP, value);
         INTVAL ivalue = string_ord(INTERP, svalue, 0);
         VTABLE_set_integer_native(INTERP, ret, ivalue);
@@ -748,7 +746,7 @@ an increment of C<pstep>
 */
 
     METHOD PMC* range(PMC *pstart, PMC *pend, PMC *pstep) {
-        PMC *ar = pmc_new(INTERP, dynclass_PyList);
+        PMC *ar = pmc_new(INTERP, PyBuiltin_PyList);
         INTVAL start = 0, end = 0, step = 1;
         int i, k, argcP;
 
@@ -804,19 +802,19 @@ calculation, and serves as a default whe n the sequence is empty.
 
         type = list->vtable->base_type;
         iter = NULL;
-        if (type == dynclass_PyString) {
+        if (type == PyBuiltin_PyString) {
             res = pmc_new(INTERP, type);
         }
         else {
             if (type == enum_class_Iterator) iter = list;
-            res = pmc_new(INTERP, dynclass_PyList);
+            res = pmc_new(INTERP, PyBuiltin_PyList);
         }
         if (!iter)
             iter = pmc_new_init(INTERP, enum_class_Iterator, list);
         VTABLE_set_integer_native(INTERP, iter, 0);
         i = 0;
         none_func = PMC_IS_NULL(func) ||
-            func->vtable->base_type == dynclass_PyNone;
+            func->vtable->base_type == PyBuiltin_PyNone;
         if (none_func) {
             /* TODO TypeError: 'NoneType' object is not callable  */
         }

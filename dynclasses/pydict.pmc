@@ -19,14 +19,9 @@ These are the vtable functions for the Python Dictionary class
 */
 
 #include "parrot/parrot.h"
+#include "pyconsts.h"
 
 STRING * hash_get_idx(Interp *interpreter, Hash *hash, PMC *key);
-
-/* cache of classes referenced */
-static INTVAL dynclass_PyDict;
-static INTVAL dynclass_PyInt;
-static INTVAL dynclass_PyNone;
-static INTVAL dynclass_PyString;
 
 pmclass PyDict extends PyObject need_ext does hash dynpmc group python_group {
 
@@ -43,11 +38,6 @@ Class initialization. Allocates the memory for the hash.
     void class_init() {
         /* class_init_code */
         if (pass) {
-            dynclass_PyDict    = Parrot_PMC_typenum(INTERP, "PyDict");
-            dynclass_PyInt     = Parrot_PMC_typenum(INTERP, "PyInt");
-            dynclass_PyNone    = Parrot_PMC_typenum(INTERP, "PyNone");
-            dynclass_PyString  = Parrot_PMC_typenum(INTERP, "PyString");
-
             make_bufferlike_pool(INTERP, sizeof(struct _hash));
         }
     }
@@ -158,9 +148,9 @@ is not specified, it defaults to C<None>.
 
     METHOD PMC* fromkeys (PMC *self, PMC *keys, PMC* value) {
         PMC *iter = VTABLE_get_iter(INTERP, keys);
-        PMC *ret = pmc_new(INTERP, dynclass_PyDict);
+        PMC *ret = pmc_new(INTERP, PyBuiltin_PyDict);
 
-        if (REG_INT(3) < 3) value = pmc_new(INTERP, dynclass_PyNone);
+        if (REG_INT(3) < 3) value = pmc_new(INTERP, PyBuiltin_PyNone);
 
         while (VTABLE_get_bool(INTERP, iter)) {       
             PMC *key = VTABLE_shift_pmc(INTERP, iter);
@@ -182,6 +172,20 @@ Returns true iff there are elements in the dictionary.
 
     INTVAL get_bool () {
         return DYNSELF.elements() != 0;
+    }
+
+/*
+
+=item C<PMC *get_class()>
+
+Return the class of this object.
+
+=cut
+
+*/
+
+    PMC* get_class() {
+        return PyBuiltin_PyDict_class;
     }
 
 /*
@@ -229,13 +233,13 @@ Returns the PMC value for the element at C<*key>.
                  * check if we really have Hash_key_type_int
                  */
                 if (hash->key_type == Hash_key_type_int) {
-                    PMC *intret = pmc_new(INTERP, dynclass_PyInt);
+                    PMC *intret = pmc_new(INTERP, PyBuiltin_PyInt);
                     INTVAL i = (INTVAL)hash_get_idx(INTERP, hash, key);
                     PMC_int_val(intret) = i;
                     return intret;
                 }
                 else {
-                    PMC *strret = pmc_new(INTERP, dynclass_PyString);
+                    PMC *strret = pmc_new(INTERP, PyBuiltin_PyString);
                     STRING *s = hash_get_idx(INTERP, hash, key);
                     VTABLE_set_string_native(INTERP, strret, s);
                     return strret;
@@ -384,13 +388,13 @@ Create a new dictionary from a sequence
 */
 
     METHOD PMC* __new__(PMC *cls, PMC *source) {
-        PMC *dict = pmc_new(INTERP, dynclass_PyDict);
+        PMC *dict = pmc_new(INTERP, PyBuiltin_PyDict);
         PMC *iter;
         INTVAL argc = REG_INT(3);
 
         if (argc == 1) return dict;
 
-        if (source->vtable->base_type == dynclass_PyDict) {
+        if (source->vtable->base_type == PyBuiltin_PyDict) {
             iter = VTABLE_get_iter(INTERP, source);
             while (VTABLE_get_bool(INTERP, iter)) {
                 PMC *key = VTABLE_shift_pmc(INTERP, iter);
@@ -431,7 +435,7 @@ Create a new dictionary from a sequence
 */
 
     void set_integer_keyed (PMC* key, INTVAL value) {
-         PMC *ivalue = pmc_new(INTERP, dynclass_PyInt);
+         PMC *ivalue = pmc_new(INTERP, PyBuiltin_PyInt);
          VTABLE_set_integer_native(INTERP, ivalue, value);
          VTABLE_set_pmc_keyed(INTERP, SELF, key, ivalue);
     }
@@ -524,7 +528,7 @@ Check if two dictionaries hold the same keys and values.
 */
 
     void set_string_keyed (PMC* key, STRING* value) {
-         PMC *svalue = pmc_new(INTERP, dynclass_PyString);
+         PMC *svalue = pmc_new(INTERP, PyBuiltin_PyString);
          VTABLE_set_string_native(INTERP, svalue, value);
          VTABLE_set_pmc_keyed(INTERP, SELF, key, svalue);
     }
