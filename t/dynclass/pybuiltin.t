@@ -16,7 +16,8 @@ Tests the Python Builtins.
 
 =cut
 
-use Parrot::Test tests => 3;
+use Parrot::Test tests => 4;
+use Parrot::Config;
 
 output_is(<< 'CODE', << 'OUTPUT', "delegating");
 ##PIR##
@@ -63,11 +64,6 @@ output_is(<< 'CODE', << 'OUTPUT', "delegating");
     print $P3
     print "\n"
 
-    find_lex $P2, "long"
-    $P3 = $P2($P0)
-    print $P3
-    print "\n"
-
     find_lex $P2, "oct"
     $P3 = $P2($P0)
     print $P3
@@ -80,9 +76,31 @@ CODE
 31.0
 0x1f
 31
-31L
 037
 OUTPUT
+
+SKIP: { skip("No BigInt Lib configured", 1) if !$PConfig{gmp};
+output_is(<< 'CODE', << 'OUTPUT', "bigint");
+##PIR##
+.sub main @MAIN
+    new_pad 0
+    loadlib $P0, "python_group"
+    find_global P0, "PyBuiltin", "__load__"
+    invoke
+
+    find_type $I0, "PyInt"
+    new $P0, $I0
+    set $P0, 31
+
+    find_lex $P1, "long"
+    $P2 = $P1($P0)
+    print $P2
+    print "\n"
+.end
+CODE
+31L
+OUTPUT
+}
 
 output_is(<< 'CODE', << 'OUTPUT', "range");
 ##PIR##
