@@ -518,7 +518,7 @@ void
 PackFile_dump(struct PackFile * self) {
     opcode_t i;
 
-    printf("MAGIC => 0x%08x,\n", self->magic);
+    printf("MAGIC => 0x%08lx,\n", (long) self->magic);
 
     printf("FIXUP => {\n");
 
@@ -536,9 +536,9 @@ PackFile_dump(struct PackFile * self) {
 
     for (i = 0; i < self->byte_code_size / 4; i++) {
         if (i % 8 == 0) {
-            printf("\n    %08x:  ", i * 4);
+            printf("\n    %08lx:  ", (long) i * 4);
         }
-        printf("%08x ", ((opcode_t *)(self->byte_code))[i]);
+        printf("%08lx ", (long) ((opcode_t *)(self->byte_code))[i]);
     }
 
     printf("\n]\n");
@@ -1052,7 +1052,7 @@ PackFile_ConstTable_dump(struct PackFile_ConstTable * self) {
     }
 
     for(i = 0; i < self->const_count; i++) {
-        printf("    # %d:\n", i);
+        printf("    # %ld:\n", (long) i);
         PackFile_Constant_dump(self->constants[i]);
     }
 
@@ -1330,7 +1330,7 @@ PackFile_Constant_unpack(struct Parrot_Interp *interpreter, struct PackFile_Cons
             break;
 
         default:
-            fprintf(stderr, "PackFile_Constant_clear: Unrecognized type '%c' during unpack!\n", type);
+            fprintf(stderr, "PackFile_Constant_clear: Unrecognized type '%c' during unpack!\n", (int) type);
             return 0;
             break;
     }
@@ -1712,7 +1712,7 @@ PackFile_Constant_dump(struct PackFile_Constant * self) {
 
         case PFC_STRING:
             printf("    [ 'PFC_STRING', {\n");
-            printf("        FLAGS    => 0x%04x,\n", self->string->flags);
+            printf("        FLAGS    => 0x%04lx,\n", (long) self->string->flags);
             printf("        ENCODING => %s,\n",
                     self->string->encoding->name);
             printf("        TYPE     => %s,\n",
