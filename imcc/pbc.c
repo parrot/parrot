@@ -34,7 +34,7 @@
  *
  */
 
-/* 
+/*
  * globals store the state between individual e_pbc_emit calls
  */
 
@@ -263,7 +263,7 @@ store_key_const(char * str, int idx)
 }
 
 
-/* 
+/*
  * find a label in the interpreter's fixup table
  */
 static int
@@ -905,6 +905,7 @@ e_pbc_emit(Interp *interpreter, void *param, IMC_Unit * unit, Instruction * ins)
     static opcode_t * pc, npc;
     op_info_t *op_info;
     int op, i;
+    /* XXX move these statics into IMCC_INFO */
     static struct PackFile_Debug *debug_seg;
     static int ins_line;
 
@@ -938,14 +939,15 @@ e_pbc_emit(Interp *interpreter, void *param, IMC_Unit * unit, Instruction * ins)
         pc = (opcode_t*) interpreter->code->byte_code + oldsize;
         npc = 0;
         /* add debug if necessary */
-        if (Interp_flags_TEST(interpreter, PARROT_DEBUG_FLAG) ||
-            PARROT_WARNINGS_test(interpreter, PARROT_WARNINGS_ALL_FLAG)) {
+        if (!IMCC_INFO(interpreter)->optimizer_level) {
             const char *sourcefile = IMCC_INFO(interpreter)->state->file;
             /* FIXME length and multiple subs */
             debug_seg = Parrot_new_debug_seg(interpreter,
                     interpreter->code->cur_cs, sourcefile,
                     (size_t) ins_line+ins_size);
         }
+        else
+            debug_seg = NULL;
         /* if item is a PCC_SUB entry then store it constants */
         if (ins->r[1] && ins->r[1]->pcc_sub) {
 #if IMC_TRACE

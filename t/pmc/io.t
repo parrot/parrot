@@ -394,24 +394,22 @@ ok 1
 Hello Parrot!
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', '32bit seek: exception');
+output_like(<<'CODE', <<'OUTPUT', '32bit seek: exception');
        open P0, "temp.file", ">"
        seek P0, -1, 0
        print "error!\n"
        end
 CODE
-seek failed (32bit)
-	in file '(unknown file)' near line -1
+/seek failed \(32bit\)/
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', '64bit seek: exception');
+output_like(<<'CODE', <<'OUTPUT', '64bit seek: exception');
        open P0, "temp.file", ">"
        seek P0, -1, -1, 0
        print "error!\n"
        end
 CODE
-seek failed (64bit)
-	in file '(unknown file)' near line -1
+/seek failed \(64bit\)/
 OUTPUT
 
 output_is(<<'CODE', <<'OUTPUT', "peek");
@@ -519,7 +517,7 @@ OUTPUT
 
 output_is(<<'CODE', <<'OUTPUT', "multiple substr after reading from file");
 ##PIR##
-.sub _main 
+.sub _main
     # Write something into a file
     .local pmc out
     out = open "temp.file", ">"

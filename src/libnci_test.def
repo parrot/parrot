@@ -37,4 +37,3 @@ EXPORTS
     nci_cb_D4
     nci_dlvar_int
     nci_dlvar_double
-    nci_dlvar_vv
