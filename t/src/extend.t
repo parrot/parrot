@@ -27,6 +27,7 @@ int main(int argc, char* argv[]) {
 
     printf("%d\n", (int)new_value);
 
+    Parrot_exit(0);
     return 0;
 }
 
@@ -58,6 +59,7 @@ int main(int argc, char* argv[]) {
 
     printf("%.1f\n", (double)new_value);
 
+    Parrot_exit(0);
     return 0;
 }
 
@@ -83,6 +85,7 @@ int main(int argc, char* argv[]) {
     output = Parrot_new_string(interpreter, "Test", 4, NULL, NULL, 0, 0);
     PIO_eprintf(interpreter, "%S\n", output);
 
+    Parrot_exit(0);
     return 0;
 }
 
@@ -112,6 +115,7 @@ int main(int argc, char* argv[]) {
     new_value = Parrot_get_strreg(interpreter, parrot_reg);
     PIO_eprintf(interpreter, "%S\n", new_value);
 
+    Parrot_exit(0);
     return 0;
 }
 
@@ -144,6 +148,7 @@ int main(int argc, char* argv[]) {
 
     printf("%ld\n", (long)new_value);
 
+    Parrot_exit(0);
     return 0;
 }
 CODE
@@ -179,6 +184,7 @@ int main(int argc, char* argv[]) {
     new_value = Parrot_PMC_get_intval(interpreter, newpmc);
     printf("%d\n", (int)new_value);
 
+    Parrot_exit(0);
     return 0;
 }
 CODE
@@ -211,6 +217,7 @@ int main(int argc, char* argv[]) {
 
     printf("%.7f\n", (double)new_value);
 
+    Parrot_exit(0);
     return 0;
 }
 CODE
@@ -243,6 +250,7 @@ int main(int argc, char* argv[]) {
 
     PIO_eprintf(interpreter, "%S\n", new_value);
 
+    Parrot_exit(0);
     return 0;
 }
 CODE
@@ -276,6 +284,7 @@ int main(int argc, char* argv[]) {
 
     Parrot_free_cstring(new_value);
 
+    Parrot_exit(0);
     return 0;
 }
 CODE
@@ -313,6 +322,7 @@ int main(int argc, char* argv[]) {
 
     Parrot_free_cstring(new_value);
 
+    Parrot_exit(0);
     return 0;
 }
 CODE
