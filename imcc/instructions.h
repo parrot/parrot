@@ -48,6 +48,7 @@ typedef enum {
 /* Functions */
 
 Instruction * mk_instruction(const char *, SymReg *, SymReg *, SymReg *, SymReg *, int);
+void free_ins(Instruction *);
 Instruction * emitb(Instruction *);
 Instruction * emit(Instruction *);
 void emit_flush();

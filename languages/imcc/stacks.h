@@ -16,7 +16,7 @@ typedef struct IMCStack_chunk_t {
 
 typedef IMCStack_Chunk IMCStack;
 IMCStack imcstack_new();
+void imcstack_free(IMCStack);
 int imcstack_depth(IMCStack);
 void imcstack_push(IMCStack, int);
 int imcstack_pop(IMCStack);
-
