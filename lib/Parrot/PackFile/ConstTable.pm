@@ -19,6 +19,7 @@ package Parrot::PackFile::ConstTable;
 use Carp;
 
 use Parrot::PackFile::Constant;
+use Parrot::Types;
 
 my $template = "l/(l l l l/a*)*";
 
