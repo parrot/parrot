@@ -1,0 +1,57 @@
+=head1 Macro
+
+boolean
+
+=head2 Description
+
+Given a pmc, set a register to indicate whether
+it is true or false from Tcl's POV.
+
+=head3 Usage
+
+ .boolean(VALUE,RETVAL,INT_TMP,STR_TMP)
+
+ Where:
+
+=over 4
+
+=item VALUE (IN)
+
+contains the value to compare
+
+=item RETVAL (OUT)
+
+will contain 0 (false) or 1 (true) after the macro.
+
+=item INT_TMP (TMP)
+
+a temporary integer register
+
+=item STR_TMP (TMP)
+
+a temporary string register
+
+=back
+
+=cut
+
+.macro boolean(VALUE,RETVAL)
+  $I0 = .VALUE
+  if $I0 == 0 goto .$FALSE
+  $S0 = .VALUE
+ 
+  if $S0 == "true" goto .$TRUE
+  if $S0 == "false" goto .$FALSE
+  if $S0 == "yes" goto .$TRUE
+  if $S0 == "no" goto .$FALSE
+
+.local $TRUE:
+  .RETVAL = 1  
+  goto .$DONE
+
+.local $FALSE:
+  .RETVAL = 0  
+
+.local $DONE:
+.endm
+
