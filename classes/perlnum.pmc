@@ -156,7 +156,7 @@ fprintf(stderr,"set_value not implemented\n");
         SELF->cache.num_val += value->cache.num_val;
     }
 
-    void inc_bigint (PMC* value, PMC* dest) {
+    void inc_bigint (BIGINT value, PMC* dest) {
       /* XXX: bigint magic */
     }
 
@@ -172,7 +172,7 @@ fprintf(stderr,"set_value not implemented\n");
         SELF->cache.num_val -= value->cache.num_val;
     }
 
-    void dec_bigint (PMC* value, PMC* dest) {
+    void dec_bigint (BIGINT value, PMC* dest) {
       /* XXX: bigint magic */
     }
     

@@ -148,7 +148,7 @@ pmclass PerlInt {
         SELF->cache.int_val += value->cache.int_val;
     }
 
-    void inc_bigint (PMC* value, PMC* dest) {
+    void inc_bigint (BIGINT value, PMC* dest) {
       /* XXX: bigint magic */
     }
 
