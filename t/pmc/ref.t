@@ -16,7 +16,7 @@ Tests that vtable method delegation works on a C<Ref> PMC.
 
 =cut
 
-use Parrot::Test tests => 8;
+use Parrot::Test tests => 12;
 use Test::More qw(skip);
 
 output_is(<<'CODE', <<'OUTPUT', "new ref");
@@ -32,6 +32,19 @@ output_is(<<'CODE', <<'OUTPUT', "inc ref");
 	new P2, .PerlInt
 	new P1, .Ref, P2
 	inc P1
+	print P1
+	print P2
+	print "\n"
+	end
+CODE
+11
+OUTPUT
+
+output_is(<<'CODE', <<'OUTPUT', "dec ref");
+	new P2, .Integer
+        set P2, 2
+	new P1, .Ref, P2
+	dec P1
 	print P1
 	print P2
 	print "\n"
@@ -181,3 +194,65 @@ CODE
 0
 OUTPUT
 
+output_is(<<'CODE', <<'OUTPUT', "set/get int");
+	new P2, .Integer
+	new P1, .Ref, P2
+        set P1, 10
+        print P2
+        print "\n"
+        set I0, P1
+        print I0
+        print "\n"
+	end
+CODE
+10
+10
+OUTPUT
+
+output_is(<<'CODE', <<'OUTPUT', "set/get float");
+	new P2, .Float
+	new P1, .Ref, P2
+        set P1, 12.5
+        set N0, P2
+        set N1, 12.5
+        eq N0, N1, OK1
+        print "not"
+OK1:    print "ok 1\n"
+        set N2, P1
+        eq N2, N1, OK2
+        print "not"
+OK2:    print "ok 2\n"
+	end
+CODE
+ok 1
+ok 2
+OUTPUT
+
+output_is(<<'CODE', <<'OUTPUT', "push/pop");
+	new P2, .ResizableIntegerArray
+	new P1, .Ref, P2
+        push P1, 200
+        push P1, -3
+        set I0, P1
+        print I0
+        print "\n"
+        set I0, P2
+        print I0
+        print "\n"
+        pop I1, P1
+        pop I2, P1
+        print I1
+        print "\n"
+        print I2
+        print "\n"
+        set I0, P1
+        print I0
+        print "\n"
+	end
+CODE
+2
+2
+-3
+200
+0
+OUTPUT
