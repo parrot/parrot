@@ -25,7 +25,7 @@
    too early
 
 */
-struct regsave {
+static struct regsave {
     struct IReg int_reg;
     struct NReg num_reg;
     struct SReg string_reg;

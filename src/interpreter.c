@@ -678,7 +678,7 @@ Parrot_runops_fromc(Parrot_Interp interpreter, PMC *sub)
 /*
  * duplicated from delegates.pmc
  */
-struct regsave {
+static struct regsave {
     struct IReg int_reg;
     struct NReg num_reg;
     struct SReg string_reg;
