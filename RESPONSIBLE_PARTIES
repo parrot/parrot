@@ -3,8 +3,10 @@ areas they're directly responsible for. This does not list all the
 people with CVS commit access, just those who have an area they've
 taken responsibility for.
 
-Project lead			Jeff Goff
+Release pumpking		Steve Fink
 JIT				Daniel Grunblatt
 Configure			Brent Dax
 I/O				Melvin Smith
 Vtables 			David Lloyd
+IMCC (active maintainer)        Leopold Toetsch
+Perl6                           Sean O'Rourke
