@@ -9,8 +9,8 @@
 #include <unistd.h>
 #include <sys/mman.h>
 #include <limits.h>
-#ifndef PAGESIZE
-#  define PAGESIZE 10
+#ifndef CACHELINESIZE
+#  define CACHELINESIZE 0x10
 #endif
 
 typedef enum {
@@ -423,36 +423,14 @@ char register_map[MAX_REGITERS_TO_MAP] =
       r24, r25, r26, r27, r28, r29, r30, r31,
       r2, r3, r4, r5, r6, r7, r8, r9, r10 };
       
-
-static void
-ppc_sync_cache (void *_start, void *_end) 
-{
-    char *start = (char*)(((int)_start) &~(PAGESIZE - 1));
-    char *end = (char *)((((int)_end) + PAGESIZE - 1) &~(PAGESIZE - 1));
-
-    /* It seems like this isn't ppc-specific -- should other systems
-     * do this, too?
-     */
-    if (mprotect(start, end - start, PROT_READ|PROT_WRITE|PROT_EXEC) < 0) {
-        internal_exception(-1, "Can't mprotect jit code %x - %x: %s\n",
-                           start, end, strerror(errno));
-    }
 static void
 ppc_sync_cache (void *_start, void *_end)
 {   
-    char *start = (char*)(((int)_start) &~(PAGESIZE - 1));
-    char *end = (char *)((((int)_end) + PAGESIZE - 1) &~(PAGESIZE - 1));
+    char *start = (char*)(((int)_start) &~(CACHELINESIZE - 1));
+    char *end = (char *)((((int)_end) + CACHELINESIZE - 1) &~(CACHELINESIZE - 1));
     char *_sync;
     
-    /* It seems like this isn't ppc-specific -- should other systems
-     * do this, too?
-     */ 
-    if (mprotect(start, end - start, PROT_READ|PROT_WRITE|PROT_EXEC) < 0) {
-        internal_exception(-1, "Can't mprotect jit code %x - %x: %s\n",
-                           start, end, strerror(errno));
-    }
-
-    for (_sync = start; _sync < end; _sync += PAGESIZE) {
+    for (_sync = start; _sync < end; _sync += CACHELINESIZE) {
         __asm__ __volatile__ (
 /* for 601, do nothing: */
         "
@@ -468,8 +446,6 @@ ppc_sync_cache (void *_start, void *_end)
         : "r" ((long)_sync)
         );  
     }
-}
-
 }
 
 #endif
