@@ -52,7 +52,7 @@ gotfile:
  
 badfile:
   code = TCL_ERROR
-  retval = new PerlString
+  retval = new String
   retval = "couldn't read file \""
   retval = retval . filename
   retval = retval . "\": no such file or directory\n"
@@ -60,7 +60,7 @@ badfile:
 
 fail:
   code = TCL_ERROR
-  retval = new PerlString
+  retval = new String
   retval =  "bad call to source\n"
 done:
   .pcc_begin_return

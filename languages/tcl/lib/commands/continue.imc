@@ -7,7 +7,7 @@
   .local int return_type
 
   .local pmc retval
-  retval = new PerlString
+  retval = new String
 
   if I3 == 0 goto noargs
 

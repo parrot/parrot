@@ -17,21 +17,29 @@
 # This tweaks it act as if only one had been passed in. This will
 # eventually need a cleanup.
 
+  #print "ARGC: "
+  #print argc
+  #print "\n"
+
   if argc == 1 goto continue
   $P0 = argv[1]
+  isnull $P0, continue
+  #print "P0 is:"
+  #print $P0
+  #print "\n"
   $I0 = typeof $P0
   if $I0 != .PerlUndef goto continue
   argc=1
 
 continue:
-  #print "ARGC="
+  #print "!ARGC="
   #print argc
   #print "\n"
 
   .local string name
   .local pmc lexical
 
-  .local string index
+  .local string windex
   .local int type
 
   .local pmc value
@@ -43,9 +51,24 @@ continue:
   .local Exception_Handler ignore
   newsub ignore, .Exception_Handler, __default_handler
 
+  #print "a\n"
   name=argv[0] 
+  #print "b\n"
   if argc == 1 goto get_scalar
-  index=argv[1] 
+  #print "c\n"
+  #$I0 = argv
+  #print "$I0 is"
+  #print $I0
+  #print "\n"
+  #print "TYPE OF ARGV is"
+  #$S9 = typeof argv
+  #print $S9
+  #print "\n" 
+  $P9 = argv[1]
+  isnull $P9, get_scalar # mix of various calling types.
+  windex = $P9
+  #windex=argv[1] 
+  #print "d\n"
 
 get_indexed:
   #print "get_indexed:\n"
@@ -56,12 +79,12 @@ get_indexed:
   $I0 = typeof lexical
   # get rid of PerlUndef when switch to Tcl*
   if .PerlUndef == $I0 goto no_such_variable
-  #isnull lexical, no_such_variable
+  isnull lexical, no_such_variable
   typeof type, lexical
   if type != .PerlHash goto get_indexed_bad
 
 get_indexed_ok:
-  retval = lexical[index]
+  retval = lexical[windex]
   goto done
 
 get_indexed_bad:
@@ -70,9 +93,9 @@ get_indexed_bad:
   $S0 =  "can't read \""
   $S0 .= name
   $S0 .= "("
-  $S0 .= index
+  $S0 .= windex
   $S0 .= ")\": variable isn't array\n"
-  retval = new PerlString
+  retval = new String
   retval = $S0
   goto done
 
@@ -89,15 +112,16 @@ get_scalar:
   # Remove perlundef when we switch back to Tcl*
   if .PerlUndef == $I0 goto no_such_variable
 
-  typeof type, lexical
-  if type != .PerlHash goto get_scalar_ok
+  #typeof type, lexical
+  #if type != .PerlHash goto get_scalar_ok
+  if $I0 != .PerlHash goto get_scalar_ok
 
 get_scalar_bad:
   return_type =TCL_ERROR
   $S0 = "can't read \""
   $S0 .= name
   $S0 .= "\": variable is an array\n"
-  retval = new PerlString
+  retval = new String
   retval = $S0
   goto done
 
@@ -114,7 +138,7 @@ no_such_variable:
   $S0 = "can't read \""
   $S0 .= name
   $S0 .= "\": no such variable"
-  retval = new PerlString
+  retval = new String
   retval = $S0
   # goto done            
 

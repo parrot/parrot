@@ -1,1 +1,50 @@
-# placeholder
+###
+# [unset]
+
+.namespace [ "Tcl" ]
+
+.sub _unset
+  .local pmc argv 
+  argv = foldup
+
+  # For now, pretend the usage is "unset <foo>"
+
+  .local int argc
+  argc = argv
+
+  .local string varname
+  varname = argv[0]
+
+  .local pmc retval
+  .local int return_type
+
+  retval = new String
+
+  .local pmc ignore
+  newsub ignore, .Exception_Handler, __default_handler
+
+  set_eh ignore
+    $P1 = find_lex -1, varname
+  clear_eh
+
+  isnull $P1, error
+
+  null $P1
+  store_lex -1, varname, $P1
+  return_type=TCL_OK
+  goto done
+
+error:
+  return_type = TCL_ERROR 
+  $S0 = "can't unset \""
+  $S0 .= varname
+  $S0 .= "\": no such variable"
+  retval = $S0
+
+done:
+ 
+  .pcc_begin_return
+    .return return_type
+    .return retval
+  .pcc_end_return
+.end

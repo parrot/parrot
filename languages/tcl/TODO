@@ -1,5 +1,12 @@
 =head1 Plan of Attack
 
+Why do we still have tcl.imc_template? should be generating tcllib.imc,
+not tcl.imc. 
+
+clean up expr so that it's not passing around
+type indicators. - just use PMCs everywhere. This should speed us up quite
+a bit, as it will reduce the need for an Array PMC for every operand.
+
 tail call optimizations - there are several cases where I could use this
 and save myself a call. Possible to do right now with PASM - wait for
 PIR support before welding in.
@@ -23,19 +30,18 @@ Add benchmarks?
 
 When converting to Tcl*, be sure to take advantage of morphing. Right now,
 we're kind of avoiding morphing. (like, having separate new PerlInt and 
-PerlString conditionally depending on the code path.)
+PerlString conditionally depending on the code path.) (fixed in string)
 
 =item Dynamic Tcl PMCs, build, switch.
 
 Ok. First, we need to build the dyn pmcs using the new build "group" tag.
 
-Then, we need to go through and eliminate all references to Perl*
+Then, we need to go through and eliminate all references to Perl:
+(This is done for PerlInt, PerlString. Get rid of PerlHash, PerlArray)
 
 We need to also make sure that we /take/ any PMC and try to do the right
 thing. Don't /require/ that someone pass in a TclString when a PerlString
 will work fine, thanks.
-
-Stop using Perl* PMCs. it's just rude.
 
 =item implement [list]
 
@@ -130,8 +136,8 @@ update docs/* - with the parser/interpreter split, things are different.
 =item TCL Pmcs
 
 Then, we can simplify anything that is dealing with numbers to just pass
-around the Numbers, and clean up expr so that it's not passing around
-type indicators. (and strip out the type indicator stuff as well.)
+around the Numbers.
+
 
 Then, we need to verify that things like [expr 2a + 2b] fail to produce 4.
 (That is, Tcl is pickier about numifying than Perl)

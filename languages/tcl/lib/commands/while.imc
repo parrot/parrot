@@ -8,12 +8,11 @@
   .param pmc body_p
 
   .local pmc retval
-  retval = new PerlString
+  retval = new String
 
   # XXX no bad arg handling...
 
   .local string code
-  .local string condition
 
   .local pmc parsed_code
   .local int return_type
@@ -27,12 +26,11 @@
   expression = find_global "_Tcl", "__expression"
   expr_boolean = find_global "_Tcl", "__expr_boolean"
 
-  condition = cond_p
   code = body_p
 
 while_loop:
   parsed_code = parse(code,0,0)
-  $P0 = expression(condition)
+  $P0 = expression(cond_p)
   # XXX Happy case - expression could have failed.
   $S0 = $P0[1]
   $I0 = expr_boolean($S0)

@@ -11,7 +11,7 @@
   argc = argv
 
   .local pmc retval
-  retval = new PerlString
+  retval = new String
   if argc == 0 goto noargs
   if argc == 1 goto onearg
 

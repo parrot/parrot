@@ -1,20 +1,26 @@
-# XXX - Should we have an expression parser/compiler, just like we have a
-#        tcl parser/compiler?
+# XXX - Should have an expression parser/interpert, just like we have a
+#        tcl parser/interpreter.
+
+# XXX the "isnull/PerlUndef" checks are defensive as I move away from Perl*
+# PMCs. eventually the PerlUndef checks can go away, leaving only the isnull
 
 .namespace [ "_Tcl" ]
 
 .sub __expression
-  .param string expr
+  .param pmc expr_pmc
 
-  # should probably also have a return-like way to signify an error condition.
-  .local string result
+  .local string expr
+  expr = expr_pmc
+
   .include "languages/tcl/lib/macros/is_space.imc"
+
+  .local pmc ops
+  .local pmc precedences
+  ops = find_global "_Tcl", "operators"
+  precedences = find_global "_Tcl", "precedence"
+
   .local pmc undef
   undef = new PerlUndef
-
-  .local pmc global_ops
-   global_ops = find_global "_Tcl", "operands"
-  .local Sub op_sub
 
   .local pmc chunks
   chunks = new PerlArray
@@ -31,15 +37,8 @@
   .local int expr_length
   length expr_length, expr
 
-  .local int state 
-  state = 0
-
 # Split the string into an array of chunks
 # XXX right now we're just handling integer operands. that's it.
-
-# The more I think about it, the more I think this should be farmed out
-# to subroutines. "if it looks like a number, call get_number". call
-# get_function if it looks like a function. that sort of thing.
 
 # parse isn't written this way, and I'm not sure if it has anything to
 # do with how much easier it was to write functions when this file was
@@ -62,15 +61,20 @@ chunk_loop:
 get_parenthetical:
   # are we on an open paren? then figure out what's inside the
   # string and call ourselves recursively.
+  # (should unroll this recursion.)
+
   if char !=40 goto get_variable
   # where do we close?  
   $I1 = __match_close(expr,chunk_start)
-  if $I1 <=0 goto die_horribly 
+  if $I1 <= 0 goto die_horribly 
   $I1 = $I1 - 2
   inc chunk_start 
   substr $S1, expr, chunk_start, $I1
   
-  $P1 = __expression($S1)
+  $P9 = new String
+  $P9 = $S1 
+
+  $P1 = __expression($P9)
   push chunks, $P1
   chunk_start = chunk_start + $I1
   inc chunk_start
@@ -78,16 +82,32 @@ get_parenthetical:
  
 get_variable:
   .local pmc varname
-  (op_length,$P1) = __expr_get_variable(expr,chunk_start) 
+  #print "expr is:"
+  #print expr
+  #print "\n"
+  #print "chunk_start is:"
+  #print chunk_start
+  #print "\n"
 
+  (op_length,$P1) = __expr_get_variable(expr,chunk_start) 
+  #print "op_length is:"
+  #print op_length
+  #print "\n"
+  #print "$P1[0] is:"
+  $S9 = typeof $P1
+  #print "TYPE OF $P1 is "
+  #print $S9
+  #print "\n"
+  #$P2 = $P1[0]
+  #print $P2
+  #print "\n"
   if op_length == 0 goto get_function
 
+  #print "BAH\n"
   ($I0,$P0) = __get_var($P1)
+  #print "BAH\n"
   # ignoring $I0 at the minute.
-  # So, the value of the string is in $P0
-  # XXX necessary to cast until we're cleverer.
-  $S0 = $P0 
-  $P1 = __expression($S0)
+  $P1 = __expression($P0)
   push chunks, $P1
  
   chunk_start = chunk_start + op_length
@@ -97,13 +117,13 @@ get_variable:
 get_function:
   # Does the string of characters here match one of our pre-defined
   # functions? If so, put that function on the stack.
-  .local Sub func
+  .local pmc func
   .local pmc result
 
   (op_length,func,result) = __expr_get_function(expr,chunk_start)
   if op_length == 0 goto get_number
   $P1 = new PerlArray
-  $P1[0] = OPFUNC
+  $P1[0] = FUNC
   $P1[1] = func
   $P1[2] = -1 # functions trump operands
   push chunks, $P1
@@ -116,7 +136,7 @@ get_number:
   .local int num_type
   .local pmc value
   (op_length,num_type,value) = __expr_get_number(expr,chunk_start)
-  if op_length == 0 goto get_operand
+  if op_length == 0 goto get_operator
   # XXX otherwise, pull that number off
   # stuff the chunk onto the chunk_list
 
@@ -124,22 +144,67 @@ get_number:
   chunk_start = chunk_start + op_length
   goto chunk_loop
  
-get_operand:
+get_operator:
   # If we got here, then char and chunk_start are already set properly
-  .local Sub a_sub
-  (op_length,a_sub,$I5) = __expr_get_operand(expr,chunk_start)
 
-  # If we didn't find an operand here, then... die. we
+  .local int op_len
+  .local int expr_len
+  .local string test_op
+
+  length expr_len, expr 
+
+  # cheat - right now there are only 2 and 1 character ops
+  # 2 char trump one char.
+
+  $I0 = chunk_start + 1
+  if $I0 == expr_len goto one_char
+
+two_char:
+  op_len = 2
+  substr test_op, expr, chunk_start, op_len
+  $P1 = ops[test_op]
+  isnull $P1, one_char
+  $I1 = typeof $P1
+  if $I1 == .PerlUndef goto one_char
+  goto op_done
+  # Does this op exist?
+
+one_char:
+  op_len = 1
+  substr test_op, expr, chunk_start, op_len
+  $P1 = ops[test_op]
+  isnull $P1, op_fail
+  $I1 = typeof $P1
+  if $I1 == .PerlUndef goto op_fail
+  goto op_done
+
+op_fail:
+  $P1 = new PerlUndef
+  op_len = 0
+
+op_done:
+
+  $I5 = precedences[test_op]
+  # If we didn't find an operator here, then... die. we
   # can handle this more gracefully later, I suppose. 
-  if op_length == 0 goto die_horribly
+
+  #print "OP_LEN:"
+  #print op_len
+  #print "\n"
+
+  if op_len == 0 goto die_horribly
+
+  $I6 = ops[test_op]
+
   $P1 = new PerlArray
-  $P1[0] = OPFUNC
-  $P1[1] = a_sub
-  $P1[2] = $I5
+  $P1[0] = OP
+  $P1[1] = $I6
+  $P1[2] = $I5 # this is the precedence.
 
   push chunks, $P1
 
-  chunk_start = chunk_start + op_length
+  chunk_start = chunk_start + op_len
+
   goto chunk_loop
 
   # if we don't match any of the possible cases so far, then we must
@@ -147,6 +212,7 @@ get_operand:
 
 chunks_done:
 
+  #print "CHUNKS DONE\n"
 # convert the chunks into a stack.
  
   # to do this, we scan for our Operators in precedence order.
@@ -192,10 +258,14 @@ converter_loop:
   if precedence_level > MAX_PRECEDENCE goto converter_done
   if stack_index >= input_len goto precedence_done
   our_op = chunks[stack_index]
+  isnull our_op, converter_next
   typeof $I0, our_op
   if $I0 == .PerlUndef goto converter_next
   $I2 = our_op[0]
-  if $I2 != OPFUNC goto converter_next
+  if $I2 == OP goto is_opfunc
+  if $I2 == FUNC goto is_opfunc
+ goto converter_next
+is_opfunc:
   $I3 = our_op[2] 
   if $I3 != precedence_level goto converter_next
 
@@ -203,6 +273,7 @@ right_arg:
   $I2 = stack_index + 1
  if $I2 >= input_len goto left_arg
   $P1 = chunks[$I2]
+  isnull $P1, left_arg
   typeof $I0, $P1
   if $I0 == .PerlUndef goto left_arg
   chunks[$I2] = undef
@@ -218,6 +289,7 @@ left_arg:
   $I2 = stack_index - 1
   if $I2 < 0 goto shift_op
   $P1 = chunks[$I2]
+  isnull $P1, shift_op
   typeof $I0, $P1
   if $I0 == .PerlUndef goto shift_op
   chunks[$I2] = undef
@@ -238,7 +310,6 @@ precedence_done:
   goto converter_loop
 
 converter_done:
-  
  
 # evaluate the stack.
 stack_evaluator:
@@ -252,26 +323,29 @@ stack_evaluator:
  .local pmc chunk
  pop chunk, program_stack
  type = chunk[0] 
+
  # move all non op non funcs to the value stack
- if type == OPFUNC goto do_op
+ if type == OP   goto do_op
+ if type == FUNC goto do_func
  push result_stack, chunk
  goto stack_evaluator
 
- # when we find an op, do that op on the value(s) in the stack.
- # put the result back on the value stack.
-do_op:
+do_func:
   # right now, we assume binary ops. IRL, each op will define the
   # number of and type of ops it takes, and we will respect it.
   # (hurm. perhaps we'll just have subs for each op. that may be
   # the way to go.)
 
-  .local string operand
+  #.local string operand # delete this?
   .local pmc func
   func = chunk[1]
 
   # XXX protect against unknown operands... 
+  isnull func, die_horribly
   typeof $I0, func
   if $I0 == .PerlUndef goto die_horribly  
+
+  # XXX this should be changed so that we don't pass in the result stack...
 
   (result_stack,$I0) = func(result_stack)
 
@@ -280,12 +354,141 @@ do_op:
   pop $P1, result_stack 
   goto evaluation_done
 
+ # when we find an op, do that op on the value(s) in the stack.
+ # put the result back on the value stack.
+
+do_op:
+  # right now, we assume binary ops. IRL, each op will define the
+  # number of and type of ops it takes, and we will respect it.
+  # (hurm. perhaps we'll just have subs for each op. that may be
+  # the way to go.)
+
+  #.local string operand # delete this?
+  .local int func
+  func = chunk[1]
+
+  # XXX protect against unknown operands... 
+  #typeof $I0, func
+  #if $I0 == .PerlUndef goto die_horribly  
+
+  # XXX assume all operands take two args.
+  .local pmc r_arg
+  .local pmc l_arg
+  .local pmc op_result
+  op_result = new PerlUndef
+  l_arg = pop result_stack
+  l_arg = l_arg[1]
+  r_arg = pop result_stack
+  r_arg = r_arg[1]
+
+  #print "FUNC type is"
+  #print func
+  #print "\n"
+
+  # Is there a more efficient way to do this dispatch?
+  if func == OPERATOR_MUL goto op_mul
+  if func == OPERATOR_DIV goto op_div
+  if func == OPERATOR_MOD goto op_mod
+  if func == OPERATOR_PLUS goto op_plus
+  if func == OPERATOR_MINUS goto op_minus
+  if func == OPERATOR_SHL goto op_shl
+  if func == OPERATOR_SHR goto op_shr
+  if func == OPERATOR_LT goto op_lt
+  if func == OPERATOR_GT goto op_gt
+  if func == OPERATOR_LTE goto op_lte
+  if func == OPERATOR_GTE goto op_gte
+  if func == OPERATOR_EQUAL goto op_equal
+  if func == OPERATOR_UNEQUAL goto op_unequal
+  if func == OPERATOR_BITAND goto op_bitand
+  if func == OPERATOR_BITXOR goto op_bitxor
+  if func == OPERATOR_BITOR goto op_bitor
+  goto die_horribly
+
+
+op_mul:
+  op_result = mul l_arg, r_arg
+  goto done_op 
+op_div:
+  op_result = div l_arg, r_arg
+  goto done_op 
+op_mod:
+  op_result = mod l_arg, r_arg
+  goto done_op 
+op_plus:
+  op_result = l_arg + r_arg
+  goto done_op 
+op_minus:
+  op_result = l_arg - r_arg
+  goto done_op 
+op_shl:
+  op_result = shl l_arg, r_arg
+  goto done_op 
+op_shr:
+  op_result = shr l_arg, r_arg
+  goto done_op 
+op_lt:
+  op_result = 1
+  if l_arg < r_arg goto done_op
+  op_result = 0
+  goto done_op 
+op_gt:
+  op_result = 1
+  if l_arg > r_arg goto done_op
+  op_result = 0
+  goto done_op 
+op_lte:
+  op_result = 1
+  if l_arg <= r_arg goto done_op
+  op_result = 0
+  goto done_op 
+op_gte:
+  op_result = 1
+  if l_arg >= r_arg goto done_op
+  op_result = 0
+  goto done_op 
+op_equal:
+  op_result = 1
+  if l_arg == r_arg goto done_op
+  op_result = 0
+  goto done_op 
+op_unequal:
+  op_result = 1
+  if l_arg != r_arg goto done_op
+  op_result = 0
+  goto done_op 
+op_bitand:
+  op_result = band l_arg, r_arg
+  goto done_op 
+op_bitxor:
+  op_result = bxor l_arg, r_arg
+  goto done_op 
+op_bitor:
+  op_result = bor l_arg, r_arg
+  # fallthrough to done_op
+
+done_op:
+  $P5 = new FixedPMCArray
+  $P5 = 2
+  $P5[0] = INTEGER
+  $P5[1] = op_result
+  push result_stack, $P5
+
+  #(result_stack,$I0) = func(result_stack)
+
+  #if $I0 != TCL_ERROR goto stack_evaluator
+  # Ignoring exceptions for now.
+  goto stack_evaluator
+ 
+  #pop $P1, result_stack 
+  #goto evaluation_done
+
 stack_done:
   pop $P1, result_stack
   goto evaluation_done
 
 die_horribly:
-  $P1 = new PerlArray
+  $P1 = new FixedPMCArray
+  $P1 = 2
   # XXX - this isn't an accurate result
   $P1[0] = INTEGER
   $P1[1] = "Eeeeeeeeeek"
@@ -312,7 +515,7 @@ evaluation_done:
   .local int char 
   .local int flag
   .local pmc value
-  value = new PerlInt
+  value = new Integer
 
   pos = start
   if pos >= len goto failure
@@ -349,7 +552,8 @@ octal_finish_up:
   dec pos
 
   substr $S0, expr, start,pos
-  $P1 = new PerlArray
+  $P1 = new FixedPMCArray
+  $P1 = 2
   $P1[0] = $S0
 
   sprintf $S0, "%o", $P1
@@ -379,7 +583,8 @@ failure:
 finish_up:
    substr $S0, expr, start,pos
    $I0 = $S0
-   value = new PerlArray
+   value = new FixedPMCArray
+   value = 2
    value[0] = INTEGER
    value[1] = $I0 
 
@@ -390,64 +595,6 @@ real_done:
     .return value
   .pcc_end_return 
 .end
-
-# given a string, starting at position, return the length
-# of the operand starting at that position. return '0' if 
-# no operand was found
-
-.sub __expr_get_operand
-  .param string expr
-  .param int pos
-
-  .local int len
-  .local int expr_len
-  .local string test_op
-  .local pmc ops
-  .local pmc precedences
-  .local int precedence
-
-  ops = find_global "_Tcl", "operands"
-  precedences = find_global "_Tcl", "precedence"
-
-  length expr_len, expr 
-
-  # cheat - right now there are only 2 and 1 character ops
-  # 2 char trump one char.
-
-  $I0 = pos + 1
-  if $I0 == expr_len goto one_char
-
-two_char:
-  len = 2
-  substr test_op, expr, pos, len
-  $P1 = ops[test_op]
-  typeof $I0, $P1
-  if $I0 == .PerlUndef goto one_char 
-  goto done
-  # Does this op exist?
-
-one_char:
-  len = 1
-  substr test_op, expr, pos, len
-  $P1 = ops[test_op]
-  typeof $I0, $P1
-  if $I0 == .PerlUndef goto fail
-  goto done
-
-fail:
-  $P1 = new PerlUndef
-  len = 0
-
-done:
-  precedence = precedences[test_op]
-
-  .pcc_begin_return
-    .return len
-    .return $P1
-    .return precedence
-  .pcc_end_return
-.end
-
 #
 # given a value, determine if it's true or not.
 #
@@ -484,7 +631,7 @@ done:
 # given a string, starting at position, return the length
 # of the variable name found at that position. return 0
 # if this doesn't look like a variable. If the return value
-# is non zero, also return a PerlArray that either has a
+# is non zero, also return a array-ish PMC that either has a
 # single element ($name or ${name}), or two elements
 # $name{index}
 
@@ -496,7 +643,8 @@ done:
   pos = 0 
 
   .local pmc varname
-  varname = new PerlArray
+  varname = new FixedPMCArray
+  varname = 2
 
   .local int expr_length
   length expr_length, expr
@@ -612,7 +760,7 @@ dd:
   $P1 = find_global "_Tcl", "functions"
   
   func = $P1[$S0]
- 
+  isnull func, fail 
   typeof $I0, func
   if $I0 == .PerlUndef goto fail
 
@@ -627,7 +775,9 @@ dd:
   len_operand = $I1 - 2
 
   substr $S1, expr, start_paren_pos, len_operand
-  operand = __expression($S1)  
+  $P9 = new String
+  $P9 = $S1
+  operand = __expression($P9)  
 
   len =  start_paren_pos + len_operand
   inc len

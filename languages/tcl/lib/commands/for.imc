@@ -12,14 +12,13 @@
   if I3 != 4 goto bad_args
 
   .local string start
-  .local string test
   .local string next
   .local string body
   .local pmc start_parsed
   .local pmc next_parsed
   .local pmc body_parsed
   .local pmc retval
-  retval = new PerlString
+  retval = new String
   .local int return_type
 
   .local pmc joe # just a placeholder, not saved.
@@ -34,7 +33,6 @@
   expr_boolean = find_global "_Tcl", "__expr_boolean"
 
   start = start_p
-  test  = test_p
   next  = next_p
   body  = body_p
 
@@ -59,7 +57,7 @@ continue:
   if return_type != TCL_OK goto done
   
   # then check condition
-  $P0 = expression(test)
+  $P0 = expression(test_p)
   $S0 = $P0[1]
   $I0 = expr_boolean($S0)
   if $I0 == 1 goto for_loop

@@ -28,7 +28,7 @@
   .local pmc retval
   .local int return_type
   return_type = TCL_OK
-  retval = new PerlString
+  retval = new String
  
   if argc == 0 goto error
 

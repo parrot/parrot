@@ -13,6 +13,7 @@
   .local int return_type
   return_type = TCL_OK
   .local pmc retval
+  retval = new Undef
   .local string command
 
   .local pmc string_index
@@ -45,18 +46,18 @@ first:
 
 first_do:
   $I1 = index $S2, $S1, $I0
-  retval = new PerlInt
   retval = $I1
   goto done
 
 bad_first:
-  retval = new PerlString
   retval = "wrong # args: should be \"string first subString string ?startIndex?\""
   return_type = TCL_ERROR
   goto done
 
 index:
-  retval = new PerlString
+  # XXX without this new String, we get a test failure.
+  #     Shouldn't be necessary.
+  retval = new String
   if argv != 3 goto bad_index
   $S1 = argv[1]
   $S2 = argv[2]
@@ -83,12 +84,10 @@ length:
   if argv != 2 goto bad_length
   $S1 = argv[1]
   $I0 = length $S1
-  retval = new PerlInt
   retval = $I0
   goto done
 
 bad_length:
-  retval = new PerlString
   retval = "wrong # args: should be \"string length string\""
   return_type = TCL_ERROR
   goto done
@@ -154,12 +153,9 @@ range_doo:
   retval = $S9
   goto done
 range_null:
-  retval = new PerlString
-  retval = ""
   goto done
 
 bad_range:
-  retval = new PerlString
   retval = "wrong # args: should be \"string range string first last\""
   return_type = TCL_ERROR
   goto done
@@ -178,18 +174,17 @@ repeat:
   #if $I1 != $I0 goto bad_arg
   $I3 = $P1
   $S0 = repeat the_string, $I3
-  retval = new PerlString
   retval = $S0
   goto done
 
 bad_repeat:
-  retval = new PerlString
   return_type = TCL_ERROR
   retval = "wrong # args: should be \"string repeat string count\""
   goto done
 
 badargs:
-  retval = new PerlString
+  # XXX Why is this new String needed?
+  retval = new String
   $S9 = "bad option \""
   $S9 .= command
   $S9 .= "\": must be bytelength, compare, equal, first, index, is, last, length, map, match, range, repeat, replace, tolower, toupper, totitle, trim, trimleft, trimright, wordend, or wordstart"
@@ -198,7 +193,6 @@ badargs:
   goto done
 
 noargs:
-  retval = new PerlString
   retval = "wrong # args: should be \"string option arg ?arg ...?\""
   return_type = TCL_ERROR
 
@@ -248,7 +242,8 @@ done:
 
   #if not, fail.
 bad_arg:
-  retval = new PerlString
+  # XXX We shouldn't need this String declaration here.
+  retval = new String
   $S9  = "bad index \""
   $S9 .= position
   $S9 .= "\": must be integer or end?-integer?"
@@ -276,7 +271,6 @@ has_end:
   $I1 = length the_string
   # so, if we had end-1, then we'd be at position 4. (end is 5, -1)
   $I1 = $I1 - $I0
-  retval = new PerlInt
   retval = $I1
 
   goto done
@@ -288,11 +282,9 @@ my_end:
   retval = $I0
 
 done:
- $P1 = new PerlString
- $P1 = retval
  .pcc_begin_return
    .return return_type
-   .return $P1
+   .return retval
  .pcc_end_return
 
 .end

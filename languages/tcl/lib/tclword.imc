@@ -74,7 +74,7 @@ Initialize the attributes for an instance of the class
   emptyArray = new PerlArray
   # P2 is our instance
   setattribute P2, "TclWord\x00chunks", emptyArray
-  constant = new PerlInt
+  constant = new Integer
   constant = 1
   setattribute P2, "TclWord\x00constant", constant
 .end
@@ -249,7 +249,7 @@ the results and return a Stringy PMC.
 
   if count == 1 goto justpmc
   ($I0,$S0) = self.__get_string()
-  $P0 = new PerlString
+  $P0 = new String
   $P0 = $S0
   .pcc_begin_return
     .return $I0 

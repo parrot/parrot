@@ -22,22 +22,34 @@ providing a compreg-compatible method.
 
 # expression codes - we use TCL_OK there, so move these out high enough
 # so there's no conflict.
-  .const int OPFUNC = 10
 
-  # 
+  .const int OP     = 20
+  .const int FUNC   = 21
   .const int INTEGER = 11
-
-  # 
   .const int FLOAT   = 12
   .const int STRING  = 13
-
-  # 
   .const int BLOCK   = 14
   .const int CHUNK   = 15
   .const int COMMAND = 16
+  .const int MAX_PRECEDENCE =  9
 
-  # misc
-  .const int MAX_PRECEDENCE = 9
+# Constants for operator lookup.
+  .const int OPERATOR_BITAND = 30
+  .const int OPERATOR_BITOR  = 31
+  .const int OPERATOR_BITXOR = 32
+  .const int OPERATOR_DIV    = 33
+  .const int OPERATOR_EQUAL  = 34
+  .const int OPERATOR_GT     = 35
+  .const int OPERATOR_GTE    = 36
+  .const int OPERATOR_LT     = 37
+  .const int OPERATOR_LTE    = 38
+  .const int OPERATOR_MINUS  = 39
+  .const int OPERATOR_MOD    = 40
+  .const int OPERATOR_MUL    = 41
+  .const int OPERATOR_PLUS   = 42
+  .const int OPERATOR_SHL    = 43
+  .const int OPERATOR_SHR    = 44
+  .const int OPERATOR_UNEQUAL= 45
 
 .namespace [ "_Tcl" ]
 
@@ -50,7 +62,7 @@ providing a compreg-compatible method.
   .local string mode
   .local string chunk
   .local string contents
-  .local pmc operands
+  .local pmc operators
   .local pmc math_funcs
   .local pmc precedence
   .local Sub a_sub
@@ -90,66 +102,51 @@ providing a compreg-compatible method.
   a_sub = find_global "_Tcl", "__math_tanh"
   math_funcs["tanh"] = a_sub
 
-  operands = new PerlHash
+  operators = new PerlHash
   precedence = new PerlHash
 
   # This precedence check should be shoved into [expr]. There's no need
-  # to make this generic. For that matter, the __operand_foo commands could
-  # probably be renamed to __operand_<operand>, removing the need for a
-  # lookup at all.
+  # to make this generic. 
 
-  a_sub = find_global "_Tcl", "__operand_mul"
-  operands["*"] = a_sub
+  operators["*"] = OPERATOR_MUL
   precedence["*"] = 1 
-  a_sub = find_global "_Tcl", "__operand_div"
-  operands["/"] = a_sub
+  operators["/"] = OPERATOR_DIV
   precedence["/"] = 1 
-  a_sub = find_global "_Tcl", "__operand_mod"
-  operands["%"] = a_sub
+  operators["%"] = OPERATOR_MOD
   precedence["%"] = 1 
-  a_sub = find_global "_Tcl", "__operand_plus"
-  operands["+"] = a_sub
+  operators["+"] = OPERATOR_PLUS
   precedence["+"] = 2
-  a_sub = find_global "_Tcl", "__operand_minus"
-  operands["-"] = a_sub
+  operators["-"] = OPERATOR_MINUS
   precedence["-"] = 2 
-  a_sub = find_global "_Tcl", "__operand_shl"
-  operands["<<"] = a_sub
+  operators["<<"] = OPERATOR_SHL
   precedence["<<"] = 3 
-  a_sub = find_global "_Tcl", "__operand_shr"
-  operands[">>"] = a_sub
+  operators[">>"] = OPERATOR_SHR
   precedence[">>"] = 3 
-  a_sub = find_global "_Tcl", "__operand_lt"
-  operands["<"] = a_sub
+  operators["<"] = OPERATOR_LT
   precedence["<"] = 4
-  a_sub = find_global "_Tcl", "__operand_gt"
-  operands[">"] = a_sub
+  operators[">"] = OPERATOR_GT
   precedence[">"] = 4
-  a_sub = find_global "_Tcl", "__operand_lte"
-  operands["<="] = a_sub
+  operators["<="] = OPERATOR_LTE
   precedence["<="] = 4 
-  a_sub = find_global "_Tcl", "__operand_gte"
-  operands[">="] = a_sub
+  operators[">="] = OPERATOR_GTE
   precedence[">="] = 4
-  a_sub = find_global "_Tcl", "__operand_equal"
-  operands["=="] = a_sub
+  operators["=="] = OPERATOR_EQUAL
   precedence["=="] = 5
-  a_sub = find_global "_Tcl", "__operand_unequal"
-  operands["!="] = a_sub
+  operators["!="] = OPERATOR_UNEQUAL
   precedence["!="] = 5 
-  a_sub = find_global "_Tcl", "__operand_bitand"
-  operands["&"] = a_sub
+  operators["&"] = OPERATOR_BITAND
   precedence["&"] = 7
-  a_sub = find_global "_Tcl", "__operand_bitxor"
-  operands["^"] = a_sub
+  operators["^"] = OPERATOR_BITXOR
   precedence["^"] =  8
-  a_sub = find_global "_Tcl", "__operand_bitor"
-  operands["|"] = a_sub
+  operators["|"] = OPERATOR_BITOR
   precedence["|"] = 9
 
-  store_global "_Tcl", "operands", operands
+  store_global "_Tcl", "operators", operators
   store_global "_Tcl", "functions", math_funcs
   store_global "_Tcl", "precedence", precedence
+
+  # Eventually, we'll need to register MMD for the various Tcl PMCs
+  # (Presuming we don't do this from the .pmc definitions.)
 
   # XXX These go away when [proc] is a little smarter.
   $P1 = new PerlHash
@@ -158,10 +155,10 @@ providing a compreg-compatible method.
   # Global variable initialization
   # XXX Are outer level tcl scopes true globals, or are they merely top
   # level lexicals?
-  #$P0 = new PerlString
+  #$P0 = new String
   #$P0 = "0.1"
   #store_lex 0, "tcl_patchLevel", $P0
-  #$P0 = new PerlString
+  #$P0 = new String
   #$P0 = "0.1"
   #store_lex 0, "tcl_version", $P0
  
@@ -176,7 +173,7 @@ providing a compreg-compatible method.
   store_global "_Tcl", "channels", $P1
   
   # Setup the id # for channels..
-  $P1 = new PerlInt
+  $P1 = new Integer
   $P1 = 1
   store_global "_Tcl", "next_channel_id", $P1
 
@@ -223,6 +220,10 @@ __default_handler:
   invoke P4
 .eom
 
+#
+# should probably move all this into another _template file.
+#
+
   .include "languages/tcl/lib/backslash_newline_subst.imc"
   .include "languages/tcl/lib/commands/append.imc"
   .include "languages/tcl/lib/commands/array.imc"
@@ -267,22 +268,6 @@ __default_handler:
   .include "languages/tcl/lib/get_var.imc"
   .include "languages/tcl/lib/interpret.imc"
   .include "languages/tcl/lib/match_close.imc"
-  .include "languages/tcl/lib/ops/bitand.imc"
-  .include "languages/tcl/lib/ops/bitor.imc"
-  .include "languages/tcl/lib/ops/bitxor.imc"
-  .include "languages/tcl/lib/ops/div.imc"
-  .include "languages/tcl/lib/ops/equal.imc"
-  .include "languages/tcl/lib/ops/gt.imc"
-  .include "languages/tcl/lib/ops/gte.imc"
-  .include "languages/tcl/lib/ops/lt.imc"
-  .include "languages/tcl/lib/ops/lte.imc"
-  .include "languages/tcl/lib/ops/minus.imc"
-  .include "languages/tcl/lib/ops/mod.imc"
-  .include "languages/tcl/lib/ops/mul.imc"
-  .include "languages/tcl/lib/ops/plus.imc"
-  .include "languages/tcl/lib/ops/shl.imc"
-  .include "languages/tcl/lib/ops/shr.imc"
-  .include "languages/tcl/lib/ops/unequal.imc"
   .include "languages/tcl/lib/parse.imc"
   .include "languages/tcl/lib/string_to_list.imc"
 

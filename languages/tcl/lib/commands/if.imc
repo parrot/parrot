@@ -14,7 +14,7 @@
   elseifs = new PerlArray
   .local pmc retval
   .local string code
-  .local string condition
+  .local pmc condition
   .local string body
   .local string else
   .local int return_type

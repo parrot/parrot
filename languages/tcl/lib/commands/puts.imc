@@ -14,7 +14,7 @@
 
   .local int return_type  
   .local pmc retval
-  retval = new PerlString
+  retval = new String
 
   return_type = TCL_OK
   retval = ""

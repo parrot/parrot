@@ -17,7 +17,7 @@
 
   sprintf $S0, format, argv 
 
-  $P0 = new PerlString
+  $P0 = new String
   $P0 = $S0
 
 done:

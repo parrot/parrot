@@ -36,7 +36,7 @@ loop:
 
 loop_done:
 
-  $P1 = new PerlString
+  $P1 = new String
   $P1 = value
   store_lex -1, $S1, $P1
 

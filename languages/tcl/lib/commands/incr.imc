@@ -38,7 +38,7 @@ offset:
 
 incr:
   value = value + increment
-  retval = new PerlInt
+  retval = new Integer
   retval = value
   store_lex -1, $S1, retval
 
@@ -48,7 +48,7 @@ incr:
 
 error:
   return_type = TCL_ERROR 
-  retval = new PerlString
+  retval = new String
   retval = "wrong # args: should be \"incr varName ?increment?\"\n"
 
 done:

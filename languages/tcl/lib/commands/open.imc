@@ -13,7 +13,7 @@
 
   .local int return_type
   .local pmc retval
-  retval = new PerlString
+  retval = new String
 
   .local int argc
   argc = argv

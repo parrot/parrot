@@ -59,12 +59,12 @@ subcommand:
 
 # Is this really an array?
 exists:
-  retval = new PerlInt
+  retval = new Integer
   retval = is_array
   goto done
 
 size:
-  retval = new PerlInt
+  retval = new Integer
   if is_array == 0 goto size_none
   $I0 = the_array
   retval = $I0
@@ -74,7 +74,7 @@ size_none:
   goto done
 
 set:
-  retval = new PerlString
+  retval = new String
   retval = ""
   # even only..
   $I0 = argc % 2
@@ -101,7 +101,7 @@ set_loop_done:
 
 set_bad_args:
  return_type = TCL_ERROR
- retval = new PerlString
+ retval = new String
  retval = "wrong # args: should be array set arrayName list" 
  goto done
 
