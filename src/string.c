@@ -1644,6 +1644,49 @@ the first string was C<< < >>, C<==>, C<< > >> the second.
 
 */
 
+static INTVAL
+cmp_diff_repr(STRING *s1, STRING *s2)
+{
+
+    /* make this 3 more cases, rather than 6 */
+    INTVAL multiplier;
+    STRING *larger;
+    STRING *smaller;
+    INTVAL cmp;
+
+    if (s1->representation > s2->representation) {
+        larger = s1;
+        smaller = s2;
+        multiplier = 1;
+    }
+    else {
+        larger = s2;
+        smaller = s1;
+        multiplier = -1;
+    }
+
+    if (larger->representation == enum_stringrep_four) {
+        if (smaller->representation == enum_stringrep_two) {
+            COMPARE_STRINGS(Parrot_UInt4, Parrot_UInt2,
+                    larger, smaller, cmp);
+        }
+        else {
+            /* smaller->representation == enum_stringrep_one */
+            COMPARE_STRINGS(Parrot_UInt4, Parrot_UInt1,
+                    larger, smaller, cmp);
+        }
+    }
+    else {
+        /*
+         * larger->representation == enum_stringrep_two,
+         * smaller->representation == enum_stringrep_one
+         */
+        COMPARE_STRINGS(Parrot_UInt2, Parrot_UInt1, larger, smaller, cmp);
+    }
+
+    return cmp * multiplier;
+}
+
 INTVAL
 string_compare(struct Parrot_Interp *interpreter,
     STRING *s1, STRING *s2)
@@ -1686,44 +1729,10 @@ string_compare(struct Parrot_Interp *interpreter,
         return cmp;
     }
     else {
-        /* make this 3 more cases, rather than 6 */
-        INTVAL multiplier;
-        STRING *larger;
-        STRING *smaller;
-
-        if (s1->representation > s2->representation) {
-            larger = s1;
-            smaller = s2;
-            multiplier = 1;
-        }
-        else {
-            larger = s2;
-            smaller = s1;
-            multiplier = -1;
-        }
-
-        if (larger->representation == enum_stringrep_four) {
-            if (smaller->representation == enum_stringrep_two) {
-                COMPARE_STRINGS(Parrot_UInt4, Parrot_UInt2,
-                    larger, smaller, cmp);
-            }
-            else {
-                /* smaller->representation == enum_stringrep_one */
-                COMPARE_STRINGS(Parrot_UInt4, Parrot_UInt1,
-                    larger, smaller, cmp);
-            }
-        }
-        else {
-            /*
-             * larger->representation == enum_stringrep_two,
-             * smaller->representation == enum_stringrep_one
-             */
-            COMPARE_STRINGS(Parrot_UInt2, Parrot_UInt1, larger, smaller, cmp);
-        }
-
-        return cmp * multiplier;
+        return cmp_diff_repr(s1, s2);
     }
 }
+
 
 /*
 
@@ -1781,7 +1790,7 @@ string_equal(struct Parrot_Interp *interpreter, STRING *s1, STRING *s2)
         /* all the fast shortcuts have been taken
          * now just left with compare
          */
-        return string_compare(interpreter, s1, s2);
+        return cmp_diff_repr(s1, s2);
     }
 }
 
