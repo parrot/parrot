@@ -167,6 +167,7 @@ void cmodulus_float(FLOATVAL value, PMC* dest) MMD_CMOD_FLOAT
 
 void pow(PMC* value, PMC* dest)        MMD_POW
 void pow_float(FLOATVAL value, PMC* dest) MMD_POW_FLOAT
+void pow_int(INTVAL value, PMC* dest) MMD_POW_INT
 
 void neg(PMC* dest)
 

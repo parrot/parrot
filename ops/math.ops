@@ -812,13 +812,18 @@ inline op pow(out NUM, in NUM, in NUM) :base_core {
   goto NEXT();
 }
 
+inline op pow(in PMC, in PMC, in PMC) :base_core {
+  mmd_dispatch_v_ppp(interpreter, $2, $3, $1, MMD_POW);
+  goto NEXT();
+}
+
 inline op pow(in PMC, in PMC, in NUM) :base_core {
   mmd_dispatch_v_pnp(interpreter, $2, $3, $1, MMD_POW_FLOAT);
   goto NEXT();
 }
 
-inline op pow(in PMC, in PMC, in PMC) :base_core {
-  mmd_dispatch_v_ppp(interpreter, $2, $3, $1, MMD_POW);
+inline op pow(in PMC, in PMC, in INT) :base_core {
+  mmd_dispatch_v_pip(interpreter, $2, $3, $1, MMD_POW_INT);
   goto NEXT();
 }
 

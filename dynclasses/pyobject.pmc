@@ -35,6 +35,7 @@ static STRING* __lshift__;
 static STRING* __mod__;
 static STRING* __mul__;
 static STRING* __or__;
+static STRING* __pow__;
 static STRING* __rshift__;
 static STRING* __sub__;
 static STRING* __xor__;
@@ -336,6 +337,22 @@ Returns the result of the logical C<OR> of C<SELF> and C<*value>.
 
 /*
 
+=item C<PMC* "__pow__"(PMC *value)>
+
+Raise the number to the specified power and return the result.
+
+=cut
+
+*/
+
+    METHOD PMC* __pow__(PMC *value) {
+        PMC * ret = pmc_new(INTERP, dynclass_PyObject);
+        mmd_dispatch_v_ppp(INTERP, SELF, value, ret, MMD_POW);
+        return ret;
+    }
+
+/*
+
 =item C<PMC* "__radd__"(PMC *value)>
 
 Adds C<*value> to C<SELF> and returns the result.
@@ -462,6 +479,20 @@ Returns the result of the logical C<OR> of C<*value> and C<SELF>.
 
     METHOD PMC* __ror__(PMC *value) {
         RIGHT(INTERP, SELF, __or__, value);
+    }
+
+/*
+
+=item C<PMC* "__rpow__"(PMC *value)>
+
+Raise the number to the specified power and return the result.
+
+=cut
+
+*/
+
+    METHOD PMC* __rpow__(PMC *value) {
+        RIGHT(INTERP, SELF, __pow__, value);
     }
 
 /*

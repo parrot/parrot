@@ -99,38 +99,6 @@ Returns the value of the prefix operator C<+>.
         PMC_int_val(ret) = PMC_int_val(SELF);
         return ret;
     }
-
-/*
-
-=item C<PMC* "__pow__"(PMC *value)>
-
-Raises C<SELF> to the power of C<*value> and returns the result.
-
-=cut
-
-*/
-
-    METHOD PMC* __pow__(PMC *value) {
-        /* XXX: redo as a proper MMD if/when a proper op is implemented */
-        FLOATVAL valf = VTABLE_get_number(INTERP, value);
-        INTVAL vali = VTABLE_get_integer(INTERP, value);
-        PMC * ret;
-        if ( (vali < 0) || ((FLOATVAL)vali != valf) ) {
-            ret = pmc_new(INTERP, dynclass_PyFloat);
-            VTABLE_set_number_native(INTERP, ret,
-                (FLOATVAL) pow( (FLOATVAL) PMC_int_val(SELF), valf) );
-        }
-        else {
-            int i;
-            ret = pmc_new(INTERP, dynclass_PyInt);
-            PMC_int_val(ret) = 1;
-            for (i=1; i<=vali; i++) {
-                PMC_int_val(ret) *= PMC_int_val(SELF);
-            }
-        }
-        return ret;
-    }
-
 /*
 
 =item C<PMC* "__truediv__"(PMC *value)>
@@ -700,6 +668,68 @@ Set C<dest> to the negated value of C<SELF>.
             PMC_int_val(SELF) = -PMC_int_val(SELF);
         else
             VTABLE_set_integer_native(INTERP, dest, -PMC_int_val(SELF));
+    }
+
+/*
+
+=item C<PMC* pow(PMC *value, PMC *dest)>
+
+Raises C<SELF> to the power of C<*value> and returns the result.
+
+=cut
+
+*/
+
+    void pow (PMC *value, PMC *dest) {
+MMD_PyInt: {
+            INTVAL vali = VTABLE_get_integer(INTERP, value);
+            mmd_dispatch_v_pip(INTERP, SELF, vali, dest, MMD_POW_INT);
+        }
+MMD_PyFloat: {
+            FLOATVAL valf = VTABLE_get_number(INTERP, value);
+            mmd_dispatch_v_pip(INTERP, SELF, valf, dest, MMD_POW_FLOAT);
+        }
+    }
+
+/*
+
+=item C<PMC* pow_float(FLOATVAL value, PMC *dest)>
+
+Raises C<SELF> to the power of C<*value> and returns the result.
+
+=cut
+
+*/
+
+    void pow_float (FLOATVAL value, PMC *dest) {
+        FLOATVAL pmcf = VTABLE_get_number(INTERP, SELF);
+        VTABLE_morph(INTERP, dest, dynclass_PyFloat);
+        VTABLE_set_number_native(INTERP, dest, (FLOATVAL) pow(pmcf, value) );
+    }
+
+/*
+
+=item C<PMC* pow_int(INTVAL *value, PMC *dest)>
+
+Raises C<SELF> to the power of C<*value> and returns the result.
+
+=cut
+
+*/
+
+    void pow_int (INTVAL value, PMC *dest) {
+        if (value < 0)
+            mmd_dispatch_v_pip(INTERP, SELF, 
+                (FLOATVAL)value, dest, MMD_POW_FLOAT);
+        else {
+            int i;
+            INTVAL pmci = PMC_int_val(SELF);
+            VTABLE_morph(INTERP, dest, dynclass_PyInt);
+            PMC_int_val(dest) = 1;
+            for (i=1; i<=value; i++) {
+                PMC_int_val(dest) *= PMC_int_val(SELF);
+            }
+        }
     }
 
 /*

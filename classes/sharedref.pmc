@@ -92,6 +92,7 @@ we can relax that a bit.
 #define VTABLE_is_equal_str(i,l,r) mmd_dispatch_i_pp(i,l,r,MMD_STREQ)
 #define VTABLE_pow(i, l, r, d) mmd_dispatch_v_ppp(i, l, r, d, MMD_POW)
 #define VTABLE_pow_float(i, l, r, d) mmd_dispatch_v_pnp(i, l, r, d, MMD_POW_FLOAT)
+#define VTABLE_pow_int(i, l, r, d) mmd_dispatch_v_pnp(i, l, r, d, MMD_POW_INT)
 
 pmclass SharedRef does ref need_ext is_shared extends Ref {
 

@@ -73,6 +73,7 @@ typedef enum {
         MMD_CMOD_FLOAT,
         MMD_POW,
         MMD_POW_FLOAT,
+        MMD_POW_INT,
         MMD_BAND,
         MMD_BAND_INT,
         MMD_BOR,

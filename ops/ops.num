@@ -1356,3 +1356,5 @@ xor_p_p_p                      1325
 pow_p_p_n                      1326
 pow_p_p_nc                     1327
 pow_p_p_p                      1328
+pow_p_p_i                      1329
+pow_p_p_ic                     1330
