@@ -16,7 +16,7 @@ static void resize_array ( PMC* self, INTVAL size ) {
     size++;
     if(self->data != NULL) {
 	if(size >= 0) {
-	    self->data = (DPOINTER*)mem_realloc(SELF->data,sizeof(PMC*)*size);
+	    self->data = (DPOINTER*)mem_realloc(self->data,self->cache.int_val*sizeof(PMC *),sizeof(PMC*)*size);
 	}
 	else {
             internal_exception(OUT_OF_BOUNDS,
