@@ -9,7 +9,7 @@
 typedef long IV;
 typedef long double NV;
 
-typedef void  VTABLE;
+typedef struct _vtable VTABLE;
 typedef void DPOINTER;
 typedef void SYNC;
 
