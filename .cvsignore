@@ -2,4 +2,4 @@ basic_opcodes.c
 test_prog
 pdump
 Makefile
-Parrot/
+*.patch

@@ -1,33 +1,16 @@
-#! perl -w
+#
+# call.pasm
+#
+# A program to demonstrate macros and poor-man's subroutine
+# calls.
+#
+# Copyright (C) 2001 Gregor N. Purdy. All rights reserved.
+# This program is free software. It is subject to the same
+# license as Perl itself.
+#
+# $Id$
+#
 
-use Parrot::Test tests => 5;
-
-# It would be very embarrassing if these didn't work...
-output_is(<<'CODE', '', "noop, end");
-	noop
-	end
-CODE
-
-output_is(<<'CODE', '1', "print 1");
-	print	1
-	end
-CODE
-
-output_is(<<'CODE', 'Parrot flies', "print string");
-	print "Parrot flies"
-	end
-CODE
-
-output_is( <<'CODE', '42', "branch_ic" );
-	set	I4, 42
-	branch	HERE
-	set	I4, 1234
-HERE:
-	print	I4
-	end
-CODE
-
-output_is( <<'CODE', <<OUTPUT, "jump" );
 neg         macro   R
             set     I0, R
             set     R, 0
@@ -54,7 +37,4 @@ MAIN:       set     I1, 42
 PRINTIT:    print        I1
             print   "\n"
             return  I31, PRINTIT
-CODE
-42
-1234
-OUTPUT
+

@@ -1,3 +1,13 @@
+#
+# test.pasm
+#
+# Copyright (C) 2001 The Parrot Team. All rights reserved.
+# This program is free software. It is subject to the same
+# license as The Parrot Interpreter.
+#
+# $Id$
+#
+
         time_i I1
         set_i_ic I2, 0
         set_i_ic I3, 1

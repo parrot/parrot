@@ -18,6 +18,13 @@
 # E2: Is it zero?
 # E3: Reduce.
 #
+# Copyright (C) 2001 Gregor N. Purdy. All rights reserved.
+# This program is free software. It is subject to the same
+# license as Perl itself.
+#
+# $Id$
+#
+
 main:   set    I1, 96
         set    I2, 64
         set    S1, "Algorithm E (Euclid's algorithm)"

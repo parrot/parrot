@@ -1,3 +1,13 @@
+#
+# local_label.pasm
+#
+# Copyright (C) 2001 The Parrot Team. All rights reserved.
+# This program is free software. It is subject to the same
+# license as The Parrot Interpreter.
+#
+# $Id$
+#
+
 main:	print		"test 1\n"
 	branch		$ok
 $ng:	print		"ng 1\n"

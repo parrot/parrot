@@ -9,6 +9,7 @@
 #
 
 use strict;
+use Carp qw(&confess);
 
 
 ###############################################################################
@@ -423,9 +424,34 @@ sub fixup {
     add_line_to_listing( sprintf( "\t%08x   %s\n", $label{$_}, $_ ) );
   }
 
+  #
+  # Resolve label arithmetic:
+  #
+
+  foreach my $label (keys %fixup) {
+    next unless $label =~ m/^\[(.*)\]$/;
+
+    my $exp = $1;
+
+    $exp =~ s/([A-Za-z_][A-Za-z0-9_]*)/$label{$1}/g;
+
+    my $result = (eval $exp) / sizeof('intval');
+
+    while (scalar(@{$fixup{$label}})) {
+      my $offset = shift @{$fixup{$label}};
+      substr($bytecode, $offset, sizeof('intval')) = pack_arg('intval', $result);
+    }
+
+    delete $fixup{$label};
+  }
+
+  #
+  # Complain about undefined symbols:
+  #
+
   return unless keys %fixup;
 
-  print STDERR "SQUAK!  These symbols were referenced but not defined:\n";
+  print STDERR "These symbols were referenced but not defined:\n";
 
   add_line_to_listing( "\nUNDEFINED SYMBOLS:\n" );
 
@@ -438,7 +464,9 @@ sub fixup {
     add_line_to_listing( "\t$_\n" );
   }
 
-  exit; # some day, unresolved symbols won't be an error!
+  # TODO: some day, unresolved symbols won't be an error!
+
+  error("Cannot assemble with unresolved symbols!\n", $file, $line);
 }
 
 
@@ -548,6 +576,9 @@ sub process_program_lines {
     }
 
     $code = replace_constants($code);
+
+    while ($code =~ s/\[([^\] \t]*)\s+/[$1/) { };  # Erase all space within label arithmetic
+
     $code =~ s/,/ /g;
     $code =~ s/#.*$//; # strip end of line comments
 
@@ -556,6 +587,7 @@ sub process_program_lines {
     if( exists( $macros{$opcode} ) ) {
       # found a macro, expand it and append its lines to the front of
       # the program lines array.  
+
       my @expanded_lines = expand_macro( $opcode, @args );
       unshift( @program, @expanded_lines );
       $lineinfo->[2] = '';
@@ -667,7 +699,7 @@ sub handle_asm_directive {
     $macros{$name} = [ [split( /,\s*/, $args)], [] ];
     while( 1 ) {
       if( !scalar( @program ) ) {
-        error( "The end of the macro was never seen" );
+        error( "The end of the macro was never seen", $file, $line);
       }
       my $l = shift( @program );
       ($file, $line, $pline, $sline) = @$l;
@@ -675,7 +707,7 @@ sub handle_asm_directive {
         last;
       }
       elsif( $pline =~ /^\S+\s+macro/ ) {
-        error( "Cannot define a macro inside of another macro" );
+        error( "Cannot define a macro inside of another macro", $file, $line );
       }
       else {
         push( @{$macros{$cur_macro}[1]}, $l );
@@ -699,48 +731,66 @@ offset.  This function handles both local labels and global labels.
 
 sub handle_label {
   my ($label, $code) = $pline =~ /^(\S+):\s*(.+)?/;
-  # if the label starts with a dollar sign, then it is a local label.
-  if( $label =~ /^\$/ ) {
-    # a local label
+
+  #
+  # Local labels (begin with '$'):
+  #
+
+  if ($label =~ /^\$/) {
     if( exists( $local_label{ $label } ) ) {
       error( "local label '$label' already defined in $last_label!", $file, $line );      
     }
+
     if( exists( $local_fixup{ $label } ) ) {
       # backpatch everything with this PC.
       while(scalar(@{$local_fixup{$label}})) {
         my $op_pc=shift(@{$local_fixup{$label}});
         my $offset=shift(@{$local_fixup{$label}});
-        substr($bytecode,$offset,sizeof('i'))=pack_arg('i', ($pc-$op_pc)/sizeof('i'));
+        substr($bytecode,$offset,sizeof('i')) = pack_arg('i', ($pc-$op_pc)/sizeof('i'));
       }
+
       delete($local_fixup{$label});  
     }
+
     $local_label{$label} = $pc;
   }
+
+  #
+  # Global labels:
+  #
+
   else {
-    # a global label
     if( exists( $label{ $label } ) ) {
       error( "'$label' already defined!", $file, $line );
     }
+
     if( exists( $fixup{$label} ) ) {
       # backpatch everything with this PC.
       while( scalar( @{ $fixup{ $label } } ) ) {
         my $op_pc = shift( @{ $fixup{ $label } } );
         my $offset = shift( @{ $fixup{ $label } } );
-        substr($bytecode,$offset,sizeof('i'))=pack_arg('i', ($pc-$op_pc)/sizeof('i'));
+        substr($bytecode,$offset,sizeof('i')) = pack_arg('i', ($pc-$op_pc)/sizeof('i'));
       }
+
       delete($fixup{$label});  
     }
 
-    # clear out any local labels
+    #
+    # Clear out any local labels
+    #
+
     %local_label = ();
+
     if( keys( %local_fixup ) ) {
       # oops, some local labels are unresolved
       error( "These local labels were undefined in $last_label: " .
              join( ",", sort( keys( %local_fixup ) ) ), $file, $line );
     }
+
     $label{ $label } = $pc; # store it
     $last_label = $label;
   }
+
   return $code;
 }
 
@@ -755,23 +805,31 @@ with the ones given to the macro.  NOTE: modifies @program.
 =cut
 
 sub expand_macro {
-  my ($opcode, @args) = shift;
+  my ($opcode, @args) = @_;
+
   my (@margs) = @{ $macros{$opcode}[0] };
   my (@macro);
+
   # we have to make sure to copy the macro, to avoid mangling the
   # original macro definition.
+
   foreach (@{ $macros{ $opcode }[1] } ) {
     push( @macro, [@$_] );
   }
-  if( scalar(@margs) != scalar(@args) ) {
-    error( "Wrong number of arguments to macro '$opcode'", $file, $line );
-  }
+
+  my $nargs = scalar(@args);
+  my $eargs = scalar(@margs);
+
+  error( "Wrong number ($nargs) of arguments to macro '$opcode' (expected $eargs)", $file, $line )
+    if $eargs != $nargs;
+
   #fixup parameters.
+
   while( my $marg = shift( @margs ) ) {
     my $param = shift( @args );
     foreach( @macro ) {
-      $_->[2] =~ s/([\s,])$marg\b/$1$param/g;
-      $_->[3] =~ s/([\s,])$marg\b/$1$param/g;
+      $_->[2] =~ s|([^A-Za-z0-9_])$marg\b|$1$param|g;
+      $_->[3] =~ s|([^A-Za-z0-9_])$marg\b|$1$param|g;
     }
   }
 
@@ -845,10 +903,12 @@ sub find_correct_opcode {
       push @arg_t, $1;
     } elsif(m/^((-?\d+)|(0b[01]+)|(0x[0-9a-f]+))$/i) { # integer
       push @arg_t,'ic';
-    } elsif(m/^[\$A-Za-z_][\w]*$/i) {                  # label
+    } elsif(m/^\[.*\]$/) {                                      # label arithmetic
+      push @arg_t,'ic';
+    } elsif(m/^\$?[A-Za-z_][\w]*$/i) { # label
       push @arg_t,'ic';
     } else {
-      error("Unrecognized argument '$_'!");
+      error("Unrecognized argument '$_'!", $file, $line);
     }
   }  
 
@@ -971,20 +1031,44 @@ sub handle_arguments {
   my ($code, $opcode, @args) = @_;
 
   foreach (0..$#args) {
-    my($rtype)= $opcodes{$opcode}{TYPES}[$_];
+    my $rtype = $opcodes{$opcode}{TYPES}[$_];
+
+    #
+    # Register arguments:
+    #
 
     if($rtype eq "I" || $rtype eq "N" || $rtype eq "P" || $rtype eq "S") {
       # its a register argument
 
       $args[$_] =~ s/^[INPS](\d+)$/$1/i
-        or error("Expected m/[INPS]\\d+/, but got '$args[$_]'!");
+        or error("Expected m/[INPS]\\d+/, but got '$args[$_]'!", $file, $line);
 
       error("Register $1 out of range (should be 0-31) in '$opcode'",$file,$line) if $1 < 0 or $1 > 31;
     }
+
+    #
+    # Destination arguments:
+    #
+
     elsif($rtype eq "D") {
-      # a destination
-      if( $args[$_] =~ /^\$/ ) {
-        # a local label
+      #
+      # Label arithmetic:
+      #
+
+      if ($args[$_] =~ m/^\[(.*)\]$/) {
+        my $mult = sizeof('intval');
+        $args[$_] =~ s/(\d+)/$mult * $1/eg;                  # Hard-coded INTVAL offsets ---> byte offsets
+        $args[$_] =~ s/[\@]/$op_pc/;                         # Map '@' to $op_pc
+
+        push @{$fixup{$args[$_]}}, $pc;
+        $args[$_] = 0xffffffff;
+      }
+
+      #
+      # Local labels:
+      #
+
+      elsif ($args[$_] =~ /^\$/) {
         if( !exists($local_label{$args[$_]}) ) {
           # we have not seen it yet...put it on the fixup list
           push(@{$local_fixup{$args[$_]}},$op_pc,$pc);
@@ -994,6 +1078,11 @@ sub handle_arguments {
           $args[$_] = ($local_label{$args[$_]}-$op_pc)/sizeof('i');
         }
       }
+
+      #
+      # Regular labels:
+      #
+
       else {
         if( !exists($label{$args[$_]}) ) {
           # we have not seen it yet...put it on the fixup list
@@ -1005,20 +1094,66 @@ sub handle_arguments {
         }
       }
     }
-    elsif($rtype eq 's') {
+
+    #
+    # String arguments:
+    #
+
+    elsif ($rtype eq 's') {
       $args[$_] =~ s/[\[]sc:(.*)[\]]/$1/;
     }
-    elsif($rtype eq 'n') {
+
+    #
+    # Number arguments:
+    #
+
+    elsif ($rtype eq 'n') {
       $args[$_] =~ s/[\[]nc:(.*)[\]]/$1/;
     }
-    else {
-      if ($args[$_] =~ /^0b[01]+$/i) {
+
+    #
+    # Integer arguments:
+    #
+
+    elsif ($rtype eq 'i') {
+      #
+      # Label arithmetic:
+      #
+
+      if ($args[$_] =~ m/^\[(.*)\]$/) {
+        my $mult = sizeof('intval');
+        $args[$_] =~ s/(\d+)/$mult * $1/eg;                  # Hard-coded INTVAL offsets ---> byte offsets
+        $args[$_] =~ s/[\@]/$op_pc/;                         # Map '@' to $op_pc
+
+        push @{$fixup{$args[$_]}}, $pc;
+        $args[$_] = 0xffffffff;
+      }
+
+      #
+      # Handle conversions of hexadecimal and octal:
+      #
+
+      elsif ($args[$_] =~ /^0b[01]+$/i) {
         $args[$_] = from_binary( $args[$_] );
       }
       elsif ($args[$_] =~ /^0x?[0-9a-f]*$/i) {
         $args[$_] = oct($args[$_]);
       }
     }
+
+    #
+    # Unknown argument types:
+    #
+
+    else {
+      error("Unrecognized argument type '$rtype'!\n", $file, $line);
+    }
+
+    #
+    # Continue:
+    #
+    # NOTE: Too bad $rtype wouldn't be visible in a continue block...
+    #
 
     $pc       += sizeof($rtype);
     $bytecode .= pack_arg($rtype, $args[$_]);
@@ -1065,8 +1200,14 @@ Outputs and error message and exits.
 =cut
 
 sub error {
-    my($message,$file,$line)=@_;
+    my ($message, $file, $line) = @_;
+
+    die("\$message undefined!") unless defined $message;
+    die("\$file undefined!")    unless defined $file;
+    die("\$line undefined!")    unless defined $line;
+
     print STDERR "Error ($file:$line): $message\n";
+
     exit 1;
 }
 
@@ -1161,6 +1302,7 @@ sub read_source {
 	my($sline)=$_;
 	s/^\s*//;
 	s/\s*$//;
+
 	push(@lines,[$file,$line,$_,$sline]);
 	if(m/^INCLUDE\s+['"](.+)["']/i) {
 	    my $newfile=$1;
