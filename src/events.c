@@ -909,17 +909,23 @@ wait_for_wakeup(Parrot_Interp interpreter, void *next)
 {
     QUEUE_ENTRY *entry;
     parrot_event* event;
-    int sleeping = 1;
+    QUEUE * tq = interpreter->task_queue;
+    interpreter->sleeping = 1;
+    /*
+     * event handler likes callbacks or timers are run as normal code
+     * so inside such an even handler function another event might get
+     * handled, which is good (higher priority events can interrupt
+     * other event handler OTOH we must ensure that all state changes
+     * are done in do_event and we should probably suspend nested
+     * event handlers sometimes
+     *
+     */
 
-    while (sleeping) {
-        entry = wait_for_entry(interpreter->task_queue);
+    while (interpreter->sleeping) {
+        entry = wait_for_entry(tq);
         event = (parrot_event* )entry->data;
         mem_sys_free(entry);
-        if (event->type == EVENT_TYPE_SLEEP && event->data == next)
-            sleeping = 0;
-        else if (event->type == EVENT_TYPE_TERMINATE ||
-                event->type == EVENT_TYPE_SIGNAL)
-            sleeping = 0;
+        edebug((stderr, "got ev %d head : %p\n", event->type, tq->head));
         next = do_event(interpreter, event, next);
     }
     return next;
@@ -1032,6 +1038,7 @@ do_event(Parrot_Interp interpreter, parrot_event* event, void *next)
             next = NULL;        /* this will terminate the run loop */
             break;
         case EVENT_TYPE_SIGNAL:
+            interpreter->sleeping = 0;
             /* generate exception */
             event_to_exception(interpreter, event);
             /* not reached - will longjmp */
@@ -1043,12 +1050,20 @@ do_event(Parrot_Interp interpreter, parrot_event* event, void *next)
             break;
         case EVENT_TYPE_CALL_BACK:
             edebug((stderr, "starting user cb\n"));
-            Parrot_runops_fromc_args(interpreter, event->u.call_back.sub,
+            Parrot_runops_fromc_args_save(interpreter, event->u.call_back.sub,
                     "PP",
                     event->u.call_back.user_data,
                     event->u.call_back.external_data);
             break;
         case EVENT_TYPE_SLEEP:
+            interpreter->sleeping = 0;
+#if 0
+            /* doesn't work do_event is called from outside too */
+            if (!next || event->data 1= next)
+                internal_exception(1,
+                        "Unhandled nested sleep call: next = %p ed = %p",
+                        next, event->data);
+#endif
             break;
         default:
             fprintf(stderr, "Unhandled event type %d\n", event->type);
@@ -1076,13 +1091,14 @@ Parrot_do_handle_events(Parrot_Interp interpreter, int restore, void *next)
 {
     QUEUE_ENTRY *entry;
     parrot_event* event;
+    QUEUE * tq = interpreter->task_queue;
 
     if (restore)
         disable_event_checking(interpreter);
-    if (!peek_entry(interpreter->task_queue))
+    if (!peek_entry(tq))
         return next;
-    while (peek_entry(interpreter->task_queue)) {
-        entry = pop_entry(interpreter->task_queue);
+    while (peek_entry(tq)) {
+        entry = pop_entry(tq);
         event = (parrot_event* )entry->data;
         mem_sys_free(entry);
         next = do_event(interpreter, event, next);

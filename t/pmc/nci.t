@@ -853,7 +853,7 @@ output_is(<<'CODE', <<'OUTPUT', "nci_cb_C1");
   set I20, 0
 loop:
   inc I20
-  ## sleep 0.1 hangs sometimes in __select ## XXX ##
+  #or  sleep 0.01 and loop only a few times
   find_global P11, "cb_done"
   if P11, fin
   gt I20, 100000, err
