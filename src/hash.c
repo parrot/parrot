@@ -434,7 +434,7 @@ find_bucket(Interp *interpreter, Hash *hash, BucketIndex head, void *key)
 void
 new_hash(Interp *interpreter, Hash **hptr)
 {
-    return new_hash_x(interpreter, hptr,
+    new_hash_x(interpreter, hptr,
             enum_type_PMC,
             0,
             Hash_key_type_ascii,
@@ -446,7 +446,7 @@ new_hash(Interp *interpreter, Hash **hptr)
 void
 new_cstring_hash(Interp *interpreter, Hash **hptr)
 {
-    return new_hash_x(interpreter, hptr,
+    new_hash_x(interpreter, hptr,
             enum_type_PMC,
             0,
             Hash_key_type_cstring,
