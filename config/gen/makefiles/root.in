@@ -107,6 +107,8 @@ LINTFLAGS2 = $(LINTFLAGS) -ansireserved -retvalother -bitwisesigned
 # ex: make LINTOPTS='-posixstrictlibs +posixlibs' lint
 LINTOPTS   =
 
+INNO_SETUP = iscc
+
 
 ###############################################################################
 #
@@ -601,6 +603,7 @@ help :
 	@echo "Release:"
 	@echo "  release:           create a TAR ball."
 	@echo "  rpm:               create RPMs."
+	@echo "  win32-inno-installer:      create MSWin32 setup."
 	@echo ""
 	@echo "Examples:"
 	@echo "  hello:             'Hello World' as an executable."
@@ -1334,6 +1337,10 @@ rpms : release
 	sudo cp parrot-$(VERSION).tar.gz /usr/src/*/SOURCES
 	sudo cp parrot.spec /usr/src/*/SPECS
 	cd /usr/src/*/SPECS ${make_and} sudo rpm -ba parrot.spec
+
+win32-inno-installer : install
+	$(PERL) tools/dev/mk_inno.pl --version=$(VERSION) --prefix=$(PREFIX)
+	$(INNO_SETUP) /Q parrot.iss
 
 ###############################################################################
 #
