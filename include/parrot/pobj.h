@@ -36,16 +36,16 @@ typedef union UnionVal {
         size_t buflen;
     } b;
     struct {                    /* PMC unionval members */
-        DPOINTER* struct_val;   /* two ptrs, both are defines */
-        PMC* pmc_val;
+        DPOINTER* _struct_val;   /* two ptrs, both are defines */
+        PMC* _pmc_val;
     } ptrs;
     INTVAL int_val;
     FLOATVAL num_val;
     struct parrot_string_t * string_val;
 } UnionVal;
 
-#define struct_val ptrs.struct_val
-#define pmc_val ptrs.pmc_val
+#define struct_val ptrs._struct_val
+#define pmc_val ptrs._pmc_val
 
 #define PMC_ptr1v(pmc) (pmc)->cache.struct_val
 #define PMC_ptr2p(pmc) (pmc)->cache.pmc_val
