@@ -1227,7 +1227,7 @@ ok
 OUT
 
 output_is(<<'CODE', <<'OUT', "more pragmas, syntax only");
-.sub _main prototyped, @MAIN, @IMMEDIATE, @LOAD, @POSTCOMP
+.sub _main prototyped, @MAIN, @LOAD, @POSTCOMP
     print "ok\n"
     end
 .end
@@ -1408,7 +1408,7 @@ CODE
 output_is(<<'CODE', "42\n", "oneliner return");
 .sub _main
 .sym int a, b
-  (a, b) = _sub()   
+  (a, b) = _sub()
   print a
   print b
   print "\n"

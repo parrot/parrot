@@ -190,7 +190,8 @@ make_code_pointers(struct PackFile_Segment *seg)
 typedef enum {
     PBC_MAIN   = 1,
     PBC_LOADED = 2,
-    PBC_PBC    = 4
+    PBC_PBC    = 4,
+    PBC_IMMEDIATE = 8
 } pbc_action_enum_t;
 
 
@@ -228,6 +229,8 @@ sub_pragma(Parrot_Interp interpreter, struct PackFile *pf,
                 todo = 1;
             break;
     }
+    if (pragmas & PObj_private6_FLAG) /* symreg.h:P_IMMEDIATE */
+        todo = 1;
     return todo;
 }
 
@@ -276,6 +279,19 @@ do_1_sub_pragma(Parrot_Interp interpreter, PMC* sub_pmc, int action)
 
     size_t start_offs;
     struct Parrot_sub * sub = PMC_sub(sub_pmc);
+    /*
+     * run IMMEDIATE sub
+     */
+    if (PObj_get_FLAGS(sub_pmc) & PObj_private6_FLAG) {
+        PObj_get_FLAGS(sub_pmc) &= ~PObj_private6_FLAG;
+        run_sub(interpreter, sub_pmc);
+        /*
+         * reset initial flag so MAIN detection works
+         */
+        interpreter->resume_flag = RESUME_INITIAL;
+        return;
+    }
+
     switch (action) {
         case PBC_LOADED:
             if (PObj_get_FLAGS(sub_pmc) & PObj_private5_FLAG) {
@@ -291,7 +307,7 @@ do_1_sub_pragma(Parrot_Interp interpreter, PMC* sub_pmc, int action)
 
                     start_offs =
                         ((ptrdiff_t) VTABLE_get_pointer(interpreter, sub_pmc)
-                            - code) / sizeof(opcode_t*);
+                         - code) / sizeof(opcode_t*);
                     interpreter->resume_offset = start_offs;
                     PObj_get_FLAGS(sub_pmc) &= ~PObj_private4_FLAG;
                 }

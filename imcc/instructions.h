@@ -112,6 +112,7 @@ typedef struct _emittert {
 	int (*open)(void *param);
 	int (*emit)(void *param, struct _IMC_Unit *, Instruction *ins);
 	int (*new_sub)(void *param, struct _IMC_Unit *);
+	int (*end_sub)(void *param, struct _IMC_Unit *);
 	int (*close)(void *param);
 } Emitter;
 

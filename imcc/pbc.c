@@ -187,7 +187,7 @@ make_new_sub(Interp *interpreter, IMC_Unit * unit)
     struct subs *s = mem_sys_allocate_zeroed(sizeof(struct subs));
 
     if (!s)
-        fatal(1, "get_old_size", "Out of mem");
+        fatal(1, "make_new_sub", "Out of mem");
     s->prev = globals.cs->subs;
     s->next = NULL;
     s->unit = unit;
@@ -841,6 +841,32 @@ e_pbc_new_sub(void *param, IMC_Unit * unit)
     if (!unit->instructions)
         return 0;
     make_new_sub(interpreter, unit);     /* we start a new compilation unit */
+    return 0;
+}
+
+int
+e_pbc_end_sub(void *param, IMC_Unit * unit)
+{
+    Interp *interpreter = (Interp *)param;
+    Instruction *ins;
+    int pragma;
+
+    if (!unit->instructions)
+        return 0;
+    /*
+     * if the sub was marked IMMEDIATE, we run it now
+     * This is *dangerous*: all possible global state can be messed
+     * up, e.g. when that sub start loading bytecode
+     */
+    ins = unit->instructions;
+    if (!ins->r[1] || !ins->r[1]->pcc_sub)
+        return 0;
+    pragma = ins->r[1]->pcc_sub->pragma;
+    if (pragma & P_IMMEDIATE) {
+        debug(interpreter, DEBUG_PBC, "immediate sub '%s'",
+                ins->r[1]->name);
+        PackFile_fixup_subs(interpreter);
+    }
     return 0;
 }
 

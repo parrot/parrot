@@ -37,11 +37,13 @@ Emitter emitters[2] = {
     {e_file_open,
      e_file_emit,
      (int (*)(void *, IMC_Unit *))NULLfunc,
+     (int (*)(void *, IMC_Unit *))NULLfunc,
      e_file_close},
 
     {e_pbc_open,
      e_pbc_emit,
      e_pbc_new_sub,
+     e_pbc_end_sub,
      e_pbc_close},
 };
 
@@ -537,6 +539,8 @@ emit_flush(void *param, IMC_Unit * unit)
         debug(interpreter, DEBUG_IMC, "emit %I\n", ins);
         (emitters[emitter]).emit(param, unit, ins);
     }
+    if (emitters[emitter].end_sub)
+        (emitters[emitter]).end_sub(param, unit);
     return 0;
 }
 

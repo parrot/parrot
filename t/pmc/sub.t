@@ -17,7 +17,7 @@ C<Continuation> PMCs.
 
 =cut
 
-use Parrot::Test tests => 78;
+use Parrot::Test tests => 79;
 use Test::More;
 use Parrot::Config;
 
@@ -1375,3 +1375,17 @@ caller 0 foo
 caller 1 main
 ok
 OUTPUT
+
+output_is(<<'CODE', <<'OUTPUT', '@IMMEDIATE');
+##PIR##
+.sub optc @IMMEDIATE
+    print "initial\n"
+.end
+.sub _main @MAIN
+    print "main\n"
+.end
+CODE
+initial
+main
+OUTPUT
+
