@@ -5,125 +5,18 @@
 #
 # Copyright (C) 2001-2003 Gregor N. Purdy. All rights reserved.
 # This program is free software. It is subject to the same
-# license as Perl itself.
+# license as the Parrot interpreter.
 #
 # $Id$
 #
 
-
-# 4 bits per file, represent the rank of the queen, 0xf for none
-
-const int BITS_PER_FILE = 4;
-const int NO_QUEEN      = 0xf;
+const int NO_QUEEN      = -1;
 
 const int NUM_FILES     = 8;
 const int NUM_RANKS     = 8;
 
-
-#
-# clear_file()
-#
-# Clears the queen from the current file. Makes no assumption about current
-# nybble contents.
-#
-
-sub int clear_file (int board, int file) {
-  var int amount;
-  var int temp;
-
-  amount = BITS_PER_FILE * file;
-  temp   = NO_QUEEN << amount;
-  board  = board | temp;
-
-  return board;
-}
-
-
-#
-# place_queen()
-#
-# Places a queen at the current rank of the current file. Assumes no queen for
-# the file yet (which means its nybble is 0xf).
-#
-
-sub int place_queen (int board, int rank, int file) {
-  var int amount;
-  var int temp;
-
-  amount = BITS_PER_FILE * file;
-  temp   = NO_QUEEN << amount;
-  temp   = not(temp);
-  board  = board & temp;
-  temp   = rank << amount;
-  board  = board | temp;
-
-  return board;
-}
-
-
-#
-# queen_rank()
-#
-# Fetches the queen's rank.
-#
-# Input:  file
-# Ouptut: rank = queen's rank in that file
-#
-
-sub int queen_rank (int board, int file) {
-  var int amount;
-  var int temp;
-
-  amount = BITS_PER_FILE *  file;
-  temp   = NO_QUEEN      << amount;
-  temp   = temp          &  board;
-  temp   = temp          >> amount;
-
-  return temp;
-}
-
-
-#
-# queen_at()
-#
-# Determines whether or not there is a queen at a given location.
-#
-# Input:  rank, file
-# Ouptut: queen
-#
-
-sub int queen_at (int board, int rank, int file) {
-  var int amount;
-  var int temp;
-
-  if (rank < 0) {
-    return 0;
-  }
-
-  if (rank >= NUM_RANKS) {
-    return 0;
-  }
-
-  if (file < 0) {
-    return 0;
-  }
-
-  if (file >= NUM_FILES) {
-    return 0;
-  }
-
-
-  amount = BITS_PER_FILE * file;
-  temp   = NO_QUEEN << amount;
-  temp   = temp &  board;
-  temp   = temp >> amount;
-
-  if (temp == rank) {
-    return 1;
-  } else {
-    return 0;
-  }
-}
+var obj board;
+board = new PerlArray;
 
 
 #
@@ -138,27 +31,17 @@ sub int free_space (int board, int rank, int file) {
   while (i <= file) {
     var int temp_file;
     var int temp_rank;
-    var int result;
 
     temp_file = file - i;
 
     temp_rank = rank;
-    result = queen_at(board, temp_rank, temp_file);
-    if (result == 1) {
-      return 0; 
-    }
+    return 0 if (board[temp_file] == temp_rank);
 
     temp_rank = rank + i;
-    result = queen_at(board, temp_rank, temp_file);
-    if (result == 1) {
-      return 0; 
-    }
+    return 0 if (board[temp_file] == temp_rank);
 
     temp_rank = rank - i;
-    result = queen_at(board, temp_rank, temp_file);
-    if (result == 1) {
-      return 0; 
-    }
+    return 0 if (board[temp_file] == temp_rank);
 
     i++;
   } 
@@ -186,11 +69,7 @@ sub print_board (int board) {
     print("$temp |");
 
     while(file < 8) {
-      var int result;
-
-      result = queen_at(board, rank, file);
-
-      if (result == 1) {
+      if (board[file] == rank) {
         print(" Q |");
       } else {
         temp = rank + file;
@@ -230,7 +109,7 @@ sub main() {
   file = 0;
 
   while(file < NUM_FILES) {
-    board = clear_file(board, file);
+    board[file] = NO_QUEEN;
     file++;
   }
 
@@ -251,11 +130,11 @@ sub main() {
 
     if (rank == NUM_RANKS) {
       file--;
-      rank  = queen_rank(board, file);
-      board = clear_file(board, file);
+      rank = board[file];
+      board[file] = NO_QUEEN;
       rank++
     } else {
-      board = place_queen(board, rank, file);
+      board[file] = rank;
       file++;
       rank = 0;
     }
