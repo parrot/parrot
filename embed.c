@@ -237,9 +237,11 @@ Parrot_loadbc(struct Parrot_Interp *interpreter, struct PackFile *pf)
 void
 Parrot_runcode(struct Parrot_Interp *interpreter, int argc, char *argv[])
 {
+    void *dummy_ptr;
     INTVAL i;
     PMC *userargv;
     KEY key;
+    interpreter->lo_var_ptr = &dummy_ptr;
 
     /* Debugging mode nonsense. */
     if (Interp_flags_TEST(interpreter, PARROT_DEBUG_FLAG)) {
