@@ -68,7 +68,7 @@ pmclass Eval extends Closure {
 	STRING *s;
 
 	/* remove bytecode seg from directory */
-	PackFile_remove_segment_by_name(pf, "BYTECODE");
+	PackFile_remove_segment_by_name(&pf->directory, "BYTECODE");
 
 	size = PackFile_pack_size(pf) * sizeof(opcode_t);
 	packed = (opcode_t*) mem_sys_allocate(size);

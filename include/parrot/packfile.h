@@ -97,6 +97,7 @@ typedef INTVAL (*PackFile_map_segments_func_t) (struct PackFile_Segment *seg,
 
 struct PackFile_Segment {
     struct PackFile     * pf;
+    struct PackFile_Directory * dir;
     /* directory information */
     UINTVAL             type;           /* one of above defined types */
     char                * name;
@@ -217,25 +218,29 @@ opcode_t PackFile_unpack(struct Parrot_Interp *interpreter,
                          struct PackFile *self, opcode_t *packed,
                          size_t packed_size);
 
+/*
+ * directory functions
+ */
+
 INTVAL PackFile_add_segment (struct PackFile_Directory *,
         struct PackFile_Segment *);
 
-struct PackFile_Segment * PackFile_find_segment (struct PackFile *pf,
-                                                 const char *name);
+struct PackFile_Segment * PackFile_find_segment (struct PackFile_Directory *,
+                                             const char *name, int recurse);
 
 struct PackFile_Segment *
-PackFile_remove_segment_by_name (struct PackFile *pf, const char *name);
+PackFile_remove_segment_by_name (struct PackFile_Directory *, const char *);
 
 INTVAL PackFile_map_segments (struct PackFile_Directory *dir,
                               PackFile_map_segments_func_t callback,
                               void* usr_data);
 
+struct PackFile_Segment * PackFile_Segment_new_seg(struct PackFile_Directory *,
+        UINTVAL type, const char *name, int add);
 /*
 ** PackFile_Segment Functions:
 */
 
-struct PackFile_Segment * PackFile_Segment_new_seg(struct PackFile_Directory *,
-        UINTVAL type, const char *name, int add);
 void PackFile_Segment_destroy(struct PackFile_Segment * self);
 size_t PackFile_Segment_packed_size(struct PackFile_Segment * self);
 opcode_t * PackFile_Segment_pack(struct PackFile_Segment *, opcode_t *);

@@ -973,7 +973,8 @@ build_asm(struct Parrot_Interp *interpreter, opcode_t *pc,
 
     name = malloc(strlen(interpreter->code->cur_cs->base.name) + 5);
     sprintf(name, "%s_JIT", interpreter->code->cur_cs->base.name);
-    jit_seg = PackFile_find_segment(interpreter->code, name);
+    jit_seg = PackFile_find_segment(interpreter->code->cur_cs->base.dir,
+            name, 0);
     free(name);
     if (jit_seg)
         jit_info->optimizer =
@@ -1146,7 +1147,7 @@ build_asm(struct Parrot_Interp *interpreter, opcode_t *pc,
             }
         }
 
-    jit_info->arena.size = 
+    jit_info->arena.size =
         (ptrdiff_t)(jit_info->native_ptr - jit_info->arena.start);
 #if JIT_DEBUG
     PIO_eprintf(interpreter, "\nTotal size %u bytes\n",

@@ -606,25 +606,34 @@ PackFile_add_segment (struct PackFile_Directory *dir,
                   sizeof (struct PackFile_Segment *) * (dir->num_segments+1));
     dir->segments[dir->num_segments] = seg;
     dir->num_segments++;
+    seg->dir = dir;
 
     return 0;
 }
 
 /*
 ** PackFile_find_segment
-**   finds the segment with the name 'name' in the PackFile 'pf'
+**   finds the segment with the name 'name' in the PackFile_Directory
+**   if 'sub_dir' is true, directorys are searched recursively
 **   The segment is returned, but its still owned by the PackFile.
 */
 
 struct PackFile_Segment *
-PackFile_find_segment (struct PackFile *pf, const char *name)
+PackFile_find_segment (struct PackFile_Directory *dir, const char *name,
+        int sub_dir)
 {
-    struct PackFile_Directory *dir = &pf->directory;
     size_t i;
 
     for (i=0; i < dir->num_segments; i++) {
-        if (dir->segments[i] && strcmp (dir->segments[i]->name, name) == 0) {
-            return dir->segments[i];
+        struct PackFile_Segment *seg = dir->segments[i];
+        if (seg && strcmp (seg->name, name) == 0) {
+            return seg;
+        }
+        if (sub_dir && seg->type == PF_DIR_SEG) {
+            seg = PackFile_find_segment((struct PackFile_Directory *)seg,
+                    name, sub_dir);
+            if (seg)
+                return seg;
         }
     }
 
@@ -633,14 +642,14 @@ PackFile_find_segment (struct PackFile *pf, const char *name)
 
 /*
 ** PackFile_remove_segment_by_name
-**   finds and removes the segment with name 'name' in the PackFile 'pf'
+**   finds and removes the segment with name 'name' in the PackFile_Directory
 **   The segment is returned and must be destroyed by the user
 */
 
 struct PackFile_Segment *
-PackFile_remove_segment_by_name (struct PackFile *pf, const char *name)
+PackFile_remove_segment_by_name (struct PackFile_Directory *dir,
+        const char *name)
 {
-    struct PackFile_Directory *dir = &pf->directory;
     size_t i;
 
     for (i=0; i < dir->num_segments; i++) {
@@ -1050,11 +1059,13 @@ directory_unpack (struct Parrot_Interp *interpreter,
         seg = PackFile_Segment_new_seg(dir, type, name, 0);
         mem_sys_free(name);
 
-        /* make compat/shorthand pointers */
+        /* make compat/shorthand pointers:
+         * the first segments read are the default segments
+         */
         switch (type) {
             case PF_FIXUP_SEG:
-                /* TODO check multiple */
-                pf->fixup_table = (struct PackFile_FixupTable *)seg;
+                if (!pf->fixup_table)
+                    pf->fixup_table = (struct PackFile_FixupTable *)seg;
                 break;
             case PF_BYTEC_SEG:
                 if (!pf->cur_cs)
@@ -1088,6 +1099,7 @@ directory_unpack (struct Parrot_Interp *interpreter,
 
         /* store the segment */
         dir->segments[i] = seg;
+        seg->dir = dir;
     }
 
     if ((cursor - pf->src) % 4)
@@ -1352,8 +1364,8 @@ pf_debug_unpack (struct Parrot_Interp *interpreter,
      * and attach it
      */
     code_name[str_len - 3] = 0;
-    code = (struct PackFile_ByteCode *)PackFile_find_segment(self->pf,
-            code_name);
+    code = (struct PackFile_ByteCode *)PackFile_find_segment(self->dir,
+            code_name, 0);
     if (!code || code->base.type != PF_BYTEC_SEG)
         internal_exception(1, "Code '%s' not found for debug segment '%s'\n",
                 code_name, self->name);
@@ -1455,7 +1467,7 @@ Parrot_pop_cs(struct Parrot_Interp *interpreter)
         return;
     }
     Parrot_switch_to_cs(interpreter, new_cs);
-    PackFile_remove_segment_by_name (interpreter->code, cur_cs->base.name);
+    PackFile_remove_segment_by_name (cur_cs->base.dir, cur_cs->base.name);
 }
 
 /*
