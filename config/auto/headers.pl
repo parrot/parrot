@@ -54,8 +54,12 @@ sub runstep {
     # the header.
     my @extra_headers = qw(malloc.h fcntl.h setjmp.h pthread.h signal.h
 			   sys/types.h sys/socket.h netinet/in.h arpa/inet.h
-			   sys/stat.h sysexit.h sysmman.h netdb.h);
+			   sys/stat.h sysexit.h);
 
+    # more extra_headers needed on mingw/msys; *BSD fails if they are present
+    if ($^O eq "msys") {
+	push @extra_headers, qw(sysmman.h netdb.h);
+    }
     my @found_headers;
     foreach my $header (@extra_headers) {
 	my $pass = 0;
