@@ -207,9 +207,7 @@ static void
 trace_active_buffers(struct Parrot_Interp *interpreter)
 {
     UINTVAL i, j;
-    Stack_Chunk_t *cur_stack;
     struct SRegChunk *cur_chunk;
-    Stack_Entry_t *entry;
 
     /* First mark the current set. We assume that all pointers in S registers
      * are pointing to valid buffers. This is not a good assumption, but it'll

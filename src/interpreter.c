@@ -283,8 +283,6 @@ static opcode_t *
 runops_prederef(struct Parrot_Interp *interpreter, opcode_t *pc)
 {
     opcode_t *code_start = (opcode_t *)interpreter->code->byte_code;
-    UINTVAL code_size;          /* in opcodes */
-    opcode_t *code_end;
     void **pc_prederef;
 
     init_prederef(interpreter, 0);

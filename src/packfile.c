@@ -273,11 +273,14 @@ PackFile_fetch_nv(struct PackFile *pf, opcode_t **stream) {
 static opcode_t
 fetch_op_mixed(opcode_t b)
 {
+#if OPCODE_T_SIZE == 4
     union {
         unsigned char buf[8];
         opcode_t o[2];
     } u;
+#else
     opcode_t o;
+#endif
 
 #if PARROT_BIGENDIAN
 #  if OPCODE_T_SIZE == 4

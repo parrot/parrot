@@ -132,8 +132,9 @@ Parrot_readbc(struct Parrot_Interp *interpreter, char *filename)
         interpreter->current_file = string_make(interpreter, filename,
                 strlen(filename), NULL, 0, NULL);
     }
-
+#ifdef HAS_HEADER_SYSMMAN
 again:
+#endif
     /* if we've opened a file (or stdin) with PIO, read it in */
     if (io != NULL) {
         size_t chunk_size;
