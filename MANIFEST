@@ -1599,6 +1599,7 @@ spf_vtable.c
 stacks.c
 string.c
 sub.c
+testyamd
 t/harness
 t/op/basic.t
 t/op/bitwise.t
