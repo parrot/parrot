@@ -1,6 +1,9 @@
 use Parrot::Test tests => 11;
 use Parrot::Config;
 
+print STDERR $PConfig{jitcpuarch}, " JIT CPU\n";
+print STDERR $PConfig{so}, " SO extension\n";
+
 SKIP: {
 if ($PConfig{jitcpuarch} eq 'i386' && -e "libnci" . $PConfig{so}) {
     $ENV{LD_LIBRARY_PATH} = '.';
@@ -47,7 +50,7 @@ ok 1
 ok 2
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "nci_f_ff");
+output_is(gen_test(<<'CODE'), <<'OUTPUT', "nci_f_ff");
   loadlib P1, "libnci.so"
   print "loaded\n"
   dlfunc P0, P1, "nci_fff", "fff"
@@ -79,7 +82,7 @@ ok 1
 ok 2
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "nci_i_sc");
+output_is(gen_test(<<'CODE'), <<'OUTPUT', "nci_i_sc");
   loadlib P1, "libnci.so"
   print "loaded\n"
   dlfunc P0, P1, "nci_isc", "isc"
@@ -112,7 +115,7 @@ ok 2
 OUTPUT
 
 
-output_is(<<'CODE', <<'OUTPUT', "nci_s_sc");
+output_is(gen_test(<<'CODE'), <<'OUTPUT', "nci_s_sc");
   loadlib P1, "libnci.so"
   print "loaded\n"
   dlfunc P0, P1, "nci_ssc", "ssc"
@@ -144,7 +147,7 @@ ok 1
 ok 2
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "nci_c_sc");
+output_is(gen_test(<<'CODE'), <<'OUTPUT', "nci_c_sc");
   loadlib P1, "libnci.so"
   print "loaded\n"
   dlfunc P0, P1, "nci_csc", "csc"
@@ -176,7 +179,7 @@ ok 1
 ok 2
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "nci_i_p");
+output_is(gen_test(<<'CODE'), <<'OUTPUT', "nci_i_p");
   # here the nci_i_p prints (now to) stderr. To get things printed
   # in order, this test prints to stderr too
   loadlib P1, "libnci.so"
@@ -209,7 +212,7 @@ ok
 ok 2
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "nci_p_p");
+output_is(gen_test(<<'CODE'), <<'OUTPUT', "nci_p_p");
   loadlib P1, "libnci.so"
   print 2, "loaded\n"
   dlfunc P0, P1, "nci_pp", "pp"
@@ -244,7 +247,7 @@ ok
 ok 2
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "nci_i_t");
+output_is(gen_test(<<'CODE'), <<'OUTPUT', "nci_i_t");
   loadlib P1, "libnci.so"
   print 2, "loaded\n"
   dlfunc P0, P1, "nci_it", "it"
@@ -274,7 +277,7 @@ ok
 ok 2
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "nci_t_t");
+output_is(gen_test(<<'CODE'), <<'OUTPUT', "nci_t_t");
   loadlib P1, "libnci.so"
   print "loaded\n"
   dlfunc P0, P1, "nci_tt", "tt"

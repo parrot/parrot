@@ -3,8 +3,8 @@
 use Parrot::Test tests => 7;
 use Test::More;
 
-output_is(<<'CODE', <<'OUTPUT', "Setting UnManagedStruct size");
-	new P0,.UnManagedStruct
+output_is(<<'CODE', <<'OUTPUT', "Setting ManagedStruct size");
+	new P0,.ManagedStruct
 	set I0,P0
 	eq I0,0,OK_1
 	print "not "
@@ -35,7 +35,7 @@ ok 4
 OUTPUT
 
 output_is(<<'CODE', <<'OUTPUT', "Setting first element");
-        new P0, .UnManagedStruct
+        new P0, .ManagedStruct
         set P0, 1
 	set P0[0],7
 	set I0,P0[0]
@@ -48,7 +48,7 @@ ok 1
 OUTPUT
 
 output_is(<<'CODE', <<'OUTPUT', "Setting second element");
-        new P0, .UnManagedStruct
+        new P0, .ManagedStruct
         set P0, 2
 	set P0[1], 7
 	set I0, P0[1]
@@ -61,7 +61,7 @@ ok 1
 OUTPUT
 
 output_is(<<'CODE', <<'OUTPUT', "Setting out-of-bounds elements");
-        new P0, .UnManagedStruct
+        new P0, .ManagedStruct
         set P0, 1
 	set P0[1], 99
 	print "ok 1\n"
@@ -71,7 +71,7 @@ ok 1
 OUTPUT
 
 output_is(<<'CODE', <<'OUTPUT', "Getting out-of-bounds elements");
-        new P0, .UnManagedStruct
+        new P0, .ManagedStruct
         set P0, 1
 	set I0, P0[2]
 	eq I0, -1, OK_1
@@ -83,7 +83,7 @@ ok 1
 OUTPUT
 
 output_is(<<'CODE', <<'OUTPUT', "Re-allocating space (growing)");
-        new P0, .UnManagedStruct
+        new P0, .ManagedStruct
         set P0, 10
         set P0[5], 99
         set P0, 20
@@ -97,7 +97,7 @@ ok 1
 OUTPUT
 
 output_is(<<'CODE', <<'OUTPUT', "Re-allocating space (shrinking)");
-        new P0, .UnManagedStruct
+        new P0, .ManagedStruct
         set P0, 10
         set P0[5], 99
         set P0, 2
