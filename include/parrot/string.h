@@ -32,15 +32,15 @@ typedef struct {
     void *bufstart;
     UINTVAL buflen;
     UINTVAL flags;
-}
+};
 
 /* Buffer flags */
-typedef enum {
+typedef enum BUFFER_flag {
     /* The contents of the buffer can't be moved by the GC */
-    BUFFER_immobile_FLAG	= 2 << 0;
+    BUFFER_immobile_FLAG	= 2 << 0,
     /* Private flag for the GC system. Set if the buffer's in use as
        far as the GC's concerned */
-    BUFFER_GC_FLAG		= 2 << 1;
+    BUFFER_GC_FLAG		= 2 << 1
 } BUFFER_flags;
 
 /* Declarations of accessors */
