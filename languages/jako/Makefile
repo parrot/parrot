@@ -20,19 +20,19 @@ default:
 #
 
 bench.pasm: bench.jako jakoc
-	jakoc bench.jako > bench.pasm
+	./jakoc bench.jako > bench.pasm
 
 euclid.pasm: euclid.jako jakoc
-	jakoc euclid.jako > euclid.pasm
+	./jakoc euclid.jako > euclid.pasm
 
 fact.pasm: fact.jako jakoc
-	jakoc fact.jako > fact.pasm
+	./jakoc fact.jako > fact.pasm
 
 fib.pasm: fib.jako jakoc
-	jakoc fib.jako > fib.pasm
+	./jakoc fib.jako > fib.pasm
 
 hello.pasm: hello.jako jakoc
-	jakoc hello.jako > hello.pasm
+	./jakoc hello.jako > hello.pasm
 
 
 #
@@ -40,19 +40,19 @@ hello.pasm: hello.jako jakoc
 #
 
 bench.pbc: bench.pasm ../assemble.pl
-	cd ..; assemble.pl $(DIR)/bench.pasm > $(DIR)/bench.pbc
+	cd ..; ./assemble.pl $(DIR)/bench.pasm > $(DIR)/bench.pbc
 
 euclid.pbc: euclid.pasm ../assemble.pl
-	cd ..; assemble.pl $(DIR)/euclid.pasm > $(DIR)/euclid.pbc
+	cd ..; ./assemble.pl $(DIR)/euclid.pasm > $(DIR)/euclid.pbc
 
 fact.pbc: fact.pasm ../assemble.pl
-	cd ..; assemble.pl $(DIR)/fact.pasm > $(DIR)/fact.pbc
+	cd ..; ./assemble.pl $(DIR)/fact.pasm > $(DIR)/fact.pbc
 
 fib.pbc: fib.pasm ../assemble.pl
-	cd ..; assemble.pl $(DIR)/fib.pasm > $(DIR)/fib.pbc
+	cd ..; ./assemble.pl $(DIR)/fib.pasm > $(DIR)/fib.pbc
 
 hello.pbc: hello.pasm ../assemble.pl
-	cd ..; assemble.pl $(DIR)/hello.pasm > $(DIR)/hello.pbc
+	cd ..; ./assemble.pl $(DIR)/hello.pasm > $(DIR)/hello.pbc
 
 
 #
@@ -73,11 +73,11 @@ over:
 	@make all
 
 test: bench.pbc euclid.pbc fact.pbc fib.pbc hello.pbc
-	cd ..; test_prog $(DIR)/bench.pbc
-	cd ..; test_prog $(DIR)/euclid.pbc
-	cd ..; test_prog $(DIR)/fact.pbc
-	cd ..; test_prog $(DIR)/fib.pbc
-	cd ..; test_prog $(DIR)/hello.pbc
+	cd ..; ./test_prog $(DIR)/bench.pbc
+	cd ..; ./test_prog $(DIR)/euclid.pbc
+	cd ..; ./test_prog $(DIR)/fact.pbc
+	cd ..; ./test_prog $(DIR)/fib.pbc
+	cd ..; ./test_prog $(DIR)/hello.pbc
 
 #
 # End of file.
