@@ -35,8 +35,6 @@ version 0.10
     end
 .end
 
-#.include "library/onload.imc"
-
 .include "errors.pasm"
 
 =head1 FUNCTIONS
