@@ -165,15 +165,9 @@ make_interpreter(Parrot_Interp parent, Interp_flags flags)
 
     /* context data */
     /* Initialize interpreter's flags */
-    interpreter->ctx.warns = new_buffer_header(interpreter);
-    Parrot_allocate(interpreter, interpreter->ctx.warns,
-        sizeof(struct warnings_t));
     PARROT_WARNINGS_off(interpreter, PARROT_WARNINGS_ALL_FLAG);
 
     /* same with errors */
-    interpreter->ctx.errors = new_buffer_header(interpreter);
-    Parrot_allocate(interpreter, interpreter->ctx.errors,
-        sizeof(struct warnings_t));
     PARROT_ERRORS_off(interpreter, PARROT_ERRORS_ALL_FLAG);
     /* undefined globals are errors by default */
     PARROT_ERRORS_on(interpreter, PARROT_ERRORS_GLOBALS_FLAG);

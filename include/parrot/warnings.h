@@ -26,15 +26,11 @@ typedef enum {
 /* &end_gen */
 
 #define PARROT_we_on(we, interp, flag) do { \
-    (interp)->ctx.we = buffer_unmake_COW(interp, (interp)->ctx.we); \
-    ( (*(UINTVAL *) PObj_bufstart((interp)->ctx.we)) |= (flag)); \
-    } while (0)
+    (interp)->ctx.we |= (flag); } while (0)
 #define PARROT_we_off(we, interp, flag) do { \
-    (interp)->ctx.we = buffer_unmake_COW(interp, (interp)->ctx.we); \
-    ( (*(UINTVAL *) PObj_bufstart((interp)->ctx.we)) &= ~(flag)); \
-    } while (0)
-#define PARROT_we_test(we, interp, flag) \
-        ( (*(UINTVAL *) PObj_bufstart((interp)->ctx.we)) & (flag))
+    (interp)->ctx.we &= ~(flag); } while (0)
+#define PARROT_we_test(we, interp, flag)  \
+    (interp)->ctx.we & (flag)
 
 #define PARROT_WARNINGS_on(interp, flag) PARROT_we_on(warns, interp, flag)
 #define PARROT_WARNINGS_off(interp, flag) PARROT_we_off(warns, interp, flag)

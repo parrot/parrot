@@ -58,8 +58,6 @@ cow_copy_context(Interp *interp,
         struct Parrot_Context *dest, struct Parrot_Context *src)
 {
     memcpy(dest, src, sizeof(*src));
-    buffer_mark_COW(dest->warns);  /* XXX */
-    buffer_mark_COW(dest->errors);
 }
 
 /*
@@ -100,8 +98,6 @@ mark_context(Interp* interpreter, struct Parrot_Context* ctx)
     mark_register_stack(interpreter, ctx->num_reg_stack);
     mark_string_register_stack(interpreter, ctx->string_reg_stack);
     mark_pmc_register_stack(interpreter, ctx->pmc_reg_stack);
-    pobject_lives(interpreter, ctx->warns);
-    pobject_lives(interpreter, ctx->errors);
 }
 
 /*
@@ -203,7 +199,7 @@ void
 swap_context(Interp *interp, struct PMC *sub)
 {
     struct Stack_Chunk * tmp_stack = NULL;
-    Buffer * warns;
+    UINTVAL warns;
     struct Parrot_Coroutine* co = (struct Parrot_Coroutine *)PMC_sub(sub);
     struct Parrot_Context *ctx = &co->ctx;
     Stack_Chunk_t *reg_top;
@@ -280,10 +276,6 @@ new_sub(Interp *interp, size_t size)
     /* Using system memory until I figure out GC issues */
     struct Parrot_Sub *newsub =
         mem_sys_allocate_zeroed(size);
-    newsub->ctx.warns = interp->ctx.warns;
-    newsub->ctx.errors = interp->ctx.errors;
-    buffer_mark_COW(interp->ctx.warns);
-    buffer_mark_COW(interp->ctx.errors);
     newsub->seg = interp->code->cur_cs;
     return newsub;
 }

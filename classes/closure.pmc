@@ -55,7 +55,6 @@ Marks the closure as live.
     void mark () {
         struct Parrot_Sub * sub = (struct Parrot_Sub *)PMC_sub(SELF);
         mark_stack(INTERP, sub->ctx.pad_stack);
-        SUPER();    /* mark warns ... in class Sub */
     }
 
 

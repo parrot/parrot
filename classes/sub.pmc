@@ -87,7 +87,7 @@ Initializes the subroutine.
     void init () {
         PMC_sub(SELF) = new_sub(INTERP, sizeof(struct Parrot_Sub));
         PMC_struct_val(SELF) = NULL;
-        PObj_custom_mark_destroy_SETALL(SELF);
+        PObj_active_destroy_SET(SELF);
         PObj_get_FLAGS(SELF) &= ~PObj_private1_FLAG;
 #if 0
         if (Interp_flags_TEST(interpreter, PARROT_DEBUG_FLAG))
@@ -111,21 +111,6 @@ Destroys the subroutine.
         mem_sys_free(sub);
     }
 
-/*
-
-=item C<void mark()>
-
-Marks the subroutine as live.
-
-=cut
-
-*/
-
-    void mark () {
-        struct Parrot_Sub * sub = (struct Parrot_Sub *)PMC_sub(SELF);
-        pobject_lives(INTERP, sub->ctx.warns);
-        pobject_lives(INTERP, sub->ctx.errors);
-    }
 
 /*
 
@@ -199,8 +184,8 @@ Invokes the subroutine.
 
     void* invoke (void* next) {
         struct Parrot_Sub * sub = (struct Parrot_Sub *)PMC_sub(SELF);
-        interpreter->ctx.warns = sub->ctx.warns;
-        if (++interpreter->ctx.recursion_depth > interpreter->recursion_limit) {
+        if (++interpreter->ctx.recursion_depth >
+                interpreter->recursion_limit) {
             real_exception(interpreter, next, 100,
                     "maximum recursion depth exceeded");
         }
@@ -226,10 +211,9 @@ Creates and returns a clone of the subroutine.
     PMC* clone () {
         struct Parrot_Sub * sub;
         PMC* ret = pmc_new_noinit(INTERP, SELF->vtable->base_type);
-        PObj_custom_mark_destroy_SETALL(ret);
+        PObj_active_destroy_SET(ret);
         sub = PMC_sub(ret) = mem_sys_allocate(sizeof(struct Parrot_Sub));
         memcpy(sub, PMC_sub(SELF), sizeof(struct Parrot_Sub));
-        buffer_mark_COW(sub->ctx.warns);
         PMC_struct_val(ret) = PMC_struct_val(SELF);
         return ret;
     }

@@ -138,9 +138,9 @@ typedef struct Parrot_Context {
     struct Stack_Chunk *user_stack;     /* Base of the scratch stack */
     struct Stack_Chunk *control_stack;  /* Base of the flow control stack */
     IntStack intstack;                  /* Base of the regex stack */
-    Buffer * warns;             /* Keeps track of what warnings
+    UINTVAL warns;             /* Keeps track of what warnings
                                  * have been activated */
-    Buffer * errors;            /* fatals that can be turned off */
+    UINTVAL errors;            /* fatals that can be turned off */
     UINTVAL current_class_offset; /* Offset into the class array of the
                                     currently found method */
     UINTVAL recursion_depth;    /* Sub call resursion depth */
