@@ -309,7 +309,7 @@ PIO_unix_read(theINTERP, ParrotIOLayer *layer, ParrotIO *io,
             return bytes;
         }
     }
-    return bytes;
+    /* return bytes; */ /* XXX never reached -- why was it here? */
 }
 
 
