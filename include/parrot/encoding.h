@@ -19,8 +19,8 @@ typedef struct {
     INTVAL (*characters)(const void *ptr, INTVAL bytes);
     INTVAL (*decode)(const void *ptr);
     void *(*encode)(void *ptr, INTVAL c);
-    void *(*skip_forward)(const void *ptr, INTVAL n);
-    void *(*skip_backward)(const void *ptr, INTVAL n);
+    void *(*skip_forward)(void *ptr, INTVAL n);
+    void *(*skip_backward)(void *ptr, INTVAL n);
 } ENCODING;
 
 const ENCODING *
