@@ -1792,6 +1792,160 @@ inline op substr(inout STR, in INT, in INT, in STR) {
 
 =cut
 
+########################################
+
+=item B<index>(out INT, in STR, in STR)
+
+=item B<index>(out INT, in STR, in STR, in INT)
+
+The index function searches for one string within
+another, but without the wildcard-like behavior of
+a full regular-expression pattern match.  It
+returns the position of the first occurrence of
+$3 in $2 at or after $4.  If $4 is omitted, starts 
+searching from the beginning of the string.  
+The return value is based at "0".
+If the substring is not found, returns "-1".
+
+=cut
+
+inline op index(out INT, in STR, in STR) {
+    STRING *s = $2;
+    STRING *p = $3;
+    INTVAL i,j,ls,lp;
+    const char *cs, *cp;
+    
+    ls = string_length(s);
+    lp = string_length(p);
+    if (s && ls && lp) {
+        cs = string_to_cstring(interpreter, (s));
+        cp = string_to_cstring(interpreter, (p));
+        for(i = 0; i <= ls - lp; i++) {
+            for(j = 0; j < lp; j++)
+                if (cs[i + j] != cp[j])
+                    break;
+            if (j == lp) {
+                $1 = i;
+                goto NEXT();
+            }
+        }
+    }
+    $1 = -1;
+    goto NEXT();
+}
+
+inline op index(out INT, in STR, in STR, in INT) {
+    STRING *s = $2;
+    STRING *p = $3;
+    INTVAL i,j,ls,lp;
+    const char *cs, *cp;
+    
+    ls = string_length(s);
+    lp = string_length(p);
+    if (s && ls && lp) {
+        cs = string_to_cstring(interpreter, (s));
+        cp = string_to_cstring(interpreter, (p));
+        for(i = $4; i <= ls - lp; i++) {
+            for(j = 0; j < lp; j++)
+                if (cs[i + j] != cp[j])
+                    break;
+            if (j == lp) {
+                $1 = i;
+                goto NEXT();
+            }
+        }
+    }
+    $1 = -1;
+    goto NEXT();
+}
+
+=back
+
+=cut
+
+
+########################################
+
+=item B<pack>(inout STR, in INT, in INT)
+
+=item B<pack>(inout STR, in INT, in NUM)
+
+=item B<pack>(inout STR, in INT, in STR)
+
+=item B<pack>(inout STR, in INT, in INT, in INT)
+
+=item B<pack>(inout STR, in INT, in NUM, in INT)
+
+=item B<pack>(inout STR, in INT, in STR, in INT)
+
+Concat $2 bytes from $3 at the end of $1 or replace them at $4 if provided.
+
+BE AFRAID, THIS IS A QUICK HACK, USE IT AT YOUR OWN RISK.
+
+=cut
+
+inline op pack(inout STR, in INT, in INT) {
+    char *c = (char *)&$3;
+    STRING *s;
+
+    s = string_make(interpreter, c, (UINTVAL)$2, NULL, 0, NULL);
+    $1 = string_concat(interpreter, $1, s, 1);
+    string_destroy(s);
+
+    goto NEXT();
+}
+
+inline op pack(inout STR, in INT, in NUM) {
+    char *c = (char *)&$3;
+    STRING *s;
+
+    s = string_make(interpreter, c, (UINTVAL)$2, NULL, 0, NULL);
+    $1 = string_concat(interpreter, $1, s, 1);
+    string_destroy(s);
+
+    goto NEXT();
+}
+
+inline op pack(inout STR, in INT, in STR) {
+    STRING *t,*s = $3;
+    UINTVAL len = (UINTVAL)$2;
+    char *c = s->bufstart;
+    char buf[3];
+
+    if (s->buflen < len) {
+        t = string_make(interpreter, buf, (UINTVAL)(len - s->buflen), NULL, 0, NULL); 
+        $1 = string_concat(interpreter, $1, s, 1);
+    } else {
+        t = string_make(interpreter, s->bufstart, (UINTVAL)len, NULL, 0, NULL); 
+    }
+    $1 = string_concat(interpreter, $1, t, 1);
+    string_destroy(t);
+
+    goto NEXT();
+}
+
+
+inline op pack(inout STR, in INT, in INT, in INT) {
+    char *c = (char *)&$3, *n;
+    STRING *s;
+    const char *t,*f;
+    int i;
+
+    s = string_make(interpreter, c, (UINTVAL)$2, NULL, 0, NULL);
+    /* XXX this is EVIL, use string_replace */
+    n = $1->bufstart;
+    t = string_to_cstring(interpreter, (s));
+    for (i = $4; i < $4 + $2; i++)
+        n[i] = t[i - $4]; 
+    string_destroy(s);
+    
+
+    goto NEXT();
+}
+
+=back
+
+=cut
 
 ###############################################################################
 
