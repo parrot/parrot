@@ -142,7 +142,7 @@ string_copy(struct Parrot_Interp *interpreter, const STRING *s) {
     d = new_string_header(interpreter);
     d->bufstart = Parrot_allocate(interpreter, s->buflen);
     d->buflen = s->buflen;
-    d->flags = s->flags;
+    d->flags = s->flags & (~(unsigned int)BUFFER_constant_FLAG);
     d->bufused = s->bufused;
     d->strlen = s->strlen;
     d->encoding = s->encoding;
