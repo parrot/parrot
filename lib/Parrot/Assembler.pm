@@ -270,6 +270,17 @@ my %equate=('*'=>sub { return $pc },
 	    '__LINE__' => sub { return $line },
 	    '__FILE__' => sub { return "\"$file\"" });
 
+
+###############################################################################
+
+=head2 %encodings
+
+maps string prefixes to encodings.
+
+=cut
+
+my %encodings=('' => 0, 'U8' => 1, 'U16' => 2, 'U32' => 3);
+
 my %opcodes = Parrot::Opcode::read_ops( -f "../opcode_table" ? "../opcode_table" : "opcode_table" );
 
 
@@ -487,7 +498,7 @@ sub add_constants {
   # now emit each constant
   my $counter = 0;
   for( @constants ) {
-    my ($type, $value) = @$_;
+    my ($type, $value, $encoding) = @$_;
 
     add_line_to_listing( sprintf( "\t%04x %s [[%s]]\n", $counter, $type, $value ) );
     $counter++;
@@ -497,7 +508,7 @@ sub add_constants {
     } elsif ($type eq 'n') {
       $const_table->add(Parrot::PackFile::Constant->new_number($value));
     } elsif ($type eq 's') {
-      $const_table->add(Parrot::PackFile::Constant->new_string(0, 0, 0, length($value), $value));
+      $const_table->add(Parrot::PackFile::Constant->new_string(0, $encoding, 0, length($value), $value));
     } else { 
       die; # TODO: Be more specific
     }
@@ -651,7 +662,7 @@ is the index into the constants table where the constant is located.
 
 sub replace_string_constants {
   my $code = shift;
-  $code =~ s/\"([^\\\"]*(?:\\.[^\\\"]*)*)\"/constantize_string($1)/eg;
+  $code =~ s/(U(?:8|16|32))?\"([^\\\"]*(?:\\.[^\\\"]*)*)\"/constantize_string($2,$1)/eg;
   return $code;
 }
 
@@ -1283,14 +1294,17 @@ constants table.
 
 sub constantize_string {
     my $s = shift;
+    my $p = shift || "";
+    my $e = $encodings{$p};
     # handle \ characters in the constant
     my %escape = ('a'=>"\a",'n'=>"\n",'r'=>"\r",'t'=>"\t",'\\'=>'\\',);
     $s=~s/\\([anrt\\])/$escape{$1}/g;
-    if(!exists($constants{$s}{s})) {
-	push(@constants, ['s', $s]);
-	$constants{$s}{s}=$#constants;
+    $s=~s/\\x([0-9a-fA-F]{1,2})/chr(hex($1))/ge;
+    if(!exists($constants{$s}{s}{$e})) {
+	push(@constants, ['s', $s, $e]);
+	$constants{$s}{s}{$e}=$#constants;
     }
-    return "[sc:".$constants{$s}{s}."]";
+    return "[sc:".$constants{$s}{s}{$e}."]";
 }
 
 
