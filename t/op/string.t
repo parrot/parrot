@@ -1,6 +1,6 @@
 #! perl -w
 
-use Parrot::Test tests => 23;
+use Parrot::Test tests => 24;
 
 output_is( <<'CODE', <<OUTPUT, "set_s_sc" );
 	set	S4, "JAPH\n"
@@ -295,6 +295,21 @@ ERROR:
 CODE
 ok
 OUTPUT
+
+output_is(<<'CODE', <<OUTPUT, "same constant twice bug");
+       set     S0, ""
+       set     S1, ""
+       set     S2, "foo"
+       concat  S1,S1,S2
+       print   S1
+       print   S0
+       print   "\n"
+       end
+CODE
+foo
+OUTPUT
+
+
 
 # Set all string registers to values given by &$_[0](reg num)
 sub set_str_regs {

@@ -153,7 +153,7 @@ AUTO_OP set(n, n) {
 }
 
 AUTO_OP set(s, sc) {
-  $1 = $2;
+  $1 = string_copy($2);
 }
 
 AUTO_OP set(s, s) {
