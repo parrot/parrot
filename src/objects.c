@@ -424,7 +424,6 @@ Parrot_add_parent(Parrot_Interp interpreter, PMC *current_class_obj,
                                                           current_class_array,
                                                           current_offset)) {
                     found = 1;
-                    puts("Found it");
                 }
             }
             /* We found it. Yay us. Add the parent class to the list */
@@ -437,7 +436,6 @@ Parrot_add_parent(Parrot_Interp interpreter, PMC *current_class_obj,
                                           current_size + 1);
                 VTABLE_set_pmc_keyed_int(interpreter, current_class_array,
                                          current_size, potential);
-                puts("Adding it in");
             }
         }
     }
