@@ -621,9 +621,9 @@ progclean:
 	cd classes && $(MAKE) progclean && cd ..
 
 testclean :
-	$(RM_F) t/op/*.pasm t/op/*.pbc t/op/*.out \
-	        t/pmc/*.pasm t/pmc/*.pbc t/pmc/*.out \
-	        t/stress/*.pasm t/stress/*.pbc t/stress/*.out \
+	$(RM_F) t/op/*.pasm t/op/*.pbc t/op/*.out t/op/*.o t/op/*.stabs.s \
+	        t/pmc/*.pasm t/pmc/*.pbc t/pmc/*.out t/pmc/*.o t/pmc/*.stabs.s \
+	        t/stress/*.pasm t/stress/*.pbc t/stress/*.out t/stress/*.o t/stress/*.stabs.s \
 	        t/src/*.o t/src/*.c
 
 realclean : clean

@@ -74,6 +74,7 @@ clean:
 	        imcparser.output \
 	        imcc${exe} \
 	        t/*/*.out t/*/*.imc \
+		t/*/*.pbc t/*/*.o t/*/*.stabs.s t/*/*.pasm
 
 realclean: clean
 	$(RM_F) a.pasm \
