@@ -751,6 +751,12 @@ sub handle_label {
   my ($label, $code) = $pline =~ /^(\S+):\s*(.+)?/;
 
   #
+  # Handle code-less lines with both labels and comments.
+  #
+
+  $code = '' if defined $code and $code =~ m/^#/;
+
+  #
   # Local labels (begin with '$'):
   #
 
