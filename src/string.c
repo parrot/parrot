@@ -163,7 +163,9 @@ string_append(struct Parrot_Interp *interpreter, STRING *a,
                 a = string_grow(interpreter, a, b->bufused + EXTRA_SIZE);
             }
             a->flags = b->flags;
-            a->flags &= ~(UINTVAL)BUFFER_constant_FLAG;
+            a->flags &= ~(UINTVAL)(BUFFER_constant_FLAG
+                                   |BUFFER_COW_FLAG
+                                   |BUFFER_external_FLAG);
             a->bufused = b->bufused;
             a->strlen = b->strlen;
             a->encoding = b->encoding;
