@@ -393,6 +393,7 @@ lib/Parrot/String.pm
 lib/Parrot/Test.pm
 lib/Parrot/Types.pm
 lib/Parrot/Vtable.pm
+lib/Parse/RecDescent.pm
 lib/Test/Builder.pm
 lib/Test/More.pm
 lib/Test/Simple.pm
