@@ -208,6 +208,11 @@ Removes and returns the first element in the list.
         return intlist_shift(INTERP, (IntList**) &PMC_data(SELF));
     }
 
+    void splice(PMC* value, INTVAL offset, INTVAL count) {
+        if (SELF->vtable->base_type != value->vtable->base_type)
+            internal_exception(1, "Type mismatch in splice\n");
+        list_splice(INTERP, (List*) PMC_data(SELF), value, offset, count);
+    }
 }
 
 /*
