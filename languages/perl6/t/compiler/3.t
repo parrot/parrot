@@ -1,6 +1,6 @@
 #!perl
 use strict;
-use P6C::TestCompiler tests => 6;
+use P6C::TestCompiler tests => 7;
 
 ##############################
 output_is(<<'CODE', <<'OUT', 'Initializers');
@@ -123,3 +123,18 @@ CODE
 11 12
 OUT
 
+##############################
+output_is(<<'CODE', <<'OUT', "Array slices 2");
+sub main() {
+    my @a = 1..100;
+    my @b;
+    my @c = 0..4;
+    @b[@c] = @a[5..9];
+    print @b, "\n";
+    @b[0..4] = @a[10..14];
+    print @b, "\n";
+}
+CODE
+678910
+1112131415
+OUT

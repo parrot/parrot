@@ -87,9 +87,9 @@ sub paramtype(*) {
 sub import {
     my ($class, $type) = @_;
     my @syms = qw(globalvar localvar paramvar findvar
-		  add_localvar add_param
+		  add_localvar add_globalvar
 		  push_scope pop_scope
-		  gentmp genlabel newtmp
+		  gentmp genlabel newtmp mangled_name
 		  code
 		  add_function set_function exists_function_def
 		  exists_function_decl set_function_params
@@ -103,6 +103,10 @@ sub import {
 	}
     } elsif ($type eq ':external') {
 	foreach (@external) {
+	    *{$caller . '::' . $_} = \&$_;
+	}
+    } else {
+	foreach (@_) {
 	    *{$caller . '::' . $_} = \&$_;
 	}
     }
@@ -143,17 +147,19 @@ sub compile {			# compile input (don't emit)
 sub emit {			# emit all code
     die "Must define main" unless $funcs{main};
     print <<'END';
-.sub _main
-	call main
+.sub __main
+	call __setup
+	call _main
 	end
 	ret
 END
     P6C::Builtins::add_code(\%funcs);
     while (my ($name, $sub) = each %funcs) {
 	unless($sub->code) {
-	    print STDERR "Skipping empty sub $name (builtin or external?)\n";
+	    diag "Function $name has no code.  Builtin?";
 	    next;
 	}
+	$name = mangled_name($name);
 	print ".sub $name\n";
 	$sub->emit;
     }
@@ -218,7 +224,7 @@ sub add_function($) {
     }
     $funcs{$f} = new P6C::IMCC::Sub;
     # NOTE: top-level closure will push a scope.
-    1;
+    return 1;
 }
 
 sub exists_function_def($) {
@@ -238,9 +244,9 @@ sub set_function($) {	       # switch to function, returning old one
 }
 
 sub set_function_params {
+    my $params = $funcs{$curfunc}->args;
     for my $p (@_) {
-	push @{$funcs{$curfunc}->args()},
-	    [$p->var->type, $p->var->mangled_name];
+	push @$params, [$p->var->type, $p->var->name];
     }
 }
 
@@ -274,11 +280,17 @@ Find local variable C<$var>, returning its IMCC name.
 
 Find parameter C<$var>.
 
-=item B<add_localvar($var)>
+=item B<add_localvar($var, $type)>
 
-Declare local variable C<$var>.  Warns if C<$var> is already defined.
-If C<$var-E<gt>type> is a PMC type, C<$var> will automatically be
-initialized.
+Declare local variable C<$var> of type C<$type>.  Warns if C<$var> is
+already defined.  If C<$type> is a PMC type, C<$var> will
+automatically be initialized.
+
+=item B<add_globalvar($var [, $type])>
+
+Declare global variable C<$var>.  Warns if C<$var> is already defined.
+C<$var> will be initialized to a new PMC of type C<$type> (or
+C<PerlUndef> if type is not given) before C<main> is called.
 
 =item B<push_scope()>
 
@@ -290,15 +302,34 @@ Pop a scope from the current function.
 
 =back
 
+=item B<mangled_name($thing)>
+
+Mangle any kind of variable, function, or operator name.
+
+=back
+
 =cut
 
 sub globalvar($) {
-    # Globals always exist...
-    # except when they don't
-    unimp 'No globals yet';
-    my $name = shift->mangled_name;
-    $globals{$name} ||= 1;
-    $name;
+    my $name = shift;
+    if (!exists $globals{$name}) {
+	if ($P6C::o{strict}) {
+	    use P6C::Util 'error';
+	    error "Reference to undeclared global $name";
+	}
+	add_globalvar($name);
+    }
+    return 'global "'.mangled_name($name).'"';
+}
+
+sub add_globalvar($;$) {
+    my $name = shift;
+    if (exists $globals{$name}) {
+	use P6C::Util 'warning';
+	warning "Re-adding global $name";
+    }
+    $globals{$name} = shift || 'PerlUndef';
+    return 'global "'.mangled_name($name).'"';
 }
 
 sub localvar($) {
@@ -308,13 +339,14 @@ sub localvar($) {
     return $funcs{$curfunc}->localvar($var);
 }
 
-sub add_localvar($) {
+sub add_localvar {
     return $funcs{$curfunc}->add_localvar(@_);
 }
 
 sub paramvar($) {
-    my $var = shift->mangled_name;
-    return $var if grep {
+    my $var = shift;
+    my $mname = mangled_name($var);
+    return $mname if grep {
 	$_->[1] eq $var;
     } @{$funcs{$curfunc}->args};
     return undef;
@@ -323,16 +355,36 @@ sub paramvar($) {
 sub findvar($) {
     my ($var) = @_;
     my $name;
-    $name = paramvar($var) || localvar($var) || globalvar($var);
-    return wantarray ? ($name, 0) : $name;
+    my $isglobal;
+    if ($name = paramvar($var) || localvar($var)) {
+	$isglobal = 0;
+    } else {
+	$name = globalvar($var);
+	$isglobal = 1;
+    }
+    return wantarray ? ($name, $isglobal) : $name;
 }
 
 sub push_scope {
+    use Carp 'confess';
+    confess $curfunc unless $curfunc && $funcs{$curfunc};
     $funcs{$curfunc}->push_scope;
 }
 
 sub pop_scope {
     $funcs{$curfunc}->pop_scope;
+}
+
+sub mangled_name($) {
+    my $name = shift;
+    my %mangle = (qw(! _BANG_
+		     ^ IMPL_
+		     $ SV_
+		     @ AV_
+		     % HV_
+		     & CV_));
+    $name =~ s/([\!\$\@\%\&\^])/$mangle{$1}/eg;
+    return '_'.$name;
 }
 
 =head2 Temporary names
@@ -446,6 +498,7 @@ $start:	if $count == 0 goto $end
 	goto $start
 $end:
 END
+    return undef;
 }
 
 sub do_scalar_to_array {
@@ -520,26 +573,25 @@ use Class::Struct 'P6C::IMCC::Sub'
 #	{oldscopes}		# other closed scopes in this sub.
 
 use P6C::Util 'diag';
+use P6C::IMCC 'mangled_name';
 
 sub localvar {
     my ($x, $var) = @_;
-    my $name = $var->mangled_name;
     for (@{$x->scopes}) {
-	if (exists $_->{$name}) {
-	    return $_->{$name}[0];
+	if (exists $_->{$var}) {
+	    return $_->{$var}[0];
 	}
     }
     return undef;
 }
 
 sub add_localvar {
-    my ($x, $var) = @_;
-    my $name = $var->mangled_name;
-    my $scopename = $name.$x->{scopelevel};
-    if ($x->scopes->[0]{$name}) {
-	diag 'Redeclaring lexical '.$var->name." in $curfunc";
+    my ($x, $var, $type) = @_;
+    my $scopename = mangled_name($var).$x->{scopelevel};
+    if ($x->scopes->[0]{$var}) {
+	diag "Redeclaring lexical $var in $curfunc";
     }
-    $x->scopes->[0]{$name} ||= [$scopename, $var->type];
+    $x->scopes->[0]{$var} ||= [$scopename, $type];
     return $scopename;
 }
 
@@ -568,6 +620,7 @@ END
     foreach (@{$x->args}) {
 	my ($t, $pname) = @$_;
 	my $ptype = P6C::IMCC::paramtype($t);
+	$pname = P6C::IMCC::mangled_name($pname);
 	print <<END;
 	.param $ptype	$pname
 END
@@ -668,6 +721,7 @@ END
 
 ##############################
 package P6C::Binop;
+use P6C::IMCC::Binop;
 use P6C::IMCC ':all';
 use P6C::Util ':all';
 use P6C::Context;
@@ -677,25 +731,9 @@ sub simple_binary {
     my $x = shift;
     my $ltmp = $x->l->val;
     my $rtmp = $x->r->val;
-    my $dest = newtmp;
+    my $dest = newtmp 'PerlUndef';
     my $op = $x->op;
     code("\t$dest = $ltmp $op $rtmp\n");
-    return $dest;
-}
-
-# XXX: exponentiation in a loop.  Will be replaced once IMCC allows more ops.
-sub slow_pow {
-    my $x = shift;
-    my $dest = newtmp;
-    my $lv = $x->l->val;
-    my $rv = $x->r->val;
-    my $cnt = gentmp 'int';
-    code(<<END);
-# POW
-	$dest = 1
-	$cnt = $rv
-END
-    code(gen_counted_loop($cnt, "$dest = $dest * $lv\n"));
     return $dest;
 }
 
@@ -703,86 +741,6 @@ END
 sub do_assign {
     my $x = shift;
     return $x->l->assign($x->r);
-}
-
-# short-circuit logical '&&' operator
-sub do_logand {
-    my $x = shift;
-    my $dest = newtmp;
-    my $thenlab = genlabel 'logical_and';
-    my $endlab = genlabel 'logical_and';
-    my $res = $x->l->val;
-    code(<<END);
-	if $res goto $thenlab
-	goto $endlab
-$thenlab:
-END
-    $res = $x->r->val;
-    code(<<END);
-	$dest = $res
-$endlab:
-END
-    return $dest;		# will be undef if first failed.
-}
-
-# Short-circuit logical or.
-sub do_logor {
-    my $x = shift;
-    my $dest = newtmp;
-    my $endlab = genlabel 'logical_or';
-    my $res = $x->l->val;
-    code(<<END);
-# LOGICAL OR
-	$dest = $res
-	if $dest goto $endlab
-END
-    $res = $x->r->val;
-    code(<<END);
-	$dest = $res
-# END_LOGICAL_OR
-$endlab:
-END
-    return $dest;
-}
-
-# Definedness test.  Result is the first defined value, or undef.
-sub do_defined {
-    my $x = shift;
-    my $val = $x->l->val;
-    my $itmp = gentmp 'int';
-    my $res = newtmp;
-    my $endlab = genlabel 'defined';
-    code(<<END);
-	$res = $val
-	$itmp = defined $res
-	if $itmp goto $endlab
-END
-    $val = $x->r->val;
-    code(<<END);
-	$res = $val
-$endlab:
-END
-    return $res;
-}
-
-# String concatenation 
-sub do_concat {
-    # XXX: The PMC concat doesn't seem to work, so we have to go
-    # through strings.
-    my $x = shift;
-    my $lt = gentmp 'str';
-    my $rt = gentmp 'str';
-    my $restmp = gentmp 'str';
-    my $res = newtmp;
-    my $lval = $x->l->val;
-    my $rval = $x->r->val;
-    code(<<END);
-	$lt = $lval
-	$rt = $rval
-	$restmp = $lt . $rt
-	$res = $restmp
-END
-    return $res;
 }
 
 # Handle a comma operator sequence.  Just flattens and calls off to
@@ -795,12 +753,6 @@ sub do_array {
     my $vallist = P6C::ValueList->new(vals => \@things);
     $vallist->{ctx} = $x->{ctx};
     return $vallist->val;
-}
-
-# 'x' operator.  Waiting for IMCC development, since it's just a
-# simple opcode.
-sub do_repeat {
-    unimp 'repeat';
 }
 
 # Binary infix operators.
@@ -831,253 +783,42 @@ our %ops =
  '..'	=> \&do_range,
 );
 
+our %op_is_array;
+BEGIN {
+    my @arrayops = qw(= .. x , // ~~ && ||);
+    @op_is_array{@arrayops} = (1) x @arrayops;
+}
+
 sub val {
     my $x = shift;
     if (ref($x->op) eq 'P6C::hype') {
+	use P6C::IMCC::hype 'do_hyped';
 	return do_hyped($x->op->op, $x->l, $x->r);
     }
+    my $ret;
     if ($ops{$x->op}) {
-	return $ops{$x->op}->($x);
+	$ret = $ops{$x->op}->($x);
     } elsif($x->op =~ /^([^=]+)=$/ && $ops{$1}) {
 	# Translate assignment operation into a binary operation.
 	# XXX: Context propagation is broken for these, so we won't
 	# ever do this.
-	return $ops{'='}->(new P6C::Binop op => '=', l => $x->l,
+	$ret = $ops{'='}->(new P6C::Binop op => '=', l => $x->l,
 			   r => P6C::Binop->new(op => $1, l => $x->l,
 						r => $x->r));
     } else {
 	unimp $x->op;
     }
-}
 
-# XXX: We go through typed registers instead of PMC registers for some
-# hyped operators.  Not sure if this is a good idea.
-
-our %optype;
-BEGIN {
-    my %opmap = (int => [ qw(>> << | & ~ ~~)],
-		 num => [ qw(+ - * / % **)]);
-    while (my ($t, $ops) = each %opmap) {
-	@optype{@$ops} = ($t) x @$ops;
+    if (!$op_is_array{$x->op} && $x->{ctx}->is_array) {
+	return do_scalar_to_array($ret);
     }
-}
-
-# Generate the loop body to compute "$targ = $lindex $op $rindex".
-#
-# XXX: may need to re-map op symbols if IMCC and Perl 6 don't agree on
-# them.
-#
-sub simple_hyped {
-    my ($op, $targ, $lindex, $rindex) = @_;
-    my $optype = $optype{$op} or unimp "Can't hype $op yet";
-    my $ltmp = gentmp $optype;
-    my $rtmp = gentmp $optype;
-    my $dest = gentmp $optype;
-    return <<END;
-	$ltmp = $lindex
-	$rtmp = $rindex
-	$dest = $ltmp $op $rtmp
-	$targ = $dest
-END
-}
-
-sub hype_and {
-    my ($op, $targ, $lindex, $rindex) = @_;
-    my $tmp = newtmp;
-    my $middle = genlabel;
-    my $end = genlabel;
-    return <<END;
-	$tmp = $lindex
-	if $tmp goto $middle
-	goto $end
-$middle:
-	$tmp = $rindex
-	$targ = $tmp
-$end:
-END
-}
-
-sub hype_or {
-    my ($op, $targ, $lindex, $rindex) = @_;
-    my $tmp = newtmp;
-    my $end = genlabel;
-    # XXX: targ, lindex, and rindex may be subscripted, so we can't
-    # use them directly in the test.
-    return <<END;
-	$tmp = $lindex
-	if $tmp goto $end
-	$tmp = $rindex
-$end:
-	$targ = $tmp
-END
-}
-
-our %hype_body = ('||' => \&hype_or, '&&' => \&hype_and);
-
-sub hype_body {
-    my $op = $_[0];
-    if (exists $hype_body{$op}) {
-	return $hype_body{$op}->(@_);
-    } else {
-	return simple_hyped(@_);
-    }
-}
-
-# Hyped operations promote a scalar left- or right-hand side to an
-# array.  XXX: should probably do context, since a hyper-operator in
-# tuple or scalar context can do less work.
-sub do_hyped {
-    my ($op, $l, $r) = @_;
-    if (is_array_expr($l) && is_array_expr($r)) {
-	return hype_array_array(@_);
-    } elsif (is_array_expr($l)) {
-	return hype_array_scalar(@_);
-    } elsif (is_array_expr($r)) {
-	return hype_scalar_array(@_);
-    } else {
-	diag "Tried to hyper-operate two scalars";
-	return simple_binary(@_);
-    }
-}
-
-# @xs ^op $y
-sub hype_array_scalar {
-    my ($op, $l, $r) = @_;
-    my $lval = $l->val;
-    my $rval = $r->val;
-    my $len = gentmp 'int';
-    my $dest = newtmp 'PerlArray';
-
-    # Initialization code:
-    code(<<END);
-	$len = $lval
-	$dest = $len
-END
-    my $code = hype_body($op, "$dest\[$len]", "$lval\[$len]", $rval);
-    code(gen_counted_loop($len, $code));
-    return $dest;
-}
-
-# $x ^op @ys
-sub hype_scalar_array {
-    my ($op, $l, $r) = @_;
-    my $lval = $l->val;
-    my $rval = $r->val;
-    my $len = gentmp 'int';
-    my $dest = newtmp 'PerlArray';
-
-    # Initializers:
-    code(<<END);
-	$len = $rval
-	$dest = $len
-END
-    my $code = hype_body($op, "$dest\[$len]", $lval, "$rval\[$len]");
-    code(gen_counted_loop($len, $code));
-    return $dest;
-}
-
-# @xs ^op @ys
-#
-# Currently iterates over the number of elements in the _shorter_ of
-# the two arrays, rather than the longer.  This is useful for working
-# with infinite lists, but may not be the behavior in the Apocalypses
-# (XXX: check this).
-#
-sub hype_array_array {
-    my ($op, $l, $r) = @_;
-    my $lval = $l->val;
-    my $rval = $r->val;
-    my $llen = gentmp 'int';
-    my $rlen = gentmp 'int';
-
-    my $cntlabel = genlabel;
-    my $dest = newtmp 'PerlArray';
-    my $looptop = genlabel 'hyper';
-    my $loopend = genlabel 'hyper_end';
-
-    # Header to figure out appropriate length.
-    code(<<END);
-	$llen = $lval
-	$rlen = $rval
-	if $llen > $rlen goto $cntlabel
-	$llen = $rlen
-$cntlabel:
-	$dest = $llen
-END
-    my $code
-	= hype_body($op, "$dest\[$rlen]", "$lval\[$rlen]", "$rval\[$rlen]");
-    code(gen_counted_loop($rlen, $code));
-    return $dest;
-}
-
-sub do_range {
-    my $x = shift;
-    my $ctx = $x->{ctx};
-
-    if ($ctx->is_array) {
-	# XXX: no way to clone PMC's so we have to go through
-	# temporaries to create new values.
-	my $ret = newtmp 'PerlArray';
-	my $itmp = gentmp 'int';
-	my $vtmp = gentmp 'int';
-	my $lval = $x->l->val;
-	my $rval = $x->r->val;
-	my $val = newtmp;
-	my $start = genlabel 'range_start';
-	my $end = genlabel 'range_end';
-	code(<<END);
-	$val = $lval
-	$itmp = 0
-$start:
-	if $val > $rval goto $end
-	$vtmp = $val
-	$ret\[$itmp] = $vtmp
-	inc $val
-	inc $itmp
-	goto $start
-$end:
-END
-	return $ret;
-
-    } elsif ($ctx->is_scalar) {
-	# Probably an iterator.  Or maybe that's its own context.  Not
-	# sure.  We lose in any case.
-	unimp "Range in scalar context.";
-
-    } elsif ($ctx->is_tuple) {
-	# generate enough undef's:
-	my @ret;
-	for (@{$ctx->type}) {
-	    push @ret, newtmp;
-	}
-	# Figure out endpoints, and jump to the end if we go past the end.
-	my $lval = $x->l->val;
-	my $rval = $x->r->val;
-	my $end = genlabel 'range_end';
-	my $vtmp = gentmp 'int';
-	for my $i (0 .. $#{$ctx->type}) {
-	    # XXX: promoting everything to PMC registers.
-	    code(<<END);
-	if $lval > $rval goto $end
-	$vtmp = $lval
-	$ret[$i] = $vtmp
-	inc $lval
-END
-	}
-	code(<<END);
-$end:
-END
-	return [@ret];
-
-    } else {
-	use Data::Dumper;
-	unimp "Unsupported range context ".Dumper($ctx->type);
-    }
+    return $ret;
 }
 
 ######################################################################
 package P6C::incr;
 use P6C::IMCC ':all';
+use P6C::Util 'is_scalar';
 
 our %inplace_op = ('++' => 'inc', '--' => 'dec');
 our %outaplace_op = ('++' => '+ 1', '--' => '- 1');
@@ -1091,25 +832,41 @@ sub val {
     # never happen, then the assigns can be removed here.
 
     # Optimize post-increment in void context to a pre-increment.
-    if ($x->post && !$x->{ctx}->type eq 'void') {
+    if ($x->post && !($x->{ctx}->type eq 'void')) {
 	my $op = $outaplace_op{$x->op}
 	    or die $x->op().' increment not understood';
-	my $val = $x->thing->val;
-	my $tmp = newtmp;
-	my $tmp2 = newtmp;
-	code(<<END);
+	if ($x->thing->isa('P6C::sv_literal') 
+		&& is_scalar($x->thing->type)) {
+	    my $val = $x->thing->val;
+	    my $tmp = newtmp 'PerlUndef';
+	    code(<<END);
+	$tmp = $val
+	$val = $val $op
+END
+    	    return $tmp;
+	} else {
+	    my $val = $x->thing->val;
+	    my $tmp = newtmp 'PerlUndef';
+	    my $tmp2 = newtmp 'PerlUndef';
+	    code(<<END);
 	$tmp = $val
 	$tmp2 = $val $op
 END
-	$x->thing->assign(new P6C::Register reg => $tmp2);
-	return $tmp;
-
+	    $x->thing->assign(new P6C::Register reg => $tmp2,
+			      type => 'PerlUndef');
+	    return $tmp;
+	}
     } else {
 	my $op = $inplace_op{$x->op}
 	    or die $x->op().' increment not understood';
 	$ret = $x->thing->val;
 	code("\t$op $ret\n");
-	$x->thing->assign(new P6C::Register reg => $ret);
+	unless ($x->thing->isa('P6C::variable')
+		&& is_scalar($x->thing->type)) {
+	    # Complex expression => can't just do increment.
+	    $x->thing->assign(new P6C::Register reg => $ret,
+			      type => $x->thing->type);
+	}
 	return $ret;
     }
 }
@@ -1121,7 +878,7 @@ use P6C::IMCC ':all';
 # Ternary operator as an r-value.  Context-aware.
 sub val {
     my $x = shift;
-    my $tmp = newtmp;
+    my $tmp = newtmp 'PerlUndef';
     my ($thenlab, $endlab) = (genlabel("ternary_then"),
 			      genlabel("ternary_end"));
     code(<<END);
@@ -1157,7 +914,7 @@ END
 # fall back to just using the same op-tree for both sides.
 sub assign {
     my ($x, $thing) = @_;
-    my $tmp = newtmp;
+    my $tmp = newtmp 'PerlUndef';
     my ($thenlab, $endlab) = (genlabel("ternary_then"),
 			      genlabel("ternary_end"));
     code(<<END);
@@ -1201,7 +958,7 @@ sub P6C::sv_literal::val {
 	|| same_type($ctx->type, $type)
 	|| (is_scalar($ctx->type) && is_scalar($type))) {
 	warn "literal in void context" if $ctx->type eq 'void';
-	$ret = newtmp;
+	$ret = newtmp 'PerlUndef';
 	code(<<END);
 	$ret = $val
 END
@@ -1210,16 +967,16 @@ END
 	$ret = do_scalar_to_array($val);
 
     } elsif ($ctx->is_tuple) {
-	$ret = newtmp;
+	$ret = newtmp 'PerlUndef';
 	code(<<END);
 	$ret = $val
 END
 
     } else {
-# 	use Data::Dumper;
-# 	unimp "Context ", Dumper($ctx);
+ 	use Data::Dumper;
+ 	unimp "Context ", Dumper($ctx);
 	# XXX: bogus
-	$ret = newtmp;
+	$ret = newtmp 'PerlUndef';
 	code(<<END);
 	$ret = $val
 END
@@ -1228,302 +985,11 @@ END
 }
 
 ######################################################################
-# Prefix operators (i.e. functions and control structures)
-package P6C::prefix;
-use P6C::IMCC ':all';
-use P6C::Util ':all';
-use P6C::Context;
+# Prefix operators (see P6C/IMCC/prefix.pm)
 
-sub val_noarg {
-    my $block = shift;
-    # XXX: pretend that the block has a no-argument prototype, since
-    # otherwise it will complain.  This is the wrong behavior for the
-    # topicalizing control structures, but we don't support them yet,
-    # anyways.
+sub P6C::prefix::val {
+    use P6C::IMCC::prefix qw(%prefix_ops gen_sub_call);
 
-    my $saveparam = $block->params;
-    $block->params(new P6C::params req => [], opt => [], rest => undef);
-    $block->val;
-    $block->params($saveparam);
-}
-
-# if/elsif/elsunless/else sequence
-sub prefix_if {
-    my $x = shift;
-    my $end = genlabel "endif";
-    my $tmp = newtmp;
-    my $nextlab;
-    foreach (@{$x->args}) {
-	my ($sense, $test, $block) = @$_;
-	$sense ||= $x->name;
-	if ($nextlab) {
-	    code("$nextlab:\n");
-	}
-	$nextlab = genlabel 'if';
-	if (!ref $test) {
-	    val_noarg($block);
-	} else {
-	    my $v = $test->val;
-	    if ($sense =~ /if$/) { # (els)?if
-		code(<<END);
-	$tmp = ! $v
-	if $tmp goto $nextlab
-END
-	    } else {		# (els)?unless
-		code(<<END);
-	if $v goto $nextlab
-END
-	    }
-	    val_noarg($block);
-	    code(<<END);
-	goto $end
-END
-	}
-    }
-    code(<<END);
-$nextlab:
-$end:		# END OF @{[$x->name]}
-END
-    return undef;
-}
-
-sub common_while {
-    my ($name, $gentest, $genbody) = @_;
-    my $start = genlabel 'start_while';
-    my $end = genlabel 'endwhile';
-    code(<<END);
-$start:
-END
-    my $testval = $gentest->();
-    if ($name eq 'while') {
-	my $startbody = genlabel 'while_body';
-	code(<<END);
-	if $testval goto $startbody
-	goto $end
-$startbody:
-END
-    } else {
-	code(<<END);
-	if $testval goto $end
-END
-    }
-    $genbody->();
-    code(<<END);
-	goto $start
-$end:
-END
-}
-
-sub prefix_while {
-    my $x = shift;
-    my ($test, $body) = ($x->args->vals(0), $x->args->vals(1));
-    common_while($x->name, sub { $test->val }, sub { val_noarg($body) });
-}
-
-# Do a subroutine call.
-#
-# XXX: currently ignores context.  We don't have a way of
-# communicating context to functions anyways, so this isn't a problem.
-sub gen_sub_call {
-    my ($x) = @_;
-
-    my $func = $P6C::IMCC::funcs{$x->name};
-    my $args = $x->args->val;
-
-    # Sometimes function arguments are a tuple, sometimes not.  Make
-    # things consistent.
-    if (ref($args) ne 'ARRAY') {
-	$args = [$args];
-    }
-    if (@$args != @{$func->args}) {
-	# internal error.
-	die "Wrong number of arguments for ".$x->name.": got ".@$args
-	    .", expected ".@{$func->args};
-    }
-
-    foreach (reverse @$args) {
-	code("\t.arg	$_\n");
-    }
-    my $name = $x->name;
-    code("\tcall	$name\n");
-    return newtmp;		# XXX: return values not implemented.
-}
-
-sub prefix_for {
-    my ($x) = @_;
-    # XXX: apo 4 explicitly says this is lazy, but we take a greedy
-    # approach here.
-    my ($streams, $body) = @{$x->args->vals};
-    unless (ref $streams eq 'ARRAY') {
-	use Data::Dumper;
-	die Dumper($streams);
-    }
-    my @bindings = map { [flatten_leftop($_, ',')] }
-	flatten_leftop($body->params, ';');
-    die "for: internal error" unless @bindings == 1 || @bindings == @$streams;
-    
-    # XXX: body closure should take care of params, but since we're
-    # faking the scope, we need to handle the params here.
-
-    # XXX: we iterate over the shortest length.  Apo 4 doesn't say
-    # anything about this, but it's consistent with what we're doing
-    # for hyperoperators, and all but necessary if we deal with
-    # infinite streams.
-
-    # XXX: There should be a "clean" version for the common case where
-    # we're iterating over one stream.
-
-    push_scope;
-
-    my @vars;			# variables to be bound for each iter.
-    print STDERR "for: bindings";
-    for (@bindings) {
-	my @l;
-	for my $v (@$_) {
-	    push @l, add_localvar($v);
-	}
-	print STDERR ' '.@l;
-	push @vars, [@l];
-    }
-    print STDERR "\n";
-
-    my @streamvals = map { $_->val } @$streams;
-    print STDERR "for ".@streamvals." streams\n";
-
-    ##############################
-    if (@bindings == 1) {
-	# No semicolons on RHS => alternate across streams:
-	@vars = @{$vars[0]};
-	my $nstreams = @$streams;
-	my $valsrc = newtmp 'PerlArray'; # value streams.
-	my $tmpsrc = newtmp 'PerlUndef'; # temp for stream.
-	my $stream = gentmp 'int';	# index into streams.
-	my $streamoff = gentmp 'int'; # offset within streams.
-	my $streamlen = gentmp 'int'; # length of shortest stream.
-	my $niters = gentmp 'int';	# number of iterations.
-	my $itmp = gentmp 'int';
-	my $loopstart = genlabel 'start_for';
-
-	# Initialization:
-	code(<<END);
-	$stream = 0
-	$streamoff = 0
-	$streamlen = 2000000000
-	$niters = 0
-	$valsrc = $nstreams
-END
-	for my $i (0..$#{$streams}) {
-	    my $streamval = $streamvals[$i];
-	    my $notless = genlabel;
-	    code(<<END);
-	$valsrc\[$i] = $streamval
-	$itmp = $streamval
-	if $itmp > $streamlen goto $notless
-	$streamlen = $itmp
-$notless:
-END
-	}
-
-	# Figure out number of iterations:
-	my $nvars = @vars;
-	code(<<END);
-	$niters = $streamlen * $nstreams
-	$niters = $niters / $nvars
-$loopstart:
-END
-
-	# bind variables:
-	for my $v (@vars) {
-	    my $notnext = genlabel;
-	    code(<<END);
-	$tmpsrc = $valsrc\[$stream]
-	$v = $tmpsrc\[$streamoff]
-	inc $stream
-	if $stream < $nstreams goto $notnext
-	$stream = 0
-	inc $streamoff
-$notnext:
-END
-	}
-
-	# Loop body:
-	val_noarg($body);
-	code(<<END);
-	dec $niters
-	if $niters > 0 goto $loopstart
-END
-
-    ##############################
-    } else {
-	# Semicolon on RHS => parallel iteration.
-	my $niters = gentmp 'int'; # number of iterations
-	my @streamoff;		# offset within each stream.
-	push(@streamoff, gentmp 'int') for @streamvals;
-	my $itmp = gentmp 'int';
-	my $loopstart = genlabel 'start_for';
-	my $notless = genlabel;
-	
-	code(<<END);
-	$niters = 2000000000
-END
-	# Figure out how many iterations:
-	for my $i (0 .. $#streamvals) {
-	    my $nvars = @{$vars[$i]};
-	    code(<<END);
-	$streamoff[$i] = 0
-	$itmp = $streamvals[$i]
-	$itmp = $itmp / $nvars
-	if $itmp > $niters goto $notless
-	$niters = $itmp
-$notless:
-END
-	}
-	code(<<END);
-$loopstart:
-END
-	# Bind variables:
-	for my $i (0 .. $#streamvals) {
-	    for my $j (0 .. $#{$vars[$i]}) {
-		code(<<END);
-	$vars[$i][$j] = $streamvals[$i]\[$streamoff[$i]]
-	inc $streamoff[$i]
-END
-	    }
-	}
-	
-	# Generate loop body:
-	val_noarg($body);
-	code(<<END);
-	dec $niters
-	if $niters > 0 goto $loopstart
-END
-    }
-    pop_scope;
-    return undef;
-}
-
-# unary minus.
-sub prefix_neg {
-    my $x = shift;
-    my $tmp = $x->args->val;
-    my $res = newtmp;
-    code(<<END);
-	$res = - $tmp
-END
-    return $res;
-}
-
-our %prefix_ops =
-(
- 'if' => \&prefix_if,
- 'unless' => \&prefix_if,
- 'while' => \&prefix_while,
- 'until' => \&prefix_while,
- 'for' => \&prefix_for,
- '-' => \&prefix_neg,
-);
-
-sub val {
     my $x = shift;
     # XXX: temporary hack.
     if (exists_function_decl($x->name)) {
@@ -1540,36 +1006,7 @@ sub val {
 package P6C::guard;
 use P6C::IMCC ':all';
 use P6C::Util 'unimp';
-
-sub guard_if {
-    my $x = shift;
-    my $test = $x->test->val;
-    my $end = genlabel $x->name;
-    if ($x->name eq 'unless') {
-	code(<<END);
-	if $test goto $end
-END
-    } else {
-	my $foo = genlabel;
-	code(<<END);
-	if $test goto $foo
-	goto $end
-$foo:
-END
-    }
-    $x->expr->val;
-    code(<<END);
-$end:
-END
-    return undef;
-}
-
-sub guard_while {
-    my $x = shift;
-    P6C::prefix::common_while($x->name,
-			      sub { $x->test->val },
-			      sub { $x->expr->val });
-}
+use P6C::IMCC::guard qw(guard_if guard_while);
 
 our %guards =
 (
@@ -1693,7 +1130,7 @@ sub P6C::sub_def::val {
     use P6C::Util 'diag';
     my $x = shift;
 
-    if (exists_function_def($x->name)) {
+    if (exists_function_def($x)) {
 	diag "Redefining function ".$x->name;
     }
     add_function($x->name);
@@ -1704,7 +1141,7 @@ sub P6C::sub_def::val {
 
 ######################################################################
 package P6C::closure;
-use P6C::Util 'unimp';
+use P6C::Util qw(unimp map_tree);
 use P6C::IMCC ':all';
 
 # A sub with no explicit parameter list gets @_.
@@ -1720,81 +1157,134 @@ BEGIN {
 
 sub val {
     my $x = shift;
+    my $ctx = $x->{ctx};
+    my ($name, $ofunc);		# for closure return value.
+    my @params;
+    if ($ctx->type ne 'void') {
+	# We need to create a closure.  This is disgusting.
+	$name = genlabel 'closure';
+	add_function($name);
+	$ofunc = set_function($name);
+    }
+
     unless ($x->params) {
 	$x->params($default_params);
     }
     push_scope;
-    if ($x->params->isa('P6C::Binop')) {
-	# Closure arguments are different, since ';' means "dimension"
-	my @params;
-	foreach ($x->params->flatten_leftop(';')) {
-	    push @params, $_->flatten_leftop(',');
-	}
-	set_function_params(@params);
-    } elsif (!defined $x->params->max) {
-	set_function_params($x->params->rest);
+    if (!defined $x->params->max) {
+	@params = $x->params->rest;
     } elsif ($x->params->min != $x->params->max) {
 	# Only support variable number of params if it's zero - Inf.
 	unimp "Unsupported parameter arity: ",
 	    $x->params->min . ' - ' . $x->params->max;
     } else {
-	set_function_params(@{$x->params->req});
+	@params = @{$x->params->req};
     }
+
+    set_function_params(@params);
+
     if (defined($x->block)) {
 	# Real definition, not just declaration.
 	foreach my $stmt (@{$x->block}) {
 	    $stmt->val;
 	}
     }
+    if ($ctx->type ne 'void') {
+	# Create a closure.
+	set_function($ofunc);
+	my $ret = newtmp 'Sub';
+	my $itmp = gentmp 'int';
+	code(<<END);
+	$itmp = addr _$name
+	$ret = $itmp
+END
+	return $ret;
+    }
     pop_scope;
+    return undef;
 }
 
 ######################################################################
 package P6C::variable;
 use P6C::IMCC ':all';
 use P6C::Context;
-use P6C::Util qw(is_scalar same_type unimp);
-
-# Name mangling to protect IMCC from Perl's wacky variable names.
-sub mangled_name {
-    my %mangle = (qw(! _BANG_
-		     $ SV_
-		     @ AV_
-		     % HV_
-		     & CV_));
-    my $x = shift;
-    return $x->{mangled} if exists $x->{mangled};
-    my $name = $x->name;
-    $name =~ s/([\!\$\@\%\&])/$mangle{$1}/eg;
-    return $x->{mangled} = $name;
-}
+use P6C::Util qw(is_scalar same_type unimp is_pmc);
 
 # XXX: need to redo this when we get globals.
 sub val {
     my $x = shift;
     my $ctx = $x->{ctx};
+    use Data::Dumper;
     return undef if $ctx->type eq 'void';
-    my $v = findvar($x);
+    my ($v, $global) = findvar($x->name);
+    if ($global) {
+	my $reg = newtmp 'PerlUndef';
+	code(<<END);
+	$reg = $v
+END
+	$v = $reg;
+    }
+
     if (!$ctx->type
 	|| same_type($x->type, $ctx->type)
-	|| (is_scalar($x->type) && is_scalar($ctx->type))
-	|| $ctx->is_tuple) {
+	|| (is_scalar($x->type) && is_scalar($ctx->type))) {
 	return $v;
+
     } elsif (is_scalar($x->type) && $ctx->is_array) {
 	return do_scalar_to_array($v);
-    } else {
-#	unimp "Variable of type ", $x->type, " in context ", $ctx->type;
-	# XXX: bogus.
+
+    } elsif ($ctx->is_tuple) {
+	my @ret;
+	my $itmp = gentmp 'int';
+	my $len = gentmp 'int';
+	my $nomore = genlabel 'array_to_tuple';
+	code(<<END);
+	$len = $v
+	$itmp = 0
+END
+	for (@{$ctx->type}) {
+	    my $vtmp = newtmp 'PerlUndef';
+	    code(<<END);
+	if $itmp >= $len goto $nomore
+	$vtmp = $v\[$itmp]
+	inc $itmp
+END
+	    push @ret, $vtmp;
+	}
+	code(<<END);
+$nomore:
+END
+	return [@ret];
+
+    } elsif ($ctx->is_scalar && $x->type eq 'PerlArray') {
 	return $v;
+
+    } else {
+	unimp "Variable of type ", $x->type, " in context ", $ctx->type;
     }
 }
 
 sub assign {
     my ($x, $thing) = @_;
-    my $name = findvar($x);
+    my ($name, $global) = findvar($x->name);
     my $tmpv = $thing->val;
-    code("\t$name = $tmpv\n");
-    return $name;
+    if ($global) {
+	code("# ASSIGN GLOBAL ".$x->name."\n");
+	code("\t$name = $tmpv\n");
+	return $tmpv;		# XXX: is this okay?
+    } else {
+	# If we assign a PMC to a PMC (or a string to a string...), we
+	# have to remember to clone it before it's modified.  Why not
+	# do so here?
+	code("# ASSIGN TO ".$x->name."\n");
+	if (is_pmc($x->type) && $thing->can('type') && is_pmc($thing->type)
+	    && $thing->type ne 'PerlArray') { # XXX: can't clone arrays.
+	    code("\t$name = clone $tmpv\n");
+	} else {
+	    code("\t$name = $tmpv\n");
+	}
+	return $name;
+    }
 }
 
 ######################################################################
@@ -1812,7 +1302,11 @@ sub val {
     if (@{$x->props}) {
 	unimp 'variable properties';
     }
-    add_localvar($_) for @{$x->vars};
+    if (ref $x->vars eq 'ARRAY') {
+	add_localvar($_->name, $_->type) for @{$x->vars};
+    } else {
+	add_localvar($x->vars->name, $x->vars->type);
+    }
 }
 
 # A declaration with initializers shows up as assigning to a decl.
@@ -1825,28 +1319,34 @@ sub assign {
 
     my $tmpv = $thing->val;
 
-    # once again, we are evaluating an expression in tuple context, so
-    # the val function may return an array ref.
-    if (@{$x->vars} == 1) {
+    if (ref $x->vars ne 'ARRAY') {
 	if (ref($tmpv) eq 'ARRAY') {
+	    use Carp 'cluck';
+	    cluck "shouldn't return tuple in scalar context\n";
 	    $tmpv = $tmpv->[-1];
 	}
-	add_localvar($x->vars(0));
-	$x->vars(0)->assign(new P6C::Register reg => $tmpv);
+	add_localvar($x->vars->name, $x->vars->type);
+	$x->vars->assign(new P6C::Register reg => $tmpv,
+			 type => $x->vars->type);
     } else {
+	# If we are evaluating an expression in tuple context, the val
+	# function must return an array ref.
 	if (ref $tmpv ne 'ARRAY') {
+	    use Carp 'cluck';
+	    cluck "Shouldn't pass single item to tuple\n";
 	    $tmpv = [$tmpv];
 	}
-	my $min = @$tmpv < @{$x->vars} ? @$tmpv : @{$x->vars};
+	my @vars = @{$x->vars};
+	my $min = @$tmpv < @vars ? @$tmpv : @vars;
 	for my $i (0.. $min - 1) {
-	    add_localvar($x->vars($i));
-	    $x->vars($i)->assign(new P6C::Register reg => $tmpv->[$i]);
+	    add_localvar($vars[$i]->name, $vars[$i]->type);
+	    $vars[$i]->assign(new P6C::Register reg => $tmpv->[$i]);
 	}
 
 	# In case we had more variables than values (tuple rvalues can
 	# do this), declare the rest of the variables.
-	for my $i ($min .. $#{$x->vars}) {
-	    add_localvar($x->vars($i));
+	for my $i ($min .. $#vars) {
+	    add_localvar($vars[$i]->name, $vars[$i]->type);
 	}
 	return undef;
     }
@@ -1857,7 +1357,6 @@ sub assign {
 sub P6C::indices::val {
     my $x = shift;
     my $ctx = $x->{ctx};
-    use Data::Dumper;
     return $x->indices->val;
 }
 
@@ -1869,21 +1368,31 @@ use P6C::IMCC ':all';
 # Temporary types for different slices:
 our %temptype = qw(PerlArray int PerlHash str);
 
-# Slice value.
-#
-# XXX: ignores context in bad ways.  For example, "@x = @y[1]" will
-# set @x's size, but "@x = @y[1,2,3]" will assign a slice array to @x.
-# This should be fixable.
-#
-# XXX: doesn't handle subscripting by an array, e.g. @x[@y].
-#
-# XXX: completely broken.  Need to fix this.
+sub call_closure {
+    my ($thing, $args) = @_;
+    my $argval = $args ? $args->val : newtmp('PerlArray');
+    my $func = $thing->val;
+    code(<<END);
+	.arg	$argval
+	.arg	$func
+	call	__CALL_CLOSURE
+END
+    return undef;		# XXX: return values not implemented.
+}
+
+# Slice value.  Probably doesn't handle every single case, but it
+# should handle most.
 sub val {
     my ($x) = @_;
     if (@{$x->subscripts} > 1) {
 	# XXX: shouldn't be too hard -- just evaluate subscripts
 	# recursively on temporaries.  Not sure how context would work.
 	unimp "multi-level subscripting";
+    }
+    if ($x->subscripts(0)->type eq 'Sub') {
+	# Function call
+	call_closure($x->thing, $x->subscripts(0)->indices);
+	return undef;
     }
     code("# Base for indexing\n");
     my $thing = $x->thing->val;
@@ -1898,7 +1407,7 @@ sub val {
     my $ctx = $x->{ctx};
     if ($ctx->is_scalar) {
 	# Scalar context or single item => return last/only item.
-	$ret = newtmp;
+	$ret = newtmp 'PerlUndef';
 	my $itmp = gentmp $temptype{$type};
 	$indexval = $indexval->[-1] if ref $indexval;
 	code(<<END);
@@ -1906,19 +1415,19 @@ sub val {
 	$ret = $thing\[$itmp]
 END
 
-    } elsif ($ctx->is_array) {
+    } elsif ($ctx->is_array || $ctx->flatten) {
 	# Slice in array context.
 	$ret = newtmp 'PerlArray';
 	my $tmp = gentmp;
 	my $itmp = gentmp $temptype{$type};
-	my $ptmp = newtmp;
+	my $ptmp = newtmp 'PerlUndef';
 	my $ret_index = gentmp 'int';
 	code(<<END);
 	$ret_index = $indexval
 	$ret = $ret_index
 END
 	code(gen_counted_loop($ret_index, <<END));
-$itmp = $indexval\[$ret_index]
+	$itmp = $indexval\[$ret_index]
 	$ptmp = $thing\[$itmp]
 	$ret\[$ret_index] = $ptmp
 END
@@ -1929,7 +1438,7 @@ END
 	die unless ref $indexval eq 'ARRAY';
 
 	for (@$indexval) {
-	    my $rettmp = newtmp;
+	    my $rettmp = newtmp 'PerlUndef';
 	    push @ret, $rettmp;
 	    code(<<END);
 	$itmp = $_
@@ -1952,7 +1461,6 @@ sub assign {
     }
     my $indexval = $x->subscripts(0)->val;
     my $type = $x->subscripts(0)->type;
-    my $ret;
     my $rhs = $thing->val;
     my $lhs = $x->thing->val;
     my $lctx = $thing->{ctx};
@@ -1960,7 +1468,6 @@ sub assign {
     if ($lctx->is_scalar) {
 	# XXX: This isn't quite right, since we're taking lhs's
 	# C<val>.  But it works for simple @arrays.
-	$ret = newtmp;
 	my $itmp = gentmp $temptype{$type};
 	$indexval = $indexval->[-1] if ref $indexval;
 	code(<<END);
@@ -1968,10 +1475,82 @@ sub assign {
 	$lhs\[$itmp] = $rhs
 END
 	return $rhs;	# XXX: should return $lhs[$itmp] ?
+
+    } elsif ($lctx->is_tuple) {
+	my $itmp = gentmp $temptype{$type};
+	for my $i (0..$#{$indexval}) {
+	    code(<<END);
+	$itmp = $indexval->[$i]
+	$lhs\[$itmp] = $rhs->[$i]
+END
+	}
+
+    } elsif ($lctx->is_array) {
+	my $index = gentmp $temptype{$type};
+	my $iter = gentmp 'int';
+	my $long = gentmp 'int';
+	my $short = gentmp 'int';
+	my $ptmp = newtmp;
+	my $start = genlabel 'slice_assign';
+	my $start2 = genlabel 'cleanup';
+	my $end2 = genlabel 'cleanup';
+	# Figure out how many values to assign:
+	code(<<END);
+	$short = $indexval
+	$long = $rhs
+	if $short < $long goto $start
+	$iter = $short
+	$short = $long
+	$long = $iter
+$start:
+	$iter = $short
+END
+	# Assign them:
+	code(gen_counted_loop($iter, <<END));
+	$index = $indexval\[$iter]
+	$ptmp = $rhs\[$iter]
+	$lhs\[$index] = $ptmp
+END
+	# If we have more values, assign undef to the rest of them:
+	code(<<END);
+	$ptmp = new PerlUndef
+	goto $end2
+$start2:
+	$index = $indexval\[$short]
+	$lhs\[$index] = $ptmp
+	inc $short
+$end2:
+	if $short < $long goto $start2
+END
     } else {
 	use Data::Dumper;
 	unimp 'Assignment to multi-element slice: '.Dumper($lctx);
     }
+}
+
+######################################################################
+sub P6C::loop::val {
+    my ($x) = @_;
+    my $start = genlabel 'loop';
+    my $end = genlabel 'loop';
+
+    push_scope;
+    $x->init->val if $x->init;
+    code(<<END);
+	goto $end
+$start:
+END
+    $_->val for @{$x->block};
+    $x->incr->val if $x->incr;
+    code(<<END);
+$end:
+END
+    my $test = $x->test->val if $x->test;
+    code(<<END);
+	if $test goto $start
+END
+    pop_scope;
+    return undef;
 }
 
 1;

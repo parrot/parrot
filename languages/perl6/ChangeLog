@@ -1,0 +1,35 @@
+Parrot 0.0.7
+============
+
+- Initial CVS revision, modified from "V.00I_0I" on perl6-internals.
+- Grammar patches (John Kingsley):
+  - squashed a warning in maybe_comma
+  - empty statements
+  - "foo::bar()" being treated as a label, "foo:".
+  - reset parser state between multiple parses.
+
+7/21/2002
+=========
+
+Additions:
+- anonymous subs (requires hacked IMCC)
+- implicit parameters (e.g. "$^a") (requires hacked IMCC)
+- hyper-concatenation ("^_")
+- perl-y functions: print, warn, die, exit
+- loop
+- foreach
+- global variables (requires hacked IMCC)
+- assignment to array slices
+
+Fixes:
+- misc context / flattening fixes.
+- tests stop on SIGINT
+- want-rule for no-arg prototypes
+- reorg: moved some val() functions from IMCC.pm to IMCC/*.pm, to be
+  loaded with SelfLoader when needed.  Trying to cut down startup time.
+- needed to be cloning PMC's instead of just setting
+- syntax in TestCompiler.pm
+
+Test failures:
+- foreach 1 (register clobbering)
+- foreach 2 (maybe register clobbering)

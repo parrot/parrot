@@ -28,6 +28,8 @@ involved.
 
 =cut
 
+use FindBin;
+use lib "$FindBin::Bin/../../lib";
 use Parse::RecDescent;
 use strict;
 
@@ -132,11 +134,12 @@ my @loop_control = qw(redo last next continue);
 my @unary_ops = qw(chop chomp chr hex lc lcfirst length
 		   ord reverse uc ucfirst
 		   abs atan2 cos exp hex int log oct rand sin sqrt srand
-		   pop shift
+		   pop shift exit
 		   delete each exists keys values
 		   defined undef
 		   chdir chroot glob mkdir rmdir stat umask
-		   close);
+		   close
+		   print1);	# temporary cruft.
 @WANT{@unary_ops} = ('prefix') x @unary_ops;
 
 ##############################
@@ -536,6 +539,7 @@ want_for_sort:	  scalar_expr comma
 maybe_decl:	  scope_class <commit> variable props['is']
 		| variable <commit> props['is']
 		| # nada
+nothing:	  ''
 
 ENDGRAMMAR
 
@@ -590,10 +594,16 @@ sub optional_last($) {
 # Build an argument context from a parameter spec.
 sub argument_context {
     my ($name, $params, $parser) = @_;
-    if ($params->min == 0 && !defined($params->max)) {
-	# List operator.
-	$WANT{$name} = $FUNCTION_ARGS;
-	return 1;
+    if ($params->min == 0) {
+	if (!defined($params->max)) {
+	    # List operator.
+	    $WANT{$name} = $FUNCTION_ARGS;
+	    return 1;
+	} elsif ($params->max == 0) {
+	    # no-arg sub
+	    $WANT{$name} = 'nothing';
+	    return 1;
+	}
     }
     my $rule;
     my $rulename = "want_for_$name";
@@ -668,6 +678,7 @@ sub P6C::'.$rulename.'::tree {
 
     $parser->Replace("$rulename: $rule\n");
     $WANT{$name} = $rulename;
+    print STDERR "Installed want-rule `$rulename' for `$name'\n\t$rule\n";
 }
 
 1;

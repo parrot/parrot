@@ -6,7 +6,7 @@ my $ERR = 'a.err';
 my $PARROT_BIN;
 if ($^O eq 'cygwin') {
     $PARROT_BIN = 'parrot.exe';
-else {
+} else {
     $PARROT_BIN = 'parrot';
 }
 

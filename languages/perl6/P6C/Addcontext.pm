@@ -48,7 +48,7 @@ BEGIN { # Add types for builtin binary operators.
 	 # NOTE: Actually, according to apo 3, boolean operators
 	 # propagate values in their surrounding context (even though
 	 # they may evaluate in boolean context?).  So we can't quite
-	 # do this.
+	 # do this:
 #	 bool => [ qw(&& ~~ ||) ],
 	);
 
@@ -88,12 +88,17 @@ sub P6C::Binop::ctx_right {
     my ($x, $ctx) = @_;
     my $op = $x->op;
     if (ref($op) && $op->isa('P6C::hype')) {
-	# XXX: do we need to propagate hyper context?  This might be
-	# useful for coalescing sequences of hyper-ops.  For now, just
-	# ignore it.
+	# XXX: is_array_expr is a hack, so this may cause some
+	# problems.  However, it works in straightforward cases.
 	my $newctx = new P6C::Context;
-	$x->l->ctx_right($newctx);
-	$x->r->ctx_right($newctx);
+	for ($x->l, $x->r) {
+	    if (is_array_expr($_)) {
+		$newctx->type('PerlArray');
+	    } else {
+		$newctx->type('PerlUndef');
+	    }
+	    $_->ctx_right($newctx);
+	}
 
     } elsif ($op eq '=') {
 	# Special-case assignment operator to enforce context l -> r
@@ -115,15 +120,19 @@ sub P6C::Binop::ctx_right {
 	# This operator determines context for its operands.
 	my ($ltype, $rtype) = @{$P6C::Context::CONTEXT{"infix $op"}->type};
 	my $opctx = $ctx->copy;
+	$opctx->flatten(0);	# XXX:
 	$opctx->type($ltype);
 	$x->l->ctx_right($opctx);
 	$opctx->type($rtype);
+	if ($x->r->isa('P6C::context')) {
+	    use Carp 'confess';
+	    confess 'ohshit: '.$op;
+	}
 	$x->r->ctx_right($opctx);
 
     } else {
 	# We know nothing about the context.  Say so, and propagate
 	# the surrounding context.
-	diag "No context information for `infix $op'";
 	my $opctx = new P6C::Context;
 	$x->l->ctx_right($opctx);
 	$x->r->ctx_right($opctx);
@@ -161,43 +170,53 @@ sub P6C::variable::ctx_left {
 }
 
 ##############################
+# Arrays are always integer-indexed.  Hashes are currently
+# string-indexed.  If that changes to PMC's change this.
+my %indextype = (PerlHash	=> 'str',
+		 PerlArray	=> 'int');
+
 sub P6C::indices::ctx_right {
     my ($x, $ctx) = @_;
-
+    if ($x->{ctx}) {
+	# Context gets called twice for assignment to a subscript.
+	# Don't propagate to the indices the second time, or they'll
+	# end up in void context, which is bad.
+	return;
+    }
 # Indices take their context's arity from the outer context, but its
 # type from the index type.  For example, in C<(str $a, num $b) =
 # @x[1,2]>, the outer context is C<[str, int]>, the index type is
 # C<PerlArray>, and the resulting indexing context is C<[int, int]>.
 
-# Arrays are always integer-indexed.  Hashes are currently
-# string-indexed.  If that changes to PMC's change this.
-    my %indextype = qw(PerlHash  str
-		       PerlArray int);
-    my $index_ctx;
-    if ($ctx->is_tuple) {
+    if (defined($x->indices)) {
+	my $index_ctx;
+	if ($x->type eq 'Sub') {
+ 	    $index_ctx = $P6C::Context::DEFAULT_ARGUMENT_CONTEXT;
 
-	$index_ctx = new P6C::Context
-	    type => [($indextype{$x->type}) x @{$ctx->type}];
+	} elsif ($ctx->is_tuple) {
+	    $index_ctx = new P6C::Context
+		type => [($indextype{$x->type}) x @{$ctx->type}];
 
-    } elsif ($ctx->is_scalar || $ctx->type eq 'void') {
-	# XXX: this causes problems with things like C<$x = @a[@i]>.
-	# I don't know what that should do.
-	$index_ctx = new P6C::Context type => [$indextype{$x->type}];
+	} elsif ($ctx->is_scalar || $ctx->type eq 'void') {
+	    # XXX: this causes problems with things like C<$x = @a[@i]>.
+	    # I don't know what that should do.
+	    $index_ctx = new P6C::Context type => $indextype{$x->type};
 
-    } elsif ($ctx->is_array) {
-	$index_ctx = new P6C::Context type => 'PerlArray';
+	} elsif ($ctx->is_array) {
+	    $index_ctx = new P6C::Context type => 'PerlArray';
 
-    } else {
-	use Data::Dumper;
-	use Carp 'confess';
-	confess "index contest: ", Dumper($ctx);
+	} else {
+	    use Data::Dumper;
+	    use Carp 'confess';
+	    confess "index contest: ", Dumper($ctx);
+	}
+
+	$x->indices->ctx_right($index_ctx);
     }
-
-    $x->indices->ctx_right($index_ctx);
 
     # unused for now.  This could be used to fix the scalar indexing
     # problem above.
-   $x->{ctx} = $ctx->copy;
+    $x->{ctx} = $ctx->copy;
 }
 
 sub P6C::indices::ctx_left {
@@ -207,27 +226,26 @@ sub P6C::indices::ctx_left {
 
     # Now figure out context for RHS.
     my $rctx = new P6C::Context;
+    my $indexctx;
 
-    if ($x->indices->isa('P6C::sv_literal')
-	|| ($x->indices->isa('P6C::variable')
-	    && is_scalar($x->indices->type))) {
-	# Scalar expression.  Note that this misses a lot of things.
-	$rctx->type('PerlUndef');
-	$x->indices->ctx_right(new P6C::Context type => $x->type);
-
-    } elsif ($x->indices->isa('P6C::Binop') && $x->op eq ',') {
+    if ($x->indices->isa('P6C::Binop') && $x->indices->op eq ',') {
 	# tuple => propagate arity to other side.
+	# XXX: doesn't flatten!
 	my @things = $x->indices->flatten_leftop(',');
 	$rctx->type([('PerlUndef') x @things]);
-	$x->indices->ctx_right(new P6C::Context
-				   type => [($x->type) x @things]);
+	$indexctx = new P6C::Context type => [($indextype{$x->type}) x @things];
+
+    } elsif (is_array_expr($x->indices)) {
+	$rctx->type('PerlArray');
+	$indexctx = new P6C::Context type => 'PerlArray';
 
     } else {
-	# Indexing by something else => fallback to array.
-	$rctx->type('PerlArray');
-	$x->indices->ctx_right(new P6C::Context type => 'PerlArray');
+	$rctx->type('PerlUndef');
+	$indexctx = new P6C::Context type => $indextype{$x->type};
     }
-    
+    $x->indices->ctx_right($indexctx);
+
+    $x->{ctx} = $indexctx;
     return $rctx;
 }
 
@@ -241,13 +259,20 @@ sub P6C::subscript_exp::ctx_right {
 	unimp "multi-level subscripting";
     }
     my $index = $x->subscripts(0);
-    # The base variable is indexed as a $index->type, so give it that
-    # context.
-    $x->thing->ctx_right(new P6C::Context type => $index->type);
+    if ($index->type eq 'Sub') {
+	# Closure.
+	$x->thing->ctx_right(new P6C::Context type => 'PerlUndef');
+	$index->ctx_right($P6C::Context::DEFAULT_ARGUMENT_CONTEXT);
 
-    # Propagate context to indices as well.  For the moment, they just
-    # use the index arity.
-    $index->ctx_right($ctx);
+    } else {
+	# The base variable is indexed as a $index->type, so give it that
+	# context.
+	$x->thing->ctx_right(new P6C::Context type => $index->type);
+	
+	# Propagate context to indices as well.  For the moment, they just
+	# use the index arity.
+	$index->ctx_right($ctx);
+    }
 
     $x->{ctx} = $ctx->copy;
 }
@@ -358,17 +383,29 @@ END
     $body->ctx_right($ctx);
 }
 
+sub foreach_context {
+    my ($x, $ctx) = @_;
+    my $args = $x->args->vals;
+    my $voidctx = new P6C::Context type => 'void';
+    if ($args->[0]) {
+	$args->[0]->ctx_right($voidctx);
+    }
+    $args->[1]->ctx_right(new P6C::Context type => 'PerlArray');
+    for (@{$args->[2]}) {
+	$_->ctx_right($voidctx);
+    }
+}
+
 BEGIN {
     $P6C::Context::CONTEXT{'-'} = new P6C::Context type => ['PerlUndef'];
     $P6C::Context::CONTEXT{if}
 	= $P6C::Context::CONTEXT{unless} =  \&ifunless_context;
     $P6C::Context::CONTEXT{'for'} = \&for_context;
+    $P6C::Context::CONTEXT{foreach} = \&foreach_context;
     $P6C::Context::CONTEXT{while}
 	= $P6C::Context::CONTEXT{until} # = \&while_context;
 	   = new P6C::Context type => ['bool', 'void'];
     $P6C::Context::CONTEXT{print1} = new P6C::Context type => ['PerlUndef'];
-#     $P6C::Context::CONTEXT{for}
-# 	= new P6C::Context type => ['PerlArray', 'void'];
 }
 
 # Lookup context for a prefix operator.  If the sub hasn't been
@@ -379,7 +416,7 @@ sub arg_context {
     if (exists $P6C::Context::CONTEXT{$name}) {
 	return $P6C::Context::CONTEXT{$name};
     }
-    diag 'no context found for ', $name;
+    diag "No context for $name";
     return $P6C::Context::DEFAULT_ARGUMENT_CONTEXT;
 }
 
@@ -390,7 +427,7 @@ sub P6C::prefix::ctx_right {
     if (ref($proto) eq 'CODE') {
 	# blech.
 	$proto->($x, $ctx);
-    } else {
+    } elsif ($x->args) {
 	$x->args->ctx_right($proto);
     }
 
@@ -481,20 +518,15 @@ sub P6C::ternary::ctx_left {
 sub P6C::decl::ctx_right { }
 
 sub P6C::decl::ctx_left {
-    # XXX: this may not be quite right.  If we're declaring a single
-    # item, we create a one-item context.  If more, a tuple context.
-    # Problem is, we may have thrown away the parens around the single
-    # item by this point.
     my ($x, $other, $ctx) = @_;
-    my @ctx = map { $_->type } @{$x->vars};
-    if (@ctx == 1) {
-	my $ctx = new P6C::Context type => $ctx[0];
-	if ($ctx[0] eq 'PerlArray') {
+    if (ref $x->vars ne 'ARRAY') { # single-variable declaration.
+ 	my $ctx = new P6C::Context type => $x->vars->type;
+	if ($ctx->is_array) {
 	    $ctx->flatten(1);
 	}
 	$other->ctx_right($ctx);
     } else {
-	# Tuple.
+	my @ctx = map { $_->type } @{$x->vars};
 	$other->ctx_right(new P6C::Context type => \@ctx);
     }
 }
@@ -523,31 +555,107 @@ sub P6C::sub_def::ctx_right {
 }
 
 ##############################
+
+sub get_closure_params {
+    my ($x) = @_;
+    my @params;
+    if (defined($x->params)) {
+	use P6C::Util 'flatten_leftop';
+	# Explicit parameter list in "-> $foo, $bar { ... }"
+	foreach (flatten_leftop($x->params, ';')) {
+	    push @params, flatten_leftop($_, ',');
+	}
+    } else {
+	my %impl;
+	# Look for implicit param-vars like $^a:
+	map_tree {
+	    if (UNIVERSAL::isa($_, 'P6C::variable')
+		&& $_->implicit) {
+		$impl{$_->name} = $_;
+	    }
+	} $x->block;
+	if (keys %impl) {
+	    @params = sort { $a->name cmp $b->name } values %impl;
+	}
+    }
+    return @params;
+}
+
+sub setup_catch_blocks {
+    my ($x) = @_;
+    my @catch;
+    use P6C::Util 'map_tree';
+    map_tree {
+	if (UNIVERSAL::isa($_, 'P6C::prefix')
+	    && $_->name eq 'CATCH') {
+	    push @catch, $_;
+	}
+    } $x->block;
+    if (@catch) {
+	$x->{catch} = [@catch];
+    }
+}
+
 sub P6C::closure::ctx_right {
     my ($x, $ctx) = @_;
+
+    # If we're not in void context, we must have an anonymous sub, so
+    # deal with it.
     if ($ctx->type ne 'void') {
-	unimp 'closure in non-void context';
+	my @params = get_closure_params($x);
+	if (@params) {
+	    use P6C::Util 'is_array_expr';
+	    my $vals = new P6C::variable(name => '@_',
+					 type => 'PerlArray');
+	    my $paramvar;
+	    if (@params == 1 && is_array_expr($params[0]->type)) {
+		$paramvar = $params[0];
+	    } else {
+		$paramvar = \@params;
+	    }
+	    my $vars = new P6C::decl(vars => $paramvar,
+				     props => [],
+				     qual => new P6C::scope_class scope=>'my');
+	    my $init = new P6C::Binop(op => '=', l => $vars, r => $vals);
+	    if (defined $x->block) {
+		unshift @{$x->block}, $init;
+	    } else {
+		diag "Closure with no statements?";
+		$x->block = [$init];
+	    }
+	    $x->params(undef);	# will fill them in in IMCC.pm
+	}
     }
 
     # NOTE: once we get return values in, we're in for serious pain
     # here, since we have to evaluate the last statement in the
     # _caller_'s context, which we don't know now.
     if (defined $x->block) {	# real def.
+	# Look for CATCH blocks in the current block:
+	setup_catch_blocks($x);
+
 	my $voidctx = new P6C::Context type => 'void';
 	foreach my $stmt (@{$x->block}) {
 	    $stmt->ctx_right($voidctx);
 	}
     }
+    $x->{ctx} = $ctx->copy;
 }
 
 ##############################
 sub P6C::ValueList::ctx_right {
     my ($x, $ctx) = @_;
 
+    # XXX: hack for hyper-operators:
+    if (!defined($ctx->type)) {
+	$ctx->type('PerlArray');
+    }
+
     if ($ctx->is_tuple) {
 	my $min = @{$ctx->type} < @{$x->vals} ? @{$ctx->type} : @{$x->vals};
 	for my $i (0 .. $min - 1) {
-	    $x->vals($i)->ctx_right(new P6C::Context type => $ctx->type->[$i]);
+	    $x->vals($i)->ctx_right(new P6C::Context
+				      type => $ctx->type->[$i]);
 	}
 	my $voidctx = new P6C::Context type => 'void';
 	for my $i ($min .. $#{$x->vals}) {
@@ -584,6 +692,19 @@ sub P6C::guard::ctx_right {
     my ($x, $ctx) = @_;
     $x->test->ctx_right(new P6C::Context type => 'bool');
     $x->expr->ctx_right(new P6C::Context type => 'void');
+}
+
+##############################
+sub P6C::loop::ctx_right {
+    my ($x, $ctx) = @_;
+    my $voidctx = new P6C::Context type => 'void';
+    # Remember that these can all be missing.
+    $x->init->ctx_right($voidctx) if $x->init;
+    $x->test->ctx_right(new P6C::Context type => 'bool') if $x->test;
+    $x->incr->ctx_right($voidctx) if $x->incr;
+    for (@{$x->block}) {
+	$_->ctx_right($voidctx);
+    }
 }
 
 1;

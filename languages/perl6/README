@@ -9,7 +9,9 @@ mkdistro.sh		bundle things up.
 P6C/Addcontext.pm	Context propagation.
 P6C/Builtins.pm		"built-in" function code and prototypes
 P6C/Context.pm		evaluation context structure
-P6C/IMCC.pm		code generation (and a few other things)
+P6C/IMCC.pm		code generation utilities; generation for
+			common types
+P6C/IMCC/*.pm		code generation for less common types
 P6C/Nodes.pm		parse tree node types
 P6C/Parser.pm		the grammar
 P6C/Tree.pm		functions translating parser output to tree

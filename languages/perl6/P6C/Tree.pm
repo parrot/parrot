@@ -86,10 +86,10 @@ sub infix_left_seq {
 # Define handlers for the simple right- and left-associative operators
 # here.
 BEGIN {
+    no strict 'refs';
     for (qw(apply match muldiv addsub bitshift bitand
 	    bitor logand logor log_AND log_OR comma semi
 	    _closure_args)) {
-	no strict 'refs';
 	*{'P6C::'.$_.'::tree'} = sub {
 	    my $x = shift;
 	    my $ret = infix_left_seq($x->[1]);
@@ -97,7 +97,6 @@ BEGIN {
 	};
     }
     for (qw(pow)) {
-	no strict 'refs';
 	*{'P6C::'.$_.'::tree'} = sub {
 	    my $x = shift;
 	    return infix_right_seq($x->[1]);
@@ -111,9 +110,11 @@ sub scalar_tree {
     shift->[1];
 }
 
-for (qw(name namepart sigil scope directive)) {
+{
     no strict 'refs';
-    *{"P6C\::$_\::tree"} = \&scalar_tree;
+    for (qw(name namepart sigil scope directive)) {
+	*{"P6C\::$_\::tree"} = \&scalar_tree;
+    }
 }
 
 ##############################
@@ -126,12 +127,14 @@ sub operator_tree {
     return $_;
 }
 
-for (qw(apply_op incr_op pow_op prefix_op filetest_op match_op
-	muldiv_op addsub_op bitshift_op compare_op bitand_op bitor_op
-	logand_op logor_op range_op assign_op comma_op semi_op
-	log_AND_op log_OR_op)) {
+{
     no strict 'refs';
-    *{"P6C\::$_\::tree"} = \&operator_tree;
+    for (qw(apply_op incr_op pow_op prefix_op filetest_op match_op
+	    muldiv_op addsub_op bitshift_op compare_op bitand_op bitor_op
+	    logand_op logor_op range_op assign_op comma_op semi_op
+	    log_AND_op log_OR_op)) {
+	*{"P6C\::$_\::tree"} = \&operator_tree;
+    }
 }
 
 ##############################
@@ -166,9 +169,11 @@ sub want_two_things {
 				       $x->[2]->tree];
 }
 
-for (qw(for given when while grep map sort)) {
+{
     no strict 'refs';
-    *{'P6C::want_for_'.$_.'::tree'} = \&want_two_things;
+    for (qw(for given when while grep map sort)) {
+	*{'P6C::want_for_'.$_.'::tree'} = \&want_two_things;
+    }
 }
 
 sub P6C::want_for_foreach::tree {
@@ -266,13 +271,6 @@ sub P6C::variable::tree {
 
 ######################################################################
 # Operators
-# sub P6C::hype::tree {
-#     my $x = shift;
-#     if (@$x == 5) {
-# 	return new P6C::hype op => $x->[4]->tree;
-#     }
-#     return $x->[1]->tree;
-# }
 
 ##############################
 sub P6C::hv_indices::tree {
@@ -298,10 +296,8 @@ sub P6C::arglist::tree {
 sub P6C::subscript::tree {
     my $x = shift;
     if (@$x == 4) {
-	if (@{$x->[2]} > 0) {
-	    return $x->[2][0]->tree;
-	}
-	return undef;		# XXX: probably bad
+	# i.e. $x(23)
+	return new P6C::indices type => 'Sub', indices => maybe_tree($x->[2]);
     }
     my $type = ($x->[2] eq '{' ? 'PerlHash' : 'PerlArray');
     my $indices = $x->[5]->tree;
@@ -506,7 +502,7 @@ sub P6C::decl::tree {
 	return P6C::decl->new(vars => P6C::Tree::flatten_list($x->[3]),
 			      props => maybe_tree($x->[5]));
     }
-    return P6C::decl->new(vars => [$x->[1]->tree],
+    return P6C::decl->new(vars => $x->[1]->tree,
 			  props => maybe_tree($x->[2]));
 }
 
@@ -742,7 +738,9 @@ sub P6C::closure::tree {
     if (@{$x->[$arg_index]} == 0) {
 	return new P6C::closure params => undef, block => $block;
     }
+
     my $p = $x->[$arg_index][0]->tree;
+
     return new P6C::closure params => $p, block => $block;
 }
 
@@ -780,6 +778,11 @@ sub P6C::maybe_namepart::tree {
 	return $x->[1]->tree;
     }
     return undef;
+}
+
+##############################
+sub P6C::nothing::tree {
+    return new P6C::ValueList vals => [];
 }
 
 1;

@@ -1,6 +1,6 @@
 #!perl
 use strict;
-use P6C::TestCompiler tests => 2;
+use P6C::TestCompiler tests => 5;
 
 ##############################
 output_is(<<'CODE', <<'OUT', "subroutine call");
@@ -66,3 +66,47 @@ one 4
 two 5 6
 OUT
 
+##############################
+output_is(<<'CODE', <<'OUT', "Closures 1");
+sub main() {
+    my $f = { print @_[0,1], "\n"; }
+    my @x = (1,2);
+    $f(@x);
+    $f(3,4);
+    $f(5..10);
+}
+CODE
+12
+34
+56
+OUT
+
+##############################
+output_is(<<'CODE', <<'OUT', "Closures 2");
+sub main() {
+    my $f = { print $^b, $^a, "\n"; }
+    my @x = (1,2);
+    $f(@x);
+    $f(3,4);
+    $f(5..10);
+}
+CODE
+21
+43
+65
+OUT
+
+##############################
+output_is(<<'CODE', <<'OUT', "Closures 3");
+sub main() {
+    my $f = -> $a, $b { print $b, $a, "\n"; }
+    my @x = (1,2);
+    $f(@x);
+    $f(3,4);
+    $f(5..10);
+}
+CODE
+21
+43
+65
+OUT

@@ -317,7 +317,7 @@ The argument list (for e.g. C<something(1, 2)>).
 =cut
 
 use Class::Struct P6C::scope_class => { qw(scope $ class $) };
-use Class::Struct P6C::decl => { qw(qual $ vars @ props @) };
+use Class::Struct P6C::decl => { qw(qual $ vars $ props @) };
 use Class::Struct P6C::property => { qw(name $ args $) };
 
 =item
@@ -601,7 +601,7 @@ a bit more developed.
 
 =cut
 
-use Class::Struct P6C::Register => { qw(reg $) };
+use Class::Struct P6C::Register => { qw(reg $ type $) };
 
 ######################################################################
 # Misc per-node-class utility functions:

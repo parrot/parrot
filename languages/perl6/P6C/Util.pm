@@ -15,6 +15,16 @@ Complain that something is unimplemented, and die.
 
 Issue a diagnostic message, but keep going.
 
+=item B<error(@_)>
+
+A recent addition to the family.  A fatal error has occurred, and it
+is the user's fault.
+
+=item B<warning(@_)>
+
+C<warning> is to C<error> as C<diag> is to C<unimp> -- it indicates a
+possible non-fatal user error.
+
 =item B<@items = flatten_leftop($tree, $opname)>
 
 Flatten B<$tree>, a binary operator tree, into a sequence of items
@@ -32,8 +42,9 @@ parents before children.  The current node will be in C<$_>.
 =cut
 
 require Exporter;
-our @EXPORT_OK = qw(unimp diag flatten_leftop map_tree
-		    is_scalar is_array_expr same_type);
+our @EXPORT_OK = qw(unimp diag error warning
+		    flatten_leftop map_tree
+		    is_scalar is_array_expr same_type is_pmc);
 our %EXPORT_TAGS = (all => [@EXPORT_OK] );
 our @ISA = qw(Exporter);
 use strict;
@@ -42,7 +53,7 @@ sub _info {
     my $type = shift;
     my ($pack, $fn, $line, $subr) = caller 2;
     $subr =~ s/^P6C:://;
-    warn "[$subr ($type)] ", @_, "\n";
+    warn "[$subr ($type) $P6C::IMCC::curfunc] ", @_, "\n";
 }
 
 sub unimp {
@@ -52,6 +63,10 @@ sub unimp {
 
 sub diag {
     _info 'diagnostic', @_;
+}
+
+sub error {
+    _info 'error', @_;
 }
 
 sub flatten_leftop {
@@ -109,9 +124,17 @@ sub _map_tree {
 
 True if C<$type> is scalar.
 
+=item B<is_pmc($type)>
+
+True if C<$type> is a PMC type.  Useful to know when you have to clone
+something, and when you can just set it.
+
 =item B<is_array_expr($expr)>
 
-True if C<$expr> looks like an array expression.  This is just a guess.
+True if C<$expr> looks like an array expression.  This is just a guess
+for now -- if it says something is an array, then it definitely is,
+but if it says no, the caller should be conservative in the
+appropriate direction.
 
 =item B<same_type($a, $b)>
 
@@ -123,15 +146,24 @@ errs on the conservative side.
 =cut
 
 my %isscalar;
+my %isprimitive;
 BEGIN {
     my @scalar_types = qw(PerlInt PerlNum PerlString PerlUndef
 			  int num str bool);
     @isscalar{@scalar_types} = (1) x @scalar_types;
+    my @primitive = qw(int num str);
+    @isprimitive{@primitive} = (1) x @primitive;
 }
 
 sub is_scalar {
     my $t = shift;
     return exists $isscalar{$t};
+}
+
+sub is_pmc {
+    my $t = shift;
+    print STDERR "primitive $t?\n";
+    return !exists $isprimitive{$t};
 }
 
 sub is_array_expr {		# hack to do guess at value types of
@@ -140,8 +172,12 @@ sub is_array_expr {		# hack to do guess at value types of
     if (!ref($x)) {
 	return !is_scalar($x);
     }
-    return ($x->isa('P6C::Binop') && ref($x->op) eq 'P6C::hype')
-	|| ($x->isa('P6C::variable') && $x->type eq 'PerlArray');
+    return (($x->isa('P6C::Binop')
+	     && (ref($x->op) eq 'P6C::hype'
+		 || $x->op eq ','
+		 || $x->op eq '..'))
+	    || ($x->isa('P6C::variable') && $x->type eq 'PerlArray')
+	    || ($x->isa('P6C::ValueList')));
 }
 
 my %pmc_scalar;

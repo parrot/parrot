@@ -84,7 +84,6 @@ if ($o{batch}) {
     local $/ = undef;
     $in = <STDIN>;
     my $result = $parser->$::rule($in);
-    print STDERR "done\n";
     exit if $o{silent};
     output_tree($result);
     exit;
