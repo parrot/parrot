@@ -897,7 +897,6 @@ op ge(in STR, in STR, in INT) {
   goto NEXT();
 }
 
-
 ########################################
 
 =item B<if>(in INT, in INT)
@@ -949,6 +948,53 @@ op if(in PMC, in INT) {
 
 ###############################################################################
 
+=item B<unless>(in INT, in INT)
+
+=item B<unless>(in NUM, in INT)
+
+=item B<unless>(in PMC, in INT)
+
+=item B<unless>(in STR, in INT)
+
+Check register $1. If false, branch by $2.
+
+=cut
+
+inline op unless(in INT, in INT) {
+  if ($1 == 0) {
+    goto OFFSET($2);
+  }
+  goto NEXT();
+}
+
+inline op unless(in NUM, in INT) {
+  if ($1 == 0.0) {
+    goto OFFSET($2);
+  }
+  goto NEXT();
+}
+
+op unless (in STR, in INT) {
+  if (!string_bool($1)) {
+    goto OFFSET($2);
+  }
+  goto NEXT();
+}
+
+op unless(in PMC, in INT) {
+  if (!$1->vtable->get_bool(interpreter, $1)) {
+    goto OFFSET($2);
+  }
+  goto NEXT();
+}
+
+=back
+
+=cut
+
+
+
+###############################################################################
 =head2 Arithmetic operations
 
 These operations store the results of arithmetic on other registers and

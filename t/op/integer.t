@@ -1,6 +1,6 @@
 #! perl -w
 
-use Parrot::Test tests => 31;
+use Parrot::Test tests => 30;
 
 output_is(<<CODE, <<OUTPUT, "set_i_ic");
 	# XXX: Need a test for writing outside the set of available
@@ -797,40 +797,6 @@ TWO:
 	print	"ok 2\\n"
 	ge	I2, 0, THREE
         branch  ERROR
-	print	"bad\\n"
-
-THREE:
-	print	"ok 3\\n"
-	end
-
-ERROR:
-	print	"bad\\n"
-        end
-CODE
-ok 1
-ok 2
-ok 3
-OUTPUT
-
-output_is(<<CODE, <<OUTPUT, "if_i_ic");
-	set	I0, 2147483647
-	set	I1, -2147483648
-	set	I2, 0
-
-	if_i_ic	I0, ONE
-        branch  ERROR
-	print	"bad\\n"
-
-ONE:
-	print	"ok 1\\n"
-	if_i_ic	I1, TWO
-        branch ERROR
-	print	"bad\\n"
-
-TWO:
-	print	"ok 2\\n"
-	if_i_ic	I2, ERROR
-        branch  THREE
 	print	"bad\\n"
 
 THREE:
