@@ -350,6 +350,8 @@ rebuild_chunk_list(Interp *interpreter, List *list)
     List_chunk *chunk, *prev, *first;
     UINTVAL len;
 
+    Parrot_block_DOD(interpreter);
+    Parrot_block_GC(interpreter);
     /* count chunks and fix prev pointers */
     rebuild_chunk_ptrs(list, 0);
     /* if not regular, check & optimize */
@@ -435,6 +437,8 @@ rebuild_chunk_list(Interp *interpreter, List *list)
     if (list->grow_policy && list->grow_policy != enum_grow_growing &&
             list->grow_policy != enum_grow_fixed)
         list->grow_policy = enum_grow_mixed;
+    Parrot_unblock_DOD(interpreter);
+    Parrot_unblock_GC(interpreter);
     return len;
 }
 

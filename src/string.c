@@ -44,7 +44,7 @@ unmake_COW(struct Parrot_Interp *interpreter, STRING *s)
 {
     if (s->flags & (BUFFER_COW_FLAG|BUFFER_constant_FLAG)) {
         void *p;
-        UINTVAL size;
+        UINTVAL size, bsize;
         if (interpreter) {
             Parrot_block_GC(interpreter);
             Parrot_block_DOD(interpreter);
@@ -54,10 +54,12 @@ unmake_COW(struct Parrot_Interp *interpreter, STRING *s)
          * we are actually using. */
         p = s->strstart;
         size = s->bufused;
+        bsize = s->buflen;
         /* Create new pool data for this header to use,
          * independant of the original COW data */
         s->flags &= ~BUFFER_constant_FLAG;
-        Parrot_allocate_string(interpreter, s, size);
+        /* don't shorten string, string_append may use buflen */
+        Parrot_allocate_string(interpreter, s, bsize);
         mem_sys_memcopy(s->strstart, p, size);
         s->flags &= ~(UINTVAL)(BUFFER_COW_FLAG | BUFFER_external_FLAG |
                 BUFFER_bufstart_external_FLAG);
