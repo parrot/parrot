@@ -527,6 +527,17 @@ analyse_life_symbol(Parrot_Interp interpreter, IMC_Unit * unit, SymReg* r)
 
     for (i=0; i < unit->n_basic_blocks; i++) {
 	if (r->life_info[i]->flags & LF_use) {
+            Instruction *ins;
+
+            ins = unit->bb_list[i]->start;
+
+            /*
+             * if the previous instruction (the last of the previous block)
+             * was a sub call, and the symbol is live/use here, it needs
+             * allocation in the non-volatile register range
+             */
+            if (ins->prev && (ins->prev->type & ITPCCSUB))
+                r->usage |= U_NON_VOLATILE;
 
 	    /* This block uses r, so it must be live at
 	       the beggining */
