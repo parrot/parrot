@@ -47,7 +47,7 @@ if ($ARGV[0] && $ARGV[0] =~ /^(-c|--compile)$/) {
 my $pattern = <>;
 chomp($pattern);
 
-generate_rx($pattern);
+generate_regular($pattern);
 exit(0) if $compile;
 
 my $status = 1;
@@ -81,7 +81,7 @@ while (1) {
 
 exit ($status ? 0 : 1);
 
-sub generate_rx_pasm {
+sub generate_regular_pasm {
     my ($filename, $pattern) = @_;
     open(PASM, ">$filename") or die "create $filename: $!";
     use FindBin;
@@ -94,55 +94,42 @@ sub generate_rx_pasm {
 # Pattern >>$pattern<<
     read S0, 400   # Read from stdin
     bsr REGEX
-    rx_info_successful P0, I0
     if I0, \$matched
     print "Match failed\\n"
-    # rx_freeinfo P0
     end
 \$matched:
     print "Match found\\n"
-    rx_info_getstartindex P0, I0
-    rx_info_getindex P0, I1
-    add I1, I1, -1
-    length I2, S0
-    print "0: "
-    print I0
-    print ".."
-    print I1
-    print "\\n"
-    set I17, 0
+    set I0, 0
 printLoop:
-    add I0, I17, 1
     set I17, I0
     bsr printGroup
+    add I0, I17, 1
     eq I16, 1, printLoop
-    # rx_freeinfo P0
     end
 printGroup:
-    rx_info_getgroup P0, I1, I2, I0
-    ne I1, 0, printIt
-    ne I2, 0, printIt
+    set I5, P0
+    lt I0, I5, printIt
     set I16, 0
     ret
 printIt:
+    get_keyed I3, P0, I0
+    get_keyed I4, P1, I0
     print I0
     print ": "
-    print I1
+    print I3
     print ".."
-    add I2, I2, -1 # Off by one
-    print I2
+    add I4, I4, -1 # Off by one
+    print I4
     print "\\n"
     set I16, 1
     ret
 
 DUMP:
         print "<"
-        rx_info_getindex P0, I20
-        substr S1, S0, 0, I20
+        substr S1, S0, 0, I1
         print S1
         print "><"
-        length I21, S0
-        sub I21, I21, I20
+        sub I21, I2, I1
         substr S1, S0, I20, I21
         print S1
         print ">\\n"
@@ -155,7 +142,7 @@ END
     my $opt1 = Regex::PreOptimize->new();
     my $rewrite = Regex::Rewrite::Rx->new();
     my $opt2 = Regex::Optimize->new();
-    my $cgen = Regex::CodeGen::Rx->new();
+    my $cgen = Regex::CodeGen::Pasm->new();
 
     my $tree = $parser->compile($pattern);
     my @code = $rewrite->run($tree);
@@ -175,9 +162,9 @@ sub generate_pbc {
     }
 }
 
-sub generate_rx {
+sub generate_regular {
     my $pattern = shift;
-    generate_rx_pasm("test.pasm", $pattern);
+    generate_regular_pasm("test.pasm", $pattern);
     generate_pbc("test.pasm", "test.pbc");
 }
 

@@ -23,7 +23,7 @@ sub rewrite_scan {
     return ($lastback, @ops);
 }
 
-sub rewrite_alternate {
+sub rewrite_simple_or_simple {
     my ($self, $R, $S, $lastback) = @_;
 
     my $nextalt = $self->mark('nextalt');
@@ -44,6 +44,30 @@ sub rewrite_alternate {
                      aop_goto($next),
             $back => aop_popindex($lastback),
                      aop_goto($try_S),
+            $next =>
+                    );
+}
+
+sub rewrite_alternate {
+    my ($self, $R, $S, $lastback) = @_;
+
+    my $back = $self->mark('alt_back');
+    my $fail = $self->mark('RS_fail');
+    my $next = $self->mark('next');
+
+    my ($R_back, @R_ops) = $self->rewrite($R, $fail);
+    my ($S_back, @S_ops) = $self->rewrite($S, $fail);
+
+    return $S_back, (
+                     aop_pushmark(),
+                     aop_pushindex(),
+                     @R_ops,
+                     aop_goto($next),
+            $back => aop_popindex($S_back),
+                     aop_popindex($R_back),
+            $fail => aop_popindex($lastback),
+                     @S_ops,
+                     aop_pushmark(),
             $next =>
                     );
 }
