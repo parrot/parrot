@@ -987,6 +987,58 @@ inline op set_keyed (out INT, in PMC, in KEY)  {
     goto NEXT();
 }
 
+=item B<set_keyed>(out PMC, in KEY, in NUM)
+
+=cut
+
+inline op set_keyed (out PMC, in KEY, in NUM)  {
+    KEY key;
+
+    MAKE_KEY(key, $2, enum_key_string, int_val);
+
+    $1->vtable->set_integer_keyed(interpreter, $1, &key, $3);
+    goto NEXT();
+}
+
+=item B<set_keyed>(out NUM, in PMC, in KEY)
+
+=cut
+
+inline op set_keyed (out NUM, in PMC, in KEY)  {
+    KEY key;
+
+    MAKE_KEY(key, $3, enum_key_string, int_val);
+
+    $1 = $2->vtable->get_integer_keyed(interpreter, $2, &key);
+    goto NEXT();
+}
+
+=item B<set_keyed>(out PMC, in KEY, in STR)
+
+=cut
+
+inline op set_keyed (out PMC, in KEY, in STR)  {
+    KEY key;
+
+    MAKE_KEY(key, $2, enum_key_string, int_val);
+
+    $1->vtable->set_integer_keyed(interpreter, $1, &key, $3);
+    goto NEXT();
+}
+
+=item B<set_keyed>(out STR, in PMC, in KEY)
+
+=cut
+
+inline op set_keyed (out STR, in PMC, in KEY)  {
+    KEY key;
+
+    MAKE_KEY(key, $3, enum_key_string, int_val);
+
+    $1 = $2->vtable->get_integer_keyed(interpreter, $2, &key);
+    goto NEXT();
+}
+
 =item B<clone>(out PMC, in PMC)
 
 Copies a PMC $1 to $2.
