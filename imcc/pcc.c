@@ -413,9 +413,13 @@ NONAMEDPARAMS: /* If no named params, don't generate any param code */
      * if we call out, the return cc in P1 must be saved
      */
     if (sub->pcc_sub->calls_a_sub) {
-        regs[0] = sub->pcc_sub->cc_sym = mk_temp_reg('P');
-        regs[1] = get_pasm_reg("P1");
-        insINS(interpreter, unit, ins, "set", regs, 2);
+        /* but not, if this is main */
+        if (!(sub->pcc_sub->pragma & P_MAIN)) {
+            regs[0] = sub->pcc_sub->cc_sym = mk_temp_reg('P');
+            regs[1] = get_pasm_reg("P1");
+            insINS(interpreter, unit, ins, "set", regs, 2);
+        }
+        /* in a method we need a reg for P2 */
         if (sub->pcc_sub->pragma & P_METHOD) {
             regs[0] = sub->pcc_sub->p2_sym = mk_temp_reg('P');
             regs[1] = get_pasm_reg("P2");
@@ -431,17 +435,21 @@ NONAMEDPARAMS: /* If no named params, don't generate any param code */
             strcmp(unit->last_ins->op, "exit") &&
             strcmp(unit->last_ins->op, "end")
        ) {
+        if (sub->pcc_sub->pragma & P_MAIN) {
+            tmp = INS(interpreter, unit, "end", NULL, regs, 0, 0, 0);
+        }
+        else {
 
-        if (sub->pcc_sub->cc_sym)
-            regs[0] = sub->pcc_sub->cc_sym;
-        else
-            regs[0] = mk_pasm_reg(str_dup("P1"));
-        tmp = INS(interpreter, unit, "invoke", NULL, regs, 1, 0, 0);
-        debug(interpreter, DEBUG_IMC, "add sub ret - invoke %s\n",
-                regs[0]->name);
-        /*
-         * TODO insert minimal PCC information - I0=I3=0
-         */
+            if (sub->pcc_sub->cc_sym)
+                regs[0] = sub->pcc_sub->cc_sym;
+            else
+                regs[0] = mk_pasm_reg(str_dup("P1"));
+            tmp = INS(interpreter, unit, "invoke", NULL, regs, 1, 0, 0);
+            /*
+             * TODO insert minimal PCC information - I0=I3=0
+             */
+        }
+        debug(interpreter, DEBUG_IMC, "add sub ret - %I\n", tmp);
         insert_ins(unit, unit->last_ins, tmp);
     }
 }
@@ -1035,6 +1043,7 @@ optc_savetop(Parrot_Interp interpreter, IMC_Unit * unit, Instruction *ins)
             break;
         case 1:
         case 2:
+        case 3:
             debug(interpreter, DEBUG_OPT1, "opt1 %I => ", ins);
             first = 1;
             for (i = 0; i < 4; i++) {

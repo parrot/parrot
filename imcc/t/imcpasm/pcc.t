@@ -1,6 +1,18 @@
 #!perl
 use strict;
-use TestCompiler tests => 10;
+use TestCompiler tests => 11;
+
+
+output_like(<<'CODE', <<'OUT', 'end in @MAIN');
+.sub _main @MAIN
+     noop
+.end
+CODE
+/_main:
+  noop
+  end
+/
+OUT
 
 ##############################
 # parrot calling conventions
