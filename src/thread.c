@@ -36,6 +36,7 @@ thread_func(void *arg)
      */
     LOCK(interpreter_array_mutex);
     interpreter->thread_data->state |= THREAD_STATE_FINISHED;
+    tid = interpreter->thread_data->tid;
     if (interpreter != interpreter_array[tid]) {
         UNLOCK(interpreter_array_mutex);
         internal_exception(1, "thread finished: interpreter mismatch");

@@ -234,6 +234,22 @@ pmclass ParrotInterpreter need_ext {
         clone_interpreter(dest, SELF);
         return dest;
     }
+
+    INTVAL is_equal(PMC* val) {
+        Parrot_Interp self, other;
+        /*
+         * 2 interpreter (threads) are equal if both are non-threaded
+         * or they have the same tid
+         */
+        self = PMC_data(SELF);
+        other = PMC_data(val);
+        if (!self->thread_data && !other->thread_data)
+            return 1;
+        if (self->thread_data && other->thread_data &&
+                self->thread_data->tid == other->thread_data->tid)
+            return 1;
+        return 0;
+    }
 }
 
 /*

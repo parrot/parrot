@@ -1,6 +1,6 @@
 #! perl -w
 
-use Parrot::Test tests => 13;
+use Parrot::Test tests => 14;
 
 output_is(<<'CODE', <<'OUTPUT', "runinterp - new style");
 	new P0, .ParrotInterpreter
@@ -242,7 +242,26 @@ from 1 interp
 OUTPUT
 
 SKIP: {
-  skip("No thread config yet" ,2) unless $^O eq 'linux';
+  skip("No thread config yet" ,3) unless $^O eq 'linux';
+
+output_is(<<'CODE', <<'OUTPUT', "interp identity");
+    getinterp P2
+    clone P3, P2
+    eq P3, P2, ok1
+    print "not"
+ok1:
+    print "ok 1\n"
+    new P4, .ParrotThread
+    ne P4, P2, ok2
+    print "not"
+ok2:
+    print "ok 2\n"
+    end
+CODE
+ok 1
+ok 2
+OUTPUT
+
 
 output_is(<<'CODE', <<'OUTPUT', "thread 1");
     set I5, 1

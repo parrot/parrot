@@ -29,14 +29,33 @@ pmclass TQueue need_ext {
     void init () {
         SELF->cache.int_val = 0;
         PMC_data(SELF) = queue_init(0);
+	PObj_custom_mark_destroy_SETALL(SELF);
+    }
+
+    PMC* clone() {
+        /* XXX fake a shared PMC */
+        return SELF;
     }
 
     void mark () {
-        /* TODO */
+        QUEUE *queue = PMC_data(SELF);
+        QUEUE_ENTRY *entry;
+        PMC *val;
+
+        queue_lock(queue);
+        entry = queue->head;
+        while (entry) {
+            pobject_lives(INTERP, (PObj*) entry->data);
+            entry = entry->next;
+        }
+        queue_unlock(queue);
     }
 
     void destroy () {
-        /* TODO */
+        if (PMC_data(SELF)) {
+            mem_sys_free(PMC_data(SELF));
+            PMC_data(SELF) = NULL;
+        }
     }
 
     INTVAL defined () {
@@ -74,6 +93,13 @@ pmclass TQueue need_ext {
         queue_unlock(queue);
     }
 
+    /*
+     * XXX we just take out the PMCs that possibly another thread
+     *     has created - that's wrong
+     * idea: remember push()ing interpreter in entry
+     *       if shift()ing interpreter is different and data aren't shared
+     *       then return clone()ed copies
+     */
     PMC* shift_pmc() {
         QUEUE_ENTRY *entry;
         QUEUE *queue = PMC_data(SELF);
