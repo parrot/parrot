@@ -16,6 +16,7 @@ typedef void               (*node_dump_t)   (struct nodeType_t*, int level);
 typedef context_type       (*node_context_t)(struct nodeType_t*, context_type);
 
 struct _SymReg;
+struct _IMC_Unit;
 
 typedef struct nodeType_t {
     node_expand_t expand;
@@ -28,6 +29,7 @@ typedef struct nodeType_t {
     struct nodeType_t *up;	/* parent */
     struct nodeType_t *next;	/* next statement */
     struct nodeType_t *dest;	/* destination or result */
+    struct _IMC_Unit *unit;
     YYLTYPE loc;
     union {
 	    struct _SymReg *r;

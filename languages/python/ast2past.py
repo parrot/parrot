@@ -385,7 +385,7 @@ class PirateVisitor(object):
 	self.set_lineno(node)
 	self.begin("Function(")
 	if not is_lambda:
-	    self.append("Name(%s)" % `node.name`)
+	    self.append("Name(:%s)" % node.name)
 	    if node.doc:
 		self.append("Py_doc(" + `node.doc` + ")")
 	self.begin("Params(")

@@ -26,6 +26,7 @@ The AST (Abstract Syntax Tree) represents the code of a HLL source module.
 
 static nodeType* create_0(int nr, nodeType *self, nodeType *p);
 static nodeType* create_1(int nr, nodeType *self, nodeType *p);
+static nodeType* create_Func(int nr, nodeType *self, nodeType *p);
 
 static void
 pr(nodeType *p)
@@ -101,6 +102,12 @@ dump(nodeType *p, int l)
 }
 
 static nodeType *
+check_nodes(Interp *interpreter, nodeType *p)
+{
+    return p;
+}
+
+static nodeType *
 new_node(YYLTYPE *loc)
 {
     nodeType *p = mem_sys_allocate_zeroed(sizeof(nodeType));
@@ -164,6 +171,22 @@ insert_new(Interp* interpreter, nodeType *var, const char *name)
     return insINS(interpreter, cur_unit, ins, "new", regs, 2);
 }
 
+static Instruction *
+insert_find_global(Interp* interpreter, nodeType *var)
+{
+    Instruction *ins;
+    SymReg *regs[IMCC_MAX_REGS], *r;
+    char name[128];
+
+    ins = cur_unit->last_ins;
+    sprintf(name, "\"%s\"", var->u.r->name);
+    r = mk_const(str_dup(name), 'S');
+
+    regs[0] = var->u.r;
+    var->u.r->type = VTIDENTIFIER;
+    regs[1] = r;
+    return insINS(interpreter, cur_unit, ins, "find_global", regs, 2);
+}
 /*
  * node expand aka code creation functions
  */
@@ -206,30 +229,33 @@ exp_default(Interp* interpreter, nodeType *p)
 static nodeType*
 exp_Assign(Interp* interpreter, nodeType *p)
 {
-    IMC_Unit *unit;
     Instruction *ins;
     SymReg *regs[IMCC_MAX_REGS], *r;
     nodeType *var = NODE0(p);
     nodeType *rhs = var->next;
 
     rhs = rhs->expand(interpreter, rhs);
-    unit = interpreter->imc_info->last_unit;
-    ins = unit->last_ins;
+    ins = cur_unit->last_ins;
     regs[0] = NODE0(var)->u.r;
     regs[1] = rhs->u.r;
     /*
      * TODO If lhs is aliased to another name, this changes both vars.
      *      Assign is wrong too, as "a = b" implies "(a is b) == True"
      */
-    insINS(interpreter, unit, ins, "set", regs, 2);
+    insINS(interpreter, cur_unit, ins, "set", regs, 2);
     return rhs;
+}
+
+static nodeType*
+exp_Args(Interp* interpreter, nodeType *p)
+{
+    return NULL;
 }
 
 static nodeType*
 exp_Binary(Interp* interpreter, nodeType *p)
 {
     nodeType *op, *left, *right, *dest;
-    IMC_Unit *unit;
     Instruction *ins;
     SymReg *regs[IMCC_MAX_REGS];
 
@@ -238,8 +264,7 @@ exp_Binary(Interp* interpreter, nodeType *p)
     right = left->next;
     left = left->expand(interpreter, left);
     right = right->expand(interpreter, right);
-    unit = interpreter->imc_info->last_unit;
-    ins = unit->last_ins;
+    ins = cur_unit->last_ins;
     if (!p->dest) {
         dest = IMCC_new_temp_node(interpreter, left->u.r->set, &p->loc);
         if (dest->u.r->set == 'P')
@@ -249,17 +274,72 @@ exp_Binary(Interp* interpreter, nodeType *p)
     regs[0] = dest->u.r;
     regs[1] = left->u.r;
     regs[2] = right->u.r;
-    insINS(interpreter, unit, ins, NODE0(op)->u.r->name + 1, regs, 3);
+    insINS(interpreter, cur_unit, ins, NODE0(op)->u.r->name + 1, regs, 3);
     return dest;
 }
 
+static nodeType*
+exp_Defaults(Interp* interpreter, nodeType *p)
+{
+    return NULL;
+}
+
+static nodeType*
+exp_Function(Interp* interpreter, nodeType *p)
+{
+    nodeType *name, *params, *body;
+    SymReg *sub;
+    Instruction *i;
+    IMC_Unit *last_unit = cur_unit;
+
+    cur_unit = p->unit;
+
+    name = NODE0(p);
+    params = name->next;
+    body = params->next;
+    sub = mk_sub_address(str_dup(NODE0(name)->u.r->name));
+    i = INS_LABEL(cur_unit, sub, 1);
+
+    i->r[1] = mk_pcc_sub(str_dup(i->r[0]->name), 0);
+    add_namespace(interpreter, i->r[1]);
+    i->r[1]->pcc_sub->pragma = P_PROTOTYPED ;
+
+    body->expand(interpreter, body);
+
+    cur_unit = last_unit;
+    return NULL; /* XXX return retval */
+}
+
+static nodeType*
+exp_Params(Interp* interpreter, nodeType *p)
+{
+    return NULL;
+}
+
+static nodeType*
+exp_Py_Call(Interp* interpreter, nodeType *p)
+{
+    nodeType *name, *args;
+    Instruction *ins;
+    SymReg *regs[IMCC_MAX_REGS];
+
+    name = NODE0(p);
+    args = name->next;
+    args = args->expand(interpreter, args);
+    ins = IMCC_create_itcall_label(interpreter);
+    IMCC_itcall_sub(interpreter, NODE0(name)->u.r);
+    return NULL;
+}
 
 static nodeType*
 exp_Py_Local(Interp* interpreter, nodeType *p)
 {
     nodeType *var = NODE0(p);
 
-    insert_new(interpreter, var, "Undef");
+    if (var->u.r->type == VTADDRESS)
+        insert_find_global(interpreter, var);
+    else
+        insert_new(interpreter, var, "Undef");
     return NULL;
 }
 
@@ -287,23 +367,21 @@ exp_Py_Module(Interp* interpreter, nodeType *p)
 static nodeType*
 exp_Py_Print(Interp* interpreter, nodeType *p)
 {
-    IMC_Unit *unit;
-    Instruction *ins;
+    Instruction *ins ;
     SymReg *regs[IMCC_MAX_REGS];
     nodeType * child = NODE0(p), *d;
     if (!child)
         fatal(1, "exp_Py_Print", "nothing to print");
     for (; child; child = child->next) {
         d = child->expand(interpreter, child);
-        unit = interpreter->imc_info->last_unit;
-        ins = unit->last_ins;
         /* TODO file handle node */
         if (d->expand == exp_Const || d->expand == exp_Var ||
                 d->expand == exp_Temp)
             regs[0] = d->u.r;
         else
             fatal(1, "exp_Py_Print", "unknown node to print: '%s'", d->d);
-        ins = insINS(interpreter, unit, ins, "print_item", regs, 1);
+        ins = cur_unit->last_ins;
+        insINS(interpreter, cur_unit, ins, "print_item", regs, 1);
     }
     return NULL;
 }
@@ -311,10 +389,9 @@ exp_Py_Print(Interp* interpreter, nodeType *p)
 static nodeType*
 exp_Py_Print_nl(Interp* interpreter, nodeType *p)
 {
-    IMC_Unit *unit = interpreter->imc_info->last_unit;
-    Instruction *ins = unit->last_ins;
+    Instruction *ins = cur_unit->last_ins;
     SymReg *regs[IMCC_MAX_REGS];
-    insINS(interpreter, unit, ins, "print_newline", regs, 0);
+    insINS(interpreter, cur_unit, ins, "print_newline", regs, 0);
     return NULL;
 }
 
@@ -347,12 +424,17 @@ typedef struct {
 
 static node_names ast_list[] = {
     { "-no-node-", 	NULL, NULL, NULL, NULL },
+    { "Args", 	        create_1, exp_Args, NULL, NULL },
     { "AssName", 	create_1, exp_Name, NULL, NULL },
     { "Assign", 	create_1, exp_Assign, NULL, NULL },
     { "Binary", 	create_1, exp_Binary, NULL, NULL },
     { "Const", 		NULL,     exp_Const, NULL, dump_Const },
+    { "Defaults", 	create_1, exp_Defaults, NULL, NULL },
+    { "Function", 	create_Func, exp_Function, NULL, NULL },
     { "Name",           create_1, exp_Name, NULL, NULL },
     { "Op",             create_Op, NULL, NULL, dump_Op },
+    { "Params", 	create_1, exp_Params, NULL, NULL },
+    { "Py_Call", 	create_1, exp_Py_Call, NULL, NULL },
     { "Py_Local", 	create_1, exp_Py_Local, NULL, NULL },
     { "Py_Module", 	create_1, exp_Py_Module, NULL, NULL },
     { "Py_Print" , 	create_1, exp_Py_Print, NULL, NULL },
@@ -360,8 +442,9 @@ static node_names ast_list[] = {
     { "Src_File",    	create_1, exp_Src_File, NULL, NULL },
     { "Src_Line",    	create_1, exp_Src_Lines, NULL, NULL },
     { "Stmts",          create_1, exp_default, NULL, NULL },
+    { "Void",           create_1, exp_default, NULL, NULL },
     { "_",              create_0, NULL, NULL, NULL }
-#define CONST_NODE 4
+#define CONST_NODE 5
 };
 
 static int
@@ -396,12 +479,29 @@ create_0(int nr, nodeType *self, nodeType *p)
 static nodeType*
 create_1(int nr, nodeType *self, nodeType *p)
 {
-    p->up = self;
-    NODE0(self) = p;
+    if (p) {
+        p->up = self;
+        NODE0(self) = p;
+    }
     set_fptrs(self, nr);
     return self;
 }
 
+static nodeType*
+create_Func(int nr, nodeType *self, nodeType *p)
+{
+    SymReg *r;
+    IMC_Unit *last;
+    self = create_1(nr, self, p);
+    r = NODE0(p)->u.r;
+    last = cur_unit->prev;      /* XXX  ->caller */
+    r = _get_sym(last->hash, r->name);
+    /* mark the name being a subroutine name
+     * s. Py_Local
+     */
+    r->type = VTADDRESS;
+    return self;
+}
 /*
  * API
  */
@@ -425,6 +525,9 @@ IMCC_find_node_type(const char *name)
     r = bsearch(&search, ast_list, sizeof(ast_list) / sizeof(ast_list[0]),
 		sizeof(ast_list[0]), ast_comp);
 
+#if 0
+    printf("find: '%s' - %d\n", name, r ? r - ast_list : 0);
+#endif
     if (!r) {
 	return 0;
     }
@@ -464,9 +567,12 @@ nodeType *
 IMCC_new_var_node(Interp* interpreter, char *name, int set, YYLTYPE *loc)
 {
     nodeType *p = new_node(loc);
+    SymReg *r;
     if (!cur_unit)
         fatal(1, "IMCC_new_var_node", "no cur_unit");
-    p->u.r = mk_ident(name, set);
+    p->u.r = r = mk_symreg(name, set);
+    if (!r->type)
+        r->type = VTIDENTIFIER;
     p->expand = exp_Var;
     p->dump   = dump_Var;
     return p;
@@ -561,6 +667,7 @@ IMCC_dump_nodes(nodeType *p)
 nodeType *
 IMCC_expand_nodes(Interp* interpreter, nodeType *p)
 {
+    p = check_nodes(interpreter, p);
     return p->expand(interpreter, p);
 }
 

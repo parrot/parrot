@@ -203,6 +203,8 @@ extern IMC_Unit * cur_unit;
 
 void IMCC_ast_init(Interp* interpreter);
 void IMCC_ast_compile(Interp *interpreter, FILE *fp);
+Instruction * IMCC_create_itcall_label(Interp *);
+void IMCC_itcall_sub(Interp* interpreter, SymReg* sub);
 
 #endif /* PARROT_IMCC_IMC_H_GUARD */
 

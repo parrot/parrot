@@ -210,13 +210,14 @@ static char * inv_op(char *op) {
     return (char *) get_neg_op(op, &n);
 }
 
-static Instruction *
-create_itcall_label(void)
+Instruction *
+IMCC_create_itcall_label(Interp* interpreter)
 {
     char name[128];
     SymReg * r;
     Instruction *i;
 
+    UNUSED(interpreter);
     sprintf(name, "%cpcc_sub_call_%d", IMCC_INTERNAL_CHAR, cnr++);
     r = mk_pcc_sub(str_dup(name), 0);
     current_call = i = iLABEL(cur_unit, r);
@@ -224,9 +225,10 @@ create_itcall_label(void)
     return i;
 }
 
-static void
-itcall_sub(SymReg* sub)
+void
+IMCC_itcall_sub(Interp* interpreter, SymReg* sub)
 {
+   UNUSED(interpreter);
    current_call->r[0]->pcc_sub->sub = sub;
    if (cur_obj) {
        if (cur_obj->set != 'P')
@@ -874,11 +876,11 @@ assignment:
          }
    |
          {
-            $<i>$ = create_itcall_label();
+            $<i>$ = IMCC_create_itcall_label(interp);
          }
      '(' targetlist  ')' '=' the_sub '(' arglist ')'
          {
-           itcall_sub($6);
+           IMCC_itcall_sub(interp, $6);
            current_call = NULL;
          }
    | op_assign
@@ -937,8 +939,8 @@ ptr:    POINTY { $$=0; }
 sub_call:
      the_sub
         {
-           $$ = create_itcall_label();
-           itcall_sub($1);
+           $$ = IMCC_create_itcall_label(interp);
+           IMCC_itcall_sub(interp, $1);
         }
      '(' arglist ')'
         {  $$ = $<i>2; }

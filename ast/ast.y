@@ -75,6 +75,7 @@ nodes: node
 node: IDENTIFIER '(' nodes0 ')'   { $$ = IMCC_new_node(interp, $1, $3, &@1); }
     | FUNCTION          { cur_unit = imc_open_unit(interp, IMC_PCCSUB); }
                  '(' nodes ')'  { $$ = IMCC_new_node(interp, $1, $4, &@1);
+		                  $$->unit = cur_unit;
 		                  cur_unit = cur_unit->prev; }
     | MODULE            { cur_unit = imc_open_unit(interp, IMC_PCCSUB); }
                  '(' nodes ')'  { $$ = IMCC_new_node(interp, $1, $4, &@1); }
