@@ -15,6 +15,7 @@ sub runstep {
   my($cc, $link, $ld, $ccflags, $linkflags, $ldflags, $libs) = 
       Configure::Data->get(qw(cc link ld ccflags linkflags ldflags libs));
   $ccflags =~ s/-D(PERL|HAVE)_\w+\s*//g;
+  $ccflags =~ s/-fno-strict-aliasing//g;
   $linkflags =~ s/-libpath:\S+//g;
   $ldflags =~ s/-libpath:\S+//g;
   my $debug='n';
