@@ -8,7 +8,7 @@ This file implements objects that represent character class atoms.  The design
 is a simple vtable design, so that we can add unicode trait classes and such
 when we find out how.
 
-Yes, it is all in PIR.  And yes, this is a speed-critical part of P6GE.  Don't
+Yes, it is all in PIR.  And yes, this is a speed-critical part of PGE.  Don't
 complain; it's designed so that you can drop in a faster implementation any
 time.  Just replace these classes with PMCs.
 
@@ -20,21 +20,21 @@ walk the logic tree and replace it with a direct lookup or something.
 
 .sub __onload @LOAD
     .local pmc base
-    newclass base, "P6GE::Class"
+    newclass base, "PGE::Class"
 
-    subclass $P0, base, "P6GE::Class::Discrete"
+    subclass $P0, base, "PGE::Class::Discrete"
     addattribute $P0, ".chars"   # str; attr 0
 
-    subclass $P0, base, "P6GE::Class::Invert"
+    subclass $P0, base, "PGE::Class::Invert"
     addattribute $P0, ".child"   # pmc; attr 0
 
     .return()
 .end
 
 
-.namespace [ "P6GE::Class" ]
+.namespace [ "PGE::Class" ]
 
-=head2 P6GE::Class
+=head2 PGE::Class
 
 This is an abstract base class for the atomic classes defined later in 
 the file.  It provides the following methods to all other classes
@@ -106,7 +106,7 @@ fail:
 dontzero:
 
     .local pmc parent
-    find_type $I0, "P6GE::Class::Invert"
+    find_type $I0, "PGE::Class::Invert"
     new parent, $I0
 
     assign parent, self
@@ -119,16 +119,16 @@ dontzero:
 
 =cut
 
-.namespace [ "P6GE::Class::Discrete" ]
+.namespace [ "PGE::Class::Discrete" ]
 
-=head2 P6GE::Class::Discrete
+=head2 PGE::Class::Discrete
 
 This class represents a discrete set of characters, such as [aeiou] (or
 <[aeiou]> in Perl 6-land).  To use this class:
 
     # create the character class
     .local pmc class
-    find_type $I0, "P6GE::Class::Discrete"
+    find_type $I0, "PGE::Class::Discrete"
     new class, $I0
 
     # assign the characters it will match
@@ -156,7 +156,7 @@ in that case.
 
 .sub __init method
     .local int offset
-    classoffset offset, self, "P6GE::Class::Discrete"
+    classoffset offset, self, "PGE::Class::Discrete"
 
     $P0 = new String
     setattribute self, offset, $P0
@@ -166,7 +166,7 @@ in that case.
 .sub __set_string_native method
     .param string list
     .local int offset
-    classoffset offset, self, "P6GE::Class::Discrete"
+    classoffset offset, self, "PGE::Class::Discrete"
     getattribute $P0, self, offset
 
     $P0 = list
@@ -183,7 +183,7 @@ in that case.
     .param pmc key
 
     .local int offset
-    classoffset offset, self, "P6GE::Class::Discrete"
+    classoffset offset, self, "PGE::Class::Discrete"
     getattribute $P0, self, offset
 
     $S0 = $P0
@@ -197,16 +197,16 @@ fail:
 .end
 
 
-.namespace [ "P6GE::Class::Invert" ]
+.namespace [ "PGE::Class::Invert" ]
 
-=head2 P6GE::Class::Invert
+=head2 PGE::Class::Invert
 
 This class represents the logical inversion of another class.  That is,
 it matches exactly when its child doesn't.  To create this class:
 
     # create the character class
     .local pmc class
-    find_type $I0, "P6GE::Class::Invert"
+    find_type $I0, "PGE::Class::Invert"
     new class, $I0
 
     # assign a child object
@@ -220,7 +220,7 @@ it matches exactly when its child doesn't.  To create this class:
     .param pmc child
 
     .local int offset
-    classoffset offset, self, "P6GE::Class::Invert"
+    classoffset offset, self, "PGE::Class::Invert"
     setattribute self, offset, child
     .return()
 .end
@@ -236,12 +236,20 @@ it matches exactly when its child doesn't.  To create this class:
     .param pmc key
 
     .local int offset
-    classoffset offset, self, "P6GE::Class::Invert"
+    classoffset offset, self, "PGE::Class::Invert"
     getattribute $P0, self, offset
 
     $I0 = $P0[key]
     $I1 = !$I0
     .return($I1)
 .end
+
+=head1 AUTHORS
+
+Luke Palmer (luke@luqui.org) wrote this module.  Patrick Michaud
+(pmichaud@pobox.com) engineered PGE as a whole.  Questions about PGE should be
+directed to perl6-compiler@perl.org.
+
+=cut
 
 # vim: ft=imc :
