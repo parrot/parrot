@@ -504,7 +504,7 @@ PDB_break(struct Parrot_Interp *interpreter)
 }
 
 /* PDB_escape
- * escapes \r \n \t \a and \\
+ * escapes " \r \n \t \a and \\
  */
 char *
 PDB_escape(const char *string)
@@ -540,6 +540,10 @@ PDB_escape(const char *string)
             case '\\':
                 *(fill++) = '\\';
                 *(fill++) = '\\';
+                break;
+            case '"':
+                *(fill++) = '\\';
+                *(fill++) = '"';
                 break;
             default:
                 *(fill++) = *string;
