@@ -33,8 +33,11 @@ END
 }
 
     print OUT <<'END';
-
-#define VA_TO_VAPTR(x) (&(x))
+#ifdef __powerpc__
+#  define VA_TO_VAPTR(x) (x)
+#else
+#  define VA_TO_VAPTR(x) (&(x))
+#endif
 END
 
 #endif guard
