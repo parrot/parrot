@@ -7,6 +7,7 @@ EXPORTS
     nci_dd
     nci_f
     nci_fff
+    nci_i
     nci_iiii
     nci_ii3
     nci_isc
@@ -17,6 +18,7 @@ EXPORTS
     nci_l
     nci_p
     nci_pi
+    nci_pii
     nci_piiii
     nci_pip
     nci_pp
@@ -26,8 +28,10 @@ EXPORTS
     nci_tB
     nci_tb
     nci_tt
+    nci_v
     nci_vP
     nci_vpii
+    nci_vv
     nci_cb_C1
     nci_cb_C2
     nci_cb_C3
@@ -37,3 +41,5 @@ EXPORTS
     nci_cb_D4
     nci_dlvar_int
     nci_dlvar_double
+    nci_dlvar_float
+    int_cb_D4
