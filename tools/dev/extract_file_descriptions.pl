@@ -101,7 +101,7 @@ sub describe_perl_file {
 	s/^\#\!.+//m;            # #!
 	s/^\# *[a-z0-9]+\.(p[ml]|pasm)\s*\n//mi; # own file name - kludgy
 	s/\#\s*Copyright[^\n]+\n(\# *\S[^\n]*\n)*/\#\n/s;
-	s/^\#\s*(\$Id$info->{Id} = $1;
+	s/^\#\s*(\$I[d]: .+)\n//m; $info->{Id} = $1;
 	s/^\#\s*Author:.+//m;
 	
 	s/^\s*\n//mg; # truly blank lines, between the # comment lines
@@ -148,7 +148,7 @@ sub describe_c_file {
     s/^ ?\*\*//mg;   # |**
     s/^ {0,2}\*//mg; # | *
 
-    s/^ *(\$Id$info->{Id} = $1;
+    s/^ *(\$I[d]: .+)\n//m; $info->{Id} = $1;
 
     my $desc;
     if(/Overview:/) { # normal parrot code files
