@@ -33,6 +33,7 @@ init_world(void) {
     Parrot_PerlString_class_init();
     Parrot_PerlArray_class_init();
     Parrot_PerlHash_class_init();
+    Parrot_ParrotPointer_class_init();
 }
 
 /*
