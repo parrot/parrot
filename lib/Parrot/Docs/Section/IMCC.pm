@@ -39,7 +39,10 @@ sub new
 	my $self = shift;
 	
 	return $self->SUPER::new(
-		'IMCC', 'imcc.html', '', 'imcc'
+		'IMCC', 'imcc.html', '', 
+		$self->new_group('Documentation', '', 'imcc/docs'),
+		$self->new_group('Examples', '', 'imcc/examples'),
+		$self->new_group('Tests', '', 'imcc/t'),
 	);
 }
 

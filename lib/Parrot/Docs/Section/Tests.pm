@@ -40,6 +40,7 @@ sub new
 	
 	return $self->SUPER::new(
 		'Tests', 'tests.html', '',
+		$self->new_item('', 't/harness'),
 		$self->new_group('Native Bytecode Tests', '', 't/native_pbc'),
 		$self->new_group('Ops Tests', '', 't/op'),
 		$self->new_group('PMC Tests', '', 't/pmc'),

@@ -79,9 +79,9 @@ sub new
 	return $self;
 }
 
-=item C<set_parent($parent)
+=item C<set_parent($parent)>
 
-=item C<parent()
+=item C<parent()>
 
 Accessors for the containing section/group for the item.
 
@@ -214,7 +214,7 @@ recursively, relative to C<$source>.
 
 If C<$path> is a file in C<$source> then C<$path> is returned.
 
-If C<$path> cannot be found then an exception is raised.
+If C<$path> cannot be found then a warning is printed.
 
 =cut
 
@@ -240,7 +240,7 @@ sub file_paths_relative_to_source
 	}
 	else
 	{
-		die "Failed to process $rel_path.\n";
+		warn "Failed to process $rel_path.\n";
 	}
 
 	return @rel_paths;

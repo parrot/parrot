@@ -181,14 +181,17 @@ sub html_for_file
 	# Unlinked URLs. We should not be having to do this here.
 	$string =~ s|(http://[^\s<)]+)|<a href="$1">$1</a>|gs;
 	
-	my ($see_also) = $string =~ m|(<h1><a name="SEE_ALSO".*?<p>.*?</p>)|s;
-	
-	if ( $see_also )
-	{
-		my $original = $see_also;
-		
-		$string =~ s|$original|$see_also|s;
-	}
+	# And I really don't want to do this here.
+	# my ($see_also) = $string =~ m|(<h1><a name="SEE_ALSO".*?<p>.*?</p>)|s;
+	#
+	# if ( $see_also )
+	# { 
+	#      my $original = $see_also;
+	#	
+	#		...
+	#		
+	#      $string =~ s|$original|$see_also|s;
+	# }
 	
 	return $string;
 }

@@ -27,7 +27,6 @@ die unless GetOptions('silent' => \$silent, 'delete' => \$delete);
 
 my $docs = Parrot::Docs::Section::Parrot->new;
 
-# Use default source and target.
-$docs->write_html(undef, undef, $silent, $delete);
+$docs->write_docs($silent, $delete);
 
 exit 0;
