@@ -13,8 +13,7 @@
 #include "parrot/packfile.h"
 #include "parrot/interpreter.h"
 
-void PackFile_dump (struct Parrot_Interp *interpreter,
-                    struct PackFile *pf);
+void PackFile_dump(struct Parrot_Interp *interpreter, struct PackFile *pf);
 
 int
 main(int argc, char **argv)
@@ -42,7 +41,7 @@ main(int argc, char **argv)
     }
 
     interpreter = make_interpreter(NO_FLAGS);
-    Parrot_init (interpreter, (void *) &file_stat);
+    Parrot_init(interpreter, (void *)&file_stat);
 
     packed_size = file_stat.st_size;
 

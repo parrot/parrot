@@ -95,7 +95,7 @@ pmc_new_noinit(struct Parrot_Interp *interpreter, INTVAL base_type)
 */
 
 PMC *
-pmc_new_init(struct Parrot_Interp *interpreter, INTVAL base_type, PMC * init)
+pmc_new_init(struct Parrot_Interp *interpreter, INTVAL base_type, PMC *init)
 {
     PMC *pmc = new_pmc_header(interpreter);
 

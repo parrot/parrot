@@ -140,7 +140,7 @@ Parrot_snprintf(struct Parrot_Interp *interpreter, char *targ, size_t len,
 }
 
 STRING *
-Parrot_psprintf(struct Parrot_Interp *interpreter, STRING *pat, PMC * ary)
+Parrot_psprintf(struct Parrot_Interp *interpreter, STRING *pat, PMC *ary)
 {
     SPRINTF_OBJ obj = pmc_core;
     obj.data = ary;

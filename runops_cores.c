@@ -52,7 +52,8 @@ runops_cgoto_core(struct Parrot_Interp *interpreter, opcode_t *pc)
     pc = cg_core(pc, interpreter);
     return pc;
 #else
-    PIO_eprintf(interpreter, "Computed goto unavailable in this configuration.\n");
+    PIO_eprintf(interpreter,
+                "Computed goto unavailable in this configuration.\n");
     exit(1);
     return NULL;
 #endif
@@ -73,7 +74,7 @@ runops_slow_core(struct Parrot_Interp *interpreter, opcode_t *pc)
     opcode_t *code_end;
     opcode_t *lastpc = NULL;
     FLOATVAL starttime = 0;
-    Interp * trace_i;
+    Interp *trace_i;
 
     code_start = interpreter->code->byte_code;
     code_size = interpreter->code->byte_code_size / sizeof(opcode_t);
@@ -81,9 +82,9 @@ runops_slow_core(struct Parrot_Interp *interpreter, opcode_t *pc)
 
     if (Interp_flags_TEST(interpreter, PARROT_TRACE_FLAG)) {
         trace_i = make_interpreter(NO_FLAGS);
-        Parrot_init(trace_i, (void*)& starttime);
+        Parrot_init(trace_i, (void *)&starttime);
         mem_sys_memcopy(&trace_i->ctx, &interpreter->ctx,
-                sizeof(struct Parrot_Context));
+                        sizeof(struct Parrot_Context));
         trace_i->code = interpreter->code;
         trace_op(trace_i, code_start, code_end, pc);
     }
@@ -99,7 +100,7 @@ runops_slow_core(struct Parrot_Interp *interpreter, opcode_t *pc)
 
         if (Interp_flags_TEST(interpreter, PARROT_TRACE_FLAG)) {
             mem_sys_memcopy(&trace_i->ctx, &interpreter->ctx,
-                    sizeof(struct Parrot_Context));
+                            sizeof(struct Parrot_Context));
             trace_op(trace_i, code_start, code_end, pc);
         }
         if (Interp_flags_TEST(interpreter, PARROT_PROFILE_FLAG)) {

@@ -21,7 +21,8 @@ Parrot_push_i(struct Parrot_Interp *interpreter)
     /* Do we have any space in the current savestack? If so, memcpy
      * down */
     if (interpreter->ctx.int_reg_top->free) {
-        memcpy(&interpreter->ctx.int_reg_top->IReg[interpreter->ctx.int_reg_top->used],
+        memcpy(&interpreter->ctx.int_reg_top->
+               IReg[interpreter->ctx.int_reg_top->used],
                &interpreter->ctx.int_reg, sizeof(struct IReg));
         interpreter->ctx.int_reg_top->free--;
         interpreter->ctx.int_reg_top->used++;
@@ -29,7 +30,7 @@ Parrot_push_i(struct Parrot_Interp *interpreter)
     /* Nope, so either move to next stack chunk or grow the stack */
     else {
         struct IRegChunk *next_chunk;
-        if(interpreter->ctx.int_reg_top->next)
+        if (interpreter->ctx.int_reg_top->next)
             next_chunk = interpreter->ctx.int_reg_top->next;
         else {
             next_chunk = mem_sys_allocate(sizeof(struct IRegChunk));
@@ -107,7 +108,7 @@ Parrot_push_s(struct Parrot_Interp *interpreter)
     /* Nope, so either move to next stack chunk or grow the stack */
     else {
         struct SRegChunk *next_chunk;
-        if(interpreter->ctx.string_reg_top->next)
+        if (interpreter->ctx.string_reg_top->next)
             next_chunk = interpreter->ctx.string_reg_top->next;
         else {
             next_chunk = mem_sys_allocate(sizeof(struct SRegChunk));
@@ -176,7 +177,8 @@ Parrot_push_n(struct Parrot_Interp *interpreter)
     /* Do we have any space in the current savestack? If so, memcpy
      * down */
     if (interpreter->ctx.num_reg_top->free) {
-        memcpy(&interpreter->ctx.num_reg_top->NReg[interpreter->ctx.num_reg_top->used],
+        memcpy(&interpreter->ctx.num_reg_top->
+               NReg[interpreter->ctx.num_reg_top->used],
                &interpreter->ctx.num_reg, sizeof(struct NReg));
         interpreter->ctx.num_reg_top->free--;
         interpreter->ctx.num_reg_top->used++;
@@ -184,7 +186,7 @@ Parrot_push_n(struct Parrot_Interp *interpreter)
     /* Nope, so either move to next stack chunk or grow the stack */
     else {
         struct NRegChunk *next_chunk;
-        if(interpreter->ctx.num_reg_top->next)
+        if (interpreter->ctx.num_reg_top->next)
             next_chunk = interpreter->ctx.num_reg_top->next;
         else {
             next_chunk = mem_sys_allocate(sizeof(struct NRegChunk));
@@ -253,7 +255,8 @@ Parrot_push_p(struct Parrot_Interp *interpreter)
     /* Do we have any space in the current savestack? If so, memcpy
      * down */
     if (interpreter->ctx.pmc_reg_top->free) {
-        memcpy(&interpreter->ctx.pmc_reg_top->PReg[interpreter->ctx.pmc_reg_top->used],
+        memcpy(&interpreter->ctx.pmc_reg_top->
+               PReg[interpreter->ctx.pmc_reg_top->used],
                &interpreter->ctx.pmc_reg, sizeof(struct PReg));
         interpreter->ctx.pmc_reg_top->free--;
         interpreter->ctx.pmc_reg_top->used++;
@@ -261,7 +264,7 @@ Parrot_push_p(struct Parrot_Interp *interpreter)
     /* Nope, so either move to next stack chunk or grow the stack */
     else {
         struct PRegChunk *next_chunk;
-        if(interpreter->ctx.pmc_reg_top->next)
+        if (interpreter->ctx.pmc_reg_top->next)
             next_chunk = interpreter->ctx.pmc_reg_top->next;
         else {
             next_chunk = mem_sys_allocate(sizeof(struct PRegChunk));

@@ -13,8 +13,7 @@ Parrot_warn(struct Parrot_Interp *interpreter, INTVAL warnclass,
     va_list args;
     va_start(args, message);
 
-    if (!(interpreter == NULL || 
-          PARROT_WARNINGS_test(interpreter, warnclass))) {
+    if (!(interpreter == NULL || PARROT_WARNINGS_test(interpreter, warnclass))) {
         return 2;
     }
 
@@ -27,13 +26,12 @@ Parrot_warn(struct Parrot_Interp *interpreter, INTVAL warnclass,
     }
 
     if (PIO_eprintf(interpreter, "%S%S.\n",
-            targ,
-            interpreter ? Parrot_sprintf_c(
-                interpreter, " at %S line %d", interpreter->current_file, 
-                                               interpreter->current_line
-            ) : NULL
-        ) < 0)
-    {
+                    targ,
+                    interpreter ? Parrot_sprintf_c(interpreter,
+                                                   " at %S line %d",
+                                                   interpreter->current_file,
+                                                   interpreter->
+                                                   current_line) : NULL) < 0) {
         return -2;
     }
     else {
@@ -50,8 +48,7 @@ Parrot_warn_s(struct Parrot_Interp *interpreter, INTVAL warnclass,
     va_list args;
     va_start(args, message);
 
-    if (!(interpreter == NULL || 
-          PARROT_WARNINGS_test(interpreter, warnclass))) {
+    if (!(interpreter == NULL || PARROT_WARNINGS_test(interpreter, warnclass))) {
         return 2;
     }
 
@@ -63,13 +60,12 @@ Parrot_warn_s(struct Parrot_Interp *interpreter, INTVAL warnclass,
     }
 
     if (PIO_eprintf(interpreter, "%S%S.\n",
-            targ,
-            interpreter ? Parrot_sprintf_c(
-                interpreter, " at %S line %d", interpreter->current_file,
-                                               interpreter->current_line
-            ) : NULL
-        ) < 0)
-    {
+                    targ,
+                    interpreter ? Parrot_sprintf_c(interpreter,
+                                                   " at %S line %d",
+                                                   interpreter->current_file,
+                                                   interpreter->
+                                                   current_line) : NULL) < 0) {
         return -2;
     }
     else {

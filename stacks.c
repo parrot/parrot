@@ -25,7 +25,7 @@ new_stack(Interp *interpreter)
 #endif
 
     Stack_Chunk_t *stack = mem_sys_allocate(sizeof(Stack_Chunk_t));
-    
+
     stack->used = 0;
     stack->flags = NO_STACK_CHUNK_FLAGS;
     stack->next = NULL;
@@ -49,8 +49,9 @@ new_stack(Interp *interpreter)
 }
 
 void
-stack_mark_cow(Stack_Chunk_t *stack) {
-    Stack_Chunk_t * chunk = stack;
+stack_mark_cow(Stack_Chunk_t *stack)
+{
+    Stack_Chunk_t *chunk = stack;
     chunk->flags |= STACK_CHUNK_COW_FLAG;
     for (chunk = chunk->prev; chunk; chunk = chunk->prev)
         chunk->flags |= STACK_CHUNK_COW_FLAG;
@@ -74,14 +75,15 @@ stack_height(Interp *interpreter, Stack_Chunk_t *stack)
  * references, fix this to do COW by chunk.
  */
 Stack_Chunk_t *
-stack_copy(struct Parrot_Interp * interp, Stack_Chunk_t *old_top) {
-    Stack_Chunk_t *old_chunk = old_top; 
+stack_copy(struct Parrot_Interp *interp, Stack_Chunk_t *old_top)
+{
+    Stack_Chunk_t *old_chunk = old_top;
     Stack_Chunk_t *new_chunk;
     Stack_Chunk_t *new_top = NULL;
     Stack_Chunk_t *last = NULL;
     do {
         new_chunk = mem_sys_allocate(sizeof(Stack_Chunk_t));
-        if(new_top == NULL) {
+        if (new_top == NULL) {
             new_top = new_chunk;
             new_top->next = NULL;
             new_top->prev = NULL;
@@ -97,17 +99,17 @@ stack_copy(struct Parrot_Interp * interp, Stack_Chunk_t *old_top) {
 
         /* Can't do bit arithmetic directly on enums, must cast via ints. */
         new_chunk->flags = (Stack_chunk_flags)((int)old_chunk->flags
-                & ~(int)STACK_CHUNK_COW_FLAG);
+                                               & ~(int)STACK_CHUNK_COW_FLAG);
 
         /* Copy stack buffer */
         new_chunk->buffer = new_buffer_header(interp);
         Parrot_allocate(interp, new_chunk->buffer,
-                    sizeof(Stack_Entry_t) * STACK_CHUNK_DEPTH);
+                        sizeof(Stack_Entry_t) * STACK_CHUNK_DEPTH);
         memcpy(new_chunk->buffer->bufstart, old_chunk->buffer->bufstart,
-                    old_chunk->buffer->buflen);
+               old_chunk->buffer->buflen);
         old_chunk = old_chunk->prev;
     }
-    while(old_chunk);
+    while (old_chunk);
     return new_top;
 }
 
@@ -122,34 +124,33 @@ stack_entry(Interp *interpreter, Stack_Chunk_t *stack, Intval depth)
     Stack_Chunk_t *chunk;
     Stack_Entry_t *entry = NULL;
     size_t offset = (size_t)depth;
-    
+
     /* For negative depths, look from the bottom of the stack up. */
     if (depth < 0) {
         /* FIXME: Non-circular stack makes this rare case slow */
-        for(chunk = stack; chunk->prev; chunk = chunk->prev)
-            ;
+        for (chunk = stack; chunk->prev; chunk = chunk->prev);
         offset = (size_t)-depth;
         while (chunk != NULL && offset >= chunk->used) {
             offset -= chunk->used;
-            chunk  = chunk->next;
+            chunk = chunk->next;
         }
-        if(chunk == NULL)
+        if (chunk == NULL)
             return NULL;
-        if(offset < chunk->used) {
+        if (offset < chunk->used) {
             entry = (Stack_Entry_t *)chunk->buffer->bufstart + offset - 1;
         }
     }
     else {
-        chunk = stack;    /* Start at top */
+        chunk = stack;          /* Start at top */
         while (chunk != NULL && offset >= chunk->used) {
             offset -= chunk->used;
-            chunk  = chunk->prev;
+            chunk = chunk->prev;
         }
-        if(chunk == NULL)
+        if (chunk == NULL)
             return NULL;
-        if(offset < chunk->used) {
+        if (offset < chunk->used) {
             entry = (Stack_Entry_t *)chunk->buffer->bufstart +
-                                                    chunk->used - offset - 1;
+                chunk->used - offset - 1;
         }
     }
     return entry;
@@ -160,13 +161,12 @@ stack_entry(Interp *interpreter, Stack_Chunk_t *stack, Intval depth)
    is bubble down, so that the Nth element becomes the top most element.
 */
 void
-rotate_entries(Interp *interpreter, Stack_Chunk_t *stack, 
-               Intval num_entries)
+rotate_entries(Interp *interpreter, Stack_Chunk_t *stack, Intval num_entries)
 {
     Stack_Entry_t temp;
     Intval i;
     Intval depth = num_entries - 1;
-    
+
     if (num_entries >= -1 && num_entries <= 1) {
         return;
     }
@@ -174,11 +174,11 @@ rotate_entries(Interp *interpreter, Stack_Chunk_t *stack,
     if (num_entries < 0) {
         num_entries = -num_entries;
         depth = num_entries - 1;
-            
+
         if (stack_height(interpreter, stack) < (size_t)num_entries) {
             internal_exception(ERROR_STACK_SHALLOW, "Stack too shallow!\n");
         }
-        
+
         temp = *stack_entry(interpreter, stack, depth);
         for (i = depth; i > 0; i--) {
             *stack_entry(interpreter, stack, i) =
@@ -186,13 +186,13 @@ rotate_entries(Interp *interpreter, Stack_Chunk_t *stack,
         }
 
         *stack_entry(interpreter, stack, 0) = temp;
-    } 
+    }
     else {
-        
+
         if (stack_height(interpreter, stack) < (size_t)num_entries) {
             internal_exception(ERROR_STACK_SHALLOW, "Stack too shallow!\n");
         }
-        
+
         temp = *stack_entry(interpreter, stack, 0);
         for (i = 0; i < depth; i++) {
             *stack_entry(interpreter, stack, i) =
@@ -258,34 +258,33 @@ stack_push(Interp *interpreter, Stack_Chunk_t **stack_p,
     entry->entry_type = type;
     /* If we were passed a cleanup function, mark the flag entry
      * for this as needing cleanup */
-    entry->flags = (cleanup ? STACK_ENTRY_CLEANUP_FLAG 
-                            : NO_STACK_ENTRY_FLAGS);
+    entry->flags = (cleanup ? STACK_ENTRY_CLEANUP_FLAG : NO_STACK_ENTRY_FLAGS);
     /* Remember the cleanup function */
     entry->cleanup = cleanup;
     /* Store our thing */
     switch (type) {
-        case STACK_ENTRY_INT:
-            entry->entry.int_val = *(Intval *)thing;
-            break;
-        case STACK_ENTRY_FLOAT:
-            entry->entry.num_val = *(Floatval *)thing;
-            break;
-        case STACK_ENTRY_PMC:
-            entry->entry.pmc_val = (PMC *)thing;
-            break;
-        case STACK_ENTRY_STRING:
-            entry->entry.string_val = (String *)thing;
-            break;
-        case STACK_ENTRY_POINTER:
-            entry->entry.generic_pointer = thing;
-            break;
-        case STACK_ENTRY_DESTINATION:
-            entry->entry.generic_pointer = thing;
-            break;
-        default:
-            internal_exception(ERROR_BAD_STACK_TYPE, 
-                               "Invalid Stack_Entry_type!\n");
-            break;
+    case STACK_ENTRY_INT:
+        entry->entry.int_val = *(Intval *)thing;
+        break;
+    case STACK_ENTRY_FLOAT:
+        entry->entry.num_val = *(Floatval *)thing;
+        break;
+    case STACK_ENTRY_PMC:
+        entry->entry.pmc_val = (PMC *)thing;
+        break;
+    case STACK_ENTRY_STRING:
+        entry->entry.string_val = (String *)thing;
+        break;
+    case STACK_ENTRY_POINTER:
+        entry->entry.generic_pointer = thing;
+        break;
+    case STACK_ENTRY_DESTINATION:
+        entry->entry.generic_pointer = thing;
+        break;
+    default:
+        internal_exception(ERROR_BAD_STACK_TYPE,
+                           "Invalid Stack_Entry_type!\n");
+        break;
     }
 
     chunk->used++;
@@ -345,7 +344,7 @@ stack_pop(Interp *interpreter, Stack_Chunk_t **stack_p,
 
     /* Cleanup routine? */
     if (entry->flags & STACK_ENTRY_CLEANUP_FLAG) {
-        (*entry->cleanup)(entry);
+        (*entry->cleanup) (entry);
     }
 
     /* Sometimes the caller doesn't care what the value was */
@@ -355,28 +354,28 @@ stack_pop(Interp *interpreter, Stack_Chunk_t **stack_p,
 
     /* Snag the value */
     switch (type) {
-        case STACK_ENTRY_INT:
-            *(Intval *)where = entry->entry.int_val;
-            break;
-        case STACK_ENTRY_FLOAT:
-            *(Floatval *)where = entry->entry.num_val;
-            break;
-        case STACK_ENTRY_PMC:
-            *(PMC **)where = entry->entry.pmc_val;
-            break;
-        case STACK_ENTRY_STRING:
-            *(String **)where = entry->entry.string_val;
-            break;
-        case STACK_ENTRY_POINTER:
-            *(void **)where = entry->entry.generic_pointer;
-            break;
-        case STACK_ENTRY_DESTINATION:
-            *(void **)where = entry->entry.generic_pointer;
-            break;
-        default:
+    case STACK_ENTRY_INT:
+        *(Intval *)where = entry->entry.int_val;
+        break;
+    case STACK_ENTRY_FLOAT:
+        *(Floatval *)where = entry->entry.num_val;
+        break;
+    case STACK_ENTRY_PMC:
+        *(PMC **)where = entry->entry.pmc_val;
+        break;
+    case STACK_ENTRY_STRING:
+        *(String **)where = entry->entry.string_val;
+        break;
+    case STACK_ENTRY_POINTER:
+        *(void **)where = entry->entry.generic_pointer;
+        break;
+    case STACK_ENTRY_DESTINATION:
+        *(void **)where = entry->entry.generic_pointer;
+        break;
+    default:
         internal_exception(ERROR_BAD_STACK_TYPE,
                            "Wrong type on top of stack!\n");
-            break;                
+        break;
     }
 
     return where;
@@ -395,18 +394,18 @@ pop_dest(Interp *interpreter)
 }
 
 void *
-stack_peek(Interp *interpreter, Stack_Chunk_t *stack_base, 
+stack_peek(Interp *interpreter, Stack_Chunk_t *stack_base,
            Stack_entry_type *type)
 {
     Stack_Entry_t *entry = stack_entry(interpreter, stack_base, 0);
     if (entry == NULL) {
         return NULL;
     }
-    
+
     if (type != NULL) {
         *type = entry->entry_type;
     }
-    
+
     return entry->entry.generic_pointer;
 }
 

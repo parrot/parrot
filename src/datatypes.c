@@ -14,14 +14,14 @@
  * return datatype enum for STRING* typename
  */
 INTVAL
-Parrot_get_datatype_enum(Interp * interpreter, STRING *typename)
+Parrot_get_datatype_enum(Interp *interpreter, STRING *typename)
 {
     const char *type = string_to_cstring(interpreter, typename);
     int i;
 
     for (i = enum_first_type; i < enum_last_type; i++) {
-	if (!strcmp(datatype_names[i-enum_first_type], type))
-	    return i;
+        if (!strcmp(datatype_names[i - enum_first_type], type))
+            return i;
     }
     return enum_type_undef;
 }
@@ -30,13 +30,13 @@ Parrot_get_datatype_enum(Interp * interpreter, STRING *typename)
  * return datatype name for type
  */
 STRING *
-Parrot_get_datatype_name(Interp * interpreter, INTVAL type)
+Parrot_get_datatype_name(Interp *interpreter, INTVAL type)
 {
     const char *s;
     if (type < enum_first_type || type >= enum_last_type)
-	s = "illegal";
+        s = "illegal";
     else
-	s = datatype_names[ type - enum_first_type ];
+        s = datatype_names[type - enum_first_type];
     return string_make(interpreter, s, strlen(s), 0, 0, 0);
 }
 

@@ -50,7 +50,7 @@ uint_to_str(struct Parrot_Interp *interpreter, STRING *out,
      * with precision--the string was being reused without
      * being cleared first.
      */
-    if(string_compare(interpreter, out, cstr2pstr("-")) != 0) {
+    if (string_compare(interpreter, out, cstr2pstr("-")) != 0) {
         string_set(interpreter, out, cstr2pstr(""));
     }
 
@@ -69,7 +69,7 @@ int_to_str(struct Parrot_Interp *interpreter, STRING *out,
         string_append(interpreter, out, cstr2pstr("-"), 0);
         num = -num;
     }
-    uint_to_str(interpreter, out, tc, (UHUGEINTVAL) num, base);
+    uint_to_str(interpreter, out, tc, (UHUGEINTVAL)num, base);
 }
 
 /* handle +, -, 0, #, space, width, and prec. */
@@ -138,9 +138,9 @@ handle_flags(struct Parrot_Interp *interpreter,
         else {                  /* right-align */
             /* signed and zero padded */
             if (info->flags & FLAG_ZERO
-                && (string_ord(str,0) == '-' || string_ord(str,0) == '+')) {
+                && (string_ord(str, 0) == '-' || string_ord(str, 0) == '+')) {
                 STRING *temp;
-                string_substr(interpreter, str, 1, len-1, &temp);
+                string_substr(interpreter, str, 1, len - 1, &temp);
                 string_chopn(str, -1);
                 string_append(interpreter, str, fill, 0);
                 string_append(interpreter, str, temp, 0);
@@ -214,7 +214,7 @@ gen_sprintf_call(struct Parrot_Interp *interpreter, STRING *ts, char *out,
 
 STRING *
 Parrot_sprintf_format(struct Parrot_Interp *interpreter, STRING *pat,
-                      SPRINTF_OBJ * obj)
+                      SPRINTF_OBJ *obj)
 {
     INTVAL i, len, old;
     STRING *targ = string_make(interpreter, NULL, 0, NULL, 0, NULL);
@@ -228,7 +228,7 @@ Parrot_sprintf_format(struct Parrot_Interp *interpreter, STRING *pat,
     char tc[PARROT_SPRINTF_BUFFER_SIZE];
 
 
-    for (i = old = len = 0; i < (INTVAL) string_length(pat); i++) {
+    for (i = old = len = 0; i < (INTVAL)string_length(pat); i++) {
         if (string_ord(pat, i) == '%') {        /* % */
             if (len) {
                 string_substr(interpreter, pat, old, len, &substr);
@@ -352,7 +352,7 @@ Parrot_sprintf_format(struct Parrot_Interp *interpreter, STRING *pat,
  *  set flags--the last does all the work.
  */
 
-                for (i++; i < (INTVAL) string_length(pat)
+                for (i++; i < (INTVAL)string_length(pat)
                      && info.phase != PHASE_DONE; i++) {
                     INTVAL ch = string_ord(pat, i);
 
@@ -507,7 +507,8 @@ Parrot_sprintf_format(struct Parrot_Interp *interpreter, STRING *pat,
                             break;
 
                         case 'x':
-                            theuint = obj->getuint(interpreter, info.type, obj);
+                            theuint =
+                                obj->getuint(interpreter, info.type, obj);
                             uint_to_str(interpreter, ts, tc, theuint, 16);
 
                             handle_flags(interpreter, &info, ts, 1, "0x");
@@ -557,7 +558,7 @@ Parrot_sprintf_format(struct Parrot_Interp *interpreter, STRING *pat,
                         case 'p':
                             ptr = obj->getptr(interpreter, info.type, obj);
                             uint_to_str(interpreter, ts, tc,
-                                       (HUGEINTVAL) (size_t) ptr, 16);
+                                        (HUGEINTVAL)(size_t)ptr, 16);
 
                             handle_flags(interpreter, &info, ts, 1, "0x");
 
@@ -587,13 +588,14 @@ Parrot_sprintf_format(struct Parrot_Interp *interpreter, STRING *pat,
                              * XXX this bug might also apply to %e and %E
                              */
 
-                            if(tolower(ch) == 'g') {
+                            if (tolower(ch) == 'g') {
                                 UINTVAL i;
-                                for(i=0; i < strlen(tc); i++) {
-                                    if(tolower(tc[i]) == 'e' &&
-                                        (tc[i+1] == '+' || tc[i+1] == '-')) {
-                                        tc[i+2]='\0';
-                                        strcat(tc, &(tc[i+3]));
+                                for (i = 0; i < strlen(tc); i++) {
+                                    if (tolower(tc[i]) == 'e' &&
+                                        (tc[i + 1] == '+'
+                                         || tc[i + 1] == '-')) {
+                                        tc[i + 2] = '\0';
+                                        strcat(tc, &(tc[i + 3]));
                                     }
                                 }
                             }

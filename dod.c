@@ -77,7 +77,7 @@ trace_active_PMCs(struct Parrot_Interp *interpreter)
 #if ! DISABLE_GC_DEBUG
     CONSERVATIVE_POINTER_CHASING = 1;
 #endif
-    last = trace_system_stack(interpreter,last);
+    last = trace_system_stack(interpreter, last);
 #if ! DISABLE_GC_DEBUG
     CONSERVATIVE_POINTER_CHASING = 0;
 #endif
@@ -130,7 +130,7 @@ trace_active_PMCs(struct Parrot_Interp *interpreter)
     cur_stack = interpreter->ctx.user_stack;
 
     while (cur_stack) {
-        if(cur_stack->buffer){
+        if (cur_stack->buffer) {
             buffer_lives(interpreter, cur_stack->buffer);
 
             entry = (Stack_Entry_t *)(cur_stack->buffer->bufstart);
@@ -148,7 +148,7 @@ trace_active_PMCs(struct Parrot_Interp *interpreter)
     cur_stack = interpreter->ctx.control_stack;
 
     while (cur_stack) {
-        if(cur_stack->buffer){
+        if (cur_stack->buffer) {
             buffer_lives(interpreter, cur_stack->buffer);
 
             entry = (Stack_Entry_t *)(cur_stack->buffer->bufstart);
@@ -168,7 +168,7 @@ trace_active_PMCs(struct Parrot_Interp *interpreter)
     prev = NULL;
     for (; current != prev; current = current->next_for_GC) {
         UINTVAL mask = PMC_is_PMC_ptr_FLAG | PMC_is_buffer_ptr_FLAG
-                     | PMC_custom_mark_FLAG;
+            | PMC_custom_mark_FLAG;
         UINTVAL bits = current->flags & mask;
 
         /* Start by checking if there's anything at all. This assumes
@@ -192,7 +192,7 @@ trace_active_PMCs(struct Parrot_Interp *interpreter)
                     PMC **cur_pmc = trace_buf->bufstart;
                     /* Mark the damn buffer as used! */
                     buffer_lives(interpreter, trace_buf);
-                    for (i = 0; i < trace_buf->buflen / sizeof(*cur_pmc); i++){
+                    for (i = 0; i < trace_buf->buflen / sizeof(*cur_pmc); i++) {
                         if (cur_pmc[i]) {
                             last = mark_used(cur_pmc[i], last);
                         }
@@ -223,18 +223,19 @@ trace_active_buffers(struct Parrot_Interp *interpreter)
      * registers are pointing to valid buffers. This is not a good
      * assumption, but it'll do for now */
     for (i = 0; i < NUM_REGISTERS; i++) {
-        Buffer* reg = (Buffer *) interpreter->ctx.string_reg.registers[i];
-        if (reg) buffer_lives(interpreter, reg);
+        Buffer *reg = (Buffer *)interpreter->ctx.string_reg.registers[i];
+        if (reg)
+            buffer_lives(interpreter, reg);
     }
 
     /* The interpreter has a few strings of its own */
     if (interpreter->current_file)
-        buffer_lives(interpreter, (Buffer*)interpreter->current_file);
+        buffer_lives(interpreter, (Buffer *)interpreter->current_file);
     if (interpreter->current_package)
-        buffer_lives(interpreter, (Buffer*)interpreter->current_package);
+        buffer_lives(interpreter, (Buffer *)interpreter->current_package);
     for (i = 1; i < enum_class_max; i++)
-        buffer_lives(interpreter, (Buffer*)Parrot_base_vtables[i].name
-                (interpreter, 0));
+        buffer_lives(interpreter, (Buffer *)Parrot_base_vtables[i].name
+                     (interpreter, 0));
 
     /* Now walk the string stack. Make sure to walk from top down
      * since stack may have segments above top that we shouldn't walk. */
@@ -242,8 +243,9 @@ trace_active_buffers(struct Parrot_Interp *interpreter)
          cur_chunk; cur_chunk = cur_chunk->prev) {
         for (j = 0; j < cur_chunk->used; j++) {
             for (i = 0; i < NUM_REGISTERS; i++) {
-                Buffer* reg = (Buffer *) cur_chunk->SReg[j].registers[i];
-                if (reg) buffer_lives(interpreter, reg);
+                Buffer *reg = (Buffer *)cur_chunk->SReg[j].registers[i];
+                if (reg)
+                    buffer_lives(interpreter, reg);
             }
         }
     }
@@ -252,7 +254,7 @@ trace_active_buffers(struct Parrot_Interp *interpreter)
     cur_stack = interpreter->ctx.user_stack;
     /* The general stack's circular, so we need to be careful */
     while (cur_stack) {
-        if(cur_stack->buffer){
+        if (cur_stack->buffer) {
             buffer_lives(interpreter, cur_stack->buffer);
             entry = (Stack_Entry_t *)(cur_stack->buffer->bufstart);
             for (i = 0; i < cur_stack->used; i++) {
@@ -270,7 +272,7 @@ trace_active_buffers(struct Parrot_Interp *interpreter)
     /* Finally the control stack frames must be marked live */
     cur_stack = interpreter->ctx.control_stack;
     while (cur_stack) {
-        if(cur_stack->buffer){
+        if (cur_stack->buffer) {
             buffer_lives(interpreter, cur_stack->buffer);
         }
 
@@ -287,8 +289,7 @@ free_unused_PMCs(struct Parrot_Interp *interpreter)
 
     /* Run through all the buffer header pools and mark */
     for (cur_arena = interpreter->arena_base->pmc_pool->last_Arena;
-         NULL != cur_arena;
-         cur_arena = cur_arena->prev) {
+         NULL != cur_arena; cur_arena = cur_arena->prev) {
         PMC *pmc_array = cur_arena->start_objects;
         for (i = 0; i < cur_arena->used; i++) {
             /* If it's not live or on the free list, put it on the free list.
@@ -296,11 +297,11 @@ free_unused_PMCs(struct Parrot_Interp *interpreter)
              * on_free_list and live, because of our conservative stack-walk
              * collection. We must be wary of this case. */
             if (!(pmc_array[i].flags & (PMC_live_FLAG | PMC_on_free_list_FLAG |
-                                       PMC_constant_FLAG))) {
+                                        PMC_constant_FLAG))) {
                 add_free_pmc(interpreter,
-                                interpreter->arena_base->pmc_pool,
-                                &pmc_array[i]);
-            } else if(!(pmc_array[i].flags & PMC_on_free_list_FLAG)) {
+                             interpreter->arena_base->pmc_pool, &pmc_array[i]);
+            }
+            else if (!(pmc_array[i].flags & PMC_on_free_list_FLAG)) {
                 total_used++;
                 pmc_array[i].flags &= ~PMC_live_FLAG;
                 pmc_array[i].next_for_GC = NULL;
@@ -327,13 +328,12 @@ used_cow(struct Parrot_Interp *interpreter, struct Small_Object_Pool *pool)
 #ifdef LEA_DEBUG
     /* check/clear tail, e.g. on changes in string.c or res.c */
     for (cur_arena = pool->last_Arena;
-            NULL != cur_arena;
-            cur_arena = cur_arena->prev) {
+         NULL != cur_arena; cur_arena = cur_arena->prev) {
         b = cur_arena->start_objects;
         for (i = 0; i < cur_arena->used; i++) {
             if ((b->flags & BUFFER_COW_FLAG) && b->bufstart &&
-                    !(b->flags & BUFFER_external_FLAG)) {
-                tail = (char*)b->bufstart + b->buflen + 1;
+                !(b->flags & BUFFER_external_FLAG)) {
+                tail = (char *)b->bufstart + b->buflen + 1;
                 assert(*tail == 0);
                 *tail = 0;
             }
@@ -343,13 +343,12 @@ used_cow(struct Parrot_Interp *interpreter, struct Small_Object_Pool *pool)
 #endif
 
     for (cur_arena = pool->last_Arena;
-            NULL != cur_arena;
-            cur_arena = cur_arena->prev) {
+         NULL != cur_arena; cur_arena = cur_arena->prev) {
         b = cur_arena->start_objects;
         for (i = 0; i < cur_arena->used; i++) {
             if ((b->flags & BUFFER_COW_FLAG) &&
-                    !(b->flags & BUFFER_external_FLAG)) {
-                tail = (char*)b->bufstart + b->buflen + 1;
+                !(b->flags & BUFFER_external_FLAG)) {
+                tail = (char *)b->bufstart + b->buflen + 1;
                 /* mark living and dead users of this bufstart
                  * tail is cleared in *allocate_string */
                 if (b->flags & BUFFER_live_FLAG)
@@ -381,14 +380,13 @@ free_unused_buffers(struct Parrot_Interp *interpreter,
 #endif /* GC_IS_MALLOC */
     /* Run through all the buffer header pools and mark */
     for (cur_arena = pool->last_Arena;
-         NULL != cur_arena;
-         cur_arena = cur_arena->prev) {
+         NULL != cur_arena; cur_arena = cur_arena->prev) {
         Buffer *b = cur_arena->start_objects;
         for (i = 0; i < cur_arena->used; i++) {
 #ifdef GC_IS_MALLOC
             if ((b->flags & BUFFER_COW_FLAG) &&
-                    !(b->flags & BUFFER_external_FLAG))
-                tail = (char*)b->bufstart + b->buflen + 1;
+                !(b->flags & BUFFER_external_FLAG))
+                tail = (char *)b->bufstart + b->buflen + 1;
             else
                 tail = 0;
 #endif /* GC_IS_MALLOC */
@@ -396,19 +394,16 @@ free_unused_buffers(struct Parrot_Interp *interpreter,
              * Note that it is technically possible to have a Buffer be both
              * on_free_list and live, because of our conservative stack-walk
              * collection. We must be wary of this case. */
-            if (!(b->flags & ( BUFFER_on_free_list_FLAG
-                             | BUFFER_constant_FLAG
-                             | BUFFER_live_FLAG )))
-            {
+            if (!(b->flags & (BUFFER_on_free_list_FLAG
+                              | BUFFER_constant_FLAG | BUFFER_live_FLAG))) {
 #ifndef GC_IS_MALLOC
                 if (pool->mem_pool) {
                     if (!(b->flags & BUFFER_COW_FLAG)) {
                         ((struct Memory_Pool *)
-                            pool->mem_pool)->guaranteed_reclaimable +=
-                                b->buflen;
+                         pool->mem_pool)->guaranteed_reclaimable += b->buflen;
                     }
                     ((struct Memory_Pool *)
-                        pool->mem_pool)->possibly_reclaimable += b->buflen;
+                     pool->mem_pool)->possibly_reclaimable += b->buflen;
                 }
 #else /* GC_IS_MALLOC */
                 /* if only dead users, this one may be freed */
@@ -421,8 +416,9 @@ free_unused_buffers(struct Parrot_Interp *interpreter,
                  */
                 else
 #endif /* GC_IS_MALLOC */
-                add_free_buffer(interpreter, pool, b);
-            } else if (!(b->flags & BUFFER_on_free_list_FLAG)) {
+                    add_free_buffer(interpreter, pool, b);
+            }
+            else if (!(b->flags & BUFFER_on_free_list_FLAG)) {
                 total_used++;
             }
 #ifdef GC_IS_MALLOC
@@ -443,13 +439,14 @@ free_unused_buffers(struct Parrot_Interp *interpreter,
 
 /* Find a mask covering the longest common bit-prefix of val1 and val2 */
 static size_t
-find_common_mask(size_t val1, size_t val2){
+find_common_mask(size_t val1, size_t val2)
+{
     int i;
     int bound = sizeof(size_t) * 8;
 
-    for(i = 0; i < bound; i++){
-        if(val1 == val2){
-                return ~(size_t)0 << i;
+    for (i = 0; i < bound; i++) {
+        if (val1 == val2) {
+            return ~(size_t)0 << i;
         }
         val1 >>= 1;
         val2 >>= 1;
@@ -460,7 +457,7 @@ find_common_mask(size_t val1, size_t val2){
     return 0;
 }
 
-PMC*
+PMC *
 trace_system_stack(struct Parrot_Interp *interpreter, PMC *last)
 {
     size_t lo_var_ptr = (size_t)interpreter->lo_var_ptr;
@@ -473,8 +470,9 @@ trace_system_stack(struct Parrot_Interp *interpreter, PMC *last)
     size_t pmc_min = get_min_pmc_address(interpreter);
     size_t pmc_max = get_max_pmc_address(interpreter);
 
-    size_t mask = find_common_mask(buffer_min < pmc_min ? buffer_min: pmc_min,
-                buffer_max > pmc_max ? buffer_max : pmc_max);
+    size_t mask = find_common_mask(buffer_min < pmc_min ? buffer_min : pmc_min,
+                                   buffer_max >
+                                   pmc_max ? buffer_max : pmc_max);
 
     /* Get the expected prefix */
     prefix = mask & buffer_min;
@@ -483,28 +481,27 @@ trace_system_stack(struct Parrot_Interp *interpreter, PMC *last)
         return last;
 
     for (cur_var_ptr = lo_var_ptr;
-        (ptrdiff_t)(cur_var_ptr * PARROT_STACK_DIR) <
-            (ptrdiff_t)(hi_var_ptr * PARROT_STACK_DIR);
-        cur_var_ptr = (size_t)( (ptrdiff_t)cur_var_ptr +
-            PARROT_STACK_DIR * PARROT_PTR_ALIGNMENT )
-         ) {
+         (ptrdiff_t)(cur_var_ptr * PARROT_STACK_DIR) <
+         (ptrdiff_t)(hi_var_ptr * PARROT_STACK_DIR);
+         cur_var_ptr = (size_t)((ptrdiff_t)cur_var_ptr +
+                                PARROT_STACK_DIR * PARROT_PTR_ALIGNMENT)
+        ) {
         size_t ptr = *(size_t *)cur_var_ptr;
 
         /* Do a quick approximate range check by bit-masking */
-        if((ptr & mask) == prefix){
+        if ((ptr & mask) == prefix) {
             /* Note that what we find on the stack is not guaranteed to be
              * a live pmc/buffer, and could very well have its bufstart/vtable
              * destroyed due to the linked list of free headers... */
             if (pmc_min <= ptr && ptr < pmc_max &&
-                is_pmc_ptr(interpreter,(void *)ptr))
-            {
+                is_pmc_ptr(interpreter, (void *)ptr)) {
                 /* ...so ensure that mark_used checks PMC_on_free_list_FLAG
                  * before adding it to the next_for_GC list, to have
                  * vtable->mark() called. */
                 last = mark_used((PMC *)ptr, last);
-            } else if (buffer_min <= ptr && ptr < buffer_max &&
-                is_buffer_ptr(interpreter,(void *)ptr))
-            {
+            }
+            else if (buffer_min <= ptr && ptr < buffer_max &&
+                     is_buffer_ptr(interpreter, (void *)ptr)) {
                 /* ...and since buffer_lives doesn't care about bufstart,
                  * it doesn't really matter if it sets a flag */
                 buffer_lives(interpreter, (Buffer *)ptr);
@@ -517,16 +514,16 @@ trace_system_stack(struct Parrot_Interp *interpreter, PMC *last)
 
 #ifdef GC_IS_MALLOC
 struct mallinfo {
-  int arena;    /* non-mmapped space allocated from system */
-  int ordblks;  /* number of free chunks */
-  int smblks;   /* number of fastbin blocks */
-  int hblks;    /* number of mmapped regions */
-  int hblkhd;   /* space in mmapped regions */
-  int usmblks;  /* maximum total allocated space */
-  int fsmblks;  /* space available in freed fastbin blocks */
-  int uordblks; /* total allocated space */
-  int fordblks; /* total free space */
-  int keepcost; /* top-most, releasable (via malloc_trim) space */
+    int arena;                  /* non-mmapped space allocated from system */
+    int ordblks;                /* number of free chunks */
+    int smblks;                 /* number of fastbin blocks */
+    int hblks;                  /* number of mmapped regions */
+    int hblkhd;                 /* space in mmapped regions */
+    int usmblks;                /* maximum total allocated space */
+    int fsmblks;                /* space available in freed fastbin blocks */
+    int uordblks;               /* total allocated space */
+    int fordblks;               /* total free space */
+    int keepcost;               /* top-most, releasable (via malloc_trim) space */
 };
 extern struct mallinfo mallinfo(void);
 #endif /* GC_IS_MALLOC */
@@ -565,7 +562,7 @@ Parrot_do_dod_run(struct Parrot_Interp *interpreter)
                         interpreter->arena_base->buffer_header_pool);
 
 #else /* GC_IS_MALLOC */
-    for (j = -2; j < (INTVAL) interpreter->arena_base->num_sized; j++) {
+    for (j = -2; j < (INTVAL)interpreter->arena_base->num_sized; j++) {
         if (j == -2)
             header_pool = interpreter->arena_base->string_header_pool;
         else if (j == -1)

@@ -34,9 +34,9 @@
 /* VARARGS CORE */
 
 static STRING *
-getchr_va(struct Parrot_Interp *interpreter, INTVAL size, SPRINTF_OBJ * obj)
+getchr_va(struct Parrot_Interp *interpreter, INTVAL size, SPRINTF_OBJ *obj)
 {
-    va_list *arg = (va_list *) (obj->data);
+    va_list *arg = (va_list *)(obj->data);
 
     /* char promoted to int */
     char ch = (char)va_arg(*arg, int);
@@ -44,28 +44,28 @@ getchr_va(struct Parrot_Interp *interpreter, INTVAL size, SPRINTF_OBJ * obj)
 }
 
 static HUGEINTVAL
-getint_va(struct Parrot_Interp *interpreter, INTVAL size, SPRINTF_OBJ * obj)
+getint_va(struct Parrot_Interp *interpreter, INTVAL size, SPRINTF_OBJ *obj)
 {
-    va_list *arg = (va_list *) (obj->data);
+    va_list *arg = (va_list *)(obj->data);
 
     switch (size) {
     case SIZE_REG:
-        return (HUGEINTVAL) (int)va_arg(*arg, int);
+        return (HUGEINTVAL)(int)va_arg(*arg, int);
     case SIZE_SHORT:
         /* "'short int' is promoted to 'int' when passed through '...'" */
-        return (HUGEINTVAL) (short)va_arg(*arg, int);
+        return (HUGEINTVAL)(short)va_arg(*arg, int);
     case SIZE_LONG:
-        return (HUGEINTVAL) (long)va_arg(*arg, long);
+        return (HUGEINTVAL)(long)va_arg(*arg, long);
     case SIZE_HUGE:
-        return (HUGEINTVAL) (HUGEINTVAL)
+        return (HUGEINTVAL)(HUGEINTVAL)
             va_arg(*arg, HUGEINTVAL);
     case SIZE_XVAL:
-        return (HUGEINTVAL) (INTVAL) va_arg(*arg, INTVAL);
+        return (HUGEINTVAL)(INTVAL)va_arg(*arg, INTVAL);
     case SIZE_OPCODE:
-        return (HUGEINTVAL) (opcode_t) va_arg(*arg, opcode_t);
+        return (HUGEINTVAL)(opcode_t)va_arg(*arg, opcode_t);
     case SIZE_PMC:{
-            PMC *pmc = (PMC *) va_arg(*arg, PMC *);
-            return (HUGEINTVAL) (INTVAL)
+            PMC *pmc = (PMC *)va_arg(*arg, PMC *);
+            return (HUGEINTVAL)(INTVAL)
                 (pmc->vtable->get_integer(interpreter, pmc));
         }
     default:
@@ -75,31 +75,31 @@ getint_va(struct Parrot_Interp *interpreter, INTVAL size, SPRINTF_OBJ * obj)
 }
 
 static UHUGEINTVAL
-getuint_va(struct Parrot_Interp *interpreter, INTVAL size, SPRINTF_OBJ * obj)
+getuint_va(struct Parrot_Interp *interpreter, INTVAL size, SPRINTF_OBJ *obj)
 {
-    va_list *arg = (va_list *) (obj->data);
+    va_list *arg = (va_list *)(obj->data);
 
     switch (size) {
     case SIZE_REG:
-        return (UHUGEINTVAL) (unsigned int)
+        return (UHUGEINTVAL)(unsigned int)
             va_arg(*arg, unsigned int);
     case SIZE_SHORT:
         /* short int promoted HLAGHLAGHLAGH. See note above */
-        return (UHUGEINTVAL) (unsigned short)
+        return (UHUGEINTVAL)(unsigned short)
             va_arg(*arg, unsigned int);
     case SIZE_LONG:
-        return (UHUGEINTVAL) (unsigned long)
+        return (UHUGEINTVAL)(unsigned long)
             va_arg(*arg, unsigned long);
     case SIZE_HUGE:
-        return (UHUGEINTVAL) (UHUGEINTVAL)
+        return (UHUGEINTVAL)(UHUGEINTVAL)
             va_arg(*arg, UHUGEINTVAL);
     case SIZE_XVAL:
-        return (UHUGEINTVAL) (UINTVAL) va_arg(*arg, UINTVAL);
+        return (UHUGEINTVAL)(UINTVAL)va_arg(*arg, UINTVAL);
     case SIZE_OPCODE:
-        return (UHUGEINTVAL) (opcode_t) va_arg(*arg, opcode_t);
+        return (UHUGEINTVAL)(opcode_t)va_arg(*arg, opcode_t);
     case SIZE_PMC:{
-            PMC *pmc = (PMC *) va_arg(*arg, PMC *);
-            return (UHUGEINTVAL) (UINTVAL)
+            PMC *pmc = (PMC *)va_arg(*arg, PMC *);
+            return (UHUGEINTVAL)(UINTVAL)
                 (pmc->vtable->get_integer(interpreter, pmc));
         }
     default:
@@ -109,75 +109,75 @@ getuint_va(struct Parrot_Interp *interpreter, INTVAL size, SPRINTF_OBJ * obj)
 }
 
 static HUGEFLOATVAL
-getfloat_va(struct Parrot_Interp *interpreter, INTVAL size, SPRINTF_OBJ * obj)
+getfloat_va(struct Parrot_Interp *interpreter, INTVAL size, SPRINTF_OBJ *obj)
 {
-    va_list *arg = (va_list *) (obj->data);
+    va_list *arg = (va_list *)(obj->data);
 
     switch (size) {
     case SIZE_SHORT:
         /* float is promoted to double */
-        return (HUGEFLOATVAL) (float)va_arg(*arg, double);
+        return (HUGEFLOATVAL)(float)va_arg(*arg, double);
     case SIZE_REG:
-        return (HUGEFLOATVAL) (double)va_arg(*arg, double);
+        return (HUGEFLOATVAL)(double)va_arg(*arg, double);
     case SIZE_HUGE:
-        return (HUGEFLOATVAL) (HUGEFLOATVAL)
+        return (HUGEFLOATVAL)(HUGEFLOATVAL)
             va_arg(*arg, HUGEFLOATVAL);
     case SIZE_XVAL:
-        return (HUGEFLOATVAL) (FLOATVAL)
+        return (HUGEFLOATVAL)(FLOATVAL)
             va_arg(*arg, FLOATVAL);
     case SIZE_PMC:{
-            PMC *pmc = (PMC *) va_arg(*arg, PMC *);
-            return (HUGEFLOATVAL) (pmc->vtable->get_number(interpreter, pmc));
+            PMC *pmc = (PMC *)va_arg(*arg, PMC *);
+            return (HUGEFLOATVAL)(pmc->vtable->get_number(interpreter, pmc));
         }
     default:
         internal_exception(INVALID_CHARACTER,
                            "Internal sprintf doesn't recognize size %d for a float",
                            size);
-        return (HUGEFLOATVAL) 0.0;
+        return (HUGEFLOATVAL)0.0;
     }
 }
 
 static STRING *
-getstring_va(struct Parrot_Interp *interpreter, INTVAL size, SPRINTF_OBJ * obj)
+getstring_va(struct Parrot_Interp *interpreter, INTVAL size, SPRINTF_OBJ *obj)
 {
-    va_list *arg = (va_list *) (obj->data);
+    va_list *arg = (va_list *)(obj->data);
 
     switch (size) {
-        case SIZE_REG:
-            {
-                char *cstr = (char *)va_arg(*arg, char *);
-                return cstr2pstr(cstr);
-            }
+    case SIZE_REG:
+        {
+            char *cstr = (char *)va_arg(*arg, char *);
+            return cstr2pstr(cstr);
+        }
 
-        case SIZE_PSTR:
-            {
-                STRING *s =  (STRING *) va_arg(*arg, STRING *);
-                /* XXX string_copy like below? */
-                return string_make(interpreter, s->strstart, s->bufused,0,
-                        BUFFER_external_FLAG, 0);
-            }
+    case SIZE_PSTR:
+        {
+            STRING *s = (STRING *)va_arg(*arg, STRING *);
+            /* XXX string_copy like below? */
+            return string_make(interpreter, s->strstart, s->bufused, 0,
+                               BUFFER_external_FLAG, 0);
+        }
 
-        case SIZE_PMC:
-            {
-                PMC *pmc = (PMC *) va_arg(*arg, PMC *);
-                STRING *s = pmc->vtable->get_string(interpreter, pmc);
-                /* XXX string_copy like below? */
-                return string_make(interpreter, s->strstart, s->bufused,0,
-                        BUFFER_external_FLAG, 0);
-            }
+    case SIZE_PMC:
+        {
+            PMC *pmc = (PMC *)va_arg(*arg, PMC *);
+            STRING *s = pmc->vtable->get_string(interpreter, pmc);
+            /* XXX string_copy like below? */
+            return string_make(interpreter, s->strstart, s->bufused, 0,
+                               BUFFER_external_FLAG, 0);
+        }
 
-        default:
-            internal_exception(INVALID_CHARACTER,
-                    "Internal sprintf doesn't recognize size %d for a string",
-                    size);
-            return NULL;
+    default:
+        internal_exception(INVALID_CHARACTER,
+                           "Internal sprintf doesn't recognize size %d for a string",
+                           size);
+        return NULL;
     }
 }
 
 static void *
-getptr_va(struct Parrot_Interp *interpreter, INTVAL size, SPRINTF_OBJ * obj)
+getptr_va(struct Parrot_Interp *interpreter, INTVAL size, SPRINTF_OBJ *obj)
 {
-    va_list *arg = (va_list *) (obj->data);
+    va_list *arg = (va_list *)(obj->data);
 
     return (void *)va_arg(*arg, void *);
 }
@@ -191,37 +191,40 @@ SPRINTF_OBJ va_core = {
 /* PMC CORE */
 
 static STRING *
-getchr_pmc(struct Parrot_Interp *interpreter, INTVAL size, SPRINTF_OBJ * obj)
+getchr_pmc(struct Parrot_Interp *interpreter, INTVAL size, SPRINTF_OBJ *obj)
 {
     STRING *s;
-    PMC *tmp = ((PMC *) obj->data)->vtable->get_pmc_keyed_int(interpreter,
-            ((PMC *) obj->data),
-            &(obj->index));
+    PMC *tmp = ((PMC *)obj->data)->vtable->get_pmc_keyed_int(interpreter,
+                                                             ((PMC *)obj->
+                                                              data),
+                                                             &(obj->index));
     obj->index++;
     s = tmp->vtable->get_string(interpreter, tmp);
     /* XXX string_copy like below? + adjusting bufused */
-    return string_make(interpreter, s->strstart, 1, 0, BUFFER_external_FLAG, 0);
+    return string_make(interpreter, s->strstart, 1, 0, BUFFER_external_FLAG,
+                       0);
 }
 
 static HUGEINTVAL
-getint_pmc(struct Parrot_Interp *interpreter, INTVAL size, SPRINTF_OBJ * obj)
+getint_pmc(struct Parrot_Interp *interpreter, INTVAL size, SPRINTF_OBJ *obj)
 {
     HUGEINTVAL ret;
-    PMC *tmp = ((PMC *) obj->data)->vtable->get_pmc_keyed_int(interpreter,
-                                                              ((PMC *) obj->data),
-                                                              &(obj->index));
+    PMC *tmp = ((PMC *)obj->data)->vtable->get_pmc_keyed_int(interpreter,
+                                                             ((PMC *)obj->
+                                                              data),
+                                                             &(obj->index));
     obj->index++;
-    ret = (HUGEINTVAL) (tmp->vtable->get_integer(interpreter, tmp));
+    ret = (HUGEINTVAL)(tmp->vtable->get_integer(interpreter, tmp));
 
     switch (size) {
     case SIZE_SHORT:
-        ret = (HUGEINTVAL) (short)ret;
+        ret = (HUGEINTVAL)(short)ret;
         break;
         /*case SIZE_REG:
          * ret=(HUGEINTVAL)(int)ret; */
         break;
     case SIZE_LONG:
-        ret = (HUGEINTVAL) (long)ret;
+        ret = (HUGEINTVAL)(long)ret;
     default:
         /* nothing */ ;
     }
@@ -230,24 +233,25 @@ getint_pmc(struct Parrot_Interp *interpreter, INTVAL size, SPRINTF_OBJ * obj)
 }
 
 static UHUGEINTVAL
-getuint_pmc(struct Parrot_Interp *interpreter, INTVAL size, SPRINTF_OBJ * obj)
+getuint_pmc(struct Parrot_Interp *interpreter, INTVAL size, SPRINTF_OBJ *obj)
 {
     UHUGEINTVAL ret;
-    PMC *tmp = ((PMC *) obj->data)->vtable->get_pmc_keyed_int(interpreter,
-                                                              ((PMC *) obj->data),
-                                                              &(obj->index));
+    PMC *tmp = ((PMC *)obj->data)->vtable->get_pmc_keyed_int(interpreter,
+                                                             ((PMC *)obj->
+                                                              data),
+                                                             &(obj->index));
     obj->index++;
-    ret = (UHUGEINTVAL) (tmp->vtable->get_integer(interpreter, tmp));
+    ret = (UHUGEINTVAL)(tmp->vtable->get_integer(interpreter, tmp));
 
     switch (size) {
     case SIZE_SHORT:
-        ret = (UHUGEINTVAL) (unsigned short)ret;
+        ret = (UHUGEINTVAL)(unsigned short)ret;
         break;
-    /* case SIZE_REG:
+        /* case SIZE_REG:
          * ret=(UHUGEINTVAL)(unsigned int)ret;
          * break; */
     case SIZE_LONG:
-        ret = (UHUGEINTVAL) (unsigned long)ret;
+        ret = (UHUGEINTVAL)(unsigned long)ret;
     default:
         /* nothing */ ;
     }
@@ -256,20 +260,21 @@ getuint_pmc(struct Parrot_Interp *interpreter, INTVAL size, SPRINTF_OBJ * obj)
 }
 
 static HUGEFLOATVAL
-getfloat_pmc(struct Parrot_Interp *interpreter, INTVAL size, SPRINTF_OBJ * obj)
+getfloat_pmc(struct Parrot_Interp *interpreter, INTVAL size, SPRINTF_OBJ *obj)
 {
     HUGEFLOATVAL ret;
-    PMC *tmp = ((PMC *) obj->data)->vtable->get_pmc_keyed_int(interpreter,
-                                                              ((PMC *) obj->data),
-                                                              &(obj->index));
+    PMC *tmp = ((PMC *)obj->data)->vtable->get_pmc_keyed_int(interpreter,
+                                                             ((PMC *)obj->
+                                                              data),
+                                                             &(obj->index));
     obj->index++;
-    ret = (HUGEFLOATVAL) (tmp->vtable->get_number(interpreter, tmp));
+    ret = (HUGEFLOATVAL)(tmp->vtable->get_number(interpreter, tmp));
 
     switch (size) {
     case SIZE_SHORT:
-        ret = (HUGEFLOATVAL) (float)ret;
+        ret = (HUGEFLOATVAL)(float)ret;
         break;
-    /* case SIZE_REG:
+        /* case SIZE_REG:
          * ret=(HUGEFLOATVAL)(double)ret;
          * break; */
     default:
@@ -280,24 +285,25 @@ getfloat_pmc(struct Parrot_Interp *interpreter, INTVAL size, SPRINTF_OBJ * obj)
 }
 
 static STRING *
-getstring_pmc(struct Parrot_Interp *interpreter,
-              INTVAL size, SPRINTF_OBJ * obj)
+getstring_pmc(struct Parrot_Interp *interpreter, INTVAL size, SPRINTF_OBJ *obj)
 {
     STRING *s;
-    PMC *tmp = ((PMC *) obj->data)->vtable->get_pmc_keyed_int(interpreter,
-            ((PMC *) obj->data),
-            &(obj->index));
+    PMC *tmp = ((PMC *)obj->data)->vtable->get_pmc_keyed_int(interpreter,
+                                                             ((PMC *)obj->
+                                                              data),
+                                                             &(obj->index));
     obj->index++;
-    s =  (STRING *)(tmp->vtable->get_string(interpreter, tmp));
+    s = (STRING *)(tmp->vtable->get_string(interpreter, tmp));
     return string_copy(interpreter, s);
 }
 
 static void *
-getptr_pmc(struct Parrot_Interp *interpreter, INTVAL size, SPRINTF_OBJ * obj)
+getptr_pmc(struct Parrot_Interp *interpreter, INTVAL size, SPRINTF_OBJ *obj)
 {
-    PMC *tmp = ((PMC *) obj->data)->vtable->get_pmc_keyed_int(interpreter,
-                                                              ((PMC *) obj->data),
-                                                              &(obj->index));
+    PMC *tmp = ((PMC *)obj->data)->vtable->get_pmc_keyed_int(interpreter,
+                                                             ((PMC *)obj->
+                                                              data),
+                                                             &(obj->index));
     obj->index++;
     /* XXX correct? */
     return (void *)(tmp->vtable->get_integer(interpreter, tmp));

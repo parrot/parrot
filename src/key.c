@@ -78,7 +78,7 @@ key_set_integer(struct Parrot_Interp *interpreter, PMC *key, INTVAL value)
 
 void
 key_set_register(struct Parrot_Interp *interpreter, PMC *key, INTVAL value,
-        INTVAL flag)
+                 INTVAL flag)
 {
     key->flags &= ~KEY_type_FLAGS;
     key->flags |= KEY_register_FLAG | flag;
@@ -134,12 +134,12 @@ key_integer(struct Parrot_Interp *interpreter, PMC *key)
     switch (key->flags & KEY_type_FLAGS) {
     case KEY_integer_FLAG:
         return key->cache.int_val;
-    case KEY_integer_FLAG|KEY_register_FLAG:
+    case KEY_integer_FLAG | KEY_register_FLAG:
         return interpreter->ctx.int_reg.registers[key->cache.int_val];
     case KEY_pmc_FLAG:
         return key->cache.pmc_val->vtable->get_integer(interpreter,
-            key->cache.pmc_val);
-    case KEY_pmc_FLAG|KEY_register_FLAG:
+                                                       key->cache.pmc_val);
+    case KEY_pmc_FLAG | KEY_register_FLAG:
         reg = interpreter->ctx.pmc_reg.registers[key->cache.int_val];
         return reg->vtable->get_integer(interpreter, reg);
     default:
@@ -156,12 +156,12 @@ key_number(struct Parrot_Interp *interpreter, PMC *key)
     switch (key->flags & KEY_type_FLAGS) {
     case KEY_number_FLAG:
         return key->cache.num_val;
-    case KEY_number_FLAG|KEY_register_FLAG:
+    case KEY_number_FLAG | KEY_register_FLAG:
         return interpreter->ctx.num_reg.registers[key->cache.int_val];
     case KEY_pmc_FLAG:
         return key->cache.pmc_val->vtable->get_number(interpreter,
-            key->cache.pmc_val);
-    case KEY_pmc_FLAG|KEY_register_FLAG:
+                                                      key->cache.pmc_val);
+    case KEY_pmc_FLAG | KEY_register_FLAG:
         reg = interpreter->ctx.pmc_reg.registers[key->cache.int_val];
         return reg->vtable->get_number(interpreter, reg);
     default:
@@ -178,12 +178,12 @@ key_string(struct Parrot_Interp *interpreter, PMC *key)
     switch (key->flags & KEY_type_FLAGS) {
     case KEY_string_FLAG:
         return key->cache.string_val;
-    case KEY_string_FLAG|KEY_register_FLAG:
+    case KEY_string_FLAG | KEY_register_FLAG:
         return interpreter->ctx.string_reg.registers[key->cache.int_val];
     case KEY_pmc_FLAG:
         return key->cache.pmc_val->vtable->get_string(interpreter,
-            key->cache.pmc_val);
-    case KEY_pmc_FLAG|KEY_register_FLAG:
+                                                      key->cache.pmc_val);
+    case KEY_pmc_FLAG | KEY_register_FLAG:
         reg = interpreter->ctx.pmc_reg.registers[key->cache.int_val];
         return reg->vtable->get_string(interpreter, reg);
     default:
@@ -198,7 +198,7 @@ key_pmc(struct Parrot_Interp *interpreter, PMC *key)
     switch (key->flags & KEY_type_FLAGS) {
     case KEY_pmc_FLAG:
         return key->cache.pmc_val;
-    case KEY_pmc_FLAG|KEY_register_FLAG:
+    case KEY_pmc_FLAG | KEY_register_FLAG:
         return interpreter->ctx.pmc_reg.registers[key->cache.int_val];
     default:
         internal_exception(INVALID_OPERATION, "Not a PMC!\n");

@@ -18,13 +18,13 @@
 ** For now just remove some warnings
 */
 
-void PackFile_dump (struct Parrot_Interp *, struct PackFile *);
-static void PackFile_FixupTable_dump (struct Parrot_Interp *,
-                                      struct PackFile_FixupTable *);
-static void PackFile_ConstTable_dump (struct Parrot_Interp *,
-                                      struct PackFile_ConstTable *);
-static void PackFile_Constant_dump (struct Parrot_Interp *,
-                                    struct PackFile_Constant *);
+void PackFile_dump(struct Parrot_Interp *, struct PackFile *);
+static void PackFile_FixupTable_dump(struct Parrot_Interp *,
+                                     struct PackFile_FixupTable *);
+static void PackFile_ConstTable_dump(struct Parrot_Interp *,
+                                     struct PackFile_ConstTable *);
+static void PackFile_Constant_dump(struct Parrot_Interp *,
+                                   struct PackFile_Constant *);
 
 void
 PackFile_dump(struct Parrot_Interp *interpreter, struct PackFile *self)
@@ -98,7 +98,7 @@ PackFile_Constant_dump(struct Parrot_Interp *interpreter,
     switch (self->type) {
     case PFC_NONE:
         /* TODO: OK to be silent here? */
-        PIO_printf(interpreter,"    [ 'PFC_NONE', undef ],\n");
+        PIO_printf(interpreter, "    [ 'PFC_NONE', undef ],\n");
         break;
 
     case PFC_NUMBER:

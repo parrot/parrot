@@ -37,12 +37,12 @@
 /* A BucketIndex is an index into the pool of available buckets. */
 typedef UINTVAL BucketIndex;
 /* Assumes 2's complement? */
-const BucketIndex NULLBucketIndex = (BucketIndex) -1;
+const BucketIndex NULLBucketIndex = (BucketIndex)-1;
 
 /* A HashIndex is an index into the hashtable, i.e., the array of
  * buckets indexed by hash(KEY) mod hash_size */
 typedef UINTVAL HashIndex;
-const HashIndex NULLHashIndex = (HashIndex) -1;
+const HashIndex NULLHashIndex = (HashIndex)-1;
 
 struct _hashbucket {
     STRING *key;
@@ -54,25 +54,29 @@ struct _hash {
     Buffer buffer;              /* This struct is a Buffer subclass! */
     HashIndex max_chain;
     UINTVAL entries;            /* Number of values stored in hashtable */
-    Buffer* bucket_pool; /* Buffer full of buckets, used and unused */
+    Buffer *bucket_pool;        /* Buffer full of buckets, used and unused */
     BucketIndex free_list;
 };
 
 /* Is there a way to portably add inlining hints anymore? */
 #define FIXME_INLINE
 
-static FIXME_INLINE HASHBUCKET* getBucket(HASH* hash, BucketIndex idx)
+static FIXME_INLINE HASHBUCKET *
+getBucket(HASH *hash, BucketIndex idx)
 {
-    if (idx == NULLBucketIndex) return NULL;
-    return &((HASHBUCKET*) hash->bucket_pool->bufstart)[idx];
+    if (idx == NULLBucketIndex)
+        return NULL;
+    return &((HASHBUCKET *)hash->bucket_pool->bufstart)[idx];
 }
 
-static FIXME_INLINE BucketIndex lookupBucketIndex(HASH* hash, HashIndex slot)
+static FIXME_INLINE BucketIndex
+lookupBucketIndex(HASH *hash, HashIndex slot)
 {
-    return ((BucketIndex*) hash->buffer.bufstart)[slot];
+    return ((BucketIndex *)hash->buffer.bufstart)[slot];
 }
 
-static FIXME_INLINE HASHBUCKET* lookupBucket(HASH* hash, HashIndex slot)
+static FIXME_INLINE HASHBUCKET *
+lookupBucket(HASH *hash, HashIndex slot)
 {
     return getBucket(hash, lookupBucketIndex(hash, slot));
 }
@@ -96,7 +100,7 @@ key_hash(Interp *interpreter, STRING *value)
         hash += hash << 5;
         hash += *buffptr++;
     }
-    
+
     return hash;
 }
 
@@ -105,22 +109,25 @@ dump_hash(Interp *interpreter, HASH *hash)
 {
     HashIndex i;
     PIO_fprintf(interpreter, PIO_STDERR(interpreter),
-            "Hashtable[%vd/%vd]\n",
-            hash->entries, hash->max_chain + 1);
+                "Hashtable[%vd/%vd]\n", hash->entries, hash->max_chain + 1);
 
     /* Iterate one past the end of the hashtable, so we can use the
      * last value as a special case for dumping out the free bucket
      * list. */
     for (i = 0; i <= hash->max_chain + 1; i++) {
-        HASHBUCKET* bucket;
-        if (i > hash->max_chain) bucket = getBucket(hash, hash->free_list);
-        else bucket = lookupBucket(hash, i);
-        if (bucket == NULL) continue;
+        HASHBUCKET *bucket;
+        if (i > hash->max_chain)
+            bucket = getBucket(hash, hash->free_list);
+        else
+            bucket = lookupBucket(hash, i);
+        if (bucket == NULL)
+            continue;
         PIO_eprintf(interpreter, "  Bucket %vd: ", i);
         while (bucket) {
             PIO_eprintf(interpreter, "type(%d)", bucket->value.type);
             bucket = getBucket(hash, bucket->next);
-            if (bucket) PIO_eprintf(interpreter, " -> ");
+            if (bucket)
+                PIO_eprintf(interpreter, " -> ");
         }
         PIO_eprintf(interpreter, "\n");
     }
@@ -133,7 +140,7 @@ mark_hash(Interp *interpreter, HASH *hash, PMC *end_of_used_list)
 
     buffer_lives(interpreter, (Buffer *)hash);
 
-    if(hash->bucket_pool) {
+    if (hash->bucket_pool) {
         buffer_lives(interpreter, hash->bucket_pool);
     }
 
@@ -180,16 +187,16 @@ mark_hash(Interp *interpreter, HASH *hash, PMC *end_of_used_list)
 static void
 expand_hash(Interp *interpreter, HASH *hash)
 {
-    BucketIndex* table;
-    HASHBUCKET* bucket;
+    BucketIndex *table;
+    HASHBUCKET *bucket;
     UINTVAL old_size = hash->max_chain + 1;
     UINTVAL new_size = (old_size ? (old_size << 1) : INITIAL_BUCKETS);
     UINTVAL new_max_chain = new_size - 1;
     HashIndex new_loc;
-    
+
     HashIndex hi;
     BucketIndex bi;
-    
+
     UINTVAL old_pool_size = hash->bucket_pool->buflen / sizeof(HASHBUCKET);
     UINTVAL new_pool_size = new_size * MAXFULL_PERCENT / 100;
 
@@ -205,9 +212,8 @@ expand_hash(Interp *interpreter, HASH *hash)
     }
 
     /* NULL out new space in table */
-    memset((HashIndex *) hash->buffer.bufstart + old_size,
-           NULLBucketIndex,
-           (new_size - old_size) * sizeof(BucketIndex));
+    memset((HashIndex *)hash->buffer.bufstart + old_size,
+           NULLBucketIndex, (new_size - old_size) * sizeof(BucketIndex));
 
     /* Warning: for efficiency, we cache the table in a local
      * variable. If any possibly gc-triggering code is added to the
@@ -218,11 +224,11 @@ expand_hash(Interp *interpreter, HASH *hash)
      * transcode to a canonical encoding, then you'll trigger GC.)
      * (And I'll probably forget to change this comment, but I think
      * I'm going to canonicalize key encodings on insertion.) */
-    table = (BucketIndex*) hash->buffer.bufstart;
+    table = (BucketIndex *)hash->buffer.bufstart;
 
     /* Move buckets to new homes */
     for (hi = 0; hi < old_size; hi++) {
-        BucketIndex* bucketIdxP = &table[hi];
+        BucketIndex *bucketIdxP = &table[hi];
         while (*bucketIdxP != NULLBucketIndex) {
             BucketIndex bucketIdx = *bucketIdxP;
             bucket = getBucket(hash, bucketIdx);
@@ -248,7 +254,7 @@ static BucketIndex
 new_bucket(Interp *interpreter, HASH *hash, STRING *key, HASH_ENTRY *value)
 {
     BucketIndex bucket_index;
-    
+
     if (key == NULL) {
         internal_exception(INTERNAL_PANIC, "NULL key\n");
         return NULLBucketIndex;
@@ -262,7 +268,7 @@ new_bucket(Interp *interpreter, HASH *hash, STRING *key, HASH_ENTRY *value)
     bucket_index = hash->free_list;
     if (bucket_index != NULLBucketIndex) {
         HASHBUCKET *bucket = getBucket(hash, bucket_index);
-        
+
         hash->free_list = bucket->next;
         bucket->key = key;
         bucket->value = *value;
@@ -275,7 +281,7 @@ new_bucket(Interp *interpreter, HASH *hash, STRING *key, HASH_ENTRY *value)
 }
 
 static HASHBUCKET *
-find_bucket(Interp *interpreter, HASH* hash, BucketIndex head, STRING *key)
+find_bucket(Interp *interpreter, HASH *hash, BucketIndex head, STRING *key)
 {
     BucketIndex next;
 
@@ -283,7 +289,7 @@ find_bucket(Interp *interpreter, HASH* hash, BucketIndex head, STRING *key)
         PANIC("find_bucket given a null key");
 
     while (head != NULLBucketIndex) {
-        HASHBUCKET* bucket = getBucket(hash, head);
+        HASHBUCKET *bucket = getBucket(hash, head);
         next = bucket->next;
         if (string_compare(interpreter, key, bucket->key) == 0) {
             return getBucket(hash, head);
@@ -309,7 +315,7 @@ new_hash(Interp *interpreter, HASH **hash_ptr)
      * valid value except when the hash is being initially created.
      * This does, however, prevent the future space optimization of
      * not allocating any buckets for empty hashes. */
-    hash->max_chain = (HashIndex) -1;
+    hash->max_chain = (HashIndex)-1;
 
     hash->entries = 0;
 
@@ -346,7 +352,7 @@ static HASHBUCKET *
 hash_lookup(Interp *interpreter, HASH *hash, STRING *key)
 {
     UINTVAL hashval = key_hash(interpreter, key);
-    HashIndex* table = (HashIndex*) hash->buffer.bufstart;
+    HashIndex *table = (HashIndex *)hash->buffer.bufstart;
     BucketIndex chain = table[hashval & hash->max_chain];
     return find_bucket(interpreter, hash, chain, key);
 }
@@ -354,8 +360,9 @@ hash_lookup(Interp *interpreter, HASH *hash, STRING *key)
 HASH_ENTRY *
 hash_get(Interp *interpreter, HASH *hash, STRING *key)
 {
-    HASHBUCKET* bucket = hash_lookup(interpreter, hash, key);
-    if (bucket == NULL) return NULL; /* Not found */
+    HASHBUCKET *bucket = hash_lookup(interpreter, hash, key);
+    if (bucket == NULL)
+        return NULL;            /* Not found */
     return &bucket->value;
 }
 
@@ -363,16 +370,16 @@ hash_get(Interp *interpreter, HASH *hash, STRING *key)
 void
 hash_put(Interp *interpreter, HASH *hash, STRING *key, HASH_ENTRY *value)
 {
-    BucketIndex* table;
+    BucketIndex *table;
     UINTVAL hashval;
-    BucketIndex bucket_index; 
+    BucketIndex bucket_index;
     BucketIndex chain;
-    HASHBUCKET* bucket;
+    HASHBUCKET *bucket;
 
     /*      dump_hash(interpreter, hash); */
 
     hashval = key_hash(interpreter, key);
-    table = (BucketIndex*) hash->buffer.bufstart;
+    table = (BucketIndex *)hash->buffer.bufstart;
     chain = table ? table[hashval & hash->max_chain] : NULLBucketIndex;
     bucket = find_bucket(interpreter, hash, chain, key);
 
@@ -388,7 +395,7 @@ hash_put(Interp *interpreter, HASH *hash, STRING *key, HASH_ENTRY *value)
         hash->entries++;
         bucket_index = new_bucket(interpreter, hash, key, value);
         bucket = getBucket(hash, bucket_index);
-        table = (BucketIndex*) hash->buffer.bufstart;
+        table = (BucketIndex *)hash->buffer.bufstart;
         bucket->next = table[hashval & hash->max_chain];
         table[hashval & hash->max_chain] = bucket_index;
     }
@@ -400,16 +407,14 @@ hash_delete(Interp *interpreter, HASH *hash, STRING *key)
 {
     UINTVAL hashval;
     HashIndex slot;
-    HASHBUCKET* bucket;
-    HASHBUCKET* prev = NULL;
+    HASHBUCKET *bucket;
+    HASHBUCKET *prev = NULL;
 
     hashval = key_hash(interpreter, key);
     slot = hashval & hash->max_chain;
 
     for (bucket = lookupBucket(hash, slot);
-         bucket != NULL;
-         bucket = getBucket(hash, bucket->next))
-    {
+         bucket != NULL; bucket = getBucket(hash, bucket->next)) {
         if (string_compare(interpreter, key, bucket->key) == 0) {
             /* FIXME: If string_compare triggers a collection, both
              * bucket and prev will end up pointing to junk memory.
@@ -417,7 +422,7 @@ hash_delete(Interp *interpreter, HASH *hash, STRING *key)
             if (prev)
                 prev->next = bucket->next;
             else {
-                BucketIndex* table = (BucketIndex*) hash->buffer.bufstart;
+                BucketIndex *table = (BucketIndex *)hash->buffer.bufstart;
                 table[slot] = bucket->next;
             }
             hash->entries--;
@@ -430,14 +435,14 @@ hash_delete(Interp *interpreter, HASH *hash, STRING *key)
 }
 
 void
-hash_clone(struct Parrot_Interp * interp, HASH * hash, HASH ** clone)
+hash_clone(struct Parrot_Interp *interp, HASH *hash, HASH **clone)
 {
     HashIndex i;
     new_hash(interp, clone);
     for (i = 0; i <= hash->max_chain; i++) {
         BucketIndex bi = lookupBucketIndex(hash, i);
         while (bi != NULLBucketIndex) {
-            HASHBUCKET * b = getBucket(hash, bi);
+            HASHBUCKET *b = getBucket(hash, bi);
             HASH_ENTRY valtmp;
             switch (b->value.type) {
             case enum_hash_undef:
@@ -456,8 +461,9 @@ hash_clone(struct Parrot_Interp * interp, HASH * hash, HASH ** clone)
 
             case enum_hash_pmc:
                 valtmp.type = enum_hash_pmc;
-                valtmp.val.pmc_val = b->value.val.pmc_val->vtable->clone(
-                    interp, b->value.val.pmc_val);
+                valtmp.val.pmc_val =
+                    b->value.val.pmc_val->vtable->clone(interp,
+                                                        b->value.val.pmc_val);
                 /* b is no longer valid (due to GC) */
                 b = getBucket(hash, bi);
                 break;

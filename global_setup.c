@@ -16,7 +16,7 @@
 
 /* These functions are defined in the auto-generated file core_pmcs.c */
 extern void Parrot_initialize_core_pmcs(Interp *interp);
-extern void Parrot_register_core_pmcs(Interp *interp, PMC* registry);
+extern void Parrot_register_core_pmcs(Interp *interp, PMC *registry);
 
 void
 init_world(Interp *interpreter)

@@ -14,12 +14,12 @@ Parrot_go_collect(struct Parrot_Interp *interpreter)
 void *
 Parrot_reallocate(struct Parrot_Interp *interpreter, void *from, size_t size)
 {
-    Buffer * buffer = from;
+    Buffer *buffer = from;
     void *p;
     size_t oldlen = buffer->buflen;
-    p =  realloc(buffer->bufstart, size);
+    p = realloc(buffer->bufstart, size);
     if (size > buffer->buflen)
-        memset((char*)p + oldlen, 0, size - oldlen);
+        memset((char *)p + oldlen, 0, size - oldlen);
     buffer->buflen = size;
     buffer->bufstart = p;
     return p;
@@ -28,7 +28,7 @@ Parrot_reallocate(struct Parrot_Interp *interpreter, void *from, size_t size)
 void *
 Parrot_allocate(struct Parrot_Interp *interpreter, void *buffer, size_t size)
 {
-    Buffer * b = buffer;
+    Buffer *b = buffer;
     b->bufstart = calloc(1, size);
     b->buflen = size;
     return b;
@@ -45,7 +45,7 @@ Parrot_reallocate_string(struct Parrot_Interp *interpreter, STRING *str,
     size = ((size + pad + 2) & ~pad) - 2;
     p = realloc(str->bufstart, size + 2);
     str->strstart = str->bufstart = p;
-    ((char*)str->bufstart)[size+1] = 0;
+    ((char *)str->bufstart)[size + 1] = 0;
     str->buflen = size;
     return p;
 }

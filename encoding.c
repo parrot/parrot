@@ -45,9 +45,9 @@ encoding_lookup_index(INTVAL n)
 {
     if (!encoding_array[0]) {
         encoding_array[enum_encoding_singlebyte] = &singlebyte_encoding;
-        encoding_array[enum_encoding_utf8]       = &utf8_encoding;
-        encoding_array[enum_encoding_utf16]      = &utf16_encoding;
-        encoding_array[enum_encoding_utf32]      = &utf32_encoding;
+        encoding_array[enum_encoding_utf8] = &utf8_encoding;
+        encoding_array[enum_encoding_utf16] = &utf16_encoding;
+        encoding_array[enum_encoding_utf32] = &utf32_encoding;
     }
     return encoding_array[n];
 }

@@ -82,12 +82,12 @@ void list_unshift(Interp *interpreter, List *list, void *item, int type);
 void * list_pop(Interp *interpreter, List *list, int type);
 void * list_shift(Interp *interpreter, List *list, int type);
 void list_assign(Interp *interpreter, List *list, INTVAL idx,
-        void *item, int type);
+                 void *item, int type);
 void * list_get(Interp *interpreter, List *list, INTVAL idx, int type);
 void list_insert(Interp *interpreter, List *list, INTVAL idx, INTVAL n_items);
 void list_delete(Interp *interpreter, List *list, INTVAL idx, INTVAL n_items);
 void list_splice(Interp *interpreter, List *list, PMC* value, INTVAL offset,
-	INTVAL count);
+                 INTVAL count);
 
 #endif
 

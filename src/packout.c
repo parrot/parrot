@@ -87,7 +87,7 @@ PackFile_pack(struct PackFile *self, opcode_t *packed)
     self->header->floattype = 0;
 
     /* write the fingerprint */
-    PackFile_write_fingerprint (self->header->pad);
+    PackFile_write_fingerprint(self->header->pad);
 
     /* Pack the header */
     mem_sys_memcopy(cursor, self->header, PACKFILE_HEADER_BYTES);
@@ -216,20 +216,22 @@ PackFile_ConstTable_pack(struct PackFile *packfile,
  * key constant is in constant table,
  * so we search for it @§$&
  */
-static int find_in_const(PMC *key, int type)
+static int
+find_in_const(PMC *key, int type)
 {
     int i;
-    for (i = 0 ; i < ct->const_count; i++)
+    for (i = 0; i < ct->const_count; i++)
         if (type == PFC_STRING && ct->constants[i]->string ==
-                key->cache.string_val)
+            key->cache.string_val)
             return i;
         else if (type == PFC_NUMBER && ct->constants[i]->number ==
-                key->cache.num_val)
+                 key->cache.num_val)
             return i;
     PIO_eprintf(NULL, "find_in_const: couldn't find const for key\n");
     exit(1);
     return 0;
 }
+
 /***************************************
 Pack a PackFile Constant into a contiguous region of memory. NOTE: The memory
 block had better have at least the amount of memory indicated by
@@ -285,8 +287,7 @@ PackFile_Constant_pack(struct PackFile_Constant *self, opcode_t *packed)
         padded_size = self->string->bufused;
 
         if (padded_size % sizeof(opcode_t)) {
-                padded_size += sizeof(opcode_t) -
-                    (padded_size % sizeof(opcode_t));
+            padded_size += sizeof(opcode_t) - (padded_size % sizeof(opcode_t));
         }
 
         /* Include space for flags, encoding, type, and size fields.  */
@@ -324,60 +325,60 @@ PackFile_Constant_pack(struct PackFile_Constant *self, opcode_t *packed)
          */
         break;
 
-        case PFC_KEY:
-            packed_size = sizeof(opcode_t);
-            for (i = 0, key = self->key; key; key = key->data, i++)
-                packed_size += 2 * sizeof(opcode_t);
-            /* size */
-            *cursor++ = packed_size;
-            /* number of key components */
-            *cursor++ = i;
-            /* and now type / value per component */
-            for (key = self->key; key; key = key->data) {
-                switch (key->flags & KEY_type_FLAGS) {
-                    case KEY_integer_FLAG:
-                        *cursor++ = PARROT_ARG_IC;
-                        *cursor++ = key->cache.int_val;
-                        break;
-                    case KEY_number_FLAG:
-                        *cursor++ = PARROT_ARG_NC;
-                        *cursor++ = find_in_const(key, PFC_NUMBER); /* Argh */
-                        break;
-                    case KEY_string_FLAG:
-                        *cursor++ = PARROT_ARG_SC;
-                        *cursor++ = find_in_const(key, PFC_STRING);/* Argh */
-                        break;
+    case PFC_KEY:
+        packed_size = sizeof(opcode_t);
+        for (i = 0, key = self->key; key; key = key->data, i++)
+            packed_size += 2 * sizeof(opcode_t);
+        /* size */
+        *cursor++ = packed_size;
+        /* number of key components */
+        *cursor++ = i;
+        /* and now type / value per component */
+        for (key = self->key; key; key = key->data) {
+            switch (key->flags & KEY_type_FLAGS) {
+            case KEY_integer_FLAG:
+                *cursor++ = PARROT_ARG_IC;
+                *cursor++ = key->cache.int_val;
+                break;
+            case KEY_number_FLAG:
+                *cursor++ = PARROT_ARG_NC;
+                *cursor++ = find_in_const(key, PFC_NUMBER);     /* Argh */
+                break;
+            case KEY_string_FLAG:
+                *cursor++ = PARROT_ARG_SC;
+                *cursor++ = find_in_const(key, PFC_STRING);     /* Argh */
+                break;
 
-                    case KEY_integer_FLAG | KEY_register_FLAG:
-                        *cursor++ = PARROT_ARG_I;
-                        *cursor++ = key->cache.int_val;
-                        break;
-                    case KEY_number_FLAG | KEY_register_FLAG:
-                        *cursor++ = PARROT_ARG_N;
-                        *cursor++ = key->cache.int_val;
-                        break;
-                    case KEY_string_FLAG | KEY_register_FLAG:
-                        *cursor++ = PARROT_ARG_S;
-                        *cursor++ = key->cache.int_val;
-                        break;
-                    case KEY_pmc_FLAG | KEY_register_FLAG:
-                        *cursor++ = PARROT_ARG_P;
-                        *cursor++ = key->cache.int_val;
-                        break;
-                    default:
-                        PIO_eprintf(NULL, "PackFile_Constant_pack: "
-                                "unsupported constant type\n");
-                        exit(1);
-                }
+            case KEY_integer_FLAG | KEY_register_FLAG:
+                *cursor++ = PARROT_ARG_I;
+                *cursor++ = key->cache.int_val;
+                break;
+            case KEY_number_FLAG | KEY_register_FLAG:
+                *cursor++ = PARROT_ARG_N;
+                *cursor++ = key->cache.int_val;
+                break;
+            case KEY_string_FLAG | KEY_register_FLAG:
+                *cursor++ = PARROT_ARG_S;
+                *cursor++ = key->cache.int_val;
+                break;
+            case KEY_pmc_FLAG | KEY_register_FLAG:
+                *cursor++ = PARROT_ARG_P;
+                *cursor++ = key->cache.int_val;
+                break;
+            default:
+                PIO_eprintf(NULL, "PackFile_Constant_pack: "
+                            "unsupported constant type\n");
+                exit(1);
             }
+        }
 
-            break;
+        break;
 
     default:
         /* TODO: OK to be silent here? */
-            /* ARGH, don't be silent -lt */
-            PIO_eprintf(NULL, "PackFile_Constant_pack: unsupported constant\n");
-            exit(1);
+        /* ARGH, don't be silent -lt */
+        PIO_eprintf(NULL, "PackFile_Constant_pack: unsupported constant\n");
+        exit(1);
         break;
     }
 
