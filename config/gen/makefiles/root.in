@@ -31,7 +31,7 @@ INCLUDE_DIR     = $(EXEC_PREFIX)/include
 # directory for abstract syntax tree sources
 AST_DIR         = ast
 
-# directory for Build tools
+# directory for build tools
 BUILD_TOOLS_DIR = build_tools
 
 # current directory
@@ -52,7 +52,7 @@ OPS_DIR         = ops
 # directory for packfile files
 PF_DIR          = pf
 
-# soure directory
+# source directory
 SRC_DIR         = src
 
 
@@ -311,21 +311,16 @@ AST_O_FILES = \
     $(AST_DIR)/ast_main$(O) \
     $(AST_DIR)/node$(O)
 
-GENERAL_H_FILES = $(NONGEN_HEADERS) $(GEN_HEADERS) ${TEMP_cg_h}
+# generated list of header files 
+GENERAL_H_FILES   = $(NONGEN_HEADERS) $(GEN_HEADERS) ${TEMP_cg_h}
+ICU_H_FILES       = ${icu_headers}
+ALL_H_FILES       = $(GENERAL_H_FILES)
 
-ICU_H_FILES = ${icu_headers}
-
-ALL_H_FILES = $(GENERAL_H_FILES)
-
-CHARSET_O_FILES = ${TEMP_charset_o}
-
-CLASS_PMC_FILES = ${TEMP_pmc_classes_pmc}
-
-CLASS_O_FILES = ${TEMP_pmc_classes_o}
-
-CLASS_STR_FILES = ${TEMP_pmc_classes_str}
-
-ENCODING_O_FILES = ${TEMP_encoding_o}
+CHARSET_O_FILES   = ${TEMP_charset_o}
+CLASS_PMC_FILES   = ${TEMP_pmc_classes_pmc}
+CLASS_O_FILES     = ${TEMP_pmc_classes_o}
+CLASS_STR_FILES   = ${TEMP_pmc_classes_str}
+ENCODING_O_FILES  = ${TEMP_encoding_o}
 
 
 IO_O_FILES = \
@@ -431,10 +426,10 @@ OPS_FILES = ${ops} $(GEN_OPSFILES)
 # Executables
 PARROT          = $(CUR_DIR)/${test_prog}$(EXE)
 PARROT_SO       = $(CUR_DIR)/${test_prog}_so$(EXE)
-DIS             = disassemble$(EXE)
-PDUMP           = pdump$(EXE)
-PINFO           = pbc_info$(EXE)
-PDB             = pdb$(EXE)
+DIS             = $(CUR_DIR)/disassemble$(EXE)
+PDUMP           = $(CUR_DIR)/pdump$(EXE)
+PINFO           = $(CUR_DIR)/pbc_info$(EXE)
+PDB             = $(CUR_DIR)/pdb$(EXE)
 
 # libs
 LIBPARROT       = ${blib_lib_libparrot_a}
@@ -519,7 +514,7 @@ PMC2CV=$(PERL) classes/pmc2c2.pl --vt
 .pmc.c :
 	$(PMC2CC) $<
 
-# not all makes might understant this, so the rules are generated
+# not all makes might understand this, so the rules are generated
 #classes/pmc_%.h : classes/%.c
 #	$(PMC2CC) $<
 
@@ -553,16 +548,12 @@ help :
 	@echo ""
 	@echo "Testing:"
 	@echo "  test:              Run the test suite."
+	@echo "  fulltest:          Run test suite with various options."
 	@echo "  test<core>:        Run the test suite with a specified core."
-	@echo "                     Valid cores are b, C, f, g, j, r, S."
-	@echo "  test_imcc:         Run the test suite only for IMCC tests."
-	@echo "  test<core>_imcc:   Run the IMCC test suite with a specific core."
 	@echo "                     Valid cores are b, C, f, g, j, r, S."
 	@echo "  src_tests:         Run test in C-file."
 	@echo "  testbench:         Run all benchmarks."
-	@echo "  fulltest:          Run test suite with various options."
-	@echo "  fulltest_imcc:     Run IMCC test suite with various options."
-	@echo "                     Try 'make -i fulltest' in case of failing tests."
+	@echo "  manitest:          Check for new files."
 	@echo ""
 	@echo "Benchmarks:"
 	@echo "  mopsbench:         Million operations"
@@ -579,7 +570,6 @@ help :
 	@echo "  distclean:         Remove everything not in MANIFEST."
 	@echo "  cvsclean:          Like 'distclean', but keep CVS files."
 	@echo "  reconfig:          'clean' and redo configuration."
-	@echo "  manitest:          Check for new files."
 	@echo ""
 	@echo "Dynamic PMCs:"
 	@echo "  dynclasses:        Proxy for default target of dynclasses/Makefile"
@@ -721,7 +711,17 @@ $(SRC_DIR)/parrot_config.h : $(BUILD_TOOLS_DIR)/parrot_config_c.pl config_lib.pa
 #
 ###############################################################################
 
-examples-clean: hello-clean
+examples-clean:
+	$(RM_F) \
+    examples/assembly/mops$(EXE) \
+    examples/assembly/mops.c \
+    examples/assembly/mops$(O) \
+    examples/assembly/mops.pbc \
+    examples/mops/mops$(O) \
+    examples/mops/mops$(EXE) \
+    examples/assembly/hello.pbc \
+    examples/assembly/hello$(O) \
+    examples/assembly/hello$(EXE)
 
 # hello
 hello:	test_prep examples/assembly/hello$(EXE)
@@ -736,8 +736,6 @@ examples/assembly/hello$(O): examples/assembly/hello.pbc
 examples/assembly/hello$(EXE):	examples/assembly/hello$(O)
 	$(MAKE) EXEC=examples/assembly/hello exec
 
-hello-clean:
-	$(RM_F) examples/assembly/hello.pbc examples/assembly/hello$(O) examples/assembly/hello$(EXE)
 
 
 ###############################################################################
@@ -955,7 +953,7 @@ $(SRC_DIR)/exec_cpu.c : lib/Parrot/OpLib/core.pm $(INC_DIR)/jit_emit.h \
     jit/${jitcpuarch}/core.jit ${TEMP_exec_h} $(INC_DIR)/exec_dep.h $(BUILD_TOOLS_DIR)/jit2h.pl
 	$(PERL) $(BUILD_TOOLS_DIR)/jit2h.pl ${jitcpuarch} $(SRC_DIR)/exec_cpu.c
 
-######## imcc files deps
+# imcc file dependencies
 #
 # The .flag files are needed because we are keeping some derived files in CVS,
 # which does not keep accurate timestamps on the files, relative to each other.
@@ -1093,14 +1091,14 @@ test : test_prep
 # 'testC', 'testg' and 'testj' are tested only,
 # when the needed runcores are available
 fulltest : testb \
-#CONDITIONED_LINE(cg_flag):  testC \
-  testf \
-#CONDITIONED_LINE(cg_flag):  testg \
-#CONDITIONED_LINE(jitcapable):  testj \
-  testr \
-  testS \
-  src_tests \
-  testbench
+#CONDITIONED_LINE(cg_flag):    testC \
+    testf \
+#CONDITIONED_LINE(cg_flag):    testg \
+#CONDITIONED_LINE(jitcapable):    testj \
+    testr \
+    testS \
+    src_tests \
+    testbench
 
 # bounds checking, slow core
 testb : test_prep
@@ -1150,47 +1148,6 @@ mopsbench : test_prep
 lifetest : test_prep
 	$(PARROT) $(PARROT_ARGS) examples/assembly/life.pasm
 
-# Running the IMCC test suite
-# normal core
-test_imcc :
-	$(PERL) t/harness $(IMCC_TEST_FILES)
-
-# Run IMCC tests with various command line options
-fulltest_imcc : testb_imcc testC_imcc testf_imcc testg_imcc \
-    testj_imcc testr_imcc testS_imcc testexec_imcc
-
-# slow core, bounds checking
-testb_imcc : test_prep
-	$(PERL) t/harness -b $(IMCC_TEST_FILES)
-
-# CGP core
-testC_imcc : test_prep
-	$(PERL) t/harness -C $(IMCC_TEST_FILES)
-
-# fast core
-testf_imcc : test_prep
-	$(PERL) t/harness -f $(IMCC_TEST_FILES)
-
-# computed goto
-testg_imcc : test_prep
-	$(PERL) t/harness -g $(IMCC_TEST_FILES)
-
-# JIT core
-testj_imcc : test_prep
-	$(PERL) t/harness -j $(IMCC_TEST_FILES)
-
-# normal core, write and run Parrot Byte Code
-testr_imcc : test_prep
-	$(PERL) t/harness -r $(IMCC_TEST_FILES)
-
-# switched core
-testS_imcc : test_prep
-	$(PERL) t/harness -s $(IMCC_TEST_FILES)
-
-# run generated executable
-testexec_imcc : test_prep
-	$(PERL) t/harness --run-exec $(IMCC_TEST_FILES)
-
 
 ###############################################################################
 #
@@ -1216,7 +1173,8 @@ nokfile :
 #
 ###############################################################################
 
-clean : test-clean \
+clean : \
+  test-clean \
   prog-clean \
   dynext-clean \
   languages-clean \
@@ -1226,10 +1184,7 @@ clean : test-clean \
   imcc-clean \
   compilers-clean
 	${TEMP_cg_r}
-	$(RM_F) *.s *~ $(FLUID_FILES) \
-  examples/assembly/mops$(EXE) examples/assembly/mops.c \
-  examples/assembly/mops$(O) examples/assembly/mops.pbc \
-  examples/mops/mops$(O) examples/mops/mops$(EXE)
+	$(RM_F) *.s *~ $(FLUID_FILES)
 
 prog-clean :
 	$(RM_F) \
@@ -1260,7 +1215,7 @@ dynext-clean :
 
 
 # Remove files generated by the test suite
-test-clean : test_imcc-clean
+test-clean :
 	$(RM_F) t/benchmarks*.imc
 	$(RM_F) t/benchmarks*.pasm
 	$(RM_F) t/library/*.imc
@@ -1282,16 +1237,13 @@ test-clean : test_imcc-clean
 	$(RM_F) t/stress/*.out
 	$(RM_F) t/stress/*.o
 	$(RM_F) t/stress/*.stabs.s
-	$(RM_F) t/src/*_*
-
-test_imcc-clean:
-	$(RM_F)  \
-    $(IMCC_DIR)/t/*/*.out \
-    $(IMCC_DIR)/t/*/*.imc \
-    $(IMCC_DIR)/t/*/*.pbc \
-    $(IMCC_DIR)/t/*/*.o \
-    $(IMCC_DIR)/t/*/*.stabs.s \
-    $(IMCC_DIR)/t/*/*.pasm
+	$(RM_F) t/src/*.c
+	$(RM_F) $(IMCC_DIR)/t/*/*.out 
+	$(RM_F) $(IMCC_DIR)/t/*/*.imc 
+	$(RM_F) $(IMCC_DIR)/t/*/*.pbc 
+	$(RM_F) $(IMCC_DIR)/t/*/*.o
+	$(RM_F) $(IMCC_DIR)/t/*/*.stabs.s
+	$(RM_F) $(IMCC_DIR)/t/*/*.pasm
 
 imcc-clean:
 	$(RM_F) \
