@@ -14,6 +14,9 @@
 #
 # $Id$
 # $Log$
+# Revision 1.5  2002/05/22 19:59:59  clintp
+# Fixed problem with uninitialized string variables
+#
 # Revision 1.4  2002/05/22 17:54:21  clintp
 # Removed unneeded code, refactored
 #
@@ -121,9 +124,15 @@ SSTORE: pushs
 # If the string wasn't previously dimensioned then
 # we return the empty string
 SFETCH: pushs
+	pushi
 	restore S0  # Name
 	get_keyed S1, P21, S0
-	save S1
+	length I0, S1
+	ne I0, 0, SNOTNULL
+	set S1, ""
+
+SNOTNULL: save S1
+	popi
 	pops
 	ret
 
