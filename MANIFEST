@@ -233,6 +233,7 @@ pmc_pm.pl
 register.c
 resources.c
 runops_cores.c
+run_indent.pl
 rx.c
 rx.ops
 rxstacks.c

@@ -65,14 +65,14 @@ To ensure that tabs aren't inadvertently used for indentation, the following
 boilerplate code must appear at the bottom of each source file. (This
 rule may be rescinded if I'm ever threatened with a lynching....)
 
-    /*
+   /*
     * Local variables:
     * c-indentation-style: bsd
     * c-basic-offset: 4
     * indent-tabs-mode: nil
-    * End
+    * End:
     *
-    * vim:expandtab shiftwidth=4:
+    * vim: expandtab shiftwidth=4:
     */
 
 
@@ -111,6 +111,16 @@ initials too), and revisit often!
 
 In function definitions, the name starts in column 0, with the
 return type on the previous line
+
+=item *
+
+However, in function declarations (in header files) the return type is kept
+on the same line.
+
+=item *
+
+Variable names should be included for all function parameters in the
+function declarations.
 
 =item *
 
@@ -174,6 +184,56 @@ with one extra indent:
 
 =back
 
+To enforce the spacing, indenting, and bracing guidelines mentioned
+above, the following arguments to GNU Indent should be used:
+
+   -kr -nce -sc -cp0 -l79 -lc79 -psl -nut -cdw -ncs -lps
+
+This expands out to:
+   -nbad  Do not force blank lines after declarations.
+   -bap   Force blank lines after procedure bodies.
+   -bbo   Prefer to break long lines before boolean operators.
+   -nbc   Do not force newlines after commas in declarations
+   -br    Put braces on line with if, etc.
+   -brs   Put braces on struct declaration line.
+   -c33   Put comments to the right of code in column 33 (not recommended)
+   -cd33  Put declaration comments to the right of code in column 33
+   -ncdb  Do not put comment delimiters on blank lines.
+   -nce   Do not cuddle } and else.
+   -cdw   Do cuddle do { } while.
+   -ci4   Continuation indent of 4 spaces
+   -cli0  Case label indent of 0 spaces
+   -ncs   Do not put a space after a cast operator.
+   -d0    Set indentation of comments not to the right of code to 0 spaces.
+   -di1   Put declaration variables 1 space after their types
+   -nfc1  Do not format comments in the first column as  normal.
+   -nfca  Do not format any comments
+   -hnl   Prefer to break long lines at the position of newlines in the input.
+   -i4    4-space indents
+   -ip0   Indent parameter types in old-style function definitions by 0 spaces.
+   -l79   maximum line length for non-comment lines is 79 spaces.
+   -lc79  maximum line length for comment lines is 79 spaces.
+   -lp    maximum line length for non-comment lines is 79 spaces.
+   -npcs  Do not put a space after the function in function calls.
+   -nprs  Do not put a space after every ´(´ and before every ´)´.
+   -saf   Put a space after each for.
+   -sai   Put a space after each if.
+   -saw   Put a space after each while.
+   -sc    Put the `*´ character at the left of comments.
+   -nsob  Do not swallow optional blank lines.
+   -nss   Do not force a space before the semicolon  after  certain statements
+   -nut   Use spaces instead of tabs.
+   -lps   Leave space between `#´ and preprocessor directive.
+
+   -psl   Put the type of a procedure on the line before its name. (.c files)
+    or
+   -npsl  Leave a procedure declaration's return type alone (.h files)
+
+Please note that it is also necessary to include all typedef types
+with the "-T" option to ensure that everything is formatted properly.
+
+A script (run_indent.pl) is be provided which runs indent properly for
+automatically.
 
 =head2 Naming conventions
 
@@ -256,11 +316,12 @@ foo_
 
 =back
 
+
 The top-level structure of the Perl source tarball should be as follows:
 
     /README, etc    a few top-level documents
-    /doc/           Assorted miscellaneous documentation
-    /pdd/           The current PDDs
+    /docs/          Assorted miscellaneous documentation
+    /docs/pdds/     The current PDDs
     /perl/          The source code for Perl itself
     /perl/os/foo/   OS-specific source code for operating system foo
     /foo/           The source code for other families of binaries (eg /x2p/)
@@ -272,6 +333,20 @@ The top-level structure of the Perl source tarball should be as follows:
     /pod/           src of the Perl man pages etc
 
 plus others as it becomes necessary.
+
+=item Header Files
+
+All .h files should include the following "guards" to prevent
+multiple-inclusion: 
+
+ /* file header comments */
+
+ #if !defined(PARROT_<FILENAME>_H_GUARD)
+ #define PARROT_<FILENAME>_H_GUARD
+
+ /* body of file */
+
+ #endif /* PARROT_<FILENAME>_H_GUARD */
 
 =item Names of code entities
 
