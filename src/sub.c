@@ -41,28 +41,6 @@ save_context(Interp *interp, struct Parrot_Context *ctx)
 /*
 
 =item C<void
-cow_copy_context(Interp *interp,
-        struct Parrot_Context *dest, struct Parrot_Context *src)>
-
-Save src context and mark it copy-on-write. We mark
-the pads and stacks, not the actual context struct. This is used for
-continuations. Stacks are COW marked to delay stack copying until
-continuation is activated.
-
-=cut
-
-*/
-
-void
-cow_copy_context(Interp *interp,
-        struct Parrot_Context *dest, struct Parrot_Context *src)
-{
-    memcpy(dest, src, sizeof(*src));
-}
-
-/*
-
-=item C<void
 restore_context(Interp *interp, struct Parrot_Context *ctx)>
 
 Set context of interpreter from a context buffer.
@@ -98,21 +76,6 @@ mark_context(Interp* interpreter, struct Parrot_Context* ctx)
     mark_register_stack(interpreter, ctx->num_reg_stack);
     mark_string_register_stack(interpreter, ctx->string_reg_stack);
     mark_pmc_register_stack(interpreter, ctx->pmc_reg_stack);
-}
-
-/*
-
-=item C<static void coro_error(Stack_Entry_t *e)>
-
-Coroutine error.
-
-=cut
-
-*/
-
-static void coro_error(Stack_Entry_t *e)
-{
-    internal_exception(1, "Coroutine popped main stack");
 }
 
 /*
@@ -198,7 +161,7 @@ swap_context(Interp *interp, struct PMC *sub)
 {
     struct Stack_Chunk * tmp_stack = NULL;
     UINTVAL warns;
-    struct Parrot_Coroutine* co = (struct Parrot_Coroutine *)PMC_sub(sub);
+    struct Parrot_coro* co = PMC_coro(sub);
     struct Parrot_Context *ctx = &co->ctx;
     Stack_Chunk_t *reg_top;
 
@@ -259,31 +222,31 @@ swap_context(Interp *interp, struct PMC *sub)
 
 /*
 
-=item C<struct Parrot_Sub *
-new_sub(Interp *interp, size_t size)>
+=item C<struct Parrot_sub *
+new_sub(Interp *interp)>
 
-Returns a new C<Parrot_Sub>.
+Returns a new C<Parrot_sub>.
 
 =cut
 
 */
 
-struct Parrot_Sub *
-new_sub(Interp *interp, size_t size)
+struct Parrot_sub *
+new_sub(Interp *interp)
 {
     /* Using system memory until I figure out GC issues */
-    struct Parrot_Sub *newsub =
-        mem_sys_allocate_zeroed(size);
+    struct Parrot_sub *newsub =
+        mem_sys_allocate_zeroed(sizeof(struct Parrot_sub));
     newsub->seg = interp->code->cur_cs;
     return newsub;
 }
 
 /*
 
-=item C<struct Parrot_Sub *
+=item C<struct Parrot_sub *
 new_closure(Interp *interp)>
 
-Returns a new C<Parrot_Sub> with its own sctatchpad.
+Returns a new C<Parrot_sub> with its own sctatchpad.
 
 XXX: Need to document semantics in detail.
 
@@ -291,15 +254,15 @@ XXX: Need to document semantics in detail.
 
 */
 
-struct Parrot_Sub *
+struct Parrot_sub *
 new_closure(Interp *interp)
 {
-    struct Parrot_Sub *newsub = new_sub(interp, sizeof(struct Parrot_Sub));
+    struct Parrot_sub *newsub = new_sub(interp);
     PMC * pad = scratchpad_get_current(interp);
-    newsub->ctx.pad_stack = new_stack(interp, "Pad");
+    newsub->pad_stack = new_stack(interp, "Pad");
     if (pad) {
         /* put the correct pad in place */
-        stack_push(interp, &newsub->ctx.pad_stack, pad,
+        stack_push(interp, &newsub->pad_stack, pad,
                 STACK_ENTRY_PMC, STACK_CLEANUP_NULL);
     }
     return newsub;
@@ -323,10 +286,10 @@ mark_stack_reusable(Parrot_Interp interpreter, struct Parrot_Context *ctx)
 }
 /*
 
-=item C<struct Parrot_Sub *
+=item C<struct Parrot_cont *
 new_continuation(Interp *interp)>
 
-Returns a new C<Parrot_Sub> with its own COW version of the current
+Returns a new C<Parrot_cont> with its own copy of the current
 context.
 
 =cut
@@ -334,41 +297,38 @@ context.
 */
 
 
-struct Parrot_Sub *
+struct Parrot_cont *
 new_continuation(Interp *interp)
 {
-    struct Parrot_Sub *cc = new_sub(interp, sizeof(struct Parrot_Sub));
-    cow_copy_context(interp, &cc->ctx, &interp->ctx);
+    struct Parrot_cont *cc = mem_sys_allocate(sizeof(struct Parrot_cont));
+    save_context(interp, &cc->ctx);
+    cc->seg = interp->code->cur_cs;
     return cc;
 }
 
 /*
 
-=item C<struct Parrot_Sub *
+=item C<struct Parrot_cont *
 new_ret_continuation(Interp *interp)>
 
-Returns a new C<Parrot_Sub> with its own copy of the current context.
+Returns a new C<Parrot_cont> with its own copy of the current context.
 
 =cut
 
 */
 
-struct Parrot_Sub *
+struct Parrot_cont *
 new_ret_continuation(Interp *interp)
 {
-    struct Parrot_Sub *cc =
-        mem_sys_allocate_zeroed(sizeof(struct Parrot_Sub));
-    cc->seg = interp->code->cur_cs;
-    save_context(interp, &cc->ctx);
-    return cc;
+    return new_continuation(interp);
 }
 
 /*
 
-=item C<struct Parrot_Sub *
+=item C<struct Parrot_coro *
 new_coroutine(Interp *interp)>
 
-Returns a new C<Parrot_Coroutine>.
+Returns a new C<Parrot_coro>.
 
 XXX: Need to document semantics in detail.
 
@@ -376,13 +336,13 @@ XXX: Need to document semantics in detail.
 
 */
 
-struct Parrot_Sub *
+struct Parrot_coro *
 new_coroutine(Interp *interp)
 {
     PMC * pad;
     struct Parrot_Context *ctx;
-    struct Parrot_Coroutine *co =
-        mem_sys_allocate_zeroed(sizeof(struct Parrot_Coroutine));
+    struct Parrot_coro *co =
+        mem_sys_allocate_zeroed(sizeof(struct Parrot_coro));
 
     co->seg = interp->code->cur_cs;
     ctx = &co->ctx;
@@ -409,25 +369,14 @@ new_coroutine(Interp *interp)
         stack_push(interp, &ctx->pad_stack, pad,
                    STACK_ENTRY_PMC, STACK_CLEANUP_NULL);
     }
-    return (struct Parrot_Sub *)co;
+    return co;
 }
-
-/*
-
-=item C<PMC *
-new_ret_continuation_pmc(Interp * interp, opcode_t * address)>
-
-Returns a new C<RetContinuation> PMC.
-
-=cut
-
-*/
 
 void
 add_to_retc_free_list(Parrot_Interp interpreter, PMC *sub)
 {
     Caches *mc = interpreter->caches;
-    struct Parrot_Sub *cc_self = PMC_sub(sub);
+    struct Parrot_cont *cc_self = PMC_cont(sub);
     /* is it created from new_ret_continuation_pmc() i.e.
      * from invokecc or callmethodcc
      */
@@ -465,6 +414,17 @@ get_retc_from_free_list(Parrot_Interp interpreter)
     return retc;
 }
 
+/*
+
+=item C<PMC *
+new_ret_continuation_pmc(Interp * interp, opcode_t * address)>
+
+Returns a new C<RetContinuation> PMC.
+
+=cut
+
+*/
+
 PMC *
 new_ret_continuation_pmc(Interp * interpreter, opcode_t * address)
 {
@@ -474,7 +434,7 @@ new_ret_continuation_pmc(Interp * interpreter, opcode_t * address)
     continuation = get_retc_from_free_list(interpreter);
     if (continuation) {
         /* freshen context */
-        struct Parrot_Sub *sub = PMC_sub(continuation);
+        struct Parrot_cont *sub = PMC_cont(continuation);
         save_context(interpreter, &sub->ctx);
         sub->seg = interpreter->code->cur_cs;
     }

@@ -304,12 +304,12 @@ void *
 throw_exception(Parrot_Interp interpreter, PMC *exception, void *dest)
 {
     PMC *handler;
-    struct Parrot_Sub * cc;
+    struct Parrot_cont * cc;
 
     handler = find_exception_handler(interpreter, exception);
     if (!handler)
         return NULL;
-    cc = (struct Parrot_Sub*)PMC_sub(handler);
+    cc = PMC_cont(handler);
     /* put the continuation ctx in the interpreter */
     restore_context(interpreter, &cc->ctx);
     /* preserve P5 register */
@@ -350,12 +350,12 @@ void *
 rethrow_exception(Parrot_Interp interpreter, PMC *exception)
 {
     PMC *handler;
-    struct Parrot_Sub * cc;
+    struct Parrot_cont * cc;
 
     if (exception->vtable->base_type != enum_class_Exception)
         PANIC("Illegal rethrow");
     handler = find_exception_handler(interpreter, exception);
-    cc = (struct Parrot_Sub*)PMC_sub(handler);
+    cc = PMC_cont(handler);
     restore_context(interpreter, &cc->ctx);
     /* put exception object in P5 */
     REG_PMC(5) = exception;

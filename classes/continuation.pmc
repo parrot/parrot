@@ -24,7 +24,7 @@ information.
 #include "parrot/method_util.h"
 #include <assert.h>
 
-pmclass Continuation extends Closure {
+pmclass Continuation {
 
 /*
 
@@ -36,8 +36,8 @@ Initializes the continuation.
 
 */
 
-void init () {
-        PMC_sub(SELF) = new_continuation(INTERP);
+    void init () {
+        PMC_cont(SELF) = new_continuation(INTERP);
         PMC_struct_val(SELF) = NULL;
         PObj_custom_mark_destroy_SETALL(SELF);
     }
@@ -54,11 +54,25 @@ Marks the continuation as live.
 
     void mark () {
 #if 1
-        struct Parrot_Sub * cc = (struct Parrot_Sub*)PMC_sub(SELF);
+        struct Parrot_cont * cc = PMC_cont(SELF);
         mark_context(INTERP, &cc->ctx);
 #endif
     }
 
+/*
+
+=item C<void destroy()>
+
+Destroys the continuation.
+
+=cut
+
+*/
+
+    void destroy () {
+        struct Parrot_cont * sub = PMC_cont(SELF);
+        mem_sys_free(sub);
+    }
 /*
 
 =item C<PMC *clone()>
@@ -70,12 +84,12 @@ Creates and returns a clone of the continuation.
 */
 
     PMC* clone() {
-        struct Parrot_Sub * sub;
-        struct Parrot_Sub *cc_self = PMC_sub(SELF);
+        struct Parrot_cont * sub;
+        struct Parrot_cont *cc_self = PMC_cont(SELF);
         PMC* ret = pmc_new_noinit(INTERP, SELF->vtable->base_type);
         PObj_custom_mark_destroy_SETALL(ret);
-        sub = PMC_sub(ret) = mem_sys_allocate(sizeof(struct Parrot_Sub));
-        memcpy(sub, cc_self, sizeof(struct Parrot_Sub));
+        sub = PMC_cont(ret) = mem_sys_allocate(sizeof(struct Parrot_cont));
+        memcpy(sub, cc_self, sizeof(struct Parrot_cont));
         PObj_get_FLAGS(SELF) &= ~PObj_private2_FLAG;
         /* be sure its not recycled */
         assert (!(PObj_get_FLAGS(ret) & PObj_private2_FLAG));
@@ -94,12 +108,54 @@ Assign context.
 
 */
     void set_pmc(PMC* src) {
-        struct Parrot_Sub *cc_self = PMC_sub(SELF);
-        struct Parrot_Sub *cc_src  = PMC_sub(src);
+        struct Parrot_cont *cc_self = PMC_cont(SELF);
+        struct Parrot_cont *cc_src  = PMC_cont(src);
 
-        memcpy(cc_self, cc_src, sizeof(struct Parrot_Sub));
+        memcpy(cc_self, cc_src, sizeof(struct Parrot_cont));
         PMC_struct_val(SELF) = PMC_struct_val(src);
     }
+/*
+
+=item C<void set_pointer(void *value)>
+
+Sets the pointer to the actual subroutine.
+
+=cut
+
+*/
+
+    void set_pointer (void* value) {
+        PObj_get_FLAGS(SELF) |= PObj_private1_FLAG;
+        PMC_struct_val(SELF) = value;
+    }
+
+/*
+
+=item C<void *get_pointer()>
+
+Returns the pointer to the actual subroutine.
+
+=cut
+
+*/
+
+    void* get_pointer () {
+        return PMC_struct_val(SELF);
+    }
+/*
+
+=item C<INTVAL defined()>
+
+Returns whether the subroutine is defined.
+
+=cut
+
+*/
+
+    INTVAL defined () {
+        return PMC_struct_val(SELF) != NULL;
+    }
+
 /*
 
 =item C<void *invoke(void *next)>
@@ -111,9 +167,12 @@ Restores the "context" and calls the superclass's C<invoke()>.
 */
 
     void* invoke (void* next) {
-        struct Parrot_Sub * cc = (struct Parrot_Sub*)PMC_sub(SELF);
+        struct Parrot_cont * cc = PMC_cont(SELF);
         restore_context(interpreter, &cc->ctx);
-        return SUPER(next);
+        if (interpreter->code->cur_cs != cc->seg) {
+            Parrot_switch_to_cs(interpreter, cc->seg, 1);
+        }
+        return PMC_struct_val(SELF);
     }
 }
 

@@ -40,14 +40,14 @@ Initializes the continuation.
 */
 
     void init () {
-        PMC_sub(SELF) = new_ret_continuation(INTERP);
+        PMC_cont(SELF) = new_ret_continuation(INTERP);
         PMC_struct_val(SELF) = NULL;
         PObj_custom_mark_destroy_SETALL(SELF);
         PObj_get_FLAGS(SELF) &= ~PObj_private2_FLAG;
     }
 
     void mark () {
-        struct Parrot_Sub * cc = (struct Parrot_Sub*)PMC_sub(SELF);
+        struct Parrot_cont * cc = PMC_cont(SELF);
        /*
         * s. imcc/t/syn/pcc_16 and t/op/gc_12
         *
@@ -68,7 +68,7 @@ Initializes the continuation.
     }
 
     void* invoke (void* next) {
-        struct Parrot_Sub * cc = (struct Parrot_Sub*)PMC_sub(SELF);
+        struct Parrot_cont * cc = PMC_cont(SELF);
 #if ! DISABLE_GC_DEBUG
         if (GC_DEBUG(interpreter)) {
             if (PObj_on_free_list_TEST(SELF))

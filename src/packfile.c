@@ -273,7 +273,7 @@ do_1_sub_pragma(Parrot_Interp interpreter, PMC* sub_pmc, int action)
 {
 
     size_t start_offs;
-    struct Parrot_Sub * sub = (struct Parrot_Sub *)PMC_sub(sub_pmc);
+    struct Parrot_sub * sub = PMC_sub(sub_pmc);
     switch (action) {
         case PBC_LOADED:
             if (PObj_get_FLAGS(sub_pmc) & PObj_private5_FLAG) {
@@ -322,7 +322,6 @@ do_sub_pragmas(Parrot_Interp interpreter, struct PackFile *self, int action)
                 switch (sub_pmc->vtable->base_type) {
                     case enum_class_Sub:
                     case enum_class_Closure:
-                    case enum_class_Continuation:
                     case enum_class_Coroutine:
                         do_1_sub_pragma(interpreter, sub_pmc, action);
                 }
@@ -417,7 +416,7 @@ fixup_subs(Interp *interpreter, struct PackFile *self, int action)
     struct PackFile_FixupTable *ft;
     struct PackFile_ConstTable *ct;
     PMC *sub_pmc;
-    struct Parrot_Sub *sub;
+    struct Parrot_sub *sub;
     INTVAL rel;
     int again = 0;
 
@@ -442,7 +441,6 @@ fixup_subs(Interp *interpreter, struct PackFile *self, int action)
                 switch (sub_pmc->vtable->base_type) {
                     case enum_class_Sub:
                     case enum_class_Closure:
-                    case enum_class_Continuation:
                     case enum_class_Coroutine:
                         if (PObj_get_FLAGS(sub_pmc) & PObj_private1_FLAG)
                             continue;
@@ -450,7 +448,7 @@ fixup_subs(Interp *interpreter, struct PackFile *self, int action)
                             sizeof(opcode_t);
                         rel += (INTVAL) self->cur_cs->base.data;
                         PMC_struct_val(sub_pmc) = (void*) rel;
-                        sub = (struct Parrot_Sub*) PMC_sub(sub_pmc);
+                        sub = PMC_sub(sub_pmc);
                         rel = (INTVAL) sub->end * sizeof(opcode_t);
                         rel += (INTVAL) self->cur_cs->base.data;
                         sub->end = (opcode_t *) rel;
@@ -2677,10 +2675,9 @@ PackFile_Constant_pack_size(struct PackFile_Constant *self)
         switch (component->vtable->base_type) {
             case enum_class_Sub:
             case enum_class_Closure:
-            case enum_class_Continuation:
             case enum_class_Coroutine:
                 packed_size = PF_size_cstring(
-                        ((struct Parrot_Sub*)PMC_sub(component))->packed);
+                        (PMC_sub(component))->packed);
                 break;
             default:
                 PIO_eprintf(NULL, "pack_size: Unknown PMC constant");
@@ -2847,7 +2844,7 @@ PackFile_Constant_unpack_pmc(Interp *interpreter,
     int start, end, flag;
     int rc, pmc_num;
     PMC *sub_pmc;
-    struct Parrot_Sub *sub;
+    struct Parrot_sub *sub;
     struct PackFile *pf_save;
     int ns_const;
 
@@ -2898,6 +2895,7 @@ PackFile_Constant_unpack_pmc(Interp *interpreter,
     sub = PMC_sub(sub_pmc);
     sub->end = (opcode_t*)(long)end;
     sub->packed = pmcs;
+    sub->name = const_string(interpreter, name);
     /*
      * if the Sub has some special pragmas in flag (LOAD, MAIN...)
      * then set private flags of that PMC

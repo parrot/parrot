@@ -40,21 +40,29 @@ print_sub_name(Parrot_Interp interpreter, PMC* sub)
     struct PackFile *pf;
     struct PackFile_FixupTable *ft;
     struct PackFile_ConstTable *ct;
+    struct Parrot_sub * s = PMC_sub(sub);
 
-    pf = interpreter->code;
-    ft = pf->cur_cs->fixups;
-    ct = pf->cur_cs->consts;
-    for (i = 0; i < ft->fixup_count; i++) {
-        switch (ft->fixups[i]->type) {
-            case enum_fixup_sub:
-                ci = ft->fixups[i]->offset;
-                if (sub == ct->constants[ci]->u.key) {
-                    PIO_eprintf(interpreter, "# Calling sub '%s'\n#",
-                    ft->fixups[i]->name);
-                    print_pbc_location(interpreter);
-                    break;
-                }
+    if (s->name) {
+        /* sub was located via globals */
+        PIO_eprintf(interpreter, "# Calling sub '%Ss'\n#", s->name);
+    }
+    else {
+        /* sub was created via new_sub and offset, probably */
+        pf = interpreter->code;
+        ft = pf->cur_cs->fixups;
+        ct = pf->cur_cs->consts;
+        for (i = 0; i < ft->fixup_count; i++) {
+            switch (ft->fixups[i]->type) {
+                case enum_fixup_sub:
+                    ci = ft->fixups[i]->offset;
+                    if (sub == ct->constants[ci]->u.key) {
+                        PIO_eprintf(interpreter, "# Calling sub '%s'\n#",
+                                ft->fixups[i]->name);
+                        break;
+                    }
+            }
         }
+        print_pbc_location(interpreter);
     }
 }
 
@@ -86,7 +94,7 @@ Initializes the subroutine.
      *   PMC_pmc_val    ... Parrot_Sub structure
      */
     void init () {
-        PMC_sub(SELF) = new_sub(INTERP, sizeof(struct Parrot_Sub));
+        PMC_sub(SELF) = new_sub(INTERP);
         PMC_struct_val(SELF) = NULL;
         PObj_active_destroy_SET(SELF);
         PObj_get_FLAGS(SELF) &= ~PObj_private1_FLAG;
@@ -108,7 +116,7 @@ Destroys the subroutine.
 */
 
     void destroy () {
-        struct Parrot_Sub * sub = (struct Parrot_Sub *)PMC_sub(SELF);
+        struct Parrot_sub * sub = PMC_sub(SELF);
         mem_sys_free(sub);
     }
 
@@ -156,7 +164,7 @@ now.> -DRS
 
     INTVAL get_integer_keyed (PMC* key) {
         return (INTVAL)
-            (((struct Parrot_Sub *)PMC_sub(SELF))->seg->base.pf->byte_code);
+            ((PMC_sub(SELF))->seg->base.pf->byte_code);
     }
 
 /*
@@ -184,7 +192,7 @@ Invokes the subroutine.
 */
 
     void* invoke (void* next) {
-        struct Parrot_Sub * sub = (struct Parrot_Sub *)PMC_sub(SELF);
+        struct Parrot_sub * sub = PMC_sub(SELF);
         if (++interpreter->ctx.recursion_depth >
                 interpreter->recursion_limit) {
             real_exception(interpreter, next, 100,
@@ -210,11 +218,11 @@ Creates and returns a clone of the subroutine.
 */
 
     PMC* clone () {
-        struct Parrot_Sub * sub;
+        struct Parrot_sub * sub;
         PMC* ret = pmc_new_noinit(INTERP, SELF->vtable->base_type);
         PObj_active_destroy_SET(ret);
-        sub = PMC_sub(ret) = mem_sys_allocate(sizeof(struct Parrot_Sub));
-        memcpy(sub, PMC_sub(SELF), sizeof(struct Parrot_Sub));
+        sub = PMC_sub(ret) = mem_sys_allocate(sizeof(struct Parrot_sub));
+        memcpy(sub, PMC_sub(SELF), sizeof(struct Parrot_sub));
         PMC_struct_val(ret) = PMC_struct_val(SELF);
         return ret;
     }
@@ -260,13 +268,13 @@ Archives the subroutine.
 
     void freeze(visit_info *info) {
         IMAGE_IO *io = info->image_io;
-        struct Parrot_Sub * sub = (struct Parrot_Sub *)PMC_sub(SELF);
+        struct Parrot_sub * sub = PMC_sub(SELF);
         size_t start_offs, end_offs;
 
         SUPER(info);
         /*
          * we currently need to write these items:
-         * - name of the sub's label: in properties?
+         * - name of the sub's label
          * - start offset in byte-code segment
          * - end   offset in byte-code segment
          * - segment TODO
@@ -308,7 +316,7 @@ Unarchives the subroutine.
         SUPER(info);
 
         if (info->extra_flags == EXTRA_IS_NULL) {
-            struct Parrot_Sub * sub = (struct Parrot_Sub *)PMC_sub(SELF);
+            struct Parrot_sub * sub = PMC_sub(SELF);
             size_t start_offs, end_offs;
             /*
              * we get relative offsets
@@ -336,7 +344,7 @@ Called after the subroutine as been unarchived.
          * for now do fixup here until packfile issues are sorted out
          */
         opcode_t *code;
-        struct Parrot_Sub * sub = (struct Parrot_Sub *)PMC_sub(SELF);
+        struct Parrot_sub * sub = PMC_sub(SELF);
         opcode_t *start_offs, *end_offs;
 
         /* its absolute */

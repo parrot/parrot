@@ -62,7 +62,7 @@ stopped. See the L<Glossary|docs/glossary.pod> for more information.
 	longjmp(exceptions->dest, 1); \
     } while(0)
 
-pmclass Coroutine extends Continuation {
+pmclass Coroutine extends Sub {
 
 /*
 
@@ -75,7 +75,7 @@ Initializes the co-routine.
 */
 
     void init () {
-        PMC_sub(SELF) = new_coroutine(INTERP);
+        PMC_coro(SELF) = new_coroutine(INTERP);
         PMC_struct_val(SELF) = NULL;
         PObj_custom_mark_destroy_SETALL(SELF);
 
@@ -94,7 +94,7 @@ Swaps the "context".
 */
 
     void* invoke (void* next) {
-        struct Parrot_Sub * sub = (struct Parrot_Sub *)PMC_sub(SELF);
+        struct Parrot_coro * sub = PMC_coro(SELF);
         void * dest = PMC_struct_val(SELF);
         int argcP = REG_INT(3);
         /* python calls the coroutine initially during
@@ -102,7 +102,7 @@ Swaps the "context".
          */
         if (PObj_get_FLAGS(SELF) & PObj_private3_FLAG) {
             PMC *ret = SELF.get_iter();
-            struct Parrot_Sub *cor = PMC_sub(ret);
+            struct Parrot_coro *cor = PMC_coro(ret);
             struct Stack_Chunk *pad_stack = cor->ctx.pad_stack;
             PMC *pad = stack_peek(INTERP, pad_stack, NULL);
             INTVAL i;
@@ -140,7 +140,7 @@ end of a coroutine:
 
     PMC* shift_pmc() {
         PMC *res;
-        struct Parrot_Sub * sub = (struct Parrot_Sub *)PMC_sub(SELF);
+        struct Parrot_coro * sub = PMC_coro(SELF);
         void * regs = Parrot_save_register_frames(interpreter, SELF);
         opcode_t offset, *call_hook;
         PMC *ex;
@@ -183,10 +183,9 @@ Return much, we don't know.
 
     PMC* get_iter () {
         if (PObj_get_FLAGS(SELF) & PObj_private3_FLAG) {
-            struct Parrot_Sub * sub = (struct Parrot_Sub *)PMC_sub(SELF);
+            struct Parrot_coro * sub = PMC_coro(SELF);
             PMC *ret = pmc_new(INTERP, enum_class_Coroutine);
-            struct Parrot_Sub * coro;
-            coro = (parrot_sub_t)PMC_sub(ret);
+            struct Parrot_coro * coro = PMC_coro(ret);
             coro->end = sub->end;
 
             PObj_get_FLAGS(ret) |= PObj_private1_FLAG; /* fixup done */
@@ -213,7 +212,7 @@ Marks the coroutine as live.
 */
 
     void mark () {
-        struct Parrot_Coroutine *c = (struct Parrot_Coroutine *)PMC_sub(SELF);
+        struct Parrot_coro *c = PMC_coro(SELF);
         mark_stack(INTERP, c->co_control_stack);
         mark_stack(INTERP, c->co_control_base);
         /* mark_stack(INTERP, c->co_pad_stack); */

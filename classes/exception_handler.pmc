@@ -36,8 +36,8 @@ Initializes the exception handler.
 */
 
     void init() {
-        PObj_get_FLAGS(SELF) &= ~PObj_private0_FLAG;
-        SUPER();
+        PMC_cont(SELF) = new_continuation(INTERP);
+        PMC_struct_val(SELF) = NULL;
         /*
          * an exception handler has no separate context, its
          * only a snapshot of an "earlier" context, which is
@@ -45,7 +45,6 @@ Initializes the exception handler.
          * can only be deeper in the interpreter - so no
          * mark of context is needed
          */
-        PObj_custom_mark_CLEAR(SELF);
     }
 
 }

@@ -242,10 +242,9 @@ PackFile_Constant_pack(struct PackFile_Constant *self, opcode_t *cursor)
         switch (key->vtable->base_type) {
             case enum_class_Sub:
             case enum_class_Closure:
-            case enum_class_Continuation:
             case enum_class_Coroutine:
                 {
-                    char *s = ((struct Parrot_Sub*)PMC_sub(key))->packed;
+                    char *s = (PMC_sub(key))->packed;
 #if TRACE_PACKFILE_PMC
                     fprintf(stderr, "PMC_packed '%s'\n", (char*) cursor);
 #endif
