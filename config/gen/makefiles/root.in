@@ -164,7 +164,8 @@ FLUID_FILES = \
     $(GEN_HEADERS) \
     $(GEN_SOURCES) \
     $(GEN_MODULES) \
-    $(INC)/jit_emit.h
+    $(INC)/jit_emit.h \
+    runtime/parrot/include/parrotlib.pbc
 
 
 ###############################################################################
@@ -392,7 +393,7 @@ MAKE_C = ${make_c}
 #
 ###############################################################################
 
-all : flags_dummy $(TEST_PROG) library/config.fpmc docs $(LIBNCI_SO)
+all : flags_dummy $(TEST_PROG) runtime/parrot/include/parrotlib.pbc library/config.fpmc docs $(LIBNCI_SO)
 
 .SUFFIXES : .c .h .pmc .dump $(O) .str
 
@@ -504,6 +505,9 @@ parrot_utils : $(PDUMP) $(DIS) $(PINFO) $(PDB)
 flags_dummy :
 	@echo Compiling with:
 	@$(PERL) tools/dev/cc_flags.pl ./CFLAGS echo $(CC) $(CFLAGS) xx$(O) -c xx.c
+
+runtime/parrot/include/parrotlib.pbc: runtime/parrot/library/parrotlib.imc
+	./parrot -o $@ $^
 
 library/config.fpmc : myconfig config_lib.pasm $(TEST_PROG)
 	@echo Invoking Parrot to generate library/config.fpmc--cross your fingers
