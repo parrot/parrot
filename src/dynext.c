@@ -103,6 +103,7 @@ get_path(Interp *interpreter, STRING *lib, void **handle)
     /*
      * Current dir with no extension
      */
+    path = string_copy(interpreter, lib);
     cpath = string_to_cstring(interpreter, lib);
     *handle = Parrot_dlopen(cpath);
     /*

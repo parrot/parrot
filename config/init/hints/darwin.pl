@@ -19,4 +19,5 @@ Configure::Data->set(
   ldflags => $ldflags,
   ccwarn => "-Wno-shadow",
   libs => $libs,
+  so => '.dylib',
 );
