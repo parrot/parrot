@@ -65,9 +65,6 @@ Parrot_exec_save(Parrot_exec_objfile_t *obj, const char *file)
                 rellocation.r_extern = 1;
                 break;
             case RTYPE_COM:
-                rellocation.r_length = 2;
-                rellocation.r_extern = 1;
-                break;
             case RTYPE_DATA:
                 rellocation.r_length = 2;
                 rellocation.r_extern = 1;
@@ -76,7 +73,7 @@ Parrot_exec_save(Parrot_exec_objfile_t *obj, const char *file)
                 break;
         }
         save_struct(fp, &rellocation, sizeof(struct relocation_info));
-   }
+    }
     /* Symbol table */
     for (i = 0; i < obj->symbol_count; i++) {
         bzero(&symlst, sizeof(struct nlist));
@@ -102,7 +99,7 @@ Parrot_exec_save(Parrot_exec_objfile_t *obj, const char *file)
                 break;
         }
         save_struct(fp, &symlst, sizeof(struct nlist));
-   }
+    }
     /* String table size */
     save_int(fp, obj->symbol_list_size);
     /* String table */
@@ -243,19 +240,21 @@ Parrot_exec_save(Parrot_exec_objfile_t *obj, const char *file)
             case RTYPE_FUNC:
                 rellocation.r_info =
                     ELF32_R_INFO(
-                        obj->text_rellocation_table[i].symbol_number + PDFS,2);
+                        obj->text_rellocation_table[i].symbol_number + PDFS,
+                            R_386_PC32);
                 break;
             case RTYPE_DATA:
             case RTYPE_COM:
                 rellocation.r_info =
                     ELF32_R_INFO(
-                        obj->text_rellocation_table[i].symbol_number + PDFS,1);
+                        obj->text_rellocation_table[i].symbol_number + PDFS,
+                            R_386_32);
                 break;
             default:
                 break;
         }
         save_struct(fp, &rellocation, sizeof(Elf32_Rel));
-   }
+    }
     /* Symbol table */
     /* zero */
     bzero(&symlst, sizeof(Elf32_Sym));
@@ -302,7 +301,7 @@ Parrot_exec_save(Parrot_exec_objfile_t *obj, const char *file)
                 break;
         }
         save_struct(fp, &symlst, sizeof(Elf32_Sym));
-   }
+    }
     /* String table */
     save_zero(fp);
     for (i = 0; i < obj->symbol_count; i++) {
