@@ -394,6 +394,8 @@ do_pre_process(Parrot_Interp interpreter)
     }
 }
 
+extern void imcc_init(Parrot_Interp interpreter);
+
 int
 main(int argc, char * argv[])
 {
@@ -403,14 +405,13 @@ main(int argc, char * argv[])
     struct Parrot_Interp *interpreter = Parrot_new(NULL);
 
     Parrot_init(interpreter);
-    interpreter->imc_info = mem_sys_allocate_zeroed(sizeof(imc_info_t));
 
     interpreter->DOD_block_level++;
     interpreter->GC_block_level++;
 
+    imcc_init(interpreter);
+
     sourcefile = parseflags(interpreter, &argc, &argv);
-    /* register PASM and PIR compilers to parrot core */
-    register_compilers(interpreter);
 
     /* default optimizations, s. optimizer.c, imc.h */
     if (!*optimizer_opt) {

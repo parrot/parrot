@@ -455,6 +455,10 @@ PDB_next(struct Parrot_Interp *interpreter, const char *command)
     pdb->state |= PDB_STOPPED;
 
     /* If program ended */
+
+    /*
+     * FIXME this doesn't handle resume opcodes
+     */
     if (!pdb->cur_opcode)
         (void)PDB_program_end(interpreter);
 }
@@ -835,17 +839,25 @@ Init the program.
 
 */
 
+extern void imcc_init(Parrot_Interp interpreter);
+
 void
 PDB_init(struct Parrot_Interp *interpreter, const char *command)
 {
-    PDB_t *pdb = interpreter->pdb;
     PMC *userargv;
-    STRING *arg;
-    struct PackFile *code;
-    unsigned long i;
     char c[256];
+    STRING *arg;
+    unsigned long i;
+    PDB_t *pdb = interpreter->pdb;
+
+#if 0
+    struct PackFile *code;
     void* stacktop = interpreter->lo_var_ptr;
 
+    /* XXX this causes reuse of structures of the old interpreter
+     * the new interpreter isn't returned nor setup properly
+     * -leo
+     */
     /* The bytecode is readonly, right? */
     code = interpreter->code;
     /* Destroy the old interpreter FIXME */
@@ -855,6 +867,15 @@ PDB_init(struct Parrot_Interp *interpreter, const char *command)
     interpreter->code = code;
     interpreter->pdb = pdb;
     interpreter->lo_var_ptr = stacktop;
+#else
+    Parrot_clear_i(interpreter);
+    Parrot_clear_n(interpreter);
+    Parrot_clear_s(interpreter);
+    Parrot_clear_p(interpreter);
+#endif
+
+    /* setup PASM compiler */
+    imcc_init(interpreter);
 
     /* set the user arguments */
     userargv = pmc_new(interpreter, enum_class_PerlArray);
@@ -2016,11 +2037,11 @@ PDB_compile(struct Parrot_Interp *interpreter, const char *command)
     STRING *buf;
     const char *end = "\nend\n";
     PMC * compiler, *code;
-    PMC *key = key_new_cstring(interpreter, "PASM");
+    STRING *key = const_string(interpreter, "PASM");
     PMC *compreg_hash = VTABLE_get_pmc_keyed_int(interpreter,
             interpreter->iglobals, IGLOBALS_COMPREG_HASH);
 
-    compiler = VTABLE_get_pmc_keyed(interpreter, compreg_hash, key);
+    compiler = VTABLE_get_pmc_keyed_str(interpreter, compreg_hash, key);
     if (!VTABLE_defined(interpreter, compiler)) {
         fprintf(stderr, "Couldn't find PASM compiler");
         return NULL;

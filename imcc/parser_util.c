@@ -875,6 +875,14 @@ str_cat(const char * s1, const char * s2)
 }
 
 
+void
+imcc_init(Parrot_Interp interpreter)
+{
+    interpreter->imc_info = mem_sys_allocate_zeroed(sizeof(imc_info_t));
+    /* register PASM and PIR compilers to parrot core */
+    register_compilers(interpreter);
+}
+
 
 /*
  * Local variables:

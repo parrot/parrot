@@ -23,8 +23,8 @@ modeled after Perl's one. Its name is F<pdb>, and is an interactive
 environment that let you step through bytecode, set breakpoints,
 evaluate assembly instructions and peek at the interpreter status.
 
-A good (well, at least some) knowledge of the Parrot internals is 
-obviously required to read this document. Some familiarity with 
+A good (well, at least some) knowledge of the Parrot internals is
+obviously required to read this document. Some familiarity with
 debugging principles is also mandatory beyond this point.
 
 =head1 BUILDING pdb
@@ -56,7 +56,7 @@ After the version banner, you'll see the friendly debugger prompt:
 
   (pdb)
 
-F<pdb> is ready to receive commands and give output. To list the available 
+F<pdb> is ready to receive commands and give output. To list the available
 commands type 'h'. To quit the debugger type 'q'.
 
 As with the Perl debugger, whenever it halts and shows you a line of code,
@@ -65,13 +65,13 @@ just executed.
 
 =head1 DEBUGGER COMMANDS
 
-Always remember that you can enter 'h' to get a list of commands (this 
-document may be outdated in respect to the actual debugger, so let it 
+Always remember that you can enter 'h' to get a list of commands (this
+document may be outdated in respect to the actual debugger, so let it
 speak for itself).
 
 Most commands can be shortened to their first letter. When available,
 this is signaled by the letter in parentheses after the command name
-Thus, C<help (h)> means that the command can be given as 'help' or 
+Thus, C<help (h)> means that the command can be given as 'help' or
 just 'h'. On the other hand, C<load> can only be given as 'load', verbatim.
 And the debugger is case sensitive.
 
@@ -87,7 +87,7 @@ patch the source code (see L</FILES> below).
 =item disassemble
 
 Disassemble a loaded bytecode file. This will turn a file loaded with
-C<load> into proper Parrot assembler. 
+C<load> into proper Parrot assembler.
 
 =item load
 
@@ -108,7 +108,7 @@ it lists the source code ten lines at a time.
 
 Note that the disassembled source code is not the same
 as the original source code: labels take the names C<L1 .. Ln>
-and opcodes are fully qualified (eg. C<set_i_ic> instead of just 
+and opcodes are fully qualified (eg. C<set_i_ic> instead of just
 C<set>). See also C<eval (e)>.
 
 Example:
@@ -150,11 +150,11 @@ Add a breakpoint. The syntax is:
 
   b LINE [if CONDITION]
 
-If you want a conditional breakpoint you should first 
-specify the register that is involved in the 
-condition (at least one must be), the comparison 
-and then the third argument can be either another 
-register or a constant, which must be of the same type as 
+If you want a conditional breakpoint you should first
+specify the register that is involved in the
+condition (at least one must be), the comparison
+and then the third argument can be either another
+register or a constant, which must be of the same type as
 the first register specified.
 
 The command returns a number which is the
@@ -167,7 +167,7 @@ Example:
   (pdb) b 10
   Breakpoint 0 at line 10
 
-  # another breakpoint on line 11 (will be breakpoint 1)  
+  # another breakpoint on line 11 (will be breakpoint 1)
   (pdb) b 11
   Breakpoint 1 at line 11
 
@@ -221,7 +221,7 @@ Reenable a disabled breakpoint. The syntax is:
 
   enable [NUM]
 
-where C<NUM> is the number of the breakpoint. 
+where C<NUM> is the number of the breakpoint.
 
 =item continue (c)
 
@@ -253,23 +253,18 @@ Run an instruction. The syntax is:
 
   eval INSTRUCTION
 
-Remember that the debugger is not the same as the assembler,
-so this will NOT work:
-
-  eval set I0, 1
-
-you have to use the fully qualified opcode names instead, eg:
-
-  eval set_i_ic I0, 1
-
-If this doesn't make sense to you, well, you're out of luck.
 
 Example:
 
-  (pdb) e set_i_ic 0, 42
+  (pdb) e set I0, 42
 
-  (pdb) e print_i 0
+  (pdb) e print I0
   42
+
+  (pdb) p i
+  I0 =           42
+  I1 =            0
+  ...
 
 =item trace (t)
 
@@ -278,8 +273,8 @@ Trace the next instruction. The syntax is:
   trace [NUM]
 
 It executes the next C<NUM> instructions (default is 1)
-just as C<next (n)> does, but printing additional trace 
-information. This is the same as the information you get when 
+just as C<next (n)> does, but printing additional trace
+information. This is the same as the information you get when
 running Parrot with the C<-t> option.
 
 Example:
@@ -316,8 +311,8 @@ Looks up the given (integer- or string-valued) key in a PMC register.
 =back
 
 For PMC registers, the command will print the number, the
-class of the PMC (in square brackets) and its string 
-representation (when available). It prints <null pmc> for 
+class of the PMC (in square brackets) and its string
+representation (when available). It prints <null pmc> for
 uninitialized PMC registers.
 
 Example:
@@ -335,7 +330,7 @@ Example:
   # prints the content of all string registers
   (pdb) p s
   String Registers:
-   0 = 
+   0 =
           Buflen  =                  4
           Flags   =                  0
           Bufused =                  4
@@ -360,11 +355,11 @@ Example:
           Bufused =                  6
           Strlen  =                  6
           String  =       hacker
-   4 = 
+   4 =
    5 =
    6 =
    7 =
-   8 =  
+   8 =
    # ... and so on
 
 
@@ -381,8 +376,8 @@ For the meaning of C<TYPE> see the C<print (p)> command.
 The C<NUM> argument is the frame number (defaults to 0).
 The whole frame (0..31) is printed out.
 
-The second form prints a single entry (C<NUM>) from the generic 
-stack (eg. results from C<save>), prepending the type of the 
+The second form prints a single entry (C<NUM>) from the generic
+stack (eg. results from C<save>), prepending the type of the
 entry on output.
 
 Example:
