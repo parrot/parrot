@@ -7,7 +7,6 @@ embed.pod - Parrot embedding system
 
 =head1 SYNOPSIS
 
-    #include "parrot/parrot.h"
     #include "parrot/embed.h"
     
     int main(int argc, char *argv[]) {
@@ -17,7 +16,7 @@ embed.pod - Parrot embedding system
 
         argc--; argv++; /* skip the program name */
         
-        interp=Parrot_new(NULL);
+        interp=Parrot_new(0);
         Parrot_init(interp);
 
         if(PARROT_JIT_CAPABLE) {
