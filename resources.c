@@ -384,7 +384,8 @@ trace_active_PMCs(struct Parrot_Interp *interpreter) {
         }
     }
 
-    /* Now walk the pmc stack */
+    /* Now walk the pmc stack. Make sure to walk from top down
+     * since stack may have segments above top that we shouldn't walk. */
     for (cur_chunk = interpreter->pmc_reg_top; cur_chunk;
          cur_chunk = cur_chunk->prev) {
         for (j = 0; j < cur_chunk->used; j++) {
@@ -465,7 +466,8 @@ trace_active_buffers(struct Parrot_Interp *interpreter) {
     }
   }
 
-  /* Now walk the string stack */
+  /* Now walk the string stack. Make sure to walk from top down
+   * since stack may have segments above top that we shouldn't walk. */
   for (cur_chunk = interpreter->string_reg_top; cur_chunk;
        cur_chunk = cur_chunk->prev) {
     for (j = 0; j < cur_chunk->used; j++) {

@@ -26,18 +26,22 @@ Parrot_push_i(struct Parrot_Interp *interpreter)
         interpreter->int_reg_top->free--;
         interpreter->int_reg_top->used++;
     }
-    /* Nope, so plan B time. Allocate a new chunk of integer register frames */
+    /* Nope, so either move to next stack chunk or grow the stack */
     else {
-        struct IRegChunk *new_chunk;
-        new_chunk = mem_sys_allocate(sizeof(struct IRegChunk));
-        memcpy(&new_chunk->IReg[0],
+        struct IRegChunk *next_chunk;
+        if(interpreter->int_reg_top->next)
+            next_chunk = interpreter->int_reg_top->next;
+        else {
+            next_chunk = mem_sys_allocate(sizeof(struct IRegChunk));
+            next_chunk->next = NULL;
+            next_chunk->prev = interpreter->int_reg_top;
+            interpreter->int_reg_top->next = next_chunk;
+        }
+        next_chunk->used = 1;
+        next_chunk->free = FRAMES_PER_INT_REG_CHUNK - 1;
+        interpreter->int_reg_top = next_chunk;
+        memcpy(&next_chunk->IReg[0],
                &interpreter->int_reg, sizeof(struct IReg));
-        new_chunk->used = 1;
-        new_chunk->free = FRAMES_PER_INT_REG_CHUNK - 1;
-        new_chunk->next = NULL;
-        new_chunk->prev = interpreter->int_reg_top;
-        interpreter->int_reg_top->next = new_chunk;
-        interpreter->int_reg_top = new_chunk;
     }
 }
 
@@ -57,11 +61,8 @@ Parrot_pop_i(struct Parrot_Interp *interpreter)
         /* Empty? */
         if (!top->used) {
             /* Yep, drop down a frame. Maybe */
-            if (top->prev) {
-                top->prev->next = NULL;
+            if (top->prev)
                 interpreter->int_reg_top = top->prev;
-                mem_sys_free(top);
-            }
         }
     }
     /* Nope. So pitch a fit */
@@ -97,18 +98,22 @@ Parrot_push_s(struct Parrot_Interp *interpreter)
         interpreter->string_reg_top->free--;
         interpreter->string_reg_top->used++;
     }
-    /* Nope, so plan B time. Allocate a new chunk of string register frames */
+    /* Nope, so either move to next stack chunk or grow the stack */
     else {
-        struct SRegChunk *new_chunk;
-        new_chunk = mem_sys_allocate(sizeof(struct SRegChunk));
-        memcpy(&new_chunk->SReg[0],
+        struct SRegChunk *next_chunk;
+        if(interpreter->string_reg_top->next)
+            next_chunk = interpreter->string_reg_top->next;
+        else {
+            next_chunk = mem_sys_allocate(sizeof(struct SRegChunk));
+            next_chunk->next = NULL;
+            next_chunk->prev = interpreter->string_reg_top;
+            interpreter->string_reg_top->next = next_chunk;
+        }
+        next_chunk->used = 1;
+        next_chunk->free = FRAMES_PER_STR_REG_CHUNK - 1;
+        interpreter->string_reg_top = next_chunk;
+        memcpy(&next_chunk->SReg[0],
                &interpreter->string_reg, sizeof(struct SReg));
-        new_chunk->used = 1;
-        new_chunk->free = FRAMES_PER_STR_REG_CHUNK - 1;
-        new_chunk->next = NULL;
-        new_chunk->prev = interpreter->string_reg_top;
-        interpreter->string_reg_top->next = new_chunk;
-        interpreter->string_reg_top = new_chunk;
     }
 }
 
@@ -128,11 +133,9 @@ Parrot_pop_s(struct Parrot_Interp *interpreter)
         /* Empty? */
         if (!top->used) {
             /* Yep, drop down a frame. Maybe */
-            if (top->prev) {
-                top->prev->next = NULL;
+            if (top->prev)
+                /* Don't free stack segments once stack has grown */
                 interpreter->string_reg_top = top->prev;
-                mem_sys_free(top);
-            }
         }
     }
     /* Nope. So pitch a fit */
@@ -167,18 +170,22 @@ Parrot_push_n(struct Parrot_Interp *interpreter)
         interpreter->num_reg_top->free--;
         interpreter->num_reg_top->used++;
     }
-    /* Nope, so plan B time. Allocate a new chunk of num register frames */
+    /* Nope, so either move to next stack chunk or grow the stack */
     else {
-        struct NRegChunk *new_chunk;
-        new_chunk = mem_sys_allocate(sizeof(struct NRegChunk));
-        memcpy(&new_chunk->NReg[0],
+        struct NRegChunk *next_chunk;
+        if(interpreter->num_reg_top->next)
+            next_chunk = interpreter->num_reg_top->next;
+        else {
+            next_chunk = mem_sys_allocate(sizeof(struct NRegChunk));
+            next_chunk->next = NULL;
+            next_chunk->prev = interpreter->num_reg_top;
+            interpreter->num_reg_top->next = next_chunk;
+        }
+        next_chunk->used = 1;
+        next_chunk->free = FRAMES_PER_NUM_REG_CHUNK - 1;
+        interpreter->num_reg_top = next_chunk;
+        memcpy(&next_chunk->NReg[0],
                &interpreter->num_reg, sizeof(struct NReg));
-        new_chunk->used = 1;
-        new_chunk->free = FRAMES_PER_NUM_REG_CHUNK - 1;
-        new_chunk->next = NULL;
-        new_chunk->prev = interpreter->num_reg_top;
-        interpreter->num_reg_top->next = new_chunk;
-        interpreter->num_reg_top = new_chunk;
     }
 }
 
@@ -198,11 +205,9 @@ Parrot_pop_n(struct Parrot_Interp *interpreter)
         /* Empty? */
         if (!top->used) {
             /* Yep, drop down a frame. Maybe */
-            if (top->prev) {
-                top->prev->next = NULL;
+            if (top->prev)
+                /* Don't free stack segments once stack has grown */
                 interpreter->num_reg_top = top->prev;
-                mem_sys_free(top);
-            }
         }
     }
     /* Nope. So pitch a fit */
@@ -237,18 +242,22 @@ Parrot_push_p(struct Parrot_Interp *interpreter)
         interpreter->pmc_reg_top->free--;
         interpreter->pmc_reg_top->used++;
     }
-    /* Nope, so plan B time. Allocate a new chunk of pmc register frames */
+    /* Nope, so either move to next stack chunk or grow the stack */
     else {
-        struct PRegChunk *new_chunk;
-        new_chunk = mem_sys_allocate(sizeof(struct PRegChunk));
-        memcpy(&new_chunk->PReg[0],
+        struct PRegChunk *next_chunk;
+        if(interpreter->pmc_reg_top->next)
+            next_chunk = interpreter->pmc_reg_top->next;
+        else {
+            next_chunk = mem_sys_allocate(sizeof(struct PRegChunk));
+            next_chunk->next = NULL;
+            next_chunk->prev = interpreter->pmc_reg_top;
+            interpreter->pmc_reg_top->next = next_chunk;
+        }
+        next_chunk->used = 1;
+        next_chunk->free = FRAMES_PER_PMC_REG_CHUNK - 1;
+        interpreter->pmc_reg_top = next_chunk;
+        memcpy(&next_chunk->PReg[0],
                &interpreter->pmc_reg, sizeof(struct PReg));
-        new_chunk->used = 1;
-        new_chunk->free = FRAMES_PER_PMC_REG_CHUNK - 1;
-        new_chunk->next = NULL;
-        new_chunk->prev = interpreter->pmc_reg_top;
-        interpreter->pmc_reg_top->next = new_chunk;
-        interpreter->pmc_reg_top = new_chunk;
     }
 }
 
@@ -268,11 +277,9 @@ Parrot_pop_p(struct Parrot_Interp *interpreter)
         /* Empty? */
         if (!top->used) {
             /* Yep, drop down a frame. Maybe */
-            if (top->prev) {
-                top->prev->next = NULL;
+            if (top->prev)
+                /* Don't free stack segments once stack has grown */
                 interpreter->pmc_reg_top = top->prev;
-                mem_sys_free(top);
-            }
         }
     }
     /* Nope. So pitch a fit */
