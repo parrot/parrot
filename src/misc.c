@@ -35,13 +35,13 @@ typedef struct spfinfo_t {
 #define SIZE_HUGE	3
 #define SIZE_XVAL	4
 
-#define GetInt(targ, whichone)																\
-	switch(whichone) {																		\
-		case SIZE_REG:																		\
-			targ=(HUGEINTVAL)(int)va_arg(*args, int);										\
-			break;																			\
-		case SIZE_SHORT:																	\
-			targ=(HUGEINTVAL)(short)va_arg(*args, short);									\
+#define GetInt(targ, whichone) \
+	switch(whichone) {	\
+		case SIZE_REG:	\
+			targ=(HUGEINTVAL)(int)va_arg(*args, int); \
+			break; \
+		case SIZE_SHORT: /* "'short int' is promoted to 'int' when passed through '...'" */ \
+			targ=(HUGEINTVAL)(short)va_arg(*args, int); \
 			break;																			\
 		case SIZE_LONG:																		\
 			targ=(HUGEINTVAL)(long)va_arg(*args, long);										\
