@@ -26,8 +26,6 @@ void Parrot_setenv(const char *name, const char *value);
 ** Dynamic Loading:
 */
 
-#define PARROT_DLOPEN_FLAGS 0
-
 void *Parrot_dlopen(const char *filename);
 const char *Parrot_dlerror(void);
 void *Parrot_dlsym(void *handle, const char *symbol);
