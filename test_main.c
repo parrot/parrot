@@ -162,7 +162,7 @@ main(int argc, char **argv) {
         read(fd, (void*)program_code, program_size);
 #else
         program_code = 
-            (opcode_t *) mmap(0, program_size, PROT_READ, MAP_SHARED, fd, 0);
+            (opcode_t *) mmap(0, program_size, PROT_READ, MAP_SHARED, fd, (off_t)0);
 #endif
 
         if (!program_code) {
@@ -172,7 +172,7 @@ main(int argc, char **argv) {
         
         pf = PackFile_new();
         if( !PackFile_unpack(interpreter, pf, (char *)program_code, 
-                              program_size) ) {
+                             program_size) ) {
             printf( "Can't unpack.\n" );
             return 1;
         }

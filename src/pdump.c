@@ -17,7 +17,7 @@ main(int argc, char **argv) {
     struct stat       file_stat;
     int               fd;
     char *            packed;
-    long              packed_size;
+    size_t            packed_size;
     struct PackFile * pf;
     struct Parrot_Interp *interpreter = make_interpreter(0);
 
@@ -52,7 +52,7 @@ main(int argc, char **argv) {
 
     read(fd, (void*)packed, packed_size);
 #else
-    packed = mmap(0, packed_size, PROT_READ, MAP_SHARED, fd, 0);
+    packed = mmap(0, packed_size, PROT_READ, MAP_SHARED, fd, (off_t)0);
 
     if (!packed) {
         printf("Can't mmap, code %i\n", errno);
