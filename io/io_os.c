@@ -105,7 +105,6 @@ ParrotIO * PIO_os_open(theINTERP, ParrotIOLayer * layer,
 #endif
                 }
                 /* Not Reached */
-                /* No, really it isn't */
         }
 
         return 0;
