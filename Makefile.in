@@ -1,6 +1,7 @@
 O = ${o}
 
-H_FILES = config.h exceptions.h io.h op.h register.h string.h events.h interpreter.h memory.h parrot.h stacks.h bytecode.h global_setup.h
+INC=include/parrot
+H_FILES = $(INC)/config.h $(INC)/exceptions.h $(INC)/io.h $(INC)/op.h $(INC)/register.h $(INC)/string.h $(INC)/events.h $(INC)/interpreter.h $(INC)/memory.h $(INC)/parrot.h $(INC)/stacks.h $(INC)/bytecode.h $(INC)/global_setup.h
 
 O_FILES = global_setup$(O) interpreter$(O) parrot$(O) register$(O) basic_opcodes$(O) memory$(O) bytecode$(O) string$(O) strnative$(O)
 
@@ -37,10 +38,10 @@ string$(O): $(H_FILES)
 
 strnative$(O): $(H_FILES)
 
-interp_guts.h: opcode_table build_interp_starter.pl
+$(INC)/interp_guts.h: opcode_table build_interp_starter.pl
 	$(PERL) build_interp_starter.pl
 
-interpreter$(O): interpreter.c $(H_FILES) interp_guts.h
+interpreter$(O): interpreter.c $(H_FILES) $(INC)/interp_guts.h
 
 memory$(O): $(H_FILES)
 
@@ -52,17 +53,18 @@ register$(O): $(H_FILES)
 
 basic_opcodes$(O): $(H_FILES) basic_opcodes.c
 
-basic_opcodes.c: basic_opcodes.ops process_opfunc.pl interp_guts.h
+basic_opcodes.c: basic_opcodes.ops process_opfunc.pl $(INC)/interp_guts.h
 	$(PERL) process_opfunc.pl basic_opcodes.ops
 
-op.h: opcode_table make_op_header.pl
-	$(PERL) make_op_header.pl opcode_table > op.h
+$(INC)/op.h: opcode_table make_op_header.pl
+	$(PERL) make_op_header.pl opcode_table > $(INC)/op.h
 
 config.h: Configure.pl config_h.in
 	$(PERL) Configure.pl
 
 clean:
-	rm -f *$(O) *.s basic_opcodes.c interp_guts.h op.h $(TEST_PROG)
+	rm -f *$(O) *.s basic_opcodes.c $(INC)/interp_guts.h $(INC)/op.h $(TEST_PROG)
 
 test:
 	$(PERL) t/harness
+

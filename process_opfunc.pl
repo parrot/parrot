@@ -36,7 +36,8 @@ my %opcodes = Parrot::Opcode::read_ops();
 
 my %opcode;
 
-open GUTS, "interp_guts.h";
+open GUTS, "include/parrot/interp_guts.h"
+  or die "Could not open include/parrot/interp_guts.h";
 my $opcode;
 while (<GUTS>) {
     next unless /\tx\[(\d+)\] = ([a-z_]+);/;

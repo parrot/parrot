@@ -123,7 +123,7 @@ own Makefile, config.h, and Parrot::Config to disk.
 END
 
 #now let's assemble the config.h file
-buildfile("config_h");
+buildfile("config_h", "include/parrot");
 #and the makefile
 buildfile("Makefile");
 #and Parrot::Config
@@ -163,7 +163,8 @@ sub prompt {
 }
 
 sub buildfile {
-	my($filename)=shift;
+	my($filename, $path)=@_;
+	$path||='.';
 
 	local $/;
 	open(IN, "<$filename.in") or die "Can't open $filename.in: $!";
@@ -173,7 +174,7 @@ sub buildfile {
 	$text =~ s/\$\{(\w+)\}/$c{$1}/g;
 	$filename =~ s/_/./;	#config_h => config.h
 
-	open(OUT, ">$filename") or die "Can't open $filename: $!";
+	open(OUT, ">$path/$filename") or die "Can't open $path/$filename: $!";
 	print OUT $text;
 	close(OUT) or die "Can't close $filename: $!";
 }

@@ -2,7 +2,7 @@
 use strict;
 use Parrot::Opcode;
 
-open INTERP, "> interp_guts.h" or die "Can't open interp_guts.h, $!/$^E";
+open INTERP, "> include/parrot/interp_guts.h" or die "Can't open include/parrot/interp_guts.h, $!/$^E";
 
 print INTERP <<CONST;
 /*
