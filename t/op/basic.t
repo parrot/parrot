@@ -1,6 +1,6 @@
 #! perl -w
 
-use Parrot::Test tests => 7;
+use Parrot::Test tests => 8;
 
 # It would be very embarrassing if these didn't work...
 output_is(<<'CODE', '', "noop, end");
@@ -52,6 +52,18 @@ CODE
 start
 lab 1
 done
+OUTPUT
+
+output_is(<<'CODE', <<'OUTPUT', "set_addr");
+       set_addr I1, FOO
+       jump I1
+       print "Jump failed\n"
+       end
+
+FOO:   print "Jump succeeded\n"
+       end
+CODE
+Jump succeeded
 OUTPUT
 
 1; # HONK

@@ -470,7 +470,7 @@ inline op clone(out STR, in STR) {
 Sets register $1 to the current address plus the offset $2
 
 inline op set_addr(out INT, in INT) {
-  $1 = cur_opcode + $2;
+  $1 = (INTVAL) (CUR_OPCODE + $2);
   goto NEXT();
 }
 
