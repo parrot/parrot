@@ -44,7 +44,7 @@ looks something like this:
   .endm
 
 Include this macro as many times as you like, and the branch statement should
-do the right thing every time. To use a global label, just as you usually do.
+do the right thing every time. To use a global label, do just as you usually do.
 
 Constants are new, and the syntax looks like:
 
