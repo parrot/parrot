@@ -2,6 +2,11 @@
 
 pmc_freeze.c - design notes
 
+=head1 VERSION
+
+This document describes freeze/thaw internals version 0.1. This is not
+the final implementation.
+
 =head1 Overview
 
 Freezing or serializing arbitrary PMCs is an interesting problem.
@@ -262,17 +267,21 @@ may look like:
   0xdf5 ... id of array itself with lo bit set
 
 The escape flag marks places in the image, where additional data will
-follow. Used as an initial PMC B<id> means, that a property hash will
-follow. Used inside the PMC stream allows a PMC to insert additional
-information into the image. During B<thaw> the PMCs vtable is called
-again, to restore these data.
+follow. After the escape flag is an int defining the kind of the
+follwing data, passed on in B<extra_flags>.  During B<thaw> the PMCs
+vtable is called again, to restore these data. So a PMCs B<thaw>
+vtable has to check B<extra_flags> if normal or extra data have to be
+shifted from the image.
 
-This is e.g. needed for arrays containing sparse holes, to set the
-array index of the following data.
+This is e.g. needed for PMC properties or arrays containing sparse
+holes, to set the array index of the following data.
 
-A PMC with a property hash thus looks like:
+A PerlInt(666) with a property hash ("answer"=>42) thus looks like:
 
-  <id+0x3><type><id-prop><pmc-data><prop-data>
+  0xdfc 33 666 0xdff 2 0xdf4 32 1 answer 0xdf8 33 42
+
+B<0xdff> is the escape mark for the PMC B<0xdfc> followed by the
+constant B<EXTRA_IS_PROP_HASH>.
 
 [ To be continued ]
 

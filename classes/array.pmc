@@ -537,19 +537,21 @@ pmclass Array need_ext does array {
     }
 
     void visit(visit_info *info) {
-	SUPER(info);
         list_visit(INTERP, (List *) PMC_data(SELF), info);
+	SUPER(info);
     }
 
     void freeze(visit_info *info) {
 	IMAGE_IO *io = info->image_io;
+	SUPER(info);
 	io->vtable->push_integer(INTERP, io, VTABLE_elements(INTERP, SELF));
     }
 
     void thaw(visit_info *info) {
 	IMAGE_IO *io = info->image_io;
 	SUPER(info);
-	DYNSELF.set_integer_native(io->vtable->shift_integer(INTERP, io));
+	if (info->extra_flags == EXTRA_IS_NULL)
+	    DYNSELF.set_integer_native(io->vtable->shift_integer(INTERP, io));
     }
 }
 

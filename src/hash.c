@@ -322,6 +322,7 @@ hash_visit(Interp *interpreter, Hash *hash, void* pinfo)
     switch (info->what) {
         case VISIT_THAW_NORMAL:
         case VISIT_THAW_CONSTANTS:
+            assert(info->extra_flags == EXTRA_IS_COUNT);
             n = (size_t) info->extra;
             for (i = 0; i < n; ++i) {
                 key = io->vtable->shift_string(interpreter, io);

@@ -318,7 +318,17 @@ pmclass default abstract noinit {
     }
 
     void visit(visit_info *info) {
-	/* default - no action */
+	/* default - mark prop hash */
+        if (SELF->pmc_ext && SELF->metadata &&
+		info->extra_flags != EXTRA_IS_PROP_HASH) {
+	    info->extra_flags = EXTRA_IS_PROP_HASH;
+	    info->extra = SELF->metadata;
+	    /* place escape mark */
+	    (info->visit_pmc_now)(interpreter, SELF, info);
+	    /* place and the prop hash */
+	    (info->visit_pmc_now)(interpreter, SELF->metadata, info);
+	}
+
     }
 
     void freeze(visit_info *info) {
@@ -327,7 +337,14 @@ pmclass default abstract noinit {
 
     void thaw(visit_info *info) {
 	/* default - initialize the PMC */
-	DYNSELF.init();
+	if (info->extra_flags == EXTRA_IS_PROP_HASH) {
+	    if (!SELF->pmc_ext)
+		add_pmc_ext(INTERP, SELF);
+	    info->thaw_ptr = &SELF->metadata;
+	    (info->visit_pmc_now)(interpreter, SELF->metadata, info);
+	}
+	else
+	    DYNSELF.init();
     }
 
     void thawfinish(visit_info *info) {

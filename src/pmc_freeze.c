@@ -37,7 +37,7 @@
 /*
  * define this to 1 for testing
  */
-#define FREEZE_ASCII 0
+#define FREEZE_ASCII 1
 
 /*
  * normal freeze can use next_for_GC ptrs or a seen hash
@@ -409,6 +409,7 @@ ft_init(Parrot_Interp interpreter, visit_info *info)
     info->last_type = -1;
     info->id_list = pmc_new(interpreter, enum_class_Array);
     info->id = 0;
+    info->extra_flags = EXTRA_IS_NULL;
 }
 
 static void visit_todo_list(Parrot_Interp, PMC*, visit_info* info);
@@ -449,6 +450,12 @@ freeze_pmc(Parrot_Interp interpreter, PMC *pmc, visit_info *info,
     INTVAL type = pmc->vtable->base_type;
 
     if (seen) {
+        if (info->extra_flags) {
+            id |= 3;
+            io->vtable->push_pmc(interpreter, io, (PMC*)id);
+            io->vtable->push_integer(interpreter, io, info->extra_flags);
+            return;
+        }
         id |= 1;         /* mark bit 0 if this PMC is known */
     }
     else if (type == info->last_type) {
@@ -469,9 +476,13 @@ thaw_pmc(Parrot_Interp interpreter, visit_info *info,
     IMAGE_IO *io = info->image_io;
     int seen = 0;
 
-    info->extra = NULL;
+    info->extra_flags = EXTRA_IS_NULL;
     n = io->vtable->shift_pmc(interpreter, io);
-    if ( (UINTVAL) n & 1) {     /* seen PMCs have bit 0 set */
+    if ( ((UINTVAL) n & 3) == 3) {
+        /* pmc has extra data */
+        info->extra_flags = io->vtable->shift_integer(interpreter, io);
+    }
+    else if ( (UINTVAL) n & 1) {     /* seen PMCs have bit 0 set */
         seen = 1;
     }
     else if ( (UINTVAL) n & 2) { /* prev PMC was same type */
@@ -505,7 +516,6 @@ do_action(Parrot_Interp interpreter, PMC *pmc, visit_info *info,
             internal_exception(1, "Illegal action %d", info->what);
             break;
     }
-    info->extra = NULL;
 }
 
 PARROT_INLINE static PMC*
@@ -553,6 +563,10 @@ do_thaw(Parrot_Interp interpreter, PMC* pmc, visit_info *info, int *seen)
     }
     if (pos) {
         *seen = 1;
+        if (info->extra_flags) {
+            VTABLE_thaw(interpreter, pmc, info);
+            return pmc;
+        }
 #if FREEZE_USE_NEXT_FOR_GC
         /*
          * the next_for_GC method doesn't keep track of repeated scalars
@@ -805,9 +819,18 @@ visit_loop_todo_list(Parrot_Interp interpreter, PMC *current,
     /*
      * can't cache upper limit, visit may append items
      */
-    for (i = 0; i < (int)list_length(interpreter, todo); ++i) {
+    i = 0;
+again:
+    for (; i < (int)list_length(interpreter, todo); ++i) {
         current = *(PMC**)list_get(interpreter, todo, i, enum_type_PMC);
         VTABLE_visit(interpreter, current, info);
+    }
+    /*
+     * if image isn't consumed, there are some extra data to thaw
+     */
+    if (info->image->bufused > 0) {
+        (info->visit_pmc_now)(interpreter, NULL, info);
+        goto again;
     }
     /*
      * on thawing call thawfinish for each processed PMC

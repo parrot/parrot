@@ -1,6 +1,6 @@
 #! perl -w
 
-use Parrot::Test tests => 6;
+use Parrot::Test tests => 8;
 use Test::More;
 
 output_is(<<'CODE', <<'OUTPUT', "freeze/thaw a PerlInt");
@@ -179,4 +179,66 @@ CODE
 PerlHash 2
 666
 777
+OUTPUT
+
+output_is(<<'CODE', <<'OUTPUT', "freeze/thaw a PerlInt with prop");
+    new P1, .PerlInt
+    set P1, 666
+    new P2, .PerlInt
+    set P2, 42
+    setprop P1, "answer", P2
+    freeze S0, P1
+
+    thaw P10, S0
+    typeof S10, P10
+    print S10
+    print " "
+    set I11, P10
+    print I11
+    print "\n"
+    getprop P12, "answer", P10
+    print P12
+    print "\n"
+    end
+CODE
+PerlInt 666
+42
+OUTPUT
+
+output_is(<<'CODE', <<'OUTPUT', "freeze/thaw Array w PerlInt with prop");
+    new P0, .PerlArray
+    new P1, .PerlInt
+    set P1, 666
+    push P0, P1
+    new P2, .PerlInt
+    set P2, 777
+    push P0, P2
+    new P3, .PerlInt
+    set P3, 42
+    setprop P1, "answer", P3
+
+    freeze S0, P0
+
+    thaw P10, S0
+    typeof S10, P10
+    print S10
+    print " "
+    set I11, P10
+    print I11
+    print "\n"
+    set P12, P10[0]
+    print P12
+    print "\n"
+    set P13, P10[1]
+    print P13
+    print "\n"
+    getprop P12, "answer", P12
+    print P12
+    print "\n"
+    end
+CODE
+PerlArray 2
+666
+777
+42
 OUTPUT

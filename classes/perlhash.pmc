@@ -291,8 +291,8 @@ pmclass PerlHash need_ext does hash {
     }
 
     void visit(visit_info *info) {
-	SUPER(info);
         hash_visit(INTERP, (Hash*)PMC_ptr1v(SELF), info);
+	SUPER(info);
     }
 
     void freeze(visit_info *info) {
@@ -304,6 +304,9 @@ pmclass PerlHash need_ext does hash {
     void thaw(visit_info *info) {
 	IMAGE_IO *io = info->image_io;
 	SUPER(info);
-	info->extra = (void *)io->vtable->shift_integer(INTERP, io);
+	if (info->extra_flags == EXTRA_IS_NULL) {
+	    info->extra_flags = EXTRA_IS_COUNT;
+	    info->extra = (void *)io->vtable->shift_integer(INTERP, io);
+	}
     }
 }

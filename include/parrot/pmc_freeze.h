@@ -53,6 +53,12 @@ typedef struct _image_io {
     image_funcs *vtable;
 } image_io;
 
+typedef enum {
+    EXTRA_IS_NULL,
+    EXTRA_IS_COUNT,
+    EXTRA_IS_PROP_HASH
+} extra_flags_enum;
+
 typedef struct _visit_info {
     visit_f             visit_pmc_now;
     visit_f             visit_pmc_later;
@@ -67,6 +73,7 @@ typedef struct _visit_info {
     PMC*                id_list;        /* seen list used by thaw */
     UINTVAL             id;             /* freze ID of PMC */
     void*               extra;          /* PMC specific */
+    extra_flags_enum    extra_flags;    /* concerning to extra */
     IMAGE_IO            *image_io;
 } visit_info;
 

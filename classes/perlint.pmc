@@ -477,6 +477,7 @@ pmclass PerlInt extends perlscalar {
     void thaw(visit_info *info) {
 	IMAGE_IO *io = info->image_io;
 	SUPER(info);
-	SELF->cache.int_val = io->vtable->shift_integer(INTERP, io);
+	if (info->extra_flags == EXTRA_IS_NULL)
+	    SELF->cache.int_val = io->vtable->shift_integer(INTERP, io);
     }
 }
