@@ -31,11 +31,11 @@ my @math_includes = map {"$math_dir/$_"} grep {m/\.imc$/} @math_files;
 my @commands = grep {s/\.imc$//} @cmd_files;
 my @functions = grep {s/\.imc$//} @math_files;
 
-my $commands;
-foreach my $command (@commands) {
-  $commands .= "  newsub a_sub, .Sub, __cmd_$command\n";
-  $commands .= "  commands[\"$command\"] = a_sub\n";
-}
+#my $commands;
+#foreach my $command (@commands) {
+  #$commands .= "  newsub a_sub, .Sub, __cmd_$command\n";
+  #$commands .= "  commands[\"$command\"] = a_sub\n";
+#}
 
 my $functions;
 foreach my $function (@functions) {
@@ -53,7 +53,7 @@ foreach my $file (sort(@cmd_includes, @libs, @op_includes, @math_includes)) {
   $includes .= "  .include \"languages/tcl/$file\"\n";
 }
 
-$contents =~ s/\${COMMANDS}/$commands/g;
+#$contents =~ s/\${COMMANDS}/$commands/g;
 $contents =~ s/\${INCLUDES}/$includes/g;
 $contents =~ s/\${FUNCTIONS}/$functions/g;
 $contents =~ s/\${HEADER}/This file automatically generated, do not edit./g;
