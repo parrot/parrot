@@ -24,7 +24,7 @@ loop:
 	bsr	fact
 	print	I0
 	print	"\n"
-	inc	I1,1
+	inc	I1
 	eq	I1,7,done
 	branch	loop
 done:
@@ -35,7 +35,7 @@ fact:
 	pushi
 	lt	I0,2,is_one
 	set	I1,I0
-	dec	I0,1	
+	dec	I0
 	bsr	fact
 	mul	I0,I0,I1
 	save	I0
