@@ -4,10 +4,6 @@
 
 =item submit prs' one in email, other is regarding fixedpmcarray (and other's) use of Perl* pmcs.
 
-=item underscore'd subs...
-
-are no longer required. Strip them out, as it will simplify processing.
-
 =item PMC based parser -
 
 Instead of the current PIR level parsing, we should instead use
