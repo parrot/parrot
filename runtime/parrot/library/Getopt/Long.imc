@@ -7,7 +7,7 @@ library/Getopt/Long.imc - parse long and short command line options
 =head1 SYNOPSIS
 
   # Assemble option specification
-  .local pmc opt_spec    
+  .local pmc opt_spec
   opt_spec = new ResizableStringArray
   push opt_spec, "bool"
   push opt_spec, "string=s"
@@ -37,7 +37,7 @@ library/Getopt/Long.imc - parse long and short command line options
 
 =head1 DESCRIPTION
 
-This PIR library can be used for parsing command line options. 
+This PIR library can be used for parsing command line options.
 A single subroutine, _get_options(), is provided.
 
 =head1 SUBROUTINES
@@ -51,12 +51,12 @@ A PerlHash is returned.
 
 =cut
 
-.sub _get_options prototyped             
-  .param pmc argv    
-  .param pmc spec    
+.sub _get_options prototyped
+  .param pmc argv
+  .param pmc spec
 
   # Loop over the array spec and build up two simple hashes
-  .local pmc type                    # the type of the option: binary, string, integer 
+  .local pmc type                    # the type of the option: binary, string, integer
   type = new PerlHash
   .local int curr_spec               # a counter for looping over the array 'spec'
   curr_spec = 0
@@ -64,34 +64,38 @@ A PerlHash is returned.
   max_spec = spec
   .local int    spec_index           # searching for patterns in 'spec'
   .local string opt_name, opt_type   # name and type of specified option
-  goto CHECK_PARSE_SPEC     
+  goto CHECK_PARSE_SPEC
   NEXT_PARSE_SPEC:                   # Look at next element in 'spec'
     opt_name = spec[curr_spec]
+    # opt_name is stored into the hash - this creates reference
+    # the substr below modifies this hash key in place, so we
+    # have to clone it
+    opt_name = clone opt_name
     spec_index = index opt_name, '=' # when '=' is not in 'opt_name' then it's binary
     if spec_index != -1 goto NOT_A_BINARY_OPTION
     opt_type = 'b'
     goto OPTION_TYPE_IS_NOW_KNOWN
   NOT_A_BINARY_OPTION:
-    inc spec_index                        # we know where '=', thus the type is one further 
-    opt_type = substr opt_name, spec_index, 1 
+    inc spec_index                        # we know where '=', thus the type is one further
+    opt_type = substr opt_name, spec_index, 1
     dec spec_index                        # Go back to the '='
     # TODO: what if we have something like    name=xy ?
     opt_name = substr spec_index, 2, ''   # The stuff before '=' is the option name
   OPTION_TYPE_IS_NOW_KNOWN:
     type[opt_name] = opt_type
-    inc curr_spec  
+    inc curr_spec
   CHECK_PARSE_SPEC:                    # check wether loop over 'spec' is complete
   if curr_spec < max_spec goto NEXT_PARSE_SPEC
 
   # uncomment this if you want debug output
-  goto SKIP_DEBUG_OUTPUT 
+  goto SKIP_DEBUG_OUTPUT
   _dumper( 'type', type )
   SKIP_DEBUG_OUTPUT:
 
   # Now that we know about the allowed options,
   # we actually parse the argument vector
   # TODO: do this correctly
-  # shift from argv until a non-option is encountered 
+  # shift from argv until a non-option is encountered
   .local pmc opt              # the return PMC
   opt = new PerlHash
   .local string arg                 # element of argument array
@@ -103,6 +107,10 @@ A PerlHash is returned.
   NEXT_PARSE_ARGV:
     # first we take a peek at the first remaining element
     arg = argv[0]
+    # arg is stored into the hash - this creates reference
+    # the substr below modifies this hash key in place, so we
+    # have to clone it
+    arg = clone arg
 
     # Is arg a long option string like '--help'
     # TODO: how about asdf--jkl ???
@@ -119,6 +127,7 @@ A PerlHash is returned.
     HANDLE_LONG_OPTION:
     # we take the current option off argv
     arg = shift argv
+    arg = clone arg
     # get rid of the leading '--'
     arg = substr arg_index, 2, ''
     # recover the value if any
@@ -131,7 +140,7 @@ A PerlHash is returned.
     .local int len_value
     len_value = length arg
     len_value = len_value - arg_index
-    value = substr arg, arg_index, len_value 
+    value = substr arg, arg_index, len_value
     # drop the '=file.m4' from '--freeze-state=file.m4'
     dec arg_index
     inc len_value
@@ -143,13 +152,13 @@ A PerlHash is returned.
     is_known_option = defined type[arg]
     unless is_known_option goto UNKNOWN_OPTION
     # Tell the caller that the option 'arg' has been passed
-    goto CHECK_PARSE_ARGV 
+    goto CHECK_PARSE_ARGV
     UNKNOWN_OPTION:
     # TODO: handle unknown options
     printerr 'unknown option: !'
     printerr  arg
     printerr "!\n"
-  
+
   CHECK_PARSE_ARGV:
     num_remaining_args = argv
     if num_remaining_args > 0 goto NEXT_PARSE_ARGV
@@ -158,7 +167,7 @@ A PerlHash is returned.
   # Nothing to do here
 
   .pcc_begin_return
-    .return opt 
+    .return opt
   .pcc_end_return
 .end
 
