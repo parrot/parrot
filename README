@@ -74,15 +74,12 @@ The file "myconfig" has an overview of configure settings.
 
 Next, run make:
 
-=over 4
+For UNIX like systems that come with its own make, 'gmake' should be
+used.  (On most Linux systems, this is the default make.)
 
-=item For UNIX like systems that come with its own make, C<gmake> should be used
+On windows systems, 'nmake' is used
 
-=item On windows systems, C<nmake> is used
-
-=item On other systems, just try C<make>
-
-=back
+On other systems, just try 'make'
 
 Now, the interpreter should build.  If you are building the ICU library
 (this is the default on most systems), you need to use GNU make instead
@@ -90,7 +87,7 @@ Now, the interpreter should build.  If you are building the ICU library
 
 You can test parrot by running
 
-    make test         (or C<nmake test>/C<gmake test>)
+    make test         (or nmake test or gmake test)
 
 You can run the full test suite with
 
