@@ -22,6 +22,8 @@ void  nci_vP(void *pmc);
 
 typedef void (*cb_C1_func)(const char*, void*);
 void nci_cb_C1(cb_C1_func, void*);
+typedef void (*cb_C2_func)(int, void*);
+void nci_cb_C2(cb_C2_func, void*);
 
 typedef void (*cb_D1_func)(void*, const char*);
 void nci_cb_D1(cb_D1_func, void*);
@@ -238,6 +240,14 @@ nci_cb_C1(cb_C1_func cb, void* user_data)
     /* call the cb synchronously */
     (cb)(result, user_data);
 }
+
+void
+nci_cb_C2(cb_C2_func cb, void* user_data)
+{
+    /* call the cb synchronously */
+    (cb)(77, user_data);
+}
+
 
 void
 nci_cb_D1(cb_D1_func cb, void* user_data)

@@ -1336,7 +1336,7 @@ Parrot_run_callback(Parrot_Interp interpreter, PMC* sub, void* ext)
     STRING* sig_str;
     char *p;
     char pasm_sig[4];
-    FLOATVAL d_param;
+    FLOATVAL* d_param;
     INTVAL   i_param;
     void*    param;
 
@@ -1355,25 +1355,35 @@ Parrot_run_callback(Parrot_Interp interpreter, PMC* sub, void* ext)
         case 'v':
             pasm_sig[2] = 'v';
             break;
+#if 0
         case '2':
         case '3':
         case '4':
+#endif
         case 'l':
+            i_param = (INTVAL)(long) ext;
+            goto case_I;
         case 'i':
+            i_param = (INTVAL)(int) ext;
+            goto case_I;
         case 's':
+            i_param = (INTVAL)(short)(int) ext;
+            goto case_I;
         case 'c':
+            i_param = (INTVAL)(char)(int)ext;
+case_I:
             pasm_sig[2] = 'I';
-            i_param = *(INTVAL*) ext;
-            param = &i_param;
-            break;
-        case 'f':
-        case 'd':
-            pasm_sig[2] = 'N';
-            d_param = *(FLOATVAL*) ext;
-            param = &d_param;
+            param = (void*) i_param;
             break;
 #if 0
+        case 'f':
+        case 'd':
+            /* these types don't fit into a pointer, they will not
+             * work
+             */
+            break;
         case 'p':
+            /* TODO created UnManagedStruct */
         case 'P':
             pasm_sig[2] = 'P';
             break;

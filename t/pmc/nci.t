@@ -1,4 +1,4 @@
-use Parrot::Test tests => 28;
+use Parrot::Test tests => 29;
 use Parrot::Config;
 
 print STDERR $PConfig{jitcpuarch}, " JIT CPU\n";
@@ -934,6 +934,63 @@ ok 2
 in callback
 user data: 42
 external data: succeeded
+done.
+OUTPUT
+
+output_is(<<'CODE', <<'OUTPUT', "nci_cb_C2");
+  # we need a flag if the call_back is already done
+  new P10, .PerlInt
+  store_global "cb_done", P10
+  # first attempt - create cb manually (this step will be hidden later)
+  newsub P6, .Sub, _call_back
+  # prepare user data
+  new P7, .PerlInt
+  set P7, 42
+  new_callback P5, P6, P7, "iU"	# Z in pdd16
+  print "ok 1\n"
+  # now call the external sub, that takes a call_back and user_data
+  loadlib P1, "libnci"
+  dlfunc P0, P1, "nci_cb_C2", "vpP"
+  print "ok 2\n"
+  # P5 is the cb
+  # P6 is user_data - the Sub
+  invoke
+  # call_back will be called at any time
+  # so spin a bit
+  set I20, 0
+loop:
+  inc I20
+  sleep 0.01
+  find_global P11, "cb_done"
+  if P11, fin
+  gt I20, 10, err
+  branch loop
+fin:
+  print "done.\n"
+  end
+err:
+  print "cb didnt run\n"
+  end
+
+_call_back:
+  print "in callback\n"
+  print "user data: "
+  print P5
+  print "\n"
+  print "external data: "
+  print I5
+  print "\n"
+  find_global P12, "cb_done"
+  inc P12
+  invoke P1
+
+
+CODE
+ok 1
+ok 2
+in callback
+user data: 42
+external data: 77
 done.
 OUTPUT
 } # SKIP
