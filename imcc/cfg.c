@@ -189,15 +189,13 @@ void analyse_life_symbol(SymReg* r) {
  */
 
 void analyse_life_block(Basic_block* bb, SymReg* r) {
-    int i, write_pos, read_pos;
+    int i;
     Instruction* ins;
     Life_range* l;
 
     l = make_life_range(r, bb->index);  
-    write_pos = -1;
-    read_pos  = -1;
-   
-    for (i=bb->start->index; i < bb->end->index; i++) {
+  
+    for (i=bb->start->index; i <= bb->end->index; i++) {
 	ins = instructions[i];
         if (ins==NULL) {
 		fprintf(stderr, "Index %i of %i has NULL instruction\n", 
@@ -207,67 +205,34 @@ void analyse_life_block(Basic_block* bb, SymReg* r) {
 		abort();
 	}
 	if (instruction_reads(ins, r)) {
-	    if (l->flags != LF_def) {
+	    if (! (l->flags & LF_def) ) {
 
 		/* we read before having written before, so the var was
 		 * live at the beggining of the block */
-		write_pos = bb->start->index;
-		l->flags = LF_use;
+		l->first = bb->start->index;
+		l->flags |= LF_use;
 	    } 
-	    read_pos = i;
+	    l->last = i;
 	}
 
 	if (instruction_writes(ins, r)) {
-	    if (write_pos < 0) {
-		l->flags = LF_def;
-		write_pos = i;
+ 	
+	    l->flags |= LF_def;
+
+	    if (l->first < 0) {
+		l->first = i;
 	    }
-	    else if (read_pos < 0) {
-		/* there has not been any read until here, so the previous write
-		 * is irrelevant */
-		write_pos = i;
-	    }
-	    else {
-		/* this is new writing, after some reading */
-		add_life_interval(l, write_pos, read_pos);
-		read_pos = -1;
-		write_pos = i;
-	    }
+	
+	    l->last = i;
 	}		    
     }	  
 
-    /* At the end, we need to add the last range */
-    if (read_pos < 0)  read_pos = write_pos;
+    if (l->last < 0)  l->last = l->first;
  
-    if (write_pos >= 0) 
-        add_life_interval(l, write_pos, read_pos);
-	   
-   
-    /* The read_pos can latter be extended if it turns out 
+    /* l->last can latter be extended if it turns out 
      * that another block needs the value resulting of this 
      * computation */
-}	
 
-/* add_life_interval records a new range of use of the var 
- * and set the LF_lv_inside flag
- */
-
-void add_life_interval(Life_range *l, int from, int to) {
-    int length = l->n_intervals;
-    
-    l->intervals = realloc(l->intervals, (2 * length + 2) * sizeof(int));    
-    if (l->intervals == NULL) {
-	fprintf(stderr, "Memory error at add_life_interval\n");
-	abort();
-    }
-
-    l->intervals[length*2] = from;
-    l->intervals[length*2 + 1] = to;
-
-    l->n_intervals = length + 1;
-
-    l->flags |= LF_lv_inside;
-    
 }	
 
 
@@ -275,11 +240,14 @@ void propagate_need(Basic_block *bb, SymReg* r) {
     Edge *edge;
     Basic_block *pred;
     Life_range *l;
+
+    l = r->life_info[bb->index];
+    l->last = bb->end->index;
     
     /* every predecessor of a LF_lv_in block must be in LF_lv_out
        and, unless itself is LV_def, this should be propagated to 
        its predecessors themselves */    
-
+    
     for (edge=bb->pred_list; edge!=NULL; edge=edge->pred_next) {
 	pred = edge->from;
 	l = r->life_info[pred->index];
@@ -289,18 +257,13 @@ void propagate_need(Basic_block *bb, SymReg* r) {
 	}
 	else {
             l->flags |= LF_lv_out;
-
-	    if (l->flags & LF_lv_inside) {
-	        /* we expand the last interval to the end */
-                l->intervals[l->n_intervals * 2 - 1] = pred->end->index;
-	    }
+	    l->last = pred->end->index;
 
 	    if (! (l->flags & LF_def) ) {
 		l->flags |= LF_lv_in;
-		if (! (l->flags & LF_lv_inside) ) {
-		    l->flags |= LF_lv_all | LF_lv_inside;		    
-		}
-			
+		l->first = pred->start->index;
+		l->last  = pred->end->index;
+
 	        propagate_need(pred, r);		
 	    }
 	}
@@ -315,7 +278,7 @@ void propagate_need(Basic_block *bb, SymReg* r) {
 void compute_dominators () {
     int i, change, pred_index;
     Edge *edge;
-    
+   
     dominators = malloc(sizeof(Set*) * n_basic_blocks);
 
     for (i=0; i < n_basic_blocks; i++) {
@@ -330,7 +293,7 @@ void compute_dominators () {
 
     change = 1;
     while (change) {
-	change = 0;
+        change = 0;
 
 	/* TODO: This 'for' should be a breadth-first search for speed  */
 	for (i = 0; i < n_basic_blocks; i++) {
@@ -477,8 +440,8 @@ Life_range* make_life_range(SymReg *r, int index) {
    }
 
    l->flags = 0;
-   l->n_intervals = 0;
-   l->intervals = NULL;
+   l->first = -1;
+   l->last = -1;
 
    r->life_info[index] = l;
    return l;

@@ -27,8 +27,8 @@ enum LIFEFLAG {    /* The status of a var inside a basic block can be */
 */
 typedef struct _Life_range {  
     int flags;
-    int n_intervals; 
-    int *intervals;
+    int first;
+    int last;
 } Life_range;
 
 typedef struct _SymReg {     
@@ -40,7 +40,11 @@ typedef struct _SymReg {
     char set;                /* Which register set/file it belongs to */
     int color;               /* Color: used for the register allocation algorithm */
     int first;               /* First occurrance of this symbol (in instructions)  */
-    int last;                /* Last ocurrance of this symbol (in instructions) */     
+    int last;                /* Last ocurrance of this symbol (in instructions) */    
+    
+    			     /* NOTE: ->first and ->last are not used currently in the interference
+			      * code, but they are left here in case they have some use in the future */
+
     int score;               /* How costly is to spill this symbol */
     int simplified;          /* Has it been simplified during the process? */
     Life_range **life_info;  /* Each block has its Life_range status */

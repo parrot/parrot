@@ -69,7 +69,7 @@ void dump_liveness_status() {
     for(i = 0; i < HASH_SIZE; i++) {
         SymReg * r = hash[i];
     	for(; r; r = r->next) {
-	    if (r->type == VTIDENTIFIER) dump_liveness_status_var(r);
+	    if (r->type == VTIDENTIFIER || r->type == VTREG ) dump_liveness_status_var(r);
     	}
     }
     fprintf(stderr, "\n");
@@ -78,7 +78,7 @@ void dump_liveness_status() {
 
 
 void dump_liveness_status_var(SymReg* r) {
-    int i, j;
+    int i;
     Life_range *l;
     
     fprintf(stderr, "\nSymbol %s:", r->name);
@@ -90,15 +90,14 @@ void dump_liveness_status_var(SymReg* r) {
 		fprintf(stderr, "\n\t%i:ALL\t", i);
 	}
 	else if (l->flags & LF_lv_inside) {
-            fprintf(stderr, "\n\t%i:", i);		   
+            fprintf(stderr, "\n\t%i:INSIDE", i);		  
+	}
 	    
-	    if (l->flags & LF_lv_in)      fprintf(stderr, "IN\t");
-	    if (l->flags & LF_lv_out)     fprintf(stderr, "OUT\t");
+	if (l->flags & LF_lv_in)      fprintf(stderr, "\n\t%i: IN\t", i);
+	if (l->flags & LF_lv_out)     fprintf(stderr, "\n\t%i: OUT\t", i);
 	
-	    for (j=0; j < l->n_intervals; j++) {
-	       fprintf(stderr, "[%d,%d]\t", 
-	       l->intervals[2*j], l->intervals[2*j+1] );
-	    }		  
+	if(l->first >= 0) {
+	      fprintf(stderr, "[%d,%d]\t", l->first, l->last);
 	}
     }
     fprintf(stderr, "\n");

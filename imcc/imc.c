@@ -8,7 +8,6 @@
  *
  * - Renumbering
  * - Coaelesceing
- * - Proper evaluation of spill costs
  *
  */
 
@@ -41,9 +40,9 @@ void allocate() {
 	compute_dominators();
 	find_loops();
 
+	life_analysis();
 	compute_spilling_costs();
 	build_interference_graph();  
-	life_analysis();
 	
         while (simplify()) {}      /* simplify until no changes can be made */
         order_spilling();          /* puts the remaing item on stack */
@@ -52,6 +51,8 @@ void allocate() {
 	
 	if ( to_spill >= 0 ) {
             spill(to_spill);
+	    life_analysis();
+	    build_interference_graph();
         }
         else {
             /* the process is finished */
@@ -180,49 +181,36 @@ int interferes(SymReg * r0, SymReg * r1) {
      * if this instrucion does modify r0, if it's value is never used 
      * later, then they can share the same register
      */
-     
-    if(r0->first > r1->last) return 0;
-    else if(r0->last < r1->first) return 0;
 
     /* If symbol was never used in a statment, it can't interfere */
     if(r0->first < 0 || r1->first < 0) return 0;
 
     /* Now: */
     
+    if (r0->life_info == NULL || r1->life_info == NULL) {
+	fprintf(stderr, "INTERNAL ERROR: Life range is NULL\n");	   
+	return 0;
+    }
+
     for (i=0; i <n_basic_blocks; i++) {
        Life_range *l0, *l1;
-
-       if (r0->life_info == NULL) continue;
-       if (r1->life_info == NULL) continue;
        
-       l0 = r0->life_info[i];
+       l0 = r0->life_info[i];       
        l1 = r1->life_info[i];
 
-       if (  (l0->flags & LF_lv_all    && l1->flags & LF_lv_inside)
-          || (l0->flags & LF_lv_inside && l1->flags & LF_lv_all)	    
-          || (l0->flags & LF_lv_in  && l1->flags & LF_lv_in)    
-	  || (l0->flags & LF_lv_out && l1->flags & LF_lv_out)
-	  )
-	   return 1;
-   
-       if (l0->flags & LF_lv_inside && l1->flags & LF_lv_inside) {
-           /* we need to compare the intervals */
-	   int i, j;
-	   for (i=0; i < l0->n_intervals; i++) {
-		for (j=0; j < l1->n_intervals; j++) {
-		     if (l0->intervals[i] >= l1->intervals[j+1] ) 
-			     continue;
+       if (l0->first < -1 || l1->first < -1) 
+	    continue;
 
-		     if (l0->intervals[i+1] <= l1->intervals[j] )
-			     continue;
+       if (l0->first > l1->last) 
+	    continue;
 
-		     return 1;		     
-		}
-           }		  
-       } 
+       if (l1->first > l0->last)
+	    continue;
+
+       return 1;
     }	  
 
-    return 1;
+    return 0;
 }
 
 /* 
@@ -447,7 +435,7 @@ void spill(int spilled) {
 
 	if (needs_fetch && !after_spilled) {
 	    sprintf(buf, "set %s, P31[%d] #FETCH", "%s", n_spilled); /*ouch*/
-	    emitb( mk_instruction(buf, new_symbol, NULL, NULL, NULL, IF_r1_write));
+	    emitb( mk_instruction(buf, new_symbol, NULL, NULL, NULL, IF_r0_write));
 	}
 
 	if (!needs_spilling && after_needs_store) {
@@ -473,6 +461,8 @@ void spill(int spilled) {
             if(r3==old_symbol) r3=new_symbol;
 
             emitb( mk_instruction(tmp->fmt, r0, r1, r2, r3, tmp->flags) );
+
+	    old_symbol->first = -1;
             /* and remember how much it's offset by: */
             offset[i] = n_instructions - 1;
 	}

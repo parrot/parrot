@@ -64,10 +64,10 @@ int instruction_reads(Instruction* ins, SymReg* r) {
  
     f = ins->flags;
     
-    if ((ins->r0 == r) && f & IF_r0_read) return 1;
-    if ((ins->r1 == r) && f & IF_r1_read) return 1;
-    if ((ins->r2 == r) && f & IF_r2_read) return 1;
-    if ((ins->r3 == r) && f & IF_r3_read) return 1;
+    if ((ins->r0 == r) && (f & IF_r0_read)) return 1;
+    if ((ins->r1 == r) && (f & IF_r1_read)) return 1;
+    if ((ins->r2 == r) && (f & IF_r2_read)) return 1;
+    if ((ins->r3 == r) && (f & IF_r3_read)) return 1;
 
     return 0;
 }
@@ -82,10 +82,10 @@ int instruction_writes(Instruction* ins, SymReg* r) {
  
     f = ins->flags;
 	
-    if ((ins->r0 == r) && f & IF_r0_write) return 1;
-    if ((ins->r1 == r) && f & IF_r1_write) return 1;
-    if ((ins->r2 == r) && f & IF_r2_write) return 1;
-    if ((ins->r3 == r) && f & IF_r3_write) return 1;
+    if ((ins->r0 == r) && (f & IF_r0_write)) return 1;
+    if ((ins->r1 == r) && (f & IF_r1_write)) return 1;
+    if ((ins->r2 == r) && (f & IF_r2_write)) return 1;
+    if ((ins->r3 == r) && (f & IF_r3_write)) return 1;
 
     return 0;
 }

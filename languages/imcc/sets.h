@@ -1,7 +1,7 @@
 
 typedef struct _Set {
    int length;
-   int* bmp;
+   char* bmp;
 } Set;
 
 Set* set_make(int);
