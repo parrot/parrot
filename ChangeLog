@@ -1,3 +1,14 @@
+2003-06-14 13:50 dan
+	* Moved the registers out of the context structure, since they
+          really aren't context
+	* Changed the register stack frames to hold only 16 registers
+	  rather than 32, added half-set push and pop ops, and reworked
+	  the full set push/pops to do two half-set push/pops. Should
+	  speed up saving register data on calls, since we usually only
+	  care about the top half of the registers anyway.
+	* Started committing some of the new class/object framework
+	* Remembered to finally start updating the Changelog
+	
 2003-03-18 03:50  ask
 
 	* Various files
