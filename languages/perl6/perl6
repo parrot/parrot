@@ -24,20 +24,17 @@ use lib "$FindBin::Bin/../../lib";
 use Getopt::Long;
 use P6C::Tree;
 use P6C::Parser;
+use Parrot::Config;
 
 use vars qw($IMCC $ASM $PARROT $PBC2C $HERE $CD $VERSION);
 $VERSION = '0.02';
 
-$HERE   = 'languages/perl6';
-$IMCC   = '../imcc/imcc';
-$ASM    = 'perl ../../assemble.pl';
-if ($^O eq 'cygwin') {
-    $PARROT = '../../parrot.exe';
-} else {
-    $PARROT = '../../parrot';
-}
-$PBC2C = 'cd ../../; perl pbc2c.pl';
-$CD = "cd ../..;";
+$HERE   = "languages$PConfig{slash}perl6";
+$IMCC   = "..$PConfig{slash}imcc$PConfig{slash}imcc";
+$ASM    = "$PConfig{perl} ..$PConfig{slash}..$PConfig{slash}assemble.pl";
+$PARROT = "..$PConfig{slash}..$PConfig{slash}parrot";
+$CD = "cd ..$PConfig{slash}..$PConfig{slash} && ";
+$PBC2C = "$CD $PConfig{perl} pbc2c.pl";
 
 sub usage($) {
     my $fh = shift;
@@ -365,10 +362,9 @@ sub pass4($$) {
     my $fw = shift;
 
     if ($o{'compile-pbc'}) {
-        use Parrot::Config;
         die $@ if $@;
         my $cmd;
-        $cmd = "$PBC2C $HERE/$file";    # FIXME
+        $cmd = "$PBC2C $HERE$PConfig{slash}$file";    # FIXME
         verbose(1, "compiling $cmd");
         my $c = `$cmd`;
         open(C, ">$filebase.c") or die("Can't write '$filebase.c'");
@@ -376,8 +372,8 @@ sub pass4($$) {
         close(C);
         $cmd = "$CD $PConfig{cc} $PConfig{ccflags} ".
                 "$PConfig{cg_flag} $PConfig{cc_inc} ".
-                "$PConfig{cc_warn} -c $HERE/$filebase.c $PConfig{'cc_o_out'} ".
-                "$HERE/$filebase$PConfig{o}";
+                "$PConfig{cc_warn} -c $HERE$PConfig{slash}$filebase.c $PConfig{'cc_o_out'} ".
+                "$HERE$PConfig{slash}$filebase$PConfig{o}";
         verbose(1, "compiling $cmd");
         if (system($cmd)) {
             die("failed: return $?");
@@ -398,7 +394,7 @@ sub pass4($$) {
                 'encodings/utf16.o encodings/utf32.o chartypes/unicode.o '.
                 'chartypes/usascii.o ';
         $cmd = "$CD $PConfig{ld} $PConfig{ldflags} ".
-                "$PConfig{ld_out} $HERE/$filebase $HERE/$filebase$PConfig{'o'} ".
+                "$PConfig{ld_out} $HERE$PConfig{slash}$filebase $HERE$PConfig{slash}$filebase$PConfig{'o'} ".
                 "$objs ".
                 "$PConfig{libs}";
         verbose(1, "linking $cmd");
