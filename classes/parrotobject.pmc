@@ -29,7 +29,7 @@
 
 */
 
-pmclass ParrotObject needs_ext {
+pmclass ParrotObject need_ext {
 
     INTVAL type() {		/* pmc2c.pl doesn't like empty classes */
 	return SELF->vtable->base_type;
