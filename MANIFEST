@@ -1391,12 +1391,14 @@ languages/imcc/t/syn/namespace.t
 languages/imcc/t/syn/scope.t
 languages/jako/docs/jako.pod
 languages/jako/elem.jako
+languages/jako/io.jako
 languages/jako/examples/bench.jako
 languages/jako/examples/euclid.jako
 languages/jako/examples/fact.jako
 languages/jako/examples/fib.jako
 languages/jako/examples/hello.jako
 languages/jako/examples/leibniz.jako
+languages/jako/examples/life.jako
 languages/jako/examples/mandelbrot.jako
 languages/jako/examples/mandelzoom.jako
 languages/jako/examples/mops.jako
