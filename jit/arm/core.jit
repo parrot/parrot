@@ -42,30 +42,598 @@ Parrot_end {
 ; nothing :-)] and choose how to maximise use of as many real CPU registers as
 ; possible.
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; set ops
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 Parrot_set_i_i {
-    Parrot_jit_int_load(jit_info, interpreter, 2, r0);
-    Parrot_jit_int_store(jit_info, interpreter, 1, r0);
+    Parrot_jit_int_load(jit_info, interpreter, cond_AL, 2, r0);
+    Parrot_jit_int_store(jit_info, interpreter, cond_AL, 1, r0);
+}
+Parrot_set_i_ic {
+    Parrot_jit_int_load(jit_info, interpreter, cond_AL, 2, r0);
+    Parrot_jit_int_store(jit_info, interpreter, cond_AL, 1, r0);
 }
 
-Parrot_add_i_i_i {
-    Parrot_jit_int_load(jit_info, interpreter, 2, r0);
-    Parrot_jit_int_load(jit_info, interpreter, 3, r1);
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; comparison ops
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+Parrot_eq_i_i_ic {
+    Parrot_jit_int_load(jit_info, interpreter, cond_AL, 1, r0);
+    Parrot_jit_int_load(jit_info, interpreter, cond_AL, 2, r1);
     jit_info->native_ptr = emit_arith_reg (jit_info->native_ptr, cond_AL,
-                                                 ADD, 0, r2, r0, r1);
-    Parrot_jit_int_store(jit_info, interpreter, 1, r2);
+                                                 CMP, 0, 0, r0, r1);
+    emit_jump_to_op (jit_info, cond_EQ, *INT_CONST[3]);
+}
+Parrot_eq_i_ic_ic {
+    Parrot_jit_jumpif_const (jit_info, interpreter, 1, *INT_CONST[2],
+                             *INT_CONST[3], cond_EQ);
+}
+Parrot_eq_ic_i_ic {
+    Parrot_jit_jumpif_const (jit_info, interpreter, 2, *INT_CONST[1],
+                             *INT_CONST[3], cond_EQ);
+}
+Parrot_eq_ic_ic_ic {
+    if (*INT_CONST[1] == *INT_CONST[2])
+        emit_jump_to_op (jit_info, cond_AL, *INT_CONST[3]);
 }
 
-Parrot_sub_i_i_i {
-    Parrot_jit_int_load(jit_info, interpreter, 2, r0);
-    Parrot_jit_int_load(jit_info, interpreter, 3, r1);
+Parrot_ne_i_i_ic {
+    Parrot_jit_int_load(jit_info, interpreter, cond_AL, 1, r0);
+    Parrot_jit_int_load(jit_info, interpreter, cond_AL, 2, r1);
     jit_info->native_ptr = emit_arith_reg (jit_info->native_ptr, cond_AL,
-                                                 SUB, 0, r2, r0, r1);
-    Parrot_jit_int_store(jit_info, interpreter, 1, r2);
+                                                 CMP, 0, 0, r0, r1);
+    emit_jump_to_op (jit_info, cond_NE, *INT_CONST[3]);
+}
+Parrot_ne_i_ic_ic {
+    Parrot_jit_jumpif_const (jit_info, interpreter, 1, *INT_CONST[2],
+                             *INT_CONST[3], cond_NE);
+}
+Parrot_ne_ic_i_ic {
+    Parrot_jit_jumpif_const (jit_info, interpreter, 2, *INT_CONST[1],
+                             *INT_CONST[3], cond_NE);
+}
+Parrot_ne_ic_ic_ic {
+    if (*INT_CONST[1] != *INT_CONST[2])
+        emit_jump_to_op (jit_info, cond_AL, *INT_CONST[3]);
+}
+
+Parrot_lt_i_i_ic {
+    Parrot_jit_int_load(jit_info, interpreter, cond_AL, 1, r0);
+    Parrot_jit_int_load(jit_info, interpreter, cond_AL, 2, r1);
+    jit_info->native_ptr = emit_arith_reg (jit_info->native_ptr, cond_AL,
+                                                 CMP, 0, 0, r0, r1);
+    emit_jump_to_op (jit_info, cond_LT, *INT_CONST[3]);
+}
+Parrot_lt_i_ic_ic {
+    Parrot_jit_jumpif_const (jit_info, interpreter, 1, *INT_CONST[2],
+                             *INT_CONST[3], cond_LT);
+}
+Parrot_lt_ic_i_ic {
+    Parrot_jit_jumpif_const (jit_info, interpreter, 2, *INT_CONST[1],
+                             *INT_CONST[3], cond_GE);
+}
+Parrot_lt_ic_ic_ic {
+    if (*INT_CONST[1] < *INT_CONST[2])
+        emit_jump_to_op (jit_info, cond_AL, *INT_CONST[3]);
+}
+
+Parrot_le_i_i_ic {
+    Parrot_jit_int_load(jit_info, interpreter, cond_AL, 1, r0);
+    Parrot_jit_int_load(jit_info, interpreter, cond_AL, 2, r1);
+    jit_info->native_ptr = emit_arith_reg (jit_info->native_ptr, cond_AL,
+                                                 CMP, 0, 0, r0, r1);
+    emit_jump_to_op (jit_info, cond_LE, *INT_CONST[3]);
+}
+Parrot_le_i_ic_ic {
+    Parrot_jit_jumpif_const (jit_info, interpreter, 1, *INT_CONST[2],
+                             *INT_CONST[3], cond_LE);
+}
+Parrot_le_ic_i_ic {
+    Parrot_jit_jumpif_const (jit_info, interpreter, 2, *INT_CONST[1],
+                             *INT_CONST[3], cond_GT);
+}
+Parrot_le_ic_ic_ic {
+    if (*INT_CONST[1] <= *INT_CONST[2])
+        emit_jump_to_op (jit_info, cond_AL, *INT_CONST[3]);
+}
+
+Parrot_gt_i_i_ic {
+    Parrot_jit_int_load(jit_info, interpreter, cond_AL, 1, r0);
+    Parrot_jit_int_load(jit_info, interpreter, cond_AL, 2, r1);
+    jit_info->native_ptr = emit_arith_reg (jit_info->native_ptr, cond_AL,
+                                                 CMP, 0, 0, r0, r1);
+    emit_jump_to_op (jit_info, cond_GT, *INT_CONST[3]);
+}
+Parrot_gt_i_ic_ic {
+    Parrot_jit_jumpif_const (jit_info, interpreter, 1, *INT_CONST[2],
+                             *INT_CONST[3], cond_GT);
+}
+Parrot_gt_ic_i_ic {
+    Parrot_jit_jumpif_const (jit_info, interpreter, 2, *INT_CONST[1],
+                             *INT_CONST[3], cond_LE);
+}
+Parrot_gt_ic_ic_ic {
+    if (*INT_CONST[1] > *INT_CONST[2])
+        emit_jump_to_op (jit_info, cond_AL, *INT_CONST[3]);
+}
+
+Parrot_ge_i_i_ic {
+    Parrot_jit_int_load(jit_info, interpreter, cond_AL, 1, r0);
+    Parrot_jit_int_load(jit_info, interpreter, cond_AL, 2, r1);
+    jit_info->native_ptr = emit_arith_reg (jit_info->native_ptr, cond_AL,
+                                                 CMP, 0, 0, r0, r1);
+    emit_jump_to_op (jit_info, cond_GE, *INT_CONST[3]);
+}
+Parrot_ge_i_ic_ic {
+    Parrot_jit_jumpif_const (jit_info, interpreter, 1, *INT_CONST[2],
+                             *INT_CONST[3], cond_GE);
+}
+Parrot_ge_ic_i_ic {
+    Parrot_jit_jumpif_const (jit_info, interpreter, 2, *INT_CONST[1],
+                             *INT_CONST[3], cond_LT);
+}
+Parrot_ge_ic_ic_ic {
+    if (*INT_CONST[1] >= *INT_CONST[2])
+        emit_jump_to_op (jit_info, cond_AL, *INT_CONST[3]);
 }
 
 Parrot_if_i_ic {
-    Parrot_jit_int_load(jit_info, interpreter, 1, r0);
+    Parrot_jit_jumpif_const (jit_info, interpreter, 1, 0, *INT_CONST[2],
+                             cond_NE);
+}
+Parrot_unless_i_ic {
+    Parrot_jit_jumpif_const (jit_info, interpreter, 1, 0, *INT_CONST[2],
+                             cond_EQ);
+}
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; arithmetic ops
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+Parrot_abs_i_ic {
+    jit_info->native_ptr = emit_load_constant (jit_info->native_ptr,
+                                               interpreter, cond_AL,
+                                               (*INT_CONST[2] < 0)
+                                               ? -*INT_CONST[2] : *INT_CONST[2],
+                                               r0);
+    Parrot_jit_int_store(jit_info, interpreter, cond_AL, 1, r0);
+}
+;
+; maybe not the best way:
+; cmp   r0, #0
+; rsblt r0, r0, #0
+;
+Parrot_abs_i_i {
+    Parrot_jit_int_load(jit_info, interpreter, cond_AL, 2, r0);
     jit_info->native_ptr = emit_arith_immediate (jit_info->native_ptr, cond_AL,
                                                  CMP, 0, 0, r0, 0, 0);
-    emit_jump_to_op (jit_info, cond_NE, 0, *INT_CONST[2]);
+    jit_info->native_ptr = emit_arith_immediate (jit_info->native_ptr, cond_LT,
+                                                 RSB, 0, r0, r0, 0, 0);
+    Parrot_jit_int_store(jit_info, interpreter, cond_AL, 1, r0);
 }
+;
+; rsbs  r0, r0, #0
+; strgt r0, [...]
+;
+;Parrot_abs_i {
+;    Parrot_jit_int_laod(jit_info, interpreter, cond_AL, 1, r0);
+;    jit_info->native_ptr = emit_arith_immediate (jit_info->native_ptr, cond_AL,
+;                                                 RSB, arith_sets_S,
+;                                                 r0, r0, 0, 0);
+;    Parrot_jit_int_store(jit_info, interpreter, cond_GT, 1, r0);
+;}
+
+Parrot_add_i_i_i {
+    Parrot_jit_int_load(jit_info, interpreter, cond_AL, 2, r0);
+    Parrot_jit_int_load(jit_info, interpreter, cond_AL, 3, r1);
+    jit_info->native_ptr = emit_arith_reg (jit_info->native_ptr, cond_AL,
+                                                 ADD, 0, r2, r0, r1);
+    Parrot_jit_int_store(jit_info, interpreter, cond_AL, 1, r2);
+}
+Parrot_add_i_i_ic {
+    Parrot_jit_arith_const_neg (jit_info, interpreter, cond_AL, ADD, SUB,
+        1, 2, *INT_CONST[3]);
+}
+Parrot_add_i_ic_i {
+    Parrot_jit_arith_const_neg (jit_info, interpreter, cond_AL, ADD, SUB,
+        1, 3, *INT_CONST[2]);
+}
+Parrot_add_i_ic_ic {
+    jit_info->native_ptr = emit_load_constant (jit_info->native_ptr,
+                                               interpreter,
+                                               cond_AL,
+                                               *INT_CONST[2] + *INT_CONST[3],
+                                               r0);
+    Parrot_jit_int_store(jit_info, interpreter, cond_AL, 1, r0);
+}
+Parrot_add_i_ic {
+    Parrot_jit_arith_const_neg (jit_info, interpreter, cond_AL, ADD, SUB,
+        1, 1, *INT_CONST[2]);
+}
+
+Parrot_dec_i {
+    Parrot_jit_arith_const_neg (jit_info, interpreter, cond_AL, SUB, ADD,
+        1, 1, 1);
+}
+Parrot_inc_i {
+    Parrot_jit_arith_const_neg (jit_info, interpreter, cond_AL, ADD, SUB,
+        1, 1, 1);
+}
+
+; mul can't do immediate constants, and there are restrictions on which
+; registers you can use. (IIRC rd and rn can't be the same register)
+Parrot_mul_i_i {
+    Parrot_jit_int_load(jit_info, interpreter, cond_AL, 1, r0);
+    Parrot_jit_int_load(jit_info, interpreter, cond_AL, 2, r1);
+    jit_info->native_ptr = emit_mul (jit_info->native_ptr, cond_AL, 0,
+                                     r2, r0, r1);
+    Parrot_jit_int_store(jit_info, interpreter, cond_AL, 1, r2);
+}
+Parrot_mul_i_i_i {
+    Parrot_jit_int_load(jit_info, interpreter, cond_AL, 2, r0);
+    Parrot_jit_int_load(jit_info, interpreter, cond_AL, 3, r1);
+    jit_info->native_ptr = emit_mul (jit_info->native_ptr, cond_AL, 0,
+                                     r2, r0, r1);
+    Parrot_jit_int_store(jit_info, interpreter, cond_AL, 1, r2);
+}
+Parrot_mul_i_ic_ic {
+    jit_info->native_ptr = emit_load_constant (jit_info->native_ptr,
+                                               interpreter,
+                                               cond_AL,
+                                               *INT_CONST[2] * *INT_CONST[3],
+                                               r0);
+    Parrot_jit_int_store(jit_info, interpreter, cond_AL, 1, r0);
+}
+
+Parrot_neg_i {
+    Parrot_jit_arith_const (jit_info, interpreter, cond_AL, RSB, 1, 1, 0);
+}
+Parrot_neg_i_i {
+    Parrot_jit_arith_const (jit_info, interpreter, cond_AL, RSB, 1, 2, 0);
+}
+Parrot_neg_i_ic {
+    jit_info->native_ptr = emit_load_constant (jit_info->native_ptr,
+                                               interpreter,
+                                               cond_AL,
+                                               -*INT_CONST[2],
+                                               r0);
+    Parrot_jit_int_store(jit_info, interpreter, cond_AL, 1, r0);
+}
+
+
+Parrot_sub_i_i_i {
+    Parrot_jit_int_load(jit_info, interpreter, cond_AL, 2, r0);
+    Parrot_jit_int_load(jit_info, interpreter, cond_AL, 3, r1);
+    jit_info->native_ptr = emit_arith_reg (jit_info->native_ptr, cond_AL,
+                                                 SUB, 0, r2, r0, r1);
+    Parrot_jit_int_store(jit_info, interpreter, cond_AL, 1, r2);
+}
+Parrot_sub_i_i_ic {
+    Parrot_jit_arith_const_neg (jit_info, interpreter, cond_AL, SUB, ADD,
+        1, 2, *INT_CONST[3]);
+}
+Parrot_sub_i_ic_i {
+    Parrot_jit_arith_const_neg (jit_info, interpreter, cond_AL, RSB, ADD,
+        1, 3, *INT_CONST[2]);
+}
+Parrot_sub_i_ic_ic {
+    jit_info->native_ptr = emit_load_constant (jit_info->native_ptr,
+                                               interpreter,
+                                               cond_AL,
+                                               *INT_CONST[2] - *INT_CONST[3],
+                                               r0);
+    Parrot_jit_int_store(jit_info, interpreter, cond_AL, 1, r0);
+}
+Parrot_sub_i_ic {
+    Parrot_jit_arith_const_neg (jit_info, interpreter, cond_AL, SUB, ADD,
+        1, 1, *INT_CONST[2]);
+}
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; bit ops
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+Parrot_band_i_i_i {
+    Parrot_jit_int_load(jit_info, interpreter, cond_AL, 2, r0);
+    Parrot_jit_int_load(jit_info, interpreter, cond_AL, 3, r1);
+    jit_info->native_ptr = emit_arith_reg (jit_info->native_ptr, cond_AL,
+                                                 AND, 0, r2, r0, r1);
+    Parrot_jit_int_store(jit_info, interpreter, cond_AL, 1, r2);
+}
+Parrot_band_i_i_ic {
+    Parrot_jit_arith_const_not (jit_info, interpreter, cond_AL, AND, BIC,
+        1, 2, *INT_CONST[3]);
+}
+Parrot_band_i_ic_i {
+    Parrot_jit_arith_const_not (jit_info, interpreter, cond_AL, AND, BIC,
+        1, 3, *INT_CONST[2]);
+}
+Parrot_band_i_ic_ic {
+    jit_info->native_ptr = emit_load_constant (jit_info->native_ptr,
+                                               interpreter,
+                                               cond_AL,
+                                               *INT_CONST[2] & *INT_CONST[3],
+                                               r0);
+    Parrot_jit_int_store(jit_info, interpreter, cond_AL, 1, r0);
+}
+Parrot_band_i_ic {
+    Parrot_jit_arith_const_not (jit_info, interpreter, cond_AL, AND, BIC,
+        1, 1, *INT_CONST[2]);
+}
+
+;Parrot_bnot_i {
+;    Parrot_jit_int_load(jit_info, interpreter, cond_AL, 1, r0);
+;    jit_info->native_ptr = emit_arith_reg (jit_info->native_ptr, cond_AL,
+;                                                 MVN, 0, r0, 0, r0);
+;    Parrot_jit_int_store(jit_info, interpreter, cond_AL, 1, r0);
+;}
+Parrot_bnot_i_i {
+    Parrot_jit_int_load(jit_info, interpreter, cond_AL, 2, r0);
+    jit_info->native_ptr = emit_arith_reg (jit_info->native_ptr, cond_AL,
+                                                 MVN, 0, r0, 0, r0);
+    Parrot_jit_int_store(jit_info, interpreter, cond_AL, 1, r0);
+}
+Parrot_bnot_i_ic {
+    jit_info->native_ptr = emit_load_constant (jit_info->native_ptr,
+                                               interpreter,
+                                               cond_AL,
+                                               ~*INT_CONST[2],
+                                               r0);
+    Parrot_jit_int_store(jit_info, interpreter, cond_AL, 1, r0);
+}
+
+Parrot_bor_i_i_i {
+    Parrot_jit_int_load(jit_info, interpreter, cond_AL, 2, r0);
+    Parrot_jit_int_load(jit_info, interpreter, cond_AL, 3, r1);
+    jit_info->native_ptr = emit_arith_reg (jit_info->native_ptr, cond_AL,
+                                           ORR, 0, r2, r0, r1);
+    Parrot_jit_int_store(jit_info, interpreter, cond_AL, 1, r2);
+}
+Parrot_bor_i_i_ic {
+    Parrot_jit_arith_const (jit_info, interpreter, cond_AL, ORR,
+                            1, 2, *INT_CONST[3]);
+}
+Parrot_bor_i_ic_i {
+    Parrot_jit_arith_const (jit_info, interpreter, cond_AL, ORR,
+                            1, 3, *INT_CONST[2]);
+}
+Parrot_bor_i_ic_ic {
+    jit_info->native_ptr = emit_load_constant (jit_info->native_ptr,
+                                               interpreter,
+                                               cond_AL,
+                                               *INT_CONST[2] | *INT_CONST[3],
+                                               r0);
+    Parrot_jit_int_store(jit_info, interpreter, cond_AL, 1, r0);
+}
+Parrot_bor_i_ic {
+    Parrot_jit_arith_const(jit_info, interpreter, cond_AL, ORR,
+                           1, 1, *INT_CONST[2]);
+}
+
+Parrot_bxor_i_i_i {
+    Parrot_jit_int_load(jit_info, interpreter, cond_AL, 2, r0);
+    Parrot_jit_int_load(jit_info, interpreter, cond_AL, 3, r1);
+    jit_info->native_ptr = emit_arith_reg (jit_info->native_ptr, cond_AL,
+                                           EOR, 0, r2, r0, r1);
+    Parrot_jit_int_store(jit_info, interpreter, cond_AL, 1, r2);
+}
+Parrot_bxor_i_i_ic {
+    Parrot_jit_arith_const (jit_info, interpreter, cond_AL, EOR,
+                            1, 2, *INT_CONST[3]);
+}
+Parrot_bxor_i_ic_i {
+    Parrot_jit_arith_const (jit_info, interpreter, cond_AL, EOR,
+                            1, 3, *INT_CONST[2]);
+}
+Parrot_bxor_i_ic_ic {
+    jit_info->native_ptr = emit_load_constant (jit_info->native_ptr,
+                                               interpreter,
+                                               cond_AL,
+                                               *INT_CONST[2] | *INT_CONST[3],
+                                               r0);
+    Parrot_jit_int_store(jit_info, interpreter, cond_AL, 1, r0);
+}
+Parrot_bxor_i_ic {
+    Parrot_jit_arith_const(jit_info, interpreter, cond_AL, EOR,
+                           1, 1, *INT_CONST[2]);
+}
+
+Parrot_shl_i_i_i {
+    Parrot_jit_int_load(jit_info, interpreter, cond_AL, 2, r0);
+    Parrot_jit_int_load(jit_info, interpreter, cond_AL, 3, r1);
+    jit_info->native_ptr
+       = emit_arith_reg_shift_reg (jit_info->native_ptr, cond_AL,
+                                   MOV, 0, r2, 0, r0, shift_LSL, r1);
+    Parrot_jit_int_store(jit_info, interpreter, cond_AL, 1, r2);
+}
+Parrot_shl_i_i_ic {
+    Parrot_jit_int_load(jit_info, interpreter, cond_AL, 2, r0);
+    jit_info->native_ptr
+       = emit_arith_reg_shift_const (jit_info->native_ptr, cond_AL,
+                                     MOV, 0, r2, 0, r0, shift_LSL,
+                                     *INT_CONST[3]);
+    Parrot_jit_int_store(jit_info, interpreter, cond_AL, 1, r2);
+}
+Parrot_shl_i_ic_i {
+    Parrot_jit_int_load(jit_info, interpreter, cond_AL, 2, r0);
+    Parrot_jit_int_load(jit_info, interpreter, cond_AL, 3, r1);
+    jit_info->native_ptr
+       = emit_arith_reg_shift_reg (jit_info->native_ptr, cond_AL,
+                                   MOV, 0, r2, 0, r0, shift_LSL, r1);
+    Parrot_jit_int_store(jit_info, interpreter, cond_AL, 1, r2);
+}
+Parrot_shl_i_ic_ic {
+    jit_info->native_ptr = emit_load_constant (jit_info->native_ptr,
+                                               interpreter,
+                                               cond_AL,
+                                               *INT_CONST[2] << *INT_CONST[3],
+                                               r0);
+    Parrot_jit_int_store(jit_info, interpreter, cond_AL, 1, r0);
+}
+Parrot_shr_i_i_i {
+    Parrot_jit_int_load(jit_info, interpreter, cond_AL, 2, r0);
+    Parrot_jit_int_load(jit_info, interpreter, cond_AL, 3, r1);
+    jit_info->native_ptr
+       = emit_arith_reg_shift_reg (jit_info->native_ptr, cond_AL,
+                                   MOV, 0, r2, 0, r0, shift_ASR, r1);
+    Parrot_jit_int_store(jit_info, interpreter, cond_AL, 1, r2);
+}
+Parrot_shr_i_i_ic {
+    Parrot_jit_int_load(jit_info, interpreter, cond_AL, 2, r0);
+    jit_info->native_ptr
+       = emit_arith_reg_shift_const (jit_info->native_ptr, cond_AL,
+                                     MOV, 0, r2, 0, r0, shift_ASR,
+                                     *INT_CONST[3]);
+    Parrot_jit_int_store(jit_info, interpreter, cond_AL, 1, r2);
+}
+Parrot_shr_i_ic_i {
+    Parrot_jit_int_load(jit_info, interpreter, cond_AL, 2, r0);
+    Parrot_jit_int_load(jit_info, interpreter, cond_AL, 3, r1);
+    jit_info->native_ptr
+       = emit_arith_reg_shift_reg (jit_info->native_ptr, cond_AL,
+                                   MOV, 0, r2, 0, r0, shift_ASR, r1);
+    Parrot_jit_int_store(jit_info, interpreter, cond_AL, 1, r2);
+}
+Parrot_shr_i_ic_ic {
+    jit_info->native_ptr = emit_load_constant (jit_info->native_ptr,
+                                               interpreter,
+                                               cond_AL,
+                                               *INT_CONST[2] >> *INT_CONST[3],
+                                               r0);
+    Parrot_jit_int_store(jit_info, interpreter, cond_AL, 1, r0);
+}
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; logical ops
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+Parrot_and_i_i_i {
+    Parrot_jit_int_load(jit_info, interpreter, cond_AL, 2, r0);
+    jit_info->native_ptr = emit_arith_immediate (jit_info->native_ptr, cond_AL,
+                                                 CMP, 0, 0, r0, 0, 0);
+    Parrot_jit_int_load(jit_info, interpreter, cond_NE, 3, r0);
+    Parrot_jit_int_store(jit_info, interpreter, cond_AL, 1, r0);
+}
+Parrot_and_i_i_ic {
+    Parrot_jit_int_load(jit_info, interpreter, cond_AL, 2, r0);
+    jit_info->native_ptr = emit_arith_immediate (jit_info->native_ptr, cond_AL,
+                                                 CMP, 0, 0, r0, 0, 0);
+    Parrot_jit_int_load(jit_info, interpreter, cond_NE, 3, r1);
+    Parrot_jit_int_store(jit_info, interpreter, cond_AL, 1, r0);
+}
+Parrot_and_i_ic_i {
+    if (*INT_CONST[2]) {
+        Parrot_jit_int_load(jit_info, interpreter, cond_AL, 3, r0);
+    } else {
+        /* *INT_CONST[2] is going to be 0 anyway, but this does generate the
+           shortest code to load 0.  */
+        Parrot_jit_int_load(jit_info, interpreter, cond_AL, 2, r0);
+    }
+    Parrot_jit_int_store(jit_info, interpreter, cond_AL, 1, r0);
+}
+Parrot_and_i_ic_ic {
+    if (*INT_CONST[2]) {
+        Parrot_jit_int_load(jit_info, interpreter, cond_AL, 3, r0);
+    } else {
+        /* *INT_CONST[2] is going to be 0 anyway, but this does generate the
+           shortest code to load 0.  */
+        Parrot_jit_int_load(jit_info, interpreter, cond_AL, 2, r0);
+    }
+    Parrot_jit_int_store(jit_info, interpreter, cond_AL, 1, r0);
+}
+
+Parrot_or_i_i_i {
+    Parrot_jit_int_load(jit_info, interpreter, cond_AL, 2, r0);
+    jit_info->native_ptr = emit_arith_immediate (jit_info->native_ptr, cond_AL,
+                                                 CMP, 0, 0, r0, 0, 0);
+    Parrot_jit_int_load(jit_info, interpreter, cond_EQ, 3, r0);
+    Parrot_jit_int_store(jit_info, interpreter, cond_AL, 1, r0);
+}
+Parrot_or_i_i_ic {
+    Parrot_jit_int_load(jit_info, interpreter, cond_AL, 2, r0);
+    jit_info->native_ptr = emit_arith_immediate (jit_info->native_ptr, cond_AL,
+                                                 CMP, 0, 0, r0, 0, 0);
+    Parrot_jit_int_load(jit_info, interpreter, cond_EQ, 3, r0);
+    Parrot_jit_int_store(jit_info, interpreter, cond_AL, 1, r0);
+}
+Parrot_or_i_ic_i {
+    if (*INT_CONST[2]) {
+        Parrot_jit_int_load(jit_info, interpreter, cond_AL, 2, r0);
+    } else {
+        Parrot_jit_int_load(jit_info, interpreter, cond_AL, 3, r0);
+    }
+    Parrot_jit_int_store(jit_info, interpreter, cond_AL, 1, r0);
+}
+Parrot_or_i_ic_ic {
+    if (*INT_CONST[2]) {
+        Parrot_jit_int_load(jit_info, interpreter, cond_AL, 2, r0);
+    } else {
+        Parrot_jit_int_load(jit_info, interpreter, cond_AL, 3, r0);
+    }
+    Parrot_jit_int_store(jit_info, interpreter, cond_AL, 1, r0);
+}
+;
+; no or_i_i :-(
+;
+;
+; RSBS  r1, r0, #1
+; ie flags set for CMP #1, r0
+; think unsigned - if r0 is 0, #1 is HIgher
+; for all other cases it's Lower or Same.
+; if r0 is 0, then #1 - #0 is 1, and r1 is set correctly.
+; else
+; MOVLS r1, #0
+; (actaully it's also set correctly for r0 is #1)
+Parrot_not_i_i {
+    Parrot_jit_int_load(jit_info, interpreter, cond_AL, 2, r0);
+    jit_info->native_ptr = emit_arith_immediate (jit_info->native_ptr, cond_AL,
+                                                 RSB, arith_sets_S,
+                                                 r1, r0, 1, 0);
+    jit_info->native_ptr = emit_arith_immediate (jit_info->native_ptr, cond_LS,
+                                                 MOV, 0,
+                                                 r1, 0, 0, 0);
+    Parrot_jit_int_store(jit_info, interpreter, cond_AL, 1, r1);
+}
+Parrot_not_i_ic {
+    jit_info->native_ptr = emit_load_constant (jit_info->native_ptr,
+                                               interpreter,
+                                               cond_AL,
+                                               !*INT_CONST[2],
+                                               r0);
+    Parrot_jit_int_store(jit_info, interpreter, cond_AL, 1, r0);
+}
+
+; XXX TODO - the non constant versions of this
+Parrot_xor_i_ic_ic {
+    jit_info->native_ptr
+       = emit_load_constant (jit_info->native_ptr, interpreter, cond_AL,
+                             (*INT_CONST[2] && ! *INT_CONST[3])
+                               ? *INT_CONST[2]
+                               : (*INT_CONST[3] && ! *INT_CONST[2])
+                                 ? *INT_CONST[3] : 0, r0);
+    Parrot_jit_int_store(jit_info, interpreter, cond_AL, 1, r0);
+}
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; branches
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+Parrot_branch_i {
+   Parrot_jit_int_load(jit_info, interpreter, cond_AL, 1, r0);
+   Parrot_jump_to_op_in_reg(jit_info, interpreter, r0);
+}
+Parrot_branch_ic {
+    emit_jump_to_op (jit_info, cond_AL, *INT_CONST[1]);
+}
+
+/*
+ * Local variables:
+ * c-indentation-style: bsd
+ * c-basic-offset: 4
+ * indent-tabs-mode: nil 
+ * End:
+ *
+ * vim: expandtab shiftwidth=4:
+ */
