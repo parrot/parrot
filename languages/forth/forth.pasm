@@ -418,6 +418,7 @@ InitializeCoreOps:
   .AddCoreOp(RDrop, "rdrop")
   .AddCoreOp(Two_To_R, "2>r")
   .AddCoreOp(Two_From_R, "2r>")
+  .AddCoreOp(Two_R_Fetch, "2r@")
 # 2r@
   .AddCoreOp(Two_RDrop, "2rdrop")
 
@@ -1120,10 +1121,17 @@ Two_To_R:
 Two_From_R:
     pop .TempPMC, .ReturnStack
     pop .PMCStack, .ReturnStack
-    save .TempPMC
     save .PMCStack
+    save .TempPMC
     branch DoneInterpretWord
   
+Two_R_Fetch:
+    set .TempPMC, .ReturnStack[-2]
+    save .TempPMC
+    set .TempPMC, .ReturnStack[-1]
+    save .TempPMC
+    branch DoneInterpretWord
+
 Two_RDrop:
     pop .PMCStack, .ReturnStack
 RDrop:
