@@ -580,8 +580,8 @@ check_tail_call(Parrot_Interp interp, IMC_Unit * unit, Instruction *ins)
     if (!tmp)
         return 0;
     if (tmp->opnum == -1 && (tmp->type & ITPCCSUB) &&
-            (tmp->type & ITLABEL) && !tmp->next) {
-                ret_ins = tmp;
+            (tmp->type & ITLABEL)) {
+        ret_ins = tmp;
         IMCC_debug(interp, DEBUG_OPT1, "check tail call %I \n", ins);
     }
     /*
@@ -605,7 +605,7 @@ check_tail_call(Parrot_Interp interp, IMC_Unit * unit, Instruction *ins)
         }
         else
             return 0;
-        if (strcmp(tmp->op, "invoke"))
+        if (strcmp(tmp->op, "returncc"))
             return 0;
         IMCC_debug(interp, DEBUG_OPT1, "check tail call %I \n", tmp);
         nrets = 0;

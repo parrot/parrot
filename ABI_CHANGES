@@ -41,4 +41,4 @@ it's slightly inefficient to create the equivalent opcodes.
 2004.11.15 leo
 
 The variables P0, P1, P2, S0 aren't visible in the called subroutine
-anymore.  See docs/ppds/pdd03_calling_conventions.pod.
+anymore.  See docs/pdds/pdd03_calling_conventions.pod.
