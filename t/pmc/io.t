@@ -105,11 +105,6 @@ ok 5
 ok 6
 OUTPUT
 
-SKIP: {
-    skip ("read routines currently crash on bad input", 1)
-        unless "hoping that someone will fix this before 0.0.11";
-
-    unlink "no_such_file" if (-e "no_such_file");
 
 output_is(<<'CODE', <<'OUTPUT', "read on invalid fh should throw exception");
 	open P0, "no_such_file", "<"
@@ -147,7 +142,6 @@ ok 1
 ok 2
 ok 4
 OUTPUT
-}
 
 SKIP: {
     skip ("clone not finished yet", 1);
