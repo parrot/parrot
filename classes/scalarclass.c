@@ -95,7 +95,7 @@ static BOOL Parrot_scalar_get_bool (struct Parrot_Interp *interpreter, PMC* pmc)
 }
 
 static void* Parrot_scalar_get_value (struct Parrot_Interp *interpreter, PMC* pmc) {
-    return pmc->cache;
+    return pmc->data;
 }
 
 static BOOL Parrot_scalar_is_same (struct Parrot_Interp *interpreter, PMC* pmc, PMC* pmc2) {

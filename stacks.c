@@ -67,7 +67,7 @@ void rotate_entries(struct Parrot_Interp *interpreter, struct StackChunk *base_c
 }
 
 /* Push something on the generic stack. Return a pointer to the entry */
-struct Stack_Entry *push_generic_entry(struct Parrot_Interp *interpreter, struct Stack_Entry **top, void *thing, INTVAL type, void *cleanup) {
+struct Stack_Entry *push_generic_entry(struct Parrot_Interp *interpreter, struct Stack_Entry **top, void *thing, INTVAL type,  void (*cleanup)(struct Stack_Entry *)) {
     struct StackChunk *chunk_base;
     
     chunk_base = STACK_CHUNK_BASE(*top);

@@ -2,6 +2,7 @@ assemble.pl
 ChangeLog
 classes/genclass.pl
 classes/intclass.c
+classes/scalarclass.c
 config_h.in
 Config_pm.in
 Configure.pl
