@@ -708,8 +708,8 @@ sub to_bytecode {
         push @{$_->[0]}, [lc(substr($1,0,1)),$1];
       }
       #
-      # XXX '[k]' should be the result of one or more chained '[k:I3]' type
-      # XXX arguments. '[k:I3:N0]' gets transformed to '[k:N0]', then just '[k]'
+      # XXX '[k]' should be the result of one or more chained '[k;I3]' type
+      # XXX arguments. '[k;I3;N0]' gets transformed to '[k;N0]', then just '[k]'
       #
       elsif($temp=~s/^\[k\]//) {
       }
@@ -717,7 +717,7 @@ sub to_bytecode {
       # XXX Nip off the first keyed register and replace the '[k' at the start
       # XXX of the string, so we can nip off another argument.
       #
-      elsif($temp=~s/^\[k:($reg_re)/\[k/) {
+      elsif($temp=~s/^\[k;($reg_re)/\[k/) {
         $suffixes .= "_k";
         push @{$_->[0]}, ['k',$1];
       }
