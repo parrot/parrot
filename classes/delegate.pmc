@@ -23,6 +23,11 @@
    
    Yes, it's damned evil, but it's what we need, since we have to
    preserve the registers--vtable methods can't change them.
+
+   Also note that if the vtable method clobbers a register that
+   contains a string or PMC not otherwise rooted it could be collected
+   too early
+
 */
 struct regsave {
   struct IReg int_reg;
@@ -59,6 +64,12 @@ find_or_die(struct Parrot_Interp *interp, PMC *pmc, const char *name) {
   }
   return returnPMC;  
 }
+
+/* All these functions to run code can leak a full parrot register
+   file, as well as potentially permanently unroot some PMCs or
+   strings, if the vtable method throws an exception. It really ought
+   be caught rather than let flow through.
+*/
 
 inline static void
 noarg_noreturn(struct Parrot_Interp *interpreter, PMC *obj, PMC *method) {
