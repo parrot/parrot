@@ -26,14 +26,6 @@ TODO currently this uses PerlString instead of String PMCs.
 
 
 pmclass ResizablePMCArray extends FixedPMCArray need_ext does array {
-    void class_init () {
-        /* this should be autmatically done - probably */
-        if (pass) {
-            enter_nci_method(INTERP, enum_class_ResizablePMCArray,
-                    F2DPTR(Parrot_ResizablePMCArray_push_pmc),
-                    "append", "vIOP");
-        }
-    }
 
 /*
 
@@ -192,6 +184,10 @@ If key is a slice, do a splice as set that item.
         else
             PMC_int_val(SELF) = size + 1;
         ((PMC**)PMC_data(SELF))[size] = value;
+    }
+
+    METHOD void append(PMC* value) {
+        Parrot_ResizablePMCArray_push_pmc(INTERP, SELF, value);
     }
 
 /*

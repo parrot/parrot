@@ -429,7 +429,7 @@ sub proto ($$) {
     my ($type, $parameters) = @_;
 
     # reduce to a comma separated set of types
-    $parameters =~ s/ +\w+(,|$)/,/g;
+    $parameters =~ s/\w+(,|$)/,/g;
     $parameters =~ s/ //g;
 
     # type method(interpreter, self, parameters...)

@@ -8,7 +8,7 @@ t/pmc/resizablepmcarray.t - ResizablePMCArray PMC
 
 =head1 SYNOPSIS
 
-	% perl -Ilib t/pmc/ResizablePMCArray.t
+	% perl -Ilib t/pmc/resizablepmcarray.t
 
 =head1 DESCRIPTION
 
@@ -17,7 +17,7 @@ out-of-bounds test. Checks INT and PMC keys.
 
 =cut
 
-use Parrot::Test tests => 8;
+use Parrot::Test tests => 10;
 use Test::More;
 
 my $fp_equality_macro = <<'ENDOFMACRO';
@@ -289,6 +289,71 @@ CODE
 0
 1
 0
+OUTPUT
+
+output_is(<< 'CODE', << 'OUTPUT', "append method");
+##PIR##
+.sub _main
+    .local pmc ar
+    .local pmc temp
+    ar = new ResizablePMCArray
+
+    temp = new PerlInt
+    set temp, 4
+    ar.append(temp)
+
+    temp = new PerlInt
+    set temp, 2
+    ar.append(temp)
+
+    .local pmc it
+    iter it, ar
+lp:
+    unless it goto done
+    $P0 = shift it
+    print $P0
+    print " "
+    goto lp
+done:
+    print "x\n"
+
+    end
+.end
+CODE
+4 2 x
+OUTPUT
+
+output_is(<< 'CODE', << 'OUTPUT', "inherited sort method");
+##PIR##
+.sub _main
+    .local pmc ar
+    ar = new ResizablePMCArray
+
+    ar[0] = 10
+    ar[1] = 2
+    ar[2] = 5
+    ar[3] = 9
+    ar[4] = 1
+
+    .local pmc cmp_fun
+    null cmp_fun
+    ar."sort"(cmp_fun)
+
+    .local pmc it
+    iter it, ar
+lp:
+    unless it goto done
+    $P0 = shift it
+    print $P0
+    print " "
+    goto lp
+done:
+    print "x\n"
+
+    end
+.end
+CODE
+1 2 5 9 10 x
 OUTPUT
 
 1;

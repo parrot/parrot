@@ -62,15 +62,25 @@ sort_ext_compare(void *a, void *b)
     return the_interp->int_reg.registers[5];
 }
 
-static void array_sort(Interp *interpreter, PMC *self, PMC *cmp_func)
-{
+pmclass FixedPMCArray need_ext does array {
+
+/*
+
+=item C<void* sort(PMC* cmp_func)>
+
+Sort this array, optionally using the provided cmp_func
+
+=cut
+
+*/
+METHOD void sort(PMC *cmp_func) {
     int (*func)(void*, void*);
     PMC *first;
     INTVAL type;
     PMC *s;
 
     if (REG_INT(3) == 0) {
-        first = ((PMC**)PMC_data(self))[0];
+        first = ((PMC**)PMC_data(SELF))[0];
         /* XXX simulate MMD inheritance: Int isa TT */
         type = first->vtable->base_type - 1;
         s = mmd_vtfind(interpreter, MMD_CMP, type, 0);
@@ -83,7 +93,7 @@ default_sort:
         func = sort_compare;
 use_func:
         the_interp = interpreter;
-        qsort(PMC_data(self), PMC_int_val(self), sizeof(PMC *),
+        qsort(PMC_data(SELF), PMC_int_val(SELF), sizeof(PMC *),
                 (int (*)(const void*, const void*))func);
     }
     else {
@@ -139,22 +149,13 @@ use_sub:
             interpreter->run_core = PARROT_SWITCH_CORE;
 #endif
         }
-        qsort(PMC_data(self), PMC_int_val(self), sizeof(PMC *),
+        qsort(PMC_data(SELF), PMC_int_val(SELF), sizeof(PMC *),
                 (int (*)(const void*, const void*))func);
         Parrot_restore_register_frames(interpreter, regs);
         interpreter->run_core = run_core;
     }
 }
 
-pmclass FixedPMCArray need_ext does array {
-
-    void class_init () {
-        if (pass) {
-            enter_nci_method(INTERP, enum_class_FixedPMCArray,
-                    F2DPTR(array_sort),
-                    "sort", "vIOP");
-        }
-    }
 /*
 
 =item C<void* invoke(void* next)>
