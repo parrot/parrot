@@ -69,6 +69,8 @@ global_setup$(O): $(H_FILES)
 
 resources$(O): $(H_FILES)
 
+platform$(O): $(H_FILES)
+
 string$(O): $(H_FILES)
 
 chartype$(O): $(H_FILES)
