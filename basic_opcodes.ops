@@ -106,24 +106,24 @@ AUTO_OP mod_i {
 **     ... the remainder when x is divided by y, and thus is zero when y
 **     divides x exactly.
 **     ...
-**     The direction of truncation for / and teh sign of the result for %
+**     The direction of truncation for / and the sign of the result for %
 **     are machine-dependent for negative operands, as is the action taken
-**     on overflow or underlfow.
+**     on overflow or underflow.
 **                                                          -- [1], page 41
 **
 ** Also:
 **
 **     ... if the second operand is 0, the result is undefined. Otherwise, it
-**     is always true that (a/b)*b + a%b is equal to z. I both operands are
-**     non-negative, then teh remainder is non-negative and smaller than the
+**     is always true that (a/b)*b + a%b is equal to z. If both operands are
+**     non-negative, then the remainder is non-negative and smaller than the
 **     divisor; if not, it is guaranteed only that the absolute value of the
 **     remainder is smaller than the absolute value of the divisor.
 **                                                          -- [1], page 205
 **
 ** This op is provided for those who need it (such as speed-sensitive
 ** applications with heavy use of mod, but using it only with positive
-** arguments), but a more mathematically useful numeric mod based on
-** floor(x/y) and defined with y == 0 is provided by the mod_i op.
+** arguments), but a more mathematically useful mod based on ** floor(x/y)
+** and defined with y == 0 is provided by the mod_i op.
 **
 **   [1] Brian W. Kernighan and Dennis M. Ritchie, *The C Programming
 **       Language*, Second Edition. Prentice Hall, 1988.
