@@ -90,6 +90,9 @@ print HEADER $preamble;
 print HEADER <<END_C;
 #include "parrot/parrot.h"
 
+#define REL_PC     ((size_t)(cur_opcode - (opcode_t *)interpreter->code->byte_code))
+#define CUR_OPCODE cur_opcode
+
 extern INTVAL    ${base}_numops;
 
 extern op_func_t ${base}_opfunc[$num_entries];
@@ -105,6 +108,44 @@ END_C
 
 print SOURCE $ops->preamble;
 
+
+#
+# Iterate over the ops, appending HEADER and SOURCE fragments:
+#
+
+my @op_funcs;
+my @op_func_table;
+
+my $index = 0;
+
+foreach my $op ($ops->ops) {
+    my $func_name  = $op->func_name;
+    my $arg_types  = "opcode_t *, struct Parrot_Interp *";
+    my $prototype  = "opcode_t * $func_name ($arg_types)";
+    my $args       = "opcode_t cur_opcode[], struct Parrot_Interp * interpreter";
+    my $definition = "static opcode_t *\n$func_name ($args)";
+    my $source     = $op->source(\&map_ret_abs, \&map_ret_rel, \&map_arg, \&map_res_abs, \&map_res_rel);
+
+#    print HEADER "$prototype;\n";
+
+    push @op_func_table, sprintf("  %-50s /* %6ld */\n", "$func_name,", $index++);
+    push @op_funcs,      "$definition {\n$source}\n\n";
+}
+
+print SOURCE <<END_C;
+
+/*
+** Op Function Definitions:
+*/
+
+END_C
+
+print SOURCE @op_funcs;
+
+#
+# Finish the SOURCE file's array initializer:
+#
+
 print SOURCE <<END_C;
 
 INTVAL ${base}_numops = $num_ops;
@@ -116,44 +157,14 @@ INTVAL ${base}_numops = $num_ops;
 op_func_t ${base}_opfunc[$num_entries] = {
 END_C
 
-
-#
-# Iterate over the ops, appending HEADER and SOURCE fragments:
-#
-
-my @op_funcs;
-my $index = 0;
-
-foreach my $op ($ops->ops) {
-    my $func_name  = $op->func_name;
-    my $arg_types  = "opcode_t *, struct Parrot_Interp *";
-    my $prototype  = "opcode_t * $func_name ($arg_types)";
-    my $args       = "opcode_t cur_opcode[], struct Parrot_Interp * interpreter";
-    my $definition = "opcode_t *\n$func_name ($args)";
-    my $source     = $op->source(\&map_ret_abs, \&map_ret_rel, \&map_arg, \&map_res_abs, \&map_res_rel);
-
-    print HEADER "$prototype;\n";
-    print SOURCE sprintf("  %-22s /* %6ld */\n", "$func_name,", $index++);
-
-    push @op_funcs, "$definition {\n$source}\n\n";
-}
-
-#
-# Finish the SOURCE file's array initializer:
-#
+print SOURCE @op_func_table;
 
 print SOURCE <<END_C;
   NULL
 };
 
 
-/*
-** Op Function Definitions:
-*/
-
 END_C
-
-print SOURCE @op_funcs;
 
 
 #
@@ -260,7 +271,7 @@ sub map_arg
 sub map_res_rel
 {
   my ($offset) = @_;
-  return "interpreter->resume_addr = cur_opcode + $offset";
+  return "interpreter->resume_offset = REL_PC + $offset; interpreter->resume_flag = 1";
 }
 
 
@@ -271,7 +282,7 @@ sub map_res_rel
 sub map_res_abs
 {
   my ($addr) = @_;
-  return "interpreter->resume_addr = $addr";
+  return "interpreter->resume_offset = $addr; interpreter->resume_flag = 1";
 }
 
 

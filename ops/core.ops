@@ -2128,7 +2128,7 @@ stack for later returning.
 =cut
 
 MANUAL_OP bsr(i|ic) {
-  push_generic_entry(interpreter, &interpreter->control_stack_top, cur_opcode + 2,  STACK_ENTRY_DESTINATION, NULL);
+  push_generic_entry(interpreter, &interpreter->control_stack_top, CUR_OPCODE + 2,  STACK_ENTRY_DESTINATION, NULL);
   RETREL($1);
 }
 
@@ -2183,10 +2183,8 @@ Take a built interpreter and run the code starting at offset $2
 =cut
 
 AUTO_OP runinterp(p, i|ic) {
-  struct PackFile local_file;
-  memcpy(&local_file, interpreter->code, sizeof(struct PackFile));
-  local_file.byte_code = (char *)(cur_opcode + $2);
-  runops($1->data, &local_file);
+  struct Parrot_Interp * new_interp = (struct Parrot_Interp *)$1->data;
+  runops(new_interp, interpreter->code, REL_PC + $2);
 }
 
 ########################################

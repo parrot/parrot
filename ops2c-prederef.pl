@@ -1,9 +1,12 @@
 #! /usr/bin/perl -w
 #
-# ops2c.pl
+# ops2c-prederef.pl
 #
 # Generate a C header and source file from the operation definitions in
 # an .ops file.
+#
+# This variant produces opfuncs that expect the args to be predereferenced
+# by the crystalizing loader and called from the crystalized runops.
 #
 
 use strict;
@@ -28,9 +31,9 @@ my $base = $file;
 $base =~ s/\.ops$//;
 
 my $incdir  = "include/parrot/oplib";
-my $include = "parrot/oplib/${base}_ops.h";
+my $include = "parrot/oplib/${base}_ops_prederef.h";
 my $header  = "include/$include";
-my $source  = "${base}_ops.c";
+my $source  = "${base}_ops_prederef.c";
 
 
 #
@@ -84,25 +87,28 @@ my $preamble = <<END_C;
 ** Any changes made here will be lost!
 */
 
+
 END_C
 
 print HEADER $preamble;
 print HEADER <<END_C;
 #include "parrot/parrot.h"
 
-#define REL_PC     ((size_t)(cur_opcode - (opcode_t *)interpreter->code->byte_code))
-#define CUR_OPCODE cur_opcode
 
-extern INTVAL    ${base}_numops;
+extern INTVAL    ${base}_numops_prederef;
 
-extern op_func_t ${base}_opfunc[$num_entries];
-extern op_info_t ${base}_opinfo[$num_entries];
+extern prederef_op_func_t ${base}_opfunc_prederef[$num_entries];
+extern op_info_t ${base}_opinfo_prederef[$num_entries];
 
 END_C
 
 print SOURCE $preamble;
 print SOURCE <<END_C;
 #include "$include"
+
+#define opcode_t void *
+#define REL_PC ((size_t)(cur_opcode - interpreter->prederef_code))
+#define CUR_OPCODE (((opcode_t *)interpreter->code->byte_code) + REL_PC)
 
 END_C
 
@@ -115,21 +121,20 @@ print SOURCE $ops->preamble;
 
 my @op_funcs;
 my @op_func_table;
-
 my $index = 0;
 
 foreach my $op ($ops->ops) {
-    my $func_name  = $op->func_name;
-    my $arg_types  = "opcode_t *, struct Parrot_Interp *";
-    my $prototype  = "opcode_t * $func_name ($arg_types)";
-    my $args       = "opcode_t cur_opcode[], struct Parrot_Interp * interpreter";
-    my $definition = "static opcode_t *\n$func_name ($args)";
+    my $func_name  = $op->func_name . "_prederef";
+    my $arg_types  = "void **, struct Parrot_Interp *";
+    my $prototype  = "void ** $func_name ($arg_types)";
+    my $args       = "void * cur_opcode[], struct Parrot_Interp * interpreter";
+    my $definition = "void **\n$func_name ($args)";
     my $source     = $op->source(\&map_ret_abs, \&map_ret_rel, \&map_arg, \&map_res_abs, \&map_res_rel);
 
-#    print HEADER "$prototype;\n";
+    print HEADER "$prototype;\n";
 
     push @op_func_table, sprintf("  %-50s /* %6ld */\n", "$func_name,", $index++);
-    push @op_funcs,      "$definition {\n$source}\n\n";
+    push @op_funcs, "$definition {\n$source}\n\n";
 }
 
 print SOURCE <<END_C;
@@ -142,30 +147,29 @@ END_C
 
 print SOURCE @op_funcs;
 
-#
-# Finish the SOURCE file's array initializer:
-#
 
 print SOURCE <<END_C;
 
-INTVAL ${base}_numops = $num_ops;
+INTVAL ${base}_numops_prederef = $num_ops;
 
 /*
 ** Op Function Table:
 */
 
-op_func_t ${base}_opfunc[$num_entries] = {
+prederef_op_func_t ${base}_opfunc_prederef[$num_entries] = {
 END_C
 
 print SOURCE @op_func_table;
+
+#
+# Finish the SOURCE file's array initializer:
+#
 
 print SOURCE <<END_C;
   NULL
 };
 
-
 END_C
-
 
 #
 # Op Info Table:
@@ -177,7 +181,7 @@ print SOURCE <<END_C;
 ** Op Info Table:
 */
 
-op_info_t ${base}_opinfo[$num_entries] = {
+op_info_t ${base}_opinfo_prederef[$num_entries] = {
 END_C
 
 $index = 0;
@@ -247,15 +251,15 @@ sub map_arg
   my %arg_maps = (
     'op' => "cur_opcode[%ld]",
 
-    'i'  => "interpreter->int_reg->registers[cur_opcode[%ld]]",
-    'n'  => "interpreter->num_reg->registers[cur_opcode[%ld]]",
-    'p'  => "interpreter->pmc_reg->registers[cur_opcode[%ld]]",
-    's'  => "interpreter->string_reg->registers[cur_opcode[%ld]]",
-  
-    'ic' => "cur_opcode[%ld]",
-    'nc' => "interpreter->code->const_table->constants[cur_opcode[%ld]]->number",
+    'i'  => "(*(INTVAL *)cur_opcode[%ld])",
+    'n'  => "(*(FLOATVAL *)cur_opcode[%ld])",
+    'p'  => "(*(PMC **)cur_opcode[%ld])",
+    's'  => "(*(STRING **)cur_opcode[%ld])",
+
+    'ic' => "(*(INTVAL *)&cur_opcode[%ld])",
+    'nc' => "(*(FLOATVAL *)cur_opcode[%ld])",
     'pc' => "%ld /* ERROR: Don't know how to handle PMC constants yet! */",
-    'sc' => "interpreter->code->const_table->constants[cur_opcode[%ld]]->string",
+    'sc' => "(*(STRING **)cur_opcode[%ld])",
   );
 
   die "Unrecognized type '$type' for num '$num' in opcode @{[$self->full_name]}" unless exists $arg_maps{$type};

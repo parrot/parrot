@@ -109,6 +109,7 @@ memory.c
 NEWS
 obscure.ops
 ops2c.pl
+ops2c-prederef.pl
 ops2pm.pl
 packfile.c
 Parrot/Assembler.pm

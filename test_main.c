@@ -22,22 +22,29 @@ main(int argc, char **argv) {
     int profiling;
     int tracing;
     int debugging;
+    int predereferencing;
 
     struct Parrot_Interp *interpreter;
     init_world();
   
     /*
-    ** Look for the '-d' debugging, '-b' bounds checking,
-    **          '-p' profiling and '-t' tracing switches.
+    ** Look for the switches:
+    **
+    **   -d  debugging
+    **   -b  bounds checking
+    **   -p  profiling
+    **   -P  predereferencing
+    **   -t  tracing
     **
     ** We really should use getopt, but are we allowed?
     */
 
-    flags           = 0;
-    bounds_checking = 0;
-    profiling       = 0;
-    tracing         = 0;
-    debugging       = 0;
+    flags            = 0;
+    bounds_checking  = 0;
+    profiling        = 0;
+    tracing          = 0;
+    debugging        = 0;
+    predereferencing = 0;
 
     while (argc > 1 && argv[1][0] == '-') {
         if (argv[1][1] == 'b' && argv[1][2] == '\0') {
@@ -49,6 +56,13 @@ main(int argc, char **argv) {
         }
         else if (argv[1][1] == 'p' && argv[1][2] == '\0') {
             profiling = 1;
+            for(i = 2; i < argc; i++) {
+                argv[i-1] = argv[i];
+            }
+            argc--;
+        }
+        else if (argv[1][1] == 'P' && argv[1][2] == '\0') {
+            predereferencing = 1;
             for(i = 2; i < argc; i++) {
                 argv[i-1] = argv[i];
             }
@@ -86,6 +100,10 @@ main(int argc, char **argv) {
 
     if (profiling) {
          flags |= PARROT_PROFILE_FLAG;
+    }
+
+    if (predereferencing) {
+         flags |= PARROT_PREDEREF_FLAG;
     }
 
     if (tracing) {
@@ -142,7 +160,7 @@ main(int argc, char **argv) {
         ** Run the interpreter loop:
         */
 
-        runops(interpreter, pf);
+        runops(interpreter, pf, 0);
         
         /*
         ** If any profile information was gathered, print it out:

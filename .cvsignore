@@ -1,4 +1,5 @@
 core_ops.c
+core_ops_prederef.c
 Makefile
 pdump
 parrot

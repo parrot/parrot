@@ -42,14 +42,19 @@ struct Parrot_Interp {
                                            that signal that runops
                                            should do something */
     INTVAL * profile;                     /* The array where we keep the profile counters */
-    opcode_t * resume_addr;
+
+    INTVAL resume_flag;
+    size_t resume_offset;
+
     struct PackFile * code;               /* The code we are executing */
+    void ** prederef_code;                /* The predereferenced code */
 };
 
-#define PARROT_DEBUG_FLAG   0x01  /* We're debugging */
-#define PARROT_TRACE_FLAG   0x02  /* We're tracing execution */
-#define PARROT_BOUNDS_FLAG  0x04  /* We're tracking byte code bounds */
-#define PARROT_PROFILE_FLAG 0x08  /* We're gathering profile information */
+#define PARROT_DEBUG_FLAG    0x01  /* We're debugging */
+#define PARROT_TRACE_FLAG    0x02  /* We're tracing execution */
+#define PARROT_BOUNDS_FLAG   0x04  /* We're tracking byte code bounds */
+#define PARROT_PROFILE_FLAG  0x08  /* We're gathering profile information */
+#define PARROT_PREDEREF_FLAG 0x10  /* We're using the prederef runops */
 
 #define PCONST(i) PF_CONST(interpreter->code, (i))
 #define PNCONST   PF_NCONST(interpreter->code)
@@ -61,7 +66,7 @@ void
 runops_generic();
 
 void
-runops(struct Parrot_Interp *, struct PackFile *);
+runops(struct Parrot_Interp *, struct PackFile *, size_t offset);
 
 #endif
 
