@@ -141,11 +141,11 @@ my(%c)=(
     debugging     => $opt_debugging,
     rm_f          => 'rm -f',
     rm_rf         => 'rm -rf',
-    stacklow      => '(~0xfff)U',
-    intlow        => '(~0xfff)U',
-    numlow        => '(~0xfff)U',
-    strlow        => '(~0xfff)U',
-    pmclow        => '(~0xfff)U',
+    stacklow      => '(~0xfff)UL',
+    intlow        => '(~0xfff)UL',
+    numlow        => '(~0xfff)UL',
+    strlow        => '(~0xfff)UL',
+    pmclow        => '(~0xfff)UL',
     make          => $Config{make},
     make_set_make => $Config{make_set_make},
         
@@ -701,7 +701,7 @@ sub lowbitmask {
         my $vector = unpack("b*", pack("V", $_));
         my $offset = rindex($vector, "1")+1;
         my $mask = 2**$offset - 1;
-        push @returns, "(~0x".sprintf("%x", $mask)."U)";
+        push @returns, "(~0x".sprintf("%x", $mask)."UL)";
     }
 
     return @returns;
