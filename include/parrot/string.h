@@ -53,7 +53,7 @@ struct parrot_string {
     INTVAL strlen;
     STRING_VTABLE* encoding;
     INTVAL type;
-    INTVAL unused;
+    INTVAL lanugage;
 };
 
 
