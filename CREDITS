@@ -20,6 +20,7 @@ D: Building on various platforms.
 N: Aldo Calpini
 
 N: Alex Gough
+D: bignum
 
 N: Andy Dougherty
 D: Config and building.
@@ -87,6 +88,9 @@ S: Seattle, WA
 
 N: H.Merijn Brand
 D: HP-UX fixes and smoke tests
+
+N: Ion Alexandru Morega
+D: string.pmc
 
 N: Jarkko Hietaniemi
 D: packfile and Tru64 fixes

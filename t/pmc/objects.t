@@ -16,7 +16,7 @@ Tests the object/class subsystem.
 
 =cut
 
-use Parrot::Test tests => 42;
+use Parrot::Test tests => 43;
 use Test::More;
 
 output_is(<<'CODE', <<'OUTPUT', "findclass (base class)");
@@ -1258,4 +1258,52 @@ output_is(<<'CODE', <<'OUTPUT', "PMC as classes - mmd methods");
 CODE
 42
 MyInt(42)
+OUTPUT
+
+output_is(<<'CODE', <<'OUTPUT', "PMC as classes - overrid mmd methods");
+##PIR##
+.sub main @MAIN
+  .local pmc MyInt
+  getclass $P0, "Integer"
+  subclass MyInt, $P0, "MyInt"
+  .local pmc i
+  .local pmc j
+  .local pmc k
+  $I0 = find_type "MyInt"
+  i = new $I0
+  j = new $I0
+  k = new $I0
+  i = 6
+  j = 7
+  .local pmc add_sub
+  add_sub = find_global "MyInt", "__add"
+  .include "mmd.pasm"
+  mmdvtregister .MMD_ADD, $I0, 0, add_sub
+  k = i + j
+  print k
+  print "\n"
+  j = new PerlInt
+  j = 100
+  k = i + j
+  print k
+  print "\n"
+.end
+
+.namespace ["MyInt"]
+.sub __add
+   .param pmc self
+   .param pmc right
+   .param pmc dest
+   print "in add\n"
+   $I0 = classoffset self, "MyInt"
+   $P0 = getattribute self, $I0
+   $I0 = $P0
+   $I1 = right
+   $I2 = $I0 + $I1
+   dest = $I2
+.end
+CODE
+in add
+13
+106
 OUTPUT
