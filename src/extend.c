@@ -45,6 +45,22 @@ Parrot_STRING Parrot_PMC_get_string(Parrot_INTERP interp, Parrot_PMC pmc) {
 
 /*
 
+=item C<Parrot_STRING 
+Parrot_PMC_get_string_intkey(Parrot_INTERP interp, Parrot_PMC pmc, Parrot_Int key)>
+
+Return the integer keyed string value of the passed-in PMC
+
+=cut
+
+*/
+
+Parrot_STRING Parrot_PMC_get_string_intkey(Parrot_INTERP interp, Parrot_PMC pmc, Parrot_Int key) {
+  return VTABLE_get_string_keyed_int(interp, pmc, key);
+}
+
+
+/*
+
 =item C<void *Parrot_PMC_get_pointer(Parrot_INTERP interp, Parrot_PMC pmc)>
 
 Returns a pointer. Used for PMCs that hold pointers to arbitrary data
