@@ -21,37 +21,34 @@ MAKE_F=${make}
 .c$(O):
 	$(CC) $(CFLAGS) ${ld_out}$@ -c $<
 
-all : default$(O) perlint$(O) perlnum$(O) perlstring$(O) perlarray$(O) perlundef$(O)
+all : $(O_FILES)
 
-default.c: default.pmc
+default.c default.h: default.pmc
 	$(PERL) pmc2c.pl default.pmc
 
 default$(O): $(H_FILES)
 
-default.h: default.c
-	$(PERL) -ne ${PQ}next unless /Parrot_default/; s/{/;/;s/^/extern /;print${PQ} default.c > default.h
-
-perlint.c: perlint.pmc 
+perlint.c perlint.h: perlint.pmc 
 	$(PERL) pmc2c.pl perlint.pmc
 
 perlint$(O): $(H_FILES)
 
-perlnum.c: perlnum.pmc 
+perlnum.c perlnum.h: perlnum.pmc 
 	$(PERL) pmc2c.pl perlnum.pmc
 
 perlnum$(O): $(H_FILES)
 
-perlstring.c: perlstring.pmc 
+perlstring.c perlstring.h: perlstring.pmc 
 	$(PERL) pmc2c.pl perlstring.pmc
 
 perlstring$(O): $(H_FILES)
 
-perlarray.c: perlarray.pmc 
+perlarray.c perlarray.h: perlarray.pmc 
 	$(PERL) pmc2c.pl perlarray.pmc
 
 perlarray$(O): $(H_FILES)
 
-perlundef.c: perlundef.pmc 
+perlundef.c perlundef.h: perlundef.pmc 
 	$(PERL) pmc2c.pl perlundef.pmc
 
 perlundef$(O): $(H_FILES)

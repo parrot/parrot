@@ -5,71 +5,13 @@
 # Generate a C source file from the methods defined in a .pmc file.
 #
 
+use FindBin;
+use lib "$FindBin::Bin/..";
+use Parrot::Vtable;
 use strict;
 
-sub extract_balanced {
-    my $balance = 0;
-    for(shift) {
-        s/^\s+//;
-        /^\{/ or die "bad block open: ".substr($_,0,10),"..."; # }
-        while(/(\{)|(\})/g) {
-            if($1) {
-                $balance++;
-            } else { # $2
-                --$balance or return (substr($_, 0, pos, ""),  $_);
-            }
-        }
-        die "Badly balanced" if $balance;
-    }
-}
-
-sub Usage {
-    print STDERR <<_EOF_;
-usage: $0 class.pmc [class2.pmc ...]\n";
-_EOF_
-    exit 1;
-}
-
-#
-# Process command-line argument:
-#
-
-Usage() unless @ARGV;  
-
-while (my $file = shift @ARGV) {
-
-  my $base = $file;
-  $base =~ s/\.pmc$//;  
-  my $cfile = "$base.c";
-
-  die "$0: Could not read class file '$file'!\n" unless -e $file; 
-  
-  open (PMC, $file) || die "$0: Unable to open file '$file'\n";  
-  my @contents = <PMC>;
-  my $contents = join('', @contents);
-  close PMC;
-      
-  my $coutput = filter($contents);     # run the filter
-
-  open (SOURCE, ">$cfile") || die "$0: Could not write file '$cfile'\n";
-  print SOURCE $coutput;  
-  close SOURCE;
-}
-
-my %flags;
-
-sub filter {
-  my $contents = shift;
-    
-  $contents =~ s/^([^{]*)pmclass ([\w]*)//s; 
-  my ($pre, $classname) = ($1, $2); 
-
-  $flags{$1}++ while $contents =~ s/^\s*(\w+)//s;
-
-  my ($classblock, $post) = extract_balanced($contents,);
-  $classblock = substr($classblock, 2,-1); # trim out the { }
-
-  my $signature_re = qr{
+my %default = parse_vtable("$FindBin::Bin/../vtable.tbl");
+my $signature_re = qr{
     ^
     (?:             #blank spaces and comments
       [\n\s]*
@@ -81,55 +23,227 @@ sub filter {
     (\w+)         #method name
     \s*    
     \(([^\(]*)\)  #parameters
-  }sx;
-  
+}sx;
+
+sub extract_balanced {
+    my $balance = 0;
+    my $lines = 0;
+    for(shift) {
+        s/^(\s+)//;
+        $lines += count_newlines($1);
+        /^\{/ or die "bad block open: ".substr($_,0,10),"..."; # }
+        while(/(\{)|(\})/g) {
+            if($1) {
+                $balance++;
+            } else { # $2
+                --$balance or return (substr($_, 0, pos, ""),  $_, $lines);
+            }
+        }
+        die "Badly balanced" if $balance;
+    }
+}
+
+sub parse_superpmc {
+  local $_ = shift;
+
+  my ($classname) = s/(?:.*?)^\s*pmclass ([\w]*)//ms;
+
+  my $superpmc = 'default';
+  my $saw_extends;
+  while (s/^(\s*)(\w+)//s) {
+      if ($saw_extends) {
+          $superpmc = $2;
+          last;
+      } elsif ($2 eq 'extends') {
+          $saw_extends = 1;
+      }
+  }
+
+  my ($classblock) = extract_balanced($_);
+  $classblock = substr($classblock, 1,-1); # trim out the { }
 
   my @methods;
 
-  my $OUT;
-  my %default;
+  while ($classblock =~ s/($signature_re)//) {
+     my $methodname = $3;
+     next if ($classblock =~ s/^(\s*=\s*default;?\s*)//s);
+     push @methods, $methodname;
+     (undef, $classblock) = extract_balanced($classblock);
+  }
 
-  while ($classblock =~ s/$signature_re//) {
-     my ($type, $methodname, $parameters) = ($1,$2,$3);
+  return \@methods, $superpmc;
+}
+
+sub superpmc_info {
+    my $pmc = shift;
+    my $filename = "$FindBin::Bin/\L$pmc\E.pmc";
+    print "Scanning $filename...\n";
+    local $/;
+    open(SUPERPMC, $filename) or die "open superpmc file $filename: $!";
+    my $data = <SUPERPMC>;
+    close SUPERPMC;
+    return parse_superpmc($data);
+}
+
+sub scan_inheritance_tree {
+    my ($class) = @_;
+
+    my %methods; # { methodname => class }
+    while ($class ne 'default') {
+        my ($methods, $super) = superpmc_info($class);
+        foreach my $method (@$methods) {
+            $methods{$method} ||= $class;
+        }
+        $class = $super;
+    }
+
+    foreach my $method (@{ $default{order} }) {
+        $methods{$method} ||= 'default';
+    }
+
+    return \%methods;
+}
+
+sub Usage {
+    print STDERR <<_EOF_;
+usage: $0 class.pmc [--no-lines] [class2.pmc ...]
+  --no-lines suppresses #line directives
+_EOF_
+    exit 1;
+}
+
+#
+# Process command-line arguments:
+#
+
+my $suppress_lines;
+Usage() unless @ARGV;
+if ($ARGV[0] eq '--no-lines') {
+    $suppress_lines = 1;
+    shift(@ARGV);
+}
+
+while (my $file = shift @ARGV) {
+
+  my $base = $file;
+  $base =~ s/\.pmc$//;  
+  my $cfile = "$base.c";
+  my $hfile = "$base.h";
+
+  die "$0: Could not read class file '$file'!\n" unless -e $file; 
+  
+  open (PMC, $file) || die "$0: Unable to open file '$file'\n";  
+  my @contents = <PMC>;
+  my $contents = join('', @contents);
+  close PMC;
+      
+  my ($coutput, $houtput) = filter($contents, $file, $cfile); # run the filter
+
+  open (SOURCE, ">$cfile") || die "$0: Could not write file '$cfile'\n";
+  print SOURCE $coutput;  
+  close SOURCE;
+
+  open (SOURCE, ">$hfile") || die "$0: Could not write file '$hfile'\n";
+  print SOURCE $houtput;
+  close SOURCE;
+}
+
+my %flags;
+
+sub count_newlines {
+    return scalar(() = $_[0] =~ /\n/g);
+}
+
+sub filter {
+  my ($contents, $pmcfile, $cfile) = @_;
+  my $lineno = 1;
+    
+  $contents =~ s/^(.*?^\s*)pmclass ([\w]*)//ms; 
+  my ($pre, $classname) = ($1, $2);
+  $lineno += count_newlines($1);
+
+  my $methodloc = scan_inheritance_tree($classname);
+
+  my $saw_extends;
+  my $superpmc = 'default';
+  while ($contents =~ s/^(\s*)(\w+)//s) {
+      $lineno += count_newlines($1);
+      if ($saw_extends) {
+          $superpmc = $2;
+          $saw_extends = 0;
+      } elsif ($2 eq 'extends') {
+          $saw_extends = 1;
+      } else {
+          $flags{$2}++;
+      }
+  }
+
+  my ($classblock, $post, $lines) = extract_balanced($contents);
+  $lineno += $lines;
+  $classblock = substr($classblock, 1,-1); # trim out the { }
+
+  my @methods;
+
+  my $OUT = '';
+  my $HOUT = '';
+  my %defaulted;
+
+  while ($classblock =~ s/($signature_re)//) {
+     $lineno += count_newlines($1);
+     my ($type, $methodname, $parameters) = ($2,$3,$4);
 
      $parameters = ", $parameters" if $parameters =~ /\w/;
-     if ($classblock =~ s/^\s*= default;?\s*//s) {
-        $default{$methodname}++;
+     if ($classblock =~ s/^(\s*=\s*default;?\s*)//s) {
+        $lineno += count_newlines($1);
+        $defaulted{$methodname}++;
         push @methods, $methodname;
         next;
      }
-     
-     my ($methodblock, $rema) = extract_balanced($classblock);
+
+     my ($methodblock, $rema, $lines) = extract_balanced($classblock);
+     $lineno += $lines;
   
      $methodblock =~ s/SELF/pmc/g;
      $methodblock =~ s/INTERP/interpreter/g;
     
-     $OUT .= "$type Parrot_" . $classname. "_" . "$methodname (struct Parrot_Interp *interpreter, PMC* pmc$parameters)";      
+     my $decl = "$type Parrot_${classname}_${methodname} (struct Parrot_Interp *interpreter, PMC* pmc$parameters)";
+     $OUT .= $decl;
+     $HOUT .= "extern $decl;\n";
+     $OUT .= "\n#line $lineno \"$pmcfile\"\n   " unless $suppress_lines;
      $OUT .= $methodblock;
      $OUT .= "\n\n";
 
+     $lineno += count_newlines($methodblock);
      $classblock = $rema;
      push @methods, $methodname;
-     };
+  };
 
-  @methods = map {(exists $default{$_} ? "Parrot_default" : 
-                                         "Parrot_$classname") 
-                  ."_$_"} @methods;
+  @methods = map { "Parrot_$methodloc->{$_}_$_" } @{ $default{order} };
+
   my $methodlist = join (",\n        ", @methods);
   my $initname = "Parrot_$classname" . "_class_init";
- 
-  if (keys %default) {
-      $OUT = "#include \"default.h\"\n\n".$OUT;
+
+  my %visible_supers;
+  @visible_supers{values %$methodloc} = ();
+
+  my $includes = '';
+  foreach my $class (keys %visible_supers) {
+      next if $class eq $classname;
+      $includes .= qq(#include "\L$class.h"\n);
   }
 
   $OUT = <<EOC . $OUT;
+ /* Do not edit - automatically generated from '$pmcfile' by $0 */
 $pre
-
+${includes}
 static STRING* whoami;
 
 EOC
 
-$OUT .= <<EOC unless exists $flags{noinit};
+  unless (exists $flags{noinit}) {
+      my $initline = 1+count_newlines($OUT)+1;
+      $OUT .= qq(#line $initline "$cfile"\n) unless $suppress_lines;
+      $OUT .= <<EOC;
 
 void $initname (void) {
 
@@ -149,8 +263,7 @@ void $initname (void) {
    Parrot_base_vtables[enum_class_$classname] = temp_base_vtable;
 }
 EOC
+  }
 
-  return $OUT;
+  return ($OUT, $HOUT);
 }
-  
-
