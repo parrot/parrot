@@ -20,7 +20,8 @@ typedef enum {
 typedef enum {
     PARROT_ERRORS_ALL_FLAG      = 0xFF,
     PARROT_ERRORS_NONE_FLAG     = 0x00,
-    PARROT_ERRORS_GLOBALS_FLAG  = 0x01
+    PARROT_ERRORS_GLOBALS_FLAG  = 0x01,
+    PARROT_ERRORS_OVERFLOW_FLAG = 0x02
 } Errors_classes;
 
 /* &end_gen */

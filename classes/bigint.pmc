@@ -83,10 +83,26 @@ bigint_add_bigint(Interp *interpreter, PMC* self, PMC *value, PMC *dest)
 }
 
 static void
+bigint_add_bigint_int(Interp *interpreter, PMC* self, INTVAL value,
+        PMC *dest)
+{
+    mpz_t v;
+    mpz_init_set_si(v, (long)value);
+    VTABLE_morph(interpreter, dest, enum_class_BigInt);
+    mpz_add(BN(dest), BN(self), v);
+    mpz_clear(v);
+}
+static void
 bigint_mul_bigint(Interp *interpreter, PMC* self, PMC *value, PMC *dest)
 {
     VTABLE_morph(interpreter, dest, enum_class_BigInt);
     mpz_mul(BN(dest), BN(self), BN(value));
+}
+
+static INTVAL
+bigint_cmp(Interp *interpreter, PMC* self, PMC *value)
+{
+    return mpz_cmp(BN(self), BN(value));
 }
 
 #else
@@ -131,9 +147,20 @@ bigint_add_bigint(Interp *interpreter, PMC* self, PMC *value, PMC *dest)
     internal_exception(1, "no bigint lib loaded");
 }
 static void
+bigint_add_bigint_int(Interp *interpreter, PMC* self, INTVAL value, PMC *dest)
+{
+    internal_exception(1, "no bigint lib loaded");
+}
+static void
 bigint_mul_bigint(Interp *interpreter, PMC* self, PMC *value, PMC *dest)
 {
     internal_exception(1, "no bigint lib loaded");
+}
+static INTVAL
+bigint_cmp(Interp *interpreter, PMC* self, PMC *value)
+{
+    internal_exception(1, "no bigint lib loaded");
+    return 0;
 }
 #endif
 
@@ -317,6 +344,10 @@ MMD_DEFAULT: {
              }
 
     }
+    void add_int(INTVAL value, PMC* dest) {
+        bigint_add_bigint_int(INTERP, SELF, value, dest);
+    }
+
     void mul(PMC* value, PMC* dest) {
 MMD_BigInt: {
                 bigint_mul_bigint(INTERP, SELF, value, dest);
@@ -325,6 +356,9 @@ MMD_DEFAULT: {
                  internal_exception(1, "unimp");
              }
 
+    }
+    INTVAL cmp(PMC* value) {
+        return bigint_cmp(INTERP, SELF, value);
     }
 }
 

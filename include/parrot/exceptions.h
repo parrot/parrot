@@ -74,6 +74,7 @@ void do_panic(struct Parrot_Interp *interpreter, const char *message,
 #define WRITE_TO_CONSTCLASS 7
 #define NOSPAWN 8
 #define INTERNAL_NOT_IMPLEMENTED 9
+#define ERR_OVERFLOW 10
 
 /* &end_gen */
 

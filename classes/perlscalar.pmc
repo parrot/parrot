@@ -55,6 +55,12 @@ Morphs the scalar to the specified type.
             SELF->vtable = Parrot_base_vtables[type];
             return;
         }
+        if (type == enum_class_BigInt) {
+            PMC_str_val(SELF) = NULL;
+            SELF->vtable = Parrot_base_vtables[type];
+            DYNSELF.init();
+            return;
+        }
         SELF->vtable = Parrot_base_vtables[type];
     }
 

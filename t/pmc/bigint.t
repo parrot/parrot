@@ -21,7 +21,7 @@ use Test::More;
 use Parrot::Config;
 
 if ($PConfig{gmp}) {
-   plan tests => 4;
+   plan tests => 5;
 }
 else {
    plan skip_all => "No BigInt Lib configured";
@@ -76,3 +76,31 @@ CODE
 999999000000
 OUT
 
+output_is(<<'CODE', <<'OUT', "add overflow");
+   new P0, .PerlInt
+   set P0, 2000000000
+   new P1, .PerlInt
+   set P1, 100000000
+   new P2, .PerlInt
+   new P3, .BigInt
+   set I3, 3
+lp:
+   add P2, P0, P1
+   set S0, P2
+   print S0
+   print " "
+   typeof S1, P2
+   print S1
+   print "\n"
+   add P1, 100000000
+   dec I3
+   if I3, lp
+   print "ok\n"
+ex:
+   end
+CODE
+2100000000 PerlInt
+2200000000 BigInt
+2300000000 BigInt
+ok
+OUT

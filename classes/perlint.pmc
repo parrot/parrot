@@ -22,6 +22,28 @@ C<PerlInt> extends C<perlscalar> to provide a Perl integer.
 #include "parrot/perltypes.h"
 #include <assert.h>
 
+static void
+overflow(Interp *interpreter, PMC *self, INTVAL b, PMC *dest, int mmd)
+{
+    PMC *temp;
+    INTVAL a = PMC_int_val(self);
+
+    if (PARROT_ERRORS_test(interpreter,PARROT_ERRORS_OVERFLOW_FLAG)) {
+        real_exception(interpreter, NULL, ERR_OVERFLOW,
+                "Integer overflow");
+    }
+    if (self == dest) {
+        VTABLE_morph(interpreter, self, enum_class_BigInt);
+        VTABLE_set_integer_native(interpreter, self, a);
+        mmd_dispatch_v_pip(interpreter, self, b, dest, mmd);
+    }
+    else {
+        temp = pmc_new(interpreter, enum_class_BigInt);
+        VTABLE_set_integer_native(interpreter, temp, a);
+        mmd_dispatch_v_pip(interpreter, temp, b, dest, mmd);
+    }
+}
+
 pmclass PerlInt extends perlscalar {
 
 /*
@@ -148,9 +170,8 @@ Morphs the integer to a C<PerlNum> and sets the value from C<value>.
 
 */
     void set_bignum (PMC* value) {
-        /* XXX not sure if this can be optimized further safely */
-        PMC_struct_val(SELF) = (DPOINTER*)VTABLE_get_bignum(INTERP, value);
-        /* SELF->vtable = Parrot_base_vtables[enum_class_PerlBigNum]; */
+        DYNSELF.morph(enum_class_BigInt);
+        DYNSELF.set_bignum(value);
     }
 
 /*
@@ -161,9 +182,8 @@ Morphs the integer to a C<PerlNum> and sets the value from C<value>.
 
 */
     void set_bignum_native (BIGNUM* value) {
-        /* XXX Some of this bignum stuff is starting to look pretty redundant -DML */
-        PMC_struct_val(SELF) = value; /* Maybe we need a copy */
-        /* SELF->vtable = Parrot_base_vtables[enum_class_PerlBignum]; */
+        DYNSELF.morph(enum_class_BigInt);
+        DYNSELF.set_bignum_native(value);
     }
 
 /*
@@ -206,8 +226,26 @@ two types.
 =cut
 
 */
+    void add_int (INTVAL b, PMC* dest) {
+        INTVAL a = PMC_int_val(SELF);
+        INTVAL c = a + b;
+        if ((c^a) >= 0 || (c^b) >= 0)
+            VTABLE_set_integer_native(INTERP, dest, c);
+        else
+            overflow(INTERP, SELF, b, dest, MMD_ADD_INT);
+    }
+
     void add (PMC* value, PMC* dest) {
 MMD_PerlInt: {
+        INTVAL a = PMC_int_val(SELF);
+        INTVAL b = PMC_int_val(value);
+        INTVAL c = a + b;
+        if ((c^a) >= 0 || (c^b) >= 0)
+            VTABLE_set_integer_native(INTERP, dest, c);
+        else
+            overflow(INTERP, SELF, b, dest, MMD_ADD_INT);
+        }
+MMD_Integer: {
         VTABLE_set_integer_native(INTERP, dest,
             PMC_int_val(SELF) + PMC_int_val(value));
         }
@@ -315,8 +353,7 @@ Multiplies the integer by C<*value> and returns the result in C<*dest>.
             if (mulf == muli)
                 VTABLE_set_integer_native(INTERP, dest, muli);
             else {
-                /* TODO BIG* promotion */
-                VTABLE_set_number_native(INTERP, dest, mulf);
+                overflow(INTERP, SELF, vali, dest, MMD_MULTIPLY_INT);
             }
             return;
 
