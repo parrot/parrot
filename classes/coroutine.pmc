@@ -33,6 +33,34 @@ stopped. See the L<Glossary|docs/glossary.pod> for more information.
 #include "parrot/parrot.h"
 #include "parrot/method_util.h"
 
+/*
+ * XXX put these into exceptions.h
+ */
+
+
+#define TRY \
+    do { \
+        new_internal_exception(interpreter); \
+        if (!setjmp(interpreter->exceptions->destination))
+
+#define CATCH \
+    else
+
+#define ENDTRY \
+    } while(0); \
+    do { \
+        Parrot_exception *e = interpreter->exceptions; \
+        interpreter->exceptions = e->prev; \
+        interpreter->exc_free_list = e; \
+    } while(0)
+
+
+#define THROW(e)  \
+    do { \
+	exceptions->err = e; \
+	longjmp(exceptions->dest, 1); \
+    } while(0)
+
 pmclass Coroutine extends Continuation {
 
 /*
@@ -72,11 +100,15 @@ Swaps the "context".
          */
         if (PObj_get_FLAGS(SELF) & PObj_private3_FLAG) {
             PMC *ret;
+            struct Parrot_Sub * coro;
             /* this works only once, the generated isn't reusable
              * inside e.g. range()
              * so, return a clone of ourself
              */
             REG_PMC(5) = ret = pmc_new(INTERP, enum_class_Coroutine);
+            coro = (parrot_sub_t)PMC_sub(ret);
+            coro->end = sub->end;
+
             PObj_get_FLAGS(ret) |= PObj_private1_FLAG; /* fixup done */
             PObj_get_FLAGS(ret) &= ~PObj_private3_FLAG;
             PMC_struct_val(ret) = PMC_struct_val(SELF);
@@ -90,6 +122,48 @@ Swaps the "context".
             Parrot_switch_to_cs(interpreter, sub->seg, 1);
         }
         return dest;
+    }
+
+/*
+
+=item C<PMC* shift_pmc>)
+
+Run the coroutine until it yields a value. The call to the coroutine
+is actually done in C<the_sub> below, a piece of inlined PASM code
+
+=cut
+
+*/
+
+    PMC* shift_pmc() {
+        PMC *res;
+        struct Parrot_Sub * sub = (struct Parrot_Sub *)PMC_sub(SELF);
+        opcode_t the_sub[] =
+            { 904, 0, 5,        /* set_p_p P0, P5 */
+              39,               /* invokecc */
+              0                 /* end */
+            };
+        void * regs = Parrot_save_register_frames(interpreter, SELF);
+        opcode_t offset;
+        PMC *ex;
+
+        REG_PMC(5) = SELF;
+        offset = the_sub - interpreter->code->byte_code;
+        /*
+         * we should also catch exceptions here, so that register
+         * frames are restores - same as with all such code
+         */
+        runops_int(interpreter, offset);
+        res = REG_PMC(5);
+        /*
+         * the generator return None, when it's finished
+         */
+        if (res == Parrot_base_vtables[enum_class_None]->data) {
+            Parrot_restore_register_frames(interpreter, regs);
+            real_exception(interpreter, NULL, E_StopIteration, "StopIteration");
+        }
+        Parrot_restore_register_frames(interpreter, regs);
+        return res;
     }
 
 /*

@@ -176,8 +176,8 @@ find_exception_handler(Parrot_Interp interpreter, PMC *exception)
                         NULL, e->entry_type);
         if (e->entry_type == STACK_ENTRY_PMC) {
             handler = UVal_pmc(e->entry);
-            if (handler &&
-                    handler->vtable->base_type == enum_class_Exception_Handler) {
+            if (handler && handler->vtable->base_type ==
+                    enum_class_Exception_Handler) {
                 return handler;
             }
         }

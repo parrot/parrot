@@ -1267,18 +1267,6 @@ EOC
 	$throw $cmt
 EOC
 }
-sub SETUP_LOOP
-{
-    my ($n, $c, $cmt) = @_;
-    my $targ = "pc_xxx";
-    if ($c =~ /to (\d+)/) {
-	$targ = "pc_$1";
-    }
-    push @loops, $targ;
-    print <<EOC;
-	# -> $targ $cmt
-EOC
-}
 sub GET_ITER
 {
     my ($n, $c, $cmt) = @_;
@@ -1311,27 +1299,11 @@ EOC
     }
     print <<EOC;
 	unless $iter goto $targ # $tos->[0]
-	$var = $iter() $cmt
-	eq_addr $var, None, $targ
+	$var = shift $iter $cmt
 EOC
     push @stack, [-1, $var, 'P']
 }
 
-sub POP_BLOCK
-{
-    my ($n, $c, $cmt) = @_;
-    if (@loops) {
-	my $pc = pop @loops;
-	print <<EOC;
-	# $pc  $cmt
-EOC
-    }
-    else {
-	print <<EOC;
-	\t\t$cmt
-EOC
-    }
-}
 
 sub UNPACK_SEQUENCE
 {
@@ -1429,6 +1401,46 @@ sub END_FINALLY
 EOC
 }
 
+sub SETUP_LOOP
+{
+    my ($n, $c, $cmt) = @_;
+    my $targ = "pc_xxx";
+    if ($c =~ /to (\d+)/) {
+	$targ = "pc_$1";
+    }
+    push @loops, $targ;
+    my $eh = temp('P');
+    print <<EOC;
+	newsub $eh, .Exception_Handler, $targ $cmt
+	set_eh $eh
+EOC
+}
+sub POP_BLOCK
+{
+    my ($n, $c, $cmt) = @_;
+    if (@loops) {
+	my $pc = pop @loops;
+	print <<EOC;
+	# $pc  $cmt
+	clear_eh
+EOC
+    }
+    else {
+	print <<EOC;
+	\t\t$cmt
+EOC
+    }
+}
+
+sub BREAK_LOOP
+{
+    my ($n, $c, $cmt) = @_;
+    my $pc = pop @loops;
+    print <<EOC;
+	goto $pc $cmt
+EOC
+}
+
 sub BUILD_CLASS
 {
     my ($n, $c, $cmt) = @_;
@@ -1441,16 +1453,6 @@ sub BUILD_CLASS
 EOC
     push @stack, ["class $tos->[1]", $cl, 'P'];
 }
-
-sub BREAK_LOOP
-{
-    my ($n, $c, $cmt) = @_;
-    my $pc = pop @loops;
-    print <<EOC;
-	goto $pc $cmt
-EOC
-}
-
 sub LOAD_ATTR
 {
     my ($n, $c, $cmt) = @_;

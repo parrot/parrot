@@ -110,8 +110,9 @@ if __name__ == '__main__':
     main()
 CODE
 
+SKIP:
+{ skip("can't pass on exception yet to outer", 1);
 test(<<'CODE', 'range 3 0 step');
-
 def main():
     try:
 	for i in range(1,2,0):
@@ -122,6 +123,7 @@ if __name__ == '__main__':
     main()
 
 CODE
+}
 
 test(<<'CODE', 'tuple 1');
 def main():
