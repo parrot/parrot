@@ -103,7 +103,7 @@ while(<>) {
 		    while(scalar(@{$local_fixup{$label}})) {
 			my $op_pc=shift(@{$local_fixup{$label}});
 			my $offset=shift(@{$local_fixup{$label}});
-			substr($bytecode,$offset,4)=pack('l',($pc-$op_pc)/4);
+			substr($bytecode,$offset,$sizeof{'i'})=pack('l',($pc-$op_pc)/$sizeof{'i'});
 		    }
 		    delete($local_fixup{$label});  
 		}
@@ -118,7 +118,7 @@ while(<>) {
 		    while(scalar(@{$fixup{$label}})) {
 			my $op_pc=shift(@{$fixup{$label}});
 			my $offset=shift(@{$fixup{$label}});
-			substr($bytecode,$offset,4)=pack('l',($pc-$op_pc)/4);
+			substr($bytecode,$offset,$sizeof{'i'})=pack('l',($pc-$op_pc)/$sizeof{'i'});
 		    }
 		    delete($fixup{$label});  
 		}
@@ -213,7 +213,7 @@ while(<>) {
     }
     $bytecode .= pack "l", $opcodes{$opcode}{CODE};
     $op_pc=$pc;
-    $pc+=4;
+    $pc+=$sizeof{'i'};
     
     foreach (0..$#args) {
 	my($rtype)=$opcodes{$opcode}{TYPES}[$_];
@@ -231,7 +231,7 @@ while(<>) {
 		    push(@{$local_fixup{$args[$_]}},$op_pc,$pc);
 		    $args[$_]=0xffffffff;
 		} else {                    
-		    $args[$_]=($local_label{$args[$_]}-$op_pc)/4;
+		    $args[$_]=($local_label{$args[$_]}-$op_pc)/$sizeof{'i'};
 		}
 	    } else {
 		if(!exists($label{$args[$_]})) {
@@ -239,7 +239,7 @@ while(<>) {
 		    push(@{$fixup{$args[$_]}},$op_pc,$pc);
 		    $args[$_]=0xffffffff;
 		} else {                    
-		    $args[$_]=($label{$args[$_]}-$op_pc)/4;
+		    $args[$_]=($label{$args[$_]}-$op_pc)/$sizeof{'i'};
 		}
 	    }
 	    $pc+=$sizeof{$rtype};
