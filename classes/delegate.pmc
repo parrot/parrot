@@ -178,6 +178,10 @@ useful defaults and don't throw exceptiions.
         /* don't delegate destroy */
     }
 
+    void mark() {
+        /* don't mark destroy */
+    }
+
     PMC* instantiate() {
         STRING *meth = const_string(interpreter,
                 PARROT_VTABLE_INSTANTIATE_METHNAME);
@@ -188,6 +192,14 @@ useful defaults and don't throw exceptiions.
             return SUPER();
         }
         return (PMC*) Parrot_run_meth_fromc(interpreter, sub, SELF, meth);
+    }
+
+    void add_method(STRING *method_name, PMC *sub_pmc) {
+        SUPER(method_name, sub_pmc);
+    }
+
+    STRING* namespace_name () {
+        return SUPER();
     }
 }
 

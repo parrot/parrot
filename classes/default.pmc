@@ -358,6 +358,10 @@ C<type_keyed()> with it.
 
 Returns the name of the PMC.
 
+=item C<STRING *namespace_name()>
+
+Returns the namespace name of the PMC.
+
 =cut
 
 */
@@ -366,12 +370,21 @@ Returns the name of the PMC.
         return SELF->vtable->whoami;
     }
 
+    STRING* namespace_name () {
+        return SELF->vtable->whoami;
+    }
+
+
 /*
 
 =item C<PMC *find_method(STRING *method_name)>
 
 Looks up the method for C<*method_name> and returns it. If no method is
 found then C<NULL> is returned.
+
+=item C<void add_method(STRING *method_name, PMC *sub)>
+
+Store the method as a global in the namespace of this class.
 
 =cut
 
@@ -382,6 +395,10 @@ found then C<NULL> is returned.
         return Parrot_find_method_with_cache(INTERP, SELF, method_name);
     }
 
+    void add_method(STRING *method_name, PMC *sub_pmc) {
+        STRING *names = DYNSELF.namespace_name();
+        Parrot_store_global(interpreter, names, method_name, sub_pmc);
+    }
 /*
 
 =item C<INTVAL get_integer_keyed_int(INTVAL key)>

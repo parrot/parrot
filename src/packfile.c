@@ -2882,7 +2882,8 @@ static void
 store_sub_in_namespace(Parrot_Interp interpreter, struct PackFile *pf,
         PMC* sub_pmc, STRING* key, int ns)
 {
-    PMC * globals = interpreter->globals->stash_hash;
+    PMC *globals = interpreter->globals->stash_hash;
+    INTVAL type;
 
 #if TRACE_PACKFILE_PMC
     fprintf(stderr, "PMC_CONST: store_global: name '%s' ns %d\n",
@@ -2914,10 +2915,30 @@ global_ns:
                 names = pfc_const->u.string;
                 if (!string_length(interpreter, names))
                     goto global_ns;
-                Parrot_store_global(interpreter, names, key, sub_pmc);
+                /*
+                 * if the namespace is a class, call add_method
+                 * on that class PMC
+                 */
+                type = pmc_type(interpreter, names);
+                if (type > enum_type_undef) {
+                    PMC *class;
+                    VTABLE *vtable;
+                    vtable = Parrot_base_vtables[type];
+                    if (!vtable)
+                        internal_exception(1, "empty vtable '%Ss'", names);
+                    class = (PMC*)vtable->data;
+                    if (!class)
+                        internal_exception(1, "empty class '%Ss'", names);
+                    VTABLE_add_method(interpreter, class, key, sub_pmc);
+                }
+                else
+                    Parrot_store_global(interpreter, names, key, sub_pmc);
                 break;
             case PFC_KEY:
                 part = pfc_const->u.key;
+                /*
+                 * TODO handle nested keys too with add_method
+                 */
                 for (; part; part = PMC_data(part)) {
                     STRING *s = key_string(interpreter, part);
 #if TRACE_PACKFILE_PMC
