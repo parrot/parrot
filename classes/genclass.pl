@@ -38,6 +38,9 @@ for (@{$vtbl}) {
     my ($retval, $methname, $args) = @{$_};
     
     print "    $retval $methname ($args) {\n";
+    if($methname eq "name") {
+        print "        return whoami\;\n";
+    }
     print "    }\n\n";
 }
 
