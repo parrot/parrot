@@ -44,6 +44,10 @@ pmclass Sub {
        SELF->cache.struct_val = (void *)value;
    }
 
+   INTVAL get_integer () {
+       return (INTVAL) SELF->cache.struct_val;
+   }
+
    INTVAL defined () {
        return SELF->cache.struct_val != NULL;
    }

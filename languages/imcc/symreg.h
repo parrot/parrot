@@ -86,13 +86,13 @@ struct namespace_t {
 EXTERN Namespace * namespace;
 /* functions */
 
-SymReg * mk_symreg(char *, char t);
-SymReg * mk_temp_reg(char t);
-SymReg * mk_ident(char *, char t);
-SymReg * mk_const(char *, char t);
-SymReg * mk_const_ident(char *, char t, SymReg *, int);
+SymReg * mk_symreg(char *, int t);
+SymReg * mk_temp_reg(int t);
+SymReg * mk_ident(char *, int t);
+SymReg * mk_const(char *, int t);
+SymReg * mk_const_ident(char *, int t, SymReg *, int);
 SymReg * mk_address(char *, int uniq);
-SymReg * mk_pcc_sub(char *, char proto);
+SymReg * mk_pcc_sub(char *, int proto);
 void add_pcc_arg(SymReg *r, SymReg * arg);
 void add_pcc_sub(SymReg *r, SymReg * arg);
 void add_pcc_cc(SymReg *r, SymReg * arg);
@@ -125,8 +125,8 @@ void store_symreg(SymReg * r);
 SymReg * find_sym(const char * name);
 SymReg * get_sym(const char * name);
 SymReg * _get_sym(SymReg * hash[], const char * name);
-SymReg * _mk_symreg(SymReg* hash[],char * name, char t);
-SymReg * _mk_const(SymReg *hash[], char * name, char t);
+SymReg * _mk_symreg(SymReg* hash[],char * name, int t);
+SymReg * _mk_const(SymReg *hash[], char * name, int t);
 void _store_symreg(SymReg *hash[], SymReg * r);
 SymReg * _mk_address(SymReg *hash[], char * name, int uniq);
 SymReg * link_keys(int nargs, SymReg *keys[]);

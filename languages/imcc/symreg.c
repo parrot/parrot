@@ -45,7 +45,7 @@ void pop_namespace(char * name) {
 /* symbolic registers */
 
 /* Makes a new SymReg from its varname and type */
-SymReg * _mk_symreg(SymReg* hsh[],char * name, char t) {
+SymReg * _mk_symreg(SymReg* hsh[],char * name, int t) {
     SymReg * r;
     if((r = _get_sym(hsh, name)) && r->set == t) {
 	free(name);
@@ -67,18 +67,18 @@ SymReg * _mk_symreg(SymReg* hsh[],char * name, char t) {
     return r;
 }
 
-SymReg * mk_symreg(char * name, char t) {
+SymReg * mk_symreg(char * name, int t) {
     return _mk_symreg(hash, name, t);
 }
 
-SymReg * mk_temp_reg(char t) {
+SymReg * mk_temp_reg(int t) {
     char buf[128];
     static int temp;
     sprintf(buf, "__imcc_temp_%d", ++temp);
     return mk_symreg(str_dup(buf), t);
 }
 
-SymReg * mk_pcc_sub(char * name, char proto) {
+SymReg * mk_pcc_sub(char * name, int proto) {
     SymReg *r = _mk_symreg(hash, name, proto);
     r->type = VT_PCC_SUB;
     r->pcc_sub = calloc(1, sizeof(struct pcc_sub_t));
@@ -170,7 +170,7 @@ char * mk_fullname(const char * name) {
 }
 
 /* Makes a new identifier */
-SymReg * mk_ident(char * name, char t) {
+SymReg * mk_ident(char * name, int t) {
     char * fullname = _mk_fullname(namespace, name);
     Identifier * ident;
     SymReg * r;
@@ -188,7 +188,7 @@ SymReg * mk_ident(char * name, char t) {
 
 /* Makes a new identifier constant with value val */
 SymReg *
-mk_const_ident(char *name, char t, SymReg *val, int global)
+mk_const_ident(char *name, int t, SymReg *val, int global)
 {
     SymReg *r;
     if (global)
@@ -201,14 +201,14 @@ mk_const_ident(char *name, char t, SymReg *val, int global)
 }
 
 /* Makes a new constant*/
-SymReg * _mk_const(SymReg *hsh[], char * name, char t) {
+SymReg * _mk_const(SymReg *hsh[], char * name, int t) {
     SymReg * r = _mk_symreg(hsh, name, t);
     r->type = VTCONST;
     r->use_count++;
     return r;
 }
 
-SymReg * mk_const(char * name, char t) {
+SymReg * mk_const(char * name, int t) {
     return _mk_const(ghash, name, t);
 }
 

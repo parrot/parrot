@@ -1,6 +1,10 @@
+- 2003-08-10	leo
+
+	* PCC: experimental tail call optimization with -Oc
+
 - 2003-08-09	leo
 
-	* PCC: fix nestes subs (resperve ret continuation)
+	* PCC: fix nested subs (preserve ret continuation)
 	* PCC: fix multiple return blocks
 
 	* SYNTAX:

@@ -1,6 +1,6 @@
 #!perl
 use strict;
-use TestCompiler tests => 5;
+use TestCompiler tests => 6;
 
 # these tests are run with -Oc by TestCompiler and show
 # generated PASM code for call optimization
@@ -251,3 +251,60 @@ _sub:
   invoke P1/
 OUT
 
+output_like(<<'CODE', <<'OUT', "tail call");
+.sub _main
+    .local Sub sub
+    newsub sub, .Sub, _sub1
+    .pcc_begin prototyped
+    .pcc_call sub
+    ret:
+    .pcc_end
+    end
+.end
+.pcc_sub _sub1 prototyped
+    .local Sub sub
+    newsub sub, .Sub, _sub2
+    .pcc_begin prototyped
+    .arg P16
+    .pcc_call sub
+    ret:
+    .result P16
+    .pcc_end
+    .pcc_begin_return
+    .return P16
+    .pcc_end_return
+.end
+.pcc_sub _sub2 prototyped
+    .pcc_begin_return
+    .pcc_end_return
+.end
+CODE
+/_main:
+        newsub P0, \d+, _sub1
+#pcc_sub_call_\d+:
+        set I0, 1
+        null I1
+        null I2
+        null I3
+        invokecc
+ret:
+        end
+_sub1:
+        set P17, P1
+        newsub P17, \d+, _sub2
+#pcc_sub_call_\d+:
+        set P5, P16
+        set I16, P17
+        jump I16
+ret:
+#pcc_sub_ret_\d+:
+_sub2:
+#pcc_sub_ret_\d+:
+        set I0, 1
+        null I1
+        null I2
+        null I3
+        null I4
+        invoke P1
+/
+OUT

@@ -406,6 +406,88 @@ overflow:
     }
 }
 
+/*
+ * check for a sequence of
+ *   .pcc_begin
+ *   ... [1]
+ *   .pcc_end
+ *   .pcc_begin_return
+ *   ... [2]
+ *   .pcc_end_return
+ *   <end>
+ * with the results in [1] matching return values in [2]
+ */
+static int
+check_tail_call(Parrot_Interp interpreter, Instruction *ins)
+{
+    Instruction *tmp, *ret_ins;
+    int call_found, ret_found;
+    int i, j, matching;
+    struct pcc_sub_t *call, *ret;
+    /*
+     * currently only with -Oc
+     */
+    UNUSED(interpreter);
+    if (!(optimizer_level & OPT_SUB))
+        return 0;
+    for (i = call_found = ret_found = 0, tmp = ins; tmp && i < 4;
+            tmp = tmp->next) {
+        ++i;    /* ins count */
+        if (tmp->opnum == -1 && (tmp->type & ITPCCSUB)) {
+            if (tmp->type & ITLABEL) {
+                ++ret_found;
+                ret_ins = tmp;
+            }
+            else
+                ++call_found;
+
+        }
+    }
+    if (i == 3 && call_found == 1 && ret_found == 1 && !tmp) {
+        debug(DEBUG_OPT1, "check tail call %s \n", ins_string(ins));
+    }
+    else
+        return 0;
+    /*
+     * now check results vs returns
+     */
+    call = ins->r[0]->pcc_sub;
+    ret = ret_ins->r[0]->pcc_sub;
+    debug(DEBUG_OPT1, "\tcall results %d retvals %d\n", call->nret, ret->nret);
+    if (call->nret != ret->nret)
+        return 0;
+    for (matching = i = 0; i < call->nret; i++) {
+        SymReg *c, *r;
+        c = call->ret[i];
+        for (j = 0; j < ret->nret; j++) {
+            r = ret->ret[i];
+            if (!strcmp(c->name, r->name) &&
+                    c->set == r->set)
+                ++matching;
+        }
+    }
+    if (matching != call->nret)
+        return 0;
+    /*
+     * deactivate the return sequence
+     */
+    ret_ins->type = 0;
+
+    return 1;
+}
+
+static void
+insert_tail_call(Parrot_Interp interpreter, Instruction *ins, SymReg *sub)
+{
+    SymReg *iaddr = mk_temp_reg('I');
+    SymReg *regs[IMCC_MAX_REGS];
+
+    regs[0] = iaddr;
+    regs[1] = sub->pcc_sub->sub;
+    ins = insINS(interpreter, ins, "set", regs, 2);
+    ins = insINS(interpreter, ins, "jump", regs, 1);
+}
+
 void
 expand_pcc_sub_call(Parrot_Interp interpreter, Instruction *ins)
 {
@@ -417,7 +499,11 @@ expand_pcc_sub_call(Parrot_Interp interpreter, Instruction *ins)
     char buf[128];
     SymReg *p3;
     int n_p3;
+    int tail_call;
 
+    tail_call = check_tail_call(interpreter, ins);
+    if (tail_call)
+        debug(DEBUG_OPT1, "found tail call %s \n", ins_string(ins));
     for (i = 0; i < 4; i++)
         next[i] = 5;
     sub = ins->r[0];
@@ -488,6 +574,15 @@ overflow:
             n_p3++;
         }
     }
+    /*
+     * if we have a tail call then
+     * insert a jump
+     */
+    if (tail_call) {
+        insert_tail_call(interpreter, ins, sub);
+        return;
+    }
+
     /*
      * setup P0, P1
      */
@@ -663,7 +758,7 @@ optc_savetop(Parrot_Interp interpreter, Instruction *ins)
             tmp = INS(interpreter, new_save[i], NULL, regs, 0, 0, 0);
             subst_ins(ins, tmp, 1);
             debug(DEBUG_OPT1, "%s\n", ins_string(tmp));
-            for (; ins ; ins = ins->next)
+            for (ins = tmp; ins ; ins = ins->next)
                 if (!strcmp(ins->op, "restoretop"))
                     break;
             debug(DEBUG_OPT1, "opt1 %s => ", ins_string(ins));
