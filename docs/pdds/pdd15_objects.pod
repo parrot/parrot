@@ -9,15 +9,19 @@ Object and Class semantics for Parrot
     Maintainer: Dan Sugalski
     Class: Internals
     PDD Number: 15
-    Version: 1.1
+    Version: 1.2
     Status: Developing
-    Last Modified: March 11, 2003
+    Last Modified: February 09, 2004
     PDD Format: 1
     Language: English
 
 =head2 HISTORY
 
 =over 4
+
+=item Version 1.2
+
+February 9, 2004
 
 =item Version 1.1
 
@@ -32,6 +36,10 @@ None. First version
 =head1 CHANGES
 
 =over 4
+
+=item Version 1.2
+
+A complete overhaul from the original spec.
 
 =item Version 1.1
 
@@ -58,207 +66,126 @@ isn't strictly necessary.
 
 =head1 DESCRIPTION
 
-This PDD lays out two separate things.
-
-The first is the object semantics, as presented to user programs. This
-means that code has an object PMC, and wants to do Object Things with
-it. Object semantics are reasonably simple, and will be defined in a bit.
-
-The second is class semantics. Class semantics are rather more
-complex, and can't really be dealt with in a generic way, such that
-all classes are compatible. As such this PDD lays out Parrot's default
-class semantics, and it is assumed that languages that need different
-semantics will then do whatever they need to, provided that the
-objects they create are generically usable.
-
-Please see the glossary for definitions of the various terms.
-
-=head2 Object interfaces
-
-Objects must present the following interface to the outside
-world. Note that these are required of PMCs in general, but objects
-are presumed to actually do something useful with these things rather
-than just (potentially) throwing an exception.
-
-Any PMC that meets these criteria can be considered an object. Objects
-do I<not> have to have corresponding classes, though it's a fairly
-common occurrence.
+This is a reasonably straightforward object system. It assumes that
+objects have:
 
 =over 4
 
-=item Get and set properties
+=item *
 
-Strictly speaking, getting and setting properties is a PMC thing
-rather than an object thing, as PMCs are all capable of having
-properties. Nevertheless, properties are put into the object bag, as
-many systems use properties to note object attributes.
+An array of attributes
 
-Note that methods and properties may share a namespace, depending on
-the language backing the PMC. Generally methods override properties,
-so doing a get or set of a property on an object that has a method of
-the same name will call that method in rvalue or lvalue context,
-respectively.
+=item *
 
-=item Get a property hash
+A parent class
 
-Returns a hash PMC with all the properties and their values in
-it. This generally should have no activity associated with it, and be
-a plain key/value hash. Usually used for introspective purposes.
+=item *
 
-=item Call a method
-
-Methods are called by name. The object's method dispatch vtable entry
-is responsible for doing the actual method dispatch, in whatever way
-it deems necessary.
-
-Note that it is perfectly acceptable, and common, for methods and
-properties to share a namespace, with the methods overriding the
-properties. That is, you may fetch property "foo", but if there is a
-method "foo" as well, the return value will be the return from method
-"foo" rather than property "foo". This behaviour is not required, however.
-
-=item Get a method PMC
-
-This returns a method PMC for the named method, which can be called
-at a later time. This may return a "no method" PMC which throws an
-exception if the object is unable to return a method PMC.
-
-This PMC should be for the I<current> definition of the method. If
-the method later changes, this method PMC should not be
-affected. (Wrapping the method doesn't count, as wrapping methods and
-subs is considered an in-place activity)
-
-=item Check if a PMC can perform a method
-
-Checks, by name, to see if the PMC can perform the method. 
-
-=item Check if a PMC implements an interface
-
-Checks to see if the PMC can implement the interface
-
-=item Check if a PMC is a member or child of a class
-
-Checks to see if the PMC is a member of, or child of, a
-particular class.
+A custom (though possibly class-wide) vtable
 
 =back
 
-=head2 Object internals
-
-Parrot's standard object is based around an attribute container,
-essentially an array of attributes. Any object tagged with the
-C<is_base_object> bit can be assumed to ultimately be derived from
-this base object, and thus behave like a base object. If the bit's
-not set, it's not safe to assume so.
-
-Note that object access doesn't allow you to alter the object's
-structure, just get info and get/set attributes values. Object
-structure alteration has to be done via the class either directly or
-via the alterations to a parent class which get delegated down.
+and that you can:
 
 =over 4
 
-=item Get attribute by slot
+=item *
 
-Fetch the value for an attribute from the object's attribute catalog
+Call a method on an object
 
-=item Set attribute by slot
+=item *
 
-Set the value of an object's attribute slot
+Get a method PMC for a method for an object (for deferred method calls)
 
-=item get attribute catalog
+=item *
 
-Get the catalog of attributes. This is a hash of classes and attribute
-offsets for the fixed attributes, and a hash of fully qualified
-attribute name and offset pairs. (A fully qualified attribute name is
-of the form CLASS::ATTRIBUTE) Generally the class base offset is used
-most often, as most attributes are created at compile time for a
-class. The fully qualified form is intended mostly for attributes
-added to classes at runtime.
+Fetch the class for an object
 
-=item get class base offset
+=item *
 
-This gets the base attribute offset for a class. 
+Subclass an existing object (note that objects may not necessarily be
+able to have their classes changed arbitrarily, but making a subclass
+and moving the object to it is allowable)
+
+=item *
+
+Get an attribute by name or offset
+
+=item *
+
+Set an attribute by name or offset
 
 =back
 
-=head2 Classes
+Additionally we assume that I<all> objects can have properties on
+them, as all PMCs can have properties. The property get/set method may
+be overridden on a per-class basis as any other vtable method may be.
 
-Default classes are objects of class Class. Like the object
-internals, classes aren't required as such by parrot.
-
-Classes all have the following attributes:
+For classes, we assume that:
 
 =over 4
 
-=item ISA
+=item *
+
+Classes have an associated namespace. (Which may be anonymous)
+
+=item *
+
+Classes have one or more immediate parent classes
+
+=item *
+
+Classes have a catalog of attribute names and offsets for all
+attributes.
+
+=item *
+
+Classes have a list of interfaces they implement
 
 =back
+
+And we further assume that classes can:
+
+=over 4
+
+=item *
+
+Instantiate an object of their class
+
+=item *
+
+Add parent classes
+
+=item *
+
+Remove parent classes
+
+=item *
+
+Add attributes
+
+=item *
+
+Remove attributes
+
+=item *
+
+Add interfaces
+
+=item *
+
+remove interfaces
+
+=back
+
+This list is likely not definitive, but it's enough to start
+with. It also doesn't address the semantics of method calls, which
+need to be dealt with, possibly separately. With that in mind, the
+object system supports these features with a combination of PMC
+classes (not to be confused with object classes) and opcodes.
 
 =head1 IMPLEMENTATION
 
-Note that because this describes the "blessed" parrot object system,
-we snag flag bits. Nyah. [Note to self: Remove this when the PDD goes final]
-
-
-=head2 Flag bits
-
-=over 4
-
-=item is_delegate
-
-If the is_delegate bit is set in the PMC's header, the object is a
-delegate of a parent object, and the method call should be made on
-the parent instead.
-
-Generally this bit will only be used if the method dispatch vtable
-entry doesn't already know whether the PMC it's part of is a delegate
-object or not.
-
-The correct behaviour is, when doing a method call on this PMC, to
-find its __PARENT property, which has the PMC for the parent PMC, and
-dispatch to that instead.
-
-=item is_base_object
-
-If set, the PMC is ultimately derived from Parrot's base object type,
-the attribute container class.
-
-=back
-
-=head2 Properties
-
-The following are 'reserved' object properties. In general the
-interpreter reserves anything with a leading double-underscore, but
-that's a matter for another PDD.
-
-=over 4
-
-=item __PARENT
-
-Object property. The value is the PMC for the parent object, the one
-encapsulating this one.
-
-=item __IS
-
-Class property. An array of the immediate superclasses.
-
-=item __GRANDS
-
-Class property. An array of I<all> the super classes, flattened, in
-search order.
-
-=item __HAS
-
-Class property. An array of the interfaces this class implements.
-
-=back
-
-=head2 Object Interface
-
-=head2 Object guts
-
-=head2 Classes
 
 =head1 TRANSLATION AND GLOSSARY
 
