@@ -1,5 +1,5 @@
 /*
-Copyright: 2001-2004 The Perl Foundation.  All Rights Reserved.
+Copyright: 2001-2005 The Perl Foundation.  All Rights Reserved.
 $Id$
 
 =head1 NAME
@@ -10,13 +10,13 @@ src/nci_test.c - shared library used for testing the Native Call Interface
 
 From this code a shared library can be compiled and linked with a command like:
 
-   cc -shared -fpic nci_test.c -o libnci.so -g
+   cc -shared -fpic nci_test.c -o libnci_test.so -g
 
 For non-Unix platforms the above command has to be modified appropriately.
 
 The resulting shared library should be copied to a location like:
 
-   parrot/runtime/parrot/dynext/libnci.so
+   parrot/runtime/parrot/dynext/libnci_test.so
 
 At that location the shared library is loadable with the opcode 'loadlib'.
 The functions in the library are available with the opcode 'dlfunc'.
@@ -38,7 +38,7 @@ The name of a test function is usually 'nci_<signature>'. E.g. the function
 
 Declarations.
 
-*** If you add a new test function here, please update libnci.def too. ***
+*** If you add a new test function here, please update libnci_test.def too. ***
 
 */
 

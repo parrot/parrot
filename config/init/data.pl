@@ -1,5 +1,6 @@
 #! perl -w
-# Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+
+# Copyright: 2001-2005 The Perl Foundation.  All Rights Reserved.
 # $Id$
 
 =head1 NAME
@@ -149,7 +150,8 @@ sub runstep {
     icu_make      => '# Building of ICU disabled',
     buildicu      => 0,
 
-    ncilib_link_extra => '',              # Extra flags needed for libnci.so
+    # Extra flags needed for libnci_test.so
+    ncilib_link_extra => '',           
 
   );
 

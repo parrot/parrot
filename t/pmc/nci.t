@@ -1,6 +1,6 @@
 #! perl -w
 
-# Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+# Copyright: 2001-2005 The Perl Foundation.  All Rights Reserved.
 # $Id$
 
 =head1 NAME
@@ -14,7 +14,7 @@ t/pmc/nci.t - Native Call Interface
 =head1 DESCRIPTION
 
 This tests the Native Call Interface, that is the ParrotLibrary PMC.
-Most tests are skipped when the F<libnci.so> library is not found.
+Most tests are skipped when the F<libnci_test.so> shared library is not found.
 
 =head1 SEE ALSO
 
@@ -28,13 +28,13 @@ use Parrot::Test tests => 48;
 use Parrot::Config;
 
 SKIP: {
-unless ( -e "runtime/parrot/dynext/libnci" . $PConfig{load_ext} ) {
-    skip( "Please make libnci$PConfig{load_ext}",
+unless ( -e "runtime/parrot/dynext/libnci_test$PConfig{load_ext}" ) {
+    skip( "Please make libnci_test$PConfig{load_ext}",
           Test::Builder->expected_tests() );
 }
 
 output_is(<<'CODE', <<'OUTPUT', "nci_dd - PASM");
-  loadlib P1, "libnci"
+  loadlib P1, "libnci_test"
   print "loaded\n"
   dlfunc P0, P1, "nci_dd", "dd"
   print "dlfunced\n"
@@ -68,14 +68,14 @@ output_is( << 'CODE', << 'OUTPUT', "nci_dd - PIR" );
 ##PIR##
 .sub _test @MAIN
     .local string library_name
-    library_name = 'libnci'
-    .local pmc libnci
-    libnci = loadlib  library_name
-    unless libnci goto NOT_LOADED
+    library_name = 'libnci_test'
+    .local pmc libnci_test
+    libnci_test = loadlib  library_name
+    unless libnci_test goto NOT_LOADED
     print library_name
     print " was successfully loaded\n"
     .local pmc twice
-    twice = dlfunc libnci, "nci_dd", "dd"
+    twice = dlfunc libnci_test, "nci_dd", "dd"
     .local float r
     r = twice( -4.128 )
     print r
@@ -83,7 +83,7 @@ NOT_LOADED:
     print "\n"
 .end
 CODE
-libnci was successfully loaded
+libnci_test was successfully loaded
 -8.256000
 OUTPUT
 
@@ -92,15 +92,15 @@ output_is( << 'CODE', << "OUTPUT", "get_string()" );
 ##PIR##
 .sub _test @MAIN
     .local string library_name
-    library_name = 'libnci'
-    .local pmc libnci
-    libnci = loadlib  library_name
-    unless libnci goto NOT_LOADED
+    library_name = 'libnci_test'
+    .local pmc libnci_test
+    libnci_test = loadlib  library_name
+    unless libnci_test goto NOT_LOADED
         .local string filename_with_path
-        filename_with_path = libnci
+        filename_with_path = libnci_test
         # depending on the platform, 'filename' has path info or not
         .local int start_of_filename
-        start_of_filename = index filename_with_path, 'libnci'
+        start_of_filename = index filename_with_path, 'libnci_test'
         if start_of_filename == -1 goto NOT_LOADED
             .local string filename
             filename = substr filename_with_path, start_of_filename
@@ -110,12 +110,12 @@ output_is( << 'CODE', << "OUTPUT", "get_string()" );
     print "\n"
 .end
 CODE
-libnci$PConfig{load_ext} was successfully loaded
+libnci_test$PConfig{load_ext} was successfully loaded
 OUTPUT
 
 
 output_is(<<'CODE', <<'OUTPUT', "nci_fff");
-  loadlib P1, "libnci"
+  loadlib P1, "libnci_test"
   print "loaded\n"
   dlfunc P0, P1, "nci_fff", "fff"
   print "dlfunced\n"
@@ -147,7 +147,7 @@ OUTPUT
 
 
 output_is(<<'CODE', <<'OUTPUT', "nci_isc");
-  loadlib P1, "libnci"
+  loadlib P1, "libnci_test"
   print "loaded\n"
   dlfunc P0, P1, "nci_isc", "isc"
   print "dlfunced\n"
@@ -179,7 +179,7 @@ OUTPUT
 
 
 output_is(<<'CODE', <<'OUTPUT', "nci_ssc");
-  loadlib P1, "libnci"
+  loadlib P1, "libnci_test"
   print "loaded\n"
   dlfunc P0, P1, "nci_ssc", "ssc"
   print "dlfunced\n"
@@ -211,7 +211,7 @@ OUTPUT
 
 
 output_is(<<'CODE', <<'OUTPUT', "nci_csc");
-  loadlib P1, "libnci"
+  loadlib P1, "libnci_test"
   print "loaded\n"
   dlfunc P0, P1, "nci_csc", "csc"
   print "dlfunced\n"
@@ -253,7 +253,7 @@ OUTPUT
 
 
 output_is(<<'CODE', <<'OUTPUT', "nci_it");
-  loadlib P1, "libnci"
+  loadlib P1, "libnci_test"
   printerr "loaded\n"
   dlfunc P0, P1, "nci_it", "it"
   printerr "dlfunced\n"
@@ -283,7 +283,7 @@ OUTPUT
 
 
 output_is(<<'CODE', <<'OUTPUT', "nci_tt");
-  loadlib P1, "libnci"
+  loadlib P1, "libnci_test"
   print "loaded\n"
   dlfunc P0, P1, "nci_tt", "tt"
   print "dlfunced\n"
@@ -313,7 +313,7 @@ OUTPUT
 
 
 output_is(<<'CODE', <<'OUTPUT', "nci_dd - stress test");
-  loadlib P1, "libnci"
+  loadlib P1, "libnci_test"
   print "loaded\n"
   set I10, 10000
   print "dlfunced\n"
@@ -348,7 +348,7 @@ OUTPUT
 
 
 output_is(<<'CODE', <<'OUTPUT', "nci_dd - clone");
-  loadlib P1, "libnci"
+  loadlib P1, "libnci_test"
   print "loaded\n"
   dlfunc P0, P1, "nci_dd", "dd"
   print "dlfunced\n"
@@ -390,7 +390,7 @@ OUTPUT
 
 
 output_is(<<'CODE', <<'OUTPUT', "nci_iiii");
-  loadlib P1, "libnci"
+  loadlib P1, "libnci_test"
   dlfunc P0, P1, "nci_iiii", "iiii"
   set I0, 1	# prototype used - unchecked
   set I5, 10
@@ -407,7 +407,7 @@ OUTPUT
 
 
 output_is(<<'CODE', <<'OUTPUT', "nci_i4i");
-  loadlib P1, "libnci"
+  loadlib P1, "libnci_test"
   dlfunc P0, P1, "nci_i4i", "i4i"
   new P5, .PerlInt
   set P5, -6
@@ -423,7 +423,7 @@ OUTPUT
 
 output_is(<<'CODE', <<'OUTPUT', "nci_ii3");
 .include "datatypes.pasm"
-  loadlib P1, "libnci"
+  loadlib P1, "libnci_test"
   dlfunc P0, P1, "nci_ii3", "ii3"
   set I5, -6
 
@@ -447,7 +447,7 @@ OUTPUT
 
 
 output_is(<<'CODE', <<'OUTPUT', "nci_tb");
-  loadlib P1, "libnci"
+  loadlib P1, "libnci_test"
   dlfunc P0, P1, "nci_tb", "tb"
   set S5, "ko\n"
   invoke
@@ -459,7 +459,7 @@ OUTPUT
 
 
 output_is(<<'CODE', <<'OUTPUT', "nci_tB");
-  loadlib P1, "libnci"
+  loadlib P1, "libnci_test"
   dlfunc P0, P1, "nci_tB", "tB"
   set S5, "ko\n"
   invoke
@@ -471,7 +471,7 @@ OUTPUT
 
 
 output_is(<<'CODE', <<'OUTPUT', "nci_pi - struct with ints");
-  loadlib P1, "libnci"
+  loadlib P1, "libnci_test"
   dlfunc P0, P1, "nci_pi", "pi"
   # this test function returns a struct { int[2]; char }
   set I5, 0
@@ -503,7 +503,7 @@ OUTPUT
 
 
 output_is(<<'CODE', <<'OUTPUT', "nci_pi - struct with floats");
-  loadlib P1, "libnci"
+  loadlib P1, "libnci_test"
   dlfunc P0, P1, "nci_pi", "pi"
   # this test function returns a struct { float[2]; double }
   set I5, 1
@@ -535,7 +535,7 @@ OUTPUT
 
 
 output_like(<<'CODE', <<'OUTPUT', "nci_pi - align");
-  loadlib P1, "libnci"
+  loadlib P1, "libnci_test"
   dlfunc P0, P1, "nci_pi", "pi"
   # this test function returns a struct { char; int }
   set I5, 2
@@ -569,7 +569,7 @@ OUTPUT
 
 
 output_is(<<'CODE', <<'OUTPUT', "nci_pi - char*");
-  loadlib P1, "libnci"
+  loadlib P1, "libnci_test"
   dlfunc P0, P1, "nci_pi", "pi"
   # this test function returns a struct { char*; int }
   set I5, 3
@@ -597,7 +597,7 @@ OUTPUT
 
 
 output_is(<<'CODE', <<'OUTPUT', "nci_pi - nested struct *");
-  loadlib P1, "libnci"
+  loadlib P1, "libnci_test"
   dlfunc P0, P1, "nci_pi", "pi"
   # this test function returns a struct { char; x->{int, double} }
   set I5, 4
@@ -652,7 +652,7 @@ OUTPUT
 
 
 output_is(<<'CODE', <<'OUTPUT', "nci_pi - nested struct * w named access");
-  loadlib P1, "libnci"
+  loadlib P1, "libnci_test"
   dlfunc P0, P1, "nci_pi", "pi"
   set I5, 8  # test fun number
   invoke
@@ -722,7 +722,7 @@ OUTPUT
 
 
 output_is(<<'CODE', <<'OUTPUT', "nci_pi - func_ptr* with signature");
-  loadlib P1, "libnci"
+  loadlib P1, "libnci_test"
   dlfunc P0, P1, "nci_pi", "pi"
   # this test function returns a struct { int (*f)(char *) }
   set I5, 5
@@ -752,7 +752,7 @@ OUTPUT
 
 
 output_is(<<'CODE', <<'OUTPUT', "nci_pi - nested struct aligned");
-  loadlib P1, "libnci"
+  loadlib P1, "libnci_test"
   dlfunc P0, P1, "nci_pi", "pi"
   # this test function returns a struct { int; {int; int} int }
   set I5, 6
@@ -807,7 +807,7 @@ OUTPUT
 
 
 output_is(<<'CODE', <<'OUTPUT', "nci_pi - nested struct unaligned");
-  loadlib P1, "libnci"
+  loadlib P1, "libnci_test"
   dlfunc P0, P1, "nci_pi", "pi"
   # this test function returns a struct { char; {char; int} char }
   set I5, 7
@@ -862,7 +862,7 @@ OUTPUT
 
 
 output_is(<<'CODE', <<'OUTPUT', "nci_pi - nested, unaligned, named");
-  loadlib P1, "libnci"
+  loadlib P1, "libnci_test"
   dlfunc P0, P1, "nci_pi", "pi"
   # this test function returns a struct { char; {char; int} char }
   set I5, 7
@@ -923,14 +923,14 @@ output_is( << 'CODE', << "OUTPUT", "nci_pi - int");
 .sub _test @MAIN
 
   # load library
-  .local pmc libnci
-  libnci = loadlib "libnci"
-  unless libnci goto NOT_LOADED
-  print "libnci was successfully loaded\n"
+  .local pmc libnci_test
+  libnci_test = loadlib "libnci_test"
+  unless libnci_test goto NOT_LOADED
+  print "libnci_test was successfully loaded\n"
 
-  # calling a function in libnci
+  # calling a function in libnci_test
   .local pmc nci_pi
-  dlfunc nci_pi, libnci, "nci_pi", "pi"
+  dlfunc nci_pi, libnci_test, "nci_pi", "pi"
   .local pmc nci_pi_out
   ( nci_pi_out ) = nci_pi( 9 )
 
@@ -950,13 +950,13 @@ NOT_LOADED:
   end
 .end
 CODE
-libnci was successfully loaded
+libnci_test was successfully loaded
 55555
 OUTPUT
 
 
 output_is(<<'CODE', <<'OUTPUT', "nci_ip");
-  loadlib P1, "libnci"
+  loadlib P1, "libnci_test"
   dlfunc P0, P1, "nci_ip", "ip"
   # this test function wants a struct
   # { double d; float f; int i; char*}
@@ -1002,7 +1002,7 @@ OUTPUT
 
 
 output_is(<<'CODE', <<'OUTPUT', "nci_vP");
-  loadlib P1, "libnci"
+  loadlib P1, "libnci_test"
   dlfunc P0, P1, "nci_vP", "vP"
   new P5, .PerlString
   set P5, "ok\n"
@@ -1031,7 +1031,7 @@ output_is(<<'CODE', <<'OUTPUT', "nci_cb_C1 - PASM");
   new_callback P5, P6, P7, "tU"	# Z in pdd16
   print "ok 1\n"
   # now call the external sub, that takes a call_back and user_data
-  loadlib P1, "libnci"
+  loadlib P1, "libnci_test"
   dlfunc P0, P1, "nci_cb_C1", "vpP"
   print "ok 2\n"
   # P5 is the cb
@@ -1101,10 +1101,10 @@ output_is(<<'CODE', <<'OUTPUT', "nci_cb_C1 - PIR");
     print "created a callback sub\n"
 
     # now call the external sub, that takes a callback and user data
-    .local pmc libnci
-    libnci = loadlib "libnci"
+    .local pmc libnci_test
+    libnci_test = loadlib "libnci_test"
     .local pmc nci_cb_C1
-    nci_cb_C1 = dlfunc libnci, "nci_cb_C1", "vpP"
+    nci_cb_C1 = dlfunc libnci_test, "nci_cb_C1", "vpP"
     print "loaded a function that takes a callback\n"
     nci_cb_C1( cb_wrapped, user_data )
 
@@ -1163,7 +1163,7 @@ output_is(<<'CODE', <<'OUTPUT', "nci_cb_C2 - PASM");
   new_callback P5, P6, P7, "iU"	# Z in pdd16
   print "ok 1\n"
   # now call the external sub, that takes a call_back and user_data
-  loadlib P1, "libnci"
+  loadlib P1, "libnci_test"
   dlfunc P0, P1, "nci_cb_C2", "vpP"
   print "ok 2\n"
   # P5 is the cb
@@ -1237,10 +1237,10 @@ output_is(<<'CODE', <<'OUTPUT', "nci_cb_C3 - PIR");
     print "created a callback sub\n"
 
     # now call the external sub, that takes a callback and user data
-    .local pmc libnci
-    libnci = loadlib "libnci"
+    .local pmc libnci_test
+    libnci_test = loadlib "libnci_test"
     .local pmc nci_cb_C3
-    nci_cb_C3 = dlfunc libnci, "nci_cb_C3", "vpP"
+    nci_cb_C3 = dlfunc libnci_test, "nci_cb_C3", "vpP"
     print "loaded a function that takes a callback\n"
     nci_cb_C3( cb_wrapped, user_data )
 
@@ -1277,7 +1277,7 @@ ERROR:
   push P2, 0
   assign P6, P2
 
-  # print referenced integer in libnci.so
+  # print referenced integer in libnci_test.so
   I17 = P6[0]
   print "external data: "
   print I17
@@ -1310,7 +1310,7 @@ output_is(<<'CODE', <<'OUTPUT', "nci_cb_D1 - PASM");
   new_callback P5, P6, P7, "Ut"	# Z in pdd16
   print "ok 1\n"
   # now call the external sub, that takes a call_back and user_data
-  loadlib P1, "libnci"
+  loadlib P1, "libnci_test"
   dlfunc P0, P1, "nci_cb_D1", "vpP"
   print "ok 2\n"
   # P5 is the cb
@@ -1368,7 +1368,7 @@ output_is(<<'CODE', <<'OUTPUT', "nci_cb_D2 - PASM");
   new_callback P5, P6, P7, "Ui"	# Z in pdd16
   print "ok 1\n"
   # now call the external sub, that takes a call_back and user_data
-  loadlib P1, "libnci"
+  loadlib P1, "libnci_test"
   dlfunc P0, P1, "nci_cb_D2", "vpP"
   print "ok 2\n"
   # P5 is the cb
@@ -1438,10 +1438,10 @@ output_is(<<'CODE', <<'OUTPUT', "nci_cb_D2 - PIR");
     print "created a callback sub\n"
 
     # now call the external sub, that takes a callback and user data
-    .local pmc libnci
-    libnci = loadlib "libnci"
+    .local pmc libnci_test
+    libnci_test = loadlib "libnci_test"
     .local pmc nci_cb_D2
-    nci_cb_D2 = dlfunc libnci, "nci_cb_D2", "vpP"
+    nci_cb_D2 = dlfunc libnci_test, "nci_cb_D2", "vpP"
     print "loaded a function that takes a callback\n"
     nci_cb_D2( cb_wrapped, user_data )
 
@@ -1515,10 +1515,10 @@ output_is(<<'CODE', <<'OUTPUT', "nci_cb_D3 - PIR");
     print "created a callback sub\n"
 
     # now call the external sub, that takes a callback and user data
-    .local pmc libnci
-    libnci = loadlib "libnci"
+    .local pmc libnci_test
+    libnci_test = loadlib "libnci_test"
     .local pmc nci_cb_D3
-    nci_cb_D3 = dlfunc libnci, "nci_cb_D3", "vpP"
+    nci_cb_D3 = dlfunc libnci_test, "nci_cb_D3", "vpP"
     print "loaded a function that takes a callback\n"
     nci_cb_D3( cb_wrapped, user_data )
 
@@ -1555,7 +1555,7 @@ ERROR:
   push P2, 0
   assign P6, P2
 
-  # print referenced integer in libnci.so
+  # print referenced integer in libnci_test.so
   I17 = P6[0]
   print "external data: "
   print I17
@@ -1590,13 +1590,13 @@ output_is(<<'CODE', <<'OUTPUT', "nci_cb_D4 - synchronous callbacks");
     user_data = new Integer
     user_data = 42
 
-    # load libnci
-    .local pmc libnci
-    libnci = loadlib "libnci"
+    # load libnci_test
+    .local pmc libnci_test
+    libnci_test = loadlib "libnci_test"
 
     # reset int_cb_D4 to 1
     .local pmc int_cb_D4
-    int_cb_D4 = dlvar libnci, "int_cb_D4"
+    int_cb_D4 = dlvar libnci_test, "int_cb_D4"
     .local pmc int_cb_D4_decl
     int_cb_D4_decl = new PerlArray
     push int_cb_D4_decl, .DATATYPE_INT
@@ -1615,7 +1615,7 @@ output_is(<<'CODE', <<'OUTPUT', "nci_cb_D4 - synchronous callbacks");
 
     # now call the external sub, that takes a callback and user data
     .local pmc nci_cb_D4
-    nci_cb_D4 = dlfunc libnci, "nci_cb_D4", "vpP"
+    nci_cb_D4 = dlfunc libnci_test, "nci_cb_D4", "vpP"
     print "loaded a function that takes a callback\n"
     nci_cb_D4( cb_wrapped, user_data )
 
@@ -1726,7 +1726,7 @@ output_is(<<'CODE', <<'OUTPUT', 'nci_pip - array of structs');
   set I1, 1
   set I3, 4
 
-  loadlib P1, "libnci"
+  loadlib P1, "libnci_test"
   dlfunc P0, P1, "nci_pip", "pip"
   invoke
   end
@@ -1767,7 +1767,7 @@ output_is(<<'CODE', <<'OUTPUT', 'nci_i33 - out parameters and return values');
   set I2, 0
   set I3, 2
   set I4, 0
-  loadlib P1, "libnci"
+  loadlib P1, "libnci_test"
   dlfunc P0, P1, "nci_i33", "i33"
   invoke
 
@@ -1829,7 +1829,7 @@ output_is(<<'CODE', <<'OUTPUT', 'nci_vpii - nested structs');
   set I3, 1
   set I4, 0
 
-  loadlib P1, "libnci"
+  loadlib P1, "libnci_test"
   dlfunc P0, P1, "nci_vpii", "vpii"
   invoke
 
@@ -1868,7 +1868,7 @@ output_is(<<'CODE', <<'OUTPUT', 'nci_piiii - nested array in a struct');
   set I7, 400
   set I8, 800
 
-  loadlib P1, "libnci"
+  loadlib P1, "libnci_test"
   dlfunc P0, P1, "nci_piiii", "piiii"
   invoke
 
@@ -1925,21 +1925,21 @@ Count: 4
 OUTPUT
 
 
-output_is( << 'CODE', << "OUTPUT", "nci_pii - writing back to libnci.so" );
+output_is( << 'CODE', << "OUTPUT", "nci_pii - writing back to libnci_test.so" );
 ##PIR##
 .include "datatypes.pasm"
 
 .sub _test @MAIN
 
   # load library
-  .local pmc libnci
-  libnci = loadlib "libnci"
-  unless libnci goto NOT_LOADED
-  print "libnci was successfully loaded\n"
+  .local pmc libnci_test
+  libnci_test = loadlib "libnci_test"
+  unless libnci_test goto NOT_LOADED
+  print "libnci_test was successfully loaded\n"
 
-  # calling a function in libnci
+  # calling a function in libnci_test
   .local pmc multiply
-  multiply = dlfunc libnci, "nci_pii", "pii"
+  multiply = dlfunc libnci_test, "nci_pii", "pii"
   .local pmc product_pointer
   ( product_pointer ) = multiply( -5, 11111 )
 
@@ -1957,13 +1957,13 @@ output_is( << 'CODE', << "OUTPUT", "nci_pii - writing back to libnci.so" );
   print product
   print "\n"
 
-  # Write back into libnci and check it
+  # Write back into libnci_test and check it
   product_pointer[0] = 333
   product = 4444
   print product
   print "\n"
   .local pmc get_product
-  dlfunc get_product, libnci, "nci_i", "i"
+  dlfunc get_product, libnci_test, "nci_i", "i"
   ( product ) = get_product()
   print product
   print "\n"
@@ -1972,7 +1972,7 @@ NOT_LOADED:
   end
 .end
 CODE
-libnci was successfully loaded
+libnci_test was successfully loaded
 -55555
 4444
 333
@@ -1985,18 +1985,18 @@ output_is( << 'CODE', << 'OUTPUT', "nci_dlvar_int - thrice" );
 
 .sub _test @MAIN
 
-    # load libnci.so
+    # load libnci_test.so
     .local string library_name
-    library_name = 'libnci'
-    .local pmc libnci
-    libnci = loadlib library_name
-    unless libnci goto NOT_LOADED
+    library_name = 'libnci_test'
+    .local pmc libnci_test
+    libnci_test = loadlib library_name
+    unless libnci_test goto NOT_LOADED
     print library_name
     print " was successfully loaded\n"
 
     # address of nci_dlvar_int
     .local pmc nci_dlvar_int
-    nci_dlvar_int = dlvar libnci, "nci_dlvar_int"
+    nci_dlvar_int = dlvar libnci_test, "nci_dlvar_int"
 
     # the contained structure pointer
     .local pmc nci_dlvar_int_decl
@@ -2011,7 +2011,7 @@ output_is( << 'CODE', << 'OUTPUT', "nci_dlvar_int - thrice" );
     print "\n"
 
     .local pmc thrice
-    thrice = dlfunc libnci, "nci_dlvar_vv", "vv"
+    thrice = dlfunc libnci_test, "nci_dlvar_vv", "vv"
     thrice()
     I1 = nci_dlvar_int[0]
     print I1
@@ -2031,7 +2031,7 @@ output_is( << 'CODE', << 'OUTPUT', "nci_dlvar_int - thrice" );
 NOT_LOADED:
 .end
 CODE
-libnci was successfully loaded
+libnci_test was successfully loaded
 -4444
 -13332
 -39996
@@ -2046,18 +2046,18 @@ output_is( << 'CODE', << 'OUTPUT', "dlvar - unknown symbol" );
 
 .sub _test @MAIN
 
-    # load libnci.so
+    # load libnci_test.so
     .local string library_name
-    library_name = 'libnci'
-    .local pmc libnci
-    libnci = loadlib library_name
-    unless libnci goto NOT_LOADED
+    library_name = 'libnci_test'
+    .local pmc libnci_test
+    libnci_test = loadlib library_name
+    unless libnci_test goto NOT_LOADED
     print library_name
     print " was successfully loaded\n"
 
     # address of nci_dlvar_int
     .local pmc non_existing
-    non_existing = dlvar libnci, "non_existing"
+    non_existing = dlvar libnci_test, "non_existing"
     .local int is_defined
     is_defined = defined non_existing
     if is_defined goto IS_DEFINED
@@ -2066,7 +2066,7 @@ IS_DEFINED:
 NOT_LOADED:
 .end
 CODE
-libnci was successfully loaded
+libnci_test was successfully loaded
 'non_existing' is not defined
 OUTPUT
 
@@ -2077,18 +2077,18 @@ output_is( << 'CODE', << 'OUTPUT', "dlfunc - unknown symbol" );
 
 .sub _test @MAIN
 
-    # load libnci.so
+    # load libnci_test.so
     .local string library_name
-    library_name = 'libnci'
-    .local pmc libnci
-    libnci = loadlib library_name
-    unless libnci goto NOT_LOADED
+    library_name = 'libnci_test'
+    .local pmc libnci_test
+    libnci_test = loadlib library_name
+    unless libnci_test goto NOT_LOADED
     print library_name
     print " was successfully loaded\n"
 
     # address of nci_dlvar_int
     .local pmc non_existing
-    non_existing = dlfunc libnci, "non_existing", "iiii"
+    non_existing = dlfunc libnci_test, "non_existing", "iiii"
     .local int is_defined
     is_defined = defined non_existing
     if is_defined goto IS_DEFINED
@@ -2097,16 +2097,16 @@ IS_DEFINED:
 NOT_LOADED:
 .end
 CODE
-libnci was successfully loaded
+libnci_test was successfully loaded
 'non_existing' is not defined
 OUTPUT
 
 output_is( << 'CODE', << 'OUTPUT', "loading same library twice" );
-      loadlib P1, "libnci"
+      loadlib P1, "libnci_test"
       if P1, OK1
       print "not "
 OK1:  print "ok 1\n"
-      loadlib P2, "libnci"
+      loadlib P2, "libnci_test"
       if P2, OK2
       print "not "
 OK2:  print "ok 2\n"

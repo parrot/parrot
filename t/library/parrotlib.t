@@ -1,4 +1,4 @@
-# Copyright (C) 2001-2004 The Perl Foundation.  All rights reserved.
+# Copyright (C) 2001-2005 The Perl Foundation.  All rights reserved.
 # $Id$
 
 =head1 NAME
@@ -89,10 +89,10 @@ END_OUT
 output_is( << "END_CODE", << "END_OUT", 'dynext_location' );
 $template_top
   location_sub = find_global "_parrotlib", "dynext_location"
-  location     = location_sub( 'libnci', '$PConfig{load_ext}' )
+  location     = location_sub( 'libnci_test', '$PConfig{load_ext}' )
 $template_bottom
 END_CODE
-runtime/parrot/dynext/libnci$PConfig{load_ext}
+runtime/parrot/dynext/libnci_test$PConfig{load_ext}
 END_OUT
 
 output_is( << "END_CODE", << 'END_OUT', 'dynext_location, non-existent' );

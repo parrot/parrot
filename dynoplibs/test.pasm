@@ -13,12 +13,12 @@ ok1:
     print "not "
 ok2:
     print "loaded foo\n"
-    loadlib P11, "libnci"
+    loadlib P11, "libnci_test"
     defined I0, P11
     if I0, ok3
     print "not "
 ok3:
-    print "loaded libnci\n"
+    print "loaded libnci_test\n"
     getinterp P2
     set P3, P2[.IGLOBALS_DYN_LIBS]
     print "found "

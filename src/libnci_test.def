@@ -1,0 +1,32 @@
+LIBRARY libnci_test
+DESCRIPTION 'Shared lib for testing the Parrot Native Call Interface'
+EXPORTS
+    nci_dd
+    nci_ssc
+    nci_csc
+    nci_isc
+    nci_fff
+    nci_ip
+    nci_it
+    nci_tt
+    nci_tb
+    nci_tB
+    nci_pp
+    nci_iiii
+    nci_i4i
+    nci_ii3
+    nci_pi
+    nci_vP
+    nci_cb_C1
+    nci_cb_C2
+    nci_cb_C3
+    nci_cb_D1
+    nci_cb_D2
+    nci_cb_D3
+    nci_cb_D4
+    nci_pip
+    nci_i33
+    nci_vpii
+    nci_piiii
+    nci_dlvar_int
+    nci_dlvar_vv

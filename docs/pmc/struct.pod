@@ -1,3 +1,6 @@
+# Copyright: 2001-2005 The Perl Foundation.  All Rights Reserved.
+# $Id$
+
 =head1 NAME
 
 Structures - Accessing C Structs from Parrot
@@ -5,7 +8,7 @@ Structures - Accessing C Structs from Parrot
 =head1 DESCRIPTION
 
 Parrot provides two PMC classes to deal with C structures. These
-are UnManagedStruct and ManagedStruct. The former hasn't any allocated
+are UnManagedStruct and ManagedStruct. The former has no allocated
 memory and is typically used to access structures returned by NCI calls,
 while the latter can be used to define a structure and pass it over
 to a C function - pointers to structures in both cases of course.
@@ -19,7 +22,7 @@ as initializer or with the B<assign> opcode to define the struct elements.
 
 =item Datatype
 
-The datatype is defined by constants declared in B<datatypes.pasm>.
+The datatype is defined by constants declared in F<datatypes.pasm>.
 
 =item Array Size
 
@@ -46,7 +49,7 @@ their size.
     int  i;
   }
 
-The B<i> above is aligned at 4 (for i386 or such).
+The C<i> above is aligned at 4 (for i386 or such).
 
 =head2 Example
 
@@ -242,7 +245,7 @@ If the structure has a pointer to another structure the datatype is:
 
 =head1 Passing A Structure to a C function
 
-For a shared library B<libnci.so> (or whatever) and a C function
+For a shared library B<libnci_test.so> (or whatever) and a C function
 
   typedef struct _dfi_t {
     double d;
@@ -254,7 +257,7 @@ For a shared library B<libnci.so> (or whatever) and a C function
 
 a pointer to the structure is passed with the B<p> signature char:
 
-  loadlib P1, "libnci"
+  loadlib P1, "libnci_test"
   dlfunc P0, P1, "nci_ip", "ip"
   # P5 is ManagedStruct from above
   invoke

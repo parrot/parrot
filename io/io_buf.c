@@ -589,7 +589,7 @@ PIO_buf_readline(theINTERP, ParrotIOLayer *layer, ParrotIO *io,
             }
             out_buf = (unsigned char*)s->strstart + s->strlen;
             memcpy(out_buf, buf_start, len);
-            s->strlen = l;
+            s->strlen = s->bufused = l;
             if (PIO_buf_fill_readbuf(interpreter, layer, io, b) == 0)
                 return l;
             buf_start = b->startb;
