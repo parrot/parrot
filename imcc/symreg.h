@@ -132,8 +132,10 @@ void add_namespace(Parrot_Interp interpreter, struct _IMC_Unit *);
 typedef enum {
 	P_NON_PROTOTYPED = 0x00,	/* must be 0 */
 	P_PROTOTYPED     = 0x01,	/* must be 1 */
-	P_NONE           = 0x04,
-	P_METHOD         = 0x08,
+	P_NONE           = 0x02,
+	P_METHOD         = 0x04,
+
+	P_ANON           = 0x08,	/* don't create global */
 
 	P_MAIN           = PObj_private4_FLAG,	/* s. packfile.c ... */
 	P_LOAD           = PObj_private5_FLAG,

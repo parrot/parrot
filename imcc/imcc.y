@@ -347,7 +347,7 @@ begin_return_or_yield(int yield)
 %token <t> COMMA ESUB DOTDOT
 %token <t> PCC_BEGIN PCC_END PCC_CALL PCC_SUB PCC_BEGIN_RETURN PCC_END_RETURN
 %token <t> PCC_BEGIN_YIELD PCC_END_YIELD NCI_CALL METH_CALL INVOCANT
-%token <t> PROTOTYPED NON_PROTOTYPED MAIN LOAD IMMEDIATE POSTCOMP METHOD
+%token <t> PROTOTYPED NON_PROTOTYPED MAIN LOAD IMMEDIATE POSTCOMP METHOD ANON
 %token <s> LABEL
 %token <t> EMIT EOM
 %token <s> IREG NREG SREG PREG IDENTIFIER REG MACRO ENDM
@@ -681,6 +681,7 @@ proto: pcc_proto
    | MAIN           {  $$ = P_MAIN; }
    | IMMEDIATE      {  $$ = P_IMMEDIATE; }
    | POSTCOMP       {  $$ = P_POSTCOMP; }
+   | ANON           {  $$ = P_ANON; }
    | METHOD         {  $$ = P_METHOD | P_NONE ; }
    ;
 

@@ -206,6 +206,7 @@ SP              [ ]
 <emit,INITIAL>"@LOAD"    return(LOAD);
 <emit,INITIAL>"@IMMEDIATE"    return(IMMEDIATE);
 <emit,INITIAL>"@POSTCOMP"    return(POSTCOMP);
+<emit,INITIAL>"@ANON"    return(ANON);
 
 ".result"       return(RESULT);
 ".yield"       return(YIELDT);

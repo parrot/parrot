@@ -3001,7 +3001,9 @@ PackFile_Constant_unpack_pmc(Interp *interpreter,
     /*
      * finally place the sub in the global stash
      */
-    store_sub_in_namespace(interpreter, pf, sub_pmc, sub->name, ns_const);
+    if (!(flag & 0x08)) {  /* TODO create include enum */
+        store_sub_in_namespace(interpreter, pf, sub_pmc, sub->name, ns_const);
+    }
 
     /*
      * restore interpreters packfile

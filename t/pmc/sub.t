@@ -17,7 +17,7 @@ C<Continuation> PMCs.
 
 =cut
 
-use Parrot::Test tests => 49;
+use Parrot::Test tests => 50;
 use Test::More;
 use Parrot::Config;
 
@@ -1281,3 +1281,29 @@ initial
 main
 OUTPUT
 
+pir_output_like(<<'CODE', <<'OUTPUT', '@ANON');
+.sub main @MAIN
+    "foo"()
+    print "ok\n"
+    $P0 = global "new"
+    $I0 = defined $P0
+    print $I0
+    print "\n"
+    $P0 = global "foo"
+.end
+
+.sub "foo" @ANON
+    print "foo\n"
+    "new"()
+.end
+
+.sub "new"
+    print "new\n"
+.end
+CODE
+/^foo
+new
+ok
+1
+Global 'foo' not found/
+OUTPUT
