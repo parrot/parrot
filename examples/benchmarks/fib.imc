@@ -1,5 +1,5 @@
 .pcc_sub _main prototyped
-    .param var argv
+    .param pmc argv
     .sym int argc
     argc = argv
     .sym int N
@@ -9,7 +9,7 @@
     N = $S0
 noarg:
     .sym float start
-    .sym var fib
+    .sym pmc fib
     fib = newsub _fib
     time start
     .pcc_begin prototyped
@@ -42,7 +42,7 @@ rec:
     .sym int n2
     .sym int r1
     .sym int r2
-    .sym var fib
+    .sym pmc fib
     fib = P0
     n1 = n - 1
     n2 = n - 2
