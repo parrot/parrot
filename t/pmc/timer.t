@@ -10,7 +10,7 @@ t/pmc/sub.t - Subroutine PMCs
 
 	% perl t/pmc/sub.t
 
-=head1 DECSRIPTION
+=head1 DESCRIPTION
 
 Tests the creation and invocation of C<Sub>, C<Closure> and
 C<Continuation> PMCs.

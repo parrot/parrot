@@ -10,7 +10,7 @@ t/src/sprintf.t - Name
 
 	% perl t/src/sprintf.t
 
-=head1 DECSRIPTION
+=head1 DESCRIPTION
 
 Tests the various C<Parrot_sprintf_*> functions.
 

@@ -10,7 +10,7 @@ t/op/number.t - Number Registers
 
 	% perl t/op/number.t
 
-=head1 DECSRIPTION
+=head1 DESCRIPTION
 
 Tests the use of Parrot's floating-point number registers.
 

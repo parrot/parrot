@@ -10,7 +10,7 @@ t/pmc/threads.t - Threads
 
 	% perl t/pmc/threads.t
 
-=head1 DECSRIPTION
+=head1 DESCRIPTION
 
 Tests running threads. All tests skipped unless running on known-good
 platform.

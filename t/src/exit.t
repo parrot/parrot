@@ -10,7 +10,7 @@ t/src/exit.t - Exiting
 
 	% perl t/src/exit.t
 
-=head1 DECSRIPTION
+=head1 DESCRIPTION
 
 Tests C<Parrot_exit()> and C<Parrot_on_exit()> functions.
 

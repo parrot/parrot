@@ -10,7 +10,7 @@ t/src/intlist.t - Integer Lists
 
 	% perl t/src/intlist.t
 
-=head1 DECSRIPTION
+=head1 DESCRIPTION
 
 Tests the various intlist_* functions.
 

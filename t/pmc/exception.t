@@ -10,7 +10,7 @@ t/pmc/exception.t - Exception Handling
 
 	% perl t/pmc/exception.t
 
-=head1 DECSRIPTION
+=head1 DESCRIPTION
 
 Tests C<Exception> and C<Exception_Handler> PMCs.
 

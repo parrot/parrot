@@ -10,7 +10,7 @@ t/native_pbc/integer.t - Integers
 
 	% perl t/native_pbc/integer.t
 
-=head1 DECSRIPTION
+=head1 DESCRIPTION
 
 Tests word-size/float-type/endian-ness for different architectures.
 

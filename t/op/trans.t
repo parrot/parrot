@@ -10,7 +10,7 @@ t/op/trans.t - Transcendental Mathematical Ops
 
 	% perl t/op/trans.t
 
-=head1 DECSRIPTION
+=head1 DESCRIPTION
 
 Tests the transcendental mathematical operations.
 

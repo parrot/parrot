@@ -11,7 +11,7 @@ t/src/hash.t - Hashes
 
 	% perl t/src/hash.t
 
-=head1 DECSRIPTION
+=head1 DESCRIPTION
 
 Tests the Hash functions.
 

@@ -10,7 +10,7 @@ t/pmc/nci.t - Native Call Interface
 
 	% perl t/pmc/nci.t
 
-=head1 DECSRIPTION
+=head1 DESCRIPTION
 
 Tests the NCI PMC. These are all skipped unless JIT CPU architecture is
 i386 and the F<libnci.so> library is found.

@@ -10,7 +10,7 @@ t/op/stacks.t - Stacks
 
 	% perl t/op/stacks.t
 
-=head1 DECSRIPTION
+=head1 DESCRIPTION
 
 Tests for stack operations, currently C<push*>, C<push_*_c> and C<pop*>
 where C<*> is not C<p>.

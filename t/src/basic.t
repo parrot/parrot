@@ -10,7 +10,7 @@ t/src/basic.t - Basics
 
 	% perl t/src/basic.t
 
-=head1 DECSRIPTION
+=head1 DESCRIPTION
 
 Tests C<printf> and C<internal_exception> functions.
 

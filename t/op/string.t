@@ -10,7 +10,7 @@ t/op/string.t - Parrot Strings
 
 	% perl t/op/string.t
 
-=head1 DECSRIPTION
+=head1 DESCRIPTION
 
 Tests Parrot's string registers and operations.
 

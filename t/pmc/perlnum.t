@@ -10,7 +10,7 @@ t/pmc/perlnum.t - Perl Numbers
 
 	% perl t/pmc/perlnum.t
 
-=head1 DECSRIPTION
+=head1 DESCRIPTION
 
 Tests the C<PerlNum> PMC. Checks Perl-specific numeric behaviour.
 

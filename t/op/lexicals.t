@@ -10,7 +10,7 @@ t/op/lexicals.t - Lexical Ops
 
 	% perl t/op/lexicals.t
 
-=head1 DECSRIPTION
+=head1 DESCRIPTION
 
 Tests various lexical scratchpad operations.
 

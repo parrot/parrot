@@ -10,7 +10,7 @@ t/pmc/eval.t - Dynamic Code Evaluation
 
 	% perl t/pmc/eval.t
 
-=head1 DECSRIPTION
+=head1 DESCRIPTION
 
 Tests on-the-fly PASM compilation and invocation.
 

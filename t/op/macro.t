@@ -10,7 +10,7 @@ t/op/macro.t - IMCC Macros
 
 	% perl t/op/macro.t
 
-=head1 DECSRIPTION
+=head1 DESCRIPTION
 
 Tests IMCC C<.macro> syntax.
 

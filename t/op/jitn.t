@@ -11,7 +11,7 @@ t/op/jitn.t - JIT register allocation
 
 	% perl t/op/jitn.t
 
-=head1 DECSRIPTION
+=head1 DESCRIPTION
 
 Tests JIT register allocation.
 

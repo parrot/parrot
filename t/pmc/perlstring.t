@@ -10,7 +10,7 @@ t/pmc/perlstring.t - Perl Strings
 
 	% perl t/pmc/perlstring.t
 
-=head1 DECSRIPTION
+=head1 DESCRIPTION
 
 Tests the C<PerlString> PMC. Checks Perl-specific string behaviour.
 

@@ -10,7 +10,7 @@ t/op/integer.t - Integer Registers
 
 	% perl t/op/integer.t
 
-=head1 DECSRIPTION
+=head1 DESCRIPTION
 
 Tests the use of Parrot's integer registers.
 

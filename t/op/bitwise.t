@@ -10,7 +10,7 @@ t/op/bitwise.t - Bitwise Ops
 
 	% perl t/op/bitwise.t
 
-=head1 DECSRIPTION
+=head1 DESCRIPTION
 
 Tests various bitwise logical operations.
 

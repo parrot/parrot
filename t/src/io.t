@@ -10,7 +10,7 @@ t/src/io.t - IO Subsystem
 
 	% perl t/src/io.t
 
-=head1 DECSRIPTION
+=head1 DESCRIPTION
 
 Tests the IO subsystem.
 

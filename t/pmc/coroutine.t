@@ -10,7 +10,7 @@ t/pmc/coroutines.t - Coroutines
 
 	% perl t/pmc/coroutines.t
 
-=head1 DECSRIPTION
+=head1 DESCRIPTION
 
 Tests the C<Coroutine> PMC.
 

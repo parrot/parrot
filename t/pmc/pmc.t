@@ -10,7 +10,7 @@ t/pmc/pmc.t - Perl PMCs
 
 	% perl t/pmc/pmc.t
 
-=head1 DECSRIPTION
+=head1 DESCRIPTION
 
 Contains a lot of Perl PMC related tests.
 

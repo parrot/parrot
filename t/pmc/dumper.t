@@ -10,7 +10,7 @@ t/pmc/dumper.t - Data Dumping
 
 	% perl t/pmc/dumper.t
 
-=head1 DECSRIPTION
+=head1 DESCRIPTION
 
 Tests data dumping.
 

@@ -10,7 +10,7 @@ t/pmc/array.t - Array PMC
 
 	% perl t/pmc/array.t
 
-=head1 DECSRIPTION
+=head1 DESCRIPTION
 
 Tests C<Array> PMC. Checks size, sets various elements, including
 out-of-bounds test. Checks INT and PMC keys.

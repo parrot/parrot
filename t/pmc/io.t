@@ -10,7 +10,7 @@ t/pmc/io.t - IO Ops
 
 	% perl t/pmc/io.t
 
-=head1 DECSRIPTION
+=head1 DESCRIPTION
 
 Tests the Parrot IO operations.
 

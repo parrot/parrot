@@ -10,7 +10,7 @@ t/native_pbc/number.t - Floating-Point Numbers
 
 	% perl t/native_pbc/number.t
 
-=head1 DECSRIPTION
+=head1 DESCRIPTION
 
 Tests word-size/float-type/endian-ness for different architectures.
 

@@ -10,7 +10,7 @@ t/pmc/tqueue.t - Thread Queue
 
 	% perl t/pmc/tqueue.t
 
-=head1 DECSRIPTION
+=head1 DESCRIPTION
 
 Tests the thread queue.
 

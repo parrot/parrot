@@ -10,7 +10,7 @@ t/pmc/boolean.t - Boolean Ops
 
 	% perl t/pmc/boolean.t
 
-=head1 DECSRIPTION
+=head1 DESCRIPTION
 
 Tests C<Boolean> PMC. Checks comparison and logic operations for various
 type combinations.

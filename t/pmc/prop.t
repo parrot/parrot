@@ -10,7 +10,7 @@ t/pmc/prop.t - Properties
 
 	% perl t/pmc/prop.t
 
-=head1 DECSRIPTION
+=head1 DESCRIPTION
 
 Tests property access on Perl PMCs.
 

@@ -10,7 +10,7 @@ t/pmc/key.t - Keys
 
 	% perl t/pmc/key.t
 
-=head1 DECSRIPTION
+=head1 DESCRIPTION
 
 Tests the C<Key> PMC.
 

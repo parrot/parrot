@@ -10,7 +10,7 @@ t/pmc/signal.t - Signal Handling
 
 	% perl t/pmc/signal.t
 
-=head1 DECSRIPTION
+=head1 DESCRIPTION
 
 Tests signal handling. All test are skipped unless running on Linux.
 

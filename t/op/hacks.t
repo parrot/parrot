@@ -10,7 +10,7 @@ t/op/hacks.t - IO Ops
 
 	% perl t/op/hacks.t
 
-=head1 DECSRIPTION
+=head1 DESCRIPTION
 
 Tests basic file IO operations.
 

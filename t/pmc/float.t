@@ -10,7 +10,7 @@ t/pmc/float.t - Floating-point Numbers
 
 	% perl t/pmc/float.t
 
-=head1 DECSRIPTION
+=head1 DESCRIPTION
 
 Tests the Float PMC.
 

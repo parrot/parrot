@@ -10,7 +10,7 @@ t/op/gc.t - Garbage Collection
 
 	% perl t/op/gc.t
 
-=head1 DECSRIPTION
+=head1 DESCRIPTION
 
 Tests garbage collection with the C<interpinfo> operation.
 

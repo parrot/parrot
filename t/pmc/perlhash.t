@@ -10,7 +10,7 @@ t/pmc/perlhash.t - Perl Hashes
 
 	% perl t/pmc/perlhash.t
 
-=head1 DECSRIPTION
+=head1 DESCRIPTION
 
 Tests the C<PerlHash> PMC. Checks key access with various types of
 normal and potentially hazardous keys. Does a bit of stress testing as

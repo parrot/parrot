@@ -10,7 +10,7 @@ t/op/ifunless.t - If/Unless
 
 	% perl t/op/ifunless.t
 
-=head1 DECSRIPTION
+=head1 DESCRIPTION
 
 Tests the conditional C<if> and C<unless> operations.
 

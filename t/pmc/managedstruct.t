@@ -10,7 +10,7 @@ t/pmc/managedstruct.t - Managed C Structure
 
 	% perl t/pmc/managedstruct.t
 
-=head1 DECSRIPTION
+=head1 DESCRIPTION
 
 Tests the ManagedStruct PMC. Checks element access and memory allocation.
 

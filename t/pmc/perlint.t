@@ -10,7 +10,7 @@ t/pmc/perlint.t - Perl Integers
 
 	% perl t/pmc/perlint.t
 
-=head1 DECSRIPTION
+=head1 DESCRIPTION
 
 Tests the PerlInt PMC. Checks Perl-specific integer behaviour.
 

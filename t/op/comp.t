@@ -10,7 +10,7 @@ t/op/comp.t - Conditionals
 
 	% perl t/op/comp.t
 
-=head1 DECSRIPTION
+=head1 DESCRIPTION
 
 Tests various conditional branch operations.
 

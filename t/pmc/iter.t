@@ -10,7 +10,7 @@ t/pmc/iter.t - Iteration
 
 	% perl -I lib t/pmc/iter.t
 
-=head1 DECSRIPTION
+=head1 DESCRIPTION
 
 Tests the C<Iterator> PMC.
 

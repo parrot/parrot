@@ -10,7 +10,7 @@ t/pmc/sarray.t - Simple Array
 
 	% perl t/pmc/sarray.t
 
-=head1 DECSRIPTION
+=head1 DESCRIPTION
 
 Tests the C<SArray> PMC, which is used for parameter-passing.
 

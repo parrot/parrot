@@ -10,7 +10,7 @@ t/pmc/mmd.t - Multi-Method Dispatch
 
 	% perl t/pmc/mmd.t
 
-=head1 DECSRIPTION
+=head1 DESCRIPTION
 
 Tests the multi-method dispatch.
 

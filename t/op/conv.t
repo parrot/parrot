@@ -10,7 +10,7 @@ t/op/conv.t - C# Ops
 
 	% perl t/op/conv.t
 
-=head1 DECSRIPTION
+=head1 DESCRIPTION
 
 Tests the additional opcodes for C# compilation. See F<ops/dotgnu.ops>.
 

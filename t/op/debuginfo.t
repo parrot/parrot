@@ -10,7 +10,7 @@ t/op/debuginfo.t - Debugging Info
 
 	% perl t/op/debuginfo.t
 
-=head1 DECSRIPTION
+=head1 DESCRIPTION
 
 Tests the various set and get operations for line, package and file info.
 

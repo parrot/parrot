@@ -10,7 +10,7 @@ t/op/globals.t - Global Variables
 
 	% perl t/op/globals.t
 
-=head1 DECSRIPTION
+=head1 DESCRIPTION
 
 Tests the C<store_global> and C<find_global> operations.
 

@@ -10,7 +10,7 @@ t/pmc/sort.t - Sorting
 
 	% perl t/pmc/sort.t
 
-=head1 DECSRIPTION
+=head1 DESCRIPTION
 
 Tests sorting.
 

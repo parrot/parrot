@@ -10,7 +10,7 @@ t/stress/gc.t - Garbage Collection
 
 	% perl t/stress/gc.t
 
-=head1 DECSRIPTION
+=head1 DESCRIPTION
 
 Tests garbage collection.
 

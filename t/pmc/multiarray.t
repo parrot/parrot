@@ -10,7 +10,7 @@ t/pmc/multiarray.t - MultiArray PMC
 
 	% perl t/pmc/multiarray.t
 
-=head1 DECSRIPTION
+=head1 DESCRIPTION
 
 Tests the C<MultiArray> PMC. Checks element access in 2 and 3 dimensions,
 and cloning.

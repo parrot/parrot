@@ -10,7 +10,7 @@ t/src/manifest.t - MANIFEST File
 
 	% perl t/src/manifest.t
 
-=head1 DECSRIPTION
+=head1 DESCRIPTION
 
 Checks that the distribution and the MANIFEST file agree.
 

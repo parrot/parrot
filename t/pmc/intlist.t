@@ -10,7 +10,7 @@ t/pmc/intlist.t - Integer Array
 
 	% perl t/pmc/intlist.t
 
-=head1 DECSRIPTION
+=head1 DESCRIPTION
 
 Tests the C<IntList> PMC.
 

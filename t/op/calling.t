@@ -10,7 +10,7 @@ t/op/calling.t - Parrot Calling Conventions
 
 	% perl t/op/calling.t
 
-=head1 DECSRIPTION
+=head1 DESCRIPTION
 
 Tests Parrot calling conventions.
 

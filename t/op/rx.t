@@ -10,7 +10,7 @@ t/op/rx.t - Regex Ops
 
 	% perl t/op/rx.t
 
-=head1 DECSRIPTION
+=head1 DESCRIPTION
 
 Tests regular expression operations.
 

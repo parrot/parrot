@@ -10,7 +10,7 @@ t/pmc/ref.t - Reference PMC
 
 	% perl t/pmc/ref.t
 
-=head1 DECSRIPTION
+=head1 DESCRIPTION
 
 Tests that method delegation works on a C<Ref> PMC.
 

@@ -10,7 +10,7 @@ t/op/interp.t - Running the Interpreter
 
 	% perl t/op/interp.t
 
-=head1 DECSRIPTION
+=head1 DESCRIPTION
 
 Tests the old and new styles of running the Parrot interpreter.
 

@@ -10,7 +10,7 @@ t/op/basic.t - Basic Ops
 
 	% perl t/op/basic.t
 
-=head1 DECSRIPTION
+=head1 DESCRIPTION
 
 Tests basic string and branching operations.
 

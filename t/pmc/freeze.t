@@ -10,7 +10,7 @@ t/pmc/freeze.t - Archiving
 
 	% perl t/pmc/freeze.t
 
-=head1 DECSRIPTION
+=head1 DESCRIPTION
 
 Tests the freeze/thaw archiving subsystem.
 

@@ -10,7 +10,7 @@ t/op/time.t - Time and Sleep
 
 	% perl t/op/time.t
 
-=head1 DECSRIPTION
+=head1 DESCRIPTION
 
 Tests the C<time> and C<sleep> operations.
 

@@ -10,7 +10,7 @@ t/pmc/objects.t - Objects
 
 	% perl t/pmc/objects.t
 
-=head1 DECSRIPTION
+=head1 DESCRIPTION
 
 Tests the object/class subsystem.
 

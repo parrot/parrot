@@ -10,7 +10,7 @@ t/pmc/perlarray.t - Perl Array
 
 	% perl t/pmc/perlarray.t
 
-=head1 DECSRIPTION
+=head1 DESCRIPTION
 
 Tests the C<PerlArray> PMC. Checks basic and Perl-specific array behaviour.
 

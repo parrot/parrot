@@ -10,7 +10,7 @@ t/op/00ff-unix.t - UNIX File format
 
 	% perl t/op/00ff-unix.t
 
-=head1 DECSRIPTION
+=head1 DESCRIPTION
 
 Tests file formats.
 

@@ -10,7 +10,7 @@ t/op/types.t - Parrot Types
 
 	% perl t/op/types.t
 
-=head1 DECSRIPTION
+=head1 DESCRIPTION
 
 Tests native Parrot types with C<typeof>. Other type tests are in
 F<t/pmc/pmc.t>.

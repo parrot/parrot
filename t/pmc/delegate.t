@@ -10,7 +10,7 @@ t/pmc/delegate.t - Method Delegation
 
 	% perl t/pmc/delegate.t
 
-=head1 DECSRIPTION
+=head1 DESCRIPTION
 
 Tests method delegation.
 

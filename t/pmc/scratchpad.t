@@ -10,7 +10,7 @@ t/pmc/scratchpad.t - Lexical Scratchpads
 
 	% perl t/pmc/scratchpad.t
 
-=head1 DECSRIPTION
+=head1 DESCRIPTION
 
 Tests using C<PerlInt> PMC on lexical scratchpads.
 

@@ -10,7 +10,7 @@ t/op/info.t - Info Ops
 
 	% perl t/op/info.t
 
-=head1 DECSRIPTION
+=head1 DESCRIPTION
 
 Tests the information finding operations.
 

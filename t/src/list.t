@@ -10,7 +10,7 @@ t/src/list.t - List Subsystem
 
 	% perl t/src/list.t
 
-=head1 DECSRIPTION
+=head1 DESCRIPTION
 
 Tests the various C<list_*> functions.
 

@@ -10,7 +10,7 @@ t/pmc/object-meths.t - Object Methods
 
 	% perl t/pmc/object-meths.t
 
-=head1 DECSRIPTION
+=head1 DESCRIPTION
 
 Tests PMC object methods.
 
