@@ -6,6 +6,10 @@ Parrot FAQ - Frequently Asked Questions
 
 =over 4
 
+=item Revision 0.4 - 26 August 2002
+
+Fixed up the licensing bits
+
 =item Revision 0.3 - 13 March 2002
 
 Translated to POD and added "Why aren't we using external tool or library I<X>?"
@@ -141,9 +145,16 @@ The most common issues are:
 
 =item *
 License compatibility.
+Parrot has an odd license -- it currently uses the same license as
+Perl 5, which is the disjunction of the GNU GPL and the Artistic
+License, which can be written (Artistic|GPL) for short.  Thus,
+Parrot's license is compatible with the GNU GPL, which means you
+can combine Parrot with GPL'ed code.
 
-Parrot has an odd license.  Most licenses--even open-source ones--aren't compatible with Parrot.  Anything licensed 
-under Perl 5's terms is okay, and some things licensed under BSD or X licenses may be.  GPL licenses aren't okay.
+Code accepted into the core interpreter must fall under the same terms
+as parrot. Library code (for example the ICU library we're using for
+Unicode) we link into the interpreter can be covered by other licenses
+so long as their terms don't prohibit this. 
 
 =item *
 Platform compatibility.
