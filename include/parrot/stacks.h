@@ -38,8 +38,9 @@ struct Stack {
   struct Stack_Entry entry[STACK_CHUNK_DEPTH];
 };
 
-struct Stack_Entry *push_generic_entry(void *thing, INTVAL type, void *cleanup);
-void pop_generic_entry(void *where, INTVAL type);
+struct Stack_Entry *push_generic_entry(struct Perl_Interp *, void *thing, INTVAL type, void *cleanup);
+void *pop_generic_entry(struct Perl_Interp *, void *where, INTVAL type);
+void toss_geleric_entry(struct Perl_Interp *, INTVAL type);
 
 #endif
 
