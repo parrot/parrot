@@ -94,7 +94,8 @@ void build_interference_graph() {
      */
     {
 	int count = 0;
-        interference_graph = calloc(n_symbols*n_symbols*n_symbols+1, sizeof(SymReg*)); 
+        interference_graph = calloc((n_symbols + 1) * (n_symbols + 1),
+                                    sizeof(SymReg*));
         if (interference_graph == NULL) {
 	    fprintf(stderr, "Memory error at build_interference_graph\n");
 	    abort();
@@ -136,8 +137,10 @@ void compute_du_chain(SymReg * r) {
     Instruction * ins;
     int i;
 
-    /* We cannot rely on computing the value of r->first when parsing, since
-       the situation can be changed at any time by the reg. allocation algorithm */
+    /* We cannot rely on computing the value of r->first when parsing,
+     * since the situation can be changed at any time by the register
+     * allocation algorithm
+     */
 
     r->first = -1;
         
@@ -145,7 +148,8 @@ void compute_du_chain(SymReg * r) {
     for(ins = instructions[i++]; ins; ins = instructions[i++]) {
         if(r == ins->r0 || r == ins->r1 || r == ins->r2 || r == ins->r3) {
 	    if (r->first < 0) r->first = i-1;
-	    r->last = i-1;
+            if(i - 1 > r->last)
+	        r->last = i-1;
 	}
     }
 }
@@ -174,8 +178,8 @@ int interferes(SymReg * r0, SymReg * r1) {
      * later, then they can share the same register
      */
      
-    if(r0->first >= r1->last) return 0;
-    else if(r0->last <= r1->first) return 0;
+    if(r0->first > r1->last) return 0;
+    else if(r0->last < r1->first) return 0;
 
     /* If symbol was never used in a statment, it can't interfere */
     if(r0->first < 0 || r1->first < 0) return 0;
@@ -390,16 +394,17 @@ int map_colors(int x, SymReg ** graph, int colors[]) {
 /* Rewrites the instructions list, inserting spill code in every ocurrence
  * of the symbol.
  */
-void spill (int spilled) {
+void spill(int spilled) {
 	
     Instruction ** old_instructions;
     int old_n_instructions;
     Instruction * tmp;
     int i, j;
     int needs_fetch, needs_store, needs_spilling, after_spilled, after_needs_store;    
-    SymReg *new_symbol, *old_symbol;     
-    char* buf;
-		    
+    SymReg * new_symbol, * old_symbol;     
+    char * buf;
+    int * offset;
+
     buf = malloc(256 * sizeof(char));
     if (buf == NULL) {
 	fprintf(stderr, "Memory error at spill\n");
@@ -408,11 +413,12 @@ void spill (int spilled) {
     
     if (IMCC_DEBUG) 
 	fprintf(stderr, "#Spilling [%s]:\n", interference_graph[spilled]->name);
-		    
+    
     old_symbol = interference_graph[spilled];
     old_instructions = instructions;  
     old_n_instructions = n_instructions;
     instructions = NULL;
+    offset = malloc(old_n_instructions * sizeof(int));
 
     sprintf(buf, "%s_%d", old_symbol->name, 0);
     new_symbol = mk_symreg(buf, old_symbol->set);
@@ -437,13 +443,11 @@ void spill (int spilled) {
 	needs_spilling = needs_fetch || needs_store;
 
 	if (needs_fetch && !after_spilled) {
-
 	    sprintf(buf, "set %s, P31[%d] #FETCH", "%s", n_spilled); /*ouch*/
 	    emitb( mk_instruction(buf, new_symbol, NULL, NULL, NULL, IF_r1_write));
 	}
 
 	if (!needs_spilling && after_needs_store) {
-
 	    sprintf(buf, "set P31[%d], %s #STORE", n_spilled, "%s"); /*ouch, ouch*/
 	    emitb ( mk_instruction(buf, new_symbol, NULL, NULL, NULL, IF_r1_read));
 
@@ -453,34 +457,48 @@ void spill (int spilled) {
 		
 	/* Emit the old instruction, with the symbol changed */
 	{
-		SymReg *r0, *r1, *r2, *r3;
-		
-		r0 = tmp->r0;
-		r1 = tmp->r1;
-		r2 = tmp->r2;
-		r3 = tmp->r3;
-		
-		if (r0==old_symbol) r0=new_symbol;
-		if (r1==old_symbol) r1=new_symbol;
-		if (r2==old_symbol) r2=new_symbol;
-		if (r3==old_symbol) r3=new_symbol;
+            SymReg *r0, *r1, *r2, *r3;
 
-		emitb( mk_instruction(tmp->fmt, r0, r1, r2, r3, tmp->flags) );
+            r0 = tmp->r0;
+            r1 = tmp->r1;
+            r2 = tmp->r2;
+            r3 = tmp->r3;
+
+            if(r0==old_symbol) r0=new_symbol;
+            if(r1==old_symbol) r1=new_symbol;
+            if(r2==old_symbol) r2=new_symbol;
+            if(r3==old_symbol) r3=new_symbol;
+
+            emitb( mk_instruction(tmp->fmt, r0, r1, r2, r3, tmp->flags) );
+            /* and remember how much it's offset by: */
+            offset[i] = n_instructions - 1;
 	}
 	after_needs_store = needs_store;
 	after_spilled = needs_spilling;
     }
 
-   free(old_instructions);
+    free(old_instructions);
 
-   /* old_symbol does'nt get deleted. It simply loses all references from 
-      instructions. So this means that the symbol table gets polluted with 
-      symbols that are used nowhere.
+    /* old_symbol doesn't get deleted. It simply loses all references from 
+       instructions. So this means that the symbol table gets polluted with 
+       symbols that are used nowhere.
 
-      We should clear, or at least reuse, them.
-   */
+       We should clear, or at least reuse, them.
+    */
 
-   dump_instructions();
+    if(IMCC_DEBUG) 
+        dump_instructions();
+
+    /* Now go through the symbols and fix up their first and last offsets */
+    for(i = 0; i < HASH_SIZE; i++) {
+        SymReg * r = hash[i];
+        for(; r; r = r->next) {
+            if(r->type == VTIDENTIFIER || r->type == VTREG) {
+                r->first = offset[r->first];
+                r->last = offset[r->last];
+            }
+        }
+    }
 }
 
 int neighbours(int node) {
