@@ -230,7 +230,6 @@ Parrot_init_lib(Interp *interpreter,
                 PMC *(*load_func)(Interp *),
                 void (*init_func)(Interp *, PMC *))
 {
-    STRING *type;
     PMC *lib_pmc;
 
     if (!load_func) {
@@ -241,15 +240,9 @@ Parrot_init_lib(Interp *interpreter,
          * s. also build_tools/ops2c.pl and lib/Parrot/Pmc2c.pm
          */
         lib_pmc = pmc_new(interpreter, enum_class_ParrotLibrary);
-        type = const_string(interpreter, "NCI");
     }
     else {
         lib_pmc = (*load_func)(interpreter);
-        /* we could set a private flag in the PMC header too
-         * but currently only ops files have struct_val set
-         */
-        type = const_string(interpreter,
-                PMC_struct_val(lib_pmc) ? "Ops" : "PMC");
     }
     /*
      *  call init, if it exists
@@ -315,6 +308,15 @@ Parrot_load_lib(Interp *interpreter, STRING *lib, PMC *initializer)
     lib_pmc = Parrot_init_lib(interpreter, load_func, init_func);
 
     PMC_data(lib_pmc) = handle;
+    if (!load_func)
+        type = const_string(interpreter, "NCI");
+    else {
+        /* we could set a private flag in the PMC header too
+         * but currently only ops files have struct_val set
+         */
+        type = const_string(interpreter,
+                PMC_struct_val(lib_pmc) ? "Ops" : "PMC");
+    }
     /*
      * remember lib_pmc in iglobals
      */
