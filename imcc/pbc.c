@@ -888,7 +888,7 @@ e_pbc_emit(void *param, IMC_Unit * unit, Instruction * ins)
     if (ins->op && *ins->op) {
         /* fixup local jumps */
         SymReg *addr, *r;
-#if IMC_TRACE
+#if IMC_TRACE_HIGH
         PIO_eprintf(NULL, "emit_pbc: op [%d %s]\n", ins->opnum, ins->op);
 #endif
         if ((addr = get_branch_reg(ins)) != 0 && !(addr->type & VTREGISTER)) {
