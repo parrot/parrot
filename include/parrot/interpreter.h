@@ -34,12 +34,13 @@ typedef enum {
 
 #include "parrot/register.h"
 #include "parrot/parrot.h"
+#include "parrot/warnings.h"
 
 #include "parrot/op.h"
 #include "parrot/oplib.h"
 
 typedef struct warnings_t {
-    INTVAL classes;
+    Warnings_classes classes;
 } *Warnings;
 
 #if 0
