@@ -40,7 +40,7 @@ sub _run_command {
     $redir_string .= "open $from, $to;"
   }
 
-  system "$^X -e \"$redir_string;system q{$command};\"";
+  system "$^X -e \"$redir_string;system q{$command};exit (\$?>>8)\"";
   my $exit_code = $? >> 8;
   $Builder->diag("'$command' failed with exit code $exit_code") if $exit_code;
 }
@@ -163,8 +163,8 @@ sub generate_functions {
       print SOURCE $source;
       close SOURCE;
 
-      _run_command("$PConfig{cc} $PConfig{ccflags} -I./include -c $PConfig{ld_out}$obj_f $source_f");
-      _run_command("$PConfig{link} $PConfig{linkflags} $obj_f $PConfig{cc_exe_out}$exe_f blib/lib/libparrot$PConfig{a} $PConfig{libs}");
+      _run_command("$PConfig{cc} $PConfig{ccflags} -I./include -c $PConfig{cc_o_out}$obj_f $source_f");
+      _run_command("$PConfig{link} $PConfig{linkflags} $obj_f $PConfig{ld_out}$exe_f blib/lib/libparrot$PConfig{a} $PConfig{libs}");
       my $prog_output;
       _run_command(".$PConfig{slash}$exe_f", 'STDOUT' => $out_f, 'STDERR' => $out_f);
 

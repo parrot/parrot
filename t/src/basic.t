@@ -7,6 +7,7 @@ c_output_is(<<'CODE', <<'OUTPUT', "hello world");
 
         int main(int argc, char* argv[]) {
                 printf("Hello, World!\n");
+              exit(0);
         }
 CODE
 Hello, World!
