@@ -1,9 +1,9 @@
-/* pmc.h
- *  Copyright: (When this is determined...it will go here)
+/* thread.h
+ *  Copyright: 2003 Yet Another Society
  *  CVS Info
  *     $Id$
  *  Overview:
- *     This is the api header for the pmc subsystem
+ *     This is the api header for the thread primitives
  *  Data Structure and Algorithms:
  *  History:
  *  Notes:
@@ -15,14 +15,16 @@
 
 #include "parrot/parrot.h"
 
+#ifndef PARROT_SYNC_PRIMITIVES_DEFINED
 #define LOCK(x)
 #define UNLOCK(x)
-#define COND_WAIT(x)
-#define COND_SIGNAL(x)
-#define COND_BROADCAST(x)
+#define COND_WAIT(x, y)
+#define COND_SIGNAL(x, y)
+#define COND_BROADCAST(x, y)
 
 typedef INTVAL Parrot_mutex;
 typedef INTVAL Parrot_cond;
+#endif
 
 #endif
 

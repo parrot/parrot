@@ -21,19 +21,27 @@ typedef struct QUEUE_ENTRY QUEUE_ENTRY;
 typedef struct QUEUE QUEUE;
 
 struct QUEUE_ENTRY {
-    volatile Buffer *entry;
-    volatile INTVAL type;
-    volatile QUEUE_ENTRY *next;
+    Buffer *entry;
+    INTVAL type;
+    QUEUE_ENTRY *next;
 };
 
 struct QUEUE {
-    volatile QUEUE_ENTRY *head;
-    volatile QUEUE_ENTRY *tail;
-    volatile INTVAL queue_in_use;
+    QUEUE_ENTRY *head;
+    QUEUE_ENTRY *tail;
+    UINTVAL max_prio;
     Parrot_mutex queue_mutex;
+    Parrot_cond queue_condition;
 };
 
-void Parrot_ins_queue_interrupt(QUEUE *queue, QUEUE_ENTRY *entry);
+QUEUE_ENTRY *pop_entry(QUEUE *);
+QUEUE_ENTRY *wait_for_entry(QUEUE *);
+void push_entry(QUEUE *, QUEUE_ENTRY *);
+void queue_lock(QUEUE *);
+void queue_unlock(QUEUE *);
+void queue_signal(QUEUE *);
+void queue_wait(QUEUE *);
+
 
 #endif /* PARROT_TSQ_H_GUARD */
 
