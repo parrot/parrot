@@ -187,9 +187,9 @@ sub disassemble($$$$) {
 	print STDERR "\n\n" if DEBUG;
 
     # FIXME
-    $result =~ s/\\x00 \\x00 $// unless $result =~ m/\\x0f \\x82 \\x00 \\x00 \\x00 \\x00/;
+    $result =~ s/\\x00 \\x00 $// unless $result =~ m/\\x0f \\x82 \\x00 \\x00 \\x00 \\x00 $/;
     # These 2 are OK by now.
-    $result =~ s/\\xff \\xff \\x00 \\x00 JUMP/JUMP/g;
+    $result =~ s/\\x.. \\x.. \\x.. \\x.. JUMP/JUMP/g;
     $result =~ s/\\x00 JUMP/JUMP/g;
 
     if (defined($Parrot::Jit::Correct_objdump_output)) {

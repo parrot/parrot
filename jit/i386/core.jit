@@ -75,12 +75,12 @@ Parrot_print_s {
 Parrot_if_i_ic {
     movl &INT_REG[1],%eax 
     cmp $0,%eax
-    jne 0xffff
+    jne ($0x0)
     JUMP(INT_CONST[2])
 }
 
 Parrot_branch_ic {
-    jmp 0xffff
+    jmp ($0x0)
     JUMP(INT_CONST[1])
 }
 
