@@ -9,12 +9,12 @@ INC=../../include/parrot
 
 H_FILES = $(INC)/parrot.h imc.h stacks.h cfg.h \
 	instructions.h cfg.h debug.h sets.h symreg.h \
-	pbc.h optimizer.h
+	pbc.h optimizer.h parser.h
 
 
 IMCC_O_FILES = imcparser$(O) imclexer$(O) imc$(O) stacks$(O) symreg$(O) \
 	instructions$(O) cfg$(O) sets$(O) debug$(O) \
-	optimizer$(O) pbc$(O)
+	optimizer$(O) pbc$(O) main$(O) parser_util$(O)
 
 
 O_FILES = $(IMCC_O_FILES) \

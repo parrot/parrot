@@ -609,7 +609,7 @@ void spill(int spilled) {
             sprintf(buf, "%d", n_spilled);
             regs[2] = mk_const(str_dup(buf), 'I');
 	    sprintf(buf, "%%s, %%s[%%s] #FETCH %s", new_symbol->name);
-	    tmp = INS("set", buf, regs, 3, 4);
+	    tmp = INS("set", buf, regs, 3, 4, 0);
 	    tmp->bbindex = ins->bbindex;
             tmp->flags |= ITSPILL;
             /* insert tmp before actual ins */
@@ -626,7 +626,7 @@ void spill(int spilled) {
             regs[1] = mk_const(str_dup(buf), 'I');
 	    regs[2] = new_symbol;
 	    sprintf(buf, "%%s[%%s], %%s #STORE %s", old_symbol->name);
-	    tmp = INS("set", buf, regs, 3, 2);
+	    tmp = INS("set", buf, regs, 3, 2, 0);
 	    tmp->bbindex = ins->bbindex;
             tmp->flags |= ITSPILL;
             /* insert tmp after ins */

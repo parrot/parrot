@@ -1,0 +1,110 @@
+#!perl
+use strict;
+use TestCompiler tests => 3;
+use Test::More qw(skip);
+
+##############################
+output_is(<<'CODE', <<'OUT', "namespace 1");
+.sub _foo
+    .local int x
+    x = 5
+    .namespace A
+    .local int x
+    x = 3
+    print x
+    print "\n"
+    .endnamespace A
+    print x
+    print "\n"
+.end
+CODE
+3
+5
+OUT
+
+##############################
+output_is(<<'CODE', <<'OUT', "namespace 2");
+.sub _foo
+    .local int x
+    .local int y
+    x = 5
+    y = 10
+    .namespace A
+    .local int x
+    x = 3
+    print x
+    print "\n"
+    print y
+    print "\n"
+    .endnamespace A
+    print x
+    print "\n"
+    print y
+    print "\n"
+.end
+CODE
+3
+10
+5
+10
+OUT
+
+##############################
+output_is(<<'CODE', <<'OUT', "namespace 3");
+.sub _foo
+    .local int x
+    .local int y
+    .local int z
+    x = 5
+    y = 10
+    z = 20
+    .namespace A
+    .local int x
+    x = 3
+    print x
+    print "\n"
+    print y
+    print "\n"
+    print z
+    print "\n"
+    .namespace B
+    .local int x
+    .local int y
+    x = 2
+    y = 11
+    print x
+    print "\n"
+    print y
+    print "\n"
+    print z
+    print "\n"
+    .endnamespace B
+    print x
+    print "\n"
+    print y
+    print "\n"
+    print z
+    print "\n"
+    .endnamespace A
+    print x
+    print "\n"
+    print y
+    print "\n"
+    print z
+    print "\n"
+.end
+CODE
+3
+10
+20
+2
+11
+20
+3
+10
+20
+5
+10
+20
+OUT
+

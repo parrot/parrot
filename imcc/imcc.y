@@ -17,17 +17,13 @@
 #define _PARSER
 #define MAIN
 #include "imc.h"
-#include "parrot/embed.h"
 #include "pbc.h"
+#include "parser.h"
 
 #define YYDEBUG 1
-/* #define OPTEST */
 
-int         yyerror(char *);
 int         yylex();
-extern char yytext[];
-int         expect_pasm;
-int         pasm_file = 0;
+
 
 /*
  * Choosing instructions for Parrot is pretty easy since
@@ -35,13 +31,8 @@ int         pasm_file = 0;
  */
 
 
-static SymReg *regs[IMCC_MAX_REGS];
-/* Bit vector saying whether argument i is a key */
-static int keyvec = 0;
-static int nargs = 0;
 static SymReg *keys[IMCC_MAX_REGS];
 static int nkeys = 0;
-#define KEY_BIT(argnum) (1 << (argnum))
 
 static SymReg ** RR(int n, ...)
 {
@@ -162,7 +153,7 @@ static int get_pmc_num(char *pmc_type)
 }
 
 /* only .PmcType */
-static SymReg * macro(char *name)
+SymReg * macro(char *name)
 {
     SymReg * r;
     char buf[16];
@@ -171,76 +162,6 @@ static SymReg * macro(char *name)
     r =  mk_const(str_dup(buf), 'I');
     return r;
 }
-/*
- * new P, .SomeThing
- */
-Instruction * iNEW(SymReg * r0, char * type, int emit) {
-    char fmt[256];
-    SymReg *pmc = macro(type);
-    /* XXX check, if type exists, but aove keyed search
-     * gives 0 for non existing  PMCs */
-    sprintf(fmt, "%%s, %d\t # .%s", atoi(pmc->name), type);
-    r0->usage = U_NEW;
-    if (!strcmp(type, "PerlArray") || !strcmp(type, "PerlHash"))
-        r0->usage |= U_KEYED;
-    free(type);
-    regs[0] = r0;
-    regs[1] = pmc;
-    nargs = 2;
-    return iANY("new", fmt, regs, emit);
-}
-
-/* TODO get rid of nargs */
-void
-op_fullname(char * dest, const char * name, SymReg * args[], int nargs) {
-    int i;
-
-    strcpy(dest, name);
-    dest += strlen(name);
-    for (i = 0; i < nargs && args[i]; i++) {
-        *dest++ = '_';
-        if (args[i]->type == VTADDRESS) {
-            *dest++ = 'i';
-            *dest++ = 'c';
-            continue;
-        }
-        /* if one ever wants num keys, they go with 'S' */
-        if (keyvec & KEY_BIT(i)) {
-            *dest++ = 'k';
-            if (args[i]->set == 'S' || args[i]->set == 'N' ||
-                    args[i]->set == 'K') {
-                *dest++ = 'c';
-                continue;
-            }
-        }
-        *dest++ = tolower(args[i]->set);
-        if (args[i]->type & VTCONST)
-            *dest++ = 'c';
-    }
-    *dest = '\0';
-}
-
-int check_op(char *fullname, char *name, SymReg *regs[])
-{
-    int op, nargs;
-    for (nargs = 0; regs[nargs]; nargs++) ;
-    op_fullname(fullname, name, regs, nargs);
-    op = interpreter->op_lib->op_code(fullname, 1);
-    return op;
-
-}
-
-int is_op(char *name)
-{
-    return interpreter->op_lib->op_code(name, 0) >= 0;
-}
-
-Instruction * INS(char * name, char *fmt, SymReg **regs, int n, int keys) {
-    nargs = n;
-    keyvec = keys;
-    return iANY(name, fmt, regs, 0);
-}
-
 
 static Instruction *
 multi_keyed(char *name, SymReg ** regs, int nr, int emit)
@@ -551,15 +472,11 @@ instruction:
 labeled_inst:
 	assignment
     |   if_statement
-    |   SYM type IDENTIFIER		{ mk_ident($3, $2); }
     |   NAMESPACE IDENTIFIER            { push_namespace($2); }
     |   ENDNAMESPACE IDENTIFIER         { pop_namespace($2); }
-    |   LOCAL type IDENTIFIER		{ mk_ident($3, $2); }
-    |   LOCAL type VAR  		{ $$ = 0;
-            warning("parser", "file %s line %d: %s already defined\n",
-            sourcefile, line, $3->name); }
-    |   PARAM type IDENTIFIER		{ $$ = MK_I("restore",
-		                            R1(mk_ident($3, $2)));}
+    |   LOCAL { is_def=1; } type IDENTIFIER { mk_ident($4, $3);is_def=0; }
+    |   PARAM { is_def=1; } type IDENTIFIER { $$ = MK_I("restore",
+		                            R1(mk_ident($4, $3)));is_def=0; }
     |   PARAM reg			{ $$ = MK_I("restore", R1($2)); }
     |   RESULT var			{ $$ = MK_I("restore", R1($2)); }
     |   ARG var				{ $$ = MK_I("save", R1($2)); }
@@ -719,232 +636,6 @@ string: SREG				{ $$ = mk_symreg($1, 'S'); }
     ;
 %%
 
-extern FILE *yyin;
-int IMCC_DEBUG;
-int gc_off;
-static int pbc, write_pbc;
-char* output;
-
-static void usage(FILE *fp)
-{
-    fprintf(fp, "imcc [-h|--help] [-V|--version] [-d|--debug] [-v|--verbose]\n");
-    fprintf(fp, "\t[-y|--yydebug] [-r|--runpbc] [-t|--trace] [-o outfile] infile\n");
-    exit(fp != stdout);
-}
-
-
-static void help()
-{
-    usage(stdout);
-}
-
-static void version()
-{
-    printf("imcc version " IMCC_VERSION "\n");
-    exit(0);
-}
-
-#define setopt(flag) Parrot_setflag(interpreter, flag, (*argv)[0]+2)
-#define unsetopt(flag) Parrot_setflag(interpreter, flag, 0)
-
-/* most stolen from test_main.c */
-char *
-parseflags(Parrot_Interp interpreter, int *argc, char **argv[])
-{
-    if (*argc == 1) {
-        usage(stderr);
-	}
-
-    /* skip the program name arg */
-    (*argc)--;
-    (*argv)++;
-
-#ifdef HAVE_COMPUTED_GOTO
-    setopt(PARROT_CGOTO_FLAG);
-#endif
-
-    while ((*argc) && (*argv)[0][0] == '-') {
-        switch ((*argv)[0][1]) {
-        case 'b':
-            setopt(PARROT_BOUNDS_FLAG);
-            break;
-        case 'j':
-            setopt(PARROT_JIT_FLAG);
-            break;
-        case 'p':
-            setopt(PARROT_PROFILE_FLAG);
-            break;
-        case 'P':
-            setopt(PARROT_PREDEREF_FLAG);
-            break;
-        case 'g':
-            unsetopt(PARROT_CGOTO_FLAG);
-            break;
-        case 't':
-            setopt(PARROT_TRACE_FLAG);
-            break;
-        case 'd':
-            if (!Interp_flags_TEST(interpreter, PARROT_DEBUG_FLAG))
-            setopt(PARROT_DEBUG_FLAG);
-            else
-            IMCC_DEBUG++;
-            break;
-        case 'w':
-            Parrot_setwarnings(interpreter, PARROT_WARNINGS_ALL_FLAG);
-            break;
-        case 'G':
-            gc_off = 1;
-            break;
-        case '.':  /* Give Windows Parrot hackers an opportunity to
-                    * attach a debuggger. */
-            fgetc(stdin);
-            break;
-        case 'h':
-            usage(stdout);
-            break;
-        case 'V':
-            version();
-            break;
-        case 'r':
-            pbc = 1;
-            break;
-        case 'c':
-            write_pbc = 1;
-            break;
-        case 'v':
-	    IMCC_VERBOSE++;
-            break;
-        case 'y':
-	    yydebug = 1;
-            break;
-        case 'o':
-            if ((*argv)[0][2])
-                output = str_dup((*argv)[0]+2);
-            else {
-                (*argc)--;
-                output = str_dup((++(*argv))[0]);
-	}
-	break;
-
-        case 'O':
-	    strncpy(optimizer_opt, (*argv)[0]+2,sizeof(optimizer_opt));
-	    optimizer_opt[sizeof(optimizer_opt)-1] = '\0';
-            break;
-        case '-':
-            /* XXX long options */
-            (*argc)--;
-            (*argv)++;
-
-            goto DONE;
-        case '\0':             /* bare '-' means read from stdin */
-            goto DONE;
-        default:
-            fatal(1, "main", "Invalid flag %s used\n", (*argv)[0]);
-            exit(1);
-    }
-
-        (*argc)--;
-        (*argv)++;
-    }
-
-  DONE:
-
-    return (*argv)[0];
-}
-
-
-int main(int argc, char * argv[])
-{
-    int stacktop;
-    struct PackFile *pf;
-
-    interpreter = Parrot_new();
-    Parrot_init(interpreter, (void*)&stacktop);
-    pf = PackFile_new();
-    interpreter->code = pf;
-    interpreter->DOD_block_level++;
-
-    sourcefile = parseflags(interpreter, &argc, &argv);
-
-    /* default optimizations, s. optimizer.c */
-    if (!*optimizer_opt)
-	strcpy(optimizer_opt, "0");
-
-    if (!sourcefile || !*sourcefile) {
-        fatal(EX_NOINPUT, "main", "No source file specified.\n" );
-    }
-    else if (!strcmp(sourcefile, "-"))
-       yyin = stdin;
-    else {
-        char *ext;
-        if(!(yyin = fopen(sourcefile, "r")))    {
-            fatal(EX_IOERR, "main", "Error reading source file %s.\n",
-                    sourcefile);
-    }
-        ext = strrchr(sourcefile, '.');
-        if (ext && strcmp (ext, ".pasm") == 0) {
-            pasm_file = 1;
-        }
-    }
-
-    if (!output)
-        output = str_dup(pbc ? "a.pbc" : "a.pasm");
-
-    if (IMCC_VERBOSE) {
-        info(1,"Reading %s", yyin == stdin ? "stdin":sourcefile);
-        if (pbc)
-            info(1, ", executing");
-        if (write_pbc)
-            info(1, " and writing %s\n", output);
-        else
-            info(1,"\n");
-    }
-    info(1, "using optimization '%s'\n", optimizer_opt);
-
-    line = 1;
-    emit_open(write_pbc | pbc, output);
-
-    debug(1, "Starting parse...\n");
-
-    yyparse();
-    emit_close();
-    fclose(yyin);
-
-    info(1, "%ld lines compiled.\n", line);
-    if (write_pbc) {
-        size_t size;
-        opcode_t *packed;
-        FILE *fp;
-
-        size = PackFile_pack_size(interpreter->code);
-        info(1, "packed code %d bytes\n", size);
-        packed = (opcode_t*) mem_sys_allocate(size);
-        if (!packed)
-            fatal(1, "main", "Out of mem\n");
-        PackFile_pack(interpreter->code, packed);
-        if (strcmp (output, "-") == 0)
-            fp = stdout;
-        else if ((fp = fopen(output, "wb")) == 0)
-            fatal(1, "main", "Couldn't open %s\n", output);
-
-        if ((1 != fwrite(packed, size, 1, fp)) )
-            fatal(1, "main", "Couldn't write %s\n", output);
-        fclose(fp);
-        info(1, "%s written.\n", output);
-        free(packed);
-    }
-    if (pbc == 1) {
-        if (!gc_off)
-            interpreter->DOD_block_level--;
-        info(1, "Running...\n");
-        Parrot_runcode(interpreter, argc, argv);
-        /* XXX no return value :-( */
-    }
-    Parrot_destroy(interpreter);
-    free(output);
-
-    return 0;
-}
 
 int yyerror(char * s)
 {

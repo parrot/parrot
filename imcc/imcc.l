@@ -15,13 +15,12 @@
 #include <string.h>
 #include "imc.h"
 #include "imcparser.h"
+#include "parser.h"
 
 #define YY_NO_UNPUT
 extern long line;
-extern int expect_pasm;
-extern int pasm_file;
+
 int state;
-int yyerror(char *);
 %}
 
 %option outfile="imclexer.c"
@@ -83,7 +82,7 @@ EOL		\r?\n
 	return REG;
 	}
 
-".sym"          return(SYM);
+".sym"          return(LOCAL);
 ".arg"          return(ARG);
 ".sub"          return(SUB);
 ".end"          return(ESUB);
@@ -142,7 +141,7 @@ EOL		\r?\n
 
 <emit,INITIAL>{LETTER}{LETTERDIGIT}* {
 	SymReg *r = find_sym(yytext);
-	if (r && r->type & VTIDENTIFIER) {
+	if (r && (r->type & VTIDENTIFIER) && !is_def) {
 	    yylval.sr = r;
 	    return VAR;
 	}

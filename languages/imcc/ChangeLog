@@ -1,3 +1,18 @@
+- 2002-12-07	leo
+
+	* version 0.0.9.6
+	* split imcc.y -> main.c parser_util.c
+	* INS takes now an additional param "emit"
+	* make namespace running
+
+- 2002-12-xx
+
+	* added t/harness stuff
+
+	* SYNTAX change:
+
+	.sub / ret => .sub / .end
+
 - 2002-09-15	leo
 
 	* fixed GC bug, BUFFER_constant_FLAG!

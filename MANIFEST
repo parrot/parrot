@@ -1357,8 +1357,11 @@ languages/imcc/imcparser.c
 languages/imcc/imcparser.h
 languages/imcc/instructions.c
 languages/imcc/instructions.h
+languages/imcc/main.c
 languages/imcc/optimizer.c
 languages/imcc/optimizer.h
+languages/imcc/parser.h
+languages/imcc/parser_util.c
 languages/imcc/pbc.c
 languages/imcc/pbc.h
 languages/imcc/sets.c
@@ -1370,6 +1373,7 @@ languages/imcc/symreg.h
 languages/imcc/t/harness
 languages/imcc/t/syn/clash.t
 languages/imcc/t/syn/labels.t
+languages/imcc/t/syn/namespace.t
 languages/jako/MAINTAINER
 languages/jako/bench.jako
 languages/jako/euclid.jako

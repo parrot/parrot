@@ -49,7 +49,6 @@ void pop_namespace(char * name) {
 
     while (ns->idents) {
         Identifier * ident = ns->idents;
-        delete_sym(ident->name);
         ns->idents = ident->next;
         free(ident);
     }
@@ -102,16 +101,29 @@ SymReg * mk_pasm_reg(char * name) {
 
 static char * _mk_fullname(Namespace * ns, const char * name) {
     char * result;
+
     if (ns == NULL) return strdup(name);
     result = (char *) malloc(strlen(name) + strlen(ns->name) + 3);
     sprintf(result, "%s::%s", ns->name, name);
     return result;
 }
 
+char * mk_fullname(const char * name) {
+    return _mk_fullname(namespace, name);
+}
+
 /* Makes a new identifier */
 SymReg * mk_ident(char * name, char t) {
     char * fullname = _mk_fullname(namespace, name);
-    SymReg * r = mk_symreg(fullname, t);
+    Identifier * ident;
+    SymReg * r;
+    if (namespace) {
+        ident = calloc(1, sizeof(struct ident_t));
+        ident->name = fullname;
+        ident->next = namespace->idents;
+        namespace->idents = ident;
+    }
+    r = mk_symreg(fullname, t);
     r->type = VTIDENTIFIER;
     free(name);
     return r;

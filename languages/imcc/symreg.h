@@ -88,6 +88,7 @@ void clear_tables();
 unsigned int  hash_str(const char * str);
 void free_life_info(SymReg *r);
 
+char * mk_fullname(const char * name);
 void push_namespace(char * name);
 void pop_namespace(char * name);
 
