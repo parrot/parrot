@@ -26,7 +26,6 @@ mmd_dispatch_pmc(struct Parrot_Interp *interpreter,
     UINTVAL offset;
     left_type = VTABLE_type(interpreter, left);
     right_type = VTABLE_type(interpreter, right);
-
     if ((left_type > interpreter->binop_mmd_funcs->x[function]) ||
         (right_type > interpreter->binop_mmd_funcs->y[function])) {
         real_function = (pmc_mmd_f)interpreter->binop_mmd_funcs->default_func[
@@ -125,11 +124,12 @@ mmd_add_function(struct Parrot_Interp *interpreter,
         interpreter->binop_mmd_funcs->default_func = new_default;
         interpreter->binop_mmd_funcs->funcs_in_table = new_func_count;
         interpreter->binop_mmd_funcs->mmd_funcs = new_functable;
+        interpreter->binop_mmd_funcs->tables = func_count;
 
     }
     /* We mark the new function by adding in the default function
        pointer */
-    interpreter->binop_mmd_funcs->default_func[func_count] = function;
+    interpreter->binop_mmd_funcs->default_func[funcnum] = function;
 
 }
 

@@ -236,6 +236,9 @@ pmc_type(Parrot_Interp interp, STRING *name)
 
 void
 register_fallback_methods(Parrot_Interp interp) {
+    /* Yeah, this first one's out of order logically, but it means
+       the table doesn't have to keep being re-malloc'd */
+    mmd_add_function(interp, MMD_SXOR, (funcptr_t)mmd_fallback_stringxor_pmc);
     mmd_add_function(interp, MMD_ADD, (funcptr_t)mmd_fallback_add_pmc);
     mmd_add_function(interp, MMD_SUBTRACT, (funcptr_t)mmd_fallback_subtract_pmc);
     mmd_add_function(interp, MMD_SUBTRACT, (funcptr_t)mmd_fallback_subtract_pmc);
@@ -259,16 +262,17 @@ register_fallback_methods(Parrot_Interp interp) {
     mmd_add_function(interp, MMD_STRCMP, (funcptr_t)mmd_fallback_strcmp_pmc);
     mmd_add_function(interp, MMD_SOR, (funcptr_t)mmd_fallback_stringor_pmc);
     mmd_add_function(interp, MMD_SAND, (funcptr_t)mmd_fallback_stringand_pmc);
-    mmd_add_function(interp, MMD_SXOR, (funcptr_t)mmd_fallback_stringxor_pmc);
 }
 
 void
 mmd_fallback_add_pmc(Parrot_Interp interp, PMC *left, PMC *right, PMC *dest)
 {
+    puts("Here");
     FLOATVAL result = (VTABLE_get_number(interp, left) +
                        VTABLE_get_number(interp, right));
+    puts("there");
     VTABLE_set_number_native(interp, dest, result);
-
+    puts("Everywhere");
 }
 
 void
