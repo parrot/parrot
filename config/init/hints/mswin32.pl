@@ -29,7 +29,7 @@
 		my $cc_output = `$cc /? 2>&1`;
 		$ccflags =~ s/-O1 // if $cc_output =~ m/Standard/ || $cc_output =~ m{/ZI};
 		$ccflags =~ s/-Gf/-GF/ if $cc_output =~ m/Version (\d+)/ && $1 >= 13;
-		
+
 
 		Configure::Data->set(
 			so         => '.dll',
@@ -38,8 +38,7 @@
 			cc_o_out   => '-Fo',
 			cc_exe_out => '-Fe',
 			cc_ldflags => '/link',
-			              #Use Edit and Continue debugging if available
-			cc_debug   => ($cc_output =~ m{/ZI} ? '-ZI' : '-Zi'),
+			cc_debug   => '-Zi', #ZI messes with __LINE__
 			ld_debug   => '-debug',
 			ld_shared  => '-dll',
 			ld_shared_flags=> '-def:libparrot.def',
@@ -56,7 +55,7 @@
 		# 'link' needs to be link.exe, not cl.exe.
 		# This makes 'link' and 'ld' the same.
 		Configure::Data->set('link', Configure::Data->get('ld'));
-		
+
 		# We can't use -opt: and -debug together.
 		if (Configure::Data->get('ld_debug') =~ /-debug/) {
 			my $linkflags = Configure::Data->get('linkflags');
@@ -74,7 +73,7 @@
 			cc_o_out => '-o',
 			cc_exe_out => '-e',
 			cc_debug => '-v',
-			
+
 			ld => ${cc},
 			ldflags => '',
 			ld_out => '-e',
@@ -82,7 +81,7 @@
 			ld_debug => '-v',
 			ld_shared => '-WD',
 			libs => 'import32.lib cw32.lib',
-			
+
                         link => ${cc},
                         linkflags => '',
 
