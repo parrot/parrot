@@ -50,8 +50,12 @@ void
 stack_mark_cow(Stack_Chunk_t *stack)
 {
     Stack_Chunk_t *chunk = stack;
+    /* Skip it all if we're already COW'd */
+    if (chunk->flags & STACK_CHUNK_COW_FLAG) {
+        return;
+    }
     chunk->flags |= STACK_CHUNK_COW_FLAG;
-    for (chunk = chunk->prev; chunk; chunk = chunk->prev)
+    for (chunk = chunk->prev; chunk && !(chunk->flags& STACK_CHUNK_COW_FLAG); chunk = chunk->prev)
         chunk->flags |= STACK_CHUNK_COW_FLAG;
 }
 
