@@ -365,8 +365,19 @@ sub P6C::arglist::tree {
 sub P6C::subscript::tree {
     my $x = shift;
     if (@$x == 4) {
-	# i.e. $x(23)
-	return new P6C::indices type => 'Sub', indices => maybe_tree($x->[2]);
+	# e.g., $x(23)
+
+        # Create a ValueList to hold the arguments so that the
+        # signature context will be applied to it, rather than
+        # directly to the argument tree (that could be a single value,
+        # and single values don't know what to do in signature
+        # context.)
+        #
+        # Is this right? If there are multiple values, will they
+        # already be wrapped up in a ValueList?
+        my $argtree = maybe_tree($x->[2]);
+        my $args = new P6C::ValueList vals => ($argtree ? [ $argtree ] : [ ]);
+	return new P6C::indices type => 'Sub', indices => $args;
     }
     my $type = ($x->[2] eq '{' ? 'PerlHash' : 'PerlArray');
     my $indices = $x->[5]->tree;
@@ -471,8 +482,20 @@ sub P6C::prefix::tree {
     if (@$x == 2) {
 	return $x->[1]->tree;
     }
+    my $args = $x->[3]->tree;
+    if (! defined $args) {
+        # The only thing I know of that hits this case is a 'skip'
+        # statement
+    } elsif (UNIVERSAL::isa($args, 'ARRAY')) {
+        # Leave it alone
+    } elsif ($args->isa('P6C::Binop') && $args->op eq ',') {
+        # Hrm... this shouldn't be wrapped up in a ValueList. Well --
+        # it should be, but not yet.
+    } elsif (! $args->isa('P6C::ValueList') && ref $args) {
+        $args = new P6C::ValueList vals => [ $args ];
+    }
     return P6C::prefix->new(name => $x->[1]->tree,
-			    args => $x->[3]->tree);
+			    args => $args);
 }
 
 ##############################

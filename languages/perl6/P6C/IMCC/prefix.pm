@@ -189,23 +189,43 @@ sub prefix_while {
 
 Do a subroutine call.
 
+Arguments:
+ $x : a P6C::prefix representing the function call
+ %options : the only valid option currently is 'is_rule'
+
 XXX: currently ignores context. We don't have a way of communicating
 context to functions anyways, so this isn't a problem.
 
+FIXME: this also heavily uses the P6C::IMCC::Sub object pulled out of
+%P6C::IMCC::funcs. Which would be good to eliminate wherever possible.
+
 =cut
 
-sub gen_sub_call {
-    my ($x, %options) = @_;
-    my $ctx_of_call = $x->{ctx};
-    my $call_string;
+# Args:
+#  $sub_name
+#
+# Returns: a P6C::IMCC::Sub object containing the parameters and
+# return value
+#
+# In addition to looking up or creating an appropriate P6C::IMCC::Sub
+# object, set the Sub's return value and context.
+sub _get_sub {
+    my ($sub_name, $is_rule) = @_;
 
-    my $func = $P6C::IMCC::funcs{$x->name}; # May not be found
+    my $func;
+
+    # If it's a sub whose name is known at compile-time, look it up
+    if (! ref $sub_name) {
+        $func = $P6C::IMCC::funcs{$sub_name}; # May not be found
+    }
+
+    # If its name is dynamic or unknown, create a P6C::IMCC::Sub
+    # object on the fly.
     if (!defined($func)) {
         # Calling function without a prototype
-        my $name = $x->name;
         my $ftab = \%P6C::IMCC::funcs;
         my ($sig, $ctx);
-        if ($options{is_rule}) {
+        if ($is_rule) {
             $sig = P6C::Rules::default_signature();
             $ctx = P6C::Rules::default_arg_context();
             $func = new P6C::IMCC::Sub params => $sig;
@@ -215,107 +235,156 @@ sub gen_sub_call {
             $func = new P6C::IMCC::Sub params => $sig;
             $func->rettype('PerlArray');
         }
-        unless (ref $name) {
-	$P6C::Context::CONTEXT{$name} = $ctx;
-            $ftab->{$name} = $func;
-        $func->{'autodeclared'} = 1;
-    }
+        unless (ref $sub_name) {
+            $P6C::Context::CONTEXT{$sub_name} = $ctx;
+            $ftab->{$sub_name} = $func;
+            $func->{'autodeclared'} = 1; # Warn if a prototype is found later
+        }
     }
 
+    return $func;
+}
+
+# Generate code that fetches a PMC representing the subroutine to be
+# called, and return the PMC.
+sub _make_sub_pmc {
+    my ($sub_name) = @_;
+
     my $subpmc = gentmp 'pmc';
-    if (! ref $x->name) {
-    my $subname = "&" . $x->name;
-        code("", "\tfind_lex $subpmc, \"$subname\"");
-    } elsif ($x->name->isa('P6C::variable')) {
-        $subpmc = $x->name->val;
+    if (! ref $sub_name) {
+        my $p6_sub_name = "&$sub_name";
+        code("", "\tfind_lex $subpmc, \"$p6_sub_name\"");
+    } elsif ($sub_name->isa('P6C::variable')) {
+        $subpmc = $sub_name->val;
     } else {
-        my $name_val = $x->name->val;
+        my $name_val = $sub_name->val;
         code("", "\tfind_lex $subpmc, $name_val");
     }
 
-    if ($x->args) {
-        # Certain constructs -- like dynamically-named arguments --
-        # prevent us from using a prototype even if it is known.
-        my $cannot_prototype;
+    return $subpmc;
+}
 
-	my $args = $x->args;
-        my $ctx = $args->{ctx};
+sub gen_sub_call {
+    my ($sub_name, $args, $ctx_of_call, %options) = @_;
 
-	# Sometimes function arguments are a tuple, sometimes not.
-	# Make things consistent. FIXME: I don't like this. I think
-	# they ought to be consistent to begin with. Otherwise,
-	# figuring out how things are done is a nightmare.
-        if (ref($args) eq 'ARRAY') {
-            # Leave as-is
-        } elsif (ref($args) eq 'P6C::ValueList') {
-            $args = $args->vals;
-        } else {
-	    $args = [$args];
-        }
+    my $func = _get_sub($sub_name, $options{is_rule});
+    my $subpmc = _make_sub_pmc($sub_name);
 
-        my $slurpy_array;
-        if ($func->params->slurpy_array) {
-            $slurpy_array = newtmp('PerlArray', "# slurpy array arg");
-        }
+    if (! $args) {
+	code("\t.pcc_begin non_prototyped # IMCC::prefix nonprototyped");
+        use Carp; Carp::confess "unimplemented";
+    }
 
-        # Split apart the arguments into their different roles
-        my $params = $func->params;
-        my ($positional, $named_known, $named_unknown) =
-          categorize_args($args, $params);
+    # Certain constructs -- like dynamically-named arguments --
+    # prevent us from using a prototype even if it is known.
+    my $cannot_prototype;
 
-        my @positional_stmts;
+    # Sometimes function arguments are a tuple, sometimes not. Make
+    # things consistent: $args will be an ARRAY ref of arguments.
+    #
+    # FIXME: I don't like this. I think they ought to be consistent to
+    # begin with. Otherwise, figuring out how things are done is a
+    # nightmare.
+    if (ref($args) eq 'ARRAY') {
+        # Leave as-is
+    } elsif (ref($args) eq 'P6C::ValueList') {
+        $args = $args->vals;
+    } else {
+        $args = [$args];
+    }
+
+    my $slurpy_array;
+    if ($func->params->slurpy_array) {
+        $slurpy_array = newtmp('PerlArray', "# slurpy array arg");
+    }
+
+    # Split apart the arguments into their different roles
+    my $params = $func->params;
+    my ($positional, $named_known, $named_unknown) =
+      categorize_args($args, $params);
+
+    my @positional_stmts;
 #        my $pos_var = newtmp 'PerlArray';
 #        code("\tset $pos_var, " . @$positional . " # length = #positional args");
 #        my $nk_var = newtmp 'Array', "# statically known named args";
 #        code("\tset $nk_var, " . @$named_known);
-        my $nu_var = newtmp 'PerlHash', "# dynamically-named args";
+    my $nu_var = newtmp 'PerlHash', "# dynamically-named args";
 
-        my $i = 0;
-        my $am_flattening;
-        foreach my $arg (@$positional) {
-            my $param = $params->indexed_param($i);
-            my $desc = $param->render;
-            if (defined $arg) {
-                if ($ctx->is_sig) {
-                    $arg->{ctx} = $ctx->indexed_context($i);
-                }
-                code("\t# Computing value of arg $i (bound to param $desc)");
-                my $val = $arg->val;
-                if ($arg->{ctx}->flatten) {
-                    if ($slurpy_array) {
-                        P6C::IMCC::do_append_array($slurpy_array, $val);
-                    } else {
-                        push @positional_stmts, "\t.flatten_arg $val # param ($desc)";
-                    }
-                    $am_flattening = 1;
+    # We now have an array of non-named arguments. Unfortunately,
+    # there is not a 1-1 correspondence between these args and the
+    # parameters of the called function, because the args might be
+    # comma-separated lists of arguments. So we'll go through and
+    # flatten them all.
+    my @positionals = map { P6C::Util::flatten_leftop($_, ',') } @$positional;
+
+    my $i = 0;
+    my $am_flattening;
+    my @slurpy_arg_vals;
+    foreach my $arg (@positionals) {
+        my $param = $params->indexed_param($i);
+        my $desc = $param->render;
+        if (defined $arg) {
+            code("\t# Computing value of arg $i (bound to param $desc)");
+            my $val = $arg->val;
+            # $val is either a string containing a PMC name, or an
+            # array of them.
+            #
+            # Err...wait. I'm hoping there will no longer ever be an
+            # array of them?
+            die "array of args?? $sub_name ".$_[1]->render
+              if UNIVERSAL::isa($val, 'ARRAY');
+            my @vals = UNIVERSAL::isa($val, 'ARRAY') ? @$val : ($val);
+
+            if ($arg->{ctx}->flatten) {
+                if ($slurpy_array) {
+                    push @slurpy_arg_vals, @vals;
                 } else {
-                    if ($am_flattening) {
-                        die "ERROR: found non-flattened param after a flattened param\n";
-                    }
-                    push @positional_stmts, $val; # param ($desc)
+                    push @positional_stmts, "\t.flatten_arg $_ # param ($desc)"
+                      foreach (@vals);
                 }
+                $am_flattening = 1;
             } else {
-                # Push some sentinel value
-                # FIXME: What if we are flattening?
-                push @positional_stmts, 0; # unfilled (FIXME) param = $desc
+                if ($am_flattening) {
+                    die "ERROR: found non-flattened param after a flattened param\n";
+                }
+                push @positional_stmts, "\t.arg $_ # param ($desc)"
+                  foreach (@vals);
             }
-        } continue {
-            $i++;
+        } else {
+            # Push some sentinel value
+            # FIXME: What if we are flattening?
+            push @positional_stmts, "\t.arg 0 # unfilled (FIXME) param = $desc";
         }
+    } continue {
+        $i++;
+    }
 
-        my $undef = newtmp('PerlUndef');
-        while ($i < $params->max_nonslurpy_positional) {
-            my $param = $params->indexed_param($i++);
-            my $desc = $param->var->name;
-            push(@positional_stmts, $undef); # dummy value for unpassed param $desc (FIXME)
-            # FIXME: At the moment, we only search through the named
-            # argument list if we call without a prototype. When the
-            # calling code is changed so that it *does* pass through
-            # statically named arguments as positionals, then this
-            # should be changed so that $cannot_prototype is only
-            # triggered for dynamically named arguments.
-            $cannot_prototype = 1;
-        }
+    if (@slurpy_arg_vals == 1) {
+        # Optimization: if there is a single array value being stuffed
+        # into a slurpy array, then just assign it to the slurpy array
+        # instead of copying it element by element (I implemented this
+        # not for speed reasons, but because it makes the generated
+        # code easier to read. If we ever implement an array append
+        # op, I'll toss this out.)
+        code("\t$slurpy_array = $slurpy_arg_vals[0] # single val in slurpy array");
+    } elsif (@slurpy_arg_vals > 1) {
+        P6C::IMCC::do_append_array($slurpy_array, $_)
+            foreach (@slurpy_arg_vals);
+    }
+
+    my $undef = newtmp('PerlUndef');
+    while ($i < $params->max_nonslurpy_positional) {
+        my $param = $params->indexed_param($i++);
+        my $desc = $param->var->name;
+        push(@positional_stmts, "\t.arg $undef # dummy value for unpassed param $desc (FIXME)");
+        # FIXME: At the moment, we only search through the named
+        # argument list if we call without a prototype. When the
+        # calling code is changed so that it *does* pass through
+        # statically named arguments as positionals, then this
+        # should be changed so that $cannot_prototype is only
+        # triggered for dynamically named arguments.
+        $cannot_prototype = 1;
+    }
 
 # And this commented-out code is needed to implement the above, also.
 # Except that it's wrong, because the sentinel value is bogus.
@@ -332,37 +401,49 @@ sub gen_sub_call {
 #         }
 
 #        foreach (@$named_unknown) {
-        foreach (@$named_known, @$named_unknown) {
-            my $key = $_->l;
-            if (ref $key) {
-                $key = $key->val;
-            } else {
-                $key = qq("$key");
-            }
-            my $value = $_->r->val;
-            code("\t$nu_var\[$key] = $value # Unknown named arg");
-        }
-
-        my $mname = P6C::IMCC::mangled_name($x->name);
-        my $call_return = genlabel 'after_call';
-	$call_string = $subpmc;
-        if ($cannot_prototype) {
-	  my (@args);
-	  push (@args, $nu_var) unless $params->{no_named};
-	  push(@args, @positional_stmts) if @positional_stmts;
-	  push (@args, $slurpy_array) if $slurpy_array;
-	  $call_string .= "(" . join(", ", @args) .")";
+    foreach (@$named_known, @$named_unknown) {
+        my $key = $_->l;
+        if (ref $key) {
+            $key = $key->val;
         } else {
-	  my (@args);
-	  push(@args, $nu_var) unless $params->{no_named};
-	  push(@args, @positional_stmts) if @positional_stmts;
-	  push(@args, $slurpy_array) if $slurpy_array;
-	  $call_string .= "(" . join(", ", @args) .")";
+            $key = qq("$key");
         }
-    } else {
-	code("\t.pcc_begin non_prototyped # IMCC::prefix nonprototyped");
-        use Carp; Carp::cluck "unimplemented";
+        my $value = $_->r->val;
+        code("\t$nu_var\[$key] = $value # Unknown named arg");
     }
+
+    my $call_return = genlabel 'after_call';
+#     my $call_string = $subpmc;
+#     if ($cannot_prototype) {
+#         my (@args);
+#         push (@args, $nu_var) unless $params->{no_named};
+#         push(@args, @positional_stmts) if @positional_stmts;
+#         push (@args, $slurpy_array) if $slurpy_array;
+#         $call_string .= "(" . join(", ", @args) .")";
+#     } else {
+#         my (@args);
+#         push(@args, $nu_var) unless $params->{no_named};
+#         push(@args, @positional_stmts) if @positional_stmts;
+#         push(@args, $slurpy_array) if $slurpy_array;
+#         $call_string .= "(" . join(", ", @args) .")";
+#     }
+    if ($cannot_prototype) {
+        code("\t.pcc_begin non_prototyped # IMCC::prefix cannot proto");
+        code("\t.arg $nu_var # named args")
+          unless $params->{no_named};
+        code(@positional_stmts) if @positional_stmts;
+    } else {
+        code("\t.pcc_begin prototyped # IMCC::prefix prototyped");
+        code("\t.arg $nu_var # named args")
+          unless $params->{no_named};
+        code(@positional_stmts) if @positional_stmts;
+#             code("\t.arg $nk_var");
+    }
+    if ($slurpy_array) {
+        code("\t.flatten_arg $slurpy_array # slurpy array");
+    }
+    code("\t.pcc_call $subpmc");
+    code("$call_return:");
 
     # Now handle return value.
 
@@ -372,19 +453,26 @@ sub gen_sub_call {
 	$rettype = 'PerlArray';
     }
     if (ref($rettype) eq 'ARRAY') {
-	my @results = map { gentmp $_ } @$rettype;
-	my $return_string = join(", ", @results);
-	$return_string = "(". $return_string. ")";
-	if (@results) {
-	  code("\t$return_string = $call_string", "");
-	} else {
-	  code("\t$call_string", "");
-	}
+ 	my @results = map { gentmp $_ } @$rettype;
+       for my $i (0 .. $#results) {
+            code("\t.result $results[$i]");
+        }
+        code("\t.pcc_end # list return", "");
+#  	my $return_string = join(", ", @results);
+# 	$return_string = "(". $return_string. ")";
+# 	if (@results) {
+# 	  code("\t$return_string = $call_string", "");
+# 	} else {
+# 	  code("\t$call_string", "");
+# 	}
 	return tuple_in_context([@results], $ctx_of_call);
 
     } elsif ($rettype eq 'PerlArray') {
       my $ret = gentmp 'pmc';
-      my $return_string = $ret;
+	code("\t.result $ret");
+        code("\t.pcc_end");
+#       my $return_string = $ret;
+#       code("\t$ret  = $call_string");
       # XXX: this is not nice, but it's more useful than returning
       # array-lengths.
       if ($ctx_of_call->is_scalar) {
@@ -392,7 +480,7 @@ sub gen_sub_call {
 	    my $blech = genlabel;
 	    my $end = genlabel;
 	    code(<<END);
-        $ret  = $call_string
+        # array return in scalar context
 	$itmp = $ret
 	if $itmp == 0 goto $blech
 	dec $itmp
@@ -401,18 +489,21 @@ sub gen_sub_call {
 $blech:
 	$ret = new PerlUndef
 $end:
-        # .pcc_end # array return in scalar context
 
 END
 	    return $ret;
 	} else {
-	  code("\t$return_string = $call_string", "");
-	  return array_in_context($ret, $ctx_of_call);
+            code("\t# array return in list context", "");
+# 	  code("\t$return_string = $call_string", "");
+##	  return array_in_context($ret, $ctx_of_call);
+          return $ret;
 	}
 
     } elsif (is_scalar($rettype)) {
 	my $ret = gentmp 'pmc';
-	code("\t$ret = $call_string", "");
+	code("\t.result $ret");
+        code("\t.pcc_end # scalar return", "");
+# 	code("\t$ret = $call_string", "");
 	return scalar_in_context($ret, $ctx_of_call);
 
     } else {
@@ -789,7 +880,7 @@ sub val_topical {
     val_noarg($block);
 }
 
-=item val_topical
+=item prefix_foreach
 
 foreach() statement
 
@@ -889,6 +980,7 @@ END
 	$bang->{ctx} = new P6C::Context;
 	set_topic $bang;
 
+        $catcher = $catcher->vals(0);
 	$result = val_noarg($catcher);
 
 	# If we make it here, the CATCH failed.  Add implicit re-throw.
@@ -947,7 +1039,7 @@ with no catch block.
 
 sub prefix_try {
     my ($x) = @_;
-    return wrap_with_catch($x->args, undef);
+    return wrap_with_catch($x->args->vals->[0], undef);
 }
 
 sub simple_control {
@@ -1010,7 +1102,7 @@ Default case in a given{} block.
 
 sub prefix_default {
     my ($x) = @_;
-    my $ret = val_noarg($x->args);
+    my $ret = val_noarg($x->args->vals(0));
     goto_label type => 'break';
     return $ret;
 }

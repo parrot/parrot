@@ -49,7 +49,14 @@ sub declare {
 	$hash->{$_} = new P6C::IMCC::Sub params => $sig, rettype => [];
 	$P6C::Parser::WANT{$_} = 'bare_arglist';
     }
-    for (qw(substr join)) {
+    for (qw(join)) {
+        my ($sig, $ctx) = P6C::Parser::parse_sig('$separator,*@params', no_named => 1);
+	$P6C::Context::CONTEXT{$_} = $ctx;
+	$hash->{$_} = new P6C::IMCC::Sub params => $sig,
+                                         rettype => 'PerlString';
+	$P6C::Parser::WANT{$_} = 'bare_arglist';
+    }
+    for (qw(substr)) {
         my ($sig, $ctx) = P6C::Parser::parse_sig('*@params', no_named => 1);
 	$P6C::Context::CONTEXT{$_} = $ctx;
 	$hash->{$_} = new P6C::IMCC::Sub params => $sig,
@@ -58,7 +65,7 @@ sub declare {
     }
 
     for (qw(index)) {
-        my ($sig, $ctx) = P6C::Parser::parse_sig('*@params', no_named => 1);
+        my ($sig, $ctx) = P6C::Parser::parse_sig('$haystack,$needle,*@params', no_named => 1);
 	$P6C::Context::CONTEXT{$_} = $ctx;
 	$hash->{$_} = new P6C::IMCC::Sub params => $sig, rettype => 'PerlInt';
 	$P6C::Parser::WANT{$_} = 'bare_arglist';
@@ -81,7 +88,7 @@ sub declare {
     }
 
     for (qw(grep map)) {
-        my ($sig, $ctx) = P6C::Parser::parse_sig('*@params');
+        my ($sig, $ctx) = P6C::Parser::parse_sig('$condition,*@params', no_named => 1);
 	$P6C::Context::CONTEXT{$_} = $ctx;
 	$hash->{$_} = new P6C::IMCC::Sub params => $sig,
                                          rettype => 'PerlArray';
@@ -99,16 +106,15 @@ sub emit {
 print <<'END';
 
 .sub _substr non_prototyped
-    .param pmc params
-    $P0 = params
-# n paras
-    $I0 = params
-    $S0 = params[0]
-    $I1 = params[1]
-    if $I0 == 2 goto substr_2
-    $I2 = params[2]
-    if $I0 > 4 goto substr_die
+    .local pmc params
+    foldup params
+    $I0 = params # Number of params
     if $I0 < 2 goto substr_die
+    $S0 = params[0] # String
+    $I1 = params[1] # Start offset
+    if $I0 == 2 goto substr_2
+    $I2 = params[2] # Length
+    if $I0 > 4 goto substr_die
     length $I3, $S0
     $I4 = $I3
     if $I2 >= 0 goto substr_34
@@ -139,10 +145,11 @@ substr_2:
     sub $I2, $I2, $I1
     goto substr_3
 substr_die:
-    set $S0, "wrong number of args for substr"
-    $P0 = new PerlArray
-    $P0[0] = $S0
-    _die($P0)
+    $S0 = "wrong number of args for substr"
+    $P3 = new PerlString
+    $P3 = $S0
+    find_lex $P2, "&die"
+    $P2($P3)
     goto substr_ret
     end
 .end
@@ -160,7 +167,8 @@ substr_die:
 .end
 
 .sub _reverse non_prototyped
-    .param pmc orig_array
+    .local pmc orig_array
+    foldup orig_array
     $I0 = orig_array
     dec $I0
     $I1 = 0
@@ -178,20 +186,22 @@ reverse_loopstart:
 .end
 
 .sub _join non_prototyped
-    .param pmc params
+    .param pmc separator_pmc
+    .local pmc params
+    foldup params, 1
     .local int num_params
     num_params = params
-    if num_params > 1 goto join_next
+    if num_params > 0 goto join_next
 # Empty args:
     $S0 = ""
     goto join_ret
 # At least one arg:
 join_next:
     .local string separator
-    separator = params[0]	# separator
-    $S0 = params[1]		# accumulated string
+    separator = separator_pmc
+    $S0 = params[0]		# accumulated string
     .local int counter
-    counter = 2			# arg number
+    counter = 1			# arg number
     goto join_test
 join_loopstart:
     $S2 = params[counter]
@@ -210,21 +220,21 @@ join_ret:
 .end
 
 .sub _index non_prototyped
-    .param pmc params
+    .param string haystack
+    .param string needle
+    .local pmc params
+    foldup params, 2
     $I2 = params
-    if $I2 < 2 goto index_numarg_error
-    $S0 = params[0]
-    $S1 =  params[1]
     $I0 = 0
     $P1 = new PerlInt
     $P1 = $I0
-    if $I3 < 3 goto index_2_arg
-    index $I0, $S0, $S1
+    if $I3 > 0 goto index_3_arg
+    index $I0, haystack, needle
     $P1 = $I0
     goto index_end
-index_2_arg:
-    $I1 = params[2]
-    index $I0, $S0, $S1, $I1
+index_3_arg:
+    $I1 = params[0]
+    index $I0, haystack, needle, $I1
     $P1 = $I0
 index_end:
     .pcc_begin_return
@@ -233,9 +243,7 @@ index_end:
     end
 index_numarg_error:
     $S0 = "wrong number of args for index"
-    $P0 = new PerlArray
-    $P0[0] = $S0
-    _die($P0)
+    _die($S0)
     goto index_end
 .end
 
@@ -261,9 +269,10 @@ index_numarg_error:
 .end
 
 .sub _print non_prototyped
-    .param pmc params
+    .local pmc params
     .local int num_elem
     .local int counter
+    foldup params
     num_elem = params
     counter = 0
 print_loopstart:
@@ -283,7 +292,8 @@ print_loopend:
 .end
 
 .sub _die non_prototyped
-    .param object params
+    .local object params
+    foldup params
 
     # setup $!: ####################
     .local object dollar_bang
@@ -325,7 +335,8 @@ die_nohandler:
 .end
 
 .sub _warn non_prototyped
-    .param object params
+    .local object params
+    foldup params
     $P1 = _print(params)
     .pcc_begin_return
     .return $P1
@@ -334,16 +345,15 @@ die_nohandler:
 
 .sub _grep non_prototyped
     .param Sub condition
-    .param pmc params
+    .local pmc params
+    foldup params, 1
     .local int tmp
     .local PerlArray result_list
     .local int ii
     .local pmc comparison_result
     .local pmc element
     result_list = new PerlArray
-    set tmp, params
-    lt tmp, 2, __grep_die_numargs
-    shift condition, params
+    lt I3, 2, __grep_die_numargs
     typeof S0, condition
     ne S0, "Sub", __grep_die_arg1
     ii = 0
@@ -376,7 +386,8 @@ __grep_die_arg1:
 .end
 
 .sub _map non_prototyped
-    .param pmc params
+    .local pmc params
+    foldup params
     $P2 = new PerlArray
     set $I3, params
     lt $I3, 2, __map_die_numargs

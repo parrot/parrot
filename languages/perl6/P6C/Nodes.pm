@@ -749,7 +749,7 @@ sub P6C::sigparam::context {
     }
     my $ctx = new P6C::Context type => $type;
     $ctx->{name} = $param->var->name;
-    $ctx->flatten(1) if $param->zone eq 'slurpy';
+#    $ctx->flatten(1) if $param->zone eq 'slurpy';
     return $ctx;
 }
 

@@ -103,7 +103,7 @@ sub import {
 		  exists_function_decl set_function_params set_function_return
 		  gen_counted_loop scalar_in_context do_flatten_array
 		  array_in_context tuple_in_context undef_in_context
-		  primitive_in_context call_closure);
+		  primitive_in_context);
     my @external = qw(init compile emit);
     my $caller = caller;
     no strict 'refs';
@@ -857,7 +857,6 @@ END
 END
 	return primitive_in_context($itmp, 'int', $ctx);
     } else {
-        $DB::single = 1;
 	unimp "Return type ".$ctx->type;
     }
 }
@@ -1021,22 +1020,6 @@ END
 
 =cut
 
-# FIXME: This completely ignores the new signature-based calling
-# stuff.
-sub call_closure {
-    my ($thing, $args) = @_;
-    my $argval = $args ? $args->val : newtmp('PerlArray');
-    my $func = $thing->val;
-    my $dummy_named = newtmp 'PerlHash';
-    my $ret_label = genlabel 'ret_label';
-    my $ret = gentmp 'pmc';
-    code(<<END);
-        $ret = $func($dummy_named, $argval)
-END
-    return $ret;
-}
-
-
 ######################################################################
 # Node-type code generation functions
 
@@ -1097,29 +1080,39 @@ END
 	# similar to tuple context. This has many gaps, but hopefully
 	# we'll cover an interesting subset of cases.
 	my @ret;
-	my $min = @{ $type->positional };
-        die "not enough args: need $min, have " . @{$x->vals}
-          if @{$x->vals} < $min; # Should be runtime exception?
+        my $i = 0;
 
-	for my $i (0..$min - 1) {
-	    push @ret, $x->vals($i)->val;
-	}
-	if ($type->slurpy_array) {
-	    # In flattening context, we have to build a new array out of
-	    # the values.  All the values should have been evaluated in
-	    # array context, so they will all be PerlArrays.
-	    push @ret, do_flatten_array($x->vals, $min);
-	} else {
-            my $opt = @{ $type->optional };
-	    for my $i ($min .. $#{$x->vals}) {
-                if ($i - $min < $opt) {
-                    push @ret, $x->vals($i)->val;
-                } else {
-                    $x->vals($i)->val;
-                }
-	    }
-	}
-	return \@ret;
+        # Fill in all of the required positional args
+        foreach (@{ $type->positional }) {
+            if (! $x->vals($i)) {
+                # Should be runtime exception
+                die "not enough args: need " . @{ $type->positional } .
+                  ", have " . @{$x->vals};
+            }
+            push @ret, $x->vals($i++)->val;
+        }
+
+        # Fill in as many optional args as we have
+        foreach (@{ $type->optional }) {
+            last if ! $x->vals($i);
+            push @ret, $x->vals($i++)->val;
+        }
+
+        return \@ret if ! $x->vals($i);
+
+        # The rest go into the slurpy array.
+        if (! $type->slurpy_array) {
+            die "too many args: got " . @{$x->vals} . ", max is " .
+              (@{ $type->positional } + @{ $type->optional });
+        }
+
+        # Heh. I highly doubt this is correct. I don't see how it
+        # flattens the list-returning pieces while still handling the
+        # scalars correctly.
+        push(@ret, $x->vals($i++)->val) while ($x->vals($i));
+#        warn "Probable bug: gobbling slurpy array" unless $::boingie++;
+
+        return \@ret;
     } elsif ($ctx->is_scalar || $ctx->type eq 'void') {
 	# The value of a list in scalar context is its last value, but
 	# we need to evaluate intermediate expressions for possible
@@ -1417,19 +1410,17 @@ use P6C::IMCC::prefix qw(%prefix_ops gen_sub_call);
 use P6C::Util 'unimp';
 
 sub val {
-
     my $x = shift;
 
     if (!defined $x->name) {
 	# This operation has been squashed, e.g. we're creating a
 	# catch block.  Do nothing.
     } elsif (exists_function_decl($x->name)) {
-	return gen_sub_call($x, @_);
+	return gen_sub_call($x->name, $x->args, $x->{ctx}, @_);
     } elsif (exists $P6C::IMCC::prefix::prefix_ops{$x->name}) {
 	return $P6C::IMCC::prefix::prefix_ops{$x->name}->($x, @_);
     } else {
-	return gen_sub_call($x, @_);
-#	unimp "Prefix operator ".$x->name();
+	return gen_sub_call($x->name, $x->args, $x->{ctx}, @_);
     }
 }
 
@@ -1975,10 +1966,12 @@ sub val {
 	unimp "multi-level subscripting";
     }
     if ($x->subscripts(0)->type eq 'Sub') {
-	# Function call
-	return array_in_context(call_closure($x->thing,
-					     $x->subscripts(0)->indices),
-				$x->{ctx});
+	# Function call : $f(...)
+        my $ret = P6C::IMCC::prefix::gen_sub_call($x->thing,
+                                                  $x->subscripts(0)->indices,
+                                                  $x->{ctx});
+
+	return array_in_context($ret, $x->{ctx});
     }
     code("# Base for indexing\n");
     my $thing = $x->thing->val;

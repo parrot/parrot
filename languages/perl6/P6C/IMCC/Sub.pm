@@ -140,33 +140,29 @@ sub emit {
     my ($x, $prototyped) = @_;
     my $params = $x->params;
 
-    # $positional_args is a PerlArray containing all of the non-named
-    # args (including all positional args and the slurpy array, if
-    # any) in the unprototyped case. In the prototyped case, the
-    # required and positional args are passed directly.
-    my $positional_args;
-    if (! $prototyped || $params->slurpy_array) {
-        $positional_args = P6C::IMCC::gensym("positionals");
-    }
-    my $known_named_args = P6C::IMCC::gensym("known_named");
     my $named_args = P6C::IMCC::gensym("unknown_named");
 
     print "\t.param PerlHash $named_args # named args\n"
       unless $params->{no_named};
 
+    # Emit all of the positional and optional parameters
+    my $param_count = 0;
+    $param_count++ unless $params->{no_named}; # Skip over the named param hash
     foreach my $param (@{ $params->positional }, @{ $params->optional }) {
         my ($ptype, $pvar) = ($param->type, $param->var);
         $ptype = P6C::IMCC::paramtype($ptype);
         my $pname = $pvar->name;
         my $pname_mangled = P6C::IMCC::mangled_name($pname);
         print "\t.param $ptype $pname_mangled # Positional param $pname\n";
+        $param_count++;
     }
 
     # The slurpy array, if any, is passed as an array PMC
     if ($params->slurpy_array) {
         my $slurpy = $params->slurpy_array->var->name;
         my $slurpy_name = P6C::IMCC::mangled_name($slurpy);
-        print "\t.param pmc $slurpy_name # slurpy array $slurpy_name\n";
+        print "\t.local PerlArray $slurpy_name\n";
+        print "\tfoldup $slurpy_name, $param_count # Suck in slurpy args\n";
     }
 
     # Create local variables for all the named arguments

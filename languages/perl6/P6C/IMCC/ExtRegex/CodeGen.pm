@@ -163,7 +163,10 @@ sub call_rule_named {
     my ($rule_call, $want_results) = @_;
     code("\t# call_rule_named");
 #    $DB::single = 1;
-    my @results = P6C::IMCC::prefix::gen_sub_call($rule_call, is_rule => 1);
+    my @results = P6C::IMCC::prefix::gen_sub_call($rule_call->name,
+                                                  $rule_call->args,
+                                                  $rule_call->{ctx},
+                                                  is_rule => 1);
     code("\tset $want_results->[$_], $results[$_]")
       for (reverse 0..$#results);
     code("\t# call_rule_named end");
