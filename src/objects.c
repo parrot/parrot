@@ -752,9 +752,103 @@ the name in the global stash.
 
 */
 
+static PMC * find_method_with_cache(Parrot_Interp, PMC *, STRING*);
+typedef struct _meth_cache_entry {
+    void * strstart;    /* string address */
+    PMC  * pmc;         /* the mthod */
+    struct _meth_cache_entry *next;
+} Meth_cache_entry;
+typedef struct {
+    UINTVAL size;              /* sizeof table */
+    Meth_cache_entry ***idx;      /* bufstart idx */
+    /* PMC **hash */    /* for non-constant keys */
+} Meth_cache;
+
+
+#define TBL_SIZE_MASK 0x1ff   /* x bits 2..10 */
+#define TBL_SIZE (1 + TBL_SIZE_MASK)
+/*
+ * quick'n'dirty method cache
+ * TODO: integrae NCI meth lookup
+ * TODO: use a hash if method_name is not constant
+ *       i.e. from obj.$Sreg(args)
+ *       If this hash is implemented mark it during DOD
+ */
 PMC *
 Parrot_find_method_with_cache(Parrot_Interp interpreter, PMC *class,
-                              STRING *method_name) {
+                              STRING *method_name)
+{
+
+    UINTVAL type = class->vtable->base_type;
+    Meth_cache *mc = interpreter->method_cache;
+    PMC *found;
+    int store_it = 0;
+    int is_const = PObj_constant_TEST(method_name);
+    UINTVAL bits = (((UINTVAL) method_name->strstart ) >> 2) & TBL_SIZE_MASK;
+    Meth_cache_entry *e, *old = NULL;
+
+    if (!is_const) {
+        /* TODO use hash - for now just go look up */
+        goto find_it;
+    }
+
+    if (!mc || type >= mc->size || !mc->idx[type] || !mc->idx[type][bits]) {
+        store_it = 1;
+find_it:
+        found = find_method_with_cache(interpreter, class, method_name);
+    }
+    else {
+        e = mc->idx[type][bits];
+        while (e && e->strstart != method_name->strstart) {
+            old = e;
+            e = e->next;
+        }
+        if (!e) {
+            found = find_method_with_cache(interpreter, class, method_name);
+            goto store_e;
+        }
+        return e->pmc;
+    }
+    if (store_it) {
+        UINTVAL i;
+        if (!mc) {
+            mc = interpreter->method_cache = mem_sys_allocate(sizeof(*mc));
+            mc->size = 0;
+            mc->idx = NULL;
+        }
+        if (type >= mc->size) {
+            mc->idx = mem_sys_realloc(mc->idx,
+                    sizeof(UINTVAL*) * (type + 1));
+            for (i = mc->size; i <= type; ++i)
+                mc->idx[i] = NULL;
+            mc->size = type + 1;
+        }
+        if (!mc->idx[type]) {
+            mc->idx[type] = mem_sys_allocate(sizeof(Meth_cache_entry*) *
+                    TBL_SIZE);
+            for (i = 0; i < TBL_SIZE; ++i)
+                mc->idx[type][i] = NULL;
+        }
+        old = mc->idx[type][bits];
+store_e:
+        /* when here no or no correct entry was at [bits] */
+        e = mem_sys_allocate(sizeof(Meth_cache_entry));
+        if (old)
+            old->next = e;
+        else
+            mc->idx[type][bits] = e;
+
+        e->pmc = found;
+        e->next = NULL;
+        e->strstart = method_name->strstart;
+    }
+    return found;
+}
+
+static PMC *
+find_method_with_cache(Parrot_Interp interpreter, PMC *class,
+                              STRING *method_name)
+{
     PMC* method = NULL;  /* The method we ultimately return */
     PMC* curclass;          /* PMC for the current search class */
     PMC* classsearch_array; /* The array of classes we're searching
