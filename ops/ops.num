@@ -1455,3 +1455,7 @@ sqrt_n_i        1427
 sqrt_n_ic       1428
 sqrt_n_n        1429
 sqrt_n_nc       1430
+gcd_i_i_i_i_i   1431
+gcd_i_i_i_ic_i  1432
+gcd_i_i_i_i_ic  1433
+gcd_i_i_i_ic_ic 1434
