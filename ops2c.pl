@@ -125,7 +125,6 @@ my $preamble = <<END_C;
 
 END_C
 
-print $header;
 print HEADER $preamble;
 print HEADER <<END_C;
 #include "parrot/parrot.h"
