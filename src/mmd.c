@@ -667,7 +667,7 @@ static void mmd_search_classes(Interp *, STRING *meth, PMC *arg_tuple, PMC *);
 static int  mmd_search_lexical(Interp *, STRING *meth, PMC *arg_tuple, PMC *);
 static int  mmd_search_package(Interp *, STRING *meth, PMC *arg_tuple, PMC *);
 static int  mmd_search_global(Interp *, STRING *meth, PMC *arg_tuple, PMC *);
-static int  mmd_search_builtin(Interp *, STRING *meth, PMC *arg_tuple, PMC *);
+static void mmd_search_builtin(Interp *, STRING *meth, PMC *arg_tuple, PMC *);
 static int  mmd_maybe_candidate(Interp *, PMC *pmc, PMC *arg_tuple, PMC *cl);
 static void mmd_sort_candidates(Interp *, PMC *arg_tuple, PMC *cl);
 
@@ -773,6 +773,7 @@ mmd_arg_tuple_inline(Interp *interpreter, STRING *signature, va_list args)
                 VTABLE_set_integer_keyed_int(interpreter, arg_tuple,
                         i, enum_type_STRING);
                 break;
+            case 'O':
             case 'P':
                 arg = va_arg(args, PMC *);
                 type = VTABLE_type(interpreter, arg);
@@ -795,6 +796,14 @@ mmd_arg_tuple_func(Interp *interpreter, STRING *signature)
     INTVAL sig_len, i, type, next_p;
     PMC* arg_tuple, *arg;
 
+    /* TODO
+     * if there is no signature e.g. because of
+     *      m = getattribute l, "__add"
+     * - we have to return the MultiSub
+     * - create a BoundMulit
+     * - dispatch in invoke - yeah ugly
+     */
+
     arg_tuple = pmc_new(interpreter, enum_class_FixedIntegerArray);
     sig_len = string_length(interpreter, signature);
     if (!sig_len)
@@ -815,6 +824,12 @@ mmd_arg_tuple_func(Interp *interpreter, STRING *signature)
             case 'S':
                 VTABLE_set_integer_keyed_int(interpreter, arg_tuple,
                         i, enum_type_STRING);
+                break;
+            case 'O':
+                arg = REG_PMC(2);
+                type = VTABLE_type(interpreter, arg);
+                VTABLE_set_integer_keyed_int(interpreter, arg_tuple,
+                        i, type);
                 break;
             case 'P':
                 if (next_p == 16)
@@ -989,14 +1004,20 @@ mmd_distance(Interp *interpreter, PMC *pmc, PMC *arg_tuple)
     INTVAL i, n, args, dist, j, m;
     INTVAL type_sig, type_call;
 
-    multi_sig = PMC_sub(pmc)->multi_signature;
-    if (!multi_sig) {
-        /* some method */
-        return 0;
+    if (pmc->vtable->base_type == enum_class_NCI) {
+        /* has to be a builtin multi method */
+        multi_sig = PMC_pmc_val(pmc);
     }
-    if (multi_sig->vtable->base_type == enum_class_FixedStringArray) {
-        multi_sig = PMC_sub(pmc)->multi_signature =
-            mmd_cvt_to_types(interpreter, multi_sig);
+    else {
+        multi_sig = PMC_sub(pmc)->multi_signature;
+        if (!multi_sig) {
+            /* some method */
+            return 0;
+        }
+        if (multi_sig->vtable->base_type == enum_class_FixedStringArray) {
+            multi_sig = PMC_sub(pmc)->multi_signature =
+                mmd_cvt_to_types(interpreter, multi_sig);
+        }
     }
     n = VTABLE_elements(interpreter, multi_sig);
     args = VTABLE_elements(interpreter, arg_tuple);
@@ -1307,19 +1328,25 @@ mmd_search_global(Interp *interpreter, STRING *meth, PMC *arg_tuple, PMC *cl)
 
 /*
 
-=item C<static int mmd_search_builtin(Interp *, STRING *meth, PMC *arg_tuple, PMC *cl)>
+=item C<static void mmd_search_builtin(Interp *, STRING *meth, PMC *arg_tuple, PMC *cl)>
 
-Search the builtin namespace for matching candidates. Return TRUE if
-the MMD search should stop.
+Search the builtin namespace for matching candidates. This is the last
+search in all the namespaces.
 
 =cut
 
 */
 
-static int
+static void
 mmd_search_builtin(Interp *interpreter, STRING *meth, PMC *arg_tuple, PMC *cl)
 {
-    return 0;
+    PMC *pmc;
+    STRING *ns;
+
+    ns = CONST_STRING(interpreter, "__parrot_core");
+    pmc = Parrot_find_global(interpreter, ns, meth);
+    if (pmc)
+        mmd_maybe_candidate(interpreter, pmc, arg_tuple, cl);
 }
 
 static void
@@ -1359,13 +1386,19 @@ mmd_create_builtin_multi_meth(Interp *interpreter, INTVAL type,
 {
     const char *name, *short_name;
     char signature[6], val_sig;
-    STRING *s, *ns;
+    STRING *meth_name, *ns;
     int len;
     char *p;
-    PMC *method, *multi;
+    PMC *method, *multi, *class, *multi_sig;
     INTVAL func_nr;
 
 
+    if (type == enum_class_Null || type == enum_class_delegate ||
+            type == enum_class_Ref  || type == enum_class_SharedRef ||
+            type == enum_class_deleg_pmc || type == enum_class_ParrotClass ||
+            type == enum_class_ParrotObject) {
+        return;
+    }
     func_nr = entry->func_nr;
     name = short_name = Parrot_MMD_methode_name(interpreter, func_nr);
     /*
@@ -1393,38 +1426,66 @@ mmd_create_builtin_multi_meth(Interp *interpreter, INTVAL type,
             }
         }
     }
-#if 0
+
     /*
      * create NCI method in left class
      */
-    s = const_string(interpreter, name);
-    strcpy(signature, "vIP.P");
+    strcpy(signature, "vJP.P");
     signature[3] = val_sig;
     if (func_nr >= MMD_EQ && func_nr <= MMD_STRCMP) {
         signature[0] = 'I';
         signature[4] = '\0';
     }
-    method = pmc_new(interpreter, enum_class_NCI);
-    VTABLE_set_pointer_keyed_str(interpreter, method,
-            const_string(interpreter, signature),
-            F2DPTR(entry->func_ptr));
-    Parrot_store_global(interpreter,
-            Parrot_base_vtables[type]->whoami,
-            const_string(interpreter, name),
-            method);
+    meth_name = const_string(interpreter, short_name);
+    class = Parrot_base_vtables[type]->class;
+    method = Parrot_find_method_with_cache(interpreter, class, meth_name);
+    if (!method) {
+        /* first method */
+        method = constant_pmc_new(interpreter, enum_class_NCI);
+        VTABLE_set_pointer_keyed_str(interpreter, method,
+                const_string(interpreter, signature),
+                F2DPTR(entry->func_ptr));
+        VTABLE_add_method(interpreter, class, meth_name, method);
+    }
+    else {
+        /* multiple methods with that same name */
+        if (method->vtable->base_type == enum_class_NCI) {
+            /* convert first to a multi */
+            multi = constant_pmc_new(interpreter, enum_class_MultiSub);
+            VTABLE_add_method(interpreter, class, meth_name, multi);
+            VTABLE_push_pmc(interpreter, multi, method);
+        }
+        else {
+            assert(method->vtable->base_type == enum_class_MultiSub);
+            multi = method;
+        }
+        method = constant_pmc_new(interpreter, enum_class_NCI);
+        VTABLE_set_pointer_keyed_str(interpreter, method,
+                const_string(interpreter, signature),
+                F2DPTR(entry->func_ptr));
+        VTABLE_push_pmc(interpreter, multi, method);
+    }
+    /* mark MMD */
+    PObj_get_FLAGS(method) |= PObj_private0_FLAG;
+    /*
+     * attach the multi_signature array to PMC_pmc_val
+     */
+    multi_sig = constant_pmc_new(interpreter, enum_class_FixedIntegerArray);
+    VTABLE_set_integer_native(interpreter, multi_sig, 2);
+    VTABLE_set_integer_keyed_int(interpreter, multi_sig, 0, type);
+    VTABLE_set_integer_keyed_int(interpreter, multi_sig, 1, entry->right);
+    PMC_pmc_val(method) = multi_sig;
 
     /*
-     * push method on multi_sub
+     * push method onto core multi_sub
+     * TODO cache the namespace
      */
     ns = CONST_STRING(interpreter, "__parrot_core");
     multi = Parrot_find_global(interpreter, ns,
             const_string(interpreter, short_name));
     assert(multi);
-    /*
-     * FIXME need the multi signature too
-     */
     VTABLE_push_pmc(interpreter, multi, method);
-#endif
+
 }
 
 /*

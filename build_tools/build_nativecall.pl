@@ -40,6 +40,8 @@ my %ret_count =
      ( p => [1,0,0,1,0],        # Returning a pointer that we PMC stuff
        P => [1,0,0,1,0],        # PMC
        S => [1,0,1,0,0],        # STR
+       I => [1,1,0,0,0],        # INTVAL
+       N => [1,0,0,0,1],        # FLOATVAL
        i => [1,1,0,0,0],        # Returning an int
        3 => [1,1,0,0,0],        # Returning an int pointer
        l => [1,1,0,0,0],        # Returning a long
@@ -68,8 +70,10 @@ my %ret_type =
        v => "void",
 #      b => "void *",
 #      B => "void **",
-       P => "void *",
+       P => "PMC *",
        S => "STRING *",
+       I => "INTVAL",
+       N => "FLOATVAL",
      );
 
 my %proto_type =
@@ -87,8 +91,10 @@ my %proto_type =
        v => "void",
        J => "Interp *",
        P => "PMC *",
+       O => "PMC *",      # object
        S => "STRING *",
-       O => "PMC *",
+       I => "INTVAL",
+       N => "FLOATVAL",
        b => "void *",
        B => "void **",
        L => "long *",
@@ -117,13 +123,16 @@ my %ret_type_decl =
        v => "void *",
 #      b => "void *",
 #      B => "void **",
-       P => "void *",
+       P => "PMC *",
        S => "STRING *",
+       I => "INTVAL",
+       N => "FLOATVAL",
      );
 
 my %ret_assign =
      ( p => "PMC_data(final_destination) = return_data;\n    REG_PMC(5) = final_destination;",
        i => "REG_INT(5) = return_data;",
+       I => "REG_INT(5) = return_data;",
        3 => "REG_INT(5) = *return_data;",
        l => "REG_INT(5) = return_data;",
        4 => "REG_INT(5) = *return_data;",
@@ -131,6 +140,7 @@ my %ret_assign =
        2 => "REG_INT(5) = *return_data;",
        f => "REG_NUM(5) = return_data;",
        d => "REG_NUM(5) = return_data;",
+       N => "REG_NUM(5) = return_data;",
        P => "REG_PMC(5) = return_data;",
        S => "REG_STR(5) = return_data;",
        v => "",
@@ -155,6 +165,8 @@ my %func_call_assign =
        t => "return_data = ",
        P => "return_data = ",
        S => "return_data = ",
+       I => "return_data = ",
+       N => "return_data = ",
 #      B => "return_data = ",
        v => "",
      );
@@ -270,6 +282,9 @@ sub make_arg {
     /l/ && do {my $reg_num = $reg_ref->{i}++;
                return "(long)REG_INT($reg_num)";
               };
+    /I/ && do {my $reg_num = $reg_ref->{i}++;
+               return "REG_INT($reg_num)";
+              };
     /4/ && do {my $reg_num = $reg_ref->{p}++;
                return "(long*)&PMC_int_val(REG_PMC($reg_num))";
               };
@@ -287,6 +302,9 @@ sub make_arg {
               };
     /d/ && do {my $reg_num = $reg_ref->{n}++;
                return "(double)REG_NUM($reg_num)";
+              };
+    /N/ && do {my $reg_num = $reg_ref->{n}++;
+               return "REG_NUM($reg_num)";
               };
     /t/ && do {my $reg_num = $reg_ref->{s}++;
                my $temp_num = ${$temp_cnt_ref}++;
@@ -472,25 +490,23 @@ build_call_func(Interp *interpreter, PMC *pmc_nci,
 
     iglobals = interpreter->iglobals;
 
-    if (iglobals)
-        HashPointer = VTABLE_get_pmc_keyed_int(interpreter, iglobals,
+    if (PMC_IS_NULL(iglobals))
+	PANIC("iglobals isnÄt created yet");
+    HashPointer = VTABLE_get_pmc_keyed_int(interpreter, iglobals,
             IGLOBALS_NCI_FUNCS);
 
     if (!HashPointer) {
         HashPointer = pmc_new(interpreter, enum_class_Hash);
+	VTABLE_set_pmc_keyed_int(interpreter, iglobals, IGLOBALS_NCI_FUNCS,
+                HashPointer);
 
 $put_pointer
 
-        if (iglobals)
-        {
-            VTABLE_set_pmc_keyed_int(interpreter, iglobals, IGLOBALS_NCI_FUNCS,
-                HashPointer);
-        }
     }
 
     b = VTABLE_get_pmc_keyed_str(interpreter, HashPointer, signature);
 
-    if (b && (b->vtable->type(interpreter, b) == enum_class_UnManagedStruct) )
+    if (b && b->vtable->base_type == enum_class_UnManagedStruct)
         return F2DPTR(PMC_data(b));
 
     /*

@@ -16,7 +16,7 @@ Tests the multi-method dispatch.
 
 =cut
 
-use Parrot::Test tests => 19;
+use Parrot::Test tests => 21;
 
 pir_output_is(<<'CODE', <<'OUTPUT', "PASM divide");
 
@@ -653,18 +653,16 @@ Any    42
 Any    43
 OUT
 
-SKIP: {
-  skip("not yet", 2);
-
 pir_output_is(<<'CODE', <<'OUTPUT', "__add as method");
 .sub main @MAIN
-    new $P0, .Integer
-    new $P1, .Integer
-    new $P2, .Integer
-    set $P1, 3
-    set $P2, 39
-    $P0 = $P1."__add"($P2)
-    print $P0
+    .local pmc d, l, r
+    d = new Integer
+    l = new Integer
+    r = new Integer
+    l = 3
+    r = 39
+    l."__add"(r, d)
+    print d
     print "\n"
     end
 .end
@@ -674,18 +672,50 @@ OUTPUT
 
 pir_output_is(<<'CODE', <<'OUTPUT', "__add as method - inherited");
 .sub main @MAIN
-    new $P0, .PerlInt
-    new $P1, .PerlInt
-    new $P2, .PerlInt
-    set $P1, 3
-    set $P2, 39
-    $P0 = $P1."__add"($P2)
-    print $P0
+    .local pmc d, l, r
+    d = new PerlInt
+    l = new PerlInt
+    r = new PerlInt
+    l = 3
+    r = 39
+    l."__add"(r, d)
+    print d
     print "\n"
-    end
 .end
 CODE
 42
 OUTPUT
 
-}
+pir_output_is(<<'CODE', <<'OUTPUT', "__add as method - Int, Float");
+.sub main @MAIN
+    .local pmc d, l, r
+    d = new Integer
+    l = new Integer
+    r = new Float
+    l = 3
+    r = 39.42
+    l."__add"(r, d)
+    print d
+    print "\n"
+    end
+.end
+CODE
+42.42
+OUTPUT
+
+pir_output_is(<<'CODE', <<'OUTPUT', "__add as function - Int, Float");
+.sub main @MAIN
+    .local pmc d, l, r
+    d = new Integer
+    l = new Integer
+    r = new Float
+    l = 3
+    r = 39.42
+    "__add"(l, r, d)
+    print d
+    print "\n"
+    end
+.end
+CODE
+42.42
+OUTPUT

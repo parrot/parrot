@@ -49,6 +49,8 @@ typedef struct _MMD_table {
                                  in question */
 } MMD_table;
 
+
+PMC *Parrot_MMD_search_default_func(Interp *, STRING *meth, STRING *signature);
 /*
  * in src/objects.c :
  */

@@ -95,26 +95,8 @@ Returns whether the class is or inherits from C<*classname>.
         return Parrot_object_isa(INTERP, SELF, class);
     }
 
-/*
-
-=item C<PMC *find_method(STRING *name)>
-
-Figure out which method PMC we need. By default we just defer to the
-system method lookup code.
-
-=cut
-
-*/
-
-    PMC* find_method(STRING* name) {
-        return Parrot_find_method_with_cache(INTERP, SELF, name);
-    }
 
 /*
-
-=item C<INTVAL can(STRING *method)>
-
-Returns whether the class can perform C<*method>.
 
 =item C<PMC *get_class()>
 
@@ -128,10 +110,6 @@ classes.
 =cut
 
 */
-
-    INTVAL can(STRING* method) {
-        return VTABLE_find_method(INTERP, SELF, method) != NULL;
-    }
 
     PMC* get_class() {
         return SELF;

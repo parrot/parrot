@@ -100,7 +100,8 @@ END
       foreach (@pmcs[0..$#pmcs-1]);
     print OUT <<"END";
 	if (!pass) {
-	    PMC *classname_hash;
+	    PMC *classname_hash, *iglobals;
+	    int i;
 	    /* Need an empty stash */
 	    interp->globals = mem_sys_allocate(sizeof(struct Stash));
 	    interp->globals->stash_hash =
@@ -110,6 +111,13 @@ END
             interp->class_hash = classname_hash =
                 pmc_new(interp, enum_class_Hash);
 	    Parrot_register_core_pmcs(interp, classname_hash);
+	    /* init the interpreter globals array */
+	    iglobals = pmc_new(interp, enum_class_SArray);
+	    interp->iglobals = iglobals;
+	    VTABLE_set_integer_native(interp, iglobals, (INTVAL)IGLOBALS_SIZE);
+	    /* clear the array */
+	    for (i = 0; i < (INTVAL)IGLOBALS_SIZE; i++)
+		VTABLE_set_pmc_keyed_int(interp, iglobals, i, NULL);
 	}
     }
 }

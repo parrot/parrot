@@ -59,6 +59,12 @@ d	d
 d	JOd      # Parrot builtins
 d	v
 
+v	JPPP	 # infix MMD
+v	JPIP
+v	JPSP
+v	JPNP
+I	JPP      # MMD compare
+
 f                # t/pmc/nci.t
 f	ff       # t/pmc/nci.t
 f	is

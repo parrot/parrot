@@ -194,8 +194,6 @@ the interpreter's errors setting.
 
 */
 
-/* XXX */
-PMC *Parrot_MMD_search_default_func(Interp *, STRING *meth, STRING *signature);
 
 PMC *
 Parrot_get_name(Interp* interpreter, STRING *name)
@@ -218,10 +216,10 @@ Parrot_get_name(Interp* interpreter, STRING *name)
     if (g) {
         if (g->vtable->base_type == enum_class_MultiSub) {
             /*
-             * signature is currently passed in S0
+             * signature is currently passed in S1
              * see also imcc/pcc.c
              */
-            g = Parrot_MMD_search_default_func(interpreter, name, REG_STR(0));
+            g = Parrot_MMD_search_default_func(interpreter, name, REG_STR(1));
             if (g)
                 return g;
         }

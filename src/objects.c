@@ -1147,7 +1147,7 @@ Parrot_find_method_with_cache(Parrot_Interp interpreter, PMC *class,
     return find_method_direct(interpreter, class, method_name);
 #endif
 
-    if (!is_const) {
+    if (!is_const || !mc) {
         /* TODO use hash - for now just go look up */
         goto find_it;
     }

@@ -116,6 +116,10 @@ about the state of the PMC passed in here after the call is made.
 
 The fully qualified name of the method or sub being called
 
+=item S1
+
+Call signature used for MMD only.
+
 =item I0
 
 1 if the sub is being called with fully prototyped parameters,

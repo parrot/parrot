@@ -137,7 +137,7 @@ Return the class of this object.
 
     PMC* find_method(STRING* name) {
         PMC *class = VTABLE_get_class(INTERP, SELF);
-        return Parrot_find_method_with_cache(INTERP, class, name);
+        return VTABLE_find_method(INTERP, class, name);
     }
 
     PMC* get_attr(INTVAL idx) {

@@ -71,13 +71,7 @@ init_world(Interp *interpreter)
     /* Create MMD_table for all MMD functions */
     Parrot_mmd_rebuild_table(interpreter, -1, -1);
 
-    /* init the interpreter globals array */
-    iglobals = pmc_new(interpreter, enum_class_SArray);
-    interpreter->iglobals = iglobals;
-    VTABLE_set_integer_native(interpreter, iglobals, (INTVAL)IGLOBALS_SIZE);
-    /* clear the array */
-    for (i = 0; i < (INTVAL)IGLOBALS_SIZE; i++)
-        VTABLE_set_pmc_keyed_int(interpreter, iglobals, i, NULL);
+    iglobals = interpreter->iglobals;
     VTABLE_set_pmc_keyed_int(interpreter, iglobals,
             (INTVAL)IGLOBALS_CLASSNAME_HASH, interpreter->class_hash);
     self = pmc_new_noinit(interpreter, enum_class_ParrotInterpreter);

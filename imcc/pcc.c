@@ -822,18 +822,24 @@ static Instruction*
 pcc_insert_signature(Parrot_Interp interp, IMC_Unit * unit, Instruction *ins,
         struct pcc_sub_t *pcc_sub)
 {
-    int i, n;
+    int i, n, m;
     SymReg *regs[IMCC_MAX_REGS];
     char buffer[20];    /* TODO is there a limit? */
 
     n = pcc_sub->nargs;
     buffer[0] = '"';
-    for (i = 0; i < n && i < 15; ++i) {
-        buffer[i + 1] = pcc_sub->args[i]->set;
+    if (pcc_sub->object) {
+        buffer[1] = 'O';
+        m = 2;
     }
-    buffer[i + 1] = '"';
-    buffer[i + 2] = '\0';
-    regs[0] = get_pasm_reg(interp, "S0");
+    else
+        m = 1;
+    for (i = 0; i < n && i < 15; ++i) {
+        buffer[m++] = pcc_sub->args[i]->set;
+    }
+    buffer[m++] = '"';
+    buffer[m] = '\0';
+    regs[0] = get_pasm_reg(interp, "S1");
     regs[1] = mk_const(interp, str_dup(buffer), 'S');
     ins = insINS(interp, unit, ins, "set", regs, 2);
     return ins;
@@ -915,9 +921,8 @@ expand_pcc_sub_call(Parrot_Interp interp, IMC_Unit * unit, Instruction *ins)
      * a possible MMD call can inspect the passed arguments
      */
     if (get_name) {
-        /* for now, put a call signature in S0 */
-        if (!meth_call)
-            ins = pcc_insert_signature(interp, unit, ins, sub->pcc_sub);
+        /* for now, put a call signature in S1 */
+        ins = pcc_insert_signature(interp, unit, ins, sub->pcc_sub);
         insert_ins(unit, ins, get_name);
         ins = get_name;
     }
@@ -946,6 +951,7 @@ expand_pcc_sub_call(Parrot_Interp interp, IMC_Unit * unit, Instruction *ins)
             else
                 ins = insINS(interp, unit, ins, "set", regs, 2);
         }
+        ins = pcc_insert_signature(interp, unit, ins, sub->pcc_sub);
         if (sub->pcc_sub->nci)
             goto move_sub;
     }

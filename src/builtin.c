@@ -154,10 +154,13 @@ Parrot_find_builtin(Interp *interpreter, STRING *func)
 {
     int i;
     PMC *m;
+    STRING *ns;
 
     i = find_builtin_s(interpreter, func);
-    if (i < 0)
-        return NULL;
+    if (i < 0) {
+        ns = CONST_STRING(interpreter, "__parrot_core");
+        return Parrot_find_global(interpreter, ns, func);
+    }
     m = Parrot_find_global(interpreter,
             builtins[i].namespace,
             builtins[i].meth_name);
