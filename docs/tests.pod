@@ -43,32 +43,39 @@ or, if it is a C test, some code like this:
     #include <stdio.h>
     #include "parrot/parrot.h"
     #include "parrot/embed.h"
-    
-    int do_test(Interp *interpreter);
-    
+
+    static opcode_t *the_test(Parrot_Interp, opcode_t *, opcode_t *);
+
     int main(int argc, char* argv[]) {
-        Interp* interpreter;
+        Parrot_Interp interpreter;
         interpreter = Parrot_new();
 
-        if ( interpreter == NULL ) return 1;
-        interpreter->lo_var_ptr = &interpreter;
-    
+        if (!interpreter)
+	    return 1;
+
         Parrot_init(interpreter);
-        return do_test(interpreter);
-    }
-    
-    int do_test(Interp *interpreter) {
-        /* Your test goes here. */
+        Parrot_run_native(interpreter, the_test);
         printf("done\n");
+	fflush(stdout);
         return 0;
+    }
+
+    static opcode_t*
+    the_test(Parrot_Interp interpreter,
+	    opcode_t *cur_op, opcode_t *start)
+    {
+        /* Your test goes here. */
+
+        return NULL;  /* always return NULL */
     }
     CODE
     # Anything that might be output prior to "done".
     done
     OUTPUT
 
-Note, it's always a good idea to output "done" to confirm that the
-compiled code executed completely.
+Note, it's always a good idea to output "done" to confirm that the compiled
+code executed completely. When mixing C<printf> and C<PIO_printf> always
+append a C<fflush(stdout);> after the former.
 
 =head2 Ideal tests:
 
@@ -89,8 +96,8 @@ can identify where and why quickly.
 =item o
 
 Are valid. Essentially, they should conform to the additional documentation
-that accompanies the feature (if any). [If there isn't any documentation, 
-then feel free to add some and/or complain to the mailing list].  
+that accompanies the feature (if any). [If there isn't any documentation,
+then feel free to add some and/or complain to the mailing list].
 
 =item o
 
