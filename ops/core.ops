@@ -33,7 +33,8 @@ introspection.
 
 These are the fundamental operations.
 Please note: These opcodes must not be moved; they must have
-exactly these opcode numbers.
+exactly these opcode numbers. Opcodes ending with underscores are for
+internal use only, don't emit these opcodes.
 
 =over 4
 
@@ -43,7 +44,7 @@ exactly these opcode numbers.
 
 =item B<end>()
 
-Halts the interpreter. (Must be op #0)
+Halts the interpreter. (Must be op #0, CORE_OPS_end). See also B<exit>.
 
 =cut
 
@@ -57,37 +58,42 @@ inline op end() {
 =item B<noop>()
 
 Does nothing other than waste an iota of time and 32 bits of bytecode space.
+(Must be op #1, CORE_OPS_noop)
 
 =item B<cpu_ret>()
 
 Emit a cpu return instruction. This is used to return from CGP core
 to JIT code. Note: Do B<not> use this opcode. It is for internal use only.
-(Must be op #2)
+(Must be op #2, CORE_OPS_cpu_ret)
 
 =item B<check_events>()
 
 Check the event queue and run event handlers if there are unhandled events.
 Note: This opcode is mainly for testing. It should not be necessary to ever
 use it explicitly.
-(Must be op #3).
+(Must be op #3, CORE_OPS_check_events).
 
 =item B<check_events__>()
 
 Check the event queue and run event handlers if there are unhandled events.
 Note: Do B<not> use this opcode. It is for internal use only.
-(Must be op #4).
+(Must be op #4, CORE_OPS_check_events__).
 
 =item B<wrapper__>()
 
 Internal opcode to wrap unknown ops from loaded opcode libs.
 Don't use.
-(Must be op #5).
+(Must be op #5, CORE_OPS_wrapper__).
 
 =item B<prederef__>()
 
 Internal opcode to prederef opcodes on the fly.
 Don't use.
-(Must be op #6).
+(Must be op #6, CORE_OPS_prederef__ ).
+
+=item B<reserved>(in INT)
+
+Reserve 2 more fixed entries.
 
 =item B<load_bytecode>(in STR)
 

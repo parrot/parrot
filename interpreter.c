@@ -135,7 +135,6 @@ prederef_args(void **pc_prederef, struct Parrot_Interp *interpreter,
         }
 
         if (pc_prederef[i] == 0) {
-            /* switched core has no func_table, so a NULL op is ok */
             internal_exception(INTERP_ERROR,
                     "Prederef generated a NULL pointer for arg of type %d!\n",
                     opinfo->types[i]);
@@ -252,9 +251,10 @@ init_prederef(struct Parrot_Interp *interpreter, int which)
 
         /* fill with the prederef__ opcode function */
         if (which == PARROT_SWITCH_CORE)
-            pred_func = (void*) 6;
+            pred_func = (void*) CORE_OPS_prederef__;
         else
-            pred_func = ((void **) interpreter->op_lib->op_func_table)[6];
+            pred_func = ((void **)
+                    interpreter->op_lib->op_func_table)[CORE_OPS_prederef__];
         for (i = 0; i < N; i++) {
             temp[i] = pred_func;
         }
@@ -1132,7 +1132,7 @@ dynop_register_cg(Parrot_Interp interpreter, PMC* lib_pmc,
         ops_addr[i] = ((void **)cg_lib->op_func_table)[i];
     /* fill new entries with the wrapper op */
     for (i = n_old; i < n_old + n_new; ++i)
-        ops_addr[i] = ((void **)cg_lib->op_func_table)[5];
+        ops_addr[i] = ((void **)cg_lib->op_func_table)[CORE_OPS_wrapper__];
     /*
      * tell the cg_core about the new jump table
      */
