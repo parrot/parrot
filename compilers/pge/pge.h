@@ -14,7 +14,8 @@ typedef enum {
     PGE_CONCAT, PGE_GROUP, PGE_ALT,
     PGE_ANCHOR_BOS, PGE_ANCHOR_EOS,
     PGE_ANCHOR_BOL, PGE_ANCHOR_EOL,
-    PGE_CUT_ALT, PGE_CUT_RULE
+    PGE_CUT_ALT, PGE_CUT_RULE,
+    PGE_BACKREFERENCE
 } pge_exp_t;
 
 enum { ctliteral=0x00, ctmeta=0x01, ctspace=0x02, ctket=0x04, ctquant=0x08 };

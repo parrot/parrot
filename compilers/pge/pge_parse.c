@@ -201,6 +201,13 @@ pge_parse_term(PGE_Text* t)
     if (c == '$') {
         type = PGE_ANCHOR_EOS; pge_skip(t, 1);
         if (*(t->pos) == '$') { type = PGE_ANCHOR_EOL; pge_skip(t, 1); }
+        else if (isdigit(*(t->pos))) { 
+           e = pge_parse_new(PGE_BACKREFERENCE, 0, 0);
+           e->group = atoi(t->pos);
+           while (isdigit(*(t->pos))) t->pos++;
+           pge_skip(t,0);
+           return e;
+        }
         return pge_parse_new(type, 0, 0);
     }
     if (c == ':' && t->pos[1] == ':') {

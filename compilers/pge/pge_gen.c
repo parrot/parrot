@@ -155,6 +155,12 @@ pge_gen_dot(PGE_Exp* e, const char* succ)
 
     emit("    maxrep = length target\n");
     emit("    maxrep -= pos\n");
+    if (e->min > 0) emit("    if maxrep < %d goto fail\n", e->min);
+    if (e->min == e->max) {
+        emit("    pos += %d\n", e->min);
+        emit("    goto %s\n\n", succ);
+        return;
+    }
     if (e->max != PGE_INF) {
         emit("    if maxrep <= %d goto R%d_1\n", e->max, e->id);
         emit("    maxrep = %d\n", e->max);
@@ -190,14 +196,12 @@ pge_gen_dot(PGE_Exp* e, const char* succ)
 
 
 static void
-pge_gen_literal(PGE_Exp* e, const char* succ)
+pge_gen_string(PGE_Exp* e, const char* succ)
 {
-    trace("%.16s %s", str_con(e->name, e->nlen), fmt_quant(e));
-
     if (e->min==1 && e->max==1) {
-        emit("    substr $S0, target, pos, %d\n", e->nlen);
-        emit("    if $S0 != %s goto fail\n", str_con(e->name, e->nlen));
-        emit("    pos += %d\n", e->nlen);
+        emit("    substr $S0, target, pos, strlen\n");
+        emit("    if $S0 != str goto fail\n");
+        emit("    pos += strlen\n");
         emit("    goto %s\n\n", succ);
         return;
     }
@@ -207,18 +211,18 @@ pge_gen_literal(PGE_Exp* e, const char* succ)
         emit("  R%d_1:\n", e->id);
         if (e->max != PGE_INF)
             emit("    if rep >= %d goto R%d_2\n", e->max, e->id);
-        emit("    substr $S0, target, pos, %d\n", e->nlen);
-        emit("    if $S0 != %s goto R%d_2\n", str_con(e->name, e->nlen), e->id);
+        emit("    substr $S0, target, pos, strlen\n");
+        emit("    if $S0 != str goto R%d_2\n", e->id);
         emit("    inc rep\n");
-        emit("    pos += %d\n", e->nlen);
+        emit("    pos += strlen\n", e->nlen);
         emit("    goto R%d_1\n", e->id);
         emit("  R%d_2:\n", e->id);
         if (e->min > 0) emit("    if rep < %d goto fail\n", e->min);
         if (e->iscut) { emit("    goto %s\n", succ); return; }
         emit("    if rep == %d goto %s\n", e->min, succ);
-        emitsub(succ, "pos", "rep", 0);
+        emitsub(succ, "pos", "rep", "strlen", 0);
         emit("    dec rep\n");
-        emit("    pos -= %d\n", e->nlen);
+        emit("    pos -= strlen\n");
         emit("    goto R%d_2\n\n", e->id);
         return;
     } 
@@ -230,15 +234,47 @@ pge_gen_literal(PGE_Exp* e, const char* succ)
         if (e->iscut) { emit("    goto %s\n", succ); return; }
         if (e->max != PGE_INF) 
             emit("    if rep == %d goto %s\n", e->max, succ);
-        emitsub(succ, "pos", "rep", 0);
+        emitsub(succ, "pos", "rep", "str", "strlen", 0);
         emit("  R%d_2:\n", e->id);
-        emit("    substr $S0, target, pos, %d\n", e->nlen);
-        emit("    if $S0 != %s goto fail\n", str_con(e->name, e->nlen));
+        emit("    substr $S0, target, pos, strlen\n", e->nlen);
+        emit("    if $S0 != str goto fail\n");
         emit("    inc rep\n");
-        emit("    pos += %d\n", e->nlen);
+        emit("    pos += strlen\n");
         emit("    goto R%d_1\n\n", e->id);
         return;
     } 
+}
+
+
+static void
+pge_gen_literal(PGE_Exp* e, const char* succ)
+{
+    trace("%.16s %s", str_con(e->name, e->nlen), fmt_quant(e));
+    emit("    str = %s\n", str_con(e->name, e->nlen));
+    emit("    strlen = %d\n", e->nlen);
+    pge_gen_string(e, succ);
+}
+
+
+static void
+pge_gen_backreference(PGE_Exp* e, const char* succ)
+{
+    char key[32];
+
+    sprintf(key,"\"%d\"", e->group);
+    trace("backref $%d %s", e->group, fmt_quant(e));
+    emit("    classoffset $I0, match, \"PGE::Match\"\n");
+    emit("    $I0 += 4\n");
+    emit("    getattribute gr_cap, match, $I0\n");
+    emit("    $I0 = defined gr_cap[%s]\n", key);
+    emit("    unless $I0 goto %s\n", succ);
+    emit("    $P0 = gr_cap[%s]\n", key);
+    emit("    $I0 = $P0[-2]\n");
+    emit("    $I1 = $P0[-1]\n");
+    emit("    if $I0 >= $I1 goto %s\n", succ);
+    emit("    strlen = $I1 - $I0\n");
+    emit("    substr str, target, $I0, strlen\n");
+    pge_gen_string(e, succ);
 }
 
 
@@ -472,6 +508,7 @@ pge_gen_exp(PGE_Exp* e, const char* succ)
     case PGE_ANCHOR_EOL: pge_gen_anchor(e, succ); break;
     case PGE_CUT_ALT: 
     case PGE_CUT_RULE: pge_gen_cut(e, succ); break;
+    case PGE_BACKREFERENCE: pge_gen_backreference(e, succ); break;
     }
 }
 
@@ -515,6 +552,8 @@ pge_gen(PGE_Exp* e)
     emit("    .local pmc gr_rep\n");
     emit("    .local pmc gr_cap\n");
     emit("    .local int cutgrp\n");
+    emit("    .local string str\n");
+    emit("    .local int strlen\n");
     sprintf(r1sub, "R%d", e->id);
     emitsub(r1sub, 0);
     emit("  fail_forever:\n");
