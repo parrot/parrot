@@ -10,15 +10,21 @@ Indexing Aggregate PMCs
    Maintainer: Simon Cozens <simon@netthink.co.uk>
    Class: Internals
    PDD Number: 8
-   Version: 1.2
+   Version: 1.3
    Status: Developing
-   Last Modified: 25 April, 2002
+   Last Modified: 25 August, 2002
    PDD Format: 1
    Language: English
 
 =head2 HISTORY
 
 =over 4
+
+=item Sun Aug 25 11:14:43 GMT 2002 : Version 1.3
+
+Updated to reflect Dan's decision to change keys to use PMCs instead
+of a custom data structure. Also corrects documentation of multi-level
+keys and how they are compiled and work. tom@compton.nu.
 
 =item Thu Apr 25 18:30:36 UTC 2002 : Version 1.2
 
@@ -73,37 +79,42 @@ multiple keys so that multidimensional aggregates can be indexed; keys
 may be specified as integer, string, number or PMC. 
 
 Hence, the following structure was produced. First, the individual keys
-as we think of them from a language level are stored in a structure
-called a C<KEY_ATOM>. 
+as we think of them from a language level are each stored in a Key PMC
+with the key type encoded in the private flags of the PMC and the value
+stored in the PMCs cache.
 
 So, for instance, indexing the multidimensional array
-C<@foo[$a;12;"hi"]> produces three C<KEY_ATOMS>, one with a PMC type,
-one with an integer type and one with a string type. Since C<KEY_ATOMS>
-need to store the type as well as the value, they end up looking like
-this:
+C<@foo[$a;12;"hi"]> produces three PMCs, one with a PMC type,
+one with an integer type and one with a string type.
 
-    typedef struct _key_atom KEY_ATOM;
+As stated, the key type is encoded in the PMC flags using 5 bits based
+on the following scheme:
 
-    struct _key_atom {
-        KEY_TYPE type;
-        UnionVal val;
-    };
+    typedef enum {
+        KEY_integer_FLAG = PMC_private0_FLAG,
+        KEY_number_FLAG = PMC_private1_FLAG,
+        KEY_string_FLAG = PMC_private2_FLAG,
+        KEY_pmc_FLAG = PMC_private3_FLAG,
+        KEY_register_FLAG = PMC_private4_FLAG,
 
-The next issue is to combine these things into a single key. Hence,
-the developer-facing C<KEY> structure looks like this:
+        KEY_type_FLAGS = KEY_integer_FLAG |
+                         KEY_number_FLAG |
+                         KEY_string_FLAG |
+                         KEY_pmc_FLAG |
+                         KEY_register_FLAG
+    } KEY_flags;
 
-    typedef struct _key KEY;
+The C<KEY_register_FLAG> is used to indicate that the C<int_val> component
+of the PMC's cache contains the number of a register of the appropriate type
+that itself contains the value of the key component.
 
-    struct _key {
-        KEY_ATOM atom;
-        KEY* next;
-    };
+The next issue is to combine these things into a single key. This is done
+by using the C<data> member of the PMC to form a linked list so that each
+key points to the next key. A linked list is used so that partial keys can
+be easily generated as a multidimensional data structure is traversed.
 
-So a KEY is a linked list of KEY_ATOMs. A linked list is used so that
-partial keys can be easily generated as a multidimensional data
-structure is traversed.
-
-These structures can be found in F<include/parrot/key.h>
+These definitions, along with declarations of support routines used to
+manipulate keys, can be found in F<include/parrot/key.h>
 
 =head2 Aggregate and non-aggregate PMCs
 
@@ -127,9 +138,10 @@ generated.
 
 So what of these magical C<_keyed> vtable methods? They are generated
 when you add the C<keyed> tag to the appropriate entry in F<vtable.tbl>.
-They are constructed by following B<every> C<PMC> argument with a C<KEY>
-argument; the name of the C<KEY> argument is formed by adding C<_key>
-onto the end of the C<PMC> argument. 
+They are constructed by following B<every> C<PMC> argument with a second
+C<PMC> argument which acts as the key for that argument; the name of the
+second C<PMC> argument is formed by adding C<_key> onto the end of the
+first C<PMC> argument. 
 
 The reason why every PMC argument has an associated key is twofold.
 Firstly, it means that 
@@ -148,14 +160,14 @@ Also, operations which take an aggregate key for one of their
 arguments should take aggregate keys for B<all> of their arguments.
 This is to avoid the following:
 
-    void foo_keyed_i(PMC* x, KEY* y, INT a)
-    void foo_keyed_n(PMC* x, KEY* y, NUM a)
-    void foo_keyed_p(PMC* x, KEY* y, PMC a)
-    void foo_keyed_p_keyed(PMC* x, KEY* y, PMC* a, KEY* b)
+    void foo_keyed_i(PMC* x, PMC* x_key, INT a)
+    void foo_keyed_n(PMC* x, PMC* x_key, NUM a)
+    void foo_keyed_p(PMC* x, PMC* x_key, PMC a)
+    void foo_keyed_p_keyed(PMC* x, PMC* x_key, PMC* a, PMC* a_key)
 
 These are all replaced with the single entry
 
-    void foo_keyed(PMC* x, KEY* y, PMC* a, KEY* b)
+    void foo_keyed(PMC* x, PMC* a_key, PMC* a, PMC* a_key)
 
 (Think how much worse it gets when there are three or more PMCs in an
 entry...)
@@ -168,10 +180,10 @@ anyway, this shouldn't be too much of a problem.
 
 So, if you have a PMC in a C<_keyed> method which you don't want to
 index, pass in C<NULL> instead of a real key. Code implementing these
-methods should understand C<PMC* foo, KEY* NULL> as meaning the
+methods should understand C<PMC* foo, PMC* NULL> as meaning the
 entirety of C<foo> in some sense; this is trivial to understand if
 C<foo> is non-aggregate, and implementation-defined if C<foo> is
-aggregate. If you remember that a C<KEY*> is really a linked list,
+aggregate. If you remember that a key PMC is really a linked list,
 you'll notice that after traversing down through the list, you'll
 reach a C<NULL> which again means the entirety of whatever object you
 traversed to.
@@ -191,89 +203,79 @@ There are several different valid specifications of an aggregate key
 to the assembler. These are:
 
     op arg, P1[1234]  # Constant integer key
-    op arg, P1[12.34] # Constant number key
-    op arg, P1["foo"] # Constant string key
-    op arg, P1[S1]    # Register key
+    op arg, P1[I1]    # Integer key
+
+    op arg, P1[12.34] # Constant number key - handled as constant key
+    op arg, P1["foo"] # Constant string key - handled as constant key
+    op arg, P1[I1;I2] # Multi-level key - handled as constant key
+
+    op arg, P1[P1]    # Register key
 
 (Rationale: fits programmer's expectation, easier to understand at a
 glance than C<op P1, P2, P3>. Also, is C<op P1, P2, P3> the same as
 C<op P1[P2], P3> or C<op P1, P2[P3]>, or are these three separate PMCs?)
 
-We shall refer to the first three types collectively as "constant keys"
-and the last as "register keys".
+In all there are four types of key. The first two are integer keys and
+constant integer keys which are optimisations for the common case of
+single level integer keys.
+
+The other two are constant keys, which can handle any combination of
+constants and registers with any number of levels; and register keys
+which are represented by a single PMC register that is assumed to 
+contain a PMC of the Key class.
 
 =head2 What the assembler did next
 
 When the assembler sees an aggregate key, it "detaches" the key to
-form a separate argument. It then decides whether or not it is a
-constant key or a register key. If it is a constant key, the data is
-temporarily munged in the same way as string constants. The constant
-itself is added to the constant integer/number/string list, much like
-any other constant, and an entry is added to the list of constant
-keys.
+form a separate argument. It then decides on the type of key. For 
+integer keys (both constant and register) the data is encoded in the
+same way as an ordinary integer argument. For register keys the data
+is encoded as for an ordinary PMC register argument, while for constant
+keys a key constant is generated that encodes the list of constants and
+registers that make up the key and an appropriate index into the constant
+table is encoded as the argument.
 
 Next it selects the appropriate op. Register keys have the signature
-C<r> and constant keys have the signature C<kc>. For example:
+C<k> and constant keys have the signature C<kc>. Integer register and
+constant keys are encoded as C<ki> and C<kic> respectively.
 
     set P1["hi"], 1234
 
 finds an op named C<set_p_kc_i>. On the other hand,
 
-    set P1[S1], 1234
+    set P1[P1], 1234
 
-produces an op named C<set_p_r_i>.
+produces an op named C<set_p_k_i>. Likewise, this:
 
-=over 3
+    set P1[1], 1234
 
-=item C<Todo>
+produces an op named C<set_p_kic>, and this:
 
-This is only half implemented. The C<r> business may need to be
-documented in another PDD somewhere. This is also not going to scale
-to keys like C<P1;S1;123>, and I don't know how to do that.
+    set P1[I1], 1234
 
-=back
-
-Keys with multiple key-atoms may need to be classed as constant keys.
+produces an op named C<set_p_ki>.
 
 =head2 Bytecode representation
 
 The bytecode representation of these keys are as follows: constant keys
-are treated just like another constant, and are an index into the "key"
-section of the packfile's constant table. 
+are treated just like another constant, and are an index into the packfile's
+constant table. 
 
-Each key in that constant table consists of one byte specifying its
-length in terms of number of key atoms. For instance, C<["hi"]> has
-length 1; C<["hi";P1;S1;123]> has length 4. Next, each key atom is
-specified using two bytes. The first byte is a type specifier:
+Each key in that constant table consists of one word specifying its
+length in terms of number of keys. For instance, C<["hi"]> has
+length 1; C<["hi";P1;S1;123]> has length 4. Next, each key is
+specified using two words. The first word is a type specifier:
 
-    0 - Integer
-    1 - Number
-    2 - String
-    3 - PMC
-    4 - Register
-    5 - Key
+    1 - Integer constant
+    2 - Number constant
+    4 - String contant
+    7 - Integer register
+    8 - Number register
+    9 - PMC register
+   10 - String register
 
-and the second byte is an index into the appropriate constant table, (in
-the first 4 cases and the last case) or a register specifier. (see below) 
+and the second word is either a value (for integer constants), a register
+number (for registers) or an index into the appropriate constant table.
 
-Register arguments (the C<_r> bit) are specified as a single byte. The
-top two bits are the type specifier:
-
-    00 - Integer
-    01 - Number
-    10 - String
-    11 - PMC
-
-and the bottom six bits are the register number. 
-
-=over 3 
-
-=item Todo
-
-The register specification stuff may need to move to another PDD.
-
-=back
-
-=head2 The interpreter's interpretation
-
-Delayed until we have bytecode that produces what we want.
+The type values shown above are actually the C<PARROT_ARG_*> values taken
+from F<include/parrot/op.h>.
