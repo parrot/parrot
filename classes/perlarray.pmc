@@ -72,7 +72,14 @@ pmclass PerlArray {
 
     FLOATVAL get_number_index ( INTVAL idx ) {
 	KEY* key = SELF->cache.struct_val;
-	KEY_PAIR* key_pair = key_element_value_i(INTERP,key,idx);
+	KEY_PAIR* key_pair;
+	INTVAL size = key_size(INTERP,key);
+	if(idx<0) {
+	    key_pair = key_element_value_i(INTERP,key,size+idx);
+	}
+	else {
+	    key_pair = key_element_value_i(INTERP,key,idx);
+	}
 	return key_pair->cache.num_val;
     }
 
@@ -82,7 +89,14 @@ pmclass PerlArray {
 
     STRING* get_string_index ( INTVAL idx ) {
 	KEY* key = SELF->cache.struct_val;
-	KEY_PAIR* key_pair = key_element_value_i(INTERP,key,idx);
+	KEY_PAIR* key_pair;
+	INTVAL size = key_size(INTERP,key);
+	if(idx<0) {
+	    key_pair = key_element_value_i(INTERP,key,size+idx);
+	}
+	else {
+	    key_pair = key_element_value_i(INTERP,key,idx);
+	}
 	return key_pair->cache.struct_val;
     }
 
@@ -130,6 +144,9 @@ pmclass PerlArray {
 	if(idx >= size) {
 	    key_set_size(INTERP,key,idx+1);
 	}
+	else if(idx < 0) {
+	    idx += size;
+        }
 	key_pair.type = enum_key_int;
 	key_pair.cache.int_val = value;
 	key_set_element_value_i(INTERP,key,idx,&key_pair);
@@ -158,8 +175,12 @@ pmclass PerlArray {
     void set_number_index (FLOATVAL value, INTVAL idx) {
 	KEY* key = SELF->cache.struct_val;
 	KEY_PAIR key_pair;
+	INTVAL size = key_size(INTERP,key);
 	if(idx >= key_size(INTERP,key)) {
 	    key_set_size(INTERP,key,idx+1);
+	}
+	else if(idx < 0) {
+	    idx += size;
 	}
 	key_pair.type = enum_key_num;
 	key_pair.cache.num_val = value;
@@ -184,8 +205,12 @@ pmclass PerlArray {
     void set_string_index (STRING * value, INTVAL idx) {
 	KEY* key = SELF->cache.struct_val;
 	KEY_PAIR key_pair;
+	INTVAL size = key_size(INTERP,key);
 	if(idx >= key_size(INTERP,key)) {
 	    key_set_size(INTERP,key,idx+1);
+	}
+	else if(idx < 0) {
+	    idx += size;
 	}
 	key_pair.type = enum_key_string;
 	key_pair.cache.struct_val = value;
