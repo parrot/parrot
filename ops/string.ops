@@ -96,6 +96,8 @@ Append the string in $2 to the string in $1.
 
 =item B<concat>(in PMC, in PMC, in STR)
 
+=item B<concat>(in PMC, in STR, in PMC)
+
 Append the string $3 to $2 and places the result into $1.
 
 =cut
@@ -117,6 +119,10 @@ inline op concat (in PMC, in PMC, in PMC) :base_mem {
 
 inline op concat (in PMC, in PMC, in STR) :base_mem {
   $2->vtable->concatenate_native(interpreter, $2, $3, $1);
+  goto NEXT();
+}
+inline op concat (in PMC, in STR, in PMC) :base_mem {
+  $1->vtable->set_string_native(interpreter, $1, string_concat(interpreter, $2, $3->vtable->get_string(interpreter, $1), 1));
   goto NEXT();
 }
 #######################################
