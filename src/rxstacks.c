@@ -20,10 +20,10 @@
 rxStack
 rxstack_new(struct Parrot_Interp *interpreter)
 {
-    rxStack stack=mem_allocate_aligned(sizeof(struct rxStack_chunk_t));
-    stack->used=0;
-    stack->next=stack;
-    stack->prev=stack;
+    rxStack stack = mem_allocate_aligned(sizeof(struct rxStack_chunk_t));
+    stack->used = 0;
+    stack->next = stack;
+    stack->prev = stack;
     return stack;
 }
 
@@ -76,7 +76,7 @@ rxstack_pop(struct Parrot_Interp *interpreter, rxStack stack)
         /* Relying on GC feels dirty... */
         chunk = stack->prev;
     }
-    
+
     /* Quick sanity check */
     if (chunk->used == 0) {
         internal_exception(ERROR_STACK_EMPTY, "No entries on stack!\n");

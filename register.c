@@ -16,9 +16,10 @@
   pushes a new integer register frame on the frame stack
 */
 void
-Parrot_push_i(struct Parrot_Interp *interpreter) {
+Parrot_push_i(struct Parrot_Interp *interpreter)
+{
     /* Do we have any space in the current savestack? If so, memcpy
-       down */
+     * down */
     if (interpreter->int_reg_top->free) {
         memcpy(&interpreter->int_reg_top->IReg[interpreter->int_reg_top->used],
                &interpreter->int_reg, sizeof(struct IReg));
@@ -44,14 +45,14 @@ Parrot_push_i(struct Parrot_Interp *interpreter) {
   pops an integer register frame off of the frame stack
 */
 void
-Parrot_pop_i(struct Parrot_Interp *interpreter) {
+Parrot_pop_i(struct Parrot_Interp *interpreter)
+{
     struct IRegChunk *top = interpreter->int_reg_top;
     /* Do we even have anything? */
     if (top->used > 0) {
         top->used--;
         memcpy(&interpreter->int_reg,
-               &top->IReg[top->used],
-               sizeof(struct IReg));
+               &top->IReg[top->used], sizeof(struct IReg));
         top->free++;
         /* Empty? */
         if (!top->used) {
@@ -65,8 +66,7 @@ Parrot_pop_i(struct Parrot_Interp *interpreter) {
     }
     /* Nope. So pitch a fit */
     else {
-        internal_exception(NO_REG_FRAMES, 
-                           "No more I register frames to pop!");
+        internal_exception(NO_REG_FRAMES, "No more I register frames to pop!");
     }
 }
 
@@ -74,9 +74,10 @@ Parrot_pop_i(struct Parrot_Interp *interpreter) {
   sets each register in an integer register frame to 0
 */
 void
-Parrot_clear_i(struct Parrot_Interp *interpreter) {
+Parrot_clear_i(struct Parrot_Interp *interpreter)
+{
     int i;
-    for (i=0; i<NUM_REGISTERS; i++) {
+    for (i = 0; i < NUM_REGISTERS; i++) {
         interpreter->int_reg.registers[i] = 0;
     }
 }
@@ -85,11 +86,13 @@ Parrot_clear_i(struct Parrot_Interp *interpreter) {
   pushes a new string register frame on the frame stack
 */
 void
-Parrot_push_s(struct Parrot_Interp *interpreter) {
+Parrot_push_s(struct Parrot_Interp *interpreter)
+{
     /* Do we have any space in the current savestack? If so, memcpy
-       down */
+     * down */
     if (interpreter->string_reg_top->free) {
-        memcpy(&interpreter->string_reg_top->SReg[interpreter->string_reg_top->used],
+        memcpy(&interpreter->string_reg_top->
+               SReg[interpreter->string_reg_top->used],
                &interpreter->string_reg, sizeof(struct SReg));
         interpreter->string_reg_top->free--;
         interpreter->string_reg_top->used++;
@@ -113,14 +116,14 @@ Parrot_push_s(struct Parrot_Interp *interpreter) {
   pops a string register frame off of the frame stack
 */
 void
-Parrot_pop_s(struct Parrot_Interp *interpreter) {
+Parrot_pop_s(struct Parrot_Interp *interpreter)
+{
     struct SRegChunk *top = interpreter->string_reg_top;
     /* Do we even have anything? */
     if (top->used > 0) {
         top->used--;
         memcpy(&interpreter->string_reg,
-               &top->SReg[top->used],
-               sizeof(struct SReg));
+               &top->SReg[top->used], sizeof(struct SReg));
         top->free++;
         /* Empty? */
         if (!top->used) {
@@ -134,8 +137,7 @@ Parrot_pop_s(struct Parrot_Interp *interpreter) {
     }
     /* Nope. So pitch a fit */
     else {
-        internal_exception(NO_REG_FRAMES, 
-                           "No more S register frames to pop!");
+        internal_exception(NO_REG_FRAMES, "No more S register frames to pop!");
     }
 }
 
@@ -143,9 +145,10 @@ Parrot_pop_s(struct Parrot_Interp *interpreter) {
   sets each register in a string register frame to NULL
 */
 void
-Parrot_clear_s(struct Parrot_Interp *interpreter) {
+Parrot_clear_s(struct Parrot_Interp *interpreter)
+{
     int i;
-    for (i=0; i<NUM_REGISTERS; i++) {
+    for (i = 0; i < NUM_REGISTERS; i++) {
         interpreter->string_reg.registers[i] = NULL;
     }
 }
@@ -154,9 +157,10 @@ Parrot_clear_s(struct Parrot_Interp *interpreter) {
   pushes a new numeric register frame on the frame stack
 */
 void
-Parrot_push_n(struct Parrot_Interp *interpreter) {
+Parrot_push_n(struct Parrot_Interp *interpreter)
+{
     /* Do we have any space in the current savestack? If so, memcpy
-       down */
+     * down */
     if (interpreter->num_reg_top->free) {
         memcpy(&interpreter->num_reg_top->NReg[interpreter->num_reg_top->used],
                &interpreter->num_reg, sizeof(struct NReg));
@@ -182,14 +186,14 @@ Parrot_push_n(struct Parrot_Interp *interpreter) {
   pops a numeric register frame off of the frame stack
 */
 void
-Parrot_pop_n(struct Parrot_Interp *interpreter) {
+Parrot_pop_n(struct Parrot_Interp *interpreter)
+{
     struct NRegChunk *top = interpreter->num_reg_top;
     /* Do we even have anything? */
     if (top->used > 0) {
         top->used--;
         memcpy(&interpreter->num_reg,
-               &top->NReg[top->used],
-               sizeof(struct NReg));
+               &top->NReg[top->used], sizeof(struct NReg));
         top->free++;
         /* Empty? */
         if (!top->used) {
@@ -203,8 +207,7 @@ Parrot_pop_n(struct Parrot_Interp *interpreter) {
     }
     /* Nope. So pitch a fit */
     else {
-        internal_exception(NO_REG_FRAMES, 
-                           "No more N register frames to pop!");
+        internal_exception(NO_REG_FRAMES, "No more N register frames to pop!");
     }
 }
 
@@ -212,9 +215,10 @@ Parrot_pop_n(struct Parrot_Interp *interpreter) {
   sets each register in a numeric register frame to 0
 */
 void
-Parrot_clear_n(struct Parrot_Interp *interpreter) {
+Parrot_clear_n(struct Parrot_Interp *interpreter)
+{
     int i;
-    for (i=0; i<NUM_REGISTERS; i++) {
+    for (i = 0; i < NUM_REGISTERS; i++) {
         interpreter->num_reg.registers[i] = 0.0;
     }
 }
@@ -223,9 +227,10 @@ Parrot_clear_n(struct Parrot_Interp *interpreter) {
   pushes a new PMC register frame on the frame stack
 */
 void
-Parrot_push_p(struct Parrot_Interp *interpreter) {
+Parrot_push_p(struct Parrot_Interp *interpreter)
+{
     /* Do we have any space in the current savestack? If so, memcpy
-       down */
+     * down */
     if (interpreter->pmc_reg_top->free) {
         memcpy(&interpreter->pmc_reg_top->PReg[interpreter->pmc_reg_top->used],
                &interpreter->pmc_reg, sizeof(struct PReg));
@@ -251,14 +256,14 @@ Parrot_push_p(struct Parrot_Interp *interpreter) {
   pops a pmc register frame off of the frame stack
 */
 void
-Parrot_pop_p(struct Parrot_Interp *interpreter) {
+Parrot_pop_p(struct Parrot_Interp *interpreter)
+{
     struct PRegChunk *top = interpreter->pmc_reg_top;
     /* Do we even have anything? */
     if (top->used > 0) {
         top->used--;
         memcpy(&interpreter->pmc_reg,
-               &top->PReg[top->used],
-               sizeof(struct PReg));
+               &top->PReg[top->used], sizeof(struct PReg));
         top->free++;
         /* Empty? */
         if (!top->used) {
@@ -272,8 +277,7 @@ Parrot_pop_p(struct Parrot_Interp *interpreter) {
     }
     /* Nope. So pitch a fit */
     else {
-        internal_exception(NO_REG_FRAMES, 
-                           "No more P register frames to pop!");
+        internal_exception(NO_REG_FRAMES, "No more P register frames to pop!");
     }
 }
 
@@ -281,9 +285,10 @@ Parrot_pop_p(struct Parrot_Interp *interpreter) {
   sets each pmc register in a pmc frame stack to NULL.
 */
 void
-Parrot_clear_p(struct Parrot_Interp *interpreter) {
+Parrot_clear_p(struct Parrot_Interp *interpreter)
+{
     int i;
-    for (i=0; i<NUM_REGISTERS; i++) {
+    for (i = 0; i < NUM_REGISTERS; i++) {
         interpreter->pmc_reg.registers[i] = NULL;
     }
 }
@@ -292,16 +297,21 @@ Parrot_clear_p(struct Parrot_Interp *interpreter) {
    pushes something on the parrot stack
 */
 void
-Parrot_push_on_stack(void *thing, INTVAL size, INTVAL type) {
-    UNUSED (thing); UNUSED (size); UNUSED (type);
+Parrot_push_on_stack(void *thing, INTVAL size, INTVAL type)
+{
+    UNUSED(thing);
+    UNUSED(size);
+    UNUSED(type);
 }
 
 /*=for api register Parrot_pop_off_stack
    pops something off the parrot stack
 */
 void
-Parrot_pop_off_stack(void *thing, INTVAL type) {
-    UNUSED (thing); UNUSED (type);
+Parrot_pop_off_stack(void *thing, INTVAL type)
+{
+    UNUSED(thing);
+    UNUSED(type);
 }
 
 /*

@@ -13,12 +13,13 @@
 #include "parrot/packfile.h"
 
 int
-main(int argc, char **argv) {
-    struct stat       file_stat;
-    int               fd;
-    opcode_t *        packed;
-    size_t            packed_size;
-    struct PackFile * pf;
+main(int argc, char **argv)
+{
+    struct stat file_stat;
+    int fd;
+    opcode_t *packed;
+    size_t packed_size;
+    struct PackFile *pf;
     struct Parrot_Interp *interpreter = make_interpreter(0);
 
     if (argc != 2) {
@@ -37,22 +38,23 @@ main(int argc, char **argv) {
     }
 
     init_world();
-  
+
     interpreter = make_interpreter(0);
 
     packed_size = file_stat.st_size;
 
 #ifndef HAS_HEADER_SYSMMAN
-    packed = (opcode_t *) mem_sys_allocate(packed_size);
+    packed = (opcode_t *)mem_sys_allocate(packed_size);
 
     if (!packed) {
         printf("Can't allocate, code %i\n", errno);
         return 1;
     }
 
-    read(fd, (void*)packed, packed_size);
+    read(fd, (void *)packed, packed_size);
 #else
-    packed = (opcode_t *) mmap(0, packed_size, PROT_READ, MAP_SHARED, fd, (off_t)0);
+    packed =
+        (opcode_t *)mmap(0, packed_size, PROT_READ, MAP_SHARED, fd, (off_t)0);
 
     if (!packed) {
         printf("Can't mmap, code %i\n", errno);
@@ -62,15 +64,15 @@ main(int argc, char **argv) {
 
     pf = PackFile_new();
 
-    if (!PackFile_unpack(interpreter, pf, (opcode_t*)packed, packed_size)) {
-        printf( "Can't unpack.\n" );
+    if (!PackFile_unpack(interpreter, pf, (opcode_t *)packed, packed_size)) {
+        printf("Can't unpack.\n");
         return 1;
     }
     PackFile_dump(pf);
     PackFile_DELETE(pf);
 
     pf = NULL;
-    
+
     return 0;
 }
 

@@ -22,10 +22,10 @@
 Stack
 new_stack(struct Parrot_Interp *interpreter)
 {
-    Stack stack=mem_allocate_aligned(sizeof(struct Stack_chunk_t));
-    stack->used=0;
-    stack->next=stack;
-    stack->prev=stack;
+    Stack stack = mem_allocate_aligned(sizeof(struct Stack_chunk_t));
+    stack->used = 0;
+    stack->next = stack;
+    stack->prev = stack;
     return stack;
 }
 
@@ -45,14 +45,15 @@ stack_depth(struct Parrot_Interp *interpreter, Stack stack)
 Stack_Entry
 stack_entry(struct Parrot_Interp *interpreter, Stack stack, INTVAL depth)
 {
-    Stack_Chunk chunk = stack->prev; /* Start at top */
+    Stack_Chunk chunk = stack->prev;    /* Start at top */
 
     while (depth >= chunk->used && chunk != stack) {
         depth -= chunk->used;
         chunk = chunk->prev;
     }
 
-    if (depth >= chunk->used) return NULL;
+    if (depth >= chunk->used)
+        return NULL;
 
     return &chunk->entry[chunk->used - depth - 1];
 }
@@ -78,9 +79,9 @@ rotate_entries(struct Parrot_Interp *interpreter, Stack stack, INTVAL depth)
 
     temp = *stack_entry(interpreter, stack, 0);
 
-    for(i = 0; i < depth - 1; i++) {
-      *stack_entry(interpreter, stack, i) = 
-          *stack_entry(interpreter, stack, i + 1);
+    for (i = 0; i < depth - 1; i++) {
+        *stack_entry(interpreter, stack, i) =
+            *stack_entry(interpreter, stack, i + 1);
     }
 
     *stack_entry(interpreter, stack, depth - 1) = temp;
@@ -105,7 +106,7 @@ stack_push(struct Parrot_Interp *interpreter, Stack stack,
     /* Remember the type */
     entry->entry_type = type;
     /* If we were passed a cleanup function, mark the flag entry
-       for this as needing cleanup*/
+     * for this as needing cleanup */
     entry->flags = (cleanup ? STACK_ENTRY_CLEANUP : 0);
     /* Remember the cleanup function */
     entry->cleanup = cleanup;
@@ -162,7 +163,7 @@ stack_pop(struct Parrot_Interp *interpreter, Stack stack,
         /* Relying on GC feels dirty... */
         chunk = stack->prev;
     }
-    
+
     /* Quick sanity check */
     if (chunk->used == 0) {
         internal_exception(ERROR_STACK_EMPTY, "No entries on stack!\n");
@@ -172,23 +173,24 @@ stack_pop(struct Parrot_Interp *interpreter, Stack stack,
 
     /* Types of 0 mean we don't care */
     if (type && entry->entry_type != type) {
-        internal_exception(ERROR_BAD_STACK_TYPE, 
+        internal_exception(ERROR_BAD_STACK_TYPE,
                            "Wrong type on top of stack!\n");
     }
 
     /* Cleanup routine? */
     if (entry->flags & STACK_ENTRY_CLEANUP) {
-        (*entry->cleanup)(entry);
+        (*entry->cleanup) (entry);
     }
 
     /* Now decrement the SP */
     chunk->used--;
 
     /* Sometimes the caller doesn't care what the value was */
-    if (where == NULL) return NULL;
+    if (where == NULL)
+        return NULL;
 
     /* Snag the value */
-    switch(type) {
+    switch (type) {
     case STACK_ENTRY_INT:
         *(INTVAL *)where = entry->entry.int_val;
         break;
@@ -218,18 +220,20 @@ pop_dest(struct Parrot_Interp *interpreter)
 {
     /* We don't mind the extra call, so we do this: (previous comment
      * said we *do* mind, but I say let the compiler decide) */
-    void* dest;
+    void *dest;
     (void)stack_pop(interpreter, interpreter->control_stack,
                     &dest, STACK_ENTRY_DESTINATION);
     return dest;
 }
 
 void *
-stack_peek(struct Parrot_Interp *interpreter, Stack stack, INTVAL* type)
+stack_peek(struct Parrot_Interp *interpreter, Stack stack, INTVAL *type)
 {
     Stack_Entry entry = stack_entry(interpreter, stack, 0);
-    if (entry == NULL) return NULL;
-    if (type != NULL) *type = entry->entry_type;
+    if (entry == NULL)
+        return NULL;
+    if (type != NULL)
+        *type = entry->entry_type;
     return entry->entry.generic_pointer;
 }
 

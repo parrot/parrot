@@ -21,7 +21,8 @@ static const CHARTYPE *string_unicode_type;
  * set up the native string vtable
  */
 void
-string_init(void) {
+string_init(void)
+{
     string_native_type = chartype_lookup("usascii");
     string_unicode_type = chartype_lookup("unicode");
 }
@@ -33,22 +34,23 @@ string_init(void) {
 STRING *
 string_make(struct Parrot_Interp *interpreter, const void *buffer,
             UINTVAL buflen, const ENCODING *encoding, UINTVAL flags,
-            const CHARTYPE *type) {
+            const CHARTYPE *type)
+{
     STRING *s;
 
     if (!type) {
-      type = string_native_type;
+        type = string_native_type;
     }
 
     if (!encoding) {
-      encoding = encoding_lookup(type->default_encoding);
+        encoding = encoding_lookup(type->default_encoding);
     }
 
     s = new_string_header(interpreter);
     s->bufstart = Parrot_allocate(interpreter, buflen);
     s->encoding = encoding;
     /* Make sure we maintain the flags we might already have on the
-       string header we just fetched */
+     * string header we just fetched */
     s->flags |= flags;
     s->type = type;
     s->buflen = buflen;
@@ -69,7 +71,8 @@ string_make(struct Parrot_Interp *interpreter, const void *buffer,
  * free the strings memory
  */
 void
-string_destroy(STRING *s) {
+string_destroy(STRING *s)
+{
     free_string(s);
 }
 
@@ -79,7 +82,8 @@ string_destroy(STRING *s) {
  * return the length of the string
  */
 UINTVAL
-string_length(const STRING* s) {
+string_length(const STRING *s)
+{
     return s->strlen;
 }
 
@@ -90,7 +94,8 @@ string_length(const STRING* s) {
  * functions are fleshed out, this function can DTRT.
  */
 INTVAL
-string_index(const STRING* s, UINTVAL idx) {
+string_index(const STRING *s, UINTVAL idx)
+{
     return s->encoding->decode(s->encoding->skip_forward(s->bufstart, idx));
 }
 
@@ -98,20 +103,21 @@ string_index(const STRING* s, UINTVAL idx) {
  * return the length of the string
  */
 INTVAL
-string_ord(const STRING* s, INTVAL idx) {
+string_ord(const STRING *s, INTVAL idx)
+{
     UINTVAL len = 0;
 
     if (s != NULL) {
         len = string_length(s);
     }
 
-    if((s == NULL) || (len == 0)) {
+    if ((s == NULL) || (len == 0)) {
         internal_exception(ORD_OUT_OF_STRING,
                            "Cannot get character of empty string");
     }
     else {
         UINTVAL true_index;
-        true_index = (UINTVAL) idx;
+        true_index = (UINTVAL)idx;
 
         if (idx < 0) {
             if ((INTVAL)(idx + len) < 0) {
@@ -130,14 +136,15 @@ string_ord(const STRING* s, INTVAL idx) {
 
         return string_index(s, true_index);
     }
-	return -1;
+    return -1;
 }
 
 /*=for api string string_copy
  * create a copy of the argument passed in
  */
-STRING*
-string_copy(struct Parrot_Interp *interpreter, const STRING *s) {
+STRING *
+string_copy(struct Parrot_Interp *interpreter, const STRING *s)
+{
     STRING *d;
     d = new_string_header(interpreter);
     d->bufstart = Parrot_allocate(interpreter, s->buflen);
@@ -157,10 +164,11 @@ string_copy(struct Parrot_Interp *interpreter, const STRING *s) {
 /*=for api string string_transcode
  * create a transcoded copy of the argument passed in
  */
-STRING*
+STRING *
 string_transcode(struct Parrot_Interp *interpreter,
                  const STRING *src, const ENCODING *encoding,
-                 const CHARTYPE *type, STRING **dest_ptr) {
+                 const CHARTYPE *type, STRING **dest_ptr)
+{
 
     STRING *dest;
     CHARTYPE_TRANSCODER transcoder1 = (CHARTYPE_TRANSCODER)NULLfunc;
@@ -179,7 +187,7 @@ string_transcode(struct Parrot_Interp *interpreter,
         return dest;
     }
 
-    dest = string_make(interpreter, NULL, src->strlen*encoding->max_bytes,
+    dest = string_make(interpreter, NULL, src->strlen * encoding->max_bytes,
                        encoding, 0, type);
 
     if (src->type != dest->type) {
@@ -192,7 +200,7 @@ string_transcode(struct Parrot_Interp *interpreter,
         }
     }
 
-    srcstart = (void*)src->bufstart;
+    srcstart = (void *)src->bufstart;
     srcend = srcstart + src->bufused;
     deststart = dest->bufstart;
     destend = deststart;
@@ -200,8 +208,10 @@ string_transcode(struct Parrot_Interp *interpreter,
     while (srcstart < srcend) {
         UINTVAL c = src->encoding->decode(srcstart);
 
-        if (transcoder1) c = transcoder1(c);
-        if (transcoder2) c = transcoder2(c);
+        if (transcoder1)
+            c = transcoder1(c);
+        if (transcoder2)
+            c = transcoder2(c);
 
         destend = dest->encoding->encode(destend, c);
 
@@ -224,7 +234,8 @@ string_transcode(struct Parrot_Interp *interpreter,
  * get the string length of the string
  */
 INTVAL
-string_compute_strlen(STRING* s) {
+string_compute_strlen(STRING *s)
+{
     s->strlen = s->encoding->characters(s->bufstart, s->bufused);
     return s->strlen;
 }
@@ -232,24 +243,26 @@ string_compute_strlen(STRING* s) {
 /*=for api string string_concat
  * concatenate two strings
  */
-STRING*
-string_concat(struct Parrot_Interp *interpreter, const STRING* a,
-              const STRING* b, UINTVAL Uflags) {
+STRING *
+string_concat(struct Parrot_Interp *interpreter, const STRING *a,
+              const STRING *b, UINTVAL Uflags)
+{
     STRING *result;
 
-    UNUSED (Uflags);
+    UNUSED(Uflags);
 
 
     if (a != NULL && a->strlen != 0) {
         if (b != NULL && b->strlen != 0) {
             result = string_make(interpreter, NULL, a->bufused +
-                                 b->strlen*a->encoding->max_bytes,
+                                 b->strlen * a->encoding->max_bytes,
                                  a->encoding, 0, a->type);
-            mem_sys_memcopy(result->bufstart,a->bufstart,a->bufused);
+            mem_sys_memcopy(result->bufstart, a->bufstart, a->bufused);
             if (a->type != b->type || a->encoding != b->encoding) {
-                b = string_transcode(interpreter, b, a->encoding, a->type, NULL);
+                b = string_transcode(interpreter, b, a->encoding, a->type,
+                                     NULL);
             }
-            mem_sys_memcopy((void*)((ptrcast_t)result->bufstart + a->bufused),
+            mem_sys_memcopy((void *)((ptrcast_t)result->bufstart + a->bufused),
                             b->bufstart, b->bufused);
             result->strlen = a->strlen + b->strlen;
             result->bufused = a->bufused + b->bufused;
@@ -260,7 +273,8 @@ string_concat(struct Parrot_Interp *interpreter, const STRING* a,
     }
     else {
         if (a != NULL) {
-            return string_transcode(interpreter, b, a->encoding, a->type, NULL);
+            return string_transcode(interpreter, b, a->encoding, a->type,
+                                    NULL);
         }
         else {
             if (b != NULL) {
@@ -278,25 +292,27 @@ string_concat(struct Parrot_Interp *interpreter, const STRING* a,
  * repeat the string I<s> I<num> times, storing result in I<d>.
  * Allocates I<d> if needed, also returns d.
 */
-STRING*
-string_repeat(struct Parrot_Interp *interpreter, const STRING* s, UINTVAL num, STRING** d) {
-    STRING* dest;
+STRING *
+string_repeat(struct Parrot_Interp *interpreter, const STRING *s, UINTVAL num,
+              STRING **d)
+{
+    STRING *dest;
     UINTVAL i;
 
-    dest = string_make(interpreter, NULL, s->bufused*num, s->encoding, 0,
+    dest = string_make(interpreter, NULL, s->bufused * num, s->encoding, 0,
                        s->type);
     if (num == 0) {
         return dest;
     }
 
     /* copy s into dest num times */
-    for (i = 0; i< num; i++) {
-        mem_sys_memcopy((void*)((ptrcast_t)dest->bufstart+s->bufused * i),
+    for (i = 0; i < num; i++) {
+        mem_sys_memcopy((void *)((ptrcast_t)dest->bufstart + s->bufused * i),
                         s->bufstart, s->bufused);
     }
 
     dest->bufused = s->bufused * num;
-    dest->strlen = s->strlen *num;
+    dest->strlen = s->strlen * num;
 
     if (d != NULL) {
         *d = dest;
@@ -308,13 +324,15 @@ string_repeat(struct Parrot_Interp *interpreter, const STRING* s, UINTVAL num, S
  * substr out the offset of src for length and store it in d.  Also return d.
  * Allocate memory for d if necessary.
  */
-STRING*
-string_substr(struct Parrot_Interp *interpreter, const STRING* src, INTVAL offset, INTVAL length, STRING** d) {
+STRING *
+string_substr(struct Parrot_Interp *interpreter, const STRING *src,
+              INTVAL offset, INTVAL length, STRING **d)
+{
     STRING *dest;
-    UINTVAL substart_off;	/* Offset from start of string to our
-                                   piece */
-    UINTVAL subend_off;		/* Offset from start of string to the
-                                   end of our piece */
+    UINTVAL substart_off;       /* Offset from start of string to our
+                                 * piece */
+    UINTVAL subend_off;         /* Offset from start of string to the
+                                 * end of our piece */
     UINTVAL true_offset;
     UINTVAL true_length;
 
@@ -326,29 +344,33 @@ string_substr(struct Parrot_Interp *interpreter, const STRING* src, INTVAL offse
     }
 
     if (offset < 0) {
-        true_offset = (UINTVAL) (src->strlen + offset);
+        true_offset = (UINTVAL)(src->strlen + offset);
     }
 
-    if (true_offset > src->strlen-1) { /* 0 based... */
+    if (true_offset > src->strlen - 1) {        /* 0 based... */
         internal_exception(SUBSTR_OUT_OF_STRING,
                            "Cannot take substr outside string");
     }
-    true_length = (UINTVAL) length;
+    true_length = (UINTVAL)length;
     if (length < 0) {
         true_length = 0;
     }
-    if (true_length > (src->strlen - true_offset) ) {
+    if (true_length > (src->strlen - true_offset)) {
         true_length = (UINTVAL)(src->strlen - true_offset);
     }
 
     substart_off = (char *)src->encoding->skip_forward(src->bufstart,
-                                           true_offset) - (char *)src->bufstart;
-    subend_off = (char *)src->encoding->skip_forward((char *)src->bufstart +
-                                             substart_off,
-                                             true_length) - (char *)src->bufstart;
+                                                       true_offset) -
+        (char *)src->bufstart;
+    subend_off =
+        (char *)src->encoding->skip_forward((char *)src->bufstart +
+                                            substart_off,
+                                            true_length) -
+        (char *)src->bufstart;
 
-    dest = string_make(interpreter, NULL, true_length*src->encoding->max_bytes,
-                       src->encoding, 0, src->type);
+    dest =
+        string_make(interpreter, NULL, true_length * src->encoding->max_bytes,
+                    src->encoding, 0, src->type);
 
     if (subend_off < substart_off) {
         char *foo = NULL;
@@ -356,7 +378,8 @@ string_substr(struct Parrot_Interp *interpreter, const STRING* src, INTVAL offse
                            "subend somehow is less than substart");
     }
 
-    mem_sys_memcopy(dest->bufstart, (char *)src->bufstart + substart_off, (unsigned)(subend_off - substart_off));
+    mem_sys_memcopy(dest->bufstart, (char *)src->bufstart + substart_off,
+                    (unsigned)(subend_off - substart_off));
     dest->bufused = subend_off - substart_off;
     dest->strlen = true_length;
 
@@ -369,13 +392,14 @@ string_substr(struct Parrot_Interp *interpreter, const STRING* src, INTVAL offse
 /*=for api string string_chopn
  * chop the last n bytes off of s.
  */
-STRING*
-string_chopn(STRING* s, INTVAL n) {
+STRING *
+string_chopn(STRING *s, INTVAL n)
+{
     char *bufstart = s->bufstart;
     char *bufend = bufstart + s->bufused;
     UINTVAL true_n;
 
-    true_n = (UINTVAL) n;
+    true_n = (UINTVAL)n;
     if (n < 0) {
         true_n = 0;
     }
@@ -395,8 +419,9 @@ string_chopn(STRING* s, INTVAL n) {
  * compare two strings.
  */
 INTVAL
-string_compare(struct Parrot_Interp *interpreter, const STRING* s1,
-               const STRING* s2) {
+string_compare(struct Parrot_Interp *interpreter, const STRING *s1,
+               const STRING *s2)
+{
     char *s1start;
     char *s1end;
     char *s2start;
@@ -434,14 +459,18 @@ string_compare(struct Parrot_Interp *interpreter, const STRING* s1,
         s2start = s2->encoding->skip_forward(s2start, 1);
     }
 
-    if (cmp == 0 && s1start < s1end) cmp = 1;
-    if (cmp == 0 && s2start < s2end) cmp = -1;
+    if (cmp == 0 && s1start < s1end)
+        cmp = 1;
+    if (cmp == 0 && s2start < s2end)
+        cmp = -1;
 
     return cmp;
 }
 
 /* A string is "true" if it is equal to anything but "" and "0" */
-BOOLVAL string_bool (const STRING* s) {
+BOOLVAL
+string_bool(const STRING *s)
+{
     INTVAL len;
     if (s == NULL) {
         return 0;
@@ -460,7 +489,7 @@ BOOLVAL string_bool (const STRING* s) {
         }
     }
 
-    return 1; /* it must be true */
+    return 1;                   /* it must be true */
 }
 
 /* A number is such that:
@@ -476,7 +505,9 @@ BOOLVAL string_bool (const STRING* s) {
   rounding towards zero.
 */
 
-INTVAL string_to_int (const STRING *s) {
+INTVAL
+string_to_int(const STRING *s)
+{
     INTVAL i = 0;
 
     if (s) {
@@ -514,7 +545,9 @@ INTVAL string_to_int (const STRING *s) {
     return i;
 }
 
-FLOATVAL string_to_num (const STRING *s) {
+FLOATVAL
+string_to_num(const STRING *s)
+{
     FLOATVAL f = 0.0;
 
     if (s) {
@@ -550,10 +583,10 @@ FLOATVAL string_to_num (const STRING *s) {
             }
             else if (!in_number) {
                 /* we've not yet seen any digits */
-                if (c == '-') {         /* XXX: ascii*/
+                if (c == '-') { /* XXX: ascii */
                     sign = -1;
                 }
-                else if (c == '.') {    /* XXX: ascii*/
+                else if (c == '.') {    /* XXX: ascii */
                     seen_dot = 1;
                 }
                 else {
@@ -563,26 +596,26 @@ FLOATVAL string_to_num (const STRING *s) {
             }
             else {
                 /* we've seen some digits, are we done yet? */
-                if (!seen_dot && c == '.' && !in_exp) { /* XXX: ascii*/
+                if (!seen_dot && c == '.' && !in_exp) { /* XXX: ascii */
                     seen_dot = 1;
                 }
-                else if (!seen_e && (c == 'e' || c == 'E')) { /* XXX: ascii*/
+                else if (!seen_e && (c == 'e' || c == 'E')) {   /* XXX: ascii */
                     seen_e = 1;
                     in_exp = 1;
                 }
                 else if (seen_e && !exp_sign) {
-                    if (c == '+') {                        /* XXX: ascii*/
+                    if (c == '+') {     /* XXX: ascii */
                         exp_sign = 1;
                     }
-                    else if (c == '-') {                   /* XXX: ascii*/
+                    else if (c == '-') {        /* XXX: ascii */
                         exp_sign = -1;
                     }
                     else {
-                        break; /* e-- is silly */
+                        break;  /* e-- is silly */
                     }
                 }
                 else {
-                    break; /* run out of number, all done */
+                    break;      /* run out of number, all done */
                 }
             }
 
@@ -591,7 +624,7 @@ FLOATVAL string_to_num (const STRING *s) {
 
         exponent = fake_exponent + exponent * exp_sign;
 
-        f = f * sign * pow(10.0, exponent); /* ugly, oh yeah */
+        f = f * sign * pow(10.0, exponent);     /* ugly, oh yeah */
     }
 
     return f;
@@ -606,8 +639,3 @@ FLOATVAL string_to_num (const STRING *s) {
  *
  * vim: expandtab shiftwidth=4:
 */
-
-
-
-
-
