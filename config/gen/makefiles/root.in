@@ -446,22 +446,25 @@ languages.dummy :
 #
 ###############################################################################
 
-test : $(TEST_PROG) ${blib_lib_libparrot_a} assemble.pl test_dummy
+test : $(TEST_PROG) test_prep test_dummy
+
+# Common prep for all test targets
+test_prep : ${blib_lib_libparrot_a} assemble.pl
 
 test_dummy :
 	$(PERL) t/harness $(TEST_PROG_ARGS)
 
-testp : $(TEST_PROG) assemble.pl blib/lib/libcore_prederef$(SO) blib/lib/libparrot$(SO) $(TEST_PROG_SO) test_dummy_p
+testp : $(TEST_PROG) test_prep blib/lib/libcore_prederef$(SO) blib/lib/libparrot$(SO) $(TEST_PROG_SO) test_dummy_p
 
 test_dummy_p :
 	$(PERL) t/harness $(TEST_PROG_ARGS) -P
 
-testj : $(TEST_PROG) assemble.pl test_dummy_j
+testj : $(TEST_PROG) test_prep test_dummy_j
 
 test_dummy_j :
 	$(PERL) t/harness $(TEST_PROG_ARGS) -j
 
-quicktest : $(TEST_PROG) assemble.pl quicktest_dummy
+quicktest : $(TEST_PROG) test_prep quicktest_dummy
 
 quicktest_dummy :
 	$(PERL) t/harness $(TEST_PROG_ARGS) quick
