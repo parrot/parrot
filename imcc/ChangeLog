@@ -1,3 +1,13 @@
+- 2003-07-02	leo
+
+	* build imcc as parrot
+	* bump version
+
+	-------------------
+	* various fixes
+	* newsub opcode fixup
+	* constant_propagation (-O2) (by Matt Fowles)
+
 - 2003-02-22	leo / Juergen Boemmels
 
 	* correct line numbers for debugger WRT macros
