@@ -1,0 +1,5 @@
+
+=head1 The Parrot Byte Code / Pack File Format
+
+See the documentation for the Parrot::PackFile Perl module.
+
