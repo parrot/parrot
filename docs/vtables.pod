@@ -31,7 +31,7 @@ unlikely that there will be a distinct "Python scalar" PMC class.
 The Python compiler could well type-inference variables such that
 C<a> would be a C<PythonString> and C<b> would be a C<PythonNumber>.
 But the point remains - incrementing a C<PythonString> is very different
-from incrementing a C<PerlScalar>
+from incrementing a C<PerlScalar>.
 
 =back
 
@@ -71,14 +71,14 @@ now look at how one is supposed to do this.
 =head2 Starting out
 
 If you're adding data types to the core of Parrot, (and you've
-checked with Dan and/or Simon that you're supposed to be doing so)
+checked with Dan and/or Steve that you're supposed to be doing so)
 you should be creating a file in the F<classes/> subdirectory; this is
 where all the built-in PMC classes live. (And a good source of examples
 to plunder even if you're not writing a core data type.)
 
 You should almost always start by running F<genclass.pl> found in the
 F<classes/> subdirectory to generate a skeleton for the class. Let's
-generate a number type for the beautifully non-existant Fooby language:
+generate a number type for the beautifully non-existent Fooby language:
 
     perl -I../lib genclass.pl FoobyNumber > foobynumber.pmc
 
@@ -104,7 +104,7 @@ To finish up adding a built-in class:
 
 =item 1.
 
-Add classes/YOURCLASS.pmc to MANIFEST.
+Add classes/YOURCLASS.pmc to MANIFEST.detailed
 
 =item 2.
 
@@ -158,12 +158,12 @@ class abstraction to save a couple of dereferences - if you want to.
 Similar shortcuts exist for strings, (C<native> and C<same>) and
 floating point numbers.
 
-=head2 Methods you need to implement
+=head2 Implementing methods
 
 The master list of vtable methods can be found in F<vtable.tbl> in
-the root directory of the Parrot source; since that's not exactly
-verbose, here's a better description of the methods that you need to
-implement:
+the root directory of the Parrot source, with documentation in
+F<docs/pdds/pdd02_vtables.pod>. A few of these are very important, 
+for instance:
 
 =over 3
 
@@ -185,15 +185,15 @@ True if the passed-in PMC has the same B<value> as you. For instance,
 a Perl integer and a Python integer could have the same value, but
 could not be the same thing as defined by C<is_same>.
 
-=back
-
-=head2 Methods, you might need, depending on your class
-
-=over 3
-
 =item C<clone>
 
 Copy your data and state into the passed-in destination PMC.
+
+=back
+
+Others are methods you may or may not need, depending on your type:
+
+=over 3
 
 =item C<morph>
 
@@ -287,10 +287,6 @@ value and the value passed in, storing the result in C<dest>.
 =item C<logical_not>
 
 Set yourself to be a logical negation of the value passed in.
-
-=item C<match>
-
-Execute the given regular expression on C<value> and store the result.
 
 =item C<repeat>
 
