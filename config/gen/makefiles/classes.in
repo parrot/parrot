@@ -29,7 +29,8 @@ PMC2C=$(PMC2CC)
 .SUFFIXES: .c .h .pmc .dump $(O)
 
 .c$(O):
-	$(CC) $(CFLAGS) ${cc_o_out}$@ -c $<
+	@echo 'classes/$<'
+	@$(CC) $(CFLAGS) ${cc_o_out}$@ -c $<
 
 .pmc.dump:
 	$(PMC2CD) *.pmc
