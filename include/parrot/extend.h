@@ -50,7 +50,9 @@ void Parrot_PMC_set_intval(Parrot_INTERP, Parrot_PMC, Parrot_Int);
 void Parrot_PMC_set_numval(Parrot_INTERP, Parrot_PMC, Parrot_Float);
 
 Parrot_PMC Parrot_PMC_new(Parrot_INTERP, Parrot_Int);
+Parrot_Int Parrot_PMC_typenum(Parrot_INTERP, char *);
 
+void Parrot_free_cstring(char *);
 
 #endif
 
