@@ -26,7 +26,8 @@ pmclass PerlNum {
     }
 
     void clone (PMC* dest) { 
-fprintf(stderr,"clone not implemented\n");
+	dest->vtable = SELF->vtable;
+	dest->cache.num_val = SELF->cache.num_val;
     }
 
     void morph (INTVAL type) {

@@ -348,6 +348,8 @@ These operations load registers from constants or other registers.
 
 =item B<set>(i, p)
 
+=item B<clone>(p, p)
+
 Set $1 to $2.
 
 =cut
@@ -383,6 +385,10 @@ AUTO_OP set(p, s|sc) {
 
 AUTO_OP set(i, p) {
   $1 = $2->vtable->get_integer(interpreter, $2);
+}
+
+AUTO_OP clone(p, p) {
+  $2->vtable->clone(interpreter, $2, $1);
 }
 
 =back

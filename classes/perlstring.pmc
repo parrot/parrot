@@ -26,6 +26,8 @@ pmclass PerlString {
     }
 
     void clone (PMC* dest) { 
+	dest->vtable = SELF->vtable;
+	dest->cache.struct_val = string_copy(INTERP,SELF->cache.struct_val);
     }
 
     void morph (INTVAL type) {

@@ -27,6 +27,8 @@ pmclass PerlInt {
     }
 
     void clone (PMC* dest) { 
+        dest->vtable = SELF->vtable;
+	dest->cache.int_val = SELF->cache.int_val;
     }
 
     void morph (INTVAL type) {
