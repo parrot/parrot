@@ -92,6 +92,7 @@ HEADER
 
 	my $str = extract_delimited $_, '"';
 	$str = substr $str, 1, -1;
+	# print STDERR "** '$str' $line\n";
 	my $n;
 	if ($n = $known_strings{$str}) {
 	    if (!$this_file_seen{$str}) {

@@ -50,6 +50,8 @@ have the same number of elements since there is a one-to-one mapping.
 #include "parrot/method_util.h"
 #include "parrot/dynext.h"
 
+#include "interpreter.str"
+
 #define ATEXIT_DESTROY
 
 #if EXEC_CAPABLE
@@ -1303,11 +1305,9 @@ Parrot_make_cb(Parrot_Interp interpreter, PMC* sub, PMC* user_data,
     interp_pmc = VTABLE_get_pmc_keyed_int(interpreter, interpreter->iglobals,
             (INTVAL) IGLOBALS_INTERPRETER);
     VTABLE_setprop(interpreter, user_data,
-            const_string(interpreter, "_interpreter"),
-            interp_pmc);
+            CONST_STRING(interpreter, "_interpreter"), interp_pmc);
     VTABLE_setprop(interpreter, user_data,
-            const_string(interpreter, "_sub"),
-            sub);
+            CONST_STRING(interpreter, "_sub"), sub);
     /* only ASCII sigs supported */
     sig_str = cb_signature->strstart;
     if (*sig_str == 'U') {
@@ -1327,8 +1327,7 @@ Parrot_make_cb(Parrot_Interp interpreter, PMC* sub, PMC* user_data,
     cb_sig = pmc_new(interpreter, enum_class_PerlString);
     VTABLE_set_string_native(interpreter, cb_sig, cb_signature);
     VTABLE_setprop(interpreter, user_data,
-            const_string(interpreter, "_signature"),
-            cb_sig);
+            CONST_STRING(interpreter, "_signature"), cb_sig);
     /*
      * we are gonna passing this PMC to external code, the PMCs
      * might get out of scope until the callback is called -
@@ -1443,7 +1442,7 @@ callback_CD(Parrot_Interp interpreter, void *external_data, PMC *callback_info)
      * 3) check interpreter ...
      */
     passed_interp = VTABLE_getprop(interpreter, callback_info,
-            const_string(interpreter, "_interpreter"));
+            CONST_STRING(interpreter, "_interpreter"));
     if (PMC_data(passed_interp) != interpreter)
         PANIC("callback gone to wrong interpreter");
     /*
@@ -1494,9 +1493,9 @@ Parrot_run_callback(Parrot_Interp interpreter, PMC* cbi, void* ext)
     void*    param = NULL;      /* avoid -Ox warning */
 
     sub = VTABLE_getprop(interpreter, cbi,
-            const_string(interpreter, "_sub"));
+            CONST_STRING(interpreter, "_sub"));
     sig = VTABLE_getprop(interpreter, cbi,
-            const_string(interpreter, "_signature"));
+            CONST_STRING(interpreter, "_signature"));
     user_data = cbi;
 
     sig_str = VTABLE_get_string(interpreter, sig);

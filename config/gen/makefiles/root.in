@@ -382,9 +382,10 @@ all : flags_dummy $(TEST_PROG) library/config.fpmc docs
 	$(PERL) build_tools/c2str.pl $< > $@
 
 STR_FILES = \
+	$(SRC)/interpreter.str \
 	$(SRC)/objects.str
 
-$(INC)/string_private_cstring.h: $(STR_FILES)
+$(INC)/string_private_cstring.h: $(STR_FILES) build_tools/c2str.pl
 	$(PERL) build_tools/c2str.pl --all
 
 # classes PMC build utils and rules
@@ -726,7 +727,8 @@ $(SRC)/thread$(O) : $(GENERAL_H_FILES)
 
 $(SRC)/extend$(O) : $(GENERAL_H_FILES) $(INC)/extend.h
 
-$(SRC)/interpreter$(O) : $(SRC)/interpreter.c $(GENERAL_H_FILES) ${TEMP_jit_h}
+$(SRC)/interpreter$(O) : $(SRC)/interpreter.c $(GENERAL_H_FILES) \
+	${TEMP_jit_h} $(SRC)/interpreter.str
 
 io/io$(O) : $(GENERAL_H_FILES) io/io_private.h
 
