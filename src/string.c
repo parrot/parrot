@@ -108,7 +108,7 @@ unmake_COW(struct Parrot_Interp *interpreter, STRING *s)
 
 /*
 
-=item C<static void 
+=item C<static void
 copy_string_header(struct Parrot_Interp *interpreter, String *dest, String *src)>
 
 Copies the string header from the first Parrot string to the second.
@@ -117,7 +117,7 @@ Copies the string header from the first Parrot string to the second.
 
 */
 
-static void 
+static void
 copy_string_header(struct Parrot_Interp *interpreter, String *dest, String *src)
 {
 #if ! DISABLE_GC_DEBUG
@@ -175,7 +175,7 @@ Makes the second Parrot string a copy-on-write reference to first.
 
 static void
 make_COW_reference_from_header(struct Parrot_Interp *interpreter,
-        STRING *s, STRING *d) 
+        STRING *s, STRING *d)
 {
     if (PObj_constant_TEST(s)) {
         PObj_is_cowed_SETALL(s);
@@ -243,8 +243,9 @@ Initializes the Parrot string subsystem.
 void
 string_init(void)
 {
-/* XXXX: pull out into a config */
-    string_set_data_directory("blib/lib/icu/2.6.1");
+/* DEFAULT_ICU_DATA_DIR is configured at build time. Need a way to
+    specify this at runtime as well. */
+    string_set_data_directory(DEFAULT_ICU_DATA_DIR);
 /*
     encoding_init();
     chartype_init();
@@ -267,7 +268,7 @@ Returns the capacity of the specified Parrot string.
 UINTVAL
 string_capacity(struct Parrot_Interp *interpreter, STRING *s)
 {
-    return ((ptrcast_t)PObj_bufstart(s) + PObj_buflen(s) - 
+    return ((ptrcast_t)PObj_bufstart(s) + PObj_buflen(s) -
         (ptrcast_t)s->strstart) / (s->representation);
 }
 
@@ -293,7 +294,7 @@ string_make_empty(struct Parrot_Interp *interpreter,
 
     s->representation = representation;
 
-    Parrot_allocate_string(interpreter, 
+    Parrot_allocate_string(interpreter,
         s, string_max_bytes(interpreter, s, capacity));
 
     s->strlen = s->bufused = 0;
@@ -395,7 +396,7 @@ _string_downscale(struct Parrot_Interp *interpreter, STRING *s,
 /* temporary */
 void Parrot_string_downscale(struct Parrot_Interp *interpreter, STRING *s,
     parrot_string_representation_t representation);
-    
+
 void
 Parrot_string_downscale(struct Parrot_Interp *interpreter, STRING *s,
     parrot_string_representation_t representation)
@@ -463,7 +464,7 @@ _string_smallest_representation(struct Parrot_Interp *interpreter, STRING *s)
 /*
 
 =item C<STRING *
-string_append(struct Parrot_Interp *interpreter, 
+string_append(struct Parrot_Interp *interpreter,
     STRING *a, STRING *b, UINTVAL Uflags)>
 
 Take in two Parrot strings and append the second to the first.
@@ -473,7 +474,7 @@ Take in two Parrot strings and append the second to the first.
 */
 
 STRING *
-string_append(struct Parrot_Interp *interpreter, 
+string_append(struct Parrot_Interp *interpreter,
     STRING *a, STRING *b, UINTVAL Uflags)
 {
     UINTVAL a_capacity;
@@ -608,7 +609,7 @@ string_append(struct Parrot_Interp *interpreter,
 
 =item C<
 STRING *
-string_from_cstring(struct Parrot_Interp *interpreter, 
+string_from_cstring(struct Parrot_Interp *interpreter,
     const void *buffer, UINTVAL len)>
 
 Make a Parrot string from a specified C string.
@@ -618,7 +619,7 @@ Make a Parrot string from a specified C string.
 */
 
 STRING *
-string_from_cstring(struct Parrot_Interp *interpreter, 
+string_from_cstring(struct Parrot_Interp *interpreter,
     const void *buffer, UINTVAL len)
 {
     return string_make(interpreter, buffer, len ? len :
@@ -626,7 +627,7 @@ string_from_cstring(struct Parrot_Interp *interpreter,
                        "iso-8859-1", 0); /* make this utf-8 eventually? */
 }
 
-/* 
+/*
 
 =item C<const char*
 string_primary_encoding_for_representation(struct Parrot_Interp *interpreter,
@@ -692,13 +693,13 @@ string_make(struct Parrot_Interp *interpreter, const void *buffer,
 Creates and returns a new Parrot string using C<len> bytes of string
 data read from C<buffer>.
 
-The value of C<encoding_name> specifies the string's representation. 
+The value of C<encoding_name> specifies the string's representation.
 The currently recognised values are:
 
     'iso-8859-1'  =  enum_stringrep_one
     'ucs-2'       =  enum_stringrep_two
     'utf-32'      =  enum_stringrep_four
-    
+
 If C<encoding_name> is unspecified the the string reperesentation will default
 to C<enum_stringrep_unknown>.
 
@@ -804,12 +805,12 @@ Grows the Parrot string's buffer by the specified number of characters.
 */
 
 STRING *
-string_grow(struct Parrot_Interp * interpreter, STRING * s, INTVAL addlen) 
+string_grow(struct Parrot_Interp * interpreter, STRING * s, INTVAL addlen)
 {
     unmake_COW(interpreter,s);
 
     /* Don't check buflen, if we are here, we already checked. */
-    Parrot_reallocate_string(interpreter, 
+    Parrot_reallocate_string(interpreter,
         s, PObj_buflen(s) + string_max_bytes(interpreter, s, addlen));
     return s;
 }
@@ -839,7 +840,7 @@ string_length(struct Parrot_Interp * interpreter, const STRING *s)
 
 /* XXX Is this right? */
 void *
-string_pointer_to_index(struct Parrot_Interp * interpreter, 
+string_pointer_to_index(struct Parrot_Interp * interpreter,
     const STRING *s, UINTVAL idx)
 {
     switch( s->representation )
@@ -1171,7 +1172,7 @@ string_chr(struct Parrot_Interp *interpreter, UINTVAL character)
     if( character <= 0xFF )
     {
         Parrot_UInt1 c = (Parrot_UInt1)character;
-        return string_make(interpreter, 
+        return string_make(interpreter,
             &c, (UINTVAL)sizeof(Parrot_UInt1), "iso-8859-1", 0);
     }
     else if( character <= 0xFFFF )
@@ -1183,7 +1184,7 @@ string_chr(struct Parrot_Interp *interpreter, UINTVAL character)
     else
     {
         Parrot_UInt4 c = (Parrot_UInt4)character;
-        return string_make(interpreter, 
+        return string_make(interpreter,
             &c, (UINTVAL)sizeof(Parrot_UInt4), "utf-32", 0);
     }
 }
@@ -1229,7 +1230,7 @@ INTVAL
 string_compute_strlen(struct Parrot_Interp *interpreter, STRING *s)
 {
     /* taking advantage of int value of the enum */
-    s->strlen = ((ptrcast_t)PObj_bufstart(s) + s->bufused - 
+    s->strlen = ((ptrcast_t)PObj_bufstart(s) + s->bufused -
         (ptrcast_t)s->strstart) / (s->representation);
 
     return s->strlen;
@@ -1259,7 +1260,7 @@ string_max_bytes(struct Parrot_Interp *interpreter, STRING *s, INTVAL nchars)
 /*
 
 =item C<STRING *
-string_concat(struct Parrot_Interp *interpreter, 
+string_concat(struct Parrot_Interp *interpreter,
     STRING *a, STRING *b, UINTVAL Uflags)>
 
 Concatenates two Parrot string. If necessary, converts the second
@@ -1273,7 +1274,7 @@ created and returned.
 */
 
 STRING *
-string_concat(struct Parrot_Interp *interpreter, 
+string_concat(struct Parrot_Interp *interpreter,
     STRING *a, STRING *b, UINTVAL Uflags)
 {
     if (a != NULL && a->strlen != 0)
@@ -1312,7 +1313,7 @@ string_concat(struct Parrot_Interp *interpreter,
 /*
 
 =item C<STRING *
-string_repeat(struct Parrot_Interp *interpreter, const STRING *s, 
+string_repeat(struct Parrot_Interp *interpreter, const STRING *s,
     UINTVAL num, STRING **d)>
 
 Repeats the specified Parrot string I<num> times and stores the result
@@ -1324,7 +1325,7 @@ necessary.
 */
 
 STRING *
-string_repeat(struct Parrot_Interp *interpreter, const STRING *s, 
+string_repeat(struct Parrot_Interp *interpreter, const STRING *s,
     UINTVAL num, STRING **d)
 {
     STRING *dest;
@@ -1509,7 +1510,7 @@ string_replace(struct Parrot_Interp *interpreter, STRING *src,
     whole string(s) */
     if( rep->representation > src->representation )
     {
-        if( _string_smallest_representation(interpreter, rep) <= 
+        if( _string_smallest_representation(interpreter, rep) <=
             src->representation )
         {
             /* downsize replacement string */
@@ -1626,31 +1627,35 @@ do { \
     type1 *curr1 = (type1 *)s1->strstart; \
     type2 *curr2 = (type2 *)s2->strstart; \
      \
-    while( (_index++ < minlen) && (*curr1 == *curr2) ) \
+    while( (_index < minlen) && (*curr1 == *curr2) ) \
     { \
         ++curr1; \
         ++curr2; \
+        ++_index; \
     } \
+    if (_index == minlen && s1->strlen == s2->strlen) { \
+        result = 0; \
+        break; \
+    } \
+    result = *curr1 - *curr2; \
      \
-    *result = *curr1 - *curr2; \
-     \
-    if( !*result ) \
+    if( !result ) \
     { \
         if( s1->strlen != s2->strlen ) \
         { \
-            *result = s1->strlen > s2->strlen ? 1 : -1; \
+            result = s1->strlen > s2->strlen ? 1 : -1; \
         } \
     } \
     else \
     { \
-        *result = *result > 0 ? 1 : -1; \
+        result = result > 0 ? 1 : -1; \
     } \
 } while(0)
 
 /*
 
 =item C<INTVAL
-string_compare(struct Parrot_Interp *interpreter, 
+string_compare(struct Parrot_Interp *interpreter,
     STRING *s1, STRING *s2)>
 
 Compares two Parrot strings, performing type and encoding conversions if
@@ -1664,7 +1669,7 @@ the first string was C<< < >>, C<==>, C<< > >> the second.
 */
 
 INTVAL
-string_compare(struct Parrot_Interp *interpreter, 
+string_compare(struct Parrot_Interp *interpreter,
     STRING *s1, STRING *s2)
 {
     INTVAL cmp;
@@ -1691,13 +1696,13 @@ string_compare(struct Parrot_Interp *interpreter,
         {
             case enum_stringrep_one:
                 /* could use memcmp in this one case; faster?? */
-                COMPARE_STRINGS(Parrot_UInt1, Parrot_UInt1, s1, s2, &cmp);
+                COMPARE_STRINGS(Parrot_UInt1, Parrot_UInt1, s1, s2, cmp);
                 break;
             case enum_stringrep_two:
-                COMPARE_STRINGS(Parrot_UInt2, Parrot_UInt2, s1, s2, &cmp);
+                COMPARE_STRINGS(Parrot_UInt2, Parrot_UInt2, s1, s2, cmp);
                 break;
             case enum_stringrep_four:
-                COMPARE_STRINGS(Parrot_UInt4, Parrot_UInt4, s1, s2, &cmp);
+                COMPARE_STRINGS(Parrot_UInt4, Parrot_UInt4, s1, s2, cmp);
                 break;
             default:
                 /* trouble! */
@@ -1730,19 +1735,19 @@ string_compare(struct Parrot_Interp *interpreter,
         {
             if( smaller->representation == enum_stringrep_two )
             {
-                COMPARE_STRINGS(Parrot_UInt4, Parrot_UInt2, 
-                    larger, smaller, &cmp);
+                COMPARE_STRINGS(Parrot_UInt4, Parrot_UInt2,
+                    larger, smaller, cmp);
             }
             else /* smaller->representation == enum_stringrep_one */
             {
-                COMPARE_STRINGS(Parrot_UInt4, Parrot_UInt1, 
-                    larger, smaller, &cmp);
+                COMPARE_STRINGS(Parrot_UInt4, Parrot_UInt1,
+                    larger, smaller, cmp);
             }
         }
-        else /* larger->representation == enum_stringrep_two, 
+        else /* larger->representation == enum_stringrep_two,
             smaller->representation == enum_stringrep_one */
         {
-            COMPARE_STRINGS(Parrot_UInt2, Parrot_UInt1, larger, smaller, &cmp);
+            COMPARE_STRINGS(Parrot_UInt2, Parrot_UInt1, larger, smaller, cmp);
         }
 
         return cmp * multiplier;
@@ -2008,7 +2013,7 @@ do { \
 /*
 
 =item C<STRING *
-string_bitwise_or(struct Parrot_Interp *interpreter, 
+string_bitwise_or(struct Parrot_Interp *interpreter,
     STRING *s1, STRING *s2, STRING **dest)>
 
 Performs a bitwise C<OR> on two Parrot string, performing type and
@@ -2020,7 +2025,7 @@ then it is reused, otherwise a new Parrot string is created.
 */
 
 STRING *
-string_bitwise_or(struct Parrot_Interp *interpreter, 
+string_bitwise_or(struct Parrot_Interp *interpreter,
     STRING *s1, STRING *s2, STRING **dest)
 {
     STRING *res = NULL;
@@ -2069,7 +2074,7 @@ string_bitwise_or(struct Parrot_Interp *interpreter,
                     s1, s2, res, maxlen, |);
                 break;
             case enum_stringrep_four:
-                BITWISE_OR_STRINGS(Parrot_UInt4, Parrot_UInt4, Parrot_UInt4, 
+                BITWISE_OR_STRINGS(Parrot_UInt4, Parrot_UInt4, Parrot_UInt4,
                     s1, s2, res, maxlen, |);
                 break;
             default:
@@ -2098,19 +2103,19 @@ string_bitwise_or(struct Parrot_Interp *interpreter,
         {
             if( smaller->representation == enum_stringrep_two )
             {
-                BITWISE_OR_STRINGS(Parrot_UInt4, Parrot_UInt2, Parrot_UInt4, 
+                BITWISE_OR_STRINGS(Parrot_UInt4, Parrot_UInt2, Parrot_UInt4,
                     larger, smaller, res, maxlen, |);
             }
             else /* smaller->representation == enum_stringrep_one */
             {
-                BITWISE_OR_STRINGS(Parrot_UInt4, Parrot_UInt1, Parrot_UInt4, 
+                BITWISE_OR_STRINGS(Parrot_UInt4, Parrot_UInt1, Parrot_UInt4,
                     larger, smaller, res, maxlen, |);
             }
         }
         else /* larger->representation == enum_stringrep_two,
             smaller->representation == enum_stringrep_one */
         {
-            BITWISE_OR_STRINGS(Parrot_UInt2, Parrot_UInt1, Parrot_UInt2, 
+            BITWISE_OR_STRINGS(Parrot_UInt2, Parrot_UInt1, Parrot_UInt2,
                 larger, smaller, res, maxlen, |);
         }
     }
@@ -2127,7 +2132,7 @@ string_bitwise_or(struct Parrot_Interp *interpreter,
 /*
 
 =item C<STRING *
-string_bitwise_xor(struct Parrot_Interp *interpreter, 
+string_bitwise_xor(struct Parrot_Interp *interpreter,
     STRING *s1, STRING *s2, STRING **dest)>
 
 Performs a bitwise C<XOR> on two Parrot strings, performing type and
@@ -2139,7 +2144,7 @@ then it is reused, otherwise a new Parrot string is created.
 */
 
 STRING *
-string_bitwise_xor(struct Parrot_Interp *interpreter, 
+string_bitwise_xor(struct Parrot_Interp *interpreter,
     STRING *s1, STRING *s2, STRING **dest)
 {
     STRING *res = NULL;
@@ -2180,15 +2185,15 @@ string_bitwise_xor(struct Parrot_Interp *interpreter,
         switch( maxrep )
         {
             case enum_stringrep_one:
-                BITWISE_OR_STRINGS(Parrot_UInt1, Parrot_UInt1, Parrot_UInt1, 
+                BITWISE_OR_STRINGS(Parrot_UInt1, Parrot_UInt1, Parrot_UInt1,
                     s1, s2, res, maxlen, ^);
                 break;
             case enum_stringrep_two:
-                BITWISE_OR_STRINGS(Parrot_UInt2, Parrot_UInt2, Parrot_UInt2, 
+                BITWISE_OR_STRINGS(Parrot_UInt2, Parrot_UInt2, Parrot_UInt2,
                     s1, s2, res, maxlen, ^);
                 break;
             case enum_stringrep_four:
-                BITWISE_OR_STRINGS(Parrot_UInt4, Parrot_UInt4, Parrot_UInt4, 
+                BITWISE_OR_STRINGS(Parrot_UInt4, Parrot_UInt4, Parrot_UInt4,
                     s1, s2, res, maxlen, ^);
                 break;
             default:
@@ -2217,19 +2222,19 @@ string_bitwise_xor(struct Parrot_Interp *interpreter,
         {
             if( smaller->representation == enum_stringrep_two )
             {
-                BITWISE_OR_STRINGS(Parrot_UInt4, Parrot_UInt2, Parrot_UInt4, 
+                BITWISE_OR_STRINGS(Parrot_UInt4, Parrot_UInt2, Parrot_UInt4,
                     larger, smaller, res, maxlen, ^);
             }
             else /* smaller->representation == enum_stringrep_one */
             {
-                BITWISE_OR_STRINGS(Parrot_UInt4, Parrot_UInt1, Parrot_UInt4, 
+                BITWISE_OR_STRINGS(Parrot_UInt4, Parrot_UInt1, Parrot_UInt4,
                     larger, smaller, res, maxlen, ^);
             }
         }
-        else /* larger->representation == enum_stringrep_two, 
+        else /* larger->representation == enum_stringrep_two,
             smaller->representation == enum_stringrep_one */
         {
-            BITWISE_OR_STRINGS(Parrot_UInt2, Parrot_UInt1, Parrot_UInt2, 
+            BITWISE_OR_STRINGS(Parrot_UInt2, Parrot_UInt1, Parrot_UInt2,
                 larger, smaller, res, maxlen, ^);
         }
     }
@@ -2281,7 +2286,7 @@ do { \
 /*
 
 =item C<STRING *
-string_bitwise_not(struct Parrot_Interp *interpreter, 
+string_bitwise_not(struct Parrot_Interp *interpreter,
     STRING *s, STRING **dest)>
 
 Performs a bitwise C<NOT> on a Parrot string. If the second string is
@@ -2292,7 +2297,7 @@ not C<NULL> then it is reused, otherwise a new Parrot string is created.
 */
 
 STRING *
-string_bitwise_not(struct Parrot_Interp *interpreter, 
+string_bitwise_not(struct Parrot_Interp *interpreter,
     STRING *s, STRING **dest)
 {
     STRING *res = NULL;
@@ -2377,7 +2382,7 @@ string_bool(struct Parrot_Interp *interpreter, const STRING *s)
 
         /* relying on character literals being interpreted as ascii--may
         not be correct on ebdic systems. use numeric value instead? */
-        if (c == '0') { 
+        if (c == '0') {
             /* later, accept other chars with digit value 0? or, no */
             return 0;
         }
@@ -2562,7 +2567,7 @@ string_to_num(struct Parrot_Interp *interpreter, const STRING *s)
 
             if (df && df == digit_family) {
                 if (in_exp) {
-                    exponent = exponent*10 + 
+                    exponent = exponent*10 +
                         Parrot_char_digit_value(interpreter, c);
                     if (!exp_sign) {
                         exp_sign = 1;
@@ -3022,11 +3027,11 @@ _string_unescape_cstring_large(struct Parrot_Interp * interpreter,
                     string_append_chr(interpreter, result, '\\');
                     break;
                 case 'x':       /* XXX encoding??? */
-                    string_append_chr(interpreter, 
+                    string_append_chr(interpreter,
                         result, _parse_hex_digits(&string, 2));
                     break;
                 case 'u':       /* XXX encoding??? */
-                    string_append_chr(interpreter, 
+                    string_append_chr(interpreter,
                         result, _parse_hex_digits(&string, 4));
                     break;
                 default:
@@ -3044,131 +3049,92 @@ _string_unescape_cstring_large(struct Parrot_Interp * interpreter,
 /*
 
 =item C<STRING *
-string_unescape_cstring(struct Parrot_Interp * interpreter, 
+string_unescape_cstring(struct Parrot_Interp * interpreter,
     char *cstring, char delimiter)>
 
-Unescapes the specified C string.
+Unescapes the specified C string. These sequences are covered:
+
+  \xhh        1..2 hex digits
+  \ooo        1..3 oct digits
+  \cX         control char X
+  \x{h..h}    1..8 hex digits
+  \uhhhh      4 hex digits
+  \Uhhhhhhhh  8 hex digits
+  \a, \b, \t, \n, \v, \f, \r, \e, \?
 
 =cut
 
 */
 
+
+static Parrot_UInt2
+char8_at(Parrot_Int4 offs, void* context)
+{
+    return ((char*)((STRING *)context)->strstart)[offs];
+
+}
+
+static Parrot_UInt2
+char16_at(Parrot_Int4 offs, void* context)
+{
+    return ((Parrot_UInt2*)((STRING *)context)->strstart)[offs];
+
+}
+
 STRING *
-string_unescape_cstring(struct Parrot_Interp * interpreter, 
+string_unescape_cstring(struct Parrot_Interp * interpreter,
     char *cstring, char delimiter)
 {
-    char *p, *string;
-    char hexdigits[] = "0123456789abcdef";
-    STRING *result;
     size_t clength = strlen(cstring);
+    STRING *result;
+    int offs, d;
+    Parrot_UInt4 r;
+    int had_int16 = 0;
+    Parrot_unescape_cb char_at = char8_at;
 
-    if( !cstring || !clength ) return NULL;
-
-    result = string_make(interpreter, cstring, clength, "iso-8859-1", 0);
-
-    for (p = (char *)result->strstart, string = cstring ; *string; ++string)
-    {
-        if (*string == '\\' && string[1]) {
-            switch (*++string) {
-                case 'n':
-                    *p++ = '\n';
-                    break;
-                case 'r':
-                    *p++ = '\r';
-                    break;
-                case 't':
-                    *p++ = '\t';
-                    break;
-                case 'a':
-                    *p++ = '\a';
-                    break;
-                case 'f':
-                    *p++ = '\f';
-                    break;
-                case 'e':
-                    *p++ = '\033';
-                    break;
-                case '\\':
-                    *p++ = '\\';
-                    break;
-                case 'x':       /* XXX encoding??? */
-                    {
-                        int c1 = tolower(*++string);
-                        char *p1 = strchr(hexdigits, c1);
-                        char *p2;
-                        if (p1) {
-                            int c2 = tolower(*++string);
-                            p2 = strchr(hexdigits, c2);
-                            if (p2)
-                                *p++ = ((p1-hexdigits) << 4) | (p2-hexdigits);
-                            else {
-                                --string;
-                                *p++ = (p1-hexdigits);
-                            }
-                        }
-                        else {
-                            /* XXX warning? */
-                            *p++ = *--string;
-                        }
-                    }
-                    break;
-                case 'u':       /* XXX encoding??? */
-                    {
-                        UINTVAL cval = 0;
-                        int count = 4;
-
-                        while (count-- && string[1])
-                        {
-                            int c1 = tolower(*++string);
-                            char *p1 = strchr(hexdigits, c1);
-
-                            if (p1) {
-                                cval = (cval << 4) | (p1-hexdigits);
-                            }
-                            else {
-                                /* XXX warning? */
-                                --string;
-                                break;
-                            }
-
-                        }
-
-                        if( cval <= 0xFF )
-                        {
-                            *p++ = cval;
-                        }
-                        else
-                        {
-                            /* fall back to a method which handles
-                            non-rep-1 strings */
-                            ++string;
-
-                            /* finish up the string so far */
-                            result->bufused = p - (char *)result->strstart;
-                            string_compute_strlen(interpreter, result);
-
-                            _string_unescape_cstring_large(interpreter, string,
-                                                        result, cval, delimiter);
-                            return string_constant_copy(interpreter, result);
-                        }
-                    }
-                    break;
-                default:
-                    *p++ = *string;
-                    break;
-            }
-        }
-        else if (*string == delimiter)
-            break;
-        else
-            *p++ = *string;
+    if (delimiter && clength)
+        --clength;
+    result = string_make(interpreter, cstring, clength, "iso-8859-1",
+            PObj_constant_FLAG);
+    if (result->representation == enum_stringrep_two) {
+        had_int16 = 1;
+        char_at = char16_at;
     }
 
-    result->bufused = p - (char *)result->strstart;
-    string_compute_strlen(interpreter, result);
-
-    return string_constant_copy(interpreter, result);
+    for (offs = d =  0; ; ++offs) {
+        r = (char_at)(offs, result);
+        if (!r || r == (Parrot_UInt4)delimiter)
+            break;
+        if (r == '\\') {
+            ++offs;
+            r = string_unescape_one(char_at, &offs, result->strlen, result);
+            --offs;
+            /* TODO r = 0xffffffff for error */
+            if (r >= 0x100 && !had_int16) {
+                assert(r <= 0xffff);    /* TODO */
+                /* current result is this */
+                result->strlen = result->bufused = clength;
+                _string_upscale(interpreter, result,
+                        enum_stringrep_two, clength);
+                had_int16 = 1;
+                char_at = char16_at;
+            }
+        }
+        if (d == offs) {
+            ++d;
+            continue;
+        }
+        /* TODO create set functions too */
+        if (had_int16)
+            ((Parrot_UInt2*)result->strstart)[d++] = r;
+        else
+            ((char*)result->strstart)[d++] = r;
+    }
+    result->strlen = d;
+    result->bufused = string_max_bytes(interpreter, result, d);
+    return result;
 }
+
 
 /*
 
@@ -3183,6 +3149,7 @@ TODO - Not yet implimented.
 =cut
 
 */
+
 
 STRING *
 string_upcase(struct Parrot_Interp *interpreter, const STRING *s)

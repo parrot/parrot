@@ -20,10 +20,17 @@ use Cwd qw(cwd);
 
 $description="Configuring ICU if requested...";
 
-@args=qw(buildicu verbose);
+@args=qw(buildicu verbose icudatadir);
 
 sub runstep {
-  my ($buildicu, $verbose) = @_;
+  my ($buildicu, $verbose, $icudatadir) = @_;
+
+  if( !defined $icudatadir )
+  {
+	  $icudatadir = 'blib/lib/icu/2.6.1';
+  }
+
+  Configure::Data->set( icudatadir => $icudatadir );
 
 #  unless ($buildicu) {
 #    print " [Skipped] " if $verbose;

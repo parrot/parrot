@@ -134,6 +134,8 @@ typedef DPOINTER DPointer;
 #define PARROT_CORE_CG_OPLIB_INIT Parrot_DynOp_core_cg_${MAJOR}_${MINOR}_${PATCH}
 #define PARROT_CORE_CGP_OPLIB_INIT Parrot_DynOp_core_cgp_${MAJOR}_${MINOR}_${PATCH}
 
+#define DEFAULT_ICU_DATA_DIR "${icudatadir}"
+
 #define INTVAL_FMT "${intvalfmt}"
 #define FLOATVAL_FMT "${floatvalfmt}"
 

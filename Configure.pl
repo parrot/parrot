@@ -54,7 +54,7 @@ Compile Options
 You can add and remove option values with C<< :rem{<opt>} >> and
 C<< :add{<opt>} >>. For example:
 
-    perl Configure.pl --ccflags="rem{-g} :add{-O2}"
+    perl Configure.pl --ccflags=":rem{-g} :add{-O2}"
 
 =over
 
@@ -167,6 +167,10 @@ Determine the type of garbage collection. The value for C<type> should
 be one of: C<gc>, C<libc>, C<malloc> or C<malloc-trace>. The default is
 C<gc>.
 
+=item C<--icudatadir=(path)>
+
+Use the given directory to locate ICU's data file(s)
+
 =back
 
 Other Options (may not be implemented)
@@ -274,6 +278,8 @@ Parrot Options:
    --execcapable        Use JIT to emit a native executable
    --gc=(type)          Determine the type of garbage collection
                         type=(gc|libc|malloc|malloc-trace) default is gc
+
+   --icudatadir=(path)  Use the given directory to locate ICU's data file(s)
 
 Other Options (may not be implemented):
 

@@ -16,7 +16,7 @@ Tests Parrot's string registers and operations.
 
 =cut
 
-use Parrot::Test tests => 132;
+use Parrot::Test tests => 131;
 use Test::More;
 
 output_is( <<'CODE', <<OUTPUT, "set_s_s|sc" );
@@ -2427,15 +2427,6 @@ OK:	print "ok 2\n"
 CODE
 ok 1
 ok 2
-OUTPUT
-
-output_is( <<'CODE', <<OUTPUT, "angstrom" );
- chr S0, 0x212B
- print S0
- print "\n"
- end
-CODE
-\xe2\x84\xab
 OUTPUT
 
 1;

@@ -23,6 +23,7 @@ API.
 #include <unicode/ucnv.h>
 #include <unicode/utypes.h>
 #include <unicode/uchar.h>
+#include <unicode/ustring.h>
 #include <assert.h>
 
 /*
@@ -41,6 +42,19 @@ void
 string_set_data_directory(const char *dir)
 {
     u_setDataDirectory(dir);
+
+    /* Since u_setDataDirectory doesn't have a result code, we'll spot
+       check that everything is okay by making sure that '9' had decimal
+       value 9. Using 57 rather than '9' so that the encoding of this
+       source code file isn't an issue.... (Don't want to get bitten by
+       EBCDIC.) */
+
+    if( !u_isdigit(57) || (u_charDigitValue(57) != 9) )
+    {
+            internal_exception(ICU_ERROR,
+                "string_set_data_directory: ICU data files not found"
+                "(apparently) for directory [%s]", dir);
+    }
 }
 
 /*
@@ -125,82 +139,13 @@ string_fill_from_buffer(struct Parrot_Interp *interpreter, const void *buffer,
 	string_compute_strlen(interpreter, s);
 }
 
-/*
+
+Parrot_UInt4
+string_unescape_one(Parrot_unescape_cb cb, Parrot_UInt4 *offset,
+        Parrot_UInt4 input_length, void *string)
 {
-
-    UErrorCode myError = U_ZERO_ERROR;
-    UConverter *conv = ucnv_open("ISO-8859-1", &myError);
-
-    NSData *data = [NSData dataWithContentsOfFile:@"/var/tmp/ja.txt"];
-
-
-    UConverter *conv2 = ucnv_open("UTF-8", &myError);
-    UChar *outputBuffer = malloc(50*sizeof(UChar));
-    UChar *start = outputBuffer;
-    char *source = [data bytes];
-    UErrorCode convError = 0;
-
-    ucnv_toUnicode(conv2, &outputBuffer, &(outputBuffer[50]), &source, source + [data length], NULL, TRUE, &convError);
-
-    NSLog(@"conv error = %i", convError);
-    NSLog(@"conv length = %i", outputBuffer - start);
-
-
-    UConverter *conv3 = ucnv_open("UCS-2", &myError); //ISO-8859-1"
-    char *outbuffer = malloc(50);
-    char *outstart = outbuffer;
-    UErrorCode redoErr = 0;
-
-    NSLog(@"conv3 = %p", conv3);
-    NSLog(@"%s", ucnv_getName(conv3, &redoErr));
-
-        UErrorCode callbackStatus = 0;
-
-          ucnv_setFromUCallBack(conv3,
-                       UCNV_FROM_U_CALLBACK_STOP, //UCNV_FROM_U_CALLBACK_ESCAPE
-                       NULL,
-                       NULL,
-                       NULL,
-                       &callbackStatus);
-
-    ucnv_fromUnicode(conv3, &outbuffer, outbuffer + 50, &start, outputBuffer, NULL, TRUE, &redoErr);
-//    ucnv_fromUnicode(conv3, NULL, NULL, &start, outputBuffer, NULL, TRUE, &redoErr);
-
-    NSLog(@"redo error = %i", redoErr);
-    NSLog(@"%s", u_errorName(redoErr));
-    NSLog(@"redo length = %i", outbuffer - outstart);
-
-NSLog(@"%x", *outstart);
-NSLog(@"%d", *outstart);
-NSLog(@"%x", outstart[1]);
-    NSLog(@"%@", [[NSString alloc] initWithData:[NSData dataWithBytes:outstart length:(outbuffer - outstart)] encoding:NSISOLatin1StringEncoding]);
-
-{
-    UConverter *jisConv = ucnv_open("shift_jis", &myError);
-    USet *set =  uset_open(0, 0);
-    UErrorCode setError = U_ZERO_ERROR;
-
-    ucnv_getUnicodeSet( jisConv, set, UCNV_ROUNDTRIP_SET, &setError);
-
-    NSLog(@"set size = %d", uset_size(set));
-    NSLog(@"contains range = %d", uset_containsRange(set, 0x10000, 0x10ffff));
-    NSLog(@"uset_containsNoneOfRange = %d", uset_containsNoneOfRange(set, 0x10000, 0x10ffff));
+    return u_unescapeAt(cb, offset, input_length, string);
 }
-{
-    UConverter *utf8Conv = ucnv_open("UTF-8", &myError);
-    USet *set =  uset_open(0, 0);
-    UErrorCode setError = U_ZERO_ERROR;
-
-    ucnv_getUnicodeSet( utf8Conv, set, UCNV_ROUNDTRIP_SET, &setError);
-
-    NSLog(@"set size = %d", uset_size(set));
-    NSLog(@"contains range = %d", uset_containsRange(set, 0x10000, 0x10ffff));
-    NSLog(@"uset_containsNoneOfRange = %d", uset_containsNoneOfRange(set, 0x10000, 0x10ffff));
-}
-    [pool release];
-    return 0;
-}
-*/
 
 /*
 
@@ -210,11 +155,11 @@ NSLog(@"%x", outstart[1]);
 
 =over
 
-=item C<UINTVAL 
+=item C<UINTVAL
 Parrot_char_digit_value(struct Parrot_Interp *interpreter, UINTVAL character)>
 
 Returns the decimal digit value of the specified character if it is a decimal
-digit character. If not, then -1 is returned. 
+digit character. If not, then -1 is returned.
 
 Note that as currently written, C<Parrot_char_digit_value()> can
 correctly return the decimal digit value of characters for which
