@@ -291,11 +291,11 @@ Returns the element for C<key>.
 
 =item C<void set_integer_native(INTVAL value)>
 
-Sets the current idx to C<value>.
+Reset the Iterator. C<value> must be one of
 
-C<value> must be in the range:
-
-    (ITERATE_FROM_START + 1) .. (ITERATE_FROM_END - 1)
+ ITERATE_FROM_START        ... Iterate from start
+ ITERATE_FROM_START_KEYS   ... OrderedHash by keys
+ ITERATE_FROM_END          ... Arrays and PerlString only
 
 =cut
 

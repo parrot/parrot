@@ -10,6 +10,22 @@ classes/slice.pmc - Slice PMC
 
 These are the vtable functions for the slice PMC class.
 
+A Slice PMC isa Key PMC, holding a chain of start and/or end values
+for slice ranges. Private flags define the meaning of the values:
+
+  [ s .. e ]    s .. KEY_start_slice_FLAG; e .. KEY_end_slice_FLAG
+  [ x,     ]    KEY_start_slice_FLAG | KEY_end_slice_FLAG
+  [  .. e  ]    KEY_inf_slice_FLAG   | KEY_end_slice_FLAG
+  [ s ..   ]    KEY_start_slice_FLAG | KEY_inf_slice_FLAG
+
+Ranges are currently implemented for Array and PerlString only.
+
+Run
+
+  $ parrot -d2000 slice.pasm
+
+to see slice constant flags.
+
 =head2 Methods
 
 =over 4
@@ -20,29 +36,50 @@ These are the vtable functions for the slice PMC class.
 
 #include "parrot/parrot.h"
 
+/*
+ * set the Slice iter state to initial, first position
+ * no backwards iterations for now
+ */
 static void
 set_slice_start(Interp *interpreter, PMC *self)
 {
     PMC* range = PMC_pmc_val(self);
 
     /*
-     * and start value in struct_val
+     * set start value in struct_val
+     * Please nt that the range PMC can hold variables too
+     * so that key_integer/key_string must be used to get the
+     * values
      */
     if (key_type(interpreter, range) & KEY_integer_FLAG) {
         /* integer key */
         if (PObj_get_FLAGS(range) & KEY_inf_slice_FLAG) {
-            /* first range is ".. end" */
+            /*
+             * first range is ".. end"
+             * start at index 0
+             * */
             PMC_struct_val(self) = (void *)0;
         }
         else {
+            /*
+             * else start at range value
+             */
             PMC_struct_val(self) = (void *)key_integer(interpreter, range);
         }
     }
     else {
+        /*
+         * string assumed
+         * - no ranges yet, start at value
+         */
         PMC_struct_val(self) = key_string(interpreter, range);
     }
 }
 
+/*
+ * increment Slice value according to range and/or advance to
+ * next range PMC in Key chain
+ */
 static void
 set_slice_next(Interp *interpreter, PMC *self, PMC *agg)
 {
@@ -84,6 +121,10 @@ set_slice_next(Interp *interpreter, PMC *self, PMC *agg)
             goto next_range;
         }
         if (PObj_get_FLAGS(range) & KEY_start_slice_FLAG) {
+            /*
+             * start ... end range
+             * end is in the next range in the Key chain
+             */
             PMC *end_range = PMC_data(range);
             if (!end_range)
                 internal_exception(1, "No end range found");
@@ -102,16 +143,29 @@ set_slice_next(Interp *interpreter, PMC *self, PMC *agg)
 
 next_range:
         range = PMC_pmc_val(self) = PMC_data(range);
-        if (!PMC_pmc_val(self))
+        if (!PMC_pmc_val(self)) {
+            /*
+             * this denotes the end of iteration
+             */
             PMC_int_val(self) = -1;
-        else
+        }
+        else {
+            /*
+             * set start value
+             */
             PMC_struct_val(self) = (void *)key_integer(interpreter, range);
+        }
     }
     else {
+        /*
+         * string assumed
+         */
         if ((PObj_get_FLAGS(range) &
                     (KEY_start_slice_FLAG|KEY_end_slice_FLAG)) ==
                 (KEY_start_slice_FLAG|KEY_end_slice_FLAG)) {
-
+            /*
+             * only single values for now - no ranges
+             */
             range = PMC_pmc_val(self) = PMC_data(range);
             if (!PMC_pmc_val(self))
                 PMC_int_val(self) = -1;
@@ -126,6 +180,39 @@ next_range:
 
 pmclass Slice need_ext extends Key {
 
+    void init () {
+        PMC_pmc_val(SELF) = NULL;
+        SUPER();
+    }
+
+    void mark () {
+        if (PMC_pmc_val(SELF))
+            pobject_lives(INTERP, (PObj*)PMC_pmc_val(SELF));
+        SUPER();
+    }
+
+    PMC* clone() {
+        internal_exception(1, "Unimplemented");
+        /*
+         * TODO - Key_Clone does all - except for the slice flags
+         */
+        return NULL;
+    }
+
+/*
+
+=item C<INTVAL get_integer()>
+
+Get the next integer key from the current slice range.
+
+=item C<STRING* get_string()>
+
+Get the next string key from the current slice range.
+
+=cut
+
+*/
+
     INTVAL get_integer() {
         INTVAL v = (INTVAL)PMC_struct_val(SELF);
         /* printf("Slice_get_integer %d\n", (int)v); */
@@ -137,9 +224,18 @@ pmclass Slice need_ext extends Key {
         return s;
     }
 
+/*
+
+=item C<PMC* nextkey_keyed (PMC* agg, INTVAL what)>
+
+Prepate slice PMC SELF for iteration over the passed aggregate or
+advance to next position in the range, dpending on what.
+
+=cut
+
+*/
     PMC* nextkey_keyed (PMC* agg, INTVAL what) {
         PMC *ret = SELF;
-        PMC *current_key;
 
         switch (what) {
             case ITERATE_FROM_START:
@@ -147,8 +243,11 @@ pmclass Slice need_ext extends Key {
                 /*
                  * need a new Slice PMC that hold's the state
                  * especially PMC_data() must be zero
+                 *
+                 * aggregate call get_integer/get_string on this
+                 * PMC, because it's marked being a Key PMC
                  */
-                ret = pmc_new_noinit(INTERP, enum_class_Slice);
+                ret = pmc_new(INTERP, enum_class_Slice);
                 PObj_get_FLAGS(ret) &= ~KEY_type_FLAGS;
                 PObj_get_FLAGS(ret) |= KEY_pmc_FLAG;
 
@@ -157,10 +256,19 @@ pmclass Slice need_ext extends Key {
                  * remember slice chain in PMC_pmc_val
                  */
                 PMC_pmc_val(ret) = SELF;
+                /*
+                 * and set start value
+                 */
                 set_slice_start(INTERP, ret);
                 break;
+            /*
+             * we are passed now the new PMC, we had created above
+             */
             case ITERATE_GET_NEXT:
                 set_slice_next(INTERP, ret, agg);
+                break;
+            default:
+                internal_exception(1, "No backward iteration on slices yet");
                 break;
         }
         return ret;

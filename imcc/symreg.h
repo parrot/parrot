@@ -19,12 +19,12 @@ enum VARTYPE {		/* variable type can be */
     VT_CONSTP	= 1 << 7,	/* pointer to constant value */
     VT_PCC_SUB  = 1 << 8,	/* PCC subroutine call */
     VT_FLATTEN  = 1 << 9,	/* .flatten_arg IDENT | VTIDENT ... */
-    /* XXX s. src/packfile.c */
-    VT_START_SLICE = 1 << 10,   /* x .. y slice range */
-    VT_END_SLICE   = 1 << 11,
-    VT_START_ZERO  = 1 << 12,   /* .. y 0..start */
-    VT_END_INF     = 1 << 13,   /* x..  start..inf */
-    VT_SLICE_BITS  = VT_START_SLICE | VT_END_SLICE | VT_START_ZERO | VT_END_INF
+    /* include/parrot/packfile.h */
+    VT_START_SLICE = PF_VT_START_SLICE ,   /* x .. y slice range */
+    VT_END_SLICE   = PF_VT_END_SLICE   ,
+    VT_START_ZERO  = PF_VT_START_ZERO  ,   /* .. y 0..start */
+    VT_END_INF     = PF_VT_END_INF     ,   /* x..  start..inf */
+    VT_SLICE_BITS  = PF_VT_SLICE_BITS
 };
 
 /* this VARTYPE needs register allocation and such */

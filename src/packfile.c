@@ -28,17 +28,6 @@ structure of the frozen bytecode.
 #include "parrot/embed.h"
 #include "parrot/packfile.h"
 
-/*
- * XXX copy from imcc/symreg.h
- */
-enum VARTYPE {		/* variable type can be */
-    VT_START_SLICE = 1 << 10,   /* x .. y slice range */
-    VT_END_SLICE   = 1 << 11,
-    VT_START_ZERO  = 1 << 12,   /* .. y 0..start */
-    VT_END_INF     = 1 << 13,   /* x..  start..inf */
-    VT_SLICE_BITS  = VT_START_SLICE | VT_END_SLICE | VT_START_ZERO | VT_END_INF
-};
-
 #include <assert.h>
 
 #define TRACE_PACKFILE 0
@@ -2989,8 +2978,8 @@ PackFile_Constant_unpack_key(Interp *interpreter,
 
     while (components-- > 0) {
         type = PF_fetch_opcode(pf, &cursor);
-        slice_bits = type & VT_SLICE_BITS;
-        type &= ~VT_SLICE_BITS;
+        slice_bits = type & PF_VT_SLICE_BITS;
+        type &= ~PF_VT_SLICE_BITS;
         if (!head && slice_bits) {
             pmc_enum = enum_class_Slice;
         }
@@ -3032,11 +3021,11 @@ PackFile_Constant_unpack_key(Interp *interpreter,
             return 0;
         }
         if (slice_bits) {
-            if (slice_bits & VT_START_SLICE)
+            if (slice_bits & PF_VT_START_SLICE)
                 PObj_get_FLAGS(tail) |= KEY_start_slice_FLAG;
-            if (slice_bits & VT_END_SLICE)
+            if (slice_bits & PF_VT_END_SLICE)
                 PObj_get_FLAGS(tail) |= KEY_end_slice_FLAG;
-            if (slice_bits & (VT_START_ZERO | VT_END_INF))
+            if (slice_bits & (PF_VT_START_ZERO | PF_VT_END_INF))
                 PObj_get_FLAGS(tail) |= KEY_inf_slice_FLAG;
         }
     }

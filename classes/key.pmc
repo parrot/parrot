@@ -274,6 +274,7 @@ Returns the key itself.
 =item C<PMC *nextkey_keyed(PMC *key, INTVAL what)>
 
 Returns the next key relative to the location specified in C<what>.
+PMC_int_val(-1) means end of iteration.
 
 =cut
 
@@ -291,11 +292,18 @@ Returns the next key relative to the location specified in C<what>.
                 PMC_int_val(ret) = 0;
                 if (!n)
                     PMC_int_val(ret) = -1;
+                /*
+                 * iterating over a hash needs additionally the
+                 * Bucket index
+                 */
                 if (is_hash_iter(agg))
                     PMC_data(ret) = (void *)INITBucketIndex;
                 break;
             case ITERATE_GET_NEXT:
-                /* src/hash.c:hash_get_idx() advances to next */
+                /*
+                 * src/hash.c:hash_get_idx() advances to next
+                 * so, if we are iterating over a hash do nothing
+                 * */
                 if (!is_hash_iter(agg)) {
                     if (PMC_int_val(ret) < n - 1)
                         ++PMC_int_val(ret);
