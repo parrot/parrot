@@ -52,7 +52,7 @@ fin:
 ${pmc_build}
 
 clean:	progclean
-	$(RM_F) *.c *.h *.dump
+	$(RM_F) *.c *.h *.dump ../vtable.dump
 
 progclean:
 	$(RM_F) *$(O)
