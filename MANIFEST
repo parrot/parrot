@@ -541,6 +541,7 @@ examples/benchmarks/vpm.imc                       [main]doc
 examples/benchmarks/vpm.pl                        [main]doc
 examples/benchmarks/vpm.py                        [main]doc
 examples/benchmarks/vpm.rb                        [main]doc
+examples/c/test_main.c                            [main]doc
 examples/compilers/Makefile                       [main]doc
 examples/compilers/japhc.c                        [main]doc
 examples/io/echo_client.imc                       [main]doc
@@ -2799,7 +2800,6 @@ src/stacks.c                                      []
 src/string.c                                      []
 src/string_primitives.c				  []
 src/sub.c                                         []
-src/test_main.c                                   []
 src/thread.c                                      []
 src/trace.c                                       []
 src/tsq.c                                         []
