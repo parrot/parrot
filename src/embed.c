@@ -50,7 +50,7 @@ Parrot_readbc(struct Parrot_Interp *interpreter, char *filename) {
     char *program_code;
     struct PackFile *pf;
 
-    if(strcmp(filename, "-")==0) { /* read from STDIN */
+    if(filename == NULL || strcmp(filename, "-")==0) { /* read from STDIN */
         char *cursor;
         INTVAL read_result;
 
@@ -172,10 +172,10 @@ Parrot_runcode(struct Parrot_Interp *interpreter, int argc, char *argv[]) {
         int call_count = 0;
         FLOATVAL time = 0.0;
 
-        printf("Operation profile:\n\n");
-
-        printf("  CODE   OP FULL NAME  CALLS         TOTAL TIME  AVG TIME  \n");
-        printf("  -----  ------------  ------------  ----------  ----------\n");
+	printf("\n\n");
+        printf("                   OPERATION PROFILE                 \n\n");
+        printf("  CODE   OP FULL NAME   CALLS  TOTAL TIME    AVG TIME\n");
+        printf("  -----  ------------  ------  ----------  ----------\n");
 
         for (j = 0; j < interpreter->op_count; j++) {
             if(interpreter->profile[j].numcalls > 0) {
@@ -183,7 +183,7 @@ Parrot_runcode(struct Parrot_Interp *interpreter, int argc, char *argv[]) {
                 call_count += interpreter->profile[j].numcalls;
                 time += interpreter->profile[j].time;
 
-                printf("  %5d  %-12s  %12ld  %5.6f  %5.6f\n", j, 
+                printf("  %5d  %-12s  %6ld  %10f  %10f\n", j, 
                        interpreter->op_info_table[j].full_name,
                        interpreter->profile[j].numcalls,
                        interpreter->profile[j].time,
@@ -192,8 +192,8 @@ Parrot_runcode(struct Parrot_Interp *interpreter, int argc, char *argv[]) {
             }
         }
 
-        printf("  -----  ------------  ------------  ----------  ----------\n");
-        printf("  %5d  %-12s  %12d  %5.6f  %5.6f\n", 
+        printf("  -----  ------------  ------  ----------  ----------\n");
+        printf("  %5d  %-12s  %6d  %10f  %10f\n", 
             op_count,
             "",
             call_count,
