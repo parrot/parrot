@@ -461,11 +461,11 @@ Sets PMC in register $1 to the current address plus the offset $2.
 
 =item B<set_addr>(in PMC, labelvar INT)
 
-Sets PMC in register $1 to the absolut address $2 obtained from B<get_addr>.
+Sets PMC in register $1 to the absolute address $2 obtained from B<get_addr>.
 
 =item B<get_addr>(out INT, in PMC)
 
-Sets $1 to the absolute address of the Sub-PMC $2.
+Sets $1 to the absolute address of the Sub PMC $2.
 
 =cut
 
