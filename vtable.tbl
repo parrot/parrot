@@ -59,6 +59,10 @@ PMC* get_pmc()
 PMC* get_pmc_keyed(PMC* key)
 PMC* get_pmc_keyed_int(INTVAL key)
 
+void* get_pointer()
+void* get_pointer_keyed(PMC* key)
+void* get_pointer_keyed_int(INTVAL key)
+
 [STORE]
 void set_integer(PMC* value)
 void set_integer_native(INTVAL value)
@@ -91,6 +95,10 @@ void set_bool_keyed_int(INTVAL key, INTVAL value)
 void set_pmc(PMC* value)
 void set_pmc_keyed(PMC* key, PMC* value)
 void set_pmc_keyed_int(INTVAL key, PMC* value)
+
+void set_pointer(void* value)
+void set_pointer_keyed(PMC* key, void* value)
+void set_pointer_keyed_int(INTVAL key, void* value)
 
 void set_same(PMC* value)
 void set_same_keyed(PMC* key, PMC* value)
