@@ -110,7 +110,8 @@ SP              [ ]
             BEGIN(emit);
         }
         if (pasm_file && YYSTATE == INITIAL && !in_pod) {
-            yy_top_state(); /* silent warning */
+            if (0)
+                yy_top_state(); /* silent warning */
             if (pasm_file == 1) {
                 BEGIN(emit);
                 return EMIT;
