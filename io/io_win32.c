@@ -49,9 +49,9 @@ size_t          PIO_win32_write(theINTERP, ParrotIOLayer * layer,
                         ParrotIO * io, const void * buffer, size_t len);
 INTVAL          PIO_win32_puts(theINTERP, ParrotIOLayer * l, ParrotIO * io,
                         const char * s);
-INTVAL          PIO_win32_seek(theINTERP, ParrotIOLayer * l, ParrotIO * io,
-                        off_t offset, INTVAL whence);
-off_t           PIO_win32_tell(theINTERP, ParrotIOLayer * l, ParrotIO * io);
+PIOOFF_T        PIO_win32_seek(theINTERP, ParrotIOLayer * l, ParrotIO * io,
+                        PIOOFF_T offset, INTVAL whence);
+PIOOFF_T        PIO_win32_tell(theINTERP, ParrotIOLayer * l, ParrotIO * io);
 
 
 /* Convert to platform specific bit open flags */
@@ -102,6 +102,12 @@ INTVAL PIO_win32_init(theINTERP, ParrotIOLayer * layer) {
         if(pio_stdin && pio_stdout && pio_stderr)
                  return 0;
         return -1;
+}
+
+
+INTVAL PIO_win32_getblksize(PIOHANDLE fd) {
+        /* Hard coded for now */
+        return PIO_BLKSIZE;
 }
 
 
@@ -172,38 +178,54 @@ INTVAL PIO_win32_isatty(PIOHANDLE fd) {
         return 0;
 }
 
+
 void PIO_win32_flush(theINTERP, ParrotIOLayer * layer, ParrotIO * io) {
+        /* No op */
 }
 
 
 size_t PIO_win32_read(theINTERP, ParrotIOLayer * layer, ParrotIO * io,
 		                void * buffer, size_t len) {
-        return 0;
+        DWORD countread;
+        if(ReadFile(io->fd, (LPVOID)buffer, (DWORD)len, &countread, NULL))
+                return countread;
+        else {
+                if(GetLastError() != NO_ERROR) {
+                        /* FIXME : An error occured */
+                } else if(len > 0) {
+                        /* FIXME : Set EOF if bytes were requested */
+                }
+                return 0;
+        }
+        return -1;
 }
 
 
 size_t PIO_win32_write(theINTERP, ParrotIOLayer * layer, ParrotIO * io,
 			const void * buffer, size_t len) {
-        return 0;
+        LPCTSTR msg;
+        DWORD countwrote = 0;
+        if(WriteFile(io->fd, (LPCSTR)buffer, (DWORD)len, &countwrote, NULL))
+                return countwrote;
+        /* FIXME: Set error flag */
+        return -1;
 }
 
 
 /*
- * puts tries WriteConsole first, then WriteFile, whereas
- * write calls WriteFile only.
+ * puts() tries WriteConsole() first, then WriteFile(), whereas
+ * write() calls WriteFile() only. I've also read that WriteFile
+ * will call WriteConsole if the handle is the right type (console) so
+ * I suppose this is saving a function call since puts is probably
+ * used for consoles a lot.
  */
 INTVAL PIO_win32_puts(theINTERP, ParrotIOLayer * l, ParrotIO * io,
                                 const char * s) {
-        LPCTSTR msg;
-        DWORD len, wrote;
-        if((msg = (LPCTSTR)s) != NULL) {
-                len = _tcslen(msg);
-                if(!WriteConsole(io->fd, msg, len, &wrote, NULL)
-                        && !WriteFile(io->fd, msg, len * sizeof(TCHAR),
-                                &wrote, NULL))
-                        return -1;
-                return wrote;
-        } 
+        DWORD len, countwrote;
+        len = _tcslen((LPCSTR)s);
+        if(WriteConsole(io->fd, (LPCSTR)s, len, &countwrote, NULL)
+                || WriteFile(io->fd, (LPCSTR)s, len, &countwrote, NULL))
+                return countwrote;
         return -1;
 }
 
@@ -211,23 +233,26 @@ INTVAL PIO_win32_puts(theINTERP, ParrotIOLayer * l, ParrotIO * io,
 /*
  * Hard seek
  */
-INTVAL PIO_win32_seek(theINTERP, ParrotIOLayer * l, ParrotIO * io,
-                        off_t offset, INTVAL whence) {
-/*        io->fpos = lseek(io->fd, offset, whence);
-        return io->fpos;
-*/
-		internal_exception( IO_NOT_IMPLEMENTED, "Seek not yet implemented on HANDLEs");
-		return 0;
+PIOOFF_T PIO_win32_seek(theINTERP, ParrotIOLayer * l, ParrotIO * io,
+                        PIOOFF_T offset, INTVAL whence) {
+        PIOOFF_T p;
+        p.LowPart = SetFilePointer(io->fd, offset.LowPart, &offset.HighPart,
+                                FILE_CURRENT);
+        if(p.LowPart == 0xFFFFFFFF && (GetLastError() != NO_ERROR)) {
+                /* FIXME: Error - exception */
+        }
+        io->fpos = p;
+        return p;
 }
 
 
-off_t PIO_win32_tell(theINTERP, ParrotIOLayer * l, ParrotIO * io) {
-/*        off_t p;
-        p = lseek(io->fd, (off_t)0, SEEK_CUR);
+PIOOFF_T PIO_win32_tell(theINTERP, ParrotIOLayer * l, ParrotIO * io) {
+        PIOOFF_T p = piooffsetzero;
+        p.LowPart = SetFilePointer(io->fd, 0, &p.HighPart, FILE_CURRENT);
+        if(p.LowPart == 0xFFFFFFFF && GetLastError() != NO_ERROR) {
+                /* FIXME: Error - exception */
+        }
         return p;
-*/
-		internal_exception( IO_NOT_IMPLEMENTED, "Seek not yet implemented on HANDLEs");
-		return 0;
 }
 
 

@@ -9,6 +9,7 @@
  *      Originally written by Melvin Smith
  *  Notes:
  *  References:
+ *      Perl6 RFCs (14,30,47,60,186,239,321,345,350)
  *      Some ideas and goals from Perl5.7 and Nick Ing-Simmons' work
  *      Some ideas from AT&T SFIO
  */
@@ -38,11 +39,11 @@
 # define O_ACCMODE 0003
 #endif
 
-/* Average block size of most systems (usually varies from 2k-8k),
- * later we can add some config to query it from the system at
- * build time (struct stat.st_blksize maybe).
- */
-#define PIO_BLKSIZE 4096 
+#ifdef BLKSIZE
+# define PIO_BLKSIZE BLKSIZE
+#else
+# define PIO_BLKSIZE  8192
+#endif
 #define PIO_BUFSIZE 4096
 #define PIO_LINEBUFSIZE 256 
 
@@ -93,18 +94,21 @@ struct _ParrotIOBuf {
 
 #ifdef WIN32
 typedef HANDLE PIOHANDLE; 
+typedef LARGE_INTEGER PIOOFF_T;
 #else
 typedef int PIOHANDLE;
+typedef off_t PIOOFF_T;
 #endif
 
+extern PIOOFF_T piooffsetzero;
 
 struct _ParrotIO {
         PIOHANDLE       fd;             /* Low level OS descriptor      */
         UINTVAL         mode;           /* Read/Write/etc.              */
         UINTVAL         flags;          /* Da flags                     */
-        off_t           fsize;          /* Current file size            */
-        off_t           fpos;           /* Current real file pointer    */
-        off_t           lpos;           /* Last file position           */
+        PIOOFF_T        fsize;          /* Current file size            */
+        PIOOFF_T        fpos;           /* Current real file pointer    */
+        PIOOFF_T        lpos;           /* Last file position           */
         ParrotIOBuf     b;              /* Buffer structure             */
         ParrotIOLayer * stack;
         /* ParrotIOFilter * filters; */
@@ -192,10 +196,9 @@ struct _ParrotIOLayerAPI {
                                         DummyCodeRef *);
         INTVAL          (*Flush)(theINTERP, ParrotIOLayer * layer,
                                 ParrotIO * io);
-        INTVAL          (*Seek)(theINTERP, ParrotIOLayer * layer,
-                                ParrotIO * io, off_t offset,
-                                        INTVAL whence);
-        off_t           (*Tell)(theINTERP, ParrotIOLayer * layer,
+        PIOOFF_T        (*Seek)(theINTERP, ParrotIOLayer * layer,
+                                ParrotIO * io, PIOOFF_T offset, INTVAL whence);
+        PIOOFF_T        (*Tell)(theINTERP, ParrotIOLayer * layer,
                                 ParrotIO * io);
         INTVAL          (*SetBuf)(theINTERP, ParrotIOLayer * layer,
                                 ParrotIO * io, size_t bufsize);
@@ -246,9 +249,13 @@ extern INTVAL           PIO_puts(theINTERP, ParrotIO *, const char *);
 #ifdef WIN32
 extern INTVAL           PIO_win32_isatty(PIOHANDLE fd);
 # define PIO_isatty(x)   PIO_win32_isatty(x)
+extern INTVAL           PIO_win32_getblksize(PIOHANDLE fd);
+# define PIO_getblksize(x)   PIO_win32_getblksize(x)
 #else
 extern INTVAL           PIO_unix_isatty(PIOHANDLE fd);
 # define PIO_isatty(x)   PIO_unix_isatty(x)
+extern INTVAL           PIO_unix_getblksize(PIOHANDLE fd);
+# define PIO_getblksize(x)   PIO_unix_getblksize(x)
 #endif
 
 extern ParrotIO * pio_stdin;

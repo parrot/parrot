@@ -32,6 +32,7 @@ ParrotIO * pio_stdin;
 ParrotIO * pio_stdout;
 ParrotIO * pio_stderr;
 
+PIOOFF_T        piooffsetzero;
 
 PMC * new_io_pmc(theINTERP, ParrotIO * io) {
         PMC * new_pmc;
@@ -62,7 +63,7 @@ ParrotIO * PIO_new(theINTERP, ParrotIO * old, INTVAL iotype,
                 /* FIXME: Reuse old IO */
         }
         new_io = (ParrotIO *)malloc(sizeof(ParrotIO));
-        new_io->fpos = new_io->lpos = (off_t)-1;
+        new_io->fpos = new_io->lpos = piooffsetzero;
         new_io->flags = flags;
         new_io->mode = mode;
         new_io->stack = pio_default_stack;

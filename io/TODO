@@ -1,6 +1,6 @@
 Add IO tables, right now IO's just float around.
 
-Finish pmc
+Finish PMC for IO object 
 
 The "stdio" layer
 	-buffering
@@ -23,5 +23,9 @@ Bottom level socket/pipe/process support in API
 UTF layers (or should we not bother and do as a filter?)
 
 Sample programs and test suite
+
+AIO - On many platforms we must fake async IO, are we doing a background
+	thread/interp or an inline event queue function that is called
+	every N ops?
 
 Documentation! :)

@@ -52,9 +52,9 @@ size_t          PIO_unix_write(theINTERP, ParrotIOLayer * layer,
                         ParrotIO * io, const void * buffer, size_t len);
 INTVAL          PIO_unix_puts(theINTERP, ParrotIOLayer * l, ParrotIO * io,
                         const char * s);
-INTVAL          PIO_unix_seek(theINTERP, ParrotIOLayer * l, ParrotIO * io,
-                        off_t offset, INTVAL whence);
-off_t           PIO_unix_tell(theINTERP, ParrotIOLayer * l, ParrotIO * io);
+PIOOFF_T        PIO_unix_seek(theINTERP, ParrotIOLayer * l, ParrotIO * io,
+                        PIOOFF_T offset, INTVAL whence);
+PIOOFF_T        PIO_unix_tell(theINTERP, ParrotIOLayer * l, ParrotIO * io);
 
 
 UINTVAL flags_to_unix(UINTVAL flags) {
@@ -236,6 +236,38 @@ INTVAL PIO_unix_isatty(PIOHANDLE fd) {
         return isatty(fd);
 }
 
+/*
+ * Various ways of determining block size. If passed a descriptor
+ * we can use fstat() and the stat buf if available, or the BLKSIZE
+ * constant if available at compile time.
+ */
+INTVAL PIO_unix_getblksize(PIOHANDLE fd) {
+        if(fd >= 0) {
+                /* Try to get the block size of a regular file */
+#if 0
+                /*
+                 * Is it even worth adding non-portable code here
+                 * or should we just estimate a nice buffer size?
+                 * Some systems have st_blksize, some don't.
+                 */
+                {
+                        struct stat sbuf;
+                        int err;
+                        err = fstat(fd, &sbuf);
+                        if(err == 0) {
+                               return sbuf.st_blksize; 
+                        }
+                }
+#endif
+        }
+        /* Try to determine it from general means. */
+#ifdef BLKSIZE
+        return BLKSIZE;
+#else
+        return PIO_BLKSIZE;
+#endif
+}
+
 /* At lowest layer all we can do for flush is ask kernel to sync().
  */
 void PIO_unix_flush(theINTERP, ParrotIOLayer * layer, ParrotIO * io) {
@@ -332,16 +364,16 @@ INTVAL PIO_unix_puts(theINTERP, ParrotIOLayer * l, ParrotIO * io,
 /*
  * Hard seek
  */
-INTVAL PIO_unix_seek(theINTERP, ParrotIOLayer * l, ParrotIO * io,
-                        off_t offset, INTVAL whence) {
+PIOOFF_T PIO_unix_seek(theINTERP, ParrotIOLayer * l, ParrotIO * io,
+                        PIOOFF_T offset, INTVAL whence) {
         io->fpos = lseek(io->fd, offset, whence);
         return io->fpos;
 }
 
 
-off_t PIO_unix_tell(theINTERP, ParrotIOLayer * l, ParrotIO * io) {
-        off_t p;
-        p = lseek(io->fd, (off_t)0, SEEK_CUR);
+PIOOFF_T PIO_unix_tell(theINTERP, ParrotIOLayer * l, ParrotIO * io) {
+        PIOOFF_T p;
+        p = lseek(io->fd, (PIOOFF_T)0, SEEK_CUR);
         return p;
 }
 

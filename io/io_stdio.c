@@ -31,6 +31,7 @@ ParrotIOLayer           pio_stdio_layer = {
  * file.
  */
 
+INTVAL          PIO_stdio_init(theINTERP, ParrotIOLayer * layer);
 ParrotIO *      PIO_stdio_open(theINTERP, ParrotIOLayer * layer,
 			const char * path, UINTVAL flags);
 INTVAL          PIO_stdio_setbuf(theINTERP, ParrotIOLayer * layer,
@@ -49,11 +50,19 @@ size_t          PIO_stdio_write(theINTERP, ParrotIOLayer * layer,
                         ParrotIO * io, const void * buffer, size_t len);
 INTVAL          PIO_stdio_puts(theINTERP, ParrotIOLayer * l, ParrotIO * io,
                         const char * s);
-INTVAL          PIO_stdio_seek(theINTERP, ParrotIOLayer * l, ParrotIO * io,
-                        off_t offset, INTVAL whence);
-off_t           PIO_stdio_tell(theINTERP, ParrotIOLayer * l,
+PIOOFF_T        PIO_stdio_seek(theINTERP, ParrotIOLayer * l, ParrotIO * io,
+                        PIOOFF_T offset, INTVAL whence);
+PIOOFF_T        PIO_stdio_tell(theINTERP, ParrotIOLayer * l,
                         ParrotIO * io);
 
+
+INTVAL PIO_stdio_init(theINTERP, ParrotIOLayer * layer) {
+        if(pio_stdout)
+                PIO_stdio_setlinebuf(interpreter, layer, pio_stdout);
+        if(pio_stdin)
+                PIO_stdio_setbuf(interpreter, layer, pio_stdin, PIO_UNBOUND);
+        return 0;
+}
 
 
 ParrotIO * PIO_stdio_open(theINTERP, ParrotIOLayer * layer,
@@ -67,7 +76,7 @@ ParrotIO * PIO_stdio_open(theINTERP, ParrotIOLayer * layer,
                          * We have an IO stream now setup stuff
                          * for our layer before returning it.
                          */
-                        PIO_stdio_setbuf(interpreter, l, io, PIO_BUFSIZE);
+                        PIO_stdio_setbuf(interpreter, l, io, PIO_UNBOUND);
                         return io;
                 }
                 l = PIO_DOWNLAYER(l);
@@ -94,7 +103,7 @@ INTVAL PIO_stdio_setbuf(theINTERP, ParrotIOLayer * layer, ParrotIO * io,
 
         /* Choose an appropriate buffer size for caller */
         if( bufsize == PIO_UNBOUND ) {
-                b->size = PIO_BUFSIZE;
+                b->size = PIO_getblksize(io->fd);
         }
         else {
                 b->size = bufsize;
@@ -144,7 +153,7 @@ ParrotIO * PIO_stdio_fdopen(theINTERP, ParrotIOLayer * layer,
                                 PIO_stdio_setlinebuf(interpreter, l, io);
                         else
                                 PIO_stdio_setbuf(interpreter, l, io,
-                                                        PIO_BUFSIZE);
+                                                        PIO_UNBOUND);
                         return io;
                 }
                 l = PIO_DOWNLAYER(l);
@@ -230,8 +239,8 @@ INTVAL PIO_stdio_puts(theINTERP, ParrotIOLayer * layer, ParrotIO * io,
 }
 
 
-INTVAL PIO_stdio_seek(theINTERP, ParrotIOLayer * l, ParrotIO * io,
-                        off_t offset, INTVAL whence) {
+PIOOFF_T PIO_stdio_seek(theINTERP, ParrotIOLayer * l, ParrotIO * io,
+                        PIOOFF_T offset, INTVAL whence) {
         int hardseek = 0;
 
         if( io->flags&PIO_F_SHARED ||
@@ -243,22 +252,19 @@ INTVAL PIO_stdio_seek(theINTERP, ParrotIOLayer * l, ParrotIO * io,
          * Try to satisfy seek request in buffer if possible,
          * else make IO request.
          */
-
-        io->fpos = lseek(io->fd, offset, whence);
+        internal_exception(IO_NOT_IMPLEMENTED, "Seek not implemented");
         return io->fpos;
 }
 
 
-off_t PIO_stdio_tell(theINTERP, ParrotIOLayer * l, ParrotIO * io) {
-        off_t p;
-        p = lseek(io->fd, (off_t)0, SEEK_CUR);
-        return p;
+PIOOFF_T PIO_stdio_tell(theINTERP, ParrotIOLayer * l, ParrotIO * io) {
+        return io->fpos;
 }
 
 
 
 ParrotIOLayerAPI        pio_stdio_layer_api = {
-        PIO_base_init,
+        PIO_stdio_init,
         PIO_base_new_layer,
         PIO_base_delete_layer,
         NULL,
