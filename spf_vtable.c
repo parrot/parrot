@@ -152,6 +152,7 @@ getstring_va(struct Parrot_Interp *interpreter, INTVAL size, SPRINTF_OBJ * obj)
         case SIZE_PSTR:
             {
                 STRING *s =  (STRING *) va_arg(*arg, STRING *);
+                /* XXX string_copy like below? */
                 return string_make(interpreter, s->strstart, s->bufused,0,
                         BUFFER_external_FLAG, 0);
             }
@@ -160,6 +161,7 @@ getstring_va(struct Parrot_Interp *interpreter, INTVAL size, SPRINTF_OBJ * obj)
             {
                 PMC *pmc = (PMC *) va_arg(*arg, PMC *);
                 STRING *s = pmc->vtable->get_string(interpreter, pmc);
+                /* XXX string_copy like below? */
                 return string_make(interpreter, s->strstart, s->bufused,0,
                         BUFFER_external_FLAG, 0);
             }
@@ -197,6 +199,7 @@ getchr_pmc(struct Parrot_Interp *interpreter, INTVAL size, SPRINTF_OBJ * obj)
             &(obj->index));
     obj->index++;
     s = tmp->vtable->get_string(interpreter, tmp);
+    /* XXX string_copy like below? + adjusting bufused */
     return string_make(interpreter, s->strstart, 1, 0, BUFFER_external_FLAG, 0);
 }
 
@@ -286,8 +289,7 @@ getstring_pmc(struct Parrot_Interp *interpreter,
             &(obj->index));
     obj->index++;
     s =  (STRING *)(tmp->vtable->get_string(interpreter, tmp));
-    return string_make(interpreter, s->strstart, s->bufused,0,
-            BUFFER_external_FLAG, 0);
+    return string_copy(interpreter, s);
 }
 
 static void *
