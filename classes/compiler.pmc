@@ -47,8 +47,7 @@ pmclass Compiler extends NCI need_ext {
 	/* morph the Byte_cointer *pointer in code_seg to an invokable sub */
 	code_seg->vtable = Parrot_base_vtables[enum_class_Eval];
 	VTABLE_init(interpreter, code_seg);
-	VTABLE_set_integer_native(interpreter, code_seg,
-		(INTVAL) eval_pf);
+	VTABLE_set_pointer(interpreter, code_seg, (void*) eval_pf);
         return code_seg;
     }
 }

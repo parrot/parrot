@@ -465,7 +465,7 @@ ok:
 .pcc_sub _the_sub:
     print "in sub\n"
     find_global P0, "_next_sub"
-    set I0, P0
+    get_addr I0, P0
     jump I0
     print "never here\n"
 
@@ -667,7 +667,7 @@ BAD2: print "not "
 OK2:  print "ok 2\n"
       end
 
-f1: 
+f1:
       print "Test\n"
       end
 
@@ -695,7 +695,7 @@ BAD2: print "not "
 OK2:  print "ok 2\n"
       end
 
-f1: 
+f1:
       print "Test\n"
       end
 

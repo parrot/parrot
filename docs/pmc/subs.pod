@@ -42,8 +42,7 @@ S. F<imcc/docs/calling_conventions.pod>
 Create a subroutine of class C<Sub> and assign the subroutine address to it:
 
   new P0, .Sub
-  set_addr I0, _sub_label
-  set P0, I0
+  set_addr P0, _sub_label
 
 This can be done with one opcode:
 
@@ -132,7 +131,7 @@ subroutine (i.e. the label) gets stored in the global stash.
   .pcc_sub _the::sub:
     print "in sub\n"			# must preserve P1
     find_global P0, "_next::sub"
-    set I0, P0				# get the absolute address
+    get_addr I0, P0			# get the absolute address
     jump I0				# jump to absolute address
 
   .pcc_sub _next::sub: 			# must preserve P1

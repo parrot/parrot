@@ -1274,3 +1274,4 @@ seti_ind_i_i    1246
 seti_ind_ic_i   1247
 seti_ind_i_ic   1248
 seti_ind_ic_ic  1249
+get_addr_i_p    1250

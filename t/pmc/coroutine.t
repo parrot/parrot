@@ -5,8 +5,7 @@ use Test::More;
 
 output_is(<<'CODE', <<'OUTPUT', "Coroutines");
     new P0, .Coroutine
-    set_addr I0, co2
-    set P0, I0
+    set_addr P0, co2
 co1:
     set I1, 4
     print "start 1\n"
@@ -21,8 +20,7 @@ co1_loop:
 co2:
     print "start 2\n"
     new P5, .Coroutine
-    set_addr I0, co3
-    set P5, I0
+    set_addr P5, co3
     set P6, P0
 co2_loop:
     invoke
@@ -36,8 +34,7 @@ co2_loop:
 co3:
     print "start 3\n"
     new P7, .Coroutine
-    set_addr I0, co2_loop
-    set P7, I0
+    set_addr P7, co2_loop
     set P8, P0
 co3_loop:
     invoke
@@ -82,12 +79,10 @@ output_is(<<'CODE', <<'OUTPUT', "Coroutines and lexicals");
     store_lex -2, "b", P21
 
     new P1, .Coroutine
-    set_addr I0, co1
-    set P1, I0
+    set_addr P1, co1
 
     new P2, .Coroutine
-    set_addr I0, co2
-    set P2, I0
+    set_addr P2, co2
 
     set P0, P1
     invoke
@@ -157,7 +152,7 @@ co1:
     invoke
 
 co2:
-    new_pad 1 
+    new_pad 1
 
     # return
     invoke
@@ -176,12 +171,10 @@ OUTPUT
 
 output_is(<<'CODE', <<'OUTPUT', "Coroutines and registers");
     new P1, .Coroutine
-    set_addr I0, co1
-    set P1, I0
+    set_addr P1, co1
 
     new P2, .Coroutine
-    set_addr I0, co2
-    set P2, I0
+    set_addr P2, co2
 
     set P0, P1
 

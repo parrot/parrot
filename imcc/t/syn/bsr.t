@@ -234,8 +234,7 @@ output_is(<<'CODE', <<'OUT', "tail recursive bsr, parrot cc");
    I6 = 5	# count
    I5 = 1	# product
    P0 = new Sub
-   $I0 = addr _fact
-   set P0, $I0
+   P0 = addr _fact
    saveall
    invokecc
    save I5
@@ -266,8 +265,7 @@ output_is(<<'CODE', <<'OUT', "coroutine");
 .sub _main
     .local Coroutine co
     co = new Coroutine
-    $I0 = addr _routine
-    co = $I0
+    co = addr _routine
     print "Hello"
     invoke co
     print "perl6"

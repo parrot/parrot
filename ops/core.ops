@@ -451,13 +451,17 @@ inline op updatecc() {
 
 ########################################
 
-=item B<set_addr>(out INT, in INT)
+=item B<set_addr>(out INT, inconst INT)
 
 Sets register $1 to the current address plus the offset $2.
 
-=item B<set_addr>(in PMC, in INT)
+=item B<set_addr>(in PMC, inconst INT)
 
 Sets PMC in register $1 to the current address plus the offset $2.
+
+=item B<get_addr>(out INT, in PMC)
+
+Sets $1 to the absolute address of the Sub-PMC $2.
 
 =cut
 
@@ -467,7 +471,12 @@ inline op set_addr(out INT, inconst INT) {
 }
 
 inline op set_addr(in PMC, inconst INT) {
-  $1->vtable->set_integer_native(interpreter, $1, PTR2OPCODE_T(CUR_OPCODE + $2));
+  $1->vtable->set_pointer(interpreter, $1, (CUR_OPCODE + $2));
+  goto NEXT();
+}
+
+inline op get_addr(out INT, in PMC) {
+  $1 = (INTVAL)$2->vtable->get_pointer(interpreter, $2);
   goto NEXT();
 }
 
@@ -489,8 +498,7 @@ inline op newsub(out PMC, in INT, inconst INT) {
   }
   $1 = pmc_new_noinit(interpreter, $2);
   $1->vtable->init(interpreter, $1);
-  VTABLE_set_integer_native(interpreter, $1,
-  	PTR2OPCODE_T(CUR_OPCODE + $3));
+  VTABLE_set_pointer(interpreter, $1, (CUR_OPCODE + $3));
   goto NEXT();
 }
 
@@ -505,12 +513,12 @@ inline op newsub(in INT, in INT, inconst INT, inconst INT) {
   }
   interpreter->pmc_reg.registers[0] = pmc_new_noinit(interpreter, $1);
   VTABLE_init(interpreter, interpreter->pmc_reg.registers[0]);
-  VTABLE_set_integer_native(interpreter, interpreter->pmc_reg.registers[0],
-      PTR2OPCODE_T(CUR_OPCODE + $3));
+  VTABLE_set_pointer(interpreter, interpreter->pmc_reg.registers[0],
+      (CUR_OPCODE + $3));
   interpreter->pmc_reg.registers[1] = pmc_new_noinit(interpreter, $2);
   VTABLE_init(interpreter, interpreter->pmc_reg.registers[1]);
-  VTABLE_set_integer_native(interpreter, interpreter->pmc_reg.registers[1],
-      PTR2OPCODE_T(CUR_OPCODE + $4));
+  VTABLE_set_pointer(interpreter, interpreter->pmc_reg.registers[1],
+      (CUR_OPCODE + $4));
   goto NEXT();
 }
 

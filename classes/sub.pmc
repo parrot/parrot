@@ -34,16 +34,12 @@ pmclass Sub {
         pobject_lives(INTERP, sub->ctx.warns);
    }
 
-   void set_integer (PMC * value) {
-       SELF->cache.struct_val = (void *)VTABLE_get_integer(INTERP, value);
+   void set_pointer (void* value) {
+       SELF->cache.struct_val = value;
    }
 
-   void set_integer_native (INTVAL value) {
-       SELF->cache.struct_val = (void *)value;
-   }
-
-   INTVAL get_integer () {
-       return (INTVAL) SELF->cache.struct_val;
+   void* get_pointer () {
+       return SELF->cache.struct_val;
    }
 
    /* This just unconditionally returns the start of bytecode. It's
