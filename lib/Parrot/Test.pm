@@ -69,6 +69,7 @@ foreach my $func ( keys %Test_Map ) {
     close ASSEMBLY;
 
     _run_command( "$PConfig{perl} assemble.pl $as_f --output $by_f" );
+    $TEST_PROG_ARGS = "" unless defined $TEST_PROG_ARGS;
     _run_command( "./$PConfig{test_prog} ${TEST_PROG_ARGS} $by_f", 'STDOUT' => $out_f, 'STDERR' => $out_f);
 
     my $prog_output;
