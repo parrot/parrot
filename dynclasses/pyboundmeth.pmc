@@ -73,13 +73,19 @@ Return the representation of this object.
         if (ret && VTABLE_defined(INTERP, ret))
             name = VTABLE_get_string(INTERP, ret);
 
-        res = string_from_cstring(INTERP, "<bound method ", 0);
-        res = string_append(INTERP, res, name, 0);
-        res = string_append(INTERP, res, const_string(INTERP, " of "), 0);
-        res = string_append(INTERP, res,
-             VTABLE_get_string(INTERP, PMC_pmc_val(SELF)), 0);
-        res = string_append(INTERP, res, const_string(INTERP, ">"), 0);
+        if (PMC_struct_val(SELF)) {
+            res = string_from_cstring(INTERP, "<bound method ", 0);
+            res = string_append(INTERP, res, name, 0);
+            res = string_append(INTERP, res, const_string(INTERP, " of "), 0);
+            res = string_append(INTERP, res,
+                 VTABLE_get_string(INTERP, (PMC*)PMC_struct_val(SELF)), 0);
+        }
+        else {
+            res = string_from_cstring(INTERP, "<unbound method ", 0);
+            res = string_append(INTERP, res, name, 0);
+        }
 
+        res = string_append(INTERP, res, const_string(INTERP, ">"), 0);
         return res;
     }
 
@@ -95,10 +101,12 @@ Invoke a method call on the indicated object.
 */
 
     void* invoke(void* next) {
-        int i = REG_INT(3)++;
-        while (i--)
-            REG_PMC(6+i)=REG_PMC(5+i);
-        REG_PMC(5) = PMC_struct_val(SELF); 
+        if (PMC_struct_val(SELF)) {
+            int i = REG_INT(3)++;
+            while (i--)
+                REG_PMC(6+i)=REG_PMC(5+i);
+            REG_PMC(5) = PMC_struct_val(SELF); 
+        }
         return VTABLE_invoke(INTERP, PMC_pmc_val(SELF), next);
     }
 

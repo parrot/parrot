@@ -44,8 +44,10 @@ Looks up the method for C<*method_name> and returns it.
                 internal_exception(1, "Non-bound method encountered in proxy");
             else {
                 PMC *proxy = INTERP->ctx.current_object;
-                VTABLE_set_pmc(INTERP, method,
-                    VTABLE_getprop(INTERP, proxy, PyString_proxy));
+                if (proxy) {
+                    VTABLE_set_pmc(INTERP, method,
+                        VTABLE_getprop(INTERP, proxy, PyString_proxy));
+                }
             }
         }
 

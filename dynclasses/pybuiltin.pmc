@@ -34,7 +34,10 @@ PMC* Parrot_lib_python_group_init(Interp* interpreter, PMC *lib_pmc) {
     return lib_pmc;
 }
 
-static PMC* make_type(Interp* interpreter, INTVAL class, STRING* name) {
+static PMC* 
+make_type(Interp* interpreter, INTVAL class, STRING* name, 
+          PMC *parent, PMC *pad)
+{
     STRING *pmcname = Parrot_base_vtables[class]->whoami;
     PMC *type = pmc_new(interpreter, PyBuiltin_PyProxyType);
     PMC *stash, *iter, *item, *nameprop;
@@ -64,6 +67,10 @@ static PMC* make_type(Interp* interpreter, INTVAL class, STRING* name) {
     nameprop = pmc_new(interpreter, PyBuiltin_PyString);
     VTABLE_set_string_native(interpreter, nameprop, name);
     VTABLE_setprop(interpreter, type, PyString_name, nameprop);
+    if (parent)
+        VTABLE_setprop(interpreter, type, PyString_bases, parent);
+    if (pad)
+        scratchpad_store_by_name(interpreter, pad, 0, name, type);
 
     return type;
 }
@@ -229,103 +236,74 @@ enter_nci_method should create these as locals to begin with.
 
         /* Class objects */
         key = const_string(INTERP, "object");
-        item = make_type(INTERP, PyBuiltin_PyClass, key);
+        item = make_type(INTERP, PyBuiltin_PyClass, key, NULL, pad);
         item->vtable = Parrot_base_vtables[PyBuiltin_PyType];
-        scratchpad_store_by_name(INTERP, pad, 0, key, item);
+        Parrot_base_vtables[PyBuiltin_PyType]->data = item;
 
-        parent = make_type(INTERP, PyBuiltin_PyObject, key);
+        parent = make_type(INTERP, PyBuiltin_PyObject, key, NULL, NULL);
         parent->vtable = Parrot_base_vtables[PyBuiltin_PyProxyType];
         PyBuiltin_PyProxyClass_class = parent;
 
         key = const_string(INTERP, "bool");
-        item = make_type(INTERP, PyBuiltin_PyBoolean, key);
-        VTABLE_setprop(INTERP, item, PyString_bases, parent);
-        scratchpad_store_by_name(INTERP, pad, 0, key, item);
+        item = make_type(INTERP, PyBuiltin_PyBoolean, key, parent, pad);
         PyBuiltin_PyBoolean_class = item;
 
         key = const_string(INTERP, "complex");
-        item = make_type(INTERP, PyBuiltin_PyComplex, key);
-        VTABLE_setprop(INTERP, item, PyString_bases, parent);
-        scratchpad_store_by_name(INTERP, pad, 0, key, item);
+        item = make_type(INTERP, PyBuiltin_PyComplex, key, parent, pad);
         PyBuiltin_PyComplex_class = item;
 
         key = const_string(INTERP, "dict");
-        item = make_type(INTERP, PyBuiltin_PyDict, key);
-        VTABLE_setprop(INTERP, item, PyString_bases, parent);
-        scratchpad_store_by_name(INTERP, pad, 0, key, item);
+        item = make_type(INTERP, PyBuiltin_PyDict, key, parent, pad);
         PyBuiltin_PyDict_class = item;
 
         key = const_string(INTERP, "Exception");
-        item = make_type(INTERP, PyBuiltin_PyException, key);
-        VTABLE_setprop(INTERP, item, PyString_bases, parent);
-        scratchpad_store_by_name(INTERP, pad, 0, key, item);
+        item = make_type(INTERP, PyBuiltin_PyException, key, parent, pad);
         PyBuiltin_PyException_class = item;
 
         key = const_string(INTERP, "int");
-        item = make_type(INTERP, PyBuiltin_PyInt, key);
-        VTABLE_setprop(INTERP, item, PyString_bases, parent);
-        scratchpad_store_by_name(INTERP, pad, 0, key, item);
+        item = make_type(INTERP, PyBuiltin_PyInt, key, parent, pad);
         PyBuiltin_PyInt_class = item;
 
         key = const_string(INTERP, "iter");
-        item = make_type(INTERP, PyBuiltin_PyIter, key);
-        VTABLE_setprop(INTERP, item, PyString_bases, parent);
-        scratchpad_store_by_name(INTERP, pad, 0, key, item);
+        item = make_type(INTERP, PyBuiltin_PyIter, key, parent, pad);
         PyBuiltin_PyIter_class = item;
 
         key = const_string(INTERP, "float");
-        item = make_type(INTERP, PyBuiltin_PyFloat, key);
-        VTABLE_setprop(INTERP, item, PyString_bases, parent);
-        scratchpad_store_by_name(INTERP, pad, 0, key, item);
+        item = make_type(INTERP, PyBuiltin_PyFloat, key, parent, pad);
         PyBuiltin_PyFloat_class = item;
 
         key = const_string(INTERP, "function");
-        item = make_type(INTERP, PyBuiltin_PyFunc, key);
-        VTABLE_setprop(INTERP, item, PyString_bases, parent);
+        item = make_type(INTERP, PyBuiltin_PyFunc, key, parent, pad);
         PyBuiltin_PyFunc_class = item;
 
         key = const_string(INTERP, "list");
-        item = make_type(INTERP, PyBuiltin_PyList, key);
-        VTABLE_setprop(INTERP, item, PyString_bases, parent);
-        scratchpad_store_by_name(INTERP, pad, 0, key, item);
+        item = make_type(INTERP, PyBuiltin_PyList, key, parent, pad);
         PyBuiltin_PyList_class = item;
 
         key = const_string(INTERP, "long");
-        item = make_type(INTERP, PyBuiltin_PyLong, key);
-        VTABLE_setprop(INTERP, item, PyString_bases, parent);
-        scratchpad_store_by_name(INTERP, pad, 0, key, item);
+        item = make_type(INTERP, PyBuiltin_PyLong, key, parent, pad);
         PyBuiltin_PyLong_class = item;
 
         key = const_string(INTERP, "tuple");
-        item = make_type(INTERP, PyBuiltin_PyTuple, key);
-        VTABLE_setprop(INTERP, item, PyString_bases, parent);
-        scratchpad_store_by_name(INTERP, pad, 0, key, item);
+        item = make_type(INTERP, PyBuiltin_PyTuple, key, parent, pad);
         PyBuiltin_PyTuple_class = item;
 
         key = const_string(INTERP, "type");
-        item = make_type(INTERP, PyBuiltin_PyType, key);
-        VTABLE_setprop(INTERP, item, PyString_bases, parent);
-        scratchpad_store_by_name(INTERP, pad, 0, key, item);
+        item = make_type(INTERP, PyBuiltin_PyType, key, parent, pad);
         PyBuiltin_PyType_class = item;
         item->vtable = Parrot_base_vtables[PyBuiltin_PyType];
 
         key = const_string(INTERP, "staticmethod");
-        item = make_type(INTERP, PyBuiltin_PyStaticMeth, key);
-        VTABLE_setprop(INTERP, item, PyString_bases, parent);
-        scratchpad_store_by_name(INTERP, pad, 0, key, item);
+        item = make_type(INTERP, PyBuiltin_PyStaticMeth, key, parent, pad);
         PyBuiltin_PyStaticMeth_class = item;
 
         key = const_string(INTERP, "str");
-        item = make_type(INTERP, PyBuiltin_PyString, key);
-        VTABLE_setprop(INTERP, item, PyString_bases, parent);
-        scratchpad_store_by_name(INTERP, pad, 0, key, item);
+        item = make_type(INTERP, PyBuiltin_PyString, key, parent, pad);
         PyBuiltin_PyString_class = item;
 
         key = const_string(INTERP, "xrange");
-        item = make_type(INTERP, PyBuiltin_PySlice, key);
-        VTABLE_setprop(INTERP, item, PyString_bases, parent);
-        scratchpad_store_by_name(INTERP, pad, 0, key, item);
-        PyBuiltin_PySlice_class = item;
+        PyBuiltin_PySlice_class = 
+            make_type(INTERP, PyBuiltin_PySlice, key, parent, pad);
 
         /* Begin main! */
         item = pmc_new(INTERP, PyBuiltin_PyString);
