@@ -811,7 +811,7 @@
 	efficient.  Thoughts? 7) I forgot what the fourth thing I thought
 	of was while writing down the others.  Sorry.
 
-	Courtesy of  "Bryan C. Warnock" <Bryan.Warnock@capita.com>
+	Courtesy of  "Bryan C. Warnock" <Bryan.Warnock@raba.com>
 
 2002-03-06 15:26  dan
 
@@ -1005,7 +1005,7 @@
 	A non-existing buffer + a non-existing buffer should be a
 	non-existing buffer, not "", which is really '\0'.
 
-	Courtesy of "Bryan C. Warnock" <Bryan.Warnock@capita.com>
+	Courtesy of "Bryan C. Warnock" <Bryan.Warnock@raba.com>
 
 2002-03-01 06:02  dan
 
@@ -1013,7 +1013,7 @@
 
 	TMTOWTDI, but strcmp is probably the worse.
 
-	Courtesy of "Bryan C. Warnock" <Bryan.Warnock@capita.com>
+	Courtesy of "Bryan C. Warnock" <Bryan.Warnock@raba.com>
 
 2002-03-01 02:32  brentdax
 
@@ -1051,19 +1051,19 @@
 
 	* examples/assembly/life.pasm: Fix a creeping string length leak.
 
-	Courtesy of  "Bryan C. Warnock" <Bryan.Warnock@capita.com>
+	Courtesy of  "Bryan C. Warnock" <Bryan.Warnock@raba.com>
 
 2002-02-28 18:26  dan
 
 	* string.c: When you clone a constant, it ain't constant no mo'.
 
-	Cocurtesy of "Bryan C. Warnock" <Bryan.Warnock@capita.com>
+	Cocurtesy of "Bryan C. Warnock" <Bryan.Warnock@raba.com>
 
 2002-02-28 00:51  dan
 
 	* MANIFEST: Add missing files
 
-	Courtesy of "Bryan C. Warnock" <Bryan.Warnock@capita.com>
+	Courtesy of "Bryan C. Warnock" <Bryan.Warnock@raba.com>
 
 2002-02-28 00:49  dan
 
@@ -1082,7 +1082,7 @@
 	should be 6.0.0, and we need to discuss Perl versus Parrot with
 	PDDs.
 
-	Courtesy of "Bryan C. Warnock" <bwarnock@capita.com>
+	Courtesy of "Bryan C. Warnock" <bwarnock@raba.com>
 
 2002-02-28 00:27  dan
 
@@ -3319,7 +3319,7 @@
 
 	* KNOWN_ISSUES, MANIFEST, README: Doc Patches
 
-	Courtesy of "Bryan C. Warnock" <bwarnock@capita.com>
+	Courtesy of "Bryan C. Warnock" <bwarnock@raba.com>
 
 2002-01-06 17:58  dan
 
@@ -3412,7 +3412,7 @@
 
 	* interpreter.c: More unsigned fixes
 
-	Courtesy of "Bryan C. Warnock" <bwarnock@capita.com>
+	Courtesy of "Bryan C. Warnock" <bwarnock@raba.com>
 
 2002-01-04 22:13  dan
 
@@ -3566,7 +3566,7 @@
 
 	* Configure.pl: 64-bit Fix.
 
-	Courtesy of "Bryan C. Warnock" <bwarnock@capita.com>
+	Courtesy of "Bryan C. Warnock" <bwarnock@raba.com>
 
 2002-01-03 22:37  dan
 
@@ -3778,7 +3778,7 @@
 	* Configure.pl: Hey, those PPros are really x86 systems! Who'dve
 	thunk it?
 
-	Courtesy of "Bryan C. Warnock" <bwarnock@capita.com>
+	Courtesy of "Bryan C. Warnock" <bwarnock@raba.com>
 
 2002-01-01 18:17  dan
 
@@ -3810,19 +3810,19 @@
 	now unsigned, as is proper.
 
 	Courtesy of: "David & Lisa Jacobs" <jacobsl001@hawaii.rr.com>
-	Courtesy of: "Bryan C. Warnock" <bwarnock@capita.com>
+	Courtesy of: "Bryan C. Warnock" <bwarnock@raba.com>
 
 2002-01-01 16:59  dan
 
 	* include/parrot/trace.h: Useless debugging prototype removed
 
-	Courtesy of: "Bryan C. Warnock" <bwarnock@capita.com>
+	Courtesy of: "Bryan C. Warnock" <bwarnock@raba.com>
 
 2002-01-01 16:58  dan
 
 	* MANIFEST: We forgot a file.
 
-	Courtesy of "Bryan C. Warnock" <bwarnock@capita.com>
+	Courtesy of "Bryan C. Warnock" <bwarnock@raba.com>
 
 2002-01-01 03:53  dan
 
@@ -4221,7 +4221,7 @@
 	* interpreter.c, key.c, register.c, stacks.c, string.c,
 	test_main.c, trace.c: Updates to match the coding standards.
 
-	Courtesy of Brian Warnock <bwarnock@capita.com>
+	Courtesy of Bryan C. Warnock <bwarnock@raba.com>
 
 2001-12-29 20:42  grunblatt
 
@@ -4269,7 +4269,7 @@
 	* examples/assembly/pmcmops.pasm:
 	PMC-using version of mops.pasm.
 
-	Courtesy of: Brian C. Warnock <bwarnock@capita.com>
+	Courtesy of: Bryan C. Warnock <bwarnock@raba.com>
 
 2001-12-28 04:56  gregor
 
@@ -7039,7 +7039,7 @@
 
 	* memory.c: Fixed uninitialized variables.
 
-	Courtesy of: Bryan C. Warnock <bwarnock@capita.com>
+	Courtesy of: Bryan C. Warnock <bwarnock@raba.com>
 
 2001-10-08 01:21  gregor
 
@@ -7047,7 +7047,7 @@
 
 	  * Potential uninitialized variable fix
 
-	Courtesy of Bryan C. Warnock <bwarnock@capita.com>
+	Courtesy of Bryan C. Warnock <bwarnock@raba.com>
 
 2001-10-08 01:15  gregor
 
@@ -7058,7 +7058,7 @@
 
 	  * Printf format fixes
 
-	Courtesy of: Bryan C. Warnock <bwarnock@capita.com>
+	Courtesy of: Bryan C. Warnock <bwarnock@raba.com>
 
 2001-10-07 22:39  thgibbs
 
@@ -7150,7 +7150,7 @@
 
 	* vtable.tbl: Added * to REGEX type.
 
-	Courtesy of Bryan C. Warnock <bwarnock@capita.com>
+	Courtesy of Bryan C. Warnock <bwarnock@raba.com>
 
 2001-10-06 13:41  simon
 
@@ -7382,7 +7382,7 @@
 
 	* interpreter.c: Changed an occurrence of INTVAL to opcode_t
 
-	Courtesy of: Bryan C. Warnock <bwarnock@capita.com>
+	Courtesy of: Bryan C. Warnock <bwarnock@raba.com>
 
 2001-10-02 17:48  dan
 
@@ -8843,7 +8843,7 @@
 2001-09-11 09:38  simon
 
 	* assemble.pl, test.pbc:
-	From: Bryan C. Warnock <bwarnock@capita.com> Subject: Patch:
+	From: Bryan C. Warnock <bwarnock@raba.com> Subject: Patch:
 	assembler deferred output
 
 	Also got rid of the bytecode, since that's probably way out of
@@ -8852,7 +8852,7 @@
 2001-09-11 09:26  simon
 
 	* basic_opcodes.ops, opcode_table, t/test2.pasm:
-	From: Bryan C. Warnock <bwarnock@capita.com> Subject: length_s_i
+	From: Bryan C. Warnock <bwarnock@raba.com> Subject: length_s_i
 	patch
 
 2001-09-10 23:20  simon
@@ -8921,7 +8921,7 @@
 2001-09-10 19:46  simon
 
 	* Makefile:
-	"clean" target cleanup from Bryan C. Warnock <bwarnock@capita.com>.
+	"clean" target cleanup from Bryan C. Warnock <bwarnock@raba.com>.
 
 2001-09-10 18:31  simon
 
