@@ -98,32 +98,34 @@
      PCC_BEGIN_YIELD = 321,
      PCC_END_YIELD = 322,
      NCI_CALL = 323,
-     PROTOTYPED = 324,
-     NON_PROTOTYPED = 325,
-     MAIN = 326,
-     LOAD = 327,
-     IMMEDIATE = 328,
-     POSTCOMP = 329,
-     METHOD = 330,
-     LABEL = 331,
-     EMIT = 332,
-     EOM = 333,
-     IREG = 334,
-     NREG = 335,
-     SREG = 336,
-     PREG = 337,
-     IDENTIFIER = 338,
-     STRINGC = 339,
-     INTC = 340,
-     FLOATC = 341,
-     REG = 342,
-     MACRO = 343,
-     ENDM = 344,
-     PARROT_OP = 345,
-     VAR = 346,
-     LINECOMMENT = 347,
-     FILECOMMENT = 348,
-     POINTY = 349
+     METH_CALL = 324,
+     INVOCANT = 325,
+     PROTOTYPED = 326,
+     NON_PROTOTYPED = 327,
+     MAIN = 328,
+     LOAD = 329,
+     IMMEDIATE = 330,
+     POSTCOMP = 331,
+     METHOD = 332,
+     LABEL = 333,
+     EMIT = 334,
+     EOM = 335,
+     IREG = 336,
+     NREG = 337,
+     SREG = 338,
+     PREG = 339,
+     IDENTIFIER = 340,
+     STRINGC = 341,
+     INTC = 342,
+     FLOATC = 343,
+     REG = 344,
+     MACRO = 345,
+     ENDM = 346,
+     PARROT_OP = 347,
+     VAR = 348,
+     LINECOMMENT = 349,
+     FILECOMMENT = 350,
+     POINTY = 351
    };
 #endif
 #define LOW_PREC 258
@@ -192,32 +194,34 @@
 #define PCC_BEGIN_YIELD 321
 #define PCC_END_YIELD 322
 #define NCI_CALL 323
-#define PROTOTYPED 324
-#define NON_PROTOTYPED 325
-#define MAIN 326
-#define LOAD 327
-#define IMMEDIATE 328
-#define POSTCOMP 329
-#define METHOD 330
-#define LABEL 331
-#define EMIT 332
-#define EOM 333
-#define IREG 334
-#define NREG 335
-#define SREG 336
-#define PREG 337
-#define IDENTIFIER 338
-#define STRINGC 339
-#define INTC 340
-#define FLOATC 341
-#define REG 342
-#define MACRO 343
-#define ENDM 344
-#define PARROT_OP 345
-#define VAR 346
-#define LINECOMMENT 347
-#define FILECOMMENT 348
-#define POINTY 349
+#define METH_CALL 324
+#define INVOCANT 325
+#define PROTOTYPED 326
+#define NON_PROTOTYPED 327
+#define MAIN 328
+#define LOAD 329
+#define IMMEDIATE 330
+#define POSTCOMP 331
+#define METHOD 332
+#define LABEL 333
+#define EMIT 334
+#define EOM 335
+#define IREG 336
+#define NREG 337
+#define SREG 338
+#define PREG 339
+#define IDENTIFIER 340
+#define STRINGC 341
+#define INTC 342
+#define FLOATC 343
+#define REG 344
+#define MACRO 345
+#define ENDM 346
+#define PARROT_OP 347
+#define VAR 348
+#define LINECOMMENT 349
+#define FILECOMMENT 350
+#define POINTY 351
 
 
 
@@ -234,7 +238,7 @@ typedef union {
     SymbolTable * symtab;
 } yystype;
 /* Line 1281 of /usr/share/bison/yacc.c.  */
-#line 238 "imcc/imcparser.h"
+#line 242 "imcc/imcparser.h"
 # define YYSTYPE yystype
 #endif
 
