@@ -101,12 +101,10 @@ tests so they're consistent.
 
 =item Add tests for...
 
-tclword.imc tcl*.pmc
-[concat] [join] [lrepeat] [uplevel] [upvar]
-[lrange] [array set] [global] [string match] [inline]
-the macros?
-expr's precedence and parens
-[puts]'s ability to write to other channels.
+tclword.imc, PMCs, the macros, expr's precedence and parens,
+[puts]'s ability to write to other channels, the C<compreg> compiler.
+
+[concat] [join] [lrepeat] [uplevel] [upvar] [lrange] [array set] [global] [string match] [inline]
 
 =item pass tcl test suite
 
