@@ -185,7 +185,7 @@ PIO_buf_fdopen(theINTERP, ParrotIOLayer *layer, PIOHANDLE fd, INTVAL flags)
         return NULL;
     }
 
-    if (PIO_isatty(fd))
+    if (io->flags & PIO_F_CONSOLE)
         PIO_buf_setlinebuf(interpreter, l, io);
     else
         PIO_buf_setbuf(interpreter, l, io, PIO_UNBOUND);

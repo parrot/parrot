@@ -53,6 +53,7 @@ static INTVAL    PIO_unix_puts(theINTERP, ParrotIOLayer *l, ParrotIO *io,
 static PIOOFF_T  PIO_unix_seek(theINTERP, ParrotIOLayer *l, ParrotIO *io,
                                PIOOFF_T offset, INTVAL whence);
 static PIOOFF_T  PIO_unix_tell(theINTERP, ParrotIOLayer *l, ParrotIO *io);
+static INTVAL    PIO_unix_isatty(PIOHANDLE fd);
 
 
 static INTVAL

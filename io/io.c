@@ -937,6 +937,17 @@ PIO_connect(theINTERP, PMC *pmc, STRING *address)
 }
 
 
+INTVAL
+PIO_isatty(theINTERP, PMC *pmc)
+{
+    ParrotIO *io = PMC_data(pmc);
+    if (!io)
+        return 0;
+
+    return (io->flags & PIO_F_CONSOLE) ? 1 : 0;
+}
+
+
 /*
  * Local variables:
  * c-indentation-style: bsd
@@ -945,4 +956,4 @@ PIO_connect(theINTERP, PMC *pmc, STRING *address)
  * End:
  *
  * vim: expandtab shiftwidth=4:
-*/
+ */

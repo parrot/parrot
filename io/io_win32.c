@@ -56,6 +56,7 @@ static INTVAL    PIO_win32_puts(theINTERP, ParrotIOLayer *l, ParrotIO *io,
 static PIOOFF_T  PIO_win32_seek(theINTERP, ParrotIOLayer *l, ParrotIO *io,
                                 PIOOFF_T off, INTVAL whence);
 static PIOOFF_T  PIO_win32_tell(theINTERP, ParrotIOLayer *l, ParrotIO *io);
+static INTVAL    PIO_win32_isatty(PIOHANDLE fd);
 
 
 /* Convert to platform specific bit open flags */

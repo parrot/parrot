@@ -56,8 +56,7 @@ static INTVAL    PIO_stdio_puts(theINTERP, ParrotIOLayer *l, ParrotIO *io,
 static PIOOFF_T  PIO_stdio_seek(theINTERP, ParrotIOLayer *l, ParrotIO *io,
                                 PIOOFF_T offset, INTVAL whence);
 static PIOOFF_T  PIO_stdio_tell(theINTERP, ParrotIOLayer *l, ParrotIO *io);
-
-
+static INTVAL    PIO_stdio_isatty(PIOHANDLE fd);
 
 
 static const char *
@@ -160,7 +159,7 @@ PIO_stdio_fdopen(theINTERP, ParrotIOLayer *layer, PIOHANDLE fptr, INTVAL flags)
     INTVAL mode;
     mode = 0;
 
-    if (PIO_isatty(fptr))
+    if (PIO_stdio_isatty(fptr))
         flags |= PIO_F_CONSOLE;
 
     /* fdopened files are always shared */

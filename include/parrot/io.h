@@ -288,27 +288,24 @@ extern PIOOFF_T PIO_tell(theINTERP, PMC *io);
 
 extern void Parrot_IOData_mark(theINTERP, ParrotIOData *piodata);
 
+extern INTVAL PIO_isatty(theINTERP, PMC *io);
+
 /* Put platform specific macros here if you must */
 #ifdef PIO_OS_WIN32
-extern INTVAL           PIO_win32_isatty(PIOHANDLE fd);
 extern STRING          *PIO_sockaddr_in(theINTERP, unsigned short, STRING *);
 extern INTVAL           PIO_win32_getblksize(PIOHANDLE fd);
-#  define PIO_isatty(x)   PIO_win32_isatty(x)
 #  define PIO_getblksize(x)   PIO_win32_getblksize(x)
 #endif
 
 #ifdef PIO_OS_UNIX
-extern INTVAL           PIO_unix_isatty(PIOHANDLE fd);
 extern STRING          *PIO_sockaddr_in(theINTERP, unsigned short, STRING *);
 extern INTVAL           PIO_unix_getblksize(PIOHANDLE fd);
-#  define PIO_isatty(x)   PIO_unix_isatty(x)
 #  define PIO_getblksize(x)   PIO_unix_getblksize(x)
 #endif
 
 #ifdef PIO_OS_STDIO
 extern INTVAL           PIO_stdio_isatty(PIOHANDLE fd);
 extern INTVAL           PIO_stdio_getblksize(PIOHANDLE fd);
-#  define PIO_isatty(x)   PIO_stdio_isatty(x)
 #  define PIO_sockaddr_in(i,p,a)
 #  define PIO_getblksize(x)   PIO_stdio_getblksize(x)
 #endif
@@ -355,4 +352,4 @@ extern PMC *PIO_STDERR(theINTERP);
  * End:
  *
  * vim: expandtab shiftwidth=4:
-*/
+ */
