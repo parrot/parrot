@@ -190,6 +190,7 @@ Used to unarchive the object.
 
         /* 1) visit class */
         pos = class_data + POD_CLASS;
+        info->thaw_ptr = pos;
         (info->visit_pmc_now)(interpreter, *pos, info);
 
         /* 2) visit the attributes */
@@ -200,12 +201,32 @@ Used to unarchive the object.
         }
     }
     void freeze(visit_info *info) {
-        Parrot_default_freeze(INTERP, SELF, info);
+        IMAGE_IO *io = info->image_io;
+        io->vtable->push_integer(INTERP, io, ATTRIB_COUNT(SELF));
     }
+
     void thaw(visit_info *info) {
-        Parrot_default_thaw(INTERP, SELF, info);
+        IMAGE_IO *io = info->image_io;
+        if (info->extra_flags == EXTRA_IS_PROP_HASH) {
+            SUPER(info);
+        }
+        else if (info->extra_flags == EXTRA_IS_NULL) {
+            INTVAL n = io->vtable->shift_integer(INTERP, io);
+            set_attrib_array_size(SELF, n);
+            ATTRIB_COUNT(SELF) = n;
+        }
     }
+
     void thawfinish(visit_info *info) {
+        PMC *class = get_attrib_num((SLOTTYPE *)PMC_data(SELF), POD_CLASS);
+        PMC *class_name = get_attrib_num((SLOTTYPE *)PMC_data(class),
+            PCD_CLASS_NAME);
+        PMC *vtable_pmc = get_attrib_num((SLOTTYPE *)PMC_data(class),
+                PCD_OBJECT_VTABLE);
+        SELF->vtable = PMC_struct_val(vtable_pmc);
+        set_attrib_num(SELF, PMC_data(SELF), POD_CLASS_NAME, class_name);
+        set_attrib_flags(SELF);
+        PObj_is_object_SET(SELF);
     }
 }
 

@@ -217,6 +217,7 @@ Create the class from the thawed parents and attributes array.
             STRING *class_name;
             INTVAL new_type;
             PMC *ar;
+            PMC *real_class;
 
             /* thaw class name */
             class_name = io->vtable->shift_string(INTERP, io);
@@ -226,19 +227,20 @@ Create the class from the thawed parents and attributes array.
              */
             new_type = pmc_type(INTERP, class_name);
             if (new_type > enum_type_undef) {
+                real_class = Parrot_class_lookup(INTERP, class_name);
+                info->extra = real_class;
                 info->extra_flags = EXTRA_CLASS_EXISTS;
-                *info->thaw_ptr = SELF =
-                    Parrot_class_lookup(INTERP, class_name);
             }
             else {
+                real_class = SELF;
                 SELF.init();
                 Parrot_new_class(INTERP, SELF, class_name);
             }
             /* make room for thawed arrays */
-            if (PMC_int_val(SELF) == PCD_MAX) {
+            if (PMC_int_val(real_class) == PCD_MAX) {
                 PMC **class_data;
-                resize_attrib_array(SELF, PCD_MAX + 2);
-                class_data = (PMC **)PMC_data(SELF);
+                resize_attrib_array(real_class, PCD_MAX + 2);
+                class_data = (PMC **)PMC_data(real_class);
                 class_data[PCD_MAX] = NULL;
                 class_data[PCD_MAX + 1] = NULL;
             }
@@ -248,18 +250,12 @@ Create the class from the thawed parents and attributes array.
 
     void thawfinish(visit_info *info) {
         INTVAL i, n, nold;
-        PMC * class = SELF;
+        PMC * class;
         PMC *parents, *attribs, *old;
-        int ignore = 0; /* XXX */
-        PMC **class_data = (PMC **)PMC_data(SELF);
+        PMC **class_data;
 
-        /*
-         * we now have two plain arrays: parents and attributes
-         * TODO if class did exists compare these with the
-         *      information in the class
-         * TODO don't thaw directly into class array - this destroys
-         *      existing classes
-         */
+        class = SELF;
+        class_data = (PMC**)(PMC_data(class));
 
         old = class_data[PCD_PARENTS];
         nold = VTABLE_elements(INTERP, old);

@@ -788,6 +788,9 @@ freeze_pmc(Parrot_Interp interpreter, PMC *pmc, visit_info *info,
         return;
     }
     type = pmc->vtable->base_type;
+
+    if (PObj_is_object_TEST(pmc))
+        type = enum_class_ParrotObject;
     if (seen) {
         if (info->extra_flags) {
             id |= 3;
@@ -909,38 +912,28 @@ Called from C<do_thaw()> to attach the vtable etc. to C<*pmc>.
 */
 
 PARROT_INLINE static PMC*
-thaw_create_pmc(Parrot_Interp interpreter, PMC *pmc, visit_info *info,
+thaw_create_pmc(Parrot_Interp interpreter, visit_info *info,
         INTVAL type)
 {
-    if (!PMC_IS_NULL(pmc)) { /* first thawed PMC - just attach vtable */
-        pmc->vtable = Parrot_base_vtables[type];
-        pmc_add_ext(interpreter, pmc);
-    }
-    else {      /* create a new header */
-        switch (info->what) {
-            case VISIT_THAW_NORMAL:
-                pmc = pmc_new_noinit(interpreter, type);
-                break;
-            case VISIT_THAW_CONSTANTS:
-                pmc = constant_pmc_new_noinit(interpreter, type);
-                break;
-            default:
-                internal_exception(1, "Illegal visit_next type");
-                break;
-        }
-        assert(info->thaw_ptr);
-        if (info->container) {
-            DOD_WRITE_BARRIER(interpreter, info->container, NULL, pmc);
-        }
-        *info->thaw_ptr = pmc;
+    PMC *pmc = NULL;
+    switch (info->what) {
+        case VISIT_THAW_NORMAL:
+            pmc = pmc_new_noinit(interpreter, type);
+            break;
+        case VISIT_THAW_CONSTANTS:
+            pmc = constant_pmc_new_noinit(interpreter, type);
+            break;
+        default:
+            internal_exception(1, "Illegal visit_next type");
+            break;
     }
     return pmc;
 }
 
 /*
 
-=item C<PARROT_INLINE static PMC*
-do_thaw(Parrot_Interp interpreter, PMC* pmc, visit_info *info, int *seen)>
+=item C<PARROT_INLINE static void
+do_thaw(Parrot_Interp interpreter, PMC* pmc, visit_info *info)>
 
 Called by C<visit_todo_list_thaw()> to thaw and return a PMC.
 
@@ -950,8 +943,8 @@ C<seen> is false if this is the first time the PMC has been encountered.
 
 */
 
-PARROT_INLINE static PMC*
-do_thaw(Parrot_Interp interpreter, PMC* pmc, visit_info *info, int *seen)
+PARROT_INLINE static void
+do_thaw(Parrot_Interp interpreter, PMC* pmc, visit_info *info)
 {
     UINTVAL id;
     INTVAL type;
@@ -963,9 +956,11 @@ do_thaw(Parrot_Interp interpreter, PMC* pmc, visit_info *info, int *seen)
     if (!id) {
         /* got a NULL PMC */
         pmc = PMCNULL;
-        *info->thaw_ptr = pmc;
-        *seen = 1;
-        return pmc;
+        if (!info->thaw_result)
+            info->thaw_result = pmc;
+        else
+            *info->thaw_ptr = pmc;
+        return;
     }
 
     pos = list_get(interpreter, PMC_data(info->id_list), id, enum_type_PMC);
@@ -977,10 +972,9 @@ do_thaw(Parrot_Interp interpreter, PMC* pmc, visit_info *info, int *seen)
             pos = NULL;
     }
     if (pos) {
-        *seen = 1;
         if (info->extra_flags) {
             VTABLE_thaw(interpreter, pmc, info);
-            return pmc;
+            return;
         }
 #if FREEZE_USE_NEXT_FOR_GC
         /*
@@ -998,23 +992,34 @@ do_thaw(Parrot_Interp interpreter, PMC* pmc, visit_info *info, int *seen)
 #endif
         /*
          * that's a duplicate
-          if (info->container)
-              DOD_WRITE_BARRIER(interpreter, info->container, NULL, pmc);
-        */
+         if (info->container)
+         DOD_WRITE_BARRIER(interpreter, info->container, NULL, pmc);
+         */
         *info->thaw_ptr = pmc;
-        return pmc;
+        return;
     }
 
     assert(!must_have_seen);
-    *seen = 0;
-    pmc = thaw_create_pmc(interpreter, pmc, info, type);
+    pmc = thaw_create_pmc(interpreter, info, type);
 
-    info->visit_action = pmc->vtable->thaw;
+    VTABLE_thaw(interpreter, pmc, info);
+    if (info->extra_flags == EXTRA_CLASS_EXISTS) {
+        pmc = info->extra;
+        info->extra = NULL;
+        info->extra_flags = 0;
+    }
+    if (!info->thaw_result)
+        info->thaw_result = pmc;
+    else {
+        if (info->container) {
+            DOD_WRITE_BARRIER(interpreter, info->container, NULL, pmc);
+        }
+        *info->thaw_ptr = pmc;
+    }
     list_assign(interpreter, PMC_data(info->id_list), id, pmc, enum_type_PMC);
-    /* remember nested aggregates breadth first */
+    /* remember nested aggregates depth first */
     if (pmc->pmc_ext)
-        list_push(interpreter, PMC_data(info->todo), pmc, enum_type_PMC);
-    return pmc;
+        list_unshift(interpreter, PMC_data(info->todo), pmc, enum_type_PMC);
 }
 
 #if ARENA_DOD_FLAGS
@@ -1213,7 +1218,7 @@ todo_list_seen(Parrot_Interp interpreter, PMC *pmc, visit_info *info,
     hash_put(interpreter, PMC_struct_val(info->seen), pmc, (void*)*id);
     /* remember containers */
     if (pmc->pmc_ext)
-        list_push(interpreter, PMC_data(info->todo), pmc, enum_type_PMC);
+        list_unshift(interpreter, PMC_data(info->todo), pmc, enum_type_PMC);
     return 0;
 }
 
@@ -1236,6 +1241,7 @@ visit_next_for_GC(Parrot_Interp interpreter, PMC* pmc, visit_info* info)
 {
     UINTVAL id;
     int seen = next_for_GC_seen(interpreter, pmc, info, &id);
+    internal_exception(1, "todo convert to depth first");
     do_action(interpreter, pmc, info, seen, id);
     /*
      * TODO probe for class methods that override the default.
@@ -1292,9 +1298,7 @@ static void
 visit_todo_list_thaw(Parrot_Interp interpreter, PMC* old, visit_info* info)
 {
     int seen;
-    PMC* pmc = do_thaw(interpreter, old, info, &seen);
-    if (!seen)
-        (info->visit_action)(interpreter, pmc, info);
+    do_thaw(interpreter, old, info);
 }
 
 /*
@@ -1337,35 +1341,48 @@ The thaw loop.
 
 */
 
-static PMC*
+extern void
+Parrot_default_thawfinish(Interp* interpreter, PMC* pmc, visit_info *info);
+
+static void
 visit_loop_todo_list(Parrot_Interp interpreter, PMC *current,
         visit_info *info)
 {
     List *todo = PMC_data(info->todo);
+    PMC *finish_list_pmc;
     int i, n;
-    PMC *ret = current;
+    List *finish_list;
+    int thawing;
+    int finished_first = 0;
+
+    thawing =  info->what == VISIT_THAW_CONSTANTS ||
+            info->what == VISIT_THAW_NORMAL;
+    if (thawing) {
+        /*
+         * create a list that contains PMCs that need thawfinish
+         */
+        finish_list_pmc = pmc_new(interpreter, enum_class_Array);
+        finish_list = PMC_data(finish_list_pmc);
+    }
 
     (info->visit_pmc_now)(interpreter, current, info);
     /*
      * can't cache upper limit, visit may append items
      */
-    i = 0;
 again:
-    for (; i < (int)list_length(interpreter, todo); ++i) {
-        current = *(PMC**)list_get(interpreter, todo, i, enum_type_PMC);
-        if (info->extra_flags == EXTRA_CLASS_EXISTS) {
-            int is_first = (ret == current);
-            info->extra_flags = 0;
-            current = *info->thaw_ptr;
-            if (is_first)
-                ret = current;
-            info->thaw_ptr = NULL;
-            list_assign(interpreter, todo, i, current, enum_type_PMC);
-        }
+    for (; (int)list_length(interpreter, todo); ) {
+        current = *(PMC**)list_shift(interpreter, todo, enum_type_PMC);
         VTABLE_visit(interpreter, current, info);
+        if (thawing) {
+            if (current == info->thaw_result)
+                finished_first = 1;
+            if (current->vtable && current->vtable->thawfinish !=
+                    Parrot_default_thawfinish)
+                list_unshift(interpreter, finish_list, current, enum_type_PMC);
+        }
     }
-    if (info->what == VISIT_THAW_CONSTANTS ||
-            info->what == VISIT_THAW_NORMAL) {
+
+    if (thawing) {
         /*
          * if image isn't consumed, there are some extra data to thaw
          */
@@ -1376,23 +1393,22 @@ again:
         /*
          * on thawing call thawfinish for each processed PMC
          */
-        if (!current->vtable) {
-            /* the first created (passed) PMC was NULL -
-             * return a NULL PMC
+        if (!finished_first) {
+            /*
+             * the first create PMC might not be in the list,
+             * if it has no pmc_ext
              */
-            ret = PMCNULL;
+            list_unshift(interpreter, finish_list,
+                    info->thaw_result, enum_type_PMC);
         }
-        else
-            if (!PMC_IS_NULL(current))
-                VTABLE_thawfinish(interpreter, current, info);
-        n = (int)list_length(interpreter, todo);
+        n = (int)list_length(interpreter, finish_list);
         for (i = 0; i < n ; ++i) {
-            current = *(PMC**)list_get(interpreter, todo, i, enum_type_PMC);
+            current = *(PMC**)list_get(interpreter, finish_list, i,
+                    enum_type_PMC);
             if (!PMC_IS_NULL(current))
                 VTABLE_thawfinish(interpreter, current, info);
         }
     }
-    return ret;
 }
 
 /*
@@ -1449,7 +1465,6 @@ static PMC*
 run_thaw(Parrot_Interp interpreter, STRING* image, visit_enum_type what)
 {
     visit_info info;
-    PMC *n = NULL;
     int dod_block = 0;
     UINTVAL bufused;
 
@@ -1472,15 +1487,11 @@ run_thaw(Parrot_Interp interpreter, STRING* image, visit_enum_type what)
     info.visit_pmc_now = visit_todo_list_thaw;
     info.visit_pmc_later = add_pmc_todo_list;
 
-    /*
-     * create first PMC, we want to return it
-     */
-    n = new_pmc_header(interpreter, 0);
-    info.thaw_ptr = &n;
+    info.thaw_result = NULL;
     /*
      * run thaw loop
      */
-    n = visit_loop_todo_list(interpreter, n, &info);
+    visit_loop_todo_list(interpreter, NULL, &info);
     /*
      * thaw does "consume" the image string by incrementing strstart
      * and decrementing bufused - restore that
@@ -1493,7 +1504,7 @@ run_thaw(Parrot_Interp interpreter, STRING* image, visit_enum_type what)
         Parrot_unblock_DOD(interpreter);
         Parrot_unblock_GC(interpreter);
     }
-    return n;
+    return info.thaw_result;
 }
 
 /*

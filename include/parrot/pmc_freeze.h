@@ -76,6 +76,7 @@ typedef struct _visit_info {
     UINTVAL             id;             /* freze ID of PMC */
     void*               extra;          /* PMC specific */
     extra_flags_enum    extra_flags;    /* concerning to extra */
+    PMC*                thaw_result;    /* 1st thawed */
     IMAGE_IO            *image_io;
 } visit_info;
 

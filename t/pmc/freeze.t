@@ -16,7 +16,7 @@ Tests the freeze/thaw archiving subsystem.
 
 =cut
 
-use Parrot::Test tests => 21;
+use Parrot::Test tests => 23;
 use Test::More;
 
 END { unlink "temp.fpmc"; };
@@ -612,3 +612,88 @@ ok 5
 ok 6
 OUTPUT
 
+output_is(<<'CODE', <<'OUTPUT', "thaw object w attr into same interpreter");
+    newclass P10, "Foo"
+    addattribute P10, ".aa"
+    addattribute P10, ".bb"
+    find_type I4, "Foo"
+    new P10, I4
+    print S10
+    freeze S3, P10
+    open P3, "temp.fpmc", ">"
+    print P3, S3
+    close P3
+    print "ok 1\n"
+
+    thaw P5, S3
+    print "ok 2\n"
+    classname S10, P5
+    print S10
+    print "\n"
+
+    print "ok 3\n"
+    classoffset I5, P5, S10
+    new P6, .PerlString
+    set P6, "ok 5\n"
+    setattribute P5, "Foo\0.aa", P6
+    new P6, .PerlString
+    set P6, "ok 6\n"
+    setattribute P5, "Foo\0.bb", P6
+    print "ok 4\n"
+    getattribute P7, P5, I5
+    print P7
+    inc I5
+    getattribute P7, P5, I5
+    print P7
+    end
+CODE
+ok 1
+ok 2
+Foo
+ok 3
+ok 4
+ok 5
+ok 6
+OUTPUT
+
+output_is(<<'CODE', <<'OUTPUT', "thaw object w attr into new interpreter");
+    set S3, "temp.fpmc"
+    .include "stat.pasm"
+    stat I0, S3, .STAT_FILESIZE
+    gt I0, 1, ok1
+    print "stat failed\n"
+    exit 1
+ok1:
+    open P3, S3, "<"
+    read S3, P3, I0
+    close P3
+
+    thaw P5, S3
+    print "ok 2\n"
+    classname S10, P5
+    print S10
+    print "\n"
+
+    print "ok 3\n"
+    classoffset I5, P5, S10
+    new P6, .PerlString
+    set P6, "ok 5\n"
+    setattribute P5, "Foo\0.aa", P6
+    new P6, .PerlString
+    set P6, "ok 6\n"
+    setattribute P5, "Foo\0.bb", P6
+    print "ok 4\n"
+    getattribute P7, P5, I5
+    print P7
+    inc I5
+    getattribute P7, P5, I5
+    print P7
+    end
+CODE
+ok 2
+Foo
+ok 3
+ok 4
+ok 5
+ok 6
+OUTPUT
