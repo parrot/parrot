@@ -417,6 +417,7 @@ make_interpreter(Interp_flags flags)
     if (env_var_set("PARROT_GC_DEBUG")) {
 #if ! DISABLE_GC_DEBUG
         Interp_flags_SET(interpreter, PARROT_GC_DEBUG_FLAG);
+       interpreter->lo_var_ptr = &interpreter;
 #else
         fprintf(stderr, "PARROT_GC_DEBUG is set but the binary was compiled "
                 "with DISABLE_GC_DEBUG.\n");

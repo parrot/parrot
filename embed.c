@@ -32,6 +32,8 @@ Parrot_init(struct Parrot_Interp *interpreter, void* stacktop)
         we set up our own in embed.c:Parrot_runcode()?
 */
 {
+    if (stacktop)
+        interpreter->lo_var_ptr = stacktop;
     static INTVAL world_inited = 0;
     if (!world_inited) {
         /* global_setup.c:init_world sets up some vtable stuff.
@@ -43,8 +45,6 @@ Parrot_init(struct Parrot_Interp *interpreter, void* stacktop)
     }
     else
         Parrot_initialize_core_pmcs(interpreter);
-    if (stacktop)
-        interpreter->lo_var_ptr = stacktop;
 }
 
 void
