@@ -62,12 +62,17 @@ check_manifest();
 #defaults for them.
 #XXX Figure out better defaults
 
-my $archname           =  $Config{archname};
-$archname              =~ s/-(net|free|open)bsd$/-bsd/i;
-my ($cpuarch, $osname) =  split('-', $archname);
+my ($archname,    $cpuarch,    $osname);
+my ($jitarchname, $jitcpuarch, $jitosname);
 
-my $jitarchname = (-e "Parrot/Jit/$archname.pm") ? $archname : 'i386-nojit';
-my ($jitcpuarch, $jitosname) =  split('-', $jitarchname);
+$archname                 =  $Config{archname};
+($cpuarch, $osname)       =  split('-', $archname);
+
+$jitarchname              =  $archname;
+$jitarchname              =~ s/-(net|free|open)bsd$/-bsd/i;
+$jitarchname              =  'i386-nojit' unless -e "Parrot/Jit/$archname.pm";
+
+($jitcpuarch, $jitosname) =  split('-', $jitarchname);
 
 my(%c)=(
 	iv =>			($Config{ivtype}   ||'long'),

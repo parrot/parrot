@@ -61,7 +61,7 @@ examples/assembly/mops.pbc: examples/assembly/mops.pasm assemble.pl
 	cd examples && cd assembly && $(MAKE) mops.pbc PERL=$(PERL) && cd .. && cd ..
 
 Parrot/Jit.pm: Parrot/Jit/${jitarchname}.pm
-	perl -MFile::Copy=cp -e 'cp q|Parrot/Jit/${jitarchname}.pm|, q|Parrot/Jit.pm|'
+	$(PERL) -MFile::Copy=cp -e 'cp q|Parrot/Jit/${jitarchname}.pm|, q|Parrot/Jit.pm|'
 
 Parrot/OpLib/core.pm: core.ops ops2pm.pl
 	$(PERL) ops2pm.pl core.ops vtable.ops
@@ -136,7 +136,7 @@ $(INC)/config.h: Configure.pl config_h.in
 $(INC)/vtable.h: vtable.tbl vtable_h.pl
 	$(PERL) vtable_h.pl
 
-$(INC)/jit_struct.h: jit2h.pl Parrot/Jit.pm jit/${jitcpuarch}/core.jit jit/${jitcpuarch}/string.jit
+$(INC)/jit_struct.h: jit2h.pl Parrot/OpLib/core.pm Parrot/Jit.pm jit/${jitcpuarch}/core.jit jit/${jitcpuarch}/string.jit
 	$(PERL) jit2h.pl ${jitcpuarch} > $(INC)/jit_struct.h
 
 docs: docs/.dummy
