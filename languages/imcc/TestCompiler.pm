@@ -87,7 +87,7 @@ sub generate_functions {
 	my $out_f = per_test('.out',$count);
 
 	my $TEST_PROG_ARGS = $ENV{TEST_PROG_ARGS} || '';
-	my $IMCC = $ENV{IMCC} || './imcc';
+	my $IMCC = $ENV{IMCC} || ".$PConfig{slash}imcc";
 
 	if ($gen_pasm) {
 	    $TEST_PROG_ARGS =~ s/-O.//;
