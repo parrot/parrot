@@ -8,11 +8,11 @@
 # $Id$
 #
 
-        new    P1, PerlInt
-        new    P2, PerlInt
-        new    P3, PerlInt
-        new    P4, PerlInt
-        new    P5, PerlInt
+        new    P1, .PerlInt
+        new    P2, .PerlInt
+        new    P3, .PerlInt
+        new    P4, .PerlInt
+        new    P5, .PerlInt
 
         set    P2, 0
         set    P3, 1
