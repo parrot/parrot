@@ -588,9 +588,10 @@ Parrot_jit_save_registers(Parrot_jit_info_t *jit_info,
 #else
 
 #  define REQUIRES_CONSTANT_POOL 0
-#  define MAX_REGITERS_TO_MAP 1
+#  define INT_REGITERS_TO_MAP 1
+#  define FLOAT_REGITERS_TO_MAP 0
 
-char register_map[MAX_REGITERS_TO_MAP] = { emitm_l(0) }; 
+char register_map[INT_REGITERS_TO_MAP] = { emitm_l(0) }; 
 
 #endif
 

@@ -122,8 +122,12 @@ optimize_jit(struct Parrot_Interp *interpreter, opcode_t *cur_op,
     cur_section->begin = code_start;
     cur_section->jit_op_count = 0;
     /* Init the register usage */ 
-    for (i = 0; i < NUM_REGISTERS; i++)
+    for (i = 0; i < NUM_REGISTERS; i++) {
         cur_section->int_reg_usage[i] = i;
+#if FLOAT_REGITERS_TO_MAP
+        cur_section->float_reg_usage[i] = i;
+#endif
+    }
     
     cur_op = code_start;
     while (cur_op < code_end) { 
@@ -155,6 +159,17 @@ optimize_jit(struct Parrot_Interp *interpreter, opcode_t *cur_op,
                         cur_section->int_reg_dir[*(cur_op + argn)] |= 
                             PARROT_ARGDIR_OUT;
                 }
+#if FLOAT_REGITERS_TO_MAP
+                else if (op_info->types[argn] == PARROT_ARG_N) {
+                    if ((!cur_section->float_reg_count[*(cur_op + argn)]++) &&
+                        (op_info->dirs[argn] & PARROT_ARGDIR_IN)) 
+                            cur_section->float_reg_dir[*(cur_op + argn)] |=
+                                PARROT_ARGDIR_IN;
+                    if (op_info->dirs[argn] & PARROT_ARGDIR_OUT)
+                        cur_section->float_reg_dir[*(cur_op + argn)] |= 
+                            PARROT_ARGDIR_OUT;
+                }
+#endif
             }
             /* If we are here means the current section is jitted, so if the
                next opcode is not end the section. */
@@ -194,13 +209,21 @@ END_SECTION:cur_section->end = cur_op;
             /* Set to 0 the register count, just in case ... */
             memset(cur_section->int_reg_count, 0, 
                 NUM_REGISTERS * sizeof(INTVAL));
+#if FLOAT_REGITERS_TO_MAP
+            memset(cur_section->float_reg_count, 0, 
+                NUM_REGISTERS * sizeof(INTVAL));
+#endif
             /* No next section yet */
             cur_section->next=NULL;
             /* 0 jitted opcodes  */
             cur_section->jit_op_count = 0;
             /* Init the register usage */ 
-            for (i = 0; i < NUM_REGISTERS; i++)
+            for (i = 0; i < NUM_REGISTERS; i++) {
                 cur_section->int_reg_usage[i] = i;
+#if FLOAT_REGITERS_TO_MAP
+                cur_section->float_reg_usage[i] = i;
+#endif
+            }
         } 
        
         /* Move to the next opcode */
@@ -220,18 +243,26 @@ END_SECTION:cur_section->end = cur_op;
     while (cur_section) {
         /* Test register 0 first */
         if (cur_section->int_reg_count[0])
-            cur_section->registers_used = 1;
+            cur_section->int_registers_used = 1;
+#if FLOAT_REGITERS_TO_MAP
+        if (cur_section->float_reg_count[0])
+            cur_section->float_registers_used = 1;
+#endif
         /* Sort the registers by the usage,
            Start from the register number 1 since we compare it with the    
            previous one */
         for (i = 1; i < NUM_REGISTERS; i++) {
             /* If the register is not used continue to the next one */
-            if (!cur_section->int_reg_count[i])
+            if (!cur_section->int_reg_count[i] && !cur_section->float_reg_count[i])
                 continue;
             /* Count the number of hardware registers that is going to be
                used in this section */
-            if (cur_section->registers_used < MAX_REGITERS_TO_MAP)
-                cur_section->registers_used++;
+            if (cur_section->int_registers_used < INT_REGITERS_TO_MAP)
+                cur_section->int_registers_used++;
+#if FLOAT_REGITERS_TO_MAP
+            if (cur_section->float_registers_used < FLOAT_REGITERS_TO_MAP)
+                cur_section->float_registers_used++;
+#endif
             
             /* Any register before this one */
             for (j = 0; j < i; j++) {
@@ -251,6 +282,22 @@ END_SECTION:cur_section->end = cur_op;
                     /* Continue with the next register */
                     break;
                 }
+#if FLOAT_REGITERS_TO_MAP
+                if (cur_section->float_reg_count[i] > 
+                  cur_section->float_reg_count[cur_section->float_reg_usage[j]])
+                {
+                    /* Move all the registers from the j'th position to
+                       the next one */
+                    for (k = i; k > j; k--)
+                        cur_section->float_reg_usage[k] = 
+                            cur_section->float_reg_usage[k - 1];
+                    
+                    /* Update the position of the register */
+                    cur_section->float_reg_usage[j] = i;
+                    /* Continue with the next register */
+                    break;
+                }
+#endif
             }
         }
         /* Set the branch target of this section, that is the section where
@@ -289,17 +336,31 @@ END_SECTION:cur_section->end = cur_op;
                 /* If the argument is an integer register */
                 if (op_info->types[op_arg] == PARROT_ARG_I) {
                     /* If the argument is in most used list */
-                    for (i = 0; i < MAX_REGITERS_TO_MAP; i++)
+                    for (i = 0; i < INT_REGITERS_TO_MAP; i++)
                         if (cur_op[op_arg] == 
                             (opcode_t)cur_section->int_reg_usage[i])
                         {
                             map[cur_op + op_arg - code_start] =
-                                register_map[i];
+                                intval_map[i];
                             cur_section->maps++;
                             break;
                         }
                 }
-            
+#if FLOAT_REGITERS_TO_MAP
+                /* If the argument is a float register */
+                if (op_info->types[op_arg] == PARROT_ARG_N) {
+                    /* If the argument is in most used list */
+                    for (i = 0; i < FLOAT_REGITERS_TO_MAP; i++)
+                        if (cur_op[op_arg] == 
+                            (opcode_t)cur_section->float_reg_usage[i])
+                        {
+                            map[cur_op + op_arg - code_start] =
+                                floatval_map[i];
+                            cur_section->maps++;
+                            break;
+                        }
+                }
+#endif
             }
 
             /* Move to the next opcode */
@@ -328,8 +389,19 @@ END_SECTION:cur_section->end = cur_op;
         fprintf(stderr, "\n\tInt register direction:\t");
         for (i = 0; i < NUM_REGISTERS; i++)
             fprintf(stderr, "%i ", (int)cur_section->int_reg_dir[i]);
-        fprintf(stderr, "\n\tRegisters used:\t%i\n", 
-            cur_section->registers_used);
+        fprintf(stderr, "\n\tInt registers used:\t%i\n", 
+            cur_section->int_registers_used);
+        fprintf(stderr, "\tFloat register count:\t");
+        for (i = 0; i < NUM_REGISTERS; i++)
+            fprintf(stderr, "%i ", cur_section->float_reg_count[i]);
+        fprintf(stderr, "\n\tFloat register usage:\t");
+        for (i = 0; i < NUM_REGISTERS; i++)
+            fprintf(stderr, "%i ", cur_section->float_reg_usage[i]);
+        fprintf(stderr, "\n\tFloat register direction:\t");
+        for (i = 0; i < NUM_REGISTERS; i++)
+            fprintf(stderr, "%i ", (int)cur_section->float_reg_dir[i]);
+        fprintf(stderr, "\n\tFloat Registers used:\t%i\n", 
+            cur_section->float_registers_used);
         fprintf(stderr, "\tJit opcodes:\t%i\n", cur_section->jit_op_count);
         fprintf(stderr, "\tTotal opcodes:\t%i\n", cur_section->op_count);
         cur_section = cur_section->next;
@@ -356,7 +428,11 @@ build_asm(struct Parrot_Interp *interpreter, opcode_t *pc,
     jit_info.optimizer = optimize_jit(interpreter,pc,code_start,code_end); 
 
     /* Attach the register map to the jit_info structure */
-    jit_info.register_map = register_map;
+    jit_info.intval_map = intval_map;
+#if FLOAT_REGITERS_TO_MAP
+    jit_info.floatval_map = floatval_map;
+#endif
+
 
     /* Byte code size in opcode_t's */
     jit_info.arena.map_size = (code_end - code_start) + 1;

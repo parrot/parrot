@@ -40,9 +40,15 @@ Parrot_set_i_i {
 }
 
 Parrot_set_n_nc {
-    emit_imm32(NATIVECODE, r12, &NUM_CONST[2]);
-    emit_lfd(NATIVECODE, r12, 0, r12);
-    emit_stfd_r(NATIVECODE, r12, &NUM_REG[1]); 
+    if (MAP[1]) {
+        emit_imm32(NATIVECODE, r12, &NUM_CONST[2]);
+        emit_lfd(NATIVECODE, MAP[1], 0, r12);
+    }
+    else {
+        emit_imm32(NATIVECODE, r12, &NUM_CONST[2]);
+        emit_lfd(NATIVECODE, r12, 0, r12);
+        emit_stfd_r(NATIVECODE, r12, &NUM_REG[1]); 
+    }
 }
 
 Parrot_neg_i_i {
@@ -507,71 +513,281 @@ Parrot_dec_i {
 }
 
 Parrot_neg_n_n {
-        emit_lfd_r(NATIVECODE, r12, &NUM_REG[2]);
-        emit_fneg(NATIVECODE, r12, r12);
-        emit_stfd_r(NATIVECODE, r12, &NUM_REG[1]);
+    if (MAP[1] && MAP[2]) {
+        emit_fneg(NATIVECODE, MAP[1], MAP[2]);
+    }
+    else if (MAP[1]) {
+        emit_lfd_r(NATIVECODE, f12, &NUM_REG[2]);
+        emit_fneg(NATIVECODE, MAP[1], f12);
+    }
+    else if (MAP[2]) {
+        emit_fneg(NATIVECODE, f12, MAP[2]);
+        emit_stfd_r(NATIVECODE, f12, &NUM_REG[1]);
+    }
+    else {
+        emit_lfd_r(NATIVECODE, f12, &NUM_REG[2]);
+        emit_fneg(NATIVECODE, f12, f12);
+        emit_stfd_r(NATIVECODE, f12, &NUM_REG[1]);
+    }
 }
 
 Parrot_abs_n_n {
-        emit_lfd_r(NATIVECODE, r12, &NUM_REG[2]);
-        emit_fabs(NATIVECODE, r12, r12);
-        emit_stfd_r(NATIVECODE, r12, &NUM_REG[1]);
+    if (MAP[1] && MAP[2]) {
+        emit_fabs(NATIVECODE, MAP[1], MAP[2]);
+    }
+    else if (MAP[1]) {
+        emit_lfd_r(NATIVECODE, f12, &NUM_REG[2]);
+        emit_fabs(NATIVECODE, MAP[1], f12);
+    }
+    else if (MAP[2]) {
+        emit_fabs(NATIVECODE, f12, MAP[2]);
+        emit_stfd_r(NATIVECODE, f12, &NUM_REG[1]);
+    }
+    else {
+        emit_lfd_r(NATIVECODE, f12, &NUM_REG[2]);
+        emit_fabs(NATIVECODE, f12, f12);
+        emit_stfd_r(NATIVECODE, f12, &NUM_REG[1]);
+    }
 }
 
 Parrot_add_n_n_n {
-        emit_lfd_r(NATIVECODE, r11, &NUM_REG[2]);
-        emit_lfd_r(NATIVECODE, r12, &NUM_REG[3]);
-        emit_fadd(NATIVECODE, r12, r11, r12);
-        emit_stfd_r(NATIVECODE, r12, &NUM_REG[1]);
+    if (MAP[1] && MAP[2] && MAP[3]) {
+        emit_fadd(NATIVECODE, MAP[1], MAP[2], MAP[3]);
+    }
+    else if (MAP[1] && MAP[2]) {
+        emit_lfd_r(NATIVECODE, f12, &NUM_REG[3]);
+        emit_fadd(NATIVECODE, MAP[1], MAP[2], f12);
+    }
+    else if (MAP[1] && MAP[3]) {
+        emit_lfd_r(NATIVECODE, f12, &NUM_REG[2]);
+        emit_fadd(NATIVECODE, MAP[1], MAP[3], f12);
+    }
+    else if (MAP[2] && MAP[3]) {
+        emit_fadd(NATIVECODE, f12, MAP[2], MAP[3]);
+        emit_stfd_r(NATIVECODE, f12, &NUM_REG[1]);
+    }
+    else if (MAP[1]) {
+        emit_lfd_r(NATIVECODE, f11, &NUM_REG[2]);
+        emit_lfd_r(NATIVECODE, f12, &NUM_REG[3]);
+        emit_fadd(NATIVECODE, MAP[1], f11, f12);
+    }
+    else if (MAP[2]) {
+        emit_lfd_r(NATIVECODE, f12, &NUM_REG[3]);
+        emit_fadd(NATIVECODE, f12, MAP[2], f12);
+        emit_stfd_r(NATIVECODE, f12, &NUM_REG[1]);
+    }
+    else if (MAP[3]) {
+        emit_lfd_r(NATIVECODE, f12, &NUM_REG[2]);
+        emit_fadd(NATIVECODE, f12, MAP[3], f12);
+        emit_stfd_r(NATIVECODE, f12, &NUM_REG[1]);
+    }
+    else {
+        emit_lfd_r(NATIVECODE, f11, &NUM_REG[2]);
+        emit_lfd_r(NATIVECODE, f12, &NUM_REG[3]);
+        emit_fadd(NATIVECODE, f12, f11, f12);
+        emit_stfd_r(NATIVECODE, f12, &NUM_REG[1]);
+    }
 }
 
 Parrot_add_n_n {
-        emit_lfd_r(NATIVECODE, r11, &NUM_REG[1]);
-        emit_lfd_r(NATIVECODE, r12, &NUM_REG[2]);
-        emit_fadd(NATIVECODE, r12, r11, r12);
-        emit_stfd_r(NATIVECODE, r12, &NUM_REG[1]);
+    if (MAP[1] && MAP[2]) {
+        emit_fadd(NATIVECODE, MAP[1], MAP[1], MAP[2]);
+    }
+    else if (MAP[1]) {
+        emit_lfd_r(NATIVECODE, f12, &NUM_REG[2]);
+        emit_fadd(NATIVECODE, MAP[1], MAP[1], f12);
+    }
+    else if (MAP[2]) {
+        emit_lfd_r(NATIVECODE, f12, &NUM_REG[1]);
+        emit_fadd(NATIVECODE, f12, f12, MAP[2]);
+        emit_stfd_r(NATIVECODE, f12, &NUM_REG[1]);
+    }
+    else {
+        emit_lfd_r(NATIVECODE, f11, &NUM_REG[1]);
+        emit_lfd_r(NATIVECODE, f12, &NUM_REG[2]);
+        emit_fadd(NATIVECODE, f12, f11, f12);
+        emit_stfd_r(NATIVECODE, f12, &NUM_REG[1]);
+    }
 }
 
 Parrot_div_n_n_n {
-        emit_lfd_r(NATIVECODE, r11, &NUM_REG[2]);
-        emit_lfd_r(NATIVECODE, r12, &NUM_REG[3]);
-        emit_fdiv(NATIVECODE, r12, r11, r12);
-        emit_stfd_r(NATIVECODE, r12, &NUM_REG[1]);
+    if (MAP[1] && MAP[2] && MAP[3]) {
+        emit_fdiv(NATIVECODE, MAP[1], MAP[2], MAP[3]);
+    }
+    else if (MAP[1] && MAP[2]) {
+        emit_lfd_r(NATIVECODE, f12, &NUM_REG[3]);
+        emit_fdiv(NATIVECODE, MAP[1], MAP[2], f12);
+    }
+    else if (MAP[1] && MAP[3]) {
+        emit_lfd_r(NATIVECODE, f12, &NUM_REG[2]);
+        emit_fdiv(NATIVECODE, MAP[1], f12, MAP[3]);
+    }
+    else if (MAP[2] && MAP[3]) {
+        emit_fdiv(NATIVECODE, f12, MAP[2], MAP[3]);
+        emit_stfd_r(NATIVECODE, f12, &NUM_REG[1]);
+    }
+    else if (MAP[1]) {
+        emit_lfd_r(NATIVECODE, f11, &NUM_REG[2]);
+        emit_lfd_r(NATIVECODE, f12, &NUM_REG[3]);
+        emit_fdiv(NATIVECODE, MAP[1], f11, f12);
+    }
+    else if (MAP[2]) {
+        emit_lfd_r(NATIVECODE, f12, &NUM_REG[3]);
+        emit_fdiv(NATIVECODE, f12, MAP[2], f12);
+        emit_stfd_r(NATIVECODE, f12, &NUM_REG[1]);
+    }
+    else if (MAP[3]) {
+        emit_lfd_r(NATIVECODE, f12, &NUM_REG[2]);
+        emit_fdiv(NATIVECODE, f12, f12, MAP[3]);
+        emit_stfd_r(NATIVECODE, f12, &NUM_REG[1]);
+    }
+    else {
+        emit_lfd_r(NATIVECODE, f11, &NUM_REG[2]);
+        emit_lfd_r(NATIVECODE, f12, &NUM_REG[3]);
+        emit_fdiv(NATIVECODE, f12, f11, f12);
+        emit_stfd_r(NATIVECODE, f12, &NUM_REG[1]);
+    }
 }
 
 Parrot_div_n_n {
-        emit_lfd_r(NATIVECODE, r11, &NUM_REG[1]);
-        emit_lfd_r(NATIVECODE, r12, &NUM_REG[2]);
-        emit_fdiv(NATIVECODE, r12, r11, r12);
-        emit_stfd_r(NATIVECODE, r12, &NUM_REG[1]);
+    if (MAP[1] && MAP[2]) {
+        emit_fdiv(NATIVECODE, MAP[1], MAP[1], MAP[2]);
+    }
+    else if (MAP[1]) {
+        emit_lfd_r(NATIVECODE, f12, &NUM_REG[2]);
+        emit_fdiv(NATIVECODE, MAP[1], MAP[1], f12);
+    }
+    else if (MAP[2]) {
+        emit_lfd_r(NATIVECODE, f12, &NUM_REG[1]);
+        emit_fdiv(NATIVECODE, f12, f12, MAP[2]);
+        emit_stfd_r(NATIVECODE, f12, &NUM_REG[1]);
+    }
+    else {
+        emit_lfd_r(NATIVECODE, f11, &NUM_REG[1]);
+        emit_lfd_r(NATIVECODE, f12, &NUM_REG[2]);
+        emit_fdiv(NATIVECODE, f12, f11, f12);
+        emit_stfd_r(NATIVECODE, f12, &NUM_REG[1]);
+    }
 }
 
 Parrot_mul_n_n_n {
-        emit_lfd_r(NATIVECODE, r11, &NUM_REG[2]);
-        emit_lfd_r(NATIVECODE, r12, &NUM_REG[3]);
-        emit_fmul(NATIVECODE, r12, r11, r12);
-        emit_stfd_r(NATIVECODE, r12, &NUM_REG[1]);
+    if (MAP[1] && MAP[2] && MAP[3]) {
+        emit_fmul(NATIVECODE, MAP[1], MAP[2], MAP[3]);
+    }
+    else if (MAP[1] && MAP[2]) {
+        emit_lfd_r(NATIVECODE, f12, &NUM_REG[3]);
+        emit_fmul(NATIVECODE, MAP[1], MAP[2], f12);
+    }
+    else if (MAP[1] && MAP[3]) {
+        emit_lfd_r(NATIVECODE, f12, &NUM_REG[2]);
+        emit_fmul(NATIVECODE, MAP[1], f12, MAP[3]);
+    }
+    else if (MAP[2] && MAP[3]) {
+        emit_fmul(NATIVECODE, f12, MAP[2], MAP[3]);
+        emit_stfd_r(NATIVECODE, f12, &NUM_REG[1]);
+    }
+    else if (MAP[1]) {
+        emit_lfd_r(NATIVECODE, f11, &NUM_REG[2]);
+        emit_lfd_r(NATIVECODE, f12, &NUM_REG[3]);
+        emit_fmul(NATIVECODE, MAP[1], f11, f12);
+    }
+    else if (MAP[2]) {
+        emit_lfd_r(NATIVECODE, f12, &NUM_REG[3]);
+        emit_fmul(NATIVECODE, f12, MAP[2], f12);
+        emit_stfd_r(NATIVECODE, f12, &NUM_REG[1]);
+    }
+    else if (MAP[3]) {
+        emit_lfd_r(NATIVECODE, f12, &NUM_REG[2]);
+        emit_fmul(NATIVECODE, f12, f12, MAP[3]);
+        emit_stfd_r(NATIVECODE, f12, &NUM_REG[1]);
+    }
+    else {
+        emit_lfd_r(NATIVECODE, f11, &NUM_REG[2]);
+        emit_lfd_r(NATIVECODE, f12, &NUM_REG[3]);
+        emit_fmul(NATIVECODE, f12, f11, f12);
+        emit_stfd_r(NATIVECODE, f12, &NUM_REG[1]);
+    }
 }
 
 Parrot_mul_n_n {
-        emit_lfd_r(NATIVECODE, r11, &NUM_REG[1]);
-        emit_lfd_r(NATIVECODE, r12, &NUM_REG[2]);
-        emit_fmul(NATIVECODE, r12, r11, r12);
-        emit_stfd_r(NATIVECODE, r12, &NUM_REG[1]);
+    if (MAP[1] && MAP[2]) {
+        emit_fmul(NATIVECODE, MAP[1], MAP[1], MAP[2]);
+    }
+    else if (MAP[1]) {
+        emit_lfd_r(NATIVECODE, f12, &NUM_REG[2]);
+        emit_fmul(NATIVECODE, MAP[1], MAP[1], f12);
+    }
+    else if (MAP[2]) {
+        emit_lfd_r(NATIVECODE, f12, &NUM_REG[1]);
+        emit_fmul(NATIVECODE, f12, f12, MAP[2]);
+        emit_stfd_r(NATIVECODE, f12, &NUM_REG[1]);
+    }
+    else {
+        emit_lfd_r(NATIVECODE, f11, &NUM_REG[1]);
+        emit_lfd_r(NATIVECODE, f12, &NUM_REG[2]);
+        emit_fmul(NATIVECODE, f12, f11, f12);
+        emit_stfd_r(NATIVECODE, f12, &NUM_REG[1]);
+    }
 }
 
 Parrot_sub_n_n_n {
-        emit_lfd_r(NATIVECODE, r11, &NUM_REG[2]);
-        emit_lfd_r(NATIVECODE, r12, &NUM_REG[3]);
-        emit_fsub(NATIVECODE, r12, r11, r12);
-        emit_stfd_r(NATIVECODE, r12, &NUM_REG[1]);
+    if (MAP[1] && MAP[2] && MAP[3]) {
+        emit_fsub(NATIVECODE, MAP[1], MAP[2], MAP[3]);
+    }
+    else if (MAP[1] && MAP[2]) {
+        emit_lfd_r(NATIVECODE, f12, &NUM_REG[3]);
+        emit_fsub(NATIVECODE, MAP[1], MAP[2], f12);
+    }
+    else if (MAP[1] && MAP[3]) {
+        emit_lfd_r(NATIVECODE, f12, &NUM_REG[2]);
+        emit_fsub(NATIVECODE, MAP[1], f12, MAP[3]);
+    }
+    else if (MAP[2] && MAP[3]) {
+        emit_fsub(NATIVECODE, f12, MAP[2], MAP[3]);
+        emit_stfd_r(NATIVECODE, f12, &NUM_REG[1]);
+    }
+    else if (MAP[1]) {
+        emit_lfd_r(NATIVECODE, f11, &NUM_REG[2]);
+        emit_lfd_r(NATIVECODE, f12, &NUM_REG[3]);
+        emit_fsub(NATIVECODE, MAP[1], f11, f12);
+    }
+    else if (MAP[2]) {
+        emit_lfd_r(NATIVECODE, f12, &NUM_REG[3]);
+        emit_fsub(NATIVECODE, f12, MAP[2], f12);
+        emit_stfd_r(NATIVECODE, f12, &NUM_REG[1]);
+    }
+    else if (MAP[3]) {
+        emit_lfd_r(NATIVECODE, f12, &NUM_REG[2]);
+        emit_fsub(NATIVECODE, f12, f12, MAP[3]);
+        emit_stfd_r(NATIVECODE, f12, &NUM_REG[1]);
+    }
+    else {
+        emit_lfd_r(NATIVECODE, f11, &NUM_REG[2]);
+        emit_lfd_r(NATIVECODE, f12, &NUM_REG[3]);
+        emit_fsub(NATIVECODE, f12, f11, f12);
+        emit_stfd_r(NATIVECODE, f12, &NUM_REG[1]);
+    }
 }
 
 Parrot_sub_n_n {
-        emit_lfd_r(NATIVECODE, r11, &NUM_REG[1]);
-        emit_lfd_r(NATIVECODE, r12, &NUM_REG[2]);
-        emit_fsub(NATIVECODE, r12, r11, r12);
-        emit_stfd_r(NATIVECODE, r12, &NUM_REG[1]);
+    if (MAP[1] && MAP[2]) {
+        emit_fsub(NATIVECODE, MAP[1], MAP[1], MAP[2]);
+    }
+    else if (MAP[1]) {
+        emit_lfd_r(NATIVECODE, f12, &NUM_REG[2]);
+        emit_fsub(NATIVECODE, MAP[1], MAP[1], f12);
+    }
+    else if (MAP[2]) {
+        emit_lfd_r(NATIVECODE, f12, &NUM_REG[1]);
+        emit_fsub(NATIVECODE, f12, f12, MAP[2]);
+        emit_stfd_r(NATIVECODE, f12, &NUM_REG[1]);
+    }
+    else {
+        emit_lfd_r(NATIVECODE, f11, &NUM_REG[1]);
+        emit_lfd_r(NATIVECODE, f12, &NUM_REG[2]);
+        emit_fsub(NATIVECODE, f12, f11, f12);
+        emit_stfd_r(NATIVECODE, f12, &NUM_REG[1]);
+    }
 }
 
 Parrot_if_i_ic {
@@ -636,10 +852,8 @@ Parrot_gt_ic_i_ic {
 }
 
 Parrot_gt_ic_ic_ic {
-    emit_imm32(NATIVECODE, r11, *INT_CONST[1]);
-    emit_imm32(NATIVECODE, r12, *INT_CONST[2]);
-    emit_cmp(NATIVECODE, r12, r11);
-    emit_bc(jit_info, BGT, *INT_CONST[3]);
+    if (*INT_CONST[1] > *INT_CONST[2])
+        emit_b(jit_info, *INT_CONST[3]);
 }
 
 Parrot_eq_i_i_ic {
@@ -693,10 +907,8 @@ Parrot_eq_ic_i_ic {
 }
 
 Parrot_eq_ic_ic_ic {
-    emit_imm32(NATIVECODE, r11, *INT_CONST[1]);
-    emit_imm32(NATIVECODE, r12, *INT_CONST[2]);
-    emit_cmp(NATIVECODE, r12, r11);
-    emit_bc(jit_info, BEQ, *INT_CONST[3]);
+    if (*INT_CONST[1] == *INT_CONST[2])
+        emit_b(jit_info, *INT_CONST[3]);
 }
 
 Parrot_ge_i_i_ic {
@@ -750,10 +962,8 @@ Parrot_ge_ic_i_ic {
 }
 
 Parrot_ge_ic_ic_ic {
-    emit_imm32(NATIVECODE, r11, *INT_CONST[1]);
-    emit_imm32(NATIVECODE, r12, *INT_CONST[2]);
-    emit_cmp(NATIVECODE, r12, r11);
-    emit_bc(jit_info, BGE, *INT_CONST[3]);
+    if (*INT_CONST[1] >= *INT_CONST[2])
+        emit_b(jit_info, *INT_CONST[3]);
 }
 
 Parrot_lt_i_i_ic {
@@ -807,10 +1017,8 @@ Parrot_lt_ic_i_ic {
 }
 
 Parrot_lt_ic_ic_ic {
-    emit_imm32(NATIVECODE, r11, *INT_CONST[1]);
-    emit_imm32(NATIVECODE, r12, *INT_CONST[2]);
-    emit_cmp(NATIVECODE, r12, r11);
-    emit_bc(jit_info, BLT, *INT_CONST[3]);
+    if (*INT_CONST[1] < *INT_CONST[2])
+        emit_b(jit_info, *INT_CONST[3]);
 }
 
 Parrot_le_i_i_ic {
@@ -864,10 +1072,8 @@ Parrot_le_ic_i_ic {
 }
 
 Parrot_le_ic_ic_ic {
-    emit_imm32(NATIVECODE, r11, *INT_CONST[1]);
-    emit_imm32(NATIVECODE, r12, *INT_CONST[2]);
-    emit_cmp(NATIVECODE, r12, r11);
-    emit_bc(jit_info, BLE, *INT_CONST[3]);
+    if (*INT_CONST[1] <= *INT_CONST[2])
+        emit_b(jit_info, *INT_CONST[3]);
 }
 
 Parrot_ne_i_i_ic {
@@ -921,201 +1127,366 @@ Parrot_ne_ic_i_ic {
 }
 
 Parrot_ne_ic_ic_ic {
-    emit_imm32(NATIVECODE, r11, *INT_CONST[1]);
-    emit_imm32(NATIVECODE, r12, *INT_CONST[2]);
-    emit_cmp(NATIVECODE, r12, r11);
-    emit_bc(jit_info, BNE, *INT_CONST[3]);
+    if (*INT_CONST[1] != *INT_CONST[2])
+        emit_b(jit_info, *INT_CONST[3]);
 }
 
 Parrot_gt_n_n_ic {
-    emit_lfd_r(NATIVECODE, r11, &NUM_REG[1]);
-    emit_lfd_r(NATIVECODE, r12, &NUM_REG[2]);
-    emit_fcmp(NATIVECODE, r11, r12);
-    emit_bc(jit_info, BGT, *INT_CONST[3]);
+    if (MAP[1] && MAP[2]) {
+        emit_fcmp(NATIVECODE, MAP[1], MAP[2]);
+        emit_bc(jit_info, BGT, *INT_CONST[3]);
+    }
+    else if (MAP[1]) {
+        emit_lfd_r(NATIVECODE, f12, &NUM_REG[2]);
+        emit_fcmp(NATIVECODE, MAP[1], f12);
+        emit_bc(jit_info, BGT, *INT_CONST[3]);
+    }
+    else if (MAP[2]) {
+        emit_lfd_r(NATIVECODE, f12, &NUM_REG[1]);
+        emit_fcmp(NATIVECODE, f12, MAP[2]);
+        emit_bc(jit_info, BGT, *INT_CONST[3]);
+    }
+    else {
+        emit_lfd_r(NATIVECODE, f11, &NUM_REG[1]);
+        emit_lfd_r(NATIVECODE, f12, &NUM_REG[2]);
+        emit_fcmp(NATIVECODE, f11, f12);
+        emit_bc(jit_info, BGT, *INT_CONST[3]);
+    }
 }
 
 Parrot_gt_n_nc_ic {
-    emit_lfd_r(NATIVECODE, r11, &NUM_REG[1]);
-    emit_imm32(NATIVECODE, r12, &NUM_CONST[2]);
-    emit_lfd(NATIVECODE, r12, 0, r12);
-    emit_fcmp(NATIVECODE, r11, r12);
-    emit_bc(jit_info, BGT, *INT_CONST[3]);
+    if (MAP[1]) {
+        emit_imm32(NATIVECODE, r12, &NUM_CONST[2]);
+        emit_lfd(NATIVECODE, f12, 0, r12);
+        emit_fcmp(NATIVECODE, MAP[1], f12);
+        emit_bc(jit_info, BGT, *INT_CONST[3]);
+    }
+    else {
+        emit_lfd_r(NATIVECODE, f11, &NUM_REG[1]);
+        emit_imm32(NATIVECODE, r12, &NUM_CONST[2]);
+        emit_lfd(NATIVECODE, f12, 0, r12);
+        emit_fcmp(NATIVECODE, f11, f12);
+        emit_bc(jit_info, BGT, *INT_CONST[3]);
+    }
 }
 
 Parrot_gt_nc_n_ic {
-    emit_imm32(NATIVECODE, r12, &NUM_CONST[1]);
-    emit_lfd(NATIVECODE, r11, 0, r12);
-    emit_lfd_r(NATIVECODE, r12, &NUM_REG[2]);
-    emit_fcmp(NATIVECODE, r11, r12);
-    emit_bc(jit_info, BGT, *INT_CONST[3]);
+    if (MAP[2]) {
+        emit_imm32(NATIVECODE, r12, &NUM_CONST[1]);
+        emit_lfd(NATIVECODE, f12, 0, r12);
+        emit_fcmp(NATIVECODE, f12, MAP[2]);
+        emit_bc(jit_info, BGT, *INT_CONST[3]);
+    }
+    else {
+        emit_lfd_r(NATIVECODE, f11, &NUM_REG[2]);
+        emit_imm32(NATIVECODE, r12, &NUM_CONST[1]);
+        emit_lfd(NATIVECODE, f12, 0, r12);
+        emit_fcmp(NATIVECODE, f12, f11);
+        emit_bc(jit_info, BGT, *INT_CONST[3]);
+    }
 }
 
 Parrot_gt_nc_nc_ic {
-    emit_imm32(NATIVECODE, r12, &NUM_CONST[1]);
-    emit_lfd(NATIVECODE, r11, 0, r12);
-    emit_imm32(NATIVECODE, r12, &NUM_CONST[2]);
-    emit_lfd(NATIVECODE, r12, 0, r12);
-    emit_fcmp(NATIVECODE, r11, r12);
-    emit_bc(jit_info, BGT, *INT_CONST[3]);
+    if (*NUM_CONST[1] > *NUM_CONST[2])
+        emit_b(jit_info, *INT_CONST[3]);
 }
 
 Parrot_eq_n_n_ic {
-    emit_lfd_r(NATIVECODE, r11, &NUM_REG[1]);
-    emit_lfd_r(NATIVECODE, r12, &NUM_REG[2]);
-    emit_fcmp(NATIVECODE, r11, r12);
-    emit_bc(jit_info, BEQ, *INT_CONST[3]);
+    if (MAP[1] && MAP[2]) {
+        emit_fcmp(NATIVECODE, MAP[1], MAP[2]);
+        emit_bc(jit_info, BEQ, *INT_CONST[3]);
+    }
+    else if (MAP[1]) {
+        emit_lfd_r(NATIVECODE, f12, &NUM_REG[2]);
+        emit_fcmp(NATIVECODE, MAP[1], f12);
+        emit_bc(jit_info, BEQ, *INT_CONST[3]);
+    }
+    else if (MAP[2]) {
+        emit_lfd_r(NATIVECODE, f12, &NUM_REG[1]);
+        emit_fcmp(NATIVECODE, f12, MAP[2]);
+        emit_bc(jit_info, BEQ, *INT_CONST[3]);
+    }
+    else {
+        emit_lfd_r(NATIVECODE, f11, &NUM_REG[1]);
+        emit_lfd_r(NATIVECODE, f12, &NUM_REG[2]);
+        emit_fcmp(NATIVECODE, f11, f12);
+        emit_bc(jit_info, BEQ, *INT_CONST[3]);
+    }
 }
 
 Parrot_eq_n_nc_ic {
-    emit_lfd_r(NATIVECODE, r11, &NUM_REG[1]);
-    emit_imm32(NATIVECODE, r12, &NUM_CONST[2]);
-    emit_lfd(NATIVECODE, r12, 0, r12);
-    emit_fcmp(NATIVECODE, r11, r12);
-    emit_bc(jit_info, BEQ, *INT_CONST[3]);
+    if (MAP[1]) {
+        emit_imm32(NATIVECODE, r12, &NUM_CONST[2]);
+        emit_lfd(NATIVECODE, f12, 0, r12);
+        emit_fcmp(NATIVECODE, MAP[1], f12);
+        emit_bc(jit_info, BEQ, *INT_CONST[3]);
+    }
+    else {
+        emit_lfd_r(NATIVECODE, f11, &NUM_REG[1]);
+        emit_imm32(NATIVECODE, r12, &NUM_CONST[2]);
+        emit_lfd(NATIVECODE, f12, 0, r12);
+        emit_fcmp(NATIVECODE, f11, f12);
+        emit_bc(jit_info, BEQ, *INT_CONST[3]);
+    }
 }
 
 Parrot_eq_nc_n_ic {
-    emit_imm32(NATIVECODE, r12, &NUM_CONST[1]);
-    emit_lfd(NATIVECODE, r11, 0, r12);
-    emit_lfd_r(NATIVECODE, r12, &NUM_REG[2]);
-    emit_fcmp(NATIVECODE, r11, r12);
-    emit_bc(jit_info, BEQ, *INT_CONST[3]);
+    if (MAP[2]) {
+        emit_imm32(NATIVECODE, r12, &NUM_CONST[1]);
+        emit_lfd(NATIVECODE, f12, 0, r12);
+        emit_fcmp(NATIVECODE, f12, MAP[2]);
+        emit_bc(jit_info, BEQ, *INT_CONST[3]);
+    }
+    else {
+        emit_lfd_r(NATIVECODE, f11, &NUM_REG[2]);
+        emit_imm32(NATIVECODE, r12, &NUM_CONST[1]);
+        emit_lfd(NATIVECODE, f12, 0, r12);
+        emit_fcmp(NATIVECODE, f12, f11);
+        emit_bc(jit_info, BEQ, *INT_CONST[3]);
+    }
 }
 
 Parrot_eq_nc_nc_ic {
-    emit_imm32(NATIVECODE, r12, &NUM_CONST[1]);
-    emit_lfd(NATIVECODE, r11, 0, r12);
-    emit_imm32(NATIVECODE, r12, &NUM_CONST[2]);
-    emit_lfd(NATIVECODE, r12, 0, r12);
-    emit_fcmp(NATIVECODE, r11, r12);
-    emit_bc(jit_info, BEQ, *INT_CONST[3]);
+    if (*NUM_CONST[1] == *NUM_CONST[2])
+        emit_b(jit_info, *INT_CONST[3]);
 }
 
 Parrot_ge_n_n_ic {
-    emit_lfd_r(NATIVECODE, r11, &NUM_REG[1]);
-    emit_lfd_r(NATIVECODE, r12, &NUM_REG[2]);
-    emit_fcmp(NATIVECODE, r11, r12);
-    emit_bc(jit_info, BGE, *INT_CONST[3]);
+    if (MAP[1] && MAP[2]) {
+        emit_fcmp(NATIVECODE, MAP[1], MAP[2]);
+        emit_bc(jit_info, BGE, *INT_CONST[3]);
+    }
+    else if (MAP[1]) {
+        emit_lfd_r(NATIVECODE, f12, &NUM_REG[2]);
+        emit_fcmp(NATIVECODE, MAP[1], f12);
+        emit_bc(jit_info, BGE, *INT_CONST[3]);
+    }
+    else if (MAP[2]) {
+        emit_lfd_r(NATIVECODE, f12, &NUM_REG[1]);
+        emit_fcmp(NATIVECODE, f12, MAP[2]);
+        emit_bc(jit_info, BGE, *INT_CONST[3]);
+    }
+    else {
+        emit_lfd_r(NATIVECODE, f11, &NUM_REG[1]);
+        emit_lfd_r(NATIVECODE, f12, &NUM_REG[2]);
+        emit_fcmp(NATIVECODE, f11, f12);
+        emit_bc(jit_info, BGE, *INT_CONST[3]);
+    }
 }
 
 Parrot_ge_n_nc_ic {
-    emit_lfd_r(NATIVECODE, r11, &NUM_REG[1]);
-    emit_imm32(NATIVECODE, r12, &NUM_CONST[2]);
-    emit_lfd(NATIVECODE, r12, 0, r12);
-    emit_fcmp(NATIVECODE, r11, r12);
-    emit_bc(jit_info, BGE, *INT_CONST[3]);
+    if (MAP[1]) {
+        emit_imm32(NATIVECODE, r12, &NUM_CONST[2]);
+        emit_lfd(NATIVECODE, f12, 0, r12);
+        emit_fcmp(NATIVECODE, MAP[1], f12);
+        emit_bc(jit_info, BGE, *INT_CONST[3]);
+    }
+    else {
+        emit_lfd_r(NATIVECODE, f11, &NUM_REG[1]);
+        emit_imm32(NATIVECODE, r12, &NUM_CONST[2]);
+        emit_lfd(NATIVECODE, f12, 0, r12);
+        emit_fcmp(NATIVECODE, f11, f12);
+        emit_bc(jit_info, BGE, *INT_CONST[3]);
+    }
 }
 
 Parrot_ge_nc_n_ic {
-    emit_imm32(NATIVECODE, r12, &NUM_CONST[1]);
-    emit_lfd(NATIVECODE, r11, 0, r12);
-    emit_lfd_r(NATIVECODE, r12, &NUM_REG[2]);
-    emit_fcmp(NATIVECODE, r11, r12);
-    emit_bc(jit_info, BGE, *INT_CONST[3]);
+    if (MAP[2]) {
+        emit_imm32(NATIVECODE, r12, &NUM_CONST[1]);
+        emit_lfd(NATIVECODE, f12, 0, r12);
+        emit_fcmp(NATIVECODE, f12, MAP[2]);
+        emit_bc(jit_info, BGE, *INT_CONST[3]);
+    }
+    else {
+        emit_lfd_r(NATIVECODE, f11, &NUM_REG[2]);
+        emit_imm32(NATIVECODE, r12, &NUM_CONST[1]);
+        emit_lfd(NATIVECODE, f12, 0, r12);
+        emit_fcmp(NATIVECODE, f12, f11);
+        emit_bc(jit_info, BGE, *INT_CONST[3]);
+    }
 }
 
 Parrot_ge_nc_nc_ic {
-    emit_imm32(NATIVECODE, r12, &NUM_CONST[1]);
-    emit_lfd(NATIVECODE, r11, 0, r12);
-    emit_imm32(NATIVECODE, r12, &NUM_CONST[2]);
-    emit_lfd(NATIVECODE, r12, 0, r12);
-    emit_fcmp(NATIVECODE, r11, r12);
-    emit_bc(jit_info, BGE, *INT_CONST[3]);
+    if (*NUM_CONST[1] >= *NUM_CONST[2])
+        emit_b(jit_info, *INT_CONST[3]);
 }
 
 Parrot_lt_n_n_ic {
-    emit_lfd_r(NATIVECODE, r11, &NUM_REG[1]);
-    emit_lfd_r(NATIVECODE, r12, &NUM_REG[2]);
-    emit_fcmp(NATIVECODE, r11, r12);
-    emit_bc(jit_info, BLT, *INT_CONST[3]);
+    if (MAP[1] && MAP[2]) {
+        emit_fcmp(NATIVECODE, MAP[1], MAP[2]);
+        emit_bc(jit_info, BLT, *INT_CONST[3]);
+    }
+    else if (MAP[1]) {
+        emit_lfd_r(NATIVECODE, f12, &NUM_REG[2]);
+        emit_fcmp(NATIVECODE, MAP[1], f12);
+        emit_bc(jit_info, BLT, *INT_CONST[3]);
+    }
+    else if (MAP[2]) {
+        emit_lfd_r(NATIVECODE, f12, &NUM_REG[1]);
+        emit_fcmp(NATIVECODE, f12, MAP[2]);
+        emit_bc(jit_info, BLT, *INT_CONST[3]);
+    }
+    else {
+        emit_lfd_r(NATIVECODE, f11, &NUM_REG[1]);
+        emit_lfd_r(NATIVECODE, f12, &NUM_REG[2]);
+        emit_fcmp(NATIVECODE, f11, f12);
+        emit_bc(jit_info, BLT, *INT_CONST[3]);
+    }
 }
 
 Parrot_lt_n_nc_ic {
-    emit_lfd_r(NATIVECODE, r11, &NUM_REG[1]);
-    emit_imm32(NATIVECODE, r12, &NUM_CONST[2]);
-    emit_lfd(NATIVECODE, r12, 0, r12);
-    emit_fcmp(NATIVECODE, r11, r12);
-    emit_bc(jit_info, BLT, *INT_CONST[3]);
+    if (MAP[1]) {
+        emit_imm32(NATIVECODE, r12, &NUM_CONST[2]);
+        emit_lfd(NATIVECODE, f12, 0, r12);
+        emit_fcmp(NATIVECODE, MAP[1], f12);
+        emit_bc(jit_info, BLT, *INT_CONST[3]);
+    }
+    else {
+        emit_lfd_r(NATIVECODE, f11, &NUM_REG[1]);
+        emit_imm32(NATIVECODE, r12, &NUM_CONST[2]);
+        emit_lfd(NATIVECODE, f12, 0, r12);
+        emit_fcmp(NATIVECODE, f11, f12);
+        emit_bc(jit_info, BLT, *INT_CONST[3]);
+    }
 }
 
 Parrot_lt_nc_n_ic {
-    emit_imm32(NATIVECODE, r12, &NUM_CONST[1]);
-    emit_lfd(NATIVECODE, r11, 0, r12);
-    emit_lfd_r(NATIVECODE, r12, &NUM_REG[2]);
-    emit_fcmp(NATIVECODE, r11, r12);
-    emit_bc(jit_info, BLT, *INT_CONST[3]);
+    if (MAP[2]) {
+        emit_imm32(NATIVECODE, r12, &NUM_CONST[1]);
+        emit_lfd(NATIVECODE, f12, 0, r12);
+        emit_fcmp(NATIVECODE, f12, MAP[2]);
+        emit_bc(jit_info, BLT, *INT_CONST[3]);
+    }
+    else {
+        emit_lfd_r(NATIVECODE, f11, &NUM_REG[2]);
+        emit_imm32(NATIVECODE, r12, &NUM_CONST[1]);
+        emit_lfd(NATIVECODE, f12, 0, r12);
+        emit_fcmp(NATIVECODE, f12, f11);
+        emit_bc(jit_info, BLT, *INT_CONST[3]);
+    }
 }
 
 Parrot_lt_nc_nc_ic {
-    emit_imm32(NATIVECODE, r12, &NUM_CONST[1]);
-    emit_lfd(NATIVECODE, r11, 0, r12);
-    emit_imm32(NATIVECODE, r12, &NUM_CONST[2]);
-    emit_lfd(NATIVECODE, r12, 0, r12);
-    emit_fcmp(NATIVECODE, r11, r12);
-    emit_bc(jit_info, BLT, *INT_CONST[3]);
+    if (*NUM_CONST[1] < *NUM_CONST[2])
+        emit_b(jit_info, *INT_CONST[3]);
 }
 
 Parrot_le_n_n_ic {
-    emit_lfd_r(NATIVECODE, r11, &NUM_REG[1]);
-    emit_lfd_r(NATIVECODE, r12, &NUM_REG[2]);
-    emit_fcmp(NATIVECODE, r11, r12);
-    emit_bc(jit_info, BLE, *INT_CONST[3]);
+    if (MAP[1] && MAP[2]) {
+        emit_fcmp(NATIVECODE, MAP[1], MAP[2]);
+        emit_bc(jit_info, BLE, *INT_CONST[3]);
+    }
+    else if (MAP[1]) {
+        emit_lfd_r(NATIVECODE, f12, &NUM_REG[2]);
+        emit_fcmp(NATIVECODE, MAP[1], f12);
+        emit_bc(jit_info, BLE, *INT_CONST[3]);
+    }
+    else if (MAP[2]) {
+        emit_lfd_r(NATIVECODE, f12, &NUM_REG[1]);
+        emit_fcmp(NATIVECODE, f12, MAP[2]);
+        emit_bc(jit_info, BLE, *INT_CONST[3]);
+    }
+    else {
+        emit_lfd_r(NATIVECODE, f11, &NUM_REG[1]);
+        emit_lfd_r(NATIVECODE, f12, &NUM_REG[2]);
+        emit_fcmp(NATIVECODE, f11, f12);
+        emit_bc(jit_info, BLE, *INT_CONST[3]);
+    }
 }
 
 Parrot_le_n_nc_ic {
-    emit_lfd_r(NATIVECODE, r11, &NUM_REG[1]);
-    emit_imm32(NATIVECODE, r12, &NUM_CONST[2]);
-    emit_lfd(NATIVECODE, r12, 0, r12);
-    emit_fcmp(NATIVECODE, r11, r12);
-    emit_bc(jit_info, BLE, *INT_CONST[3]);
+    if (MAP[1]) {
+        emit_imm32(NATIVECODE, r12, &NUM_CONST[2]);
+        emit_lfd(NATIVECODE, f12, 0, r12);
+        emit_fcmp(NATIVECODE, MAP[1], f12);
+        emit_bc(jit_info, BLE, *INT_CONST[3]);
+    }
+    else {
+        emit_lfd_r(NATIVECODE, f11, &NUM_REG[1]);
+        emit_imm32(NATIVECODE, r12, &NUM_CONST[2]);
+        emit_lfd(NATIVECODE, f12, 0, r12);
+        emit_fcmp(NATIVECODE, f11, f12);
+        emit_bc(jit_info, BLE, *INT_CONST[3]);
+    }
 }
 
 Parrot_le_nc_n_ic {
-    emit_imm32(NATIVECODE, r12, &NUM_CONST[1]);
-    emit_lfd(NATIVECODE, r11, 0, r12);
-    emit_lfd_r(NATIVECODE, r12, &NUM_REG[2]);
-    emit_fcmp(NATIVECODE, r11, r12);
-    emit_bc(jit_info, BLE, *INT_CONST[3]);
+    if (MAP[2]) {
+        emit_imm32(NATIVECODE, r12, &NUM_CONST[1]);
+        emit_lfd(NATIVECODE, f12, 0, r12);
+        emit_fcmp(NATIVECODE, f12, MAP[2]);
+        emit_bc(jit_info, BLE, *INT_CONST[3]);
+    }
+    else {
+        emit_lfd_r(NATIVECODE, f11, &NUM_REG[2]);
+        emit_imm32(NATIVECODE, r12, &NUM_CONST[1]);
+        emit_lfd(NATIVECODE, f12, 0, r12);
+        emit_fcmp(NATIVECODE, f12, f11);
+        emit_bc(jit_info, BLE, *INT_CONST[3]);
+    }
 }
 
 Parrot_le_nc_nc_ic {
-    emit_imm32(NATIVECODE, r12, &NUM_CONST[1]);
-    emit_lfd(NATIVECODE, r11, 0, r12);
-    emit_imm32(NATIVECODE, r12, &NUM_CONST[2]);
-    emit_lfd(NATIVECODE, r12, 0, r12);
-    emit_fcmp(NATIVECODE, r11, r12);
-    emit_bc(jit_info, BLE, *INT_CONST[3]);
+    if (*NUM_CONST[1] <= *NUM_CONST[2])
+        emit_b(jit_info, *INT_CONST[3]);
 }
 
 Parrot_ne_n_n_ic {
-    emit_lfd_r(NATIVECODE, r11, &NUM_REG[1]);
-    emit_lfd_r(NATIVECODE, r12, &NUM_REG[2]);
-    emit_fcmp(NATIVECODE, r11, r12);
-    emit_bc(jit_info, BNE, *INT_CONST[3]);
+    if (MAP[1] && MAP[2]) {
+        emit_fcmp(NATIVECODE, MAP[1], MAP[2]);
+        emit_bc(jit_info, BNE, *INT_CONST[3]);
+    }
+    else if (MAP[1]) {
+        emit_lfd_r(NATIVECODE, f12, &NUM_REG[2]);
+        emit_fcmp(NATIVECODE, MAP[1], f12);
+        emit_bc(jit_info, BNE, *INT_CONST[3]);
+    }
+    else if (MAP[2]) {
+        emit_lfd_r(NATIVECODE, f12, &NUM_REG[1]);
+        emit_fcmp(NATIVECODE, f12, MAP[2]);
+        emit_bc(jit_info, BNE, *INT_CONST[3]);
+    }
+    else {
+        emit_lfd_r(NATIVECODE, f11, &NUM_REG[1]);
+        emit_lfd_r(NATIVECODE, f12, &NUM_REG[2]);
+        emit_fcmp(NATIVECODE, f11, f12);
+        emit_bc(jit_info, BNE, *INT_CONST[3]);
+    }
 }
 
 Parrot_ne_n_nc_ic {
-    emit_lfd_r(NATIVECODE, r11, &NUM_REG[1]);
-    emit_imm32(NATIVECODE, r12, &NUM_CONST[2]);
-    emit_lfd(NATIVECODE, r12, 0, r12);
-    emit_fcmp(NATIVECODE, r11, r12);
-    emit_bc(jit_info, BNE, *INT_CONST[3]);
+    if (MAP[1]) {
+        emit_imm32(NATIVECODE, r12, &NUM_CONST[2]);
+        emit_lfd(NATIVECODE, f12, 0, r12);
+        emit_fcmp(NATIVECODE, MAP[1], f12);
+        emit_bc(jit_info, BNE, *INT_CONST[3]);
+    }
+    else {
+        emit_lfd_r(NATIVECODE, f11, &NUM_REG[1]);
+        emit_imm32(NATIVECODE, r12, &NUM_CONST[2]);
+        emit_lfd(NATIVECODE, f12, 0, r12);
+        emit_fcmp(NATIVECODE, f11, f12);
+        emit_bc(jit_info, BNE, *INT_CONST[3]);
+    }
 }
 
 Parrot_ne_nc_n_ic {
-    emit_imm32(NATIVECODE, r12, &NUM_CONST[1]);
-    emit_lfd(NATIVECODE, r11, 0, r12);
-    emit_lfd_r(NATIVECODE, r12, &NUM_REG[2]);
-    emit_fcmp(NATIVECODE, r11, r12);
-    emit_bc(jit_info, BNE, *INT_CONST[3]);
+    if (MAP[2]) {
+        emit_imm32(NATIVECODE, r12, &NUM_CONST[1]);
+        emit_lfd(NATIVECODE, f12, 0, r12);
+        emit_fcmp(NATIVECODE, f12, MAP[2]);
+        emit_bc(jit_info, BNE, *INT_CONST[3]);
+    }
+    else {
+        emit_lfd_r(NATIVECODE, f11, &NUM_REG[2]);
+        emit_imm32(NATIVECODE, r12, &NUM_CONST[1]);
+        emit_lfd(NATIVECODE, f12, 0, r12);
+        emit_fcmp(NATIVECODE, f12, f11);
+        emit_bc(jit_info, BNE, *INT_CONST[3]);
+    }
 }
 
 Parrot_ne_nc_nc_ic {
-    emit_imm32(NATIVECODE, r12, &NUM_CONST[1]);
-    emit_lfd(NATIVECODE, r11, 0, r12);
-    emit_imm32(NATIVECODE, r12, &NUM_CONST[2]);
-    emit_lfd(NATIVECODE, r12, 0, r12);
-    emit_fcmp(NATIVECODE, r11, r12);
-    emit_bc(jit_info, BNE, *INT_CONST[3]);
+    if (*NUM_CONST[1] != *NUM_CONST[2])
+        emit_b(jit_info, *INT_CONST[3]);
 }
-

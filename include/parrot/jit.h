@@ -80,24 +80,27 @@ typedef struct {
  *      The bytecode will be divided in sections depending on the 
  *      program structure.
  *
- *  begin:          Points where sections begins in the bytecode.
- *  end:            Points where sections ends in the bytecode.
- *  int_reg_count:  An array with one position for each integer register
- *                  holding the number of times each register is used in the
- *                  section.
- *  int_reg_usage:  An array with the registers sorted by the usage.
- *  int_reg_dir:    If the register needs to be loaded or saved.
- *  arena:          The first arena for this section, or NULL if the section is
- *                  in the arena inlined in jit_info.
- *  registers_used: The number of used registers.
- *  maps:           Total maps done. 
- *  jit_op_count:   How many opcodes are jitted.
- *  op_count:       Opcodes in this section.
- *  load_size:      The size of the register load instructions to be skipped in
- *                  an in-section branch.
- *  type:           If this section is a jitted one or not.
- *  branch_target:  The section where execution continues if this section ends
- *                  at a branch source the targeted section is used.
+ *  begin:              Points where sections begins in the bytecode.
+ *  end:                Points where sections ends in the bytecode.
+ *  int_reg_count:      An array with one position for each integer register
+ *                      holding the number of times each register is used in the
+ *                      section.
+ *  int_reg_usage:      An array with the registers sorted by the usage.
+ *  int_reg_dir:        If the register needs to be loaded or saved.
+ *  float_reg_count:    Same as int_ but for floats.
+ *  float_reg_usage:    Same as int_ but for floats.
+ *  float_reg_dir:      Same as int_ but for floats.
+ *  arena:              The first arena for this section, or NULL if the 
+ *                      section is in the arena inlined in jit_info.
+ *  int_registers_used: The number of used registers.
+ *  maps:               Total maps done. 
+ *  jit_op_count:       How many opcodes are jitted.
+ *  op_count:           Opcodes in this section.
+ *  load_size:          The size of the register load instructions to be 
+ *                      skipped in an in-section branch.
+ *  type:               If this section is a jitted one or not.
+ *  branch_target:      The section where execution continues if this section 
+ *                      ends at a branch source the targeted section is used.
  */
 
 typedef struct Parrot_jit_optimizer_section *Parrot_jit_optimizer_section_ptr;
@@ -108,8 +111,12 @@ typedef struct Parrot_jit_optimizer_section {
     Parrot_jit_register_count_t          int_reg_count[NUM_REGISTERS];
     Parrot_jit_register_usage_t          int_reg_usage[NUM_REGISTERS];
     Parrot_jit_register_dir_t            int_reg_dir[NUM_REGISTERS];
+    unsigned char                        int_registers_used;
+    Parrot_jit_register_count_t          float_reg_count[NUM_REGISTERS];
+    Parrot_jit_register_usage_t          float_reg_usage[NUM_REGISTERS];
+    Parrot_jit_register_dir_t            float_reg_dir[NUM_REGISTERS];
+    unsigned char                        float_registers_used;
     Parrot_jit_arena_t                  *arena;
-    unsigned char                        registers_used;
     unsigned int                         maps;
     unsigned int                         jit_op_count;
     unsigned int                         op_count;
@@ -153,7 +160,7 @@ typedef struct {
     INTVAL                          *slot_ptr;
 } Parrot_jit_constant_pool_t;
 
-/*  Parrot_jit_info
+/*  Parrot_jit_info_t
  *      All the information needed to jit the bytecode will be here.
  *      
  *  prev_op:        The previous opcode in this section.
@@ -174,7 +181,8 @@ typedef struct {
     Parrot_jit_arena_t               arena;
     Parrot_jit_optimizer_t          *optimizer;
     Parrot_jit_constant_pool_t      *constant_pool;
-    char                            *register_map;
+    char                            *intval_map;
+    char                            *floatval_map;
 } Parrot_jit_info_t;
 
 #define Parrot_jit_fixup_target(jit_info, fixup) \

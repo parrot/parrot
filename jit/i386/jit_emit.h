@@ -1,10 +1,10 @@
 /*
-** jit_emit.h
-** 
-** i386
-**
-** $Id$
-**/
+ * jit_emit.h
+ * 
+ * i386
+ *
+ * $Id$
+ */
 
 /* Register codes */
 #define emit_None 0 
@@ -990,11 +990,11 @@ Parrot_jit_load_registers(Parrot_jit_info_t *jit_info,
                           struct Parrot_Interp * interpreter)
 {
     Parrot_jit_optimizer_section_t *cur_se = jit_info->optimizer->cur_section;
-    int i = cur_se->registers_used;
+    int i = cur_se->int_registers_used;
 
     while (i--)
         if (cur_se->int_reg_dir[cur_se->int_reg_usage[i]] & PARROT_ARGDIR_IN)
-            emit_movl_m_r(jit_info->native_ptr, jit_info->register_map[i],
+            emit_movl_m_r(jit_info->native_ptr, jit_info->intval_map[i],
                 &interpreter->ctx.int_reg.registers[cur_se->int_reg_usage[i]]);
 
     /* The total size of the loads */
@@ -1011,23 +1011,24 @@ Parrot_jit_save_registers(Parrot_jit_info_t *jit_info,
                           struct Parrot_Interp * interpreter)
 {
     Parrot_jit_optimizer_section_t *cur_se = jit_info->optimizer->cur_section;
-    int i = cur_se->registers_used;
+    int i = cur_se->int_registers_used;
 
     while (i--)
         if (cur_se->int_reg_dir[cur_se->int_reg_usage[i]] & PARROT_ARGDIR_OUT)
-            emit_movl_r_m(jit_info->native_ptr, jit_info->register_map[i],
+            emit_movl_r_m(jit_info->native_ptr, jit_info->intval_map[i],
                 &interpreter->ctx.int_reg.registers[cur_se->int_reg_usage[i]]);
 }
 
-#else /* DEFINE_ROUTINES */
+#else /* JIT_EMIT */
 
 #  define REQUIRES_CONSTANT_POOL 0
-#  define MAX_REGITERS_TO_MAP 4
+#  define INT_REGITERS_TO_MAP 4
+#  define FLOAT_REGITERS_TO_MAP 0
 
-char register_map[MAX_REGITERS_TO_MAP] =
+char intval_map[INT_REGITERS_TO_MAP] =
     { emit_EDI, emit_EBX, emit_EDX, emit_ECX };
 
-#endif /* DEFINE_ROUTINES */
+#endif /* JIT_EMIT */
 
 /*
  * Local variables:
