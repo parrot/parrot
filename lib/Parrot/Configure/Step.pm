@@ -2,6 +2,7 @@ package Parrot::Configure::Step;
 
 use strict;
 use Exporter;
+use File::Copy ();
 use vars qw(@ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
 
 @ISA=qw(Exporter);
@@ -68,7 +69,7 @@ sub copy_if_diff {
         return if $from_sum == $to_sum;
     }
 
-    rename($from, $to);
+    File::Copy::copy($from, $to);
 
     # Make sure the timestamp is updated
     my $now=time;
