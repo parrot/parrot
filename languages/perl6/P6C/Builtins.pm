@@ -167,13 +167,42 @@ invoke
 popp
 ret
 
-__setup:
-    store_global "_AV_ARGS", P0
+ __setup:
+    save P0			# == argv
     pushp
+    pushi
+    restore P0
+#  P0 is array of commandline args
+#  -lt: should we really preserve any registers here?
+    new P1, .PerlArray
+    new P2, .PerlString
+    set I0, P0
+# $0 / $PROGRAM_NAME
+    set P2, P0[0]
+    store_global "_SV_0", P2
+    store_global "_SV_PROGRAM_NAME", P2
+
+# @ARGS == @ARGV[1..@ARGV.length]
+    set I1, 0
+    set I2, 1
+    dec I0
+    set P1, I0
+    goto __setup_arg_end
+__setup_arg:
+    set S0, P0[I2]
+    set P1[I1], S0
+    inc I1
+    inc I2
+__setup_arg_end:
+    lt I1, I0, __setup_arg
+    store_global "_AV_ARGV", P1
+
+# exception handling:
     new P0, .PerlArray
     store_global "_AV_catchers", P0
     new P0, .PerlUndef
     store_global "_SV__BANG_", P0
+    popi
     popp
     ret
 

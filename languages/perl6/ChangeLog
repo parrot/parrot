@@ -144,3 +144,20 @@
 
 	* Additions:
 	    - @ARGS, at last.
+
+2002-08-10
+
+	* Additions (Leo):
+	    - corrected @ARGS, $0, $PROGRAM_NAME
+	    - use real pow op
+	    - new version of perl6 driver
+	    - config script (pconfig.pl)
+
+	* Fixes (Leo):
+	    - tidied catch-blocks
+	    - tidied flattening
+	    - update config/gen/makefiles/perl6.in to call pconfig.pl
+
+	* Broken (me, probably):
+	    - "$x = @xs" will leave $x undefined.
+	

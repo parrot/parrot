@@ -60,7 +60,6 @@ package P6C::IMCC::prefix;
 sub prefix_if {
     my $x = shift;
     my $end = genlabel "endif";
-    my $tmp = newtmp;
     my $nextlab;
     foreach (@{$x->args}) {
 	my ($sense, $test, $block) = @$_;
@@ -75,8 +74,7 @@ sub prefix_if {
 	    my $v = $test->val;
 	    if ($sense =~ /if$/) { # (els)?if
 		code(<<END);
-	$tmp = ! $v
-	if $tmp goto $nextlab
+	unless $v goto $nextlab
 END
 	    } else {		# (els)?unless
 		code(<<END);
@@ -520,6 +518,25 @@ sub wrap_with_catch {
     my $endblock = genlabel 'end_try';
     my $try = genlabel 'try';
     my $cont = newtmp 'Continuation';
+    my $label = $endblock;
+    my $catch;
+    my $addr = newtmp 'int';
+    if ($catcher) {
+       $catch = genlabel 'catch';
+       $label = $catch;
+    }
+    code(<<END);
+       $addr = addr $label
+       $cont = $addr
+       .arg $cont
+       call __install_catch
+       goto $try
+END
+    if ($catcher) {
+       code(<<END);
+$catch:
+END
+
     my $catch = genlabel 'catch';
     my $itmp = gentmp 'int';
     code(<<END);

@@ -6,11 +6,11 @@ use P6C::Context;
 require Exporter;
 use vars qw(@ISA %EXPORT_TAGS @EXPORT_OK);
 @ISA = qw(Exporter);
-@EXPORT_OK = qw(slow_pow do_logand do_logor do_defined do_concat do_repeat
+@EXPORT_OK = qw(do_pow do_logand do_logor do_defined do_concat do_repeat
 		do_range do_smartmatch);
 %EXPORT_TAGS = (all => [@EXPORT_OK]);
 
-sub slow_pow ;
+sub do_pow ;
 sub do_logand ;
 sub do_logor ;
 sub do_defined ;
@@ -32,18 +32,21 @@ __DATA__
 package P6C::IMCC::Binop;
 
 # XXX: exponentiation in a loop.  Will be replaced once IMCC allows more ops.
-sub slow_pow {
+sub do_pow {
     my $x = shift;
     my $dest = newtmp;
     my $lv = $x->l->val;
     my $rv = $x->r->val;
     my $cnt = gentmp 'int';
+    my $ln = newtmp 'num';
+    my $rn = newtmp 'num';
+    my $dn = newtmp 'num';
     code(<<END);
-# POW
-	$dest = 1
-	$cnt = $rv
+       $ln = $lv
+       $rn = $rv
+       $dn = $ln ** $rn
+       $dest = $dn
 END
-    code(gen_counted_loop($cnt, "$dest = $dest * $lv\n"));
     return $dest;
 }
 

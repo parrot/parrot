@@ -649,7 +649,7 @@ END
 	    my $itemval = $vals->[$i]->lval;
 	    code(<<END);
 	$tmp\[$offset] = $itemval
-	$offset = $offset + 1
+	inc $offset
 END
 	} else {
 	    my $item = $vals->[$i]->val;
@@ -952,7 +952,7 @@ BEGIN {
  '*'	=> \&simple_binary,
  '/'	=> \&simple_binary,
  '%'	=> \&simple_binary,
- '**'	=> \&slow_pow,
+ '**'	=> \&do_pow,
 
  '>>'	=> \&simple_binary,
  '<<'	=> \&simple_binary,
@@ -1402,19 +1402,23 @@ sub val {
     }
 
     my $ret;
-    my @catchers;
-    foreach (@{$x->block}) {
-	if ($_->isa('P6C::prefix') && $_->name eq 'CATCH') {
-	    push @catchers, $_->args;
-	    $_->name(undef);
-	}
-    }
-    if (@catchers) {
-	die "Only one catch block per block, please" if @catchers > 1;
-	wrap_with_catch($x, $catchers[0]);
+    if (UNIVERSAL::isa($x->block, 'P6C::regex')) {
+	$x->block->val;
     } else {
-	foreach my $stmt (@{$x->block}) {
-	    $stmt->val;
+	my @catchers;
+	foreach (@{$x->block}) {
+	    if ($_->isa('P6C::prefix') && $_->name eq 'CATCH') {
+		push @catchers, $_->args;
+		$_->name(undef);
+	    }
+	}
+	if (@catchers) {
+	    die "Only one catch block per block, please" if @catchers > 1;
+	    wrap_with_catch($x, $catchers[0]);
+	} else {
+	    foreach my $stmt (@{$x->block}) {
+		$stmt->val;
+	    }
 	}
     }
     if ($ctx->type ne 'void') {
@@ -1824,9 +1828,9 @@ sub P6C::label::val {
 
 ######################################################################
 sub P6C::debug_info::val {
-	my $x = shift;
-	my ($f, $l, $c, $txt) = @$x;
-	code( qq{#line $l "$f"\n#@@@@ $txt\n}) if ($P6C::IMCC::curfunc);
+    my $x = shift;
+    my ($f, $l, $c, $txt) = @$x;
+    code( qq{#line $l "$f"\n#@@@@ $txt\n}) if ($P6C::IMCC::curfunc);
 }
 
 1;

@@ -1,8 +1,10 @@
 #!perl
 use strict;
 use P6C::TestCompiler tests => 12;
+use Test::More qw(skip);
 
 ##############################
+SKIP: { skip "testing", 1;
 output_is(<<'CODE', <<'OUT', "Basic hello.");
 sub main() {
     print1("Hello, " _ "world");
@@ -10,6 +12,7 @@ sub main() {
 CODE
 Hello, world
 OUT
+}
 
 ##############################
 output_is(<<'CODE', <<'OUT', "Binary math ops");
@@ -21,6 +24,9 @@ sub main() {
     print1(2 % 3);
     print1(2 _ 3);
     print1(2 ** 3);
+    print1(2 ** 3 ** 1);
+    print1(2 ** 1 ** 3);
+    print1(2 ** -1 ** 3);
 }
 CODE
 5
@@ -29,7 +35,10 @@ CODE
 3.000000
 2
 23
-8
+8.000000
+8.000000
+2.000000
+0.500000
 OUT
 
 ##############################

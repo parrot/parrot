@@ -63,7 +63,8 @@ sub _info {
     my $type = shift;
     my ($pack, $fn, $line, $subr) = caller 2;
     $subr =~ s/^P6C:://;
-    warn "[$subr ($type) $P6C::IMCC::curfunc] ", @_, "\n";
+    my $curfunc = $P6C::IMCC::curfunc ? " $P6C::IMCC::curfunc" : '';
+    warn "[$subr ($type)$curfunc] ", @_, "\n";
 }
 
 sub unimp {
