@@ -208,6 +208,8 @@ find_label_cs(struct Parrot_Interp *interpreter, char *name)
     struct PackFile_FixupTable *ft = interpreter->code->fixup_table;
     opcode_t i;
 
+    if (!ft)
+        return -1;
     for (i = 0; i < ft->fixup_count; i++) {
         switch (ft->fixups[i]->type) {
             case 0:
@@ -257,8 +259,10 @@ store_labels(struct Parrot_Interp *interpreter, int *src_lines, int oldsize)
             store_label(ins->r[0], pc);
             ins->r[0]->color = pc;
         }
-        else if (!strcmp(ins->op, "bsr"))
-            store_bsr(ins->r[0], pc, 1);
+        else if (!strcmp(ins->op, "bsr")) {
+            if (!(ins->r[0]->type & VTREGISTER))
+                store_bsr(ins->r[0], pc, 1);
+        }
         else if (!strcmp(ins->op, "set_addr"))
             store_bsr(ins->r[1], pc, 2);
         else if (!strcmp(ins->op, "compile"))
@@ -295,6 +299,9 @@ store_labels(struct Parrot_Interp *interpreter, int *src_lines, int oldsize)
             continue;
         /* if no jump */
         if ((addr = get_branch_reg(ins)) == 0)
+            continue;
+        /* it's kind of a register */
+        if (addr->type & VTREGISTER)
             continue;
         /* branch found */
         label = _get_sym(globals.cs->subs->labels, addr->name);
@@ -688,7 +695,7 @@ int e_pbc_emit(void *param, Instruction * ins) {
     if (ins->op && *ins->op) {
         /* fixup local jumps */
         SymReg *addr, *r;
-        if ((addr = get_branch_reg(ins)) != 0) {
+        if ((addr = get_branch_reg(ins)) != 0 && !(addr->type & VTREGISTER)) {
             SymReg *label = _get_sym(globals.cs->subs->labels, addr->name);
             /* maybe global */
             if (label) {

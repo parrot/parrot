@@ -112,7 +112,6 @@ EOL		\r?\n
 "clone"         return(CLONE);
 "string"        return(STRINGV);
 "call"          return(CALL);
-"print"         return(PRINT);
 "saveall"       return(SAVEALL);
 "restoreall"    return(RESTOREALL);
 "<<"            return(SHIFT_LEFT);

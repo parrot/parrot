@@ -201,7 +201,7 @@ SymReg ** r, int nr, int emit)
     static int p = 0;
     SymReg *preg[IMCC_MAX_REGS];    /* px,py,pz */
     SymReg *nreg[IMCC_MAX_REGS];
-    Instruction * ins;
+    Instruction *ins = 0;
 
     /* count keys in keyvec */
     kv = keyvec;
@@ -406,7 +406,7 @@ iANY(struct Parrot_Interp *interpreter, char * name,
     Instruction *i;
 }
 
-%token <t> CALL GOTO ARG PRINT IF UNLESS NEW END SAVEALL RESTOREALL
+%token <t> CALL GOTO ARG IF UNLESS NEW END SAVEALL RESTOREALL
 %token <t> SUB NAMESPACE ENDNAMESPACE CLASS ENDCLASS SYM LOCAL CONST PARAM
 %token <t> INC DEC
 %token <t> SHIFT_LEFT SHIFT_RIGHT INTV FLOATV STRINGV DEFINED LOG_XOR
@@ -526,7 +526,6 @@ labeled_inst:
                                               R1(mk_address($2, U_add_once)));}
     |   INC var				{ $$ = MK_I(interp, "inc",R1($2)); }
     |   DEC var				{ $$ = MK_I(interp, "dec",R1($2)); }
-    |   PRINT var			{ $$ = MK_I(interp, "print",R1($2)); }
     |   SAVEALL				{ $$ = MK_I(interp, "saveall" ,R0()); }
     |   RESTOREALL			{ $$ = MK_I(interp, "restoreall" ,R0()); }
     |   END				{ $$ = MK_I(interp, "end" ,R0()); }
