@@ -215,7 +215,8 @@ static char * inv_op(char *op) {
 %nonassoc '\n'
 %nonassoc <t> PARAM
 
-%token <t> CALL GOTO ARG FLATTEN_ARG IF UNLESS NEW NEWSUB NEWCLOSURE END SAVEALL RESTOREALL
+%token <t> CALL GOTO ARG FLATTEN_ARG IF UNLESS END SAVEALL RESTOREALL
+%token <t> NEW NEWSUB NEWCLOSURE NEWCOR NEWCONT
 %token <t> NAMESPACE ENDNAMESPACE CLASS ENDCLASS FIELD METHOD
 %token <t> SUB SYM LOCAL CONST
 %token <t> INC DEC GLOBAL_CONST
@@ -230,7 +231,7 @@ static char * inv_op(char *op) {
 %token <t> EMIT EOM
 %token <s> IREG NREG SREG PREG IDENTIFIER STRINGC INTC FLOATC REG MACRO ENDM
 %token <s> PARROT_OP
-%type <t> type
+%type <t> type newsub
 %type <i> program class class_body member_decls member_decl field_decl method_decl
 %type <i> sub sub_start emit pcc_sub sub_body pcc_ret pcc_yield
 %type <i> compilation_units compilation_unit
@@ -556,6 +557,7 @@ label:  LABEL		{ $$ = iLABEL(mk_address($1, U_add_uniq_label)); }
 instruction:
 	labels  labeled_inst '\n'  { $$ = $2; }
     ;
+
 labeled_inst:
 	assignment
     |   if_statement
@@ -579,9 +581,18 @@ labeled_inst:
     |   SAVEALL				{ $$ = MK_I(interp, "saveall" ,0); }
     |   RESTOREALL			{ $$ = MK_I(interp, "restoreall" ,0); }
     |   END				{ $$ = MK_I(interp, "end" ,0); }
+    |   NEWSUB                          { expect_pasm = 1; }
+            pasm_args           { $$ = INS(interp, "newsub",0,regs,nargs,keyvec,1); }
     |  PARROT_OP vars           { $$ = INS(interp, $1,0,regs,nargs,keyvec, 1);
                                           free($1); }
     | /* none */                        { $$ = 0;}
+    ;
+
+newsub:
+    NEWSUB
+    | NEWCLOSURE
+    | NEWCOR
+    | NEWCONT
     ;
 
 type:
@@ -620,26 +631,23 @@ assignment:
     |  var '[' keylist ']' '=' var	{ $$ = iINDEXSET(interp, $1, $3, $6); }
     |  target '=' NEW classname COMMA var { $$ = iNEW(interp, $1, $4, $6, 1); }
     |  target '=' NEW classname		{ $$ = iNEW(interp, $1, $4, NULL, 1); }
-    |  target '=' NEWSUB IDENTIFIER     { $$ = iNEWSUB(interp, $1, "Sub",
-                                                 mk_address($4, U_add_once), 1); }
-    |  target '=' NEWCLOSURE IDENTIFIER { $$ = iNEWSUB(interp, $1, "Closure",
+    |  target '=' newsub IDENTIFIER     { $$ = iNEWSUB(interp, $1, $3,
                                                  mk_address($4, U_add_once), 1); }
     |  target '=' DEFINED var	        { $$ = MK_I(interp, "defined",2, $1,$4); }
     |  target '=' DEFINED var '[' keylist ']' { keyvec=KEY_BIT(2);
-                                     $$ = MK_I(interp, "defined", 3, $1, $4, $6);}
-    |  target '=' CLONE var		{ $$ = MK_I(interp, "clone",2, $1, $4);
-    }
+                                     $$ = MK_I(interp, "defined", 3, $1, $4, $6); }
+    |  target '=' CLONE var		{ $$ = MK_I(interp, "clone",2, $1, $4); }
     |  target '=' ADDR IDENTIFIER	{ $$ = MK_I(interp, "set_addr",
                                           2, $1, mk_address($4,U_add_once)); }
     |  target '=' GLOBAL string	{ $$ = MK_I(interp, "find_global",2, $1,$4); }
     |  GLOBAL string '=' var	{ $$ = MK_I(interp, "store_global",2, $2,$4); }
+       /* NEW and NEWSUB are here because they are both PIR and PASM keywords so we
+        * have to handle the token here (or badly hack the lexer). */
     |  NEW                              { expect_pasm = 1; }
           pasm_args	    { $$ = INS(interp, "new",0,regs,nargs,keyvec,1); }
-    |  NEWSUB                           { expect_pasm = 1; }
-          pasm_args	    { $$ = INS(interp, "newsub",0,regs,nargs,keyvec,1); }
     |  DEFINED target COMMA var   { $$ = MK_I(interp, "defined", 2, $2, $4); }
     |  DEFINED target COMMA var '[' keylist ']'  { keyvec=KEY_BIT(2);
-                                  $$ = MK_I(interp, "defined", 3, $2, $4, $6);}
+                                  $$ = MK_I(interp, "defined", 3, $2, $4, $6); }
     |  CLONE target COMMA var     { $$ = MK_I(interp, "clone", 2, $2, $4); }
     ;
 

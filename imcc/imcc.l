@@ -218,6 +218,8 @@ SP              [ ]
 "float"         return(FLOATV);
 "new"           return(NEW);
 "newclosure"    return(NEWCLOSURE);
+"newcont"       return(NEWCONT);
+"newcor"        return(NEWCOR);
 "newsub"        return(NEWSUB);
 "defined"       return(DEFINED);
 "addr"          return(ADDR);

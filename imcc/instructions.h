@@ -80,7 +80,7 @@ Instruction * INS_LABEL(SymReg * r0, int emit);
 
 Instruction * iNEW(struct Parrot_Interp *,SymReg * r0, char * type,
 	SymReg *init, int emit);
-Instruction * iNEWSUB(struct Parrot_Interp *,SymReg * r0, const char * type,
+Instruction * iNEWSUB(struct Parrot_Interp *,SymReg * r0, int type,
 	SymReg *init, int emit);
 Instruction * emitb(Instruction *);
 

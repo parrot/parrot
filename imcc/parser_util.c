@@ -80,7 +80,7 @@ iNEW(struct Parrot_Interp *interpreter, SymReg * r0, char * type,
  */
 
 Instruction *
-iNEWSUB(struct Parrot_Interp *interpreter, SymReg * r0, const char * type,
+iNEWSUB(struct Parrot_Interp *interpreter, SymReg * r0, int type,
         SymReg *init, int emit)
 {
     char fmt[256];
@@ -88,27 +88,27 @@ iNEWSUB(struct Parrot_Interp *interpreter, SymReg * r0, const char * type,
     SymReg *pmc;
     int i, nargs;
     int pmc_num;
-
-    if (!strcmp(type, "Sub")) {
-
+    const char * classnm;
+    switch(type) {
+       case NEWSUB: classnm = "Sub";
+       case NEWCLOSURE: classnm = "Closure";
+       case NEWCOR: classnm = "Coroutine";
+       case NEWCONT: classnm = "Continuation";
+       default:
+          fataly(1, sourcefile, line,
+             "iNEWSUB: unimplemented classtype '%d'\n", type);
     }
-    else if(!strcmp(type, "Closure")) {
-
-    }
-    else if(!strcmp(type, "Continuation")) {
-
-    }
-    else fataly(1, sourcefile, line, "Invalid PMC type '%s' for newsub op\n", type);
 
     pmc_num = pmc_type(interpreter,
-            string_from_cstring(interpreter, *type == '.' ?type+1:type, 0));
+            string_from_cstring(interpreter,
+                      *classnm == '.' ?classnm+1:classnm, 0));
 
     sprintf(fmt, "%d", pmc_num);
     pmc = mk_const(str_dup(fmt), 'I');
 
     if (pmc_num <= 0)
-        fataly(1, sourcefile, line, "Unknown PMC type '%s'\n", type);
-    sprintf(fmt, "%%s, %d\t # .%s", pmc_num, type);
+        fataly(1, sourcefile, line, "Unknown PMC type '%s'\n", classnm);
+    sprintf(fmt, "%%s, %d\t # .%s", pmc_num, classnm);
     r0->usage = U_NEW;
 
     regs[0] = r0;
