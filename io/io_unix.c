@@ -87,7 +87,7 @@ flags_to_unix(INTVAL flags)
 static INTVAL
 PIO_unix_init(theINTERP, ParrotIOLayer *layer)
 {
-    ParrotIOData *d = GET_INTERP_IOD(interpreter);
+    ParrotIOData *d = interpreter->piodata;
     if (d != NULL && d->table != NULL) {
         ParrotIO *io;
 

@@ -141,9 +141,9 @@ PIO_init(theINTERP)
     interpreter->piodata = mem_sys_allocate(sizeof(ParrotIOData));
     if (interpreter->piodata == NULL)
         internal_exception(PIO_ERROR, "PIO alloc piodata failure.");
-    GET_INTERP_IOD(interpreter)->default_stack = NULL;
-    GET_INTERP_IOD(interpreter)->table = alloc_pio_array(PIO_NR_OPEN);
-    if (GET_INTERP_IOD(interpreter)->table == NULL)
+    interpreter->piodata->default_stack = NULL;
+    interpreter->piodata->table = alloc_pio_array(PIO_NR_OPEN);
+    if (interpreter->piodata->table == NULL)
         internal_exception(PIO_ERROR, "PIO alloc table failure.");
 
 }
@@ -166,19 +166,19 @@ PIO_finish(theINTERP)
     /* TODO: close std descriptors */
 
     for (i = 0 ; i < PIO_NR_OPEN; i++) {
-        if ( (io = GET_INTERP_IOD(interpreter)->table[i]) ) {
+        if ( (io = ((ParrotIOData *)interpreter->piodata)->table[i]) ) {
             PIO_close(interpreter, new_io_pmc(interpreter, io));
         }
     }
 #endif
-    for (p = GET_INTERP_IO(interpreter); p; ) {
+    for (p = ((ParrotIOData *)interpreter->piodata)->default_stack; p; ) {
         down = p->down;
         if (p->api->Delete)
             (*p->api->Delete) (p);
         /* mem_sys_free(p); */ /* XXX ??? */
         p = down;
     }
-    mem_sys_free(GET_INTERP_IOD(interpreter)->table);
+    mem_sys_free(((ParrotIOData *)interpreter->piodata)->table);
     mem_sys_free(interpreter->piodata);
 }
 
