@@ -652,7 +652,7 @@ static opcode_t*
 the_test(Interp *interpreter,
 	opcode_t *cur_op, opcode_t *start)
 {
-    ParrotIO *io;
+    PMC *io;
     char peekbuf[1024], readbuf[1024];
     UINTVAL len;
     STRING fake, *s;
