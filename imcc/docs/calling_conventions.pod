@@ -56,7 +56,7 @@ Notes:
 
 =over 4
 
-=item * B<prototyped>, B<non_rototyped>
+=item * B<prototyped>, B<non_prototyped>
 
 If a subroutine definition has no prototyped specifier, code gets
 emitted to receive parameters by both flavors.
