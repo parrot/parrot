@@ -248,9 +248,10 @@ setup_argv(struct Parrot_Interp *interpreter, int argc, char ** argv)
                 argc);
     }
 
-    userargv = pmc_new(interpreter, enum_class_PerlArray);
+    userargv = pmc_new_noinit(interpreter, enum_class_PerlArray);
     /* immediately anchor pmc to root set */
     interpreter->ctx.pmc_reg.registers[0] = userargv;
+    userargv->vtable->init(interpreter, userargv);
 
     for (i = 0; i < argc; i++) {
         /* Run through argv, adding everything to @ARGS. */
@@ -318,8 +319,8 @@ Parrot_runcode(struct Parrot_Interp *interpreter, int argc, char *argv[])
 
         PIO_printf(interpreter, "\n\n");
         PIO_printf(interpreter, "                   OPERATION PROFILE                 \n\n");
-        PIO_printf(interpreter, "  CODE   OP FULL NAME   CALLS  TOTAL TIME    AVG TIME\n");
-        PIO_printf(interpreter, "  -----  ------------  ------  ----------  ----------\n");
+        PIO_printf(interpreter, "  CODE   OP FULL NAME       CALLS  TOTAL TIME    AVG TIME\n");
+        PIO_printf(interpreter, "  -----  ------------     -------  ----------  ----------\n");
 
         for (j = 0; j < interpreter->op_count; j++) {
             if (interpreter->profile[j].numcalls > 0) {
@@ -327,7 +328,7 @@ Parrot_runcode(struct Parrot_Interp *interpreter, int argc, char *argv[])
                 call_count += interpreter->profile[j].numcalls;
                 sum_time += interpreter->profile[j].time;
 
-                PIO_printf(interpreter, "  %5vu  %-12s  %6vu  %10vf  %10vf\n", j,
+                PIO_printf(interpreter, "  %5vu  %-15s  %7vu  %10vf  %10vf\n", j,
                        interpreter->op_info_table[j].full_name,
                        interpreter->profile[j].numcalls,
                        interpreter->profile[j].time,
@@ -337,8 +338,8 @@ Parrot_runcode(struct Parrot_Interp *interpreter, int argc, char *argv[])
             }
         }
 
-        PIO_printf(interpreter, "  -----  ------------  ------  ----------  ----------\n");
-        PIO_printf(interpreter, "  %5vu  %-12s  %6vu  %10vf  %10vf\n",
+        PIO_printf(interpreter, "  -----  ------------     -------  ----------  ----------\n");
+        PIO_printf(interpreter, "  %5vu  %-15s  %7vu  %10vf  %10vf\n",
             op_count,
             "",
             call_count,
