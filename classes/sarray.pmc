@@ -144,15 +144,15 @@ ret_pmc(Parrot_Interp interpreter, HashEntry *e)
     PMC *ret;
     switch (e->type) {
         case enum_hash_int:
-            ret = pmc_new(interpreter, enum_class_PerlUndef);
+            ret = pmc_new(interpreter, enum_class_Undef);
             VTABLE_set_integer_native(interpreter, ret, UVal_int(e->val));
             return ret;
         case enum_hash_num:
-            ret = pmc_new(interpreter, enum_class_PerlUndef);
+            ret = pmc_new(interpreter, enum_class_Undef);
             VTABLE_set_number_native(interpreter, ret, UVal_num(e->val));
             return ret;
         case enum_hash_string:
-            ret = pmc_new(interpreter, enum_class_PerlUndef);
+            ret = pmc_new(interpreter, enum_class_Undef);
             VTABLE_set_string_native(interpreter, ret, UVal_str(e->val));
             return ret;
         case enum_hash_pmc:
