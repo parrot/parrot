@@ -4110,7 +4110,7 @@ inline op loadext(in STR, in STR) {
      fprintf(stderr, "%s\n", err);
      PANIC("Failed to load native library");
   }
-  func = Parrot_dlsym(p, $2->bufstart);
+  func = D2FPTR(Parrot_dlsym(p, $2->bufstart));
   if (NULL == func) {
     PANIC("Failed to find symbol in native library");
   }
