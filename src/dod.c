@@ -14,6 +14,8 @@
 
 #include "parrot/parrot.h"
 
+static size_t find_common_mask(size_t val1, size_t val2);
+
 PMC *
 mark_used(PMC *used_pmc, PMC *current_end_of_list)
 {
@@ -329,17 +331,44 @@ free_unused_buffers(struct Parrot_Interp *interpreter,
 }
 
 #ifndef PLATFORM_STACK_WALK
+
+/* Find a mask covering the longest common bit-prefix of val1 and val2 */
+static size_t
+find_common_mask(size_t val1, size_t val2){
+    int i, count;
+    int bound = sizeof(size_t) * 8;
+
+    for(i = 0; i < bound; i++){
+        if(val1 == val2){
+                return ~(size_t)0 << i;
+        }
+        val1 >>= 1;
+        val2 >>= 1;
+    }
+
+    internal_exception(INTERP_ERROR,
+                       "Unexpected condition in find_common_prefix()!\n");
+    return 0;
+}
+
 PMC*
 trace_system_stack(struct Parrot_Interp *interpreter, PMC *last)
 {
     size_t lo_var_ptr = (size_t)interpreter->lo_var_ptr;
     size_t hi_var_ptr = (size_t)&lo_var_ptr;
+    size_t prefix;
     ptrdiff_t cur_var_ptr;
 
     size_t buffer_min = get_min_buffer_address(interpreter);
     size_t buffer_max = get_max_buffer_address(interpreter);
     size_t pmc_min = get_min_pmc_address(interpreter);
     size_t pmc_max = get_max_pmc_address(interpreter);
+
+    size_t mask = find_common_mask(buffer_min < pmc_min ? buffer_min: pmc_min,
+                buffer_max > pmc_max ? buffer_max : pmc_max);
+
+    /* Get the expected prefix */
+    prefix = mask & buffer_min;
 
     if (!lo_var_ptr)
         return last;
@@ -349,10 +378,14 @@ trace_system_stack(struct Parrot_Interp *interpreter, PMC *last)
          cur_var_ptr = (size_t)( (ptrdiff_t)cur_var_ptr + PARROT_STACK_DIR * PARROT_PTR_ALIGNMENT )
          ) {
         size_t ptr = *(size_t *)cur_var_ptr;
-        if (pmc_min <= ptr && ptr < pmc_max && is_pmc_ptr(interpreter,(void *)ptr)) {
-            last = mark_used((PMC *)ptr, last);
-        } else if (buffer_min <= ptr && ptr < buffer_max && is_buffer_ptr(interpreter,(void *)ptr)) {
-            buffer_lives((Buffer *)ptr);
+
+        /* Do a quick approximate range check by bit-masking */
+        if((ptr & mask) == prefix){
+            if (pmc_min < ptr && ptr < pmc_max && is_pmc_ptr(interpreter,(void *)ptr)) {
+                last = mark_used((PMC *)ptr, last);
+            } else if (buffer_min < ptr && ptr < buffer_max && is_buffer_ptr(interpreter,(void *)ptr)) {
+                buffer_lives((Buffer *)ptr);
+            }
         }
     }
     return last;
