@@ -11,7 +11,7 @@
 ** $Id$
 */
 
-#include <parrot/config.h>
+#include <parrot/parrot.h>
 #include <stdio.h>
 #include <sys/time.h>
 
