@@ -133,9 +133,9 @@ a small C program.  This could take a bit...
 END
 
 buildfile("test_c");
-system("$c{cc} $c{ccflags} -o test$c{exe} test.c") and die "C compiler died!";
-(@c{qw(ivsize longsize nvsize)})=split('/', `./test$c{exe}`);
-unlink('test.c', "test$c{exe}", "test$c{o}");
+system("$c{cc} $c{ccflags} -o test_siz$c{exe} test.c") and die "C compiler died!";
+(@c{qw(ivsize longsize nvsize)})=split('/', `./test_sizes$c{exe}`);
+unlink('test.c', "test_siz$c{exe}", "test$c{o}");
 
 print <<"END";
 
