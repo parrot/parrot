@@ -1812,7 +1812,7 @@ find_fixup_iter(struct PackFile_Segment *seg, void *user_data)
 }
 
 struct PackFile_FixupEntry *
-PackFile_find_fixup_entry(Parrot_Interp interpreter, enum_fixup_t type,
+PackFile_find_fixup_entry(struct Parrot_Interp *interpreter, enum_fixup_t type,
         char * name)
 {
     /* TODO make a hash of all fixups */

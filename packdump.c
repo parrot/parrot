@@ -24,7 +24,8 @@ void PackFile_ConstTable_dump(struct Parrot_Interp *,
                                      struct PackFile_ConstTable *);
 static void PackFile_Constant_dump(struct Parrot_Interp *,
                                    struct PackFile_Constant *);
-void PackFile_Fixup_dump(Parrot_Interp , struct PackFile_FixupTable *ft);
+void PackFile_Fixup_dump(struct Parrot_Interp *,
+                         struct PackFile_FixupTable *ft);
 
 void
 PackFile_ConstTable_dump(struct Parrot_Interp *interpreter,
@@ -99,14 +100,15 @@ PackFile_Constant_dump(struct Parrot_Interp *interpreter,
         PIO_printf(interpreter, "    } ],\n");
         break;
     default:
-        PIO_printf(interpreter, "    [ 'PFC_????', type '0x%x' ],\n",
+        PIO_printf(interpreter, "    [ 'PFC_\?\?\?', type '0x%x' ],\n",
                 self->type);
         break;
     }
 }
 
 void
-PackFile_Fixup_dump(Parrot_Interp interpreter, struct PackFile_FixupTable *ft)
+PackFile_Fixup_dump(struct Parrot_Interp *interpreter, 
+                    struct PackFile_FixupTable *ft)
 {
     opcode_t i;
 
