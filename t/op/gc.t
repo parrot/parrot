@@ -17,7 +17,7 @@ DOD/GC related bugs.
 
 =cut
 
-use Parrot::Test tests => 16;
+use Parrot::Test tests => 18;
 
 output_is( <<'CODE', '1', "sweep 1" );
       interpinfo I1, 2   # How many DOD runs have we done already?
@@ -579,6 +579,140 @@ ok:
     lt I2, I3, lp3
     print "ok\n"
     end
+CODE
+ok
+OUTPUT
+
+output_is(<<'CODE', <<OUTPUT, "write barrier 3 - ref");
+    null I2
+    set I3, 10
+lp3:
+    null I0
+    set I1, 100
+    new P5, .Ref
+    new P0, .Integer
+    needs_destroy P0
+    # force partial sweep
+    # ref should now be black
+    sweep 0
+    # store white hash in ref - needs a barrier
+    new P1, .PerlHash
+    setref P5, P1
+    null P1
+    new P0, .Integer
+    needs_destroy P0
+    null P0
+    # force full sweep
+    sweep 0
+    deref P1, P5
+lp1:
+    new P0, .Integer
+    new P2, .Ref, P0
+    set P0, I0
+    set S0, I0
+    set P1[S0], P2
+    if I0, not_0
+    new P0, .Integer
+not_0:
+    new P3, .Undef
+    new P4, .Undef
+    inc I0
+    lt I0, I1, lp1
+
+    null I0
+    deref P1, P5
+    # trace 1
+lp2:
+    set S0, I0
+    set P2, P1[S0]
+    deref P2, P2
+    eq P2, I0, ok
+    print "nok\n"
+    print "I0: "
+    print I0
+    print " P2: "
+    print P2
+    print " type: "
+    typeof S0, P2
+    print S0
+    print " I2: "
+    print I2
+    print "\n"
+    exit 1
+ok:
+    inc I0
+    lt I0, I1, lp2
+    inc I2
+    lt I2, I3, lp3
+    print "ok\n"
+    end
+
+CODE
+ok
+OUTPUT
+
+output_is(<<'CODE', <<OUTPUT, "write barrier 4 - tqueue");
+    null I2
+    set I3, 100
+lp3:
+    null I0
+    set I1, 10
+    new P5, .TQueue
+    new P0, .PerlInt
+    needs_destroy P0
+    # force partial sweep
+    # P5 should now be black
+    sweep 0
+    # store white queue P1 in black P5 - needs a barrier
+    new P1, .TQueue
+    push P5, P1
+    null P1
+    new P0, .PerlInt
+    needs_destroy P0
+    # force  sweep
+    sweep 0
+    shift P1, P5
+    push P5, P1
+lp1:
+    new P0, .PerlInt
+    needs_destroy P0
+    # force  sweep
+    sweep 0
+    set P0, I0
+    new P2, .TQueue
+    push P2, P0
+    push P1, P2
+    new P3, .Undef
+    new P4, .Undef
+    inc I0
+    lt I0, I1, lp1
+
+    null I0
+    shift P1, P5
+lp2:
+    shift P2, P1
+    shift P2, P2
+    eq P2, I0, ok
+    print "nok\n"
+    print "I0: "
+    print I0
+    print " P2: "
+    print P2
+    print " type: "
+    typeof S0, P2
+    print S0
+    print " I2: "
+    print I2
+    print "\n"
+    exit 1
+ok:
+    inc I0
+    lt I0, I1, lp2
+    inc I2
+    lt I2, I3, lp3
+    print "ok\n"
+    end
+
 CODE
 ok
 OUTPUT

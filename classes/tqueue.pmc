@@ -10,7 +10,7 @@ classes/tqueue.pmc - Threadsafe Queue
 
 Threadsafe queue class for inter thread communication. If you have an
 unthreaded program then please use a PerlArray.
-     
+
      new P0, .TQueue
      push P0, some
      new P2, .ParrotThread
@@ -188,6 +188,7 @@ Adds the thread C<*item> to the end of the queue.
                     (VTABLE_IS_CONST_FLAG | VTABLE_IS_SHARED_FLAG)))
             VTABLE_share(INTERP, item);
 
+        DOD_WRITE_BARRIER(INTERP, SELF, NULL, item);
         entry->data = item;
         entry->type = QUEUE_ENTRY_TYPE_NONE;
         /* s. tsq.c:queue_push */

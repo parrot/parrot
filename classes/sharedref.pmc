@@ -95,7 +95,7 @@ pmclass SharedRef does ref need_ext is_shared extends Ref {
 
 
     void init () {
-        internal_exception(1, "SharedRef init without PMC\n");
+        SUPER();
     }
 
 /*
@@ -144,6 +144,7 @@ Initialize the shared reference with the specified properties.
 
     void init_pmc_props(PMC* init, PMC* props) {
         SUPER(init, props);
+        PObj_active_destroy_SET(SELF);
     }
 
 /*
@@ -173,6 +174,25 @@ Marks the reference as live.
         SUPER();
     }
 
+/*
+
+=item C<void set_pmc(PMC *other)>
+
+Sets the referenced PMC to C<*other>.
+
+=item C<PMC* get_pmc()>
+
+Catch dereferencing. This would unshare the refered PMC.
+
+=cut
+
+*/
+
+    void set_pmc(PMC* other) {
+        SUPER(other);
+        PObj_active_destroy_SET(SELF);
+    }
+
     PMC* get_pmc () {
         internal_exception(1, "deref not allowed");
         return NULL;
@@ -182,7 +202,8 @@ Marks the reference as live.
 
 =item C<void destroy()>
 
-Destroys the reference.
+Destroys the refered object and itself. This probably nees destroy oderdering
+or at least a detection if the refered PMC is already destroyed.
 
 =cut
 
