@@ -124,6 +124,19 @@ for(@{$ops->{OPS}}) {
 my @sorted = sort { $a->{CODE} <=> $b->{CODE} } (@{$ops->{OPS}} );
 @{$ops->{OPS}} = @sorted;
 
+# verify opcode numbers
+my $seq = 0;
+for(@{$ops->{OPS}}) {
+	my $opname = $_->full_name;
+	my $n = $ParrotOps::optable{$opname} ;
+	if ($n != $_->{CODE}) {
+		die "op number mismatch ops.num: $n core.ops: $_->{CODE}";
+	}
+	if ($seq != $_->{CODE}) {
+		die "op sequence mismatch ops.num: $seq core.ops: $_->{CODE}";
+	}
+	++$seq;
+}
 #
 # Open the output file:
 #
@@ -206,7 +219,7 @@ sub load_op_map_file {
     $file = "ops/ops.num";
   }
 
-  my ($name, $number);
+  my ($name, $number, $prev);
 
   if (!defined $ParrotOps::max_op_num) {
     $ParrotOps::max_op_num = 0;
@@ -214,6 +227,7 @@ sub load_op_map_file {
 
   local *OP;
   open OP, "< $file" or die "Can't open $file, error $!";
+  $prev = -1;
 
   while (<OP>) {
     chomp;
@@ -222,12 +236,20 @@ sub load_op_map_file {
     s/^\s*//;
     next unless $_;
     ($name, $number) = split(/\s+/, $_);
+    if ($prev + 1 != $number) {
+	    die "hole in ops.num opcode # $number";
+    }
+    if (exists $ParrotOps::optable{$name}) {
+	    die "duplicate opcode $name and $number";
+    }
+    $prev = $number;
     $ParrotOps::optable{$name} = $number;
     if ($number > $ParrotOps::max_op_num) {
       $ParrotOps::max_op_num = $number;
     }
   }
   close OP;
+  warn "last opcode in ops.num: $number\n";
   return;
 }
 
