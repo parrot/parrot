@@ -25,27 +25,24 @@
 #
 open(T, ">merged_basic.pasm") || die;
 
-$a=<<'EOF';
-
-# I5 Stack Depth?
-
-	new P20, .PerlHash     # PerlHash   # Numerics
-	new P21, .PerlHash     # Alphabetics.
-	time I24      # Seed the random number generator
-
+print T <<'EOF';
 	branch MAIN
 
-.include stackops.pasm
-.include alpha.pasm
-.include dumpstack.pasm
-.include tokenize.pasm
-.include basicvar.pasm
-.include basic.pasm
-.include instructions.pasm
-.include expr.pasm
+.include "stackops.pasm"
+.include "alpha.pasm"
+.include "dumpstack.pasm"
+.include "tokenize.pasm"
+.include "basicvar.pasm"
+.include "basic.pasm"
+.include "instructions.pasm"
+.include "expr.pasm"
 
 
 MAIN:
+	new P20, .PerlHash     # PerlHash   # Numerics
+	new P21, .PerlHash     # Alphabetics.
+	time I24  	       # Seed the random number generator
+
 	save 0  # Initialize the runtime stack!
 	save "LOAD autorun"
 	bsr RUNLINE
@@ -100,14 +97,8 @@ ENDMAINLOOPNR:
 EOF
 
 # Includes and constant substitutions
-$a=~s/^\.include (.*)/open(F,$1) and print STDERR "Including $1\n" and join('', <F>)/mge;
-$b=()=$a=~m/\n/g;
-print "  $b lines\n";
-$a=~s/\bputs\b/print/g;   # puts() breaks things.
-print T $a;
-
 close(T);
+
 unlink "basic.pbc";
 system("perl -I../../lib ../../assemble.pl -o basic.pbc merged_basic.pasm");
-
 system("../../parrot basic.pbc");
