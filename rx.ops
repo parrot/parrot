@@ -108,7 +108,7 @@ In Rx4, that regular expression would be something like:
 		rx_literal S0, I1, "b", $next
 		branch $top
 	$backtrack:
-		rx_popindex S0, I1, $advance
+		rx_popindex I1, $advance
 	$next:
 		rx_oneof S0, I1, "cd", $backtrack
 		branch $success
