@@ -874,7 +874,7 @@ list_set(Interp *interpreter, List *list, void *item, INTVAL type, INTVAL idx)
         ((STRING **)chunk->data.bufstart)[idx] = (STRING *)item;
         break;
     default:
-        internal_exception(1, "type N/Y\n");
+        internal_exception(1, "Unknown list entry type\n");
         break;
     }
 }
@@ -924,7 +924,7 @@ list_item(Interp *interpreter, List *list, int type, INTVAL idx)
         return (void *)&((STRING **)chunk->data.bufstart)[idx];
         break;
     default:
-        internal_exception(1, "type N/Y\n");
+        internal_exception(1, "Unknown list entry type\n");
         break;
     }
     return 0;
@@ -954,7 +954,7 @@ list_new(Interp *interpreter, INTVAL type)
     list = (List *)new_bufferlike_header(interpreter, sizeof(*list));
     list->item_type = type;
     switch (type) {
-    case enum_type_sized:       /* get's overridden below */
+    case enum_type_sized:       /* gets overridden below */
     case enum_type_char:
         list->item_size = sizeof(char);
         break;
@@ -977,7 +977,7 @@ list_new(Interp *interpreter, INTVAL type)
         list->item_size = sizeof(STRING *);
         break;
     default:
-        internal_exception(1, "N/Y\n");
+        internal_exception(1, "Unknown list type\n");
         break;
     }
     return list;
