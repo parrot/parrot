@@ -22,10 +22,15 @@
 Stack
 new_stack(struct Parrot_Interp *interpreter)
 {
+    int i;
     Stack stack = mem_allocate_aligned(sizeof(struct Stack_chunk_t));
     stack->used = 0;
     stack->next = stack;
     stack->prev = stack;
+#ifdef TIDY
+    for (i = 0; i < STACK_CHUNK_DEPTH; i++)
+        stack->entry[i].flags = 0;
+#endif
     return stack;
 }
 
