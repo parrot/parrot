@@ -48,8 +48,8 @@ sub runstep {
     osname      => $osname,
   );
 
+  $cpuarch                     =~ s/i[456]86/i386/i;
   my $jitarchname              =  "$cpuarch-$osname";
-  $jitarchname                 =~ s/i[456]86/i386/i;
   $jitarchname                 =~ s/-(net|free|open)bsd$/-bsd/i;
   my $jitcapable               =  0;
 
