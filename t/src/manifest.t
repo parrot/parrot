@@ -20,7 +20,7 @@ SKIP: {
   skip ('No CVS version', 1) unless -e 'CVS';
 
   local @cvs_entries;
-  find { wanted => \&scan_cvs }, '.';
+  find(\&scan_cvs, '.');
 
   @cvs_entries = grep { s,^./,, && !m/$ignore_re/ } @cvs_entries;
 
