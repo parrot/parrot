@@ -6,9 +6,18 @@ use Parrot::Configure::Step ':auto';
 
 $description="Determining your minimum pointer alignment...";
 
-@args=qw();
+@args=qw(miniparrot);
 
 sub runstep {
+  my ($miniparrot) = @_;
+
+  if ($miniparrot) {
+     # we can't guarantee anything about pointer alignment under ANSI C89.
+     # so we will have to check every byte.
+     Configure::Data->set(ptr_alignment => 1);
+     return;
+  }
+
   return if (defined(Configure::Data->get('ptr_alignment')));
   cc_gen('config/auto/alignptrs/test_c.in');
   cc_build();
