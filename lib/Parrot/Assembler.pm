@@ -1104,7 +1104,7 @@ sub handle_arguments {
           $args[$_] = 0xffffffff;
         }
         else {                    
-          $args[$_] = constantize_integer( ($local_label{$args[$_]}-$op_pc)/sizeof('op') );
+          $args[$_] = constantize_integer( ($label{$args[$_]}-$op_pc)/sizeof('op') );
         }
       }
     }
