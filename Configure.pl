@@ -395,15 +395,34 @@ END
 
 foreach ('intvalsize', 'opcode_t_size') {
     my $which = $_ eq 'intvalsize' ? 'packtype_i' : 'packtype_op';
+    my $format;
     if (($] >= 5.006) && ($c{$_} == $c{longsize}) ) {
-        $c{$which} = 'l!';
+        $format = 'l!';
     }
     elsif ($c{$_} == 4) {
-        $c{$which} = 'l';
+        $format = 'l';
     }
-    else {
-        die "Configure.pl:  Unable to find a suitable packtype for $_.\n";
+    elsif ($c{$_} == 8 and $Config{quadtype}) {
+         # pp_pack is annoying, and this won't work unless sizeof(UV) >= 8
+        $format = 'q';
     }
+    die "Configure.pl:  Unable to find a suitable packtype for $_.\n"
+        unless $format;
+
+    my $test = eval {pack $format, 0};
+    unless (defined $test) {
+        die <<"AARGH"
+Configure.pl:  Unable to find a functional packtype for $_.
+               '$format' failed: $@
+AARGH
+    }
+    unless (length $test == $c{$_}) {
+        die sprintf <<"AARGH", $c{$_}, length $test;
+Configure.pl:  Unable to find a functional packtype for $_.
+               Need a format for %d bytes, but '$format' gave %d bytes.
+AARGH
+    }
+    $c{$which} = $format;
 }
 
 $c{packtype_n} = 'd';
