@@ -668,7 +668,7 @@ output_is($code, <<'OUT', "overflow pmcs 18 spill");
 all params ok
 OUT
 
-my $code = repeat($template2, 22,
+$code = repeat($template2, 22,
                LOCALS => ".local PerlInt a<index>\n\ta<index> = new PerlInt",
                INITS => 'a<index> = <index>',
                ARGS => 'a<index>',
