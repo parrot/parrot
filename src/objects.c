@@ -302,7 +302,8 @@ Parrot_single_subclass(Parrot_Interp interpreter, PMC *base_class,
     temp_pmc = pmc_new(interpreter, enum_class_Array);
     set_attrib_num(child_class_array, PCD_CLASS_ATTRIBUTES, temp_pmc);
 
-    Parrot_class_register(interpreter, child_class_name, child_class);
+    Parrot_class_register(interpreter, child_class_name, child_class,
+            base_class);
 
     rebuild_attrib_stuff(interpreter, child_class);
 
@@ -355,7 +356,7 @@ Parrot_new_class(Parrot_Interp interpreter, PMC *class, STRING *class_name)
     VTABLE_set_string_native(interpreter, classname_pmc, class_name);
     set_attrib_num(class_array, PCD_CLASS_NAME, classname_pmc);
 
-    Parrot_class_register(interpreter, class_name, class);
+    Parrot_class_register(interpreter, class_name, class, NULL);
 
     rebuild_attrib_stuff(interpreter, class);
 }
@@ -408,10 +409,10 @@ you can create a new C<foo> in PASM like this: C<new Px, foo>.
 
 INTVAL
 Parrot_class_register(Parrot_Interp interpreter, STRING *class_name,
-        PMC *new_class)
+        PMC *new_class, PMC *parent)
 {
     INTVAL new_type;
-    VTABLE *new_vtable;
+    VTABLE *new_vtable, *parent_vtable;
     PMC *vtable_pmc;
 
     /*
@@ -423,11 +424,17 @@ Parrot_class_register(Parrot_Interp interpreter, STRING *class_name,
     }
     new_type = pmc_register(interpreter, class_name);
     /* Build a new vtable for this class
-     * The child class PMC gets a ParrotClass vtable, which is a
-     * good base to work from
+     * The child class PMC gets the vtable of its parent class or
+     * a ParrotClass vtable
+     *
      * XXX we are leaking this vtable
      */
-    new_vtable = Parrot_clone_vtable(interpreter, new_class->vtable);
+    parent_vtable = new_class->vtable;
+    if (parent && PObj_is_class_TEST(parent))
+        parent_vtable = parent->vtable;
+    else
+        parent_vtable = new_class->vtable;
+    new_vtable = Parrot_clone_vtable(interpreter, parent_vtable);
 
     /* Set the vtable's type to the newly allocated type */
     Parrot_vtable_set_type(interpreter, new_vtable, new_type);
@@ -445,10 +452,18 @@ Parrot_class_register(Parrot_Interp interpreter, STRING *class_name,
     Parrot_base_vtables[new_type] = new_vtable;
 
     /*
-     * prepare object vtable
+     * prepare object vtable - again that of the parent or
+     * a ParrotObject vtable
      */
-    new_vtable = Parrot_clone_vtable(interpreter,
-            Parrot_base_vtables[enum_class_ParrotObject]);
+    if (parent && PObj_is_class_TEST(parent)) {
+        vtable_pmc =
+            get_attrib_num((SLOTTYPE*)PMC_data(parent), PCD_OBJECT_VTABLE);
+        parent_vtable = PMC_struct_val(vtable_pmc);
+    }
+    else
+        parent_vtable = Parrot_base_vtables[enum_class_ParrotObject];
+
+    new_vtable = Parrot_clone_vtable(interpreter, parent_vtable);
     new_vtable->base_type = new_type;
     set_attrib_num((SLOTTYPE*)PMC_data(new_class), PCD_OBJECT_VTABLE,
             vtable_pmc = constant_pmc_new(interpreter, enum_class_VtableCache));

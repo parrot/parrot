@@ -70,10 +70,8 @@ trace_pmc_dump(Interp *interpreter, PMC* pmc)
                         PMC_struct_val(pmc));
             }
             else if (PObj_is_object_TEST(pmc)) {
-                /* don't call name, which calls delegate's __name
-                 * and changes the trace - or fails
-                 */
-                PIO_eprintf(interpreter, "Object=PMC(%#p)", pmc);
+                PIO_eprintf(interpreter, "Object(%Ss)=PMC(%#p)",
+                        VTABLE_name(interpreter, pmc), pmc);
             }
             else {
                 PIO_eprintf(interpreter, "%S=PMC(%#p)",
