@@ -21,6 +21,15 @@ pmclass default noinit {
      return NULL;
    }
 
+   /* The end of used parameter is passed into the mark_used function of
+    * the garbage collector.
+    */
+   void mark (PMC *end_of_used_list) {
+   }
+
+   void collect () {
+   }
+
    void init (INTVAL size) {
    }
 

@@ -348,9 +348,9 @@ mark_buffers_unused(struct Parrot_Interp *interpreter)
     }
 }
 
-static PMC *
-mark_used(PMC *used_pmc, PMC *current_end_of_list)
-{
+PMC *
+mark_used(struct Parrot_Interp *interpreter, PMC *used_pmc, PMC *current_end_of_list) {
+
     /* If the PMC we've been handed has already been marked as live
      * (ie we put it on the list already) we just return. Otherwise we
      * could get in some nasty loops */
@@ -358,11 +358,17 @@ mark_used(PMC *used_pmc, PMC *current_end_of_list)
         return current_end_of_list;
     }
 
-    /* First, mark the PMC itself as used */
-    used_pmc->flags |= PMC_live_FLAG;
-
-    /* Now put it on the end of the list */
+    /* Put it on the end of the list */
     current_end_of_list->next_for_GC = used_pmc;
+
+    /* If there's a custom mark routine, call it. */
+    if (used_pmc->flags & PMC_custom_mark_FLAG) {
+        used_pmc->vtable->mark(interpreter, used_pmc, current_end_of_list);
+        return used_pmc;
+    }
+        
+    /* OK, mark the PMC itself as used */
+    used_pmc->flags |= PMC_live_FLAG;
 
     /* return the PMC we were passed as the new end of the list */
     return used_pmc;
@@ -381,7 +387,7 @@ trace_active_PMCs(struct Parrot_Interp *interpreter)
      * place */
     last = current = interpreter->perl_stash->stash_hash;;
     /* mark it as used and get an updated end of list */
-    last = mark_used(current, last);
+    last = mark_used(interpreter, current, last);
 
     /* Wipe out the next for gc bit, otherwise we'll never get anywhere */
     last->next_for_GC = NULL;
@@ -390,7 +396,7 @@ trace_active_PMCs(struct Parrot_Interp *interpreter)
     /* First mark the current set. */
     for (i = 0; i < NUM_REGISTERS; i++) {
         if (interpreter->pmc_reg.registers[i]) {
-            last = mark_used(interpreter->pmc_reg.registers[i], last);
+            last = mark_used(interpreter, interpreter->pmc_reg.registers[i], last);
         }
     }
 
@@ -398,9 +404,9 @@ trace_active_PMCs(struct Parrot_Interp *interpreter)
     for (cur_chunk = interpreter->pmc_reg_top; cur_chunk;
          cur_chunk = cur_chunk->prev) {
         for (j = 0; j < cur_chunk->used; j++) {
-            for (i = 0; i < NUM_REGISTERS; i++) {
-                if (cur_chunk->PReg[j].registers[i]) {
-                    last = mark_used(cur_chunk->PReg[j].registers[i], last);
+            for (i=0; i < NUM_REGISTERS; i++) {
+                if(cur_chunk->PReg[j].registers[i]) {
+                    last = mark_used(interpreter, cur_chunk->PReg[j].registers[i], last);
                 }
             }
         }
@@ -413,7 +419,7 @@ trace_active_PMCs(struct Parrot_Interp *interpreter)
     while (cur_stack && ((start_stack != cur_stack) || (chunks_traced == 0))) {
         for (i = 0; i < STACK_CHUNK_DEPTH; i++) {
             if (STACK_ENTRY_PMC == cur_stack->entry[i].flags) {
-                last = mark_used(cur_stack->entry[i].entry.pmc_val, last);
+                last = mark_used(interpreter, cur_stack->entry[i].entry.pmc_val, last);
             }
         }
 
@@ -428,12 +434,18 @@ trace_active_PMCs(struct Parrot_Interp *interpreter)
         UINTVAL mask = PMC_is_PMC_ptr_FLAG | PMC_is_buffer_ptr_FLAG;
         UINTVAL bits = current->flags & mask;
 
+        /* Private mark? If so, do it and bail*/
+        if (current->flags & PMC_custom_mark_FLAG) {
+            mark_used(interpreter, current->data, last);
+            continue;
+        }
+
         /* Start by checking if there's anything at all. This assumes
          * that the largest percentage of PMCs won't have anything in
          * their data pointer that we need to trace */
         if (bits) {
             if (bits == PMC_is_PMC_ptr_FLAG) {
-                last = mark_used(current->data, last);
+                last = mark_used(interpreter, current->data, last);
             }
             else {
                 if (bits == PMC_is_buffer_ptr_FLAG) {
@@ -445,7 +457,7 @@ trace_active_PMCs(struct Parrot_Interp *interpreter)
                     PMC **cur_pmc = trace_buf->bufstart;
                     for (i = 0; i < trace_buf->buflen; i++) {
                         if (cur_pmc[i]) {
-                            last = mark_used(cur_pmc[i], last);
+                            last = mark_used(interpreter, cur_pmc[i], last);
                         }
                     }
                 }

@@ -26,6 +26,8 @@ void free_buffer(Buffer *);
 void *new_bigint_header(struct Parrot_Interp *);
 void free_bigint(void);
 
+PMC *mark_used(struct Parrot_Interp *, PMC *, PMC *);
+
 void *new_bignum_header(struct Parrot_Interp *);
 void free_bignum(void);
 
