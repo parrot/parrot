@@ -187,7 +187,7 @@ ret
     set I2, 1
     dec I0
     set P1, I0
-    goto __setup_arg_end
+    branch __setup_arg_end
 __setup_arg:
     set S0, P0[I2]
     set P1[I1], S0
