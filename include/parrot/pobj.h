@@ -187,14 +187,19 @@ struct PMC_EXT {
 
 typedef struct PMC_EXT PMC_EXT;
 
+#ifdef NDEBUG
+#  define PMC_ext_checked(pmc)             (pmc)->pmc_ext
+#else
+#  define PMC_ext_checked(pmc)             (assert((pmc)->pmc_ext), (pmc)->pmc_ext)
+#endif /* NDEBUG */
 #if PMC_DATA_IN_EXT
-#  define PMC_data(pmc)       (pmc)->pmc_ext->data
+#  define PMC_data(pmc)       PMC_ext_checked(pmc)->data
 #else
 #  define PMC_data(pmc)       (pmc)->data
 #endif /* PMC_DATA_IN_EXT */
-#define PMC_metadata(pmc)     (pmc)->pmc_ext->_metadata
-#define PMC_next_for_GC(pmc)  (pmc)->pmc_ext->_next_for_GC
-#define PMC_sync(pmc)         (pmc)->pmc_ext->_synchronize
+#define PMC_metadata(pmc)     PMC_ext_checked(pmc)->_metadata
+#define PMC_next_for_GC(pmc)  PMC_ext_checked(pmc)->_next_for_GC
+#define PMC_sync(pmc)         PMC_ext_checked(pmc)->_synchronize
 #define PMC_union(pmc)        (pmc)->obj.u
 
 /* macro for accessing union data */
