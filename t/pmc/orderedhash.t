@@ -16,7 +16,7 @@ Tests the C<OrderedHash> PMC.
 
 =cut
 
-use Parrot::Test tests => 19;
+use Parrot::Test tests => 22;
 use Test::More;
 
 output_is(<<'CODE', <<OUT, "init");
@@ -198,10 +198,17 @@ output_is(<<'CODE', <<OUT, "exists_keyed");
     print I0
     exists I0, P0[1]
     print I0
+    new P1, .Key
+    set P1, 0
+    exists I0, P0[P1]
+    print I0
+    set P1, 1
+    exists I0, P0[P1]
+    print I0
     print "\n"
     end
 CODE
-1100
+110010
 OUT
 
 output_is(<<'CODE', <<OUT, "defined_keyed");
@@ -216,16 +223,30 @@ output_is(<<'CODE', <<OUT, "defined_keyed");
     print I0
     defined I0, P0[1]
     print I0
+    new P2, .Key
+    set P2, 0
+    defined I0, P0[P2]
+    print I0
+    set P2, 1
+    defined I0, P0[P2]
+    print I0
 
     set P1, 0
     defined I0, P0["key"]
     print I0
     defined I0, P0[0]
     print I0
+    new P3, .Key
+    set P3, 0
+    defined I0, P0[P3]
+    print I0
+    set P3, 1
+    defined I0, P0[P3]
+    print I0
     print "\n"
     end
 CODE
-000011
+0000001110
 OUT
 
 output_is(<<'CODE', <<OUT, "delete");
@@ -268,6 +289,34 @@ ok 1
 ok 3
 ok 3
 OUT
+
+SKIP: {
+    skip("Awaiting resolution of RT ticket 33641", 1);
+output_is(<<'CODE', <<'OUTPUT', "delete with int keys");
+    new P0, .OrderedHash
+    set P0["abc"], "Foo"
+    set P0["def"], 12.6
+    set P0["ghi"], 5
+    new P1, .Key
+    set P1, 1
+    delete P0[P1]
+    exists I0, P0["abc"]
+    print I0
+    exists I0, P0["def"]
+    print I0
+    exists I0, P0["ghi"]
+    print I0
+    exists I0, P0[0]
+    print I0
+    exists I0, P0[1]
+    print I0
+    exists I0, P0[2]
+    print I0
+    end
+CODE
+101110
+OUTPUT
+}
 
 output_like(<<'CODE', '/[axj]/', "iterate over keys");
     .include "iterator.pasm"
@@ -533,3 +582,56 @@ CODE
 0
 OUTPUT
 
+output_is(<<'CODE', <<'OUTPUT', "get_integer_keyed");
+    new P0, .OrderedHash
+    set P0["Foo"], 10
+    set P0["Bar"], 20
+    set I0, P0["Bar"]
+    print I0
+    print "\n"
+    set I1, P0["Foo"]
+    print I1
+    print "\n"
+    set I2, P0[0]
+    print I2
+    print "\n"
+    set I3, P0[1]
+    print I3
+    print "\n"
+    end
+CODE
+20
+10
+10
+20
+OUTPUT
+
+output_is(<<'CODE', <<'OUTPUT', "get_number_keyed");
+     new P0, .OrderedHash
+     set N0, 12.3
+     set N1, 45.1
+     set P0["Foo"], N0
+     set P0["ooF"], N1
+     set N2, P0["ooF"]
+     eq N1, N2, OK1
+     print "not "
+OK1: print "ok 1\n"
+     set N3, P0["Foo"]
+     eq N0, N3, OK2
+     print "not "
+OK2: print "ok 2\n"
+     set N4, P0[0]
+     eq N4, N0, OK3
+     print "not "
+OK3: print "ok 3\n"
+     set N5, P0[1]
+     eq N5, N1, OK4
+     print "not "
+OK4: print "ok 4\n"
+     end
+CODE
+ok 1
+ok 2
+ok 3
+ok 4
+OUTPUT
