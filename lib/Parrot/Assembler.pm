@@ -98,6 +98,8 @@ be called by the driver routine. Use would be something like:
 ###############################################################################
 ###############################################################################
 
+my $seen_end;
+
 my $pf; # The Parrot::PackFile object
 
 %options = get_options();  # command line options
@@ -525,6 +527,8 @@ Ensures the file is in binmode.
 sub output_bytecode {
   $pf->byte_code($bytecode);
 
+  warn "Warning: No 'end' opcode detected.\n" unless $seen_end;
+
   my $output = $pf->pack;
 
   if( defined $options{'output'} and $options{'output'} ne "" ) {
@@ -926,6 +930,8 @@ sub find_correct_opcode {
   my $match_level_2;
   my ($old_op) = $opcode;
   my @tests;
+
+  $seen_end=1 if $opcode eq 'end';
 
   $opcode=lc($opcode);
 
