@@ -59,7 +59,7 @@ This function returns the quoted string.
     .local int j
     .local int c
     .local string tmp
-    
+
     i = 0
     j = length str
     null ret
@@ -67,10 +67,15 @@ LOOP:
     if i >= j goto END
     tmp = str[i]
     ord c, tmp
-    
+
     if c > 40 goto gt40
     if c > 30 goto gt30
-    
+
+    if c > 0 goto n00
+    set tmp, "\\0"
+    branch DONE
+n00:
+
     # \t
     if c != 9 goto n09
     set tmp, "\\t"
@@ -106,7 +111,7 @@ n34:
 n39:
 
 gt40: # ascii codes greater than 40 below
-    
+
 DONE:
     concat ret, tmp
     inc i
