@@ -406,7 +406,7 @@ sub add_globalvar($;$) {
 
 sub localvar($) {
     my $var = shift;
-    
+
     die "Local variable outside function" unless defined $curfunc;
     return $funcs{$curfunc}->localvar($var);
 }
@@ -525,7 +525,7 @@ my $lasttmp = 0;
 my $lastlabel = 0;
 sub gensym(;*) {
     'S'.$_[0] . ++$lastsym
-} 
+}
 
 sub _gentmp(*) {		# uninitialized temporary (internal)
     '$' . $_[0] . ++$lasttmp
@@ -541,8 +541,9 @@ sub gentmp(;*) {			# uninitialized temporary
 }
 
 sub genlabel(;$) {		# new label (optionally annotated)
-    no warnings 'uninitialized';
-    'L_'.$_[0]. ++$lastlabel
+    my $n = shift;
+    $n = '' unless defined $n;
+    'L_'.$n. ++$lastlabel
 }
 
 sub newtmp(;*) {			# initialized temporary
@@ -728,7 +729,8 @@ sub add_localvar {
 sub label {
     my $x = shift;
     my %o = @_;
-    no warnings 'uninitialized';
+    $o{name} = '' unless defined $o{name};
+    $o{type} = '' unless defined $o{type};
     my $mangled = "label:$o{name}:$o{type}";
     return $x->_find($mangled);
 }
@@ -848,7 +850,7 @@ use P6C::Util ':all';
 sub val {
     my $x = shift;
     my $ctx = $x->{ctx};
-    
+
     if ($ctx->flatten) {
 	# XXX: flatten has to come first.
 	# In flattening context, we have to build a new array out of
@@ -966,8 +968,8 @@ BEGIN {
 
 use vars '%op_is_array';
 BEGIN {
-    no warnings 'qw';
-    my @arrayops = qw(= .. x , // ~~ && ||);
+    my @arrayops = qw(= .. x // ~~ && ||);
+    push(@arrayops, ',');
     @op_is_array{@arrayops} = (1) x @arrayops;
 }
 
@@ -984,7 +986,7 @@ sub val {
     } elsif($op =~ /^([^=]+)=$/ && $ops{$1}) {
 	# XXX:
 	die "Internal error -- assignment op `$op' snuck into IMCC.pm";
-	
+
 	# Translate assignment operation into a binary operation.
 	# XXX: Context propagation is broken for these, so we won't
 	# ever do this.
@@ -1064,7 +1066,7 @@ END
 	$ret = $tmp $op
 END
 	    # Complex expression => can't just do increment.
-	    my $desttype = $x->thing->can('type') ? 
+	    my $desttype = $x->thing->can('type') ?
 		$x->thing->type : 'PerlUndef';
 	    $x->thing->assign(new P6C::Register reg => $ret,
 			      type => $desttype);

@@ -60,7 +60,6 @@ BEGIN {
 use strict;
 
 sub _info {
-    no warnings 'uninitialized';
     my $type = shift;
     my ($pack, $fn, $line, $subr) = caller 2;
     $subr =~ s/^P6C:://;
@@ -133,7 +132,7 @@ sub map_postorder(&@) {
 
 sub _map_tree {
     my ($code, $pre) = @_;
-    
+
     &$code if $pre;
 
     my $class = ref $_;
@@ -144,7 +143,7 @@ sub _map_tree {
 		for (@$v) {
 		    _map_tree($code) if UNIVERSAL::isa($_, 'HASH');
 		}
-	    } elsif (UNIVERSAL::isa($v, 'HASH')) {
+	    } elsif ($v && UNIVERSAL::isa($v, 'HASH')) {
 		local $_ = $v;
 		_map_tree($code);
 	    }
