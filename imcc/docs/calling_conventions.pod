@@ -134,6 +134,13 @@ Parrot provides an B<invoke P1> as last instruction automatically.
 
 =back
 
+=head2 Getting the Parameter Count
+
+The reserved words C<argcI>, C<argcS>, C<argcP>, and C<argcN> hold the
+count of passed parameters (or return values) according to
+F<docs/pdds/pdd03_calling_conventions.pod>. The variable
+C<is_prototyped> is an alias for C<I0>.
+
 =head2 Calling Methods
 
 The syntax is very similar to subroutine calls. The call is done with
@@ -293,7 +300,7 @@ branch from the B<ret> statement back is ignored in the CFG.
 =head1 FILES
 
 F<imcc/imcc.y>, F<imcc/t/syn/bsr.t>, F<imcc/t/syn/pcc.t>,
-F<imcc/t/syn/objects.t>
+F<imcc/t/syn/objects.t>, F<docs/pdds/pdd03_calling_conventions.pod>
 
 =head1 AUTHOR
 

@@ -1,6 +1,6 @@
 #!perl
 use strict;
-use TestCompiler tests => 35;
+use TestCompiler tests => 36;
 
 ##############################
 # Parrot Calling Conventions
@@ -1346,5 +1346,51 @@ CODE
 P3 is not NULL
 2
 11
+OUT
+
+output_is(<<'CODE', <<'OUT', "argcX identifiers");
+.sub _main
+    .local int i
+    .local int j
+    .local float f
+    .local string s
+    .local string t
+    .local string u
+    .local pmc p
+    .local pmc q
+    _func(i,j,f,s,t,u,p,q)
+    print "proto "
+    print is_prototyped
+    print "\n"
+    print "P "
+    print argcP
+    print "\n"
+    end
+.end
+.sub _func
+    print "proto "
+    print is_prototyped
+    print "\n"
+    print "I "
+    print argcI
+    print "\n"
+    print "S "
+    print argcS
+    print "\n"
+    print "P "
+    print argcP
+    print "\n"
+    print "N "
+    print argcN
+    print "\n"
+.end
+CODE
+proto 1
+I 2
+S 3
+P 2
+N 1
+proto 0
+P 0
 OUT
 

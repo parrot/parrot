@@ -380,13 +380,34 @@ SP              [ ]
 		    return VAR;
 		}
                 if (cur_unit && cur_unit->instructions &&
-                        !strcmp(yytext, "self") &&
-                        (r = cur_unit->instructions->r[1])) {
-                    if (r->pcc_sub && r->pcc_sub->pragma & P_METHOD)
+                        (r = cur_unit->instructions->r[1]) &&
+                        r->pcc_sub) {
+                    if ((r->pcc_sub->pragma & P_METHOD) &&
+                        !strcmp(yytext, "self")) {
                         valp->s = str_dup("P2");
                         return REG;
+                    }
+                    if (!strcmp(yytext, "argcI")) {
+                        valp->s = str_dup("I1");
+                        return REG;
+                    }
+                    if (!strcmp(yytext, "argcS")) {
+                        valp->s = str_dup("I2");
+                        return REG;
+                    }
+                    if (!strcmp(yytext, "argcP")) {
+                        valp->s = str_dup("I3");
+                        return REG;
+                    }
+                    if (!strcmp(yytext, "argcN")) {
+                        valp->s = str_dup("I4");
+                        return REG;
+                    }
+                    if (!strcmp(yytext, "is_prototyped")) {
+                        valp->s = str_dup("I0");
+                        return REG;
+                    }
                 }
-
 	}
         valp->s = str_dup(yytext);
         return(!is_def && is_op(interp, valp->s) ? PARROT_OP : IDENTIFIER);
