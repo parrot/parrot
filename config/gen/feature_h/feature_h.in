@@ -1,0 +1,20 @@
+/*
+ * feature.h - arch specific defines resulting from some tests
+ */
+
+
+#if !defined(PARROT_FEATRUE_H_GUARD)
+#define PARROT_FEATRUE_H_GUARD
+
+#perl - all below here gets evaled by perl, OUT is the filehandle
+
+
+if (${jit_i386} && ${jit_i386} eq 'fcomip') {
+	print OUT "#ifdef I386\n";
+	print OUT "#  define HAS_JIT_FCOMIP\n";
+	print OUT "#endif\n";
+}
+
+
+#endif guard
+print OUT "\n\n#endif\n"

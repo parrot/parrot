@@ -63,7 +63,7 @@ sub runstep {
 
   if (-e "jit/$cpuarch/core.jit") {
     $jitcapable = 1;
-    if ($cpuarch =~ /sun4|sparc64/ && 
+    if ($cpuarch =~ /sun4|sparc64/ &&
 	Configure::Data->get('intvalsize') > Configure::Data->get('ptrsize')) {
 	    $jitcapable = 0;
 	}
@@ -83,6 +83,17 @@ sub runstep {
       jit_h       => '$(INC)/jit.h',
       jit_o       => 'jit$(O) jit_cpu$(O)'
     );
+
+    # test for some instructions
+    if ($jitcpuarch eq 'i386') {
+      cc_gen('config/auto/jit/test_c.in');
+      eval { cc_build(); };
+      unless ($@ || cc_run() !~ /ok/) {
+	Configure::Data->set(
+	  jit_i386 => 'fcomip'
+	);
+      }
+    }
   }
   else {
     Configure::Data->set(

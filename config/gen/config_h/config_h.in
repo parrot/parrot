@@ -112,6 +112,7 @@ typedef SYNC     Sync;
 #define FLOATVAL_FMT "${floatvalfmt}"
 
 #include "parrot/has_header.h"
+#include "parrot/feature.h"
 
 #endif
 

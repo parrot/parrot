@@ -28,6 +28,7 @@ use vars qw(@steps);
 	auto/cgoto.pl
 	auto/gc.pl
 	gen/config_h.pl
+	gen/feature_h.pl
 	gen/config_pm.pl
 	gen/makefiles.pl
 	gen/myconfig.pl

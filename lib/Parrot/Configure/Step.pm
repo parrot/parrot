@@ -17,7 +17,7 @@ use vars qw(@ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
 	auto  => [qw(cc_gen cc_build cc_run cc_clean cc_run_capture)],
 	gen   => [qw(genfile copy_if_diff)]
 );
-	
+
 my $redir_err = (($ENV{COMSPEC} || "")=~ /command\.com/i) ? "" : "2>&1";
 
 #Configure::Data->get('key')
@@ -31,7 +31,7 @@ sub prompt {
 	print("$message [$value] ");
 
 	chomp(my $input=<STDIN>);
-	
+
 	while($input =~ s/:add\{([^}]+)\}//) {
 		$value .= $1;
 	}
@@ -39,11 +39,11 @@ sub prompt {
 	while($input =~ s/:rem\{([^}]+)\}//) {
 		$value =~ s/\Q$1\E//;
 	}
-	
+
 	if($input) {
 		$value =  $input;
 	}
-	
+
 	return $value;
 }
 
@@ -78,8 +78,10 @@ sub copy_if_diff {
 
 sub genfile {
 	my($source, $target, %options)=@_;
-	
+
 	open IN , "< $source" or die "Can't open $source: $!";
+	# don't change the name of the outfile handle
+	# feature.pl / feature_h.in need OUT
 	open OUT, "> $target.tmp" or die "Can't open $target.tmp: $!";
 
         if ($options{commentType}) {
@@ -99,6 +101,17 @@ sub genfile {
         }
 
 	while(<IN>) {
+		if (/^#perl/ && $options{feature_file}) {
+			local $/ = undef;
+			$_ = <IN>;
+			s{
+			    \$\{(\w+)\}
+			}{Configure::Data->get("$1")}gx;
+			eval;
+			die $@ if $@;
+			last;
+
+		}
 		s{
                     \$\{(\w+)\}
                 }{Configure::Data->get($1)}egx;
@@ -113,16 +126,16 @@ sub genfile {
 
 sub cc_gen {
 	my($source)=@_;
-	
+
 	genfile($source, "test.c");
 }
 
 sub cc_build {
 	my($cc, $ccflags, $ldout, $o, $link, $linkflags, $cc_exe_out, $exe, $libs)=
 		Configure::Data->get( qw(cc ccflags ld_out o link linkflags cc_exe_out exe libs) );
-	
+
 	system("$cc $ccflags -I./include -c test.c >test.cco $redir_err") and die "C compiler failed (see test.cco)";
-	
+
 	system("$link $linkflags test$o ${cc_exe_out}test$exe $libs >test.ldo $redir_err") and die "Linker failed (see test.ldo)";
 }
 

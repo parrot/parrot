@@ -60,6 +60,7 @@ config/auto/gcc/test_c.in
 config/auto/headers.pl
 config/auto/headers/test_c.in
 config/auto/jit.pl
+config/auto/jit/test_c.in
 config/auto/pack.pl
 config/auto/sizes.pl
 config/auto/sizes/test_c.in
@@ -67,6 +68,8 @@ config/gen/config_h.pl
 config/gen/config_h/config_h.in
 config/gen/config_pm.pl
 config/gen/config_pm/Config_pm.in
+config/gen/feature_h.pl
+config/gen/feature_h/feature_h.in
 config/gen/core_pmcs.pl
 config/gen/libparrot_def.pl
 config/gen/libparrot_def/libparrot_def.in
