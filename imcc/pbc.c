@@ -758,7 +758,15 @@ add_1_const(Interp *interpreter, SymReg *r)
             else if (r->name[0] == '0' && r->name[1] == 'b')
                 r->color = strtoul(r->name+2, 0, 2);
             else
-                r->color = atol(r->name);
+                r->color = strtol(r->name, 0, 10);
+            /*
+             * TODO
+             * - is this portable?
+             * - reset errnor first?
+             * - there are some more atol()s in this file
+             */
+            if (errno == ERANGE)
+                fatal(1, "add_1_const", "Integer overflow '%s'", r->name);
             break;
         case 'S':
             r->color = add_const_str(interpreter, r);

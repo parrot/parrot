@@ -54,7 +54,7 @@ END
   while(<IN>) {      
     if(/<<HERE>>/) {
       my $k;
-      for $k(Configure::Data->keys) {
+      for $k(sort { lc $a cmp lc $b || $a cmp $b } Configure::Data->keys) {
 	my $v=Configure::Data->get($k);
 	if(defined $v) {
           $v =~ s/(["\\])/\\$1/g;
