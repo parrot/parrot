@@ -13,7 +13,7 @@
 #include <stdlib.h>
 #include <assert.h>
 
-#include <parrot/parrot.h>
+#include "../imcc/imc.h"
 #include "ast.h"
 #include "astparser.h"
 
@@ -47,29 +47,37 @@ extern struct nodeType_t *top_node;
 }
 
 %token <s> STRINGC INTC FLOATC USTRINGC NAME
-%token <t> IDENTIFIER
+%token <t> IDENTIFIER MODULE FUNCTION
 
-%type <n> program nodes node const var
+%type <n> program nodes nodes0 node const var
 %type <t> type
 
 %pure_parser
 
 %start program
-%expect 2
 
 %%
 
 program: nodes          { top_node = $$; }
      | error { pr_error(@1, "Bug"); YYABORT; }
      ;
+
+nodes0: nodes
+     | /* empty */	{ $$ = 0; }
+     ;
+
 nodes: node
      | nodes node       { $$ = IMCC_append_node(interp, $1, $2, &@1); }
      | const
      | var
-     | /* empty */	{ $$ = 0; }
      ;
 
-node: IDENTIFIER '(' nodes ')'   { $$ = IMCC_new_node(interp, $1, $3, &@1); }
+node: IDENTIFIER '(' nodes0 ')'   { $$ = IMCC_new_node(interp, $1, $3, &@1); }
+    | FUNCTION          { cur_unit = imc_open_unit(interp, IMC_PCCSUB); }
+                 '(' nodes ')'  { $$ = IMCC_new_node(interp, $1, $4, &@1);
+		                  cur_unit = cur_unit->prev; }
+    | MODULE            { cur_unit = imc_open_unit(interp, IMC_PCCSUB); }
+                 '(' nodes ')'  { $$ = IMCC_new_node(interp, $1, $4, &@1); }
 	;
 
 const:

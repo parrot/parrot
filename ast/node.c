@@ -76,7 +76,7 @@ create_Op(int nr, nodeType *self, nodeType *p)
 {
     char *s;
     s = p->u.r->name;
-    p->u.r->set = 'o';  /* don't create const segmenet entries */
+    p->u.r->set = 'o';  /* don't create const segment entries */
     s[strlen(s) - 1] = '\0';
     create_1(nr, self, p);
     return self;
@@ -155,7 +155,6 @@ insert_new(Interp* interpreter, nodeType *var, const char *name)
     int type = pmc_type(interpreter, const_string(interpreter, name));
     char ireg[8];
 
-    cur_unit = interpreter->imc_info->last_unit;
     ins = cur_unit->last_ins;
     sprintf(ireg, "%d", type);
     r = mk_const(str_dup(ireg), 'I');
@@ -218,7 +217,11 @@ exp_Assign(Interp* interpreter, nodeType *p)
     ins = unit->last_ins;
     regs[0] = NODE0(var)->u.r;
     regs[1] = rhs->u.r;
-    insINS(interpreter, unit, ins, "assign", regs, 2);
+    /*
+     * TODO If lhs is aliased to another name, this changes both vars.
+     *      Assign is wrong too, as "a = b" implies "(a is b) == True"
+     */
+    insINS(interpreter, unit, ins, "set", regs, 2);
     return rhs;
 }
 
@@ -270,9 +273,8 @@ exp_Py_Module(Interp* interpreter, nodeType *p)
      * this is the main init code
      * (Py_doc, Py_local, Stmts)
      */
-    cur_unit = interpreter->imc_info->last_unit;
     if (!cur_unit)
-        cur_unit = imc_open_unit(interpreter, IMC_PCCSUB);
+        fatal(1, "exp_Py_Module", "no cur_unit");
     sub = mk_sub_address(str_dup("__main__"));
     i = INS_LABEL(cur_unit, sub, 1);
 
@@ -462,9 +464,8 @@ nodeType *
 IMCC_new_var_node(Interp* interpreter, char *name, int set, YYLTYPE *loc)
 {
     nodeType *p = new_node(loc);
-    cur_unit = interpreter->imc_info->last_unit;
     if (!cur_unit)
-        cur_unit = imc_open_unit(interpreter, IMC_PCCSUB);
+        fatal(1, "IMCC_new_var_node", "no cur_unit");
     p->u.r = mk_ident(name, set);
     p->expand = exp_Var;
     p->dump   = dump_Var;

@@ -64,7 +64,9 @@
      FLOATC = 260,
      USTRINGC = 261,
      NAME = 262,
-     IDENTIFIER = 263
+     IDENTIFIER = 263,
+     MODULE = 264,
+     FUNCTION = 265
    };
 #endif
 #define STRINGC 258
@@ -73,6 +75,8 @@
 #define USTRINGC 261
 #define NAME 262
 #define IDENTIFIER 263
+#define MODULE 264
+#define FUNCTION 265
 
 
 
@@ -94,7 +98,7 @@
 #include <stdlib.h>
 #include <assert.h>
 
-#include <parrot/parrot.h>
+#include "../imcc/imc.h"
 #include "ast.h"
 #include "astparser.h"
 
@@ -142,7 +146,7 @@ typedef union {
     struct nodeType_t *n;
 } yystype;
 /* Line 193 of /usr/share/bison/yacc.c.  */
-#line 146 "ast/astparser.c"
+#line 150 "ast/astparser.c"
 # define YYSTYPE yystype
 # define YYSTYPE_IS_TRIVIAL 1
 #endif
@@ -163,7 +167,7 @@ typedef struct yyltype
 
 
 /* Line 213 of /usr/share/bison/yacc.c.  */
-#line 167 "ast/astparser.c"
+#line 171 "ast/astparser.c"
 
 #if ! defined (yyoverflow) || YYERROR_VERBOSE
 
@@ -261,21 +265,21 @@ union yyalloc
 #endif
 
 /* YYFINAL -- State number of the termination state. */
-#define YYFINAL  15
-#define YYLAST   22
+#define YYFINAL  19
+#define YYLAST   44
 
 /* YYNTOKENS -- Number of terminals. */
-#define YYNTOKENS  12
+#define YYNTOKENS  14
 /* YYNNTS -- Number of nonterminals. */
-#define YYNNTS  7
+#define YYNNTS  10
 /* YYNRULES -- Number of rules. */
-#define YYNRULES  15
+#define YYNRULES  20
 /* YYNRULES -- Number of states. */
-#define YYNSTATES  20
+#define YYNSTATES  31
 
 /* YYTRANSLATE(YYLEX) -- Bison symbol number corresponding to YYLEX.  */
 #define YYUNDEFTOK  2
-#define YYMAXUTOK   263
+#define YYMAXUTOK   265
 
 #define YYTRANSLATE(X) \
   ((unsigned)(X) <= YYMAXUTOK ? yytranslate[X] : YYUNDEFTOK)
@@ -287,8 +291,8 @@ static const unsigned char yytranslate[] =
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
-       9,    10,     2,     2,     2,     2,     2,     2,     2,     2,
-       2,     2,     2,     2,     2,     2,     2,     2,    11,     2,
+      11,    12,     2,     2,     2,     2,     2,     2,     2,     2,
+       2,     2,     2,     2,     2,     2,     2,     2,    13,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
@@ -309,7 +313,7 @@ static const unsigned char yytranslate[] =
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     1,     2,     3,     4,
-       5,     6,     7,     8
+       5,     6,     7,     8,     9,    10
 };
 
 #if YYDEBUG
@@ -317,24 +321,28 @@ static const unsigned char yytranslate[] =
    YYRHS.  */
 static const unsigned char yyprhs[] =
 {
-       0,     0,     3,     5,     7,     9,    12,    14,    16,    17,
-      22,    24,    26,    28,    30,    33
+       0,     0,     3,     5,     7,     9,    10,    12,    15,    17,
+      19,    24,    25,    31,    32,    38,    40,    42,    44,    46,
+      49
 };
 
 /* YYRHS -- A `-1'-separated list of the rules' RHS. */
 static const yysigned_char yyrhs[] =
 {
-      13,     0,    -1,    14,    -1,     1,    -1,    15,    -1,    14,
-      15,    -1,    16,    -1,    17,    -1,    -1,     8,     9,    14,
-      10,    -1,     3,    -1,     4,    -1,     5,    -1,     6,    -1,
-      18,     7,    -1,    11,    -1
+      15,     0,    -1,    17,    -1,     1,    -1,    17,    -1,    -1,
+      18,    -1,    17,    18,    -1,    21,    -1,    22,    -1,     8,
+      11,    16,    12,    -1,    -1,    10,    19,    11,    17,    12,
+      -1,    -1,     9,    20,    11,    17,    12,    -1,     3,    -1,
+       4,    -1,     5,    -1,     6,    -1,    23,     7,    -1,    13,
+      -1
 };
 
 /* YYRLINE[YYN] -- source line where rule number YYN was defined.  */
 static const unsigned char yyrline[] =
 {
-       0,    62,    62,    63,    65,    66,    67,    68,    69,    72,
-      75,    77,    78,    79,    82,    85
+       0,    61,    61,    62,    65,    66,    69,    70,    71,    72,
+      75,    76,    76,    79,    79,    83,    85,    86,    87,    90,
+      93
 };
 #endif
 
@@ -344,8 +352,9 @@ static const unsigned char yyrline[] =
 static const char *const yytname[] =
 {
   "$end", "error", "$undefined", "STRINGC", "INTC", "FLOATC", "USTRINGC", 
-  "NAME", "IDENTIFIER", "'('", "')'", "':'", "$accept", "program", 
-  "nodes", "node", "const", "var", "type", 0
+  "NAME", "IDENTIFIER", "MODULE", "FUNCTION", "'('", "')'", "':'", 
+  "$accept", "program", "nodes0", "nodes", "node", "@1", "@2", "const", 
+  "var", "type", 0
 };
 #endif
 
@@ -354,23 +363,25 @@ static const char *const yytname[] =
    token YYLEX-NUM.  */
 static const unsigned short yytoknum[] =
 {
-       0,   256,   257,   258,   259,   260,   261,   262,   263,    40,
-      41,    58
+       0,   256,   257,   258,   259,   260,   261,   262,   263,   264,
+     265,    40,    41,    58
 };
 # endif
 
 /* YYR1[YYN] -- Symbol number of symbol that rule YYN derives.  */
 static const unsigned char yyr1[] =
 {
-       0,    12,    13,    13,    14,    14,    14,    14,    14,    15,
-      16,    16,    16,    16,    17,    18
+       0,    14,    15,    15,    16,    16,    17,    17,    17,    17,
+      18,    19,    18,    20,    18,    21,    21,    21,    21,    22,
+      23
 };
 
 /* YYR2[YYN] -- Number of symbols composing right hand side of rule YYN.  */
 static const unsigned char yyr2[] =
 {
-       0,     2,     1,     1,     1,     2,     1,     1,     0,     4,
-       1,     1,     1,     1,     2,     1
+       0,     2,     1,     1,     1,     0,     1,     2,     1,     1,
+       4,     0,     5,     0,     5,     1,     1,     1,     1,     2,
+       1
 };
 
 /* YYDEFACT[STATE-NAME] -- Default rule to reduce with in state
@@ -378,56 +389,66 @@ static const unsigned char yyr2[] =
    means the default is an error.  */
 static const unsigned char yydefact[] =
 {
-       0,     3,    10,    11,    12,    13,     0,    15,     0,     2,
-       4,     6,     7,     0,     8,     1,     5,    14,     0,     9
+       0,     3,    15,    16,    17,    18,     0,    13,    11,    20,
+       0,     2,     6,     8,     9,     0,     5,     0,     0,     1,
+       7,    19,     0,     4,     0,     0,    10,     0,     0,    14,
+      12
 };
 
 /* YYDEFGOTO[NTERM-NUM]. */
 static const yysigned_char yydefgoto[] =
 {
-      -1,     8,     9,    10,    11,    12,    13
+      -1,    10,    22,    11,    12,    18,    17,    13,    14,    15
 };
 
 /* YYPACT[STATE-NUM] -- Index in YYTABLE of the portion describing
    STATE-NUM.  */
-#define YYPACT_NINF -8
+#define YYPACT_NINF -12
 static const yysigned_char yypact[] =
 {
-       0,    -8,    -8,    -8,    -8,    -8,    -7,    -8,    10,     1,
-      -8,    -8,    -8,    15,     9,    -8,    -8,    -8,    11,    -8
+       0,   -12,   -12,   -12,   -12,   -12,    -9,   -12,   -12,   -12,
+       7,    34,   -12,   -12,   -12,     4,    15,     3,    16,   -12,
+     -12,   -12,    14,    34,    15,    15,   -12,    24,    29,   -12,
+     -12
 };
 
 /* YYPGOTO[NTERM-NUM].  */
 static const yysigned_char yypgoto[] =
 {
-      -8,    -8,     4,    -2,    -8,    -8,    -8
+     -12,   -12,   -12,     6,   -11,   -12,   -12,   -12,   -12,   -12
 };
 
 /* YYTABLE[YYPACT[STATE-NUM]].  What to do in state STATE-NUM.  If
    positive, shift that token.  If negative, reduce the rule which
    number is the opposite.  If zero, do what YYDEFACT says.
    If YYTABLE_NINF, parse error.  */
-#define YYTABLE_NINF -9
-static const yysigned_char yytable[] =
+#define YYTABLE_NINF -1
+static const unsigned char yytable[] =
 {
-      -8,     1,    14,     2,     3,     4,     5,    16,     6,     6,
-      15,     7,     2,     3,     4,     5,    16,     6,    18,     6,
-       7,    19,    17
+      20,     1,    16,     2,     3,     4,     5,    19,     6,     7,
+       8,    21,    20,     9,    24,     0,    20,    20,     2,     3,
+       4,     5,    23,     6,     7,     8,    26,    25,     9,     0,
+      27,    28,     6,     7,     8,     0,    29,     6,     7,     8,
+       0,    30,     6,     7,     8
 };
 
-static const unsigned char yycheck[] =
+static const yysigned_char yycheck[] =
 {
-       0,     1,     9,     3,     4,     5,     6,     9,     8,     8,
-       0,    11,     3,     4,     5,     6,    18,     8,    14,     8,
-      11,    10,     7
+      11,     1,    11,     3,     4,     5,     6,     0,     8,     9,
+      10,     7,    23,    13,    11,    -1,    27,    28,     3,     4,
+       5,     6,    16,     8,     9,    10,    12,    11,    13,    -1,
+      24,    25,     8,     9,    10,    -1,    12,     8,     9,    10,
+      -1,    12,     8,     9,    10
 };
 
 /* YYSTOS[STATE-NUM] -- The (internal number of the) accessing
    symbol of state STATE-NUM.  */
 static const unsigned char yystos[] =
 {
-       0,     1,     3,     4,     5,     6,     8,    11,    13,    14,
-      15,    16,    17,    18,     9,     0,    15,     7,    14,    10
+       0,     1,     3,     4,     5,     6,     8,     9,    10,    13,
+      15,    17,    18,    21,    22,    23,    11,    20,    19,     0,
+      18,     7,    16,    17,    11,    11,    12,    17,    17,    12,
+      12
 };
 
 #if ! defined (YYSIZE_T) && defined (__SIZE_TYPE__)
@@ -992,57 +1013,78 @@ yyreduce:
   switch (yyn)
     {
         case 2:
-#line 62 "ast/ast.y"
+#line 61 "ast/ast.y"
     { top_node = yyval.n; }
     break;
 
   case 3:
-#line 63 "ast/ast.y"
+#line 62 "ast/ast.y"
     { pr_error(yylsp[0], "Bug"); YYABORT; }
     break;
 
   case 5:
 #line 66 "ast/ast.y"
-    { yyval.n = IMCC_append_node(interp, yyvsp[-1].n, yyvsp[0].n, &yylsp[-1]); }
-    break;
-
-  case 8:
-#line 69 "ast/ast.y"
     { yyval.n = 0; }
     break;
 
-  case 9:
-#line 72 "ast/ast.y"
-    { yyval.n = IMCC_new_node(interp, yyvsp[-3].t, yyvsp[-1].n, &yylsp[-3]); }
+  case 7:
+#line 70 "ast/ast.y"
+    { yyval.n = IMCC_append_node(interp, yyvsp[-1].n, yyvsp[0].n, &yylsp[-1]); }
     break;
 
   case 10:
-#line 76 "ast/ast.y"
-    { yyval.n = IMCC_new_const_node(interp, yyvsp[0].s, 'S', &yylsp[0]); }
+#line 75 "ast/ast.y"
+    { yyval.n = IMCC_new_node(interp, yyvsp[-3].t, yyvsp[-1].n, &yylsp[-3]); }
     break;
 
   case 11:
-#line 77 "ast/ast.y"
-    { yyval.n = IMCC_new_const_node(interp, yyvsp[0].s, 'I', &yylsp[0]); }
+#line 76 "ast/ast.y"
+    { cur_unit = imc_open_unit(interp, IMC_PCCSUB); }
     break;
 
   case 12:
-#line 78 "ast/ast.y"
-    { yyval.n = IMCC_new_const_node(interp, yyvsp[0].s, 'N', &yylsp[0]); }
+#line 77 "ast/ast.y"
+    { yyval.n = IMCC_new_node(interp, yyvsp[-4].t, yyvsp[-1].n, &yylsp[-4]);
+		                  cur_unit = cur_unit->prev; }
     break;
 
   case 13:
 #line 79 "ast/ast.y"
-    { yyval.n = IMCC_new_const_node(interp, yyvsp[0].s, 'U', &yylsp[0]); }
+    { cur_unit = imc_open_unit(interp, IMC_PCCSUB); }
     break;
 
   case 14:
-#line 82 "ast/ast.y"
-    { yyval.n = IMCC_new_var_node(interp, yyvsp[0].s, yyvsp[-1].t, &yylsp[0]); }
+#line 80 "ast/ast.y"
+    { yyval.n = IMCC_new_node(interp, yyvsp[-4].t, yyvsp[-1].n, &yylsp[-4]); }
     break;
 
   case 15:
+#line 84 "ast/ast.y"
+    { yyval.n = IMCC_new_const_node(interp, yyvsp[0].s, 'S', &yylsp[0]); }
+    break;
+
+  case 16:
 #line 85 "ast/ast.y"
+    { yyval.n = IMCC_new_const_node(interp, yyvsp[0].s, 'I', &yylsp[0]); }
+    break;
+
+  case 17:
+#line 86 "ast/ast.y"
+    { yyval.n = IMCC_new_const_node(interp, yyvsp[0].s, 'N', &yylsp[0]); }
+    break;
+
+  case 18:
+#line 87 "ast/ast.y"
+    { yyval.n = IMCC_new_const_node(interp, yyvsp[0].s, 'U', &yylsp[0]); }
+    break;
+
+  case 19:
+#line 90 "ast/ast.y"
+    { yyval.n = IMCC_new_var_node(interp, yyvsp[0].s, yyvsp[-1].t, &yylsp[0]); }
+    break;
+
+  case 20:
+#line 93 "ast/ast.y"
     { yyval.t = 'P'; }
     break;
 
@@ -1050,7 +1092,7 @@ yyreduce:
     }
 
 /* Line 1016 of /usr/share/bison/yacc.c.  */
-#line 1054 "ast/astparser.c"
+#line 1096 "ast/astparser.c"
 
   yyvsp -= yylen;
   yyssp -= yylen;
@@ -1269,7 +1311,7 @@ yyreturn:
 }
 
 
-#line 88 "ast/ast.y"
+#line 96 "ast/ast.y"
 
 
 static void

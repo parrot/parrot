@@ -78,6 +78,14 @@ SP              [ ]
 {EOL}             { ++line; col=1; }
 
 {WS}+		/* eat white space */ ;
+"Py_Module"        {
+			valp->t = IMCC_find_node_type(yytext);
+			return MODULE;
+		   }
+"Function"         {
+			valp->t = IMCC_find_node_type(yytext);
+			return FUNCTION;
+		   }
 {ID}		   {
 			valp->t = IMCC_find_node_type(yytext);
 			if (valp->t)
