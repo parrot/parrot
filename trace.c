@@ -141,7 +141,7 @@ trace_op_dump(struct Parrot_Interp *interpreter, opcode_t *code_start,
                         constants[*(pc + i)]->u.number);
                 break;
             case PARROT_ARG_PC:
-                /* what is a PMC constant look like? */
+                /* what does a PMC constant look like? */
                 PIO_eprintf(interpreter, "PMCc:%vd", *(pc + i));
                 break;
             case PARROT_ARG_SC:
