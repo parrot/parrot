@@ -5,11 +5,6 @@ GC issues (copying allocator)
 
 - immobile strings/buffers get freed during GC
 
-Packfile
-
-- 'long doubles' work only, if "floattype" of interpreter and PBC are the same.
-  The "floattype" field in the packfile header is ignored.
-
 Memory Leaks
 
 - PIO subsystem leaks file handles (ParrotIO structures)
@@ -23,7 +18,6 @@ Regexes
 JIT
 
 - 64 bit integers on 32 bit machines don't work
-- stabs/gdb support lacks line numbers
 - parrot register inspection is incomplete (P-regs)
 
 Configuration
@@ -40,7 +34,6 @@ Portability issues
 - conversion ops for machines without 1/2/4 byte integer data types
 - 32 bit pointer/64 bit integer and vv.
 - dynamic library loading
-- packfile floats
 
 Tests
 
@@ -50,6 +43,9 @@ Tests
 Utilities
 
 - assemble.pl rolls its own packfile packing
+- lib/Parrot/PackFile.pm does it's own packing & unpacking, which is
+  not capable of reading the dir_format=1 PBC format. Non native floats
+  are also not implemented.
 
 Classes
 
