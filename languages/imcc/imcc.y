@@ -582,7 +582,6 @@ assignment:
     |  NEW                              { expect_pasm = 1; }
           pasm_args	        { $$ = iANY(interp, "new",0,regs,1);  }
     |  DEFINED target COMMA var         { $$ = MK_I(interp, "defined", R2($2, $4)); }
-    |  DEFINED target COMMA var         { $$ = MK_I(interp, "defined", R2($2, $4)); }
     |  DEFINED target COMMA var '[' keylist ']'  { keyvec=KEY_BIT(2);
                                        $$ = MK_I(interp, "defined", R3($2, $4, $6));}
     |  CLONE target COMMA var           { $$ = MK_I(interp, "clone", R2($2, $4)); }
