@@ -11,33 +11,25 @@
   To really start having fun with the Parrot runtime I wanted
   a language similar to C/C++/C#/Java.
 
-  The parser is LALR, developed with flex/bison, with
-  an intermediate code compiler written in Perl. The
-  parser generates a simple intermediate code (more on that later)
-  which is easier to read than Parrot assembly, and
-  also includes a few directives that Parrot currently
-  lacks. The parser leaves register allocation/spill control,
-  optimization and a few other specifics to the intermediate
-  compiler (imcc).
+  The Cola parser is LALR, developed with flex/bison. It targets
+  an intermediate language (PIR?) which can be found in
+  parrot/languages/imcc or alongside Cola on CPAN.
+  IMCC does the register allocation/spill control, optimization
+  and various other dirty things, before generating machine
+  instructions. Currently the only target is Parrot.
 
 Where to Get the Latest Compiler
 
-  Currently Cola is included in the Parrot distribution,
+  Cola is included in the Parrot distribution,
   see http://www.parrotcode.org or http://dev.perl.org/perl6
   At some point the distributions may diverge for some reason
   so you can grab the latest tarball from CPAN.
 
     http://cpan.org/authors/id/M/ME/MELVIN
 
-  If you get it separate from the Parrot dist, you'll also need
-  imcc from the same download site. imcc is the intermediate
-  language (PIR) compiler; currently Cola is the only language targetting
-  PIR. Just unpack imcc, build it, and copy the exe into the
-  cola directory.
-
 The Syntax
 
-  Compatible (eventually) C# syntax.
+  Compatible (eventually, maybe) C# syntax.
 
   The easiest way to see what it currently looks like is
   to read the examples.
@@ -86,7 +78,7 @@ Supported Constructs
         Console.WriteLine("Hello Mr " + name + "\n");
     
     There is no support for concatenation with non-strings yet.    
-    Need to whip up a few conversion routines.
+    I need to whip up a few conversion routines.
  
   Comparisons:  <, >, <=, >=, !=, ==
 
@@ -152,7 +144,7 @@ Supported Constructs
 
   Arrays:
     Parrot now has a substr with replace op so we can emulate arrays
-    on top of it. Its still a hack but it works.
+    on top of it. It is a hack but it works.
 
 What you currently CANNOT do even though the Parser may eat it...
   Statement lists:          i = j, j = k;
@@ -190,7 +182,7 @@ Using the Compiler
         parrot a.pbc
 
   Currently colac is a short Perl pre-processor that includes
-  class for any import statements (using System;)
+  classes for any import statements (using System;)
   If you have trouble with colac you can just use colacc which
   is the raw compiler which ignores 'using' directives.
 
@@ -240,9 +232,9 @@ Optimization
   generated between basic blocks or in situations where
   the generator is currently dumb.
  
-  I'll at a most add in a simple peephole optimizer to skip
-  useless assignments, temporaries and branches.
-
+  The plan is to convert intermediate code to SSA (Static
+  Single Assignment) form before doing various optimization
+  passes.
 
 Coming Soon
   Some form of a printf()
