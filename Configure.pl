@@ -70,7 +70,7 @@ $archname                 =  $Config{archname};
 
 $jitarchname              =  $archname;
 $jitarchname              =~ s/-(net|free|open)bsd$/-bsd/i;
-$jitarchname              =  'i386-nojit' unless -e "Parrot/Jit/$archname.pm";
+$jitarchname              =  'i386-nojit' unless -e "Parrot/Jit/$jitarchname.pm";
 
 ($jitcpuarch, $jitosname) =  split('-', $jitarchname);
 

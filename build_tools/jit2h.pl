@@ -31,6 +31,12 @@ my (@value_p);
 my (@value_n);
 my (@value_f);
 
+# Don't know if this should be keep separate per plataform, but that's easy.
+my %Call = (
+    "printf"        => 0,
+    "fflush"        => 1
+);
+
 open (IN,"jit/$cpuarch/core.jit");
 while ($line = <IN>) {
     next if (($line =~ m/^[#;]/) || ($line =~ m/^\s*$/));
@@ -68,6 +74,39 @@ for ($i = 0; $i < $core_numops; $i++) {
 			$move += 4;
 			$position += 1;
 		}
+        if ($char eq 'C') {
+            # call a C function
+
+            $tmp_bytecode = "";
+            $tmp = substr($body,$move,index($body,')',$move) + 1);
+            $tmp =~ m/(\w+),([^\)]*)\)/;
+            $function = $1;
+            $k = $argc = $argv = $2;
+
+            # Contorned atempt to get argc
+            $k =~ s/([\*][a-zA-Z_]+\d+)//g;
+            $argc =~ s/([\&][a-zA-Z_]+\d+)//g;
+            $k =~ s/[^\&]//g;
+            $k = length($k);
+            $argc =~ s/[^\*]//g;
+            $argc = length($argc) + $k;
+
+            if (defined($Call{$function})) {
+                $n = 27;
+                
+                $j = 1;
+                for($k = 0; $k < $argc; $k++) {
+                    $argv =~ s/([\&\*][a-zA-Z_]+\d+)//;
+                    $tmp_bytecode .= '\\x68' . $1;
+                    $j += 5;
+                }
+        	    $tmp_bytecode .= '\\xe8' . '\\x00' x 4;
+          	    $values[$n]++;
+                $value_p[$n][$values[$n]] = $position + $j;
+                $value_n[$n][$values[$n]] = $Call{$function};
+                $body =~ s/C\([^\)]*\)/$tmp_bytecode/;
+            }
+        }
 		if ($char eq 'F') {
 			# fuction
 			$tmp_bytecode = "";
@@ -80,7 +119,7 @@ for ($i = 0; $i < $core_numops; $i++) {
 				$argc =~ s/[^A]//g;
 				$argc = length($argc);
 				for($k = 0; $k < $argc; $k++) {
-					$argv =~ s/([\&\*][a-zA-Z]+\d+)//; 
+					$argv =~ s/([\&\*][a-zA-Z_]+\d+)//; 
 					$arg = $1;
 					$tmp_bytecode =~ s/A/$arg/;
 				}
@@ -89,21 +128,20 @@ for ($i = 0; $i < $core_numops; $i++) {
 		}
 		if ($char eq 'S') {
 			# system call
-			$tmp_bytecode = "";
 			$tmp = substr($body,$move,index($body,')',$move) + 1);
 			$tmp =~ m/(\w+),(\d+),([^\)]*)\)/;
 			$syscall = $1;
 			$argc = $2;
 			$argv = $3;
 
-			$tmp_bytecode .= Jit::system_call($argc,$argv,$syscall);
+			$tmp_bytecode = Jit::system_call($argc,$argv,$syscall);
 			
 			$body =~ s/S\([^\)]*\)/$tmp_bytecode/;
 		}
 		if ($char =~ m/[\&\*]/) {
 			# Copy \x00 * sizeof(INTVAL) to the bytecode and add to the list
 			$tmp = substr($body,$move,length($body) - $move + 1);
-			$tmp =~ m/([\&\*][a-zA-Z]+)(\d+)/;
+			$tmp =~ m/([\&\*][a-zA-Z_]+)(\d+)/;
 			$type = $1;
 			$number = $2;
 			$strflag = undef;
@@ -254,6 +292,9 @@ for ($i = 0; $i < $core_numops; $i++) {
 			elsif ($type eq '&TC') {
 				$n = 15;
 			}
+            elsif ($type eq '*CONST_INTVAL') {
+                $n = 16;
+            }
 			elsif ($type eq '&CF') {
 				$n = 21;
 			}
@@ -262,9 +303,6 @@ for ($i = 0; $i < $core_numops; $i++) {
 			}
 			elsif ($type eq '*JIC') {
 				$n = 24;
-			}
-			elsif ($type eq '&L') {
-				$n = 27;
 			}
 			$bytecode .= '\\x00' x 4;
 			$values[$n]++;

@@ -16,17 +16,13 @@ INTVAL temp_intval[10];
 char temp_char[100];
 
 
-FLOATVAL floatval_constants[1] = {1000000.0};
+/* Constants */
+
+INTVAL const_intval[1]         = { (INTVAL)0 };
+FLOATVAL floatval_constants[1] = { 1000000.0 };
 
 
-/*
-** If I remove the \n printf doesn't print anything, don't know why yet
-**
-** TODO: Solve this. Does it have something to do with flushing? \n usually
-** causes a buffer flush... [2001-12-19 GNP]
-*/
-
-char char_constants[] = "%f\n";
+char char_constants[] = "%f";
 
 
 /*
@@ -45,6 +41,8 @@ build_asm(struct Parrot_Interp *interpreter,opcode_t *pc, opcode_t *code_start, 
     substitution_t v;
     string_substitution_t sv;
     STRING *s;
+
+    const_intval[0] = (INTVAL)stdout;
 
     /* how should I allocate memory? */
     op_address = (INTVAL *)malloc(1024 * sizeof(INTVAL)); 
@@ -257,6 +255,16 @@ build_asm(struct Parrot_Interp *interpreter,opcode_t *pc, opcode_t *code_start, 
             address = (INTVAL *)&temp_char[v.info[i].number];
             memcpy(&arena[v.info[i].position],&address,sizeof(address));
         }
+
+
+        v = op_assembly[*pc].constant_intval_value;
+        /* constant_intval_value */
+        for (i = 0; i < v.amount; i++)
+        {
+            ivalue = const_intval[v.info[i].number];
+            memcpy(&arena[v.info[i].position],&ivalue,sizeof(ivalue));
+        }
+ 
         v = op_assembly[*pc].c_floatval_a;
         /* FLOATVAL CONSTANTS */
         for (i = 0; i < v.amount; i++)
@@ -304,6 +312,9 @@ build_asm(struct Parrot_Interp *interpreter,opcode_t *pc, opcode_t *code_start, 
                 case 0: 
                         address = (INTVAL *)printf; 
                         break;
+                case 1: 
+                        address = (INTVAL *)fflush; 
+                        break;
             }
 
             if (address > (INTVAL *)arena) {
@@ -312,7 +323,7 @@ build_asm(struct Parrot_Interp *interpreter,opcode_t *pc, opcode_t *code_start, 
                 address = (INTVAL *)
                           (-(arena - 
                              (char *)address + 
-                             op_assembly[*pc].size));
+                             v.info[i].position + 4));
             }
 
             memcpy(&arena[v.info[i].position],&address,sizeof(address));

@@ -55,7 +55,7 @@ typedef struct {
     substitution_t temporary_string_address;
     substitution_t temporary_char_address;
     /* constants ... */
-    substitution_t c_intval_v;
+    substitution_t constant_intval_value;
     substitution_t c_floatval_v; /* Not likely to be used */
     substitution_t c_string_v; /* Not likely to be used */
     substitution_t c_char_v;
