@@ -110,7 +110,7 @@ examples/sub.pbc:        examples/sub.pasm
 #
 
 clean:
-	$(RM_F) imcc *.imc *.pasm *.list *.pbc
+	$(RM_F) imcc examples/*.imc examples/*.pasm examples/*.list examples/*.pbc
 
 over:
 	@$(MAKE) clean
