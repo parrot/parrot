@@ -2,6 +2,7 @@ package Scheme::Generator;
 
 use strict;
 use Data::Dumper;
+use Scheme::Builtins;
 
 sub _gensym {
   return sprintf "G%04d",shift->{gensym}++;
@@ -39,6 +40,12 @@ sub _save {
   @temp;
 }
 
+sub _save_1 {
+  my $type = shift || 'I';
+  my @temp = _save 1, $type;
+  $temp[0];
+}
+
 sub _restore {
   die "Nothing to restore"
     unless defined @_;
@@ -48,6 +55,15 @@ sub _restore {
       unless defined $1;
     $regs->{$1}{$_}=0;
   }
+}
+
+sub _num_arg {
+  my ($node, $expected, $name) = @_;
+
+  my $children = scalar @{$node->{children}};
+
+  die "$name: Wrong number of arguments (expected $expected, got $children).\n"
+    if ($children != $expected);
 }
 
 #------------------------------------
@@ -194,22 +210,105 @@ sub _op_eq_p {
 sub _op_equal_p {
 }
 
-sub _op_pair {
+sub _op_pair_p {
+  my ($self, $node) = @_;
+  my $return;
+  my $label = $self->_gensym();
+
+  _num_arg ($node, 1, 'pair?');
+
+  my $item = $self->_generate($node->{children}->[0]);
+
+  $return = _save_1 ('I');
+
+  if ($item =~ /^[INS]/) {
+    $self->_add_inst ('', 'set', [$return,0]);
+  }
+  else {
+    $self->_add_inst ('', 'typeof', [$return,$item]);
+    $self->_add_inst ('', 'ne', [$return,'.Array',"FAIL_$label"]);
+    $self->_add_inst ('', 'set', [$return,$item]);
+    $self->_add_inst ('', 'ne', [$return,2,"FAIL_$label"]);
+    $self->_add_inst ('', 'set', [$return,1]);
+    $self->_add_inst ('', 'branch', ["DONE_$label"]);
+    $self->_add_inst ("FAIL_$label", 'set', [$return,0]);
+    $self->_add_inst ("DONE_$label");
+  }
+
+  return $return;
 }
 
 sub _op_cons {
+  my ($self, $node) = @_;
+  my $return;
+
+  _num_arg ($node, 2, 'cons');
+  
+  my $car = $self->_generate($node->{children}->[0]);
+  $return = _save_1('P');
+
+  $self->_add_inst ('', 'new', [$return,'.Array']);
+  $self->_add_inst ('', 'set', [$return,2]);
+  $self->_add_inst ('', 'set', [$return.'[0]',$car]);
+  _restore ($car);
+
+  my $cdr = $self->_generate($node->{children}->[1]);
+  $self->_add_inst ('', 'set', [$return.'[1]', $cdr]);
+  _restore ($cdr);
+
+  return $return;
 }
 
 sub _op_car {
+  my ($self, $node) = @_;
+
+  _num_arg ($node, 1, 'car');
+
+  my $return = $self->_generate ($node->{children}->[0]);
+  die "car: Element not pair\n" unless $return =~ /^P/;
+  $self->_add_inst ('', 'set', [$return,$return.'[0]']);
+
+  return $return;
 }
 
 sub _op_cdr {
+  my ($self, $node) = @_;
+
+  _num_arg ($node, 1, 'cdr');
+
+  my $return = $self->_generate ($node->{children}->[0]);
+  die "cdr: Element not pair\n" unless $return =~ /^P/;
+  $self->_add_inst ('', 'set', [$return,$return.'[1]']);
+
+  return $return;
 }
 
-sub _op_set_car {
+sub _op_set_car_bang {
+  my ($self, $node) = @_;
+
+  _num_arg ($node, 2, 'set-car!');
+
+  my $return = $self->_generate ($node->{children}->[0]);
+  die "set-car!: Element not pair\n" unless $return =~ /^P/;
+  my $value = $self->_generate ($node->{children}->[1]);
+  $self->_add_inst ('', 'set', [$return.'[0]',$value]);
+  _restore ($value);
+
+  return $return;
 }
 
-sub _op_set_cdr {
+sub _op_set_cdr_bang {
+  my ($self, $node) = @_;
+
+  _num_arg ($node, 2, 'set-cdr!');
+
+  my $return = $self->_generate ($node->{children}->[0]);
+  die "set-cdr!: Element not pair\n" unless $return =~ /^P/;
+  my $value = $self->_generate ($node->{children}->[1]);
+  $self->_add_inst ('', 'set', [$return.'[1]',$value]);
+  _restore ($value);
+
+  return $return;
 }
 
 sub _op_null {
@@ -219,9 +318,53 @@ sub _op_list_p {
 }
 
 sub _op_list {
+  my ($self, $node) = @_;
+  my $label = $self->_gensym ();
+  my $return = _save_1 ('P');
+
+  $self->_add_inst ('', 'new',[$return,'.PerlUndef']);
+
+  return $return unless exists $node->{children};
+
+  for (reverse @{$node->{children}}) {
+    my $item = $self->_generate($_);
+    my $pair = _save_1 ('P');
+
+    $self->_add_inst ('', 'new',[$pair,'.Array']);
+    $self->_add_inst ('', 'set',[$pair,2]);
+    $self->_add_inst ('', 'set',[$pair.'[0]',$item]);
+    $self->_add_inst ('', 'set',[$pair.'[1]',$return]);
+    $self->_add_inst ('', 'set',[$return,$pair]);
+
+    _restore($item, $pair);
+  }
+
+  return $return;
 }
 
 sub _op_length {
+  my ($self, $node) = @_;
+  my $label = $self->_gensym ();
+  my $return = _save_1 ('I');
+
+  _num_arg ($node, 1, 'length');
+
+  my $list = $self->_generate($node->{children}->[0]);
+  
+  $self->_add_inst ('', 'set',[$return,'0']);
+  my $type = _save_1 ('I');
+  $self->_add_inst ("NEXT_$label", 'typeof',[$type,$list]);
+  $self->_add_inst ('', 'eq',[$type,'.PerlUndef', "DONE_$label"]);
+  $self->_add_inst ('', 'ne',[$type,'.Array', "ERR_$label"]);
+  $self->_add_inst ('', 'inc',[$return]);
+  $self->_add_inst ('', 'set',[$list,$list.'[1]']);
+  $self->_add_inst ('', 'branch',["NEXT_$label"]);
+  # XXX Use exceptions here
+  $self->_add_inst ("ERR_$label", 'print',['"Object is not a list\n"']);
+
+  $self->_add_inst ("DONE_$label");
+
+  return $return;
 }
 
 sub _op_append {
@@ -903,7 +1046,20 @@ sub _op_write {
   my ($self,$node) = @_;
   for(@{$node->{children}}) {
     my $temp = $self->_generate($_);
-    $self->_add_inst('','print',[$temp]);
+    if ($temp =~ /[INS]/) {
+      $self->_add_inst('','print',[$temp]);
+    }
+    else {
+      $self->_use_function ('write');
+      if ($temp ne 'P5') {
+	$self->_add_inst('', 'save', ['P5']) if $regs->{P}{5};
+	$self->_add_inst('', 'set', ['P5',$temp]);
+      }
+      $self->_add_inst('', 'bsr', ['write_ENTRY']);
+      if ($temp ne 'P5' && $regs->{P}{5}) {
+	$self->_add_inst('', 'restore', ['P5']);
+      }
+    }
     _restore($temp);
   }
 }
@@ -1264,6 +1420,13 @@ sub __max_lengths {
   @max_len;
 }
 
+sub _use_function {
+  my ($self, $name) = @_;
+
+  push @{$self->{functions}}, $name 
+    unless grep { $_ eq $name } @{$self->{functitons}};
+}
+
 sub _format_columns {
   my $self    = shift;
   my $colref  = $self->{instruction};
@@ -1290,6 +1453,7 @@ sub new {
     tree     => $tree,
     register => [(0) x 32],
     gensym   => 0,
+    functions=> [],
   };
   bless $self,$class;
 }
@@ -1319,6 +1483,14 @@ sub _generate {
   $return;
 }
 
+sub _link_buildins {
+  my ($self) = @_;
+
+  for (@{$self->{functions}}) {
+    Scheme::Builtins::generate ($self, $_);
+  }
+}
+
 sub generate {
   my $self = shift;
   my @temp = _save(1);
@@ -1326,6 +1498,7 @@ sub generate {
 #die Dumper($self->{tree});
   _restore(@temp);
   $self->_add_inst('',"end");
+  $self->_link_buildins();
   $self->_format_columns();
 }
 

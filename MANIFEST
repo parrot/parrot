@@ -58,6 +58,8 @@ config/gen/config_h.pl
 config/gen/config_h/config_h.in
 config/gen/config_pm.pl
 config/gen/config_pm/Config_pm.in
+config/gen/libparrot_def.pl
+config/gen/libparrot_def/libparrot_def.in
 config/gen/makefiles.pl
 config/gen/makefiles/classes.in
 config/gen/makefiles/docs.in
@@ -68,6 +70,7 @@ config/gen/makefiles/miniperl.in
 config/gen/makefiles/perl6.in
 config/gen/makefiles/root.in
 config/gen/makefiles/scheme.in
+config/gen/makefiles/imcc.in
 config/gen/myconfig.pl
 config/gen/myconfig/myconfig.in
 config/gen/platform.pl
@@ -379,6 +382,7 @@ languages/perl6/examples/life.p6
 languages/perl6/examples/mandel.p6
 languages/perl6/examples/qsort.p6
 languages/perl6/mkdistro.sh
+languages/perl6/overview.pod
 languages/perl6/pconfig.pl
 languages/perl6/perl6
 languages/perl6/perl6re/Perl6RE.bnf
@@ -435,6 +439,7 @@ languages/perl6/t/parser/speed_2.pl
 languages/perl6/t/parser/speed_3.exp
 languages/perl6/t/parser/speed_3.pl
 languages/perl6/t/rx/basic.t
+languages/perl6/t/rx/call.t
 languages/perl6/t/rx/special.t
 languages/python/python.bnf
 languages/python/python.prd
@@ -488,6 +493,7 @@ languages/ruby/interactive.pl
 languages/ruby/t/01_terminal.t
 languages/ruby/t/02_expression.t
 languages/scheme/Scheme.pm
+languages/scheme/Scheme/Builtins.pm
 languages/scheme/Scheme/Generator.pm
 languages/scheme/Scheme/Parser.pm
 languages/scheme/Scheme/Test.pm
@@ -499,6 +505,7 @@ languages/scheme/t/arith/nested.t
 languages/scheme/t/harness
 languages/scheme/t/io/basic.t
 languages/scheme/t/logic/basic.t
+languages/scheme/t/logic/lists.t
 lib/Class/Struct.pm
 lib/Make.pm
 lib/Parrot/BuildUtil.pm

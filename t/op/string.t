@@ -1,6 +1,6 @@
 #! perl -w
 
-use Parrot::Test tests => 91;
+use Parrot::Test tests => 94;
 use Test::More;
 
 output_is( <<'CODE', <<OUTPUT, "set_s_s|sc" );
@@ -1000,6 +1000,24 @@ output_is(<<'CODE','Cannot get character before beginning of string','3-param or
 	set S0,"ab"
 	ord I0,S0,-3
 	print I0
+        end
+CODE
+
+output_is(<<'CODE',chr(32),'chr of 32 is space in ASCII');
+        chr S0, 32
+        print S0
+        end
+CODE
+
+output_is(<<'CODE',chr(65),'chr of 65 is A in ASCII');
+        chr S0, 65
+        print S0
+        end
+CODE
+
+output_is(<<'CODE',chr(122),'chr of 122 is z in ASCII');
+        chr S0, 122
+        print S0
 	end
 CODE
 

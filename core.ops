@@ -201,6 +201,22 @@ inline op ord (out INT, in STR, in INT) {
   goto NEXT();
 }
 
+=item B<chr>(out STR, in INT)
+
+Returns the character represented by the $2 number in the ASCII
+character set.
+
+=cut
+
+inline op chr (out STR, in INT) {
+  STRING *s;
+  s = string_make(interpreter, &$1, (UINTVAL)1, NULL, 0, NULL);
+  *(char *)s->bufstart = $2;
+  s->strlen = 1;
+  $1 = s;
+  goto NEXT();
+}
+
 
 ########################################
 

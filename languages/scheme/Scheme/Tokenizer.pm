@@ -34,6 +34,9 @@ sub tokenize {
     } elsif($ch eq '?' and
             $token =~ /^[a-z]/) { # Question marks can follow an identifier
       $token .= $ch;
+    } elsif($ch eq '!' and
+            $token =~ /^[a-z]/) { # Exclamation marks can follow an identifier
+      $token .= $ch;
     } elsif($ch eq '=' and
             $token =~ /^[<>]/) {  # Equal sign can follow '<','>'
       $token .= $ch;
