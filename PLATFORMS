@@ -6,7 +6,7 @@ Platform                B8    Runloops      Feature Comp Test Inst YYYYMMDD
 aix-pwr-xlc6            B    -    Y    -     Y   -   Y    Y
 aix-pwr64-xlc6          B8   -    -    -     Y   -   Y    Y/20
 darwin                  B    Y    Y    Y     Y   Y   Y    Y     Y  20041007
-freebsd5.2-i386              Y    Y/4  Y     Y   -   Y    Y
+freebsd5.2-i386              Y    Y/4  Y     Y   -   Y*6  Y
 hpux-pa_risc2.0-gcc2.9  B         -    -     Y   Y   Y*2  Y
 ?-ia64
 irix6.5                                      Y       Y    Y/2
@@ -64,6 +64,7 @@ Remarks:
 *4 need deactivating of  PARROT_HAS_HEADER_DLFCN
 *5 by enabling cygwin in t/pmc/threads.t, some tests fail due to a bug in
    that release. 1.5.10-3 and latest snapshots are ok.
+*6 needs "gmake"
 
 The following configurations are also working on x86/linux (and likely
 other platforms):
