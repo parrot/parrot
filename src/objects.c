@@ -25,11 +25,19 @@ Handles class and object manipulation.
 #define get_attrib_num(x, y) VTABLE_get_pmc_keyed_int(interpreter, x, y)
 #define set_attrib_num(x, y, z) VTABLE_set_pmc_keyed_int(interpreter, x, y, z)
 #define get_attrib_count(x) VTABLE_elements(interpreter, x)
+#define new_attrib_array() pmc_new(interpreter, enum_class_Array)
+#define set_attrib_array_size(x, y) VTABLE_set_integer_native(interpreter, (x), (y))
+#define resize_attrib_array(x, y)  VTABLE_set_integer_native(interpreter, (x), (y))
+#define SLOTTYPE PMC
 
 /* These are the new way, which isn't in yet
-#define get_attrib_num(x, y) ((PMC *)PObj_bufstart((Buffer *)PMC_data(x)))+y
-#define set_attrib_num(x, y, z) ((PMC *)PObj_bufstart((Buffer *)PMC_data(x)))+y = z
-#define get_attrib_count(x) 
+#define get_attrib_num(x, y) ((PMC *)PObj_bufstart(x))+y
+#define set_attrib_num(x, y, z) ((PMC *)PObj_bufstart(x))+y = z
+#define get_attrib_count(x) (PObj_buflen(x) / sizeof(PMC *))
+#define new_attrib_array() new_buffer_header(interpreter)
+#define set_attrib_array_size(x, y) Parrot_allocate_zeroed(interpreter, x, (sizeof(PMC *)*(y)))
+#define resize_attrib_array(x, y) Parrot_reallocate(interpreter, x, (sizeof(PMC *)*(y)))
+#define SLOTTYPE Buffer
 */
 
 static PMC *
@@ -120,7 +128,7 @@ find_global(Parrot_Interp interpreter, STRING *class, STRING *globalname)
 static void
 rebuild_attrib_stuff(Parrot_Interp interpreter, PMC *class) {
     INTVAL cur_offset = POD_FIRST_ATTRIB;
-    PMC *obj_array;
+    SLOTTYPE *class_slots;
     PMC *attr_offset_hash;
     PMC *class_offset_hash;
     PMC *parent_array;
@@ -129,22 +137,22 @@ rebuild_attrib_stuff(Parrot_Interp interpreter, PMC *class) {
     INTVAL class_offset;
     INTVAL parent_class_count;
 
-    obj_array = PMC_data(class);
+    class_slots = PMC_data(class);
     attr_offset_hash = pmc_new(interpreter, enum_class_OrderedHash);
     class_offset_hash = pmc_new(interpreter, enum_class_OrderedHash);
-    parent_array = get_attrib_num(obj_array, PCD_ALL_PARENTS);
+    parent_array = get_attrib_num(class_slots, PCD_ALL_PARENTS);
     parent_class_count = VTABLE_elements(interpreter, parent_array);
     if (parent_class_count) {
         for (class_offset = 0; class_offset < parent_class_count;
              class_offset++) {
             INTVAL parent_attr_count;
-            PMC *a_parent_array;
+            SLOTTYPE *parent_slots;
             PMC *parent_attrib_array;
             a_parent_class = VTABLE_get_pmc_keyed_int(interpreter,
                                                       parent_array,
                                                       class_offset);
-            a_parent_array = PMC_data(a_parent_class);
-            parent_attrib_array = get_attrib_num(a_parent_array,
+            parent_slots = PMC_data(a_parent_class);
+            parent_attrib_array = get_attrib_num(parent_slots,
                                                  PCD_CLASS_ATTRIBUTES);
             parent_attr_count = VTABLE_elements(interpreter,
                                                 parent_attrib_array);
@@ -157,7 +165,7 @@ rebuild_attrib_stuff(Parrot_Interp interpreter, PMC *class) {
                 STRING *FQ_name;
                 STRING *partial_name;
                 parent_name = VTABLE_get_string(interpreter,
-                                                get_attrib_num(a_parent_array,
+                                                get_attrib_num(parent_slots,
                                                                PCD_CLASS_NAME));
                 /* Note the current offset as where this class'
                    attributes start */
@@ -183,14 +191,14 @@ rebuild_attrib_stuff(Parrot_Interp interpreter, PMC *class) {
        always appear in the offset list, even if we don't have any
        attributes. That way the append code for adding attributes to a
        child class works better */
-    classname = VTABLE_get_string(interpreter, get_attrib_num(obj_array,
+    classname = VTABLE_get_string(interpreter, get_attrib_num(class_slots,
                                                               PCD_CLASS_NAME));
     VTABLE_set_integer_keyed_str(interpreter, class_offset_hash, classname,
                                  cur_offset);
     {
         PMC *attribs;
         INTVAL attr_count;
-        attribs = get_attrib_num(obj_array, PCD_CLASS_ATTRIBUTES);
+        attribs = get_attrib_num(class_slots, PCD_CLASS_ATTRIBUTES);
         attr_count = VTABLE_elements(interpreter, attribs);
         if (attr_count) {
             STRING *partial_name;
@@ -212,8 +220,8 @@ rebuild_attrib_stuff(Parrot_Interp interpreter, PMC *class) {
     }
 
     /* And replace what was in there with the new ones */
-    set_attrib_num(obj_array, PCD_ATTRIBUTES, attr_offset_hash);
-    set_attrib_num(obj_array, PCD_ATTRIB_OFFS, class_offset_hash);
+    set_attrib_num(class_slots, PCD_ATTRIBUTES, attr_offset_hash);
+    set_attrib_num(class_slots, PCD_ATTRIB_OFFS, class_offset_hash);
     /* And note the totals */
     class->cache.int_val = cur_offset - POD_FIRST_ATTRIB;
     return;
@@ -252,9 +260,9 @@ Parrot_single_subclass(Parrot_Interp interpreter, PMC *base_class,
     child_class = pmc_new(interpreter, enum_class_ParrotClass);
     /* Hang an array off the data pointer */
     child_class_array = PMC_data(child_class) =
-        pmc_new(interpreter, enum_class_SArray);
+        new_attrib_array();
     /* We will have five entries in this array */
-    VTABLE_set_integer_native(interpreter, child_class_array, PCD_MAX);
+    set_attrib_array_size(child_class_array, PCD_MAX);
 
     /* We have the same number of attributes as our parent */
     child_class->cache.int_val = base_class->cache.int_val;
@@ -287,20 +295,20 @@ Parrot_single_subclass(Parrot_Interp interpreter, PMC *base_class,
        list, with our parent unshifted onto the beginning */
     temp_pmc =
         clone_array(interpreter,
-                    get_attrib_num((PMC *)PMC_data(base_class),
+                    get_attrib_num((SLOTTYPE *)PMC_data(base_class),
                                    PCD_ALL_PARENTS));
     VTABLE_unshift_pmc(interpreter, temp_pmc, base_class);
     set_attrib_num(child_class_array, PCD_ALL_PARENTS, temp_pmc);
 
     /* Our attribute list is our parent's attribute list */
     temp_pmc = clone_array(interpreter,
-                           get_attrib_num((PMC *)PMC_data(base_class),
+                           get_attrib_num((SLOTTYPE *)PMC_data(base_class),
                                           PCD_ATTRIB_OFFS));
     set_attrib_num(child_class_array, PCD_ATTRIB_OFFS, temp_pmc);
 
     /* And our full keyed attribute list is our parent's */
     temp_pmc = clone_array(interpreter,
-                           get_attrib_num((PMC *)PMC_data(base_class),
+                           get_attrib_num((SLOTTYPE *)PMC_data(base_class),
                                           PCD_ATTRIBUTES));
     set_attrib_num(child_class_array, PCD_ATTRIBUTES, temp_pmc);
 
@@ -335,9 +343,9 @@ Parrot_new_class(Parrot_Interp interpreter, PMC *class, STRING *class_name)
     VTABLE *new_vtable;
 
     /* Hang an array off the data pointer, empty of course */
-    class_array = PMC_data(class) = pmc_new(interpreter, enum_class_SArray);
+    class_array = PMC_data(class) = new_attrib_array();
     /* We will have five entries in this array */
-    VTABLE_set_integer_native(interpreter, class_array, PCD_MAX);
+    set_attrib_array_size(class_array, PCD_MAX);
     /* Our parent class array has nothing in it */
     set_attrib_num(class_array, PCD_PARENTS,
                    pmc_new(interpreter, enum_class_Array));
@@ -448,7 +456,7 @@ Parrot_class_register(Parrot_Interp interpreter, STRING *class_name,
     new_vtable = Parrot_clone_vtable(interpreter,
             Parrot_base_vtables[enum_class_ParrotObject]);
     new_vtable->base_type = new_type;
-    set_attrib_num((PMC*)PMC_data(new_class), PCD_OBJECT_VTABLE,
+    set_attrib_num((SLOTTYPE*)PMC_data(new_class), PCD_OBJECT_VTABLE,
                    vtable_pmc = pmc_new(interpreter, enum_class_VtableCache));
     PMC_struct_val(vtable_pmc) = new_vtable;
 
@@ -460,7 +468,7 @@ static void
 do_initcall(Parrot_Interp interpreter, PMC* class, PMC *object)
 {
 
-    PMC *class_data = PMC_data(class);
+    SLOTTYPE *class_data = PMC_data(class);
     PMC *classsearch_array = get_attrib_num(class_data, PCD_ALL_PARENTS);
     PMC *parent_class;
     INTVAL i, nparents;
@@ -492,7 +500,7 @@ void
 Parrot_instantiate_object(Parrot_Interp interpreter, PMC *object) {
     PMC *new_object_array;
     INTVAL attrib_count;
-    PMC *class_array;
+    SLOTTYPE *class_array;
     PMC *class;
     PMC *class_name;
     PMC *vtable_pmc;
@@ -502,7 +510,7 @@ Parrot_instantiate_object(Parrot_Interp interpreter, PMC *object) {
      * put in the real vtable
      */
 
-    vtable_pmc = get_attrib_num((PMC *)PMC_data(class), PCD_OBJECT_VTABLE);
+    vtable_pmc = get_attrib_num((SLOTTYPE *)PMC_data(class), PCD_OBJECT_VTABLE);
     object->vtable = PMC_struct_val(vtable_pmc);
 
     /* Grab the attribute count from the parent */
@@ -512,10 +520,10 @@ Parrot_instantiate_object(Parrot_Interp interpreter, PMC *object) {
     class_name = get_attrib_num(class_array, PCD_CLASS_NAME);
 
     /* Build the array that hangs off the new object */
-    new_object_array = pmc_new(interpreter, enum_class_Array);
+    new_object_array = new_attrib_array();
     /* Presize it */
-    VTABLE_set_integer_native(interpreter, new_object_array,
-            attrib_count + POD_FIRST_ATTRIB);
+    set_attrib_array_size(new_object_array,
+                          attrib_count + POD_FIRST_ATTRIB);
     /* 0 - class PMC, 1 - class name */
     set_attrib_num(new_object_array, POD_CLASS, class);
     set_attrib_num(new_object_array, POD_CLASS_NAME, class_name);
@@ -551,8 +559,8 @@ the parent classes that we're adding in.
 PMC *
 Parrot_add_parent(Parrot_Interp interpreter, PMC *current_class_obj,
            PMC *add_on_class_obj) {
-    PMC *current_class;
-    PMC *add_on_class;
+    SLOTTYPE *current_class;
+    SLOTTYPE *add_on_class;
     PMC *current_class_array;
     PMC *current_parent_array;
     PMC *add_on_class_array;
@@ -693,8 +701,8 @@ Return whether the object C<pmc> is an instance of class C<cl>.
 INTVAL
 Parrot_object_isa(Parrot_Interp interpreter, PMC *pmc, PMC *cl) {
     PMC * t;
-    PMC * object_array = PMC_data(pmc);
-    PMC* classsearch_array; /* The array of classes we're searching */
+    SLOTTYPE *object_array = PMC_data(pmc);
+    SLOTTYPE *classsearch_array; /* The array of classes we're searching */
     INTVAL i, classcount;
 
     /* if this is a class */
@@ -714,7 +722,7 @@ Parrot_object_isa(Parrot_Interp interpreter, PMC *pmc, PMC *cl) {
     /* If not, time to walk through the parent class array. Wheee */
     classsearch_array =
         get_attrib_num(object_array, PCD_ALL_PARENTS);
-    classcount = VTABLE_get_integer(interpreter, classsearch_array);
+    classcount = VTABLE_elements(interpreter, classsearch_array);
     for (i = 0; i < classcount; ++i) {
         if (VTABLE_get_pmc_keyed_int(interpreter, classsearch_array, i) == cl)
             return 1;
@@ -788,7 +796,7 @@ Parrot_find_method_with_cache(Parrot_Interp interpreter, PMC *class,
     /* See if we get lucky and its in the class of the PMC */
     method = find_global(interpreter,
                          VTABLE_get_string(interpreter,
-                                  get_attrib_num((PMC *)PMC_data(class),
+                                  get_attrib_num((SLOTTYPE *)PMC_data(class),
                                                  PCD_CLASS_NAME)),
                          method_name);
 
@@ -798,7 +806,7 @@ Parrot_find_method_with_cache(Parrot_Interp interpreter, PMC *class,
     }
 
     /* If not, time to walk through the parent class array. Wheee */
-    classsearch_array = get_attrib_num((PMC *)PMC_data(class), 
+    classsearch_array = get_attrib_num((SLOTTYPE *)PMC_data(class), 
                                        PCD_ALL_PARENTS);
     classcount = VTABLE_elements(interpreter, classsearch_array);
 
@@ -808,7 +816,7 @@ Parrot_find_method_with_cache(Parrot_Interp interpreter, PMC *class,
                 classsearch_array, searchoffset);
         method = find_global(interpreter,
                              VTABLE_get_string(interpreter,
-                                  get_attrib_num((PMC *)PMC_data(curclass),
+                                  get_attrib_num((SLOTTYPE *)PMC_data(curclass),
                                                  PCD_CLASS_NAME)),
                              method_name);
         if (method) {
@@ -853,7 +861,7 @@ Adds the attribute C<attr> to the class.
 INTVAL
 Parrot_add_attribute(Parrot_Interp interpreter, PMC* class, STRING* attr)
 {
-    PMC *class_array;
+    SLOTTYPE *class_array;
     STRING *class_name;
     INTVAL idx;
     PMC *offs_hash;
@@ -861,7 +869,7 @@ Parrot_add_attribute(Parrot_Interp interpreter, PMC* class, STRING* attr)
     PMC *attr_array;
     STRING *full_attr_name;
 
-    class_array = (PMC*) PMC_data(class);
+    class_array = (SLOTTYPE *)PMC_data(class);
     class_name = VTABLE_get_string(interpreter, get_attrib_num(class_array,
                                                                PCD_CLASS_NAME));
     attr_array = get_attrib_num(class_array, PCD_CLASS_ATTRIBUTES);
@@ -898,7 +906,7 @@ is asking for the correct attribute number.
 PMC *
 Parrot_get_attrib_by_num(Parrot_Interp interpreter, PMC *object, INTVAL attrib)
 {
-    PMC *attrib_array;
+    SLOTTYPE *attrib_array;
     if (PObj_is_object_TEST(object)) {
         INTVAL attrib_count;
         attrib_array = PMC_data(object);
@@ -916,7 +924,7 @@ Parrot_get_attrib_by_num(Parrot_Interp interpreter, PMC *object, INTVAL attrib)
 
 void
 Parrot_set_attrib_by_num(Parrot_Interp interpreter, PMC *object, INTVAL attrib, PMC *value) {
-    PMC *attrib_array;
+    SLOTTYPE *attrib_array;
     if (PObj_is_object_TEST(object)) {
         INTVAL attrib_count;
         attrib_array = PMC_data(object);
@@ -937,12 +945,10 @@ Parrot_class_offset(Parrot_Interp interpreter, PMC *object, STRING *class) {
     PMC *class_pmc;
     INTVAL offset;
 
-    class_pmc = VTABLE_get_pmc_keyed_int(interpreter,
-                                         (PMC *)PMC_data(object),
-                                     POD_CLASS);
-    offset_hash = VTABLE_get_pmc_keyed_int(interpreter,
-                                           (PMC *)PMC_data(class_pmc),
-                                           PCD_ATTRIB_OFFS);
+    class_pmc = get_attrib_num((SLOTTYPE *)PMC_data(object),
+                               POD_CLASS);
+    offset_hash = get_attrib_num((SLOTTYPE *)PMC_data(class_pmc),
+                                 PCD_ATTRIB_OFFS);
     if (VTABLE_exists_keyed_str(interpreter, offset_hash, class)) {
         offset = VTABLE_get_integer_keyed_str(interpreter, offset_hash, class);
     }
