@@ -163,8 +163,6 @@ Parrot_memalign_if_possible(size_t align, size_t size)
     return memalign(align, size);
 }
 
-#else
-#error "generic platform without memalign"
 #endif
 
 void
