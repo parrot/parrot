@@ -10,25 +10,25 @@ use strict;
 use Parrot::OpLib::core;
 use Parrot::Types;
 
-my %ops;
-my %fullops;
+my $ops;
+my $fullops;
 for (@$Parrot::OpLib::core::ops) {
     my $argtype = join "_", @{$_->{ARGS}}[1..$#{$_->{ARGS}}];
-    ${$ops{$_->{NAME}}}{$argtype} = $_->{CODE};
-    $fullops{$_->{NAME}.($argtype &&"_$argtype") } = $_->{CODE};
+    ${$ops->{$_->{NAME}}}{$argtype} = $_->{CODE};
+    $fullops->{$_->{NAME}.($argtype &&"_$argtype") } = $_->{CODE};
 }
 
 # The first pass over the code detaches keys and saves labels
 my @asm;
 my $pc = 0;
-my %labels;
+my $labels;
 while (<>) {
     next if /^\s*#/;
     chomp;
     $_ = detach_key($_);
     s/,\s*$//; # In case of comments, trailing commas, etc.
     push @asm, $_;
-    define_labels(\%labels,$_);
+    define_labels($labels,$_);
 }
 
 # Reset variables
@@ -42,9 +42,9 @@ my @const_array;
 # bytecode
 for (@asm) {
     $lineno++;
-    $_ = replace_labels($lineno,\%labels,$_);
-    $_ = expand_op(\%ops,$lineno,$_);
-    $bc .= emit(\%const_hash,\@const_array,\%fullops,$_);
+    $_ = replace_labels($lineno,$labels,$_);
+    $_ = expand_op($ops,$lineno,$_);
+    $bc .= emit(\%const_hash,\@const_array,$fullops,$_);
 }
 my $packfile = {
     bytecode => $bc,
