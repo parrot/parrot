@@ -49,14 +49,15 @@ if(exists($options{'listing'}) && $options{'listing'} eq "") {
 # define data types
 my %pack_type;
 # Alas perl5.7.2 doesn't have an IV flag for pack().
-if ($PConfig{ivsize} == $PConfig{longsize}) {
+# The ! modifier only works for perl 5.6.x or greater.
+if (($] >= 5.006) && ($PConfig{ivsize} == $PConfig{longsize}) ) {
     %pack_type = ('i'=>'l!','n'=>'d');
-}
-elsif ($PConfig{ivsize} == 8) {
-    %pack_type = ('i'=>'q','n'=>'d');
 }
 elsif ($PConfig{ivsize} == 4) {
     %pack_type = ('i'=>'l','n'=>'d');
+}
+elsif ($PConfig{ivsize} == 8) {
+    %pack_type = ('i'=>'q','n'=>'d');
 }
 else {
     die("I don't know how to pack an IV!\n");
