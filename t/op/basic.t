@@ -1,6 +1,6 @@
 #! perl -w
 
-use Parrot::Test tests => 7;
+use Parrot::Test tests => 8;
 
 # It would be very embarrassing if these didn't work...
 output_is(<<'CODE', '', "noop, end");
@@ -68,3 +68,21 @@ CODE
 42
 1234
 OUTPUT
+
+output_is(<<'CODE', <<'OUTPUT', "bsr_i");
+	print	"start\n"
+	
+	bsr	LAB1
+
+	print	"done\n"
+	end
+
+LAB1:	print	"lab 1\n"
+	ret
+CODE
+start
+lab 1
+done
+OUTPUT
+
+1; # HONK
