@@ -310,7 +310,6 @@ Instruction * INS_LABEL(SymReg * r0, int emit)
 {
     Instruction *i = _mk_instruction("","%s:", R1(r0), 0);
     i->type = ITLABEL;
-    r0->first_ins = i;
     if (emit)
         emitb(i);
     return i;
@@ -904,28 +903,28 @@ static const unsigned short yyrline[] =
    First, the terminals, then, starting at YYNTOKENS, nonterminals. */
 static const char *const yytname[] =
 {
-  "$end", "error", "$undefined", "CALL", "GOTO", "ARG", "IF", "UNLESS",
-  "NEW", "END", "SAVEALL", "RESTOREALL", "SUB", "NAMESPACE",
-  "ENDNAMESPACE", "CLASS", "ENDCLASS", "SYM", "LOCAL", "CONST", "PARAM",
-  "INC", "DEC", "SHIFT_LEFT", "SHIFT_RIGHT", "INTV", "FLOATV", "STRINGV",
-  "DEFINED", "LOG_XOR", "RELOP_EQ", "RELOP_NE", "RELOP_GT", "RELOP_GTE",
-  "RELOP_LT", "RELOP_LTE", "GLOBAL", "ADDR", "CLONE", "RESULT", "RETURN",
-  "POW", "SHIFT_RIGHT_U", "LOG_AND", "LOG_OR", "COMMA", "ESUB",
-  "PCC_BEGIN", "PCC_END", "PCC_CALL", "PCC_SUB", "PCC_BEGIN_RETURN",
-  "PCC_END_RETURN", "PROTOTYPED", "NON_PROTOTYPED", "LABEL", "EMIT",
-  "EOM", "IREG", "NREG", "SREG", "PREG", "IDENTIFIER", "STRINGC", "INTC",
-  "FLOATC", "REG", "MACRO", "ENDM", "PARROT_OP", "VAR", "'\\n'", "'='",
-  "'!'", "'-'", "'~'", "'+'", "'*'", "'/'", "'%'", "'.'", "'&'", "'|'",
-  "'['", "']'", "';'", "$accept", "program", "@1", "pasmcode", "pasmline",
-  "pasm_inst", "@2", "pasm_args", "emit", "@3", "nsub", "sub_body", "sub",
-  "sub_start", "@4", "pcc_sub", "@5", "@6", "pcc_params", "pcc_param",
-  "@7", "pcc_sub_call", "@8", "pcc_proto", "pcc_sub_proto", "pcc_call",
-  "pcc_args", "pcc_arg", "pcc_results", "pcc_result", "@9", "pcc_ret",
-  "@10", "pcc_returns", "pcc_return", "statements", "statement", "@11",
-  "labels", "_labels", "label", "instruction", "labeled_inst", "@12",
-  "@13", "@14", "type", "classname", "assignment", "@15", "if_statement",
-  "relop", "target", "lhs", "vars", "_vars", "_var_or_i", "label_op",
-  "var_or_i", "var", "keylist", "@16", "_keylist", "key", "rc", "reg",
+  "$end", "error", "$undefined", "CALL", "GOTO", "ARG", "IF", "UNLESS", 
+  "NEW", "END", "SAVEALL", "RESTOREALL", "SUB", "NAMESPACE", 
+  "ENDNAMESPACE", "CLASS", "ENDCLASS", "SYM", "LOCAL", "CONST", "PARAM", 
+  "INC", "DEC", "SHIFT_LEFT", "SHIFT_RIGHT", "INTV", "FLOATV", "STRINGV", 
+  "DEFINED", "LOG_XOR", "RELOP_EQ", "RELOP_NE", "RELOP_GT", "RELOP_GTE", 
+  "RELOP_LT", "RELOP_LTE", "GLOBAL", "ADDR", "CLONE", "RESULT", "RETURN", 
+  "POW", "SHIFT_RIGHT_U", "LOG_AND", "LOG_OR", "COMMA", "ESUB", 
+  "PCC_BEGIN", "PCC_END", "PCC_CALL", "PCC_SUB", "PCC_BEGIN_RETURN", 
+  "PCC_END_RETURN", "PROTOTYPED", "NON_PROTOTYPED", "LABEL", "EMIT", 
+  "EOM", "IREG", "NREG", "SREG", "PREG", "IDENTIFIER", "STRINGC", "INTC", 
+  "FLOATC", "REG", "MACRO", "ENDM", "PARROT_OP", "VAR", "'\\n'", "'='", 
+  "'!'", "'-'", "'~'", "'+'", "'*'", "'/'", "'%'", "'.'", "'&'", "'|'", 
+  "'['", "']'", "';'", "$accept", "program", "@1", "pasmcode", "pasmline", 
+  "pasm_inst", "@2", "pasm_args", "emit", "@3", "nsub", "sub_body", "sub", 
+  "sub_start", "@4", "pcc_sub", "@5", "@6", "pcc_params", "pcc_param", 
+  "@7", "pcc_sub_call", "@8", "pcc_proto", "pcc_sub_proto", "pcc_call", 
+  "pcc_args", "pcc_arg", "pcc_results", "pcc_result", "@9", "pcc_ret", 
+  "@10", "pcc_returns", "pcc_return", "statements", "statement", "@11", 
+  "labels", "_labels", "label", "instruction", "labeled_inst", "@12", 
+  "@13", "@14", "type", "classname", "assignment", "@15", "if_statement", 
+  "relop", "target", "lhs", "vars", "_vars", "_var_or_i", "label_op", 
+  "var_or_i", "var", "keylist", "@16", "_keylist", "key", "rc", "reg", 
   "const", "string", 0
 };
 #endif
