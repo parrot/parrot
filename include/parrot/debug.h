@@ -160,10 +160,10 @@ void PDB_print_int(struct IReg *, int);
 void PDB_print_num(struct NReg *, int);
 
 void PDB_print_string(struct Parrot_Interp *interpreter,
-    struct SReg *, int);
+                      struct SReg *, int);
 
 void PDB_print_pmc(struct Parrot_Interp *interpreter,
-    struct PReg *, int, PMC* key);
+                   struct PReg *, int, PMC* key);
 
 void PDB_debug(struct Parrot_Interp *);
 

@@ -1711,13 +1711,13 @@ PDB_print_stack_pmc(struct Parrot_Interp *interpreter, const char *command)
     PDB_print_pmc(interpreter,&chunk->PReg[depth], atoi(command), NULL);
 } 
 
-static void dump_string(struct Parrot_Interp *interpreter, STRING* s)
+static void
+dump_string(struct Parrot_Interp *interpreter, STRING* s)
 {
     if (s) {
         fprintf(stderr,"\tBuflen  =\t%12ld\n",s->buflen);
         fprintf(stderr,"\tFlags   =\t%12ld\n",s->flags);
         fprintf(stderr,"\tBufused =\t%12ld\n",s->bufused);
-        fprintf(stderr,"\tBuflen  =\t%12ld\n",s->buflen);
         fprintf(stderr,"\tStrlen  =\t%12ld\n",s->strlen);
         fprintf(stderr,"\tOffset  =\t%12d\n",
                 (char*) s->strstart - (char*) s->bufstart);
