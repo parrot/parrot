@@ -48,7 +48,7 @@ my (%proto_type) = (p => "void *",
 		    v => "void",
 		    I => "struct Parrot_Interp *",
 		    P => "PMC *",
-#		    b => "void *",
+		    b => "void *",
 		    B => "void **",
 		   );
 
@@ -179,9 +179,9 @@ while (<>) {
     my %reg_count;
     @reg_count{qw(p i s n)} = (5, 5, 5, 5);
     if (defined $args and not $args =~ m/^\s*$/ ) {
-    foreach (split //, $args) {
+      foreach (split //, $args) {
 	push @arg, make_arg($_, \%reg_count);
-    }
+      }
     }
 
     # Header
