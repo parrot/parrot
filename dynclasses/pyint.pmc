@@ -68,7 +68,7 @@ Returns the hex representation of C<SELF>.
 
 =item C<PMC* "__oct__"()>
 
-Returns the hex representation of C<SELF>.
+Returns the octal representation of C<SELF>.
 
 =cut
 

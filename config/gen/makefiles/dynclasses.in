@@ -10,6 +10,7 @@ PMCS = foo subproxy \
 tclobject tclstring tclint tclfloat \
 tcllist tclarray \
 match matchrange \
+pybuiltin \
 pyobject \
   pyboolean \
   pyclass \

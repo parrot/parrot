@@ -246,3 +246,7 @@ i	IPP
 
 # examples/japh/japh11.pasm
 v	Iiiip
+
+# PyBuiltins
+P	IOPP
+

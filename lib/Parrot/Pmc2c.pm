@@ -1005,14 +1005,16 @@ EOH
 
 =item C<implements($method)>
 
-True if this class generates code for C<$method>.
+True if this class generates code for VTABLE method C<$method>.
 
 =cut
 
 sub implements
 {
     my ($self, $meth) = @_;
-    return exists $self->{has_method}{$meth};
+    return 0 unless exists $self->{has_method}{$meth};
+    my $n = $self->{has_method}{$meth};
+    return $self->{methods}[$n]{'loc'} ne 'nci';
 }
 
 =back
