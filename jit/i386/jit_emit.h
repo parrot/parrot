@@ -2251,33 +2251,16 @@ char intval_map[] =
  */
 char floatval_map[] = { 1,2,3,4 };
 
-/* my i386/athlon has a drastic speed penalty for what?
- * not for unaligned odd jump targets
- *
- * But:
- * mops.pbc 790 => 300-530  if code gets just 4 bytes bigger
- * (loop is at 200 instead of 196 ???)
- *
- * FAST:
- * 0x818100a <jit_func+194>:    sub    %edi,%ebx
- * 0x818100c <jit_func+196>:    jne    0x818100a <jit_func+194)
- *
- * Same fast speed w/o 2nd register
- * 0x8181102 <jit_func+186>:    sub    0x8164c2c,%ebx
- * 0x8181108 <jit_func+192>:    jne    0x8181102 <jit_func+186>
- *
- * SLOW (same slow with register or odd aligned)
- * 0x818118a <jit_func+194>:    sub    0x8164cac,%ebx
- * 0x8181190 <jit_func+200>:    jne    0x818118a <jit_func+194>
- *
- */
 
 /*
  * if jit_emit_noop is defined, it does align a jump target
- * (it is called, when pc is odd)
+ * to 1 << JUMP_ALIGN (it should emit exactly 1 byte)
+ *
+ * s. also info gcc /malign-jump
  */
 
-/* #define jit_emit_noop(pc) *pc++ = 0x90; */
+#define jit_emit_noop(pc) *pc++ = 0x90;
+#define JUMP_ALIGN 1
 
 /* registers are either allocate per section or per basic block
  * set this to 1 or 0 to change allocation scheme

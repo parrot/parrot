@@ -382,7 +382,7 @@ sort_registers(struct Parrot_Interp *interpreter,
 {
     Parrot_jit_optimizer_section_ptr cur_section, next, prev;
     int i, any, k, typ;
-    int max_count, max_i;
+    int max_count, max_i = 0;
     int to_map[] = { INT_REGISTERS_TO_MAP, 0, 0, FLOAT_REGISTERS_TO_MAP };
 
     /* Start from the first section */
@@ -708,7 +708,7 @@ Parrot_jit_load_registers(Parrot_jit_info_t *jit_info,
     char * maps[] = {0, 0, 0, 0};
     maps[0] = jit_info->intval_map;
     maps[3] = jit_info->floatval_map;
-    
+
 
     for (typ = 0; typ < 4; typ++) {
         if (maps[typ]) {
@@ -804,7 +804,7 @@ build_asm(struct Parrot_Interp *interpreter, opcode_t *pc,
 {
     UINTVAL i;
     char *new_arena;
-    Parrot_jit_info_t *jit_info;
+    Parrot_jit_info_t *jit_info = NULL;
     opcode_t cur_opcode_byte, *cur_op;
     Parrot_jit_optimizer_section_ptr cur_section;
     char *map;
@@ -915,7 +915,7 @@ build_asm(struct Parrot_Interp *interpreter, opcode_t *pc,
 #ifdef jit_emit_noop
             if (map[cur_op - code_start] == JIT_BRANCH_TARGET) {
                 char *opc = jit_info->native_ptr;
-                if ((long)jit_info->native_ptr & 1)
+                while ((long)jit_info->native_ptr & ((1<<JUMP_ALIGN) - 1))
                     jit_emit_noop(jit_info->native_ptr);
                 jit_info->arena.op_map[jit_info->op_i].offset +=
                     jit_info->native_ptr - opc;
