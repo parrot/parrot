@@ -1,363 +1,162 @@
 #!/usr/bin/perl -w
 
 use strict;
-use Data::Dumper;
-
-package Makefile::Parser;
-
-use File::Spec;
-
-use Data::Dumper;
-
 use FindBin;
+use lib "$FindBin::Bin/lib";
+use Make::Dependency qw(Object Executable);
+use Make::CC_Obj qw(CC);
+use Make::Link_Obj qw(Link);
+use Make::Perl_Obj qw(Perl);
+use Make::Target_Obj qw(Target);
+use YAML qw(Store);
 
-sub new {
-  my $proto = shift;
-  my $file  = shift || 'Makefile';
-  my $class = ref $proto || $proto;
-  my $self = { };
-  unless(-e $file) {
-    warn "File $file does not exist for opening!";
-    return undef;
-  }
-  bless $self,$proto;
-  $self->_unfold_lines($file);
-  $self->{expansion}{MAKE} = { exp => $FindBin::Bin, line => -1 };
-  return $self;
-}
+=head2 NAME
 
-sub __parse_expansion {
-  my ($self,$line,$line_num) = @_;
+make.pl - Make replacement for Parrot.
 
-  my ($macro,$value) = split /=/,$line;
-  $macro=~s/\s+$//;
-  $value=~s/^\s+//;
-  $self->{expansion}{$macro} = {
-    exp => $value,
-    line => $line_num-1,
-  };
-}
+=head2 SYNOPSIS
 
-sub __parse_dependency {
-  my ($self,$junkref,$line) = @_;
-  for(split /\s+/,$junkref->{dependent}) {
-    $self->{depend}{$_} = {
-      files => $junkref->{upon},
-      actions => $junkref->{action},
-      line => $line-1,
-    };
-  }
-  $junkref->{action} = [];
-  ($junkref->{dependent},$junkref->{upon}) = split /:/;
-  $junkref->{dependent} =~ s/\s+$//;
-  $junkref->{upon} =~ s/^\s+// if defined $junkref->{upon};
-}
+It was hoped that Parrot could get away from platform-dependent tools like gcc
+and make, and rely solely on perl, or maybe even something like miniparrot. At
+the moment, it relies heavily on several different varieties of make, each with
+differing syntax and various subtleties, making it hard to write portable code.
 
-sub _parse_file {
-  my $self = shift;
-  my $line = 0;
-  my $junkref = {
-    action => [],
-    dependent => '',
-    upon => '',
-  };
-  for(@{$self->{line}}) {
-    $line++;
-    next if /^\s*$/;
-    next if /^\s*#/;
-    if(!/^\t/) {
-      if(/=/) {
-        $self->__parse_expansion($_,$line);
-      }
-      elsif(/:/) {
-        $self->__parse_dependency($junkref,$line);
-      }
-    }
-    else {
-      s/^\s+//;
-      push @{$junkref->{action}},$_;
-    }
-  }
-  $self->__parse_dependency($junkref,$line);
-}
+Having make in perl means that we're no longer dependent on platforms where make
+exists, don't have to deal with the vagaries of various implementations of make,
+and and can work almost anywhere perl and a compiler can run. It'll also help
+with portability of things such as platform-specific extensions and various
+pathname issues.
 
-sub parse {
-  my $self = shift;
-  $self->_parse_file;
-  $self->_validate_macros;
-  $self->_expand;
-  $self->_unpack_files;
-  $self->_toposort( $self->_depgraph_edges() );;
+=cut
 
+#------------------------------------------------------------------------------
 
-  #  $self->_walk($self->{depend});
-}
+=item Object
 
-sub _uptodate {
-  my $self = shift;
-  my $target = shift;
+Take a filename without the object extension (.o or .obj, commonly), and return
+the filename with the proper extension for the platform. Unlike most of the
+other Make targets, this doesn't return an object but a scalar.
 
-#  print "$target is dependent on...\n";
-#  print "$_\n" for keys %{$self->{depend}{$_}{files}};
-  return 0 unless -e $target;
+=cut
 
-  my $M = -M $target;
-  for (keys %{$self->{depend}{$target}{files}}) {
-    print "$_ < $target\n";
-    return 0 if (-M $_ > $M);
-  }
+=item Generic Notes
 
-  return 1;
-}
+Excepting C<Object> and C<Executable>, all targets take a list of parameters
+such as C<output>, C<input>, and C<dependsOn>. These parameters can either be
+a scalar, another target, or a list of mixed scalars and targets. Generally a
+scalar is assumed to be a filename, and targets are recursively evaluated.
 
-sub run {
-  my $self   = shift;
-  my $target = shift;
+Each target is recursively evaluated to see if its dependencies are satisfied.
+The algorithm does this by going through the filenames and targets in the
+C<dependsOn> parameter. Targets are resolved to their filename(s). All of the
+filenames (whether real or evaluated) are checked. If any of the files do not
+exist, it's assumed that a previous dependency creates it. If any of the files
+are newer than the target, the target must be rebuilt.
 
-  my @order = $self->_order($target);
-  for my $t (@order) {
-#    print "# building $t\n";
-    my $target = $self->{depend}{$t};
+=cut
 
-    unless ($target->{actions}) {
-      # handle implicit stuff - this should be split out
-      $t =~ /\.([^\.]+)$/;
-      next unless $1;
-      # FIXME: this only handles the first implicit match
-      my ($implicit) = grep  {/^\.\w+\.$1/ } (keys %{$self->{depend}});
-      if ($implicit) {
-	my $src = $t;
-	my ($q,$r) = $implicit =~ /^(\.\w)(\.\w)/ or die;
-	$src =~ s/$r$/$q/;
-	print "HERE $src\n";
-	if (-e $src) {
-	  $target->{actions} = $self->{depend}{$implicit}{actions};
-	  $target->{files} = { $src => 1 };
-	  $target->{selif} = { reverse %{$target->{files}} };
-	}
-      }
-    } # end implicit handler
+=item Perl
 
-    if (!$self->_uptodate($t)) {
-      for (@{$target->{actions}}) {
-	# handle special variables
-	{
-	  my $first = $target->{selif}->{1};
-	  $_ =~ s/\$@/$t/g;
-	  $_ =~ s/\$</$first/g;
-	}
-	print "$_\n";
-	system($_);
-      }
-    }
-  }
+Runs perl on the files in the C<input> parameter to form the file in the
+C<output> parameter.
 
+=cut
 
-#  if(defined $self->{depend}{$target}) {
-#    $self->_run($self->{depend}{$target});
-#  }
-#  else {
-#    print STDERR "*** Target '$target' not defined.\n";
-#    exit 1;
-#  }
-}
+my $foo_c = Perl(
+  output => 'foo.c',
+  input => 'foo.ops',
+  commandLine => 'makeTest.pl foo.ops > foo.c',
+  dependsOn => ['foo.ops', 'makeTest.pl'],
+);
 
-sub _validate_macros {
-  my $self = shift;
-  my $exp  = $self->{expansion};
-  my $dep  = $self->{depend};
-  my $fail = 0;
+=item CC
 
-  for my $key (keys %$exp) {
-    if($exp->{$key}{exp}=~/\$\($key\)/) {
-      $fail++;
-      print STDERR
-        "*** Macro '$key' recursive at line $exp->{$key}{line}\n";
-    }
-    for my $macro ($exp->{$key}{exp}=~/\$\((.*?)\)/g) {
-      next if defined $exp->{$macro};
-      $fail++;
-      print STDERR
-        "*** Macro '$macro' does not exist at line $exp->{$key}{line}\n";
-    }
-  }
-  for my $key (keys %$dep) {
-    for my $macro ($dep->{$key}{files}=~/\$\((.*?)\)/g) {
-      next if defined $exp->{$macro};
-      $fail++;
-      print STDERR
-        "*** Macro '$macro' does not exist at line $dep->{$key}{line}\n";
-    }
-    for my $action (@{$dep->{$key}{actions}}) {
-      for my $macro ($action=~/\$\((.*?)\)/g) {
-        next if defined $exp->{$macro};
-        $fail++;
-        print STDERR
-          "*** Macro '$macro' does not exist at line $dep->{$key}{line}\n";
-      }
-    }
-  }
-  exit if $fail;
-}
+Compiles the files in the C<input> parameter to form the file in the C<output>
+parameter. Note in this case that the C<Object> target takes its C<input>
+parameter and adds the appropriate platform-specific extension (For Windows,
+C<.obj>, for UNIX C<.o>), generating a platform-specific file name to build.
 
-sub _expand {
-  my $self = shift;
-  my $exp  = $self->{expansion};
-  my $dep  = $self->{depend};
+=cut
 
-  $exp->{$_}{exp}=~s/\$\((.*?)\)/$exp->{$1}{exp}/eg for keys %$exp;
+my $foo_o = CC(
+  output => Object( input => 'foo' ),
+  input => 'foo.c',     # foo.o: foo.c
+  dependsOn => $foo_c,
+);
 
-  for my $key(keys %$dep) {
-    $dep->{$key}{files}=~s/\$\((.*?)\)/$exp->{$1}{exp}/eg;
-    foreach(@{$dep->{$key}{actions}}) {
-      s/\$\((.*?)\)/defined $exp->{$1} ? $exp->{$1}{exp} : $1/eg;
-    }
-    my $new_key = $key;
-    if($new_key=~s/\$\((.*?)\)/$exp->{$1}{exp}/eg) {
-      $dep->{$new_key} = $dep->{$key};
-      delete $dep->{$key};
-    }
+my $bar_o = CC(
+  output => Object( input => 'bar' ),
+  input => 'bar.c',     # bar.o: bar.c
+  dependsOn => 'bar.c', #   cc -c bar.c
+);
+
+=item Link
+
+Takes the files in the C<input> parameter and links them to create the file in
+C<output>. Several interesting things happen here. First is the C<Executable>
+target, which handles platform-specific build issues for executable files.
+More specifically, it attaches C<.exe> to builds on Windows and does nothing
+for the other platforms.
+
+Also, you'll notice that C<dependsOn> is a list of target objects. Each of these
+gets evaluated to generate the instructions needed to build its file in turn.
+Also, since they're not filenames, each target knows what filename it will
+eventually end up being.
+
+=cut
+
+my $foo_exe = Link(
+  output => Executable( input => 'foo' ),
+  input => [ Object(input=>'foo'),
+             Object(input=>'bar') ], # foo: foo.o bar.o
+  dependsOn => [$foo_o, $bar_o],     #   cc -o foo foo.o bar.o
+);
+
+my $depends = {};
+
+=item Target
+
+What the user invokes when typing 'make foo'. C<foo> is a sample target, and
+when it's made, the nested dependencies are evaluated and eventually the
+proper executable is built.
+
+=cut
+
+$depends->{foo} = Target(
+  input => 'foo',
+  dependsOn => $foo_exe,
+);
+
+#------------------------------------------------------------------------------
+
+my $target = shift(@ARGV);
+
+Satisfy($target);
+
+exit;
+
+#------------------------------------------------------------------------------
+
+=item Satisfy
+
+Satisfy dependencies by generating a list of actions and execute them in order.
+This simply generates a list of actions to be taken in a linear order, with no
+notes on how many of these tasks can be executed in parallel. This needs to be
+added before it will be a true make() replacement.
+
+=cut
+
+sub Satisfy {
+  my ($target) = @_;
+  my $actions = [];
+  $depends->{$target}->satisfied($actions);
+
+#  print Store($depends);
+
+  for(@$actions) {
+print "running $_->{action}\n";
+    system $_->{action};
   }
 }
 
-sub _unpack_files {
-  my $self = shift;
-  my $dep = $self->{depend};
-  for my $dependency (values %$dep) {
-    my $i = 1;
-    $dependency->{files} = {
-      map { $_ => $i++ }
-      split /\s+/, $dependency->{files}
-    };
-    $dependency->{selif} = { reverse %{$dependency->{files}} };
-  }
-  # reversed so we can get the n'th element.
-
-}
-
-sub _walk {
-  my $self = shift;
-  my $child = shift;
-
-  if(defined $child->{files}) {
-    for(keys %{$child->{files}}) {
-      $child->{files}{$_} = $self->{depend}{$_}
-        if defined $self->{depend}{$_};
-    }
-  }
-
-  for(keys %$child) {
-    next unless ref $child->{$_} eq 'HASH';
-    $self->_walk($child->{$_});
-  }
-}
-
-sub _unfold_lines {
-  my $self = shift;
-  my $file = shift;
-  my @line;
-  my $line='';
-  unless(open FILE,"<$file") {
-    print STDERR "Can't open file <$file: $!\n";
-    return undef;
-  }
-  while(<FILE>) {
-    chomp;
-    if($line=~/\\$/) {
-      $line=~s/.$//;
-      $line .= $_;
-    }
-    else {
-      push @{$self->{line}},$line;
-      $line = $_;
-    }
-  }
-  push @{$self->{line}},$line;
-  close FILE;
-}
-
-
-sub _depgraph_edges {
-  my $self = shift;
-  my @out;
-
-  for my $k (keys %{$self->{depend}}) {
-    for my $v (keys %{$self->{depend}{$k}{files}}) {
-      push @out,[$k,$v];
-    }
-  }
-  return @out
-}
-
-sub _toposort {
-  my ($self,@pairs) = @_;               # list of lists
-  my %numpreds = ();
-  my %successors = ();
-
-  foreach (@pairs) {
-    my ($k,$v) = @$_;
-    # make sure every element is in numpreds
-    $numpreds{$k} = 0 unless exists $numpreds{$k};
-    $numpreds{$v} = 0 unless exists $numpreds{$v};
-    # since k < v , second gains a pred
-    $numpreds{$v}++;
-    # and first gains a succ
-    if ( exists $successors{$k} ) {
-      push @{$successors{$k}},$v;
-    } else {
-      $successors{$k} = [$v];
-    }
-  }
-
-  my @answer = grep { $numpreds{$_} == 0} keys %numpreds;
-
-  foreach my $x (@answer) {
-    delete $numpreds{$x};
-    if ( exists $successors{$x} ) {
-      for my $y ( @{$successors{$x}} ) {
-        $numpreds{$y}--;
-        push @answer,$y if $numpreds{$y} == 0;
-      }
-      delete $successors{$x};
-    }
-  }
-
-  if (keys %numpreds) {
-    # can get a more detailed error by printing the remaining values
-    # in numpreds
-    die "Cycle Error!";
-  }
-
-  $self->{tsort} = [@answer];
-}
-
-
-
-sub _order {
-  my ($self, $target) = @_;
-  my @order = @{ $self->{tsort} };
-  my @working = ( $target );
-  my %seen;
-  # walk the graph starting at our target, and mark everything we pass
-  while (@working) {
-    my $c = shift @working;
-    $seen{$c}++;
-    push @working, (grep { !$seen{$_} } (keys %{$self->{depend}{$c}{files}}));
-  }
-  # trim @order (into @deps) with only the stuff we've seen;
-  my (@deps) = grep { $seen{$_} } @order;
-  return reverse @deps;
-}
-
-
-package main;
-
-my $parser = Makefile::Parser->new($ARGV[0]);
-$parser->parse();
-#print Dumper($parser->{expansion});
-#print Dumper($parser->{depend});
-
-$parser->run($ARGV[1]||'test');
-
-
-# make.pl by Jeff Goff and Robert Spier (test for bonsai)
+#------------------------------------------------------------------------------

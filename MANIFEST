@@ -341,6 +341,11 @@ languages/scheme/t/arith/nested.t
 languages/scheme/t/harness
 languages/scheme/t/io/basic.t
 languages/scheme/t/logic/basic.t
+lib/Make/CC_Obj.pm
+lib/Make/Dependency.pm
+lib/Make/Link_Obj.pm
+lib/Make/Perl_Obj.pm
+lib/Make/Target_Obj.pm
 lib/Parrot/BuildUtil.pm
 lib/Parrot/Configure/RunSteps.pm
 lib/Parrot/Configure/Step.pm
