@@ -174,9 +174,11 @@ sub want_two_things {
 
 {
     no strict 'refs';
-    for (qw(for given when while grep map sort)) {
+    for (qw(for when)) {
 	*{'P6C::want_for_'.$_.'::tree'} = \&want_two_things;
     }
+    *P6C::want_scalar_block::tree = \&want_two_things;
+    *P6C::want_expr_array::tree = \&want_two_things;
 }
 
 sub P6C::want_for_foreach::tree {
@@ -184,11 +186,6 @@ sub P6C::want_for_foreach::tree {
     return new P6C::ValueList vals => [maybe_tree($x->[1]),
 				       $x->[3]->tree,
 				       $x->[5]->tree];
-}
-
-sub P6C::want_for_default::tree {
-    my $x = shift;
-    return $x->[1]->tree;
 }
 
 sub P6C::want_for_if::tree {
@@ -578,14 +575,13 @@ sub P6C::assign::tree {
 ##############################
 sub P6C::scalar_expr::tree {
     my $x = shift;
-    if (@{$x->[2]} > 0) {
-	my @buts;
-	foreach (@{$x->[2]}) {
-	    push @buts, $_->[2]->tree;
-	}
-	return new P6C::but buts => [@buts], thing => $x->[1]->tree;
+    my ($expr, @buts) = @{$x->[1]};
+    $expr = $expr->tree;
+    if (@buts) {
+	@buts = map { $_->tree  } @buts;
+	return new P6C::but buts => [@buts], thing => $expr;
     }
-    return $x->[1]->tree;
+    return $expr
 }
 
 ##############################

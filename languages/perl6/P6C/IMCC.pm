@@ -1569,7 +1569,8 @@ END
     } else {
 	my @catchers;
 	foreach (@{$x->block}) {
-	    if ($_->isa('P6C::prefix') && $_->name eq 'CATCH') {
+	    if ($_->isa('P6C::prefix') && defined($_->name)
+		&& $_->name eq 'CATCH') {
 		push @catchers, $_->args;
 		$_->name(undef);
 	    }

@@ -795,7 +795,7 @@ END
 
 sub P6C::rx_cut::rx_val {
     my ($x, $ctx) = @_;
-    die $x->level if $x->level != 1 && $x->level != 2;
+    unimp 'cut-level '.$x->level if $x->level != 1 && $x->level != 2;
 
     my $bt = genlabel 'cut_'.$x->level.'_';
     my $needsucc;

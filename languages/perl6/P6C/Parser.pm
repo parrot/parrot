@@ -23,6 +23,10 @@ If C<$on> is true, generate line-number information.  This actually
 has a surprisingly small impact on performance.  If C<$on> is false,
 turn line-number generation off.
 
+=item B<Reset()>
+
+Reset global parser state.
+
 =back
 
 It's been tweaked for speed in a number of ways.  First, the infix
@@ -148,13 +152,10 @@ my @builtin_funcs = qw(crypt index pack rindex sprintf substr
 		       return fail
 		       puts
 		       not);
-@WANT{@builtin_funcs} = ($FUNCTION_ARGS) x @builtin_funcs;
 
 ##############################
 # Loop control
 my @loop_control = qw(redo last next continue break skip);
-@WANT{@loop_control} = ('maybe_label') x @loop_control;
-$WANT{goto} = 'label';
 
 ##############################
 # Unary operators
@@ -168,7 +169,6 @@ my @unary_ops = qw(chop chomp chr hex lc lcfirst length
 		   chdir chroot glob mkdir rmdir stat umask
 		   close
 		   print1);	# temporary cruft.
-@WANT{@unary_ops} = ('prefix') x @unary_ops;
 
 ##############################
 # Control operators
@@ -176,10 +176,9 @@ my @unary_ops = qw(chop chomp chr hex lc lcfirst length
 # XXX: as with the builtin functions above, most of these will not
 # compile, but are useful for testing the parser.
 
-my @control = qw(for foreach if given while when default sort grep map);
-@WANT{@control} = map { "want_for_$_" } @control;
-$WANT{unless} = 'want_for_if';
-$WANT{until} = 'want_for_while';
+my @control_expr_array = qw(grep map sort);
+my @control_scalar_block = qw(given while until);
+my @control_other = qw(for foreach if when);
 
 ##############################
 # Named blocks
@@ -188,7 +187,6 @@ $WANT{until} = 'want_for_while';
 my @special_blocks = qw(CATCH BEGIN END INIT AUTOLOAD
 			PRE POST NEXT LAST FIRST
 			try do);
-@WANT{@special_blocks} = ('closure') x @special_blocks;
 
 ##############################
 # Classes (builtin and otherwise)
@@ -196,7 +194,24 @@ my @special_blocks = qw(CATCH BEGIN END INIT AUTOLOAD
 # XXX: Will not compile.
 my @builtin_types = qw(int num str HASH ARRAY SCALAR Inf NaN
 		       true false); # XXX: these are really constants
-@CLASSES{@builtin_types} = @builtin_types;
+sub Reset {
+    %WANT = ();
+    @WANT{@builtin_funcs} = ($FUNCTION_ARGS) x @builtin_funcs;
+    @WANT{@loop_control} = ('maybe_label') x @loop_control;
+    $WANT{goto} = 'label';
+    @WANT{@unary_ops} = ('prefix') x @unary_ops;
+
+    @WANT{@control_other} = map { "want_for_$_" } @control_other;
+    @WANT{@control_expr_array} = ('want_expr_array') x @control_expr_array;
+    @WANT{@control_scalar_block}
+	= ('want_scalar_block') x @control_scalar_block;
+    $WANT{default} = 'closure';
+
+    $WANT{unless} = 'want_for_if';
+    @WANT{@special_blocks} = ('closure') x @special_blocks;
+    %CLASSES = ();
+    @CLASSES{@builtin_types} = @builtin_types;
+}
 
 BEGIN {
 # Handle comments:
@@ -397,8 +412,6 @@ name:		  /(?:::|\.|\*)?$NAMEPART(?:::$NAMEPART)*/o
 
 namepart:	  /$NAMEPART/o
 
-maybe_namepart:	  namepart |
-
 ##############################
 # Expressions
 
@@ -527,8 +540,7 @@ assign_op:	  /$HYPE$ASSIGN/o
 # 		| bitand_op | bitor_op | bitshift_op
 # 		| addsub_op | muldiv_op | pow_op
 
-scalar_expr:	  assign but(s?)
-but:		  'but' assign
+scalar_expr:	  <leftop: assign 'but' assign>
 
 comma:		  <leftop: <matchrule:@{[@arg ? $arg[0] : 'scalar_expr']}>
 			comma_op <matchrule:@{[@arg?$arg[0]:'scalar_expr']}> >
@@ -681,18 +693,14 @@ _closure_args:	  <leftop: comma['variable'] semi_op comma['variable']>
 
 want_for_for:	  av_seq closure
 want_for_foreach: maybe_decl '(' expr ')' block
-want_for_given:	  scalar_expr closure
-want_for_while:	  scalar_expr closure
 want_for_when:	  comma closure
-want_for_default: closure
 
 want_for_if:	  scalar_expr closure elsif(s?) else(?)
 elsif:		  /els(?:if|unless)/ scalar_expr closure
 else:		  'else' closure
 
-want_for_grep:	  scalar_expr comma
-want_for_map:	  scalar_expr comma
-want_for_sort:	  scalar_expr comma
+want_scalar_block: scalar_expr comma
+want_expr_array:  scalar_expr closure
 
 maybe_decl:	  scope_class <commit> variable props['is']
 		| variable <commit> props['is']

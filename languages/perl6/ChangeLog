@@ -314,3 +314,9 @@
 	    - compiler/1_11: segfault, compiler/3_7: weird stack problem.
 	      These seem to be either memory corruption or use of freed
 	      memory -- small changes to the .p6 files make them go away.
+
+2002-09-07
+
+	* Fixes:
+	    - remove a few unneeded grammar rules.
+	    - reset parser state on compiler init.

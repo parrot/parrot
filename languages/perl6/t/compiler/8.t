@@ -8,17 +8,17 @@ use P6C::TestCompiler tests => 6;
 output_is(<<'CODE', <<'OUT', "Exceptions 1");
 sub main() {
     try {
-	print1 "dying";
+	print "dying\n";
 	die;
-	print1 "foo";
+	print "foo\n";
     }
-    print1 "alive";
+    print "alive\n";
     my $x = try { 1 }
     my $y = try {
 	die;
 	CATCH { default { 2 } }
     }
-    print1 $x _' ' _$y;
+    print $x _' ' _$y, "\n";
 }
 CODE
 dying
@@ -30,11 +30,11 @@ OUT
 output_is(<<'CODE', <<'OUT', "Exceptions 2");
 sub main() {
     try {
-	print1 "dying";
+	print "dying\n";
 	die;
-	print1 "foo";
+	print "foo\n";
     }
-    print1 "alive";
+    print "alive\n";
     die;
 }
 CODE

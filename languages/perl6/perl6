@@ -482,8 +482,6 @@ sub run_tests {
 	print STDERR "$n ";
 	$filebase =~ s/(?:_\d+)?$/_$n/;
 	my $fw = "$filebase.warn";
-	my $result = warnings(sub {
-	    $parser->$::rule($test,0,'-')}, $fw);
 	my $file = "$filebase.p6";
 	my $outf = "$filebase.out";
 	$ARGV[0] = "> $outf";
@@ -496,6 +494,8 @@ sub run_tests {
 	else {
 	    # reinit IMCC
 	    P6C::IMCC::init();
+	    my $result = warnings(sub {
+	      $parser->$::rule($test,0,'-')}, $fw);
 	    # write .p6 file for reuse
 	    # XXX if --keep only ??
 	    open(OUT, ">$file");
