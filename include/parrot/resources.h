@@ -30,7 +30,7 @@ void *new_bignum_header(struct Parrot_Interp *);
 void free_bignum(void);
 
 void *Parrot_allocate(struct Parrot_Interp *, size_t size);
-void *Parrot_alloc_new_block(struct Parrot_Interp *, size_t, size_t);
+void *Parrot_alloc_new_block(struct Parrot_Interp *, size_t, UINTVAL);
 
 void Parrot_new_pmc_header_arena(struct Parrot_Interp *interpreter);
 
