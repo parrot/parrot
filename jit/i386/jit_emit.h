@@ -1368,16 +1368,25 @@ static unsigned char *lastpc;
 #  define jit_emit_sub_rm_i(pc, reg, address) \
     emitm_subl_m_r(pc, reg, emit_None, emit_None, emit_None, address)
 
-#  define emit_subl_m_r(pc, reg, address) \
-    emitm_subl_m_r(pc, reg, emit_None, emit_None, emit_None, address)
+#  define jit_emit_sub_mr_i(pc, address, reg) \
+    emitm_subl_r_m(pc, reg, emit_None, emit_None, emit_None, address)
+
+#  define jit_emit_sub_mi_i(pc, address, imm) \
+    emitm_subl_i_m(pc, imm, emit_None, emit_None, emit_None, address)
 
 #  define jit_emit_add_rm_i(pc, reg, address) \
     emitm_addl_m_r(pc, reg, emit_None, emit_None, emit_None, address)
 
+#  define jit_emit_add_mr_i(pc, address, reg) \
+    emitm_addl_r_m(pc, reg, emit_None, emit_None, emit_None, address)
+
+#  define jit_emit_add_mi_i(pc, address, imm) \
+    emitm_addl_i_m(pc, imm, emit_None, emit_None, emit_None, address)
+
 #  define jit_emit_cmp_rm_i(pc, reg, address) \
     emitm_cmpl_r_m(pc, reg, emit_None, emit_None, emit_None, address)
 
-#  define jit_emit_cmpr_mr_i(pc, address, reg) \
+#  define jit_emit_cmp_mr_i(pc, address, reg) \
     emitm_cmpl_m_r(pc, reg, emit_None, emit_None, emit_None, address)
 
 
@@ -1567,7 +1576,7 @@ static unsigned char *lastpc;
 #  define jit_emit_cmp_ri_n(pc, r, nc) jit_emit_cmp_rm_n(pc, r, nc)
 
 /* compare mem <-> ST(r) */
-#  define jit_emit_cmpr_mr_n(pc, mem, r) { \
+#  define jit_emit_cmp_mr_n(pc, mem, r) { \
     jit_emit_fload_m_n(pc, mem); \
     emitm_fcomip(pc, (r+1)); \
 }
@@ -1607,37 +1616,31 @@ static unsigned char *lastpc;
 #  define jit_emit_neg_m_i(pc, address) \
     emitm_negl_m(pc, emit_None, emit_None, emit_None, (long)address)
 
-#  define emit_shrl_r_m(pc, reg, d) \
-    emitm_shrl_r_m(pc, reg, emit_None, emit_None, emit_None, d)
-
-#  define emit_shrl_i_m(pc, imm, d) \
-    emitm_shrl_i_m(pc, imm, emit_None, emit_None, emit_None, d)
-
-#  define emit_andl_r_m(pc, reg, d) \
+#  define jit_emit_band_mr_i(pc, d, reg) \
     emitm_andl_r_m(pc, reg, emit_None, emit_None, emit_None, d)
 
 #  define jit_emit_band_rm_i(pc, reg, d) \
     emitm_andl_m_r(pc, reg, emit_None, emit_None, emit_None, d)
 
-#  define emit_andl_i_m(pc, imm, d) \
+#  define jit_emit_band_mi_i(pc, d, imm) \
     emitm_andl_i_m(pc, imm, emit_None, emit_None, emit_None, d)
 
-#  define emit_orl_r_m(pc, reg, d) \
+#  define jit_emit_bor_mr_i(pc, d, reg) \
     emitm_orl_r_m(pc, reg, emit_None, emit_None, emit_None, d)
 
 #  define jit_emit_bor_rm_i(pc, reg, d) \
     emitm_orl_m_r(pc, reg, emit_None, emit_None, emit_None, d)
 
-#  define emit_orl_i_m(pc, imm, d) \
+#  define jit_emit_bor_mi_i(pc, d, imm) \
     emitm_orl_i_m(pc, imm, emit_None, emit_None, emit_None, d)
 
-#  define emit_xorl_r_m(pc, reg, d) \
+#  define jit_emit_bxor_mr_i(pc, d, reg) \
     emitm_xorl_r_m(pc, reg, emit_None, emit_None, emit_None, d)
 
 #  define jit_emit_bxor_rm_i(pc, reg, d) \
     emitm_xorl_m_r(pc, reg, emit_None, emit_None, emit_None, d)
 
-#  define emit_xorl_i_m(pc, imm, d) \
+#  define jit_emit_bxor_mi_i(pc, d, imm) \
     emitm_xorl_i_m(pc, imm, emit_None, emit_None, emit_None, d)
 
 #  define emitm_popl_r(pc, reg) \

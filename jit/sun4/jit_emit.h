@@ -45,6 +45,8 @@
 #define emitm_simm13_max 4095
 #define emitm_simm13_min -4096
 
+#define emitm_simm13_const(val) (((val) >= emitm_simm13_min) && ((val) < emitm_simm13_max))
+
 #define emitm_branch_max 8388607
 #define emitm_branch_min -8388608
 
@@ -240,10 +242,15 @@
 #define emitm_fsubd(pc, rs1, rs2, rd) emitm_3c(pc, 2, rd, 064, rs1, 0106, rs2)
 #define emitm_fmuld(pc, rs1, rs2, rd) emitm_3c(pc, 2, rd, 064, rs1, 0112, rs2)
 #define emitm_fdivd(pc, rs1, rs2, rd) emitm_3c(pc, 2, rd, 064, rs1, 0116, rs2)
+#define emitm_fabss(pc, rs, rd) emitm_3c(pc, 2, rd, 064, 0, 0011, rs)
+#define emitm_fnegs(pc, rs, rd) emitm_3c(pc, 2, rd, 064, 0, 0005, rs)
 
 /* Floating <-> Integer Conversion */
 #define emitm_fitod(pc, rs, rd) emitm_3c(pc, 2, rd, 064, 0, 0310, rs)
 #define emitm_fdtoi(pc, rs, rd) emitm_3c(pc, 2, rd, 064, 0, 0322, rs)
+
+/* Floating point tests */
+#define emitm_fcmpd(pc, rs1, rs2, rd) emitm_3c(pc, 2, rd, 064, rs1, 0112, rs2)
 
 /* Jump and Link */
 
@@ -308,11 +315,16 @@ enum  {JIT_BRANCH, JIT_CALL30 };
 /* The register containing the address of the opmap */
 #define Parrot_jit_opmap emitm_i(3)
 
-/* This scratch register is used for certain address calculations */
-#define ISR1 emitm_l(5)
-#define ISR2 emitm_l(6)
+/* These registers should be used only in .jit ops and not helper routines
+ *   in jit_emit.h
+ */
+#define ISR1 emitm_i(4)
+#define ISR2 emitm_i(5)
 #define FSR1 emitm_f(0)
 #define FSR2 emitm_f(2)
+
+/* This register can be used only in jit_emit.h calculations */
+#define XSR1 emitm_l(0)
 
 #define Parrot_jit_regbase_ptr(i) &((i)->ctx.int_reg.registers[0])
 
@@ -329,21 +341,21 @@ Parrot_jit_bytejump(Parrot_jit_info_t *jit_info,
 
     /* Construct the starting address of the byte code */
     emitm_sethi(jit_info->native_ptr, emitm_hi22(interpreter->code->byte_code),
-        ISR2);
-    emitm_or_i(jit_info->native_ptr, ISR2,
-        emitm_lo10(interpreter->code->byte_code), ISR2);
+        XSR1);
+    emitm_or_i(jit_info->native_ptr, XSR1,
+        emitm_lo10(interpreter->code->byte_code), XSR1);
 
     /* Calculates the offset into op_map shadow array
      * assuming sizeof(opcode_t) == sizeof(opmap array entry) */
-    emitm_sub_r(jit_info->native_ptr, reg_num, ISR2,
-                ISR2);
+    emitm_sub_r(jit_info->native_ptr, reg_num, XSR1,
+                XSR1);
 
     /* Load the address of the native code from op_map */
-    emitm_ld_r(jit_info->native_ptr, Parrot_jit_opmap, ISR2,
-               ISR2);
+    emitm_ld_r(jit_info->native_ptr, Parrot_jit_opmap, XSR1,
+               XSR1);
 
     /* This jumps to the address from op_map */
-    emitm_jumpl_i(jit_info->native_ptr, ISR2, 0, ISR2);
+    emitm_jumpl_i(jit_info->native_ptr, XSR1, 0, XSR1);
     emitm_nop(jit_info->native_ptr);
 }
 
@@ -402,8 +414,8 @@ static void jit_emit_load_i(Parrot_jit_info_t *jit_info,
                     constants[val]->u.number;
 
             /* Load double into integer registers */
-            emitm_sethi(jit_info->native_ptr, emitm_hi22(val), ISR2);
-            emitm_ldd_i(jit_info->native_ptr, ISR2, emitm_lo10(val),
+            emitm_sethi(jit_info->native_ptr, emitm_hi22(val), XSR1);
+            emitm_ldd_i(jit_info->native_ptr, XSR1, emitm_lo10(val),
                         hwreg);
             break;
 
@@ -486,19 +498,27 @@ static void jit_emit_load_n(Parrot_jit_info_t *jit_info,
                              int hwreg)
 {
     opcode_t op_type;
-    int val;
+    long val;
 
     op_type = interpreter->op_info_table[*jit_info->cur_op].types[param];
     val = jit_info->cur_op[param];
 
     switch(op_type){
+        case PARROT_ARG_IC:
+            /* Load integer into floating point registers - should use 
+               constant pool */
+            val = &jit_info->cur_op[param];
+            emitm_sethi(jit_info->native_ptr, emitm_hi22(val), XSR1);
+            emitm_ldf_i(jit_info->native_ptr, XSR1, emitm_lo10(val), hwreg);
+            break;
+
         case PARROT_ARG_NC:
             val = (int)&interpreter->code->const_table->
                     constants[val]->u.number;
 
-            /* Load double into integer registers */
-            emitm_sethi(jit_info->native_ptr, emitm_hi22(val), ISR2);
-            emitm_lddf_i(jit_info->native_ptr, ISR2, emitm_lo10(val),
+            /* Load double into floating point registers */
+            emitm_sethi(jit_info->native_ptr, emitm_hi22(val), XSR1);
+            emitm_lddf_i(jit_info->native_ptr, XSR1, emitm_lo10(val),
                         hwreg);
             break;
 
@@ -698,15 +718,44 @@ Parrot_jit_emit_mov_rm_n(struct Parrot_Interp * interpreter, int reg, char *mem)
                  Parrot_jit_regbase, Parrot_jit_regoff(mem, interpreter), reg);
 }
 
+#  ifndef NO_JIT_VTABLE_OPS
+
+#    undef Parrot_jit_vtable1_op
+/*#    undef Parrot_jit_vtable1r_op
+#    undef Parrot_jit_vtable2rk_op
+#    undef Parrot_jit_vtable3k_op
+
+#    undef Parrot_jit_vtable_112_op
+#    undef Parrot_jit_vtable_221_op
+#    undef Parrot_jit_vtable_1121_op
+#    undef Parrot_jit_vtable_1123_op
+#    undef Parrot_jit_vtable_2231_op
+
+#    undef Parrot_jit_vtable_1r223_op
+#    undef Parrot_jit_vtable_1r332_op
+
+#    undef Parrot_jit_vtable_ifp_op
+#    undef Parrot_jit_vtable_unlessp_op
+#    undef Parrot_jit_vtable_newp_ic_op
+*/
+
+static void
+Parrot_jit_vtable1_op(Parrot_jit_info_t *jit_info,
+                      struct Parrot_Interp *interpreter)
+{
+}
+
+#endif /* NO_JIT_VTABLE_OPS */
+
 #else
 
 #  define REQUIRES_CONSTANT_POOL 0
-#  define INT_REGISTERS_TO_MAP 5
+#  define INT_REGISTERS_TO_MAP 6
 #  define FLOAT_REGISTERS_TO_MAP 6
 
 #ifndef JIT_IMCC
 char intval_map[INT_REGISTERS_TO_MAP] =
-    { emitm_l(0), emitm_l(1), emitm_l(2), emitm_l(3), emitm_l(4)
+    { emitm_l(1), emitm_l(2), emitm_l(3), emitm_l(4), emitm_l(5), emitm_l(6)
     };
 
 char floatval_map[] = 
@@ -714,7 +763,7 @@ char floatval_map[] =
     };
 #endif
 
-#define PRESERVED_INT_REGS 5
+#define PRESERVED_INT_REGS 6
 #define PRESERVED_FLOAT_REGS 0
 
 #endif

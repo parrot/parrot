@@ -118,14 +118,22 @@ TEMPLATE Parrot_binop_x_x {
         jit_emit_<op>_rm<_N>(NATIVECODE, MAP[1], &INT_REG[2]);
     }
     else if (MAP[2]) {
+# ifdef jit_emit_<op>_mr<_N>
+        jit_emit_<op>_mr<_N>(NATIVECODE, &INT_REG[1], MAP[2]);
+# else
         jit_emit_mov_rm<_N>(NATIVECODE, ISR1, &INT_REG[1]);
         jit_emit_<op>_rr<_N>(NATIVECODE, ISR1, MAP[2]);
         jit_emit_mov_mr<_N>(NATIVECODE, &INT_REG[1], ISR1);
+# endif
     }
     else {
         jit_emit_mov_rm<_N>(NATIVECODE, ISR1, &INT_REG[1]);
+# ifdef jit_emit_<op>_mr<_N>
+        jit_emit_<op>_mr<_N>(NATIVECODE, &INT_REG[1], ISR1);
+# else
         jit_emit_<op>_rm<_N>(NATIVECODE, ISR1, &INT_REG[2]);
         jit_emit_mov_mr<_N>(NATIVECODE, &INT_REG[1], ISR1);
+# endif
     }
 }
 
@@ -251,9 +259,13 @@ TEMPLATE Parrot_binop_x_xc {
         jit_emit_<op>_ri<_N>(NATIVECODE, MAP[1], <typ>_CONST[2]);
     }
     else {
+# ifdef jit_emit_<op>_mi_<_N>
+        jit_emit_<op>_mi<_N>(NATIVECODE, &INT_REG[1], <typ>_CONST[2]);
+# else
         jit_emit_mov_rm<_N>(NATIVECODE, ISR1, &INT_REG[1]);
         jit_emit_<op>_ri<_N>(NATIVECODE, ISR1, <typ>_CONST[2]);
         jit_emit_mov_mr<_N>(NATIVECODE, &INT_REG[1], ISR1)
+# endif
     }
 }
 
@@ -408,13 +420,13 @@ TEMPLATE Parrot_binop_x_x_xc {
         jit_emit_mov_rm<_N>(NATIVECODE, MAP[1], &INT_REG[2]);
         jit_emit_<op>_ri<_N>(NATIVECODE, MAP[1], <typ>_CONST[3]);
     }
-    else if (MAP[2]) {
-        jit_emit_mov_rr<_N>(NATIVECODE, ISR1, MAP[2]);
-        jit_emit_<op>_ri<_N>(NATIVECODE, ISR1, <typ>_CONST[3]);
-        jit_emit_mov_mr<_N>(NATIVECODE, &INT_REG[1], ISR1)
-    }
     else {
-        jit_emit_mov_rm<_N>(NATIVECODE, ISR1, &INT_REG[2]);
+        if (MAP[2]) {
+            jit_emit_mov_rr<_N>(NATIVECODE, ISR1, MAP[2]);
+        }
+        else {
+            jit_emit_mov_rm<_N>(NATIVECODE, ISR1, &INT_REG[2]);
+        }
         jit_emit_<op>_ri<_N>(NATIVECODE, ISR1, <typ>_CONST[3]);
         jit_emit_mov_mr<_N>(NATIVECODE, &INT_REG[1], ISR1)
     }
@@ -1006,7 +1018,7 @@ TEMPLATE Parrot_cmp_x_x_ic {
         jit_emit_cmp_rm<_N>(NATIVECODE, MAP[1], <typ>_REG[2]);
     }
     else if (MAP[2]) {
-        jit_emit_cmpr_mr<_N>(NATIVECODE, <typ>_REG[1], MAP[2]);
+        jit_emit_cmp_mr<_N>(NATIVECODE, <typ>_REG[1], MAP[2]);
     }
     else {
         jit_emit_mov_rm<_N>(NATIVECODE, ISR1, <typ>_REG[1]);
