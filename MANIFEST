@@ -77,13 +77,14 @@ languages/jako/hello.jako
 languages/jako/jakoc
 languages/jako/leibniz.jako
 languages/jako/MAINTAINER
-languages/jako/Makefile
+languages/jako/Makefile.in
 languages/jako/mandelbrot.jako
 languages/jako/mandelzoom.jako
 languages/jako/mops.jako
 languages/jako/primes.jako
 languages/jako/queens.jako
 languages/jako/sub.jako
+languages/Makefile.in
 languages/scheme/Makefile
 languages/scheme/Scheme/Generator.pm
 languages/scheme/Scheme/Parser.pm

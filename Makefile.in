@@ -137,6 +137,11 @@ docs/.dummy:
 $(CLASS_O_FILES):
 	$(MAKE) -C classes
 
+languages: languages.dummy
+
+languages.dummy:
+	$(MAKE) -C languages
+
 clean:
 	$(RM_F) *$(O) chartypes/*$(O) encodings/*$(O)
 	$(RM_F) *.s core_ops.c core_ops_prederef.c $(TEST_PROG) $(PDISASM) $(PDUMP)
@@ -150,7 +155,7 @@ clean:
 	$(RM_F) Parrot/OpLib/core.pm
 	$(MAKE) -C docs clean
 	$(MAKE) -C classes clean
-
+	$(MAKE) -C languages clean
 
 distclean:
 	$(PERL) -MExtUtils::Manifest=filecheck -le '$$ExtUtils::Manifest::Quiet=1;unlink $$_ for filecheck()'

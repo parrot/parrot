@@ -204,6 +204,8 @@ buildfile("config_h", "include/parrot");
 # and the makefile
 buildfile("Makefile");
 buildfile("classes/Makefile");
+buildfile("languages/Makefile");
+buildfile("languages/jako/Makefile");
 # and Parrot::Config
 buildconfigpm();
 # and the types file

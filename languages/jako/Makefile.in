@@ -104,7 +104,6 @@ sub.pbc: sub.pasm
 # Other targets:
 #
 
-
 clean:
 	rm -f *.pasm *.list *.pbc
 
@@ -125,6 +124,7 @@ test: all
 	cd $(TOOL_DIR); $(INTERP) $(DIR)/primes.pbc
 	cd $(TOOL_DIR); $(INTERP) $(DIR)/queens.pbc
 	cd $(TOOL_DIR); $(INTERP) $(DIR)/sub.pbc
+
 
 #
 # End of file.
