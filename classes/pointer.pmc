@@ -79,10 +79,6 @@ pmclass Pointer {
         POINTER_ERROR;
     }
 
-    void set_integer_bignum (BIGNUM* value) {
-        POINTER_ERROR;
-    }
-
     void set_integer_same (PMC* value) {
         POINTER_ERROR;
     }
@@ -92,10 +88,6 @@ pmclass Pointer {
     }
 
     void set_number_native (FLOATVAL value) {
-        POINTER_ERROR;
-    }
-
-    void set_number_bignum (BIGNUM* value) {
         POINTER_ERROR;
     }
 

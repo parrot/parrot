@@ -72,11 +72,6 @@ pmclass PerlInt {
         SELF->cache.int_val = value;
     }
 
-    void set_integer_bignum (BIGNUM* value) {
-        SELF->cache.struct_val = value; /* Maybe we need a copy */
-        /* SELF->vtable = &(Parrot_base_vtables[enum_class_PerlBignum]); */
-    }
-
     void set_integer_same (PMC * value) {
         SELF->cache.int_val = value->cache.int_val;
     }
@@ -91,10 +86,6 @@ pmclass PerlInt {
 	SELF->cache.num_val = value;
     }
 
-    void set_number_bignum (BIGNUM* value) {
-	/* SELF->vtable = &(Parrot_base_vtables[enum_class_PerlBigNum]); */
-    }
-
     void set_number_same (PMC * value) {
 	CHANGE_TYPE(pmc, PerlNum);
 	SELF->cache.num_val = (FLOATVAL)value->cache.int_val;
@@ -106,18 +97,10 @@ pmclass PerlInt {
 	/* SELF->vtable = &(Parrot_base_vtables[enum_class_PerlBigNum]); */
     }
     
-    void set_bignum_int (INTVAL value) {
-        /* XXX Make bignum from value */
-    }
-    
     void set_bignum_native (BIGNUM* value) {
         /* XXX Some of this bignum stuff is starting to look pretty redundant -DML */
         SELF->cache.struct_val = value; /* Maybe we need a copy */
         /* SELF->vtable = &(Parrot_base_vtables[enum_class_PerlBignum]); */
-    }
-    
-    void set_bignum_float (FLOATVAL value) {
-        /* XXX */
     }
     
     void set_bignum_same (PMC* value) {
@@ -168,7 +151,7 @@ pmclass PerlInt {
 	    }
 	}
 	else {
-	    CHANGE_TYPE(dest, PerlInt);
+            CHANGE_TYPE(dest, PerlInt);
             dest->vtable->set_integer_native(INTERP, dest, 
 		SELF->cache.int_val +
                 value->vtable->get_integer(INTERP, value)

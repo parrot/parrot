@@ -17,7 +17,7 @@ pmclass default noinit {
     }
 
     void init_pmc (PMC* value) {
-        SELF->vtable->init(INTERP, SELF);
+        DYNSELF.init();
     }
 
     void morph (INTVAL type) {
@@ -46,7 +46,7 @@ pmclass default noinit {
     INTVAL type_keyed_int (INTVAL* key) {
         KEY r_key;
         MAKE_KEY_INT(r_key, *key);
-        return SELF->vtable->type_keyed(INTERP, SELF, &r_key);
+        return DYNSELF.type_keyed(&r_key);
     }
 
     UINTVAL subtype (INTVAL type) {
@@ -61,7 +61,7 @@ pmclass default noinit {
     UINTVAL subtype_keyed_int (INTVAL* key, INTVAL type) {
         KEY r_key;
         MAKE_KEY_INT(r_key, *key);
-        return SELF->vtable->subtype_keyed(INTERP, SELF, &r_key, type);
+        return DYNSELF.subtype_keyed(&r_key, type);
     }
 
     STRING* name () {
@@ -76,7 +76,7 @@ pmclass default noinit {
     STRING* name_keyed_int (INTVAL *key) {
         KEY r_key;
         MAKE_KEY_INT(r_key, *key);
-        return SELF->vtable->name_keyed(INTERP, SELF, &r_key);
+        return DYNSELF.name_keyed(&r_key);
     }
 
     PMC* clone () {
@@ -95,7 +95,7 @@ pmclass default noinit {
     PMC* clone_keyed_int (INTVAL* key) {
         KEY r_key;
         MAKE_KEY_INT(r_key, *key);
-        return SELF->vtable->clone_keyed(INTERP, SELF, &r_key);
+        return DYNSELF.clone_keyed(&r_key);
     }
 
     PMC* find_method(STRING* method_name) {
@@ -110,7 +110,7 @@ pmclass default noinit {
     PMC* find_method_keyed_int(INTVAL *key, STRING* method_name) {
         KEY r_key;
         MAKE_KEY_INT(r_key, *key);
-        return SELF->vtable->find_method_keyed(INTERP, SELF, &r_key, method_name);
+        return DYNSELF.find_method_keyed(&r_key, method_name);
     }
 
     INTVAL get_integer () {
@@ -125,7 +125,7 @@ pmclass default noinit {
     INTVAL get_integer_keyed_int (INTVAL* key) {
         KEY r_key;
         MAKE_KEY_INT(r_key, *key);
-        return SELF->vtable->get_number_keyed(INTERP, SELF, &r_key);
+        return DYNSELF.get_number_keyed(&r_key);
     }
 
     FLOATVAL get_number () {
@@ -140,7 +140,7 @@ pmclass default noinit {
     FLOATVAL get_number_keyed_int (INTVAL* key) {
         KEY r_key;
         MAKE_KEY_INT(r_key, *key);
-        return SELF->vtable->get_number_keyed(INTERP, SELF, &r_key);
+        return DYNSELF.get_number_keyed(&r_key);
     }
 
     BIGNUM* get_bignum () {
@@ -155,7 +155,7 @@ pmclass default noinit {
     BIGNUM* get_bignum_keyed_int (INTVAL* key) {
         KEY r_key;
         MAKE_KEY_INT(r_key, *key);
-        return SELF->vtable->get_bignum_keyed(INTERP, SELF, &r_key);
+        return DYNSELF.get_bignum_keyed(&r_key);
     }
 
     STRING* get_string () {
@@ -171,14 +171,14 @@ pmclass default noinit {
     STRING* get_string_keyed_int (INTVAL* key) {
         KEY r_key;
         MAKE_KEY_INT(r_key, *key);
-        return SELF->vtable->get_string_keyed(INTERP, SELF, &r_key);
+        return DYNSELF.get_string_keyed(&r_key);
     }
 
     INTVAL get_bool () {
         /*  Everything has to be 0 */
-        if (   SELF->vtable->get_integer(INTERP, SELF) == 0
-            && SELF->vtable->get_number(INTERP, SELF) == 0.0
-            && string_bool(SELF->vtable->get_string(INTERP, SELF)) == 0
+        if (   DYNSELF.get_integer() == 0
+            && DYNSELF.get_number() == 0.0
+            && string_bool(DYNSELF.get_string()) == 0
             )
         {
             return 0;
@@ -194,7 +194,7 @@ pmclass default noinit {
     INTVAL get_bool_keyed_int (INTVAL* key) {
         KEY r_key;
         MAKE_KEY_INT(r_key, *key);
-        return SELF->vtable->get_bool_keyed(INTERP, SELF, &r_key);
+        return DYNSELF.get_bool_keyed(&r_key);
     }
 
     INTVAL elements () {
@@ -210,7 +210,7 @@ pmclass default noinit {
     INTVAL elements_keyed_int (INTVAL* key) {
         KEY r_key;
         MAKE_KEY_INT(r_key, *key);
-        return SELF->vtable->elements_keyed(INTERP, SELF, &r_key);
+        return DYNSELF.elements_keyed(&r_key);
     }
 
     PMC* get_pmc () {
@@ -225,7 +225,7 @@ pmclass default noinit {
     PMC* get_pmc_keyed_int (INTVAL* key) {
         KEY r_key;
         MAKE_KEY_INT(r_key, *key);
-        return SELF->vtable->get_pmc_keyed(INTERP, SELF, &r_key);
+        return DYNSELF.get_pmc_keyed(&r_key);
     }
 
     INTVAL is_same (PMC* pmc2) {
@@ -248,14 +248,14 @@ pmclass default noinit {
         KEY r_key, r_value_key;
         if (key == NULL) {
             MAKE_KEY_INT(r_value_key, *value_key);
-            return SELF->vtable->is_same_keyed(INTERP, SELF, NULL, value, &r_value_key);
+            return DYNSELF.is_same_keyed(NULL, value, &r_value_key);
         }
         MAKE_KEY_INT(r_key, *key);
         if (value_key == NULL) {
-            return SELF->vtable->is_same_keyed(INTERP, SELF, &r_key, value, NULL);
+            return DYNSELF.is_same_keyed(&r_key, value, NULL);
         }
         MAKE_KEY_INT(r_value_key, *value_key);
-        return SELF->vtable->is_same_keyed(INTERP, SELF, &r_key, value, &r_value_key);
+        return DYNSELF.is_same_keyed(&r_key, value, &r_value_key);
     }
 
     /* The set methods merely make the appropriate part of the cache
@@ -268,10 +268,6 @@ pmclass default noinit {
 
     void set_integer_native (INTVAL value) {
         SELF->cache.int_val = value;
-    }
-
-    void set_integer_bignum (BIGNUM* value) {
-        /* XXX: do something to copy the BigInt .. */
     }
 
     void set_integer_same (PMC* value) {
@@ -296,10 +292,6 @@ pmclass default noinit {
         SELF->cache.num_val = value;
     }
 
-    void set_number_bignum (BIGNUM* value) {
-        /* XXX: will want to use bignum library to copy bignum... */
-    }
-
     void set_number_same (PMC* value) {
         SELF->cache.num_val = value->vtable->get_number(INTERP, value);
     }
@@ -318,16 +310,8 @@ pmclass default noinit {
         SELF->cache.struct_val = (DPOINTER*)value->vtable->get_bignum(INTERP, value);
     }
 
-    void set_bignum_int (INTVAL value) {
-        /* XXX: bignum from int */
-    }
-
     void set_bignum_native (BIGNUM* value) {
         SELF->cache.struct_val = (DPOINTER*)value;
-    }
-
-    void set_bignum_float (FLOATVAL value) {
-        /* XXX */
     }
 
     void set_bignum_same (PMC* value) {
@@ -387,11 +371,11 @@ pmclass default noinit {
         }
         MAKE_KEY_INT(r_key, *key);
         if (value_key == NULL) {
-            SELF->vtable->set_pmc_keyed(INTERP, SELF, &r_key, value, NULL);
+            DYNSELF.set_pmc_keyed(&r_key, value, NULL);
             return;
         }
         MAKE_KEY_INT(r_value_key, *value_key);
-        SELF->vtable->set_pmc_keyed(INTERP, SELF, &r_key, value, &r_value_key);
+        DYNSELF.set_pmc_keyed(&r_key, value, &r_value_key);
     }
 
     void set_same (PMC* value) {
@@ -406,16 +390,16 @@ pmclass default noinit {
         KEY r_key, r_value_key;
         if (key == NULL) {
             MAKE_KEY_INT(r_value_key, *value_key);
-            SELF->vtable->set_same_keyed(INTERP, SELF, NULL, value, &r_value_key);
+            DYNSELF.set_same_keyed(NULL, value, &r_value_key);
             return;
         }
         MAKE_KEY_INT(r_key, *key);
         if (value_key == NULL) {
-            SELF->vtable->set_same_keyed(INTERP, SELF, &r_key, value, NULL);
+            DYNSELF.set_same_keyed(&r_key, value, NULL);
             return;
         }
         MAKE_KEY_INT(r_value_key, *value_key);
-        SELF->vtable->set_same_keyed(INTERP, SELF, &r_key, value, &r_value_key);
+        DYNSELF.set_same_keyed(&r_key, value, &r_value_key);
     }
 
     INTVAL pop_integer() {
@@ -431,7 +415,7 @@ pmclass default noinit {
     INTVAL pop_integer_keyed_int(INTVAL* key) {
         KEY r_key;
         MAKE_KEY_INT(r_key, *key);
-        return SELF->vtable->pop_integer_keyed(INTERP, SELF, &r_key);
+        return DYNSELF.pop_integer_keyed(&r_key);
     }    
 
     FLOATVAL pop_float() {
@@ -447,7 +431,7 @@ pmclass default noinit {
     FLOATVAL pop_float_keyed_int(INTVAL* key) {
         KEY r_key;
         MAKE_KEY_INT(r_key, *key);
-        return SELF->vtable->pop_float_keyed(INTERP, SELF, &r_key);
+        return DYNSELF.pop_float_keyed(&r_key);
     }    
 
     BIGNUM* pop_bignum() {
@@ -463,7 +447,7 @@ pmclass default noinit {
     BIGNUM* pop_bignum_keyed_int(INTVAL* key) {
         KEY r_key;
         MAKE_KEY_INT(r_key, *key);
-        return SELF->vtable->pop_bignum_keyed(INTERP, SELF, &r_key);
+        return DYNSELF.pop_bignum_keyed(&r_key);
     }    
 
     STRING* pop_string() {
@@ -479,7 +463,7 @@ pmclass default noinit {
     STRING* pop_string_keyed_int(INTVAL* key) {
         KEY r_key;
         MAKE_KEY_INT(r_key, *key);
-        return SELF->vtable->pop_string_keyed(INTERP, SELF, &r_key);
+        return DYNSELF.pop_string_keyed(&r_key);
     }    
 
     PMC* pop_pmc() {
@@ -495,7 +479,7 @@ pmclass default noinit {
     PMC* pop_pmc_keyed_int(INTVAL* key) {
         KEY r_key;
         MAKE_KEY_INT(r_key, *key);
-        return SELF->vtable->pop_pmc_keyed(INTERP, SELF, &r_key);
+        return DYNSELF.pop_pmc_keyed(&r_key);
     }    
 
     void push_integer (INTVAL value) {
@@ -509,7 +493,7 @@ pmclass default noinit {
     void push_integer_keyed_int (INTVAL* key, INTVAL value) {
         KEY r_key;
         MAKE_KEY_INT(r_key, *key);
-        SELF->vtable->push_integer_keyed(INTERP, SELF, &r_key, value);
+        DYNSELF.push_integer_keyed(&r_key, value);
     }    
 
     void push_float (FLOATVAL value) {
@@ -523,7 +507,7 @@ pmclass default noinit {
     void push_float_keyed_int (INTVAL* key, FLOATVAL value) {
         KEY r_key;
         MAKE_KEY_INT(r_key, *key);
-        SELF->vtable->push_float_keyed(INTERP, SELF, &r_key, value);
+        DYNSELF.push_float_keyed(&r_key, value);
     }    
 
     void push_bignum (BIGNUM* value) {
@@ -537,7 +521,7 @@ pmclass default noinit {
     void push_bignum_keyed_int (INTVAL* key, BIGNUM* value) {
         KEY r_key;
         MAKE_KEY_INT(r_key, *key);
-        SELF->vtable->push_bignum_keyed(INTERP, SELF, &r_key, value);
+        DYNSELF.push_bignum_keyed(&r_key, value);
     }    
 
     void push_string (STRING* value) {
@@ -551,7 +535,7 @@ pmclass default noinit {
     void push_string_keyed_int (INTVAL* key, STRING* value) {
         KEY r_key;
         MAKE_KEY_INT(r_key, *key);
-        SELF->vtable->push_string_keyed(INTERP, SELF, &r_key, value);
+        DYNSELF.push_string_keyed(&r_key, value);
     }    
 
     void push_pmc (PMC* value) {
@@ -566,16 +550,16 @@ pmclass default noinit {
         KEY r_key, r_value_key;
         if (key == NULL) {
             MAKE_KEY_INT(r_value_key, *value_key);
-            SELF->vtable->push_pmc_keyed(INTERP, SELF, NULL, value, &r_value_key);
+            DYNSELF.push_pmc_keyed(NULL, value, &r_value_key);
             return;
         }
         MAKE_KEY_INT(r_key, *key);
         if (value_key == NULL) {
-            SELF->vtable->push_pmc_keyed(INTERP, SELF, &r_key, value, NULL);
+            DYNSELF.push_pmc_keyed(&r_key, value, NULL);
             return;
         }
         MAKE_KEY_INT(r_value_key, *value_key);
-        SELF->vtable->push_pmc_keyed(INTERP, SELF, &r_key, value, &r_value_key);
+        DYNSELF.push_pmc_keyed(&r_key, value, &r_value_key);
     }    
 
     INTVAL shift_integer() {
@@ -591,7 +575,7 @@ pmclass default noinit {
     INTVAL shift_integer_keyed_int(INTVAL* key) {
         KEY r_key;
         MAKE_KEY_INT(r_key, *key);
-        return SELF->vtable->shift_integer_keyed(INTERP, SELF, &r_key);
+        return DYNSELF.shift_integer_keyed(&r_key);
     }    
 
     FLOATVAL shift_float() {
@@ -607,7 +591,7 @@ pmclass default noinit {
     FLOATVAL shift_float_keyed_int(INTVAL* key) {
         KEY r_key;
         MAKE_KEY_INT(r_key, *key);
-        return SELF->vtable->shift_float_keyed(INTERP, SELF, &r_key);
+        return DYNSELF.shift_float_keyed(&r_key);
     }    
 
     BIGNUM* shift_bignum() {
@@ -623,7 +607,7 @@ pmclass default noinit {
     BIGNUM* shift_bignum_keyed_int(INTVAL* key) {
         KEY r_key;
         MAKE_KEY_INT(r_key, *key);
-        return SELF->vtable->shift_bignum_keyed(INTERP, SELF, &r_key);
+        return DYNSELF.shift_bignum_keyed(&r_key);
     }    
 
     STRING* shift_string() {
@@ -639,7 +623,7 @@ pmclass default noinit {
     STRING* shift_string_keyed_int(INTVAL* key) {
         KEY r_key;
         MAKE_KEY_INT(r_key, *key);
-        return SELF->vtable->shift_string_keyed(INTERP, SELF, &r_key);
+        return DYNSELF.shift_string_keyed(&r_key);
     }    
 
     PMC* shift_pmc() {
@@ -655,7 +639,7 @@ pmclass default noinit {
     PMC* shift_pmc_keyed_int(INTVAL* key) {
         KEY r_key;
         MAKE_KEY_INT(r_key, *key);
-        return SELF->vtable->shift_pmc_keyed(INTERP, SELF, &r_key);
+        return DYNSELF.shift_pmc_keyed(&r_key);
     }    
 
     void unshift_integer (INTVAL value) {
@@ -669,7 +653,7 @@ pmclass default noinit {
     void unshift_integer_keyed_int (INTVAL* key, INTVAL value) {
         KEY r_key;
         MAKE_KEY_INT(r_key, *key);
-        SELF->vtable->unshift_integer_keyed(INTERP, SELF, &r_key, value);
+        DYNSELF.unshift_integer_keyed(&r_key, value);
     }    
 
     void unshift_float (FLOATVAL value) {
@@ -683,7 +667,7 @@ pmclass default noinit {
     void unshift_float_keyed_int (INTVAL* key, FLOATVAL value) {
         KEY r_key;
         MAKE_KEY_INT(r_key, *key);
-        SELF->vtable->unshift_float_keyed(INTERP, SELF, &r_key, value);
+        DYNSELF.unshift_float_keyed(&r_key, value);
     }    
 
     void unshift_bignum (BIGNUM* value) {
@@ -697,7 +681,7 @@ pmclass default noinit {
     void unshift_bignum_keyed_int (INTVAL* key, BIGNUM* value) {
         KEY r_key;
         MAKE_KEY_INT(r_key, *key);
-        SELF->vtable->unshift_bignum_keyed(INTERP, SELF, &r_key, value);
+        DYNSELF.unshift_bignum_keyed(&r_key, value);
     }    
 
     void unshift_string (STRING* value) {
@@ -711,7 +695,7 @@ pmclass default noinit {
     void unshift_string_keyed_int (INTVAL* key, STRING* value) {
         KEY r_key;
         MAKE_KEY_INT(r_key, *key);
-        SELF->vtable->unshift_string_keyed(INTERP, SELF, &r_key, value);
+        DYNSELF.unshift_string_keyed(&r_key, value);
     }    
 
     void unshift_pmc (PMC* value) {
@@ -726,16 +710,16 @@ pmclass default noinit {
         KEY r_key, r_value_key;
         if (key == NULL) {
             MAKE_KEY_INT(r_value_key, *value_key);
-            SELF->vtable->unshift_pmc_keyed(INTERP, SELF, NULL, value, &r_value_key);
+            DYNSELF.unshift_pmc_keyed(NULL, value, &r_value_key);
             return;
         }
         MAKE_KEY_INT(r_key, *key);
         if (value_key == NULL) {
-            SELF->vtable->unshift_pmc_keyed(INTERP, SELF, &r_key, value, NULL);
+            DYNSELF.unshift_pmc_keyed(&r_key, value, NULL);
             return;
         }
         MAKE_KEY_INT(r_value_key, *value_key);
-        SELF->vtable->unshift_pmc_keyed(INTERP, SELF, &r_key, value, &r_value_key);
+        DYNSELF.unshift_pmc_keyed(&r_key, value, &r_value_key);
     }    
 
     void add (PMC* value, PMC* dest) {
@@ -743,7 +727,7 @@ pmclass default noinit {
 
         FLOATVAL result;
 
-        result = SELF->vtable->get_number(INTERP, SELF)
+        result = DYNSELF.get_number()
             + value->vtable->get_number(INTERP, value);
 
         dest->vtable->set_number_native(INTERP, dest, result);
@@ -755,7 +739,7 @@ pmclass default noinit {
 
         FLOATVAL result;
 
-        result = SELF->vtable->get_number(INTERP, SELF)
+        result = DYNSELF.get_number()
             + value;
 
         dest->vtable->set_number_native(INTERP, dest, result);
@@ -771,7 +755,7 @@ pmclass default noinit {
 
         FLOATVAL result;
 
-        result = SELF->vtable->get_number(INTERP, SELF)
+        result = DYNSELF.get_number()
             + value;
 
         dest->vtable->set_number_native(INTERP, dest, result);
@@ -782,7 +766,7 @@ pmclass default noinit {
 
         FLOATVAL result;
 
-        result = SELF->vtable->get_number(INTERP, SELF)
+        result = DYNSELF.get_number()
             + value->vtable->get_number(INTERP, value);
 
         dest->vtable->set_number_native(INTERP, dest, result);
@@ -796,7 +780,7 @@ pmclass default noinit {
         if (key == NULL) {
             FLOATVAL result;
 
-            result = SELF->vtable->get_number(INTERP, SELF) + (
+            result = DYNSELF.get_number() + (
                 value_key == NULL ?
                 value->vtable->get_number(INTERP, value) :
                 value->vtable->get_number_keyed(INTERP, value, value_key)
@@ -820,30 +804,30 @@ pmclass default noinit {
         if (key == NULL) {
             if (value_key == NULL) {
                 MAKE_KEY_INT(r_dest_key, *dest_key);
-                SELF->vtable->add_keyed(INTERP, SELF, NULL, value, NULL, dest, &r_dest_key);
+                DYNSELF.add_keyed(NULL, value, NULL, dest, &r_dest_key);
             }
             else {
                 MAKE_KEY_INT(r_value_key, *value_key);
-                SELF->vtable->add_keyed(INTERP, SELF, NULL, value, &r_value_key, dest, NULL);
+                DYNSELF.add_keyed(NULL, value, &r_value_key, dest, NULL);
             }
         }
         else {
             MAKE_KEY_INT(r_key, *key);
             if (value_key == NULL) {
                 if (dest_key == NULL)
-                    SELF->vtable->add_keyed(INTERP, SELF, &r_key, value, NULL, dest, NULL);
+                    DYNSELF.add_keyed(&r_key, value, NULL, dest, NULL);
                 else {
                     MAKE_KEY_INT(r_dest_key, *dest_key);
-                    SELF->vtable->add_keyed(INTERP, SELF, &r_key, value, NULL, dest, &r_dest_key);
+                    DYNSELF.add_keyed(&r_key, value, NULL, dest, &r_dest_key);
                 }
             }
             else {
                 MAKE_KEY_INT(r_value_key, *value_key);
                 if (dest_key == NULL)
-                    SELF->vtable->add_keyed(INTERP, SELF, &r_key, value, &r_value_key, dest, NULL);
+                    DYNSELF.add_keyed(&r_key, value, &r_value_key, dest, NULL);
                 else {
                     MAKE_KEY_INT(r_dest_key, *dest_key);
-                    SELF->vtable->add_keyed(INTERP, SELF, &r_key, value, &r_value_key, dest, &r_dest_key);
+                    DYNSELF.add_keyed(&r_key, value, &r_value_key, dest, &r_dest_key);
                 }
             }
         }
@@ -854,7 +838,7 @@ pmclass default noinit {
 
         FLOATVAL result;
 
-        result = SELF->vtable->get_number(INTERP, SELF)
+        result = DYNSELF.get_number()
             - value->vtable->get_number(INTERP, value);
 
         dest->vtable->set_number_native(INTERP, dest, result);
@@ -866,7 +850,7 @@ pmclass default noinit {
 
         FLOATVAL result;
 
-        result = SELF->vtable->get_number(INTERP, SELF)
+        result = DYNSELF.get_number()
             - value;
 
         dest->vtable->set_number_native(INTERP, dest, result);
@@ -882,7 +866,7 @@ pmclass default noinit {
 
         FLOATVAL result;
 
-        result = SELF->vtable->get_number(INTERP, SELF)
+        result = DYNSELF.get_number()
             - value;
 
         dest->vtable->set_number_native(INTERP, dest, result);
@@ -893,7 +877,7 @@ pmclass default noinit {
 
         FLOATVAL result;
 
-        result = SELF->vtable->get_number(INTERP, SELF)
+        result = DYNSELF.get_number()
             - value->vtable->get_number(INTERP, value);
 
         dest->vtable->set_number_native(INTERP, dest, result);
@@ -907,7 +891,7 @@ pmclass default noinit {
         if (key == NULL) {
             FLOATVAL result;
 
-            result = SELF->vtable->get_number(INTERP, SELF) - (
+            result = DYNSELF.get_number() - (
                 value_key == NULL ?
                 value->vtable->get_number(INTERP, value) :
                 value->vtable->get_number_keyed(INTERP, value, value_key)
@@ -931,30 +915,30 @@ pmclass default noinit {
         if (key == NULL) {
             if (value_key == NULL) {
                 MAKE_KEY_INT(r_dest_key, *dest_key);
-                SELF->vtable->subtract_keyed(INTERP, SELF, NULL, value, NULL, dest, &r_dest_key);
+                DYNSELF.subtract_keyed(NULL, value, NULL, dest, &r_dest_key);
             }
             else {
                 MAKE_KEY_INT(r_value_key, *value_key);
-                SELF->vtable->subtract_keyed(INTERP, SELF, NULL, value, &r_value_key, dest, NULL);
+                DYNSELF.subtract_keyed(NULL, value, &r_value_key, dest, NULL);
             }
         }
         else {
             MAKE_KEY_INT(r_key, *key);
             if (value_key == NULL) {
                 if (dest_key == NULL)
-                    SELF->vtable->subtract_keyed(INTERP, SELF, &r_key, value, NULL, dest, NULL);
+                    DYNSELF.subtract_keyed(&r_key, value, NULL, dest, NULL);
                 else {
                     MAKE_KEY_INT(r_dest_key, *dest_key);
-                    SELF->vtable->subtract_keyed(INTERP, SELF, &r_key, value, NULL, dest, &r_dest_key);
+                    DYNSELF.subtract_keyed(&r_key, value, NULL, dest, &r_dest_key);
                 }
             }
             else {
                 MAKE_KEY_INT(r_value_key, *value_key);
                 if (dest_key == NULL)
-                    SELF->vtable->subtract_keyed(INTERP, SELF, &r_key, value, &r_value_key, dest, NULL);
+                    DYNSELF.subtract_keyed(&r_key, value, &r_value_key, dest, NULL);
                 else {
                     MAKE_KEY_INT(r_dest_key, *dest_key);
-                    SELF->vtable->subtract_keyed(INTERP, SELF, &r_key, value, &r_value_key, dest, &r_dest_key);
+                    DYNSELF.subtract_keyed(&r_key, value, &r_value_key, dest, &r_dest_key);
                 }
             }
         }
@@ -965,7 +949,7 @@ pmclass default noinit {
 
         FLOATVAL result;
 
-        result = SELF->vtable->get_number(INTERP, SELF)
+        result = DYNSELF.get_number()
             * value->vtable->get_number(INTERP, value);
 
         dest->vtable->set_number_native(INTERP, dest, result);
@@ -976,7 +960,7 @@ pmclass default noinit {
 
         FLOATVAL result;
 
-        result = SELF->vtable->get_number(INTERP, SELF)
+        result = DYNSELF.get_number()
             * value;
 
         dest->vtable->set_number_native(INTERP, dest, result);
@@ -991,7 +975,7 @@ pmclass default noinit {
 
         FLOATVAL result;
 
-        result = SELF->vtable->get_number(INTERP, SELF)
+        result = DYNSELF.get_number()
             * value;
 
         dest->vtable->set_number_native(INTERP, dest, result);
@@ -1002,7 +986,7 @@ pmclass default noinit {
 
         FLOATVAL result;
 
-        result = SELF->vtable->get_number(INTERP, SELF)
+        result = DYNSELF.get_number()
             * value->vtable->get_number(INTERP, value);
 
         dest->vtable->set_number_native(INTERP, dest, result);
@@ -1016,7 +1000,7 @@ pmclass default noinit {
         if (key == NULL) {
             FLOATVAL result;
 
-            result = SELF->vtable->get_number(INTERP, SELF) * (
+            result = DYNSELF.get_number() * (
                 value_key == NULL ?
                 value->vtable->get_number(INTERP, value) :
                 value->vtable->get_number_keyed(INTERP, value, value_key)
@@ -1040,30 +1024,30 @@ pmclass default noinit {
         if (key == NULL) {
             if (value_key == NULL) {
                 MAKE_KEY_INT(r_dest_key, *dest_key);
-                SELF->vtable->multiply_keyed(INTERP, SELF, NULL, value, NULL, dest, &r_dest_key);
+                DYNSELF.multiply_keyed(NULL, value, NULL, dest, &r_dest_key);
             }
             else {
                 MAKE_KEY_INT(r_value_key, *value_key);
-                SELF->vtable->multiply_keyed(INTERP, SELF, NULL, value, &r_value_key, dest, NULL);
+                DYNSELF.multiply_keyed(NULL, value, &r_value_key, dest, NULL);
             }
         }
         else {
             MAKE_KEY_INT(r_key, *key);
             if (value_key == NULL) {
                 if (dest_key == NULL)
-                    SELF->vtable->multiply_keyed(INTERP, SELF, &r_key, value, NULL, dest, NULL);
+                    DYNSELF.multiply_keyed(&r_key, value, NULL, dest, NULL);
                 else {
                     MAKE_KEY_INT(r_dest_key, *dest_key);
-                    SELF->vtable->multiply_keyed(INTERP, SELF, &r_key, value, NULL, dest, &r_dest_key);
+                    DYNSELF.multiply_keyed(&r_key, value, NULL, dest, &r_dest_key);
                 }
             }
             else {
                 MAKE_KEY_INT(r_value_key, *value_key);
                 if (dest_key == NULL)
-                    SELF->vtable->multiply_keyed(INTERP, SELF, &r_key, value, &r_value_key, dest, NULL);
+                    DYNSELF.multiply_keyed(&r_key, value, &r_value_key, dest, NULL);
                 else {
                     MAKE_KEY_INT(r_dest_key, *dest_key);
-                    SELF->vtable->multiply_keyed(INTERP, SELF, &r_key, value, &r_value_key, dest, &r_dest_key);
+                    DYNSELF.multiply_keyed(&r_key, value, &r_value_key, dest, &r_dest_key);
                 }
             }
         }
@@ -1074,7 +1058,7 @@ pmclass default noinit {
 
         FLOATVAL result;
 
-        result = SELF->vtable->get_number(INTERP, SELF)
+        result = DYNSELF.get_number()
             / value->vtable->get_number(INTERP, value);
 
         dest->vtable->set_number_native(INTERP, dest, result);
@@ -1087,7 +1071,7 @@ pmclass default noinit {
 
         FLOATVAL result;
 
-        result = SELF->vtable->get_number(INTERP, SELF)
+        result = DYNSELF.get_number()
             / value;
 
         dest->vtable->set_number_native(INTERP, dest, result);
@@ -1104,7 +1088,7 @@ pmclass default noinit {
 
         FLOATVAL result;
 
-        result = SELF->vtable->get_number(INTERP, SELF)
+        result = DYNSELF.get_number()
             / value;
 
         dest->vtable->set_number_native(INTERP, dest, result);
@@ -1115,7 +1099,7 @@ pmclass default noinit {
 
         FLOATVAL result;
 
-        result = SELF->vtable->get_number(INTERP, SELF)
+        result = DYNSELF.get_number()
             / value->vtable->get_number(INTERP, value);
 
         dest->vtable->set_number_native(INTERP, dest, result);
@@ -1129,7 +1113,7 @@ pmclass default noinit {
         if (key == NULL) {
             FLOATVAL result;
 
-            result = SELF->vtable->get_number(INTERP, SELF) / (
+            result = DYNSELF.get_number() / (
                 value_key == NULL ?
                 value->vtable->get_number(INTERP, value) :
                 value->vtable->get_number_keyed(INTERP, value, value_key)
@@ -1153,30 +1137,30 @@ pmclass default noinit {
         if (key == NULL) {
             if (value_key == NULL) {
                 MAKE_KEY_INT(r_dest_key, *dest_key);
-                SELF->vtable->divide_keyed(INTERP, SELF, NULL, value, NULL, dest, &r_dest_key);
+                DYNSELF.divide_keyed(NULL, value, NULL, dest, &r_dest_key);
             }
             else {
                 MAKE_KEY_INT(r_value_key, *value_key);
-                SELF->vtable->divide_keyed(INTERP, SELF, NULL, value, &r_value_key, dest, NULL);
+                DYNSELF.divide_keyed(NULL, value, &r_value_key, dest, NULL);
             }
         }
         else {
             MAKE_KEY_INT(r_key, *key);
             if (value_key == NULL) {
                 if (dest_key == NULL)
-                    SELF->vtable->divide_keyed(INTERP, SELF, &r_key, value, NULL, dest, NULL);
+                    DYNSELF.divide_keyed(&r_key, value, NULL, dest, NULL);
                 else {
                     MAKE_KEY_INT(r_dest_key, *dest_key);
-                    SELF->vtable->divide_keyed(INTERP, SELF, &r_key, value, NULL, dest, &r_dest_key);
+                    DYNSELF.divide_keyed(&r_key, value, NULL, dest, &r_dest_key);
                 }
             }
             else {
                 MAKE_KEY_INT(r_value_key, *value_key);
                 if (dest_key == NULL)
-                    SELF->vtable->divide_keyed(INTERP, SELF, &r_key, value, &r_value_key, dest, NULL);
+                    DYNSELF.divide_keyed(&r_key, value, &r_value_key, dest, NULL);
                 else {
                     MAKE_KEY_INT(r_dest_key, *dest_key);
-                    SELF->vtable->divide_keyed(INTERP, SELF, &r_key, value, &r_value_key, dest, &r_dest_key);
+                    DYNSELF.divide_keyed(&r_key, value, &r_value_key, dest, &r_dest_key);
                 }
             }
         }
@@ -1187,7 +1171,7 @@ pmclass default noinit {
 
         INTVAL result;
 
-        result = SELF->vtable->get_integer(INTERP, SELF)
+        result = DYNSELF.get_integer()
             % value->vtable->get_integer(INTERP, value);
 
         dest->vtable->set_integer_native(INTERP, dest, result);
@@ -1196,7 +1180,7 @@ pmclass default noinit {
     void modulus_int (INTVAL value,  PMC* dest) {
         INTVAL result;
 
-        result = SELF->vtable->get_integer(INTERP, SELF)
+        result = DYNSELF.get_integer()
             % value;
 
         dest->vtable->set_integer_native(INTERP, dest, result);
@@ -1210,7 +1194,7 @@ pmclass default noinit {
         /* XXX: makes all arguments integers...*/
         INTVAL result;
 
-        result = SELF->vtable->get_integer(INTERP, SELF)
+        result = DYNSELF.get_integer()
             % (INTVAL)value;
 
         dest->vtable->set_integer_native(INTERP, dest, result);
@@ -1220,7 +1204,7 @@ pmclass default noinit {
         /* This does perl-like modulus */
         INTVAL result;
 
-        result = SELF->vtable->get_integer(INTERP, SELF)
+        result = DYNSELF.get_integer()
             % value->vtable->get_integer(INTERP, value);
 
         dest->vtable->set_integer_native(INTERP, dest, result);
@@ -1234,7 +1218,7 @@ pmclass default noinit {
         if (key == NULL) {
             INTVAL result;
 
-            result = SELF->vtable->get_integer(INTERP, SELF) % (
+            result = DYNSELF.get_integer() % (
                 value_key == NULL ?
                 value->vtable->get_integer(INTERP, value) :
                 value->vtable->get_integer_keyed(INTERP, value, value_key)
@@ -1258,43 +1242,43 @@ pmclass default noinit {
         if (key == NULL) {
             if (value_key == NULL) {
                 MAKE_KEY_INT(r_dest_key, *dest_key);
-                SELF->vtable->modulus_keyed(INTERP, SELF, NULL, value, NULL, dest, &r_dest_key);
+                DYNSELF.modulus_keyed(NULL, value, NULL, dest, &r_dest_key);
             }
             else {
                 MAKE_KEY_INT(r_value_key, *value_key);
-                SELF->vtable->modulus_keyed(INTERP, SELF, NULL, value, &r_value_key, dest, NULL);
+                DYNSELF.modulus_keyed(NULL, value, &r_value_key, dest, NULL);
             }
         }
         else {
             MAKE_KEY_INT(r_key, *key);
             if (value_key == NULL) {
                 if (dest_key == NULL)
-                    SELF->vtable->modulus_keyed(INTERP, SELF, &r_key, value, NULL, dest, NULL);
+                    DYNSELF.modulus_keyed(&r_key, value, NULL, dest, NULL);
                 else {
                     MAKE_KEY_INT(r_dest_key, *dest_key);
-                    SELF->vtable->modulus_keyed(INTERP, SELF, &r_key, value, NULL, dest, &r_dest_key);
+                    DYNSELF.modulus_keyed(&r_key, value, NULL, dest, &r_dest_key);
                 }
             }
             else {
                 MAKE_KEY_INT(r_value_key, *value_key);
                 if (dest_key == NULL)
-                    SELF->vtable->modulus_keyed(INTERP, SELF, &r_key, value, &r_value_key, dest, NULL);
+                    DYNSELF.modulus_keyed(&r_key, value, &r_value_key, dest, NULL);
                 else {
                     MAKE_KEY_INT(r_dest_key, *dest_key);
-                    SELF->vtable->modulus_keyed(INTERP, SELF, &r_key, value, &r_value_key, dest, &r_dest_key);
+                    DYNSELF.modulus_keyed(&r_key, value, &r_value_key, dest, &r_dest_key);
                 }
             }
         }
     }
 
     void neg (PMC* dest) {
-        dest->vtable->set_integer_native(INTERP, dest, -SELF->vtable->get_integer(INTERP, SELF));
+        dest->vtable->set_integer_native(INTERP, dest, -DYNSELF.get_integer());
     }
 
     void neg_keyed (KEY* key, PMC* dest, KEY* dest_key) {
         if (key == NULL)
             dest->vtable->set_integer_keyed(INTERP, dest,
-                dest_key, -SELF->vtable->get_integer(INTERP, SELF));
+                dest_key, -DYNSELF.get_integer());
         else
             internal_exception(OUT_OF_BOUNDS, "Subscript on something that's not an aggregate!\n");
     }
@@ -1303,22 +1287,22 @@ pmclass default noinit {
         KEY r_key, r_dest_key;
         if (key == NULL) {
             MAKE_KEY_INT(r_dest_key, *dest_key);
-            SELF->vtable->neg_keyed(INTERP, SELF, NULL, dest, &r_dest_key);
+            DYNSELF.neg_keyed(NULL, dest, &r_dest_key);
             return;
         }
         MAKE_KEY_INT(r_key, *key);
         if (dest_key == NULL) {
-            SELF->vtable->neg_keyed(INTERP, SELF, &r_key, dest, NULL);
+            DYNSELF.neg_keyed(&r_key, dest, NULL);
             return;
         }
         MAKE_KEY_INT(r_dest_key, *dest_key);
-        SELF->vtable->neg_keyed(INTERP, SELF, &r_key, dest, &r_dest_key);
+        DYNSELF.neg_keyed(&r_key, dest, &r_dest_key);
     }
 
     void bitwise_or (PMC* value, PMC* dest) {
         INTVAL result;
 
-        result = SELF->vtable->get_integer(INTERP, SELF)
+        result = DYNSELF.get_integer()
             | value->vtable->get_integer(INTERP, value);
 
         dest->vtable->set_integer_native(INTERP, dest, result);
@@ -1327,7 +1311,7 @@ pmclass default noinit {
     void bitwise_or_int (INTVAL value, PMC* dest) {
         INTVAL result;
 
-        result = SELF->vtable->get_integer(INTERP, SELF)
+        result = DYNSELF.get_integer()
             | value;
 
         dest->vtable->set_integer_native(INTERP, dest, result);
@@ -1336,7 +1320,7 @@ pmclass default noinit {
     void bitwise_or_same (PMC* value, PMC* dest) {
         INTVAL result;
 
-        result = SELF->vtable->get_integer(INTERP, SELF)
+        result = DYNSELF.get_integer()
             | value->vtable->get_integer(INTERP, value);
 
         dest->vtable->set_integer_native(INTERP, dest, result);
@@ -1350,7 +1334,7 @@ pmclass default noinit {
         if (key == NULL) {
             INTVAL result;
 
-            result = SELF->vtable->get_integer(INTERP, SELF) | (
+            result = DYNSELF.get_integer() | (
                 value_key == NULL ?
                 value->vtable->get_integer(INTERP, value) :
                 value->vtable->get_integer_keyed(INTERP, value, value_key)
@@ -1374,30 +1358,30 @@ pmclass default noinit {
         if (key == NULL) {
             if (value_key == NULL) {
                 MAKE_KEY_INT(r_dest_key, *dest_key);
-                SELF->vtable->bitwise_or_keyed(INTERP, SELF, NULL, value, NULL, dest, &r_dest_key);
+                DYNSELF.bitwise_or_keyed(NULL, value, NULL, dest, &r_dest_key);
             }
             else {
                 MAKE_KEY_INT(r_value_key, *value_key);
-                SELF->vtable->bitwise_or_keyed(INTERP, SELF, NULL, value, &r_value_key, dest, NULL);
+                DYNSELF.bitwise_or_keyed(NULL, value, &r_value_key, dest, NULL);
             }
         }
         else {
             MAKE_KEY_INT(r_key, *key);
             if (value_key == NULL) {
                 if (dest_key == NULL)
-                    SELF->vtable->bitwise_or_keyed(INTERP, SELF, &r_key, value, NULL, dest, NULL);
+                    DYNSELF.bitwise_or_keyed(&r_key, value, NULL, dest, NULL);
                 else {
                     MAKE_KEY_INT(r_dest_key, *dest_key);
-                    SELF->vtable->bitwise_or_keyed(INTERP, SELF, &r_key, value, NULL, dest, &r_dest_key);
+                    DYNSELF.bitwise_or_keyed(&r_key, value, NULL, dest, &r_dest_key);
                 }
             }
             else {
                 MAKE_KEY_INT(r_value_key, *value_key);
                 if (dest_key == NULL)
-                    SELF->vtable->bitwise_or_keyed(INTERP, SELF, &r_key, value, &r_value_key, dest, NULL);
+                    DYNSELF.bitwise_or_keyed(&r_key, value, &r_value_key, dest, NULL);
                 else {
                     MAKE_KEY_INT(r_dest_key, *dest_key);
-                    SELF->vtable->bitwise_or_keyed(INTERP, SELF, &r_key, value, &r_value_key, dest, &r_dest_key);
+                    DYNSELF.bitwise_or_keyed(&r_key, value, &r_value_key, dest, &r_dest_key);
                 }
             }
         }
@@ -1406,7 +1390,7 @@ pmclass default noinit {
     void bitwise_and (PMC* value, PMC* dest) {
         INTVAL result;
 
-        result = SELF->vtable->get_integer(INTERP, SELF)
+        result = DYNSELF.get_integer()
             & value->vtable->get_integer(INTERP, value);
 
         dest->vtable->set_integer_native(INTERP, dest, result);
@@ -1415,7 +1399,7 @@ pmclass default noinit {
     void bitwise_and_int (INTVAL value, PMC* dest) {
         INTVAL result;
 
-        result = SELF->vtable->get_integer(INTERP, SELF)
+        result = DYNSELF.get_integer()
             & value;
 
         dest->vtable->set_integer_native(INTERP, dest, result);
@@ -1424,7 +1408,7 @@ pmclass default noinit {
     void bitwise_and_same (PMC* value, PMC* dest) {
         INTVAL result;
 
-        result = SELF->vtable->get_integer(INTERP, SELF)
+        result = DYNSELF.get_integer()
             & value->vtable->get_integer(INTERP, value);
 
         dest->vtable->set_integer_native(INTERP, dest, result);
@@ -1438,7 +1422,7 @@ pmclass default noinit {
         if (key == NULL) {
             INTVAL result;
 
-            result = SELF->vtable->get_integer(INTERP, SELF) & (
+            result = DYNSELF.get_integer() & (
                 value_key == NULL ?
                 value->vtable->get_integer(INTERP, value) :
                 value->vtable->get_integer_keyed(INTERP, value, value_key)
@@ -1462,30 +1446,30 @@ pmclass default noinit {
         if (key == NULL) {
             if (value_key == NULL) {
                 MAKE_KEY_INT(r_dest_key, *dest_key);
-                SELF->vtable->bitwise_and_keyed(INTERP, SELF, NULL, value, NULL, dest, &r_dest_key);
+                DYNSELF.bitwise_and_keyed(NULL, value, NULL, dest, &r_dest_key);
             }
             else {
                 MAKE_KEY_INT(r_value_key, *value_key);
-                SELF->vtable->bitwise_and_keyed(INTERP, SELF, NULL, value, &r_value_key, dest, NULL);
+                DYNSELF.bitwise_and_keyed(NULL, value, &r_value_key, dest, NULL);
             }
         }
         else {
             MAKE_KEY_INT(r_key, *key);
             if (value_key == NULL) {
                 if (dest_key == NULL)
-                    SELF->vtable->bitwise_and_keyed(INTERP, SELF, &r_key, value, NULL, dest, NULL);
+                    DYNSELF.bitwise_and_keyed(&r_key, value, NULL, dest, NULL);
                 else {
                     MAKE_KEY_INT(r_dest_key, *dest_key);
-                    SELF->vtable->bitwise_and_keyed(INTERP, SELF, &r_key, value, NULL, dest, &r_dest_key);
+                    DYNSELF.bitwise_and_keyed(&r_key, value, NULL, dest, &r_dest_key);
                 }
             }
             else {
                 MAKE_KEY_INT(r_value_key, *value_key);
                 if (dest_key == NULL)
-                    SELF->vtable->bitwise_and_keyed(INTERP, SELF, &r_key, value, &r_value_key, dest, NULL);
+                    DYNSELF.bitwise_and_keyed(&r_key, value, &r_value_key, dest, NULL);
                 else {
                     MAKE_KEY_INT(r_dest_key, *dest_key);
-                    SELF->vtable->bitwise_and_keyed(INTERP, SELF, &r_key, value, &r_value_key, dest, &r_dest_key);
+                    DYNSELF.bitwise_and_keyed(&r_key, value, &r_value_key, dest, &r_dest_key);
                 }
             }
         }
@@ -1494,7 +1478,7 @@ pmclass default noinit {
     void bitwise_xor (PMC* value, PMC* dest) {
         INTVAL result;
 
-        result = SELF->vtable->get_integer(INTERP, SELF)
+        result = DYNSELF.get_integer()
             ^ value->vtable->get_integer(INTERP, value);
 
         dest->vtable->set_integer_native(INTERP, dest, result);
@@ -1503,7 +1487,7 @@ pmclass default noinit {
     void bitwise_xor_int (INTVAL value, PMC* dest) {
         INTVAL result;
 
-        result = SELF->vtable->get_integer(INTERP, SELF)
+        result = DYNSELF.get_integer()
             ^ value;
 
         dest->vtable->set_integer_native(INTERP, dest, result);
@@ -1512,7 +1496,7 @@ pmclass default noinit {
     void bitwise_xor_same (PMC* value, PMC* dest) {
         INTVAL result;
 
-        result = SELF->vtable->get_integer(INTERP, SELF)
+        result = DYNSELF.get_integer()
             ^ value->vtable->get_integer(INTERP, value);
 
         dest->vtable->set_integer_native(INTERP, dest, result);
@@ -1526,7 +1510,7 @@ pmclass default noinit {
         if (key == NULL) {
             INTVAL result;
 
-            result = SELF->vtable->get_integer(INTERP, SELF) ^ (
+            result = DYNSELF.get_integer() ^ (
                 value_key == NULL ?
                 value->vtable->get_integer(INTERP, value) :
                 value->vtable->get_integer_keyed(INTERP, value, value_key)
@@ -1550,43 +1534,43 @@ pmclass default noinit {
         if (key == NULL) {
             if (value_key == NULL) {
                 MAKE_KEY_INT(r_dest_key, *dest_key);
-                SELF->vtable->bitwise_xor_keyed(INTERP, SELF, NULL, value, NULL, dest, &r_dest_key);
+                DYNSELF.bitwise_xor_keyed(NULL, value, NULL, dest, &r_dest_key);
             }
             else {
                 MAKE_KEY_INT(r_value_key, *value_key);
-                SELF->vtable->bitwise_xor_keyed(INTERP, SELF, NULL, value, &r_value_key, dest, NULL);
+                DYNSELF.bitwise_xor_keyed(NULL, value, &r_value_key, dest, NULL);
             }
         }
         else {
             MAKE_KEY_INT(r_key, *key);
             if (value_key == NULL) {
                 if (dest_key == NULL)
-                    SELF->vtable->bitwise_xor_keyed(INTERP, SELF, &r_key, value, NULL, dest, NULL);
+                    DYNSELF.bitwise_xor_keyed(&r_key, value, NULL, dest, NULL);
                 else {
                     MAKE_KEY_INT(r_dest_key, *dest_key);
-                    SELF->vtable->bitwise_xor_keyed(INTERP, SELF, &r_key, value, NULL, dest, &r_dest_key);
+                    DYNSELF.bitwise_xor_keyed(&r_key, value, NULL, dest, &r_dest_key);
                 }
             }
             else {
                 MAKE_KEY_INT(r_value_key, *value_key);
                 if (dest_key == NULL)
-                    SELF->vtable->bitwise_xor_keyed(INTERP, SELF, &r_key, value, &r_value_key, dest, NULL);
+                    DYNSELF.bitwise_xor_keyed(&r_key, value, &r_value_key, dest, NULL);
                 else {
                     MAKE_KEY_INT(r_dest_key, *dest_key);
-                    SELF->vtable->bitwise_xor_keyed(INTERP, SELF, &r_key, value, &r_value_key, dest, &r_dest_key);
+                    DYNSELF.bitwise_xor_keyed(&r_key, value, &r_value_key, dest, &r_dest_key);
                 }
             }
         }
     }
 
     void bitwise_not (PMC* dest) {
-        dest->vtable->set_integer_native(INTERP, dest, ~SELF->vtable->get_integer(INTERP, SELF));
+        dest->vtable->set_integer_native(INTERP, dest, ~DYNSELF.get_integer());
     }
 
     void bitwise_not_keyed (KEY* key, PMC* dest, KEY* dest_key) {
         if (key == NULL)
             dest->vtable->set_integer_keyed(INTERP, dest,
-                dest_key, ~SELF->vtable->get_integer(INTERP, SELF));
+                dest_key, ~DYNSELF.get_integer());
         else
             internal_exception(OUT_OF_BOUNDS, "Subscript on something that's not an aggregate!\n");
     }
@@ -1595,22 +1579,22 @@ pmclass default noinit {
         KEY r_key, r_dest_key;
         if (key == NULL) {
             MAKE_KEY_INT(r_dest_key, *dest_key);
-            SELF->vtable->bitwise_not_keyed(INTERP, SELF, NULL, dest, &r_dest_key);
+            DYNSELF.bitwise_not_keyed(NULL, dest, &r_dest_key);
             return;
         }
         MAKE_KEY_INT(r_key, *key);
         if (dest_key == NULL) {
-            SELF->vtable->bitwise_not_keyed(INTERP, SELF, &r_key, dest, NULL);
+            DYNSELF.bitwise_not_keyed(&r_key, dest, NULL);
             return;
         }
         MAKE_KEY_INT(r_dest_key, *dest_key);
-        SELF->vtable->bitwise_not_keyed(INTERP, SELF, &r_key, dest, &r_dest_key);
+        DYNSELF.bitwise_not_keyed(&r_key, dest, &r_dest_key);
     }
 
     void bitwise_shr (PMC* value, PMC* dest) {
         INTVAL result;
 
-        result = SELF->vtable->get_integer(INTERP, SELF)
+        result = DYNSELF.get_integer()
             >> value->vtable->get_integer(INTERP, value);
 
         dest->vtable->set_integer_native(INTERP, dest, result);
@@ -1619,7 +1603,7 @@ pmclass default noinit {
     void bitwise_shr_int (INTVAL value, PMC* dest) {
         INTVAL result;
 
-        result = SELF->vtable->get_integer(INTERP, SELF)
+        result = DYNSELF.get_integer()
             >> value;
 
         dest->vtable->set_integer_native(INTERP, dest, result);
@@ -1628,7 +1612,7 @@ pmclass default noinit {
     void bitwise_shr_same (PMC* value, PMC* dest) {
         INTVAL result;
 
-        result = SELF->vtable->get_integer(INTERP, SELF)
+        result = DYNSELF.get_integer()
             >> value->vtable->get_integer(INTERP, value);
 
         dest->vtable->set_integer_native(INTERP, dest, result);
@@ -1642,7 +1626,7 @@ pmclass default noinit {
         if (key == NULL) {
             INTVAL result;
 
-            result = SELF->vtable->get_integer(INTERP, SELF) >> (
+            result = DYNSELF.get_integer() >> (
                 value_key == NULL ?
                 value->vtable->get_integer(INTERP, value) :
                 value->vtable->get_integer_keyed(INTERP, value, value_key)
@@ -1666,30 +1650,30 @@ pmclass default noinit {
         if (key == NULL) {
             if (value_key == NULL) {
                 MAKE_KEY_INT(r_dest_key, *dest_key);
-                SELF->vtable->bitwise_shr_keyed(INTERP, SELF, NULL, value, NULL, dest, &r_dest_key);
+                DYNSELF.bitwise_shr_keyed(NULL, value, NULL, dest, &r_dest_key);
             }
             else {
                 MAKE_KEY_INT(r_value_key, *value_key);
-                SELF->vtable->bitwise_shr_keyed(INTERP, SELF, NULL, value, &r_value_key, dest, NULL);
+                DYNSELF.bitwise_shr_keyed(NULL, value, &r_value_key, dest, NULL);
             }
         }
         else {
             MAKE_KEY_INT(r_key, *key);
             if (value_key == NULL) {
                 if (dest_key == NULL)
-                    SELF->vtable->bitwise_shr_keyed(INTERP, SELF, &r_key, value, NULL, dest, NULL);
+                    DYNSELF.bitwise_shr_keyed(&r_key, value, NULL, dest, NULL);
                 else {
                     MAKE_KEY_INT(r_dest_key, *dest_key);
-                    SELF->vtable->bitwise_shr_keyed(INTERP, SELF, &r_key, value, NULL, dest, &r_dest_key);
+                    DYNSELF.bitwise_shr_keyed(&r_key, value, NULL, dest, &r_dest_key);
                 }
             }
             else {
                 MAKE_KEY_INT(r_value_key, *value_key);
                 if (dest_key == NULL)
-                    SELF->vtable->bitwise_shr_keyed(INTERP, SELF, &r_key, value, &r_value_key, dest, NULL);
+                    DYNSELF.bitwise_shr_keyed(&r_key, value, &r_value_key, dest, NULL);
                 else {
                     MAKE_KEY_INT(r_dest_key, *dest_key);
-                    SELF->vtable->bitwise_shr_keyed(INTERP, SELF, &r_key, value, &r_value_key, dest, &r_dest_key);
+                    DYNSELF.bitwise_shr_keyed(&r_key, value, &r_value_key, dest, &r_dest_key);
                 }
             }
         }
@@ -1698,7 +1682,7 @@ pmclass default noinit {
     void bitwise_shl (PMC* value, PMC* dest) {
         INTVAL result;
 
-        result = SELF->vtable->get_integer(INTERP, SELF)
+        result = DYNSELF.get_integer()
             << value->vtable->get_integer(INTERP, value);
 
         dest->vtable->set_integer_native(INTERP, dest, result);
@@ -1707,7 +1691,7 @@ pmclass default noinit {
     void bitwise_shl_int (INTVAL value, PMC* dest) {
         INTVAL result;
 
-        result = SELF->vtable->get_integer(INTERP, SELF)
+        result = DYNSELF.get_integer()
             << value;
 
         dest->vtable->set_integer_native(INTERP, dest, result);
@@ -1716,7 +1700,7 @@ pmclass default noinit {
     void bitwise_shl_same (PMC* value, PMC* dest) {
         INTVAL result;
 
-        result = SELF->vtable->get_integer(INTERP, SELF)
+        result = DYNSELF.get_integer()
             << value->vtable->get_integer(INTERP, value);
 
         dest->vtable->set_integer_native(INTERP, dest, result);
@@ -1730,7 +1714,7 @@ pmclass default noinit {
         if (key == NULL) {
             INTVAL result;
 
-            result = SELF->vtable->get_integer(INTERP, SELF) << (
+            result = DYNSELF.get_integer() << (
                 value_key == NULL ?
                 value->vtable->get_integer(INTERP, value) :
                 value->vtable->get_integer_keyed(INTERP, value, value_key)
@@ -1754,30 +1738,30 @@ pmclass default noinit {
         if (key == NULL) {
             if (value_key == NULL) {
                 MAKE_KEY_INT(r_dest_key, *dest_key);
-                SELF->vtable->bitwise_shl_keyed(INTERP, SELF, NULL, value, NULL, dest, &r_dest_key);
+                DYNSELF.bitwise_shl_keyed(NULL, value, NULL, dest, &r_dest_key);
             }
             else {
                 MAKE_KEY_INT(r_value_key, *value_key);
-                SELF->vtable->bitwise_shl_keyed(INTERP, SELF, NULL, value, &r_value_key, dest, NULL);
+                DYNSELF.bitwise_shl_keyed(NULL, value, &r_value_key, dest, NULL);
             }
         }
         else {
             MAKE_KEY_INT(r_key, *key);
             if (value_key == NULL) {
                 if (dest_key == NULL)
-                    SELF->vtable->bitwise_shl_keyed(INTERP, SELF, &r_key, value, NULL, dest, NULL);
+                    DYNSELF.bitwise_shl_keyed(&r_key, value, NULL, dest, NULL);
                 else {
                     MAKE_KEY_INT(r_dest_key, *dest_key);
-                    SELF->vtable->bitwise_shl_keyed(INTERP, SELF, &r_key, value, NULL, dest, &r_dest_key);
+                    DYNSELF.bitwise_shl_keyed(&r_key, value, NULL, dest, &r_dest_key);
                 }
             }
             else {
                 MAKE_KEY_INT(r_value_key, *value_key);
                 if (dest_key == NULL)
-                    SELF->vtable->bitwise_shl_keyed(INTERP, SELF, &r_key, value, &r_value_key, dest, NULL);
+                    DYNSELF.bitwise_shl_keyed(&r_key, value, &r_value_key, dest, NULL);
                 else {
                     MAKE_KEY_INT(r_dest_key, *dest_key);
-                    SELF->vtable->bitwise_shl_keyed(INTERP, SELF, &r_key, value, &r_value_key, dest, &r_dest_key);
+                    DYNSELF.bitwise_shl_keyed(&r_key, value, &r_value_key, dest, &r_dest_key);
                 }
             }
         }
@@ -1785,7 +1769,7 @@ pmclass default noinit {
 
     void concatenate (PMC* value,  PMC* dest) {
         STRING* s = string_concat(INTERP,
-            SELF->vtable->get_string(INTERP, SELF),
+            DYNSELF.get_string(),
             value->vtable->get_string(INTERP, value), 0);
 
         dest->vtable->set_string_native(INTERP, dest, s);
@@ -1794,7 +1778,7 @@ pmclass default noinit {
     void concatenate_native (STRING* value,  PMC* dest) {
         /* dest = SELF (concat) value */
         STRING* s = string_concat(INTERP,
-            SELF->vtable->get_string(INTERP, SELF),
+            DYNSELF.get_string(),
             value, 0);
 
         dest->vtable->set_string_native(INTERP, dest, s);
@@ -1802,7 +1786,7 @@ pmclass default noinit {
 
     void concatenate_same (PMC* value,  PMC* dest) {
         STRING* s = string_concat(INTERP,
-            SELF->vtable->get_string(INTERP, SELF),
+            DYNSELF.get_string(),
             value->vtable->get_string(INTERP, value), 0);
 
         dest->vtable->set_string_native(INTERP, dest, s);
@@ -1819,11 +1803,11 @@ pmclass default noinit {
 
             if (value_key == NULL)
                 result = string_concat(INTERP,
-                    SELF->vtable->get_string(INTERP, SELF),
+                    DYNSELF.get_string(),
                     value->vtable->get_string(INTERP, value), 0);
             else
                 result = string_concat(INTERP,
-                    SELF->vtable->get_string(INTERP, SELF),
+                    DYNSELF.get_string(),
                     value->vtable->get_string_keyed(INTERP, value, value_key), 0);
 
             if (dest_key == NULL)
@@ -1844,30 +1828,30 @@ pmclass default noinit {
         if (key == NULL) {
             if (value_key == NULL) {
                 MAKE_KEY_INT(r_dest_key, *dest_key);
-                SELF->vtable->concatenate_keyed(INTERP, SELF, NULL, value, NULL, dest, &r_dest_key);
+                DYNSELF.concatenate_keyed(NULL, value, NULL, dest, &r_dest_key);
             }
             else {
                 MAKE_KEY_INT(r_value_key, *value_key);
-                SELF->vtable->concatenate_keyed(INTERP, SELF, NULL, value, &r_value_key, dest, NULL);
+                DYNSELF.concatenate_keyed(NULL, value, &r_value_key, dest, NULL);
             }
         }
         else {
             MAKE_KEY_INT(r_key, *key);
             if (value_key == NULL) {
                 if (dest_key == NULL)
-                    SELF->vtable->concatenate_keyed(INTERP, SELF, &r_key, value, NULL, dest, NULL);
+                    DYNSELF.concatenate_keyed(&r_key, value, NULL, dest, NULL);
                 else {
                     MAKE_KEY_INT(r_dest_key, *dest_key);
-                    SELF->vtable->concatenate_keyed(INTERP, SELF, &r_key, value, NULL, dest, &r_dest_key);
+                    DYNSELF.concatenate_keyed(&r_key, value, NULL, dest, &r_dest_key);
                 }
             }
             else {
                 MAKE_KEY_INT(r_value_key, *value_key);
                 if (dest_key == NULL)
-                    SELF->vtable->concatenate_keyed(INTERP, SELF, &r_key, value, &r_value_key, dest, NULL);
+                    DYNSELF.concatenate_keyed(&r_key, value, &r_value_key, dest, NULL);
                 else {
                     MAKE_KEY_INT(r_dest_key, *dest_key);
-                    SELF->vtable->concatenate_keyed(INTERP, SELF, &r_key, value, &r_value_key, dest, &r_dest_key);
+                    DYNSELF.concatenate_keyed(&r_key, value, &r_value_key, dest, &r_dest_key);
                 }
             }
         }
@@ -1875,12 +1859,12 @@ pmclass default noinit {
 
     INTVAL is_equal (PMC* value) {
         /* I think we need to check everything, do the easiest first... */
-        if (SELF->vtable->get_integer(INTERP, SELF)
+        if (DYNSELF.get_integer()
                 == value->vtable->get_integer(INTERP, value)
-            && SELF->vtable->get_number(INTERP, SELF)
+            && DYNSELF.get_number()
                 == value->vtable->get_number(INTERP, value)
             && 0 == string_compare(INTERP,
-                SELF->vtable->get_string(INTERP, SELF),
+                DYNSELF.get_string(),
                 value->vtable->get_string(INTERP, value))
             )
         {
@@ -1891,12 +1875,12 @@ pmclass default noinit {
 
     INTVAL is_equal_keyed (KEY* key, PMC* value, KEY* value_key) {
         if (key == NULL) {
-            if (SELF->vtable->get_integer(INTERP, SELF)
+            if (DYNSELF.get_integer()
                     == value->vtable->get_integer_keyed(INTERP, value, value_key)
-                && SELF->vtable->get_number(INTERP, SELF)
+                && DYNSELF.get_number()
                     == value->vtable->get_number_keyed(INTERP, value, value_key)
                 && 0 == string_compare(INTERP,
-                    SELF->vtable->get_string(INTERP, SELF),
+                    DYNSELF.get_string(),
                     value->vtable->get_string_keyed(INTERP, value, value_key))
                 )
             {
@@ -1912,14 +1896,14 @@ pmclass default noinit {
         KEY r_key, r_value_key;
         if (key == NULL) {
             MAKE_KEY_INT(r_value_key, *value_key);
-            return SELF->vtable->is_equal_keyed(INTERP, SELF, NULL, value, &r_value_key);
+            return DYNSELF.is_equal_keyed(NULL, value, &r_value_key);
         }
         MAKE_KEY_INT(r_key, *key);
         if (value_key == NULL) {
-            return SELF->vtable->is_equal_keyed(INTERP, SELF, &r_key, value, NULL);
+            return DYNSELF.is_equal_keyed(&r_key, value, NULL);
         }
         MAKE_KEY_INT(r_value_key, *value_key);
-        return SELF->vtable->is_equal_keyed(INTERP, SELF, &r_key, value, &r_value_key);
+        return DYNSELF.is_equal_keyed(&r_key, value, &r_value_key);
     }
 
     INTVAL cmp (PMC* value) {
@@ -1939,20 +1923,20 @@ pmclass default noinit {
         KEY r_key, r_value_key;
         if (key == NULL) {
             MAKE_KEY_INT(r_value_key, *value_key);
-            return SELF->vtable->cmp_keyed(INTERP, SELF, NULL, value, &r_value_key);
+            return DYNSELF.cmp_keyed(NULL, value, &r_value_key);
         }
         MAKE_KEY_INT(r_key, *key);
         if (value_key == NULL) {
-            return SELF->vtable->cmp_keyed(INTERP, SELF, &r_key, value, NULL);
+            return DYNSELF.cmp_keyed(&r_key, value, NULL);
         }
         MAKE_KEY_INT(r_value_key, *value_key);
-        return SELF->vtable->cmp_keyed(INTERP, SELF, &r_key, value, &r_value_key);
+        return DYNSELF.cmp_keyed(&r_key, value, &r_value_key);
     }
 
     INTVAL cmp_num (PMC* value) {
         /* XXX - Floating-point precision errors possible? */
         FLOATVAL diff = value->vtable->get_number(INTERP, value) -
-                        SELF->vtable->get_number(INTERP, SELF);
+                        DYNSELF.get_number();
 
         return diff == 0.0 ? 0 : diff < 0.0 ? -1 : 1;
     }
@@ -1961,7 +1945,7 @@ pmclass default noinit {
         if (key == NULL) {
             /* XXX - Floating-point precision errors possible? */
             FLOATVAL diff = value->vtable->get_number_keyed(INTERP, value, value_key) -
-                            SELF->vtable->get_number(INTERP, SELF);
+                            DYNSELF.get_number();
 
             return diff == 0.0 ? 0 : diff < 0.0 ? -1 : 1;
         }
@@ -1973,24 +1957,24 @@ pmclass default noinit {
         KEY r_key, r_value_key;
         if (key == NULL) {
             MAKE_KEY_INT(r_value_key, *value_key);
-            return SELF->vtable->cmp_num_keyed(INTERP, SELF, NULL, value, &r_value_key);
+            return DYNSELF.cmp_num_keyed(NULL, value, &r_value_key);
         }
         MAKE_KEY_INT(r_key, *key);
         if (value_key == NULL) {
-            return SELF->vtable->cmp_num_keyed(INTERP, SELF, &r_key, value, NULL);
+            return DYNSELF.cmp_num_keyed(&r_key, value, NULL);
         }
         MAKE_KEY_INT(r_value_key, *value_key);
-        return SELF->vtable->cmp_num_keyed(INTERP, SELF, &r_key, value, &r_value_key);
+        return DYNSELF.cmp_num_keyed(&r_key, value, &r_value_key);
     }
 
     INTVAL cmp_string (PMC* value) {
-        return string_compare(INTERP, SELF->vtable->get_string(INTERP, SELF),
+        return string_compare(INTERP, DYNSELF.get_string(),
             value->vtable->get_string(INTERP, value));
     }
 
     INTVAL cmp_string_keyed (KEY* key, PMC* value, KEY* value_key) {
         if (key == NULL)
-            return string_compare(INTERP, SELF->vtable->get_string(INTERP, SELF),
+            return string_compare(INTERP, DYNSELF.get_string(),
                 value->vtable->get_string_keyed(INTERP, value, value_key));
         internal_exception(OUT_OF_BOUNDS, "Subscript on something that's not an aggregate!\n");
         return 0;
@@ -2000,18 +1984,18 @@ pmclass default noinit {
         KEY r_key, r_value_key;
         if (key == NULL) {
             MAKE_KEY_INT(r_value_key, *value_key);
-            return SELF->vtable->cmp_string_keyed(INTERP, SELF, NULL, value, &r_value_key);
+            return DYNSELF.cmp_string_keyed(NULL, value, &r_value_key);
         }
         MAKE_KEY_INT(r_key, *key);
         if (value_key == NULL) {
-            return SELF->vtable->cmp_string_keyed(INTERP, SELF, &r_key, value, NULL);
+            return DYNSELF.cmp_string_keyed(&r_key, value, NULL);
         }
         MAKE_KEY_INT(r_value_key, *value_key);
-        return SELF->vtable->cmp_string_keyed(INTERP, SELF, &r_key, value, &r_value_key);
+        return DYNSELF.cmp_string_keyed(&r_key, value, &r_value_key);
     }
 
     void logical_or (PMC* value,  PMC* dest) {
-        if (SELF->vtable->get_bool(INTERP, SELF)) {
+        if (DYNSELF.get_bool()) {
             dest->vtable->set_pmc(INTERP, dest, SELF);
         }
         else {
@@ -2022,7 +2006,7 @@ pmclass default noinit {
     void logical_or_keyed (KEY* key, PMC* value, KEY* value_key, PMC* dest, KEY* dest_key) {
         if (key == NULL) {
             PMC* new_value;
-            if (SELF->vtable->get_bool(INTERP, SELF)) {
+            if (DYNSELF.get_bool()) {
                 if (dest_key != NULL)
                     dest->vtable->set_pmc_keyed(INTERP, dest, dest_key, SELF, NULL);
                 else
@@ -2045,37 +2029,37 @@ pmclass default noinit {
         if (key == NULL) {
             if (value_key == NULL) {
                 MAKE_KEY_INT(r_dest_key, *dest_key);
-                SELF->vtable->logical_or_keyed(INTERP, SELF, NULL, value, NULL, dest, &r_dest_key);
+                DYNSELF.logical_or_keyed(NULL, value, NULL, dest, &r_dest_key);
             }
             else {
                 MAKE_KEY_INT(r_value_key, *value_key);
-                SELF->vtable->logical_or_keyed(INTERP, SELF, NULL, value, &r_value_key, dest, NULL);
+                DYNSELF.logical_or_keyed(NULL, value, &r_value_key, dest, NULL);
             }
         }
         else {
             MAKE_KEY_INT(r_key, *key);
             if (value_key == NULL) {
                 if (dest_key == NULL)
-                    SELF->vtable->logical_or_keyed(INTERP, SELF, &r_key, value, NULL, dest, NULL);
+                    DYNSELF.logical_or_keyed(&r_key, value, NULL, dest, NULL);
                 else {
                     MAKE_KEY_INT(r_dest_key, *dest_key);
-                    SELF->vtable->logical_or_keyed(INTERP, SELF, &r_key, value, NULL, dest, &r_dest_key);
+                    DYNSELF.logical_or_keyed(&r_key, value, NULL, dest, &r_dest_key);
                 }
             }
             else {
                 MAKE_KEY_INT(r_value_key, *value_key);
                 if (dest_key == NULL)
-                    SELF->vtable->logical_or_keyed(INTERP, SELF, &r_key, value, &r_value_key, dest, NULL);
+                    DYNSELF.logical_or_keyed(&r_key, value, &r_value_key, dest, NULL);
                 else {
                     MAKE_KEY_INT(r_dest_key, *dest_key);
-                    SELF->vtable->logical_or_keyed(INTERP, SELF, &r_key, value, &r_value_key, dest, &r_dest_key);
+                    DYNSELF.logical_or_keyed(&r_key, value, &r_value_key, dest, &r_dest_key);
                 }
             }
         }
     }
 
     void logical_and (PMC* value,  PMC* dest) {
-        if (SELF->vtable->get_bool(INTERP, SELF)) {
+        if (DYNSELF.get_bool()) {
             dest->vtable->set_pmc(INTERP, dest, value);
         }
         else {
@@ -2085,7 +2069,7 @@ pmclass default noinit {
 
     void logical_and_keyed (KEY* key, PMC* value, KEY* value_key, PMC* dest, KEY* dest_key) {
         if (key == NULL) {
-            if (SELF->vtable->get_bool(INTERP, SELF))
+            if (DYNSELF.get_bool())
                 /* Either value_key or dest_key is not NULL */
                 dest->vtable->set_pmc_keyed(INTERP, dest, dest_key, value, value_key);
             else {
@@ -2108,30 +2092,30 @@ pmclass default noinit {
         if (key == NULL) {
             if (value_key == NULL) {
                 MAKE_KEY_INT(r_dest_key, *dest_key);
-                SELF->vtable->logical_and_keyed(INTERP, SELF, NULL, value, NULL, dest, &r_dest_key);
+                DYNSELF.logical_and_keyed(NULL, value, NULL, dest, &r_dest_key);
             }
             else {
                 MAKE_KEY_INT(r_value_key, *value_key);
-                SELF->vtable->logical_and_keyed(INTERP, SELF, NULL, value, &r_value_key, dest, NULL);
+                DYNSELF.logical_and_keyed(NULL, value, &r_value_key, dest, NULL);
             }
         }
         else {
             MAKE_KEY_INT(r_key, *key);
             if (value_key == NULL) {
                 if (dest_key == NULL)
-                    SELF->vtable->logical_and_keyed(INTERP, SELF, &r_key, value, NULL, dest, NULL);
+                    DYNSELF.logical_and_keyed(&r_key, value, NULL, dest, NULL);
                 else {
                     MAKE_KEY_INT(r_dest_key, *dest_key);
-                    SELF->vtable->logical_and_keyed(INTERP, SELF, &r_key, value, NULL, dest, &r_dest_key);
+                    DYNSELF.logical_and_keyed(&r_key, value, NULL, dest, &r_dest_key);
                 }
             }
             else {
                 MAKE_KEY_INT(r_value_key, *value_key);
                 if (dest_key == NULL)
-                    SELF->vtable->logical_and_keyed(INTERP, SELF, &r_key, value, &r_value_key, dest, NULL);
+                    DYNSELF.logical_and_keyed(&r_key, value, &r_value_key, dest, NULL);
                 else {
                     MAKE_KEY_INT(r_dest_key, *dest_key);
-                    SELF->vtable->logical_and_keyed(INTERP, SELF, &r_key, value, &r_value_key, dest, &r_dest_key);
+                    DYNSELF.logical_and_keyed(&r_key, value, &r_value_key, dest, &r_dest_key);
                 }
             }
         }
@@ -2141,7 +2125,7 @@ pmclass default noinit {
 
         INTVAL my_bool, value_bool;
 
-        my_bool = SELF->vtable->get_bool(INTERP, SELF);
+        my_bool = DYNSELF.get_bool();
         value_bool = value->vtable->get_bool(INTERP, value);
 
         if (my_bool && ! value_bool) {
@@ -2162,7 +2146,7 @@ pmclass default noinit {
 
             INTVAL my_bool, value_bool;
 
-            my_bool = SELF->vtable->get_bool(INTERP, SELF);
+            my_bool = DYNSELF.get_bool();
 
             if (value_key == NULL)
                 value_bool = value->vtable->get_bool(INTERP, value);
@@ -2201,30 +2185,30 @@ pmclass default noinit {
         if (key == NULL) {
             if (value_key == NULL) {
                 MAKE_KEY_INT(r_dest_key, *dest_key);
-                SELF->vtable->logical_xor_keyed(INTERP, SELF, NULL, value, NULL, dest, &r_dest_key);
+                DYNSELF.logical_xor_keyed(NULL, value, NULL, dest, &r_dest_key);
             }
             else {
                 MAKE_KEY_INT(r_value_key, *value_key);
-                SELF->vtable->logical_xor_keyed(INTERP, SELF, NULL, value, &r_value_key, dest, NULL);
+                DYNSELF.logical_xor_keyed(NULL, value, &r_value_key, dest, NULL);
             }
         }
         else {
             MAKE_KEY_INT(r_key, *key);
             if (value_key == NULL) {
                 if (dest_key == NULL)
-                    SELF->vtable->logical_xor_keyed(INTERP, SELF, &r_key, value, NULL, dest, NULL);
+                    DYNSELF.logical_xor_keyed(&r_key, value, NULL, dest, NULL);
                 else {
                     MAKE_KEY_INT(r_dest_key, *dest_key);
-                    SELF->vtable->logical_xor_keyed(INTERP, SELF, &r_key, value, NULL, dest, &r_dest_key);
+                    DYNSELF.logical_xor_keyed(&r_key, value, NULL, dest, &r_dest_key);
                 }
             }
             else {
                 MAKE_KEY_INT(r_value_key, *value_key);
                 if (dest_key == NULL)
-                    SELF->vtable->logical_xor_keyed(INTERP, SELF, &r_key, value, &r_value_key, dest, NULL);
+                    DYNSELF.logical_xor_keyed(&r_key, value, &r_value_key, dest, NULL);
                 else {
                     MAKE_KEY_INT(r_dest_key, *dest_key);
-                    SELF->vtable->logical_xor_keyed(INTERP, SELF, &r_key, value, &r_value_key, dest, &r_dest_key);
+                    DYNSELF.logical_xor_keyed(&r_key, value, &r_value_key, dest, &r_dest_key);
                 }
             }
         }
@@ -2233,14 +2217,14 @@ pmclass default noinit {
     void logical_not (PMC* dest) {
         /* XXX - Need a better way to set boolean state */
         dest->vtable->set_integer_native(INTERP, dest,
-            ! SELF->vtable->get_bool(INTERP, SELF));
+            ! DYNSELF.get_bool());
     }
 
     void logical_not_keyed (KEY* key, PMC* dest, KEY* dest_key) {
         /* XXX - Need a better way to set boolean state */
         if (key == NULL)
             dest->vtable->set_integer_keyed(INTERP, dest,
-                dest_key, ! SELF->vtable->get_bool(INTERP, SELF));
+                dest_key, ! DYNSELF.get_bool());
         else
             internal_exception(OUT_OF_BOUNDS, "Subscript on something that's not an aggregate!\n");
     }
@@ -2249,16 +2233,16 @@ pmclass default noinit {
         KEY r_key, r_dest_key;
         if (key == NULL) {
             MAKE_KEY_INT(r_dest_key, *dest_key);
-            SELF->vtable->logical_not_keyed(INTERP, SELF, NULL, dest, &r_dest_key);
+            DYNSELF.logical_not_keyed(NULL, dest, &r_dest_key);
             return;
         }
         MAKE_KEY_INT(r_key, *key);
         if (dest_key == NULL) {
-            SELF->vtable->logical_not_keyed(INTERP, SELF, &r_key, dest, NULL);
+            DYNSELF.logical_not_keyed(&r_key, dest, NULL);
             return;
         }
         MAKE_KEY_INT(r_dest_key, *dest_key);
-        SELF->vtable->logical_not_keyed(INTERP, SELF, &r_key, dest, &r_dest_key);
+        DYNSELF.logical_not_keyed(&r_key, dest, &r_dest_key);
     }
 
     void repeat (PMC* value,  PMC* dest) {
@@ -2280,30 +2264,30 @@ pmclass default noinit {
         if (key == NULL) {
             if (value_key == NULL) {
                 MAKE_KEY_INT(r_dest_key, *dest_key);
-                SELF->vtable->repeat_keyed(INTERP, SELF, NULL, value, NULL, dest, &r_dest_key);
+                DYNSELF.repeat_keyed(NULL, value, NULL, dest, &r_dest_key);
             }
             else {
                 MAKE_KEY_INT(r_value_key, *value_key);
-                SELF->vtable->repeat_keyed(INTERP, SELF, NULL, value, &r_value_key, dest, NULL);
+                DYNSELF.repeat_keyed(NULL, value, &r_value_key, dest, NULL);
             }
         }
         else {
             MAKE_KEY_INT(r_key, *key);
             if (value_key == NULL) {
                 if (dest_key == NULL)
-                    SELF->vtable->repeat_keyed(INTERP, SELF, &r_key, value, NULL, dest, NULL);
+                    DYNSELF.repeat_keyed(&r_key, value, NULL, dest, NULL);
                 else {
                     MAKE_KEY_INT(r_dest_key, *dest_key);
-                    SELF->vtable->repeat_keyed(INTERP, SELF, &r_key, value, NULL, dest, &r_dest_key);
+                    DYNSELF.repeat_keyed(&r_key, value, NULL, dest, &r_dest_key);
                 }
             }
             else {
                 MAKE_KEY_INT(r_value_key, *value_key);
                 if (dest_key == NULL)
-                    SELF->vtable->repeat_keyed(INTERP, SELF, &r_key, value, &r_value_key, dest, NULL);
+                    DYNSELF.repeat_keyed(&r_key, value, &r_value_key, dest, NULL);
                 else {
                     MAKE_KEY_INT(r_dest_key, *dest_key);
-                    SELF->vtable->repeat_keyed(INTERP, SELF, &r_key, value, &r_value_key, dest, &r_dest_key);
+                    DYNSELF.repeat_keyed(&r_key, value, &r_value_key, dest, &r_dest_key);
                 }
             }
         }
@@ -2323,20 +2307,20 @@ pmclass default noinit {
         KEY r_key, r_dest_key;
         if (key == NULL) {
             MAKE_KEY_INT(r_dest_key, *dest_key);
-            SELF->vtable->repeat_int_keyed(INTERP, SELF, NULL, value, dest, &r_dest_key);
+            DYNSELF.repeat_int_keyed(NULL, value, dest, &r_dest_key);
             return;
         }
         MAKE_KEY_INT(r_key, *key);
         if (dest_key == NULL) {
-            SELF->vtable->repeat_int_keyed(INTERP, SELF, &r_key, value, dest, NULL);
+            DYNSELF.repeat_int_keyed(&r_key, value, dest, NULL);
             return;
         }
         MAKE_KEY_INT(r_dest_key, *dest_key);
-        SELF->vtable->repeat_int_keyed(INTERP, SELF, &r_key, value, dest, &r_dest_key);
+        DYNSELF.repeat_int_keyed(&r_key, value, dest, &r_dest_key);
     }
 
     void increment () {
-        SELF->cache.int_val = SELF->vtable->get_integer(INTERP, SELF) + 1;
+        SELF->cache.int_val = DYNSELF.get_integer() + 1;
     }
 
     void increment_keyed (KEY* key) {
@@ -2346,11 +2330,11 @@ pmclass default noinit {
     void increment_keyed_int (INTVAL* key) {
         KEY r_key;
         MAKE_KEY_INT(r_key, *key);
-        SELF->vtable->increment_keyed(INTERP, SELF, &r_key);
+        DYNSELF.increment_keyed(&r_key);
     }
 
     void decrement () {
-        SELF->cache.int_val = SELF->vtable->get_integer(INTERP, SELF) - 1;
+        SELF->cache.int_val = DYNSELF.get_integer() - 1;
     }
 
     void decrement_keyed (KEY* key) {
@@ -2360,7 +2344,7 @@ pmclass default noinit {
     void decrement_keyed_int (INTVAL* key) {
         KEY r_key;
         MAKE_KEY_INT(r_key, *key);
-        SELF->vtable->decrement_keyed(INTERP, SELF, &r_key);
+        DYNSELF.decrement_keyed(&r_key);
     }
 
     INTVAL exists_keyed (KEY* key) {
@@ -2371,7 +2355,7 @@ pmclass default noinit {
     INTVAL exists_keyed_int (INTVAL* key) {
         KEY r_key;
         MAKE_KEY_INT(r_key, *key);
-        return SELF->vtable->exists_keyed(INTERP, SELF, &r_key);
+        return DYNSELF.exists_keyed(&r_key);
     }
 
     INTVAL defined () {
@@ -2386,7 +2370,7 @@ pmclass default noinit {
     INTVAL defined_keyed_int (INTVAL* key) {
         KEY r_key;
         MAKE_KEY_INT(r_key, *key);
-        return SELF->vtable->defined_keyed(INTERP, SELF, &r_key);
+        return DYNSELF.defined_keyed(&r_key);
     }
 
     void delete_keyed(KEY* key) {
@@ -2396,7 +2380,7 @@ pmclass default noinit {
     void delete_keyed_int(INTVAL* key) {
         KEY r_key;
         MAKE_KEY_INT(r_key, *key);
-        SELF->vtable->delete_keyed(INTERP, SELF, &r_key);
+        DYNSELF.delete_keyed(&r_key);
     }
 
     KEY* nextkey_keyed (KEY* key) {
@@ -2408,7 +2392,7 @@ pmclass default noinit {
         /* XXX - Something's not right with this method */
         KEY r_key;
         MAKE_KEY_INT(r_key, *key);
-        return SELF->vtable->nextkey_keyed(INTERP, SELF, &r_key);
+        return DYNSELF.nextkey_keyed(&r_key);
     }
 
     void substr(INTVAL offset, INTVAL length, PMC* dest) {
@@ -2422,16 +2406,16 @@ pmclass default noinit {
         KEY r_key, r_dest_key;
         if (key == NULL) {
             MAKE_KEY_INT(r_dest_key, *dest_key);
-            SELF->vtable->substr_keyed(INTERP, SELF, NULL, offset, length, dest, &r_dest_key);
+            DYNSELF.substr_keyed(NULL, offset, length, dest, &r_dest_key);
             return;
         }
         MAKE_KEY_INT(r_key, *key);
         if (dest_key == NULL) {
-            SELF->vtable->substr_keyed(INTERP, SELF, &r_key, offset, length, dest, NULL);
+            DYNSELF.substr_keyed(&r_key, offset, length, dest, NULL);
             return;
         }
         MAKE_KEY_INT(r_dest_key, *dest_key);
-        SELF->vtable->substr_keyed(INTERP, SELF, &r_key, offset, length, dest, &r_dest_key);
+        DYNSELF.substr_keyed(&r_key, offset, length, dest, &r_dest_key);
     }
 
     STRING* substr_str(INTVAL offset, INTVAL length) {
@@ -2447,7 +2431,7 @@ pmclass default noinit {
     STRING* substr_str_keyed_int (INTVAL* key, INTVAL offset, INTVAL length) {
         KEY r_key;
         MAKE_KEY_INT(r_key, *key);
-        return SELF->vtable->substr_str_keyed(INTERP, SELF, &r_key, offset, length);
+        return DYNSELF.substr_str_keyed(&r_key, offset, length);
     }
 
     void* invoke (void* next) {

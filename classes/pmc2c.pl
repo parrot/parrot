@@ -15,8 +15,8 @@ use strict;
 my $default = parse_vtable("$FindBin::Bin/../vtable.tbl");
 my $signature_re = qr{
     ^
-    (?:             #blank spaces and comments
-      [\n\s]*
+    (?:             #blank spaces and comments and spurious semicolons
+      [;\n\s]*
       (?:/\*.*?\*/)?  # C-like comments
     )*
   
@@ -90,20 +90,25 @@ sub superpmc_info {
 sub scan_inheritance_tree {
     my ($class) = @_;
 
+    my $leafclass = $class;
+
     my %methods; # { methodname => class }
+    my %super; # { methodname => class }
     while ($class ne 'default') {
         my ($methods, $super) = superpmc_info($class);
         foreach my $method (@$methods) {
             $methods{$method} ||= $class;
+            $super{$method} ||= $class unless $class eq $leafclass;
         }
         $class = $super;
     }
 
     foreach my $method (@{$default}) {
         $methods{$method->[1]} ||= 'default';
+        $super{$method->[1]} ||= 'default';
     }
 
-    return \%methods;
+    return \%methods, \%super;
 }
 
 sub Usage {
@@ -156,6 +161,47 @@ sub count_newlines {
     return scalar(() = $_[0] =~ /\n/g);
 }
 
+sub full_arguments {
+    my $args = shift;
+    if ($args =~ /\S/) {
+        return "INTERP, SELF, $args";
+    } else {
+        return "INTERP, SELF";
+    }
+}
+
+sub rewrite_method ($$$$$) {
+    my ($class, $method, $super, $super_table) = @_;
+    local $_ = $_[4];
+
+    # Rewrite method body
+    my $supertype = "enum_class_$super";
+    die "$class defines unknown vtable method '$method'\n"
+      if ! defined $super_table->{$method};
+    my $supermethod = "Parrot_" . $super_table->{$method} . "_$method";
+
+    # Rewrite DYNSUPER(args...)
+    s/DYNSUPER\(\s*(.*?)\)/"Parrot_base_vtables[$supertype].$method(".full_arguments($1).")"/eg;
+
+    # Rewrite SUPER(args...)
+    s/SUPER\(\s*(.*?)\)/"$supermethod(".full_arguments($1).")"/eg;
+
+    # Rewrite DYNSELF.other_method(args...)
+    s/DYNSELF\.(\w+)\(\s*(.*?)\)/"pmc->vtable->$1(".full_arguments($2).")"/eg;
+
+    # Rewrite DYNSELF(args...). See comments above.
+    s/DYNSELF\(\s*(.*?)\)/"pmc->vtable->$method(".full_arguments($1).")"/eg;
+
+    # Rewrite SELF.other_method(args...)
+    s/SELF\.(\w+)\(\s*(.*?)\)/"Parrot_${class}_$1(".full_arguments($2).")"/eg;
+
+    # Rewrite SELF -> pmc, INTERP -> interpreter
+    s/SELF/pmc/g;
+    s/INTERP/interpreter/g;
+
+    return $_;
+}
+
 sub filter {
   my ($contents, $pmcfile, $cfile) = @_;
   my $lineno = 1;
@@ -164,7 +210,7 @@ sub filter {
   my ($pre, $classname) = ($1, $2);
   $lineno += count_newlines($1);
 
-  my $methodloc = scan_inheritance_tree($classname);
+  my ($methodloc, $supermethodloc) = scan_inheritance_tree($classname);
 
   my $saw_extends;
   my $superpmc = 'default';
@@ -214,10 +260,10 @@ EOC
 
      my ($methodblock, $rema, $lines) = extract_balanced($classblock);
      $lineno += $lines;
-  
-     $methodblock =~ s/SELF/pmc/g;
-     $methodblock =~ s/INTERP/interpreter/g;
-    
+
+     $methodblock = rewrite_method($classname, $methodname,
+                                   $superpmc, $supermethodloc,
+                                   $methodblock);
      my $decl = "$type Parrot_${classname}_${methodname} (struct Parrot_Interp *interpreter, PMC* pmc$parameters)";
      $OUT .= $decl;
      $HOUT .= "extern $decl;\n";
@@ -240,9 +286,6 @@ EOC
 
   my $includes = '';
   foreach my $class (keys %visible_supers) {
-      # No, include yourself to check your headers match your bodies
-      # (and gcc -W... is happy then)
-      # next if $class eq $classname;
       $includes .= qq(#include "\L$class.h"\n);
   }
 
@@ -293,3 +336,87 @@ EOC
 
   return ($OUT, $HOUT);
 }
+
+__END__
+
+=head1 NAME
+
+pmc2c.pl - PMC compiler
+
+=head1 SYNOPSIS
+
+perl pmc2c.pl foo.pmc
+
+=head1 DESCRIPTION
+
+Compile the PMC file listed on the command line, producing
+a corresponding .c file.
+
+=head2 PMC FILE SYNTAX
+
+The basic syntax of a PMC file is
+
+=over 4
+
+=item 1.
+
+A preamble, consisting of code to be copied directly to the .c file
+
+=item 2.
+
+pmclass PMCNAME [extends PMCNAME] {
+
+=item 3.
+
+A list of vtable method implementations
+
+=item 4.
+
+The final close }
+
+=back
+
+=head2 METHOD BODY SUBSTITUTIONS
+
+The vtable method bodies can use the following substitutions:
+
+=over 4
+
+=item *
+
+I<SELF> - Converted to the current PMC object of type PMC*.
+
+=item *
+
+I<INTERP> - Converted to the interpreter object.
+
+=item *
+
+I<SELF.method(a,b,c)> - calls the vtable method 'method' using the
+static type of SELF (in other words, calls another method defined in
+the same file).
+
+=item *
+
+I<DYNSELF.method(a,b,c)> - calls the vtable method 'method' using the
+dynamic type of SELF
+
+=item *
+
+I<DYNSELF(a,b,c)> - same as above, but calls the current method
+
+=item *
+
+I<SUPER(a,b,c)> - calls the overridden implementation of the current
+method in the nearest superclass, using the static type of SELF.
+
+=item *
+
+I<DYNSUPER(a,b,c)> - as above, but uses the actual dynamic type of SELF.
+
+=back
+
+=head1 LICENSE
+
+This program is free software. It is subject to the same license
+as the Parrot interpreter.

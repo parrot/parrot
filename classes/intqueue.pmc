@@ -159,11 +159,6 @@ pmclass IntQueue {
 	enqueue(SELF->data,value);
     }
 
-    void set_integer_bignum (BIGNUM* value) {
-        SELF->cache.struct_val = (DPOINTER*)value; /* Maybe we need a copy */
-        /* SELF->vtable = &(Parrot_base_vtables[enum_class_PerlBigInt]); */
-    }
-
     void set_integer_same (PMC* value) {
         SELF->cache.int_val = value->cache.int_val;
     }
@@ -176,10 +171,6 @@ pmclass IntQueue {
     void set_number_native (FLOATVAL value) {
 	SELF->vtable = &(Parrot_base_vtables[enum_class_PerlNum]);
 	SELF->cache.num_val = value;
-    }
-
-    void set_number_bignum (BIGNUM* value) {
-	/* SELF->vtable = &(Parrot_base_vtables[enum_class_PerlBigNum]); */
     }
 
     void set_number_same (PMC* value) {

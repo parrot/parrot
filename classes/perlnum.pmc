@@ -88,9 +88,6 @@ fprintf(stderr,"morph not implemented\n");
         SELF->cache.int_val = value;
     }
 
-    void set_integer_bignum (BIGNUM* value) {
-    }
-
     void set_integer_same (PMC* value) {
 	CHANGE_TYPE(SELF, PerlInt);
         SELF->cache.int_val = value->cache.int_val;
@@ -104,9 +101,6 @@ fprintf(stderr,"morph not implemented\n");
         SELF->cache.num_val = value;
     }
 
-    void set_number_bignum (BIGNUM* value) {
-    }
-
     void set_number_same (PMC* value) {
         SELF->cache.num_val = value->cache.num_val;
     }
@@ -114,13 +108,7 @@ fprintf(stderr,"morph not implemented\n");
     void set_bignum (PMC* value) {
     }
     
-    void set_bignum_int (INTVAL value) {
-    }
-
     void set_bignum_native (BIGNUM* value) {
-    }
-    
-    void set_bignum_float (FLOATVAL value) {
     }
     
     void set_bignum_same (PMC* value) {

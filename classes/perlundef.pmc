@@ -105,13 +105,7 @@ pmclass PerlUndef {
     void set_bignum (PMC* value) {
     }
 
-    void set_bignum_int (INTVAL value) {
-    }
-
     void set_bignum_native (BIGNUM* value) {
-    }
-
-    void set_bignum_float (FLOATVAL value) {
     }
 
     void set_bignum_same (PMC* value) {
@@ -405,16 +399,6 @@ pmclass PerlUndef {
     }
 
     void repeat (PMC* value,  PMC* dest) {
-        Parrot_warn(INTERP, PARROT_WARNINGS_UNDEF_FLAG, "Use of uninitialized value in repeat");
-        dest->vtable->set_string(INTERP, dest, NULL);
-    }
-
-    void repeat_native (STRING* value,  PMC* dest) {
-        Parrot_warn(INTERP, PARROT_WARNINGS_UNDEF_FLAG, "Use of uninitialized value in repeat");
-        dest->vtable->set_string(INTERP, dest, NULL);
-    }
-
-    void repeat_same (PMC* value,  PMC* dest) {
         Parrot_warn(INTERP, PARROT_WARNINGS_UNDEF_FLAG, "Use of uninitialized value in repeat");
         dest->vtable->set_string(INTERP, dest, NULL);
     }

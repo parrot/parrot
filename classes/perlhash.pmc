@@ -218,10 +218,6 @@ pmclass PerlHash {
         internal_exception(INTERNAL_PANIC, "Cannot set hash to int\n");
     }
 
-    void set_integer_bignum (BIGNUM* value) {
-        internal_exception(INTERNAL_PANIC, "Cannot set hash to int\n");
-    }
-
     void set_integer_same (PMC* value) {
         internal_exception(INTERNAL_PANIC, "Cannot set hash to int\n");
     }
@@ -242,10 +238,6 @@ pmclass PerlHash {
         internal_exception(INTERNAL_PANIC, "Cannot set hash to number\n");
     }
 
-    void set_number_bignum (BIGNUM* value) {
-        internal_exception(INTERNAL_PANIC, "Cannot set hash to number\n");
-    }
-
     void set_number_same (PMC* value) {
         internal_exception(INTERNAL_PANIC, "Cannot set hash to number\n");
     }
@@ -262,15 +254,7 @@ pmclass PerlHash {
         internal_exception(INTERNAL_PANIC, "Cannot set hash to bignum\n");
     }
 
-    void set_bignum_int (INTVAL size) {
-        internal_exception(INTERNAL_PANIC, "Cannot set hash to bignum\n");
-    }
-
     void set_bignum_native (BIGNUM* size) {
-        internal_exception(INTERNAL_PANIC, "Cannot set hash to bignum\n");
-    }
-
-    void set_bignum_float (FLOATVAL value) {
         internal_exception(INTERNAL_PANIC, "Cannot set hash to bignum\n");
     }
 

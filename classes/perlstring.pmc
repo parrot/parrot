@@ -85,9 +85,6 @@ pmclass PerlString {
         SELF->cache.int_val = value;
     }
 
-    void set_integer_bignum (BIGNUM* value) {
-    }
-
     void set_integer_same (PMC* value) {
 	CHANGE_TYPE(SELF, PerlInt);
         SELF->cache.int_val = value->vtable->get_integer(INTERP,value);
@@ -101,9 +98,6 @@ pmclass PerlString {
     void set_number_native (FLOATVAL value) {
 	CHANGE_TYPE(SELF, PerlNum);
         SELF->cache.num_val = value;
-    }
-
-    void set_number_bignum (BIGNUM* value) {
     }
 
     void set_number_same (PMC * value) {

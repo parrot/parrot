@@ -36,6 +36,7 @@ void do_panic(struct Parrot_Interp *interpreter, const char *message,
 #define NEG_SUBSTR 1
 #define NEG_SLEEP 1
 #define NEG_CHOP 1
+#define INVALID_OPERATION 1
 #define ARG_OP_NOT_HANDLED 1
 #define KEY_NOT_FOUND 1
 #define JIT_UNAVAILABLE 1

@@ -7,10 +7,52 @@
  *  Data Structure and Algorithms:
  *  History:
  *  Notes:
+ *     TODO: Create global immutable undef object
+ *     TODO: PerlUndef should really be just Undef
+ *     TODO: Array should not autocreate something called a PerlInt,
+ *           PerlString, etc. Either nothing should get autocreated,
+ *           or * those should all lose the Perl prefix.
  *  References:
  */
 
 #include "parrot/parrot.h"
+
+#define THROW_UNSUPPORTED internal_exception(INVALID_OPERATION, "Operation not supported\n")
+
+static PMC* undef(struct Parrot_Interp* interpreter)
+{
+    return pmc_new(interpreter, enum_class_PerlUndef);
+}
+
+#define resize_array Parrot_Array_resize_array
+extern void Parrot_Array_resize_array (struct Parrot_Interp *, PMC*, INTVAL);
+void Parrot_Array_resize_array (struct Parrot_Interp *interpreter, PMC* self, INTVAL size)
+{
+    int oldsize = self->cache.int_val;
+    Buffer* buffer = (Buffer *) self->data;
+    if(buffer != NULL) {
+        if(size >= 0) {
+            Parrot_reallocate(interpreter, buffer, size * sizeof(PMC *));
+            size = buffer->buflen / sizeof(PMC *);
+            if (size > oldsize)
+                memset((char *)buffer->bufstart + oldsize * sizeof(PMC *), 0, (size - oldsize) * sizeof(PMC *));
+        }
+        else {
+            internal_exception(OUT_OF_BOUNDS,
+                               "Array resize out of bounds!\n");
+        }
+    }
+    else {
+        buffer = (Buffer *) (self->data = new_buffer_header(interpreter));
+        
+        self->flags |= PMC_is_buffer_ptr_FLAG;
+        self->flags |= PMC_is_PMC_ptr_FLAG;
+        Parrot_allocate(interpreter, buffer, sizeof(PMC*)*size);
+        memset(buffer->bufstart, 0, size * sizeof(PMC *));
+    }
+
+    self->cache.int_val = size;
+}
 
 static INTVAL atom2int(Interp *interpreter, KEY_ATOM* atom) {
     switch ((int)atom->type) {
@@ -28,152 +70,61 @@ static INTVAL atom2int(Interp *interpreter, KEY_ATOM* atom) {
     }
 }
 
-static void resize_array ( struct Parrot_Interp *interpreter, PMC* self, INTVAL size ) {
-    int i;
-    int old_size = self->cache.int_val;
-    if(self->data != NULL) {
-        if(size >= 0) {
-
-            Parrot_reallocate(interpreter, ((Buffer *)self->data), sizeof(PMC *) * size);
-            size = ((Buffer *)self->data)->buflen / sizeof(PMC *);
-            self->cache.int_val = size;
-        }
-        else {
-            internal_exception(OUT_OF_BOUNDS,
-                               "Array resize out of bounds!\n");
-        }
-    }
-    else {
-        self->data = new_buffer_header(interpreter);
-        Parrot_allocate(interpreter, (Buffer *)self->data, sizeof(PMC*)*size);
-        self->cache.int_val = size;
-    }
-
-    for (i = old_size; i < size; i++) {
-        PMC** array = ((Buffer *)self->data)->bufstart;
-        /* I guess we need an undef PMC? A non-perl array should not
-           be populated with perl PMCs */
-        array[i] = pmc_new(interpreter, enum_class_PerlUndef);
-    }
-}
-
 pmclass Array {
 
     void init () {
-        SELF->data = new_buffer_header(interpreter);
-        ((Buffer *)SELF->data)->bufstart = NULL;
-        ((Buffer *)SELF->data)->buflen = 0;
-        SELF->flags |= (PMC_is_buffer_ptr_FLAG | PMC_is_PMC_ptr_FLAG);
+        SELF->data = NULL;
         SELF->cache.int_val = 0;
+        resize_array(INTERP, SELF, 0);
     }
 
     void morph (INTVAL type) {
     }
-    
+
+    void destroy () {
+    }
+
     INTVAL type () {
         return enum_class_Array;
     }
-    
-    INTVAL type_keyed (KEY* key) {
-        /* XXX - Do this */
-        return 0;
-    }
-    
-    INTVAL type_keyed_int (INTVAL* key) {
-        /* XXX - Do this */
-        return 0;
-    }
 
-    UINTVAL subtype (INTVAL type) {
-        /* XXX */
-        return 0;
-    }
-    
-    UINTVAL subtype_keyed (KEY* key, INTVAL type) {
-        /* XXX */
-        return 0;
-    }
-
-    UINTVAL subtype_keyed_int (INTVAL* key, INTVAL type) {
-        /* XXX */
-        return 0;
-    }
-
-    STRING* name () {
+    STRING* name() {
         return whoami;
     }
-    
-    STRING* name_keyed (KEY* key) {
-        /* XXX */
-        return NULL;
-    }
 
-    STRING* name_keyed_int (INTVAL* key) {
-        /* XXX */
-        return NULL;
-    }
+    PMC* clone () { 
+        PMC* dest;
+        INTVAL ix, size;
+        PMC* element;
+        PMC** array;
 
-    PMC* clone () {
-        return NULL;
-    }
-    
-    PMC* clone_keyed (KEY* key) {
-        /* XXX */
-        return NULL;
-    }
-    
-    PMC* clone_keyed_int (INTVAL* key) {
-        /* XXX */
-        return NULL;
-    }
+        dest = pmc_new(INTERP, enum_class_Array);
+        dest->vtable = SELF->vtable;
+	dest->vtable->init(interpreter, dest);
+	size = SELF->cache.int_val;
+	resize_array(interpreter, dest, size);
+	for (ix = 0; ix < size; ix++) {
+	    PMC *copy;
+	    array = ((Buffer *) SELF->data)->bufstart;
+	    element = array[ix];
 
-    PMC* find_method (STRING* method_name) {
-        return NULL;
-    }
-    
-    PMC* find_method_keyed (KEY* key, STRING* method_name) {
-        /* XXX */
-        return NULL;
-    }
+	    if (element) {
+		copy = element->vtable->clone(interpreter, element);
+		((PMC**)((Buffer *) dest->data)->bufstart)[ix] = copy;
+	    }
 
-    PMC* find_method_keyed_int (INTVAL* key, STRING* method_name) {
-        /* XXX */
-        return NULL;
+	}
+        return dest;
     }
 
     INTVAL get_integer () {
         return SELF->cache.int_val;
     }
 
-    INTVAL get_integer_keyed (KEY* key) {
-        KEY_ATOM* kp;
-        INTVAL ix;
-        PMC* value;
-
-        if (!key) {
-            return 0;
-        }
-
-        kp = &key->atom;
-        ix = atom2int(INTERP, kp);
-
-        if (ix >= SELF->cache.int_val || ix < 0) {
-            internal_exception(OUT_OF_BOUNDS, "Array element out of bounds!\n");
-        }
-
-        value = ((PMC**)(((Buffer *)SELF->data)->bufstart))[ix];
-
-        if(key->next != NULL) {
-            return value->vtable->get_integer_keyed(INTERP, value, key->next);
-        }
-        else {
-            return value->vtable->get_integer(INTERP, value);
-        }
-    }
-
     INTVAL get_integer_keyed_int (INTVAL* key) {
         INTVAL ix;
         PMC* value;
+        PMC** array;
 
         if (!key) {
             return 0;
@@ -181,47 +132,42 @@ pmclass Array {
 
         ix = *key;
 
-        if (ix >= SELF->cache.int_val || ix < 0) {
-            internal_exception(OUT_OF_BOUNDS, "Array element out of bounds!\n");
+        if ((ix >= SELF->cache.int_val) || (ix < -SELF->cache.int_val)) {
+            internal_exception(OUT_OF_BOUNDS,
+                               "Array index out of bounds!\n");
         }
 
-        value = ((PMC**)(((Buffer *)SELF->data)->bufstart))[ix];
+        if (ix < 0) {
+            ix += SELF->cache.int_val;
+        }
+
+        array = ((Buffer *) SELF->data)->bufstart;
+        value = array[ix];
+        if (value == NULL) value = undef(INTERP);
         return value->vtable->get_integer(INTERP, value);
     }
 
-    FLOATVAL get_number () {
-        return (FLOATVAL)(SELF->cache.int_val);
+    INTVAL get_integer_keyed (KEY* key) {
+        INTVAL ix;
+        PMC* box;
+
+        if (!key) return 0;
+        ix = atom2int(interpreter, &key->atom);
+        if (key->next == NULL) return SELF.get_integer_keyed_int(&ix);
+
+        box = SELF.get_pmc_keyed_int(&ix);
+        if (box == NULL) box = undef(INTERP);
+        return box->vtable->get_integer_keyed(INTERP, box, key->next);
     }
 
-    FLOATVAL get_number_keyed (KEY* key) {
-        KEY_ATOM* kp;
-        INTVAL ix;
-        PMC* value;
-
-        if (!key) {
-            return 0;
-        }
-
-        kp = &key->atom;
-        ix = atom2int(INTERP, kp);
-
-        if (ix >= SELF->cache.int_val || ix < 0) {
-            internal_exception(OUT_OF_BOUNDS, "Array element out of bounds!\n");
-        }
-
-        value = ((PMC**)(((Buffer *)SELF->data)->bufstart))[ix];
-
-        if(key->next != NULL) {
-            return value->vtable->get_number_keyed(INTERP, value, key->next);
-        }
-        else {
-            return value->vtable->get_number(INTERP, value);
-        }
+    FLOATVAL get_number () {
+        return (FLOATVAL)SELF->cache.int_val;
     }
 
     FLOATVAL get_number_keyed_int (INTVAL* key) {
         INTVAL ix;
         PMC* value;
+        PMC** array;
 
         if (!key) {
             return 0;
@@ -229,96 +175,42 @@ pmclass Array {
 
         ix = *key;
 
-        if (ix >= SELF->cache.int_val || ix < 0) {
-            internal_exception(OUT_OF_BOUNDS, "Array element out of bounds!\n");
+        if ((ix >= SELF->cache.int_val) || (ix < -SELF->cache.int_val)) {
+            internal_exception(OUT_OF_BOUNDS,
+                               "Array index out of bounds!\n");
         }
 
-        value = ((PMC**)(((Buffer *)SELF->data)->bufstart))[ix];
+        if (ix < 0) {
+            ix += SELF->cache.int_val;
+        }
+
+        array = ((Buffer *) SELF->data)->bufstart;
+        value = array[ix];
+        if (value == NULL) value = undef(INTERP);
         return value->vtable->get_number(INTERP, value);
     }
 
-    BIGNUM* get_bignum () {
-        /* XXX - Cast cache.int_val to BIGNUM and return it */
-        return NULL;
-    }
-    
-    BIGNUM* get_bignum_keyed (KEY* key) {
-        KEY_ATOM* kp;
+    FLOATVAL get_number_keyed (KEY* key) {
         INTVAL ix;
-        PMC* value;
+        PMC* box;
 
-        if (!key) {
-            return 0;
-        }
+        if (!key) return 0;
+        ix = atom2int(interpreter, &key->atom);
+        if (key->next == NULL) return SELF.get_number_keyed_int(&ix);
 
-        kp = &key->atom;
-        ix = atom2int(INTERP, kp);
-
-        if (ix >= SELF->cache.int_val || ix < 0) {
-            internal_exception(OUT_OF_BOUNDS, "Array element out of bounds!\n");
-        }
-
-        value = ((PMC**)(((Buffer *)SELF->data)->bufstart))[ix];
-
-        if(key->next != NULL) {
-            return value->vtable->get_bignum_keyed(INTERP, value, key->next);
-        }
-        else {
-            return value->vtable->get_bignum(INTERP, value);
-        }
-    }
-
-    BIGNUM* get_bignum_keyed_int (INTVAL* key) {
-        INTVAL ix;
-        PMC* value;
-
-        if (!key) {
-            return 0;
-        }
-
-        ix = *key;
-
-        if (ix >= SELF->cache.int_val || ix < 0) {
-            internal_exception(OUT_OF_BOUNDS, "Array element out of bounds!\n");
-        }
-
-        value = ((PMC**)(((Buffer *)SELF->data)->bufstart))[ix];
-        return value->vtable->get_bignum(INTERP, value);
+        box = SELF.get_pmc_keyed_int(&ix);
+        if (box == NULL) box = undef(INTERP);
+        return box->vtable->get_number_keyed(INTERP, box, key->next);
     }
 
     STRING* get_string () {
         return NULL;
     }
 
-    STRING* get_string_keyed (KEY * key) {
-        KEY_ATOM* kp;
+    STRING* get_string_keyed_int (INTVAL* key) {
         INTVAL ix;
         PMC* value;
-
-        if (!key) {
-            return 0;
-        }
-
-        kp = &key->atom;
-        ix = atom2int(INTERP, kp);
-
-        if (ix >= SELF->cache.int_val || ix < 0) {
-            internal_exception(OUT_OF_BOUNDS, "Array element out of bounds!\n");
-        }
-
-        value = ((PMC**)(((Buffer *)SELF->data)->bufstart))[ix];
-
-        if(key->next != NULL) {
-            return value->vtable->get_string_keyed(INTERP, value, key->next);
-        }
-        else {
-            return value->vtable->get_string(INTERP, value);
-        }
-    }
-
-    STRING* get_string_keyed_int (INTVAL * key) {
-        INTVAL ix;
-        PMC* value;
+        PMC** array;
 
         if (!key) {
             return 0;
@@ -326,141 +218,38 @@ pmclass Array {
 
         ix = *key;
 
-        if (ix >= SELF->cache.int_val || ix < 0) {
-            internal_exception(OUT_OF_BOUNDS, "Array element out of bounds!\n");
+        if ((ix >= SELF->cache.int_val) || (ix < -SELF->cache.int_val)) {
+            internal_exception(OUT_OF_BOUNDS,
+                               "Array index out of bounds!\n");
         }
 
-        value = ((PMC**)(((Buffer *)SELF->data)->bufstart))[ix];
+        if (ix < 0) {
+            ix += SELF->cache.int_val;
+        }
+
+        array = ((Buffer *) SELF->data)->bufstart;
+        value = array[ix];
+        if (value == NULL) value = undef(INTERP);
         return value->vtable->get_string(INTERP, value);
     }
 
-    INTVAL get_bool () {
-        return (INTVAL)(SELF->cache.int_val != 0);
-    }
-    
-    INTVAL get_bool_keyed (KEY* key) {
-        KEY_ATOM* kp;
+    STRING* get_string_keyed (KEY* key) {
         INTVAL ix;
-        PMC* value;
+        PMC* box;
 
-        if (!key) {
-            return 0;
-        }
+        if (!key) return 0;
+        ix = atom2int(interpreter, &key->atom);
+        if (key->next == NULL) return SELF.get_string_keyed_int(&ix);
 
-        kp = &key->atom;
-        ix = atom2int(INTERP, kp);
-
-        if (ix >= SELF->cache.int_val || ix < 0) {
-            internal_exception(OUT_OF_BOUNDS, "Array element out of bounds!\n");
-        }
-
-        value = ((PMC**)(((Buffer *)SELF->data)->bufstart))[ix];
-
-        if(key->next != NULL) {
-            return value->vtable->get_bool_keyed(INTERP, value, key->next);
-        }
-        else {
-            return value->vtable->get_bool(INTERP, value);
-        }
-    }
-
-    INTVAL get_bool_keyed_int (INTVAL* key) {
-        INTVAL ix;
-        PMC* value;
-
-        if (!key) {
-            return 0;
-        }
-
-        ix = *key;
-
-        if (ix >= SELF->cache.int_val || ix < 0) {
-            internal_exception(OUT_OF_BOUNDS, "Array element out of bounds!\n");
-        }
-
-        value = ((PMC**)(((Buffer *)SELF->data)->bufstart))[ix];
-        return value->vtable->get_bool(INTERP, value);
-    }
-
-    INTVAL elements () {
-        /* XXX - this seems redundant in view of get_integer */
-        return SELF->cache.int_val;
-    }
-    
-    INTVAL elements_keyed (KEY* key) {
-        KEY_ATOM* kp;
-        INTVAL ix;
-        PMC* value;
-
-        if (!key) {
-            return 0;
-        }
-
-        kp = &key->atom;
-        ix = atom2int(INTERP, kp);
-
-        if (ix >= SELF->cache.int_val || ix < 0) {
-            internal_exception(OUT_OF_BOUNDS, "Array element out of bounds!\n");
-        }
-
-        value = ((PMC**)(((Buffer *)SELF->data)->bufstart))[ix];
-
-        if(key->next != NULL) {
-            return value->vtable->elements_keyed(INTERP, value, key->next);
-        }
-        else {
-            return value->vtable->elements(INTERP, value);
-        }
-    }        
-
-    INTVAL elements_keyed_int (INTVAL* key) {
-        INTVAL ix;
-        PMC* value;
-
-        if (!key) {
-            return 0;
-        }
-
-        ix = *key;
-
-        if (ix >= SELF->cache.int_val || ix < 0) {
-            internal_exception(OUT_OF_BOUNDS, "Array element out of bounds!\n");
-        }
-
-        value = ((PMC**)(((Buffer *)SELF->data)->bufstart))[ix];
-        return value->vtable->elements(INTERP, value);
-    }
-
-    PMC* get_pmc_keyed (KEY* key) {
-        KEY_ATOM* kp;
-        INTVAL ix;
-        PMC* value;
-
-        if (!key) {
-            return 0;
-        }
-
-        kp = &key->atom;
-        ix = atom2int(INTERP, kp);
-
-        if (ix >= SELF->cache.int_val || ix < 0) {
-            internal_exception(OUT_OF_BOUNDS, "Array element out of bounds!\n");
-        }
-
-        value = ((PMC**)(((Buffer *)SELF->data)->bufstart))[ix];
-
-        if(key->next != NULL) {
-            return value->vtable->get_pmc_keyed(INTERP, value, key->next);
-        }
-        else {
-            /* XXX - should this be value->get_pmc? */
-            return value;
-        }
+        box = SELF.get_pmc_keyed_int(&ix);
+        if (box == NULL) box = undef(INTERP);
+        return box->vtable->get_string_keyed(INTERP, box, key->next);
     }
 
     PMC* get_pmc_keyed_int (INTVAL* key) {
         INTVAL ix;
         PMC* value;
+        PMC** array;
 
         if (!key) {
             return 0;
@@ -468,80 +257,69 @@ pmclass Array {
 
         ix = *key;
 
-        if (ix >= SELF->cache.int_val || ix < 0) {
-            internal_exception(OUT_OF_BOUNDS, "Array element out of bounds!\n");
+        if ((ix >= SELF->cache.int_val) || (ix < -SELF->cache.int_val)) {
+            internal_exception(OUT_OF_BOUNDS,
+                               "Array index out of bounds!\n");
         }
 
-        value = ((PMC**)(((Buffer *)SELF->data)->bufstart))[ix];
-        /* XXX - should this be value->get_pmc? */
+        if (ix < 0) {
+            ix += SELF->cache.int_val;
+        }
+
+        array = ((Buffer *) SELF->data)->bufstart;
+        value = array[ix];
+        if (value == NULL) value = undef(INTERP);
         return value;
     }
 
-    INTVAL is_same (PMC* other) {
+    PMC* get_pmc_keyed (KEY* key) {
+        INTVAL ix;
+        PMC* box;
+
+        if (!key) return 0;
+        ix = atom2int(interpreter, &key->atom);
+        if (key->next == NULL) return SELF.get_pmc_keyed_int(&ix);
+
+        box = SELF.get_pmc_keyed_int(&ix);
+        if (box == NULL) box = undef(INTERP);
+        return box->vtable->get_pmc_keyed(INTERP, box, key->next);
+    }
+
+    INTVAL get_bool () {
+        INTVAL size = SELF->cache.int_val;
+        return (INTVAL)(size != 0);
+    }
+
+    INTVAL elements () {
+        return SELF->cache.int_val;
+    }
+
+    INTVAL is_same (PMC* pmc2) {
         STRING* s1 = (STRING*)SELF->cache.struct_val;
-        STRING* s2 = (STRING*)other->cache.struct_val;
-        return (INTVAL)( other->vtable == SELF->vtable &&
+        STRING* s2 = (STRING*)pmc2->cache.struct_val;
+        return (INTVAL)( pmc2->vtable == SELF->vtable &&
                           s1->bufused   == s2->bufused  &&
             (memcmp(s1->bufstart,s2->bufstart,(size_t)s1->bufused)==0));
     }
-    
-    INTVAL is_same_keyed (KEY* key, PMC* pmc2, KEY* pmc2_key) {
-        /* XXX */
-        return 0;
-    }
-
-    INTVAL is_same_keyed_int (INTVAL* key, PMC* pmc2, INTVAL* pmc2_key) {
-        /* XXX */
-        return 0;
-    }
 
     void set_integer (PMC* value) {
-        INTVAL idx = value->vtable->get_integer(INTERP,value);
-        resize_array(interpreter, SELF, idx);
+        INTVAL size = value->vtable->get_integer(INTERP,value);
+        resize_array(interpreter, SELF, size);
     }
 
-    void set_integer_native (INTVAL idx) {
-        resize_array(interpreter, SELF, idx);
-    }
-    
-    void set_integer_bignum (BIGNUM* value) {
-        /* XXX - BIGNUM stuffs */
+    void set_integer_native (INTVAL size) {
+        resize_array(interpreter, SELF, size);
     }
 
     void set_integer_same (PMC* value) {
-        INTVAL idx = value->cache.int_val;
-        resize_array(interpreter, SELF, idx);
-    }
-
-    void set_integer_keyed (KEY* key, INTVAL value) {
-        KEY_ATOM* kp;
-        INTVAL ix;
-        PMC* mypmc;
-
-        if (!key) {
-            return;
-        }
-
-        kp = &key->atom;
-        ix = atom2int(INTERP, kp);
-
-        if (ix >= SELF->cache.int_val || ix < 0) {
-            internal_exception(OUT_OF_BOUNDS, "Array element out of bounds!\n");
-        }
-
-        mypmc = ((PMC**)(((Buffer *)SELF->data)->bufstart))[ix];
-
-        if(key->next != NULL) {
-            mypmc->vtable->set_integer_keyed(INTERP, mypmc, key->next, value);
-        }
-        else {
-            mypmc->vtable->set_integer_native(INTERP, mypmc, value);
-        }
+        INTVAL size = value->cache.int_val;
+        resize_array(interpreter, SELF, size);
     }
 
     void set_integer_keyed_int (INTVAL* key, INTVAL value) {
         INTVAL ix;
-        PMC* mypmc;
+        PMC* element;
+        PMC** array;
 
         if (!key) {
             return;
@@ -549,60 +327,53 @@ pmclass Array {
 
         ix = *key;
 
-        if (ix >= SELF->cache.int_val || ix < 0) {
-            internal_exception(OUT_OF_BOUNDS, "Array element out of bounds!\n");
+        if (ix >= SELF->cache.int_val || ix < -SELF->cache.int_val) {
+            internal_exception(OUT_OF_BOUNDS,
+                               "Array index out of bounds!\n");
         }
 
-        mypmc = ((PMC**)(((Buffer *)SELF->data)->bufstart))[ix];
-        mypmc->vtable->set_integer_native(INTERP, mypmc, value);
+        if (ix < 0) {
+            ix += SELF->cache.int_val;
+        }
+
+        array = ((Buffer *) SELF->data)->bufstart;
+        element = array[ix];
+        if (element == NULL) {
+            element = pmc_new(INTERP, enum_class_PerlInt);
+            array = ((Buffer *) SELF->data)->bufstart; /* May have moved */
+            array[ix] = element;
+        }
+
+        element->vtable->set_integer_native(INTERP, element, value);
     }
 
-    void set_number (PMC * value) {
-        INTVAL idx = (INTVAL)value->cache.num_val;
-        resize_array(interpreter, SELF, idx);
-    }
-
-    void set_number_native (FLOATVAL idx) {
-        resize_array(interpreter, SELF, (INTVAL)idx);
-    }
-
-    void set_number_bignum (BIGNUM* value) {
-        /* XXX - BIGNUM stuffs */
-    }
-
-    void set_number_same (PMC * value) {
-        INTVAL idx = value->cache.int_val;
-        resize_array(interpreter, SELF, idx);
-    }
-
-    void set_number_keyed (KEY * key, FLOATVAL value) {
-        KEY_ATOM* kp;
+    void set_integer_keyed (KEY* key, INTVAL value) {
         INTVAL ix;
-        PMC* mypmc;
 
-        if (!key) {
-            return;
-        }
+        if (!key) return;
 
-        kp = &key->atom;
-        ix = atom2int(INTERP, kp);
-
-        if (ix >= SELF->cache.int_val || ix < 0) {
-            internal_exception(OUT_OF_BOUNDS, "Array element out of bounds!\n");
-        }
-
-        mypmc = ((PMC**)(((Buffer *)SELF->data)->bufstart))[ix];
-        if(key->next != NULL) {
-            mypmc->vtable->set_number_keyed(INTERP, mypmc, key->next, value);
-        }
-        else {
-            mypmc->vtable->set_number_native(INTERP, mypmc, value);
-        }
+        ix = atom2int(interpreter, &key->atom);
+        SELF.set_integer_keyed_int(&ix, value);
     }
 
-    void set_number_keyed_int (INTVAL * key, FLOATVAL value) {
+    void set_number (PMC* value) {
+        INTVAL size = (INTVAL)value->cache.num_val;
+        resize_array(interpreter, SELF, size+1);
+    }
+
+    void set_number_native (FLOATVAL size) {
+        resize_array(interpreter, SELF, (INTVAL)size);
+    }
+
+    void set_number_same (PMC* value) {
+        INTVAL size = value->cache.int_val;
+        resize_array(interpreter, SELF, size);
+    }
+
+    void set_number_keyed_int (INTVAL* key, FLOATVAL value) {
         INTVAL ix;
-        PMC* mypmc;
+        PMC* element;
+        PMC** array;
 
         if (!key) {
             return;
@@ -610,42 +381,49 @@ pmclass Array {
 
         ix = *key;
 
-        if (ix >= SELF->cache.int_val || ix < 0) {
-            internal_exception(OUT_OF_BOUNDS, "Array element out of bounds!\n");
+        if (ix >= SELF->cache.int_val || ix < -SELF->cache.int_val) {
+            internal_exception(OUT_OF_BOUNDS,
+                               "Array index out of bounds!\n");
+        }
+        else if (ix < 0) {
+            ix += SELF->cache.int_val;
         }
 
-        mypmc = ((PMC**)(((Buffer *)SELF->data)->bufstart))[ix];
-        mypmc->vtable->set_number_native(INTERP, mypmc, value);
+        array = ((Buffer *) SELF->data)->bufstart;
+        element = array[ix];
+        if (element == NULL) {
+            element = pmc_new(INTERP, enum_class_PerlNum);
+            array = ((Buffer *) SELF->data)->bufstart; /* May have moved */
+            array[ix] = element;
+        }
+
+        element->vtable->set_number_native(INTERP, element, value);
     }
 
-    void set_string_keyed (KEY * key, STRING * value) {
-        KEY_ATOM* kp;
+    void set_number_keyed (KEY* key, FLOATVAL value) {
         INTVAL ix;
-        PMC* mypmc;
 
-        if (!key) {
-            return;
-        }
-
-        kp = &key->atom;
-        ix = atom2int(INTERP, kp);
-
-        if (ix >= SELF->cache.int_val || ix < 0) {
-            internal_exception(OUT_OF_BOUNDS, "Array element out of bounds!\n");
-        }
-
-        mypmc = ((PMC**)(((Buffer *)SELF->data)->bufstart))[ix];
-        if(key->next != NULL) {
-            mypmc->vtable->set_string_keyed(INTERP, mypmc, key->next, value);
-        }
-        else {
-            mypmc->vtable->set_string_native(INTERP, mypmc, value);
-        }
+        if (!key) return;
+        ix = atom2int(interpreter, &key->atom);
+        SELF.set_number_keyed_int(&ix, value);
     }
 
-    void set_string_keyed_int (INTVAL * key, STRING * value) {
+    void set_string (PMC* value) {
+        THROW_UNSUPPORTED;
+    }
+
+    void set_string_native (STRING* value) {
+        THROW_UNSUPPORTED;
+    }
+
+    void set_string_same (PMC* value) {
+        THROW_UNSUPPORTED;
+    }
+
+    void set_string_keyed_int (INTVAL* key, STRING* value) {
         INTVAL ix;
-        PMC* mypmc;
+        PMC** array;
+        PMC* element;
 
         if (!key) {
             return;
@@ -653,237 +431,267 @@ pmclass Array {
 
         ix = *key;
 
-        if (ix >= SELF->cache.int_val || ix < 0) {
-            internal_exception(OUT_OF_BOUNDS, "Array element out of bounds!\n");
+        if (ix >= SELF->cache.int_val || ix < -SELF->cache.int_val) {
+            internal_exception(OUT_OF_BOUNDS,
+                               "Array index out of bounds!\n");
+        }
+        else if (ix < 0) {
+            ix += SELF->cache.int_val;
         }
 
-        mypmc = ((PMC**)(((Buffer *)SELF->data)->bufstart))[ix];
-        mypmc->vtable->set_string_native(INTERP, mypmc, value);
-    }
-
-    void set_pmc_keyed(KEY * dest_key, PMC* src, KEY* src_key) {
-        if (src_key) {
-            src = src->vtable->get_pmc_keyed(INTERP, src, src_key);
+        array = ((Buffer *) SELF->data)->bufstart;
+        element = array[ix];
+        if (element == NULL) {
+            element = pmc_new(INTERP, enum_class_PerlString);
+            array = ((Buffer *) SELF->data)->bufstart; /* May have moved */
+            array[ix] = element;
         }
-        if (dest_key) {
-            INTVAL ix = atom2int(INTERP, &dest_key->atom);
-            PMC* dest = ((PMC**)(((Buffer *)SELF->data)->bufstart))[ix];
-            dest->vtable->set_pmc(INTERP, dest, src);
-        } 
-        else {
-            /* $#array = $foo[$bar] */
-            resize_array(interpreter, SELF, 1+src->vtable->get_integer(INTERP, src));
-        }       
+
+        element->vtable->set_string_native(INTERP, element, value);
     }
 
-    void set_pmc_keyed_int(INTVAL * dest_key, PMC* src, INTVAL* src_key) {
-        if (src_key) {
-            src = src->vtable->get_pmc_keyed_int(INTERP, src, src_key);
+    void set_string_keyed (KEY* key, STRING* value) {
+        INTVAL ix;
+
+        if (!key) return;
+        ix = atom2int(interpreter, &key->atom);
+        return SELF.set_string_keyed_int(&ix, value);
+    }
+
+    void set_pmc_keyed_int (INTVAL* dest_key, PMC* src, INTVAL* src_key) {
+        INTVAL ix;
+        PMC** array;
+
+        if (!dest_key) {
+            return;
         }
-        if (dest_key) {
-            INTVAL ix = *dest_key;
-            PMC* dest = ((PMC**)(((Buffer *)SELF->data)->bufstart))[ix];
-            dest->vtable->set_pmc(INTERP, dest, src);
+
+        ix = *dest_key;
+
+        if ((ix >= SELF->cache.int_val) || (ix < -SELF->cache.int_val)) {
+            internal_exception(OUT_OF_BOUNDS,
+                               "Array index out of bounds!\n");
         }
-        else {
-            /* $#array = $foo[$bar] */
-            resize_array(interpreter, SELF, 1+src->vtable->get_integer(INTERP, src));
+
+        if (ix < 0) {
+            ix += SELF->cache.int_val;
         }
+
+        if (src_key) src = src->vtable->get_pmc_keyed_int(INTERP, src, src_key);
+
+        array = ((Buffer *) SELF->data)->bufstart;
+        /* XXX I don't pretend to understand how this is supposed to work.
+         * With "set P0[0], P1[1]", I am ignoring P0[0]'s old value and just
+         * overwriting it with P1[1]. */
+        array[ix] = src;
     }
 
-    void add (PMC * value, PMC* dest) {
-        if(value->vtable == &Parrot_base_vtables[enum_class_PerlInt]) {
-            dest->vtable = &Parrot_base_vtables[enum_class_PerlInt];
-            dest->vtable->set_integer_native(INTERP, dest, 
-                SELF->vtable->get_integer(INTERP, SELF) +
-                value->cache.int_val
-            );
-        }
-        else if(value->vtable == &Parrot_base_vtables[enum_class_PerlNum]) {
-            dest->vtable = &Parrot_base_vtables[enum_class_PerlNum];
-            dest->vtable->set_number_native(INTERP, dest, 
-                SELF->vtable->get_number(INTERP, SELF) +
-                value->cache.num_val
-            );
-        }
-        else {
-        }
-    }
+    void set_pmc_keyed (KEY* dest_key, PMC* src, KEY* src_key) {
+        INTVAL ix;
 
-    void add_int (INTVAL value, PMC* dest) {
-        dest->vtable = &Parrot_base_vtables[enum_class_PerlInt];
-        dest->vtable->set_integer_native(INTERP, dest, 
-            SELF->vtable->get_integer(INTERP, SELF) +
-            value
-        );
-    }
+        if (!dest_key) return;
 
-    void add_bignum (BIGNUM* value, PMC* dest) {
-        /* XXX - You know it */
-    }
-
-    void add_float (FLOATVAL value, PMC* dest) {
-        dest->vtable = &Parrot_base_vtables[enum_class_PerlNum];
-        dest->vtable->set_number_native(INTERP, dest, 
-            SELF->vtable->get_number(INTERP, SELF) +
-            value
-        );
-    }
-
-    void subtract (PMC * value, PMC* dest) {
-        if(value->vtable == &Parrot_base_vtables[enum_class_PerlInt]) {
-            dest->vtable = &Parrot_base_vtables[enum_class_PerlInt];
-            dest->vtable->set_integer_native(INTERP, dest, 
-                SELF->vtable->get_integer(INTERP, SELF) -
-                value->cache.int_val
-            );
-        }
-        else if(value->vtable == &Parrot_base_vtables[enum_class_PerlNum]) {
-            dest->vtable = &Parrot_base_vtables[enum_class_PerlNum];
-            dest->vtable->set_number_native(INTERP, dest, 
-                SELF->vtable->get_number(INTERP, SELF) -
-                value->cache.num_val
-            );
-        }
-        else {
-        }
-    }
-
-    void subtract_int (INTVAL value, PMC* dest) {
-        dest->vtable = &Parrot_base_vtables[enum_class_PerlInt];
-        dest->vtable->set_integer_native(INTERP, dest, 
-            SELF->vtable->get_integer(INTERP, SELF) -
-            value
-        );
-    }
-
-    void subtract_float (FLOATVAL value, PMC* dest) {
-        dest->vtable = &Parrot_base_vtables[enum_class_PerlNum];
-        dest->vtable->set_number_native(INTERP, dest, 
-            SELF->vtable->get_number(INTERP, SELF) -
-            value
-        );
-    }
-
-    void multiply (PMC * value, PMC* dest) {
-        if(value->vtable == &Parrot_base_vtables[enum_class_PerlInt]) {
-            dest->vtable = &Parrot_base_vtables[enum_class_PerlInt];
-            dest->vtable->set_integer_native(INTERP, dest, 
-                SELF->vtable->get_integer(INTERP, SELF) *
-                value->cache.int_val
-            );
-        }
-        else if(value->vtable == &Parrot_base_vtables[enum_class_PerlNum]) {
-            dest->vtable = &Parrot_base_vtables[enum_class_PerlNum];
-            dest->vtable->set_number_native(INTERP, dest, 
-                SELF->vtable->get_number(INTERP, SELF) *
-                value->cache.num_val
-            );
-        }
-        else {
-        }
-    }
-
-    void multiply_int (INTVAL value, PMC* dest) {
-        dest->vtable = &Parrot_base_vtables[enum_class_PerlInt];
-        dest->vtable->set_integer_native(INTERP, dest, 
-            SELF->vtable->get_integer(INTERP, SELF) *
-            value
-        );
-    }
-
-    void multiply_float (FLOATVAL value, PMC* dest) {
-        dest->vtable = &Parrot_base_vtables[enum_class_PerlNum];
-        dest->vtable->set_number_native(INTERP, dest, 
-            SELF->vtable->get_number(INTERP, SELF) *
-            value
-        );
-    }
-
-    void divide (PMC * value, PMC* dest) {
-        if(value->vtable == &Parrot_base_vtables[enum_class_PerlInt]) {
-            dest->vtable = &Parrot_base_vtables[enum_class_PerlInt];
-            dest->vtable->set_integer_native(INTERP, dest, 
-                SELF->vtable->get_integer(INTERP, SELF) /
-                value->cache.int_val
-            );
-        }
-        else if(value->vtable == &Parrot_base_vtables[enum_class_PerlNum]) {
-            dest->vtable = &Parrot_base_vtables[enum_class_PerlNum];
-            dest->vtable->set_number_native(INTERP, dest, 
-                SELF->vtable->get_number(INTERP, SELF) /
-                value->cache.num_val
-            );
-        }
-        else {
-        }
-    }
-
-    void divide_int (INTVAL value, PMC* dest) {
-        dest->vtable = &Parrot_base_vtables[enum_class_PerlInt];
-        dest->vtable->set_integer_native(INTERP, dest, 
-            SELF->vtable->get_integer(INTERP, SELF) /
-            value
-        );
-    }
-
-    void divide_float (FLOATVAL value, PMC* dest) {
-        dest->vtable = &Parrot_base_vtables[enum_class_PerlNum];
-        dest->vtable->set_number_native(INTERP, dest, 
-            SELF->vtable->get_number(INTERP, SELF) /
-            value
-        );
-    }
-
-    void modulus (PMC * value, PMC* dest) {
-        if(value->vtable == &Parrot_base_vtables[enum_class_PerlInt]) {
-            dest->vtable = &Parrot_base_vtables[enum_class_PerlInt];
-            dest->vtable->set_integer_native(INTERP, dest, 
-                SELF->vtable->get_integer(INTERP, SELF) %
-                value->cache.int_val
-            );
-        }
-        else {
-        }
-    }
-
-    void modulus_int (INTVAL value, PMC* dest) {
-        dest->vtable = &Parrot_base_vtables[enum_class_PerlInt];
-        dest->vtable->set_integer_native(INTERP, dest, 
-            SELF->vtable->get_integer(INTERP, SELF) %
-            value
-        );
-    }
-
-    void concatenate (PMC * value, PMC* dest) {
-        dest->cache.struct_val =
-            string_concat(INTERP,
-                      SELF->cache.struct_val,
-                      value->vtable->get_string(INTERP, value),
-                      0
-                     );
-    }
-
-    void concatenate_native (STRING * value, PMC* dest) {
-        dest->cache.struct_val =
-            string_concat(INTERP,
-                      SELF->cache.struct_val,
-                      value,
-                      0
-                     );
-    }
-
-    void concatenate_same (PMC * value, PMC* dest) {
-        dest->cache.struct_val =
-            string_concat(INTERP,
-                      SELF->cache.struct_val,
-                      value->cache.struct_val,
-                      0
-                     );
+        ix = atom2int(interpreter, &dest_key->atom);
+        if (src_key)
+            SELF.set_pmc_keyed_int(&ix, src, &src_key->atom.val.int_val);
+        else
+            SELF.set_pmc_keyed_int(&ix, src, NULL);
     }
 
     /* == operation */
     INTVAL is_equal (PMC* value) {
         return 0;
+    }
+    
+    INTVAL is_equal_keyed (KEY* key, PMC* value, KEY* value_key) {
+        return 0;
+    }
+
+    INTVAL is_equal_keyed_int (INTVAL* key, PMC* value, INTVAL* value_key) {
+        return 0;
+    }
+
+    void logical_or (PMC* value, PMC* dest) {
+        THROW_UNSUPPORTED;
+    }
+
+    void logical_and (PMC* value, PMC* dest) {
+        THROW_UNSUPPORTED;
+    }
+
+    void logical_not (PMC* value) {
+        THROW_UNSUPPORTED;
+    }
+
+    void add (PMC* value, PMC* dest) {
+        THROW_UNSUPPORTED;
+    }
+
+    void add_int (INTVAL value, PMC* dest) {
+        THROW_UNSUPPORTED;
+    }
+
+    void add_bignum (BIGNUM* value, PMC* dest) {
+        THROW_UNSUPPORTED;
+    }
+
+    void add_float (FLOATVAL value, PMC* dest) {
+        THROW_UNSUPPORTED;
+    }
+
+    void add_same (PMC* value, PMC* dest) {
+        THROW_UNSUPPORTED;
+    }
+
+    void add_keyed (KEY* key, PMC* value, KEY* value_key,
+                               PMC* dest, KEY* dest_key) {
+        THROW_UNSUPPORTED;
+    }
+
+    void add_keyed_int (INTVAL* key, PMC* value, INTVAL* value_key,
+                                      PMC* dest, INTVAL* dest_key) {
+        THROW_UNSUPPORTED;
+    }
+
+    void subtract (PMC* value, PMC* dest) {
+        THROW_UNSUPPORTED;
+    }
+
+    void subtract_int (INTVAL value, PMC* dest) {
+        THROW_UNSUPPORTED;
+    }
+
+    void subtract_bignum (BIGNUM* value, PMC* dest) {
+        THROW_UNSUPPORTED;
+    }
+
+    void subtract_float (FLOATVAL value, PMC* dest) {
+        THROW_UNSUPPORTED;
+    }
+
+    void subtract_same (PMC* value, PMC* dest) {
+        THROW_UNSUPPORTED;
+    }
+
+    void subtract_keyed (KEY* key, PMC* value, KEY* value_key,
+                                    PMC* dest, KEY* dest_key) {
+        THROW_UNSUPPORTED;
+    }
+
+    void subtract_keyed_int (INTVAL* key, PMC* value, INTVAL* value_key,
+                                           PMC* dest, INTVAL* dest_key) {
+        THROW_UNSUPPORTED;
+    }
+
+    void multiply (PMC* value, PMC* dest) {
+        THROW_UNSUPPORTED;
+    }
+
+    void multiply_int (INTVAL value, PMC* dest) {
+        THROW_UNSUPPORTED;
+    }
+
+    void multiply_bignum (BIGNUM* value, PMC* dest) {
+        THROW_UNSUPPORTED;
+    }
+
+    void multiply_float (FLOATVAL value, PMC* dest) {
+        THROW_UNSUPPORTED;
+    }
+
+    void multiply_same (PMC* value, PMC* dest) {
+        THROW_UNSUPPORTED;
+    }
+
+    void multiply_keyed (KEY* key, PMC* value, KEY* value_key,
+                                    PMC* dest, KEY* dest_key) {
+        THROW_UNSUPPORTED;
+    }
+
+    void multiply_keyed_int (INTVAL* key, PMC* value, INTVAL* value_key,
+                                           PMC* dest, INTVAL* dest_key) {
+        THROW_UNSUPPORTED;
+    }
+
+    void divide (PMC* value, PMC* dest) {
+        THROW_UNSUPPORTED;
+    }
+
+    void divide_int (INTVAL value, PMC* dest) {
+        THROW_UNSUPPORTED;
+    }
+
+    void divide_bignum (BIGNUM* value, PMC* dest) {
+        THROW_UNSUPPORTED;
+    }
+
+    void divide_float (FLOATVAL value, PMC* dest) {
+        THROW_UNSUPPORTED;
+    }
+
+    void divide_same (PMC* value, PMC* dest) {
+        THROW_UNSUPPORTED;
+    }
+
+    void divide_keyed (KEY* key, PMC* value, KEY* value_key,
+                                  PMC* dest, KEY* dest_key) {
+        THROW_UNSUPPORTED;
+    }
+
+    void divide_keyed_int (INTVAL* key, PMC* value, INTVAL* value_key,
+                                         PMC* dest, INTVAL* dest_key) {
+        THROW_UNSUPPORTED;
+    }
+
+    void modulus (PMC* value, PMC* dest) {
+        THROW_UNSUPPORTED;
+    }
+
+    void modulus_int (INTVAL value, PMC* dest) {
+        THROW_UNSUPPORTED;
+    }
+
+    void modulus_bignum (BIGNUM* value, PMC* dest) {
+        THROW_UNSUPPORTED;
+    }
+
+    void modulus_float (FLOATVAL value, PMC* dest) {
+        THROW_UNSUPPORTED;
+    }
+
+    void modulus_same (PMC* value, PMC* dest) {
+        THROW_UNSUPPORTED;
+    }
+
+    void modulus_keyed (KEY* key, PMC* value, KEY* value_key,
+                                   PMC* dest, KEY* dest_key) {
+        THROW_UNSUPPORTED;
+    }
+
+    void modulus_keyed_int (INTVAL* key, PMC* value, INTVAL* value_key,
+                                          PMC* dest, INTVAL* dest_key) {
+        THROW_UNSUPPORTED;
+    }
+
+    void concatenate (PMC* value, PMC* dest) {
+        THROW_UNSUPPORTED;
+    }
+
+    void concatenate_native (STRING* value, PMC* dest) {
+        THROW_UNSUPPORTED;
+    }
+
+    void concatenate_same (PMC* value, PMC* dest) {
+        THROW_UNSUPPORTED;
+    }
+
+    void concatenate_keyed (KEY* key, PMC* value, KEY* value_key,
+                                       PMC* dest, KEY* dest_key) {
+        THROW_UNSUPPORTED;
+    }
+
+    void concatenate_keyed_int (INTVAL* key, PMC* value, INTVAL* value_key,
+                                              PMC* dest, INTVAL* dest_key) {
+        THROW_UNSUPPORTED;
     }
 }

@@ -108,7 +108,7 @@ output_is(<<'CODE', <<'OUTPUT', "Setting out-of-bounds elements");
 
 	end
 CODE
-Array element out of bounds!
+Array index out of bounds!
 OUTPUT
 
 output_is(<<'CODE', <<'OUTPUT', "Getting out-of-bounds elements");
@@ -118,7 +118,7 @@ output_is(<<'CODE', <<'OUTPUT', "Getting out-of-bounds elements");
 	set I0, P0[1]
 	end
 CODE
-Array element out of bounds!
+Array index out of bounds!
 OUTPUT
 
 1;
