@@ -34,20 +34,6 @@ PMC *constant_pmc_new_init(struct Parrot_Interp *, INTVAL base_type, PMC *);
 INTVAL pmc_register(struct Parrot_Interp *, STRING *);
 INTVAL pmc_type(struct Parrot_Interp *, STRING *);
 
-typedef enum {
-    TRAV_DO_CLONE,
-    TRAV_DO_DUMP,
-    TRAV_DO_FREEZE,
-    TRAV_DO_THAW,
-    TRAV_DO_DESTROY_ORDER
-} traverse_enum_t;
-
-PMC*      do_clone(Parrot_Interp, PMC*);
-opcode_t* do_freeze(Parrot_Interp, PMC*);
-STRING*   do_dump(Parrot_Interp, PMC*);
-PMC*      do_thaw(Parrot_Interp, opcode_t*);
-void*     do_traverse(Parrot_Interp, void*, traverse_enum_t what);
-
 /* multi method fallbacks */
 void register_fallback_methods(Parrot_Interp);
 void mmd_fallback_add_pmc(Parrot_Interp, PMC *left, PMC *right, PMC *dest);

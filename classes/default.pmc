@@ -164,6 +164,11 @@ pmclass default abstract noinit {
         return DYNSELF.name_keyed(r_key);
     }
 
+    void clone_keyed_int (INTVAL key, PMC *dest) {
+        PMC* r_key = INT2KEY(INTERP, key);
+        DYNSELF.clone_keyed(r_key, dest);
+    }
+
     PMC* find_method(STRING* method_name) {
 	if (SELF->vtable->method_table)
 	    return VTABLE_get_pmc_keyed(INTERP, SELF->vtable->method_table,

@@ -37,11 +37,11 @@
 
 /* Other headers, where available */
 
-#ifdef PARROT_HAS_HEADER_NIIN
+#ifdef PARROT_HAS_HEADER_NIIN 
 #  include <netinet/in.h>
 #endif
 
-#ifdef PARROT_HAS_HEADER_ARPAINET
+#ifdef PARROT_HAS_HEADER_ARPAINET 
 #  include <arpa/inet.h>
 #endif
 
@@ -97,15 +97,6 @@ typedef jmp_buf Parrot_jump_buff;
 typedef struct PMC PMC;
 typedef void STRING_FUNCS;
 typedef void BIGNUM;
-
-typedef struct _traverse_info {
-    PMC *src;   /* clone, freeze, dump src */
-    PMC *dest;  /* thaw, clone destination */
-    void *seen;  /* seen hash */
-    void *todo;  /* todo list */
-    opcode_t *image;    /* freeze, thaw image */
-} traverse_info;
-
 
 /* weird architectures might need this, s. C-FAQ 5.17
  *
