@@ -61,7 +61,7 @@ pmclass PerlNum extends perlscalar {
     }
 
     void set_number_native (FLOATVAL value) {
-	int vali = (INTVAL) value;
+	INTVAL vali = (INTVAL) value;
 
         SELF->cache.num_val = value;
 	if (value == vali)
