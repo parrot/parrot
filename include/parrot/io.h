@@ -55,18 +55,21 @@ enum {
         PIO_TYPE_MAX
 };
 
-#define PIO_F_READ      0000001
-#define PIO_F_WRITE     0000002
-#define PIO_F_APPEND    0000004
-#define PIO_F_TRUNC     0000010
-#define PIO_F_FILE      0000100
-#define PIO_F_PIPE      0000200
-#define PIO_F_SOCKET    0000400
-#define PIO_F_CONSOLE   0001000         /* A terminal, we can linebuf   */
-#define PIO_F_LINEBUF   0010000
-#define PIO_F_BUF       0020000
-#define PIO_F_MALLOC    0040000         /* Buffer malloced              */
-#define PIO_F_SHARED    0100000         /* Stream shares a file handle  */
+/* IO object flags */
+#define PIO_F_READ      00000001
+#define PIO_F_WRITE     00000002
+#define PIO_F_APPEND    00000004
+#define PIO_F_TRUNC     00000010
+#define PIO_F_FILE      00000100
+#define PIO_F_PIPE      00000200
+#define PIO_F_SOCKET    00000400
+#define PIO_F_CONSOLE   00001000        /* A terminal                   */
+#define PIO_F_LINEBUF   00010000        /* Flushes on newline           */
+#define PIO_F_BUF       00020000
+#define PIO_F_MALLOC    00040000        /* Buffer malloced              */
+#define PIO_F_SHARED    00100000        /* Stream shares a file handle  */
+#define PIO_F_EOF       01000000
+
 
 #define PIO_ACCMODE     0000003
 #define PIO_DEFAULTMODE DEFAULT_OPEN_MODE 
@@ -170,12 +173,8 @@ struct _ParrotIOLayerAPI {
         INTVAL          (*Popped)(ParrotIOLayer * l, ParrotIO * io);
         ParrotIO *      (*Open)(theINTERP, ParrotIOLayer * l,
                                 const char * name, UINTVAL flags);
-        ParrotIO *      (*Open2)(theINTERP, ParrotIOLayer * l,
-                                const char * name, const char * mode,
-                                        int perm);
-        ParrotIO *      (*Open3)(theINTERP, ParrotIOLayer * l,
-                                const char * name, const char * mode,
-                                        int perm, ParrotIO * io);
+        ParrotIO *      (*Open2_Unused)(theINTERP);
+        ParrotIO *      (*Open3_Unused)(theINTERP);
         ParrotIO *      (*Open_ASync)(theINTERP, ParrotIOLayer * l,
                                 const char * name, const char * mode,
                                         DummyCodeRef *);
@@ -196,8 +195,9 @@ struct _ParrotIOLayerAPI {
                                         DummyCodeRef *);
         INTVAL          (*Flush)(theINTERP, ParrotIOLayer * layer,
                                 ParrotIO * io);
-        PIOOFF_T        (*Seek)(theINTERP, ParrotIOLayer * layer,
-                                ParrotIO * io, PIOOFF_T offset, INTVAL whence);
+        INTVAL          (*Seek)(theINTERP, ParrotIOLayer * layer,
+                                ParrotIO * io, INTVAL hi, INTVAL lo,
+                                INTVAL whence);
         PIOOFF_T        (*Tell)(theINTERP, ParrotIOLayer * layer,
                                 ParrotIO * io);
         INTVAL          (*SetBuf)(theINTERP, ParrotIOLayer * layer,
@@ -210,6 +210,8 @@ struct _ParrotIOLayerAPI {
                                 ParrotIO * io, const char * s);
         INTVAL          (*GetS)(theINTERP, ParrotIOLayer * layer,
                                 ParrotIO * io, char * s, INTVAL maxlen);
+        INTVAL          (*Eof)(theINTERP, ParrotIOLayer * l,
+                                ParrotIO * io);
 };
 
 
@@ -243,6 +245,9 @@ extern INTVAL           PIO_write(theINTERP, ParrotIO *, void *, size_t);
 extern INTVAL           PIO_setbuf(theINTERP, ParrotIO *, size_t);
 extern INTVAL           PIO_setlinebuf(theINTERP, ParrotIO *);
 extern INTVAL           PIO_puts(theINTERP, ParrotIO *, const char *);
+extern INTVAL           PIO_seek(theINTERP, ParrotIO *, INTVAL hi,
+                                INTVAL lo, INTVAL whence);
+extern INTVAL           PIO_eof(theINTERP, ParrotIO *);
 
 
 /* Put platform specific macros here if you must */

@@ -1,6 +1,7 @@
 /* io_stdio.c
  *  Copyright: (When this is determined...it will go here)
  *  CVS Info
+ *      $Id$
  *  Overview:
  *      The "STDIO" layer of Parrot IO. Buffering and all the fun stuff.
  *
@@ -31,27 +32,27 @@ ParrotIOLayer           pio_stdio_layer = {
  * file.
  */
 
-INTVAL          PIO_stdio_init(theINTERP, ParrotIOLayer * layer);
-ParrotIO *      PIO_stdio_open(theINTERP, ParrotIOLayer * layer,
+INTVAL          PIO_stdio_init(theINTERP, ParrotIOLayer * l);
+ParrotIO *      PIO_stdio_open(theINTERP, ParrotIOLayer * l,
 			const char * path, UINTVAL flags);
-INTVAL          PIO_stdio_setbuf(theINTERP, ParrotIOLayer * layer,
+INTVAL          PIO_stdio_setbuf(theINTERP, ParrotIOLayer * l,
                         ParrotIO * io, size_t bufsize);
-INTVAL          PIO_stdio_setlinebuf(theINTERP, ParrotIOLayer * layer,
+INTVAL          PIO_stdio_setlinebuf(theINTERP, ParrotIOLayer * l,
                         ParrotIO * io);
-ParrotIO *      PIO_stdio_fdopen(theINTERP, ParrotIOLayer * layer,
+ParrotIO *      PIO_stdio_fdopen(theINTERP, ParrotIOLayer * l,
 		        PIOHANDLE fd, UINTVAL flags);
-INTVAL          PIO_stdio_close(theINTERP, ParrotIOLayer * layer,
+INTVAL          PIO_stdio_close(theINTERP, ParrotIOLayer * l,
                         ParrotIO * io);
-void            PIO_stdio_flush(theINTERP, ParrotIOLayer * layer,
+void            PIO_stdio_flush(theINTERP, ParrotIOLayer * l,
                         ParrotIO * io);
-size_t          PIO_stdio_read(theINTERP, ParrotIOLayer * layer,
+size_t          PIO_stdio_read(theINTERP, ParrotIOLayer * l,
                         ParrotIO * io, void * buffer, size_t len);
-size_t          PIO_stdio_write(theINTERP, ParrotIOLayer * layer,
+size_t          PIO_stdio_write(theINTERP, ParrotIOLayer * l,
                         ParrotIO * io, const void * buffer, size_t len);
-INTVAL          PIO_stdio_puts(theINTERP, ParrotIOLayer * l, ParrotIO * io,
+INTVAL          PIO_stdio_puts(theINTERP, ParrotIOLayer *l, ParrotIO * io,
                         const char * s);
-PIOOFF_T        PIO_stdio_seek(theINTERP, ParrotIOLayer * l, ParrotIO * io,
-                        PIOOFF_T offset, INTVAL whence);
+INTVAL          PIO_stdio_seek(theINTERP, ParrotIOLayer *l, ParrotIO * io,
+                        INTVAL hi, INTVAL lo, INTVAL whence);
 PIOOFF_T        PIO_stdio_tell(theINTERP, ParrotIOLayer * l,
                         ParrotIO * io);
 
@@ -239,8 +240,8 @@ INTVAL PIO_stdio_puts(theINTERP, ParrotIOLayer * layer, ParrotIO * io,
 }
 
 
-PIOOFF_T PIO_stdio_seek(theINTERP, ParrotIOLayer * l, ParrotIO * io,
-                        PIOOFF_T offset, INTVAL whence) {
+INTVAL PIO_stdio_seek(theINTERP, ParrotIOLayer * l, ParrotIO * io,
+                        INTVAL hi, INTVAL lo, INTVAL whence) {
         int hardseek = 0;
 
         if( io->flags&PIO_F_SHARED ||
@@ -253,7 +254,7 @@ PIOOFF_T PIO_stdio_seek(theINTERP, ParrotIOLayer * l, ParrotIO * io,
          * else make IO request.
          */
         internal_exception(IO_NOT_IMPLEMENTED, "Seek not implemented");
-        return io->fpos;
+        return -1;
 }
 
 
@@ -287,7 +288,8 @@ ParrotIOLayerAPI        pio_stdio_layer_api = {
         NULL,
         NULL,
         PIO_stdio_puts,
-        NULL 
+        NULL,
+        NULL
 };
 
 

@@ -1,6 +1,7 @@
 /* io.c
  *  Copyright: (When this is determined...it will go here)
  *  CVS Info
+ *      $Id$
  *  Overview:
  *      This is the Parrot IO subsystem API.  Generic IO stuff
  *      goes here, each specific layer goes in its own file...
@@ -333,8 +334,9 @@ UINTVAL PIO_parse_open_flags(const char * flagstr) {
                         if( *(++s) == '>') {
                                 flags |= PIO_F_APPEND;
                         }
-                        else if(*s != 0)
-                                return 0;
+                        else {
+                                flags |= PIO_F_TRUNC;
+                        }
                         break;
                 default:
                         return 0;
@@ -478,6 +480,37 @@ INTVAL PIO_write(theINTERP, ParrotIO * io, void * buffer, size_t len) {
         }
 
         return 0;
+}
+
+
+/*
+ * 64 bit support wrapper. Some platforms/filesystems don't
+ * support large files. Pass hi as 0 for 32bit seek. There is
+ * a 1 and 2 arg version of seek opcode.
+ */
+INTVAL PIO_seek(theINTERP, ParrotIO * io, INTVAL hi, INTVAL lo,
+                                INTVAL w) {
+        if( io ) {
+                ParrotIOLayer * l = io->stack;
+                while(l) {
+                        if( l->api->Seek ) {
+                                return (*l->api->Seek)(interpreter, l,
+                                                        io, hi, lo, w);
+                        }
+                        l = PIO_DOWNLAYER(l);
+                }
+        }
+}
+
+
+/*
+ * Iterate down the stack to the first layer implementing "Read" API
+ */
+INTVAL PIO_eof(theINTERP, ParrotIO * io) {
+        if( io ) {
+                return (io->flags & (PIO_F_EOF)) != 0;
+        }
+        return 1;
 }
 
 

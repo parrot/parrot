@@ -1,6 +1,7 @@
 /* io_unix.c
  *  Copyright: (When this is determined...it will go here)
  *  CVS Info
+ *      $Id$
  *  Overview:
  *      This is the Parrot IO UNIX layer. May be changed to
  *      include other platforms if that platform is similar 
@@ -52,8 +53,8 @@ size_t          PIO_unix_write(theINTERP, ParrotIOLayer * layer,
                         ParrotIO * io, const void * buffer, size_t len);
 INTVAL          PIO_unix_puts(theINTERP, ParrotIOLayer * l, ParrotIO * io,
                         const char * s);
-PIOOFF_T        PIO_unix_seek(theINTERP, ParrotIOLayer * l, ParrotIO * io,
-                        PIOOFF_T offset, INTVAL whence);
+INTVAL          PIO_unix_seek(theINTERP, ParrotIOLayer * l, ParrotIO * io,
+                        INTVAL hi, INTVAL lo, INTVAL whence);
 PIOOFF_T        PIO_unix_tell(theINTERP, ParrotIOLayer * l, ParrotIO * io);
 
 
@@ -104,12 +105,7 @@ ParrotIO * PIO_unix_open(theINTERP, ParrotIOLayer * layer,
         const char * modeptr;
         type = PIO_TYPE_FILE;
         mode = DEFAULT_OPEN_MODE;
-#if 0
-        if((interpreter->flags & PARROT_DEBUG_FLAG) != 0) {
-                fprintf(stderr, "PIO_unix_open: %s, %s\n",
-                                spath, modeptr);
-        }
-#endif
+
         if( (flags & (PIO_F_WRITE|PIO_F_READ)) == 0 )
                 return NULL;
 
@@ -159,31 +155,19 @@ ParrotIO * PIO_unix_open(theINTERP, ParrotIOLayer * layer,
                                 errno = 0;
                 }
         } else {
-#if 0
-                if((interpreter->flags & PARROT_DEBUG_FLAG) != 0) {
-                        char * errstr = strerror( errno );
-                        fprintf(stderr, "PIO_unix_open: %s",
-                                errstr );
-                }
-#endif
+                /* File doesn't exist and O_CREAT not specified */
         }
 
         if(fd >= 0) {
-                /*
-                 * Finally we have a descriptor, create an IO stream
-                 */
-                io = PIO_new(interpreter, NULL, type, flags, mode);
-#if 0
                 /* Set generic flag here if is a terminal then
                  * higher layers can know how to setup buffering.
                  * STDIN, STDOUT, STDERR would be in this case
                  * so we would setup linebuffering.
                  */
-                if( isatty(fd) )
+                if( PIO_unix_isatty(fd) )
                         flags |= PIO_F_CONSOLE;
-#endif
+                io = PIO_new(interpreter, NULL, type, flags, mode);
                 io->fd = fd;
-                io->flags = flags;
                 return io;
         }
         return NULL;
@@ -210,14 +194,8 @@ ParrotIO * PIO_unix_fdopen(theINTERP, ParrotIOLayer * layer,
         } 
 #endif
 
-#if 0
-        if((interpreter->flags & PARROT_DEBUG_FLAG) != 0) {
-                fprintf(stderr, "PIO_unix_fdopen: %d\n", (int)fd );
-        }
-#endif
-        /* FIXME: Add mode string parser from PIO_unix_open() here,
-         * possibly need a seperate function for it.
-         */
+        if( PIO_unix_isatty(fd) )
+                flags |= PIO_F_CONSOLE;
         io = PIO_new(interpreter, NULL, PIO_F_FILE, flags, mode);
         io->fd = fd;
         return io;
@@ -293,7 +271,9 @@ size_t PIO_unix_read(theINTERP, ParrotIOLayer * layer, ParrotIO * io,
                                 default:        return bytes;
                         }
                 } else {
-                        /* Set EOF flag */
+                        /* Read returned 0, EOF if len requested > 0 */
+                        if( len > 0 )
+                                io->flags |= PIO_F_EOF;
                         return bytes;
                 }
         }
@@ -310,12 +290,6 @@ size_t PIO_unix_write(theINTERP, ParrotIOLayer * layer, ParrotIO * io,
 
         UNUSED (interpreter); UNUSED (layer);
 
-#if 0
-        if((interpreter->flags & PARROT_DEBUG_FLAG) != 0) {
-                fprintf(stderr, "PIO_unix_write(fd=%d): %d bytes\n",
-                        io->fd, len );
-        }
-#endif
         ptr = buffer;
         to_write = len;
         bytes = 0;
@@ -326,9 +300,6 @@ size_t PIO_unix_write(theINTERP, ParrotIOLayer * layer, ParrotIO * io,
                                 ptr += err;
                                 to_write -= err; 
                                 bytes += err;
-#if 0
-                                fprintf(stderr, "PIO_unix_write: wrote %d bytes\n", err );
-#endif
                 } else {
                         switch(errno) {
                                 case EINTR:     goto write_through;
@@ -363,18 +334,31 @@ INTVAL PIO_unix_puts(theINTERP, ParrotIOLayer * l, ParrotIO * io,
 
 /*
  * Hard seek
+ * FIXME: 64bit support, ignoring 'hi' 32bits for now
  */
-PIOOFF_T PIO_unix_seek(theINTERP, ParrotIOLayer * l, ParrotIO * io,
-                        PIOOFF_T offset, INTVAL whence) {
-        io->fpos = lseek(io->fd, offset, whence);
-        return io->fpos;
+INTVAL PIO_unix_seek(theINTERP, ParrotIOLayer * l, ParrotIO * io,
+                        INTVAL hi, INTVAL lo, INTVAL whence) {
+        PIOOFF_T pos;
+        errno = 0;
+        /* Whenever Configure defines a constant we can use here. */
+#ifndef _HAVE_LARGEFILESUPPORT_BLAH
+        if((pos = lseek(io->fd, (PIOOFF_T)lo, whence)) >= 0) {
+                io->lpos = io->fpos;
+                io->fpos = pos;
+        }
+#else
+        /* Use llseek, lseek64, etc. from Configure */
+#endif
+        /* Seek clears EOF */
+        io->flags &= ~PIO_F_EOF;
+        return (((INTVAL)pos != -1) ? 0 : -1);
 }
 
 
 PIOOFF_T PIO_unix_tell(theINTERP, ParrotIOLayer * l, ParrotIO * io) {
-        PIOOFF_T p;
-        p = lseek(io->fd, (PIOOFF_T)0, SEEK_CUR);
-        return p;
+        PIOOFF_T pos;
+        pos = lseek(io->fd, (PIOOFF_T)0, SEEK_CUR);
+        return pos;
 }
 
 
@@ -403,6 +387,7 @@ ParrotIOLayerAPI        pio_unix_layer_api = {
         NULL,
         NULL,
         PIO_unix_puts,
+        NULL,
         NULL 
 };
 

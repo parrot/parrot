@@ -1,6 +1,7 @@
 /* io_win32.c
  *  Copyright: (When this is determined...it will go here)
  *  CVS Info
+ *      $Id$
  *  Overview:
  *      This is the Parrot IO OS layer for Win32 platforms.
  *  Data Structure and Algorithms:
@@ -47,11 +48,11 @@ size_t          PIO_win32_read(theINTERP, ParrotIOLayer * layer,
                         ParrotIO * io, void * buffer, size_t len);
 size_t          PIO_win32_write(theINTERP, ParrotIOLayer * layer,
                         ParrotIO * io, const void * buffer, size_t len);
-INTVAL          PIO_win32_puts(theINTERP, ParrotIOLayer * l, ParrotIO * io,
+INTVAL          PIO_win32_puts(theINTERP, ParrotIOLayer *l, ParrotIO *io,
                         const char * s);
-PIOOFF_T        PIO_win32_seek(theINTERP, ParrotIOLayer * l, ParrotIO * io,
-                        PIOOFF_T offset, INTVAL whence);
-PIOOFF_T        PIO_win32_tell(theINTERP, ParrotIOLayer * l, ParrotIO * io);
+INTVAL          PIO_win32_seek(theINTERP, ParrotIOLayer *l, ParrotIO *io,
+                        INTVAL hi, INTVAL lo, INTVAL whence);
+PIOOFF_T        PIO_win32_tell(theINTERP, ParrotIOLayer *l, ParrotIO *io);
 
 
 /* Convert to platform specific bit open flags */
@@ -193,7 +194,8 @@ size_t PIO_win32_read(theINTERP, ParrotIOLayer * layer, ParrotIO * io,
                 if(GetLastError() != NO_ERROR) {
                         /* FIXME : An error occured */
                 } else if(len > 0) {
-                        /* FIXME : Set EOF if bytes were requested */
+                        /* EOF if read 0 and bytes were requested */
+                        io->flags |= PIO_F_EOF;
                 }
                 return 0;
         }
@@ -233,16 +235,19 @@ INTVAL PIO_win32_puts(theINTERP, ParrotIOLayer * l, ParrotIO * io,
 /*
  * Hard seek
  */
-PIOOFF_T PIO_win32_seek(theINTERP, ParrotIOLayer * l, ParrotIO * io,
-                        PIOOFF_T offset, INTVAL whence) {
-        PIOOFF_T p;
-        p.LowPart = SetFilePointer(io->fd, offset.LowPart, &offset.HighPart,
-                                FILE_CURRENT);
+INTVAL PIO_win32_seek(theINTERP, ParrotIOLayer * l, ParrotIO * io,
+                        INTVAL hi, INTVAL lo, INTVAL whence) {
+        PIOOFF_T p, offset;
+        offset.LowPart = lo;
+        offset.HighPart = hi;
+        p.LowPart = SetFilePointer(io->fd, offset.LowPart,
+                                        &offset.HighPart, FILE_CURRENT);
         if(p.LowPart == 0xFFFFFFFF && (GetLastError() != NO_ERROR)) {
-                /* FIXME: Error - exception */
+                /* Error - exception */
+                return -1;
         }
         io->fpos = p;
-        return p;
+        return 0;
 }
 
 
@@ -281,6 +286,7 @@ ParrotIOLayerAPI        pio_win32_layer_api = {
         NULL,
         NULL,
         PIO_win32_puts,
+        NULL,
         NULL 
 };
 
