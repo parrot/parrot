@@ -317,7 +317,7 @@ emit_movb_i_r(char *pc, char imm, int reg)
     return pc;
 }
 
-#define emitm_movl_i_r(pc, imm, reg) { \
+#define jit_emit_mov_ri_i(pc, reg, imm) { \
   *(pc++) = 0xb8 | (reg - 1); \
   *(long *)pc = (long)imm; (pc) += 4; }
 
@@ -748,7 +748,7 @@ emit_movb_i_m(char *pc, char imm, int base, int i, int scale, long disp)
 #define emitm_jg  15
 
 /* Shortcuts */
-#define emit_movl_i_m(pc, immediate, dest) \
+#define jit_emit_mov_mi_ii(pc, dest, immediate) \
   emitm_movl_i_m(pc, immediate, emit_None, emit_None, emit_None, dest)
 
 #define emit_movl_m_r(pc, reg, address) \
@@ -990,7 +990,7 @@ Parrot_jit_begin(Parrot_jit_info_t *jit_info,
 
     /* Point EBP to the opcode-native code map array - this destroy above
      * stack frame. If we have debugging, we should change this */
-    emitm_movl_i_r(jit_info->native_ptr, jit_info->arena.op_map, emit_EBP);
+    jit_emit_mov_ri_i(jit_info->native_ptr, emit_EBP, jit_info->arena.op_map);
 
     /* jump to restart pos or first op */
     Parrot_emit_jump_to_eax(jit_info, interpreter);
