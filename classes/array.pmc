@@ -575,24 +575,6 @@ pmclass Array {
         return array[ix] != NULL;
     }
 
-    INTVAL defined_keyed (PMC* key) {
-        INTVAL ix;
-        PMC* nextkey;
-        PMC* box;
-
-        if (!key)
-	    return 0;
-        ix = key_integer(INTERP, key);
-        nextkey = key_next(INTERP, key);
-        if (nextkey == NULL)
-	    return SELF.exists_keyed_int(&ix);
-
-        box = SELF.get_pmc_keyed_int(&ix);
-        if (box == NULL)
-	    return 0;
-        return box->vtable->exists_keyed(INTERP, box, nextkey);
-    }
-
     /* == operation */
     INTVAL is_equal (PMC* value) {
         return 0;
