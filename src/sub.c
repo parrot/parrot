@@ -69,7 +69,7 @@ Marks the context C<*ctx>.
 void
 mark_context(Interp* interpreter, struct Parrot_Context* ctx)
 {
-    PObj *cont;
+    PObj *obj;
 
     mark_stack(interpreter, ctx->pad_stack);
     mark_stack(interpreter, ctx->user_stack);
@@ -80,9 +80,15 @@ mark_context(Interp* interpreter, struct Parrot_Context* ctx)
     mark_pmc_register_stack(interpreter, ctx->pmc_reg_stack);
     mark_reg_stack(interpreter, ctx->reg_stack);
 
-    cont = (PObj*)ctx->current_cont;
-    if (cont && !PObj_live_TEST(cont))
-        pobject_lives(interpreter, cont);
+    obj = (PObj*)ctx->current_sub;
+    if (obj)
+        pobject_lives(interpreter, obj);
+    obj = (PObj*)ctx->current_object;
+    if (obj)
+        pobject_lives(interpreter, obj);
+    obj = (PObj*)ctx->current_cont;
+    if (obj && !PObj_live_TEST(obj))
+        pobject_lives(interpreter, obj);
 }
 
 /*
