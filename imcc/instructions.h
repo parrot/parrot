@@ -19,19 +19,19 @@ enum INSTYPE {    /*instruction type can be   */
 
 
 typedef struct _Instruction {
-    char * op;		/* opstring w/o params */
+    char * op;		   /* opstring w/o params */
     char * fmt;            /* printf style format string for params   */
     SymReg * r[IMCC_MAX_REGS];  /*   uses {r0-rx}->reg     */
-    unsigned int flags;            /* how the instruction affects each of the values */
+    unsigned int flags;    /* how the instruction affects each of the values */
     unsigned int type;	   /* 16 bit register branches, + ITxxx */
-    int keys;		/* bitmask of keys used in this ins */
+    int keys;		   /* bitmask of keys used in this instruction */
     int index;             /* index on instructions[] */
-    int bbindex;	   /* nr of bb, where ins is in */
+    int bbindex;	   /* number of basic block containing instruction */
     struct _Instruction * prev;
     struct _Instruction * next;
-    int opnum;		/* parrot op #*/
-    int opsize;		/* parrot op size */
-    int line;		/* source code line# */
+    int opnum;		   /* parrot op number */
+    int opsize;		   /* parrot op size   */
+    int line;		   /* source code line number */
 } Instruction;
 
 
@@ -41,7 +41,7 @@ typedef struct _Instruction {
  * int flags_jump
  */
 typedef enum {
-    /* Indicate how the instruction affects each of the register */
+    /* Indicate how the instruction affects each of the registers */
     IF_r0_read  = (1 << 0),
     IF_r1_read  = (1 << 1),
     IF_r2_read  = (1 << 2),
@@ -55,7 +55,7 @@ typedef enum {
     IF_binary  = (IF_r0_write|IF_r1_read|IF_r2_read), /* templ for binary op */
     IF_unary   = (IF_r0_write|IF_r1_read),           /* templ for unary  op */
     IF_inplace = (IF_r0_write|IF_r0_read),    /* templ for inplace unary  op */
-    /* the branch flags are the lowe 16 bits of type
+    /* the branch flags are the low 16 bits of type
      * for upper 16 see ITXX above */
     IF_r0_branch  = (1 << 0),
     IF_r1_branch  = (1 << 1),

@@ -33,10 +33,10 @@ enum VARTYPE {		/* variable type can be */
 enum LIFEFLAG {    /* The status of a var inside a basic block can be */
     LF_use       = 1 << 0, /* block uses the the var before defining it */
     LF_def       = 1 << 1, /* block defines the variable */
-    LF_lv_in     = 1 << 2, /* variable is alive at the beggining of the block */
+    LF_lv_in     = 1 << 2, /* variable is alive at the begining of the block */
     LF_lv_out    = 1 << 3, /* variable is alive at the end of the block */
-    LF_lv_inside = 1 << 4, /* variable is alive at some momement in the block */
-    LF_lv_all    = 1 << 5  /* alive during all the block */
+    LF_lv_inside = 1 << 4, /* variable is alive at some moment in the block */
+    LF_lv_all    = 1 << 5  /* variable is alive throughout the block */
 };
 
 /* Liveness represents the usage of a var inside a basic block
@@ -62,13 +62,13 @@ typedef struct _SymReg {
     char * name;
     enum VARTYPE type;       /* Variable type */
     enum USAGE usage;	     /* s. USAGE above */
-    int set;                /* Which register set/file it belongs to */
+    int set;                 /* Which register set/file it belongs to */
     int want_regno;	     /* wanted register number */
-    INTVAL color;             /* Color: parrot register number
+    INTVAL color;            /* Color: parrot register number
     				and parrot const table index of VTCONST */
-    int score;               /* How costly is to spill this symbol */
-    int use_count;	     /* how often is this sym used */
-    int lhs_use_count;	     /* how often is this sym written to */
+    int score;               /* How costly it is to spill this symbol */
+    int use_count;	     /* How often this symbol is used */
+    int lhs_use_count;	     /* How often this symbol is written to */
     int simplified;          /* Has it been simplified during the process? */
     Life_range **life_info;  /* Each block has its Life_range status */
     struct _SymReg * next;   /* used in the symbols hash */
