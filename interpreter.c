@@ -12,7 +12,7 @@
 
 #include "parrot/parrot.h"
 #include "parrot/interp_guts.h"
-#include "parrot/op_info.h"
+#include "parrot/oplib/core_ops.h"
 
 runops_core_f   runops_cores[4] = {
   runops_t0b0_core,
@@ -28,6 +28,10 @@ runops_core_f   runops_cores[4] = {
 void
 check_fingerprint(struct Parrot_Interp *interpreter) {
 /*    if (PNCONST == 0) { */
+
+    return;
+
+#if 0
     if (interpreter->code->const_table->const_count == 0) {
         fprintf(stderr, "Warning: Bytecode does not include opcode table fingerprint!\n");
     }
@@ -45,6 +49,8 @@ check_fingerprint(struct Parrot_Interp *interpreter) {
             exit(1);
         }
     }
+#endif
+
 }
 
 /*=for api interpreter runops_t0b0_core
@@ -53,9 +59,10 @@ check_fingerprint(struct Parrot_Interp *interpreter) {
  * No tracing.
  * No bounds checking.
  */
+
 opcode_t *
 runops_t0b0_core (struct Parrot_Interp *interpreter, opcode_t * pc) {
-    while (*pc) { DO_OP(pc, interpreter); }
+    while (pc) { DO_OP(pc, interpreter); }
     return pc;
 }
 
@@ -65,6 +72,7 @@ runops_t0b0_core (struct Parrot_Interp *interpreter, opcode_t * pc) {
  * No tracing.
  * With bounds checking.
  */
+
 opcode_t *
 runops_t0b1_core (struct Parrot_Interp *interpreter, opcode_t * pc) {
     opcode_t * code_start;
@@ -75,7 +83,7 @@ runops_t0b1_core (struct Parrot_Interp *interpreter, opcode_t * pc) {
     code_size  = interpreter->code->byte_code_size;
     code_end   = (opcode_t *)(interpreter->code->byte_code + code_size);
 
-    while (pc >= code_start && pc < code_end && *pc) {
+    while (pc && pc >= code_start && pc < code_end) {
         DO_OP(pc, interpreter);
     }
 
@@ -91,24 +99,28 @@ runops_t0b1_core (struct Parrot_Interp *interpreter, opcode_t * pc) {
  */
 void
 trace_op_b0(struct Parrot_Interp *interpreter, opcode_t * code_start, opcode_t *pc) {
-    int i;
+    INTVAL i;
 
-    fflush(NULL); /* Flush *ALL* output before printing trace info */
+    if (!pc) {
+        return;
+    }
+
+    (void)fflush(NULL); /* Flush *ALL* output before printing trace info */
 
     fprintf(stderr, "PC=%ld; OP=%ld (%s)", (long)(pc - code_start), *pc,
-        interpreter->opcode_info[*pc].name);
+        interpreter->opcode_info[*pc].full_name);
 
-    if (interpreter->opcode_info[*pc].nargs) {
+    if (interpreter->opcode_info[*pc].arg_count > 1) {
         fprintf(stderr, "; ARGS=(");
-        for(i = 0; i < interpreter->opcode_info[*pc].nargs; i++) {
-            if (i) { fprintf(stderr, ", "); }
-            fprintf(stderr, "%ld", (long) *(pc + i + 1));
+        for(i = 1; i < interpreter->opcode_info[*pc].arg_count; i++) {
+            if (i > 1) { fprintf(stderr, ", "); }
+            fprintf(stderr, "%ld", (long) *(pc + i));
         }
         fprintf(stderr, ")");
     }
     fprintf(stderr, "\n");
 
-    fflush(stderr); /* Flush *stderr* now that we've output the trace info */
+    (void)fflush(stderr); /* Flush *stderr* now that we've output the trace info */
 }
 
 /*=for api interpreter runops_t1b0_core
@@ -118,6 +130,7 @@ trace_op_b0(struct Parrot_Interp *interpreter, opcode_t * code_start, opcode_t *
  * With tracing.
  * No bounds checking.
  */
+
 opcode_t *
 runops_t1b0_core (struct Parrot_Interp *interpreter, opcode_t * pc) {
     opcode_t *code_start;
@@ -125,7 +138,7 @@ runops_t1b0_core (struct Parrot_Interp *interpreter, opcode_t * pc) {
     code_start = (opcode_t *)interpreter->code->byte_code;
 
     trace_op_b0(interpreter, code_start, pc);
-    while (*pc) {
+    while (pc) {
         DO_OP(pc, interpreter);
         trace_op_b0(interpreter, code_start, pc);
     }
@@ -142,29 +155,33 @@ runops_t1b0_core (struct Parrot_Interp *interpreter, opcode_t * pc) {
  */
 void
 trace_op_b1(struct Parrot_Interp *interpreter, opcode_t * code_start, opcode_t * code_end, opcode_t *pc) {
-    int i;
+    INTVAL i;
 
-    fflush(NULL); /* Flush *ALL* output before printing trace info */
+    if (!pc) {
+        return;
+    }
+
+    (void)fflush(NULL); /* Flush *ALL* output before printing trace info */
 
     if (pc >= code_start && pc < code_end) {
         fprintf(stderr, "PC=%ld; OP=%ld (%s)", (long)(pc - code_start), *pc,
-            interpreter->opcode_info[*pc].name);
+            interpreter->opcode_info[*pc].full_name);
 
-        if (interpreter->opcode_info[*pc].nargs) {
+        if (interpreter->opcode_info[*pc].arg_count > 1) {
             fprintf(stderr, "; ARGS=(");
-            for(i = 0; i < interpreter->opcode_info[*pc].nargs; i++) {
-                if (i) { fprintf(stderr, ", "); }
-                fprintf(stderr, "%ld", (long) *(pc + i + 1));
+            for(i = 1; i < interpreter->opcode_info[*pc].arg_count; i++) {
+                if (i > 1) { fprintf(stderr, ", "); }
+                fprintf(stderr, "%ld", (long) *(pc + i));
             }
             fprintf(stderr, ")");
         }
         fprintf(stderr, "\n");
     }
-    else {
+    else if (pc) {
         fprintf(stderr, "PC=%ld; OP=<err>\n", (long)(pc - code_start));
     }
 
-    fflush(stderr); /* Flush *stderr* now that we've output the trace info */
+    (void)fflush(stderr); /* Flush *stderr* now that we've output the trace info */
 }
 
 /*=for api interpreter runops_t1b1_core
@@ -174,6 +191,7 @@ trace_op_b1(struct Parrot_Interp *interpreter, opcode_t * code_start, opcode_t *
  * With tracing.
  * With bounds checking.
  */
+
 opcode_t *
 runops_t1b1_core (struct Parrot_Interp *interpreter, opcode_t * pc) {
     opcode_t * code_start;
@@ -186,7 +204,7 @@ runops_t1b1_core (struct Parrot_Interp *interpreter, opcode_t * pc) {
 
     trace_op_b1(interpreter, code_start, code_end, pc);
     
-    while (pc >= code_start && pc < code_end && *pc) {
+    while (pc && pc >= code_start && pc < code_end ) {
         DO_OP(pc, interpreter);
         trace_op_b1(interpreter, code_start, code_end, pc);
     }
@@ -212,7 +230,7 @@ runops_generic (opcode_t * (*core)(struct Parrot_Interp *, opcode_t *), struct P
 
     pc = core(interpreter, pc);
 
-    if (pc < code_start || pc >= code_end) {
+    if (pc && (pc < code_start || pc >= code_end)) {
         fprintf(stderr, "Error: Control left bounds of byte-code block (now at location %d)!\n", (int) (pc - code_start));
         exit(1);
     }
@@ -226,7 +244,8 @@ void
 runops (struct Parrot_Interp *interpreter, struct PackFile * code) {
     opcode_t * (*core)(struct Parrot_Interp *, opcode_t *);
 
-    interpreter->resume_addr = (opcode_t *)code->byte_code;
+    interpreter->code        = code;
+    interpreter->resume_addr = (opcode_t *)interpreter->code->byte_code;
 
     while (interpreter->resume_addr) {
         int        which = 0;
@@ -239,8 +258,6 @@ runops (struct Parrot_Interp *interpreter, struct PackFile * code) {
 
         core = runops_cores[which];
 
-        interpreter->code = code;
-
         runops_generic(core, interpreter, pc);
     }
 }
@@ -252,7 +269,7 @@ struct Parrot_Interp *
 make_interpreter() {
     struct Parrot_Interp *interpreter;
     /* Get an empty interpreter from system memory */
-    interpreter = mem_sys_allocate(sizeof(struct Parrot_Interp));
+    interpreter = mem_sys_allocate((INTVAL)sizeof(struct Parrot_Interp));
     /* Set up the memory allocation system */
     mem_setup_allocator(interpreter);
 
@@ -312,9 +329,10 @@ make_interpreter() {
     /* Need an empty stash */
     interpreter->perl_stash = mem_allocate_new_stash();
     
-    /* Load the builtin op func and info tables */
-    interpreter->opcode_funcs = builtin_op_func_table;
-    interpreter->opcode_info  = builtin_op_info_table;
+    /* Load the core op func and info tables */
+
+    interpreter->opcode_funcs = core_opfunc;
+    interpreter->opcode_info  = core_opinfo;
     
     /* In case the I/O system needs something */
     Init_IO(interpreter);

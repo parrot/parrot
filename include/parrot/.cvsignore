@@ -1,5 +1,2 @@
-op.h
-op_info.h
 config.h
-interp_guts.h
 vtable.h

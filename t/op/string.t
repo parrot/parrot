@@ -140,9 +140,9 @@ CODE
 fishbone
 OUTPUT
 
-output_is(<<"CODE", <<'OUTPUT', "clear_s");
+output_is(<<"CODE", <<'OUTPUT', "clears");
 @{[ set_str_regs( sub {"BOO $_[0]\\n"} ) ]}
-	clear_s
+	clears
 @{[ print_str_regs() ]}
 	print "done\\n"
 	end
@@ -164,7 +164,7 @@ my @strings = (
   "hElLo", "hElLo"
 );
 
-output_is(<<CODE, <<OUTPUT, "eq_s_ic");
+output_is(<<CODE, <<OUTPUT, "eq_s_s_ic");
 @{[ compare_strings( 0, "eq", @strings ) ]}
     print "ok\\n"
     end
@@ -175,7 +175,7 @@ CODE
 ok
 OUTPUT
 
-output_is(<<CODE, <<OUTPUT, "eq_sc_ic");
+output_is(<<CODE, <<OUTPUT, "eq_s_sc_ic");
 @{[ compare_strings( 1, "eq", @strings ) ]}
     print "ok\\n"
     end
@@ -186,7 +186,7 @@ CODE
 ok
 OUTPUT
 
-output_is(<<CODE, <<OUTPUT, "ne_s_ic");
+output_is(<<CODE, <<OUTPUT, "ne_s_s_ic");
 @{[ compare_strings( 0, "ne", @strings ) ]}
     print "ok\\n"
     end
@@ -197,7 +197,7 @@ CODE
 ok
 OUTPUT
 
-output_is(<<CODE, <<OUTPUT, "ne_sc_ic");
+output_is(<<CODE, <<OUTPUT, "ne_s_sc_ic");
 @{[ compare_strings( 1, "ne", @strings ) ]}
     print "ok\\n"
     end
@@ -208,7 +208,7 @@ CODE
 ok
 OUTPUT
 
-output_is(<<CODE, <<OUTPUT, "lt_s_ic");
+output_is(<<CODE, <<OUTPUT, "lt_s_s_ic");
 @{[ compare_strings( 0, "lt", @strings ) ]}
     print "ok\\n"
     end
@@ -219,7 +219,7 @@ CODE
 ok
 OUTPUT
 
-output_is(<<CODE, <<OUTPUT, "lt_sc_ic");
+output_is(<<CODE, <<OUTPUT, "lt_s_sc_ic");
 @{[ compare_strings( 1, "lt", @strings ) ]}
     print "ok\\n"
     end
@@ -230,7 +230,7 @@ CODE
 ok
 OUTPUT
 
-output_is(<<CODE, <<OUTPUT, "le_s_ic");
+output_is(<<CODE, <<OUTPUT, "le_s_s_ic");
 @{[ compare_strings( 0, "le", @strings ) ]}
     print "ok\\n"
     end
@@ -241,7 +241,7 @@ CODE
 ok
 OUTPUT
 
-output_is(<<CODE, <<OUTPUT, "le_sc_ic");
+output_is(<<CODE, <<OUTPUT, "le_s_sc_ic");
 @{[ compare_strings( 1, "le", @strings ) ]}
     print "ok\\n"
     end
@@ -252,7 +252,7 @@ CODE
 ok
 OUTPUT
 
-output_is(<<CODE, <<OUTPUT, "gt_s_ic");
+output_is(<<CODE, <<OUTPUT, "gt_s_s_ic");
 @{[ compare_strings( 0, "gt", @strings ) ]}
     print "ok\\n"
     end
@@ -263,7 +263,7 @@ CODE
 ok
 OUTPUT
 
-output_is(<<CODE, <<OUTPUT, "gt_sc_ic");
+output_is(<<CODE, <<OUTPUT, "gt_s_sc_ic");
 @{[ compare_strings( 1, "gt", @strings ) ]}
     print "ok\\n"
     end
@@ -274,7 +274,7 @@ CODE
 ok
 OUTPUT
 
-output_is(<<CODE, <<OUTPUT, "ge_s_ic");
+output_is(<<CODE, <<OUTPUT, "ge_s_s_ic");
 @{[ compare_strings( 0, "ge", @strings ) ]}
     print "ok\\n"
     end
@@ -285,7 +285,7 @@ CODE
 ok
 OUTPUT
 
-output_is(<<CODE, <<OUTPUT, "ge_sc_ic");
+output_is(<<CODE, <<OUTPUT, "ge_s_sc_ic");
 @{[ compare_strings( 1, "ge", @strings ) ]}
     print "ok\\n"
     end

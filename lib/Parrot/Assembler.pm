@@ -32,7 +32,11 @@ BEGIN {
 
 use Getopt::Long;
 
-use Parrot::Opcode;
+use Parrot::Op;
+use Parrot::OpLib::core;
+
+#use Parrot::Opcode;
+
 use Parrot::Types;
 use Parrot::Config;
 
@@ -43,6 +47,7 @@ use Parrot::PackFile::ConstTable;
 #use Parrot::String;
 
 use Symbol;
+use Carp;
 
 
 ###############################################################################
@@ -281,7 +286,13 @@ maps string prefixes to encodings.
 
 my %encodings=('' => 0, 'N' => 0, 'U' => 3);
 
-my %opcodes = Parrot::Opcode::read_ops( -f "../opcode_table" ? "../opcode_table" : "opcode_table" );
+#my %opcodes = Parrot::Opcode::read_ops( -f "../opcode_table" ? "../opcode_table" : "opcode_table" );
+
+my %opcodes;
+
+foreach my $op (@$Parrot::OpLib::core::ops) {
+  $opcodes{$op->full_name} = $op;
+}
 
 
 ###############################################################################
@@ -409,7 +420,7 @@ creates the program lines array from each source file passed in
 
 sub init_assembler {
   my @cmdln = @_;
-  constantize_string( Parrot::Opcode::fingerprint() ); # make it constant zero.
+#  constantize_string( Parrot::Opcode::fingerprint() ); # make it constant zero.
   add_line_to_listing( "PARROT ASSEMBLY LISTING - " . scalar( localtime ) . "\n\n" );
   foreach my $file( @cmdln ) {
     push( @program, read_source( $file ) );
@@ -931,7 +942,7 @@ sub find_correct_opcode {
 
   foreach my $op (@grep_ops) {
     push( @tests, $op );                      # remember what you have examined.
-    next unless @args == $opcodes{$op}{ARGS}; # make sure the argcount is the same
+    next unless @args == scalar($opcodes{$op}->arg_types - 1); # make sure the argcount is the same
     my ($match) = 1;                          # assume a match
 
     #
@@ -939,10 +950,10 @@ sub find_correct_opcode {
     # ic match to ic.
     #
 
-    foreach my $idx ( 0 .. $#{ $opcodes{$op}{TYPES} } ) {
-      if( $type_to_suffix{ $opcodes{$op}{TYPES}[$idx] } ne $arg_t[$idx] ) {
+    foreach my $idx ( 0 .. $opcodes{$op}->size - 2 ) {
+      if( $opcodes{$op}->arg_type($idx + 1) ne $arg_t[$idx] ) {
         # if they are not the same check ic/nc
-        if ($type_to_suffix{ $opcodes{$op}{TYPES}[$idx] } eq "nc" &&
+        if ( $opcodes{$op}->arg_type($idx + 1) eq "nc" &&
             $arg_t[$idx] eq "ic" ) {
           # got ic/nc level 2 match
           $match = 2;
@@ -1016,12 +1027,12 @@ sub handle_operator {
     $opcode = find_correct_opcode($opcode, @args);
   }
 
-  if (@args != $opcodes{$opcode}{ARGS}) {
+  if (@args != scalar($opcodes{$opcode}->arg_types) - 1) {
     error("Wrong arg count for op '$opcode'--got " . scalar(@args) . " needed "
-      . $opcodes{$opcode}{ARGS} . " in <$code>", $file, $line );
+      . scalar($opcodes{$opcode}->arg_types - 1) . " in <$code>", $file, $line );
   }
 
-  $bytecode .= pack_op($opcodes{$opcode}{CODE});
+  $bytecode .= pack_op($opcodes{$opcode}->code);
   $op_pc     = $pc;
   $pc       += sizeof('op');
 
@@ -1037,11 +1048,23 @@ Packs the argument into the bytecode.
 
 =cut
 
+my %rtype_map = (
+  "i" => "I",
+  "n" => "N",
+  "p" => "P",
+  "s" => "S",
+
+  "ic" => "i",
+  "nc" => "n",
+  "pc" => "p",
+  "sc" => "s",
+);
+
 sub handle_arguments {
   my ($code, $opcode, @args) = @_;
 
   foreach (0..$#args) {
-    my $rtype = $opcodes{$opcode}{TYPES}[$_];
+    my $rtype = $rtype_map{$opcodes{$opcode}->arg_type($_ + 1)};
 
     #
     # Make any replacements due to 'equates':
@@ -1072,10 +1095,20 @@ sub handle_arguments {
     }
 
     #
-    # Destination arguments:
+    # String arguments:
     #
 
-    elsif($rtype eq "D") {
+    elsif ($rtype eq 's') {
+      $args[$_] =~ s/[\[]sc:(.*)[\]]/$1/;
+    }
+    elsif($rtype eq 'n') {
+      $args[$_] = constantize_number( $args[$_] );
+    }
+    #
+    # Integer arguments:
+    #
+
+    elsif ($rtype eq 'i') {
       #
       # Label arithmetic:
       #
@@ -1108,7 +1141,7 @@ sub handle_arguments {
       # Regular labels:
       #
 
-      else {
+      elsif ($args[$_] =~ m/^[A-Za-z_][A-Za-z0-9_]+$/) {
         if( !exists($label{$args[$_]}) ) {
           # we have not seen it yet...put it on the fixup list
           push( @{ $fixup{ $args[$_] } }, $op_pc, $pc);
@@ -1118,43 +1151,17 @@ sub handle_arguments {
           $args[$_] = constantize_integer( ($label{$args[$_]}-$op_pc)/sizeof('op') );
         }
       }
-    }
-
-    #
-    # String arguments:
-    #
-
-    elsif ($rtype eq 's') {
-      $args[$_] =~ s/[\[]sc:(.*)[\]]/$1/;
-    }
-    elsif($rtype eq 'n') {
-      $args[$_] = constantize_number( $args[$_] );
-    }
-    #
-    # Integer arguments:
-    #
-
-    elsif ($rtype eq 'i') {
-      #
-      # Label arithmetic:
-      #
-
-      if ($args[$_] =~ m/^\[(.*)\]$/) {
-        my $mult = sizeof('op');
-        $args[$_] =~ s/(\d+)/$mult * $1/eg;                  # Hard-coded opcode_t offsets ---> byte offsets
-        $args[$_] =~ s/[\@]/$op_pc/;                         # Map '@' to $op_pc
-
-        push @{$fixup{$args[$_]}}, $pc;
-        $args[$_] = 0xffffffff;
-      }
 
       #
       # Handle conversions of hexadecimal and octal:
       #
+
       else {
         $args[$_] = constantize_integer( $args[$_] );
       }
+
     }
+
     #
     # Unknown argument types:
     #
@@ -1268,12 +1275,20 @@ TODO: Document this.
 
 sub constantize_integer {
     my $i = shift;
+
     if ($i =~ /^[+-]?0b[01]+$/i) {
       $i = from_binary( $i );
     }
     elsif ($i =~ /^[+-]?0x?[0-9a-f]*$/i) {
       $i = oct($i);
     }
+    elsif ($i =~ m/^[+-]?\d+$/) {
+      # Good ones
+    }
+
+    confess "constantize_integer(): Called with non-numeric argument '$i'!"
+      unless $i =~ m/^[+-]?\d+$/;
+
 # XXX parrot cannot currently handle integers over 2 ** 31
     if( $i > (2 ** 31) || $i < -(2**31) ) {
       error( "Cannot have integer $i because it is greater than 2 ** 31.\n", $file, $line );

@@ -14,7 +14,10 @@
 use strict;
 
 use Parrot::Config;
-use Parrot::Opcode;
+
+use Parrot::OpLib::core;
+use Parrot::Op;
+
 use Parrot::Types;
 use Parrot::PackFile;
 use Parrot::PackFile::ConstTable;
@@ -30,13 +33,9 @@ $Data::Dumper::Indent = 0;
 # GLOBAL VARIABLES:
 #
 
-my %opcodes            = Parrot::Opcode::read_ops();
-my $opcode_fingerprint = Parrot::Opcode::fingerprint();
-my @opcodes;
-for my $name (keys %opcodes) {
-    $opcodes[$opcodes{$name}{CODE}] = { NAME => $name,
-					%{$opcodes{$name}} };
-}
+my @opcodes = @$Parrot::OpLib::core::ops;
+
+#my $opcode_fingerprint = Parrot::Opcode::fingerprint();
 
 
 #
@@ -56,12 +55,13 @@ sub dump_const_table {
     #
 
     my $count = $pf->const_table->const_count;
+
+=no
     if ($count < 1) {
 	warn "Disassembling without opcode table fingerprint (no constants)!";
 	return;
     }
 
-=no
     my $type = $pf->const_table->constant(0)->type;
     if ($type ne Parrot::PackFile::Constant->type_code('PFC_STRING')) {
         $type = Parrot::PackFile::Constant->type_name($type);
@@ -112,6 +112,18 @@ sub dump_const_table {
 # disassemble_byte_code()
 #
 
+my %rtype_map = (
+  "i" => "I",
+  "n" => "N",
+  "p" => "P",
+  "s" => "S",
+
+  "ic" => "i",
+  "nc" => "n",
+  "pc" => "p",
+  "sc" => "s",
+);
+
 sub disassemble_byte_code {
     my ($pf) = @_;
 
@@ -151,11 +163,11 @@ sub disassemble_byte_code {
             $pasm{$op_start} = [ undef,               [ $op_code ], $opcodes[$op_code]{NAME}, [ ] ];
         }
 
-	my $arg_count = $opcodes[$op_code]{ARGS};
+	my $arg_count = $opcodes[$op_code]->size - 1;
 	my @args = ();
 
-	foreach (0 .. $arg_count - 1) {
-	    my $type        = $opcodes[$op_code]{TYPES}[$_];
+	foreach (1 .. $arg_count) {
+	    my $type        = $rtype_map{$opcodes[$op_code]->arg_type($_)};
 	    my $unpack_size = sizeof($type);
 
 	    if (($offset + $unpack_size) > $length) {

@@ -15,8 +15,7 @@
 
 #include "parrot/parrot.h"
 
-#include "parrot/op_info.h"
-#include "parrot/interp_guts.h"
+#include "parrot/op.h"
 
 struct Parrot_Interp {
     struct IReg *int_reg;            /* Current top of int reg stack */

@@ -58,7 +58,7 @@ NOTE: The PackFile's magic is automatically set to PARROT_MAGIC.
 
 struct PackFile *
 PackFile_new(void) {
-    struct PackFile * self = mem_sys_allocate(sizeof(struct PackFile));
+    struct PackFile * self = mem_sys_allocate((INTVAL)sizeof(struct PackFile));
 
     if (!self) {
         fprintf(stderr, "PackFile_new: Unable to allocate!\n");
@@ -252,7 +252,7 @@ PackFile_set_byte_code(struct PackFile * self, opcode_t byte_code_size, char * b
             return;
         }
 
-        mem_sys_memcopy(self->byte_code, byte_code, byte_code_size);
+        mem_sys_memcopy(self->byte_code, byte_code, (INTVAL)byte_code_size);
 
         self->byte_code_size = byte_code_size;
     }
@@ -579,7 +579,7 @@ Allocate a new empty PackFile FixupTable.
 
 struct PackFile_FixupTable *
 PackFile_FixupTable_new(void) {
-    struct PackFile_FixupTable * self = mem_sys_allocate(sizeof(struct PackFile_FixupTable));
+    struct PackFile_FixupTable * self = mem_sys_allocate((INTVAL)sizeof(struct PackFile_FixupTable));
 
     self->dummy = 0;
 
@@ -735,7 +735,7 @@ Allocate a new empty PackFile ConstTable.
 
 struct PackFile_ConstTable *
 PackFile_ConstTable_new(void) {
-    struct PackFile_ConstTable * self = mem_sys_allocate(sizeof(struct PackFile_ConstTable));
+    struct PackFile_ConstTable * self = mem_sys_allocate((INTVAL)sizeof(struct PackFile_ConstTable));
 
     self->const_count = 0;
     self->constants   = NULL;
@@ -849,7 +849,7 @@ PackFile_ConstTable_push_constant(struct PackFile_ConstTable * self, struct Pack
         return;
     }
 
-    temp = mem_sys_allocate((self->const_count + 1) * sizeof(struct PackFile_Constant *));
+    temp = mem_sys_allocate((self->const_count + 1) * (INTVAL)sizeof(struct PackFile_Constant *));
 
     if (!temp) {
         fprintf(stderr, "Unable to reallocate Constant array to push a new Constant!\n");
@@ -937,7 +937,7 @@ PackFile_ConstTable_unpack(struct PackFile_ConstTable * self, char * packed, opc
         return 1;
     }
 
-    self->constants = mem_sys_allocate(self->const_count * sizeof(struct PackFile_Constant *));
+    self->constants = mem_sys_allocate(self->const_count * (INTVAL)sizeof(struct PackFile_Constant *));
 
     if (!self->constants) {
         fprintf(stderr, "PackFile_ConstTable_unpack: Could not allocate memory for array!\n");
@@ -1094,7 +1094,7 @@ This is only here so we can make a new one and then do an unpack.
 
 struct PackFile_Constant *
 PackFile_Constant_new(void) {
-    struct PackFile_Constant * self = mem_sys_allocate(sizeof(struct PackFile_Constant));
+    struct PackFile_Constant * self = mem_sys_allocate((INTVAL)sizeof(struct PackFile_Constant));
 
     self->type = PFC_NONE;
 
@@ -1114,7 +1114,7 @@ Allocate a new PackFile Constant containing an opcode_t.
 
 struct PackFile_Constant *
 PackFile_Constant_new_integer(opcode_t i) {
-    struct PackFile_Constant * self = mem_sys_allocate(sizeof(struct PackFile_Constant));
+    struct PackFile_Constant * self = mem_sys_allocate((INTVAL)sizeof(struct PackFile_Constant));
 
     self->type    = PFC_INTEGER;
     self->integer = i;
@@ -1135,7 +1135,7 @@ Allocate a new PackFile Constant containing an FLOATVAL.
 
 struct PackFile_Constant *
 PackFile_Constant_new_number(FLOATVAL n) {
-    struct PackFile_Constant * self = mem_sys_allocate(sizeof(struct PackFile_Constant));
+    struct PackFile_Constant * self = mem_sys_allocate((INTVAL)sizeof(struct PackFile_Constant));
 
     self->type    = PFC_NUMBER;
     self->number = n;
@@ -1156,7 +1156,7 @@ Allocate a new PackFile Constant containing a string.
 
 struct PackFile_Constant *
 PackFile_Constant_new_string(STRING * s) {
-    struct PackFile_Constant * self = mem_sys_allocate(sizeof(struct PackFile_Constant));
+    struct PackFile_Constant * self = mem_sys_allocate((INTVAL)sizeof(struct PackFile_Constant));
 
     self->type   = PFC_STRING;
     self->string = string_copy(s);

@@ -332,18 +332,18 @@ ok 1
 ok 2
 OUTPUT
 
-output_is(<<CODE, <<OUTPUT, "ne_nc_ic");
+output_is(<<CODE, <<OUTPUT, "ne_n_nc_ic");
 	set	N0, 1073741824.0
 
 	# XXX: This should be just ne, but the assembler can't handler it
 	# at the moment.
-	ne_nc_ic	N0, 1073741824.0, ERROR
+	ne_n_nc_ic	N0, 1073741824.0, ERROR
         branch          ONE
 	print	"bad\\n"
 
 ONE:
 	print	"ok 1\\n"
-	ne_nc_ic	I0, 0.0, TWO
+	ne_n_nc_ic	I0, 0.0, TWO
         branch  ERROR
 	print	"bad\\n"
 
@@ -761,7 +761,7 @@ CODE
 -2147483648
 OUTPUT
 
-output_is(<<CODE, <<OUTPUT, "clear_n");
+output_is(<<CODE, <<OUTPUT, "clearn");
 	set	N0, 547972.0
 	set	N1, 547972.0
 	set	N2, 547972.0
@@ -794,7 +794,7 @@ output_is(<<CODE, <<OUTPUT, "clear_n");
 	set	N29, 547972.0
 	set	N30, 547972.0
 	set	N31, 547972.0
-	clear_n
+	clearn
 	print	N0
 	print	N1
 	print	N2

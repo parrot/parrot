@@ -790,7 +790,7 @@ CODE
 -2147483648.000000
 OUTPUT
 
-output_is(<<CODE, <<OUTPUT, "clear_i");
+output_is(<<CODE, <<OUTPUT, "cleari");
 	set	I0, 0xdeadbee
 	set	I1, 0xdeadbee
 	set	I2, 0xdeadbee
@@ -823,7 +823,7 @@ output_is(<<CODE, <<OUTPUT, "clear_i");
 	set	I29, 0xdeadbee
 	set	I30, 0xdeadbee
 	set	I31, 0xdeadbee
-	clear_i
+	cleari
 	print	I0
 	print	I1
 	print	I2

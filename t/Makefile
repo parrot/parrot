@@ -4,7 +4,7 @@
 .SUFFIXES: .pbc .pasm
 
 clean:
-	rm *.pbc
+	rm -f *.pbc test1.c test1.o test1
 
 .pasm.pbc:
 	perl -I.. ../assemble.pl $< > $@

@@ -123,18 +123,18 @@ output_is( <<"CODE", sprintf( "%f%f", sech(1.0), sech(1.0) ), "sech" );
     end
 CODE
 
-output_is( <<'CODE', sprintf( "%f%f%f%f", atan2(1.0,1.0), atan2(1.0,1.0), atan2(1.0,1.0), atan2(1.0,1.0) ), "atan2" );
+output_is( <<'CODE', sprintf( "%f%f%f%f", atan2(1.0,1.0), atan2(1.0,1.0), atan2(1.0,1.0), atan2(1.0,1.0) ), "atan" );
    set N1, 1.0
    set I1, 1
    set N2, 1.0
    set I2, 1
-   atan2 N3, N1, N2
+   atan N3, N1, N2
    print_n N3
-   atan2 N3, N1, I2
+   atan N3, N1, I2
    print_n N3
-   atan2 N3, I1, N2
+   atan N3, I1, N2
    print_n N3
-   atan2 N3, I1, I2
+   atan N3, I1, I2
    print_n N3
    end
 CODE

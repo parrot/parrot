@@ -27,12 +27,12 @@
 
 main:   set    I1, 96
         set    I2, 64
-        set    S1, "Algorithm E (Euclid's algorithm)"
-        print  S1
+        print  "Algorithm E (Euclid's algorithm)\n"
 e1:     mod    I4, I1, I2
 e2:     eq     I4, 0, done
 e3:     set    I1, I2
         set    I2, I4
         branch e1
 done:   print  I2
+        print  "\n"
         end

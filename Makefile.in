@@ -2,9 +2,9 @@ O = ${o}
 RM_F = ${rm_f}
 
 INC=include/parrot
-H_FILES = $(INC)/config.h $(INC)/exceptions.h $(INC)/io.h $(INC)/op.h $(INC)/register.h $(INC)/string.h $(INC)/events.h $(INC)/interpreter.h $(INC)/memory.h $(INC)/parrot.h $(INC)/stacks.h $(INC)/packfile.h $(INC)/global_setup.h $(INC)/vtable.h
+H_FILES = $(INC)/config.h $(INC)/exceptions.h $(INC)/io.h $(INC)/op.h $(INC)/register.h $(INC)/string.h $(INC)/events.h $(INC)/interpreter.h $(INC)/memory.h $(INC)/parrot.h $(INC)/stacks.h $(INC)/packfile.h $(INC)/global_setup.h $(INC)/vtable.h $(INC)/oplib/core_ops.h
 
-O_FILES = global_setup$(O) interpreter$(O) parrot$(O) register$(O) basic_opcodes$(O) memory$(O) packfile$(O) stacks$(O) string$(O) strnative$(O) strutf8$(O) strutf16$(O) strutf32$(O) transcode$(O)
+O_FILES = global_setup$(O) interpreter$(O) parrot$(O) register$(O) core_ops$(O) memory$(O) packfile$(O) stacks$(O) string$(O) strnative$(O) strutf8$(O) strutf16$(O) strutf32$(O) transcode$(O)
 
 #DO NOT ADD C COMPILER FLAGS HERE
 #Add them in Configure.pl--look for the
@@ -22,20 +22,39 @@ PDUMP = pdump${exe}
 .c$(O):
 	$(CC) $(CFLAGS) -o $@ -c $<
 
-all : $(TEST_PROG) $(PDUMP)
+all : $(TEST_PROG) $(PDUMP) t/test1${exe}
 
 #XXX This target is not portable to Win32
+
 shared: libparrot.so
+
 libparrot.so: $(O_FILES)
 	$(CC) -shared $(C_LIBS) -o $@ $(O_FILES)
 
-$(TEST_PROG): test_main$(O) $(O_FILES) interp_guts$(O) op_info$(O)
-	$(CC) $(CFLAGS) -o $(TEST_PROG) $(O_FILES) interp_guts$(O) op_info$(O) test_main$(O) $(C_LIBS)
+$(TEST_PROG): test_main$(O) $(O_FILES)
+	$(CC) $(CFLAGS) -o $(TEST_PROG) $(O_FILES) test_main$(O) $(C_LIBS)
 
 $(PDUMP): pdump$(O) packfile$(O) memory$(O) global_setup$(O) string$(O) strnative$(O) strutf8$(O) strutf16$(O) strutf32$(O) transcode$(O)
 	$(CC) $(CFLAGS) -o $(PDUMP) pdump$(O) packfile$(O) memory$(O) global_setup$(O) string$(O) strnative$(O) strutf8$(O) strutf16$(O) strutf32$(O) transcode$(O) $(C_LIBS)
 
-test_main$(O): $(H_FILES) $(INC)/interp_guts.h
+test_main$(O): $(H_FILES)
+
+t/test.pbc: t/test.pasm assemble.pl
+	cd t; make test.pbc
+
+assemble.pl: Parrot/OpLib/core.pm
+
+Parrot/OpLib/core.pm: core.ops
+	$(PERL) ops2pm.pl core.ops
+
+t/test1.c: t/test.pbc
+	$(PERL) pbc2c.pl t/test.pbc > t/test1.c
+
+t/test1$(O): t/test1.c
+	$(CC) -o t/test1$(O) -c -I ./include t/test1.c
+
+t/test1${exe}: t/test1$(O) $(O_FILES)
+	$(CC) $(CFLAGS) -o t/test1${exe} t/test1$(O) $(O_FILES) $(C_LIBS)
 
 global_setup$(O): $(H_FILES)
 
@@ -51,10 +70,7 @@ strutf32$(O): $(H_FILES)
 
 transcode$(O): $(H_FILES)
 
-$(INC)/interp_guts.h interp_guts.c $(INC)/op_info.h op_info.c: opcode_table build_interp_starter.pl
-	$(PERL) build_interp_starter.pl
-
-interpreter$(O): interpreter.c $(H_FILES) $(INC)/interp_guts.h
+interpreter$(O): interpreter.c $(H_FILES)
 
 memory$(O): $(H_FILES)
 
@@ -66,13 +82,10 @@ register$(O): $(H_FILES)
 
 stacks$(O): $(H_FILES)
 
-basic_opcodes$(O): $(H_FILES) basic_opcodes.c
+core_ops$(O): $(H_FILES) core_ops.c
 
-basic_opcodes.c: basic_opcodes.ops process_opfunc.pl $(INC)/interp_guts.h
-	$(PERL) process_opfunc.pl basic_opcodes.ops
-
-$(INC)/op.h: opcode_table make_op_header.pl
-	$(PERL) make_op_header.pl opcode_table > $(INC)/op.h
+core_ops.c $(INC)/oplib/core_ops.h: core.ops ops2c.pl
+	$(PERL) ops2c.pl core.ops
 
 $(INC)/config.h: Configure.pl config_h.in
 	$(PERL) Configure.pl
@@ -86,8 +99,10 @@ docs/.dummy:
 	cd docs; make
 
 clean:
-	$(RM_F) *$(O) *.s basic_opcodes.c interp_guts.c $(INC)/interp_guts.h $(INC)/op.h op_info.c $(INC)op_info.h $(TEST_PROG) $(PDISASM) $(PDUMP)
-	$(RM_F) *$(O) *.s basic_opcodes.c $(INC)/interp_guts.h $(INC)/op.h $(TEST_PROG)
+	$(RM_F) *$(O) *.s core_ops.c $(TEST_PROG) $(PDISASM) $(PDUMP)
+	$(RM_F) $(INC)/oplib/core_ops.h
+	$(RM_F) $(TEST_PROG) $(PDISASM) $(PDUMP)
+	cd t; make clean
 	cd docs; make clean
 
 test:	.test_dummy
@@ -97,3 +112,4 @@ test:	.test_dummy
 
 update:
 	cvs -q update -dP
+

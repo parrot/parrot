@@ -69,7 +69,7 @@ mem_allocate_aligned(INTVAL size) {
 */
 void *
 mem_sys_allocate(INTVAL size) {
-    return malloc(size);
+    return malloc((size_t)size);
 }
 
 /*=for api mem mem_setup_allocator
