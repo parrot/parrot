@@ -265,6 +265,7 @@ void allocate() {
 	    clear_tables();
 	    
 	    fprintf(stderr, "\n");
+            spill_counter = 0;
 	    return;
 	}
 	    
