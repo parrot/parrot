@@ -110,7 +110,7 @@ matches that of the interpreter:
 
 =head2 Generating a Subroutine Symbol Table Entry
 
-Whem a subroutine label is prefixed by B<.pcc_sub>, the name of the
+When a subroutine label is prefixed by B<.pcc_sub>, the name of the
 subroutine (i.e. the label) gets stored in the global stash.
 
     find_global P0, "_the_sub"

@@ -1,6 +1,6 @@
 #!perl
 use strict;
-use TestCompiler tests => 26;
+use TestCompiler tests => 27;
 
 ##############################
 # Parrot Calling Conventions
@@ -1020,6 +1020,9 @@ output_is(<<'CODE', <<'OUT', ".flatten_arg 4");
     .param var f
     .param var g
     .param var h
+    print "Got "
+    print I2
+    print " params\n"
     print a
     print b
     print c
@@ -1031,6 +1034,7 @@ output_is(<<'CODE', <<'OUT', ".flatten_arg 4");
     end
 .end
 CODE
+Got 8 params
 first
 ok 1
 ok 2
@@ -1038,6 +1042,101 @@ middle
 ok 3
 ok 4
 ok 5
+last
+OUT
+
+output_is(<<'CODE', <<'OUT', ".flatten_arg - overflow");
+.pcc_sub _main prototyped
+    .local Sub sub
+    newsub sub, .Sub, _sub
+    .local var x
+    x = new PerlString
+    x = "first\n"
+    .local var y
+    y = new PerlString
+    y = "middle\n"
+    .local var z
+    z = new PerlString
+    z = "last\n"
+    .local var ar
+    ar = new PerlArray
+    push ar, "ok 1\n"
+    push ar, "ok 2\n"
+    .local var ar2
+    ar2 = new PerlArray
+    push ar2, "ok 3\n"
+    push ar2, "ok 4\n"
+    push ar2, "ok 5\n"
+    push ar2, "ok 6\n"
+    push ar2, "ok 7\n"
+    push ar2, "ok 8\n"
+    push ar2, "ok 9\n"
+    push ar2, "ok 10\n"
+    push ar2, "ok 11\n"
+    push ar2, "ok 12\n"
+    .pcc_begin non_prototyped
+    .arg x
+    .flatten_arg ar
+    .arg y
+    .flatten_arg ar2
+    .arg z
+    .pcc_call sub
+    ret:
+    .pcc_end
+    end
+.end
+.pcc_sub _sub non_prototyped
+    .param var a
+    .param var b
+    .param var c
+    .param var d
+    .param var e
+    .param var f
+    .param var g
+    .param var h
+    .param var i
+    .param var j
+    .param var k
+    .param var l
+    .param var m
+    .param var n
+    .param var o
+    print "Got "
+    print I2
+    print " params\n"
+    print a
+    print b
+    print c
+    print d
+    print e
+    print f
+    print g
+    print h
+    print i
+    print j
+    print k
+    print l
+    print m
+    print n
+    print o
+    end
+.end
+CODE
+Got 15 params
+first
+ok 1
+ok 2
+middle
+ok 3
+ok 4
+ok 5
+ok 6
+ok 7
+ok 8
+ok 9
+ok 10
+ok 11
+ok 12
 last
 OUT
 

@@ -63,7 +63,7 @@ static Instruction *
 pcc_emit_check_param(Parrot_Interp interpreter, Instruction *ins,
         SymReg *sub, SymReg *i0, SymReg *p3, int first, int type)
 {
-    SymReg *check_sub, *regs[IMCC_MAX_REGS], *check_type, *what;
+    SymReg *check_sub, *regs[IMCC_MAX_REGS], *check_type, *what, *check_pmc;
     char buf[128];
 
     /*
@@ -118,6 +118,25 @@ pcc_emit_check_param(Parrot_Interp interpreter, Instruction *ins,
         INS(interpreter, "ne", NULL, regs, 3, 0, 1);
         INS(interpreter, "ret", NULL, regs, 0, 0, 1);
 
+        /*
+         * PMC type check entry to check sub
+         */
+        check_pmc = mk_address(str_dup("_#check_param_type_pmc"),
+                U_add_uniq_label);
+        INS_LABEL(check_pmc, 1);
+        /*
+         * either type = enum_type_PMC || > 0
+         */
+        /* typeof I0, P3[0] */
+        regs[0] = i0;
+        regs[1] = p3;
+        regs[2] = mk_const(str_dup("0"), 'I');
+        INS(interpreter, "typeof", NULL, regs, 3, 4, 1);
+        regs[0] = i0;
+        regs[1] = mk_const(str_dup("0"), 'I');
+        regs[2] = check_type;
+        INS(interpreter, "lt", NULL, regs, 3, 0, 1);
+        INS(interpreter, "ret", NULL, regs, 0, 0, 1);
         /* emit err handler routines
          * param count
          */
@@ -143,7 +162,8 @@ pcc_emit_check_param(Parrot_Interp interpreter, Instruction *ins,
     sprintf(buf, "%d", type);
     regs[1] = mk_const(str_dup(buf), 'I');
     ins = insINS(interpreter, ins, "set", regs, 2);
-    strcpy(buf, "_#check_param_type");
+    strcpy(buf, enum_type_PMC == type ?
+            "_#check_param_type_pmc" : "_#check_param_type");
     check_type = _get_sym(ghash, buf);
     regs[0] = check_type;
     ins = insINS(interpreter, ins, "bsr", regs, 1);
@@ -183,10 +203,10 @@ expand_pcc_sub(Parrot_Interp interpreter, Instruction *ins)
 	for (i = 0; i < n; i++) {
 	    arg = sub->pcc_sub->args[i];
 	    if (proto == 1 ||
-		    (arg->set == 'P' && next[2] < 15)) {
+		    (arg->set == 'P' && next[2] < 16)) {
 		for (j = 0; j < 4; j++) {
 		    if (arg->set == types[j]) {
-			if (next[j] == 15)
+			if (next[j] == 16)
 			    goto overflow;
 			if (arg->color == next[j]) {
 			    next[j]++;
@@ -315,7 +335,7 @@ expand_pcc_sub_ret(Parrot_Interp interpreter, Instruction *ins)
     for (i = 0; i < n; i++) {
         arg = sub->pcc_sub->ret[i];
         if (sub->pcc_sub->prototyped ||
-                (arg->set == 'P' && next[2] < 15)) {
+                (arg->set == 'P' && next[2] < 16)) {
             /*
              * prototyped
              */
@@ -328,7 +348,7 @@ expand_pcc_sub_ret(Parrot_Interp interpreter, Instruction *ins)
 lazy:
                     for (j = 0; j < 4; j++) {
                         if (arg->set == types[j]) {
-                            if (next[j] == 15)
+                            if (next[j] == 16)
                                 goto overflow;
                             if (arg->color == next[j]) {
                                 next[j]++;
@@ -508,8 +528,8 @@ pcc_emit_flatten(Parrot_Interp interpreter, Instruction *ins,
 {
 
     SymReg *regs[IMCC_MAX_REGS];
-    SymReg *i0, *i1, *i2, *py, *p3;
-    SymReg *loop, *next, *over;
+    SymReg *i0, *i1, *i2, *py, *p3, *ic16;
+    SymReg *loop, *next, *over, *over1;
     Instruction *tmp;
     char buf[128];
     /*
@@ -522,70 +542,84 @@ pcc_emit_flatten(Parrot_Interp interpreter, Instruction *ins,
      *   if $I0 >= $I1 goto next_arg_N
      *   PY = arg[$I0]
      *   inc $I0
-     *   if $I2 >= 15  goto over_flow_N
+     *   if $I2 == 16  goto over_flow_1_N
+     *   if $I2 > 16  goto over_flow_N
      *   setp_ind $I2, Py
      *   inc $I2
      *   goto _arg_loop_N
+     * over_flow_1_N:
+     *   new P3, .PerlArray
      * over_flow_N:
      *   push P3, $P0
      *   goto _arg_loop_N
      * next_arg_N:
      *
      * if there was a flattening before, next regs are handled with:
+     *
+     *   if $I2 == 16  goto over_flow_1_N
+     *   if $I2 > 16  goto over_flow_N
      *   setp_ind $I2, arg
      *   inc $I2
+     *   goto next_arg_N
+     * over_flow_1_N:
+     *   new P3, .PerlArray
+     * over_flow_N:
+     *   push P3, arg
+     * next_arg_N:
+     *
      */
 
     i0 = mk_symreg(str_dup("#i0"), 'I');        /* TODO cache syms */
     i1 = mk_symreg(str_dup("#i1"), 'I');
-    i2 = mk_symreg(str_dup("#i2"), 'I');
+    i2 = mk_pasm_reg(str_dup("I2"));
     py = mk_symreg(str_dup("#py"), 'P');
     p3 = mk_pasm_reg(str_dup("P3"));
     /* first time */
-    if (!*flatten) {
-        *flatten = 1;
+    if (!(*flatten)++) {
         regs[0] = i2;
         sprintf(buf, "%d", i+5);
         regs[1] = mk_const(str_dup(buf), 'I');
         ins = insINS(interpreter, ins, "set", regs, 2);
     }
-    if (!(arg->type & VT_FLATTEN)) {
-        /* normal arg, but needs indirect addressing */
-        regs[0] = i2;
-        regs[1] = arg;
-        ins = insINS(interpreter, ins, "setp_ind", regs, 2);
-        regs[0] = i2;
-        ins = insINS(interpreter, ins, "inc", regs, 1);
-        return ins;
-    }
-    regs[0] = i0;
-    ins = insINS(interpreter, ins, "null", regs, 1);
-    regs[0] = i1;
-    regs[1] = arg;
-    ins = insINS(interpreter, ins, "set", regs, 2);
     sprintf(buf, "#arg_loop_%d", i);
     loop = mk_address(str_dup(buf), U_add_uniq_label);
-    tmp = INS_LABEL(loop, 0);
-    insert_ins(ins, tmp);
-    ins = tmp;
     sprintf(buf, "#next_arg_%d", i);
     next = mk_address(str_dup(buf), U_add_uniq_label);
-    regs[0] = i0;
-    regs[1] = i1;
-    regs[2] = next;
-    ins = insINS(interpreter, ins, "ge", regs, 3);
-    regs[0] = py;
-    regs[1] = arg;
-    regs[2] = i0;
-    tmp = INS(interpreter, "set", NULL, regs, 3, KEY_BIT(2), 0);
-    insert_ins(ins, tmp);
-    ins = tmp;
-    regs[0] = i0;
-    ins = insINS(interpreter, ins, "inc", regs, 1);
+    sprintf(buf, "#over_flow_1_%d", i);
+    over1 = mk_address(str_dup(buf), U_add_uniq_label);
     sprintf(buf, "#over_flow_%d", i);
     over = mk_address(str_dup(buf), U_add_uniq_label);
+
+    if (arg->type & VT_FLATTEN) {
+        regs[0] = i0;
+        ins = insINS(interpreter, ins, "null", regs, 1);
+        regs[0] = i1;
+        regs[1] = arg;
+        ins = insINS(interpreter, ins, "set", regs, 2);
+        tmp = INS_LABEL(loop, 0);
+        insert_ins(ins, tmp);
+        ins = tmp;
+        regs[0] = i0;
+        regs[1] = i1;
+        regs[2] = next;
+        ins = insINS(interpreter, ins, "ge", regs, 3);
+        regs[0] = py;
+        regs[1] = arg;
+        regs[2] = i0;
+        tmp = INS(interpreter, "set", NULL, regs, 3, KEY_BIT(2), 0);
+        insert_ins(ins, tmp);
+        ins = tmp;
+        regs[0] = i0;
+        ins = insINS(interpreter, ins, "inc", regs, 1);
+    }
+    else
+        py = arg;
     regs[0] = i2;
-    regs[1] = mk_const(str_dup("15"), 'I');
+    regs[1] = ic16 = mk_const(str_dup("16"), 'I');
+    regs[2] = over1;
+    ins = insINS(interpreter, ins, "eq", regs, 3);
+    regs[0] = i2;
+    regs[1] = ic16;
     regs[2] = over;
     ins = insINS(interpreter, ins, "gt", regs, 3);
     regs[0] = i2;
@@ -593,15 +627,25 @@ pcc_emit_flatten(Parrot_Interp interpreter, Instruction *ins,
     ins = insINS(interpreter, ins, "setp_ind", regs, 2);
     regs[0] = i2;
     ins = insINS(interpreter, ins, "inc", regs, 1);
-    regs[0] = loop;
+
+    regs[0] = (arg->type & VT_FLATTEN) ? loop : next;
     ins = insINS(interpreter, ins, "branch", regs, 1);
+    tmp = INS_LABEL(over1, 0);
+    insert_ins(ins, tmp);
+    ins = tmp;
+    p3 = mk_pasm_reg(str_dup("P3"));
+    tmp = iNEW(interpreter, p3, str_dup("PerlArray"), NULL, 0);
+    insert_ins(ins, tmp);
+    ins = tmp;
     tmp = INS_LABEL(over, 0);
     insert_ins(ins, tmp);
     ins = tmp;
     regs[0] = p3;
     regs[1] = py;
     ins = insINS(interpreter, ins, "push", regs, 2);
-    regs[0] = loop;
+    regs[0] = i2;
+    ins = insINS(interpreter, ins, "inc", regs, 1);
+    regs[0] = (arg->type & VT_FLATTEN) ? loop : next;
     ins = insINS(interpreter, ins, "branch", regs, 1);
     tmp = INS_LABEL(next, 0);
     insert_ins(ins, tmp);
@@ -644,7 +688,7 @@ expand_pcc_sub_call(Parrot_Interp interpreter, Instruction *ins)
         arg = sub->pcc_sub->args[i];
         arg_reg = arg->reg;
         if (sub->pcc_sub->prototyped ||
-                (arg->set == 'P' && next[2] < 15)) {
+                (arg->set == 'P' && next[2] < 16)) {
             switch (arg->type) {
                 /* if arg is constant, set register */
                 case VT_CONSTP:
@@ -656,7 +700,7 @@ lazy:
                                 next[j]++;
                                 break;
                             }
-                            if (next[j] == 15)
+                            if (next[j] == 16)
                                 goto overflow;
                             sprintf(buf, "%c%d", arg_reg->set, next[j]++);
                             reg = mk_pasm_reg(str_dup(buf));
@@ -768,7 +812,13 @@ move_cc:
     /* set items in P3: I1 */
     ins = set_I_const(interpreter, ins, 1, n_p3);
     /* set items in PRegs: I2 */
-    ins = set_I_const(interpreter, ins, 2, next[2] - 5);
+    if (flatten) {
+        regs[0] = mk_pasm_reg(str_dup("I2"));;
+        regs[1] = mk_const(str_dup("5"), 'I');
+        ins = insINS(interpreter, ins, "sub", regs, 2);
+    }
+    else
+        ins = set_I_const(interpreter, ins, 2, next[2] - 5);
     /* return type 0=void, or -n-1: I3 */
     ins = set_I_const(interpreter, ins, 3,
             sub->pcc_sub->nret ? -1 - sub->pcc_sub->nret : 0);
@@ -814,7 +864,7 @@ move_cc:
     for (i = 0; i < n; i++) {
         arg = sub->pcc_sub->ret[i];
         if (sub->pcc_sub->prototyped == 1 ||
-                (arg->set == 'P' && next[2] < 15)) {
+                (arg->set == 'P' && next[2] < 16)) {
             for (j = 0; j < 4; j++) {
                 if (arg->set == types[j]) {
                     if (arg->reg->color == next[j]) {

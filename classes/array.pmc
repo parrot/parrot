@@ -137,6 +137,13 @@ pmclass Array need_ext {
         return VTABLE_get_integer(INTERP, value);
     }
 
+    INTVAL type_keyed_int (INTVAL key) {
+        PMC* value;
+
+        value = Parrot_Array_get_pmc_ptr(INTERP, (List*)PMC_data(SELF), key);
+        return VTABLE_type(INTERP, value);
+    }
+
     INTVAL get_integer_keyed (PMC* key) {
         INTVAL ix;
         PMC* nextkey;
