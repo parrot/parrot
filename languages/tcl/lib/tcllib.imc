@@ -150,8 +150,6 @@ providing a compreg-compatible method.
   # XXX These go away when [proc] is a little smarter.
   $P1 = new PerlHash
   store_global "_Tcl", "proc_body", $P1
-  $P1 = new PerlHash
-  store_global "_Tcl", "proc_args", $P1
 
   # Global variable initialization
   # XXX Are outer level tcl scopes true globals, or are they merely top
@@ -196,6 +194,7 @@ providing a compreg-compatible method.
   pir_compiler = compreg "PIR"
 
   # should generate a new sub each time, or no?
+  # yes, we should.
   pir_code = ".namespace [ \"_Tcl\" ]\n.sub _throwaway_sub\n.local string code\ncode = \""
   tcl_code = escaper(tcl_code,"\"")
   pir_code .= tcl_code

@@ -22,23 +22,27 @@
   if argc != 2 goto error
   oldName = argv[0]
   newName = argv[1]
- 
-  find_global commands, "commands"
 
-  $P1 = commands[oldName]
+  oldName = "_" . oldName 
+  newName = "_" . newName 
 
+  .local pmc theSub
+
+  # If oldname is just _, then just delete
   length $I1, newName
-  if $I1 == 0 goto delete
+  if $I1 == 1 goto delete
 
 add:
-  commands[newName] = $P1
+  # Grab the original sub 
+  theSub = find_global "Tcl", oldName
+  # Create the new sub
+  store_global "Tcl", newName, theSub
 
 delete:
-  delete commands[oldName]
+  null theSub 
+  store_global "Tcl", oldName, theSub
 
   goto done 
-
-  # fall through to a bad call.
 
 error:
   return_type = TCL_ERROR

@@ -1,17 +1,13 @@
 =head1 TODO
 
+If only I had an RT queue for these! ^_^
+
 =over 4
 
 =item builtins
 
 for any of the builtins that take a fixed number of ops, remove the
 call to C<foldup> and simply define the C<.params>
-
-=item rename
-
-jens doesn't think we can delete a global 
-but we could replace it with
-a null PMC, and have that be a check before any function call.
 
 =item given freeze/thaw for objects...
 
@@ -49,8 +45,6 @@ much as possible to simplify upkeep
 =item [[list]] proc
 
 doesn't handle varargs.
-
-throw a tcl error if the user-defined proc is called with the wrong # args
 
 support default values (e.g.: proc joe {{drink coffee}} { slurp $drink } )
 

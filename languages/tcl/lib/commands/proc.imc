@@ -33,7 +33,6 @@ Create a PIR sub on the fly for this user defined proc.
   args = argv[1]
   body = argv[2]
 
-
   .local pmc arg_list
   arg_list = string2list(args)
 
@@ -46,15 +45,11 @@ Create a PIR sub on the fly for this user defined proc.
   # definition. The arg list will be used to generate the proc's
   # indvidual argument handling code.
  
-  # XXX BUG - this version doesn't currently set the args at all,
-  # so only procs that take no args work. 
-
   # Now, shove the parsed routine into the global hash...
   $P0 = find_global "_Tcl", "proc_body"
-  $P2 = find_global "_Tcl", "proc_args"
   
   $P0[name] = parsed_body
-  $P2[name] = arg_list
+  #$P2[name] = arg_list
 
   .local pmc escaper
   escaper = find_global "Data::Escape", "String"
@@ -64,34 +59,57 @@ Create a PIR sub on the fly for this user defined proc.
   .local string proc_body
   proc_body  = ".namespace [\"Tcl\"]\n.sub _"
   proc_body .= name
-  proc_body .= "\n.param pmc args\n.local pmc interpret\ninterpret = find_global \"_Tcl\", \"__interpret\"\n.local pmc proc_body\n.local pmc proc_body\n.local pmc proc_args\n$P0 = find_global \"_Tcl\", \"proc_body\"\n$P1=find_global \"_Tcl\", \"proc_args\"\nproc_body=$P0[\""
-  proc_body .= esc_name
-  proc_body .= "\"]\nproc_args = $P1[\""
+  proc_body .= "\n.param pmc args\nargs = foldup\nnew_pad 1\n"
+  .local int arg_count 
+  arg_count = arg_list
+  .local int ii
+  ii = 0
+arg_loop:
+  if ii == arg_count goto arg_loop_done
+  $S1 = ii
+  proc_body .= "$P1 = args["
+  proc_body .= $S1
+  proc_body .= "]\nstore_lex -1,\""
+  # XXX This should be Escape'd
+  $S1 = arg_list[ii]
+  proc_body .= $S1
+  proc_body .= "\", $P1\n"
+  ii = ii + 1
+  goto arg_loop
+arg_loop_done:
+
+  proc_body .= ".local pmc interpret\ninterpret = find_global \"_Tcl\", \"__interpret\"\n.local pmc proc_body\n$P0 = find_global \"_Tcl\", \"proc_body\"\nproc_body=$P0[\""
   proc_body .= esc_name
   proc_body .= "\"]\n"
-  proc_body .= "#validate arg count\n"
-#.local int passed_arg_num
-#.local int count_arg_num
-#passed_arg_num = args
-#count_arg_num = proc_args
-#if passed_arg_num == count_arg_num goto args_ok
-#
-#args_ok:
+  # I3 is "The number of parameters in PMC registers."
+  proc_body .= "if I3 == "
+  $S1 = arg_count
+  proc_body .= $S1
+  proc_body .= " goto args_ok\n"
+  proc_body .= "bad_args:\n"
+  proc_body .= ".pcc_begin_return\n"
+  proc_body .= ".return 1\n"
+  proc_body .= ".return \"wrong # args: should be \\\""
+  proc_body .= name
+  proc_body .= " "
+  proc_body .= args
+  proc_body .= "\\\"\"\n"
+  proc_body .= ".pcc_end_return\n"
+  proc_body .= "args_ok:\n"
   #proc_body .= "#setup vars\n"
 
-  # XXX Is the pop_pad necessary, or is it handled as a side effect of the
-  # .pcc_return?
+  # XXX Is the pop_pad necessary, or would it be  handled as a side
+  #  effect of the .pcc_return?
 
-  proc_body .= "new_pad 1\n($I0,$S0) = interpret(proc_body)\npop_pad\n.pcc_begin_return\n.return $I0\n.return $S0\n.pcc_end_return\n.end\n"
+  proc_body .= "($I0,$S0) = interpret(proc_body)\npop_pad\n.pcc_begin_return\n.return $I0\n.return $S0\n.pcc_end_return\n.end\n"
 
- # print "PROC_BODY=\n"
- # print proc_body
- # print "\n--\n"
+  #print "PROC_BODY=\n"
+  #print proc_body
+  #print "\n--\n"
   
   .local pmc pir_compiler
   pir_compiler = compreg "PIR"
   $P0 = compile pir_compiler, proc_body 
-
  
   goto done
  
@@ -105,13 +123,3 @@ done:
     .return retval
   .pcc_end_return
 .end
-
-=pod
-
-Here's what the generated sub needs to look like (based on what used to
-be in interpreter...) (GOAL here is to remove all the code in interpreter
-that's specific to UDFS - Calling a UDF should be just like calling a
-real sub.
-
-
-=cut

@@ -28,7 +28,8 @@ sub output_is() {
   my $parrotdir = dirname $self->{parrot};
 
   $TEST_PROG_ARGS = $ENV{TEST_PROG_ARGS} || '';
-  my $args = $TEST_PROG_ARGS;
+  # Force any tcl tests to run with -G
+  my $args = "-G " . $TEST_PROG_ARGS;
 
   # flatten filenames (don't use directories)
   $lang_f = (File::Spec->splitpath($lang_f))[2];
@@ -42,7 +43,7 @@ sub output_is() {
   my $exit_code = 0;
   my $pass = 0;
 
-  $cmd = "(cd " . $self->{relpath} . " && " . $self->{parrot} . " languages/tcl/tcl.pbc ${args} $lang_f)";
+  $cmd = "(cd " . $self->{relpath} . " && " . $self->{parrot} . " ${args} languages/tcl/tcl.pbc $lang_f)";
 
   # For some reason, if you redirect both STDERR and STDOUT here, 
   # you get a 38M file of garbage. We'll temporarily assume everything
