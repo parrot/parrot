@@ -18,7 +18,7 @@ use strict;
 use vars qw($description @args);
 use Parrot::Configure::Step ':auto';
 
-$description = "Determining wether your compiler supports computed goto...";
+$description = "Determining whether your compiler supports computed goto...";
 
 @args=qw(cgoto miniparrot verbose);
 
