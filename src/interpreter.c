@@ -65,7 +65,7 @@ struct Perl_Interp *make_interpreter() {
   interpreter->pmc_reg_base->free = FRAMES_PER_PMC_REG_CHUNK - 1;
   interpreter->pmc_reg_base->next = NULL;
   interpreter->pmc_reg_base->prev = NULL;
-  clear_p(interpreter);
+  Parrot_clear_p(interpreter);
 
   /* Need a default stack */
   interpreter->stack_base = Allocate_New_Stack();
