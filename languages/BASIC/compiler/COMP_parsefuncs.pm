@@ -356,7 +356,7 @@ CLS
 sub parse_open {
 	my(@filename)=EXPRESSION;
 	feedme();
-	die "Expecting FOR" unless $syms[CURR] eq "for";
+	die "Expecting FOR at $sourceline" unless $syms[CURR] eq "for";
 	feedme();
 	my $mode="";
 	if ($syms[CURR] eq "input") {
@@ -386,7 +386,7 @@ OPEN
 }
 sub parse_close {
 	feedme();
-	die "Expecting #" unless $syms[CURR] eq "#";
+	die "Expecting # at $sourceline" unless $syms[CURR] eq "#";
 	feedme();
 	$fd=$syms[CURR];
 	print CODE<<CLOSE;
@@ -424,7 +424,7 @@ sub parse_print {
 		feedme();	# ;
 	}
 	while(1) {
-		if ($type[CURR] eq "STMT" or $type[CURR] eq "COMP") {
+		if ($type[CURR] eq "STMT" or $type[CURR] eq "COMP" or $type[CURR] eq "COMM") {
 			last;
 		}
 		last if (iskeyword($syms[CURR]) and not isbuiltin($syms[CURR]));

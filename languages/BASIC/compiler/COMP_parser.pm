@@ -87,6 +87,9 @@ use vars qw( $funcname );
 use vars qw( $branchseq @selects $sourceline );
 sub parse {
 	my(%opts)=@_;
+	if (%opts) {
+		print STDERR "Options: ", join(',', %opts), "\n";
+	}
 	init;
 	runtime_init;
 	feedme;
@@ -180,7 +183,7 @@ PARSE_NOFEED:
 		print CODE EXPRESSION;
 		feedme();
 		#print "Post 'if' token is $syms[CURR]\n";
-		die "No then?  $syms[CURR]" if ($syms[CURR] ne "then");
+		die "No then at $sourceline --  $syms[CURR]" if ($syms[CURR] ne "then");
 		$singleif=1 if ($type[NEXT] ne "STMT" and $type[NEXT] ne "COMM");
 		#print "Single if!\n" if $singleif;
 		print CODE<<TRUTHTEST;
@@ -394,9 +397,8 @@ PARSEERR:
 }
 sub trace {
 	print CODE<<TRACE;
-print "Trace "
-print .LINE
-print "\\n"
+print 2, .LINE
+print 2, "\\n"
 TRACE
 }
 

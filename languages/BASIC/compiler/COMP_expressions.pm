@@ -220,7 +220,7 @@ PROCEXP_NOFEED:
 		if (@workstack) {
 			while(@workstack) {
 				($type,$op)=@{$workstack[-1]}[0,1];
-				if ( $op ne '(' and
+				if ( $op ne '(' and 
 					precedence($op)>=$_) {
 					push(@evalstack, pop @workstack);
 				} else {
@@ -234,7 +234,7 @@ PROCEXP_NOFEED:
 	my $shuffleargs = sub {
 		while(@workstack) {
 			($type,$op)=@{$workstack[-1]}[0,1];
-			if ($op ne '(' and
+			if ($op ne '(' and 
 				precedence($op)>=$_) {
 				push(@evalstack, pop @workstack);
 			} else {
@@ -253,6 +253,7 @@ PROCEXP_NOFEED:
 			push(@evalstack, [ ( 'ARG', 'ARG' ) ] );
 		} elsif ($syms[NEXT] eq '(') {  # Arrays!  TBD...
 			&$shuffleargs;
+			push(@workstack, [ ( 'PUN', '(' ) ] );
 			push(@workstack, [ ( 'SUBSCRIPT', $syms[CURR] ) ] );
 			push(@evalstack, [ ( 'SUBS', 'SUBS' ) ] );
 		} else {

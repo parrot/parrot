@@ -26,6 +26,26 @@ while(1) {
 }
 
 __DATA__
+' Expect ??
+Dim A(10)
+z=3
+c=c+a(z)
+
+
+STOPPLEASE
+' Expect -10,11
+Dim Index(10)
+D=5
+Index(D)=-10
+print Index(D)
+print 31 + (Index(D) * 2)
+print 31 + Index(D) * 2
+print 31 + (Index(D)) * 2
+
+' Expect a Hello, World!
+print "Hello, ";	' COmment
+print "World!"
+
 ' Expect Correct
 DIM A(1,1)
 RO=1

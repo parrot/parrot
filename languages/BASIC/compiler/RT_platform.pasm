@@ -32,9 +32,9 @@ SCREEN_SETYCUR:
 
 	# X in P7, Y in P6
 SCREEN_LOCATE:
-	set I0, P6["value"]
-	set I1, P7["value"]
-	set I14, I0
+	set I1, P6["value"]
+	set I0, P7["value"]
+	set I14, I1
 	sysinfo S0, 4
 	eq S0, "MSWin32", WIN32_SCREEN_LOCATE
 	branch ANSI_SCREEN_LOCATE
