@@ -14,6 +14,8 @@ so there's something that works.
 
 */
 
+=cut
+
 #include "parrot/parrot.h"
 
 pmclass PMCArray extends PerlArray need_ext {
