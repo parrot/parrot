@@ -72,7 +72,7 @@
 static int
 emit_is8bit(long disp)
 {
-    return (((disp > -129) && (disp < 128)) ? 1 : 0);
+    return (disp & 0xff) == disp;
 }
 
 static char *
@@ -131,8 +131,8 @@ emit_r_X(char *pc, int reg_opcode, int base, int i, int scale, long disp)
             return emit_disp8_32(pc, disp);
         }
         /* modrm sib disp */
-        else {
-            *(pc++) = (emit_is8bit ? emit_Mod_b01 : emit_Mod_b10 )
+        else { 
+            *(pc++) = (emit_is8bit(disp) ? emit_Mod_b01 : emit_Mod_b10 ) 
                 | reg_opcode | emit_b100;
             emit_sib(pc++, scale, i, base);
             return emit_disp8_32(pc, disp);
