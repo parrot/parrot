@@ -20,7 +20,7 @@ src/dynext.c - Dynamic extensions to Parrot
 #include "parrot/dynext.h"
 
 /* _PARROTLIB is now the default */
-#define _PARROTLIB
+/*#define _PARROTLIB not working: "make testr" */
 
 /*
 
@@ -181,6 +181,17 @@ get_path(Interp *interpreter, STRING *lib, void **handle)
         string_cstring_free(cpath);
         path = Parrot_sprintf_c(interpreter, "%s%Ss",
                                 RUNTIME_DYNEXT,
+                                lib);
+        cpath = string_to_cstring(interpreter, path);
+        *handle = Parrot_dlopen(cpath);
+    }
+    if (!*handle) {
+        /*
+         * then in runtime/ with no extension
+         */
+        /* TODO only if not an absolute path */
+        string_cstring_free(cpath);
+        path = Parrot_sprintf_c(interpreter, "runtime/parrot/%Ss",
                                 lib);
         cpath = string_to_cstring(interpreter, path);
         *handle = Parrot_dlopen(cpath);
