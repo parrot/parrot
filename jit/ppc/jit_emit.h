@@ -557,9 +557,13 @@ jit_emit_bx(Parrot_jit_info_t *jit_info, char type, opcode_t disp)
     if ((long)imm >> 16 != 0) { \
       jit_emit_oris(pc, D, D, (long)imm >> 16); }
 
-#  define curop_disp(pc, D, disp) \
+#  define add_disp(pc, D, disp) \
     jit_emit_addis(pc, D, r15, (long)disp >> 16); \
     jit_emit_add_rri_i(pc, D, D, (long)disp & 0xffff)
+
+
+#endif /* JIT_EMIT */
+#if JIT_EMIT == 2
 
 void
 Parrot_jit_begin(Parrot_jit_info_t *jit_info,
@@ -580,7 +584,7 @@ void
 Parrot_jit_normal_op(Parrot_jit_info_t *jit_info,
                      struct Parrot_Interp * interpreter)
 {
-    curop_disp(jit_info->native_ptr, r3,
+    add_disp(jit_info->native_ptr, r3,
         ((long)jit_info->cur_op - (long)interpreter->code->byte_code));
     jit_emit_mov_rr(jit_info->native_ptr, r4, r13);
 
@@ -687,7 +691,8 @@ Parrot_jit_emit_mov_rm_n(struct Parrot_Interp * interpreter, int reg,char *mem)
         ((Parrot_jit_info_t *)(interpreter->jit_info))->native_ptr, reg, mem);
 }
 
-#else
+#endif /* JIT_EMIT == 2 */
+#if JIT_EMIT == 0
 
 #  define REQUIRES_CONSTANT_POOL 0
 #  define INT_REGISTERS_TO_MAP 24
@@ -729,7 +734,7 @@ ppc_sync_cache (void *_start, void *_end)
     __asm__ __volatile__ ("sync");
 }
 
-#endif
+#endif /* JIT_EMIT == 0 */
 
 #endif
 
