@@ -46,6 +46,7 @@ KEY* key_clone(struct Parrot_Interp *interpreter, KEY *key);
 INTVAL key_size(struct Parrot_Interp *interpreter, KEY *key);
 void key_set_size(struct Parrot_Interp *interpreter, KEY *key, INTVAL size);
 void key_destroy(struct Parrot_Interp *interpreter, KEY *key);
+INTVAL key_element_type(struct Parrot_Interp *interpreter, KEY* key, INTVAL index);
 KEY_PAIR* key_element_value_i(struct Parrot_Interp *interpreter, KEY *key, INTVAL index);
 KEY_PAIR* key_element_value_s(struct Parrot_Interp *interpreter, KEY *key, STRING* index);
 void key_set_element_value_i(struct Parrot_Interp *interpreter, KEY *key, INTVAL index, KEY_PAIR* value);

@@ -53,7 +53,7 @@ string_make(struct Parrot_Interp *interpreter, const void *buffer,
     if (buffer) {
         mem_sys_memcopy(s->bufstart, buffer, buflen);
         s->bufused = buflen;
-        string_compute_strlen(s);
+        (void)string_compute_strlen(s);
     }
     else {
         s->strlen = s->bufused = 0;

@@ -333,7 +333,7 @@ PackFile_unpack(struct Parrot_Interp *interpreter, struct PackFile * self, char 
 
     if (segment_size % sizeof(opcode_t)) {
         fprintf(stderr, "PackFile_unpack: Illegal fixup table segment size %d (must be multiple of %d)!\n",
-            segment_size, sizeof(opcode_t));
+            (int)segment_size, sizeof(opcode_t));
         return 0;
     }
 
@@ -358,7 +358,7 @@ PackFile_unpack(struct Parrot_Interp *interpreter, struct PackFile * self, char 
 
     if (segment_size % sizeof(opcode_t)) {
         fprintf(stderr, "PackFile_unpack: Illegal constant table segment size %d (must be multiple of %d)!\n",
-            segment_size, sizeof(opcode_t));
+            (int)segment_size, sizeof(opcode_t));
         return 0;
     }
 
@@ -1721,7 +1721,8 @@ PackFile_Constant_dump(struct PackFile_Constant * self) {
                     (long) self->string->bufused);
             /* TODO: Won't do anything reasonable for most encodings */
             printf("        DATA     => '%.*s'\n",
-                    self->string->bufused, (char *) self->string->bufstart);
+                   (int)self->string->bufused,
+                   (char *) self->string->bufstart);
             printf("    } ],\n");
             break;
 

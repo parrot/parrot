@@ -314,7 +314,7 @@ void
 Parrot_clear_n(struct Parrot_Interp *interpreter) {
     int i;
     for (i=0; i<NUM_REGISTERS; i++) {
-        interpreter->num_reg->registers[i] = 0;
+        interpreter->num_reg->registers[i] = 0.0;
     }
 }
 

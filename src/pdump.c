@@ -62,7 +62,10 @@ main(int argc, char **argv) {
 
     pf = PackFile_new();
 
-    PackFile_unpack(interpreter, pf, packed, packed_size);
+    if (!PackFile_unpack(interpreter, pf, packed, packed_size)) {
+        printf( "Can't unpack.\n" );
+        return 1;
+    }
     PackFile_dump(pf);
     PackFile_DELETE(pf);
 
