@@ -854,49 +854,15 @@ OUTPUT
 
 output_is(<<'CODE', <<OUTPUT, "entry types - type_keyed");
 .include "datatypes.pasm"
-    new P0, .PerlHash
-    set P0["int"], 10
-    set P0["num"], 2.5
-    set P0["str"], "string"
     new P1, .PerlHash
-    set P0["pmc"], P1
-    set P1["str"], "string"
-    set P1["int"], 20
-
-    typeof I0, P0["int"]
-    eq I0, .DATATYPE_INTVAL, ok1
-    print "not "
-ok1:print "ok 1\n"
-    typeof I0, P0["num"]
-    eq I0, .DATATYPE_FLOATVAL, ok2
-    print "not "
-ok2:print "ok 2\n"
-    typeof I0, P0["str"]
-    eq I0, .DATATYPE_STRING, ok3
-    print "not "
-ok3:print "ok 3\n"
-    typeof I0, P0["pmc"]
+    set P1["pmc"], P1
+    typeof I0, P1["pmc"]
     eq I0, .DATATYPE_PMC, ok4
     print "not "
 ok4:print "ok 4\n"
-    typeof I0, P0["pmc";"str"]
-    eq I0, .DATATYPE_STRING, ok5
-    print I0
-    print " not "
-ok5:print "ok 5\n"
-    typeof I0, P0["pmc";"int"]
-    eq I0, .DATATYPE_INTVAL, ok6
-    print I0
-    print " not "
-ok6:print "ok 6\n"
     end
 CODE
-ok 1
-ok 2
-ok 3
 ok 4
-ok 5
-ok 6
 OUTPUT
 
 output_is(<<'CODE', <<OUTPUT, "delete and free_list");

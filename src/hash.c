@@ -22,15 +22,23 @@
  *                    hash keys are now (void *)
  *                    add new_cstring_hash() function
  *
+ *     2003.11.04 leo bucket->value is now a plain pointer, no nore
+ *                    an HASH_ENTRY
+ *                    With little changes, we can again store
+ *                    arbitrary items if needed, s. TODO in code
+ *
  *  Notes:
  *     Future optimizations:
  *       - Stop reallocating the bucket pool, and instead add chunks on.
  *         (Saves pointer fixups and copying during realloc.)
  *       - Hash contraction (dunno if it's worth it)
+ *
  *  References:
- *     pdd08_keys.pod */
+ *     pdd08_keys.pod
+ */
 
 #include "parrot/parrot.h"
+#include <assert.h>
 
 #define INITIAL_BUCKETS 16
 #define MAXFULL_PERCENT 80
@@ -49,6 +57,7 @@ getBucket(HASH *hash, BucketIndex idx)
 {
     if (idx == NULLBucketIndex)
         return NULL;
+    /* TODO honor hash->value_size */
     return &((HASHBUCKET *)hash->bucket_pool->bufstart)[idx];
 }
 
@@ -135,7 +144,7 @@ dump_hash(Interp *interpreter, HASH *hash)
         PIO_eprintf(interpreter, "  Bucket %vd: ", i);
         while (bucket) {
             Parrot_block_GC(interpreter); /* don't allow bucket to move */
-            PIO_eprintf(interpreter, "type(%d)", bucket->value.type);
+            PIO_eprintf(interpreter, "(%p)", bucket->value);
             Parrot_unblock_GC(interpreter);
             bucket = getBucket(hash, bucket->next);
             if (bucket)
@@ -156,7 +165,7 @@ mark_hash(Interp *interpreter, HASH *hash)
         pobject_lives(interpreter, (PObj *)hash->bucket_pool);
     }
 
-    if (hash->buffer.bufstart == NULL || hash->bucket_pool->bufstart == NULL) {
+    if (!hash->buffer.bufstart|| !hash->bucket_pool->bufstart) {
         return;
     }
 
@@ -165,11 +174,10 @@ mark_hash(Interp *interpreter, HASH *hash)
         while (bucket) {
             if (hash->mark_key)
                 (hash->mark_key)(interpreter, (PObj *)bucket->key);
-            if (bucket->value.type == enum_hash_string)
-                pobject_lives(interpreter,
-                             (PObj *)bucket->value.val.string_val);
-            else if (bucket->value.type == enum_hash_pmc)
-                pobject_lives(interpreter, (PObj *)bucket->value.val.pmc_val);
+            if (hash->entry_type == enum_hash_string)
+                pobject_lives(interpreter, (PObj *)bucket->value);
+            else if (hash->entry_type == enum_hash_pmc)
+                pobject_lives(interpreter, (PObj *)bucket->value);
             bucket = getBucket(hash, bucket->next);
         }
     }
@@ -211,6 +219,7 @@ expand_hash(Interp *interpreter, HASH *hash)
     UINTVAL new_pool_size = new_size * MAXFULL_PERCENT / 100;
 
     Parrot_reallocate(interpreter, hash, new_size * sizeof(BucketIndex));
+    /* TODO honor hash->value_size */
     Parrot_reallocate(interpreter, hash->bucket_pool,
                       new_pool_size * sizeof(HASHBUCKET));
 
@@ -262,7 +271,7 @@ expand_hash(Interp *interpreter, HASH *hash)
 }
 
 static BucketIndex
-new_bucket(Interp *interpreter, HASH *hash, STRING *key, HASH_ENTRY *value)
+new_bucket(Interp *interpreter, HASH *hash, STRING *key, void *value)
 {
     BucketIndex bucket_index;
 
@@ -285,7 +294,7 @@ new_bucket(Interp *interpreter, HASH *hash, STRING *key, HASH_ENTRY *value)
 
         hash->free_list = bucket->next;
         bucket->key = key;
-        bucket->value = *value;
+        bucket->value = value;  /* TODO copy value_size if(value_size) */
         return bucket_index;
     }
 
@@ -314,36 +323,36 @@ find_bucket(Interp *interpreter, HASH *hash, BucketIndex head, void *key)
     return NULL;
 }
 
-/* FIXME: This function can go back to just returning the hash struct
- * pointer once Buffers can define their own custom mark routines. */
-void
-new_hash(Interp *interpreter, HASH **hash_ptr)
+HASH *
+new_hash(Interp *interpreter)
 {
-    new_hash_x(interpreter, hash_ptr,
+    return new_hash_x(interpreter,
             STRING_compare,     /* STRING compare */
             key_hash_STRING,    /*        hash */
             pobject_lives);     /*        mark */
 }
 
-void
-new_cstring_hash(Interp *interpreter, HASH **hash_ptr)
+HASH *
+new_cstring_hash(Interp *interpreter)
 {
-    new_hash_x(interpreter, hash_ptr,
+    return new_hash_x(interpreter,
             cstring_compare,     /* cstring compare */
             key_hash_cstring,    /*        hash */
             (hash_mark_key_fn)0);/* no     mark */
 }
 
-void
-new_hash_x(Interp *interpreter, HASH **hash_ptr,
+HASH *
+new_hash_x(Interp *interpreter,
         hash_comp_fn compare, hash_hash_key_fn keyhash,
         hash_mark_key_fn mark)
 {
     HASH *hash = (HASH *)new_bufferlike_header(interpreter, sizeof(*hash));
-    *hash_ptr = hash;
     hash->compare = compare;
     hash->hash_val = keyhash;
     hash->mark_key = mark;
+    /* TODO make next 2 params configurable */
+    hash->entry_type = enum_type_PMC;
+    hash->value_size = 0;       /* extra size */
 
     /*      PObj_report_SET(&hash->buffer); */
 
@@ -362,6 +371,7 @@ new_hash_x(Interp *interpreter, HASH **hash_ptr,
     /*      PObj_report_SET(hash->bucket_pool); */
     hash->free_list = NULLBucketIndex;
     expand_hash(interpreter, hash);
+    return hash;
 }
 
 /*=for api hash hash_size
@@ -376,13 +386,10 @@ hash_size(Interp *interpreter, HASH *hash)
 {
     UNUSED(interpreter);
 
-    if (hash != NULL) {
+    if (hash)
         return hash->entries;
-    }
-    else {
-        PIO_eprintf(interpreter, "*** hash_size asked to check a NULL hash\n");
-        return 0;
-    }
+    internal_exception(1, "hash_size asked to check a NULL hash\n");
+    return 0;
 }
 
 /*
@@ -420,8 +427,9 @@ hash_get_idx(Interp *interpreter, HASH *hash, PMC * key)
     return b->key;
 }
 
-PARROT_INLINE static HASHBUCKET *
-hash_lookup(Interp *interpreter, HASH *hash, void *key)
+
+HASHBUCKET *
+hash_get(Interp *interpreter, HASH *hash, void *key)
 {
     UINTVAL hashval = (hash->hash_val)(interpreter, key);
     HashIndex *table = (HashIndex *)hash->buffer.bufstart;
@@ -429,18 +437,9 @@ hash_lookup(Interp *interpreter, HASH *hash, void *key)
     return find_bucket(interpreter, hash, chain, key);
 }
 
-HASH_ENTRY *
-hash_get(Interp *interpreter, HASH *hash, void *key)
-{
-    HASHBUCKET *bucket = hash_lookup(interpreter, hash, key);
-    if (bucket == NULL)
-        return NULL;            /* Not found */
-    return &bucket->value;
-}
-
 /* The key is *not* copied. */
 void
-hash_put(Interp *interpreter, HASH *hash, void *key, HASH_ENTRY *value)
+hash_put(Interp *interpreter, HASH *hash, void *key, void *value)
 {
     BucketIndex *table;
     UINTVAL hashval;
@@ -452,7 +451,8 @@ hash_put(Interp *interpreter, HASH *hash, void *key, HASH_ENTRY *value)
 
     hashval = (hash->hash_val)(interpreter, key);
     table = (BucketIndex *)hash->buffer.bufstart;
-    chain = table ? table[hashval & hash->max_chain] : NULLBucketIndex;
+    assert(table);
+    chain = table[hashval & hash->max_chain];
     bucket = find_bucket(interpreter, hash, chain, key);
 
     /*      fprintf(stderr, "HASH=%p buckets=%p chain=%p bucket=%p KEY=%s\n", */
@@ -460,7 +460,7 @@ hash_put(Interp *interpreter, HASH *hash, void *key, HASH_ENTRY *value)
 
     if (bucket) {
         /* Replacing old value */
-        memcpy(&bucket->value, value, sizeof(HASH_ENTRY));
+        bucket->value = value;  /* TODO copy value_size */
     }
     else {
         /* Create new bucket */
@@ -513,19 +513,20 @@ hash_delete(Interp *interpreter, HASH *hash, void *key)
     PANIC("hash_delete given nonexistent key");
 }
 
-void
-hash_clone(struct Parrot_Interp *interp, HASH *hash, HASH **dest)
+HASH *
+hash_clone(struct Parrot_Interp *interp, HASH *hash)
 {
     HashIndex i;
+    HASH *dest;
 
-    new_hash_x(interp, dest, hash->compare, hash->hash_val, hash->mark_key);
+    dest = new_hash_x(interp, hash->compare, hash->hash_val, hash->mark_key);
     for (i = 0; i <= hash->max_chain; i++) {
         BucketIndex bi = lookupBucketIndex(hash, i);
         while (bi != NULLBucketIndex) {
             HASHBUCKET *b = getBucket(hash, bi);
             void *key = b->key;
-            HASH_ENTRY valtmp;
-            switch (b->value.type) {
+            void *valtmp;
+            switch (hash->entry_type) {
             case enum_hash_undef:
             case enum_hash_int:
             case enum_hash_num:
@@ -533,24 +534,20 @@ hash_clone(struct Parrot_Interp *interp, HASH *hash, HASH **dest)
                 break;
 
             case enum_hash_string:
-                valtmp.type = enum_hash_string;
-                valtmp.val.string_val
-                    = string_copy(interp, b->value.val.string_val);
+                valtmp = string_copy(interp, b->value);
                 break;
 
             case enum_hash_pmc:
-                valtmp.type = enum_hash_pmc;
-                valtmp.val.pmc_val = pmc_new_noinit(interp,
-                    b->value.val.pmc_val->vtable->base_type);
-                VTABLE_clone(interp,
-                    b->value.val.pmc_val, valtmp.val.pmc_val );
+                valtmp = pmc_new_noinit(interp,
+                    ((PMC*)b->value)->vtable->base_type);
+                VTABLE_clone(interp, (PMC*)b->value, valtmp);
                 break;
 
             default:
                 internal_exception(-1, "hash corruption: type = %d\n",
-                                   b->value.type);
+                                   hash->entry_type);
             };
-            hash_put(interp, *dest, key, &valtmp);
+            hash_put(interp, dest, key, valtmp);
             /*
              * hash_put may extend the hash, which can trigger GC
              * we could also check the GC count and refetch b only when needed
@@ -559,6 +556,7 @@ hash_clone(struct Parrot_Interp *interp, HASH *hash, HASH **dest)
             bi = b->next;
         }
     }
+    return dest;
 }
 
 /*

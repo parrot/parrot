@@ -28,6 +28,9 @@ typedef enum {
     enum_hash_pmc = enum_type_PMC
 } HASH_ENTRY_TYPE;
 
+/*
+ * hash_entry is currently unused
+ */
 typedef struct _hash_entry {
     HASH_ENTRY_TYPE type;
     UnionVal val;
@@ -39,8 +42,8 @@ typedef UINTVAL BucketIndex;
 typedef UINTVAL HashIndex;
 struct _hashbucket {
     void *key;
-    HASH_ENTRY value;
     BucketIndex next;
+    void *value;
 };
 
 typedef int    (*hash_comp_fn)(Parrot_Interp, void*, void*);
@@ -53,21 +56,24 @@ struct _hash {
     UINTVAL entries;            /* Number of values stored in hashtable */
     Buffer *bucket_pool;        /* Buffer full of buckets, used and unused */
     BucketIndex free_list;
+    PARROT_DATA_TYPES entry_type;   /* type of value */
+    size_t value_size;          /* currently unused, if set this size
+                                   at value is copied as a hash_entry */
     hash_comp_fn   compare;
     hash_hash_key_fn hash_val;
     hash_mark_key_fn mark_key;
 };
 
-void new_hash(Interp * interpreter, HASH **hash_ptr);
-void new_hash_x(Interp * interpreter, HASH **hash_ptr,
+HASH * new_hash(Interp * interpreter);
+HASH * new_hash_x(Interp * interpreter,
         hash_comp_fn, hash_hash_key_fn, hash_mark_key_fn);
-void new_cstring_hash(Interp *interpreter, HASH **hash_ptr);
-void hash_clone(Interp * interpreter, HASH * src, HASH **dest);
+HASH * new_cstring_hash(Interp *interpreter);
+HASH * hash_clone(Interp * interpreter, HASH * src);
 INTVAL hash_size(Interp * interpreter, HASH *hash);
 void hash_set_size(Interp * interpreter, HASH *hash, UINTVAL size);
 void hash_destroy(Interp * interpreter, HASH *hash);
-HASH_ENTRY *hash_get(Interp * interpreter, HASH *hash, void *key);
-void hash_put(Interp * interpreter, HASH *hash, void *key, HASH_ENTRY * value);
+HASHBUCKET *hash_get(Interp * interpreter, HASH *hash, void *key);
+void hash_put(Interp * interpreter, HASH *hash, void *key, void *value);
 void hash_delete(Interp * interpreter, HASH *hash, void *key);
 void mark_hash(Interp * interpreter, HASH *hash);
 void dump_hash(Interp * interpreter, HASH *hash);

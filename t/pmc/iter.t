@@ -1,6 +1,6 @@
 #! perl -w
 
-use Parrot::Test tests => 10;
+use Parrot::Test tests => 9;
 use Test::More qw(skip);
 output_is(<<'CODE', <<'OUTPUT', "new iter");
 	new P2, .PerlArray
@@ -185,52 +185,6 @@ ok2:
 CODE
 ok 1
 ok 2
-OUTPUT
-
-output_is(<<'CODE', <<'OUTPUT', "hash iter - various types");
-    .include "datatypes.pasm"	# type constants
-    .include "iterator.pasm"
-    new P1, .PerlHash
-    set P1["int"], 10
-    set P1["num"], 2.5
-    set P1["str"], "string"
-    new P2, .PerlString
-    set P2, "string"
-    set P1["pmc"], P2
-
-    set I10, 0			# count items
-    new P0, .Iterator, P1	# setup iterator for hash P1
-    set P0, .ITERATE_FROM_START
-iter_loop:
-    unless P0, iter_end		# while (entries) ...
-      inc I10
-      shift S2, P0		# get key for entry
-      typeof I0, P0[S2]		# get type of entry for key S2
-      ne I0, .DATATYPE_INTVAL, no_int
-      set I1, P0[S2]
-      eq I1, 10, iter_loop
-      print "not ok int\n"
-    no_int:
-      ne I0, .DATATYPE_FLOATVAL, no_num
-      set N1, P0[S2]
-      eq N1, 2.5, iter_loop
-      print "not ok num\n"
-    no_num:
-      ne I0, .DATATYPE_STRING, no_str
-      set S1, P0[S2]
-      eq S1, "string", iter_loop
-      print "not ok str\n"
-    no_str:
-      set P4, P0[S2]
-      eq P4, P2, iter_loop
-      print "not ok pmc\n"
-      branch iter_loop
-iter_end:
-    print I10
-    print "\n"
-    end
-CODE
-4
 OUTPUT
 
 output_is(<<'CODE', <<OUTPUT, "string iteration forward");

@@ -34,115 +34,95 @@ static STRING* make_hash_key(Interp* interpreter, PMC * key)
 pmclass PerlHash need_ext does hash {
 
     void class_init() {
-        /* class_init_code */
+	/* class_init_code */
 	make_bufferlike_pool(INTERP, sizeof(struct _hash));
     }
     void init () {
-        if (undef == NULL) {
-            undef = constant_pmc_new_noinit(INTERP, enum_class_PerlUndef);
-            VTABLE_init(INTERP, undef);
-        }
-        PObj_custom_mark_SET(SELF);
-        new_hash(INTERP, (HASH **)&PMC_ptr1v(SELF));
+	if (undef == NULL) {
+	    undef = constant_pmc_new_noinit(INTERP, enum_class_PerlUndef);
+	    VTABLE_init(INTERP, undef);
+	}
+	PObj_custom_mark_SET(SELF);
+	PMC_ptr1v(SELF) = new_hash(INTERP);
     }
 
     void mark () {
-        if (PMC_ptr1v(SELF))
-            mark_hash(INTERP, PMC_ptr1v(SELF));
+	if (PMC_ptr1v(SELF))
+	    mark_hash(INTERP, PMC_ptr1v(SELF));
     }
 
     INTVAL type_keyed (PMC* key) {
-        PMC* valpmc;
-        STRING* keystr = make_hash_key(INTERP, key);
-        HASH_ENTRY* entry = hash_get(INTERP, (HASH*) PMC_ptr1v(SELF), keystr);
-        if (entry == NULL) {
-            return enum_hash_undef;
-        }
-        if (entry->type == enum_hash_pmc) {
-	    PMC* nextkey;
-	    nextkey = key_next(INTERP, key);
-            valpmc = entry->val.pmc_val;
-	    if (!nextkey)
-		return enum_hash_pmc;
-	    return VTABLE_type_keyed(INTERP, valpmc, nextkey);
-        }
-        return entry->type;
+	PMC* valpmc;
+	PMC* nextkey;
+	STRING* keystr = make_hash_key(INTERP, key);
+	HASHBUCKET* b = hash_get(INTERP, (HASH*) PMC_ptr1v(SELF), keystr);
+	if (b == NULL) {
+	    return enum_hash_undef;
+	}
+	nextkey = key_next(INTERP, key);
+	valpmc = b->value;
+	if (!nextkey)
+	    return enum_hash_pmc;
+	return VTABLE_type_keyed(INTERP, valpmc, nextkey);
+	return enum_hash_pmc;
     }
 
     void clone (PMC *ret) {
-        PObj_custom_mark_SET(ret);
-        hash_clone(INTERP, (HASH *)PMC_ptr1v(SELF), (HASH **)&PMC_ptr1v(ret));
+	PObj_custom_mark_SET(ret);
+	PMC_ptr1v(ret) = hash_clone(INTERP, (HASH *)PMC_ptr1v(SELF));
     }
 
     INTVAL get_integer () {
-        return hash_size(INTERP, PMC_ptr1v(SELF));
+	return hash_size(INTERP, PMC_ptr1v(SELF));
     }
 
     INTVAL get_integer_keyed (PMC* key) {
-        PMC* valpmc;
-        STRING* keystr = make_hash_key(INTERP, key);
-        HASH_ENTRY* entry = hash_get(INTERP, (HASH*) PMC_ptr1v(SELF), keystr);
-        if (entry == NULL) {
-            /* XXX Warning: use of uninitialized value */
-            return VTABLE_get_integer(INTERP, undef);
-        }
-        if (entry->type == enum_hash_int) return entry->val.int_val;
-        if (entry->type == enum_hash_pmc) {
-	    PMC* nextkey;
-	    nextkey = key_next(INTERP, key);
-            valpmc = entry->val.pmc_val;
-	    if (!nextkey)
-		return VTABLE_get_integer(INTERP, valpmc);
-	    return VTABLE_get_integer_keyed(INTERP, valpmc, nextkey);
+	PMC* valpmc;
+	STRING* keystr = make_hash_key(INTERP, key);
+	HASHBUCKET *b = hash_get(INTERP, (HASH*) PMC_ptr1v(SELF), keystr);
+	PMC* nextkey;
+	if (b == NULL) {
+	    /* XXX Warning: use of uninitialized value */
+	    return VTABLE_get_integer(INTERP, undef);
+	}
+	nextkey = key_next(INTERP, key);
+	valpmc = b->value;
+	if (!nextkey)
+	    return VTABLE_get_integer(INTERP, valpmc);
+	return VTABLE_get_integer_keyed(INTERP, valpmc, nextkey);
 
-        }
-        internal_exception(OUT_OF_BOUNDS,
-		"Cannot fetch integer out of non-integer key!\n");
-        return -1;
     }
 
     FLOATVAL get_number_keyed (PMC* key) {
-        PMC* valpmc;
-        STRING* keystr = make_hash_key(INTERP, key);
-        HASH_ENTRY* entry = hash_get(INTERP, (HASH*) PMC_ptr1v(SELF), keystr);
-        if (entry == NULL) {
-            /* XXX Warning: Use of uninitialized value */
-            return VTABLE_get_number(INTERP, undef);
-        }
-        if (entry->type == enum_hash_num) return entry->val.num_val;
-        if (entry->type == enum_hash_pmc) {
-	    PMC* nextkey;
-	    nextkey = key_next(INTERP, key);
-            valpmc = entry->val.pmc_val;
-	    if (!nextkey)
-		return VTABLE_get_number(INTERP, valpmc);
-	    return VTABLE_get_number_keyed(INTERP, valpmc, nextkey);
-        }
-        internal_exception(OUT_OF_BOUNDS,
-		"Cannot fetch number out of non-numeric key!\n");
-        return 0.0;
+	PMC* valpmc;
+	STRING* keystr = make_hash_key(INTERP, key);
+	HASHBUCKET *b = hash_get(INTERP, (HASH*) PMC_ptr1v(SELF), keystr);
+	PMC* nextkey;
+	if (b == NULL) {
+	    /* XXX Warning: Use of uninitialized value */
+	    return VTABLE_get_number(INTERP, undef);
+	}
+	nextkey = key_next(INTERP, key);
+	valpmc = b->value;
+	if (!nextkey)
+	    return VTABLE_get_number(INTERP, valpmc);
+	return VTABLE_get_number_keyed(INTERP, valpmc, nextkey);
     }
 
     BIGNUM* get_bignum_keyed (PMC* key) {
-        PMC* valpmc;
-        STRING* keystr = make_hash_key(INTERP, key);
-        HASH_ENTRY* entry = hash_get(INTERP, (HASH*) PMC_ptr1v(SELF), keystr);
-        if (entry == NULL) {
-            /* XXX Warning: Use of uninitialized value */
-            return VTABLE_get_bignum(INTERP, undef);
-        }
-        if (entry->type == enum_hash_num) return (BIGNUM*)entry->val.struct_val;
-        if (entry->type == enum_hash_pmc) {
-	    PMC* nextkey;
-	    nextkey = key_next(INTERP, key);
-            valpmc = entry->val.pmc_val;
-	    if (!nextkey)
-		return VTABLE_get_bignum(INTERP, valpmc);
-	    return VTABLE_get_bignum_keyed(INTERP, valpmc, nextkey);
-        }
-        internal_exception(OUT_OF_BOUNDS,
-		"Cannot fetch number out of non-numeric key!\n");
-        return NULL;
+	PMC* valpmc;
+	STRING* keystr = make_hash_key(INTERP, key);
+	HASHBUCKET *b = hash_get(INTERP, (HASH*) PMC_ptr1v(SELF), keystr);
+	PMC* nextkey;
+	if (b == NULL) {
+	    /* XXX Warning: Use of uninitialized value */
+	    return VTABLE_get_bignum(INTERP, undef);
+	}
+	nextkey = key_next(INTERP, key);
+	valpmc = b->value;
+	if (!nextkey)
+	    return VTABLE_get_bignum(INTERP, valpmc);
+	return VTABLE_get_bignum_keyed(INTERP, valpmc, nextkey);
     }
 
     STRING* get_string () {
@@ -150,9 +130,10 @@ pmclass PerlHash need_ext does hash {
     }
 
     STRING* get_string_keyed (PMC* key) {
-        PMC* valpmc;
-        STRING* keystr;
-        HASH_ENTRY* entry;
+	PMC* valpmc;
+	STRING* keystr;
+	HASHBUCKET *b;
+	PMC* nextkey;
 
 	switch (PObj_get_FLAGS(key) & KEY_type_FLAGS) {
 	    case KEY_integer_FLAG:
@@ -161,23 +142,16 @@ pmclass PerlHash need_ext does hash {
 	    default:
 		keystr = make_hash_key(INTERP, key);
 	}
-        entry = hash_get(INTERP, (HASH*) PMC_ptr1v(SELF), keystr);
-        if (entry == NULL) {
-            /* XXX Warning: use of uninitialized value */
-            return VTABLE_get_string(INTERP, undef);
-        }
-        if (entry->type == enum_hash_string) return entry->val.string_val;
-        if (entry->type == enum_hash_pmc) {
-	    PMC* nextkey;
-	    nextkey = key_next(INTERP, key);
-            valpmc = entry->val.pmc_val;
-	    if (!nextkey)
-		return VTABLE_get_string(INTERP, valpmc);
-	    return VTABLE_get_string_keyed(INTERP, valpmc, nextkey);
-        }
-        internal_exception(OUT_OF_BOUNDS,
-		"Cannot fetch string out of non-string key!\n");
-        return NULL;
+	b = hash_get(INTERP, (HASH*) PMC_ptr1v(SELF), keystr);
+	if (b == NULL) {
+	    /* XXX Warning: use of uninitialized value */
+	    return VTABLE_get_string(INTERP, undef);
+	}
+	nextkey = key_next(INTERP, key);
+	valpmc = b->value;
+	if (!nextkey)
+	    return VTABLE_get_string(INTERP, valpmc);
+	return VTABLE_get_string_keyed(INTERP, valpmc, nextkey);
     }
 
     INTVAL get_bool () {
@@ -189,24 +163,17 @@ pmclass PerlHash need_ext does hash {
     }
 
     PMC* get_pmc_keyed (PMC* key) {
-        STRING* keystr = make_hash_key(INTERP, key);
-        HASH_ENTRY* entry = hash_get(INTERP, (HASH*) PMC_ptr1v(SELF), keystr);
-        if (entry == NULL) {
-            PMC *new_undef = pmc_new(INTERP, enum_class_PerlUndef);
-            return new_undef;
-        }
-        if (entry->type == enum_hash_pmc) {
-	    PMC* nextkey;
-	    nextkey = key_next(INTERP, key);
-	    if (!nextkey)
-		return entry->val.pmc_val;
-	    return VTABLE_get_pmc_keyed(INTERP,
-		    entry->val.pmc_val, nextkey);
-
-        }
-        internal_exception(OUT_OF_BOUNDS,
-		"Cannot fetch PMC out of non-PMC key!\n");
-        return NULL;
+	STRING* keystr = make_hash_key(INTERP, key);
+	HASHBUCKET *b = hash_get(INTERP, (HASH*) PMC_ptr1v(SELF), keystr);
+	PMC* nextkey;
+	if (b == NULL) {
+	    PMC *new_undef = pmc_new(INTERP, enum_class_PerlUndef);
+	    return new_undef;
+	}
+	nextkey = key_next(INTERP, key);
+	if (!nextkey)
+	    return b->value;
+	return VTABLE_get_pmc_keyed(INTERP, (PMC*)b->value, nextkey);
     }
 
     INTVAL is_same (PMC* other) {
@@ -214,88 +181,34 @@ pmclass PerlHash need_ext does hash {
 			PMC_ptr1v(other) == PMC_ptr1v(SELF));
     }
 
-    void set_integer (PMC* value) {
-        internal_exception(INTERNAL_PANIC, "Cannot set hash to int\n");
-    }
-
-    void set_integer_native (INTVAL size) {
-        internal_exception(INTERNAL_PANIC, "Cannot set hash to int\n");
-    }
-
-    void set_integer_same (PMC* value) {
-        internal_exception(INTERNAL_PANIC, "Cannot set hash to int\n");
-    }
-
     void set_integer_keyed (PMC* key, INTVAL value) {
         STRING* keystr = make_hash_key(INTERP, key);
-        HASH_ENTRY entry;
-        entry.type = enum_hash_int;
-        entry.val.int_val = value;
-        hash_put(INTERP, PMC_ptr1v(SELF), keystr, &entry);
-    }
-
-    void set_number (PMC* value) {
-        internal_exception(INTERNAL_PANIC, "Cannot set hash to number\n");
-    }
-
-    void set_number_native (FLOATVAL size) {
-        internal_exception(INTERNAL_PANIC, "Cannot set hash to number\n");
-    }
-
-    void set_number_same (PMC* value) {
-        internal_exception(INTERNAL_PANIC, "Cannot set hash to number\n");
+        PMC *val = pmc_new(interpreter, enum_class_PerlInt);
+        VTABLE_set_integer_native(INTERP, val, value);
+        hash_put(INTERP, PMC_ptr1v(SELF), keystr, val);
     }
 
     void set_number_keyed (PMC* key, FLOATVAL value) {
         STRING* keystr = make_hash_key(INTERP, key);
-        HASH_ENTRY entry;
-        entry.type = enum_hash_num;
-        entry.val.num_val = value;
-        hash_put(INTERP, PMC_ptr1v(SELF), keystr, &entry);
-    }
-
-    void set_bignum (PMC* value) {
-        internal_exception(INTERNAL_PANIC, "Cannot set hash to bignum\n");
-    }
-
-    void set_bignum_native (BIGNUM* size) {
-        internal_exception(INTERNAL_PANIC, "Cannot set hash to bignum\n");
-    }
-
-    void set_bignum_same (PMC* value) {
-        internal_exception(INTERNAL_PANIC, "Cannot set hash to bignum\n");
+        PMC *val = pmc_new(interpreter, enum_class_PerlNum);
+        VTABLE_set_number_native(INTERP, val, value);
+        hash_put(INTERP, PMC_ptr1v(SELF), keystr, val);
     }
 
     void set_bignum_keyed (PMC* key, BIGNUM* value) {
         /* XXX */
     }
 
-    void set_string (PMC* value) {
-        internal_exception(INTERNAL_PANIC, "Cannot set hash to string\n");
-    }
-
-    void set_string_native (STRING* value) {
-        internal_exception(INTERNAL_PANIC, "Cannot set hash to string\n");
-    }
-
-    void set_string_same (PMC* value) {
-        internal_exception(INTERNAL_PANIC, "Cannot set hash to string\n");
-    }
-
     void set_string_keyed (PMC* key, STRING* value) {
         STRING* keystr = make_hash_key(INTERP, key);
-        HASH_ENTRY entry;
-        entry.type = enum_hash_string;
-        entry.val.string_val = value;
-        hash_put(INTERP, PMC_ptr1v(SELF), keystr, &entry);
+        PMC *val = pmc_new(interpreter, enum_class_PerlString);
+        VTABLE_set_string_native(INTERP, val, value);
+        hash_put(INTERP, PMC_ptr1v(SELF), keystr, val);
     }
 
     void set_pmc_keyed (PMC* dest_key, PMC* value) {
         STRING* keystr = make_hash_key(INTERP, dest_key);
-        HASH_ENTRY entry;
-        entry.type = enum_hash_pmc;
-        entry.val.pmc_val = value;
-        hash_put(INTERP, PMC_ptr1v(SELF), keystr, &entry);
+        hash_put(INTERP, PMC_ptr1v(SELF), keystr, value);
     }
 
 
@@ -307,51 +220,45 @@ pmclass PerlHash need_ext does hash {
     INTVAL exists_keyed(PMC* key) {
 	STRING * sx;
 	HASH * h = (HASH *)PMC_ptr1v(SELF);
-	HASH_ENTRY * he;
+	HASHBUCKET *b;
 	sx = key_string(INTERP, key);
 	key = key_next(INTERP, key);
-	he = hash_get(INTERP, h, sx);
-	if (he == NULL)
+	b = hash_get(INTERP, h, sx);
+	if (b == NULL)
 	    return 0;		/* no such key */
 	if (key == NULL)
 	    return 1;		/* lookup stops here */
-	return VTABLE_exists_keyed(INTERP, he->val.pmc_val, key);
+	return VTABLE_exists_keyed(INTERP, (PMC*)b->value, key);
     }
 
     INTVAL defined_keyed(PMC* key) {
 	STRING * sx;
 	HASH * h = (HASH *)PMC_ptr1v(SELF);
-	HASH_ENTRY * he;
+	HASHBUCKET *b;
 	sx = key_string(INTERP, key);
 	key = key_next(INTERP, key);
-	he = hash_get(INTERP, h, sx);
-	if (he == NULL)
+	b = hash_get(INTERP, h, sx);
+	if (b == NULL)
 	    return 0;		/* no such key */
-        if (he->type == enum_hash_pmc) {
-	    if (key == NULL)
-		return VTABLE_defined(INTERP,
-			he->val.pmc_val);
-	    else
-		return VTABLE_defined_keyed(
-			INTERP, he->val.pmc_val, key);
-	}
-	/* some other contents */
-	return 1;
+	if (key == NULL)
+	    return VTABLE_defined(INTERP, (PMC*)b->value);
+	else
+	    return VTABLE_defined_keyed( INTERP, (PMC*)b->value, key);
     }
 
     void delete_keyed(PMC* key) {
 	STRING * sx;
 	HASH * h = (HASH *)PMC_ptr1v(SELF);
-	HASH_ENTRY * he;
+	HASHBUCKET *b;
 	sx = key_string(INTERP, key);
 	key = key_next(INTERP, key);
-	he = hash_get(INTERP, h, sx);
-	if (he == NULL)
+	b = hash_get(INTERP, h, sx);
+	if (b == NULL)
             return;  /* no such key */
 	else if (key == NULL)
 	    hash_delete(INTERP, h, sx);
 	else
-	    VTABLE_delete_keyed(INTERP, he->val.pmc_val, key);
+	    VTABLE_delete_keyed(INTERP, (PMC*)b->value, key);
     }
 
     PMC* nextkey_keyed (PMC* key, INTVAL what) {
