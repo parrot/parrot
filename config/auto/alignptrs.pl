@@ -17,6 +17,12 @@ sub runstep {
      Configure::Data->set(ptr_alignment => 1);
      return;
   }
+  # HP-UX 10.20/32 hangs in this test.
+  # We currently don't need this configure setting,
+  # so we just do not test and set some value here
+  print(" not tested (4) ");
+  Configure::Data->set(ptr_alignment => 4);
+  return;
 
   return if (defined(Configure::Data->get('ptr_alignment')));
   cc_gen('config/auto/alignptrs/test_c.in');
@@ -36,7 +42,7 @@ sub runstep {
   if ($align == 999999) {
     die "Can't determine alignment!\n";
   }
-  
+
   Configure::Data->set(ptr_alignment => $align);
 }
 

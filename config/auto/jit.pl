@@ -99,7 +99,7 @@ sub runstep {
       jit_o       => 'jit$(O) jit_cpu$(O) jit_debug$(O)'
     );
 
-    if (($jitcpuarch eq 'i386' && ($osname =~ /bsd$/i || $osname =~ /linux/i)) 
+    if (($jitcpuarch eq 'i386' && ($osname =~ /bsd$/i || $osname =~ /linux/i))
      || ($jitcpuarch eq 'ppc')) {
       $execcapable = 1;
       if ($osname eq 'openbsd') {
@@ -133,7 +133,7 @@ sub runstep {
         execcapable  => 0
       );
     }
- 
+
     # test for some instructions
     if ($jitcpuarch eq 'i386') {
       cc_gen('config/auto/jit/test_c.in');
@@ -153,6 +153,7 @@ sub runstep {
       jitosname   => 'nojit',
       jitcapable  => 0,
       execcapable => 0,
+      execos      => 0,
       cc_hasjit   => '',
       jit_h       => '',
       jit_o       => '',
