@@ -772,32 +772,194 @@ Parrot_jit_emit_mov_rm_n(Interp * interpreter, int reg, char *mem)
 }
 
 #  ifndef NO_JIT_VTABLE_OPS
-/*
-#    undef Parrot_jit_vtable1_op
-#    undef Parrot_jit_vtable1r_op
-#    undef Parrot_jit_vtable2rk_op
-#    undef Parrot_jit_vtable3k_op
 
+#    undef Parrot_jit_vtable1_op
+/* #    undef Parrot_jit_vtable1r_op */
+ 
+#    undef Parrot_jit_vtable_111_op
 #    undef Parrot_jit_vtable_112_op
 #    undef Parrot_jit_vtable_221_op
 #    undef Parrot_jit_vtable_1121_op
 #    undef Parrot_jit_vtable_1123_op
 #    undef Parrot_jit_vtable_2231_op
-
+/* 
 #    undef Parrot_jit_vtable_1r223_op
 #    undef Parrot_jit_vtable_1r332_op
-
+ 
 #    undef Parrot_jit_vtable_ifp_op
 #    undef Parrot_jit_vtable_unlessp_op
 #    undef Parrot_jit_vtable_newp_ic_op
+*/
+/* emit a call to a vtable func
+ * $X->vtable(interp, $X [, $Y...] )
+ */
+static void
+Parrot_jit_vtable_n_op(Parrot_jit_info_t *jit_info,
+                       Interp *interpreter, int n, int *args)
+{
+    int        nvtable = op_jit[*jit_info->cur_op].extcall;
+    op_info_t *op_info = &interpreter->op_info_table[*jit_info->cur_op];
 
+    int    pmc = 0;  /* pmc saves the left most Pi       */
+    int    rdx = 1;  /* native (outgoing) register index */
 
+    int    idx, pi, i;
+    size_t offset;
+
+    offset  = offsetof(struct _vtable, init);
+    offset += nvtable * sizeof(void *);
+
+    for (idx = 1; idx <= n; idx++) {
+        i  = args[idx - 1];
+        pi = *(jit_info->cur_op + i);
+
+        switch (op_info->types[i]) {
+            case PARROT_ARG_S:
+                emitm_ld_i(jit_info->native_ptr, Parrot_jit_regbase,
+                           REG_OFFS_STR(pi), emitm_o(rdx));
+                break;
+            case PARROT_ARG_K:
+            case PARROT_ARG_P:
+                emitm_ld_i(jit_info->native_ptr, Parrot_jit_regbase,
+                           REG_OFFS_PMC(pi), emitm_o(rdx));
+                if (! pmc) { pmc = rdx; }
+                break;
+            case PARROT_ARG_KI:
+            case PARROT_ARG_I:
+                emitm_ld_i(jit_info->native_ptr, Parrot_jit_regbase,
+                           REG_OFFS_INT(pi), emitm_o(rdx));
+                break;
+            case PARROT_ARG_KIC:
+            case PARROT_ARG_IC:
+                if (emitm_simm13_const(pi)) {
+                    emitm_mov_i(jit_info->native_ptr, pi, emitm_o(rdx));
+                } else {
+                    emitm_sethi(jit_info->native_ptr, emitm_hi22(pi), emitm_o(rdx));
+                    emitm_or_i(jit_info->native_ptr, emitm_o(rdx), emitm_lo10(pi), emitm_o(rdx));
+                }
+                break;
+            case PARROT_ARG_N:
+                emitm_ld_i(jit_info->native_ptr, Parrot_jit_regbase,
+                           REG_OFFS_NUM(pi), emitm_o(rdx));
+                emitm_ld_i(jit_info->native_ptr, Parrot_jit_regbase,
+                           REG_OFFS_NUM(pi) + 4, emitm_o(++rdx));
+                break;
+            case PARROT_ARG_NC:
+#                define NC_addr &interpreter->code->const_table->constants[pi]->u.number
+                emitm_sethi(jit_info->native_ptr, emitm_hi22(NC_addr), XSR1);
+                emitm_or_i(jit_info->native_ptr, XSR1, emitm_lo10(NC_addr), XSR1);
+
+                emitm_ld_i(jit_info->native_ptr, XSR1, 0, emitm_o(rdx));
+                emitm_ld_i(jit_info->native_ptr, XSR1, 4, emitm_o(++rdx));
+                break;
+            case PARROT_ARG_SC:
+#                define SC_addr &interpreter->code->const_table->constants[pi]->u.string
+                emitm_sethi(jit_info->native_ptr, emitm_hi22(SC_addr), XSR1);
+                emitm_or_i(jit_info->native_ptr, XSR1, emitm_lo10(SC_addr), XSR1);
+
+                emitm_ld_i(jit_info->native_ptr, XSR1, 0, emitm_o(rdx));
+              break;
+            case PARROT_ARG_KC:
+#                define KC_addr &interpreter->code->const_table->constants[pi]->u.key
+                emitm_sethi(jit_info->native_ptr, emitm_hi22(KC_addr), XSR1);
+                emitm_or_i(jit_info->native_ptr, XSR1, emitm_lo10(KC_addr), XSR1);
+
+                emitm_ld_i(jit_info->native_ptr, XSR1, 0, emitm_o(rdx));
+              break;
+            default:
+                internal_exception(1,
+                        "jit_vtable_n_op: unimp type %d, arg %d vtable %d",
+                        op_info->types[i], i, nvtable);
+                break;
+        }
+
+        rdx++;
+    }
+
+    emitm_ld_i(jit_info->native_ptr, emitm_o(pmc), offsetof(struct PMC, vtable), XSR1);
+    emitm_ld_i(jit_info->native_ptr, XSR1, offset, XSR1);
+
+    emitm_jumpl_i(jit_info->native_ptr, XSR1, 0, emitm_o(7));
+    emitm_mov_r(jit_info->native_ptr, Parrot_jit_intrp, emitm_o(0));
+}
+
+/* emit a call to a vtable func
+ * $1->vtable(interp, $1)
+ */
 static void
 Parrot_jit_vtable1_op(Parrot_jit_info_t *jit_info,
-                      Interp *interpreter)
+                     Interp * interpreter)
 {
+    int a[] = { 1 };
+    Parrot_jit_vtable_n_op(jit_info, interpreter, 1, a);
 }
-*/
+
+/* emit a call to a vtable func
+ * $1->vtable(interp, $1, $2)
+ */
+static void
+Parrot_jit_vtable_112_op(Parrot_jit_info_t *jit_info,
+                     Interp * interpreter)
+{
+    int a[] = { 1, 2 };
+    Parrot_jit_vtable_n_op(jit_info, interpreter, 2, a);
+}
+
+/* emit a call to a vtable func
+ * $1->vtable(interp, $1, $1)
+ */
+static void
+Parrot_jit_vtable_111_op(Parrot_jit_info_t *jit_info,
+                     Interp * interpreter)
+{
+    int a[] = { 1, 1 };
+    Parrot_jit_vtable_n_op(jit_info, interpreter, 2, a);
+}
+
+/* emit a call to a vtable func
+ * $2->vtable(interp, $2, $1)
+ */
+static void
+Parrot_jit_vtable_221_op(Parrot_jit_info_t *jit_info,
+                     Interp * interpreter)
+{
+    int a[] = { 2, 1 };
+    Parrot_jit_vtable_n_op(jit_info, interpreter, 2, a);
+}
+
+/* emit a call to a vtable func
+ * $2->vtable(interp, $2, $3, $1)
+ */
+static void
+Parrot_jit_vtable_2231_op(Parrot_jit_info_t *jit_info,
+                     Interp * interpreter)
+{
+    int a[] = { 2, 3, 1 };
+    Parrot_jit_vtable_n_op(jit_info, interpreter, 3, a);
+}
+
+/* emit a call to a vtable func
+ * $1->vtable(interp, $1, $2, $3)
+ */
+static void
+Parrot_jit_vtable_1123_op(Parrot_jit_info_t *jit_info,
+                     Interp * interpreter)
+{
+    int a[] = { 1, 2, 3 };
+    Parrot_jit_vtable_n_op(jit_info, interpreter, 3, a);
+}
+
+/* emit a call to a vtable func
+ * $1->vtable(interp, $1, $2, $1)
+ */
+static void
+Parrot_jit_vtable_1121_op(Parrot_jit_info_t *jit_info,
+                     Interp * interpreter)
+{
+    int a[] = { 1, 2, 1 };
+    Parrot_jit_vtable_n_op(jit_info, interpreter, 3, a);
+}
+
 #endif /* NO_JIT_VTABLE_OPS */
 
 #else
