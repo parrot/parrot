@@ -120,7 +120,6 @@ struct _ParrotIOLayer {
 
 #define PIO_DOWNLAYER(x)   x->down
 #define PIO_UPLAYER(x)     x->up
-#define GET_INTERP_IO(i)   (((ParrotIOData*)i->piodata)->default_stack)
 
 /*
  * Terminal layer can't be pushed on top of other layers;

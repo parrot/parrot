@@ -82,7 +82,7 @@ PIO_new(theINTERP, INTVAL iotype, INTVAL flags, INTVAL mode)
     new_io->fpos = new_io->lpos = piooffsetzero;
     new_io->flags = flags;
     new_io->mode = mode;
-    new_io->stack = GET_INTERP_IO(interpreter);
+    new_io->stack = interpreter->piodata->default_stack;
     new_io->b.flags = 0;
     new_io->b.size = 0;
     new_io->b.startb = NULL;
@@ -219,7 +219,7 @@ PIO_init_stacks(theINTERP)
     PIO_push_layer(interpreter, PIO_base_new_layer(&pio_buf_layer), NULL);
 
     /* Note: All layer pushes should be done before init calls */
-    for (p = GET_INTERP_IO(interpreter); p; p = p->down) {
+    for (p = interpreter->piodata->default_stack; p; p = p->down) {
         if (p->api->Init) {
             if ((*p->api->Init) (interpreter, p) != 0) {
                 char buf[1024];
@@ -547,7 +547,7 @@ PMC *
 PIO_open(theINTERP, const char *spath, const char *sflags)
 {
     ParrotIO *io;
-    ParrotIOLayer *l = GET_INTERP_IO(interpreter);
+    ParrotIOLayer *l = interpreter->piodata->default_stack;
     INTVAL flags = PIO_parse_open_flags(sflags);
 
     io = PIO_open_down(interpreter, l, spath, flags);
@@ -571,7 +571,7 @@ PIO_fdopen(theINTERP, PIOHANDLE fd, const char *sflags)
 {
     ParrotIO *io;
     INTVAL flags;
-    ParrotIOLayer *l = GET_INTERP_IO(interpreter);
+    ParrotIOLayer *l = interpreter->piodata->default_stack;
 
     flags = PIO_parse_open_flags(sflags);
     io = PIO_fdopen_down(interpreter, l, fd, flags);
@@ -858,7 +858,7 @@ PMC *
 PIO_socket(theINTERP, INTVAL fam, INTVAL type, INTVAL proto)
 {
     ParrotIO *io;
-    ParrotIOLayer *l = GET_INTERP_IO(interpreter);
+    ParrotIOLayer *l = interpreter->piodata->default_stack;
     io = PIO_socket_down(interpreter, l, fam, type, proto);
     if(io)
         return new_io_pmc(interpreter, io);
