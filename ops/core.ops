@@ -198,14 +198,12 @@ AUTO_OP print(s|sc) {
 
 AUTO_OP print(p) {
   PMC *p = $1;
-  if (p->vtable != &Parrot_base_vtables[enum_class_PerlInt]) {
-    printf("This disgustingly ugly hack has served its purpose\n");
-    abort();
+  if (p->vtable == &Parrot_base_vtables[enum_class_PerlInt]) {
+    printf("%li",(long)(p->vtable->get_integer(interpreter, p)));
+  } else if (p->vtable == &Parrot_base_vtables[enum_class_PerlNum]) {
+    printf("%f",(p->vtable->get_number(interpreter, p)));
   }
-  printf("%li",(long)(p->vtable->get_integer(interpreter, p)));
 }
-
-
 
 
 ########################################
@@ -333,6 +331,10 @@ These operations load registers from constants or other registers.
 
 =item B<set>(n, nc)
 
+=item B<set>(p, n)
+
+=item B<set>(p, nc)
+
 =item B<set>(n, p)
 
 =item B<set>(s, sc)
@@ -362,6 +364,10 @@ AUTO_OP set(s, s|sc) {
 
 AUTO_OP set(p, i|ic) { 
   $1->vtable->set_integer_native(interpreter, $1, $2);
+}
+
+AUTO_OP set(p, n|nc) { 
+  $1->vtable->set_number_native(interpreter, $1, $2);
 }
 
 =back
