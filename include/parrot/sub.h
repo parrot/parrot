@@ -31,6 +31,7 @@ typedef struct Parrot_Sub {
     struct PackFile_ByteCode *seg;
     opcode_t *end;      /* end of bytecode in normal (bounds_check run loop */
     char *packed;       /* to simplify packing Constant Subs */
+    size_t use_reg_offs; /* offset of highest changed register*/
 } * parrot_sub_t;
 
 #define PMC_sub(pmc) LVALUE_CAST(parrot_sub_t, PMC_pmc_val(pmc))
@@ -43,6 +44,7 @@ typedef struct Parrot_Coroutine {
     struct PackFile_ByteCode *seg;
     opcode_t *end;      /* end of bytecode in normal (bounds_check run loop */
     char *packed;       /* to simplify packing Constant Subs */
+    size_t use_reg_offs; /* offset of highest changed register*/
     struct Stack_Chunk *co_control_base;
     struct Stack_Chunk *co_control_stack;  /* control stack top of the cor.*/
 } * parrot_coroutine_t;

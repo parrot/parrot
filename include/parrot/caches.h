@@ -39,6 +39,7 @@ typedef struct _regsave {
     struct _regsave *prev;       /* free list ptr */
     struct _regsave *next;       /* mark list ptr */
     reg_store      regs;
+    size_t size;                 /* saved size */
 } regsave;
 
 typedef struct _regs_cache {
