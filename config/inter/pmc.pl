@@ -35,7 +35,12 @@ END
   # names of class files for classes/Makefile
   (my $pmc_o = $pmc) =~ s/\.pmc/\$(O)/g;
   # calls to pmc2c.pl for classes/Makefile
-  (my $pmc_build = $pmc) =~ s/(.*?)\.pmc ?/$1.c $1.h: $1.pmc\n\t\$(PMC2C) $1.pmc\n\n$1\$(O): \$(H_FILES)\n\n/g;
+  (my $pmc_build = $pmc) =~ s{(.*?)\.pmc ?}{
+    # make each pmc depend upon its parent. Only one level PMC hierarchies exist at the moment
+    my $parent = "";
+    $parent = "default.pmc" if ($1 ne "default");
+    "$1.c $1.h: $parent $1.pmc\n\t\$(PMC2C) $1.pmc\n\n$1\$(O): \$(H_FILES)\n\n"
+  }eg;
   # build list of libraries for link line in Makfile
   (my $pmc_classes_o = $pmc_o) =~ s/^| / classes\//g;
   
