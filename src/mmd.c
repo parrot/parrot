@@ -451,6 +451,7 @@ mmd_expand_x(Interp *interpreter, INTVAL function, INTVAL new_x)
     }
     if (interpreter->binop_mmd_funcs->mmd_funcs[function])
         mem_sys_free(interpreter->binop_mmd_funcs->mmd_funcs[function]);
+    interpreter->binop_mmd_funcs->x[function] = new_x;
     /* Set the old table to point to the new table */
     interpreter->binop_mmd_funcs->mmd_funcs[function] = new_table;
 }

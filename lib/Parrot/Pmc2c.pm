@@ -489,21 +489,35 @@ sub init_func() {
     if (exists $self->{flags}{is_shared}) {
         $vtbl_flag .= '|VTABLE_IS_SHARED_FLAG';
     }
-    my @meths;
+    my (@meths, @mmds);
     foreach my $method (@{ $self->{vtable}{methods}} ) {
         my $meth = $method->{meth};
+        my $meth_name;
         if ($self->implements($meth)) {
-            push @meths, "Parrot_${classname}_$meth";
+            $meth_name = "Parrot_${classname}_$meth";
         }
         elsif (exists $self->{super}{$meth}) {
             my $class = $self->{super}{$meth};
-            push @meths, "Parrot_${class}_$meth";
+            $meth_name = "Parrot_${class}_$meth";
         }
         else {
-            push @meths, "Parrot_default_$meth";
+            $meth_name = "Parrot_default_$meth";
+        }
+        push @meths, $meth_name;  # for now push even MMDs
+        if ($method->{mmd} =~ /MMD_/) {
+            my ($func, $left, $right);
+            $func = $method->{mmd};
+            $left = "enum_class_$classname";
+            $right = 0;
+            push @mmds, [ $func, $left, $right, $meth_name ];
         }
     }
     my $methlist = join(",\n        ", @meths);
+    my $mmd_list = join(",\n        ", map {
+        "{ $_->[0], $_->[1], $_->[2],
+                    (funcptr_t) $_->[3] }" } @mmds);
+    # XXX mmd_default - old cruft
+    $mmd_list = '/* N/Y */' if $classname =~ /^(mmd_default|Integer|Float)$/;
     my $isa = join(" ", $classname, @{ $self->{parents} });
     $isa =~ s/\s?default$//;
     my $does = join(" ", keys(%{ $self->{flags}{does} }));
@@ -528,6 +542,16 @@ EOC
     $cout .= <<"EOC";
     };
 
+    const struct {
+        INTVAL func_nr;
+        INTVAL left, right;
+        funcptr_t func_ptr;
+    } _temp_mmd_init[] = {
+        $mmd_list
+    };
+
+    int i;
+
     /*
      * parrotio calls some class_init functions during its class_init
      * code, so some of the slots might already be allocated
@@ -545,6 +569,17 @@ EOC
 
 	Parrot_base_vtables[entry] =
 	    Parrot_clone_vtable(interp, &temp_base_vtable);
+    }
+    /*
+     * register mmds
+     */
+    #define N_MMD_INIT (sizeof(_temp_mmd_init)/sizeof(_temp_mmd_init[0]))
+    for (i = 0; i < (int)N_MMD_INIT; ++i) {
+        mmd_register(interp,
+            _temp_mmd_init[i].func_nr,
+            _temp_mmd_init[i].left,
+            _temp_mmd_init[i].right,
+            _temp_mmd_init[i].func_ptr);
     }
     $class_init_code
 } /* Parrot_${classname}_class_init */

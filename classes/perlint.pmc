@@ -24,11 +24,6 @@ C<PerlInt> extends C<perlscalar> to provide a Perl integer.
 
 pmclass PerlInt extends perlscalar {
 
-    void class_init() {
-        mmd_register(interp, MMD_BXOR, enum_class_PerlInt, 0,
-                (funcptr_t)Parrot_PerlInt_bitwise_xor);
-    }
-
 /*
 
 =item C<void init()>
