@@ -68,10 +68,10 @@ intval_mod(INTVAL i2, INTVAL i3)
     r = y % z;
 
     switch (s) {
-	case 0 + 0:            break;
-	case 0 + 1: r = r - z; break;
-	case 2 + 0: r = z - r; break;
-	case 2 + 1: r = -r;    break;
+	case 0:            break;
+	case 1: r = r - z; break;
+	case 2: r = z - r; break;
+	case 3: r = -r;    break;
     }
 
     return r;

@@ -40,7 +40,7 @@ if (@ARGV) {
 shift(@ARGV);
 
 tokenize();
-push(@ARGV);
+#push(@ARGV);
 parse(@ARGV);
 
 open(CODE, ">TARG_test.imc") || die;

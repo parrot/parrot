@@ -73,6 +73,13 @@ STRING *string_bitwise_xor(struct Parrot_Interp *interpreter, STRING *s1,
 void string_iterator_init(struct string_iterator_t *i, const STRING *s);
 UINTVAL string_decode_and_advance(struct string_iterator_t *i);
 
+STRING *string_upcase(struct Parrot_Interp *, const STRING *);
+STRING *string_downcase(struct Parrot_Interp *, const STRING *);
+STRING *string_titlecase(struct Parrot_Interp *, const STRING *);
+void string_upcase_inplace(struct Parrot_Interp *, STRING *);
+void string_downcase_inplace(struct Parrot_Interp *, STRING *);
+void string_titlecase_inplace(struct Parrot_Interp *, STRING *);
+
 #endif
 
 #endif

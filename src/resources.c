@@ -22,7 +22,7 @@ src/resources.c - Allocate and deallocate tracked resources
 #define RECLAMATION_FACTOR 0.20
 #define MINIMUM_MEMPOOL_SIZE  1
 #define MAXIMUM_MEMPOOL_SIZE  8
-
+#define WE_WANT_EVER_GROWING_ALLOCATIONS
 typedef void (*compact_f) (struct Parrot_Interp *, struct Memory_Pool *);
 
 /*

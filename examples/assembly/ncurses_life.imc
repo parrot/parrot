@@ -327,11 +327,16 @@ print_err:
 	ENV = new Env
 	$S0 = ENV["COLUMNS"]
 	cols = $S0
+        if cols, checklines
+	cols = 80
+ checklines:
 	$S0 = ENV["LINES"]
 	rows = $S0
+	if rows, donelines
+ 	rows = 24
+ donelines:
 	.local int X_COORD
 	.local int Y_COORD
-
 printloop:
         # TODO skip unprintable out of screen
 	if CHARACTER_OFFSET >= total goto dumpend
@@ -339,9 +344,9 @@ printloop:
 	substr_r $S0, world, CHARACTER_OFFSET, 1
 	if $S0 != "*" goto incit
 	X_COORD = CHAR_POS % size
-	if X_COORD > cols goto incit
 	Y_COORD = CHAR_POS / size
 	Y_COORD = Y_COORD + 2
+	if X_COORD > cols goto incit
 	if Y_COORD > rows goto dumpend
 	.pcc_begin prototyped
 	.arg STDSCR
@@ -447,6 +452,11 @@ dumpend:
 	.param string world
 	.param int size
 	.param int stop
+
+#print "World:\n"
+#print world
+#print "\n"
+#sleep 3
 
 	.sym int len
 	.sym int pos
@@ -566,7 +576,6 @@ dif:
 	S16 = ""
 	repeat S16, S17, $I0
 nosize:
-
 	set S0,  "               "
 	set S1,  "               "
 	set S2,  "               "

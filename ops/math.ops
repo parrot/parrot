@@ -238,6 +238,8 @@ inline op cmod(out INT, in INT, in INT) {
 
 =item B<cmod>(in PMC, in PMC, in NUM)
 
+=item B<cmod>(out PMC, in INT, in INT)
+
 =cut
 
 inline op cmod(in PMC, in PMC, in PMC) {
@@ -254,6 +256,12 @@ inline op cmod(in PMC, in PMC, in NUM) {
   $2->vtable->cmodulus_float(interpreter, $2, $3, $1);
   goto NEXT();
 }
+
+op cmod(in PMC, in INT, in INT) {
+  $1->vtable->set_integer_native(interpreter, $1, $2 % $3);
+  goto NEXT();
+}
+
 
 ########################################
 
@@ -525,6 +533,8 @@ References:
 
 =item B<mod>(in PMC, in PMC, in NUM)
 
+=item B<mod>(out PMC, in INT, in INT)
+
 Sets $1 to the modulus of $2 and $3.
 
 =item B<mod>(in PMC, in INT)
@@ -535,6 +545,13 @@ Sets $1 to the modulus of $1 and $2.
 
 op mod(out INT, in INT, in INT) {
   $1 = intval_mod($2, $3);
+  goto NEXT();
+}
+
+op mod(in PMC, in INT, in INT) {
+   INTVAL value;
+  value = intval_mod($2, $3);
+  $1->vtable->set_integer_native(interpreter, $1, intval_mod($2, $3));
   goto NEXT();
 }
 

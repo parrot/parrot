@@ -2126,6 +2126,64 @@ string_iterator_init(struct string_iterator_t *i, const STRING *s)
     i->set_position = s->encoding->set_position;
 }
 
+
+/* for api string_upcase
+   Return an upper-case version of the string s. Non-caseable
+   characters are left unchanged
+ */
+STRING *
+string_upcase(struct Parrot_Interp *interpreter, const STRING *s) {
+        internal_exception(INTERNAL_NOT_IMPLEMENTED,
+                           "Case mangling not yet implemented");
+}
+
+/* for api string_upcase_inplace
+   upcase the passed-in string in place.
+*/
+void
+string_upcase_inplace(struct Parrot_Interp *interpreter, STRING *s) {
+        internal_exception(INTERNAL_NOT_IMPLEMENTED,
+                           "Case mangling not yet implemented");
+}
+
+/* for api string_downcase
+   Return an downc-case version of the string s. Non-caseable
+   characters are left unchanged
+ */
+STRING *
+string_downcase(struct Parrot_Interp *interpreter, const STRING *s) {
+        internal_exception(INTERNAL_NOT_IMPLEMENTED,
+                           "Case mangling not yet implemented");
+}
+
+/* for api string_downcase_inplace
+   downcase the passed-in string in place.
+*/
+void
+string_downcase_inplace(struct Parrot_Interp *interpreter, STRING *s) {
+        internal_exception(INTERNAL_NOT_IMPLEMENTED,
+                           "Case mangling not yet implemented");
+}
+
+/* for api string_titlecase
+   Return an title-case version of the string s. Non-caseable
+   characters are left unchanged
+ */
+STRING *
+string_titlecase(struct Parrot_Interp *interpreter, const STRING *s) {
+        internal_exception(INTERNAL_NOT_IMPLEMENTED,
+                           "Case mangling not yet implemented");
+}
+
+/* for api string_titlecase_inplace
+  titlecase the passed-in string in place.
+*/
+void
+string_titlecase_inplace(struct Parrot_Interp *interpreter, STRING *s) {
+        internal_exception(INTERNAL_NOT_IMPLEMENTED,
+                           "Case mangling not yet implemented");
+}
+
 /*
 
 =back

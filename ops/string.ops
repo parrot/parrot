@@ -583,11 +583,69 @@ inline op stringinfo(out INT, in STR, in INT) {
   goto NEXT();
 }
 
-=back
+=cut
+
+########################################
+
+=item B<upcase>(out STR, in STR)
+
+Uppercase $2 and put the result in $1
+
+=item B<upcase>(inout STR)
+
+Uppercase $1 in place
 
 =cut
 
+inline op upcase(out STR, in STR) {
+  goto NEXT();
+}
+
+inline op upcase(inout STR) {
+  goto NEXT();
+}
+
+=item B<downcase>(out STR, in STR)
+
+Downcase $2 and put the result in $1
+
+=item B<downcase>(inout STR)
+
+Downcase $1 in place
+
+=cut
+
+inline op downcase(out STR, in STR) {
+  goto NEXT();
+}
+
+inline op downcase(inout STR) {
+  goto NEXT();
+}
+
+=item B<titlecase>(out STR, in STR)
+
+Titlecase $2 and put the result in $1
+
+=item B<titlease>(inout STR)
+
+Titlecase $1 in place
+
+=cut
+
+inline op titlecase(out STR, in STR) {
+  $1 = string_titlecase(interpreter, $2);
+  goto NEXT();
+}
+
+inline op titlecase(inout STR) {
+  string_titlecase_inplace(interpreter, $1);
+  goto NEXT();
+}
+
 ###############################################################################
+
+=back
 
 =head1 COPYRIGHT
 
