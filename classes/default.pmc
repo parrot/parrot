@@ -810,17 +810,21 @@ Look for NCI methods and propertys.
     }
 
     PMC* get_attr_str(STRING* name) {
-        /* lets look for props first */
-        PMC *p;
+        PMC *p = NULL;
         HashBucket* b;
+        /* lets look for props first
+         * XXX do we need that in the default object system?
+         */
         if (SELF->pmc_ext && PMC_metadata(SELF)) {
              b = hash_get_bucket(INTERP, (Hash*) PMC_metadata(SELF), name);
              if (b)
-                 return b->value;
+                 p = b->value;
         }
-        /* may be NCI? */
-        p = Parrot_find_method_with_cache(INTERP, SELF, name);
-        if (!p) {
+        if (PMC_IS_NULL(p)) {
+            /* may be NCI? */
+            p = VTABLE_find_method(INTERP, SELF, name);
+        }
+        if (PMC_IS_NULL(p)) {
             /* TODO AttributeError */
         }
         else if (p->vtable->base_type == enum_class_NCI) {
