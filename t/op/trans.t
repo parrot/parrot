@@ -11,32 +11,44 @@ use Math::Trig qw( tan sec atan asin acos asec cosh sinh tanh sech );
 
 my $fp_equality_macro = <<'ENDOFMACRO';
 fp_eq	macro	J,K,L
-	save	J
-	save	K
-	pushn
-	restore	N1
-	restore	N0
+	save	N0
+	save	N1
+	save	N2
+
+	set	N0, J
+	set	N1, K
 	sub	N2, N1,N0
 	abs	N2, N2
 	gt	N2, 0.000001, $FPEQNOK
-	popn
-	branch	L
-$FPEQNOK:	
-	popn
-endm
-fp_ne	macro	J,K,L
-	save	J
-	save	K
-	pushn
+
+	restore N2
 	restore	N1
 	restore	N0
+	branch	L
+$FPEQNOK:
+	restore N2
+	restore	N1
+	restore	N0
+endm
+fp_ne	macro	J,K,L
+	save	N0
+	save	N1
+	save	N2
+
+	set	N0, J
+	set	N1, K
 	sub	N2, N1,N0
 	abs	N2, N2
 	lt	N2, 0.000001, $FPNENOK
-	popn
+
+	restore	N2
+	restore	N1
+	restore	N0
 	branch	L
-$FPNENOK:	
-	popn
+$FPNENOK:
+	restore	N2
+	restore	N1
+	restore	N0
 endm
 ENDOFMACRO
 
