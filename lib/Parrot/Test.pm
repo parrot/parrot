@@ -92,6 +92,16 @@ my $count = 0;
 
 sub generate_functions {
   my ($package, $pbc_generator, $directory) = @_;
+
+  sub slurp_file {
+    open SLURP, "< $_[0]";
+    local $/ = undef;
+    my $file = <SLURP> . '';
+    $file =~ s/\cM\cJ/\n/g;
+    close SLURP;
+    return $file;
+  }
+
   foreach my $func ( keys %Test_Map ) {
     no strict 'refs';
 
@@ -117,17 +127,8 @@ sub generate_functions {
       $TEST_PROG_ARGS = $ENV{TEST_PROG_ARGS} || '';
       _run_command( "${directory}$PConfig{test_prog} ${TEST_PROG_ARGS} $by_f", 'STDOUT' => $out_f, 'STDERR' => $out_f);
 
-      my $prog_output;
-      open OUTPUT, "< $out_f";
-      {
-        local $/ = undef;
-        $prog_output = <OUTPUT> . '';
-        $prog_output =~ s/\cM\cJ/\n/g;
-      }
-      close OUTPUT;
-
       my $meth = $Test_Map{$func};
-      my $pass = $Builder->$meth( $prog_output, $output, $desc );
+      my $pass = $Builder->$meth( slurp_file($out_f), $output, $desc );
 
       unless($ENV{POSTMORTEM}) {
         unlink $out_f;
@@ -145,7 +146,7 @@ sub generate_functions {
   foreach my $func ( keys %C_Test_Map ) {
     no strict 'refs';
 
-    *{$package.'::'.$func} = sub ($$;$) {
+    *{$package.'::'.$func} = sub ($$;$ ) {
       my( $source, $output, $desc ) = @_;
 
       ++$count;
@@ -157,30 +158,30 @@ sub generate_functions {
       my $exe_f = per_test($PConfig{exe},$count);
       $exe_f =~ s@[\\/:]@$PConfig{slash}@g;
       my $out_f = per_test('.out',$count);
+      my $build_f = per_test('.build',$count);
 
       open SOURCE, "> $source_f" or die "Unable to open '$source_f'";
       binmode SOURCE;
       print SOURCE $source;
       close SOURCE;
 
-      _run_command("$PConfig{cc} $PConfig{ccflags} -I./include -c $PConfig{cc_o_out}$obj_f $source_f");
-      _run_command("$PConfig{link} $PConfig{linkflags} $obj_f $PConfig{ld_out}$exe_f blib/lib/libparrot$PConfig{a} $PConfig{libs}");
-      my $prog_output;
+      _run_command("$PConfig{cc} $PConfig{ccflags} -I./include -c $PConfig{cc_o_out}$obj_f $source_f", 'STDOUT' => $build_f, 'STDERR' => $build_f);
+      _run_command("$PConfig{link} $PConfig{linkflags} $obj_f $PConfig{ld_out}$exe_f blib/lib/libparrot$PConfig{a} $PConfig{libs}", 'STDOUT' => $build_f, 'STDERR' => $build_f);
+
+      if (! -e $exe_f) {
+	$Builder->diag("Failed to build '$exe_f': " . slurp_file($build_f));
+	unlink $build_f;
+	return 0;
+      }
+
       _run_command(".$PConfig{slash}$exe_f", 'STDOUT' => $out_f, 'STDERR' => $out_f);
 
-      open OUTPUT, "< $out_f";
-      {
-        local $/ = undef;
-        $prog_output = <OUTPUT> . '';
-        $prog_output =~ s/\cM\cJ/\n/g;
-      }
-      close OUTPUT;
-
       my $meth = $C_Test_Map{$func};
-      my $pass = $Builder->$meth( $prog_output, $output, $desc );
+      my $pass = $Builder->$meth( slurp_file($out_f), $output, $desc );
 
       unless($ENV{POSTMORTEM}) {
         unlink $out_f;
+	unlink $build_f;
       }
       return $pass;
     }
