@@ -76,6 +76,11 @@ Note: Do B<not> use this opcode. It is for internal use only.
 
 TODO: Load the opcode library $1.
 
+=item B<load_bytecode>(in STR)
+
+Load Parrot bytecode from file $1, and (TODO) search the library path,
+to locate the file.
+
 =cut
 
 inline op noop() {
@@ -111,6 +116,13 @@ inline op reserved(in INT) {
   goto NEXT();  /* reserve 2 entries */
 }
 
+inline op load_bytecode(in STR) {
+  char * file = string_to_cstring(interpreter, $1);
+  Parrot_load_bytecode(interpreter, file);
+  string_cstring_free(file);
+  goto NEXT();
+}
+
 =back
 
 =cut
@@ -138,9 +150,14 @@ inline op branch (in INT) {
 }
 
 
-=item B<branch_cs>(in INT)
+=item B<branch_cs>(inconst INT)
 
-Intersegment branch to location in fixup table $1.
+Intersegment branch to location in fixup table $1, $1 is an index into
+the current const_table holding the name of the label.
+
+=item B<branch_cs>(in STR)
+
+Intersegment branch to location in fixup table named $1.
 
 =cut
 
@@ -150,6 +167,19 @@ inline op branch_cs (inconst INT) {
   goto ADDRESS(0);
 }
 
+inline op branch_cs (in STR) {
+    char * label = string_to_cstring(interpreter, $1);
+    struct PackFile_FixupEntry *fe = PackFile_find_fixup_entry(interpreter,
+	    enum_fixup_label, label);
+    string_cstring_free(label);
+    if (!fe)
+	interpreter->resume_offset = -1;
+    else
+	interpreter->resume_offset = fe->offset;
+    interpreter->code = fe->seg->base.pf;
+    interpreter->resume_flag = 1;
+    goto ADDRESS(0);
+}
 
 ########################################
 

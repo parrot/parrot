@@ -18,6 +18,7 @@
 */
 
 #include "parrot/parrot.h"
+#include "parrot/embed.h"
 #include "parrot/packfile.h"
 
 #define TRACE_PACKFILE 0
@@ -1716,9 +1717,11 @@ find_fixup(struct PackFile_FixupTable *ft, enum_fixup_t type,
 static INTVAL
 find_fixup_iter(struct PackFile_Segment *seg, void *user_data)
 {
-    if (seg->type == PF_DIR_SEG)
-	PackFile_map_segments((struct PackFile_Directory*)seg,
-                find_fixup_iter, user_data);
+    if (seg->type == PF_DIR_SEG) {
+	if (PackFile_map_segments((struct PackFile_Directory*)seg,
+                find_fixup_iter, user_data))
+            return 1;
+    }
     else if (seg->type == PF_FIXUP_SEG) {
         struct PackFile_FixupEntry **e = user_data;
         struct PackFile_FixupEntry *fe = find_fixup(
@@ -2227,9 +2230,45 @@ PackFile_Constant_unpack_key(struct Parrot_Interp *interpreter,
 
 =back
 
+=item PackFile_append_pbc
+
+Read a PBC and append it to the current directory
+
+=item Parrot_load_bytecode
+
+Load some bytecode (PASM, PIR, PBC ...) and append it to the current
+directory.
+
 =cut
 
 */
+
+static struct PackFile *
+PackFile_append_pbc(struct Parrot_Interp *interpreter, char *filename)
+{
+    struct PackFile * pf = Parrot_readbc(interpreter, filename);
+    if (!pf)
+        return NULL;
+    PackFile_add_segment(&interpreter->code->directory,
+            &pf->directory.base);
+    return pf;
+}
+
+void
+Parrot_load_bytecode(struct Parrot_Interp *interpreter, char *filename)
+{
+    char *ext;
+
+    ext = strrchr(filename, '.');
+    if (ext && strcmp (ext, ".pasm") == 0) {
+        internal_exception(1, "Can't load PASM yet.");
+    }
+    else if (ext && strcmp (ext, ".pbc") == 0) {
+        PackFile_append_pbc(interpreter, filename);
+    }
+    else
+        internal_exception(1, "Can't load this file yet.");
+}
 
 /*
 * Local variables:

@@ -603,6 +603,9 @@ runops_int(struct Parrot_Interp *interpreter, size_t offset)
          * is ok.
          */
         interpreter->lo_var_ptr = (void *)&lo_var_ptr;
+        if ((interpreter->resume_flag & 1) &&
+                (int)interpreter->resume_offset < 0)
+                internal_exception(1, "branch_cs: illegal resume offset");
     }
 }
 
