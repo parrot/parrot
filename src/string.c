@@ -739,7 +739,7 @@ string_substr(struct Parrot_Interp *interpreter, STRING *src,
 
         if (subend_off < substart_off) {
             internal_exception(SUBSTR_OUT_OF_STRING,
-                    "subend somehow is less than substart");
+                    "substr: subend somehow is less than substart");
         }
 
         dest->strstart = (char *)dest->strstart + substart_off;
@@ -813,7 +813,7 @@ string_replace(struct Parrot_Interp *interpreter, STRING *src,
 
     if (subend_off < substart_off) {
         internal_exception(SUBSTR_OUT_OF_STRING,
-                           "subend somehow is less than substart");
+                           "replace: subend somehow is less than substart");
     }
 
     /* XXX if *d == NULL, dest is unused, we could drop below lines
