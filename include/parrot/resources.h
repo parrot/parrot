@@ -33,6 +33,8 @@ void free_bignum(void);
 void *Parrot_allocate(struct Parrot_Interp *, UINTVAL size);
 void Parrot_alloc_new_block(struct Parrot_Interp *, UINTVAL size);
 
+void buffer_lives(Buffer *);
+
 struct PMC_Arena {
     UINTVAL free;	  /* Count of PMCs free in this arena */
     UINTVAL used;         /* Count of PMCs used in this arena */

@@ -122,4 +122,7 @@ Parrot_allocate(struct Parrot_Interp *interpreter, UINTVAL size) {
   return((void *)return_val);
 }
 
-
+void
+buffer_lives(Buffer *buffer) {
+  buffer->flags &= BUFFER_GC_FLAG;
+}
