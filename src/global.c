@@ -113,6 +113,43 @@ Parrot_find_global(Parrot_Interp interpreter, STRING *class, STRING *globalname)
 }
 
 PMC *
+Parrot_find_global_p(Parrot_Interp interpreter, PMC *ns, STRING *name)
+{
+    PMC *stash;
+    STRING *class, *ns_name;
+
+    if (PMC_IS_NULL(ns))
+        return Parrot_find_global(interpreter, NULL, name);
+    switch (ns->vtable->base_type) {
+        case enum_class_String:
+            return Parrot_find_global(interpreter, PMC_str_val(ns), name);
+        case enum_class_Key:
+            stash = interpreter->globals->stash_hash;
+            while (1) {
+                class = key_string(interpreter, ns);
+                ns_name = string_concat(interpreter,
+                        string_from_cstring(interpreter, "\0", 1),
+                        class, 0);
+                if (!VTABLE_exists_keyed_str(interpreter, stash, ns_name)) {
+                    return NULL;
+                }
+                stash = VTABLE_get_pmc_keyed_str(interpreter, stash, ns_name);
+                ns = key_next(interpreter, ns);
+                if (!ns)
+                    break;
+            }
+            assert(ns->vtable->base_type == enum_class_Hash);
+            /* fall through */
+        case enum_class_Hash:
+            if (!VTABLE_exists_keyed_str(interpreter, ns, name)) {
+                return NULL;
+            }
+            return VTABLE_get_pmc_keyed_str(interpreter, ns, name);
+    }
+    return NULL;
+}
+
+PMC *
 Parrot_get_global(Parrot_Interp interpreter, STRING *class,
         STRING *name, void *next)
 {
@@ -126,7 +163,22 @@ Parrot_get_global(Parrot_Interp interpreter, STRING *class,
                 "Global '%Ss' not found",
                 name);
     }
+    return pmc_new(interpreter, enum_class_Undef);
+}
 
+PMC *
+Parrot_get_global_p(Parrot_Interp interpreter, PMC *ns, STRING *name)
+{
+    PMC *g = Parrot_find_global_p(interpreter, ns, name);
+    if (g)
+        return g;
+    if (PARROT_ERRORS_test(interpreter, PARROT_ERRORS_GLOBALS_FLAG))  {
+        real_exception(interpreter, NULL, E_NameError,
+               Interp_flags_TEST(interpreter, PARROT_PYTHON_MODE) ?
+                "global name '%Ss' is not defined" :
+                "Global '%Ss' not found",
+                name);
+    }
     return pmc_new(interpreter, enum_class_Undef);
 }
 
@@ -242,16 +294,13 @@ Parrot_store_global(Interp *interpreter, STRING *class,
     Parrot_invalidate_method_cache(interpreter, class);
 }
 
-void
-Parrot_store_sub_in_namespace(Parrot_Interp interpreter, PMC* sub_pmc)
+static void
+store_sub_in_namespace(Parrot_Interp interpreter, PMC* sub_pmc,
+        PMC *name_space, STRING *sub_name)
 {
     PMC *globals = interpreter->globals->stash_hash;
     INTVAL type, class_type;
-    STRING* sub_name;
-    PMC *name_space;
 
-    sub_name = PMC_sub(sub_pmc)->name;
-    name_space = PMC_sub(sub_pmc)->name_space;
 #if DEBUG_GLOBAL
     fprintf(stderr, "PMC_CONST: store_global: name '%s' ns %s\n",
             (char*)sub_name->strstart,
@@ -312,6 +361,62 @@ global_ns:
                 internal_exception(1, "Unhandled namespace constant");
         }
 
+    }
+}
+
+/* XXX in mmd.c ? */
+STRING* Parrot_multi_long_name(Parrot_Interp interpreter, PMC* sub_pmc);
+
+STRING*
+Parrot_multi_long_name(Parrot_Interp interpreter, PMC* sub_pmc)
+{
+    PMC *multi_sig;
+    STRING* sub_name, *sig;
+    INTVAL i, n;
+
+    sub_name = PMC_sub(sub_pmc)->name;
+    multi_sig = PMC_sub(sub_pmc)->multi_signature;
+    n = VTABLE_elements(interpreter, multi_sig);
+    /*
+     * foo @MULTI(STRING, Integer) =>
+     *
+     * foo_@STRING_@Integer
+     */
+    for (i = 0; i < n; ++i) {
+        sig = VTABLE_get_string_keyed_int(interpreter, multi_sig, i);
+        sub_name = string_concat(interpreter, sub_name,
+                const_string(interpreter, "_@"), 0);
+        sub_name = string_concat(interpreter, sub_name, sig, 0);
+    }
+    return sub_name;
+}
+
+void
+Parrot_store_sub_in_namespace(Parrot_Interp interpreter, PMC* sub_pmc)
+{
+    STRING* sub_name;
+    PMC *multi_sig;
+    PMC *name_space;
+
+    sub_name = PMC_sub(sub_pmc)->name;
+    name_space = PMC_sub(sub_pmc)->name_space;
+    multi_sig = PMC_sub(sub_pmc)->multi_signature;
+    if (PMC_IS_NULL(multi_sig)) {
+        store_sub_in_namespace(interpreter, sub_pmc, name_space, sub_name);
+    }
+    else {
+        STRING *long_name;
+        PMC *multi_sub;
+
+        multi_sub = Parrot_find_global_p(interpreter, name_space, sub_name);
+        if (!multi_sub) {
+            multi_sub = pmc_new(interpreter, enum_class_MultiSub);
+            store_sub_in_namespace(interpreter, multi_sub,
+                    name_space, sub_name);
+        }
+        VTABLE_push_pmc(interpreter, multi_sub, sub_pmc);
+        long_name = Parrot_multi_long_name(interpreter, sub_pmc);
+        store_sub_in_namespace(interpreter, sub_pmc, name_space, long_name);
     }
 }
 

@@ -862,7 +862,7 @@ mmd_search_default(Interp *interpreter, STRING *meth, PMC *arg_tuple)
      *    if the first found function is a plain Sub: finito
      */
     n = VTABLE_elements(interpreter, candidate_list);
-    if (n) {
+    if (n == 1) {
         pmc = VTABLE_get_pmc_keyed_int(interpreter, candidate_list, 0);
         _sub = CONST_STRING(interpreter, "Sub");
 
@@ -871,7 +871,7 @@ mmd_search_default(Interp *interpreter, STRING *meth, PMC *arg_tuple)
         }
     }
     /*
-     * 4) first is a MultiSub - go through all found MultiSubs and check
+     * 4) first was a MultiSub - go through all found MultiSubs and check
      *    the first arguments MRO, add all MultiSubs and plain methods,
      *    where the first argument matches
      */
@@ -914,6 +914,7 @@ mmd_search_classes(Interp *interpreter, STRING *meth, PMC *arg_tuple, PMC *cl)
      */
     type1 = VTABLE_get_integer_keyed_int(interpreter, arg_tuple, 0);
     if (type1 < 0) {
+        return;
         internal_exception(1, "unimplemted native MMD type");
         /* TODO create some class namespace */
     }
@@ -942,7 +943,7 @@ distance_cmp(Interp *interpreter, INTVAL a, INTVAL b)
 {
     short da = a & 0xffff;
     short db = b & 0xffff;
-    return da > db ? -1 : da < db ? 1 : 0;
+    return da > db ? 1 : da < db ? -1 : 0;
 }
 
 extern void Parrot_FixedPMCArray_sort(Interp* , PMC* pmc, PMC *cmp_func);
@@ -958,13 +959,33 @@ Create Manhattan Distance of sub C<pmc> against given argument types.
 
 */
 
+#define MMD_BIG_DISTANCE 0x7fff
+
 static UINTVAL
 mmd_distance(Interp *interpreter, PMC *pmc, PMC *arg_tuple)
 {
+    PMC *multi_sig;
+    INTVAL n, args, dist;
+
+    multi_sig = PMC_sub(pmc)->multi_signature;
+    if (!multi_sig) {
+        /* some method */
+        return 0;
+    }
+    n = VTABLE_elements(interpreter, multi_sig);
+    args = VTABLE_elements(interpreter, arg_tuple);
     /*
-     * TODO need a signaute in the sub pmc
+     * arg_tuple may have more arguments - only the
+     * n multi_sig invocants are counted
      */
-    return 0;
+    if (args < n)
+        return MMD_BIG_DISTANCE;
+    dist = 0;
+    if (args > n)
+        dist = 1;
+    /*
+     * TODO run through arg types */
+    return dist;
 }
 
 /*
@@ -980,7 +1001,7 @@ Sort the candidate list C<cl> by Manhattan Distance
 static void
 mmd_sort_candidates(Interp *interpreter, PMC *arg_tuple, PMC *cl)
 {
-    INTVAL i, n, d;
+    INTVAL i, n, d, i3;
     PMC *nci, *pmc, *sort;
     INTVAL *helper;
     PMC **data;
@@ -997,7 +1018,7 @@ mmd_sort_candidates(Interp *interpreter, PMC *arg_tuple, PMC *cl)
     for (i = 0; i < n; ++i) {
         pmc = VTABLE_get_pmc_keyed_int(interpreter, cl, i);
         d = mmd_distance(interpreter, pmc, arg_tuple);
-        helper[i] = i << 16 | d;
+        helper[i] = i << 16 | (d & 0xffff);
     }
     /*
      * need an NCI function pointer
@@ -1007,7 +1028,10 @@ mmd_sort_candidates(Interp *interpreter, PMC *arg_tuple, PMC *cl)
     /*
      * sort it
      */
+    i3 = REG_INT(3);
+    REG_INT(3) = 1;
     Parrot_FixedPMCArray_sort(interpreter, sort, nci);
+    REG_INT(3) = i3;
     /*
      * now helper has a sorted list of indices in the upper 16 bits
      * fill helper with sorted candidates
@@ -1099,7 +1123,7 @@ mmd_maybe_candidate(Interp *interpreter, PMC *pmc, PMC *arg_tuple, PMC *cl)
     INTVAL i, n;
 
     _sub = CONST_STRING(interpreter, "Sub");
-    _multi_sub = CONST_STRING(interpreter, "Multi_Sub");
+    _multi_sub = CONST_STRING(interpreter, "MultiSub");
 
     if (VTABLE_isa(interpreter, pmc, _sub)) {
         /* a plain sub stops outer searches */

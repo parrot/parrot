@@ -16,7 +16,7 @@ Tests the multi-method dispatch.
 
 =cut
 
-use Parrot::Test tests => 10;
+use Parrot::Test tests => 11;
 
 pir_output_is(<<'CODE', <<'OUTPUT', "PASM divide");
 
@@ -352,3 +352,32 @@ calling foo(b, f)
   Bar::foo
 OUT
 
+pir_output_is(<<'CODE', <<'OUT', "MMD on argument count");
+.namespace ["main"]
+.sub main @MAIN
+    p("ok 1\n")
+    p("-twice", "ok 2\n")
+.end
+
+.namespace [""]
+
+.sub p @MULTI(string)
+    .param string s
+    print s
+.end
+
+.sub p @MULTI(string, string)
+    .param string opt
+    .param string s
+    if opt != '-twice' goto no_twice
+	print s
+	print s
+    .return()
+no_twice:
+    print s
+.end
+CODE
+ok 1
+ok 2
+ok 2
+OUT
