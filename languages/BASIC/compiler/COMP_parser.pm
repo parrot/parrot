@@ -250,7 +250,7 @@ CODE
 			print CODE "CASE_$s->{jump}_FIN:\n";
 			goto PARSE;
 		}
-		push @{$code{$seg}->{code}}, "\tend\n";
+		push @{$code{$seg}->{code}}, "\tcall _platform_shutdown\n\tend\n";
 		goto PARSE;
 	}
 	die "Unkown keyword $syms[CURR]/$type[CURR] source line $sourceline";

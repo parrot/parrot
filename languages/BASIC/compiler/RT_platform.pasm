@@ -10,6 +10,16 @@ NOTWIN: call _ansi_setup
 END:	restoreall
 	ret
 .end
+.sub _platform_shutdown
+	saveall
+	sysinfo S0, 4
+	ne S0, "MSWin32", NOTWIN
+	call _win32_shutdown
+	branch END
+NOTWIN: call _ansi_shutdown
+END:	restoreall
+	ret
+.end
 .sub _screen_clear
 	saveall
 	find_global $P0, "PRINTCOL"
@@ -76,6 +86,26 @@ NOTWIN: call _ANSI_SCREEN_COLOR
 END:	restoreall
 	ret
 .end
+
+.sub _line_read
+	saveall
+	.local string sys
+	sysinfo sys, 4
+	eq sys, "MSWin32", END
+	call _TERMIO_normal
+END:	restoreall
+	ret
+.end
+.sub _scan_read
+	saveall
+	.local string sys
+	sysinfo sys, 4
+	eq sys, "MSWin32", END
+	call _TERMIO_scankey
+END:	restoreall
+	ret
+.end
+
 .sub _inkey_string		# string inkey$(void)
 	saveall
 	.local string sys
@@ -83,29 +113,7 @@ END:	restoreall
 	ne sys, "MSWin32", NOTWIN
 	call _WIN32_INKEY
 	branch END
-NOTWIN: call _POSIX_INKEY
+NOTWIN: call _TERMIO_INKEY
 END:	restoreall
 	ret
 .end
-## Problem in ANSI
-#SCREEN_GETFORE:
-#	sysinfo S0, 4
-#	set I0, 0
-#	ne S0, "MSWin32", SCREEN_GETFORE_NOTWIN
-#	bsr WIN32_SCREEN_GETFORE
-#SCREEN_GETFORE_NOTWIN:
-#	new P6, .PerlArray
-#	set P6[.TYPE], "INT"
-#	set P6[.VALUE], I0
-#	ret
-#
-#SCREEN_GETBACK:
-#	sysinfo S0, 4
-#	set I0, 0
-#	ne S0, "MSWin32", SCREEN_GETBACK_NOTWIN
-#	bsr WIN32_SCREEN_GETBACK
-#SCREEN_GETBACK_NOTWIN:
-#	new P6, .PerlArray
-#	set P6[.TYPE], "INT"
-#	set P6[.VALUE], I0
-#	ret

@@ -579,7 +579,10 @@ DOREAD:	.arg fd
 	restoreall
 	ret
 .end
-.sub _BUILTIN_INKEY_STRING
+.sub _BUILTIN_INKEY_STRING	# string inkey$(void)
+	.param int argc		
+	call _scan_read		# Put terminal in char-at-a-time mode
 	call _inkey_string
 	ret
 .end
+

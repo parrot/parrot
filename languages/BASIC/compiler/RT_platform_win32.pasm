@@ -19,6 +19,9 @@
 	restoreall
 	ret
 .end
+.sub _win32_shutdown			# void win32_shutdown(void)
+	ret
+.end
 .sub _WIN32_CONSOLE_INFO		# void WIN32_CONSOLE_INFO(void)
 	saveall
 	find_global P1, "kernel32"

@@ -211,6 +211,7 @@ sub parse_on {
 	branch ONOK_${ons}
 ONERR_${ons}:
 	call _ERR_ON_RANGE
+	call _platform_shutdown
 	end
 ONOK_${ons}:
 ON
@@ -495,6 +496,7 @@ sub parse_stop {
 	print "Stopped at source line "
 	print I11
 	print "\\n"
+	call _platform_shutdown
 	end
 STOP
 }
@@ -1218,6 +1220,7 @@ sub CALL_BODY {
 	print "Function $englishname received "
 	print argc
 	print " arguments expected $_\\n"
+	call _platform_shutdown
 	end
 ${englishname}_ARGOK:
 EOH
@@ -1327,6 +1330,7 @@ DISP
 	print "Structure type of "
 	print S0
 	print " not found\\n"
+	call _platform_shutdown
 	end
 DISP2
 
@@ -1346,6 +1350,7 @@ DISP
 	print "Structure type of "
 	print S0
 	print " not found\\n"
+	call _platform_shutdown
 	end
 DISP2
 RTJUMP:
@@ -1364,6 +1369,7 @@ RTB
 	print "Runtime branch of "
 	print JUMPLABEL
 	print " not found\\n"
+	call _platform_shutdown
 	end
 RTBE
 }

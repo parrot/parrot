@@ -4,6 +4,8 @@
 	#
 	# Not a lot of error handling here yet
 .sub _READCHARS 	# string readchars(int numchar, int fd)
+	call _line_read
+
 	saveall
 	.param int numchar
 	.param int fd
@@ -64,6 +66,7 @@
 #        # Returns:
 #        #       I0   Error?
 .sub _READLINE		# string readline(int fd)
+	call _line_read
 	saveall
 	.param int fd
 	set $S0, ""

@@ -25,6 +25,7 @@
 	call _data_run
 	call _platform_setup
 	call _basicmain_run
+	call _platform_shutdown
 	end
 
 .end	        

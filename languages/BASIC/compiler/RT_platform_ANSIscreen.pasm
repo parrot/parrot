@@ -37,12 +37,21 @@
 	set $P0[14], YELLOW
 	set $P0[15], 8
 	store_global "ANSI_bgcolors", $P0
+
+	$P0=new PerlHash
+	$P0["value"]=0
+	store_global "scankey", $P0
+
 	restoreall
 	ret
 .end
 .sub _ansi_screen_clear
 	print "\e[2J"
 	print "\e[H"
+	ret
+.end
+.sub _ansi_shutdown
+	call _TERMIO_normal
 	ret
 .end
 .sub _ANSI_SCREEN_LOCATE	# void ansi_screen_locate (int x, int y)
@@ -109,40 +118,130 @@ ANSI_BG:find_global $P0, "ANSI_bgcolors"
 	restoreall
 	ret
 .end
-.sub _POSIX_INKEY
+.sub _set_noecho_cbreak
 	saveall
 	loadlib P1, ""
-	dlfunc P0, P1, "system", "it"
+	dlfunc P0, P1, "ioctl", "iiip"
 	set I0, 1
-	set S5, "stty cbreak -echo"
-	invoke
+	P9 = new ManagedStruct	# Saved
+	P10 = new ManagedStruct   # New
+	set P9, 20	# sizeof termio 4/byte aligned
+	set P10, 20
+	set I5, 0
+	set I6, 0x5405  # TCGETA
+	set P5, P9
+	invoke		# ioctl(0, TCGETA, &savetty);
+	set I5, 0
+	set I6, 0x5405
+	set P5, P10
+	invoke		# ioctl(0, TCGETA, &settty);
+	.arg 2
+	.arg 6
+	.arg P10
+	call _get_little_endian
+	.result I0
+	set I1, 2	# ICANON
+	bnot I1, I1 	# ~ICANON
+	band I0, I0, I1 # settty.c_lflag &= ~ICANON;
+	set I1, 8	# IECHO
+	bnot I1, I1 	# ~ICANON
+	band I0, I0, I1	# settty.c_lflag &= ~ECHO;
+	.arg I0
+	.arg 2
+	.arg 6
+	.arg P10
+	call _set_little_endian
+	set I5, 0
+	set I6, 0x5408
+	set P5, P10
+	invoke		# ioctl(0, TCSETAF, &settty);
+	store_global "ioctl_mode", P9
+	restoreall
+	ret
+.end
+.sub _set_echo_nocbreak
+	saveall	
+	loadlib P1, ""
+	dlfunc P0, P1, "ioctl", "iiip"
+	find_global P9, "ioctl_mode"
+	set I5, 0
+	set I6, 0x5408
+	set P5, P9
+	invoke		# ioctl(0, TCSETAF, &savetty)
+	restoreall
+	ret
+.end
 
+.sub _set_nonblock	# void _set_nonblock
+	saveall
+	set I11, 0
+	loadlib P1, ""
 	dlfunc P0, P1, "fcntl", "iiii"
 	set I0, 1
 	set I5, 0	# Stdin
 	set I6, 3	# F_GETFL
-	invoke
+	invoke		# mode=fcntl(0, F_GETFL, unused)
 
-	set I9, I5	# Old values
+	set I11, I5	# Old values
+	dlfunc P0, P1, "fcntl", "iiil"
 	bor I7, I5, 2048  # O_NONBLOCK 04000
 	set I5, 0	# Stdin
 	set I6, 4	# F_SETFL
-	invoke
+	invoke		# nmode=fcntl(0, F_SETFL, mode | O_NONBLOCK)
 
-	read S0, 1
-
-	set I7, I9
-	set I5, 0
-	set I6, 4
-	invoke
-
-	loadlib P1, ""
-	dlfunc P0, P1, "system", "it"
-	set I0, 1
-	set S5, "stty -cbreak echo"
-	invoke
-
-	.return S0
+	$P0=new PerlHash
+	set $P0["value"], I11
+	store_global "fcntl_mode", $P0
 	restoreall
 	ret
 .end
+.sub _unset_nonblock	# void _unset_nonblock
+	saveall
+	find_global P0, "fcntl_mode"
+	set I11, P0["value"]
+	loadlib P1, ""
+	dlfunc P0, P1, "fcntl", "iiil"
+	set I7, I11
+	set I5, 0
+	set I6, 4
+	invoke		# nmode=fcntl(0, F_SETFL, mode)
+	restoreall
+	ret
+.end
+.sub _TERMIO_scankey
+	saveall
+	find_global $P0, "scankey"
+	set I0, $P0["value"]
+	eq I0, 1, END
+        #call _set_nonblock
+	call _set_noecho_cbreak
+END:    set $P0["value"], 1
+	store_global "scankey", $P0
+	restoreall
+	ret
+.end
+.sub _TERMIO_normal
+	saveall
+	find_global $P0, "scankey"
+	set I0, $P0["value"]
+	eq I0, 0, END
+	#call _unset_nonblock
+	call _set_echo_nocbreak
+END:    set $P0["value"], 0
+	store_global "scankey", $P0
+	restoreall
+	ret
+.end
+
+# For now, uses TERMIO calls directly and assumes you're on a
+# LITTLE ENDIAN machine.
+.sub _TERMIO_INKEY
+	saveall
+
+	read $S0, 1
+
+	.return $S0
+	restoreall
+	ret
+.end
+
