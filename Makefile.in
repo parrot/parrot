@@ -204,7 +204,7 @@ $(PDUMP): pdump$(O) $(O_FILES)
 test_main$(O): test_main.c $(H_FILES)
 
 Parrot/Jit.pm: Parrot/Jit/${jitarchname}.pm
-	$(PERL) -MFile::Copy=cp -e 'cp q|Parrot/Jit/${jitarchname}.pm|, q|Parrot/Jit.pm|'
+	$(PERL) -MFile::Copy=cp -e ${PQ}cp q|Parrot/Jit/${jitarchname}.pm|, q|Parrot/Jit.pm|${PQ}
 
 Parrot/OpLib/core.pm: core.ops ops2pm.pl Parrot/OpsFile.pm Parrot/Op.pm
 	$(PERL) ops2pm.pl core.ops vtable.ops
@@ -367,10 +367,10 @@ realclean: clean
 	$(RM_F) $(STICKY_FILES)
 
 distclean:
-	$(PERL) -MExtUtils::Manifest=filecheck -le '$$ExtUtils::Manifest::Quiet=1;unlink $$_ for filecheck()'
+	$(PERL) -MExtUtils::Manifest=filecheck -le ${PQ}$$ExtUtils::Manifest::Quiet=1;unlink $$_ for filecheck()${PQ}
 
 cvsclean:
-	$(PERL) -MExtUtils::Manifest=filecheck -le '$$ExtUtils::Manifest::Quiet=1; do { unlink $$_ unless $$_ =~ m!(?:CVS/|\.cvs)! } for filecheck()'
+	$(PERL) -MExtUtils::Manifest=filecheck -le ${PQ}$$ExtUtils::Manifest::Quiet=1; do { unlink $$_ unless $$_ =~ m!(?:CVS/|\.cvs)! } for filecheck()${PQ}
 
 
 

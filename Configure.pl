@@ -169,6 +169,12 @@ my(%c)=(
     PATCH   =>    $parrot_version[2],
 );
 
+# What's the platform shell quote character?
+if ($^O eq 'VMS' || $^O eq 'MSWin') {
+    $c{PQ} = '"';
+} else {
+    $c{PQ} = "'";
+}
 
 # If using gcc, crank up its warnings as much as possible and make it behave
 # ansi-ish.
