@@ -249,6 +249,10 @@ compact_pool(struct Parrot_Interp *interpreter, struct Memory_Pool *pool)
     if (interpreter->GC_block_level) {
         return;
     }
+    if (Interp_flags_TEST(interpreter, PARROT_TRACE_FLAG)) {
+        /* no PIO_printf here */
+        fprintf(stderr, "# GC run\n");
+    }
     Parrot_block_GC(interpreter);
     if (interpreter->profile)
         profile_gc_start(interpreter);
