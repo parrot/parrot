@@ -118,7 +118,7 @@ Store object $3 as lexical $2 at depth $1.  If [$1, $2] does not
 exist, it will be created.  If $1 is negative, count out from the
 current lexical scope; otherwise, count in from the outermost scope.
 So store_lex -1, .... will operate on the current pad. Lexicals can
-be restrieved by index too: the index is generated in storage order.
+be retrieved by index too: the index is generated in storage order.
 
 =item B<store_lex>(in INT, in INT, in PMC)
 
@@ -157,7 +157,7 @@ Find the lexical variable named $2 (at any depth) and store it in $1.
 =item B<find_lex>(out PMC, in INT, in STR)
 
 Find the lexical variable named $3 at depth $2 and store it in $1.
-If $2 is negative the, count out from the current lexical scope;
+If $2 is negative, then count out from the current lexical scope;
 otherwise, count up from the outermost scope.
 
 =item B<find_lex>(out PMC, in INT)
@@ -167,7 +167,7 @@ Find the lexical number $2 at the topmost pad.
 =item B<find_lex>(out PMC, in INT, in INT)
 
 Find the lexical variable at position $3 at depth $2 and store it in
-$1. If $2 is negative the, count out from the current lexical scope;
+$1. If $2 is negative, then count out from the current lexical scope;
 otherwise, count up from the outermost scope.
 
 =cut
