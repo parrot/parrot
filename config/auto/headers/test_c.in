@@ -1,4 +1,4 @@
-#include <${testheader}>
+${testheaders}
 
 /* Don't want stdio influencing our ability to include headers. Some day soon
    we won't be using stdio  */

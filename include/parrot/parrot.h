@@ -37,6 +37,24 @@
 
 /* Other headers, where available */
 
+/* FreeBSD wants this order:
+
+     #include <sys/types.h>
+     #include <sys/socket.h>
+     #include <netinet/in.h>
+     #include <arpa/inet.h>
+
+   as netinet/in.h relies on things defined earlier
+*/
+
+#ifdef PARROT_HAS_HEADER_SYSTYPES
+#  include <sys/types.h>
+#endif
+
+#ifdef PARROT_HAS_HEADER_SYSSOCKET
+#include <sys/socket.h>
+#endif
+
 #ifdef PARROT_HAS_HEADER_NETINETIN
 #  include <netinet/in.h>
 #endif
@@ -65,16 +83,8 @@
 #  include <fcntl.h>
 #endif
 
-#ifdef PARROT_HAS_HEADER_SYSTYPES
-#  include <sys/types.h>
-#endif
-
 #ifdef PARROT_HAS_HEADER_NETDB
 #  include <netdb.h>
-#endif
-
-#ifdef PARROT_HAS_HEADER_SYSSOCKET
-#include <sys/socket.h>
 #endif
 
 #ifdef PARROT_HAS_HEADER_SYSSTAT
