@@ -81,6 +81,7 @@ N: Jason Gloudon
 N: Jeff Clites
 
 N: Jeff Goff
+D: Release pumpking for 0.0.5-0.0.8
 
 N: Jerome Quelin
 D: befunge interpreter, ook compiler.
@@ -173,6 +174,7 @@ N: Sean O'Rourke
 D: Original Perl6 compiler
 
 N: Simon Cozens
+D: Release pumpking for 0.0.1-0.0.4
 
 N: Simon Glover
 D: Tests, docs and misc. bugfixes
@@ -185,7 +187,9 @@ N: Steve Clark
 D: Bugfixes
 
 N: Steve Fink
-D: Pumpking up to 0.0.11
+D: Release pumpking for 0.0.9-0.0.11
+E: steve@fink.com
+S: San Carlos, CA, USA
 
 N: Tom Hughes
 
