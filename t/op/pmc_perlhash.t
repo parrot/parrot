@@ -1,6 +1,6 @@
 #! perl
 
-use Parrot::Test tests => 5;
+use Parrot::Test tests => 7;
 
 output_is(<<'CODE', <<OUTPUT, "simple set / get");
 	new P0, PerlHash
@@ -18,6 +18,28 @@ output_is(<<'CODE', <<OUTPUT, "simple set / get");
 	print I1
 	print "\n"
     end
+CODE
+1
+2
+OUTPUT
+
+output_is(<<'CODE', <<OUTPUT, "more than one PerlHash");
+	new P0, PerlHash
+	set S0, "key"
+	set P0, 1, S0
+		
+        new P1, PerlHash
+        set S1, "another_key"
+        set P1, 2, S1 
+
+	set I0, P0, S0
+	set I1, P1, S1
+
+	print I0
+	print "\n"
+	print I1
+	print "\n"
+        end
 CODE
 1
 2
@@ -112,5 +134,23 @@ CODE
 2
 2
 OUTPUT
+
+
+# NB Next test depends on "key2" hashing to zero, which it does with
+# the current algorithm; if the algorithm changes, change the test!
+
+output_is(<<'CODE', <<OUTPUT, "key that hashes to zero");
+        new P0, PerlHash
+        set S0, "key2"
+        set P0, 1, S0
+        set I0, P0, S0
+	print I0
+	print "\n"	
+	end
+CODE
+1
+OUTPUT
+
+
 
 1;

@@ -327,7 +327,7 @@ void key_set_element_value_s(struct Parrot_Interp *interpreter, KEY* key,
         if(bucket != NULL) {
           hash = hash % NUM_BUCKETS;
           /* Resize the hash here rather than set an initial size. */
-          if(hash > key->size) {
+          if(hash >= key->size) {
             key_set_size(interpreter,key,hash+1);
           }
           if(key->keys[hash].type != enum_key_undef) {
