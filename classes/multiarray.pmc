@@ -29,15 +29,18 @@
 static INTVAL calc_offset(Interp* interp, List*list, PMC *key)
 {
     INTVAL l = 1;
+    INTVAL ninj;
     PMC * dim = list->user_data->vtable->
 	get_pmc_keyed_int(interp, list->user_data, &l);
 
     l = key_integer(interp, key);
+    ninj = 1;
     for(; dim ; dim = key_next(interp, dim)) {
 	key = key_next(interp, key);
 	if (!key)
 	    break;
-	l += key_integer(interp, key) * key_integer(interp, dim);
+	ninj *= key_integer(interp, dim);
+	l += key_integer(interp, key) * ninj;
     }
     return l;
 }
@@ -57,8 +60,7 @@ pmclass MultiArray extends Array {
     PMC* clone () {
         PMC* dest;
 
-	/* XXX  calls the wrong init */
-        dest = pmc_new(INTERP, enum_class_MultiArray);
+	dest = new_pmc_header(INTERP);
         dest->flags |= PMC_custom_mark_FLAG;
         dest->vtable = SELF->vtable;
         dest->data = list_clone(INTERP, (List *) SELF->data);

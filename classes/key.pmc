@@ -17,6 +17,45 @@ pmclass Key {
         SELF->flags |= PMC_custom_mark_FLAG;
     }
 
+    PMC* clone() {
+	PMC *dest = key_new(INTERP);
+	PMC *dkey = dest;
+	PMC *key = SELF;
+	PMC *p;
+
+	for (; key ; ) {
+
+	    switch (key->flags & KEY_type_FLAGS) {
+		case KEY_integer_FLAG:
+		case KEY_integer_FLAG|KEY_register_FLAG:
+		    key_set_integer(INTERP, dkey, key_integer(INTERP, key));
+		    break;
+		case KEY_number_FLAG:
+		case KEY_number_FLAG|KEY_register_FLAG:
+		    key_set_number(INTERP, dkey, key_number(INTERP, key));
+		    break;
+		case KEY_string_FLAG:
+		case KEY_string_FLAG|KEY_register_FLAG:
+		    key_set_string(INTERP, dkey,
+			    string_copy(INTERP, key_string(INTERP, key)));
+		    break;
+		case KEY_pmc_FLAG:
+		case KEY_pmc_FLAG|KEY_register_FLAG:
+		    p = key_pmc(INTERP, key);
+		    key_set_pmc(INTERP, dkey,
+			    p->vtable->clone(INTERP, p));
+		    break;
+	    }
+	    key = key_next(INTERP, key);
+	    if (key) {
+		p = key_new(INTERP);
+		key_append(INTERP, dkey, p);
+		dkey = p;
+	    }
+	}
+	return dest;
+    }
+
     PMC* mark (PMC* end_of_used_list) {
         return key_mark(INTERP, SELF, end_of_used_list);
     }

@@ -1,6 +1,6 @@
 #! perl -w
 
-use Parrot::Test tests => 2;
+use Parrot::Test tests => 3;
 use Test::More;
 
 output_is(<<'CODE', <<'OUTPUT', "multiarray creation");
@@ -22,7 +22,7 @@ CODE
 ok
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "multiarray access");
+output_is(<<'CODE', <<'OUTPUT', "multiarray access 2d");
 	new P1, .PerlArray
 	# intial size
 	set P1[0], 100
@@ -74,6 +74,99 @@ nok1:
 CODE
 ok 1
 ok 2
+OUTPUT
+
+output_is(<<'CODE', <<'OUTPUT', "multiarray access 3d");
+	new P1, .PerlArray
+	# intial size
+	set P1[0], 200
+	# dimensions
+	new P2, .Key
+	set P2, 10
+	new P3, .Key
+	set P3, 5
+	push P2, P3
+	new P3, .Key
+	set P3, 4
+	push P2, P3
+	set P1[1], P2
+	new P0, .MultiArray, P1
+	set P0, 200
+
+	set I10, 10
+	set I11, 5
+	set I12, 4
+	set I0, 0
+lp0:
+	set I1, 0
+lp1:
+	set I2, 0
+lp2:
+	mul I9, I0, I1
+	mul I9, I9, I2
+	set P0[I0;I1;I2], I9
+	inc I2
+	lt I2, I12, lp2
+	inc I1
+	lt I1, I11, lp1
+	inc I0
+	lt I0, I10, lp0
+	print "ok 1\n"
+
+	# read values
+
+	set I0, 0
+lp10:
+	set I1, 0
+lp11:
+	set I2, 0
+lp12:
+	mul I9, I0, I1
+	mul I9, I9, I2
+	set I8, P0[I0;I1;I2]
+	ne I8, I9, nok1
+	inc I2
+	lt I2, I12, lp12
+	inc I1
+	lt I1, I11, lp11
+	inc I0
+	lt I0, I10, lp10
+	print "ok 2\n"
+
+	# clone then read values
+	clone P10, P0
+
+	set I0, 0
+lp20:
+	set I1, 0
+lp21:
+	set I2, 0
+lp22:
+	mul I9, I0, I1
+	mul I9, I9, I2
+	set I8, P10[I0;I1;I2]
+	ne I8, I9, nok2
+	inc I2
+	lt I2, I12, lp22
+	inc I1
+	lt I1, I11, lp21
+	inc I0
+	lt I0, I10, lp20
+	print "ok 3\n"
+	end
+nok2:
+	print "cloned read failed "
+nok1:
+	print "got "
+	print I8
+	print " wanted "
+	print I9
+	print "\n"
+	end
+CODE
+ok 1
+ok 2
+ok 3
 OUTPUT
 
 1;
