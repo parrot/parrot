@@ -71,7 +71,7 @@ END
     print OUT "    Parrot_${_}_class_init(enum_class_${_});\n"
       foreach (@pmcs);
     print OUT <<"END";
-};
+}
 
 static void register_pmc(PMC* registry, int pmc_id)
 {
