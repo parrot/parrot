@@ -126,6 +126,9 @@ For documentation on the user-visible changes between this version and
 previous versions, please see NEWS. The full changelog is (or should be)
 available as ChangeLog.
 
+CVS history can be browsed online at
+http://cvs.perl.org/viewcvs/cvs-public/parrot/
+
 MAILING LISTS
 -------------
 
