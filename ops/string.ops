@@ -561,7 +561,7 @@ with string $2.
 
 =item B<split>(out PMC, in STR, in STR)
 
-Create a new PerlArray PMC $1 by splitting the string $3 with
+Create a new Array PMC $1 by splitting the string $3 with
 regexp $2. Currently implemented only for the empty string $2.
 
 =cut
@@ -589,7 +589,7 @@ op join(out STR, in STR, in PMC) :base_core {
 }
 
 op split(out PMC, in STR, in STR) :base_core {
-    PMC *res = $1 = pmc_new(interpreter, enum_class_PerlArray);
+    PMC *res = $1 = pmc_new(interpreter, enum_class_Array);
     STRING *r = $2;
     STRING *s = $3;
     int slen = string_length(interpreter, s);
@@ -599,6 +599,7 @@ op split(out PMC, in STR, in STR) :base_core {
 	goto NEXT();
     if (string_length(interpreter, r))
 	internal_exception(1, "Unimplemented split by regex");
+    VTABLE_set_integer_native(interpreter, res, slen);
     for (i = 0; i < slen; ++i) {
 	STRING *p = string_substr(interpreter, s, i, 1, NULL, 0);
 	/* TODO first set empty string, then replace */
