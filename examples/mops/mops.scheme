@@ -4,6 +4,13 @@
 ; A Scheme implementation of the mops.pasm example program,
 ; for speed comparisons.
 ;
+; Example command line:
+;
+;   umb-scheme mops.scheme
+;
+; NOTE: 1,000,000 iterations used instead of 100,000,000
+; to keep thing from bogging down too much.
+;
 ; Copyright (C) 2001 The Parrot Team. All rights reserved.
 ; This program is free software. It is subject to the same
 ; license as The Parrot Interpreter.
@@ -13,7 +20,7 @@
 
 (let ((I1 0) (I2 0) (I3 1)   ; set    I2, 0
       (N1 0) (N2 0) (N4 0)   ; set    I3, 1
-      (N5 0) (I4 1000000)    ; set    I4, 100000000
+      (N5 0) (I4 1000000)    ; set    I4, 1000000
       (I5 0))                ;
 (display "Iterations:    ")  ; print  "Iterations:    "
 (display I4)                 ; print  I4

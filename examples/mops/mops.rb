@@ -2,6 +2,13 @@
 #
 # mops.rb
 #
+# Example command line:
+#
+#   ruby mops.rb
+#
+# NOTE: 10,000,000 iterations used instead of 100,000,000
+# to keep things from bogging down too much.
+#
 # A Ruby implementation of the mops.pasm example program,
 # for speed comparisons.
 #
@@ -14,7 +21,7 @@
 
 i2 = 0                       # set    I2, 0
 i3 = 1                       # set    I3, 1
-i4 = 100000000               # set    I4, 100000000
+i4 = 10000000                # set    I4, 10000000
                              #
 puts "Iterations:    #{i4}"  # print  "Iterations:    "
                              # print  I4

@@ -2,6 +2,13 @@
 %
 % mops.ps
 %
+% Example command line:
+%
+%   gs -q -DNODISPLAY mops.ps
+%
+% NOTE: 10,000,000 instead of 100,000,000 iterations are used
+% to keep things from bogging down too much.
+%
 % A PostScript implementation of the mops.pasm example program,
 % for speed comparisons.
 %
@@ -14,7 +21,7 @@
 
 /I2 0 def                    % set    I2, 0
 /I3 1 def                    % set    I3, 1
-/I4 100000000 def            % set    I4, 100000000
+/I4 10000000 def             % set    I4, 10000000
                              %
 (Iterations:    ) print      % print  "Iterations:    "
 I4 20 string cvs print       % print  I4

@@ -2,6 +2,13 @@
 #
 # mops.py
 #
+# Example command line:
+#
+#   python mops.py
+#
+# NOTE: 10,000,000 iterations used instead of 100,000,000
+# to keep things from bogging down too much.
+#
 # A Python implementation of the mops.pasm example program,
 # for speed comparisons.
 #
@@ -17,7 +24,7 @@ import time
 
 I2 = 0                       # set    I2, 0
 I3 = 1                       # set    I3, 1
-I4 = 100000000               # set    I4, 100000000
+I4 = 10000000                # set    I4, 10000000
                              #
 print "Iterations:   ", I4   # print  "Iterations:    "
                              # print  I4
