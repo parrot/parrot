@@ -62,7 +62,6 @@ struct Arenas {
     struct Small_Object_Pool *constant_string_header_pool;
     struct Small_Object_Pool **sized_header_pools;
     size_t num_sized;
-    Buffer extra_buffer_headers;
 };
 
 struct Stash {

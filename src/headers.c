@@ -573,27 +573,6 @@ is_pmc_ptr(struct Parrot_Interp *interpreter, void *ptr)
             interpreter->arena_base->pmc_pool, ptr);
 }
 
-/*
-
-=item C<void
-add_extra_buffer_header(struct Parrot_Interp *interpreter, void *buffer)>
-
-Adds an extre header to C<buffer> (I<?>).
-
-=cut
-
-*/
-
-void
-add_extra_buffer_header(struct Parrot_Interp *interpreter, void *buffer)
-{
-    Buffer *headers = &interpreter->arena_base->extra_buffer_headers;
-    void **ptr;
-    Parrot_reallocate(interpreter, headers, PObj_buflen(headers) + sizeof(void *));
-    ptr = (void **)((char *) PObj_bufstart(headers) + PObj_buflen(headers) -
-            sizeof(void *));
-    *ptr = buffer;
-}
 
 /*
 
@@ -609,25 +588,11 @@ Initialize the pools for the tracked resources.
 void
 Parrot_initialize_header_pools(struct Parrot_Interp *interpreter)
 {
-#if 0
-    Parrot_allocate(interpreter,
-            &interpreter->arena_base->extra_buffer_headers, 0);
-    add_extra_buffer_header(interpreter,
-            &interpreter->arena_base->extra_buffer_headers);
-#else
-    PObj_bufstart(&interpreter->arena_base->extra_buffer_headers)  = NULL;
-    PObj_buflen(&interpreter->arena_base->extra_buffer_headers)    = 0;
-    interpreter->arena_base->extra_buffer_headers.obj.flags = 0;
-#  if ! DISABLE_GC_DEBUG
-    PObj_version(&interpreter->arena_base->extra_buffer_headers)   = 0;
-#  endif
-#endif
     /* Init the constant string header pool */
     interpreter->arena_base->constant_string_header_pool =
             new_string_pool(interpreter, 1);
     interpreter->arena_base->constant_string_header_pool->name =
         "constant_string_header";
-
 
     /* Init the buffer header pool
      *

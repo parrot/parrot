@@ -363,42 +363,6 @@ compact_pool(struct Parrot_Interp *interpreter, struct Memory_Pool *pool)
         }
     }
 
-    /* Run through all the out-of-band Buffer header pools and copy */
-    /* This code ignores COW, for now. This essentially means that if any
-     * other buffers COW-reference data with the buffers below, that data will
-     * get duplicated during this collection run. */
-    for (j = 0;
-            j < (INTVAL)(PObj_buflen(&interpreter->arena_base->extra_buffer_headers) /
-                    sizeof(Buffer *)); j++) {
-        Buffer **buffers =
-                PObj_bufstart(&interpreter->arena_base->extra_buffer_headers);
-        Buffer *b = buffers[j];
-
-        /* ! (immobile | on_free_list | constant | external) */
-        if (PObj_bufstart(b) && PObj_is_movable_TESTALL(b)) {
-            struct Buffer_Tail *new_tail =
-                    (struct Buffer_Tail *)((char *)cur_spot + PObj_buflen(b));
-            /* we can't perform the math all the time, because strstart might
-             * be in unallocated memory */
-            ptrdiff_t offset = 0;
-
-            if (PObj_is_string_TEST(b)) {
-                offset = (ptrdiff_t)((STRING *)b)->strstart -
-                        (ptrdiff_t)PObj_bufstart(b);
-            }
-            memcpy(cur_spot, PObj_bufstart(b), PObj_buflen(b));
-            new_tail->flags = 0;
-            PObj_bufstart(b) = cur_spot;
-            cur_size = PObj_buflen(b);
-            cur_size = (cur_size + BUFFER_ALIGNMENT - 1) &
-                    ~(BUFFER_ALIGNMENT - 1);
-            cur_spot += cur_size;
-            if (PObj_is_string_TEST(b)) {
-                ((STRING *)b)->strstart = (char *)PObj_bufstart(b) + offset;
-            }
-        }
-    }
-
     /* Okay, we're done with the copy. Set the bits in the pool struct */
     /* First, where we allocate next */
     new_block->top = cur_spot;
