@@ -191,7 +191,7 @@ MANUAL_OP jump_i {
 
 /* SET Nx, CONSTANT */
 AUTO_OP set_n_nc {
-  NUM_REG(P1) = PCONST(P2)->number;
+  NUM_REG(P1) = NUM_CONST(P2);
 } 
 
 /* SET Nx, Nx */
@@ -232,7 +232,7 @@ MANUAL_OP eq_n_ic {
 
 /* EQ Nx, CONSTANT, EQ_BRANCH */
 MANUAL_OP eq_nc_ic {
-  if (NUM_REG(P1) == PCONST(P2)->number) {
+  if (NUM_REG(P1) == NUM_CONST(P2)) {
     RETURN(P3);
   }
 }
@@ -246,7 +246,7 @@ MANUAL_OP ne_n_ic {
 
 /* NE Nx, CONSTANT, NE_BRANCH */
 MANUAL_OP ne_nc_ic {
-  if (NUM_REG(P1) != PCONST(P2)->number) {
+  if (NUM_REG(P1) != NUM_CONST(P2)) {
     RETURN(P3);
   }
 }
@@ -260,7 +260,7 @@ MANUAL_OP lt_n_ic {
 
 /* LT Nx, CONSTANT, LT_BRANCH */
 MANUAL_OP lt_nc_ic {
-  if (NUM_REG(P1) < PCONST(P2)->number) {
+  if (NUM_REG(P1) < NUM_CONST(P2)) {
     RETURN(P3);
   }
 }
@@ -274,7 +274,7 @@ MANUAL_OP le_n_ic {
 
 /* LE Nx, CONSTANT, LE_BRANCH */
 MANUAL_OP le_nc_ic {
-  if (NUM_REG(P1) <= PCONST(P2)->number) {
+  if (NUM_REG(P1) <= NUM_CONST(P2)) {
     RETURN(P3);
   }
 }
@@ -288,7 +288,7 @@ MANUAL_OP gt_n_ic {
 
 /* GT Nx, CONSTANT, GT_BRANCH */
 MANUAL_OP gt_nc_ic {
-  if (NUM_REG(P1) > PCONST(P2)->number) {
+  if (NUM_REG(P1) > NUM_CONST(P2)) {
     RETURN(P3);
   }
 }
@@ -302,7 +302,7 @@ MANUAL_OP ge_n_ic {
 
 /* GE Nx, CONSTANT, GE_BRANCH */
 MANUAL_OP ge_nc_ic {
-  if (NUM_REG(P1) >= PCONST(P2)->number) {
+  if (NUM_REG(P1) >= NUM_CONST(P2)) {
     RETURN(P3);
   }
 }
@@ -326,7 +326,7 @@ AUTO_OP print_n {
  
 /* PRINT nc */
 AUTO_OP print_nc {
-  printf("%f", PCONST(P1)->number);
+  printf("%f", NUM_CONST(P1));
 }
 
 /* INC Nx */
@@ -336,7 +336,7 @@ AUTO_OP inc_n {
 
 /* INC Nx, nnn */
 AUTO_OP inc_n_nc {
-  NUM_REG(P1) += PCONST(P2)->number;
+  NUM_REG(P1) += NUM_CONST(P2);
 }
 
 /* DEC Nx */
@@ -346,7 +346,7 @@ AUTO_OP dec_n {
 
 /* DEC Nx, nnn */
 AUTO_OP dec_n_nc {
-  NUM_REG(P1) -= PCONST(P2)->number;
+  NUM_REG(P1) -= NUM_CONST(P2);
 }
 
 /* ITON Nx, Iy */
@@ -425,7 +425,7 @@ AUTO_OP clear_p {
 
 /* SET Sx, CONSTANT */
 AUTO_OP set_s_sc {
-  STR_REG(P1) = PCONST(P2)->string;
+  STR_REG(P1) = STR_CONST(P2);
 }
 
 /* PRINT Sx */
@@ -436,7 +436,7 @@ AUTO_OP print_s {
 
 /* PRINT sc */
 AUTO_OP print_sc {
-  STRING *s = PCONST(P1)->string;
+  STRING *s = STR_CONST(P1);
   IV l = string_length(s);
   printf("%.*s",(int)l, (char *)s->bufstart);
 }

@@ -119,6 +119,14 @@ while (<INPUT>) {
     s/RETURN\((.*)\)/return cur_opcode + $1/;
 
     s/\bP(\d+)\b/$param_sub[$1]/g;
+    s/INT_REG\(([^)]+)\)/interpreter->int_reg->registers[$1]/g;
+    s/STR_REG\(([^)]+)\)/interpreter->string_reg->registers[$1]/g;
+    s/PMC_REG\(([^)]+)\)/interpreter->pmc_reg->registers[$1]/g;
+    s/NUM_REG\(([^)]+)\)/interpreter->num_reg->registers[$1]/g;
+
+    s/NUM_CONST\(([^)]+)\)/interpreter->code->const_table->constants[$1]->number/g;
+    s/STR_CONST\(([^)]+)\)/interpreter->code->const_table->constants[$1]->string/g;
+    s/INT_CONST\(([^)]+)\)/interpreter->code->const_table->constants[$1]->string/g;
 
     if (/^}/) {
         print OUTPUT $footer, "\n";

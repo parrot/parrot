@@ -63,12 +63,6 @@ struct PRegChunk {
     struct PReg PReg[FRAMES_PER_CHUNK];
 };
 
-/* Accessor macros */
-#define INT_REG(x) interpreter->int_reg->registers[x]
-#define STR_REG(x) interpreter->string_reg->registers[x]
-#define PMC_REG(x) interpreter->pmc_reg->registers[x]
-#define NUM_REG(x) interpreter->num_reg->registers[x]
-
 /* This macro masks off the low bits of a register chunk address,
    since we're guaranteed to be aligned */
 #define CHUNK_BASE(x) (void *)(MASK_CHUNK_LOW_BITS & (IV)x)

@@ -74,7 +74,7 @@ void
 Parrot_clear_i(struct Parrot_Interp *interpreter) {
     int i;
     for (i=0; i<NUM_REGISTERS; i++) {
-        INT_REG(i) = 0;
+        interpreter->int_reg->registers[i] = 0;
     }
 }
 
@@ -143,7 +143,7 @@ void
 Parrot_clear_s(struct Parrot_Interp *interpreter) {
     int i;
     for (i=0; i<NUM_REGISTERS; i++) {
-        STR_REG(i) = NULL;
+        interpreter->string_reg->registers[i] = NULL;
     }
 }
 
@@ -209,7 +209,7 @@ void
 Parrot_clear_n(struct Parrot_Interp *interpreter) {
     int i;
     for (i=0; i<NUM_REGISTERS; i++) {
-        NUM_REG(i) = 0;
+        interpreter->num_reg->registers[i] = 0;
     }
 }
 
@@ -277,7 +277,7 @@ void
 Parrot_clear_p(struct Parrot_Interp *interpreter) {
     int i;
     for (i=0; i<NUM_REGISTERS; i++) {
-        PMC_REG(i) = NULL;
+        interpreter->pmc_reg->registers[i] = NULL;
     }
 }
 
