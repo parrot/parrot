@@ -29,7 +29,8 @@ $description = "Determining whether python is installed...";
 sub runstep {
     my $a = `python -V 2>&1` || '';
     my ($python, $major, $minor, $revision) = 
-        $a =~ m/(Python)\s+(\d+).(\d+).(\d+)/;
+        $a =~ m/(Python)\s+(\d+).(\d+)(?:.(\d+))?/;
+    $revision = 0 unless defined $revision;
     my $has_python = $python ? 1 : 0;
 
     Configure::Data->set(has_python => $has_python);
