@@ -66,20 +66,6 @@ PackFile_pack(struct PackFile *self, opcode_t *cursor)
 
     self->src = cursor;
 
-    self->header->wordsize = sizeof(opcode_t);
-    self->header->byteorder = PARROT_BIGENDIAN;
-    self->header->major = PARROT_MAJOR_VERSION;
-    /* XXX during development, we check PATCH_LEVEL too */
-    self->header->minor = PARROT_MINOR_VERSION | PARROT_PATCH_VERSION;
-    self->header->flags = 0;
-    if (NUMVAL_SIZE == 8)
-        self->header->floattype = 0;
-    else /* if XXX */
-        self->header->floattype = 1;
-
-    /* write the fingerprint */
-    PackFile_write_fingerprint(self->header->pad);
-
     /* Pack the header */
     mem_sys_memcopy(cursor, self->header, PACKFILE_HEADER_BYTES);
     cursor += PACKFILE_HEADER_BYTES / sizeof(opcode_t);

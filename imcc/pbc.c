@@ -81,7 +81,7 @@ imcc_globals_destroy(int ex, void *param)
     SymReg **h;
 
     UNUSED(ex);
-    UNUSED(param);
+    UNUSED(interpreter);
     cs = globals.cs;
     while (cs) {
         s = cs->subs;
@@ -611,8 +611,6 @@ add_const_pmc_sub(struct Parrot_Interp *interpreter, SymReg *r,
     sprintf(buf, "%s %s %d %d", "Sub", r->name, offs, len);
     pfc = malloc(sizeof(struct PackFile_Constant));
 
-    interpreter->code->const_table->base.pf->header->wordsize =
-        sizeof(opcode_t);
     rc = PackFile_Constant_unpack_pmc(interpreter,
             interpreter->code->const_table, pfc, (opcode_t*)buf);
     if (!rc)

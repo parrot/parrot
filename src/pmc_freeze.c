@@ -680,6 +680,49 @@ create_image(Parrot_Interp interpreter, PMC *pmc, visit_info *info)
 
     info->image = string_make(interpreter, NULL, len, NULL, 0, NULL);
 }
+
+/*
+ * run_thaw - helper func
+ *
+ * thaw could use the next_for_GC pointers as todo-list too,
+ * but this would need 2 runs through the arenas to clean the
+ * next_for_GC pointers.
+ * For now it seems cheaper to use a list for remembering contained
+ * aggregates. We could of course decide dynamically, which strategy
+ * to use, e.g.: given a big image, the first thawed item is a small
+ * aggregate. This implies, it probably contains[1] more nested containers,
+ * for which the next_for_GC approach could be a win.
+ * [1] or some big strings :)
+ */
+
+static PMC*
+run_thaw(Parrot_Interp interpreter, STRING* image, visit_enum_type what)
+{
+    visit_info info;
+    PMC *n = NULL;
+    int dod_block = 0;
+
+    info.image = image;
+    if (string_length(image) > THAW_BLOCK_DOD_SIZE) {
+        Parrot_do_dod_run(interpreter, 1);
+        Parrot_block_DOD(interpreter);
+        Parrot_block_GC(interpreter);
+        dod_block = 1;
+    }
+
+    info.what = what;   /* _NORMAL or _CONSTANTS */
+    todo_list_init(interpreter, &info);
+    info.visit_child_function = visit_todo_list_thaw;
+
+    n = new_pmc_header(interpreter);
+    visit_loop_todo_list(interpreter, n, &info);
+
+    if (dod_block) {
+        Parrot_unblock_DOD(interpreter);
+        Parrot_unblock_GC(interpreter);
+    }
+    return n;
+}
 /*
  * public interface
  */
@@ -740,45 +783,23 @@ Parrot_freeze(Parrot_Interp interpreter, PMC* pmc)
 }
 
 /*
- * thaw could use the next_for_GC pointers as todo-list too,
- * but this would need 2 runs through the arenas to clean the
- * next_for_GC pointers.
- * For now it seems cheaper to use a list for remembering contained
- * aggregates. We could of course decide dynamically, which strategy
- * to use, e.g.: given a big image, the first thawed item is a small
- * aggregate. This implies, it probably contains[1] more nested containers,
- * for which the next_for_GC approach could be a win.
- * [1] or some big strings :)
+ * thaw a PMC, called from the thaw opcode
  */
-
 PMC*
 Parrot_thaw(Parrot_Interp interpreter, STRING* image)
 {
-    visit_info info;
-    PMC *n = NULL;
-    int dod_block = 0;
-
-    info.image = image;
-    if (string_length(image) > THAW_BLOCK_DOD_SIZE) {
-        Parrot_do_dod_run(interpreter, 1);
-        Parrot_block_DOD(interpreter);
-        Parrot_block_GC(interpreter);
-        dod_block = 1;
-    }
-
-    info.what = VISIT_THAW_NORMAL;
-    todo_list_init(interpreter, &info);
-    info.visit_child_function = visit_todo_list_thaw;
-
-    n = new_pmc_header(interpreter);
-    visit_loop_todo_list(interpreter, n, &info);
-
-    if (dod_block) {
-        Parrot_unblock_DOD(interpreter);
-        Parrot_unblock_GC(interpreter);
-    }
-    return n;
+    return run_thaw(interpreter, image, VISIT_THAW_NORMAL);
 }
+
+/*
+ * thaw constants - used by packfile for unpacking PMC constants
+ */
+PMC*
+Parrot_thaw_constants(Parrot_Interp interpreter, STRING* image)
+{
+    return run_thaw(interpreter, image, VISIT_THAW_CONSTANTS);
+}
+
 
 /*
  * there are for sure shortcuts to clone faster, e.g. allways
