@@ -15,8 +15,6 @@ use strict;
 
 package Parrot::PackFile::Constant;
 
-my $template = "l l l l/a*";
-
 
 #
 # new()
@@ -103,16 +101,25 @@ sub data
 # unpack()
 #
 # Unpack from the string and return the number of characters that should
-# be removed from the string.
+# be removed from the packed string.
 #
 
 sub unpack
 {
   my ($self, $string) = @_;
 
-  my ($flags, $encoding, $type, $size, $data) = unpack($template, $string);
+  my ($flags, $encoding, $type, $size) = unpack('l l l l', $string);
 
-  return $size + ($size % 4);
+  my $block_size = $size + ($size % 4);
+  my $data       = unpack("x16 a$block_size", $string);
+
+  $self->{FLAGS}    = $flags;
+  $self->{ENCODING} = $encoding;
+  $self->{TYPE}     = $type;
+  $self->{SIZE}     = $size;
+  $self->{DATA}     = substr($data, 0, $size);
+
+  return 16 + $block_size;
 }
 
 
@@ -126,7 +133,7 @@ sub pack
   
   my $block = $self->data . ("\0" x ($self->size % 4));
 
-  return pack($template, $self->flags, $self->encoding, $self->type, $self->size,
+  return pack('l l l l a*', $self->flags, $self->encoding, $self->type, $self->size,
     $block);
 }
 

@@ -81,7 +81,7 @@ sub const_table
 {
   my $self = shift;
 
-  return $self->{FIXUP};
+  return $self->{CONST};
 }
 
 
@@ -111,7 +111,7 @@ sub unpack
 {
   my ($self, $string) = @_;
 
-  printf "Input string is %d bytes long\n", length($string);
+#  printf "Input string is %d bytes long\n", length($string);
 
   my $magic = unpack("l", $string);
   $string = substr($string, 4);
@@ -168,12 +168,12 @@ sub unpack
   # Report on what we found:
   #
 
-  printf "  * %6d bytes magic\n", 4;
-  printf "  * %6d bytes fixup segment header\n", 4;
-  printf "  * %6d bytes fixup\n", length($fixup);
-  printf "  * %6d bytes const segment header\n", 4;
-  printf "  * %6d bytes const\n", length($const);
-  printf "  * %6d bytes bcode\n", length($string);
+#  printf "  * %6d bytes magic\n", 4;
+#  printf "  * %6d bytes fixup segment header\n", 4;
+#  printf "  * %6d bytes fixup\n", length($fixup);
+#  printf "  * %6d bytes const segment header\n", 4;
+#  printf "  * %6d bytes const\n", length($const);
+#  printf "  * %6d bytes bcode\n", length($string);
 
 #  printf "Parsed string with %d bytes of fixup, %d bytes of const and %d bytes of prog.\n", length($fixup), length($const), length($prog);
 
@@ -186,10 +186,10 @@ sub unpack
 
 
 #
-# read_filehandle()
+# unpack_filehandle()
 #
 
-sub read_filehandle
+sub unpack_filehandle
 {
   my ($self, $fh) = @_;
 
@@ -198,16 +198,17 @@ sub read_filehandle
   my @lines  = $fh->getlines();
   my $string = join('', @lines);
  
-  printf "Read %d lines, %d bytes.\n", scalar(@lines), length($string);
+#  printf "Read %d lines, %d bytes.\n", scalar(@lines), length($string);
+
   return $self->unpack($string);
 }
 
 
 #
-# read_file()
+# unpack_file()
 #
 
-sub read_file
+sub unpack_file
 {
   my $self = shift;
 
@@ -215,7 +216,7 @@ sub read_file
 
   return unless $fh;
 
-  return $self->read_filehandle($fh);
+  return $self->unpack_filehandle($fh);
 }
 
 
@@ -254,10 +255,10 @@ sub pack
 
 
 #
-# write_filehandle()
+# pack_filehandle()
 #
 
-sub write_filehandle
+sub pack_filehandle
 {
   my ($self, $fh) = @_;
 
@@ -266,17 +267,17 @@ sub write_filehandle
 
 
 #
-# write_file()
+# pack_file()
 #
 
-sub write_file
+sub pack_file
 {
   my $self = shift;
   my $fh = new FileHandle('>' . shift);
 
   return unless $fh;
 
-  return $self->write_filehandle($fh);
+  return $self->pack_filehandle($fh);
 }
 
 
@@ -287,11 +288,11 @@ __END__
 
 =head1 NAME
 
-Parrot::Bytecode
+Parrot::PackFile
 
 =head1 SYNOPSIS
 
-  use Parrot::Bytecode;
+  use Parrot::PackFile;
 
 =head1 DESCRIPTION
 
@@ -300,6 +301,54 @@ file. It is not intended to understand the contents of the bytecode file's
 segments, but merely to dissect and reconstruct data from the various
 segments. See L<parrotbyte> for information about the structure of the frozen
 bycode.
+
+=head2 byte_code
+=head2 byte_code CODE
+
+Get or set the byte code.
+
+=head2 const_table
+
+Get the constant table, and instance of the L<Parrot::PackFile::ConstTable>
+class.
+
+=head2 fixup_table
+
+Get the fixup table, and instance of the L<Parrot::PackFile::FixupTable>
+class.
+
+=head2 magic
+
+Get the magic number.
+
+=head2 new
+
+Make a new instance.
+
+=head2 pack
+
+Pack the contents to a string.
+
+=head2 pack_file FILENAME
+
+Pack the contents to a string and write it to the named file.
+
+=head2 pack_filehandle FILEHANDLE
+
+Pack the contents to a string and write it to the filehandle.
+
+=head2 unpack STRING
+
+Unpack the contents from the string.
+
+=head2 unpack_file FILENAME
+
+Unpack the contents from the named file.
+
+=head2 unpack_filehandle FILEHANDLE
+
+Unpack the contents from the filehandle.
+
 
 =head1 FORMAT
 

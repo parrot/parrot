@@ -1,11 +1,26 @@
 #! /usr/bin/perl -w
 #
-# Disassemble.pl
+# disassemble.pl
 #
-# Turn a parrot bytecode file into text
+# Turn a parrot bytecode file into text.
+#
+# Copyright (C) 2001 The Parrot Team. All rights reserved.
+# This program is free software. It is subject to the same license
+# as the Parrot interpreter.
+#
+# $Id$
+#
 
 use strict;
+
 use Parrot::Opcode;
+use Parrot::PackFile;
+use Parrot::PackFile::ConstTable;
+
+
+#
+# GLOBAL VARIABLES:
+#
 
 my %unpack_type = (i => 'l',
 		   I => 'l',
@@ -32,69 +47,147 @@ for my $name (keys %opcodes) {
 					%{$opcodes{$name}} };
 }
 
-$/ = \4;
 
-my $magic = unpack('l', <>);
-die "Not parrot bytecode!\n" if ($magic != 0x013155a1);
+#
+# dump_const_table()
+#
 
-my $fixups = unpack('l', <>);
-# No fixups yet
+sub dump_const_table {
+    my ($pf) = @_;
 
-my $constants = unpack('l', <>);
-if($constants) {
-    my $count=unpack('l', <>);
-    print "# Constants: $count entries ($constants bytes)\n";
+    my $count = $pf->const_table->const_count;
+
+    if ($count < 1) {
+	warn "Disassembling without opcode table fingerprint!";
+	return;
+    }
+
+    die "Cannot disassemble (differing opcode table)!"
+        if $pf->const_table->constant(0)->data ne $opcode_fingerprint;
+
+    print "# Constants: $count entries\n";
     print "# ID  Flags    Encoding Type     Size     Data\n"; 
-    my $constant_num = 0;
-    foreach (1..$count) {
-       my $flags=unpack('l',<>);
-       my $encoding=unpack('l',<>);
-       my $type=unpack('l',<>);
-       my $size=unpack('l',<>);
-       my $data="";
-       while(length($data) < $size) {
-           $data.=<>;
-       }
-       # strip off any padding nulls
-       $data=substr($data,0,$size);
-       printf("%04x: %08x %08x %08x %08x %s\n",$_-1,$flags,$encoding,$type,$size,$data);
 
-	die "Cannot disassemble (differing opcode table)!" if $constant_num == 0 and $data ne $opcode_fingerprint;
+    my $constant_num = 0;
+
+    foreach ($pf->const_table->constants) {
+        printf("%04x: %08x %08x %08x %08x %s\n",
+	    $constant_num, $_->flags, $_->encoding, $_->type,
+            $_->size, $_->data);
+
 	$constant_num++;
     }
-} else {
-    warn "Disassembling without opcode table fingerprint!";
 }
-print "# Code Section\n";
-my $offset=0;
-while (<>) {
-    my $code = unpack 'l', $_;
-    my $args = $opcodes[$code]{ARGS};
-    my $op_offset=$offset;
-    print sprintf("%08x:  ",$offset),$opcodes[$code]{NAME},"\t";
-    my @args=();
-    $offset+=4;
-    if ($args) {
-	foreach (1..$args) {
-	    my $type=$opcodes[$code]{TYPES}[$_-1];
-	    local $/ = \$unpack_size{$type};
-	    $offset+=$unpack_size{$type};
-	    my $data = <> || die("EOF when expecting argument!\n");
-	    if($type eq "I" || $type eq "N" || $type eq "P" || $type eq "S") {
-		# register
-		push(@args,$type.unpack($unpack_type{$type},$data));
-	    } elsif($type eq "D") {
-		# destination address
-		push(@args,sprintf("%08x",$op_offset+unpack($unpack_type{$type},$data)*4));
-	    } elsif($type eq "s") {
-		# string constant
-		push(@args,sprintf("[string %04x]",unpack($unpack_type{$type},$data)));
-		
-	    } else { 
-		# constant
-		push(@args,unpack $unpack_type{$type}, $data);
+
+
+#
+# disassemble_byte_code()
+#
+
+sub disassemble_byte_code {
+    my ($pf) = @_;
+
+    my $cursor = 0;
+    my $length = length($pf->byte_code);
+
+    print "# Code Section\n";
+
+    my $offset=0;
+
+    while ($offset + 4 <= $length) {
+	my $op_start = $offset;
+	my $op_code = unpack "x$offset l", $pf->byte_code;
+	printf "%08x: %-10s", $op_start, $opcodes[$op_code]{NAME};
+	$offset += 4;
+
+	my $arg_count = $opcodes[$op_code]{ARGS};
+	my @args = ();
+
+        unless($arg_count) {
+	    print "\n";
+	    next;
+	}
+
+	foreach (0 .. $arg_count - 1) {
+	    my $type        = $opcodes[$op_code]{TYPES}[$_];
+	    my $unpack_type = $unpack_type{$type};
+	    my $unpack_size = $unpack_size{$type};
+
+	    die "$0: Premature end of bytecode in argument.\n"
+		if ($offset + $unpack_size) > $length;
+
+	    my $arg = unpack "x$offset $unpack_type", $pf->byte_code;
+	    $offset += $unpack_size;
+
+
+	    if($type =~ m/^[INPS]$/) { # Register
+		push @args, $type . $arg;
+	    } elsif($type eq "D") { # destination address
+		push @args, sprintf("%08x",$op_start + (4 * $arg));
+	    } elsif($type eq "s") { # string constant
+		push @args, sprintf("[string %04x]", $arg);
+	    } else { # constant
+		push @args, $arg;
 	    }
 	}
+
+	print join(", ", @args), "\n";
     }
-    print join(", ",@args),"\n";
 }
+
+
+#
+# disassemble_file()
+#
+
+sub disassemble_file {
+    my ($file_name) = @_;
+
+    my $pf = Parrot::PackFile->new;
+    $pf->unpack_file($file_name);
+
+    dump_const_table($pf);
+    disassemble_byte_code($pf);
+ 
+    undef $pf;
+
+    return;
+}
+
+
+#
+# MAIN PROGRAM:
+#
+
+@ARGV = qw(-) unless @ARGV;
+
+foreach (@ARGV) {
+    disassemble_file($_)
+}
+
+exit 0;
+
+__END__
+
+=head1 NAME
+
+disassemble.pl - disassemble the byte code from Parrot Pack Files
+
+=head1 SYNOPSIS
+
+  perl disassemble.pl FILE
+
+=head1 DESCRIPTION
+
+Disassembles the Parrot Pack Files listed on the command line, or
+from standard input if no file is named.
+
+=head1 COPYRIGHT
+
+Copyright (C) 2001 The Parrot Team. All rights reserved.
+
+=head1 LICENSE
+
+This program is free software. It is subject to the same license
+as the Parrot interpreter.
+

@@ -92,6 +92,42 @@ sub pack
 }
 
 
+#
+# const_count()
+#
+
+sub const_count
+{
+  my $self = shift;
+
+  return scalar(@{$self->{CONST}});
+}
+
+
+#
+# constant()
+#
+
+sub constant
+{
+  my ($self, $index) = @_;
+
+  return $self->{CONST}[$index];
+}
+
+
+#
+# constants()
+#
+
+sub constants
+{
+  my $self = shift;
+
+  return @{$self->{CONST}};
+}
+
+
 1;
 
 __END__
@@ -109,6 +145,12 @@ Parrot::PackFile::ConstTable
 Constant tables from Parrot pack files.
 
 =head2 clear
+
+=head2 const_count
+
+=head2 constant
+
+=head2 constants
 
 =head2 new
 
