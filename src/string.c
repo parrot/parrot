@@ -1049,11 +1049,6 @@ hash_string_equal(struct Parrot_Interp *interpreter, STRING *s1, STRING *s2)
 INTVAL
 string_equal(struct Parrot_Interp *interpreter, STRING *s1, STRING *s2)
 {
-    const char *s1start;
-    const char *s1end;
-    const char *s2start;
-    const char *s2end;
-
     if (!s1 && !s2) {
         return 0;
     }

@@ -481,7 +481,6 @@ runops_int(struct Parrot_Interp *interpreter, size_t offset)
     interpreter->resume_flag = 1;
 
     while (interpreter->resume_flag & 1) {
-        unsigned int slow;
         opcode_t *pc = (opcode_t *)
             interpreter->code->byte_code + interpreter->resume_offset;
 

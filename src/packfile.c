@@ -158,7 +158,6 @@ PackFile_check_segment_size(opcode_t segment_size, const char *debug)
 static void
 make_code_pointers(struct PackFile_Segment *seg)
 {
-    size_t i;
     struct PackFile *pf = seg->pf;
 
     switch (seg->type) {
@@ -997,7 +996,7 @@ directory_destroy (struct PackFile_Segment *self)
 static void
 sort_segs(struct PackFile_Directory *dir)
 {
-    size_t i, j, num_segs = dir->num_segments;
+    size_t i, num_segs = dir->num_segments;
 
     struct PackFile_Segment *seg = dir->segments[0], *s2;
     if (seg->type != PF_BYTEC_SEG) {

@@ -78,7 +78,7 @@ str_append(Parrot_Interp interpreter, STRING *s, const void *b, size_t len)
      * grow by factor 1.5 or such
      */
     if (need_free <= 16) {
-        size_t new_size = s->buflen * 1.5;
+        size_t new_size = (size_t) (s->buflen * 1.5);
         if (new_size < s->buflen - need_free + 512)
             new_size = s->buflen - need_free + 512;
         Parrot_reallocate_string(interpreter, s, new_size);
@@ -150,7 +150,7 @@ op_append(Parrot_Interp interpreter, STRING *s, opcode_t b, size_t len)
      * grow by factor 1.5 or such
      */
     if (need_free <= 16) {
-        size_t new_size = s->buflen * 1.5;
+        size_t new_size = (size_t) (s->buflen * 1.5);
         if (new_size < s->buflen - need_free + 512)
             new_size = s->buflen - need_free + 512;
         Parrot_reallocate_string(interpreter, s, new_size);

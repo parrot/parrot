@@ -72,8 +72,6 @@ runops_cgoto_core(struct Parrot_Interp *interpreter, opcode_t *pc)
 opcode_t *
 runops_slow_core(struct Parrot_Interp *interpreter, opcode_t *pc)
 {
-    opcode_t *code_start;
-    opcode_t *code_end;
 #ifdef USE_TRACE_INTERP
     Interp * trace_i;
     struct Parrot_Context *trace_ctx;
@@ -148,7 +146,7 @@ runops_slow_core(struct Parrot_Interp *interpreter, opcode_t *pc)
 opcode_t *
 runops_profile_core(struct Parrot_Interp *interpreter, opcode_t *pc)
 {
-    opcode_t *code_start, *code_end, cur_op;
+    opcode_t cur_op;
     RunProfile *profile = interpreter->profile;
 
     while (pc) {/* && pc >= code_start && pc < code_end) */

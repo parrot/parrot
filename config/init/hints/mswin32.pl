@@ -56,6 +56,13 @@
 		# 'link' needs to be link.exe, not cl.exe.
 		# This makes 'link' and 'ld' the same.
 		Configure::Data->set('link', Configure::Data->get('ld'));
+		
+		# We can't use -opt: and -debug together.
+		if (Configure::Data->get('ld_debug') =~ /-debug/) {
+			my $linkflags = Configure::Data->get('linkflags');
+			$linkflags =~ s/-opt:\S+//;
+			Configure::Data->set('linkflags', $linkflags);
+		}
 	    }
 	if( $is_bcc ) {
 		Configure::Data->set(

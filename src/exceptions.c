@@ -100,7 +100,6 @@ static PMC *
 find_exception_handler(Parrot_Interp interpreter, PMC *exception)
 {
     PMC *handler;
-    Stack_entry_type type;
     STRING *message;
     char *m;
     int exit_status;
@@ -294,7 +293,6 @@ static opcode_t *
 create_exception(Parrot_Interp interpreter)
 {
     PMC *exception;     /* exception object */
-    size_t offset;      /* resume offset of handler */
     opcode_t *dest;     /* absolute address of handler */
 
 
@@ -353,7 +351,6 @@ real_exception(struct Parrot_Interp *interpreter, void *ret_addr,
 {
 #ifdef PARROT_HAS_HEADER_SETJMP
     STRING *msg;
-    opcode_t *dest;     /* absolute address of handler */
 
 
     /*

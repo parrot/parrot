@@ -204,7 +204,7 @@ Parrot_int_rand(INTVAL how_random)
 INTVAL
 Parrot_range_rand(INTVAL from, INTVAL to, INTVAL how_random)
 {
-    return from + ((double)(to - from)) * Parrot_float_rand(how_random);
+    return (INTVAL) from + ((double)(to - from)) * Parrot_float_rand(how_random);
 }
 
 void
