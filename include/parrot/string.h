@@ -69,7 +69,7 @@ string_transcode(struct Parrot_Interp *interpreter, const STRING *src,
                  const ENCODING *encoding, const CHARTYPE *type, STRING **d);
 void
 string_init(void);
-static INTVAL
+INTVAL
 string_index(const STRING* s, INTVAL index);
 
 #endif
