@@ -39,11 +39,22 @@ Prints a PMC to C<stderr>.
 void
 trace_pmc_dump(struct Parrot_Interp *interpreter, PMC* pmc)
 {
+    char *escaped;
     if (pmc && pmc != PMCNULL) {
         if(pmc->vtable) {
             if (pmc->vtable->base_type == enum_class_PerlString) {
-                PIO_eprintf(interpreter, "%S=PMC(%#p Str:\"%Ps\")",
-                        VTABLE_name(interpreter, pmc), pmc, pmc);
+                STRING *s = VTABLE_get_string(interpreter, pmc);
+                if (!s)
+                    PIO_eprintf(interpreter, "%S=PMC(%#p Str:(NULL))",
+                        VTABLE_name(interpreter, pmc), pmc);
+                else {
+                    escaped = PDB_escape(s->bufstart, s->strlen);
+                    PIO_eprintf(interpreter, "%S=PMC(%#p Str:\"%s\")",
+                        VTABLE_name(interpreter, pmc), pmc,
+                        escaped ? escaped : "(null)");
+                    if (escaped)
+                        mem_sys_free(escaped);
+                }
             }
             else if (pmc->vtable->base_type == enum_class_PerlUndef
                  ||  pmc->vtable->base_type == enum_class_PerlInt
