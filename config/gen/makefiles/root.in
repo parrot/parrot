@@ -1159,14 +1159,25 @@ progclean :
 	$(RM_F) classes/*.c classes/*.h classes/*.dump vtable.dump
 
 testclean :
-	$(RM_F) t/op/*.pasm t/op/*.imc
-	$(RM_F) t/op/*.pbc t/op/*.out
-	$(RM_F) t/op/*.o t/op/*.stabs.s
-	$(RM_F) t/library/*.imc t/library/*.pbc
-	$(RM_F) t/pmc/*.pasm t/pmc/*.imc t/pmc/*.pbc
-	$(RM_F) t/pmc/*.out t/pmc/*.o t/pmc/*.stabs.s
-	$(RM_F) t/stress/*.pasm t/stress/*.pbc
-	$(RM_F) t/stress/*.out t/stress/*.o t/stress/*.stabs.s
+	$(RM_F) t/op/*.pasm
+	$(RM_F) t/op/*.imc
+	$(RM_F) t/op/*.pbc
+	$(RM_F) t/op/*.out
+	$(RM_F) t/op/*.o
+	$(RM_F) t/op/*.stabs.s
+	$(RM_F) t/library/*.imc
+	$(RM_F) t/library/*.pbc
+	$(RM_F) t/pmc/*.pasm
+	$(RM_F) t/pmc/*.imc
+	$(RM_F) t/pmc/*.pbc
+	$(RM_F) t/pmc/*.out
+	$(RM_F) t/pmc/*.o
+	$(RM_F) t/pmc/*.stabs.s
+	$(RM_F) t/stress/*.pasm
+	$(RM_F) t/stress/*.pbc
+	$(RM_F) t/stress/*.out
+	$(RM_F) t/stress/*.o
+	$(RM_F) t/stress/*.stabs.s
 	$(RM_F) t/src/*_*
 	$(MAKE_C) $(IMCC_DIR) testclean
 
