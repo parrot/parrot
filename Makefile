@@ -51,8 +51,10 @@ clean:
 
 test:
 	perl assemble.pl t/test.pasm  > t/test.pbc
-	./test_prog t/test.pbc
+	./test_prog t/test.pbc > t/test.out
 	perl assemble.pl t/test2.pasm > t/test2.pbc
-	./test_prog t/test2.pbc
+	./test_prog t/test2.pbc > t/test2.out
 	perl assemble.pl t/test3.pasm > t/test3.pbc
-	./test_prog t/test3.pbc
+	./test_prog t/test3.pbc > t/test3.out
+	perl assemble.pl t/euclid.pasm > t/euclid.pbc
+	./test_prog t/euclid.pbc > t/euclid.out
