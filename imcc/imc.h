@@ -17,6 +17,14 @@
 
 #include "parrot/parrot.h"
 
+/* For people without unistd.h to compile Flex lexer
+ * unistd.h probably isn't required on most if any
+ * platforms anyway.
+ */
+#ifndef PARROT_HAS_HEADER_UNISTD
+#  define YY_NO_UNISTD_H 1
+#endif
+
 #define IMCC_MAX_REGS PARROT_MAX_ARGS
 #if IMCC_MAX_REGS > 16
 #error: flags wont fit
