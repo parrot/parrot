@@ -2059,7 +2059,7 @@ AUTO_OP entrytype(i, i|ic) {
   INTVAL depth;
   struct Stack_Entry *entry;
   depth = stack_depth(interpreter, interpreter->user_stack_base);
-  if (depth < $2) {
+  if (depth <= $2) {
     INTERNAL_EXCEPTION(99, "Stack Depth wrong");
   }
 

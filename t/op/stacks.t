@@ -1,6 +1,6 @@
 #! perl -w
 
-use Parrot::Test tests => 16;
+use Parrot::Test tests => 18;
 
 # Tests for stack operations, currently push*, push_*_c and pop*
 # where * != p.
@@ -385,6 +385,56 @@ find themselves caught in a loop
 never to escape
 OUTPUT
 
+output_is(<<CODE, <<OUTPUT, "entrytype");
+	set	I0, 12
+	set	N0, 0.1
+	set	S0, "Difference Engine #2"
+	new	P0, PerlString
+	set	P0, "Shalmaneser"
+
+	save	P0
+	save	S0
+	save	"Wintermute"
+	save	N0
+	save	1.23
+	save	I0
+	save	12
+
+	print	"starting\\n"
+
+	set	I1, 0
+LOOP:	entrytype	I0, I1
+	print	I0
+	print	"\\n"
+	inc	I1
+	lt	I1, 7, LOOP
+
+	print	"done\\n"
+	end
+CODE
+starting
+1
+1
+2
+2
+3
+3
+4
+done
+OUTPUT
+
+SKIP: { skip("Await exceptions", 1);
+# this should throw an exception...
+output_is(<<CODE, <<OUTPUT, "entrytype, beyond stack depth");
+	save	12
+	print	"ready\\n"
+	entrytype	I0, 1
+	print	"done\\n"
+CODE
+ready
+Stack Depth Wrong
+OUTPUT
+}
 
 ##############################
 
