@@ -1,6 +1,6 @@
 #!perl
 use strict;
-use TestCompiler tests => 30;
+use TestCompiler tests => 31;
 
 ##############################
 # Parrot Calling Conventions
@@ -1222,4 +1222,23 @@ output_is(<<'CODE', <<'OUT', "more pragmas, syntax only");
 .end
 CODE
 ok
+OUT
+
+output_is(<<'CODE', <<'OUT', "_func() syntax");
+.sub _main
+    _sub(10, 20)
+    end
+.end
+.pcc_sub _sub prototyped
+    .param int a
+    .param int b
+    print a
+    print "\n"
+    print b
+    print "\n"
+    end
+.end
+CODE
+10
+20
 OUT

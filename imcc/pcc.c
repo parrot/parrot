@@ -762,18 +762,26 @@ expand_pcc_sub_call(Parrot_Interp interp, IMC_Unit * unit, Instruction *ins)
      * See if we need to create a temporary sub object
      */
     if (ins->type & ITCALL) {
+        if (sub->pcc_sub->sub->type == VTADDRESS) {
 #if IMC_TRACE
-        fprintf(stderr, "generating sub object [sub->name = %s]\n", sub->pcc_sub->sub->name);
+            fprintf(stderr, "generating sub object [sub->name = %s]\n",
+                    sub->pcc_sub->sub->name);
 #endif
-        /* sub->pcc_sub->sub is an actual subroutine name, not a variable. */
-        reg = mk_temp_reg('P');
-        tmp = iNEWSUB(interp, unit, reg, NEWSUB, sub->pcc_sub->sub, NULL, 0);
-        add_pcc_sub(sub, reg);
-        ins->type &= ~ITCALL;
-        prepend_ins(unit, ins, tmp);
+            /*
+             * sub->pcc_sub->sub is an actual subroutine name,
+             * not a variable.
+             */
+            reg = mk_temp_reg('P');
+            tmp = iNEWSUB(interp, unit, reg, NEWSUB, sub->pcc_sub->sub, NULL, 0);
+            add_pcc_sub(sub, reg);
+            ins->type &= ~ITCALL;
+            prepend_ins(unit, ins, tmp);
 
-        expand_pcc_sub_call(interp, unit, ins);
-        return;
+            expand_pcc_sub_call(interp, unit, ins);
+            return;
+        }
+        else
+            add_pcc_sub(sub, sub->pcc_sub->sub);
     }
 
     /*

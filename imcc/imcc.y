@@ -194,6 +194,30 @@ static char * inv_op(char *op) {
     return (char *) get_neg_op(op, &n);
 }
 
+static Instruction *
+create_itcall_label(void)
+{
+    char name[128];
+    SymReg * r;
+    Instruction *i;
+
+    sprintf(name, "%cpcc_sub_call_%d", IMCC_INTERNAL_CHAR, cnr++);
+    r = mk_pcc_sub(str_dup(name), 0);
+    current_call = i = iLABEL(cur_unit, r);
+    i->type = ITCALL | ITPCCSUB;
+    return i;
+}
+
+static void
+itcall_sub(SymReg* sub)
+{
+   current_call->r[0]->pcc_sub->sub = sub;
+   /* FIXME use the default settings from .pragma */
+   current_call->r[0]->pcc_sub->pragma = P_PROTOTYPED;
+   if(cur_unit->type == IMC_PCCSUB)
+        cur_unit->instructions->r[1]->pcc_sub->calls_a_sub = 1;
+}
+
 %}
 
 %union {
@@ -236,7 +260,7 @@ static char * inv_op(char *op) {
 %type <i> labels _labels label statements statement sub_call
 %type <i> pcc_sub_call
 %type <sr> sub_param sub_params pcc_arg pcc_result pcc_args pcc_results pcc_params pcc_param
-%type <sr> pcc_returns pcc_return pcc_call arg
+%type <sr> pcc_returns pcc_return pcc_call arg the_sub
 %type <t> pcc_proto pcc_sub_proto proto
 %type <i> instruction assignment if_statement labeled_inst opt_label
 %type <sr> target reg const var string
@@ -792,43 +816,28 @@ assignment:
          }
    |
          {
-            char name[128];
-            SymReg * r;
-            Instruction *i;
-            sprintf(name, "%cpcc_sub_call_%d", IMCC_INTERNAL_CHAR, cnr++);
-            r = mk_pcc_sub(str_dup(name), 0);
-            current_call = i = iLABEL(cur_unit, r);
-            i->type = ITCALL | ITPCCSUB;
-            $<i>$ = i;
+            $<i>$ = create_itcall_label();
          }
-     '(' targetlist  ')' '=' IDENTIFIER '(' arglist ')'
+     '(' targetlist  ')' '=' the_sub '(' arglist ')'
          {
-            current_call->r[0]->pcc_sub->sub = mk_sub_address($6);
-           /* FIXME use the default settings from .pragma */
-            current_call->r[0]->pcc_sub->pragma = P_PROTOTYPED;
-            if(cur_unit->type == IMC_PCCSUB)
-               cur_unit->instructions->r[1]->pcc_sub->calls_a_sub = 1;
-
-            current_call = NULL;
+           itcall_sub($6);
+           current_call = NULL;
          }
    ;
 
+the_sub: IDENTIFIER  { $$ = mk_sub_address($1); }
+       /* this produces 18 shift/reduce conflicts and wrong code
+       | target      { $$ = $1;
+                       if ($1->set != 'P')
+                          fataly(1, sourcefile, line, "Sub isn't a PMC");
+       */
+   ;
+
 sub_call:
-     IDENTIFIER
+     the_sub
         {
-           char name[128];
-           SymReg * r;
-           Instruction *i;
-           sprintf(name, "%cpcc_sub_call_%d", IMCC_INTERNAL_CHAR, cnr++);
-           r = mk_pcc_sub(str_dup(name), 0);
-           current_call = i = iLABEL(cur_unit, r);
-           i->type = ITCALL | ITPCCSUB;
-           $$ = i;
-           current_call->r[0]->pcc_sub->sub = mk_sub_address($1);
-           /* FIXME use the default settings from .pragma */
-           current_call->r[0]->pcc_sub->pragma = P_PROTOTYPED;
-           if(cur_unit->type == IMC_PCCSUB)
-              cur_unit->instructions->r[1]->pcc_sub->calls_a_sub = 1;
+           $$ = create_itcall_label();
+           itcall_sub($1);
         }
      '(' arglist ')'
         {  $$ = $<i>2; }
