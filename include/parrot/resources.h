@@ -27,6 +27,39 @@ void free_bigint(void);
 void *new_bignum_header(struct Parrot_Interp *);
 void free_bignum(void);
 
+struct PMC_Arena {
+    UINTVAL free;	  /* Count of PMCs free in this arena */
+    UINTVAL used;         /* Count of PMCs used in this arena */
+    struct PMC_Arena *prev;
+    struct PMC_Arena *next;
+    PMC *next_PMC;	  /* Next PMC in the arena ready to allocate */
+    UINTVAL *GC_data;     /* Actually an array with one element per PMC */
+};
+
+struct STRING_Arena {
+    UINTVAL free;
+    UINTVAL used;
+    struct STRING_Arena *prev;
+    struct STRING_Arena *next;
+    STRING *next_STRING;
+};
+
+struct Memory_Pool {
+    UINTVAL free;
+    UINTVAL size;
+    struct Memory_Pool *prev;
+    struct Memory_Pool *next;
+    void *start;
+    void *top;
+};
+
+struct Arena {
+    struct PMC_Arena *last_PMC_Arena;
+    struct STRING_Arena *last_STRING_Arena;
+    struct Memory_Pool *memory_pool;
+};
+
+
 #endif /* PARROT_RESOURCES_H */
 
 /*
