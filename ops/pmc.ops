@@ -287,6 +287,23 @@ inline op delete(in PMC, in INTKEY) {
 
 =cut
 
+########################################
+
+=item B<elements>(out INT, in PMC)
+
+Returns the number of items in aggregate $2
+
+=cut
+
+inline op elements(out INT, in PMC) {
+  $1 = VTABLE_elements(interpreter, $2);
+  goto NEXT();
+}
+
+=back
+
+=cut
+
 ###############################################################################
 
 =head2 Fast access ops
