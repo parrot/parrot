@@ -6,55 +6,54 @@ MYPATH  = languages${slash}tcl${slash}
 LIBPATH  = $(MYPATH)lib${slash}
 
 DEPS = $(RELPATH)$(PARROT) \
-lib/commands/append.imc \
-lib/commands/array.imc \
-lib/commands/break.imc \
-lib/commands/catch.imc \
-lib/commands/continue.imc \
-lib/commands/error.imc \
-lib/commands/eval.imc \
-lib/commands/exit.imc \
-lib/commands/expr.imc \
-lib/commands/for.imc \
-lib/commands/format.imc \
-lib/commands/global.imc \
-lib/commands/if.imc \
-lib/commands/incr.imc \
-lib/commands/lappend.imc \
-lib/commands/list.imc \
-lib/commands/llength.imc \
-lib/commands/proc.imc \
-lib/commands/puts.imc \
-lib/commands/rename.imc \
-lib/commands/return.imc \
-lib/commands/set.imc \
-lib/commands/source.imc \
-lib/commands/time.imc \
-lib/commands/unset.imc \
-lib/commands/while.imc \
-lib/expression.imc \
-lib/get_var.imc \
-lib/interpret.imc \
-lib/macros/boolean.imc \
-lib/macros/is_space.imc \
-lib/match_close.imc \
-lib/parse.imc \
-lib/string_to_list.imc \
+lib${slash}commands${slash}append.imc \
+lib${slash}commands${slash}array.imc \
+lib${slash}commands${slash}break.imc \
+lib${slash}commands${slash}catch.imc \
+lib${slash}commands${slash}continue.imc \
+lib${slash}commands${slash}error.imc \
+lib${slash}commands${slash}eval.imc \
+lib${slash}commands${slash}exit.imc \
+lib${slash}commands${slash}expr.imc \
+lib${slash}commands${slash}for.imc \
+lib${slash}commands${slash}format.imc \
+lib${slash}commands${slash}global.imc \
+lib${slash}commands${slash}if.imc \
+lib${slash}commands${slash}incr.imc \
+lib${slash}commands${slash}lappend.imc \
+lib${slash}commands${slash}list.imc \
+lib${slash}commands${slash}llength.imc \
+lib${slash}commands${slash}proc.imc \
+lib${slash}commands${slash}puts.imc \
+lib${slash}commands${slash}rename.imc \
+lib${slash}commands${slash}return.imc \
+lib${slash}commands${slash}set.imc \
+lib${slash}commands${slash}source.imc \
+lib${slash}commands${slash}time.imc \
+lib${slash}commands${slash}unset.imc \
+lib${slash}commands${slash}while.imc \
+lib${slash}expression.imc \
+lib${slash}get_var.imc \
+lib${slash}interpret.imc \
+lib${slash}macros${slash}boolean.imc \
+lib${slash}macros${slash}is_space.imc \
+lib${slash}match_close.imc \
+lib${slash}parse.imc \
+lib${slash}string_to_list.imc \
 tcl.imc_template \
 tcl.pl
 
-tcl.pbc: tcl.imc
+tcl.pbc: lib${slash}tcllib.pbc lib${slash}tclword.pbc
 	(cd $(RELPATH) && $(PARROT) --output=$(MYPATH)tcl.pbc $(MYPATH)tcl.imc)
 
-tcl.imc: tcl.pl lib/tcllib.pbc
-	$(PERL) tcl.pl > tcl.imc
+lib${slash}tcllib.imc: $(DEPS)
+	$(PERL) tcl.pl > lib${slash}tcllib.imc
 
-lib/tcllib.pbc: $(DEPS) lib/tclword.pbc lib/tcllib.imc
+lib${slash}tcllib.pbc: lib${slash}tcllib.imc
 	(cd $(RELPATH) && $(PARROT) --output=$(LIBPATH)tcllib.pbc $(LIBPATH)tcllib.imc)
 
-lib/tclword.pbc: $(DEPS) lib/tclword.imc
+lib${slash}tclword.pbc: lib${slash}tclword.imc
 	(cd $(RELPATH) && $(PARROT) --output=$(LIBPATH)tclword.pbc $(LIBPATH)tclword.imc)
-
 
 test:	tcl.pbc
 	cd t && $(PERL) -MTest::Harness -e 'runtests(glob("*.t"))' && cd ..
@@ -63,7 +62,7 @@ devtest:
 	cd t && $(PERL) -e 'use Test::Harness qw($$verbose runtests) ; $$Test::Harness::verbose=1;runtests(glob("*.t"))' && cd ..
 
 clean:
-	$(RM_F) tcl.imc tcl.pbc lib/*.pbc
+	$(RM_F) lib${slash}tcllib.imc tcl.pbc lib${slash}*.pbc
 
 distclean: clean
 	$(RM_F) Makefile
