@@ -50,7 +50,7 @@ sub runstep {
 
     cc_gen('config/auto/memalign/test_c2.in');
     eval { cc_build(); };
-    unless ($@ || cc_run() !~ /ok/) {
+    unless ($@ || cc_run_capture() !~ /ok/) {
 	$test2 = 1;
     }
     cc_clean();
