@@ -508,7 +508,7 @@ sub major_version
 {
   my $self = shift;
 
-  $self->{VERSION} =~ m/^(\d+)\.\d+\.\d+$/;
+  $self->{VERSION} =~ m/^(\d+)\./;
 
   return $1;
 }
@@ -522,7 +522,7 @@ sub minor_version
 {
   my $self = shift;
 
-  $self->{VERSION} =~ m/^\d+\.(\d+)\.\d+$/;
+  $self->{VERSION} =~ m/^\d+\.(\d+)\./;
 
   return $1;
 }
@@ -536,7 +536,7 @@ sub patch_version
 {
   my $self = shift;
 
-  $self->{VERSION} =~ m/^\d+\.\d+\.(\d+)$/;
+  $self->{VERSION} =~ m/^\d+\.\d+\.(.*)$/;
 
   return $1;
 }
