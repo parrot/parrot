@@ -40,7 +40,7 @@ $(PDUMP): pdump$(O) packfile$(O) memory$(O) global_setup$(O) string$(O) strnativ
 test_main$(O): $(H_FILES)
 
 examples/assembly/mops.pbc: examples/assembly/mops.pasm assemble.pl
-	cd examples/assembly; make mops.pbc
+	cd examples/assembly; make mops.pbc PERL=$(PERL)
 
 Parrot/OpLib/core.pm: core.ops
 	$(PERL) ops2pm.pl core.ops

@@ -23,6 +23,7 @@ my $file = $ARGV[0];
 my $base = $file;
 $base =~ s/\.ops$//;
 
+my $incdir  = "include/parrot/oplib";
 my $include = "parrot/oplib/${base}_ops.h";
 my $header  = "include/$include";
 my $source  = "${base}_ops.c";
@@ -43,6 +44,10 @@ my $num_entries = $num_ops + 1; # For trailing NULL
 #
 # Open the output files:
 #
+
+if (! -d $incdir) {
+    mkdir $incdir or die "ops2cpl: Could not mkdir $incdir $!!\n";
+}
 
 open HEADER, ">$header"
   or die "ops2c.pl: Could not open header file '$header' for writing: $!!\n";

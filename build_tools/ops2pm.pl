@@ -28,6 +28,7 @@ my $base = $file;
 $base =~ s/\.ops$//;
 
 my $package = "${base}";
+my $moddir  = "Parrot/OpLib";
 my $module  = "Parrot/OpLib/${package}.pm";
 
 
@@ -47,6 +48,9 @@ my $num_entries = $num_ops + 1; # For trailing NULL
 # Open the output file:
 #
 
+if (! -d $moddir) {
+    mkdir $moddir or die "ops2pm.pl: Could not mkdir $moddir: $!!\n";
+}
 open MODULE, ">$module"
   or die "ops2pm.pl: Could not open module file '$module' for writing: $!!\n";
 
