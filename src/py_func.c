@@ -59,7 +59,7 @@ parrot_py_chr(Interp *interpreter, PMC *pmc)
     PMC *s = pmc_new_noinit(interpreter, enum_class_PerlString);
     INTVAL i = VTABLE_get_integer(interpreter, pmc);
     /*
-     * TODO if i < 0 || > 255 throgh ValueError
+     * TODO if i < 0 || > 255 throw ValueError
      */
     PMC_str_val(s) = string_chr(interpreter, (UINTVAL)i);
     PObj_custom_mark_SET(s);
