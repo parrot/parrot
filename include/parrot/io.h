@@ -17,9 +17,6 @@
 #if !defined(PARROT_IO_H_GUARD)
 #define PARROT_IO_H_GUARD
 
-#ifndef SSIZE_MAX
-#define SSIZE_MAX 8192
-#endif
 
 #ifndef STDIN_FILENO
 # define STDIN_FILENO 0

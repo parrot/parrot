@@ -8,8 +8,8 @@
 
 #include <parrot/parrot.h>
 
-#define PF_NCONST(pf)  (pf)->const_table->const_count
-#define PF_CONST(pf,i) (pf)->const_table->constants[i]
+#define PF_NCONST(pf)  ((pf)->const_table->const_count)
+#define PF_CONST(pf,i) ((pf)->const_table->constants[(i)])
 
 
 /*

@@ -79,11 +79,11 @@ void bitmap_add(struct Parrot_Interp *, Bitmap, INTVAL);
 BOOLVAL bitmap_match(Bitmap, INTVAL);
 void bitmap_destroy(Bitmap);
 
-#define RX_dUNPACK(pmc)            rxinfo *rx=(rxinfo *)pmc->data
-#define RxCurChar(rx)              (char)string_ord(rx->string, rx->index)
+#define RX_dUNPACK(pmc)            rxinfo *rx=(rxinfo *)(pmc)->data
+#define RxCurChar(rx)              ((char)string_ord((rx)->string, (rx)->index))
 
-#define RxAdvance(rx)              RxAdvanceX(rx, 1)
-#define RxAdvanceX(rx, x)          rx->index += x * rx->whichway
+#define RxAdvance(rx)              RxAdvanceX((rx), 1)
+#define RxAdvanceX(rx, x)          ((rx)->index += (x) * (rx)->whichway)
 
 #define RxCaseInsensitive_on(rx)   RxFlagOn(rx, enum_rxflags_case_insensitive)
 #define RxCaseInsensitive_off(rx)  RxFlagOff(rx, enum_rxflags_case_insensitive)
@@ -101,10 +101,10 @@ void bitmap_destroy(Bitmap);
 #define RxReverse_off(rx)          RxFlagOff(rx, enum_rxflags_reverse)
 #define RxReverse_test(rx)         RxFlagTest(rx, enum_rxflags_reverse)
 
-#define RxFlagOn(rx, flag)         (rx->flags |=  flag)
-#define RxFlagOff(rx, flag)        (rx->flags &= ~flag)
-#define RxFlagTest(rx, flag)       (rx->flags  &  flag)
+#define RxFlagOn(rx, flag)         ((rx)->flags |=  (flag))
+#define RxFlagOff(rx, flag)        ((rx)->flags &= ~(flag))
+#define RxFlagTest(rx, flag)       ((rx)->flags  &  (flag))
 
-#define RxFlagsOff(rx)             rx->flags = enum_rxflags_none
+#define RxFlagsOff(rx)             ((rx)->flags = enum_rxflags_none)
 
 #endif /* PARROT_RX_H_GUARD */

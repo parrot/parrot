@@ -46,7 +46,7 @@ typedef unsigned long utf32_t;
                       (uv) < 0x800   ? 2 : \
                       (uv) < 0x10000 ? 3 : 4 )
 
-#define UTF16SKIP(s) ( UNICODE_IS_HIGH_SURROGATE(*s) ? 2 : 1 )
+#define UTF16SKIP(s) ( UNICODE_IS_HIGH_SURROGATE(*(s)) ? 2 : 1 )
 
 /*
 

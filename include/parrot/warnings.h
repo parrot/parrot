@@ -10,9 +10,9 @@
 
 #include "parrot/parrot.h"
 
-#define PARROT_WARNINGS_on(interp, flag)   interp->warns->classes |=  flag
-#define PARROT_WARNINGS_off(interp, flag)  interp->warns->classes &= ~flag
-#define PARROT_WARNINGS_test(interp, flag) interp->warns->classes &   flag
+#define PARROT_WARNINGS_on(interp, flag)   ((interp)->warns->classes |= (flag))
+#define PARROT_WARNINGS_off(interp, flag)  ((interp)->warns->classes &= ~(flag))
+#define PARROT_WARNINGS_test(interp, flag) ((interp)->warns->classes & (flag))
 
 INTVAL
 Parrot_warn(struct Parrot_Interp *, INTVAL warnclass, const char* message, ...);
