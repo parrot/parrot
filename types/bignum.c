@@ -68,23 +68,23 @@ Get value of digit at pos. [macro]
     ( (x->buffer[(y) / BN_D_PER_NIB] >> \
      ( (y) % BN_D_PER_NIB)*4) & 15 )
 
-/*=for api bignum_private CHECK_OVERFLOW(value, increment, max)
+/*=for api bignum_private CHECK_OVERFLOW(bn, incr, context)
 
-If I<value> + I<increment> will be greater than I<max> returns
-false, otherwise true. [macro]
-
-=cut*/
-#define CHECK_OVERFLOW(expn, add, max) \
-    (((max) - (expn) < (add)) ? 1 : 0)
-
-/*=for api bignum_private CHECK_UNDERFLOW(value, decrement, min)
-
-If I<value> - I<decrement> (assumed positive number) will be less
-than I<min> returns false.  Otherwise true.  [macro]
+If increasing the exponent of I<bn> by I<incr> will cause overflow
+(as decided by I<elimit>), returns true.
 
 =cut*/
-#define CHECK_UNDERFLOW(expn, sub, min) \
-    (((min) - (expn) > (-(sub))) ? 1 : 0)
+#define CHECK_OVERFLOW(bn, incr, context) \
+    ( (context)->elimit - ((bn)->expn + (bn)->digits -1 ) < (incr) ? 1 : 0) 
+
+/*=for api bignum_private CHECK_UNDERFLOW(bn, decrement, context)
+
+If subtracting I<decrement> (a positive number) from the exponent
+of I<bn> would cause underflow, returns true.
+
+=cut*/
+#define CHECK_UNDERFLOW(bn, decr, context) \
+    ( (context)->elimit + ((bn)->expn + (bn)->digits -1) > (decr) ? 0 : 1 )
 
 /********** Special Values ******************/
 
@@ -141,8 +141,8 @@ BN_idivide (PINTD_ BIGNUM* result, BIGNUM *one, BIGNUM *two,
             BN_DIV_ENUM operation, BIGNUM* rem);
 int BN_iround (PINTD_ BIGNUM *bn, BN_CONTEXT* context);
 INTVAL BN_to_scieng_string(PINTD_ BIGNUM* bn, char **dest, int eng);
-int BN_strip_lead_zeros(PINTD_ BIGNUM* victim);
-int BN_strip_tail_zeros(PINTD_ BIGNUM* victim);
+int BN_strip_lead_zeros(PINTD_ BIGNUM* victim, BN_CONTEXT*);
+int BN_strip_tail_zeros(PINTD_ BIGNUM* victim, BN_CONTEXT*);
 int BN_round_up(PINTD_ BIGNUM *victim, BN_CONTEXT* context);
 int BN_round_down(PINTD_ BIGNUM *victim, BN_CONTEXT* context);
 int BN_make_integer(PINTD_ BIGNUM* bn, BN_CONTEXT* context);
@@ -222,6 +222,46 @@ BN_destroy(PINTD_ BIGNUM *bn) {
     BN_free(PINT_ bn->buffer);
     BN_free(PINT_ bn);
     return;
+}
+
+/*=for api bignum BN_create_context(precision)
+
+Creates a new context object, with specified I<precision>, other fields
+are initialised as follows:
+
+ elimit   = BN_HARD_EXPN_LIMIT ( defined during configure)
+ rounding = ROUND_HALF_UP
+ extended = 1
+ flags    = 0
+ traps    = Division by zero, invalid operation, overflow, underflow
+            and rounded are enabled.
+            Lost digits and inexact are disabled.
+
+The context object can be destroyed with free().
+
+=cut*/
+BN_CONTEXT*
+BN_create_context(PINTD_ INTVAL precision) {
+    BN_CONTEXT *result;
+
+    result = (BN_CONTEXT*)BN_alloc(PINT_ sizeof(BN_CONTEXT));
+    if (result == NULL) {
+        BN_EXCEPT(PINT_ BN_INSUFFICIENT_STORAGE,
+                  "Cannot create a context");
+    }
+
+    result->precision = precision;
+
+    result->elimit = BN_HARD_EXPN_LIMIT;
+    result->rounding = ROUND_HALF_UP;
+    result->extended = 1;
+    result->flags = 0;
+    result->traps = ( BN_F_DIVISION_BY_ZERO  |
+                      BN_F_INVALID_OPERATION |
+                      BN_F_OVERFLOW          |
+                      BN_F_ROUNDED           |
+                      BN_F_UNDERFLOW           );
+    return result;
 }
 
 /*=for api bignum BN_set_digit(BIGNUM* bn, INTVAL pos, INTVAL value)
@@ -334,7 +374,7 @@ BN_set_verybig(PINTD_ BIGNUM* bn, BN_CONTEXT *context) {
             BN_setd(bn, i, 9);
         }
         bn->digits = context->precision;
-        bn->expn = BN_EXPN_LIMIT - context->precision + 1;
+        bn->expn = context->elimit - context->precision + 1;
     }
     else {
         BN_set_inf(PINT_ bn);
@@ -917,13 +957,13 @@ BN_from_string(PINTD_ char* s2, BN_CONTEXT *context) {
 }
 
 
-/*=for api bignum_private BN_strip_zeros(BIGNUM* victim)
+/*=for api bignum_private BN_strip_zeros(BIGNUM* victim, context)
 
 Removes any zeros before the msd and after the lsd
 
 =cut*/
 int
-BN_strip_lead_zeros(PINTD_ BIGNUM* bn) {
+BN_strip_lead_zeros(PINTD_ BIGNUM* bn, BN_CONTEXT *context) {
     INTVAL msd, i;
   
     if (bn->digits == 0) return 0; /* Cannot "fail" with special nums */
@@ -937,7 +977,7 @@ BN_strip_lead_zeros(PINTD_ BIGNUM* bn) {
     bn->digits -= bn->digits-1 - msd;
 }
 
-/*=for api bignum_private BN_strip_tail_zeros(BIGNUM *victim)
+/*=for api bignum_private BN_strip_tail_zeros(BIGNUM *victim, context)
 
 Removes trailing zeros and increases the exponent appropriately.
 Does not remove zeros before the decimal point.
@@ -945,7 +985,7 @@ Does not remove zeros before the decimal point.
 =cut*/
 
 int
-BN_strip_tail_zeros(PINTD_ BIGNUM *bn) {
+BN_strip_tail_zeros(PINTD_ BIGNUM *bn, BN_CONTEXT *context) {
     INTVAL lsd, i;
 
     lsd = 0;
@@ -963,7 +1003,7 @@ BN_strip_tail_zeros(PINTD_ BIGNUM *bn) {
         BN_setd(bn, i, BN_getd(bn, i+lsd));
     }
     
-    if (CHECK_OVERFLOW( bn->expn, lsd, BN_EXPN_MAX)) {
+    if (CHECK_OVERFLOW( bn, lsd, context)) {
         BN_EXCEPT(PINT_ BN_OVERFLOW, "overflow when striping zeros");
     }
     bn->expn += lsd;
@@ -1043,7 +1083,7 @@ precision: -9 =>  1.234567E+3   1234.567
 void
 BN_round(PINTD_ BIGNUM *bn, BN_CONTEXT* context) {
     /* In exported version, must check for sNAN */
-    if (bn->digits == 0 && am_sNaN(bn)) {
+    if (bn->digits == 0 && am_sNAN(bn)) {
         BN_nonfatal(PINT_ context, BN_INVALID_OPERATION,
                     "sNaN in round");
         BN_set_sNAN(PINT_ bn);
@@ -1177,7 +1217,7 @@ BN_round_up(PINTD_ BIGNUM *bn, BN_CONTEXT* context) {
     if (carry) { /* We had 999999999 + 1, extend number */
         INTVAL extra = bn->digits - context->precision;
         BN_setd(bn, context->precision, carry);
-        if (CHECK_OVERFLOW(bn->expn, extra, BN_EXPN_MAX)) {
+        if (CHECK_OVERFLOW(bn, extra, context)) {
             BN_EXCEPT(PINT_ BN_OVERFLOW, "overflow while rounding");
         }
         bn->expn += extra;
@@ -1186,7 +1226,7 @@ BN_round_up(PINTD_ BIGNUM *bn, BN_CONTEXT* context) {
     }
     else {
         INTVAL extra = bn->digits - context->precision;
-        if (CHECK_OVERFLOW(bn->expn, extra, BN_EXPN_MAX)) {
+        if (CHECK_OVERFLOW(bn, extra, context)) {
             BN_EXCEPT(PINT_ BN_OVERFLOW, "overflow while rounding");
         }
         bn->expn += extra;
@@ -1211,7 +1251,7 @@ BN_round_down(PINT_ BIGNUM *bn, BN_CONTEXT* context) {
         BN_setd(bn, i, temp);
     }
     extra = bn->digits - context->precision;
-    if (CHECK_OVERFLOW(bn->expn, extra, BN_EXPN_MAX)) {
+    if (CHECK_OVERFLOW(bn, extra, context)) {
         BN_EXCEPT(PINT_ BN_OVERFLOW, "overflow while rounding");
     }
     bn->expn += extra;
@@ -1323,8 +1363,8 @@ modified to the appropriate representation and will not be restorable.
 int
 BN_arith_setup(PINTD_ BIGNUM* result, BIGNUM *one, BIGNUM *two,
                BN_CONTEXT *context, BN_SAVE_PREC* restore) {
-    BN_strip_lead_zeros(PINT_ one);
-    BN_strip_lead_zeros(PINT_ two);
+    BN_strip_lead_zeros(PINT_ one, context);
+    BN_strip_lead_zeros(PINT_ two, context);
     BN_iround(PINT_ one, context);
     BN_iround(PINT_ two, context);
     if (restore) {
@@ -1372,7 +1412,7 @@ BN_arith_cleanup(PINTD_ BIGNUM* result, BIGNUM *one, BIGNUM *two,
     context->flags =  (context->flags & ~(unsigned char)BN_F_LOST_DIGITS)
                     | (flags_save & BN_F_LOST_DIGITS);
 
-    BN_strip_lead_zeros(PINT_ result);
+    BN_strip_lead_zeros(PINT_ result, context);
     BN_really_zero(PINT_ result, context->extended);
     BN_make_integer(PINT_ result, context);
 }
@@ -1888,7 +1928,7 @@ BN_multiply (PINTD_ BIGNUM* result, BIGNUM *one, BIGNUM *two,
 
     BN_imultiply(PINT_ result, one, two, context);
 
-    BN_strip_lead_zeros(PINT_ result);
+    BN_strip_lead_zeros(PINT_ result, context);
     BN_arith_cleanup(PINT_ result, one, two, context, NULL);
 
 }
@@ -1942,10 +1982,11 @@ BN_imultiply (PINTD_ BIGNUM* result, BIGNUM *one, BIGNUM *two,
     }
   
     i = one->expn + two->expn;
-    if (CHECK_OVERFLOW(result->expn, i, BN_EXPN_MAX)) {
+    /*XXX: use unsigned here to be sure? */
+    if ( i > context->elimit) {
         BN_EXCEPT(PINT_ BN_OVERFLOW, "overflow in multiplication");
     }
-    if (CHECK_UNDERFLOW(result->expn,-i, BN_EXPN_MIN)) {
+    if (i < -context->elimit) {
         BN_EXCEPT(PINT_ BN_UNDERFLOW, "underflow in multipliaction");
     }
     result->expn = i;
@@ -2035,7 +2076,7 @@ BN_divide(PINTD_ BIGNUM* result, BIGNUM *one, BIGNUM *two,
     /* Use rem to work out things like rounding here, we'll do our
        own clean up as it's all a little odd */
 
-    BN_strip_lead_zeros(PINT_ result);
+    BN_strip_lead_zeros(PINT_ result, context);
 
     /*XXX: write this rounding to cope with precision < 1 */
     if (context->rounding == ROUND_HALF_EVEN) {
@@ -2165,7 +2206,7 @@ BN_divide(PINTD_ BIGNUM* result, BIGNUM *one, BIGNUM *two,
 
     BN_really_zero(PINT_ result, context->extended);
 
-    BN_strip_tail_zeros(PINT_ result);
+    BN_strip_tail_zeros(PINT_ result, context);
 
     BN_make_integer(PINT_ result, context);
 
@@ -2180,7 +2221,7 @@ BN_divide(PINTD_ BIGNUM* result, BIGNUM *one, BIGNUM *two,
                 BN_setd(result, j-i, BN_getd(result, j));
             }
         }
-        if (CHECK_OVERFLOW(result->expn, i, BN_EXPN_MAX)) {
+        if (CHECK_OVERFLOW(result, i, context)) {
             BN_EXCEPT(PINT_ BN_OVERFLOW, "overflow in divide");
         }
         result->expn += i;
@@ -2392,11 +2433,11 @@ BN_idivide (PINT_ BIGNUM* result, BIGNUM *one, BIGNUM *two,
 
     /* First position to try to fill */
     newexpn = one->digits + one->expn - two->digits - two->expn;
-    if (CHECK_OVERFLOW(t1->expn, newexpn, BN_EXPN_MAX)) {
-        BN_EXCEPT(PINT_ BN_OVERFLOW, "overflow in divide");
+    if (newexpn > context->elimit) {
+        BN_EXCEPT(PINT_ BN_OVERFLOW, "overflow in divide (1)");
     }
-    if (CHECK_UNDERFLOW(t1->expn, -newexpn, BN_EXPN_MIN)) {
-        BN_EXCEPT(PINT_ BN_UNDERFLOW, "underflow in divide");
+    if (newexpn < -context->elimit) {
+        BN_EXCEPT(PINT_ BN_UNDERFLOW, "underflow in divide (1)");
     }
     t1->expn = newexpn;
         
@@ -2453,11 +2494,8 @@ BN_idivide (PINT_ BIGNUM* result, BIGNUM *one, BIGNUM *two,
         if (operation == BN_DIV_DIVINT|| operation == BN_DIV_REMAIN) {
             if (t1->expn ==0) break;
         }
-        if (CHECK_OVERFLOW(t1->expn, 1, BN_EXPN_MAX)) {
-            BN_EXCEPT(PINT_ BN_OVERFLOW, "overflow in divide");
-        }
-        if (CHECK_UNDERFLOW(t1->expn, -1, BN_EXPN_MIN)) {
-            BN_EXCEPT(PINT_ BN_UNDERFLOW, "underflow in divide");
+        if (CHECK_UNDERFLOW(t1, 1, context)) {
+            BN_EXCEPT(PINT_ BN_UNDERFLOW, "underflow in divide (2)");
         }
         t1->expn--;
         if (divided) BN_copy(PINT_ div, rem);
@@ -2493,8 +2531,8 @@ BN_comp (PINTD_ BIGNUM *one, BIGNUM *two, BN_CONTEXT* context) {
     INTVAL i,j;
     int cmp;
 
-    BN_strip_lead_zeros(PINT_ one);
-    BN_strip_lead_zeros(PINT_ two);
+    BN_strip_lead_zeros(PINT_ one, context);
+    BN_strip_lead_zeros(PINT_ two, context);
 
     if (one->sign != two->sign) {
         if (BN_is_zero(PINT_ one, context) && BN_is_zero(PINT_ two, context)) {
@@ -2587,7 +2625,7 @@ BN_to_int(PINT_ BIGNUM* bn, BN_CONTEXT* context) {
     if (context->precision < 0) maxdigs = BN_D_PER_INT;
 
 
-    BN_strip_lead_zeros(PINT_ bn);
+    BN_strip_lead_zeros(PINT_ bn, context);
     /* Check for definite big as your head overflow */
     if (bn->expn >= 0 && bn->expn + bn->digits > BN_D_PER_INT) {
         BN_EXCEPT(PINT_ BN_OVERFLOW, "bignum too large to fit in an int");

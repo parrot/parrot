@@ -33,7 +33,7 @@ typedef char BOOLVAL;
 #define BN_D_PER_NIB 8       /* digits stored in a BN_NIB */
 #define BN_D_PER_INT 10      /* Decimal digits in an INTVAL */
 #define BN_D_PER_FLOAT 32    /* Decimal digits in a FLOATVAL */
-#define BN_EXPN_LIMIT 999999999 /* better*/
+#define BN_HARD_EXPN_LIMIT 999999999 /* perhaps max INTVAL? */
 #define BN_EXPN_MAX 10000    /* maximum value of expn*/
 #define BN_EXPN_MIN -10000   /* minimum value of expn */
 #define BN_MAX_DIGITS 10000  /* max number of digits in coeff */
@@ -82,6 +82,7 @@ typedef enum {
 
 typedef struct {
     INTVAL precision;     /* number of digs to retain */
+    INTVAL elimit;        /* maximum exponent allowed */
     BN_ROUNDING rounding; /* rounding type to perform */
     BOOLVAL extended;     /* do we use extended or base semantics? */
     unsigned char flags;       /* records possible errors */
@@ -140,6 +141,7 @@ typedef enum {
 */
 BIGNUM* BN_from_string(PINTD_ char*, BN_CONTEXT*);
 BIGNUM* BN_new(PINTD_ INTVAL length);
+BN_CONTEXT* BN_create_context(PINTD_ INTVAL precision);
 void BN_grow(PINTD_ BIGNUM *in, INTVAL length);
 void BN_destroy(PINTD_ BIGNUM *bn);
 void bn_fatal_error (PINTD_ char* mesg);

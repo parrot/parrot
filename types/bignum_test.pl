@@ -16,6 +16,7 @@ int runtest (char* lef, char *rih, int oper, int prec, int round, int extended) 
   char *traps[7] = {"Lost_digits","Division_by_zero","Inexact",
 		    "Invalid_operation","Overflow","Rounded","Underflow"};
 
+  context.elimit = 999999999;
   context.precision = prec;
   context.extended = extended;
   context.flags = 0;
