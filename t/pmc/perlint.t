@@ -1,9 +1,52 @@
 #! perl -w
 
-use Parrot::Test tests => 11;
+use Parrot::Test tests => 19;
 use Parrot::PMC '%pmc_types';
 my $perlint = $pmc_types{'PerlInt'};
 my $ok = '"ok 1\n"';
+my $fp_equality_macro = <<'ENDOFMACRO';
+.macro fp_eq (	J, K, L )
+	save	N0
+	save	N1
+	save	N2
+
+	set	N0, .J
+	set	N1, .K
+	sub	N2, N1,N0
+	abs	N2, N2
+	gt	N2, 0.000001, .$FPEQNOK
+
+	restore N2
+	restore	N1
+	restore	N0
+	branch	.L
+.local $FPEQNOK:
+	restore N2
+	restore	N1
+	restore	N0
+.endm
+.macro fp_ne(	J,K,L)
+	save	N0
+	save	N1
+	save	N2
+
+	set	N0, .J
+	set	N1, .K
+	sub	N2, N1,N0
+	abs	N2, N2
+	lt	N2, 0.000001, .$FPNENOK
+
+	restore	N2
+	restore	N1
+	restore	N0
+	branch	.L
+.local $FPNENOK:
+	restore	N2
+	restore	N1
+	restore	N0
+.endm
+ENDOFMACRO
+
 
 output_is(<<"CODE", <<'OUTPUT', "type");
     new P0,.PerlInt
@@ -359,3 +402,204 @@ CODE
 1.500000
 OUTPUT
 
+output_is(<<'CODE', <<OUTPUT, "subtract native integer from PerlInt");
+	new P0, .PerlInt
+	new P1, .PerlInt
+	set I0, 4000
+	set P0, 123
+	sub P1, P0, I0
+	print P1
+	print "\n"
+	sub P0, P0, I0
+	print P0
+	print "\n"
+        sub P0, -3876
+	print P0
+	print "\n"
+	end
+CODE
+-3877
+-3877
+-1
+OUTPUT
+
+output_is(<<'CODE', <<OUTPUT, "multiply PerlInt with native integer");
+	new P0, .PerlInt
+	new P1, .PerlInt
+	set I0, 4000
+	set P0, 123
+	mul P1, P0, I0
+	print P1
+	print "\n"
+	mul P0, P0, I0
+	print P0
+	print "\n"
+        mul P0, -1
+	print P0
+	print "\n"
+        mul P0, 0
+	print P0
+	print "\n"
+	end
+CODE
+492000
+492000
+-492000
+0
+OUTPUT
+
+output_is(<<"CODE", <<OUTPUT, "divide PerlInt by native integer");
+@{[ $fp_equality_macro ]}
+	new P0, .PerlInt
+	set I0, 4000
+	set P0, 123
+	div P0, P0, I0
+	.fp_eq( P0, 0.03075, EQ1)
+	print P0
+	print "not "
+EQ1:	print "ok 1"
+	print "\\n"
+
+        div P0, 5
+        .fp_eq(P0, 0.00615, EQ2)
+	print P0
+	print "not "
+EQ2:	print "ok 2"
+	print "\\n"
+	end
+CODE
+ok 1
+ok 2
+OUTPUT
+
+#
+# PerlInt and FLOATVAL, tests
+#
+output_is(<<"CODE", <<OUTPUT, "add native number to integer");
+@{[ $fp_equality_macro ]}
+	new P0, .PerlInt
+	new P1, .PerlInt
+	set N0, 4000.04
+	set P0, 123
+	add P1, P0, N0
+	.fp_eq( P1, 4123.04, EQ1)
+	print "not "
+EQ1:	print "ok 1\\n"
+	add P0, P0, N0
+	.fp_eq( P0, 4123.04, EQ2)
+        print "not "
+EQ2:	print "ok 2\\n"
+        new P0, .PerlInt
+        set P0, 12
+        add P0, 0.16
+	.fp_eq( P0, 12.16, EQ3)
+        print "not "
+EQ3:	print "ok 3\\n"
+	end
+CODE
+ok 1
+ok 2
+ok 3
+OUTPUT
+
+output_is(<<"CODE", <<OUTPUT, "subtract native number from integer");
+@{[ $fp_equality_macro ]}
+	new P0, .PerlInt
+	new P1, .PerlInt
+	set N0, 4000.04
+	set P0, 123
+	sub P1, P0, N0
+	.fp_eq( P1, -3877.04, EQ1)
+	print "not "
+EQ1:	print "ok 1\\n"
+	sub P0, P0, N0
+	.fp_eq( P0, -3877.04, EQ2)
+	print "not "
+EQ2:	print "ok 2\\n"
+        new P0, .PerlInt
+        set P0, -3877
+        sub P0, 23.01
+	.fp_eq( P0, -3900.01, EQ3)
+	print "not "
+EQ3:	print "ok 3\\n"
+	end
+CODE
+ok 1
+ok 2
+ok 3
+OUTPUT
+
+output_is(<<'CODE', <<OUTPUT, "multiply integer with native number");
+	new P0, .PerlInt
+	new P1, .PerlInt
+	set N0, 4000.04
+	set P0, 123
+	mul P1, P0, N0
+	print P1
+	print "\n"
+	mul P0, P0, N0
+	print P0
+	print "\n"
+
+        new P0, .PerlInt
+        set P0, 12
+        mul P0, 25.5
+	print P0
+	print "\n"
+	end
+CODE
+492004.920000
+492004.920000
+306
+OUTPUT
+
+output_is(<<"CODE", <<OUTPUT, "divide integer by native number");
+@{[ $fp_equality_macro ]}
+	new P0, .PerlInt
+	set N0, 4000
+	set P0, 123
+	div P0, P0, N0
+
+	.fp_eq( P0, 0.03074969250307496925, EQ1)
+	print P0
+	print "not "
+EQ1:	print "ok 1"
+	print "\\n"
+
+        new P0, .PerlInt
+        set P0, 250
+        div P0, 0.01
+	.fp_eq( P0, 25000.0, EQ2)
+        print P0
+	print "not "
+EQ2:	print "ok 2"
+	print "\\n"
+	end
+CODE
+ok 1
+ok 2
+OUTPUT
+
+#
+# PerlInt and INTVAL tests
+#
+output_is(<<'CODE', <<OUTPUT, "add native integer to PerlInt");
+	new P0, .PerlInt
+	new P1, .PerlInt
+	set I0, 4000
+	set P0, 123
+	add P1, P0, I0
+	print P1
+	print "\n"
+	add P0, P0, I0
+	print P0
+	print "\n"
+        add P0, 20
+	print P0
+	print "\n"
+	end
+CODE
+4123
+4123
+4143
+OUTPUT

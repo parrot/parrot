@@ -1,6 +1,6 @@
 #! perl -w
 
-use Parrot::Test tests => 20;
+use Parrot::Test tests => 32;
 
 my $fp_equality_macro = <<'ENDOFMACRO';
 .macro fp_eq (	J, K, L )
@@ -353,3 +353,250 @@ output_is(<<'CODE', <<OUTPUT, "divide number by number gives int");
 CODE
 2
 OUTPUT
+
+output_is(<<"CODE", <<OUTPUT, "add PerlNum to PerlNum");
+@{[ $fp_equality_macro ]}
+	new P0, .PerlNum
+	new P1, .PerlNum
+	set P1, 4000.04
+	set P0, 123
+	add P0, P0, P1
+	.fp_eq( P0, 4123.04, EQ1)
+	print "not "
+EQ1:	print "ok 1"
+	print "\\n"
+	end
+CODE
+ok 1
+OUTPUT
+
+output_is(<<"CODE", <<OUTPUT, "subtract PerlNum from PerlNum");
+@{[ $fp_equality_macro ]}
+	new P0, .PerlNum
+	new P1, .PerlNum
+	set P1, 4000.04
+	set P0, 123
+	sub P0, P0, P1
+	.fp_eq( P0, -3877.04, EQ1)
+	print "not "
+EQ1:	print "ok 1"
+	print "\\n"
+        new P2, .PerlNum
+        new P3, .PerlNum
+        new P4, .PerlNum
+        set P2, 12.7
+        set P3, 12.6
+        sub P3, P2
+	.fp_eq( P3, -0.1, EQ2)
+	print "not "
+EQ2:	print "ok 2"
+	print "\\n"
+	end
+CODE
+ok 1
+ok 2
+OUTPUT
+
+output_is(<<'CODE', <<OUTPUT, "multiply PerlNum with PerlNum");
+	new P0, .PerlNum
+	new P1, .PerlNum
+	set P1, 4000.04
+	set P0, 123
+	mul P0, P0, P1
+	print P0
+	print "\n"
+	end
+CODE
+492004.920000
+OUTPUT
+
+output_is(<<"CODE", <<OUTPUT, "divide PerlNum by PerlNum");
+@{[ $fp_equality_macro ]}
+	new P0, .PerlNum
+	new P1, .PerlNum
+	set P1, 4000
+	set P0, 123
+	div P0, P0, P1
+
+	.fp_eq( P0, 0.03074969250307496925, EQ1)
+	print P0
+	print "not "
+EQ1:	print "ok 1"
+	print "\\n"
+	end
+CODE
+ok 1
+OUTPUT
+
+output_is(<<"CODE", <<OUTPUT, "add INTVAL to PerlNum");
+@{[ $fp_equality_macro ]}
+        new P0, .PerlNum
+        new P1, .PerlNum
+
+        set P0, 12.5
+        add P1, P0, 12
+        .fp_eq(P1, 24.5, OK1)
+        print "not "
+OK1:    print "ok 1\\n"
+
+        add P0, -12
+        .fp_eq(P0, 0.5, OK2)
+        print "not "
+OK2:    print "ok 2\\n"
+
+        end
+CODE
+ok 1
+ok 2
+OUTPUT
+
+output_is(<<"CODE", <<OUTPUT, "add FLOATVAL to PerlNum");
+@{[ $fp_equality_macro ]}
+        new P0, .PerlNum
+        new P1, .PerlNum
+
+        set P0, 12.5
+        add P1, P0, 12.6
+        .fp_eq(P1, 25.1, OK1)
+        print "not "
+OK1:    print "ok 1\\n"
+
+        add P0, -100.2
+        .fp_eq(P0, -87.7, OK2)
+        print "not "
+OK2:    print "ok 2\\n"
+        end
+CODE
+ok 1
+ok 2
+OUTPUT
+
+output_is(<<"CODE", <<OUTPUT, "subtract INTVAL from PerlNum");
+@{[ $fp_equality_macro ]}
+        new P0, .PerlNum
+        new P1, .PerlNum
+
+        set P0, 12.5
+        sub P1, P0, 12
+        .fp_eq(P1, 0.5, OK1)
+        print "not "
+OK1:    print "ok 1\\n"
+
+        sub P0, -12
+        .fp_eq(P0, 24.5, OK2)
+        print "not "
+OK2:    print "ok 2\\n"
+
+        end
+CODE
+ok 1
+ok 2
+OUTPUT
+
+output_is(<<"CODE", <<OUTPUT, "subtract FLOATVAL from PerlNum");
+@{[ $fp_equality_macro ]}
+        new P0, .PerlNum
+        new P1, .PerlNum
+
+        set P0, 12.5
+        sub P1, P0, 12.6
+        .fp_eq(P1, -0.1, OK1)
+        print "not "
+OK1:    print "ok 1\\n"
+
+        sub P0, -100.2
+        .fp_eq(P0, 112.7, OK2)
+        print "not "
+OK2:    print "ok 2\\n"
+        end
+CODE
+ok 1
+ok 2
+OUTPUT
+
+output_is(<<"CODE", <<OUTPUT, "multiply PerlNum by INTVAL");
+@{[ $fp_equality_macro ]}
+        new P0, .PerlNum
+        new P1, .PerlNum
+
+        set P0, 12.5
+        mul P1, P0, 5
+        .fp_eq(P1, 62.5, OK1)
+        print "not "
+OK1:    print "ok 1\\n"
+
+        mul P0, -1
+        .fp_eq(P0, -12.5, OK2)
+        print "not "
+OK2:    print "ok 2\\n"
+
+        end
+CODE
+ok 1
+ok 2
+OUTPUT
+
+output_is(<<"CODE", <<OUTPUT, "multiply PerlNum by FLOATVAL");
+@{[ $fp_equality_macro ]}
+        new P0, .PerlNum
+        new P1, .PerlNum
+
+        set P0, 12.5
+        mul P1, P0, 12.5
+        .fp_eq(P1, 156.25, OK1)
+        print "not "
+OK1:    print "ok 1\\n"
+
+        mul P0, 2.2
+        .fp_eq(P0, 27.5, OK2)
+        print "not "
+OK2:    print "ok 2\\n"
+        end
+CODE
+ok 1
+ok 2
+OUTPUT
+
+output_is(<<"CODE", <<OUTPUT, "divide PerlNum by INTVAL");
+@{[ $fp_equality_macro ]}
+        new P0, .PerlNum
+        new P1, .PerlNum
+
+        set P0, 12.5
+        div P1, P0, 5
+        .fp_eq(P1, 2.5, OK1)
+        print "not "
+OK1:    print "ok 1\\n"
+
+        div P0, 10
+        .fp_eq(P0, 1.25, OK2)
+        print "not "
+OK2:    print "ok 2\\n"
+
+        end
+CODE
+ok 1
+ok 2
+OUTPUT
+
+output_is(<<"CODE", <<OUTPUT, "divide PerlNum by FLOATVAL");
+@{[ $fp_equality_macro ]}
+        new P0, .PerlNum
+        new P1, .PerlNum
+
+        set P0, 12.5
+        div P1, P0, 0.35
+        .fp_eq(P1, 35.714286, OK1)
+        print "not "
+OK1:    print "ok 1\\n"
+
+        div P0, 5.0
+        .fp_eq(P0, 2.5, OK2)
+        print "not "
+OK2:    print "ok 2\\n"
+        end
+CODE
+ok 1
+ok 2
+OUTPUT
+

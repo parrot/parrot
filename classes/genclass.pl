@@ -23,6 +23,7 @@ print <<EOF;
  *  Data Structure and Algorithms:
  *  History:
  *  Notes:
+ *     Please remove unneeded entries.
  *  References:
  */
 
@@ -36,10 +37,14 @@ my $decls;
 
 for (@{$vtbl}) {
     my ($retval, $methname, $args) = @{$_};
+    if ($methname eq 'type' || $methname eq 'name' || $methname =~ /prop/) {
+	# default.pmc handles these
+	next;
+    }
 
     print "    $retval $methname ($args) {\n";
     if($retval !~ /void/) {
-        print "        return ($retval)0;\n";
+	print "        return ($retval)0;\n";
     }
     print "    }\n\n";
 }
