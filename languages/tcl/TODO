@@ -20,22 +20,12 @@ moving the parser into a pmc.)
 
 =item migrate all these issues to RT.
 
+TODO tests would also suffice, where possible.
+
 =item tclword
 
 An object is probably too heavyweight for this. A PMC with a few overloaded
 methods is probably sufficient.
-
-=item Insure that the right thing happens when shimmering between a list and a string.
-
-For example, insure that:
-
- puts '[string range [list 1 2 3] 0 2]'
- 
-Actually generates
-
- '1 2'
-
-which will have been shimmered from a TclList (returned by [list]) to a TclString
 
 =item From leo - cleanup of tcl objects.
 
@@ -58,20 +48,6 @@ Mostly done. All that seems to be left is PerlUndef. Much was already
 converted to the internal types. PerlUndef removal will probably result
 (finally) in the use of null checks where it's being used for that, and
 TclObject where it's being used for shimmering.
-
-=item function calls...
-
-I do a lot of function calls that should probably be inlined as macros
-(or removed as functions entirely) for speed. I had gotten rid of macros
-ages past, but there's a LOT that goes on when
-using the calling conventions...
-
-match_close is almost entirely macro-ized, modulo a bug in parse - 
-switch to macro... the app behaves differently, even if that code
-path is never executed. I suspect register stomping.
-
-possible macro get_var, also. and whatever's left in expression.imc
-(__expr_get_*)
 
 =item Freeze/Thaw of TclWord would ...
 
@@ -207,7 +183,7 @@ who don't play nice with the new tests...
 [string totitle], [string toupper], [string trim], [string trimleft],
 [string trimright], [string compare], [string equal], [string last]
 
-[string bytelength], [string compare], [sring is], [string map],
+[string bytelength], [string compare], [string is], [string map],
 [string wordstart], [string wordend]
 
 =item given [list]
@@ -315,7 +291,7 @@ implemented procs will require updating after procs/features are added.
   http interp {setup our current single parser/interp as an pmc?}
   library lindex load lset memory
   msgcat namespace package packagens
-  pkgMkIndex re_syntax registry resource
+  pkgMkIndex registry resource
   safe socket subst (use our parser?) tcltest
   update variable vwait
  
