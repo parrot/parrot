@@ -59,8 +59,9 @@ Create an (empty) list of function arguments
 */
 
     void init () {
+        PMC *func_args;
         SUPER();
-        PMC *func_args = pmc_new(INTERP, dynclass_PyList);
+        pmc_new(INTERP, dynclass_PyList);
         VTABLE_setprop(INTERP, SELF, FUNC_ARGS, func_args);
     }
 
@@ -93,7 +94,7 @@ TODO: error checking (e.g., missing, duplicate or extra arguments)
             if (func_defaults && VTABLE_defined(INTERP, func_defaults)) {
                 INTVAL nd = VTABLE_elements(INTERP, func_defaults);
                 for (j=n-nd; j<n && j<11; j++) {
-                    REG_PMC(5+j) = VTABLE_get_pmc_keyed_int(INTERP, 
+                    REG_PMC(5+j) = VTABLE_get_pmc_keyed_int(INTERP,
                         func_defaults, j+nd-n);
                 }
             }
@@ -111,7 +112,7 @@ TODO: error checking (e.g., missing, duplicate or extra arguments)
                 for (j=0; j<n && j<11; j++) {
                     PMC *name = VTABLE_get_pmc_keyed_int(INTERP, func_args, j);
                     if (VTABLE_exists_keyed(INTERP, keywords, name)) {
-                        REG_PMC(5+j) = 
+                        REG_PMC(5+j) =
                             VTABLE_get_pmc_keyed(INTERP, keywords, name);
                     }
                 }
@@ -145,7 +146,7 @@ Invoke a function.  Defaults are filled in first.
                     INTVAL nd = VTABLE_elements(INTERP, func_defaults);
                     INTVAL j;
                     for (j=n-nd+REG_INT(3); j<n && j<11; j++) {
-                        REG_PMC(5+j) = VTABLE_get_pmc_keyed_int(INTERP, 
+                        REG_PMC(5+j) = VTABLE_get_pmc_keyed_int(INTERP,
                             func_defaults, j+nd-n);
                     }
 
