@@ -9,12 +9,12 @@ version 0.10
 =head1 SYNOPSIS
 
 	...
-	
+
 	# dump the P0 register
 	_dumper( "P0", P0 )
-	
+
 	...
-	
+
 	END
 	.include "library/dumper.imc"
 
@@ -128,7 +128,7 @@ Returns the global dumper instance used by the non object interface.
     .local pmc self
     .local int mytype
     .local int type
-    
+
     find_type mytype, "Data::Dumper"
     if mytype != 0 goto TYPE_OK
     load_bytecode "library/Data/Dumper.imc"
@@ -138,17 +138,17 @@ Returns the global dumper instance used by the non object interface.
     end
 TYPE_OK:
 
-    errorsoff PARROT_ERRORS_GLOBALS_FLAG
+    errorsoff .PARROT_ERRORS_GLOBALS_FLAG
     find_global self, "Data::Dumper", "global"
     errorson .PARROT_ERRORS_GLOBALS_FLAG
-    
+
     typeof type, self
     if type == mytype goto END
 
     new self, mytype
     store_global "Data::Dumper", "global", self
 
-END:    
+END:
     .pcc_begin_return
     .return self
     .pcc_end_return

@@ -2,10 +2,16 @@ BUGS:
 
  - lexer doesn't impose limits on identifiers, this could lead
    to buffer overflows.
-   So there are a bunch of strcats and sprintf's, some of them
-   marked XXX, that are unsafe.
+   So there are a bunch of unsafe strcats and sprintfs, some of them
+   marked XXX.
 
  - IMCC does produce b0rken PASM files, when compiling .imc source
    files with duplicate local labels.
    Also label fixup handling is different so just don't compile
    PIR files to PASM except for debugging.
+
+ - statements like "print NO_SUCH_IDENT" are valid, the identifier
+   evaluates to -1. There is currently no way, to distinguish a label
+   from an identifier, because ops definition files are missing hints,
+   which argument might really be a label.
+   (Both "branch x" and "print x" are equivalent, basically)

@@ -326,7 +326,7 @@ INS(struct Parrot_Interp *interpreter, IMC_Unit * unit, char *name,
                 len -= 2;
                 format[len] = '\0';
                 strcat(format, "[%s], ");
-	}
+            }
             else
                 strcat(format, "%s, ");
 	}

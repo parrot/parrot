@@ -976,7 +976,7 @@ e_pbc_emit(void *param, IMC_Unit * unit, Instruction * ins)
                     debug(interpreter, DEBUG_PBC," %d", pc[-1]);
                     break;
                 default:
-                    fatal(1, "e-pbc_emit", "unknown argtype in parrot op\n");
+                    fatal(1, "e_pbc_emit", "unknown argtype in parrot op\n");
                     break;
             }
         }
