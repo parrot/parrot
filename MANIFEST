@@ -1220,6 +1220,7 @@ include/parrot/list.h
 include/parrot/memory.h
 include/parrot/method_util.h
 include/parrot/misc.h
+include/parrot/nci.h
 include/parrot/op.h
 include/parrot/oplib.h
 include/parrot/packfile.h

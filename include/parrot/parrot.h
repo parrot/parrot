@@ -222,6 +222,7 @@ typedef void (*funcptr_t)(void);
 #include "parrot/sub.h"
 #include "parrot/key.h"
 #include "parrot/exit.h"
+#include "parrot/nci.h"
 #endif
 
 /*
