@@ -32,6 +32,7 @@
 #define PREDEREF_NORMAL         0
 #define PREDEREF_FOR_CGP        1
 #define PREDEREF_FOR_SWITCH     2
+#define PREDEREF_FOR_EXEC       3
 
 #if EXEC_CAPABLE
 struct Parrot_Interp interpre;
@@ -178,6 +179,49 @@ prederef(void **pc_prederef, struct Parrot_Interp *interpreter)
     return pc_prederef;
 }
 
+/*
+ * non plain prederf cores immediately do the dereferencing
+ * the opcode is replaced depending on the run core
+ */
+static void
+fill_prederef(struct Parrot_Interp *interpreter, int cgp, size_t N, void **temp)
+{
+    size_t i;
+    opcode_t *pc = interpreter->code->cur_cs->base.data;
+    op_func_t *prederef_op_func = interpreter->op_lib->op_func_table;
+    size_t n;
+    int is_ret;
+
+    for (i = 0; i < N; ) {
+        is_ret = 0;
+        switch (cgp) {
+            case PREDEREF_FOR_EXEC:
+                if (*temp)
+                    is_ret = 1;
+                break;
+        }
+        prederef(temp, interpreter);
+        switch (cgp) {
+            case PREDEREF_FOR_SWITCH:
+                *temp = (void**) *pc;
+                break;
+            case PREDEREF_FOR_CGP:
+                *temp = ((void**)(interpreter->op_lib->op_func_table)) [*pc];
+                break;
+            case PREDEREF_FOR_EXEC:
+                if (is_ret)
+                    *temp = ((op_func_t*)interpreter->op_lib->op_func_table)[2];
+                else
+                    *temp = (void *)(ptrcast_t)prederef_op_func[*pc];
+                break;
+        }
+        n = interpreter->op_info_table[*pc].arg_count;
+        pc += n;
+        i += n;
+        temp += n;
+    }
+}
+
 /*=for api interpreter init_prederef
  *
  * interpreter->op_lib = prederefed oplib
@@ -214,38 +258,17 @@ init_prederef(struct Parrot_Interp *interpreter, int cgp)
                 N * sizeof(void *));
 #endif
 
-        for (i = 0; i < N; i++) {
-            temp[i] = (void *)(ptrcast_t)prederef;
+        if (cgp == PREDEREF_NORMAL) {
+            for (i = 0; i < N; i++) {
+                temp[i] = (void *)(ptrcast_t)prederef;
+            }
         }
 
         interpreter->prederef_code = temp;
         interpreter->code->cur_cs->prederef_code = temp;
-        if (cgp == PREDEREF_FOR_SWITCH) {
-            opcode_t *pc = interpreter->code->cur_cs->base.data;
-            size_t n;
-            for (i = 0; i < N; ) {
-                prederef(temp, interpreter);
-                *temp = (void**) *pc;
-                n = interpreter->op_info_table[*pc].arg_count;
-                pc += n;
-                i += n;
-                temp += n;
-            }
-        }
-#ifdef HAVE_COMPUTED_GOTO
-        if (cgp == PREDEREF_FOR_CGP) {
-            opcode_t *pc = interpreter->code->cur_cs->base.data;
-            size_t n;
-            for (i = 0; i < N; ) {
-                prederef(temp, interpreter);
-                *temp = ((void**)(interpreter->op_lib->op_func_table)) [*pc];
-                n = interpreter->op_info_table[*pc].arg_count;
-                pc += n;
-                i += n;
-                temp += n;
-            }
-        }
-#endif
+
+        if (cgp != PREDEREF_NORMAL)
+            fill_prederef(interpreter, cgp, N, temp);
     }
 }
 
@@ -261,86 +284,7 @@ stop_prederef(struct Parrot_Interp *interpreter)
 }
 
 #if EXEC_CAPABLE
-static void **
-exec_prederef(void **pc_prederef, struct Parrot_Interp *interpreter)
-{
-    size_t offset = pc_prederef - interpreter->prederef_code;
-    opcode_t *pc = ((opcode_t *)interpreter->code->byte_code) + offset;
-    op_info_t *opinfo = &interpreter->op_info_table[*pc];
-    op_func_t *prederef_op_func = interpreter->op_lib->op_func_table;
-    int i;
-
-    for (i = 0; i < opinfo->arg_count; i++) {
-        switch (opinfo->types[i]) {
-        case PARROT_ARG_OP:
-            if ((int)pc_prederef[i] == 1)
-                pc_prederef[i] = ((op_func_t*)interpreter->op_lib->op_func_table)[2];
-            else
-                pc_prederef[i] = (void *)(ptrcast_t)prederef_op_func[pc[i]];
-            break;
-
-        case PARROT_ARG_KI:
-        case PARROT_ARG_I:
-            pc_prederef[i] = (void *)&interpreter->int_reg.registers[pc[i]];
-            break;
-
-        case PARROT_ARG_N:
-            pc_prederef[i] = (void *)&interpreter->num_reg.registers[pc[i]];
-            break;
-
-        case PARROT_ARG_K:
-        case PARROT_ARG_P:
-            pc_prederef[i] = (void *)&interpreter->pmc_reg.registers[pc[i]];
-            break;
-
-        case PARROT_ARG_S:
-            pc_prederef[i] =
-                (void *)&interpreter->string_reg.registers[pc[i]];
-            break;
-
-        case PARROT_ARG_KIC:
-        case PARROT_ARG_IC:
-            pc_prederef[i] = (void *)&pc[i];
-            break;
-
-        case PARROT_ARG_NC:
-            pc_prederef[i] = (void *)
-                &interpreter->code->const_table->constants[pc[i]]->u.number;
-            break;
-
-        case PARROT_ARG_PC:
-/*        pc_prederef[i] = (void *)
-                 &interpreter->code->const_table->constants[pc[i]]->pmc; */
-            internal_exception(ARG_OP_NOT_HANDLED,
-                               "PMC constants not yet supported!\n");
-            break;
-
-        case PARROT_ARG_SC:
-            pc_prederef[i] = (void *)
-                &interpreter->code->const_table->constants[pc[i]]->u.string;
-            break;
-
-        case PARROT_ARG_KC:
-            pc_prederef[i] = (void *)
-                &interpreter->code->const_table->constants[pc[i]]->u.key;
-            break;
-        default:
-            internal_exception(ARG_OP_NOT_HANDLED,
-                               "Unhandled argtype %d\n",opinfo->types[i]);
-            break;
-        }
-
-        if (pc_prederef[i] == 0) {
-            internal_exception(INTERP_ERROR,
-                    "Prederef generated a NULL pointer for arg of type %d!\n",
-                    opinfo->types[i]);
-        }
-    }
-
-    return pc_prederef;
-}
-
-/*=for api interpreter init_prederef
+/*=for api interpreter exec_init_prederef
  *
  * interpreter->op_lib = prederefed oplib
  *
@@ -370,21 +314,9 @@ exec_init_prederef(struct Parrot_Interp *interpreter, void *prederef_arena)
         void **temp = prederef_arena;
         opcode_t *pc = interpreter->code->cur_cs->base.data;
 
-        for (i = 0; i < N; i++)
-            if (temp[i])
-                temp[i] = (void *)1;
-            else
-                temp[i] = (void *)(ptrcast_t)exec_prederef;
-
         interpreter->prederef_code = temp;
         interpreter->code->cur_cs->prederef_code = temp;
-        for (i = 0; i < N; ) {
-            exec_prederef(temp, interpreter);
-            n = interpreter->op_info_table[*pc].arg_count;
-            pc += n;
-            i += n;
-            temp += n;
-        }
+        fill_prederef(interpreter, PREDEREF_FOR_EXEC, N, temp);
     }
 }
 #endif
