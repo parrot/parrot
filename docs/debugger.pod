@@ -210,6 +210,19 @@ Example:
   # delete the first breakpoint (was on line 10, see example above)
   (pdb) d 0
 
+=item disable
+
+Disable a breakpoint. The syntax is the same as for the C<delete>
+command. Disabled breakpoints can be reenabled with C<enable>.
+
+=item enable
+
+Reenable a disabled breakpoint. The syntax is:
+
+  enable [NUM]
+
+where C<NUM> is the number of the breakpoint. 
+
 =item continue (c)
 
 Continue the program execution. The syntax of this command is:

@@ -186,6 +186,15 @@ void PDB_continue(struct Parrot_Interp *interpreter, const char *command);
 
 char PDB_break(struct Parrot_Interp *interpreter);
 
+PDB_breakpoint_t* PDB_find_breakpoint(struct Parrot_Interp *interpreter, 
+                                     const char *command);
+
+void PDB_disable_breakpoint(struct Parrot_Interp *interpreter,
+                            const char *command);
+
+void PDB_enable_breakpoint(struct Parrot_Interp *interpreter,
+                           const char *command);
+
 void PDB_delete_breakpoint(struct Parrot_Interp *interpreter,
     const char *command);
 
@@ -294,7 +303,9 @@ void PDB_help(const char *command);
 #define c_stack         414120
 #define c_trace         405705
 #define c_watch         416160
+#define c_enable        571455
 #define c_delete        588285
+#define c_disable       772140
 #define c_continue      1053405
 #define c_disassemble   1903830
 

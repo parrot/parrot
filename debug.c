@@ -290,6 +290,12 @@ PDB_run_command(struct Parrot_Interp *interpreter, const char *command)
         case c_delete:
             PDB_delete_breakpoint(interpreter, command);
             break;
+        case c_disable:
+            PDB_disable_breakpoint(interpreter, command);
+            break;
+        case c_enable:
+            PDB_enable_breakpoint(interpreter, command);
+            break;
         case c_r:
         case c_run:
             PDB_init(interpreter, command);
@@ -792,15 +798,18 @@ PDB_continue(struct Parrot_Interp *interpreter,
         DO_OP(pdb->cur_opcode,interpreter);
 }
 
-/* PDB_delete_breakpoint
- * delete a breakpoint
+
+/* PDB_find_breakpoint
+ *
+ * Find breakpoint number N; returns NULL if the breakpoint doesn't
+ * exist or if no breakpoint was specified
+ *
  */
-void
-PDB_delete_breakpoint(struct Parrot_Interp *interpreter,
+PDB_breakpoint_t *
+PDB_find_breakpoint(struct Parrot_Interp *interpreter,
                       const char *command)
 {
     PDB_breakpoint_t *breakpoint;
-    PDB_line_t *line;
     long m,n;
 
     if (isdigit((int) *command)) {
@@ -810,9 +819,72 @@ PDB_delete_breakpoint(struct Parrot_Interp *interpreter,
             breakpoint = breakpoint->next;
         if (!breakpoint) {
             PIO_eprintf(interpreter, "No breakpoint number %ld", m);
-            return;
+            return NULL;
         }
+        return breakpoint;
+    }
+    else {
+        /* Report an appropriate error */
+        if (*command) {
+            PIO_eprintf(interpreter, "Not a valid breakpoint");
+            return NULL;
+        }
+        else {
+            PIO_eprintf(interpreter, "No breakpoint specified");
+            return NULL;
+        }
+    }
+}
 
+/* PDB_disable_breakpoint
+ *
+ * Disable a breakpoint; it can be reenabled with the enable command
+ *
+ */
+void
+PDB_disable_breakpoint(struct Parrot_Interp *interpreter,
+                       const char *command)
+{
+    PDB_breakpoint_t *breakpoint;    
+
+    breakpoint = PDB_find_breakpoint(interpreter, command);
+    if (breakpoint) {
+        breakpoint->skip = -1;
+    }
+    return;
+}
+
+/* PDB_enable_breakpoint
+ *
+ * Reenable a disabled breakpoint; if the breakpoint was not
+ * disabled, has no effect
+ *
+ */
+void
+PDB_enable_breakpoint(struct Parrot_Interp *interpreter,
+                      const char *command)
+{
+    PDB_breakpoint_t *breakpoint;    
+
+    breakpoint = PDB_find_breakpoint(interpreter, command);
+    if (breakpoint && breakpoint->skip == -1) {
+        breakpoint->skip = 0;
+    }
+    return;
+}
+
+/* PDB_delete_breakpoint
+ * delete a breakpoint
+ */
+void
+PDB_delete_breakpoint(struct Parrot_Interp *interpreter,
+                      const char *command)
+{
+    PDB_breakpoint_t *breakpoint;
+    PDB_line_t *line;
+
+    breakpoint = PDB_find_breakpoint(interpreter, command);
+    if (breakpoint) {
         line = interpreter->pdb->file->line;
         while (line->opcode != breakpoint->pc)
             line = line->next;
@@ -821,18 +893,6 @@ PDB_delete_breakpoint(struct Parrot_Interp *interpreter,
         if (breakpoint->condition) {
             PDB_delete_condition(interpreter, breakpoint);
             breakpoint->condition = NULL;
-        }
-
-    }
-    else {
-        /* Report an appropriate error */
-        if (*command) {
-            PIO_eprintf(interpreter, "Not a valid breakpoint");
-            return;
-        }
-        else {
-            PIO_eprintf(interpreter, "No breakpoint specified");
-            return;
         }
     }
 }
@@ -2210,6 +2270,8 @@ List of commands:\n\
     break (b) -- add a breakpoint\n\
     watch (w) -- add a watchpoint\n\
     delete (d) -- delete a breakpoint\n\
+    disable -- disable a breakpoint\n\
+    enable  -- reenable a disabled breakpoint\n\
     continue (c) -- continue the program execution\n\
     next (n) -- run the next instruction\n\
     eval (e) -- run an instruction\n\
