@@ -68,7 +68,7 @@ my ($jitarchname, $jitcpuarch, $jitosname, $jitcapable);
 $archname                 =  $Config{archname};
 ($cpuarch, $osname)       =  split('-', $archname);
 
-$jitarchname              =  $archname;
+$jitarchname              =  "$cpuarch-$osname";
 $jitarchname              =~ s/-(net|free|open)bsd$/-bsd/i;
 
 if (-e "Parrot/Jit/$jitarchname.pm") {
