@@ -1,11 +1,11 @@
 #! perl -w
 
-use Parrot::Test tests => 5;
+use Parrot::Test tests => 6;
 use Test::More;
 use Parrot::Config;
 
 SKIP: {
-skip("no setjmp header", 3) unless ($PConfig{'i_setjmp'});
+skip("no setjmp header", 4) unless ($PConfig{'i_setjmp'});
 
 output_is(<<'CODE', <<OUT, "die_hard");
     newsub P0, .Exception_Handler, _handler
@@ -52,6 +52,27 @@ _handler:
     end
 CODE
 No exception handler and no message
+OUT
+
+output_like(<<'CODE', <<OUT, "find_lex");
+    new_pad 0
+    newsub P0, .Exception_Handler, _handler
+    set_eh P0
+    find_lex P1, "no_such_thing"
+    print "resumed\n"
+    end
+_handler:
+    print "catched it\n"
+    set S0, P5["_message"]
+    print S0
+    print "\n"
+    set P1, P5["_invoke_cc"]
+    invoke P1
+CODE
+/^catched it
+Lexical 'no_such_thing' not found
+resumed
+/
 OUT
 }
 

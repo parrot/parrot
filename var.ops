@@ -10,7 +10,7 @@ var.ops - Variable Ops
 
 =head1 DESCRIPTION
 
-These operations deal with both lexical and global variables, 
+These operations deal with both lexical and global variables,
 as well as the symbol tables that contain them.
 
 =cut
@@ -168,8 +168,14 @@ otherwise, count up from the outermost scope.
 
 op find_lex(out PMC, in STR) {
     PMC * pad = scratchpad_get_current(interpreter);
-    $1 = scratchpad_get(interpreter, pad, $2, 0);
-    goto NEXT();
+    PMC * lex = $1 = scratchpad_get(interpreter, pad, $2, 0);
+    opcode_t *resume = expr NEXT();
+    if (!lex)
+        resume = real_exception(interpreter, LEX_NOT_FOUND, resume,
+	    "Lexical '%s' not found",
+                           ($2 == NULL) ? "???"
+                           : string_to_cstring(interpreter, $2));
+    restart ADDRESS(resume);
 }
 
 op find_lex(out PMC, in INT) {

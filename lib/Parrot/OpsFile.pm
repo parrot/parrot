@@ -354,6 +354,10 @@ sub make_op
       elsif($short_name eq 'branch_cs' || $short_name eq 'invoke') {
 	$restart = 1;
       }
+      elsif ($body =~ s/\brestart\s+ADDRESS\((.*?)\)/{{=$1}}/mg) {
+	  $next = 0;
+	  $restart = 1;
+      }
 
       $body =~ s/\$(\d+)/{{\@$1}}/mg;
 

@@ -638,7 +638,6 @@ runops_ex(struct Parrot_Interp *interpreter, size_t offset)
 #ifdef HAS_HEADER_SETJMP
 /* XXX s. exception.c */
 extern Parrot_exception the_exception;
-extern size_t handle_exception(Parrot_Interp);
 #endif
 void
 runops(struct Parrot_Interp *interpreter, size_t offset)
@@ -646,7 +645,7 @@ runops(struct Parrot_Interp *interpreter, size_t offset)
 #ifdef HAS_HEADER_SETJMP
     if (setjmp(the_exception.destination)) {
         /* an exception was thrown */
-        offset = handle_exception(interpreter);
+        offset = handle_exception(interpreter, NULL);
     }
 #endif
     runops_ex(interpreter, offset);

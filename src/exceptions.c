@@ -185,8 +185,6 @@ rethrow_exception(Parrot_Interp interpreter, PMC *exception)
 #ifdef HAS_HEADER_SETJMP
 /* XXX s. interpreter.c */
 Parrot_exception the_exception;
-size_t handle_exception(Parrot_Interp);
-void do_exception(exception_severity severity, long error);
 
 static size_t
 dest2offset(Parrot_Interp interpreter, opcode_t *dest)
@@ -204,8 +202,8 @@ dest2offset(Parrot_Interp interpreter, opcode_t *dest)
     return offset;
 }
 
-size_t
-handle_exception(Parrot_Interp interpreter)
+static opcode_t *
+create_exception(Parrot_Interp interpreter, opcode_t *resume, STRING *msg)
 {
     PMC *exception;     /* exception object */
     size_t offset;      /* resume offset of handler */
@@ -217,25 +215,76 @@ handle_exception(Parrot_Interp interpreter)
     /* create an exception object */
     exception = pmc_new(interpreter, enum_class_Exception);
     /* exception type */
-    s = string_make(interpreter, "_type", 5, NULL,0,NULL);
+    s = string_from_cstring(interpreter, "_type", 0);
     key = key_new_string(interpreter, s);
     VTABLE_set_integer_keyed(interpreter, exception, key,
             the_exception.error);
     /* exception severity */
-    s = string_make(interpreter, "_severity", 9, NULL,0,NULL);
+    s = string_from_cstring(interpreter, "_severity", 0);
     key = key_new_string(interpreter, s);
     VTABLE_set_integer_keyed(interpreter, exception, key,
             (INTVAL)the_exception.severity);
+    if (msg) {
+        s = string_from_cstring(interpreter, "_message", 0);
+        key = key_new_string(interpreter, s);
+        VTABLE_set_string_keyed(interpreter, exception, key, msg);
+    }
     /* now fill rest of exception, locate handler and get
      * destination of handler
      */
-    dest = throw_exception(interpreter, exception, NULL);
-    offset = dest2offset(interpreter, dest);
-
+    dest = throw_exception(interpreter, exception, resume);
     Parrot_unblock_DOD(interpreter);
-    return offset;
+    return dest;
 }
 
+size_t
+handle_exception(Parrot_Interp interpreter, opcode_t *resume)
+{
+    opcode_t *dest;     /* absolute address of handler */
+
+    dest = create_exception(interpreter, resume, NULL);
+    return dest2offset(interpreter, dest);
+}
+
+/*
+ * instead of internal_exception this throws a real exception
+ */
+void *
+real_exception(struct Parrot_Interp *interpreter,
+        int exitcode, void *ret_addr, const char *format, ...)
+{
+    STRING *msg;
+    opcode_t *dest;     /* absolute address of handler */
+
+    /*
+     * make exception message
+     */
+    if (strchr(format, '%')) {
+        va_list arglist;
+        va_start(arglist, format);
+        msg = Parrot_vsprintf_c(interpreter, format, arglist);
+        va_end(arglist);
+    }
+    else
+        msg = string_make(interpreter, format, strlen(format),
+                NULL, PObj_external_FLAG, NULL);
+    /*
+     * FIXME classify errors
+     */
+    the_exception.error = exitcode;
+    the_exception.severity = EXCEPT_error;
+    /*
+     * construct exception object and get handler address
+     */
+    return create_exception(interpreter, ret_addr, msg);
+}
+/*
+ * do_exception:
+ * - called from interrupt code
+ * - does a longjmp in front of the runloop, which calls
+ * - handle_exception(): returning the handler address
+ * - where execution then resumes
+ */
 void
 do_exception(exception_severity severity, long error)
 {

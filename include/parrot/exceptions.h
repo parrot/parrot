@@ -16,6 +16,8 @@
 
 /* Prototypes */
 void internal_exception(int exitcode, const char *format, ...);
+void * real_exception(struct Parrot_Interp *interpreter,
+        int exitcode, void *ret_addr, const char *format, ...);
 void do_panic(struct Parrot_Interp *interpreter, const char *message,
               const char *file, int line);
 
@@ -57,6 +59,7 @@ void do_panic(struct Parrot_Interp *interpreter, const char *message,
 #define ILL_INHERIT 2
 #define NO_PREV_CS 3
 #define NO_CLASS 2
+#define LEX_NOT_FOUND 4
 
 /* &end_gen */
 
@@ -89,6 +92,8 @@ void pop_exception(Parrot_Interp);
 void * throw_exception(Parrot_Interp, PMC *, void *);
 void * rethrow_exception(Parrot_Interp, PMC *);
 
+size_t handle_exception(Parrot_Interp, opcode_t *);
+void do_exception(exception_severity severity, long error);
 #endif
 
 /*
