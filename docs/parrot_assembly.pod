@@ -649,30 +649,44 @@ Create a new filehandle px
 
 Open the file Y on filehandle X
 
-=item read px, py
+=item read px, py, pz
 
-Issue a read on the filehandle in Y, and put the result in PMC
-X. 
+Issue a read on the filehandle in y, and put the result in PMC
+X. PMC Z is the sync object.
 
-=item write px, sy
+=item write px, sy, pz
 
-Write the string Y to filehandle X
+Write the string Y to filehandle X. PMC Z is the sync object.
 
 =item wait px
 
-Wait for the I/O operation on filehandle X to finish
+Wait for the I/O operation represented by sync object X to finish
 
 =item readw px, py
 
-
+Read from filehandle Y and put the results in PMC X. Blocks until the
+read completes.
 
 =item writew px, sy
 
+Write string Y to filehandle X, waiting for the write to complete.
+
 =item seek px, ty
 
-=item seekw px, ty
+Seek filehndle X to position Y.
 
 =item tell tx, py
+
+Return the current position of filehandle Y and put it in X. Returns
+-1 for filehandles where this can't be determined. (Such as stream
+connections)
+
+=item status px, py, tz
+
+Get informational item Z for filehandle Y and put the result in
+X. This fetches things like the number of entries in the IO pipe,
+number of outstanding I/O ops, number of ops on the filehandle, and so
+forth.
 
 =back
 
