@@ -391,9 +391,14 @@ if ($c{gccversion}) {
     # out that you're using 2.7.2 and -Wfoo isn't recognised there, move it up
     # into the next version becone (2.8)
 
-    
+    # Don't use -ansi -pedantic.  It makes it much harder to compile
+    # using the system headers, which may well be tuned to a
+    # non-strict environment -- especially since we are using perl5
+    # compilation flags determined in a non-strict environment.
+    # An example is Solaris 8.
+
     my @opt_and_vers = 
-        (0 => "-Wall -ansi -pedantic -Wstrict-prototypes -Wmissing-prototypes -Winline -Wshadow -Wpointer-arith -Wcast-qual -Wcast-align -Wwrite-strings -Wconversion -Waggregate-return -Winline -W -Wsign-compare -Wno-unused",
+        (0 => "-Wall -Wstrict-prototypes -Wmissing-prototypes -Winline -Wshadow -Wpointer-arith -Wcast-qual -Wcast-align -Wwrite-strings -Wconversion -Waggregate-return -Winline -W -Wsign-compare -Wno-unused",
         # others; ones we might like marked with ?
         # ? -Wundef for undefined idenfiers in #if
         # ? -Wbad-function-cast
