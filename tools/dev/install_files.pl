@@ -14,7 +14,7 @@ tools/dev/install_files.pl - Copy files to their correct locations
 
 =head1 DESCRIPTION
 
-Use a detailed MANIFEST to install a set of files. 
+Use a detailed MANIFEST to install a set of files.
 
 =head2 Options
 
@@ -123,6 +123,7 @@ my %options = ( buildprefix => '',
                 bindir => '/usr/bin',
                 libdir => '/usr/lib',
                 includedir => '/usr/include',
+		'dry-run' => 0,
               );
 
 my @manifests;
@@ -158,6 +159,9 @@ while(<>) {
     my ($package) = $meta =~ /^\[(.*?)\]/;
     $meta =~ s/^\[(.*?)\]//;
     next unless $package; # Skip if this file belongs to no package
+
+    next unless $package eq 'main';	# XXX -lt
+
     my %meta;
     @meta{split(/,/, $meta)} = ();
     $meta{$_} = 1 for (keys %meta); # Laziness
@@ -181,23 +185,30 @@ while(<>) {
     close ARGV if eof; # Reset line numbering for each input file
 }
 
-for my $dir (keys %directories) {
-    unless (-d $dir) {
-        # Make full path to the directory $dir
-        my @dirs;
-        while (! -d $dir) { # Scan up to nearest existing ancestor
-            unshift @dirs, $dir;
-            $dir = dirname($dir);
-        }
-        foreach (@dirs) {
-            mkdir($_, 0777) or die "mkdir $_: $!\n";
-        }
+unless ($options{'dry-run'}) {
+    for my $dir (keys %directories) {
+	unless (-d $dir) {
+	    # Make full path to the directory $dir
+	    my @dirs;
+	    while (! -d $dir) { # Scan up to nearest existing ancestor
+		unshift @dirs, $dir;
+		$dir = dirname($dir);
+	    }
+	    foreach (@dirs) {
+		mkdir($_, 0777) or die "mkdir $_: $!\n";
+	    }
+	}
     }
 }
-
 foreach (@files) {
     my ($src, $dest) = @$_;
-    copy($src, $dest) or die "copy $src to $dest: $!\n";
+    if ($options{'dry-run'}) {
+	print "cp $src \t$dest\n";
+	next;
+    }
+    else {
+	copy($src, $dest) or die "copy $src to $dest: $!\n";
+    }
     my $mode = (stat($src))[2];
     chmod $mode, $dest;
 }
