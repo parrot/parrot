@@ -249,6 +249,9 @@ EOC
   unless (exists $flags{noinit}) {
       my $initline = 1+count_newlines($OUT)+1;
       $OUT .= qq(#line $initline "$cfile"\n) unless $suppress_lines;
+      $HOUT .= <<EOH;
+void $initname (void);
+EOH
       $OUT .= <<EOC;
 
 void $initname (void) {
