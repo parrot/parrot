@@ -74,30 +74,34 @@ pmclass PerlInt extends perlscalar {
      */
     void add (PMC* value, PMC* dest) {
         INTVAL pmci;
-	int dtype = enum_class_PerlInt;
 	int vtype = VTABLE_type(INTERP, value);
+	FLOATVAL valf;
+	FLOATVAL sumf;
 
-	pmci = VTABLE_get_integer(INTERP, SELF);
-	if (vtype == enum_class_PerlNum) {
-	    dtype = enum_class_PerlNum;
+	pmci = SELF->cache.int_val;
+	if (vtype == enum_class_PerlUndef) {
+            VTABLE_set_integer_native(INTERP, dest, pmci);
+	    return;
 	}
-	else if (vtype == enum_class_PerlString) {
-	    FLOATVAL valf = VTABLE_get_number(INTERP, value);
-	    INTVAL vali = VTABLE_get_integer(INTERP, value);
-	    if (valf == vali)
-		VTABLE_set_integer_native(INTERP, dest, pmci + vali);
-	    else
-		VTABLE_set_number_native(INTERP, dest, pmci + valf);
+
+	valf = VTABLE_get_number(INTERP, value);
+	sumf = pmci + valf;
+	if (vtype == enum_class_PerlNum) {
+            VTABLE_set_number_native(INTERP, dest, sumf);
+	    return;
+	}
+	{
+	    INTVAL vali = (INTVAL) valf;
+	    INTVAL   sumi = pmci + vali;
+	    if (sumf == sumi)
+		VTABLE_set_integer_native(INTERP, dest, sumi);
+	    else {
+		/* TODO BIG* promotion */
+		VTABLE_set_number_native(INTERP, dest, sumf);
+	    }
 	    return;
 
 	}
-	/* no add_int here: SELF may be dest */
-	if (dtype == enum_class_PerlNum)
-            VTABLE_set_number_native(INTERP, dest,
-		pmci + VTABLE_get_number(INTERP, value));
-	else
-            VTABLE_set_integer_native(INTERP, dest,
-		pmci + VTABLE_get_integer(INTERP, value));
     }
 
     void add_same (PMC* value, PMC* dest) {

@@ -162,6 +162,7 @@ expand_pcc_sub(Parrot_Interp interpreter, Instruction *ins)
 
     sub = ins->r[1];
     p3 = i0 = NULL;
+    label1 = label2 = NULL;
     ps = pe = sub->pcc_sub->prototyped;
     if (ps == -1) {
 	ps = 0; pe = 1;
@@ -441,6 +442,7 @@ check_tail_call(Parrot_Interp interpreter, Instruction *ins)
     UNUSED(interpreter);
     if (!(optimizer_level & OPT_SUB))
         return 0;
+    ret_ins = 0;
     for (i = call_found = ret_found = 0, tmp = ins; tmp && i < 4;
             tmp = tmp->next) {
         ++i;    /* ins count */

@@ -1002,7 +1002,7 @@ string_bitwise_and(struct Parrot_Interp *interpreter, STRING *s1,
     const char *s1start;
     const char *s2start;
     char *dp;
-    STRING *res;
+    STRING *res = NULL;
     size_t len;
 
    if (dest && *dest)
@@ -1064,7 +1064,7 @@ string_bitwise_or(struct Parrot_Interp *interpreter, STRING *s1,
     const char *s1end;
     const char *s2end;
     char *dp;
-    STRING *res;
+    STRING *res = NULL;
     size_t len;
 
     if (dest && *dest)
@@ -1146,7 +1146,7 @@ string_bitwise_xor(struct Parrot_Interp *interpreter, STRING *s1,
     const char *s1end;
     const char *s2end;
     char *dp;
-    STRING *res;
+    STRING *res = NULL;
     size_t len;
 
     if (dest && *dest)
