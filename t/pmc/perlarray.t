@@ -1,4 +1,20 @@
 #! perl -w
+# Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+# $Id$
+
+=head1 NAME
+
+t/pmc/perlarray.t - Perl Array
+
+=head1 SYNOPSIS
+
+	% perl t/pmc/perlarray.t
+
+=head1 DECSRIPTION
+
+Tests the C<PerlArray> PMC. Checks basic and Perl-specific array behaviour.
+
+=cut
 
 use Parrot::Test tests => 26;
 use Test::More;

@@ -1,4 +1,20 @@
 #! perl -w
+# Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+# $Id$
+
+=head1 NAME
+
+t/pmc/ref.t - Reference PMC
+
+=head1 SYNOPSIS
+
+	% perl t/pmc/ref.t
+
+=head1 DECSRIPTION
+
+Tests that method delegation works on a C<Ref> PMC.
+
+=cut
 
 use Parrot::Test tests => 6;
 use Test::More qw(skip);

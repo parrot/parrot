@@ -1,4 +1,20 @@
 #! perl -w
+# Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+# $Id$
+
+=head1 NAME
+
+t/src/manifest.t - MANIFEST File
+
+=head1 SYNOPSIS
+
+	% perl t/src/manifest.t
+
+=head1 DECSRIPTION
+
+Checks that the distribution and the MANIFEST file agree.
+
+=cut
 
 use Test::More tests => 4;
 

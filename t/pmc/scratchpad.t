@@ -1,4 +1,20 @@
 #! perl -w
+# Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+# $Id$
+
+=head1 NAME
+
+t/pmc/scratchpad.t - Lexical Scratchpads
+
+=head1 SYNOPSIS
+
+	% perl t/pmc/scratchpad.t
+
+=head1 DECSRIPTION
+
+Tests using C<PerlInt> PMC on lexical scratchpads.
+
+=cut
 
 use Parrot::Test tests => 5;
 

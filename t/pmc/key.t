@@ -1,4 +1,20 @@
 #! perl -w
+# Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+# $Id$
+
+=head1 NAME
+
+t/pmc/key.t - Keys
+
+=head1 SYNOPSIS
+
+	% perl t/pmc/key.t
+
+=head1 DECSRIPTION
+
+Tests the C<Key> PMC.
+
+=cut
 
 use Parrot::Test tests => 2;
 use Test::More;

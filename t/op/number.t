@@ -1,4 +1,20 @@
 #! perl -w
+# Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+# $Id$
+
+=head1 NAME
+
+t/op/number.t - Number Registers
+
+=head1 SYNOPSIS
+
+	% perl t/op/number.t
+
+=head1 DECSRIPTION
+
+Tests the use of Parrot's floating-point number registers.
+
+=cut
 
 use Parrot::Test tests => 38;
 use Test::More;

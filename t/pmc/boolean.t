@@ -1,4 +1,21 @@
 #! perl -w
+# Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+# $Id$
+
+=head1 NAME
+
+t/pmc/boolean.t - Boolean Ops
+
+=head1 SYNOPSIS
+
+	% perl t/pmc/boolean.t
+
+=head1 DECSRIPTION
+
+Tests C<Boolean> PMC. Checks comparison and logic operations for various
+type combinations.
+
+=cut
 
 use Parrot::Test tests => 7;
 use Test::More;

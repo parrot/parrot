@@ -1,4 +1,20 @@
 #! perl -w
+# Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+# $Id$
+
+=head1 NAME
+
+t/src/exit.t - Exiting
+
+=head1 SYNOPSIS
+
+	% perl t/src/exit.t
+
+=head1 DECSRIPTION
+
+Tests C<Parrot_exit()> and C<Parrot_on_exit()> functions.
+
+=cut
 
 use Parrot::Test tests => 3;
 

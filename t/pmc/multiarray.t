@@ -1,4 +1,21 @@
 #! perl -w
+# Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+# $Id$
+
+=head1 NAME
+
+t/pmc/multiarray.t - MultiArray PMC
+
+=head1 SYNOPSIS
+
+	% perl t/pmc/multiarray.t
+
+=head1 DECSRIPTION
+
+Tests the C<MultiArray> PMC. Checks element access in 2 and 3 dimensions,
+and cloning.
+
+=cut
 
 use Parrot::Test tests => 3;
 use Test::More;

@@ -1,4 +1,20 @@
 #! perl -w
+# Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+# $Id$
+
+=head1 NAME
+
+t/op/debuginfo.t - Debugging Info
+
+=head1 SYNOPSIS
+
+	% perl t/op/debuginfo.t
+
+=head1 DECSRIPTION
+
+Tests the various set and get operations for line, package and file info.
+
+=cut
 
 use Parrot::Test tests => 3;
 

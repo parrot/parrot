@@ -1,4 +1,20 @@
 #! perl -w
+# Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+# $Id$
+
+=head1 NAME
+
+t/op/ifunless.t - If/Unless
+
+=head1 SYNOPSIS
+
+	% perl t/op/ifunless.t
+
+=head1 DECSRIPTION
+
+Tests the conditional C<if> and C<unless> operations.
+
+=cut
 
 use Parrot::Test tests => 6;
 

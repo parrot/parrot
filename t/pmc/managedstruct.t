@@ -1,4 +1,20 @@
 #! perl -w
+# Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+# $Id$
+
+=head1 NAME
+
+t/pmc/managedstruct.t - Managed C Structure
+
+=head1 SYNOPSIS
+
+	% perl t/pmc/managedstruct.t
+
+=head1 DECSRIPTION
+
+Tests the ManagedStruct PMC. Checks element access and memory allocation.
+
+=cut
 
 use Parrot::Test tests => 5;
 use Test::More;

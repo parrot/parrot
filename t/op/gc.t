@@ -1,4 +1,20 @@
 #! perl -w
+# Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+# $Id$
+
+=head1 NAME
+
+t/op/gc.t - Garbage Collection
+
+=head1 SYNOPSIS
+
+	% perl t/op/gc.t
+
+=head1 DECSRIPTION
+
+Tests garbage collection with the C<interpinfo> operation.
+
+=cut
 
 use Parrot::Test tests => 8;
 

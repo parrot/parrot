@@ -1,3 +1,22 @@
+#! perl -w
+# Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+# $Id$
+
+=head1 NAME
+
+t/pmc/nci.t - Native Call Interface
+
+=head1 SYNOPSIS
+
+	% perl t/pmc/nci.t
+
+=head1 DECSRIPTION
+
+Tests the NCI PMC. These are all skipped unless JIT CPU architecture is
+i386 and the F<libnci.so> library is found.
+
+=cut
+
 use Parrot::Test tests => 29;
 use Parrot::Config;
 

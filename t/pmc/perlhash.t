@@ -1,4 +1,22 @@
 #! perl
+# Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+# $Id$
+
+=head1 NAME
+
+t/pmc/perlhash.t - Perl Hashes
+
+=head1 SYNOPSIS
+
+	% perl t/pmc/perlhash.t
+
+=head1 DECSRIPTION
+
+Tests the C<PerlHash> PMC. Checks key access with various types of
+normal and potentially hazardous keys. Does a bit of stress testing as
+well.
+
+=cut
 
 use Parrot::Test tests => 31;
 use Test::More;

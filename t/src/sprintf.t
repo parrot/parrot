@@ -1,4 +1,20 @@
 #! perl -w
+# Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+# $Id$
+
+=head1 NAME
+
+t/src/sprintf.t - Name
+
+=head1 SYNOPSIS
+
+	% perl t/src/sprintf.t
+
+=head1 DECSRIPTION
+
+Tests the various C<Parrot_sprintf_*> functions.
+
+=cut
 
 use Parrot::Test tests => 3;
 

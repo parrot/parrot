@@ -1,4 +1,21 @@
-#perl -w
+#! perl -w
+# Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+# $Id$
+
+=head1 NAME
+
+t/op/types.t - Parrot Types
+
+=head1 SYNOPSIS
+
+	% perl t/op/types.t
+
+=head1 DECSRIPTION
+
+Tests native Parrot types with C<typeof>. Other type tests are in
+F<t/pmc/pmc.t>.
+
+=cut
 
 use Parrot::Test tests => 3;
 

@@ -1,4 +1,20 @@
 #! perl -w
+# Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+# $Id$
+
+=head1 NAME
+
+t/op/conv.t - C# Ops
+
+=head1 SYNOPSIS
+
+	% perl t/op/conv.t
+
+=head1 DECSRIPTION
+
+Tests the additional opcodes for C# compilation. See F<ops/dotgnu.ops>.
+
+=cut
 
 use Parrot::Test tests => 12;
 use Test::More;

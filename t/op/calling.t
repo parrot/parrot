@@ -1,4 +1,20 @@
 #! perl -w
+# Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+# $Id$
+
+=head1 NAME
+
+t/op/calling.t - Parrot Calling Conventions
+
+=head1 SYNOPSIS
+
+	% perl t/op/calling.t
+
+=head1 DECSRIPTION
+
+Tests Parrot calling conventions.
+
+=cut
 
 use Parrot::Test tests => 2;
 use Test::More;

@@ -1,4 +1,20 @@
 #! perl -w
+# Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+# $Id$
+
+=head1 NAME
+
+t/pmc/mmd.t - Multi-Method Dispatch
+
+=head1 SYNOPSIS
+
+	% perl t/pmc/mmd.t
+
+=head1 DECSRIPTION
+
+Tests the multi-method dispatch.
+
+=cut
 
 use Parrot::Test tests => 1;
 

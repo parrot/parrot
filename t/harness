@@ -1,9 +1,64 @@
 #! perl -w
+# Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
 # $Id$
 
-# Mike Lambert stole parrot/t/harness for perl6/t/harness
-# Leo Toetsch stole perl6/t/harness for imcc/t/harness
-# Bernhard Schmalhofer merged imcc/t/harness back into parrot/t/harness
+=head1 NAME
+
+t/harness - Parrot Test Harness
+
+=head1 SYNOPSIS
+
+    % perl t/harness [options] [testfiles]
+
+=head1 DESCRIPTION
+
+Command-line options are:
+
+=over 4
+
+=item C<-w>
+
+Turn warnings on.
+
+=item C<-g>
+
+Run the C<CGoto> core.
+
+=item C<-j>
+
+Run with JIT enabled.
+
+=item C<-P>
+
+Run the C<Prederef> core.
+
+=item C<-P> (sic)
+
+Run the C<CGP> core.
+
+=item C<-S>
+
+Run Switched.
+
+=item C<-b>
+
+Run bounds checking enabled.
+
+=item C<-d>
+
+Run with debugging enabled.
+
+=item C<-r>
+
+assemble to Parrot bytecode and then run the bytecode.
+
+=item C<-O[012]>
+
+Run optimized to the specified level.
+
+=back
+
+=cut
 
 use strict;
 use lib qw(lib imcc);
@@ -25,21 +80,21 @@ my $run_pbc = grep { $_ eq '--run-pbc' } @ARGV;
 my %opts;
 getopts('wgjPCSbvdr?hO:', \%opts);
 if ($opts{'?'} || $opts{h}) {
-	print <<"EOF";
+    print <<"EOF";
 perl t/harness [options] [testfiles]
-        -w ... warnings on
-	-g ... run CGoto
-	-j ... run JIT
-	-P ... run Prederef
-	-P ... run CGP
-	-S ... run Switched
-	-b ... run bounds checked
-	-v ... run verbose
-	-d ... run debug
-	-r ... assemble to PBC run PBC
-	-O[012] optimize
+    -w ... warnings on
+    -g ... run CGoto
+    -j ... run JIT
+    -P ... run Prederef
+    -P ... run CGP
+    -S ... run Switched
+    -b ... run bounds checked
+    -v ... run verbose
+    -d ... run debug
+    -r ... assemble to PBC run PBC
+    -O[012] optimize
 EOF
-	exit;
+    exit;
 }
 
 my $args = join(' ', map { "-$_" } keys %opts );
@@ -55,3 +110,13 @@ my @default_tests = ( ( map { glob( "t/$_/*.t" ) } qw(op pmc native_pbc) ),
                     );
 my @tests = @ARGV ? map { glob( $_ ) } @ARGV : @default_tests;
 runtests(@tests);
+
+=head1 HISTORY
+
+Mike Lambert stole F<t/harness> for F<languages/perl6/t/harness>.
+
+Leo Toetsch stole F<languages/perl6/t/harness> for F<imcc/t/harness>.
+
+Bernhard Schmalhofer merged F<imcc/t/harness> back into F<t/harness>.
+
+=cut

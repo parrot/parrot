@@ -1,4 +1,20 @@
 #! perl -w
+# Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+# $Id$
+
+=head1 NAME
+
+t/pmc/pmc.t - Perl PMCs
+
+=head1 SYNOPSIS
+
+	% perl t/pmc/pmc.t
+
+=head1 DECSRIPTION
+
+Contains a lot of Perl PMC related tests.
+
+=cut
 
 use Parrot::Test tests => 92;
 use Test::More;

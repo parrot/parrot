@@ -1,4 +1,20 @@
 #! perl -w
+# Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+# $Id$
+
+=head1 NAME
+
+t/pmc/eval.t - Dynamic Code Evaluation
+
+=head1 SYNOPSIS
+
+	% perl t/pmc/eval.t
+
+=head1 DECSRIPTION
+
+Tests on-the-fly PASM compilation and invocation.
+
+=cut
 
 use Parrot::Test tests => 6;
 use Test::More;

@@ -1,4 +1,20 @@
 #! perl -w
+# Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+# $Id$
+
+=head1 NAME
+
+t/pmc/delegate.t - Method Delegation
+
+=head1 SYNOPSIS
+
+	% perl t/pmc/delegate.t
+
+=head1 DECSRIPTION
+
+Tests method delegation.
+
+=cut
 
 use Parrot::Test tests => 9;
 use Test::More;

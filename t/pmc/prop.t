@@ -1,4 +1,20 @@
 #! perl -w
+# Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+# $Id$
+
+=head1 NAME
+
+t/pmc/prop.t - Properties
+
+=head1 SYNOPSIS
+
+	% perl t/pmc/prop.t
+
+=head1 DECSRIPTION
+
+Tests property access on Perl PMCs.
+
+=cut
 
 use Parrot::Test tests => 7;
 use Test::More;

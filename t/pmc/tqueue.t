@@ -1,4 +1,20 @@
 #! perl -w
+# Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+# $Id$
+
+=head1 NAME
+
+t/pmc/tqueue.t - Thread Queue
+
+=head1 SYNOPSIS
+
+	% perl t/pmc/tqueue.t
+
+=head1 DECSRIPTION
+
+Tests the thread queue.
+
+=cut
 
 use Parrot::Test tests => 1;
 use Test::More;

@@ -1,4 +1,20 @@
 #! perl -w
+# Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+# $Id$
+
+=head1 NAME
+
+t/op/string.t - Parrot Strings
+
+=head1 SYNOPSIS
+
+	% perl t/op/string.t
+
+=head1 DECSRIPTION
+
+Tests Parrot's string registers and operations.
+
+=cut
 
 use Parrot::Test tests => 126;
 use Test::More;

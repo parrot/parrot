@@ -1,4 +1,20 @@
 #! perl -w
+# Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+# $Id$
+
+=head1 NAME
+
+t/op/time.t - Time and Sleep
+
+=head1 SYNOPSIS
+
+	% perl t/op/time.t
+
+=head1 DECSRIPTION
+
+Tests the C<time> and C<sleep> operations.
+
+=cut
 
 use Parrot::Test tests => 4;
 

@@ -1,4 +1,21 @@
 #! perl -w
+# Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+# $Id$
+
+=head1 NAME
+
+t/op/basic.t - Basic Ops
+
+=head1 SYNOPSIS
+
+	% perl t/op/basic.t
+
+=head1 DECSRIPTION
+
+Tests basic string and branching operations.
+
+=cut
+
 use strict;
 
 use Parrot::Test tests => 21;

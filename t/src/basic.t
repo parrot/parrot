@@ -1,4 +1,20 @@
 #! perl -w
+# Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+# $Id$
+
+=head1 NAME
+
+t/src/basic.t - Basics
+
+=head1 SYNOPSIS
+
+	% perl t/src/basic.t
+
+=head1 DECSRIPTION
+
+Tests C<printf> and C<internal_exception> functions.
+
+=cut
 
 use Parrot::Test tests => 3;
 

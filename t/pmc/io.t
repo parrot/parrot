@@ -1,4 +1,20 @@
 #! perl -w
+# Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+# $Id$
+
+=head1 NAME
+
+t/pmc/io.t - IO Ops
+
+=head1 SYNOPSIS
+
+	% perl t/pmc/io.t
+
+=head1 DECSRIPTION
+
+Tests the Parrot IO operations.
+
+=cut
 
 use Parrot::Test tests => 21;
 use Test::More;

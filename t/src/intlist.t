@@ -1,4 +1,20 @@
 #! perl -w
+# Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+# $Id$
+
+=head1 NAME
+
+t/src/intlist.t - Integer Lists
+
+=head1 SYNOPSIS
+
+	% perl t/src/intlist.t
+
+=head1 DECSRIPTION
+
+Tests the various intlist_* functions.
+
+=cut
 
 use Parrot::Test tests => 4;
 

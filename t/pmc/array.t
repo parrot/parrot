@@ -1,4 +1,21 @@
 #! perl -w
+# Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+# $Id$
+
+=head1 NAME
+
+t/pmc/array.t - Array PMC
+
+=head1 SYNOPSIS
+
+	% perl t/pmc/array.t
+
+=head1 DECSRIPTION
+
+Tests C<Array> PMC. Checks size, sets various elements, including
+out-of-bounds test. Checks INT and PMC keys.
+
+=cut
 
 use Parrot::Test tests => 12;
 use Test::More;

@@ -1,4 +1,20 @@
 #! perl -w
+# Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+# $Id$
+
+=head1 NAME
+
+t/op/macro.t - IMCC Macros
+
+=head1 SYNOPSIS
+
+	% perl t/op/macro.t
+
+=head1 DECSRIPTION
+
+Tests IMCC C<.macro> syntax.
+
+=cut
 
 use Parrot::Test tests => 16;
 use Test::More;

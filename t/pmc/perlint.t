@@ -1,4 +1,20 @@
 #! perl -w
+# Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+# $Id$
+
+=head1 NAME
+
+t/pmc/perlint.t - Perl Integers
+
+=head1 SYNOPSIS
+
+	% perl t/pmc/perlint.t
+
+=head1 DECSRIPTION
+
+Tests the PerlInt PMC. Checks Perl-specific integer behaviour.
+
+=cut
 
 use Parrot::Test tests => 27;
 use Parrot::PMC '%pmc_types';

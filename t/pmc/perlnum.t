@@ -1,4 +1,20 @@
 #! perl -w
+# Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+# $Id$
+
+=head1 NAME
+
+t/pmc/perlnum.t - Perl Numbers
+
+=head1 SYNOPSIS
+
+	% perl t/pmc/perlnum.t
+
+=head1 DECSRIPTION
+
+Tests the C<PerlNum> PMC. Checks Perl-specific numeric behaviour.
+
+=cut
 
 use Parrot::Test tests => 35;
 

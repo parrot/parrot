@@ -1,4 +1,20 @@
-#perl -w
+#!perl -w
+# Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+# $Id$
+
+=head1 NAME
+
+t/op/bitwise.t - Bitwise Ops
+
+=head1 SYNOPSIS
+
+	% perl t/op/bitwise.t
+
+=head1 DECSRIPTION
+
+Tests various bitwise logical operations.
+
+=cut
 
 use Parrot::Test tests => 23;
 

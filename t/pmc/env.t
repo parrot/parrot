@@ -1,4 +1,20 @@
 #! perl -w
+# Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+# $Id$
+
+=head1 NAME
+
+t/pmc/env.t - System Environment
+
+=head1 SYNOPSIS
+
+	% perl t/pmc/env.t
+
+=head1 DECSRIPTION
+
+Tests the C<Env> PMC.
+
+=cut
 
 use Parrot::Test tests => 6;
 use Test::More;

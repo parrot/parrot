@@ -1,4 +1,20 @@
 #! perl -w
+# Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+# $Id$
+
+=head1 NAME
+
+t/pmc/perlstring.t - Perl Strings
+
+=head1 SYNOPSIS
+
+	% perl t/pmc/perlstring.t
+
+=head1 DECSRIPTION
+
+Tests the C<PerlString> PMC. Checks Perl-specific string behaviour.
+
+=cut
 
 use Parrot::Test tests => 29;
 use Test::More; # Included for skip().

@@ -1,5 +1,22 @@
 #! perl -w
+# Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+# $Id$
 # test WRT JIT register allocation
+
+=head1 NAME
+
+t/op/jitn.t - JIT register allocation
+
+=head1 SYNOPSIS
+
+	% perl t/op/jitn.t
+
+=head1 DECSRIPTION
+
+Tests JIT register allocation.
+
+=cut
+
 use Parrot::Test tests => 9;
 
 output_is(<<'CODE', <<'OUTPUT', "sub_i_i_i 1,2,3 mapped");

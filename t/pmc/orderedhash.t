@@ -1,4 +1,20 @@
 #! perl -w
+# Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+# $Id$
+
+=head1 NAME
+
+t/pmc/orderedhash.t - Ordered Hash
+
+=head1 SYNOPSIS
+
+	% perl t/pmc/orderedhash.t
+
+=head1 DECSRIPTION
+
+Tests the C<OrderedHash> PMC.
+
+=cut
 
 use Parrot::Test tests => 10;
 use Test::More;

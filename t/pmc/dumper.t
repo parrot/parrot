@@ -1,4 +1,21 @@
 #! perl -w
+# Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+# $Id$
+
+=head1 NAME
+
+t/pmc/dumper.t - Data Dumping
+
+=head1 SYNOPSIS
+
+	% perl t/pmc/dumper.t
+
+=head1 DECSRIPTION
+
+Tests data dumping.
+
+=cut
+
 use strict;
 
 use Parrot::Test tests => 8;

@@ -1,4 +1,21 @@
 #! perl -w
+# Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+# $Id$
+
+=head1 NAME
+
+t/op/arithmetics.t - Arithmetic Ops
+
+=head1 SYNOPSIS
+
+	% perl t/op/arithmetics.t
+
+=head1 DECSRIPTION
+
+Tests basic arithmetic on various combinations of Parrot integer and
+number types and C<PerlInt> and C<PerlNum>.
+
+=cut
 
 use Parrot::Test tests => 20;
 use Test::More;

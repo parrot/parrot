@@ -1,4 +1,20 @@
 #! perl -w
+# Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+# $Id$
+
+=head1 NAME
+
+t/op/hacks.t - IO Ops
+
+=head1 SYNOPSIS
+
+	% perl t/op/hacks.t
+
+=head1 DECSRIPTION
+
+Tests basic file IO operations.
+
+=cut
 
 use Parrot::Test tests => 2;
 use Test::More;

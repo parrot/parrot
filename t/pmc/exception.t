@@ -1,4 +1,20 @@
 #! perl -w
+# Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+# $Id$
+
+=head1 NAME
+
+t/pmc/exception.t - Exception Handling
+
+=head1 SYNOPSIS
+
+	% perl t/pmc/exception.t
+
+=head1 DECSRIPTION
+
+Tests C<Exception> and C<Exception_Handler> PMCs.
+
+=cut
 
 use Parrot::Test tests => 22;
 use Test::More;

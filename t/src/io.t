@@ -1,4 +1,20 @@
 #! perl -w
+# Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+# $Id$
+
+=head1 NAME
+
+t/src/io.t - IO Subsystem
+
+=head1 SYNOPSIS
+
+	% perl t/src/io.t
+
+=head1 DECSRIPTION
+
+Tests the IO subsystem.
+
+=cut
 
 use Parrot::Test tests => 20;
 use Test::More;

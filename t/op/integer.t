@@ -1,4 +1,20 @@
 #! perl -w
+# Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+# $Id$
+
+=head1 NAME
+
+t/op/integer.t - Integer Registers
+
+=head1 SYNOPSIS
+
+	% perl t/op/integer.t
+
+=head1 DECSRIPTION
+
+Tests the use of Parrot's integer registers.
+
+=cut
 
 use Parrot::Test tests => 39;
 

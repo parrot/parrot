@@ -1,4 +1,21 @@
 #! perl -w
+# Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+# $Id$
+
+=head1 NAME
+
+t/pmc/threads.t - Threads
+
+=head1 SYNOPSIS
+
+	% perl t/pmc/threads.t
+
+=head1 DECSRIPTION
+
+Tests running threads. All tests skipped unless running on Linux and
+Darwin.
+
+=cut
 
 use Parrot::Test;
 use Test::More;

@@ -1,4 +1,21 @@
 #! perl -w
+# Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+# $Id$
+
+=head1 NAME
+
+t/op/stacks.t - Stacks
+
+=head1 SYNOPSIS
+
+	% perl t/op/stacks.t
+
+=head1 DECSRIPTION
+
+Tests for stack operations, currently C<push*>, C<push_*_c> and C<pop*>
+where C<*> is not C<p>.
+
+=cut
 
 use Parrot::Test tests => 56;
 use Test::More;

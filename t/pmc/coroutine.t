@@ -1,4 +1,20 @@
 #! perl -w
+# Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+# $Id$
+
+=head1 NAME
+
+t/pmc/coroutines.t - Coroutines
+
+=head1 SYNOPSIS
+
+	% perl t/pmc/coroutines.t
+
+=head1 DECSRIPTION
+
+Tests the C<Coroutine> PMC.
+
+=cut
 
 use Parrot::Test tests => 4;
 use Test::More;

@@ -1,4 +1,20 @@
 #! perl -w
+# Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+# $Id$
+
+=head1 NAME
+
+t/src/list.t - List Subsystem
+
+=head1 SYNOPSIS
+
+	% perl t/src/list.t
+
+=head1 DECSRIPTION
+
+Tests the various C<list_*> functions.
+
+=cut
 
 use Parrot::Test tests => 2;
 

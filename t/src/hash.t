@@ -1,5 +1,21 @@
 #! perl -w
+# Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+# $Id$
 # Tests the hash.h API without reference to PMCs.
+
+=head1 NAME
+
+t/src/hash.t - Hashes
+
+=head1 SYNOPSIS
+
+	% perl t/src/hash.t
+
+=head1 DECSRIPTION
+
+Tests the Hash functions.
+
+=cut
 
 use Parrot::Test tests => 10;
 

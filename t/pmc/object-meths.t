@@ -1,4 +1,20 @@
 #! perl -w
+# Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+# $Id$
+
+=head1 NAME
+
+t/pmc/object-meths.t - Object Methods
+
+=head1 SYNOPSIS
+
+	% perl t/pmc/object-meths.t
+
+=head1 DECSRIPTION
+
+Tests PMC object methods.
+
+=cut
 
 use Parrot::Test tests => 4;
 use Test::More;

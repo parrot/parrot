@@ -1,4 +1,21 @@
 #! perl -w
+# Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+# $Id$
+
+=head1 NAME
+
+t/pmc/sub.t - Subroutine PMCs
+
+=head1 SYNOPSIS
+
+	% perl t/pmc/sub.t
+
+=head1 DECSRIPTION
+
+Tests the creation and invocation of C<Sub>, C<Closure> and
+C<Continuation> PMCs.
+
+=cut
 
 use Parrot::Test tests => 7;
 use Test::More;

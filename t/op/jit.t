@@ -1,4 +1,21 @@
 #! perl -w
+# Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+# $Id$
+
+=head1 NAME
+
+t/op/jit.t - JIT register allocation
+
+=head1 SYNOPSIS
+
+	% perl t/op/jit.t
+
+=head1 DECSRIPTION
+
+Tests JIT register allocation.
+
+=cut
+
 # test WRT JIT register allocation
 use Parrot::Test tests => 58;
 

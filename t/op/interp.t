@@ -1,4 +1,20 @@
 #! perl -w
+# Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+# $Id$
+
+=head1 NAME
+
+t/op/interp.t - Running the Interpreter
+
+=head1 SYNOPSIS
+
+	% perl t/op/interp.t
+
+=head1 DECSRIPTION
+
+Tests the old and new styles of running the Parrot interpreter.
+
+=cut
 
 use Parrot::Test tests => 11;
 

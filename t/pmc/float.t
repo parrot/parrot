@@ -1,4 +1,20 @@
 #! perl -w
+# Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+# $Id$
+
+=head1 NAME
+
+t/pmc/float.t - Floating-point Numbers
+
+=head1 SYNOPSIS
+
+	% perl t/pmc/float.t
+
+=head1 DECSRIPTION
+
+Tests the Float PMC.
+
+=cut
 
 use Parrot::Test tests => 9;
 

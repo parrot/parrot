@@ -1,5 +1,21 @@
 #! perl -w
+# Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+# $Id$
 # Tests the extension API
+
+=head1 NAME
+
+t/src/extend.t - Parrot Extension API
+
+=head1 SYNOPSIS
+
+	% perl t/src/extend.t
+
+=head1 DECSRIPTION
+
+Tests the extension API.
+
+=cut
 
 use Parrot::Test tests => 12;
 use Parrot::Config;

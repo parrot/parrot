@@ -1,4 +1,20 @@
 #! perl -w
+# Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+# $Id$
+
+=head1 NAME
+
+t/stress/gc.t - Garbage Collection
+
+=head1 SYNOPSIS
+
+	% perl t/stress/gc.t
+
+=head1 DECSRIPTION
+
+Tests garbage collection.
+
+=cut
 
 use Parrot::Test tests => 1;
 use Test::More;

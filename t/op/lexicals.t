@@ -1,4 +1,20 @@
 #! perl -w
+# Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+# $Id$
+
+=head1 NAME
+
+t/op/lexicals.t - Lexical Ops
+
+=head1 SYNOPSIS
+
+	% perl t/op/lexicals.t
+
+=head1 DECSRIPTION
+
+Tests various lexical scratchpad operations.
+
+=cut
 
 use Parrot::Test tests => 6;
 

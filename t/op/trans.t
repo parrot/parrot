@@ -1,4 +1,20 @@
-#!/usr/local/bin/perl -w
+#!perl -w
+# Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+# $Id$
+
+=head1 NAME
+
+t/op/trans.t - Transcendental Mathematical Ops
+
+=head1 SYNOPSIS
+
+	% perl t/op/trans.t
+
+=head1 DECSRIPTION
+
+Tests the transcendental mathematical operations.
+
+=cut
 
 use Parrot::Test tests => 18;
 use Math::Trig qw( tan sec atan asin acos asec cosh sinh tanh sech );

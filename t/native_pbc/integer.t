@@ -1,4 +1,21 @@
 #! perl -w
+# Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+# $Id$
+
+=head1 NAME
+
+t/native_pbc/integer.t - Integers
+
+=head1 SYNOPSIS
+
+	% perl t/native_pbc/integer.t
+
+=head1 DECSRIPTION
+
+Tests word-size/float-type/endian-ness for different architectures.
+
+=cut
+
 my $comment = <<'EOC';
 
 s. t/native_pbc/number.t for additional comments
