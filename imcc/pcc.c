@@ -34,6 +34,86 @@ set_I_const(struct Parrot_Interp *interpreter, Instruction *ins,
     return insINS(interpreter, ins, "set", regs, 2);
 }
 
+static Instruction *
+pcc_emit_check_param(Parrot_Interp interpreter, Instruction *ins,
+        SymReg *sub, SymReg *i0, SymReg *p3, int first)
+{
+    SymReg *check_sub, *regs[IMCC_MAX_REGS], *p0, *check_type, *i31;
+    char buf[128];
+    Instruction *last;
+
+    /*
+     * generate check subroutine if not done yet
+     */
+    i31 = mk_pasm_reg(str_dup("I31"));
+    strcpy(buf, "_#check_params");
+    check_sub = _get_sym(ghash, buf);
+    if (!check_sub) {
+        SymReg * err_nparam;
+
+	check_sub = mk_address(str_dup(buf), U_add_uniq_label);
+        /* we just append to the current ins stream */
+        last = INS_LABEL(check_sub, 1);
+        /*
+         * first time check: amount of params, elements in P3 >= I1
+         * we can globber I0
+         */
+        if (!i0)
+            i0 = mk_pasm_reg(str_dup("I0"));
+        regs[0] = i0;
+        regs[1] = p3;
+        /* set I0, P3 */
+        INS(interpreter, "set", NULL, regs, 2, 0, 1);
+        /* lt I0, nparam, check_err_nparams */
+	err_nparam = mk_address(str_dup("#check_err_nparam"), U_add_uniq_label);
+        /* the param count in passed by the sub in I31
+         */
+        regs[0] = i0;
+        regs[1] = i31;
+        regs[2] = err_nparam;
+	INS(interpreter, "lt", NULL, regs, 3, 0, 1);
+        /*
+         * type check entry
+         */
+	check_type = mk_address(str_dup("_#check_param_type"),
+                U_add_uniq_label);
+        /* we just append to the current ins stream */
+        last = INS_LABEL(check_type, 1);
+
+	INS(interpreter, "ret", NULL, regs, 0, 0, 1);
+        INS_LABEL(err_nparam, 1);
+        /* new P0, .Exception */
+        p0 = mk_pasm_reg(str_dup("P0"));
+        iNEW(interpreter, p0, str_dup("Exception"), NULL, 1);
+        regs[0] = p0;
+        regs[1] = mk_const(str_dup("\"_message\""), 'S');
+        sprintf(buf, "\"wrong param count\"");
+        regs[2] = mk_const(str_dup(buf), 'S');
+        INS(interpreter, "set", NULL, regs, 3, 2, 1);
+	INS(interpreter, "throw", NULL, regs, 1, 0, 1);
+	INS(interpreter, "ret", NULL, regs, 0, 0, 1);
+    }
+    if (first) {
+        /* emit first time check
+         * I31 is param count
+         */
+        regs[0] = i31;
+        sprintf(buf, "%d", sub->pcc_sub->nargs);
+        regs[1] = mk_const(str_dup(buf), 'I');
+        ins = insINS(interpreter, ins, "set", regs, 2);
+        regs[0] = check_sub;
+        ins = insINS(interpreter, ins, "bsr", regs, 1);
+    }
+    else {
+        /* emit type check */
+        strcpy(buf, "_#check_param_type");
+        check_type = _get_sym(ghash, buf);
+        regs[0] = check_type;
+        ins = insINS(interpreter, ins, "bsr", regs, 1);
+    }
+    return ins;
+}
+
 void
 expand_pcc_sub(Parrot_Interp interpreter, Instruction *ins)
 {
@@ -46,7 +126,7 @@ expand_pcc_sub(Parrot_Interp interpreter, Instruction *ins)
     char buf[128];
 
     sub = ins->r[1];
-    p3 = NULL;
+    p3 = i0 = NULL;
     ps = pe = sub->pcc_sub->prototyped;
     if (ps == -1) {
 	ps = 0; pe = 1;
@@ -88,6 +168,12 @@ expand_pcc_sub(Parrot_Interp interpreter, Instruction *ins)
 overflow:
 		if (!p3)
 		    p3 = mk_pasm_reg(str_dup("P3"));
+                /*
+                 * emit code to inspect the argument type
+                 * if something is wrong, an exception gets thrown
+                 */
+                ins = pcc_emit_check_param(interpreter, ins, sub, i0, p3,
+                        i == 0);
 		regs[0] = sub->pcc_sub->args[i];
 		regs[1] = p3;
 		ins = insINS(interpreter, ins, "shift", regs, 2);

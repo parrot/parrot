@@ -6,6 +6,7 @@ use Parrot::Config;
 require Exporter;
 require Test::Builder;
 require Test::More;
+require Parrot::Test;
 
 @EXPORT = ( qw(skip) );
 @ISA = qw(Exporter);
@@ -100,10 +101,14 @@ sub generate_functions {
 	    my $pbc_f = per_test('.pbc',$count);
 	    $TEST_PROG_ARGS =~ s/-c//;
 	    system("$IMCC ${TEST_PROG_ARGS} -o $pbc_f $by_f");
-	    system("$IMCC -r ${TEST_PROG_ARGS} $pbc_f >$out_f");
+	    # system("$IMCC -r ${TEST_PROG_ARGS} $pbc_f >$out_f");
+	    Parrot::Test::_run_command("$IMCC -r ${TEST_PROG_ARGS} $pbc_f",
+		STDOUT => $out_f, STDERR => $out_f);
 	}
 	else {
-	    system("$IMCC -r ${TEST_PROG_ARGS} $by_f >$out_f");
+	    #system("$IMCC -r ${TEST_PROG_ARGS} $by_f >$out_f");
+	    Parrot::Test::_run_command("$IMCC -r ${TEST_PROG_ARGS} $by_f",
+		STDOUT => $out_f, STDERR => $out_f);
 	}
 
 	my $meth = $Test_Map{$func};

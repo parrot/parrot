@@ -111,11 +111,12 @@ find_exception_handler(Parrot_Interp interpreter, PMC *exception)
             stack_peek(interpreter, interpreter->ctx.control_stack, &type);
         if (!handler)
             break;
-        (void)stack_pop(interpreter, &interpreter->ctx.control_stack, &handler,
-                        STACK_ENTRY_PMC);
         if (type == STACK_ENTRY_PMC &&
-                handler->vtable->base_type == enum_class_Exception_Handler)
+                handler->vtable->base_type == enum_class_Exception_Handler) {
             return handler;
+        }
+        (void)stack_pop(interpreter, &interpreter->ctx.control_stack,
+                            NULL, 0);
     } while (1);
     m = string_to_cstring(interpreter, message);
     if (m && *m) {
