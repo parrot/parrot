@@ -54,7 +54,7 @@ typedef struct string_iterator_t {
 #define STRINGINFO_STRLEN   6
 
 /* &end_gen */
-#define STRING struct parrot_string_t
+typedef struct parrot_string_t STRING;
 
 #endif /* PARROT_IN_CORE */
 #endif /* PARROT_STRING_H_GUARD */
