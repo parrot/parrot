@@ -141,7 +141,7 @@ void free_pmc(PMC *pmc) {
 
 Buffer *new_tracked_header(struct Parrot_Interp *interpreter, UINTVAL size) {
   UNUSED (interpreter);
-  return( (Buffer *)mem_sys_allocate(size));
+  return (Buffer *)mem_sys_allocate(size);
 }
 
 void free_tracked(Buffer *thing) {
@@ -621,7 +621,7 @@ Parrot_allocate(struct Parrot_Interp *interpreter, UINTVAL size) {
       }
     }
   }
-  return((void *)return_val);
+  return (void *)return_val;
 }
 
 /* Tag a buffer header as alive. Used by the GC system when tracing
