@@ -21,7 +21,6 @@ INTVAL string_compute_strlen(STRING *);
 INTVAL string_max_bytes(STRING*, INTVAL);
 STRING *string_concat(struct Parrot_Interp *, STRING *, STRING *, UINTVAL);
 STRING *string_append(struct Parrot_Interp *, STRING *, STRING *, UINTVAL);
-STRING *string_from_c_string(struct Parrot_Interp *, const void *, UINTVAL);
 STRING *string_repeat(struct Parrot_Interp *, const STRING *, UINTVAL,
                       STRING **);
 STRING *string_chopn(STRING *, INTVAL);
@@ -57,6 +56,7 @@ void string_init(void);
 INTVAL string_index(const STRING *, UINTVAL idx);
 INTVAL string_str_index(struct Parrot_Interp *interpreter, const STRING *s,
         const STRING *s2, UINTVAL start);
+STRING *string_from_cstring(struct Parrot_Interp *, const void *, UINTVAL);
 char *string_to_cstring(struct Parrot_Interp *, STRING *);
 void string_cstring_free(void *);
 void string_pin(struct Parrot_Interp *, STRING *);

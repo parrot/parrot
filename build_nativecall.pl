@@ -273,14 +273,14 @@ HEADER
   if (defined $params) {
   push @icky_global_variable, <<CALL;
     if (!string_compare(interpreter, signature,
-      string_from_c_string(interpreter, "$return$params", 0)))
+      string_from_cstring(interpreter, "$return$params", 0)))
           return F2DPTR(pcf_${return}_$params);
 CALL
   }
   else {
   push @icky_global_variable, <<CALL;
     if (!string_compare(interpreter, signature,
-      string_from_c_string(interpreter, "$return", 0)))
+      string_from_cstring(interpreter, "$return", 0)))
           return F2DPTR(pcf_${return});
 CALL
   }

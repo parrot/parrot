@@ -131,7 +131,7 @@ int do_test(struct Parrot_Interp* interpreter) {
  	ival = 1000000;
  	S = string_nprintf(interpreter, NULL, 0, "== %d\n", (int) ival);
  	printf("%d %s", (int) ival, string_to_cstring(interpreter, S));
- 	S2 = string_from_c_string(interpreter,"Parrot", 0);
+ 	S2 = string_from_cstring(interpreter,"Parrot", 0);
  	S = string_nprintf(interpreter, S2, 0, "== %d\n", (int) ival);
  	printf("%d %s", (int) ival, string_to_cstring(interpreter, S));
  	printf("%s\n", (S == S2) ? "ok" : "different?!?");

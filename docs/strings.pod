@@ -407,7 +407,7 @@ The transcoding section is out of sync with the code.
 
 Should the following functions be mentioned?
 C<string_append>,
-C<string_from_c_string>,
+C<string_from_cstring>,
 C<string_from_int>,
 C<string_from_num>,
 C<string_index>,
