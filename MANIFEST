@@ -43,6 +43,7 @@ include/parrot/stacks.h
 include/parrot/string.h
 include/parrot/strnative.h
 interpreter.c
+little_languages/.cvsignore
 little_languages/Makefile
 little_languages/bench.jako
 little_languages/euclid.jako
@@ -50,6 +51,11 @@ little_languages/fact.jako
 little_languages/fib.jako
 little_languages/hello.jako
 little_languages/jakoc
+little_languages/leibniz.jako
+little_languages/mandelbrot.jako
+little_languages/mops.jako
+little_languages/primes.jako
+little_languages/sub.jako
 make_op_header.pl
 memory.c
 opcheck.pl
@@ -79,3 +85,5 @@ t/test2.pasm
 t/test3.pasm
 test_c.in
 test_main.c
+
+
