@@ -365,36 +365,20 @@ do_sub_pragmas(Parrot_Interp interpreter, struct PackFile *self, int action)
 static void
 mark_1_seg(Parrot_Interp interpreter, struct PackFile_ByteCode *cs)
 {
-    opcode_t i, ci;
-    struct PackFile_FixupTable *ft;
+    opcode_t i;
     struct PackFile_ConstTable *ct;
-    PMC *sub_pmc;
-    PMC *p;
-    STRING *name;
+    PMC *pmc;
 
-    ft = cs->fixups;
-    if (!ft)
-        return;
     ct = cs->consts;
     if (!ct)
         return;
     /* fprintf(stderr, "mark %s\n", cs->base.name); */
-    for (i = 0; i < ft->fixup_count; i++) {
-        switch (ft->fixups[i]->type) {
-            case enum_fixup_sub:
-                ci = ft->fixups[i]->offset;
-                sub_pmc = ct->constants[ci]->u.key;
-                pobject_lives(interpreter, (PObj *)sub_pmc);
-                name = PMC_sub(sub_pmc)->name;
-                if (name)
-                    pobject_lives(interpreter, (PObj *)name);
-                p = PMC_sub(sub_pmc)->name_space;
-                if (!PMC_IS_NULL(p))
-                    pobject_lives(interpreter, (PObj *)p);
-                p = PMC_sub(sub_pmc)->multi_signature;
-                if (!PMC_IS_NULL(p))
-                    pobject_lives(interpreter, (PObj *)p);
-                break;
+    for (i = 0; i < ct->const_count; i++) {
+        switch (ct->constants[i]->type) {
+            case PFC_PMC:
+                pmc = ct->constants[i]->u.key;
+                if (pmc)
+                    pobject_lives(interpreter, (PObj *)pmc);
         }
     }
 }

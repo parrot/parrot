@@ -470,6 +470,57 @@ C<value>.
         DYNSELF.set_pmc_keyed_int(k, value);
     }
 
+/*
+
+=back
+
+=head2 Freeze/thaw Interface
+
+=over 4
+
+=item C<void freeze(visit_info *info)>
+
+Used to archive the string.
+
+=cut
+
+*/
+    void freeze(visit_info *info) {
+        IMAGE_IO *io = info->image_io;
+        INTVAL i, n;
+        STRING **data;
+
+        data = (STRING**)PMC_data(SELF);
+        n = PMC_int_val(SELF);
+        io->vtable->push_integer(INTERP, io, n);
+        for (i = 0; i < n; ++i) {
+            io->vtable->push_string(INTERP, io, data[i]);
+        }
+    }
+
+/*
+
+=item C<void thaw(visit_info *info)>
+
+Used to unarchive the string.
+
+=cut
+
+*/
+    void thaw(visit_info *info) {
+        IMAGE_IO *io = info->image_io;
+        INTVAL i, n;
+        STRING **data;
+        SUPER(info);
+        if (info->extra_flags == EXTRA_IS_NULL) {
+            DYNSELF.init();
+            n = io->vtable->shift_integer(INTERP, io);
+            DYNSELF.set_integer_native(n);
+            data = PMC_data(SELF);
+            for (i = 0; i < n; ++i)
+                data[i] = io->vtable->shift_string(INTERP, io);
+        }
+    }
 }
 
 /*

@@ -959,18 +959,41 @@ Create Manhattan Distance of sub C<pmc> against given argument types.
 
 */
 
+static PMC*
+mmd_cvt_to_types(Interp* interpreter, PMC *multi_sig)
+{
+    INTVAL i, n, type;
+    PMC *ar;
+    STRING *sig;
+
+    n = VTABLE_elements(interpreter, multi_sig);
+    ar = pmc_new(interpreter, enum_class_FixedIntegerArray);
+    VTABLE_set_integer_native(interpreter, ar, n);
+    for (i = 0; i < n; ++i) {
+        sig = VTABLE_get_string_keyed_int(interpreter, multi_sig, i);
+        type = pmc_type(interpreter, sig);
+        VTABLE_set_integer_keyed_int(interpreter, ar, i, type);
+    }
+    return ar;
+}
+
 #define MMD_BIG_DISTANCE 0x7fff
 
 static UINTVAL
 mmd_distance(Interp *interpreter, PMC *pmc, PMC *arg_tuple)
 {
     PMC *multi_sig;
-    INTVAL n, args, dist;
+    INTVAL i, n, args, dist;
+    INTVAL type_sig, type_call;
 
     multi_sig = PMC_sub(pmc)->multi_signature;
     if (!multi_sig) {
         /* some method */
         return 0;
+    }
+    if (multi_sig->vtable->base_type == enum_class_FixedStringArray) {
+        multi_sig = PMC_sub(pmc)->multi_signature =
+            mmd_cvt_to_types(interpreter, multi_sig);
     }
     n = VTABLE_elements(interpreter, multi_sig);
     args = VTABLE_elements(interpreter, arg_tuple);
@@ -984,7 +1007,20 @@ mmd_distance(Interp *interpreter, PMC *pmc, PMC *arg_tuple)
     if (args > n)
         dist = 1;
     /*
-     * TODO run through arg types */
+     * now go through args
+     */
+    for (i = 0; i < n; ++i) {
+        type_sig  = VTABLE_get_integer_keyed_int(interpreter, multi_sig, i);
+        type_call = VTABLE_get_integer_keyed_int(interpreter, arg_tuple, i);
+        if (type_sig == type_call)
+            continue;
+        /* different native types are very different */
+        if (type_sig <= 0 || type_call <= 0) {
+            dist = MMD_BIG_DISTANCE;
+            break;
+        }
+        /* TODO now consider MRO of types */
+    }
     return dist;
 }
 

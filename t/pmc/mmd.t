@@ -16,7 +16,7 @@ Tests the multi-method dispatch.
 
 =cut
 
-use Parrot::Test tests => 11;
+use Parrot::Test tests => 12;
 
 pir_output_is(<<'CODE', <<'OUTPUT', "PASM divide");
 
@@ -355,6 +355,7 @@ OUT
 pir_output_is(<<'CODE', <<'OUT', "MMD on argument count");
 .namespace ["main"]
 .sub main @MAIN
+    sweepoff  # TODO
     p("ok 1\n")
     p("-twice", "ok 2\n")
 .end
@@ -380,4 +381,29 @@ CODE
 ok 1
 ok 2
 ok 2
+OUT
+
+pir_output_is(<<'CODE', <<'OUT', "MMD on mative types");
+.namespace ["main"]
+.sub main @MAIN
+    sweepoff  # TODO
+    p("ok 1\n")
+    p(42)
+.end
+
+.namespace [""]
+
+.sub p @MULTI(string)
+    .param string s
+    print s
+.end
+
+.sub p @MULTI(int)
+    .param int i
+    print i
+    print "\n"
+.end
+CODE
+ok 1
+42
 OUT
