@@ -36,6 +36,7 @@
 # String ops
 
 31	set_s_sc	2	i i
+32	print_s	1	i
 33	length_s_i	2	i i
 34	chopn_s_ic	2	i i
 
@@ -57,10 +58,25 @@
 29	iton_n_i	2	i i
 30	ntoi_i_n	2	i i
 
-# Miscellaneous ops
+# Miscellaneous and debugging ops
 
 3	time_i	1	i
 4	print_i	1	i
 22	time_n	1	i
 23	print_n	1	i
-32	print_s	1	i
+47	noop	0
+
+# Register ops
+35	push_i	0
+36	push_s	0
+37	push_n	0
+38	push_p	0
+39	pop_i	0
+40	pop_s	0
+41	pop_n	0
+42	pop_p	0
+43	clear_i	0
+44	clear_s	0
+45	clear_n	0
+46	clear_p	0
+

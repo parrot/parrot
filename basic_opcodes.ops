@@ -189,6 +189,66 @@ AUTO_OP ntoi_i_n {
   INT_REG(P1) = number;
 }
 
+// PUSH_I
+AUTO_OP push_i {
+  Parrot_push_i(interpreter);
+}
+
+// PUSH_N
+AUTO_OP push_n {
+  Parrot_push_n(interpreter);
+}
+
+// PUSH_S
+AUTO_OP push_s {
+  Parrot_push_s(interpreter);
+}
+
+// PUSH_P
+AUTO_OP push_p {
+  Parrot_push_p(interpreter);
+}
+
+// POP_I
+AUTO_OP pop_i {
+  Parrot_pop_i(interpreter);
+}
+
+// POP_N
+AUTO_OP pop_n {
+  Parrot_pop_n(interpreter);
+}
+
+// POP_S
+AUTO_OP pop_s {
+  Parrot_pop_s(interpreter);
+}
+
+// POP_P
+AUTO_OP pop_p {
+  Parrot_pop_p(interpreter);
+}
+
+// CLEAR_I
+AUTO_OP clear_i
+  Parrot_clear_i(interpreter);
+}
+
+// CLEAR_N
+AUTO_OP clear_n {
+  Parrot_clear_n(interpreter);
+}
+
+// CLEAR_S
+AUTO_OP clear_s {
+  Parrot_clear_s(interpreter);
+}
+
+// CLEAR_P
+AUTO_OP clear_p {
+  Parrot_clear_p(interpreter);
+}
+
 // SET Sx, CONSTANT
 AUTO_OP set_s_sc {
   STR_REG(P1) = Parrot_string_constants[P2];
@@ -208,4 +268,8 @@ AUTO_OP length_s_i {
 // CHOPN Sx, CONSTANT
 AUTO_OP chopn_s_ic {
    string_chopn(STR_REG(P1), P2);
+}
+
+// NOOP
+AUTO_OP noop {
 }
