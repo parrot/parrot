@@ -26,12 +26,11 @@ my %std_to =
 
 my $updir = File::Spec->updir();
 my $parrotdir = File::Spec->catfile( File::Spec->curdir() );
-my $myconfig  = File::Spec->catdir($parrotdir, "myconfig");
 
 my ( $to, $cc, $from, $subject, $msgid, $body );
 my ( $category, $severity );
 my ( $is_linux, $is_macos, $is_mswin32, $is_vms );
-my $parrot_version;
+my ( $parrot_version, $parrot_myconfig ) ;
 
 
 #-------------------------------------------#
@@ -40,8 +39,6 @@ my $parrot_version;
 BEGIN {
     eval "use Mail::Send;";
     $have_send = ($@ eq "");
-    eval "use Mail::Util;";
-    $have_util = ($@ eq "");
 }
 
 init();
@@ -68,7 +65,7 @@ A program to help generate bug reports about parrot, and mail them.
 
 Usage:
 
- $0 [-s subject] [-b body] [-ok|-nok]
+ $0 [-s subject] [-b body] [-r returnaddress] [-ok|-nok]
  $0 {-h|-V}
 
 Options:
@@ -90,43 +87,40 @@ sub init {
     $is_linux   = lc($^O) eq 'linux';
     $is_macos   = $^O eq 'MacOS';
 
+    ##
+    ## Fetch Parrot information.
+    ##
+
     # Get parrot version.
-    # There will be an up-to-date VERSION file provided in parrot's root.
+    # There will always be an up-to-date $parrot/VERSION
     my $filename = File::Spec->catfile($parrotdir, "VERSION");
     open(VERSION, "<$filename") or die "Cannot open '$filename': $!";
     $parrot_version = <VERSION>;
     chomp($parrot_version);
     close(VERSION) or die "Cannot close '$filename': $!";
 
-    # Process options.
+    # Get parrot configuration, stored in $parrot/myconfig
+    $filename = File::Spec->catfile($parrotdir, "myconfig");
+    open(MYCONFIG, "<$filename") or die "Cannot open '$filename': $!";
+    {
+        local $/;
+        $parrot_myconfig = <MYCONFIG>;
+    }
+    close(MYCONFIG) or die "Cannot close '$filename': $!";
+
+
+    ##
+    ## Process options.
+    ##
     @ARGV = split m/\s+/,
         MacPerl::Ask('Provide command-line args here (-h for help):')
         if $is_macos && $MacPerl::Version =~ /App/;
-
     help() unless getopts("Vhn:o:");
 
 
-    ## Mail information.
-    # Target address.
-    $address = $opt_a || $parrotbug;
-
-    # User address, used in message and in Reply-To header.
-    $from = $opt_r || "";
-
-    # Message-Id.
-    my $domain;
-    if ($::HaveUtil) {
-        $domain = Mail::Util::maildomain();
-    } elsif ($Is_MSWin32) {
-        $domain = $ENV{'USERDOMAIN'};
-    } else {
-        require Sys::Hostname;
-        $domain = Sys::Hostname::hostname();
-    }
-    $messageid = "<parrotbug_$VERSION_${$}_".time."\@$domain>";
-
-
+    ##
     ## Report to be sent.
+    ##
   sw: {
       opt_o: {
             last opt_o unless defined $opt_o;
@@ -161,23 +155,30 @@ sub init {
         $subject  = $opt_s || "";
         $body     = $opt_b || "";
         $category = "";
-        $secerity = "";
+        $severity = "";
     };
 
 
+    ## 
+    ## Mail information.
+    ## 
 
-    # ok - send "OK" report for build on this system
-    if ($opt_o || $opt_n) {
-        $subject = ($opt_n ? 'Not ' : '')
-                   . "OK: parrot"
-                   ." $Config{archname} $::Config{osvers} $subject";
-        $body = "Parrot reported to build OK on this system.\n\n";
-        open(MYCONFIG, "<$myconfig") or die "Couldn't open '$myconfig'; $!\n";
-        while(<MYCONFIG>) { $body .= $_ }
-        close(MYCONFIG) or die "Error closing '$myconfig': $!";
+    # User address, used in message and in Reply-To header.
+    $from = $opt_r || "";
+
+    # Message-Id.
+    my $domain;
+
+    eval "use Mail::Util;";
+    if ( $@ eq "" ) {
+        $domain = Mail::Util::maildomain();
+    } elsif ($is_mswin32) {
+        $domain = $ENV{'USERDOMAIN'};
     } else {
-        help();
+        require Sys::Hostname;
+        $domain = Sys::Hostname::hostname();
     }
+    $msgid = "<parrotbug_$VERSION_$$_".time."\@$domain>";
 }
 
 
