@@ -1,6 +1,6 @@
 #! perl -w
 
-use Parrot::Test tests => 2;
+use Parrot::Test tests => 3;
 
 output_is(<<'CODE', <<'OUTPUT', "runinterp");
 	newinterp P0, 0
@@ -18,6 +18,22 @@ In 2
 ending
 OUTPUT
 
+output_is(<<'CODE', <<'OUTPUT', "runinterp - new style");
+	new P0, .ParrotInterpreter
+	print "calling\n"
+	# set_addr/invoke ?
+	runinterp P0, foo
+	print "ending\n"
+	end
+	print "bad things!\n"
+foo:
+	print "In 2\n"
+	end
+CODE
+calling
+In 2
+ending
+OUTPUT
 output_like(<<'CODE', <<'OUTPUT', "restart trace");
 	print 2, "ok 1\n"
 	set I0, 1

@@ -1,0 +1,46 @@
+/* parrotinterpreter.pmc
+ *  Copyright: 2003 Yet Another Society
+ *  CVS Info
+ *     $Id$
+ *  Overview:
+ *     These are the vtable functions for the ParrotInterpreter base class
+ *  Data Structure and Algorithms:
+ *  History:
+ *  Notes:
+ *  References:
+ */
+
+#include "parrot/parrot.h"
+
+pmclass ParrotInterpreter {
+
+    void init () {
+	struct Parrot_Interp *new_interp;
+	new_interp = make_interpreter(0);
+	new_interp->parent_interpreter = interpreter;
+	PMC_data(SELF) = new_interp;
+    }
+    void set_integer_native (INTVAL value) {
+        SELF->cache.int_val = value;
+    }
+
+    void* invoke (void* next) {
+	struct Parrot_Interp * new_interp =
+	    (struct Parrot_Interp *)PMC_data(SELF);
+	Interp_flags_SET(new_interp, PARROT_EXTERN_CODE_FLAG);
+	new_interp->code = interpreter->code;
+	/* this is obviously the wrong offset */
+	runops(new_interp, (opcode_t *)SELF->cache.int_val - (opcode_t *)next);
+	return next;
+    }
+
+    INTVAL type () {
+	return enum_class_ParrotInterpreter;
+    }
+
+    STRING* name() {
+	return whoami;
+    }
+
+
+}
