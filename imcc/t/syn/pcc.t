@@ -1,6 +1,6 @@
 #!perl
 use strict;
-use TestCompiler tests => 14;
+use TestCompiler tests => 16;
 
 ##############################
 # Parrot Calling Conventions
@@ -435,6 +435,7 @@ output_is(<<'CODE', <<'OUT', "coroutine iterator");
     savetop
     invoke
     goto ret_addr
+    restoretop
  after_loop:
   print "done in main\n"
   end
@@ -448,13 +449,9 @@ output_is(<<'CODE', <<'OUT', "coroutine iterator");
  loop:
     if i >= 10 goto done
     $I5 = a+i
-    save i
-    save a
     .pcc_begin_yield
     .return $I5
     .pcc_end_yield
-    restore a
-    restore i
     i = i + 1
     goto loop
  done:
@@ -475,4 +472,114 @@ CODE
 14
 done in coroutine
 done in main
+OUT
+
+output_is(<<'CODE', <<'OUT', "sub calling another sub, SRegs");
+.sub _main
+    .local Sub sub
+    newsub sub, .Sub, _sub
+    $S0 = "ok 1\n"
+    $S1 = "ok 2\n"
+    .pcc_begin prototyped
+    .arg $S0
+    .arg $S1
+    .pcc_call sub
+    ret:
+    .pcc_end
+    print "back\n"
+    end
+.end
+.pcc_sub _sub
+    .param string a
+    .param string b
+    .local Continuation retcc
+    retcc = P1
+    print a
+    print b
+    .local Sub sub
+    newsub sub, .Sub, _sub2
+    $S0 = "ok 3\n"
+    $S1 = "ok 4\n"
+    .pcc_begin prototyped
+    .arg $S0
+    .arg $S1
+    .pcc_call sub
+    ret:
+    .pcc_end
+    print a
+    print b
+    invoke retcc
+.end
+.pcc_sub _sub2
+    .param string a
+    .param string b
+    print a
+    print b
+    invoke P1
+.end
+CODE
+ok 1
+ok 2
+ok 3
+ok 4
+ok 1
+ok 2
+back
+OUT
+
+output_is(<<'CODE', <<'OUT', "sub calling another sub, PRegs");
+.sub _main
+    .local Sub sub
+    newsub sub, .Sub, _sub
+    $P0 = new PerlUndef
+    $P1 = new PerlUndef
+    $P0 = "ok 1\n"
+    $P1 = "ok 2\n"
+    .pcc_begin prototyped
+    .arg $P0
+    .arg $P1
+    .pcc_call sub
+    ret:
+    .pcc_end
+    print "back\n"
+    end
+.end
+.pcc_sub _sub
+    .param PerlUndef a
+    .param PerlUndef b
+    .local Continuation retcc
+    retcc = P1
+    print a
+    print b
+    .local Sub sub
+    newsub sub, .Sub, _sub2
+    $P0 = new PerlUndef
+    $P1 = new PerlUndef
+    $P0 = "ok 3\n"
+    $P1 = "ok 4\n"
+    .pcc_begin prototyped
+    .arg $P0
+    .arg $P1
+    .pcc_call sub
+    ret:
+    .pcc_end
+    print a
+    print b
+    invoke retcc
+.end
+.pcc_sub _sub2
+    .param PerlUndef a
+    .param PerlUndef b
+    print a
+    print b
+    invoke P1
+.end
+CODE
+ok 1
+ok 2
+ok 3
+ok 4
+ok 1
+ok 2
+back
 OUT

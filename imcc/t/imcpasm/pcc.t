@@ -326,7 +326,9 @@ _sub:
   set I16, -100
   bsr _#check_param_type
   shift I5, P3
+  branch (\S*)
 \1:
+\2:
   print I5
   end/
 OUT
@@ -364,7 +366,9 @@ ret:
   end
 _sub:
   if I0, (\S+)
+  branch (\S*)
 \1:
+\2:
   print P5
   end/
 OUT

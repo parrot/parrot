@@ -156,7 +156,7 @@ expand_pcc_sub(Parrot_Interp interpreter, Instruction *ins)
     char types[] = "ISPN";
     int proto, ps, pe;
     Instruction *tmp;
-    SymReg *p3, *i0, *regs[IMCC_MAX_REGS], *label1;
+    SymReg *p3, *i0, *regs[IMCC_MAX_REGS], *label1, *label2;
     char buf[128];
 
     sub = ins->r[1];
@@ -189,8 +189,26 @@ expand_pcc_sub(Parrot_Interp interpreter, Instruction *ins)
 			    next[j]++;
 			    break;
 			}
-			/* assign register to that param */
-			arg->reg->color = next[j]++;
+			/* assign register to that param
+                         *
+                         * if this subroutine calls another one,
+                         * new registers are ssigned, so that
+                         * they don't interfer with this subs params
+                         */
+                        if (sub->pcc_sub->calls_a_sub) {
+                            regs[0] = arg;
+                            sprintf(buf, "%c%d", arg->set, next[j]++);
+                            regs[1] = mk_pasm_reg(str_dup(buf));
+                            /* e.g. set $I0, I5 */
+                            ins = insINS(interpreter, ins, "set", regs, 2);
+                        }
+                        else {
+                            /*
+                             * if no sub is called from here
+                             * just use the passed register numbers
+                             */
+                            arg->reg->color = next[j]++;
+                        }
 			break;
 		    }
 		}
@@ -198,7 +216,7 @@ expand_pcc_sub(Parrot_Interp interpreter, Instruction *ins)
 	    else {
                 int type;
                 /*
-                 * TODO handle overflow
+                 * TODO overflow tests
                  */
 overflow:
 		if (!p3)
@@ -216,6 +234,9 @@ overflow:
                  */
                 ins = pcc_emit_check_param(interpreter, ins, sub, i0, p3,
                         i == 0, type);
+                /* this uses register numbers (if any)
+                 * from the first prototyped pass
+                 */
 		regs[0] = sub->pcc_sub->args[i];
 		regs[1] = p3;
 		ins = insINS(interpreter, ins, "shift", regs, 2);
@@ -224,10 +245,21 @@ overflow:
         /*
          * TODO branch to end
          */
-        if (ps != pe && !proto) {
-            tmp = INS_LABEL(label1, 0);
-            insert_ins(ins, tmp);
-            ins = tmp;
+        if (ps != pe) {
+            if (!proto) {
+                /* branch to the end */
+                sprintf(buf, "#sub_%s_p0", sub->name);
+                regs[0] = label2 = mk_address(str_dup(buf), U_add_uniq_label);
+                ins = insINS(interpreter, ins, "branch", regs, 1);
+                tmp = INS_LABEL(label1, 0);
+                insert_ins(ins, tmp);
+                ins = tmp;
+            }
+            else {
+                tmp = INS_LABEL(label2, 0);
+                insert_ins(ins, tmp);
+                ins = tmp;
+            }
         }
     } /* proto */
 }
@@ -314,12 +346,28 @@ overflow:
     ins = set_I_const(interpreter, ins, 0, sub->pcc_sub->prototyped);
     for (i = 0; i < 4; i++)
         ins = set_I_const(interpreter, ins, i + 1, next[i] - 5);
+
+    /*
+     * we have a pcc_begin_yield
+     */
+    if (arg_count == 0) {
+        /*
+         * preserve registers over coroutine invoke
+         *
+         * TODO optimize this later
+         */
+        ins = insINS(interpreter, ins, "savetop", regs, 0);
+    }
     /*
      * insert return invoke
      */
     reg = mk_pasm_reg(str_dup("P1"));
     regs[0] = reg;
     ins = insINS(interpreter, ins, "invoke", regs, arg_count);
+    if (arg_count == 0) {
+        /* TODO optimize this later */
+        ins = insINS(interpreter, ins, "restoretop", regs, 0);
+    }
 }
 
 void

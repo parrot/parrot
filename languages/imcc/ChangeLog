@@ -1,11 +1,17 @@
 - 2003-07-31	leo
 
+	* version 0.0.10.3
+
 	* unprototyped subroutines now check the amount and type
 	  of parameters against their .param definitions at runtime
 	* TestCompiler.pm: capture stderr too
 
 	* added coroutine code courtesy of Kenneth A Graves
 	  s. t/syn/pcc.t for an example and #23186 for a description
+
+	* if a pcc sub calls another sub (or it yields), the passed
+	  registers (I5...) are not used as parameters dirctly.
+	* emit savetop/restoretop in a yield block
 
 - 2003-07-30	leo
 

@@ -527,6 +527,12 @@ pcc_sub_call: PCC_BEGIN pcc_proto '\n' {
               */
               i = iLABEL(r);
               i->type = ITPCCSUB;
+              /*
+               * if we are inside a pcc_sub mark the sub as doing a
+               * sub call; the sub is in r[1] of the first ins
+               */
+              if (instructions->r[1] && instructions->r[1]->pcc_sub)
+                  instructions->r[1]->pcc_sub->calls_a_sub = 1;
 
            }
            pcc_args
@@ -592,6 +598,7 @@ pcc_yield: PCC_BEGIN_YIELD '\n' {
                 if (!ins || !ins->r[1] || ins->r[1]->type != VT_PCC_SUB)
                     fataly(EX_SOFTWARE, "pcc_yield", line,
                         "pcc_yield not inside pcc subroutine\n");
+                ins->r[1]->pcc_sub->calls_a_sub = 1;
                 $<sr>$ = ins->r[1];
                 sprintf(name, "#pcc_sub_yield_%d:", line - 1);
                 i = _mk_instruction("", name, NULL, 0);
