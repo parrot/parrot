@@ -2,7 +2,11 @@
 
 use Parrot::Test tests => 1;
 
-c_output_is(<<'CODE', <<'OUTPUT', "hello world");
+TODO: {
+    local $TODO="t/src doesn't work on Windows" if $^O =~ /Win32/;
+    $TODO=$TODO;  #warnings
+
+    c_output_is(<<'CODE', <<'OUTPUT', "hello world");
         #include <stdio.h>
         #include "parrot/parrot.h"
         #include "parrot/embed.h"
@@ -31,5 +35,4 @@ PerlHash[0x100]
 PerlHash[0x100]
 Hello, Pa!
 OUTPUT
-
-
+}

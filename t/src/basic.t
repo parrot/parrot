@@ -2,7 +2,11 @@
 
 use Parrot::Test tests => 2;
 
-c_output_is(<<'CODE', <<'OUTPUT', "hello world");
+TODO: {
+    local $TODO="t/src doesn't work on Windows" if $^O =~ /Win32/;
+    $TODO=$TODO;  #warnings
+
+    c_output_is(<<'CODE', <<'OUTPUT', "hello world");
         #include <stdio.h>
 
         int main(int argc, char* argv[]) {
@@ -13,7 +17,7 @@ CODE
 Hello, World!
 OUTPUT
 
-c_output_is(<<'CODE', <<'OUTPUT', "direct internal_exception call");
+    c_output_is(<<'CODE', <<'OUTPUT', "direct internal_exception call");
         #include <parrot/parrot.h>
         #include <parrot/exceptions.h>
 
@@ -23,5 +27,5 @@ c_output_is(<<'CODE', <<'OUTPUT', "direct internal_exception call");
 CODE
 Blow'd Up(tm)
 OUTPUT
-
+}
 1;

@@ -2,7 +2,11 @@
 
 use Parrot::Test tests => 4;
 
-c_output_is(<<'CODE', <<'OUTPUT', "creation");
+TODO: {
+    local $TODO="t/src doesn't work on Windows" if $^O =~ /Win32/;
+    $TODO=$TODO;  #warnings
+
+    c_output_is(<<'CODE', <<'OUTPUT', "creation");
         #include <stdio.h>
 	#include "parrot/parrot.h"
 	#include "parrot/embed.h"
@@ -28,7 +32,7 @@ CODE
 The answer is 42.
 OUTPUT
 
-c_output_is(<<'CODE', <<'OUTPUT', "list aerobics");
+    c_output_is(<<'CODE', <<'OUTPUT', "list aerobics");
         #include <stdio.h>
 	#include "parrot/parrot.h"
 	#include "parrot/embed.h"
@@ -294,5 +298,7 @@ c_output_is(<<'CODE', <<'OUTPUT', "yoyo");
 CODE
 Done.
 OUTPUT
+
+}
 
 1;
