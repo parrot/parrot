@@ -58,11 +58,12 @@ typedef enum {
 } ARRAY_ADD_POS;
 
 
-#define MIN_ITEMS 4		/* smallest chunk can hold */
 #ifdef LIST_TEST
+#  define MIN_ITEMS 4		/* smallest chunk can hold */
 #  define LD_MAX 4                /* log2(MAX_ITEMS) */
 #  define MAX_ITEMS 16  	        /* biggest chunk can hold */
 #else
+#  define MIN_ITEMS 16		/* smallest chunk can hold */
 #  define LD_MAX 10               /* log2(MAX_ITEMS) */
 #  define MAX_ITEMS 1024  	/* biggest chunk can hold */
 #endif

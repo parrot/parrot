@@ -20,10 +20,10 @@ use Parrot::Configure::Step;
 
 $description="Setting up Configure's data structures...";
 
-@args=('debugging', 'optimize', 'verbose');
+@args=('debugging', 'optimize', 'profile', 'verbose');
 
 sub runstep {
-  my ($debugging, $optimize, $verbose) = @_;
+  my ($debugging, $optimize, $profile,  $verbose) = @_;
 
   package Configure::Data;
   use Config;
@@ -116,15 +116,23 @@ sub runstep {
 
     icu_make      => '# Building of ICU disabled',
     buildicu      => 0,
-    
+
   );
+  # add profiling if needed
+  # FIXME gcc syntax
+  # we should have this in the hints files e.g. cc_profile
+  if ($profile) {
+    $c{cc_debug} .= " -pg ";
+    $c{ld_debug} .= " -pg ";
+  }
+
 
   *get=sub {
     shift;
     @c{@_};
   };
 
-  *set=$verbose 
+  *set=$verbose
     ? sub {
       shift;
       return unless (defined ($_[0]));

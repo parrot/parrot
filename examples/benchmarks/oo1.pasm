@@ -1,3 +1,8 @@
+# all timings Athlon 800, gcc 2.95.2
+# parrot CVS
+# perl 5.8.0
+# python 2.3.3
+
 # perl oo1.pl                   0.8
 # python pp1.py                 1.2 (first time)
 # python pp1.py                 0.5

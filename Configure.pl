@@ -68,6 +68,12 @@ This turns on the user prompts.
 
 Debugging is turned on by default. Use this to disable it.
 
+=item C<--profile>
+
+Turn on profiled compile (gcc only for now)
+
+Tell the compiler to do an optimization phase.
+
 =item C<--optimize>
 
 Tell the compiler to do an optimization phase.
