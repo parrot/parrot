@@ -14,6 +14,14 @@ typedef void (*jit_f)(void *);
 #ifdef I386
 typedef void (*jit_f)(void);
 #endif
+#ifdef SUN4
+static void write_lo_13(char *instr_end, ptrcast_t value);
+static void write_hi_22(char *instr_end, ptrcast_t value);
+static void write_22(char *instr_end, ptrcast_t value);
+static void write_30(char *instr_end, ptrcast_t value);
+static void write_32(char *instr_end, ptrcast_t value);
+typedef void (*jit_f)(void *int_reg, void *num_reg, void *str_reg);
+#endif
 
 
 #define MAX_SUBSTITUTION 3

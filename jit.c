@@ -8,6 +8,7 @@
 #include "parrot/jit.h"
 #include "parrot/jit_struct.h"
 
+
 /* Don't ever count on any info here */
 
 INTVAL temp_intval[10];
@@ -37,6 +38,7 @@ build_asm(struct Parrot_Interp *interpreter,opcode_t *pc, opcode_t *code_start, 
     INTVAL high,low;
 #endif
 
+
     /* temporary variables */
 
     substitution_t v;
@@ -57,7 +59,7 @@ build_asm(struct Parrot_Interp *interpreter,opcode_t *pc, opcode_t *code_start, 
     k = 0;
 
     /* The size in bytes that the whole program will have */
-    size = 0;
+    size = START_SIZE;
 
     /* 
         op_address holds the displacement from arena_start 
@@ -108,20 +110,30 @@ build_asm(struct Parrot_Interp *interpreter,opcode_t *pc, opcode_t *code_start, 
         for (i = 0; i < v.amount; i++)
         {
             address = &interpreter->int_reg.registers[pc[v.info[i].number]];
+#ifdef SUN4
+            address = (INTVAL*)(((char *)address) - (char *)&interpreter->int_reg.registers[0]);
+            write_lo_13(&arena[v.info[i].position], (ptrcast_t)address);
+#else
 #ifdef ALPHA
             address = (INTVAL*)(((char *)address) - interpreter_registers);
 #endif
             memcpy(&arena[v.info[i].position],&address,OP_ARGUMENT_SIZE);
+#endif
         }
         /* Address of a NUMVAL register */
         v = op_assembly[*pc].floatval_register_address;
         for (i = 0; i < v.amount; i++)
         {
             address = (INTVAL *)&interpreter->num_reg.registers[pc[v.info[i].number]];
+#ifdef SUN4
+            address = (INTVAL*)(((char *)address) - (char *)&interpreter->num_reg.registers[0]);
+            write_lo_13(&arena[v.info[i].position], (ptrcast_t)address);
+#else
 #ifdef ALPHA
             address = (INTVAL*)(((char *)address) - interpreter_registers);
 #endif
             memcpy(&arena[v.info[i].position],&address,OP_ARGUMENT_SIZE);
+#endif
         }
 
         /* the address where will be a STRING register */
@@ -130,10 +142,15 @@ build_asm(struct Parrot_Interp *interpreter,opcode_t *pc, opcode_t *code_start, 
         for (i = 0; i < v.amount; i++)
         {
             address = (INTVAL *)&interpreter->string_reg.registers[pc[v.info[i].number]];
+#ifdef SUN4
+            address = (INTVAL*)(((char *)address) - (char *)&interpreter->string_reg.registers[0]);
+            write_lo_13(&arena[v.info[i].position], (ptrcast_t)address);
+#else
 #ifdef ALPHA
             address = (INTVAL*)(((char *)address) - interpreter_registers);
 #endif
             memcpy(&arena[v.info[i].position],&address,OP_ARGUMENT_SIZE);
+#endif
         }
 
         v = op_assembly[*pc].intval_constant_value;
@@ -146,21 +163,29 @@ build_asm(struct Parrot_Interp *interpreter,opcode_t *pc, opcode_t *code_start, 
         for (i = 0; i < v.amount; i++)
         {
             address = &pc[v.info[i].number];
+#ifdef SUN4
+            write_32(&arena[v.info[i].position], (ptrcast_t)address);
+#else
 #ifdef ALPHA
             calculate_displacement((INTVAL *)arena_start,address,&high,(INTVAL *)&address);
             memcpy(&arena[v.info[i].position - 4],&high,OP_ARGUMENT_SIZE);
 #endif
             memcpy(&arena[v.info[i].position],&address,OP_ARGUMENT_SIZE);
+#endif
         }
         v = op_assembly[*pc].floatval_constant_address;
         for (i = 0; i < v.amount; i++)
         {
             address = (INTVAL *)&interpreter->code->const_table->constants[pc[v.info[i].number]]->number;
+#ifdef SUN4
+            write_32(&arena[v.info[i].position], (ptrcast_t)address);
+#else
 #ifdef ALPHA
             calculate_displacement((INTVAL *)arena_start,address,&high,(INTVAL *)&address);
             memcpy(&arena[v.info[i].position - 4],&high,OP_ARGUMENT_SIZE);
 #endif
             memcpy(&arena[v.info[i].position],&address,OP_ARGUMENT_SIZE);
+#endif
         }
 
         /* Address of a STRING constant or one of it's elements */
@@ -199,11 +224,15 @@ build_asm(struct Parrot_Interp *interpreter,opcode_t *pc, opcode_t *code_start, 
                         break;
             }
 
+#ifdef SUN4
+            write_32(&arena[sv.info[i].position], (ptrcast_t)address);
+#else
 #ifdef ALPHA
             calculate_displacement((INTVAL *)arena_start,address,&high,(INTVAL *)&address);
             memcpy(&arena[sv.info[i].position - 4],&high,OP_ARGUMENT_SIZE);
 #endif
             memcpy(&arena[sv.info[i].position],&address,OP_ARGUMENT_SIZE);
+#endif
         }
 
         /* value of string constant or one of the elements */
@@ -248,7 +277,7 @@ build_asm(struct Parrot_Interp *interpreter,opcode_t *pc, opcode_t *code_start, 
             address = &temp_intval[tiv.info[i].number];
 #ifdef ALPHA
             calculate_displacement((INTVAL *)arena_start,address,&high,(INTVAL *)&address);
-            memcpy(&arena[sv.info[i].position - 4],&high,OP_ARGUMENT_SIZE);
+            memcpy(&arena[tiv.info[i].position - 4],&high,OP_ARGUMENT_SIZE);
 #endif
             memcpy(&arena[tiv.info[i].position],&address,OP_ARGUMENT_SIZE);
         }
@@ -259,7 +288,7 @@ build_asm(struct Parrot_Interp *interpreter,opcode_t *pc, opcode_t *code_start, 
             address = (INTVAL *)&temp_char[v.info[i].number];
 #ifdef ALPHA
             calculate_displacement((INTVAL *)arena_start,address,&high,(INTVAL *)&address);
-            memcpy(&arena[sv.info[i].position - 4],&high,OP_ARGUMENT_SIZE);
+            memcpy(&arena[v.info[i].position - 4],&high,OP_ARGUMENT_SIZE);
 #endif
             memcpy(&arena[v.info[i].position],&address,OP_ARGUMENT_SIZE);
         }
@@ -277,11 +306,15 @@ build_asm(struct Parrot_Interp *interpreter,opcode_t *pc, opcode_t *code_start, 
         for (i = 0; i < v.amount; i++)
         {
             address = &const_intval[v.info[i].number];
+#ifdef SUN4
+            write_32(&arena[v.info[i].position], (ptrcast_t)address);
+#else
 #ifdef ALPHA
             calculate_displacement((INTVAL *)arena_start,address,&high,(INTVAL *)&address);
-            memcpy(&arena[sv.info[i].position - 4],&high,OP_ARGUMENT_SIZE);
+            memcpy(&arena[v.info[i].position - 4],&high,OP_ARGUMENT_SIZE);
 #endif
             memcpy(&arena[v.info[i].position],&address,OP_ARGUMENT_SIZE);
+#endif
         }
  
 
@@ -290,11 +323,15 @@ build_asm(struct Parrot_Interp *interpreter,opcode_t *pc, opcode_t *code_start, 
         for (i = 0; i < v.amount; i++)
         {
             address = (INTVAL *)&floatval_constants[v.info[i].number];
+#ifdef SUN4
+            write_32(&arena[v.info[i].position], (ptrcast_t)address);
+#else
 #ifdef ALPHA
             calculate_displacement((INTVAL *)arena_start,address,&high,(INTVAL *)&address);
-            memcpy(&arena[sv.info[i].position - 4],&high,OP_ARGUMENT_SIZE);
+            memcpy(&arena[v.info[i].position - 4],&high,OP_ARGUMENT_SIZE);
 #endif
             memcpy(&arena[v.info[i].position],&address,OP_ARGUMENT_SIZE);
+#endif
         }
         v = op_assembly[*pc].constant_char_address;
         /* CHAR CONSTANTS */
@@ -303,7 +340,7 @@ build_asm(struct Parrot_Interp *interpreter,opcode_t *pc, opcode_t *code_start, 
             address = (INTVAL *)&char_constants[v.info[i].number];
 #ifdef ALPHA
             calculate_displacement((INTVAL *)arena_start,address,&high,(INTVAL *)&address);
-            memcpy(&arena[sv.info[i].position - 4],&high,OP_ARGUMENT_SIZE);
+            memcpy(&arena[v.info[i].position - 4],&high,OP_ARGUMENT_SIZE);
 #endif
             memcpy(&arena[v.info[i].position],&address,OP_ARGUMENT_SIZE);
         }
@@ -319,6 +356,11 @@ build_asm(struct Parrot_Interp *interpreter,opcode_t *pc, opcode_t *code_start, 
                                   pc[v.info[i].number]
                                  ]
                       ); 
+
+#ifdef SUN4
+            address = (INTVAL *)((char *)address - (arena + v.info[i].position - 3));
+            write_22(&arena[v.info[i].position], (ptrcast_t)address);
+#else
             ivalue = (INTVAL) (arena+v.info[i].position) + 4;
 
             if (address > (INTVAL *)ivalue) {
@@ -337,6 +379,7 @@ build_asm(struct Parrot_Interp *interpreter,opcode_t *pc, opcode_t *code_start, 
 #endif
             
             memcpy(&arena[v.info[i].position],&address,OP_ARGUMENT_SIZE);
+#endif
         }
         
         /* XXX the idea is to write all this functions in asm */
@@ -366,6 +409,10 @@ build_asm(struct Parrot_Interp *interpreter,opcode_t *pc, opcode_t *code_start, 
                         address = (INTVAL *)interpreter->op_func_table[*pc];
                         break;
             }
+#ifdef SUN4
+            address = (INTVAL *)((char *)address - (arena + v.info[i].position - 3));
+            write_30(&arena[v.info[i].position], (ptrcast_t)address);
+#else
 #ifdef ALPHA
             calculate_displacement((INTVAL *)arena_start,address,&high,&low);
             memcpy(&arena[v.info[i].position - 12],&high,OP_ARGUMENT_SIZE);
@@ -388,6 +435,7 @@ build_asm(struct Parrot_Interp *interpreter,opcode_t *pc, opcode_t *code_start, 
 #endif
 
             memcpy(&arena[v.info[i].position],&address,OP_ARGUMENT_SIZE);
+#endif
         }
 
         v = op_assembly[*pc].interpreter;
@@ -401,11 +449,15 @@ build_asm(struct Parrot_Interp *interpreter,opcode_t *pc, opcode_t *code_start, 
                         address = (INTVAL *)interpreter->control_stack; 
                         break;
             }
+#ifdef SUN4
+            write_32(&arena[v.info[i].position], (ptrcast_t)address);
+#else
 #ifdef ALPHA
             calculate_displacement((INTVAL *)arena_start,address,&high,(INTVAL *)&address);
             memcpy(&arena[v.info[i].position - 4],&high,OP_ARGUMENT_SIZE);
 #endif
             memcpy(&arena[v.info[i].position],&address,OP_ARGUMENT_SIZE);
+#endif
         }
 
         v = op_assembly[*pc].cur_opcode;;
@@ -418,11 +470,15 @@ build_asm(struct Parrot_Interp *interpreter,opcode_t *pc, opcode_t *code_start, 
                 memcpy(&arena[v.info[i].position],&ivalue,sizeof(ivalue));
             } else {
                 address = (INTVAL *)pc;
+#ifdef SUN4
+            write_32(&arena[v.info[i].position], (ptrcast_t)address);
+#else
 #ifdef ALPHA
                 calculate_displacement((INTVAL *)arena_start,address,&high,(INTVAL *)&address);
                 memcpy(&arena[v.info[i].position - 4],&high,OP_ARGUMENT_SIZE);
 #endif
                 memcpy(&arena[v.info[i].position],&address,OP_ARGUMENT_SIZE);
+#endif
             }
         }
  
@@ -462,6 +518,57 @@ calculate_displacement(INTVAL *src_address, INTVAL *dest_address, INTVAL *high, 
     }
 }
 #endif
+
+#ifdef SUN4
+
+/* Write 13 bit immediate value into an instruction */
+static void write_lo_13(char *instr_end, ptrcast_t value){
+    value &= 0x1fff;
+    *instr_end = (char)(value & 0xff);
+    *(instr_end-1) |= (char)(value >> 8);
+}
+
+/* Write 22 bit immediate value into sethi instructions */
+static void write_hi_22(char *instr_end, ptrcast_t value){
+    value >>= 10;
+    *(instr_end-4) = (char)(value & 0xff);
+    value >>= 8;
+    *(instr_end-5) = (char)(value & 0xff);
+    value >>= 8;
+    *(instr_end-6) |= (char)(value & 0x3f); /* This is really just 6 bits */
+}
+
+/* Write 22 bit immediate value into PC relative branches */
+static void write_22(char *instr_end, ptrcast_t value){
+    value /= 4; /* divide displacement by 4 */
+    *(instr_end--) = (char)(value & 0xff);
+    value >>= 8;
+    *(instr_end--) = (char)(value & 0xff);
+    value >>= 8;
+    *instr_end |= (char)(value & 0x3f); /* This is really just 6 bits */
+}
+
+/* Write 30 bit value into PC relative call instruction */
+static void write_30(char *instr_end, ptrcast_t value){
+    value /= 4;
+    *(instr_end--) = (char)(value & 0xff);
+    value >>= 8;
+    *(instr_end--) = (char)(value & 0xff);
+    value >>= 8;
+    *(instr_end--) = (char)(value & 0xff);
+    value >>= 8;
+    *instr_end |= (char)(value & 0x3f);
+}
+
+/* Write a 32 bit value into a sethi instruction followed by an instruction 
+ * with a 13 bit immediate */ 
+static void write_32(char *instr_end, ptrcast_t value){
+    write_lo_13(instr_end, value & 0x3ff);
+    write_hi_22(instr_end, value);
+}
+
+#endif
+
 
 /*
  * Local variables:

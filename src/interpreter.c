@@ -303,6 +303,12 @@ runops_jit (struct Parrot_Interp *interpreter, opcode_t * pc) {
 #ifdef I386
     (jit_code)();
 #endif
+#ifdef SUN4
+    (jit_code)((void *)(&interpreter->int_reg.registers[0]),
+                        (void *)&interpreter->num_reg.registers[0],
+                        (void *)&interpreter->string_reg.registers[0]);
+#endif
+
 #else
     return;
 #endif
