@@ -130,7 +130,7 @@ descriptor into $1.
 =cut
 
 inline op open(out INT, in STR) {
-  $1 = (INTVAL)fopen(string_to_cstring(interpreter, ($2)), "r+"));
+  $1 = (INTVAL)fopen(string_to_cstring(interpreter, ($2)), "r+");
   if (!$1) {
     perror("Can't open");
     exit(1);
