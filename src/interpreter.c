@@ -15,7 +15,9 @@
 #include "parrot/oplib/core_ops.h"
 #include "parrot/oplib/core_ops_prederef.h"
 #include "parrot/runops_cores.h"
+#ifdef HAS_JIT
 #include "parrot/jit.h"
+#endif
 
 
 /*=for api interpreter check_fingerprint
@@ -280,8 +282,10 @@ runops_jit (struct Parrot_Interp *interpreter, opcode_t * pc) {
     code_size  = interpreter->code->byte_code_size;
     code_end   = (opcode_t *)(interpreter->code->byte_code + code_size);
 
+#ifdef HAS_JIT
     jit_code = build_asm(interpreter, pc, code_start, code_end);
     ((*(void (*)())jit_code)());
+#endif
 }
 
 

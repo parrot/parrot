@@ -159,6 +159,10 @@ my(%c)=(
     jitosname     => $jitosname,
     jitarchname   => $jitarchname,
     jitcapable    => $jitcapable,
+    cc_hasjit     => '',
+    jit_h         => '',
+    jit_struct_h  => '',
+    jit_o         => '',
 
     cp            => 'cp',
     slash         => '/',
@@ -183,7 +187,13 @@ if ($Config{ccname} eq "gcc") {
    $c{cc_warn} .= " -ansi -pedantic" if $opt_pedantic;
 }
 
-
+# Add the -DHAS_JIT if we're jitcapable
+if ($jitcapable) {
+    $c{cc_hasjit} = " -DHAS_JIT";
+    $c{jit_h} = "\$(INC)/jit.h";
+    $c{jit_struct_h} = "\$(INC)/jit_struct.h";
+    $c{jit_o} = "jit\$(O)";
+}
 
 #
 # Copy the things from --define foo=bar

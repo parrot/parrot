@@ -41,7 +41,7 @@ STICKY_FILES = $(GEN_CONFIGS) $(GEN_MAKEFILES)
 
 GEN_OPSFILES = vtable.ops
 
-GEN_HEADERS = $(INC)/vtable.h $INC/jit_struct.h $(INC)/oplib/core_ops.h \
+GEN_HEADERS = $(INC)/vtable.h ${jit_struct_h} $(INC)/oplib/core_ops.h \
 $(INC)/oplib/core_ops_prederef.h
 
 GEN_SOURCES = core_ops.c core_ops_prederef.c vtable_ops.c
@@ -63,7 +63,7 @@ $(INC)/memory.h $(INC)/parrot.h $(INC)/stacks.h $(INC)/packfile.h \
 $(INC)/global_setup.h $(INC)/vtable.h $(INC)/oplib/core_ops.h $(INC)/oplib/core_ops_prederef.h \
 $(INC)/runops_cores.h $(INC)/trace.h \
 $(INC)/pmc.h $(INC)/key.h $(INC)/resources.h $(INC)/platform.h \
-$(INC)/interp_guts.h $(INC)/jit.h $(INC)/jit_struct.h
+$(INC)/interp_guts.h ${jit_h} ${jit_struct_h}
 
 CLASS_O_FILES = classes/default$(O) classes/perlint$(O) classes/perlstring$(O) \
 classes/perlnum$(O) classes/perlarray$(O) classes/perlundef$(O)
@@ -76,7 +76,7 @@ CHARTYPE_O_FILES = chartypes/unicode$(O) chartypes/usascii$(O)
 INTERP_O_FILES = global_setup$(O) interpreter$(O) parrot$(O) register$(O) \
 core_ops$(O) core_ops_prederef$(O) memory$(O) packfile$(O) stacks$(O) \
 string$(O) encoding$(O) chartype$(O) runops_cores$(O) trace$(O) pmc$(O) key$(O) \
-platform$(O) jit$(O) resources$(O)
+platform$(O) ${jit_o} resources$(O)
 
 O_FILES = $(INTERP_O_FILES) $(CLASS_O_FILES) $(ENCODING_O_FILES) $(CHARTYPE_O_FILES)
 
@@ -91,7 +91,7 @@ O_FILES = $(INTERP_O_FILES) $(CLASS_O_FILES) $(ENCODING_O_FILES) $(CHARTYPE_O_FI
 #
 ###############################################################################
 
-CFLAGS = ${ccflags} ${cc_warn} ${cc_debug} ${cc_inc}
+CFLAGS = ${ccflags} ${cc_warn} ${cc_debug} ${cc_inc} ${cc_hasjit}
 
 C_LIBS = ${libs}
 
