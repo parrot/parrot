@@ -2,7 +2,7 @@
 # Types
 #
 # INT reg stuff
-# c - char 
+# c - char
 # s - short
 # i - int
 # l - long
@@ -16,6 +16,7 @@
 #
 #Return params
 i	i
+i	d
 i	ii
 f	is
 d	d

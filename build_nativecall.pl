@@ -1,6 +1,6 @@
 #! perl -w
 #
-# Build up the native call routines. 
+# Build up the native call routines.
 
 my %ret_count;
 %ret_count = (p => [0,0,0,1,0],        # Returning a pointer that we PMC stuff
@@ -197,12 +197,12 @@ static void pcf_${return}_$params(struct Parrot_Interp *interpreter, PMC *self) 
 
   pointer =  ($ret_type (*)())D2FPTR(self->cache.struct_val);
   $return_assign ($ret_type)(*pointer)($call_params);
-  $final_assign 
+  $final_assign
 HEADER
 
   push @icky_global_variable, <<CALL;
   if (!string_compare(interpreter, signature,
-    string_from_c_string(interpreter, "$return$params", 1)))
+    string_from_c_string(interpreter, "$return$params", 0)))
         return pcf_${return}_$params;
 CALL
 

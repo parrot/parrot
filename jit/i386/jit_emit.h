@@ -1648,7 +1648,7 @@ Parrot_jit_begin(Parrot_jit_info_t *jit_info,
      * the stack this will stop working !!! */
     emitm_pushl_i(jit_info->native_ptr, interpreter);
 
-    /* get the pc from stack:  mov 12(%ebx), %eax */
+    /* get the pc from stack:  mov 12(%ebp), %eax */
     emitm_movl_m_r(jit_info->native_ptr, emit_EAX, emit_EBP, emit_None, 1, 12);
 
     /* Point EBP to the opcode-native code map array - this destroy above
@@ -2086,6 +2086,81 @@ Parrot_jit_restart_op(Parrot_jit_info_t *jit_info,
     Parrot_emit_jump_to_eax(jit_info, interpreter);
 }
 
+void *
+Parrot_jit_build_call_func(struct Parrot_Interp *interpreter,
+        String *signature) {
+
+    Parrot_jit_info_t jit_info, *pj;
+    char *sig;
+    int next_n = 5;
+    int next_i = 5;
+    int st = 0;
+
+    jit_info.native_ptr = jit_info.arena.start =
+        mem_sys_allocate_zeroed((size_t)1024);
+    pj = &jit_info;
+
+    /* make stack frame */
+    jit_emit_stack_frame_enter(pj);
+    /* get left most param, assume ascii chars */
+    sig = (char *)signature->bufstart + signature->bufused - 1;
+    /* as long as there are params */
+    while (sig > (char *)signature->strstart) {
+        switch (*sig) {
+            case 'd':
+                /* get a double from next num reg and push it on stack */
+                jit_emit_fload_m_n(pj->native_ptr,
+                        &interpreter->ctx.num_reg.registers[next_n++]);
+                /* make room for double */
+                emitm_addb_i_r(pj->native_ptr, -8, emit_ESP);
+                emitm_fstpl(pj->native_ptr, emit_ESP, emit_None, 1, 0);
+                st += 4;
+                break;
+            case 'i':
+                jit_emit_mov_rm_i(pj->native_ptr, emit_EAX,
+                        &interpreter->ctx.int_reg.registers[next_i++]);
+                emitm_pushl_r(pj->native_ptr, emit_EAX);
+                break;
+            default:
+                internal_exception(1, "Parrot_jit_build_call_func: unimp\n");
+                break;
+        }
+        /* stack */
+        st += 4;
+        --sig;
+    }
+    /* get the pmc from stack */
+    emitm_movl_m_r(pj->native_ptr, emit_EAX, emit_EBP, 0, 1, 12);
+    /* call the thing in struct_val, i.e. offset 12 */
+    emitm_callm(pj->native_ptr, emit_EAX, emit_None, emit_None, 12);
+    /* adjust stack */
+    emitm_addb_i_r(pj->native_ptr, st, emit_ESP);
+
+    /* now place return values in registers */
+    next_i = next_n = 5;
+    switch (*sig) {
+        case 'd':
+            /* pop num from st(0) and mov to reg */
+            jit_emit_fstore_m_n(pj->native_ptr,
+                    &interpreter->ctx.num_reg.registers[next_n++]);
+            break;
+        case 'i':
+            jit_emit_mov_mr_i(pj->native_ptr,
+                    &interpreter->ctx.int_reg.registers[next_i++], emit_EAX);
+            break;
+    }
+    /* set regs passed on stack */
+    jit_emit_mov_mi_i(pj->native_ptr, &interpreter->ctx.int_reg.registers[0], 0);
+    jit_emit_mov_mi_i(pj->native_ptr, &interpreter->ctx.int_reg.registers[1], next_i-5);
+    jit_emit_mov_mi_i(pj->native_ptr, &interpreter->ctx.int_reg.registers[2], 0);
+    jit_emit_mov_mi_i(pj->native_ptr, &interpreter->ctx.int_reg.registers[3], 0);
+    jit_emit_mov_mi_i(pj->native_ptr, &interpreter->ctx.int_reg.registers[4], next_n-5);
+
+    jit_emit_stack_frame_leave(pj);
+    emitm_ret(pj->native_ptr);
+
+    return (jit_f)D2FPTR(jit_info.arena.start);
+}
 
 #else /* JIT_EMIT */
 
