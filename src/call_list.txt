@@ -239,3 +239,5 @@ p	ti
 p	ptp
 i	pt33
 
+# For python
+i	IPP
