@@ -139,7 +139,7 @@ typedef enum {
     CURRENT_SUB,
     CURRENT_CONT,
     CURRENT_OBJECT,
-    CURRENT_NAMESPACE_ROOT,
+    NAMESPACE_ROOT,
     CURRENT_LEXPAD,
 
     /* interpinfo_s constants */

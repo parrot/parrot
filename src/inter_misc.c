@@ -249,7 +249,7 @@ interpinfo_p(Interp *interpreter, INTVAL what)
             return cont;
         case CURRENT_OBJECT:
             return interpreter->ctx.current_object;
-        case CURRENT_NAMESPACE_ROOT: /* XXX */
+        case NAMESPACE_ROOT: /* XXX */
             return interpreter->globals->stash_hash;
         case CURRENT_LEXPAD:
             return scratchpad_get_current(interpreter);

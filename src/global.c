@@ -74,8 +74,7 @@ Parrot_find_global(Parrot_Interp interpreter, STRING *class, STRING *globalname)
                 (Hash*) PMC_struct_val(stash), globalname);
         if (!b)
             return NULL;
-        return VTABLE_get_pmc_keyed_int(interpreter, stash,
-                PMC_int_val((PMC*)b->value));
+        return (PMC*) b->value;
     }
     if (!globalname)
         return stash;
@@ -158,7 +157,7 @@ Parrot_global_namespace(Interp *interpreter, PMC *globals, STRING *class)
             string_from_cstring(interpreter, "\0", 1),
             class, 0);
     if (!VTABLE_exists_keyed_str(interpreter, globals, ns_name)) {
-        stash = pmc_new(interpreter, enum_class_OrderedHash);
+        stash = pmc_new(interpreter, enum_class_Hash);
         VTABLE_set_pmc_keyed_str(interpreter, globals, ns_name, stash);
     }
     else {
@@ -188,14 +187,11 @@ Parrot_store_global(Interp *interpreter, STRING *class,
     PMC *stash;
     if (class) {
         stash = Parrot_global_namespace(interpreter, globals, class);
-        if (globalname->strlen > 2 &&
-                string_ord(interpreter, globalname, 0) == '_' &&
-                string_ord(interpreter, globalname, 1) == '_')
-            Parrot_invalidate_method_cache(interpreter, class);
     }
     else
         stash = globals;
     VTABLE_set_pmc_keyed_str(interpreter, stash, globalname, pmc);
+    Parrot_invalidate_method_cache(interpreter, class);
 }
 
 /*
