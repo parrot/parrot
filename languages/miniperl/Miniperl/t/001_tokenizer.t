@@ -1,7 +1,7 @@
 # Before `make install' is performed this script should be runnable with
 # `make test'. After `make install' it should work as `perl test.pl'
 
-use Test::More tests => 59;
+use Test::More tests => 60;
 
 BEGIN { use_ok( 'Tokenizer' ); }
 require_ok( 'Tokenizer' );
@@ -67,6 +67,8 @@ is_deeply($tok->tokenize(q(@_[0])), [q(@_),'[','0',']'],
           'magic array variable index');
 is_deeply($tok->tokenize(q(@foo[-7])), [q(@foo),'[','-','7',']'],
           'regular array variable index');
+is_deeply($tok->tokenize(q(@foo[$foo])), [q(@foo),'[',q($foo),']'],
+          'regular array variable index, scalar variable');
 
 #
 # Hash variable
