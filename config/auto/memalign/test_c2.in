@@ -12,7 +12,14 @@ int main(int argc, char *argv[])
 {
 	void * p;
 	size_t s = 256;
-	int i = posix_memalign(&p, s, s);
-	puts(((int)p & 0xff) == 0 ? "ok" : "nix");
+	/*
+	 * at least glibc 2.2.4's posix_memalign is broken
+	 * (it checks size for being a power of 2 instead of alignment)
+	 *
+	 * TODO only disable memalign_if_possible (which may have
+	 *      arbitrary allocation size)
+	 */
+	int i = posix_memalign(&p, s, 177);
+	puts(((int)p & 0xff) == 0 && i == 0 ? "ok" : "nix");
 	return i;
 }
