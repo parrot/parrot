@@ -191,6 +191,7 @@ do_prederef(void **pc_prederef, Parrot_Interp interpreter, int type)
                 nb = 8;
             pi->branches = mem_sys_allocate( sizeof(Prederef_branch) * nb);
             pi->n_allocated = nb;
+            pi->n_branches = 0;
         }
         else if (pi->n_branches >= pi->n_allocated) {
             pi->n_allocated *= 1.5;
