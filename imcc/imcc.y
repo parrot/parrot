@@ -510,7 +510,7 @@ subs:	subs sub
 
 sub:	sub_start statements ESUB
         {
-          $$ = 0; MK_I("ret", R0());
+          $$ = 0;
 	  allocate();
 	  emit_flush();
 	  clear_tables();

@@ -1368,7 +1368,7 @@ case 10:
 case 15:
 #line 512 "imcc.y"
 {
-          yyval.i = 0; MK_I("ret", R0());
+          yyval.i = 0;
 	  allocate();
 	  emit_flush();
 	  clear_tables();
