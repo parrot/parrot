@@ -1,0 +1,406 @@
+=head1 TITLE
+
+IMCC and Parrot Programming for Compiler Developers - Frequently Asked Questions
+
+=head1 VERSION
+
+=over 4
+
+=item Revision 0.1 - 03 December 2001
+
+Initial creation as of Parrot version 0.0.13 by Melvin Smith
+
+=back
+
+=head1 GENERAL QUESTIONS
+
+=head2 What is Parrot?
+
+Wrong FAQ, start with the Parrot FAQ first. Then come back here because this is
+where the fun is.
+
+The Parrot FAQ : http://www.parrotcode.org/faq/
+
+
+=head2 What is IMC, PIR and IMCC?
+
+IMC stands for Intermediate Code; IMCC stands for Intermediate Code Compiler.
+You will also see the term PIR which is for Parrot Intermediate Representation
+and means the same as IMC, but for some each Parrot developer has his favorite
+term. PIR was the original term, where IMC seems to be the vernacular.
+It is an intermediate language that compiles either directly to Parrot Byte code,
+or translates to Parrot Assembly language. It is the preferred target language
+for compilers for the Parrot Virtual Machine. PIR is halfway between
+a High Level Language (HLL) and Parrot Assembly (PASM).
+
+=head2 What is the history of IMCC?
+
+IMCC was a toy compiler written by Melvin Smith as a little 2-week experiment for
+another toy language, Cola. It was not originally a part of Parrot, and understandably
+wasn't designed for public consumption. Parrot's early alpha versions (0.0.6 and
+earlier) included only the raw Parrot assembler that compiled Parrot Assembly
+language. This was considered the reference assembler. The Cola compiler, on the
+other hand, targeted its own little back end compiler that included a register
+allocator, basic block tracking and medium level expression parsing. The backend compiler
+was eventually named IMCC and benefitted from contributions from Angel Faus, Leo
+Toetsch, Steve Fink and Sean O'Rourke. The first version of Perl6 written by Sean
+used IMCC as its backend and that's how it currently exists.
+
+Leopold Toetsch added, among many other things, the ability for IMCC to compile
+PASM by proxying any instructions that were not valid IMCC through to be assembled
+as PASM. This was a great improvement. As Parrot's calling convention changed to a
+continuation style (PCC), and generally became more complex, the PASM instructions
+required to call or declare subroutines became just as complex. IMCC abstracted
+some of the convention and eventually the core team stopped using the old reference
+assembler altogether. Leo integrated IMCC into Parrot and now IMCC is _the_ front-end
+for the Parrot VM.
+
+=head2 Parrot is a VM, why does it need IMCC builtin?
+
+Static languages, such as Java, can run on VMs that are dedicated to execution of
+pre-compiled byte code with no problems. Languages such as Perl, Ruby and Python
+are not so static. They have support for runtime evaluation and compilation and
+their parsers are always available. These languages run on their own "dynamic"
+interpreters.
+
+Since Parrot is specialized to be a dynamic VM, it must be able to compile code on the fly.
+For this reason, IMCC is written in C and integrated into the VM. IMCC is fast
+since it does very little type checking, and since most of Parrot's ops are
+polymorphic, IMCC punts most of the type checking and method dispatch
+to runtime. This allows extremely fast compile times, which is what scripters
+need.
+
+=head2 How Is IMCC different than Parrot Assembly language?
+
+PASM is an assembly language, raw and low-level. PASM does exactly what you say, and each
+PASM instruction represents a single VM opcode.  Assembly language can be tough to debug,
+simply due to the amount of instructions that a high-level compiler generates for a given
+construct. Assembly language typically has no concept of basic blocks, namespaces, variable
+tracking, etc. You must track your register usage and take care of saving/restoring values
+in cases where you run out of registers. This is called spilling.
+
+IMC is medium level and a bit more friendly to write or debug. IMCC also has a builtin
+register allocator and spiller. IMC has the concept of a "subroutine" unit, complete
+with local variables and high-level sub call syntax. IMCC also allows unlimited
+symbolic registers. It will take care of assigning the appropriate register to your
+variables and will usually find the most efficient mapping so as to use as few
+registers as possible for a given piece of code. If you use more registers than
+are currently available, IMCC will generate instructions to save/restore (spill)
+the registers for you. This is a significant piece of every compiler.
+
+While it is possible to write more efficient code by hand directly in PASM, it is rare.
+IMC is still very close to PASM as far as granularity. It is also common for
+IMCC to generate instructions that use less registers than handwritten PASM. This is
+good for cache performance.
+
+=head2 Why should I target IMC instead of PASM?
+
+Several reasons. IMC is so much easier to read, understand and debug. When passing snippets
+back and forth on the Parrot internals list, IMC is preferred since the code is
+much shorter than the equivalent PASM. In some cases it is necessary to debug the PASM
+code as bugs in IMCC are found.
+
+Hand writing and debugging of code aside, most IMC code will be mostly compiler generated.
+In this respect, the most important technical reason to use IMC is the amount of
+abstraction it provides. IMC now completely hides the Parrot calling conventions
+and allows different call conventions to be selected via .pragma without changes
+to the high-level code emitter. This allows Parrot to change somewhat without
+impacting existing compilers. The workload is balanced between the IMCC team
+and the compiler authors. The term "modular" springs to mind.
+
+Since development on the old assembler has stopped, IMCC will be the best way to
+compile bytecode classes complete with metadata and externally linkable symbols.
+It will still be possible to construct classes on the fly with PASM, but IMC's
+higher level directives allow it to do compile time construction of certain
+things and pack them into the bytecode in a way that does not have an equivalent
+set of Parrot instructions. The PASM assembler may or may not ever catch up
+with these features.
+
+=head2 Can I use IMCC without Parrot?
+
+Not yet. IMCC is currently tightly integrated to the Parrot bytecode format. One goal
+is to rework IMCC's modularity to make it easy to run separately, but this is not a top
+priority since IMCC currently only targets Parrot. Eventually IMCC will contain
+a config option to build without linking the Parrot VM, but IMCC must be able to
+do lookups of opcodes so it will require some sort of static opcode metadata.
+
+
+=head1 IMCC PROGRAMMING 101
+
+=head2 Hello world?
+
+The basic block of execution of an IMC program is the subroutine. Subs can be simple,
+with no arguments or returns. Line comments are allowed in IMC using #.
+
+	# Hello world
+        .sub _main
+	   print "Hello world.\n"
+           end
+        .end
+
+=head2 How do I compile and run an IMC module?
+
+Parrot uses the filename extension to detect whether the file is an IMC file (.imc),
+a Parrot Assembly file (.pasm) or a pre-compiled bytecode file (.pbc).
+
+	parrot hello.imc
+
+
+=head2 How do I see the assembly code that IMC generates?
+
+Use the -o option for Parrot. You can provide an output filename, or the - character
+which indicates standard output. If the filename has a .pbc extension, IMCC will compile
+the module and assemble it to bytecode.
+
+=head3 Examples:
+
+=head4 Create the PASM source from IMC.
+
+	parrot -o hello.pasm hello.imc
+
+=head4 Compile to bytecode from IMC.
+
+	parrot -o hello.pbc hello.imc
+
+=head4 Dump PASM to screen (my favorite shortcut).
+
+	parrot -o - hello.imc
+	
+
+=head2 Does IMCC do variable interpolation in strings?
+
+No, and it shouldn't. IMC is an intermediate language for compiling high level languages.
+Interpolation (print "$count items") is a high level concept and the specifics are
+unique to each language. Perl6 already does interpolation without special support
+from IMCC.
+
+=head2 What are IMC variables?
+
+IMC has 2 classes of variables, symbolic registers and named variables. Both
+are mapped to real registers, but there are a few minor differences. Named
+variables must be declared. They may be global or local, and may be qualified
+by a namespace. Symbolic registers, on the other hand, do not need declaration,
+but their scope never extends outside of a subroutine unit. Symbolics registers
+basically give compiler front ends an easy way to generate code from their
+parse trees or AST. To generate expressions compilers have to create
+temporaries. 
+
+=head3 Symbolic Registers (or Temporaries)
+
+Symbolic registers have a $ sign for the first character, have single letter (S,N,I,P) for
+the second character, and 1 or more digits for the rest. By the 2nd character IMCC
+determines which set of Parrot registers it belongs to.
+
+=head4 Example:
+
+	$S1 = "hiya"
+	$S2 = $S1 . "mel"
+	$I1 = 1 + 2
+	$I2 = $I1 * 3
+
+
+This uses symbolic STRING and INTVAL registers as temporaries. This is they typical sort of code
+that compilers generate from the syntax tree.
+
+=head3 Named Variables
+
+Named variables are either local, global or namespace qualified. Currently IMCC only
+supports locals transparently, however globals are support in an explicit syntax.
+The way to declare locals in a subroutine is with the B<.local> directive. The B<.local> directive
+also requires a type (B<int>, B<num>, B<string> or a classname such as B<PerlArray>).
+
+=head4 Example:
+
+	.sub _main
+	   .local int i
+	   .local num n
+	   i = 7
+	   n = 5.003
+	   end
+	.end
+
+
+=head2 How do I declare global or package variables in IMC?
+
+You can't yet. IMCC still lacks a few features and these are one of those features.
+You can explicitly create global variables at runtime, however, but currently it
+only works for PMC types, like so:
+
+	.sub _main
+	   .local Integer i
+	   .local Integer j
+	   i = new Integer
+	   j = new Integer
+	   i = 123
+	   # Create the global
+	   global "i" = i
+
+	   # Retrieve the global
+	   j = global "i"
+	   end
+	.end
+
+
+Two new directives are planned for IMC.
+
+=over 4
+
+=item *
+
+C<.global>
+
+=item *
+
+C<.extern>
+
+=back
+
+The C<.global> directive will be orthogonal to C<.local>.
+IMCC will track globals and take care of spilling just like local variables.
+
+Theoretically, when .global is added, the above code segment will look like:
+
+	.global Integer i = 123
+
+	.sub _main
+	   .local Integer j
+	   j = i
+	   end
+	.end
+
+The global C<i> will created and initialized during the bytecode load and
+other modules will be able to refer to C<i> if they include the B<.extern>
+directive like so:
+
+	.extern Integer i
+	...
+
+Parrot will fixup the symbol references at runtime.
+
+
+ 
+
+=head1 IMCC ADVANCED TOPICS
+
+=head2 How can I make a library of IMC routines and include it in other Parrot/IMC programs?
+
+This one is very simple. Use the B<.include> directive to include other .imc source
+files. Do keep in mind that currently Parrot starts execution with the first
+sub it sees in the bytecode; so if your main includes external .imc files it needs
+to include them after the your "main" start sub. If you .include them first (in
+typical C or Perl style, Parrot will execute the first sub in the first included
+source file. This is because B<.include> is a preprocessed directive and simply creates
+one huge .imc source module.
+
+	#############################
+	# dynamic.imc
+	#
+	.sub _dynamic
+	   print "_dynamic include and compilation\n"
+	   .pcc_begin_return
+	   .pcc_end_return
+	   end
+	.end
+
+
+
+	#############################
+	# main.imc
+	#
+	# dynamic compilation with .include
+	#
+	.sub _main
+	   print "_main\n"
+	   _dynamic()
+	   end
+	.end
+
+	.include "dynamic.imc"
+
+
+The C<.include> directive is not the long-term solution for working with
+modular bytecode, but Parrot still lacks some infrastructure for linking and
+running precompiled bytecodes transparently or via an import, so C<.include>
+is the simplest method. The downsize is all code is compiled on the fly.
+
+=head2 How do I precompile a bytecode library and use it in another module?
+
+If C<.include> just isn't good enough for you, and you want to go ahead and use precompiled
+bytecodes, you can, with some restrictions. You have to explicitly link the symbols
+at runtime. This isn't too tough, just lookup the symbol name and use the PMC you
+get in return. Subroutine PMCs are globals and are autoloaded by the "load_bytecode"
+PASM instruction. 
+
+The main restriction with current Parrot/IMCC is that you can't use the high level
+shortcut for calling subs, ie.  _bar(a,b). Instead you have to setup the arguments
+and the return continuation yourself and call C<invoke> on the Sub PMC. Soon, IMCC and
+Parrot will support a cleaner way of doing this.
+
+	#######################################################
+	# main.imc
+	#
+	# External subs example
+	#
+	# This way is the only way that currently works to call
+	# an externally defined sub. Eventually we will support
+	# "extern" symbol linkage in the bytecode loader but for
+	# now you have to do it like so...
+	#
+	.sub _main
+	   .local ParrotSub fun
+
+	   # load the external bytecode lib
+	   load_bytecode "subs.pbc"
+
+	   # _baz()      <-- this style doesn't work yet, but it will soon
+
+	   # Instead, retrieve the global sub that was defined in subs.imc by name
+	   fun = global "_baz"
+
+	   # invokecc sets up the return continuation in P1 for the caller
+	   invokecc fun
+	   # Done!
+
+	   # Calling a forward declared sub in same module.
+	   # IMCC resolves _localsub at compile time so we can use the shortcut
+	   _localsub()
+	   end
+	.end
+
+	.sub _localsub
+	   print "this is localsub\n"
+	   end
+	.end
+
+
+	##################################
+	# subs.imc
+	#
+	# Sample extern sub library
+	#
+	# Compile this separately to subs.pbc
+	#
+	.sub _foo
+	   print "_foo is local to _baz\n"
+	   .pcc_begin_return
+	   .pcc_end_return
+	.end
+
+	.sub _baz
+	   print "this is external sub _baz\n"
+	   _foo()
+	   .pcc_begin_return
+	   .pcc_end_return
+	.end
+
+=head1 Thats not all.
+
+I have lots more to come. If you have suggestions for the FAQ or have an idea for a new
+feature for IMCC, please email me at B<melvin.smith@mindspring.com> and/or hop on #parrot IRC (see
+the Parrot FAQ for IRC directions). I'm also on AOL Instant Messenger, handle: B<MrJoltCola>
+
+Happy Hacking.
+
+
+=cut
+
