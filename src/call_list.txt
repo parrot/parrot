@@ -6,9 +6,6 @@
 # s - short
 # i - int
 # l - long
-# 2 - pointer to short
-# 3 - pointer to int
-# 4 - pointer to long
 # NUM reg stuff
 # f - float
 # d - double
@@ -17,10 +14,13 @@
 # PMC reg stuff
 # p - data pointer from PMC (on store into a new UnManagedStruct PMC)
 # P - pointer to a PMC-register
-# O - pointer to PMC-regise 2 (object)
+# O - pointer to PMC-register #2 (object)
+# 2 - pointer to short
+# 3 - pointer to int
+# 4 - pointer to long
 # void stuff
 # v - void
-# P - void *
+# b - void *
 # B - void **
 
 # special stuff
@@ -206,10 +206,11 @@ p	tiB3P
 i	pPtiiipi
 i	tpiibi
 
-# Used by library/sdl.imc
+# Used by SDL
 p	iiil
 i	ppl
 
 # used by t/pmc/nci.t
 v	pP
 p	ip
+i	33

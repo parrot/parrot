@@ -17,7 +17,7 @@ i386 and the F<libnci.so> library is found.
 
 =cut
 
-use Parrot::Test tests => 30;
+use Parrot::Test tests => 31;
 use Parrot::Config;
 
 print STDERR $PConfig{jitcpuarch}, " JIT CPU\n";
@@ -343,8 +343,9 @@ OUTPUT
 output_is(<<'CODE', <<'OUTPUT', "nci_i_4i");
   loadlib P1, "libnci"
   dlfunc P0, P1, "nci_i4i", "i4i"
-  set I5, 6
-  set I6, 7
+  new P5, .PerlInt
+  set P5, 6
+  set I5, 7
   invoke
   print I5
   print "\n"
@@ -354,14 +355,22 @@ CODE
 OUTPUT
 
 output_is(<<'CODE', <<'OUTPUT', "nci_i_i3");
+.include "datatypes.pasm"
   loadlib P1, "libnci"
   dlfunc P0, P1, "nci_ii3", "ii3"
   set I5, 6
-  set I6, 7
+
+  new P5, .PerlInt
+  set P5, 7
+
+  set I0, 1
+  set I1, 1
+  set I3, 1
   invoke
+
   print I5
   print "\n"
-  print I6
+  print P5
   print "\n"
   end
 CODE
@@ -1094,6 +1103,40 @@ X: 400
 Y: 410
 W: 420
 H: 430
+OUTPUT
+
+output_is(<<'CODE', <<'OUTPUT', 'out parameters and return values');
+
+.include "datatypes.pasm"
+  new P2, .PerlInt
+  set P2, 3
+  new P3, .PerlInt
+  set P3, 2
+
+  set P5, P2
+  set P6, P3
+
+  set I0, 1
+  set I2, 0
+  set I3, 2
+  set I4, 0
+  loadlib P1, "libnci"
+  dlfunc P0, P1, "nci_i_33", "i33"
+  invoke
+
+  print "Double: "
+  print P2
+  print "\nTriple: "
+  print P3
+  print "\nSum: "
+  print I5
+  print "\n"
+
+  end
+CODE
+Double: 6
+Triple: 6
+Sum: 12
 OUTPUT
 
 } # SKIP

@@ -33,7 +33,7 @@ signatures (C header files are not always available (certainly not
 for libraries not designed for access from C) and not always
 reasonably parseable anyway, and there is no generic way to query a
 function for its signature) the signature must be passed in when the
-linkage between the C function and parrot is made. 
+linkage between the C function and parrot is made.
 
 =head2 Function signatures
 
@@ -75,18 +75,6 @@ int. An integer type.
 
 long. An integer type. You know the drill.
 
-=item 2
-
-A pointer to a short, taken from an I register.
-
-=item 3
-
-A pointer to an int, taken from an I register.
-
-=item 4
-
-A pointer to a long, taken from an I register.
-
 =item f
 
 float. F register denizen.
@@ -95,12 +83,31 @@ float. F register denizen.
 
 double. F register, double-precision floating point type
 
+=item P
+
+A PMC register.
+
 =item p
 
 PMC thingie. A generic pointer, taken from or stuck into a PMC's
 data pointer. If this is a return type, parrot will create a new
 UnManagedStruct PMC type, which is just a generic "pointer so some
 damn thing or other" PMC type which Parrot does I<no> management of.
+
+=item 2
+
+A pointer to a short, taken from an P register of an int-like PMC.
+On return from NCI, the PMC_int_val will hold the new value.
+
+=item 3
+
+A pointer to an int, taken from an P register of an int-like PMC.
+On return from NCI, the PMC_int_val will hold the new value.
+
+=item 4
+
+A pointer to a long, taken from an P register of an int-like PMC.
+On return from NCI, the PMC_int_val will hold the new value.
 
 =item t
 
@@ -139,12 +146,12 @@ follows a parameter of type Y.
 
 =back
 
-Note that not all types are valid as return types. 
+Note that not all types are valid as return types.
 
 =head2 Examples
 
 Most of the function parameters are reasonably self-evident. Some,
-however, merit additional explanation. The 
+however, merit additional explanation. The
 
 =head2 Callbacks
 
@@ -177,7 +184,7 @@ don't have to be void *, but they must be pointers of some sort.
 Since parrot needs more than just a pointer to a generic function to
 figure out what to do, it stuffs all the extra information into the
 C<your_data> pointer, which contains a custom PMC holding all the
-information that Parrot needs. 
+information that Parrot needs.
 
 The NCI function signature for a callback matching Parrot_callback_C
 is C<vCYZ>, while the function signature for a callback matching
@@ -222,7 +229,7 @@ Hand over control to the external library. I<IT IS IMPORTANT THAT THE
 INTERPRETER YOU ARE CALLING BACK INTO IS NOT ACTIVE WHEN THE CALLBACK
 IS MADE!>
 
-=back  
+=back
 
 When the callback function is invoked by the external library, the
 function itself should look like:

@@ -2806,10 +2806,10 @@ static int
 count_regs(char *sig, char *sig_start)
 {
     const char *typs[] = {
-        "lisc234", /* I */
-        "tbB",    /* S */
-        "pP",   /* P */
-        "fd"   /* N */
+        "lisc",         /* I */
+        "tbB",          /* S */
+        "pP234",        /* P */
+        "fd"            /* N */
     };
     int first_reg = 5;
     int i, found;
@@ -2868,8 +2868,12 @@ Parrot_jit_build_call_func(Interp *interpreter, PMC *pmc_nci,
             case '3':
             case '4':
                 /* This might be right. Or not... */
-                jit_emit_mov_ri_i(pc, emit_EAX,
-                    &INT_REG(count_regs(sig, signature->strstart)));
+                /* we need the offset of PMC_int_val */
+                jit_emit_mov_rm_i(pc, emit_EDX,
+                        &PMC_REG(count_regs(sig, signature->strstart)));
+                //emitm_movl_m_r(pc, emit_EAX, emit_EDX, 0, 1,
+                emitm_lea_m_r (pc, emit_EAX, emit_EDX, 0, 1,
+                        (size_t) &PMC_int_val((PMC *) 0));
                 emitm_pushl_r(pc, emit_EAX);
                 break;
             case 'f':

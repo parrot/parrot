@@ -35,6 +35,7 @@ typedef struct
 } Rect_Like;
 
 void nci_pip (int count, Rect_Like *rects);
+int nci_i_33 (int *double_me, int *triple_me);
 
 double nci_dd(double d) {
     return d * 2.0;
@@ -272,6 +273,14 @@ void nci_pip (int count, Rect_Like *rects)
     for (i = 0; i < 4; ++i)
         printf("X: %d\nY: %d\nW: %d\nH: %d\n",
 		rects[i].x, rects[i].y, rects[i].w, rects[i].h );
+}
+
+int nci_i_33 (int *double_me, int *triple_me)
+{
+	*double_me *= 2;
+	*triple_me *= 3;
+
+	return( *double_me + *triple_me );
 }
 
 #ifdef TEST
