@@ -268,7 +268,7 @@ int main(int argc, char* argv[]) {
 		{
 			io = PIO_open(interpreter, file[i], flags[j]);
 
-			if ( ( io != NULL ) != expected[i][j] )
+			if ( (PIO_eof(interpreter, io) ? 0:1) != expected[i][j] )
 			{
 				printf("\"%s\" \"%s\" should%s have opened\n", 
 					file[i], flags[j], expected[i][j] ? "" : " not");
@@ -311,7 +311,7 @@ int main(int argc, char* argv[]) {
 
 	io = PIO_open(interpreter, "temp.file", "<");
 
-	if ( !io )
+	if ( PIO_eof(interpreter, io) )
 	{
 		printf("PIO_open failed\n");
 		return 1;
