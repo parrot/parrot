@@ -147,14 +147,14 @@ Pad_it(SpfInfo info, char *buf) {
 	else if(howmuch < 0) {
 		memmove(buf, buf-howmuch, len+howmuch);
 	}
-	else if(info->flags & FLAG_MINUS) { //left-align
+	else if(info->flags & FLAG_MINUS) { /* left-align */
 		for(i=0; i < howmuch; i++) {
 			buf[i+len]=' ';
 		}
 
 		buf[i+len]=0;
 	}
-	else { //right-align
+	else { /* right-align */
 		memmove(buf+howmuch, buf, len);
 
 		for(i=0; i < howmuch; i++) {
