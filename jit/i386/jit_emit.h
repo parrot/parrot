@@ -1,14 +1,14 @@
 /*
  * jit_emit.h
- * 
+ *
  * i386
  *
  * $Id$
  */
 
 /* Register codes */
-#define emit_None 0 
- 
+#define emit_None 0
+
 /* These are + 1 the real values */
 #define emit_EAX 1
 #define emit_ECX 2
@@ -53,8 +53,8 @@
   emit_r_X((pc), emit_reg((reg1)-1), (b), (i), (s), (d))
 
 /* ESIB byte */
-#define emit_Scale(scale) ((scale) << 6) 
-#define emit_reg_Index(x) (((x)-1) << 3) 
+#define emit_Scale(scale) ((scale) << 6)
+#define emit_reg_Index(x) (((x)-1) << 3)
 #define emit_reg_Base(x) ((x)-1)
 
 /* Scale factor values */
@@ -69,7 +69,7 @@
 
 #define emit_alu_r_r(reg1,reg2) emit_alu_X_r((reg1 - 1), (reg2))
 
-static int 
+static int
 emit_is8bit(long disp)
 {
     return (((disp > -129) && (disp < 128)) ? 1 : 0);
@@ -88,7 +88,7 @@ emit_disp8_32(char *pc, int disp)
     }
 }
 
-static void 
+static void
 emit_sib(char *pc, int scale, int i, int base)
 {
     int scale_byte;
@@ -126,13 +126,13 @@ emit_r_X(char *pc, int reg_opcode, int base, int i, int scale, long disp)
     if (base == emit_EBP) {
     /* modrm disp */
         if (i == emit_None) {
-            *(pc++) = (emit_is8bit(disp) ? emit_Mod_b01 : emit_Mod_b10 ) 
+            *(pc++) = (emit_is8bit(disp) ? emit_Mod_b01 : emit_Mod_b10 )
                 | reg_opcode | emit_reg_rm(emit_EBP);
             return emit_disp8_32(pc, disp);
         }
         /* modrm sib disp */
-        else { 
-            *(pc++) = (emit_is8bit ? emit_Mod_b01 : emit_Mod_b10 ) 
+        else {
+            *(pc++) = (emit_is8bit ? emit_Mod_b01 : emit_Mod_b10 )
                 | reg_opcode | emit_b100;
             emit_sib(pc++, scale, i, base);
             return emit_disp8_32(pc, disp);
@@ -228,7 +228,7 @@ emit_shift_r_r(char *pc, int opcode, int reg1, int reg2)
         internal_exception(JIT_ERROR,
             "emit_shift_r_r passed invalid register\n");
     }
-    
+
     *(pc++) = 0xd3;
     *(pc++) = emit_alu_X_r(opcode,  reg2);
 
@@ -243,7 +243,7 @@ emit_shift_r_m(char *pc, int opcode, int reg,
         internal_exception(JIT_ERROR,
             "emit_shift_r_m passed invalid register\n");
     }
-    
+
     *(pc++) = 0xd3;
     pc = emit_r_X(pc, opcode,  base, i, scale, disp);
 
@@ -481,7 +481,7 @@ emit_movb_i_m(char *pc, char imm, int base, int i, int scale, long disp)
 
 #define emitm_andl_i_r(pc, imm, reg) \
   emitm_alul_i_r(pc, 0x81, emit_b100, imm, reg)
-  
+
 #define emitm_andl_r_m(pc, reg, b, i, s, d) \
   emitm_alul_r_m(pc, 0x21, reg, b, i, s, d)
 
@@ -589,7 +589,7 @@ emit_movb_i_m(char *pc, char imm, int base, int i, int scale, long disp)
   *(pc++) = 0x8b; \
   *(pc++) = src | dest << 3
 
-/* MOV X(reg),reg */ 
+/* MOV X(reg),reg */
 #define emit_movb_i_r_r(pc, imm, src, dest) \
   *(pc++) = 0x8b; \
   *(pc++) = 0x40 | (src - 1) | (dest - 1) << 3; \
@@ -782,7 +782,7 @@ emit_movb_i_m(char *pc, char imm, int base, int i, int scale, long disp)
 
 #define emit_fstpl(pc, address) \
   emitm_fstpl(pc, emit_None, emit_None, emit_None, address)
-    
+
 #define emit_negl_m(pc, address) \
   emitm_negl_m(pc, emit_None, emit_None, emit_None, (long)address)
 
@@ -824,7 +824,7 @@ emit_movb_i_m(char *pc, char imm, int base, int i, int scale, long disp)
 
 enum { JIT_X86BRANCH, JIT_X86JUMP, JIT_X86CALL };
 
-static void 
+static void
 emit_jcc(Parrot_jit_info_t *jit_info, int code, opcode_t disp)
 {
     long offset;
@@ -833,17 +833,17 @@ emit_jcc(Parrot_jit_info_t *jit_info, int code, opcode_t disp)
     opcode = jit_info->op_i + disp;
 
     if (opcode <= jit_info->op_i) {
-        offset = jit_info->arena.op_map[opcode].offset - 
+        offset = jit_info->arena.op_map[opcode].offset -
                 (jit_info->native_ptr - jit_info->arena.start);
 
-        /* If we are here, the current section must have a branch_target 
+        /* If we are here, the current section must have a branch_target
            section, I think. */
         if (jit_info->optimizer->cur_section->branch_target ==
             jit_info->optimizer->cur_section)
-                offset += 
+                offset +=
                     jit_info->optimizer->cur_section->branch_target->load_size;
 
-        if (emit_is8bit(offset)) {
+        if (emit_is8bit(offset - 2)) {
             emitm_jxs(jit_info->native_ptr, code, offset - 2);
         }
         else {
@@ -853,19 +853,19 @@ emit_jcc(Parrot_jit_info_t *jit_info, int code, opcode_t disp)
         return;
     }
 
-    Parrot_jit_newfixup(jit_info); 
+    Parrot_jit_newfixup(jit_info);
     jit_info->arena.fixups->type = JIT_X86BRANCH;
     jit_info->arena.fixups->param.opcode = opcode;
     /* If the branch is to the current section, skip the load instructions. */
     if (jit_info->optimizer->cur_section->branch_target ==
         jit_info->optimizer->cur_section)
-            jit_info->arena.fixups->skip = 
+            jit_info->arena.fixups->skip =
                 jit_info->optimizer->cur_section->branch_target->load_size;
- 
+
     emitm_jxl(jit_info->native_ptr, code, 0xc0def00d);
 }
 
-static void 
+static void
 emit_jump(Parrot_jit_info_t *jit_info, opcode_t disp)
 {
     long offset;
@@ -876,7 +876,7 @@ emit_jump(Parrot_jit_info_t *jit_info, opcode_t disp)
     if (opcode <= jit_info->op_i) {
         offset = jit_info->arena.op_map[opcode].offset -
                                 (jit_info->native_ptr - jit_info->arena.start);
-        if (emit_is8bit(offset)) {
+        if (emit_is8bit(offset - 2)) {
             emitm_jumps(jit_info->native_ptr, offset - 2);
         }
         else {
@@ -885,18 +885,18 @@ emit_jump(Parrot_jit_info_t *jit_info, opcode_t disp)
         return;
     }
 
-    Parrot_jit_newfixup(jit_info); 
+    Parrot_jit_newfixup(jit_info);
     jit_info->arena.fixups->type = JIT_X86JUMP;
     jit_info->arena.fixups->param.opcode = opcode;
     /* If the branch is to the current section, skip the load instructions. */
     if (jit_info->optimizer->cur_section->branch_target ==
         jit_info->optimizer->cur_section)
-            jit_info->arena.fixups->skip = 
+            jit_info->arena.fixups->skip =
                 jit_info->optimizer->cur_section->branch_target->load_size;
     emitm_jumpl(jit_info->native_ptr, 0xc0def00d);
 }
 
-void 
+void
 Parrot_jit_dofixup(Parrot_jit_info_t *jit_info,
                    struct Parrot_Interp * interpreter)
 {
@@ -935,8 +935,8 @@ Parrot_jit_dofixup(Parrot_jit_info_t *jit_info,
     }
 }
 
-void 
-Parrot_jit_begin(Parrot_jit_info_t *jit_info, 
+void
+Parrot_jit_begin(Parrot_jit_info_t *jit_info,
                  struct Parrot_Interp * interpreter)
 {
     /* Maintain the stack frame pointer for the sake of gdb */
@@ -957,11 +957,11 @@ Parrot_jit_begin(Parrot_jit_info_t *jit_info,
      * the stack this will stop working !!! */
     emitm_pushl_i(jit_info->native_ptr, interpreter);
 
-    /* Point ESI to the opcode-native code map array */ 
+    /* Point ESI to the opcode-native code map array */
     emitm_movl_i_r(jit_info->native_ptr, jit_info->arena.op_map, emit_ESI);
 }
 
-void 
+void
 Parrot_jit_normal_op(Parrot_jit_info_t *jit_info,
                      struct Parrot_Interp * interpreter)
 {
@@ -976,7 +976,7 @@ Parrot_jit_normal_op(Parrot_jit_info_t *jit_info,
     emitm_addb_i_r(jit_info->native_ptr, 4, emit_ESP);
 }
 
-void 
+void
 Parrot_jit_cpcf_op(Parrot_jit_info_t *jit_info,
                    struct Parrot_Interp * interpreter)
 {
@@ -984,7 +984,7 @@ Parrot_jit_cpcf_op(Parrot_jit_info_t *jit_info,
 
     /* This calculates (INDEX into op_map * 4) */
     emitm_subl_i_r(jit_info->native_ptr, interpreter->code->byte_code,emit_EAX);
-                        
+
     /* This jumps to the address in op_map[ESI + sizeof(void *) * INDEX] */
     emitm_jumpm(jit_info->native_ptr, emit_ESI, emit_EAX,
                         sizeof(*jit_info->arena.op_map) / 4, 0);
@@ -992,7 +992,7 @@ Parrot_jit_cpcf_op(Parrot_jit_info_t *jit_info,
 
 /* Load registers for the current section */
 void
-Parrot_jit_load_registers(Parrot_jit_info_t *jit_info, 
+Parrot_jit_load_registers(Parrot_jit_info_t *jit_info,
                           struct Parrot_Interp * interpreter)
 {
     Parrot_jit_optimizer_section_t *sect = jit_info->optimizer->cur_section;
@@ -1007,8 +1007,8 @@ Parrot_jit_load_registers(Parrot_jit_info_t *jit_info,
     if (!sect->load_size)
         sect->load_size =
             jit_info->native_ptr -
-                (jit_info->arena.start + 
-                    jit_info->arena.op_map[jit_info->op_i].offset); 
+                (jit_info->arena.start +
+                    jit_info->arena.op_map[jit_info->op_i].offset);
 }
 
 /* Save registers for the current section */
@@ -1040,7 +1040,7 @@ char intval_map[INT_REGISTERS_TO_MAP] =
  * Local variables:
  * c-indentation-style: bsd
  * c-basic-offset: 4
- * indent-tabs-mode: nil 
+ * indent-tabs-mode: nil
  * End:
  *
  * vim: expandtab shiftwidth=4:
