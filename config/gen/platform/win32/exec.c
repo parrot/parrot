@@ -45,5 +45,12 @@ Parrot_Run_OS_Command(Parrot_Interp interpreter, STRING *command) {
 
 void 
 Parrot_Exec_OS_Command(Parrot_Interp interpreter, STRING *command) {
-  internal_exception(NOSPAWN, "Exec not implemented");
+  /* Be horribly profligate with memory, since we're
+     about to be something else */
+  int status;
+  status = _execlp(string_to_cstring(interpreter, command), NULL);
+  /* if we get here, something's horribly wrong... */
+  if (status) {
+    internal_exception(NOSPAWN, "Exec failed, code %i", status);
+  }
 }
