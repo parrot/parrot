@@ -83,11 +83,16 @@ sub filter {
   my @methods;
 
   my $OUT;
+  my %default;
 
   while ($classblock =~ s/$signature_re//) {
      my ($type, $methodname, $parameters) = ($1,$2,$3);
 
      $parameters = ", $parameters" if $parameters =~ /\w/;
+     if ($classblock =~ s/= default;?//) {
+        $default{$methodname}++;
+        next;
+     }
      
      my ($methodblock, $rema) = extract_balanced($classblock);
   
@@ -102,7 +107,9 @@ sub filter {
      push @methods, $methodname;
      };
 
-  @methods = map {"Parrot_$classname" ."_$_"} @methods;
+  @methods = map {(exists $default{$_} ? "Parrot_default" : 
+                                         "Parrot_$classname") 
+                  ."_$_"} @methods;
   my $methodlist = join (",\n        ", @methods);
   my $initname = "Parrot_$classname" . "_class_init";
  
