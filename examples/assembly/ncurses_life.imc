@@ -31,24 +31,10 @@
 	.local float TIME_DIFF
 	.local float GPS
 	.local int SUPRESS_PRINT
-	.local pmc INITSCR
+	.local pmc CURS_SET
 	.local pmc ENDWIN
 	.local pmc DISPLAY
 	.local pmc STDSCR
-	.local pmc WCLEAR
-	.local pmc KEYPAD
-	.local pmc NODELAY
-	.local pmc WREFRESH
-	.local pmc MVWADDCH
-	.local int X_COORD
-	.local int Y_COORD
-	.local pmc WATTRON
-	.local pmc COLOR_PAIR
-	.local pmc START_COLOR
-	.local pmc INIT_PAIR
-	.local pmc MVWADDSTR
-	.local pmc CURS_SET
-	.local int has_usleep
 	.local int size
 	.local int stop
 	.local int sleep_lim
@@ -58,70 +44,21 @@
 
 	# 15 * sizef is real size of world
 	.const int sizef = 8
-	# if sizef > sleep_lim then sleep
-	sleep_lim = 1
-	# if sleeping then that long usec
+	# delay in usec
 	.sym int delay
 	delay = 20000
 
 	# Note the time
 	time START_TIME
-	has_usleep = 0	# unknown yet
 
 	# If true, we don't print
 	SUPRESS_PRINT = 0
-	stop = -1
+	stop = 0		# -1 start with <g>o
 	x_offs = 0
 	y_offs = 0
 
-	INITSCR = global "ncurses::initscr"
-	NODELAY = global "ncurses::nodelay"
-	KEYPAD = global "ncurses::keypad"
 	ENDWIN = global "ncurses::endwin"
-	WCLEAR = global "ncurses::wclear"
-	WREFRESH = global "ncurses::wrefresh"
-	MVWADDCH = global "ncurses::mvwaddch"
-	WATTRON = global "ncurses::wattron"
-	COLOR_PAIR = global "ncurses::COLOR_PAIR"
-	START_COLOR = global "ncurses::start_color"
-	INIT_PAIR = global "ncurses::init_pair"
-	MVWADDSTR = global "ncurses::mvwaddstr"
 	CURS_SET = global "ncurses::curs_set"
-
-	P0 = INITSCR
-	invoke
-	STDSCR = P5
-
-	P0 = START_COLOR
-	invoke
-
-	P0 = INIT_PAIR
-	I5 = 1		# Color pair 1
-	I6 = 2 		# dark green fg
-	I7 = 0		# Black background
-	invoke
-
-	P0 = COLOR_PAIR
-	I5 = 1
-	invoke
-
-	# We pass what's returned from COLOR_PAIR straight on
-	P0 = WATTRON
-	invoke
-
-	P0 = CURS_SET	# turn off cursor
-	I5 = 0
-	invoke
-
-	P0 = NODELAY	# set nodelay mode
-	P5 = STDSCR
-	I5 = 1
-	invoke
-
-	P0 = KEYPAD	# set keypad mode
-	P5 = STDSCR
-	I5 = 1
-	invoke
 
 	size = 15 * sizef
 	.local string err
@@ -140,8 +77,8 @@ retl:
 	.result err
 	.pcc_end
 	length $I0, err
-	if $I0, getout
-	goto dump1
+	if $I0, print_err
+	goto start_curses
 
 def_world:
 	.sym Sub default
@@ -154,15 +91,39 @@ def_world:
 retd:
 	.result S15
 	.pcc_end
-dump1:
-	bsr dump
+
+start_curses:
+	.sym Sub init_curses
+	newsub init_curses, .Sub, _init_curses
+	.pcc_begin prototyped
+	.pcc_call init_curses
+	.result STDSCR
+	.pcc_end
+
 	GEN_COUNT = 0
+
+	.sym Sub dump
+	newsub dump, .Sub, _dump
+
 	.sym Sub generate
 	newsub generate, .Sub, _generate
 	.sym Sub check_key
 	newsub check_key, .Sub, _check_key
 
-loop:	if GEN_COUNT >= MAX_GEN goto getout
+loop:
+	.pcc_begin prototyped
+	.arg S15
+	.arg SUPRESS_PRINT
+	.arg x_offs
+	.arg y_offs
+	.arg size
+	.arg GEN_COUNT
+	.arg STDSCR
+	.arg delay
+	.pcc_call dump
+	.pcc_end
+
+         if GEN_COUNT >= MAX_GEN goto getout
 	.pcc_begin prototyped
 	.arg stop
 	.arg x_offs
@@ -199,7 +160,6 @@ retk:
 	.result stop
 	.pcc_end
 no_gen:
-	bsr dump
 	branch loop
 
 getout:
@@ -210,11 +170,8 @@ getout:
 	invoke
 	time CUR_TIME
 	TIME_DIFF = CUR_TIME - START_TIME
-	length $I0, err
-	if $I0 goto print_err
 
 	# sleeping invalidates these data
-	if sizef > sleep_lim goto no_gps
 	print "\n"
 	print GEN_COUNT
 	print " generations in "
@@ -224,7 +181,6 @@ getout:
 
 	print GPS
 	print " generations/sec\n"
-no_gps:
 
 	interpinfo I1, 1
 	print "A total of "
@@ -263,31 +219,53 @@ print_err:
 	printerr err
 	printerr "\n"
 	exit 1
+.end
 
 
 # S15 has the incoming string, S0 is scratch
-dump:
+.pcc_sub _dump prototyped
+        .param string world
+	.param int SUPRESS_PRINT
+	.param int x_offs
+	.param int y_offs
+	.param int size
+	.param int GEN_COUNT
+	.param pmc STDSCR
+	.param int delay
+
 	if SUPRESS_PRINT goto dumpend
 
-	saveall
+	.local pmc WCLEAR
+	.local pmc MVWADDSTR
+	.local pmc MVWADDCH
+	.local pmc WREFRESH
 
-	P0 = WCLEAR
-	P5 = STDSCR
-	invoke
+	WCLEAR     = global "ncurses::wclear"
+	MVWADDSTR  = global "ncurses::mvwaddstr"
+	MVWADDCH   = global "ncurses::mvwaddch"
+	WREFRESH   = global "ncurses::wrefresh"
 
-	P0 = MVWADDSTR
-	S5 = "Generation: "
-	I5 = 0
-	I6 = 0
-	P5 = STDSCR
-	invoke
+	.pcc_begin prototyped
+	.arg STDSCR
+	.nci_call WCLEAR
+	.pcc_end
 
-	P0 = MVWADDSTR
-	S5 = GEN_COUNT
-	I5 = 0
-	I6 = 13
-	P5 = STDSCR
-	invoke
+	.pcc_begin prototyped
+	.arg STDSCR
+	.arg 0
+	.arg 0
+	.arg "Generation: "
+	.nci_call MVWADDSTR
+	.pcc_end
+
+	$S0 = GEN_COUNT
+	.pcc_begin prototyped
+	.arg STDSCR
+	.arg 0
+	.arg 13
+	.arg $S0
+	.nci_call MVWADDSTR
+	.pcc_end
 
 	$I0 = size * y_offs
 	$I0 = $I0 + x_offs
@@ -305,59 +283,114 @@ dump:
 	cols = $S0
 	$S0 = ENV["LINES"]
 	rows = $S0
+	.local int X_COORD
+	.local int Y_COORD
 
 printloop:
         # TODO skip unprintable out of screen
 	if CHARACTER_OFFSET >= total goto dumpend
 
-	substr_r S0, S15, CHARACTER_OFFSET, 1
-	if S0 != "*" goto incit
+	substr_r $S0, world, CHARACTER_OFFSET, 1
+	if $S0 != "*" goto incit
 	X_COORD = CHAR_POS % size
 	if X_COORD > cols goto incit
 	Y_COORD = CHAR_POS / size
 	Y_COORD = Y_COORD + 2
 	if Y_COORD > rows goto dumpend
-	I5 = Y_COORD
-	I6 = X_COORD
-	I7 = 42				# Behold, the lowly star
-	P5 = STDSCR
-	P0 = MVWADDCH
-	invoke
+	.pcc_begin prototyped
+	.arg STDSCR
+	.arg Y_COORD
+	.arg X_COORD
+	.arg 42				# Behold, the lowly star
+	.nci_call MVWADDCH
+	.pcc_end
 
 incit:	inc CHARACTER_OFFSET
         inc CHAR_POS
 	if  CHARACTER_OFFSET < total goto printloop
 
-	P0 = WREFRESH
-	P5 = STDSCR
-	invoke
+	.pcc_begin prototyped
+	.arg STDSCR
+	.nci_call WREFRESH
+	.pcc_end
 
-	if sizef <= sleep_lim goto dumpend
-	if delay < 10 goto dumpend
+	if delay < 100 goto dumpend
 	# as we gonna sleep here, lets burn some cycles to
 	# check if usleep is available
-	if has_usleep == 1 goto usleep
-	if has_usleep == 0 goto test_usleep
-sl:
+	null $P0
+	.sym pmc USLEEP
+	dlfunc USLEEP, $P0, "usleep", "vi"
+	$I0 = defined USLEEP
+	if $I0 goto usleep
 	sleep 1
 	goto dumpend
-test_usleep:
-	null P0
-	dlfunc P0, P0, "usleep", "vi"
-	$I0 = defined P0
-	has_usleep = 1
-	if $I0 goto usleep
-	has_usleep = -1
-	goto sl
 usleep:
-	null P0
-	dlfunc P0, P0, "usleep", "vi"
-	I5 = delay
-	invoke
+	.pcc_begin prototyped
+	.arg delay
+	.nci_call USLEEP
+	.pcc_end
 dumpend:
-	restoreall
-	ret
+	.pcc_begin_return
+	.pcc_end_return
+.end
 
+.pcc_sub _init_curses prototyped
+	.local pmc INITSCR
+	.local pmc START_COLOR
+	.local pmc INIT_PAIR
+	.local pmc COLOR_PAIR
+	.local pmc WATTRON
+	.local pmc CURS_SET
+	.local pmc NODELAY
+	.local pmc KEYPAD
+	.local pmc STDSCR
+
+	INITSCR     = global "ncurses::initscr"
+	START_COLOR = global "ncurses::start_color"
+	INIT_PAIR   = global "ncurses::init_pair"
+	COLOR_PAIR  = global "ncurses::COLOR_PAIR"
+	WATTRON     = global "ncurses::wattron"
+	CURS_SET    = global "ncurses::curs_set"
+	NODELAY     = global "ncurses::nodelay"
+	KEYPAD      = global "ncurses::keypad"
+
+	P0 = INITSCR
+	invoke
+	STDSCR = P5
+
+	P0 = START_COLOR
+	invoke
+
+	P0 = INIT_PAIR
+	I5 = 1		# Color pair 1
+	I6 = 2 		# dark green fg
+	I7 = 0		# Black background
+	invoke
+
+	P0 = COLOR_PAIR
+	I5 = 1
+	invoke
+
+	# We pass what's returned from COLOR_PAIR straight on
+	P0 = WATTRON
+	invoke
+
+	P0 = CURS_SET	# turn off cursor
+	I5 = 0
+	invoke
+
+	P0 = NODELAY	# set nodelay mode
+	P5 = STDSCR
+	I5 = 1
+	invoke
+
+	P0 = KEYPAD	# set keypad mode
+	P5 = STDSCR
+	I5 = 1
+	invoke
+	.pcc_begin_return
+	.return STDSCR
+	.pcc_end_return
 .end
 
 # in: world (string)

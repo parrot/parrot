@@ -871,7 +871,7 @@ move_cc:
      * locate return label,
      * we must have one or the parser would have failed
      */
-    if (ins->next->type == ITLABEL)
+    if (ins->next->type == ITLABEL && sub->pcc_sub->label)
         ins = ins->next;
     ins = insINS(interpreter, ins, "restoretop", regs, 0);
     /*

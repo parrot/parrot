@@ -357,8 +357,8 @@ pcc_sub_call: PCC_BEGIN pcc_proto '\n' {
            PCC_END  '\n' { $$ = 0; }
     ;
 
-opt_label: /* empty */   { $$ = 0; }
-         | label '\n'
+opt_label: /* empty */   { $$ = NULL;  $<sr>-2 ->pcc_sub->label = 0; }
+         | label '\n'    { $$ = NULL;  $<sr>-2 ->pcc_sub->label = 1; }
     ;
 
 pcc_proto: PROTOTYPED           { $$ = 1; }

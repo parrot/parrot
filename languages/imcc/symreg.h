@@ -113,6 +113,7 @@ struct pcc_sub_t {
     int prototyped;
     int calls_a_sub;
     int nci;
+    int label;
 };
 
 
