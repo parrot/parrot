@@ -134,6 +134,7 @@ utf8_skip_backward(const void *ptr, UINTVAL n)
 }
 
 const ENCODING utf8_encoding = {
+    enum_encoding_utf8,
     "utf8",
     UTF8_MAXLEN,
     utf8_characters,

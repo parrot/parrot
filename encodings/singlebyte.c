@@ -60,6 +60,7 @@ singlebyte_skip_backward(const void *ptr, UINTVAL n)
 }
 
 const ENCODING singlebyte_encoding = {
+    enum_encoding_singlebyte,
     "singlebyte",
     1,
     singlebyte_characters,

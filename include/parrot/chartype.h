@@ -15,7 +15,14 @@
 
 typedef Parrot_UInt (*Parrot_CharType_Transcoder)(Parrot_UInt c);
 
+enum {
+    enum_chartype_unicode,
+    enum_chartype_usascii,
+    enum_chartype_MAX
+};
+
 struct parrot_chartype_t {
+    INTVAL index;
     const char *name;
     const char *default_encoding;
     Parrot_CharType_Transcoder (*transcode_from)(const char *from);
@@ -26,12 +33,18 @@ struct parrot_chartype_t {
 
 #define Parrot_CharType struct parrot_chartype_t *
 
-const Parrot_CharType Parrot_chartype_lookup(const char *name);
-
 #ifdef PARROT_IN_CORE
 
 #define CHARTYPE struct parrot_chartype_t
+const CHARTYPE *
+chartype_lookup_index(INTVAL n);
+
 typedef Parrot_CharType_Transcoder CHARTYPE_TRANSCODER;
+
+CHARTYPE_TRANSCODER
+chartype_lookup_transcoder(const CHARTYPE *from, const CHARTYPE *to);
+
+const Parrot_CharType Parrot_chartype_lookup(const char *name);
 
 #define chartype_lookup Parrot_chartype_lookup
 

@@ -65,6 +65,7 @@ utf32_skip_backward(const void *ptr, UINTVAL n)
 }
 
 const ENCODING utf32_encoding = {
+    enum_encoding_utf32,
     "utf32",
     4,
     utf32_characters,

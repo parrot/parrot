@@ -37,6 +37,7 @@ unicode_get_digit(UINTVAL c)
 }
 
 const CHARTYPE unicode_chartype = {
+    enum_chartype_unicode,
     "unicode",
     "utf32",
     unicode_transcode_from,

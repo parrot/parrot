@@ -143,7 +143,7 @@ ${make_set_make}
 .c$(O):
 	$(CC) $(CFLAGS) ${cc_o_out}$@ -c $<
 
-all : $(TEST_PROG) $(PDUMP) docs
+all : $(TEST_PROG) docs
 
 mops: examples/assembly/mops${exe} examples/mops/mops${exe}
 
@@ -218,8 +218,8 @@ $(TEST_PROG_SO): test_main$(O) blib/lib/libparrot$(SO) lib/Parrot/OpLib/core.pm 
 # Parrot Dump
 #
 
-$(PDUMP): pdump$(O) $(O_FILES)
-	$(LD) ${ld_out}$(PDUMP) $(O_FILES) pdump$(O) $(C_LIBS) $(LDFLAGS)
+#$(PDUMP): pdump$(O) packfile$(O)
+	#$(LD) ${ld_out}$(PDUMP) pdump$(O) packfile$(O) string$(O) chartype$(O) memory$(O) $(C_LIBS) $(LDFLAGS)
 
 
 ###############################################################################

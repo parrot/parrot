@@ -63,6 +63,7 @@ usascii_get_digit(UINTVAL c)
 }
 
 const CHARTYPE usascii_chartype = {
+    enum_chartype_usascii,
     "usascii",
     "singlebyte",
     usascii_transcode_from,

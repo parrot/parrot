@@ -13,7 +13,16 @@
 #if !defined(PARROT_ENCODING_H_GUARD)
 #define PARROT_ENCODING_H_GUARD
 
+enum {
+    enum_encoding_singlebyte,
+    enum_encoding_utf8,
+    enum_encoding_utf16,
+    enum_encoding_utf32,
+    enum_encoding_MAX
+};
+
 struct parrot_encoding_t {
+    INTVAL index;
     const char *name;
     Parrot_UInt max_bytes;
      Parrot_UInt(*characters) (const void *ptr, Parrot_UInt bytes);
@@ -34,6 +43,9 @@ const Parrot_Encoding Parrot_encoding_lookup(const char *name);
 #define encoding_lookup Parrot_encoding_lookup
 
 #endif
+
+const ENCODING *
+encoding_lookup_index(INTVAL n);
 
 #endif
 
