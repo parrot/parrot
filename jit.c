@@ -173,6 +173,19 @@ make_branch_list(struct Parrot_Interp *interpreter,
                     cur_op + cur_op[op_info->arg_count - 1];
                 branch[cur_op[op_info->arg_count - 1]] |= JIT_BRANCH_TARGET;
             }
+            /* the labels of set_addr and newsub are branch targets too
+             * this is needed e.g. for JIT_CGP
+             */
+            else if (!strcmp(op_info->name, "set_addr"))
+                branch[cur_op - code_start + cur_op[op_info->arg_count - 1]] |=
+                    JIT_BRANCH_TARGET;
+            else if (!strcmp(op_info->name, "newsub")) {
+                branch[cur_op - code_start + cur_op[op_info->arg_count - 1]] |=
+                    JIT_BRANCH_TARGET;
+                if (op_info->arg_count == 5)
+                    branch[cur_op - code_start +
+                        cur_op[op_info->arg_count - 2]] |= JIT_BRANCH_TARGET;
+            }
         }
         /* The address of the next opcode */
         if ((op_info->jump & PARROT_JUMP_ENEXT) ||

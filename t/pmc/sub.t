@@ -282,8 +282,6 @@ func1:
 
     invoke    # tail invoke (reuses context already in P1)
     print "this should not be called\n"
-    # XXX this end is here for JIT/i386
-    end
 
 func2:
     print "in func2\n"
