@@ -21,7 +21,7 @@ Outstanding Parrot archicture/design issues:
 
 Benchmark status/issues:
 
-  b1: passes.  Would perform better if xranges were implemented as an iter.
+  b1: passes.
   b2: passes.
   b3: need to implement __new__
   b4: there is no b4!

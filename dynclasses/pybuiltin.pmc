@@ -184,6 +184,11 @@ enter_nci_method should create these as locals to begin with.
         VTABLE_set_integer_native(INTERP, item, 15);
         scratchpad_store_by_name(INTERP, pad, 0, key, item);
 
+        /* TODO: convert this to instances of <type> */
+        key = const_string(INTERP, "xrange");
+        item = pmc_new(INTERP, enum_class_Slice);
+        scratchpad_store_by_name(INTERP, pad, 0, key, item);
+
         key = const_string(INTERP, "object");
         item = Parrot_class_lookup(interpreter, const_string(INTERP, "PyType"));
         scratchpad_store_by_name(INTERP, pad, 0, key, item);
@@ -854,23 +859,6 @@ Returns the tuple value of C<value>.
         }
 
         return ret;
-    }
-
-/*
-
-=item C<PMC* "xrange"(PMC *pstart, PMC *pend, PMC *pstep)>
-
-Returns an object which can be iterated over to obtain a list of
-integers ranging from C<pstart> to C<pend> with an increment of C<pstep>
-
-=cut
-
-TODO: actually do the above.  For now, simply return a list.  ;-)
-
-*/
-
-    METHOD PMC* xrange(PMC *pstart, PMC *pend, PMC *pstep) {
-        return Parrot_PyBuiltin_range(INTERP, SELF, pstart, pend, pstep);
     }
 
 /*
