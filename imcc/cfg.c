@@ -68,9 +68,9 @@ find_basic_blocks (Parrot_Interp interpreter, IMC_Unit * unit, int first)
 
     info(interpreter, 2, "find_basic_blocks\n");
     init_basic_blocks(unit);
-    for(i = 0; i < HASH_SIZE; i++) {
+    for (i = 0; i < HASH_SIZE; i++) {
         SymReg * r;
-        for(r = unit->hash[i]; r; r = r->next) {
+        for (r = unit->hash[i]; r; r = r->next) {
             if (r && (r->type & VTADDRESS)) {
                 r->last_ins = NULL;
             }
@@ -460,8 +460,8 @@ propagate_alias(Parrot_Interp interpreter)
 	    r0 = ins->r[0];
 	    r1 = ins->r[1];
 	    if (r1->type & VTREGISTER) {
-		for(ins = ins->next ; ins; ins = ins->next)
-		    if(instruction_writes(ins, r0))
+		for (ins = ins->next ; ins; ins = ins->next)
+		    if (instruction_writes(ins, r0))
 			break;
 		    else if (instruction_reads(ins, r0) &&
 			   !instruction_reads(ins, r1)) {
@@ -494,7 +494,7 @@ life_analysis(Parrot_Interp interpreter, IMC_Unit * unit)
 #ifdef ALIAS
     propagate_alias(interpreter);
 #endif
-    for(i = 0; i < unit->n_symbols; i++)
+    for (i = 0; i < unit->n_symbols; i++)
         analyse_life_symbol(interpreter, unit, reglist[i]);
 }
 
@@ -724,14 +724,14 @@ compute_dominators (Parrot_Interp interpreter, IMC_Unit * unit)
     len=1;
     cur=0;
 
-    while(cur < len) {
+    while (cur < len) {
         for (edge = unit->bb_list[q[cur]]->succ_list;
                 edge; edge = edge->succ_next) {
             succ_index = edge->to->index;
             set_intersec_inplace(dominators[succ_index], dominators[q[cur]]);
             set_add(dominators[succ_index],succ_index);
 
-            if(!set_contains(visited, succ_index)) {
+            if (!set_contains(visited, succ_index)) {
                 set_add(visited, succ_index);
                 q[len++] = succ_index;
             }
@@ -740,7 +740,7 @@ compute_dominators (Parrot_Interp interpreter, IMC_Unit * unit)
     }
 #else
     change = 1;
-    while(change) {
+    while (change) {
         change = 0;
 
         /* TODO: This 'for' should be a breadth-first search for speed */

@@ -35,7 +35,7 @@ Method * new_method(Symbol * sym, Symbol * label)
    return meth;
 }
 
-/* 
+/*
  * XXX: I suppose this is inadequate since there are
  * languages which may allow fields and methods to
  * be the same name.
@@ -60,9 +60,9 @@ void store_method_symbol(Class * cl, Symbol * sym)
 Symbol * lookup_field_symbol(Class *cl, const char * name)
 {
    Symbol * sym = lookup_symbol(cl->members, name);
-   if(!sym)
+   if (!sym)
       return NULL;
-   if(sym->symtype == SYMTYPE_FIELD)
+   if (sym->symtype == SYMTYPE_FIELD)
       return sym;
    return NULL;
 }
@@ -71,9 +71,9 @@ Symbol * lookup_field_symbol(Class *cl, const char * name)
 Symbol * lookup_method_symbol(Class *cl, const char * name)
 {
    Symbol * sym = lookup_symbol(cl->members, name);
-   if(!sym)
+   if (!sym)
       return NULL;
-   if(sym->symtype == SYMTYPE_METHOD)
+   if (sym->symtype == SYMTYPE_METHOD)
       return sym;
    return NULL;
 }

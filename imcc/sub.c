@@ -14,7 +14,7 @@
  * languages that want to interface with Perl6 on Parrot. PCC works
  * well with continuations and co-routines.
  *
- * Plans are for a FASTCALL convention which can be enabled with: 
+ * Plans are for a FASTCALL convention which can be enabled with:
  * .pragma fastcall
  * which will allow library developers (or non-Perl languages) to turn
  * on very efficient calling conventions. It could also be used for internal
@@ -27,8 +27,8 @@
  * The side effect is the subroutine code generators and optimizers can be
  * very modular and less interlocked to a specific convention.
  *
- */ 
-    
+ */
+
 #include <stdlib.h>
 #include <string.h>
 #include <assert.h>
@@ -49,7 +49,7 @@ expand_sub(Parrot_Interp interp, IMC_Unit * unit, Instruction *ins)
     /* For expand sub, we check the unit->type only, since the
      * pragma might be overridden.
      */
-    if(pragmas.fastcall) {
+    if (pragmas.fastcall) {
         expand_fast_sub(interp, unit, ins);
     }
     /* IMC_PCCSUB */
@@ -70,7 +70,7 @@ expand_sub_ret(Parrot_Interp interp, IMC_Unit * unit, Instruction *ins)
     PIO_eprintf(NULL, "expand_sub_ret\n");
 #endif
     /* IMC_FASTSUB */
-    if(pragmas.fastcall) {
+    if (pragmas.fastcall) {
         expand_fast_sub_ret(interp, unit, ins);
     }
     /* IMC_PCCSUB */
@@ -90,7 +90,7 @@ expand_sub_call(Parrot_Interp interp, IMC_Unit * unit, Instruction *ins)
     PIO_eprintf(NULL, "expand_sub_call\n");
 #endif
     /* IMC_FASTSUB */
-    if(pragmas.fastcall) {
+    if (pragmas.fastcall) {
         expand_fast_sub_call(interp, unit, ins);
     }
     /* IMC_PCCSUB */
@@ -108,7 +108,7 @@ void
 sub_optimize(Parrot_Interp interp, IMC_Unit * unit)
 {
     /* IMC_FASTSUB */
-    if(pragmas.fastcall) {
+    if (pragmas.fastcall) {
         pcc_sub_optimize(interp, unit);
     }
     /* IMC_PCCSUB */
@@ -118,7 +118,12 @@ sub_optimize(Parrot_Interp interp, IMC_Unit * unit)
 }
 
 
-
-
-
- 
+/*
+ * Local variables:
+ * c-indentation-style: bsd
+ * c-basic-offset: 4
+ * indent-tabs-mode: nil
+ * End:
+ *
+ * vim: expandtab shiftwidth=4:
+ */

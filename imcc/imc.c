@@ -30,11 +30,11 @@ void imc_check_units(struct Parrot_Interp *interp, char * caller)
     UNUSED(caller);
 #if IMC_TRACE
     fprintf(stderr, "imc.c: unit check pass %d from %s\n", ++ncheck, caller);
-    for(unit = interp->imc_info->imc_units; unit; unit = unit_next) {
+    for (unit = interp->imc_info->imc_units; unit; unit = unit_next) {
         unit_next = unit->next;
         {
             Instruction *ins = unit->instructions;
-            if(ins->r[1] && ins->r[1]->pcc_sub) {
+            if (ins->r[1] && ins->r[1]->pcc_sub) {
 #if IMC_TRACE_HIGH
                 fprintf(stderr, "UNIT[%d] : pcc_sub %s (nargs=%d)\n",
                      i, ins->r[1]->name, ins->r[1]->pcc_sub->nargs);
@@ -60,7 +60,7 @@ imc_compile_all_units(struct Parrot_Interp *interp)
 #endif
     UNUSED(ins_next);
     UNUSED(ins);
-    for(unit = interp->imc_info->imc_units; unit; unit = unit_next) {
+    for (unit = interp->imc_info->imc_units; unit; unit = unit_next) {
         unit_next = unit->next;
 #if IMC_TRACE
         fprintf(stderr, "compiling unit %d\n", i++);
@@ -76,7 +76,7 @@ imc_compile_all_units(struct Parrot_Interp *interp)
      * in the symbol tables.
      */
 #if 1
-    for(unit = interp->imc_info->imc_units; unit;) {
+    for (unit = interp->imc_info->imc_units; unit;) {
         unit_next = unit->next;
 #if 0
         for (ins = unit->instructions; ins; ) {
@@ -146,10 +146,10 @@ imc_open_unit(Parrot_Interp interp, IMC_Unit_Type t)
 {
     IMC_Unit * unit;
     unit = imc_new_unit(t);
-    if(!interp->imc_info->imc_units)
+    if (!interp->imc_info->imc_units)
        interp->imc_info->imc_units = unit;
     unit->prev = interp->imc_info->last_unit;
-    if(interp->imc_info->last_unit)
+    if (interp->imc_info->last_unit)
        interp->imc_info->last_unit->next = unit;
     interp->imc_info->last_unit = unit;
     interp->imc_info->n_comp_units++;
@@ -231,7 +231,7 @@ imc_pragma(char * str)
     fprintf(stderr, "imc_pragma %s\n", str);
 #endif
     if     (!strcmp(str, "fastcall"))   pragmas.fastcall = 1;
-    else if(!strcmp(str, "prototyped")) pragmas.prototyped = 1;
+    else if (!strcmp(str, "prototyped")) pragmas.prototyped = 1;
     else return;
     /* More options here */
 }

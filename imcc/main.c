@@ -426,7 +426,7 @@ main(int argc, char * argv[])
     }
     else {
         char *ext;
-        if(!(yyin = fopen(sourcefile, "r")))    {
+        if (!(yyin = fopen(sourcefile, "r")))    {
             fatal(EX_IOERR, "main", "Error reading source file %s.\n",
                     sourcefile);
         }

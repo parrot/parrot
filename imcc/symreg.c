@@ -66,7 +66,7 @@ SymReg *
 _mk_symreg(SymReg* hsh[], char * name, int t)
 {
     SymReg * r;
-    if((r = _get_sym(hsh, name)) && r->set == t) {
+    if ((r = _get_sym(hsh, name)) && r->set == t) {
 	free(name);
         return r;
     }
@@ -81,7 +81,7 @@ _mk_symreg(SymReg* hsh[], char * name, int t)
     r->set = t;
     r->type = VTREG;
 
-    if(name[0])
+    if (name[0])
         _store_symreg(hsh,r);
     return r;
 }
@@ -102,16 +102,16 @@ symreg_to_str(SymReg * s)
     int t = s->type;
     sprintf(buf, "symbol [%s]  set [%c]  color [%d]  type [",
                  s->name, s->set, s->color);
-    if(t & VTCONST)      { strcat(buf, "VTCONST ");      }
-    if(t & VTREG)        { strcat(buf, "VTREG ");        }
-    if(t & VTIDENTIFIER) { strcat(buf, "VTIDENTIFIER "); }
-    if(t & VTADDRESS)    { strcat(buf, "VTADDRESS ");    }
-    if(t & VTREGKEY)     { strcat(buf, "VTREGKEY ");     }
-    if(t & VTPASM)       { strcat(buf, "VTPASM ");       }
-    if(t & VT_REGP)      { strcat(buf, "VT_REGP ");      }
-    if(t & VT_CONSTP)    { strcat(buf, "VT_CONSTP ");    }
-    if(t & VT_PCC_SUB)   { strcat(buf, "VT_PCC_SUB ");   }
-    if(t & VT_FLATTEN)   { strcat(buf, "VT_FLATTEN ");   }
+    if (t & VTCONST)      { strcat(buf, "VTCONST ");      }
+    if (t & VTREG)        { strcat(buf, "VTREG ");        }
+    if (t & VTIDENTIFIER) { strcat(buf, "VTIDENTIFIER "); }
+    if (t & VTADDRESS)    { strcat(buf, "VTADDRESS ");    }
+    if (t & VTREGKEY)     { strcat(buf, "VTREGKEY ");     }
+    if (t & VTPASM)       { strcat(buf, "VTPASM ");       }
+    if (t & VT_REGP)      { strcat(buf, "VT_REGP ");      }
+    if (t & VT_CONSTP)    { strcat(buf, "VT_CONSTP ");    }
+    if (t & VT_PCC_SUB)   { strcat(buf, "VT_PCC_SUB ");   }
+    if (t & VT_FLATTEN)   { strcat(buf, "VT_FLATTEN ");   }
     strcat(buf, "]");
     return str_dup(buf);
 }
@@ -144,15 +144,15 @@ add_pcc_arg(SymReg *r, SymReg * arg)
 {
     int n = r->pcc_sub->nargs;
 #if IMC_TRACE_HIGH
-    PIO_eprintf(NULL, "add_pcc_arg(%s)\n", arg->name); 
+    PIO_eprintf(NULL, "add_pcc_arg(%s)\n", arg->name);
 #endif
     r->pcc_sub->args = realloc(r->pcc_sub->args, (n + 1) * sizeof(SymReg *));
-    if(arg->type & (VTCONST)) {
+    if (arg->type & (VTCONST)) {
         r->pcc_sub->args[n] = dup_sym(arg);
         r->pcc_sub->args[n]->reg = arg;
         r->pcc_sub->args[n]->type = VT_CONSTP;
     }
-    else if(arg->type & (VTREGISTER)) {
+    else if (arg->type & (VTREGISTER)) {
         r->pcc_sub->args[n] = dup_sym(arg);
         r->pcc_sub->args[n]->reg = arg;
         r->pcc_sub->args[n]->type = VT_REGP;
@@ -160,14 +160,14 @@ add_pcc_arg(SymReg *r, SymReg * arg)
     /* If this is already a pointer, dup the symbol
      * that it point to, not the pointer itself.
      */
-    else if(arg->type & (VT_CONSTP)) {
+    else if (arg->type & (VT_CONSTP)) {
         r->pcc_sub->args[n] = dup_sym(arg->reg);
         r->pcc_sub->args[n]->reg = arg->reg;
         r->pcc_sub->args[n]->type = VT_CONSTP;
     }
     else
         fataly(EX_SOFTWARE, sourcefile, line,
-                "sub argument is not a valid arg (const, constp or reg) '%s'\n%s",
+            "sub argument is not a valid arg (const, constp or reg) '%s'\n%s",
                      arg->name, symreg_to_str(arg));
     r->pcc_sub->nargs++;
 }
@@ -222,10 +222,11 @@ add_pcc_cc(SymReg *r, SymReg * arg)
     r->pcc_sub->cc->type = VT_REGP;
 }
 
-SymReg * mk_pasm_reg(char * name)
+SymReg *
+mk_pasm_reg(char * name)
 {
     SymReg * r;
-    if((r = _get_sym(cur_unit->hash, name))) {
+    if ((r = _get_sym(cur_unit->hash, name))) {
 	free(name);
         return r;
     }
@@ -249,13 +250,15 @@ _mk_fullname(Namespace * ns, const char * name)
     return result;
 }
 
-char * mk_fullname(const char * name)
+char *
+mk_fullname(const char * name)
 {
     return _mk_fullname(namespace, name);
 }
 
 /* Makes a new identifier */
-SymReg * mk_ident(char * name, int t)
+SymReg *
+mk_ident(char * name, int t)
 {
     char * fullname = _mk_fullname(namespace, name);
     Identifier * ident;
@@ -316,7 +319,7 @@ _mk_address(SymReg *hsh[], char * name, int uniq)
         return r;
     }
 
-    if(uniq && (r = _get_sym(hsh, name)) &&
+    if (uniq && (r = _get_sym(hsh, name)) &&
             r->type == VTADDRESS &&
             r->lhs_use_count            /* we use this for labels/subs */
       ) {
@@ -335,12 +338,13 @@ _mk_address(SymReg *hsh[], char * name, int uniq)
     return r;
 }
 
-SymReg * mk_address(char * name, int uniq)
+SymReg *
+mk_address(char * name, int uniq)
 {
     SymReg * s;
     SymReg ** h = *name == '_' ? ghash : cur_unit->hash;
     s = _mk_address(h, name, uniq);
-    if(*name == '_')
+    if (*name == '_')
        s->usage |= U_FIXUP;
     return s;
 }
@@ -349,7 +353,8 @@ SymReg * mk_address(char * name, int uniq)
  * Make and store a new address label for a sub.
  * Label gets a fixup entry.
  */
-SymReg * mk_sub_label(char * name)
+SymReg *
+mk_sub_label(char * name)
 {
     SymReg * s = _mk_address(ghash, name, U_add_uniq_sub);
     s->usage |= U_FIXUP;
@@ -359,17 +364,19 @@ SymReg * mk_sub_label(char * name)
 /*
  * Make a symbol for a label, symbol gets a fixup entry.
  */
-SymReg * mk_sub_address(char * name)
+SymReg *
+mk_sub_address(char * name)
 {
     SymReg * s = _mk_address(ghash, name, U_add_once);
     s->usage |= U_FIXUP;
-    return s;  
+    return s;
 }
 
 /*
  * Make a local symbol, no fixup entry.
  */
-SymReg * mk_local_label(IMC_Unit * unit, char * name)
+SymReg *
+mk_local_label(IMC_Unit * unit, char * name)
 {
     return _mk_address(unit->hash, name, U_add_uniq_label);
 }
@@ -377,7 +384,8 @@ SymReg * mk_local_label(IMC_Unit * unit, char * name)
 /*
  *
  */
-SymReg * mk_label_address(IMC_Unit * unit, char * name)
+SymReg *
+mk_label_address(IMC_Unit * unit, char * name)
 {
     return _mk_address(unit->hash, name, U_add_once);
 }
@@ -542,11 +550,11 @@ _get_sym(SymReg * hsh[], const char * name)
 {
     SymReg * p;
     int i = hash_str(name) % HASH_SIZE;
-    for(p = hsh[i]; p; p = p->next) {
+    for (p = hsh[i]; p; p = p->next) {
 #if IMC_TRACE_HIGH
         printf("   [%s]\n", p->name);
 #endif
-	if(!strcmp(name, p->name))
+	if (!strcmp(name, p->name))
 	    return p;
     }
     return 0;
@@ -586,7 +594,7 @@ _find_sym(Namespace * nspace, SymReg * hsh[], const char * name)
 SymReg *
 find_sym(const char * name)
 {
-    if(cur_unit)
+    if (cur_unit)
         return _find_sym(namespace, cur_unit->hash, name);
     return NULL;
 }
@@ -597,9 +605,9 @@ _delete_sym(IMC_Unit * unit, const char * name)
 {
     SymReg ** p;
     int i = hash_str(name) % HASH_SIZE;
-    for(p = &unit->hash[i]; *p; p = &(*p)->next) {
+    for (p = &unit->hash[i]; *p; p = &(*p)->next) {
         SymReg * deadmeat = *p;
-	if(!strcmp(name, deadmeat->name)) {
+	if (!strcmp(name, deadmeat->name)) {
             *p = deadmeat->next;
             if (deadmeat->life_info){
 	        free_life_info(unit, deadmeat);
@@ -618,8 +626,8 @@ clear_sym_hash(SymReg **hsh)
 {
     int i;
     SymReg * p, *next;
-    for(i = 0; i < HASH_SIZE; i++) {
-	for(p = hsh[i]; p; ) {
+    for (i = 0; i < HASH_SIZE; i++) {
+	for (p = hsh[i]; p; ) {
 	    next = p->next;
 	    free_sym(p);
 	    p = next;
@@ -635,10 +643,10 @@ clear_locals(IMC_Unit * unit)
     int i;
     SymReg * p, *next;
     SymReg **hsh = unit->hash;
-    for(i = 0; i < HASH_SIZE; i++) {
-	for(p = hsh[i]; p; ) {
+    for (i = 0; i < HASH_SIZE; i++) {
+	for (p = hsh[i]; p; ) {
 	    next = p->next;
-            if(unit && p->life_info) {
+            if (unit && p->life_info) {
                 free_life_info(unit, p);
             }
 	    free_sym(p);
@@ -655,8 +663,8 @@ clear_globals()
     int i;
     SymReg * p, *next;
 
-    for(i = 0; i < HASH_SIZE; i++) {
-        for(p = ghash[i]; p; ) {
+    for (i = 0; i < HASH_SIZE; i++) {
+        for (p = ghash[i]; p; ) {
 	    next = p->next;
             if (p->type & VTADDRESS)
                 p->first_ins = p->last_ins = NULL;
@@ -675,7 +683,7 @@ hash_str(const char * str)
 {
     unsigned long key = 0;
     const char * s;
-    for(s=str; *s; s++)
+    for (s=str; *s; s++)
         key = key * 65599 + *s;
     return key;
 }

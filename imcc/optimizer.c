@@ -59,7 +59,7 @@ static void subst_constants_mix(struct Parrot_Interp *interpreter, IMC_Unit *);
 static void subst_constants_umix(struct Parrot_Interp *interpreter, IMC_Unit *);
 static void subst_constants(struct Parrot_Interp *interpreter, IMC_Unit *);
 static void subst_constants_c(struct Parrot_Interp *interpreter, IMC_Unit *);
-static void subst_constants_if(struct Parrot_Interp *interpreter, IMC_Unit *);
+static void subst_constants_if (struct Parrot_Interp *interpreter, IMC_Unit *);
 
 static int constant_propagation(struct Parrot_Interp *interpreter, IMC_Unit *);
 static int used_once(struct Parrot_Interp *, IMC_Unit *);
@@ -77,7 +77,7 @@ pre_optimize(struct Parrot_Interp *interpreter, IMC_Unit * unit)
         subst_constants_umix(interpreter, unit);
         subst_constants(interpreter, unit);
         subst_constants_c(interpreter, unit);
-        subst_constants_if(interpreter, unit);
+        subst_constants_if (interpreter, unit);
         strength_reduce(interpreter, unit);
         if (!dont_optimize)
             if_branch(interpreter, unit);
@@ -372,12 +372,12 @@ constant_propagation(struct Parrot_Interp *interpreter, IMC_Unit * unit)
                         }
                     }
 
-                }/* for(i ... )*/
-            }/* for(ins2 ... )*/
+                }/* for (i ... )*/
+            }/* for (ins2 ... )*/
         } /* if */
 next_constant:;
 
-    }/*for(ins ... )*/
+    }/*for (ins ... )*/
     return any;
 }
 
@@ -752,7 +752,7 @@ do_res:
  * rewrite e.g. if_ic_ic => branch_ic/nothing
  */
 static void
-subst_constants_if(struct Parrot_Interp *interpreter, IMC_Unit * unit)
+subst_constants_if (struct Parrot_Interp *interpreter, IMC_Unit * unit)
 {
     Instruction *ins, *tmp;
     const char *ops[] = { "if", "unless" };

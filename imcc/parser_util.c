@@ -31,8 +31,8 @@
  * best would be to have a flag in core.ops, where a PMC type is expected
  */
 Instruction *
-iNEW(struct Parrot_Interp *interpreter, IMC_Unit * unit, SymReg * r0, char * type,
-        SymReg *init, int emit)
+iNEW(struct Parrot_Interp *interpreter, IMC_Unit * unit, SymReg * r0,
+        char * type, SymReg *init, int emit)
 {
     char fmt[256];
     SymReg *regs[IMCC_MAX_REGS];
@@ -82,8 +82,8 @@ iNEW(struct Parrot_Interp *interpreter, IMC_Unit * unit, SymReg * r0, char * typ
  */
 
 Instruction *
-iNEWSUB(struct Parrot_Interp *interpreter, IMC_Unit * unit, SymReg * r0, int type,
-        SymReg *subinit, SymReg *retinit, int emit)
+iNEWSUB(struct Parrot_Interp *interpreter, IMC_Unit * unit, SymReg * r0,
+        int type, SymReg *subinit, SymReg *retinit, int emit)
 {
     char fmt[256];
     SymReg *regs[IMCC_MAX_REGS];
@@ -112,7 +112,7 @@ iNEWSUB(struct Parrot_Interp *interpreter, IMC_Unit * unit, SymReg * r0, int typ
     sprintf(fmt, "%%s, %d\t # .%s", pmc_num, classnm);
 
     /* 1st form:   px = newsub _foo */
-    if(!retinit) {
+    if (!retinit) {
         r0->usage = U_NEW;
         regs[0] = r0;
         regs[1] = subpmc;
@@ -128,7 +128,7 @@ iNEWSUB(struct Parrot_Interp *interpreter, IMC_Unit * unit, SymReg * r0, int typ
      * XXX: Currently px is ignored, this op sets P0/P1 implicitly
      */
     else {
-        if(!subinit) { /* sanity check */
+        if (!subinit) { /* sanity check */
             fataly(1, sourcefile, line, "iNEWSUB: NULL $0 for newsub\n");
         }
 
@@ -266,8 +266,8 @@ is_op(struct Parrot_Interp *interpreter, char *name)
  * s. e.g. imc.c for usage
  */
 Instruction *
-INS(struct Parrot_Interp *interpreter, IMC_Unit * unit, char *name, const char *fmt,
-      SymReg **r, int n, int keyvec, int emit)
+INS(struct Parrot_Interp *interpreter, IMC_Unit * unit, char *name,
+        const char *fmt, SymReg **r, int n, int keyvec, int emit)
 {
     char fullname[64];
     int i;
@@ -511,7 +511,7 @@ imcc_compile_file (Parrot_Interp interp, const char *s)
     } __ptr_u;
 #define const_cast(b) (__ptr_u.__c_ptr = (b), __ptr_u.__ptr)
 
-    if(!(new = fopen(s, "r"))) {
+    if (!(new = fopen(s, "r"))) {
         fatal(1, "imcc_compile_file", "couldn't open '%s'\n", s);
         return NULL;
     }
@@ -569,8 +569,8 @@ register_compilers(Parrot_Interp interp)
  *      ge_n_ic_ic => ge_n_nc_ic
  */
 int
-try_find_op(Parrot_Interp interpreter, IMC_Unit * unit, char *name, SymReg ** r,
-        int n, int keyvec, int emit)
+try_find_op(Parrot_Interp interpreter, IMC_Unit * unit, char *name,
+        SymReg ** r, int n, int keyvec, int emit)
 {
     char fullname[64];
     SymReg *s;

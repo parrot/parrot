@@ -81,7 +81,7 @@ imc_reg_alloc(struct Parrot_Interp *interpreter, IMC_Unit * unit)
 
 #if IMC_TRACE
     fprintf(stderr, "reg_alloc.c: imc_reg_alloc\n");
-    if(unit->instructions->r[1] && unit->instructions->r[1]->pcc_sub) {
+    if (unit->instructions->r[1] && unit->instructions->r[1]->pcc_sub) {
         fprintf(stderr, "img_reg_alloc: pcc_sub (nargs = %d)\n",
             unit->instructions->r[1]->pcc_sub->nargs);
     }
@@ -213,9 +213,9 @@ make_stat(IMC_Unit * unit, int *sets, int *cols)
     /* register usage summary */
     char type[] = "INSP";
     int i, j;
-    for(i = 0; i < HASH_SIZE; i++) {
+    for (i = 0; i < HASH_SIZE; i++) {
         SymReg * r = unit->hash[i];
-    	for(; r; r = r->next)
+    	for (; r; r = r->next)
             for (j = 0; j < 4; j++)
                 if (r->set == type[j] && (r->type & VTREGISTER)) {
                     sets[j]++;
@@ -260,7 +260,8 @@ static void print_stat(Parrot_Interp interpreter, IMC_Unit * unit)
 
 /* sort list by line  nr */
 static int
-reg_sort_f(const void *a, const void *b) {
+reg_sort_f(const void *a, const void *b)
+{
     SymReg *ra = *(SymReg**) a;
     SymReg *rb = *(SymReg**) b;
     if (ra->first_ins->index < rb->first_ins->index) {
@@ -291,10 +292,10 @@ build_reglist(Parrot_Interp interpreter, IMC_Unit * unit)
     /* count symbols */
     if (unit->reglist)
         free_reglist(unit);
-    for(i = count = 0; i < HASH_SIZE; i++) {
+    for (i = count = 0; i < HASH_SIZE; i++) {
         SymReg * r = unit->hash[i];
-        for(; r; r = r->next)
-            if(r->type & VTREGISTER)
+        for (; r; r = r->next)
+            if (r->type & VTREGISTER)
                 count++;
     }
     n_symbols = count;
@@ -308,11 +309,11 @@ build_reglist(Parrot_Interp interpreter, IMC_Unit * unit)
         fatal(1, "build_reglist","Out of mem\n");
     }
 
-    for(i = count = 0; i < HASH_SIZE; i++) {
+    for (i = count = 0; i < HASH_SIZE; i++) {
         SymReg * r = unit->hash[i];
         /* Add each symbol to reglist  */
-        for(; r; r = r->next) {
-            if(r->type & VTREGISTER) {
+        for (; r; r = r->next) {
+            if (r->type & VTREGISTER) {
                 if (r->type & VT_REGP)
                     unit->reglist[count++] = r->reg;
                 else
@@ -395,18 +396,18 @@ compute_du_chain(IMC_Unit * unit)
     lastbranch = 0;
 
     /* Compute last branch in this procedure, update instruction index */
-    for(i = 0, ins = unit->instructions; ins; ins = ins->next) {
+    for (i = 0, ins = unit->instructions; ins; ins = ins->next) {
         ins->index = i++;
-        if(ins->type == ITBRANCH)
+        if (ins->type == ITBRANCH)
             lastbranch = ins;
     }
 
     /* Compute du-chains for all symbolics */
-    for(i = 0; i < n_symbols; i++) {
+    for (i = 0; i < n_symbols; i++) {
         SymReg * r = unit->reglist[i];
         compute_one_du_chain(r, unit);
         /* what is this used for? -lt */
-        if(r->type == VTIDENTIFIER
+        if (r->type == VTIDENTIFIER
                 && lastbranch
                 && r->last_ins
                 && r->last_ins->index < lastbranch->index)
@@ -426,11 +427,11 @@ compute_one_du_chain(SymReg * r, IMC_Unit * unit)
 
     r->first_ins = 0;
     r->use_count = r->lhs_use_count = 0;
-    for(ins = unit->instructions; ins; ins = ins->next) {
+    for (ins = unit->instructions; ins; ins = ins->next) {
         int ro, rw;
         ro = instruction_reads(ins, r);
         rw = instruction_writes(ins, r);
-        if(ro || rw) {
+        if (ro || rw) {
             if (!r->first_ins) {
                 r->first_ins = ins;
             }
@@ -459,7 +460,7 @@ compute_spilling_costs (Parrot_Interp interpreter, IMC_Unit * unit)
     SymReg *r;
     Instruction * ins;
 
-    for(i = 0; i < n_symbols; i++) {
+    for (i = 0; i < n_symbols; i++) {
         r = unit->reglist[i];
         r->score = r->use_count + (r->lhs_use_count << 2);
         /* TODO score high if -Oj and register is used in
@@ -514,7 +515,8 @@ done:
  */
 
 static int
-interferes(IMC_Unit * unit, SymReg * r0, SymReg * r1) {
+interferes(IMC_Unit * unit, SymReg * r0, SymReg * r1)
+{
 
     int i;
 
@@ -596,18 +598,19 @@ interferes(IMC_Unit * unit, SymReg * r0, SymReg * r1) {
  */
 #ifdef DO_SIMPLIFY
 static int
-simplify (IMC_Unit * unit) {
+simplify (IMC_Unit * unit)
+{
     int changes = 0;
     int x;
     SymReg **g;
 
     g = unit->reglist;
 
-    for(x = 0; x < n_symbols; x++) {
+    for (x = 0; x < n_symbols; x++) {
         if (g[x]->color >= 0)   /* VTPASM */
             g[x]->simplified = 1;
     }
-    for(x = 0; x < n_symbols; x++) {
+    for (x = 0; x < n_symbols; x++) {
 	if (g[x]->simplified) {
             break;
 	}
@@ -636,7 +639,8 @@ simplify (IMC_Unit * unit) {
  */
 
 static void
-order_spilling (IMC_Unit * unit) {
+order_spilling (IMC_Unit * unit)
+{
     int min_score = 0, total_score;
     int min_node;
     int x;
@@ -645,7 +649,7 @@ order_spilling (IMC_Unit * unit) {
 
 	min_node = -1;
 
-        for(x = 0; x < n_symbols; x++) {
+        for (x = 0; x < n_symbols; x++) {
 
             /* for now, our score function only
 	       takes in account how many times a symbols
@@ -678,7 +682,8 @@ order_spilling (IMC_Unit * unit) {
 
 
 static void
-restore_interference_graph(IMC_Unit * unit) {
+restore_interference_graph(IMC_Unit * unit)
+{
     int i;
     for (i=0; i < n_symbols; i++) {
         if ((unit->reglist[i]->type & VTPASM) && !(optimizer_level & OPT_PASM))
@@ -724,7 +729,8 @@ allocate_wanted_regs(IMC_Unit * unit)
  */
 
 static int
-try_allocate(Parrot_Interp interpreter, IMC_Unit * unit) {
+try_allocate(Parrot_Interp interpreter, IMC_Unit * unit)
+{
     int x = 0;
     int color, colors[MAX_COLOR];
     int free_colors, t;
@@ -779,7 +785,8 @@ try_allocate(Parrot_Interp interpreter, IMC_Unit * unit) {
  * map_colors: calculates what colors can be assigned to the x-th symbol.
  */
 static int
-map_colors(int x, SymReg ** graph, int colors[], int typ) {
+map_colors(int x, SymReg ** graph, int colors[], int typ)
+{
     int y = 0;
     SymReg * r;
     int color, free_colors;
@@ -787,15 +794,15 @@ map_colors(int x, SymReg ** graph, int colors[], int typ) {
     /* reserved for spilling */
     if (typ == 'P')
         colors[31] = 1;
-    for(y = 0; y < n_symbols; y++) {
-        if((r = graph[x*n_symbols+y])
+    for (y = 0; y < n_symbols; y++) {
+        if ((r = graph[x*n_symbols+y])
     	    && r->color != -1
 	    && r->set == typ) {
     	    colors[r->color] = 1;
     	}
     }
-    for(color = free_colors = 0; color < MAX_COLOR; color++)
-	if(!colors[color])
+    for (color = free_colors = 0; color < MAX_COLOR; color++)
+	if (!colors[color])
 	    free_colors++;
     return free_colors;
 }
@@ -820,7 +827,7 @@ update_life(Parrot_Interp interpreter, IMC_Unit * unit, Instruction *ins,
     fprintf(stderr, "reg_alloc.c: update_life(%s)\n", r->name);
 #endif
 
-    for(i = 0, ins2 = unit->instructions; ins2; ins2 = ins2->next) {
+    for (i = 0, ins2 = unit->instructions; ins2; ins2 = ins2->next) {
         ins2->index = i++;
     }
     /* add this sym to reglist, if not there */
@@ -865,7 +872,8 @@ update_life(Parrot_Interp interpreter, IMC_Unit * unit, Instruction *ins,
  */
 
 static void
-update_interference(Parrot_Interp interpreter, IMC_Unit * unit, SymReg *old, SymReg *new)
+update_interference(Parrot_Interp interpreter, IMC_Unit * unit,
+        SymReg *old, SymReg *new)
 {
     int x, y;
     SymReg ** reglist = unit->reglist;
@@ -957,7 +965,7 @@ spill(struct Parrot_Interp *interpreter, IMC_Unit * unit, int spilled)
     else
         p31 = unit->p31;
 
-    for(ins = unit->instructions; ins; ins = ins->next) {
+    for (ins = unit->instructions; ins; ins = ins->next) {
 	needs_store = 0;
 	needs_fetch = 0;
 
@@ -1028,7 +1036,7 @@ spill(struct Parrot_Interp *interpreter, IMC_Unit * unit, int spilled)
 
 #if DOIT_AGAIN_SAM
     /* update index */
-    for(i = 0, ins = unit; ins; ins = ins->next) {
+    for (i = 0, ins = unit; ins; ins = ins->next) {
 	ins->index = i++;
     }
 #endif
@@ -1038,7 +1046,8 @@ spill(struct Parrot_Interp *interpreter, IMC_Unit * unit, int spilled)
 }
 
 static int
-neighbours(int node) {
+neighbours(int node)
+{
     int y, cnt;
     SymReg *r;
 

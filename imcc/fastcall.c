@@ -106,7 +106,7 @@ expand_fast_sub_call(Parrot_Interp interp, IMC_Unit * unit, Instruction *ins)
 #endif
 
     sub = ins->r[0];
-    for(i = 0; i < sub->pcc_sub->nargs; i++) {
+    for (i = 0; i < sub->pcc_sub->nargs; i++) {
         regs[0] = sub->pcc_sub->args[i];
         ins = insINS(interp, unit, ins, "save", regs, 1);
     }
@@ -116,11 +116,21 @@ expand_fast_sub_call(Parrot_Interp interp, IMC_Unit * unit, Instruction *ins)
 
     /* XXX: Only supports prototyped subs for now */
 
-    for(i = 0; i < sub->pcc_sub->nret; i++) {
+    for (i = 0; i < sub->pcc_sub->nret; i++) {
         ret = sub->pcc_sub->ret[i];
         regs[0] = mk_temp_reg(ret->set);
         ins = insINS(interp, unit, ins, "restore", regs, 1);
     }
 }
+
+/*
+ * Local variables:
+ * c-indentation-style: bsd
+ * c-basic-offset: 4
+ * indent-tabs-mode: nil
+ * End:
+ *
+ * vim: expandtab shiftwidth=4:
+*/
 
 

@@ -18,17 +18,19 @@
 #include "class.h"
 
 
-static int hash_str(const char * str)
+static int
+hash_str(const char * str)
 {
     unsigned long key = 0;
     const char * s;
-    for(s=str; *s; s++)
+    for (s=str; *s; s++)
         key = key * 65599 + *s;
-    return key;    
+    return key;
 }
 
 
-Symbol * new_symbol(const char * str)
+Symbol *
+new_symbol(const char * str)
 {
    Symbol * sym = calloc(1, sizeof(Symbol));
    sym->name = malloc(strlen(str)+1);
@@ -37,22 +39,24 @@ Symbol * new_symbol(const char * str)
 }
 
 
-SymbolTable * new_symbol_table(void)
+SymbolTable *
+new_symbol_table(void)
 {
    SymbolTable * st = calloc(1,sizeof(SymbolTable));
 
-   if(!st)
+   if (!st)
       abort();
 
    return st;
 }
 
 
-SymbolList * new_symbol_list(void)
+SymbolList *
+new_symbol_list(void)
 {
    SymbolList * sl = calloc(1,sizeof(SymbolList));
 
-   if(!sl)
+   if (!sl)
       abort();
 
    return sl;
@@ -62,10 +66,11 @@ SymbolList * new_symbol_list(void)
 /*
  * Store a symbol into table
  */
-void store_symbol(SymbolTable * st, Symbol * sym)
+void
+store_symbol(SymbolTable * st, Symbol * sym)
 {
    unsigned int i;
-   if(!sym)
+   if (!sym)
       return;
    i = hash_str(sym->name) % SYMTAB_HASHSIZE;
    sym->nextintable = st->table[i];
@@ -80,12 +85,13 @@ void store_symbol(SymbolTable * st, Symbol * sym)
  * Lookup a symbol by name in table.
  * No scope levels yet.
  */
-Symbol * lookup_symbol(SymbolTable * st, const char * name)
+Symbol *
+lookup_symbol(SymbolTable * st, const char * name)
 {
     Symbol * sym;
     unsigned int i = hash_str(name) % SYMTAB_HASHSIZE;
-    for(sym = st->table[i]; sym; sym = sym->nextintable) {
-        if(!strcmp(name, sym->name))
+    for (sym = st->table[i]; sym; sym = sym->nextintable) {
+        if (!strcmp(name, sym->name))
             return sym;
     }
 
@@ -93,11 +99,12 @@ Symbol * lookup_symbol(SymbolTable * st, const char * name)
 }
 
 
-void push_symbol(SymbolList * list, Symbol * sym)
+void
+push_symbol(SymbolList * list, Symbol * sym)
 {
     sym->nextinlist = list->head;
     list->head = sym;
-    if(!list->tail)
+    if (!list->tail)
        list->tail = sym;
 }
 
@@ -107,19 +114,20 @@ void push_symbol(SymbolList * list, Symbol * sym)
  * already belong to a list, the old list will become
  * invalid.
  */
-SymbolList * symtab_to_symlist(SymbolTable * st)
+SymbolList *
+symtab_to_symlist(SymbolTable * st)
 {
    Symbol * sym, * next;
    int i;
    SymbolList * list = new_symbol_list();
    sym = NULL;
-   for(i = 0; i < SYMTAB_HASHSIZE; i++) {
-      for(next = st->table[i]; next; next = next->nextintable) {
-         if(!list->head)
+   for (i = 0; i < SYMTAB_HASHSIZE; i++) {
+      for (next = st->table[i]; next; next = next->nextintable) {
+         if (!list->head)
             list->head = next;
-         if(sym)
+         if (sym)
             sym->nextinlist = next;
- 
+
          sym = next;
          sym->nextinlist = NULL;
       }

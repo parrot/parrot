@@ -279,7 +279,7 @@ store_bsr(SymReg * r, int pc, int offset)
     /* This is hackish but its better to have it here than in the
      * fixup code until we decide if we need the _globallabel semantic.
      */
-    if(r->name[0] == '_')
+    if (r->name[0] == '_')
        bsr->usage |= U_FIXUP;
 }
 
@@ -453,8 +453,8 @@ fixup_bsrs(struct Parrot_Interp *interpreter)
     int jumppc = 0;
 
     for (s = globals.cs->first; s; s = s->next) {
-        for(i = 0; i < HASH_SIZE; i++) {
-            for(bsr = s->bsrs[i]; bsr; bsr = bsr->next ) {
+        for (i = 0; i < HASH_SIZE; i++) {
+            for (bsr = s->bsrs[i]; bsr; bsr = bsr->next ) {
 #if IMC_TRACE_HIGH
                 fprintf(stderr, "fixup_bsr %s\n", bsr->name);
 #endif
@@ -791,9 +791,9 @@ constant_folding(struct Parrot_Interp *interpreter, IMC_Unit * unit)
     int i;
 
     /* go through all consts of current sub */
-    for(i = 0; i < HASH_SIZE; i++) {
+    for (i = 0; i < HASH_SIZE; i++) {
         /* normally constants are in ghash ... */
-        for(r = ghash[i]; r; r = r->next) {
+        for (r = ghash[i]; r; r = r->next) {
             if (r->type & VTCONST) {
                 add_1_const(interpreter, r);
             }
@@ -801,7 +801,7 @@ constant_folding(struct Parrot_Interp *interpreter, IMC_Unit * unit)
         /* ... but keychains 'K' are in local hash, they may contain
          * variables and constants
          */
-        for(r = unit->hash[i]; r; r = r->next) {
+        for (r = unit->hash[i]; r; r = r->next) {
             if (r->type & VTCONST) {
                 add_1_const(interpreter, r);
             }
