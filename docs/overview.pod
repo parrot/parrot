@@ -87,6 +87,9 @@ operations we perform on them will do Perlish things; if we execute
 Python code, we can manufacture PMCs with Python operations, and the
 same underlying bytecode will now perform Pythonic activities.
 
+For documentation on the specific PMCs that ship with Parrot, see the
+docs/pmc directory.
+
 =head1 Vtables
 
 The way we achieve this abstraction is to assign to each PMC a set of
