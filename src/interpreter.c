@@ -1,8 +1,6 @@
 /*
-################################################################################
 Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
 $Id$
-################################################################################
 
 =head1 NAME
 
@@ -32,7 +30,6 @@ have the same number of elements since there is a one-to-one mapping.
 
 =cut
 
-################################################################################
 */
 
 #include <assert.h>
@@ -63,7 +60,6 @@ static void setup_default_compreg(Parrot_Interp interpreter);
 static void setup_event_func_ptrs(Parrot_Interp interpreter);
 
 /*
-################################################################################
 
 =item C<static void
 prederef_args(void **pc_prederef, struct Parrot_Interp *interpreter,
@@ -75,7 +71,6 @@ C<pc_prederef> is the current opcode.
 
 =cut
 
-################################################################################
 */
 
 static void
@@ -165,7 +160,6 @@ prederef_args(void **pc_prederef, struct Parrot_Interp *interpreter,
 }
 
 /*
-################################################################################
 
 =item C<void
 do_prederef(void **pc_prederef, Parrot_Interp interpreter, int type)>
@@ -177,7 +171,6 @@ C<pc_prederef> is the current opcode, and C<type> is the run core type.
 
 =cut
 
-################################################################################
 */
 
 void
@@ -239,7 +232,6 @@ do_prederef(void **pc_prederef, Parrot_Interp interpreter, int type)
 }
 
 /*
-################################################################################
 
 =item C<static void
 turn_ev_check(Parrot_Interp interpreter, int on)>
@@ -254,7 +246,6 @@ handler thread.
 
 =cut
 
-################################################################################
 */
 
 static void
@@ -278,7 +269,6 @@ turn_ev_check(Parrot_Interp interpreter, int on)
 }
 
 /*
-################################################################################
 
 =item C<static oplib_init_f
 get_op_lib_init(int core_op, int which, PMC *lib)>
@@ -294,7 +284,6 @@ C<ParrotLibrary> PMC.
 
 =cut
 
-################################################################################
 */
 
 static oplib_init_f
@@ -332,7 +321,6 @@ get_op_lib_init(int core_op, int which, PMC *lib)
 }
 
 /*
-################################################################################
 
 =item C<static void
 load_prederef(struct Parrot_Interp *interpreter, int which)>
@@ -341,7 +329,6 @@ C<< interpreter->op_lib >> = prederefed oplib.
 
 =cut
 
-################################################################################
 */
 
 static void
@@ -361,7 +348,6 @@ load_prederef(struct Parrot_Interp *interpreter, int which)
 }
 
 /*
-################################################################################
 
 =item C<static void
 init_prederef(struct Parrot_Interp *interpreter, int which)>
@@ -370,7 +356,6 @@ Initialize: load prederef C<func_table>, file prederef.code.
 
 =cut
 
-################################################################################
 */
 
 static void
@@ -406,7 +391,6 @@ init_prederef(struct Parrot_Interp *interpreter, int which)
 }
 
 /*
-################################################################################
 
 =item C<static void
 stop_prederef(struct Parrot_Interp *interpreter)>
@@ -415,7 +399,6 @@ Restore the interpreter's op function tables to their initial state.
 
 =cut
 
-################################################################################
 */
 
 static void
@@ -434,7 +417,6 @@ stop_prederef(struct Parrot_Interp *interpreter)
 #if EXEC_CAPABLE
 
 /*
-################################################################################
 
 =item C<void
 exec_init_prederef(struct Parrot_Interp *interpreter, void *prederef_arena)>
@@ -447,7 +429,6 @@ C<op_info_table>
 
 =cut
 
-################################################################################
 */
 
 void
