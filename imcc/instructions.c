@@ -271,6 +271,32 @@ insert_ins(IMC_Unit *unit, Instruction *ins, Instruction * tmp)
 }
 
 /*
+ * insert tmp before ins
+ */
+void
+prepend_ins(IMC_Unit *unit, Instruction *ins, Instruction * tmp)
+{
+    Instruction *next, *prev;
+    if (!ins) {
+        next = unit->instructions;
+        unit->instructions = tmp;
+        tmp->next = next;
+        next->prev = tmp;
+        tmp->line = next->line;
+    }
+    else {
+        prev = ins->prev;
+        ins->prev = tmp;
+        tmp->next = ins;
+        tmp->prev = prev;
+        if (prev)
+            prev->next = tmp;
+        if (!tmp->line)
+            tmp->line = ins->line;
+    }
+}
+
+/*
  * subst tmp for ins
  */
 

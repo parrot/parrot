@@ -113,6 +113,7 @@ find_basic_blocks (Parrot_Interp interpreter, IMC_Unit * unit, int first)
             add_instruct_writes(ins, p0);
             add_instruct_writes(ins, p1);
         }
+
         if (ins->opnum == -1 && (ins->type & ITPCCSUB)) {
             if (first) {
                 /* XXX FIXME: Now the way to check for a sub is unit->type */
@@ -131,6 +132,7 @@ find_basic_blocks (Parrot_Interp interpreter, IMC_Unit * unit, int first)
             /* set the labels address (ins) */
             ins->r[0]->first_ins = ins;
         }
+
         /* a LABEL starts a new basic block, but not, if we already have
          * a new one (last was a branch)
          */

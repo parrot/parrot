@@ -222,7 +222,7 @@ expand_pcc_sub(Parrot_Interp interpreter, IMC_Unit * unit, Instruction *ins)
     char buf[128];
 
 #if IMC_TRACE
-    PIO_eprintf("expand_pcc_sub\n");
+    PIO_eprintf(NULL, "expand_pcc_sub\n");
 #endif
 
     sub = ins->r[1];
@@ -366,7 +366,7 @@ expand_pcc_sub_ret(Parrot_Interp interpreter, IMC_Unit * unit, Instruction *ins)
     int n_p3;
 
 #if IMC_TRACE
-    PIO_eprintf("expand_pcc_sub_ret\n");
+    PIO_eprintf(NULL, "expand_pcc_sub_ret\n");
 #endif
 
     arg_count = ins->type & ITPCCYIELD ? 0 : 1;
@@ -725,7 +725,7 @@ pcc_emit_flatten(Parrot_Interp interpreter, IMC_Unit * unit, Instruction *ins,
  * This is the nuts and bolts of Perl6/Parrot routine call style
  */
 void
-expand_pcc_sub_call(Parrot_Interp interpreter, IMC_Unit * unit, Instruction *ins)
+expand_pcc_sub_call(Parrot_Interp interp, IMC_Unit * unit, Instruction *ins)
 {
     SymReg *arg, *sub, *reg, *arg_reg, *regs[IMCC_MAX_REGS];
     int next[4], i, j, n;
@@ -739,12 +739,12 @@ expand_pcc_sub_call(Parrot_Interp interpreter, IMC_Unit * unit, Instruction *ins
     int flatten;
 
 #if IMC_TRACE
-    PIO_eprintf("expand_pcc_sub_call\n");
+    PIO_eprintf(NULL, "expand_pcc_sub_call\n");
 #endif
 
-    tail_call = check_tail_call(interpreter, unit, ins);
+    tail_call = check_tail_call(interp, unit, ins);
     if (tail_call)
-        debug(interpreter, DEBUG_OPT1, "found tail call %I \n", ins);
+        debug(interp, DEBUG_OPT1, "found tail call %I \n", ins);
     for (i = 0; i < 4; i++)
         next[i] = 5;
     call_ins = ins;
@@ -752,9 +752,31 @@ expand_pcc_sub_call(Parrot_Interp interpreter, IMC_Unit * unit, Instruction *ins
     p3 = NULL;
     n_p3 = 0;
     flatten = 0;
+
+    /*
+     * See if we need to create a temporary sub object
+     */
+    if(ins->type & ITCALL) {
+#if IMC_TRACE
+        fprintf(stderr, "generating sub object [sub->name = %s]\n", sub->pcc_sub->sub->name);
+#endif
+        /* sub->pcc_sub->sub is an actual subroutine name, not a variable. */
+        reg = mk_temp_reg('P');
+        tmp = iNEWSUB(interp, unit, reg, NEWSUB, sub->pcc_sub->sub, NULL, 0);
+        add_pcc_sub(sub, reg);
+        ins->type &= ~ITCALL;
+        prepend_ins(unit, ins, tmp);
+
+        expand_pcc_sub_call(interp, unit, ins);
+        return;
+    }
+
     /*
      * insert arguments
      */
+#if IMC_TRACE
+    PIO_eprintf(NULL, "expand_pcc_sub_call: nargs = %d\n", sub->pcc_sub->nargs);
+#endif
     n = sub->pcc_sub->nargs;
     for (i = 0; i < n; i++) {
         /*
@@ -781,7 +803,7 @@ lazy:
                             reg = mk_pasm_reg(str_dup(buf));
                             regs[0] = reg;
                             regs[1] = arg_reg;
-                            ins = insINS(interpreter, unit, ins, "set", regs, 2);
+                            ins = insINS(interp, unit, ins, "set", regs, 2);
                             /* remember reg for life analysis */
                             sub->pcc_sub->args[i]->used = reg;
 
@@ -811,19 +833,19 @@ lazy:
 overflow:
             if (!p3) {
                 p3 = mk_pasm_reg(str_dup("P3"));
-                tmp = iNEW(interpreter, unit, p3, str_dup("SArray"), NULL, 0);
+                tmp = iNEW(interp, unit, p3, str_dup("SArray"), NULL, 0);
                 insert_ins(unit, ins, tmp);
                 ins = tmp;
                 sprintf(buf, "%d", n);
                 regs[0] = p3;
                 regs[1] = mk_const(str_dup(buf), 'I');
-                ins = insINS(interpreter, unit, ins, "set", regs, 2);
+                ins = insINS(interp, unit, ins, "set", regs, 2);
             }
             if (flatten || (arg_reg->type & VT_FLATTEN))
                 goto flatten;
             regs[0] = p3;
             regs[1] = arg;
-            ins = insINS(interpreter, unit, ins, "push", regs, 2);
+            ins = insINS(interp, unit, ins, "push", regs, 2);
             n_p3++;
         }
         continue;
@@ -831,7 +853,7 @@ flatten:
         /* if we had a flattening arg, we must continue emitting
          * code to do all at runtime
          */
-        ins = pcc_emit_flatten(interpreter, unit, ins, arg_reg, i, &flatten);
+        ins = pcc_emit_flatten(interp, unit, ins, arg_reg, i, &flatten);
     } /* for i */
 
     /*
@@ -839,7 +861,7 @@ flatten:
      * insert a jump
      */
     if (tail_call) {
-        insert_tail_call(interpreter, unit, ins, sub);
+        insert_tail_call(interp, unit, ins, sub);
         return;
     }
 
@@ -854,7 +876,7 @@ move_sub:
             regs[0] = reg;
             regs[1] = arg;
             arg->reg->want_regno = 0;
-            ins = insINS(interpreter, unit, ins, "set", regs, 2);
+            ins = insINS(interp, unit, ins, "set", regs, 2);
         }
     }
     else {
@@ -872,7 +894,7 @@ move_cc:
                 regs[0] = reg;
                 regs[1] = arg;
                 arg->reg->want_regno = 1;
-                ins = insINS(interpreter, unit, ins, "set", regs, 2);
+                ins = insINS(interp, unit, ins, "set", regs, 2);
             }
         }
         else {
@@ -883,24 +905,24 @@ move_cc:
     else if (!sub->pcc_sub->nci)
         need_cc = 1;
     /* set prototyped: I0 */
-    ins = set_I_const(interpreter, unit, ins, 0, sub->pcc_sub->prototyped);
+    ins = set_I_const(interp, unit, ins, 0, sub->pcc_sub->prototyped);
     /* set items in P3: I1 */
-    ins = set_I_const(interpreter, unit, ins, 1, n_p3);
+    ins = set_I_const(interp, unit, ins, 1, n_p3);
     /* set items in PRegs: I2 */
     if (flatten) {
         regs[0] = mk_pasm_reg(str_dup("I2"));;
         regs[1] = mk_const(str_dup("5"), 'I');
-        ins = insINS(interpreter, unit, ins, "sub", regs, 2);
+        ins = insINS(interp, unit, ins, "sub", regs, 2);
     }
     else
-        ins = set_I_const(interpreter, unit, ins, 2, next[2] - 5);
+        ins = set_I_const(interp, unit, ins, 2, next[2] - 5);
     /* return type 0=void, or -n-1: I3 */
-    ins = set_I_const(interpreter, unit, ins, 3,
+    ins = set_I_const(interp, unit, ins, 3,
             sub->pcc_sub->nret ? -1 - sub->pcc_sub->nret : 0);
 #if 0
     /* TODO method calls */
     /* meth hash value: I4 */
-    ins = set_I_const(interpreter, unit, ins, 4, 0);
+    ins = set_I_const(interp, unit, ins, 4, 0);
     /* meth name: S0 */
     /* object: P2 */
 #endif
@@ -909,12 +931,12 @@ move_cc:
      */
     if (!sub->pcc_sub->nci)
         if (!need_cc)
-            ins = insINS(interpreter, unit, ins, "updatecc", regs, 0);
+            ins = insINS(interp, unit, ins, "updatecc", regs, 0);
     /*
      * emit a savetop for now
      */
-    ins = insINS(interpreter, unit, ins, "savetop", regs, 0);
-    ins = insINS(interpreter, unit, ins, need_cc ? "invokecc" : "invoke", regs, 0);
+    ins = insINS(interp, unit, ins, "savetop", regs, 0);
+    ins = insINS(interp, unit, ins, need_cc ? "invokecc" : "invoke", regs, 0);
     ins->type |= ITPCCSUB;
     /*
      * move the pcc_sub structure to the invoke
@@ -929,7 +951,7 @@ move_cc:
      */
     if (ins->next->type == ITLABEL && sub->pcc_sub->label)
         ins = ins->next;
-    ins = insINS(interpreter, unit, ins, "restoretop", regs, 0);
+    ins = insINS(interp, unit, ins, "restoretop", regs, 0);
     /*
      * handle return results
      * TODO: overflow
@@ -952,7 +974,7 @@ move_cc:
                     reg = mk_pasm_reg(str_dup(buf));
                     regs[0] = arg;
                     regs[1] = reg;
-                    ins = insINS(interpreter, unit, ins, "set", regs, 2);
+                    ins = insINS(interp, unit, ins, "set", regs, 2);
                     sub->pcc_sub->ret[i]->used = reg;
                     break;
                 }
@@ -963,7 +985,7 @@ move_cc:
                 p3 = mk_pasm_reg(str_dup("P3"));
             regs[0] = arg;
             regs[1] = p3;
-            ins = insINS(interpreter, unit, ins, "shift", regs, 2);
+            ins = insINS(interp, unit, ins, "shift", regs, 2);
         }
     }
 }

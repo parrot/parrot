@@ -154,6 +154,7 @@ add_pcc_sub(SymReg *r, SymReg * arg)
     r->pcc_sub->sub->reg = arg;
     r->pcc_sub->sub->type = VT_REGP;
 }
+
 void
 add_pcc_cc(SymReg *r, SymReg * arg)
 {

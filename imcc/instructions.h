@@ -97,6 +97,7 @@ int ins_print(FILE *fd, Instruction * ins);
 
 Instruction *delete_ins(struct _IMC_Unit *, Instruction *ins, int needs_freeing);
 void insert_ins(struct _IMC_Unit *, Instruction *ins, Instruction * tmp);
+void prepend_ins(struct _IMC_Unit *, Instruction *ins, Instruction * tmp);
 Instruction *move_ins(struct _IMC_Unit *, Instruction *cur, Instruction *to);
 void subst_ins(struct _IMC_Unit *, Instruction *ins, Instruction * tmp, int);
 
