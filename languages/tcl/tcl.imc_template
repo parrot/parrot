@@ -234,10 +234,6 @@ providing a compreg-compatible method.
   pir_code .= tcl_code
   pir_code .= "\"\n.local pmc parser\n.local pmc tcl_interpret\nparser = find_global \"_Tcl\", \"parser\"\ntcl_interpret = find_global \"_Tcl\", \"__interpret\"\n$P1 = parse.\"parse\"(code,zero,zero)\n($I0,$P3) = tcl_interpret($P1)\n.return($I0,$P3)\n .end\n"
 
-  print "PIR_CODE:"
-  print pir_code
-  print "\n\n"
-
   .local pmc compiled_sub
   compiled_sub = compile pir_compiler, pir_code
 
