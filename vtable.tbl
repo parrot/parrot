@@ -84,6 +84,10 @@ void set_string_same(PMC* value)
 void set_string_keyed(PMC* key, STRING* value)
 void set_string_keyed_int(INTVAL key, STRING* value)
 
+void set_bool(INTVAL value)
+void set_bool_keyed(PMC* key, INTVAL value)
+void set_bool_keyed_int(INTVAL key, INTVAL value)
+
 void set_pmc(PMC* value)
 void set_pmc_keyed(PMC* key, PMC* value)
 void set_pmc_keyed_int(INTVAL key, PMC* value)

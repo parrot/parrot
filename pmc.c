@@ -329,29 +329,34 @@ mmd_fallback_lxor_pmc(Parrot_Interp interp, PMC *left, PMC *right, PMC *dest)
 void
 mmd_fallback_repeat_pmc(Parrot_Interp interp, PMC *left, PMC *right, PMC *dest)
 {
-    STRING *base, *total;
+    STRING *base;
     INTVAL count;
 
     base = VTABLE_get_string(interp, left);
     count = VTABLE_get_integer(interp, right);
 
-    VTABLE_set_string_native(interp, dest, total);
+    VTABLE_set_string_native(interp, dest,
+                             string_repeat(interp, base, count, NULL));
 }
 
 void
 mmd_fallback_numeq_pmc(Parrot_Interp interp, PMC *left, PMC *right, PMC *dest)
 {
-    VTABLE_set_integer_native(interp, dest,
-                              VTABLE_get_integer(interp, left) >>
-                              VTABLE_get_integer(interp, right));
+    if (VTABLE_get_number(interp, left) == VTABLE_get_number(interp, right)) {
+        VTABLE_set_bool(interp, dest, 1);
+    } else {
+        VTABLE_set_bool(interp, dest, 0);
+    }
 }
 
 void
 mmd_fallback_streq_pmc(Parrot_Interp interp, PMC *left, PMC *right, PMC *dest)
 {
-    VTABLE_set_integer_native(interp, dest,
-                              VTABLE_get_integer(interp, left) >>
-                              VTABLE_get_integer(interp, right));
+    if (string_compare(interp, VTABLE_get_string(interp, left), VTABLE_get_string(interp, right))) {
+        VTABLE_set_bool(interp, dest, 1);
+    } else {
+        VTABLE_set_bool(interp, dest, 0);
+    }
 }
 
 void
@@ -363,19 +368,24 @@ mmd_fallback_numcmp_pmc(Parrot_Interp interp, PMC *left, PMC *right, PMC *dest)
     left_float = VTABLE_get_number(interp, left);
     right_float = VTABLE_get_number(interp, right);
 
+    if (left_float == right_float) {
+        cmp_val = 0;
+    } else {
+        if (left_float > right_float) {
+            cmp_val = 1;
+        } else {
+            cmp_val = -1;
+        }
+    }
 
-
-    VTABLE_set_integer_native(interp, dest,
-                              VTABLE_get_integer(interp, left) >>
-                              VTABLE_get_integer(interp, right));
+    VTABLE_set_integer_native(interp, dest, cmp_val);
 }
 
 void
 mmd_fallback_strcmp_pmc(Parrot_Interp interp, PMC *left, PMC *right, PMC *dest)
 {
     VTABLE_set_integer_native(interp, dest,
-                              VTABLE_get_integer(interp, left) >>
-                              VTABLE_get_integer(interp, right));
+                              string_compare(interp, VTABLE_get_string(interp, left), VTABLE_get_string(interp, right)));
 }
 
 
