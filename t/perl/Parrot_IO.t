@@ -24,7 +24,7 @@ to ensure nothing is broken.
 =cut
 
 use lib 'lib';
-use Test::More 'tests' => 54;
+use Test::More 'tests' => 56;
 use File::Spec::Functions qw(:ALL);
     
 # Path is really only an abstract superclass but there's a few things we
@@ -58,10 +58,16 @@ ok($oldp ne $p, 'delete from cache');
 
 ok($p->parent_path eq tmp_dir_path(), 'parent_path');
 
+$r = Parrot::IO::Path->new(rootdir);
+ok(!$r->parent_path, 'root has no parent_path');
+
 teardown();
 
 BEGIN { use_ok('Parrot::IO::Directory') };
 BEGIN { use_ok('Parrot::IO::File') };
+
+$r = Parrot::IO::Directory->new(rootdir);
+ok(!$r->parent, 'root has no parent');
 
 my $d = Parrot::IO::Directory->tmp_directory('t');
 ok($d, 'tmp_directory');

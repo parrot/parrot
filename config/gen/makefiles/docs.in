@@ -18,10 +18,9 @@ clean:
 	$(RM_F) packfile-c.pod $(POD)
 
 html:
-	$(MKDIR) html
-	$(PERL) -e "chdir '..';system 'perl tools/docs/write_docs.pl -s -d'"
+	$(PERL) -I../lib ../tools/docs/write_docs.pl --silent
 
 html-clean:
-	$(PERL) -I../lib -MParrot::IO::Directory -e "Parrot::IO::Directory->new('html')->delete"
+	$(PERL) -I../lib -MParrot::Distribution -e "Parrot::Distribution->new->delete_html_docs"
 
 

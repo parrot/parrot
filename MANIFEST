@@ -351,13 +351,16 @@ examples/benchmarks/stress1.pl                    [main]doc
 examples/benchmarks/stress2.pasm                  [main]doc
 examples/benchmarks/stress2.pl                    [main]doc
 examples/benchmarks/stress3.pasm                  [main]doc
-examples/benchmarks/vpm.pl                        [main]doc
 examples/benchmarks/vpm.imc                       [main]doc
+examples/benchmarks/vpm.pl                        [main]doc
 examples/benchmarks/vpm1.imc                      [main]doc
 examples/benchmarks/vpm2.imc                      [main]doc
-examples/compilers/Makefile                       [main]doc
 examples/compilers/japhc.c                        [main]doc
-examples/japh/README                              [main]doc
+examples/compilers/Makefile                       [main]doc
+examples/io/echo_client.imc                       [main]doc
+examples/io/http.imc                              [main]doc
+examples/io/net_smtp.pasm                         [main]doc
+examples/io/pioctl.pasm                           [main]doc
 examples/japh/japh1.pasm                          [main]doc
 examples/japh/japh10.pasm                         [main]doc
 examples/japh/japh11.pasm                         [main]doc
@@ -374,10 +377,7 @@ examples/japh/japh6.pasm                          [main]doc
 examples/japh/japh7.pasm                          [main]doc
 examples/japh/japh8.pasm                          [main]doc
 examples/japh/japh9.pasm                          [main]doc
-examples/io/echo_client.imc                       [main]doc
-examples/io/http.imc                              [main]doc
-examples/io/net_smtp.pasm                         [main]doc
-examples/io/pioctl.pasm                           [main]doc
+examples/japh/README                              [main]doc
 examples/mops/mops.c                              [main]doc
 examples/mops/mops.cs                             [main]doc
 examples/mops/mops.il                             [main]doc
@@ -1823,7 +1823,6 @@ languages/converter.pl                            []
 languages/forth/forth.pasm                        [forth]
 languages/forth/forth.pod                         [forth]
 languages/jako/Curses.jako                        [jako]
-languages/jako/README                             [jako]
 languages/jako/docs/future.pod                    [jako]
 languages/jako/docs/jako.pod                      [jako]
 languages/jako/elem.jako                          [jako]
@@ -1898,6 +1897,7 @@ languages/jako/lib/Jako/Processor.pm              [jako]
 languages/jako/lib/Jako/Symbol.pm                 [jako]
 languages/jako/lib/Jako/Token.pm                  [jako]
 languages/jako/MAINTAINER                         [jako]
+languages/jako/README                             [jako]
 languages/jako/string.jako                        [jako]
 languages/jako/sys.jako                           [jako]
 languages/jako/t/assign.jako                      [jako]
@@ -2037,7 +2037,6 @@ languages/perl6/t/harness                         [perl6]
 languages/perl6/t/op/common/bitwise.t             [perl6]
 languages/perl6/t/op/common/concat.t              [perl6]
 languages/perl6/t/op/common/minus.t               [perl6]
-languages/perl6/t/var/scalar/string/qq.t          [perl6]
 languages/perl6/t/parser/apoc1.t                  [perl6]
 languages/perl6/t/parser/basic.t                  [perl6]
 languages/perl6/t/parser/error.t                  [perl6]
@@ -2078,6 +2077,7 @@ languages/perl6/t/parser/speed.t                  [perl6]
 languages/perl6/t/rx/basic.t                      [perl6]
 languages/perl6/t/rx/call.t                       [perl6]
 languages/perl6/t/rx/special.t                    [perl6]
+languages/perl6/t/var/scalar/string/qq.t          [perl6]
 languages/perl6/TODO                              [perl6]
 languages/python/python.bnf                       []
 languages/python/python.prd                       []
@@ -2214,6 +2214,7 @@ lib/Make.pm                                       [devel]
 lib/Parrot/BuildUtil.pm                           [devel]
 lib/Parrot/Configure/RunSteps.pm                  [devel]
 lib/Parrot/Configure/Step.pm                      [devel]
+lib/Parrot/Distribution.pm                        [devel]
 lib/Parrot/Docs/Directory.pm                      [devel]
 lib/Parrot/Docs/File.pm                           [devel]
 lib/Parrot/Docs/Group.pm                          [devel]
@@ -2331,8 +2332,8 @@ ops/sys.ops                                       []
 ops/var.ops                                       []
 parrot.spec                                       []
 PBC_COMPAT                                        [main]doc
-PLATFORMS                                         [main]doc
 pf/pf_items.c                                     []
+PLATFORMS                                         [main]doc
 README                                            [main]doc
 RELEASE_INSTRUCTIONS                              []
 RESPONSIBLE_PARTIES                               [main]doc
@@ -2448,6 +2449,7 @@ t/op/string.t                                     []
 t/op/time.t                                       []
 t/op/trans.t                                      []
 t/op/types.t                                      []
+t/perl/Parrot_Distribution.t                      [devel]
 t/perl/Parrot_Docs.t                              [devel]
 t/perl/Parrot_IO.t                                [devel]
 t/pmc/array.t                                     []

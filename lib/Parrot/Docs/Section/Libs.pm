@@ -40,7 +40,8 @@ sub new
 	
 	return $self->SUPER::new(
 		'Libraries', 'libs.html', '',
-		$self->new_item('', 'library', 'dynoplibs')
+		$self->new_group('Parrot Core Libraries', '', 'library'),
+		$self->new_group('Dynamic Libraries', '', 'dynoplibs'),
 	);
 }
 

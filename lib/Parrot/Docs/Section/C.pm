@@ -28,6 +28,98 @@ use strict;
 use Parrot::Docs::Section;
 @Parrot::Docs::Section::C::ISA = qw(Parrot::Docs::Section);
 
+use Parrot::Distribution;
+
+=item C<header_item($text, @names)>
+
+Returns a C header files documentation item.
+
+=cut
+
+sub c_header_item
+{
+	my $self = shift;
+	
+	return $self->c_item(shift, 'headers' => [@_]);
+}
+
+=item C<c_source_item($text, @names)>
+
+Returns a C source files documentation item.
+
+=cut
+
+sub c_source_item
+{
+	my $self = shift;
+
+	return $self->c_item(shift, 'sources' => [@_]);
+}
+
+=item C<c_pair_item($text, $name)>
+
+Returns a new C source and header file documentation item.
+
+=cut
+
+sub c_pair_item
+{
+	my $self = shift;
+	
+	return $self->c_item(shift, 'pairs' => [@_]);
+}
+
+=item C<c_item($text, %contents)>
+
+Returns a new C source and/or header files documentation item. Recognized keys
+for C<%contents> are C<pairs>, C<sources>, C<headers> and C<contents>.
+
+=cut
+
+sub c_item
+{
+	my $self = shift;
+	my $text = shift;
+	my %contents = @_;
+	my @contents = ();
+	my $dist = Parrot::Distribution->new;
+	
+	if ( exists $contents{'pairs'} )
+	{
+		foreach my $name (@{$contents{'pairs'}})
+		{
+			push @contents,
+				$dist->relative_path($dist->c_source_file_with_name($name)), 
+				$dist->relative_path($dist->c_header_file_with_name($name));
+		}
+	}
+	
+	if ( exists $contents{'sources'} )
+	{
+		foreach my $name (@{$contents{'sources'}})
+		{
+			push @contents,
+				$dist->relative_path($dist->c_source_file_with_name($name));
+		}
+	}
+	
+	if ( exists $contents{'headers'} )
+	{
+		foreach my $name (@{$contents{'headers'}})
+		{
+			push @contents,
+				$dist->relative_path($dist->c_header_file_with_name($name));
+		}
+	}
+	
+	if ( exists $contents{'contents'} )
+	{
+		push @contents, @{$contents{'contents'}};
+	}
+	
+	return $self->new_item($text, grep {defined} @contents);
+}
+
 =item C<new()>
 
 Returns a new section.
@@ -40,121 +132,195 @@ sub new
 	
 	return $self->SUPER::new(
 		'C', 'c.html', '',
-		$self->new_group('General', '',
-			$self->new_item('This just includes parrot.h. It\'s unused.', 'src/parrot.c'),
-			$self->new_item('', 'include/parrot/parrot.h'),
-			$self->new_item('', 'src/warnings.c', 'include/parrot/warnings.h'),
-			$self->new_item('', 'src/longopt.c', 'include/parrot/longopt.h'),
+		$self->new_group(
+			'General', 
+			'',
+			$self->c_source_item('This file is unused.', 'parrot'),
+			$self->c_header_item('', 'parrot'),
+			$self->c_pair_item('', 'warnings'),
+			$self->c_pair_item('', 'longopt'),
 		),
-		$self->new_group('Interpreter', '',
-			$self->new_item('', 'src/embed.c', 'include/parrot/embed.h'),
-			$self->new_item('', 'src/global_setup.c', 
-				'include/parrot/global_setup.h'),
-			$self->new_item('', 'src/interpreter.c', 'include/parrot/interpreter.h', 
-				'include/parrot/interp_guts.h'),
-			$self->new_item('', 'src/exit.c', 'include/parrot/exit.h'),
+		$self->new_group(
+			'Interpreter', 
+			'',
+			$self->c_pair_item('', 'embed'),
+			$self->c_pair_item('', 'global_setup'),
+			$self->c_item(
+				'', 
+				'pairs' => ['interpreter'], 
+				'headers' => ['interp_guts']
+			),
+			$self->c_pair_item('', 'exit'),
 		),
-		$self->new_group('Registers and Stacks', '',
-			$self->new_item('', 'src/register.c', 'include/parrot/register.h', 
-				'include/parrot/regfuncs.h'),
-			$self->new_item('', 'src/stacks.c', 'include/parrot/stacks.h'),
-			$self->new_item('', 'include/parrot/enums.h'),
+		$self->new_group(
+			'Registers and Stacks', 
+			'',
+			$self->c_item(
+				'', 
+				'pairs' => ['register'], 
+				'headers' => ['regfuncs']
+			),
+			$self->c_pair_item('', 'stacks'),
+			$self->c_header_item('', 'enums'),
 		),
-		$self->new_group('Ops', '',
-			$self->new_item('', 'src/runops_cores.c', 
-				'include/parrot/runops_cores.h'),
-			$self->new_item('', 'include/parrot/op.h'),
-			$self->new_item('', 'include/parrot/oplib.h'),
+		$self->new_group(
+			'Ops', 
+			'',
+			$self->c_pair_item('', 'runops_cores'),
+			$self->c_header_item('', 'op'),
+			$self->c_header_item('', 'oplib'),
 		),
-		$self->new_group('Bytecode', '',
-			$self->new_item('', 'src/packfile.c', 'include/parrot/packfile.h',
-				'src/packdump.c', 'src/packout.c', 'src/pdump.c', 
-				'pf/pf_items.c'),
-			$self->new_item('', 'src/byteorder.c'),
+		$self->new_group(
+			'Bytecode', 
+			'',
+			$self->c_item(
+				'Parrot Packfile API and utilities.', 
+				'pairs' => ['packfile'],
+				'sources' => ['packdump', 'packout', 'pdump', 'pf_items']
+			),
+			$self->c_source_item('', 'byteorder'),
 		),
-		$self->new_group('Data Types', '',
-			$self->new_item('', 'src/datatypes.c', 'include/parrot/datatypes.h'),
-			$self->new_item('', 'src/hash.c', 'include/parrot/hash.h'),
-			$self->new_item('', 'src/intlist.c', 'include/parrot/intlist.h'),
-			$self->new_item('', 'src/list.c', 'include/parrot/list.h'),
+		$self->new_group(
+			'Data Types',
+			'',
+			$self->c_pair_item('', 'datatypes'),
+			$self->c_pair_item('', 'hash'),
+			$self->c_pair_item('', 'intlist'),
+			$self->c_pair_item('', 'list'),
 		),
-		$self->new_group('PMCs', '',
-			$self->new_item('', 'src/pmc.c', 'include/parrot/pmc.h'),
-			$self->new_item('', 'include/parrot/vtable.h'),
-			$self->new_item('', 'src/key.c', 'include/parrot/key.h'),
-			$self->new_item('', 'src/sub.c', 'include/parrot/sub.h'),
-			$self->new_item('', 'src/method_util.c', 'include/parrot/method_util.h'),
-			$self->new_item('', 'include/parrot/pobj.h'),
-			$self->new_item('', 'include/parrot/perltypes.h'),
-			$self->new_item('', 'src/pmc_freeze.c', 'include/parrot/pmc_freeze.h'),
+		$self->new_group(
+			'PMCs', 
+			'',
+			$self->c_pair_item('', 'pmc'),
+			$self->c_header_item('', 'vtable'),
+			$self->c_pair_item('', 'key'),
+			$self->c_pair_item('', 'sub'),
+			$self->c_pair_item('', 'method_util'),
+			$self->c_header_item('', 'pobj'),
+			$self->c_header_item('', 'perltypes'),
+			$self->c_pair_item('', 'pmc_freeze'),
 		),
-		$self->new_group('Objects', '',
-			$self->new_item('', 'src/objects.c', 'include/parrot/objects.h'),
+		$self->new_group(
+			'Objects', 
+			'',
+			$self->c_pair_item('', 'objects'),
 		),
-		$self->new_group('Strings', '',
-			$self->new_item('', 'src/chartype.c', 'include/parrot/chartype.h',
-				'chartypes'),
-			$self->new_item('', 'src/string.c', 'include/parrot/string.h',
-				'include/parrot/string_funcs.h'),
-			$self->new_item('', 'src/encoding.c', 'include/parrot/encoding.h',
-				'encodings'),
-			$self->new_item('', 'include/parrot/unicode.h'),
-			$self->new_item('', 'src/misc.c', 'include/parrot/misc.h',
-				'src/spf_render.c', 'src/spf_vtable.c', 'src/utils.c'),
+		$self->new_group(
+			'Strings', 
+			'',
+			$self->c_item(
+				'String character types', 
+				'pairs' => ['chartype'],
+				'contents' => ['chartypes']
+			),
+			$self->c_item(
+				'', 
+				'pairs' => ['string'],
+				'headers' => ['string_funcs']
+			),
+			$self->c_item(
+				'String encodings', 
+				'pairs' => ['encoding'],
+				'contents' => ['encodings']
+			),
+			$self->c_header_item('', 'unicode'),
+			$self->c_item(
+				'Miscellaneous, <code>sprintf</code> and utility functions.', 
+				'pairs' => ['misc'],
+				'sources' => ['spf_render', 'spf_vtable', 'utils']
+			),
 		),
-		$self->new_group('Multi-methods', '',
-			$self->new_item('', 'src/mmd.c', 'include/parrot/mmd.h'),
+		$self->new_group(
+			'Multi-methods', 
+			'',
+			$self->c_pair_item('', 'mmd'),
 		),
-		$self->new_group('Extensions', '',
-			$self->new_item('', 'src/extend.c', 'include/parrot/extend.h'),
+		$self->new_group(
+			'Extensions', 
+			'',
+			$self->c_pair_item('', 'extend'),
 		),
-		$self->new_group('NCI', '',
-			$self->new_item('', 'src/nci.c', 'include/parrot/nci.h'),
+		$self->new_group(
+			'NCI', 
+			'',
+			$self->c_pair_item('', 'nci'),
 		),
-		$self->new_group('JIT', '',
-			$self->new_item('', 'src/jit.c', 'include/parrot/jit.h',
-				'src/jit_debug.c', 'src/jit_debug_xcoff.c'),
+		$self->new_group(
+			'JIT', 
+			'',
+			$self->c_item(
+				'Parrot\'s JIT subsystem, with support for stabs files.', 
+				'pairs' => ['jit'],
+				'sources' => ['jit_debug', 'jit_debug_xcoff']
+			),
 		),
-		$self->new_group('Exec', '',
-			$self->new_item('', 'src/exec.c', 'include/parrot/exec.h',
-				'src/exec_save.c', 'include/parrot/exec_save.h', 
-				'src/exec_start.c'),
+		$self->new_group(
+			'Exec', 
+			'',
+			$self->c_item(
+				'Parrot\'s native executable subsystem.', 
+				'pairs' => ['exec', 'exec_save'],
+				'sources' => ['exec_start']
+			),
 		),
-		$self->new_group('IO', '',
-			$self->new_item('', 'include/parrot/io.h', 'io'),
+		$self->new_group(
+			'IO', 
+			'',
+			$self->c_item(
+				'Parrot\'s layer-based I/O subsystem.', 
+				'headers' => ['io'], 
+				'contents' => ['io']
+			),
 		),
-		$self->new_group('Threads', '',
-			$self->new_item('', 'src/thread.c', 'include/parrot/thread.h'),
-			$self->new_item('', 'include/parrot/thr_pthread.h'),
-			$self->new_item('', 'src/tsq.c', 'include/parrot/tsq.h'),
+		$self->new_group(
+			'Threads',
+			'',
+			$self->c_pair_item('', 'thread'),
+			$self->c_header_item('', 'thr_pthread'),
+			$self->c_pair_item('', 'tsq'),
 		),
-		$self->new_group('Regular Expressions', '',
-			$self->new_item('', 'src/rx.c', 'include/parrot/rx.h',
-				'src/rxstacks.c', 'include/parrot/rxstacks.h'),
+		$self->new_group(
+			'Regular Expressions', 
+			'',
+			$self->c_pair_item('Regular expression support.', 'rx', 'rxstacks'),
 		),
-		$self->new_group('Exceptions', '',
-			$self->new_item('', 'src/exceptions.c', 'include/parrot/exceptions.h'),
-			$self->new_item('', 'src/events.c', 'include/parrot/events.h'),
+		$self->new_group(
+			'Exceptions',
+			'',
+			$self->c_pair_item('', 'exceptions'),
+			$self->c_pair_item('', 'events'),
 		),
-		$self->new_group('Memory', '',
-			$self->new_item('', 'src/memory.c', 'include/parrot/memory.h'),
-			$self->new_item('', 'src/malloc.c'),
-			$self->new_item('', 'src/malloc-trace.c'),
-			$self->new_item('', 'src/resources.c', 'include/parrot/resources.h',
-				'src/res_lea.c'),
-			$self->new_item('', 'src/smallobject.c', 'include/parrot/smallobject.h'),
-			$self->new_item('', 'src/headers.c', 'include/parrot/headers.h'),
+		$self->new_group(
+			'Memory', 
+			'',
+			$self->c_pair_item('', 'memory'),
+			$self->c_source_item('', 'malloc'),
+			$self->c_source_item('', 'malloc-trace'),
+			$self->c_item(
+				'', 
+				'pairs' => ['resources'], 
+				'sources' => ['res_lea']
+			),
+			$self->c_pair_item('', 'smallobject'),
+			$self->c_pair_item('', 'headers'),
 		),
-		$self->new_group('Garbage Collection', '',
-			$self->new_item('', 'src/dod.c', 'include/parrot/dod.h'),
-			$self->new_item('', 'src/cpu_dep.c'),
+		$self->new_group(
+			'Garbage Collection', 
+			'',
+			$self->c_pair_item('', 'dod'),
+			$self->c_source_item('', 'cpu_dep'),
 		),
-		$self->new_group('Debugging', '',
-			$self->new_item('', 'src/debug.c', 'include/parrot/debug.h',
-				'src/pdb.c'),
-			$self->new_item('', 'src/disassemble.c'),
-			$self->new_item('', 'src/trace.c', 'include/parrot/trace.h'),
-			$self->new_item('', 'src/test_main.c'),
+		$self->new_group(
+			'Debugging', 
+			'',
+			$self->c_item(
+				'', 
+				'pairs' => ['debug'], 
+				'sources' => ['pdb']
+			),
+			$self->c_source_item('', 'disassemble'),
+			$self->c_pair_item('', 'trace'),
+			$self->c_source_item('', 'test_main'),
 		),
 	);
 }

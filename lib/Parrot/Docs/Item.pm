@@ -182,7 +182,9 @@ sub write_html
 	
 	if ( ! $self->{TEXT} and @short_desc )
 	{
-		my $short_desc = join('. ', @short_desc) . '.';
+		my $short_desc = join '. ', @short_desc;
+		
+		$short_desc .= '.' unless $short_desc =~ /\.$/o;
 		
 		$self->{TEXT} = $short_desc;
 	}

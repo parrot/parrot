@@ -56,7 +56,7 @@ sub new
 		$self->new_section('Scheme', 'scheme.html', '', 'languages/scheme'),
 		$self->new_section('URM', 'urm.html', '', 'languages/urm'),
 		$self->new_section('Ruby', 'ruby.html', '', 'languages/ruby'),
-		$self->new_section('Conversion', 'conversion.html', '', 
+		$self->new_section('Language Conversion', 'conversion.html', '', 
 			'languages/converter.pl', 'languages/conversion'),
 		$self->new_section('miniperl', 'miniperl.html', '', 'languages/miniperl'),
 		$self->new_section('Befunge', 'befunge.html', '', 'languages/befunge'),

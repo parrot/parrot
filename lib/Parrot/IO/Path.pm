@@ -67,6 +67,9 @@ sub new
 	# To remove the trailing slash.
 	$parent_path = File::Spec->canonpath($parent_path);
 	
+	# If we are root then the above will make parent the same as path.
+	undef $parent_path if $parent_path eq $path;
+	
 	$self = bless {
 		PATH => $path,
 		NAME => $name,
@@ -88,6 +91,8 @@ Subclasses should reimplement this method to complete the task.
 sub create_path
 {
 	my $self = shift;
+	
+	return 1 unless $self->parent_path;
 	
 	unless ( -e $self->parent_path )
 	{

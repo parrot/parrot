@@ -28,6 +28,8 @@ use strict;
 use Parrot::Docs::Section;
 @Parrot::Docs::Section::Parrot::ISA = qw(Parrot::Docs::Section);
 
+use Parrot::Distribution;
+
 use Parrot::Docs::Section::Info;
 use Parrot::Docs::Section::Docs;
 use Parrot::Docs::Section::Examples;
@@ -93,14 +95,13 @@ once by the root section, it is not passed to subsections.
 sub write_docs
 {
     my $self = shift;
-    my $source = Parrot::Docs::Directory->new('.');
-    my $target = Parrot::Docs::Directory->new("docs/html");
     my $silent = shift || 0;
     my $delete = shift || 0;
+    my $dist = Parrot::Distribution->new;
 
-    $target->delete_contents if $delete;
+    $dist->delete_html_docs if $delete;
 
-	$self->write_html($source, $target, $silent);
+	$self->write_html($dist, $dist->html_docs_directory, $silent);
 }
 
 =back

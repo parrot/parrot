@@ -3,14 +3,16 @@
 
 =head1 NAME
 
-Parrot::IO::File - File in the Parrot distribution.
+Parrot::IO::File - File in the Parrot distribution
 
 =head1 SYNOPSIS
 
 	use Parrot::IO::File;
-	my $file = Parrot::IO::File->new('parrot/MANIFEST');
+	$manifest = Parrot::IO::File->new('MANIFEST');
 
 =head1 DESCRIPTION
+
+Use this to query and manipulate files and their contents.
 
 =head2 Methods
 
@@ -227,6 +229,52 @@ sub cvs_version
 	my ($version) = $id =~ /,v\s+(\S+)/s;
 	
 	return $version;
+}
+
+=item C<is_hidden()>
+
+Returns whether the file is "hidden", i.e. it's name starts with a dot.
+
+=cut
+
+sub is_hidden
+{
+	my $self = shift;
+
+	return $self->parent eq 'CVS' or $self->name =~ /^\./o;
+}
+
+=item C<is_generated()>
+
+Returns whether the file is generated.
+
+=cut
+
+sub is_generated
+{
+	my $self = shift;
+	
+	# CFLAGS
+	# libparrot.def
+	# Makefile
+	# myconfig
+	
+	# include/parrot/config.h
+	# include/parrot/core_pmcs.h
+	# include/parrot/feature.h
+	# include/parrot/platform.h
+	
+	# runtime/parrot/include/* (all?)
+
+	# lib/Parrot/Config.pm
+	
+	
+
+	return 1 if $self->suffix =~ /^(?:dump|html|flag|o)$/o
+		or $self->name =~ /^(?:perl6-config|libparrot.def|CFLAGS|myconfig|(?:core_pmcs|exec_(?:cpu|dep)|fingerprint|jit_(?:cpu|emit)|nci|platform(?:_interface)?)\.[ch]|(?:charclass|feature)\.h)$/o
+		or $self->parent->name eq 'ops' and $self->suffix =~ /^(?:c|pod)$/;
+	
+	return 0;
 }
 
 =item C<delete()>

@@ -3,18 +3,20 @@
 
 =head1 NAME
 
-Parrot::IO::Directory - Directory in the Parrot distribution.
+Parrot::IO::Directory - Directory
 
 =head1 SYNOPSIS
 
 	use Parrot::IO::Directory;
-	my $dir = Parrot::IO::Directory->new('parrot');
+	$docs = Parrot::IO::Directory->new('docs');
 
 =head1 DESCRIPTION
 
+Use this to query and manipulate directories and their contents.
+
 =head2 Methods
 
-=over
+=over 4
 
 =cut
 
@@ -30,6 +32,18 @@ use File::Path;
 use File::Spec;
 use Parrot::IO::File;
 
+=item C<directory_class()>
+
+Returns the class used in the various directory creation methods. This
+default implementation returns C<Parrot::IO::Directory>.
+
+=cut
+
+sub directory_class
+{
+	return 'Parrot::IO::Directory';
+}
+
 =item C<file_class()>
 
 Returns the class used in the various file creation methods. This default
@@ -39,9 +53,39 @@ implementation returns C<Parrot::IO::File>.
 
 sub file_class
 {
+	return 'Parrot::IO::File';
+}
+
+=item C<directory_with_path($path)>
+
+Returns the directory with the specified path. 
+
+The directory is an instance of the class returned by
+C<directory_class>.
+
+
+=cut
+
+sub directory_with_path
+{
 	my $self = shift;
 	
-	return 'Parrot::IO::File';
+	return $self->directory_class->new(@_);
+}
+
+=item C<file_with_path($path)>
+
+Returns the file with the specified path. 
+
+The file is an instance of the class returned by C<file_class>.
+
+=cut
+
+sub file_with_path
+{
+	my $self = shift;
+	
+	return $self->file_class->new(@_);
 }
 
 =item C<tmp_directory($path)>
@@ -55,12 +99,12 @@ sub tmp_directory
 {
 	my $self = shift;
 	
-	return $self->new(File::Spec->catdir(File::Spec->tmpdir, @_));
+	return $self->directory_with_path(File::Spec->catdir(File::Spec->tmpdir, @_));
 }
 
 =item C<new($path)>
 
-Returns the instance for C<$path>.
+Returns the instance for specified path.
 
 =cut
 
@@ -95,32 +139,40 @@ sub create_path
 	return -d $self->path;
 }
 
+=item C<relative_path($directory)>
+
+=item C<relative_path($file)>
+
 =item C<relative_path($path)>
 
-Returns C<$path> relative to the directory.	
+Returns the specified path relative to the directory.	
 
 =cut
 
 sub relative_path
 {
 	my $self = shift;
-	my $path = shift;
+	my $path = shift || return undef;
+	
+	$path = $path->path if ref $path;
 	
 	return File::Spec->abs2rel($path, $self->path);
 }
 
-=item C<parent($path)>
+=item C<parent()>
 
-Returns the directory's parent directory.	
+Returns the directory's parent directory. The root directory returns
+C<undef>.
 	
 =cut
 
 sub parent
 {
 	my $self = shift;
-	my $path = shift;
 	
-	return $self->new($self->parent_path);
+	return undef unless $self->parent_path;
+	
+	return $self->directory_with_path($self->parent_path);
 }
 
 =item C<file_and_directory_names()>
@@ -180,6 +232,35 @@ sub directory_paths
     return sort grep {-d} $self->file_and_directory_paths;
 }
 
+=item C<file_exists_with_name($name)>
+
+Returns whether a file with the specified name exists in the directory.
+
+=cut
+
+sub file_exists_with_name
+{
+	my $self = shift;
+	my $name = shift;
+	
+	return -f File::Spec->catfile($self->path, $name);
+}
+
+=item C<directory_exists_with_name($name)>
+
+Returns whether a subdirectory with the specified name exists in the
+directory.
+
+=cut
+
+sub directory_exists_with_name
+{
+	my $self = shift;
+	my $name = shift;
+	
+	return -d File::Spec->catdir($self->path, $name);
+}
+
 =item C<files($recursive, $ignore)>
 
 This gives you an array of C<Parrot::IO::File> instances.
@@ -195,7 +276,7 @@ sub files
 	my $self = shift;
 	my $recursive = shift;
 	my $ignore = shift;
-	my @files = map {$self->file_class->new($_)} $self->file_paths;
+	my @files = map {$self->file_with_path($_)} $self->file_paths;
 	
 	if ( $recursive )
 	{
@@ -221,7 +302,7 @@ sub directories
 {
 	my $self = shift;
 
-	return map {$self->new($_)} $self->directory_paths;
+	return map {$self->directory_with_path($_)} $self->directory_paths;
 }
 
 =item C<file_suffixes($recursive, $ignore)>
@@ -289,6 +370,35 @@ sub files_with_suffix
 	return @files;
 }
 
+=item C<path_for_directory_with_name($name)>
+
+Returns the path for the subdirectory with the specified name in the
+directory.
+
+=cut
+
+sub path_for_directory_with_name
+{
+	my $self = shift;
+	my $name = shift || return undef;
+	
+	return File::Spec->catdir($self->path, $name);
+}
+
+=item C<path_for_file_with_name($name)>
+
+Returns the path for the file with the specified name in the directory.
+
+=cut
+
+sub path_for_file_with_name
+{
+	my $self = shift;
+	my $name = shift || return undef;
+	
+	return File::Spec->catfile($self->path, $name);
+}
+
 =item C<directory_with_name($name)>
 
 Returns a directory with the specified name in the directory.
@@ -298,9 +408,9 @@ Returns a directory with the specified name in the directory.
 sub directory_with_name
 {
 	my $self = shift;
-	my $name = shift;
+	my $path = $self->path_for_directory_with_name(shift) || return undef;
 	
-	return $self->new(File::Spec->catdir($self->path, $name));
+	return $self->directory_with_path($path);
 }
 
 =item C<file_with_name($name)>
@@ -312,9 +422,76 @@ Returns a file with the specified name in the directory.
 sub file_with_name
 {
 	my $self = shift;
-	my $name = shift;
+	my $path = $self->path_for_file_with_name(shift) || return undef;
 	
-	return $self->file_class->new(File::Spec->catfile($self->path, $name));
+	return $self->file_with_path($path);
+}
+
+=item C<existing_directory_with_name($name)>
+
+Returns a directory with the specified name in the directory.
+
+=cut
+
+sub existing_directory_with_name
+{
+	my $self = shift;
+	my $path = $self->path_for_directory_with_name(shift) || return undef;
+	
+	return undef unless -d $path;
+	
+	return $self->directory_with_path($path);
+}
+
+=item C<existing_file_with_name($name)>
+
+Returns a file with the specified name in the directory.
+
+=cut
+
+sub existing_file_with_name
+{
+	my $self = shift;
+	my $path = $self->path_for_file_with_name(shift) || return undef;
+	
+	return undef unless -f $path;
+	
+	return $self->file_with_path($path);
+}
+
+=item C<path_for_directory_with_relative_path($path)>
+
+Returns the path for the subdirectory with the specified path taken
+relative to the directory.
+
+=cut
+
+sub path_for_directory_with_relative_path
+{
+	my $self = shift;
+	my $path = shift || return undef;
+	my ($volume, $directories, $name) = File::Spec->splitpath($path);
+	
+	return File::Spec->catdir($self->path, $directories, $name);
+}
+
+=item C<path_for_file_with_relative_path($path)>
+
+Returns the path for the file with the specified with the specified path
+taken relative to the directory.
+
+=cut
+
+sub path_for_file_with_relative_path
+{
+	my $self = shift;
+	my $path = shift || return undef;
+	my ($volume, $directories, $name) = File::Spec->splitpath($path);
+	
+	$path = File::Spec->catdir($self->path, $directories);
+	$path = File::Spec->catfile($path, $name);
+	
+	return $path;
 }
 
 =item C<relative_path_is_directory($path)>
@@ -326,10 +503,11 @@ Returns whether the specified relative path is a directory.
 sub relative_path_is_directory
 {
 	my $self = shift;
-	my $path = shift;
-	my ($volume, $directories, $name) = File::Spec->splitpath($path);
+	my $path = $self->path_for_directory_with_relative_path(shift);
 	
-	return -d File::Spec->catdir($self->path, $directories, $name);
+	return undef unless $path;
+	
+	return -d $path;
 }
 
 =item C<relative_path_is_file($path)>
@@ -341,11 +519,9 @@ Returns whether the specified relative path is a file.
 sub relative_path_is_file
 {
 	my $self = shift;
-	my $path = shift;
-	my ($volume, $directories, $name) = File::Spec->splitpath($path);
+	my $path = $self->path_for_file_with_relative_path(shift);
 	
-	$path = File::Spec->catdir($self->path, $directories);
-	$path = File::Spec->catfile($path, $name);
+	return undef unless $path;
 	
 	return -f $path;
 }
@@ -359,12 +535,11 @@ Returns a directory with the specified relative path below the directory.
 sub directory_with_relative_path
 {
 	my $self = shift;
-	my $path = shift;
-	my ($volume, $directories, $name) = File::Spec->splitpath($path);
+	my $path = $self->path_for_directory_with_relative_path(shift);
 	
-	$path = File::Spec->catdir($self->path, $directories, $name);
+	return undef unless $path;
 	
-	return $self->new($path);
+	return $self->directory_with_path($path);
 }
 
 =item C<file_with_relative_path($path)>
@@ -376,12 +551,9 @@ Returns a file with the specified relative path below the directory.
 sub file_with_relative_path
 {
 	my $self = shift;
-	my $path = shift;
-	my ($volume, $directories, $name) = File::Spec->splitpath($path);
+	my $path = $self->path_for_file_with_relative_path(shift) || return undef;
 	
-	$directories = File::Spec->catdir($self->path, $directories);
-	
-	return $self->file_class->new(File::Spec->catfile($directories, $name));
+	return $self->file_with_path($path);
 }
 
 =item C<delete()>

@@ -18,7 +18,6 @@ This script writes the HTML documentation for Parrot.
 
 use lib 'lib';
 use Getopt::Long;
-use Parrot::Docs::Directory;
 use Parrot::Docs::Section::Parrot;
 
 my ($silent, $delete);

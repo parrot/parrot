@@ -329,7 +329,8 @@ sub is_docs_link
 =item C<short_description()>
 
 Returns a short description of the file extracted from the C<NAME> section
-of the POD documentation, if it exists.
+of the POD documentation, if it exists. If an C<ABSTRACT> is found then
+that is preferred.
 
 =cut
 
@@ -338,6 +339,51 @@ sub short_description
 	my $self = shift;
 
 	return '' unless $self->contains_pod;
+	
+	my @lines = $self->read;
+	
+	while ( @lines )
+	{
+		my $line = shift @lines;
+		
+		if ( $line =~ /^=head1\s+ABSTRACT/o )
+		{
+			while ( @lines )
+			{
+				$line = shift @lines;
+		
+				last if $line =~ /\S/o;
+			}
+		
+			my @abstract = $line;
+			
+			while ( @lines )
+			{
+				$line = shift @lines;
+		
+				last if $line !~ /\S/o;
+				
+				push @abstract, $line;
+			}
+			
+			my $desc = join ' ', @abstract;
+			
+			# Joining lines may have created a bit of extra whitespace.
+			$desc =~ s/\s+/ /osg;
+			$desc =~ s/^\s+//os;
+			$desc =~ s/\s+$//os;
+			
+			# Remove any POD.
+			# TODO - Decide whether we want to do this or convert
+			# to HTML in the documentation item.
+			$desc =~ s/[CFL]<([^>]+)>/$1/osg;
+			
+			return $desc;
+		}
+	}
+	
+	# TODO - The abstract section above was added later. The two searches 
+	# could be combined.
 	
 	my $text = $self->read;
 	
@@ -355,7 +401,8 @@ sub short_description
 	
 	return $text unless $text =~ /-/o;
 	
-	my ($path, $desc) = split /\s*--?\s*/, $text, 2;
+	# There has to be some space each side of the dash.
+	my ($path, $desc) = split /\s+--?\s+/, $text, 2;
 	
 	return $desc;
 }
