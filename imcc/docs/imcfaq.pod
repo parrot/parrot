@@ -183,16 +183,18 @@ IMC has 2 classes of variables, symbolic registers and named variables. Both
 are mapped to real registers, but there are a few minor differences. Named
 variables must be declared. They may be global or local, and may be qualified
 by a namespace. Symbolic registers, on the other hand, do not need declaration,
-but their scope never extends outside of a subroutine unit. Symbolics registers
+but their scope never extends outside of a subroutine unit. Symbolic registers
 basically give compiler front ends an easy way to generate code from their
-parse trees or AST. To generate expressions compilers have to create
-temporaries. 
+parse trees or abstract syntax tree (AST). To generate expressions compilers 
+have to create temporaries. 
 
 =head2 Symbolic Registers (or Temporaries)
 
-Symbolic registers have a $ sign for the first character, have single letter (S,N,I,P) for
-the second character, and 1 or more digits for the rest. By the 2nd character IMCC
-determines which set of Parrot registers it belongs to.
+Symbolic registers have a $ sign for the first character, have a single letter 
+representing the register type [S(tring), N(umber), I(nteger) or P(MC)] for
+the second character, and one or more digits for the rest. Although Parrot has
+only 32 real registers of each type, IMCC can handle an arbitrarily large 
+number of symbolic registers of a given type.
 
 Example:
 
@@ -201,16 +203,16 @@ Example:
 	$I1 = 1 + 2
 	$I2 = $I1 * 3
 
-
-This uses symbolic STRING and INTVAL registers as temporaries. This is the typical sort of code
-that compilers generate from the syntax tree.
+This example uses symbolic STRING and INTVAL registers as temporaries. This is the 
+typical sort of code that compilers generate from the syntax tree.
 
 =head2 Named Variables
 
 Named variables are either local, global or namespace qualified. Currently IMCC only
-supports locals transparently, however globals are supported with explicit syntax.
-The way to declare locals in a subroutine is with the B<.local> directive. The B<.local> directive
-also requires a type (B<int>, B<num>, B<string> or a classname such as B<PerlArray>).
+supports locals transparently. However, globals are supported with explicit syntax.
+The way to declare locals in a subroutine is with the B<.local> directive. The 
+B<.local> directive also requires a type (B<int>, B<num>, B<string> or a classname 
+such as B<PerlArray>).
 
 Example:
 
@@ -291,7 +293,7 @@ This one is very simple. Use the B<.include> directive to include other .imc sou
 files. Do keep in mind that currently Parrot starts execution with the first
 sub it sees in the bytecode; so if your main includes external .imc files you need
 to include them after your "main" start sub. If you .include them first (in
-typical C or Perl style, Parrot will execute the first sub in the first included
+typical C or Perl style), Parrot will execute the first sub in the first included
 source file. This is because B<.include> is a preprocessed directive and simply creates
 one huge .imc source module.
 
@@ -324,20 +326,21 @@ one huge .imc source module.
 The C<.include> directive is not the long-term solution for working with
 modular bytecode, but Parrot still lacks some infrastructure for linking and
 running precompiled bytecodes transparently or via an import, so C<.include>
-is the simplest method. The downsize is all code is compiled on the fly.
+is the simplest method. The downside is that all code is compiled on the fly.
 
 =head2 How do I precompile a bytecode library and use it in another module?
 
 If C<.include> just isn't good enough for you, and you want to go ahead and use precompiled
 bytecodes, you can, with some restrictions. You have to explicitly link the symbols
-at runtime. This isn't too tough, just lookup the symbol name and use the PMC you
+at runtime. This isn't too tough: just look up the symbol name and use the PMC you
 get in return. Subroutine PMCs are globals and are autoloaded by the "load_bytecode"
 PASM instruction. 
 
 The main restriction with current Parrot/IMCC is that you can't use the high level
 shortcut for calling subs, ie.  _bar(a,b). Instead you have to setup the arguments
 and the return continuation yourself and call C<invoke> on the Sub PMC. Soon, IMCC and
-Parrot will support a cleaner way of doing this.
+Parrot will support a cleaner way of doing this. For details of the Parrot calling
+conventions, see F<docs/pdds/pdd03_calling_conventions.pod>.
 
 	#######################################################
 	# main.imc
@@ -405,10 +408,8 @@ dynamically.
 Write support routines for new and construct and generate your constructors
 as simple subroutines. I suggest some sort of simple name mangling (C++/Java)
 when naming the subs (_TestClass__print_i). Your compiler will need
-to track field (or member) offsets in the array, or if you want to
-be even lazier and give up a tiny amount of speed, use a hash and you don't
-have to track them.
-
+to track field (or member) offsets in the array. Alternatively, if you want to
+be even lazier and give up a tiny amount of speed, you can use a hash.
 
 =head2 That sounds easy, but how would it look?
 
@@ -427,7 +428,7 @@ there soon. By the time we DO get there, you won't need the syntax below.
 
 =head2 An OOP Example
 
-Hypothetical language Mython, (apologies to Python, but it sure is nice and brief):
+Hypothetical language Mython (apologies to Python, but it sure is nice and brief):
 
 	class TestClass:
 	   int i
@@ -472,8 +473,8 @@ Here is the IMCC workaround until we have explicit .class syntax and bytecode fr
 	.sub _init_world
 	   .local SArray c
 	   .local Sub meth
-	   .local PerlString classname
-	   classname = new PerlString               # class TestClass:
+	   .local String classname
+	   classname = new String                   # class TestClass:
 	   c = new SArray
 	   c = 10    # Array size 10
 	   global "classes::TestClass" = c
@@ -483,7 +484,7 @@ Here is the IMCC workaround until we have explicit .class syntax and bytecode fr
 	   c[2] = meth
 	   meth = global "_TestClass_print_self"    # method print_self:
 	   c[3] = meth
-	   $P100 = new PerlInt                      # int i
+	   $P100 = new Integer                      # int i
 	   c[4] = $P100
 	   # TestClass is now defined, instantiate away
 	   # Setup any other globals for program
@@ -508,8 +509,8 @@ Here is the IMCC workaround until we have explicit .class syntax and bytecode fr
 	   .param pmc self
 	   # Call TestClass constructor
 	   $P100 = self[2]
-	   P2 = self       # For method calling convention P2 is the object
-	   invoke $P100    # Leave P1 with ret continuation (tail chain)
+	   P2 = self       # For method calling convention, P2 is the object
+	   invoke $P100    # Leave P1 with return continuation (tail chain)
 	   .pcc_begin_return
 	   .pcc_end_return
 	.end
@@ -544,8 +545,9 @@ Here is the IMCC workaround until we have explicit .class syntax and bytecode fr
 =head1 Thats not all.
 
 I have lots more to come. If you have suggestions for the FAQ or have an idea for a new
-feature for IMCC, please email me at B<melvin.smith@mindspring.com> and/or hop on #parrot IRC (see
-the Parrot FAQ for IRC directions). I'm also on AOL Instant Messenger, handle: B<MrJoltCola>
+feature for IMCC, please email me at B<melvin.smith@mindspring.com> and/or hop on 
+#parrot IRC (see the Parrot FAQ for IRC directions). I'm also on AOL Instant Messenger, 
+handle: B<MrJoltCola>
 
 Happy Hacking.
 
