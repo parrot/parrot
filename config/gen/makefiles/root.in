@@ -1050,6 +1050,8 @@ languages-clean :
 	$(MAKE_C) languages clean
 
 
+${TEMP_icu_make}
+
 ###############################################################################
 #
 # compiler implementation targets:
@@ -1206,13 +1208,19 @@ nokfile :
 #
 ###############################################################################
 
-clean : test-clean progclean languages-clean docs-clean dynclasses-clean \
- examples-clean imcc-clean compilers-clean
+clean : test-clean \
+  progclean \
+  languages-clean \
+  docs-clean \
+  dynclasses-clean \
+  examples-clean \
+  imcc-clean \
+  compilers-clean
 	${TEMP_cg_r}
 	$(RM_F) *.s *~ $(FLUID_FILES) \
-    examples/assembly/mops$(EXE) examples/assembly/mops.c \
-    examples/assembly/mops$(O) examples/assembly/mops.pbc \
-    examples/mops/mops$(O) examples/mops/mops$(EXE)
+  examples/assembly/mops$(EXE) examples/assembly/mops.c \
+  examples/assembly/mops$(O) examples/assembly/mops.pbc \
+  examples/mops/mops$(O) examples/mops/mops$(EXE)
 
 progclean :
 	$(RM_F) $(O_FILES) \
