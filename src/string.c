@@ -52,29 +52,34 @@ static const CHARTYPE *string_unicode_type;
  * allocated string
  * the header stays the same
  */
+
 static void
 unmake_COW(struct Parrot_Interp *interpreter, STRING *s)
 {
     /* COW_FLAG | constant_FLAG | external_FLAG) */
     if (PObj_is_cowed_TESTALL(s)) {
-        void *p;
-        UINTVAL size, bsize;
-        /* Make the copy point to only the portion of the string that
-         * we are actually using. */
-        p = s->strstart;
-        size = s->bufused;
-        bsize = s->buflen;
+        STRING for_alloc;
+
         /* Create new pool data for this header to use,
          * independant of the original COW data */
         PObj_constant_CLEAR(s);
-        /* don't shorten string, string_append may use buflen
-         *
-         * block GC, p points into string memory
+        /*
+         * allocate a dummy strings memory
+         * buflen might be bigger and used, so pass this length
+         * also be sure not to allocate from the constant pool
          */
-        Parrot_block_GC(interpreter);
-        Parrot_allocate_string(interpreter, s, bsize);
-        Parrot_unblock_GC(interpreter);
-        mem_sys_memcopy(s->strstart, p, size);
+        PObj_constant_CLEAR(&for_alloc);
+        Parrot_allocate_string(interpreter, &for_alloc, s->buflen);
+        /*
+         * now copy memory over
+         */
+        mem_sys_memcopy(for_alloc.strstart, s->strstart, s->bufused);
+        /*
+         * and finally use that string memory
+         */
+        s->bufstart = for_alloc.bufstart;
+        s->strstart = for_alloc.strstart;
+        s->buflen   = for_alloc.buflen;
         /* COW_FLAG | external_FLAG | bufstart_external_FLAG immobile_FLAG */
         PObj_is_external_CLEARALL(s);
     }
