@@ -511,7 +511,7 @@ itcall_sub(SymReg* sub)
    if (current_call->r[0]->pcc_sub->sub->pmc_type == enum_class_NCI)
        current_call->r[0]->pcc_sub->nci = 1;
    if (cur_unit->type == IMC_PCCSUB)
-        cur_unit->instructions->r[1]->pcc_sub->calls_a_sub = 1;
+        cur_unit->instructions->r[1]->pcc_sub->calls_a_sub |= 1;
 }
 
 
@@ -2205,7 +2205,7 @@ yyreduce:
              */
             r1 = cur_unit->instructions->r[1];
             if (r1 && r1->pcc_sub)
-                r1->pcc_sub->calls_a_sub = 1;
+                r1->pcc_sub->calls_a_sub |= 1;
          }
     break;
 
@@ -2406,7 +2406,7 @@ yyreduce:
             if(!ins || !ins->r[1] || ins->r[1]->type != VT_PCC_SUB)
                fataly(EX_SOFTWARE, sourcefile, line,
                       "pcc_yield not inside pcc subroutine\n");
-            ins->r[1]->pcc_sub->calls_a_sub = 1;
+            ins->r[1]->pcc_sub->calls_a_sub = 1 | ITPCCYIELD;
             sprintf(name, "%cpcc_sub_yield_%d", IMCC_INTERNAL_CHAR, cnr++);
             yyval.sr = r = mk_pcc_sub(str_dup(name), 0);
             i = iLABEL(cur_unit, r);
