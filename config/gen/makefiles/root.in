@@ -55,7 +55,7 @@ GEN_HEADERS = $(INC)/vtable.h $(INC)/oplib/core_ops.h \
 
 GEN_SOURCES = core_ops.c core_ops_prederef.c fingerprint.c
 
-GEN_MODULES = lib/Parrot/Jit.pm lib/Parrot/OpLib/core.pm
+GEN_MODULES = lib/Parrot/OpLib/core.pm
 
 FLUID_FILES = $(GEN_OPSFILES) $(GEN_HEADERS) $(GEN_SOURCES) $(GEN_MODULES)
 
@@ -594,3 +594,20 @@ lint2 : ${test_prog}
 	$(LINT) ${cc_inc} ${cc_hasjit} "-Iclasses" $(LINTFLAGS2) `echo $(O_FILES) | sed 's/\.o/\.c/g'`
 	$(LINT) ${cc_inc} $(LINTFLAGS2) test_main.c
 
+
+###############################################################################
+#
+# miniparrot targets:
+#
+###############################################################################
+
+miniparrot-prebuild : $(GEN_CONFIGS) $(FLUID_FILES)
+	@tools/dev/rebuild_miniparrot.pl --action=clean
+	@tools/dev/rebuild_miniparrot.pl --action=prebuild_classes $(CLASS_O_FILES)
+	@tools/dev/rebuild_miniparrot.pl --action=copy_src $(GEN_CONFIGS) $(FLUID_FILES) $(ALL_H_FILES)
+	@tools/dev/rebuild_miniparrot.pl --action=copy_src classes/*.h test_main.c $(INC)/debug.h
+	@tools/dev/rebuild_miniparrot.pl --action=copy_src_from_obj $(O_FILES)
+	@tools/dev/rebuild_miniparrot.pl --action=write_buildscripts --executable=parrot $(O_FILES) test_main.o
+
+miniparrot-update :
+	tools/dev/rebuild_miniparrot.pl	
