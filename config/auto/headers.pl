@@ -21,13 +21,13 @@ use Config;
 
 $description="Probing for C headers...";
 
-@args=qw(miniparrot);
+@args=qw(miniparrot verbose);
 
 sub runstep {
-    my ($miniparrot) = @_;
+    my ($miniparrot, $verbose) = @_;
 
     return if $miniparrot;
-
+    
     # perl5's Configure system doesn't call this by its full name, which may
     # confuse use later, particularly once we break free and start doing all
     # probing ourselves
@@ -54,11 +54,11 @@ sub runstep {
     # the header.
     my @extra_headers = qw(malloc.h fcntl.h setjmp.h pthread.h signal.h
 			   sys/types.h sys/socket.h netinet/in.h arpa/inet.h
-			   sys/stat.h sysexit.h);
+			   sys/stat.h sysexit.h sysmman.h netdb.h);
 
     my @found_headers;
     foreach my $header (@extra_headers) {
-	my $pass;
+	my $pass = 0;
 
 	# First try with just the header. If that fails, try with all the
 	# headers we found so far. This is somewhat a hack, but makes probing
@@ -76,7 +76,7 @@ sub runstep {
 	    Configure::Data->set(testheader => undef);
 
 	    eval { cc_build(); };
-	    if (!$@ && cc_run() =~ /^$header OK$/) {
+	    if (!$@ && cc_run() =~ /^$header OK/) {
 		$pass = 1;
 		push @found_headers, $header;
 	    }
@@ -86,7 +86,7 @@ sub runstep {
 
         my $flag = "i_$header";
         $flag =~ s/\.h$//g; $flag =~ s/\///g;
-
+	print "$flag: $pass\n" if defined $verbose;
 	Configure::Data->set($flag, $pass ? 'define' : undef);
     }
 
