@@ -35,6 +35,10 @@ pmclass ParrotObject need_ext {
 	return SELF->vtable->base_type;
     }
 
+    INTVAL isa(STRING * classname) {
+        return Parrot_object_isa(INTERP, SELF, classname);
+    }    
+
     /* Figure out which method PMC we need. By default we just defer to the
      * system method lookup code
      */
