@@ -613,7 +613,7 @@ if ($dynamic) {
 PMC*
 $load_func(Parrot_Interp interpreter)
 {
-    PMC *lib = pmc_new(interpreter, enum_class_ConstParrotLibrary);
+    PMC *lib = pmc_new(interpreter, enum_class_ParrotLibrary);
     lib->cache.struct_val = (void *) $init_func;
     dynop_register(interpreter, lib);
     return lib;

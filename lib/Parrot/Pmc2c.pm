@@ -266,7 +266,7 @@ PMC* Parrot_lib_${lc_classname}_load(Interp *interpreter)
     /*
      * create a library PMC
      */
-    pmc = pmc_new(interpreter, enum_class_ConstParrotLibrary);
+    pmc = pmc_new(interpreter, enum_class_ParrotLibrary);
     /*
      * TODO stuff some info into this PMCs props
      */

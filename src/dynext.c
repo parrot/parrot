@@ -198,7 +198,12 @@ Parrot_load_lib(Interp *interpreter, STRING *lib, PMC *initializer)
     string_cstring_free(cload_func_name);
     if (!load_func) {
         /* seems to be a native/NCI lib */
-        lib_pmc = pmc_new(interpreter, enum_class_ConstParrotLibrary);
+        /*
+         * this PMC should better be constant, but then all the contents
+         * and the metadata have to be constant too
+         * s. also build_tools/ops2c.pl and lib/Parrot/Pmc2c.pm
+         */
+        lib_pmc = pmc_new(interpreter, enum_class_ParrotLibrary);
         type = string_from_cstring(interpreter, "NCI", 0);
     }
     else {

@@ -328,6 +328,9 @@ sub read_dump {
         elsif ($dump =~ m!^vtable!) {
             $dump = "../vtable.dump";
         }
+        unless ( -e $dump) {
+            $dump = "../classes/$dump";
+        }
     }
     print "Reading $dump\n" if $opt{verbose};
 

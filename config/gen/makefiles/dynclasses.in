@@ -18,7 +18,8 @@ all: foo$(SO) subproxy$(SO)
 .PRECIOUS: %.c
 
 %.c  : %.pmc
-	$(PERL) ..${slash}classes${slash}pmc2c.pl $<
+	$(PERL) ..${slash}classes${slash}pmc2c2.pl --dump $<
+	$(PERL) ..${slash}classes${slash}pmc2c2.pl --c $<
 
 %$(SO) : %.c
 	$(LD) $(LD_SHARED) $(LD_SHARED_FLAGS) $(LDFLAGS) -o $@ \
