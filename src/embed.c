@@ -223,6 +223,11 @@ Parrot_readbc(Interp *interpreter, const char *filename)
 
         fullname = Parrot_locate_runtime_file(interpreter, filename,
                 PARROT_RUNTIME_FT_PBC);
+        if (fullname == NULL) {
+            PIO_eprintf(interpreter, "Parrot VM: Can't locate %s, code %i.\n",
+                        filename, errno);
+            return NULL;
+        }
         fs = interpreter->current_file = string_make(interpreter, fullname,
                 strlen(fullname), "iso-8859-1", 0);
         if (!Parrot_stat_info_intval(interpreter, fs, STAT_EXISTS)) {
