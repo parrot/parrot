@@ -30,7 +30,8 @@ API.
 =item C<void
 string_set_data_directory(const char *dir)>
 
-Sets the ICU data directory.
+Set the directory where ICU finds its data files (encodings, locales,
+etc.).
 
 =cut
 
@@ -48,7 +49,8 @@ string_set_data_directory(const char *dir)
 string_fill_from_buffer(struct Parrot_Interp *interpreter, const void *buffer,
             UINTVAL len, const char *encoding_name, STRING *s)>
 
-Creates a Parrot string from an "external" buffer.
+Creates a Parrot string from an "external" buffer, converting from any
+supported encoding into Parrot string's internal format.
 
 =cut
 
@@ -201,6 +203,12 @@ NSLog(@"%x", outstart[1]);
 */
 
 /*
+
+=back
+
+=head2 Character Property Functions
+
+=over
 
 =item C<UINTVAL 
 Parrot_char_digit_value(struct Parrot_Interp *interpreter, UINTVAL character)>
