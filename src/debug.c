@@ -1691,7 +1691,7 @@ PDB_compile(struct Parrot_Interp *interpreter, char *command)
         command = nextarg(command);
         switch (op_info->types[i]) {
             /* If it's a register skip the letter that
-               presides the register number */
+               precedes the register number */
             case PARROT_ARG_I:
             case PARROT_ARG_N:
             case PARROT_ARG_S:
@@ -1922,13 +1922,20 @@ dump_string(struct Parrot_Interp *interpreter, STRING* s)
 void
 PDB_print_user_stack(struct Parrot_Interp *interpreter, const char *command)
 {
-    unsigned long depth = 0,i;
+    long depth = 0;
     Stack_Chunk_t *chunk = interpreter->ctx.user_stack;
     Stack_Entry_t *entry;
 
-    valid_chunk(chunk, command, depth, STACK_CHUNK_DEPTH, i);
+    if (*command) {
+        depth = atol(command);
+    }
 
-    entry = (Stack_Entry_t *)(chunk->items.bufstart) + depth;
+    entry = stack_entry(interpreter, chunk, (INTVAL)depth);
+
+    if (!entry) {
+        PIO_eprintf(interpreter, "No such entry on stack\n");
+        return;
+    }
 
     switch (entry->entry_type) {
         case STACK_ENTRY_INT:
@@ -2115,6 +2122,9 @@ print_pmc(struct Parrot_Interp *interpreter, PMC* pmc)
     }
 }
 
+/* PDB_print_pmc
+ * print the whole or a specific value of a PMC register structure.
+ */
 void
 PDB_print_pmc(struct Parrot_Interp *interpreter, struct PReg *pmc_reg,
               int regnum, PMC* key)
