@@ -625,7 +625,7 @@ sub op_comp
     #
 
     if (substr($a, 0, 1) eq 'I' and num_q($b)) {
-      emit_code('iton', ['N0', $a]);
+      emit_code('set', ['N0', $a]);
       $a = 'N0';
     }
   } else {
@@ -635,10 +635,10 @@ sub op_comp
 
     if (substr($a, 0, 1) ne substr($b, 0, 1)) {
       if ($a =~ m/^I/) {
-        emit_code('iton', ['N0', $a]);
+        emit_code('set', ['N0', $a]);
         $a = 'N0';
       } elsif ($b =~ m/^I/) {
-        emit_code('iton', ['N0', $b]);
+        emit_code('set', ['N0', $b]);
         $b = 'N0';
       } else {
         confess "jakoc: Internal compiler error. Expected to have to use iton op.";
@@ -1072,9 +1072,9 @@ sub assign_var
   #
 
   if ($ident_info->{TYPE} eq "N" and $value_ident_info->{TYPE} eq "I") {
-    emit_code('iton', [ $ident_info->{VALUE}, $value_ident_info->{VALUE} ]);
+    emit_code('set', [ $ident_info->{VALUE}, $value_ident_info->{VALUE} ]);
   } elsif ($ident_info->{TYPE} eq "I" and $value_ident_info->{TYPE} eq "N") {
-    emit_code('ntoi', [ $ident_info->{VALUE}, $value_ident_info->{VALUE} ]);
+    emit_code('set', [ $ident_info->{VALUE}, $value_ident_info->{VALUE} ]);
   } else {
     printf(STDERR "jakoc: Cannot assign type '%s' to type '%s' on line %d.\n", 
       $value_ident_info->{TYPE}, $ident_info->{TYPE}, $line);
