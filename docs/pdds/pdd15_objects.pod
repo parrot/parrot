@@ -445,38 +445,16 @@ Currently Parrot only supports mutating a class' metainformation for
 ParrotClass classes. This is a restriction which will be lifted at
 some point soon.
 
-=head2 Supporting code
-
-Most of the supporting code is in the src/objects.c file. The
-following routines are provided for PMC authors to use:
-
-=over 4
-
-=item Parrot_single_subclass
-
-=item Parrot_new_class
-
-=item Parrot_class_lookup
-
-=item Parrot_class_register
-
-=item Parrot_instantiate_object
-
-=item Parrot_add_parent
-
-=item Parrot_remove_parent
-
-=item Parrot_object_isa
-
-
-
-=back
 
 =head1 What The Bytecode Sees
 
 The bytecode is isolated from most of the internal details of the
 implementation. This allows both for flexibility in the implementation
-and forward compatibility, generally good things.
+and forward compatibility, generally good things. It also allows for
+multiple concurrent interoperable object systems. The major thrust is
+for transparent use of objects, though most class activity (including
+creation of subclasses and modifications of existing classes) should
+be transparent as well.
 
 =head1 EXAMPLES
 
@@ -485,15 +463,42 @@ ParrotObject objects and ParrotClass classes.
 
 =head2 Creating a new class
 
+To create a new class C<Foo> which has no parent classes:
+
+   newclass $P0, "Foo"
+
 =head2 Creating a new class with multiple parents
 
+To create a class C<Foo> with the parents C<A> and C<B>, the code
+would be:
+
+   findclass $P0, "A"
+   findclass $P1
+   subclass $P2, $P0, "Foo"
+   addparent $P2, $P1
+
 =head2 Creating a new class with attributes
+
+Adding the attributes C<a> and C<b> to the new class C<Foo>:
+
+  newclass $P0, "Foo"
+  addattr $P0, "a", "Foo::a" # This is offset 0
+  addattr $P0, "b", "Foo::b" # This is offset 1
 
 =head2 Instantiating an object
 
 =head2 Calling a method on an object
 
 =head2 Accessing attributes from within a class
+
+Assuming we've an object that has class C<Foo> in it somewhere and
+want to get attribute C<b> out of it:
+
+  .local int BaseOffset
+  .local int BOffset
+  classoffset BaseOffset, $P0, "Foo"
+  BOffset = BaseOffset + 1
+  getattr $P1, $P0, BOffset
 
 =head1 TRANSLATION AND GLOSSARY
 
