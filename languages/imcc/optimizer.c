@@ -49,12 +49,12 @@
  *  because Px where different before
  *
  */
-static void if_branch();
-static void branch_branch();
-static void unused_label();
-static int used_once();
-static int loop_optimization();
-static int clone_remove();
+static void if_branch(void);
+static void branch_branch(void);
+static void unused_label(void);
+static int used_once(void);
+static int loop_optimization(void);
+static int clone_remove(void);
 
 void pre_optimize() {
     if (*optimizer_opt != '0') {      /* XXX */

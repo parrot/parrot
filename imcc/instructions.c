@@ -192,7 +192,7 @@ SymReg *get_branch_reg(Instruction * ins)
  * delete and free *ins
  * actual new ins is returned
  */
-Instruction * delete_ins(Instruction *ins, int free)
+Instruction * delete_ins(Instruction *ins, int needs_freeing)
 {
     Instruction *next, *prev;
 
@@ -200,7 +200,7 @@ Instruction * delete_ins(Instruction *ins, int free)
     prev = ins->prev;
     prev->next = next;
     next->prev = prev;
-    if (free)
+    if (needs_freeing)
         free_ins(ins);
     return next;
 }

@@ -16,8 +16,8 @@
 #include "optimizer.h"
 
 static void make_stat(int *sets, int *cols);
-static void imc_stat_init();
-static void print_stat();
+static void imc_stat_init(void);
+static void print_stat(void);
 
 /* Globals: */
 

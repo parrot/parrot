@@ -80,7 +80,7 @@ void compute_spilling_costs();
 void free_ins(Instruction *);
 char * ins_string(Instruction * ins);
 
-Instruction *delete_ins(Instruction *ins, int free);
+Instruction *delete_ins(Instruction *ins, int needs_freeing);
 void insert_ins(Instruction *ins, Instruction * tmp);
 Instruction *move_ins(Instruction *cur, Instruction *to);
 
