@@ -134,7 +134,9 @@ END
 
 buildfile("test_c");
 system("$c{cc} $c{ccflags} -o test_siz$c{exe} test.c") and die "C compiler died!";
-(@c{qw(ivsize longsize nvsize)})=split('/', `./test_sizes$c{exe}`);
+(@c{qw(ivsize longsize nvsize)})=split('/', `./test_siz$c{exe}`);
+die "Something wicked happened!" 
+    unless defined $c{ivsize} and defined $c{longsize} and defined $c{nvsize};
 unlink('test.c', "test_siz$c{exe}", "test$c{o}");
 
 print <<"END";
