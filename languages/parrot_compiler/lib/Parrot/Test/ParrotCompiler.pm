@@ -47,7 +47,7 @@ sub gen_output
   my $out_f    = Parrot::Test::per_test( '.out', $test_no );
 
   my $test_prog_args = $ENV{TEST_PROG_ARGS} || '';
-  my $cmd      = "(cd $self->{relpath} && $self->{parrot} languages/parrot_compiler/parrot_compiler.pbc $test_prog_args < languages/$code_f)";
+  my $cmd = "(cd $self->{relpath} && $self->{parrot} languages/parrot_compiler/$test_prog_args < languages/$code_f)";
 
   my $parrotdir       = File::Basename::dirname( $self->{parrot} );
   Parrot::Test::generate_code( $code, $parrotdir, $test_no, $code_f );
