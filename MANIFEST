@@ -33,11 +33,11 @@ config_h.in
 core.ops
 disassemble.pl
 docs/Makefile.in
+docs/ParrotFAQ.htm
 docs/embed.pod
 docs/intro.pod
 docs/jit.pod
 docs/overview.pod
-docs/ParrotFAQ.htm
 docs/parrot.pod
 docs/parrot_assembly.pod
 docs/parrotbyte.pod
@@ -89,8 +89,8 @@ hints/mswin32.pl
 hints/os2.pl
 hints/vms.pl
 include/parrot/chartype.h
-include/parrot/encoding.h
 include/parrot/embed.h
+include/parrot/encoding.h
 include/parrot/events.h
 include/parrot/exceptions.h
 include/parrot/global_setup.h
@@ -106,8 +106,8 @@ include/parrot/oplib.h
 include/parrot/packfile.h
 include/parrot/parrot.h
 include/parrot/pmc.h
-include/parrot/register.h
 include/parrot/regfuncs.h
+include/parrot/register.h
 include/parrot/resources.h
 include/parrot/runops_cores.h
 include/parrot/rx.h
@@ -205,6 +205,7 @@ lib/Parrot/Vtable.pm
 lib/Test/Builder.pm
 lib/Test/More.pm
 lib/Test/Simple.pm
+lib_deps.pl
 make.pl
 make_vtable_ops.pl
 manicheck.pl
@@ -237,9 +238,9 @@ t/op/basic.t
 t/op/bitwise.t
 t/op/debuginfo.t
 t/op/hacks.t
+t/op/ifunless.t
 t/op/integer.t
 t/op/interp.t
-t/op/ifunless.t
 t/op/macro.t
 t/op/number.t
 t/op/rx.t
@@ -248,10 +249,10 @@ t/op/string.t
 t/op/time.t
 t/op/trans.t
 t/pmc/array.t
-t/pmc/pmc.t
 t/pmc/perlarray.t
 t/pmc/perlhash.t
 t/pmc/perlstring.t
+t/pmc/pmc.t
 test_c.in
 test_gnuc.c
 test_main.c
