@@ -286,7 +286,7 @@ mark_used(PMC *used_pmc, PMC *current_end_of_list)
 /* Tag a buffer header as alive. Used by the GC system when tracing
  * the root set, and used by the PMC GC handling routines to tag their
  * individual pieces if they have private ones */
-INLINE void
+void
 buffer_lives(Buffer *buffer)
 {
     buffer->flags |= BUFFER_live_FLAG;
@@ -615,7 +615,7 @@ Parrot_initialize_resource_pools(struct Parrot_Interp *interpreter)
                           interpreter->arena_base->constant_string_pool);
 }
 
-INLINE static UINTVAL
+static UINTVAL
 sized_index(size_t unit_size)
 {
     return (unit_size - sizeof(Buffer)) / sizeof(void*);

@@ -69,10 +69,10 @@ typedef struct rxinfo {
 
 rxinfo *rx_allocate_info(struct Parrot_Interp *, STRING *);
 
-INLINE INTVAL rx_is_word_character(struct Parrot_Interp *, INTVAL ch);
-INLINE INTVAL rx_is_number_character(struct Parrot_Interp *, INTVAL ch);
-INLINE INTVAL rx_is_whitespace_character(struct Parrot_Interp *, INTVAL ch);
-INLINE INTVAL rx_is_newline(struct Parrot_Interp *, INTVAL ch);
+INTVAL rx_is_word_character(struct Parrot_Interp *, INTVAL ch);
+INTVAL rx_is_number_character(struct Parrot_Interp *, INTVAL ch);
+INTVAL rx_is_whitespace_character(struct Parrot_Interp *, INTVAL ch);
+INTVAL rx_is_newline(struct Parrot_Interp *, INTVAL ch);
 
 Bitmap bitmap_make(struct Parrot_Interp *, STRING *);
 Bitmap bitmap_make_cstr(struct Parrot_Interp *, const char *);

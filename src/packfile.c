@@ -101,7 +101,7 @@ byteorder if needed.
 
 ***************************************/
 
-INLINE opcode_t
+opcode_t
 PackFile_fetch_op(struct PackFile *pf, opcode_t *stream) {
     if(pf->fetch_op == NULL)
         return *stream;
@@ -122,7 +122,7 @@ byteorder if needed.
 
 ***************************************/
 
-INLINE INTVAL
+INTVAL
 PackFile_fetch_iv(struct PackFile *pf, opcode_t *stream) {
     if(pf->fetch_iv == NULL)
         return *stream;
@@ -140,7 +140,7 @@ byteorder if needed.
 
 ***************************************/
 
-INLINE FLOATVAL
+FLOATVAL
 PackFile_fetch_nv(struct PackFile *pf, opcode_t *stream) {
     /* When we have alignment all squared away we don't need
      * to use memcpy() for native byteorder.

@@ -49,7 +49,7 @@ rx_allocate_info(struct Parrot_Interp *interpreter, STRING *string)
     return rx;
 }
 
-INLINE INTVAL
+INTVAL
 rx_is_word_character(struct Parrot_Interp *interpreter, INTVAL ch)
 {
     static Bitmap bmp = NULL;
@@ -61,7 +61,7 @@ rx_is_word_character(struct Parrot_Interp *interpreter, INTVAL ch)
     return bitmap_match(bmp, ch);
 }
 
-INLINE INTVAL
+INTVAL
 rx_is_number_character(struct Parrot_Interp *interpreter, INTVAL ch)
 {
     /* faster to do less-than/greater-than */
@@ -74,7 +74,7 @@ rx_is_number_character(struct Parrot_Interp *interpreter, INTVAL ch)
     }
 }
 
-INLINE INTVAL
+INTVAL
 rx_is_whitespace_character(struct Parrot_Interp *interpreter, INTVAL ch)
 {
     static Bitmap bmp = NULL;
@@ -86,7 +86,7 @@ rx_is_whitespace_character(struct Parrot_Interp *interpreter, INTVAL ch)
     return bitmap_match(bmp, ch);
 }
 
-INLINE INTVAL
+INTVAL
 rx_is_newline(struct Parrot_Interp *interpreter, INTVAL ch)
 {
     static Bitmap bmp = NULL;

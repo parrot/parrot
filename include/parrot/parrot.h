@@ -97,19 +97,6 @@ typedef void (*funcptr_t)(void);
 #define D2FPTR(x) (funcptr_t)(UINTVAL) x
 #define F2DPTR(x) (void*)(UINTVAL)(funcptr_t) x
 
-
-/* Provide support for inline keyword where available.  Just make sure to use
- * "INLINE" instead and it will DTRT. */
-#ifdef __cplusplus
-#  define INLINE inline
-#else
-#  ifdef __GNUC__
-#    define INLINE __inline__
-#  else 
-#    define INLINE
-#  endif
-#endif
-
 /* On Win32 we need the constant O_BINARY for open() (at least for Borland C), 
    but on UNIX it doesn't exist, so set it to 0 if it's not defined
  */
