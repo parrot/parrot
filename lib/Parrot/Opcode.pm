@@ -6,6 +6,7 @@ use Digest::MD5 qw(&md5_hex);
 
 my %opcode;
 my $fingerprint;
+my $revision;
 
 sub _load {
     my $file = @_ ? shift : "opcode_table";
@@ -17,6 +18,10 @@ sub _load {
     my $count = 1;
     while (<$fh>) {
 	$md5->add($_);
+
+	if (m/^# \$Id: opcode_table,v ([0-9.]+) /) {
+	  $revision = $1;
+        }
 
 	s/#.*//;
 	s/^\s+//;
@@ -54,6 +59,11 @@ sub read_ops {
 sub fingerprint {
     _load(@_) unless defined $fingerprint;
     return $fingerprint;
+}
+
+sub revision {
+    _load(@_) unless defined $revision;
+    return $revision;
 }
 
 1;
