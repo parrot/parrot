@@ -2975,9 +2975,12 @@ preg:
                 emitm_pushl_i(pc, interpreter);
                 break;
             default:
-                internal_exception(1,
-                        "Parrot_jit_build_call_func: unimp argument\n");
-                break;
+                /*
+                 * oops unknown signature:
+                 * cleanup and try nci.c
+                 */
+                mem_free_executable(jit_info.native_ptr);
+                return NULL;
         }
         /* default stack usage */
         st += 4;
@@ -3093,12 +3096,11 @@ preg:
             jit_emit_mov_mr_i(pc, &STR_REG(next_s++), emit_EAX);
             break;
         default:
-            internal_exception(1,
-                    "Parrot_jit_build_call_func: unimp return value\n");
-            break;
+            mem_free_executable(jit_info.native_ptr);
+            return NULL;
     }
-    /* set return values passed on stack */
-    jit_emit_mov_mi_i(pc, &INT_REG(0), 0);
+    /* set prototyped return */
+    jit_emit_mov_mi_i(pc, &INT_REG(0), 0);  /* XXX fix tests */
     /* set return values in I,S,P,N regs */
     jit_emit_mov_mi_i(pc, &INT_REG(1), next_i-5);
     jit_emit_mov_mi_i(pc, &INT_REG(2), next_s-5);
