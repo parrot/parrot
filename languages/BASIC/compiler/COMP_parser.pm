@@ -283,6 +283,7 @@ BARE:	# Check for user-subroutine
 		print CODE "$labels{$syms[CURR]}:   # For user branch ($syms[CURR])\n";
 		print CODE "\tset .LINE, $sourceline\n";
 		trace() if ($opts{trace});
+		debug() if ($opts{debug});
 		$currline="$labels{$syms[CURR]}";
 		feedme;  # Get the :
 		goto PARSE
@@ -374,6 +375,7 @@ UNK:	if (($type[CURR] eq "STMT" or $type[CURR] eq "COMM") and $singleif) {
 		print CODE "$labels{$syms[CURR]}:   # For user branch ($syms[CURR])\n";
 		print CODE "\tset .LINE, $sourceline\n";
 		trace() if ($opts{trace});
+		debug() if ($opts{debug});
 		goto PARSE
 	}
 	#

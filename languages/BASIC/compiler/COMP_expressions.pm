@@ -253,7 +253,7 @@ PROCEXP_NOFEED:
 			push(@evalstack, [ ( 'ARG', 'ARG' ) ] );
 		} elsif ($syms[NEXT] eq '(') {  # Arrays!  TBD...
 			&$shuffleargs;
-			push(@workstack, [ ( 'PUN', '(' ) ] );
+			#push(@workstack, [ ( 'PUN', '(' ) ] );
 			push(@workstack, [ ( 'SUBSCRIPT', $syms[CURR] ) ] );
 			push(@evalstack, [ ( 'SUBS', 'SUBS' ) ] );
 		} else {

@@ -1337,6 +1337,7 @@
 [BASIC]		languages/BASIC/compiler/compile.pl
 [BASIC]		languages/BASIC/compiler/readme.bas
 [BASIC]		languages/BASIC/compiler/samples/conn4.bas
+[BASIC]		languages/BASIC/compiler/samples/chess.bas
 [BASIC]		languages/BASIC/compiler/samples/eliza2.bas
 [BASIC]		languages/BASIC/compiler/samples/hanoi.bas
 [BASIC]		languages/BASIC/compiler/samples/newtrek.bas
