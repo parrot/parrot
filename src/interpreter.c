@@ -96,7 +96,7 @@ make_interpreter() {
 
     BUILD_TABLE(foo);
 
-    (void *)interpreter->opcode_funcs = foo;
+    interpreter->opcode_funcs = (void*)foo;
   }
 
   /* In case the I/O system needs something */
