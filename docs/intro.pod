@@ -301,7 +301,7 @@ This little program displays the Unix epoch time every second: (or so)
  REDO:   time I1
          print I1
          print "\n"
-         set I2 0
+         set I2, 0
  SPIN:   inc I2
          le I2, I3, SPIN
          branch REDO
