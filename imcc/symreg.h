@@ -45,7 +45,10 @@ typedef struct _Life_range {
 enum USAGE {
 	U_KEYED		= 1 << 0,	/* array, hash, keyed */
 	U_NEW		= 1 << 1,	/* PMC was inited */
-	U_SPILL		= 1 << 2	/* reg is spilled */
+	U_SPILL		= 1 << 2,	/* reg is spilled */
+	U_GLOBAL        = 1 << 3,       /* symbol is global (fixup) */
+	U_LEXICAL       = 1 << 4,       /* symbol is lexical */
+	U_FIXUP         = 1 << 5        /* maybe not global, force fixup */
 };
 
 typedef struct _SymReg {
@@ -88,6 +91,10 @@ struct namespace_t {
 };
 
 EXTERN Namespace * namespace;
+
+struct _IMC_Unit;
+
+
 /* functions */
 
 SymReg * mk_symreg(char *, int t);
@@ -95,9 +102,16 @@ SymReg * mk_temp_reg(int t);
 SymReg * mk_ident(char *, int t);
 SymReg * mk_const(char *, int t);
 SymReg * mk_const_ident(char *, int t, SymReg *, int);
+
+/* Eventually make mk_address static */
 SymReg * mk_address(char *, int uniq);
+/* Expose API through these */
 SymReg * mk_sub_label(char *);
+SymReg * mk_sub_address(char *);
+SymReg * mk_local_label(struct _IMC_Unit *, char *);
+SymReg * mk_label_address(struct _IMC_Unit *, char *);
 SymReg * mk_pcc_sub(char *, int proto);
+
 char * symreg_to_str(SymReg *);    
 void add_pcc_arg(SymReg *r, SymReg * arg);
 void add_pcc_sub(SymReg *r, SymReg * arg);
@@ -128,7 +142,6 @@ enum uniq_t {
 	U_add_all };
 SymReg * mk_pasm_reg(char *);
 
-struct _IMC_Unit;
 
 void free_sym(SymReg *r);
 void store_symreg(SymReg * r);

@@ -332,21 +332,52 @@ _mk_address(SymReg *hsh[], char * name, int uniq)
     return r;
 }
 
-
 SymReg * mk_address(char * name, int uniq)
 {
+    SymReg * s;
     SymReg ** h = *name == '_' ? ghash : cur_unit->hash;
-    return _mk_address(h, name, uniq);
+    s = _mk_address(h, name, uniq);
+    if(*name == '_')
+       s->usage |= U_FIXUP;
+    return s;
 }
 
 /*
  * Make and store a new address label for a sub.
+ * Label gets a fixup entry.
  */
 SymReg * mk_sub_label(char * name)
 {
-    return _mk_address(ghash, name, U_add_uniq_sub);
+    SymReg * s = _mk_address(ghash, name, U_add_uniq_sub);
+    s->usage |= U_FIXUP;
+    return s;
 }
 
+/*
+ * Make a symbol for a label, symbol gets a fixup entry.
+ */
+SymReg * mk_sub_address(char * name)
+{
+    SymReg * s = _mk_address(ghash, name, U_add_once);
+    s->usage |= U_FIXUP;
+    return s;  
+}
+
+/*
+ * Make a local symbol, no fixup entry.
+ */
+SymReg * mk_local_label(IMC_Unit * unit, char * name)
+{
+    return _mk_address(unit->hash, name, U_add_uniq_label);
+}
+
+/*
+ *
+ */
+SymReg * mk_label_address(IMC_Unit * unit, char * name)
+{
+    return _mk_address(unit->hash, name, U_add_once);
+}
 
 
 /* link keys to a keys structure = SymReg
