@@ -23,7 +23,7 @@ dispatches these to one or all interpreters.
 #include <assert.h>
 
 /*
- * event debugging stuff - turn it off befreo running tests
+ * event debugging stuff - turn it off before running tests
  */
 #define EVENT_DEBUG 0
 /*
@@ -37,6 +37,26 @@ dispatches these to one or all interpreters.
 
 #if EVENT_DEBUG
 #  define edebug(x) fprintf x
+static const char *ev_names[] = {
+    "EVENT_TYPE_NONE",
+    "EVENT_TYPE_EVENT",
+    "EVENT_TYPE_IO",
+    "EVENT_TYPE_MSG",
+    "EVENT_TYPE_ASYNC_IO",
+    "EVENT_TYPE_TIMER",
+    "EVENT_TYPE_CALL_BACK",
+    "EVENT_TYPE_SLEEP",
+    "EVENT_TYPE_TERMINATE",
+    "EVENT_TYPE_EVENT_TERMINATE",
+    "EVENT_TYPE_CLASS_CHANGED",
+    "EVENT_TYPE_SIGNAL"
+};
+static const char*
+et(parrot_event* e)
+{
+    return ev_names[e->type];
+}
+
 #else
 #  define edebug(x)
 #endif
@@ -476,7 +496,7 @@ Parrot_schedule_interp_qentry(Parrot_Interp interpreter, QUEUE_ENTRY* entry)
     /*
      * sleep checks events when it awakes
      */
-    edebug((stderr, "got entry - schedule_inter_qentry %d\n", event->type));
+    edebug((stderr, "got entry - schedule_inter_qentry %s\n", et(event)));
     if (event->type != EVENT_TYPE_SLEEP)
         enable_event_checking(interpreter);
     /*
@@ -915,7 +935,7 @@ wait_for_wakeup(Parrot_Interp interpreter, void *next)
      * event handler likes callbacks or timers are run as normal code
      * so inside such an even handler function another event might get
      * handled, which is good (higher priority events can interrupt
-     * other event handler OTOH we must ensure that all state changes
+     * other event handler) OTOH we must ensure that all state changes
      * are done in do_event and we should probably suspend nested
      * event handlers sometimes
      *
@@ -929,9 +949,10 @@ wait_for_wakeup(Parrot_Interp interpreter, void *next)
         entry = wait_for_entry(tq);
         event = (parrot_event* )entry->data;
         mem_sys_free(entry);
-        edebug((stderr, "got ev %d head : %p\n", event->type, tq->head));
+        edebug((stderr, "got ev %s head : %p\n", et(event), tq->head));
         next = do_event(interpreter, event, next);
     }
+    edebug((stderr, "woke up\n"));
     return next;
 }
 
@@ -951,6 +972,8 @@ Parrot_sleep_on_event(Parrot_Interp interpreter, FLOATVAL t, void* next)
 {
 #if PARROT_HAS_THREADS
 
+    if (interpreter->sleeping)
+        fprintf(stderr, "nested sleep might not work\n");
     /*
      * place the opcode_t* next arg in the event data, so that
      * we can identify this event in wakeup
@@ -1036,7 +1059,7 @@ Run user code or such.
 static void*
 do_event(Parrot_Interp interpreter, parrot_event* event, void *next)
 {
-    edebug((stderr, "do_event %d\n", event->type));
+    edebug((stderr, "do_event %s\n", et(event)));
     switch (event->type) {
         case EVENT_TYPE_TERMINATE:
             next = NULL;        /* this will terminate the run loop */
@@ -1061,13 +1084,6 @@ do_event(Parrot_Interp interpreter, parrot_event* event, void *next)
             break;
         case EVENT_TYPE_SLEEP:
             interpreter->sleeping = 0;
-#if 0
-            /* doesn't work do_event is called from outside too */
-            if (!next || event->data 1= next)
-                internal_exception(1,
-                        "Unhandled nested sleep call: next = %p ed = %p",
-                        next, event->data);
-#endif
             break;
         default:
             fprintf(stderr, "Unhandled event type %d\n", event->type);
