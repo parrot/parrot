@@ -12,7 +12,7 @@ tools/docs/pod_errors.pl - Reports POD errors
 
 =head1 DESCRIPTION
 
-This script reports on any POD errors found int the files.
+This script reports on any POD errors found in the files.
 
 =cut
 
