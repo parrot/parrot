@@ -50,7 +50,7 @@ my $labels={};
 
 for my $file (@files) {
     open FILE,"<$file" or
-        die "Couldn't open <$file: $!";
+        die "Couldn't read from '$file': $!";
     while (<FILE>) {
         next if /^\s*#/;
         chomp;
@@ -85,7 +85,7 @@ my $packfile = {
 exit if exists $args{checksyntax};
 if(exists $args{output}) {
     open FILE,">$args{output}"
-      or die "Could not write to $args{output}: $!";
+      or die "Could not write to '$args{output}': $!";
     print FILE Parrot::PakFile2::output_bytecode($packfile);
     close FILE;
 }
@@ -136,7 +136,7 @@ sub define_labels {
 
     # If we find a label, store its PC
     if (s/^(\s*(\w+):)//) {
-        die "Redefined label $2 at line $.\n" if exists $labels->{$2};
+        die "Redefined label '$2' at line $.\n" if exists $labels->{$2};
         $labels->{$2} = $pc;
     }
 
@@ -177,7 +177,7 @@ sub replace_labels {
             if (defined $labels->{$arg}) {
                 push @args, $labels->{$arg} - $ops_pc;
             } else {
-                die "Undefined label $arg used at line $lineno\n";
+                die "Undefined label '$arg' used at line $lineno\n";
             }
         } else {
             push @args, $arg;
@@ -207,7 +207,7 @@ sub expand_op {
     my $type_specifier = join "_", @arg_t;
     my $complete = $op;
     $complete .="_$type_specifier" if $type_specifier;
-    warn "Can't find op $complete at line $lineno\n" 
+    warn "Can't find op '$complete' at line $lineno\n" 
         unless exists $ops->{$op}{$type_specifier};
     return $complete." ".join ",",@args;
 }
@@ -222,7 +222,7 @@ sub emit {
     return unless $_;
 
     s/(\w+)\s*//;
-    die "Can't find op $1\n" unless exists $fullops->{$1};
+    die "Can't find op '$1'\n" unless exists $fullops->{$1};
     $rv .= pack_op($fullops->{$1}); 
     Parrot::Assembler::Utils::map_args {
         my ($arg_t, $arg) = @_;
