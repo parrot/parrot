@@ -11,9 +11,20 @@
  *     for another entry; if a chunk is filled, a new chunk is added
  *     onto the list before returning.
  *
- *     A stack chunk is a bufferlike structure and may be GCed or COWed.
- *     As top chunks are COWed on usage, its only safe to walk the stack
- *     from top down via the prev pointers.
+ *     We use "tree-stacks" and COW (copy-on-write) semantics in order
+ *     to make continuations easy. A stack chunk is a bufferlike structure
+ *     and may be GCed or COWed. As top chunks are COWed on usage, its only
+ *     safe to walk the stack from top down via the prev pointers.
+ *     stack_chunk->prev->next may not equal stack_chunk if prev is
+ *     COWed and not copied yet.
+ *
+ *     COWed chunks are NOT magically copied, so any attempts to write should
+ *     take care that the chunk may be shared.
+ *
+ *     However:
+ *     API calls stack_push, stack_pop and rotate_entries will take care of
+ *     COW semantics themselves.
+ *     
  *
  *  History:
  *  Notes:
