@@ -1003,7 +1003,7 @@ PDB_disassemble_op(struct Parrot_Interp *interpreter, char* dest, int space,
     int j;
 
     /* Write the opcode name */
-    strcpy(dest, full_name ? info->full_name : info->name);
+    strcpy(&dest[file->size], full_name ? info->full_name : info->name);
     size += strlen(dest);
 
     dest[size++] = ' ';
@@ -1210,7 +1210,7 @@ PDB_disassemble_op(struct Parrot_Interp *interpreter, char* dest, int space,
     }
 
     dest[size] = '\0';
-    return size;
+    return ++size;
 }
 
 /* PDB_disassemble
@@ -1224,6 +1224,8 @@ PDB_disassemble(struct Parrot_Interp *interpreter, const char *command)
     PDB_line_t *pline,*newline;
     PDB_label_t *label;
     opcode_t *code_end,*pc = interpreter->code->byte_code;
+
+    int space = 0;  /* How much space do we have? */
 
     pfile = (PDB_file_t *)mem_sys_allocate(sizeof(PDB_file_t));
     pline = (PDB_line_t *)mem_sys_allocate(sizeof(PDB_line_t));
@@ -1239,13 +1241,15 @@ PDB_disassemble(struct Parrot_Interp *interpreter, const char *command)
     code_end = pc + interpreter->code->byte_code_size / sizeof(opcode_t);
     while (pc != code_end) {
         /* Grow it early*/
-        if (pfile->size % 32768 < 100 ) {
+        if (pfile->size % 32768 < 32668 ) {
             pfile->source = mem_sys_realloc(pfile->source,
                                             (size_t)pfile->size + 32768);
+
+            space += 32768;
         }
 
         pfile->size =
-            PDB_disassemble_op(interpreter, pfile->source, pfile->size,
+            PDB_disassemble_op(interpreter, pfile->source, space,
                                &interpreter->op_info_table[*pc], pc,
                                pfile, NULL, 1);
         pfile->source[pfile->size - 1] = '\n';
@@ -1256,6 +1260,7 @@ PDB_disassemble(struct Parrot_Interp *interpreter, const char *command)
         /* Prepare for next line */
         newline = (PDB_line_t *)mem_sys_allocate(sizeof(PDB_line_t));
         newline->number = pline->number + 1;
+        newline->label  = NULL;
         pline->next = newline;
         pline = newline;
         pline->source_offset = pfile->size;
