@@ -1,5 +1,5 @@
 use Parrot::Test 'no_plan';
-use Parrot::Test::P6GE;
+use Parrot::Test::PGE;
 
 $str = q{abc
 def

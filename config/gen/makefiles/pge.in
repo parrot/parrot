@@ -31,24 +31,26 @@ SO        = ${share_ext}
 LD_LOAD_FLAGS = ${ld_load_flags}
 
 # the default target
-all: $(PARROT_RUNTIME)${slash}p6ge$(SO)
+all: $(PARROT_RUNTIME)${slash}pge$(SO)
 
-$(PARROT_RUNTIME)${slash}p6ge$(SO): p6ge$(SO)
-	$(CP) p6ge$(SO) $(PARROT_RUNTIME)
+$(PARROT_RUNTIME)${slash}pge$(SO): pge$(SO)
+	$(CP) pge$(SO) $(PARROT_RUNTIME)
 
-p6ge$(SO): p6ge_parse$(O) p6ge_gen$(O) p6ge_parsep5$(O)
-	$(LD) $(LD_SHARE_FLAGS) $(LDFLAGS) -o p6ge$(SO) p6ge_parse$(O) p6ge_gen$(O) p6ge_parsep5$(O)
+pge$(SO): pge_parse$(O) pge_gen$(O) pge_opt$(O) pge_parsep5$(O) pge_parseglob$(O)
+	$(LD) $(LD_SHARE_FLAGS) $(LDFLAGS) -o pge$(SO) pge_parse$(O) pge_gen$(O) pge_opt$(O) pge_parsep5$(O) pge_parseglob$(O)
 
-p6ge_gen$(O): p6ge_gen.c p6ge.h
-p6ge_parse$(O): p6ge_parse.c p6ge.h
-p6ge_parsep5$(O): p6ge_parsep5.c p6ge.h
+pge_gen$(O): pge_gen.c pge.h
+pge_parse$(O): pge_parse.c pge.h
+pge_parsep5$(O): pge_parsep5.c pge.h
+pge_parseglob$(O): pge_parseglob.c pge.h
+pge_opt$(O): pge_opt.c pge.h
 
 # This is a listing of all targets, that are meant to be called by users
 help:
 	@echo ""
 	@echo "Following targets are available for the user:"
 	@echo ""
-	@echo "  all:               p6ge.so"
+	@echo "  all:               pge.so"
 	@echo "                     This is the default."
 	@echo "Testing:"
 	@echo "  test:              Run the test suite."
@@ -70,7 +72,7 @@ testclean:
 	$(RM_RF) ../../t/p6rules/*.imc ../../t/p6rules/*.pasm
 
 clean: testclean
-	$(RM_RF) *$(O) p6ge$(SO)
+	$(RM_RF) *$(O) pge$(SO)
 
 realclean: clean
 	$(RM_RF) Makefile

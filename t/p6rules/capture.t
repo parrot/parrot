@@ -1,5 +1,5 @@
 use Parrot::Test 'no_plan';
-use Parrot::Test::P6GE;
+use Parrot::Test::PGE;
 
 p6rule_is  ('zzzabcdefzzz', '(a.)..(..)', 'basic match');
 p6rule_like('zzzabcdefzzz', '(a.)..(..)', qr/0: <abcdef @ 3>/, 'basic $0');

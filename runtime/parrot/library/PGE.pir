@@ -1,22 +1,22 @@
 =head1 TITLE
 
-p6ge.pir - main module for the Perl 6 Grammar Engine
+PGE.pir - main module for the Parrot Grammar Engine
 
 =head1 SYNOPSIS
 
     ...
-    .local pmc p6gec
-    loadbytecode "p6ge.pir"
-    p6gec = global "_p6ge_compile"
+    .local pmc pgec
+    loadbytecode "pge.pir"
+    pgec = global "_pge_compile"
     ...
-    rule = p6gec("^(From|To):")
+    rule = pgec("^(From|To):")
     match = rule($S0)
     ...
 
 =head1 DESCRIPTION
 
 This module contains the routines and constants necessary to
-use the Perl 6 Grammar Engine.
+use the Parrot Grammar Engine.
 
 =head1 FUNCTIONS
 
@@ -25,7 +25,7 @@ use the Perl 6 Grammar Engine.
 =cut
 
 .sub __onload @LOAD
-    newclass $P0, "P6GE::Match"
+    newclass $P0, "PGE::Match"
     addattribute $P0, ".target"            # string to be matched
     addattribute $P0, ".rulecor"           # match coroutine
     addattribute $P0, ".state"             # result of the match
@@ -33,11 +33,11 @@ use the Perl 6 Grammar Engine.
     addattribute $P0, ".caphash"           # captures hash (key=groupid)
 .end
 
-.namespace [ "P6GE" ]
+.namespace [ "PGE" ]
 
-=item sub = _p6ge_compile( pattern )
+=item rulesub = p6rule( pattern )
 
-=item (sub, pir) = _p6ge_compile( pattern )
+=item (rulesub, pir) = p6rule( pattern )
 
 Compiles a string containing a pattern into a subroutine that can
 be used to match strings containing the pattern.  The first form
@@ -47,31 +47,87 @@ the subroutine.
 
 =cut
 
-.sub _p6ge_compile
+.sub p6rule
     .param string pattern
-    .local pmc p6gec
+    .local pmc pgec
     .local string pir
     .local pmc rulesub
 
-    loadlib $P0, "p6ge"                    # load p6ge.so
-    dlfunc p6gec, $P0, "p6ge_p6rule_pir", "tt"  # find the p6ge compiler
+    loadlib $P0, "pge"                    # load pge.so
+    dlfunc pgec, $P0, "pge_p6rule_pir", "tt"  # find the pge compiler
 
   compile:
-    pir = p6gec(pattern)                   # compile to PIR
+    pir = pgec(pattern)                   # compile to PIR
     compreg $P0, "PIR"                     # get the PIR compiler
     rulesub = compile $P0, pir             # compile rule's PIR to a sub
     .return(rulesub, pir)               
 .end
 
-.sub _p6ge_set_trace
+=item rulesub = p5re( pattern )
+
+=item (rulesub, pir) = p5re( pattern )
+
+Compiles a string containing a pattern into a subroutine that can
+be used to match strings containing the pattern.  The first form
+simply returns a subroutine; the second form also returns a string
+containing the intermediate PIR code that was generated to produce
+the subroutine.
+
+=cut
+
+.sub p5re
+    .param string pattern
+    .local pmc pgec
+    .local string pir
+    .local pmc rulesub
+
+    loadlib $P0, "pge"                    # load pge.so
+    dlfunc pgec, $P0, "pge_p5re_pir", "tt"  # find the pge compiler
+
+  compile:
+    pir = pgec(pattern)                   # compile to PIR
+    compreg $P0, "PIR"                     # get the PIR compiler
+    rulesub = compile $P0, pir             # compile rule's PIR to a sub
+    .return(rulesub, pir)               
+.end
+
+=item rulesub = pge_glob( pattern )
+
+=item (rulesub, pir) = pge_glob( pattern )
+
+Compiles a string containing a glob pattern into a subroutine that can
+be used to match strings containing the pattern.  The first form
+simply returns a subroutine; the second form also returns a string
+containing the intermediate PIR code that was generated to produce
+the subroutine.
+
+=cut
+
+.sub glob
+    .param string pattern
+    .local pmc pgec
+    .local string pir
+    .local pmc rulesub
+
+    loadlib $P0, "pge"                    # load pge.so
+    dlfunc pgec, $P0, "pge_glob_pir", "tt"  # find the pge compiler
+
+  compile:
+    pir = pgec(pattern)                   # compile to PIR
+    compreg $P0, "PIR"                     # get the PIR compiler
+    rulesub = compile $P0, pir             # compile rule's PIR to a sub
+    .return(rulesub, pir)               
+.end
+
+.sub set_trace
     .param int istraced
-    .local pmc p6ge_set_trace
-    loadlib $P0, "p6ge"                    # load p6ge.so
-    dlfunc $P1, $P0, "p6ge_set_trace", "vi"  # find the p6ge compiler
+    .local pmc pge_set_trace
+    loadlib $P0, "pge"                    # load pge.so
+    dlfunc $P1, $P0, "pge_set_trace", "vi"  # find the pge compiler
     $P1(istraced)
 .end
 
-.namespace [ "P6GE::Match" ]
+.namespace [ "PGE::Match" ]
 
 .sub _init method
     .param string target
@@ -79,7 +135,7 @@ the subroutine.
     .local pmc state, rephash, caphash
     $P0 = new .PerlString                  # set .target
     $P0 = target
-    classoffset $I0, self, "P6GE::Match"       
+    classoffset $I0, self, "PGE::Match"       
     setattribute self, $I0, $P0              
     inc $I0                                # set .rulecor
     setattribute self, $I0, rulecor               
@@ -96,7 +152,7 @@ the subroutine.
 .end
 
 .sub __get_bool method
-    classoffset $I0, self, "P6GE::Match"
+    classoffset $I0, self, "PGE::Match"
     $I0 += 2
     getattribute $P0, self, $I0            # ".status"
     $I1 = $P0
@@ -110,7 +166,7 @@ the subroutine.
     .local string target_s
     .local int target_len
     .local int pos
-    classoffset $I0, self, "P6GE::Match"
+    classoffset $I0, self, "PGE::Match"
     getattribute target, self, $I0         # ".target" string to match
     inc $I0
     getattribute rulecor, self, $I0        # ".rulecor" coroutine
@@ -137,7 +193,7 @@ the subroutine.
     .local pmc caparray
     .local pmc groupiter
     .local string gname
-    classoffset $I0, self, "P6GE::Match"
+    classoffset $I0, self, "PGE::Match"
     getattribute target, self, $I0         # ".target" string
     $I0 += 4
     getattribute caphash, self, $I0        # ".capture" hash

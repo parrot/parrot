@@ -1,13 +1,13 @@
 =head1 NAME
 
-Parrot::Test::P6GE - test functions for Perl 6 Grammar Engine
+Parrot::Test::PGE - test functions for Perl 6 Grammar Engine
 
 =head1 SYNOPSIS
 
 In a .t file:
 
   use Parrot::Test tests => 2;
-  use Parrot::Test::P6GE;
+  use Parrot::Test::PGE;
 
   p6rule_is('abc', '^abc', 'BOS abc');
   p6rule_isnt('abc', '^bc', 'BOS bc');
@@ -15,7 +15,7 @@ In a .t file:
 
 =head1 DESCRIPTION
 
-Parrot::Test::P6GE provides functions for testing the grammar engine
+Parrot::Test::PGE provides functions for testing the grammar engine
 and Perl 6 rules.
 
 =cut
@@ -40,7 +40,7 @@ using qr// for the $pattern then you're misreading what this does.)
 sub p6rule_is {
     my ($target, $pattern, $description) = @_;
     Parrot::Test::pir_output_is(
-            Parrot::Test::P6GE::_generate_pir_for($target, $pattern),
+            Parrot::Test::PGE::_generate_pir_for($target, $pattern),
             'matched',
             $description);
 }
@@ -55,7 +55,7 @@ if they do not match.
 sub p6rule_isnt {
     my ($target, $pattern, $description) = @_;
     Parrot::Test::pir_output_is(
-            Parrot::Test::P6GE::_generate_pir_for($target, $pattern),
+            Parrot::Test::PGE::_generate_pir_for($target, $pattern),
             'failed',
             $description);
 }
@@ -71,12 +71,12 @@ parameter.  Note that C<$expected> is a I<Perl 5> pattern.
 sub p6rule_like {
     my ($target, $pattern, $expected, $description) = @_;
     Parrot::Test::pir_output_like(
-            Parrot::Test::P6GE::_generate_pir_for($target, $pattern, 1),
+            Parrot::Test::PGE::_generate_pir_for($target, $pattern, 1),
             $expected,
             $description);
 }
 
-package Parrot::Test::P6GE;
+package Parrot::Test::PGE;
 
 sub _parrot_stringify {
     $_ = $_[0];
@@ -100,10 +100,10 @@ sub _generate_pir_for {
         $captures = "";
     }
     return qq(
-        .sub _P6GE_Test
+        .sub _PGE_Test
             .local pmc p6rule_compile
-            load_bytecode "compilers/p6ge/p6ge.pir"
-            find_global p6rule_compile, "P6GE", "_p6ge_compile"
+            load_bytecode "runtime/parrot/library/PGE.pir"
+            find_global p6rule_compile, "PGE", "p6rule"
 
             .local string target
             .local string pattern

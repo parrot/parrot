@@ -1,13 +1,13 @@
-=head1 Perl 6 Grammar Engine (P6GE)
+=head1 Parrot Grammar Engine (PGE)
 
-This is an initial implementation of a Perl 6 Grammar Engine designed
-to run in Parrot.  It's definitely a work in progress, and much of the
-current implementation is designed simply to "bootstrap" us along
-(i.e., some parts such as the parser and generator are expected to be
-discarded).  The current work is also largely incomplete -- although
-it has support for groups (capturing and non-capturing), quantifiers, 
-alterations, etc., many of the standard assertions and character classes 
-are not implemented yet but will be coming soon.
+This is an initial implementation of a regular expression/rules/grammar 
+engine designed to run in Parrot.  It's definitely a work in progress, 
+and much of the current implementation is designed simply to "bootstrap" 
+us along (i.e., some parts such as the parser and generator are 
+expected to be discarded).  The current work is also largely incomplete 
+-- although it has support for groups (capturing and non-capturing), 
+quantifiers, alterations, etc., many of the standard assertions and 
+character classes are not implemented yet but will be coming soon.
 
 In addition there's some experimental work here in being able to parse 
 and convert Perl *5* regular expressions into PIR subroutines, but the
@@ -16,45 +16,50 @@ fold in perl 5 syntax a bit later.
 
 =head1 Installation
 
-P6GE assumes that it is part of the parrot distribution in the 
-F<compilers/p6ge> directory.   Simply type C<make> in this directory
-to build the F<p6ge.so> shared library it needs -- p6ge.so is
+PGE assumes that it is part of the parrot distribution in the 
+F<compilers/pge> directory.   Simply type C<make> in this directory
+to build the F<pge.so> shared library it needs -- pge.so is
 then placed in F<runtime/parrot/dynext>.  In some environments you
 may need to set LD_LIBRARY_PATH to search this correctly.
 
 The distribution comes with a small F<demo.pir> program that gives an
-example of using P6GE.  To run the demo, simply do 
-C<parrot demo.pir>.  In the demo, you can use a leading slash to enter
-a rule to be compiled (note: no trailing slash), you can enter a 
-string to be matched against the previously entered rule, you can enter
-a "?" to see the PIR subroutine for the rule, and you can enter a "+"
-to re-invoke the rule on the previous string.
+example of using PGE.  To run the demo, simply do 
+C<parrot demo.pir>.  The demo understands the following commands:
 
+    rule <pattern>    - a perl 6 rule to be matched
+    text              - a text string to match against previously entered rule
+    glob <pattern>    - a glob (wildcard) pattern to be matched
+    print             - display the PIR cod generated for current rule
+    trace             - toggle pattern execution tracing
+    next              - repeat last match on target string
+    
 If you get errors about "cannot open shared object file", that usually
-means that Parrot was unable to locate the p6ge.so object file.
+means that Parrot was unable to locate the pge.so object file.
 
-=head1 Using P6GE
+=head1 Using PGE
 
 Because I couldn't find a lot of detailed information about writing a
 Parrot compiler in C, I went ahead and wrote this using Parrot's
 native call interface.  Essentially the library provides a 
-C<p6ge_p6rule_pir()> function that builds a PIR code string from a 
+C<pge_p6rule_pir()> function that builds a PIR code string from a 
 given rule string, this PIR code string can then be sent to the PIR 
 compiler to get a final subroutine.  (Having the PIR code string 
 easily available and printable is also very handy for debugging as 
 we build the rest of the grammar engine.)
 
-Here's a short example for compiling a regular expression and then
-matching it against another string:
+There's a PGE.pir library in F<runtime/parrot/library> that provides
+PIR-compatible calling interfaces to the compiler.  Here's a short
+example for compiling a regular expression and then matching it
+against another string:
 
-    load_bytecode "p6ge.pir"
-    .local pmc p6ge_compile
-    find_global p6ge_compile, "P6GE", "_p6ge_compile"  # get the compiler
+    load_bytecode "library/PGE.pir"          
+    .local pmc p6rule_compile
+    find_global p6rule_compile, "PGE", "p6rule"  # get the compiler
 
     .local string pattern       
     .local pmc rulesub                     
-    set pattern, "^(From|Subject):"        # pattern to compile
-    rulesub = p6ge_compile(pattern)        # compile it to rulesub
+    pattern = "^(From|Subject):"           # pattern to compile
+    rulesub = p6rule_compile(pattern)     # compile it to rulesub
 
     .local pmc match
     $S0 = "From: pmichaud@pobox.com"       # target string
@@ -72,25 +77,25 @@ matching it against another string:
   match_fail:
     print "match failed\n"            
 
-One can also get the intermediate PIR code that P6GE generates for
+One can also get the intermediate PIR code that PGE generates for
 the rule subroutine -- just use
 
-    (rule, $S0) = p6ge_compile(target)
+    (rulesub, $S0) = p6rule_compiler(target)
 
 and you can print/inspect the contents of $S0 to see the generated code.
 
 =head1 Known Limitations
 
-At the moment, P6GE is not very aware of Unicode strings -- it's pretty 
+At the moment, PGE is not very aware of Unicode strings -- it's pretty 
 much limited to 8-bit Latin-1 characters in patterns.  This is because the
-P6GE parser is still in C, and because support for character class 
+PGE parser is still in C, and because support for character class 
 operations in Parrot is still being worked out.  Eventually these
-things will be resolved and we'll fix P6GE up for Unicode then.
+things will be resolved and we'll fix PGE up for Unicode then.
 
 Most of the backslash sequences (\d, \D, \N, etc.) are unimplemented, 
 although backslashes do properly escape metacharacters in literals.
 
-P6GE doesn't (yet) properly handle nested repetitions of zero-length 
+PGE doesn't (yet) properly handle nested repetitions of zero-length 
 patterns in groups -- that's coming next.
 
 This is just the first-cut framework for building the 
@@ -105,12 +110,12 @@ implemented yet -- my primary goals at this point are to
 that more people can be testing and building upon the engine.
 
 Lastly, error handling needs to be improved, but this will likely
-be decided as we discover how P6GE integrates with the rest of
+be decided as we discover how PGE integrates with the rest of
 Parrot.
 
 =head1 Implementation notes
 
-Basically, P6GE consists of a parser and a PIR code generator written
+Basically, PGE consists of a parser and a PIR code generator written
 in C.  The parser takes a string representing a P6 rule and builds a
 parse tree for the rule.  The generator then produces a PIR subroutine
 (matching engine) that can match strings according to the components 
@@ -122,7 +127,7 @@ conventions for all interfaces with external callers/callees.
 The compiler is designed such that we can switch the matching engine 
 to use PCC for its internal calls at some point in the future.
 
-P6GE also uses Parrot coroutines for the matching
+PGE also uses Parrot coroutines for the matching
 engine, so that after a successful match is found, the 
 next match within the same string can be found by simply 
 returning control to the matching coroutine (which then
