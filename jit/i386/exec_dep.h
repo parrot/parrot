@@ -235,18 +235,7 @@ Parrot_exec_save(Parrot_exec_objfile_t *obj, const char *file)
     header.a_drsize = obj->data_rellocation_count
         * sizeof(struct relocation_info);
     save_struct(fp, &header, sizeof(struct exec));
-    /*
-    save_zero(fp);
-    fprintf(fp, "\x86\x01\x07");
-    save_int(fp, obj->text.size);
-    save_int(fp, obj->data.size);
-    save_int(fp, obj->bss.size);
-    save_int(fp, obj->symbol_count * 0xc);
-    save_int(fp, 0);
-    save_int(fp, obj->text_rellocation_count * 0x8);
-    save_int(fp, 0);
-    */
-    /* Text */
+   /* Text */
     for (i = 0; i < obj->text.size; i++)
         fprintf(fp, "%c", obj->text.code[i]);
     /* Data */
@@ -275,12 +264,7 @@ Parrot_exec_save(Parrot_exec_objfile_t *obj, const char *file)
                 break;
         }
         save_struct(fp, &rellocation, sizeof(struct relocation_info));
-        /* 
-        save_int(fp, obj->text_rellocation_table[i].offset);
-        save_short(fp, obj->text_rellocation_table[i].symbol_number);
-        save_short(fp, obj->text_rellocation_table[i].type);
-        */
-    }
+   }
     /* Symbol table */
     for (i = 0; i < obj->symbol_count; i++) {
         bzero(&symlst, sizeof(struct nlist));
@@ -306,12 +290,7 @@ Parrot_exec_save(Parrot_exec_objfile_t *obj, const char *file)
                 break;
         }
         save_struct(fp, &symlst, sizeof(struct nlist));
-        /*
-        save_int(fp, obj->symbol_table[i].offset_list);
-        save_int(fp, obj->symbol_table[i].type);
-        save_int(fp, obj->symbol_table[i].offset_text);
-        */
-    }
+   }
     /* String table size */
     save_int(fp, obj->symbol_list_size);
     /* String table */
@@ -379,7 +358,7 @@ Parrot_exec_save(Parrot_exec_objfile_t *obj, const char *file)
 #   if EXEC_OS == NETBSD
     header.e_ident[7] = ELFOSABI_NETBSD;
 #   endif
-#   if EXEC_OS == LINUX
+#   if EXEC_OS == LINUX && defined(ELFOSABI_LINUX)
     header.e_ident[7] = ELFOSABI_LINUX;
 #   endif
 
@@ -467,12 +446,7 @@ Parrot_exec_save(Parrot_exec_objfile_t *obj, const char *file)
                 break;
         }
         save_struct(fp, &rellocation, sizeof(Elf32_Rel));
-        /* 
-        save_int(fp, obj->text_rellocation_table[i].offset);
-        save_short(fp, obj->text_rellocation_table[i].symbol_number);
-        save_short(fp, obj->text_rellocation_table[i].type);
-        */
-    }
+   }
     /* Symbol table */
     /* zero */
     bzero(&symlst, sizeof(Elf32_Sym));
@@ -535,12 +509,7 @@ Parrot_exec_save(Parrot_exec_objfile_t *obj, const char *file)
                 break;
         }
         save_struct(fp, &symlst, sizeof(Elf32_Sym));
-        /*
-        save_int(fp, obj->symbol_table[i].offset_list);
-        save_int(fp, obj->symbol_table[i].type);
-        save_int(fp, obj->symbol_table[i].offset_text);
-        */
-    }
+   }
     /* String table */
     save_zero(fp);
     fprintf(fp, "t.pbc");
@@ -557,54 +526,6 @@ Parrot_exec_save(Parrot_exec_objfile_t *obj, const char *file)
     save_zero(fp);
     fclose(fp);
 }
-/*
-    sechdr.sh_name = 1;
-    sechdr.sh_type = SHT_STRTAB;
-    sechdr.sh_flags = 0;
-    sechdr.sh_addr = 0;
-    sechdr.sh_offset = current_offset;
-    sechdr.sh_size = 0x41;
-    sechdr.sh_link = 0;
-    sechdr.sh_info = 0;
-    sechdr.sh_addralign = 1;
-    sechdr.sh_entsize = 0;
-
-    save_struct(fp, &sechdr, sizeof(struct Elf32_Shdr));
-    
-    current_offset += 0x41;
-*/
-/*
-    sechdr.sh_name = 0xf;
-    sechdr.sh_type = SHT_PROGBITS;
-    sechdr.sh_flags = SHF_WRITE | SHF_ALLOC;
-    sechdr.sh_addr = 0;
-    sechdr.sh_offset = current_offset;
-    sechdr.sh_size = obj->data.size;
-    sechdr.sh_link = 0;
-    sechdr.sh_info = 0;
-    sechdr.sh_addralign = 4;
-    sechdr.sh_entsize = 0;
-
-    save_struct(fp, &sechdr, sizeof(struct Elf32_Shdr));
-    
-    current_offset += obj->data.size;
-*/
-/*
-    sechdr.sh_name = 0xb;
-    sechdr.sh_type = SHT_PROGBITS;
-    sechdr.sh_flags = SHF_ALLOC | SHF_EXECINSTR;
-    sechdr.sh_addr = 0;
-    sechdr.sh_offset = current_offset;
-    sechdr.sh_size = obj->text.size;
-    sechdr.sh_link = 0;
-    sechdr.sh_info = 0;
-    sechdr.sh_addralign = 4;
-    sechdr.sh_entsize = 0;
-
-    save_struct(fp, &sechdr, sizeof(struct Elf32_Shdr));
-    
-    current_offset += obj->text.size;
-*/
 
 #  endif /* EXEC_ELF */
 
