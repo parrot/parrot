@@ -156,7 +156,7 @@ pmclass PerlArray {
 	KEY* key = SELF->cache.struct_val;
 	KEY_PAIR key_pair;
 	if(index >= key_size(INTERP,key)) {
-	    key_set_size(INTERP,key,index);
+	    key_set_size(INTERP,key,index+1);
 	}
 	key_pair.type = enum_key_num;
 	key_pair.cache.num_val = value;
@@ -182,7 +182,7 @@ pmclass PerlArray {
 	KEY* key = SELF->cache.struct_val;
 	KEY_PAIR key_pair;
 	if(index >= key_size(INTERP,key)) {
-	    key_set_size(INTERP,key,index);
+	    key_set_size(INTERP,key,index+1);
 	}
 	key_pair.type = enum_key_string;
 	key_pair.cache.struct_val = value;
