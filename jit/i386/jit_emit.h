@@ -18,9 +18,10 @@
 /*
  * if we have a delegated method like typeof_i_p, that returns an INTVAL
  * and that is all in a sequence of JITted opcodes, and when these INTVAL
- * is MAPped, we got a problem
+ * is MAPped, we got a problem. So the EXT_CALL flag is disabled - mapped
+ * registers are saved/restored around vtable calls.
  */
-#  define  JIT_VTABLE_OPS 0
+#  define  JIT_VTABLE_OPS 1
 
 /* EXEC_SHARED generates code to be used with libparrot.so
  * It grabs the real address of cgp_core from the gcc generated code
@@ -1962,58 +1963,9 @@ Parrot_jit_vtable_n_op(Parrot_jit_info_t *jit_info,
     int pi;
     int idx, i, j;
     int st = 0;         /* stack pop correction */
-    int saved = 0;
-    Parrot_jit_register_usage_t *ru = jit_info->optimizer->cur_section->ru;
     extern char **Parrot_exec_rel_addr;
     extern int Parrot_exec_rel_count;
-    int loaded_eax = 0;
 
-    /* this is not callee saved, emit_EDX is 4th in intval_map
-     * should also save floating regs back?
-     */
-    if (ru[0].registers_used >= INT_REGISTERS_TO_MAP - 1) {
-        emitm_pushl_r(jit_info->native_ptr, emit_EDX);
-        saved = 1;
-    }
-    if (ru[0].registers_used == INT_REGISTERS_TO_MAP) {
-        emitm_pushl_r(jit_info->native_ptr, emit_ECX);
-        saved = 2;
-    }
-    /*
-     * if we have key constants these might contain mapped integer
-     * registers. first scan for KC
-     */
-    for (idx = n; idx > 0; idx--) {
-        i = args[idx-1];
-        switch (op_info->types[i]) {
-            case PARROT_ARG_KC:
-                /*
-                 * check map[0] i.e. INTVALS
-                 */
-                for (j = 0; j < ru[0].registers_used; j++) {
-                    int us = ru[0].reg_usage[j];
-                    /* get interpreter */
-                    if (!loaded_eax) {
-                        emitm_movl_m_r(jit_info->native_ptr,
-                                emit_EAX, emit_EBP, emit_None, 1,
-                                INTERP_BP_OFFS);
-                        loaded_eax = 1;
-                    }
-                    Parrot_jit_emit_mov_mr_offs(interpreter, emit_EAX,
-                            REG_OFFS_INT(us),
-                            jit_info->intval_map[j]);
-                }
-        }
-    }
-
-    if (loaded_eax) {
-        jit_emit_mov_rr_i(jit_info->native_ptr, emit_EBX, emit_EAX);
-    }
-    else {
-        /* get interpreter into %ebx - mov offs(%ebp), %ecx */
-        emitm_movl_m_r(jit_info->native_ptr,
-                emit_EBX, emit_EBP, emit_None, 1, INTERP_BP_OFFS);
-    }
     /* get the offset of the first vtable func */
     offset = offsetof(struct _vtable, init);
     offset += nvtable * sizeof(void *);
@@ -2136,10 +2088,6 @@ store:
     emitm_callm(jit_info->native_ptr, emit_EAX, emit_None, emit_None, offset);
     emitm_addb_i_r(jit_info->native_ptr,
             st + sizeof(void *) * (n + 1), emit_ESP);
-    if (saved == 2)
-        emitm_popl_r(jit_info->native_ptr, emit_ECX);
-    if (saved)
-        emitm_popl_r(jit_info->native_ptr, emit_EDX);
 }
 
 static void
@@ -2148,31 +2096,12 @@ Parrot_jit_store_retval(Parrot_jit_info_t *jit_info,
 {
     op_info_t *op_info = &interpreter->op_info_table[*jit_info->cur_op];
     int p1 = *(jit_info->cur_op + 1);
-    Parrot_jit_register_usage_t *ru = jit_info->optimizer->cur_section->ru;
 
-    /*
-     * if we have an MAPped return value, we don't need the interpreter
-     * else get interpreter
-     */
-
-    if (MAP(1) && (op_info->types[1] == PARROT_ARG_I ||
-                   op_info->types[1] == PARROT_ARG_N)) {
-        ; /* nix */
-    }
-    else {
-        emitm_movl_m_r(jit_info->native_ptr,
-                emit_EBX, emit_EBP, emit_None, 1, INTERP_BP_OFFS);
-    }
     /* return result is in EAX or ST(0) */
     switch (op_info->types[1]) {
         case PARROT_ARG_I:
-            /* XXX INTVAL_SIZE */
-            if (MAP(1)) {
-                jit_emit_mov_rr_i(jit_info->native_ptr, MAP(1), emit_EAX);
-            }
-            else
-                emitm_movl_r_m(jit_info->native_ptr,
-                        emit_EAX, emit_EBX, emit_None, 1, REG_OFFS_INT(p1));
+            emitm_movl_r_m(jit_info->native_ptr,
+                    emit_EAX, emit_EBX, emit_None, 1, REG_OFFS_INT(p1));
             break;
         case PARROT_ARG_S:
             emitm_movl_r_m(jit_info->native_ptr,
@@ -2183,12 +2112,8 @@ Parrot_jit_store_retval(Parrot_jit_info_t *jit_info,
                     emit_EAX, emit_EBX, emit_None, 1, REG_OFFS_PMC(p1));
             break;
         case PARROT_ARG_N:
-            if (MAP(1)) {
-                emitm_fstp(jit_info->native_ptr, (1 + MAP(1)));
-            }
-            else
-                jit_emit_fstore_mb_n(jit_info->native_ptr, emit_EBX,
-                        REG_OFFS_NUM(p1));
+            jit_emit_fstore_mb_n(jit_info->native_ptr, emit_EBX,
+                    REG_OFFS_NUM(p1));
             break;
         default:
             internal_exception(1, "jit_vtable1r: ill LHS");
@@ -2348,25 +2273,9 @@ Parrot_jit_vtable_newp_ic_op(Parrot_jit_info_t *jit_info,
     int p1, i2;
     op_info_t *op_info = &interpreter->op_info_table[*jit_info->cur_op];
     size_t offset = offsetof(struct _vtable, init);
-    int nvtable = op_jit[*jit_info->cur_op].extcall;
-    int saved = 0;
-    Parrot_jit_register_usage_t *ru = jit_info->optimizer->cur_section->ru;
     extern char **Parrot_exec_rel_addr;
     extern int Parrot_exec_rel_count;
 
-    /* this is not callee saved, emit_EDX is 3rd in intval_map
-     * should also save floating regs back?
-     */
-    if (ru[0].registers_used >= INT_REGISTERS_TO_MAP - 1) {
-        emitm_pushl_r(jit_info->native_ptr, emit_EDX);
-        saved = 1;
-    }
-    if (ru[0].registers_used == INT_REGISTERS_TO_MAP) {
-        emitm_pushl_r(jit_info->native_ptr, emit_ECX);
-        saved = 2;
-    }
-
-    assert(nvtable == 0);       /* vtable->init */
     assert(op_info->types[1] == PARROT_ARG_P);
     p1 = *(jit_info->cur_op + 1);
     assert(p1 >= 0 && p1 < NUM_REGISTERS);
@@ -2402,10 +2311,6 @@ Parrot_jit_vtable_newp_ic_op(Parrot_jit_info_t *jit_info,
     emitm_callm(jit_info->native_ptr, emit_EAX, emit_None, emit_None, offset);
     /* adjust 4 args pushed */
     emitm_addb_i_r(jit_info->native_ptr, 16, emit_ESP);
-    if (saved == 2)
-        emitm_popl_r(jit_info->native_ptr, emit_ECX);
-    if (saved)
-        emitm_popl_r(jit_info->native_ptr, emit_EDX);
 }
 
 #    undef IREG
@@ -2787,6 +2692,11 @@ Parrot_jit_normal_op(Parrot_jit_info_t *jit_info,
     if (cur_op >= jit_op_count()) {
         cur_op = CORE_OPS_wrapper__;
     }
+    /*
+     * op functions have the signature (cur_op, intepreter)
+     * we use the interpreter already on stack and only push the
+     * cur_op
+     */
     emitm_pushl_i(jit_info->native_ptr, jit_info->cur_op);
 
     call_func(jit_info,
@@ -3227,19 +3137,13 @@ char floatval_map[] = { 1,2,3,4 };
 #    define INTERP_BP_OFFS -16
 #  endif
 
-#  define Parrot_jit_emit_get_base_reg_no(interp) \
-    (Parrot_jit_emit_mov_rm_offs(interpreter, emit_EAX, \
-                                 emit_EBP,INTERP_BP_OFFS), \
-    emit_EAX)
-
-
 /*
- * I386 has JITed vtables, which have the vtable# in extcall.
- * This Parrot_jit_vtable_n_op() doese use register mappings.
+ * just return the interpreter for now
  */
-#  if JIT_VTABLE_OPS
-#  define EXTCALL(op) (op_jit[*(op)].extcall == 1)
-#  endif
+#  define Parrot_jit_emit_get_base_reg_no(interp) \
+    emit_EBX
+
+
 
 #endif /* JIT_EMIT */
 #endif /* PARROT_I386_JIT_EMIT_H_GUARD */
