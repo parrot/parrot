@@ -378,7 +378,7 @@ all : flags_dummy $(TEST_PROG) library/config.fpmc docs
 .SUFFIXES: .c .h .pmc .dump $(O) .str
 
 # constant string support
-.c.str: build_tools/c2str.pl
+.c.str:
 	$(PERL) build_tools/c2str.pl $< > $@
 
 STR_FILES = \
