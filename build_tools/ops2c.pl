@@ -53,9 +53,10 @@ die "$0: Could not read ops file '$file'!\n" unless -e $file;
 
 my $ops = new Parrot::OpsFile $file;
 
-my $version = $ops->version;
+my $version       = $ops->version;
 my $major_version = $ops->major_version;
 my $minor_version = $ops->minor_version;
+my $patch_version = $ops->patch_version;
 
 for $file (@ARGV) {
     die "$0: Could not read ops file '$file'!\n" unless -e $file;
@@ -107,7 +108,7 @@ print HEADER <<END_C;
 #include "parrot/parrot.h"
 #include "parrot/oplib.h"
 
-extern op_lib_t * Parrot_DynOp_${base}${suffix}_${major_version}_${minor_version}(void);
+extern op_lib_t * Parrot_DynOp_${base}${suffix}_${major_version}_${minor_version}_${patch_version}(void);
 
 END_C
 
@@ -230,12 +231,13 @@ static op_lib_t op_lib = {
   "$base",
   $major_version,
   $minor_version,
+  $patch_version,
   $num_ops,
   op_info_table,
   op_func_table
 };
 
-op_lib_t * Parrot_DynOp_${base}${suffix}_${major_version}_${minor_version}(void) {
+op_lib_t * Parrot_DynOp_${base}${suffix}_${major_version}_${minor_version}_${patch_version}(void) {
   return &op_lib;
 }
 

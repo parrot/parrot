@@ -93,12 +93,12 @@ init_prederef(struct Parrot_Interp * interpreter)
   char file_name[50];
   char func_name[50];
 
-  sprintf(file_name, "lib%s_prederef_%d_%d.so", PARROT_CORE_OPLIB_NAME,
-    PARROT_CORE_OPLIB_MAJOR_VERSION, PARROT_CORE_OPLIB_MINOR_VERSION);
+  sprintf(file_name, "lib%s_prederef.so.%s", PARROT_CORE_OPLIB_NAME,
+    PARROT_VERSION);
 
-  sprintf(func_name, "Parrot_DynOp_%s_prederef_%d_%d",
-    PARROT_CORE_OPLIB_NAME, PARROT_CORE_OPLIB_MAJOR_VERSION,
-    PARROT_CORE_OPLIB_MINOR_VERSION);
+  sprintf(func_name, "Parrot_DynOp_%s_prederef_%d_%d_%d",
+    PARROT_CORE_OPLIB_NAME, PARROT_MAJOR_VERSION,
+    PARROT_MINOR_VERSION, PARROT_PATCH_VERSION);
 
   /*
   ** Get a handle to the library file:
@@ -107,9 +107,8 @@ init_prederef(struct Parrot_Interp * interpreter)
   prederef_oplib_handle = Parrot_dlopen(file_name);
 
   if (!prederef_oplib_handle) {
-    fprintf(stderr, "Unable to dynamically load oplib file '%s' for oplib '%s_prederef' version %d.%d!\n",
-      file_name, PARROT_CORE_OPLIB_NAME, PARROT_CORE_OPLIB_MAJOR_VERSION, 
-      PARROT_CORE_OPLIB_MINOR_VERSION);
+    fprintf(stderr, "Unable to dynamically load oplib file '%s' for oplib '%s_prederef' version %s!\n",
+      file_name, PARROT_CORE_OPLIB_NAME, PARROT_VERSION);
 
     exit(1);
   }
@@ -121,10 +120,8 @@ init_prederef(struct Parrot_Interp * interpreter)
   prederef_oplib_init   = Parrot_dlsym(prederef_oplib_handle, func_name);
 
   if (!prederef_oplib_init) {
-    fprintf(stderr, "No exported symbol for oplib init function '%s' from oplib file '%s' for oplib '%s_prederef' version %d.%d!\n",
-      func_name, file_name,
-      PARROT_CORE_OPLIB_NAME, PARROT_CORE_OPLIB_MAJOR_VERSION, 
-      PARROT_CORE_OPLIB_MINOR_VERSION);
+    fprintf(stderr, "No exported symbol for oplib init function '%s' from oplib file '%s' for oplib '%s_prederef' version %s!\n",
+      func_name, file_name, PARROT_CORE_OPLIB_NAME, PARROT_VERSION);
 
     exit(1);
   }
@@ -136,10 +133,9 @@ init_prederef(struct Parrot_Interp * interpreter)
   prederef_oplib        = prederef_oplib_init();
 
   if (!prederef_oplib) {
-    fprintf(stderr, "No oplib info returned by oplib init function '%s' from oplib file '%s' for oplib '%s_prederef' version %d.%d!\n",
+    fprintf(stderr, "No oplib info returned by oplib init function '%s' from oplib file '%s' for oplib '%s_prederef' version %s!\n",
       func_name, file_name,
-      PARROT_CORE_OPLIB_NAME, PARROT_CORE_OPLIB_MAJOR_VERSION, 
-      PARROT_CORE_OPLIB_MINOR_VERSION);
+      PARROT_CORE_OPLIB_NAME, PARROT_VERSION);
     exit(1);
   }
 
@@ -150,10 +146,9 @@ init_prederef(struct Parrot_Interp * interpreter)
   prederef_op_count     = prederef_oplib->op_count;
 
   if (prederef_op_count <= 0) {
-    fprintf(stderr, "Illegal op count (%d) from oplib file '%s' for oplib '%s_prederef' version %d.%d!\n",
+    fprintf(stderr, "Illegal op count (%d) from oplib file '%s' for oplib '%s_prederef' version %s!\n",
       prederef_op_count, file_name,
-      PARROT_CORE_OPLIB_NAME, PARROT_CORE_OPLIB_MAJOR_VERSION, 
-      PARROT_CORE_OPLIB_MINOR_VERSION);
+      PARROT_CORE_OPLIB_NAME, PARROT_VERSION);
     exit(1);
   }
 
@@ -164,10 +159,9 @@ init_prederef(struct Parrot_Interp * interpreter)
   prederef_op_info      = prederef_oplib->op_info_table;
 
   if (!prederef_op_info) {
-    fprintf(stderr, "No op info table in oplib file '%s' for oplib '%s_prederef' version %d.%d!\n",
+    fprintf(stderr, "No op info table in oplib file '%s' for oplib '%s_prederef' version %s!\n",
       file_name,
-      PARROT_CORE_OPLIB_NAME, PARROT_CORE_OPLIB_MAJOR_VERSION, 
-      PARROT_CORE_OPLIB_MINOR_VERSION);
+      PARROT_CORE_OPLIB_NAME, PARROT_VERSION);
     exit(1);
   }
 
@@ -178,10 +172,9 @@ init_prederef(struct Parrot_Interp * interpreter)
   prederef_op_func      = prederef_oplib->op_func_table;
 
   if (!prederef_op_func) {
-    fprintf(stderr, "No op func table in oplib file '%s' for oplib '%s_prederef' version %d.%d!\n",
+    fprintf(stderr, "No op func table in oplib file '%s' for oplib '%s_prederef' version %s!\n",
       file_name,
-      PARROT_CORE_OPLIB_NAME, PARROT_CORE_OPLIB_MAJOR_VERSION,
-      PARROT_CORE_OPLIB_MINOR_VERSION);
+      PARROT_CORE_OPLIB_NAME, PARROT_VERSION);
     exit(1);
   }
 }

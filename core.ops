@@ -2,7 +2,7 @@
 ** core.ops
 */
 
-VERSION = 0.3;
+VERSION = PARROT_VERSION;
 
 =head1 NAME
 

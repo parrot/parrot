@@ -1,7 +1,62 @@
 O = ${o}
+SO = .so
+A = .a
 RM_F = ${rm_f}
+RM_RF = ${rm_f} -r
+AR_CRS = ar crs
 
 INC=include/parrot
+
+
+###############################################################################
+#
+# "STICKY" GENERATED FILES:
+#
+# These files are created when Configure.pl runs.
+#
+# We don't delete these on 'clean' only on 'realclean'.
+# That way, we don't have to re-Configure.pl after making
+# clean.
+#
+###############################################################################
+
+GEN_MAKEFILES = Makefile classes/Makefile languages/Makefile \
+languages/jako/Makefile languages/miniperl/Makefile languages/scheme/Makefile
+
+GEN_CONFIGS  = include/parrot/config.h include/parrot/platform.h Parrot/Config.pm \
+Parrot/Types.pm platform.c
+
+STICKY_FILES = $(GEN_CONFIGS) $(GEN_MAKEFILES)
+
+
+###############################################################################
+#
+# "FLUID" GENERATED FILES:
+#
+# These files are created during the build process.
+#
+# We *do* delete these on 'clean'.
+#
+###############################################################################
+
+GEN_OPSFILES = vtable.ops
+
+GEN_HEADERS = $(INC)/vtable.h $INC/jit_struct.h $(INC)/oplib/core_ops.h \
+$(INC)/oplib/core_ops_prederef.h
+
+GEN_SOURCES = core_ops.c core_ops_prederef.c vtable_ops.c
+
+GEN_MODULES = Parrot/Jit.pm Parrot/PMC.pm Parrot/Types.pm \
+Parrot/OpLib/core.pm
+
+FLUID_FILES = $(GEN_OPSFILES) $(GEN_HEADERS) $(GEN_SOURCES) $(GEN_MODULES)
+
+
+###############################################################################
+#
+# OTHER FILE GROUPS:
+#
+###############################################################################
 
 H_FILES = $(INC)/config.h $(INC)/exceptions.h $(INC)/io.h $(INC)/op.h \
 $(INC)/register.h $(INC)/string.h $(INC)/events.h $(INC)/interpreter.h \
@@ -14,16 +69,29 @@ $(INC)/interp_guts.h $(INC)/jit.h $(INC)/jit_struct.h
 CLASS_O_FILES = classes/default$(O) classes/perlint$(O) classes/perlstring$(O) \
 classes/perlnum$(O) classes/perlarray$(O) classes/perlundef$(O)
 
-O_FILES = global_setup$(O) interpreter$(O) parrot$(O) register$(O) \
-core_ops$(O) core_ops_prederef$(O) memory$(O) packfile$(O) stacks$(O) string$(O) encoding$(O) \
-chartype$(O) runops_cores$(O) trace$(O) pmc$(O) key$(O) \
-encodings/singlebyte$(O) encodings/utf8$(O) encodings/utf16$(O) \
-encodings/utf32$(O) chartypes/unicode$(O) chartypes/usascii$(O) resources$(O) \
-platform$(O) $(CLASS_O_FILES) jit$(O)
+ENCODING_O_FILES = encodings/singlebyte$(O) encodings/utf8$(O) encodings/utf16$(O) \
+encodings/utf32$(O)
 
-#DO NOT ADD C COMPILER FLAGS HERE
-#Add them in Configure.pl--look for the
-#comment 'ADD C COMPILER FLAGS HERE'
+CHARTYPE_O_FILES = chartypes/unicode$(O) chartypes/usascii$(O)
+
+INTERP_O_FILES = global_setup$(O) interpreter$(O) parrot$(O) register$(O) \
+core_ops$(O) core_ops_prederef$(O) memory$(O) packfile$(O) stacks$(O) \
+string$(O) encoding$(O) chartype$(O) runops_cores$(O) trace$(O) pmc$(O) key$(O) \
+platform$(O) jit$(O) resources$(O)
+
+O_FILES = $(INTERP_O_FILES) $(CLASS_O_FILES) $(ENCODING_O_FILES) $(CHARTYPE_O_FILES)
+
+
+###############################################################################
+#
+# BUILD TOOL CONFIGURATIONS:
+#
+# DO NOT ADD C COMPILER FLAGS HERE
+# Add them in Configure.pl--look for the
+# comment 'ADD C COMPILER FLAGS HERE'
+#
+###############################################################################
+
 CFLAGS = ${ccflags} ${cc_debug} -I./include
 
 C_LIBS = ${libs}
@@ -31,10 +99,30 @@ C_LIBS = ${libs}
 CC = ${cc}
 LD = ${ld}
 PERL = ${perl}
+
+
+###############################################################################
+#
+# BUILD TARGET CONFIGURATIONS:
+#
+###############################################################################
+
 TEST_PROG = ${test_prog}
+TEST_PROG_SO = ${test_prog}_so
 PDUMP = pdump${exe}
+
+
+###############################################################################
+#
+# MAKE CONFIGURATION:
+#
+###############################################################################
+
+#
 # This is set to  MAKE=$make if your $make command doesn't
 # do it for you.
+#
+
 ${make_set_make}
 
 .c$(O):
@@ -42,21 +130,73 @@ ${make_set_make}
 
 all : $(TEST_PROG) $(PDUMP) examples/assembly/mops${exe} examples/mops/mops${exe} docs
 
-#XXX This target is not portable to Win32
-
-shared: Libparrot.so libcore_prederef_0_3.so
-
-libparrot.so: $(O_FILES)
-	$(CC) -shared $(C_LIBS) -o $@ $(O_FILES)
-
-libcore_prederef_0_3.so: core_ops_prederef$(O)
-	$(CC) -shared $(C_LIBS) -o $@ $(O_FILES)
-
 $(TEST_PROG): test_main$(O) $(O_FILES) Parrot/OpLib/core.pm Parrot/PMC.pm
 	$(CC) $(CFLAGS) -o $(TEST_PROG) $(O_FILES) test_main$(O) $(C_LIBS)
 
+
+###############################################################################
+#
+# Shared Library Targets:
+#
+# XXX This target is not portable to Win32
+#
+###############################################################################
+
+blib:
+	mkdir -p blib
+
+blib_lib:
+	mkdir -p blib/lib
+
+shared: blib_lib blib/lib/libparrot$(SO) blib/lib/libcore_prederef$(SO) $(TEST_PROG_SO)
+
+blib/lib/libparrot$(SO).${VERSION}: $(O_FILES)
+	$(CC) -shared -Wl,-soname,libparrot$(SO).${MAJOR} -o blib/lib/libparrot$(SO).${VERSION} $(O_FILES)
+
+blib/lib/libparrot$(SO).${MAJOR}.${MINOR}: blib/lib/libparrot$(SO).${VERSION}
+	rm -f $@
+	cd blib/lib; ln -s libparrot$(SO).${VERSION} libparrot$(SO).${MAJOR}.${MINOR}
+
+blib/lib/libparrot$(SO).${MAJOR}: blib/lib/libparrot$(SO).${MAJOR}.${MINOR}
+	rm -f $@
+	cd blib/lib; ln -s libparrot$(SO).${MAJOR}.${MINOR} libparrot$(SO).${MAJOR}
+
+blib/lib/libparrot$(SO): blib/lib/libparrot$(SO).${MAJOR}
+	rm -f $@
+	cd blib/lib; ln -s libparrot$(SO).${MAJOR} libparrot$(SO)
+
+blib/lib/libcore_prederef$(SO).${VERSION}: core_ops_prederef$(O)
+	$(CC) -shared -Wl,-soname,libparrot$(SO).${MAJOR} -o blib/lib/libcore_prederef$(SO).${VERSION} core_ops_prederef$(O)
+
+blib/lib/libcore_prederef$(SO).${MAJOR}.${MINOR}: blib/lib/libcore_prederef$(SO).${VERSION}
+	rm -f $@
+	cd blib/lib; ln -s libcore_prederef$(SO).${VERSION} libcore_prederef$(SO).${MAJOR}.${MINOR}
+
+blib/lib/libcore_prederef$(SO).${MAJOR}: blib/lib/libcore_prederef$(SO).${MAJOR}.${MINOR}
+	rm -f $@
+	cd blib/lib; ln -s libcore_prederef$(SO).${MAJOR}.${MINOR} libcore_prederef$(SO).${MAJOR}
+
+blib/lib/libcore_prederef$(SO): blib/lib/libcore_prederef$(SO).${MAJOR}
+	rm -f $@
+	cd blib/lib; ln -s libcore_prederef$(SO).${MAJOR} libcore_prederef$(SO)
+
+$(TEST_PROG_SO): test_main$(O) blib/lib/libparrot$(SO) Parrot/OpLib/core.pm Parrot/PMC.pm
+	$(CC) $(CFLAGS) -o $(TEST_PROG) test_main$(O) $(C_LIBS) -L blib/lib -lparrot
+
+
+#
+# Parrot Dump
+#
+
 $(PDUMP): pdump$(O) $(O_FILES)
 	$(CC) $(CFLAGS) -o $(PDUMP) $(O_FILES) pdump$(O) $(C_LIBS)
+
+
+###############################################################################
+#
+# Other Dependencies and Build Rules:
+#
+###############################################################################
 
 test_main$(O): test_main.c $(H_FILES)
 
@@ -138,7 +278,7 @@ core_ops_prederef.c $(INC)/oplib/core_ops_prederef.h: core.ops vtable.ops ops2c.
 vtable.ops: make_vtable_ops.pl
 	$(PERL) make_vtable_ops.pl > vtable.ops
 
-$(INC)/config.h: Configure.pl config_h.in
+$(STICKY_FILES): Configure.pl config_h.in
 	$(PERL) Configure.pl
 
 $(INC)/vtable.h: vtable.tbl vtable_h.pl
@@ -160,37 +300,62 @@ languages: languages.dummy
 languages.dummy:
 	cd languages && $(MAKE) && cd ..
 
-clean:
-	$(RM_F) *$(O) chartypes/*$(O) encodings/*$(O)
-	$(RM_F) *.s core_ops.c core_ops_prederef.c $(TEST_PROG) $(PDUMP)
-	$(RM_F) $(INC)/vtable.h
-	$(RM_F) $(INC)/oplib/core_ops.h $(INC)/oplib/core_ops_prederef.h
-	$(RM_F) vtable.ops
-	$(RM_F) $(TEST_PROG) $(PDUMP)
-	$(RM_F) t/op/*.pasm t/op/*.pbc t/op/*.out
-	$(RM_F) examples/assembly/mops${exe} examples/assembly/mops.c
-	$(RM_F) examples/assembly/mops$(O) examples/assembly/mops.pbc
-	$(RM_F) examples/mops/mops$(O) examples/mops/mops${exe}
-	$(RM_F) Parrot/OpLib/core.pm
-	$(RM_F) Parrot/Jit.pm
-	$(RM_F) include/parrot/jit_struct.h
-	$(RM_F) libparrot.so libcore_prederef_0_3.so
-	$(RM_F) *~
-	cd docs && $(MAKE) clean && cd ..
-	cd classes && $(MAKE) clean && cd ..
-	cd languages && $(MAKE) clean && cd ..
 
-distclean:
-	$(PERL) -MExtUtils::Manifest=filecheck -le '$$ExtUtils::Manifest::Quiet=1;unlink $$_ for filecheck()'
-
-cvsclean:
-	$(PERL) -MExtUtils::Manifest=filecheck -le '$$ExtUtils::Manifest::Quiet=1; do { unlink $$_ unless $$_ =~ m!(?:CVS/|\.cvs)! } for filecheck()'
+###############################################################################
+#
+# Testing Targets:
+#
+###############################################################################
 
 test: $(TEST_PROG) assemble.pl .test_dummy
 
 .test_dummy:
 	$(PERL) t/harness
 
+
+###############################################################################
+#
+# Cleaning Targets:
+#
+###############################################################################
+
+clean: testclean
+	$(RM_F) $(O_FILES)
+	$(RM_F) *.s
+	$(RM_F) $(FLUID_FILES)
+	$(RM_F) $(TEST_PROG) $(PDUMP)
+	$(RM_F) examples/assembly/mops${exe} examples/assembly/mops.c
+	$(RM_F) examples/assembly/mops$(O) examples/assembly/mops.pbc
+	$(RM_F) examples/mops/mops$(O) examples/mops/mops${exe}
+	$(RM_RF) blib
+	$(RM_F) *~
+	cd docs && $(MAKE) clean && cd ..
+	cd classes && $(MAKE) clean && cd ..
+	cd languages && $(MAKE) clean && cd ..
+
+testclean:
+	$(RM_F) t/op/*.pasm t/op/*.pbc t/op/*.out
+
+realclean: clean
+	$(RM_F) $(STICKY_FILES)
+	
+distclean:
+	$(PERL) -MExtUtils::Manifest=filecheck -le '$$ExtUtils::Manifest::Quiet=1;unlink $$_ for filecheck()'
+
+cvsclean:
+	$(PERL) -MExtUtils::Manifest=filecheck -le '$$ExtUtils::Manifest::Quiet=1; do { unlink $$_ unless $$_ =~ m!(?:CVS/|\.cvs)! } for filecheck()'
+
+
+
+###############################################################################
+#
+# CVS Targets:
+#
+###############################################################################
+
 update:
 	cvs -q update -dP
+
+status:
+	cvs -n -q upd -dP
 

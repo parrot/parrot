@@ -1,66 +1,92 @@
 #!/usr/bin/perl -w
-#so we get -w
-
-#Configure.pl, written by Brent Dax
+#
+# Configure.pl
+#
+# $Id$
+#
+# Author: Brent Dax
+#
 
 use strict;
+
 use Config;
 use Getopt::Long;
 use ExtUtils::Manifest qw(manicheck);
 use File::Copy;
 
+use Parrot::BuildUtil;
+
+
+#
+# Read the array and scalar forms of the version.
+# from the VERSION file.
+#
+
+my $parrot_version = parrot_version();
+my @parrot_version = parrot_version();
+
+
+#
+# Handle options:
+#
+
 my($opt_debugging, $opt_defaults, $opt_version, $opt_help) = (0, 0, 0, 0);
 my(%opt_defines);
 my $result = GetOptions(
-	'debugging!' => \$opt_debugging,
-	'defaults!'  => \$opt_defaults,
-	'version'    => \$opt_version,
-	'help'       => \$opt_help,
-	'define=s'   => \%opt_defines,
+    'debugging!' => \$opt_debugging,
+    'defaults!'  => \$opt_defaults,
+    'version'    => \$opt_version,
+    'help'       => \$opt_help,
+    'define=s'   => \%opt_defines,
 );
 
 if($opt_version) {
-	print '$Id$' . "\n";
-	exit;
+    print "Parrot Version $parrot_version Configure\n";
+    print '$Id$' . "\n";
+    exit;
 }
 
 if($opt_help) {
-	print <<"EOT";
+        print <<"EOT";
 $0 - Parrot Configure
 Options:
    --debugging          Enable debugging
    --defaults           Accept all default values
    --define name=value  Defines value name as value
    --help               This text
-   --version            Show assembler version
+   --version            Show version
 EOT
-	exit;
+        exit;
 }
 
 my($DDOK)=undef;
 eval {
-	require Data::Dumper;
-	Data::Dumper->import();
-	$DDOK=1;
+        require Data::Dumper;
+        Data::Dumper->import();
+        $DDOK=1;
 };
 
-#print the header
+#
+# print the header
+#
+
 print <<"END";
-Parrot Configure
-Copyright (C) 2001 Yet Another Society
+Parrot Version $parrot_version Configure
+Copyright (C) 2001-2002 Yet Another Society
 
 Since you're running this script, you obviously have
 Perl 5--I'll be pulling some defaults from its configuration.
 
-First, I'm gonna check the manifest, to make sure you got a
-complete Parrot kit.
+Checking the MANIFEST to make sure you have a complete Parrot kit...
 END
 
 check_manifest();
 
-#Some versions don't seem to have ivtype or nvtype--provide
-#defaults for them.
-#XXX Figure out better defaults
+#
+# Some versions don't seem to have ivtype or nvtype--provide
+# defaults for them.
+# XXX Figure out better defaults
+#
 
 my ($archname,    $cpuarch,    $osname);
 my ($jitarchname, $jitcpuarch, $jitosname, $jitcapable);
@@ -82,68 +108,89 @@ else {
 ($jitcpuarch, $jitosname) =  split('-', $jitarchname);
 
 my(%c)=(
-	iv =>			($Config{ivtype}   ||'long'),
-	intvalsize =>       undef,
+    iv            => ($Config{ivtype} || 'long'),
+    intvalsize    => undef,
 
-	nv =>			($Config{nvtype}   ||'double'),
-	numvalsize =>       undef,
+    nv            => ($Config{nvtype} || 'double'),
+    numvalsize    => undef,
 
-	opcode_t =>		($Config{ivtype}   ||'long'),
-	longsize =>		undef,
+    opcode_t      => ($Config{ivtype} || 'long'),
+    longsize      => undef,
 
-	cc =>			$Config{cc},
-	#ADD C COMPILER FLAGS HERE
-	ccflags =>		$Config{ccflags},
-	libs =>			$Config{libs},
-	cc_debug =>		'-g',
-	o =>			'.o',		# object files extension
-	exe =>			$Config{_exe},
+    cc            => $Config{cc},
 
-	ld =>			$Config{ld},
-	ld_out =>		'-o ',		# ld output file
-	ld_debug =>     '',			# include debug info in executable
+    #
+    # ADD C COMPILER FLAGS HERE
+    #
 
-  	perl =>			$^X,
-	test_prog =>	'test_parrot' . $Config{_exe},
-	debugging =>	$opt_debugging,
-	rm_f =>		'rm -f',
-	stacklow =>	'(~0xfff)',
-	intlow =>	'(~0xfff)',
-	numlow =>	'(~0xfff)',
-	strlow =>	'(~0xfff)',
-	pmclow =>	'(~0xfff)',
-	make=>          $Config{make},
-	make_set_make=>          $Config{make_set_make},
-	
-	platform =>	$^O,
+    ccflags       => $Config{ccflags},
+    libs          => $Config{libs},
+    cc_debug      => '-g',
+    o             => '.o',                # object files extension
+    exe           => $Config{_exe},
 
-    cpuarch  => $cpuarch,
-    osname   => $osname,
-    archname => $archname,
+    ld            => $Config{ld},
+    ld_out        => '-o ',               # ld output file
+    ld_debug      => '',                  # include debug info in executable
 
-    jitcpuarch  => $jitcpuarch,
-    jitosname   => $jitosname,
-    jitarchname => $jitarchname,
-    jitcapable  => $jitcapable,
+    perl          => $^X,
+    test_prog     => 'test_parrot' . $Config{_exe},
+    debugging     => $opt_debugging,
+    rm_f          => 'rm -f',
+    stacklow      => '(~0xfff)',
+    intlow        => '(~0xfff)',
+    numlow        => '(~0xfff)',
+    strlow        => '(~0xfff)',
+    pmclow        => '(~0xfff)',
+    make          => $Config{make},
+    make_set_make => $Config{make_set_make},
+        
+    platform      => $^O,
 
-	cp =>		'cp',
-	slash =>	'/',
+    cpuarch       => $cpuarch,
+    osname        => $osname,
+    archname      => $archname,
+
+    jitcpuarch    => $jitcpuarch,
+    jitosname     => $jitosname,
+    jitarchname   => $jitarchname,
+    jitcapable    => $jitcapable,
+
+    cp            => 'cp',
+    slash         => '/',
+
+    VERSION =>    $parrot_version,
+    MAJOR   =>    $parrot_version[0],
+    MINOR   =>    $parrot_version[1],
+    PATCH   =>    $parrot_version[2],
 );
 
-#copy the things from --define foo=bar
+
+#
+# Copy the things from --define foo=bar
+#
+
 @c{keys %opt_defines}=values %opt_defines;
 
-# set up default values
+
+#
+# Set up default values
+#
+
 my $hints = "hints/" . lc($^O) . ".pl";
 if(-f $hints) {
-	local($/);
-	open HINT, "< $hints" or die "Unable to open hints file '$hints'";
-	my $hint = <HINT>;
-	close HINT;
-	eval $hint or die "Error in hints file $hints: '$@/$!'";
+    local($/);
+    open HINT, "< $hints" or die "Unable to open hints file '$hints'";
+    my $hint = <HINT>;
+    close HINT;
+    eval $hint or die "Error in hints file $hints: '$@/$!'";
 }
 
-#ask questions
+
+#
+# Ask questions
+#
+
 prompt("What C compiler do you want to use?", 'cc');
 prompt("How about your linker?", 'ld');
 prompt("What flags would you like passed to your C compiler?", 'ccflags');
@@ -152,7 +199,11 @@ prompt("How big would you like integers to be?", 'iv');
 prompt("And your floats?", 'nv');
 prompt("What is your native opcode type?", 'opcode_t');
 
+
+#
 # Copy the appropriate platform-specific file over
+#
+
 if (-e "platforms/$c{platform}.h") {
     copy("platforms/$c{platform}.h", "include/parrot/platform.h");
     copy("platforms/$c{platform}.c", "platform.c");
@@ -163,201 +214,281 @@ else {
 }
 
 unless( $c{debugging} ) {
-	$c{ld_debug} = ' ';
-	$c{cc_debug} = ' ';
+    $c{ld_debug} = ' ';
+    $c{cc_debug} = ' ';
 }
 
 print <<"END";
 
-Okay.  Now I'm gonna probe Perl 5's configuration to see
-what headers you have around.  This could take a bit on slow
-machines...
+Probing Perl 5's configuration to determine which headers you have (this could
+take a while on slow machines)...
 END
 
-#set up HAS_HEADER_
+
+#
+# Set up HAS_HEADER_
+#
+
 foreach(grep {/^i_/} keys %Config) {
-	$c{$_}=$Config{$_};
-	$c{headers}.=defineifdef((/^i_(.*)$/));
+    $c{$_}=$Config{$_};
+    $c{headers}.=defineifdef((/^i_(.*)$/));
 }
 
 print <<"END";
 
-Alright, now I'm gonna check some stuff by compiling and running
-a small C program.  This could take a bit...
+Determining C data type sizes by compiling and running a small C program (this
+could take a while):
+
 END
 
 {
-	my %newc;
+    my %newc;
 
-	buildfile("test_c");
-	compiletestc();
-	%newc=eval(runtestc()) or die "Can't run the test program: $!";
+    buildfile("test_c");
+    compiletestc();
+    %newc=eval(runtestc()) or die "Can't run the test program: $!";
 
-	@c{keys %newc}=values %newc;
+    @c{keys %newc}=values %newc;
 
-	unlink('test.c', "test_siz$c{exe}", "test$c{o}");
+    unlink('test.c', "test_siz$c{exe}", "test$c{o}");
 }
 
 print <<"END";
 
-Done. Now I'm figuring out what formats to pass to pack() for the
-various Parrot internal types.
+Figuring out the formats to pass to pack() for the various Parrot internal
+types...
 END
 
 
+#
 # Alas perl5.7.2 doesn't have an INTVAL flag for pack().
 # The ! modifier only works for perl 5.6.x or greater.
+#
+
 foreach ('intvalsize', 'opcode_t_size') {
     my $which = $_ eq 'intvalsize' ? 'packtype_i' : 'packtype_op';
     if (($] >= 5.006) && ($c{$_} == $c{longsize}) ) {
-	$c{$which} = 'l!';
+        $c{$which} = 'l!';
     }
     elsif ($c{$_} == 4) {
-	$c{$which} = 'l';
-    }
-    elsif ($c{$_} == 8) {
-	$c{$which} = 'q';
+        $c{$which} = 'l';
     }
     else {
-	die "Configure.pl:  Unable to find a suitable packtype for $_.\n";
+        die "Configure.pl:  Unable to find a suitable packtype for $_.\n";
     }
 }
 
 $c{packtype_n} = 'd';
 
+
+#
+# Build config.h, the Makfefiles and Types.pm:
+#
+# Also build Parrot/Config.pm
+#
+
 print <<"END";
 
-Okay, that's finished.  I'm now going to write your very
-own Makefile, config.h, Parrot::Types, and Parrot::Config to disk.
+Building a preliminary version of include/parrot/config.h, your Makefiles, and
+other files:
+
 END
 
-# now let's assemble the config.h file
 buildfile("config_h", "include/parrot");
-# and the makefile
+
 buildfile("Makefile");
 buildfile("classes/Makefile");
 buildfile("languages/Makefile");
 buildfile("languages/jako/Makefile");
 buildfile("languages/miniperl/Makefile");
 buildfile("languages/scheme/Makefile");
-# and Parrot::Config
-buildconfigpm();
-# and the types file
+
 buildfile("Types_pm", "Parrot");
 
-# and now we figure out how big our things are
+buildconfigpm();
+
+
+#
+# And now we figure out how big our things are
+#
+
 print <<"END";
 
-Alright, now I'm gonna check some stuff by compiling and running
-another small C program.  This could take a bit...
+Checking some things by compiling and running another small C program (this
+could take a while):
+
 END
 
 {
-	my %newc;
+    my %newc;
 
-       open NEEDED, ">include/parrot/vtable.h";
-       close NEEDED;
-	buildfile("testparrotsizes_c");
-	compiletestc("testparrotsizes");
-	%newc=eval(runtestc()) or die "Can't run the test program: $!";
+    open NEEDED, ">include/parrot/vtable.h";
+    close NEEDED;
+    buildfile("testparrotsizes_c");
+    compiletestc("testparrotsizes");
+    %newc=eval(runtestc()) or die "Can't run the test program: $!";
 
-	@c{keys %newc}=values %newc;
+    @c{keys %newc}=values %newc;
 
-	@c{qw(stacklow intlow numlow strlow pmclow)} = lowbitmask(@c{qw(stackchunk iregchunk nregchunk sregchunk pregchunk)});
+    @c{qw(stacklow intlow numlow strlow pmclow)} = lowbitmask(@c{qw(stackchunk iregchunk nregchunk sregchunk pregchunk)});
 
-	unlink('testparrotsizes.c', "test_siz$c{exe}", "test$c{o}");
-       unlink("include/parrot/vtable.h");
+    unlink('testparrotsizes.c', "test_siz$c{exe}", "test$c{o}");
+    unlink("include/parrot/vtable.h");
 }
 
-# rewrite the config file with the updated info
+
+#
+# Rewrite the config file with the updated info
+#
+
+print <<"END";
+
+Updating include/parrot/config.h:
+
+END
+
 buildfile("config_h", "include/parrot");
+
+
+#
+# Wrap up:
+#
 
 print <<"END";
 
 Okay, we're done!
-You can now use `make parrot' (or your platform's equivalent to `make')
-to build your Parrot.
+
+You can now use `make' (or your platform's equivalent to `make') to build your
+Parrot. After that, you can use `make test' to run the test suite.
 
 Happy Hacking,
-	The Parrot Team
+
+        The Parrot Team
+
 END
 
-#give us the #define we may need for header X
+exit(0);
+
+
+###############################################################################
+###############################################################################
+##
+## Support Subroutines
+##
+###############################################################################
+###############################################################################
+
+
+#
+# defineifdef()
+#
+# Give us the #define we may need for header X
+#
+
 sub defineifdef {
-	my $thing=shift;
+    my $thing=shift;
 
-	if($Config{"i_$thing"}) {
-		return "#define HAS_HEADER_\U$thing\E\n";
-	}
-	else {
-		return "#undef HAS_HEADER_\U$thing\E\n"; #XXX do we want this?
-	}
+    if($Config{"i_$thing"}) {
+        return "#define HAS_HEADER_\U$thing\E\n";
+    }
+    else {
+        return "#undef HAS_HEADER_\U$thing\E\n"; #XXX do we want this?
+    }
 }
 
-#prompt for something from the user
+
+#
+# prompt()
+#
+# Prompt for something from the user.
+#
+
 sub prompt {
-	return if $opt_defaults;
+    return if $opt_defaults;
 
-	my($message, $field)=(@_);
-	my($input);
-	print "$message [$c{$field}] ";
-	chomp($input=<STDIN>);
-	$c{$field}=$input||$c{$field};
+    my($message, $field)=(@_);
+    my($input);
+    print "$message [$c{$field}] ";
+    chomp($input=<STDIN>);
+    $c{$field}=$input||$c{$field};
 }
+
+
+#
+# buildfile()
+#
 
 sub buildfile {
-	my($filename, $path)=@_;
-	$path||='.';
+    my($source_filename, $path)=@_;
+    $path||='.';
 
-	local $/;
-	open(IN, "<$filename.in") or die "Can't open $filename.in: $!";
-	my $text=<IN>;
-	close(IN) or die "Can't close $filename.in: $!";
+    my $target_filename = $source_filename;
+    $target_filename =~ s/_/./;        #config_h => config.h
 
-	$text =~ s/\$\{(\w+)\}/$c{$1}/g;
-	$filename =~ s/_/./;	#config_h => config.h
+    printf "  Building %-30s from %s...\n", "$path/$target_filename",
+        "$source_filename.in";
 
-	open(OUT, ">$path/$filename") or die "Can't open $path/$filename: $!";
-	print OUT $text;
-	close(OUT) or die "Can't close $filename: $!";
+    local $/;
+    open(IN, "<$source_filename.in") or die "Can't open $source_filename.in: $!";
+    my $text=<IN>;
+    close(IN) or die "Can't close $source_filename.in: $!";
+
+    $text =~ s/\$\{(\w+)\}/$c{$1}/g;
+
+    open(OUT, ">$path/$target_filename") or die "Can't open $path/$target_filename: $!";
+    print OUT $text;
+    close(OUT) or die "Can't close $target_filename: $!";
 }
 
+
+#
+# buildconfigpm()
+#
+
 sub buildconfigpm {
-	unless($DDOK) {
-		print <<"END";
+    unless($DDOK) {
+        print <<"END";
 
 Your system doesn't have Data::Dumper installed, so I couldn't
 build Parrot::Config.  If you want Parrot::Config installed,
 use CPAN.pm to install Data::Dumper and run this script again.
 END
 
-		return;
-	}
+        return;
+    }
 
-	my %C=%c;
-	delete $C{headers};
-	my $dd=new Data::Dumper([\%C]);
-	$dd->Names(['*PConfig']);
+    printf "  Building %-30s from %s...\n", "Parrot/Config.pm",
+        "Config_pm.in";
 
-	local $/;
-	open(IN, "<Config_pm.in") or die "Can't open Config_pm.in: $!";
-	my $text=<IN>;
-	close(IN) or die "Can't close Config.pm_in: $!";
+    my %C=%c;
+    delete $C{headers};
+    my $dd=new Data::Dumper([\%C]);
+    $dd->Names(['*PConfig']);
 
-	$text =~ s/#DUMPER OUTPUT HERE/$dd->Dump()/eg;
+    local $/;
+    open(IN, "<Config_pm.in") or die "Can't open Config_pm.in: $!";
+    my $text=<IN>;
+    close(IN) or die "Can't close Config.pm_in: $!";
 
-	open(OUT, ">Parrot/Config.pm") or die "Can't open file Parrot/Config.pm: $!";
-	print OUT $text;
-	close(OUT) or die "Can't close file Parrot/Config.pm: $!";
+    $text =~ s/#DUMPER OUTPUT HERE/$dd->Dump()/eg;
+
+    open(OUT, ">Parrot/Config.pm") or die "Can't open file Parrot/Config.pm: $!";
+    print OUT $text;
+    close(OUT) or die "Can't close file Parrot/Config.pm: $!";
 }
 
+
+#
+# check_manifest()
+#
+
 sub check_manifest {
-	print "\n";
+    print "\n";
 
-	my(@missing)=manicheck();
+    my(@missing)=manicheck();
 
-	if(@missing) {
-		print <<"END";
+    if(@missing) {
+        print <<"END";
 
 Ack, some files were missing!  I can't continue running
 without everything here.  Please try to find the above
@@ -365,18 +496,23 @@ files and then try running Configure again.
 
 END
 
-		exit;
-	}
-	else {
-		print <<"END";
+        exit;
+    }
+    else {
+                print <<"END";
 Okay, we found everything.  Next you'll need to answer
 a few questions about your system.  Rules are the same
 as Perl 5's Configure--defaults are in square brackets,
 and you can hit enter to accept them.
 
 END
-	}
+    }
 }
+
+
+#
+# compiletestc()
+#
 
 sub compiletestc {
     my $name;
@@ -385,18 +521,32 @@ sub compiletestc {
     system("$c{cc} $c{ccflags} -I./include -o test_siz$c{exe} $name.c") and die "C compiler died!";
 }
 
+
+#
+# runtestc()
+#
+
 sub runtestc {
-	`./test_siz$c{exe}`
+    `./test_siz$c{exe}`
 }
 
-# Find the bitmask for the low bits of any passed-in size
+
+#
+# lowbitmas()
+#
+# Find the bitmask for the low bits of any passed-in size.
+#
+
 sub lowbitmask {
     my @returns;
+
     foreach (@_) {
-	my $vector = unpack("b*", pack("V", $_));
-	my $offset = rindex($vector, "1")+1;
-	my $mask = 2**$offset - 1;
-	push @returns, "(~0x".sprintf("%x", $mask).")";
+        my $vector = unpack("b*", pack("V", $_));
+        my $offset = rindex($vector, "1")+1;
+        my $mask = 2**$offset - 1;
+        push @returns, "(~0x".sprintf("%x", $mask).")";
     }
+
     return @returns;
 }
+

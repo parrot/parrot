@@ -96,7 +96,7 @@ sub read_ops
     $seen_pod = 1 if m|^=|;
 
     unless ($seen_op or m|^(inline\s+)?op\s+|) {
-      if (m/^\s*VERSION\s*=\s*(\d+\.\d+)\s*;\s*$/) {
+      if (m/^\s*VERSION\s*=\s*"(\d+\.\d+\.\d+)"\s*;\s*$/) {
         if (exists $self->{VERSION}) {
           die "VERSION MULTIPLY DEFINED!";
         }
@@ -105,12 +105,20 @@ sub read_ops
 
         $_ = '';
       }
+      elsif (m/^\s*VERSION\s*=\s*PARROT_VERSION\s*;\s*$/) {
+        if (exists $self->{VERSION}) {
+          die "VERSION MULTIPLY DEFINED!";
+        }
+
+        $self->version($PConfig{VERSION});
+
+        $_ = '';
+      }
 
       $self->{PREAMBLE} .= $_ unless $seen_pod or $count; # Lines up to first op def.
       next;
     };
   
-
     die "No 'VERSION = ...;' line found before beginning of ops in file '$orig'!\n"
       unless defined $self->version;
 
@@ -333,11 +341,22 @@ sub version
 {
   my $self = shift;
 
-  if (@_) {
+  if (@_ == 1) {
     $self->{VERSION} = shift;
   }
+  elsif (@_ == 3) {
+    $self->{VERSION} = join('.', @_);
+  }
+  elsif (@_ == 0) {
+    if (wantarray) {
+      return split(/\./, $self->{VERSION});
+    }
+    else {
+      return $self->{VERSION};
+    }
+  }
   else {
-    return $self->{VERSION};
+    die "Parrot::OpsFile::version(): Illegal argument count" . scalar(@_) . "!";
   }
 }
 
@@ -350,7 +369,7 @@ sub major_version
 {
   my $self = shift;
 
-  $self->{VERSION} =~ m/^(\d+)\.\d+$/;
+  $self->{VERSION} =~ m/^(\d+)\.\d+\.\d+$/;
 
   return $1;
 }
@@ -364,10 +383,25 @@ sub minor_version
 {
   my $self = shift;
 
-  $self->{VERSION} =~ m/^\d+\.(\d+)$/;
+  $self->{VERSION} =~ m/^\d+\.(\d+)\.\d+$/;
 
   return $1;
 }
+
+
+#
+# patch_version()
+#
+
+sub patch_version
+{
+  my $self = shift;
+
+  $self->{VERSION} =~ m/^\d+\.\d+\.(\d+)$/;
+
+  return $1;
+}
+
 
 
 #
