@@ -13,6 +13,21 @@
 #if !defined(PARROT_ENCODING_FIXED_8_H_GUARD)
 #define PARROT_ENCODING_FIXED_8_H_GUARD
 
+static void to_encoding(Interp *interpreter, STRING *source_string);
+static STRING *copy_to_encoding(Interp *interpreter, STRING *source_string);
+static UINTVAL get_codepoint(Interp *interpreter, STRING *source_string, UINTVAL offset);
+static void set_codepoint(Interp *interpreter, STRING *source_string, UINTVAL offset, UINTVAL codepoint);
+static UINTVAL get_byte(Interp *interpreter, STRING *source_string, UINTVAL offset);
+static void set_byte(Interp *interpreter, STRING *source_string, UINTVAL offset, UINTVAL byte);
+static STRING *get_codepoints(Interp *interpreter, STRING *source_string, UINTVAL offset, UINTVAL count);
+static STRING *get_bytes(Interp *interpreter, STRING *source_string, UINTVAL offset, UINTVAL count);
+static void set_codepoints(Interp *interpreter, STRING *source_string, UINTVAL offset, UINTVAL count, STRING *new_codepoints);
+static void set_bytes(Interp *interpreter, STRING *source_string, UINTVAL offset, UINTVAL count, STRING *new_bytes);
+static void become_encoding(Interp *interpreter, STRING *source_string);
+static UINTVAL codepoints(Interp *interpreter, STRING *source_string);
+static UINTVAL bytes(Interp *interpreter, STRING *source_string);
+ENCODING *Parrot_encoding_fixed_8_init(Interp *interpreter);
+
 #endif /* PARROT_ENCODING_FIXED_8_H_GUARD */
 /*
  * Local variables:

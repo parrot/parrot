@@ -15,8 +15,10 @@ This file implements the encoding functions for fixed-width 8-bit codepoints
 */
 
 #include "parrot/parrot.h"
-#include "fixed_8.h"
+#include "encodings/fixed_8.h"
 
+/* This function needs to go through and get all the code points one
+   by one and turn them into a byte */
 static void to_encoding(Interp *interpreter, STRING *source_string) {
 }
 
@@ -38,7 +40,7 @@ static void set_codepoint(Interp *interpreter, STRING *source_string, UINTVAL of
 
 static UINTVAL get_byte(Interp *interpreter, STRING *source_string, UINTVAL offset) {
   if (offset >= source_string->bufused) {
-    INTERNAL_EXCEPTION(0, "get_byte past the end of the buffer");
+    internal_exception(0, "get_byte past the end of the buffer");
   }
   char *contents = source_string->strstart;
   return contents[offset];
@@ -67,6 +69,8 @@ static void set_codepoints(Interp *interpreter, STRING *source_string, UINTVAL o
 static void set_bytes(Interp *interpreter, STRING *source_string, UINTVAL offset, UINTVAL count, STRING *new_bytes) {
 }
 
+/* Unconditionally makes the string be in this encoding, if that's
+   valid */
 static void become_encoding(Interp *interpreter, STRING *source_string) {
 }
 
@@ -83,6 +87,19 @@ ENCODING *Parrot_encoding_fixed_8_init(Interp *interpreter) {
   ENCODING *return_encoding = Parrot_new_encoding(interpreter);
 
   ENCODING base_encoding = {
+      to_encoding,
+      copy_to_encoding,
+      get_codepoint,
+      set_codepoint,
+      get_byte,
+      set_byte,
+      get_codepoints,
+      get_bytes,
+      set_codepoints,
+      set_bytes,
+      become_encoding,
+      codepoints,
+      bytes
   };
   memcpy(return_encoding, &base_encoding, sizeof(ENCODING));
   return return_encoding;
