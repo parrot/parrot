@@ -646,6 +646,8 @@ AUTO_OP ge(s, s|sc, ic) {
 
 =item B<if>(i, ic)
 
+=item B<if>(p, ic)
+
 =item B<if>(n, ic)
 
 Check register $1. If true, branch by $2.
@@ -660,6 +662,12 @@ AUTO_OP if(i, ic) {
 
 AUTO_OP if(n, ic) {
   if ($1 != 0.0) {
+    RETREL($2);
+  }
+}
+
+AUTO_OP if(p, ic) {
+  if ($1->vtable->get_bool(interpreter, $1)) {
     RETREL($2);
   }
 }
