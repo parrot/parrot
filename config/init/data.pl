@@ -208,9 +208,18 @@ Dump config keys.
 
 =cut
 
-  *dump=sub {
-    Data::Dumper->new([\%c], ['*PConfig'])->Sortkeys(1)->Dump();
-  };
+  # Data::Dumper supports Sortkeys since 2.12
+  # older versions will work but obviously not sorted
+  if ($Data::Dumper::VERSION >= 2.12) {
+    *dump=sub {
+      Data::Dumper->new([\%c], ['*PConfig'])->Sortkeys(1)->Dump();
+    };
+  }
+  else {
+    *dump=sub {
+      Data::Dumper->new([\%c], ['*PConfig'])->Dump();
+    };
+  }
 
 =item Configure::Data->clean()
 
