@@ -1,7 +1,7 @@
 # [expr sinh()]
 
 .sub __math_sinh
-  .param PerlArray argv
+  .param pmc argv
 
   # requires 1 args, numeric only
 

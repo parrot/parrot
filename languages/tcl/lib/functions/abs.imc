@@ -1,7 +1,7 @@
 # [expr abs()]
 
 .sub __math_abs
-  .param PerlArray argv
+  .param pmc argv
 
   # requires 1 args, numeric only
 

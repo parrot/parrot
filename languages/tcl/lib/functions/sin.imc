@@ -1,7 +1,7 @@
 # [expr sin()]
 
 .sub __math_sin
-  .param PerlArray argv
+  .param pmc argv
 
   # requires 1 args, numeric only
 

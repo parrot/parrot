@@ -1,7 +1,7 @@
 # [expr tanh()]
 
 .sub __math_tanh
-  .param PerlArray argv
+  .param pmc argv
 
   # requires 1 args, numeric only
 

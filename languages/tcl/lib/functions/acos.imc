@@ -1,7 +1,7 @@
 # [expr acos()]
 
 .sub __math_acos
-  .param PerlArray argv
+  .param pmc argv
 
   # requires 1 args, numeric only
 

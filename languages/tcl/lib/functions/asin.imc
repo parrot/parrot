@@ -1,7 +1,7 @@
 # [expr asin()]
 
 .sub __math_asin
-  .param PerlArray argv
+  .param pmc argv
 
   # requires 1 args, numeric only
 
