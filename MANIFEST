@@ -271,6 +271,8 @@ config/init/hints/vms.pl                          []
 config/init/manifest.pl                           []
 config/init/miniparrot.pl                         []
 config/init/optimize.pl                           []
+config/inter/charset.pl				  []
+config/inter/encoding.pl			  []
 config/inter/exp.pl                               []
 config/inter/ops.pl                               []
 config/inter/pmc.pl                               []
@@ -377,6 +379,7 @@ editor/indent_imc.vim                             [devel]
 encodings/fixed_8.c				  []
 encodings/fixed_8.h				  []
 encodings/utf8.c                                  []
+encodings/utf8.h				  []
 examples/assembly/99beer.pasm                     [main]doc
 examples/assembly/Makefile                        [main]doc
 examples/assembly/acorn.l                         [main]doc

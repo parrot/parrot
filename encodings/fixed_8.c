@@ -15,7 +15,7 @@ This file implements the encoding functions for fixed-width 8-bit codepoints
 */
 
 #include "parrot/parrot.h"
-#include "encodings/fixed_8.h"
+#include "fixed_8.h"
 
 /* This function needs to go through and get all the code points one
    by one and turn them into a byte */

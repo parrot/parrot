@@ -46,7 +46,7 @@ static INTVAL is_newline(Interp *interpreter, STRING *source_string, UINTVAL off
 static INTVAL find_newline(Interp *interpreter, STRING *source_string, UINTVAL offset);
 static INTVAL find_not_newline(Interp *interpreter, STRING *source_string, UINTVAL offset);
 static INTVAL find_word_boundary(Interp *interpreter, STRING *source_string, UINTVAL offset);
-CHARSET *Parrot_charset_iso_8859_1_init(Interp *interpreter);
+CHARSET *Parrot_charset_ascii_init(Interp *interpreter);
 
 
 #endif /* PARROT_CHARSET_ASCII_H_GUARD */

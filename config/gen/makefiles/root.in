@@ -275,14 +275,16 @@ ICU_H_FILES = ${icu_headers}
 
 ALL_H_FILES = $(GENERAL_H_FILES)
 
+CHARSET_O_FILES = ${TEMP_charset_o}
+
 CLASS_PMC_FILES = ${TEMP_pmc_classes_pmc}
 
 CLASS_O_FILES = ${TEMP_pmc_classes_o}
 
 CLASS_STR_FILES = ${TEMP_pmc_classes_str}
 
-ENCODING_O_FILES = \
-    encodings/utf8$(O)
+ENCODING_O_FILES = ${TEMP_encoding_o}
+    
 
 IO_O_FILES = \
     io/io$(O) \
@@ -367,6 +369,7 @@ INTERP_O_FILES = \
 
 O_FILES = \
     $(INTERP_O_FILES) \
+    $(CHARSET_O_FILES) \
     $(IO_O_FILES) $(CLASS_O_FILES) \
     $(ENCODING_O_FILES) \
     $(IMCC_O_FILES) \
@@ -794,8 +797,6 @@ $(SRC)/dynext$(O) : $(GENERAL_H_FILES)
 
 $(SRC)/exceptions$(O) : $(GENERAL_H_FILES)
 
-encoding/utf8$(O) : $(GENERAL_H_FILES)
-
 $(SRC)/events$(O) : $(GENERAL_H_FILES)
 
 $(SRC)/thread$(O) : $(GENERAL_H_FILES)
@@ -910,6 +911,10 @@ ${TEMP_cg_c}
 ${TEMP_gc_c}
 
 ${TEMP_pmc_build}
+
+${TEMP_charset_build}
+
+${TEMP_encoding_build}
 
 # $(STICKY_FILES) : Configure.pl
 #	$(PERL) Configure.pl
