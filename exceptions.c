@@ -92,6 +92,44 @@ push_exception(Parrot_Interp interpreter, PMC *handler)
             STACK_ENTRY_PMC, STACK_CLEANUP_NULL);
 }
 
+static PMC *
+find_exception_handler(Parrot_Interp interpreter, PMC *exception)
+{
+    PMC *handler;
+    Stack_entry_type type;
+    STRING *message, *s;
+    PMC *key;
+    char *m;
+    /* for now, we don't check the exception class and we don't
+     * look for matching handlers
+     */
+    s = string_make(interpreter, "_message", 8, NULL,0,NULL);
+    key = key_new_string(interpreter, s);
+    message = VTABLE_get_string_keyed(interpreter, exception, key);
+    do {
+        handler =
+            stack_peek(interpreter, interpreter->ctx.control_stack, &type);
+        if (!handler)
+            break;
+        (void)stack_pop(interpreter, &interpreter->ctx.control_stack, &handler,
+                        STACK_ENTRY_PMC);
+        if (type == STACK_ENTRY_PMC &&
+                handler->vtable->base_type == enum_class_Exception_Handler)
+            return handler;
+    } while (1);
+    m = string_to_cstring(interpreter, message);
+    if (m && *m) {
+        fprintf(stderr, m);
+        if (m[strlen(m-1)] != '\n')
+            fprintf(stderr, "%c", '\n');
+    }
+    else
+        fprintf(stderr, "No exception handler and no message\n");
+    Parrot_exit(1);
+
+    return NULL;
+}
+
 void
 pop_exception(Parrot_Interp interpreter)
 {
@@ -109,29 +147,25 @@ pop_exception(Parrot_Interp interpreter)
 void *
 throw_exception(Parrot_Interp interpreter, PMC *exception, void *dest)
 {
-    Stack_entry_type type;
     PMC *handler;
     struct Parrot_Sub * cc;
     PMC* key;
     STRING *s;
 
     Parrot_block_DOD(interpreter);
-    handler = stack_peek(interpreter, interpreter->ctx.control_stack, &type);
-    if (type != STACK_ENTRY_PMC ||
-            handler->vtable->base_type != enum_class_Exception_Handler)
-        PANIC("Tried to clear_eh a non Exception_Handler");
-    (void)stack_pop(interpreter, &interpreter->ctx.control_stack, &handler,
-                    STACK_ENTRY_PMC);
+    handler = find_exception_handler(interpreter, exception);
     cc = (struct Parrot_Sub*)PMC_data(handler);
     /* preserve P5 register */
     s = string_make(interpreter, "_P5", 3, NULL,0,NULL);
     key = key_new_string(interpreter, s);
     VTABLE_set_pmc_keyed(interpreter, exception, key, REG_PMC(5));
     /* generate and place return continuation */
-    s = string_make(interpreter, "_invoke_cc", 10, NULL,0,NULL);
-    key = key_new_string(interpreter, s);
-    VTABLE_set_pmc_keyed(interpreter, exception, key,
-            new_continuation_pmc(interpreter, dest));
+    if (dest) {
+        s = string_make(interpreter, "_invoke_cc", 10, NULL,0,NULL);
+        key = key_new_string(interpreter, s);
+        VTABLE_set_pmc_keyed(interpreter, exception, key,
+                new_continuation_pmc(interpreter, dest));
+    }
     /* TODO update the whole context */
     cc->ctx.pad_stack = interpreter->ctx.pad_stack;
     stack_mark_cow(cc->ctx.pad_stack);

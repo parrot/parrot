@@ -1,6 +1,6 @@
 #! perl
 
-use Parrot::Test tests => 27;
+use Parrot::Test tests => 28;
 use Test::More;
 
 output_is(<<CODE, <<OUTPUT, "Initial PerlHash tests");
@@ -832,6 +832,24 @@ output_is(<<'CODE', <<OUTPUT, "Cloning keys");
 CODE
 Food
 Sheep
+OUTPUT
+
+output_is(<<'CODE', <<OUTPUT, "Cloning PMC vals");
+    new P10, .PerlHash
+    new P1, .PerlUndef
+    set P1, "value\n"
+    set P10["str"], P1
+    new P1, .PerlUndef
+    set P1, 42
+    set P10["int"], P1
+    clone P2, P10
+    set P0, P2["int"]
+    print P0
+    set P0, P2["str"]
+    print P0
+    end
+CODE
+42value
 OUTPUT
 
 output_is(<<'CODE', <<OUTPUT, "entry types - type_keyed");

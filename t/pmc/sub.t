@@ -1,6 +1,6 @@
 #! perl -w
 
-use Parrot::Test tests => 46;
+use Parrot::Test tests => 51;
 use Test::More;
 
 output_is(<<'CODE', <<'OUTPUT', "PASM subs - newsub");
@@ -630,6 +630,126 @@ something happend
 42
 back again
 43
+OUTPUT
+
+output_is(<<'CODE', <<'OUTPUT', "throw - no handler");
+    new P0, .Exception
+    set P0["_message"], "something happend"
+    throw P0
+    print "not reached\n"
+    end
+CODE
+something happend
+OUTPUT
+
+output_is(<<'CODE', <<'OUTPUT', "throw - no handler, no message");
+    new P0, .Exception
+    throw P0
+    print "not reached\n"
+    end
+CODE
+No exception handler and no message
+OUTPUT
+
+output_is(<<'CODE', <<'OUTPUT', "2 exception handlers");
+    print "main\n"
+    newsub P20, .Exception_Handler, _handler1
+    set_eh P20
+    newsub P21, .Exception_Handler, _handler2
+    set_eh P21
+
+    new P30, .Exception
+    set P30["_message"], "something happend"
+    throw P30
+    print "not reached\n"
+    end
+_handler1:
+    print "catched it in 1\n"
+    set S0, P5["_message"]
+    print S0
+    print "\n"
+    end
+_handler2:
+    print "catched it in 2\n"
+    set S0, P5["_message"]
+    print S0
+    print "\n"
+    end
+CODE
+main
+catched it in 2
+something happend
+OUTPUT
+
+output_is(<<'CODE', <<'OUTPUT', "2 exception handlers, throw next");
+    print "main\n"
+    newsub P20, .Exception_Handler, _handler1
+    set_eh P20
+    newsub P21, .Exception_Handler, _handler2
+    set_eh P21
+
+    new P30, .Exception
+    set P30["_message"], "something happend"
+    throw P30
+    print "not reached\n"
+    end
+_handler1:
+    print "catched it in 1\n"
+    set S0, P5["_message"]
+    print S0
+    print "\n"
+    end
+_handler2:
+    print "catched it in 2\n"
+    set S0, P5["_message"]
+    print S0
+    print "\n"
+    throw P5	# XXX rethrow?
+    end
+CODE
+main
+catched it in 2
+something happend
+catched it in 1
+something happend
+OUTPUT
+
+output_is(<<'CODE', <<'OUTPUT', "2 exception handlers, throw next - return");
+    print "main\n"
+    newsub P20, .Exception_Handler, _handler1
+    set_eh P20
+    newsub P21, .Exception_Handler, _handler2
+    set_eh P21
+
+    new P30, .Exception
+    set P30["_message"], "something happend"
+    throw P30
+    print "back in main\n"
+    end
+_handler1:
+    print "catched it in 1\n"
+    set S0, P5["_message"]
+    print S0
+    print "\n"
+    set P2, P5["_invoke_cc"]	# the return continuation
+    invoke P2
+_handler2:
+    print "catched it in 2\n"
+    set S0, P5["_message"]
+    print S0
+    print "\n"
+    throw P5
+    print "back in 2\n"
+    # XXX we cant return from here, the _return_cc in P5 is common
+    # to both exception handlers
+    end
+CODE
+main
+catched it in 2
+something happend
+catched it in 1
+something happend
+back in 2
 OUTPUT
 
 1;
