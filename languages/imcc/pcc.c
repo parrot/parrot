@@ -824,7 +824,7 @@ move_cc:
             goto move_cc;
         }
     }
-    else
+    else if (!sub->pcc_sub->nci)
         need_cc = 1;
     /* set prototyped: I0 */
     ins = set_I_const(interpreter, ins, 0, sub->pcc_sub->prototyped);
@@ -851,8 +851,9 @@ move_cc:
     /*
      * if we reuse the continuation, update it
      */
-    if (!need_cc)
-        ins = insINS(interpreter, ins, "updatecc", regs, 0);
+    if (!sub->pcc_sub->nci)
+        if (!need_cc)
+            ins = insINS(interpreter, ins, "updatecc", regs, 0);
     /*
      * emit a savetop for now
      */

@@ -1,6 +1,13 @@
+- 2003-09-29	leo
+
+	* new .nci_call directive
+	* updated docs/calling_conventions for NCI
+	* the return label after a pcc/nci_call is now optional
+	* check param count of unprototyped P params too
+
 - 2003-09-19	sfink
 	* version number change to 0.0.11.0 for parrot 0.0.11 release
-	
+
 - 2003-08-23	leo
 
 	* start moving globals tointerpreter->imcc_info

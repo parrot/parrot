@@ -1,6 +1,6 @@
 #!perl
 use strict;
-use TestCompiler tests => 30;
+use TestCompiler tests => 31;
 
 ##############################
 # Parrot Calling Conventions
@@ -1223,3 +1223,31 @@ ret:
 CODE
 ok
 OUT
+
+SKIP: {
+  skip("cant do NCI on $^O", 1) unless ($^O =~ /linux/);
+output_is(<<'CODE', <<'OUT', "nci");
+.sub _main
+    .sym pmc FABS
+    .sym pmc NULL
+    null NULL
+    dlfunc FABS, NULL, "fabs", "dd"
+    .sym float d
+    .sym float r
+    d = -42
+    .pcc_begin prototyped
+    .arg d
+    .nci_call FABS
+    .result r
+    .pcc_end
+    print d
+    print "\n"
+    print r
+    print "\n"
+    end
+.end
+CODE
+-42.000000
+42.000000
+OUT
+}

@@ -187,6 +187,7 @@ SP              [ ]
 ".pcc_begin"    return(PCC_BEGIN);
 ".pcc_end"      return(PCC_END);
 ".pcc_call"     return(PCC_CALL);
+".nci_call"     return(NCI_CALL);
 <emit,INITIAL>".pcc_sub"      return(PCC_SUB);
 ".pcc_begin_return"    return(PCC_BEGIN_RETURN);
 ".pcc_end_return"      return(PCC_END_RETURN);

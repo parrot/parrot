@@ -112,6 +112,7 @@ struct pcc_sub_t {
     int nret;
     int prototyped;
     int calls_a_sub;
+    int nci;
 };
 
 

@@ -208,7 +208,7 @@ static char * inv_op(char *op) {
 %token <t> GLOBAL ADDR CLONE RESULT RETURN POW SHIFT_RIGHT_U LOG_AND LOG_OR
 %token <t> COMMA ESUB
 %token <t> PCC_BEGIN PCC_END PCC_CALL PCC_SUB PCC_BEGIN_RETURN PCC_END_RETURN
-%token <t> PCC_BEGIN_YIELD PCC_END_YIELD
+%token <t> PCC_BEGIN_YIELD PCC_END_YIELD NCI_CALL
 %token <t> PROTOTYPED NON_PROTOTYPED
 %token <s> LABEL
 %token <t> EMIT EOM
@@ -223,7 +223,7 @@ static char * inv_op(char *op) {
 %type <sr> pcc_arg pcc_result pcc_args pcc_results pcc_params pcc_param
 %type <sr> pcc_returns pcc_return pcc_call
 %type <t> pcc_proto pcc_sub_proto
-%type <i> instruction assignment if_statement labeled_inst
+%type <i> instruction assignment if_statement labeled_inst opt_label
 %type <sr> target reg const var rc string
 %type <sr> key keylist _keylist
 %type <sr> vars _vars var_or_i _var_or_i label_op
@@ -352,9 +352,13 @@ pcc_sub_call: PCC_BEGIN pcc_proto '\n' {
            }
            pcc_args
            pcc_call
-           label '\n'
+           opt_label
            pcc_results
            PCC_END  '\n' { $$ = 0; }
+    ;
+
+opt_label: /* empty */   { $$ = 0; }
+         | label '\n'
     ;
 
 pcc_proto: PROTOTYPED           { $$ = 1; }
@@ -372,6 +376,10 @@ pcc_call: PCC_CALL var COMMA var '\n' {
        | PCC_CALL var '\n' {
                   add_pcc_sub($<sr>-1, $2);
               }
+       | NCI_CALL var '\n' {
+                  add_pcc_sub($<sr>-1, $2);
+                  $<sr>-1 ->pcc_sub->nci = 1;
+              }
      ;
 
 pcc_args: /* empty */                   { $$ = 0; }
@@ -383,7 +391,7 @@ pcc_arg: ARG var                        { $$ = $2; }
     ;
 
 pcc_results: /* empty */                { $$ = 0; }
-    | pcc_results pcc_result '\n'       { if($2) add_pcc_result($<sr>-4, $2); }
+    | pcc_results pcc_result '\n'       { if($2) add_pcc_result($<sr>-3, $2); }
     ;
 
 pcc_result: RESULT target               { $$ = $2; }
