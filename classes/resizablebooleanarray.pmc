@@ -4,12 +4,12 @@ $Id$
 
 =head1 NAME
 
-classes/resizablebooleanarray.pmc - resizable size array for booleans only
+classes/resizablebooleanarray.pmc - resizable array for booleans only
 
 =head1 DESCRIPTION
 
-This class, ResizableBooleanArray, implements an array of resizable size, which stores booleans,
-it uses Boolean PMCs for all of the conversions
+This class, ResizableBooleanArray, implements an array of resizable size, which stores booleans.
+It uses Boolean PMCs for all of the conversions,
 
 =head2 Functions
 
@@ -71,6 +71,22 @@ Sets the integer value of the element at index C<key> to C<value>.
 
         sd = (SizeBooleanData *)PMC_data(SELF);
         sd->data[key] = (value != 0);
+    }
+
+/*
+
+=item C<void push_integer (STRING* value)>
+
+Extends the array by adding an element of value C<*value> to the end of
+the array.
+
+=cut
+
+*/
+
+    void push_integer (INTVAL value) {
+        INTVAL nextix = DYNSELF.elements();
+        DYNSELF.set_integer_keyed_int(nextix, value);
     }
 
 /*
@@ -138,12 +154,13 @@ Creates and returns a copy of the array.
 
 =head1 SEE ALSO
 
-F<docs/pdds/pdd03_calling_conventions.pod>.
+F<docs/pdds/pdd17_basic_types.pod>.
 
 =head1 HISTORY
 
-Initial version 2004.06.11 by Matt Fowles
-Changed allocator to double size - MF 2004.06.15
+Initial version                  - Matt Fowles 2004-06-11
+Changed allocator to double size - Matt Fowles 2004-06-15
+Added push_integer               - Bernhard Schmalhofer 2004-10-17
 
 =cut
 

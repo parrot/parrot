@@ -10,7 +10,6 @@ classes/fixedpmcarray.pmc - fixed size array for PMCs only
 
 This class, FixedPMCArray, implements an array of fixed size, which stores PMCs,
 it puts things into Integer, Float, or String PMCs as appropriate
-TODO currently this uses Perl types.
 
 =head2 Functions
 
@@ -734,9 +733,13 @@ Return a new iterator for SELF.
 
 =back
 
+=head1 TODO 
+
+currently this uses Perl types.
+
 =head1 SEE ALSO
 
-F<docs/pdds/pdd03_calling_conventions.pod>.
+F<docs/pdds/pdd17_basic_types.pod>.
 
 =head1 HISTORY
 

@@ -4,15 +4,13 @@ $Id$
 
 =head1 NAME
 
-classes/resizablepmcarray.pmc - resizable size array for PMCs only
+classes/resizablepmcarray.pmc - resizable array for PMCs only
 
 =head1 DESCRIPTION
 
-This class, ResizablePMCArray, implements an array of resizable size,
-which stores PMCs, it puts things into Integer, Float, or String PMCs
-as appropriate
-
-TODO currently this uses PerlString instead of String PMCs.
+This class, ResizablePMCArray, implements an resizable array,
+which stores PMCs. It puts things into Integer, Float, or String PMCs
+as appropriate.
 
 =head2 Functions
 
@@ -176,14 +174,24 @@ If key is a slice, do a splice as set that item.
                 "ResizablePMCArray: unimplemented delete!\n");
     }
 
+/*
+
+=item C<void push_pmc (PMC* value)>
+
+Extends the array by adding an element of value C<*value> to the end of
+the array.
+
+=cut
+
+*/
+
     void push_pmc(PMC* value) {
-        INTVAL cap = PMC_int_val2(SELF);
         INTVAL size = PMC_int_val(SELF);
-        if (size + 1 >= cap)
-            DYNSELF.set_integer_native(size + 1);
-        else
-            PMC_int_val(SELF) = size + 1;
+        /* let set_integer_native() worry about memory allocation */
+        DYNSELF.set_integer_native(size + 1);
         ((PMC**)PMC_data(SELF))[size] = value;
+
+        return;
     }
 
     METHOD void append(PMC* value) {
@@ -308,14 +316,18 @@ list.elements == 1.
 
 =back
 
+=head1 TODO
+
+Currently this uses PerlString instead of String PMCs.
+
 =head1 SEE ALSO
 
-F<docs/pdds/pdd03_calling_conventions.pod>.
+F<docs/pdds/pdd17_basic_types.pod>.
 
 =head1 HISTORY
 
-Initial version 2004.06.11 by Matt Fowles
-Changed allocator to double size - MF 2004.06.15
+Initial version                  - Matt Fowles 2004-06-11
+Changed allocator to double size - Matt Fowles 2004-06-15
 
 =cut
 

@@ -4,12 +4,12 @@ $Id$
 
 =head1 NAME
 
-classes/resizablestringarray.pmc - resizable size array for strings only
+classes/resizablestringarray.pmc - resizable array for strings only
 
 =head1 DESCRIPTION
 
-This class, ResizableStringArray, implements an array of resizable size, which stored STRING*
-TODO: it uses PerlString's internally to perform conversion, but it should use String PMCs
+This class, ResizableStringArray, implements a resizeable array, which stores STRING*
+values only.
 
 =head2 Functions
 
@@ -71,6 +71,22 @@ Sets the Parrot string value of the element at index C<key> to C<value>.
 
         sd = (SizeStringData *)PMC_data(SELF);
         sd->data[key] = value;
+    }
+
+/*
+
+=item C<void push_string (STRING* value)>
+
+Extends the array by adding an element of value C<*value> to the end of
+the array.
+
+=cut
+
+*/
+
+    void push_string (STRING* value) {
+        INTVAL nextix = DYNSELF.elements();
+        DYNSELF.set_string_keyed_int(nextix, value);
     }
 
 /*
@@ -168,14 +184,19 @@ Marks the array as live.
 
 =back
 
+=head1 TODO
+
+This PMC uses PerlString's internally to perform conversion, but it should use String PMCs.
+
 =head1 SEE ALSO
 
-F<docs/pdds/pdd03_calling_conventions.pod>.
+F<docs/pdds/pdd17_basic_types.pod>.
 
 =head1 HISTORY
 
-Initial version 2004.06.11 by Matt Fowles
-Changed allocator to double size - MF 2004.06.15
+Initial version                  - Matt Fowles 2004-06-11
+Changed allocator to double size - Matt Fowles 2004-06-15
+Added push_string                - Bernhard Schmalhofer 2004-10-17
 
 =cut
 

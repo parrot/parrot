@@ -17,7 +17,7 @@ out-of-bounds test. Checks INT and PMC keys.
 
 =cut
 
-use Parrot::Test tests => 8;
+use Parrot::Test tests => 9;
 use Test::More;
 
 my $fp_equality_macro = <<'ENDOFMACRO';
@@ -308,4 +308,24 @@ CODE
 0
 OUTPUT
 
-1;
+output_is(<< 'CODE', << 'OUTPUT', "push integer");
+##PIR##
+.sub _main
+    .local pmc pmc1
+    pmc1 = new ResizableBooleanArray
+    pmc1[9999] = 0
+    push pmc1, 10001
+    .local int elements
+    elements = pmc1
+    print elements
+    print "\n"
+    .local string last
+    last = pmc1[10000]
+    print last
+    print "\n"
+    end
+.end
+CODE
+10001
+1
+OUTPUT
