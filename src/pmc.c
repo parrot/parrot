@@ -182,7 +182,7 @@ pmc_new_noinit(struct Parrot_Interp *interpreter, INTVAL base_type)
             pmc = VTABLE_get_pmc_keyed_int(interpreter, interpreter->iglobals,
                     (INTVAL)IGLOBALS_ENV_HASH);
             if (!pmc) {
-                pmc = get_new_pmc_header(interpreter, base_type, 0);
+                pmc = get_new_pmc_header(interpreter, base_type, 1);
                 VTABLE_set_pmc_keyed_int(interpreter, interpreter->iglobals,
                         (INTVAL)IGLOBALS_ENV_HASH, pmc);
             /* UNLOCK */}
@@ -193,11 +193,13 @@ pmc_new_noinit(struct Parrot_Interp *interpreter, INTVAL base_type)
          * with the class is:
          * - get_pointer: return NULL or a pointer to the single instance
          * - set_pointer: set the only instance once
+         *
+         * - singletons are created in the constant pmc pool  
          */
         pmc = (Parrot_base_vtables[base_type]->get_pointer)(interpreter, NULL);
         /* LOCK */
         if (!pmc) {
-            pmc = get_new_pmc_header(interpreter, base_type, 0);
+            pmc = get_new_pmc_header(interpreter, base_type, 1);
             VTABLE_set_pointer(interpreter, pmc, pmc);
         }
         return pmc;

@@ -643,9 +643,12 @@ ret0:
     newsub handler, .Exception_Handler, catch0
     set_eh handler
 
-
     # now call the generator, until that throws 'StopIteration'
+    # protect against endless loops
+    set I20, 10
 loop:
+    dec I20
+    unless I20, err
     .pcc_begin non_prototyped
     .arg $P0
     .pcc_call generator
@@ -662,6 +665,9 @@ ret1:
 catch0:
     print "caught it!\n"
 endtry0:
+    end
+err:
+    print "didn't stop\n"
     end
 .end
 
@@ -681,13 +687,18 @@ endtry0:
 # all it does is throw StopIteration
 .pcc_sub _count_g non_prototyped
     .local PerlInt c
+count_loop:
     find_lex c, -1, "start"
     lt c, 0, stop
     .pcc_begin_yield
     .return c
     .pcc_end_yield
     c = c - 1
-    goto _count_g
+    # this branch was to _coung_g, which isn't quite right 
+    # code shouldn't branch to the entry label, where some
+    # function prologue does exist
+    # OTOH there might be some more bugs with coruoutines
+    goto count_loop
 
 stop:
     .local pmc ex0

@@ -171,24 +171,8 @@ imc_close_unit(Parrot_Interp interp, IMC_Unit * unit)
 #if IMC_TRACE
     fprintf(stderr, "imc_close_unit()\n");
 #endif
+    UNUSED(interp);
     if (unit) {
-        Instruction *ins = unit->instructions;
-
-        if (ins->r[1] && ins->r[1]->type == VT_PCC_SUB) {
-            if (unit->last_ins->type != (ITPCCSUB|ITLABEL) &&
-                    strcmp(unit->last_ins->op, "ret") &&
-                    strcmp(unit->last_ins->op, "exit") &&
-                    strcmp(unit->last_ins->op, "end")
-               ) {
-                SymReg *regs[IMCC_MAX_REGS];
-                Instruction *tmp;
-
-                regs[0] = mk_pasm_reg(str_dup("P1"));
-                tmp = INS(interp, unit, "invoke", NULL, regs, 1, 0, 0);
-                debug(interp, DEBUG_IMC, "add sub ret - invoke P1\n");
-                insert_ins(unit, unit->last_ins, tmp);
-            }
-        }
     }
     cur_unit = NULL;
 }

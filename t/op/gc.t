@@ -16,7 +16,7 @@ Tests garbage collection with the C<interpinfo> operation.
 
 =cut
 
-use Parrot::Test tests => 8;
+use Parrot::Test tests => 9;
 
 output_is( <<'CODE', '1', "sweep 1" );
       interpinfo I1, 2   # How many DOD runs have we done already?
@@ -99,7 +99,7 @@ output_is( <<'CODE', <<'OUTPUT', "Nested collectoff/collecton" );
       collectoff
       collectoff
       collecton
-      collect           # This shouldn't do anything...
+      collect           # This shouldn't do anything...    #'
       interpinfo I2, 3
       sub I3, I2, I1
       print I3
@@ -138,3 +138,34 @@ starting
 ending
 OUTPUT
 
+output_is(<<'CODE', <<OUTPUT, "vanishing slingleton PMC");
+_main:
+    newsub P0, .Sub, _rand
+    set I16, 100
+    set I17, 0
+loop:
+    sweep 1
+    savetop
+    invokecc
+    restoretop
+    inc I17
+    lt I17, I16, loop
+    print "ok\n"
+    end
+
+_rand:
+    new P16, .Random
+    set I5, P16[10]
+    gt I5, 10, err
+    lt I5, 0, err
+    invoke P1
+err:
+    print "singleton destroyed .Random = ."
+    new P16, .Random
+    typeof S16, P16
+    print S16
+    print "\n"
+    end
+CODE
+ok
+OUTPUT

@@ -371,17 +371,17 @@ expand_pcc_sub(Parrot_Interp interpreter, IMC_Unit * unit, Instruction *ins)
     label1 = label2 = NULL;
     ps = pe = sub->pcc_sub->pragma & P_PROTOTYPED;
     if (sub->pcc_sub->pragma & P_NONE) {
-	ps = 0; pe = 1;
-	/* subroutine can handle both */
-	i0 = get_pasm_reg("I0");
-	regs[0] = i0;
-	sprintf(buf, "_%csub_%s_p1", IMCC_INTERNAL_CHAR, sub->name);
+        ps = 0; pe = 1;
+        /* subroutine can handle both */
+        i0 = get_pasm_reg("I0");
+        regs[0] = i0;
+        sprintf(buf, "_%csub_%s_p1", IMCC_INTERNAL_CHAR, sub->name);
         regs[1] = label1 = mk_address(str_dup(buf), U_add_uniq_label);
-	ins = insINS(interpreter, unit, ins, "if", regs, 2);
+        ins = insINS(interpreter, unit, ins, "if", regs, 2);
 
     }
     for (proto = ps; proto <= pe; ++proto) {
-	nargs = sub->pcc_sub->nargs;
+        nargs = sub->pcc_sub->nargs;
         ins = pcc_get_args(interpreter, unit, ins, sub->pcc_sub, nargs,
                 proto, sub->pcc_sub->args, 1);
         if (ps != pe) {
@@ -411,6 +411,28 @@ NONAMEDPARAMS: /* If no named params, don't generate any param code */
         regs[0] = sub->pcc_sub->cc_sym = mk_temp_reg('P');
         regs[1] = get_pasm_reg("P1");
         insINS(interpreter, unit, ins, "set", regs, 2);
+    }
+    /*
+     * check if there is a return 
+     */
+
+    if (unit->last_ins->type != (ITPCCSUB|ITLABEL) &&
+            strcmp(unit->last_ins->op, "ret") &&
+            strcmp(unit->last_ins->op, "exit") &&
+            strcmp(unit->last_ins->op, "end")
+       ) {
+
+        if (sub->pcc_sub->cc_sym) 
+            regs[0] = sub->pcc_sub->cc_sym;
+        else
+            regs[0] = mk_pasm_reg(str_dup("P1"));
+        tmp = INS(interpreter, unit, "invoke", NULL, regs, 1, 0, 0);
+        debug(interpreter, DEBUG_IMC, "add sub ret - invoke %s\n",
+                regs[0]->name);
+        /*
+         * TODO insert minimal PCC information - I0=I3=0
+         */
+        insert_ins(unit, unit->last_ins, tmp);
     }
 }
 
