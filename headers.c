@@ -100,6 +100,8 @@ get_free_buffer(struct Parrot_Interp *interpreter,
     
     /* Don't let it point to garbage memory */
     buffer->bufstart = NULL;
+    /* Clear the flagpole (especially BUFFER_on_free_list_FLAG) */
+    buffer->flags = 0;
 #if GC_DEBUG
     buffer->version++;
 #endif
