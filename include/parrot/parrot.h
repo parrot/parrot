@@ -70,9 +70,14 @@
 #  include <netdb.h>
 #endif
 
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <fcntl.h>
+#ifdef HAS_HEADER_SYSTYPES
+#  include <sys/types.h>
+#endif
+
+#ifdef HAS_HEADER_SYSSTAT
+#  include <sys/stat.h>
+#endif
+
 #include <errno.h>
 #include <string.h>
 #include <ctype.h>
