@@ -52,5 +52,8 @@ op.h: opcode_table make_op_header.pl
 config.h: Configure.pl config_h.in
 	${perl} Configure.pl
 
+test: test_prog
+	perl t/harness
+
 clean:
 	rm -f *$(O) *.s basic_opcodes.c interp_guts.h op.h test_prog
