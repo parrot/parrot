@@ -622,7 +622,7 @@ PDB_set_break(struct Parrot_Interp *interpreter, const char *command)
     }
 
     /* Allocate the new break point */
-    newbreak = (PDB_breakpoint_t *)mem_sys_allocate(sizeof(PDB_breakpoint_t));
+    newbreak = (PDB_breakpoint_t *)mem_sys_allocate(PDB_breakpoint_t));
 
     na(command);
 
@@ -633,11 +633,16 @@ PDB_set_break(struct Parrot_Interp *interpreter, const char *command)
         if (!(newbreak->condition = PDB_cond(interpreter, command)))
             return;
     }
+    else {
+        newbreak->condition = NULL;
+    }
 
     /* Set the address where to stop */
     newbreak->pc = line->opcode;
     /* No next breakpoint */
     newbreak->next = NULL;
+    /* Don't skip (at least initially) */
+    newbreak->skip = 0;
 
     /* Add the breakpoint to the end of the list */
     i = 0;
