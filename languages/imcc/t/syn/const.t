@@ -1,6 +1,6 @@
 #!perl
 use strict;
-use TestCompiler tests => 3;
+use TestCompiler tests => 4;
 
 ##############################
 output_is(<<'CODE', <<'OUT', "const 1");
@@ -51,6 +51,36 @@ output_is(<<'CODE', <<'OUT', "const 2");
 CODE
 15
 OUT
+##############################
+output_is(<<'CODE', <<'OUT', "array/hash consts");
+.sub MAIN
+   .local PerlArray ar
+   .local PerlHash ha
+   .local string key1
+   .const string key2 = "key2"
+   .local int idx1
+   .const int idx2 = 2
+   ar = new PerlArray
+   ha = new PerlHash
+   key1 = "key1"
+   idx1 = 1
+   ha[key1] = idx1
+   ha[key2] = idx2
+   $I0 = ha[key1]
+   $I1 = ha[key2]
+   ar[idx1] = $I0
+   ar[idx2] = $I1
+   $I2 = ar[idx1]
+   $I3 = ar[idx2]
+   print $I2
+   print $I3
+   print "\n"
+   end
+.end
+CODE
+12
+OUT
+
 
 ##############################
 output_is(<<'CODE', <<'OUT', "escaped");

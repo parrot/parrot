@@ -615,6 +615,7 @@ build_key(struct Parrot_Interp *interpreter, SymReg *reg)
         if (r->reg)
             r = r->reg;
         switch (r->type) {
+            case VTIDENTIFIER:       /* P[S0] */
             case VTPASM:       /* P[S0] */
             case VTREG:        /* P[S0] */
                 if (r->set == 'I')
