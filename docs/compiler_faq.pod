@@ -17,6 +17,16 @@ C89-compliant C compiler, although some features require C<gcc>.  See the
 F<README> files in the root directory for more information about building
 Parrot.
 
+=head2 How can I implement a compiler to use as a compiler object from within
+Parrot? (For example, with the C<compile> op.)
+
+=head2 How do I embed source locations in my code for debugging?
+
+You can do this using the C<setfile> and C<setline> opcodes. Simply
+set the source file name or line number whenever it changes. This is
+sub-optimal for a number of reasons, so there should eventually be a
+better system for this.
+
 =head1 Subroutines
 
 =head2 How do I generate a sub call in PIR?
@@ -344,4 +354,3 @@ the arguments as key/value pairs:
 =item Revision 0.3 - 17 May 2004
 
 =back
-
