@@ -1,0 +1,61 @@
+To prepare a release:
+
+    0.  Announce to perl6-internals and #parrot at least a
+        couple days in advance, asking if there are any
+        showstopping bugs.
+
+    1.  cvs update.
+
+    2.  Update files with version-specific information:
+
+        a.  Increment the version number in VERSION.
+
+        b.  Change the information in DEVELOPING to reflect
+            this release's version number and date.
+
+        c.  Update README.
+
+        d.  Update ChangeLog and NEWS.
+
+        e.  Make sure nothing in TODO has been done.
+
+        f.  Make sure RESPONSIBLE_PARTIES is still
+            accurate.
+
+    3.  cvs commit.
+
+    4.  Delete DEVELOPING.  If it appears in the MANIFEST, 
+        delete its entry in MANIFEST as well.  (This will
+        remove the 'devel' postfix from the version 
+        number--e.g. 0.0.8, as opposed to 0.0.8-devel, 
+        which is the number you'd get by downloading from 
+        CVS and getting a DEVELOPING file.)
+        
+    5.  make distclean.
+    
+    6.  Run tools/dev/manicheck.pl and fix any errors it finds.
+        
+    7.  Make sure everything works--Configure, make and 
+        make test.  Check the Tinderbox and make sure that 
+        everything's green (or that any yellows and reds are
+        due to problems with the particular box, like a
+        botched compiler upgrade).
+
+    8.  make distclean again.
+
+    9.  tar, gzip, and upload to CPAN.
+
+    10. Compose and send out the announcements--perl6-internals,
+        -language, -announce, perl5-porters, use Perl, PerlMonks,
+        comp.lang.perl.misc, etc.
+
+    11. You're done!  Help yourself to a beer, cola or other
+        celebratory drink.
+
+ABOUT THIS DOCUMENT:
+
+This document was written after a couple of subtly incorrectly
+assembled releases--usually when someone forgot to delete 
+DEVELOPING, but at least once where the MANIFEST check failed.
+The intent of this file is to document what must be done to 
+release so that such mistakes don't happen again.
