@@ -447,6 +447,7 @@ examples/assembly/ncurses_life.imc                [main]doc
 examples/assembly/pcre.imc                        [main]doc
 examples/assembly/pmcmops.pasm                    [main]doc
 examples/assembly/queens.pasm                     [main]doc
+examples/assembly/queens_r.imc                    [main]doc
 examples/assembly/slurp.pasm                      [main]doc
 examples/assembly/small.xml                       [main]doc
 examples/assembly/stack.pasm                      [main]doc
