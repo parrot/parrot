@@ -78,6 +78,20 @@ Destroys the array.
 
 /*
 
+=item C<INTVAL get_bool()>
+
+Returns true iff there are elements in the tuple.
+
+=cut
+
+*/
+
+    INTVAL get_bool () {
+        return DYNSELF.elements() != 0;
+    }
+
+/*
+
 =item C<INTVAL elements()>
 
 Returns the number of elements in the array.

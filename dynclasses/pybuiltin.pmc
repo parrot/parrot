@@ -91,14 +91,14 @@ enter_nci_method should create these as locals to begin with.
         INTVAL j, n;
 
         /* Already init'ed? */
-        pad = scratchpad_get_current(interpreter);
+        pad = scratchpad_get_current(INTERP);
         name = const_string(INTERP, "__name__");
         find = scratchpad_find(INTERP, pad, name);
         if (find && VTABLE_defined(INTERP, find)) return;
 
         /* Find all PyBuiltin "nci" methods */
         class = const_string(INTERP, "PyBuiltin");
-        stash = interpreter->globals->stash_hash;
+        stash = INTERP->globals->stash_hash;
         b = hash_get_bucket(INTERP, (Hash*) PMC_struct_val(stash), class);
         if (!b) internal_exception(1, "Can't find PyBuiltins");
 
@@ -182,6 +182,62 @@ Combines a real and imaginary number and returns the result.
         fvalue = VTABLE_get_number(INTERP, imag);
         VTABLE_set_number_keyed_int(INTERP, ret, 1, fvalue);
         return ret;
+    }
+
+/*
+
+=item C<PMC* "filter"(PMC *func, PMC *list)>
+
+Combines a real and imaginary number and returns the result.
+Return those it ems of sequence for which function(item) is true.
+If function is None, return the items that are true.  If sequence
+is a tuple or string, return the same type, else return a list.
+
+=cut
+
+*/
+
+    METHOD PMC* Filter(PMC *func, PMC *list) {
+        PMC *res, *iter;
+        INTVAL i, n;
+        STRING *s;
+        INTVAL type;
+        int none_func;
+    
+        type = list->vtable->base_type;
+        iter = NULL;
+    
+        if (type == dynclass_PyString || type == dynclass_PyTuple) {
+            res = pmc_new(INTERP, type);
+        }
+        else {
+            if (type == enum_class_Iterator) iter = list;
+            res = pmc_new(INTERP, dynclass_PyList);
+        }
+    
+        if (!iter)
+            iter = pmc_new_init(INTERP, enum_class_Iterator, list);
+        VTABLE_set_integer_native(INTERP, iter, 0);
+        i = 0;
+        none_func = PMC_IS_NULL(func) ||
+            func == Parrot_base_vtables[enum_class_None]->data;
+        while (VTABLE_get_bool(INTERP, iter)) {
+            PMC *item = VTABLE_shift_pmc(INTERP, iter);
+            if (none_func) {
+                if (!VTABLE_get_bool(INTERP, item))
+                    continue;
+            }
+            else {
+                /* run filter func -
+                 * TODO save registers once around loop
+                 */
+                PMC *t = Parrot_runops_fromc_args(INTERP, func, "PP", item);
+                if (!VTABLE_get_bool(INTERP, t))
+                    continue;
+            }
+            VTABLE_set_pmc_keyed_int(INTERP, res, i++, item);
+        }
+        return res;
     }
 
 /*
@@ -327,6 +383,24 @@ Returns the octal representation of C<value>.
 
 /*
 
+=item C<PMC* "ord"(PMC *value)>
+
+Return the integer ordinal of a one-character string.
+
+=cut
+
+*/
+
+    METHOD PMC* ord(PMC *value) {
+        PMC * ret = pmc_new(INTERP, dynclass_PyInt);
+        STRING *svalue = VTABLE_get_string(INTERP, value);
+        INTVAL ivalue = string_ord(INTERP, svalue, 0);
+        VTABLE_set_integer_native(INTERP, ret, ivalue);
+        return ret;
+    }
+
+/*
+
 =item C<PMC* "tuple"(PMC *value)>
 
 Returns the tuple value of C<value>.
@@ -362,24 +436,24 @@ an increment of C<pstep>
 */
 
     METHOD PMC* range(PMC *pstart, PMC *pend, PMC *pstep) {
-        PMC *ar = pmc_new(interpreter, dynclass_PyList);
+        PMC *ar = pmc_new(INTERP, dynclass_PyList);
         INTVAL start = 0, end = 0, step = 1;
         int i, k, argcP;
 
         argcP = REG_INT(3);
         if (argcP == 1) {
-            end = VTABLE_get_integer(interpreter, pstart);
+            end = VTABLE_get_integer(INTERP, pstart);
         }
         else if (argcP == 2) {
-            start = VTABLE_get_integer(interpreter, pstart);
-            end =  VTABLE_get_integer(interpreter, pend);
+            start = VTABLE_get_integer(INTERP, pstart);
+            end =  VTABLE_get_integer(INTERP, pend);
         }
         else if (argcP == 3) {
-            start = VTABLE_get_integer(interpreter, pstart);
-            end =  VTABLE_get_integer(interpreter, pend);
-            step =  VTABLE_get_integer(interpreter, pstep);
+            start = VTABLE_get_integer(INTERP, pstart);
+            end =  VTABLE_get_integer(INTERP, pend);
+            step =  VTABLE_get_integer(INTERP, pstep);
             if (step == 0)
-                real_exception(interpreter, NULL, E_ValueError,
+                real_exception(INTERP, NULL, E_ValueError,
                         "range() step argument must not be zero");
         }
         else {
@@ -387,13 +461,30 @@ an increment of C<pstep>
         }
         if (step < 0) {
             for (i = start, k = 0; i > end; i += step, ++k)
-                VTABLE_set_integer_keyed_int(interpreter, ar, k, i);
+                VTABLE_set_integer_keyed_int(INTERP, ar, k, i);
         }
         else {
             for (i = start, k = 0; i < end; i += step, ++k)
-                VTABLE_set_integer_keyed_int(interpreter, ar, k, i);
+                VTABLE_set_integer_keyed_int(INTERP, ar, k, i);
         }
         return ar;
+    }
+
+/*
+
+=item C<PMC* "xrange"(PMC *pstart, PMC *pend, PMC *pstep)>
+
+Returns an object which can be iterated over to obtain a list of 
+integers ranging from C<pstart> to C<pend> with an increment of C<pstep>
+
+=cut
+
+TODO: actually do the above.  For now, simply return a list.  ;-)
+
+*/
+
+    METHOD PMC* xrange(PMC *pstart, PMC *pend, PMC *pstep) {
+        return Parrot_PyBuiltin_range(INTERP, SELF, pstart, pend, pstep);
     }
 
 /*

@@ -61,7 +61,7 @@ Create an (empty) list of function arguments
     void init () {
         PMC *func_args;
         SUPER();
-        pmc_new(INTERP, dynclass_PyList);
+        func_args = pmc_new(INTERP, dynclass_PyList);
         VTABLE_setprop(INTERP, SELF, FUNC_ARGS, func_args);
     }
 
