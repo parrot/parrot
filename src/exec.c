@@ -20,6 +20,7 @@
 #define JIT_EMIT 1
 #include "parrot/jit_emit.h"
 #include "parrot/exec_dep.h"
+#include "parrot/exec_save.h"
 
 static void exec_init(Parrot_exec_objfile_t *obj);
 static void add_data_member(Parrot_exec_objfile_t *obj, void *src, size_t len);

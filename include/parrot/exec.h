@@ -27,7 +27,7 @@
 #   if EXEC_OS == DARWIN
 #     define EXEC_MACH_O
 #   endif
-#   if (EXEC_OS == FREENBSD) || (EXEC_OS == LINUX)
+#   if (EXEC_OS == FREEBSD) || (EXEC_OS == LINUX)
 #     define EXEC_ELF
 #   endif
 
