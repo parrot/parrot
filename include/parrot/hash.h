@@ -22,10 +22,10 @@ typedef struct _hash HASH;
 
 typedef enum {
     enum_hash_undef,
-    enum_hash_int,
-    enum_hash_num,
-    enum_hash_string,
-    enum_hash_pmc
+    enum_hash_int = enum_type_INTVAL,
+    enum_hash_num = enum_type_FLOATVAL,
+    enum_hash_string = enum_type_STRING,
+    enum_hash_pmc = enum_type_PMC
 } HASH_ENTRY_TYPE;
 
 typedef struct _hash_entry {
@@ -50,7 +50,7 @@ void dump_hash(Interp * interpreter, HASH *hash);
  * Local variables:
  * c-indentation-style: bsd
  * c-basic-offset: 4
- * indent-tabs-mode: nil 
+ * indent-tabs-mode: nil
  * End:
  *
  * vim: expandtab shiftwidth=4:

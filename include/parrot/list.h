@@ -14,19 +14,6 @@
 
 #include "parrot/parrot.h"
 
-typedef enum {
-    enum_type_undef,
-    enum_type_bit,
-    enum_type_char,
-    enum_type_short,
-    enum_type_int,
-    enum_type_ptr,
-    enum_type_INTVAL,
-    enum_type_FLOATVAL,
-    enum_type_PMC,
-    enum_type_STRING
-} ARRAY_ENTRY_TYPE;
-
 typedef struct List_chunk {
     Buffer data;                /* item store */
     UINTVAL items;              /* items in this chunk */

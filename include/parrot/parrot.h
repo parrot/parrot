@@ -175,6 +175,7 @@ typedef void (*funcptr_t)(void);
 #include "parrot/global_setup.h"
 #include "parrot/interpreter.h"
 #include "parrot/encoding.h"
+#include "parrot/datatypes.h"
 #include "parrot/chartype.h"
 #include "parrot/string.h"
 #include "parrot/hash.h"

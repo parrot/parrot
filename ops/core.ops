@@ -4022,11 +4022,25 @@ inline op typeof (out INT, in PMC) {
   goto NEXT();
 }
 
+=item B<typeof>(out STR, in INT)
+
+Return the (native) parrot type of datatype $2.
+
+=cut
+
+inline op typeof(out STR, in INT) {
+    if ($2 > 0 && $2 < enum_class_max)
+	$1 = Parrot_base_vtables[$2].name(interpreter, 0);
+    else
+	$1 = Parrot_get_datatype_name(interpreter, $2);
+    goto NEXT();
+}
+
 ########################################
 
 =item B<find_type>(out INT, in STR)
 
-Find the PMC type by name.
+Find the PMC type or parrot data type by name.
 
 =cut
 
@@ -4034,7 +4048,24 @@ op find_type(out INT, in STR) {
     PMC * key = key_new_string(interpreter, $2);
 
     $1 = Parrot_base_classname_hash->vtable->get_integer_keyed(interpreter, Parrot_base_classname_hash, key);
+    if ($1 == enum_type_undef)
+	$1 = Parrot_get_datatype_enum(interpreter, $2);
+    goto NEXT();
+}
 
+=item B<valid_type>(out INT, in INT)
+
+Check if the PMC type or parrot data type $2 is valid.
+
+=cut
+
+op valid_type(out INT, in INT) {
+    if ($2 > 0 && $2 < enum_class_max)
+        $1 = 1;
+    else if ($2 >= enum_first_type && $2 < enum_last_type)
+        $1 = 1;
+    else
+        $1 = 0;
     goto NEXT();
 }
 
