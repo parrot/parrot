@@ -8,11 +8,9 @@ src/library.c - Interface to Parrot's bytecode library
 
 =head1 DESCRIPTION
 
-tdb
+This file contains a C function to access parrot's bytecode library functions.
 
 =head2 Functions
-
-tdb
 
 =over 4
 
@@ -23,28 +21,23 @@ tdb
 #include "parrot/parrot.h"
 #include <assert.h>
 
+/*
+
+=item C<static void
+library_init(Parrot_Interp interpreter)>
+
+internal helper function - loads the parrotlib bytecode
+
+=cut
+
+*/
+
 static void
 library_init(Parrot_Interp interpreter)
 {
-    PMC *pmc;
-    STRING *a, *b;
-
     /* XXX TODO: file location not known at runtime, should
        be linked with parrot (or use the upcoming config system) */
     Parrot_load_bytecode_direct(interpreter, "runtime/parrot/include/parrotlib.pbc");
-
-#if 0
-    a = string_from_cstring(interpreter, "_parrotlib", 10);
-    b = string_from_cstring(interpreter, "__lib_init", 10);
-    pmc = Parrot_find_global(interpreter, a, b);
-    if (!pmc) {
-	internal_exception(1,"_parrotlib::__lib_init not found");
-	abort();
-    }
-    pmc = Parrot_runops_fromc_args_save(interpreter, pmc, "vv");
-    VTABLE_set_pmc_keyed_int(interpreter, interpreter->iglobals,
-	    IGLOBALS_RUNTIME_LIBRARY, pmc);
-#endif
 }
 
 /*
@@ -68,19 +61,22 @@ Parrot_library_query(Parrot_Interp interpreter, const char *func_name, ...)
     PMC *sub, *prop;
     STRING *str, *name;
     char *csig;
-    va_start(args, func_name);
+    INTVAL resume = interpreter->resume_flag;
 
     if (!init_done) {	
 	library_init(interpreter);
+
         init_done = 1;
     }
     
     name = string_from_cstring(interpreter, func_name, strlen(func_name));
     
+    /* get the sub pmc */
     str = string_from_cstring(interpreter, "_parrotlib", 10 );
     sub = Parrot_find_global(interpreter, str, name);
     if (!sub) {
-	internal_exception(1, "unkown _parrotlib method '%s'", func_name);
+        interpreter->resume_flag = resume;
+	internal_exception(1, "unkown parrotlib method '%s'", func_name);
 	abort();
     }
 
@@ -88,15 +84,20 @@ Parrot_library_query(Parrot_Interp interpreter, const char *func_name, ...)
     str = string_from_cstring(interpreter, "signature", 9 );
     prop = VTABLE_getprop(interpreter, sub, str);
     if (!prop) {
-	internal_exception(1, "_parrotlib method '%s' has no signature", func_name);
+        interpreter->resume_flag = resume;
+	internal_exception(1, "parrotlib method '%s' has no signature", func_name);
 	abort();
     }
     str = VTABLE_get_string(interpreter, prop);
     csig = string_to_cstring(interpreter, str);
     
+    /* call the bytecode method */
+    va_start(args, func_name);
     ret = Parrot_runops_fromc_arglist_save(interpreter, sub, csig, args);
     va_end(args);
     
+    /* done */
+    interpreter->resume_flag = resume;
     return ret;
 }
 
