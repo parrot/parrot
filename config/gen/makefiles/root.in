@@ -1147,10 +1147,14 @@ progclean :
 	$(RM_F) classes/*.c classes/*.h classes/*.dump vtable.dump
 
 testclean :
-	$(RM_F) t/op/*.pasm t/op/*.imc t/op/*.pbc t/op/*.out t/op/*.o t/op/*.stabs.s \
-    t/pmc/*.pasm t/pmc/*.imc t/pmc/*.pbc t/pmc/*.out t/pmc/*.o t/pmc/*.stabs.s \
-    t/stress/*.pasm t/stress/*.pbc t/stress/*.out t/stress/*.o t/stress/*.stabs.s \
-    t/src/*_*
+	$(RM_F) t/op/*.pasm t/op/*.imc
+	$(RM_F) t/op/*.pbc t/op/*.out
+	$(RM_F) t/op/*.o t/op/*.stabs.s
+	$(RM_F) t/pmc/*.pasm t/pmc/*.imc t/pmc/*.pbc
+	$(RM_F) t/pmc/*.out t/pmc/*.o t/pmc/*.stabs.s
+	$(RM_F) t/stress/*.pasm t/stress/*.pbc
+	$(RM_F) t/stress/*.out t/stress/*.o t/stress/*.stabs.s
+	$(RM_F) t/src/*_*
 	$(MAKE_C) $(IMCC_DIR) testclean
 
 realclean : clean
