@@ -105,7 +105,6 @@ Swaps the "context".
         }
         else {
             wanted_seg = sub->caller_seg;
-            sub->caller_seg = interpreter->code->cur_cs;
         }
         swap_context(interpreter, SELF);
 

@@ -183,6 +183,8 @@ swap_context(Interp *interpreter, struct PMC *sub)
         if (!interpreter->ctx.current_sub) {
             copy_regs(interpreter, ctx->bp);
             interpreter->ctx.current_sub = sub;
+            if (!(PObj_get_FLAGS(sub) & SUB_FLAG_GENERATOR))
+                ctx->current_sub = sub;
             interpreter->ctx.current_cont = BP_REG_PMC(ctx->bp,1);
             REG_PMC(0) = sub;
             REG_PMC(1) = interpreter->ctx.current_cont;
