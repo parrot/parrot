@@ -427,7 +427,7 @@ but:		  'but' assign
 comma:		  <leftop: <matchrule:@{[@arg ? $arg[0] : 'scalar_expr']}>
 			comma_op <matchrule:@{[@arg?$arg[0]:'scalar_expr']}> >
 comma_op:	  ','
-maybe_comma:	  ...!'(' comma[@{@arg ? $arg[0] : ()}]
+maybe_comma:	  ...!'(' comma[@{[@arg ? $arg[0] : ()]}]
 		| ...!'('
 
 semi:		  <leftop: expr semi_op expr>
@@ -480,7 +480,7 @@ stmt_sep:	  ';'
 		| { check_end('block', $text) }
 		| { check_end('label', $text) }
 
-stmt:		  label ':' { mark_end('label', $text);1 } ''
+stmt:		  label /:(?!:)/ { mark_end('label', $text);1 } ''
 		| directive <commit> name comma(?)
 		| 'method' <commit> name params props['is'] block
 		| 'loop' <commit>
@@ -494,6 +494,7 @@ stmt:		  label ':' { mark_end('label', $text);1 } ''
 		| scope(?) 'class' <commit> name { add_class($item[4]);1 }
 			props['is'] block
 		| expr guard(?)
+		| ...';'
 
 directive:	  /package|module|use/
 guard:		  { check_end('block', $text) ? undef : 1 } _guard

@@ -637,7 +637,8 @@ sub P6C::stmts::tree {
     }
     my @ret = ();
     for (my $i = 0; $i <= $#{$x->[1]}; $i += 2) {
-	push @ret, $x->[1][$i]->tree;
+	my $child = $x->[1][$i]->tree;
+	push @ret, $child if ($child);   # Ignore empty statements
     }
     return [@ret];
 }
@@ -672,6 +673,9 @@ sub P6C::stmt::tree {
 				   expr => $x->[1]->tree);
 	}
 	return $x->[1]->tree;	# no guard.
+
+    } elsif (@$x == 2) {       # empty statement
+        return undef;
 
     } elsif ($x->[1] eq 'method') {
 	my $sc = P6C::closure->new(params => maybe_tree($x->[4]),
