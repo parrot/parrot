@@ -19,6 +19,16 @@ Outstanding Parrot archicture/design issues:
 
   Keyword/Default arguments
 
+Benchmark status/issues:
+
+  b1: passes.  Would perform better if xranges were implemented as an iter.
+  b2: co-routine issue.  main calls izip which calls PI which 
+      yields to izip which yields to... PI?  WTF?
+  b3: need to implement __new__
+  b4: there is no b4!
+  b5: awaiting completion of float, complex, ...
+  b6: requires a dictionary with integer keys.
+
 - Sam Ruby
 
 Below is the previous contents of this README:

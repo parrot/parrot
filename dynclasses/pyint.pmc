@@ -216,6 +216,10 @@ MMD_PyComplex: {
             valf = VTABLE_get_number_keyed_int(INTERP, value, 1);
             VTABLE_set_number_keyed_int(INTERP, dest, 1, valf);
         }
+MMD_PyString: {
+            real_exception(INTERP, NULL, E_TypeError,
+               "TypeError: unsupported operand type(s) for +: 'int' and 'str'");
+        }
     }
 
 /*

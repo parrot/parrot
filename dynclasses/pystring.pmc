@@ -139,6 +139,37 @@ Return a new iterator for this string.
             PMC_int_val(key) = -1;
         return iter;
     }
+
+/*
+
+=item C<INTVAL get_integer()>
+
+Returns the integer representation of the string.
+
+=cut
+
+*/
+
+    INTVAL get_integer () {
+        STRING *s = (STRING*) PMC_str_val(SELF);
+        return string_to_int(INTERP, s);
+    }
+
+/*
+
+=item C<FLOATVAL get_number()>
+
+Returns the floating-point representation of the string.
+
+=cut
+
+*/
+
+    FLOATVAL get_number () {
+        STRING *s = (STRING*) PMC_str_val(SELF);
+        return string_to_num(INTERP, s);
+    }
+
 /*
 
 =item C<PMC *get_pmc_keyed_int(INTVAL key)>
@@ -281,9 +312,9 @@ downcase this string
 */
 
     METHOD PMC* lower() {
-        STRING *s = string_downcase(interpreter, PMC_str_val(SELF));
-        PMC *ret = pmc_new(interpreter, dynclass_PyString);
-        string_set(interpreter, PMC_str_val(ret), s);
+        STRING *s = string_downcase(INTERP, PMC_str_val(SELF));
+        PMC *ret = pmc_new(INTERP, dynclass_PyString);
+        VTABLE_set_string_native(INTERP, ret, s);
         return ret;
     }
 
