@@ -8,6 +8,7 @@ use strict;
 use Getopt::Long;
 use Parrot::Opcode;
 use Parrot::Types;
+use Parrot::PackFile::ConstTable;
 use Parrot::Config;
 use Symbol;
 
@@ -47,38 +48,10 @@ if(exists($options{'listing'}) && $options{'listing'} eq "") {
     exit;
 }
 
-# define data types
-my %pack_type;
-# Alas perl5.7.2 doesn't have an IV flag for pack().
-# The ! modifier only works for perl 5.6.x or greater.
-if (($] >= 5.006) && ($PConfig{ivsize} == $PConfig{longsize}) ) {
-    %pack_type = ('i'=>'l!','n'=>'d');
-}
-elsif ($PConfig{ivsize} == 4) {
-    %pack_type = ('i'=>'l','n'=>'d');
-}
-elsif ($PConfig{ivsize} == 8) {
-    %pack_type = ('i'=>'q','n'=>'d');
-}
-else {
-    die("I don't know how to pack an IV!\n");
-}
-
-my(%real_type)=('I'=>'i','i'=>'i',
-                'N'=>'i','n'=>'n',
-                'S'=>'i','s'=>'i',
-                'D'=>'i');
 my(%type_swap)=('I'=>'i',  'N'=>'n',
                 'S'=>'s',  'P'=>'p',
                 'i'=>'ic', 'n'=>'nc',
                 's'=>'sc', 'D'=>'ic');
-
-# compute sizes
-my(%sizeof);
-foreach (keys(%real_type)) {
-    $sizeof{$_}=length(pack($pack_type{$real_type{$_}},0));
-}
-
 
 # get opcodes
 my %opcodes = Parrot::Opcode::read_ops(-f "../opcode_table" ? "../opcode_table" : "opcode_table");
@@ -323,15 +296,13 @@ while(my $l=shift(@program)) {
     }
     $bytecode .= pack_op($opcodes{$opcode}{CODE});
     $op_pc=$pc;
-    $pc+=$sizeof{'i'};
+    $pc+=sizeof('i');
     
     foreach (0..$#args) {
 	my($rtype)=$opcodes{$opcode}{TYPES}[$_];
-	my($type)=$real_type{$opcodes{$opcode}{TYPES}[$_]};
 	if($rtype eq "I" || $rtype eq "N" || $rtype eq "P" || $rtype eq "S") {
 	    # its a register argument
 	    $args[$_]=~s/^[INPS](\d+)$/$1/i;
-	    $pc+=$sizeof{$rtype}
 	} elsif($rtype eq "D") {
 	    # a destination
 	    if($args[$_]=~/^\$/) {
@@ -341,7 +312,7 @@ while(my $l=shift(@program)) {
 		    push(@{$local_fixup{$args[$_]}},$op_pc,$pc);
 		    $args[$_]=0xffffffff;
 		} else {                    
-		    $args[$_]=($local_label{$args[$_]}-$op_pc)/$sizeof{'i'};
+		    $args[$_]=($local_label{$args[$_]}-$op_pc)/sizeof('i');
 		}
 	    } else {
 		if(!exists($label{$args[$_]})) {
@@ -349,22 +320,21 @@ while(my $l=shift(@program)) {
 		    push(@{$fixup{$args[$_]}},$op_pc,$pc);
 		    $args[$_]=0xffffffff;
 		} else {                    
-		    $args[$_]=($label{$args[$_]}-$op_pc)/$sizeof{'i'};
+		    $args[$_]=($label{$args[$_]}-$op_pc)/sizeof('i');
 		}
 	    }
-	    $pc+=$sizeof{$rtype};
 	} elsif($rtype eq 's') {
 	    $args[$_]=~s/[\[\]]//g;
-	    $pc+=$sizeof{$rtype};           
 	} else {
 	    $args[$_]=oct($args[$_]) if($args[$_]=~/^0/);
-	    $pc+=$sizeof{$rtype};           
 	}
+        $pc+=sizeof($rtype);
 	$bytecode .= pack_arg($rtype, $args[$_]);
     }
     if($options{'listing'}) {
 	# add line to listing.
 	my $odata;
+        # XXX FIXME This can't be right!
 	foreach (unpack('l*',substr($bytecode,$op_pc))) {
 	    $odata.=sprintf("%08x ",$_);
 	}
@@ -378,7 +348,7 @@ my $output;
 # build file in memory
 
 # MAGIC COOKIE
-$output=pack($pack_type{i},0x13155a1);
+$output=pack_arg('i',0x13155a1);
 
 
 # FIXUP (also, dump listing symbols)
@@ -405,39 +375,27 @@ if(keys(%fixup)) {
     exit;  # some day, unresolved symbols won't be an error!
 } else {
     # dump empty header
-    $output.=pack($pack_type{i},0);
+    $output.=pack_arg('i',0);
 }
 
 # CONSTANTS
-if(@constants) {
-    my($const);
-    # Then spit out how many constants there are, so we can allocate
-    $const .= pack($pack_type{i}, scalar @constants);
 
-    if($options{'listing'}) {
-	$listing.="\nSTRING CONSTANTS\n";
-    }
-    # Now emit each constant
-    my $counter=0;
-    for (@constants) {
-        $const .= pack($pack_type{i},0) x 3; # Flags, encoding, type
-        $const .= pack($pack_type{i},length($_)); # Strlen followed by that many bytes.
-        $const .= $_;
-        my $pad=(length($_) % $sizeof{i});
-        if($pad) {
-            $const .= "\0" x ($sizeof{i}-(length($_) % $sizeof{i})); # Padding;
-	}
+my $const_table = new Parrot::PackFile::ConstTable;
+
+if($options{'listing'}) {
+    $listing.="\nSTRING CONSTANTS\n";
+}
+
+# Now emit each constant
+my $counter=0;
+for (@constants) {
 	$listing.=sprintf("\t%04x %08x [[%s]]\n",$counter,length($_),$_) 
 	    if($options{'listing'});
 	$counter++;
-    }
-
-    $output.=pack($pack_type{i},length($const));
-    $output.=$const;
-} else {
-    # no constants, dump empty header.
-    $output.=pack($pack_type{i},0);
+    $const_table->add(new Parrot::PackFile::Constant (0, 0, 0, length $_, $_));
 }
+
+$output.=$const_table->pack;
 
 ## BYTECODE
 $output.=$bytecode;
