@@ -1,5 +1,7 @@
 /*
 ** jit.c
+**
+** $Id$
 */
 
 #include <parrot/parrot.h>
@@ -31,7 +33,7 @@ INTVAL *op_real_address;
 char *
 build_asm(struct Parrot_Interp *interpreter,opcode_t *pc, opcode_t *code_start, opcode_t *code_end)
 {
-    char *arena, *arena_start, *arena_end, *arena_tmp;
+    char *arena, *arena_start;
     INTVAL *address,ivalue,size,i,k;
     INTVAL *op_address, prev_address, bytecode_position;
 

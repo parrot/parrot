@@ -43,62 +43,35 @@ my %Call = (
     "push_generic_entry"    => 5
 );
 
-open (IN,"jit/$cpuarch/core.jit");
-while ($line = <IN>) {
-    next if (($line =~ m/^[#;]/) || ($line =~ m/^\s*$/));
-    if (!defined($function)) {
-        $line =~ m/([^\s]*)\s*{/;
-        $function = $1;
-        $asm = "";
-        next;
+sub readjit($) {
+    my $file = shift;
+
+    my %ops;
+
+    open (IN,$file) or die "Can't open file $file: $!";
+    while ($line = <IN>) {
+        next if (($line =~ m/^[#;]/) || ($line =~ m/^\s*$/));
+        if (!defined($function)) {
+            $line =~ m/([^\s]*)\s*{/;
+            $function = $1;
+            $asm = "";
+            next;
+        }
+        if ($line =~ m/}/) {
+            $body = Parrot::Jit::Assemble($asm);
+            $body =~ s/\s+//g;
+            $ops{$function} = $body;
+            $function = undef;
+            $body = undef;
+        }
+        $asm .= $line;
     }
-    if ($line =~ m/}/) {
-        $body = Parrot::Jit::Assemble($asm);
-        $body =~ s/\s+//g;
-        $core_ops{$function} = $body;
-        $function = undef;
-        $body = undef;
-    }
-    $asm .= $line;
+    return %ops;
 }
 
-open (IN,"jit/$cpuarch/string.jit");
-while ($line = <IN>) {
-    next if (($line =~ m/^[#;]/) || ($line =~ m/^\s*$/));
-    if (!defined($function)) {
-        $line =~ m/([^\s]*)\s*{/;
-        $function = $1;
-        $asm = "";
-        next;
-    }
-    if ($line =~ m/}/) {
-        $body = Parrot::Jit::Assemble($asm);
-        $body =~ s/\s+//g;
-        $string{$function} = $body;
-        $function = undef;
-        $body = undef;
-    }
-    $asm .= $line;
-}
-
-open (IN,"jit/$cpuarch/lib.jit") or die "Can't open file jit/$cpuarch/lib.jit: $!";
-while ($line = <IN>) {
-    next if (($line =~ m/^[#;]/) || ($line =~ m/^\s*$/));
-    if (!defined($function)) {
-        $line =~ m/([^\s]*)\s*{/;
-        $function = $1;
-        $asm = "";
-        next;
-    }
-    if ($line =~ m/}/) {
-        $body = Parrot::Jit::Assemble($asm);
-        $body =~ s/\s+//g;
-        $lib{$function} = $body;
-        $function = undef;
-        $body = undef;
-    }
-    $asm .= $line;
-}
+%core_ops = readjit("jit/$cpuarch/core.jit");
+%string = readjit("jit/$cpuarch/string.jit");
+%lib = readjit("jit/$cpuarch/lib.jit");
 
 for ($i = 0; $i < $core_numops; $i++) {
     $body = $core_ops{$core_opfunc[$i]};

@@ -39,7 +39,7 @@ Parrot_sub_i_i_i {
     movl %eax,&INT_REG[1]
 }
 
-Parrot_iton_n_i {
+Parrot_set_n_i {
     fildl &INT_REG[2]
     fstpl &NUM_REG[1]
 }
