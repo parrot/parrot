@@ -1,6 +1,6 @@
 #!perl
 use strict;
-use TestCompiler tests => 2;
+use TestCompiler tests => 3;
 use Test::More qw(skip);
 
 ##############################
@@ -57,3 +57,53 @@ CODE
 OUT
 
 
+##############################
+output_is(<<'CODE', <<'OUT', "stack calling conventions");
+.sub _main
+   .local int x
+   x = 10
+   .const int y = 20
+
+   .arg y	# save args in reversed order
+   .arg x
+   call _foo	#(r, s) = _foo(x,y)
+   .local int r
+   .local int s
+   .result s	# restore results in reversed order
+   .result r
+
+   print "r = "
+   print r
+   print "\n"
+   print "s = "
+   print s
+   print "\n"
+   end
+.end
+
+.sub _foo		# sub foo(int a, int b)
+   saveall
+   .param int a
+   .param int b
+   print "a = "
+   print a
+   print "\n"
+   print "b = "
+   print b
+   print "\n"
+   .local int pl
+   .local int mi
+   pl = a + b
+   mi = a - b
+   .return pl		# return (pl, mi)
+   .return mi
+   restoreall
+   ret
+.end
+
+CODE
+a = 10
+b = 20
+r = 30
+s = -10
+OUT
