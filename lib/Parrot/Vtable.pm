@@ -12,7 +12,7 @@ sub parse_vtable {
         s/\s+$//;
 	next unless $_;
         my (@line) = split /\t+/, $_;
-#	my $meth_type = shift @line; # Method type
+	my $meth_type = shift @line; # Method type
         my $tn = shift @line; # Type and name;
         my ($type, $name) = $tn =~ /(.*?)\s+(\w+)/;
         $vtbl{$name}{type} = $type;
