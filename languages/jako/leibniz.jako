@@ -1,0 +1,44 @@
+#
+# leibniz.jako
+#
+# Simple code to calculate the Leibniz summation for 
+# PI, which is:
+#
+# PI/4 = 1/1 - 1/3 + 1/5 - 1/7 + 1/9 ....
+#
+# (The summation isn't a very good one)
+#
+# Based on a Parrot assembly language example by Greg McCarroll.,
+# which can be found at http://www.parrotcode.org/examples/
+#
+# Copyright (C) 2001 Gregor N. Purdy. All rights reserved.
+# This program is free software. It is subject to the same
+# license as Parrot itself.
+#
+
+const num first_den =       1.0;
+const num last_den  = 1000000.0;
+
+var num flag        =       1.0;
+var num cur_frac    =       0.0;
+
+var num this_den;
+
+this_den = first_den;
+
+while (this_den <= last_den) {
+  var num new_frac;
+  new_frac  = flag / this_den;
+  cur_frac += new_frac;
+} continue {
+  flag     *= -1.0;
+  this_den +=  2.0;
+}
+
+var num pi;
+pi = 4.0 * cur_frac;
+
+print("PI is (very) approximately: $pi\n");
+
+end
+

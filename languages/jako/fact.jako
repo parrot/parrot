@@ -12,9 +12,10 @@
 # $Id$
 #
 
-var int n = 15;
-var int i =  0;
-var int f =  1;
+const int n = 15;
+
+var   int i =  0;
+var   int f =  1;
 
 print("Algorithm F1 (The factorial function)\n");
 print("    Calculating fact($n) = ...\n");
@@ -25,5 +26,3 @@ while(i <= n) {
 }
 
 print("    ... = $f\n");
-
-end;

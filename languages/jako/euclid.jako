@@ -24,14 +24,11 @@ var int r;
 print("Algorithm E (Euclid's algorithm)\n");
 print("  Calculating gcd($m, $n) = ...\n");
 
-r = mod(m, n);
+r = m % n;
 while (r != 0) {
   m = n;
   n = r;
-  r = mod(m, n);
+  r = m % n;
 } 
 
 print("  ... = $n\n");
-
-end;    
-

@@ -23,10 +23,10 @@
 # $Id$
 #
 
-var int q =     1;
-var int w =     1;
-var int i =     1;
-var int j =     1;
+var int q = 1;
+var int w = 1;
+var int i = 1;
+var int j = 1;
 
 while (q < 100) {
   w = 1;
@@ -40,6 +40,3 @@ while (q < 100) {
 
   q++;
 }
-
-end
-

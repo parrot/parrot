@@ -1,0 +1,47 @@
+#
+# primes.jako
+#
+# A simple program to print out the primes up to 100.
+#
+# Based on a Parrot assembly example by Leon Brocard <acme@astray.com>
+#
+# Copyright (C) 2001 Gregor N. Purdy. All rights reserved.
+# This program is free software. It is subject to the same
+# license as Perl itself.
+#
+# $Id$
+#
+
+const int n = 100;
+
+var   int i =   2;
+
+print("Algorithm P (Naiive primality test)\n");
+print("  Printing primes up to $n...\n");
+
+NUMBER: while (i <= n) {
+  var int m;
+  var int j = 2;
+
+  m = i / 2;
+
+  FACTOR: while (j <= m) {
+    var int x;
+
+    x = i % j;
+
+    if (x == 0) {
+        next NUMBER;
+    }
+
+    j++;
+  }
+
+  print("$i  ");
+
+} continue {
+  i++;
+}
+
+print("\n");
+

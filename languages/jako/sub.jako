@@ -1,0 +1,25 @@
+#
+# sub.jako
+#
+# A program to demonstrate macros and poor-man's subroutine
+# calls.
+#
+# Copyright (C) 2001 Gregor N. Purdy. All rights reserved.
+# This program is free software. It is subject to the same
+# license as Perl itself.
+#
+# $Id$
+#
+
+var int x;
+
+sub printit {
+  print("$x\n");
+}
+
+x = 42;
+printit();
+
+x = 1234;
+printit();
+
