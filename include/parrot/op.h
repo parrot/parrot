@@ -46,6 +46,15 @@ typedef enum {
     PARROT_ARGDIR_INOUT
 } arg_dir_t;
 
+typedef enum {
+    PARROT_JUMP_RELATIVE = 1,
+    PARROT_JUMP_ADDRESS = 2,
+    PARROT_JUMP_POP = 4,
+    PARROT_JUMP_ENEXT = 8,
+    PARROT_JUMP_GNEXT = 16,
+    PARROT_JUMP_UNPREDICTABLE = 32
+} op_jump_t;
+
 /* NOTE: Sure wish we could put the types here... */
 
 struct Parrot_Interp;

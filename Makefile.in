@@ -44,7 +44,7 @@ STICKY_FILES = $(GEN_CONFIGS) $(GEN_MAKEFILES) config.opt
 
 GEN_OPSFILES = vtable.ops
 
-GEN_HEADERS = $(INC)/vtable.h ${jit_struct_h} $(INC)/oplib/core_ops.h \
+GEN_HEADERS = $(INC)/vtable.h $(INC)/oplib/core_ops.h \
 $(INC)/oplib/core_ops_prederef.h
 
 GEN_SOURCES = core_ops.c core_ops_prederef.c vtable_ops.c
@@ -69,7 +69,7 @@ $(INC)/pmc.h $(INC)/key.h $(INC)/hash.h $(INC)/resources.h $(INC)/platform.h ${c
 $(INC)/interp_guts.h ${jit_h} $(INC)/rx.h $(INC)/rxstacks.h \
 $(INC)/embed.h $(INC)/warnings.h $(INC)/misc.h
 
-ALL_H_FILES = $(GENERAL_H_FILES) ${jit_struct_h}
+ALL_H_FILES = $(GENERAL_H_FILES)
 
 CLASS_O_FILES = classes/default$(O) classes/array$(O) \
 classes/perlint$(O) classes/perlstring$(O) classes/perlnum$(O) \
@@ -239,9 +239,6 @@ $(TEST_PROG_SO) : test_main$(O) blib/lib/libparrot$(SO) lib/Parrot/OpLib/core.pm
 
 test_main$(O) : test_main.c $(GENERAL_H_FILES)
 
-lib/Parrot/Jit.pm : lib/Parrot/Jit/${jitarchname}.pm lib/Parrot/Jit/${jitcpuarch}Generic.pm
-	$(PERL) "-MFile::Copy=cp" -e ${PQ}cp q|lib/Parrot/Jit/${jitarchname}.pm|, q|lib/Parrot/Jit.pm|${PQ}
-
 lib/Parrot/OpLib/core.pm : $(OPS_FILES) ops2pm.pl lib/Parrot/OpsFile.pm lib/Parrot/Op.pm
 	$(PERL) ops2pm.pl $(OPS_FILES)
 
@@ -295,7 +292,9 @@ global_setup$(O) : $(GENERAL_H_FILES)
 
 pmc$(O) : $(GENERAL_H_FILES)
 
-jit$(O) : $(GENERAL_H_FILES) ${jit_struct_h}
+jit$(O) : $(GENERAL_H_FILES)
+
+jit_cpu$(O): $(GENERAL_H_FILES) $(INC)/jit_emit.h
 
 key$(O) : $(GENERAL_H_FILES)
 
@@ -376,8 +375,10 @@ $(STICKY_FILES) : Configure.pl config_h.in
 $(INC)/vtable.h : vtable.tbl vtable_h.pl
 	$(PERL) vtable_h.pl
 
-$(INC)/jit_struct.h : jit2h.pl lib/Parrot/OpLib/core.pm lib/Parrot/Jit.pm jit/${jitcpuarch}/core.jit jit/${jitcpuarch}/string.jit
-	$(PERL) jit2h.pl ${jitcpuarch} > $(INC)/jit_struct.h
+$(INC)/jit_emit.h: jit/${jitcpuarch}/jit_emit.h
+	$(PERL) -MFile::Copy=cp -e ${PQ}cp q|jit/${jitcpuarch}/jit_emit.h|, q|$(INC)/jit_emit.h|${PQ}
+jit_cpu.c: lib/Parrot/OpLib/core.pm $(INC)/jit_emit.h jit/${jitcpuarch}/core.jit
+	$(PERL) jit2h.pl ${jitcpuarch} jit_cpu.c
 
 docs : docs/.dummy
 

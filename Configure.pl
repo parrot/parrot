@@ -151,19 +151,27 @@ if (!defined $osname) {
     ($osname, $cpuarch) = ($cpuarch, "");
 }
 
+if($cpuarch =~ /MSWin32/){
+    $cpuarch = 'i386';
+    $osname = 'MSWin32';
+}
+if(($osname =~ /cygwin/i) || ($cpuarch =~ /cygwin/i)){
+    $cpuarch = 'i386';
+}
+$cpuarch                  =~ s/i[456]86/i386/i;
+$cpuarch                  =~ s/sparc/sun4/i;
 $jitarchname              =  "$cpuarch-$osname";
-$jitarchname		      =~ s/i[456]86/i386/i;
 $jitarchname              =~ s/-(net|free|open)bsd$/-bsd/i;
 $jitcapable               = 0;
 
-if (-e "lib/Parrot/Jit/$jitarchname.pm") {
+if (-e "jit/$cpuarch") {
     $jitcapable = 1;
 }
 
 $jitcapable = $opt_defines{jitcapable} if exists $opt_defines{jitcapable};
 
 unless($jitcapable){
-    $jitarchname = 'i386-nojit';
+    $jitarchname = 'nojit';
 }
 
 ($jitcpuarch, $jitosname) =  split('-', $jitarchname);
@@ -233,7 +241,6 @@ my(%c)=(
     jitcapable    => $jitcapable,
     cc_hasjit     => '',
     jit_h         => '',
-    jit_struct_h  => '',
     jit_o         => '',
 
     cp            => 'cp',
@@ -289,7 +296,7 @@ if ($jitcapable) {
     $c{cc_hasjit} = " -DHAS_JIT -D" . uc $jitcpuarch;
     $c{jit_h} = "\$(INC)/jit.h";
     $c{jit_struct_h} = "\$(INC)/jit_struct.h";
-    $c{jit_o} = "jit\$(O)";
+    $c{jit_o} = "jit\$(O) jit_cpu\$(O)";
 }
 
 #

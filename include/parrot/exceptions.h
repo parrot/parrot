@@ -49,6 +49,7 @@ void do_panic(struct Parrot_Interp *interpreter, const char *message,
 #define ALLOCATION_ERROR 1
 #define INTERNAL_PANIC 1
 #define OUT_OF_BOUNDS 1
+#define JIT_ERROR 1
 
 #endif
 

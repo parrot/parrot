@@ -10,7 +10,7 @@ use strict;
 package Parrot::OpTrans::C;
 
 use Parrot::OpTrans;
-use vars qw(@ISA);
+use vars qw(@ISA %arg_maps);
 @ISA = qw(Parrot::OpTrans);
 
 
@@ -50,7 +50,7 @@ sub expr_pop {
 # access_arg()
 #
 
-my %arg_maps = (
+%arg_maps = (
   'op' => "cur_opcode[%ld]",
 
   'i'  => "interpreter->int_reg.registers[cur_opcode[%ld]]",

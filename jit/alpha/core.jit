@@ -1,145 +1,50 @@
 ;
-;   alpha_core.jit 
+; alpha/core.jit
 ;
 ; $Id$
 ;
 
-Parrot_end {
-    mov $15,$30
-    ldq $26,0($30)
-    ldq $15,8($30)
-    lda $30,16($30)
-    ret $31,($26),0x1
-}
-
 Parrot_noop {
-    nop
+    emit_nop(jit_info->native_ptr);
 }
 
 Parrot_set_i_i {
-    ldq $3 , &INT_REG[2]
-    stq $3 , &INT_REG[1]
+    jit_info->native_ptr = emit_l_s_r(jit_info->native_ptr, interpreter, LDQ, REG7_t6, REG6_t5, &INT_REG[2]);
+    jit_info->native_ptr = emit_l_s_r(jit_info->native_ptr, interpreter, STQ, REG7_t6, REG6_t5, &INT_REG[1]);
 }
 
 Parrot_set_i_ic {
-    ldah $3 , 1($27)
-    ldq $3 , &INT_CONST[2]
-    stq $3 , &INT_REG[1]
-}
-
-Parrot_set_n_nc {
-    ldah $7 , 1($27)
-    ldt $f0 , &NUM_CONST[2]
-    stt $f0 , &NUM_REG[1]
-}
-
-Parrot_set_n_n {
-    ldt $f0 , &NUM_REG[2]
-    stt $f0 , &NUM_REG[1]
-}
-
-Parrot_set_n_i {
-    ldt $f0 , &INT_REG[2]
-    cvtqt $f0,$f1 
-    stt $f1 , &NUM_REG[1]
-}
-
-Parrot_set_i_n {
-    ldt $f0 , &NUM_REG[2]
-    cvttq $f0,$f1 
-    stt $f1 , &INT_REG[1]
-}
-
-Parrot_mul_i_i_i {
-    ldq $3 , &INT_REG[2]
-    ldq $4 , &INT_REG[3]
-    mulq $3,$4,$4
-    stq $4 , &INT_REG[1]
-}
-
-Parrot_sub_i_i_i {
-    ldq $3 , &INT_REG[2]
-    ldq $4 , &INT_REG[3]
-    subq $3,$4,$4
-    stq $4 , &INT_REG[1]
-}
-
-Parrot_sub_i_i_ic {
-    ldq $3 , &INT_REG[2]
-    ldah $4 , 1($27)
-    ldq $4 , &INT_CONST[3]
-    subq $3,$4,$4
-    stq $4 , &INT_REG[1]
+    jit_info->native_ptr = emit_l_c(jit_info, REG7_t6, &INT_CONST[2]);
+    jit_info->native_ptr = emit_l_s_r(jit_info->native_ptr, interpreter, STQ, REG7_t6, REG6_t5, &INT_REG[1]);
 }
 
 Parrot_add_i_i_i {
-    ldq $3 , &INT_REG[2]
-    ldq $4 , &INT_REG[3]
-    addq $3,$4,$4
-    stq $4 , &INT_REG[1]
-}
-
-Parrot_add_i_i_ic {
-    ldq $3 , &INT_REG[2]
-    ldah $4 , 1($27)
-    ldq $4 , &INT_CONST[3]
-    addq $3,$4,$4
-    stq $4 , &INT_REG[1]
-}
-
-Parrot_div_n_n_n {
-    ldt $f0 , &NUM_REG[2]
-    ldt $f1 , &NUM_REG[3]
-    divt $f0 , $f1 , $f1
-    stt $f1 , &NUM_REG[1]
-}
-
-Parrot_sub_n_n_n {
-    ldt $f0 , &NUM_REG[2]
-    ldt $f1 , &NUM_REG[3]
-    subt $f0 , $f1 , $f1
-    stt $f1 , &NUM_REG[1]
+    jit_info->native_ptr = emit_l_s_r(jit_info->native_ptr, interpreter, LDQ, REG7_t6, REG6_t5, &INT_REG[3]);
+    jit_info->native_ptr = emit_l_s_r(jit_info->native_ptr, interpreter, LDQ, REG8_t7, REG6_t5, &INT_REG[2]);
+    jit_info->native_ptr = emit_arithmetic(jit_info->native_ptr, ADDQ, REG7_t6, REG7_t6, REG8_t7);
+    jit_info->native_ptr = emit_l_s_r(jit_info->native_ptr, interpreter, STQ, REG7_t6, REG6_t5, &INT_REG[1]);
 }
 
 Parrot_if_i_ic {
-    ldq $3 , &INT_REG[1]
-    bne $3 , 0
-    JUMP(INT_CONST[2])
+    jit_info->native_ptr = emit_l_s_r(jit_info->native_ptr, interpreter, LDQ, REG7_t6, REG6_t5, &INT_REG[1]);
+    jit_info->native_ptr = emit_b(jit_info, BNE, REG7_t6, *INT_CONST[2]);
 }
 
-Parrot_neg_i_i {
-    ldq $3 , &INT_REG[2]
-    negq $3 , $3
-    stq $3 , &INT_REG[1]
+Parrot_end {
+    emit_mov(jit_info->native_ptr, REG15_s6, REG30_sp);
+    jit_info->native_ptr = emit_l_s_c(jit_info->native_ptr, LDQ, REG26_ra, REG30_sp, 0);
+
+    jit_info->native_ptr = emit_l_s_c(jit_info->native_ptr, LDQ, REG15_s6, REG30_sp, 8);
+    jit_info->native_ptr = emit_l_s_c(jit_info->native_ptr, LDA, REG30_sp, REG30_sp, 16);
+    emit_ret(jit_info->native_ptr);
 }
 
-Parrot_neg_i_ic {
-    ldah $3 , 1($27)
-    ldq $3 , &INT_CONST[2]
-    negq $3 , $3
-    stq $3 , &INT_REG[1]
-}
-
-Parrot_neg_n_n {
-    ldt $f0 , &NUM_REG[2]
-    negt $f0,$f0
-    stt $f0 , &NUM_REG[1]
-}
-
-Parrot_neg_n_nc {
-    ldah $7 , 1($27)
-    ldt $f0 , &NUM_CONST[2]
-    negt $f0,$f0
-    stt $f0 , &NUM_REG[1]
-}
-
-#Parrot_print_sc {
-#    lda $16 , 1
-#    SYSTEMCALL(WRITE,3, V*CPU_REG[16] V&STRING_CONST_bufstart[1] A&STRING_CONST_strlen[1])
-#}
-
-#Parrot_print_ic {
-#    ldq $2 , &INT_CONST[1]
-#    ldq $3 , &TEMP_CHAR[15]
-#     
-#}
+/*
+ * Local variables:
+ * c-indentation-style: bsd
+ * c-basic-offset: 4
+ * indent-tabs-mode: nil 
+ * End:
+ *
+ * vim: expandtab shiftwidth=4:
+ */

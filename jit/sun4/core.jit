@@ -1,118 +1,68 @@
 ;
-;  sparc_core.jit 
+; sun4/core.jit
 ;
-; $Id$
+; $Id$ 
 ;
 
 Parrot_end {
-    ret
-    restore
+    emitm_ret(NATIVECODE);
+    emitm_restore_i(NATIVECODE, emitm_g(0), emitm_g(0), emitm_g(0));
 }
 
 Parrot_noop {
-    nop
+    emitm_nop(NATIVECODE);
 }
 
 Parrot_set_i_i {
-    ld &INT_REG[2], %l0
-    st %l0, &INT_REG[1]
+    Parrot_jit_int_load(jit_info, interpreter, 2, emitm_l(0));
+    Parrot_jit_int_store(jit_info, interpreter, 1, emitm_l(0));
 }
 
 Parrot_set_i_ic {
-    sethi %hi(0), %l2
-    ld &INT_CONST[2], %l0
-    st %l0, &INT_REG[1]
+    Parrot_jit_int_load(jit_info, interpreter, 2, emitm_l(0));
+    Parrot_jit_int_store(jit_info, interpreter, 1, emitm_l(0));
 }
 
 Parrot_set_n_nc {
-    sethi %hi(0), %l2
-    ldd &NUM_CONST[2], %f0
-    std %f0, &NUM_REG[1]
+    Parrot_jit_int_load(jit_info, interpreter, 2, emitm_l(0));
+    Parrot_jit_int_store(jit_info, interpreter, 1, emitm_l(0));
 }
 
 Parrot_set_n_n {
-    ldd &NUM_REG[2], %f0
-    std %f0, &NUM_REG[1]
+    Parrot_jit_int_load(jit_info, interpreter, 2, emitm_l(0));
+    Parrot_jit_int_store(jit_info, interpreter, 1, emitm_l(0));
 }
 
 Parrot_set_n_i {
-    ld &INT_REG[2], %f0
-    fitod %f0,%f2 
-    std %f2, &NUM_REG[1]
+    Parrot_jit_float_load(jit_info, interpreter, 2, emitm_f(0));
+    emitm_fitod(NATIVECODE, emitm_f(0), emitm_f(2));
+    Parrot_jit_float_store(jit_info, interpreter, 1, emitm_f(2));
 }
 
 Parrot_set_i_n {
-    ldd &NUM_REG[2], %f0
-    fdtoi %f0, %f2
-    st %f2, &INT_REG[1]
-}
-
-#Parrot_mul_i_i_i {
-#    ld &INT_REG[2], %l0
-#    ld &INT_REG[3], %l1
-#    smulq $3,$4,$4
-#    st %l1, &INT_REG[1]
-#}
-#
-
-Parrot_sub_i_i_i {
-    ld &INT_REG[2], %l0
-    ld &INT_REG[3], %l1
-    sub %l0,%l1,%l0
-    st %l0, &INT_REG[1]
-}
-
-Parrot_sub_i_i_ic {
-    ld &INT_REG[2], %l0
-    sethi %hi(0), %l2
-    ld &INT_CONST[3], %l1
-    sub %l0,%l1,%l0
-    st %l0, &INT_REG[1]
-}
-
-Parrot_add_i_i_i {
-    ld &INT_REG[2], %l0
-    ld &INT_REG[3], %l1
-    add %l0, %l1, %l0
-    st %l0, &INT_REG[1]
-}
-
-Parrot_add_i_i_ic {
-    ld &INT_REG[2], %l0
-    sethi %hi(0), %l2
-    ld &INT_CONST[3], %l1
-    add %l0, %l1, %l0
-    st %l0, &INT_REG[1]
-}
-
-Parrot_div_n_n_n {
-    ldd &NUM_REG[2], %f0
-    ldd &NUM_REG[3], %f2
-    fdivd %f0, %f2 , %f4
-    std %f4, &NUM_REG[1]
-}
-
-Parrot_sub_n_n_n {
-    ldd &NUM_REG[2], %f0
-    ldd &NUM_REG[3], %f2
-    fsubd %f0, %f2 , %f4
-    std %f4, &NUM_REG[1]
+    Parrot_jit_float_load(jit_info, interpreter, 2, emitm_f(0));
+    emitm_fdtoi(NATIVECODE, emitm_f(0), emitm_f(2));
+    Parrot_jit_float_store(jit_info, interpreter, 1, emitm_f(2));
 }
 
 Parrot_if_i_ic {
-    ld &INT_REG[1], %l0
-    cmp %l0, 0
-    bne *JUMP_INT_CONST[2]
-    nop
+    Parrot_jit_int_load(jit_info, interpreter, 1, emitm_l(0));
+    emitm_subcc_r(NATIVECODE, emitm_l(0), emitm_g(0), emitm_g(0));
+    Parrot_jit_bicc(jit_info, emitm_bne, 0, *INT_CONST[2]);
+    emitm_nop(NATIVECODE);
 }
-#
-##Parrot_print_sc {
-##    lda $16 , 1
-##    SYSTEMCALL(WRITE,3, V*CPU_REG[16] V&STRING_CONST_bufstart[1] A&STRING_CONST_strlen[1])
-##}
-#
-##Parrot_print_ic {
-##    ldq $2 , &INT_CONST[1]
-##    ldq $3 , &TEMP_CHAR[15]
-##     
-##}
+
+Parrot_branch_ic {
+    Parrot_jit_bicc(jit_info, emitm_ba, 0, *INT_CONST[1]);
+    emitm_nop(NATIVECODE);
+}
+
+/*
+ * Local variables:
+ * c-indentation-style: bsd
+ * c-basic-offset: 4
+ * indent-tabs-mode: nil 
+ * End:
+ *
+ * vim: expandtab shiftwidth=4:
+ */

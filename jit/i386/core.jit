@@ -1,258 +1,85 @@
 ;
-;   i386_core.jit 
+; i386/core.jit 
 ;
 ; $Id$
 ;
 
+Parrot_end {
+    NATIVECODE = emit_popl_r(NATIVECODE, emit_ESI);
+    emitm_ret(NATIVECODE);
+}
+
 Parrot_noop {
-    nop
+    NATIVECODE = emit_nop(NATIVECODE);
 }
 
 Parrot_set_i_ic {
-    movl *INT_CONST[2],&INT_REG[1]
+    emitm_movl_i_m(NATIVECODE, *INT_CONST[2], emit_None, emit_None, emit_None,
+	    &INT_REG[1]);
 }
 
 Parrot_set_i_i {
-    movl &INT_REG[2],%eax
-    movl %eax,&INT_REG[1]
+    emitm_movl_m_r(NATIVECODE, emit_EAX, emit_None, emit_None, emit_None, &INT_REG[2]);
+    emitm_movl_r_m(NATIVECODE, emit_EAX, emit_None, emit_None, emit_None, &INT_REG[1]);
 }
 
 Parrot_set_n_nc {
-    fldl &NUM_CONST[2] 
-    fstpl &NUM_REG[1]
+    emitm_fldl(NATIVECODE, emit_None, emit_None, emit_None, &NUM_CONST[2]);
+    emitm_fstpl(NATIVECODE, emit_None, emit_None, emit_None, &NUM_REG[1]);
 }
 
 Parrot_set_n_n {
-    fldl &NUM_REG[2]
-    fstpl &NUM_REG[1]
+    emitm_fldl(NATIVECODE, emit_None, emit_None, emit_None, &NUM_REG[2]);
+    emitm_fstpl(NATIVECODE, emit_None, emit_None, emit_None, &NUM_REG[1]);
 }
 
 Parrot_mul_i_i_i {
-    movl &INT_REG[2],%eax
-    imul &INT_REG[3],%eax 
-    movl %eax,&INT_REG[1]
+    emitm_movl_m_r(NATIVECODE, emit_EAX, emit_None, emit_None, emit_None, &INT_REG[2]);
+    emitm_smull_r_m(NATIVECODE, emit_EAX, emit_None, emit_None, emit_None, &INT_REG[3]);
+    emitm_movl_r_m(NATIVECODE, emit_EAX, emit_None, emit_None, emit_None, &INT_REG[1]);
 }
 
 Parrot_sub_i_i_i {
-    movl &INT_REG[2],%eax
-    sub &INT_REG[3],%eax
-    movl %eax,&INT_REG[1]
+    emitm_movl_m_r(NATIVECODE, emit_EAX, emit_None, emit_None, emit_None, &INT_REG[2]);
+    emitm_subl_m_r(NATIVECODE, emit_EAX, emit_None, emit_None, emit_None, &INT_REG[3]);
+    emitm_movl_r_m(NATIVECODE, emit_EAX, emit_None, emit_None, emit_None, &INT_REG[1])
 }
 
 Parrot_set_n_i {
-    fildl &INT_REG[2]
-    fstpl &NUM_REG[1]
+    emitm_fildl(NATIVECODE, emit_None, emit_None, emit_None, &INT_REG[2]);
+    emitm_fstpl(NATIVECODE, emit_None, emit_None, emit_None, &NUM_REG[1]);
 }
 
 Parrot_div_n_n_n {
-    fldl &NUM_REG[2]
-    fldl &NUM_REG[3] 
-    fdivrp %st,%st(1)
-    fstpl &NUM_REG[1]
+    emitm_fldl(NATIVECODE, emit_None, emit_None, emit_None, &NUM_REG[2]);
+    emitm_fldl(NATIVECODE, emit_None, emit_None, emit_None, &NUM_REG[3]);
+    emitm_fdivp(NATIVECODE, 1);
+    emitm_fstpl(NATIVECODE, emit_None, emit_None, emit_None, &NUM_REG[1]);
 }
 
 Parrot_sub_n_n_n {
-    fldl &NUM_REG[2]
-    fldl &NUM_REG[3] 
-    fsubrp  %st,%st(1)
-    fstpl &NUM_REG[1]
-}
-
-Parrot_print_sc {
-    movl $1,&TEMP_INT[1]
-    SYSTEMCALL(WRITE,3, A&TEMP_INT[1] V&STRING_CONST_bufstart[1] V*STRING_CONST_strlen[1])
-}
-
-Parrot_print_s {
-    movl $1,&TEMP_INT[1]
-    cmp $0,&STRING_REG[1]
-    je ($0x0)
-    JUMP(END)
-    F(get_bufstart, &STRING_REG[1]) 
-    movl %eax,&TEMP_INT[0]
-    F(get_strlen, &STRING_REG[1]) 
-    movl %eax, &TEMP_INT[2] 
-    SYSTEMCALL(WRITE,3, A&TEMP_INT[1] A&TEMP_INT[0] A&TEMP_INT[2])
+    emitm_fldl(NATIVECODE, emit_None, emit_None, emit_None, &NUM_REG[2]);
+    emitm_fldl(NATIVECODE, emit_None, emit_None, emit_None, &NUM_REG[3]);
+    emitm_fsubp(NATIVECODE, 1);
+    emitm_fstpl(NATIVECODE, emit_None, emit_None, emit_None, &NUM_REG[1]);
 }
 
 Parrot_if_i_ic {
-    movl &INT_REG[1],%eax 
-    cmp $0,%eax
-    jne ($0x0)
-    JUMP(INT_CONST[2])
+    emitm_movl_m_r(NATIVECODE, emit_EAX, emit_None, emit_None, emit_None, &INT_REG[1]);
+    emitm_cmpl_i_r(NATIVECODE, 0, emit_EAX);
+    emit_jcc(jit_info, emitm_jne, *INT_CONST[2]);
 }
 
 Parrot_branch_ic {
-    jmp ($0x0)
-    JUMP(INT_CONST[1])
+    emit_jump(jit_info, *INT_CONST[1]);
 }
 
-; I'm not quite sure if this's ok
-
-Parrot_time_n {
-    SYSTEMCALL(GETTIMEOFDAY, 2, V&TEMP_INT[0] V&TEMP_INT[2])
-    fildl &TEMP_INT[0]
-    fildl &TEMP_INT[1] 
-    fldl &CONST_FLOAT[0]
-    fdivrp %st,%st(1)
-    faddp %st,%st(1)
-    fstpl &NUM_REG[1]
-}
-
-Parrot_end {
-    leave
-    ret
-}
-
-Parrot_add_i_i_i {
-    movl &INT_REG[2],%eax 
-    addl &INT_REG[3],%eax
-    movl %eax,&INT_REG[1]
-}
-
-Parrot_add_i_i_ic {
-    movl &INT_REG[2],%eax 
-    addl &INT_CONST[3],%eax
-    movl %eax,&INT_REG[1]
-}
-
-; OK, I really dislike these ones
-
-; I'm sure there is a faster way (that's what we are searching, right?)
-
-Parrot_print_ic {
-    pushl L&TEMP_CHAR[15]
-    pushl $0x0
-    lea 0x4(%esp,1),%ebx
-    subl $0x1,(%ebx)
-    pushl $0xa
-    movl &INT_CONST[1],%eax
-    cmp $0,%eax
-    mov $0,%esi
-    jge again
-    neg %eax
-    movl $1,%esi
-again:    movl %esp,%ecx
-    addl $0x1,0x4(%ecx)
-    cmp $0xa,%eax
-    jl next
-    cltd
-    idiv (%ecx),%eax
-    subl $0x1,(%ebx)
-    mov (%ebx),%ecx
-    add $0x30,%dl
-    mov %dl,(%ecx)
-    loop again
-next:    subl $0x1,(%ebx)
-    mov (%ebx),%ecx
-    addb $0x30,%al
-    movb %al,(%ecx)
-    cmp $1,%esi
-    jne print
-    movl %esp,%ecx
-    addl $0x1,0x4(%ecx)
-    subl $0x1,(%ebx)
-    mov (%ebx),%ecx
-    movb $0x2d,(%ecx)
-print:    mov 0x4(%esp),%ecx
-    movl %ecx,&TEMP_INT[0]
-    mov (%ebx),%ecx
-    mov %ecx, &TEMP_INT[1]
-    movl $1,&TEMP_INT[2]
-    SYSTEMCALL(WRITE,3, A&TEMP_INT[2] A&TEMP_INT[1] A&TEMP_INT[0]) 
-}
-
-Parrot_print_i {
-    pushl L&TEMP_CHAR[15]
-    pushl $0x0
-    lea 0x4(%esp,1),%ebx
-    subl $0x1,(%ebx)
-    pushl $0xa
-    movl &INT_REG[1],%eax
-    cmp $0,%eax
-    mov $0,%esi
-    jge again
-    neg %eax
-    movl $1,%esi
-again:    movl %esp,%ecx
-    addl $0x1,0x4(%ecx)
-    cmp $0xa,%eax
-    jl next
-    cltd
-    idiv (%ecx),%eax
-    subl $0x1,(%ebx)
-    mov (%ebx),%ecx
-    add $0x30,%dl
-    mov %dl,(%ecx)
-    loop again
-next:    subl $0x1,(%ebx)
-    mov (%ebx),%ecx
-    addb $0x30,%al
-    movb %al,(%ecx)
-    cmp $1,%esi
-    jne print
-    movl %esp,%ecx
-    addl $0x1,0x4(%ecx)
-    subl $0x1,(%ebx)
-    mov (%ebx),%ecx
-    movb $0x2d,(%ecx)
-print:    mov 0x4(%esp),%ecx
-    movl %ecx,&TEMP_INT[0]
-    mov (%ebx),%ecx
-    mov %ecx, &TEMP_INT[1]
-    movl $1,&TEMP_INT[2]
-    SYSTEMCALL(WRITE,3, A&TEMP_INT[2] A&TEMP_INT[1] A&TEMP_INT[0])
-}
-
-Parrot_neg_i_i {
-    movl &INT_REG[2],%eax
-    neg %eax
-    movl %eax,&INT_REG[1]
-}
-
-Parrot_neg_i_ic {
-    movl *INT_CONST[2],%eax
-    neg %eax
-    movl %eax,&INT_REG[1]
-}
-
-Parrot_neg_n_n {
-    fldl &NUM_REG[2]
-    fchs
-    fstpl &NUM_REG[1]
-}
-
-Parrot_neg_n_nc {
-    fldl &NUM_CONST[2]
-    fchs
-    fstpl &NUM_REG[1]
-}
-
-;
-; Down here are the ops to be changed
-;
-
-Parrot_print_n {
-    CALL(Parrot_op,V*CUR_OPCODE[0]V&INTERPRETER[0])
-    CALL(fflush, V*CONST_INTVAL[0])
-}
-
-Parrot_print_nc {
-    CALL(Parrot_op,V*CUR_OPCODE[0]V&INTERPRETER[0])
-    CALL(fflush, V*CONST_INTVAL[0])
-}
-
-Parrot_print_p_s {
-    CALL(Parrot_op,V*CUR_OPCODE[0]V&INTERPRETER[0])
-    CALL(fflush, V*CONST_INTVAL[0])
-}
-
-Parrot_print_p_sc {
-    CALL(Parrot_op,V*CUR_OPCODE[0]V&INTERPRETER[0])
-    CALL(fflush, V*CONST_INTVAL[0])
-}
-
-Parrot_print_p {
-    CALL(Parrot_op,V*CUR_OPCODE[0]V&INTERPRETER[0])
-    CALL(fflush, V*CONST_INTVAL[0])
-}
+/*
+ * Local variables:
+ * c-indentation-style: bsd
+ * c-basic-offset: 4
+ * indent-tabs-mode: nil 
+ * End:
+ *
+ * vim: expandtab shiftwidth=4:
+ */

@@ -7,106 +7,89 @@
 #ifndef JIT_H_GUARD
 #define JIT_H_GUARD
 
-#ifdef ALPHA
-void calculate_displacement(INTVAL *, INTVAL *, INTVAL *, INTVAL *);
-typedef void (*jit_f)(void *);
-#endif
-#ifdef I386
-typedef void (*jit_f)(void);
-#endif
-#ifdef SUN4
-static void write_lo_13(char *instr_end, ptrcast_t value);
-static void write_hi_22(char *instr_end, ptrcast_t value);
-static void write_22(char *instr_end, ptrcast_t value);
-static void write_30(char *instr_end, ptrcast_t value);
-static void write_32(char *instr_end, ptrcast_t value);
-typedef void (*jit_f)(void *int_reg, void *num_reg, void *str_reg);
-#endif
-
-
-#define MAX_SUBSTITUTION 3
-#define MAX_TEMP_INT_SUBSTITUTION 8
+typedef void (*jit_f)(struct Parrot_Interp *);
 
 jit_f build_asm(struct Parrot_Interp *, opcode_t *, opcode_t *, opcode_t *);
 
-typedef struct {
-    int position;
-    int number;
-} info_t;
+/* Platform generic fixup information */
+typedef struct Parrot_jit_fixup_t {
+    int type;
+    ptrdiff_t native_offset;	/* Where to apply fixup */
+    union { 
+        opcode_t opcode;
+        void (*fptr)(void);
+    } param;                    /* Fixup specific data */
+
+    struct Parrot_jit_fixup_t *next;
+} Parrot_jit_fixup;
+
+/* Hold native code offsets/addresses */
+typedef union {
+    void *ptr;		/* Pointer to native code */
+    ptrdiff_t offset;	/* Offset of native code from arena_start */
+} Parrot_jit_opmap;
+
+enum {
+    JIT_BRANCH_NO,
+    JIT_BRANCH_TARGET,
+    JIT_BRANCH_SOURCE
+};
+
+typedef int Parrot_jit_register_count_t;
+
+/* Hold information about which Parrot register is mapped to a 
+** hardware register, whether we need to add some instructions before
+** or after the opcode.
+**/
+
+typedef struct Parrot_jit_optimizer_section *Parrot_jit_optimizer_section_ptr;
+
+typedef struct Parrot_jit_optimizer_section {
+    opcode_t begin;
+    opcode_t end;
+    Parrot_jit_register_count_t int_reg_count[NUM_REGISTERS];
+    Parrot_jit_optimizer_section_ptr prev;
+    Parrot_jit_optimizer_section_ptr next;
+    char has_jit_op;
+} Parrot_jit_optimizer_section_t;
 
 typedef struct {
-    int amount;
-    info_t info[MAX_SUBSTITUTION];
-} substitution_t;
+    Parrot_jit_optimizer_section_t *sections;
+    char has_unpredictable_jumps;
+} Parrot_jit_optimizer_t; 
 
 typedef struct {
-    int position;
-    int number;
-    int flag;
-} string_info_t;
+    opcode_t *cur_op;
+    opcode_t op_i;
+    Parrot_jit_opmap *op_map;	/* Maps opcode offsets to native code */
+    UINTVAL map_size;
+    char *native_ptr;		/* Current pointer to native code */
+    char *arena_start;		/* Start of current native code segment */
+    ptrdiff_t arena_size;	/* in bytes */
+    Parrot_jit_fixup *fixups;   /* List of fixupes */
+    Parrot_jit_optimizer_t *optimizer; /* Optimizer information */
+} Parrot_jit_info;
 
-typedef struct {
-    int amount;
-    string_info_t info[MAX_SUBSTITUTION];
-} string_substitution_t;
+#define Parrot_jit_fixup_target(jit_info, fixup) \
+    ((jit_info)->arena_start + (fixup)->native_offset)
 
-typedef struct {
-    int amount;
-    info_t info[MAX_TEMP_INT_SUBSTITUTION];
-} temp_int_substitution_t;
-
-typedef struct {
-    const char *assembly;
-    unsigned int size;
-    int nargop;
-    /* &interpreter->xxx->register[pc[x]] */
-    substitution_t intval_register_address;
-    substitution_t floatval_register_address;
-    substitution_t string_register_address;
-    substitution_t pmc_r_a;
-    /* pc[x] || interpreter->code->const_table->constants[pc[x]]->number || interpreter->code->const_table->constants[pc[x]]->string || ?? */
-    substitution_t intval_constant_value;
-    substitution_t floatval_constant_value;     /* Not likely to be used */
-    string_substitution_t string_constant_value;
-    substitution_t pmc_c_v;
-    /* &pc[x] || &interpreter->code->const_table->constants[pc[x]]->number || &interpreter->code->const_table->constants[pc[x]]->string || ?? */
-    substitution_t intval_constant_address;
-    substitution_t floatval_constant_address;
-    string_substitution_t string_constant_address;
-    substitution_t pmc_c_a;
-    /* &(temporary variables) ... */
-    temp_int_substitution_t temporary_intval_address;
-    substitution_t temporary_floatval_address;
-    substitution_t temporary_string_address;
-    substitution_t temporary_char_address;
-    /* constants ... */
-    substitution_t constant_intval_value;
-    substitution_t c_floatval_v;        /* Not likely to be used */
-    substitution_t c_string_v;  /* Not likely to be used */
-    substitution_t c_char_v;
-    /* &constants ... */
-    substitution_t constant_intval_address;
-    substitution_t constant_floatval_address;
-    substitution_t c_string_a;
-    substitution_t constant_char_address;
-    /* where to branch */
-    substitution_t jump_int_const;
-    substitution_t fixup_a;
-    substitution_t fixup_o;
-    substitution_t libc_c;
-    substitution_t interpreter;
-    substitution_t cur_opcode;
-} opcode_assembly_t;
-
+typedef void (*jit_fn_t)(Parrot_jit_info *jit_info, struct Parrot_Interp * interpreter);
 
 /* Don't ever count on any info here */
 
-extern INTVAL temp_intval[10];
-extern char temp_char[100];
+typedef struct {
+    jit_fn_t fn;
+    int nargop;
+} jit_fn_info_t; 
 
-extern FLOATVAL floatval_constants[1];
-extern char char_constants[];
-extern INTVAL *op_real_address;
+extern jit_fn_info_t op_jit[];
+
+void Parrot_jit_newfixup(Parrot_jit_info *jit_info);
+
+void Parrot_jit_begin(Parrot_jit_info *jit_info, struct Parrot_Interp * interpreter);
+void Parrot_jit_dofixup(Parrot_jit_info *jit_info, struct Parrot_Interp * interpreter);
+void Parrot_jit_cpcf_op(Parrot_jit_info *jit_info, struct Parrot_Interp * interpreter);
+void Parrot_jit_normal_op(Parrot_jit_info *jit_info, struct Parrot_Interp * interpreter);
 
 #endif /* JIT_H_GUARD */
 
@@ -114,8 +97,8 @@ extern INTVAL *op_real_address;
  * Local variables:
  * c-indentation-style: bsd
  * c-basic-offset: 4
- * indent-tabs-mode: nil
+ * indent-tabs-mode: nil 
  * End:
  *
  * vim: expandtab shiftwidth=4:
- */
+*/

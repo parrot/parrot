@@ -1,600 +1,234 @@
 /*
- * jit.c
- *
- * $Id$
- */
+** jit.c
+**
+** $Id$
+*/
 
 #include <parrot/parrot.h>
 #include "parrot/jit.h"
-#include "parrot/jit_struct.h"
-
-
-/* Don't ever count on any info here */
-
-INTVAL temp_intval[10];
-char temp_char[100];
-
-
-/* Constants */
-
-INTVAL const_intval[3] = { (INTVAL)0, (INTVAL)0, (INTVAL)0 };
-FLOATVAL floatval_constants[1] = { 1000000.0 };
-char char_constants[] = "%f";
-
-INTVAL *op_real_address;
 
 /*
- * build_asm()
- */
+** optimize_jit()
+** XXX Don't pay much attention to this yet.
+*/
 
-jit_f
-build_asm(struct Parrot_Interp *interpreter, opcode_t *pc,
-          opcode_t *code_start, opcode_t *code_end)
+Parrot_jit_optimizer_t *
+optimize_jit(struct Parrot_Interp *interpreter, opcode_t *pc, opcode_t *code_start, opcode_t *code_end)
 {
-    char *arena, *arena_start;
-    INTVAL *address, ivalue, size, i, k;
-    INTVAL *op_address, prev_address, bytecode_position;
-#ifdef ALPHA
-    char *interpreter_registers =
-        ((char *)&interpreter->int_reg.registers[0]) + 0x7fff;
-    INTVAL high, low;
-#endif
+    Parrot_jit_optimizer_t *optimizer;
+    Parrot_jit_register_count_t int_reg_usage_count[NUM_REGISTERS];
+    Parrot_jit_optimizer_section_ptr prev_section,cur_section,next_section;
+    opcode_t section_begin, section_end;
+    op_info_t *op_info;
+    char *branches;
+    int argn;
 
+    optimizer = (Parrot_jit_optimizer_t *)mem_sys_allocate(sizeof(Parrot_jit_optimizer_t));
+    branches = (char *)mem_sys_allocate((size_t)(code_end - code_start));
 
-    /* temporary variables */
+    while (pc < code_end)
+    {
+        /* Depending on where the op continues we may:
+           0  = Do nothing, the op doesn't jumps.
+           1  = The op jumps to an address relative to the current position,
+                thus we mark the branch target and the branch source.
+           2  = The op jumps to an absolute address,
+                thus we mark the branch target.
+           4  = The op pops the address to jump to,
+                thus we don't mark the branch target,
+                anyway it may probably use expr(NEXT)
+           8  = The op does something with expr(NEXT),
+                XXX I'll assume that it stores it in the 
+                    control stack for later returning since
+                    that's the only way it's used now but 
+                    this should go away by the time we add
+                    some metadata to the ops.
+                So we will mark the branch target.
+           16 = Means the op jumps and also might goto(NEXT)
+           32 = The branch target is unpredictable.
+         */
+        op_info = &interpreter->op_info_table[*pc];
 
-    substitution_t v;
-    string_substitution_t sv;
-    temp_int_substitution_t tiv;
-    STRING *s;
-
-    /* how should I allocate memory? */
-    op_address =
-        (INTVAL *)malloc((code_end - code_start + START_SIZE + 3) *
-                         sizeof(INTVAL));
-
-    op_real_address =
-        (INTVAL *)malloc((code_end - code_start + START_SIZE + 3) *
-                         sizeof(INTVAL));
-
-    /* intval constants */
-    const_intval[0] = (INTVAL)stdout;
-    const_intval[1] = (INTVAL)STACK_ENTRY_DESTINATION;
-    const_intval[2] = (INTVAL)op_real_address;
-
-    k = 0;
-
-    /* The size in bytes that the whole program will have */
-    size = START_SIZE;
-
-    /* 
-     * op_address holds the displacement from arena_start 
-     * and the start of each parrot op 
-     * at the same position in the parrot bytecode:
-     * 
-     * bytecode:       56  1   1   56  1   1
-     * op_address:     3   0   0   15  0   0
-     */
-
-    op_address[k] = START_SIZE;
-    prev_address = START_SIZE;
-    while (pc < code_end) {
-        k += op_assembly[*pc].nargop;
-        prev_address = op_address[k] = prev_address + op_assembly[*pc].size;
-        size += op_assembly[*pc].size;
-        pc += op_assembly[*pc].nargop;
+        if (op_info->jump)
+            branches[pc - code_start] = JIT_BRANCH_SOURCE;
+        if (op_info->jump & PARROT_JUMP_RELATIVE)
+            branches[pc - code_start + pc[op_info->arg_count - 1]] = JIT_BRANCH_TARGET;
+        if (op_info->jump & PARROT_JUMP_ADDRESS)
+            branches[pc[op_info->arg_count - 1]] = JIT_BRANCH_TARGET; 
+        if (op_info->jump & PARROT_JUMP_ENEXT)
+            branches[pc - code_start + op_jit[*pc].nargop] = JIT_BRANCH_TARGET;
+        if (op_info->jump & PARROT_JUMP_GNEXT)
+        {
+        }
+        pc += op_jit[*pc].nargop;
     }
 
-    bytecode_position = 0;
-    arena_start = arena = malloc((unsigned int)size);
+    /* ok, let's loop again and generate the sections */
+
+    cur_section = optimizer->sections = (Parrot_jit_optimizer_section_t *) mem_sys_allocate(sizeof(Parrot_jit_optimizer_section_t));
+    memset(cur_section->int_reg_count, 0, NUM_REGISTERS * sizeof(INTVAL));
+    cur_section->prev=NULL;
+    cur_section->next=NULL;
+    cur_section->begin=0;
+    cur_section->has_jit_op = 1;
+    
+    /* Reset the register usage for the first section */
 
     pc = code_start;
+    while (pc < code_end)
+    {
+        op_info = &interpreter->op_info_table[*pc];
 
-    /* Make the arena look like a subroutine */
-    memcpy(arena, &START, START_SIZE);
-    arena += START_SIZE;
+        for (argn = 0; argn < op_info->arg_count - 1; argn++)
+            if (op_info->types[argn] == PARROT_ARG_I)
+                cur_section->int_reg_count[*(pc + argn)]++;
+
+        if ((branches[pc - code_start] == JIT_BRANCH_SOURCE) || (branches[pc - code_start + op_jit[*pc].nargop] == JIT_BRANCH_TARGET))
+        {
+            /* cur_section->int_reg_map = registers_tomap(&cur_section->int_reg_count) */
+            cur_section->end = (pc - code_start);
+            /* If it's not the last op allocate a new section */
+            if ((pc + op_jit[*pc].nargop) < code_end)
+            {
+                next_section = (Parrot_jit_optimizer_section_t *) mem_sys_allocate(sizeof(Parrot_jit_optimizer_section_t));
+                cur_section->next = next_section;
+                next_section->prev = cur_section;
+                cur_section = next_section; 
+                cur_section->begin = pc + op_jit[*pc].nargop - code_start;
+                memset(cur_section->int_reg_count, 0, NUM_REGISTERS * sizeof(INTVAL));
+                cur_section->next=NULL;
+                cur_section->has_jit_op = 1;
+            }
+        } 
+
+        if ((op_jit[*pc].fn != Parrot_jit_normal_op) && (op_jit[*pc].fn != Parrot_jit_cpcf_op))
+            cur_section->has_jit_op = 0;
+        
+        pc += op_jit[*pc].nargop;
+    }
+    cur_section->end = (pc - code_start);
+
+    cur_section = optimizer->sections;
+/*
+    while (cur_section)
+    {
+        if (cur_section->has_jit_op)
+        {   
+            cur_section->int_reg_usage     
+        }
+        cur_section = cur_section->next;
+*/
+    return optimizer;
+}
+
+
+/*
+** build_asm()
+*/
+
+jit_f
+build_asm(struct Parrot_Interp *interpreter,opcode_t *pc, opcode_t *code_start, opcode_t *code_end)
+{
+    INTVAL *address,ivalue,i,k;
+    INTVAL bytecode_position;
+    char *new_arena;
+    void *prev_address;
+    Parrot_jit_info jit_info;
+    opcode_t cur_opcode_byte;
+
+    STRING *s;
+
+    jit_info.optimizer = optimize_jit(interpreter,pc,code_start,code_end); 
+    /* Byte code size in opcode_t's */
+    jit_info.map_size = (code_end - code_start);
+    jit_info.op_map = (Parrot_jit_opmap *)mem_sys_allocate(
+                            jit_info.map_size * sizeof(*(jit_info.op_map)) );
+    
+    /* This memory MUST be zeroed for conversion of offsets to pointers to 
+     * work later
+     */
+    memset(jit_info.op_map, 0, jit_info.map_size * sizeof(*(jit_info.op_map)));
+
+    jit_info.arena_size = 1024;
+    jit_info.native_ptr = jit_info.arena_start =
+        mem_sys_allocate(jit_info.arena_size);
+
+    jit_info.op_i = 0;
+    jit_info.cur_op = pc;
+    jit_info.fixups = NULL;
 
     /* 
-     * Loop again over all the opcodes.
-     * Concatenate the position independent code 
-     * of each parrot opcode and place 
-     * the correct addresses in the correct place 
-     * this is done using the opcode_assembly_t structure
-     * where we have all the information we need 
-     * about how many register and of which type 
-     * the opcode requires.
+     *   op_map holds the offset from arena_start 
+     *   of the parrot op at the given opcode index
+     *
+     *  bytecode:       56  1   1   56  1   1
+     *  op_map:         3   0   0   15  0   0
      */
 
-    while (pc < code_end) {
-        memcpy(arena, op_assembly[*pc].assembly, op_assembly[*pc].size);
-        op_real_address[bytecode_position] =
-            (INTVAL)arena_start + op_address[bytecode_position];
-
-        /* Address of a INTVAL register */
-        v = op_assembly[*pc].intval_register_address;
-        for (i = 0; i < v.amount; i++) {
-            address = &interpreter->int_reg.registers[pc[v.info[i].number]];
-#ifdef SUN4
-            address =
-                (INTVAL *)(((char *)address) -
-                           (char *)&interpreter->int_reg.registers[0]);
-            write_lo_13(&arena[v.info[i].position], (ptrcast_t)address);
-#else
-#  ifdef ALPHA
-            address = (INTVAL *)(((char *)address) - interpreter_registers);
-#  endif
-            memcpy(&arena[v.info[i].position], &address, OP_ARGUMENT_SIZE);
-#endif
-        }
-        /* Address of a NUMVAL register */
-        v = op_assembly[*pc].floatval_register_address;
-        for (i = 0; i < v.amount; i++) {
-            address =
-                (INTVAL *)&interpreter->num_reg.
-                registers[pc[v.info[i].number]];
-#ifdef SUN4
-            address =
-                (INTVAL *)(((char *)address) -
-                           (char *)&interpreter->num_reg.registers[0]);
-            write_lo_13(&arena[v.info[i].position], (ptrcast_t)address);
-#else
-#  ifdef ALPHA
-            address = (INTVAL *)(((char *)address) - interpreter_registers);
-#  endif
-            memcpy(&arena[v.info[i].position], &address, OP_ARGUMENT_SIZE);
-#endif
+    Parrot_jit_begin(&jit_info, interpreter);
+    jit_info.op_map[jit_info.op_i].offset = 
+                                    jit_info.native_ptr - jit_info.arena_start;
+    while (jit_info.cur_op < code_end)
+    {
+        /* Grow the arena early */ 
+        if(jit_info.arena_size < (jit_info.op_map[jit_info.op_i].offset + 100)){
+            new_arena = mem_sys_realloc(jit_info.arena_start,
+                                        jit_info.arena_size * 2);
+            jit_info.arena_size *= 2;
+            jit_info.native_ptr = new_arena +
+                                (jit_info.native_ptr - jit_info.arena_start);
+            jit_info.arena_start = new_arena;
         }
 
-        /* the address where will be a STRING register */
+        /* Generate native code for current op */
+        cur_opcode_byte = *jit_info.cur_op;
+        (op_jit[cur_opcode_byte].fn)(&jit_info, interpreter);
 
-        v = op_assembly[*pc].string_register_address;
-        for (i = 0; i < v.amount; i++) {
-            address =
-                (INTVAL *)&interpreter->string_reg.
-                registers[pc[v.info[i].number]];
-#ifdef SUN4
-            address =
-                (INTVAL *)(((char *)address) -
-                           (char *)&interpreter->string_reg.registers[0]);
-            write_lo_13(&arena[v.info[i].position], (ptrcast_t)address);
-#else
-#  ifdef ALPHA
-            address = (INTVAL *)(((char *)address) - interpreter_registers);
-#  endif
-            memcpy(&arena[v.info[i].position], &address, OP_ARGUMENT_SIZE);
-#endif
-        }
+        /* update op_i and cur_op accordingly */ 
+        jit_info.op_i += op_jit[cur_opcode_byte].nargop;
+        jit_info.cur_op += op_jit[cur_opcode_byte].nargop;
 
-        v = op_assembly[*pc].intval_constant_value;
-        for (i = 0; i < v.amount; i++) {
-            ivalue = pc[v.info[i].number];
-            memcpy(&arena[v.info[i].position], &ivalue, sizeof(ivalue));
-        }
-        v = op_assembly[*pc].intval_constant_address;
-        for (i = 0; i < v.amount; i++) {
-            address = &pc[v.info[i].number];
-#ifdef SUN4
-            write_32(&arena[v.info[i].position], (ptrcast_t)address);
-#else
-#  ifdef ALPHA
-            calculate_displacement((INTVAL *)arena_start, address, &high,
-                                   (INTVAL *)&address);
-            memcpy(&arena[v.info[i].position - 4], &high, OP_ARGUMENT_SIZE);
-#  endif
-            memcpy(&arena[v.info[i].position], &address, OP_ARGUMENT_SIZE);
-#endif
-        }
-        v = op_assembly[*pc].floatval_constant_address;
-        for (i = 0; i < v.amount; i++) {
-            address =
-                (INTVAL *)&interpreter->code->const_table->
-                constants[pc[v.info[i].number]]->number;
-#ifdef SUN4
-            write_32(&arena[v.info[i].position], (ptrcast_t)address);
-#else
-#  ifdef ALPHA
-            calculate_displacement((INTVAL *)arena_start, address, &high,
-                                   (INTVAL *)&address);
-            memcpy(&arena[v.info[i].position - 4], &high, OP_ARGUMENT_SIZE);
-#  endif
-            memcpy(&arena[v.info[i].position], &address, OP_ARGUMENT_SIZE);
-#endif
-        }
-
-        /* Address of a STRING constant or one of it's elements */
-        /* &SC */
-        sv = op_assembly[*pc].string_constant_address;
-        for (i = 0; i < sv.amount; i++) {
-            s = interpreter->code->const_table->
-                constants[pc[sv.info[i].number]]->string;
-            switch (sv.info[i].flag) {
-            case 0:
-                address = (INTVAL *)s;
-                break;
-            case 1:
-                address = (INTVAL *)s->bufstart;
-                break;
-            case 2:
-                address = (INTVAL *)&s->buflen;
-                break;
-            case 3:
-                address = (INTVAL *)&s->flags;
-                break;
-            case 4:
-                address = (INTVAL *)&s->bufused;
-                break;
-            case 5:
-                address = (INTVAL *)&s->strlen;
-                break;
-            case 6:
-                address = (INTVAL *)&s->encoding;
-                break;
-            case 7:
-                address = (INTVAL *)&s->type;
-                break;
-            case 8:
-                address = &s->language;
-                break;
-            }
-
-#ifdef SUN4
-            write_32(&arena[sv.info[i].position], (ptrcast_t)address);
-#else
-#  ifdef ALPHA
-            calculate_displacement((INTVAL *)arena_start, address, &high,
-                                   (INTVAL *)&address);
-            memcpy(&arena[sv.info[i].position - 4], &high, OP_ARGUMENT_SIZE);
-#  endif
-            memcpy(&arena[sv.info[i].position], &address, OP_ARGUMENT_SIZE);
-#endif
-        }
-
-        /* value of string constant or one of the elements */
-        /* *SC */
-        sv = op_assembly[*pc].string_constant_value;
-        for (i = 0; i < sv.amount; i++) {
-            s = interpreter->code->const_table->
-                constants[pc[sv.info[i].number]]->string;
-            switch (sv.info[i].flag) {
-                /* case 1: 
-                 * ivalue = *interpreter->code->const_table->constants[pc[op_assembly[*pc].string_constant_value.variable[i].number]]->string->bufstart;
-                 * break;
-             */ case 2:
-                ivalue = s->buflen;
-                break;
-            case 3:
-                ivalue = s->flags;
-                break;
-            case 4:
-                ivalue = s->bufused;
-                break;
-            case 5:
-                ivalue = s->strlen;
-                break;
-                /*  case 6: 
-                 * ivalue = (INTVAL)interpreter->code->const_table->constants[pc[op_assembly[*pc].string_constant_value.variable[i].number]]->string->encoding;
-                 * break;
-                 * case 7: 
-                 * ivalue = (INTVAL)interpreter->code->const_table->constants[pc[op_assembly[*pc].string_constant_value.variable[i].number]]->string->type;
-                 * break; */
-            case 8:
-                ivalue = s->language;
-                break;
-            }
-
-            memcpy(&arena[sv.info[i].position], &ivalue, sizeof(ivalue));
-        }
-
-        tiv = op_assembly[*pc].temporary_intval_address;
-        for (i = 0; i < tiv.amount; i++) {
-            address = &temp_intval[tiv.info[i].number];
-#ifdef ALPHA
-            calculate_displacement((INTVAL *)arena_start, address, &high,
-                                   (INTVAL *)&address);
-            memcpy(&arena[tiv.info[i].position - 4], &high, OP_ARGUMENT_SIZE);
-#endif
-            memcpy(&arena[tiv.info[i].position], &address, OP_ARGUMENT_SIZE);
-        }
-        v = op_assembly[*pc].temporary_char_address;
-        /* temporary char address */
-        for (i = 0; i < v.amount; i++) {
-            address = (INTVAL *)&temp_char[v.info[i].number];
-#ifdef ALPHA
-            calculate_displacement((INTVAL *)arena_start, address, &high,
-                                   (INTVAL *)&address);
-            memcpy(&arena[v.info[i].position - 4], &high, OP_ARGUMENT_SIZE);
-#endif
-            memcpy(&arena[v.info[i].position], &address, OP_ARGUMENT_SIZE);
-        }
-
-        v = op_assembly[*pc].constant_intval_value;
-        /* constant_intval_value */
-        for (i = 0; i < v.amount; i++) {
-            ivalue = const_intval[v.info[i].number];
-            memcpy(&arena[v.info[i].position], &ivalue, sizeof(ivalue));
-        }
-
-        v = op_assembly[*pc].constant_intval_address;
-        /* constant_intval_address */
-        for (i = 0; i < v.amount; i++) {
-            address = &const_intval[v.info[i].number];
-#ifdef SUN4
-            write_32(&arena[v.info[i].position], (ptrcast_t)address);
-#else
-#  ifdef ALPHA
-            calculate_displacement((INTVAL *)arena_start, address, &high,
-                                   (INTVAL *)&address);
-            memcpy(&arena[v.info[i].position - 4], &high, OP_ARGUMENT_SIZE);
-#  endif
-            memcpy(&arena[v.info[i].position], &address, OP_ARGUMENT_SIZE);
-#endif
-        }
-
-
-        v = op_assembly[*pc].constant_floatval_address;
-        /* FLOATVAL CONSTANTS */
-        for (i = 0; i < v.amount; i++) {
-            address = (INTVAL *)&floatval_constants[v.info[i].number];
-#ifdef SUN4
-            write_32(&arena[v.info[i].position], (ptrcast_t)address);
-#else
-#  ifdef ALPHA
-            calculate_displacement((INTVAL *)arena_start, address, &high,
-                                   (INTVAL *)&address);
-            memcpy(&arena[v.info[i].position - 4], &high, OP_ARGUMENT_SIZE);
-#  endif
-            memcpy(&arena[v.info[i].position], &address, OP_ARGUMENT_SIZE);
-#endif
-        }
-        v = op_assembly[*pc].constant_char_address;
-        /* CHAR CONSTANTS */
-        for (i = 0; i < v.amount; i++) {
-            address = (INTVAL *)&char_constants[v.info[i].number];
-#ifdef ALPHA
-            calculate_displacement((INTVAL *)arena_start, address, &high,
-                                   (INTVAL *)&address);
-            memcpy(&arena[v.info[i].position - 4], &high, OP_ARGUMENT_SIZE);
-#endif
-            memcpy(&arena[v.info[i].position], &address, OP_ARGUMENT_SIZE);
-        }
-
-        /* BRANCHES */
-        v = op_assembly[*pc].jump_int_const;
-        for (i = 0; i < v.amount; i++) {
-            address = (INTVAL *)
-                (arena_start +
-                 op_address[bytecode_position + pc[v.info[i].number]
-                 ]
-                );
-
-#ifdef SUN4
-            address =
-                (INTVAL *)((char *)address - (arena + v.info[i].position - 3));
-            write_22(&arena[v.info[i].position], (ptrcast_t)address);
-#else
-            ivalue = (INTVAL)(arena + v.info[i].position) + 4;
-
-            if (address > (INTVAL *)ivalue) {
-                address = (INTVAL *)((char *)address - (char *)ivalue);
-            }
-            else if (address < (INTVAL *)ivalue) {
-                address = (INTVAL *)
-                    (-(arena - (char *)address + op_assembly[*pc].size));
-            }
-            else {
-                address = 0;
-            }
-#  ifdef ALPHA
-            address = (INTVAL *)((INTVAL)address / 4);
-            arena[v.info[i].position + 2] |=
-                (*(((char *)&address) + 2) & 0x1f);
-#  endif
-
-            memcpy(&arena[v.info[i].position], &address, OP_ARGUMENT_SIZE);
-#endif
-        }
-
-        /* XXX the idea is to write all this functions in asm */
-        v = op_assembly[*pc].libc_c;
-        for (i = 0; i < v.amount; i++) {
-            switch (v.info[i].number) {
-            case 0:
-                address = (INTVAL *)printf;
-                break;
-            case 1:
-                address = (INTVAL *)fflush;
-                break;
-            case 2:
-                address = (INTVAL *)string_copy;
-                break;
-            case 3:
-                address = (INTVAL *)string_compare;
-                break;
-            case 4:
-                address = (INTVAL *)stack_pop;
-                break;
-            case 5:
-                address = (INTVAL *)stack_push;
-                break;
-            case 6:
-                address = (INTVAL *)interpreter->op_func_table[*pc];
-                break;
-            }
-#ifdef SUN4
-            address =
-                (INTVAL *)((char *)address - (arena + v.info[i].position - 3));
-            write_30(&arena[v.info[i].position], (ptrcast_t)address);
-#else
-#  ifdef ALPHA
-            calculate_displacement((INTVAL *)arena_start, address, &high,
-                                   &low);
-            memcpy(&arena[v.info[i].position - 12], &high, OP_ARGUMENT_SIZE);
-            memcpy(&arena[v.info[i].position - 8], &low, OP_ARGUMENT_SIZE);
-#  endif
-
-            ivalue = (INTVAL)(arena + v.info[i].position) + 4;
-
-            if (address > (INTVAL *)arena) {
-                address = (INTVAL *)((char *)address - (char *)ivalue);
-            }
-            else {
-                address = (INTVAL *)
-                    (-(arena - (char *)address + v.info[i].position + 4));
-            }
-#  ifdef ALPHA
-            address = (INTVAL *)((INTVAL)address / 4);
-            arena[v.info[i].position + 2] |=
-                (*(((char *)&address) + 2) & 0x1f);
-#  endif
-
-            memcpy(&arena[v.info[i].position], &address, OP_ARGUMENT_SIZE);
-#endif
-        }
-
-        v = op_assembly[*pc].interpreter;
-        for (i = 0; i < v.amount; i++) {
-            switch (v.info[i].number) {
-            case 0:
-                address = (INTVAL *)interpreter;
-                break;
-            case 1:
-                address = (INTVAL *)interpreter->control_stack;
-                break;
-            }
-#ifdef SUN4
-            write_32(&arena[v.info[i].position], (ptrcast_t)address);
-#else
-#  ifdef ALPHA
-            calculate_displacement((INTVAL *)arena_start, address, &high,
-                                   (INTVAL *)&address);
-            memcpy(&arena[v.info[i].position - 4], &high, OP_ARGUMENT_SIZE);
-#  endif
-            memcpy(&arena[v.info[i].position], &address, OP_ARGUMENT_SIZE);
-#endif
-        }
-
-        v = op_assembly[*pc].cur_opcode;;
-        /* cur_opcode */
-        for (i = 0; i < v.amount; i++) {
-            if (v.info[i].number) {
-                ivalue = (INTVAL)(pc - code_start) + v.info[i].number - 1;
-                memcpy(&arena[v.info[i].position], &ivalue, sizeof(ivalue));
-            }
-            else {
-                address = (INTVAL *)pc;
-#ifdef SUN4
-                write_32(&arena[v.info[i].position], (ptrcast_t)address);
-#else
-#  ifdef ALPHA
-                calculate_displacement((INTVAL *)arena_start, address, &high,
-                                       (INTVAL *)&address);
-                memcpy(&arena[v.info[i].position - 4], &high,
-                       OP_ARGUMENT_SIZE);
-#  endif
-                memcpy(&arena[v.info[i].position], &address, OP_ARGUMENT_SIZE);
-#endif
-            }
-        }
-
-        /* Keep it pointing to "where the code goes" */
-        arena += op_assembly[*pc].size;
-
-        ivalue = op_assembly[*pc].nargop;
-        /* Replace the op number in the bytecode with a pointer to
-         * the start of jitted code for that opcode */
-        *pc = op_real_address[bytecode_position];
-        bytecode_position += ivalue;
-        pc += ivalue;
+        jit_info.op_map[jit_info.op_i].offset =
+                                    jit_info.native_ptr - jit_info.arena_start;
     }
 
-    return (jit_f) arena_start;
-}
+    /* Do fixups before converting offsets */
+    Parrot_jit_dofixup(&jit_info, interpreter);
 
-#ifdef ALPHA
-/* calculates the proper values for the displacement 
-   from src_address to dest_address.
-   returned values should be interpreted as:
-   dest_address = src_address + *high * 65536 + *low  
-*/
-void
-calculate_displacement(INTVAL *src_address, INTVAL *dest_address, INTVAL *high,
-                       INTVAL *low)
-{
-    char *displacement = (char *)((char *)dest_address - (char *)src_address);
+    /* Convert offsets to pointers */
+    for(i = 0; i < jit_info.map_size; i++){
 
-    *high = (INTVAL)displacement / 65536;
-    *low = (INTVAL)displacement % 65536;
-    if (*low > 32767) {
-        *high += 1;
-        *low -= 65536;
+        /* Assuming native code chunks contain some initialization code, 
+         * the first op (and every other op) is at an offset > 0
+         */
+        if(jit_info.op_map[i].offset){
+            jit_info.op_map[i].ptr = (char *)jit_info.arena_start +
+                                                jit_info.op_map[i].offset; 
+        }
     }
-    else if (*low < -32767) {
-        *high -= 1;
-        *low += 65536;
+
+    return (jit_f)jit_info.arena_start;
+}
+
+/* Remember the current position in the native code for later update */
+
+void Parrot_jit_newfixup(Parrot_jit_info *jit_info){
+    Parrot_jit_fixup *fixup;
+
+    fixup = mem_sys_allocate(sizeof(*fixup));
+    if(fixup == NULL){
+        internal_exception(ALLOCATION_ERROR,
+                            "System memory allocation failed\n"); 
     }
+
+    /* Insert fixup at the head of the list */
+    fixup->next = jit_info->fixups;
+    jit_info->fixups = fixup;
+
+    /* Fill in the native code offset */
+    fixup->native_offset =
+            (ptrdiff_t)(jit_info->native_ptr - jit_info->arena_start);
 }
-#endif
-
-#ifdef SUN4
-
-/* Write 13 bit immediate value into an instruction */
-static void
-write_lo_13(char *instr_end, ptrcast_t value)
-{
-    value &= 0x1fff;
-    *instr_end = (char)(value & 0xff);
-    *(instr_end - 1) |= (char)(value >> 8);
-}
-
-/* Write 22 bit immediate value into sethi instructions */
-static void
-write_hi_22(char *instr_end, ptrcast_t value)
-{
-    value >>= 10;
-    *(instr_end - 4) = (char)(value & 0xff);
-    value >>= 8;
-    *(instr_end - 5) = (char)(value & 0xff);
-    value >>= 8;
-    *(instr_end - 6) |= (char)(value & 0x3f);   /* This is really just 6 bits */
-}
-
-/* Write 22 bit immediate value into PC relative branches */
-static void
-write_22(char *instr_end, ptrcast_t value)
-{
-    value /= 4;                 /* divide displacement by 4 */
-    *(instr_end--) = (char)(value & 0xff);
-    value >>= 8;
-    *(instr_end--) = (char)(value & 0xff);
-    value >>= 8;
-    *instr_end |= (char)(value & 0x3f); /* This is really just 6 bits */
-}
-
-/* Write 30 bit value into PC relative call instruction */
-static void
-write_30(char *instr_end, ptrcast_t value)
-{
-    value /= 4;
-    *(instr_end--) = (char)(value & 0xff);
-    value >>= 8;
-    *(instr_end--) = (char)(value & 0xff);
-    value >>= 8;
-    *(instr_end--) = (char)(value & 0xff);
-    value >>= 8;
-    *instr_end |= (char)(value & 0x3f);
-}
-
-/* Write a 32 bit value into a sethi instruction followed by an instruction 
- * with a 13 bit immediate */
-static void
-write_32(char *instr_end, ptrcast_t value)
-{
-    write_lo_13(instr_end, value & 0x3ff);
-    write_hi_22(instr_end, value);
-}
-
-#endif
-
 
 /*
  * Local variables:
