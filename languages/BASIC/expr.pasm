@@ -183,13 +183,15 @@ FUNC_ABS:
 	gt I10, 1, ENDISFUNC  # Only checking!
 	restore I5            # pulling ABS's arguments (strings)
 	ne I5, 1, FUNC_ERR    # Wrong number of args.
-	bsr ATOI
-	restore I0
-	save I0
-	ge I0, 0, ENDFUNCDISPATCH
-	restore I0
-	mul I0, I0, -1
-	save I0
+	bsr ATON
+	restore N0
+	save N0
+	ge N0, 0.0, FUNCABS_POS
+	restore N0
+	mul N0, N0, -1.0
+	save N0
+
+FUNCABS_POS:
 	bsr NTOA
 	branch ENDFUNCDISPATCH
 
@@ -254,7 +256,7 @@ FUNC_INSTR:
 	restore I0
 	inc I0
 	save I0
-	bsr NTOA
+	bsr ITOA
 	branch ENDFUNCDISPATCH
 
 # Returns the Epoch seconds (core op TIME INT)
@@ -265,7 +267,7 @@ FUNC_TIME:
 	ge I5, 1 FUNC_ERR	# No arguments for time()
 	time I0
 	save I0
-	bsr NTOA
+	bsr ITOA
 	branch ENDFUNCDISPATCH
 
 FUNC_LEN:
@@ -276,7 +278,7 @@ FUNC_LEN:
 	restore S1
 	length I0, S1
 	save I0
-	bsr NTOA
+	bsr ITOA
 	branch ENDFUNCDISPATCH
 # The old seed is kept in
 # Uses X[n+1]=(a*x[n]+c) mod m
