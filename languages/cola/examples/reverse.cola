@@ -13,16 +13,15 @@ public class Reverse {
     // Recursively reverse string halves until halves are length 1
     public string Reverse(string s1, string s2, int d) {
         int len = strlen(s1);
-        puts("recurse depth ");
-        puti(d);
-        puts("\n");
+//        puts("recurse depth ");
+//        puti(d);
+//        puts("\n");
         if(len > 1)
             s1 = Reverse(substr(s1, 0, len/2), substr(s1, len/2, len-len/2), d + 1);
         len = strlen(s2);
         if(len > 1)
             s2 = Reverse(substr(s2, 0, len/2), substr(s2, len/2, len-len/2), d + 1);
 
-        //puts("(" + s1 + ")(" + s2 + ")\n");
         return s2 + s1; 
     }
 
@@ -32,11 +31,8 @@ public class Reverse {
             bstr = gets();
             if(bstr == "")
                 break;
-            puts(bstr);
             str = str + bstr;
         }
-        
-        //puts(bstr);
         
         // Reverse it with recursion
         puts("\n");

@@ -83,15 +83,7 @@ public class Calc {
             op = GetArgN(s, 2);
             arg2 = GetArgN(s, 3);
 
-            if(arg1 == "") {
-                puts("Not enough arguments.\n");
-                continue;
-            }
-            if(op == "") {
-                puts("Not enough arguments.\n");
-                continue;
-            }
-            if(arg2 == "") {
+            if(arg1 == "" || op == "" || arg2 == "") {
                 puts("Not enough arguments.\n");
                 continue;
             }
