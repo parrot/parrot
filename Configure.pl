@@ -135,6 +135,7 @@ my(%c)=(
     cc_exe_out    => '-o ',               # cc executable output file (different on Win32)
 
     ld            => $Config{ld},
+    ldflags	  => $Config{ldflags},
     ld_out        => '-o ',               # ld output file
     ld_debug      => '',                  # include debug info in executable
 
@@ -228,6 +229,7 @@ if(-f $hints) {
 prompt("What C compiler do you want to use?", 'cc');
 prompt("How about your linker?", 'ld');
 prompt("What flags would you like passed to your C compiler?", 'ccflags');
+prompt("What flags would you like passed to your linker?", 'ldflags');
 prompt("Which libraries would you like your C compiler to include?", 'libs');
 prompt("How big would you like integers to be?", 'iv');
 prompt("And your floats?", 'nv');
@@ -695,7 +697,7 @@ sub compiletestc {
     my $name;
     $name = shift;
     $name = "test" unless $name;
-    system("$c{cc} $c{ccflags} -I./include $c{cc_exe_out}test_siz$c{exe} $name.c") and die "C compiler died!";
+    system("$c{cc} $c{ccflags} $c{ldflags} -I./include $c{cc_exe_out}test_siz$c{exe} $name.c") and die "C compiler died!";
 }
 
 
