@@ -348,7 +348,7 @@ sub Regex::Ops::Tree::group::render {
     return "($str)";
 }
 
-# FIXME: We actually need to render the _absence_ of this op differently!
+# FIXME: Should render the _absence_ of this op differently!
 sub Regex::Ops::Tree::scan::needparen { 0 }
 sub Regex::Ops::Tree::scan::render { $_[0]->{args}->[0]->render() }
 

@@ -101,15 +101,15 @@ sub output_terminate {
 sub output_label_use {
     my ($self, $label) = @_;
     $DB::single = 1 if ! ref $label;
-    ($label = $label->{label}) =~ s/^@/\$/;
-    return $label;
+    ($label = $label->{label}) =~ s/^@//; # FIXME: local labels?
+    return "$label";
 }
 
 sub output_label_def {
     my ($self, $label, $reachable) = @_;
     my $comment = $self->{_label_comments}{$label->{label}};
     $comment = $comment ? "\n\t# $comment" : "";
-    ($label = $label->{label}) =~ s/^@/\$/;
+    ($label = $label->{label}) =~ s/^@//; # FIXME: local labels?
     return "$label:\n$comment";
 }
 
