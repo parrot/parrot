@@ -60,9 +60,12 @@ END
 #defaults for them.
 #XXX Figure out better defaults
 my(%c)=(
-	iv =>			($Config{ivtype}||'long'),
-	nv =>			($Config{nvtype}||'double'),
-        opcode_t =>             ($Config{ivtype}||'long'),
+	iv =>			($Config{ivtype}   ||'long'),
+        ivsize =>               ($Config{ivsize}   || 4 ),
+        longsize =>             ($Config{longsize} || 4 ),
+	nv =>			($Config{nvtype}   ||'double'),
+        nvsize =>               ($Config{nvsize}   || 8 ),
+        opcode_t =>             ($Config{ivtype}   ||'long'),
 	cc =>			$Config{cc},
 	#ADD C COMPILER FLAGS HERE
 	ccflags =>		$Config{ccflags}." -I./include",

@@ -7,6 +7,7 @@
 use strict;
 use Getopt::Long;
 use Parrot::Opcode;
+use Parrot::Config;
 use Symbol;
 
 my %options;
@@ -46,7 +47,21 @@ if(exists($options{'listing'}) && $options{'listing'} eq "") {
 }
 
 # define data types
-my(%pack_type)=('i'=>'l','n'=>'d');
+my %pack_type;
+# Alas perl5.7.2 doesn't have an IV flag for pack().
+if ($PConfig{ivsize} == $PConfig{longsize}) {
+    %pack_type = ('i'=>'l!','n'=>'d');
+}
+elsif ($PConfig{ivsize} == 8) {
+    %pack_type = ('i'=>'q','n'=>'d');
+}
+elsif ($PConfig{ivsize} == 4) {
+    %pack_type = ('i'=>'l','n'=>'d');
+}
+else {
+    die("I don't know how to pack an IV!\n");
+}
+
 my(%real_type)=('I'=>'i','i'=>'i',
                 'N'=>'i','n'=>'n',
                 'S'=>'i','s'=>'i',
