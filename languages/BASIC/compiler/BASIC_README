@@ -76,6 +76,24 @@ How do I get going?  Quickstart?
 eliza2 and wumpus2 are simply ports from the Parrot BASIC 1.0 version.  All
 that had to be done were to add DIM statements and a RANDOMIZE.
 
+What're more hacks?
+The implementation for CLS, LOCATE, and COLOR.  :)
+
+Is there a BASIC debugger?
+Yup.  A simple one was added in 2003/05/16.  To get it started, you have to compile
+for debugging with: compile.pl program.bas debug 1
+And then the commands are:
+	  \n		-- Step once, or no-op if not stepping
+	  c		-- Continue  (clears step mode)
+	  s 		-- Step      (sets step mode)
+	  b,xxx		-- set breakpoint at x
+	  d,xxx		-- delete breakpoint at x
+	  p,var		-- display var's value (no arrays yet)
+	  aw,var	-- add var to watchlist
+	  dw,var	-- delete var from watchlist
+	  pw		-- print watches
+	  daw		-- delete all watches
+
 Where's the advanced syntax stuff?
 Once you've fixed "testrun.pl" as noted above, the script "testsuite.pl" will
 run BASIC through its self-tests.  If you look through the script there's examples

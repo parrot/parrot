@@ -441,6 +441,11 @@ sub debug_init {
 	}
 	print CODE<<DEBEND;
 	set P25["code"], P0
+	set P25["step"], 1   # Turn on stepping mode
+	new P0, .PerlHash
+	set P25["break"], P0  # Breakpoints
+	new P0, .PerlArray
+	set P25["watch"], P0  # Watch
 	ret
 DEBEND
 
