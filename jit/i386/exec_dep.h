@@ -201,10 +201,10 @@ offset_fixup(Parrot_exec_objfile_t *obj)
 
     for (i = 0; i < obj->data_count; i++) {
 #ifdef EXEC_A_OUT
-        obj->symbol_table[i].offset_text = obj->text.size;
+        obj->symbol_table[i].value = obj->text.size;
 #endif
         for (j = 0; j < i; j++) 
-            obj->symbol_table[i].offset_text += obj->data_size[j];
+            obj->symbol_table[i].value += obj->data_size[j];
     }
 }
 
@@ -277,11 +277,11 @@ Parrot_exec_save(Parrot_exec_objfile_t *obj, const char *file)
             case STYPE_GDATA:
                 symlst.n_type = N_EXT | N_DATA;
                 symlst.n_other = AUX_OBJECT;
-                symlst.n_value = obj->symbol_table[i].offset_text;
+                symlst.n_value = obj->symbol_table[i].value;
                 break;
             case STYPE_COM:
                 symlst.n_type = N_EXT;
-                symlst.n_value = obj->symbol_table[i].offset_text;
+                symlst.n_value = obj->symbol_table[i].value;
                 break;
             case STYPE_UND:
                 symlst.n_type = N_EXT;
@@ -474,12 +474,12 @@ Parrot_exec_save(Parrot_exec_objfile_t *obj, const char *file)
                 symlst.st_shndx = 2; /* text */
                 break;
             case STYPE_GDATA:
-                symlst.st_value = obj->symbol_table[i].offset_text;
+                symlst.st_value = obj->symbol_table[i].value;
                 symlst.st_info = ELF32_ST_INFO(STB_GLOBAL, STT_OBJECT);
                 symlst.st_shndx = 3; /* data */
                 break;
             case STYPE_COM:
-                symlst.st_value = obj->symbol_table[i].offset_text;
+                symlst.st_value = obj->symbol_table[i].value;
                 symlst.st_info = ELF32_ST_INFO(STB_GLOBAL, STT_OBJECT);
                 symlst.st_shndx = SHN_COMMON;
                 break;

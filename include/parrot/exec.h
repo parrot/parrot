@@ -61,7 +61,7 @@ typedef struct {
 typedef struct {
     int                                                 offset_list;
     int                                                 type;
-    int                                                 offset_text;
+    int                                                 value;
     const char                                         *symbol;
 } Parrot_exec_symbol_t;
 

@@ -213,12 +213,11 @@ Parrot_exec_add_symbol(Parrot_exec_objfile_t *obj, const char *symbol,
             obj->symbol_list_size++;
         if (stype == STYPE_COM) {
             new_symbol->type = STYPE_COM;
-            new_symbol->offset_text = sizeof(struct Parrot_Interp);
+            new_symbol->value = sizeof(struct Parrot_Interp);
         }
         else {
             new_symbol->type = stype;
-            /* XXX RENAME offset_text is wrong. */
-            new_symbol->offset_text = 0;
+            new_symbol->value = 0;
         }
     }
     return symbol_number; 
