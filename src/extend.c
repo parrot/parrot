@@ -71,7 +71,7 @@ char *Parrot_PMC_get_cstring(Parrot_INTERP interp, Parrot_PMC pmc) {
  * Yes, right now this is a bit of a cheat. It needs fixing, but
  * without disturbing the interface.
  */
-char *Parrot_PMC_get_cstringn(Parrot_INTERP interp, Parrot_PMC pmc, INTVAL *length) {
+char *Parrot_PMC_get_cstringn(Parrot_INTERP interp, Parrot_PMC pmc, Parrot_Int *length) {
     char *retval;
     retval = string_to_cstring(interp, VTABLE_get_string(interp, pmc));
     *length = strlen(retval);
