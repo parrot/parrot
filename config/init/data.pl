@@ -25,7 +25,7 @@ sub runstep {
     # (Usually cc or cl, or something like that.)
     cc            => $Config{cc},
     ccflags       => $Config{ccflags},
-    ccwarn        => $Config{ccwarn},
+    ccwarn        => exists($Config{ccwarn}) ? $Config{ccwarn} : '',
 
     # Linker, used to link object files (plus libraries) into
     # an executable.  It is usually $cc on Unix-ish systems.
