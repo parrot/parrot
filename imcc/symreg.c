@@ -364,8 +364,10 @@ void free_sym(SymReg *r)
             free(r->pcc_sub->ret);
         if (r->pcc_sub->cc)
             free_sym(r->pcc_sub->cc);
+    /* multilpe freed
         if (r->pcc_sub->cc_sym)
             free_sym(r->pcc_sub->cc_sym);
+    */
         if (r->pcc_sub->sub)
             free_sym(r->pcc_sub->sub);
         free(r->pcc_sub);
