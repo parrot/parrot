@@ -315,8 +315,21 @@ class PirateVisitor(object):
 	self.set_lineno(node)
 	self.begin("Compare(")
 	self.visit(node.expr)	# lhs
+	op_map = {
+	    '>'  : 'isgt',
+	    '>=' : 'isge',
+	    '==' : 'iseq',
+	    '!=' : 'isne',
+	    '<=' : 'isle',
+	    '<'  : 'islt',
+	    'is' : 'issame',
+	    'is not' : 'TODO',
+	    'in' : 'TODO',
+	    'not in' : 'TODO'
+        }
+	   
 	for op, n in node.ops:
-	    self.append("Op(%s)" % op)
+	    self.append("Op(%s)" % op_map[op])
 	    self.visit(n)
 	self.end(") # Compare")
 

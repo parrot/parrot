@@ -146,12 +146,22 @@ Sets $1 to 1 or 0, depending on whether $2 is true or not
 
 =item B<issame>(out INT, in PMC, in PMC)
 
-Sets $1 to 1 or 0, dependig on the identity of the 2 objects.
+Sets $1 to 1 or 0, depending on the identity of the 2 objects.
+The identity is the PMCs memory address.
+
+=item B<isntsame>(out INT, in PMC, in PMC)
+
+Sets $1 to 0 or 1, depending on the identity of the 2 objects.
 
 =cut
 
 inline op issame(out INT, in PMC, in PMC) {
-    $1 = &$2 == &$3;
+    $1 = $2 == $3;
+    goto NEXT();
+}
+
+inline op isntsame(out INT, in PMC, in PMC) {
+    $1 = $2 != $3;
     goto NEXT();
 }
 

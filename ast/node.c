@@ -216,6 +216,40 @@ ctx_Binary(nodeType *p, context_type ctx)
     return p->ctx;
 }
 
+static context_type
+ctx_Compare(nodeType *p, context_type ctx)
+{
+    nodeType *op, *left, *right;
+
+    left = CHILD(p);
+    op = left->next;
+
+    /* we don't have general compare ops 
+     * XXX not a problem for Python but for statically typed languages
+     * this produces really bad code
+     *
+     * TODO or not WRT "is" and "is not" and native types
+     * we could cheat and emit "eq" for I and N, but that complicates
+     * code generation. STRINGs maybe different anyway
+     */
+    left->ctx = ctx = CTX_PMC;
+    for (; op; op = right->next) {
+        right = op->next;
+        right->ctx = CTX_PMC;
+        /*
+         * TODO bool is ok for If, *but* if e.g. Python prints this value
+         * it has to be converted to a bool object
+         *
+         * The simple and ugly way is to create a new boolean PMC
+         * assign this dest value and return it
+         * Better would be to have True and False static
+         * bool constants around
+         */
+        p->ctx = CTX_BOOL;
+    }
+    return p->ctx;
+}
+
 /*
  * node creation
  */
@@ -376,7 +410,7 @@ exp_default(Interp* interpreter, nodeType *p)
  * statement nodes don't have a result
  * expression nodes return the result node
  *
- * assign returns the rhs so that assigns can get chained together
+ * assign returns the lhs so that assigns can get chained together
  * [Python] assign is a statement with possibly multiple LHS
  *          ast2past.py has converted multiple LHS to chained
  *          assignment operations so that this matches a more "natural"
@@ -407,7 +441,7 @@ exp_Assign(Interp* interpreter, nodeType *p)
      * TODO store in lexicals if needed, i.e. if its not a leaf function
      * node
      */
-    return rhs;
+    return var;
 }
 
 /*
@@ -466,6 +500,47 @@ exp_Binary(Interp* interpreter, nodeType *p)
     regs[1] = left->u.r;
     regs[2] = right->u.r;
     insINS(interpreter, cur_unit, ins, op->u.r->name, regs, 3);
+    return dest;
+}
+
+/*
+ * left
+ * Op  ... islt, isle, ... issame
+ * right
+ * [ Op
+ *  right ... ]
+ * 
+ * if a < b < c := a < b && b < c   but evaluate b once
+ *
+ */
+static nodeType*
+exp_Compare(Interp* interpreter, nodeType *p)
+{
+    nodeType *op, *left, *right, *dest, *last;
+    Instruction *ins;
+    SymReg *regs[IMCC_MAX_REGS];
+
+    left = CHILD(p);
+    op = left->next;
+    last = right = op->next;
+    /*
+     * first create code for left and right
+     */
+    left = left->expand(interpreter, left);
+    right = right->expand(interpreter, right);
+    /*
+     * then get the current instruction pointer
+     * and append the binary operation
+     */
+    ins = cur_unit->last_ins;
+    dest = IMCC_new_temp_node(interpreter, 'I', &p->loc);
+    p->dest = dest;
+    regs[0] = dest->u.r;
+    regs[1] = left->u.r;
+    regs[2] = right->u.r;
+    insINS(interpreter, cur_unit, ins, op->u.r->name, regs, 3);
+    if (last->next)
+        fatal(1, "ext_Compare", "unimplemented");
     return dest;
 }
 
@@ -712,6 +787,7 @@ static node_names ast_list[] = {
     { "AssName", 	create_Name, NULL, NULL, NULL, ctx_Var },
     { "Assign", 	create_1, exp_Assign, NULL, NULL, NULL },
     { "Binary", 	create_1, exp_Binary, NULL, NULL, ctx_Binary },
+    { "Compare", 	create_1, exp_Compare, NULL, NULL, ctx_Compare },
     { "Const", 		NULL,     exp_Const, NULL, dump_Const, ctx_Const },
     { "Defaults", 	create_1, exp_Defaults, NULL, NULL, NULL },
     { "Function", 	create_Func, exp_Function, NULL, NULL, NULL },
@@ -735,7 +811,7 @@ static node_names ast_list[] = {
     { "_options",       create_1, NULL, NULL, NULL, NULL },
     { "version",        create_1, exp_default, NULL, NULL, NULL }
 
-#define CONST_NODE 5
+#define CONST_NODE 6
 };
 
 /*
@@ -1015,6 +1091,9 @@ IMCC_expand_nodes(Interp* interpreter, nodeType *p)
      */
     p = check_nodes(interpreter, p);
     ctx_default(p, CTX_VOID);
+    if (interpreter->imc_info->debug & DEBUG_AST) {
+        IMCC_dump_nodes(interpreter, p);
+    }
     return p->expand(interpreter, p);
 }
 
@@ -1027,6 +1106,8 @@ IMCC_free_nodes(Interp* interpreter, nodeType *p)
             child = CHILD(p);
             IMCC_free_nodes(interpreter, child);
         }
+        if (p->dest)
+            mem_sys_free(p->dest);
         next = p->next;
         mem_sys_free(p);
         p = next;

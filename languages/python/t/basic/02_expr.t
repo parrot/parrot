@@ -3,7 +3,7 @@
 use strict;
 use lib '../../lib';
 
-use Parrot::Test tests => 16;
+use Parrot::Test tests => 20;
 
 sub test {
     language_output_is('python', $_[0], '', $_[1]);
@@ -84,6 +84,33 @@ elif 0:
     print "nok"
 else:
     print "ok"
+CODE
+
+test( <<'CODE', 'if Ic < Ic' );
+if 1 < 2:
+    print "ok"
+CODE
+
+test( <<'CODE', 'if Ic < P' );
+a = 1
+if a < 2:
+    print "ok"
+CODE
+
+test( <<'CODE', 'if P < P' );
+a = 1
+b = 2
+if a < b:
+    print "ok"
+CODE
+
+test( <<'CODE', 'if P is P' );
+a = b = 1
+c = 2
+if a is b:
+    print "ok"
+if a is c:
+    print "nok"
 CODE
 
 SKIP: {
