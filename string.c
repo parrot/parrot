@@ -331,6 +331,9 @@ string_substr(struct Parrot_Interp *interpreter, const STRING* src, INTVAL offse
     subend = src->encoding->skip_forward(substart, true_length);
 
     if (subend < substart) {
+        char *foo = NULL;
+        printf("substart/subend are %i, %i\n", substart, subend);
+        *foo = 1;
         internal_exception(SUBSTR_OUT_OF_STRING,
                            "subend somehow is less than substart");
     }

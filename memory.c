@@ -95,7 +95,12 @@ void
 mem_setup_allocator(struct Parrot_Interp *interpreter) {
     interpreter->arena_base = mem_sys_allocate(sizeof(struct Arenas));
     interpreter->arena_base->memory_pool = NULL;
+    interpreter->arena_base->last_STRING_Arena = NULL;
+    interpreter->arena_base->string_header_pool = mem_sys_allocate(sizeof(struct STRING_free_pool));
     Parrot_alloc_new_block(interpreter, 0);
+    interpreter->arena_base->string_header_pool->pool_buffer.bufstart = Parrot_allocate(interpreter, 1024);
+    interpreter->arena_base->string_header_pool->pool_buffer.buflen = 1024;
+    interpreter->arena_base->string_header_pool->entries_in_pool = 0;
 }
 
 void *

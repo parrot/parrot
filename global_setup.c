@@ -72,7 +72,6 @@ init_world(void) {
                                                          (STRING*)Parrot_base_vtables[enum_class_IntQueue].name(NULL, NULL)
 );
                                                          */
-
 }
 
 /*
