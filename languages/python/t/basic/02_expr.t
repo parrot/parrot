@@ -3,28 +3,39 @@
 use strict;
 use lib '../../lib';
 
-use Parrot::Test tests => 5;
+use Parrot::Test tests => 6;
 
-language_output_is( 'python', <<'CODE', '', 'subtract' );
+sub test {
+    language_output_is('python', $_[0], '', $_[1]);
+}
+
+test( <<'CODE', 'subtract' );
 print 1-2-3-4
 CODE
 
-language_output_is( 'python', <<'CODE', '', 'add' );
+test( <<'CODE', 'add' );
 print 1+2+3+4
 CODE
 
-language_output_is( 'python', <<'CODE', '', 'add P' );
+test( <<'CODE', 'add P' );
 a=41
 print a+1
 CODE
 
-language_output_is( 'python', <<'CODE', '', 'add P, sub' );
+test( <<'CODE', 'add P, sub' );
 a=41
 print a+1-2-3
 CODE
 
-language_output_is( 'python', <<'CODE', '', 'assign twice' );
+test( <<'CODE', 'assign twice' );
 a=41
 a=1-2-3
+print a
+CODE
+
+test( <<'CODE', 'floor div' );
+a= 5//3
+print a
+a=77/10
 print a
 CODE

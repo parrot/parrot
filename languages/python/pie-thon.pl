@@ -535,12 +535,12 @@ EOC
     }
     push @stack, [-1, $n, $t];
 }
+
 sub BINARY_ADD
 {
     my ($n, $c, $cmt) = @_;
     binary('+', $cmt);
 }
-
 
 sub BINARY_SUBTRACT
 {
@@ -557,6 +557,38 @@ sub BINARY_MULTIPLY
 {
     my ($n, $c, $cmt) = @_;
     binary('*', $cmt);
+}
+sub BINARY_FLOOR_DIVIDE
+{
+    my ($n, $c, $cmt) = @_;
+    binary('/', $cmt);	# XXX
+    my $l = pop @stack;
+    my $i = temp('I');
+    print <<EOC;
+	$i = $l->[1]
+	$l->[1] = $i
+EOC
+    push @stack, $l;
+}
+sub BINARY_DIVIDE
+{
+    my ($n, $c, $cmt) = @_;
+    binary('/', $cmt);
+}
+sub inplace
+{
+    my ($op, $cmt) = @_;
+    my $r = pop @stack;
+    my $l = pop @stack;
+    print <<"EOC";
+	$l->[1] $op= $r->[1] $cmt
+EOC
+    push @stack, [-1, $l->[1], $l->[2]];
+}
+sub INPLACE_ADD
+{
+    my ($n, $c, $cmt) = @_;
+    inplace('+', $cmt);
 }
 sub JUMP_FORWARD()
 {
@@ -586,6 +618,10 @@ sub JUMP_IF_FALSE
     my $targ = "pc_xxx";
     if ($c =~ /to (\d+)/) {
 	$targ = "pc_$1";
+    }
+    if (!@stack) {
+	print "\t\t$cmt - stack empty\n";
+	return;
     }
     print <<EOC;
 	unless $tos->[1] goto $targ $cmt
@@ -849,7 +885,7 @@ EOC
     else {
 	$lexicals{$c} = 1;
 	print <<"EOC";
-        .local pmc $c
+        .local pmc $c $cmt
 	$c = new $DEFVAR
 	$c = $tos->[1]
 	store_lex -1, $n, $c
@@ -872,6 +908,19 @@ EOC
 sub BUILD_TUPLE
 {
     my ($n, $c, $cmt) = @_;
+    my ($opcode, $rest) = ($code[$code_l]->[2],$code[$code_l]->[4]);
+    if ($opcode eq 'UNPACK_SEQUENCE') {
+	$code_l++;
+	print "\t\t$cmt + UNPACK_SEQUENCE\n";
+	# have to reverse n stack elems
+	my ($i, @rev);
+	for ($i = 0; $i < $n; $i++) {
+	    push @rev, pop @stack;
+	}
+	push @stack, @rev;
+
+	return;
+    }
     my $ar = temp('P');
     print <<EOC;
 	$ar = new PerlArray $cmt
