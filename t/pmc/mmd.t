@@ -16,7 +16,7 @@ Tests the multi-method dispatch.
 
 =cut
 
-use Parrot::Test tests => 22;
+use Parrot::Test tests => 23;
 
 pir_output_is(<<'CODE', <<'OUTPUT', "PASM divide");
 
@@ -742,5 +742,37 @@ pir_output_is(<<'CODE', <<'OUTPUT', "bound __add method");
 .end
 CODE
 42.42
+42
+OUTPUT
+
+pir_output_is(<<'CODE', <<'OUTPUT', "Integer subclasses");
+.sub main @MAIN
+    .local pmc d, l, r, cl
+    cl = subclass "Integer", "AInt"
+    d = new "AInt"
+    l = new "AInt"
+    r = new "AInt"
+    l = 3
+    r = 39
+    print l
+    print "\n"
+    print r
+    print "\n"
+    # this works only by calling the mmd_fallback
+    add d, l, r
+    print d
+    print "\n"
+    # dispatches to Parrot_Integer_add_Integer
+    l."__add"(r, d)
+    print d
+    print "\n"
+.end
+
+
+
+CODE
+3
+39
+42
 42
 OUTPUT

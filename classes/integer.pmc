@@ -420,8 +420,23 @@ two types.
 
     void add (PMC* value, PMC* dest) {
 MMD_Integer: {
-        INTVAL a = PMC_int_val(SELF);
-        INTVAL b = PMC_int_val(value);
+        /*
+         * SELF and value can both be PMCs that inherit
+         * from Integer:
+         *   cl = subclass "Integer", "MyInt"
+         * so we can't used PMC_int_val(SELF) in any of these
+         * Integer methods
+         *
+         * TODO one of
+         *   a) remember MMD distance of this call
+         *      (works only for dynamic dispatch)
+         *   b) check for exact Integer type
+         *   c) create MMD_Any_Integer MMD
+         *   d) or dispatch to MMD_DEFAULT
+         */
+
+        INTVAL a = VTABLE_get_integer(INTERP, SELF);
+        INTVAL b = VTABLE_get_integer(INTERP, value);
         INTVAL c = a + b;
         if ((c^a) >= 0 || (c^b) >= 0)
             VTABLE_set_integer_native(INTERP, dest, c);
