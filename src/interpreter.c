@@ -181,7 +181,7 @@ init_prederef(struct Parrot_Interp *interpreter, int cgp)
 
 #ifdef HAVE_COMPUTED_GOTO
     oplib_init_f init_func = cgp ?
-        Parrot_DynOp_core_cgp_0_0_9 :
+        PARROT_CORE_CGP_OPLIB_INIT :
         PARROT_CORE_PREDEREF_OPLIB_INIT;
 #else
     oplib_init_f init_func = PARROT_CORE_PREDEREF_OPLIB_INIT;

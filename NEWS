@@ -1,4 +1,18 @@
-VERSION 0.0.9
+VERSION 0.0.10
+
+New in 0.0.10
+ - IMCC integration
+ - eval
+ - some more benchmarking
+ - cgp core
+ - optimized math ops
+ - intersegment branches
+ - more complete use of PObjs
+ - beefed up packfiles
+ - sub/continuation/coroutine fixes
+ - better NCI (native calling interface)
+ - many imcc improvements
+ - jako improvements
 
 New in 0.0.9
 

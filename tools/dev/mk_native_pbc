@@ -17,8 +17,9 @@ make -s
 cd languages/imcc
 make clean && make -s
 #cp imcc imcc-d12
-cd -
-imcc -o n.pbc t/op/number_1.pasm
+cd ..
+cd ..
+languages/imcc/imcc -o n.pbc t/op/number_1.pasm
 mv n.pbc t/native_pbc/number_2.pbc
 
 make progclean
@@ -29,8 +30,9 @@ make -s
 cd languages/imcc
 make clean && make -s
 #cp imcc imcc-d8
-cd -
-imcc -o n.pbc t/op/number_1.pasm
+cd ..
+cd ..
+languages/imcc/imcc -o n.pbc t/op/number_1.pasm
 mv n.pbc t/native_pbc/number_1.pbc
 
 make pdump
