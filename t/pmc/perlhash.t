@@ -853,11 +853,12 @@ CODE
 OUTPUT
 
 output_is(<<'CODE', <<OUTPUT, "entry types - type_keyed");
-.include "datatypes.pasm"
+.include "pmctypes.pasm"
     new P1, .PerlHash
-    set P1["pmc"], P1
+    new P2, .PerlInt
+    set P1["pmc"], P2
     typeof I0, P1["pmc"]
-    eq I0, .DATATYPE_PMC, ok4
+    eq I0, .PerlInt, ok4
     print "not "
 ok4:print "ok 4\n"
     end

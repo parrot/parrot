@@ -54,11 +54,6 @@ pmclass PerlUndef extends PerlInt {
         return (INTVAL)(pmc2->vtable == pmc->vtable);
     }
 
-    void set_integer (PMC * value) {
-	DYNSELF.morph(enum_class_PerlInt);
-        DYNSELF.set_integer(value);
-    }
-
     void set_integer_native (INTVAL value) {
 	DYNSELF.morph(enum_class_PerlInt);
         DYNSELF.set_integer_native(value);
@@ -66,11 +61,6 @@ pmclass PerlUndef extends PerlInt {
 
     void set_integer_same (PMC* value) {
         /* Do nothing; Can't happen? */
-    }
-
-    void set_string (PMC* value) {
-	DYNSELF.morph(enum_class_PerlString);
-        DYNSELF.set_string(value);
     }
 
     void set_string_native (STRING* value) {
@@ -102,12 +92,6 @@ pmclass PerlUndef extends PerlInt {
         VTABLE_set_number_native(INTERP, dest, value);
     }
 
-    void add_same (PMC* value,  PMC* dest) {
-        Parrot_warn(INTERP, PARROT_WARNINGS_UNDEF_FLAG,
-	    "Use of two uninitialized values in addition");
-        VTABLE_set_integer_native(INTERP, dest, 0);
-    }
-
     void subtract (PMC* value,  PMC* dest) {
         Parrot_warn(INTERP, PARROT_WARNINGS_UNDEF_FLAG,
 	    "Use of uninitialized value in subtraction");
@@ -132,12 +116,6 @@ pmclass PerlUndef extends PerlInt {
         VTABLE_set_number_native(INTERP, dest, 0-value);
     }
 
-    void subtract_same (PMC* value,  PMC* dest) {
-        Parrot_warn(INTERP, PARROT_WARNINGS_UNDEF_FLAG,
-	    "Use of two uninitialized values in subtraction");
-        VTABLE_set_integer_native(INTERP, dest, 0);
-    }
-
     void multiply (PMC* value,  PMC* dest) {
         Parrot_warn(INTERP, PARROT_WARNINGS_UNDEF_FLAG,
 	    "Use of uninitialized value in multiplication");
@@ -159,12 +137,6 @@ pmclass PerlUndef extends PerlInt {
     void multiply_float (FLOATVAL value,  PMC* dest) {
         Parrot_warn(INTERP, PARROT_WARNINGS_UNDEF_FLAG,
 	    "Use of uninitialized value in numeric multiplication");
-        VTABLE_set_integer_native(INTERP, dest, 0);
-    }
-
-    void multiply_same (PMC* value,  PMC* dest) {
-        Parrot_warn(INTERP, PARROT_WARNINGS_UNDEF_FLAG,
-	    "Use of two uninitialized values in multiplication");
         VTABLE_set_integer_native(INTERP, dest, 0);
     }
 
@@ -211,12 +183,6 @@ pmclass PerlUndef extends PerlInt {
         VTABLE_set_integer_native(INTERP, dest, 0);
     }
 
-    void divide_same (PMC* value,  PMC* dest) {
-        Parrot_warn(INTERP, PARROT_WARNINGS_UNDEF_FLAG,
-	    "Use of two uninitialized values in division");
-        internal_exception(DIV_BY_ZERO, "division by zero!\n");
-    }
-
     void modulus (PMC* value,  PMC* dest) {
         Parrot_warn(INTERP, PARROT_WARNINGS_UNDEF_FLAG,
 	    "Use of uninitialized value in modulus");
@@ -260,28 +226,17 @@ pmclass PerlUndef extends PerlInt {
         VTABLE_set_integer_native(INTERP, dest, 0);
     }
 
-    void modulus_same (PMC* value,  PMC* dest) {
-        Parrot_warn(INTERP, PARROT_WARNINGS_UNDEF_FLAG,
-	    "Use of two uninitialized values in modulus");
-        internal_exception(DIV_BY_ZERO, "division by zero!\n");
-    }
-
     void bitwise_or (PMC* value, PMC* dest) {
         Parrot_warn(INTERP, PARROT_WARNINGS_UNDEF_FLAG,
 	    "Use of uninitialized value in bitwise or");
-        VTABLE_set_integer(INTERP, dest, value);
+        VTABLE_set_integer_native(INTERP, dest,
+			VTABLE_get_integer(INTERP, value));
     }
 
     void bitwise_or_int (INTVAL value, PMC* dest) {
         Parrot_warn(INTERP, PARROT_WARNINGS_UNDEF_FLAG,
 	    "Use of uninitialized value in bitwise or");
         VTABLE_set_integer_native(INTERP, dest, value);
-    }
-
-    void bitwise_or_same (PMC* value, PMC* dest) {
-        Parrot_warn(INTERP, PARROT_WARNINGS_UNDEF_FLAG,
-	    "Use of two uninitialized values in bitwise or");
-        VTABLE_set_integer(INTERP, dest, value);
     }
 
     void bitwise_and (PMC* value, PMC* dest) {
@@ -296,28 +251,17 @@ pmclass PerlUndef extends PerlInt {
         VTABLE_set_integer_native(INTERP, dest, 0);
     }
 
-    void bitwise_and_same (PMC* value, PMC* dest) {
-        Parrot_warn(INTERP, PARROT_WARNINGS_UNDEF_FLAG,
-	    "Use of two uninitialized values in bitwise and");
-        VTABLE_set_integer_native(INTERP, dest, 0);
-    }
-
     void bitwise_xor (PMC* value, PMC* dest) {
         Parrot_warn(INTERP, PARROT_WARNINGS_UNDEF_FLAG,
 	    "Use of uninitialized value in bitwise xor");
-        VTABLE_set_integer(INTERP, dest, value);
+        VTABLE_set_integer_native(INTERP, dest,
+			VTABLE_get_integer(INTERP, value));
     }
 
     void bitwise_xor_int (INTVAL value, PMC* dest) {
         Parrot_warn(INTERP, PARROT_WARNINGS_UNDEF_FLAG,
 	    "Use of uninitialized value in bitwise xor");
         VTABLE_set_integer_native(INTERP, dest, value);
-    }
-
-    void bitwise_xor_same (PMC* value, PMC* dest) {
-        Parrot_warn(INTERP, PARROT_WARNINGS_UNDEF_FLAG,
-	    "Use of two uninitialized values in bitwise xor");
-        VTABLE_set_integer(INTERP, dest, value);
     }
 
     void bitwise_not (PMC* dest) {
@@ -329,19 +273,14 @@ pmclass PerlUndef extends PerlInt {
     void concatenate (PMC* value,  PMC* dest) {
         Parrot_warn(INTERP, PARROT_WARNINGS_UNDEF_FLAG,
 	    "Use of uninitialized value in concatenation");
-        VTABLE_set_string(INTERP, dest, value);
+        VTABLE_set_string_native(INTERP, dest,
+			VTABLE_get_string(INTERP, value));
     }
 
     void concatenate_native (STRING* value,  PMC* dest) {
         Parrot_warn(INTERP, PARROT_WARNINGS_UNDEF_FLAG,
 	    "Use of uninitialized value in concatenation");
         VTABLE_set_string_native(INTERP, dest, value);
-    }
-
-    void concatenate_same (PMC * value,  PMC* dest) {
-        Parrot_warn(INTERP, PARROT_WARNINGS_UNDEF_FLAG,
-	    "Use of uninitialized value in concatenation");
-        VTABLE_set_string_native(INTERP, dest, NULL);
     }
 
     INTVAL is_equal (PMC* value) {
@@ -378,7 +317,7 @@ pmclass PerlUndef extends PerlInt {
         STRING * empty_string;
         Parrot_warn(INTERP, PARROT_WARNINGS_UNDEF_FLAG,
 	    "Use of uninitialized value in repeat");
-    
+
         empty_string = string_make(interpreter,  NULL, 0, NULL, 0, NULL);
         VTABLE_set_string_native(INTERP, dest, empty_string);
     }

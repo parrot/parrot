@@ -17,97 +17,94 @@ PMC* getprops()
 INTVAL type()
 INTVAL type_keyed(PMC* key)
 INTVAL type_keyed_int(INTVAL key)
+INTVAL type_keyed_str(STRING* key)
 
 UINTVAL subtype(INTVAL type)
-UINTVAL subtype_keyed(PMC* key, INTVAL type)
-UINTVAL subtype_keyed_int(INTVAL key, INTVAL type)
 
 STRING* name()
-STRING* name_keyed(PMC* key)
-STRING* name_keyed_int(INTVAL key)
 
 void clone(PMC* dest)
-void clone_keyed(PMC* key, PMC* dest)
-void clone_keyed_int(INTVAL key, PMC* dest)
 
 PMC* find_method(STRING* method_name)
-PMC* find_method_keyed(PMC* key, STRING* method_name)
-PMC* find_method_keyed_int(INTVAL key, STRING* method_name)
 
 [FETCH]
 INTVAL get_integer()
 INTVAL get_integer_keyed(PMC* key)
 INTVAL get_integer_keyed_int(INTVAL key)
+INTVAL get_integer_keyed_str(STRING* key)
 
 FLOATVAL get_number()
 FLOATVAL get_number_keyed(PMC* key)
 FLOATVAL get_number_keyed_int(INTVAL key)
+FLOATVAL get_number_keyed_str(STRING* key)
 
 BIGNUM* get_bignum()
 BIGNUM* get_bignum_keyed(PMC* key)
 BIGNUM* get_bignum_keyed_int(INTVAL key)
+BIGNUM* get_bignum_keyed_str(STRING* key)
 
 STRING* get_string()
 STRING* get_string_keyed(PMC* key)
 STRING* get_string_keyed_int(INTVAL key)
+STRING* get_string_keyed_str(STRING* key)
 
 INTVAL get_bool()
 INTVAL get_bool_keyed(PMC* key)
 INTVAL get_bool_keyed_int(INTVAL key)
+INTVAL get_bool_keyed_str(STRING* key)
 
 PMC* get_pmc()
 PMC* get_pmc_keyed(PMC* key)
 PMC* get_pmc_keyed_int(INTVAL key)
+PMC* get_pmc_keyed_str(STRING* key)
 
 void* get_pointer()
 void* get_pointer_keyed(PMC* key)
 void* get_pointer_keyed_int(INTVAL key)
+void* get_pointer_keyed_str(STRING* key)
 
 [STORE]
-void set_integer(PMC* value)
 void set_integer_native(INTVAL value)
 void set_integer_same(PMC* value)
 void set_integer_keyed(PMC* key, INTVAL value)
 void set_integer_keyed_int(INTVAL key, INTVAL value)
+void set_integer_keyed_str(STRING* key, INTVAL value)
 
-void set_number(PMC* value)
 void set_number_native(FLOATVAL value)
 void set_number_same(PMC* value)
 void set_number_keyed(PMC* key, FLOATVAL value)
 void set_number_keyed_int(INTVAL key, FLOATVAL value)
+void set_number_keyed_str(STRING* key, FLOATVAL value)
 
-void set_bignum(PMC* value)
 void set_bignum_native(BIGNUM* value)
 void set_bignum_same(PMC* value)
 void set_bignum_keyed(PMC* key, BIGNUM* value)
 void set_bignum_keyed_int(INTVAL key, BIGNUM* value)
+void set_bignum_keyed_str(STRING* key, BIGNUM* value)
 
-void set_string(PMC* value)
 void set_string_native(STRING* value)
 void set_string_same(PMC* value)
 void set_string_keyed(PMC* key, STRING* value)
 void set_string_keyed_int(INTVAL key, STRING* value)
+void set_string_keyed_str(STRING* key, STRING* value)
 
 void set_bool(INTVAL value)
 void set_bool_keyed(PMC* key, INTVAL value)
 void set_bool_keyed_int(INTVAL key, INTVAL value)
+void set_bool_keyed_str(STRING* key, INTVAL value)
 
 void set_pmc(PMC* value)
 void set_pmc_keyed(PMC* key, PMC* value)
 void set_pmc_keyed_int(INTVAL key, PMC* value)
+void set_pmc_keyed_str(STRING* key, PMC* value)
 
 void set_pointer(void* value)
 void set_pointer_keyed(PMC* key, void* value)
 void set_pointer_keyed_int(INTVAL key, void* value)
-
-void set_same(PMC* value)
-void set_same_keyed(PMC* key, PMC* value)
-void set_same_keyed_int(INTVAL key, PMC* value)
+void set_pointer_keyed_str(STRING* key, void* value)
 
 [FETCHSIZE]
 INTVAL elements()
-INTVAL elements_keyed(PMC* key)
-INTVAL elements_keyed_int(INTVAL key)
 
 [POP]
 INTVAL pop_integer()
@@ -147,86 +144,69 @@ void add(PMC* value, PMC* dest)
 void add_int(INTVAL value, PMC* dest)
 void add_bignum(BIGNUM* value, PMC* dest)
 void add_float(FLOATVAL value, PMC* dest)
-void add_same(PMC* value, PMC* dest)
 
 void subtract(PMC* value, PMC* dest)
 void subtract_int(INTVAL value, PMC* dest)
 void subtract_bignum(BIGNUM* value, PMC* dest)
 void subtract_float(FLOATVAL value, PMC* dest)
-void subtract_same(PMC* value, PMC* dest)
 
 void multiply(PMC* value, PMC* dest)
 void multiply_int(INTVAL value, PMC* dest)
 void multiply_bignum(BIGNUM* value, PMC* dest)
 void multiply_float(FLOATVAL value, PMC* dest)
-void multiply_same(PMC* value, PMC* dest)
 
 void divide(PMC* value, PMC* dest)
 void divide_int(INTVAL value, PMC* dest)
 void divide_bignum(BIGNUM* value, PMC* dest)
 void divide_float(FLOATVAL value, PMC* dest)
-void divide_same(PMC* value, PMC* dest)
 
 void modulus(PMC* value, PMC* dest)
 void modulus_int(INTVAL value, PMC* dest)
 void modulus_bignum(BIGNUM* value, PMC* dest)
 void modulus_float(FLOATVAL value, PMC* dest)
-void modulus_same(PMC* value, PMC* dest)
 
 void cmodulus(PMC* value, PMC* dest)
 void cmodulus_int(INTVAL value, PMC* dest)
 void cmodulus_bignum(BIGNUM* value, PMC* dest)
 void cmodulus_float(FLOATVAL value, PMC* dest)
-void cmodulus_same(PMC* value, PMC* dest)
 
 void neg(PMC* dest)
 
 [BITWISE]
 void bitwise_or(PMC* value, PMC* dest)
 void bitwise_or_int(INTVAL value, PMC* dest)
-void bitwise_or_same(PMC* value, PMC* dest)
 
 void bitwise_and(PMC* value, PMC* dest)
 void bitwise_and_int(INTVAL value, PMC* dest)
-void bitwise_and_same(PMC* value, PMC* dest)
 
 void bitwise_xor(PMC* value, PMC* dest)
 void bitwise_xor_int(INTVAL value, PMC* dest)
-void bitwise_xor_same(PMC* value, PMC* dest)
 
 void bitwise_ors(PMC* value, PMC* dest)
 void bitwise_ors_str(STRING* value, PMC* dest)
-void bitwise_ors_same(PMC* value, PMC* dest)
 
 void bitwise_ands(PMC* value, PMC* dest)
 void bitwise_ands_str(STRING* value, PMC* dest)
-void bitwise_ands_same(PMC* value, PMC* dest)
 
 void bitwise_xors(PMC* value, PMC* dest)
 void bitwise_xors_str(STRING* value, PMC* dest)
-void bitwise_xors_same(PMC* value, PMC* dest)
 
 void bitwise_not(PMC* dest)
 
 void bitwise_shl(PMC* value, PMC* dest)
 void bitwise_shl_int(INTVAL value, PMC* dest)
-void bitwise_shl_same(PMC* value, PMC* dest)
 
 void bitwise_shr(PMC* value, PMC* dest)
 void bitwise_shr_int(INTVAL value, PMC* dest)
-void bitwise_shr_same(PMC* value, PMC* dest)
 
 [STRING]
 void concatenate(PMC* value, PMC* dest)
 void concatenate_native(STRING* value, PMC* dest)
-void concatenate_same(PMC* value, PMC* dest)
 
 [CMP]
 INTVAL is_equal(PMC* value)
 
 INTVAL is_same(PMC* value)
-INTVAL is_same_keyed(PMC* key, PMC* value)
-INTVAL is_same_keyed_int(INTVAL key, PMC* value)
 
 INTVAL cmp(PMC* value)
 INTVAL cmp_num(PMC* value)
@@ -250,19 +230,23 @@ void decrement()
 [EXISTS]
 INTVAL exists_keyed(PMC* key)
 INTVAL exists_keyed_int(INTVAL key)
+INTVAL exists_keyed_str(STRING* key)
 
 [MAIN]
 INTVAL defined()
 INTVAL defined_keyed(PMC* key)
 INTVAL defined_keyed_int(INTVAL key)
+INTVAL defined_keyed_str(STRING* key)
 
 [DELETE]
 void delete_keyed(PMC* key)
 void delete_keyed_int(INTVAL key)
+void delete_keyed_str(STRING* key)
 
 [MAIN]
 PMC* nextkey_keyed(PMC* key, INTVAL what)
 PMC* nextkey_keyed_int(INTVAL key, INTVAL what)
+PMC* nextkey_keyed_str(STRING* key, INTVAL what)
 
 [STRING]
 void substr(INTVAL offset, INTVAL length, PMC* dest)
@@ -270,19 +254,12 @@ STRING* substr_str(INTVAL offset, INTVAL length)
 
 [MAIN]
 void* invoke(void* next)
-void* invoke_pmc(PMC* sub, void* next)
 
 INTVAL can(STRING* method)
-INTVAL can_keyed(PMC* key, STRING* method)
-INTVAL can_keyed_int(INTVAL key, STRING* method)
 
 INTVAL does(STRING* method)
-INTVAL does_keyed(PMC* key, STRING* method)
-INTVAL does_keyed_int(INTVAL key, STRING* method)
 
 INTVAL isa(STRING* _class)
-INTVAL isa_keyed(PMC* key, STRING* _class)
-INTVAL isa_keyed_int(INTVAL key, STRING* _class)
 
 void freeze(visit_info* info)
 void thaw  (visit_info* info)
