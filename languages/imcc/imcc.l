@@ -140,7 +140,7 @@ WS              [\t\f\r ]
 
 ^"="            { in_pod = 1; BEGIN(pod); }
 <pod>^"=cut"{EOL}    { in_pod = 0; BEGIN(INITIAL); }
-<pod>.          { /*ignore*/ }
+<pod>.*         { /*ignore*/ }
 <pod>{EOL}      { ++line; }
 
 ".sym"          return(LOCAL);
