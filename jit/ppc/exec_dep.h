@@ -32,11 +32,10 @@ Parrot_exec_normal_op(Parrot_jit_info_t *jit_info,
         ((long)jit_info->cur_op - (long)interpreter->code->byte_code));
     jit_emit_mov_rr(jit_info->native_ptr, r4, r13);
 
-    Parrot_exec_add_text_rellocation_func(jit_info->objfile,
-        jit_info->native_ptr,
-            interpreter->op_info_table[*jit_info->cur_op].func_name);
-    _emit_bx(jit_info->native_ptr, 1, (jit_info->arena.start -
-        jit_info->native_ptr - 4));
+    Parrot_exec_add_text_rellocation(jit_info->objfile,
+        jit_info->native_ptr, RTYPE_FUNC,
+            interpreter->op_info_table[*jit_info->cur_op].func_name, 0);
+    _emit_bx(jit_info->native_ptr, 1, 0);
 }
 
 #  endif /* JIT_CGP */
@@ -84,7 +83,9 @@ offset_fixup(Parrot_exec_objfile_t *obj)
     int i,j;
 
     for (i = 0; i < obj->data_count; i++) {
+#  ifdef EXEC_MACH_O
         obj->symbol_table[i].value = obj->text.size;
+#  endif
         for (j = 0; j < i; j++) 
             obj->symbol_table[i].value += obj->data_size[j];
     }

@@ -93,7 +93,9 @@ Parrot_exec(struct Parrot_Interp *interpreter, opcode_t *pc,
     /* PAD */
     obj->text.size += (4 - obj->text.size % 4);
     obj->data.size += (4 - obj->data.size % 4);
+#if I386
     do_fixup(obj);
+#endif
     offset_fixup(obj);
     Parrot_exec_save(obj, "exec_output.o");
 }
@@ -267,6 +269,7 @@ Parrot_exec_add_text_rellocation(Parrot_exec_objfile_t *obj, char *nptr,
             symbol_number = Parrot_exec_add_symbol(obj, symbol, STYPE_COM);
             break;
         case RTYPE_DATA:
+        case RTYPE_DATA1:
             symbol_number = Parrot_exec_add_symbol(obj, symbol, STYPE_GDATA);
             new_relloc->fixup = new_fixup(FIXUP_BYTECODE,(void *)(nptr+disp));
             break;

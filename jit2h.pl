@@ -156,6 +156,10 @@ sub readjit($) {
                 $asm =~ s/([^\n]*CONST[^\n]*)\n[^\t]/$1\\\n\tParrot_exec_add_text_rellocation(jit_info->objfile, jit_info->native_ptr, RTYPE_COM, "const_table", -4);\n/g;
                 $asm =~ s/jit_emit_end/exec_emit_end/;
             }
+            if (($cpuarch eq 'ppc') && ($genfile ne "jit_cpu.c")) {
+                $asm =~ s/jit_emit_mov_ri_i\(jit_info->native_ptr, ISR([12]), &CONST\((\d)\)\);/load_nc(jit_info->native_ptr, ISR$1, ECONST($2);/g;
+            }
+
             $asm =~ s/PUSH_MAPPED_REG\((\d)\)/Parrot_jit_push_registers(jit_info,$1)/g;
             $ops{$function} = [ $asm , $extern ];
             $function = undef;
@@ -267,6 +271,10 @@ else {
     emitm_calll(jit_info->native_ptr, EXEC_CALLDISP);
 END_C
 }
+if (($cpuarch eq 'ppc') && ($genfile ne "jit_cpu.c")) {
+    print JITCPU "#define ECONST(i) (int *)(jit_info->cur_op[i] * sizeof(struct PackFile_Constant) + 8)\n";
+}
+
 
 %core_ops = readjit("jit/$cpuarch/core.jit");
 

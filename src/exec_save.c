@@ -149,6 +149,7 @@ Parrot_exec_save(Parrot_exec_objfile_t *obj, const char *file)
     Elf32_Ehdr header;
     Elf32_Shdr sechdr;
     Elf32_Rel rellocation;
+    Elf32_Rela rel_addend;
     Elf32_Sym symlst;
     Elf32_Off current_offset;
     FILE *fp;
@@ -163,7 +164,11 @@ Parrot_exec_save(Parrot_exec_objfile_t *obj, const char *file)
     header.e_ident[2] = ELFMAG2;
     header.e_ident[3] = ELFMAG3;
     header.e_ident[4] = ELFCLASS32;
+#  if PARROT_BIGENDIAN
+    header.e_ident[5] = ELFDATA2MSB;
+#  else /* PARROT_BIGENDIAN */
     header.e_ident[5] = ELFDATA2LSB;
+#  endif /* PARROT_BIGENDIAN */
     header.e_ident[6] = EV_CURRENT;
 #  if EXEC_OS == FREEBSD
     header.e_ident[7] = ELFOSABI_FREEBSD;
@@ -171,12 +176,17 @@ Parrot_exec_save(Parrot_exec_objfile_t *obj, const char *file)
 #  if EXEC_OS == NETBSD
     header.e_ident[7] = ELFOSABI_NETBSD;
 #  endif
-#  if EXEC_OS == LINUX && defined(ELFOSABI_LINUX)
+#  if EXEC_OS == LINUX && defined(ELFOSABI_LINUX) && !defined(PPC)
     header.e_ident[7] = ELFOSABI_LINUX;
 #  endif
 
     header.e_type = ET_REL;
+#  if I386
     header.e_machine = EM_386;
+#  endif
+#  if PPC
+    header.e_machine = EM_PPC;
+#  endif
     header.e_version = EV_CURRENT;
     header.e_entry = 0;
     header.e_phoff = 0;
@@ -215,8 +225,17 @@ Parrot_exec_save(Parrot_exec_objfile_t *obj, const char *file)
      * Link must be the symtab section header index.
      * Info is the text section header index.
      */
+#  if I386
     sh_add(".rel.text", SHT_REL, 0, obj->text_rellocation_count *
         sizeof(Elf32_Rel), 6, 2, 4, sizeof(Elf32_Rel));
+#  endif
+    /*
+     * PPC requires rellocation structures with addends.
+     */
+#  if PPC
+    sh_add(".rela.text", SHT_RELA, 0, obj->text_rellocation_count *
+        sizeof(Elf32_Rela), 6, 2, 4, sizeof(Elf32_Rela));
+#  endif
     /* 
      * Symbol table.
      * Link is the strtab section header index.
@@ -234,6 +253,7 @@ Parrot_exec_save(Parrot_exec_objfile_t *obj, const char *file)
     save_struct(fp, obj->data.code, obj->data.size); /* Data */
     /* Text rellocations */
     for (i = 0; i < obj->text_rellocation_count; i++) {
+#  if I386
         bzero(&rellocation, sizeof(Elf32_Rel));
         rellocation.r_offset = obj->text_rellocation_table[i].offset;
         switch (obj->text_rellocation_table[i].type) {
@@ -254,6 +274,46 @@ Parrot_exec_save(Parrot_exec_objfile_t *obj, const char *file)
                 break;
         }
         save_struct(fp, &rellocation, sizeof(Elf32_Rel));
+#  endif
+#  if PPC
+        bzero(&rel_addend, sizeof(Elf32_Rela));
+        rel_addend.r_offset = obj->text_rellocation_table[i].offset;
+        switch (obj->text_rellocation_table[i].type) {
+            case RTYPE_FUNC:
+                rel_addend.r_info =
+                    ELF32_R_INFO(
+                        obj->text_rellocation_table[i].symbol_number + PDFS,
+                            R_PPC_REL24);
+                break;
+            case RTYPE_DATA:
+            case RTYPE_COM:
+                rel_addend.r_info =
+                    ELF32_R_INFO(
+                        obj->text_rellocation_table[i].symbol_number + PDFS,
+                            R_PPC_ADDR16_HI);
+                rel_addend.r_addend = *((short *)
+                    (&obj->text.code[obj->text_rellocation_table[i].offset]))
+                        << 16;
+                rel_addend.r_addend += *((short *)
+                    (&obj->text.code[
+                        obj->text_rellocation_table[i].offset + 4]));
+                break;
+            case RTYPE_DATA1:
+                rel_addend.r_info =
+                    ELF32_R_INFO(
+                        obj->text_rellocation_table[i].symbol_number + PDFS,
+                            R_PPC_ADDR16_LO);
+                rel_addend.r_addend = *((short *)
+                    (&obj->text.code[obj->text_rellocation_table[i].offset]));
+                rel_addend.r_addend += *((short *)
+                    (&obj->text.code[
+                        obj->text_rellocation_table[i].offset - 4])) << 16;
+                break;
+            default:
+                break;
+        }
+        save_struct(fp, &rel_addend, sizeof(Elf32_Rela));
+#  endif
     }
     /* Symbol table */
     /* zero */
@@ -286,11 +346,13 @@ Parrot_exec_save(Parrot_exec_objfile_t *obj, const char *file)
                 break;
             case STYPE_GDATA:
                 symlst.st_value = obj->symbol_table[i].value;
+                symlst.st_size = obj->data_size[i];
                 symlst.st_info = ELF32_ST_INFO(STB_GLOBAL, STT_OBJECT);
                 symlst.st_shndx = 3; /* data */
                 break;
             case STYPE_COM:
                 symlst.st_value = obj->symbol_table[i].value;
+                symlst.st_size = obj->data_size[i];
                 symlst.st_info = ELF32_ST_INFO(STB_GLOBAL, STT_OBJECT);
                 symlst.st_shndx = SHN_COMMON;
                 break;
@@ -316,7 +378,7 @@ Parrot_exec_save(Parrot_exec_objfile_t *obj, const char *file)
 
 #endif /* EXEC_ELF */
 
-#if EXEC_MACH_O
+#ifdef EXEC_MACH_O
 
 /* This is a hack. */
  

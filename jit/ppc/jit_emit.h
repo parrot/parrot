@@ -561,6 +561,13 @@ jit_emit_bx(Parrot_jit_info_t *jit_info, char type, opcode_t disp)
     jit_emit_addis(pc, D, r15, (long)disp >> 16); \
     jit_emit_add_rri_i(pc, D, D, (long)disp & 0xffff)
 
+#  define load_nc(pc, D, disp) \
+    jit_emit_oris(pc, D, r31, (long)disp >> 16); \
+    Parrot_exec_add_text_rellocation(jit_info->objfile, \
+        pc, RTYPE_DATA, "const_table", -2); \
+    jit_emit_ori(jit_info->native_ptr, D, D, (long)disp & 0xffff); \
+    Parrot_exec_add_text_rellocation(jit_info->objfile, \
+        pc, RTYPE_DATA1, "const_table", -2);
 
 #endif /* JIT_EMIT */
 #if JIT_EMIT == 2
@@ -575,7 +582,19 @@ Parrot_jit_begin(Parrot_jit_info_t *jit_info,
     jit_emit_stwu(jit_info->native_ptr, r1, -64, r1);
     jit_emit_xor_rrr(jit_info->native_ptr, r31, r31, r31);
     jit_emit_mov_rr(jit_info->native_ptr, r13, r3);
-    jit_emit_mov_ri_i(jit_info->native_ptr, r14, jit_info->arena.op_map);
+    if (!jit_info->objfile) {
+        jit_emit_mov_ri_i(jit_info->native_ptr, r14, jit_info->arena.op_map);
+    }
+#  if EXEC_CAPABLE
+    else {
+        jit_emit_oris(jit_info->native_ptr, r14, r31, 0);
+        Parrot_exec_add_text_rellocation(jit_info->objfile,
+            jit_info->native_ptr, RTYPE_DATA, "opcode_map", -2);
+        jit_emit_ori(jit_info->native_ptr, r14, r14, 0);
+        Parrot_exec_add_text_rellocation(jit_info->objfile,
+            jit_info->native_ptr, RTYPE_DATA1, "opcode_map", -2);
+    }
+#  endif
     jit_emit_mov_rr(jit_info->native_ptr, r15, r4);
     /* TODO jit_emit restart code s. i386 */
 }

@@ -52,7 +52,8 @@
 /* Rellocation types */
 #   define RTYPE_DATA  1   /* Data */
 #   define RTYPE_COM   2   /* Variable */
-#   define RTYPE_FUNC  4   /* Function */
+#   define RTYPE_FUNC  3   /* Function */
+#   define RTYPE_DATA1 4   /* 2nd. rellocation for RISC machines */
 
 #   define FIXUP_BYTECODE  1
 #   define FIXUP_OPMAP     2
