@@ -39,6 +39,8 @@ INTVAL ascii_cs_index(Interp *, const STRING *source_string,
 INTVAL ascii_cs_rindex(Interp *, const STRING *source_string,
         const STRING *search_string, UINTVAL offset);
 size_t ascii_compute_hash(Interp *, STRING *source_string);
+STRING * ascii_to_unicode(Interp *, STRING *source_string, STRING *dest);
+STRING * ascii_to_charset(Interp *, STRING *src, CHARSET *new_cs, STRING *dest);
 
 static void compose(Interp *, STRING *source_string);
 static void decompose(Interp *, STRING *source_string);
@@ -63,6 +65,8 @@ static INTVAL find_punctuation(Interp *, STRING *source_string, UINTVAL offset);
 static INTVAL find_not_punctuation(Interp *, STRING *source_string, UINTVAL offset);
 CHARSET *Parrot_charset_ascii_init(Interp *);
 
+STRING *charset_cvt_ascii_to_binary(Interp *, STRING *src, STRING *dest);
+STRING *charset_cvt_ascii_to_iso_8859_1(Interp *, STRING *src, STRING *dest);
 
 #endif /* PARROT_CHARSET_ASCII_H_GUARD */
 /*

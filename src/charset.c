@@ -15,6 +15,7 @@ These are parrot's generic charset handling functions
 #define PARROT_NO_EXTERN_CHARSET_PTRS
 #include "parrot/parrot.h"
 #include "../charset/iso-8859-1.h"
+#include "../charset/ascii.h"
 
 CHARSET *Parrot_iso_8859_1_charset_ptr;
 CHARSET *Parrot_binary_charset_ptr;
@@ -59,6 +60,8 @@ Parrot_deinit_charsets(Interp *interpreter)
 
     n = all_charsets->n_charsets;
     for (i = 0; i < n; ++i) {
+        if (all_charsets->set[i].n_converters)
+            mem_sys_free(all_charsets->set[i].to_converters);
         mem_sys_free(all_charsets->set[i].charset);
     }
     mem_sys_free(all_charsets->set);
@@ -174,6 +177,24 @@ register_charset(Interp *interpreter, const char *charsetname,
     return 1;
 }
 
+static void
+register_static_converters(Interp *interpreter)
+{
+    Parrot_register_charset_converter(interpreter,
+            Parrot_iso_8859_1_charset_ptr, Parrot_ascii_charset_ptr,
+            charset_cvt_iso_8859_1_to_ascii);
+    Parrot_register_charset_converter(interpreter,
+            Parrot_iso_8859_1_charset_ptr, Parrot_binary_charset_ptr,
+            charset_cvt_ascii_to_binary);
+
+    Parrot_register_charset_converter(interpreter,
+            Parrot_ascii_charset_ptr, Parrot_binary_charset_ptr,
+            charset_cvt_ascii_to_binary);
+    Parrot_register_charset_converter(interpreter,
+            Parrot_ascii_charset_ptr, Parrot_iso_8859_1_charset_ptr,
+            charset_cvt_ascii_to_iso_8859_1);
+}
+
 INTVAL
 Parrot_register_charset(Interp *interpreter, const char *charsetname,
         CHARSET *charset)
@@ -199,11 +220,16 @@ Parrot_register_charset(Interp *interpreter, const char *charsetname,
         return register_charset(interpreter, charsetname, charset);
     }
     if (!strcmp("ascii", charsetname)) {
+        INTVAL result;
+
         Parrot_ascii_charset_ptr = charset;
-        Parrot_register_charset_converter(interpreter,
-                Parrot_iso_8859_1_charset_ptr, charset,
-                charset_cvt_iso_8859_1_to_ascii);
-        return register_charset(interpreter, charsetname, charset);
+        result = register_charset(interpreter, charsetname, charset);
+        /*
+         * ascii is currently the last charset - so we can
+         * now install charset converters
+         */
+        register_static_converters(interpreter);
+        return result;
     }
     return 0;
 }

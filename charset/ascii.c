@@ -95,20 +95,6 @@ ascii_get_graphemes_inplace(Interp *interpreter, STRING *source_string,
             offset, count, dest_string);
 }
 
-static STRING *
-to_charset(Interp *interpreter, STRING *src, CHARSET *new_charset, STRING *dest)
-{
-    internal_exception(UNIMPLEMENTED, "to_charset for ascii not implemented");
-    return NULL;
-}
-
-
-static STRING *
-to_unicode(Interp *interpreter, STRING *source_string, STRING *dest)
-{
-    internal_exception(UNIMPLEMENTED, "to_unicode for ascii not implemented");
-    return NULL;
-}
 
 static STRING *
 from_charset(Interp *interpreter, STRING *source_string, STRING *dest)
@@ -122,6 +108,30 @@ from_unicode(Interp *interpreter, STRING *source_string, STRING *dest)
 {
     internal_exception(UNIMPLEMENTED, "Can't do this yet");
     return NULL;
+}
+
+STRING *
+ascii_to_unicode(Interp *interpreter, STRING *source_string, STRING *dest)
+{
+    internal_exception(UNIMPLEMENTED,
+            "to_unicode for iso-8859-1 not implemented");
+    return NULL;
+}
+
+STRING *
+ascii_to_charset(Interp *interpreter, STRING *src, CHARSET *new_charset, STRING *dest)
+{
+    charset_converter_t conversion_func;
+
+    if ((conversion_func = Parrot_find_charset_converter(interpreter,
+                    src->charset, new_charset))) {
+         return conversion_func(interpreter, src, dest);
+    }
+    else {
+        STRING *res = ascii_to_unicode(interpreter, src, dest);
+        return new_charset->from_charset(interpreter, res, dest);
+
+    }
 }
 
 /* A noop. can't compose ascii */
@@ -506,8 +516,8 @@ Parrot_charset_ascii_init(Interp *interpreter)
       ascii_get_graphemes,
       ascii_get_graphemes_inplace,
       set_graphemes,
-      to_charset,
-      to_unicode,
+      ascii_to_charset,
+      ascii_to_unicode,
       from_charset,
       from_unicode,
       compose,
@@ -555,6 +565,41 @@ Parrot_charset_ascii_init(Interp *interpreter)
   return return_set;
 }
 
+STRING *
+charset_cvt_ascii_to_binary(Interp *interpreter, STRING *src, STRING *dest)
+{
+    UINTVAL offs, c;
+    if (dest) {
+        Parrot_reallocate_string(interpreter, dest, src->strlen);
+        dest->bufused = src->bufused;
+        dest->strlen  = src->strlen;
+        for (offs = 0; offs < src->strlen; ++offs) {
+            c = ENCODING_GET_BYTE(interpreter, src, offs);
+            ENCODING_SET_BYTE(interpreter, dest, offs, c);
+        }
+        return dest;
+    }
+    src->charset = Parrot_binary_charset_ptr;
+    return src;
+}
+
+STRING *
+charset_cvt_ascii_to_iso_8859_1(Interp *interpreter, STRING *src, STRING *dest)
+{
+    UINTVAL offs, c;
+    if (dest) {
+        Parrot_reallocate_string(interpreter, dest, src->strlen);
+        dest->bufused = src->bufused;
+        dest->strlen  = src->strlen;
+        for (offs = 0; offs < src->strlen; ++offs) {
+            c = ENCODING_GET_BYTE(interpreter, src, offs);
+            ENCODING_SET_BYTE(interpreter, dest, offs, c);
+        }
+        return dest;
+    }
+    src->charset = Parrot_iso_8859_1_charset_ptr;
+    return src;
+}
 /*
  * Local variables:
  * c-indentation-style: bsd

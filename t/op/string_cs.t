@@ -16,7 +16,7 @@ Tests charset support.
 
 =cut
 
-use Parrot::Test tests => 20;
+use Parrot::Test tests => 26;
 use Test::More;
 
 output_is( <<'CODE', <<OUTPUT, "basic syntax" );
@@ -303,5 +303,101 @@ output_is( <<'CODE', <<OUTPUT, "trans_charset_s_i - same");
 CODE
 abc
 ascii
+OUTPUT
+
+output_is( <<'CODE', <<OUTPUT, "trans_charset_s_s_i iso-8859-1 to binary");
+    set S0, "abc"
+    find_charset I0, "binary"
+    trans_charset S1, S0, I0
+    print S1
+    print "\n"
+    charset I0, S1
+    charsetname S2, I0
+    print S2
+    print "\n"
+    end
+CODE
+abc
+binary
+OUTPUT
+
+output_is( <<'CODE', <<OUTPUT, "trans_charset_s_i iso-8859-1 to binary");
+    set S1, "abc"
+    find_charset I0, "binary"
+    trans_charset S1, I0
+    print S1
+    print "\n"
+    charset I0, S1
+    charsetname S2, I0
+    print S2
+    print "\n"
+    end
+CODE
+abc
+binary
+OUTPUT
+
+output_is( <<'CODE', <<OUTPUT, "trans_charset_s_s_i ascii to binary");
+    set S0, ascii:"abc"
+    find_charset I0, "binary"
+    trans_charset S1, S0, I0
+    print S1
+    print "\n"
+    charset I0, S1
+    charsetname S2, I0
+    print S2
+    print "\n"
+    end
+CODE
+abc
+binary
+OUTPUT
+
+output_is( <<'CODE', <<OUTPUT, "trans_charset_s_i ascii to binary");
+    set S1, ascii:"abc"
+    find_charset I0, "binary"
+    trans_charset S1, I0
+    print S1
+    print "\n"
+    charset I0, S1
+    charsetname S2, I0
+    print S2
+    print "\n"
+    end
+CODE
+abc
+binary
+OUTPUT
+
+output_is( <<'CODE', <<OUTPUT, "trans_charset_s_s_i ascii to iso-8859-1");
+    set S0, ascii:"abc"
+    find_charset I0, "iso-8859-1"
+    trans_charset S1, S0, I0
+    print S1
+    print "\n"
+    charset I0, S1
+    charsetname S2, I0
+    print S2
+    print "\n"
+    end
+CODE
+abc
+iso-8859-1
+OUTPUT
+
+output_is( <<'CODE', <<OUTPUT, "trans_charset_s_i ascii to iso-8859-1");
+    set S1, ascii:"abc"
+    find_charset I0, "iso-8859-1"
+    trans_charset S1, I0
+    print S1
+    print "\n"
+    charset I0, S1
+    charsetname S2, I0
+    print S2
+    print "\n"
+    end
+CODE
+abc
+iso-8859-1
 OUTPUT
 
