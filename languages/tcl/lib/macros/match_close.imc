@@ -1,0 +1,137 @@
+=head1 Macro
+
+boolean
+
+=head2 Description
+
+Given a string and a starting position, find the appropriate closer
+for that type of opener. (), {}, [], "", etc.
+
+=head3 Usage
+
+ Where:
+
+=over 4
+
+=item BUFFER (IN)
+
+contains the string
+
+...
+
+=back
+
+=cut
+
+#
+# match_close
+#
+# given a string and a starting $I5,
+# return the $I5 at which the leading { or " 
+# closes, including the last character.
+
+.macro match_close(BUFFER,START_POS,RETVAL)
+
+# XXX perhaps convert these to high numbers?
+
+#$I0 OPENER
+#$I1 CLOSER
+#$I2 PEEKCHAR
+#$I3 COUNT
+#$I4 STATE
+#$I5 POSITION
+#$I6 BUFFERLEN
+#$I7 HIERARCHICAL
+
+  $I7 = 0 
+
+  $I5 = .START_POS
+
+  length $I6, .BUFFER
+  ord $I0, .BUFFER, .START_POS
+  $I1 = -1
+
+  # {}
+  if $I0 != 123 goto .$TRYCOMMAND
+  $I7 = 1
+  $I1 = 125
+  goto .$GOTCLOSER 
+
+  # []
+.local $TRYCOMMAND:
+  if $I0 != 91 goto .$TRYQUOTE
+  $I1 = 93
+  goto .$GOTCLOSER 
+
+  # ""
+.local $TRYQUOTE: 
+  if $I0 != 34 goto .$TRYPAREN
+  $I1 = 34
+
+.local $TRYPAREN: 
+  if $I0 != 40 goto .$GOTCLOSER
+  $I7 = 1
+  $I1 = 41
+
+.local $GOTCLOSER: 
+  if $I1 == -1 goto .$DIE1 
+
+  $I3 = 1
+  $I4 = 1
+  # 1 == normal, 2 == saw a \
+
+.local $OUTER:
+
+  if $I3 == 0 goto .$OUTER_DONE
+
+  inc $I5 
+  if $I5 == $I6 goto .$die2
+
+  ord $I2,.BUFFER,$I5
+
+  if $I4==2 goto .$STATE2
+
+  if $I2 == $I1 goto .$DECR
+  if $I2 == $I0 goto .$INCR
+
+  # backslash
+  if $I2 != 92 goto .$OUTER
+
+  $I4 = 2
+  goto .$OUTER
+
+# a \ is only special the first time...
+.local $STATE2:
+  $I4 = 1
+  goto .$OUTER
+
+# found a closer
+.local $DECR:
+  if $I0 == $I1 goto .$OUTER_DONE 
+  $I3 = $I3 - 1
+  goto .$OUTER
+
+# found another opener
+.local $INCR:
+  if $I7 == 0 goto .$OUTER
+  $I3 = $I3 + 1
+  goto .$OUTER
+
+.local $OUTER_DONE:
+
+  .RETVAL = $I5 - .START_POS
+  # off by two?
+  inc .RETVAL
+  goto .$DONE
+
+.local $DIE1:
+  # invalid opening match char
+  .RETVAL = -1
+  goto .$DONE
+
+.local $die2:
+  # no closing char found
+  .RETVAL = -2
+
+.local $DONE:
+.endm
