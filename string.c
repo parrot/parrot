@@ -382,6 +382,15 @@ string_compare(struct Parrot_Interp *interpreter, const STRING* s1,
     char *s2end;
     INTVAL cmp = 0;
 
+    if (s1 && !s2) {
+        return (string_length(s1) != 0);
+    }
+    if (s2 && !s1) {
+        return (string_length(s2) != 0);
+    }
+    if (!s1 && !s2) {
+        return 0;
+    }
     if (s1->type != s2->type || s1->encoding != s2->encoding) {
         s1 = string_transcode(interpreter, s1, NULL, string_unicode_type,
                               NULL);
