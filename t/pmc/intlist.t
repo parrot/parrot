@@ -1,6 +1,6 @@
 #! perl -w
 
-use Parrot::Test tests => 8;
+use Parrot::Test tests => 9;
 use Test::More;
 
 output_is(<<'CODE', <<'OUTPUT', "creation");
@@ -456,4 +456,50 @@ ok_6:
 	end
 CODE
 ok
+OUTPUT
+
+output_is(<<'CODE', <<'OUTPUT', "access via a PMC key");
+        new P0, .IntList
+        new P1, .Key
+        set I0, 0
+
+L1:     set P1, I0
+        mul I1, I0, 2 
+        set P0[P1], I1
+        inc I0
+        lt I0, 1025, L1
+
+        set I2, 0
+L2:     set I3, P0[I2]
+        mul I4, I2, 2
+        ne I3, I4, BAD1
+        inc I2
+        lt I2, 1025, L2
+        print "ok 1\n"
+
+GET:
+        new P2, .IntList
+        new P3, .Key
+
+        set I0, 0
+L3:     set P2[I0], I0
+        inc I0
+        lt I0, 260, L3
+
+        set I1, 0
+L4:     set P3, I1
+        set I2, P2[P3]
+        ne I1, I2, BAD2
+        inc I1
+        lt I1, 260, L4        
+        print "ok 2\n"
+        end
+
+BAD1:   print "not ok 1\n"
+        branch GET
+BAD2:   print "not ok 2\n"
+        end
+CODE
+ok 1
+ok 2
 OUTPUT
