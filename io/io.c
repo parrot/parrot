@@ -121,7 +121,7 @@ realloc_pio_array(ParrotIOTable *table, int numhandles)
 =item C<ParrotIO *
 PIO_new(theINTERP, INTVAL iotype, INTVAL flags, INTVAL mode)>
 
-Create a new IO stream. 
+Create a new IO stream.
 
 The values of C<flags> and C<mode> are set in the returned C<ParrotIO>.
 
@@ -665,8 +665,8 @@ PIO_peek(theINTERP, PMC *pmc, void *buffer)
         return -1;
     return PIO_peek_down(interpreter, l, io, buffer);
 }
- 
- 
+
+
 
 /*
 
@@ -775,7 +775,7 @@ PIO_setlinebuf(theINTERP, PMC *pmc)
 /*
 
 =item C<PMC *
-PIO_open(theINTERP, ParrotIOLayer *layer, const char *spath, 
+PIO_open(theINTERP, ParrotIOLayer *layer, const char *spath,
          const char *sflags)>
 
 Creates and returns a C<ParrotIO> PMC for C<*spath>.
@@ -785,7 +785,7 @@ Creates and returns a C<ParrotIO> PMC for C<*spath>.
 */
 
 PMC *
-PIO_open(theINTERP, ParrotIOLayer *layer, const char *spath, 
+PIO_open(theINTERP, ParrotIOLayer *layer, const char *spath,
          const char *sflags)
 {
     ParrotIO *io;
@@ -827,7 +827,7 @@ PIO_fdopen(theINTERP, ParrotIOLayer *layer, PIOHANDLE fd, const char *sflags)
 {
     ParrotIO *io;
     INTVAL flags;
-    
+
     if (!layer) {
         layer = interpreter->piodata->default_stack;
     }
@@ -1045,7 +1045,7 @@ Writes C<*s> tp C<*pmc>. Parrot string version.
 INTVAL
 PIO_putps(theINTERP, PMC *pmc, STRING *s)
 {
-    return PIO_write(interpreter, pmc, s->strstart, s->strlen);
+    return PIO_write(interpreter, pmc, s->strstart, s->bufused);
 }
 
 /*
@@ -1328,7 +1328,7 @@ PIO_make_offset32(INTVAL hi, INTVAL lo)
 =item C<PIOOFF_T
 PIO_make_offset_pmc(theINTERP, PMC *pmc)>
 
-Returns the return value of the C<get_integer> vtable method on C<*pmc>. 
+Returns the return value of the C<get_integer> vtable method on C<*pmc>.
 
 =cut
 
