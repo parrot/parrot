@@ -57,7 +57,8 @@ two_arg_channel:
   goto done
 
 one_arg:
-  $S1 = argv[0]
+  $P99 = argv[0]
+  $S1 = $P99
   print $S1
   print "\n"
   goto done  
