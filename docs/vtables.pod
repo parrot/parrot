@@ -319,6 +319,9 @@ in C<dest>.
 
 Parrot will provide a set of default methods you can inherit from if
 you don't need to do anything special for a given method. These will
-be named C<Parrot_default_...>.
+be named C<Parrot_default_...>. If you don't want to implement a
+specific method, simply say something like
 
+    void logical_not (PMC* value) = default;
 
+and a sensible default will be provided for you.

@@ -1,7 +1,36 @@
-grep docs/strings.pod for unimplemented functions and implement them
 
-Implement transcoding
+String subsystem
+----------------
+    grep docs/strings.pod for unimplemented functions and implement them
+    Implement transcoding
+    Automate string vtable generation
+    Fill in vtables for non-ASCII encodings: UTF-8, UTF-16, UTF-32, etc.
 
-Automate string vtable generation
+    Find a decent way of including Unicode properties tables. (Not for
+    the feint of heart.)
 
-Implement PMCs (!) [ This isn't actually that bad, just needs thought. ]
+Vtables
+-------
+    Fix vtable key support for hashes and arrays
+    PythonInteger/String/Object?
+
+JIT
+---
+    More instructions needed!
+
+Configure system
+----------------
+    Long term, should be replaced with a bootstrapping miniparrot system.
+    
+IO
+--
+
+Regular expression engine
+-------------------------
+    Implement case folding
+    More speed!
+
+Interpreter
+-----------
+
+
