@@ -1461,9 +1461,29 @@ MAIN:
     set I0, -255
     bsr NEWARYI
     bsr PRINTF
-    
+
+    set S1, "+123 == %+vd\n"
+    set I0, 123
+    bsr NEWARYI
+    bsr PRINTF
+
     set S1, "256 == %vu\n"
     set I0, 256
+    bsr NEWARYI
+    bsr PRINTF
+
+    set S1, "+1 == %+vu\n"
+    set I0, 1
+    bsr NEWARYI
+    bsr PRINTF
+
+    set S1, "001 == %0.3u\n"
+    set I0, 1
+    bsr NEWARYI
+    bsr PRINTF    
+
+    set S1, "+001 == %+0.3u\n"
+    set I0, 1
     bsr NEWARYI
     bsr PRINTF
     	
@@ -1492,6 +1512,11 @@ MAIN:
     bsr NEWARYN
     bsr PRINTF	
 
+    set S1, "%% == %%\n"
+    set I0, 0
+    bsr NEWARYI
+    bsr PRINTF   
+
     set S1, "That's all, %s\n"
     set S0, "folks!"
     bsr NEWARYS
@@ -1506,12 +1531,17 @@ Hello, Pa!
 Hello, Hello, Pa!
 1 == 1
 -255 == -255
++123 == +123
 256 == 256
++1 == +1
+001 == 001
++001 == +001
 0.500000 == 0.500000
 0.500 == 0.500
 0.001 == 0.001
 1e+06 == 1e+06
 0.5 == 0.5
+% == %
 That's all, folks!
 OUTPUT
 
