@@ -762,7 +762,7 @@ relop:
 target: VAR
     |  reg
     ;
-lhs: VAR
+lhs: VAR        /* duplicated because of reduce conflict */
     |  reg
     ;
 
@@ -784,8 +784,7 @@ label_op:
     |  PARROT_OP                        { $$ = mk_address($1, U_add_once); }
     ;
 var_or_i:
-       IDENTIFIER			{ $$ = mk_address($1, U_add_once); }
-    |  PARROT_OP                        { $$ = mk_address($1, U_add_once); }
+      label_op
     |  var
     ;
 
