@@ -149,7 +149,9 @@ sub cc_run_capture {
 }
 
 sub cc_clean {
-	unlink glob "test.*";
+	unlink map "test$_",
+		qw( .c .cco .ldo ),
+		Configure::Data->get( qw( o exe ) );
 }
 
 1;
