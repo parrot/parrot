@@ -142,6 +142,7 @@ IMCC_O_FILES = \
 	$(IMCC_DIR)/symreg$(O) 	\
 	$(IMCC_DIR)/instructions$(O) 	\
 	$(IMCC_DIR)/cfg$(O) 	\
+	$(IMCC_DIR)/reg_alloc$(O) 	\
 	$(IMCC_DIR)/sets$(O) 	\
 	$(IMCC_DIR)/debug$(O) 	\
 	$(IMCC_DIR)/optimizer$(O) 	\
