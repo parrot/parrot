@@ -7,7 +7,7 @@ Platform                B8    Runloops      Feature   Compile  Tests
 aix                          -    Y    -     Y   -      Y       Y
 darwin                  B    Y    Y    Y     Y   -      Y       Y
 freebsd
-hpux
+hpux-pa_risc2.0-gcc2.9  B         -    -     Y   Y      Y*2     Y
 ?-ia64
 irix6.5                                      Y          Y       Y/2
 linux-amd64              8
@@ -46,3 +46,4 @@ Signals . Parrot catches kind of a SIGINT (program termination) signal
 
 Remarks:
 *1 ~90% test failures with the CGP core, also 00ff-dos.t tests are failing
+*2 need s/inet_pton/inet_aton/ in io_unix.c:623
