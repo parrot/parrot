@@ -1,19 +1,17 @@
 RM_F = ${rm_f}
-PERL = ${perl}
 
-ASSEMBLE=$(PERL) ../../assemble.pl
 PARROT=../../parrot
 IMCC=../imcc/imcc
 
 all: build
 
 test: build
-	$(PARROT) bf.pbc test.bf
+	$(IMCC) -r bf.pbc test.bf
 	$(IMCC) -r bfc.pbc test.bf
 
 build: bf.pasm
-	$(ASSEMBLE) -o bf.pbc bf.pasm
-	$(IMCC) -o bfc.pbc bfc.pasm
+	$(IMCC) -o bf.pbc bf.pasm
+	$(IMCC) -o bfc.pbc bfc.imc
 
 clean:
 	$(RM_F) core *.pbc *~
