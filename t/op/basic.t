@@ -1,6 +1,6 @@
 #! perl -w
 
-use Parrot::Test tests => 14;
+use Parrot::Test tests => 15;
 
 # It would be very embarrassing if these didn't work...
 output_is(<<'CODE', '', "noop, end");
@@ -105,5 +105,18 @@ output_is(<<'CODE', 32, "Predeclared opcodes");
      print I0
      end
 CODE
+
+output_is(<<'CODE', <<'OUTPUT', "jsr");
+     set_addr I1, FOO
+     jsr I1
+     print "and back again\n"
+     end
+
+FOO: print "There "
+     ret
+
+CODE
+There and back again
+OUTPUT
 
 1; # HONK

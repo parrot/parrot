@@ -1,6 +1,6 @@
 #! perl -w
 
-use Parrot::Test tests => 85;
+use Parrot::Test tests => 87;
 use Test::More;
 
 output_is( <<'CODE', <<OUTPUT, "set_s_s|sc" );
@@ -12,6 +12,26 @@ output_is( <<'CODE', <<OUTPUT, "set_s_s|sc" );
 CODE
 JAPH
 JAPH
+OUTPUT
+
+output_is( <<'CODE', <<OUTPUT, "clone" );
+        set     S0, "Foo\n"
+	clone   S1, S0
+        print   S0
+	print   S1
+
+	clone   S1, "Bar\n"
+	print   S1
+        chopn   S1, 1   # Check that the contents of S1 are no longer constant
+	print   S1
+        print   "\n"
+
+	end
+CODE
+Foo
+Foo
+Bar
+Bar
 OUTPUT
 
 output_is( <<'CODE', '4', "length_i_s" );
@@ -1218,15 +1238,57 @@ CODE
 -1
 OUTPUT
 
-output_is(<<'CODE',<<OUTPUT,"string to num");
+output_is(<<'CODE',<<OUTPUT,"num to string");
     set N0, 80.43 
+    set S0, N0
+    print S0
+    print "\n"
+
+    set N0, -1.111111
     set S0, N0
     print S0
     print "\n"
     end
 CODE
 80.430000
+-1.111111
 OUTPUT
+
+output_is(<<'CODE', <<OUTPUT, "string to int");
+	set	S0, "123"
+	set	I0, S0
+	print	I0
+	print	"\n"
+
+	set	S0, " 1"
+	set	I0, S0
+	print	I0
+	print	"\n"
+
+	set	S0, "-1"
+	set	I0, S0
+	print	I0
+	print	"\n"
+
+        set     S0, "Not a number"
+ 	set	I0, S0
+	print	I0
+	print	"\n"
+
+	set	S0, ""
+	set	I0, S0
+	print	I0
+	print	"\n"
+
+	end
+CODE
+123
+1
+-1
+0
+0
+OUTPUT
+
 
 # Set all string registers to values given by &$_[0](reg num)
 sub set_str_regs {

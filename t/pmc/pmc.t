@@ -1,6 +1,6 @@
 #! perl -w
 
-use Parrot::Test tests => 60;
+use Parrot::Test tests => 65;
 use Test::More;
 
 my $fp_equality_macro = <<'ENDOFMACRO';
@@ -934,6 +934,26 @@ ok 1
 ok 2
 OUTPUT
 
+output_is(<<CODE, <<OUTPUT, "unless (P) - Int");
+	new	P0, .PerlInt
+
+	set	P0, 0
+	unless	P0, OK1
+	print	"not "
+OK1:	print	"ok 1\\n"
+
+	set	P0, 1
+	unless	P0, BAD2
+	branch OK2
+BAD2:	print	"not "
+OK2:	print	"ok 2\\n"
+
+	end
+CODE
+ok 1
+ok 2
+OUTPUT
+
 output_is(<<CODE, <<OUTPUT, "if (P) - Num");
 	new	P0, .PerlInt
 
@@ -944,6 +964,26 @@ OK1:	print	"ok 1\\n"
 
 	set	P0, 0.0
 	if	P0, BAD2
+	branch OK2
+BAD2:	print	"not "
+OK2:	print	"ok 2\\n"
+
+	end
+CODE
+ok 1
+ok 2
+OUTPUT
+
+output_is(<<CODE, <<OUTPUT, "unless (P) - Num");
+	new	P0, .PerlInt
+
+	set	P0, 0.0
+	unless	P0, OK1
+	print	"not "
+OK1:	print	"ok 1\\n"
+
+	set	P0, 1.1
+	unless	P0, BAD2
 	branch OK2
 BAD2:	print	"not "
 OK2:	print	"ok 2\\n"
@@ -1015,6 +1055,26 @@ ok 6
 ok 7
 ok 8
 ok 9
+OUTPUT
+
+output_is(<<CODE, <<OUTPUT, "unless (P) - String");
+	new	P0, .PerlString
+
+        set     P0, "0"
+        unless  P0, OK1
+        print   "not"
+OK1:	print	"ok 1\\n"
+
+	set	P0, "1"
+	unless	P0, BAD2
+        branch  OK2
+BAD2:	print	"not "
+OK2:	print	"ok 2\\n"
+
+	end
+CODE
+ok 1
+ok 2
 OUTPUT
 
 output_is(<<"CODE", <<'OUTPUT', "undef-logical");
@@ -1335,6 +1395,44 @@ OK_2:
 CODE
 ok 1
 ok 2
+OUTPUT
+
+output_is(<<'CODE', <<OUTPUT, "inc, PerlInt");
+    new P3, .PerlInt
+    set P3, 0
+    inc P3
+    print P3
+    print "\n"
+
+LP: inc P3
+    set I3, P3
+    lt I3, 1000, LP
+    print P3
+    print "\n"
+
+    end
+CODE
+1
+1000
+OUTPUT
+
+output_is(<<'CODE', <<OUTPUT, "dec, PerlInt");
+    new P3, .PerlInt
+    set P3, 0
+    dec P3
+    print P3
+    print "\n"
+
+LP: dec P3
+    set I3, P3
+    gt I3, -2000, LP
+    print P3
+    print "\n"
+
+    end
+CODE
+-1
+-2000
 OUTPUT
 
 1;

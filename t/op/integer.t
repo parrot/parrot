@@ -1,6 +1,6 @@
 #! perl -w
 
-use Parrot::Test tests => 35;
+use Parrot::Test tests => 39;
 
 output_is(<<CODE, <<OUTPUT, "set_i_ic");
 	# XXX: Need a test for writing outside the set of available
@@ -439,6 +439,8 @@ output_is(<<CODE, <<OUTPUT, "eq i, i|ic (pop label from stack)");
 	print	"done 2\\n"
 	bsr	BR3
 	print	"done 3\\n"
+        bsr     BR4
+        print   "Shouldn't get here \\n"
 
 	end
 
@@ -454,11 +456,16 @@ BR3:	eq	I0, I1
 	print	"not equal, equal int regs "
 	ret
 
+BR4:    eq      12, 13
+        print   "done 4\\n"
+        end
+
 CODE
 the word
 done 1
 done 2
 done 3
+done 4
 OUTPUT
 
 output_is(<<CODE, <<OUTPUT, "ne_i_ic");
@@ -525,6 +532,8 @@ output_is(<<CODE, <<OUTPUT, "ne ic, i (pop label off stack)");
 	print	"done 2\\n"
 	bsr	BR3
 	print	"done 3\\n"
+        bsr     BR4
+        print   "Shouldn't get here\\n"
 
 	end
 
@@ -539,11 +548,17 @@ BR2:	ne	10, 12
 BR3:	ne	I0, I1
 	print	"10 is 12, even when in I reg "
 	ret
+
+BR4:    ne      12, 12
+        print   "done 4\\n"
+        end
+
 CODE
 start
 done 1
 done 2
 done 3
+done 4
 OUTPUT
 
 output_is(<<CODE, <<OUTPUT, "lt_i_ic");
@@ -820,6 +835,141 @@ CODE
 ok 1
 ok 2
 ok 3
+OUTPUT
+
+output_is(<<'CODE', <<OUTPUT, "not_i_i");
+        set I0, 1
+        not I1, I0
+        print I1
+        print "\n"
+
+        not I2, I1
+        print I2
+        print "\n"
+
+        set I3, 12345
+        not I4, I3
+        print I4
+        print "\n"
+
+        set I5, -1
+        not I6, I5
+        print I6
+        print "\n"
+
+        not I7, 0
+        print I7
+        print "\n"
+        not I7, 1
+        print I7
+        print "\n"
+
+        end
+CODE
+0
+1
+0
+0
+1
+0
+OUTPUT
+
+output_is(<<'CODE', <<OUTPUT, "and");
+        set I0, 0
+        set I1, 10
+
+        set I2, 1
+        and I2, I1, I0
+        print I2
+        print "\n"
+
+        set I2, 1
+        and I2, I0, I1
+        print I2
+        print "\n"
+
+        set I2, 1
+        and I2, I0, I0
+        print I2
+        print "\n"
+
+        set I2, 1
+        and I2, I2, I1
+        print I2
+        print "\n"
+
+        end
+CODE
+0
+0
+0
+10
+OUTPUT
+
+output_is(<<'CODE', <<OUTPUT, "or");
+        set I0, 0
+        set I1, 10
+
+        set I2, 42
+        or I2, I1, I0
+        print I2
+        print "\n"
+
+        set I2, 42
+        or I2, I0, I1
+        print I2
+        print "\n"
+
+        or I2, I0, I0
+        print I2
+        print "\n"
+
+        or I2, I2, I1
+        print I2
+        print "\n"
+
+        end
+CODE
+10
+10
+0
+10
+OUTPUT
+
+output_is(<<'CODE', <<OUTPUT, "xor");
+        set I0, 0
+        set I1, 2
+
+        set I2, 42
+        xor I2, I1, I0
+        print I2
+        print "\n"
+
+        set I2, 42
+        xor I2, I0, I1
+        print I2
+        print "\n"
+
+        xor I2, I0, I0
+        print I2
+        print "\n"
+
+        xor I2, I1, I1
+        print I2
+        print "\n"
+
+        set I2, 1
+        xor I2, I2, I2
+        print I2
+        print "\n"
+
+        end
+CODE
+2
+2
+0
+0
+0
 OUTPUT
 
 output_is(<<CODE, <<OUTPUT, "inc_i");

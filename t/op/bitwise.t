@@ -1,6 +1,6 @@
 #perl -w
 
-use Parrot::Test tests => 15;
+use Parrot::Test tests => 18;
 
 output_is(<<'CODE', <<'OUTPUT', "shr_i_i (>>)");
 	set I0, 0b001100
@@ -142,7 +142,7 @@ CODE
 40
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "bxor_i_i (~)");
+output_is(<<'CODE', <<'OUTPUT', "bxor_i_i (^)");
 	set	I0, 0b001100
 	set	I1, 0b100110
 	bxor	I2, I0, I1
@@ -160,7 +160,7 @@ CODE
 12
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "bxor_i_ic (~)");
+output_is(<<'CODE', <<'OUTPUT', "bxor_i_ic (^)");
  	set I0, 0b001100
 	bxor I2, I0, 0b100110
  	print I2
@@ -175,6 +175,36 @@ CODE
 42
 12
 42
+OUTPUT
+
+output_is(<<'CODE', <<'OUTPUT', "bxor_i|ic (^)");
+ 	set I0, 0b001100
+        set I2, 0b000011
+	bxor I2, I0
+ 	print I2
+ 	print "\n"
+
+        set I2, 0b001100
+	bxor  I2, I0
+ 	print I2
+ 	print "\n"
+
+        set I2, 0b101010
+        bxor I2, I2
+ 	print I2
+ 	print "\n"
+
+        set I2, 0b010101
+        bxor I2, 0b000011
+ 	print I2
+ 	print "\n"
+
+ 	end
+CODE
+15
+0
+0
+22
 OUTPUT
 
 output_is(<<'CODE', <<'OUTPUT', "band_i_i (&)");
@@ -212,6 +242,36 @@ CODE
 4
 OUTPUT
 
+output_is(<<'CODE', <<'OUTPUT', "band_i|ic (&)");
+ 	set I0, 0b001100
+        set I2, 0b000011
+	band I2, I0
+ 	print I2
+ 	print "\n"
+
+        set I2, 0b001100
+	band  I2, I0
+ 	print I2
+ 	print "\n"
+
+        set I2, 0b101010
+        band I2, I2
+ 	print I2
+ 	print "\n"
+
+        set I2, 0b010101
+        band I2, 0b000011
+ 	print I2
+ 	print "\n"
+
+ 	end
+CODE
+0
+12
+42
+1
+OUTPUT
+
 output_is(<<'CODE', <<'OUTPUT', "bor_i_i (|)");
  	set I0, 0b001100
  	set I1, 0b010110
@@ -245,6 +305,36 @@ CODE
 30
 12
 30
+OUTPUT
+
+output_is(<<'CODE', <<'OUTPUT', "bor_i|ic (|)");
+ 	set I0, 0b001100
+        set I2, 0b000011
+	bor I2, I0
+ 	print I2
+ 	print "\n"
+
+        set I2, 0b001100
+	bor  I2, I0
+ 	print I2
+ 	print "\n"
+
+        set I2, 0b101010
+        bor I2, I2
+ 	print I2
+ 	print "\n"
+
+        set I2, 0b010101
+        bor I2, 0b000011
+ 	print I2
+ 	print "\n"
+
+ 	end
+CODE
+15
+12
+42
+23
 OUTPUT
 
 # use C<and> to only check low order bits, this should be platform nice
