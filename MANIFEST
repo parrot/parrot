@@ -26,6 +26,7 @@ io.h
 make_op_header.pl
 memory.c
 memory.h
+opcheck.pl
 opcode_table
 parrot.c
 parrot.h
