@@ -873,12 +873,12 @@ update_interference(Parrot_Interp interpreter, SymReg *old, SymReg *new)
  */
 
 static void
-spill(struct Parrot_Interp *interpreter, int spilled) {
-
+spill(struct Parrot_Interp *interpreter, int spilled)
+{
     Instruction * tmp, *ins;
     int i, n, dl;
     int needs_fetch, needs_store;
-    SymReg * old_symbol, *p31, *new_symbol;
+    SymReg * old_sym, *p31, *new_sym;
     char * buf;
     SymReg *regs[IMCC_MAX_REGS];
 
@@ -889,10 +889,10 @@ spill(struct Parrot_Interp *interpreter, int spilled) {
 
     debug(interpreter, DEBUG_IMC, "#Spilling [%s]:\n", reglist[spilled]->name);
 
-    new_symbol = old_symbol = reglist[spilled];
-    if (old_symbol->usage & U_SPILL)
+    new_sym = old_sym = reglist[spilled];
+    if (old_sym->usage & U_SPILL)
         fatal(1, "spill", "double spill - program too complex\n");
-    new_symbol->usage |= U_SPILL;
+    new_sym->usage |= U_SPILL;
 
     IMCC_INFO(interpreter)->n_spilled++;
     n = 0;
@@ -924,20 +924,20 @@ spill(struct Parrot_Interp *interpreter, int spilled) {
 	needs_store = 0;
 	needs_fetch = 0;
 
-	if (instruction_reads (ins, old_symbol) && !(ins->flags & ITSPILL))
+	if (instruction_reads (ins, old_sym) && !(ins->flags & ITSPILL))
 	    needs_fetch = 1;
 
-	if (instruction_writes (ins, old_symbol) && !(ins->flags & ITSPILL))
+	if (instruction_writes (ins, old_sym) && !(ins->flags & ITSPILL))
 	    needs_store = 1;
         if (dl)
             ins->index += dl;
 
 	if (needs_fetch) {
-	    regs[0] = new_symbol;
+	    regs[0] = new_sym;
             regs[1] = p31;
             sprintf(buf, "%d", IMCC_INFO(interpreter)->n_spilled);
             regs[2] = mk_const(str_dup(buf), 'I');
-	    sprintf(buf, "%%s, %%s[%%s] #FETCH %s", old_symbol->name);
+	    sprintf(buf, "%%s, %%s[%%s] #FETCH %s", old_sym->name);
 	    tmp = INS(interpreter, "set", buf, regs, 3, 4, 0);
 	    tmp->bbindex = ins->bbindex;
             tmp->flags |= ITSPILL;
@@ -947,17 +947,17 @@ spill(struct Parrot_Interp *interpreter, int spilled) {
             insert_ins(ins->prev, tmp);
             dl++;
 	}
-        /* change all occurance of old_symbol to new */
-        for (i = 0; old_symbol != new_symbol && ins->r[i] &&
+        /* change all occurance of old_sym to new */
+        for (i = 0; old_sym != new_sym && ins->r[i] &&
                 i < IMCC_MAX_REGS; i++)
-            if (ins->r[i] == old_symbol)
-                ins->r[i] = new_symbol;
+            if (ins->r[i] == old_sym)
+                ins->r[i] = new_sym;
 	if (needs_store) {
             regs[0] = p31;
             sprintf(buf, "%d", IMCC_INFO(interpreter)->n_spilled);
             regs[1] = mk_const(str_dup(buf), 'I');
-	    regs[2] = new_symbol;
-	    sprintf(buf, "%%s[%%s], %%s #STORE %s", old_symbol->name);
+	    regs[2] = new_sym;
+	    sprintf(buf, "%%s[%%s], %%s #STORE %s", old_sym->name);
 	    tmp = INS(interpreter, "set", buf, regs, 3, 2, 0);
 	    tmp->bbindex = ins->bbindex;
             tmp->flags |= ITSPILL;
@@ -969,19 +969,19 @@ spill(struct Parrot_Interp *interpreter, int spilled) {
         if (needs_fetch || needs_store) {
 #if ! DOIT_AGAIN_SAM
             /* update life info of prev sym */
-            update_life(interpreter, ins, new_symbol, needs_fetch, needs_store,
-                    old_symbol != new_symbol);
+            update_life(interpreter, ins, new_sym, needs_fetch, needs_store,
+                    old_sym != new_sym);
             /* and interference of both */
-            update_interference(interpreter, old_symbol, new_symbol);
+            update_interference(interpreter, old_sym, new_sym);
 #endif
             /* if all symbols are in one basic_block, we need a new
              * symbol, so that the life_ranges are minimal
              * It would be nice, to detect, when changing the symbol
              * is necessary.
              */
-            sprintf(buf, "%s_%d", old_symbol->name, n++);
-            new_symbol = mk_symreg(str_dup(buf), old_symbol->set);
-            new_symbol->usage |= U_SPILL;
+            sprintf(buf, "%s_%d", old_sym->name, n++);
+            new_sym = mk_symreg(str_dup(buf), old_sym->set);
+            new_sym->usage |= U_SPILL;
             if (needs_store)    /* advance past store */
                 ins = tmp;
         }

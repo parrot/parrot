@@ -19,6 +19,7 @@
 
 # please insert tab separated entries at the top of the list
 
+2003.10.24	leo	start using this file for fingerprinting
 2003.10.22	dan	add delegates.pmc
 2003.10.21	dan	delete instantiate op
 2003.10.21	leo	start this file

@@ -387,7 +387,7 @@ lib/Parrot/OpLib/core.pm : $(OPS_FILES) $(BUILD_TOOL)/ops2pm.pl \
 	lib/Parrot/OpsFile.pm lib/Parrot/Op.pm $(OPS)/ops.num
 	$(PERL) $(BUILD_TOOL)/ops2pm.pl $(OPS_FILES)
 
-$(SRC)/fingerprint.c : $(BUILD_TOOL)/fingerprint_c.pl lib/Parrot/OpLib/core.pm
+$(SRC)/fingerprint.c : $(BUILD_TOOL)/fingerprint_c.pl PBC_COMPAT
 	$(PERL) $(BUILD_TOOL)/fingerprint_c.pl > $(SRC)/fingerprint.c
 
 ###############################################################################
