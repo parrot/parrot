@@ -68,7 +68,7 @@ GEN_OPSFILES =
 
 GEN_HEADERS = $(INC)/vtable.h $(INC)/oplib/core_ops.h \
 	$(INC)/oplib/core_ops_prederef.h \
-	$(INC)/oplib/core_ops_switch.h $(INC)/jit_emit.h $(INC)/exec_dep.h
+	$(INC)/oplib/core_ops_switch.h $(INC)/jit_emit.h
 
 GEN_SOURCES = core_ops.c core_ops_prederef.c fingerprint.c nci.c \
               core_ops_switch.c jit_cpu.c exec_cpu.c
