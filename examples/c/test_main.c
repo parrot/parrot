@@ -8,7 +8,8 @@ src/test_main.c - A sample test program
 
 =head1 DESCRIPTION
 
-THIS FILE IS NO LONGER USED.
+C<examples/c/test_main.c> is being retained as an example of a non-trivial, but
+still clean, Parrot embedding. 
 
 =head2 Functions
 
