@@ -86,12 +86,13 @@ N: H.Merijn Brand
 D: HP-UX fixes and smoke tests
 
 N: Jarkko Hietaniemi
-D: packfile and Tru64 fixes; lot of general hints to improve portability
+D: packfile and Tru64 fixes
+D: lot of general hints and patches to improve portability
 
 N: Jason Gloudon
 
 N: Jeff Clites
-D: PPC JIT patches
+D: PPC JIT patches, ICU support, string handling
 
 N: Jeff Goff
 D: Release pumpking for 0.0.5-0.0.8
@@ -203,6 +204,9 @@ N: Simon Glover
 D: Tests, docs and misc. bugfixes
 E: scog@amnh.org
 S: New York, NY
+
+N: Stefan Lidman
+D: sqrt ops
 
 N: Stéphane Payrard
 D: Various code fixes and improvement

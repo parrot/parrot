@@ -1418,13 +1418,13 @@ TEMPLATE Parrot_ord_i_sx {
 #undef push_r
 #undef push_c
 }
-Parrot_ord_i_s {
-    Parrot_ord_i_sx s/<typ>/r/
-}
+;Parrot_ord_i_s {
+;    Parrot_ord_i_sx s/<typ>/r/
+;}
 
-Parrot_ord_i_sc {
-    Parrot_ord_i_sx s/<typ>/c/
-}
+;Parrot_ord_i_sc {
+;    Parrot_ord_i_sx s/<typ>/c/
+;}
 
 ; TODO or,and,not,cmp
 

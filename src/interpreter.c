@@ -485,7 +485,7 @@ init_jit(Interp *interpreter, opcode_t *pc)
 #    endif
 #  endif
 
-    jit_code = build_asm(interpreter, pc, code_start, code_end, NULL);
+    jit_code = build_asm(interpreter, code_start, code_start, code_end, NULL);
     interpreter->code->cur_cs->jit_info = interpreter->jit_info;
     return F2DPTR(jit_code);
 #else
