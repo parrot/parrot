@@ -289,11 +289,12 @@ sort_reglist(SymReg ** reglist)
  * run through them and allocate all that don't overlap
  * in one bunch
  *
- * XXX doesn't work yet - currently allocated registers are also
- *     in reglist to find allocatable registers and to check for interference
+ * registers 28-30 are reserved for short range temps, which
+ * get allocate immediately
  */
 
 
+#define ALLOCATE_HACK
 #ifdef ALLOCATE_HACK
 static void
 allocate_non_interfering(Parrot_Interp interpreter, SymReg ** reglist, int n)
@@ -305,55 +306,54 @@ allocate_non_interfering(Parrot_Interp interpreter, SymReg ** reglist, int n)
     for (t = 0; t < 4; t++) {
         int typ = "INSP"[t];
         first_color = 30;
-again:
         /* scan reglist if this color is unused */
-        while (first_color >= 16) {
+        while (first_color >= 28) {  /* 28..30 for 3 temps */
             for (i = 0; i < n; i++) {
                 r = reglist[i];
                 if (r->set != typ || (r->type & VT_REGP) ||
                         r->want_regno >= 0 || r->color >= 0)
                     continue;
                 if (r->color == first_color) {
-                    first_color--;
-                    goto again;
+                    warning(interpreter, "allocate_non_interfering",
+                            "couldn't find a color for register type %c", typ);
+                    goto out;
                 }
             }
-            break;
-        }
-        if (first_color < 16)
-            fatal(1, "allocate_non_interfering",
-                    "couldn't find a color for register type %c", typ);
-        /*
-         * no scan reglist for small ranged non-interfering regs of that typ
-         */
-        bb_index = last_line = -1;
-        for (i = 0; i < n; i++) {
-            r = reglist[i];
-            if (r->set != typ || (r->type & VT_REGP) ||
-                        r->want_regno >= 0 || r->color >= 0)
-                continue;
-            if (r->last_ins->index - r->first_ins->index > 10)
-                continue;
-            if (r->first_ins->bbindex != r->last_ins->bbindex)
-            /* found a short ranged reg
-             *
-             * if this is used before the previous one ended, they overlap
-             */
-            if (r->first_ins->index <= last_line)
-                continue;
             /*
-             * if this is not the same basic block, the might interfer
-             * due to a branch
+             * no scan reglist for small ranged non-interfering regs of that typ
              */
-            if (r->first_ins->bbindex != bb_index)
-                continue;
-            last_line = r->last_ins->index;
-            bb_index = r->last_ins->bbindex;
-            r->color = first_color;
-            r->type = VTPASM;
-            debug(interpreter, DEBUG_IMC, "coloring '%s' %d\n",
-                    r->name, r->color);
+            bb_index = last_line = -1;
+            for (i = 0; i < n; i++) {
+                r = reglist[i];
+                if (r->set != typ || (r->type & VT_REGP) ||
+                        r->want_regno >= 0 || r->color >= 0)
+                    continue;
+                if (r->last_ins->index - r->first_ins->index > 10)
+                    continue;
+                if (r->first_ins->bbindex != r->last_ins->bbindex)
+                    continue;
+                /* found a short ranged reg
+                 *
+                 * if this is used before the previous one ended, they overlap
+                 */
+                if (r->first_ins->index <= last_line)
+                    continue;
+                /*
+                 * if this is not the same basic block, the might interfer
+                 * due to a branch
+                 */
+                if (r->first_ins->bbindex != bb_index && bb_index >= 0)
+                    continue;
+                last_line = r->last_ins->index;
+                bb_index = r->last_ins->bbindex;
+                r->color = first_color;
+                r->type = VTPASM;
+                debug(interpreter, DEBUG_IMC, "coloring '%s' %d\n",
+                        r->name, r->color);
+            }
+            first_color--;
         }
+out:
     }
 }
 #endif
@@ -376,9 +376,16 @@ build_reglist(Parrot_Interp interpreter, IMC_Unit * unit, int first)
         free_reglist(unit);
     for (i = count = 0; i < HASH_SIZE; i++) {
         SymReg * r = unit->hash[i];
-        for (; r; r = r->next)
+        for (; r; r = r->next) {
+            if (r->type & VT_REGP)
+                count++;
+#ifdef ALLOCATE_HACK
+            if (r->color >= 28)
+                continue;
+#endif
             if (r->type & VTREGISTER)
                 count++;
+        }
     }
     n_symbols = count;
     if (count == 0)
@@ -399,7 +406,10 @@ build_reglist(Parrot_Interp interpreter, IMC_Unit * unit, int first)
                 if (r->type & VT_REGP)
                     unit->reglist[count++] = r->reg;
                 else
-                    unit->reglist[count++] = r;
+#ifdef ALLOCATE_HACK
+                    if (r->color < 28)
+#endif
+                        unit->reglist[count++] = r;
                 /* rearange I/N registers
                  * XXX not here, do it, when reading the source
                  * .nciarg, ... !!!1 */
@@ -882,6 +892,11 @@ map_colors(int x, SymReg ** graph, int colors[], int typ)
     /* reserved for spilling */
     if (typ == 'P')
         colors[31] = 1;
+#ifdef ALLOCATE_HACK
+    colors[28] = 1;     /* for immediate allocation */
+    colors[29] = 1;     /* for immediate allocation */
+    colors[30] = 1;     /* for immediate allocation */
+#endif
     for (y = 0; y < n_symbols; y++) {
         if ((r = graph[x*n_symbols+y])
     	    && r->color != -1
