@@ -46,6 +46,6 @@ pmclass Continuation extends Closure {
     void* invoke (void* next) {
 	struct Parrot_Sub * cc = (struct Parrot_Sub*)PMC_data(SELF);
 	restore_context(interpreter, &cc->ctx);
-	return SELF->cache.struct_val;
+	return SUPER(next);
     }
 }

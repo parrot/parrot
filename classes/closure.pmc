@@ -38,7 +38,7 @@ pmclass Closure extends Sub {
    void* invoke (void* next) {
        struct Parrot_Sub * sub = (struct Parrot_Sub *)PMC_data(SELF);
        INTERP->ctx.pad_stack = sub->ctx.pad_stack;
-       return SELF->cache.struct_val;
+       return SUPER(next);
    }
 
    void clone (PMC *ret) {

@@ -82,9 +82,16 @@ runops_slow_core(struct Parrot_Interp *interpreter, opcode_t *pc)
     struct Parrot_Context *trace_ctx;
 #endif
 
-    code_start = interpreter->code->byte_code;
-    code_end = interpreter->code->byte_code +
-        interpreter->code->cur_cs->base.size;
+#ifdef code_start
+#  undef code_start
+#endif
+#ifdef code_end
+#  undef code_end
+#endif
+
+#define  code_start interpreter->code->byte_code
+#define  code_end   (interpreter->code->byte_code + \
+        interpreter->code->cur_cs->base.size)
 
 #ifdef USE_TRACE_INTERP
     if (Interp_flags_TEST(interpreter, PARROT_TRACE_FLAG)) {
@@ -143,6 +150,8 @@ runops_slow_core(struct Parrot_Interp *interpreter, opcode_t *pc)
        "Error: Control left bounds of byte-code block (now at location %d)!\n",
        (int)(pc - code_start));
     }
+#undef code_stat
+#undef code_end
     return pc;
 }
 

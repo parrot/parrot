@@ -28,6 +28,7 @@ typedef struct Parrot_Lexicals {
  */
 typedef struct Parrot_Sub {
     struct Parrot_Context ctx;
+    struct PackFile_ByteCode *seg;
 } * parrot_sub_t;
 
 struct Parrot_Sub * new_sub(struct Parrot_Interp * interp);

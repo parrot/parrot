@@ -176,7 +176,7 @@ inline op branch_cs (in STR) {
 	interpreter->resume_offset = -1;
     else
 	interpreter->resume_offset = fe->offset;
-    interpreter->code = fe->seg->base.pf;
+    Parrot_switch_to_cs(interpreter, fe->seg);
     interpreter->resume_flag = 1;
     goto ADDRESS(0);
 }

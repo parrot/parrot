@@ -1477,6 +1477,8 @@ Parrot_switch_to_cs(struct Parrot_Interp *interpreter,
     struct PackFile_ByteCode *new_cs)
 {
     struct PackFile_ByteCode *cur_cs = interpreter->code->cur_cs;
+    if (new_cs->base.pf != interpreter->code)
+        interpreter->code = new_cs->base.pf;
     interpreter->code->cur_cs = new_cs;
     new_cs->prev = cur_cs;
     interpreter->code->byte_code = new_cs->base.data;

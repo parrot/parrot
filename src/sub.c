@@ -66,6 +66,7 @@ new_sub(struct Parrot_Interp *interp)
         mem_sys_allocate(sizeof(struct Parrot_Sub));
     newsub->ctx.warns = interp->ctx.warns;
     buffer_mark_COW(interp->ctx.warns);
+    newsub->seg = interp->code->cur_cs;
     return newsub;
 }
 
