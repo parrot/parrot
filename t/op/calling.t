@@ -51,15 +51,16 @@ output_is(<<'CODE', <<OUTPUT, "foldup");
     set P14,P29
     set P15,P30
     new P3, .SArray
-    set P3,15
+    set P3, 4
     push P3,P27
     push P3,P26
     push P3,P25
     push P3,P23
     set I0,1
-    set I1,4
+    set I1,0
     set I2,0
     set I3,11
+    set I4,0
     savetop
     invokecc
     restoretop

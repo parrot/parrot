@@ -1035,17 +1035,17 @@ C<<bucket->value>> is now a plain pointer, no more an C<HASH_ENTRY>
 With little changes, we can again store arbitrary items if needed, see
 TODO in code.
 
-=item * 2003.11.06 
+=item * 2003.11.06
 
 boemmels renamed C<HASH> and C<HASHBUCKET> to C<Hash> and C<HashBucket>
 
-=item * 2003.11.11 
+=item * 2003.11.11
 
 leo randomize C<key_hash> seed
 
 extend C<new_hash_x()> init call by C<value_type> and C<_size>.
 
-=item * 2003.11.14 
+=item * 2003.11.14
 
 leo C<USE_STRING_EQUAL> define, see comment above
 

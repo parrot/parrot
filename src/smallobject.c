@@ -4,7 +4,7 @@ $Id$
 
 =head1 NAME
 
-src/resources.c - Handling Small Object Pools 
+src/resources.c - Handling Small Object Pools
 
 =head1 DESCRIPTION
 
@@ -226,7 +226,8 @@ get_free_object(struct Parrot_Interp *interpreter,
     arena->dod_flags[ n >> ARENA_FLAG_SHIFT ] &=
          ~((PObj_on_free_list_FLAG << (( n & ARENA_FLAG_MASK ) << 2)));
 #if ! DISABLE_GC_DEBUG
-    if (GC_DEBUG(interpreter))
+    if (GC_DEBUG(interpreter) && pool !=
+            interpreter->arena_base->pmc_ext_pool)
         ((Buffer*)ptr)->pobj_version++;
 #endif
     return ptr;
@@ -268,7 +269,8 @@ get_free_object(struct Parrot_Interp *interpreter,
     ptr = pool->free_list;
     pool->free_list = *(void **)ptr;
 #if ! DISABLE_GC_DEBUG
-    if (GC_DEBUG(interpreter))
+    if (GC_DEBUG(interpreter) && pool !=
+            interpreter->arena_base->pmc_ext_pool)
         ((Buffer*)ptr)->pobj_version++;
 #endif
     return ptr;

@@ -81,6 +81,9 @@ the_test(struct Parrot_Interp *interpreter,
 {
     Hash *hash;
     STRING *key;
+    /* FIXME this is wrong - hash takes pointers only
+       when DOD is triggered, this fails
+    */
     HashEntry value;
 
     UNUSED(cur_op);
@@ -236,15 +239,17 @@ the_test(struct Parrot_Interp *interpreter,
 	opcode_t *cur_op, opcode_t *start)
 {
     Hash *hash;
+    PMC *h;
     STRING *key;
-    HashEntry _value;
-    HashEntry *value = &_value;
     char *big;
+    PMC *i, *j;
 
     UNUSED(cur_op);
     UNUSED(start);
 
-    new_hash(interpreter, &hash);
+    h = pmc_new(interpreter, enum_class_PerlHash);
+    hash = PMC_struct_val(h);
+    i = pmc_new(interpreter, enum_class_PerlInt);
 
     if ( hash == NULL ) {
 	PIO_eprintf(interpreter, "hash creation failed\n");
@@ -255,14 +260,13 @@ the_test(struct Parrot_Interp *interpreter,
     big = calloc(BIGLEN, sizeof(char));
     big = memset(big, 'x', BIGLEN - 1);
 
-    key = string_from_cstring(interpreter, big, NULL);
+    key = string_from_cstring(interpreter, big, 0);
 
-    value->type = enum_hash_int;
-    value->val.int_val = 42;
-    hash_put(interpreter, hash, key, value);
-    value = hash_get(interpreter, hash, key);
+    VTABLE_set_integer_native(interpreter, i, 42);
+    hash_put(interpreter, hash, key, i);
+    j = hash_get(interpreter, hash, key);
 
-    PIO_eprintf(interpreter, "%i\n", value->val.int_val);
+    PIO_eprintf(interpreter, "%Pi\n", j);
 
     return NULL;
 }

@@ -64,6 +64,8 @@ ok1:
     print "ok 1\n"
     set I0, P0[.PARROT_TIMER_USEC]
     eq I0, 400000, ok2
+    eq I0, 400001, ok2
+    eq I0, 399999, ok2
     print "not "
 ok2:
     print "ok 2\n"
