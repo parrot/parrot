@@ -269,7 +269,7 @@ static INTVAL get_marray_keyed( Interp *interpreter, CELL_B *mg_marray, PMC *key
 	* it should work anyway. TODO: verify its validity
 	*/
 
-		dead_val = buffer_ptr->virtual_addr; // save our begin value
+		dead_val = buffer_ptr->virtual_addr; /* save our begin value */
 		while(buffer_ptr->virtual_addr != offs && (buffer_ptr != NULL)) {
 
                        /* my_val = (offs - (buffer_ptr->sparse_offset)); */
@@ -354,7 +354,7 @@ pmclass MultiArray {
 		 */
 
 	} else {
-		init_marray(INTERP, SELF, NULL); //no size
+		init_marray(INTERP, SELF, NULL); /* no size */
 	}
 	
     }
