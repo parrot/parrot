@@ -214,6 +214,51 @@ The mailing list precedes the Parrot joke and subsequent unveiling of
 the True Grand Project by a number of months. We've just not gotten
 around to renaming the mailing list. We will.
 
+=head2 Pugs is going great shakes - why not just toss Parrot and run Perl 6 on Pugs?
+
+Autrijus Tang, the lead on the Pugs project, notes that an B<unoptimised>
+Parrot is already 30% faster than Haskell. Add compiler optimisation and a
+few planned optimisations and Parrot will beat Pugs for speed hands down.
+Autrijus thinks that Pugs could be made faster with some Haskell compiler
+tricks, but it's harder work and less effective than the Parrot optimisations
+we already know how to do.
+
+Perl 5 is highly portable, and builds on around 50 different systems, many
+far removed from Unix or MS Windows. We'd like Perl 6 to be able run
+everywhere that Perl 5 runs, so we need to keep Parrot as portable as possible.
+The Glasgow Haskell Compiler is a pain to build on minor systems, and downright
+impossible on small systems. So by going with Pugs and Haskell we'd be
+sacrificing portability.
+
+Finally there is a reason the Parrot design keeps talking about running
+bytecode direct from disk rather than relying on doing compiling (from Perl or
+with a JIT) in memory. It's all very well doing such operations when running
+one program, but think what happens on a multi-user system when 300 people
+fire up "parrot order.pbc" - 300 parrot processes all fighting for resources.
+To quote Dan,
+
+  non-jit vss/rss is 29784 17312, JIT vss/rss is 122032 108916. A not
+  insignificant difference :)
+
+With read only bytecode shared between processes, much of that "non-jit"
+resident memory is going to be shared. So much less swapping. And don't think
+that this won't matter to you because you don't have 300 users all running
+the same program - consider what happens if each Perl 6 module is compiled to
+bytecode. With read only bytecode 300 different Perl scripts all share the
+same memory for Carp.pbc, warnings.pbc, etc. Without, and they're all swapping
+like crazy...
+
+=head2 OK, so Parrot is fast... Pugs can back-end to Parrot, right?
+
+Yes (though at this time, that's in the early stages). Still, the
+ultimate goal is for Perl 6 to be self-hosting (that is, written in
+itself) in order to improve introspection, debugger capabilities,
+compile-time semantic modulation, etc. For this reason, Pugs will
+probably be the compiler that first compiles the ultimate Perl 6
+compiler, but thereafter Pugs will no longer be the primary reference
+implementation. This is documented by the Pugs team at
+L<http://svn.perl.org/perl6/pugs/trunk/docs/01Overview.html>
+
 =head1 PARROT AND PERL
 
 =head2 Why re-implement Perl?
@@ -490,6 +535,9 @@ Really.: http://developer.apple.com/techpubs/mac/PPCSoftware/PPCSoftware-13.html
 =cut
 
 =head1 VERSION
+
+The FAQ is now in version control and "Revision" isn't really being tracked.
+The most recent CVS ID is C<$Id$>
 
 =over 4
 
