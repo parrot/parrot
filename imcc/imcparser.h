@@ -261,6 +261,7 @@
 #ifndef YYSTYPE
 #line 249 "imcc/imcc.y"
 typedef union {
+    IdList * idlist;
     int t;
     char * s;
     SymReg * sr;
@@ -270,7 +271,7 @@ typedef union {
     SymbolTable * symtab;
 } yystype;
 /* Line 1281 of /usr/share/bison/yacc.c.  */
-#line 274 "imcc/imcparser.h"
+#line 275 "imcc/imcparser.h"
 # define YYSTYPE yystype
 #endif
 
