@@ -1,6 +1,6 @@
 #! perl -w
 
-use Parrot::Test tests => 37;
+use Parrot::Test tests => 40;
 
 my $fp_equality_macro = <<'ENDOFMACRO';
 fp_eq	macro	J,K,L
@@ -493,6 +493,55 @@ foobar
 OUTPUT
 
 #
+# Basic string number conversion
+#
+output_is(<<CODE, <<OUTPUT, "string to int");
+	new	P0, 0
+
+	set	P0, "1"
+	set	I0, P0
+	print	I0
+	print	P0
+	print	"\\n"
+
+	set	P0, " 1"
+	set	I0, P0
+	print	I0
+	print	P0
+	print	"\\n"
+
+	set	P0, "-1"
+	set	I0, P0
+	print	I0
+	print	P0
+	print	"\\n"
+
+	end
+CODE
+11
+1 1
+-1-1
+OUTPUT
+
+SKIP: { skip("sting->num not finished yet", 1);
+output_is(<<CODE, <<OUTPUT, "nasty string -> int");
+	new	P0, 0
+	set	P0, "Z1"
+	set	I0, P0
+	print	I0
+	print	P0
+	print	"\\n"
+
+	set	P0, "\0 1"
+	set	I0, P0
+	print	I0
+	print	"\\n"
+CODE
+1Z1
+1
+OUTPUT
+}
+#
 # Arithmetic operators
 #
 output_is(<<'CODE', <<OUTPUT, "add integer to string integer");
@@ -583,6 +632,20 @@ EQ1:	print "ok 1\\n"
 	end
 CODE
 ok 1
+OUTPUT
+
+output_is(<<CODE, <<OUTPUT, "p =  p % p (int % int)");
+	new 	P0, 0
+	new	P1, 0
+	new	P2, 0
+	set	P0, 11
+	set	P1, 10
+	mod	P2, P0, P1
+	print	P2
+	print	"\\n"
+	end
+CODE
+1
 OUTPUT
 
 1;

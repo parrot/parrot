@@ -344,6 +344,8 @@ These operations load registers from constants or other registers.
 
 =item B<set>(p, sc)
 
+=item B<set>(i, p)
+
 Set $1 to $2.
 
 =cut
@@ -375,6 +377,10 @@ AUTO_OP set(p, n|nc) {
 
 AUTO_OP set(p, s|sc) {
   $1->vtable->set_string_native(interpreter, $1, $2);
+}
+
+AUTO_OP set(i, p) {
+  $1 = $2->vtable->get_integer(interpreter, $2);
 }
 
 =back
