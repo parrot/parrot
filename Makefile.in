@@ -48,9 +48,6 @@ Parrot/OpLib/core.pm: core.ops
 examples/assembly/mops.c: examples/assembly/mops.pbc
 	$(PERL) pbc2c.pl examples/assembly/mops.pbc > examples/assembly/mops.c
 
-examples/assembly/mops$(O): examples/assembly/mops.c
-	$(CC) -o examples/assembly/mops$(O) -c -I./include examples/assembly/mops.c
-
 examples/assembly/mops${exe}: examples/assembly/mops$(O) $(O_FILES)
 	$(CC) $(CFLAGS) -o examples/assembly/mops${exe} examples/assembly/mops$(O) $(O_FILES) $(C_LIBS)
 
