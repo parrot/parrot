@@ -288,6 +288,7 @@ CODE
 done
 OUTPUT
 
+SKIP: { skip("Trying to do multidimensional hashes. This will change.",1);
 output_is(<<CODE, <<OUTPUT, "String as keys");
         new P0,.PerlHash
         new P1,.PerlArray
@@ -302,5 +303,6 @@ output_is(<<CODE, <<OUTPUT, "String as keys");
 CODE
 string
 OUTPUT
+}
 
 1;

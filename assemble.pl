@@ -624,6 +624,31 @@ sub _numeric_constant {
   return ['nc',$self->{constants}{n}{$constant}];
 }
 
+=item _to_keyed
+
+Convert the operator to a keyed operator. Admittedly it's not much of a
+transformation, but it's a way to mark the code.
+
+=cut
+
+sub _to_keyed {
+  my $operator = shift;
+  return if $operator->[0][0] =~ /^[a-zA-Z]+_keyed/;
+  $operator->[0][0] =~ s/^([a-zA-Z]+)/${1}_keyed/;
+}
+
+=item _to_keyed_integer
+
+Convert the operator to a keyed operator
+
+=cut
+
+sub _to_keyed_integer {
+  my $operator = shift;
+  return if $operator->[0][0] =~ /^[a-zA-Z]+_keyed_integer/;
+  $operator->[0][0] =~ s/^([a-zA-Z]+)/${1}_keyed_integer/;
+}
+
 =item to_bytecode
 
 Take the content array ref and turn it into a ragged AoAoA of operations with
@@ -723,21 +748,23 @@ sub to_bytecode {
       # XXX of the string, so we can nip off another argument.
       #
       elsif($temp=~s/^\[k;($reg_re)/\[k/) {
-        my $reg_idx = substr(1,$1);
+        my $reg_idx = substr($1,1);
         unless($reg_idx >= 0 and $reg_idx <= 31) {
           print STDERR "Caught out-of-bounds register $1 at line $_->[1].\n";
           last;
         }
         $suffixes .= "_k";
+        _to_keyed($_);
         push @{$_->[0]}, ['k',$1];
       }
       elsif($temp=~s/^\[(S\d+)\]//) { # The only key register should be Sn
-        my $reg_idx = substr(1,$1);
+        my $reg_idx = substr($1,1);
         unless($reg_idx >= 0 and $reg_idx <= 31) {
           print STDERR "Caught out-of-bounds register $1 at line $_->[1].\n";
           last;
         }
-        $suffixes .= "_s";
+        $suffixes .= "_k";
+        _to_keyed($_);
         push @{$_->[0]}, ['s',$1];
       }
       elsif($temp=~s/^($flt_re)//) {
@@ -745,20 +772,24 @@ sub to_bytecode {
         push @{$_->[0]}, $self->_numeric_constant($1);
       }
       elsif($temp=~s/^\[($str_re)\]//) {
-        $suffixes .= "_sc";
+        $suffixes .= "_kc";
+        _to_keyed($_);
         push @{$_->[0]}, $self->_string_constant($1);
       }
       elsif($temp=~s/^\[($bin_re)\]//) { # P3[0b11101]
         my $val = $1;$val=~s/0b//;
         $suffixes .= "_ic";
+        _to_keyed_integer($_);
         push @{$_->[0]}, ['ic',(strtol($val,2))[0]];
       }
       elsif($temp=~s/^\[($hex_re)\]//) { # P7[0x1234]
         $suffixes .= "_ic";
+        _to_keyed_integer($_);
         push @{$_->[0]}, ['ic',(strtol($1,16))[0]];
       }
       elsif($temp=~s/^\[($dec_re)\]//) { # P14[3]
         $suffixes .= "_ic";
+        _to_keyed_integer($_);
         push @{$_->[0]}, ['ic',0+$1];
       }
       elsif($temp=~s/^($bin_re)//) {     # 0b1101
