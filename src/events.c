@@ -504,10 +504,8 @@ Parrot_schedule_broadcast_qentry(QUEUE_ENTRY* entry)
              * handle it
              * Finally, we send the first (main) interpreter that signal
              *
-             * or just send to all?
+             * For now just send to all.
              *
-             * TODO put first interpreter into interp. array immediately
-             *      not only when threads are started
              */
             switch(event->u.signal) {
                 case SIGINT:
@@ -516,8 +514,9 @@ Parrot_schedule_broadcast_qentry(QUEUE_ENTRY* entry)
                         for (i = 1; i < n_interpreters; ++i) {
                             edebug((stderr, "deliver SIGINT to %d\n", i));
                             interp = interpreter_array[i];
-                            Parrot_schedule_interp_qentry(interp,
-                                    dup_entry(entry));
+                            if (interp)
+                                Parrot_schedule_interp_qentry(interp,
+                                        dup_entry(entry));
                         }
                         UNLOCK(interpreter_array_mutex);
                     }

@@ -22,8 +22,9 @@ B<PARROT_HAS_HEADER_PTHREAD> link against B<libpthread>.
 =head1 DESCRIPTION
 
 On construction of the first interpreter (that one with no
-B<parent_interpreter>) an B<event_thread> is started, which manages
-the static global B<event_queue>.
+B<parent_interpreter>) two threads are started: The B<event_thread>,
+which manages the static global B<event_queue> and the B<io_thread>
+which is responsible for signal and IO related events.
 
 =head2 Events
 
@@ -50,6 +51,25 @@ When the popped off entry is a timed event and has a repeat interval,
 the entry is duplicated and reinserted with the interval added to the
 current time.
 
+=head2 B<Signals>
+
+All signals that should be handled inside Parrot are blocked in all
+threads and only enabled in the B<io_thread>. The signal handler
+functions just sets an atomic flag, that this signal arrived and
+returns. This finally interrupts the select(2) loop in the
+B<io_thread>.
+
+=head2 The B<io_thread>
+
+The B<io_thread> sleeps in a select(2) loop, which is interrupted,
+when either a signal arrives or when one of the file descriptors has a
+ready condition. Additionally the file descriptor set contains the
+reader end of an internal pipe, which is used by other threads, to
+communicate with the B<io_thread>.
+
+Signal events like SIGINT are broadcasted to all running
+interpreters, which then throw an approprate exception.
+
 =head2 The interpreter event checking code
 
 We cannot interrupt the interpreter at arbitrary points and run some
@@ -63,11 +83,14 @@ the event. The same scheme works for the CGOTO core, where the address
 table is replaced. The switched core does an explicit check if events
 are to be handled.
 
-Prederefed and especially the CGP core are not handled yet. The plan
-is to replace backward branches (and invoke) in the opcode image, with
-the B<check_events__> opcode.
+Prederefed and especially the CGP core don't have an opcode dispatch
+table that is checked during running the opcodes. When an event is
+scheduled, the event handler replaces backward branches in the opcode
+image, with the B<check_events__> opcode.
 
-After all events are poped off and handled, the opcode dispatch table
+The JIT core doesn't handles events yet.
+
+After all events are popped off and handled, the opcode dispatch table
 is restored to its original, and the B<check_events__> reexecutes the
 same instruction again, which is now the real one and thus normal
 execution flow continues.
@@ -83,24 +106,12 @@ all cores execept switched and JIT.
 
 Sync events could be placed directly into the interpreters task queue.
 
-=item Broadcast events
-
-When there is no interpreter argument for an event, broadcast the event
-to all running interpreters or depeding on the event type, only to the
-first interpreter.
-
 =item Async IO
 
 That depends probably on the underlying OS, i.e. if it does async IO
 or we have to do it.
 
-=item timer.pmc
-
-Remove time handling code, use events.
-
-=item Handle event priorities
-
-=item Signals
+=item Event priorities
 
 =item A lot more
 
