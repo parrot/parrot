@@ -143,15 +143,14 @@ This method is primarily used when the interpreter has need of
 coercing a PMC to a particular type, and isn't meant as a general
 purpose casting tool. Compilers should only emit valid transformations.
 
-=item PMC* mark(INTERP, PMC* self, PMC* tail)
+=item void mark(INTERP, PMC* self)
 
 Called by the DOD when it is sweeping through the PMCs and has detected
-that this PMC is both alive and has a custom mark routine. The second
-parameter is the PMC at the tail of the free PMC list, as passed to
-C<mark_used>. This should return the new tail of the free PMC list.
+that this PMC is both alive and has a custom mark routine (as indicated
+by the custom mark PMC flag). 
 
-If a PMC has this set, it is responsible for marking all buffers and
-PMCs under its control as alive. If it does not, those PMCs or buffers
+If a PMC has this flag set, then it is responsible for marking all buffers 
+and PMCs under its control as alive. If it does not, those PMCs or buffers
 may be collected later. This method does I<not> have to call the
 C<mark> method on any PMCs it marks--the DOD system takes care of
 that. (So no need to recurse into aggregate PMCs or anything of the sort).
