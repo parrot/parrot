@@ -58,6 +58,10 @@ The following functions are supported in the full expression parser:
 	        begins in X
 	ASC(X)  Return the ASCII code for the character X
 	CHR(X)  Return the ASCII character for the code X
+	SQR(X)  Square root of X
+	SIN(X)  Sine of X (radians)
+	COS(X)  Cosine of X (radians)
+	LOG(X)	Base-e log of X
 
 Additionally, the expression parser understands:
 	*+/-    Operators, will perform them
@@ -77,7 +81,7 @@ BASIC NOTES
    Multidimensional variables: Alpha and Numeric
    String delimiters: ' and ", interchangeable
    Conditionals: < > = and <> (not equal)
-   Math: Integer arithmetic only
+   Math: 32-bit floating-point arithmetic.  (*new)
    Case sensitive: All statements and keywords
    Line numbers: Required
    

@@ -14,6 +14,9 @@
 #
 # $Id$
 # $Log$
+# Revision 1.9  2002/06/16 21:23:28  clintp
+# Floating Point BASIC
+#
 # Revision 1.8  2002/06/03 21:45:01  clintp
 # FINALLY runs under new assembler
 #
@@ -244,7 +247,7 @@ READ_PEEK:
 	save S0  # Name
 	save S2  # Value
 	eq I3, .STYPE, DATA_STR
-	bsr ATOI
+	bsr ATON
 	bsr NSTORE
 	branch END_I_READ
 
@@ -269,8 +272,7 @@ END_I_READ:
 # PRINT		 (just a newline)
 # PRINT expr     (anything else)
 #   I6 is the trailing newline marker
-I_PRINT:
-	pushi
+I_PRINT: pushi
 	pushs
 	set I6, 1
 	restore I0  # Line number
@@ -351,7 +353,7 @@ I_LET:  pushi
 
 LETNUM: save S1
 	save S0
-	bsr ATOI
+	bsr ATON
 	bsr NSTORE
 
 END_I_LET:
@@ -570,6 +572,7 @@ IFERR:  print "FATAL: Unexpected comparison operator mismatch\n"
 # With FOR you *always* get one loop for free
 I_FOR:	pushi
 	pushs
+	pushn
 	restore I10  # My line number.
 
 	restore I5
@@ -582,15 +585,15 @@ I_FOR:	pushi
 	save I5
 	save "TO"    # Stopword
 	bsr EVAL_EXPR
-	bsr ATOI
-	restore I0
+	bsr ATON
+	restore N0
 
 	restore I5
 	save I5
 	eq I5, 0, ERR_SYN_CLEAR  # If the "TO" is missing
 
 	save S0	     # Variable name
-	save I0      # Begin value
+	save N0      # Begin value
 	bsr NSTORE
 
 	restore I5
@@ -621,7 +624,7 @@ NOARGSFOR:
 	# Okay, what's on the stack now?  A step?
 	restore I5
 	save I5
-	set I3, 1    # Assume step 1
+	set N3, 1    # Assume step 1
 	eq I5, 0, NOSTEP
 	restore I5
 	restore S1
@@ -633,9 +636,9 @@ NOARGSFOR:
 	bsr EVAL_EXPR
 	restore S31
 	save S31
-	bsr ATOI
-	restore I3   # The step
-	eq I3, 0, FOR_SYNTAX1
+	bsr ATON
+	restore N3   # The step
+	eq N3, 0.0, FOR_SYNTAX1
 
 NOSTEP:
 	bsr CLEAR    # clear instruction stack
@@ -645,8 +648,8 @@ NOSTEP:
 	# Meddle with runtime stack
 	restore I5   # The old depth
 
-	save I3
-	bsr ITOA   # Step
+	save N3
+	bsr NTOA   # Step
 	inc I5
 
 	save S2	   # Final (this is an expression!)
@@ -672,6 +675,7 @@ END_I_FOR:
 	save I24
 	popi
 	pops
+	popn
 	restore I24
 	ret
 
@@ -683,6 +687,7 @@ FOR_SYNTAX1:
 #
 I_NEXT: pushi
 	pushs
+	pushn
 	restore I10  # My Line #
 	restore I5
 
@@ -691,7 +696,7 @@ I_NEXT: pushi
 	restore S0   # Variable Name
 	save S0
 	bsr NFETCH
-	restore I0   # Current value
+	restore N0   # Current value
 	dec I5
 	save I5      # Clear rest of INSTRUCTION stack
 	bsr CLEAR
@@ -727,42 +732,42 @@ I_NEXT: pushi
 	bsr REVERSESTACK
 	save ""		  # No stopwords
 	bsr EVAL_EXPR
-	bsr ATOI
-	restore I2
+	bsr ATON
+	restore N2
 	dec I5
 	bsr CLEAR
 	restore I1   # dummy
 
-	bsr ATOI
-	restore I3   # Step
+	bsr ATON
+	restore N3   # Step
 	dec I5
 
 	# FOR LOOP CONTINUE (logic used by NEXT)
-	#     I3  - step
-	#     I2  - end value
-	#     I0  - current value
+	#     N3  - step
+	#     N2  - end value
+	#     N0  - current value
 	#     I11 - branch target (if succeed)
 	#
-	#   STEP > 0    IF I0 > I2  BAIL
-	#               IF I0 <= I2 CONTINUE
-	#   STEP < 0    IF I0 < I2  BAIL
-	#               IF I0 >= I2 CONTINUE
-	add I0, I0, I3
+	#   STEP > 0    IF N0 > N2  BAIL
+	#               IF N0 <= N2 CONTINUE
+	#   STEP < 0    IF N0 < N2  BAIL
+	#               IF N0 >= N2 CONTINUE
+	add N0, N0, N3
 
 	save S0
-	save I0
+	save N0
 	bsr NSTORE
 
-	lt I3, 0, FOR_BACK
-	gt I0, I2, GO_FORWARD
+	lt N3, 0.0, FOR_BACK
+	gt N0, N2, GO_FORWARD
 	branch GO_BACK
 FOR_BACK:
-	lt I0, I2, GO_FORWARD
+	lt N0, N2, GO_FORWARD
 	branch GO_BACK
 
 GO_BACK:
-	save I3  # Step
-	bsr ITOA
+	save N3  # Step
+	bsr NTOA
 
 	save S8  # Final Expr
 	save S0  # Var name
@@ -780,6 +785,7 @@ GO_BACK:
 	save I24
 	popi
 	pops
+	popn
 	restore I24
 	restore I23
 	ret
@@ -789,6 +795,7 @@ GO_FORWARD:
 	save I24
 	popi
 	pops
+	popn
 	restore I24
 	ret       # Go to next instruction normally
 
@@ -1085,7 +1092,7 @@ I_INPUT:
 
 	save S0
 	save S5
-	bsr ATOI
+	bsr ATON
 	bsr NSTORE
 	branch ENDINPUT
 

@@ -10,6 +10,9 @@
 #
 # $Id$
 # $Log$
+# Revision 1.3  2002/06/16 21:23:28  clintp
+# Floating Point BASIC
+#
 # Revision 1.2  2002/04/29 01:10:04  clintp
 # Speed changes, new language features
 #

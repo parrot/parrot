@@ -14,6 +14,9 @@
 #
 # $Id$
 # $Log$
+# Revision 1.9  2002/06/16 21:23:28  clintp
+# Floating Point BASIC
+#
 # Revision 1.8  2002/06/03 21:45:01  clintp
 # FINALLY runs under new assembler
 #
@@ -85,24 +88,22 @@
 #    call
 #
 # Store numerics
-NSTORE: 
-	pushi
+NSTORE: pushn
 	pushs
-	restore I1   # Value
+	restore N1   # Value
 	restore S0   # Name
-	set P20[S0], I1
-	popi
+	set P20[S0], N1
+	popn
 	pops
 	ret
 
 # Fetch Numerics
-NFETCH: 
-	pushi
+NFETCH: pushn
 	pushs
 	restore S0   # Name
-	set I1, P20[S0]
-	save I1
-	popi
+	set N1, P20[S0]
+	save N1
+	popn
 	pops
 	ret
 

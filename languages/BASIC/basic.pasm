@@ -10,6 +10,9 @@
 #
 # $Id$
 # $Log$
+# Revision 1.7  2002/06/16 21:23:28  clintp
+# Floating Point BASIC
+#
 # Revision 1.6  2002/06/01 18:23:01  clintp
 # For new assembler
 #
@@ -76,7 +79,11 @@ NOLINE: restore S0
 	set I22, 0 # Error flag
 	eq I25, 0, LOAD_TABLE
 
-	trace I25
+	print "Running "
+	print I4 
+	print " "
+	print S0
+	print "\n"
 
 
 LOAD_TABLE:

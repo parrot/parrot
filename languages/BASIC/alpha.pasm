@@ -7,6 +7,9 @@
 #
 # $Id$
 # $Log$
+# Revision 1.3  2002/06/16 21:23:28  clintp
+# Floating Point BASIC
+#
 # Revision 1.2  2002/04/29 01:10:04  clintp
 # Speed changes, new language features
 #
@@ -40,7 +43,8 @@ NONLOW:
         branch NONUM
 NUMBER: le S1, "9", ALPHA
 NONUM:  eq S1, "_", ALPHA
-        # Not A-Z0-9_
+	eq S1, ".", ALPHA
+        # Not A-Z0-9_.
 	set I1, 0
 	branch LEAVE_ISALPHA
 ALPHA:  set I1, 1
@@ -120,6 +124,15 @@ ATOI:   pushi
 	pops
 	ret
 
+ATON:   pushn
+	pushs
+	restore S0
+	set N0, S0
+	save N0
+	popn
+	pops
+	ret
+
 # itoa  -- Integer to string
 #  Inputs: Integer on stack
 # Outputs: String on top of the stack
@@ -131,6 +144,38 @@ ITOA: 	pushi
 	set S0, I0
 	save S0
 	popi
+	pops
+	ret
+
+# ANSI-C's %f format uses something like %.6f which
+# is ugly and exposes things I'd rather not have exposed.
+NTOA: 	pushn
+	pushs
+	pushi
+	restore N0
+	set S0, N0
+	length I0, S0
+	dec I0
+	eq 0, I0, NTOADONE
+
+NTOATRUNC:
+	le I0, 0, NTOADONE
+	substr S1, S0, I0, 1
+	ne S1, "0", NTOA_ALMOST
+	substr S0, S0, 0, I0
+	dec I0
+	branch NTOATRUNC
+
+NTOA_ALMOST:
+	substr S1, S0, I0, 1
+	ne S1, ".", NTOADONE
+	substr S0, S0, 0, I0
+	dec I0
+
+NTOADONE:
+	save S0
+	popi
+	popn
 	pops
 	ret
 
@@ -269,23 +314,53 @@ PADE:   save S1
 # isnum -- is this thing a number?
 #  Inputs: string on stack
 # Outputs: 1 if it is, 0 if it is not
-# Converts to integer and back, if that worked then it's a number.
-#  (Simple view of the world  :)
+#   I can't think of a fast and easy way to do this.
+#   The obvious ways are all flawed.  BF&I then.
 ISNUM:
 	pushi
+	pushn
 	pushs
 	restore S0  # The thing in question
-	save S0
-	bsr ATOI
-	bsr ITOA
-	restore S1
-	eq S1, S0, ISNUM_YES
-	save 0
-	branch ENDISNUM
+
+	length I0, S0
+	eq 0, I0, NOTISNUM
+	set I1, 0
+	set I3, 0  # Decimal flag
+
+NUMLOOP:
+	eq I1, I0, ISNUM_YES
+	gt I3, 1, NOTISNUM     # Multiple .'s
+	substr S1, S0, I1, 1
+	eq S1, "-", ISNUMNEG
+	ne S1, ".", NOPOINT
+	inc I3
+	inc I1
+	branch NUMLOOP
+
+ISNUMNEG:
+	gt I1, 0, NOTISNUM	# - not in first position
+	eq I0, 1, NOTISNUM	# or bare -
+	inc I1
+	branch NUMLOOP
+
+NOPOINT:
+	ge S1, "0", STILLNUM
+	branch NOTISNUM
+STILLNUM:
+	le S1, "9", GOTNUM
+	branch NOTISNUM
+GOTNUM:
+	inc I1
+	branch NUMLOOP
+
 ISNUM_YES:
 	save 1
+	branch ENDISNUM
+NOTISNUM:
+	save 0
 ENDISNUM:
 	popi
+	popn
 	pops
 	ret
 

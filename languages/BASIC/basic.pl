@@ -2,6 +2,9 @@
 #
 # $Id$
 # $Log$
+# Revision 1.11  2002/06/16 21:23:28  clintp
+# Floating Point BASIC
+#
 # Revision 1.10  2002/06/03 03:51:53  clintp
 # Minor edits for compilation
 #
@@ -25,6 +28,8 @@ open(T, ">merged_basic.pasm") || die;
 $a=<<'EOF';
 
 # I5 Stack Depth?
+	collectoff
+	sweepoff
 
 	new P20, .PerlHash     # PerlHash   # Numerics
 	new P21, .PerlHash     # Alphabetics.

@@ -1,9 +1,10 @@
 10 GOSUB 100
-20 GOSUB 300
-30 GOSUB 400
-40 GOSUB 500
-50 GOSUB 600
-60 GOSUB 700
+15 GOSUB 300
+20 GOSUB 400
+25 GOSUB 500
+30 GOSUB 600
+35 GOSUB 700
+40 GOSUB 800
 90 END
 100 REM 
 101 REM Exercise the expression evaluator
@@ -79,7 +80,7 @@
 502 REM
 505 PRINT "Distribution of 100 random numbers 1-10:"
 510 FOR I=0 TO 99
-520 LET NUMBER=RND(10)
+520 LET NUMBER=INT(RND(10))
 530 LET ARR(NUMBER)=ARR(NUMBER)+1
 540 NEXT I
 545 FOR I=0 TO 9
@@ -93,7 +94,7 @@
 600 REM
 601 REM Conditionals and stuff
 602 REM
-603 PRINT "Conditionals.  Loop 5 times and then bail\n"
+603 PRINT "Conditionals.  Loop 5 times and then bail"
 604 LET I=0
 605 LET I=I+1
 606 PRINT "Loop ";
@@ -125,3 +126,23 @@
 795 PRINT
 797 NEXT I
 799 RETURN
+800 REM
+801 REM Floating Point stuff
+802 REM
+810 PRINT "Floating point tests"
+820 PRINT "PI more or less: ";
+825 PRINT 22/7
+830 PRINT "Count from 0 to 2.5 by .3: ";
+835 FOR I=0 TO 2.5 STEP .3
+840 PRINT I;
+842 PRINT " ";
+845 NEXT I
+847 PRINT
+850 PRINT "FP Functions: SIN/COS: "
+860 FOR I=0 TO (22/7)*2 STEP .5
+865 FOR J=0 TO 10+INT(10*SIN(I))
+866 PRINT " ";
+867 NEXT J
+868 PRINT "*"
+870 NEXT I
+899 RETURN

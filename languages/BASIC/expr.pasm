@@ -8,6 +8,9 @@
 #
 # $Id$
 # $Log$
+# Revision 1.9  2002/06/16 21:23:28  clintp
+# Floating Point BASIC
+#
 # Revision 1.8  2002/06/03 21:45:01  clintp
 # FINALLY runs under new assembler
 #
@@ -100,6 +103,7 @@ INITOPSTACK:
 ISFUNC:
 	pushi
 	pushs
+	pushn
 	set I10, 1   # Only test and return.
 	save 1	     # Falsify stack
 	branch FUNCDISPATCH
@@ -109,6 +113,7 @@ ISFUNC:
 STFUNCDISPATCH:
 	pushi
 	pushs
+	pushn
 	set I10, 0   # Actually *DO* the function.
 
 FUNCDISPATCH:
@@ -130,9 +135,14 @@ FUNCDISPATCH:
 #
 FUNCJUMP:
 	eq S0, "ABS", FUNC_ABS
+	eq S0, "SQR", FUNC_SQR
+	eq S0, "SIN", FUNC_SIN
+	eq S0, "COS", FUNC_COS
+	eq S0, "LOG", FUNC_LOG
 	eq S0, "LEN", FUNC_LEN
 	eq S0, "RND", FUNC_RND
 	eq S0, "MID", FUNC_MID	
+	eq S0, "INT", FUNC_INT	
 	eq S0, "ASC", FUNC_ASC
 	eq S0, "CHR", FUNC_CHR
 	eq S0, "RIGHT", FUNC_RIGHT
@@ -151,14 +161,17 @@ ENDFUNCDISPATCH:
 	save I24
 	popi
 	pops
+	popn
 	restore I24     # Random number seed.
 	ret
+
 ENDISFUNC:
 	restore I0	# The fake depth we used before
 	dec I10		# 2->1  1->0
 	save I10
 	popi
 	pops
+	popn
 	ret
 
 # Here's some functions!
@@ -177,7 +190,53 @@ FUNC_ABS:
 	restore I0
 	mul I0, I0, -1
 	save I0
-	bsr ITOA
+	bsr NTOA
+	branch ENDFUNCDISPATCH
+
+FUNC_SQR:
+	inc I10
+	gt I10, 1, ENDISFUNC
+	restore I5
+	ne I5, 1, FUNC_ERR
+	bsr ATON
+	restore N0
+	pow N0, N0, 0.5
+	save N0
+	bsr NTOA
+	branch ENDFUNCDISPATCH
+
+FUNC_SIN:
+	inc I10
+	gt I10, 1, ENDISFUNC
+	restore I5
+	ne I5, 1, FUNC_ERR
+	bsr ATON
+	restore N0
+	sin N0, N0
+	save N0
+	bsr NTOA
+	branch ENDFUNCDISPATCH
+FUNC_COS:
+	inc I10
+	gt I10, 1, ENDISFUNC
+	restore I5
+	ne I5, 1, FUNC_ERR
+	bsr ATON
+	restore N0
+	cos N0, N0
+	save N0
+	bsr NTOA
+	branch ENDFUNCDISPATCH
+FUNC_LOG:
+	inc I10
+	gt I10, 1, ENDISFUNC
+	restore I5
+	ne I5, 1, FUNC_ERR
+	bsr ATON
+	restore N0
+	ln N0, N0
+	save N0
+	bsr NTOA
 	branch ENDFUNCDISPATCH
 
 # instr(string, substring)  0=not found, otherwise offset
@@ -195,7 +254,7 @@ FUNC_INSTR:
 	restore I0
 	inc I0
 	save I0
-	bsr ITOA
+	bsr NTOA
 	branch ENDFUNCDISPATCH
 
 # Returns the Epoch seconds (core op TIME INT)
@@ -206,9 +265,8 @@ FUNC_TIME:
 	ge I5, 1 FUNC_ERR	# No arguments for time()
 	time I0
 	save I0
-	bsr ITOA
+	bsr NTOA
 	branch ENDFUNCDISPATCH
-
 
 FUNC_LEN:
 	inc I10
@@ -218,7 +276,7 @@ FUNC_LEN:
 	restore S1
 	length I0, S1
 	save I0
-	bsr ITOA
+	bsr NTOA
 	branch ENDFUNCDISPATCH
 # The old seed is kept in
 # Uses X[n+1]=(a*x[n]+c) mod m
@@ -226,6 +284,8 @@ FUNC_LEN:
 # I24 is the seed.  The period is 65536
 # and probably isn't fair in the low bits.
 #
+.constant RANDMAX 65536
+.constant RANDMAXF 65536.0
 FUNC_RND:
 	inc I10
 	gt I10, 1, ENDISFUNC  	# Only checking!
@@ -235,8 +295,25 @@ FUNC_RND:
 	restore I0  		# Range for random
 	mul I24, I24, 5         # *a
 	add I24, I24, 1         # +c	
-	mod I24, I24, 65536	# % m
-	mod I0, I24, I0
+	mod I24, I24, .RANDMAX  
+	# % m
+	set N0, I24            # Big 'ol number.
+	div N0, N0, .RANDMAXF  
+	# <1.0 decimal
+	set N1, I0
+	mul N0, N0, N1   # Scale it to the argument
+	save N0
+	bsr NTOA
+	branch ENDFUNCDISPATCH
+
+FUNC_INT:
+	inc I10
+	gt I10, 1, ENDISFUNC
+	restore I5
+	ne I5, 1, FUNC_ERR
+	bsr ATON
+	restore N0
+	set I0, N0
 	save I0
 	bsr ITOA
 	branch ENDFUNCDISPATCH
@@ -290,7 +367,6 @@ FUNC_RIGHT:
 F_R_TOOSHORT:
 	save S0
 	branch ENDFUNCDISPATCH
-	
 
 FUNC_CHR: 
 	inc I10
@@ -319,7 +395,7 @@ FUNC_ASC:
 	restore I0
 	eq I0, -1, FUNC_ASCII_ERROR
 	save I0
-	bsr ITOA
+	bsr NTOA
 	branch ENDFUNCDISPATCH
 
 	# Re-used a few places.  :)
@@ -402,7 +478,7 @@ ENDSUBS:
 
 DOSUBFNUM:
 	bsr NFETCH
-	bsr ITOA
+	bsr NTOA
 DOSUBRET:
 	save I24    # Random number seed.
 	popi
@@ -782,7 +858,7 @@ FINISH:
 	#   we need to produce a valid stack from that.  DON'T 
 	#   USE TOKENIZE.  It's too smart for this.
 ALLDONE:
-	#print "RPN:"
+	##print "RPN:"
 	#print S0
 	#print "\n"
 	set I5, 0
@@ -819,6 +895,7 @@ ENDINFIX:
 DOCALC:
 	pushi
 	pushs
+	pushn
 	bsr INITOPSTACK
 	bsr REVERSESTACK
 	restore I5
@@ -828,6 +905,7 @@ CALCLOOP:
 	le I5, 0, CALCFINISH
 	restore S0
 	dec I5
+	
 	save S0
 	bsr ISNUM
 	restore I1
@@ -902,7 +980,7 @@ NORMVAR:
 	# Numeric var
 	save S0
 	bsr NFETCH	# Get the numeric value
-	bsr ITOA
+	bsr NTOA
 	restore S0
 	branch PUSHVAR
 
@@ -922,8 +1000,8 @@ PUSHVAR:save S0
 #    variables and functions should already have been resolved
 # Joy!  If either thing is *not* a number, then + should concatenate.
 #
-DOOP:   set I2, 0
-	set I3, 0
+DOOP:   set N2, 0
+	set N3, 0
 	set I8, 0          # Perform normal addition
 	set S12, ""
 	set S13, ""
@@ -939,8 +1017,8 @@ DOOP:   set I2, 0
 	inc I8
 OPNUM1:
 	save S12
-	bsr ATOI
-	restore I2
+	bsr ATON
+	restore N2
 
 	bsr OPSTACKDEPTH
 	restore I0
@@ -954,12 +1032,12 @@ OPNUM1:
 	inc I8
 OPNUM2:	
 	save S13
-	bsr ATOI
-	restore I3
+	bsr ATON
+	restore N3
 	
 	# Okay, at this point we've got either
-	#   S12  I2  (alpha/num)
-	#   S13  I3
+	#   S12  N2  (alpha/num)
+	#   S13  N3
 NOSTACK:ne S0, "+", SUB
 	eq I8, 0, NUMADD
 	set S4, ""
@@ -968,63 +1046,64 @@ NOSTACK:ne S0, "+", SUB
 	branch ENDOP # Note different branch
 
 	# Numeric ops
-NUMADD: add I4, I2, I3
+NUMADD: add N4, N2, N3
 	branch ENDNOP
 SUB:	ne S0, "-", MUL
-	sub I4, I3, I2
+	sub N4, N3, N2
 	branch ENDNOP
 MUL:	ne S0, "*", DIV
-	mul I4, I3, I2
+	mul N4, N3, N2
 	branch ENDNOP
 DIV:    ne S0, "/", EQ
-	div I4, I3, I2
+	div N4, N3, N2
 	branch ENDNOP
 
 	# Mixed ops
 	#    set to 0 or 1, branch to ENDNOP when done
 EQ:	ne S0, "=", NE
-	set I4, 1		# Assume true
+	set N4, 1.0		# Assume true
 	eq I8, 0, NEQ
 	eq S12, S13, TRUE
-	set I4, 0
+	set N4, 0.0
 	branch FALSE 
-NEQ:    eq I2, I3, TRUE
-	set I4, 0
+NEQ:    eq N2, N3, TRUE
+	set N4, 0.0
         branch FALSE
 
 NE:	ne S0, "<>", GT
-	set I4, 1
+	set N4, 1.0
 	eq I8, 0, NNE
 	ne S12, S13, TRUE
-	set I4, 0
+	set N4, 0.0
 	branch FALSE
-NNE:	ne I2, I3, TRUE
-	set I4, 0
+NNE:	ne N2, N3, TRUE
+	set N4, 0.0
 	branch FALSE
 
 
 GT:	ne S0, "<", LT
-	set I4, 1
+	set N4, 1.0
 	eq I8, 0, NGT
 	gt S12, S13, TRUE
-	set I4, 0
+	set N4, 0.0
 	branch FALSE
-NGT:	gt I2, I3, TRUE
-	set I4, 0
+NGT:	gt N2, N3, TRUE
+	set N4, 0.0
 	branch FALSE
 
 LT:	ne S0, ">", AND
-	set I4, 1
+	set N4, 1.0
 	eq I8, 0, NLT
 	lt S12, S13, TRUE
-	set I4, 0
+	set N4, 0.0
 	branch FALSE
-NLT:	lt I2, I3, TRUE
-	set I4, 0
+NLT:	lt N2, N3, TRUE
+	set N4, 0.0
 	branch FALSE
 
+	# TRUTH and false are still integers
 AND:	ne S0, "AND", OR
-	set I4, 1	# Assume true
+	set N4, 1.0	# Assume true
 	save S12
 	bsr TRUTH
 	restore I2
@@ -1034,11 +1113,11 @@ AND:	ne S0, "AND", OR
 	eq I3, 0, ANDF
 	eq I2, 0, ANDF
 	branch TRUE
-ANDF:	set I4, 0
+ANDF:	set N4, 0.0
 	branch FALSE
 
 OR:	ne S0, "OR", UNKOP
-	set I4, 1
+	set N4, 1.0
 	save S12
 	bsr TRUTH
 	restore I2
@@ -1047,7 +1126,7 @@ OR:	ne S0, "OR", UNKOP
 	restore I3
 	eq I3, 1, TRUE
 	eq I2, 1, TRUE
-ORF:	set I4, 0
+ORF:	set N4, 0
 	branch FALSE
 
 UNKOP:  branch DOFUNC
@@ -1059,8 +1138,8 @@ FALSE:
 	noop
 ENDNOP: 
 # Convert result to string again
-	save I4
-	bsr ITOA
+	save N4
+	bsr NTOA
 	set S4, ""
 	restore S4
 	branch ENDOP
@@ -1145,6 +1224,7 @@ CALCEXIT2:
 	save I24
 	popi
 	pops
+	popn
 	restore I24
 	ret
 
