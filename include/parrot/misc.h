@@ -30,6 +30,12 @@
 INTVAL   intval_mod(INTVAL i2, INTVAL i3);
 FLOATVAL floatval_mod(FLOATVAL n2, FLOATVAL n3);
 
+FLOATVAL Parrot_float_rand(INTVAL how_random);
+INTVAL Parrot_uint_rand(INTVAL how_random);
+INTVAL Parrot_int_rand(INTVAL how_random);
+INTVAL Parrot_range_rand(INTVAL from, INTVAL to, INTVAL how_random);
+void Parrot_srand(INTVAL seed);
+
 /*
  * misc.c
  */

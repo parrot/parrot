@@ -48,7 +48,7 @@ struct _hashbucket {
 
 typedef int    (*hash_comp_fn)(Parrot_Interp, void*, void*);
 typedef void   (*hash_mark_key_fn)(Parrot_Interp, PObj *);
-typedef size_t (*hash_hash_key_fn)(Parrot_Interp, void*);
+typedef size_t (*hash_hash_key_fn)(Parrot_Interp, struct _hash*, void*);
 
 struct _hash {
     Buffer buffer;              /* This struct is a Buffer subclass! */
@@ -59,13 +59,15 @@ struct _hash {
     PARROT_DATA_TYPES entry_type;   /* type of value */
     size_t value_size;          /* currently unused, if set this size
                                    at value is copied as a hash_entry */
-    hash_comp_fn   compare;
-    hash_hash_key_fn hash_val;
-    hash_mark_key_fn mark_key;
+    size_t seed;                /* randomizes the hash_key generation
+                                   updated for each new hash */
+    hash_comp_fn   compare;     /* compare two keys, 0 = equal */
+    hash_hash_key_fn hash_val;  /* generate a hash value for key */
+    hash_mark_key_fn mark_key;  /* mark a key being alive */
 };
 
 Hash * new_hash(Interp * interpreter);
-Hash * new_hash_x(Interp * interpreter,
+Hash * new_hash_x(Interp *, PARROT_DATA_TYPES, size_t val_size,
         hash_comp_fn, hash_hash_key_fn, hash_mark_key_fn);
 Hash * new_cstring_hash(Interp *interpreter);
 Hash * hash_clone(Interp * interpreter, Hash * src);
