@@ -133,15 +133,41 @@ fprintf(stderr,"Parrot_PerlString_get_bool not yet implemented!\n");
     }
 
     void add (PMC * value, PMC* dest) {
+	if(value->vtable == &Parrot_base_vtables[enum_class_PerlInt]) {
+	    dest->vtable = &Parrot_base_vtables[enum_class_PerlInt];
+            dest->vtable->set_integer_native(INTERP, dest, 
+		SELF->vtable->get_integer(INTERP, SELF) +
+                value->cache.int_val
+            );
+	}
+	else if(value->vtable == &Parrot_base_vtables[enum_class_PerlNum]) {
+	    dest->vtable = &Parrot_base_vtables[enum_class_PerlNum];
+            dest->vtable->set_number_native(INTERP, dest, 
+		SELF->vtable->get_number(INTERP, SELF) +
+                value->cache.num_val
+            );
+	}
+	else {
+	}
     }
 
     void add_int (INTVAL value, PMC* dest) {
+	dest->vtable = &Parrot_base_vtables[enum_class_PerlInt];
+        dest->vtable->set_integer_native(INTERP, dest, 
+	    SELF->vtable->get_integer(INTERP, SELF) +
+            value
+        );
     }
 
     void add_bigint (BIGINT value, PMC* dest) {
     }
 
     void add_float (FLOATVAL value, PMC* dest) {
+	dest->vtable = &Parrot_base_vtables[enum_class_PerlNum];
+	dest->vtable->set_number_native(INTERP, dest, 
+	    SELF->vtable->get_number(INTERP, SELF) +
+            value
+        );
     }
 
     void add_bigfloat (BIGFLOAT value, PMC* dest) {
@@ -151,15 +177,41 @@ fprintf(stderr,"Parrot_PerlString_get_bool not yet implemented!\n");
     }
 
     void subtract (PMC * value, PMC* dest) {
+	if(value->vtable == &Parrot_base_vtables[enum_class_PerlInt]) {
+	    dest->vtable = &Parrot_base_vtables[enum_class_PerlInt];
+            dest->vtable->set_integer_native(INTERP, dest, 
+		SELF->vtable->get_integer(INTERP, SELF) -
+                value->cache.int_val
+            );
+	}
+	else if(value->vtable == &Parrot_base_vtables[enum_class_PerlNum]) {
+	    dest->vtable = &Parrot_base_vtables[enum_class_PerlNum];
+            dest->vtable->set_number_native(INTERP, dest, 
+		SELF->vtable->get_number(INTERP, SELF) -
+                value->cache.num_val
+            );
+	}
+	else {
+	}
     }
 
     void subtract_int (INTVAL value, PMC* dest) {
+	dest->vtable = &Parrot_base_vtables[enum_class_PerlInt];
+        dest->vtable->set_integer_native(INTERP, dest, 
+	    SELF->vtable->get_integer(INTERP, SELF) -
+            value
+        );
     }
 
     void subtract_bigint (BIGINT value, PMC* dest) {
     }
 
     void subtract_float (FLOATVAL value, PMC* dest) {
+	dest->vtable = &Parrot_base_vtables[enum_class_PerlNum];
+	dest->vtable->set_number_native(INTERP, dest, 
+	    SELF->vtable->get_number(INTERP, SELF) -
+            value
+        );
     }
 
     void subtract_bigfloat (BIGFLOAT value, PMC* dest) {
@@ -169,15 +221,41 @@ fprintf(stderr,"Parrot_PerlString_get_bool not yet implemented!\n");
     }
 
     void multiply (PMC * value, PMC* dest) {
+	if(value->vtable == &Parrot_base_vtables[enum_class_PerlInt]) {
+	    dest->vtable = &Parrot_base_vtables[enum_class_PerlInt];
+            dest->vtable->set_integer_native(INTERP, dest, 
+		SELF->vtable->get_integer(INTERP, SELF) *
+                value->cache.int_val
+            );
+	}
+	else if(value->vtable == &Parrot_base_vtables[enum_class_PerlNum]) {
+	    dest->vtable = &Parrot_base_vtables[enum_class_PerlNum];
+            dest->vtable->set_number_native(INTERP, dest, 
+		SELF->vtable->get_number(INTERP, SELF) *
+                value->cache.num_val
+            );
+	}
+	else {
+	}
     }
 
     void multiply_int (INTVAL value, PMC* dest) {
+	dest->vtable = &Parrot_base_vtables[enum_class_PerlInt];
+        dest->vtable->set_integer_native(INTERP, dest, 
+	    SELF->vtable->get_integer(INTERP, SELF) *
+            value
+        );
     }
 
     void multiply_bigint (BIGINT value, PMC* dest) {
     }
 
     void multiply_float (FLOATVAL value, PMC* dest) {
+	dest->vtable = &Parrot_base_vtables[enum_class_PerlNum];
+	dest->vtable->set_number_native(INTERP, dest, 
+	    SELF->vtable->get_number(INTERP, SELF) *
+            value
+        );
     }
 
     void multiply_bigfloat (BIGFLOAT value, PMC* dest) {
@@ -187,15 +265,41 @@ fprintf(stderr,"Parrot_PerlString_get_bool not yet implemented!\n");
     }
 
     void divide (PMC * value, PMC* dest) {
+	if(value->vtable == &Parrot_base_vtables[enum_class_PerlInt]) {
+	    dest->vtable = &Parrot_base_vtables[enum_class_PerlInt];
+            dest->vtable->set_integer_native(INTERP, dest, 
+		SELF->vtable->get_integer(INTERP, SELF) /
+                value->cache.int_val
+            );
+	}
+	else if(value->vtable == &Parrot_base_vtables[enum_class_PerlNum]) {
+	    dest->vtable = &Parrot_base_vtables[enum_class_PerlNum];
+            dest->vtable->set_number_native(INTERP, dest, 
+		SELF->vtable->get_number(INTERP, SELF) /
+                value->cache.num_val
+            );
+	}
+	else {
+	}
     }
 
     void divide_int (INTVAL value, PMC* dest) {
+	dest->vtable = &Parrot_base_vtables[enum_class_PerlInt];
+        dest->vtable->set_integer_native(INTERP, dest, 
+	    SELF->vtable->get_integer(INTERP, SELF) /
+            value
+        );
     }
 
     void divide_bigint (BIGINT value, PMC* dest) {
     }
 
     void divide_float (FLOATVAL value, PMC* dest) {
+	dest->vtable = &Parrot_base_vtables[enum_class_PerlNum];
+	dest->vtable->set_number_native(INTERP, dest, 
+	    SELF->vtable->get_number(INTERP, SELF) /
+            value
+        );
     }
 
     void divide_bigfloat (BIGFLOAT value, PMC* dest) {
@@ -205,9 +309,23 @@ fprintf(stderr,"Parrot_PerlString_get_bool not yet implemented!\n");
     }
 
     void modulus (PMC * value, PMC* dest) {
+	if(value->vtable == &Parrot_base_vtables[enum_class_PerlInt]) {
+	    dest->vtable = &Parrot_base_vtables[enum_class_PerlInt];
+            dest->vtable->set_integer_native(INTERP, dest, 
+		SELF->vtable->get_integer(INTERP, SELF) %
+                value->cache.int_val
+            );
+	}
+	else {
+	}
     }
 
     void modulus_int (INTVAL value, PMC* dest) {
+	dest->vtable = &Parrot_base_vtables[enum_class_PerlInt];
+        dest->vtable->set_integer_native(INTERP, dest, 
+	    SELF->vtable->get_integer(INTERP, SELF) %
+            value
+        );
     }
 
     void modulus_bigint (BIGINT value, PMC* dest) {
@@ -223,18 +341,48 @@ fprintf(stderr,"Parrot_PerlString_get_bool not yet implemented!\n");
     }
 
     void concatenate (PMC * value, PMC* dest) {
+	dest->cache.struct_val =
+	    string_concat(INTERP,
+			  SELF->cache.struct_val,
+			  value->vtable->get_string(INTERP, value),
+			  0
+			 );
     }
 
     void concatenate_native (STRING * value, PMC* dest) {
+	dest->cache.struct_val =
+	    string_concat(INTERP,
+			  SELF->cache.struct_val,
+			  value,
+			  0
+			 );
     }
 
     void concatenate_unicode (STRING * value, PMC* dest) {
+	dest->cache.struct_val =
+	    string_concat(INTERP,
+			  SELF->cache.struct_val,
+			  value,
+			  0
+			 );
     }
 
     void concatenate_other (STRING * value, PMC* dest) {
+	dest->cache.struct_val =
+	    string_concat(INTERP,
+			  SELF->cache.struct_val,
+			  value,
+			  0
+			 );
     }
 
     void concatenate_same (PMC * value, PMC* dest) {
+	dest->cache.struct_val =
+	    string_concat(INTERP,
+			  SELF->cache.struct_val,
+			  value->cache.struct_val,
+			  0
+			 );
     }
 
     /* == operation */
