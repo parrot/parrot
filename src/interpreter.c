@@ -271,6 +271,7 @@ prederef(void ** pc_prederef, struct Parrot_Interp * interpreter)
  */
 static void
 runops_jit (struct Parrot_Interp *interpreter, opcode_t * pc) {
+#ifdef HAS_JIT
     opcode_t * code_start;
     INTVAL     code_size;
     opcode_t * code_end;
@@ -282,9 +283,10 @@ runops_jit (struct Parrot_Interp *interpreter, opcode_t * pc) {
     code_size  = interpreter->code->byte_code_size;
     code_end   = (opcode_t *)(interpreter->code->byte_code + code_size);
 
-#ifdef HAS_JIT
     jit_code = build_asm(interpreter, pc, code_start, code_end);
     (jit_code)();
+#else
+    return;
 #endif
 }
 
