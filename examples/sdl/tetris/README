@@ -1,4 +1,4 @@
 To run this example, be in the Parrot directory
 and run the following command:
 
-./parrot examples/tetris/tetris.imc
+./parrot examples/sdl/tetris/tetris.imc

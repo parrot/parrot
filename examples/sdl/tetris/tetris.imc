@@ -6,7 +6,7 @@ tetris.imc - a second tetris for parrot (with parrot's SDL bindings)
 
 To run this file, be in the Parrot directory and run the following command:
 
-	$ parrot examples/tetris/tetris.imc
+	$ parrot examples/sdl/tetris/tetris.imc
 	$
 
 =head1 FUNCTIONS
@@ -31,7 +31,7 @@ Array with commandline parameters.
     .param pmc argv
     .local pmc app
 
-    load_bytecode "examples/tetris/app.imc"
+    load_bytecode "examples/sdl/tetris/app.imc"
     
     # create the tetris app
     find_type I0, "Tetris::App"

@@ -49,8 +49,8 @@ it parent classes nor is it subclassed.
     load_bytecode "library/SDL/Event.imc"
     load_bytecode "library/SDL/Rect.imc"
 
-    load_bytecode "examples/tetris/eventhandler.imc"
-    load_bytecode "examples/tetris/board.imc"
+    load_bytecode "examples/sdl/tetris/eventhandler.imc"
+    load_bytecode "examples/sdl/tetris/board.imc"
 
     newclass $P0, "Tetris::App"
     

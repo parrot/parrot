@@ -23,8 +23,8 @@ board.imc - a tetris board class.
 .sub __onload @LOAD
     find_type $I0, "Tetris::Board"
     if $I0 > 1 goto END
-    load_bytecode "examples/tetris/boarddata.imc"
-    load_bytecode "examples/tetris/blocks.imc"
+    load_bytecode "examples/sdl/tetris/boarddata.imc"
+    load_bytecode "examples/sdl/tetris/blocks.imc"
     getclass $P0, "Tetris::BoardData"
     subclass $P0, $P0, "Tetris::Board"
 
