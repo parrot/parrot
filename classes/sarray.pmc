@@ -36,8 +36,8 @@ pmclass SArray {
 	e = (HASH_ENTRY *) PMC_data(SELF);
 	start = e[0].val.int_val;
 	end = e[1].val.int_val;
-	for (i = start; i < end; i++) {
-	    e = (HASH_ENTRY *) PMC_data(SELF) + (2 + i);
+	e = (HASH_ENTRY *) PMC_data(SELF) + (2 + start);
+	for (i = start; i < end; i++, e++) {
 	    switch (e->type) {
 		case enum_hash_string:
 		    pobject_lives(INTERP, (PObj *)e->val.string_val);
@@ -77,9 +77,9 @@ pmclass SArray {
 	end = e[1].val.int_val;
 	d[0].val.int_val = start;
 	d[1].val.int_val = end;
-	for (i = start; i < end; i++) {
-	    e = (HASH_ENTRY *) PMC_data(SELF) + (2 + i);
-	    d = (HASH_ENTRY *) PMC_data(dest) + (2 + i);
+	e = (HASH_ENTRY *) PMC_data(SELF) + (2 + start);
+	d = (HASH_ENTRY *) PMC_data(dest) + (2 + start);
+	for (i = start; i < end; i++, e++, d++) {
 	    d->type = e->type;
 	    switch (e->type) {
 		case enum_hash_int:

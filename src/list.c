@@ -28,6 +28,7 @@
  *      1.29               join chunks > MAX_ITEMS (Matt Fowles)
  *      1.30               greater threshold befor do_sparse
  *                         setting initial size to avoid sparse
+ *      1.33    04.07.2003 use a SArray for user_data
  *
  *  Data Structure and Algorithms:
  *  ==============================
@@ -1004,6 +1005,7 @@ list_new_init(Interp *interpreter, INTVAL type, PMC *init)
 
     if (!init->vtable ||
             ((init->vtable->base_type != enum_class_PerlArray) &&
+             (init->vtable->base_type != enum_class_SArray) &&
              (init->vtable->base_type != enum_class_Array)))
         internal_exception(1, "Illegal initializer for init\n");
     len = VTABLE_elements(interpreter, init);
@@ -1054,9 +1056,9 @@ list_new_init(Interp *interpreter, INTVAL type, PMC *init)
     if (size)
         list_set_length(interpreter, list, size);
     /* make a private copy of init data */
-    list->user_data = user_array = pmc_new(interpreter, enum_class_Array);
+    list->user_data = user_array = pmc_new(interpreter, enum_class_SArray);
     /* set length */
-    VTABLE_set_integer_native(interpreter, user_array, 4);
+    VTABLE_set_integer_native(interpreter, user_array, 2);
     /* store values */
     key = 0;
     VTABLE_set_integer_keyed_int(interpreter, user_array,
@@ -1136,7 +1138,7 @@ list_clone(Interp *interpreter, List *other)
         }
     }
     if (other->user_data) {
-        l->user_data = pmc_new_noinit(interpreter, enum_class_Array);
+        l->user_data = pmc_new_noinit(interpreter, enum_class_SArray);
         VTABLE_clone(interpreter, other->user_data,
                 l->user_data);
     }
