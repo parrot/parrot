@@ -24,37 +24,23 @@ To prepare a release:
 
     3.  cvs commit.
 
-    4.  Delete DEVELOPING.  If it appears in the MANIFEST, 
-        delete its entry in MANIFEST as well.  (This will
-        remove the 'devel' postfix from the version 
-        number--e.g. 0.0.8, as opposed to 0.0.8-devel, 
-        which is the number you'd get by downloading from 
-        CVS and getting a DEVELOPING file.)
-        
-    5.  make distclean.
+    5.  make release VERSION=<version>
 
-    5.5. This should really be fixed in distclean, but you'll
-        also need to delete all of the empty CVS subdirectories.
-        On Unix, 'find . -name CVS | xargs rmdir' should do the
-        trick safely enough.
-    
-    6.  Run tools/dev/manicheck.pl and fix any errors it finds.
-        
+    6.  untar ../parrot-<version>.tar.gz into another area
+
     7.  Make sure everything works--Configure, make and 
         make fulltest.  Check the Tinderbox and make sure that 
         everything's green (or that any yellows and reds are
         due to problems with the particular box, like a
         botched compiler upgrade).
 
-    8.  make distclean again.
+    8.  upload to CPAN.
 
-    9.  tar, gzip, and upload to CPAN.
-
-    10. Compose and send out the announcements--perl6-internals,
+    9.  Compose and send out the announcements--perl6-internals,
         -language, -announce, perl5-porters, use Perl, PerlMonks,
         comp.lang.perl.misc, etc.
 
-    11. You're done!  Help yourself to a beer, cola or other
+    10. You're done!  Help yourself to a beer, cola or other
         celebratory drink.
 
 ABOUT THIS DOCUMENT:
