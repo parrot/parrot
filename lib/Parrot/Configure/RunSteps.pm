@@ -26,6 +26,7 @@ use vars qw(@steps);
 	auto/jit.pl
 	auto/funcptr.pl
 	auto/cgoto.pl
+	auto/gc.pl
 	gen/config_h.pl
 	gen/config_pm.pl
 	gen/makefiles.pl

@@ -96,7 +96,7 @@ INTERP_O_FILES = exceptions$(O) global_setup$(O) interpreter$(O) parrot$(O) \
 				 packfile$(O) stacks$(O) string$(O) sub$(O) encoding$(O) \
 				 chartype$(O) runops_cores$(O) trace$(O) pmc$(O) key$(O) hash$(O) \
 				 core_pmcs$(O) platform$(O) ${jit_o} \
-				 resources$(O) rx$(O) rxstacks$(O) intlist$(O) \
+	     ${gc_o} rx$(O) rxstacks$(O) intlist$(O) \
 				 embed$(O) warnings$(O) misc$(O) ${cg_o} \
 				 packout$(O) byteorder$(O) debug$(O) smallobject$(O) \
 				 headers$(O) dod$(O) method_util$(O)
@@ -119,7 +119,8 @@ OPS_FILES = ${ops} $(GEN_OPSFILES)
 #
 ###############################################################################
 
-CFLAGS = ${ccflags} ${cc_warn} ${cc_inc} ${cc_hasjit} ${cg_flag}
+CFLAGS = ${ccflags} ${cc_warn} ${cc_inc} ${cc_hasjit} ${cg_flag} ${gc_flag}
+
 LINKFLAGS = ${linkflags}
 LDFLAGS = ${ldflags}
 
@@ -414,6 +415,8 @@ core_ops_prederef.c $(INC)/oplib/core_ops_prederef.h : $(OPS_FILES) ops2c.pl lib
 	$(PERL) ops2c.pl CPrederef $(OPS_FILES)
 
 ${cg_c}
+
+${gc_c}
 
 warnings$(O) : $(H_FILES)
 

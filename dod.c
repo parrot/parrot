@@ -308,6 +308,57 @@ free_unused_PMCs(struct Parrot_Interp *interpreter)
         interpreter->arena_base->pmc_pool->total_objects - total_used;
 }
 
+#ifdef GC_IS_MALLOC
+
+/* find other users of COW's bufstart */
+static void
+used_cow(struct Parrot_Interp *interpreter, struct Small_Object_Pool *pool)
+{
+    UINTVAL object_size = pool->object_size;
+    struct Small_Object_Arena *cur_arena;
+    UINTVAL i;
+    Buffer *b;
+    char *tail;
+
+#ifdef LEA_DEBUG
+    /* check/clear tail, e.g. on changes in string.c or res.c */
+    for (cur_arena = pool->last_Arena;
+            NULL != cur_arena;
+            cur_arena = cur_arena->prev) {
+        b = cur_arena->start_objects;
+        for (i = 0; i < cur_arena->used; i++) {
+            if ((b->flags & BUFFER_COW_FLAG) && b->bufstart &&
+                    !(b->flags & BUFFER_external_FLAG)) {
+                tail = (char*)b->bufstart + b->buflen + 1;
+                assert(*tail == 0);
+                *tail = 0;
+            }
+            b = (Buffer *)((char *)b + object_size);
+        }
+    }
+#endif
+
+    for (cur_arena = pool->last_Arena;
+            NULL != cur_arena;
+            cur_arena = cur_arena->prev) {
+        b = cur_arena->start_objects;
+        for (i = 0; i < cur_arena->used; i++) {
+            if ((b->flags & BUFFER_COW_FLAG) &&
+                    !(b->flags & BUFFER_external_FLAG)) {
+                tail = (char*)b->bufstart + b->buflen + 1;
+                /* mark living and dead users of this bufstart
+                 * tail is cleared in *allocate_string */
+                if (b->flags & BUFFER_live_FLAG)
+                    *tail |= 0x2;
+                else
+                    *tail |= 0x1;
+            }
+            b = (Buffer *)((char *)b + object_size);
+        }
+    }
+}
+
+#endif /* GC_IS_MALLOC */
 /* Put any buffers that are now unused, on to the free list
  * Avoid buffers that are immune from collection (ie, constant) */
 static void
@@ -317,13 +368,26 @@ free_unused_buffers(struct Parrot_Interp *interpreter,
     struct Small_Object_Arena *cur_arena;
     UINTVAL i, total_used = 0;
     UINTVAL object_size = pool->object_size;
+#ifdef GC_IS_MALLOC
+    char *tail;
+#endif /* GC_IS_MALLOC */
 
+#ifdef GC_IS_MALLOC
+    used_cow(interpreter, pool);
+#endif /* GC_IS_MALLOC */
     /* Run through all the buffer header pools and mark */
     for (cur_arena = pool->last_Arena;
          NULL != cur_arena;
          cur_arena = cur_arena->prev) {
         Buffer *b = cur_arena->start_objects;
         for (i = 0; i < cur_arena->used; i++) {
+#ifdef GC_IS_MALLOC
+            if ((b->flags & BUFFER_COW_FLAG) &&
+                    !(b->flags & BUFFER_external_FLAG))
+                tail = (char*)b->bufstart + b->buflen + 1;
+            else
+                tail = 0;
+#endif /* GC_IS_MALLOC */
             /* If it's not live or on the free list, put it on the free list.
              * Note that it is technically possible to have a Buffer be both
              * on_free_list and live, because of our conservative stack-walk
@@ -332,6 +396,7 @@ free_unused_buffers(struct Parrot_Interp *interpreter,
                              | BUFFER_constant_FLAG
                              | BUFFER_live_FLAG )))
             {
+#ifndef GC_IS_MALLOC
                 if (pool->mem_pool) {
                     if (!(b->flags & BUFFER_COW_FLAG)) {
                         ((struct Memory_Pool *)
@@ -341,10 +406,27 @@ free_unused_buffers(struct Parrot_Interp *interpreter,
                     ((struct Memory_Pool *)
                         pool->mem_pool)->possibly_reclaimable += b->buflen;
                 }
+#else /* GC_IS_MALLOC */
+                /* if only dead users, this one may be freed */
+                if (tail && *tail == 0x1)
+                    b->flags &= ~BUFFER_COW_FLAG;
+                /* don't free this bufstart this time, because
+                 * tail will be invalid then -
+                 * if we want to free immediately, we need extended
+                 * bookkeeping to free exactly the last user
+                 */
+                else
+#endif /* GC_IS_MALLOC */
                 add_free_buffer(interpreter, pool, b);
             } else if (!(b->flags & BUFFER_on_free_list_FLAG)) {
                 total_used++;
             }
+#ifdef GC_IS_MALLOC
+            /* clear tail for next dod run and
+             * don't unset COW on other possbily dead users */
+            if (tail)
+                *tail = 0;
+#endif /* GC_IS_MALLOC */
             b->flags &= ~BUFFER_live_FLAG;
             b = (Buffer *)((char *)b + object_size);
         }
@@ -429,11 +511,31 @@ trace_system_stack(struct Parrot_Interp *interpreter, PMC *last)
 }
 #endif
 
+#ifdef GC_IS_MALLOC
+struct mallinfo {
+  int arena;    /* non-mmapped space allocated from system */
+  int ordblks;  /* number of free chunks */
+  int smblks;   /* number of fastbin blocks */
+  int hblks;    /* number of mmapped regions */
+  int hblkhd;   /* space in mmapped regions */
+  int usmblks;  /* maximum total allocated space */
+  int fsmblks;  /* space available in freed fastbin blocks */
+  int uordblks; /* total allocated space */
+  int fordblks; /* total free space */
+  int keepcost; /* top-most, releasable (via malloc_trim) space */
+};
+extern struct mallinfo mallinfo(void);
+#endif /* GC_IS_MALLOC */
 
 /* See if we can find some unused headers */
 void
 Parrot_do_dod_run(struct Parrot_Interp *interpreter)
 {
+#ifdef GC_IS_MALLOC
+    struct Small_Object_Pool *header_pool;
+    int j;
+
+#endif /* GC_IS_MALLOC */
     if (interpreter->DOD_block_level) {
         return;
     }
@@ -452,11 +554,29 @@ Parrot_do_dod_run(struct Parrot_Interp *interpreter)
     free_unused_PMCs(interpreter);
 
     /* And unused buffers on the free list */
+#ifndef GC_IS_MALLOC
     free_unused_buffers(interpreter,
                         interpreter->arena_base->string_header_pool);
     free_unused_buffers(interpreter,
                         interpreter->arena_base->buffer_header_pool);
 
+#else /* GC_IS_MALLOC */
+    for (j = -2; j < (INTVAL) interpreter->arena_base->num_sized; j++) {
+        if (j == -2)
+            header_pool = interpreter->arena_base->string_header_pool;
+        else if (j == -1)
+            header_pool = interpreter->arena_base->buffer_header_pool;
+        else
+            header_pool = interpreter->arena_base->sized_header_pools[j];
+        if (header_pool && j < 0) {
+            free_unused_buffers(interpreter, header_pool);
+        }
+    }
+    /* update mem stats */
+#if 0
+    interpreter->memory_allocated = mallinfo().uordblks;
+#endif
+#endif /* GC_IS_MALLOC */
     /* Note it */
     interpreter->dod_runs++;
 

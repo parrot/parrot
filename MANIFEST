@@ -45,6 +45,8 @@ config/auto/cgoto/test_c.in
 config/auto/format.pl
 config/auto/funcptr.pl
 config/auto/funcptr/test_c.in
+config/auto/gc.pl
+config/auto/gc/test_c.in
 config/auto/gcc.pl
 config/auto/gcc/test_c.in
 config/auto/headers.pl
@@ -554,6 +556,8 @@ lib/Test/More.pm
 lib/Test/Simple.pm
 lib/Text/Balanced.pm
 make.pl
+malloc.c
+malloc-trace.c
 math.ops
 memory.c
 method_util.c
@@ -573,6 +577,7 @@ pdump.c
 pmc.c
 pxs.c
 register.c
+res_lea.c
 resources.c
 runops_cores.c
 rx.c

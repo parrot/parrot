@@ -20,9 +20,15 @@
 #    define BUFFER_HEADERS_PER_ALLOC 1
 #    define STRING_HEADERS_PER_ALLOC 1
 #else
+#ifndef GC_IS_MALLOC
 #    define PMC_HEADERS_PER_ALLOC 256
 #    define BUFFER_HEADERS_PER_ALLOC 256
 #    define STRING_HEADERS_PER_ALLOC 256
+#else /* GC_IS_MALLOC */
+#    define PMC_HEADERS_PER_ALLOC 512
+#    define BUFFER_HEADERS_PER_ALLOC 512
+#    define STRING_HEADERS_PER_ALLOC 512
+#endif /* GC_IS_MALLOC */
 #endif
 
 /** PMC Header Functions for small-object lookup table **/
@@ -33,6 +39,9 @@ add_free_pmc(struct Parrot_Interp *interpreter,
 {
     ((PMC *)pmc)->flags = PMC_on_free_list_FLAG;
     /* Don't let it point to garbage memory */
+#ifdef GC_IS_MALLOC
+    /* XXX custom destroy ?! */
+#endif /* GC_IS_MALLOC */
     ((PMC *)pmc)->data = NULL;
 
     /* Copied from add_free_object */
@@ -75,9 +84,20 @@ void
 add_free_buffer(struct Parrot_Interp *interpreter, 
                 struct Small_Object_Pool *pool, void *buffer)
 {
+#ifdef GC_IS_MALLOC
+    /* free allocated space at bufstart, but not if it is used
+     * COW or it is external
+     */
+    if (((Buffer *)buffer)->bufstart &&
+            !(((Buffer *)buffer)->flags &
+                (BUFFER_COW_FLAG|BUFFER_external_FLAG))) {
+        free(((Buffer *)buffer)->bufstart);
+    }
+#endif /* GC_IS_MALLOC */
     ((Buffer *)buffer)->flags = BUFFER_on_free_list_FLAG;
     /* Use the right length */
     ((Buffer *)buffer)->buflen = 0;
+    ((Buffer *)buffer)->bufstart = 0;
 
     /* Copied from add_free_object */
     *(void **)buffer = pool->free_list;

@@ -18,32 +18,31 @@ static const CHARTYPE *string_unicode_type;
 #define EXTRA_SIZE 4
 
 /* String COW support */
+
+/* make a copy of string's data:
+ * copy used string data from strstart to a newly
+ * allocated string
+ * the header stays the same
+ */
 static void
 unmake_COW(struct Parrot_Interp *interpreter, STRING *s)
 {
-#if 0
-    if (s->flags & BUFFER_constant_FLAG) {
-        /* this happens when we call string_to_cstring on 
-         * a constant string in order to print it
-         */
-        internal_exception(INVALID_OPERATION,
-                           "Cannot unmake COW on a constant header");
-    }
-    else
-#endif
     if (s->flags & (BUFFER_COW_FLAG|BUFFER_constant_FLAG)) {
+        void *p;
+        UINTVAL size;
         interpreter->GC_block_level++;
         interpreter->DOD_block_level++;
 
         /* Make the copy point to only the portion of the string that
          * we are actually using. */
-        s->bufstart = s->strstart;
-        s->buflen = s->bufused;
-
+        p = s->strstart;
+        size = s->bufused;
         /* Create new pool data for this header to use, 
          * independant of the original COW data */
-        Parrot_reallocate_string(interpreter, s, s->buflen);
-        s->flags &= ~(UINTVAL)(BUFFER_COW_FLAG | BUFFER_constant_FLAG);
+        s->flags &= ~BUFFER_constant_FLAG;
+        Parrot_allocate_string(interpreter, s, size);
+        mem_sys_memcopy(s->bufstart, p, size);
+        s->flags &= ~(UINTVAL)(BUFFER_COW_FLAG | BUFFER_external_FLAG);
         interpreter->GC_block_level--;
         interpreter->DOD_block_level--;
     }
@@ -399,8 +398,7 @@ string_transcode(struct Parrot_Interp *interpreter,
 INTVAL
 string_compute_strlen(STRING *s)
 {
-    s->strlen = s->encoding->characters(s->bufstart, s->bufused) - 
-        ((UINTVAL)s->strstart - (UINTVAL)s->bufstart);
+    s->strlen = s->encoding->characters(s->strstart, s->bufused);
     return s->strlen;
 }
 
@@ -972,13 +970,6 @@ string_from_num(struct Parrot_Interp * interpreter, FLOATVAL f)
 const char *
 string_to_cstring(struct Parrot_Interp * interpreter, STRING * s)
 {
-    char *cstring;
-
-    /* We shouldn't modify a constant string, 
-     * so instead create a new copy of it */
-    if (s->flags & BUFFER_constant_FLAG) {
-        s = make_COW_reference(interpreter,s);
-    }
 
     unmake_COW(interpreter, s);
 
@@ -986,11 +977,9 @@ string_to_cstring(struct Parrot_Interp * interpreter, STRING * s)
         string_grow(interpreter, s, 1);
     }
 
-    cstring = s->strstart;
-
-    cstring[s->bufused] = 0;
-
-    return cstring;
+    ((char *)s->strstart)[s->bufused] = 0;
+    /* don't return local vars, return the right thing */
+    return (char*)s->strstart;
 }
 
 

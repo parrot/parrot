@@ -57,6 +57,10 @@ Options:
    --ld=(linker)        Use the given linker
    --intval=(type)      Use the given type for INTVAL
    --floatval=(type)    Use the given type for FLOATVAL
+
+   --cgoto=0		Don't build cgoto core - recommended when short of mem
+   --gc=gc|libc|malloc|malloc-trace	determine GC type, default = gc
+
 EOT
       exit;
     };
