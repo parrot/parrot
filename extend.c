@@ -217,7 +217,7 @@ Parrot_STRING Parrot_get_strreg(Parrot_INTERP interpreter, Parrot_Int regnum) {
     return REG_STR(regnum);
 }
 
-/*=for api extend Parrot_get_intreg
+/*=for api extend Parrot_get_pmcreg
  *
  * Return the value of a PMC register
  */
