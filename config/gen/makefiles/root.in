@@ -1,7 +1,7 @@
 VERSION=${VERSION}${DEVEL}
 
 BUILDPREFIX =
-PREFIX = /usr/local/parrot/0.0.10
+PREFIX = /usr/local/parrot/${VERSION}
 EXEC_PREFIX = $(PREFIX)
 BINDIR = $(EXEC_PREFIX)/bin
 LIBDIR = $(EXEC_PREFIX)/lib
@@ -722,7 +722,7 @@ install :
 
 release : MANIFEST MANIFEST.generated
 	[ -d parrot-$(VERSION) ] || ln -s . parrot-$(VERSION)
-	tar zcvf parrot-$(VERSION).tar.gz $$(perl -lane 'print"parrot-$(VERSION)/$$F[0]"' MANIFEST)
+	tar zcvf parrot-$(VERSION).tar.gz $$(perl -lane '/DEVELOPING/&&next;print"parrot-$(VERSION)/$$F[0]"unless!length||/#/' MANIFEST)
 	rm parrot-$(VERSION)
 
 rpms : release
