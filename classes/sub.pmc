@@ -80,9 +80,9 @@ Initializes the subroutine.
 
     /*
      * Sub PMC's flags usage:
-     * - private0 ... Coroutine flip/flop
+     * - private0 ... Coroutine flip/flop - C exception handler
      * - private1 ... Fixup is done
-     * - private2 ... put RetCont on free list
+     * - private2 ... unused
      * - private3 ... pythonic coroutine generator flag
      * - private4 ... @MAIN
      * - private5 ... @LOAD

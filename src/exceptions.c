@@ -268,8 +268,11 @@ PMC*
 new_c_exception_handler(Parrot_Interp interpreter, Parrot_exception *jb)
 {
     PMC *handler = pmc_new(interpreter, enum_class_Exception_Handler);
+    /*
+     * this flag denotes a C exception handler
+     */
     PObj_get_FLAGS(handler) |= PObj_private0_FLAG;
-    PMC_struct_val(handler) = jb;
+    VTABLE_set_pointer(interpreter, handler, jb);
     return handler;
 }
 
@@ -306,6 +309,7 @@ throw_exception(Parrot_Interp interpreter, PMC *exception, void *dest)
 {
     PMC *handler;
     struct Parrot_cont * cc;
+    void *address;
 
     handler = find_exception_handler(interpreter, exception);
     if (!handler)
@@ -327,13 +331,14 @@ throw_exception(Parrot_Interp interpreter, PMC *exception, void *dest)
     }
     /* put exception object in P5 */
     REG_PMC(5) = exception;
+    address = VTABLE_get_pointer(interpreter, handler);
     if (PObj_get_FLAGS(handler) & PObj_private0_FLAG) {
         /* its a C exception handler */
-        Parrot_exception *jb = (Parrot_exception *) PMC_struct_val(handler);
+        Parrot_exception *jb = (Parrot_exception *) address;
         longjmp(jb->destination, 1);
     }
     /* return the address of the handler */
-    return PMC_struct_val(handler);
+    return address;
 }
 
 /*
@@ -361,7 +366,7 @@ rethrow_exception(Parrot_Interp interpreter, PMC *exception)
     /* put exception object in P5 */
     REG_PMC(5) = exception;
     /* return the address of the handler */
-    return PMC_struct_val(handler);
+    return VTABLE_get_pointer(interpreter, handler);
 }
 
 /*
@@ -391,7 +396,7 @@ rethrow_c_exception(Parrot_Interp interpreter)
     /*
      * if there was no user handler, interpreter is already shutdown
      */
-    the_exception->resume = PMC_struct_val(handler);
+    the_exception->resume = VTABLE_get_pointer(interpreter, handler);
     the_exception->error = VTABLE_get_integer_keyed_int(interpreter,
             exception, 1);
     the_exception->severity = VTABLE_get_integer_keyed_int(interpreter,

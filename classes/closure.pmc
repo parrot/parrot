@@ -94,22 +94,6 @@ Creates a clone of the closure and returns it.
         sub->pad_stack = PMC_sub(SELF)->pad_stack;
         return ret;
     }
-
-/*
-
-=item C<void set_same(PMC* value)>
-
-Makes the closure the same as C<*value>.
-
-=cut
-
-*/
-
-    void set_same (PMC* value) {
-        PMC_sub(SELF) = PMC_sub(value); /* XXX */
-        PMC_struct_val(SELF) = PMC_struct_val(value);
-    }
-
 }
 
 /*

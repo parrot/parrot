@@ -372,8 +372,7 @@ new_ret_continuation_pmc(Interp * interpreter, opcode_t * address)
     PMC* continuation;
 
     continuation = pmc_new(interpreter, enum_class_RetContinuation);
-    PObj_get_FLAGS(continuation) |= PObj_private1_FLAG;
-    PMC_struct_val(continuation) = address;
+    VTABLE_set_pointer(interpreter, continuation, address);
     return continuation;
 }
 
