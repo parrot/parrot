@@ -39,15 +39,15 @@
 #endif
 
 #ifndef STDIN_FILENO
-# define STDIN_FILENO 0
+#  define STDIN_FILENO 0
 #endif
 
 #ifndef STDOUT_FILENO
-# define STDOUT_FILENO 1
+#  define STDOUT_FILENO 1
 #endif
 
 #ifndef STDERR_FILENO
-# define STDERR_FILENO 2
+#  define STDERR_FILENO 2
 #endif
 
 #define PIO_STDIN_FILENO 0
@@ -55,7 +55,7 @@
 #define PIO_STDERR_FILENO 2
 
 #ifndef O_ACCMODE
-# define O_ACCMODE 0003
+#  define O_ACCMODE 0003
 #endif
 
 #ifdef BLKSIZE
@@ -203,7 +203,7 @@ extern ParrotIOLayer *pio_default_stack;
 
 
 #ifndef theINTERP
-# define theINTERP      struct Parrot_Interp * interpreter
+#  define theINTERP      struct Parrot_Interp * interpreter
 #endif
 
 /*

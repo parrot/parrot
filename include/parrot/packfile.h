@@ -7,8 +7,8 @@
 *   (Do endian conversion and wordsize transforms on the fly.)
 */
 
-#ifndef PACKFILE_H
-#define PACKFILE_H
+#if !defined(PACKFILE_H_GUARD)
+#define PACKFILE_H_GUARD
 
 #include <parrot/parrot.h>
 
@@ -177,7 +177,7 @@ void fetch_buf_be_16(unsigned char * rb, unsigned char * b);
 
 
 
-#endif /* PACKFILE_H */
+#endif /* PACKFILE_H_GUARD */
 
 /*
  * Local variables:

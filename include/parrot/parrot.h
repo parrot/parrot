@@ -101,7 +101,7 @@ typedef void (*funcptr_t)(void);
    but on UNIX it doesn't exist, so set it to 0 if it's not defined
  */
 #ifndef O_BINARY
-    #define O_BINARY 0
+#  define O_BINARY 0
 #endif
 
 /* define a macro to acknowledge an unused argument, and silence a "helpful"

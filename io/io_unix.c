@@ -191,16 +191,16 @@ PIO_unix_fdopen(theINTERP, ParrotIOLayer *layer, PIOHANDLE fd, INTVAL flags)
 {
     ParrotIO *io;
     INTVAL oflags, mode;
-#ifdef HAS_HEADER_FCNTL
+#  ifdef HAS_HEADER_FCNTL
     INTVAL rflags;
-#endif
+#  endif
     mode = 0;
 
     oflags = flags_to_unix(flags);
     UNUSED(oflags)
 
         /* FIXME - Check file handle flags, validity */
-#ifdef HAS_HEADER_FCNTL
+#  ifdef HAS_HEADER_FCNTL
         /* Get descriptor flags */
         if ((rflags = fcntl(fd, F_GETFL, 0)) >= 0) {
         /*int accmode = rflags & O_ACCMODE; */
@@ -210,7 +210,7 @@ PIO_unix_fdopen(theINTERP, ParrotIOLayer *layer, PIOHANDLE fd, INTVAL flags)
         /* Probably invalid descriptor */
         return NULL;
     }
-#endif
+#  endif
 
     if (PIO_unix_isatty(fd))
         flags |= PIO_F_CONSOLE;
@@ -246,7 +246,7 @@ PIO_unix_getblksize(PIOHANDLE fd)
 {
     if (fd >= 0) {
         /* Try to get the block size of a regular file */
-#if 0
+#  if 0
         /*
          * Is it even worth adding non-portable code here
          * or should we just estimate a nice buffer size?
@@ -260,14 +260,14 @@ PIO_unix_getblksize(PIOHANDLE fd)
                 return sbuf.st_blksize;
             }
         }
-#endif
+#  endif
     }
     /* Try to determine it from general means. */
-#ifdef BLKSIZE
+#  ifdef BLKSIZE
     return BLKSIZE;
-#else
+#  else
     return PIO_BLKSIZE;
-#endif
+#  endif
 }
 
 /* At lowest layer all we can do for flush is ask kernel to sync().
@@ -275,9 +275,9 @@ PIO_unix_getblksize(PIOHANDLE fd)
 void
 PIO_unix_flush(theINTERP, ParrotIOLayer *layer, ParrotIO *io)
 {
-#if 0
+#  if 0
     fsync(io->fd);
-#endif
+#  endif
 }
 
 
@@ -340,10 +340,10 @@ PIO_unix_write(theINTERP, ParrotIOLayer *layer, ParrotIO *io,
             switch (errno) {
             case EINTR:
                 goto write_through;
-#ifdef EAGAIN
+#  ifdef EAGAIN
             case EAGAIN:
                 return bytes;
-#endif
+#  endif
             default:
                 return (size_t)-1;
             }
@@ -384,14 +384,14 @@ PIO_unix_seek(theINTERP, ParrotIOLayer *l, ParrotIO *io,
     PIOOFF_T pos;
     errno = 0;
     /* Whenever Configure defines a constant we can use here. */
-#ifndef _HAVE_LARGEFILESUPPORT_BLAH
+#  ifndef _HAVE_LARGEFILESUPPORT_BLAH
     if ((pos = lseek(io->fd, (PIOOFF_T)lo, whence)) >= 0) {
         io->lpos = io->fpos;
         io->fpos = pos;
     }
-#else
+#  else
     /* Use llseek, lseek64, etc. from Configure */
-#endif
+#  endif
     /* Seek clears EOF */
     io->flags &= ~PIO_F_EOF;
     return (((INTVAL)pos != -1) ? 0 : -1);

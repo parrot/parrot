@@ -10,7 +10,7 @@
 #define DEFAULT_OPEN_MODE 0
 
 #ifndef S_ISREG
-#   define S_ISREG(m) ((m & S_IFMT) == S_IFREG)
+#  define S_ISREG(m) ((m & S_IFMT) == S_IFREG)
 #endif
 
 /* These disable certain Level 4 Warnings */
