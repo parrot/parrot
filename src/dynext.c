@@ -70,7 +70,7 @@ store_lib_pmc(Parrot_Interp interpreter, PMC* lib_pmc, STRING *path,
     dyn_libs = VTABLE_get_pmc_keyed_int(interpreter, iglobals,
             IGLOBALS_DYN_LIBS);
     if (!dyn_libs) {
-        dyn_libs = pmc_new(interpreter, enum_class_PerlArray);
+        dyn_libs = pmc_new(interpreter, enum_class_ResizablePMCArray);
         VTABLE_set_pmc_keyed_int(interpreter, iglobals,
                 IGLOBALS_DYN_LIBS, dyn_libs);
     }
@@ -87,8 +87,8 @@ store_lib_pmc(Parrot_Interp interpreter, PMC* lib_pmc, STRING *path,
 =item C<static PMC*
 is_loaded(Parrot_Interp interpreter, STRING *path)>
 
-Check if a C<ParrotLibrary> PMC with the filename path exists, if yes
-return it.
+Check if a C<ParrotLibrary> PMC with the filename path exists. 
+If it does, return it. Otherwise, return NULL.
 
 =cut
 
@@ -289,7 +289,7 @@ Parrot_load_lib(Interp *interpreter, STRING *lib, PMC *initializer)
     path = get_path(interpreter, lib, &handle);
     if (!path || !handle) {
         /*
-         * XXX internal_exception? return a PerlUndef? return PMCNULL?
+         * XXX internal_exception? return PMCNULL?
          * PMC Undef seems convenient, because it can be queried with get_bool()
          */
         return pmc_new(interpreter, enum_class_Undef);
