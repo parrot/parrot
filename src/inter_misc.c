@@ -97,7 +97,7 @@ enter_nci_method(Parrot_Interp interpreter, int type,
 /*
 
 =item C<void
-Parrot_compreg(Parrot_Interp interpreter, STRING *type, PMC *func)>
+Parrot_compreg(Parrot_Interp interpreter, STRING *type, Parrot_compiler_func_t func);
 
 Register a parser/compiler function.
 
@@ -106,7 +106,7 @@ Register a parser/compiler function.
 */
 
 void
-Parrot_compreg(Parrot_Interp interpreter, STRING *type, PMC *func)
+Parrot_compreg(Parrot_Interp interpreter, STRING *type, Parrot_compiler_func_t func)
 {
     PMC *hash, *nci;
     PMC* iglobals = interpreter->iglobals;

@@ -84,7 +84,7 @@ static eval_error          exp_term( eval_token, eval_t * );
 static eval_error          unary_term( eval_token, eval_t * );
 static eval_error          simple_term( eval_token, eval_t * );
 boolean                    evaluate (const char *, eval_t *);
-void *                     m4_eval_compiler(Parrot_Interp interpreter, const char *);
+PMC *                      m4_eval_compiler(Parrot_Interp interpreter, const char *);
 void                       Parrot_lib_m4_eval_compiler_init(Parrot_Interp , PMC* );
 
 /*--------------------.
@@ -794,10 +794,7 @@ $ make -C examples/compilers/
 void
 Parrot_lib_m4_eval_compiler_init(Parrot_Interp interpreter, PMC* lib)
 {
-    STRING *cmp;
-
-    cmp = const_string(interpreter, "m4_eval_compiler");
-    Parrot_compreg(interpreter, cmp, (PMC*)F2DPTR(m4_eval_compiler));
+    Parrot_compreg(interpreter, const_string(interpreter, "m4_eval_compiler"), m4_eval_compiler);
 }
 
 
@@ -828,7 +825,7 @@ unescape(char *string)
 /*
  * simple compiler - no error checking
  */
-void*
+PMC *
 m4_eval_compiler( Parrot_Interp interpreter, const char *program )
 {
     eval_t value;  /* will be returned to caller */

@@ -28,6 +28,10 @@
  *       this is needed for the debugger pdb and called from imcc/main.c
  */
 void imcc_init(Parrot_Interp interpreter);
+PMC * imcc_compile_pir(Parrot_Interp interp, const char *s);
+PMC * imcc_compile_pasm(Parrot_Interp interp, const char *s);
+PMC * imcc_compile(Parrot_Interp interp, const char *s);
+void *imcc_compile_file(Parrot_Interp interp, const char *s);
 
 /*
  * P = new type, [init]
@@ -417,7 +421,7 @@ INS(Interp *interpreter, IMC_Unit * unit, char *name,
     return ins;
 }
 
-/* imcc_compile(interp*, const char*)
+/* PMC *imcc_compile(interp*, const char*)
  *
  * compile a pasm or imcc string
  *
@@ -429,7 +433,7 @@ extern void* yy_scan_string(const char *);
 extern SymReg *cur_namespace; /* s. imcc.y */
 
 
-static void *
+PMC *
 imcc_compile(Parrot_Interp interp, const char *s)
 {
     /* imcc always compiles to interp->code->byte_code
@@ -480,42 +484,43 @@ imcc_compile(Parrot_Interp interp, const char *s)
     sub_data->address = new_cs->base.data;
     sub_data->end = new_cs->base.data + new_cs->base.size;
     sub_data->name = string_from_cstring(interp, name, 0);
+
     return sub;
 }
 
-static void *
+PMC *
 imcc_compile_pasm(Parrot_Interp interp, const char *s)
 {
     int pasm = pasm_file;
-    void *pf;
+    PMC *sub;
 
     pasm_file = 1;
     expect_pasm = 0;
-    pf = imcc_compile(interp, s);
+    sub = imcc_compile(interp, s);
     imc_cleanup(interp);
     pasm_file = pasm;
-    return pf;
+    return sub;
 }
 
-static void *
+PMC *
 imcc_compile_pir (Parrot_Interp interp, const char *s)
 {
     int pasm = pasm_file;
-    void *pf;
+    PMC *sub;
 
     pasm_file = 0;
     expect_pasm = 0;
-    pf = imcc_compile(interp, s);
+    sub = imcc_compile(interp, s);
     imc_cleanup(interp);
     pasm_file = pasm;
-    return pf;
+    return sub;
 }
 
 
 /*
  * Compile a file by filename (can be either PASM or IMCC code)
  */
-static void *
+void *
 imcc_compile_file (Parrot_Interp interp, const char *s)
 {
     struct PackFile *pf_save = interp->code;
@@ -581,20 +586,16 @@ IMCC_compile_file (Parrot_Interp interp, const char *s)
     return imcc_compile_file(interp, s);
 }
 
+
 /* Register additional compilers with the interpreter */
 void
 register_compilers(Parrot_Interp interp)
 {
-    STRING *pasm = const_string(interp, "PASM");
-    STRING *pir = const_string(interp, "PIR");
-    STRING *source = const_string(interp, "FILE");
-    Parrot_csub_t pa = (Parrot_csub_t)imcc_compile_pasm;
-    Parrot_csub_t pi = (Parrot_csub_t)imcc_compile_pir;
-    Parrot_csub_t ps = (Parrot_csub_t)imcc_compile_file;
-
-    Parrot_compreg(interp, pasm, (PMC*)F2DPTR(pa));
-    Parrot_compreg(interp, pir, (PMC*)F2DPTR(pi));
-    Parrot_compreg(interp, source, (PMC*)F2DPTR(ps) );
+    Parrot_compreg(interp, const_string(interp, "PASM"), imcc_compile_pasm);
+    Parrot_compreg(interp, const_string(interp, "PIR"), imcc_compile_pir);
+    /* It looks like this isn't used anywhere yet */
+    /* TODO: return a Eval PMc, instead of a packfile */
+    /* Parrot_compreg(interp, const_string(interp, "FILE"), imcc_compile_file ); */
 }
 
 

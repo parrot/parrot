@@ -432,12 +432,15 @@ PMC* Parrot_make_cb(Interp * interpreter, PMC* sub, PMC* user_data,
         STRING* cb_signature);
 
 typedef opcode_t *(*native_func_t)(Interp * interpreter,
-                                  opcode_t * cur_opcode,
-                                  opcode_t * start_code);
+                                   opcode_t * cur_opcode,
+                                   opcode_t * start_code);
 
 VAR_SCOPE native_func_t run_native;
 
-void Parrot_compreg(Interp * interpreter, STRING *type, PMC *func);
+typedef PMC *(*Parrot_compiler_func_t)(Parrot_Interp interpreter,
+                                       const char * program );
+
+void Parrot_compreg(Interp * interpreter, STRING *, Parrot_compiler_func_t func);
 INTVAL sysinfo_i(Interp * interpreter, INTVAL info_wanted);
 STRING *sysinfo_s(Interp * interpreter, INTVAL info_wanted);
 void exec_init_prederef(Interp *interpreter,

@@ -25,7 +25,8 @@ The AST (Abstract Syntax Tree) represents the code of a HLL source module.
 extern FILE* ASTin;
 extern void ASTparse(Interp *);
 
-static void*
+PMC * ast_compile_past(Interp *interpreter, const char *src_string);
+PMC *
 ast_compile_past(Interp *interpreter, const char *src_string)
 {
     fatal(1, "ast_compile_past", "unimplemented");
@@ -67,8 +68,7 @@ static void
 register_ast_compiler(Interp* interpreter)
 {
     STRING *past = const_string(interpreter, "PAST");
-    Parrot_csub_t f = (Parrot_csub_t)ast_compile_past;
-    Parrot_compreg(interpreter, past, (PMC*)F2DPTR(f));
+    Parrot_compreg(interpreter, past, ast_compile_past);
 }
 /*
 
