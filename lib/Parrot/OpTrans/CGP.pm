@@ -58,7 +58,9 @@ sub goto_address
   if ($addr eq '0') {
   	return "return (0);"
   } else {
-  	return "goto *ops_addr[*(cur_opcode = (opcode_t *)
+  	return "if ((opcode_t *) $addr == 0)
+	  return 0;
+   goto *ops_addr[*(cur_opcode = (opcode_t *)
 	opcode_to_prederef(interpreter, $addr))]";
   }
 }
