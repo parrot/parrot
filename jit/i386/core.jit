@@ -951,26 +951,6 @@ Parrot_abs_n_n {
     Parrot_absneg_x_x s/<_N>/_n/ s/ISR/FSR/ s/INT/NUM/ s/<op>/abs/
 }
 
-TEMPLATE Parrot_ifunless_xc_ic {
-    if (*<x>_CONST[1] <op> 0)
-        emit_jump(jit_info, *INT_CONST[2]);
-}
-
-Parrot_if_ic_ic {
-    Parrot_ifunless_xc_ic s/<op>/!=/ s/<x>/INT/
-}
-
-Parrot_unless_ic_ic {
-    Parrot_ifunless_xc_ic s/<op>/==/ s/<x>/INT/
-}
-
-Parrot_if_nc_ic {
-    Parrot_ifunless_xc_ic s/<op>/!=/ s/<x>/NUM/
-}
-
-Parrot_unless_nc_ic {
-    Parrot_ifunless_xc_ic s/<op>/==/ s/<x>/NUM/
-}
 
 TEMPLATE Parrot_ifunless_x_ic {
  /*
@@ -1224,59 +1204,6 @@ Parrot_dec_n {
 }
 
 
-TEMPLATE Parrot_cmp_xc_xc_ic {
-    if (<typ>_CONST[1] <op> <typ>_CONST[2])
-        emit_jump(jit_info, *INT_CONST[3]);
-}
-
-Parrot_lt_ic_ic_ic {
-    Parrot_cmp_xc_xc_ic s/<typ>/*INT/ s/<op>/</
-}
-
-Parrot_lt_nc_nc_ic {
-    Parrot_cmp_xc_xc_ic s/<typ>/*NUM/ s/<op>/</
-}
-
-Parrot_gt_ic_ic_ic {
-    Parrot_cmp_xc_xc_ic s/<typ>/*INT/ s/<op>/>/
-}
-
-Parrot_gt_nc_nc_ic {
-    Parrot_cmp_xc_xc_ic s/<typ>/*NUM/ s/<op>/>/
-}
-
-Parrot_ge_ic_ic_ic {
-    Parrot_cmp_xc_xc_ic s/<typ>/*INT/ s/<op>/>=/
-}
-
-Parrot_ge_nc_nc_ic {
-    Parrot_cmp_xc_xc_ic s/<typ>/*NUM/ s/<op>/>=/
-}
-
-Parrot_le_ic_ic_ic {
-    Parrot_cmp_xc_xc_ic s/<typ>/*INT/ s/<op>/<=/
-}
-
-Parrot_le_nc_nc_ic {
-    Parrot_cmp_xc_xc_ic s/<typ>/*NUM/ s/<op>/<=/
-}
-
-Parrot_eq_ic_ic_ic {
-    Parrot_cmp_xc_xc_ic s/<typ>/*INT/ s/<op>/==/
-}
-
-Parrot_eq_nc_nc_ic {
-    Parrot_cmp_xc_xc_ic s/<typ>/*NUM/ s/<op>/==/
-}
-
-Parrot_ne_ic_ic_ic {
-    Parrot_cmp_xc_xc_ic s/<typ>/*INT/ s/<op>/!=/
-}
-
-Parrot_ne_nc_nc_ic {
-    Parrot_cmp_xc_xc_ic s/<typ>/*NUM/ s/<op>/!=/
-}
-
 ; string funcs
 ;
 Parrot_set_s_sc {
@@ -1335,10 +1262,6 @@ Parrot_eq_sc_s_ic {
     Parrot_eq_sx_sx_ic s/<typ1>/c/ s/<typ2>/r/ s/<op>/emitm_jz/
 }
 
-Parrot_eq_sc_sc_ic {
-    Parrot_eq_sx_sx_ic s/<typ1>/c/ s/<typ2>/c/ s/<op>/emitm_jz/
-}
-
 Parrot_ne_s_s_ic {
     Parrot_eq_sx_sx_ic s/<typ1>/r/ s/<typ2>/r/ s/<op>/emitm_jnz/
 }
@@ -1349,10 +1272,6 @@ Parrot_ne_s_sc_ic {
 
 Parrot_ne_sc_s_ic {
     Parrot_eq_sx_sx_ic s/<typ1>/c/ s/<typ2>/r/ s/<op>/emitm_jnz/
-}
-
-Parrot_ne_sc_sc_ic {
-    Parrot_eq_sx_sx_ic s/<typ1>/c/ s/<typ2>/c/ s/<op>/emitm_jnz/
 }
 
 Parrot_le_s_s_ic {
@@ -1367,10 +1286,6 @@ Parrot_le_sc_s_ic {
     Parrot_cmp_sx_sx_ic s/<typ1>/c/ s/<typ2>/r/ s/<op>/emitm_jle/
 }
 
-Parrot_le_sc_sc_ic {
-    Parrot_cmp_sx_sx_ic s/<typ1>/c/ s/<typ2>/c/ s/<op>/emitm_jle/
-}
-
 Parrot_lt_s_s_ic {
     Parrot_cmp_sx_sx_ic s/<typ1>/r/ s/<typ2>/r/ s/<op>/emitm_jl/
 }
@@ -1382,11 +1297,6 @@ Parrot_lt_s_sc_ic {
 Parrot_lt_sc_s_ic {
     Parrot_cmp_sx_sx_ic s/<typ1>/c/ s/<typ2>/r/ s/<op>/emitm_jl/
 }
-
-Parrot_lt_sc_sc_ic {
-    Parrot_cmp_sx_sx_ic s/<typ1>/c/ s/<typ2>/c/ s/<op>/emitm_jl/
-}
-
 
 Parrot_ge_s_s_ic {
     Parrot_cmp_sx_sx_ic s/<typ1>/r/ s/<typ2>/r/ s/<op>/emitm_jnl/
@@ -1400,10 +1310,6 @@ Parrot_ge_sc_s_ic {
     Parrot_cmp_sx_sx_ic s/<typ1>/c/ s/<typ2>/r/ s/<op>/emitm_jnl/
 }
 
-Parrot_ge_sc_sc_ic {
-    Parrot_cmp_sx_sx_ic s/<typ1>/c/ s/<typ2>/c/ s/<op>/emitm_jnl/
-}
-
 Parrot_gt_s_s_ic {
     Parrot_cmp_sx_sx_ic s/<typ1>/r/ s/<typ2>/r/ s/<op>/emitm_jg/
 }
@@ -1414,10 +1320,6 @@ Parrot_gt_s_sc_ic {
 
 Parrot_gt_sc_s_ic {
     Parrot_cmp_sx_sx_ic s/<typ1>/c/ s/<typ2>/r/ s/<op>/emitm_jg/
-}
-
-Parrot_gt_sc_sc_ic {
-    Parrot_cmp_sx_sx_ic s/<typ1>/c/ s/<typ2>/c/ s/<op>/emitm_jg/
 }
 
 
@@ -1444,16 +1346,8 @@ Parrot_if_s_ic {
     Parrot_ifunless_sx_ic s/<typ>/r/ s/<op>/emitm_jnz/
 }
 
-Parrot_if_sc_ic {
-    Parrot_ifunless_sx_ic s/<typ>/c/ s/<op>/emitm_jnz/
-}
-
 Parrot_unless_s_ic {
     Parrot_ifunless_sx_ic s/<typ>/r/ s/<op>/emitm_jz/
-}
-
-Parrot_unless_sc_ic {
-    Parrot_ifunless_sx_ic s/<typ>/c/ s/<op>/emitm_jz/
 }
 
 TEMPLATE Parrot_ord_i_sx {
