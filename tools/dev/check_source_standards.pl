@@ -18,6 +18,7 @@ if ($files[0] eq "all_source") {
     File::Find::find({wanted => sub {
                           if ($File::Find::dir =~ /(languages|icu|miniparrot)$/) {
                               $File::Find::prune = 1;	
+			      return;
                           }
 
                           /^.*\.[ch]\z/s &&
