@@ -1,4 +1,113 @@
 #!/usr/bin/perl -w
+# Copyright: 2004 The Perl Foundation.  All Rights Reserved.
+# $Id$
+
+=head1 NAME
+
+tools/dev/nm.pl - Display symbol table information
+
+=head1 SYNOPSIS
+
+    % perl tools/dev/nm.pl [options] file
+
+To list all the symbols in Parrot:
+
+    % perl tools/dev/nm.pl parrot
+
+=head1 DESCRIPTION
+
+Portable frontend for C<nm(1)>; by default lists all the code and data
+symbols in the object or archive files.
+
+=head2 Command-Line Options
+
+The following options can be used to limit the symbols:
+
+=over 4
+
+=item C<--code>
+
+List the code/text symbols.
+
+=item C<--data>
+
+List the data symbols.
+
+=item C<--init>
+
+List the initialised data symbols.
+
+=item C<--uninit>
+
+List the uninitialised data symbols.
+
+=item C<--const>
+
+List the constant (read-only) data symbols.
+
+Not all platforms support this, a warning will be given if not. You can
+try GNU C<nm> if you want this feature.
+
+=item C<--undef>
+
+List the undefined symbols.
+
+=item C<--def>
+
+List the defined symbols.
+
+=item C<--file>
+
+List the file(name) symbols.
+
+=back
+
+If more than one of all the above options are given, they are C<AND>ed.
+They can also be negated with a "no", for example C<--noconst>.
+
+=over 4
+
+=item C<--objectname>
+
+Prepend the object name before the symbol name.
+
+=item C<--t>
+
+Append the short BSD-style type to the symbol name.
+
+    B - uninitialised data symbol
+    D - initialised data symbol
+    F - file name symbol
+    R - read-only data symbol
+    T - code/text symbol
+    U - undefined symbol
+
+Uppercase indicates that the symbol is global; lowercase indicates that
+it is local.
+
+=item C<--type=bsd>
+
+The same as C<--t>.
+
+=item C<--type=long>
+
+Append a long type (e.g. "global_const_init_data" versus "R") to the
+symbol name.
+
+=item C<--help>
+
+Show the help.
+
+=item C<--version>
+
+Show the version number.
+
+=back
+
+All the options can be shortened to their unique prefixes, and one
+leading dash ("-") can be used instead of two ("--").
+
+=cut
 
 use strict;
 use Getopt::Long;
@@ -270,3 +379,10 @@ for my $f (@ARGV) {
 }
 
 exit(0);
+
+=head1 HISTORY
+
+Author: Jarkko Hietaniemi.
+
+=cut
+

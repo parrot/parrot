@@ -51,6 +51,8 @@ sub new
 		$self->new_group('Bytecode', '',
 			$self->new_item('', 'build_tools/fingerprint_c.pl'),
 			$self->new_item('', 'build_tools/pbc2c.pl'),
+			$self->new_item('', 'tools/dev/nm.pl'),
+			$self->new_item('', 'tools/dev/symlink.pl'),
 		),
 		$self->new_group('QA', '',
 			$self->new_item('', 'parrotbug'),
