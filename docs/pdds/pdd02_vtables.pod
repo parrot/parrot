@@ -173,6 +173,8 @@ All the functions marked with ## must have multiple forms, one for
 each possible form of a data type. (IV, bigint, etc) Perl will
 automatically produce conversion code if a v it isn't.
 
+=over 4
+
 =item get_value
 
    void *       get_value(PMC[, key]);
@@ -182,4 +184,10 @@ this data must be determined by examining the PMCs C<type>. This must
 only be used by other vtable functions inside the core, and must never
 be used if the PMC is of a type defined by a user outside the core,
 unless you know what you're doing. (eg, comparing C<get_value>s from two
-PMCs of the same type, or C<set_value(PMC1,get_valu
+PMCs of the same type, or C<set_value(PMC1,get_valu>
+
+WHERE IS THE REST OF THIS FILE?
+
+=back
+
+=cut
