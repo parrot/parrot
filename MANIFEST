@@ -3,6 +3,10 @@ Config_pm.in
 Makefile.in
 MANIFEST
 Parrot/Opcode.pm
+Parrot/PackFile.pm
+Parrot/PackFile/Constant.pm
+Parrot/PackFile/ConstTable.pm
+Parrot/PackFile/FixupTable.pm
 Parrot/Test.pm
 README
 TODO
