@@ -1,0 +1,62 @@
+=head1 TITLE
+
+tetris.imc - a second tetris for parrot (with parrot's SDL bindings)
+
+=head1 SYNOPSIS
+
+To run this file, be in the Parrot directory and run the following command:
+
+	$ parrot examples/tetris/tetris.imc
+	$
+
+=head1 FUNCTIONS
+
+=over 4
+
+=item _main( argv )
+
+The entry point of SDL applications.
+
+=over 4
+
+=item parameter C<argv>
+
+Array with commandline parameters.
+
+=back
+
+=cut
+
+.sub _main @MAIN
+    .param pmc argv
+    .local pmc app
+
+    load_bytecode "examples/tetris/app.imc"
+    
+    # create the tetris app
+    find_type I0, "Tetris::App"
+    new app, I0
+    
+    app."flag"( "show blocksize", 1 )
+    # run the tetris app
+    app."run"()
+
+    # shutdown the app
+    app."shutdown"()
+
+    end
+.end
+
+=back
+
+=head1 AUTHOR
+
+Jens Rieks E<lt>parrot at jensbeimsurfen dot deE<gt> is the author
+and maintainer.
+Please send patches and suggestions to the Perl 6 Internals mailing list.
+
+=head1 COPYRIGHT
+
+Copyright (c) 2004, the Perl Foundation.
+
+=cut

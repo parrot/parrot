@@ -491,6 +491,15 @@ examples/streams/Replay.imc                       [main]doc
 examples/streams/SubCounter.imc                   [main]doc
 examples/streams/SubHello.imc                     [main]doc
 examples/streams/Writer.imc                       [main]doc
+examples/tetris/README				  [main]doc
+examples/tetris/app.imc				  [main]doc
+examples/tetris/blockdata.imc			  [main]doc
+examples/tetris/block.imc			  [main]doc
+examples/tetris/blocks.imc			  [main]doc
+examples/tetris/boarddata.imc			  [main]doc
+examples/tetris/board.imc			  [main]doc
+examples/tetris/eventhandler.imc		  [main]doc
+examples/tetris/tetris.imc			  [main]doc
 icu/README.parrot                                 [icu]
 icu/license.html                                  [icu]
 icu/readme.html                                   [icu]
