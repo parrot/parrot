@@ -91,11 +91,15 @@ string_native_compare(STRING* s1, STRING* s2) {
 
     if (s1->bufused < s2->bufused) {
         cmp = memcmp(s1->bufstart, s2->bufstart, s1->bufused);
-        if (cmp == 0) cmp == -1;
+        if (cmp == 0) {
+            cmp = -1;
+        }
     }
     else {
         cmp = memcmp(s1->bufstart, s2->bufstart, s2->bufused);
-        if (cmp ==0 && s1->bufused > s2->bufused) cmp = 1;
+        if (cmp == 0 && s1->bufused > s2->bufused) {
+            cmp = 1;
+        }
     }
 
     return cmp;
