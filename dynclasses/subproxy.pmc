@@ -1,0 +1,60 @@
+/*
+ * Sample SubProxy class
+ *
+ * s. dynclasses/main.pasm for usage
+ */
+
+#include "parrot/parrot.h"
+
+/*
+ * the real class enum is created at load time
+ */
+#define enum_class_SubProxy -1
+
+pmclass SubProxy dynpmc need_ext extends Sub {
+
+    void init() {
+	SUPER();
+	PObj_get_FLAGS(SELF) |= PObj_private0_FLAG;
+    }
+
+    void set_pmc(PMC *key) {
+	PMC_data(SELF) = key;
+    }
+
+    void* invoke (void* next) {
+	if (PObj_get_FLAGS(SELF) & PObj_private0_FLAG) {
+	    PMC* key = PMC_data(SELF);
+	    STRING* file;
+	    PMC* rsub, *sub;
+	    char *s;
+
+	    if (!key)
+		internal_exception(1, "SubProxy: no key");
+
+	    file = key_string(INTERP, key);
+	    if (!file)
+		internal_exception(1, "SubProxy: no file");
+	    sub = key_next(INTERP, key);
+	    if (!sub)
+		internal_exception(1, "SubProxy: no sub");
+	    s = string_to_cstring(INTERP, file);
+	    Parrot_load_bytecode(INTERP, s);
+	    string_cstring_free(s);
+	    rsub = VTABLE_get_pmc_keyed(interpreter,
+		    interpreter->perl_stash->stash_hash, sub);
+
+	    if (!VTABLE_defined(interpreter, rsub))
+		internal_exception(1, "SubProxy: sub not found");
+
+	    PObj_get_FLAGS(SELF) &= ~PObj_private0_FLAG;
+	    SELF->cache.struct_val = rsub->cache.struct_val;
+	    ((parrot_sub_t)(PMC_sub(SELF))) ->seg =
+		    ((parrot_sub_t)(PMC_sub(rsub))) ->seg;
+	    ((parrot_sub_t)(PMC_sub(SELF))) ->end =
+		    ((parrot_sub_t)(PMC_sub(rsub))) ->end;
+	}
+	SUPER(next);
+    }
+}
+

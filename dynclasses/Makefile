@@ -2,7 +2,7 @@
 # sample Makefile
 #
 
-all: foo.so #subproxy.so
+all: foo.so subproxy.so
 
 .SUFFIXES: .pmc .c .so
 # preserve .c if needed
