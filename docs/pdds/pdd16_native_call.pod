@@ -145,7 +145,7 @@ to look like:
 
 then use type C, where if the function signature is:
 
-   void (function *)(void *library_data, void *your_data);
+   void (function *)(void *your_data, void *library_data);
 
 then use a type of D. The actual pointer types for the parameters
 don't have to be void *, but they must be pointers of some sort.
