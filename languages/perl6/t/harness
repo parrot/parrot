@@ -13,11 +13,9 @@ use Test::Harness qw(runtests);
 
 use Getopt::Std;
 my %opts;
-getopts('gjP', \%opts);
+getopts('vgjP', \%opts);
+$Test::Harness::verbose = delete $opts{'v'};
 $ENV{TEST_PROG_ARGS} = join(' ', map { "-$_" } keys %opts );
-
-$ENV{PARROT_QUICKTEST} = grep $_ eq 'quick', @ARGV;
-@ARGV = grep $_ ne 'quick', @ARGV;
 
 # Pass in a list of tests to run on the command line, else run all the tests.
 my @tests = @ARGV ? @ARGV : grep !m{^t/parser/}, glob( "t/*/*.t" );
