@@ -35,14 +35,22 @@ sub runstep {
   my($gccversion, $warns, $ccwarn);
   $ccwarn=Configure::Data->get('ccwarn');
 
+  # Set gccversion to undef.  This will also trigger any hints-file
+  # callbacks that depend on knowing whether or not we're using gcc.
+
+  # This key should always exist unless the program couldn't be run,
+  # which should have been caught by the 'die' above.
   unless (exists $gnuc{__GNUC__}) {
+    Configure::Data->set(gccversion => undef);
     return;
   }
+  
   my $major = $gnuc{__GNUC__};
   my $minor = $gnuc{__GNUC_MINOR__};
   unless (defined $major) {
     print " (no) " if $_[1];
     $Configure::Step::result = 'no';
+    Configure::Data->set(gccversion => undef);
     return;
   }
   if ($major =~ tr/0-9//c) {
