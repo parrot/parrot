@@ -16,8 +16,8 @@ MULTIDIM CALC OFFSET
 
 Algorithm:
 
-	i + j*Ni + k*Ni*Nj + l*Ni*Nj*Nk ...
-	
+    i + j*Ni + k*Ni*Nj + l*Ni*Nj*Nk ...
+    
 where i,j,k,l... are coordinates in a multidimensional space and
 Ni,Nj,Nk... are the lengths of the dimensions.
 
@@ -54,11 +54,11 @@ static INTVAL calc_offset(Interp* interp, List*list, PMC *key)
     l = key_integer(interp, key);
     ninj = 1;
     for(; dim ; dim = key_next(interp, dim)) {
-		key = key_next(interp, key);
-		if (!key)
-			break;
-		ninj *= key_integer(interp, dim);
-		l += key_integer(interp, key) * ninj;
+        key = key_next(interp, key);
+        if (!key)
+            break;
+        ninj *= key_integer(interp, dim);
+        l += key_integer(interp, key) * ninj;
     }
     return l;
 }
@@ -211,4 +211,14 @@ Initial revision by Josef Hook <joh@stacken.kth.se>
 
 =cut
 
+*/
+
+/*
+ * Local variables:
+ * c-indentation-style: bsd
+ * c-basic-offset: 4
+ * indent-tabs-mode: nil
+ * End:
+ *
+ * vim: expandtab shiftwidth=4:
 */

@@ -71,10 +71,10 @@ Creates and returns a clone of the continuation.
         struct Parrot_Sub * sub;
         PMC* ret = SUPER();
         sub = PMC_sub(ret);
-	sub->ctx.user_stack = stack_copy(interpreter,
-				PMC_sub(SELF)->ctx.user_stack);
-	sub->ctx.control_stack = stack_copy(interpreter,
-				PMC_sub(SELF)->ctx.control_stack);
+    sub->ctx.user_stack = stack_copy(interpreter,
+                PMC_sub(SELF)->ctx.user_stack);
+    sub->ctx.control_stack = stack_copy(interpreter,
+                PMC_sub(SELF)->ctx.control_stack);
         return ret;
     }
 
@@ -105,4 +105,14 @@ Initial revision by sean 2002/08/04.
 
 =cut
 
+*/
+
+/*
+ * Local variables:
+ * c-indentation-style: bsd
+ * c-basic-offset: 4
+ * indent-tabs-mode: nil
+ * End:
+ *
+ * vim: expandtab shiftwidth=4:
 */

@@ -36,8 +36,8 @@ Raises an exception. Use C<init_pmc()> instead.
 
 */
 
-	void init () {
-		internal_exception(1, "Ref init without PMC\n");
+    void init () {
+        internal_exception(1, "Ref init without PMC\n");
     }
 
 /*
@@ -53,18 +53,18 @@ If C<initializer> is C<NULL> then an exception is raised.
 */
 
     void init_pmc (PMC* initializer) {
-		if (initializer) {
-			PMC_pmc_val(SELF) = initializer; /* the refered PMC itself */
-			PObj_custom_mark_SET(SELF);
-			/*
-			 * if referred PMC needs active destruction
-			 * we have to pass it on
-			 */
-			if (PObj_active_destroy_TEST(initializer))
-			PObj_active_destroy_SET(SELF);
-		}
-		else
-			internal_exception(1, "Ref init with NULL PMC\n");
+        if (initializer) {
+            PMC_pmc_val(SELF) = initializer; /* the refered PMC itself */
+            PObj_custom_mark_SET(SELF);
+            /*
+             * if referred PMC needs active destruction
+             * we have to pass it on
+             */
+            if (PObj_active_destroy_TEST(initializer))
+            PObj_active_destroy_SET(SELF);
+        }
+        else
+            internal_exception(1, "Ref init with NULL PMC\n");
     }
 
 /*
@@ -80,7 +80,7 @@ C<*props> with the reference.
 */
 
     void init_pmc_props(PMC* init, PMC* props) {
-		SUPER(init, props);
+        SUPER(init, props);
     }
 
 /*
@@ -94,8 +94,8 @@ Sets the referenced PMC to C<*other>.
 */
 
     void set_pmc(PMC* other) {
-		PObj_active_destroy_CLEAR(SELF);
-		SELF.init_pmc(other);
+        PObj_active_destroy_CLEAR(SELF);
+        SELF.init_pmc(other);
     }
 
 /*
@@ -109,7 +109,7 @@ Marks the referenced PMC as live.
 */
 
     void mark () {
-		pobject_lives(INTERP, (PObj *) PMC_pmc_val(SELF));
+        pobject_lives(INTERP, (PObj *) PMC_pmc_val(SELF));
     }
 
 /*
@@ -129,7 +129,7 @@ Returns the type of the PMC, not the type of the referenced PMC.
 */
 
     INTVAL type() {
-		return SUPER();
+        return SUPER();
     }
 
 /*
@@ -143,7 +143,7 @@ Returns the name of the PMC, not the name of the referenced PMC.
 */
 
     STRING* name() {
-		return SUPER();
+        return SUPER();
     }
 }
 
@@ -159,3 +159,12 @@ Initial revision by leo 2003.09.01.
 
 */
 
+/*
+ * Local variables:
+ * c-indentation-style: bsd
+ * c-basic-offset: 4
+ * indent-tabs-mode: nil
+ * End:
+ *
+ * vim: expandtab shiftwidth=4:
+*/

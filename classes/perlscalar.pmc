@@ -36,26 +36,26 @@ Morphs the scalar to the specified type.
 
 */
 
-	void morph (INTVAL type) {
-		if (SELF->vtable->base_type == type)
-			return;
-		if (SELF->vtable->base_type == enum_class_PerlString) {
-			PObj_custom_mark_CLEAR(SELF);
-			SELF->vtable = Parrot_base_vtables[type];
-			return;
-		}
-		if (type == enum_class_PerlString) {
-			/*
-			 * if we morph to a string, first clear str_val
-			 * so that after changing the vtable a parallel
-			 * reader doesn't get a gargabe pointer
-			 */
-			PMC_str_val(SELF) = NULL;
-			PObj_custom_mark_SET(SELF);
-			SELF->vtable = Parrot_base_vtables[type];
-			return;
-		}
-		SELF->vtable = Parrot_base_vtables[type];
+    void morph (INTVAL type) {
+        if (SELF->vtable->base_type == type)
+            return;
+        if (SELF->vtable->base_type == enum_class_PerlString) {
+            PObj_custom_mark_CLEAR(SELF);
+            SELF->vtable = Parrot_base_vtables[type];
+            return;
+        }
+        if (type == enum_class_PerlString) {
+            /*
+             * if we morph to a string, first clear str_val
+             * so that after changing the vtable a parallel
+             * reader doesn't get a gargabe pointer
+             */
+            PMC_str_val(SELF) = NULL;
+            PObj_custom_mark_SET(SELF);
+            SELF->vtable = Parrot_base_vtables[type];
+            return;
+        }
+        SELF->vtable = Parrot_base_vtables[type];
     }
 
 /*
@@ -70,22 +70,22 @@ according to the type of C<*value>.
 */
 
     void set_pmc (PMC* value) {
-		DYNSELF.morph(value->vtable->base_type);
-		switch (value->vtable->base_type) {
-			case enum_class_Boolean:
-			case enum_class_PerlInt:
-				DYNSELF.set_integer_same(value);
-				break;
-			case enum_class_PerlNum:
-				DYNSELF.set_number_same(value);
-				break;
-			case enum_class_PerlString:
-				DYNSELF.set_string_same(value);
-				break;
-			case enum_class_PerlUndef:
-				(void) VTABLE_get_pmc(interpreter, value);
-				break;
-		}
+        DYNSELF.morph(value->vtable->base_type);
+        switch (value->vtable->base_type) {
+            case enum_class_Boolean:
+            case enum_class_PerlInt:
+                DYNSELF.set_integer_same(value);
+                break;
+            case enum_class_PerlNum:
+                DYNSELF.set_number_same(value);
+                break;
+            case enum_class_PerlString:
+                DYNSELF.set_string_same(value);
+                break;
+            case enum_class_PerlUndef:
+                (void) VTABLE_get_pmc(interpreter, value);
+                break;
+        }
     }
 
 }
@@ -96,4 +96,14 @@ according to the type of C<*value>.
 
 =cut
 
+*/
+
+/*
+ * Local variables:
+ * c-indentation-style: bsd
+ * c-basic-offset: 4
+ * indent-tabs-mode: nil
+ * End:
+ *
+ * vim: expandtab shiftwidth=4:
 */

@@ -33,7 +33,7 @@ Initializes the number to C<0.0>.
 
 */
 
-	void init () {
+    void init () {
         PMC_num_val(SELF) = 0.0;
     }
 
@@ -643,3 +643,14 @@ Decrements the number.
 =cut
 
 */
+
+/*
+ * Local variables:
+ * c-indentation-style: bsd
+ * c-basic-offset: 4
+ * indent-tabs-mode: nil
+ * End:
+ *
+ * vim: expandtab shiftwidth=4:
+*/
+

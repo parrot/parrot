@@ -36,7 +36,7 @@ pmclass Random singleton {
 */
 
 void* get_pointer() {
-		return Rand_PMC;
+        return Rand_PMC;
     }
 
 /*
@@ -51,8 +51,8 @@ information see F<src/pmc.c>.
 */
 
     void set_pointer(void* ptr) {
-		assert(!Rand_PMC);
-		Rand_PMC = (PMC*) ptr;
+        assert(!Rand_PMC);
+        Rand_PMC = (PMC*) ptr;
     }
 
 /*
@@ -66,7 +66,7 @@ Sets the random number seed to C<seed>.
 */
 
     void set_integer_native(INTVAL seed) {
-		Parrot_srand(seed);
+        Parrot_srand(seed);
     }
 
 /*
@@ -80,7 +80,7 @@ Returns a random integer in the range C<-2^31..2^31>.
 */
 
     INTVAL get_integer() {
-		return Parrot_int_rand(0);
+        return Parrot_int_rand(0);
     }
 
 /*
@@ -94,7 +94,7 @@ Returns a ramdom integer in the range C<0..max>.
 */
 
     INTVAL get_integer_keyed_int(INTVAL max) {
-		return Parrot_range_rand(0, max, 0);
+        return Parrot_range_rand(0, max, 0);
     }
 
 /*
@@ -108,7 +108,7 @@ Returns a ramdom floating-point number in the range C<0.0..1.0>.
 */
 
     FLOATVAL get_number() {
-		return Parrot_float_rand(0);
+        return Parrot_float_rand(0);
     }
 
 }
@@ -119,9 +119,19 @@ Returns a ramdom floating-point number in the range C<0.0..1.0>.
 
 =head1 HISTORY
 
-2003.12.10	first rev by leo.
+2003.12.10  first rev by leo.
 
 =cut
 
+*/
+
+/*
+ * Local variables:
+ * c-indentation-style: bsd
+ * c-basic-offset: 4
+ * indent-tabs-mode: nil
+ * End:
+ *
+ * vim: expandtab shiftwidth=4:
 */
 

@@ -578,3 +578,13 @@ Sets C<*value> as the value of attribute C<*attr>.
 =cut
 
 */
+
+/*
+ * Local variables:
+ * c-indentation-style: bsd
+ * c-basic-offset: 4
+ * indent-tabs-mode: nil
+ * End:
+ *
+ * vim: expandtab shiftwidth=4:
+*/

@@ -51,7 +51,7 @@ Initializes the ordered hash.
 
 */
 
-	void init () {
+    void init () {
         /* clear the Hash ptr - its not yet existing */
         PMC_struct_val(SELF) = NULL;
         SUPER();

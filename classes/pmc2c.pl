@@ -1,8 +1,6 @@
 #! perl -w
-################################################################################
 # Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
 # $Id$
-################################################################################
 
 =head1 NAME
 
@@ -174,8 +172,6 @@ As above, but uses the actual dynamic type of C<SELF>.
 
 =cut
 
-################################################################################
-
 use FindBin;
 use lib 'lib';
 use lib "$FindBin::Bin/..";
@@ -208,8 +204,6 @@ my $signature_re = qr{
     \(([^\(]*)\)  #parameters
 }sx;
 
-################################################################################
-
 =item C<extract_balanced($code)>
 
 This function's purpose is to extract the C code between the opening
@@ -239,8 +233,6 @@ in string with the above removed, and the current line number after
 the above has been removed.
 
 =cut
-
-################################################################################
 
 sub extract_balanced {
     my $balance = 0;
@@ -293,8 +285,6 @@ sub parse_flags {
     ($pre, $classname, $superpmc, \%flags);
 }
 
-################################################################################
-
 =item C<parse_superpmc($data)>
 
 This function looks for a superclass declaration in the current PMC
@@ -304,8 +294,6 @@ method names. It returns an array ref to the method names and the name
 of the superclass that was analyzed.
 
 =cut
-
-################################################################################
 
 sub parse_superpmc {
 
@@ -327,16 +315,12 @@ sub parse_superpmc {
   return (\@methods, $superpmc, $flags);
 }
 
-################################################################################
-
 =item C<superpmc_info($class)>
 
 This function opens the file containing the superclass reads in the
 data and calls C<parse_superpmc()>.
 
 =cut
-
-################################################################################
 
 sub superpmc_info {
     my $pmc = shift;
@@ -353,8 +337,6 @@ sub superpmc_info {
     return parse_superpmc($data);
 }
 
-################################################################################
-
 =item C<scan_inheritance_tree($classname)>
 
 This function repeatedly calls C<superpmc_info()> passing in the current
@@ -365,8 +347,6 @@ superclass is processed. It returns a hash that maps the method name to
 the most derived class it was defined in.
 
 =cut
-
-################################################################################
 
 sub scan_inheritance_tree {
     my ($class) = @_;
@@ -459,15 +439,11 @@ while (my $file = shift @ARGV) {
   close SOURCE;
 }
 
-################################################################################
-
 =item C<count_newlines($string)>
 
 Returns the number of newlines in C<$string>.
 
 =cut
-
-################################################################################
 
 sub count_newlines {
     return scalar(() = $_[0] =~ /\n/g);
@@ -618,8 +594,6 @@ EOC
     $OUT;
 }
 
-################################################################################
-
 =item C<filter($contents, $file, $cfile)>
 
 The C<filter()> function choreographs the previous functions actions on
@@ -631,8 +605,6 @@ replaces directives with the appropriate values. Finally, it generates
 the .c and .h files for the .pmc file being analyzed.
 
 =cut
-
-################################################################################
 
 my (%flags, %parent_flags);
 sub filter {
@@ -875,8 +847,6 @@ EOH
   return ($OUT, $HOUT);
 }
 
-################################################################################
-
 =back
 
 =head1 TODO
@@ -888,5 +858,3 @@ EOH
 =back
 
 =cut
-
-################################################################################

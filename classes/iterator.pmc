@@ -263,7 +263,7 @@ Sets the current index to C<value>.
 
 C<value> must be in the range:
 
-	(ITERATE_FROM_START + 1) .. (ITERATE_FROM_END - 1)
+    (ITERATE_FROM_START + 1) .. (ITERATE_FROM_END - 1)
 
 =cut
 
@@ -547,4 +547,14 @@ Returns the result of calling C<type_keyed(key)> on the aggregate.
 
 =cut
 
+*/
+
+/*
+ * Local variables:
+ * c-indentation-style: bsd
+ * c-basic-offset: 4
+ * indent-tabs-mode: nil
+ * End:
+ *
+ * vim: expandtab shiftwidth=4:
 */

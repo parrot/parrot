@@ -54,11 +54,11 @@ static PMC* retval(Interp *interp, void *ret)
     /* XXX getting non existent value, exception or undef?
      * current is for perlarray */
     if (ret == (void*) -1)
-    	value = undef(interp);
+        value = undef(interp);
     else {
-		value = *(PMC**) ret;
-		if (value == NULL)  /* XXX same here */
-			value = undef(interp);
+        value = *(PMC**) ret;
+        if (value == NULL)  /* XXX same here */
+            value = undef(interp);
     }
     return value;
 }
@@ -1207,4 +1207,14 @@ C<PerlUndef> should really be just C<Undef>.
 
 =cut
 
+*/
+
+/*
+ * Local variables:
+ * c-indentation-style: bsd
+ * c-basic-offset: 4
+ * indent-tabs-mode: nil
+ * End:
+ *
+ * vim: expandtab shiftwidth=4:
 */

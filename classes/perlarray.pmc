@@ -22,9 +22,9 @@ These are the vtable functions for the PerlArray base class
 
 /*
 
-=item C<>
+=item C<static PMC *undef(struct Parrot_Interp *interpreter)>
 
-
+Returns the C<PerlUndef> PMC.
 
 =cut
 
@@ -37,9 +37,10 @@ static PMC* undef(struct Parrot_Interp* interpreter)
 
 /*
 
-=item C<>
+=item C<static PMC *
+Parrot_PerlArray_set_pmc_ptr(Interp *interp, List *list, INTVAL key)>
 
-
+Returns the PMC pointer for the element at index C<key>. 
 
 =cut
 
@@ -53,17 +54,23 @@ Parrot_PerlArray_set_pmc_ptr(Interp *interp, List *list, INTVAL key)
 
     /* assign into a sparse or past end */
     if (ret == 0 || ret == (void*) -1 || *(PMC**)ret == 0) {
-    value = undef(interp);
-    list_assign(interp, list, key, value, enum_type_PMC);
+        value = undef(interp);
+        list_assign(interp, list, key, value, enum_type_PMC);
     }
     else
-    value = *(PMC**) ret;
+        value = *(PMC**) ret;
     return value;
 }
 
 pmclass PerlArray extends Array need_ext does array {
 
 /*
+
+=back
+
+=head2 Methods
+
+=over 4
 
 =item C<void set_integer_keyed_int(INTVAL key, INTVAL value)>
 
@@ -323,3 +330,12 @@ possibly seg fault).
 
 */
 
+/*
+ * Local variables:
+ * c-indentation-style: bsd
+ * c-basic-offset: 4
+ * indent-tabs-mode: nil
+ * End:
+ *
+ * vim: expandtab shiftwidth=4:
+*/

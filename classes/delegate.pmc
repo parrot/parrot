@@ -59,7 +59,7 @@ save_regs(Parrot_Interp interp) {
     struct regsave *save;
     save = mem_sys_allocate(sizeof(struct regsave));
     if (!save) {
-		internal_exception(ALLOCATION_ERROR, "No memory for save struct");
+        internal_exception(ALLOCATION_ERROR, "No memory for save struct");
     }
     mem_sys_memcopy(save, interp, sizeof(struct regsave));
     return save;
@@ -117,8 +117,8 @@ PARROT_INLINE static PMC *
 find_or_die(Parrot_Interp interpreter, PMC *pmc, const char *name) {
     PMC *returnPMC = find_meth(interpreter, pmc, name);
     if (PMC_IS_NULL(returnPMC)) {
-		internal_exception(METH_NOT_FOUND,
-			"Can't find method '%s' for object", name);
+        internal_exception(METH_NOT_FOUND,
+            "Can't find method '%s' for object", name);
     }
     REG_PMC(2) = pmc;
     return returnPMC;
@@ -149,11 +149,11 @@ PARROT_INLINE static void
 noarg_noreturn(Parrot_Interp interpreter, PMC *obj, const char *meth, int die) {
     struct regsave *data = save_regs(interpreter);
     PMC *method = die ? find_or_die(interpreter, obj, meth) :
-	                find_meth  (interpreter, obj, meth);
+                    find_meth  (interpreter, obj, meth);
     if (PMC_IS_NULL(method))
-	return;
+    return;
     REG_PMC(2) = obj;
-    REG_INT(0) = 1;	/* prototyped */
+    REG_INT(0) = 1; /* prototyped */
     REG_INT(1) = 0;
     REG_INT(2) = 0;
     REG_INT(3) = 0;
@@ -181,7 +181,7 @@ Calls the delegated C<init()> method.
 */
 
     void init () {
-		noarg_noreturn(INTERP, SELF, PARROT_VTABLE_INIT_METHNAME, 0);
+        noarg_noreturn(INTERP, SELF, PARROT_VTABLE_INIT_METHNAME, 0);
     }
 
 
@@ -195,3 +195,12 @@ Calls the delegated C<init()> method.
 
 */
 
+/*
+ * Local variables:
+ * c-indentation-style: bsd
+ * c-basic-offset: 4
+ * indent-tabs-mode: nil
+ * End:
+ *
+ * vim: expandtab shiftwidth=4:
+*/

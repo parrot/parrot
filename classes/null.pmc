@@ -33,7 +33,7 @@ Overrides the default to do nothing.
 
 */
 
-	void init () {
+    void init () {
     }
 
 }
@@ -44,4 +44,14 @@ Overrides the default to do nothing.
 
 =cut
 
+*/
+
+/*
+ * Local variables:
+ * c-indentation-style: bsd
+ * c-basic-offset: 4
+ * indent-tabs-mode: nil
+ * End:
+ *
+ * vim: expandtab shiftwidth=4:
 */

@@ -60,7 +60,7 @@ Initializes the class.
 
 */
 
-	void init () {
+    void init () {
         /* No attributes to start with */
         PMC_int_val(SELF) = 0;
         /* But we are a class, really */
@@ -185,4 +185,14 @@ Attribute accessor methods.
 
 =cut
 
+*/
+
+/*
+ * Local variables:
+ * c-indentation-style: bsd
+ * c-basic-offset: 4
+ * indent-tabs-mode: nil
+ * End:
+ *
+ * vim: expandtab shiftwidth=4:
 */

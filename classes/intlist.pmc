@@ -34,11 +34,11 @@ Creates and returns a clone of the list.
 
 */
 
-	PMC* clone () {
-		PMC* dest = pmc_new_noinit(INTERP, SELF->vtable->base_type);
+    PMC* clone () {
+        PMC* dest = pmc_new_noinit(INTERP, SELF->vtable->base_type);
         PObj_custom_mark_SET(dest);
         PMC_data(dest) = intlist_clone(INTERP, (IntList *) PMC_data(SELF));
-		return dest;
+        return dest;
     }
 
 /*
@@ -213,4 +213,14 @@ Removes and returns the first element in the list.
 
 =cut
 
+*/
+
+/*
+ * Local variables:
+ * c-indentation-style: bsd
+ * c-basic-offset: 4
+ * indent-tabs-mode: nil
+ * End:
+ *
+ * vim: expandtab shiftwidth=4:
 */

@@ -779,7 +779,7 @@ C<*value>.
 */
     void repeat (PMC* value, PMC* dest) {
         internal_exception(INVALID_OPERATION,
-        	"repeat() not implemented in class 'PerlInt'\n");
+            "repeat() not implemented in class 'PerlInt'\n");
     }
 
 /*
@@ -861,4 +861,13 @@ Used to unarchive the integer.
 =cut
 
 */
- 
+
+/*
+ * Local variables:
+ * c-indentation-style: bsd
+ * c-basic-offset: 4
+ * indent-tabs-mode: nil
+ * End:
+ *
+ * vim: expandtab shiftwidth=4:
+*/

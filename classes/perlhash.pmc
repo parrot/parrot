@@ -28,9 +28,9 @@ STRING * hash_get_idx(Interp *interpreter, Hash *hash, PMC *key);
 
 /*
 
-=item C<>
+=item C<static STRING* make_hash_key(Interp *interpreter, PMC *key)>
 
-
+Returns a Parrot string for C<*key>.
 
 =cut
 
@@ -834,4 +834,14 @@ F<docs/pdds/pdd08_keys.pod>.
 
 =cut
 
+*/
+
+/*
+ * Local variables:
+ * c-indentation-style: bsd
+ * c-basic-offset: 4
+ * indent-tabs-mode: nil
+ * End:
+ *
+ * vim: expandtab shiftwidth=4:
 */

@@ -36,10 +36,10 @@ Initializes the continuation.
 
 */
 
-	void init () {
-		PMC_sub(SELF) = new_ret_continuation(INTERP);
-		PMC_struct_val(SELF) = NULL;
-		PObj_custom_mark_destroy_SETALL(SELF);
+    void init () {
+        PMC_sub(SELF) = new_ret_continuation(INTERP);
+        PMC_struct_val(SELF) = NULL;
+        PObj_custom_mark_destroy_SETALL(SELF);
     }
 
 /*
@@ -53,13 +53,13 @@ Creates and returns a clone of the continuation.
 */
 
     PMC* clone() {
-		struct Parrot_Sub * sub;
-		PMC* ret = pmc_new_noinit(INTERP, SELF->vtable->base_type);
-		sub = PMC_sub(ret) = mem_sys_allocate(sizeof(struct Parrot_Sub));
-		memcpy(sub, PMC_sub(SELF), sizeof(struct Parrot_Sub));
-		PMC_struct_val(ret) = PMC_struct_val(SELF);
-		PObj_custom_mark_destroy_SETALL(ret);
-		return ret;
+        struct Parrot_Sub * sub;
+        PMC* ret = pmc_new_noinit(INTERP, SELF->vtable->base_type);
+        sub = PMC_sub(ret) = mem_sys_allocate(sizeof(struct Parrot_Sub));
+        memcpy(sub, PMC_sub(SELF), sizeof(struct Parrot_Sub));
+        PMC_struct_val(ret) = PMC_struct_val(SELF);
+        PObj_custom_mark_destroy_SETALL(ret);
+        return ret;
     }
 }
 
@@ -73,4 +73,14 @@ Initial revision by sean 2002/08/04.
 
 =cut
 
+*/
+
+/*
+ * Local variables:
+ * c-indentation-style: bsd
+ * c-basic-offset: 4
+ * indent-tabs-mode: nil
+ * End:
+ *
+ * vim: expandtab shiftwidth=4:
 */

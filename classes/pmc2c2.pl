@@ -1,8 +1,6 @@
 #! perl -w
-################################################################################
 # Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
 # $Id$
-################################################################################
 
 =head1 NAME
 
@@ -214,8 +212,6 @@ Many thanks to the author of F<pmc2c.pl>, many useful code pieces got
 reused.
 
 =cut
-
-################################################################################
 
 use FindBin;
 use lib 'lib';

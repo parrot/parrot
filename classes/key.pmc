@@ -32,7 +32,7 @@ Initializes the key.
 
 */
 
-	void init () {
+    void init () {
         PObj_custom_mark_SET(SELF);
     }
 
@@ -296,4 +296,14 @@ Raises an exception of an attempt is made to iterate backwards.
 
 =cut
 
+*/
+
+/*
+ * Local variables:
+ * c-indentation-style: bsd
+ * c-basic-offset: 4
+ * indent-tabs-mode: nil
+ * End:
+ *
+ * vim: expandtab shiftwidth=4:
 */
