@@ -5,31 +5,37 @@
 # Shortly we will create an echo server in Parrot and
 # combine these 2 into a test suite.
 
+.sub _main
+    .local pmc sock
+    .local string address
+    .local string buf
+    .local int ret
+    .local int len
     print "Creating socket.\n"
     # create the socket handle 
-    socket P0, 2, 1, 0
+    socket sock, 2, 1, 0
     # Pack a sockaddr_in structure with IP and port
-    sockaddr S0, 7, "127.0.0.1"
+    sockaddr address, 7, "127.0.0.1"
     print "Connecting to port 7 (ECHO)\n"
-    connect I0, P0, S0
+    connect ret, sock, address 
     print "connect returned "
-    print I0
+    print ret 
     print "\n"
 COMMAND:
     print "echo>"
-    read S1, 100
-    chopn S1, 1
-    length I0, S1
-    le I0, 0, END
-    concat S1, "\n"
-    send I0, P0, S1 
-    poll I0, P0, 1, 5, 0
-    recv I0, P0, S0
-    lt I0, 0, END
-    print S0
+    read buf, 100
+    chopn buf, 1
+    length len, buf 
+    if len <= 0 goto END
+    concat buf, "\n"
+    send ret, sock, buf 
+    poll ret, sock, 1, 5, 0
+    recv ret, sock, buf 
+    if ret < 0 goto END
+    print buf 
     branch COMMAND
 END:
-    close P0
+    close sock 
     end
-
+.end
 
