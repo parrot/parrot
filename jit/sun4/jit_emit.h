@@ -72,6 +72,7 @@
         emitm_rs1(rs1) | (low14); \
     pc +=4 ; }
 
+/* format 3b */
 #define emitm_3a(pc, op, rd, op3, rs1, asi, rs2) \
     emitm_fmt3(pc, op, rd, op3, rs1, ((asi) << 5) | (rs2))
 
@@ -231,6 +232,16 @@
 
 /* Floating point operations */
 
+/* MOV */
+#define emitm_fmovs(pc, rs, rd) emitm_3c(pc, 2, rd, 064, 0, 0001, rs)
+
+/* Arithmetic operations */
+#define emitm_faddd(pc, rs1, rs2, rd) emitm_3c(pc, 2, rd, 064, rs1, 0102, rs2)
+#define emitm_fsubd(pc, rs1, rs2, rd) emitm_3c(pc, 2, rd, 064, rs1, 0106, rs2)
+#define emitm_fmuld(pc, rs1, rs2, rd) emitm_3c(pc, 2, rd, 064, rs1, 0112, rs2)
+#define emitm_fdivd(pc, rs1, rs2, rd) emitm_3c(pc, 2, rd, 064, rs1, 0116, rs2)
+
+/* Floating <-> Integer Conversion */
 #define emitm_fitod(pc, rs, rd) emitm_3c(pc, 2, rd, 064, 0, 0310, rs)
 #define emitm_fdtoi(pc, rs, rd) emitm_3c(pc, 2, rd, 064, 0, 0322, rs)
 
@@ -262,6 +273,11 @@
 /* Branch */
 #define emitm_bicc(pc, a, cond, disp22) emitm_2b(pc, a, cond, 02, disp22)
 
+#define jit_emit_mov_rr_i(pc, dst, src) emitm_mov(pc, src, dst)
+#define jit_emit_mov_rr_n(pc, dst, src) { \
+    emitm_fmovs(pc, src, dst); \
+    emitm_fmovs(pc, (src)+1, (dst)+1); }
+
 /*
 void main(){
     char ar[1024];
@@ -292,15 +308,20 @@ enum  {JIT_BRANCH, JIT_CALL30 };
 /* The register containing the address of the opmap */
 #define Parrot_jit_opmap emitm_i(3)
 
-/* The scratch register used for certain address calculations */
-#define Parrot_jit_tmp emitm_l(7)
+/* This scratch register is used for certain address calculations */
+#define ISR1 emitm_l(5)
+#define ISR2 emitm_l(6)
+#define FSR1 emitm_f(0)
+#define FSR2 emitm_f(2)
 
 #define Parrot_jit_regbase_ptr(i) &((i)->ctx.int_reg.registers[0])
 
 /* The offset of a Parrot register from the base register */
 #define Parrot_jit_regoff(a, i) (unsigned)(a) - (unsigned)(Parrot_jit_regbase_ptr(i))
 
-/* Generate a jump to a bytecode address - uses the temporary register */
+/* Generate a jump to a bytecode address in reg_num
+ *  - uses the temporary register
+ */
 static void
 Parrot_jit_bytejump(Parrot_jit_info_t *jit_info,
                     struct Parrot_Interp *interpreter, int reg_num)
@@ -308,21 +329,21 @@ Parrot_jit_bytejump(Parrot_jit_info_t *jit_info,
 
     /* Construct the starting address of the byte code */
     emitm_sethi(jit_info->native_ptr, emitm_hi22(interpreter->code->byte_code),
-        Parrot_jit_tmp);
-    emitm_or_i(jit_info->native_ptr, Parrot_jit_tmp,
-        emitm_lo10(interpreter->code->byte_code), Parrot_jit_tmp);
+        ISR2);
+    emitm_or_i(jit_info->native_ptr, ISR2,
+        emitm_lo10(interpreter->code->byte_code), ISR2);
 
     /* Calculates the offset into op_map shadow array
      * assuming sizeof(opcode_t) == sizeof(opmap array entry) */
-    emitm_sub_r(jit_info->native_ptr, reg_num, Parrot_jit_tmp,
-                Parrot_jit_tmp);
+    emitm_sub_r(jit_info->native_ptr, reg_num, ISR2,
+                ISR2);
 
     /* Load the address of the native code from op_map */
-    emitm_ld_r(jit_info->native_ptr, Parrot_jit_opmap, Parrot_jit_tmp,
-               Parrot_jit_tmp);
+    emitm_ld_r(jit_info->native_ptr, Parrot_jit_opmap, ISR2,
+               ISR2);
 
     /* This jumps to the address from op_map */
-    emitm_jumpl_i(jit_info->native_ptr, Parrot_jit_tmp, 0, Parrot_jit_tmp);
+    emitm_jumpl_i(jit_info->native_ptr, ISR2, 0, ISR2);
     emitm_nop(jit_info->native_ptr);
 }
 
@@ -353,7 +374,7 @@ static void Parrot_jit_bicc(Parrot_jit_info_t *jit_info, int cond, int annul,
 }
 
 /* This function loads a value */
-static void Parrot_jit_int_load(Parrot_jit_info_t *jit_info,
+static void jit_emit_load_i(Parrot_jit_info_t *jit_info,
                              struct Parrot_Interp *interpreter,
                              int param,
                              int hwreg)
@@ -381,13 +402,25 @@ static void Parrot_jit_int_load(Parrot_jit_info_t *jit_info,
                     constants[val]->u.number;
 
             /* Load double into integer registers */
-            emitm_sethi(jit_info->native_ptr, emitm_hi22(val), Parrot_jit_tmp);
-            emitm_ldd_i(jit_info->native_ptr, Parrot_jit_tmp, emitm_lo10(val),
+            emitm_sethi(jit_info->native_ptr, emitm_hi22(val), ISR2);
+            emitm_ldd_i(jit_info->native_ptr, ISR2, emitm_lo10(val),
                         hwreg);
             break;
 
         case PARROT_ARG_I:
             val = (int)&interpreter->ctx.int_reg.registers[val];
+            emitm_ld_i(jit_info->native_ptr, Parrot_jit_regbase,
+                       Parrot_jit_regoff(val, interpreter), hwreg);
+            break;
+
+        case PARROT_ARG_P:
+            val = (int)&interpreter->ctx.pmc_reg.registers[val];
+            emitm_ld_i(jit_info->native_ptr, Parrot_jit_regbase,
+                       Parrot_jit_regoff(val, interpreter), hwreg);
+            break;
+
+        case PARROT_ARG_S:
+            val = (int)&interpreter->ctx.string_reg.registers[val];
             emitm_ld_i(jit_info->native_ptr, Parrot_jit_regbase,
                        Parrot_jit_regoff(val, interpreter), hwreg);
             break;
@@ -405,7 +438,7 @@ static void Parrot_jit_int_load(Parrot_jit_info_t *jit_info,
     }
 }
 
-static void Parrot_jit_int_store(Parrot_jit_info_t *jit_info,
+static void jit_emit_store_i(Parrot_jit_info_t *jit_info,
                              struct Parrot_Interp *interpreter,
                              int param,
                              int hwreg)
@@ -423,6 +456,18 @@ static void Parrot_jit_int_store(Parrot_jit_info_t *jit_info,
                        Parrot_jit_regoff(val, interpreter));
             break;
 
+        case PARROT_ARG_P:
+            val = (int)&interpreter->ctx.pmc_reg.registers[val];
+            emitm_st_i(jit_info->native_ptr, hwreg, Parrot_jit_regbase,
+                       Parrot_jit_regoff(val, interpreter));
+            break;
+
+        case PARROT_ARG_S:
+            val = (int)&interpreter->ctx.string_reg.registers[val];
+            emitm_st_i(jit_info->native_ptr, hwreg, Parrot_jit_regbase,
+                       Parrot_jit_regoff(val, interpreter));
+            break;
+
         case PARROT_ARG_N:
             val = (int)&interpreter->ctx.num_reg.registers[val];
             emitm_std_i(jit_info->native_ptr, hwreg, Parrot_jit_regbase,
@@ -435,7 +480,7 @@ static void Parrot_jit_int_store(Parrot_jit_info_t *jit_info,
     }
 }
 
-static void Parrot_jit_float_load(Parrot_jit_info_t *jit_info,
+static void jit_emit_load_n(Parrot_jit_info_t *jit_info,
                              struct Parrot_Interp *interpreter,
                              int param,
                              int hwreg)
@@ -447,6 +492,16 @@ static void Parrot_jit_float_load(Parrot_jit_info_t *jit_info,
     val = jit_info->cur_op[param];
 
     switch(op_type){
+        case PARROT_ARG_NC:
+            val = (int)&interpreter->code->const_table->
+                    constants[val]->u.number;
+
+            /* Load double into integer registers */
+            emitm_sethi(jit_info->native_ptr, emitm_hi22(val), ISR2);
+            emitm_lddf_i(jit_info->native_ptr, ISR2, emitm_lo10(val),
+                        hwreg);
+            break;
+
         case PARROT_ARG_I:
             val = (int)&interpreter->ctx.int_reg.registers[val];
             emitm_ldf_i(jit_info->native_ptr, Parrot_jit_regbase,
@@ -465,7 +520,7 @@ static void Parrot_jit_float_load(Parrot_jit_info_t *jit_info,
     }
 }
 
-static void Parrot_jit_float_store(Parrot_jit_info_t *jit_info,
+static void jit_emit_store_n(Parrot_jit_info_t *jit_info,
                              struct Parrot_Interp *interpreter,
                              int param,
                              int hwreg)
@@ -615,34 +670,52 @@ void Parrot_jit_restart_op(Parrot_jit_info_t *jit_info,
 void
 Parrot_jit_emit_mov_mr(struct Parrot_Interp * interpreter, char *mem, int reg)
 {
+    emitm_st_i(((Parrot_jit_info_t *)(interpreter->jit_info))->native_ptr,
+               reg, Parrot_jit_regbase, Parrot_jit_regoff(mem, interpreter));
 }
 
 /* move mem (i.e. intreg) to reg */
 void
 Parrot_jit_emit_mov_rm(struct Parrot_Interp * interpreter, int reg, char *mem)
 {
+    emitm_ld_i(((Parrot_jit_info_t *)(interpreter->jit_info))->native_ptr,
+               Parrot_jit_regbase, Parrot_jit_regoff(mem, interpreter), reg);
 }
 
 /* move reg to mem (i.e. numreg) */
 void
 Parrot_jit_emit_mov_mr_n(struct Parrot_Interp * interpreter, char *mem, int reg)
 {
+    emitm_stdf_i(((Parrot_jit_info_t *)(interpreter->jit_info))->native_ptr,
+                 reg, Parrot_jit_regbase, Parrot_jit_regoff(mem, interpreter));
 }
 
 /* move mem (i.e. numreg) to reg */
 void
 Parrot_jit_emit_mov_rm_n(struct Parrot_Interp * interpreter, int reg, char *mem)
 {
+    emitm_lddf_i(((Parrot_jit_info_t *)(interpreter->jit_info))->native_ptr,
+                 Parrot_jit_regbase, Parrot_jit_regoff(mem, interpreter), reg);
 }
 
 #else
 
 #  define REQUIRES_CONSTANT_POOL 0
-#  define INT_REGISTERS_TO_MAP 1
+#  define INT_REGISTERS_TO_MAP 5
+#  define FLOAT_REGISTERS_TO_MAP 6
 
 #ifndef JIT_IMCC
-char intval_map[INT_REGISTERS_TO_MAP] = { emitm_l(0) };
+char intval_map[INT_REGISTERS_TO_MAP] =
+    { emitm_l(0), emitm_l(1), emitm_l(2), emitm_l(3), emitm_l(4)
+    };
+
+char floatval_map[] = 
+    { emitm_f(4), emitm_f(6), emitm_f(8), emitm_f(10), emitm_f(12), emitm_f(14)
+    };
 #endif
+
+#define PRESERVED_INT_REGS 5
+#define PRESERVED_FLOAT_REGS 0
 
 #endif
 
