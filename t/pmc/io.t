@@ -101,7 +101,7 @@ ok 6
 OUTPUT
 
 SKIP: {
-  skip "clone not finished yet", 1
+    skip ("clone not finished yet", 1);
 output_is(<<'CODE', <<'OUTPUT', "clone");
 	open P0, "temp.file", "<"
 	clone P1, P0
