@@ -1,108 +1,353 @@
-/* mmd_default.pmc
- *  Copyright: 2003 The Perl Foundation.  All Rights Reserved.
- *  CVS Info $Id$
- *  Overview:
- *	MMD dispatching base class
- *  Data Structure and Algorithms:
- *  History:
- *  Notes:
- *      This class provides MMD versions of all the binary operators
- *      for PMC classes to inherit from.
- *  References:
- */
+/*
+Copyright: 2003 The Perl Foundation.  All Rights Reserved.
+$Id$
+
+=head1 NAME
+
+classes/mmd_default.pmc - Abstract default for multi-method dispatch
+
+=head1 DESCRIPTION
+
+C<mmd_default> extends C<default> to provide multi-method dispatch
+versions of all the binary operators for PMC classes to inherit from.
+
+=head2 Methods
+
+=over 4
+
+=cut
+
+*/
 
 #include "parrot/parrot.h"
 
 pmclass mmd_default extends default {
 
+/*
+
+=item C<void init()>
+
+Initialises the PMC with a default value of C<0.0>.
+
+=cut
+
+*/
+
     void init() {
-	PMC_num_val(SELF) = 0.0;
+        PMC_num_val(SELF) = 0.0;
     }
+    
+/*
 
-  void add(PMC* value, PMC* dest) {
-    mmd_dispatch_pmc(INTERP, SELF, value, dest, MMD_ADD);
-  }
+=item C<void add(PMC *value, PMC *dest)>
 
-  void subtract(PMC* value, PMC* dest) {
-    mmd_dispatch_pmc(INTERP, SELF, value, dest, MMD_SUBTRACT);
-  }
+Returns in C<*dest> the result of adding the PMC to C<*value>.
 
-  void multiply(PMC* value, PMC* dest) {
-    mmd_dispatch_pmc(INTERP, SELF, value, dest, MMD_MULTIPLY);
-  }
+=cut
 
-  void divide(PMC* value, PMC* dest) {
-    mmd_dispatch_pmc(INTERP, SELF, value, dest, MMD_DIVIDE);
-  }
+*/
 
-  void modulus(PMC* value, PMC* dest) {
-    mmd_dispatch_pmc(INTERP, SELF, value, dest, MMD_MOD);
-  }
+    void add(PMC* value, PMC* dest) {
+        mmd_dispatch_pmc(INTERP, SELF, value, dest, MMD_ADD);
+    }
+    
+/*
 
-  void cmodulus(PMC* value, PMC* dest) {
-    mmd_dispatch_pmc(INTERP, SELF, value, dest, MMD_CMOD);
-  }
+=item C<void subtract(PMC *value, PMC *dest)>
 
-  void bitwise_and(PMC* value, PMC* dest) {
-    mmd_dispatch_pmc(INTERP, SELF, value, dest, MMD_BAND);
-  }
+Returns in C<*dest> the result of subtracting C<*value> from the PMC.
 
-  void bitwise_or(PMC* value, PMC* dest) {
-    mmd_dispatch_pmc(INTERP, SELF, value, dest, MMD_BOR);
-  }
+=cut
 
-  void bitwise_xor(PMC* value, PMC* dest) {
-    mmd_dispatch_pmc(INTERP, SELF, value, dest, MMD_BXOR);
-  }
+*/
 
-  void bitwise_shl(PMC* value, PMC* dest) {
-    mmd_dispatch_pmc(INTERP, SELF, value, dest, MMD_BSL);
-  }
+    void subtract(PMC* value, PMC* dest) {
+        mmd_dispatch_pmc(INTERP, SELF, value, dest, MMD_SUBTRACT);
+    }
+    
+/*
 
-  void bitwise_shr(PMC* value, PMC* dest) {
-    mmd_dispatch_pmc(INTERP, SELF, value, dest, MMD_BSR);
-  }
+=item C<void multiply(PMC *value, PMC *dest)>
 
-  void concatenate(PMC* value, PMC* dest) {
-    mmd_dispatch_pmc(INTERP, SELF, value, dest, MMD_CONCAT);
-  }
+Returns in C<*dest> the result of multiplying the PMC by C<*value>.
 
-  void logical_and(PMC* value, PMC* dest) {
-    mmd_dispatch_pmc(INTERP, SELF, value, dest, MMD_LAND);
-  }
+=cut
 
-  void logical_or(PMC* value, PMC* dest) {
-    mmd_dispatch_pmc(INTERP, SELF, value, dest, MMD_LOR);
-  }
+*/
 
-  void logical_xor(PMC* value, PMC* dest) {
-    mmd_dispatch_pmc(INTERP, SELF, value, dest, MMD_LXOR);
-  }
+    void multiply(PMC* value, PMC* dest) {
+        mmd_dispatch_pmc(INTERP, SELF, value, dest, MMD_MULTIPLY);
+    }
+    
+/*
 
-  void repeat(PMC* value, PMC* dest) {
-    mmd_dispatch_pmc(INTERP, SELF, value, dest, MMD_REPEAT);
-  }
+=item C<void divide(PMC *value, PMC *dest)>
 
-  INTVAL is_equal(PMC* value) {
-    return mmd_dispatch_intval(INTERP, SELF, value, MMD_NUMEQ);
-  }
+Returns in C<*dest> the result of dividing the PMC by C<*value>.
 
-  INTVAL cmp(PMC* value) {
-    return mmd_dispatch_intval(INTERP, SELF, value, MMD_NUMCMP);
-  }
+=cut
 
-  void bitwise_ors(PMC* value, PMC* dest) {
-    mmd_dispatch_pmc(INTERP, SELF, value, dest, MMD_SOR);
-  }
+*/
 
-  void bitwise_ands(PMC* value, PMC* dest) {
-    mmd_dispatch_pmc(INTERP, SELF, value, dest, MMD_SAND);
-  }
+    void divide(PMC* value, PMC* dest) {
+        mmd_dispatch_pmc(INTERP, SELF, value, dest, MMD_DIVIDE);
+    }
+    
+/*
 
-  void bitwise_xors(PMC* value, PMC* dest) {
-    mmd_dispatch_pmc(INTERP, SELF, value, dest, MMD_SXOR);
-  }
+=item C<void modulus(PMC *value, PMC *dest)>
 
+Returns in C<*dest> the result of PMC modulo C<*value>.
 
+=cut
 
+*/
+
+    void modulus(PMC* value, PMC* dest) {
+        mmd_dispatch_pmc(INTERP, SELF, value, dest, MMD_MOD);
+    }
+    
+/*
+
+=item C<void cmodulus(PMC *value, PMC *dest)>
+
+Returns in C<*dest> the result of PMC C-style modulo C<*value>.
+
+=cut
+
+*/
+
+    void cmodulus(PMC* value, PMC* dest) {
+        mmd_dispatch_pmc(INTERP, SELF, value, dest, MMD_CMOD);
+    }
+    
+/*
+
+=item C<void bitwise_and(PMC *value, PMC *dest)>
+
+Returns in C<*dest> the result of applying a bitwise C<AND> between the
+PMC and C<*value>.
+
+=cut
+
+*/
+
+    void bitwise_and(PMC* value, PMC* dest) {
+        mmd_dispatch_pmc(INTERP, SELF, value, dest, MMD_BAND);
+    }
+    
+/*
+
+=item C<void bitwise_or(PMC *value, PMC *dest)>
+
+Returns in C<*dest> the result of applying a bitwise C<OR> between the
+PMC and C<*value>.
+
+=cut
+
+*/
+
+    void bitwise_or(PMC* value, PMC* dest) {
+        mmd_dispatch_pmc(INTERP, SELF, value, dest, MMD_BOR);
+    }
+    
+/*
+
+=item C<void bitwise_xor(PMC *value, PMC *dest)>
+
+Returns in C<*dest> the result of applying a bitwise C<XOR> between the
+PMC and C<*value>.
+
+=cut
+
+*/
+
+    void bitwise_xor(PMC* value, PMC* dest) {
+        mmd_dispatch_pmc(INTERP, SELF, value, dest, MMD_BXOR);
+    }
+    
+/*
+
+=item C<void bitwise_shl(PMC *value, PMC *dest)>
+
+Returns in C<*dest> the result of applying a bitwise shift left
+(C<<<<<>>>) between the PMC and C<*value>.
+
+=cut
+
+*/
+
+    void bitwise_shl(PMC* value, PMC* dest) {
+        mmd_dispatch_pmc(INTERP, SELF, value, dest, MMD_BSL);
+    }
+    
+/*
+
+=item C<void bitwise_shr(PMC *value, PMC *dest)>
+
+Returns in C<*dest> the result of applying a bitwise shift right
+(C<<<>>>>>) between the PMC and C<*value>.
+
+=cut
+
+*/
+
+    void bitwise_shr(PMC* value, PMC* dest) {
+        mmd_dispatch_pmc(INTERP, SELF, value, dest, MMD_BSR);
+    }
+    
+/*
+
+=item C<void concatenate(PMC *value, PMC *dest)>
+
+Returns in C<*dest> the result of concatenating the PMC with C<*value>.
+
+=cut
+
+*/
+
+    void concatenate(PMC* value, PMC* dest) {
+        mmd_dispatch_pmc(INTERP, SELF, value, dest, MMD_CONCAT);
+    }
+    
+/*
+
+=item C<void logical_and(PMC *value, PMC *dest)>
+
+Returns in C<*dest> the result of applying a logical C<AND> between the
+PMC and C<*value>.
+
+=cut
+
+*/
+
+    void logical_and(PMC* value, PMC* dest) {
+        mmd_dispatch_pmc(INTERP, SELF, value, dest, MMD_LAND);
+    }
+    
+/*
+
+=item C<void logical_or(PMC *value, PMC *dest)>
+
+Returns in C<*dest> the result of applying a logical C<OR> between the
+PMC and C<*value>.
+
+=cut
+
+*/
+
+    void logical_or(PMC* value, PMC* dest) {
+        mmd_dispatch_pmc(INTERP, SELF, value, dest, MMD_LOR);
+    }
+    
+/*
+
+=item C<void logical_xor(PMC *value, PMC *dest)>
+
+Returns in C<*dest> the result of applying a logical C<XOR> between the
+PMC and C<*value>.
+
+=cut
+
+*/
+
+    void logical_xor(PMC* value, PMC* dest) {
+        mmd_dispatch_pmc(INTERP, SELF, value, dest, MMD_LXOR);
+    }
+    
+/*
+
+=item C<void repeat(PMC *value, PMC *dest)>
+
+Returns in C<*dest> the result of repeating the PMC C<*value> times.
+
+=cut
+
+*/
+
+    void repeat(PMC* value, PMC* dest) {
+        mmd_dispatch_pmc(INTERP, SELF, value, dest, MMD_REPEAT);
+    }
+    
+/*
+
+=item C<INTVAL is_equal(PMC *value)>
+
+Returns whether the PMC is equal to C<*value>.
+
+=cut
+
+*/
+
+    INTVAL is_equal(PMC* value) {
+        return mmd_dispatch_intval(INTERP, SELF, value, MMD_NUMEQ);
+    }
+    
+/*
+
+=item C<INTVAL cmp(PMC *value)>
+
+Returns a comparison result (i.e. one of C<{-1, 0, 1}>) for the PMC and
+C<*value>.
+
+=cut
+
+*/
+
+    INTVAL cmp(PMC* value) {
+        return mmd_dispatch_intval(INTERP, SELF, value, MMD_NUMCMP);
+    }
+    
+/*
+
+=item C<void bitwise_ors(PMC *value, PMC *dest)>
+
+Returns in C<*dest> the result of the string bitwise C<OR> of the PMC
+and C<*value>.
+
+=cut
+
+*/
+
+    void bitwise_ors(PMC* value, PMC* dest) {
+        mmd_dispatch_pmc(INTERP, SELF, value, dest, MMD_SOR);
+    }
+    
+/*
+
+=item C<void bitwise_ands(PMC *value, PMC *dest)>
+
+Returns in C<*dest> the result of the string bitwise C<AND> of the PMC
+and C<*value>.
+
+=cut
+
+*/
+
+    void bitwise_ands(PMC* value, PMC* dest) {
+        mmd_dispatch_pmc(INTERP, SELF, value, dest, MMD_SAND);
+    }
+    
+/*
+
+=item C<void bitwise_xors(PMC *value, PMC *dest)>
+
+Returns in C<*dest> the result of the string bitwise C<XOR> of the PMC
+and C<*value>.
+
+=cut
+
+*/
+
+    void bitwise_xors(PMC* value, PMC* dest) {
+        mmd_dispatch_pmc(INTERP, SELF, value, dest, MMD_SXOR);
+    }
 }
+
+/*
+
+=back
+
+=cut
+
+*/

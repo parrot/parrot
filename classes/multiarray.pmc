@@ -1,30 +1,49 @@
-/* Multiarray.pmc
- *  Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
- *  CVS Info
- *     $Id$
- *  Overview:
- *     These are the vtable functions for the Multiarray base class
- *  Data Structure and Algorithms:
- *   This is one way for calculating offsets in 2 dimensional space.
- *
- * MULTIDIM CALC OFFSET
- * Algorithm:
- *  i + j*Ni + k*Ni*Nj + l*Ni*Nj*Nk ...
- * where i,j,k,l... are coordinates in a multidimensional space
- * and Ni,Nj,Nk... are the lengths of the dimensions.
- *
- * Limitations: the array can only expand in the last dimension
- *              The first (n-1) dimensions of a n-dimensional array
- *              are fixed and layed out at array creation.
- *  History:
- *        	Initial revision by Josef Hook <joh@stacken.kth.se>
- *        1.6	Based on list.c by Leopold Toetsch <lt@toetsch.at>
- *
- *  Notes:
- *  References:
- */
+/*
+Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+$Id$
+
+=head1 NAME
+
+classes/multiarray.pmc - Multi-dimensional Array
+
+=head1 DESCRIPTION
+
+C<MultiArray> extends C<Array> to provide a multi-dimensional array.
+
+This is one way for calculating offsets in 2 dimensional space.
+
+MULTIDIM CALC OFFSET
+
+Algorithm:
+
+	i + j*Ni + k*Ni*Nj + l*Ni*Nj*Nk ...
+	
+where i,j,k,l... are coordinates in a multidimensional space and
+Ni,Nj,Nk... are the lengths of the dimensions.
+
+Limitations: the array can only expand in the last dimension The first
+(n-1) dimensions of a n-dimensional array are fixed and layed out at
+array creation.
+
+=head2 Functions
+
+=over 4
+
+=cut
+
+*/
 
 #include "parrot/parrot.h"
+
+/*
+
+=item C<static INTVAL calc_offset(Interp *interp, List *list, PMC *key)>
+
+Calculates the offset for C<*key>.
+
+=cut
+
+*/
 
 static INTVAL calc_offset(Interp* interp, List*list, PMC *key)
 {
@@ -35,58 +54,161 @@ static INTVAL calc_offset(Interp* interp, List*list, PMC *key)
     l = key_integer(interp, key);
     ninj = 1;
     for(; dim ; dim = key_next(interp, dim)) {
-	key = key_next(interp, key);
-	if (!key)
-	    break;
-	ninj *= key_integer(interp, dim);
-	l += key_integer(interp, key) * ninj;
+		key = key_next(interp, key);
+		if (!key)
+			break;
+		ninj *= key_integer(interp, dim);
+		l += key_integer(interp, key) * ninj;
     }
     return l;
 }
 
 pmclass MultiArray extends Array need_ext {
 
+/*
+
+=item C<void init()>
+
+Overrides the default in C<Array>. There is no initialization.
+
+=cut
+
+*/
+
     void init () {
-	/* override default in Array - no init */
+        /* override default in Array - no init */
     }
+
+/*
+
+=item C<INTVAL get_integer_keyed(PMC *key)>
+
+Returns the integer value for C<*key>.
+
+=cut
+
+*/
 
     INTVAL get_integer_keyed (PMC* key) {
-	INTVAL ix = calc_offset(INTERP, (List*) PMC_data(SELF), key);
-	return DYNSELF.get_integer_keyed_int(ix);
+        INTVAL ix = calc_offset(INTERP, (List*) PMC_data(SELF), key);
+        return DYNSELF.get_integer_keyed_int(ix);
     }
 
+/*
+
+=item C<FLOATVAL get_number_keyed(PMC *key)>
+
+Returns the floating-point number value for C<*key>.
+
+=cut
+
+*/
 
     FLOATVAL get_number_keyed (PMC* key) {
-	INTVAL ix = calc_offset(INTERP, (List*) PMC_data(SELF), key);
-	return DYNSELF.get_number_keyed_int(ix);
+        INTVAL ix = calc_offset(INTERP, (List*) PMC_data(SELF), key);
+        return DYNSELF.get_number_keyed_int(ix);
     }
+
+/*
+
+=item C<STRING *get_string_keyed(PMC *key)>
+
+Returns the Parrot string value for C<*key>.
+
+=cut
+
+*/
 
     STRING* get_string_keyed (PMC* key) {
-	INTVAL ix = calc_offset(INTERP, (List*) PMC_data(SELF), key);
-	return DYNSELF.get_string_keyed_int(ix);
+        INTVAL ix = calc_offset(INTERP, (List*) PMC_data(SELF), key);
+        return DYNSELF.get_string_keyed_int(ix);
     }
+
+/*
+
+=item C<PMC *get_pmc_keyed (PMC *key)>
+
+Returns the PMC value for C<*key>.
+
+=cut
+
+*/
 
     PMC* get_pmc_keyed (PMC* key) {
-	INTVAL ix = calc_offset(INTERP, (List*) PMC_data(SELF), key);
-	return DYNSELF.get_pmc_keyed_int(ix);
+        INTVAL ix = calc_offset(INTERP, (List*) PMC_data(SELF), key);
+        return DYNSELF.get_pmc_keyed_int(ix);
     }
 
+/*
+
+=item C<void set_integer_keyed(PMC *key, INTVAL value)>
+
+Sets the integer value C<value> at C<*key>.
+
+=cut
+
+*/
+
     void set_integer_keyed (PMC* key, INTVAL value) {
-	INTVAL ix = calc_offset(INTERP, (List*) PMC_data(SELF), key);
+        INTVAL ix = calc_offset(INTERP, (List*) PMC_data(SELF), key);
         DYNSELF.set_integer_keyed_int(ix, value);
     }
 
+/*
+
+=item C<void set_number_keyed(PMC *key, FLOATVAL value)>
+
+Sets the floating-point number value C<value> at C<*key>.
+
+=cut
+
+*/
+
     void set_number_keyed (PMC* key, FLOATVAL value) {
-	INTVAL ix = calc_offset(INTERP, (List*) PMC_data(SELF), key);
+        INTVAL ix = calc_offset(INTERP, (List*) PMC_data(SELF), key);
         DYNSELF.set_number_keyed_int(ix, value);
     }
 
+/*
+
+=item C<void set_string_keyed(PMC *key, STRING *value)>
+
+Sets the Parrot string value C<value> at C<*key>.
+
+=cut
+
+*/
+
     void set_string_keyed (PMC* key, STRING* value) {
-	INTVAL ix = calc_offset(INTERP, (List*) PMC_data(SELF), key);
+        INTVAL ix = calc_offset(INTERP, (List*) PMC_data(SELF), key);
         DYNSELF.set_string_keyed_int(ix, value);
     }
 
+/*
+
+=item C<void set_pmc_keyed(PMC *dest_key, PMC *src)>
+
+Unimplemented.
+
+=cut
+
+*/
+
     void set_pmc_keyed (PMC* dest_key, PMC* src) {
-	/* XXX array ??? */
+        /* XXX array ??? */
     }
 }
+
+/*
+
+=back
+
+=head1 HISTORY
+
+Initial revision by Josef Hook <joh@stacken.kth.se>
+
+1.6 Based on list.c by Leopold Toetsch <lt@toetsch.at>
+
+=cut
+
+*/

@@ -1,15 +1,23 @@
 /*
- *  Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
- *  CVS Info
- *     $Id$
- *  Overview:
- *     PMC class to hold structs that parrot's responsible for disposing of
- *  Data Structure and Algorithms:
- *  History:
- *     Initial revision by sean 2002/08/04
- *  Notes:
- *  References:
- */
+Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+$Id$
+
+=head1 DESCRIPTION
+
+classes/managedstruct.pmc - Memory-managed C struct
+
+=head1 DESCRIPTION
+
+C<ManagedStruct> extends C<UnManagedStruct> to provide a class to hold C
+C<struct> values that Parrot is responsible for disposing of.
+
+=head2 Methods
+
+=over 4
+
+=cut
+
+*/
 
 #include "parrot/parrot.h"
 #include "parrot/method_util.h"
@@ -19,23 +27,62 @@ INTVAL key_2_idx(Parrot_Interp interpreter, PMC *pmc, PMC *key);
 
 pmclass ManagedStruct extends UnManagedStruct need_ext {
 
-    void init () {
-	SUPER();
-	PObj_active_destroy_SET(SELF);
-	PMC_int_val(SELF) = 0;
+/*
+
+=item C<void init()>
+
+Initializes an empty struct.
+
+=cut
+
+*/
+
+	void init () {
+        SUPER();
+        PObj_active_destroy_SET(SELF);
+        PMC_int_val(SELF) = 0;
     }
+
+/*
+
+=item C<void init_pmc(PMC *value)>
+
+Initializes the struct with C<*value>.
+
+=cut
+
+*/
 
     void init_pmc (PMC* value) {
-
-	SELF.init();
-	SUPER(value);
+        SELF.init();
+        SUPER(value);
     }
+
+/*
+
+=item C<void destroy()>
+
+Destroys the struct, freeing the allocated memory.
+
+=cut
+
+*/
 
     void destroy () {
-	if (PMC_data(SELF)) {
-	    mem_sys_free(PMC_data(SELF));
-	}
+        if (PMC_data(SELF)) {
+            mem_sys_free(PMC_data(SELF));
+        }
     }
+
+/*
+
+=item C<void set_integer_native(INTVAL value)>
+
+(Re)allocates C<value> bytes for the struct.
+
+=cut
+
+*/
 
     void set_integer_native (INTVAL value) {
         if (PMC_data(SELF) && (! value)) {
@@ -55,3 +102,15 @@ pmclass ManagedStruct extends UnManagedStruct need_ext {
     }
 
 }
+
+/*
+
+=back
+
+=head1 HISTORY
+
+Initial revision by sean 2002/08/04.
+
+=cut
+
+*/

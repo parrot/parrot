@@ -1,61 +1,157 @@
-/* NCI.pmc
- *  Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
- *  CVS Info
- *     $Id$
- *  Overview:
- *     The vtable functions for the native C call functions
- *  Data Structure and Algorithms:
- *  History:
- *     Initial revision by sean 2002/08/04
- *  Notes:
- *     Invoking a NCI function changes some registers according to pdd03.
- *     The caller has to preserve registers if needed.
- *  References:
- *     docs/pdds/pdd03_calling_conventions.pod
- */
+/*
+Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+$Id$
+
+=head1 NAME
+
+classes/nci.pmc - Naitive Call Interface
+
+=head1 DESCRIPTION
+
+The vtable functions for the native C call functions.
+
+Invoking an NCI function changes some registers according to PDD 3.
+
+The caller has to preserve registers if needed.
+
+=head2 Methods
+
+=over 4
+
+=cut
+
+*/
 
 #include "parrot/parrot.h"
 #include "parrot/method_util.h"
 
 pmclass NCI need_ext {
 
-    void init() {
-	PMC_struct_val(SELF) = NULL;
+/*
+
+=item C<void init()>
+
+Initializes the NCI with a C<NULL> function pointer.
+
+=cut
+
+*/
+
+	void init() {
+        PMC_struct_val(SELF) = NULL;
     }
+
+/*
+
+=item C<void set_string_keyed(PMC *func, STRING *value)>
+
+Sets the specified function pointer and signature (C<*value>).
+
+=cut
+
+*/
 
     void set_string_keyed (PMC* func, STRING* value) {
-	/* key = func_ptr, value = signature */
-	PMC_struct_val(SELF) = (DPOINTER *)func;
-	PMC_data(SELF) = build_call_func(INTERP, SELF, value);
+        /* key = func_ptr, value = signature */
+        PMC_struct_val(SELF) = (DPOINTER *)func;
+        PMC_data(SELF) = build_call_func(INTERP, SELF, value);
     }
+
+/*
+
+=item C<void destroy()>
+
+Destroys the NCI, freeing any allocated memory.
+
+=cut
+
+*/
 
     void destroy() {
-	if (PMC_data(SELF))
-	    mem_free_executable(PMC_data(SELF));
+        if (PMC_data(SELF))
+            mem_free_executable(PMC_data(SELF));
     }
 
+/*
+
+=item C<PMC *clone()>
+
+Creates and returns a clone of the NCI.
+
+=cut
+
+*/
+
     PMC* clone () {
-	PMC* ret = pmc_new_noinit(INTERP, SELF->vtable->base_type);
+        PMC* ret = pmc_new_noinit(INTERP, SELF->vtable->base_type);
         PMC_struct_val(ret) = PMC_struct_val(SELF);
-	/* FIXME if data is malloced (JIT/i386!) then we need
-	 * the length of data here, to memcpy it
-	 * ManagedStruct or Buffer?
-	 */
-	PMC_data(ret) = PMC_data(SELF);
-	return ret;
+        /* FIXME if data is malloced (JIT/i386!) then we need
+         * the length of data here, to memcpy it
+         * ManagedStruct or Buffer?
+         */
+        PMC_data(ret) = PMC_data(SELF);
+        return ret;
     }
+
+/*
+
+=item C<INTVAL defined()>
+
+Returns whether the NCI is defined.
+
+=cut
+
+*/
 
     INTVAL defined () {
         return PMC_data(SELF) != NULL;
     }
+
+/*
+
+=item C<void *invoke(void *next)>
+
+Calls the associated C function, returning C<*next>.
+
+=cut
+
+*/
 
     void* invoke (void * next) {
         Parrot_csub_t func = (Parrot_csub_t)D2FPTR(PMC_data(SELF));
         func(INTERP, SELF);
         return next;
     }
+    
+/*
+
+=item C<INTVAL get_integer()>
+
+Returns the function pointer as an integer.
+
+=cut
+
+*/
+
     INTVAL get_integer () {
-	return((INTVAL)PMC_data(SELF));
+        return((INTVAL)PMC_data(SELF));
     }
 
 }
+
+/*
+
+=back
+
+=head1 SEE ALSO
+
+F<docs/pdds/pdd03_calling_conventions.pod>.
+
+=head1 HISTORY
+
+Initial revision by sean 2002/08/04.
+
+=cut
+
+*/
+

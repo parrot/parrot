@@ -1,22 +1,47 @@
-/* Null.pmc
- *  Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
- *  CVS Info
- *     $Id$
- *  Overview:
- *     These are the vtable functions for the Null PMC
- *     This simply creates a way of catching NULL register accesses without
- *     really slowing down the bytecode execution.
- *  Data Structure and Algorithms:
- *  History:
- *  Notes:
- *  References:
- */
+/*
+Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+$Id$
+
+=head1 NAME
+
+classes/null.pmc - NULL
+
+=head1 DESCRIPTION
+
+This simply creates a way of catching C<NULL> register accesses without
+really slowing down the bytecode execution.
+
+=head2 Methods
+
+=over 4
+
+=cut
+
+*/
 
 #include "parrot/parrot.h"
 
 pmclass Null {
 
-    void init () {
+/*
+
+=item C<void init()>
+
+Overrides the default to do nothing.
+
+=cut
+
+*/
+
+	void init () {
     }
 
 }
+
+/*
+
+=back
+
+=cut
+
+*/

@@ -1,129 +1,300 @@
-/* key.pmc
- *  Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
- *  CVS Info $Id$
- *  Overview:
- *     These are the vtable functions for the default PMC class
- *  Data Structure and Algorithms:
- *  History:
- *  Notes:
- *  References:
- */
+/*
+Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+$Id$
+
+=head1 NAME
+
+classes/key.pmc - Key PMC
+
+=head1 DESCRIPTION
+
+These are the vtable functions for the default PMC class.
+
+=head2 Methods
+
+=over 4
+
+=cut
+
+*/
 
 #include "parrot/parrot.h"
 
 pmclass Key need_ext {
 
-    void init () {
+/*
+
+=item C<void init()>
+
+Initializes the key.
+
+=cut
+
+*/
+
+	void init () {
         PObj_custom_mark_SET(SELF);
     }
 
+/*
+
+=item C<PMC *clone()>
+
+Creates and returns a clone of the key.
+
+=cut
+
+*/
+
     PMC* clone() {
-	PMC *dest = pmc_new_noinit(INTERP, SELF->vtable->base_type);
-	PMC *dkey = dest;
-	PMC *key = SELF;
-	PMC *p;
-
+        PMC *dest = pmc_new_noinit(INTERP, SELF->vtable->base_type);
+        PMC *dkey = dest;
+        PMC *key = SELF;
+        PMC *p;
+    
         PObj_custom_mark_SET(dest);
-	for (; key ; ) {
-
-	    switch (PObj_get_FLAGS(key) & KEY_type_FLAGS) {
-		case KEY_integer_FLAG:
-		case KEY_integer_FLAG|KEY_register_FLAG:
-		    key_set_integer(INTERP, dkey, key_integer(INTERP, key));
-		    break;
-		case KEY_number_FLAG:
-		case KEY_number_FLAG|KEY_register_FLAG:
-		    key_set_number(INTERP, dkey, key_number(INTERP, key));
-		    break;
-		case KEY_string_FLAG:
-		case KEY_string_FLAG|KEY_register_FLAG:
-		    key_set_string(INTERP, dkey,
-			    string_copy(INTERP, key_string(INTERP, key)));
-		    break;
-		case KEY_pmc_FLAG:
-		case KEY_pmc_FLAG|KEY_register_FLAG:
-		    p = key_pmc(INTERP, key);
-		    key_set_pmc(INTERP, dkey, VTABLE_clone(INTERP, p));
-		    break;
-	    }
-	    key = key_next(INTERP, key);
-	    if (key) {
-		p = key_new(INTERP);
-		key_append(INTERP, dkey, p);
-		dkey = p;
-	    }
-	}
-	return dest;
+        for (; key ; ) {
+            switch (PObj_get_FLAGS(key) & KEY_type_FLAGS) {
+                case KEY_integer_FLAG:
+                case KEY_integer_FLAG|KEY_register_FLAG:
+                    key_set_integer(INTERP, dkey, key_integer(INTERP, key));
+                    break;
+                case KEY_number_FLAG:
+                case KEY_number_FLAG|KEY_register_FLAG:
+                    key_set_number(INTERP, dkey, key_number(INTERP, key));
+                    break;
+                case KEY_string_FLAG:
+                case KEY_string_FLAG|KEY_register_FLAG:
+                    key_set_string(INTERP, dkey,
+                        string_copy(INTERP, key_string(INTERP, key)));
+                    break;
+                case KEY_pmc_FLAG:
+                case KEY_pmc_FLAG|KEY_register_FLAG:
+                    p = key_pmc(INTERP, key);
+                    key_set_pmc(INTERP, dkey, VTABLE_clone(INTERP, p));
+                    break;
+            }
+            key = key_next(INTERP, key);
+            if (key) {
+                p = key_new(INTERP);
+                key_append(INTERP, dkey, p);
+                dkey = p;
+            }
+        }
+        return dest;
     }
+
+/*
+
+=item C<void mark()>
+
+Marks the key as live.
+
+=cut
+
+*/
 
     void mark () {
         key_mark(INTERP, SELF);
     }
 
+/*
+
+=item C<INTVAL get_integer()>
+
+Returns the integer value of the key.
+
+=cut
+
+*/
+
     INTVAL get_integer () {
         return key_integer(INTERP, SELF);
     }
+
+/*
+
+=item C<FLOATVAL get_number()>
+
+Returns the floating-point number value of the key.
+
+=cut
+
+*/
 
     FLOATVAL get_number () {
         return key_number(INTERP, SELF);
     }
 
+/*
+
+=item C<STRING *get_string()>
+
+Returns the Parrot string value of the key.
+
+=cut
+
+*/
+
     STRING* get_string () {
         return key_string(INTERP, SELF);
     }
+
+/*
+
+=item C<PMC *get_pmc()>
+
+Returns the PMC value of the key.
+
+=cut
+
+*/
 
     PMC* get_pmc () {
         return key_pmc(INTERP, SELF);
     }
 
+/*
+
+=item C<void set_integer_native(INTVAL value)>
+
+=cut
+
+*/
+
     void set_integer_native (INTVAL value) {
         key_set_integer(INTERP, SELF, value);
     }
+
+/*
+
+=item C<void set_number_native(FLOATVAL value)>
+
+Sets the value of the key to C<value>.
+
+=cut
+
+*/
 
     void set_number_native (FLOATVAL value) {
         key_set_number(INTERP, SELF, value);
     }
 
+/*
+
+=item C<void set_string_native(STRING *value)>
+
+
+=cut
+
+*/
+
     void set_string_native (STRING* value) {
         key_set_string(INTERP, SELF, value);
     }
+
+/*
+
+=item C<void set_pmc(PMC *value)>
+
+Sets the value of the key to C<*value>.
+
+=cut
+
+*/
 
     void set_pmc (PMC* value) {
         key_set_pmc(INTERP, SELF, value);
     }
 
+/*
+
+=item C<void push_pmc(PMC *value)>
+
+Appends C<*value> to the key.
+
+=cut
+
+*/
+
     void push_pmc (PMC * value) {
-	key_append(INTERP, SELF, value);
+        key_append(INTERP, SELF, value);
     }
 
-    /* actually doesn't remove the entry but might be useful
-     * to traverse a key chain
      */
+/*
+
+=item C<PMC *shift_pmc()>
+
+Returns the next key.
+
+Actually doesn't remove the entry but might be useful to traverse a key
+chain.
+
+=cut
+
+*/
+
     PMC* shift_pmc() {
-	return key_next(INTERP, SELF);
+        return key_next(INTERP, SELF);
     }
 
-    /* iterator interface */
+/*
+
+=back
+
+=head2 Iterator Interface
+
+=over 4
+
+=item C<PMC *get_pmc_keyed(PMC *key)>
+
+Returns the key itself.
+
+=cut
+
+*/
+
     PMC* get_pmc_keyed (PMC* key) {
-	return key;
+        return key;
     }
+
+/*
+
+=item C<PMC *nextkey_keyed(PMC *key, INTVAL what)>
+
+Returns the next key relative to the location specified in C<what>.
+
+Raises an exception of an attempt is made to iterate backwards.
+
+=cut
+
+*/
 
     PMC* nextkey_keyed (PMC* key, INTVAL what) {
-	PMC *ret = SELF;
-
-	switch (what) {
-	    case ITERATE_FROM_START:	/* reset key */
-		break;
-	    case ITERATE_GET_NEXT:
-		if (PMC_data(key))
-		    ret = key_next(interpreter, key);
-		else
-		    PMC_int_val(ret) = -1;
-		break;
-	    default:
-		internal_exception(1, "Key can't iterate backwards");
-		break;
-	}
-	return ret;
+        PMC *ret = SELF;
+    
+        switch (what) {
+            case ITERATE_FROM_START:    /* reset key */
+            break;
+            case ITERATE_GET_NEXT:
+            if (PMC_data(key))
+                ret = key_next(interpreter, key);
+            else
+                PMC_int_val(ret) = -1;
+            break;
+            default:
+            internal_exception(1, "Key can't iterate backwards");
+            break;
+        }
+        return ret;
     }
 }
+
+/*
+
+=back
+
+=cut
+
+*/

@@ -1,124 +1,293 @@
- /* orderedhash.pmc
- *  Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
- *  CVS Info
- *     $Id$
- *  Overview:
- *     These are the vtable functions for the OrderedHash base class
- *  Data Structure and Algorithms:
- *  History:
- *     Initial rev by leo 2003-08-21
- *  Notes:
- *     This class combines the functionality of PerlArray
- *     (list in data) and a PerlHash (hash in struct_val).
- *     The list holds the PMC values, the hash keys point to
- *     the index of the value in the list.
- *
- *     There are 2 iterator interfaces:
- *     - retrieve value (in creation order)
- *     - retrieve key (no special order)
- *     s. t/pmc/ordereredhash.t
- *
- *     If values are set by numeric index only, there is no hash
- *     key. Iterating over the hash doesn't show these values.
- *
- *  References:
- *     pdd08_keys.pod
- */
+/*
+Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+$Id$
+
+=head1 NAME
+
+classes/orderedhash.pmc - Ordered Hash
+
+=head1 DESCRIPTION
+
+C<OrderedHash> extends C<PerlArray> to provide the functionality of
+C<PerlArray> (list in C<data>) and a C<PerlHash> (hash in
+C<struct_val>). The list holds the PMC values, the hash keys point to
+the index of the value in the list.
+ 
+There are 2 iterator interfaces:
+
+=over 4
+
+=item * retrieve value (in creation order)
+
+=item * retrieve key (no special order)
+
+=back
+
+See F<t/pmc/ordereredhash.t>.
+ 
+If values are set by numeric index only, there is no hash key. Iterating
+over the hash doesn't show these values.
+
+=head2 Methods
+
+=over 4
+
+=cut
+
+*/
 
 #include "parrot/parrot.h"
 #include "pmc_perlhash.h"
 
 pmclass OrderedHash extends PerlArray need_ext does array does hash {
-    void init () {
+
+/*
+
+=item C<void init()>
+
+Initializes the ordered hash.
+
+=cut
+
+*/
+
+	void init () {
         /* clear the Hash ptr - its not yet existing */
         PMC_struct_val(SELF) = NULL;
-	SUPER();
-	PerlHash.SUPER();
+        SUPER();
+        PerlHash.SUPER();
     }
+
+/*
+
+=item C<void mark()>
+
+Marks the ordered hash as live.
+
+=cut
+
+*/
 
     void mark () {
         SUPER();
         PerlHash.SUPER();
     }
 
+/*
+
+=item C<PMC *clone()>
+
+Creates and returns a clone of the ordered hash.
+
+=cut
+
+*/
+
     PMC* clone () {
         PMC* dest = SUPER();
-	hash_clone(INTERP, (Hash *)PMC_struct_val(SELF), (Hash**)&PMC_struct_val(dest));
+        hash_clone(INTERP, (Hash *)PMC_struct_val(SELF), 
+            (Hash**)&PMC_struct_val(dest));
         return dest;
     }
 
+/*
+
+=item C<PMC *get_pmc_keyed(PMC *key)>
+
+=cut
+
+*/
+
     PMC* get_pmc_keyed (PMC* key) {
-	if (PObj_get_FLAGS(key) & KEY_integer_FLAG) {
-	    return SUPER(key);
-	}
-	else {
+        if (PObj_get_FLAGS(key) & KEY_integer_FLAG) {
+            return SUPER(key);
+        }
+        else {
             INTVAL n = PerlHash.SELF.get_integer_keyed(key);
             return DYNSELF.get_pmc_keyed_int(n);
         }
     }
+    
+/*
+
+=item C<PMC *get_pmc_keyed_str(STRING *key)>
+
+Returns the PMC value associated with C<*key>.
+
+=cut
+
+*/
+
     PMC* get_pmc_keyed_str (STRING* key) {
         INTVAL n = PerlHash.SELF.get_integer_keyed_str(key);
         return DYNSELF.get_pmc_keyed_int(n);
     }
+
+/*
+
+=item C<INTVAL get_integer_keyed_str(STRING *key)>
+
+=cut
+
+*/
 
     INTVAL get_integer_keyed_str (STRING* key) {
         INTVAL n = PerlHash.SELF.get_integer_keyed_str(key);
         return DYNSELF.get_integer_keyed_int(n);
     }
 
+/*
+
+=item C<INTVAL get_integer_keyed(PMC *key)>
+
+Returns the integer value associated with C<*key>.
+
+=cut
+
+*/
+
     INTVAL get_integer_keyed (PMC* key) {
         INTVAL n = PerlHash.SELF.get_integer_keyed(key);
         return DYNSELF.get_integer_keyed_int(n);
     }
+    
+/*
+
+=item C<void set_pmc_keyed(PMC *key, PMC *value)>
+
+Associates C<*value> with C<*key>.
+
+=cut
+
+*/
+
     void set_pmc_keyed (PMC* key, PMC* value) {
-	INTVAL n = DYNSELF.elements();
-	DYNSELF.set_pmc_keyed_int(n, value);
-	PerlHash.SELF.set_integer_keyed(key, n);
+        INTVAL n = DYNSELF.elements();
+        DYNSELF.set_pmc_keyed_int(n, value);
+        PerlHash.SELF.set_integer_keyed(key, n);
     }
+
+/*
+
+=item C<void set_integer_keyed(PMC *key, INTVAL value)>
+
+Associates C<value> with C<*key>.
+
+=cut
+
+*/
 
     void set_integer_keyed (PMC* key, INTVAL value) {
-	INTVAL n = DYNSELF.elements();
-	DYNSELF.set_integer_keyed_int(n, value);
-	PerlHash.SELF.set_integer_keyed(key, n);
+        INTVAL n = DYNSELF.elements();
+        DYNSELF.set_integer_keyed_int(n, value);
+        PerlHash.SELF.set_integer_keyed(key, n);
     }
+
+/*
+
+=item C<void set_pmc_keyed_str(STRING *key, PMC *value)>
+
+Associates C<*value> with C<*key>.
+
+=cut
+
+*/
 
     void set_pmc_keyed_str (STRING* key, PMC* value) {
-	INTVAL n = DYNSELF.elements();
-	DYNSELF.set_pmc_keyed_int(n, value);
-	PerlHash.SELF.set_integer_keyed_str(key, n);
+        INTVAL n = DYNSELF.elements();
+        DYNSELF.set_pmc_keyed_int(n, value);
+        PerlHash.SELF.set_integer_keyed_str(key, n);
     }
+
+/*
+
+=item C<void set_integer_keyed_str(STRING *key, INTVAL value)>
+
+Associates C<value> with C<*key>.
+
+=cut
+
+*/
 
     void set_integer_keyed_str (STRING* key, INTVAL value) {
-	INTVAL n = DYNSELF.elements();
-	DYNSELF.set_integer_keyed_int(n, value);
-	PerlHash.SELF.set_integer_keyed_str(key, n);
+        INTVAL n = DYNSELF.elements();
+        DYNSELF.set_integer_keyed_int(n, value);
+        PerlHash.SELF.set_integer_keyed_str(key, n);
     }
 
+/*
+
+=item C<INTVAL exists_keyed(PMC *key)>
+
+=cut
+
+*/
+
     INTVAL exists_keyed(PMC* key) {
-	if (PObj_get_FLAGS(key) & KEY_integer_FLAG) {
-	    return SUPER(key);
-	}
-	else {
+        if (PObj_get_FLAGS(key) & KEY_integer_FLAG) {
+            return SUPER(key);
+        }
+        else {
             return PerlHash.SUPER(key);
         }
     }
+    
+/*
+
+=item C<INTVAL exists_keyed_str(STRING *key)>
+
+Returns whether the key C<*key> exists in the hash.
+
+=cut
+
+*/
+
     INTVAL exists_keyed_str(STRING* key) {
         return PerlHash.SUPER(key);
     }
 
+/*
+
+=item C<INTVAL defined_keyed(PMC *key)>
+
+=cut
+
+*/
+
     INTVAL defined_keyed(PMC* key) {
-	if (PObj_get_FLAGS(key) & KEY_integer_FLAG) {
-	    return SUPER(key);
-	}
-	else {
+        if (PObj_get_FLAGS(key) & KEY_integer_FLAG) {
+            return SUPER(key);
+        }
+        else {
             INTVAL n = PerlHash.SELF.get_integer_keyed(key);
             return DYNSELF.defined_keyed_int(n);
         }
     }
+    
+/*
+
+=item C<INTVAL defined_keyed_str(STRING *key)>
+
+Returns whether the value for key C<*key> is defined in the hash.
+
+=cut
+
+*/
+
     INTVAL defined_keyed_str(STRING* key) {
         INTVAL n = PerlHash.SELF.get_integer_keyed_str(key);
         return DYNSELF.defined_keyed_int(n);
     }
+
+/*
+
+=item C<void delete_keyed(PMC *key)>
+
+Deletes the key C<*key> from the hash.
+
+=cut
+
+*/
 
     void delete_keyed(PMC* key) {
         if (PObj_get_FLAGS(key) & KEY_integer_FLAG) {
@@ -130,6 +299,17 @@ pmclass OrderedHash extends PerlArray need_ext does array does hash {
             DYNSELF.delete_keyed_int(n);
         }
     }
+
+/*
+
+=item C<PMC *nextkey_keyed(PMC *key, INTVAL what)>
+
+Returns the next key after C<*key> relative to the location specified in
+C<what>.
+
+=cut
+
+*/
 
     PMC* nextkey_keyed (PMC* key, INTVAL what) {
         switch (what) {
@@ -145,10 +325,36 @@ pmclass OrderedHash extends PerlArray need_ext does array does hash {
         return SUPER(key, what);
     }
 
+/*
+
+=item C<STRING *get_string_keyed(PMC *key)>
+
+Returns the Parrot string associated with C<*key>.
+
+=cut
+
+*/
+
     STRING* get_string_keyed (PMC* key) {
         return PerlHash.SUPER(key);
     }
 }
+
+/*
+
+=back
+
+=head1 SEE ALSO
+
+F<docs/pdds/pdd08_keys.pod>.
+
+=head1 HISTORY
+
+Initial rev by leo 2003-08-21.
+
+=cut
+
+*/
 
 /*
  * Local variables:
