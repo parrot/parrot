@@ -26,13 +26,28 @@ static void*
 thread_func(void *arg)
 {
     PMC *self = (PMC*) arg;
+    UINTVAL tid;
+
     Parrot_Interp interpreter = PMC_data(self);
     runops(interpreter, (opcode_t *)self->cache.struct_val -
-			(opcode_t *)interpreter->code->byte_code);
+            (opcode_t *)interpreter->code->byte_code);
+    /*
+     * thread is finito
+     */
+    LOCK(interpreter_array_mutex);
+    interpreter->thread_data->state |= THREAD_STATE_FINISHED;
+    if (interpreter != interpreter_array[tid]) {
+        UNLOCK(interpreter_array_mutex);
+        internal_exception(1, "thread finished: interpreter mismatch");
+    }
+    if ((interpreter->thread_data->state & THREAD_STATE_DETACHED) ||
+        (interpreter->thread_data->state & THREAD_STATE_JOINED)) {
+        interpreter_array[tid] = NULL;
+    }
+    UNLOCK(interpreter_array_mutex);
 
     /*
      * TODO pass return value
-     * TODO set state and clear interp array
      */
     return NULL;
 }
@@ -99,7 +114,7 @@ pt_thread_run(Parrot_Interp interp, PMC* dest_interp, PMC* sub)
 }
 
 /*
- * pt_yield
+ * pt_thread_yield
  * religuish the processor
  */
 
@@ -110,22 +125,27 @@ pt_thread_yield(void)
 }
 
 /*
- * helper, check if tid is valid - call holds mutex
+ * helper, check if tid is valid - caller holds mutex
  * return interpreter for tid
  */
 static Parrot_Interp
-pt_check_tid(UINTVAL tid)
+pt_check_tid(UINTVAL tid, const char *from)
 {
     if (tid >= n_interpreters) {
         UNLOCK(interpreter_array_mutex);
-        internal_exception(1, "join: illegal thread tid %d", tid);
+        internal_exception(1, "%s: illegal thread tid %d", from, tid);
+    }
+    if (tid == 0) {
+        UNLOCK(interpreter_array_mutex);
+        internal_exception(1, "%s: llegal thread tid %d (main)", from, tid);
     }
     if (!interpreter_array[tid]) {
         UNLOCK(interpreter_array_mutex);
-        internal_exception(1, "join: illegal thread tid %d - empty", tid);
+        internal_exception(1, "%s: illegal thread tid %d - empty", from, tid);
     }
     return interpreter_array[tid];
 }
+
 /*
  * join (wait for) a joinable thread
  */
@@ -136,13 +156,14 @@ pt_thread_join(UINTVAL tid)
     int state;
 
     LOCK(interpreter_array_mutex);
-    interpreter = pt_check_tid(tid);
-    if (interpreter->thread_data->state == THREAD_STATE_JOINABLE) {
+    interpreter = pt_check_tid(tid, "join");
+    if (interpreter->thread_data->state == THREAD_STATE_JOINABLE ||
+            interpreter->thread_data->state == THREAD_STATE_FINISHED) {
         void *retval;
+        interpreter->thread_data->state |= THREAD_STATE_JOINED;
         UNLOCK(interpreter_array_mutex);
         JOIN(interpreter->thread_data->thread, retval);
         LOCK(interpreter_array_mutex);
-        interpreter->thread_data->state = THREAD_STATE_JOINED;
         UNLOCK(interpreter_array_mutex);
         return retval;
     }
@@ -161,6 +182,22 @@ pt_thread_join(UINTVAL tid)
 void
 pt_thread_detach(UINTVAL tid)
 {
+    Parrot_Interp interpreter;
+
+    LOCK(interpreter_array_mutex);
+    interpreter = pt_check_tid(tid, "detach");
+    /*
+     * if interpreter is joinable, we detach em
+     */
+    if (interpreter->thread_data->state == THREAD_STATE_JOINABLE ||
+            interpreter->thread_data->state == THREAD_STATE_FINISHED) {
+        DETACH(interpreter->thread_data->thread);
+        interpreter->thread_data->state |= THREAD_STATE_DETACHED;
+        if (interpreter->thread_data->state & THREAD_STATE_FINISHED) {
+            interpreter_array[tid] = NULL;
+        }
+    }
+    UNLOCK(interpreter_array_mutex);
 }
 
 /*
@@ -172,13 +209,17 @@ pt_thread_kill(UINTVAL tid)
     Parrot_Interp interpreter;
 
     LOCK(interpreter_array_mutex);
-    interpreter = pt_check_tid(tid);
+    interpreter = pt_check_tid(tid, "kill");
     /*
      * if interpreter is joinable, we detach em
      */
     if (interpreter->thread_data->state == THREAD_STATE_JOINABLE) {
         DETACH(interpreter->thread_data->thread);
-        interpreter->thread_data->state = THREAD_STATE_DETACHED;
+        interpreter->thread_data->state |= THREAD_STATE_DETACHED;
+    }
+    if (interpreter->thread_data->state & THREAD_STATE_FINISHED) {
+        UNLOCK(interpreter_array_mutex);
+        return;
     }
     UNLOCK(interpreter_array_mutex);
     /*
@@ -193,7 +234,7 @@ pt_thread_kill(UINTVAL tid)
 
 /*
  * all threaded interpreters are stored in an array
- * assumens that called with LOCK hold
+ * assumes that caller holds LOCK
  */
 void
 pt_add_to_interpreters(Parrot_Interp interpreter, Parrot_Interp new_interp)

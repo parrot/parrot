@@ -55,11 +55,10 @@ struct timespec {
 #endif
 
 typedef enum {
-    THREAD_STATE_NEW,           /* initial after malloc */
-    THREAD_STATE_JOINABLE,      /* default */
-    THREAD_STATE_DETACHED,      /* i.e. non-joinable */
-    THREAD_STATE_JOINED,        /* JOIN was issued */
-    THREAD_STATE_FINISHED       /* the thread function has ended */
+    THREAD_STATE_JOINABLE,              /* default */
+    THREAD_STATE_DETACHED = 0x01,       /* i.e. non-joinable */
+    THREAD_STATE_JOINED   = 0x02,       /* JOIN was issued */
+    THREAD_STATE_FINISHED = 0x04        /* the thread function has ended */
 } thread_state_enum;
 
 /*
