@@ -385,6 +385,10 @@ Parrot_runops_fromc_args_save_retf(Parrot_Interp interpreter, PMC *sub,
         const char *sig, ...)>
 
 =item C<void *
+Parrot_runops_fromc_arglist_save(Parrot_Interp interpreter, PMC *sub,
+        const char *sig, va_list args)>
+
+=item C<void *
 Parrot_run_meth_fromc_args_save(Parrot_Interp interpreter, PMC *sub,
         PMC* obj, STRING* meth, const char *sig, ...)>
 
@@ -616,6 +620,19 @@ Parrot_run_meth_fromc_args_save_retf(Parrot_Interp interpreter,
     restore_regs(interpreter, data);
     RESTORE_S0_P2;
     return rf;
+}
+
+void *
+Parrot_runops_fromc_arglist_save(Parrot_Interp interpreter, PMC *sub,
+        const char *sig, va_list args)
+{
+    regsave *data = save_regs(interpreter, sub);
+    void *ret;
+
+    runops_args(interpreter, sub, sig, args);
+    ret = set_retval(interpreter, *sig);
+    restore_regs(interpreter, data);
+    return ret;
 }
 
 /*
