@@ -197,6 +197,9 @@ make_branch_list(struct Parrot_Interp *interpreter,
 
     while (cur_op < code_end) {
         opcode_t op = *cur_op;
+        int i, n;
+        size_t rel_offset;
+
         if (*cur_op >= jit_op_count())
            op = CORE_OPS_wrapper__;
 
@@ -206,48 +209,47 @@ make_branch_list(struct Parrot_Interp *interpreter,
 
         /* if op_info->jump is not 0 this opcode may jump,
          * so mark this opcode as a branch source */
+        rel_offset = cur_op - code_start;
         if (op_info->jump)
-            branch[cur_op - code_start] |= JIT_BRANCH_SOURCE;
-        /* If it's not a constant, no joy */
-        if (op_info->types[op_info->arg_count - 1] == PARROT_ARG_IC) {
-            /* The branch target is relative, the offset is in last argument */
-            if (op_info->jump & PARROT_JUMP_RELATIVE) {
-                /* Set the branch target */
-                optimizer->branch_list[cur_op - code_start] =
-                    cur_op + cur_op[op_info->arg_count - 1];
-                branch[cur_op - code_start + cur_op[op_info->arg_count - 1]] |=
-                    JIT_BRANCH_TARGET;
-            }
-            /* The branch target is absolute, the address is in last argument */
-            else if (op_info->jump & PARROT_JUMP_ADDRESS) {
-                /* Set the branch target */
-                optimizer->branch_list[cur_op - code_start] =
-                    cur_op + cur_op[op_info->arg_count - 1];
-                branch[cur_op[op_info->arg_count - 1]] |= JIT_BRANCH_TARGET;
-            }
-            /* the labels of set_addr and newsub are branch targets too
-             * this is needed e.g. for JIT_CGP
-             */
-            else if (!strcmp(op_info->name, "set_addr"))
-                branch[cur_op - code_start + cur_op[op_info->arg_count - 1]] |=
-                    JIT_BRANCH_TARGET;
-            else if (!strcmp(op_info->name, "newsub")) {
-                branch[cur_op - code_start + cur_op[op_info->arg_count - 1]] |=
-                    JIT_BRANCH_TARGET;
-                if (op_info->arg_count == 5)
-                    branch[cur_op - code_start +
-                        cur_op[op_info->arg_count - 2]] |= JIT_BRANCH_TARGET;
+            branch[rel_offset] |= JIT_BRANCH_SOURCE;
+
+        n = op_info->arg_count;
+
+        for (i = 1; i < n; ++i) {
+            /* If it's not a constant, no joy */
+            if (op_info->types[i] == PARROT_ARG_IC && op_info->labels[i]) {
+                /* The branch target is relative,
+                 * the offset is in the i argument
+                 */
+                if (op_info->jump & PARROT_JUMP_RELATIVE) {
+                    /* Set the branch target */
+                    optimizer->branch_list[rel_offset] = cur_op + cur_op[i];
+                    branch[rel_offset + cur_op[i]] |= JIT_BRANCH_TARGET;
+                }
+                /* The branch target is absolute,
+                 * the address is in the i argument
+                 */
+                else if (op_info->jump & PARROT_JUMP_ADDRESS) {
+                    /* Set the branch target */
+                    optimizer->branch_list[rel_offset] = cur_op + cur_op[i];
+                    branch[cur_op[i]] |= JIT_BRANCH_TARGET;
+                }
+                /* the labels of set_addr and newsub are branch targets too
+                 * this is needed e.g. for JIT_CGP
+                 */
+                else {
+                    branch[rel_offset + cur_op[i]] |= JIT_BRANCH_TARGET;
+                }
             }
         }
         /* The address of the next opcode */
         if ((op_info->jump & PARROT_JUMP_ENEXT) ||
             (op_info->jump & PARROT_JUMP_GNEXT))
-            branch[cur_op + op_info->arg_count - code_start] |=
-                JIT_BRANCH_TARGET;
+            branch[rel_offset + n] |= JIT_BRANCH_TARGET;
         if (op_info->jump & PARROT_JUMP_UNPREDICTABLE)
             optimizer->has_unpredictable_jump = 1;
         /* Move to the next opcode */
-        cur_op += op_info->arg_count;
+        cur_op += n;
     }
     insert_fixup_targets(interpreter, branch, code_end - code_start);
 }
@@ -1139,7 +1141,7 @@ build_asm(struct Parrot_Interp *interpreter, opcode_t *pc,
           opcode_t *code_start, opcode_t *code_end,
           void *objfile)>
 
-This is the main function of the JIT code generator. 
+This is the main function of the JIT code generator.
 
 It loops over the bytecode, calling the code generating routines for
 each opcode.
