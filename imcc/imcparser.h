@@ -125,7 +125,9 @@
      VAR = 348,
      LINECOMMENT = 349,
      FILECOMMENT = 350,
-     POINTY = 351
+     DOT = 351,
+     CONCAT = 352,
+     POINTY = 353
    };
 #endif
 #define LOW_PREC 258
@@ -221,7 +223,9 @@
 #define VAR 348
 #define LINECOMMENT 349
 #define FILECOMMENT 350
-#define POINTY 351
+#define DOT 351
+#define CONCAT 352
+#define POINTY 353
 
 
 
@@ -238,7 +242,7 @@ typedef union {
     SymbolTable * symtab;
 } yystype;
 /* Line 1281 of /usr/share/bison/yacc.c.  */
-#line 242 "imcc/imcparser.h"
+#line 246 "imcc/imcparser.h"
 # define YYSTYPE yystype
 #endif
 
