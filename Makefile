@@ -44,4 +44,4 @@ op.h: opcode_table
 	perl make_op_header.pl opcode_table > op.h
 
 clean:
-	rm -f *.o *.s interp_guts.h test_prog basic_opcodes.c
+	rm -f *$(O) *.s basic_opcodes.c interp_guts.h op.h test_prog
