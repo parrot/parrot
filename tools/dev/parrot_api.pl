@@ -86,9 +86,9 @@ for it).
 
 =head2 Data is not an API
 
-Consider making the data const(ant) heap (and accessed through a real
-API that takes care of synchronization, data as such is not a good API
-unless it's constant).
+Consider making the data const(ant), or moving it into the heap (and
+accessed through a real API that takes care of synchronization, data
+as such is not a good API unless it's constant).
 
 Think multithreaded access, or just plain reentrancy (think recursion).
 
