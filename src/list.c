@@ -974,34 +974,34 @@ list_new_init(Interp *interpreter, INTVAL type, PMC *init)
             ((init->vtable->base_type != enum_class_PerlArray) &&
              (init->vtable->base_type != enum_class_Array)))
         internal_exception(1, "Illegal initializer for init\n");
-    len = init->vtable->elements(interpreter, init);
+    len = VTABLE_elements(interpreter, init);
     if (len & 1)
         internal_exception(1, "Illegal initializer for init: odd elements\n");
 
     size = item_size = items_per_chunk = 0;
     multi_key = NULL;
     for (i = 0; i < len; i += 2) {
-        key = init->vtable->get_integer_keyed_int(interpreter, init, &i);
+        key = VTABLE_get_integer_keyed_int(interpreter, init, &i);
         val = i + 1;
         switch (key) {
             case 0:
-                size = init->vtable->get_integer_keyed_int(interpreter,
+                size = VTABLE_get_integer_keyed_int(interpreter,
                         init, &val);
                 break;
             case 1:
-                multi_key = init->vtable->get_pmc_keyed_int(interpreter,
+                multi_key = VTABLE_get_pmc_keyed_int(interpreter,
                         init, &val);
                 break;
             case 2:
-                type = init->vtable->get_integer_keyed_int(interpreter,
+                type = VTABLE_get_integer_keyed_int(interpreter,
                         init, &val);
                 break;
             case 3:
-                item_size = init->vtable->get_integer_keyed_int(interpreter,
+                item_size = VTABLE_get_integer_keyed_int(interpreter,
                         init, &val);
                 break;
             case 4:
-                items_per_chunk = init->vtable->get_integer_keyed_int(
+                items_per_chunk = VTABLE_get_integer_keyed_int(
                         interpreter, init, &val);
                 break;
         }
@@ -1024,21 +1024,21 @@ list_new_init(Interp *interpreter, INTVAL type, PMC *init)
     /* make a private copy of init data */
     list->user_data = user_array = pmc_new(interpreter, enum_class_Array);
     /* set length */
-    user_array->vtable->set_integer_native(interpreter, user_array, 4);
+    VTABLE_set_integer_native(interpreter, user_array, 4);
     /* store values */
     key = 0;
-    user_array->vtable->set_integer_keyed_int(interpreter, user_array,
+    VTABLE_set_integer_keyed_int(interpreter, user_array,
             &key, size);
     key = 1;
-    user_array->vtable->set_pmc_keyed_int(interpreter, user_array,
+    VTABLE_set_pmc_keyed_int(interpreter, user_array,
             &key, multi_key, NULL);
 #if 0
     /* don't need these, they are stored in the List structure */
     key = 2;
-    user_array->vtable->set_integer_keyed_int(interpreter, user_array,
+    VTABLE_set_integer_keyed_int(interpreter, user_array,
             &key, type);
     key = 3;
-    user_array->vtable->set_integer_keyed_int(interpreter, user_array,
+    VTABLE_set_integer_keyed_int(interpreter, user_array,
             &key, item_size);
 #endif
     return list;
@@ -1083,7 +1083,7 @@ list_clone(Interp *interpreter, List *other)
                         np = pmc_new_noinit(interpreter,
                                 op->vtable->base_type);
                         ((PMC **)new_chunk->data.bufstart)[i] = np;
-                        op->vtable->clone(interpreter, op, np);
+                        VTABLE_clone(interpreter, op, np);
                     }
                 }
                 break;
@@ -1105,7 +1105,7 @@ list_clone(Interp *interpreter, List *other)
     }
     if (other->user_data) {
         l->user_data = pmc_new_noinit(interpreter, enum_class_Array);
-        other->user_data->vtable->clone(interpreter, other->user_data,
+        VTABLE_clone(interpreter, other->user_data,
                 l->user_data);
     }
     rebuild_chunk_list(interpreter, l);

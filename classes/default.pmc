@@ -18,7 +18,7 @@ static const char * caller(Parrot_Interp interp, PMC * pmc);
 static const char * caller(Parrot_Interp interp, PMC * pmc)
 {
     return pmc && pmc->vtable && pmc->vtable->name ?
-	pmc->vtable->name(interp, pmc)->strstart : "(null)";
+	VTABLE_name(interp, pmc)->strstart : "(null)";
 }
 
 pmclass default abstract noinit {
@@ -49,7 +49,7 @@ pmclass default abstract noinit {
     PMC* getprop(STRING* key) {
         PMC* p_key = key_new_string(interpreter, key);
 	if (SELF->metadata) {
-	  return (SELF->metadata->vtable->get_pmc_keyed(interpreter, SELF->metadata, p_key));
+	  return (VTABLE_get_pmc_keyed(interpreter, SELF->metadata, p_key));
 	} else {
 	  PMC* undef = pmc_new(INTERP, enum_class_PerlUndef);
           PObj_constant_SET(undef);
@@ -61,15 +61,15 @@ pmclass default abstract noinit {
         PMC* p_key;
 	if (SELF->metadata) {
           p_key = key_new_string(interpreter, key);
-	  SELF->metadata->vtable->set_pmc_keyed(interpreter,
+	  VTABLE_set_pmc_keyed(interpreter,
 			  SELF->metadata, p_key, value, NULL);
 	} else {
           /* first make new hash */
 	  SELF->metadata = pmc_new_noinit(interpreter, enum_class_PerlHash);
-	  SELF->metadata->vtable->init(interpreter, SELF->metadata);
+	  VTABLE_init(interpreter, SELF->metadata);
 	  /* then the key, else it vanishes with --gc-debug */
           p_key = key_new_string(interpreter, key);
-	  SELF->metadata->vtable->set_pmc_keyed(interpreter,
+	  VTABLE_set_pmc_keyed(interpreter,
 			  SELF->metadata, p_key, value, NULL);
 	}
 	return;
@@ -78,7 +78,7 @@ pmclass default abstract noinit {
     void delprop(STRING* key) {
 	if (SELF->metadata) {
           PMC* p_key = key_new_string(interpreter, key);
-	  SELF->metadata->vtable->delete_keyed(interpreter, SELF->metadata, p_key);
+	  VTABLE_delete_keyed(interpreter, SELF->metadata, p_key);
 	}
         return;
     }
@@ -86,7 +86,7 @@ pmclass default abstract noinit {
     PMC* getprops() {
 	if (!SELF->metadata) {
 	  SELF->metadata = pmc_new_noinit(interpreter, enum_class_PerlHash);
-	  SELF->metadata->vtable->init(interpreter, SELF->metadata);
+	  VTABLE_init(interpreter, SELF->metadata);
 	}
     	return SELF->metadata;
     }
@@ -354,7 +354,7 @@ pmclass default abstract noinit {
 
     void set_integer_keyed_int (INTVAL* key, INTVAL value) {
         PMC* r_key = INT2KEY(INTERP, key);
-        SELF->vtable->set_integer_keyed(INTERP, SELF, r_key, value);
+        VTABLE_set_integer_keyed(INTERP, SELF, r_key, value);
     }
 
     void set_number (PMC* value) {
@@ -383,7 +383,7 @@ pmclass default abstract noinit {
 
     void set_number_keyed_int (INTVAL* key, FLOATVAL value) {
         PMC* r_key = INT2KEY(INTERP, key);
-        SELF->vtable->set_number_keyed(INTERP, SELF, r_key, value);
+        VTABLE_set_number_keyed(INTERP, SELF, r_key, value);
     }
 
     void set_bignum (PMC* value) {
@@ -412,7 +412,7 @@ pmclass default abstract noinit {
 
     void set_bignum_keyed_int (INTVAL* key, BIGNUM* value) {
         PMC* r_key = INT2KEY(INTERP, key);
-        SELF->vtable->set_bignum_keyed(INTERP, SELF, r_key, value);
+        VTABLE_set_bignum_keyed(INTERP, SELF, r_key, value);
     }
 
     void set_string (PMC* value) {
@@ -441,11 +441,11 @@ pmclass default abstract noinit {
 
     void set_string_keyed_int (INTVAL* key, STRING* string) {
         PMC* r_key = INT2KEY(INTERP, key);
-        SELF->vtable->set_string_keyed(INTERP, SELF, r_key, string);
+        VTABLE_set_string_keyed(INTERP, SELF, r_key, string);
     }
 
     void set_pmc (PMC* value) {
-        SELF->cache.struct_val = value->vtable->get_pmc(INTERP, value);
+        SELF->cache.struct_val = VTABLE_get_pmc(INTERP, value);
     }
 
     void set_pmc_keyed (PMC* key, PMC* value, PMC* value_key) {
@@ -1576,17 +1576,17 @@ pmclass default abstract noinit {
         DYNSELF.delete_keyed(r_key);
     }
 
-    PMC* nextkey_keyed (PMC* key) {
+    PMC* nextkey_keyed (PMC* key, INTVAL w) {
 	internal_exception(ILL_INHERIT,
 		"nextkey_keyed() not implemented in class '%s'\n",
 		caller(INTERP, SELF));
         return NULL;
     }
 
-    PMC* nextkey_keyed_int (INTVAL* key) {
+    PMC* nextkey_keyed_int (INTVAL* key, INTVAL w) {
         /* XXX - Something's not right with this method */
         PMC* r_key = INT2KEY(INTERP, key);
-        return DYNSELF.nextkey_keyed(r_key);
+        return DYNSELF.nextkey_keyed(r_key, w);
     }
 
     void substr(INTVAL offset, INTVAL length, PMC* dest) {

@@ -22,7 +22,7 @@ pmclass Boolean extends PerlInt {
 
     void set_integer (PMC* value) {
     /* XXX change type on set_xx? */
-        SELF->cache.int_val = (value->vtable->get_integer(INTERP, value) != 0);
+        SELF->cache.int_val = (VTABLE_get_integer(INTERP, value) != 0);
     }
 
     void set_integer_native (INTVAL value) {
@@ -59,28 +59,28 @@ pmclass Boolean extends PerlInt {
 
 
     void neg (PMC* dest) {
-        dest->vtable->set_integer_native(INTERP, dest, !SELF->cache.int_val);
+        VTABLE_set_integer_native(INTERP, dest, !SELF->cache.int_val);
     }
 
 
     void logical_or (PMC* value, PMC* dest) {
-        dest->vtable->set_integer_native(INTERP, dest,
+        VTABLE_set_integer_native(INTERP, dest,
 					 SELF->cache.int_val ||
-					 value->vtable->get_bool(INTERP, value)
+					 VTABLE_get_bool(INTERP, value)
 	    );
     }
 
     void logical_and (PMC* value, PMC* dest) {
-        dest->vtable->set_integer_native(INTERP, dest,
+        VTABLE_set_integer_native(INTERP, dest,
 					 SELF->cache.int_val &&
-					 value->vtable->get_bool(INTERP, value)
+					 VTABLE_get_bool(INTERP, value)
 	    );
     }
 
     void logical_xor (PMC* value, PMC* dest) {
-        dest->vtable->set_integer_native(INTERP, dest,
+        VTABLE_set_integer_native(INTERP, dest,
             ( SELF->cache.int_val ? 1 : 0 ) ^
-					 value->vtable->get_bool(INTERP, value)
+					 VTABLE_get_bool(INTERP, value)
 	    );
     }
 

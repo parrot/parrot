@@ -16,7 +16,7 @@
 pmclass scalar abstract noinit {
 
     void clone (PMC *dest) {
-	dest->vtable->init(INTERP, dest);
+	VTABLE_init(INTERP, dest);
         memcpy(&dest->cache, &SELF->cache, sizeof(UnionVal));
         dest->data = 0;
     }
@@ -63,8 +63,8 @@ pmclass scalar abstract noinit {
     INTVAL is_same_keyed (PMC* key, PMC* value, PMC* value_key) {
         if (key == NULL) {
             /* pmc2_key must not be null, else why did you call me? */
-            return SELF->vtable->is_same(INTERP, SELF,
-		    value->vtable->get_pmc_keyed(INTERP,
+            return VTABLE_is_same(INTERP, SELF,
+		    VTABLE_get_pmc_keyed(INTERP,
 			value, value_key));
         }
 	return SUPER(key, value, value_key);
@@ -81,7 +81,7 @@ pmclass scalar abstract noinit {
       exercise for the inheriting class. */
 
     void set_integer (PMC* value) {
-        SELF->cache.int_val = value->vtable->get_integer(INTERP, value);
+        SELF->cache.int_val = VTABLE_get_integer(INTERP, value);
     }
 
     void set_integer_native (INTVAL value) {
@@ -89,11 +89,11 @@ pmclass scalar abstract noinit {
     }
 
     void set_integer_same (PMC* value) {
-        SELF->cache.int_val = value->vtable->get_integer(INTERP, value);
+        SELF->cache.int_val = VTABLE_get_integer(INTERP, value);
     }
 
     void set_number (PMC* value) {
-        SELF->cache.num_val = value->vtable->get_number(INTERP, value);
+        SELF->cache.num_val = VTABLE_get_number(INTERP, value);
     }
 
     void set_number_native (FLOATVAL value) {
@@ -101,11 +101,11 @@ pmclass scalar abstract noinit {
     }
 
     void set_number_same (PMC* value) {
-        SELF->cache.num_val = value->vtable->get_number(INTERP, value);
+        SELF->cache.num_val = VTABLE_get_number(INTERP, value);
     }
 
     void set_bignum (PMC* value) {
-        SELF->cache.struct_val = (DPOINTER*)value->vtable->get_bignum(INTERP, value);
+        SELF->cache.struct_val = (DPOINTER*)VTABLE_get_bignum(INTERP, value);
     }
 
     void set_bignum_native (BIGNUM* value) {
@@ -113,11 +113,11 @@ pmclass scalar abstract noinit {
     }
 
     void set_bignum_same (PMC* value) {
-        SELF->cache.struct_val = (DPOINTER*)value->vtable->get_bignum(INTERP, value);
+        SELF->cache.struct_val = (DPOINTER*)VTABLE_get_bignum(INTERP, value);
     }
 
     void set_string (PMC* value) {
-        SELF->cache.struct_val = value->vtable->get_string(INTERP, value);
+        SELF->cache.struct_val = VTABLE_get_string(INTERP, value);
     }
 
     void set_string_native (STRING* value) {
@@ -125,18 +125,18 @@ pmclass scalar abstract noinit {
     }
 
     void set_string_same (PMC* value) {
-        SELF->cache.struct_val = value->vtable->get_string(INTERP, value);
+        SELF->cache.struct_val = VTABLE_get_string(INTERP, value);
     }
 
     void set_pmc (PMC* value) {
-        SELF->cache.struct_val = value->vtable->get_pmc(INTERP, value);
+        SELF->cache.struct_val = VTABLE_get_pmc(INTERP, value);
     }
 
     void set_pmc_keyed (PMC* key, PMC* value, PMC* value_key) {
         /* Either key or value must NOT be NULL */
         if (key == NULL)
-            SELF->vtable->set_pmc (INTERP, SELF,
-		    value->vtable->get_pmc_keyed(INTERP, value,
+            VTABLE_set_pmc(INTERP, SELF,
+		    VTABLE_get_pmc_keyed(INTERP, value,
 			value_key));
         else
 	    SUPER(key, value, value_key);
@@ -160,7 +160,7 @@ pmclass scalar abstract noinit {
 
         result = DYNSELF.get_integer() + value;
         /* XXX: overflow detection, bigint promotion? */
-        dest->vtable->set_integer_native(INTERP, dest, result);
+        VTABLE_set_integer_native(INTERP, dest, result);
     }
 
     void add_bignum (BIGNUM* value, PMC* dest) {
@@ -175,7 +175,7 @@ pmclass scalar abstract noinit {
 
         result = DYNSELF.get_number() + value;
 
-        dest->vtable->set_number_native(INTERP, dest, result);
+        VTABLE_set_number_native(INTERP, dest, result);
     }
 
     void add_same (PMC* value,  PMC* dest) {
@@ -192,14 +192,14 @@ pmclass scalar abstract noinit {
 
             result = DYNSELF.get_number() + (
                 value_key == NULL ?
-                value->vtable->get_number(INTERP, value) :
-                value->vtable->get_number_keyed(INTERP, value, value_key)
+                VTABLE_get_number(INTERP, value) :
+                VTABLE_get_number_keyed(INTERP, value, value_key)
             );
 
             if (dest_key == NULL)
-                dest->vtable->set_number_native(INTERP, dest, result);
+                VTABLE_set_number_native(INTERP, dest, result);
             else
-                dest->vtable->set_number_keyed(INTERP, dest, dest_key, result);
+                VTABLE_set_number_keyed(INTERP, dest, dest_key, result);
         }
         else
             SUPER(key, value, value_key, dest, dest_key);
@@ -219,9 +219,9 @@ pmclass scalar abstract noinit {
         FLOATVAL result;
 
         result = DYNSELF.get_number()
-            - value->vtable->get_number(INTERP, value);
+            - VTABLE_get_number(INTERP, value);
 
-        dest->vtable->set_number_native(INTERP, dest, result);
+        VTABLE_set_number_native(INTERP, dest, result);
     }
 
     void subtract_int (INTVAL value,  PMC* dest) {
@@ -233,7 +233,7 @@ pmclass scalar abstract noinit {
         result = DYNSELF.get_number()
             - value;
 
-        dest->vtable->set_number_native(INTERP, dest, result);
+        VTABLE_set_number_native(INTERP, dest, result);
     }
 
     void subtract_bignum (BIGNUM* value,  PMC* dest) {
@@ -249,7 +249,7 @@ pmclass scalar abstract noinit {
         result = DYNSELF.get_number()
             - value;
 
-        dest->vtable->set_number_native(INTERP, dest, result);
+        VTABLE_set_number_native(INTERP, dest, result);
     }
 
     void subtract_same (PMC* value,  PMC* dest) {
@@ -258,9 +258,9 @@ pmclass scalar abstract noinit {
         FLOATVAL result;
 
         result = DYNSELF.get_number()
-            - value->vtable->get_number(INTERP, value);
+            - VTABLE_get_number(INTERP, value);
 
-        dest->vtable->set_number_native(INTERP, dest, result);
+        VTABLE_set_number_native(INTERP, dest, result);
     }
 
     void subtract_keyed (PMC* key, PMC* value, PMC* value_key,
@@ -273,14 +273,14 @@ pmclass scalar abstract noinit {
 
             result = DYNSELF.get_number() - (
                 value_key == NULL ?
-                value->vtable->get_number(INTERP, value) :
-                value->vtable->get_number_keyed(INTERP, value, value_key)
+                VTABLE_get_number(INTERP, value) :
+                VTABLE_get_number_keyed(INTERP, value, value_key)
             );
 
             if (dest_key == NULL)
-                dest->vtable->set_number_native(INTERP, dest, result);
+                VTABLE_set_number_native(INTERP, dest, result);
             else
-                dest->vtable->set_number_keyed(INTERP, dest, dest_key, result);
+                VTABLE_set_number_keyed(INTERP, dest, dest_key, result);
         }
         else
             SUPER(key, value, value_key, dest, dest_key);
@@ -300,9 +300,9 @@ pmclass scalar abstract noinit {
         FLOATVAL result;
 
         result = DYNSELF.get_number()
-            * value->vtable->get_number(INTERP, value);
+            * VTABLE_get_number(INTERP, value);
 
-        dest->vtable->set_number_native(INTERP, dest, result);
+        VTABLE_set_number_native(INTERP, dest, result);
     }
 
     void multiply_int (INTVAL value,  PMC* dest) {
@@ -313,7 +313,7 @@ pmclass scalar abstract noinit {
         result = DYNSELF.get_number()
             * value;
 
-        dest->vtable->set_number_native(INTERP, dest, result);
+        VTABLE_set_number_native(INTERP, dest, result);
     }
 
     void multiply_bignum (BIGNUM* value,  PMC* dest) {
@@ -328,7 +328,7 @@ pmclass scalar abstract noinit {
         result = DYNSELF.get_number()
             * value;
 
-        dest->vtable->set_number_native(INTERP, dest, result);
+        VTABLE_set_number_native(INTERP, dest, result);
     }
 
     void multiply_same (PMC* value,  PMC* dest) {
@@ -337,9 +337,9 @@ pmclass scalar abstract noinit {
         FLOATVAL result;
 
         result = DYNSELF.get_number()
-            * value->vtable->get_number(INTERP, value);
+            * VTABLE_get_number(INTERP, value);
 
-        dest->vtable->set_number_native(INTERP, dest, result);
+        VTABLE_set_number_native(INTERP, dest, result);
     }
 
     void multiply_keyed (PMC* key, PMC* value, PMC* value_key,
@@ -352,14 +352,14 @@ pmclass scalar abstract noinit {
 
             result = DYNSELF.get_number() * (
                 value_key == NULL ?
-                value->vtable->get_number(INTERP, value) :
-                value->vtable->get_number_keyed(INTERP, value, value_key)
+                VTABLE_get_number(INTERP, value) :
+                VTABLE_get_number_keyed(INTERP, value, value_key)
             );
 
             if (dest_key == NULL)
-                dest->vtable->set_number_native(INTERP, dest, result);
+                VTABLE_set_number_native(INTERP, dest, result);
             else
-                dest->vtable->set_number_keyed(INTERP, dest, dest_key, result);
+                VTABLE_set_number_keyed(INTERP, dest, dest_key, result);
         }
         else
             SUPER(key, value, value_key, dest, dest_key);
@@ -379,9 +379,9 @@ pmclass scalar abstract noinit {
         FLOATVAL result;
 
         result = DYNSELF.get_number()
-            / value->vtable->get_number(INTERP, value);
+            / VTABLE_get_number(INTERP, value);
 
-        dest->vtable->set_number_native(INTERP, dest, result);
+        VTABLE_set_number_native(INTERP, dest, result);
     }
 
     void divide_int (INTVAL value,  PMC* dest) {
@@ -394,7 +394,7 @@ pmclass scalar abstract noinit {
         result = DYNSELF.get_number()
             / value;
 
-        dest->vtable->set_number_native(INTERP, dest, result);
+        VTABLE_set_number_native(INTERP, dest, result);
     }
 
     void divide_bignum (BIGNUM* value,  PMC* dest) {
@@ -411,7 +411,7 @@ pmclass scalar abstract noinit {
         result = DYNSELF.get_number()
             / value;
 
-        dest->vtable->set_number_native(INTERP, dest, result);
+        VTABLE_set_number_native(INTERP, dest, result);
     }
 
     void divide_same (PMC* value,  PMC* dest) {
@@ -420,9 +420,9 @@ pmclass scalar abstract noinit {
         FLOATVAL result;
 
         result = DYNSELF.get_number()
-            / value->vtable->get_number(INTERP, value);
+            / VTABLE_get_number(INTERP, value);
 
-        dest->vtable->set_number_native(INTERP, dest, result);
+        VTABLE_set_number_native(INTERP, dest, result);
     }
 
     void divide_keyed (PMC* key, PMC* value, PMC* value_key,
@@ -435,14 +435,14 @@ pmclass scalar abstract noinit {
 
             result = DYNSELF.get_number() / (
                 value_key == NULL ?
-                value->vtable->get_number(INTERP, value) :
-                value->vtable->get_number_keyed(INTERP, value, value_key)
+                VTABLE_get_number(INTERP, value) :
+                VTABLE_get_number_keyed(INTERP, value, value_key)
             );
 
             if (dest_key == NULL)
-                dest->vtable->set_number_native(INTERP, dest, result);
+                VTABLE_set_number_native(INTERP, dest, result);
             else
-                dest->vtable->set_number_keyed(INTERP, dest, dest_key, result);
+                VTABLE_set_number_keyed(INTERP, dest, dest_key, result);
         }
         else
             SUPER(key, value, value_key, dest, dest_key);
@@ -462,9 +462,9 @@ pmclass scalar abstract noinit {
         INTVAL result;
 
         result = DYNSELF.get_integer()
-            % value->vtable->get_integer(INTERP, value);
+            % VTABLE_get_integer(INTERP, value);
 
-        dest->vtable->set_integer_native(INTERP, dest, result);
+        VTABLE_set_integer_native(INTERP, dest, result);
     }
 
     void modulus_int (INTVAL value,  PMC* dest) {
@@ -473,7 +473,7 @@ pmclass scalar abstract noinit {
         result = DYNSELF.get_integer()
             % value;
 
-        dest->vtable->set_integer_native(INTERP, dest, result);
+        VTABLE_set_integer_native(INTERP, dest, result);
     }
 
     void modulus_bignum (BIGNUM* value,  PMC* dest) {
@@ -489,9 +489,9 @@ pmclass scalar abstract noinit {
         INTVAL result;
 
         result = DYNSELF.get_integer()
-            % value->vtable->get_integer(INTERP, value);
+            % VTABLE_get_integer(INTERP, value);
 
-        dest->vtable->set_integer_native(INTERP, dest, result);
+        VTABLE_set_integer_native(INTERP, dest, result);
     }
 
     void modulus_keyed (PMC* key, PMC* value, PMC* value_key,
@@ -504,14 +504,14 @@ pmclass scalar abstract noinit {
 
             result = DYNSELF.get_integer() % (
                 value_key == NULL ?
-                value->vtable->get_integer(INTERP, value) :
-                value->vtable->get_integer_keyed(INTERP, value, value_key)
+                VTABLE_get_integer(INTERP, value) :
+                VTABLE_get_integer_keyed(INTERP, value, value_key)
             );
 
             if (dest_key == NULL)
-                dest->vtable->set_integer_native(INTERP, dest, result);
+                VTABLE_set_integer_native(INTERP, dest, result);
             else
-                dest->vtable->set_integer_keyed(INTERP, dest, dest_key, result);
+                VTABLE_set_integer_keyed(INTERP, dest, dest_key, result);
         }
         else
             SUPER(key, value, value_key, dest, dest_key);
@@ -526,12 +526,12 @@ pmclass scalar abstract noinit {
     }
 
     void neg (PMC* dest) {
-        dest->vtable->set_integer_native(INTERP, dest, -DYNSELF.get_integer());
+        VTABLE_set_integer_native(INTERP, dest, -DYNSELF.get_integer());
     }
 
     void neg_keyed (PMC* key, PMC* dest, PMC* dest_key) {
         if (key == NULL)
-            dest->vtable->set_integer_keyed(INTERP, dest,
+            VTABLE_set_integer_keyed(INTERP, dest,
                 dest_key, -DYNSELF.get_integer());
         else
             SUPER(key, dest, dest_key);
@@ -547,9 +547,9 @@ pmclass scalar abstract noinit {
         INTVAL result;
 
         result = DYNSELF.get_integer()
-            | value->vtable->get_integer(INTERP, value);
+            | VTABLE_get_integer(INTERP, value);
 
-        dest->vtable->set_integer_native(INTERP, dest, result);
+        VTABLE_set_integer_native(INTERP, dest, result);
     }
 
     void bitwise_or_int (INTVAL value, PMC* dest) {
@@ -558,16 +558,16 @@ pmclass scalar abstract noinit {
         result = DYNSELF.get_integer()
             | value;
 
-        dest->vtable->set_integer_native(INTERP, dest, result);
+        VTABLE_set_integer_native(INTERP, dest, result);
     }
 
     void bitwise_or_same (PMC* value, PMC* dest) {
         INTVAL result;
 
         result = DYNSELF.get_integer()
-            | value->vtable->get_integer(INTERP, value);
+            | VTABLE_get_integer(INTERP, value);
 
-        dest->vtable->set_integer_native(INTERP, dest, result);
+        VTABLE_set_integer_native(INTERP, dest, result);
     }
 
     void bitwise_or_keyed (PMC* key, PMC* value, PMC* value_key,
@@ -580,14 +580,14 @@ pmclass scalar abstract noinit {
 
             result = DYNSELF.get_integer() | (
                 value_key == NULL ?
-                value->vtable->get_integer(INTERP, value) :
-                value->vtable->get_integer_keyed(INTERP, value, value_key)
+                VTABLE_get_integer(INTERP, value) :
+                VTABLE_get_integer_keyed(INTERP, value, value_key)
             );
 
             if (dest_key == NULL)
-                dest->vtable->set_integer_native(INTERP, dest, result);
+                VTABLE_set_integer_native(INTERP, dest, result);
             else
-                dest->vtable->set_integer_keyed(INTERP, dest, dest_key, result);
+                VTABLE_set_integer_keyed(INTERP, dest, dest_key, result);
         }
         else
             SUPER(key, value, value_key, dest, dest_key);
@@ -605,9 +605,9 @@ pmclass scalar abstract noinit {
         INTVAL result;
 
         result = DYNSELF.get_integer()
-            & value->vtable->get_integer(INTERP, value);
+            & VTABLE_get_integer(INTERP, value);
 
-        dest->vtable->set_integer_native(INTERP, dest, result);
+        VTABLE_set_integer_native(INTERP, dest, result);
     }
 
     void bitwise_and_int (INTVAL value, PMC* dest) {
@@ -616,16 +616,16 @@ pmclass scalar abstract noinit {
         result = DYNSELF.get_integer()
             & value;
 
-        dest->vtable->set_integer_native(INTERP, dest, result);
+        VTABLE_set_integer_native(INTERP, dest, result);
     }
 
     void bitwise_and_same (PMC* value, PMC* dest) {
         INTVAL result;
 
         result = DYNSELF.get_integer()
-            & value->vtable->get_integer(INTERP, value);
+            & VTABLE_get_integer(INTERP, value);
 
-        dest->vtable->set_integer_native(INTERP, dest, result);
+        VTABLE_set_integer_native(INTERP, dest, result);
     }
 
     void bitwise_and_keyed (PMC* key, PMC* value, PMC* value_key,
@@ -638,14 +638,14 @@ pmclass scalar abstract noinit {
 
             result = DYNSELF.get_integer() & (
                 value_key == NULL ?
-                value->vtable->get_integer(INTERP, value) :
-                value->vtable->get_integer_keyed(INTERP, value, value_key)
+                VTABLE_get_integer(INTERP, value) :
+                VTABLE_get_integer_keyed(INTERP, value, value_key)
             );
 
             if (dest_key == NULL)
-                dest->vtable->set_integer_native(INTERP, dest, result);
+                VTABLE_set_integer_native(INTERP, dest, result);
             else
-                dest->vtable->set_integer_keyed(INTERP, dest, dest_key, result);
+                VTABLE_set_integer_keyed(INTERP, dest, dest_key, result);
         }
         else
             SUPER(key, value, value_key, dest, dest_key);
@@ -663,9 +663,9 @@ pmclass scalar abstract noinit {
         INTVAL result;
 
         result = DYNSELF.get_integer()
-            ^ value->vtable->get_integer(INTERP, value);
+            ^ VTABLE_get_integer(INTERP, value);
 
-        dest->vtable->set_integer_native(INTERP, dest, result);
+        VTABLE_set_integer_native(INTERP, dest, result);
     }
 
     void bitwise_xor_int (INTVAL value, PMC* dest) {
@@ -674,16 +674,16 @@ pmclass scalar abstract noinit {
         result = DYNSELF.get_integer()
             ^ value;
 
-        dest->vtable->set_integer_native(INTERP, dest, result);
+        VTABLE_set_integer_native(INTERP, dest, result);
     }
 
     void bitwise_xor_same (PMC* value, PMC* dest) {
         INTVAL result;
 
         result = DYNSELF.get_integer()
-            ^ value->vtable->get_integer(INTERP, value);
+            ^ VTABLE_get_integer(INTERP, value);
 
-        dest->vtable->set_integer_native(INTERP, dest, result);
+        VTABLE_set_integer_native(INTERP, dest, result);
     }
 
     void bitwise_xor_keyed (PMC* key, PMC* value, PMC* value_key,
@@ -696,14 +696,14 @@ pmclass scalar abstract noinit {
 
             result = DYNSELF.get_integer() ^ (
                 value_key == NULL ?
-                value->vtable->get_integer(INTERP, value) :
-                value->vtable->get_integer_keyed(INTERP, value, value_key)
+                VTABLE_get_integer(INTERP, value) :
+                VTABLE_get_integer_keyed(INTERP, value, value_key)
             );
 
             if (dest_key == NULL)
-                dest->vtable->set_integer_native(INTERP, dest, result);
+                VTABLE_set_integer_native(INTERP, dest, result);
             else
-                dest->vtable->set_integer_keyed(INTERP, dest, dest_key, result);
+                VTABLE_set_integer_keyed(INTERP, dest, dest_key, result);
         }
         else
             SUPER(key, value, value_key, dest, dest_key);
@@ -718,12 +718,12 @@ pmclass scalar abstract noinit {
     }
 
     void bitwise_not (PMC* dest) {
-        dest->vtable->set_integer_native(INTERP, dest, ~DYNSELF.get_integer());
+        VTABLE_set_integer_native(INTERP, dest, ~DYNSELF.get_integer());
     }
 
     void bitwise_not_keyed (PMC* key, PMC* dest, PMC* dest_key) {
         if (key == NULL)
-            dest->vtable->set_integer_keyed(INTERP, dest,
+            VTABLE_set_integer_keyed(INTERP, dest,
                 dest_key, ~DYNSELF.get_integer());
         else
             SUPER(key, dest, dest_key);
@@ -739,9 +739,9 @@ pmclass scalar abstract noinit {
         INTVAL result;
 
         result = DYNSELF.get_integer()
-            >> value->vtable->get_integer(INTERP, value);
+            >> VTABLE_get_integer(INTERP, value);
 
-        dest->vtable->set_integer_native(INTERP, dest, result);
+        VTABLE_set_integer_native(INTERP, dest, result);
     }
 
     void bitwise_shr_int (INTVAL value, PMC* dest) {
@@ -750,16 +750,16 @@ pmclass scalar abstract noinit {
         result = DYNSELF.get_integer()
             >> value;
 
-        dest->vtable->set_integer_native(INTERP, dest, result);
+        VTABLE_set_integer_native(INTERP, dest, result);
     }
 
     void bitwise_shr_same (PMC* value, PMC* dest) {
         INTVAL result;
 
         result = DYNSELF.get_integer()
-            >> value->vtable->get_integer(INTERP, value);
+            >> VTABLE_get_integer(INTERP, value);
 
-        dest->vtable->set_integer_native(INTERP, dest, result);
+        VTABLE_set_integer_native(INTERP, dest, result);
     }
 
     void bitwise_shr_keyed (PMC* key, PMC* value, PMC* value_key,
@@ -772,14 +772,14 @@ pmclass scalar abstract noinit {
 
             result = DYNSELF.get_integer() >> (
                 value_key == NULL ?
-                value->vtable->get_integer(INTERP, value) :
-                value->vtable->get_integer_keyed(INTERP, value, value_key)
+                VTABLE_get_integer(INTERP, value) :
+                VTABLE_get_integer_keyed(INTERP, value, value_key)
             );
 
             if (dest_key == NULL)
-                dest->vtable->set_integer_native(INTERP, dest, result);
+                VTABLE_set_integer_native(INTERP, dest, result);
             else
-                dest->vtable->set_integer_keyed(INTERP, dest, dest_key, result);
+                VTABLE_set_integer_keyed(INTERP, dest, dest_key, result);
         }
         else
             SUPER(key, value, value_key, dest, dest_key);
@@ -797,9 +797,9 @@ pmclass scalar abstract noinit {
         INTVAL result;
 
         result = DYNSELF.get_integer()
-            << value->vtable->get_integer(INTERP, value);
+            << VTABLE_get_integer(INTERP, value);
 
-        dest->vtable->set_integer_native(INTERP, dest, result);
+        VTABLE_set_integer_native(INTERP, dest, result);
     }
 
     void bitwise_shl_int (INTVAL value, PMC* dest) {
@@ -808,16 +808,16 @@ pmclass scalar abstract noinit {
         result = DYNSELF.get_integer()
             << value;
 
-        dest->vtable->set_integer_native(INTERP, dest, result);
+        VTABLE_set_integer_native(INTERP, dest, result);
     }
 
     void bitwise_shl_same (PMC* value, PMC* dest) {
         INTVAL result;
 
         result = DYNSELF.get_integer()
-            << value->vtable->get_integer(INTERP, value);
+            << VTABLE_get_integer(INTERP, value);
 
-        dest->vtable->set_integer_native(INTERP, dest, result);
+        VTABLE_set_integer_native(INTERP, dest, result);
     }
 
     void bitwise_shl_keyed (PMC* key, PMC* value, PMC* value_key,
@@ -830,14 +830,14 @@ pmclass scalar abstract noinit {
 
             result = DYNSELF.get_integer() << (
                 value_key == NULL ?
-                value->vtable->get_integer(INTERP, value) :
-                value->vtable->get_integer_keyed(INTERP, value, value_key)
+                VTABLE_get_integer(INTERP, value) :
+                VTABLE_get_integer_keyed(INTERP, value, value_key)
             );
 
             if (dest_key == NULL)
-                dest->vtable->set_integer_native(INTERP, dest, result);
+                VTABLE_set_integer_native(INTERP, dest, result);
             else
-                dest->vtable->set_integer_keyed(INTERP, dest, dest_key, result);
+                VTABLE_set_integer_keyed(INTERP, dest, dest_key, result);
         }
         else
             SUPER(key, value, value_key, dest, dest_key);
@@ -854,9 +854,9 @@ pmclass scalar abstract noinit {
     void concatenate (PMC* value,  PMC* dest) {
         STRING* s = string_concat(INTERP,
             DYNSELF.get_string(),
-            value->vtable->get_string(INTERP, value), 0);
+            VTABLE_get_string(INTERP, value), 0);
 
-        dest->vtable->set_string_native(INTERP, dest, s);
+        VTABLE_set_string_native(INTERP, dest, s);
     }
 
     void concatenate_native (STRING* value,  PMC* dest) {
@@ -865,15 +865,15 @@ pmclass scalar abstract noinit {
             DYNSELF.get_string(),
             value, 0);
 
-        dest->vtable->set_string_native(INTERP, dest, s);
+        VTABLE_set_string_native(INTERP, dest, s);
     }
 
     void concatenate_same (PMC* value,  PMC* dest) {
         STRING* s = string_concat(INTERP,
             DYNSELF.get_string(),
-            value->vtable->get_string(INTERP, value), 0);
+            VTABLE_get_string(INTERP, value), 0);
 
-        dest->vtable->set_string_native(INTERP, dest, s);
+        VTABLE_set_string_native(INTERP, dest, s);
     }
 
     void concatenate_keyed (PMC* key, PMC* value, PMC* value_key,
@@ -888,16 +888,16 @@ pmclass scalar abstract noinit {
             if (value_key == NULL)
                 result = string_concat(INTERP,
                     DYNSELF.get_string(),
-                    value->vtable->get_string(INTERP, value), 0);
+                    VTABLE_get_string(INTERP, value), 0);
             else
                 result = string_concat(INTERP,
                     DYNSELF.get_string(),
-                    value->vtable->get_string_keyed(INTERP, value, value_key), 0);
+                    VTABLE_get_string_keyed(INTERP, value, value_key), 0);
 
             if (dest_key == NULL)
-                dest->vtable->set_string_native(INTERP, dest, result);
+                VTABLE_set_string_native(INTERP, dest, result);
             else
-                dest->vtable->set_string_keyed(INTERP, dest, dest_key, result);
+                VTABLE_set_string_keyed(INTERP, dest, dest_key, result);
         }
         else
             SUPER(key, value, value_key, dest, dest_key);
@@ -914,12 +914,12 @@ pmclass scalar abstract noinit {
     INTVAL is_equal (PMC* value) {
         /* I think we need to check everything, do the easiest first... */
         if (DYNSELF.get_integer()
-                == value->vtable->get_integer(INTERP, value)
+                == VTABLE_get_integer(INTERP, value)
             && DYNSELF.get_number()
-                == value->vtable->get_number(INTERP, value)
+                == VTABLE_get_number(INTERP, value)
             && 0 == string_compare(INTERP,
                 DYNSELF.get_string(),
-                value->vtable->get_string(INTERP, value))
+                VTABLE_get_string(INTERP, value))
             )
         {
             return 1;
@@ -930,12 +930,12 @@ pmclass scalar abstract noinit {
     INTVAL is_equal_keyed (PMC* key, PMC* value, PMC* value_key) {
         if (key == NULL) {
             if (DYNSELF.get_integer()
-                    == value->vtable->get_integer_keyed(INTERP, value, value_key)
+                    == VTABLE_get_integer_keyed(INTERP, value, value_key)
                 && DYNSELF.get_number()
-                    == value->vtable->get_number_keyed(INTERP, value, value_key)
+                    == VTABLE_get_number_keyed(INTERP, value, value_key)
                 && 0 == string_compare(INTERP,
                     DYNSELF.get_string(),
-                    value->vtable->get_string_keyed(INTERP, value, value_key))
+                    VTABLE_get_string_keyed(INTERP, value, value_key))
                 )
             {
                 return 1;
@@ -954,7 +954,7 @@ pmclass scalar abstract noinit {
 
     INTVAL cmp_num (PMC* value) {
         /* XXX - Floating-point precision errors possible? */
-        FLOATVAL diff = value->vtable->get_number(INTERP, value) -
+        FLOATVAL diff = VTABLE_get_number(INTERP, value) -
                         DYNSELF.get_number();
 
         return diff == 0.0 ? 0 : diff < 0.0 ? -1 : 1;
@@ -963,7 +963,7 @@ pmclass scalar abstract noinit {
     INTVAL cmp_num_keyed (PMC* key, PMC* value, PMC* value_key) {
         if (key == NULL) {
             /* XXX - Floating-point precision errors possible? */
-            FLOATVAL diff = value->vtable->get_number_keyed(INTERP, value, value_key) -
+            FLOATVAL diff = VTABLE_get_number_keyed(INTERP, value, value_key) -
                             DYNSELF.get_number();
 
             return diff == 0.0 ? 0 : diff < 0.0 ? -1 : 1;
@@ -979,13 +979,13 @@ pmclass scalar abstract noinit {
 
     INTVAL cmp_string (PMC* value) {
         return string_compare(INTERP, DYNSELF.get_string(),
-            value->vtable->get_string(INTERP, value));
+            VTABLE_get_string(INTERP, value));
     }
 
     INTVAL cmp_string_keyed (PMC* key, PMC* value, PMC* value_key) {
         if (key == NULL)
             return string_compare(INTERP, DYNSELF.get_string(),
-                value->vtable->get_string_keyed(INTERP, value, value_key));
+                VTABLE_get_string_keyed(INTERP, value, value_key));
         return SUPER(key, value, value_key);
     }
 
@@ -997,10 +997,10 @@ pmclass scalar abstract noinit {
 
     void logical_or (PMC* value,  PMC* dest) {
         if (DYNSELF.get_bool()) {
-            dest->vtable->set_pmc(INTERP, dest, SELF);
+            VTABLE_set_pmc(INTERP, dest, SELF);
         }
         else {
-            dest->vtable->set_pmc(INTERP, dest, value);
+            VTABLE_set_pmc(INTERP, dest, value);
         }
     }
 
@@ -1008,13 +1008,13 @@ pmclass scalar abstract noinit {
         if (key == NULL) {
             if (DYNSELF.get_bool()) {
                 if (dest_key != NULL)
-                    dest->vtable->set_pmc_keyed(INTERP, dest, dest_key, SELF, NULL);
+                    VTABLE_set_pmc_keyed(INTERP, dest, dest_key, SELF, NULL);
                 else
-                    dest->vtable->set_pmc(INTERP, dest, SELF);
+                    VTABLE_set_pmc(INTERP, dest, SELF);
             }
             else
                 /* Either value_key or dest_key is not NULL */
-                dest->vtable->set_pmc_keyed(INTERP, dest, dest_key, value, value_key);
+                VTABLE_set_pmc_keyed(INTERP, dest, dest_key, value, value_key);
         }
         else
             SUPER(key, value, value_key, dest, dest_key);
@@ -1030,10 +1030,10 @@ pmclass scalar abstract noinit {
 
     void logical_and (PMC* value,  PMC* dest) {
         if (DYNSELF.get_bool()) {
-            dest->vtable->set_pmc(INTERP, dest, value);
+            VTABLE_set_pmc(INTERP, dest, value);
         }
         else {
-            dest->vtable->set_pmc(INTERP, dest, SELF);
+            VTABLE_set_pmc(INTERP, dest, SELF);
         }
     }
 
@@ -1041,12 +1041,12 @@ pmclass scalar abstract noinit {
         if (key == NULL) {
             if (DYNSELF.get_bool())
                 /* Either value_key or dest_key is not NULL */
-                dest->vtable->set_pmc_keyed(INTERP, dest, dest_key, value, value_key);
+                VTABLE_set_pmc_keyed(INTERP, dest, dest_key, value, value_key);
             else {
                 if (dest_key != NULL)
-                    dest->vtable->set_pmc_keyed(INTERP, dest, dest_key, SELF, NULL);
+                    VTABLE_set_pmc_keyed(INTERP, dest, dest_key, SELF, NULL);
                 else
-                    dest->vtable->set_pmc(INTERP, dest, SELF);
+                    VTABLE_set_pmc(INTERP, dest, SELF);
             }
         }
         else
@@ -1066,17 +1066,17 @@ pmclass scalar abstract noinit {
         INTVAL my_bool, value_bool;
 
         my_bool = DYNSELF.get_bool();
-        value_bool = value->vtable->get_bool(INTERP, value);
+        value_bool = VTABLE_get_bool(INTERP, value);
 
         if (my_bool && ! value_bool) {
-            dest->vtable->set_pmc(INTERP, dest, SELF);
+            VTABLE_set_pmc(INTERP, dest, SELF);
         }
         else if (value_bool && ! my_bool) {
-            dest->vtable->set_pmc(INTERP, dest, value);
+            VTABLE_set_pmc(INTERP, dest, value);
         }
         else {
             /* XXX - Need a better way to set FALSE */
-            dest->vtable->set_integer_native(INTERP, dest, 0);
+            VTABLE_set_integer_native(INTERP, dest, 0);
         }
     }
 
@@ -1089,26 +1089,26 @@ pmclass scalar abstract noinit {
             my_bool = DYNSELF.get_bool();
 
             if (value_key == NULL)
-                value_bool = value->vtable->get_bool(INTERP, value);
+                value_bool = VTABLE_get_bool(INTERP, value);
             else
-                value_bool = value->vtable->get_bool_keyed(INTERP, value, value_key);
+                value_bool = VTABLE_get_bool_keyed(INTERP, value, value_key);
 
             if (my_bool && ! value_bool) {
                 if (dest_key == NULL)
-                    dest->vtable->set_pmc(INTERP, dest, SELF);
+                    VTABLE_set_pmc(INTERP, dest, SELF);
                 else
-                    dest->vtable->set_pmc_keyed(INTERP, dest, dest_key, SELF, NULL);
+                    VTABLE_set_pmc_keyed(INTERP, dest, dest_key, SELF, NULL);
             }
             else if (value_bool && ! my_bool) {
                 /* Either dest_key or value_key must be non-NULL */
-                dest->vtable->set_pmc_keyed(INTERP, dest, dest_key, value, value_key);
+                VTABLE_set_pmc_keyed(INTERP, dest, dest_key, value, value_key);
             }
             else {
                 /* XXX - Need a better way to set FALSE */
                 if (dest_key == NULL)
-                    dest->vtable->set_integer_native(INTERP, dest, 0);
+                    VTABLE_set_integer_native(INTERP, dest, 0);
                 else
-                    dest->vtable->set_integer_keyed(INTERP, dest, dest_key, 0);
+                    VTABLE_set_integer_keyed(INTERP, dest, dest_key, 0);
             }
         }
         else
@@ -1126,14 +1126,14 @@ pmclass scalar abstract noinit {
 
     void logical_not (PMC* dest) {
         /* XXX - Need a better way to set boolean state */
-        dest->vtable->set_integer_native(INTERP, dest,
+        VTABLE_set_integer_native(INTERP, dest,
             ! DYNSELF.get_bool());
     }
 
     void logical_not_keyed (PMC* key, PMC* dest, PMC* dest_key) {
         /* XXX - Need a better way to set boolean state */
         if (key == NULL)
-            dest->vtable->set_integer_keyed(INTERP, dest,
+            VTABLE_set_integer_keyed(INTERP, dest,
                 dest_key, ! DYNSELF.get_bool());
         else
             SUPER(key, dest, dest_key);
@@ -1146,9 +1146,9 @@ pmclass scalar abstract noinit {
     }
 
     void repeat (PMC* value,  PMC* dest) {
-        dest->vtable->set_string_native(INTERP, dest,
-            string_repeat(INTERP, SELF->vtable->get_string(INTERP,SELF),
-                (UINTVAL)value->vtable->get_integer(INTERP, value), NULL) );
+        VTABLE_set_string_native(INTERP, dest,
+            string_repeat(INTERP, VTABLE_get_string(INTERP,SELF),
+                (UINTVAL)VTABLE_get_integer(INTERP, value), NULL) );
     }
 
     void repeat_keyed (PMC* key, PMC* value, PMC* value_key, PMC* dest, PMC* dest_key) {
@@ -1164,8 +1164,8 @@ pmclass scalar abstract noinit {
     }
 
     void repeat_int (INTVAL value, PMC* dest) {
-        SELF->vtable->set_string_native(INTERP, dest,
-            string_repeat(INTERP, SELF->vtable->get_string(INTERP,SELF),
+        VTABLE_set_string_native(INTERP, dest,
+            string_repeat(INTERP, VTABLE_get_string(INTERP,SELF),
                 (UINTVAL)value, NULL) );
     }
 
@@ -1201,7 +1201,7 @@ pmclass scalar abstract noinit {
     }
 
     STRING* substr_str(INTVAL offset, INTVAL length) {
-        return string_substr(INTERP, SELF->vtable->get_string(INTERP,SELF),
+        return string_substr(INTERP, VTABLE_get_string(INTERP,SELF),
             offset, length, NULL);
     }
 

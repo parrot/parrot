@@ -49,26 +49,26 @@ pmclass PerlArray extends Array {
     void set_integer_keyed_int (INTVAL* key, INTVAL value) {
 	PMC * ptr = Parrot_PerlArray_set_pmc_ptr(INTERP,
 		(List *) SELF->data, *key);
-        ptr->vtable->set_integer_native(INTERP, ptr, value);
+        VTABLE_set_integer_native(INTERP, ptr, value);
     };
 
 
     void set_number_keyed_int (INTVAL* key, FLOATVAL value) {
 	PMC * ptr = Parrot_PerlArray_set_pmc_ptr(INTERP,
 		(List *) SELF->data, *key);
-        ptr->vtable->set_number_native(INTERP, ptr, value);
+        VTABLE_set_number_native(INTERP, ptr, value);
     };
 
 
     void set_string_keyed_int (INTVAL* key, STRING* value) {
 	PMC * ptr = Parrot_PerlArray_set_pmc_ptr(INTERP,
 		(List *) SELF->data, *key);
-        ptr->vtable->set_string_native(INTERP, ptr, value);
+        VTABLE_set_string_native(INTERP, ptr, value);
     };
 
     void set_pmc_keyed_int (INTVAL* key, PMC* src, INTVAL* src_key) {
         if (src_key)
-	    src = src->vtable->get_pmc_keyed_int(INTERP, src, src_key);
+	    src = VTABLE_get_pmc_keyed_int(INTERP, src, src_key);
 	list_assign(INTERP, (List *) SELF->data, *key, src, enum_type_PMC);
     };
 
@@ -84,7 +84,7 @@ pmclass PerlArray extends Array {
     INTVAL get_integer_keyed_int (INTVAL* key) {
         if (*key >= DYNSELF.elements() || *key < -DYNSELF.elements()) {
             PMC* temp = undef(INTERP);
-            return temp->vtable->get_integer(INTERP, temp);
+            return VTABLE_get_integer(INTERP, temp);
         }
         else
             return SUPER(key);
@@ -93,7 +93,7 @@ pmclass PerlArray extends Array {
     FLOATVAL get_number_keyed_int (INTVAL* key) {
         if (*key >= DYNSELF.elements() || *key < -DYNSELF.elements()) {
             PMC* temp = undef(INTERP);
-            return temp->vtable->get_number(INTERP, temp);
+            return VTABLE_get_number(INTERP, temp);
         }
         else
             return SUPER(key);
@@ -106,7 +106,7 @@ pmclass PerlArray extends Array {
     STRING* get_string_keyed_int (INTVAL* key) {
         if (*key >= DYNSELF.elements() || *key < -DYNSELF.elements()) {
             PMC* value = undef(INTERP);
-            return value->vtable->get_string(INTERP, value);
+            return VTABLE_get_string(INTERP, value);
         }
         else
             return SUPER(key);

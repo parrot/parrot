@@ -39,7 +39,7 @@ pmclass Sub {
    }
 
    void set_integer (PMC * value) {
-       ((struct Parrot_Sub*)SELF->data)->init = (opcode_t*)value->vtable->get_integer(INTERP, value);
+       ((struct Parrot_Sub*)SELF->data)->init = (opcode_t*)VTABLE_get_integer(INTERP, value);
    }
 
    void set_integer_native (INTVAL value) {

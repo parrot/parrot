@@ -51,7 +51,7 @@ pmclass PerlNum extends scalar {
     }
 
     void set_pmc (PMC* value) {
-        SELF->cache.num_val = value->vtable->get_number(INTERP, value);
+        SELF->cache.num_val = VTABLE_get_number(INTERP, value);
     }
 
     void set_integer (PMC* value) {
@@ -70,7 +70,7 @@ pmclass PerlNum extends scalar {
     }
 
     void set_number (PMC* value) {
-        SELF->cache.num_val = (FLOATVAL)value->vtable->get_number(INTERP, value);
+        SELF->cache.num_val = (FLOATVAL)VTABLE_get_number(INTERP, value);
     }
 
     void set_number_native (FLOATVAL value) {
@@ -106,14 +106,14 @@ pmclass PerlNum extends scalar {
     }
 
     void add (PMC* value, PMC* dest) {
-	dest->vtable->set_number_native(INTERP, dest,
+	VTABLE_set_number_native(INTERP, dest,
 	    SELF->cache.num_val +
-	    value->vtable->get_number(INTERP, value)
+	    VTABLE_get_number(INTERP, value)
 	);
     }
 
     void add_int (INTVAL value, PMC* dest) {
-        dest->vtable->set_number_native(INTERP, dest,
+        VTABLE_set_number_native(INTERP, dest,
 	SELF->cache.num_val + value);
     }
 
@@ -121,7 +121,7 @@ pmclass PerlNum extends scalar {
     }
 
     void add_float (FLOATVAL value, PMC* dest) {
-        dest->vtable->set_number_native(INTERP, dest,
+        VTABLE_set_number_native(INTERP, dest,
 	SELF->cache.num_val + value);
     }
 
@@ -130,14 +130,14 @@ pmclass PerlNum extends scalar {
     }
 
     void subtract (PMC* value, PMC* dest) {
-	dest->vtable->set_number_native(INTERP, dest,
+	VTABLE_set_number_native(INTERP, dest,
 	    SELF->cache.num_val -
-	    value->vtable->get_number(INTERP, value)
+	    VTABLE_get_number(INTERP, value)
 	);
     }
 
     void subtract_int (INTVAL value, PMC* dest) {
-        dest->vtable->set_number_native(INTERP, dest,
+        VTABLE_set_number_native(INTERP, dest,
             SELF->cache.num_val - (FLOATVAL)value
         );
     }
@@ -146,7 +146,7 @@ pmclass PerlNum extends scalar {
     }
 
     void subtract_float (FLOATVAL value, PMC* dest) {
-        dest->vtable->set_number_native(INTERP, dest,
+        VTABLE_set_number_native(INTERP, dest,
 	SELF->cache.num_val - value);
     }
 
@@ -155,14 +155,14 @@ pmclass PerlNum extends scalar {
     }
 
     void multiply (PMC* value, PMC* dest) {
-	dest->vtable->set_number_native(INTERP, dest,
+	VTABLE_set_number_native(INTERP, dest,
 	    SELF->cache.num_val *
-	    value->vtable->get_number(INTERP, value)
+	    VTABLE_get_number(INTERP, value)
 	);
     }
 
     void multiply_int (INTVAL value, PMC* dest) {
-        dest->vtable->set_number_native(INTERP, dest,
+        VTABLE_set_number_native(INTERP, dest,
             SELF->cache.num_val * value
         );
     }
@@ -171,7 +171,7 @@ pmclass PerlNum extends scalar {
     }
 
     void multiply_float (FLOATVAL value, PMC* dest) {
-        dest->vtable->set_number_native(INTERP, dest,
+        VTABLE_set_number_native(INTERP, dest,
 	SELF->cache.num_val * value);
     }
 
@@ -180,20 +180,20 @@ pmclass PerlNum extends scalar {
     }
 
     void divide (PMC* value, PMC* dest) {
-	dest->vtable->set_number_native(INTERP, dest,
+	VTABLE_set_number_native(INTERP, dest,
 	    SELF->cache.num_val /
-	    value->vtable->get_number(INTERP, value)
+	    VTABLE_get_number(INTERP, value)
 	);
     }
 
     void divide_int (INTVAL value, PMC* dest) {
-        dest->vtable->set_number_native(INTERP, dest,
+        VTABLE_set_number_native(INTERP, dest,
             SELF->cache.num_val / value
         );
     }
 
     void divide_float (FLOATVAL value, PMC* dest) {
-        dest->vtable->set_number_native(INTERP, dest,
+        VTABLE_set_number_native(INTERP, dest,
             SELF->cache.num_val / value
         );
     }
@@ -203,104 +203,104 @@ pmclass PerlNum extends scalar {
     }
 
     void modulus (PMC* value, PMC* dest) {
-        FLOATVAL f = value->vtable->get_number(INTERP, value);
-        dest->vtable->set_number_native(INTERP, dest,
+        FLOATVAL f = VTABLE_get_number(INTERP, value);
+        VTABLE_set_number_native(INTERP, dest,
                                         fmod(SELF->cache.num_val, f));
     }
 
     void modulus_int (INTVAL value, PMC* dest) {
-        dest->vtable->set_number_native(INTERP, dest,
+        VTABLE_set_number_native(INTERP, dest,
                                         fmod(SELF->cache.num_val, value));
     }
 
     void neg (PMC * dest) {
-	dest->vtable->set_number_native(INTERP, dest, -SELF->cache.num_val);
+	VTABLE_set_number_native(INTERP, dest, -SELF->cache.num_val);
     }
 
     void bitwise_or (PMC* value, PMC* dest) {
-        dest->vtable->set_integer_native(INTERP, dest,
+        VTABLE_set_integer_native(INTERP, dest,
 	    /* XXX ? */
             (INTVAL)SELF->cache.num_val |
-            value->vtable->get_integer(INTERP, value)
+            VTABLE_get_integer(INTERP, value)
         );
     }
 
     void bitwise_or_int (INTVAL value, PMC* dest) {
-        dest->vtable->set_integer_native(INTERP, dest,
+        VTABLE_set_integer_native(INTERP, dest,
             (INTVAL)SELF->cache.num_val |
             value
         );
     }
 
     void bitwise_or_same (PMC* value, PMC* dest) {
-        dest->vtable->set_integer_native(INTERP, dest,
+        VTABLE_set_integer_native(INTERP, dest,
             (INTVAL)SELF->cache.num_val |
             (INTVAL)value->cache.num_val
         );
     }
 
     void bitwise_and (PMC* value, PMC* dest) {
-        dest->vtable->set_integer_native(INTERP, dest,
+        VTABLE_set_integer_native(INTERP, dest,
             (INTVAL)SELF->cache.num_val &
-            value->vtable->get_integer(INTERP, value)
+            VTABLE_get_integer(INTERP, value)
         );
     }
 
     void bitwise_and_int (INTVAL value, PMC* dest) {
-        dest->vtable->set_integer_native(INTERP, dest,
+        VTABLE_set_integer_native(INTERP, dest,
             (INTVAL)SELF->cache.num_val &
             value
         );
     }
 
     void bitwise_and_same (PMC* value, PMC* dest) {
-        dest->vtable->set_integer_native(INTERP, dest,
+        VTABLE_set_integer_native(INTERP, dest,
             (INTVAL)SELF->cache.num_val &
             (INTVAL)value->cache.num_val
         );
     }
 
     void bitwise_xor (PMC* value, PMC* dest) {
-        dest->vtable->set_integer_native(INTERP, dest,
+        VTABLE_set_integer_native(INTERP, dest,
             (INTVAL)SELF->cache.num_val ^
-            value->vtable->get_integer(INTERP, value)
+            VTABLE_get_integer(INTERP, value)
         );
     }
 
     void bitwise_xor_int (INTVAL value, PMC* dest) {
-        dest->vtable->set_integer_native(INTERP, dest,
+        VTABLE_set_integer_native(INTERP, dest,
             (INTVAL)SELF->cache.num_val ^
             value
         );
     }
 
     void bitwise_xor_same (PMC* value, PMC* dest) {
-        dest->vtable->set_integer_native(INTERP, dest,
+        VTABLE_set_integer_native(INTERP, dest,
             (INTVAL)SELF->cache.num_val ^
             (INTVAL)value->cache.num_val
         );
     }
 
     void bitwise_not (PMC* dest) {
-        dest->vtable->set_integer_native(INTERP, dest,
+        VTABLE_set_integer_native(INTERP, dest,
             ~(INTVAL)SELF->cache.num_val
         );
     }
 
     /* == operation */
     INTVAL is_equal (PMC* value) {
-        return (INTVAL)(SELF->cache.num_val == value->vtable->get_number(INTERP, value));
+        return (INTVAL)(SELF->cache.num_val == VTABLE_get_number(INTERP, value));
     }
 
     INTVAL cmp(PMC* value) {
         FLOATVAL diff;
-        diff = SELF->cache.num_val - value->vtable->get_number(INTERP, value);
+        diff = SELF->cache.num_val - VTABLE_get_number(INTERP, value);
         return diff > 0 ? 1 : diff < 0 ? -1 : 0;
     }
 
     INTVAL cmp_num(PMC* value) {
         FLOATVAL diff;
-        diff = SELF->cache.num_val - value->vtable->get_number(INTERP, value);
+        diff = SELF->cache.num_val - VTABLE_get_number(INTERP, value);
         return diff > 0 ? 1 : diff < 0 ? -1 : 0;
     }
 

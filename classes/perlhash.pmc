@@ -37,7 +37,7 @@ pmclass PerlHash {
     void init () {
         if (undef == NULL) {
             undef = constant_pmc_new_noinit(INTERP, enum_class_PerlUndef);
-            undef->vtable->init(INTERP, undef);
+            VTABLE_init(INTERP, undef);
         }
         PObj_custom_mark_SET(SELF);
         new_hash(INTERP, (HASH **)&SELF->data);
@@ -71,7 +71,7 @@ pmclass PerlHash {
         HASH_ENTRY* entry = hash_get(INTERP, (HASH*) SELF->data, keystr);
         if (entry == NULL) {
             /* XXX Warning: use of uninitialized value */
-            return undef->vtable->get_integer(INTERP, undef);
+            return VTABLE_get_integer(INTERP, undef);
         }
         if (entry->type == enum_hash_int) return entry->val.int_val;
         if (entry->type == enum_hash_pmc) {
@@ -79,8 +79,8 @@ pmclass PerlHash {
 	    nextkey = key_next(INTERP, key);
             valpmc = entry->val.pmc_val;
 	    if (!nextkey)
-            return valpmc->vtable->get_integer(INTERP, valpmc);
-	    return valpmc->vtable->get_integer_keyed(INTERP, valpmc, nextkey);
+            return VTABLE_get_integer(INTERP, valpmc);
+	    return VTABLE_get_integer_keyed(INTERP, valpmc, nextkey);
 
         }
         internal_exception(OUT_OF_BOUNDS,
@@ -94,7 +94,7 @@ pmclass PerlHash {
         HASH_ENTRY* entry = hash_get(INTERP, (HASH*) SELF->data, keystr);
         if (entry == NULL) {
             /* XXX Warning: Use of uninitialized value */
-            return undef->vtable->get_number(INTERP, undef);
+            return VTABLE_get_number(INTERP, undef);
         }
         if (entry->type == enum_hash_num) return entry->val.num_val;
         if (entry->type == enum_hash_pmc) {
@@ -102,8 +102,8 @@ pmclass PerlHash {
 	    nextkey = key_next(INTERP, key);
             valpmc = entry->val.pmc_val;
 	    if (!nextkey)
-            return valpmc->vtable->get_number(INTERP, valpmc);
-	    return valpmc->vtable->get_number_keyed(INTERP, valpmc, nextkey);
+            return VTABLE_get_number(INTERP, valpmc);
+	    return VTABLE_get_number_keyed(INTERP, valpmc, nextkey);
         }
         internal_exception(OUT_OF_BOUNDS,
 		"Cannot fetch number out of non-numeric key!\n");
@@ -116,7 +116,7 @@ pmclass PerlHash {
         HASH_ENTRY* entry = hash_get(INTERP, (HASH*) SELF->data, keystr);
         if (entry == NULL) {
             /* XXX Warning: Use of uninitialized value */
-            return undef->vtable->get_bignum(INTERP, undef);
+            return VTABLE_get_bignum(INTERP, undef);
         }
         if (entry->type == enum_hash_num) return (BIGNUM*)entry->val.struct_val;
         if (entry->type == enum_hash_pmc) {
@@ -124,8 +124,8 @@ pmclass PerlHash {
 	    nextkey = key_next(INTERP, key);
             valpmc = entry->val.pmc_val;
 	    if (!nextkey)
-            return valpmc->vtable->get_bignum(INTERP, valpmc);
-	    return valpmc->vtable->get_bignum_keyed(INTERP, valpmc, nextkey);
+            return VTABLE_get_bignum(INTERP, valpmc);
+	    return VTABLE_get_bignum_keyed(INTERP, valpmc, nextkey);
         }
         internal_exception(OUT_OF_BOUNDS,
 		"Cannot fetch number out of non-numeric key!\n");
@@ -142,7 +142,7 @@ pmclass PerlHash {
         HASH_ENTRY* entry = hash_get(INTERP, (HASH*) SELF->data, keystr);
         if (entry == NULL) {
             /* XXX Warning: use of uninitialized value */
-            return undef->vtable->get_string(INTERP, undef);
+            return VTABLE_get_string(INTERP, undef);
         }
         if (entry->type == enum_hash_string) return entry->val.string_val;
         if (entry->type == enum_hash_pmc) {
@@ -150,8 +150,8 @@ pmclass PerlHash {
 	    nextkey = key_next(INTERP, key);
             valpmc = entry->val.pmc_val;
 	    if (!nextkey)
-            return valpmc->vtable->get_string(INTERP, valpmc);
-	    return valpmc->vtable->get_string_keyed(INTERP, valpmc, nextkey);
+            return VTABLE_get_string(INTERP, valpmc);
+	    return VTABLE_get_string_keyed(INTERP, valpmc, nextkey);
         }
         internal_exception(OUT_OF_BOUNDS,
 		"Cannot fetch string out of non-string key!\n");
@@ -171,14 +171,14 @@ pmclass PerlHash {
         HASH_ENTRY* entry = hash_get(INTERP, (HASH*) SELF->data, keystr);
         if (entry == NULL) {
             /* XXX Warning: use of uninitialized value */
-            return (PMC*)undef->vtable->get_pmc(INTERP, undef);
+            return (PMC*)VTABLE_get_pmc(INTERP, undef);
         }
         if (entry->type == enum_hash_pmc) {
 	    PMC* nextkey;
 	    nextkey = key_next(INTERP, key);
 	    if (!nextkey)
             return entry->val.pmc_val;
-	    return entry->val.pmc_val->vtable->get_pmc_keyed(INTERP,
+	    return VTABLE_get_pmc_keyed(INTERP,
 		    entry->val.pmc_val, nextkey);
 
         }
@@ -296,7 +296,7 @@ pmclass PerlHash {
 	    return 0;		/* no such key */
 	if (key == NULL)
 	    return 1;		/* lookup stops here */
-	return he->val.pmc_val->vtable->exists_keyed(INTERP, he->val.pmc_val,
+	return VTABLE_exists_keyed(INTERP, he->val.pmc_val,
 						     key);
     }
 
@@ -311,10 +311,10 @@ pmclass PerlHash {
 	    return 0;		/* no such key */
         if (he->type == enum_hash_pmc) {
 	    if (key == NULL)
-		return he->val.pmc_val->vtable->defined(INTERP,
+		return VTABLE_defined(INTERP,
 			he->val.pmc_val);
 	    else
-		return he->val.pmc_val->vtable->defined_keyed(
+		return VTABLE_defined_keyed(
 			INTERP, he->val.pmc_val, key);
 	}
 	/* some other contents */
@@ -333,7 +333,7 @@ pmclass PerlHash {
 	else if (key == NULL)
 	    hash_delete(INTERP, h, sx);
 	else
-	    he->val.pmc_val->vtable->delete_keyed(INTERP, he->val.pmc_val,
+	    VTABLE_delete_keyed(INTERP, he->val.pmc_val,
 						  key);
     }
 }

@@ -41,7 +41,7 @@ pmclass PerlInt extends scalar {
     }
 
     void set_pmc (PMC* value) {
-        SELF->cache.int_val = value->vtable->get_integer(INTERP, value);
+        SELF->cache.int_val = VTABLE_get_integer(INTERP, value);
     }
 
     void set_integer_same (PMC * value) {
@@ -65,7 +65,7 @@ pmclass PerlInt extends scalar {
 
     void set_bignum (PMC* value) {
         /* XXX not sure if this can be optimized further safely */
-        SELF->cache.struct_val = (DPOINTER*)value->vtable->get_bignum(INTERP, value);
+        SELF->cache.struct_val = (DPOINTER*)VTABLE_get_bignum(INTERP, value);
 	/* SELF->vtable = &(Parrot_base_vtables[enum_class_PerlBigNum]); */
     }
 
@@ -77,7 +77,7 @@ pmclass PerlInt extends scalar {
 
     void set_bignum_same (PMC* value) {
         /* XXX not sure if this can be optimized further safely */
-        SELF->cache.struct_val = (DPOINTER*)value->vtable->get_bignum(INTERP, value);
+        SELF->cache.struct_val = (DPOINTER*)VTABLE_get_bignum(INTERP, value);
 	/* SELF->vtable = &(Parrot_base_vtables[enum_class_PerlBigNum]); */
     }
 
@@ -104,19 +104,19 @@ pmclass PerlInt extends scalar {
 	    type = enum_class_PerlNum;
 	}
 	else if(value->vtable == &Parrot_base_vtables[enum_class_PerlString]) {
-	    FLOATVAL f = value->vtable->get_number(INTERP, value);
-	    i = value->vtable->get_integer(INTERP, value);
+	    FLOATVAL f = VTABLE_get_number(INTERP, value);
+	    i = VTABLE_get_integer(INTERP, value);
 	    if(f != i)
 		type = enum_class_PerlNum;
 	}
 	i = SELF->cache.int_val;
 	/* no add_int here: SELF may be dest */
 	if(type == enum_class_PerlNum)
-            dest->vtable->set_number_native(INTERP, dest,
-		i + value->vtable->get_number(INTERP, value));
+            VTABLE_set_number_native(INTERP, dest,
+		i + VTABLE_get_number(INTERP, value));
 	else
-            dest->vtable->set_integer_native(INTERP, dest,
-		i + value->vtable->get_integer(INTERP, value));
+            VTABLE_set_integer_native(INTERP, dest,
+		i + VTABLE_get_integer(INTERP, value));
     }
 
     void add_same (PMC* value, PMC* dest) {
@@ -131,23 +131,23 @@ pmclass PerlInt extends scalar {
 	    type = enum_class_PerlNum;
 	}
 	else if(value->vtable == &Parrot_base_vtables[enum_class_PerlString]) {
-	    FLOATVAL f = value->vtable->get_number(INTERP, value);
-	    i = value->vtable->get_integer(INTERP, value);
+	    FLOATVAL f = VTABLE_get_number(INTERP, value);
+	    i = VTABLE_get_integer(INTERP, value);
 	    if(f != i) {
 		type = enum_class_PerlNum;
 	    }
 	}
 	i = SELF->cache.int_val;
 	if(type == enum_class_PerlNum)
-            dest->vtable->set_number_native(INTERP, dest,
-		i - value->vtable->get_number(INTERP, value));
+            VTABLE_set_number_native(INTERP, dest,
+		i - VTABLE_get_number(INTERP, value));
 	else
-            dest->vtable->set_integer_native(INTERP, dest,
-		i - value->vtable->get_integer(INTERP, value));
+            VTABLE_set_integer_native(INTERP, dest,
+		i - VTABLE_get_integer(INTERP, value));
     }
 
     void subtract_int (INTVAL value, PMC* dest) {
-        dest->vtable->set_integer_native(INTERP, dest,
+        VTABLE_set_integer_native(INTERP, dest,
             SELF->cache.int_val - value
         );
     }
@@ -164,23 +164,23 @@ pmclass PerlInt extends scalar {
 	    type = enum_class_PerlNum;
 	}
 	else if(value->vtable == &Parrot_base_vtables[enum_class_PerlString]) {
-	    FLOATVAL f = value->vtable->get_number(INTERP, value);
-	    i = value->vtable->get_integer(INTERP, value);
+	    FLOATVAL f = VTABLE_get_number(INTERP, value);
+	    i = VTABLE_get_integer(INTERP, value);
 	    if(f != i) {
 		type = enum_class_PerlNum;
 	    }
 	}
 	i = SELF->cache.int_val;
 	if(type == enum_class_PerlNum)
-            dest->vtable->set_number_native(INTERP, dest,
-		i * value->vtable->get_number(INTERP, value));
+            VTABLE_set_number_native(INTERP, dest,
+		i * VTABLE_get_number(INTERP, value));
 	else
-            dest->vtable->set_integer_native(INTERP, dest,
-		i * value->vtable->get_integer(INTERP, value));
+            VTABLE_set_integer_native(INTERP, dest,
+		i * VTABLE_get_integer(INTERP, value));
     }
 
     void multiply_int (INTVAL value, PMC* dest) {
-        dest->vtable->set_integer_native(INTERP, dest,
+        VTABLE_set_integer_native(INTERP, dest,
             SELF->cache.int_val * value
         );
     }
@@ -190,12 +190,12 @@ pmclass PerlInt extends scalar {
     }
 
     void divide (PMC* value, PMC* dest) {
-	dest->vtable->set_number_native(INTERP, dest,
-		SELF->cache.int_val / value->vtable->get_number(INTERP, value));
+	VTABLE_set_number_native(INTERP, dest,
+		SELF->cache.int_val / VTABLE_get_number(INTERP, value));
     }
 
     void divide_int (INTVAL value, PMC* dest) {
-        dest->vtable->set_number_native(INTERP, dest,
+        VTABLE_set_number_native(INTERP, dest,
             (FLOATVAL)SELF->cache.int_val / value
         );
     }
@@ -210,21 +210,21 @@ pmclass PerlInt extends scalar {
 		    "modulus() not implemented for PerlNum\n");
 	}
 	else if(value->vtable == &Parrot_base_vtables[enum_class_PerlString]) {
-	    FLOATVAL f = value->vtable->get_number(INTERP, value);
-	    INTVAL   i = value->vtable->get_integer(INTERP, value);
+	    FLOATVAL f = VTABLE_get_number(INTERP, value);
+	    INTVAL   i = VTABLE_get_integer(INTERP, value);
 	    if(f != i) {
 		internal_exception(INVALID_OPERATION,
 			"modulus() not implemented for PerlNum\n");
 	    }
 	}
-	dest->vtable->set_integer_native(INTERP, dest,
+	VTABLE_set_integer_native(INTERP, dest,
 	    SELF->cache.int_val %
-	    value->vtable->get_integer(INTERP, value)
+	    VTABLE_get_integer(INTERP, value)
 	);
     }
 
     void modulus_int (INTVAL value, PMC* dest) {
-        dest->vtable->set_integer_native(INTERP, dest,
+        VTABLE_set_integer_native(INTERP, dest,
             SELF->cache.int_val % value
         );
     }
@@ -234,107 +234,107 @@ pmclass PerlInt extends scalar {
     }
 
     void neg (PMC* dest) {
-        dest->vtable->set_integer_native(INTERP, dest, -SELF->cache.int_val);
+        VTABLE_set_integer_native(INTERP, dest, -SELF->cache.int_val);
     }
 
     void bitwise_or (PMC* value, PMC* dest) {
-        dest->vtable->set_integer_native(INTERP, dest,
+        VTABLE_set_integer_native(INTERP, dest,
             SELF->cache.int_val |
-            value->vtable->get_integer(INTERP, value)
+            VTABLE_get_integer(INTERP, value)
         );
     }
 
     void bitwise_or_int (INTVAL value, PMC* dest) {
-        dest->vtable->set_integer_native(INTERP, dest,
+        VTABLE_set_integer_native(INTERP, dest,
             SELF->cache.int_val | value
         );
     }
 
     void bitwise_or_same (PMC* value, PMC* dest) {
-        dest->vtable->set_integer_native(INTERP, dest,
+        VTABLE_set_integer_native(INTERP, dest,
             SELF->cache.int_val |
             value->cache.int_val
         );
     }
 
     void bitwise_and (PMC* value, PMC* dest) {
-        dest->vtable->set_integer_native(INTERP, dest,
+        VTABLE_set_integer_native(INTERP, dest,
             SELF->cache.int_val &
-            value->vtable->get_integer(INTERP, value)
+            VTABLE_get_integer(INTERP, value)
         );
     }
 
     void bitwise_and_int (INTVAL value, PMC* dest) {
-        dest->vtable->set_integer_native(INTERP, dest,
+        VTABLE_set_integer_native(INTERP, dest,
             SELF->cache.int_val & value
         );
     }
 
     void bitwise_and_same (PMC* value, PMC* dest) {
-        dest->vtable->set_integer_native(INTERP, dest,
+        VTABLE_set_integer_native(INTERP, dest,
             SELF->cache.int_val &
             value->cache.int_val
         );
     }
 
     void bitwise_xor (PMC* value, PMC* dest) {
-        dest->vtable->set_integer_native(INTERP, dest,
+        VTABLE_set_integer_native(INTERP, dest,
             SELF->cache.int_val ^
-            value->vtable->get_integer(INTERP, value)
+            VTABLE_get_integer(INTERP, value)
         );
     }
 
     void bitwise_xor_int (INTVAL value, PMC* dest) {
-        dest->vtable->set_integer_native(INTERP, dest,
+        VTABLE_set_integer_native(INTERP, dest,
             SELF->cache.int_val ^ value
         );
     }
 
     void bitwise_xor_same (PMC* value, PMC* dest) {
-        dest->vtable->set_integer_native(INTERP, dest,
+        VTABLE_set_integer_native(INTERP, dest,
             SELF->cache.int_val ^
             value->cache.int_val
         );
     }
 
     void bitwise_not (PMC* dest) {
-        dest->vtable->set_integer_native(INTERP, dest, ~SELF->cache.int_val);
+        VTABLE_set_integer_native(INTERP, dest, ~SELF->cache.int_val);
     }
 
     void bitwise_shr (PMC* value, PMC* dest) {
-        dest->vtable->set_integer_native(INTERP, dest,
+        VTABLE_set_integer_native(INTERP, dest,
             SELF->cache.int_val >>
-            value->vtable->get_integer(INTERP, value)
+            VTABLE_get_integer(INTERP, value)
         );
     }
 
     void bitwise_shr_int (INTVAL value, PMC* dest) {
-        dest->vtable->set_integer_native(INTERP, dest,
+        VTABLE_set_integer_native(INTERP, dest,
             SELF->cache.int_val >> value
         );
     }
 
     void bitwise_shr_same (PMC* value, PMC* dest) {
-        dest->vtable->set_integer_native(INTERP, dest,
+        VTABLE_set_integer_native(INTERP, dest,
             SELF->cache.int_val >> value->cache.int_val
         );
     }
 
     void bitwise_shl (PMC* value, PMC* dest) {
-        dest->vtable->set_integer_native(INTERP, dest,
+        VTABLE_set_integer_native(INTERP, dest,
             SELF->cache.int_val <<
-            value->vtable->get_integer(INTERP, value)
+            VTABLE_get_integer(INTERP, value)
         );
     }
 
     void bitwise_shl_int (INTVAL value, PMC* dest) {
-        dest->vtable->set_integer_native(INTERP, dest,
+        VTABLE_set_integer_native(INTERP, dest,
             SELF->cache.int_val << value
         );
     }
 
     void bitwise_shl_same (PMC* value, PMC* dest) {
-        dest->vtable->set_integer_native(INTERP, dest,
+        VTABLE_set_integer_native(INTERP, dest,
             SELF->cache.int_val << value->cache.int_val
         );
     }
@@ -343,16 +343,16 @@ pmclass PerlInt extends scalar {
     /* == operation */
     INTVAL is_equal (PMC* value) {
         return (INTVAL)(SELF->cache.int_val ==
-	value->vtable->get_integer(INTERP, value));
+	VTABLE_get_integer(INTERP, value));
     }
 
     INTVAL cmp(PMC* value) {
 	if (value->vtable == &Parrot_base_vtables[enum_class_PerlString]) {
 	    FLOATVAL fdiff = SELF->cache.int_val
-		- value->vtable->get_number(INTERP, value);
+		- VTABLE_get_number(INTERP, value);
 	    if (fdiff == 0) {
 		INTVAL idiff = SELF->cache.int_val
-		    - value->vtable->get_integer(INTERP, value);
+		    - VTABLE_get_integer(INTERP, value);
 		return idiff > 0 ? 1 : idiff < 0 ? -1 : 0;
 	    } else {
 		return fdiff > 0 ? 1 : -1;
@@ -361,13 +361,13 @@ pmclass PerlInt extends scalar {
 	else if (value->vtable == &Parrot_base_vtables[enum_class_PerlNum]) {
 	    FLOATVAL diff;
 	    diff = (FLOATVAL)SELF->cache.int_val
-		- value->vtable->get_number(INTERP, value);
+		- VTABLE_get_number(INTERP, value);
 	    return diff > 0 ? 1 : diff < 0 ? -1 : 0;
 	}
 	else {
 	    /* int or undef */
 	    INTVAL diff = SELF->cache.int_val
-		- value->vtable->get_integer(INTERP, value);
+		- VTABLE_get_integer(INTERP, value);
 	    return diff > 0 ? 1 : diff < 0 ? -1 : 0;
 	}
     }
@@ -375,10 +375,10 @@ pmclass PerlInt extends scalar {
     INTVAL cmp_num(PMC* value) {
 	if (value->vtable == &Parrot_base_vtables[enum_class_PerlString]) {
 	    FLOATVAL fdiff = SELF->cache.int_val
-		- value->vtable->get_number(INTERP, value);
+		- VTABLE_get_number(INTERP, value);
 	    if (fdiff == 0) {
 		INTVAL idiff = SELF->cache.int_val
-		    - value->vtable->get_integer(INTERP, value);
+		    - VTABLE_get_integer(INTERP, value);
 		return idiff > 0 ? 1 : idiff < 0 ? -1 : 0;
 	    } else {
 		return fdiff > 0 ? 1 : -1;
@@ -387,40 +387,40 @@ pmclass PerlInt extends scalar {
 	else if (value->vtable == &Parrot_base_vtables[enum_class_PerlNum]) {
 	    FLOATVAL diff;
 	    diff = (FLOATVAL)SELF->cache.int_val
-		- value->vtable->get_number(INTERP, value);
+		- VTABLE_get_number(INTERP, value);
 	    return diff > 0 ? 1 : diff < 0 ? -1 : 0;
 	}
 	else {
 	    /* int or undef */
 	    INTVAL diff = SELF->cache.int_val
-		- value->vtable->get_integer(INTERP, value);
+		- VTABLE_get_integer(INTERP, value);
 	    return diff > 0 ? 1 : diff < 0 ? -1 : 0;
 	}
     }
 
     void logical_or (PMC* value, PMC* dest) {
-        dest->vtable->set_integer_native(INTERP, dest,
+        VTABLE_set_integer_native(INTERP, dest,
             SELF->cache.int_val ||
-            value->vtable->get_bool(INTERP, value)
+            VTABLE_get_bool(INTERP, value)
         );
     }
 
     void logical_and (PMC* value, PMC* dest) {
-        dest->vtable->set_integer_native(INTERP, dest,
+        VTABLE_set_integer_native(INTERP, dest,
             SELF->cache.int_val &&
-            value->vtable->get_bool(INTERP, value)
+            VTABLE_get_bool(INTERP, value)
         );
     }
 
     void logical_xor (PMC* value, PMC* dest) {
-        dest->vtable->set_integer_native(INTERP, dest,
+        VTABLE_set_integer_native(INTERP, dest,
             ( SELF->cache.int_val ? 1 : 0 ) ^
-            value->vtable->get_bool(INTERP, value)
+            VTABLE_get_bool(INTERP, value)
         );
     }
 
     void logical_not (PMC* value) {
-	    value->vtable->set_integer_native(INTERP, value,
+	    VTABLE_set_integer_native(INTERP, value,
 	    !SELF->cache.int_val);
     }
 

@@ -31,6 +31,7 @@ classes/default.pmc
 classes/eval.pmc
 classes/genclass.pl
 classes/intlist.pmc
+classes/iterator.pmc
 classes/key.pmc
 classes/managedstruct.pmc
 classes/multiarray.pmc
@@ -1724,6 +1725,7 @@ lib/Parrot/OpTrans/CGP.pm
 lib/Parrot/OpTrans/CGoto.pm
 lib/Parrot/OpTrans/CPrederef.pm
 lib/Parrot/OpTrans/Compiled.pm
+lib/Parrot/OpTrans/CSwitch.pm
 lib/Parrot/OpsFile.pm
 lib/Parrot/Optimizer.pm
 lib/Parrot/PackFile.pm

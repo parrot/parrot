@@ -45,7 +45,7 @@ pmclass Coroutine {
 
     void set_integer (PMC * value) {
         ((struct Parrot_Coroutine*)SELF->data)->resume
-            = (opcode_t*)value->vtable->get_integer(INTERP, value);
+            = (opcode_t*)VTABLE_get_integer(INTERP, value);
     }
 
     void set_integer_native (INTVAL value) {

@@ -30,6 +30,7 @@
 []		classes/eval.pmc
 []		classes/genclass.pl
 []		classes/intlist.pmc
+[]		classes/iterator.pmc
 []		classes/key.pmc
 []		classes/managedstruct.pmc
 []		classes/multiarray.pmc

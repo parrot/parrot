@@ -393,6 +393,9 @@ sub rewrite_method ($$$$$) {
     s/SELF/pmc/g;
     s/INTERP/interpreter/g;
 
+    # now use macros for all rewritten stuff
+    s/\s(?:\w+)->vtable->(\w+)\(/ VTABLE_$1(/g;
+
     return $_;
 }
 

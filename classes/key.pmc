@@ -42,9 +42,9 @@ pmclass Key {
 		case KEY_pmc_FLAG:
 		case KEY_pmc_FLAG|KEY_register_FLAG:
 		    p = key_pmc(INTERP, key);
-		    c = pmc_new_noinit(INTERP, p->vtable->type(INTERP, p));
+		    c = pmc_new_noinit(INTERP, VTABLE_type(INTERP, p));
 		    key_set_pmc(INTERP, dkey, c);
-		    p->vtable->clone(INTERP, p, c);
+		    VTABLE_clone(INTERP, p, c);
 		    break;
 	    }
 	    key = key_next(INTERP, key);
@@ -81,7 +81,7 @@ pmclass Key {
     }
 
     void set_integer (PMC* value) {
-        key_set_integer(INTERP, SELF, value->vtable->get_integer(INTERP, value));
+        key_set_integer(INTERP, SELF, VTABLE_get_integer(INTERP, value));
     }
 
     void set_integer_native (INTVAL value) {
@@ -89,7 +89,7 @@ pmclass Key {
     }
 
     void set_number (PMC* value) {
-        key_set_number(INTERP, SELF, value->vtable->get_number(INTERP, value));
+        key_set_number(INTERP, SELF, VTABLE_get_number(INTERP, value));
     }
 
     void set_number_native (FLOATVAL value) {
@@ -97,7 +97,7 @@ pmclass Key {
     }
 
     void set_string (PMC* value) {
-        key_set_string(INTERP, SELF, value->vtable->get_string(INTERP, value));
+        key_set_string(INTERP, SELF, VTABLE_get_string(INTERP, value));
     }
 
     void set_string_native (STRING* value) {

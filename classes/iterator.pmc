@@ -1,0 +1,417 @@
+/* Iterator.pmc
+ *  Copyright: (When this is determined...it will go here)
+ *  CVS Info
+ *     $Id$
+ *  Overview:
+ *     These are the vtable functions for the Iterator base class
+ *  Data Structure and Algorithms:
+ *  History:
+ *  Notes:
+ *  References:
+ */
+
+#include "parrot/parrot.h"
+
+pmclass Iterator {
+
+    void init () {
+	internal_exception(1, "Iterator init without aggregate\n");
+    }
+
+    void init_pmc (PMC* initializer) {
+	SELF->data = initializer; /* the aggregate itself */
+        SELF->cache.struct_val = NULL;
+        PObj_custom_mark_SET(SELF);
+    }
+
+    void mark () {
+        pobject_lives(INTERP, (PObj *)SELF->data);
+	if (SELF->cache.struct_val) /* the KEY */
+	     pobject_lives(INTERP, (PObj *) SELF->cache.struct_val);
+	if (SELF->data)		/* the aggregate */
+	     pobject_lives(INTERP, (PObj *) SELF->data);
+    }
+
+    PMC* getprop (STRING* key) {
+#if 0
+        return VTABLE_getprop(INTERP,
+		(PMC *)SELF->data, key);
+#else
+	return VTABLE_getprop(INTERP, (PMC*) SELF->data, key);
+#endif
+    }
+
+    void setprop (STRING* key, PMC* value) {
+        VTABLE_setprop(INTERP,
+					     (PMC *)SELF->data, key, value);
+    }
+
+    void delprop (STRING* key) {
+        VTABLE_delprop(INTERP, (PMC *)SELF->data, key);
+    }
+
+    PMC* getprops () {
+        return VTABLE_getprops(INTERP, (PMC *)SELF->data);
+    }
+
+    STRING* name () {
+        return whoami;
+    }
+
+
+    void clone (PMC* dest) {
+	/* XXX TODO */
+    }
+
+    INTVAL get_integer () {
+        return VTABLE_get_integer(INTERP,
+		(PMC *)SELF->data);
+    }
+
+    INTVAL get_integer_keyed (PMC* key) {
+	/* XXX adjust index */
+        return VTABLE_get_integer_keyed(INTERP,
+		(PMC *)SELF->data, key);
+    }
+
+    INTVAL get_integer_keyed_int (INTVAL* key) {
+	/* XXX adjust index */
+        return VTABLE_get_integer_keyed_int(INTERP,
+		(PMC *)SELF->data, key);
+    }
+
+    FLOATVAL get_number () {
+        return (FLOATVAL)0;
+    }
+
+    FLOATVAL get_number_keyed (PMC* key) {
+        return (FLOATVAL)0;
+    }
+
+    FLOATVAL get_number_keyed_int (INTVAL* key) {
+        return (FLOATVAL)0;
+    }
+
+    BIGNUM* get_bignum () {
+        return (BIGNUM*)0;
+    }
+
+    BIGNUM* get_bignum_keyed (PMC* key) {
+        return (BIGNUM*)0;
+    }
+
+    BIGNUM* get_bignum_keyed_int (INTVAL* key) {
+        return (BIGNUM*)0;
+    }
+
+    STRING* get_string () {
+        return (STRING*)0;
+    }
+
+    STRING* get_string_keyed (PMC* key) {
+        return (STRING*)0;
+    }
+
+    STRING* get_string_keyed_int (INTVAL* key) {
+        return (STRING*)0;
+    }
+
+    INTVAL get_bool () {
+	PMC *key = SELF->cache.struct_val;
+	PMC *agg = SELF->data;
+        return key && key->cache.int_val >= 0 &&
+	    key->cache.int_val < VTABLE_elements(INTERP, agg);
+    }
+
+    INTVAL get_bool_keyed (PMC* key) {
+        return (INTVAL)0;
+    }
+
+    INTVAL get_bool_keyed_int (INTVAL* key) {
+        return (INTVAL)0;
+    }
+
+    INTVAL elements () {
+        return (INTVAL)0;
+    }
+
+    INTVAL elements_keyed (PMC* key) {
+        return (INTVAL)0;
+    }
+
+    INTVAL elements_keyed_int (INTVAL* key) {
+        return (INTVAL)0;
+    }
+
+    PMC* get_pmc () {
+        return (PMC*)0;
+    }
+
+    PMC* get_pmc_keyed (PMC* key) {
+        return (PMC*)0;
+    }
+
+    PMC* get_pmc_keyed_int (INTVAL* key) {
+        return (PMC*)0;
+    }
+
+    INTVAL is_same (PMC* value) {
+        return (INTVAL)0;
+    }
+
+    INTVAL is_same_keyed (PMC* key, PMC* value, PMC* value_key) {
+        return (INTVAL)0;
+    }
+
+    INTVAL is_same_keyed_int (INTVAL* key, PMC* value, INTVAL* value_key) {
+        return (INTVAL)0;
+    }
+
+    void set_integer (PMC* value) {
+    }
+
+    void set_integer_native (INTVAL value) {
+	PMC *key;
+	if (value < 0 || value > 3)
+	    internal_exception(1, "Illegal set_integer on iterator\n");
+	/* reset iterator on aggregate */
+	if (!SELF->cache.struct_val) {
+	    SELF->cache.struct_val = key_new(INTERP);
+	}
+	key = SELF->cache.struct_val;
+	SELF->cache.struct_val =
+	    VTABLE_nextkey_keyed(INTERP, (PMC*) SELF->data, key, value);
+    }
+
+    void set_integer_same (PMC* value) {
+    }
+
+    void set_integer_keyed (PMC* key, INTVAL value) {
+    }
+
+    void set_integer_keyed_int (INTVAL* key, INTVAL value) {
+    }
+
+    void set_number (PMC* value) {
+    }
+
+    void set_number_native (FLOATVAL value) {
+    }
+
+    void set_number_same (PMC* value) {
+    }
+
+    void set_number_keyed (PMC* key, FLOATVAL value) {
+    }
+
+    void set_number_keyed_int (INTVAL* key, FLOATVAL value) {
+    }
+
+    void set_bignum (PMC* value) {
+    }
+
+    void set_bignum_native (BIGNUM* value) {
+    }
+
+    void set_bignum_same (PMC* value) {
+    }
+
+    void set_bignum_keyed (PMC* key, BIGNUM* value) {
+    }
+
+    void set_bignum_keyed_int (INTVAL* key, BIGNUM* value) {
+    }
+
+    void set_string (PMC* value) {
+    }
+
+    void set_string_native (STRING* value) {
+    }
+
+    void set_string_same (PMC* value) {
+    }
+
+    void set_string_keyed (PMC* key, STRING* value) {
+    }
+
+    void set_string_keyed_int (INTVAL* key, STRING* value) {
+    }
+
+    void set_pmc (PMC* value) {
+    }
+
+    void set_pmc_keyed (PMC* key, PMC* value, PMC* value_key) {
+    }
+
+    void set_pmc_keyed_int (INTVAL* key, PMC* value, INTVAL* value_key) {
+    }
+
+    void set_same (PMC* value) {
+    }
+
+    void set_same_keyed (PMC* key, PMC* value, PMC* value_key) {
+    }
+
+    void set_same_keyed_int (INTVAL* key, PMC* value, INTVAL* value_key) {
+    }
+
+    INTVAL pop_integer () {
+	PMC *key = SELF->cache.struct_val;
+	PMC *agg = SELF->data;
+	INTVAL ret = VTABLE_get_integer_keyed(INTERP, agg, key);
+	SELF->cache.struct_val =
+	    VTABLE_nextkey_keyed(INTERP, agg, key, 2);
+        return ret;
+    }
+
+    INTVAL pop_integer_keyed (PMC* key) {
+        return (INTVAL)0;
+    }
+
+    INTVAL pop_integer_keyed_int (INTVAL* key) {
+        return (INTVAL)0;
+    }
+
+    FLOATVAL pop_float () {
+        return (FLOATVAL)0;
+    }
+
+    FLOATVAL pop_float_keyed (PMC* key) {
+        return (FLOATVAL)0;
+    }
+
+    FLOATVAL pop_float_keyed_int (INTVAL* key) {
+        return (FLOATVAL)0;
+    }
+
+    BIGNUM* pop_bignum () {
+        return (BIGNUM*)0;
+    }
+
+    BIGNUM* pop_bignum_keyed (PMC* key) {
+        return (BIGNUM*)0;
+    }
+
+    BIGNUM* pop_bignum_keyed_int (INTVAL* key) {
+        return (BIGNUM*)0;
+    }
+
+    STRING* pop_string () {
+        return (STRING*)0;
+    }
+
+    STRING* pop_string_keyed (PMC* key) {
+        return (STRING*)0;
+    }
+
+    STRING* pop_string_keyed_int (INTVAL* key) {
+        return (STRING*)0;
+    }
+
+    PMC* pop_pmc () {
+        return (PMC*)0;
+    }
+
+    PMC* pop_pmc_keyed (PMC* key) {
+        return (PMC*)0;
+    }
+
+    PMC* pop_pmc_keyed_int (INTVAL* key) {
+        return (PMC*)0;
+    }
+
+    INTVAL shift_integer () {
+	PMC *key = SELF->cache.struct_val;
+	PMC *agg = SELF->data;
+	INTVAL ret = VTABLE_get_integer_keyed(INTERP, agg, key);
+	SELF->cache.struct_val =
+	    VTABLE_nextkey_keyed(INTERP, agg, key, 1);
+        return ret;
+    }
+
+    INTVAL shift_integer_keyed (PMC* key) {
+        return (INTVAL)0;
+    }
+
+    INTVAL shift_integer_keyed_int (INTVAL* key) {
+        return (INTVAL)0;
+    }
+
+    FLOATVAL shift_float () {
+        return (FLOATVAL)0;
+    }
+
+    FLOATVAL shift_float_keyed (PMC* key) {
+        return (FLOATVAL)0;
+    }
+
+    FLOATVAL shift_float_keyed_int (INTVAL* key) {
+        return (FLOATVAL)0;
+    }
+
+    BIGNUM* shift_bignum () {
+        return (BIGNUM*)0;
+    }
+
+    BIGNUM* shift_bignum_keyed (PMC* key) {
+        return (BIGNUM*)0;
+    }
+
+    BIGNUM* shift_bignum_keyed_int (INTVAL* key) {
+        return (BIGNUM*)0;
+    }
+
+    STRING* shift_string () {
+        return (STRING*)0;
+    }
+
+    STRING* shift_string_keyed (PMC* key) {
+        return (STRING*)0;
+    }
+
+    STRING* shift_string_keyed_int (INTVAL* key) {
+        return (STRING*)0;
+    }
+
+    PMC* shift_pmc () {
+        return (PMC*)0;
+    }
+
+    PMC* shift_pmc_keyed (PMC* key) {
+        return (PMC*)0;
+    }
+
+    PMC* shift_pmc_keyed_int (INTVAL* key) {
+        return (PMC*)0;
+    }
+
+    INTVAL exists_keyed (PMC* key) {
+        return (INTVAL)0;
+    }
+
+    INTVAL exists_keyed_int (INTVAL* key) {
+        return (INTVAL)0;
+    }
+
+    INTVAL defined () {
+        return (INTVAL)0;
+    }
+
+    INTVAL defined_keyed (PMC* key) {
+        return (INTVAL)0;
+    }
+
+    INTVAL defined_keyed_int (INTVAL* key) {
+        return (INTVAL)0;
+    }
+
+
+    PMC* nextkey_keyed (PMC* key, INTVAL what) {
+        return (PMC*)0;
+    }
+
+    PMC* nextkey_keyed_int (INTVAL* key, INTVAL what) {
+        return (PMC*)0;
+    }
+
+}

@@ -318,8 +318,8 @@ INTVAL defined_keyed_int(INTVAL* key)
 void delete_keyed(PMC* key)
 void delete_keyed_int(INTVAL* key)
 
-PMC* nextkey_keyed(PMC* key)
-PMC* nextkey_keyed_int(INTVAL* key)
+PMC* nextkey_keyed(PMC* key, INTVAL what)
+PMC* nextkey_keyed_int(INTVAL* key, INTVAL what)
 
 void substr(INTVAL offset, INTVAL length, PMC* dest)
 void substr_keyed(PMC* key, INTVAL offset, INTVAL length, PMC* dest, PMC* dest_key)

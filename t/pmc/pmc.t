@@ -1563,6 +1563,7 @@ OUTPUT
 
 my $checkTypes;
 while (my ($type, $id) = each %pmc_types) {
+    next if $type eq "Iterator";
     $checkTypes .= <<"CHECK";
     new P0, .$type
     set S1, "$type"
@@ -1663,7 +1664,7 @@ output_is(<<'CODE', <<OUTPUT, "eq_p_i");
 
       new P0, .PerlInt
       set P0, I0
-      eq P0, I0, OK1 
+      eq P0, I0, OK1
       print "not "
 OK1:  print "ok 1\n"
 

@@ -85,7 +85,7 @@ pmclass IntList {
 
         if (!key) return;
 
-        value = src->vtable->get_integer_keyed_int(INTERP, src, src_key);
+        value = VTABLE_get_integer_keyed_int(INTERP, src, src_key);
         intlist_assign(INTERP, (IntList*) SELF->data, *key, value);
     };
 
@@ -97,7 +97,7 @@ pmclass IntList {
 
         ix = key_integer(INTERP, key);
 
-        value = src->vtable->get_integer_keyed(INTERP, src, src_key);
+        value = VTABLE_get_integer_keyed(INTERP, src, src_key);
         intlist_assign(INTERP, (IntList*) SELF->data, ix, value);
     };
 

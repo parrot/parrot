@@ -119,7 +119,7 @@ Parrot_init_stash(struct Parrot_Interp *interp, struct method_rec_t *recp,
         STRING *name = string_make(interp, recp->name, strlen(recp->name),
                                    NULL, 0, NULL);
         key_set_string(interp, k, name);
-        hash->vtable->set_pmc_keyed(interp, hash, NULL, csub, k);
+        VTABLE_set_pmc_keyed(interp, hash, NULL, csub, k);
         ++recp;
     }
 }
@@ -132,7 +132,7 @@ Parrot_find_method(struct Parrot_Interp *interp, struct Stash *stash, PMC *key)
 {
     while (stash) {
         PMC *meth =
-            stash->stash_hash->vtable->get_pmc_keyed(interp, stash->stash_hash,
+            VTABLE_get_pmc_keyed(interp, stash->stash_hash,
                                                      key);
         if (meth)
             return meth;

@@ -30,7 +30,7 @@ PMC *
 pmc_new(struct Parrot_Interp *interpreter, INTVAL base_type)
 {
     PMC *pmc = pmc_new_noinit(interpreter, base_type);
-    pmc->vtable->init(interpreter, pmc);
+    VTABLE_init(interpreter, pmc);
     return pmc;
 }
 
@@ -119,7 +119,7 @@ pmc_new_init(struct Parrot_Interp *interpreter, INTVAL base_type, PMC *init)
         return NULL;
     }
 
-    pmc->vtable->init_pmc(interpreter, pmc, init);
+    VTABLE_init_pmc(interpreter, pmc, init);
 
     return pmc;
 }

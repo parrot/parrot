@@ -445,7 +445,7 @@ hash_clone(struct Parrot_Interp *interp, HASH *hash, HASH **dest)
                 valtmp.type = enum_hash_pmc;
                 valtmp.val.pmc_val = pmc_new_noinit(interp,
                     b->value.val.pmc_val->vtable->base_type);
-                b->value.val.pmc_val->vtable->clone(interp,
+                VTABLE_clone(interp,
                     b->value.val.pmc_val, valtmp.val.pmc_val );
                 /* b is no longer valid (due to GC) */
                 b = getBucket(hash, bi);

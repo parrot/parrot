@@ -691,7 +691,7 @@ PDB_init(struct Parrot_Interp *interpreter, const char *command)
         na(command);
 
         arg = string_make(interpreter, c, i, NULL, 0, NULL);
-        userargv->vtable->push_string(interpreter, userargv, arg);
+        VTABLE_push_string(interpreter, userargv, arg);
     }
 
     /* Restart if we are already running */
@@ -1956,7 +1956,7 @@ static void
 print_pmc(struct Parrot_Interp *interpreter, PMC* pmc)
 {
     if (pmc && pmc->vtable) {
-        STRING* s = pmc->vtable->name(interpreter, pmc);
+        STRING* s = VTABLE_name(interpreter, pmc);
         if (s) {
             PIO_eprintf(interpreter, " [%S]\n", s);
         }
@@ -1988,7 +1988,7 @@ PDB_print_pmc(struct Parrot_Interp *interpreter, struct PReg *pmc_reg,
         if (key) trace_key_dump(interpreter, key);
         PIO_fprintf(interpreter, PIO_STDERR(interpreter)," =");
 
-        if (key) pmc = pmc->vtable->get_pmc_keyed(interpreter, pmc, key);
+        if (key) pmc = VTABLE_get_pmc_keyed(interpreter, pmc, key);
         print_pmc(interpreter, pmc);
     }
 }

@@ -25,17 +25,17 @@ trace_pmc_dump(struct Parrot_Interp *interpreter, PMC* pmc)
         if(pmc->vtable) {
             if (pmc->vtable == Parrot_base_vtables + enum_class_PerlString) {
                 PIO_eprintf(interpreter, "%S=PMC(%#p Str:\"%Ps\")",
-                        pmc->vtable->name(interpreter, pmc), pmc, pmc);
+                        VTABLE_name(interpreter, pmc), pmc, pmc);
             }
             else if (pmc->vtable == Parrot_base_vtables + enum_class_PerlUndef
                  ||  pmc->vtable == Parrot_base_vtables + enum_class_PerlInt
                  ||  pmc->vtable == Parrot_base_vtables + enum_class_PerlNum) {
                 PIO_eprintf(interpreter, "%S=PMC(%#p Num:%Pg Int:%Pd)",
-                        pmc->vtable->name(interpreter, pmc), pmc, pmc, pmc);
+                        VTABLE_name(interpreter, pmc), pmc, pmc, pmc);
             }
             else {
                 PIO_eprintf(interpreter, "%S=PMC(%#p)",
-                        pmc->vtable->name(interpreter, pmc), pmc);
+                        VTABLE_name(interpreter, pmc), pmc);
             }
         }
         else {

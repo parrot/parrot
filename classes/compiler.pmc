@@ -44,8 +44,8 @@ pmclass Compiler extends NCI {
 	eval_cs = (struct PackFile_ByteCode *) code_seg->data;
 	/* morph the Byte_cointer *pointer in code_seg to an invokable sub */
 	code_seg->vtable = &Parrot_base_vtables[enum_class_Eval];
-	code_seg->vtable->init(interpreter, code_seg);
-	code_seg->vtable->set_integer_native(interpreter, code_seg,
+	VTABLE_init(interpreter, code_seg);
+	VTABLE_set_integer_native(interpreter, code_seg,
 		(INTVAL) eval_cs);
         return code_seg;
     }

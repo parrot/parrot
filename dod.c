@@ -193,7 +193,7 @@ trace_active_PMCs(struct Parrot_Interp *interpreter)
             }
             else {
                 /* All that's left is the custom */
-                current->vtable->mark(interpreter, current);
+                VTABLE_mark(interpreter, current);
             }
         }
 
@@ -351,7 +351,7 @@ free_unused_pobjects(struct Parrot_Interp *interpreter,
                      * more_objects too
                      */
                     if (PObj_active_destroy_TEST(b))
-                        ((PMC *)b)->vtable->destroy(interpreter, (PMC *)b);
+                        VTABLE_destroy(interpreter, (PMC *)b);
                 }
                 /* else object is a buffer(like) */
                 else if (PObj_sysmem_TEST(b) && b->bufstart) {

@@ -138,11 +138,11 @@ key_integer(struct Parrot_Interp *interpreter, PMC *key)
     case KEY_integer_FLAG | KEY_register_FLAG:
         return interpreter->ctx.int_reg.registers[key->cache.int_val];
     case KEY_pmc_FLAG:
-        return key->cache.pmc_val->vtable->get_integer(interpreter,
+        return VTABLE_get_integer(interpreter,
                                                        key->cache.pmc_val);
     case KEY_pmc_FLAG | KEY_register_FLAG:
         reg = interpreter->ctx.pmc_reg.registers[key->cache.int_val];
-        return reg->vtable->get_integer(interpreter, reg);
+        return VTABLE_get_integer(interpreter, reg);
     default:
         internal_exception(INVALID_OPERATION, "Key not an integer!\n");
         return 0;
@@ -160,11 +160,11 @@ key_number(struct Parrot_Interp *interpreter, PMC *key)
     case KEY_number_FLAG | KEY_register_FLAG:
         return interpreter->ctx.num_reg.registers[key->cache.int_val];
     case KEY_pmc_FLAG:
-        return key->cache.pmc_val->vtable->get_number(interpreter,
+        return VTABLE_get_number(interpreter,
                                                       key->cache.pmc_val);
     case KEY_pmc_FLAG | KEY_register_FLAG:
         reg = interpreter->ctx.pmc_reg.registers[key->cache.int_val];
-        return reg->vtable->get_number(interpreter, reg);
+        return VTABLE_get_number(interpreter, reg);
     default:
         internal_exception(INVALID_OPERATION, "Key not a number!\n");
         return 0;
@@ -182,11 +182,11 @@ key_string(struct Parrot_Interp *interpreter, PMC *key)
     case KEY_string_FLAG | KEY_register_FLAG:
         return interpreter->ctx.string_reg.registers[key->cache.int_val];
     case KEY_pmc_FLAG:
-        return key->cache.pmc_val->vtable->get_string(interpreter,
+        return VTABLE_get_string(interpreter,
                                                       key->cache.pmc_val);
     case KEY_pmc_FLAG | KEY_register_FLAG:
         reg = interpreter->ctx.pmc_reg.registers[key->cache.int_val];
-        return reg->vtable->get_string(interpreter, reg);
+        return VTABLE_get_string(interpreter, reg);
     default:
         internal_exception(INVALID_OPERATION, "Key not a string!\n");
         return 0;
