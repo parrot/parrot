@@ -6,9 +6,9 @@
 # for more information on this silly language
 
   # Get the brainfuck source file into S0
-  set S0, P0[1]
+  set S0, P5[1]
   if S0, SOURCE
-  set S0, P0[0]
+  set S0, P5[0]
   print "usage: ./parrot "
   print S0
   print " file.bf\n"

@@ -4,7 +4,7 @@
 #
 # See http://www.catseye.mb.ca/esoteric/bf/
 # for more information on this silly language
-
+.sub _main
   .local int pc
   .local int maxpc
   .local int label
@@ -16,12 +16,12 @@
   .local string program
   .local string char
 
-  program = P0[0]
+  program = P5[0]
   # check argc
-  I0 = P0
+  I0 = P5
   if I0 < 2 goto usage
   # Get the filename
-  filename = P0[1]
+  filename = P5[1]
   if filename goto SOURCE
 usage:
   print "usage: ../../parrot "
@@ -168,3 +168,4 @@ NEXT:
   compile P0, P1, code
   invoke
   end
+.end

@@ -19,9 +19,9 @@
 #
 # By Leon Brocard <acme@astray.com>
 
-  set I0, P0
+  set I0, P5
   ne I0, 1, SOURCE
-  set S0, P0[0]
+  set S0, P5[0]
   print "usage: parrot "
   print S0
   print " [-cdu] filename\n"
@@ -32,17 +32,17 @@ SOURCE:
 
   ne S0, "-c", NOTC
   set I10, 1 # count mode
-  set S0, P0[2]
+  set S0, P5[2]
 
 NOTC:
   ne S0, "-d", NOTD
   set I11, 1 # duplicate mode
-  set S0, P0[2]
+  set S0, P5[2]
 
 NOTD:
   ne S0, "-u", GO
   set I12, 1 # unique mode
-  set S0, P0[2]
+  set S0, P5[2]
 
 GO:
   # S2 is the previous line

@@ -6,13 +6,13 @@
 .include "load.pasm"
 .include "maths.pasm"
 .include "stack.pasm"
-        
+
 MAIN:
         set I0, 0
         set I5, 0               # debug mode
-ARGV_NEXT:        
-        inc I0       
-        set S10, P0[I0]
+ARGV_NEXT:
+        inc I0
+        set S10, P5[I0]
         substr S11, S10, 0, 1
         ne S11, "-", ARGV_DONE
         eq S10, "-d", ARGV_DEBUG
@@ -22,7 +22,7 @@ ARGV_DEBUG:
         bsr DEBUG_INITIALIZE    # initialize P3
         branch ARGV_NEXT
 ARGV_DONE:
-        set S10, P0[I0]
+        set S10, P5[I0]
         save S10
         bsr LOAD
         restore P1              # P1 = the playfield
@@ -34,7 +34,7 @@ ARGV_DONE:
         time N0                 # N0 = random seed
         mod N0, N0, .RANDMAX
         set S2, ""              # S2 = user input
-        
+
 TICK:
         set I20, P1[I1;I0]
         chr S0, I20             # S0 = current instruction
@@ -50,7 +50,7 @@ TICK_NODEBUG:
         lt S0, "0", NOT_NUM
         le S0, "9", MATHS_PUSH_NUMBER
 NOT_NUM:
-        
+
         # Direction changing.
         eq S0, "^", FLOW_GO_NORTH
         eq S0, ">", FLOW_GO_EAST
@@ -64,7 +64,7 @@ NOT_NUM:
         eq S0, "|", FLOW_NS_IF
         eq S0, "#", FLOW_BRIDGE
         eq S0, "@", FLOW_END
-        
+
         # Math functions.
         eq S0, "+", MATHS_ADD
         eq S0, "-", MATHS_SUB
@@ -77,7 +77,7 @@ NOT_NUM:
         eq S0, ":", STACK_DUP
         eq S0, "$", STACK_POP
         eq S0, "\\", STACK_SWAP
-        
+
         # I/O operations.
         eq S0, "&", IO_INPUT_INT
         eq S0, "~", IO_INPUT_CHAR
@@ -88,8 +88,8 @@ NOT_NUM:
 
         # Unknow instruction.
         branch MOVE_PC
-        
-MAIN_TRAMPOLINE:        
+
+MAIN_TRAMPOLINE:
         set I4, 0               # no more trampoline
 MOVE_PC:
         eq I2, 1, MOVE_EAST
@@ -112,7 +112,7 @@ MOVE_WEST:
         dec I0
         mod I0, I0, 80
         branch TICK
-        
+
 MAIN_END:
         end
 

@@ -64,10 +64,10 @@
 # }
 
 MAIN:
-        set I0, P0
+        set I0, P5
         lt I0, 2, ERROR
 
-	set S5, P0[1]           # S5 = argv[0]
+	set S5, P5[1]           # S5 = argv[0]
         set I5, S5              # Convert to an int
 	new P0, .PerlArray
 	new P1, .PerlArray

@@ -17,7 +17,7 @@ use P6C::Parser;
 use vars '%builtin_names';
 BEGIN {
     my @names = qw(print1 exit warn die print sleep time substr length
-		   index map grep join reverse defined install_catch 
+		   index map grep join reverse defined install_catch
 		   pop_catch);
     @builtin_names{@names} = (1) x @names;
 }
@@ -501,13 +501,13 @@ warn_ret_label:
     pushp
     pushi
     restore P0
-#  P0 is array of commandline args
+#  P5 is array of commandline args
 #  -lt: should we really preserve any registers here?
     new P1, .PerlArray
     new P2, .PerlString
-    set I0, P0
+    set I0, P5
 # $0 / $PROGRAM_NAME
-    set P2, P0[0]
+    set P2, P5[0]
     store_global "_SV_0", P2
     store_global "_SV_PROGRAM_NAME", P2
 
@@ -518,7 +518,7 @@ warn_ret_label:
     set P1, I0
     branch __setup_arg_end
 __setup_arg:
-    set S0, P0[I2]
+    set S0, P5[I2]
     set P1[I1], S0
     inc I1
     inc I2

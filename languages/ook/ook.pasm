@@ -1,5 +1,5 @@
 # First, read the file.
-        set S0, P0[1]      # Name of the Ook source.
+        set S0, P5[1]      # Name of the Ook source.
 	open P0, S0, "<"   # P0 = file descriptor
 	set S1, ""         # S1 = accumulator
 READ:

@@ -68,13 +68,13 @@ output_is(<<'CODE', <<'OUTPUT', "access argv");
     .include "iglobals.pasm"
     getinterp P1
     set P2, P1[.IGLOBALS_ARGV_LIST]
-    set I0, P0
+    set I0, P5
     set I1, P2
     eq I0, I1, ok1
     print "not "
 ok1:
     print "ok 1\n"
-    set S0, P0[0]
+    set S0, P5[0]
     set S1, P2[0]
     eq S0, S1, ok2
     print "not "

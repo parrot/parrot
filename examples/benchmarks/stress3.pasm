@@ -7,9 +7,9 @@
 #
 # with a program arg of 1 these are destroyed before the 2. loop
 
-	set I10, P0
+	set I10, P5
 	lt I10, 2, noarg
-	set I11, P0[1]
+	set I11, P5[1]
 noarg:
 	set I0, 100
 	new P0, .PerlArray
