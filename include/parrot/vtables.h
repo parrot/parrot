@@ -18,3 +18,13 @@ VTABLE *Parrot_clone_vtable(Parrot_Interp, VTABLE *base_vtable);
 void Parrot_destroy_vtable(Parrot_Interp, VTABLE *vtable);
 
 #endif
+
+/*
+ * Local variables:
+ * c-indentation-style: bsd
+ * c-basic-offset: 4
+ * indent-tabs-mode: nil
+ * End:
+ *
+ * vim: expandtab shiftwidth=4:
+*/

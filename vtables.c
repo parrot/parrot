@@ -14,19 +14,29 @@
 
 VTABLE *
 Parrot_new_vtable(Parrot_Interp interpreter) {
-  return mem_sys_allocate_zeroed(sizeof(VTABLE));
+    return mem_sys_allocate_zeroed(sizeof(VTABLE));
 }
 
 VTABLE *
 Parrot_clone_vtable(Parrot_Interp interpreter, VTABLE *base_vtable) {
-  VTABLE *new_vtable = mem_sys_allocate(sizeof(VTABLE));
-  if (new_vtable) {
-    memcpy(new_vtable, base_vtable, sizeof(VTABLE));
-  }
-  return new_vtable;
+    VTABLE *new_vtable = mem_sys_allocate(sizeof(VTABLE));
+    if (new_vtable) {
+        memcpy(new_vtable, base_vtable, sizeof(VTABLE));
+    }
+    return new_vtable;
 }
 
 void
 Parrot_destroy_vtable(Parrot_Interp interpreter, VTABLE *vtable) {
-  mem_sys_free(vtable);
+    mem_sys_free(vtable);
 }
+
+/*
+ * Local variables:
+ * c-indentation-style: bsd
+ * c-basic-offset: 4
+ * indent-tabs-mode: nil
+ * End:
+ *
+ * vim: expandtab shiftwidth=4:
+ */
