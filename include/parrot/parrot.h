@@ -37,11 +37,11 @@
 
 /* Other headers, where available */
 
-#ifdef PARROT_HAS_HEADER_NIIN 
+#ifdef PARROT_HAS_HEADER_NIIN
 #  include <netinet/in.h>
 #endif
 
-#ifdef PARROT_HAS_HEADER_ARPAINET 
+#ifdef PARROT_HAS_HEADER_ARPAINET
 #  include <arpa/inet.h>
 #endif
 
@@ -199,7 +199,7 @@ typedef void (*funcptr_t)(void);
  * samples by reducing various numbers, and causing DOD and allocation runs
  * to occur more frequently. It does significantly reduce performance. */
 #ifndef DISABLE_GC_DEBUG
-#  define DISABLE_GC_DEBUG 1
+#  define DISABLE_GC_DEBUG 0
 #endif
 
 /* Helpful internal macro for testing whether we are currently

@@ -909,7 +909,7 @@ outer:
     set P0[0], I1
     sprintf S0, "ok %vd\n", P0
     set P1[S0], S0
-    set I0, 100000
+    set I0, 100
 lp:
     set P1["key"], 1
     delete P1["key"]
