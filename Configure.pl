@@ -499,6 +499,7 @@ END
     my %newc;
 
     open NEEDED, ">include/parrot/vtable.h";
+    print NEEDED "/* dummy */ struct _vtable { int a; };\n";
     close NEEDED;
     buildfile("testparrotsizes_c");
     compiletestc("testparrotsizes");
