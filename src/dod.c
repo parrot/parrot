@@ -260,10 +260,12 @@ trace_active_PMCs(Interp *interpreter, int trace_stack)
      * mark vtable->data
      *
      * XXX these PMCs are constant and shouldn't get collected
-     * but t/library/dumper* fails w/o this marking - strange
-     * (maybe the VtableCache PMC gets destroyed)
+     * but t/library/dumper* fails w/o this marking.
+     *
+     * It seems that the Class PMC gets DODed - these should
+     * get created as constant PMCs
      */
-    for (i = 1; i < (unsigned int)enum_class_max; i++) {
+    for (i = enum_class_core_max; i < (unsigned int)enum_class_max; i++) {
         if (Parrot_base_vtables[i]->data)
             pobject_lives(interpreter, (PObj*)Parrot_base_vtables[i]->data);
     }

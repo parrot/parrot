@@ -16,7 +16,7 @@ Tests the object/class subsystem.
 
 =cut
 
-use Parrot::Test tests => 38;
+use Parrot::Test tests => 40;
 use Test::More;
 
 output_is(<<'CODE', <<'OUTPUT', "findclass (base class)");
@@ -1119,5 +1119,49 @@ CODE
 ok 1
 ok 2
 Integer
+OUTPUT
+
+output_is(<<'CODE', <<'OUTPUT', "PMC as classes - subclass");
+##PIR##
+.sub main @MAIN
+  .local pmc MyInt
+  getclass $P0, "Integer"
+  print "ok 1\n"
+  subclass MyInt, $P0, "MyInt"
+  print "ok 2\n"
+  $S0 = typeof MyInt
+  print $S0
+  print "\n"
+  $I0 = isa MyInt, "MyInt"
+  print $I0
+  $I0 = isa MyInt, "Integer"
+  print $I0
+  print "\n"
+.end
+CODE
+ok 1
+ok 2
+ParrotClass
+11
+OUTPUT
+
+output_is(<<'CODE', <<'OUTPUT', "PMC as classes - instantiate");
+##PIR##
+.sub main @MAIN
+  .local pmc MyInt
+  getclass $P0, "Integer"
+  print "ok 1\n"
+  subclass MyInt, $P0, "MyInt"
+  addattribute MyInt, ".i"
+  print "ok 2\n"
+  .local pmc i
+  $I0 = find_type "MyInt"
+  i = new $I0
+  print "ok 3\n"
+.end
+CODE
+ok 1
+ok 2
+ok 3
 OUTPUT
 

@@ -74,6 +74,12 @@ rebuild_attrib_stuff(Parrot_Interp interpreter, PMC *class)
 
         a_parent_class = VTABLE_get_pmc_keyed_int(interpreter,
                 parent_array, class_offset);
+        if (!PObj_is_class_TEST(a_parent_class)) {
+            /* this Class inherits from a PMC -
+             * no attributes there
+             */
+            break;
+        }
         parent_slots = PMC_data(a_parent_class);
         parent_attrib_array = get_attrib_num(parent_slots,
                 PCD_CLASS_ATTRIBUTES);
@@ -180,15 +186,13 @@ Parrot_single_subclass(Parrot_Interp interpreter, PMC *base_class,
     PMC *parents, *temp_pmc;
     VTABLE *new_vtable;
     INTVAL new_class_number;
+    int parent_is_class;
 
-    if (!PObj_is_class_TEST(base_class)) {
-        internal_exception(NO_CLASS, "Can't subclass a non-class!");
-    }
+    parent_is_class = PObj_is_class_TEST(base_class);
 
     child_class = pmc_new(interpreter, enum_class_ParrotClass);
     /* Hang an array off the data pointer */
-    child_class_array = PMC_data(child_class) =
-        new_attrib_array();
+    child_class_array = PMC_data(child_class) = new_attrib_array();
     set_attrib_flags(child_class);
     /* We will have five entries in this array */
     set_attrib_array_size(child_class_array, PCD_MAX);
@@ -206,12 +210,6 @@ Parrot_single_subclass(Parrot_Interp interpreter, PMC *base_class,
     classname_pmc = pmc_new(interpreter, enum_class_PerlString);
     if (child_class_name) {
         VTABLE_set_string_native(interpreter, classname_pmc, child_class_name);
-
-#if 0
-        /* Add ourselves to the interpreter's class hash */
-        VTABLE_set_pmc_keyed_str(interpreter, interpreter->class_hash,
-                child_class_name, child_class);
-#endif
     }
     else {
         child_class_name = string_make(interpreter,
@@ -224,30 +222,22 @@ Parrot_single_subclass(Parrot_Interp interpreter, PMC *base_class,
 
     /* Our penultimate parent list is a clone of our parent's parent
        list, with our parent unshifted onto the beginning */
-    temp_pmc =
-        clone_array(interpreter,
-                    get_attrib_num((SLOTTYPE *)PMC_data(base_class),
-                                   PCD_ALL_PARENTS));
+    if (parent_is_class) {
+        temp_pmc = clone_array(interpreter,
+                get_attrib_num((SLOTTYPE *)PMC_data(base_class),
+                    PCD_ALL_PARENTS));
+    }
+    else {
+        /*
+         * we have 1 parent
+         */
+        temp_pmc = pmc_new(interpreter, enum_class_Array);
+        VTABLE_set_integer_native(interpreter, temp_pmc, 1);
+        VTABLE_set_pmc_keyed_int(interpreter, temp_pmc, 0, base_class);
+    }
     VTABLE_unshift_pmc(interpreter, temp_pmc, base_class);
     set_attrib_num(child_class_array, PCD_ALL_PARENTS, temp_pmc);
 
-#if 0
-    /*
-     * recreated in rebuild_attrib_stuff
-     * -leo
-     */
-    /* Our attribute list is our parent's attribute list */
-    temp_pmc = clone_array(interpreter,
-                           get_attrib_num((SLOTTYPE *)PMC_data(base_class),
-                                          PCD_ATTRIB_OFFS));
-    set_attrib_num(child_class_array, PCD_ATTRIB_OFFS, temp_pmc);
-
-    /* And our full keyed attribute list is our parent's */
-    temp_pmc = clone_array(interpreter,
-                           get_attrib_num((SLOTTYPE *)PMC_data(base_class),
-                                          PCD_ATTRIBUTES));
-    set_attrib_num(child_class_array, PCD_ATTRIBUTES, temp_pmc);
-#endif
 
     /* But we have no attributes of our own. Yet */
     temp_pmc = pmc_new(interpreter, enum_class_Array);
@@ -290,15 +280,6 @@ Parrot_new_class(Parrot_Interp interpreter, PMC *class, STRING *class_name)
                    pmc_new(interpreter, enum_class_Array));
     set_attrib_num(class_array, PCD_ALL_PARENTS,
                    pmc_new(interpreter, enum_class_Array));
-#if 0
-    /* these two are created in rebuild_attrib_stuf
-     * -leo
-     */
-    set_attrib_num(class_array, PCD_ATTRIB_OFFS,
-            pmc_new(interpreter, enum_class_OrderedHash));
-    set_attrib_num(class_array, PCD_ATTRIBUTES,
-            pmc_new(interpreter, enum_class_OrderedHash));
-#endif
     set_attrib_num(class_array, PCD_CLASS_ATTRIBUTES,
             pmc_new(interpreter, enum_class_Array));
 
@@ -368,8 +349,7 @@ Parrot_class_register(Parrot_Interp interpreter, STRING *class_name,
     PMC *vtable_pmc;
 
     /*
-     * register the class in the PMCs name hash and in the
-     * class_name hash
+     * register the class in the PMCs name class_hash
      */
     if ((new_type = pmc_type(interpreter, class_name)) > enum_type_undef) {
         internal_exception(1, "Class %s already registered!\n",
@@ -382,12 +362,6 @@ Parrot_class_register(Parrot_Interp interpreter, STRING *class_name,
      * XXX we are leaking this vtable
      */
     new_vtable = Parrot_clone_vtable(interpreter, new_class->vtable);
-
-#if 0
-    /* register the class */
-    VTABLE_set_pmc_keyed_str(interpreter, interpreter->class_hash,
-            class_name, new_class);
-#endif
 
     /* Set the vtable's type to the newly allocated type */
     Parrot_vtable_set_type(interpreter, new_vtable, new_type);
@@ -411,7 +385,7 @@ Parrot_class_register(Parrot_Interp interpreter, STRING *class_name,
             Parrot_base_vtables[enum_class_ParrotObject]);
     new_vtable->base_type = new_type;
     set_attrib_num((SLOTTYPE*)PMC_data(new_class), PCD_OBJECT_VTABLE,
-                   vtable_pmc = pmc_new(interpreter, enum_class_VtableCache));
+            vtable_pmc = constant_pmc_new(interpreter, enum_class_VtableCache));
     PMC_struct_val(vtable_pmc) = new_vtable;
 
     return new_type;
@@ -455,91 +429,49 @@ do_initcall(Parrot_Interp interpreter, PMC* class, PMC *object, PMC *init)
     PMC *classsearch_array = get_attrib_num(class_data, PCD_ALL_PARENTS);
     PMC *parent_class;
     INTVAL i, nparents;
-#if 0
-    int free_it;
-    static void *what = (void*)-1;
     /*
-     * XXX compat mode
+     * 1) if class has a CONSTRUCT property run it on the object
+     *    no redispatch
+     *
+     *  TODO if the first meth is found, save registers, do all init
+     *       calls and after the last one restore registers.
+     *
      */
-    if (what == (void*)-1)
-        what = Parrot_getenv("CALL__BUILD", &free_it);
-    if (!what) {
-        nparents = VTABLE_elements(interpreter, classsearch_array);
-        for (i = nparents - 1; i >= 0; --i) {
-            parent_class = VTABLE_get_pmc_keyed_int(interpreter,
-                    classsearch_array, i);
-            Parrot_base_vtables[enum_class_delegate]->init_pmc(interpreter,
-                    object, parent_class);
-        }
-        Parrot_base_vtables[enum_class_delegate]->init(interpreter, object);
+    STRING *meth_str;
+    PMC *meth = get_init_meth(interpreter, class,
+            CONST_STRING(interpreter, "CONSTRUCT"), &meth_str);
+    int default_meth;
+    if (meth) {
+        if (init)
+            Parrot_run_meth_fromc_args_save(interpreter, meth,
+                    object, meth_str, "vP", init);
+        else
+            Parrot_run_meth_fromc_save(interpreter, meth,
+                    object, meth_str);
     }
-    else {
-#endif
-        /*
-         * 1) if class has a CONSTRUCT property run it on the object
-         *    no redispatch
-         *
-         *  TODO if the first meth is found, save registers, do all init
-         *       calls and after the last one restore registers.
-         *
-         */
-        STRING *meth_str;
-        PMC *meth = get_init_meth(interpreter, class,
-                CONST_STRING(interpreter, "CONSTRUCT"), &meth_str);
-	int default_meth;
-        if (meth) {
-            if (init)
-                Parrot_run_meth_fromc_args_save(interpreter, meth,
-                        object, meth_str, "vP", init);
-            else
-                Parrot_run_meth_fromc_save(interpreter, meth,
-                        object, meth_str);
-        }
-        /*
-         * 2. if class has a BUILD property call it for all classes
-         *    in reverse search order - this class last.
-         */
-        nparents = VTABLE_elements(interpreter, classsearch_array);
-        for (i = nparents - 1; i >= 0; --i) {
-            parent_class = VTABLE_get_pmc_keyed_int(interpreter,
-                    classsearch_array, i);
-            meth = get_init_meth(interpreter, parent_class,
-                    CONST_STRING(interpreter, "BUILD"), &meth_str);
-	    /* no method found and no BUILD property set? */
-	    if (!meth && meth_str == NULL) {
-		/* use __init as fallback constructor method, if it exists */
-		meth_str = string_from_cstring(interpreter, "__init", 6);
-		meth = Parrot_find_method_with_cache(interpreter,
-		        parent_class, meth_str);
-		default_meth = 1;
-	    }
-	    else
-		default_meth = 0;
-            if (meth) {
-                if (init)
-                    Parrot_run_meth_fromc_args_save(interpreter, meth,
-                            object, meth_str, "vP", init);
-                else
-                    Parrot_run_meth_fromc_save(interpreter, meth,
-                            object, meth_str);
-            }
-	    else if (meth_str != NULL &&
-		    string_length(interpreter, meth_str) != 0 && !default_meth) {
-	        real_exception(interpreter, NULL, METH_NOT_FOUND,
-	            "Class BUILD method ('%Ss') not found", meth_str);
-	    }
-        }
-        meth = get_init_meth(interpreter, class,
+    /*
+     * 2. if class has a BUILD property call it for all classes
+     *    in reverse search order - this class last.
+     */
+    nparents = VTABLE_elements(interpreter, classsearch_array);
+    for (i = nparents - 1; i >= 0; --i) {
+        parent_class = VTABLE_get_pmc_keyed_int(interpreter,
+                classsearch_array, i);
+        /* if its a PMC skip it for now */
+        if (!PObj_is_class_TEST(parent_class))
+            continue;
+        meth = get_init_meth(interpreter, parent_class,
                 CONST_STRING(interpreter, "BUILD"), &meth_str);
-	/* no method found and no BUILD property set? */
-	if (!meth && meth_str == NULL) {
-	    /* use __init as fallback constructor method, if it exists */
-	    meth_str = string_from_cstring(interpreter, "__init", 6);
-	    meth = Parrot_find_method_with_cache(interpreter, class, meth_str);
-	    default_meth = 1;
-	}
-	else
-	    default_meth = 0;
+        /* no method found and no BUILD property set? */
+        if (!meth && meth_str == NULL) {
+            /* use __init as fallback constructor method, if it exists */
+            meth_str = string_from_cstring(interpreter, "__init", 6);
+            meth = Parrot_find_method_with_cache(interpreter,
+                    parent_class, meth_str);
+            default_meth = 1;
+        }
+        else
+            default_meth = 0;
         if (meth) {
             if (init)
                 Parrot_run_meth_fromc_args_save(interpreter, meth,
@@ -548,14 +480,36 @@ do_initcall(Parrot_Interp interpreter, PMC* class, PMC *object, PMC *init)
                 Parrot_run_meth_fromc_save(interpreter, meth,
                         object, meth_str);
         }
-	else if (meth_str != NULL && string_length(interpreter, meth_str) != 0
-		&& !default_meth) {
-	    real_exception(interpreter, NULL, METH_NOT_FOUND,
-		"Class BUILD method ('%Ss') not found", meth_str);
-	}
-#if 0
+        else if (meth_str != NULL &&
+                string_length(interpreter, meth_str) != 0 && !default_meth) {
+            real_exception(interpreter, NULL, METH_NOT_FOUND,
+                    "Class BUILD method ('%Ss') not found", meth_str);
+        }
     }
-#endif
+    meth = get_init_meth(interpreter, class,
+            CONST_STRING(interpreter, "BUILD"), &meth_str);
+    /* no method found and no BUILD property set? */
+    if (!meth && meth_str == NULL) {
+        /* use __init as fallback constructor method, if it exists */
+        meth_str = string_from_cstring(interpreter, "__init", 6);
+        meth = Parrot_find_method_with_cache(interpreter, class, meth_str);
+        default_meth = 1;
+    }
+    else
+        default_meth = 0;
+    if (meth) {
+        if (init)
+            Parrot_run_meth_fromc_args_save(interpreter, meth,
+                    object, meth_str, "vP", init);
+        else
+            Parrot_run_meth_fromc_save(interpreter, meth,
+                    object, meth_str);
+    }
+    else if (meth_str != NULL && string_length(interpreter, meth_str) != 0
+            && !default_meth) {
+        real_exception(interpreter, NULL, METH_NOT_FOUND,
+                "Class BUILD method ('%Ss') not found", meth_str);
+    }
 }
 
 /*
@@ -1067,6 +1021,8 @@ find_method_direct(Parrot_Interp interpreter, PMC *class,
     for (searchoffset = 0; searchoffset < classcount; searchoffset++) {
         curclass = VTABLE_get_pmc_keyed_int(interpreter,
                 classsearch_array, searchoffset);
+        if (!PObj_is_class_TEST(curclass))
+            break;
         method = Parrot_find_global(interpreter,
                              VTABLE_get_string(interpreter,
                                   get_attrib_num((SLOTTYPE *)PMC_data(curclass),
