@@ -35,6 +35,7 @@ Configure system
     Long term, should be replaced with a bootstrapping miniparrot system.
     Short term, fix the dependencies (eg, more needs to depend on classes/*)
     Platform-independent library creation for pbc2c.pl & extensions
+    Valgrind test target on supporting platforms
 
 IO
 --
@@ -51,7 +52,6 @@ Regular expression engine
 
 Interpreter
 -----------
-    Continuations and/or coroutines
     Dynamic op libs
 
 Assembler
