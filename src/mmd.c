@@ -1,21 +1,66 @@
-/* mmd.c
- *  Copyright: 2003 The Perl Foundation.  All Rights Reserved.
- *  CVS Info
- *     $Id$
- *  Overview:
- *     Multimethod dispatch handling for parrot
- *  Data Structure and Algorithms:
- *
- *  History:
- *  Notes:
- *  References:
- */
+/*
+Copyright: 2003 The Perl Foundation.  All Rights Reserved.
+$Id$
+
+=head1 NAME
+
+src/mmd.c - Multimethod dispatch for binary opcode functions
+
+=head1 SYNOPSIS
+
+This system is set up to handle type-based dispatching for binary (i.e.
+two-arg) functions. This includes, though isn't necessarily limited to,
+binary operators such as addition or subtraction.
+
+=head1 DESCRIPTION
+
+The MMD system is straightforward, and currently must be explicitly
+invoked, for example by a vtable function. (We may reserve the right to
+use MMD in all circumstances, but currently do not).
+
+=head2 API
+
+For the purposes of the API, each MMD-able function is assigned a unique
+number which is used to find the correct function table. This is the
+C<func_num> parameter in the following functions. While Parrot isn't
+restricted to a predefined set of functions, it I<does> set things up so
+that all the binary vtable functions have a MMD table preinstalled for
+them, with default behaviour.
+
+=head2 Functions
+
+=over 4
+
+=cut
+
+*/
 
 #include "parrot/parrot.h"
 typedef void (*pmc_mmd_f)(struct Parrot_Interp *, PMC *, PMC *, PMC *);
 typedef STRING *(*string_mmd_f)(struct Parrot_Interp *, PMC *, PMC *);
 typedef INTVAL (*intval_mmd_f)(struct Parrot_Interp *, PMC *, PMC *);
 typedef FLOATVAL (*floatval_mmd_f)(struct Parrot_Interp *, PMC *, PMC *);
+
+/*
+
+=item C<void
+mmd_dispatch_pmc(struct Parrot_Interp *interpreter,
+		 PMC *left, PMC *right, PMC *dest, INTVAL function)>
+
+Dispatch to a multimethod that "returns" a PMC. C<left>, C<right>, and
+C<dest> are all PMC pointers, while C<func_num> is the MMD table that
+should be used to do the dispatching.
+
+The MMD system will figure out which function should be called based on
+the types of C<left> and C<right> and call it, passing in C<left>,
+C<right>, and C<dest> like any other binary vtable function.
+
+This function has a C<void> return type, like all the "take two PMCs,
+return a PMC" vtable functions do.
+
+=cut
+
+*/
 
 void
 mmd_dispatch_pmc(struct Parrot_Interp *interpreter,
@@ -38,6 +83,21 @@ mmd_dispatch_pmc(struct Parrot_Interp *interpreter,
     (*real_function)(interpreter, left, right, dest);
 }
 
+/*
+
+=item C<STRING *
+mmd_dispatch_string(struct Parrot_Interp *interpreter,
+		 PMC *left, PMC *right, INTVAL function)>
+
+Dispatch to a multimethod that returns a string. left and right are PMC
+pointers, while C<func_num> is the MMD table that should be used to do the
+dispatching. The function is responsible for creating the returned
+string.
+
+=cut
+
+*/
+
 STRING *
 mmd_dispatch_string(struct Parrot_Interp *interpreter,
 		 PMC *left, PMC *right, INTVAL function)
@@ -58,6 +118,18 @@ mmd_dispatch_string(struct Parrot_Interp *interpreter,
     return (*real_function)(interpreter, left, right);
 }
 
+/*
+
+=item C<INTVAL
+mmd_dispatch_intval(struct Parrot_Interp *interpreter,
+		 PMC *left, PMC *right, INTVAL function)>
+
+Like C<mmd_dispatch_string()>, only it returns an C<INTVAL>.
+
+=cut
+
+*/
+
 INTVAL
 mmd_dispatch_intval(struct Parrot_Interp *interpreter,
 		 PMC *left, PMC *right, INTVAL function)
@@ -77,6 +149,18 @@ mmd_dispatch_intval(struct Parrot_Interp *interpreter,
     }
     return (*real_function)(interpreter, left, right);
 }
+
+/*
+
+=item C<FLOATVAL
+mmd_dispatch_floatval(struct Parrot_Interp *interpreter,
+		 PMC *left, PMC *right, INTVAL function)>
+
+Like C<mmd_dispatch_string()>, only it returns a C<FLOATVAL>.
+
+=cut
+
+*/
 
 FLOATVAL
 mmd_dispatch_floatval(struct Parrot_Interp *interpreter,
@@ -99,7 +183,22 @@ mmd_dispatch_floatval(struct Parrot_Interp *interpreter,
     return (*real_function)(interpreter, left, right);
 }
 
-/* Add a new binary MMD function to the table */
+/*
+
+=item C<void
+mmd_add_function(struct Parrot_Interp *interpreter,
+        INTVAL funcnum, funcptr_t function)>
+
+Add a new binary MMD function to the list of functions the MMD system knows
+of. C<func_num> is the number of the new function, while C<default_func> is
+the function to be called when the system doesn't know which function it
+should call. (Because, for example, there hasn't been a function
+installed that matches the left and right types for a call).
+
+=cut
+
+*/
+
 void
 mmd_add_function(struct Parrot_Interp *interpreter,
         INTVAL funcnum, funcptr_t function)
@@ -153,7 +252,17 @@ mmd_add_function(struct Parrot_Interp *interpreter,
 
 }
 
-/* The table needs to get bigger in the X direction. Do so. */
+/*
+
+=item C<static void
+mmd_expand_x(struct Parrot_Interp *interpreter, INTVAL function, INTVAL new_x)>
+
+Expands the function table in the X dimension to include C<new_x>.
+
+=cut
+
+*/
+
 static void
 mmd_expand_x(struct Parrot_Interp *interpreter, INTVAL function, INTVAL new_x)
 {
@@ -201,6 +310,17 @@ mmd_expand_x(struct Parrot_Interp *interpreter, INTVAL function, INTVAL new_x)
     interpreter->binop_mmd_funcs->mmd_funcs[function] = new_table;
 }
 
+/*
+
+=item C<static void
+mmd_expand_y(struct Parrot_Interp *interpreter, INTVAL function, INTVAL new_y)>
+
+Expands the function table in the Y direction.
+
+=cut
+
+*/
+
 static void
 mmd_expand_y(struct Parrot_Interp *interpreter, INTVAL function, INTVAL new_y)
 {
@@ -240,9 +360,38 @@ mmd_expand_y(struct Parrot_Interp *interpreter, INTVAL function, INTVAL new_y)
 
 }
 
-/* Add a function to the MMD table by class name, rather than class
- * number. Handles the case where the named class isn't loaded yet.
- */
+/*
+
+=item C<void
+mmd_add_by_class(struct Parrot_Interp *interpreter,
+             INTVAL functype,
+             STRING *left_class, STRING *right_class,
+             funcptr_t funcptr)>
+
+Add a function to the MMD table by class name, rather than class number.
+Handles the case where the named class isn't loaded yet.
+
+Adds a new MMD function C<funcptr> to the C<func_num> function table
+that will be invoked when the left parameter is of class C<left_class>
+and the right parameter is of class C<right_class>. Both classes are
+C<STRING *>s that hold the PMC class names for the left and right sides.
+If either class isn't yet loaded, Parrot will cache the information such
+that the function will be installed if at some point in the future both
+classes are available.
+
+Currently this is done by just assigning class numbers to the classes,
+which the classes will pick up and use if they're later loaded, but we
+may later put the functions into a deferred table that we scan when PMC
+classes are loaded. Either way, the function will be guaranteed to be
+installed when it's needed.
+
+The function table must exist, but if it is too small, it will
+automatically be expanded.
+
+=cut
+
+*/
+
 void
 mmd_add_by_class(struct Parrot_Interp *interpreter,
              INTVAL functype,
@@ -264,14 +413,36 @@ mmd_add_by_class(struct Parrot_Interp *interpreter,
 }
 
 /*
- * Add a new function to the table. This can be interestingly
- * non-trivial, so we get to be tricky.
- *
- * If the left or right types are larger than anything we've seen so
- * far, it means that we have to expand the table. Making Y larger is
- * simple--just realloc with some more rows. Making X larger is less
- * simple. In either case, we punt to other functions.
- */
+
+=item C<void
+mmd_register(struct Parrot_Interp *interpreter,
+             INTVAL type,
+             INTVAL left_type, INTVAL right_type,
+             funcptr_t funcptr)>
+
+Register a function C<funcptr> for MMD function table C<func_num> for classes
+C<left_type> and C<right_type>. The left and right types are C<INTVAL>s that
+represent the class ID numbers.
+
+The function table must exist, but if it is too small, it will
+automatically be expanded.
+
+Adding a new function to the table can be interestingly non-trivial, so
+we get to be tricky.
+
+If the left or right types are larger than anything we've seen so far,
+it means that we have to expand the table. Making Y larger is simple --
+just realloc with some more rows. Making X larger is less simple. In
+either case, we punt to other functions.
+
+TODO - Currently the MMD system doesn't handle inheritance and best match
+searching, as it assumes that all PMC types have no parent type. This
+can be considered a bug, and will be resolved at some point in the
+future.
+
+=cut
+
+*/
 
 void
 mmd_register(struct Parrot_Interp *interpreter,
@@ -296,6 +467,17 @@ mmd_register(struct Parrot_Interp *interpreter,
     *(interpreter->binop_mmd_funcs->mmd_funcs[type] + offset) = funcptr;
 }
 
+/*
+
+=item C<void
+mmd_destroy(Parrot_Interp interpreter)>
+
+Frees all the memmory allocated used the MMD subsystem.
+
+=cut
+
+*/
+
 void
 mmd_destroy(Parrot_Interp interpreter)
 {
@@ -314,6 +496,18 @@ mmd_destroy(Parrot_Interp interpreter)
     }
     mem_sys_free(interpreter->binop_mmd_funcs);
 }
+
+/*
+
+=back
+
+=head1 SEE ALSO
+
+F<include/parrot/mmd.h>.
+
+=cut
+
+*/
 
 /*
  * Local variables:

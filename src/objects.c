@@ -1,19 +1,37 @@
-/* objects.c
- *  Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
- *  CVS Info
- *     $Id$
- *  Overview:
- *     Handles class and object manipulation
- *  Data Structure and Algorithms:
- *  History:
- *  Notes:
- *  References:
- */
+/*
+Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+$Id$
+
+=head1 NAME
+
+objects.c - Class and object
+
+=head1 DESCRIPTION
+
+Handles class and object manipulation.
+
+=head2 Functions
+
+=over 4
+
+=cut
+
+*/
 
 #include "parrot/parrot.h"
 #include <assert.h>
 
-/* This should be public, but for right now it's internal */
+/*
+
+=item C<static PMC *
+find_global(Parrot_Interp interpreter, STRING *globalname)>
+
+This should be public, but for right now it's internal.
+
+=cut
+
+*/
+
 static PMC *
 find_global(Parrot_Interp interpreter, STRING *globalname) {
     if (!VTABLE_exists_keyed_str(interpreter,
@@ -25,11 +43,21 @@ find_global(Parrot_Interp interpreter, STRING *globalname) {
             interpreter->globals->stash_hash, globalname);
 }
 
-/* Subclass a class. Single parent class, nice and
-   straightforward. If child_class is NULL, this is an anonymous
-   subclass we're creating, which happens commonly enough to warrant
-   an actual single-subclass function
- */
+/*
+
+=item C<PMC *
+Parrot_single_subclass(Parrot_Interp interpreter, PMC *base_class,
+                       STRING *child_class_name)>
+
+Subclass a class. Single parent class, nice and straightforward. If
+C<child_class> is C<NULL>, this is an anonymous subclass we're creating,
+which happens commonly enough to warrant an actual single-subclass
+function.
+
+=cut
+
+*/
+
 PMC *
 Parrot_single_subclass(Parrot_Interp interpreter, PMC *base_class,
                        STRING *child_class_name)
@@ -108,10 +136,17 @@ Parrot_single_subclass(Parrot_Interp interpreter, PMC *base_class,
     return child_class;
 }
 
-/*=for api objects Parrot_new_class
- *
- * Create a brand new class, named what we pass in.
- */
+/*
+
+=item C<void
+Parrot_new_class(Parrot_Interp interpreter, PMC *class, STRING *class_name)>
+
+Creates a new class, named C<class_name>.
+
+=cut
+
+*/
+
 void
 Parrot_new_class(Parrot_Interp interpreter, PMC *class, STRING *class_name)
 {
@@ -141,6 +176,17 @@ Parrot_new_class(Parrot_Interp interpreter, PMC *class, STRING *class_name)
     Parrot_class_register(interpreter, class_name, class);
 }
 
+/*
+
+=item C<PMC *
+Parrot_class_lookup(Parrot_Interp interpreter, STRING *class_name)>
+
+Looks for the class named C<class_name> and returns it if it exists.
+Otherwise it returns C<PMCNULL>.
+
+=cut
+
+*/
 
 PMC *
 Parrot_class_lookup(Parrot_Interp interpreter, STRING *class_name)
@@ -152,12 +198,22 @@ Parrot_class_lookup(Parrot_Interp interpreter, STRING *class_name)
     return PMCNULL;
 }
 
-/* This is the method to register a new Parrot class as an
-   instantiatable type. Doing this involves putting it in the class
-   hash, setting its vtable so that the init method inits objects of
-   the class rather than the class itself, and adding it to the
-   interpreter's base type table so you can "new Px, foo" the things.
+/*
+
+=item C<void
+Parrot_class_register(Parrot_Interp interpreter, STRING *class_name,
+        PMC *new_class)>
+
+This is the way to register a new Parrot class as an instantiatable
+type. Doing this involves putting it in the class hash, setting its
+vtable so that the C<init> method initializes objects of the class rather than
+the class itself, and adding it to the interpreter's base type table so
+you can create a new C<foo> in PASM like this: C<new Px, foo>.
+
+=cut
+
 */
+
 void
 Parrot_class_register(Parrot_Interp interpreter, STRING *class_name,
         PMC *new_class)
@@ -200,14 +256,19 @@ Parrot_class_register(Parrot_Interp interpreter, STRING *class_name,
     Parrot_base_vtables[new_type] = new_vtable;
 }
 
+/*
 
-/*=for api objects Parrot_instantiate_object
- *
- * Create a  parrot object. Takes a passed-in class PMC that has
- * sufficient information to describe the layout of the object and,
- * well, makes the darned object.
- *
- */
+=item C<void
+Parrot_instantiate_object(Parrot_Interp interpreter, PMC *object)>
+
+Creates a Parrot object. Takes a passed-in class PMC that has sufficient
+information to describe the layout of the object and, well, makes the
+darned object.
+
+=cut
+
+*/
+
 void
 Parrot_instantiate_object(Parrot_Interp interpreter, PMC *object) {
     PMC *new_object_array;
@@ -256,11 +317,35 @@ Parrot_instantiate_object(Parrot_Interp interpreter, PMC *object) {
     /* TODO We really ought to call the class init routines here... */
 }
 
+/*
+
+=item C<PMC *
+Parrot_add_parent(Parrot_Interp interpreter, PMC *new_base_class,
+           PMC *existing_class)>
+
+This currently does nothing but return C<NULL>.
+
+=cut
+
+*/
+
 PMC *
 Parrot_add_parent(Parrot_Interp interpreter, PMC *new_base_class,
            PMC *existing_class) {
     return NULL;
 }
+
+/*
+
+=item C<PMC *
+Parrot_remove_parent(Parrot_Interp interpreter, PMC *removed_class,
+                     PMC *existing_class)>
+
+This currently does nothing but return C<NULL>.
+
+=cut
+
+*/
 
 PMC *
 Parrot_remove_parent(Parrot_Interp interpreter, PMC *removed_class,
@@ -268,16 +353,35 @@ Parrot_remove_parent(Parrot_Interp interpreter, PMC *removed_class,
     return NULL;
 }
 
+/*
+
+=item C<PMC *
+Parrot_multi_subclass(Parrot_Interp interpreter, PMC *base_class_array,
+                      STRING *child_class_name)>
+
+This currently does nothing but return C<NULL>.
+
+=cut
+
+*/
+
 PMC *
 Parrot_multi_subclass(Parrot_Interp interpreter, PMC *base_class_array,
                       STRING *child_class_name) {
     return NULL;
 }
 
-/*=for api objects Parrot_object_is
- *
- * Is the object an instance of class.
- */
+/*
+
+=item C<INTVAL
+Parrot_object_isa(Parrot_Interp interpreter, PMC *pmc, PMC *cl)>
+
+Return whether the object C<pmc> is an instance of class Ccl>.
+
+=cut
+
+*/
+
 INTVAL
 Parrot_object_isa(Parrot_Interp interpreter, PMC *pmc, PMC *cl) {
     PMC * t;
@@ -310,26 +414,42 @@ Parrot_object_isa(Parrot_Interp interpreter, PMC *pmc, PMC *cl) {
     return 0;
 }
 
-/*=for api objects Parrot_new_method_cache
- *
- * Create a new method cache PMC.
- */
+/*
+
+=item C<PMC *
+Parrot_new_method_cache(Parrot_Interp interpreter)>
+
+This should create and return a new method cache PMC.
+
+Currently it does nothing but return C<NULL>.
+
+=cut
+
+*/
+
 PMC *
 Parrot_new_method_cache(Parrot_Interp interpreter) {
     return NULL;
 }
 
-/*=for api objects Parrot_find_method
- *
- * Find a method PMC for a named method, given the class PMC, current
- * interpreter, and name of the method.
- *
- * This routine should use the current scope's method cache, if there
- * is one. If not, it creates a new method cache. Or, rather, it will
- * when we've got that bit working. For now it unconditionally goes
- * and looks up the name in the global stash.
- *
- */
+/*
+
+=item C<PMC *
+Parrot_find_method_with_cache(Parrot_Interp interpreter, PMC *class,
+                              STRING *method_name)>
+
+Find a method PMC for a named method, given the class PMC, current
+interpreter, and name of the method.
+
+This routine should use the current scope's method cache, if there is
+one. If not, it creates a new method cache. Or, rather, it will when
+we've got that bit working. For now it unconditionally goes and looks up
+the name in the global stash.
+
+=cut
+
+*/
+
 PMC *
 Parrot_find_method_with_cache(Parrot_Interp interpreter, PMC *class,
                               STRING *method_name) {
@@ -404,6 +524,17 @@ Parrot_find_method_with_cache(Parrot_Interp interpreter, PMC *class,
     return method;
 }
 
+/*
+
+=item C<INTVAL
+Parrot_add_attribute(Parrot_Interp interpreter, PMC* class, STRING* attr)>
+
+Adds the attribute C<attr> to the class.
+
+=cut
+
+*/
+
 INTVAL
 Parrot_add_attribute(Parrot_Interp interpreter, PMC* class, STRING* attr)
 {
@@ -456,6 +587,18 @@ Parrot_add_attribute(Parrot_Interp interpreter, PMC* class, STRING* attr)
     class->cache.int_val = idx + 1;
     return idx;
 }
+
+/*
+
+=back
+
+=head1 SEE ALSO
+
+F<include/parrot/objects.h>, F<docs/pdds/pdd15_objects.pod>.
+
+=cut
+
+*/
 
 /*
  * Local variables:

@@ -1,29 +1,23 @@
-/* spf_vtable.c
- *  Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
- *  CVS Info
- *     $Id$
- *  Overview:
- *     Implements the two families of functions Parrot_sprintf
- *     may use to retrieve arguments.
- *  Data Structure and Algorithms:
- *  History:
- *     When I was first working on this implementation of
- *     sprintf, I ran into a problem.  I wanted to re-use the
- *     implementation for a Parrot bytecode-level sprintf, but
- *     that couldn't be done, since it used va_* directly.  For
- *     a while I thought about generating two versions of the
- *     source with a Perl script, but that seemed like overkill.
- *     Eventually I came across this idea--pass in a specialized
- *     vtable with methods for extracting things from the arglist,
- *     whatever it happened to be.  This is the result.
- *  Notes:
- *     In the future, it may be deemed desirable to similarly
- *     vtable-ize appending things to the string, allowing for
- *     faster PIO_printf &c, as well as a version that writes
- *     directly to a C string.  However, at this point neither
- *     of those is needed.
- *  References: misc.h, misc.c, spf_render.c
- */
+/*
+Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+$Id$
+
+=head1 NAME
+
+src/spf_vtable.c - Parrot sprintf
+
+=head1 DESCRIPTION
+
+Implements the two families of functions C<Parrot_sprintf> may use to
+retrieve arguments.
+
+=head2 Var args Functions
+
+=over 4
+
+=cut
+
+*/
 
 #define IN_SPF_SYSTEM
 
@@ -31,7 +25,19 @@
 
 #include <stdarg.h>
 
-/* VARARGS CORE */
+/*
+
+=item C<static STRING *
+getchr_va(struct Parrot_Interp *interpreter, INTVAL size, SPRINTF_OBJ *obj)>
+
+Gets a C<char> out of the C<va_list> in C<obj> and returns it as a
+Parrot C<STRING>.
+
+C<size> is unused.
+
+=cut
+
+*/
 
 static STRING *
 getchr_va(struct Parrot_Interp *interpreter, INTVAL size, SPRINTF_OBJ *obj)
@@ -43,6 +49,21 @@ getchr_va(struct Parrot_Interp *interpreter, INTVAL size, SPRINTF_OBJ *obj)
 
     return string_make(interpreter, &ch, 1, NULL, 0, NULL);
 }
+
+/*
+
+=item C<static HUGEINTVAL
+getint_va(struct Parrot_Interp *interpreter, INTVAL size, SPRINTF_OBJ *obj)>
+
+Gets an integer out of the C<va_list> in C<obj> and returns it as a
+Parrot C<STRING>.
+
+C<size> is an C<enum spf_type_t> value which indicates the storage type
+of the integer.
+
+=cut
+
+*/
 
 static HUGEINTVAL
 getint_va(struct Parrot_Interp *interpreter, INTVAL size, SPRINTF_OBJ *obj)
@@ -81,6 +102,21 @@ getint_va(struct Parrot_Interp *interpreter, INTVAL size, SPRINTF_OBJ *obj)
         return 0;
     }
 }
+
+/*
+
+=item C<static UHUGEINTVAL
+getuint_va(struct Parrot_Interp *interpreter, INTVAL size, SPRINTF_OBJ *obj)>
+
+Gets an unsigned integer out of the C<va_list> in C<obj> and returns it
+as a Parrot C<STRING>.
+
+C<size> is an C<enum spf_type_t> value which indicates the storage type
+of the integer.
+
+=cut
+
+*/
 
 static UHUGEINTVAL
 getuint_va(struct Parrot_Interp *interpreter, INTVAL size, SPRINTF_OBJ *obj)
@@ -123,6 +159,21 @@ getuint_va(struct Parrot_Interp *interpreter, INTVAL size, SPRINTF_OBJ *obj)
     }
 }
 
+/*
+
+=item C<static HUGEFLOATVAL
+getfloat_va(struct Parrot_Interp *interpreter, INTVAL size, SPRINTF_OBJ *obj)>
+
+Gets an floating-point number out of the C<va_list> in C<obj> and
+returns it as a Parrot C<STRING>.
+
+C<size> is an C<enum spf_type_t> value which indicates the storage type of
+the number.
+
+=cut
+
+*/
+
 static HUGEFLOATVAL
 getfloat_va(struct Parrot_Interp *interpreter, INTVAL size, SPRINTF_OBJ *obj)
 {
@@ -156,6 +207,21 @@ getfloat_va(struct Parrot_Interp *interpreter, INTVAL size, SPRINTF_OBJ *obj)
         return (HUGEFLOATVAL)0.0;
     }
 }
+
+/*
+
+=item C<static STRING *
+getstring_va(struct Parrot_Interp *interpreter, INTVAL size, SPRINTF_OBJ *obj)>
+
+Gets an string out of the C<va_list> in C<obj> and returns it as a
+Parrot C<STRING>.
+
+C<size> is an C<enum spf_type_t> value which indicates the storage type
+of the string.
+
+=cut
+
+*/
 
 static STRING *
 getstring_va(struct Parrot_Interp *interpreter, INTVAL size, SPRINTF_OBJ *obj)
@@ -193,6 +259,19 @@ getstring_va(struct Parrot_Interp *interpreter, INTVAL size, SPRINTF_OBJ *obj)
     }
 }
 
+/*
+
+=item C<static void *
+getptr_va(struct Parrot_Interp *interpreter, INTVAL size, SPRINTF_OBJ *obj)>
+
+Gets a C<void *> out of the C<va_list> in C<obj> and returns it.
+
+C<size> is unused.
+
+=cut
+
+*/
+
 static void *
 getptr_va(struct Parrot_Interp *interpreter, INTVAL size, SPRINTF_OBJ *obj)
 {
@@ -206,8 +285,23 @@ SPRINTF_OBJ va_core = {
     getfloat_va, getstring_va, getptr_va
 };
 
+/*
 
-/* PMC CORE */
+=back
+
+=head2 PMC Functions
+
+=over 4
+
+=item C<static STRING *
+getchr_pmc(struct Parrot_Interp *interpreter, INTVAL size, SPRINTF_OBJ *obj)>
+
+Same as C<getchr_va()> except that a vtable is used to get the value
+from C<obj>.
+
+=cut
+
+*/
 
 static STRING *
 getchr_pmc(struct Parrot_Interp *interpreter, INTVAL size, SPRINTF_OBJ *obj)
@@ -222,6 +316,18 @@ getchr_pmc(struct Parrot_Interp *interpreter, INTVAL size, SPRINTF_OBJ *obj)
     /* XXX string_copy like below? + adjusting bufused */
     return string_make(interpreter, s->strstart, 1, 0, 0, 0);
 }
+
+/*
+
+=item C<static HUGEINTVAL
+getint_pmc(struct Parrot_Interp *interpreter, INTVAL size, SPRINTF_OBJ *obj)>
+
+Same as C<getint_va()> except that a vtable is used to get the value
+from C<obj>.
+
+=cut
+
+*/
 
 static HUGEINTVAL
 getint_pmc(struct Parrot_Interp *interpreter, INTVAL size, SPRINTF_OBJ *obj)
@@ -249,6 +355,18 @@ getint_pmc(struct Parrot_Interp *interpreter, INTVAL size, SPRINTF_OBJ *obj)
     return ret;
 }
 
+/*
+
+=item C<static UHUGEINTVAL
+getuint_pmc(struct Parrot_Interp *interpreter, INTVAL size, SPRINTF_OBJ *obj)>
+
+Same as C<getuint_va()> except that a vtable is used to get the value
+from C<obj>.
+
+=cut
+
+*/
+
 static UHUGEINTVAL
 getuint_pmc(struct Parrot_Interp *interpreter, INTVAL size, SPRINTF_OBJ *obj)
 {
@@ -274,6 +392,18 @@ getuint_pmc(struct Parrot_Interp *interpreter, INTVAL size, SPRINTF_OBJ *obj)
     return ret;
 }
 
+/*
+
+=item C<static HUGEFLOATVAL
+getfloat_pmc(struct Parrot_Interp *interpreter, INTVAL size, SPRINTF_OBJ *obj)>
+
+Same as C<getfloat_va()> except that a vtable is used to get the value
+from C<obj>.
+
+=cut
+
+*/
+
 static HUGEFLOATVAL
 getfloat_pmc(struct Parrot_Interp *interpreter, INTVAL size, SPRINTF_OBJ *obj)
 {
@@ -297,6 +427,18 @@ getfloat_pmc(struct Parrot_Interp *interpreter, INTVAL size, SPRINTF_OBJ *obj)
     return ret;
 }
 
+/*
+
+=item C<static STRING *
+getstring_pmc(struct Parrot_Interp *interpreter, INTVAL size, SPRINTF_OBJ *obj)>
+
+Same as C<getstring_va()> except that a vtable is used to get the value
+from C<obj>.
+
+=cut
+
+*/
+
 static STRING *
 getstring_pmc(struct Parrot_Interp *interpreter, INTVAL size, SPRINTF_OBJ *obj)
 {
@@ -309,6 +451,18 @@ getstring_pmc(struct Parrot_Interp *interpreter, INTVAL size, SPRINTF_OBJ *obj)
     s = (STRING *)(VTABLE_get_string(interpreter, tmp));
     return s;
 }
+
+/*
+
+=item C<static void *
+getptr_pmc(struct Parrot_Interp *interpreter, INTVAL size, SPRINTF_OBJ *obj)>
+
+Same as C<getptr_va()> except that a vtable is used to get the value
+from C<obj>.
+
+=cut
+
+*/
 
 static void *
 getptr_pmc(struct Parrot_Interp *interpreter, INTVAL size, SPRINTF_OBJ *obj)
@@ -326,6 +480,36 @@ SPRINTF_OBJ pmc_core = {
     NULL, 0, getchr_pmc, getint_pmc, getuint_pmc,
     getfloat_pmc, getstring_pmc, getptr_pmc
 };
+
+/*
+
+=back
+
+=head1 SEE ALSO
+
+F<src/misc.h>, F<src/misc.c>, F<src/spf_render.c>.
+
+=head1 HISTORY
+
+When I was first working on this implementation of sprintf, I ran into a
+problem.  I wanted to re-use the implementation for a Parrot
+bytecode-level sprintf, but that couldn't be done, since it used C<va_*>
+directly.  For a while I thought about generating two versions of the
+source with a Perl script, but that seemed like overkill. Eventually I
+came across this idea -- pass in a specialized vtable with methods for
+extracting things from the arglist, whatever it happened to be.  This is
+the result.
+
+=head1 TODO
+
+In the future, it may be deemed desirable to similarly vtable-ize
+appending things to the string, allowing for faster C<PIO_printf()> &c,
+as well as a version that writes directly to a C string. However, at
+this point neither of those is needed.
+
+=cut
+
+*/
 
 /*
  * Local variables:

@@ -1,15 +1,23 @@
-/* spf_render.c
- *  Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
- *  CVS Info
- *     $Id$
- *  Overview:
- *     Implements the main function that drives the Parrot_sprintf
- *     family and its utility functions.
- *  Data Structure and Algorithms:
- *  History:
- *  Notes:
- *  References: misc.h, misc.c, spf_vtable.c
- */
+/*
+Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+$Id$
+
+=head1 NAME
+
+src/spf_render.c - Parrot sprintf
+
+=head1 DESCRIPTION
+
+Implements the main function that drives the C<Parrot_sprintf> family
+and its utility functions.
+
+=head2 Utility Functions
+
+=over 4
+
+=cut
+
+*/
 
 #define IN_SPF_SYSTEM
 
@@ -22,7 +30,21 @@
 #  define snprintf _snprintf
 #endif
 
-/* UTILITY FUNCTIONS */
+/*
+
+=item C<static STRING*
+uint_to_str(struct Parrot_Interp *interpreter,
+            char *tc, UHUGEINTVAL num, char base, int minus)>
+
+Returns C<num> converted to a Parrot C<STRING>.
+
+Note that C<base> must be defined, a default of 10 is not assumed.
+
+If C<minus> is true then C<-> is prepended to the string representation.
+
+=cut
+
+*/
 
 static STRING*
 uint_to_str(struct Parrot_Interp *interpreter,
@@ -47,6 +69,22 @@ uint_to_str(struct Parrot_Interp *interpreter,
     return string_make(interpreter, p, tail - p, NULL, 0, NULL);
 }
 
+/*
+
+=item C<STRING *
+int_to_str(struct Parrot_Interp *interpreter,
+           char *tc, HUGEINTVAL num, char base)>
+
+Returns C<num> converted to a Parrot C<STRING>.
+
+Note that C<base> must be defined, a default of 10 is not assumed.
+
+If C<num < 0> then C<-> is prepended to the string representation.
+
+=cut
+
+*/
+
 STRING *
 int_to_str(struct Parrot_Interp *interpreter,
            char *tc, HUGEINTVAL num, char base)
@@ -60,7 +98,18 @@ int_to_str(struct Parrot_Interp *interpreter,
     return uint_to_str(interpreter, tc, (UHUGEINTVAL) num, base, minus);
 }
 
-/* handle +, -, 0, #, space, width, and prec. */
+/*
+
+=item C<static STRING *
+handle_flags(struct Parrot_Interp *interpreter,
+             SpfInfo info, STRING *str, INTVAL is_int_type, const char *prefix)>
+
+Handles C<+>, C<->, C<0>, C<#>, space, width, and prec.
+
+=cut
+
+*/
+
 static STRING *
 handle_flags(struct Parrot_Interp *interpreter,
              SpfInfo info, STRING *str, INTVAL is_int_type, const char *prefix)
@@ -144,11 +193,19 @@ handle_flags(struct Parrot_Interp *interpreter,
     return str;
 }
 
+/*
 
-/* Turn the info structure back into an sprintf format.  Far from being
- * pointless, this is used to call snprintf() when we're confronted with
- * a float.
- */
+=item C<static void
+gen_sprintf_call(struct Parrot_Interp *interpreter, char *out,
+                 SpfInfo info, int thingy)>
+
+Turn the info structure back into an sprintf format. Far from being
+pointless, this is used to call C<snprintf()> when we're confronted with
+a float.
+
+=cut
+
+*/
 
 static void
 gen_sprintf_call(struct Parrot_Interp *interpreter, char *out,
@@ -209,8 +266,17 @@ gen_sprintf_call(struct Parrot_Interp *interpreter, char *out,
     out[i] = 0;
 }
 
+/*
 
-/* This is the engine that does all the formatting. */
+=item C<STRING *
+Parrot_sprintf_format(struct Parrot_Interp *interpreter, STRING *pat,
+                      SPRINTF_OBJ * obj)>
+
+This is the engine that does all the formatting.
+
+=cut
+
+*/
 
 STRING *
 Parrot_sprintf_format(struct Parrot_Interp *interpreter, STRING *pat,
@@ -674,6 +740,18 @@ Parrot_sprintf_format(struct Parrot_Interp *interpreter, STRING *pat,
 
     return targ;
 }
+
+/*
+
+=back
+
+=head1 SEE ALSO
+
+F<src/misc.h>, F<src/misc.c>, F<src/spf_vtable.c>.
+
+=cut
+
+*/
 
 /*
  * Local variables:
