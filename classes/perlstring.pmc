@@ -69,7 +69,7 @@ pmclass PerlString {
     }
 
     BOOLVAL get_bool () {
-fprintf(stderr,"Parrot_PerlString_get_bool not yet implemented!\n");
+	return string_bool(interpreter, SELF->cache.struct_val);
     }
 
     void* get_value () {

@@ -1,6 +1,6 @@
 #! perl -w
 
-use Parrot::Test tests => 43;
+use Parrot::Test tests => 47;
 
 output_is( <<'CODE', <<OUTPUT, "set_s_sc" );
 	set	S4, "JAPH\n"
@@ -210,6 +210,62 @@ ERROR:
     end
 CODE
 ok
+OUTPUT
+
+output_is(<<CODE, <<OUTPUT, "eq_sc_s_ic");
+	set	S0, "I am legion"
+
+	eq	"I am legion", S0, GOOD1
+	print	"not "
+GOOD1:	print	"ok 1\\n"
+
+	eq	"I am legend", S0, BAD1
+	branch	GOOD2
+BAD1:	print	"not "
+GOOD2:	print	"ok 2\\n"
+	end
+CODE
+ok 1
+ok 2
+OUTPUT
+
+output_is(<<CODE, <<OUTPUT, "ne_sc_s_ic");
+	set	S0, "I am legion"
+
+	ne	"I am legend", S0, GOOD1
+	print	"not "
+GOOD1:	print	"ok 1\\n"
+
+	ne	"I am legion", S0, BAD1
+	branch	GOOD2
+BAD1:	print	"not "
+GOOD2:	print	"ok 2\\n"
+	end
+CODE
+ok 1
+ok 2
+OUTPUT
+
+output_is(<<CODE, <<OUTPUT, "eq_sc_s");
+
+	set	S0, "Sparticus"
+	bsr	TEST1
+	print	"ok 1\\n"
+	bsr	TEST2
+	print	"ok 2\\n"
+	end
+
+TEST1:	eq	"Sparticus", S0
+	print	"not "
+	ret
+
+TEST2:	ne	"Spartisnt", S0
+	print	"not "
+	ret
+
+CODE
+ok 1
+ok 2
 OUTPUT
 
 output_is(<<CODE, <<OUTPUT, "ne_s_s_ic");
@@ -436,6 +492,67 @@ output_is(<<'CODE',ord('b'),'3-param ord, multi-character string register, from 
 	print I0
 	end
 CODE
+
+output_is(<<CODE, <<OUTPUT, "if_s_ic");
+	set	S0, "I've told you once, I've told you twice..."
+	if	S0, OK1
+	print	"not "
+OK1:	print	"ok 1\\n"
+
+	set	S0, "0.0"
+	if	S0, OK2
+	print	"not "
+OK2:	print	"ok 2\\n"
+
+	set	S0, ""
+	if	S0, BAD3
+	branch OK3
+BAD3:	print	"not "
+OK3:	print	"ok 3\\n"
+
+	set	S0, "0"
+	if	S0, BAD4
+	branch OK4
+BAD4:	print	"not "
+OK4:	print	"ok 4\\n"
+
+	set	S0, "0e0"
+	if	S0, OK5
+	print	"not "
+OK5:	print	"ok 5\\n"
+
+	set	S0, "x"
+	if	S0, OK6
+	print	"not "
+OK6:	print	"ok 6\\n"
+
+	set	S0, "\0"
+	if	S0, OK7
+	print	"not "
+OK7:	print	"ok 7\\n"
+
+	set	S0, "\\n"
+	if	S0, OK8
+	print	"not "
+OK8:	print	"ok 8\\n"
+
+	set	S0, " "
+	if	S0, OK9
+	print	"not "
+OK9:	print	"ok 9\\n"
+
+	end
+CODE
+ok 1
+ok 2
+ok 3
+ok 4
+ok 5
+ok 6
+ok 7
+ok 8
+ok 9
+OUTPUT
 
 # Set all string registers to values given by &$_[0](reg num)
 sub set_str_regs {

@@ -50,12 +50,18 @@ usascii_is_digit(INTVAL c) {
     return isdigit(c) ? 1 : 0;
 }
 
+static INTVAL
+usascii_get_digit(INTVAL c) {
+    return c - '0';
+}
+
 const CHARTYPE usascii_chartype = {
     "usascii",
     "singlebyte",
     usascii_transcode_from,
     usascii_transcode_to,
-    usascii_is_digit
+    usascii_is_digit,
+    usascii_get_digit
 };
 
 /*

@@ -331,6 +331,29 @@ string_compare(struct Parrot_Interp *interpreter, STRING* s1, STRING* s2) {
     return cmp;
 }
 
+/* A string is "true" if it is equal to anything but "" and "0" */
+BOOLVAL string_bool (struct Parrot_Interp *interpreter, STRING* s) {
+    INTVAL len;
+    if (s == NULL) {
+        return 0;
+    }
+
+    len = string_length(s);
+
+    if (len == 0) {
+        return 0;
+    }
+
+    if (len == 1) {
+        INTVAL c = s->encoding->decode(s->bufstart);
+        if (s->type->is_digit(c) && s->type->get_digit(c) == 0) {
+            return 0;
+        }
+    }
+
+    return 1; /* it must be true */
+}
+
 /* A number is such that:
   sign           =  '+' | '-'
   digit          =  '0' | '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9'
@@ -402,7 +425,7 @@ FLOATVAL string_to_num (struct Parrot_Interp *interpreter, STRING *s) {
 
             if (s->type->is_digit(c)) {
                 if (in_exp) {
-                    exponent = exponent * 10 + (c - '0');
+                    exponent = exponent * 10 + s->type->get_digit(c);
                     if (!exp_sign) {
                         exp_sign = 1;
                     }
@@ -410,7 +433,7 @@ FLOATVAL string_to_num (struct Parrot_Interp *interpreter, STRING *s) {
                 else {
                     /* We're somewhere in the main string of numbers */
                     in_number = 1;
-                    f = f * 10 + (c - '0');
+                    f = f * 10 + s->type->get_digit(c);
                     if (seen_dot) {
                         fake_exponent--;
                     }
@@ -418,10 +441,10 @@ FLOATVAL string_to_num (struct Parrot_Interp *interpreter, STRING *s) {
             }
             else if (!in_number) {
                 /* we've not yet seen any digits */
-                if (c == '-') {
+                if (c == '-') {         /* XXX: ascii*/
                     sign = -1;
                 }
-                else if (c == '.') {
+                else if (c == '.') {    /* XXX: ascii*/
                     seen_dot = 1;
                 }
                 else {
@@ -431,18 +454,18 @@ FLOATVAL string_to_num (struct Parrot_Interp *interpreter, STRING *s) {
             }
             else {
                 /* we've seen some digits, are we done yet? */
-                if (!seen_dot && c == '.' && !in_exp) {
+                if (!seen_dot && c == '.' && !in_exp) { /* XXX: ascii*/
                     seen_dot = 1;
                 }
-                else if (!seen_e && (c == 'e' || c == 'E')) {
+                else if (!seen_e && (c == 'e' || c == 'E')) { /* XXX: ascii*/
                     seen_e = 1;
                     in_exp = 1;
                 }
                 else if (seen_e && !exp_sign) {
-                    if (c == '+') {
+                    if (c == '+') {                        /* XXX: ascii*/
                         exp_sign = 1;
                     }
-                    else if (c == '-') {
+                    else if (c == '-') {                   /* XXX: ascii*/
                         exp_sign = -1;
                     }
                     else {

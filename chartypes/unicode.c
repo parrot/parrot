@@ -27,12 +27,18 @@ unicode_is_digit(INTVAL c) {
     return isdigit(c) ? 1 : 0; /* FIXME - Other code points are also digits */
 }
 
+static INTVAL
+unicode_get_digit(INTVAL c) {
+    return c - '0'; /* FIXME - many more digits than this... */
+}
+
 const CHARTYPE unicode_chartype = {
     "unicode",
     "utf32",
     unicode_transcode_from,
     unicode_transcode_to,
-    unicode_is_digit
+    unicode_is_digit,
+    unicode_get_digit
 };
 
 /*

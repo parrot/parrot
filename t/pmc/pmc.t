@@ -1,6 +1,6 @@
 #! perl -w
 
-use Parrot::Test tests => 44;
+use Parrot::Test tests => 47;
 
 my $fp_equality_macro = <<'ENDOFMACRO';
 fp_eq	macro	J,K,L
@@ -843,6 +843,110 @@ CODE
 3
 3.700000
 hey
+OUTPUT
+
+output_is(<<CODE, <<OUTPUT, "if (P) - Int");
+	new	P0, PerlInt
+
+	set	P0, 1
+	if	P0, OK1
+	print	"not "
+OK1:	print	"ok 1\\n"
+
+	set	P0, 0
+	if	P0, BAD2
+	branch OK2
+BAD2:	print	"not "
+OK2:	print	"ok 2\\n"
+
+	end
+CODE
+ok 1
+ok 2
+OUTPUT
+
+output_is(<<CODE, <<OUTPUT, "if (P) - Num");
+	new	P0, PerlInt
+
+	set	P0, 1.1
+	if	P0, OK1
+	print	"not "
+OK1:	print	"ok 1\\n"
+
+	set	P0, 0.0
+	if	P0, BAD2
+	branch OK2
+BAD2:	print	"not "
+OK2:	print	"ok 2\\n"
+
+	end
+CODE
+ok 1
+ok 2
+OUTPUT
+
+output_is(<<CODE, <<OUTPUT, "if (P) - String");
+	new	P0, PerlString
+
+	set	P0, "I've told you once, I've told you twice..."
+	if	P0, OK1
+	print	"not "
+OK1:	print	"ok 1\\n"
+
+	set	P0, "0.0"
+	if	P0, OK2
+	print	"not "
+OK2:	print	"ok 2\\n"
+
+	set	P0, ""
+	if	P0, BAD3
+	branch OK3
+BAD3:	print	"not "
+OK3:	print	"ok 3\\n"
+
+	set	P0, "0"
+	if	P0, BAD4
+	branch OK4
+BAD4:	print	"not "
+OK4:	print	"ok 4\\n"
+
+	set	P0, "0e0"
+	if	P0, OK5
+	print	"not "
+OK5:	print	"ok 5\\n"
+
+	set	P0, "x"
+	if	P0, OK6
+	print	"not "
+OK6:	print	"ok 6\\n"
+
+	set	P0, "\0"
+	if	P0, OK7
+	print	"not "
+OK7:	print	"ok 7\\n"
+
+	set	P0, "\\n"
+	if	P0, OK8
+	print	"not "
+OK8:	print	"ok 8\\n"
+
+	set	P0, " "
+	if	P0, OK9
+	print	"not "
+OK9:	print	"ok 9\\n"
+
+
+	end
+CODE
+ok 1
+ok 2
+ok 3
+ok 4
+ok 5
+ok 6
+ok 7
+ok 8
+ok 9
 OUTPUT
 
 1;

@@ -41,6 +41,8 @@ STRING*
 string_substr(struct Parrot_Interp *interpreter, STRING*, INTVAL, INTVAL, STRING**);
 INTVAL
 string_compare(struct Parrot_Interp *, STRING*, STRING*);
+BOOLVAL
+string_bool(struct Parrot_Interp *, STRING*);
 
 /* Declarations of other functions */
 INTVAL

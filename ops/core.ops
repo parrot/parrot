@@ -906,6 +906,8 @@ op ge(s, s|sc, ic) {
 
 =item B<if>(n, ic)
 
+=item B<if>(s, ic)
+
 Check register $1. If true, branch by $2.
 
 =cut
@@ -919,6 +921,13 @@ inline op if(i, ic) {
 
 inline op if(n, ic) {
   if ($1 != 0.0) {
+    goto OFFSET($2);
+  }
+  goto NEXT();
+}
+
+op if (s, ic) {
+  if (string_bool(interpreter, $1)) {
     goto OFFSET($2);
   }
   goto NEXT();
