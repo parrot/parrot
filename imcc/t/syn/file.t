@@ -355,6 +355,7 @@ OUT
 .end
 END_PIR
     close FOO;
+    local *OLDERR;
     open OLDERR, ">&STDERR" or die "Can't save STDERR\n";
     open STDERR, ">temp.out" or die "Can't write temp.out\n";
     system "$PARROT temp.imc";
