@@ -17,7 +17,7 @@ build_tools/build_nativecall.pl - Build up the native call routines
 This script creates the Native Call Interface file F<src/nci.c>. It
 parses a file of function signatures of the form:
 
-    <return-type-specifier><whitespace><parameter-type-specifiers> 
+    <return-type-specifier><whitespace><parameter-type-specifiers>
     ...
 
 The types specifiers are documented in F<src/call_list.txt>.
@@ -173,13 +173,19 @@ print NCI <<'HEAD';
  */
 #include "parrot/parrot.h"
 
+/*
+ * if the architecture can build some or all of these signatures
+ * enable the define below
+ * - the JITed function will be called first
+ * - if it returns NULL, the hardcoded version will do the job
+ */
+
 #if defined(HAS_JIT) && defined(I386)
 #  include "parrot/exec.h"
 #  include "parrot/jit.h"
 #  define CAN_BUILD_CALL_FRAMES
 #endif
 
-#if !defined(CAN_BUILD_CALL_FRAMES)
 /* All our static functions that call in various ways. Yes, terribly
    hackish, but that's just fine */
 
@@ -227,7 +233,7 @@ while (<>) {
 $icky_global_bit = join("\n", @icky_global_variable);
 
 print NCI <<TAIL;
-#endif
+
 
 /* This function serves a single purpose. It takes the function
    signature for a C function we want to call and returns a pointer
@@ -236,16 +242,21 @@ void *
 build_call_func(struct Parrot_Interp *interpreter, PMC *pmc_nci,
                 STRING *signature)
 {
+    STRING *ns;
+    STRING *message;
+    char   *c;
+    void   *result = NULL;
 #if defined(CAN_BUILD_CALL_FRAMES)
-    /* This would be a good place to put the code that builds the
-       frames. Undoubtedly painfully platform-dependent */
 
-     return Parrot_jit_build_call_func(interpreter, pmc_nci, signature);
+    /* Try if JIT code can build that signature,
+     * if yes, we are done
+     */
 
-#else
-	STRING *ns;
-	STRING *message;
-	char   *c;
+     result = Parrot_jit_build_call_func(interpreter, pmc_nci, signature);
+
+#endif
+    if (result)
+        return result;
     /* And in here is the platform-independent way. Which is to say
        "here there be hacks" */
     UNUSED(pmc_nci);
@@ -268,7 +279,6 @@ build_call_func(struct Parrot_Interp *interpreter, PMC *pmc_nci,
     c = string_to_cstring(interpreter, message);
     PANIC(c);
     return NULL;
-#endif
 }
 
 TAIL
