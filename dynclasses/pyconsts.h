@@ -6,19 +6,20 @@
 
 /* Python class types */
 
-PYVAR_SCOPE INTVAL PyBuiltin_PyObject;
 PYVAR_SCOPE INTVAL PyBuiltin_PyBoolean;
 PYVAR_SCOPE INTVAL PyBuiltin_PyClass;
 PYVAR_SCOPE INTVAL PyBuiltin_PyComplex;
 PYVAR_SCOPE INTVAL PyBuiltin_PyDict;
 PYVAR_SCOPE INTVAL PyBuiltin_PyException;
+PYVAR_SCOPE INTVAL PyBuiltin_PyFloat;
+PYVAR_SCOPE INTVAL PyBuiltin_PyGen;
 PYVAR_SCOPE INTVAL PyBuiltin_PyInt;
 PYVAR_SCOPE INTVAL PyBuiltin_PyIter;
-PYVAR_SCOPE INTVAL PyBuiltin_PyFloat;
 PYVAR_SCOPE INTVAL PyBuiltin_PyList;
 PYVAR_SCOPE INTVAL PyBuiltin_PyLong;
 PYVAR_SCOPE INTVAL PyBuiltin_PyNCI;
 PYVAR_SCOPE INTVAL PyBuiltin_PyNone;
+PYVAR_SCOPE INTVAL PyBuiltin_PyObject;
 PYVAR_SCOPE INTVAL PyBuiltin_PyProxyClass;
 PYVAR_SCOPE INTVAL PyBuiltin_PyProxyType;
 PYVAR_SCOPE INTVAL PyBuiltin_PySlice;
@@ -50,11 +51,13 @@ PYVAR_SCOPE STRING *PyString_call;
 PYVAR_SCOPE STRING *PyString_class;
 PYVAR_SCOPE STRING *PyString_cmp;
 PYVAR_SCOPE STRING *PyString_hex;
+PYVAR_SCOPE STRING *PyString_hash;
 PYVAR_SCOPE STRING *PyString_init;
 PYVAR_SCOPE STRING *PyString_int;
 PYVAR_SCOPE STRING *PyString_iter;
 PYVAR_SCOPE STRING *PyString_name;
 PYVAR_SCOPE STRING *PyString_new;
+PYVAR_SCOPE STRING *PyString_next;
 PYVAR_SCOPE STRING *PyString_oct;
 PYVAR_SCOPE STRING *PyString_proxy;
 PYVAR_SCOPE STRING *PyString_repr;

@@ -53,6 +53,22 @@ pmclass PyInt extends PyObject dynpmc group python_group {
 
 /*
 
+=item C<PMC* clone()>
+
+Return a clone of the integer.
+
+=cut
+
+*/
+
+    PMC* clone () {
+        PMC* ret = pmc_new(INTERP, SELF->vtable->base_type);
+        PMC_int_val(ret) = PMC_int_val(SELF);
+        return ret;
+    }
+
+/*
+
 =item C<PMC* "__hex__"(PMC *self)>
 
 Returns the hex representation of C<self>.

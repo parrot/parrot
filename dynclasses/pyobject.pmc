@@ -205,6 +205,23 @@ Floor divides C<self> by C<*value> and returns the result.
 
 /*
 
+=item C<PMC* "__hash__"(PMC *self)>
+
+Returns the hash value of C<self>.
+
+=cut
+
+*/
+
+    METHOD PMC* __hash__(PMC *self) {
+        PMC * ret = pmc_new(INTERP, PyBuiltin_PyInt);
+        INTVAL value = VTABLE_hash(INTERP, self);
+        VTABLE_set_integer_native(INTERP, ret, value);
+        return ret;
+    }
+
+/*
+
 =item C<PMC* "__int__"(PMC *self)>
 
 Returns the integer value of C<self>.

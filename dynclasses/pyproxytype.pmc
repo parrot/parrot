@@ -108,10 +108,11 @@ initializers with arguments to be run.
             object = pmc_new(INTERP, object_class->vtable->base_type);
         }
 
-        if (object_class == SELF)
-            proxy = object;
-        else {
-            proxy = pmc_new(interpreter, PyBuiltin_PyClass);
+        proxy = object;
+
+        if (object_class != SELF) {
+            object = VTABLE_clone(interpreter, proxy);
+            pmc_reuse(INTERP, proxy, PyBuiltin_PyClass, 0);
             VTABLE_setprop(INTERP, proxy, PyString_class, REG_PMC(0));
             VTABLE_setprop(INTERP, proxy, PyString_proxy, object);
         }

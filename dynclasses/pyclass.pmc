@@ -256,12 +256,22 @@ Return an iterator for this object.
 */
 
     PMC* get_iter() {
-        PMC *iter = VTABLE_find_method(INTERP, SELF, PyString_iter);
+        PMC *gen, *iter, *next;
+        iter = VTABLE_find_method(INTERP, SELF, PyString_iter);
         if (!iter || !VTABLE_defined(INTERP, iter))
            real_exception(INTERP, NULL, E_TypeError,
                    "TypeError: iteration over non-sequence");
-        return Parrot_PyClass_run_meth_fromc_P(INTERP, iter, SELF,
+        iter = Parrot_PyClass_run_meth_fromc_P(INTERP, iter, SELF,
              PyString_iter);
+        next = VTABLE_find_method(INTERP, iter, PyString_next);
+
+        if (PObj_get_FLAGS(next) & SUB_FLAG_GENERATOR)
+            return iter;
+        else {
+            gen = pmc_new(INTERP, PyBuiltin_PyGen);
+            VTABLE_set_pmc(INTERP, gen, iter);
+            return gen;
+        }
     }
 
 /*
@@ -322,6 +332,29 @@ Return the object in string form.
         }
         else {
             return VTABLE_get_repr(INTERP, SELF);
+        }
+    }
+
+/*
+
+=item C<INTVAL hash()>
+
+Returns a unique hash for this value
+
+=cut
+
+*/
+
+    INTVAL hash () {
+        PMC *hash_method = VTABLE_find_method(INTERP, SELF, PyString_hash);
+        if (hash_method) {
+            PMC *ret;
+            ret = Parrot_PyClass_run_meth_fromc_P(INTERP, hash_method, SELF,
+                PyString_hash);
+            return VTABLE_get_integer(INTERP, ret);
+        }
+        else {
+            return (INTVAL)SELF;
         }
     }
 

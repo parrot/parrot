@@ -19,11 +19,28 @@ These are the vtable functions for the Python Generator class
 */
 
 #include "parrot/parrot.h"
+#include "pyconsts.h"
 
-static STRING *NEXT;
 static STRING *STOPITERATION;
 
-pmclass PyGen dynpmc group python_group {
+static PMC* PyGen_next(Parrot_Interp interpreter, PMC *self) {
+    PMC *ret;
+    PMC *iter = PMC_pmc_val(self);
+    PMC *next = VTABLE_find_method(interpreter, iter, PyString_next);
+    if (PObj_get_FLAGS(iter) & KEY_end_slice_FLAG) {
+        real_exception(interpreter, NULL, E_StopIteration, "StopIteration");
+    }
+
+    PObj_get_FLAGS(iter) |= KEY_end_slice_FLAG;
+    ret = Parrot_runops_fromc_args(interpreter, next, "PP", iter);
+    if (iter == ret)
+        /* XXX: runops ate my exception: presume StopIteration */
+        real_exception(interpreter, NULL, E_StopIteration, "StopIteration");
+    PObj_get_FLAGS(iter) &= ~KEY_end_slice_FLAG;
+    return ret;
+}
+
+pmclass PyGen dynpmc extends PyClass group python_group {
 
 /*
 
@@ -37,7 +54,6 @@ Class initialization.
 
     void class_init() {
         if (pass) {
-            NEXT = const_string(INTERP, "next");
             STOPITERATION = const_string(INTERP, "StopIteration");
         }
     }
@@ -55,7 +71,7 @@ Initializes the key.
     void init () {
         PObj_custom_mark_SET(SELF);
         PMC_struct_val(SELF) = NULL;
-        PMC_pmc_val(SELF) = NULL;
+        PMC_pmc_val(SELF) = SELF;
     }
 
 /*
@@ -77,29 +93,6 @@ Marks the hash as live.
 
 /*
 
-=item C<PMC *find_method(STRING *method_name)>
-
-Looks up the method for C<*method_name> and returns it. If no method is
-found then lookup an attribute by this name, and return it.  If all else
-fails, return null.
-
-=cut
-
-*/
-
-    PMC* find_method(STRING* method_name) {
-        PMC *method;
-
-        if (0 == string_compare(INTERP, method_name, NEXT))
-            return PMC_pmc_val(SELF);
-
-        method = SUPER(method_name);
-        if (!method) method = VTABLE_getprop(INTERP, SELF, method_name);
-        return method;
-    }
-
-/*
-
 =item C<INTVAL get_bool()>
 
 Returns true if there are more elements to return
@@ -116,13 +109,11 @@ Returns true if there are more elements to return
         new_internal_exception(INTERP);
         push_new_c_exception_handler(INTERP, INTERP->exceptions);
         if (!setjmp(INTERP->exceptions->destination)) {
-            PMC_struct_val(SELF) =
-                Parrot_runops_fromc_args(INTERP, PMC_pmc_val(SELF), "P");
+            PMC_struct_val(SELF) = PyGen_next(INTERP, SELF);
         } else {
-            PMC *exception = REG_PMC(5);
-            INTVAL extype = VTABLE_get_integer_keyed_int(INTERP, exception, 1);
-            if (extype != E_StopIteration) {
-                rethrow_exception(INTERP, REG_PMC(5));
+            Parrot_exception *exception = INTERP->exceptions;
+            if (exception->error != E_StopIteration) {
+                rethrow_c_exception(INTERP);
             }
         }
 
@@ -148,6 +139,22 @@ For now, return self.  TODO: revisit this.
 
 /*
 
+=item C<void setprop(STRING *key, PMC *value)>
+
+Sets the property for C<*key> to C<*value>.
+
+=cut
+
+*/
+
+    void setprop(STRING* key, PMC* value) {
+        if (0 == string_compare(INTERP, key, PyString_next))
+            PObj_get_FLAGS(value) |= SUB_FLAG_GENERATOR;
+        SUPER(key, value);
+    }
+
+/*
+
 =item C<void set_pmc(PMC *value)>
 
 Sets the value of the NEXT function.
@@ -158,7 +165,6 @@ Sets the value of the NEXT function.
 
     void set_pmc (PMC* value) {
         PMC_pmc_val(SELF) = value;
-        PObj_get_FLAGS(value) |= SUB_FLAG_GENERATOR;
     }
 
 /*
@@ -179,7 +185,7 @@ Returns the next yielded element.
             PMC_struct_val(SELF) = NULL;
         }
         else {
-            ret = Parrot_runops_fromc_args(INTERP, PMC_pmc_val(SELF), "P");
+            ret = PyGen_next(INTERP, SELF);
         }
 
         return ret;

@@ -88,6 +88,7 @@ they will be used frequently here.
             PyBuiltin_PyDict       = Parrot_PMC_typenum(INTERP, "PyDict");
             PyBuiltin_PyException  = Parrot_PMC_typenum(INTERP, "PyException");
             PyBuiltin_PyFloat      = Parrot_PMC_typenum(INTERP, "PyFloat");
+            PyBuiltin_PyGen        = Parrot_PMC_typenum(INTERP, "PyGen");
             PyBuiltin_PyInt        = Parrot_PMC_typenum(INTERP, "PyInt");
             PyBuiltin_PyIter       = Parrot_PMC_typenum(INTERP, "PyIter");
             PyBuiltin_PyList       = Parrot_PMC_typenum(INTERP, "PyList");
@@ -108,6 +109,7 @@ they will be used frequently here.
             PyString_call  = const_string(INTERP, "__call__");
             PyString_cmp   = const_string(INTERP, "__cmp__");
             PyString_hex   = const_string(INTERP, "__hex__");
+            PyString_hash  = const_string(INTERP, "__hash__");
             PyString_init  = const_string(INTERP, "__init__");
             PyString_int   = const_string(INTERP, "__int__");
             PyString_iter  = const_string(INTERP, "__iter__");
@@ -117,6 +119,8 @@ they will be used frequently here.
             PyString_proxy = const_string(INTERP, "__proxy__");
             PyString_repr  = const_string(INTERP, "__repr__");
             PyString_str   = const_string(INTERP, "__str__");
+
+            PyString_next  = const_string(INTERP, "next");
         }
     }
 
