@@ -175,7 +175,7 @@ PIO_stdio_close(theINTERP, ParrotIOLayer *layer, ParrotIO *io)
 }
 
 
-static INTVAL
+INTVAL
 PIO_stdio_isatty(PIOHANDLE fptr)
 {
     /* no obvious way to check for this with STDIO */
@@ -183,7 +183,7 @@ PIO_stdio_isatty(PIOHANDLE fptr)
 }
 
 
-static INTVAL
+INTVAL
 PIO_stdio_getblksize(PIOHANDLE fptr)
 {
     /* Hard coded for now */
@@ -191,10 +191,10 @@ PIO_stdio_getblksize(PIOHANDLE fptr)
 }
 
 
-static void
+static INTVAL
 PIO_stdio_flush(theINTERP, ParrotIOLayer *layer, ParrotIO *io)
 {
-    fflush(io->fd);
+    return fflush(io->fd);
 }
 
 
