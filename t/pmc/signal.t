@@ -33,12 +33,12 @@ else {
 }
 
 #
-# A SIGINT is sent to parrot from the alarm handler
+# A SIGHUP is sent to parrot from the alarm handler
 # This is a non-portable hack.
 
 my $pid;
 
-sub send_SIGINT {
+sub send_SIGHUP {
     $SIG{ALRM} = sub {
 	# get PID of parrot
 	my @ps = `ps -C parrot -o pid`;
@@ -48,8 +48,8 @@ sub send_SIGINT {
 	my $io_thread = pop @ps;
 	if ($io_thread =~ /^\s*(\d+)/) {
 	    $pid = $1;
-	    # send a SIGINT
-	    kill 'SIGINT', $pid;
+	    # send a
+	    kill 'SIGHUP', $pid;
 	}
 	else {
 	    die 'no pid found for parrot';
@@ -70,9 +70,9 @@ sub check_running {
     }
 }
 
-send_SIGINT;
+send_SIGHUP;
 
-output_is(<<'CODE', <<'OUTPUT', "SIGINT event - sleep");
+output_is(<<'CODE', <<'OUTPUT', "SIGHUP event - sleep");
     print "start\n"
     # no exception handler - parrot should die silently
     sleep 2
@@ -84,9 +84,9 @@ OUTPUT
 
 check_running;
 
-send_SIGINT;
+send_SIGHUP;
 
-output_is(<<'CODE', <<'OUTPUT', "SIGINT event - loop");
+output_is(<<'CODE', <<'OUTPUT', "SIGHUP event - loop");
     bounds 1 # no JIT
     print "start\n"
     # no exception handler - parrot should die silently
@@ -105,9 +105,9 @@ check_running;
 
 SKIP: {
   skip("works standalone but not in test", 2);
-send_SIGINT;
+send_SIGHUP;
 
-output_is(<<'CODE', <<'OUTPUT', "SIGINT event - sleep, catch");
+output_is(<<'CODE', <<'OUTPUT', "SIGHUP event - sleep, catch");
     newsub P20, .Exception_Handler, _handler
     set_eh P20
     print "start\n"
@@ -119,8 +119,8 @@ _handler:
     print "catched "
     set I0, P5["_type"]
     neg I0, I0
-    ne I0, .SIGINT, nok
-    print "SIGINT\n"
+    ne I0, .SIGHUP, nok
+    print "SIGHUP\n"
     end
 nok:
     print "something _type = "
@@ -131,7 +131,7 @@ nok:
 
 CODE
 start
-catched SIGINT
+catched SIGHUP
 OUTPUT
 
 check_running;

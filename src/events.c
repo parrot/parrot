@@ -84,12 +84,15 @@ static QUEUE* event_queue;
 #ifndef SIGINT
 #  define SIGINT -4711
 #endif
+#ifndef SIGHUP
+#  define SIGHUP -4712
+#endif
 
 /*
  * XXX need a configure test
  * should be sig_atomic_t
  */
-static int sig_int;
+static int sig_int, sig_hup;
 
 /*
  * a pipe is used to send messages to the IO thread
@@ -115,7 +118,7 @@ static int pipe_fds[2];
 
 Handle signal C<signum>.
 
-TODO - Only C<SIGINT> is handled at the moment.
+TODO - Only C<SIGHUP> is handled at the moment for testing
 
 =cut
 
@@ -126,6 +129,9 @@ sig_handler(int signum)
 {
     switch (signum) {
         case SIGINT:
+            sig_int = 1;
+            break;
+        case SIGHUP:
             sig_int = 1;
             break;
     }
@@ -196,7 +202,7 @@ Parrot_init_signals(void)
      * some don't, so we have to use direct checks if we are dividing
      * by zero
      */
-    Parrot_sigaction(SIGINT, sig_handler);
+    Parrot_sigaction(SIGHUP, sig_handler);
 }
 
 /*
@@ -565,6 +571,7 @@ Parrot_schedule_broadcast_qentry(QUEUE_ENTRY* entry)
              *
              */
             switch(event->u.signal) {
+                case SIGHUP:
                 case SIGINT:
                     if (n_interpreters) {
                         LOCK(interpreter_array_mutex);
@@ -635,7 +642,7 @@ io_thread(void *data)
      * all signals that we shall handle here have to be unblocked
      * in this and only in this thread
      */
-    Parrot_unblock_signal(SIGINT);
+    Parrot_unblock_signal(SIGHUP);
     while (running) {
         int retval = select(n_highest, &rfds, &wfds, NULL, NULL);
         switch (retval) {
@@ -649,6 +656,14 @@ io_thread(void *data)
                          * signal the event thread
                          */
                         schedule_signal_event(SIGINT);
+                    }
+                    if (sig_hup) {
+                        edebug((stderr, "int arrived\n"));
+                        sig_hup = 0;
+                        /*
+                         * signal the event thread
+                         */
+                        schedule_signal_event(SIGHUP);
                     }
 
                 }
@@ -1050,6 +1065,7 @@ event_to_exception(Parrot_Interp interpreter, parrot_event* event)
 
     switch (event->u.signal) {
         case SIGINT:
+        case SIGHUP:
             /*
              * SIGINT is silent, if no exception handler is
              * installed: set severity to EXCEPT_exit
