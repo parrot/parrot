@@ -111,6 +111,7 @@ sub import {
 	    *{$caller . '::' . $_} = \&$_;
 	}
     } else {
+	shift;
 	foreach (@_) {
 	    *{$caller . '::' . $_} = \&$_;
 	}
