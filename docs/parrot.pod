@@ -36,6 +36,10 @@ your assembly programs.
 
 Describes what PMCs are and how they work.
 
+=item F<jit.pod>
+
+A brief description of Parrot's Just-In-Time compiler.
+
 =item F<parrotbyte.pod>
 
 The Parrot bytecode format.
