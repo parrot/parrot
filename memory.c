@@ -101,6 +101,7 @@ mem_setup_allocator(struct Parrot_Interp *interpreter)
     interpreter->arena_base = mem_sys_allocate(sizeof(struct Arenas));
     interpreter->arena_base->memory_pool = NULL;
     interpreter->arena_base->last_STRING_Arena = NULL;
+    interpreter->arena_base->last_PMC_Arena = NULL;
 
     /* Allocate a first default-sized block of memory */
     Parrot_alloc_new_block(interpreter, 0, 1);
@@ -114,6 +115,7 @@ mem_setup_allocator(struct Parrot_Interp *interpreter)
         BUFFER_live_FLAG;
     interpreter->arena_base->string_header_pool->pool_buffer.buflen = 1024;
     interpreter->arena_base->string_header_pool->entries_in_pool = 0;
+    
 
     /* Init the PMC header pool */
     interpreter->arena_base->pmc_pool =
@@ -123,6 +125,7 @@ mem_setup_allocator(struct Parrot_Interp *interpreter)
     interpreter->arena_base->pmc_pool->pool_buffer.flags = BUFFER_live_FLAG;
     interpreter->arena_base->pmc_pool->pool_buffer.buflen = 1024;
     interpreter->arena_base->pmc_pool->entries_in_pool = 0;
+    Parrot_new_pmc_header_arena(interpreter);
 }
 
 void *

@@ -56,6 +56,7 @@ struct Parrot_Interp {
     struct Stack_chunk_t *control_stack;/* Base of the flow control stack */
     struct Stash *perl_stash;           /* Pointer to the global variable
                                          * area */
+    struct Scratchpad *cur_pad;         /* The current scratchpad */
     struct Arenas *arena_base;          /* Pointer to this interpreter's 
                                          * arena */
     void *piodata;                      /* interpreter's IO system */

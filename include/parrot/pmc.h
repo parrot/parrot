@@ -38,10 +38,28 @@ struct PMC {
         DPOINTER *struct_val;
     } cache;
     SYNC *synchronize;
+    PMC *next_for_GC;         /* Yeah, the GC data should be out of
+                                 band, but that makes things really
+                                 slow when actually marking things for
+                                 the GC runs. Unfortunately putting
+                                 this here makes marking things clear
+                                 for the GC pre-run slow as well, as
+                                 we need to touch all the PMC
+                                 structs. (Though we will for flag
+                                 setting anyway) We can potentially
+                                 make this a pointer to the real GC
+                                 stuff, which'd merit an extra
+                                 dereference when setting, but let us
+                                 memset the actual GC data in a big
+                                 block */
 };
 
 /* PMC flag bits */
 
+
+/* Flag bit notes: When both the is_PMC_ptr and is_buffer_ptr flags
+   are set, we assume that data is pointing to a buffer of PMCs, and
+   will run through that buffer and mark all the PMCs in it as live */
 typedef enum {
     /* the first 8 bits are for private use by individual vtable
      * classes. It is suggested that you alias these within an individual
@@ -74,7 +92,11 @@ typedef enum {
     /* Are we live? */
     PMC_live_FLAG = 1 << 13,
     /* Are we on the free list */
-    PMC_on_free_list_FLAG = 1 << 14
+    PMC_on_free_list_FLAG = 1 << 14,
+    /* Our refcount */
+    PMC_refcount_field = 1 << 15 | 1 << 16,
+    /* Constant flag */
+    PMC_constant_FLAG = 1 << 17
 } PMC_flags;
 
 /* XXX add various bit test macros once we have need of them */

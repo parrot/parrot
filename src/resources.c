@@ -45,21 +45,13 @@ static void add_pmc_to_free(struct Parrot_Interp *interpreter,
 }
 
 
-/* We have no more headers on the free header pool. Go allocate more
-   and put them on */
-static void alloc_more_pmc_headers(struct Parrot_Interp *interpreter) {
+/* Just go and get more headers unconditionally */
+void
+Parrot_new_pmc_header_arena(struct Parrot_Interp *interpreter) {
   struct PMC_Arena *new_arena, *old_arena;
   PMC *cur_pmc;
   int i;
 
-  /* First, try and find some unused headers */
-  Parrot_do_dod_run(interpreter);
-
-  /* If we found some, then bail as we don't need to do anything */
-  if (interpreter->arena_base->pmc_pool->entries_in_pool) {
-    return;
-  }
-  
   new_arena = mem_sys_allocate(sizeof(struct PMC_Arena));
   new_arena->GC_data = mem_sys_allocate(sizeof(PMC *) * PMC_HEADERS_PER_ALLOC);
   memset(new_arena->GC_data, 0, sizeof(PMC *) * PMC_HEADERS_PER_ALLOC);
@@ -91,6 +83,25 @@ static void alloc_more_pmc_headers(struct Parrot_Interp *interpreter) {
 		    interpreter->arena_base->pmc_pool,
 		    cur_pmc++);
   }
+}
+
+/* We have no more headers on the free header pool. Go allocate more
+   and put them on */
+static void alloc_more_pmc_headers(struct Parrot_Interp *interpreter) {
+  struct PMC_Arena *new_arena, *old_arena;
+  PMC *cur_pmc;
+  int i;
+
+  /* First, try and find some unused headers */
+  Parrot_do_dod_run(interpreter);
+
+  /* If we found some, then bail as we don't need to do anything */
+  if (interpreter->arena_base->pmc_pool->entries_in_pool) {
+    return;
+  }
+
+  /* We didn't find any, so go get more */
+  Parrot_new_pmc_header_arena(interpreter);
 }
 
 PMC *new_pmc_header(struct Parrot_Interp *interpreter) {
@@ -179,13 +190,26 @@ static void add_header_to_free(struct Parrot_Interp *interpreter,
 
 /* Mark all the PMCs as not in use.
 
-   Not implemented yet
-
 */
 static void
 mark_PMCs_unused(struct Parrot_Interp *interpreter) {
+  struct PMC_Arena *cur_arena;
+  UINTVAL i;
 
-  return;
+  /* Run through all the buffer header pools and mark */
+  for (cur_arena = interpreter->arena_base->last_PMC_Arena;
+       NULL != cur_arena;
+       cur_arena = cur_arena->prev) {
+    PMC *pmc_array = cur_arena->start_PMC;
+    for (i = 0; i < cur_arena->used; i++) {
+      /* Tentatively unused, unless it's a constant */
+      if (!(pmc_array[i].flags & PMC_constant_FLAG)) {
+	pmc_array[i].flags &= ~PMC_live_FLAG;
+      }
+      /* But the GC pointer's NULLed anyway */
+      pmc_array[i].next_for_GC = NULL;
+    }
+  }
 }
 
 /* Mark all the buffers as unused */
@@ -208,14 +232,110 @@ mark_buffers_unused(struct Parrot_Interp *interpreter) {
   }
 }
 
-/* Do a full trace run and mark all the PMCs as active if they are
+static PMC *
+mark_used(PMC *used_pmc, PMC *current_end_of_list) {
 
-   Not implemented yet
+    /* If the PMC we've been handed has already been marked as live
+       (ie we put it on the list already) we just return. Otherwise we
+       could get in some nasty loops */
+    if (used_pmc->next_for_GC) {
+        return current_end_of_list;
+    }
 
-*/
+    /* First, mark the PMC itself as used */
+    used_pmc->flags |= PMC_live_FLAG;
+
+    /* Now put it on the end of the list */
+    current_end_of_list->next_for_GC = used_pmc;
+
+    /* return the PMC we were passed as the new end of the list */
+    return used_pmc;
+}
+
+/* Do a full trace run and mark all the PMCs as active if they are */
 static void
 trace_active_PMCs(struct Parrot_Interp *interpreter) {
-  return;
+    PMC *last, *current; /* Pointers to the last marked PMC and the
+                            currently being processed PMC. */
+    unsigned int i, j, chunks_traced;
+    struct Stack_chunk_t *cur_stack, *start_stack;
+    struct PRegChunk *cur_chunk;
+    /* We have to start somewhere, and the global stash is a good
+       place */
+    last = current = interpreter->perl_stash->stash_hash;;
+    /* mark it as used and get an updated end of list */
+    last = mark_used(current, last);
+
+    /* Wipe out the next for gc bit, otherwise we'll never get anywhere */
+    last->next_for_GC = NULL;
+    
+    /* Now, go run through the PMC registers and mark them as live */
+    /* First mark the current set. */
+    for (i=0; i < NUM_REGISTERS; i++) {
+        if (interpreter->pmc_reg.registers[i]) {
+            last = mark_used(interpreter->pmc_reg.registers[i], last);
+        }
+    }
+
+    /* Now walk the pmc stack */
+    for (cur_chunk = interpreter->pmc_reg_top; cur_chunk;
+         cur_chunk = cur_chunk->prev) {
+        for (j = 0; j < cur_chunk->used; j++) {
+            for (i=0; i < NUM_REGISTERS; i++) {
+                if(cur_chunk->PReg[j].registers[i]) {
+                    last =mark_used(cur_chunk->PReg[j].registers[i], last);
+                }
+            }
+        }
+    }
+    
+    /* Finally the general stack */
+    start_stack = cur_stack = interpreter->user_stack;
+    chunks_traced = 0;
+    /* The general stack's circular, so we need to be careful */
+    while(cur_stack && ((start_stack != cur_stack) || (chunks_traced == 0))) {
+        for (i = 0; i < STACK_CHUNK_DEPTH; i++) {
+            if (STACK_ENTRY_PMC == cur_stack->entry[i].flags) {
+                last = mark_used(cur_stack->entry[i].entry.pmc_val, last);
+            }
+        }
+        
+        chunks_traced++;
+        cur_stack = cur_stack->prev;
+    }
+
+
+    /* Okay, we've marked the whole root set, and should have a
+       good-sized list 'o things to look at. Run through it */
+    for (; current; current = current->next_for_GC) {
+        UINTVAL mask = PMC_is_PMC_ptr_FLAG | PMC_is_buffer_ptr_FLAG;
+        UINTVAL bits = current->flags & mask;
+
+        /* Start by checking if there's anything at all. This assumes
+           that the largest percentage of PMCs won't have anything in
+           their data pointer that we need to trace */
+        if (bits) {
+            if (bits == PMC_is_PMC_ptr_FLAG) {
+                last = mark_used(current->data, last);
+            }
+            else {
+                if (bits == PMC_is_buffer_ptr_FLAG) {
+                    buffer_lives(current->data);
+                }
+                else {
+                    /* The only thing left is "buffer of PMCs" */
+                    Buffer *trace_buf = current->data;
+                    UINTVAL i;
+                    PMC **cur_pmc = trace_buf->bufstart;
+                    for (i = 0; i < trace_buf->buflen; i++) {
+                        if (cur_pmc[i]) {
+                            last = mark_used(cur_pmc[i], last);
+                        }
+                    }
+                }
+            }
+        }
+    }
 }
 
 /* Scan any buffers in S registers and other non-PMC places and mark
