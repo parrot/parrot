@@ -34,7 +34,7 @@ shift(@ARGV);
 
 use vars qw( @tokens @tokdsc);
 use vars qw( @syms @type );
-use vars qw( %labels );
+use vars qw( %labels $runtime_jump );
 
 
 tokenize();
@@ -64,7 +64,10 @@ foreach my $seg ("_main", "_basicmain", keys %code) {
 		}
 	}
 
-	print CODE @{$code{$seg}->{code}};
+	foreach(@{$code{$seg}->{code}}) {
+		s/#RTJ// if $runtime_jump;
+		print CODE $_;
+	}
 	print CODE "\trestoreall\n\tret\n";
 	if ($debug) {
 		print CODE<<'EOD';

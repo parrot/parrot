@@ -1,8 +1,111 @@
-10 PRINT "  ****************************"
-20 PRINT "  ** PROGRAMME D'ECHECS CSS **"
-30 PRINT "  ****************************"
-40 PRINT "     par Dieter Steinwender"
-50 PRINT
+' Chessboard.bas
+'  ###  /\  +  www WWW  +   /\ ###  p
+'  |R| {K  [B] (Q) |X| [B] {K  |R|  I
+'  === === === === === === === === ===
+sub rook(l1$,l2$,l3$)
+	l1$="###"
+	l2$="|R|"
+	l3$="==="
+end sub
+sub knight(l1$,l2$,l3$)
+	l1$=" /\\"
+	l2$="{K"
+	l3$="==="
+end sub
+sub bishop(l1$,l2$,l3$)
+	l1$=" + "
+	l2$="[B]"
+	l3$="==="
+end sub
+sub queen(l1$,l2$,l3$)
+	l1$="www"
+	l2$="(Q)"
+	l3$="==="
+end sub
+sub king(l1$,l2$,l3$)
+	l1$="WWW"
+	l2$="|X|"
+	l3$="==="
+end sub
+sub pawn(l1$,l2$,l3$)
+	l1$=" p "
+	l2$=" I "
+	l3$="==="
+end sub
+sub blank(l1$,l2$,l3$)
+	l1$="   "
+	l2$="   "
+	l3$="   "
+end sub
+sub piece(x,y,color)
+	call queen(one$, two$, three$) 
+	locate y*3+1, x*5+2
+	print one$
+	locate y*3+2, x*5+2
+	print two$
+	locate y*3+3, x*5+2
+	print three$
+end sub
+sub drawsquare(x,y,squarecolor,piece$)
+	if squarecolor=1 then background=4 else background=6
+	p$=left$(piece$, 1)
+	if p$="*" then foreground=15 else foreground=0
+	p$=right$(piece$,1)
+	if p$="." then call blank(one$, two$, three$)
+	if p$="P" then call pawn(one$, two$, three$)
+	if p$="T" then call rook(one$, two$, three$)
+	if p$="F" then call bishop(one$, two$, three$)
+	if p$="C" then call knight(one$, two$, three$)
+	if p$="D" then call queen(one$, two$, three$)
+	if p$="R" then call king(one$, two$, three$)
+
+	if y=0 then posx$=chr$(65+x) else posx$=" "
+	if x=0 then posy$=str$(8-y) else posy$=" "
+	locate y*3+1, x*5+1
+	color foreground, background
+	print " ";one$;
+	color 11, background
+	print posx$;
+	color foreground, background
+	locate y*3+2, x*5+1
+	print " ";two$;" ";
+	locate y*3+3, x*5+1
+	color 11, background
+	print posy$;
+	color foreground, background
+	print three$;" ";
+end sub
+sub drawboard()
+	locate 0,0
+	c=0
+	piece$=".P"
+	for i = 0 to 7
+	for j = 0 to 7
+		call drawsquare( i, j, c mod 2, piece$ )
+		c=c+1
+	next j
+	c=c+1
+	next i
+end sub
+sub clearscreen(normalfore, normalback)
+	cls
+	color normalfore, normalback
+	for i=1 to 24
+	locate i, 41
+	print string$(38, " ");
+	next i
+	locate 23,42 
+	print "LV = Change Levels, NG = New Game";
+	locate 24,42 
+	print "Col/row for moves.  e.g. A2A3";
+end sub
+5  normalback=0
+   normalfore=14
+10 REM "  ****************************"
+20 REM "  ** PROGRAMME D'ECHECS CSS **"
+30 REM "  ****************************"
+40 REM "     par Dieter Steinwender"
+50 REM
 60 DEFINT A-L, N-Z
 70 DIM B(119), S(10, 4)
 71 DIM M(10), A$(10), U(10), F$(10)
@@ -11,7 +114,9 @@
 80 DIM O(15), OA(6), OE(6), L(6), Z(200, 6)
 90 DIM ZT(9, 8), BV(8), BL(2, 9), TL(2, 9)
 100 DIM T7(2), BA(2), KR(2), KL(2)
-200 RESTORE
+110 et = 0
+200 call clearscreen(normalfore, normalback)
+    RESTORE
 210 REM: initialisation
 270 FOR I = 0 TO 119
 280 B(I) = 100
@@ -70,9 +175,20 @@
 940 G1(0) = 1
 950 T0 = 1
 1800 T = 0
-2000 REM: coup du joueur
-2020 PRINT "   VOTRE COUP"; : INPUT E$
-2050 IF E$ <> "DE" THEN 2070
+2000 REM Process player commands
+     color normalfore, normalback
+     Gosub 4000
+     color normalfore, normalback
+     for i=12 to 20
+     	locate i, 42
+	print string$(29, " ");
+     next i
+2020 locate 12, 42
+     color normalfore, normalback
+     PRINT "   Your move"; : INPUT E$
+     locate 11, 42
+     print string$(25, " ");
+2050 IF E$ <> "NG" THEN 2070
 2060 GOTO 200
 2070 IF E$ <> "FI" THEN 2090
 2080 GOTO 15000
@@ -100,8 +216,9 @@
 2300 GOSUB 9600
 2310 PRINT "  OK"
 2320 GOTO 2000
-2330 IF E$ <> "PR" THEN 3000
-2340 PRINT "  PROFONDEUR D'ANALYSE="; T0;
+2330 IF E$ <> "LV" THEN 3000
+2340 locate 12, 42
+     PRINT "  Depth (1=Fast)="; T0;
 2350 INPUT T0
 2360 T0 = ABS(T0)
 2370 GOTO 2000
@@ -115,15 +232,20 @@
 3070 IF Z(Z1, 1) <> V1 THEN 3090
 3080 IF Z(Z1, 2) = N1 THEN 3120
 3090 NEXT Z1
-3100 PRINT "  COUP ILLEGAL"
+3100 Locate 11, 42
+     color 4,15
+     PRINT "Illegal Move!";
+     color 0,15
 3110 GOTO 2000
 3120 IF Z(Z1, 4) = 0 THEN 3170
 3140 IF RIGHT$(E$, 1) = "C" THEN Z1 = Z1 + 1
 3150 IF RIGHT$(E$, 1) = "F" THEN Z1 = Z1 + 2
 3160 IF RIGHT$(E$, 1) = "T" THEN Z1 = Z1 + 3
-3170 PRINT "  VOTRE COUP: ";
+3170 locate 3,42
+     PRINT "Your move was ";
 3180 GOSUB 6000			' Posting
 3190 GOSUB 9000			' Executing
+     GOSUB 4000			' Show board again
 3200 GOSUB 7000			' Generating moves
 3210 IF MT = 0 THEN 3300
 3220 GOSUB 9600			' Reprise?  Take it back?
@@ -132,24 +254,26 @@
 3500 REM: coup de l'ordinateur  ' Computer's move
 3520 GOSUB 8800			' Initilaize the move tree
 _STARTASM
- 	time I0
- 	print "Start time: "
- 	print I0
- 	print "\n"
+ 	time $I0
+	et=$I0
 _ENDASM
 3530 GOSUB 10000		' Seek?
 _STARTASM
- 	time I0
- 	print "End time: "
- 	print I0
- 	print "\n"
+	time $I0
+	$N0=$I0
+	et=$N0-et
 _ENDASM
 3540 IF Z2 = 0 THEN 3650
 3545 IF W = 1 THEN 3660		' Stalemate
 3550 IF W = -32766 THEN 3630	' Player wins?
 3560 Z1 = Z2
-3570 PRINT "  MON COUP: ";
+3570 color 10, normalback
+     locate 5,42
+     PRINT "My move is ";
 3580 GOSUB 6000			' Post computer's move
+     color 3, normalback
+     locate 6,42
+     print "Time "; et; " secs";
 3590 GOSUB 9000			' Execute it.
 3595 IF W = -2 THEN 3660
 3600 IF W < 32765 THEN 3670
@@ -158,33 +282,45 @@ _ENDASM
 3630 PRINT "  DAMNED, VOUS AVEZ GAGNE!"
 3640 GOTO 3670
 3650 IF T0 = 0 THEN 3670
-3660 PRINT "  PAT: PARTIE NULLE!"
-3670 PRINT "  VALEUR="; W; "  POSITIONS ANALYSEES="; C1
+3660 locate 6,42
+     PRINT "  PAT: PARTIE NULLE!"
+3670 locate 7,42
+     PRINT "Positions Analyzed="; C1
 3680 GOTO 2000
-4000 REM: affichage de la position
-4020 PRINT
+
+
+4000 REM Draw the board
+     sqc=0
+4020 REM
+     call drawboard
 4030 FOR I = 9 TO 2 STEP -1
-4040 PRINT "  "; I - 1; "  ";
+4040 ' PRINT "  "; I - 1; "  ";
 4050 FOR J = 1 TO 8
 4060 A1 = B(I * 10 + J)
 4070 F1 = SGN(A1)
 4080 A1 = ABS(A1)
-4090 PRINT F$(F1 + 1); A$(A1); "  ";
+     piece$=F$(F1+1) + A$(A1)
+     call drawsquare(j-1, 9-i, sqc mod 2, piece$)
+     sqc=sqc+1
+4090 ' PRINT F$(F1 + 1); A$(A1); "  ";
 4100 NEXT J
-4110 PRINT : PRINT
+     sqc=sqc+1
+4110 'PRINT : PRINT
 4120 NEXT I
-4140 PRINT "        ";
-4150 FOR J = 1 TO 8
-4160 PRINT CHR$(64 + J); "   ";
-4170 NEXT J
-4180 PRINT : PRINT
-4190 PRINT "   BILAN MATERIEL= "; M(T)
-4200 PRINT "   CASE E.P.     =  "; : GOSUB 6700
-4210 PRINT "   STATUT ROQUE  = "; S(T, 1); S(T, 2); S(T, 3); S(T, 4)
-4220 PRINT "   AU TOUR DE    = ";
-4230 IF F = 1 THEN PRINT " BLANC": GOTO 4250
-4240 PRINT " NOIR"
+4140 'PRINT "        ";
+     ' FOR J = 1 TO 8
+     ' PRINT CHR$(64 + J); "   ";
+     ' NEXT J
+4180 ' PRINT : PRINT
+4190 ' PRINT "   BILAN MATERIEL= "; M(T)
+4200 ' PRINT "   CASE E.P.     =  "; : GOSUB 6700
+4210 ' PRINT "   STATUT ROQUE  = "; S(T, 1); S(T, 2); S(T, 3); S(T, 4)
+4220 ' PRINT "   AU TOUR DE    = ";
+4230 ' IF F = 1 THEN PRINT " BLANC": GOTO 4250
+4240 ' PRINT " NOIR"
 4250 RETURN
+
+
 5000 REM: entree de la position
 5020 T = 0
 5030 PRINT "   VIDER L'ECHIQUIER(O/N) "
@@ -455,7 +591,10 @@ _ENDASM
 10200 W(T + 2) = W(T)
 10220 Z1 = P(T)
 10230 IF T <> 0 THEN 10250
-10240 GOSUB 6000
+10240 locate 14,42
+      color normalback, normalfore
+      print "Examining ";
+      GOSUB 6000
 10250 GOSUB 9000
 10260 C1 = C1 + 1
 10270 GOTO 10070
@@ -463,7 +602,9 @@ _ENDASM
 10300 W(T + 2) = -W(T + 3)
 10310 IF T > 0 THEN 10340
 10320 Z2 = P(T)
-10330 PRINT "  NOUVEAU MEILLEUR COUP "; "- VALEUR="; W(2)
+10330 locate 15,42
+      color normalback, normalfore
+      PRINT "  Better move "; "- value ="; W(2)
 10340 IF W(T + 2) >= -W(T + 1) THEN 10380
 10350 P(T) = P(T) + 1
 10360 IF P(T) < G1(T + 1) THEN 10220

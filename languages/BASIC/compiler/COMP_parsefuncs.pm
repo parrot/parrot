@@ -8,7 +8,7 @@ use vars qw( %arrays );
 use vars qw( $funcname $subname );
 use vars qw( %labels $branchseq @selects);
 use vars qw( @data $sourceline );
-use vars qw( %code $debug );
+use vars qw( %code $debug $runtime_jump);
 
 
 my @fors=();
@@ -219,7 +219,7 @@ ON
 		push @{$code{$seg}->{code}}, "\tne $result, $i.0, ON_${ons}_$i\n";
 		if ($branch eq "gosub") {
 			push @{$code{$seg}->{code}}, qq{\tbsr $labels{$jumps}\t# $branch $jumps\n};
-			push @{$code{$seg}->{code}}, qq{\tne S0, "", RUNTIME_JUMP\n};
+			push @{$code{$seg}->{code}}, qq{\t#RTJ ne S0, "", RUNTIME_JUMP\n};
 			push @{$code{$seg}->{code}}, qq{\tbranch ON_END_$ons\n};
 		} elsif ($branch eq "goto") {
 			push @{$code{$seg}->{code}}, qq{\tbranch $labels{$jumps}\t# $branch $jumps\n};
@@ -549,22 +549,25 @@ sub parse_restore {
 	push @{$code{$seg}->{code}}, "\tcall _RESTORE\n";
 }
 
+
 sub parse_exit {
 	if ($syms[NEXT] eq "for") {
 		feedme();
-		$foo=$fors[$scopes]->[-1];
-		print CODE "\tbranch AFTER_NEXT_$foo->{jump}\n";
+	  	$foo=$fors[$scopes]->[-1];
+		push @{$code{$seg}->{code}}, "\tbranch AFTER_NEXT_$foo->{num}\n";
 	} elsif ($syms[NEXT] eq "function") {
+		push @{$code{$seg}->{code}}, qq{\tbranch END_$seg\n};
 		feedme();
-		$_=english_func($funcname);
-		print CODE "\tbranch FUNC_EXIT_$_\n";
+		#$_=english_func($funcname);
+		#print CODE "\tbranch FUNC_EXIT_$_\n";
 	} elsif ($syms[NEXT] eq "sub") {
+		push @{$code{$seg}->{code}}, qq{\tbranch END_$seg\n};
 		feedme();
-		print CODE "\tbranch SUB_EXIT_$subname\n";
+		#print CODE "\tbranch SUB_EXIT_$subname\n";
 	} elsif ($syms[NEXT] eq "do") {
 		feedme();
 		$foo=$dos[-1];
-		print CODE "\tbranch AFTERDO_$foo->{jump}\n";
+		push @{$code{$seg}->{code}}, "\tbranch AFTERDO_$foo->{jump}\n";
 	} else {
 		die "Unknown EXIT type source line $sourceline";
 	}
@@ -803,7 +806,7 @@ sub parse_gosub {
 
 	push @{$code{$seg}->{code}}, <<GOSUB;	
 	bsr $labels{$syms[CURR]}\t# GOSUB $syms[CURR]
-	ne JUMPLABEL, "", RUNTIME_JUMP
+	#RTJ ne JUMPLABEL, "", RUNTIME_JUMP
 GOSUB
 }
 sub parse_return {
@@ -818,6 +821,10 @@ RETURN1
 	set JUMPLABEL, "$labels{$syms[CURR]}"  # Return $syms[CURR]
 	ret
 RETURN2
+		if (! $runtime_jump) {
+			warn "Note: RETURN x causes slow IMCC compilation\n";
+			$runtime_jump=1;
+		}
 	}
 }
 sub parse_loop {
@@ -1249,6 +1256,7 @@ sub parse_endfunc {
 	$seg=~s/^_//;       # Remove the _
 	$seg=~tr/A-Z/a-z/;  # lowercase
 	$seg=~s/userfunc_//;
+	push @{$code{$t}->{code}}, "END_$t:\n";
 	if (exists $code{$t}->{args}) {
 		foreach(@{$code{$t}->{args}}) {
 			push @{$code{$t}->{code}}, "\t.return $_\t# Returning arg\n";
@@ -1346,9 +1354,12 @@ RTJUMP:
 	# that are only discovered at runtime.
 RUNTIME_JUMP:
 RTB
-	foreach(sort keys %labels) {
-		push @{$code{$seg}->{code}}, qq|\teq JUMPLABEL, "$labels{$_}", $labels{$_}\n|;
+	if ($runtime_jump) {
+		foreach(sort keys %labels) {
+			push @{$code{$seg}->{code}}, qq|\teq JUMPLABEL, "$labels{$_}", $labels{$_}\n|;
+		}
 	}
+
 	push @{$code{$seg}->{code}}, <<RTBE;
 	print "Runtime branch of "
 	print JUMPLABEL

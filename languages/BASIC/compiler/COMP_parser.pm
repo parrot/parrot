@@ -8,7 +8,7 @@ use constant CURR => 1;
 use constant NEXT => 0;
 use subs qw(dumpq EXPRESSION);
 use Data::Dumper;
-use vars qw( %code $seg $debug );
+use vars qw( %code $seg $debug $runtime_jump );
 
 require "COMP_parsefuncs.pm";
 
@@ -77,6 +77,7 @@ sub parse {
 	if (%opts) {
 		print STDERR "Options: ", join(',', %opts), "\n";
 	}
+	$runtime_jump=0;
 	init;
 	runtime_init;
 	feedme;

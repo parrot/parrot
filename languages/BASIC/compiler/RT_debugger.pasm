@@ -1,4 +1,4 @@
-.sub _DEBUGGER_STOP	# void Debugger_stop(int line, PerlHash local_values)
+.sub _DEBUGGER_STOP_FOR_REAL	# void Debugger_stop(int line, PerlHash local_values)
 	saveall
 	.param int line
 	.param PerlHash locals

@@ -107,6 +107,8 @@ FLO_END:
 	restoreall
 	ret
 .end
+# INT - a math function that returns the largest integer less than
+#       or equal to a numeric-expression
 .sub _BUILTIN_INT   		# float int(float arg)
 	saveall
 	.param int argc
@@ -115,7 +117,9 @@ FLO_END:
 	.local int truncate
 	set truncate, arg
 	set res, truncate
-	.return res
+	ge arg, 0.0, ENDINT
+	dec res
+ENDINT:	.return res
 	restoreall
 	ret
 .end

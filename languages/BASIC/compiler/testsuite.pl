@@ -32,6 +32,99 @@ while(1) {
 }
 
 __DATA__
+' Evil BASIC bug, expect 55
+dim B(1), z(1)
+Z(54,6)=54
+B(54)=1
+Z1= 54
+Z(Z1,6)= 54
+B(Z(Z1,6))= 55
+print B(Z(Z1,6))
+
+
+' Comparison operator tests
+if 4<5 then print "Ok" else print "Wrong"
+if 5<5 then print "Wrong" else print "Ok"
+if 6<5 then print "Wrong" else print "OK"
+if 4<=5 then print "Ok" else print "Wrong"
+if 5<=5 then print "Ok" else print "Wrong"
+if 6<=5 then print "Wrong" else print "OK"
+if 4=5 then print "Wrong" else print "Ok"
+if 5=4 then print "Wrong" else print "Ok"
+if 5=5 then print "Ok" else print "Wrong"
+if 5>4 then print "Ok" else print "Wrong"
+if 5>5 then print "Wrong" else print "Ok"
+if 4>5 then print "Wrong" else print "OK"
+if 5>=4 then print "Ok" else print "Wrong"
+if 5>=5 then print "Ok" else print "Wrong"
+if 4>=5 then print "Wrong" else print "OK"
+
+' Exit for, count 1-3
+for i=1 to 5
+  if i=4 then exit for
+  print i
+next i
+
+' Branch test, all OK in sequence
+PRINT "1 in module-level code"
+GOSUB Sub1
+PRINT "ERR this line in main routine should be skipped"
+Label1:
+   PRINT "5 back in module-level code"
+   END
+Sub1:
+   PRINT "2 in subroutine one"
+   GOSUB Sub2
+   PRINT "ERR this line in subroutine one should be skipped"
+Label2:
+   PRINT "4 back in subroutine one"
+   RETURN Label1
+Sub2:
+   PRINT "3 in subroutine two"
+   RETURN Label2   'Cannot return from here to main
+                   'program - only to SUB1.
+' Exit tests
+sub mysub(b,c)
+	print "Print me"
+	exit sub
+	print "Don't print me"
+end sub
+function foo$
+	foo$="Right one"
+	exit function
+	foo$="Wrong one"
+end function
+call mysub( 78, 80)
+t$=foo$
+print t$
+t=0
+do
+	print "This is right"
+	exit do
+	print "This is wrong"
+	t=t+1
+loop until t>1
+
+' Mathmagic
+dim m(1), ba(1)
+fa=-1
+m0=48100
+m=48000
+w=-19
+t=3
+m(t)=-100
+ba(fa+1)=9
+w=w+M(T)+INT(M(T) * BA(FA + 1) / (BA(FA + 1) + 1) * (M0 - M) * .0001)
+print w
+
+' INT madness.  0, 0, 0, -1, -1, 3
+print int(.8),
+print int(.3),
+print int(0),
+print int(-.8),
+print int(-.3),
+print int(3.14)
+
 ' Simple subs, Made it here
 sub mysub()
 	print "Made it here"
@@ -47,7 +140,6 @@ t=2
 call twice t
 print t
 
-STOPPLEASE
 ' Passing arrays, twice, expect 12
 function aftwo(y())
 	print y(4)

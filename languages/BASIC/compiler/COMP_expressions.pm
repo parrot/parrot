@@ -4,7 +4,7 @@ use subs qw(fetchvar);
 use vars qw(@builtins @keywords);
 use strict;
 
-my $retcount;
+my $retcount=200;
 my $currentexpr;
 
 @builtins=qw( 	abs      	asc      	atn
@@ -508,22 +508,23 @@ sub generate_code {   # Will return a result register, or something.
 			next;
 		}
 		next if ($sym eq ",");  # Commas get ignored, args to stack
-
+		my($ac, @args, $extern);
 		if (isarray($sym) and $lhs) {
-			my($ac,@args)=pushargs(\@code, \$optype, \@work);
-			my $extern=$sym;
+			($ac,@args)=pushargs(\@code, \$optype, \@work);
+			$extern=$sym;
 			$optype=optype_of($extern);
+			goto NEST_ARRAY_ASSIGN if (@work); # Ugly, yeah sue me.
 			push @code, qq{\t.arg $ac\t\t\t# argc};
 			push @code, qq{\tINSERT NEW VALUE HERE};
 			push @code, qq{\t.arg "$extern$seg"\t\t# array name};
 			push @code, "\tcall _ARRAY_ASSIGN";
 			return("~Array", "$optype", @code);
 		} elsif (hasargs($sym)) {
-			my($ac,@args)=pushargs(\@code, \$optype, \@work);
-			my $extern=$sym;
+			($ac,@args)=pushargs(\@code, \$optype, \@work);
+			$extern=$sym;
 			$optype=optype_of($extern);
 			if (isarray($sym)) {
-				push @code, qq{\t.arg $ac\t\t\t# argc};
+NEST_ARRAY_ASSIGN:		push @code, qq{\t.arg $ac\t\t\t# argc};
 				push @code, qq{\t.arg "$extern$seg"\t\t# array name};
 				push @code, "\tcall _ARRAY_LOOKUP_$optype";
 				if ($ac == 0) {
@@ -596,11 +597,13 @@ sub build_assignment {
 
 	if ($left =~ /^\w+$/) {
 		if ($left =~ /(_percent|_amp)$/) {
+			my $ti="\$I" . ++$retcount;
+			my $tn="\$N" . ++$retcount;
 			@ass=(
 				@$rightexpr,
-				"\tset \$I0, $right\t# Truncate",
-				"\tset \$N0, \$I0",
-				"\t$left = \$N0",
+				"\tset $ti, $right\t# Truncate",
+				"\tset $tn, $ti",
+				"\t$left = $tn",
 			);
 		} else {
 			# Simple a=expr case.
@@ -627,8 +630,8 @@ sub EXPRESSION {
 	%opts=%{$_[0]} if @_;
 	my(@expr, @stream, @left, $whole);
 	my($assignto, $result);
-	$retcount=0;
 	$whole="";
+	$retcount=0;
 	my $type="";
 
 	if ($opts{assign}) {
