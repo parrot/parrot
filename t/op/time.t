@@ -28,7 +28,7 @@ OUTPUT
 output_is(<<'CODE', <<'OUTPUT', "time_n");
 	time	N0
 	time	N1
-	ge	N0, 0, OK1
+	ge	N0, 0.0, OK1
 	branch	FAIL
 OK1:	print "ok, (!= 1970) Grateful Dead not\n"
 	ge	N1, N0, OK2

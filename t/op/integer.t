@@ -340,7 +340,6 @@ OUTPUT
 output_is(<<CODE, <<OUTPUT, "cmod_i");
 	set	I0, 5
 	set	I1, 3
-#	cmod_i	I2, I0, I1
 	cmod	I2, I0, I1
 	print	I2
 	print	"\\n"

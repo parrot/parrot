@@ -4,7 +4,7 @@ use Parrot::Test tests => 10;
 use Test::More;
 
 output_is(<<'CODE', <<OUTPUT, "simple set / get");
-	new P0, PerlHash
+	new P0, .PerlHash
 	set S0, "one"
 	set S1, "two"
 
@@ -25,11 +25,11 @@ CODE
 OUTPUT
 
 output_is(<<'CODE', <<OUTPUT, "more than one PerlHash");
-	new P0, PerlHash
+	new P0, .PerlHash
 	set S0, "key"
 	set_keyed P0, S0, 1
 		
-        new P1, PerlHash
+        new P1, .PerlHash
         set S1, "another_key"
         set_keyed P1, S1, 2
 
@@ -47,7 +47,7 @@ CODE
 OUTPUT
 
 output_is(<<'CODE', <<OUTPUT, "hash keys with nulls in them");
-	new P0, PerlHash
+	new P0, .PerlHash
 	set S0, "parp\0me"
 	set S1, "parp\0you"
 
@@ -68,7 +68,7 @@ CODE
 OUTPUT
 
 output_is(<<'CODE', <<OUTPUT, "nearly the same hash keys");
-	new P0, PerlHash
+	new P0, .PerlHash
 	set S0, "a\0"
 	set S1, "\0a"
 
@@ -90,7 +90,7 @@ CODE
 OUTPUT
 
 output_is(<<'CODE', <<OUTPUT, "The same hash keys");
-	new P0, PerlHash
+	new P0, .PerlHash
 	set S0, "Happy"
 	set S1, "Happy"
 
@@ -112,7 +112,7 @@ CODE
 OUTPUT
 
 output_is(<<'CODE', <<OUTPUT, "size of the hash");
-	new P0, PerlHash
+	new P0, .PerlHash
 	
 	set_keyed P0, 0, 1
 	set I0, P0
@@ -141,7 +141,7 @@ OUTPUT
 # the current algorithm; if the algorithm changes, change the test!
 
 output_is(<<'CODE', <<OUTPUT, "key that hashes to zero");
-        new P0, PerlHash
+        new P0, .PerlHash
         set S0, "key2"
         set_keyed P0, S0, 1
         get_keyed I0, P0, S0
@@ -153,7 +153,7 @@ CODE
 OUTPUT
 
 output_is(<<CODE, <<OUTPUT, "Initial PerlHash tests");
-	new	P0, PerlHash
+	new	P0, .PerlHash
 
 	set_keyed	P0, "foo", -7
 	set_keyed	P0, "bar", 3.5
@@ -181,7 +181,7 @@ ok 3
 OUTPUT
 
 output_is(<<CODE, <<OUTPUT, "stress test: loop(set, check)");
-	new	P0, PerlHash
+	new	P0, .PerlHash
 
         set I0, 200
         set S0, "mikey"
@@ -253,7 +253,7 @@ OUTPUT
 
 # Check all values after setting all of them
 output_is(<<CODE, <<OUTPUT, "stress test: loop(set), loop(check)");
-	new	P0, PerlHash
+	new	P0, .PerlHash
 
         set I0, 200
         set S0, "mikey"

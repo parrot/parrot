@@ -4,7 +4,7 @@ use Parrot::Test tests => 1;
 use Test::More;
 
 output_is(<<'CODE', <<'OUTPUT', "Basic array tests");
-	new P0,Array
+	new P0,.Array
 
 	set I0,P0
 	eq I0,0,OK_1

@@ -7,21 +7,18 @@ output_is(<<CODE, <<OUTPUT, "if_i_ic");
 	set	I1, -2147483648
 	set	I2, 0
 
-#	if_i_ic	I0, ONE
 	if      I0, ONE
         branch  ERROR
 	print	"bad\\n"
 
 ONE:
 	print	"ok 1\\n"
-#	if_i_ic	I1, TWO
 	if      I1, TWO
         branch ERROR
 	print	"bad\\n"
 
 TWO:
 	print	"ok 2\\n"
-#	if_i_ic	I2, ERROR
 	if      I2, ERROR
         branch  THREE
 	print	"bad\\n"
@@ -103,14 +100,12 @@ output_is(<<CODE, <<OUTPUT, "unless_i_ic");
 	set	I0, 0
 	set	I1, -2147483648
 
-#	unless_i_ic	I0, ONE
 	unless	I0, ONE
         branch  ERROR
 	print	"bad\\n"
 
 ONE:
 	print	"ok 1\\n"
-#	unless_i_ic	I1, ERROR
 	unless	I1, ERROR
         branch TWO
 	print	"bad\\n"

@@ -4,7 +4,7 @@ use Parrot::Test tests => 6;
 use Test::More;
 
 output_is(<<'CODE', <<'OUTPUT', "size of the array");
-	new P0,PerlArray
+	new P0,.PerlArray
         set P0,0
         set I0,P0
         print I0
@@ -28,7 +28,7 @@ CODE
 OUTPUT
 
 output_is(<<'CODE', <<'OUTPUT', "set/get by index");
-        new P0,PerlArray
+        new P0,.PerlArray
 	set_keyed P0,0,3       # set P0[0], 3
 	get_keyed I1,P0,0      # set I1, P0[0]
 	print I1
@@ -47,7 +47,7 @@ output_is(<<'CODE', <<'OUTPUT', "set/get by index");
 	print "\n"
 
         set P0, 4
-        new P1, PerlInt
+        new P1, .PerlInt
         set P1, 42
 	set_keyed P0,3,P1      # set P0[3], P1
 	get_keyed P2,P0,3      # set S1, P0[3]
@@ -63,7 +63,7 @@ hey
 OUTPUT
 
 output_is(<<'CODE', <<'OUTPUT', "same, but with implicit resizing");
-        new P0,PerlArray
+        new P0,.PerlArray
 	set_keyed P0,0,3       # set P0[0], 3
 	get_keyed I1,P0,0      # set I1, P0[0]
 	print I1
@@ -79,7 +79,7 @@ output_is(<<'CODE', <<'OUTPUT', "same, but with implicit resizing");
 	print S1
 	print "\n"
 
-        new P1, PerlInt
+        new P1, .PerlInt
         set P1, 42
 	set_keyed P0,3,P1      # set P0[3], P1
 	get_keyed P2,P0,3      # set S1, P0[3]
@@ -95,7 +95,7 @@ hey
 OUTPUT
 
 output_is(<<'CODE', <<'OUTPUT', "keys of different types");
-        new P0, PerlArray
+        new P0, .PerlArray
         set_keyed P0, 5.0, 3
         set I0, P0
         bsr PRINT
@@ -126,7 +126,7 @@ CODE
 OUTPUT
 
 output_is(<<'CODE', <<'OUTPUT', "If P");
-        new P0, PerlArray
+        new P0, .PerlArray
         if P0, TR
         print "false\n"
         branch NEXT   
@@ -138,7 +138,7 @@ NEXT:   set_keyed P0, 0, 1      # set P0[0], 1
         branch NEXT2
 TR2:    print "true\n"
 
-NEXT2:  new P1, PerlArray
+NEXT2:  new P1, .PerlArray
         set P1, 1
         if P1, TR3
         print "false\n"
@@ -160,7 +160,7 @@ false
 OUTPUT
 
 output_is(<<'CODE', <<'OUTPUT', "Negative and Positive array accesses");
-	new P0,PerlArray
+	new P0,.PerlArray
 
 	set I0,P0
 	eq I0,0,OK_1
