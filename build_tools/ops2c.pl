@@ -342,6 +342,8 @@ sub generate_switch {
   my $indent = "  " x $index;
 
   print SOURCE <<END_C;
+#ifndef PARROT_NO_GIANT_SWITCH
+
 ${indent}  switch (name[$index]) {
 END_C
 
@@ -363,5 +365,7 @@ ${indent}    default:
 ${indent}      return -1;
 ${indent}      break;
 ${indent}  }
+
+#endif
 END_C
 }
