@@ -65,7 +65,7 @@ To convert the generated foo.c file to a binary, do (on Unix only):
 
   make libparrot.a
   gcc -O3 -g -Iinclude -c foo.c -o foo.o
-  gcc -g -o foo foo.o -L. -lparrot -ldl
+  gcc -g -o foo foo.o -L. -lparrot -ldl -lm
   ./foo # Runs it
 
 =item B<make test>

@@ -123,6 +123,7 @@ debug.c
 debug.ops
 disassemble.c
 disassemble.pl
+docs/debug.pod
 docs/debugger.pod
 docs/dev/byteorder.dev
 docs/dev/dod.dev
