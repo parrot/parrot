@@ -61,7 +61,7 @@ string_make(struct Parrot_Interp *interpreter, const void *buffer,
     }
 
     /* Make it null terminate. This will simplify making a native string */
-    memset(s->bufstart+s->bufused,0,1);
+    memset((char *)s->bufstart+s->bufused,0,1);
 
     return s;
 }
@@ -145,10 +145,10 @@ string_transcode(struct Parrot_Interp *interpreter,
     STRING *dest;
     CHARTYPE_TRANSCODER transcoder1 = NULL;
     CHARTYPE_TRANSCODER transcoder2 = NULL;
-    void *srcstart;
-    void *srcend;
-    void *deststart;
-    void *destend;
+    char *srcstart;
+    char *srcend;
+    char *deststart;
+    char *destend;
 
     if (src->encoding == encoding && src->type == type) {
         return string_copy(interpreter, src);
@@ -185,7 +185,7 @@ string_transcode(struct Parrot_Interp *interpreter,
 
     dest->bufused = destend - deststart;
     dest->strlen = src->strlen;
-    memset(dest->bufstart+dest->bufused,0,1);
+    memset((char *)dest->bufstart+dest->bufused,0,1);
 
     if (dest_ptr) {
         *dest_ptr = dest;
@@ -226,7 +226,7 @@ string_concat(struct Parrot_Interp *interpreter, const STRING* a,
                             b->bufstart, b->bufused);
             result->strlen = a->strlen + b->strlen;
             result->bufused = a->bufused + b->bufused;
-            memset(result->bufstart+result->bufused,0,1);
+            memset((char *)result->bufstart+result->bufused,0,1);
         }
         else {
             return string_copy(interpreter, a);
@@ -289,8 +289,8 @@ string_repeat(struct Parrot_Interp *interpreter, const STRING* s, INTVAL num, ST
 STRING*
 string_substr(struct Parrot_Interp *interpreter, const STRING* src, INTVAL offset, INTVAL length, STRING** d) {
     STRING *dest;
-    void *substart;
-    void *subend;
+    char *substart;
+    char *subend;
     if (offset < 0) {
         offset = src->strlen + offset;
     }
@@ -311,7 +311,7 @@ string_substr(struct Parrot_Interp *interpreter, const STRING* src, INTVAL offse
     mem_sys_memcopy(dest->bufstart, substart, subend - substart);
     dest->bufused = subend - substart;
     dest->strlen = length;
-    memset(dest->bufstart+dest->bufused,0,1);
+    memset((char *)dest->bufstart+dest->bufused,0,1);
 
     if (d != NULL) {
         *d = dest;
@@ -324,8 +324,8 @@ string_substr(struct Parrot_Interp *interpreter, const STRING* src, INTVAL offse
  */
 STRING*
 string_chopn(STRING* s, INTVAL n) {
-    void *bufstart = s->bufstart;
-    void *bufend = bufstart + s->bufused;
+    char *bufstart = s->bufstart;
+    char *bufend = bufstart + s->bufused;
     if (n > s->strlen) {
         n = s->strlen;
     }
@@ -335,7 +335,7 @@ string_chopn(STRING* s, INTVAL n) {
     bufend = s->encoding->skip_backward(bufend, n);
     s->bufused = bufend - bufstart;
     s->strlen = s->strlen - n;
-    memset(s->bufstart+s->bufused,0,1);
+    memset((char *)s->bufstart+s->bufused,0,1);
     return s;
 }
 
@@ -345,10 +345,10 @@ string_chopn(STRING* s, INTVAL n) {
 INTVAL
 string_compare(struct Parrot_Interp *interpreter, const STRING* s1,
                const STRING* s2) {
-    void *s1start;
-    void *s1end;
-    void *s2start;
-    void *s2end;
+    char *s1start;
+    char *s1end;
+    char *s2start;
+    char *s2end;
     INTVAL cmp = 0;
 
     if (s1->type != s2->type || s1->encoding != s2->encoding) {
@@ -358,9 +358,9 @@ string_compare(struct Parrot_Interp *interpreter, const STRING* s1,
                               NULL);
     }
 
-    s1start = (void*)s1->bufstart;
+    s1start = s1->bufstart;
     s1end = s1start + s1->bufused;
-    s2start = (void*)s2->bufstart;
+    s2start = s2->bufstart;
     s2end = s2start + s2->bufused;
 
     while (cmp == 0 && s1start < s1end && s2start < s2end) {
@@ -419,8 +419,8 @@ INTVAL string_to_int (const STRING *s) {
     INTVAL i = 0;
 
     if (s) {
-        void *start = (void*)s->bufstart;
-        void *end = start + s->bufused;
+        char *start = s->bufstart;
+        char *end = start + s->bufused;
         int sign = 1;
         BOOLVAL in_number = 0;
 
@@ -457,15 +457,15 @@ FLOATVAL string_to_num (const STRING *s) {
     FLOATVAL f = 0.0;
 
     if (s) {
-        void *start = (void*)s->bufstart;
-        void *end = start + s->bufused;
+        char *start = s->bufstart;
+        char *end = start + s->bufused;
         int sign = 1;
         BOOLVAL seen_dot = 0;
         BOOLVAL seen_e = 0;
         int exp_sign = 0;
         BOOLVAL in_exp = 0;
         BOOLVAL in_number = 0;
-        INTVAL exponent = 0;
+        FLOATVAL exponent = 0;
         INTVAL fake_exponent = 0;
 
         while (start < end) {
@@ -530,7 +530,7 @@ FLOATVAL string_to_num (const STRING *s) {
 
         exponent = fake_exponent + exponent * exp_sign;
 
-        f = f * sign * pow(10, exponent); /* ugly, oh yeah */
+        f = f * sign * pow(10.0, exponent); /* ugly, oh yeah */
     }
 
     return f;
