@@ -5,6 +5,17 @@ use vars qw(@ISA @EXPORT_OK);
 @ISA=qw(Make::Dependency);
 @EXPORT_OK = qw(Link);
 
+my $flags = undef;
+my $command = "cc"; # XXX Platform-specific, don't know the other options.
+
+sub flags {
+  $flags = shift;
+}
+
+sub command {
+  $command  shift;
+}
+
 sub Link {
   my $class = 'Make::Link_Obj';
   my %args = @_;
@@ -34,10 +45,9 @@ sub Link {
 
 sub build {
   my ($self) = @_;
+  my $ldflags = defined $flags ? $flags : '';
 
-#  { action => "cc -o $self->{output} $self->{input}",
-#  };
-  { action => "cc -o $self->{output} ".join ' ',@{$self->{input}},
+  { action => "$link_command $ldflags -o $self->{output} ".join ' ',@{$self->{input}},
   };
 }
 
