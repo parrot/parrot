@@ -459,6 +459,8 @@ EOC
   my %defaulted;
   my $class_init_code = '';
 
+  my %methodbody;
+
   # start processing methods
   while ($classblock =~ s/($signature_re)//) {
      $lineno += count_newlines($1);
@@ -497,11 +499,12 @@ EOC
      # method name, and parameters make it extern in the .h file and
      # add the actual code for the .c file
      my $decl = "$type Parrot_${classname}_${methodname} (struct Parrot_Interp *interpreter, PMC* pmc$parameters)";
-     $OUT .= $decl;
      $HOUT .= "extern $decl;\n";
-     $OUT .= "\n#line $lineno \"$pmcfile\"\n   " unless $suppress_lines;
-     $OUT .= $methodblock;
-     $OUT .= "\n\n";
+
+     $methodbody{ $methodname } =
+		$decl .
+		( $suppress_lines ? '' : "\n#line $lineno \"$pmcfile\"\n   " ) .
+		$methodblock;
 
      $lineno += count_newlines($methodblock);
      # set the class block to the remaining code
@@ -513,7 +516,15 @@ EOC
   # necessary) after this insane line of code @methods will have the
   # correct function name for each of the methods listed in the
   # vtable.tbl file.
-  @methods = map { "Parrot_$methodloc->{$_->[1]}_$_->[1]" } @{$default};
+
+  @methods = ();
+  for (@$default)
+  {
+      my $methodname = $_->[1];
+      push @methods, "Parrot_$methodloc->{$methodname}_$methodname";
+      $OUT .= $methodbody{ $methodname } . "\n\n"
+          if exists $methodbody{ $methodname };
+  }
 
   # this collapses the array and makes sure the spacing is right for
   # the vtable
