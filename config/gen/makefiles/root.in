@@ -972,12 +972,10 @@ $(SRC_DIR)/exec_cpu.c : lib/Parrot/OpLib/core.pm $(INC_DIR)/jit_emit.h \
 # target files, instead of just the .flag files.
 
 $(IMCC_DIR)/imcc.y.flag $(IMCC_DIR)/imcparser.c $(IMCC_DIR)/imcparser.h : $(IMCC_DIR)/imcc.y
-	$(RM_F) $(IMCC_DIR)/imcparser.c
 	$(YACC) $(IMCC_DIR)/imcc.y -d -o $(IMCC_DIR)/imcparser.c
 	$(TOUCH) $(IMCC_DIR)/imcc.y.flag $(IMCC_DIR)/imcparser.c $(IMCC_DIR)/imcparser.h
 
 $(IMCC_DIR)/imcc.l.flag $(IMCC_DIR)/imclexer.c : $(IMCC_DIR)/imcc.l
-	$(RM_F) $(IMCC_DIR)/imclexer.c
 	$(LEX) -o$(IMCC_DIR)/imclexer.c $(IMCC_DIR)/imcc.l
 	$(TOUCH) $(IMCC_DIR)/imcc.l.flag $(IMCC_DIR)/imclexer.c
 
@@ -1034,7 +1032,7 @@ html-clean :
 
 dynclasses : dynclasses.dummy
 
-dynclasses.dummy : 
+dynclasses.dummy :
 	$(MAKE_C) dynclasses
 
 dynclasses-test :
