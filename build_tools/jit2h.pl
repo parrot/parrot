@@ -171,15 +171,9 @@ sub readjit($) {
                 $asm =~ s/&CONST/CONST/g;
                 # Use the macro
                 $asm =~ s/call_func\(\s*jit_info\s*,\s*\(void\*\)\s*(.*)\)/CALL("$1")/g;
-                # For every call to the interpreter a rellocation is in place.
-                $asm =~ s/interpreter/Parrot_exec_add_text_rellocation_reg(jit_info->objfile, jit_info->native_ptr, "interpre", 0, 0)/g;
                 # The ->u.(string|float) is unnecessary.
                 $asm =~ s/\)->u\.(\w+)/)/g;
                 $asm =~ s/CONST\((\d)\)\s*([><=!]=?)\s*CONST\((\d)\)/RCONST($1)->u.number $2 RCONST($3)->u.number/ if ($asm =~ /CONST.*CONST/);
-                $asm =~ s/(jit_emit_mov_([mr]i_ni).*)&jit_info->cur_op\[(\d)\]\);/$1(int)&jit_info->cur_op[$3] - (int)interpreter->code->cur_cs->base.data + jit_info->objfile->bytecode_header_size);\n\tParrot_exec_add_text_rellocation(jit_info->objfile, NULL, RTYPE_DATA, "program_code", 0);/g;
-                $asm =~ s/(\n(\s*)[^\n]*((rm|mr|mi|ri)_(ni|n|i))[^\n]*[INSP]REG[^\n]*)/$1\n$2Parrot_exec_add_text_rellocation(jit_info->objfile, NULL, RTYPE_COM, "interpre", 0);/g;
-                $asm =~ s/(\n(\s*)[^\n]*((rm|mr|mi|ri)_(ni|n|i))[^\n]*CONST[^\n]*)/$1\n$2Parrot_exec_add_text_rellocation(jit_info->objfile, NULL, RTYPE_DATA, "const_table", 0);/g;
-                $asm =~ s/(\\\n\s*Parrot_exec_add_text_rellocation[^\n]*)/$1\\/g;
                 $asm =~ s/(emitm_pushl_m[^\n]*CONST[^\n]*)/$1\\\n\tParrot_exec_add_text_rellocation(jit_info->objfile, NULL, RTYPE_DATA, "const_table", 0);/g;
                 $asm =~ s/jit_emit_end/exec_emit_end/;
             }
@@ -278,6 +272,11 @@ print JITCPU<<END_C;
 extern char **Parrot_exec_rel_addr;
 extern int Parrot_exec_rel_count;
 
+#define ROFFS_INT(x) REG_OFFS_INT(jit_info->cur_op[x])
+#define ROFFS_NUM(x) REG_OFFS_NUM(jit_info->cur_op[x])
+#define ROFFS_STR(x) REG_OFFS_STR(jit_info->cur_op[x])
+#define ROFFS_PMC(x) REG_OFFS_PMC(jit_info->cur_op[x])
+#
 END_C
 
 if ($jit_cpu) {
@@ -291,11 +290,6 @@ END_C
 }
 else {
     print JITCPU<<END_C;
-#define EXR(m, s) (int *)(offsetof(Interp, m) + s)
-#define IREG(i) EXR(int_reg.registers, jit_info->cur_op[i] * sizeof(INTVAL))
-#define NREG(i) EXR(num_reg.registers, jit_info->cur_op[i] * sizeof(FLOATVAL))
-#define PREG(i) EXR(pmc_reg.registers, jit_info->cur_op[i] * sizeof(PMC *))
-#define SREG(i) EXR(string_reg.registers, jit_info->cur_op[i] * sizeof(STRING *))
 #define CONST(i) (int *)(jit_info->cur_op[i] * sizeof(struct PackFile_Constant) + offsetof(struct PackFile_Constant, u))
 #define RCONST(i) interpreter->code->const_table->constants[jit_info->cur_op[i]]
 #define CALL(f) Parrot_exec_add_text_rellocation_func(jit_info->objfile, jit_info->native_ptr, f); \\
