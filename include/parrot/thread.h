@@ -15,7 +15,12 @@
 
 #include "parrot/parrot.h"
 
+#  define PARROT_HAS_THREADS 1
+
 #ifndef PARROT_SYNC_PRIMITIVES_DEFINED
+
+#  undef  PARROT_HAS_THREADS
+#  define PARROT_HAS_THREADS 0
 
 #  define LOCK(m)
 #  define UNLOCK(m)

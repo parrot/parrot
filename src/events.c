@@ -20,6 +20,7 @@
 
 /* forward def */
 static void* event_thread(void *data);
+static void* do_event(Parrot_Interp, parrot_event*, void*);
 
 /*
  * we have exactly one event_queue
@@ -132,6 +133,7 @@ Parrot_schedule_event(Parrot_Interp interpreter, parrot_event* ev)
     entry->data = ev;
     switch (ev->type) {
         case EVENT_TYPE_TIMER:
+        case EVENT_TYPE_SLEEP:
             entry->type = QUEUE_ENTRY_TYPE_TIMED_EVENT;
             insert_entry(event_queue, entry);
             break;
@@ -148,11 +150,11 @@ Parrot_schedule_event(Parrot_Interp interpreter, parrot_event* ev)
  */
 void
 Parrot_new_timer_event(Parrot_Interp interpreter, PMC* timer, FLOATVAL diff,
-        FLOATVAL interval, int repeat, PMC* sub)
+        FLOATVAL interval, int repeat, PMC* sub, parrot_event_type_enum typ)
 {
     parrot_event* ev = mem_sys_allocate(sizeof(parrot_event));
     FLOATVAL now = Parrot_floatval_time();
-    ev->type = EVENT_TYPE_TIMER;
+    ev->type = typ;
     ev->data = timer;
     ev->u.timer_event.abs_time = now + diff;
     ev->u.timer_event.interval = interval;
@@ -214,8 +216,11 @@ Parrot_kill_event_loop(void)
 void
 Parrot_schedule_interp_qentry(Parrot_Interp interpreter, QUEUE_ENTRY* entry)
 {
+    parrot_event* event;
     push_entry(interpreter->task_queue, entry);
-    enable_event_checking(interpreter);
+    event = entry->data;
+    if (event->type != EVENT_TYPE_SLEEP)
+        enable_event_checking(interpreter);
 }
 
 /*
@@ -347,6 +352,47 @@ out:
     return NULL;
 }
 
+static void*
+wait_for_wakeup(Parrot_Interp interpreter, void *next)
+{
+    QUEUE_ENTRY *entry;
+    parrot_event* event;
+    int sleeping = 1;
+
+    while (sleeping) {
+        entry = wait_for_entry(interpreter->task_queue);
+        event = (parrot_event* )entry->data;
+        if (event->type == EVENT_TYPE_SLEEP && event->data == next)
+            sleeping = 0;
+        next = do_event(interpreter, event, next);
+    }
+    return next;
+}
+
+/*
+ * goto sleep
+ */
+void*
+Parrot_sleep_on_event(Parrot_Interp interpreter, FLOATVAL t, void* next)
+{
+#if PARROT_HAS_THREADS
+
+    /*
+     * place the opcode_t* next arg in the event data, so that
+     * we can identify this event in wakeup
+     */
+    Parrot_new_timer_event(interpreter, (PMC*) next, t,
+			0, 0, NULL, EVENT_TYPE_SLEEP);
+    next = wait_for_wakeup(interpreter, next);
+#else
+    /*
+     * TODO check for nanosleep or such
+     */
+    Parrot_sleep((UINTVAL) t);
+#endif
+    return next;
+}
+
 /*
  * explicitely sync called by the check_event opcode from run loops
  */
@@ -355,6 +401,28 @@ Parrot_do_check_events(Parrot_Interp interpreter, void *next)
 {
     if (peek_entry(interpreter->task_queue))
         return Parrot_do_handle_events(interpreter, 0, next);
+    return next;
+}
+
+static void*
+do_event(Parrot_Interp interpreter, parrot_event* event, void *next)
+{
+    switch (event->type) {
+        case EVENT_TYPE_TERMINATE:
+            next = NULL;
+            break;
+        case EVENT_TYPE_TIMER:
+            /* run ops, save registers */
+            Parrot_runops_fromc_save(interpreter,
+                    event->u.timer_event.sub);
+            break;
+        case EVENT_TYPE_SLEEP:
+            break;
+        default:
+            fprintf(stderr, "Unhandled event type %d\n", event->type);
+            break;
+    }
+    mem_sys_free(event);
     return next;
 }
 
@@ -377,21 +445,7 @@ Parrot_do_handle_events(Parrot_Interp interpreter, int restore, void *next)
         entry = pop_entry(interpreter->task_queue);
         event = (parrot_event* )entry->data;
         mem_sys_free(entry);
-
-        switch (event->type) {
-            case EVENT_TYPE_TERMINATE:
-                next = NULL;
-                break;
-            case EVENT_TYPE_TIMER:
-                /* run ops, save registers */
-                Parrot_runops_fromc_save(interpreter,
-                        event->u.timer_event.sub);
-                break;
-            default:
-                fprintf(stderr, "Unhandled event type %d\n", event->type);
-                break;
-        }
-        mem_sys_free(event);
+        next = do_event(interpreter, event, next);
     }
     return next;
 }

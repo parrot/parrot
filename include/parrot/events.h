@@ -22,6 +22,7 @@ typedef enum {
     EVENT_TYPE_MSG,
     EVENT_TYPE_ASYNC_IO,
     EVENT_TYPE_TIMER,
+    EVENT_TYPE_SLEEP,
     EVENT_TYPE_TERMINATE,
     EVENT_TYPE_EVENT_TERMINATE,
     EVENT_TYPE_CLASS_CHANGED,
@@ -63,13 +64,15 @@ void Parrot_init_events(Parrot_Interp);
 void* Parrot_do_check_events(Parrot_Interp, void*);
 void* Parrot_do_handle_events(Parrot_Interp, int, void*);
 
-void Parrot_new_timer_event(Parrot_Interp, PMC*, FLOATVAL, FLOATVAL, int, PMC*);
+void Parrot_new_timer_event(Parrot_Interp, PMC*, FLOATVAL,
+        FLOATVAL, int, PMC*, parrot_event_type_enum);
 void Parrot_del_timer_event(Parrot_Interp, PMC* timer);
 void Parrot_new_terminate_event(Parrot_Interp);
 void disable_event_checking(Parrot_Interp);
 void enable_event_checking(Parrot_Interp);
 
 void Parrot_kill_event_loop(void);
+void* Parrot_sleep_on_event(Parrot_Interp, FLOATVAL t, void* next);
 
 #endif
 

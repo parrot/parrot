@@ -69,7 +69,7 @@ add_timer(Parrot_Interp interpreter, PMC *pmc)
     parrot_timer_event *t = pmc->cache.struct_val;
     if (!PMC_IS_NULL(t->sub))
 	Parrot_new_timer_event(interpreter, pmc, t->abs_time,
-			t->interval, t->repeat, t->sub);
+			t->interval, t->repeat, t->sub, EVENT_TYPE_TIMER);
 }
 
 static void

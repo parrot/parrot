@@ -1357,3 +1357,5 @@ floor_i_n       1329
 floor_i_nc      1330
 floor_n_n       1331
 floor_n_nc      1332
+sleep_n	1333
+sleep_nc	1334

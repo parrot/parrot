@@ -140,16 +140,30 @@ inline op sysinfo(out INT, in INT) {
 
 =item B<sleep>(in INT)
 
+=item B<sleep>(in NUM)
+
 Sleep for $1 seconds.
 
 =cut
 
 inline op sleep(in INT) {
+  opcode_t *next = expr NEXT();
   if ($1 < 0) {
-      internal_exception(NEG_SLEEP, "Cannot go back in time\n");
+      real_exception(interpreter, next, NEG_SLEEP,
+	"Cannot go back in time");
   }
-  Parrot_sleep((UINTVAL)$1);
-  goto NEXT();
+  next = Parrot_sleep_on_event(interpreter, (FLOATVAL) $1, next);
+  goto ADDRESS(next);
+}
+
+inline op sleep(in NUM) {
+  opcode_t *next = expr NEXT();
+  if ($1 < 0.0) {
+      real_exception(interpreter, next, NEG_SLEEP,
+	"Cannot go back in time");
+  }
+  next = Parrot_sleep_on_event(interpreter, $1, next);
+  goto ADDRESS(next);
 }
 
 ########################################

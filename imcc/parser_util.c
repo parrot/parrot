@@ -361,8 +361,10 @@ INS(struct Parrot_Interp *interpreter, IMC_Unit * unit, char *name, const char *
              */
             if (op_info->jump & PARROT_JUMP_RESTART)
                 ins->type = ITBRANCH;
-            else if (n && (r[n-1]->set == 'I' || r[n-1]->type == VTADDRESS) &&
-                    strcmp(name, "find_lex"))
+            else if (n && (r[n-1]->set == 'I' || r[n-1]->type == VTADDRESS)
+                    && strcmp(name, "find_lex")
+                    && strcmp(name, "sleep")
+                    )
                 ins->type = ITBRANCH | (1 << (n-1));
             else
                 ins->type = ITBRANCH;

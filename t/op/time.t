@@ -65,9 +65,10 @@ start
 done
 OUTPUT
 
-output_is(<<CODE, "Cannot go back in time\n", "sleep");
+output_like(<<CODE, <<OUT , "sleep");
 	sleep	-1
 	end
 CODE
+/Cannot go back in time/
+OUT
 
-1;
