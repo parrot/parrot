@@ -14,7 +14,7 @@ use Config;
 use File::Spec;
 use Getopt::Std;
 
-my $VERSION = "0.0.2";
+my $VERSION = "0.0.3";
 
 my %std_to = 
   ( bug => 'parrotbug@parrotcode.org',
@@ -315,9 +315,47 @@ sub init {
 # Query missing information in order to have a complete report.
 sub query_info {
     $subject = "" if trivial_subject( $subject );
-    query_subject()        unless $subject;
-    query_return_address() unless $from;
-    query_body()           unless $use_file || $body;
+    ask_for_subject()        unless $subject;
+    ask_for_alternative
+      ( "category", [ qw[ core docs install library utilities ] ],
+        "core" )             unless $category;
+    ask_for_alternative
+      ( "severity", [ qw[ critical high medium low wishlist none ] ],
+        "low" )              unless $severity;
+    ask_for_return_address() unless $from;
+    ask_for_body()           unless $use_file || $body;
+}
+
+
+#----
+# Prompt for alternatives from a set of choices.
+# Provide:
+#  - the name of alternative
+#  - the choices (array ref)
+#  - the default answer
+# Return the lowercased alternative chosen.
+# Die if more than 5 wrong answers.
+sub ask_for_alternative {
+    my ( $what, $choices, $default ) = @_;
+
+    print <<EOF;
+Please pick a $what from the following:
+  @{$choices}
+
+EOF
+
+    my $alt;
+    my $err = 0;
+    do {
+        die "Invalid $name: aborting.\n" if $err++ > 5;
+        print "Please enter a $what [$default]: ";
+        $alt = <>;
+        chomp $alt;
+        $alt = $default if $alt =~ /^\s*$/;
+    } until ( ($alt) = grep /^$alt/i, @$choices );
+
+    print "\n\n\n";
+    return lc $alt;
 }
 
 
@@ -338,7 +376,7 @@ versions are relevant.
 EOF
 
     # Prompt for editor to use if none supplied.
-    query_editor(<<EOF) unless $opt_e;
+    ask_for_editor(<<EOF) unless $opt_e;
 You will probably want to use an editor to enter the report. If the
 default editor proposed below is the editor you want to use, then just
 press the 'Enter' key, otherwise type in the name of the editor you
