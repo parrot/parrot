@@ -4,7 +4,6 @@
 #
 # $expect below is currently:
 # - 3 stdio handles
-# - 2 chartype/encoding init
 # - 1 summary line
 
 cleanup() {
@@ -16,7 +15,7 @@ trap cleanup 1 2 3
 mv parrot parrot.orig
 echo "run-yamd -l2 -f -n ./parrot.orig  \$@ 2>&1 | perl -ne'
 	BEGIN { undef $/; $|=1; };
-	my \$expect = 6;
+	my \$expect = 3 + 1;
 	my \$found = 0;
 	my \$err = 0;
 	print \$1 if (/\*{9,9}\n(.*?)\*{9,9}/s);

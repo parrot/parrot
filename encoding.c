@@ -31,6 +31,12 @@ encoding_init()
     encoding_array[enum_encoding_utf32] = &utf32_encoding;
 }
 
+void
+encoding_destroy()
+{
+    mem_sys_free(encoding_array);
+}
+
 const ENCODING *
 encoding_lookup(const char *name)
 {
@@ -52,7 +58,7 @@ encoding_lookup_index(INTVAL n)
 }
 
 INTVAL
-encoding_find_encoding(const char *name) 
+encoding_find_encoding(const char *name)
 {
     const ENCODING *enc = encoding_lookup(name);
     if (enc)

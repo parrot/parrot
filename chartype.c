@@ -12,7 +12,7 @@
 
 #include "parrot/parrot.h"
 
-/* 
+/*
  * Unicode mapping table
  */
 struct chartype_unicode_map_t {
@@ -61,6 +61,12 @@ chartype_init()
     chartype_register(&usascii_chartype);
 }
 
+void
+chartype_destroy()
+{
+    mem_sys_free(chartype_array);
+}
+
 static char *
 malloc_and_strcpy(const char *in)
 {
@@ -82,7 +88,7 @@ chartype_to_unicode_cparray(const CHARTYPE *from, const CHARTYPE *to, UINTVAL c)
 }
 
 static UINTVAL
-chartype_from_unicode_cparray(const CHARTYPE *from, const CHARTYPE *to, 
+chartype_from_unicode_cparray(const CHARTYPE *from, const CHARTYPE *to,
                               UINTVAL c)
 {
     const struct chartype_unicode_map_t *map = to->unicode_map;
@@ -95,7 +101,7 @@ chartype_from_unicode_cparray(const CHARTYPE *from, const CHARTYPE *to,
             if (map->cparray[i] == (INTVAL)c)
                 return i + map->n1;
         }
-        internal_exception(INVALID_CHARACTER, 
+        internal_exception(INVALID_CHARACTER,
                            "Invalid character for chartype\n");
         return 0;
     }
@@ -152,7 +158,7 @@ chartype_create_from_mapping(const char *name)
         }
     }
     fclose(f);
-    
+
     type = mem_sys_allocate(sizeof(CHARTYPE));
     type->index = -1;    /* will be allocated during registration */
     type->name = malloc_and_strcpy(name);
@@ -192,7 +198,7 @@ chartype_lookup_index(INTVAL n)
 }
 
 INTVAL
-chartype_find_chartype(const char *name) 
+chartype_find_chartype(const char *name)
 {
     const CHARTYPE *type = chartype_lookup(name);
     if (type)
@@ -223,7 +229,7 @@ chartype_lookup_transcoder(const CHARTYPE *from, const CHARTYPE *to)
 Parrot_Int
 chartype_is_digit_map1(const CHARTYPE* type, const UINTVAL c)
 {
-    return c >= type->digit_map->first_code 
+    return c >= type->digit_map->first_code
         && c <= type->digit_map->last_code;
 }
 

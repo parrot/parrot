@@ -15,8 +15,8 @@
 
 struct parrot_chartype_t;
 typedef Parrot_UInt (*Parrot_CharType_Transcoder)
-           (const struct parrot_chartype_t *from, 
-            const struct parrot_chartype_t *to, 
+           (const struct parrot_chartype_t *from,
+            const struct parrot_chartype_t *to,
             Parrot_UInt c);
 
 /* &gen_from_enum(chartypes.pasm) subst(s/enum_(\w+)/uc($1)/e) */
@@ -76,6 +76,7 @@ struct parrot_chartype_t {
 #define CHARTYPE struct parrot_chartype_t
 
 void chartype_init(void);
+void chartype_destroy(void);
 const CHARTYPE * chartype_lookup_index(INTVAL n);
 INTVAL chartype_find_chartype(const char *name);
 
@@ -83,8 +84,8 @@ Parrot_Int chartype_is_digit_map1(const CHARTYPE* type, const UINTVAL c);
 Parrot_Int chartype_get_digit_map1(const CHARTYPE* type, const UINTVAL c);
 Parrot_Int chartype_is_digit_mapn(const CHARTYPE* type, const UINTVAL c);
 Parrot_Int chartype_get_digit_mapn(const CHARTYPE* type, const UINTVAL c);
-Parrot_UInt chartype_transcode_nop(const struct parrot_chartype_t *from, 
-                                   const struct parrot_chartype_t *to, 
+Parrot_UInt chartype_transcode_nop(const struct parrot_chartype_t *from,
+                                   const struct parrot_chartype_t *to,
                                    Parrot_UInt c);
 
 typedef Parrot_CharType_Transcoder CHARTYPE_TRANSCODER;
