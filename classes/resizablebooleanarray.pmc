@@ -75,9 +75,9 @@ Sets the integer value of the element at index C<key> to C<value>.
 
 /*
 
-=item C<void push_integer (STRING* value)>
+=item C<void push_integer (INTVAL value)>
 
-Extends the array by adding an element of value C<*value> to the end of
+Extends the array by adding an element of value C<value> to the end of
 the array.
 
 =cut
