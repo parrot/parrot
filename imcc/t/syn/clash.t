@@ -79,8 +79,6 @@ CODE
 OUT
 
 ##############################
-SKIP: {
- skip("no core ops yet", 1);
 
 output_is(<<'CODE', <<'OUT', "defined keyed");
 .sub _test
@@ -104,7 +102,6 @@ CODE
 1
 0
 OUT
-}
 
 
 1;

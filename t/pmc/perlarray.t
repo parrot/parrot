@@ -1,6 +1,6 @@
 #! perl -w
 
-use Parrot::Test tests => 19;
+use Parrot::Test tests => 21;
 use Test::More;
 
 output_is(<<'CODE', <<'OUTPUT', "size of the array");
@@ -1064,6 +1064,68 @@ ok 4
 ok 5
 ok 6
 ok 7
+OUTPUT
+
+output_is(<<'CODE', <<OUTPUT, "defined");
+    new P0, .PerlArray
+    defined I0, P0
+    print I0
+    print "\n"
+    defined I0, P1
+    print I0
+    print "\n"
+    set P0, 5
+    set P0[0], 1
+    defined I0, P0[0]
+    print I0
+    print "\n"
+    defined I0, P0[1]
+    print I0
+    print "\n"
+    defined I0, P0[100]
+    print I0
+    print "\n"
+    new P1, .PerlUndef
+    set P0[2], P1
+    defined I0, P0[2]
+    print I0
+    print "\n"
+    end
+
+CODE
+1
+0
+1
+0
+0
+0
+OUTPUT
+
+output_is(<<'CODE', <<OUTPUT, "exists");
+    new P0, .PerlArray
+    set P0, 5
+    set P0[0], 1
+    exists I0, P0[0]
+    print I0
+    print "\n"
+    exists I0, P0[1]
+    print I0
+    print "\n"
+    exists I0, P0[100]
+    print I0
+    print "\n"
+    new P1, .PerlUndef
+    set P0[2], P1
+    exists I0, P0[2]
+    print I0
+    print "\n"
+    end
+
+CODE
+1
+0
+0
+1
 OUTPUT
 
 1;

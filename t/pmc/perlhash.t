@@ -1,6 +1,6 @@
 #! perl
 
-use Parrot::Test tests => 21;
+use Parrot::Test tests => 23;
 use Test::More;
 
 output_is(<<CODE, <<OUTPUT, "Initial PerlHash tests");
@@ -60,7 +60,7 @@ output_is(<<'CODE', <<OUTPUT, "more than one PerlHash");
 	new P0, .PerlHash
 	set S0, "key"
 	set P0[S0], 1
-		
+
         new P1, .PerlHash
         set S1, "another_key"
         set P1[S1], 2
@@ -160,21 +160,21 @@ OUTPUT
 
 output_is(<<'CODE', <<OUTPUT, "size of the hash");
 	new P0, .PerlHash
-	
+
 	set P0["0"], 1
 	set I0, P0
 	print I0
-	print "\n"	
+	print "\n"
 
 	set P0["1"], 1
 	set I0, P0
 	print I0
-	print "\n"	
+	print "\n"
 
 	set P0["0"], 1
 	set I0, P0
 	print I0
-	print "\n"	
+	print "\n"
 
 	end
 CODE
@@ -540,14 +540,14 @@ output_is(<<'CODE', <<OUTPUT, "Testing clone");
     set P0["b"], P2
 
     # P0 = { a => "a", b => [undef, undef] }
-    
+
     clone P1, P0
     set P0["c"], 4
     set P3, P0["b"]
     set P3, 3
     set P0["b"], P3
     set P1["a"], "A"
-    
+
     # P0 = { a => "a", b => [undef, undef, undef], c => 4 }
     # P1 = { a => "A", b => [undef, undef] }
 
@@ -556,26 +556,26 @@ output_is(<<'CODE', <<OUTPUT, "Testing clone");
     print "not "
 ok1:
     print "ok 1\n"
-    
+
     set P5, P0["b"]
     set I0, P5
     eq I0, 3, ok2
     print "not "
 ok2:
     print "ok 2\n"
-    
+
     set I0, P0["c"]
     eq I0, 4, ok3
     print "not "
 ok3:
     print "ok 3\n"
-    
+
     set S0, P1["a"]
     eq S0, "A", ok4
     print "not "
 ok4:
     print "ok 4\n"
-    
+
     set P5, P1["b"]
     set I0, P5
     eq I0, 2, ok5
@@ -585,7 +585,7 @@ ok4:
 ok5:
     print "ok 5\n"
 
-# XXX: this should return undef or something, but it dies instead.    
+# XXX: this should return undef or something, but it dies instead.
 #     set P3, P0["c"]
 #     unless P3, ok6
 #     print "not "
@@ -742,6 +742,58 @@ ok 1
 ok 2
 ok 3
 ok 4
+OUTPUT
+
+output_is(<<'CODE', <<OUTPUT, "defined");
+    new P0, .PerlHash
+    defined I0, P0
+    print I0
+    print "\n"
+    defined I0, P1
+    print I0
+    print "\n"
+    set P0["a"], 1
+    defined I0, P0["a"]
+    print I0
+    print "\n"
+    defined I0, P0["b"]
+    print I0
+    print "\n"
+    new P1, .PerlUndef
+    set P0["c"], P1
+    defined I0, P0["c"]
+    print I0
+    print "\n"
+    end
+
+CODE
+1
+0
+1
+0
+0
+OUTPUT
+
+output_is(<<'CODE', <<OUTPUT, "exists");
+    new P0, .PerlHash
+    set P0["a"], 1
+    exists I0, P0["a"]
+    print I0
+    print "\n"
+    exists I0, P0["b"]
+    print I0
+    print "\n"
+    new P1, .PerlUndef
+    set P0["c"], P1
+    exists I0, P0["c"]
+    print I0
+    print "\n"
+    end
+
+CODE
+1
+0
+1
 OUTPUT
 
 1;

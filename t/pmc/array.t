@@ -1,6 +1,6 @@
 #! perl -w
 
-use Parrot::Test tests => 5;
+use Parrot::Test tests => 7;
 use Test::More;
 
 output_is(<<'CODE', <<'OUTPUT', "Setting array size");
@@ -119,6 +119,68 @@ output_is(<<'CODE', <<'OUTPUT', "Getting out-of-bounds elements");
 	end
 CODE
 Array index out of bounds!
+OUTPUT
+
+output_is(<<'CODE', <<OUTPUT, "defined");
+    new P0, .Array
+    defined I0, P0
+    print I0
+    print "\n"
+    defined I0, P1
+    print I0
+    print "\n"
+    set P0, 5
+    set P0[0], 1
+    defined I0, P0[0]
+    print I0
+    print "\n"
+    defined I0, P0[1]
+    print I0
+    print "\n"
+    defined I0, P0[100]
+    print I0
+    print "\n"
+    new P1, .PerlUndef
+    set P0[2], P1
+    defined I0, P0[2]
+    print I0
+    print "\n"
+    end
+
+CODE
+1
+0
+1
+0
+0
+0
+OUTPUT
+
+output_is(<<'CODE', <<OUTPUT, "exists");
+    new P0, .Array
+    set P0, 5
+    set P0[0], 1
+    exists I0, P0[0]
+    print I0
+    print "\n"
+    exists I0, P0[1]
+    print I0
+    print "\n"
+    exists I0, P0[100]
+    print I0
+    print "\n"
+    new P1, .PerlUndef
+    set P0[2], P1
+    exists I0, P0[2]
+    print I0
+    print "\n"
+    end
+
+CODE
+1
+0
+0
+1
 OUTPUT
 
 1;

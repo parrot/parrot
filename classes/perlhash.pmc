@@ -70,7 +70,7 @@ pmclass PerlHash {
         hash_clone(INTERP, (HASH *)SELF->data, (HASH **)&ret->data);
 	return ret;
     }
-    
+
     INTVAL get_integer () {
         return hash_size(INTERP, SELF->data);
     }
@@ -319,10 +319,16 @@ pmclass PerlHash {
 	he = hash_get(INTERP, h, sx);
 	if (he == NULL)
 	    return 0;		/* no such key */
-	if (key == NULL)
-	    return he->val.pmc_val->vtable->defined(INTERP, he->val.pmc_val);
-	return he->val.pmc_val->vtable->defined_keyed(INTERP, he->val.pmc_val,
-						      key);
+        if (he->type == enum_hash_pmc) {
+	    if (key == NULL)
+		return he->val.pmc_val->vtable->defined(INTERP,
+			he->val.pmc_val);
+	    else
+		return he->val.pmc_val->vtable->defined_keyed(
+			INTERP, he->val.pmc_val, key);
+	}
+	/* some other contents */
+	return 1;
     }
 
     void delete_keyed(PMC* key) {

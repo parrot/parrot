@@ -428,11 +428,13 @@ pmclass Array {
 
     INTVAL defined_keyed_int (INTVAL* key) {
         PMC* value;
+	void *ret;
 
-        if (!key)
-            return 0;
-        value = Parrot_Array_get_pmc_ptr(INTERP, (List *)SELF->data, *key);
-        if (value == NULL)
+	ret = list_get(INTERP, (List *) pmc->data, *key, enum_type_PMC);
+	if (ret == 0 || ret == (void *) -1)
+	    return 0;
+	value = *(PMC**) ret;
+	if (!value)
 	    return 0;
         return value->vtable->defined(INTERP, value);
     }
@@ -442,8 +444,6 @@ pmclass Array {
         PMC* nextkey;
         PMC* box;
 
-        if (!key)
-	    return 0;
         ix = key_integer(INTERP, key);
         nextkey = key_next(INTERP, key);
         if (nextkey == NULL)
@@ -458,8 +458,6 @@ pmclass Array {
     INTVAL exists_keyed_int (INTVAL* key) {
         void * ret;
 
-        if (!key)
-            return 0;
 	ret = list_get(INTERP, (List *) pmc->data, *key, enum_type_PMC);
 	if (ret == 0 || ret == (void *) -1)
 	    return 0;
@@ -471,8 +469,6 @@ pmclass Array {
         PMC* nextkey;
         PMC* box;
 
-        if (!key)
-	    return 0;
         ix = key_integer(INTERP, key);
         nextkey = key_next(INTERP, key);
         if (nextkey == NULL)

@@ -2842,12 +2842,44 @@ inline op xor(inout PMC, in PMC, in PMC) {
 
 =item B<defined>(out INT, in PMC)
 
+=item B<defined>(out INT, in PMC, in INTKEY)
+
+=item B<defined>(out INT, in PMC, in KEY)
+
 Test for PMC definedness.
+
+=item B<exists>(out INT, in PMC, in INTKEY)
+
+=item B<exists>(out INT, in PMC, in KEY)
+
+Test for key existance.
 
 =cut
 
 inline op defined(out INT, in PMC) {
-  $1 = $2->vtable->defined(interpreter, $2);
+  $1 = $2 ? $2->vtable->defined(interpreter, $2) : 0;
+  goto NEXT();
+}
+
+inline op defined(out INT, in PMC, in INTKEY) {
+  INTVAL key = $3;
+  $1 = $2 ? $2->vtable->defined_keyed_int(interpreter, $2, &$3) : 0;
+  goto NEXT();
+}
+
+inline op defined(out INT, in PMC, in KEY) {
+  $1 = ($2 && $3) ? $2->vtable->defined_keyed(interpreter, $2, $3) : 0;
+  goto NEXT();
+}
+
+inline op exists(out INT, in PMC, in INTKEY) {
+  INTVAL key = $3;
+  $1 = $2 ? $2->vtable->exists_keyed_int(interpreter, $2, &$3) : 0;
+  goto NEXT();
+}
+
+inline op exists(out INT, in PMC, in KEY) {
+  $1 = ($2 && $3) ? $2->vtable->exists_keyed(interpreter, $2, $3) : 0;
   goto NEXT();
 }
 
@@ -3646,15 +3678,15 @@ Ops to manipulate the symbol table
 =item B<new_pad>(in INT)
 
 Create a new lexical scope pad with static nesting depth $1
-and push it onto the lexical scope stack. Static depths 0 
-through $1 - 1, inclusive, are copied from the current static 
+and push it onto the lexical scope stack. Static depths 0
+through $1 - 1, inclusive, are copied from the current static
 nesting.
 
 =item B<new_pad>(out PMC, in INT)
 
 Create a new lexical scope pad with static nesting depth $2
-and store it in $1 (do NOT push on the stack). Static depths 0 
-through $2 - 1, inclusive, are copied from the current static 
+and store it in $1 (do NOT push on the stack). Static depths 0
+through $2 - 1, inclusive, are copied from the current static
 nesting.
 
 =item B<pop_pad>()
@@ -3674,7 +3706,7 @@ top of the lexical pad stack) in $1.
 =item B<store_lex>(in STR, in PMC)
 
 Store object $2 as lexical symbol $1.  $1 must have already been
-created at some static depth. 
+created at some static depth.
 
 =item B<store_lex>(in INT, in STR, in PMC)
 
@@ -3685,7 +3717,7 @@ So store_lex -1, .... will operate on the current pad.
 
 =item B<store_lex>(in INT, in INT, in PMC)
 
-Store object $3 at lexical position $2 at depth $1.  If [$1, $2] does 
+Store object $3 at lexical position $2 at depth $1.  If [$1, $2] does
 not exist, it will be created.  If $1 is negative, count out from the
 current lexical scope; otherwise, count in from the outermost scope.
 So store_lex -1, .... will operate on the current pad.
@@ -3696,14 +3728,14 @@ Find the lexical variable named $2 (at any depth) and store it in $1.
 
 =item B<find_lex>(out PMC, in INT, in STR)
 
-Find the lexical variable named $3 at depth $2 and store it in $1. 
-If $2 is negative the, count out from the current lexical scope; 
+Find the lexical variable named $3 at depth $2 and store it in $1.
+If $2 is negative the, count out from the current lexical scope;
 otherwise, count up from the outermost scope.
 
 =item B<find_lex>(out PMC, in INT, in INT)
 
 Find the lexical variable at position $3 at depth $2 and store it in
-$1. If $2 is negative the, count out from the current lexical scope; 
+$1. If $2 is negative the, count out from the current lexical scope;
 otherwise, count up from the outermost scope.
 
 =item B<store_global>(in STR, in PMC)
@@ -3738,7 +3770,7 @@ op push_pad(in PMC) {
 }
 
 op pop_pad() {
-    stack_pop(interpreter, &interpreter->ctx.pad_stack, 
+    stack_pop(interpreter, &interpreter->ctx.pad_stack,
               NULL, STACK_ENTRY_PMC);
     goto NEXT();
 }
