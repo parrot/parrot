@@ -576,6 +576,8 @@ InitializeCoreOps:
 # endcase
 # of
 # endof
+    .AddCoreOp(Loop_Index_I, "i")
+    .AddCoreOp(Loop_Index_J, "j")
 
     #
     # Control Structures, Calls and returns
@@ -607,6 +609,8 @@ InitializeCoreOps:
     # Variables
     #
 # variable
+    .AddCoreOp(New_Variable, "variable")
+   
 # 2variable
 # fvariable
 # user
@@ -1192,6 +1196,16 @@ Two_R_Fetch:
     save .TempPMC
     branch DoneInterpretWord
 
+Loop_Index_I:
+    set .PMCStack, .ReturnStack[-1]
+    .PushPMC
+    branch DoneInterpretWord
+
+Loop_Index_J:
+    set .PMCStack, .ReturnStack[-3]
+    .PushPMC
+    branch DoneInterpretWord
+
 Two_RDrop:
     pop .PMCStack, .ReturnStack
 RDrop:
@@ -1364,6 +1378,18 @@ Constant:
     concat .TempStr2, .TempString
     concat .TempStr2, "]\n"
     concat .TempStr2, "save P31\nret\n"
+    compile .CompiledWordPMC, .PASMCompiler, .TempStr2
+    set .TempInt, .CompiledWordPMC[1]
+    set .CoreOps[.CurrentWord], .TempInt
+    branch DoneInterpretWord
+
+New_Variable:
+    bsr CollectWord
+    inc .LastCellUsed
+    set .TempStr2, "new P31, .Integer\nset P31, "
+    set .TempString, .LastCellUsed
+    concat .TempStr2, .TempString
+    concat .TempStr2, "\nsave P31\nret\n"
     compile .CompiledWordPMC, .PASMCompiler, .TempStr2
     set .TempInt, .CompiledWordPMC[1]
     set .CoreOps[.CurrentWord], .TempInt
