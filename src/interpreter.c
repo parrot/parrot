@@ -998,8 +998,9 @@ Parrot_really_destroy(int exit_code, void *vinterp)
         stash = next_stash;
     }
     /* free vtables */
-    for (i = 1; i < (int)enum_class_max; i++)
-        Parrot_destroy_vtable(interpreter, Parrot_base_vtables[i]);
+    if (!interpreter->parent_interpreter)
+        for (i = 1; i < (int)enum_class_max; i++)
+            Parrot_destroy_vtable(interpreter, Parrot_base_vtables[i]);
     mmd_destroy(interpreter);
 
     if (interpreter->profile) {
@@ -1035,8 +1036,10 @@ Parrot_really_destroy(int exit_code, void *vinterp)
     intstack_free(interpreter, interpreter->ctx.intstack);
 
     /* chartype, encodings */
-    chartype_destroy();
-    encoding_destroy();
+    if (!interpreter->parent_interpreter) {
+        chartype_destroy();
+        encoding_destroy();
+    }
 
     mem_sys_free(interpreter);
 }
