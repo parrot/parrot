@@ -62,6 +62,7 @@ The subsystem initalizers include:
 	_set_Color_layout(        layouts )
 	_set_Palette_layout(      layouts )
 	_set_PixelFormat_layout(  layouts )
+	_set_Pixels_layout(       layouts )
 	_set_Surface_layout(      layouts )
 
 .end
