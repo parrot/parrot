@@ -1,7 +1,7 @@
 # [expr <]
 
 .sub __operand_gt
-  .param PerlArray argv
+  .param pmc argv
 
   # requires 2 args, string or numeric.
   .local pmc result 

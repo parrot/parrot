@@ -1,7 +1,7 @@
 # [expr -]
 
 .sub __operand_minus
-  .param PerlArray argv
+  .param pmc argv
 
   # requires 2 args, numeric only
 
