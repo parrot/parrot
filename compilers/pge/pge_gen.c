@@ -459,7 +459,7 @@ pge_gen_exp(PGE_Exp* e, const char* succ)
     emitlcount();
     emit("  R%d:\n", e->id);
     switch (e->type) {
-    case PGE_NULL_PATTERN: emit("R%d: goto %s\n", e->id, succ); break;
+    case PGE_NULL_PATTERN: emit("    goto %s\n", e->id, succ); break;
     case PGE_PATTERN_END: pge_gen_pattern_end(e, succ); break;
     case PGE_DOT: pge_gen_dot(e, succ); break;
     case PGE_LITERAL: pge_gen_literal(e, succ); break;
