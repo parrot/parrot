@@ -1,6 +1,6 @@
 #perl -w
 
-use Parrot::Test tests => 18;
+use Parrot::Test tests => 20;
 
 output_is(<<'CODE', <<'OUTPUT', "shr_i_i (>>)");
 	set I0, 0b001100
@@ -70,6 +70,37 @@ output_is(<<'CODE', <<'OUTPUT', "shr_ic_ic (>>)");
 CODE
 6
 5
+OUTPUT
+
+# The crux of this test is that a proper logical right shift
+# will clear the most significant bit, so the shifted value
+# will be a positive value on any 2's or 1's complement CPU
+output_is(<<'CODE', <<'OUTPUT', "lsr_ic_ic (<<)");
+ 	lsr I2, -40, 1
+ 	lt I2, 0, BAD
+	print "OK\n"
+	end
+BAD:
+	print "Not OK"
+ 	print "\n"
+	end
+CODE
+OK
+OUTPUT
+
+output_is(<<'CODE', <<'OUTPUT', "lsr_i_i (<<)");
+	set I0, -40
+	set I1, 1
+ 	lsr I2, I0, I1
+ 	lt I2, 0, BAD
+	print "OK\n"
+	end
+BAD:
+	print "Not OK"
+ 	print "\n"
+	end
+CODE
+OK
 OUTPUT
 
 output_is(<<'CODE', <<'OUTPUT', "shl_i_i (<<)");

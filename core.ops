@@ -2667,6 +2667,19 @@ inline op shr(out PMC, in PMC, in PMC) {
 
 ########################################
 
+=item B<lsr>(out INT, in INT, in INT)
+
+Set $1 to the value of $2 logically shifted right by $3 bits.
+
+=cut
+
+inline op lsr(out INT, in INT, in INT) {
+  $1 = (INTVAL)((UINTVAL)$2 >> $3);
+  goto NEXT();
+}
+
+########################################
+
 =item B<bxor>(inout INT, in INT)
 
 =item B<bxor>(inout PMC, in INT)
