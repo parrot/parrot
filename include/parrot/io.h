@@ -39,9 +39,9 @@
 #endif
 
 #ifdef BLKSIZE
-# define PIO_BLKSIZE BLKSIZE
+#  define PIO_BLKSIZE BLKSIZE
 #else
-# define PIO_BLKSIZE  8192
+#  define PIO_BLKSIZE  8192
 #endif
 #define PIO_LINEBUFSIZE 256     /* Default linebuffer size */
 #define PIO_GRAIN 2048          /* Smallest size for a block buffer */
@@ -298,14 +298,14 @@ extern INTVAL           PIO_eof(theINTERP, ParrotIO *);
 /* Put platform specific macros here if you must */
 #ifdef WIN32
 extern INTVAL           PIO_win32_isatty(PIOHANDLE fd);
-# define PIO_isatty(x)   PIO_win32_isatty(x)
+#  define PIO_isatty(x)   PIO_win32_isatty(x)
 extern INTVAL           PIO_win32_getblksize(PIOHANDLE fd);
-# define PIO_getblksize(x)   PIO_win32_getblksize(x)
+#  define PIO_getblksize(x)   PIO_win32_getblksize(x)
 #else
 extern INTVAL           PIO_unix_isatty(PIOHANDLE fd);
-# define PIO_isatty(x)   PIO_unix_isatty(x)
+#  define PIO_isatty(x)   PIO_unix_isatty(x)
 extern INTVAL           PIO_unix_getblksize(PIOHANDLE fd);
-# define PIO_getblksize(x)   PIO_unix_getblksize(x)
+#  define PIO_getblksize(x)   PIO_unix_getblksize(x)
 #endif
 
 

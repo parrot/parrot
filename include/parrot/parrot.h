@@ -19,9 +19,9 @@
 #define PARROT_PARROT_H_GUARD
 
 #if defined(INSIDE_GLOBAL_SETUP)
-#define VAR_SCOPE
+#  define VAR_SCOPE
 #else
-#define VAR_SCOPE extern
+#  define VAR_SCOPE extern
 #endif
 
 #define PARROT_IN_CORE
@@ -33,27 +33,27 @@
 /*#include <types.h> */
 
 #ifdef WIN32
-#    include <io.h>
+#  include <io.h>
 #endif
 
 #ifdef HAS_HEADER_UNISTD
-#    include <unistd.h>
+#  include <unistd.h>
 #endif
 
 #ifdef HAS_HEADER_SYSMMAN
-#    include <sys/mman.h>
+#  include <sys/mman.h>
 #endif
 
 #ifdef HAS_HEADER_SYSTIME
-#    include <sys/time.h>
+#  include <sys/time.h>
 #endif
 
 #ifdef HAS_HEADER_MATH
-#    include <math.h>
+#  include <math.h>
 #endif
 
 #ifdef HAS_HEADER_FCNTL
-#    include <fcntl.h>
+#  include <fcntl.h>
 #endif
 
 #include <sys/types.h>
@@ -83,13 +83,13 @@ typedef void (*funcptr_t)(void);
 /* Provide support for inline keyword where available.  Just make sure to use
  * "INLINE" instead and it will DTRT. */
 #ifdef __cplusplus
-    #define INLINE inline
+#  define INLINE inline
 #else
-    #ifdef __GNUC__
-        #define INLINE __inline__
-    #else 
-        #define INLINE
-    #endif
+#  ifdef __GNUC__
+#    define INLINE __inline__
+#  else 
+#    define INLINE
+#  endif
 #endif
 
 /* On Win32 we need the constant O_BINARY for open() (at least for Borland C), 

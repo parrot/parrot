@@ -114,9 +114,9 @@ build_asm(struct Parrot_Interp *interpreter,opcode_t *pc, opcode_t *code_start, 
             address = (INTVAL*)(((char *)address) - (char *)&interpreter->int_reg.registers[0]);
             write_lo_13(&arena[v.info[i].position], (ptrcast_t)address);
 #else
-#ifdef ALPHA
+#  ifdef ALPHA
             address = (INTVAL*)(((char *)address) - interpreter_registers);
-#endif
+#  endif
             memcpy(&arena[v.info[i].position],&address,OP_ARGUMENT_SIZE);
 #endif
         }
@@ -129,9 +129,9 @@ build_asm(struct Parrot_Interp *interpreter,opcode_t *pc, opcode_t *code_start, 
             address = (INTVAL*)(((char *)address) - (char *)&interpreter->num_reg.registers[0]);
             write_lo_13(&arena[v.info[i].position], (ptrcast_t)address);
 #else
-#ifdef ALPHA
+#  ifdef ALPHA
             address = (INTVAL*)(((char *)address) - interpreter_registers);
-#endif
+#  endif
             memcpy(&arena[v.info[i].position],&address,OP_ARGUMENT_SIZE);
 #endif
         }
@@ -146,9 +146,9 @@ build_asm(struct Parrot_Interp *interpreter,opcode_t *pc, opcode_t *code_start, 
             address = (INTVAL*)(((char *)address) - (char *)&interpreter->string_reg.registers[0]);
             write_lo_13(&arena[v.info[i].position], (ptrcast_t)address);
 #else
-#ifdef ALPHA
+#  ifdef ALPHA
             address = (INTVAL*)(((char *)address) - interpreter_registers);
-#endif
+#  endif
             memcpy(&arena[v.info[i].position],&address,OP_ARGUMENT_SIZE);
 #endif
         }
@@ -166,10 +166,10 @@ build_asm(struct Parrot_Interp *interpreter,opcode_t *pc, opcode_t *code_start, 
 #ifdef SUN4
             write_32(&arena[v.info[i].position], (ptrcast_t)address);
 #else
-#ifdef ALPHA
+#  ifdef ALPHA
             calculate_displacement((INTVAL *)arena_start,address,&high,(INTVAL *)&address);
             memcpy(&arena[v.info[i].position - 4],&high,OP_ARGUMENT_SIZE);
-#endif
+#  endif
             memcpy(&arena[v.info[i].position],&address,OP_ARGUMENT_SIZE);
 #endif
         }
@@ -180,10 +180,10 @@ build_asm(struct Parrot_Interp *interpreter,opcode_t *pc, opcode_t *code_start, 
 #ifdef SUN4
             write_32(&arena[v.info[i].position], (ptrcast_t)address);
 #else
-#ifdef ALPHA
+#  ifdef ALPHA
             calculate_displacement((INTVAL *)arena_start,address,&high,(INTVAL *)&address);
             memcpy(&arena[v.info[i].position - 4],&high,OP_ARGUMENT_SIZE);
-#endif
+#  endif
             memcpy(&arena[v.info[i].position],&address,OP_ARGUMENT_SIZE);
 #endif
         }
@@ -227,10 +227,10 @@ build_asm(struct Parrot_Interp *interpreter,opcode_t *pc, opcode_t *code_start, 
 #ifdef SUN4
             write_32(&arena[sv.info[i].position], (ptrcast_t)address);
 #else
-#ifdef ALPHA
+#  ifdef ALPHA
             calculate_displacement((INTVAL *)arena_start,address,&high,(INTVAL *)&address);
             memcpy(&arena[sv.info[i].position - 4],&high,OP_ARGUMENT_SIZE);
-#endif
+#  endif
             memcpy(&arena[sv.info[i].position],&address,OP_ARGUMENT_SIZE);
 #endif
         }
@@ -309,10 +309,10 @@ build_asm(struct Parrot_Interp *interpreter,opcode_t *pc, opcode_t *code_start, 
 #ifdef SUN4
             write_32(&arena[v.info[i].position], (ptrcast_t)address);
 #else
-#ifdef ALPHA
+#  ifdef ALPHA
             calculate_displacement((INTVAL *)arena_start,address,&high,(INTVAL *)&address);
             memcpy(&arena[v.info[i].position - 4],&high,OP_ARGUMENT_SIZE);
-#endif
+#  endif
             memcpy(&arena[v.info[i].position],&address,OP_ARGUMENT_SIZE);
 #endif
         }
@@ -326,10 +326,10 @@ build_asm(struct Parrot_Interp *interpreter,opcode_t *pc, opcode_t *code_start, 
 #ifdef SUN4
             write_32(&arena[v.info[i].position], (ptrcast_t)address);
 #else
-#ifdef ALPHA
+#  ifdef ALPHA
             calculate_displacement((INTVAL *)arena_start,address,&high,(INTVAL *)&address);
             memcpy(&arena[v.info[i].position - 4],&high,OP_ARGUMENT_SIZE);
-#endif
+#  endif
             memcpy(&arena[v.info[i].position],&address,OP_ARGUMENT_SIZE);
 #endif
         }
@@ -375,10 +375,10 @@ build_asm(struct Parrot_Interp *interpreter,opcode_t *pc, opcode_t *code_start, 
             else {
                 address = 0;
             }
-#ifdef ALPHA
+#  ifdef ALPHA
             address = (INTVAL *)((INTVAL)address / 4);
             arena[v.info[i].position + 2] |= (*(((char *)&address) + 2) & 0x1f);
-#endif
+#  endif
             
             memcpy(&arena[v.info[i].position],&address,OP_ARGUMENT_SIZE);
 #endif
@@ -415,11 +415,11 @@ build_asm(struct Parrot_Interp *interpreter,opcode_t *pc, opcode_t *code_start, 
             address = (INTVAL *)((char *)address - (arena + v.info[i].position - 3));
             write_30(&arena[v.info[i].position], (ptrcast_t)address);
 #else
-#ifdef ALPHA
+#  ifdef ALPHA
             calculate_displacement((INTVAL *)arena_start,address,&high,&low);
             memcpy(&arena[v.info[i].position - 12],&high,OP_ARGUMENT_SIZE);
             memcpy(&arena[v.info[i].position - 8],&low,OP_ARGUMENT_SIZE);
-#endif
+#  endif
 
             ivalue = (INTVAL) (arena+v.info[i].position) + 4;
 
@@ -432,10 +432,10 @@ build_asm(struct Parrot_Interp *interpreter,opcode_t *pc, opcode_t *code_start, 
                              (char *)address + 
                              v.info[i].position + 4));
             }
-#ifdef ALPHA
+#  ifdef ALPHA
             address = (INTVAL *)((INTVAL)address / 4);
             arena[v.info[i].position + 2] |= (*(((char *)&address) + 2) & 0x1f);
-#endif
+#  endif
 
             memcpy(&arena[v.info[i].position],&address,OP_ARGUMENT_SIZE);
 #endif
@@ -455,10 +455,10 @@ build_asm(struct Parrot_Interp *interpreter,opcode_t *pc, opcode_t *code_start, 
 #ifdef SUN4
             write_32(&arena[v.info[i].position], (ptrcast_t)address);
 #else
-#ifdef ALPHA
+#  ifdef ALPHA
             calculate_displacement((INTVAL *)arena_start,address,&high,(INTVAL *)&address);
             memcpy(&arena[v.info[i].position - 4],&high,OP_ARGUMENT_SIZE);
-#endif
+#  endif
             memcpy(&arena[v.info[i].position],&address,OP_ARGUMENT_SIZE);
 #endif
         }
@@ -477,10 +477,10 @@ build_asm(struct Parrot_Interp *interpreter,opcode_t *pc, opcode_t *code_start, 
 #ifdef SUN4
             write_32(&arena[v.info[i].position], (ptrcast_t)address);
 #else
-#ifdef ALPHA
+#  ifdef ALPHA
                 calculate_displacement((INTVAL *)arena_start,address,&high,(INTVAL *)&address);
                 memcpy(&arena[v.info[i].position - 4],&high,OP_ARGUMENT_SIZE);
-#endif
+#  endif
                 memcpy(&arena[v.info[i].position],&address,OP_ARGUMENT_SIZE);
 #endif
             }

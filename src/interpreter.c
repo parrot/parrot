@@ -15,7 +15,7 @@
 #include "parrot/oplib/core_ops.h"
 #include "parrot/runops_cores.h"
 #ifdef HAS_JIT
-#include "parrot/jit.h"
+#  include "parrot/jit.h"
 #endif
 
 
@@ -297,17 +297,17 @@ runops_jit (struct Parrot_Interp *interpreter, opcode_t * pc) {
     code_end   = interpreter->code->byte_code + code_size;
 
     jit_code = build_asm(interpreter, pc, code_start, code_end);
-#ifdef ALPHA
+#  ifdef ALPHA
     (jit_code)((void *)(((char *)&interpreter->int_reg.registers[0]) + 0x7fff));
-#endif
-#ifdef I386
+#  endif
+#  ifdef I386
     (jit_code)();
-#endif
-#ifdef SUN4
+#  endif
+#  ifdef SUN4
     (jit_code)((void *)(&interpreter->int_reg.registers[0]),
                         (void *)&interpreter->num_reg.registers[0],
                         (void *)&interpreter->string_reg.registers[0]);
-#endif
+#  endif
 
 #else
     return;

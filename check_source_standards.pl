@@ -22,6 +22,7 @@ if ($files[0] eq "all_source") {
                       }}, '.');
 }
 
+FILE:
 foreach my $file (@files) {
     $file =~ s/^\.\///g;
     if (!open(F, "<$file")) {
@@ -32,7 +33,14 @@ foreach my $file (@files) {
     my @lines = <F>;
     close(F);
     chomp @lines;
-
+    
+    for (@lines[0..10]) {
+	if (/DO NOT EDIT/) {
+	    info($file, 0, "$file is automatically generated.  Skipping");
+	    next FILE;
+	}
+    }
+    
     check_source($file, \@lines);
 }
 
@@ -77,8 +85,8 @@ sub check_returns {
 
     my $line = 0;
     foreach (@$source) {
-        if (/return\s*\(/) {
-            warning($file, $line, "possible use of return (foo); rather than return foo;");
+        if (/return\(/) {
+            warning($file, $line, "possible use of return(foo); rather than return foo;");
         }
 
 
@@ -199,24 +207,21 @@ sub check_cpp_indents {
     # comparitively easy.  Each level of the hierarchy should be
     # indented two spaces.
 
-    # there is one exception.  The outermost "GUARD" ifdef doesn't increase
-    # the indenting level.
+    # there are two exceptions.  The outermost "GUARD" ifdef doesn't increase
+    # the indenting level.  Neither does PARROT_IN_CORE.
 
     my @stack;
     my $line = 0;
     foreach (@$source) {
         $line++;
         if (/^\s*\#(\s*)(ifdef|if)\s+(.*)/) {
-            my $indent = "  " x (@stack-1);
+            next if (/PARROT_IN_CORE|_GUARD/);
+
+            my $indent = "  " x (@stack);
             if ($1 ne $indent) {
-                print "Improper indenting for \"$_\" (should be \"#$indent$2 $3\")\n";
+                error($file, $line, "Improper indenting for \"$_\" (should be \"#$indent$2 $3\")\n");
             }
             push @stack, "#$2 $3";
-
-            # ignore "GUARD" ifdefs for purposes of indenting.
-            if (@stack == 1 && $stack[0] =~ /_GUARD/) {
-                shift @stack;
-            }
 
             next;
         }
@@ -234,7 +239,9 @@ sub check_cpp_indents {
             if ($1 ne $indent) {
                 error($file, $line, "Improper indenting for \"$_\"\n(should be \"#$indent$2 $3\" because it is inside of " . (join ' > ', @stack) . ")\n")
             }
+
             pop @stack;
+
             next;
         }
 

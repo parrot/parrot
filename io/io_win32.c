@@ -16,7 +16,7 @@
 
 #ifdef WIN32
 
-#include <tchar.h>
+#  include <tchar.h>
 
 /* Defined at bottom */
 extern ParrotIOLayerAPI        pio_win32_layer_api;
@@ -122,11 +122,11 @@ ParrotIO * PIO_win32_open(theINTERP, ParrotIOLayer * layer,
         DWORD fAcc, fShare, fCreat;
         PIOHANDLE fd;
         type = PIO_TYPE_FILE;
-#if 0
+#  if 0
         if((interpreter->flags & PARROT_DEBUG_FLAG) != 0) {
                 fprintf(stderr, "PIO_win32_open: %s\n", spath);
         }
-#endif
+#  endif
         if((flags & (PIO_F_WRITE|PIO_F_READ)) == 0)
                 return (ParrotIO *)NULL;
 
