@@ -638,30 +638,9 @@ PDB_set_break(struct Parrot_Interp *interpreter, const char *command)
     while (!line->opcode)
         line = line->next;
 
-    /* Search if we got a breakpoint at that line  */
-    i = 0;
-    sbreak = pdb->breakpoint;
-    while (sbreak && sbreak->pc != line->opcode) {
-        sbreak = sbreak->next;
-        i++;
-    }
-
-    /* Don't do anything if there is already a breakpoint at this line */
-    if (sbreak && sbreak->skip > -1) {
-        PIO_eprintf(interpreter,
-                    "Breakpoint %li already at line %li\n",i,line->number);
-        return;
-    }
-
-    /* Revive the breakpoint if was deleted */
-    if (sbreak && sbreak->skip == -1) {
-        sbreak->skip = 0;
-    }
-    else {
     /* Allocate the new break point */
-        newbreak = (PDB_breakpoint_t *)mem_sys_allocate(sizeof(PDB_breakpoint_t));
-    }
-
+    newbreak = (PDB_breakpoint_t *)mem_sys_allocate(sizeof(PDB_breakpoint_t));
+  
     na(command);
     condition = NULL;
 
@@ -670,30 +649,15 @@ PDB_set_break(struct Parrot_Interp *interpreter, const char *command)
     if (command && *command) {
         na(command);
         if ((condition = PDB_cond(interpreter, command))) {
-            if (sbreak) {
-                sbreak->condition = condition;
-                return;
-            }
-            else {
-                newbreak->condition = condition;
-            }
+            newbreak->condition = condition;
         }
     }
 
     /* If there are no other arguments, or if there isn't a valid condition,
        then condition will be NULL */
     if (!condition) {
-        if (sbreak) {
-           sbreak->condition = NULL;
-           return;
-        }
-        else {
-           newbreak->condition = NULL;
-        }
+        newbreak->condition = NULL;
     }
-
-    /* We only reach this point if we're a new breakpoint, in which
-     * case there are several other things to set up */
 
     /* Set the address where to stop */
     newbreak->pc = line->opcode;
@@ -711,10 +675,14 @@ PDB_set_break(struct Parrot_Interp *interpreter, const char *command)
             sbreak = sbreak->next;
             i++;
         }
+        newbreak->prev = sbreak;
         sbreak->next = newbreak;
+        sbreak->next->id = i;
     }
     else {
+        newbreak->prev = NULL;
         pdb->breakpoint = newbreak;
+        pdb->breakpoint->id = i;
     }
 
     PIO_eprintf(interpreter, "Breakpoint %li at line %li\n",i,line->number);
@@ -810,15 +778,15 @@ PDB_find_breakpoint(struct Parrot_Interp *interpreter,
                       const char *command)
 {
     PDB_breakpoint_t *breakpoint;
-    long m,n;
+    long n;
 
     if (isdigit((int) *command)) {
-        m = n = atol(command);
+        n = atol(command);
         breakpoint = interpreter->pdb->breakpoint;
-        while (breakpoint && n--)
+        while (breakpoint && breakpoint->id != n)
             breakpoint = breakpoint->next;
         if (!breakpoint) {
-            PIO_eprintf(interpreter, "No breakpoint number %ld", m);
+            PIO_eprintf(interpreter, "No breakpoint number %ld", n);
             return NULL;
         }
         return breakpoint;
@@ -891,11 +859,27 @@ PDB_delete_breakpoint(struct Parrot_Interp *interpreter,
         while (line->opcode != breakpoint->pc)
             line = line->next;
 
-        breakpoint->skip = -1;
+        /* Delete the condition structure, if there is one */
         if (breakpoint->condition) {
             PDB_delete_condition(interpreter, breakpoint);
             breakpoint->condition = NULL;
         }
+
+        /* Remove the breakpoint from the list */
+        if (breakpoint->prev && breakpoint->next) {
+            breakpoint->prev->next = breakpoint->next;
+        }
+        else if (breakpoint->prev && !breakpoint->next) {
+            breakpoint->prev->next = NULL;
+        }            
+        else if (!breakpoint->prev && breakpoint->next) {
+            interpreter->pdb->breakpoint = breakpoint->next;
+        }
+        else {
+            interpreter->pdb->breakpoint = NULL;
+        }
+        /* Kill the breakpoint */ 
+        mem_sys_free(breakpoint);
     }
 }
 

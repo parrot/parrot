@@ -125,8 +125,10 @@ typedef struct PDB_breakpoint *PDB_breakpoint_ptr;
 
 typedef struct PDB_breakpoint {
     opcode_t                *pc;
+    long                    id;
     long                    skip;
     PDB_condition_t         *condition;
+    PDB_breakpoint_ptr      prev;
     PDB_breakpoint_ptr      next;
 } PDB_breakpoint_t;
 
