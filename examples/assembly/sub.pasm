@@ -8,15 +8,14 @@ set P0, I0
 save P0
 new P0, .Sub
 set P0, I0
-# Calling convention says P0 will contain the sub
-invoke
+invokecc # Call the sub in P0, store the current continuation in P1
 restore P0
 # Call second one
-invoke
+invokecc
 end
 
 # A subroutine
 SUB:
 print "Hello subroutine\n"
-ret
+invoke P1
 
