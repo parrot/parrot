@@ -36,17 +36,28 @@
 
 /*
  * GC_SUBSYSTEM selection
+ * 0 ... MS  stop-the-world mark & sweep
+ * 1 ... IMS incremental mark & sweep
+ * 2 ... GMS generational mark & sweep
  */
 
-/*
- * PARROT_GC_MS is the stop-the-world mark and sweep collector
- */
-#define PARROT_GC_MS      1
+#define PARROT_GC_SUBSYSTEM 0
 
-/*
- * PARROT_GC_IMS incremental mark and sweep collector
- */
-#define PARROT_GC_IMS     !PARROT_GC_MS
+#if PARROT_GC_SUBSYSTEM == 0
+#  define PARROT_GC_MS      1
+#  define PARROT_GC_IMS     0
+#  define PARROT_GC_GMS     0
+#endif
+#if PARROT_GC_SUBSYSTEM == 1
+#  define PARROT_GC_MS      0
+#  define PARROT_GC_IMS     1
+#  define PARROT_GC_GMS     0
+#endif
+#if PARROT_GC_SUBSYSTEM == 2
+#  define PARROT_GC_MS      0
+#  define PARROT_GC_IMS     0
+#  define PARROT_GC_GMS     1
+#endif
 
 
 /*
@@ -65,6 +76,15 @@
  */
 
 #define ARENA_DOD_FLAGS 0
+
+/*
+ * ARENA_DOD_FLAGS works only for GC_MS
+ */
+
+#if ! PARROT_GC_MS
+#  undef ARENA_DOD_FLAGS
+#  define ARENA_DOD_FLAGS 0
+#endif
 
 /*
  * misc settings

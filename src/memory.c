@@ -189,6 +189,9 @@ mem_setup_allocator(Interp *interpreter)
 #if PARROT_GC_IMS
     Parrot_gc_ims_init(interpreter);
 #endif
+#if PARROT_GC_GMS
+    Parrot_gc_gms_init(interpreter);
+#endif
 
     Parrot_initialize_memory_pools(interpreter);
     Parrot_initialize_header_pools(interpreter);

@@ -63,7 +63,18 @@ void clear_cow(Interp *interpreter,
 
 /* mark a PObj live during DOD */
 
+#if PARROT_GC_GMS
+#  define pobject_lives(i, o) do { \
+    if (!PObj_live_TEST(o) && \
+	    PObj_to_GMSH(o)->gen->gen_no >= i->gc_generation) \
+	parrot_gc_gms_pobject_lives(i, o); \
+  } while (0)
+
+void parrot_gc_gms_pobject_lives(Interp* interpreter, PObj *obj);
+
+#else
 void pobject_lives(Interp *interpreter, PObj *buffer);
+#endif
 
 #if ! DISABLE_GC_DEBUG
 /* Set when walking the system stack */
@@ -82,6 +93,7 @@ void Parrot_dod_profile_end(Parrot_Interp interpreter, int what);
 /* GC subsystem init functions */
 void Parrot_gc_ms_init(Interp* interpreter);
 void Parrot_gc_ims_init(Interp* interpreter);
+void Parrot_gc_gms_init(Interp* interpreter);
 /* do_dod_run function for MS */
 void Parrot_dod_ms_run(Interp *interpreter, int flags);
 
@@ -101,12 +113,40 @@ void Parrot_dod_ims_wb(Interp*, PMC *, PMC *);
     } while (0)
 
 #  define DOD_WRITE_BARRIER_KEY(interp, agg, old, old_key, new, new_key) \
-          DOD_WRITE_BARRIER_KEY(interp, agg, old, new)
+          DOD_WRITE_BARRIER(interp, agg, old, new)
 #endif
 
 #if PARROT_GC_MS
 #  define DOD_WRITE_BARRIER(interp, agg, old, new)
 #  define DOD_WRITE_BARRIER_KEY(interp, agg, old, old_key, new, new_key)
+#endif
+
+#if PARROT_GC_GMS
+#  define DOD_WRITE_BARRIER(interp, agg, old, new) do { \
+    UINTVAL gen_agg, gen_new; \
+    if (PMC_IS_NULL(new)) \
+        break; \
+    gen_agg = PObj_to_GMSH(agg)->gen->gen_no; \
+    gen_new = PObj_to_GMSH(new)->gen->gen_no; \
+    if (gen_agg < gen_new) \
+        parrot_gc_gms_wb(interp, agg, old, new); \
+} while (0)
+
+#  define DOD_WRITE_BARRIER_KEY(interp, agg, old, old_key, new, new_key) do { \
+    UINTVAL gen_agg, gen_new, gen_key; \
+    if (PMC_IS_NULL(new)) \
+        break; \
+    gen_agg = PObj_to_GMSH(agg)->gen->gen_no; \
+    gen_new = PObj_to_GMSH(new)->gen->gen_no; \
+    gen_key = PObj_to_GMSH(new_key)->gen->gen_no; \
+    if (gen_agg < gen_new || gen_agg < gen_key) \
+        parrot_gc_gms_wb_key(interp, agg, old, old_key, new, new_key); \
+} while (0)
+
+void parrot_gc_gms_wb(Interp *, PMC *agg, PMC *old, PMC *new);
+void parrot_gc_gms_wb_key(Interp *, PMC *agg,
+        PMC *old, void *old_key, PMC *new, void *new_key);
+
 #endif
 
 #endif /* PARROT_DOD_H_GUARD */

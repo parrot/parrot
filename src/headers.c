@@ -298,10 +298,14 @@ new_pmc_ext(Interp *interpreter)
      * can't use normall get_free_object--PMC_EXT doesn't have flags
      * it isn't a Buffer
      */
+#if PARROT_GC_GMS
+    ptr = pool->get_free_object(interpreter, pool);
+#else
     if (!pool->free_list)
         (*pool->more_objects) (interpreter, pool);
     ptr = pool->free_list;
     pool->free_list = *(void **)ptr;
+#endif
     memset(ptr, 0, sizeof(PMC_EXT));
     return ptr;
 }

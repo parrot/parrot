@@ -280,6 +280,7 @@ struct parrot_interp_t {
     PMC ** exception_list;              /* precreated exception objects */
     struct _Thread_data *thread_data;   /* thread specific items */
     UINTVAL recursion_limit;    /* Sub call resursion limit */
+    UINTVAL gc_generation;      /* GC generation number */
 };
 
 /* typedef struct parrot_interp_t Interp;    done in parrot.h so that

@@ -873,6 +873,7 @@ parrot_gc_ims_run(Interp *interpreter, int flags)
          */
         if (g_ims->state >= GC_IMS_RE_INIT || g_ims->state < GC_IMS_FINISHED)
             Parrot_dod_clear_live_bits(interpreter);
+        Parrot_dod_sweep(interpreter, interpreter->arena_base->pmc_pool);
         g_ims->state = GC_IMS_DEAD;
         return;
     }

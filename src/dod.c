@@ -130,7 +130,8 @@ mark_special(Parrot_Interp interpreter, PMC* obj)
     }
 }
 
-#if ARENA_DOD_FLAGS
+#if !PARROT_GC_GMS
+#  if ARENA_DOD_FLAGS
 
 /*
 
@@ -145,8 +146,8 @@ ones.
 =cut
 
 */
-
-void pobject_lives(Interp *interpreter, PObj *obj)
+void
+pobject_lives(Interp *interpreter, PObj *obj)
 {
 
     struct Small_Object_Arena *arena = GET_ARENA(obj);
@@ -187,7 +188,7 @@ void pobject_lives(Interp *interpreter, PObj *obj)
     }
 }
 
-#else
+#  else
 
 void pobject_lives(Interp *interpreter, PObj *obj)
 {
@@ -226,7 +227,8 @@ void pobject_lives(Interp *interpreter, PObj *obj)
 #endif
 }
 
-#endif
+#  endif
+#endif  /* PARROT_GC_GMS */
 
 /*
 
@@ -1175,8 +1177,10 @@ Parrot_dod_ms_run(Interp *interpreter, int flags)
      * the sync sweep is always at the end, so that
      * the live bits are cleared
      */
-    if (flags & DOD_finish_FLAG)
+    if (flags & DOD_finish_FLAG) {
+        Parrot_dod_sweep(interpreter, interpreter->arena_base->pmc_pool);
         return;
+    }
     ++arena_base->DOD_block_level;
     arena_base->lazy_dod = flags & DOD_lazy_FLAG;
     /*

@@ -319,7 +319,6 @@ Parrot_really_destroy(int exit_code, void *vinterp)
      */
     Parrot_do_dod_run(interpreter, DOD_finish_FLAG);
 
-    Parrot_dod_sweep(interpreter, interpreter->arena_base->pmc_pool);
     /*
      * that doesn't get rid of constant PMCs like these in vtable->data
      * so if such a PMC needs destroy, we got a memory leak, like for

@@ -218,6 +218,12 @@ cstring_compare(Parrot_Interp interp, void *a, void *b)
     return strcmp(a, b);
 }
 
+static void
+pobject_lives_fn(Interp *interp, PObj *o)
+{
+    pobject_lives(interp, o);
+}
+
 /*
 
 =item C<void
@@ -564,7 +570,7 @@ new_hash(Interp *interpreter, Hash **hptr)
             Hash_key_type_ascii,
             STRING_compare,     /* STRING compare */
             key_hash_STRING,    /*        hash */
-            pobject_lives);     /*        mark */
+            pobject_lives_fn);     /*        mark */
 }
 
 void
@@ -576,7 +582,7 @@ new_pmc_hash(Interp *interpreter, PMC *container)
             Hash_key_type_ascii,
             STRING_compare,     /* STRING compare */
             key_hash_STRING,    /*        hash */
-            pobject_lives);     /*        mark */
+            pobject_lives_fn);     /*        mark */
 }
 /*
 

@@ -562,10 +562,16 @@ Used in C<dod_register_pmc()>.
 */
 
 static int
-int_compare(Parrot_Interp interp, void *a, void *b)
+int_compare(Interp *interp, void *a, void *b)
 {
     UNUSED(interp);
     return a != b;
+}
+
+static void
+pobject_lives_fn(Interp *interp, PObj *o)
+{
+    pobject_lives(interp, o);
 }
 
 /*
@@ -599,7 +605,7 @@ dod_register_pmc(Parrot_Interp interpreter, PMC* pmc)
         registry = interpreter->DOD_registry = pmc_new_noinit(interpreter,
                 enum_class_Hash);
         new_hash_x(interpreter, &hash, enum_type_int, 0, Hash_key_type_int,
-                int_compare, key_hash_int, pobject_lives);
+                int_compare, key_hash_int, pobject_lives_fn);
         PObj_custom_mark_SET(registry);
         PMC_struct_val(registry) = hash;
     }
