@@ -32,6 +32,23 @@ static void usage(FILE* fp)
     "parrot -[abcgGhjpPrStvVwy.] [-d [FLAGS]] [-O [level]] [-o FILE] <file>\n");
 }
 
+static void help_debug(void)
+{
+    printf(
+    "parrot ... -d [Flags] ...\n"
+    "  Flags:\n"
+    "    0x0001    parrot\n"
+    "    0x0002    lexer\n"
+    "    0x0004    parser\n"
+    "    0x0008    imc\n"
+    "    0x0010    CFG\n"
+    "    0x0020    optimization 1\n"
+    "    0x0040    optimization 2\n"
+    "    0x1000    PBC\n"
+    "    0x2000    PBC constants\n"
+    "    0x4000    PBC fixups\n");
+}
+
 static void help(void)
 {
     printf(
@@ -48,6 +65,7 @@ static void help(void)
     "    -g --no-computed-goto\n"
     "    -t --trace\n"
     "    -d --debug[=HEXFLAGS]\n"
+    "       --help-debug\n"
     "    -w --warnings\n"
     "    -G --no-gc\n"
     "       --gc-debug\n"
@@ -89,6 +107,7 @@ the GNU General Public License or the Artistic License for more details.\n\n");
 
 #define OPT_GC_DEBUG     128
 #define OPT_DESTROY_FLAG 129
+#define OPT_HELP_DEBUG   130
 static struct longopt_opt_decl options[] = {
     { '.', '.', 0, { "--wait" } },
     { 'E', 'E', 0, { "--pre-precess-only" } },
@@ -103,6 +122,7 @@ static struct longopt_opt_decl options[] = {
     { 'b', 'b', 0, { "--bounds-checks" } },
     { 'c', 'c', 0, { "--pbc" } },
     { 'd', 'd', OPTION_optional_FLAG, { "--debug" } },
+    { '\0', OPT_HELP_DEBUG, 0, { "--help-debug" } },
     { 'g', 'g', 0, { "--no-computed-goto" } },
     { 'h', 'h', 0, { "--help" } },
     { 'j', 'j', 0, { "--jit" } },
@@ -181,6 +201,10 @@ parseflags(Parrot_Interp interp, int *argc, char **argv[])
                 break;
             case 'h':
                 help();
+                exit(EX_USAGE);
+                break;
+            case OPT_HELP_DEBUG:
+                help_debug();
                 exit(EX_USAGE);
                 break;
             case 'V':
