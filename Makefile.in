@@ -236,6 +236,12 @@ examples/assembly/mops${exe}: examples/assembly/mops$(O) $(O_FILES)
 examples/assembly/life.pbc: examples/assembly/life.pasm assemble.pl
 	cd examples && cd assembly && $(MAKE) life.pbc PERL=$(PERL) && cd .. && cd ..
 
+examples/assembly/life.c: examples/assembly/life.pbc pbc2c.pl
+	$(PERL) pbc2c.pl examples/assembly/life.pbc > examples/assembly/life.c
+
+examples/assembly/life{exe}: examples/assembly/life(O) $(O_FILES)
+	$(LD) $(LDFLAGS) ${ld_out}examples/assembly/life{exe} examples/assembly/life(O) $(O_FILES) $(C_LIBS)
+
 ###############################################################################
 #
 # Examples (MOPS) - Comparative:
