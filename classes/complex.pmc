@@ -660,6 +660,13 @@ Multiplies the complex number with C<value>, placing the result in C<dest>.
 
 */
 
+/*
+
+  TODO for better precision:
+
+  (a+ib)(c+id)=(ac-bd)+i((a+b)(c+d)-ac-bd).
+
+*/
     void multiply (PMC* value, PMC* dest) {
 MMD_PerlInt: {
         FLOATVAL re = RE(SELF) * PMC_int_val(value);
@@ -766,6 +773,18 @@ Compares the complex number with C<value> and returs true if they are equal.
 Sets C<dest> to the absolute value of SELF that is the distance from (0.0).
 
 =cut
+
+*/
+
+/*
+
+  TODO for better precision: hinted by vaxman according to "Numerival Recipes
+  in Fortran 77", 2nd edition, Press, Vetterling, Teukolsky, Flannery,
+  Cambridge University Press, 2001, pp. 171ff:
+
+
+|a+ib|=|a|*sqrt(1+(b/a)**2), if |a|>=|b|,
+       |b|*sqrt(1+(a/b)**2)  else.
 
 */
 
