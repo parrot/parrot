@@ -16,7 +16,7 @@ Tests the object/class subsystem.
 
 =cut
 
-use Parrot::Test tests => 52;
+use Parrot::Test tests => 53;
 use Test::More;
 
 output_is(<<'CODE', <<'OUTPUT', "findclass (base class)");
@@ -1777,3 +1777,33 @@ d: 6789
 OUTPUT
 
 }
+
+pir_output_is(<<'CODE', <<'OUTPUT', "namespace vs name");
+.sub main @MAIN
+    .local pmc o, cl, f
+    newclass cl, "Foo"
+    $I0 = find_type "Foo"
+    o = new $I0
+    print o
+    Foo()
+    f = global "Foo"
+    f()
+    f = find_global "Foo", "Foo"
+    f()
+.end
+.sub Foo
+    print "ok 2\n"
+.end
+.namespace [ "Foo" ]
+.sub __get_string
+    .return("ok 1\n")
+.end
+.sub Foo
+    print "ok 3\n"
+.end
+CODE
+ok 1
+ok 2
+ok 2
+ok 3
+OUTPUT

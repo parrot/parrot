@@ -27,12 +27,16 @@ tdb
 =item C<PMC *
 Parrot_find_global(Parrot_Interp interpreter, STRING *class, STRING *globalname)>
 
+If C<class> is NULL search global stash. If C<globalname> is NULL, return the
+stash PMC.
+
 Return NULL if the global isn't found or the global.
 
 =item C<PMC *
 Parrot_get_global(Parrot_Interp interpreter, STRING *class, STRING *globalname)>
 
-If the global exists, return it. If not either throw an exception or return an C<Undef> depeneding on the interpreter's error settings.
+If the global exists, return it. If not either throw an exception or return an
+C<Undef> depending on the interpreter's error settings.
 
 =cut
 
@@ -42,6 +46,7 @@ PMC *
 Parrot_find_global(Parrot_Interp interpreter, STRING *class, STRING *globalname)
 {
     PMC *stash;
+    STRING *ns_name;
 #if 1
     /*
      * we are cheating a bit and use PerlHash internals to avoid
@@ -54,11 +59,16 @@ Parrot_find_global(Parrot_Interp interpreter, STRING *class, STRING *globalname)
 #endif
     stash = interpreter->globals->stash_hash;
     if (class) {
+        ns_name = string_concat(interpreter,
+                string_from_cstring(interpreter, "\0", 1),
+                class, 0);
         b = hash_get_bucket(interpreter,
-                (Hash*) PMC_struct_val(stash), class);
+                (Hash*) PMC_struct_val(stash), ns_name);
         if (!b)
             return NULL;
         stash = b->value;
+        if (!globalname)
+            return stash;
         b = hash_get_bucket(interpreter,
                 (Hash*) PMC_struct_val(stash), globalname);
         if (!b)
@@ -66,6 +76,8 @@ Parrot_find_global(Parrot_Interp interpreter, STRING *class, STRING *globalname)
         return VTABLE_get_pmc_keyed_int(interpreter, stash,
                 PMC_int_val((PMC*)b->value));
     }
+    if (!globalname)
+        return stash;
     b = hash_get_bucket(interpreter,
                 (Hash*) PMC_struct_val(stash), globalname);
     if (!b)
@@ -74,18 +86,23 @@ Parrot_find_global(Parrot_Interp interpreter, STRING *class, STRING *globalname)
 
 #else
     if (class) {
+        ns_name = string_concat(interpreter,
+                string_from_cstring(interpreter, "\0", 1),
+                class, 0);
         if (!VTABLE_exists_keyed_str(interpreter,
                                      interpreter->globals->stash_hash,
-                                     class)) {
+                                     ns_name)) {
             return NULL;
         }
         stash = VTABLE_get_pmc_keyed_str(interpreter,
                                          interpreter->globals->stash_hash,
-                                         class);
+                                         ns_name);
     }
     else {
         stash = interpreter->globals->stash_hash;
     }
+    if (!globalname)
+        return stash;
     if (!VTABLE_exists_keyed_str(interpreter, stash, globalname)) {
         return NULL;
     }
@@ -124,9 +141,10 @@ If it doesn't exist yet, add it to the stash C<globals>.
 */
 
 PMC*
-Parrot_global_namespace(Interp *interpreter, PMC *globals, STRING *names)
+Parrot_global_namespace(Interp *interpreter, PMC *globals, STRING *class)
 {
     PMC *stash;
+    STRING *ns_name;
 
     /*
      * this routine is called by PackFile_ConstTable_unpack too, which
@@ -135,14 +153,15 @@ Parrot_global_namespace(Interp *interpreter, PMC *globals, STRING *names)
      * lookup dies then during mark_1_seg.
      */
     Parrot_block_DOD(interpreter);
-    if (!VTABLE_exists_keyed_str(interpreter, globals, names)) {
+    ns_name = string_concat(interpreter,
+            string_from_cstring(interpreter, "\0", 1),
+            class, 0);
+    if (!VTABLE_exists_keyed_str(interpreter, globals, ns_name)) {
         stash = pmc_new(interpreter, enum_class_OrderedHash);
-        VTABLE_set_pmc_keyed_str(interpreter, globals, names,
-                stash);
+        VTABLE_set_pmc_keyed_str(interpreter, globals, ns_name, stash);
     }
     else {
-        stash = VTABLE_get_pmc_keyed_str(interpreter, globals,
-                names);
+        stash = VTABLE_get_pmc_keyed_str(interpreter, globals, ns_name);
     }
     Parrot_unblock_DOD(interpreter);
     return stash;

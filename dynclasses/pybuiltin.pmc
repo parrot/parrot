@@ -75,12 +75,12 @@ they will be used frequently here.
 
 =item C<PMC* "__load__"()>
 
-This is unabashed hackery scaffolding.  It copies all the builtins 
+This is unabashed hackery scaffolding.  It copies all the builtins
 functions from globals to lexicaly scoped variables.
 
 =cut
 
-The implementation is highly dependent on the internals of globals and 
+The implementation is highly dependent on the internals of globals and
 ordered hashes, and will break should either of them change - of course,
 any such breakage should show up quickly in the unit tests.
 
@@ -91,9 +91,8 @@ enter_nci_method should create these as locals to begin with.
 */
 
     METHOD void __load__() {
-        STRING *class, *name, *key;
+        STRING *name, *key;
         PMC *stash, *iter, *item, *pad, *find;
-        HashBucket *b;
         INTVAL j, n;
 
         /* Already init'ed? */
@@ -103,13 +102,12 @@ enter_nci_method should create these as locals to begin with.
         if (find && VTABLE_defined(INTERP, find)) return;
 
         /* Find all PyBuiltin "nci" methods */
-        class = const_string(INTERP, "PyBuiltin");
-        stash = INTERP->globals->stash_hash;
-        b = hash_get_bucket(INTERP, (Hash*) PMC_struct_val(stash), class);
-        if (!b) internal_exception(1, "Can't find PyBuiltins");
+        stash = Parrot_find_global(INTERP,
+                const_string(INTERP, "PyBuiltin"), NULL);
+        if (!stash)
+            internal_exception(1, "Can't find PyBuiltins");
 
         /* For each, extract the key and item, and store in the scratchpad */
-        stash = b->value;
         iter = Parrot_PerlHash_get_iter(INTERP, stash);
         n = VTABLE_elements(INTERP, stash);
         for (j = 0; j < n; ++j) {
@@ -308,10 +306,10 @@ is a tuple or string, return the same type, else return a list.
         STRING *s;
         INTVAL type;
         int none_func;
-    
+
         type = list->vtable->base_type;
         iter = NULL;
-    
+
         if (type == dynclass_PyString) {
             res = pmc_new(INTERP, type);
         }
@@ -319,7 +317,7 @@ is a tuple or string, return the same type, else return a list.
             if (type == enum_class_Iterator) iter = list;
             res = pmc_new(INTERP, dynclass_PyList);
         }
-    
+
         if (!iter)
             iter = pmc_new_init(INTERP, enum_class_Iterator, list);
         VTABLE_set_integer_native(INTERP, iter, 0);
@@ -397,7 +395,7 @@ Returns the hex representation of C<value>.
         PMC *h = pmc_new_noinit(INTERP, dynclass_PyInt);
         INTVAL type = value->vtable->base_type;
         INTVAL i;
-    
+
         if (type == dynclass_PyString)
             i = string_hash(INTERP, PMC_str_val(value));
         else if (type == dynclass_PyComplex)
@@ -833,7 +831,7 @@ Returns the tuple value of C<value>.
 
 =item C<PMC* "xrange"(PMC *pstart, PMC *pend, PMC *pstep)>
 
-Returns an object which can be iterated over to obtain a list of 
+Returns an object which can be iterated over to obtain a list of
 integers ranging from C<pstart> to C<pend> with an increment of C<pstep>
 
 =cut

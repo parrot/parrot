@@ -234,11 +234,12 @@ Store global $2 as global symbol $1
 
 =item B<store_global>(in STR, in STR, in PMC)
 
-Store global $3 as global symbol $2 in namespace $1
+Store global $3 as global symbol $2 in namespace $1. If namespace $1 doesn't
+exist it is created.
 
 =item B<store_global>(in PMC, in STR, in PMC)
 
-Store global $3 as global symbol $2 in namespace $1
+Store global $3 as global symbol $2 in namespace $1.
 
 
 =cut
@@ -254,17 +255,7 @@ op store_global(in STR, in STR, in PMC) {
 }
 
 op store_global(in PMC, in STR, in PMC) {
-    /* XXX: All globals should go through an API */
-    PMC * globals = interpreter->globals->stash_hash;
-    PMC * stash;
-    if (!VTABLE_exists_keyed(interpreter, globals, $1)) {
-	stash = pmc_new(interpreter, enum_class_OrderedHash);
-	VTABLE_set_pmc_keyed(interpreter, globals, $1, stash);
-    }
-    else {
-        stash = VTABLE_get_pmc_keyed(interpreter, globals, $1);
-    }
-    VTABLE_set_pmc_keyed_str(interpreter, stash, $2, $3);
+    VTABLE_set_pmc_keyed_str(interpreter, $1, $2, $3);
     goto NEXT();
 }
 
@@ -282,9 +273,11 @@ Find the global named $3 in namespace $2 and store it in $1. If the
 global doesn't exist either throws an exception or sets $1 to undef,
 depending on current errors settings, s. B<errorson>.
 
+If $3 is NULL the namespace hash for namespace $2 is returned.
+
 =item B<find_global>(out PMC, in PMC, in STR)
 
-Find the global named $3 in the namespace specified by the key in $2
+Find the global named $3 in the namespace specified by $2
 and store it in $1. If the global doesn't exist either throws an
 exception or sets $1 to undef, depending on current errors settings,
 s. B<errorson>.
@@ -305,8 +298,6 @@ op find_global(out PMC, in STR, in STR) {
     opcode_t * next;
     if (!$2)
 	internal_exception(1, "Tried to get null class.");
-    if (!$3)
-	internal_exception(1, "Tried to get null global.");
 
     next = expr NEXT();
     $1 = Parrot_get_global(interpreter, $2, $3, next);
@@ -316,27 +307,13 @@ op find_global(out PMC, in STR, in STR) {
 op find_global(out PMC, in PMC, in STR) {
     /* XXX: All globals should go through an API */
     opcode_t * next;
-    PMC * globals = interpreter->globals->stash_hash;
-    PMC * stash = NULL; /* -O unit warn */
+    PMC * stash = $2;
     if (!$2)
-	internal_exception(1, "Tried to get null global.");
+	internal_exception(1, "Tried to get from null namespace.");
     if (!$3)
 	internal_exception(1, "Tried to get null global.");
 
     next = expr NEXT();
-    if (!VTABLE_exists_keyed(interpreter, globals, $2)) {
-	if (PARROT_ERRORS_test(interpreter, PARROT_ERRORS_GLOBALS_FLAG))  {
-	    real_exception(interpreter, next, GLOBAL_NOT_FOUND,
-		    "Global '%Ss' not found\n", $3);
-	}
-	else {
-	    stash = pmc_new(interpreter, enum_class_Undef);
-	    VTABLE_set_pmc_keyed(interpreter, globals, $2, stash);
-	}
-    }
-    else {
-	stash = VTABLE_get_pmc_keyed(interpreter, globals, $2);
-    }
     if (!VTABLE_exists_keyed_str(interpreter, stash, $3)) {
 	if (PARROT_ERRORS_test(interpreter, PARROT_ERRORS_GLOBALS_FLAG))  {
 	    real_exception(interpreter, next, GLOBAL_NOT_FOUND,
