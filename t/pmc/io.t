@@ -19,6 +19,16 @@ Tests the Parrot IO operations.
 use Parrot::Test tests => 23;
 use Test::More;
 
+sub file_content_is {
+    my ($file, $content, $name) = @_;
+    local $/=undef; # slurp mode
+    open FOO, "temp.file";
+
+    is(<FOO>, $content, $name);
+
+    close FOO;
+}
+
 output_is(<<'CODE', <<'OUTPUT', "open/close");
 	open P0, "temp.file", ">"
 	print P0, "a line\n"
@@ -249,14 +259,9 @@ CODE
 done
 OUTPUT
 
-$/=undef; # slurp mode
-open FOO, "temp.file";
-
-is(<FOO>, <<'OUTPUT', 'file contents');
+file_content_is("temp.file", <<'OUTPUT', 'file contents');
 Hello, World!
 OUTPUT
-
-close FOO;
 
 output_is(<<'CODE', '', 'append');
        open P1, "temp.file", ">>"
@@ -265,14 +270,10 @@ output_is(<<'CODE', '', 'append');
        end
 CODE
 
-open FOO, "temp.file";
-
-is(<FOO>, <<'OUTPUT', 'append file contents');
+file_content_is("temp.file", <<'OUTPUT', 'append file contents');
 Hello, World!
 Parrot flies
 OUTPUT
-
-close FOO;
 
 output_is(<<'CODE', '', 'write to file');
        open P1, "temp.file", ">"
@@ -281,13 +282,9 @@ output_is(<<'CODE', '', 'write to file');
        end
 CODE
 
-open FOO, "temp.file";
-
-is(<FOO>, <<'OUTPUT', 'file contents');
+file_content_is("temp.file", <<'OUTPUT', 'file contents');
 Parrot overwrites
 OUTPUT
-
-close FOO;
 
 unlink("temp.file");
 
