@@ -297,9 +297,7 @@ PackFile_unpack(struct Parrot_Interp *interpreter, struct PackFile *self,
     header->magic = PackFile_fetch_op(self, cursor++);
 
     /*
-     * The magic and byteorder fields must be in standard left-right
-     * (big endian) order. The bytecode file itself may be in any
-     * supported order.
+     * The magic and opcodetype fields are in native byteorder.
      */
     if (header->magic != PARROT_MAGIC) {
         fprintf(stderr, "PackFile_unpack: Not a Parrot PackFile!\n");
