@@ -183,21 +183,21 @@ Adds C<*value> to the integer and returns the result in C<*dest>.
 
     void add (PMC* value, PMC* dest) {
 MMD_PyInt: {
-            VTABLE_morph(INTERP, dest, dynclass_PyInt);
             INTVAL pmci = PMC_int_val(SELF);
             INTVAL vali = VTABLE_get_integer(INTERP, value);
+            VTABLE_morph(INTERP, dest, dynclass_PyInt);
             VTABLE_set_integer_native(INTERP, dest, pmci + vali);
         }
 MMD_PyFloat: {
-            VTABLE_morph(INTERP, dest, dynclass_PyFloat);
             INTVAL pmci = PMC_int_val(SELF);
             FLOATVAL valf = VTABLE_get_number(INTERP, value);
+            VTABLE_morph(INTERP, dest, dynclass_PyFloat);
             VTABLE_set_number_native(INTERP, dest, pmci + valf);
         }
 MMD_PyComplex: {
-            VTABLE_morph(INTERP, dest, dynclass_PyComplex);
             INTVAL pmci = PMC_int_val(SELF);
             FLOATVAL valf = VTABLE_get_number_keyed_int(INTERP, value, 0);
+            VTABLE_morph(INTERP, dest, dynclass_PyComplex);
             VTABLE_set_number_keyed_int(INTERP, dest, 0, pmci + valf);
             valf = VTABLE_get_number_keyed_int(INTERP, value, 1);
             VTABLE_set_number_keyed_int(INTERP, dest, 1, valf);
