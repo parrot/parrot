@@ -52,7 +52,7 @@ required of PMC classes.
 
 Doing GC takes a bit of work--we need to make sure that everything is
 findable from the root set, and that we don't go messing up data
-shared between interpreters. This, then, is 
+shared between interpreters. 
 
 =head2 DOD Steps
 
@@ -78,7 +78,7 @@ For each PMC on the trace list we:
 
 =item Set its live bit
 
-=item Check its flags. If it has a custom DOD routine, we call it.
+=item Check its flags. If it has a custom DOD routine, we call it
 
 =item If there's no custom DOD routine, we check the flags for one of the following:
 
@@ -88,11 +88,11 @@ For each PMC on the trace list we:
 
 =item Points to a Buffer. We mark the buffer as live
 
-=item Points to a Buffer of PMCs. We put all the PMCs on the trace list.
+=item Points to a Buffer of PMCs. We put all the PMCs on the trace list
 
 =item Points to a Buffer of Buffers. We mark those buffers as live
 
-=item Anything else we ignore.
+=item Anything else we ignore
 
 =back
 
@@ -111,7 +111,7 @@ free bit) are put on the free buffer list.
 
 =head2 GC Steps
 
-These are the steps that the GC takes,
+These are the steps that the GC takes:
 
 =over 4
 

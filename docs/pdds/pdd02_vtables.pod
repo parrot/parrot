@@ -103,7 +103,7 @@ XXX - What is the initializer used for?
 
 =item void morph(INTERP, PMC* self, INTVAL type)
 
-turns the PMC into a PMC of type C<type>. If the morphing can't be
+Turn the PMC into a PMC of type C<type>. If the morphing can't be
 reasonably done, for example if an integer is asked to turn into a
 PerlArray, then the PMC is first destroyed, then recreated as an empty
 PMC of the new type.
@@ -115,7 +115,7 @@ transformations.
 
 =item PMC* mark(INTERP, PMC* self, PMC* tail)
 
-Called by the DOD when its sweeping through the PMCs and has detected
+Called by the DOD when it is sweeping through the PMCs and has detected
 that this PMC is both alive and has a custom mark routine. The second
 parameter is the PMC at the tail of the free PMC list, as passed to
 C<mark_used>. This should return the new tail of the free PMC list.
@@ -153,8 +153,8 @@ key for that PMC; this means that that arguement is unkeyed.
 In some cases, the caller I<must> provide a non-NULL 
 key.  Those cases are explicitly stated below.  In the other cases, you may
 have to implement the keyed vtable methods and check for a NULL B<self> key even 
-if you are implementing a non-aggregate type.  If the B<self> key is non-
-NULL and the PMC class is a non-aggregate type, the _keyed_* methods
+if you are implementing a non-aggregate type.  If the B<self> key is non-NULL
+and the PMC class is a non-aggregate type, the _keyed_* methods
 should throw an exception.
 
 If you do not implement the _keyed_int methods, the default will convert

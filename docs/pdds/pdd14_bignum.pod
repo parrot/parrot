@@ -342,7 +342,7 @@ of the library (they will share a common private header file).
 
 =head1 IMPLEMENTATION
 
-Functions are provided with implement the arithmetic, conversion,
+Functions are provided which implement the arithmetic, conversion,
 creation and destruction of big numbers by dealing with otherwise
 opaque big number objects.
 

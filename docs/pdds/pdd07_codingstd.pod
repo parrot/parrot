@@ -701,7 +701,7 @@ Related to extensibility is portability. Perl runs on many, many
 platforms, and will no doubt be ported to ever more bizarre and obscure
 ones over time.  You should never assume an operating system, processor
 architecture, endian-ness, word size, or whatever. In particular, don't
-fall into the any of the following common traps:
+fall into any of the following common traps:
 
 Internal data types and their utility functions (especially for strings)
 should be used over a bare char * whenever possible. Ideally there should
@@ -782,7 +782,7 @@ zillions of #ifdefs.
 And remember to document it.
 
 Loosely speaking, Perl tends to optimism for speed rather than space,
-So you may want to code for speed first, then tweak to reclaim some
+so you may want to code for speed first, then tweak to reclaim some
 space while not affecting performance.
 
 =head1 REFERENCES

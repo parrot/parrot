@@ -256,7 +256,7 @@ specified using two bytes. The first byte is a type specifier:
 and the second byte is an index into the appropriate constant table, (in
 the first 4 cases and the last case) or a register specifier. (see below) 
 
-Register arguments (The C<_r> bit) are specified as a single byte. The
+Register arguments (the C<_r> bit) are specified as a single byte. The
 top two bits are the type specifier:
 
     00 - Integer
