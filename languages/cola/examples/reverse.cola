@@ -1,7 +1,7 @@
 // reverse.cola
 //
-// Simple old fashioned Recursive 101 example to
-// reverse a string.
+// Reverse a string 2 ways, recursively swapping and
+// use array indexing.
 //
 // Copyright (C) 2002 Melvin Smith
 
@@ -10,16 +10,27 @@ using System;
 public class Reverse {
 
     // Recursively reverse string halves until halves are length 1
-    public string Reverse(string s1, string s2) {
+    public string Reverse1(string s1, string s2) {
         int len = strlen(s1);
         if(len > 1)
-            s1 = Reverse(substr(s1, 0, len/2), substr(s1, len/2, len-len/2));
+            s1 = Reverse1(substr(s1, 0, len/2), substr(s1, len/2, len-len/2));
         len = strlen(s2);
         if(len > 1)
-            s2 = Reverse(substr(s2, 0, len/2), substr(s2, len/2, len-len/2));
+            s2 = Reverse1(substr(s2, 0, len/2), substr(s2, len/2, len-len/2));
 
         puts("(" + s1 + ")(" + s2 + ")\n");
         return s2 + s1; 
+    }
+
+    public string Reverse2(string str) {
+        int i, j = 0;
+        string rev;
+
+        // Reverse it with a loop
+        i = strlen(str) - 1;
+        while(i >= 0)
+            rev[j++] = str[i--];
+        return rev;
     }
 
     public static void Main() {
@@ -29,18 +40,10 @@ public class Reverse {
         // Reverse it with recursion
         puts("\n");
         // Reverse the 2 halves
-        puts( Reverse(str, "") + "\n" );
+        puts( Reverse1(str, "") + "\n" );
         
-        int i;
-        string rev;
-
-        // Reverse it with a loop
-        i = strlen(str) - 1;
-        rev = "";
-        while(i >= 0) {
-            rev = rev + str[i--];
-        }
-        puts( "Reverse with a loop:\n" + rev + "\n" );
+        puts( "Reverse with arrays:\n" );
+        puts( Reverse2(str) + "\n" );
     }
 }
 

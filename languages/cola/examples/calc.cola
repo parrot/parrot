@@ -2,17 +2,13 @@
 //
 // Toy calculator (simple 2 argument expressions: 1 + 2, 1 * 2, 2 / 1, 2 - 1) 
 // Demonstrates subroutines, strings, string indexed access with [], etc.
-// NOTE: Cola doesn't yet support assignment to dereferences,
-// so you can only use the [] operator as rvalues (read-only) for now
-// Example:
-//         if(s[i] == 'a')      <-- OK
-//         s[i] = 'a';          <-- Not yet
+// REVISION: Support assignment to array indirections.
 //
 // Copyright (C) 2002 Melvin Smith
 
 using System;
 
-public class Hello {
+public class Calc {
 
 	// Get a numbered item out of a string
 	public string GetArgN(string s, int n) {

@@ -59,6 +59,8 @@ void gen_bootstrap() {
 				saveregs, restoreregs);
 	printf("\n__strchop:\n%s\trestore S0\n\tchopn S0, 1\n\tsave S0\n%s\tret\n",
 				saveregs, restoreregs);
+	printf("\n__strrep:\n%s\trestore S30\n\trestore I31\n\trestore I30\n\trestore S31\n\tsubstr S31, I30, I31, S30\n\tsave S31\n%s\tret\n",
+				saveregs, restoreregs);
 	printf("\n__ord:\n%s\trestore S0\n\tord I0, S0\n\tsave I0\n%s\tret\n",
 				saveregs, restoreregs);
 	printf("\n__gets:\n%s\treadline S0, 0\n\tsave S0\n%s\tret\n",
@@ -215,43 +217,61 @@ void gen_assign(AST * ast) {
 #ifdef DEBUG
 	printf("#gen_assign\n");
 #endif
-	gen_unary_expr(p->arg1);
+	if(p->arg1->asttype == ASTT_IDENTIFIER ||
+		p->arg1->asttype == ASTT_LITERAL) {
+		p->arg1->targ = p->arg1->sym;
+	}
 
 	/*
 	 *	gen_expr() generates the assignment if
-	 *	a target lval is passed to it. This gets rid of all the
-	 *	temporaries of type (temp1 = source; target = temp1)
+	 *	a target lval is passed to it. This gets rid of some
+	 *	temporaries of type (temp1 = source; target = temp1),
 	 */
 	if(p->arg1->targ) {
-		/* target is an identifier or address */
+		/* target is an identifier or address, pass the
+		 * symbol to gen_expr() which will emit the expression
+		 * and assignment.
+		 */
 		gen_expr(p->arg2, p->arg1->targ);
 	}
 	else {
 		/* target is an expression that may or may not
 		 * have parsed to a assignable lvalue
 		 */
-		gen_expr(p->arg2, NULL);
+
+		/* Now assign the temporary to the lvalue expression */
 		if(p->arg1->asttype == ASTT_INDEX) {
 			char buf[4096];
-			if(p->arg1->arg1 == NULL || p->arg1->arg2 == NULL) {
-				printf("Internal error: invalid array expression as lvalue\n");
+			AST * deref = p->arg1;
+       		/* Assign to an array */
+		    gen_expr(deref->arg1, NULL);
+		    gen_expr(deref->arg2, NULL);
+			if(deref->arg1 == NULL || deref->arg2 == NULL) {
+				printf("Internal error: invalid array expression or indirection as lvalue\n");
 				abort();
 			}
-			sprintf(buf, "%s [] %s", p->arg1->arg1->targ->name, p->arg1->arg2->targ->name);
+
+            /* If destination indirection uses a variable, copy it to a temporary
+             * in case it is modified by source expression code ( d[i] = s[++i] )
+             */
+            if(deref->arg2->asttype == ASTT_IDENTIFIER) {
+                deref->arg2->targ = make_rval(deref->arg2->sym->type);
+                printf("\t(%s)%s = %s\n", type_name(deref->arg2->targ),
+                    deref->arg2->targ->name, deref->arg2->sym->name);
+            }
+            /* emit source expression with a temporary */
+	    	gen_expr(p->arg2, NULL);
+
+			sprintf(buf, "%s%s%s", deref->arg1->targ->name, op_name(INDEX), deref->arg2->targ->name);
 			p->targ = new_symbol(IDENTIFIER, buf);
 			p->targ->is_lval = 1;
-			p->targ->type = p->arg1->arg1->targ->type;
+			p->targ->type = deref->arg1->targ->type;
 			
 			// Generate assignment
 			printf("\t(%s)%s = %s\n", type_name(p->targ), p->targ->name, p->arg2->targ->name);
 			return;
 		}
-		
-		if(!IS_LVAL(p->arg1->targ)) {
-			printf("Need an lvalue as target of assignment.\n");
-			exit(0);
-		}
-		
+
 		printf("#gen_assign: Internal error, unsupported assignment.\n");
 		exit(0);
 	}
@@ -264,16 +284,12 @@ void gen_assign(AST * ast) {
  * $0.type = expr.type
  */
 
+#if 0
 void gen_unary_expr(AST * p) {
 #ifdef DEBUG
 	printf("#gen_unary_expr\n");
 #endif
-	if(p->asttype == ASTT_IDENTIFIER ||
-		p->asttype == ASTT_LITERAL) {
-		p->targ = p->sym;
-		return;
-	}
-	else if(p->asttype == ASTT_INDEX) {
+	if(p->asttype == ASTT_INDEX) {
 		/* Element access of an array */
 		/* Ugly ugly kludgy klunky. I wrote the generator wrong to begin
 		 * with, so now I'm patching in lvalue generation for things
@@ -295,6 +311,7 @@ void gen_unary_expr(AST * p) {
 	}
 	emit_unary_expr(p->targ, p->arg1->targ, op_name(p->op));
 }
+#endif
 
 void gen_add_expr(AST * ast) {
 	AST * p = ast;
@@ -393,7 +410,7 @@ void gen_expr(AST * p, Symbol * lval) {
 			}
 			if(p->targ == NULL)
 				p->targ = make_rval(type1);
-			printf("\t(%s)%s = %s %s %s\n", type_name(p->targ), p->targ->name,
+			printf("\t(%s)%s = %s%s%s\n", type_name(p->targ), p->targ->name,
 						p->arg1->targ->name, op_name(INDEX), p->arg2->targ->name);
 			return;
 		}

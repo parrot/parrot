@@ -1,6 +1,6 @@
 "Cola" - A compiler for the Parrot VM
 
-  V0.0.1
+  V0.0.2
 
   Thanks for trying this little language.
 
@@ -94,12 +94,8 @@ Supported Constructs
 
 
   Arrays:
-    You may treat strings as read-only arrays, you may not assign
-    to an array slot (yet). This is for 2 reasons, Parrot still
-    needs a substr op that will replace, and also my code
-    generator is too dumb right now to really handle "deref"
-    variables in all their forms. The string [] is a hack
-    until the rewrite which will support arrays of anything.
+    Parrot now has a substr with replace op so we can emulate arrays
+    on top of it. Its still a hack but it works.
 
 What you currently CANNOT do even though the Parser may eat it...
   Statement lists:          i = j, j = k;
@@ -224,11 +220,9 @@ Coming Soon
 Gaping Holes
 
   Arrays
-    I've yet to completely implement arrays, mainly because Parrot doesn't yet
-    support them. Someone is currently working away on that area so
-    I'm waiting with bated breath. You can, however, use array syntax
-    for strings, but they are read-only.
-    
+    Strings can be treated as arrays, thats it for now.
+    Parrot still needs keyed aggregates finished to do this.
+ 
   Class/Struct instantiation
     Lotta work involved here, I won't go there for now.
     Currently you can define multiple Cola classes per file, but cannot

@@ -198,7 +198,7 @@ sub read_program {
 		my ($line) = $_;
 		$label = '';
 
-        	#print STDERR ">>$line\n";
+        print STDERR ">>$line\n";
 
 		# Allow "here document" syntax to emit straight
 		# Parrot code without symbolic registers.
@@ -221,7 +221,7 @@ sub read_program {
 		    print "\t$line\n"; next;
 		}
 
-        	# Trim trailing comments
+        # Trim trailing comments
 		$line = &trim_comment($line);
 
 		# .directives
@@ -359,7 +359,9 @@ sub assign_expr {
 	my $left = shift;
 	my $right = shift;
 	my $type;
-
+    my $op;
+    my $offset;
+    
 	if( $left =~ /^\((\w+)\)(.*)$/ ) {
 		$left = $2;
 		$type = $1;
@@ -374,15 +376,19 @@ sub assign_expr {
 	# Check to see if target is indirection
 	# Only strings are supported for now, hence the
 	# hard-coded hackfu.
-	if( $left =~ m{(\S+)\s+(\[\])\s+(\S+)} ) {
-		# Parrot doesn't have a substr version for replacement
-		# at this time. So fake it by grabbing the first piece,
-		# concating the assignment piece, and concating the old
-		# remainder.
-		my ($arg1, $arg2) = (&reg_assign($1, $type), &reg_assign($3, 'i32'));
-		#
-		#print "\tstrrep $arg1, $arg3, $arg2, 1\n";
-		die "Parrot does not currently support assignment to substrings.\nDo it the long way with a substr() and strcat(). :)\n ";
+	if( $left =~ m{(\$?\w+)(\[\])(\$?\w+)} ) {
+		$targ = &reg_assign($1, $type);
+        $offset = &reg_assign($3, 'i32');
+   	    my $saverval = $3;
+		$op = &op_to_parrot($targ, $2);
+		if( $right =~ /^(\S+|"[^"\n]*["\n])/ ) {
+            my $src = &reg_assign($1, $type);
+     		print "\t$op $targ, $offset, 1, $src\n";
+#    		if(&is_rval($saverval)) { &free_reg($offset); }
+    		if(&is_rval($1)) { &free_reg($src); }
+     		return;
+        }
+		die "Invalid expression on right hand of assignment to indirect address\n ";
 	}
 	
 	$targ = &reg_assign($left, $type);
@@ -392,22 +398,25 @@ sub assign_expr {
 	# hand of assignments. This is a simple little technique
 	# which is easier than doing correct register allocation
 	# via graph coloring.
-	if( $right =~ m{^(\S+|"[^"\n]*["\n])\s+([-+*/%]|\[\])\s+(\S+|"[^"\n"]*["\n])} ) {
+	if( $right =~ m{^(\S+|"[^"\n]*["\n])\s+([-+*/%])\s+(\S+|"[^"\n"]*["\n])} ) {
 		my ($arg2, $arg3) = (&reg_assign($1, $type), &reg_assign($3, $type));
-		my $op = &op_to_parrot($targ, $2);
-		if($op eq 'substr') {
-			print "\t$op $targ, $arg2, $arg3, 1\n";
-		}
+		$op = &op_to_parrot($targ, $2);
+		print "\t$op $targ, $arg2, $arg3\n";
+		if(&is_rval($1)) { &free_reg($arg2); }
+		if(&is_rval($3)) { &free_reg($arg3); }
+	}
+	elsif( $right =~ m{(\$?\w+)(\[\])(\$?\w+)} ) {
+		my ($arg2, $arg3) = (&reg_assign($1, $type), &reg_assign($3, $type));
+		$op = &op_to_parrot($targ, $2);
+    	if($op eq 'substr') {
+	    	print "\t$op $targ, $arg2, $arg3, 1\n";
+        }
 		else {
 			print "\t$op $targ, $arg2, $arg3\n";
 		}
-		if(&is_rval($1)) {
-			&free_reg($arg2);
-		}
-		if(&is_rval($3)) {
-			&free_reg($arg3);
-		}
-	}
+		if(&is_rval($1)) { &free_reg($arg2); }
+		if(&is_rval($3)) { &free_reg($arg3); }
+    }
 	elsif( $right =~ /new\s+(\w+)/ ) {
 		# All aggregate types map to a generic Parrot type for now
 		my $native_type = 'PerlString';
@@ -418,14 +427,13 @@ sub assign_expr {
 	}
 	else {
 		# Simple assign
+	    #print STDERR "#simple assignment\n";
 		$reg = &reg_assign($right, $type);
 		print "\tset $targ, $reg\n";
 		if(&is_rval($right)) {
 			&free_reg($reg);
 		}
 	}
-
-	next;
 }
 
 sub op_to_parrot {

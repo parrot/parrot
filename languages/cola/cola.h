@@ -11,7 +11,7 @@
 #ifndef _COLA_H
 #define _COLA_H
 
-#define COLA_VERSION "0.0.1"
+#define COLA_VERSION "0.0.2"
 
 
 void abort(void);

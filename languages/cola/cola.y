@@ -906,6 +906,7 @@ int main(int argc, char * argv[])
 		store_identifier(current_symbol_table, "substr", METHOD, t_string);
 		store_identifier(current_symbol_table, "strlen", METHOD, t_int);
 		store_identifier(current_symbol_table, "strchop", METHOD, t_string);
+		store_identifier(current_symbol_table, "strrep", METHOD, t_string);
 		store_identifier(current_symbol_table, "ord", METHOD, t_int);
 		store_identifier(current_symbol_table, "sleep", METHOD, t_void);
 	}
