@@ -107,19 +107,21 @@ STRING_compare(Parrot_Interp interp, void *a, void *b)
     return string_compare(interp, (STRING *)a, (STRING *) b);
 #else
     /*
-     * we only won't to know if strings are the same,
-     * so this is a specialized version of string_compare
+     * We only won't to know if strings are the same or not,
+     * so this is a specialized version of string_compare.
+     * Also transcoding inside here is the wrong place.
+     * hash->compare may be called repeatedly for the same key.
      *
-     * XXX if we have to consider string->type too, then:
+     * XXX we have to consider string->type too:
      * * as long as there are only ascii keys: noop
-     * * on first non ascii key, convert all to utf8 - doesn't change
+     * * on first non ascii key, convert all hash to utf8 - doesn't change
      *   hash values
-     * * then if key is non-ascii and non-utf8 trancode it in
-     *   find_bucket
+     * * then if key is non-ascii and non-utf8 transcode it in
+     *   find_bucket()
      */
     STRING *s1 = (STRING*) a;
     STRING *s2 = (STRING*) b;
-    const char *s1start;
+    const char *s1start, *s1end;
     const char *s2start;
     size_t len;
     /*
@@ -127,21 +129,25 @@ STRING_compare(Parrot_Interp interp, void *a, void *b)
      */
     if (s1->strlen != s2->strlen)
         return 1;       /* we don't care which is bigger */
+    if (!s1->strlen)
+        return 0;
     /*
      * both strings have equal amount of chars
      */
     s1start = s1->strstart;
     s2start = s2->strstart;
     len = (size_t) s1->bufused;
-#if 1
-    /* speed up ascii, slow down general case */
+
+    /* speed up ascii, slow down general case
+     * TODO if above is done, just swap the compare function
+     */
     if (s1->encoding->index == enum_encoding_singlebyte &&
         s2->encoding->index == enum_encoding_singlebyte) {
-        return memcmp(s1start, s2start, len);
+        return memcmp(s1start, s2start, s1->bufused);
     }
-#endif
 
-    while (len--) {
+    s1end = s1start + len;
+    while (s1start < s1end) {
         if (s1->encoding->decode(s1start) != s2->encoding->decode(s2start))
             return 1;
         s1start = s1->encoding->skip_forward(s1start, 1);
