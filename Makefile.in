@@ -147,6 +147,7 @@ all : $(TEST_PROG) docs
 
 mops: examples/assembly/mops${exe} examples/mops/mops${exe}
 
+# XXX Unix-only for now
 libparrot$(A) : $(O_FILES)
 	$(AR_CRS) $@ $(O_FILES)
 
