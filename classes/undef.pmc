@@ -25,7 +25,11 @@ passed-in type and does a same-type assignment from there.
 #include "parrot/parrot.h"
 
 
-pmclass undef extends default {
+pmclass Undef extends default {
+
+  void morph(INTVAL new_type) {
+    pmc_reuse(INTERP, SELF, new_type, 0);
+  }
 
   INTVAL get_integer() {
     return 0;

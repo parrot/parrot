@@ -73,6 +73,97 @@ pmc_new(Interp *interpreter, INTVAL base_type)
 
 /*
 
+=item C<PMC *
+pmc_reuse(Interp *interpreter, PMC *pmc, INTVAL new_type,
+          UINTVAL flags)
+
+Reuse an existing PMC, turning it into an empty PMC of the new
+type. Any required internal structure will be put in place (such as
+the extension area) and the PMC will be ready to go. This will throw
+an exception if the PMC is constant or of a singleton type (such as
+the environment PMC) or is being turned into a PMC of a singleton
+type.
+
+=cut
+
+*/
+
+PMC*
+pmc_reuse(Interp *interpreter, PMC *pmc, INTVAL new_type,
+          UINTVAL flags)
+{
+    INTVAL has_ext = 0, needs_ext = 0;
+    PMC_EXT hold_ext;
+
+    /* First, is the destination a singleton? No joy for us there */
+    if (Parrot_base_vtables[new_type]->flags & VTABLE_PMC_IS_SINGLETON) {
+         internal_exception(ALLOCATION_ERROR,
+                            "Parrot VM: Can't turn to a singleton type!\n");
+        return NULL;
+    }
+
+    /* First, is the destination a constant? No joy for us there */
+    if (Parrot_base_vtables[new_type]->flags & VTABLE_IS_CONST_FLAG) {
+         internal_exception(ALLOCATION_ERROR,
+                            "Parrot VM: Can't turn to a constant type!\n");
+        return NULL;
+    }
+
+    /* Is the source a singleton? */
+    if (pmc->vtable->flags & VTABLE_PMC_IS_SINGLETON) {
+         internal_exception(ALLOCATION_ERROR,
+                            "Parrot VM: Can't modify a singleton\n");
+        return NULL;
+    }
+
+    /* Is the source constant? */
+    if (pmc->vtable->flags & VTABLE_IS_CONST_FLAG) {
+         internal_exception(ALLOCATION_ERROR,
+                            "Parrot VM: Can't modify a constant\n");
+        return NULL;
+    }
+
+    /* Do we have an extension area? */
+    if (PObj_is_PMC_EXT_TEST(pmc)) {
+        has_ext = 1;
+    }
+
+    /* Do we need one? */
+    if (Parrot_base_vtables[new_type]->flags & VTABLE_PMC_NEEDS_EXT) {
+        needs_ext = 1;
+    }
+
+
+    /* Unconditionally free and potentially reallocate the ext area,
+       for simplicity. Not the most efficient way to do this */
+    if (has_ext && pmc->pmc_ext) {
+        /* if the PMC has a PMC_EXT structure,
+         * return it to the pool/arena
+         */
+        struct Small_Object_Pool *ext_pool =
+            interpreter->arena_base->pmc_ext_pool;
+        ext_pool->add_free_object(interpreter, ext_pool, pmc->pmc_ext);
+    }
+
+    PObj_flags_CLEARALL(pmc);
+#if ! PMC_DATA_IN_EXT
+    PMC_data(pmc) = NULL;
+#endif
+
+    /* If we need an ext area, go allocate one */
+    if (needs_ext) {
+        add_pmc_ext(interpreter, pmc);
+    }
+
+    /* Set the right vtable */
+    pmc->vtable = Parrot_base_vtables[new_type];
+    /* Call the base init for the redone pmc */
+    VTABLE_init(interpreter, pmc);
+    return pmc;
+}
+
+/*
+
 =item C<static PMC*
 get_new_pmc_header(Interp *interpreter, INTVAL base_type,
     UINTVAL flags)>

@@ -28,6 +28,7 @@ PMC *pmc_init_null(struct Parrot_Interp * interpreter);
 
 /* Prototypes */
 PMC *pmc_new(struct Parrot_Interp *interpreter, INTVAL base_type);
+PMC *pmc_reuse(struct Parrot_Interp *interpreter, PMC *pmc, INTVAL new_type, UINTVAL flags);
 PMC *pmc_new_noinit(struct Parrot_Interp *interpreter, INTVAL base_type);
 PMC *pmc_new_init(struct Parrot_Interp *interpreter, INTVAL base_type, PMC *p);
 PMC *constant_pmc_new_noinit(struct Parrot_Interp *, INTVAL base_type);
