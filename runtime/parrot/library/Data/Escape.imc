@@ -88,9 +88,9 @@ n09:
     branch DONE
 n10:
 
-    # \n
-    if c != 10 goto n13
-    set tmp, "\\n"
+    # \r
+    if c != 13 goto n13
+    set tmp, "\\r"
     branch DONE
 n13:
 
