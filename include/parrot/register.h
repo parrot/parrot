@@ -90,6 +90,8 @@ void Parrot_pop_n(struct Parrot_Interp *);
 void Parrot_pop_s(struct Parrot_Interp *);
 void Parrot_pop_p(struct Parrot_Interp *);
 
+void Parrot_push_on_stack(void *thing, INTVAL size, INTVAL type);
+void Parrot_pop_off_stack(void *thing, INTVAL type);
 
 #endif /* PARROT_REGISTER_H */
 
