@@ -43,7 +43,7 @@ void gen_ast(AST * ast) {
                     exit(0);
         }
         else {
-            printf("Unknown AST class or type for start node.\n");
+            printf("Unknown AST kind or type at top level.\n");
             exit(0);
         }
     }
@@ -111,7 +111,6 @@ void gen_class_body(AST * p) {
     }
 }
 
-
 void gen_constant_decl(AST * p) {
     /* Just to generate the comment */
     printf("\t\t\t# constant %s = %s\n", p->sym->name, p->sym->literal->name);
@@ -132,7 +131,7 @@ void gen_block(AST * p) {
 void gen_statement(AST * p) {
     AST * t;
 #ifdef DEBUG
-    printf("#gen_statement\n");
+    fprintf(stderr, "#gen_statement\n");
 #endif
     if(p->kind == KIND_EXPRESSION) {
         gen_expr(p, NULL);
@@ -229,7 +228,7 @@ void gen_method_decl(AST * p) {
 void gen_assign(AST * ast) {
     AST * p = ast;
 #ifdef DEBUG
-    printf("#gen_assign\n");
+    fprintf(stderr,"#gen_assign\n");
 #endif
     if(p->arg1->asttype == ASTT_IDENTIFIER ||
         p->arg1->asttype == ASTT_LITERAL) {
@@ -291,46 +290,10 @@ void gen_assign(AST * ast) {
     }
 }
 
-
-/*
- * $0 = '-' expr 
- *
- * $0.type = expr.type
- */
-
-#if 0
-void gen_unary_expr(AST * p) {
-#ifdef DEBUG
-    printf("#gen_unary_expr\n");
-#endif
-    if(p->asttype == ASTT_INDEX) {
-        /* Element access of an array */
-        /* Ugly ugly kludgy klunky. I wrote the generator wrong to begin
-         * with, so now I'm patching in lvalue generation for things
-         * like arrays. Time for a rewrite.
-         */
-        gen_expr(p->arg1, NULL);
-        gen_expr(p->arg2, NULL);
-        return;
-    }
-    else if(p->kind == KIND_EXPRESSION)
-        gen_expr(p, p->targ);    
-
-    if(p->targ == NULL) {
-        printf("Internal error: expression didn't generate an rval or lval\n");
-#if 1
-        abort();
-#endif
-        exit(0);    
-    }
-    emit_unary_expr(p->targ, p->arg1->targ, op_name(p->op));
-}
-#endif
-
 void gen_add_expr(AST * ast) {
     AST * p = ast;
 #ifdef DEBUG
-    printf("#gen_add_expr\n");
+    fprintf(stderr, "#gen_add_expr\n");
 #endif
     if(!p->arg1->targ)
         gen_expr(p->arg1, NULL);
@@ -350,7 +313,7 @@ void gen_add_expr(AST * ast) {
  */
 void gen_expr(AST * p, Symbol * lval) {
 #ifdef DEBUG
-    printf("#gen_expr\n");
+    fprintf(stderr, "#gen_expr\n");
 #endif
 
     /* Expression is a simple identifier or literal */
@@ -537,9 +500,10 @@ void gen_call(AST * p) {
 }
 
 void gen_if(AST * p) {
-    AST * t;
     char * if_label, * else_label, *end_label;
-    int op_inv;
+#ifdef DEBUG
+    fprintf(stderr, "#gen_if\n");
+#endif
     if_label = make_label();
     else_label = make_label();
     end_label = make_label();
@@ -548,57 +512,48 @@ void gen_if(AST * p) {
         printf("gen_if: Null or invalid CONDITION node\n");
         exit(0);
     }
-    gen_boolean(p->Attr.Conditional.condition);
+    
     if(!p->arg1) {
         printf("gen_if: Null THEN node\n");
         exit(0);
     }
-    t = p->Attr.Conditional.condition->arg1;
-    if(t->asttype == ASTT_IDENTIFIER || t->asttype == ASTT_LITERAL)
-        t = p->Attr.Conditional.condition;
-    op_inv = op_inverse(t->op);
-    /* Else */
+ 
+    /* If Then Else */
     if(p->arg2) {
-        printf("\tif %s %s %s goto %s\n", EVAL_SYM(t->arg1->targ), op_name(op_inv),
-                        EVAL_SYM(t->arg2->targ), else_label);
+        gen_boolean(p->Attr.Conditional.condition, if_label, else_label, 1);
+        printf("%s:\n", if_label);
         gen_block(p->arg1);
         printf("\tgoto %s\n", end_label);
         printf("%s:\n", else_label);
         gen_block(p->arg2);
-    } else {
-        printf("\tif %s %s %s goto %s\n", EVAL_SYM(t->arg1->targ),
-                        op_name(op_inv), EVAL_SYM(t->arg2->targ), end_label);
+    }
+    /* If Then */
+    else {
+        gen_boolean(p->Attr.Conditional.condition, if_label, end_label, 1);
+        printf("%s:\n", if_label);
         gen_block(p->arg1);
     }
     printf("%s:\n", end_label);
 }
 
 void gen_while(AST * p) {
-    AST * t;
-    int op_inv;
+    const char * redo_label = make_label();
     p->start_label = make_label();
     p->end_label = make_label();
     push_primary_block(p);
+    printf("%s:\n", redo_label);
+    gen_boolean(p->Attr.Loop.condition, p->start_label, p->end_label, 1);
     printf("%s:\n", p->start_label);
-    gen_boolean(p->Attr.Loop.condition);
-    t = p->Attr.Loop.condition->arg1;
-    if(t->asttype == ASTT_IDENTIFIER || t->asttype == ASTT_LITERAL)
-        t = p->Attr.Loop.condition;
-    
-    op_inv = op_inverse(t->op);
-    printf("\tif %s %s %s goto %s\n", EVAL_SYM(t->arg1->targ), op_name(op_inv),
-                EVAL_SYM(t->arg2->targ), p->end_label);
     gen_block(p->arg1);
-    printf("\tgoto %s\n", p->start_label);    
+    printf("\tgoto %s\n", redo_label);    
     printf("%s:\n", p->end_label);
     pop_primary_block();
 }
 
 void gen_for(AST * p) {
-    AST * t;
-    int op_inv;
+    const char * redo_label = make_label();
 #ifdef DEBUG
-    printf("#gen_for\n");
+    fprintf(stderr, "#gen_for\n");
 #endif
     p->start_label = make_label();
     p->end_label = make_label();
@@ -608,96 +563,104 @@ void gen_for(AST * p) {
     push_primary_block(p);
     if(p->Attr.Loop.init != NULL) {
 #ifdef DEBUG
-        printf("#gen_for: generate init statement\n");
+        fprintf(stderr, "#gen_for: generate init statement\n");
 #endif
         gen_statement(p->Attr.Loop.init);
     }
+    printf("%s:\n", redo_label);
+    gen_boolean(p->Attr.Loop.condition, p->start_label, p->end_label, 1);
     printf("%s:\n", p->start_label);
-    gen_boolean(p->Attr.Loop.condition);
-    t = p->Attr.Loop.condition->arg1;
-    if(t->asttype == ASTT_IDENTIFIER || t->asttype == ASTT_LITERAL)
-        t = p->Attr.Loop.condition;
-    op_inv = op_inverse(t->op);
-    printf("\tif %s %s %s goto %s\n", EVAL_SYM(t->arg1->targ), op_name(op_inv),
-                    EVAL_SYM(t->arg2->targ), p->end_label);
     gen_block(p->arg1);
     if(p->Attr.Loop.iteration) {
         printf("%s:\n", p->Attr.Loop.iteration->start_label);
         gen_statement(p->Attr.Loop.iteration);
     }
-    printf("\tgoto %s\n", p->start_label);    
+    printf("\tgoto %s\n", redo_label);    
     printf("%s:\n", p->end_label);
     pop_primary_block();
 }
 
-void gen_boolean(AST * p) {
+/*
+ * boolean->arg1 points to the actual expression, boolean just converts to true/false
+ * The invert arg is for generating the branches depending on if we are generating
+ * a simple logical or compound for lazy evaluation.
+ */
+void gen_boolean(AST * p, const char * true_label, const char * false_label, int invert) {
+    int op_inv;
+    const char * inverse_label;
 #ifdef DEBUG
-    printf("#gen_boolean\n");
+    fprintf(stderr, "#gen_boolean\n");
 #endif
 
-    if(!p->arg1) {
-        printf("gen_boolean: NULL expression\n");
-        exit(0);
-    }
-
-    /* Assume arg1->kind is an KIND_EXPRESSION for now */
-    switch(p->arg1->asttype) {
+    switch(p->asttype) {
         /* If literal or identifier generate a comparison to 0
          * Fix this to skip the conditional for constant expressions.
          */
         case ASTT_IDENTIFIER:
         case ASTT_LITERAL:
-            if(p->arg1->sym == NULL) {
+            /* If boolean expression is a literal or variable we can
+             * either optimize the compare away or generate a comparison
+             * to the boolean false equivalent to the data type.
+             */
+            if(p->sym == NULL) {
                 printf("Internal error: gen_bool(): NULL symbol for condition\n");
                 abort();
             }
-            p->arg1->targ = p->arg1->sym;
-            p->arg2 = new_expression(ASTT_LITERAL, NULL, NULL);
-            if(p->arg1->targ->type == t_string) {
-                p->arg2->sym = p->arg2->targ = new_symbol(LITERAL, "\"\"");
-            } else {
-                p->arg2->sym = p->arg2->targ = new_symbol(LITERAL, "0");
-                p->arg2->sym->name = str_dup("0");
+            p->targ = p->sym;
+            if(invert) {
+                inverse_label = false_label;
+                op_inv = LOGICAL_EQ;
             }
-            p->op = LOGICAL_NE;
+            else {
+                inverse_label = true_label;
+                op_inv = LOGICAL_NE;
+            }
+            if(p->targ->type == t_string) {
+                printf("\tif %s %s \"\" goto %s\n", EVAL_SYM(p->targ),
+                            op_name(op_inv), inverse_label);
+            } else {
+                printf("\tif %s %s 0 goto %s\n", EVAL_SYM(p->targ),
+                            op_name(op_inv), inverse_label);
+            }
+            return;
+        case ASTT_LOGICAL:
+            fprintf(stderr, "#Logical expression\n");
+            if(p->op == LOGICAL_AND) {
+                /* AND */
+                const char * next_logical = make_label();
+                gen_boolean(p->arg1, next_logical, false_label, 1);
+                printf("%s:\n", next_logical);
+                gen_boolean(p->arg2, true_label, false_label, 1);
+            }
+            else {
+                /* OR */
+                const char * next_logical = make_label();
+                gen_boolean(p->arg1, true_label, next_logical, 0);
+                printf("%s:\n", next_logical);
+                gen_boolean(p->arg2, true_label, false_label, invert);
+            }
             return;
         case ASTT_COMPARISON:
-            gen_comparison(p->arg1);
+            if(!p->arg1 || !p->arg2) {
+                printf("#gen_boolean(comparison): Need 2 operands\n");
+                exit(0);
+            }
+            gen_expr(p->arg1, NULL);
+            gen_expr(p->arg2, NULL);
+            if(invert) {
+                op_inv = op_inverse(p->op);
+                inverse_label = false_label;
+            } else {
+                op_inv = p->op;
+                inverse_label = true_label;
+            }
+            printf("\tif %s %s %s goto %s\n", EVAL_SYM(p->arg1->targ), op_name(op_inv),
+                        EVAL_SYM(p->arg2->targ), inverse_label);
             return;
         default:
             printf("#gen_boolean: Unknown boolean AST type(%d).\n", p->arg1->asttype);
             exit(0);
     }
-}
-
-void gen_comparison(AST * p) {
-#ifdef DEBUG
-    printf("#gen_comparison\n");
-#endif
-
-    if(!p->arg1 || !p->arg2) {
-        printf("#gen_comparison: Null arguments\n");
-        exit(0);
-    }
-    gen_expr(p->arg1, NULL);
-    gen_expr(p->arg2, NULL);
-
-    /* Comparison doesn't generate a final statement because
-     * the evaluation of the final comparison will be done as
-     * a part of a higher level statement (assignment, if, while)
-     */
-    if(!p->arg1->targ || !p->arg2->targ) {
-        printf("#gen_comparison: Comparison needs 2 rvalues\n");
-        exit(0);
-    }
-}
-
-void gen_conditional_expr(AST * p) {
-    switch(p->kind) {
-        /* Not implemented */
-        default:
-    }
-
 }
 
 void coerce_operands(Symbol ** t1, Symbol ** t2) {
@@ -815,7 +778,7 @@ char * make_label() {
 
 void emit_op_expr(Symbol * r, Symbol * a1, char * op, Symbol * a2) {
 #ifdef DEBUG
-    printf("#emit_op_expr\n");
+    fprintf(stderr, "#emit_op_expr\n");
 #endif
 
     printf( "\t(%s)%s = %s %s %s\n", type_name(r), r->name,
@@ -824,7 +787,7 @@ void emit_op_expr(Symbol * r, Symbol * a1, char * op, Symbol * a2) {
 
 void emit_unary_expr(Symbol * res, Symbol * arg1, char * op) {
 #ifdef DEBUG
-    printf("#emit_unary_expr\n");
+    fprintf(stderr, "#emit_unary_expr\n");
 #endif
     
     if( op )

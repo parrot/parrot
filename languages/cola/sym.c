@@ -215,6 +215,12 @@ AST * new_op_expression(AST * left, int op, AST * right) {
     return p;    
 }
 
+AST * new_logical_expression(AST * left, int op, AST * right) {
+    AST * p = new_ast(KIND_EXPRESSION, ASTT_LOGICAL, left, right);
+    p->op = op;
+    return p;    
+}
+
 AST * new_if(AST * condition, AST * then_part, AST * else_part) {
     AST * p = new_statement(ASTT_IF, then_part, else_part);
     p->Attr.Conditional.condition = condition;

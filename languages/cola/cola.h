@@ -11,7 +11,7 @@
 #ifndef _COLA_H
 #define _COLA_H
 
-#define COLA_VERSION "0.0.3"
+#define COLA_VERSION "0.0.4"
 
 
 void abort(void);
@@ -38,7 +38,7 @@ enum ASTTYPE {
     ASTT_PARAM_ARRAY,
     ASTT_ASSIGN,
     ASTT_OP,
-    /*ASTT_MUL,*/
+    ASTT_LOGICAL,
     ASTT_INDEX,
     ASTT_IF,
     ASTT_WHILE,
@@ -224,6 +224,7 @@ AST                 *new_ast(enum ASTKIND kind, int type, AST * left, AST * righ
 AST                 *new_statement(int type, AST * left, AST * right);
 AST                 *new_expression(int type, AST * left, AST * right);
 AST                 *new_op_expression(AST * left, int op, AST * right);
+AST                 *new_logical_expression(AST * left, int op, AST * right);
 AST                 *new_if(AST * condition, AST * then_part, AST * else_part);
 AST                 *new_while(AST * condition, AST * block);
 AST                 *new_for(AST * init, AST * condition, AST * increment, AST * block);
@@ -247,13 +248,12 @@ void                gen_block(AST * ast);
 void                gen_statement(AST * ast);
 void                gen_assign(AST * ast);
 void                gen_expr(AST * ast, Symbol * lval);
-void                gen_unary_expr(AST *);
 void                gen_call(AST *);
 void                gen_if(AST *);
 void                gen_while(AST *);
 void                gen_for(AST *);
-void                gen_boolean(AST *);
-void                gen_comparison(AST *);
+void                gen_boolean(AST *, const char * true_label, const char * false_label,
+                                    int invert);
 
 void                emit_op_expr(Symbol * res, Symbol * arg1, char * op, Symbol * arg2);
 void                emit_unary_expr(Symbol * res, Symbol * arg1, char * op);

@@ -75,7 +75,7 @@ Symbol * t_void, * t_string, * t_int, * t_float;
 %type <ast> shift_expression exclusive_or_expression relational_expression
 %type <ast> unary_expression add_expression mult_expression
 %type <ast> equality_expression relational_expression
-%type <ast> call element_access arg arg_list
+%type <ast> call element_access arg arg_list member_access
 %type <ival> relational_op
 %type <ival> rank_specifier rank_specifiers dim_separators
 
@@ -510,35 +510,13 @@ compound_assign_op:
     ;
 */
   
-primary_expression:
-    LITERAL
-        {$$ = new_expression(ASTT_LITERAL, NULL, NULL); $$->sym = $1;}
-    |   IDENTIFIER
-        {
-            Symbol * orig;
-            orig = check_id_decl(current_symbol_table, $1->name);
-            /* Kludge for now, defaults to global namespace if current
-             * namespace fails. This should run up the stack of namespaces.
-             */
-            if(orig == NULL)
-                orig = check_id_decl(global_symbol_table, $1->name);
-            if(orig == NULL) {
-                printf("error (line %ld): undeclared identifier %s.\n", line, $1->name);
-                exit(0);
-            }
-            $$ = new_expression(ASTT_IDENTIFIER, NULL, NULL);
-            $$->sym = orig;
-        }
-    |   '(' expression ')'
-        {$$ = $2; }
-    |   call
-        {$$ = $1; }
-    |   post_inc_expr
-    |   post_dec_expr
-    |   element_access
-    |   new_expression
+member_access:
+    primary_expression '.' IDENTIFIER
+/*
+    |   predefined_type '.' IDENTIFIER
+*/
     ;
-
+    
 pre_inc_expr:
     INC unary_expression
         {
@@ -587,26 +565,62 @@ new_object_expression:
         }
     ;
 
-expression:
-    conditional_expression
-        { $$ = $1; }
-    |   assignment
-        { $$ = new_expression(ASTT_ASSIGN, $1, NULL); }
+primary_expression:
+    LITERAL
+        {$$ = new_expression(ASTT_LITERAL, NULL, NULL); $$->sym = $1;}
+    |   IDENTIFIER
+        {
+            Symbol * orig;
+            orig = check_id_decl(current_symbol_table, $1->name);
+            /* Kludge for now, defaults to global namespace if current
+             * namespace fails. This should run up the stack of namespaces.
+             */
+            if(orig == NULL)
+                orig = check_id_decl(global_symbol_table, $1->name);
+            if(orig == NULL) {
+                printf("error (line %ld): undeclared identifier %s.\n", line, $1->name);
+                exit(0);
+            }
+            $$ = new_expression(ASTT_IDENTIFIER, NULL, NULL);
+            $$->sym = orig;
+        }
+    |   '(' expression ')'
+        {$$ = $2; }
+    |   call
+        {$$ = $1; }
+    |   post_inc_expr
+    |   post_dec_expr
+    |   element_access
+    |   new_expression
+    |   member_access
     ;
 
-boolean_expression:    expression
-        { $$ = new_expression(ASTT_BOOLEAN, $1, NULL);    }
+expression:
+    conditional_expression
+    |   assignment
+/*        {
+            $$ = new_expression(ASTT_ASSIGN, $1, NULL);
+        }
+*/
+    ;
+
+boolean_expression:
+    expression
+/*    {
+        $$ = new_expression(ASTT_BOOLEAN, $1, NULL);
+    }
+*/
     ;
 
 unary_expression:
     primary_expression
         { $$ = $1; }
     |   '+' unary_expression
-        { $$ = $2; $$->op = '+'}
+        { $$ = $2; $$->op = '+'; }
     |   '-' unary_expression
-        { $$ = $2; $$->op = '-'}
+        { $$ = $2; $$->op = '-'; }
     |   '!' unary_expression
-        { $$ = $2; $$->op = '!'}
+        { $$ = $2; $$->op = '!'; }
     |   pre_inc_expr
     |   pre_dec_expr
     ;
@@ -642,13 +656,17 @@ add_expression:
 conditional_expression:
     conditional_or_expression
     |   conditional_or_expression '?' expression ':' expression
+    {
+        fprintf(stderr, "Ternary conditional operator not yet supported.\n");
+        exit(0);
+    }
     ;
 
 conditional_and_expression:
     inclusive_or_expression
     |   conditional_and_expression LOGICAL_AND inclusive_or_expression
     {
-    
+        $$ = new_logical_expression($1, LOGICAL_AND, $3);
     }
     ;
 
@@ -656,7 +674,7 @@ conditional_or_expression:
     conditional_and_expression
     |   conditional_or_expression LOGICAL_OR conditional_and_expression
     {
-    
+        $$ = new_logical_expression($1, LOGICAL_OR, $3);
     }
     ;
 

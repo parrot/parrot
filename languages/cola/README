@@ -1,8 +1,6 @@
 "Cola" - A compiler for the Parrot VM
 
-  V0.0.2
-
-  Thanks for trying this little language.
+  V0.0.4
 
   I've started this compiler (I call it Cola) to simultaneously
   teach myself how to write a compiler (ok I admit I squeaked
@@ -51,8 +49,15 @@ Supported Constructs
     shortcuts to the next iteration). return may return a value
     from anywhere inside a method.
 
-    NOTE: Conditional expressions do not yet support complex
-    expressions, only single comparisons.
+    0.0.4 adds logical operators.
+    Conditional expressions may now be compound and use logical
+    operators (&& and ||).
+    CAUTION: Assignments inside conditionals such as...
+
+        if((i = 15) == 15)
+
+    are still not supported. This sort of expression will be fixed
+    in the next update.
 
   Types: int, float, string (classes and arrays coming soon) 
     Currently these map directly to the Parrot primitive types.
@@ -75,7 +80,11 @@ Supported Constructs
     Need to whip up a few conversion routines.
  
   Comparisons:  <, >, <=, >=, !=, ==
-  
+
+  Bitwise operators:  <<, >>, |, &, ^, and ~ are now supported in 0.0.4
+
+  Boolean: The boolean ! operator isn't yet supported.
+ 
   Methods:  
     Classic C style, recursion supported. Return types supported.
     Will be adding variable argument support per the C# spec.
@@ -102,15 +111,12 @@ What you currently CANNOT do even though the Parser may eat it...
   Nested assigns:           i = (j = 0);
   Fancy For loops:          for(i = 0; j++, j < 4; i++)
   Empty For headers:        for(;;) // use while(1)
-  Compound conditionals:    if(i < 0 || j > 3)
-    For now only use single comparisons, literals or identifiers in
-    conditionals.
     
 Using the Compiler
 
   Build it by typing:
 
-	make ; make clean
+	make
 
   Usage:
 
@@ -210,8 +216,6 @@ Optimization
 
 
 Coming Soon
-  More operators (shift, etc.)
-  Compound logical expressions (&&, ||)
   Ternary conditionals:   i = (j > 0 ? 1 : 0);
   Some form of a printf()
   Full array support
