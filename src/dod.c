@@ -1007,10 +1007,6 @@ Parrot_do_dod_run(struct Parrot_Interp *interpreter, UINTVAL flags)
         return;
     }
     Parrot_block_DOD(interpreter);
-    if (Interp_flags_TEST(interpreter, PARROT_TRACE_FLAG)) {
-        /* no PIO_printf here */
-        fprintf(stderr, "# DOD run\n");
-    }
     /*
      * tell the threading system that we gonna DOD mark
      */

@@ -106,6 +106,7 @@ runops_slow_core(struct Parrot_Interp *interpreter, opcode_t *pc)
     struct Parrot_Context *trace_ctx;
 #endif
     opcode_t *opc;
+    static size_t dod, gc;
 
 #ifdef code_start
 #  undef code_start
@@ -135,6 +136,8 @@ runops_slow_core(struct Parrot_Interp *interpreter, opcode_t *pc)
     }
 #endif
 
+    dod = interpreter->dod_runs;
+    gc = interpreter->collect_runs;
     while (pc) {/* && pc >= code_start && pc < code_end) {*/
         interpreter->cur_pc = pc;
         opc = pc;
@@ -149,6 +152,14 @@ runops_slow_core(struct Parrot_Interp *interpreter, opcode_t *pc)
 #else
             trace_op(interpreter, code_start, code_end, opc);
 #endif
+            if (dod != interpreter->dod_runs) {
+                dod = interpreter->dod_runs;
+                PIO_printf(interpreter, "       DOD\n");
+            }
+            if (gc != interpreter->collect_runs) {
+                gc = interpreter->collect_runs;
+                PIO_printf(interpreter, "       GC\n");
+            }
         }
     }
 #ifdef USE_TRACE_INTERP
