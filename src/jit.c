@@ -214,7 +214,7 @@ build_asm(struct Parrot_Interp *interpreter,opcode_t *pc, opcode_t *code_start, 
                         address = (INTVAL *)&s->strlen;
                         break;
                 case 6: 
-                        address = (INTVAL *)s->encoding;
+                        address = (INTVAL *)&s->encoding;
                         break;
                 case 7: 
                         address = (INTVAL *)&s->type;

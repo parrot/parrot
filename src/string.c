@@ -36,8 +36,6 @@ string_make(struct Parrot_Interp *interpreter, const void *buffer,
             const CHARTYPE *type) {
     STRING *s;
 
-    UNUSED (interpreter);
-
     if (!type) {
       type = string_native_type;
     }
@@ -49,7 +47,9 @@ string_make(struct Parrot_Interp *interpreter, const void *buffer,
     s = new_string_header(interpreter);
     s->bufstart = Parrot_allocate(interpreter, buflen);
     s->encoding = encoding;
-    s->flags = flags;
+    /* Make sure we maintain the flags we might already have on the
+       string header we just fetched */
+    s->flags |= flags;
     s->type = type;
     s->buflen = buflen;
 
@@ -138,8 +138,20 @@ string_ord(const STRING* s, INTVAL idx) {
  */
 STRING*
 string_copy(struct Parrot_Interp *interpreter, const STRING *s) {
-    return string_make(interpreter, s->bufstart, s->bufused, s->encoding,
-                       s->flags, s->type);
+    STRING *d;
+    d = new_string_header(interpreter);
+    d->bufstart = Parrot_allocate(interpreter, s->buflen);
+    d->buflen = s->buflen;
+    d->flags = s->flags;
+    d->bufused = s->bufused;
+    d->strlen = s->strlen;
+    d->encoding = s->encoding;
+    d->type = s->type;
+    d->language = s->language;
+
+    memcpy(d->bufstart, s->bufstart, s->buflen);
+
+    return d;
 }
 
 /*=for api string string_transcode
@@ -227,6 +239,7 @@ string_concat(struct Parrot_Interp *interpreter, const STRING* a,
 
     UNUSED (Uflags);
 
+
     if (a != NULL && a->strlen != 0) {
         if (b != NULL && b->strlen != 0) {
             result = string_make(interpreter, NULL, a->bufused +
@@ -298,8 +311,10 @@ string_repeat(struct Parrot_Interp *interpreter, const STRING* s, UINTVAL num, S
 STRING*
 string_substr(struct Parrot_Interp *interpreter, const STRING* src, INTVAL offset, INTVAL length, STRING** d) {
     STRING *dest;
-    char *substart;
-    char *subend;
+    UINTVAL substart_off;	/* Offset from start of string to our
+                                   piece */
+    UINTVAL subend_off;		/* Offset from start of string to the
+                                   end of our piece */
     UINTVAL true_offset;
     UINTVAL true_length;
 
@@ -325,21 +340,24 @@ string_substr(struct Parrot_Interp *interpreter, const STRING* src, INTVAL offse
     if (true_length > (src->strlen - true_offset) ) {
         true_length = (UINTVAL)(src->strlen - true_offset);
     }
+
+    substart_off = (char *)src->encoding->skip_forward(src->bufstart,
+                                           true_offset) - (char *)src->bufstart;
+    subend_off = (char *)src->encoding->skip_forward((char *)src->bufstart +
+                                             substart_off,
+                                             true_length) - (char *)src->bufstart;
+
     dest = string_make(interpreter, NULL, true_length*src->encoding->max_bytes,
                        src->encoding, 0, src->type);
-    substart = src->encoding->skip_forward(src->bufstart, true_offset);
-    subend = src->encoding->skip_forward(substart, true_length);
 
-    if (subend < substart) {
+    if (subend_off < substart_off) {
         char *foo = NULL;
-        printf("substart/subend are %i, %i\n", substart, subend);
-        *foo = 1;
         internal_exception(SUBSTR_OUT_OF_STRING,
                            "subend somehow is less than substart");
     }
 
-    mem_sys_memcopy(dest->bufstart, substart, (unsigned)(subend - substart));
-    dest->bufused = subend - substart;
+    mem_sys_memcopy(dest->bufstart, (char *)src->bufstart + substart_off, (unsigned)(subend_off - substart_off));
+    dest->bufused = subend_off - substart_off;
     dest->strlen = true_length;
 
     if (d != NULL) {

@@ -9,15 +9,19 @@ Garbage Collection and Dead Object Detection
     Maintainer: Dan Sugalski
     Class: Internals
     PDD Number: 9
-    Version: 1.0
+    Version: 1.1
     Status: Developing
-    Last Modified: 25 February, 2002
+    Last Modified: 26 February, 2002
     PDD Format: 1
     Language: English
 
 =head2 HISTORY
 
 =over 4
+
+=item Version 1.1
+
+26 February 2002
 
 =item version 1
 
@@ -28,6 +32,10 @@ None. First version
 =head1 CHANGES
 
 =over 4
+
+=item Version 1.1
+
+Started documenting the internal routines
 
 =item Version 1.0
 
@@ -139,6 +147,17 @@ needing GC. Bad, very very bad.
 =back
 
 =head1 IMPLEMENTATION
+
+=head2 Internal routines
+
+=over 4
+
+=item go_collect
+
+Scans the Buffer header pools and compacts the used memory. Doesn't
+check for string liveness or anything of the sort, just does a compaction.
+
+=back
 
 =head1 ATTACHMENTS
 

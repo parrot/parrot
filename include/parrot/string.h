@@ -19,13 +19,13 @@
 
 struct parrot_string_t {
     void *bufstart;
-    Parrot_UInt buflen;
-    Parrot_UInt flags;
-    Parrot_UInt bufused;
-    Parrot_UInt strlen;
-    const Parrot_Encoding encoding;
-    const Parrot_CharType type;
-    Parrot_Int language;
+    UINTVAL buflen;
+    UINTVAL flags;
+    UINTVAL bufused;
+    UINTVAL strlen;
+    const ENCODING *encoding;
+    const CHARTYPE *type;
+    INTVAL language;
 };
 
 #define Parrot_String struct parrot_string_t *
@@ -44,16 +44,18 @@ typedef struct {
 /* Buffer flags */
 typedef enum BUFFER_flag {
     /* The contents of the buffer can't be moved by the GC */
-    BUFFER_immobile_FLAG = 2 << 0,
+    BUFFER_immobile_FLAG = 1 << 0,
+     /* Marks the contents as coming from a non-Parrot source */
+    BUFFER_external_FLAG   = 1 << 1,
+    /* Mark the buffer as pointing to system memory */
+    BUFFER_sysmem_FLAG   = 1 << 2,
+    /* Mark the contents as Copy on write */
+    BUFFER_COW_FLAG      = 1 << 3,
     /* Private flag for the GC system. Set if the buffer's in use as
        far as the GC's concerned */
-    BUFFER_GC_FLAG       = 2 << 1,
-    /* Marks the contents as shared */
-    BUFFER_shared_FLAG   = 2 << 2,
-    /* Mark the contents as Copy on write */
-    BUFFER_COW_FLAG      = 2 << 3,
-    /* Mark the buffer as pointing to system memory */
-    BUFFER_sysmem_FLAG   = 2 << 4
+    BUFFER_live_FLAG       = 1 << 4,
+    /* Mark the bufffer as needing GC */
+    BUFFER_needs_GC_FLAG   = 1 << 5
 } BUFFER_flags;
 
 #define STRING struct parrot_string_t
