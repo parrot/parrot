@@ -21,6 +21,7 @@ pmclass RetContinuation extends Continuation {
     void init () {
 	PMC_data(SELF) = new_ret_continuation(INTERP);
 	SELF->cache.struct_val = NULL;
+	PObj_custom_mark_destroy_SETALL(SELF);
     }
 
     STRING* name () {
@@ -31,6 +32,7 @@ pmclass RetContinuation extends Continuation {
 	struct Parrot_Sub * sub;
 	sub = PMC_data(ret) = mem_sys_allocate(sizeof(struct Parrot_Sub));
 	memcpy(sub, PMC_data(SELF), sizeof(struct Parrot_Sub));
+	PObj_custom_mark_destroy_SETALL(ret);
     }
 }
 
