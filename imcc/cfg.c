@@ -283,7 +283,7 @@ invok:
                         if (!saves)
                             bb_add_edge(unit, bb,
                                     unit->bb_list[j+1]);
-                        debug(interpreter, DEBUG_CFG, "\tand does saevall %s\n",
+                        debug(interpreter, DEBUG_CFG, "\tand does saveall %s\n",
                                 saves ? "yes" : "no");
                     }
                 }
