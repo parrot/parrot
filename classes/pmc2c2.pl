@@ -242,7 +242,7 @@ use FindBin;
 use lib "$FindBin::Bin/..";
 use lib "$FindBin::Bin/../lib";
 use Parrot::Vtable;
-use Parrot::Pmc2c;
+use Parrot::Pmc2c qw(count_newlines);
 use strict;
 use Data::Dumper;
 use Getopt::Long;
@@ -296,10 +296,6 @@ sub dump_default {
     $Dumper->Indent(3);
     print VTD $Dumper->Dump();
     close VTD;
-}
-
-sub count_newlines {
-    return scalar $_[0] =~ tr/\n//;
 }
 
 sub extract_balanced {

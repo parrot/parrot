@@ -26,7 +26,7 @@ use vars qw(@EXPORT_OK @writes %writes );
 use Parrot::PMC qw(%pmc_types);
 
 use base qw( Exporter );
-@EXPORT_OK = qw(gen_c gen_h gen_ret dynext_load_code);
+@EXPORT_OK = qw(gen_c gen_h gen_ret dynext_load_code count_newlines);
 
 BEGIN {
     @writes = qw(STORE PUSH POP SHIFT UNSHIFT DELETE);
@@ -54,7 +54,7 @@ Returns the number of newlines (C<\n>) in C<$string>.
 =cut
 
 sub count_newlines {
-    return scalar(() = $_[0] =~ /\n/g);
+    return scalar $_[0] =~ tr/\n//;
 }
 
 =item C<gen_ret($method, $body)>
