@@ -190,6 +190,7 @@ languages/cola/examples/mandelbrot.cola
 languages/cola/examples/reverse.cola
 languages/cola/gen.c
 languages/cola/int2pasm.pl
+languages/cola/semant.c
 languages/cola/sym.c
 languages/cola/type.c
 languages/jako/MAINTAINER
