@@ -10,8 +10,9 @@ This document describes the macro layer of imcc
 
 The macro support for IMCC was designed to be a drop in replacement
 for the original F<assemble.pl> macro layer. There for the the macro
-expansion at the moment only works in assembly mode. Furthermore this
-documentation is in large parts copied literally from there.
+expansion at the moment only works in assembly mode, except for the
+B<.include "file"> feature.  Furthermore this documentation is in
+large parts copied literally from there.
 
 The addition of the '.' preface will hopefully make things easier to
 parse, inasmuch as everything within an assembler file that needs to
@@ -24,7 +25,7 @@ including of files.
 A macro definition starts with a line consisting of ".macro", the
 name for the newly created macro and an optional list of parameters.
 Thereafter follows the definition of the macro which can span several
-lines. The definition is ended by ".endm". In the macro definition the 
+lines. The definition is ended by ".endm". In the macro definition the
 formal parameters, preceeded by a '.', are valid macros.
 
   .macro swap (A,B,TEMP) # . marks the directive
