@@ -25,6 +25,8 @@ Handles class and object manipulation.
 #include "objects.str"
 
 static void* instantiate_py_object(Interp*, PMC*, void*);
+extern void
+parrot_py_set_vtable(Parrot_Interp interpreter, PMC* class);
 
 static PMC *
 clone_array(Parrot_Interp interpreter, PMC *source_array)
@@ -255,15 +257,18 @@ Parrot_single_subclass(Parrot_Interp interpreter, PMC *base_class,
     PMC *classname_pmc;
     PMC *parents, *temp_pmc;
     int parent_is_class;
+    int is_python = 0;
 
     if (base_class->vtable->base_type == enum_class_FixedPMCArray) {
         PMC *tuple = base_class;
         /* got a tuple holding parents - Python!
          */
         INTVAL n = VTABLE_elements(interpreter, tuple);
+        is_python = 1;
         if (!n) {
             PMC* class = pmc_new(interpreter, enum_class_ParrotClass);
             Parrot_new_class(interpreter, class, child_class_name);
+            parrot_py_set_vtable(interpreter, class);
             return class;
         }
         if (n > 1)
@@ -276,6 +281,8 @@ Parrot_single_subclass(Parrot_Interp interpreter, PMC *base_class,
     if (base_class->vtable->base_type == enum_class_ParrotClass) {
         PMC* class = pmc_new(interpreter, enum_class_ParrotClass);
         Parrot_new_class(interpreter, class, child_class_name);
+        if (is_python)
+            parrot_py_set_vtable(interpreter, class);
         return class;
     }
     parent_is_class = PObj_is_class_TEST(base_class);
@@ -313,9 +320,20 @@ Parrot_single_subclass(Parrot_Interp interpreter, PMC *base_class,
     /* Our penultimate parent list is a clone of our parent's parent
        list, with our parent unshifted onto the beginning */
     if (parent_is_class) {
-        temp_pmc = clone_array(interpreter,
-                get_attrib_num((SLOTTYPE *)PMC_data(base_class),
-                    PCD_ALL_PARENTS));
+        PMC *all_parents, *last;
+        all_parents = get_attrib_num((SLOTTYPE *)PMC_data(base_class),
+                    PCD_ALL_PARENTS);
+        temp_pmc = clone_array(interpreter, all_parents);
+        /*
+         * if any of the parent is a PMC, we need a deleg_pmc vtable
+         * XXX - we always use the parents vtable XXX
+         */
+        if (0 && VTABLE_elements(interpreter, all_parents)) {
+            last = VTABLE_get_pmc_keyed_int(interpreter, all_parents, -1);
+            if (!PObj_is_class_TEST(last))
+                parent_is_class = 0;
+        }
+
     }
     else {
         /*
@@ -347,6 +365,8 @@ Parrot_single_subclass(Parrot_Interp interpreter, PMC *base_class,
          */
         create_deleg_pmc_vtable(interpreter, child_class, child_class_name);
     }
+    if (is_python)
+        parrot_py_set_vtable(interpreter, child_class);
     return child_class;
 }
 
@@ -532,8 +552,6 @@ get_init_meth(Parrot_Interp interpreter, PMC *class,
     return Parrot_find_method_with_cache(interpreter, class, meth);
 }
 
-extern void
-parrot_py_set_vtable(Parrot_Interp interpreter, PMC* class, PMC *object);
 
 static void
 do_py_initcall(Parrot_Interp interpreter, PMC* class, PMC *object)
@@ -704,8 +722,30 @@ static void*
 instantiate_py_object(Interp* interpreter, PMC* class, void* next)
 {
     INTVAL type = class->vtable->base_type;
-    PMC *object = pmc_new_noinit(interpreter, type);
-    instantiate_object(interpreter, object, (void*)-1);
+    PMC *object = NULL;
+    if (PObj_is_class_TEST(class)) {
+        /* __new__ is a type constructor, it takes a class and
+         * arguments and returns a new object
+         */
+        STRING *meth_str = CONST_STRING(interpreter, "__new__");
+        PMC *meth = Parrot_find_method_with_cache(interpreter, class, meth_str);
+        if (meth) {
+            void *data = Parrot_save_register_frames(interpreter, meth);
+            REG_STR(0) = meth_str;
+            REG_PMC(2) = class;
+            /* args are just passed on */
+            PIO_eprintf(interpreter, "__new__ class %Ss nargs = %d\n",
+                    VTABLE_name(interpreter, class),
+                    (int)REG_INT(3));
+            Parrot_runops_fromc(interpreter, meth);
+            object = REG_PMC(5);
+            Parrot_restore_register_frames(interpreter, data);
+        }
+    }
+    if (!object)  {
+        object = pmc_new_noinit(interpreter, type);
+        instantiate_object(interpreter, object, (void*)-1);
+    }
     REG_PMC(5) = object;
     return next;
 }
@@ -758,7 +798,6 @@ instantiate_object(Parrot_Interp interpreter, PMC *object, PMC *init)
         /*
          * we are coming from Python
          */
-        parrot_py_set_vtable(interpreter, class, object);
         do_py_initcall(interpreter, class, object);
 
     }
@@ -1138,10 +1177,13 @@ find_method_direct(Parrot_Interp interpreter, PMC *class,
      * see also enter_nci_method()
      */
     if (!PObj_is_class_TEST(class)) {
-        STRING *class_name = class->vtable->whoami;
+        STRING *class_name;
         STRING *isa;
         UINTVAL start;
         INTVAL pos;
+find_in_pmc:
+
+        class_name = class->vtable->whoami;
         method = Parrot_find_global(interpreter,
                            class_name,
                            method_name);
@@ -1151,6 +1193,8 @@ find_method_direct(Parrot_Interp interpreter, PMC *class,
          * now look into that PMCs parents
          * the parent classes are in vtable->isa_str as blank
          * terminated class names - suboptimal but good enough for now
+         *
+         * TODO check vtable standard names
          */
         start = class_name->strlen + 1;
         for (isa = class->vtable->isa_str; ;) {
@@ -1204,8 +1248,12 @@ find_method_direct(Parrot_Interp interpreter, PMC *class,
     for (searchoffset = 0; searchoffset < classcount; searchoffset++) {
         curclass = VTABLE_get_pmc_keyed_int(interpreter,
                 classsearch_array, searchoffset);
-        if (!PObj_is_class_TEST(curclass))
-            break;
+        if (!PObj_is_class_TEST(curclass)) {
+            class = curclass;
+            if (class->vtable->base_type == enum_class_delegate)
+                break;
+            goto find_in_pmc;
+        }
         method = Parrot_find_global(interpreter,
                              VTABLE_get_string(interpreter,
                                   get_attrib_num((SLOTTYPE *)PMC_data(curclass),

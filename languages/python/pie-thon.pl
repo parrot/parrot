@@ -258,20 +258,22 @@ EOC
 	$k =~ s/[\*"]//g;
 	$params[$v] = $k;
     }
+    my $self;
     if ($meth ne '') {
-	my $self = shift @params;
-	if ($self ne 'self') {
-	    print <<EOC;
-	    .local pmc $self
-	    $self = self
-EOC
-	}
+	$self = shift @params;
+	shift @{$def_args{$arg}};
     }
 
     $params = join("\n\t", map {".param pmc $_"} @params);
     print <<EOC;
 	$params
 EOC
+    if ($self && $self ne 'self') {
+	print <<EOC;
+	.local pmc $self
+	$self = self
+EOC
+    }
     if ($func_info{$arg}{flags} & 0x20) {  # GENERATOR flag
 	for (my $i = 0; $i < @params; ++$i) {
 	    my $p = $params[$i];
@@ -741,7 +743,7 @@ EOC
 	    unshift @{$def_args{$f}}, $gn;
 	}
     }
-    if ($cur_func =~ /Build::(\w+)/) {
+    if ($cur_func =~ /Build::(\w+)/) {   ## XXX && $f ne '__new__'
 	$namespace{$f} = $classes{$1};
 	if ($vtables{$f}) {
 	    print <<EOC;

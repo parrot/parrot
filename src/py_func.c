@@ -361,6 +361,15 @@ parrot_py_repr(Interp *interpreter, PMC *pmc)
 }
 
 static PMC *
+parrot_py_str(Interp *interpreter, PMC *pmc)
+{
+    PMC *res = pmc_new(interpreter, enum_class_PerlString);
+    STRING *repr = VTABLE_get_string(interpreter, pmc);
+    VTABLE_assign_string_native(interpreter, res, repr);
+    return res;
+}
+
+static PMC *
 parrot_py_hash(Interp *interpreter, PMC *pmc)
 {
     PMC *h = pmc_new_noinit(interpreter, enum_class_PerlInt);
@@ -700,16 +709,37 @@ integer_divide_int(Interp* interp, PMC* self, INTVAL value, PMC* destination)
      result = PMC_int_val(self) / value;
      VTABLE_set_integer_native(interp, destination, result);
 }
+
+static PMC*
+parrot_py_instantiate_new(Parrot_Interp interpreter, PMC *class)
+{
+    if (PObj_is_class_TEST(class)) {
+        /* init calls instantiate */
+        return pmc_new_init(interpreter, class->vtable->base_type, (void*) -1);
+    }
+    else {
+        VTABLE_invoke(interpreter, class, NULL);
+    }
+    return REG_PMC(5);
+}
+
 static void
 parrot_py_create_default_meths(Interp *interpreter)
 {
     STRING *pio = CONST_STRING(interpreter, "PIO");
     STRING *class = CONST_STRING(interpreter, "object");
 
-    STRING *meth =  CONST_STRING(interpreter, "__get_repr");
+    STRING *repr =  CONST_STRING(interpreter, "__get_repr");
+    STRING *str =  CONST_STRING(interpreter, "__get_string");
+    STRING *new__ =  CONST_STRING(interpreter, "__new__");
 
     parrot_py_object(interpreter, class,
-            F2DPTR(parrot_py_repr), meth, pio);
+            F2DPTR(parrot_py_repr), repr, pio);
+    /* parrot_py_object(interpreter, class,
+            F2DPTR(parrot_py_str), str, pio);
+    */
+    parrot_py_global(interpreter,
+            F2DPTR(parrot_py_instantiate_new), new__, pio);
 
     mmd_register(interpreter, MMD_DIVIDE,
             enum_class_PerlInt, enum_class_PerlInt,
@@ -898,7 +928,7 @@ Parrot_py_get_slice(Interp *interpreter, PMC *self, PMC *key)
 }
 
 void
-parrot_py_set_vtable(Parrot_Interp interpreter, PMC* class, PMC *object);
+parrot_py_set_vtable(Parrot_Interp interpreter, PMC* class);
 
 static PMC*
 parrot_py_get_attr_str(Interp* interpreter, PMC *object, STRING *name)
@@ -923,22 +953,30 @@ parrot_py_get_attr_str(Interp* interpreter, PMC *object, STRING *name)
         }
     }
     /*
-     * check attributes
+     * check attributes, if its an object
      */
 
-    class = GET_CLASS((SLOTTYPE *)PMC_data(object), object);
-    class_array = (SLOTTYPE *)PMC_data(class);
-    p = get_attrib_num(class_array, PCD_ATTRIBUTES);
-    b = hash_get_bucket(interpreter,
+    if (PObj_is_object_TEST(object)) {
+        class = GET_CLASS((SLOTTYPE *)PMC_data(object), object);
+        class_array = (SLOTTYPE *)PMC_data(class);
+        p = get_attrib_num(class_array, PCD_ATTRIBUTES);
+        b = hash_get_bucket(interpreter,
                 (Hash*) PMC_struct_val(p), name);
-    if (b) {
-        offs = PMC_int_val( (PMC*) b->value);
-        return Parrot_get_attrib_by_num(interpreter, object, offs);
+        if (b) {
+            offs = PMC_int_val( (PMC*) b->value);
+            return Parrot_get_attrib_by_num(interpreter, object, offs);
+        }
+        /*
+         * 3) try method
+         */
+        p = Parrot_find_method_with_cache(interpreter, class, name);
+        if (p)
+            return p;
     }
     /*
-     * 3) try method
+     * 4) global - class method
      */
-    p = Parrot_find_method_with_cache(interpreter, class, name);
+    p = Parrot_find_global(interpreter, NULL, name);
     if (p)
         return p;
     /*
@@ -986,11 +1024,17 @@ parrot_py_get_iter(Interp* interpreter, PMC *obj)
 }
 
 void
-parrot_py_set_vtable(Parrot_Interp interpreter, PMC* class, PMC *object)
+parrot_py_set_vtable(Parrot_Interp interpreter, PMC* class)
 {
-    object->vtable->get_attr_str = parrot_py_get_attr_str;
-    object->vtable->set_attr_str = parrot_py_set_attr_str;
-    object->vtable->get_iter     = parrot_py_get_iter;
+    PMC * vtable_pmc =
+        get_attrib_num((SLOTTYPE *)PMC_data(class), PCD_OBJECT_VTABLE);
+    VTABLE *vtable = PMC_struct_val(vtable_pmc);
+
+    vtable->get_attr_str = parrot_py_get_attr_str;
+    vtable->set_attr_str = parrot_py_set_attr_str;
+    vtable->get_iter     = parrot_py_get_iter;
+
+    class->vtable->get_attr_str = parrot_py_get_attr_str;
 
 }
 /*
