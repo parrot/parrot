@@ -7,7 +7,7 @@
  *  Data Structure and Algorithms:
  *  History:
  *  Notes:
- *  References:
+ *  References: memory_internals.pod
  */
 
 #if !defined(PARROT_POBJ_H_GUARD)
@@ -276,11 +276,11 @@ typedef enum PObj_enum {
 
 #if ARENA_DOD_FLAGS
 /*
- * these 4 flags are kept in one nibble
+ * these flags are stored in one nibble per object. 0x08 is unused.
  */
-#  define d_PObj_live_FLAG              0x01
-#  define d_PObj_on_free_list_FLAG      0x02
-#  define d_PObj_is_special_PMC_FLAG    0x04
+#  define d_PObj_live_FLAG              ((UINTVAL)0x01)
+#  define d_PObj_on_free_list_FLAG      ((UINTVAL)0x02)
+#  define d_PObj_is_special_PMC_FLAG    ((UINTVAL)0x04)
 
 /*
  * arenas are constant sized ~32 byte object size, ~16K objects
@@ -288,6 +288,16 @@ typedef enum PObj_enum {
 # define ARENA_SIZE (32*1024*16)
 # define ARENA_ALIGN ARENA_SIZE
 # define ARENA_MASK (~ (ARENA_SIZE-1) )
+
+/*
+ * ARENA_FLAG_SHIFT is log2 of the number of nibbles per UINTVAL, i.e. how
+ * many object flag sets fit into a frame of arena->dod_flags.
+ * ARENA_FLAG_MASK has its lowest ARENA_FLAG_SHIFT bits set.
+ *
+ * 32-bit systems have 32/4=8=2<<3 nibbles per word
+ * 64-bit systems have 64/4=16=2<<4 nibbles per word
+ */
+
 #if INTVAL_SIZE == 4
 # define ARENA_FLAG_SHIFT 3
 # define ARENA_FLAG_MASK 0x7
@@ -295,7 +305,7 @@ typedef enum PObj_enum {
 # define ALL_FREE_MASK 0x22222222
 #elif INTVAL_SIZE == 8
 # define ARENA_FLAG_SHIFT 4
-# define ARENA_FLAG_MASK 0x0f
+# define ARENA_FLAG_MASK 0xf
 # define ALL_LIVE_MASK 0x1111111111111111
 # define ALL_FREE_MASK 0x2222222222222222
 #else
@@ -306,12 +316,24 @@ typedef enum PObj_enum {
      (4*sizeof(INTVAL) + sizeof(INTVAL) * \
       ((ARENA_OBJECTS(_pool) >> ARENA_FLAG_SHIFT )) )
 
+/*
+ * since arenas are memaligned, the beginning of one can be found by zeroing
+ * the low bits of any object in it
+ */
 # define GET_ARENA(o) \
      ((struct Small_Object_Arena *) (PTR2UINTVAL(o) & ARENA_MASK))
+
+/*
+ * objects are all same size, so to determine one's index we need only divide
+ * its offset in the arena by that size
+ */
 # define GET_OBJ_N(arena, o) \
      ((PTR2UINTVAL(o) - PTR2UINTVAL((arena)->start_objects)) \
           / (arena)->object_size)
 
+/*
+ * see memory_internals.pod for discussion of flag packing format
+ */
 # define DOD_flag_TEST(flag, o) \
       GET_ARENA(o)->dod_flags[ GET_OBJ_N(GET_ARENA(o), o) >> \
       ARENA_FLAG_SHIFT ] & ((d_PObj_ ## flag ## _FLAG << \

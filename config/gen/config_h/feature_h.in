@@ -54,7 +54,7 @@ END
 
     print OUT <<'END';
 
-#ifdef __powerpc__
+#if defined __powerpc__ || defined __x86_64__
 #  define PARROT_VA_TO_VAPTR(x) (x)
 #else
 #  define PARROT_VA_TO_VAPTR(x) (&(x))

@@ -108,15 +108,16 @@ Adding a I<vtable> (and some other structure members) yields a C<PMC>.
 
 =head2 ARENA_DOD_FLAGS
 
-Only four flags need to be checked during a DOD run: C<PObj_live_FLAG>,
-C<PObj_on_free_list_FLAG>, C<PObj_is_special_PMC_FLAG> and 
-C<PObj_needs_early_DOD_FLAG>. Normally these flags are stored in 
-C<PObj->flags>, meaning that each PMC must be accessed during the DOD run.
+Only three flags need to be checked during a DOD run: C<PObj_live_FLAG>,
+C<PObj_on_free_list_FLAG>, and C<PObj_is_special_PMC_FLAG>.  Normally these
+flags are stored in C<PObj-E<gt>flags>, meaning that each PMC must be accessed
+during the DOD run.
 
 An alternative approach is to store the DOD-Flags in the Arenas as a packed
-array of bits. This approach will be used if the preprocessor variable 
-C<ARENA_DOD_FLAGS> is defined to 1. Here the C<struct Small_Object_Arena> is
-extended with a pointer to the packed bitarray
+array of bits. This approach will be used if the preprocessor variable
+C<ARENA_DOD_FLAGS> is defined to 1, which happens by default if the system
+provides a memory alignment primitive such as C<memalign>. In this case the
+C<struct Small_Object_Arena> is extended with a pointer to the packed bitarray
 
     struct Small_Object_Arena {
         UINTVAL *dod_flags;
@@ -125,26 +126,68 @@ extended with a pointer to the packed bitarray
     };
 
 The memory for this Small_Object_Arena is allocated at the beginning of a 
-large aligned block of memory (currently 4MiB) and the objects in this arena 
+large aligned block of memory (currently 4Mib) and the objects in this arena 
 come from this memory block. Therefore the arena of an object can be found by 
 simply masking out the lower bits of the pointer to the object:
 
     arena = object & ARENA_MASK;
 
-The macro C<GET_ARENA> does the exactly this, including the necessary type
-casts to remove warnings. The dod_flags are accessed by getting the element
-number in the arena (this is possible because the C<object_size> is fixed and
-stored in the C<struct Small_Object_Arena>), creating the appropriate
-bitmask by shifting and accessing the right element of C<dod_flags[]>.
+The macro C<GET_ARENA> does exactly this, including the necessary type casts
+to remove warnings. The dod_flags are accessed by getting the element number
+in the arena (this is possible because the C<object_size> is fixed and stored
+in the C<struct Small_Object_Arena>), creating the appropriate bitmask by
+shifting and accessing the right element of C<dod_flags[]>.
 
     n = (object - arena->start_objects) / arena->object_size;
     arena->dod_flags[n >> ARENA_FLAG_SHIFT] 
         & flag << ((n & ARENA_FLAG_MASK) << 2)
 
-To simplify this, the macros C<DOD_flag_SET>, C<DOD_flag_CLEAR> and
-C<DOD_flag_TEST> are introduced. As these macros are also defined in the case
-without ARENA_DOD_FLAGS, these macros are a portable way of manipulating the 
-DOD flags.
+
+F<pobj.h> provides macros to facilitate referencing individual object flags:
+C<DOD_flag_SET>, C<DOD_flag_CLEAR> and C<DOD_flag_TEST>. They are also defined
+in the case without ARENA_DOD_FLAGS, so they make up a portable way of
+manipulating the DOD-relevant object flags.
+
+=head3 Flag packing format
+
+The three object flags consulted during DOD are packed into one 4-bit nibble
+per object (one bit is currently unused).  Since C<arena-E<gt>dod_flags[]> is
+an array of native-sized UINTVALs ("words"), the number of nibbles per array
+entry varies depending on the platform. 
+
+To reference a particular flag in a test, set, or clear operation, we require
+both the word containing the object's flags and a bitmask to isolate the flag.
+
+The flag word for object o is found as follows:
+
+- Get the C<dod_flags[]> array for the object's arena
+    [GET_ARENA(o)->dod_flags]
+
+- Get the index of the object in its arena
+    [n=GET_OBJ_N(arena,o)]
+
+- Determine which word in dod_flags contains the needed flag nibble
+    [(obj index)/(obj flag sets per word) = n>>ARENA_FLAG_SHIFT]
+
+The composite expression to reference the flag word is then
+  GET_ARENA(o)->dod_flags[ GET_OBJ_N(GET_ARENA(o), o) >> ARENA_FLAG_SHIFT ]
+
+The bitmask for the desired flag is constructed as follows:
+
+- Determine the index into the flag word of the object's nibble
+    [(obj index)%(nibbles per word) = n & ARENA_FLAG_MASK]
+
+- Convert nibble index into bit index
+    [(nibble index)*(bits per nibble) = (n & ARENA_FLAG_MASK) << 2]
+
+- Create bitmask for desired flag by shifting base flag by bit index
+    [d_PObj_whatever_FLAG << (nibble index)]
+
+The composite expression to form the bitmask is then
+  (d_PObj_ ## flag ## _FLAG << (( GET_OBJ_N(GET_ARENA(o), o) &
+     ARENA_FLAG_MASK ) << 2))
+
+The DOD_flag_* macros combine these constructions to access the flags.
 
 =head1 Variable sized items
 
@@ -283,4 +326,4 @@ Leopold Tötsch <lt@toetsch.at>
 
 =head1 VERSION
 
-0.0.9 Dec 2002
+0.1.0 Mar 2004

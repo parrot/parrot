@@ -658,11 +658,11 @@ free_unused_pobjects(struct Parrot_Interp *interpreter,
             }
             else
                 nm += 4;
+
             /* If it's not live or on the free list, put it on the free list.
              * Note that it is technically possible to have a Buffer be both
              * on_free_list and live, because of our conservative stack-walk
              * collection. We must be wary of this case. */
-
             if ((*dod_flags & (PObj_on_free_list_FLAG << nm)))
                 ; /* if its on free list, do nothing */
             else if ((*dod_flags & (PObj_live_FLAG << nm)))
@@ -735,7 +735,7 @@ free_unused_pobjects(struct Parrot_Interp *interpreter,
                      * XXX Jarkko did report that on irix pool->mem_pool
                      *     was NULL, which really shouldn't happen
                      */
-		    if (pool->mem_pool) {
+                    if (pool->mem_pool) {
                         if (!PObj_COW_TEST(b)) {
                             ((struct Memory_Pool *)
                              pool->mem_pool)->guaranteed_reclaimable +=
