@@ -4,7 +4,7 @@ core_ops.c
 core_ops_prederef.c
 Makefile
 pdump
-test_parrot
+parrot
 Makefile
 *.patch
 vtable.ops
