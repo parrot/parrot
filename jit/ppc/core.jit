@@ -34,7 +34,16 @@ Parrot_set_i_ic {
     }
 }
 
-Parrot_set_i_i {
+Parrot_null_i {
+    if (MAP[1]) {
+        jit_emit_mov_rr(NATIVECODE, MAP[1], r31);
+    }
+    else {
+        jit_emit_mov_mr_i(NATIVECODE, &INT_REG[1], r31); 
+    }
+}
+
+TEMPLATE Parrot_set_x_x {
     if (MAP[1] && MAP[2]) {
         jit_emit_mov_rr(NATIVECODE, MAP[1], MAP[2]);
     }
@@ -48,6 +57,18 @@ Parrot_set_i_i {
         jit_emit_mov_rm_i(NATIVECODE, ISR1, &INT_REG[2]); 
         jit_emit_mov_mr_i(NATIVECODE, &INT_REG[1], ISR1); 
     }
+}
+
+Parrot_set_i_i {
+    Parrot_set_x_x
+}
+
+Parrot_set_s_s {
+    Parrot_set_x_x s/INT/STR/`
+}
+
+Parrot_set_p_p {
+    Parrot_set_x_x s/INT/PMC/
 }
 
 Parrot_set_n_nc {
@@ -953,4 +974,9 @@ Parrot_clone_s_s {
     jit_emit_call_func(NATIVECODE, (void*) string_copy);
 
     jit_emit_mov_mr_i(NATIVECODE, &STRING_REG[1], r3);
+}
+
+Parrot_set_p_pc {
+    jit_emit_mov_ri_i(NATIVECODE, ISR1, CONST(2)->u.key);
+    jit_emit_mov_mr_i(NATIVECODE, &PMC_REG[1], ISR1); 
 }
