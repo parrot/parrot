@@ -164,6 +164,7 @@ opcode_t PackFile_fetch_op(struct PackFile *pf, opcode_t *stream);
 */
 void endian_matrix(unsigned char * buf);
 INTVAL endian_fetch_intval(INTVAL w, unsigned char * o);
+opcode_t endian_fetch_op(opcode_t op, unsigned char * o);
 void endian_fetch_buf(unsigned char * rb, unsigned char * b, unsigned char * o,
                         int wsize);
 void endian_put_intval(unsigned char * rb, INTVAL w, unsigned char * o);
