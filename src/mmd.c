@@ -106,6 +106,11 @@ get_mmd_dispatch_type(Interp *interpreter, UINTVAL left_type,
     x_funcs = table->x;
     y_funcs = table->y;
 
+    /*
+     * XXX quick hack for delegates
+     */
+    if (left_type == enum_class_delegate)
+        right_type = 0;
     if (left_type < x_funcs) {
         if (right_type < y_funcs) {
             offset = x_funcs * right_type + left_type;

@@ -198,38 +198,31 @@ Sets the value of the integer to C<*value>.
 
 Adds C<*value> to the integer and returns the result in C<*dest>.
 
+Please note: the label syntax I<MMD_type:> denote the behavior, if
+the right hand value is of that type. The part inside the braces is
+converted to a distinct function and gets I<mmd_register>ed for these
+two types.
+
 =cut
 
 */
     void add (PMC* value, PMC* dest) {
-        INTVAL pmci;
-        int vtype = VTABLE_type(INTERP, value);
-        FLOATVAL valf;
-        FLOATVAL sumf;
-
-        pmci = PMC_int_val(SELF);
-        if (vtype == enum_class_PerlUndef) {
-            VTABLE_set_integer_native(INTERP, dest, pmci);
-            return;
+MMD_PerlInt: {
+        VTABLE_set_integer_native(INTERP, dest,
+            PMC_int_val(SELF) + PMC_int_val(value));
         }
-
-        valf = VTABLE_get_number(INTERP, value);
-        sumf = pmci + valf;
-        if (vtype == enum_class_PerlNum) {
-            VTABLE_set_number_native(INTERP, dest, sumf);
-            return;
+MMD_PerlUndef: {
+        Parrot_warn(INTERP, PARROT_WARNINGS_UNDEF_FLAG,
+            "Use of uninitialized value in integer context");
+        VTABLE_set_integer_native(INTERP, dest, PMC_int_val(SELF));
         }
-        {
-            INTVAL vali = (INTVAL) valf;
-            INTVAL   sumi = pmci + vali;
-            if (sumf == sumi)
-                VTABLE_set_integer_native(INTERP, dest, sumi);
-            else {
-                /* TODO BIG* promotion */
-                VTABLE_set_number_native(INTERP, dest, sumf);
-            }
-            return;
-
+MMD_PerlNum: {
+        VTABLE_set_number_native(INTERP, dest,
+            PMC_int_val(SELF) + PMC_num_val(value));
+        }
+MMD_DEFAULT: {
+        VTABLE_set_number_native(INTERP, dest,
+            PMC_int_val(SELF) + VTABLE_get_number(INTERP, value));
         }
     }
 
