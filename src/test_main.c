@@ -172,12 +172,19 @@ main(int argc, char **argv) {
             program_size = 1024;
             
             program_code = (opcode_t*)malloc(1024);
+            if (NULL == program_code) {
+                fprintf(stderr, "Could not allocate buffer to read stdin\n");
+            }
             cursor = (char*)program_code;
 
             while ((read_result = read(0, cursor, 1024)) > 0) {
                 read_last = read_result;
                 program_size += 1024;
-                realloc(program_code, program_size);
+                program_code = realloc(program_code, program_size);
+                if (NULL == program_code) {
+                    fprintf(stderr,
+                            "Could not reallocate buffer to read stdin\n");
+                }
                 cursor = (char*)program_code + program_size - 1024;
             }
 
