@@ -490,6 +490,38 @@ op string_encoding(out INT, in STR) {
    $1 = encoding_by_encoding($2->encoding);
    goto NEXT();
 }
+
+=item B<find_chartype>(out INT, in STR)
+
+Find the chartype named in $2 and return its number in $1
+
+=cut
+
+op find_chartype(out INT, in STR) {
+  char *temp_chartype = string_to_cstring(interpreter, $2);
+  char chartype[255];
+
+  /* Copy the string to stack storage and free. Ick. */
+  strncpy(chartype, temp_chartype, sizeof(chartype));
+  chartype[sizeof(chartype)-1] = 0;
+  string_cstring_free(temp_chartype);
+
+  $1 = chartype_find_chartype(chartype);
+  goto NEXT();
+}
+
+=item B<string_chartype>(out INT, in STR)
+
+Find the chartype type for $2 and put it in $1
+
+=cut
+
+op string_chartype(out INT, in STR) {
+   $1 = chartype_by_chartype($2->type);
+   goto NEXT();
+}
+
+
 ########################################
 
 =item B<stringinfo>(out INT, in STR, in INT)

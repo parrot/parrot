@@ -19,36 +19,37 @@ extern const ENCODING utf32_encoding;
 
 static const ENCODING *encoding_array[enum_encoding_MAX];
 
+static void
+encoding_init(void)
+{
+    encoding_array[enum_encoding_singlebyte] = &singlebyte_encoding;
+    encoding_array[enum_encoding_utf8] = &utf8_encoding;
+    encoding_array[enum_encoding_utf16] = &utf16_encoding;
+    encoding_array[enum_encoding_utf32] = &utf32_encoding;
+}
+
 const ENCODING *
 encoding_lookup(const char *name)
 {
-    if (strcmp(name, "singlebyte") == 0) {
-        return &singlebyte_encoding;
+    int i;
+
+    if (!encoding_array[0])
+        encoding_init();
+  
+    for (i=0; i<enum_encoding_MAX; i++) {
+        if (strcmp(name, encoding_array[i]->name) == 0) {
+            return encoding_array[i];
+        }
     }
-    else if (strcmp(name, "utf8") == 0) {
-        return &utf8_encoding;
-    }
-    else if (strcmp(name, "utf16") == 0) {
-        return &utf16_encoding;
-    }
-    else if (strcmp(name, "utf32") == 0) {
-        return &utf32_encoding;
-    }
-    else {
-        internal_exception(INVALID_ENCODING, "Invalid encoding '%s'\n", name);
-        return NULL;
-    }
+    internal_exception(INVALID_ENCODING, "Invalid encoding '%s'\n", name);
+    return NULL;
 }
 
 const ENCODING *
 encoding_lookup_index(INTVAL n)
 {
-    if (!encoding_array[0]) {
-        encoding_array[enum_encoding_singlebyte] = &singlebyte_encoding;
-        encoding_array[enum_encoding_utf8] = &utf8_encoding;
-        encoding_array[enum_encoding_utf16] = &utf16_encoding;
-        encoding_array[enum_encoding_utf32] = &utf32_encoding;
-    }
+    if (!encoding_array[0]) 
+        encoding_init();
     return encoding_array[n];
 }
 
@@ -67,22 +68,11 @@ encoding_by_encoding(const ENCODING *encoding) {
 INTVAL
 encoding_find_encoding(const char *name) 
 {
-    if (strcmp(name, "singlebyte") == 0) {
-        return enum_encoding_singlebyte;
-    }
-    else if (strcmp(name, "utf8") == 0) {
-        return enum_encoding_utf8;
-    }
-    else if (strcmp(name, "utf16") == 0) {
-        return enum_encoding_utf16;
-    }
-    else if (strcmp(name, "utf32") == 0) {
-        return enum_encoding_utf32;
-    }
-    else {
-        internal_exception(INVALID_ENCODING, "Invalid encoding '%s'\n", name);
-        return 0;
-    }
+    const ENCODING *enc = encoding_lookup(name);
+    if (enc)
+        return enc->index;
+    else
+        return -1;
 }
 
 /*
