@@ -141,11 +141,11 @@ my(%c)=(
     debugging     => $opt_debugging,
     rm_f          => 'rm -f',
     rm_rf         => 'rm -rf',
-    stacklow      => '(~0xfff)UL',
-    intlow        => '(~0xfff)UL',
-    numlow        => '(~0xfff)UL',
-    strlow        => '(~0xfff)UL',
-    pmclow        => '(~0xfff)UL',
+    stacklow      => '(~0xfffu)',
+    intlow        => '(~0xfffu)',
+    numlow        => '(~0xfffu)',
+    strlow        => '(~0xfffu)',
+    pmclow        => '(~0xfffu)',
     make          => $Config{make},
     make_set_make => $Config{make_set_make},
         
@@ -429,6 +429,24 @@ AARGH
 
 $c{packtype_n} = 'd';
 
+#
+# Find out what integer constant type we can use
+# for pointers.
+#
+
+print "Figuring out what integer type we can mix with pointers...\n";
+
+if ($c{intsize} == $c{ptrsize}) {
+    print "We'll use 'unsigned int'.\n";
+    $c{ptrconst} = "u";
+} elsif ($c{longsize} == $c{ptrsize}) {
+    print "We'll use 'unsigned long'.\n";
+    $c{ptrconst} = "ul";
+} else {
+    die <<"AARGH";
+Configure.pl:  Unable to find an integer type that fits a pointer.
+AARGH
+}
 
 #
 # Build config.h, the Makfefiles and Types.pm:
@@ -701,7 +719,7 @@ sub lowbitmask {
         my $vector = unpack("b*", pack("V", $_));
         my $offset = rindex($vector, "1")+1;
         my $mask = 2**$offset - 1;
-        push @returns, "(~0x".sprintf("%x", $mask)."UL)";
+        push @returns, "(~0x".sprintf("%x", $mask).$c{ptrconst}.")";
     }
 
     return @returns;
