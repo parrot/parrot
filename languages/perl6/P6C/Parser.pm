@@ -711,8 +711,9 @@ no_args:	  ...!'('
 ##############################
 # Strings:
 
-quoted_string:	  double_quoted_string { $return = $item[1] }
-		| single_quoted_string { $return = $item[1] }
+quoted_string:
+          double_quoted_string
+        | single_quoted_string
 
 double_quoted_string: <rulevar:$delim>
 double_quoted_string:
@@ -726,15 +727,18 @@ double_quoted_string_head:
 		| /qq$SPECIAL_DELIM/o { substr($item[1],2) }
 
 double_quoted_string_body:
-		  m/\\(?=q\{|Q\[)/ <commit> single_quoted_string { $item[-1] }
+         '\\' backslashed_expr { $item[2] }
+        | '\\' /./ { $item[2] }
 		| interpolated_value { $item[1] }
 		| variable str_subscript(s?) ...!/[\[\{\(]/ { [@item[1,2]] }
-		| m/(?:[^\\\$\@\%\&$arg[0]]|\\(?!q\{|Q\[).)*/ { $item[1] }
+        | m/[^\\\$\@\%\&\Q$arg[0]\E]*/ { $item[1] }
 
-str_subscript:	  <skip:$Parse::RecDescent::skip> ...!/\s/ subscript
+str_subscript:
+        <skip:$Parse::RecDescent::skip> ...!/\s/ subscript
 			<skip:$item[1]> { $item[3] }
 
-interpolated_value: sigil <skip:''>
+interpolated_value:
+        sigil <skip:''>
 			'(' <skip:$Parse::RecDescent::skip> comma ')'
 			<skip:$item[2]>
 
@@ -752,8 +756,24 @@ single_quoted_string_head:
 
 single_quoted_string_body:
 		  m/\\(?=qq\{)/ <commit> double_quoted_string { $item[-1] }
-		| m/(?:[^\\$arg[0]]|\\(?!qq\{).)*/ {
+        | m/(?:[^\Q$arg[0]\E\\]+|\\(?!qq\{).)*/ {
 			$item[-1] =~ s/\\'/'/g; quotemeta($item[-1]) }
+
+backslashed_expr: <rulevar:$delim>
+backslashed_expr:
+          /(?=[qQ])/ single_quoted_string { $item[2] }
+        | 'c' '[' string_set ']'
+        | ':' '[' string_set ']'
+        | /[ULE]/ '[' /[^\]]*/ ']'
+        | /[ule]/ /./
+        | /[terfn]/
+
+string_set:
+        (
+            ...!/[:\]]+\]/
+            single_quoted_string_body[';'](s)
+        )(s?)
+        single_quoted_string_body[']'](s)
 
 ##############################
 # Regexes:

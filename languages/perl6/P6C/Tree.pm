@@ -24,7 +24,7 @@ use Carp 'confess';
 use P6C::Nodes;
 use Data::Dumper;
 use P6C::Util qw(unimp flatten_leftop error);
-use P6C::Tree::String qw(concat_string);
+use P6C::Tree::String;
 
 ######################################################################
 
@@ -226,7 +226,7 @@ sub P6C::sv_literal::tree {
 	}
 	$val = $x->[1];
     } else {
-        return concat_string($x);
+        return $x->[1]->tree;
     }
     return new P6C::sv_literal type => $type, lval => $val;
 }
@@ -279,37 +279,6 @@ sub P6C::scalar_var::tree {
 }
 
 *P6C::nonscalar_var::tree = *P6C::scalar_var::tree;
-
-sub P6C::interpolated_value::tree {
-    my $x = shift;
-    my $sigil = $x->[1]->tree;
-    my @values;
-    if ($sigil eq '$') {
-        push (@values, $x->[5]->tree);
-    }
-
-# XXX: @ context needs to join with $" (or its perl6 equiv)
-
-    elsif ($sigil eq '@') {
-        if (@{$x->[5][1]} > 1) {
-            my $space = new P6C::sv_literal type => 'PerlString',
-		lval => '" "';
-            my $args  = new P6C::ValueList vals => [$space, $x->[5]->tree ];
-            push (@values, new P6C::prefix name => 'join', args => $args);
-        }
-        else {
-            push (@values, $x->[5]->tree);
-        }
-    }
-
-# XXX: Unsure of how hashes are supposed to interpolate.
-#      Data::Dumper style, perahps?
-
-    elsif ($sigil eq '%') { unimp qq("%()"\n); }
-    elsif ($sigil eq '&') { unimp qq("&()"\n); }
-    else { error qq( attempted interpolation of unknown type.\n) }
-    return @values;
-}
 
 ######################################################################
 # Operators

@@ -1,12 +1,3 @@
-package P6C::Tree::String;
-use P6C::Nodes;
-use strict;
-use vars qw(@EXPORT_OK @ISA);
-require Exporter;
-@EXPORT_OK = qw(concat_string);
-@ISA = qw(Exporter);
-
-
 =head1 B<P6C::Tree>
 
 This is the string interpolation section.  Here's a rundown:
@@ -23,8 +14,7 @@ This is the string interpolation section.  Here's a rundown:
       specifying the return value inside the rule.
 
 2.) Next, C<sv_literal>'s tree method is called.  After discovering that the
-    literal is a string, it calls and returns
-    C<P6C::Tree::String::concat_string>.
+    literal is a string, it calls and returns quoted_string's tree method.
 
 3.) C<concat_string> first removes the parse object name, and then calls
     C<P6C::Tree::String::interpolate_expand>.
@@ -47,7 +37,12 @@ This is the string interpolation section.  Here's a rundown:
 
 =cut
 
-sub concat_string {
+package P6C::quoted_string;
+use P6C::Nodes;
+use strict;
+use P6C::Util qw(unimp error);
+
+sub tree {
     my ($x) = @_;
     shift @$x;
     my $expand = [interpolate_expand($x)];
@@ -62,7 +57,7 @@ sub interpolate_expand {
     foreach my $item (@$list) {
         if (defined $item) {
             if (ref $item eq 'ARRAY') {
-                    push (@flat, interpolate_expand($item))
+                push @flat, interpolate_expand($item)
             }
             else {
                 push @flat, $item
@@ -77,20 +72,45 @@ sub interpolate_concat_literal {
     my (@short, $string);
     foreach my $item (@$list)
     {
-
-# XXX: Each P6C::variable type should be handled differently
-#      e.g., arrays should be joined with $", and hashes need
-#      something weird done to them.
-
         if (ref $item eq 'P6C::variable') {
             push (@short, escape($string)) if defined $string;
-            push (@short, $item->tree);
+            my $var = $item->tree;
+            my $sigil = $item->[1]->[1];
+
+            if ($sigil eq '$') {
+	            push @short, $var
+	        }
+
+            # XXX: @ context needs to join with .sep property
+            elsif ($sigil eq '@') {
+                my $space = new P6C::sv_literal type => 'PerlString',
+                    lval => '" "';
+                my $args  = new P6C::ValueList vals => [$space, $var];
+                push (@short, new P6C::prefix name => 'join', args => $args);
+            }
+
+            # XXX: Needs to stringify with proper properties
+            elsif ($sigil eq '%') {
+                unimp qq("\%"\n)
+            }
+            elsif ($sigil eq '&') {
+	            push @short, $var
+	        }
+            else {
+	            error qq( attempted interpolation of unknown type.\n)
+	        }
+
             $string='';
         }
         elsif (ref $item eq 'P6C::interpolated_value') {
-
             push (@short, escape($string)) if defined $string;
-            push (@short, $item->tree);
+            push @short, $item->tree;
+            $string='';
+
+        }
+        elsif (ref $item eq 'P6C::backslashed_expr') {
+            push (@short, escape($string)) if defined $string;
+            push @short, $item->tree;
             $string='';
 
         }
@@ -102,30 +122,26 @@ sub interpolate_concat_literal {
     return \@short
 }
 
-sub concat_list
-{
+sub concat_list {
     my ($list) = @_;
     my $type = 'PerlString';
     if (@$list > 1) {
-
         my $val = new P6C::Binop op => '_', l => make_node(shift @$list), r => make_node(shift @$list);
         while (@$list) {
             $val = new P6C::Binop op => '_', l => $val, r => make_node(shift @$list)
         }
         return $val;
     }
-    elsif (ref($list->[0]) =~ /P6C/) {
+    elsif (ref $list->[0]) {
         return $list->[0]
     }
     else {
         return new P6C::sv_literal type => $type,
-	    #lval => ($list->[0] || '""')
 	    lval => (defined $list->[0] ? $list->[0] : '""')
     }
 }
 
-sub make_node
-{
+sub make_node {
     my $right = shift;
     my $type = 'PerlString';
     if (ref($right) !~ /P6C/) {
@@ -134,12 +150,113 @@ sub make_node
     return $right;
 }
 
-sub escape
-{
+sub escape {
     my $string = shift;
     $string =~ s/(?<!\x5C)\x22/\\x22/g;
     $string =~ s/\x5C\x22/\\x22/g;
     return qq{"$string"};
+}
+
+
+package P6C::backslashed_expr;
+use P6C::Nodes;
+use strict;
+use P6C::Util qw(unimp error);
+
+sub tree {
+    my $x = shift;
+    my $val = "";
+    if ($x->[1] eq 'c') {
+        return string_special($x->[5]->tree)
+    }
+    elsif ($x->[1] eq ':') {
+        unimp qq("\\:[]")
+    }
+    elsif ($x->[1] =~ /u/i) {
+        $val = uc $x->[2];
+        $val = uc $x->[3] if @$x > 3
+    }
+    elsif ($x->[1] =~ /l/i) {
+        $val = lc $x->[2];
+        $val = lc $x->[3] if @$x > 3
+    }
+    elsif ($x->[1] eq 'e') {
+        $val = '\\' . quotemeta $x->[2];
+    }
+    elsif ($x->[1] eq 'E') {
+        $val = quotemeta $x->[3];
+        $val =~ s/\\/\\\\/g;
+    }
+    else {
+        $val = '\\' . $x->[1]
+    }
+    return new P6C::sv_literal type => "PerlString", lval => qq{"$val"};
+}
+
+sub string_special {
+    foreach (@_) {
+        my $data = $_->lval;
+        if (substr($data,0,1) eq '^') {
+            $data = substr($data,1);
+            $_->lval(eval qq["\\c$data"]);
+        }
+        else {
+            $_->lval(eval qq["\\N{$data}"]);
+        }
+    }
+    return @_
+}
+
+
+package P6C::interpolated_value;
+use P6C::Nodes;
+use strict;
+use P6C::Util qw(unimp error);
+
+sub tree {
+    my $x = shift;
+    my $sigil = $x->[1]->tree;
+    my @values;
+    if ($sigil eq '$') {
+        push (@values, $x->[5]->tree);
+    }
+
+# XXX: @ context needs to join with $" (or its perl6 equiv)
+
+    elsif ($sigil eq '@') {
+        if (@{$x->[5][1]} > 1) {
+            my $space = new P6C::sv_literal type => 'PerlString',
+        lval => '" "';
+            my $args  = new P6C::ValueList vals => [$space, $x->[5]->tree ];
+            push (@values, new P6C::prefix name => 'join', args => $args);
+        }
+        else {
+            push (@values, $x->[5]->tree);
+        }
+    }
+
+# XXX: Unsure of how hashes are supposed to interpolate.
+#      Data::Dumper style, perahps?
+
+    elsif ($sigil eq '%') { unimp qq("%()"\n) }
+    else { error qq( attempted interpolation of unknown type.\n) }
+    return @values;
+}
+
+
+package P6C::string_set;
+use P6C::Nodes;
+use strict;
+use P6C::Util qw(unimp error);
+
+sub tree {
+    my $x = shift;
+    my @items;
+    foreach my $item (@{$x->[1]}) {
+        push @items, P6C::quoted_string::tree($x->[1]->[2])
+    }
+    push @items, P6C::quoted_string::tree($x->[2]);
+    return @items
 }
 
 1;
