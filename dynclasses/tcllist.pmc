@@ -78,7 +78,7 @@ static PMC* retval(Interp *interpreter, void *ret)
     return value;
 }
 
-pmclass TclList extends Array need_ext does array dynpmc {
+pmclass TclList extends Array need_ext does array dynpmc group tclgroup {
 
 /*
 
