@@ -58,6 +58,7 @@ struct Parrot_Interp {
 #define PARROT_BOUNDS_FLAG   0x04  /* We're tracking byte code bounds */
 #define PARROT_PROFILE_FLAG  0x08  /* We're gathering profile information */
 #define PARROT_PREDEREF_FLAG 0x10  /* We're using the prederef runops */
+#define PARROT_JIT_FLAG      0x20  /* We're using the jit runops */
 
 #define PCONST(i) PF_CONST(interpreter->code, (i))
 #define PNCONST   PF_NCONST(interpreter->code)

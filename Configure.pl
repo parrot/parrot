@@ -61,6 +61,14 @@ check_manifest();
 #Some versions don't seem to have ivtype or nvtype--provide
 #defaults for them.
 #XXX Figure out better defaults
+
+my $archname           =  $Config{archname};
+$archname              =~ s/-(net|free|open)bsd$/-bsd/i;
+my ($cpuarch, $osname) =  split('-', $archname);
+
+my $jitarchname = (-e "Parrot/Jit/$archname.pm") ? $archname : 'i386-nojit';
+my ($jitcpuarch, $jitosname) =  split('-', $jitarchname);
+
 my(%c)=(
 	iv =>			($Config{ivtype}   ||'long'),
 	intvalsize =>       undef,
@@ -96,6 +104,15 @@ my(%c)=(
 	make_set_make=>          $Config{make_set_make},
 	
 	platform =>	$^O,
+
+    cpuarch  => $cpuarch,
+    osname   => $osname,
+    archname => $archname,
+
+    jitcpuarch  => $jitcpuarch,
+    jitosname   => $jitosname,
+    jitarchname => $jitarchname,
+
 	cp =>		'cp',
 	slash =>	'/',
 );

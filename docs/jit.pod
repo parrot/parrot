@@ -1,0 +1,124 @@
+#
+# This file is in POD format; if you're not used to reading POD,
+# you can run the file through "perldoc" for a plain text version.
+
+
+=head1 Parrot JIT Subsystem
+
+Files:
+
+=over 4
+
+=item jit/${cpuarch}/core.jit
+
+All the core parrot opcodes are (or will be) 
+here written in x86 assembly, with the correspondent 
+object code, the syntax is described later.
+
+=item jit/${cpuarch}/string.jit
+
+The string subsystem.
+   
+
+=item include/parrot/jit.h
+
+The definition of the opcode_assembly_t structure:
+    
+The idea is to have a structure for each parrot opcode
+holding the assembly, the position independent code,
+the size of both, and the necesary information to fill
+the position independent code with addresses, that's why
+we use a structure that holds the amount of replacements
+to be done and for each the position where it goes 
+(relative to the start of this opcode) and the 
+argument number. That is hold for each data type.
+Some data types , like STRING, need aditional information
+so a different structure may be specified.
+
+=item jit.c
+
+Is where the real job is done, it loops over
+the parrot bytecode accumulating the size of each 
+opcode and filling an array with the displacement
+from the start of the program to each opcode at the
+same position that the opcode number has in the bytecode.
+
+Then loops again and concatenate the PIC of each 
+parrot opcode placing the addresses or values.
+    
+=item jit2h.pl
+
+Reads the .jit files and prints the struct opcode_assembly_t.
+
+=back
+
+
+=head1 Format of .jit Files
+
+Jit files are interpreted as follows:
+
+=over 4
+
+=item I<op-name>C<:>I<body>
+
+Where I<op-name> is the name of the Parrot opcode, and I<body> consists
+of a sequence of the following forms:
+
+=item C<B<\x>>I<HH>
+
+Represents the byte C<0x>I<HH>, where I<HH> is between 00 and ff.
+
+=item C<B<F>(>I<func-name>, I<arg1>, ..., I<argN>C<)>
+
+Call a function defined in another C<.jit> file (except from the core).
+
+=item C<B<S>(>I<syscall-name>, I<arg1>, ..., I<argN>C<)>
+
+Call a system call, the names are defined in syscall.pl.
+
+=item C<B<C>(>I<func-name>, I<arg1>, ..., I<argN>C<)>
+
+Call a C function. The idea is to replace all the C<B<C>()> with C<B<F>()>.
+
+=item C<B<&IR>>I<n>
+
+Place the address of the C<INTVAL> register specified in the I<n>th argument.
+
+=item C<B<&NR>>I<n>
+
+Place the address of the C<FLOATVAL> register specified in the I<n>th argument.
+
+=item C<B<&SR>>I<n>
+
+Place the address of the C<STRING> register specified in the I<n>th argument.
+
+=item C<B<&SRbufstart>>I<n>
+
+Place the address of C<bufstart> of the C<STRING> register specified in the I<n>th argument.
+
+=item C<B<&SRbuflen>>I<n>
+
+Place the address of C<buflen> of the C<STRING> register specified in the I<n>th argument.
+
+=item C<B<&SRflags>>I<n>
+
+Place the address of C<flags> of the C<STRING> register specified in the I<n>th argument.
+
+=item C<B<&SRstrlen>>I<n>
+
+Place the address of C<strlen> of the C<STRING> register specified in the I<n>th argument.
+
+=item C<B<&SRenconding>>I<n>
+
+Place the address of C<encoding> of the C<STRING> register specified in the I<n>th argument.
+
+=item C<B<&SRtype>>I<n>
+
+Place the address of C<type> of the C<STRING> register specified in the I<n>th argument.
+
+=item C<B<&SRlanguage>>I<n>
+
+Place the address of C<language> of the C<STRING> register specified in the I<n>th argument.
+
+=back
+

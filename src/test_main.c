@@ -23,6 +23,7 @@ main(int argc, char **argv) {
     int tracing;
     int debugging;
     int predereferencing;
+    int jit;
 
     struct Parrot_Interp *interpreter;
     init_world();
@@ -32,6 +33,7 @@ main(int argc, char **argv) {
     **
     **   -d  debugging
     **   -b  bounds checking
+    **   -j  JIT
     **   -p  profiling
     **   -P  predereferencing
     **   -t  tracing
@@ -45,10 +47,18 @@ main(int argc, char **argv) {
     tracing          = 0;
     debugging        = 0;
     predereferencing = 0;
+    jit              = 0;
 
     while (argc > 1 && argv[1][0] == '-') {
         if (argv[1][1] == 'b' && argv[1][2] == '\0') {
             bounds_checking = 1;
+            for(i = 2; i < argc; i++) {
+                argv[i-1] = argv[i];
+            }
+            argc--;
+        }
+        else if (argv[1][1] == 'j' && argv[1][2] == '\0') {
+            jit = 1;
             for(i = 2; i < argc; i++) {
                 argv[i-1] = argv[i];
             }
@@ -96,6 +106,10 @@ main(int argc, char **argv) {
 
     if (bounds_checking) {
          flags |= PARROT_BOUNDS_FLAG;
+    }
+
+    if (jit) {
+         flags |= PARROT_JIT_FLAG;
     }
 
     if (profiling) {

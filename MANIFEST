@@ -19,6 +19,7 @@ core.ops
 disassemble.pl
 docs/Makefile
 docs/intro.pod
+docs/jit.pod
 docs/overview.pod
 docs/parrot.pod
 docs/parrot_assembly.pod
@@ -55,6 +56,7 @@ include/parrot/global_setup.h
 include/parrot/interp_guts.h
 include/parrot/interpreter.h
 include/parrot/io.h
+include/parrot/jit.h
 include/parrot/key.h
 include/parrot/memory.h
 include/parrot/op.h
@@ -69,6 +71,9 @@ include/parrot/string.h
 include/parrot/trace.h
 include/parrot/unicode.h
 interpreter.c
+jit/i386/core.jit
+jit/i386/string.jit
+jit2h.pl
 key.c
 languages/jako/bench.jako
 languages/jako/euclid.jako
@@ -121,6 +126,9 @@ ops2pm.pl
 packfile.c
 Parrot/Assembler.pm
 parrot.c
+Parrot/Jit/i386-bsd.pm
+Parrot/Jit/i386-linux.pm
+Parrot/Jit/i386-nojit.pm
 Parrot/Opcode.pm
 Parrot/Op.pm
 Parrot/OpsFile.pm

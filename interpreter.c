@@ -15,6 +15,7 @@
 #include "parrot/oplib/core_ops.h"
 #include "parrot/oplib/core_ops_prederef.h"
 #include "parrot/runops_cores.h"
+#include "parrot/jit.h"
 
 
 /*=for api interpreter check_fingerprint
@@ -141,6 +142,26 @@ prederef(void ** pc_prederef, struct Parrot_Interp * interpreter)
 }
 
 
+/*=for api interpreter runops_jit
+ */
+void
+runops_jit (struct Parrot_Interp *interpreter, opcode_t * pc) {
+    opcode_t * code_start;
+    INTVAL     code_size;
+    opcode_t * code_end;
+    void *     jit_code;
+
+    check_fingerprint(interpreter);
+
+    code_start = (opcode_t *)interpreter->code->byte_code;
+    code_size  = interpreter->code->byte_code_size;
+    code_end   = (opcode_t *)(interpreter->code->byte_code + code_size);
+
+    jit_code = build_asm(interpreter, pc, code_start, code_end);
+    ((*(void (*)())jit_code)());
+}
+
+
 /*=for api interpreter runops_prederef
  */
 void
@@ -228,6 +249,9 @@ runops (struct Parrot_Interp *interpreter, struct PackFile * code, size_t offset
           }
 
           runops_prederef(interpreter, pc, interpreter->prederef_code + offset);
+        }
+        else if ((interpreter->flags & PARROT_JIT_FLAG) != 0) {
+          runops_jit(interpreter, pc);
         }
         else {
           runops_generic(core, interpreter, pc);
