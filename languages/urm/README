@@ -17,7 +17,7 @@ Why a compiler?
 You might know that it is quite boring to program with pen and paper,
 at least if you're not debugging some screwed up C code but just some
 examples for your upcoming exam. So, I didn't want to learn and I
-wrote a compiler - in Perl. It wasn't really a compile, just some
+wrote a compiler - in Perl. It wasn't really a compiler, just some
 regexes and eval commands. It had one problem - it was slow.
 
 So I dropped it and didn't think about it for a year now. Enter
@@ -28,8 +28,8 @@ on Parrot. So here it is! :-)
 Usage
 =====
 
-The urm compiler (urmc) has two operation modes. One is to simply call
-it with 
+The urm compiler (urmc) has some command line arguments and operation modes.
+One is to simply call it with 
 	./urmc somefile.urm
 and it will compile it to a temporary pasm (Parrot Assembly) file and
 try to execute this file with your Parrot installation.
@@ -38,6 +38,13 @@ The other one mode is if you call it with
 	./urmc -c somefile.urm
 it will create a pasm file called somefile.pasm which you can execute
 by hand with your parrot installation.
+The URM standard is rather strict (see Syntax) and therefore does not
+allow some operation which are easy to implement (e.g. writing r1 <-
+r2 + 1). I allowed these options but throw a warning every time you
+violate the standard. If you don't like these warnings you can say
+	./urmc -s somefile.urm 
+which will not give any warnings.
+
 
 Overall Syntax
 ==============
@@ -52,7 +59,8 @@ You can have as many input registers as you like (delimited by ",")
 but only one output register.
 
 Code lines are always preceded by their logical line number (not the
-actual line number in the file) which are addressed in goto statements.
+actual line number in the file) which are addressed in the goto
+control flow statements.
 
 Register Naming
 ===============
@@ -120,7 +128,7 @@ language, so it shouldn't have such a huge version requirement.
 Prerequisites
 =============
 Getopt::Long is needed for urmc
-Parrot to actually execute the code (best in your path)
+Parrot to actually execute the code.
 
 License
 =======

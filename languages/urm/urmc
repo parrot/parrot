@@ -10,14 +10,13 @@ use warnings;
 use strict;
 
 use Getopt::Long;
-use lib '../../lib';
+use FindBin;
+use lib "$FindBin::RealBin/../../lib";
 use Parrot::Config;
 use Time::HiRes qw(time);
-use FindBin;
 
 use vars qw($filename
 	    $compile
-	    $output
 	    $opti
 	    $silent);
 
@@ -33,7 +32,6 @@ sub filename {
 }
 
 GetOptions("compile"    => \$compile,
-	   "output=s"   => \$output,
 	   "silent"     => \$silent,
 	   "<>"         => \&filename
 	   );

@@ -2,6 +2,10 @@ Not very much to do:
 Try 
 	make test
 to see if your perl is capable of running urmc
-Then go into the examples directory and try
-	make
-You'll end up with a bunch of pasm files.
+Then try to build the examples:
+	make examples
+You'll end up with a bunch of pasm files in the 
+examples dir.
+
+Have fun,
+	Marcus (marcus@cpan.org)

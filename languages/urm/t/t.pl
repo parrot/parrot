@@ -14,14 +14,24 @@ sub compile_test {
     my $file = shift;
 
     my $ret = system ("$urmc $compile $FindBin::RealBin$PConfig{slash}$file");
-    die "TEST FAILED: $file ($ret)\n" if $ret;
+    if ($ret) {
+	print STDERR "TEST FAILED: $file ($ret)\n";
+	return;
+	}
     print "OK: $file\n";
 }
 
 sub run_test {
     my ($file, $expect) = @_;
     my $ret = `$urmc $run $FindBin::RealBin$PConfig{slash}$file`;
-    die "TEST FAILED: $file (got $ret expected $expect)\n" if ($ret != $expect);
+    if (!$ret) {
+	print STDERR "TEST FAILED: $file didn't return a value, Parrot crashed?\n";
+	return;
+    }
+    if ($ret != $expect) {
+	print STDERR "TEST FAILED: $file (got $ret expected $expect)\n";
+	return;
+    }
     print "OK: $file\n";
 }
 
