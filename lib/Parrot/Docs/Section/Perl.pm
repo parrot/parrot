@@ -50,7 +50,7 @@ sub new
 			$self->item('', 'lib/Parrot/String.pm'),
 		),
 		$self->group('PMCs', '',
-			$self->item('', 'lib/Parrot/Pmc.pm'),
+			$self->item('', 'lib/Parrot/PMC.pm'),
 			$self->item('', 'lib/Parrot/Pmc2c.pm'),
 			$self->item('', 'lib/Parrot/Vtable.pm'),
 		),
