@@ -38,7 +38,7 @@ To run this file, be in the Parrot directory and run the following command:
 	SDL_BlitSurface = global "SDL::BlitSurface"
 
 	.pcc_begin prototyped
-		.arg 65535
+		.arg 32
 		.nci_call SDL_Init
 	.pcc_end
 
