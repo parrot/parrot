@@ -77,7 +77,6 @@ as the arguments and getting back $results.
 sub output_call_rule {
     my ($self, $rule_call, $args, $results, $context) = @_;
     my $ctx = $self->{ctx};
-#    $DB::single =1 ;
 
     die unless $rule_call->args->isa('P6C::ValueList');
 
@@ -162,7 +161,6 @@ Helper function for output_call_rule when calling a named function.
 sub call_rule_named {
     my ($rule_call, $want_results) = @_;
     code("\t# call_rule_named");
-#    $DB::single = 1;
     my @results = P6C::IMCC::prefix::gen_sub_call($rule_call->name,
                                                   $rule_call->args,
                                                   $rule_call->{ctx},
