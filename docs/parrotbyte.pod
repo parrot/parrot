@@ -2,7 +2,7 @@
 
   0          1          2          3
   +----------+----------+----------+----------+
-  | Wordsize |  Major   |  Minor   |  Flags   |
+  | Wordsize | Byteorder|  Major   |  Minor   |
   +----------+----------+----------+----------+
 
 Wordsize must be at least 4 (32-bit). Loader is
@@ -11,27 +11,17 @@ VM native wordsize on the fly. For performance,
 a utility should be provided to convert PBCs
 on disk if they cannot be recompiled.
 
-  4 
+Byteorder currently supports two values:
+(0-Little Endian, 1-Big Endian)
+
+  4          5
+  +----------+----------+----------+----------+
+  |  Flags   | FloatType| Pad - For future use|
   +----------+----------+----------+----------+
   |           Pad - For future use            |
   +----------+----------+----------+----------+
-
-Not used yet, there for alignment.
-
-  8 
+  |           Pad - For future use            |
   +----------+----------+----------+----------+
-  |    0th    Byte Ordering  2nd        3rd   | 
-  +----------+----------+----------+----------+
-  |    4th   |    5th   |    6th   |    7th   |
-  +----------+----------+----------+----------+
-
-Byteorder that this file is in. Transform the
-file's byteorder matrix (b) with our native (n),
-which results in the transform
-  b by n -> t
-Consider a PDP-11 (2301) reading a Sparc generated (3210).
-The transform matrix (t) is (1032) which passed to
-endian_fetch_* for arbitrary transform by the VM.
 
   16 
   +----------+----------+----------+----------+
