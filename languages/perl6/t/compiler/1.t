@@ -161,7 +161,7 @@ sub main() {
     parray $i ^* @x ^+ @b;
     parray @a  * @x ^+ @b;
     parray 2 * 3 ^+ @b;
-    print1(@a ^* @x  + @b);
+#    print1(@a ^* @x  + @b); # Array math not in 0.0.7
 # IMCC clobbers too many registers with this:
 #     @y = @a ^<< @a;
 #     print1('(' _ @y[0] _ ', ' _ @y[1] _ ')');
@@ -171,7 +171,6 @@ CODE
 (11.000000, 14.000000)
 (9.000000, 10.000000)
 (11.000000, 12.000000)
-4
 OUT
 
 ##############################
