@@ -58,6 +58,7 @@ static int yylex_skip (YYSTYPE *valp, void *interp, const char *skip);
 static int read_macro (YYSTYPE *valp, void *interp);
 static int expand_macro (YYSTYPE *valp, void *interp, const char *name);
 static void include_file (const char *file_name);
+static int in_pod;
 
 #define YY_DECL int yylex(YYSTYPE *valp, struct Parrot_Interp *interp)
 
@@ -89,14 +90,15 @@ WS              [\t\f\r ]
 
 %x emit
 %x macro
+%x pod
 
 %%
         /* for emacs "*/
-        if (expect_pasm == 1) {
+        if (expect_pasm == 1 && !in_pod) {
             expect_pasm = 2;
             BEGIN(emit);
         }
-        if (pasm_file && YYSTATE == INITIAL) {
+        if (pasm_file && YYSTATE == INITIAL && !in_pod) {
             if (pasm_file == 1) {
                 BEGIN(emit);
                 return EMIT;
@@ -135,6 +137,11 @@ WS              [\t\f\r ]
 	valp->s = str_dup(yytext);
 	return REG;
 	}
+
+^"="            { in_pod = 1; BEGIN(pod); }
+<pod>^"=cut"{EOL}    { in_pod = 0; BEGIN(INITIAL); }
+<pod>.          { /*ignore*/ }
+<pod>{EOL}      { ++line; }
 
 ".sym"          return(LOCAL);
 ".arg"          return(ARG);

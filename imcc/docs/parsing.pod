@@ -10,6 +10,8 @@ IMCC - parsing
 
 =item 0.2 lexicals
 
+=item 0.3 pod markers
+
 =back
 
 =head1 OVERVIEW
@@ -32,10 +34,23 @@ where a statement is a simple statement like B<if ...>	or a
 I<compilation unit> containing statements. This allows e.g. nested
 subs.
 
+=head2 Comments
+
+Comment start with B<#> and end at line end.
+
+=head2 POD
+
+Everything enclosed in POD markers is ignored.
+
+	=some_pod_marker in col 1
+	...
+	=cut
+
+A POD starts with a B<=> in columns 1 and ends with B<=cut> on its own line.
 
 =head1 Compilation units
 
-=head2 Subroutines .sub ... .end
+=head2 Subroutines .sub ... .end and .pcc_sub ... .end
 
 	.sub _name
 		statements

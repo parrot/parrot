@@ -1,6 +1,6 @@
 #!perl
 use strict;
-use TestCompiler tests => 12;
+use TestCompiler tests => 14;
 
 ##############################
 # this tests register allocation/preserving of local bsr calls
@@ -352,3 +352,36 @@ output_is(<<'CODE', <<'OUT', "newsub");
 CODE
 foo
 OUT
+
+output_is(<<'CODE', <<'OUT', "pod before");
+=head1 BLA
+
+ fasel
+
+=cut
+.sub _main
+	print "ok 1\n"
+	end
+.end
+CODE
+ok 1
+OUT
+
+output_is(<<'CODE', <<'OUT', "pod before, after");
+=head1 FOO
+
+ fasel
+
+=cut
+.sub _main
+	print "ok 1\n"
+	end
+.end
+=head1 BAR
+
+ junk
+
+CODE
+ok 1
+OUT
+

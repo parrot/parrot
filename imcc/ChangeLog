@@ -6,6 +6,8 @@
 	  - only upper half of registers are preserved
 	  - s. t/imcpasm/pcc.t for generated code
 
+	* ignore text between =$pod_marker and =cut
+
 - 2003-07-09	leo
 
 	* version 0.0.10.1
