@@ -502,6 +502,10 @@ fixup_subs(struct Parrot_Interp *interpreter, struct PackFile *self)
     struct Parrot_Sub *sub;
     INTVAL rel;
 
+#if TRACE_PACKFILE
+    PIO_eprintf(NULL, "fixup_subs\n");
+#endif
+
     ft = self->cur_cs->fixups;
     ct = self->cur_cs->consts;
     for (i = 0; i < ft->fixup_count; i++) {
@@ -2336,6 +2340,9 @@ PackFile_Constant_unpack_pmc(struct Parrot_Interp *interpreter,
      * finally place the sub in the global stash
      */
     key = key_new_cstring(interpreter, name);
+#if TRACE_PACKFILE_PMC
+    fprintf(stderr, "PMC_CONST: store_global: name '%s'\n", name);
+#endif
     VTABLE_set_pmc_keyed(interpreter, interpreter->perl_stash->stash_hash,
             key, sub_pmc);
 
@@ -2458,13 +2465,17 @@ Parrot_load_bytecode(struct Parrot_Interp *interpreter, char *filename)
     char *ext;
     const char *mode = NULL;
 
+#if TRACE_PACKFILE
+    fprintf(stderr, "packfile.c: parrot_load_bytecode()\n");
+#endif
+
     ext = strrchr(filename, '.');
     if (ext && strcmp (ext, ".pbc") == 0) {
         PackFile_append_pbc(interpreter, filename);
     }
     else {
         PMC * compiler, *code;
-        PMC *key = key_new_cstring(interpreter, "FILE");
+        PMC *key = key_new_cstring(interpreter, "FILE"); /* see imcc/parser_util.c */
         PMC *compreg_hash = VTABLE_get_pmc_keyed_int(interpreter,
                 interpreter->iglobals, IGLOBALS_COMPREG_HASH);
         struct PackFile *pf;
@@ -2476,6 +2487,9 @@ Parrot_load_bytecode(struct Parrot_Interp *interpreter, char *filename)
             return;
         }
         file = string_from_cstring(interpreter, filename, 0);
+#if TRACE_PACKFILE
+        fprintf(stderr, "packfile.c: VTABLE: compiler->invoke '%s'\n", filename);
+#endif
         code = VTABLE_invoke(interpreter, compiler, file);
         pf = code->cache.struct_val;
         if (pf) {

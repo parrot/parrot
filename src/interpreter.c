@@ -1140,6 +1140,9 @@ void Parrot_compreg(Parrot_Interp interpreter, STRING *type, PMC *func)
 }
 
 
+/*
+ * setup default compiler for PASM
+ */
 static void setup_default_compreg(Parrot_Interp interpreter)
 {
     STRING *pasm1 = string_from_cstring(interpreter, "PASM1", 0);
