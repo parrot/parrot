@@ -2119,7 +2119,26 @@ Parrot_jit_store_retval(Parrot_jit_info_t *jit_info,
 {
     op_info_t *op_info = &interpreter->op_info_table[*jit_info->cur_op];
     int p1 = *(jit_info->cur_op + 1);
+    Parrot_jit_register_usage_t *ru = jit_info->optimizer->cur_section->ru;
+    int saved = 0;
 
+    /*
+     * if we have an MAPped return value, we don't need the interpreter
+     * else get interpreter
+     */
+
+    if (MAP(1) && (op_info->types[1] == PARROT_ARG_I ||
+                   op_info->types[1] == PARROT_ARG_N)) {
+        ; /* nix */
+    }
+    else {
+        if (ru[0].registers_used == 5) {
+            emitm_pushl_r(jit_info->native_ptr, emit_ECX);
+            saved = 2;
+        }
+        emitm_movl_m_r(jit_info->native_ptr,
+                emit_ECX, emit_EBP, emit_None, 1, INTERP_BP_OFFS);
+    }
     /* return result is in EAX or ST(0) */
     switch (op_info->types[1]) {
         case PARROT_ARG_I:
@@ -2128,53 +2147,31 @@ Parrot_jit_store_retval(Parrot_jit_info_t *jit_info,
                 jit_emit_mov_rr_i(jit_info->native_ptr, MAP(1), emit_EAX);
             }
             else
-#    if EXEC_CAPABLE
-                if (jit_info->objfile) {
-                    jit_emit_mov_mr_i(jit_info->native_ptr, IREG(p1),
-                        emit_EAX);
-                    Parrot_exec_add_text_rellocation(jit_info->objfile,
-                        jit_info->native_ptr, RTYPE_COM, "interpre", -4);
-                }
-                else
-#    endif
-                    jit_emit_mov_mr_i(jit_info->native_ptr, &INT_REG(p1),
-                        emit_EAX);
+                emitm_movl_r_m(jit_info->native_ptr,
+                        emit_EAX, emit_ECX, emit_None, 1, REG_OFFS_INT(p1));
             break;
         case PARROT_ARG_S:
-#    if EXEC_CAPABLE
-            if (jit_info->objfile) {
-                jit_emit_mov_mr_i(jit_info->native_ptr, SREG(p1),
-                    emit_EAX);
-                Parrot_exec_add_text_rellocation(jit_info->objfile,
-                    jit_info->native_ptr, RTYPE_COM, "interpre", -4);
-            }
-            else
-#    endif
-                jit_emit_mov_mr_i(jit_info->native_ptr, &STR_REG(p1),emit_EAX);
+            emitm_movl_r_m(jit_info->native_ptr,
+                    emit_EAX, emit_ECX, emit_None, 1, REG_OFFS_STR(p1));
             break;
         case PARROT_ARG_P:
-#    if EXEC_CAPABLE
-            if (jit_info->objfile) {
-                jit_emit_mov_mr_i(jit_info->native_ptr, PREG(p1),
-                    emit_EAX);
-                Parrot_exec_add_text_rellocation(jit_info->objfile,
-                    jit_info->native_ptr, RTYPE_COM, "interpre", -4);
-            }
-            else
-#    endif
-                jit_emit_mov_mr_i(jit_info->native_ptr, &PMC_REG(p1),emit_EAX);
+            emitm_movl_r_m(jit_info->native_ptr,
+                    emit_EAX, emit_ECX, emit_None, 1, REG_OFFS_PMC(p1));
             break;
         case PARROT_ARG_N:
             if (MAP(1)) {
                 emitm_fstp(jit_info->native_ptr, (1 + MAP(1)));
             }
             else
-                jit_emit_fstore_m_n(jit_info->native_ptr, &NUM_REG(p1));
+                jit_emit_fstore_mb_n(jit_info->native_ptr, emit_ECX,
+                        REG_OFFS_NUM(p1));
             break;
         default:
             internal_exception(1, "jit_vtable1r: ill LHS");
             break;
     }
+    if (saved == 2)
+        emitm_popl_r(jit_info->native_ptr, emit_ECX);
 }
 
 /* emit a call to a vtable func
@@ -2354,37 +2351,31 @@ Parrot_jit_vtable_newp_ic_op(Parrot_jit_info_t *jit_info,
     i2 = *(jit_info->cur_op + 2);
     if (i2 <= 0 || i2 >= enum_class_max)
         internal_exception(1, "Illegal PMC enum (%d) in new\n", i2);
+    /* get interpreter */
+    emitm_movl_m_r(jit_info->native_ptr,
+            emit_ECX, emit_EBP, emit_None, 1, INTERP_BP_OFFS);
     /* push pmc enum and interpreter */
     emitm_pushl_i(jit_info->native_ptr, i2);
+    emitm_pushl_r(jit_info->native_ptr, emit_ECX);
 #    if EXEC_CAPABLE
     if (jit_info->objfile) {
-        emitm_pushl_i(jit_info->native_ptr, 0);
-        Parrot_exec_add_text_rellocation(jit_info->objfile,
-            jit_info->native_ptr, RTYPE_COM, "interpre", -4);
         CALL("pmc_new_noinit");
-        /* result = eax = PMC */
-        jit_emit_mov_mr_i(jit_info->native_ptr, PREG(p1), emit_EAX);
-        Parrot_exec_add_text_rellocation(jit_info->objfile,
-            jit_info->native_ptr, RTYPE_COM, "interpre", -4);
-
-        emitm_pushl_r(jit_info->native_ptr, emit_EAX);
-        /* push interpreter */
-        emitm_pushl_i(jit_info->native_ptr, 0);
-        Parrot_exec_add_text_rellocation(jit_info->objfile,
-            jit_info->native_ptr, RTYPE_COM, "interpre", -4);
     }
     else
 #    endif
     {
-        emitm_pushl_i(jit_info->native_ptr, interpreter);
         call_func(jit_info, (void (*)(void))pmc_new_noinit);
-        /* result = eax = PMC */
-        jit_emit_mov_mr_i(jit_info->native_ptr,
-                &interpreter->pmc_reg.registers[p1], emit_EAX);
-        emitm_pushl_r(jit_info->native_ptr, emit_EAX);
-        /* push interpreter */
-        emitm_pushl_i(jit_info->native_ptr, interpreter);
     }
+    /* interpreter in ECX might be globbered */
+    emitm_movl_m_r(jit_info->native_ptr,
+            emit_ECX, emit_EBP, emit_None, 1, INTERP_BP_OFFS);
+    /* result = eax push pmc */
+    emitm_pushl_r(jit_info->native_ptr, emit_EAX);
+    /* store in PMC too */
+    emitm_movl_r_m(jit_info->native_ptr,
+            emit_EAX, emit_ECX, emit_None, 1, REG_OFFS_PMC(p1));
+    /* push interpreter */
+    emitm_pushl_r(jit_info->native_ptr, emit_ECX);
     /* mov (offs)%eax, %eax i.e. $1->vtable */
     emitm_movl_m_r(jit_info->native_ptr, emit_EAX, emit_EAX, emit_None, 1,
             offsetof(struct PMC, vtable));
