@@ -41,12 +41,17 @@ float nci_fff(float l1, float l2) {
     return l1 / l2;
 }
 
-/* test calls this with a string */
 int nci_ip(void *p) {
-    fprintf(stderr, "%c%c\n", (*(char**) p)[1], (*(char **) p)[0]);
-    return 2;
+    typedef struct _dfi {
+        double d;
+        float f;
+        int i;
+    } dfi;
+    dfi *sp = (dfi*) p;
+    return (int) (sp->d + sp->f + sp->i);
 }
 
+/* test calls this with a string */
 int nci_it(void *p) {
     fprintf(stderr, "%c%c\n", ((char*) p)[1], ((char *) p)[0]);
     return 2;

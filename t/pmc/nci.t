@@ -1,4 +1,4 @@
-use Parrot::Test tests => 17;
+use Parrot::Test tests => 18;
 use Parrot::Config;
 
 print STDERR $PConfig{jitcpuarch}, " JIT CPU\n";
@@ -19,7 +19,6 @@ output_is(<<'CODE', <<'OUTPUT', "nci_d_d");
   dlfunc P0, P1, "nci_dd", "dd"
   print "dlfunced\n"
   set I0, 1	# prototype used - unchecked
-  set I1, 0	# items on stack - unchecked
   set N5, 4.0
   invoke
   ne N5, 8.0, nok_1
@@ -50,7 +49,6 @@ output_is(<<'CODE', <<'OUTPUT', "nci_f_ff");
   dlfunc P0, P1, "nci_fff", "fff"
   print "dlfunced\n"
   set I0, 1	# prototype used - unchecked
-  set I1, 0	# items on stack - unchecked
   set N5, 12.0
   set N6, 3.0
   invoke
@@ -82,7 +80,6 @@ output_is(<<'CODE', <<'OUTPUT', "nci_i_sc");
   dlfunc P0, P1, "nci_isc", "isc"
   print "dlfunced\n"
   set I0, 1	# prototype used - unchecked
-  set I1, 0	# items on stack - unchecked
   set I5, 2
   set I6, 3
   invoke
@@ -115,7 +112,6 @@ output_is(<<'CODE', <<'OUTPUT', "nci_s_sc");
   dlfunc P0, P1, "nci_ssc", "ssc"
   print "dlfunced\n"
   set I0, 1	# prototype used - unchecked
-  set I1, 0	# items on stack - unchecked
   set I5, 2
   set I6, 3
   invoke
@@ -147,7 +143,6 @@ output_is(<<'CODE', <<'OUTPUT', "nci_c_sc");
   dlfunc P0, P1, "nci_csc", "csc"
   print "dlfunced\n"
   set I0, 1	# prototype used - unchecked
-  set I1, 0	# items on stack - unchecked
   set I5, 64
   set I6, 2
   invoke
@@ -180,7 +175,6 @@ output_is(<<'CODE', <<'OUTPUT', "nci_i_t");
   dlfunc P0, P1, "nci_it", "it"
   printerr "dlfunced\n"
   set I0, 1	# prototype used - unchecked
-  set I1, 0	# items on stack - unchecked
   set S5, "ko\n"
   invoke
   ne I5, 2, nok_1
@@ -210,7 +204,6 @@ output_is(<<'CODE', <<'OUTPUT', "nci_t_t");
   dlfunc P0, P1, "nci_tt", "tt"
   print "dlfunced\n"
   set I0, 1	# prototype used - unchecked
-  set I1, 0	# items on stack - unchecked
   set S5, "ko\n"
   invoke
   print S5
@@ -242,7 +235,6 @@ output_is(<<'CODE', <<'OUTPUT', "nci_d_d - stress test");
 loop:
   dlfunc P0, P1, "nci_dd", "dd"
   set I0, 1	# prototype used - unchecked
-  set I1, 0	# items on stack - unchecked
   set N5, 4.0
   invoke
   ne N5, 8.0, nok_1
@@ -277,7 +269,6 @@ output_is(<<'CODE', <<'OUTPUT', "nci_d_d - clone");
   clone P2, P0
   print "ok 1\n"
   set I0, 1	# prototype used - unchecked
-  set I1, 0	# items on stack - unchecked
   set N5, 4.0
   invoke
   ne N5, 8.0, nok_1
@@ -315,7 +306,6 @@ output_is(<<'CODE', <<'OUTPUT', "nci_i_iii");
   loadlib P1, "libnci"
   dlfunc P0, P1, "nci_iiii", "iiii"
   set I0, 1	# prototype used - unchecked
-  set I1, 0	# items on stack - unchecked
   set I5, 10
   set I6, 20
   set I7, 30
@@ -439,6 +429,43 @@ CODE
 42.000000
 100.000000
 47.110000
+OUTPUT
+
+output_is(<<'CODE', <<'OUTPUT', "nci_i_p");
+  loadlib P1, "libnci"
+  dlfunc P0, P1, "nci_ip", "ip"
+  # this test function wants a struct { double d; float f; int i }
+  # and returns the sum of these values
+  new P2, .PerlArray
+.include "datatypes.pasm"
+  push P2, .DATATYPE_DOUBLE
+  push P2, 0
+  push P2, 0
+  push P2, .DATATYPE_FLOAT
+  push P2, 0	# 1 elem array
+  push P2, 0
+  push P2, .DATATYPE_INT
+  push P2, 0	# 1 elem array
+  push P2, 0
+  new P5, .ManagedStruct, P2
+  set I6, 0
+  sizeof I7, .DATATYPE_DOUBLE
+  add I6, I7
+  sizeof I7, .DATATYPE_FLOAT
+  add I6, I7
+  sizeof I7, .DATATYPE_INT
+  add I6, I7
+  set P5, I6
+  set P5[0], 10.0
+  set P5[1], 4.0
+  set P5[2], 17
+  set I5, 1
+  invoke
+  print I5
+  print "\n"
+  end
+CODE
+31
 OUTPUT
 
 output_is(<<'CODE', <<'OUTPUT', "nci_v_P");
