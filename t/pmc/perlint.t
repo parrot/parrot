@@ -16,7 +16,7 @@ Tests the PerlInt PMC. Checks Perl-specific integer behaviour.
 
 =cut
 
-use Parrot::Test tests => 29;
+use Parrot::Test tests => 30;
 use Parrot::PMC '%pmc_types';
 my $perlint = $pmc_types{'PerlInt'};
 my $ok = '"ok 1\n"';
@@ -707,7 +707,7 @@ output_is(<<"CODE", <<OUTPUT, "logical or with Num/Str/Undef");
 OK1:    print "ok 1\\n"
         set P1, 0
         or P2, P1, P0
-        .fp_eq(P2, 10.5, OK2) 
+        .fp_eq(P2, 10.5, OK2)
         print P2
         print "not "
 OK2:    print "ok 2\\n"
@@ -738,7 +738,7 @@ OK5:    print "ok 5\\n"
         set P1, 0
         or P2, P1, P0
         defined I2, P2
-        eq I2, 0, OK6 
+        eq I2, 0, OK6
         print P2
         print "not "
 OK6:    print "ok 6\\n"
@@ -989,3 +989,18 @@ CODE
 0
 OUTPUT
 
+output_is(<< 'CODE', << 'OUTPUT', "Fix for a minor problem");
+##PIR##
+.sub main @MAIN
+    $P1 = new PerlInt
+    $P1 = 5
+    $P2 = new PerlNum
+    $P2 = 0.2
+    $P3 = new PerlNum
+    $P3 = $P1 / $P2
+    print $P3
+    print "\n"
+.end
+CODE
+25
+OUTPUT

@@ -507,7 +507,6 @@ MMD_BigInt:     {
 MMD_DEFAULT: {
 
         FLOATVAL valf = VTABLE_get_number(INTERP, value);
-        INTVAL   vali = VTABLE_get_integer(INTERP, value);
         FLOATVAL d;
         INTVAL i;
         if (valf == 0.0) {
@@ -515,7 +514,7 @@ MMD_DEFAULT: {
             return;
         }
         d = PMC_int_val(SELF)/valf;
-        i = PMC_int_val(SELF)/vali;
+        i = (INTVAL) d;
         if ((FLOATVAL)(i) == d)
             VTABLE_set_integer_native(INTERP, dest, i);
         else
