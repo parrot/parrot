@@ -289,7 +289,7 @@ SymReg * iSET_ADDR(SymReg * r0, SymReg * r1) {
 
 SymReg * iSET_GLOBAL(SymReg * r0, SymReg * r1) {
     if (r0->set == 'S' && r1->set == 'P') {
-	emitb(mk_instruction("store_global %s, %s", r1, r0,
+	emitb(mk_instruction("store_global %s, %s", r0, r1,
 			     NULL, NULL, IF_r0_read | IF_r1_read));
     }
     else {
