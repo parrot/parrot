@@ -4,9 +4,9 @@ use Parrot::Test tests => 77;
 
 output_is( <<'CODE', <<OUTPUT, "set_s_s|sc" );
 	set	S4, "JAPH\n"
- set S5, S4
+	set     S5, S4
 	print	S4
- print S5
+	print   S5
 	end
 CODE
 JAPH
@@ -26,25 +26,25 @@ output_is( <<'CODE', '0', "0 length substr" );
 	set	S4, "JAPH"
         substr  S3, S4, 1, 0
 	length  I4, S3
-        print I4
+        print   I4
 	end
 CODE
 
 output_is( <<'CODE', <<OUTPUT, "chopn with clone" );
 	set	S4, "JAPHxyzw"
 	set	S5, "japhXYZW"
-        clone     S3, S4
+        clone   S3, S4
 	set	S1, "\n"
 	set	I1, 4
 	chopn	S4, 3
 	chopn	S4, 1
-        chopn S5, I1
+        chopn   S5, I1
 	print	S4
-        print S1
+        print   S1
 	print	S5
-        print S1
+        print   S1
 	print	S3
-        print S1
+        print   S1
 	end
 CODE
 JAPH
@@ -60,13 +60,13 @@ output_is( <<'CODE', <<OUTPUT, "chopn with set" );
 	set	I1, 4
 	chopn	S4, 3
 	chopn	S4, 1
-        chopn S5, I1
+        chopn   S5, I1
 	print	S4
-        print S1
+        print   S1
 	print	S5
-        print S1
+        print   S1
 	print	S3
-        print S1
+        print   S1
 	end
 CODE
 JAPH
@@ -88,7 +88,7 @@ output_is(<<'CODE', <<OUTPUT, "chopn, OOB values");
 	chopn	S1, 1000
 	print	S1
 	print	"** nothing **\n"
-    end
+	end
 CODE
 A string of length 21
 A string of lengt
@@ -102,21 +102,21 @@ output_is( <<'CODE', <<'OUTPUT', "substr_s_s|sc_i|ic_i|ic" );
 	set	I5, 4
 	substr	S5, S4, I4, I5
 	print	S5
- substr S5, S4, I4, 4
- print S5
- substr S5, S4, 5, I5
- print S5
- substr S5, S4, 5, 4
- print S5
- substr S5, "12345JAPH01", I4, I5
- print S5
- substr S5, "12345JAPH01", I4, 4
- print S5
- substr S5, "12345JAPH01", 5, I5
- print S5
- substr S5, "12345JAPH01", 5, 4
- print S5
- print "\n"
+	substr S5, S4, I4, 4
+	print  S5
+	substr S5, S4, 5, I5
+	print  S5
+	substr S5, S4, 5, 4
+	print  S5
+	substr S5, "12345JAPH01", I4, I5
+	print  S5
+	substr S5, "12345JAPH01", I4, 4
+	print  S5
+	substr S5, "12345JAPH01", 5, I5
+	print  S5
+	substr S5, "12345JAPH01", 5, 4
+	print  S5
+	print  "\n"
 	end
 CODE
 JAPHJAPHJAPHJAPHJAPHJAPHJAPHJAPH
@@ -125,13 +125,13 @@ OUTPUT
 # negative offsets
 output_is(<<'CODE', <<'OUTPUT', "neg substr offset");
 	set	S0, "A string of length 21"
- set I0, -9
- set I1, 6
- substr S1, S0, I0, I1
- print S0
- print "\n"
- print S1
- print "\n"
+	set I0, -9
+	set I1, 6
+	substr S1, S0, I0, I1
+	print S0
+	print "\n"
+	print S1
+	print "\n"
 	end
 CODE
 A string of length 21
@@ -141,31 +141,31 @@ OUTPUT
 # This asks for substring it shouldn't be allowed...
 output_is(<<'CODE', 'Cannot take substr outside string', "substr OOB");
 	set	S0, "A string of length 21"
- set I0, -99
- set I1, 6
- substr S1, S0, I0, I1
- end
+	set I0, -99
+	set I1, 6
+	substr S1, S0, I0, I1
+	end
 CODE
 
 # This asks for substring it shouldn't be allowed...
 output_is(<<'CODE', 'Cannot take substr outside string', "substr OOB");
- set S0, "A string of length 21"
- set I0, 99
- set I1, 6
- substr S1, S0, I0, I1
+	set S0, "A string of length 21"
+	set I0, 99
+	set I1, 6
+	substr S1, S0, I0, I1
 	end
 CODE
 
 # This asks for substring much greater than length of original string
 output_is(<<'CODE', <<'OUTPUT', "len>strlen");
 	set	S0, "A string of length 21"
- set I0, 12
- set I1, 1000
- substr S1, S0, I0, I1
- print  S0
- print "\n"
- print S1
- print "\n"
+	set I0, 12
+	set I1, 1000
+	substr S1, S0, I0, I1
+	print  S0
+	print "\n"
+	print S1
+	print "\n"
 	end
 CODE
 A string of length 21
@@ -175,13 +175,13 @@ OUTPUT
 # The same, with a negative offset
 output_is(<<'CODE', <<'OUTPUT', "len>strlen, -ve os");
 	set	S0, "A string of length 21"
- set I0, -9
- set I1, 1000
- substr S1, S0, I0, I1
- print S0
- print "\n"
- print S1
- print "\n"
+	set I0, -9
+	set I1, 1000
+	substr S1, S0, I0, I1
+	print S0
+	print "\n"
+	print S1
+	print "\n"
 	end
 CODE
 A string of length 21
@@ -404,33 +404,33 @@ foo2
 OUTPUT
 
 output_is( <<'CODE', <<OUTPUT, "concat_s_s|sc" );
- set S1, "fish"
- set S2, "bone"
- concat S1, S2
- print S1
- concat S1, "\n"
- print S1
-    end
+	set S1, "fish"
+	set S2, "bone"
+	concat S1, S2
+	print S1
+	concat S1, "\n"
+	print S1
+	end
 CODE
 fishbonefishbone
 OUTPUT
 
 output_is( <<'CODE', <<OUTPUT, "concat_s_s|sc_s|sc" );
- set S1, "japh"
- set S2, "JAPH"
- concat S0, "japh", "JAPH"
- print S0
- print "\n"
- concat S0, S1, "JAPH"
- print S0
- print "\n"
- concat S0, "japh", S2
- print S0
- print "\n"
- concat S0, S1, S2
- print S0
- print "\n"
-    end
+	set S1, "japh"
+	set S2, "JAPH"
+	concat S0, "japh", "JAPH"
+	print S0
+	print "\n"
+	concat S0, S1, "JAPH"
+	print S0
+	print "\n"
+	concat S0, "japh", S2
+	print S0
+	print "\n"
+	concat S0, S1, S2
+	print S0
+	print "\n"
+	end
 CODE
 japhJAPH
 japhJAPH
@@ -439,14 +439,14 @@ japhJAPH
 OUTPUT
 
 output_is( <<'CODE', <<OUTPUT, "concat - ensure copy is made" );
- set S2, "JAPH"
- concat S0, S2, ""
- concat S1, "", S2
- chopn S0, 1
- chopn S1, 1
- print S2
- print "\n"
- end
+	set S2, "JAPH"
+	concat S0, S2, ""
+	concat S1, "", S2
+	chopn S0, 1
+	chopn S1, 1
+	print S2
+	print "\n"
+	end
 CODE
 JAPH
 OUTPUT
@@ -571,10 +571,10 @@ output_is(<<CODE, <<OUTPUT, "eq_s|sc_s|sc");
 	print	"ok 1\\n"
 	bsr	TEST2
 	print	"ok 2\\n"
- bsr TEST3
- print "ok 3\\n"
- bsr TEST4
- print "ok 4\\n"
+	bsr TEST3
+	print "ok 3\\n"
+	bsr TEST4
+	print "ok 4\\n"
 	end
 
 TEST1:	eq	"Sparticus", S0
@@ -820,9 +820,9 @@ output_is(<<'CODE',ord('a'),'2-param ord, one-character string');
 CODE
 
 output_is(<<'CODE',ord('a'),'2-param ord, multi-character string');
- ord I0,"abc"
- print I0
- end
+	ord I0,"abc"
+	print I0
+	end
 CODE
 
 output_is(<<'CODE',ord('a'),'2-param ord, one-character string register');
@@ -898,10 +898,10 @@ output_is(<<'CODE',ord('b'),'3-param ord, multi-character string register, from 
 CODE
 
 output_is(<<'CODE','Cannot get character before beginning of string','3-param ord, multi-character string register, from end, OOB');
- set S0,"ab"
- ord I0,S0,-3
- print I0
- end
+	set S0,"ab"
+	ord I0,S0,-3
+	print I0
+	end
 CODE
 
 output_is(<<CODE, <<OUTPUT, "if_s_ic");
@@ -1008,8 +1008,8 @@ XXXXXXXXXXXX
 OUTPUT
 
 output_is(<<'CODE','Cannot repeat with negative arg','repeat OOB');
- repeat S0, "japh", -1
- end
+	repeat S0, "japh", -1
+	end
 CODE
 
 

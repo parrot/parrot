@@ -462,7 +462,6 @@ output_is(<<'CODE', <<'OUTPUT', 'save/savec for strings');
       print S3
       print "\n"
       end
-
 CODE
 Foo
 Foobar
@@ -583,6 +582,7 @@ output_is(<<CODE, <<OUTPUT, "entrytype, beyond stack depth");
 	print	"ready\\n"
 	entrytype	I0, 1
 	print	"done\\n"
+	end
 CODE
 ready
 Stack Depth Wrong

@@ -35,7 +35,7 @@ OK_4:	print "ok 4\n"
 	print "not "
 OK_5:	print "ok 5\n"
 
-end
+	end
 CODE
 ok 1
 ok 2

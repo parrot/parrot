@@ -20,7 +20,7 @@ answer	macro	A
 endm
 	answer	42
 	print	"\n"
-end
+	end
 CODE
 42
 OUTPUT
@@ -32,7 +32,7 @@ endm
 	set	I0, 43
 	answer	I0
 	print	"\n"
-end
+	end
 CODE
 42
 OUTPUT
@@ -43,7 +43,7 @@ answer	macro	A
 endm
 	answer	42
 	print	"\n"
-end
+	end
 CODE
 42
 OUTPUT
@@ -56,7 +56,7 @@ answer	macro
 endm
 	answer 42
 	print "\n"
-end
+	end
 CODE
 42
 OUTPUT
@@ -69,7 +69,7 @@ endm
 	set	I0,42
 	answer	I0
 	print	"\n"
-end
+	end
 CODE
 42
 OUTPUT
@@ -83,7 +83,7 @@ endm
 	set	I0,42
 	answer	I0
 	answer	I0
-end
+	end
 CODE
 42
 43
@@ -98,7 +98,7 @@ $done:
 endm
 	set	I0,42
 	answer	I0
-end
+	end
 CODE
 42
 OUTPUT
@@ -113,7 +113,7 @@ endm
 	set	I0,42
 	answer	I0
 	answer	I0
-end
+	end
 CODE
 42
 42

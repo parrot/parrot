@@ -18,7 +18,7 @@ output_is(<<'CODE', <<OUTPUT, "simple set / get");
 	print "\n"
 	print I1
 	print "\n"
-    end
+	end
 CODE
 1
 2
@@ -61,7 +61,7 @@ output_is(<<'CODE', <<OUTPUT, "hash keys with nulls in them");
 	print "\n"
 	print I1
 	print "\n"
-    end
+	end
 CODE
 1
 2

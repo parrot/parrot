@@ -452,6 +452,7 @@ BR2:	eq	10, 10
 
 BR3:	eq	I0, I1
 	print	"not equal, equal int regs "
+	ret
 
 CODE
 the word

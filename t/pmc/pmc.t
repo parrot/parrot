@@ -1004,7 +1004,6 @@ OK8:	print	"ok 8\\n"
 	print	"not "
 OK9:	print	"ok 9\\n"
 
-
 	end
 CODE
 ok 1
@@ -1118,7 +1117,6 @@ output_is(<<"CODE", <<'OUTPUT', "undef-subtract");
 	print "not" 
 OK2:	print "ok"
 	print "\\n"
-
 
 	end
 CODE
