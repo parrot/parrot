@@ -328,8 +328,18 @@ sub generate_functions {
       print SOURCE $source;
       close SOURCE;
 
-      my $libparrot = $PConfig{blib_lib_libparrot_a};
-      $libparrot =~ s/\$\(A\)/$PConfig{a}/;
+      (my $libparrot_root = $PConfig{blib_lib_libparrot_a}) =~ s/\$\(A\)//;
+      my $libparrot_dynamic = $libparrot_root.$PConfig{share_ext};
+
+      my $libparrot;
+
+      # use shared library version if available
+      if( -e $libparrot_dynamic ) {
+          $libparrot = '-Lblib/lib -lparrot';
+      } else {
+          $libparrot = $libparrot_root.$PConfig{a};
+      }
+
       my $iculibs = $PConfig{blib_lib_libsicuuc_a}." ".$PConfig{blib_lib_libsicudata_a};
       $iculibs =~ s/\$\(A\)/$PConfig{a}/g;
 

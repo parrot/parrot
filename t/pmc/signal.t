@@ -12,7 +12,7 @@ t/pmc/signal.t - Signal Handling
 
 =head1 DESCRIPTION
 
-Tests signal handling. All test are skipped unless running on Linux.
+Tests signal handling.
 
 =cut
 
@@ -45,10 +45,14 @@ else {
 
 my $pid;
 
+sub parrot_pids {
+    grep { !/harness/ && !/sh -c/ } `ps axw | grep '[p]arrot'`;
+}
+
 sub send_SIGHUP {
     $SIG{ALRM} = sub {
 	# get PID of parrot
-	my @ps = `ps axw | grep [p]arrot`;
+       my @ps = parrot_pids;
 	die 'no output from ps' unless @ps;
 	# the IO thread parrot process
 	# on linux 2.2.x there are 4 processes, last is the IO thread
@@ -68,7 +72,7 @@ sub send_SIGHUP {
 
 sub check_running {
     select undef, undef, undef, 0.1;
-    my @ps = `ps axw | grep [p]arrot`;
+    my @ps = parrot_pids;
     my $thread = pop @ps;
     if ($thread =~ /^\s*(\d+)/ && $1 == $pid) {
 	ok(0, "parrot $pid still running");
