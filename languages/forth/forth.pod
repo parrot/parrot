@@ -216,6 +216,31 @@ Take the parrot string off the stack and turn it into a Forth counted
 string, putting the cell address of the resulting data and the length
 on the stack.
 
+=item substr (s n1 n2 -- s )
+
+Extract a substring from parrot string S, from offset N1 for N2
+characters, and put the resulting parrot string back on the stack.
+
+=item concat (s s -- s )
+
+Concatenate the two strings on top of the stack and create a new
+string, putting the new string on the stack.
+
+=item getparams ( -- v*x n v*x n v*x n v*x n )
+
+Unpack the parameters, as passed in via parrot's calling conventions,
+from registers to the Forth stack. The results will be the parameters
+topped by a count for each set of parameter types. The registers will
+be taken in numeric, string, integer, and PMC order. (So the top word
+on the stack is the number of PMC parameters passed)
+
+=item decode-by-sig ( s -- v*x n )
+
+Take the signature S, a parrot string with the function signature, and
+pull the parameters out of the registers based on that signature,
+properly handling the potential for the parameters to come in without
+prototyping. The top word on the stack is the parameter count.
+
 =back
 
 =head1 CREDITS
