@@ -238,6 +238,8 @@ delete_ins(IMC_Unit *unit, Instruction *ins, int needs_freeing)
         unit->instructions = next;
     if (next)
         next->prev = prev;
+    else
+        unit->last_ins = prev;
     if (needs_freeing)
         free_ins(ins);
     return next;
