@@ -79,9 +79,9 @@ emitsub(const char* sub, ...)
 }
 
 
-/* strcon(...) converts string values into PIR string constants */
+/* str_con(...) converts string values into PIR string constants */
 static char*
-strcon(const unsigned char* s, int len)
+str_con(const unsigned char* s, int len)
 {
     static char esc[P6GE_MAX_LITERAL_LEN * 2 + 3];
     char* t = esc;
@@ -154,12 +154,12 @@ static void
 p6ge_gen_literal(P6GE_Exp* e, const char* succ)
 {
     emit("R%d:                               # %.16s {%d..%d}%c\n", 
-         e->id, strcon(e->name, e->nlen), e->min, e->max, 
+         e->id, str_con(e->name, e->nlen), e->min, e->max, 
          (e->isgreedy) ? ' ' : '?');
 
     if (e->min==1 && e->max==1) {
         emit("    substr $S0, target, pos, %d\n", e->nlen);
-        emit("    if $S0 != %s goto fail\n", strcon(e->name, e->nlen));
+        emit("    if $S0 != %s goto fail\n", str_con(e->name, e->nlen));
         emit("    pos += %d\n", e->nlen);
         emit("    goto %s\n\n", succ);
         return;
@@ -171,7 +171,7 @@ p6ge_gen_literal(P6GE_Exp* e, const char* succ)
         if (e->max != P6GE_INF)
             emit("    if rep >= %d goto R%d_2\n", e->max, e->id);
         emit("    substr $S0, target, pos, %d\n", e->nlen);
-        emit("    if $S0 != %s goto R%d_2\n", strcon(e->name, e->nlen), e->id);
+        emit("    if $S0 != %s goto R%d_2\n", str_con(e->name, e->nlen), e->id);
         emit("    inc rep\n");
         emit("    pos += %d\n", e->nlen);
         emit("    goto R%d_1\n", e->id);
@@ -195,7 +195,7 @@ p6ge_gen_literal(P6GE_Exp* e, const char* succ)
         emitsub(succ, "pos", "rep", 0);
         emit("  R%d_2:\n", e->id);
         emit("    substr $S0, target, pos, %d\n", e->nlen);
-        emit("    if $S0 != %s goto fail\n", strcon(e->name, e->nlen));
+        emit("    if $S0 != %s goto fail\n", str_con(e->name, e->nlen));
         emit("    inc rep\n");
         emit("    pos += %d\n", e->nlen);
         emit("    goto R%d_1\n\n", e->id);
