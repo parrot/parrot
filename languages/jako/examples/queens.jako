@@ -76,10 +76,14 @@ sub int queen_rank (int board, int file) {
   var int amount;
   var int temp;
 
+  return 0 if (file < 0);
+  return 0 if (file >= NUM_FILES);
+
   amount = BITS_PER_FILE *  file;
   temp   = NO_QUEEN      << amount;
   temp   = temp          &  board;
   temp   = temp          >> amount;
+  temp   = temp          |  NO_QUEEN;
 
   return temp;
 }
@@ -95,7 +99,6 @@ sub int queen_rank (int board, int file) {
 #
 
 sub int queen_at (int board, int rank, int file) {
-  var int amount;
   var int temp;
 
   return 0 if (rank < 0);
@@ -103,11 +106,10 @@ sub int queen_at (int board, int rank, int file) {
   return 0 if (file < 0);
   return 0 if (file >= NUM_FILES);
 
-  amount = BITS_PER_FILE * file;
-  temp   = NO_QUEEN << amount;
-  temp   = temp &  board;
-  temp   = temp >> amount;
-
+  temp = queen_rank(board, file);
+ 
+  return 0 if (temp < 0);
+  return 0 if (temp >= NUM_RANKS);
   return 1 if (temp == rank);
   return 0;
 }
