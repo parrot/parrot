@@ -54,7 +54,7 @@ sub dump_const_table {
 =cut
 
     print "# Constants: $count entries\n";
-    print "# ID  Flags    Encoding Type     Size     Data\n"; 
+    print "# ID  Flags    Encoding Type     Size     Data\n";
 
     my $constant_num = 0;
 
@@ -126,11 +126,11 @@ END_C
 	push @{$opcodes{$pc}->{args}}, @args;
 
         $src = $op->full_body();
-	
+
 	# The regexes here correspond to the rewriting rules for the various
 	# forms of goto recognized by Parrot/OpsFile.pm and Parrot/Op.pm
 
-	# absolute address goto 
+	# absolute address goto
 	while($src =~ /{{=(.*?)}}/g){
 	    my $offset = $1;
 	    $is_branch = 1;
@@ -162,7 +162,7 @@ END_C
 	$leaders{$new_pc} = 1 if $is_branch;
     }
 
-    my $enternative; 
+    my $enternative;
 
 FINDENTERN:
     foreach my $cur_op (@$Parrot::OpLib::core::ops) {
@@ -194,7 +194,7 @@ FINDENTERN:
 	}
     }
 
-    print<<END_C; 
+    print<<END_C;
 static opcode_t* run_compiled(struct Parrot_Interp *interpreter, opcode_t *cur_opcode, opcode_t *start_code);
 
 #include "parrot/embed.h"
@@ -230,7 +230,7 @@ main(int argc, char **argv) {
         return 1;
     }
     Parrot_init(interpreter, (void*) &dummy_var);
-  
+
     run_native = run_compiled;
     interpreter = make_interpreter(NO_FLAGS);
     pf          = PackFile_new();
@@ -259,7 +259,7 @@ main(int argc, char **argv) {
         userargv->vtable->push_string(interpreter, userargv, arg);
     }
 
-//    runops(interpreter, pf, 0);
+/*    runops(interpreter, pf, 0); */
     run_compiled(interpreter, (opcode_t *)program_code, (opcode_t *)program_code);
     exit(0);
 }
@@ -319,7 +319,7 @@ sub compile_file {
 
 #    dump_const_table($pf);
     compile_byte_code($pf, $file_name);
- 
+
     undef $pf;
 
     return;

@@ -27,6 +27,7 @@ use Parrot::PackFile::FixupTable;
 use Parrot::PackFile::ConstTable;
 use Parrot::Types;
 use Parrot::Config;
+use Digest::MD5 qw(md5_hex);
 
 use FileHandle;
 
@@ -39,6 +40,17 @@ my $template = "l l/a* l/a* l/a*";
 # new()
 #
 
+sub _fingerprint {
+  my $fingerprint = md5_hex join "\n", map {
+    join '_', $_->{NAME}, @{$_->{ARGS}}
+  } @$Parrot::OpLib::core::ops;
+  my @arr = ();
+  for my $i (0..9) {
+    push @arr, hex substr ($fingerprint, $i*2, 2);
+  }
+  return @arr;
+}
+
 sub new
 {
   my $class = shift;
@@ -46,11 +58,11 @@ sub new
   my $self = bless {
     WORDSIZE => sizeof("op"),
     BYTEORDER => $PConfig{bigendian},
-    MAJOR => 0,
-    MINOR => 0,
+    MAJOR => $PConfig{MAJOR},
+    MINOR => $PConfig{MINOR} | $PConfig{PATCH},
     FLAGS => 0,
     FLOATTYPE => 0,
-    PAD => 'zzzzzzzzzz',
+    PAD => [ _fingerprint ],
     MAGIC => $PARROT_MAGIC,
     OPCODETYPE => 0x5045524c,
     FIXUP => Parrot::PackFile::FixupTable->new(),
@@ -77,49 +89,49 @@ sub wordsize
   return $self->{WORDSIZE};
 }
 
-sub byteorder 
+sub byteorder
 {
   my $self = shift;
 
   return $self->{BYTEORDER};
 }
 
-sub major 
+sub major
 {
   my $self = shift;
 
   return $self->{MAJOR};
 }
 
-sub minor 
+sub minor
 {
   my $self = shift;
 
   return $self->{MINOR};
 }
 
-sub flags 
+sub flags
 {
   my $self = shift;
 
   return $self->{FLAGS};
 }
 
-sub pad 
+sub pad
 {
   my $self = shift;
 
   return $self->{PAD};
 }
 
-sub floattype 
+sub floattype
 {
   my $self = shift;
 
   return $self->{FLOATTYPE};
 }
 
-sub opcodetype 
+sub opcodetype
 {
   my $self = shift;
 
@@ -187,6 +199,7 @@ sub unpack
   $self->{MINOR} = shift_byte($string);
   $self->{FLAGS} = shift_byte($string);
   $self->{FLOATTYPE} = shift_byte($string);
+  $self->{PAD} = substr($string, 0, 10);
   $string = substr($string, 10);
 
   my $magic = shift_op($string);
@@ -200,7 +213,7 @@ sub unpack
   #
   # Read the fixup table:
   #
- 
+
   my $fixup = '';
 
   my $fixup_length = shift_op($string);
@@ -216,7 +229,7 @@ sub unpack
   #
   # Read the constant table:
   #
- 
+
   my $const = '';
 
   my $const_length = shift_op($string);
@@ -277,7 +290,7 @@ sub unpack_filehandle
 
   my @lines  = $fh->getlines();
   my $string = join('', @lines);
- 
+
 #  printf "Read %d lines, %d bytes.\n", scalar(@lines), length($string);
 
   return $self->unpack($string);
