@@ -219,7 +219,7 @@ $(TEST_PROG_SO): test_main$(O) blib/lib/libparrot$(SO) lib/Parrot/OpLib/core.pm 
 #
 
 #$(PDUMP): pdump$(O) packfile$(O)
-	#$(LD) ${ld_out}$(PDUMP) pdump$(O) packfile$(O) string$(O) chartype$(O) memory$(O) $(C_LIBS) $(LDFLAGS)
+#	$(LD) ${ld_out}$(PDUMP) pdump$(O) packfile$(O) string$(O) chartype$(O) memory$(O) $(C_LIBS) $(LDFLAGS)
 
 
 ###############################################################################
