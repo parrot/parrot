@@ -13,7 +13,9 @@ my %ret_count;
 	      d => [0,0,0,0,1],        # returning a double
 	      t => [0,0,1,0,0],        # returning a string
 	      v => [0,0,0,0,0],        # void return
-	      );
+#	      b => [0,0,1,0,0],        # Returns a buffer
+#	      B => [0,0,1,0,0],        # Returns a buffer
+	     );
 
 
 my (%ret_type) = (p => "void *",
@@ -28,6 +30,8 @@ my (%ret_type) = (p => "void *",
                   d => "double",
                   t => "char *",
 		  v => "void",
+#		  b => "void *",
+#		  B => "void **",
                  );
 
 my (%proto_type) = (p => "void *",
@@ -43,10 +47,15 @@ my (%proto_type) = (p => "void *",
 		    t => "char *",
 		    v => "void",
 		    I => "struct Parrot_Interp *",
-		    P => "PMC *"
+		    P => "PMC *",
+#		    b => "void *",
+		    B => "void **",
 		   );
 
-my (%other_decl) = (p => "PMC *final_destination = pmc_new(interpreter, enum_class_UnManagedStruct);");
+my (%other_decl) = (p => "PMC *final_destination = pmc_new(interpreter, enum_class_UnManagedStruct);",
+#		    b => "Buffer *final_destination = new_buffer_header(interpreter);\nPObj_external_SET(final_destination)",
+#		    B => "Buffer *final_destination = new_buffer_header(interpreter);\nPObj_external_SET(final_destination)",
+		   );
 
 my (%ret_type_decl) = (p => "void *",
 		       i => "int",
@@ -60,6 +69,8 @@ my (%ret_type_decl) = (p => "void *",
                        d => "double",
                        t => "char *",
 		       v => "void *",
+#		       b => "void *",
+#		       B => "void **",
                      );
 
 my (%ret_assign) = (p => "PMC_data(final_destination) = return_data;\nPMC_REG(5) = final_destination;",
@@ -73,6 +84,8 @@ my (%ret_assign) = (p => "PMC_data(final_destination) = return_data;\nPMC_REG(5)
                     f => "NUM_REG(5) = return_data;",
                     d => "NUM_REG(5) = return_data;",
 		    v => "",
+#		    b => "final_destination->bufstart = return_data;\nSTR_REG(5) = final_destination",
+#		    B => "final_destination->bufstart = *return_data;\nSTR_REG(5) = final_destination",
                    );
 
 my (%func_call_assign) = (p => "return_data = ",
@@ -85,7 +98,9 @@ my (%func_call_assign) = (p => "return_data = ",
 			  s => "return_data = ",
                           f => "return_data = ",
                           d => "return_data = ",
-		          v => "",
+			  b => "return_data = ",
+#			  B => "return_data = ",
+#		          v => "",
                           );
 
 open NCI, ">nci.c" or die "Can't open nci.c!";
@@ -242,6 +257,12 @@ sub make_arg {
               };
     /t/ && do {my $regnum = $reg_ref->{s}++;
 	       return "string_to_cstring(interpreter, STR_REG($regnum))";
+              };
+    /b/ && do {my $regnum = $reg_ref->{s}++;
+	       return "STR_REG($regnum)->bufstart";
+              };
+    /B/ && do {my $regnum = $reg_ref->{s}++;
+	       return "&(STR_REG($regnum)->bufstart)";
               };
     /I/ && do {
 	       return "interpreter";
