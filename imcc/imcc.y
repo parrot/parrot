@@ -305,7 +305,7 @@ emit:
                                           function = "(emit)"; }
       pasmcode
       EOM 				{ if (optimizer_level & OPT_PASM)
-                                                allocate(interp);
+                                                imc_compile_unit(interp, instructions);
                                           emit_flush(interp); $$=0;}
     ;
 
@@ -376,7 +376,7 @@ sub_body:
         statements ESUB
         {
           $$ = 0;
-	  allocate(interp);
+	  imc_compile_unit(interp, instructions);
 	  emit_flush(interp);
         }
      ;

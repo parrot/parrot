@@ -33,9 +33,9 @@ static void make_stat(int *sets, int *cols);
 static void imc_stat_init(void);
 static void print_stat(Parrot_Interp);
 static void allocate_wanted_regs(void);
-static void build_reglist(Parrot_Interp);
+static void build_reglist(Parrot_Interp, Instruction * unit);
 static void build_interference_graph(Parrot_Interp);
-static void compute_du_chain(void);
+static void compute_du_chain(Instruction * unit);
 static int interferes(Parrot_Interp, SymReg * r0, SymReg * r1);
 static int map_colors(int x, SymReg ** graph, int colors[], int typ);
 #ifdef DO_SIMPLIFY
@@ -43,7 +43,7 @@ static int simplify (void);
 #endif
 static void compute_spilling_costs (Parrot_Interp);
 static void order_spilling (void);
-static void spill (struct Parrot_Interp *, int);
+static void spill (struct Parrot_Interp *, Instruction * unit, int);
 static int try_allocate(Parrot_Interp);
 static void restore_interference_graph(void);
 static int neighbours(int node);
@@ -56,12 +56,16 @@ static SymReg** interference_graph;
 static SymReg** reglist;
 static int n_symbols;
 
-/* allocate is the main loop of the allocation algorithm */
-void allocate(struct Parrot_Interp *interpreter) {
+/* imc_compile_unit is the main loop of the allocation algorithm. It operates
+ * on a single compilation unit at a time.
+ */
+void
+imc_compile_unit(struct Parrot_Interp *interpreter, Instruction * unit)
+{
     int to_spill;
     int todo, first;
 
-    if (!instructions)
+    if (!unit)
         return;
     if (!optimizer_level && pasm_file)
         return;
@@ -106,7 +110,7 @@ void allocate(struct Parrot_Interp *interpreter) {
         compute_dominators(interpreter);
         find_loops(interpreter);
 
-        build_reglist(interpreter);
+        build_reglist(interpreter, unit);
         life_analysis(interpreter);
         /* optimize, as long as there is something to do */
         if (dont_optimize)
@@ -139,7 +143,7 @@ void allocate(struct Parrot_Interp *interpreter) {
 
         if ( to_spill >= 0 ) {
             allocated = 0;
-            spill(interpreter, to_spill);
+            spill(interpreter, unit, to_spill);
             /*
              * build the new cfg/reglist on the fly in spill() and
              * do life analysis there for only the involved regs
@@ -167,7 +171,8 @@ void allocate(struct Parrot_Interp *interpreter) {
 }
 
 void
-free_reglist(Parrot_Interp interpreter) {
+free_reglist(Parrot_Interp interpreter)
+{
     if (interference_graph) {
         free(interference_graph);
         IMCC_INFO(interpreter)->interference_graph = interference_graph = 0;
@@ -185,7 +190,8 @@ free_reglist(Parrot_Interp interpreter) {
 /* some statistics about register usage
  * printed with --verbose --verbose
  */
-static void make_stat(int *sets, int *cols)
+static void
+make_stat(int *sets, int *cols)
 {
     /* register usage summary */
     char type[] = "INSP";
@@ -236,7 +242,8 @@ static void print_stat(Parrot_Interp interpreter)
 }
 
 /* sort list by line  nr */
-static int reg_sort_f(const void *a, const void *b) {
+static int
+reg_sort_f(const void *a, const void *b) {
     SymReg *ra = *(SymReg**) a;
     SymReg *rb = *(SymReg**) b;
     if (ra->first_ins->index < rb->first_ins->index) {
@@ -250,14 +257,16 @@ static int reg_sort_f(const void *a, const void *b) {
     }
 }
 
-static void sort_reglist(void)
+static void
+sort_reglist(void)
 {
     qsort(reglist, n_symbols, sizeof(SymReg*), reg_sort_f);
 }
 /* make a linear list of IDENTs and VARs, set n_symbols */
 
 static void
-build_reglist(Parrot_Interp interpreter) {
+build_reglist(Parrot_Interp interpreter, Instruction * unit)
+{
     int i, count, unused;
 
     info(interpreter, 2, "build_reglist\n");
@@ -301,7 +310,7 @@ build_reglist(Parrot_Interp interpreter) {
             }
         }
     }
-    compute_du_chain();
+    compute_du_chain(unit);
     /* we might have unused symbols here, from spilling */
     for (i = count = unused = 0; i < n_symbols; i++) {
         if (!reglist[i]->first_ins)
@@ -358,17 +367,18 @@ build_interference_graph(Parrot_Interp interpreter)
 }
 
 
-static void compute_one_du_chain(SymReg * r);
-/* Compute a DU-chain for each symbolic
+static void compute_one_du_chain(SymReg * r, Instruction * unit);
+/* Compute a DU-chain for each symbolic in a compilation unit
  */
-static void compute_du_chain() {
+static void
+compute_du_chain(Instruction * unit) {
     Instruction * ins, *lastbranch;
     int i;
 
     lastbranch = 0;
 
     /* Compute last branch in this procedure, update instruction index */
-    for(i = 0, ins = instructions; ins; ins = ins->next) {
+    for(i = 0, ins = unit; ins; ins = ins->next) {
         ins->index = i++;
         if(ins->type == ITBRANCH)
             lastbranch = ins;
@@ -377,7 +387,7 @@ static void compute_du_chain() {
     /* Compute du-chains for all symbolics */
     for(i = 0; i < n_symbols; i++) {
         SymReg * r = reglist[i];
-        compute_one_du_chain(r);
+        compute_one_du_chain(r, unit);
         /* what is this used for? -lt */
         if(r->type == VTIDENTIFIER
                 && lastbranch
@@ -387,7 +397,9 @@ static void compute_du_chain() {
     }
 }
 
-static void compute_one_du_chain(SymReg * r) {
+static void
+compute_one_du_chain(SymReg * r, Instruction * unit)
+{
     Instruction * ins;
 
     /* We cannot rely on computing the value of r->first when parsing,
@@ -397,7 +409,7 @@ static void compute_one_du_chain(SymReg * r) {
 
     r->first_ins = 0;
     r->use_count = r->lhs_use_count = 0;
-    for(ins = instructions; ins; ins = ins->next) {
+    for(ins = unit; ins; ins = ins->next) {
         int ro, rw;
         ro = instruction_reads(ins, r);
         rw = instruction_writes(ins, r);
@@ -777,7 +789,7 @@ map_colors(int x, SymReg ** graph, int colors[], int typ) {
  *
  */
 static void
-update_life(Parrot_Interp interpreter, Instruction *ins,
+update_life(Parrot_Interp interpreter, Instruction * unit, Instruction *ins,
         SymReg *r, int needs_fetch, int needs_store, int add)
 {
     Life_range *l;
@@ -785,7 +797,7 @@ update_life(Parrot_Interp interpreter, Instruction *ins,
     Instruction *ins2;
     Basic_block **bb_list = IMCC_INFO(interpreter)->bb_list;
 
-    for(i = 0, ins2 = instructions; ins2; ins2 = ins2->next) {
+    for(i = 0, ins2 = unit; ins2; ins2 = ins2->next) {
         ins2->index = i++;
     }
     /* add this sym to reglist, if not there */
@@ -868,12 +880,12 @@ update_interference(Parrot_Interp interpreter, SymReg *old, SymReg *new)
 }
 #endif
 
-/* Rewrites the instructions list, inserting spill code in every ocurrence
+/* Rewrites the unit instructions, inserting spill code in every ocurrence
  * of the symbol.
  */
 
 static void
-spill(struct Parrot_Interp *interpreter, int spilled)
+spill(struct Parrot_Interp *interpreter, Instruction * unit, int spilled)
 {
     Instruction * tmp, *ins;
     int i, n, dl;
@@ -908,7 +920,7 @@ spill(struct Parrot_Interp *interpreter, int spilled)
         Instruction *spill_ins;
 
         p31 = IMCC_INFO(interpreter)->p31 = mk_pasm_reg(str_dup("P31"));
-        ins = instructions;
+        ins = unit;
         while (ins
                 && (strncmp(ins->fmt, "push", 4) == 0
                     || strcmp(ins->fmt, "saveall") == 0)) {
@@ -920,7 +932,7 @@ spill(struct Parrot_Interp *interpreter, int spilled)
     else
         p31 = IMCC_INFO(interpreter)->p31;
 
-    for(ins = instructions; ins; ins = ins->next) {
+    for(ins = unit; ins; ins = ins->next) {
 	needs_store = 0;
 	needs_fetch = 0;
 
@@ -969,7 +981,7 @@ spill(struct Parrot_Interp *interpreter, int spilled)
         if (needs_fetch || needs_store) {
 #if ! DOIT_AGAIN_SAM
             /* update life info of prev sym */
-            update_life(interpreter, ins, new_sym, needs_fetch, needs_store,
+            update_life(interpreter, unit, ins, new_sym, needs_fetch, needs_store,
                     old_sym != new_sym);
             /* and interference of both */
             update_interference(interpreter, old_sym, new_sym);
@@ -991,7 +1003,7 @@ spill(struct Parrot_Interp *interpreter, int spilled)
 
 #if DOIT_AGAIN_SAM
     /* update index */
-    for(i = 0, ins = instructions; ins; ins = ins->next) {
+    for(i = 0, ins = unit; ins; ins = ins->next) {
 	ins->index = i++;
     }
 #endif

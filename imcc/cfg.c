@@ -196,7 +196,9 @@ find_basic_blocks (Parrot_Interp interpreter, int first) {
 /* Once the basic blocks have been computed, build_cfg computes
    the dependences between them. */
 
-void build_cfg(Parrot_Interp interpreter) {
+void
+build_cfg(Parrot_Interp interpreter)
+{
     int i, j;
     SymReg * addr;
     Basic_block *last = NULL, *bb;
