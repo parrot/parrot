@@ -708,6 +708,31 @@ constants into their destination register, $1.
 =over 4
 
 =cut
+########################################
+
+=item B<abs>(i|n, i|ic|n|nc)
+
+Set $1 to absolute value of $2.
+
+=cut
+
+AUTO_OP abs(i, i|ic|n|nc) {
+  if ($2 < 0) {
+    $1 = - (INTVAL)$2;
+  }
+  else {
+    $1 = (INTVAL)$2;
+  }
+}
+
+AUTO_OP abs(n, n|nc|i|ic) {
+  if ($2 < 0) {
+    $1 = - (FLOATVAL)$2;
+  }
+  else {
+    $1 = (FLOATVAL)$2;
+  }
+}
 
 
 ########################################
