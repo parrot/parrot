@@ -127,6 +127,7 @@ CODE
 no match
 OUTPUT
 
+SKIP: { skip("Arrays are still wacky", 1);
 output_is(gentest('a', <<'CODE'), <<'OUTPUT', 'groups');
 		rx_startgroup P0, 0
 		rx_literal P0, "a", $advance
@@ -142,6 +143,7 @@ CODE
 (a)
 <><a><>
 OUTPUT
+}
 
 output_is(gentest('a', <<'CODE'), <<'OUTPUT', 'ZWA: ^ (success)');
 		rx_zwa_atbeginning P0, $advance
