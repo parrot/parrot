@@ -51,7 +51,7 @@ SymbolTable global_sym_tab;
  */
 static Class * current_class;
 static Instruction * current_call;
-static SymReg *cur_obj;
+static SymReg *cur_obj, *cur_call;
 int cur_pmc_type;      /* used in mk_ident */
 IMC_Unit * cur_unit;
 SymReg *cur_namespace; /* ugly hack for mk_address */
@@ -362,9 +362,9 @@ begin_return_or_yield(Interp *interp, int yield)
 %type <i> labels _labels label  statement sub_call
 %type <i> pcc_sub_call
 %type <sr> sub_param sub_params pcc_arg pcc_result pcc_args pcc_results
-%type <sr> pcc_returns pcc_return pcc_call arg the_sub
+%type <sr> pcc_returns pcc_return pcc_call arg the_sub multi_type
 %type <t> pcc_return_many
-%type <t> pcc_proto pcc_sub_proto proto sub_proto multi
+%type <t> pcc_proto pcc_sub_proto proto sub_proto multi multi_types
 %type <i> instruction assignment if_statement labeled_inst opt_label op_assign
 %type <i> func_assign
 %type <i> opt_invocant
@@ -576,21 +576,18 @@ sub:
      sub_label_op_c
         {
           Instruction *i = iSUBROUTINE(cur_unit, $3);
-          /*
-           * $<sr>$ is the SymReg value of this action rule
-           */
-          i->r[1] = $<sr>$ = mk_pcc_sub(interp, str_dup(i->r[0]->name), 0);
+          i->r[1] = cur_call = mk_pcc_sub(interp, str_dup(i->r[0]->name), 0);
           add_namespace(interp, cur_unit);
         }
-     sub_proto '\n' { $<sr>4->pcc_sub->pragma = $5; }
+     sub_proto '\n' { cur_call->pcc_sub->pragma = $5; }
      sub_params
-     sub_body  ESUB { $$ = 0; }
+     sub_body  ESUB { $$ = 0; cur_call = NULL; }
    ;
 
 sub_params:
      /* empty */                       { $$ = 0; } %prec LOW_PREC
    | '\n'                              { $$ = 0; }
-   | sub_params sub_param '\n'         { add_pcc_param($<sr>-3, $2);}
+   | sub_params sub_param '\n'         { add_pcc_param(cur_call, $2);}
    ;
 
 sub_param:
@@ -606,7 +603,22 @@ sub_proto:
    | multi          { $$ = P_NONE; }
    ;
 
-multi: MULTI '(' ')'  { $$ = 0; }
+multi: MULTI '(' multi_types ')'  { $$ = 0; }
+   ;
+
+multi_types:
+     /* empty */     { $$ = 0; }
+   | multi_types COMMA multi_type { $$ = 0; add_pcc_multi(cur_call, $3); }
+   | multi_type      { $$ = 0;  add_pcc_multi(cur_call, $1);}
+   ;
+
+multi_type:
+     INTV             { $$ = mk_const(interp, str_dup("int"), 'S'); }
+   | FLOATV           { $$ = mk_const(interp, str_dup("num"), 'S'); }
+   | PMCV             { $$ = mk_const(interp, str_dup("pmc"), 'S'); }
+   | STRINGV          { $$ = mk_const(interp, str_dup("string"), 'S'); }
+   | '_'              { $$ = mk_const(interp, str_dup("pmc"), 'S'); }
+   | IDENTIFIER       { $$ = mk_const(interp, $1, 'S'); }
    ;
 
 sub_body:
@@ -619,13 +631,13 @@ pcc_sub:
      IDENTIFIER
          {
             Instruction *i = iSUBROUTINE(cur_unit, mk_sub_label(interp, $3));
-            i->r[1] = $<sr>$ = mk_pcc_sub(interp, str_dup(i->r[0]->name), 0);
+            i->r[1] = cur_call = mk_pcc_sub(interp, str_dup(i->r[0]->name), 0);
             add_namespace(interp, cur_unit);
 
          }
-     sub_proto '\n' { $<sr>4->pcc_sub->pragma = $5; }
+     sub_proto '\n' { cur_call->pcc_sub->pragma = $5; }
      sub_params
-     sub_body  ESUB { $$ = 0; }
+     sub_body  ESUB { $$ = 0; cur_call = NULL; }
    ;
 
 pcc_sub_call:

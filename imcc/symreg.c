@@ -190,6 +190,15 @@ add_pcc_result(SymReg *r, SymReg * arg)
 }
 
 void
+add_pcc_multi(SymReg *r, SymReg * arg)
+{
+    int n = r->pcc_sub->nmulti;
+    r->pcc_sub->multi = realloc(r->pcc_sub->multi, (n + 1) * sizeof(SymReg *));
+    r->pcc_sub->multi[n] = arg;
+    r->pcc_sub->nmulti++;
+}
+
+void
 add_pcc_return(SymReg *r, SymReg * arg)
 {
     add_pcc_result(r, arg);

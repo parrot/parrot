@@ -127,6 +127,7 @@ void add_pcc_cc(SymReg *r, SymReg * arg);
 void add_pcc_result(SymReg *r, SymReg * arg);
 void add_pcc_param(SymReg *r, SymReg * arg);
 void add_pcc_return(SymReg *r, SymReg * arg);
+void add_pcc_multi(SymReg *r, SymReg * arg);
 void add_namespace(Parrot_Interp interpreter, struct _IMC_Unit *);
 
 typedef enum {
@@ -150,6 +151,8 @@ struct pcc_sub_t {
     SymReg *cc;
     SymReg ** ret;
     int nret;
+    SymReg ** multi;
+    int nmulti;
     pragma_enum_t pragma;
     int calls_a_sub;
     int nci;

@@ -1522,6 +1522,12 @@ pir_output_is(<<'CODE', <<'OUT', "multi 1");
 .sub foo @MULTI()
     print "ok 1\n"
 .end
+.sub f1 @MULTI(int)
+.end
+.sub f2 @MULTI(int, float)
+.end
+.sub f3 @MULTI(Integer, Any, _)
+.end
 CODE
 ok 1
 OUT
