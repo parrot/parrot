@@ -30,12 +30,24 @@ void nci_cb_D1(cb_D1_func, void*);
 
 typedef struct
 {
+	int y;
+} Nested;
+
+typedef struct
+{
+	int x;
+	Nested *nested;
+} Outer;
+
+typedef struct
+{
 	int x, y;
 	int w, h;
 } Rect_Like;
 
 void nci_pip (int count, Rect_Like *rects);
 int nci_i_33 (int *double_me, int *triple_me);
+void nci_v_pii (Outer *my_data, int my_x, int my_y);
 
 double nci_dd(double d) {
     return d * 2.0;
@@ -283,6 +295,12 @@ int nci_i_33 (int *double_me, int *triple_me)
 	*triple_me *= 3;
 
 	return( *double_me + *triple_me );
+}
+
+void nci_v_pii (Outer *my_data, int my_x, int my_y)
+{
+	my_data->x         = my_x;
+	my_data->nested->y = my_y;
 }
 
 #ifdef TEST

@@ -176,6 +176,11 @@ char_offset_key(Parrot_Interp interpreter, PMC *pmc, PMC *key, int *type)
                 PMC_data(init) = p;
             }
         }
+        else if (init->vtable->base_type == enum_class_ManagedStruct &&
+            *type == enum_type_struct_ptr) {
+            /* a nested struct pointer belonging to us */
+            printf("here\n");
+        }
         return char_offset_key(interpreter, init, next, type);
     }
     if (count >= max)

@@ -209,8 +209,10 @@ i	tpiibi
 # Used by SDL
 p	iiil
 i	ppl
+v	pip
 
 # used by t/pmc/nci.t
 v	pP
 p	ip
 i	33
+v	pii

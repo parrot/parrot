@@ -17,7 +17,7 @@ i386 and the F<libnci.so> library is found.
 
 =cut
 
-use Parrot::Test tests => 31;
+use Parrot::Test tests => 32;
 use Parrot::Config;
 
 print STDERR $PConfig{jitcpuarch}, " JIT CPU\n";
@@ -1137,6 +1137,68 @@ CODE
 Double: 6
 Triple: 6
 Sum: 12
+OUTPUT
+
+output_is(<<'CODE', <<'OUTPUT', 'nested structs');
+
+.include "datatypes.pasm"
+  new  P8, .OrderedHash
+  set  P8[ 'y' ],      .DATATYPE_INT
+  push P8, 0
+  push P8, 0
+  new  P9, .ManagedStruct, P8
+
+  new  P6, .OrderedHash
+  set  P6[ 'x' ],      .DATATYPE_INT
+  push P6, 0
+  push P6, 0
+  set  P6[ 'nested' ], .DATATYPE_STRUCT_PTR
+
+  set  P7, P6[ -1 ]
+  setprop P7, '_struct', P9
+
+  push P6, 0
+  push P6, 0
+
+  new  P5, .ManagedStruct, P6
+  set  P9[ 'y' ], 200
+  set  P5[ 'x' ], 100
+
+  set I0, P5[ 'x' ]
+  set I1, P5[ 'nested'; 'y' ]
+  print "Old X: "
+  print I0
+  print "\nOld Y: "
+  print I1
+  print "\n"
+
+  set I5, 1
+  set I6, 2
+
+  set I0, 1
+  set I1, 2
+  set I2, 0
+  set I3, 1
+  set I4, 0
+
+  loadlib P1, "libnci"
+  dlfunc P0, P1, "nci_v_pii", "vpii"
+  invoke
+
+  set I0, P5[ 'x' ]
+  set I1, P5[ 'nested'; 'y' ]
+  print "X: "
+  print I0
+  print "\nY: "
+  print I1
+  print "\n"
+
+  end
+CODE
+Old X: 100
+Old Y: 200
+X: 1
+Y: 2
 OUTPUT
 
 } # SKIP
