@@ -1,7 +1,7 @@
 This is Parrot, version 0.0.3
 -----------------------------
 
-Parrot is Copyright (C) 2001 Yet Another Society. All Rights Reserved.
+Parrot is Copyright (C) 2001-2002 Yet Another Society. All Rights Reserved.
 
 LICENSE INFORMATION
 -------------------
@@ -13,23 +13,12 @@ redistribute it and/or modify it under the terms of either:
     Software Foundation; either version 1, or (at your option) any
     later version, or
 
-    b) the "Artistic License" which can be found in the file "LICENSE"
+    b) the "Artistic License" which can be found in the directory "LICENSES"
 
 This program is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See either
 the GNU General Public License or the Artistic License for more details.
-
-|                                                              |
-| IMPORTANT! IMPORTANT! IMPORTANT!                             |
-|                                                              |
-| The final license for Parrot has not yet been decided, and   |
-| hence you should *NOT* use this code in any other product    |
-| or project until a final license is determined. By           |
-| submitting code you agree to the above, as well as           |
-| agreeing to relicense any submitted code under whatever      |
-| final license is chosen.                                     |
-|                                                              |
 
 PREREQUISITES
 -------------
