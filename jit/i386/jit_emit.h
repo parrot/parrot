@@ -8,6 +8,9 @@
 
 #include <assert.h>
 
+/* #define NEG_MINUS_ZERO */
+#define NEG_ZERO_SUB
+
 /* Register codes */
 #define emit_None 0
 
@@ -946,10 +949,10 @@ static unsigned char *lastpc;
 /* Mul ST(i) = ST * ST(i); POP  */
 #  define emitm_fmulp(pc, sti) emitm_fl_3(pc, emit_b110, emit_b001, sti)
 
-/* SubR ST(i) = ST(i) / ST; POP  */
+/* SubR ST(i) = ST - ST(i); POP  */
 #  define emitm_fsubrp(pc, sti) emitm_fl_3(pc, emit_b110, emit_b100, sti)
 
-/* Sub ST(i) = ST - ST(i); POP  */
+/* Sub ST(i) = ST(i) - ST; POP  */
 #  define emitm_fsubp(pc, sti) emitm_fl_3(pc, emit_b110, emit_b101, sti)
 
 /* DivR ST(i) = ST(i) / ST(0); POP  */
@@ -1019,6 +1022,38 @@ static unsigned char *lastpc;
 #  define emitm_fprem(pc) { *(pc)++ = 0xd9; *(pc)++ = 0xF8; }
 #  define emitm_fprem1(pc) { *(pc)++ = 0xd9; *(pc)++ = 0xF5; }
 
+#if defined(NEG_MINUS_ZERO)
+#  define jit_emit_neg_r_n(pc, r) { \
+    if (r) { \
+      emitm_fld(pc, r); \
+    } \
+    emitm_fchs(pc); \
+    if (r) { \
+      emitm_fstp(pc, (r+1)); \
+    } \
+}
+
+#  define jit_emit_neg_m_n(pc, mem) { \
+    jit_emit_fload_m_n(pc, mem); \
+    emitm_fchs(pc); \
+    jit_emit_fstore_m_n(pc, mem); \
+}
+
+#elif defined(NEG_ZERO_SUB)
+
+#  define jit_emit_neg_r_n(pc, r) { \
+    emitm_fldz(pc); \
+    emitm_fsubrp(pc, (r+1)); \
+}
+
+#  define jit_emit_neg_m_n(pc, mem) { \
+    jit_emit_fload_m_n(pc, mem); \
+    emitm_fldz(pc); \
+    emitm_fsubrp(pc, 1); \
+    jit_emit_fstore_m_n(pc, mem); \
+}
+#else
+
 #  define jit_emit_neg_r_n(pc, r) { \
     if (r) { \
       emitm_fld(pc, r); \
@@ -1042,6 +1077,8 @@ static unsigned char *lastpc;
     emitm_fchs(pc); \
     jit_emit_fstore_m_n(pc, mem); \
 }
+#endif
+
 
 #  define jit_emit_abs_r_n(pc, r) { \
     if (r) { \
