@@ -68,7 +68,7 @@ Instead of the label a Subroutine object can be used too:
   ...
   .end
 
-=head3 Subpragma
+=head2 Subpragma
 
 This is a comma separated list of zero or more items with the
 following meaning:

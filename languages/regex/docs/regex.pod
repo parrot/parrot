@@ -8,7 +8,7 @@ This document describes how the languages/regex compiler implements
 perl5/6-style regular expressions. I know; I really should come up
 with a better name than "languages/regex".
 
-=head2 PHILOSOPHY
+=head1 PHILOSOPHY
 
 Everything must be implemented with primitive operations. The compiler
 should be language-agnostic, for both the input and output. Operations
@@ -17,7 +17,7 @@ maintain their own state and do direct jumps to the next operation (or
 back to the previous, when failing). Optimizations should apply as
 generally as possible.
 
-=head2 STAGES
+=head1 STAGES
 
 The input to the compiler is a tree containing the expression to be
 compiled. This tree is traversed to gather information for
@@ -29,7 +29,7 @@ The initial tree is constructed out of what are called "tree ops", and
 are compiled into different (simpler) ops referred to as "list
 ops". Dumb names, but simple, yes?
 
-=head2 EXAMPLE
+=head1 EXAMPLE
 
 We'll compile the expression (a|bc)* down to the list ops, ignoring
 optimizations.
@@ -43,7 +43,7 @@ The tree representing that expression is:
         literal(b)
         literal(c)
 
-=head3 REWRITING A GREEDY CLOSURE (R*)
+=head2 REWRITING A GREEDY CLOSURE (R*)
 
 First, we apply the 'star' rewrite rule. This rule says R* is
 converted to
@@ -171,7 +171,7 @@ then it will jump to the WHATEVER label in the "or WHATEVER"
 clause. But by the time it reaches WHATEVER, it will have completely
 undone the last (failed) match of R.
 
-=head3 REWRITING AN ALTERNATION (R|S)
+=head2 REWRITING AN ALTERNATION (R|S)
 
 Whew. So we now know how to rewrite R*. To continue with our example
 -- you remember our original example, right? -- we need to now compile
@@ -232,7 +232,7 @@ ceiling and was curious as to what caused to catastrophe. So, let's go
 on to the simplest rewrite rule of all, and almost the only one that
 actually does any work:
 
-=head3 REWRITING A SINGLE-CHARACTER MATCH
+=head2 REWRITING A SINGLE-CHARACTER MATCH
 
 Now we have to match the trivial expression /a/. This is easy, right?
 You just do "if input[pos] != 'a', then goto lastback", right?
@@ -266,7 +266,7 @@ each expression independently -- the rewrite rule for R* would change
 depending on exactly what R is. Maintaining a dozen different rewrite
 rules for every tree operator would be a major pain in the posterior.
 
-=head3 REWRITING THE SEQUENCE RS
+=head2 REWRITING THE SEQUENCE RS
 
 We now know how to rewrite everything in the sample expression except
 for the 'sequence' tree op. The specific case of /bc/ is easy, but
@@ -288,11 +288,11 @@ would just be:
 
 Yay, no excess jumps!
 
-=head3 LIES!! ALL LIES!!!
+=head2 LIES!! ALL LIES!!!
 
 (scanning)
 
-=head3 OPTIMIZATIONS
+=head2 OPTIMIZATIONS
 
 If you put all that together, you get a lot of code. 34 lines, if I'm
 counting correctly. More, in fact, than is strictly necessary. Here is

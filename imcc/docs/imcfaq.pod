@@ -152,20 +152,23 @@ Use the -o option for Parrot. You can provide an output filename, or the - chara
 which indicates standard output. If the filename has a .pbc extension, IMCC will compile
 the module and assemble it to bytecode.
 
-=head3 Examples:
+Examples:
 
-=head4 Create the PASM source from IMC.
+=over 4
+
+=item Create the PASM source from IMC.
 
 	parrot -o hello.pasm hello.imc
 
-=head4 Compile to bytecode from IMC.
+=item Compile to bytecode from IMC.
 
 	parrot -o hello.pbc hello.imc
 
-=head4 Dump PASM to screen (my favorite shortcut).
+=item Dump PASM to screen (my favorite shortcut).
 
 	parrot -o - hello.imc
 
+=back
 
 =head2 Does IMCC do variable interpolation in strings?
 
@@ -185,13 +188,13 @@ basically give compiler front ends an easy way to generate code from their
 parse trees or AST. To generate expressions compilers have to create
 temporaries. 
 
-=head3 Symbolic Registers (or Temporaries)
+=head2 Symbolic Registers (or Temporaries)
 
 Symbolic registers have a $ sign for the first character, have single letter (S,N,I,P) for
 the second character, and 1 or more digits for the rest. By the 2nd character IMCC
 determines which set of Parrot registers it belongs to.
 
-=head4 Example:
+Example:
 
 	$S1 = "hiya"
 	$S2 = $S1 . "mel"
@@ -202,14 +205,14 @@ determines which set of Parrot registers it belongs to.
 This uses symbolic STRING and INTVAL registers as temporaries. This is the typical sort of code
 that compilers generate from the syntax tree.
 
-=head3 Named Variables
+=head2 Named Variables
 
 Named variables are either local, global or namespace qualified. Currently IMCC only
 supports locals transparently, however globals are supported with explicit syntax.
 The way to declare locals in a subroutine is with the B<.local> directive. The B<.local> directive
 also requires a type (B<int>, B<num>, B<string> or a classname such as B<PerlArray>).
 
-=head4 Example:
+Example:
 
 	.sub _main
 	   .local int i
@@ -422,7 +425,7 @@ supporting destruction with Parrot's garbage collection requires a bit of
 support from the internals that currently just isn't there. But we plan to get
 there soon. By the time we DO get there, you won't need the syntax below.
 
-=head3 An OOP Example
+=head2 An OOP Example
 
 Hypothetical language Mython, (apologies to Python, but it sure is nice and brief):
 
