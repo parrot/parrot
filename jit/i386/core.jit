@@ -140,7 +140,6 @@ next:    subl $0x1,(%ebx)
     addb $0x30,%al
     movb %al,(%ecx)
     mov %esp,%ecx
-    addl $0x1,0x4(%ecx)
     mov 0x4(%ecx),%ecx
     movl %ecx,&TEMP_INT[0]
     mov (%ebx),%ecx
@@ -172,7 +171,6 @@ next:    subl $0x1,(%ebx)
     addb $0x30,%al
     movb %al,(%ecx)
     mov %esp,%ecx
-    addl $0x1,0x4(%ecx)
     mov 0x4(%ecx),%ecx
     movl %ecx,&TEMP_INT[0]
     mov (%ebx),%ecx
