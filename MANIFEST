@@ -163,6 +163,7 @@ languages/cola/cola.h
 languages/cola/cola.l
 languages/cola/cola.y
 languages/cola/examples/calc.cola
+languages/cola/examples/expressions.cola
 languages/cola/examples/fib.cola
 languages/cola/examples/life.cola
 languages/cola/examples/mandelbrot.cola
@@ -203,6 +204,7 @@ languages/regex/README
 languages/regex/lib/Regex.pm
 languages/regex/lib/Regex/AsmOps.pm
 languages/regex/lib/Regex/CodeGen.pm
+languages/regex/lib/Regex/CodeGen/Pasm.pm
 languages/regex/lib/Regex/CodeGen/Re.pm
 languages/regex/lib/Regex/CodeGen/Rx.pm
 languages/regex/lib/Regex/Generate.pm
@@ -219,6 +221,7 @@ languages/regex/lib/Regex/Rewrite/Rx.pm
 languages/regex/lib/Regex/Rewrite/Stackless.pm
 languages/regex/regex.pl
 languages/regex/t/alt.t
+languages/regex/t/example.t
 languages/regex/t/group.t
 languages/regex/t/ngplus.t
 languages/regex/t/plus.t
@@ -257,6 +260,7 @@ lib/Parrot/OpTrans.pm
 lib/Parrot/OpTrans/C.pm
 lib/Parrot/OpTrans/CGoto.pm
 lib/Parrot/OpTrans/CPrederef.pm
+lib/Parrot/OpTrans/Compiled.pm
 lib/Parrot/OpsFile.pm
 lib/Parrot/Optimizer.pm
 lib/Parrot/PackFile.pm
