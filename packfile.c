@@ -1482,7 +1482,7 @@ Parrot_switch_to_cs(struct Parrot_Interp *interpreter,
     return cur_cs;
 }
 
-/* destroy current byte code seg and witch to previous */
+/* destroy current byte code segment and switch to previous */
 void
 Parrot_pop_cs(struct Parrot_Interp *interpreter)
 {
