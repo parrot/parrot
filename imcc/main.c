@@ -487,6 +487,8 @@ int main(int argc, char * argv[])
         if (!gc_off)
             interpreter->DOD_block_level--;
         info(1, "Running...\n");
+        if (run_pbc == 1)
+            PackFile_fixup_subs(interpreter);
         Parrot_runcode(interpreter, argc, argv);
         /* XXX no return value :-( */
     }

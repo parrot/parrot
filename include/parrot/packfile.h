@@ -226,6 +226,7 @@ opcode_t PackFile_unpack(struct Parrot_Interp *interpreter,
                          struct PackFile *self, opcode_t *packed,
                          size_t packed_size);
 
+void PackFile_fixup_subs(struct Parrot_Interp *interpreter);
 /*
  * directory functions
  */

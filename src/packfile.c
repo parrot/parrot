@@ -2477,6 +2477,11 @@ Parrot_load_bytecode(struct Parrot_Interp *interpreter, char *filename)
     }
 }
 
+void
+PackFile_fixup_subs(struct Parrot_Interp *interpreter)
+{
+    fixup_subs(interpreter, interpreter->code);
+}
 /*
 * Local variables:
 * c-indentation-style: bsd

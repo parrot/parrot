@@ -276,7 +276,7 @@ ENDF
 
 SKIP:
 {
-  skip("multiple loading not speced - failing", 3);
+  skip("multiple loading not speced - failing", 1);
 output_is(<<'CODE', <<'OUT', "twice call sub in external imc, return");
 .pcc_sub _sub1 prototyped
     print "sub1\n"
@@ -309,6 +309,7 @@ loaded again
 sub2
 back again
 OUT
+}
 
 output_is(<<'CODE', <<'OUT', "call internal sub like external");
 .pcc_sub _sub1 prototyped
@@ -366,7 +367,6 @@ sub2
 back
 OUT
 
-}
 
 END {
   unlink $file;
