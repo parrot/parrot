@@ -332,7 +332,8 @@ iANY(struct Parrot_Interp *interpreter, char * name,
                 strcat(format, "%s, ");
 	}
 	len = strlen(format);
-	len -= 2;
+	if (len >= 2)
+	    len -= 2;
 	format[len] = '\0';
         if (fmt && *fmt)
             strcpy(format, fmt);

@@ -6,6 +6,7 @@ output_is(<<'CODE', <<'OUTPUT', "new iter");
 	new P2, .PerlArray
 	new P1, .Iterator, P2
 	print "ok 1\n"
+	end
 CODE
 ok 1
 OUTPUT

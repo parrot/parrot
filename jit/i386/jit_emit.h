@@ -1924,21 +1924,14 @@ Parrot_jit_vtable_n_op(Parrot_jit_info_t *jit_info,
         p[i] = *(jit_info->cur_op + i);
         switch (op_info->types[i]) {
             case PARROT_ARG_S:
+                jit_emit_mov_rm_i(jit_info->native_ptr, emit_EAX,
+                        &STR_REG(p[i]));
+                emitm_pushl_r(jit_info->native_ptr, emit_EAX);
+                break;
+            case PARROT_ARG_K:
             case PARROT_ARG_P:
-                assert(p[i] >= 0 && p[i] < NUM_REGISTERS);
-                /* get $i to EAX */
-                switch (op_info->types[i]) {
-                    case PARROT_ARG_S:
-                        jit_emit_mov_rm_i(jit_info->native_ptr, emit_EAX,
-                                &STR_REG(p[i]));
-                        break;
-                    case PARROT_ARG_P:
-                        jit_emit_mov_rm_i(jit_info->native_ptr, emit_EAX,
-                                &PMC_REG(p[i]));
-                        break;
-                    default:
-                        break;
-                }
+                jit_emit_mov_rm_i(jit_info->native_ptr, emit_EAX,
+                        &PMC_REG(p[i]));
                 /* push $i, the left most Pi stays in eax, which is used
                  * below, to call the vtable method
                  */
