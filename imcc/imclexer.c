@@ -1111,10 +1111,12 @@ case 52:
 YY_RULE_SETUP
 #line 142 "imcc.l"
 {
-	SymReg *r = find_sym(yytext);
-	if (r && (r->type & VTIDENTIFIER) && !is_def) {
-	    yylval.sr = r;
-	    return VAR;
+	if (!is_def) {
+		SymReg *r = find_sym(yytext);
+		if (r && (r->type & VTIDENTIFIER)) {
+		    yylval.sr = r;
+		    return VAR;
+		}
 	}
         yylval.s = str_dup(yytext);
         return(is_op(yylval.s) ? PARROT_OP : IDENTIFIER);
@@ -1122,7 +1124,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 53:
 YY_RULE_SETUP
-#line 152 "imcc.l"
+#line 154 "imcc.l"
 {
         yylval.s = str_dup(yytext);
         return(FLOATC);
@@ -1130,7 +1132,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 54:
 YY_RULE_SETUP
-#line 157 "imcc.l"
+#line 159 "imcc.l"
 {
         yylval.s = str_dup(yytext);
         return(INTC);
@@ -1138,7 +1140,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 55:
 YY_RULE_SETUP
-#line 161 "imcc.l"
+#line 163 "imcc.l"
 {
         yylval.s = str_dup(yytext);
         return(INTC);
@@ -1146,7 +1148,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 56:
 YY_RULE_SETUP
-#line 165 "imcc.l"
+#line 167 "imcc.l"
 {
         yylval.s = str_dup(yytext);
         return(INTC);
@@ -1154,7 +1156,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 57:
 YY_RULE_SETUP
-#line 169 "imcc.l"
+#line 171 "imcc.l"
 {
         yylval.s = str_dup(yytext); /* XXX delete quotes, -> emit, pbc */
         return(STRINGC);
@@ -1162,7 +1164,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 58:
 YY_RULE_SETUP
-#line 173 "imcc.l"
+#line 175 "imcc.l"
 {
         yylval.s = str_dup(yytext);
         return(STRINGC);
@@ -1170,7 +1172,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 59:
 YY_RULE_SETUP
-#line 178 "imcc.l"
+#line 180 "imcc.l"
 {
         yylval.s = str_dup(yytext);
         return(IREG);
@@ -1178,7 +1180,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 60:
 YY_RULE_SETUP
-#line 183 "imcc.l"
+#line 185 "imcc.l"
 {
         yylval.s = str_dup(yytext);
         return(NREG);
@@ -1186,7 +1188,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 61:
 YY_RULE_SETUP
-#line 188 "imcc.l"
+#line 190 "imcc.l"
 {
         yylval.s = str_dup(yytext);
         return(SREG);
@@ -1194,7 +1196,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 62:
 YY_RULE_SETUP
-#line 193 "imcc.l"
+#line 195 "imcc.l"
 {
         yylval.s = str_dup(yytext);
         return(PREG);
@@ -1202,18 +1204,18 @@ YY_RULE_SETUP
 	YY_BREAK
 case 63:
 YY_RULE_SETUP
-#line 198 "imcc.l"
+#line 200 "imcc.l"
 ;
 	YY_BREAK
 case 64:
 YY_RULE_SETUP
-#line 199 "imcc.l"
+#line 201 "imcc.l"
 {
        return yytext[0];
     }
 	YY_BREAK
 case YY_STATE_EOF(emit):
-#line 203 "imcc.l"
+#line 205 "imcc.l"
 {
 	   BEGIN (INITIAL);
 	   if (pasm_file) {
@@ -1224,15 +1226,15 @@ case YY_STATE_EOF(emit):
     }
 	YY_BREAK
 case YY_STATE_EOF(INITIAL):
-#line 212 "imcc.l"
+#line 214 "imcc.l"
 yyterminate();
 	YY_BREAK
 case 65:
 YY_RULE_SETUP
-#line 213 "imcc.l"
+#line 215 "imcc.l"
 ECHO;
 	YY_BREAK
-#line 1236 "imclexer.c"
+#line 1238 "imclexer.c"
 
 	case YY_END_OF_BUFFER:
 		{
@@ -2118,7 +2120,7 @@ int main()
 	return 0;
 	}
 #endif
-#line 213 "imcc.l"
+#line 215 "imcc.l"
 
 
 #ifdef yywrap
