@@ -308,7 +308,7 @@ Parrot_clear_p(struct Parrot_Interp *interpreter)
 {
     int i;
     for (i = 0; i < NUM_REGISTERS; i++) {
-        interpreter->pmc_reg.registers[i] = NULL;
+        interpreter->pmc_reg.registers[i] = PMCNULL;
     }
 }
 

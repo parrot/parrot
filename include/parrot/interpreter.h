@@ -239,6 +239,13 @@ typedef enum {
 #define PCONST(i) PF_CONST(interpreter->code, (i))
 #define PNCONST   PF_NCONST(interpreter->code)
 
+
+#if PARROT_CATCH_NULL
+extern PMC * PMCNULL;                     /* Holds single Null PMC         */
+#else
+# define PMCNULL NULL
+#endif
+
 /* &gen_from_def(sysinfo.pasm) prefix(SYSINFO_) */
 
 #define PARROT_INTSIZE               1

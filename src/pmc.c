@@ -15,6 +15,25 @@
 
 #include "parrot/parrot.h"
 
+#if PARROT_CATCH_NULL
+PMC * PMCNULL;
+Parrot_mutex init_null_mutex;
+
+PMC *
+pmc_init_null(struct Parrot_Interp * interpreter)
+{
+    LOCK(init_null_mutex);
+    if(!PMCNULL)
+       PMCNULL = mem_sys_allocate(sizeof(PMC));
+    PMCNULL->pmc_ext = NULL; 
+    PMCNULL->vtable = Parrot_base_vtables[enum_class_Null];
+    PObj_sysmem_SET(PMCNULL);
+    PObj_immobile_SET(PMCNULL);
+    UNLOCK(init_null_mutex);
+    return PMCNULL;
+}
+#endif
+
 /*=for api pmc pmc_new
 
    Creates a new PMC of type C<base_type> (which is an index into
