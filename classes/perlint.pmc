@@ -269,7 +269,21 @@ MMD_PerlInt: {
             VTABLE_set_integer_native(INTERP, dest, c);
         else
             overflow(INTERP, SELF, b, dest, MMD_ADD_INT);
+    }
+MMD_Complex: {
+        if (dest != SELF) {
+            VTABLE_morph(INTERP, dest, enum_class_Complex);
+            VTABLE_set_number_native(INTERP, dest,
+                    PMC_int_val(SELF) +
+                    VTABLE_get_number_keyed_int(INTERP, value, 0));
+            VTABLE_set_number_keyed_int(INTERP, dest, 1,
+                    VTABLE_get_number_keyed_int(INTERP, value, 1));
+
         }
+        else {
+            internal_exception(1, "Complex: unimp add self");
+        }
+    }
 MMD_BigInt: {
             overflow_p(INTERP, SELF, value, dest, MMD_ADD);
         }

@@ -1063,7 +1063,7 @@ find_method_direct(Parrot_Interp interpreter, PMC *class,
         start = class_name->strlen + 1;
         for (isa = class->vtable->isa_str; ;) {
             if (isa->strlen <= start)
-                return NULL;
+                break;
             pos = string_str_index(interpreter, isa,
                     CONST_STRING(interpreter, " "), start);
             if (pos == -1) {

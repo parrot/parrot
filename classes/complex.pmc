@@ -282,18 +282,28 @@ Returns true if the complex number is non-zero.
     }
 
     FLOATVAL get_number () {
-        /* XXX calculate modulus */
+        internal_exception(1, "Complex: unimp get_number");
         return (FLOATVAL)0;
     }
 
     STRING* get_string () {
         STRING *s;
-        if(IM(SELF) >= 0)
-            s = Parrot_sprintf_c(INTERP,
-                    "%vg+%vgi", RE(SELF), IM(SELF));
-        else
-            s = Parrot_sprintf_c(INTERP,
-                    "%vg-%vgi", RE(SELF), -IM(SELF));
+        if (Interp_flags_TEST(INTERP, PARROT_PYTHON_MODE)) {
+            if (IM(SELF) >= 0)
+                s = Parrot_sprintf_c(INTERP,
+                        "(%vg+%vgj)", RE(SELF), IM(SELF));
+            else
+                s = Parrot_sprintf_c(INTERP,
+                        "(%vg-%vgj)", RE(SELF), -IM(SELF));
+        }
+        else {
+            if (IM(SELF) >= 0)
+                s = Parrot_sprintf_c(INTERP,
+                        "%vg+%vgi", RE(SELF), IM(SELF));
+            else
+                s = Parrot_sprintf_c(INTERP,
+                        "%vg-%vgi", RE(SELF), -IM(SELF));
+        }
         return s;
     }
 
@@ -357,6 +367,45 @@ Returns the requested number (real part for C<real> and imaginary for C<imag>).
         return ret;
     }
 
+/*
+
+=item C<FLOATVAL get_number_keyed_int(INTVAL key)>
+
+Quick hack to emulate get_real() and get_imag():
+
+  key = 0 ... get real part
+  key = 1 ... get imag part
+
+=item C<void set_number_keyed_int(INTVAL key, FLOATVAL v)>
+
+Set real or imag dependig on key
+
+*/
+
+    FLOATVAL get_number_keyed_int(INTVAL key) {
+        switch (key) {
+            case 0:
+                return RE(SELF);
+            case 1:
+                return IM(SELF);
+            default:
+                internal_exception(1, "Complex: key must be 0 or 1");
+        }
+        return 0.0;
+    }
+
+    void set_number_keyed_int(INTVAL key, FLOATVAL v) {
+        switch (key) {
+            case 0:
+                RE(SELF) = v;
+                break;
+            case 1:
+                IM(SELF) = v;
+                break;
+            default:
+                internal_exception(1, "Complex: key must be 0 or 1");
+        }
+    }
 /*
 
 =item C<void set_string_native (STRING* value)>

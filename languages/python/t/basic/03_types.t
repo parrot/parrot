@@ -3,7 +3,7 @@
 use strict;
 use lib '../../lib';
 
-use Parrot::Test tests => 8;
+use Parrot::Test tests => 9;
 
 sub test {
     language_output_is('python', $_[0], '', $_[1]);
@@ -30,6 +30,13 @@ if __name__ == '__main__':
 	print abs(i)
 	i=-3j + 4
 	print abs(i)
+CODE
+
+test(<<'CODE', 'complex()');
+if __name__ == '__main__':
+    print complex(3, 4), 3+4j
+    print `3+4j`
+
 CODE
 
 test(<<'CODE', 'long() function and conversion');

@@ -16,9 +16,10 @@ getopts('dnD', \%opt);
 $file = $ARGV[0];
 
 my %builtin_ops = (
-    abs => 1,
-    iter =>1,
+    abs => 'o',
+    iter => 'o',
     bool => 's',   # special
+    complex => 's',   # special
 );
 
 my %builtins = (
@@ -495,11 +496,12 @@ EOC
 
 sub LOAD_NAME() {
     my ($n, $c, $cmt) = @_;
-    if (is_opcode($c)) {
+    my ($o);
+    if (($o = is_opcode($c))) {
 	print <<EOC;
-	# builtin $c $cmt
+	# builtin $c $cmt $o
 EOC
-	push @stack, [-1, $c, 'F'];
+	push @stack, [$c, $c, $o];
 	return;
     }
     if ($globals{$c}) {
@@ -858,19 +860,61 @@ sub print_stack {
 	print "# st $_->[2] : $_->[1]\n";
     }
 }
+
 # python func to opcode translations
-sub OPC_bool() {
-    my ($c, $args, $cmt) = @_;
+sub OPC_bool {
+    my ($n, $c, $cmt) = @_;
     my $b = temp('I');
     my $p = temp('P');
+    my $arg = promote(pop @stack);
+    my $self = pop @stack;
     print <<EOC;
-	$b = istrue $args $cmt
+	$b = istrue $arg $cmt
 	# TODO create true P, false P opcodes
 	$p = new .Boolean
 	$p = $b
 EOC
     push @stack, [-1, $p, 'I'];
 }
+
+sub OPC_complex {
+    my ($n, $c, $cmt) = @_;
+    my $p = temp('P');
+    my $im = pop @stack;
+    my $re = pop @stack; # TODO 1 argument only
+    my $self = pop @stack;
+    print "\t# stack messed $c ne $self->[1]\n" if ($c ne $self->[1]);
+    print <<EOC;
+	# cmplx($re->[1], $im->[1]) $cmt
+	$p = new .Complex
+EOC
+    if ($re->[2] eq 'P') {
+	my $n = temp('N');
+	print <<EOC;
+	$n = $re->[1]
+	$p = $n
+EOC
+    }
+    else {
+	print <<EOC;
+	$p = $re->[1]
+EOC
+    }
+    if ($im->[2] eq 'P') {
+	my $n = temp('N');
+	print <<EOC;
+	$n = $im->[1]
+	$p\["imag"\] = $n
+EOC
+    }
+    else {
+	print <<EOC;
+	$p\["imag"\] = $im->[1]
+EOC
+    }
+    push @stack, [-1, $p, 'I'];
+}
+
 
 sub CALL_FUNCTION
 {
@@ -884,14 +928,23 @@ EOC
 	pop @stack;
 	return;
     }
+    my $func;
+    my $nfix =  ($n & 0xff);
+    my $nk =  2*($n >> 8);
+    $func = $stack[-1 - $nfix-$nk]->[0];
+    print "\t\t $cmt $func\n";
+    if ($builtin_ops{$func} && $builtin_ops{$func} eq 's') {
+	no strict "refs";
+	my $opcode = "OPC_$func";
+	&$opcode($n, $func, $cmt);
+	return;
+    }
     # arguments = $n & 0xff
     # named args: = ($n >> 8) *2
-    my $nfix =  ($n & 0xff);
     for (my $i = 0; $i < $nfix; $i++) {
 	my $arg = pop @stack;
 	unshift @args, promote($arg);
     }
-    my $nk =  2*($n >> 8);
     my ($i, $j, $arg_name);
     my $name = $stack[-1 - $nk]->[0];
     my $pushed_args = scalar @args;
@@ -912,7 +965,7 @@ EOC
     my $tos = pop @stack;
     my $args = join ', ', @args;
     my $t;
-    my $func = $tos->[1];
+    $func = $tos->[1];
     if ($builtins{$name} && $builtins{$name} eq 'v') {
 	my $ar = temp('P');
 	print <<"EOC";
@@ -927,13 +980,7 @@ EOC
 	}
 	$args = $ar;
     }
-    if ($tos->[2] eq 'F') {	# builtin opcode
-	if ($builtin_ops{$func} eq 's') {
-	    no strict "refs";
-	    my $opcode = "OPC_$func";
-	    &$opcode($func, $args, $cmt);
-	    return;
-	}
+    if ($tos->[2] eq 'o') {	# builtin opcode
 	$t = temp('P');
 	print <<EOC;
 	$t = new $DEFVAR
