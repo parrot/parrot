@@ -497,16 +497,16 @@ STRING *
 PF_fetch_string(Parrot_Interp interp, struct PackFile *pf, opcode_t **cursor)
 {
     UINTVAL flags;
-    opcode_t representation;
+    opcode_t charset_nr;
     size_t size;
-    STRING *s;
+    STRING *s, *cs;
     int wordsize = pf ? pf->header->wordsize : sizeof(opcode_t);
-    const char *encoding_name = NULL;
+    const char *charset_name;
 
     flags = PF_fetch_opcode(pf, cursor);
     /* don't let PBC mess our internals - only constant or not */
     flags &= (PObj_constant_FLAG | PObj_private7_FLAG);
-    representation = PF_fetch_opcode(pf, cursor);
+    charset_nr = PF_fetch_opcode(pf, cursor);
 
     /* These may need to be separate */
     size = (size_t)PF_fetch_opcode(pf, cursor);
@@ -514,41 +514,14 @@ PF_fetch_string(Parrot_Interp interp, struct PackFile *pf, opcode_t **cursor)
 /* #define TRACE_PACKFILE 1 */
 #if TRACE_PACKFILE
     PIO_eprintf(NULL, "PF_fetch_string(): flags are 0x%04x...\n", flags);
-    PIO_eprintf(NULL, "PF_fetch_string(): representation is %ld...\n",
-           representation);
+    PIO_eprintf(NULL, "PF_fetch_string(): charset_nr is %ld...\n",
+           charset_nr);
     PIO_eprintf(NULL, "PF_fetch_string(): size is %ld...\n", size);
 #endif
 
-    if( size == 0 && representation == enum_stringrep_unknown )
-    {
-        representation = enum_stringrep_one;
-    }
 
-    /* check if we need to worry about byte order */
-    if( (representation == enum_stringrep_one)
-        || (pf->header->byteorder == PARROT_BIGENDIAN) ) /* byte order ok*/
-    {
-        encoding_name =
-            string_primary_encoding_for_representation(interp,
-                                                    representation);
-    }
-    else /* byte order mismatch */
-    {
-        /* ICU has special encoding names to represent the byte-swapped
-           case, so we don't need to do that logic ourselves. That is,
-           ICU will figure out if we mean UTF-16BE or UTF-16LE, etc. */
-
-        if( representation == enum_stringrep_two )
-        {
-            encoding_name = "UTF16_OppositeEndian";
-        }
-        else /* representation == enum_stringrep_four */
-        {
-            encoding_name = "UTF32_OppositeEndian";
-        }
-    }
-
-    s = string_make(interp, *cursor, size, encoding_name, flags);
+    charset_name = Parrot_charset_c_name(interp, charset_nr);
+    s = string_make(interp, *cursor, size, charset_name, flags);
 
 #if TRACE_PACKFILE
     PIO_eprintf(NULL, "PF_fetch_string(): string is: ");
@@ -591,7 +564,15 @@ PF_store_string(opcode_t *cursor, STRING *s)
     }
 
     *cursor++ = PObj_get_FLAGS(s); /* only constant_FLAG and private7 */
-    *cursor++ = enum_stringrep_one;
+    /*
+     * TODO as soon as we have dynamically loadable charsets
+     *      we have to store the charset name, not the number
+     *
+     * TODO encoding
+     *
+     * see also PF_fetch_string
+     */
+    *cursor++ = Parrot_charset_number_of_str(NULL, s);
     *cursor++ = s->bufused;
 
     /* Switch to char * since rest of string is addressed by

@@ -83,6 +83,7 @@ charset_converter_t Parrot_find_charset_converter(Interp *, CHARSET *lhs, CHARSE
 void Parrot_deinit_charsets(Interp *);
 INTVAL Parrot_charset_number(Interp *, STRING *charsetname);
 STRING* Parrot_charset_name(Interp *, INTVAL);
+const char* Parrot_charset_c_name(Interp *, INTVAL);
 INTVAL Parrot_charset_number_of_str(Interp *, STRING *src);
 
 struct _charset {

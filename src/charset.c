@@ -126,6 +126,14 @@ Parrot_charset_name(Interp *interpreter, INTVAL number_of_charset)
     return all_charsets->set[number_of_charset].name;
 }
 
+const char *
+Parrot_charset_c_name(Interp *interpreter, INTVAL number_of_charset)
+{
+    if (number_of_charset >= all_charsets->n_charsets)
+        return NULL;
+    return all_charsets->set[number_of_charset].charset->name;
+}
+
 static INTVAL
 register_charset(Interp *interpreter, const char *charsetname,
         CHARSET *charset)
