@@ -40,16 +40,6 @@ ParrotIOLayer   * pio_default_stack;
 
 PIOOFF_T piooffsetzero;
 
-PMC *
-new_io_pmc(theINTERP, ParrotIO *io)
-{
-    PMC *new_pmc;
-    new_pmc = new_pmc_header(interpreter);
-    PMC_data(new_pmc) = io;
-    new_pmc->vtable = YOU_LOSE_VTABLE;
-    return new_pmc;
-}
-
 #if 0
 void
 free_io_header(ParrotIO *io)

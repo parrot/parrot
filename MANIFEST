@@ -39,6 +39,7 @@ classes/multiarray.pmc
 classes/nci.pmc
 classes/parrotclass.pmc
 classes/parrotinterpreter.pmc
+classes/parrotio.pmc
 classes/parrotobject.pmc
 classes/perlarray.pmc
 classes/perlhash.pmc
@@ -1826,6 +1827,7 @@ t/pmc/boolean.t
 t/pmc/coroutine.t
 t/pmc/eval.t
 t/pmc/intlist.t
+t/pmc/io.t
 t/pmc/iter.t
 t/pmc/managedstruct.t
 t/pmc/multiarray.t

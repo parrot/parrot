@@ -64,7 +64,9 @@ inline op fdopen(out PMC, in INT, in STR) {
      qualifier -lt
    */
   if(io) {
-    $1 = new_io_pmc(interpreter, io);
+    $1 = pmc_new_noinit(interpreter, enum_class_ParrotIO);
+    VTABLE_init(interpreter, $1);
+    PMC_data($1) = io;
   }
   else {
     $1 = pmc_new(interpreter, enum_class_PerlUndef);
@@ -89,7 +91,6 @@ inline op open(out PMC, in STR, in STR) {
   /* These char * need to go away soon */
   const char * path, * mode;
 
-  /* FIXME: potential infant mortality problem */
   path = string_to_cstring(interpreter, $2);
   mode = string_to_cstring(interpreter, $3);
 
@@ -97,7 +98,9 @@ inline op open(out PMC, in STR, in STR) {
   /* string_cstring_free(mode); */
   /* string_cstring_free(path); */
   if(io) {
-    $1 = new_io_pmc(interpreter, io);
+    $1 = pmc_new_noinit(interpreter, enum_class_ParrotIO);
+    VTABLE_init(interpreter, $1);
+    PMC_data($1) = io;
   }
   else {
     $1 = pmc_new(interpreter, enum_class_PerlUndef);

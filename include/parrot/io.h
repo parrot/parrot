@@ -298,7 +298,6 @@ extern ParrotIOLayer *PIO_pop_layer(theINTERP, ParrotIO *);
 extern ParrotIOLayer *PIO_copy_stack(ParrotIOLayer *);
 
 
-extern struct PMC *new_io_pmc(struct Parrot_Interp *, ParrotIO *);
 extern void free_io_header(ParrotIO *);
 extern ParrotIOTable alloc_pio_array(int);
 extern int realloc_pio_array(ParrotIOTable *, int);

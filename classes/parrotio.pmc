@@ -1,0 +1,33 @@
+/* ParrotIO.pmc
+ *  Copyright: (When this is determined...it will go here)
+ *  CVS Info
+ *     $Id$
+ *  Overview:
+ *     These are the vtable functions for Parrot IO
+ *  Data Structure and Algorithms:
+ *  History:
+ *     Initial version by leo 2003/06/23
+ *  Notes:
+ *  References:
+ */
+
+#include "parrot/parrot.h"
+
+pmclass ParrotIO {
+
+    STRING* name () {
+	return whoami;
+    }
+
+    void init () {
+	PObj_active_destroy_SET(SELF);
+	PObj_needs_early_DOD_SET(SELF);
+	interpreter->has_early_DOD_PMCs = 1;
+    }
+
+    void destroy () {
+	if (PMC_data(SELF)) {
+	    PIO_close(interpreter, (ParrotIO*)(PMC_data(SELF)));
+	}
+    }
+}
