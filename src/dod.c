@@ -840,7 +840,7 @@ find_common_mask(size_t val1, size_t val2)
     int i;
     int bound = sizeof(size_t) * 8;
 
-    for (i = 0; i < bound; i++) {
+    for (i = 0; i <= bound; i++) {
         if (val1 == val2) {
             return ~(size_t)0 << i;
         }
