@@ -9,6 +9,7 @@ PLATFORM_SETUP:
 	ret
 SCREEN_CLEAR:
 	bsr WIN32_SCREEN_CLEAR
+	set I14, 0	# Column position for tab()
 	ret
 
 

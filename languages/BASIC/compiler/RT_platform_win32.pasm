@@ -73,7 +73,6 @@ WIN32_CONSOLE_HOME:
 	set P5, P24["handle"]
 	set I5, 0
 	invoke
-	set I14, 0	# Column position for tab()
 	ret
 
 WIN32_CONSOLE_CLEAR:
