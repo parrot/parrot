@@ -21,7 +21,7 @@ use Test::More;
 use Parrot::Config;
 
 if ($PConfig{gmp}) {
-   plan tests => 15;
+   plan tests => 19;
 }
 else {
    plan skip_all => "No BigInt Lib configured";
@@ -157,9 +157,16 @@ output_is(<<'CODE', <<'OUT', "add");
    set S0, P2
    print S0
    print "\n"
+   set P0, "12345678987654321"
+   set P1, "10000000000000000"
+   add P2, P1, P0
+   set S0, P2
+   print S0
+   print "\n"
    end
 CODE
 1999999
+22345678987654321
 OUT
 
 output_is(<<'CODE', <<'OUT', "add_int");
@@ -170,10 +177,109 @@ output_is(<<'CODE', <<'OUT', "add_int");
    set S0, P2
    print S0
    print "\n"
+   set P0, "100000000000000000000"
+   add P2, P0, 1000000
+   set S0, P2
+   print S0
+   print "\n"
    end
 CODE
 1999999
+100000000000001000000
 OUT
+
+output_is(<<'CODE', <<'OUTPUT', "sub bigint");
+     new P0, .BigInt
+     set P0, 12345678
+     new P1, .BigInt
+     set P1, 5678
+     new P2, .BigInt
+     sub P2, P0, P1
+     set I0, P2
+     eq I0, 12340000, OK1
+     print "not "
+OK1: print "ok 1\n"
+     set P0, "123456789012345678"
+     sub P2, P0, P1
+     new P3, .BigInt
+     set P3, "123456789012340000"
+     eq P2, P3, OK2
+     print "not "
+OK2: print "ok 2\n"
+     set P1, "223456789012345678"
+     sub P2, P0, P1
+     set P3, "-100000000000000000"
+     eq P2, P3, OK3
+     print "not "
+OK3: print "ok 3\n"
+     end
+CODE
+ok 1
+ok 2
+ok 3
+OUTPUT
+
+output_is(<<'CODE', <<'OUTPUT', "sub native int");
+     new P0, .BigInt
+     set P0, 12345678
+     new P2, .BigInt
+     sub P2, P0, 5678
+     set I0, P2
+     eq I0, 12340000, OK1
+     print "not "
+OK1: print "ok 1\n"
+     set P0, "123456789012345678"
+     sub P2, P0, 5678
+     new P3, .BigInt
+     set P3, "123456789012340000"
+     eq P2, P3, OK2
+     print "not "
+OK2: print "ok 2\n"
+     end
+CODE
+ok 1
+ok 2
+OUTPUT
+
+output_is(<<'CODE', <<'OUTPUT', "sub other int");
+     new P0, .BigInt
+     set P0, 12345678
+     new P1, .PerlInt
+     set P1, 5678
+     new P2, .BigInt
+     sub P2, P0, P1
+     set I0, P2
+     eq I0, 12340000, OK1
+     print "not "
+OK1: print "ok 1\n"
+     set P0, "123456789012345678"
+     sub P2, P0, P1
+     new P3, .BigInt
+     set P3, "123456789012340000"
+     eq P2, P3, OK2
+     print "not "
+OK2: print "ok 2\n"
+     set P0, 9876543
+     new P4, .Integer
+     set P4, 44
+     sub P2, P0, P4
+     set I0, P2
+     eq I0, 9876499, OK3
+     print "not "
+OK3: print "ok 3\n"
+     set P0, "9876543219876543"
+     sub P2, P0, P4
+     set P3, "9876543219876499"
+     eq P3, P2, OK4
+     print "not "
+OK4: print "ok 4\n"
+     end
+CODE
+ok 1
+ok 2
+ok 3
+ok 4
+OUTPUT
 
 output_is(<<'CODE', <<'OUT', "mul");
    new P0, .BigInt
@@ -360,7 +466,7 @@ OUTPUT
 
 output_is(<<"CODE", <<'OUTPUT', "Truth");
      new P0, .BigInt
-     set P0, "10000000000"
+     set P0, "123456789123456789"
      if P0, OK1
      print "not "
 OK1: print "ok 1\\n"
@@ -372,4 +478,18 @@ OK2: print "ok 2\\n"
 CODE
 ok 1
 ok 2
+OUTPUT
+
+output_is(<<"CODE", <<'OUTPUT', "neg");
+     new P0, .BigInt
+     new P1, .BigInt
+     set P0, "123456789123456789"
+     neg P0
+     set P1, "-123456789123456789"
+     eq P0, P1, OK1
+     print "not "
+OK1: print "ok 1\\n"
+     end
+CODE
+ok 1
 OUTPUT
