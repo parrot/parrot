@@ -1298,11 +1298,11 @@ languages/befunge/load.pasm
 languages/befunge/maths.pasm
 languages/befunge/stack.pasm
 languages/befunge/test.bef
-languages/brainfuck/README
-languages/brainfuck/brainfuck.pasm
-languages/brainfuck/countdown.bf
-languages/brainfuck/helloworld.bf
-languages/brainfuck/test.bf
+languages/bf/README
+languages/bf/brainfuck.pasm
+languages/bf/countdown.bf
+languages/bf/helloworld.bf
+languages/bf/test.bf
 languages/cola/MAINTAINER
 languages/cola/Makefile
 languages/cola/README
