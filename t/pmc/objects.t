@@ -467,7 +467,7 @@ output_is(<<'CODE', <<'OUTPUT', "attribute values and subclassing");
     new P2, I0
     classoffset I1, P2, "Foo"
     new P3, I0
-    classoffset I3, P3, "Bar"
+    classoffset I3, P3, "Foo"
  
 # Note that setattribute holds the actual PMC, not a copy, so
 # in this test both attributes get the PMC from P4, and should
