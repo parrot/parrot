@@ -86,8 +86,6 @@ Parrot_exec(struct Parrot_Interp *interpreter, opcode_t *pc,
     bhs = obj->bytecode_header_size / sizeof(opcode_t);
     add_data_member(obj, &bhs, 4);
 
-    /* obj->text.code = (char *)mem_sys_allocate_zeroed(jit_info->arena.size); */
-
     obj->text.code = jit_info->arena.start;
     obj->text.size = jit_info->arena.size;
 
@@ -270,8 +268,7 @@ Parrot_exec_add_text_rellocation(Parrot_exec_objfile_t *obj, char *nptr,
             break;
         case RTYPE_DATA:
             symbol_number = Parrot_exec_add_symbol(obj, symbol, STYPE_GDATA);
-            /* symbol_number = 6; */
-            new_relloc->fixup = new_fixup(FIXUP_BYTECODE,(void *)(nptr + disp));
+            new_relloc->fixup = new_fixup(FIXUP_BYTECODE,(void *)(nptr+disp));
             break;
     }
             
