@@ -353,8 +353,13 @@ free_unused_pobjects(struct Parrot_Interp *interpreter,
                     if (PObj_active_destroy_TEST(b))
                         ((PMC *)b)->vtable->destroy(interpreter, (PMC *)b);
                 }
+                /* else object is a buffer(like) */
+                else if (PObj_sysmem_TEST(b) && b->bufstart) {
+                    /* has sysmem allocated, e.g. string_pin */
+                    mem_sys_free(b->bufstart);
+                    memset(b + 1, 0, wash_size);
+                }
                 else {
-                    /* else object is a buffer(like) */
 #ifdef GC_IS_MALLOC
                     /* free allocated space at bufstart,
                      * but not if it is used COW or external

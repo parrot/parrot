@@ -224,6 +224,13 @@ typedef enum PObj_enum {
 #define PObj_is_string_SET(o) PObj_flag_SET(is_string, o)
 #define PObj_is_string_CLEAR(o) PObj_flag_CLEAR(is_string, o)
 
+#define PObj_immobile_TEST(o) PObj_flag_TEST(immobile, o)
+#define PObj_immobile_SET(o) PObj_flag_SET(immobile, o)
+#define PObj_immobile_CLEAR(o) PObj_flag_CLEAR(immobile, o)
+
+#define PObj_sysmem_TEST(o) PObj_flag_TEST(sysmem, o)
+#define PObj_sysmem_SET(o) PObj_flag_SET(sysmem, o)
+#define PObj_sysmem_CLEAR(o) PObj_flag_CLEAR(sysmem, o)
 
 #define PObj_special_SET(flag, o) do { \
     PObj_flag_SET(flag, o); \

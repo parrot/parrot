@@ -319,13 +319,13 @@ string_index(const STRING *s, UINTVAL idx)
 
 /* string_str_index_multibyte:  Helper function for string_str_index.
  * This implements a naive substring search, but one that is guaranteed to
- * work for all encodings. 
+ * work for all encodings.
  */
 static INTVAL
 string_str_index_multibyte(struct Parrot_Interp *interpreter,
         const STRING *str, const STRING *find, UINTVAL start)
 {
-    const void* const lastmatch = 
+    const void* const lastmatch =
         str->encoding->skip_backward((char*)str->strstart + str->strlen,
                             find->encoding->characters(find, find->strlen));
     const void* const lastfind  = (char*)find->strstart + find->strlen;
@@ -338,26 +338,26 @@ string_str_index_multibyte(struct Parrot_Interp *interpreter,
     while (sp < lastmatch) {
         fp = find->strstart;
         ip = sp;
-        
+
         for (; fp < lastfind; fp = find->encoding->skip_forward(fp, 1),
                               ip =  str->encoding->skip_forward(ip, 1)) {
             if (find->encoding->decode(fp) != str->encoding->decode(ip))
                 break;
         }
-        
+
         if (fp == lastfind) {
             return pos;
         }
-        
+
         sp = str->encoding->skip_forward(sp, 1);
         pos++;
     }
-    
+
     return -1;
 }
 
 /* string_str_index_singlebyte: Helper function for string_str_index.
- * This is optimized for the simple case where both strings are in 
+ * This is optimized for the simple case where both strings are in
  * encoding_singlebyte.  It implements the Boyer-Moore string search
  * algorithm.
  */
@@ -369,7 +369,7 @@ string_str_index_singlebyte(struct Parrot_Interp *interpreter,
     const unsigned char* const str_strstart  = str->strstart;
     const UINTVAL              find_strlen   = find->strlen;
     const UINTVAL              str_strlen    = str->strlen;
-    const unsigned char* const lastmatch     = 
+    const unsigned char* const lastmatch     =
                                    str_strstart + str_strlen - find_strlen;
     UINTVAL* p;
     const unsigned char* cp;
@@ -1238,7 +1238,7 @@ string_to_cstring(struct Parrot_Interp * interpreter, STRING * s)
 #endif
 }
 
-/* 
+/*
    free up a string returned by string_to_cstring. Hopefully this can
    be a noop at some point, as it's got all sorts of leak potential otherwise.
  */
@@ -1247,54 +1247,67 @@ string_cstring_free(void *ptr) {
     free(ptr);
 }
 
+/*for api string_pin
+ * replace the managed buffer memory by system memory
+ */
 void
 string_pin(struct Parrot_Interp * interpreter, STRING * s) {
     void *memory;
     INTVAL size;
-    
+
     /* If this string is marked as immobile, external memory, starts
     in external memory, is already from system memory, or is a
     constant, we just don't do this */
-    if (s->obj.flags & (PObj_immobile_FLAG | PObj_external_FLAG |
+    if (PObj_get_FLAGS(s) & (PObj_immobile_FLAG | PObj_external_FLAG |
                         PObj_bufstart_external_FLAG | PObj_sysmem_FLAG |
                         PObj_constant_FLAG)) {
         return;
     }
 
+    /* XXX -lt: COW strings have the external_FLAG set, so this will
+     *          not work for these
+     *          so probably only sysmem should be tested
+     */
     unmake_COW(interpreter, s);
-    Parrot_block_GC(interpreter);
-    Parrot_block_DOD(interpreter);
     size = s->buflen;
     memory = mem_sys_allocate(size);
-    memcpy(memory, s->bufstart, size);
+    mem_sys_memcopy(memory, s->bufstart, size);
     s->bufstart = memory;
     /* Mark the memory as both from the system and immobile */
-    s->obj.flags = s->obj.flags | (PObj_immobile_FLAG | PObj_sysmem_FLAG);
-    Parrot_unblock_GC(interpreter);
-    Parrot_unblock_DOD(interpreter);
+    PObj_flags_SETTO(s, PObj_get_FLAGS(s) |
+        (PObj_immobile_FLAG | PObj_sysmem_FLAG));
 }
+
+/*for api string_unpin
+ * undo a string_pin: used managed memory
+ */
 
 void
 string_unpin(struct Parrot_Interp * interpreter, STRING * s) {
     void *memory;
     INTVAL size;
 
-    /* If this string is marked as immobile, external memory, starts
-    in external memory, is already from system memory, or is a
-    constant, we just don't do this */
-    if (!(s->obj.flags & (PObj_immobile_FLAG | PObj_sysmem_FLAG))) {
+    /* If this string is not marked using system memory,
+     * we just don't do this
+     */
+    if (!(PObj_sysmem_TEST(s))) {
         return;
     }
 
-    unmake_COW(interpreter, s);
+    /* unmake_COW(interpreter, s); XXX -lt: can not be cowed ??? */
     size = s->buflen;
     /* We need a handle on the fixed memory so we can get rid of it
        later */
     memory = s->bufstart;
-    /* Reallocate it the same size */
-    Parrot_reallocate_string(interpreter, s, size);
+    /* Reallocate it the same size
+     * NOTE can't use Parrot_reallocate_string because of the LEA
+     * allocator, where this is a noop for the same size
+     */
+    Parrot_allocate_string(interpreter, s, size);
+    mem_sys_memcopy(s->bufstart, memory, size);
     /* Mark the memory as neither immobile nor system allocated */
-    s->obj.flags &= !(PObj_immobile_FLAG | PObj_sysmem_FLAG);
+    PObj_immobile_CLEAR(s);
+    PObj_sysmem_CLEAR(s);
     /* Free up the memory */
     mem_sys_free(memory);
 }
