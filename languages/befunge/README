@@ -1,6 +1,6 @@
 DESCRIPTION
 -----------
-This is a Befunge interpreter written in Parrot assembler, version 0.1.0
+This is a Befunge interpreter written in Parrot assembler, version 0.1.1
 
 This interpreter should be Befunge-93 compliant. This means the
 playfield is limited to 80x25. This should also mean that the torus
@@ -17,7 +17,8 @@ Then you can run your Befunge program with:
      $ ../../parrot befunge.pbc [-d] foo.bef
 
 The -d flag enables debugging within the befunge interpreter (not yet
-fully implemented, this is a work in progress).
+fully implemented, this is a work in progress). Type 'help' in the
+debugger to see the commands supported.
 
 
 FILES

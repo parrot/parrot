@@ -1,24 +1,17 @@
 # Initialize the debug structure.
-# P3 = [ 1, "000 ... 000", [x1, x2, ...], [y1, y2, ...], [x1,y1, x2,y2, ...] ]
+# P3 = [ 1, { "<" => 1, "10,10" => 1, "r:6" => 1, "c:3" => 1, ... } ]
 # P3[0] = stop at each step
-# P3[1] = a 128 chars length string, 0 or 1 depending wether the
-#         interpreter should stop at the corresponding character.
-# P3[2] = a PerlArray of column index that should stop the interpreter.
-# P3[3] = a PerlArray of row index that should stop the interpreter.
-# P3[4] = a PerlArray of 2d coord that should stop the interpreter.
+# P3[1] = a PerlHash which keys are either the char to break upon
+#         when reaching it, or a location "y,x", or a column "c:nn"
+#         or a row "r:nn"
 DEBUG_INITIALIZE:
         pushi
         pushs
         new P3, .PerlArray
         set P3[0], 1          # Stop at first step.
         repeat S10, "0", 128  # No char to break on.
-        set P3[1], S10
-        new P4, .PerlArray    # No col to break on.
-        set P3[2], P4
-        new P4, .PerlArray    # No row to break on.
-        set P3[3], P4
-        new P4, .PerlArray    # No coord to break on.
-        set P3[4], P4
+        new P4, .PerlHash
+        set P3[1], P4         # The breakpoints.
         pops
         popi
         ret
@@ -29,12 +22,45 @@ DEBUG_INITIALIZE:
 DEBUG_CHECK_BREAKPOINT:
         pushi
         pushs
+        pushp
         set I10, P3[0]
         eq 0, I10, DEBUG_CHECK_BREAKPOINT_CHAR
         bsr DEBUG_INTERACT
         branch DEBUG_CHECK_BREAKPOINT_END
 DEBUG_CHECK_BREAKPOINT_CHAR:
-DEBUG_CHECK_BREAKPOINT_END:     
+        set P4, P3[1]
+        exists I10, P4[S0]
+        eq 0, I10, DEBUG_CHECK_BREAKPOINT_COORD
+        bsr DEBUG_INTERACT
+        branch DEBUG_CHECK_BREAKPOINT_END
+DEBUG_CHECK_BREAKPOINT_COORD:
+        set S10, I0
+        concat S10, ","
+        set S11, I1
+        concat S10, S11
+        exists I10, P4[S10]
+        eq 0, I10, DEBUG_CHECK_BREAKPOINT_ROW
+        bsr DEBUG_INTERACT
+        branch DEBUG_CHECK_BREAKPOINT_END
+DEBUG_CHECK_BREAKPOINT_ROW:
+        set S10, "r:"
+        set S11, I1
+        concat S10, S11
+        exists I10, P4[S10]
+        eq 0, I10, DEBUG_CHECK_BREAKPOINT_COL
+        bsr DEBUG_INTERACT
+        branch DEBUG_CHECK_BREAKPOINT_END
+DEBUG_CHECK_BREAKPOINT_COL:     
+        set S10, "c:"
+        set S11, I0
+        concat S10, S11
+        exists I10, P4[S10]
+        eq 0, I10, DEBUG_CHECK_BREAKPOINT_END
+        bsr DEBUG_INTERACT
+        # Fallback
+        # branch DEBUG_CHECK_BREAKPOINT_END
+DEBUG_CHECK_BREAKPOINT_END:
+        popp
         pops
         popi
         ret
@@ -66,7 +92,11 @@ DEBUG_INTERACT:
         print "Unknown instruction. Type help for help.\n"
         branch DEBUG_INTERACT
 DEBUG_INTERACT_BREAK:
-        print "Not yet implemented...\n"
+        substr S11, S10, 0, 6, ""
+        pushp
+        set P4, P3[1]    
+        set P4[S10], 1      # stop at specified breakpoint
+        popp
         branch DEBUG_INTERACT
 DEBUG_INTERACT_CONTINUE:
         set P3[0], 0        # do not stop at next instruction
@@ -78,8 +108,10 @@ DEBUG_INTERACT_HELP:
         print "Available commands are:\n"
         print " status        - print state of current IP\n"
         print " dump          - dump playfield\n"
-        print " break char c  - set a breakpoint on character c\n"
-        print " break at x,y  - set a breakpoint at coords (x,y)\n"
+        print " break c       - set a breakpoint on character c\n"
+        print " break x,y     - set a breakpoint at coords (x,y)\n"
+        print " break c:x     - set a breakpoint on column x\n"
+        print " break r:y     - set a breakpoint on row y\n"
         print " list          - list breakpoints\n"
         print " next          - step one befunge instruction\n"
         print " continue      - resume execution\n"
