@@ -5,3 +5,4 @@ imcparser.h
 imcparser.output
 Makefile
 *.tmp
+*.flag

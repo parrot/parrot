@@ -17,8 +17,7 @@ IMCC_O_FILES = imcparser$(O) imclexer$(O) imc$(O) stacks$(O) symreg$(O) \
 	optimizer$(O) pbc$(O) main$(O) parser_util$(O) jit$(O)
 
 
-O_FILES = $(IMCC_O_FILES) \
-	../../$(PARROTLIB)
+O_FILES = $(IMCC_O_FILES) ../../$(PARROTLIB)
 
 #DO NOT ADD C COMPILER FLAGS HERE
 #Add them in Configure.pl--look for the
@@ -30,9 +29,9 @@ C_LIBS = ${libs}
 
 CC = ${cc}
 PERL = ${perl}
-MAKE_F=${make}
-YACC = bison -v -y
-LEX = flex
+YACC = ${yacc}
+LEX = ${lex}
+TOUCH  = perl -e ${PQ}open(A,q{>>},$$_) or die foreach @ARGV${PQ}
 
 LD = ${ld}
 LD_SHARED = ${ld_shared}
@@ -40,19 +39,29 @@ LD_OUT = ${ld_out}
 LINK = ${link}
 LINKFLAGS=${linkflags} ${ld_debug}
 
+#
+# This is set to  MAKE=$make if your $make command doesn't
+# do it for you.
+#
+${make_set_make}
+
+
 all : imcc${exe}
 
 ../../$(PARROTLIB): ../../parrot$(EXE)
 	cd ..${slash}.. && $(MAKE) $(PARROTLIB) && cd languages${slash}imcc
 
-.PHONY : FORCE
-FORCE :
+# The .flag files are needed because we are keeping some derived files in CVS,
+# which does not keep accurate timestamps on the files, relative to each other.
+# Note that YACC or LEX may be null commands, so we must `touch` all the
+# target files, instead of just the .flag files.
+imcc.y.flag imcparser.c imcparser.h: imcc.y
+	$(YACC) imcc.y -d -o imcparser.c
+	$(TOUCH) imcc.y.flag imcparser.c imcparser.h
 
-imcparser.c imcparser.h : imcc.y FORCE
-	$(PERL) rebuild.pl ${PQ}$(YACC) imcc.y -d -o imcparser.c${PQ} imcc.y imcparser.h imcparser.c
-
-imclexer.c : imcc.l FORCE
-	$(PERL) rebuild.pl ${PQ}$(LEX) imcc.l${PQ} imcc.l
+imcc.l.flag imclexer.c: imcc.l
+	$(LEX) imcc.l
+	$(TOUCH) imcc.l.flag imclexer.c
 
 .c$(O):
 	$(CC) $(CFLAGS) ${cc_exe_out}$@ -c $<

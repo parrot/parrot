@@ -85,6 +85,13 @@ sub runstep {
 
     configdate    => scalar localtime,
     PQ            => "'",
+
+    # yacc = Automatic parser generator
+    # lex  = Automatic lexer  generator
+    # Some systems may lack these
+    yacc          => 'bison -v -y',
+    lex           => 'flex',
+    
   );
 
   *get=sub {

@@ -6,14 +6,14 @@ use Parrot::Configure::Step ':inter';
 
 $description = 'Determining what C compiler and linker to use...';
 
-@args = qw(ask cc link ld ccflags ccwarn linkflags ldflags libs debugging);
+@args = qw(ask cc link ld ccflags ccwarn linkflags ldflags libs debugging lex yacc);
 
 sub runstep {
   my %args;
   @args{@args}=@_;
   
-  my($cc, $link, $ld, $ccflags, $linkflags, $ldflags, $libs) = 
-      Configure::Data->get(qw(cc link ld ccflags linkflags ldflags libs));
+  my($cc, $link, $ld, $ccflags, $linkflags, $ldflags, $libs, $lex, $yacc) = 
+      Configure::Data->get(qw(cc link ld ccflags linkflags ldflags libs lex yacc));
   $ccflags =~ s/-D(PERL|HAVE)_\w+\s*//g;
   $ccflags =~ s/-fno-strict-aliasing//g;
   $linkflags =~ s/-libpath:\S+//g;
@@ -24,6 +24,20 @@ sub runstep {
   $libs=join ' ',
            grep { $^O=~/VMS|MSWin/ || !/^-l(c|gdbm|dbm|ndbm|db)$/ }
            split(' ', $libs);
+
+  # Try each alternative, until one works.
+  # If none work, then set to null command.
+  # XXX need config support for a null command.
+  my $first_working = sub {
+    my $null = $^O eq 'Win32' ? 'REM' : '#';
+    foreach (@_) {
+      `$_ -h 2>&1`;
+      return $_ if not $?;
+    }
+    return $null;
+  };
+  $lex  = &$first_working($lex,  'flex', 'lex'                 );
+  $yacc = &$first_working($yacc, 'bison -v -y', 'yacc', 'byacc');
   
   $cc=$args{cc}           if defined $args{cc};
   $link=$args{link}       if defined $args{link};
@@ -34,6 +48,8 @@ sub runstep {
   $libs=$args{libs}       if defined $args{libs};
   $debug='y'              if defined $args{debugging};
   $cc_warn=$args{ccwarn}  if defined $args{ccwarn};
+  $cc_warn=$args{lex}     if defined $args{lex};
+  $cc_warn=$args{yacc}    if defined $args{yacc};
   
   if($args{ask}) {
     print <<'END';
@@ -56,6 +72,8 @@ END
     $ldflags=prompt("And your $ld for building shared libraries?", $ldflags);
     $libs=prompt("What libraries should your C compiler use?", $libs);
     $debug=prompt("Do you want a debugging build of Parrot?", $debug);
+    $lex=prompt("Do you have a lexical analyzer generator, like flex or lex?",$lex);
+    $yacc=prompt("Do you have a parser generator, like bison or yacc?",$yacc);
   }
 
   if(!$debug || $debug =~ /n/i) {
@@ -74,7 +92,9 @@ END
     linkflags => $linkflags,
     ldflags => $ldflags,
     libs    => $libs,
-    cc_warn => $cc_warn
+    cc_warn => $cc_warn,
+    lex     => $lex,
+    yacc    => $yacc,
   );
 }
 
