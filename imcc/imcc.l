@@ -128,7 +128,7 @@ SP              [ ]
                       valp->s = str_dup(yytext);
                       return FILECOMMENT;
                }
-<cmt3>["]{EOL}    { BEGIN(prev_state) ; line++; }
+<cmt3>["]      { BEGIN(cmt4); }
 
 <*>setfile{SP}+["]   { prev_state = YYSTATE; BEGIN(cmt2); }
 <*>setline{SP}+      { prev_state = YYSTATE; BEGIN(cmt1); }
@@ -137,7 +137,7 @@ SP              [ ]
                        BEGIN(cmt4);
                        return LINECOMMENT;
                }
-<cmt4>{WS}*{EOL}  { BEGIN(prev_state) ; line++; }
+<cmt4>.*{EOL}  { BEGIN(prev_state) ; line++; }
 
 <INITIAL,emit>{EOL} {
         if (expect_pasm == 2)
