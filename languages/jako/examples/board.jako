@@ -1,0 +1,46 @@
+#
+# board.jako
+#
+# An example that prints a Chess board using simple looping constructs.
+#
+# Copyright (C) 2001-2003 Gregor N. Purdy. All rights reserved.
+# This program is free software. It is subject to the same
+# license as the Parrot interpreter.
+#
+# $Id$
+#
+
+sub print {op} (str s);
+
+var int rank, file;
+var int temp;
+
+rank = 7;
+
+print("  +---+---+---+---+---+---+---+---+\n");
+
+while(rank >= 0) {
+  temp = rank + 1;
+  file = 0;
+
+  print("$temp |");
+
+  while(file < 8) {
+    temp = rank + file;
+    temp %= 2;
+ 
+    if (temp == 1) {
+      print("   |");
+    } else {
+      print(" * |");
+    }
+
+    file++;
+  }
+
+  print("\n");
+  print("  +---+---+---+---+---+---+---+---+\n");
+  rank--;
+}
+
+print("    A   B   C   D   E   F   G   H  \n");
