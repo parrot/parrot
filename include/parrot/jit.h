@@ -221,6 +221,9 @@ void Parrot_jit_cpcf_op(Parrot_jit_info_t *jit_info,
 void Parrot_jit_normal_op(Parrot_jit_info_t *jit_info,
                           struct Parrot_Interp *interpreter);
 
+void Parrot_jit_restart_op(Parrot_jit_info_t *jit_info,
+                          struct Parrot_Interp *interpreter);
+
 Parrot_jit_optimizer_t *optimize_jit(struct Parrot_Interp *interpreter,
             opcode_t *pc, opcode_t *code_start, opcode_t *code_end);
 

@@ -1,6 +1,6 @@
 #! perl -w
 
-use Parrot::Test tests => 33;
+use Parrot::Test tests => 35;
 use Test::More;
 
 output_is(<<CODE, <<OUTPUT, "set_n_nc");
@@ -962,6 +962,34 @@ CODE
 9.876540
 1.234560
 -100.200300
+OUTPUT
+
+output_is(<<'CODE', <<OUTPUT, "op_n_nc_nc");
+    add N1, 2.0, 3.0
+    print N1
+    print "\n"
+    sub N1, 2.0, 4.0
+    print N1
+    print "\n"
+    end
+CODE
+5.000000
+-2.000000
+OUTPUT
+
+output_is(<<'CODE', <<OUTPUT, "lt_nc_nc_ic");
+    lt 2.0, 1.0, nok
+    print "ok 1\n"
+    lt 3.0, 4.0, ok_2
+nok:
+    print "nok\n"
+    end
+ok_2:
+    print "ok 2\n"
+    end
+CODE
+ok 1
+ok 2
 OUTPUT
 
 1;

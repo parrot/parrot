@@ -149,10 +149,16 @@ print JITCPU<<END_C;
 #define Parrot_jit_vtable1_op Parrot_jit_normal_op
 #define Parrot_jit_vtable1r_op Parrot_jit_normal_op
 #define Parrot_jit_vtable2_op Parrot_jit_normal_op
+#define Parrot_jit_vtable2rk_op Parrot_jit_normal_op
 #define Parrot_jit_vtable3_op Parrot_jit_normal_op
+#define Parrot_jit_vtable31_op Parrot_jit_normal_op
+#define Parrot_jit_vtable3k_op Parrot_jit_normal_op
 #define Parrot_jit_vtable_ifp_op Parrot_jit_cpcf_op
 #define Parrot_jit_vtable_unlessp_op Parrot_jit_cpcf_op
 #define Parrot_jit_vtable_newp_ic_op Parrot_jit_normal_op
+
+/* define dummy, until architecure have this implemented */
+#define Parrot_jit_restart_op Parrot_jit_cpcf_op
 
 #include"parrot/jit_emit.h"
 
@@ -219,6 +225,22 @@ for ($i = 0; $i < $core_numops; $i++) {
 	    $extern = vtable_num($1);
 	    #print $op->full_name .": $jit_func $extern\n";
 	}
+	# *) $1 = $2->vtable->{vtable}(interp, $2, &key)
+	elsif ($opbody =~ /
+	core.ops"\s+
+	(?:INTVAL\s+key\s+=\s+{{\@3}};\s+)
+	{{\@1}}\s*=\s*
+	{{\@2}}->vtable->
+	(\w+)
+	\(interpreter,
+	\s*
+	{{\@2}},\s*&key
+	\);
+	\s+{{\+=\d}}/xm) {
+	    $jit_func = "Parrot_jit_vtable2rk_op";
+	    $extern = vtable_num($1);
+	    #print $op->full_name .": $jit_func $extern\n";
+	}
 	# *) $1->vtable->{vtable}(interp, $1, $2)
 	elsif ($opbody =~ /
 	core.ops"\s+
@@ -243,7 +265,22 @@ for ($i = 0; $i < $core_numops; $i++) {
 	{{\@1}},\s*{{\@2}},\s*{{\@1}}
 	\);
 	\s+{{\+=\d}}/xm) {
-	    $jit_func = "Parrot_jit_vtable3_op";
+	    $jit_func = "Parrot_jit_vtable31_op";
+	    $extern = vtable_num($1);
+	    #print $op->full_name .": $jit_func $extern\n";
+	}
+	# *) $1->vtable->{vtable}(interp, $1, &key, $3)
+	elsif ($opbody =~ /
+	core.ops"\s+
+	(?:INTVAL\s+key\s+=\s+{{\@2}};\s+)
+	{{\@1}}->vtable->
+	(\w+)
+	\(interpreter,
+	\s*
+	{{\@1}},\s*&key,\s*{{\@3}}
+	\);
+	\s+{{\+=\d}}/xm) {
+	    $jit_func = "Parrot_jit_vtable3k_op";
 	    $extern = vtable_num($1);
 	    #print $op->full_name .": $jit_func $extern\n";
 	}
@@ -281,6 +318,9 @@ for ($i = 0; $i < $core_numops; $i++) {
 	    #print "$jit_func $extern\n";
 	}
 
+	elsif ($op->jump =~ /JUMP_RESTART/ ) {
+	    $jit_func = "Parrot_jit_restart_op";
+        }
 	elsif ($op->jump) {
 	    $jit_func = "Parrot_jit_cpcf_op";
 	} else {

@@ -48,23 +48,21 @@ Parrot_set_s_s {
     Parrot_set_x_x s/<_N>/_i/ s/INT_R/STRING_R/
 }
 
-Parrot_set_i_ic {
+TEMPLATE Parrot_set_x_ic {
     if (MAP[1]) {
-        jit_emit_mov_ri_i(NATIVECODE, MAP[1], *INT_CONST[2]);
+        jit_emit_mov_ri<_N>(NATIVECODE, MAP[1], <typ>_CONST[2]);
     }
     else {
-        jit_emit_mov_mi_ii(NATIVECODE, &INT_REG[1], *INT_CONST[2]);
+        jit_emit_mov_mi<_N>(NATIVECODE, &INT_REG[1], <typ>_CONST[2]);
     }
 }
 
+Parrot_set_i_ic {
+    Parrot_set_x_ic s/<_N>/_i/ s/<typ>/*INT/
+}
+
 Parrot_set_n_ic {
-    if (MAP[1]) {
-    /* i387 needs address of int */
-        jit_emit_mov_ri_n(NATIVECODE, MAP[1], &INT_CONST[2]);
-    }
-    else {
-        jit_emit_mov_mi_ni(NATIVECODE, &NUM_REG[1], &INT_CONST[2]);
-    }
+    Parrot_set_x_ic s/<_N>/_ni/ s/<typ>/&INT/ s/INT_R/NUM_R/
 }
 
 Parrot_set_n_nc {
@@ -78,15 +76,37 @@ Parrot_set_n_nc {
 }
 
 Parrot_set_n_i {
+; store mapped int
     if (MAP[2]) {
         jit_emit_mov_mr_i(NATIVECODE, &INT_REG[2], MAP[2]);
     }
     if (MAP[1]) {
-        jit_emit_mov_ri_n(NATIVECODE, MAP[1], &INT_REG[2]);
+        jit_emit_mov_ri_ni(NATIVECODE, MAP[1], &INT_REG[2]);
     }
     else {
-        jit_emit_mov_ri_n(NATIVECODE, FSR1, &INT_REG[2]);
+        jit_emit_mov_ri_ni(NATIVECODE, FSR1, &INT_REG[2]);
         jit_emit_mov_mr_n(NATIVECODE, &NUM_REG[1], FSR1);
+    }
+}
+
+Parrot_set_i_n {
+    if (MAP[2]) {
+        jit_emit_mov_mr_in(NATIVECODE, &INT_REG[1], MAP[2]);
+    }
+    else {
+        jit_emit_mov_rm_n(NATIVECODE, FSR1, &NUM_REG[2]);
+        jit_emit_mov_mr_in(NATIVECODE, &INT_REG[1], FSR1);
+    }
+    if (MAP[1]) {
+        jit_emit_mov_rm_i(NATIVECODE, MAP[1], &INT_REG[1]);
+    }
+}
+
+Parrot_set_i_nc {
+    jit_emit_mov_rm_n(NATIVECODE, FSR1, &NUM_CONST[2]);
+    jit_emit_mov_mr_in(NATIVECODE, &INT_REG[1], FSR1);
+    if (MAP[1]) {
+        jit_emit_mov_rm_i(NATIVECODE, MAP[1], &INT_REG[1]);
     }
 }
 
@@ -108,6 +128,7 @@ TEMPLATE Parrot_binop_x_x {
         jit_emit_mov_mr<_N>(NATIVECODE, &INT_REG[1], ISR1);
     }
 }
+
 Parrot_mul_i_i {
     Parrot_binop_x_x s/<op>/mul/ s/<_N>/_i/
 }
@@ -148,24 +169,20 @@ Parrot_div_n_n {
     Parrot_binop_x_x s/<op>/div/ s/<_N>/_n/ s/ISR/FSR/ s/INT_R/NUM_R/
 }
 
-Parrot_mul_i_ic {
-    if (MAP[1]) {
-        jit_emit_mul_rir_i(NATIVECODE, MAP[1], *INT_CONST[2], MAP[1]);
-    }
-    else {
-        jit_emit_mov_rm_i(NATIVECODE, ISR1, &INT_REG[1]);
-        jit_emit_mul_rir_i(NATIVECODE, ISR1, *INT_CONST[2], ISR1);
-        jit_emit_mov_mr_i(NATIVECODE, &INT_REG[1], ISR1);
-    }
+Parrot_exchange_i_i {
+    Parrot_binop_x_x s/<op>/xchg/ s/<_N>/_i/
 }
 
-Parrot_mul_i_ic_ic {
-    if (MAP[1]) {
-        jit_emit_mov_ri_i(NATIVECODE, MAP[1], *INT_CONST[2] * *INT_CONST[3]);
-    }
-    else {
-        jit_emit_mov_mi_ii(NATIVECODE, &INT_REG[1], *INT_CONST[2] * *INT_CONST[3]);
-    }
+Parrot_exchange_s_s {
+    Parrot_binop_x_x s/<op>/xchg/ s/<_N>/_i/ s/INT_R/STRING_R/
+}
+
+Parrot_exchange_p_p {
+    Parrot_binop_x_x s/<op>/xchg/ s/<_N>/_i/ s/INT_R/PMC_R/
+}
+
+Parrot_exchange_n_n {
+    Parrot_binop_x_x s/<op>/xchg/ s/<_N>/_n/ s/INT_R/NUM_R/
 }
 
 Parrot_mul_i_i_ic {
@@ -219,12 +236,24 @@ Parrot_add_i_ic {
     Parrot_binop_x_xc s/<_N>/_i/ s/<op>/add/ s/<typ>/*INT/
 }
 
+Parrot_mul_i_ic {
+    Parrot_binop_x_xc s/<_N>/_i/ s/<op>/mul/ s/<typ>/*INT/
+}
+
 Parrot_add_n_nc {
     Parrot_binop_x_xc s/<_N>/_n/ s/<op>/add/ s/<typ>/&NUM/ s/ISR/FSR/ s/INT_R/NUM_R/
 }
 
 Parrot_sub_i_ic {
     Parrot_binop_x_xc s/<_N>/_i/ s/<op>/sub/ s/<typ>/*INT/
+}
+
+Parrot_bor_i_ic {
+    Parrot_binop_x_xc s/<_N>/_i/ s/<op>/bor/ s/<typ>/*INT/
+}
+
+Parrot_bxor_i_ic {
+    Parrot_binop_x_xc s/<_N>/_i/ s/<op>/bxor/ s/<typ>/*INT/
 }
 
 Parrot_sub_n_nc {
@@ -236,13 +265,90 @@ Parrot_mul_n_nc {
 }
 
 
-Parrot_add_i_ic_ic {
+TEMPLATE Parrot_binop_i_ic_ic {
     if (MAP[1]) {
-        jit_emit_mov_ri_i(NATIVECODE, MAP[1], *INT_CONST[2] + *INT_CONST[3]);
+        jit_emit_mov_ri_i(NATIVECODE, MAP[1],
+        (INTVAL)((uicast)*INT_CONST[2] <op> *INT_CONST[3]));
     }
     else {
-        jit_emit_mov_mi_ii(NATIVECODE, &INT_REG[1], *INT_CONST[2] + *INT_CONST[3]);
+        jit_emit_mov_mi_i(NATIVECODE, &INT_REG[1],
+        (INTVAL)((uicast)*INT_CONST[2] <op> *INT_CONST[3]));
     }
+}
+Parrot_mul_i_ic_ic {
+    Parrot_binop_i_ic_ic s!<op>!*! s/uicast/INTVAL/
+}
+
+Parrot_add_i_ic_ic {
+    Parrot_binop_i_ic_ic s/<op>/+/ s/uicast/INTVAL/
+}
+
+Parrot_sub_i_ic_ic {
+    Parrot_binop_i_ic_ic s/<op>/-/ s/uicast/INTVAL/
+}
+
+Parrot_div_i_ic_ic {
+    Parrot_binop_i_ic_ic s!<op>!/! s/uicast/INTVAL/
+}
+
+Parrot_cmod_i_ic_ic {
+    Parrot_binop_i_ic_ic s!<op>!%! s/uicast/INTVAL/
+}
+
+Parrot_band_i_ic_ic {
+    Parrot_binop_i_ic_ic s/<op>/&/ s/uicast/INTVAL/
+}
+
+Parrot_bor_i_ic_ic {
+    Parrot_binop_i_ic_ic s/<op>/|/ s/uicast/INTVAL/
+}
+
+Parrot_bxor_i_ic_ic {
+    Parrot_binop_i_ic_ic s/<op>/^/ s/uicast/INTVAL/
+}
+
+Parrot_shl_i_ic_ic {
+    Parrot_binop_i_ic_ic s/<op>/<</ s/uicast/INTVAL/
+}
+
+Parrot_shr_i_ic_ic {
+    Parrot_binop_i_ic_ic s/<op>/>>/ s/uicast/INTVAL/
+}
+
+Parrot_lsr_i_ic_ic {
+    Parrot_binop_i_ic_ic s/<op>/>>/ s/uicast/UINTVAL/
+}
+
+TEMPLATE Parrot_binop_n_nc_nc {
+    if (MAP[1]) {
+        jit_emit_mov_ri_n(NATIVECODE, MAP[1], &NUM_CONST[2]);
+        jit_emit_<op>_ri_n(NATIVECODE, MAP[1], &NUM_CONST[3]);
+    }
+    else {
+        jit_emit_mov_ri_n(NATIVECODE, FSR1, &NUM_CONST[2]);
+        jit_emit_<op>_ri_n(NATIVECODE, FSR1, &NUM_CONST[3]);
+        jit_emit_mov_mr_n(NATIVECODE, &NUM_REG[1], FSR1)
+    }
+}
+
+Parrot_add_n_nc_nc {
+    Parrot_binop_n_nc_nc s/<op>/add/
+}
+
+Parrot_sub_n_nc_nc {
+    Parrot_binop_n_nc_nc s/<op>/sub/
+}
+
+Parrot_mul_n_nc_nc {
+    Parrot_binop_n_nc_nc s/<op>/mul/
+}
+
+Parrot_div_n_nc_nc {
+    Parrot_binop_n_nc_nc s/<op>/div/
+}
+
+Parrot_cmod_n_nc_nc {
+    Parrot_binop_n_nc_nc s/<op>/cmod/
 }
 
 TEMPLATE Parrot_binop_x_x_xc {
@@ -284,6 +390,10 @@ Parrot_sub_n_n_nc {
 
 Parrot_div_i_i_ic {
     Parrot_binop_x_x_xc s/<_N>/_i/ s/<op>/div/ s/<typ>/*INT/
+}
+
+Parrot_mul_n_n_nc {
+    Parrot_binop_x_x_xc s/<_N>/_n/ s/<op>/mul/ s/<typ>/&NUM/ s/ISR/FSR/ s/INT_R/NUM_R/
 }
 
 Parrot_div_n_n_nc {
@@ -366,6 +476,10 @@ Parrot_sub_n_nc_n {
     Parrot_binop_x_xc_x s/<_N>/_n/ s/<op>/sub/ s/<typ>/&NUM/ s/ISR/FSR/ s/INT_R/NUM_R/
 }
 
+Parrot_mul_n_nc_n {
+    Parrot_binop_x_xc_x s/<_N>/_n/ s/<op>/mul/ s/<typ>/&NUM/ s/ISR/FSR/ s/INT_R/NUM_R/
+}
+
 Parrot_div_i_ic_i {
     Parrot_binop_x_xc_x s/<_N>/_i/ s/<op>/div/ s/<typ>/*INT/
 }
@@ -406,14 +520,6 @@ Parrot_lsr_i_ic_i {
     Parrot_binop_x_xc_x s/<_N>/_i/ s/<op>/lsr/ s/<typ>/*INT/
 }
 
-Parrot_sub_i_ic_ic {
-    if (MAP[1]) {
-        jit_emit_mov_ri_i(NATIVECODE, MAP[1], *INT_CONST[2] - *INT_CONST[3]);
-    }
-    else {
-        jit_emit_mov_mi_ii(NATIVECODE, &INT_REG[1], *INT_CONST[2] - *INT_CONST[3]);
-    }
-}
 
 
 TEMPLATE Parrot_binop_x_x_x {
@@ -555,7 +661,7 @@ Parrot_neg_i_ic {
         jit_emit_mov_ri_i(NATIVECODE, MAP[1], -(*INT_CONST[2]));
     }
     else {
-        jit_emit_mov_mi_ii(NATIVECODE, &INT_REG[1], -(*INT_CONST[2]));
+        jit_emit_mov_mi_i(NATIVECODE, &INT_REG[1], -(*INT_CONST[2]));
     }
 }
 
@@ -565,7 +671,7 @@ Parrot_abs_i_ic {
         jit_emit_mov_ri_i(NATIVECODE, MAP[1], i < 0 ? -i : i);
     }
     else {
-        jit_emit_mov_mi_ii(NATIVECODE, &INT_REG[1], i < 0 ? -i : i);
+        jit_emit_mov_mi_i(NATIVECODE, &INT_REG[1], i < 0 ? -i : i);
     }
 }
 
@@ -618,7 +724,7 @@ Parrot_bnot_i_ic {
         jit_emit_mov_ri_i(NATIVECODE, MAP[1], ~(*INT_CONST[2]));
     }
     else {
-        jit_emit_mov_mi_ii(NATIVECODE, &INT_REG[1], ~(*INT_CONST[2]));
+        jit_emit_mov_mi_i(NATIVECODE, &INT_REG[1], ~(*INT_CONST[2]));
     }
 }
 
@@ -904,54 +1010,60 @@ Parrot_dec_n {
 }
 
 
-Parrot_lt_ic_ic_ic {
-    if (*INT_CONST[1] < *INT_CONST[2])
+TEMPLATE Parrot_cmp_xc_xc_ic {
+    if (<typ>_CONST[1] <op> <typ>_CONST[2])
         emit_jump(jit_info, *INT_CONST[3]);
 }
 
+Parrot_lt_ic_ic_ic {
+    Parrot_cmp_xc_xc_ic s/<typ>/*INT/ s/<op>/</
+}
+
+Parrot_lt_nc_nc_ic {
+    Parrot_cmp_xc_xc_ic s/<typ>/*NUM/ s/<op>/</
+}
 
 Parrot_gt_ic_ic_ic {
-    if (*INT_CONST[1] > *INT_CONST[2])
-        emit_jump(jit_info, *INT_CONST[3]);
+    Parrot_cmp_xc_xc_ic s/<typ>/*INT/ s/<op>/>/
+}
+
+Parrot_gt_nc_nc_ic {
+    Parrot_cmp_xc_xc_ic s/<typ>/*NUM/ s/<op>/>/
 }
 
 Parrot_ge_ic_ic_ic {
-    if (*INT_CONST[1] >= *INT_CONST[2])
-        emit_jump(jit_info, *INT_CONST[3]);
+    Parrot_cmp_xc_xc_ic s/<typ>/*INT/ s/<op>/>=/
 }
 
+Parrot_ge_nc_nc_ic {
+    Parrot_cmp_xc_xc_ic s/<typ>/*NUM/ s/<op>/>=/
+}
 
 Parrot_le_ic_ic_ic {
-    if (*INT_CONST[1] <= *INT_CONST[2])
-        emit_jump(jit_info, *INT_CONST[3]);
+    Parrot_cmp_xc_xc_ic s/<typ>/*INT/ s/<op>/<=/
+}
+
+Parrot_le_nc_nc_ic {
+    Parrot_cmp_xc_xc_ic s/<typ>/*NUM/ s/<op>/<=/
 }
 
 Parrot_eq_ic_ic_ic {
-    if (*INT_CONST[1] == *INT_CONST[2])
-        emit_jump(jit_info, *INT_CONST[3]);
+    Parrot_cmp_xc_xc_ic s/<typ>/*INT/ s/<op>/==/
+}
+
+Parrot_eq_nc_nc_ic {
+    Parrot_cmp_xc_xc_ic s/<typ>/*NUM/ s/<op>/==/
 }
 
 Parrot_ne_ic_ic_ic {
-    if (*INT_CONST[1] != *INT_CONST[2])
-        emit_jump(jit_info, *INT_CONST[3]);
+    Parrot_cmp_xc_xc_ic s/<typ>/*INT/ s/<op>/!=/
 }
 
-Parrot_band_i_ic_ic {
-    jit_emit_mov_mi_ii(NATIVECODE, &INT_REG[1], *INT_CONST[2] & *INT_CONST[3]);
+Parrot_ne_nc_nc_ic {
+    Parrot_cmp_xc_xc_ic s/<typ>/*NUM/ s/<op>/!=/
 }
 
-
-Parrot_bor_i_ic_ic {
-    jit_emit_mov_mi_ii(NATIVECODE, &INT_REG[1], *INT_CONST[2] | *INT_CONST[3]);
-}
-
-
-Parrot_bxor_i_ic_ic {
-    jit_emit_mov_mi_ii(NATIVECODE, &INT_REG[1], *INT_CONST[2] | *INT_CONST[3]);
-}
-
-
-
+; TODO or,and,not
 
 /*
  * Local variables:
