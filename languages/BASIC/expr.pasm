@@ -12,12 +12,8 @@
 #
 # $Id$
 # $Log$
-# Revision 1.2  2002/04/29 01:10:04  clintp
-# Speed changes, new language features
-#
-# Revision 1.10  2002/04/28 01:09:36  Clinton
-# Added speedups by using set Ix, Sx and avoiding a lot of
-# STRIPSPACE calls.  Compensated for weird read-data bug.
+# Revision 1.3  2002/04/30 17:39:42  clintp
+# Changed terminator
 #
 # Revision 1.8  2002/04/21 22:58:57  Clinton
 # Made Eliza compatable
@@ -41,6 +37,7 @@
 
 # Width of things on the pseudo-stack
 .const STACKSIZE 80
+.const FUNCMARK "\x0"
 
 # Some stack stuff.  Allows me to move things from one stack to another, etc..
 #
@@ -122,12 +119,12 @@ FUNCDISPATCH:
 	save I5
 	
 	# Okay, while the function's on the stack being processed it 
-	#   might have this ! thing after it.  Remove it.
+	#   might have this FUNCMARK thing after it.  Remove it.
 	set S3, ""
 	length I0, S0
 	dec I0
 	substr S3, S0, I0, 1
-	ne S3, "!", FUNCJUMP
+	ne S3, FUNCMARK, FUNCJUMP
 	substr S0, S0, 0, I0
 
 # To add a function, add to this jump table.  Follow the rules above.
@@ -518,7 +515,7 @@ NOTDOLLAR:
 	eq I7, 0, CHECKUM      #  and the funcflag is set!
 	bsr POPOPSTACK
 	restore S3
-	concat S3, "!"
+	concat S3, FUNCMARK
 	savec S3
 	bsr PUSHOPSTACK
 	savec "~"
@@ -884,12 +881,12 @@ STRING: length I0, S0
 NOTSTRINGLIT:
 	# Okay, the thing here is either
 	#   1. var
-	#   2. var(....)  w/trailing !
+	#   2. var(....)  w/trailing FUNCMARK
 	set S3, ""
 	length I0, S0
 	dec I0
 	substr S3, S0, I0, 1
-	ne S3, "!", NORMVAR
+	ne S3, FUNCMARK, NORMVAR
 	save S0			# A var(...), resolve later.
 	bsr PUSHOPSTACK
 	branch CALCLOOP
@@ -1081,7 +1078,7 @@ PULLOP: bsr OPSTACKDEPTH
 	dec I1
 	lt I1, 0, NOTOP
 	substr S2, S1, I1, 1   # Last char
-	eq S2, "!", RUNFUNC
+	eq S2, FUNCMARK, RUNFUNC
 NOTOP:
 	save S1
 	inc I4
