@@ -63,11 +63,11 @@ While this seems like a lot of work, lets consider all the cases:
 
 #include "parrot/parrot.h"
 
-INTVAL dynclass_PyClass;
-STRING *BASES;
-STRING *CLASS;
-STRING *INIT;
-STRING *PROXY_STRING;
+static INTVAL dynclass_PyClass;
+static STRING *BASES;
+static STRING *CLASS;
+static STRING *INIT;
+static STRING *PROXY;
 
 pmclass PyProxyType extends PyType dynpmc group python_group {
 
@@ -88,7 +88,7 @@ they will be used frequently here.
             BASES = const_string(INTERP, "__bases__");
             CLASS = const_string(INTERP, "__class__");
             INIT  = const_string(INTERP, "__init__");
-            PROXY_STRING = const_string(INTERP, "__proxy__");
+            PROXY = const_string(INTERP, "__proxy__");
         }
     }
 
@@ -128,7 +128,7 @@ TODO: reconcile this with Parrot's instantiate VTABLE entry.
             object = REG_PMC(5);
         }
 
-        VTABLE_setprop(INTERP, proxy, PROXY_STRING, object);
+        VTABLE_setprop(INTERP, proxy, PROXY, object);
 
         REG_PMC(5) = proxy;
         return next;
