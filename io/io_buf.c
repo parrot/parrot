@@ -55,9 +55,11 @@ PIOOFF_T PIO_buf_tell(theINTERP, ParrotIOLayer *l, ParrotIO *io);
 /* Local util functions */
 size_t PIO_buf_writethru(theINTERP, ParrotIOLayer *layer,
                            ParrotIO *io, const void *buffer, size_t len);
+size_t PIO_buf_readthru(theINTERP, ParrotIOLayer *layer,
+                           ParrotIO *io, void *buffer, size_t len);
 
-
-
+#define MAX(a, b) ((a) > (b) ? (a) : (b))
+#define MIN(a, b) ((a) < (b) ? (a) : (b))
 
 INTVAL
 PIO_buf_init(theINTERP, ParrotIOLayer *layer)
@@ -122,12 +124,12 @@ PIO_buf_setbuf(theINTERP, ParrotIOLayer *layer, ParrotIO *io, size_t bufsize)
     }
 
     if (b->startb && (b->flags & PIO_BF_MALLOC)) {
-        free(b->startb);
+        mem_sys_free(b->startb);
         b->startb = b->next = NULL;
     }
 
     if (b->size > 0) {
-        b->startb = b->next = malloc(b->size);
+        b->startb = b->next = mem_sys_allocate(b->size);
         b->flags |= PIO_BF_MALLOC;
     }
 
@@ -235,14 +237,95 @@ size_t
 PIO_buf_read(theINTERP, ParrotIOLayer *layer, ParrotIO *io,
                void *buffer, size_t len)
 {
-    UNUSED(interpreter);
-    UNUSED(layer);
-    UNUSED(io);
-    UNUSED(buffer);
-    UNUSED(len);
-    return 0;
+    ParrotIOLayer *l = layer;
+    ParrotIOBuf *b;
+    char *out_buf = buffer;
+    size_t current = 0;
+
+    /* write buffer flush */
+    if (io->b.flags & PIO_BF_WRITEBUF) {
+        PIO_buf_flush(interpreter, layer, io);
+    }
+
+    b = &io->b;
+
+    /* read Data from buffer */
+    if (b->flags & PIO_BF_READBUF) {
+        size_t avail = b->endb - b->next;
+
+        current = MIN(avail, len);
+        memcpy(out_buf, b->next, current);
+        b->next += current;
+
+        /* buffer completed */
+        if (current == avail) {
+            io->b.flags &= ~PIO_BF_READBUF;
+            /* XXX: Is the reset of next and endb really necessary ? */
+            io->b.endb = NULL;
+            io->b.next = io->b.startb;
+        }
+
+        if (len == current) {
+            return current;
+        }
+        else {
+            /* more data needed from downlayer */
+            out_buf += current;
+            len -= current;
+        }
+    }
+
+    /* (re)fill the readbuffer */
+    if (!(b->flags & PIO_BF_READBUF)) {
+        size_t got;
+
+        if (len >= io->b.size) {
+            return current + PIO_buf_readthru(interpreter, l, io, buffer, len);
+        }
+
+        got = PIO_buf_readthru(interpreter, l, io, b->startb, b->size);
+        b->endb = b->startb + got;
+        b->next = b->startb;
+
+        io->b.flags |= PIO_BF_READBUF;
+
+        len = MIN(len, got);
+    }
+
+    /* read from the read_buffer */
+    memcpy(out_buf, io->b.next, len);
+    io->b.next += len;
+
+    /* is the buffer is completely empty ? */
+    if (io->b.next == io->b.endb) {
+        io->b.flags &= ~PIO_BF_READBUF;
+        /* XXX: Is the reset of next and encb really necessary ? */
+        io->b.endb = NULL;
+        io->b.next = io->b.startb;
+    }
+    return current + len;
 }
 
+/* XXX: This function is not really io_buf specific */
+size_t
+PIO_buf_readthru (theINTERP, ParrotIOLayer *layer, ParrotIO *io,
+                    void *buffer, size_t len)
+{
+    ParrotIOLayer *l = layer;
+
+    do {
+        l = PIO_DOWNLAYER(layer);
+    } while (l && !l->api->Read);
+
+    if (l) {
+        return (l->api->Read)(interpreter, l, io, buffer, len);
+    }
+    else {
+        /* No underlying read implementation */
+        /* XXX: Handle error here */
+        return 0;
+    }
+}
 
 size_t
 PIO_buf_write(theINTERP, ParrotIOLayer *layer, ParrotIO *io,
@@ -293,7 +376,6 @@ PIO_buf_write(theINTERP, ParrotIOLayer *layer, ParrotIO *io,
         io->b.flags |= PIO_BF_WRITEBUF;
         /* Fill remainder, flush, then try to buffer more */
         memcpy(io->b.next, buffer, diff);
-        /* We don't call flush here because it clears flag */
         PIO_buf_flush(interpreter, layer, io);
         memcpy(io->b.startb, ((const char *)buffer + diff), len - diff);
         io->b.next = io->b.startb + (len - diff);

@@ -50,6 +50,7 @@ new_io_pmc(theINTERP, ParrotIO *io)
     return new_pmc;
 }
 
+#if 0
 void
 free_io_header(ParrotIO *io)
 {
@@ -58,6 +59,7 @@ free_io_header(ParrotIO *io)
         free(io->b.startb);
     free(io);
 }
+#endif
 
 ParrotIOTable
 alloc_pio_array(int numhandles)
@@ -89,7 +91,7 @@ PIO_new(theINTERP, ParrotIO *old, INTVAL iotype, INTVAL flags, INTVAL mode)
     if (old) {
         /* FIXME: Reuse old IO */
     }
-    new_io = (ParrotIO *)malloc(sizeof(ParrotIO));
+    new_io = (ParrotIO *)mem_sys_allocate(sizeof(ParrotIO));
     new_io->fpos = new_io->lpos = piooffsetzero;
     new_io->flags = flags;
     new_io->mode = mode;
@@ -98,6 +100,19 @@ PIO_new(theINTERP, ParrotIO *old, INTVAL iotype, INTVAL flags, INTVAL mode)
     new_io->b.endb = NULL;
     new_io->b.next = NULL;
     return new_io;
+}
+
+/*
+ * Destroying the IO-Stream, at the moment only free memory
+ */
+void
+PIO_destroy(theINTERP, ParrotIO *io)
+{
+    UNUSED(interpreter);
+
+    if (io->b.startb && (io->b.flags & PIO_BF_MALLOC))
+        mem_sys_free(io->b.startb);
+    mem_sys_free(io);
 }
 
 /*
@@ -136,7 +151,7 @@ PIO_init(theINTERP)
 }
 
 void
-PIO_destroy(theINTERP)
+PIO_finish(theINTERP)
 {
     ParrotIOLayer *p, *down;
     ParrotIO *io;
@@ -145,15 +160,11 @@ PIO_destroy(theINTERP)
     /* XXX is this all correct? */
 
     fflush(stdout);
-    fflush(stdout);
+    fflush(stderr);
 
     for (i = 0 ; i < PIO_NR_OPEN; i++) {
         if ( (io = GET_INTERP_IOD(interpreter)->table[i]) ) {
-#if 0
-            PIO_flush(interpreter, io);
             PIO_close(interpreter, io);
-#endif
-            mem_sys_free(io);
         }
     }
     for (p = GET_INTERP_IO(interpreter); p; ) {
@@ -201,9 +212,7 @@ PIO_init_stacks(theINTERP)
 #ifdef PIO_OS_STDIO
     PIO_push_layer(interpreter, PIO_base_new_layer(&pio_stdio_layer), NULL);
 #endif
-#if 0
     PIO_push_layer(interpreter, PIO_base_new_layer(&pio_buf_layer), NULL);
-#endif
 
     /* Note: All layer pushes should be done before init calls */
     for (p = GET_INTERP_IO(interpreter); p; p = p->down) {
@@ -266,7 +275,7 @@ void
 PIO_base_delete_layer(ParrotIOLayer *layer)
 {
     if (layer != NULL)
-        free(layer);
+        mem_sys_free(layer);
 }
 
 
@@ -524,7 +533,7 @@ PIO_close(theINTERP, ParrotIO *io)
             if (l->api->Close) {
                 PIO_flush(interpreter, io);
                 res =  (*l->api->Close) (interpreter, l, io);
-                mem_sys_free(io);
+                PIO_destroy(interpreter, io);
                 return res;
             }
             l = PIO_DOWNLAYER(l);

@@ -290,7 +290,7 @@ extern INTVAL pio_errno;
 
 /* io.c - If you add new layers, register them in init_layers() */
 extern void PIO_init(theINTERP);
-extern void PIO_destroy(theINTERP);
+extern void PIO_finish(theINTERP);
 extern INTVAL PIO_init_stacks(theINTERP);
 extern void PIO_atexit(theINTERP);
 extern INTVAL PIO_push_layer(theINTERP, ParrotIOLayer *, ParrotIO *);
@@ -304,6 +304,7 @@ extern ParrotIOTable alloc_pio_array(int);
 extern int realloc_pio_array(ParrotIOTable *, int);
 extern ParrotIO *PIO_new(struct Parrot_Interp *, ParrotIO *,
                          INTVAL, INTVAL, INTVAL);
+extern void PIO_destroy(theINTERP, ParrotIO *io);
 
 extern INTVAL PIO_base_init(theINTERP, ParrotIOLayer *proto);
 extern ParrotIOLayer *PIO_base_new_layer(ParrotIOLayer *proto);
