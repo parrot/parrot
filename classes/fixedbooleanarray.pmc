@@ -491,8 +491,9 @@ Used to archive the string.
 */
     void freeze(visit_info *info) {
         IMAGE_IO *io = info->image_io;
+        STRING *s;
         io->vtable->push_integer(INTERP, io, PMC_int_val(SELF));
-        STRING * s = string_from_cstring(INTERP, PMC_data(SELF), PMC_int_val2(SELF)/BITS_PER_CHAR);
+        s = string_from_cstring(INTERP, PMC_data(SELF), PMC_int_val2(SELF)/BITS_PER_CHAR);
         io->vtable->push_string(INTERP, io, s);
     }
 
