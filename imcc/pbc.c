@@ -452,6 +452,9 @@ static int unescape(char *string)
                 case 'f':
                     *p++ = '\f';
                     break;
+                case 'e':
+                    *p++ = '\033';
+                    break;
                 case '\\':
                     *p++ = '\\';
                     break;
