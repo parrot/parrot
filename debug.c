@@ -1806,6 +1806,14 @@ PDB_print(struct Parrot_Interp *interpreter, const char *command)
 
     command = skip_ws(command);
     command = parse_command(command, &c);
+    if (command == NULL) {
+        PDB_print_int(interpreter, &interpreter->ctx.int_reg, -1);
+        PDB_print_num(interpreter, &interpreter->ctx.num_reg, -1);
+        PDB_print_string(interpreter, &interpreter->ctx.string_reg, -1);
+        PDB_print_pmc(interpreter, &interpreter->ctx.pmc_reg, -1, NULL);
+        return;
+    }
+
     command = skip_ws(command);
 
     if (isdigit((int) *command)) {
