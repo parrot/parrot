@@ -330,7 +330,7 @@ PDB_run_command(struct Parrot_Interp *interpreter, const char *command)
             break;
         case c_h:
         case c_help:
-            PDB_help(command);
+            PDB_help(interpreter, command);
             break;
         case c_q:
         case c_quit:
@@ -848,9 +848,11 @@ PDB_disable_breakpoint(struct Parrot_Interp *interpreter,
     PDB_breakpoint_t *breakpoint;    
 
     breakpoint = PDB_find_breakpoint(interpreter, command);
+
     if (breakpoint) {
         breakpoint->skip = -1;
     }
+
     return;
 }
 
@@ -2367,13 +2369,93 @@ PDB_info(struct Parrot_Interp *interpreter)
 }
 
 /* PDB_help
- * print the help
- * TODO complete me.
+ * Print the help text. "Help" with no arguments prints a list of commands.
+ * "Help xxx" prints information on command xxx.
  */
 void
-PDB_help(const char *command)
+PDB_help(struct Parrot_Interp *interpreter, const char *command)
 {
-    PIO_eprintf(NULL, "\
+    unsigned long c;
+    const char* temp;
+
+    temp = command;
+    command = parse_command(command, &c);
+
+    switch (c) {
+        case c_disassemble:
+            break;
+        case c_load:
+            break;
+        case c_list:
+            PIO_eprintf(interpreter, 
+            "List the source code.\n\n\
+Optionally specify the line number to begin the listing from and the number
+of lines to display.\n"); 
+            break;
+        case c_run:
+            PIO_eprintf(interpreter, 
+            "Run (or restart) the program being debugged.\n\n\
+Arguments specified after \"run\" are passed as command line arguments to\n\
+the program.\n"); 
+            break;
+        case c_break:
+            PIO_eprintf(interpreter,
+"Set a breakpoint at a given line number (which must be specified).\n\n\
+Optionally, specify a condition, in which case the breakpoint will only\n\
+activate if the condition is met. Conditions take the form:\n\n\
+           if [REGISTER] [COMPARISON] [REGISTER or CONSTANT]\n\n\
+
+For example:\n\n\
+           break 10 if I4 > I3\n\n\
+           break 45 if S1 == \"foo\"\n\n
+The command returns a number which is the breakpoint identifier.");
+            break;
+        case c_watch:
+            PIO_eprintf(interpreter,"No documentation yet");
+            break;
+        case c_delete:
+            PIO_eprintf(interpreter,"No documentation yet");
+            break;
+        case c_disable:
+            PIO_eprintf(interpreter,
+"Disable a breakpoint.\n\n\
+The breakpoint to disable must be specified by its breakpoint number.\n\
+Disabled breakpoints are not forgotten, but have no effect until re-enabled\n\
+with the \"enable\" command.\n");
+            break;
+        case c_enable:
+            PIO_eprintf(interpreter,"Re-enable a disabled breakpoint.\n");
+            break;
+        case c_continue:
+            PIO_eprintf(interpreter,"No documentation yet");
+            break;
+        case c_next:
+            PIO_eprintf(interpreter,"No documentation yet");
+            break;
+        case c_eval:
+            PIO_eprintf(interpreter,"No documentation yet");
+            break;
+        case c_trace:
+            PIO_eprintf(interpreter,"No documentation yet");
+            break;
+        case c_print:
+            PIO_eprintf(interpreter,"No documentation yet");
+            break;
+        case c_stack:
+            PIO_eprintf(interpreter,"No documentation yet");
+            break;
+        case c_info:
+            PIO_eprintf(interpreter, 
+                    "Print information about the current interpreter\n");
+            break;
+        case c_quit:
+            PIO_eprintf(interpreter, "Exit the debugger.\n");
+            break;
+        case c_help:
+            PIO_eprintf(interpreter, "Print a list of available commands.\n");
+            break;
+        case 0:
+            PIO_eprintf(interpreter, "\
 List of commands:\n\
     disassemble -- disassemble the bytecode\n\
     load -- load a source code file\n\
@@ -2392,7 +2474,13 @@ List of commands:\n\
     stack (s) -- examine the stack\n\
     info -- print interpreter information\n\
     quit (q) -- exit the debugger\n\
-    help (h) -- print this help\n\n");
+    help (h) -- print this help\n\n\
+Type \"help\" followed by a command name for full documentation.\n\n");
+            break;
+        default:
+            PIO_eprintf(interpreter, "Unknown command: \"%s\".", temp);
+            break;
+    }
 }
 
 /*

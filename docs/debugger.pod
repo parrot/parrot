@@ -429,7 +429,11 @@ Exit the debugger.
 
 =item help (h)
 
-List the available commands.
+Prints information about debugger commands. The syntax is:
+
+  help [COMMAND]
+
+If C<COMMAND> is omitted, prints a list of the available commands.
 
 =back
 

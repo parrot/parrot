@@ -266,7 +266,7 @@ void PDB_print_stack_pmc(struct Parrot_Interp *interpreter,
 
 void PDB_info(struct Parrot_Interp *interpreter);
 
-void PDB_help(const char *command);
+void PDB_help(struct Parrot_Interp *interpreter, const char *command);
 
 #define valid_chunk(chunk,c,d,s,i) { \
     if (*c) { \
