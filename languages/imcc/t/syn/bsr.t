@@ -1,6 +1,6 @@
 #!perl
 use strict;
-use TestCompiler tests => 11;
+use TestCompiler tests => 12;
 
 ##############################
 # this tests register allocation/preserving of local bsr calls
@@ -338,3 +338,17 @@ Inner2
 back
 OUT
 
+output_is(<<'CODE', <<'OUT', "newsub");
+    .sub _main
+        newsub P0, .Sub, _foo	# PASM syntax only for now
+        invokecc P0
+        end
+    .end
+
+    .sub _foo
+        print "foo\n"
+	invoke P1
+    .end
+CODE
+foo
+OUT

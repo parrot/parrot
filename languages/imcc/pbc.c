@@ -227,7 +227,7 @@ static void store_bsr(SymReg * r, int pc, int offset)
     SymReg * bsr;
     bsr = _mk_address(globals.cs->subs->bsrs, str_dup(r->name), U_add_all);
     bsr->color = pc;
-    bsr->score = offset;        /* bsr = 1, addr I,x = 2 */
+    bsr->score = offset;        /* bsr = 1, set_addr I,x = 2, newsub = 3 */
 }
 
 static void store_str_const(char * str, int idx)
@@ -316,6 +316,8 @@ store_labels(struct Parrot_Interp *interpreter, int *src_lines, int oldsize)
             }
             else if (!strcmp(ins->op, "set_addr"))
                 store_bsr(ins->r[1], pc, 2);
+            else if (!strcmp(ins->op, "newsub"))
+                store_bsr(ins->r[2], pc, 3);
         }
         pc += ins->opsize;
     }
@@ -361,7 +363,7 @@ store_labels(struct Parrot_Interp *interpreter, int *src_lines, int oldsize)
         if (label)
             continue;
         if (strcmp(ins->op, "bsr") && strcmp(ins->op, "set_addr") &&
-                strcmp(ins->op, "branch_cs")) {
+                strcmp(ins->op, "branch_cs") && strcmp(ins->op, "newsub")) {
             char buf[64];
             Instruction *il;
             SymReg *r[IMCC_MAX_REGS];
@@ -791,14 +793,14 @@ e_pbc_emit(void *param, Instruction * ins)
                         npc, label->color, addr->name,addr->color);
             }
             else if (strcmp(ins->op, "bsr") && strcmp(ins->op, "set_addr") &&
-                    strcmp(ins->op, "branch_cs")) {
+                    strcmp(ins->op, "branch_cs") && strcmp(ins->op, "newsub")) {
                 /* TODO make intersegment branch */
                 fatal(1, "e_pbc_emit", "label not found for '%s'\n",
                         addr->name);
             }
             if (ins->opsize == 5 && !strcmp(ins->op, "newsub")) {
                 /* this only fixes local branches,
-                 * TOTO globals
+                 * TODO globals
                  */
                 addr = ins->r[2];
                 label = _get_sym(globals.cs->subs->labels, addr->name);
