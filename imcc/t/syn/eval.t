@@ -37,7 +37,7 @@ back
 OUT
 
 output_is(<<'CODE', <<'OUT', "intersegment branch");
-# #!/usr/bin/perl -w
+# #! perl -w
 # my $i= 5;
 # LAB:
 #    $i++;

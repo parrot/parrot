@@ -1,4 +1,4 @@
-#!/usr/local/bin/perl -w
+#! perl -w
 #$Id$
 
 package Digest::Perl::MD5;

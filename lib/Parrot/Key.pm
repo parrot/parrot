@@ -1,14 +1,21 @@
-#!/usr/bin/perl -w
-#
-# Key.pm
-#
-# Parrot Key Constants.
-#
-# This program is free software. It is subject to the same
-# license as Perl itself.
-#
+# Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
 # $Id$
-#
+
+=head1 NAME
+
+Parrot::Key - Parrot Key Constants
+
+=head1 SYNOPSIS
+
+  use Parrot::Key;
+
+=head1 DESCRIPTION
+
+=head2 Functions
+
+=over 4
+
+=cut
 
 use strict;
 
@@ -16,10 +23,9 @@ package Parrot::Key;
 use Parrot::Types;
 use Data::Dumper;
 
+=item C<new()>
 
-#
-# new()
-#
+=cut
 
 sub new
 {
@@ -34,10 +40,9 @@ sub new
   return $self;
 }
 
+=item C<components()>
 
-#
-# components()
-#
+=cut
 
 sub components
 {
@@ -51,13 +56,12 @@ sub components
   }
 }
 
+=item C<unpack()
 
-#
-# unpack()
-#
-# Unpack from the string and return the number of characters that should
-# be removed from the packed string.
-#
+Unpack from the string and return the number of characters that should
+be removed from the packed string.
+
+=cut
 
 sub unpack
 {
@@ -78,10 +82,9 @@ sub unpack
   return sizeof("op") + $self->{COMPONENT_COUNT}*2*sizeof("op");
 }
 
+=item C<packed_size()>
 
-#
-# packed_size()
-#
+=cut
 
 sub packed_size
 {
@@ -90,10 +93,9 @@ sub packed_size
   return $self->{COMPONENT_COUNT}*2*sizeof("op");
 }
 
+=item C<pack()>
 
-#
-# pack()
-#
+=cut
 
 sub pack
 {
@@ -107,10 +109,9 @@ sub pack
   return $packed;
 }
 
+=item C<dump().
 
-#
-# dump()
-#
+=cut
 
 sub dump
 {
@@ -151,37 +152,3 @@ sub dump
 
 
 1;
-
-__END__
-
-=head1 NAME
-
-Parrot::Key
-
-=head1 SYNOPSIS
-
-  use Parrot::Key;
-
-=head1 DESCRIPTION
-
-=head2 components COMPONENTS
-
-=head2 components
-
-=head2 new COMPONENTS
-
-=head2 packed_size
-
-=head2 pack
-
-=head2 unpack KEY
-
-=head2 unpack
-
-=head2 dump
-
-=head1 LICENSE
-
-This program is free software. It is subject to the same
-license as Perl itself.
-

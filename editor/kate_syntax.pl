@@ -1,4 +1,4 @@
-#!/usr/bin/perl -w
+#! perl -w
 
 # Create Kate syntax highlighting XML file for IMCC
 # Language:	Parrot IMCC
