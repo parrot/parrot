@@ -43,21 +43,33 @@ typedef const void * Parrot_Const_CharType;
 
 #endif
 
+Parrot_PMC Parrot_PMC_get_pmc_intkey(Parrot_INTERP, Parrot_PMC, Parrot_Int);
 Parrot_STRING Parrot_PMC_get_string(Parrot_INTERP, Parrot_PMC);
+Parrot_STRING Parrot_PMC_get_string_intkey(Parrot_INTERP, Parrot_PMC, Parrot_Int);
 void *Parrot_PMC_get_pointer(Parrot_INTERP, Parrot_PMC);
+void *Parrot_PMC_get_pointer_intkey(Parrot_INTERP, Parrot_PMC, Parrot_Int);
 Parrot_Int Parrot_PMC_get_intval(Parrot_INTERP, Parrot_PMC);
 Parrot_Int Parrot_PMC_get_intval_intkey(Parrot_INTERP, Parrot_PMC, Parrot_Int);
 Parrot_Float Parrot_PMC_get_numval(Parrot_INTERP, Parrot_PMC);
+Parrot_Float Parrot_PMC_get_numval_intkey(Parrot_INTERP, Parrot_PMC, Parrot_Int);
 char *Parrot_PMC_get_cstring(Parrot_INTERP, Parrot_PMC);
+char *Parrot_PMC_get_cstring_intkey(Parrot_INTERP, Parrot_PMC, Parrot_Int);
 char *Parrot_PMC_get_cstringn(Parrot_INTERP, Parrot_PMC, Parrot_Int *);
+char *Parrot_PMC_get_cstringn_intkey(Parrot_INTERP, Parrot_PMC, Parrot_Int *, Parrot_Int);
 
+void Parrot_PMC_set_pmc_intkey(Parrot_INTERP, Parrot_PMC, Parrot_PMC, Parrot_Int);
 void Parrot_PMC_set_string(Parrot_INTERP, Parrot_PMC, Parrot_STRING);
+void Parrot_PMC_set_string_intkey(Parrot_INTERP, Parrot_PMC, Parrot_STRING, Parrot_Int);
 void Parrot_PMC_set_pointer(Parrot_INTERP, Parrot_PMC, void *);
+void Parrot_PMC_set_pointer_intkey(Parrot_INTERP, Parrot_PMC, void *, Parrot_Int);
 void Parrot_PMC_set_cstring(Parrot_INTERP, Parrot_PMC, const char *);
+void Parrot_PMC_set_cstring_intkey(Parrot_INTERP, Parrot_PMC, const char *, Parrot_Int);
 void Parrot_PMC_set_cstringn(Parrot_INTERP, Parrot_PMC, const char *, Parrot_Int);
+void Parrot_PMC_set_cstringn_intkey(Parrot_INTERP, Parrot_PMC, const char *, Parrot_Int, Parrot_Int);
 void Parrot_PMC_set_intval(Parrot_INTERP, Parrot_PMC, Parrot_Int);
 void Parrot_PMC_set_intval_intkey(Parrot_INTERP, Parrot_PMC, Parrot_Int, Parrot_Int);
 void Parrot_PMC_set_numval(Parrot_INTERP, Parrot_PMC, Parrot_Float);
+void Parrot_PMC_set_numval_intkey(Parrot_INTERP, Parrot_PMC, Parrot_Float, Parrot_Int);
 
 Parrot_PMC Parrot_PMC_new(Parrot_INTERP, Parrot_Int);
 Parrot_PMC Parrot_PMC_null(void);

@@ -52,7 +52,6 @@ store_lib_pmc(Parrot_Interp interpreter, PMC* lib_pmc, STRING *path,
      */
     set_cstring_prop(interpreter, lib_pmc, "_filename", path);
     set_cstring_prop(interpreter, lib_pmc, "_type", type);
-
     VTABLE_push_pmc(interpreter, dyn_libs, lib_pmc);
 }
 
@@ -71,8 +70,9 @@ is_loaded(Parrot_Interp interpreter, STRING *path)
     iglobals = interpreter->iglobals;
     dyn_libs = VTABLE_get_pmc_keyed_int(interpreter, iglobals,
             IGLOBALS_DYN_LIBS);
-    if (!dyn_libs)
+    if (!dyn_libs) {
         return NULL;
+    }
     n = VTABLE_elements(interpreter, dyn_libs);
     key = string_from_cstring(interpreter, "_filename", 0);
     /* we could use an ordered hash for faster lookup here */

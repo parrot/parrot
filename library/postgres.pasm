@@ -1,5 +1,5 @@
 saveall
-loadlib P1, '/usr/local/pgsql/lib/libpq.so'
+loadlib P1, 'libpq'
 dlfunc P2, P1, 'PQconnectStart', 'pt'
 store_global 'PostgreSQL::PQconnectStart', P2
 dlfunc P2, P1, 'PQconnectPoll', 'ip'

@@ -109,8 +109,10 @@ optimize(struct Parrot_Interp *interpreter, IMC_Unit * unit)
             return 1;
         if (used_once(interpreter, unit))
             return 1;
+#if 0
         if (loop_optimization(interpreter, unit))
             return 1;
+#endif
     }
     return any;
 }

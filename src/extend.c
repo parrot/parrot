@@ -44,6 +44,24 @@ void *Parrot_PMC_get_pointer(Parrot_INTERP interp, Parrot_PMC pmc) {
     return VTABLE_get_pointer(interp, pmc);
 }
 
+/*=for api extend Parrot_PMC_get_pointer_intkey
+ *
+ * Return the keyed, signed integer value of the value in the PMC
+ */
+
+void *Parrot_PMC_get_pointer_intkey(Parrot_INTERP interp, Parrot_PMC pmc, Parrot_Int key) {
+    return VTABLE_get_pointer_keyed_int(interp, pmc, key);
+}
+
+/*=for api extend Parrot_PMC_get_pmc_intkey
+ *
+ * Return the integer keyed PMC value of the passed-in PMC
+ */
+
+Parrot_PMC Parrot_PMC_get_pmc_intkey(Parrot_INTERP interp, Parrot_PMC pmc, Parrot_Int key) {
+    return VTABLE_get_pmc_keyed_int(interp, pmc, key);
+}
+
 /*=for api extend Parrot_PMC_get_intval
  *
  * Return the signed integer value of the value in the PMC
@@ -53,9 +71,9 @@ Parrot_Int Parrot_PMC_get_intval(Parrot_INTERP interp, Parrot_PMC pmc) {
     return VTABLE_get_integer(interp, pmc);
 }
 
-/*=for api extend Parrot_PMC_get_intval
+/*=for api extend Parrot_PMC_get_intval_intkey
  *
- * Return the signed integer value of the value in the PMC
+ * Return the keyed, signed integer value of the value in the PMC
  */
 
 Parrot_Int Parrot_PMC_get_intval_intkey(Parrot_INTERP interp, Parrot_PMC pmc, Parrot_Int key) {
@@ -69,6 +87,26 @@ Parrot_Int Parrot_PMC_get_intval_intkey(Parrot_INTERP interp, Parrot_PMC pmc, Pa
 
 Parrot_Float Parrot_PMC_get_numval(Parrot_INTERP interp, Parrot_PMC pmc) {
     return VTABLE_get_number(interp, pmc);
+}
+
+/*=for api extend Parrot_PMC_get_numval_intkey
+ *
+ * Return the keyed, signed integer value of the value in the PMC
+ */
+
+Parrot_Float Parrot_PMC_get_numval_intkey(Parrot_INTERP interp, Parrot_PMC pmc, Parrot_Int key) {
+    return VTABLE_get_number_keyed_int(interp, pmc, key);
+}
+
+/*=for api extend Parrot_PMC_get_cstring_intkey
+ *
+ * Return a null-terminated string that represents the string value of
+ * the PMC.
+ */
+char *Parrot_PMC_get_cstring_intkey(Parrot_INTERP interp, Parrot_PMC pmc, Parrot_Int key) {
+    STRING *retval;
+    retval = VTABLE_get_string_keyed_int(interp, pmc, key);
+    return string_to_cstring(interp, retval);
 }
 
 /*=for api extend Parrot_PMC_get_cstring
@@ -97,6 +135,21 @@ char *Parrot_PMC_get_cstringn(Parrot_INTERP interp, Parrot_PMC pmc, Parrot_Int *
     return retval;
 }
 
+/*=for api extend Parrot_PMC_get_cstringn_intkey
+ *
+ * Return a null-terminated string for the PMC, along with the
+ * length.
+ *
+ * Yes, right now this is a bit of a cheat. It needs fixing, but
+ * without disturbing the interface.
+ */
+char *Parrot_PMC_get_cstringn_intkey(Parrot_INTERP interp, Parrot_PMC pmc, Parrot_Int *length, Parrot_Int key) {
+    char *retval;
+    retval = string_to_cstring(interp, VTABLE_get_string_keyed_int(interp, pmc, key));
+    *length = strlen(retval);
+    return retval;
+}
+
 /*=for api extend Parrot_PMC_set_string
  *
  * Assign the passed-in parrot string to the passed-in PMC
@@ -105,12 +158,36 @@ void Parrot_PMC_set_string(Parrot_INTERP interp, Parrot_PMC pmc, Parrot_STRING v
     VTABLE_set_string_native(interp, pmc, value);
 }
 
+/*=for api extend Parrot_PMC_set_string
+ *
+ * Assign the passed-in parrot string to the passed-in PMC
+ */
+void Parrot_PMC_set_string_intkey(Parrot_INTERP interp, Parrot_PMC pmc, Parrot_STRING value, Parrot_Int key) {
+    VTABLE_set_string_keyed_int(interp, pmc, key, value);
+}
+
 /*=for api extend Parrot_PMC_set_pointer
  *
  * Assign the passed-in pointer to the passed-in PMC
  */
 void Parrot_PMC_set_pointer(Parrot_INTERP interp, Parrot_PMC pmc, void *value) {
     VTABLE_set_pointer(interp, pmc, value);
+}
+
+/*=for api extend Parrot_PMC_set_pmc_intkey
+ *
+ * Assign the passed-in pmc to the passed-in slot of the passed-in PMC
+ */
+void Parrot_PMC_set_pmc_intkey(Parrot_INTERP interp, Parrot_PMC pmc, Parrot_PMC value, Parrot_Int key) {
+    VTABLE_set_pmc_keyed_int(interp, pmc, key, value);
+}
+
+/*=for api extend Parrot_PMC_set_pointer
+ *
+ * Assign the passed-in pointer to the passed-in PMC
+ */
+void Parrot_PMC_set_pointer_intkey(Parrot_INTERP interp, Parrot_PMC pmc, void *value, Parrot_Int key) {
+    VTABLE_set_pointer_keyed_int(interp, pmc, key, value);
 }
 
 /*=for api extend Parrot_PMC_set_intval
@@ -137,6 +214,14 @@ void Parrot_PMC_set_numval(Parrot_INTERP interp, Parrot_PMC pmc, Parrot_Float va
     VTABLE_set_number_native(interp, pmc, value);
 }
 
+/*=for api extend Parrot_PMC_set_numval
+ *
+ * Assign the passed-in parrot number to the passed-in PMC
+ */
+void Parrot_PMC_set_numval_intkey(Parrot_INTERP interp, Parrot_PMC pmc, Parrot_Float value, Parrot_Int key) {
+    VTABLE_set_number_keyed_int(interp, pmc, key, value);
+}
+
 /*=for api extend Parrot_PMC_set_cstring
  *
  * Assign the passed-in null-terminated C string to the passed-in PMC
@@ -145,12 +230,28 @@ void Parrot_PMC_set_cstring(Parrot_INTERP interp, Parrot_PMC pmc, const char *va
     VTABLE_set_string_native(interp, pmc, string_from_cstring(interp, value, 0));
 }
 
+/*=for api extend Parrot_PMC_set_cstring
+ *
+ * Assign the passed-in null-terminated C string to the passed-in PMC
+ */
+void Parrot_PMC_set_cstring_intkey(Parrot_INTERP interp, Parrot_PMC pmc, const char *value, Parrot_Int key) {
+    VTABLE_set_string_keyed_int(interp, pmc, key, string_from_cstring(interp, value, 0));
+}
+
 /*=for api extend Parrot_PMC_set_cstringn
  *
  * Assign the passed-in length-noted string  to the passed-in PMC
  */
 void Parrot_PMC_set_cstringn(Parrot_INTERP interp, Parrot_PMC pmc, const char *value, Parrot_Int length) {
     VTABLE_set_string_native(interp, pmc, string_from_cstring(interp, value, length));
+}
+
+/*=for api extend Parrot_PMC_set_cstringn
+ *
+ * Assign the passed-in length-noted string  to the passed-in PMC
+ */
+void Parrot_PMC_set_cstringn_intkey(Parrot_INTERP interp, Parrot_PMC pmc, const char *value, Parrot_Int length, Parrot_Int key) {
+    VTABLE_set_string_keyed_int(interp, pmc, key, string_from_cstring(interp, value, length));
 }
 
 /*=for api extend Parrot_PMC_new
