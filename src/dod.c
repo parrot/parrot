@@ -984,7 +984,7 @@ profile_dod_end(Parrot_Interp interpreter, int what)
         profile->data[what].numcalls++;
         profile->data[what].time += now - profile->dod_time;
         profile->starttime += now - profile->dod_time;
-        interpreter->profile->dod_time = now;
+        profile->dod_time = now;
     }
 }
 

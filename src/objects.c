@@ -927,7 +927,11 @@ Parrot_find_method_with_cache(Parrot_Interp interpreter, PMC *class,
     UINTVAL bits = (((UINTVAL) method_name->strstart ) >> 2) & TBL_SIZE_MASK;
     Meth_cache_entry *e, *old = NULL;
 
-    if (!is_const || DISABLE_METH_CACHE) {
+#if DISABLE_METH_CACHE
+    return find_method_direct(interpreter, class, method_name);
+#endif
+
+    if (!is_const) {
         /* TODO use hash - for now just go look up */
         goto find_it;
     }
@@ -1016,7 +1020,7 @@ find_method_direct(Parrot_Interp interpreter, PMC *class,
                          method_name);
 
     /* Bail immediately if we got something */
-    if (NULL != method) {
+    if (method) {
         return method;
     }
 
@@ -1025,8 +1029,7 @@ find_method_direct(Parrot_Interp interpreter, PMC *class,
                                        PCD_ALL_PARENTS);
     classcount = VTABLE_elements(interpreter, classsearch_array);
 
-    for (searchoffset = 0; NULL == method && searchoffset < classcount;
-            searchoffset++) {
+    for (searchoffset = 0; searchoffset < classcount; searchoffset++) {
         curclass = VTABLE_get_pmc_keyed_int(interpreter,
                 classsearch_array, searchoffset);
         method = find_global(interpreter,
@@ -1036,6 +1039,7 @@ find_method_direct(Parrot_Interp interpreter, PMC *class,
                              method_name);
         if (method) {
             Parrot_note_method_offset(interpreter, searchoffset, method);
+            return method;
         }
     }
     return method;

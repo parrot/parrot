@@ -13,7 +13,7 @@ loop:
     new P4, .PerlInt
     set P4, I10
     setattribute P3, I0, P4
-    inc I1
+    inc I0
     new P4, .PerlInt
     set P4, I10
     setattribute P3, I0, P4
