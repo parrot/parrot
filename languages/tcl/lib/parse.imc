@@ -1,24 +1,34 @@
+=head1 __parse
+
+Given a string that contains tcl commands, return an array of arrays of 
+C<TclWord>. 
+
+Takes a second parameter, preserve_whitespace. This function is typically
+called with a value of "0", which makes it the top level parser. if called
+with a value of 1, then the entire passed buffer is treated as a single
+word, and whitespace encountered here is added into the string. 
+
+=cut
+
 .sub __parse
   .param string buffer
-  # buffer contains the string we are working on.
+  .param int preserve_whitespace
 
-  .include "languages/tcl/lib/macros/debug.imc"
-  .const int debug = 0
+  #print "BUFFER="
+  #print buffer
+  #print "\n"
 
-  .debug("Called with buffer of {")
-  .debug(buffer)
-  .debug("}\n")
-  
+  # TclWord
+  .local pmc word 
+
+  .local int tclword
+  tclword = find_type "TclWord"
+
   # Keep track of the position of the current word
   .local int start_word
   .local int word_length
   .local int word_trailing_length
   start_word = 0
-
-  # Keep track of the position of the current command
-  .local int start_command
-  .local int command_length
-  start_command = 0
 
   # Keep track of a particular character
   .local int character
@@ -28,190 +38,185 @@
   .local int end_of_word
 
   # An array of commands, the current command
-  .local PerlArray commands
+  .local pmc commands
   commands = new PerlArray
+
   .local PerlArray command
 
-  # Define any macros we use.
+  # macros..
   .include "languages/tcl/lib/macros/is_space.imc"
-  .include "languages/tcl/lib/macros/debug.imc"
-
-  .debug("Backslash newline substitution\n")
 
   buffer = __backslash_newline_subst(buffer)
 
-  # (Do this after the newline_subst since this could change the size of the buffer.)
+  # (Do this after the newline_subst since this could change the
+  #  size of the buffer.)  ... don't fall off the end
 
-  # don't fall off the end
   .local int buffer_length
-  length buffer_length, buffer
+  buffer_length = length buffer
 
-BEGIN_COMMAND:
-  .debug("BEGIN COMMAND:\n")
-  .debug("start_word=")
-  .debug(start_word)
-  .debug("\n")
-
+begin_command:
+  #print "begin_command:\n"
   command = new PerlArray
 
-BEGIN_WORD:
-  .debug("BEGIN WORD:\n")
+begin_word:
+  #print "begin_word:\n"
+  word = new tclword
 
   end_of_word = 0
-  # Skip any leading whitespace.
+  # Skip any leading whitespace, unless we're preserving.
+  if preserve_whitespace == 1 goto pre_middle
 
 space_loop:
-  .debug("space_loop:\n")
-  .debug("start word='")
-  .debug(start_word)
-  .debug("'\n")
-
-  if start_word >= buffer_length goto END_SCOPE
+  #print "space_loop:\n"
+  if start_word >= buffer_length goto end_scope
 
 space_loop_cont:
-  ord $I0, buffer, start_word
+  #print "space_loop_cont:\n"
+  $I0 = ord buffer, start_word
   .is_space($I0,$I1)
   if $I1 == 0 goto space_loop_end
   inc start_word
   goto space_loop
 
 space_loop_end:
-  .debug("space_loop_end:\n")
   # at this point, we know start_word is correct. Now to figure out where
   # the word ends.
 
   # If the first character is special, then DTRT
-  ord character, buffer, start_word
+  character = ord buffer, start_word
 
   # {block}
-  if character == 123 goto block_begin
+  if character == 123 goto handle_brace
   
-  # "string"
-  if character == 34 goto block_begin
+  # "string" XXX - update to handle like block...
+  if character == 34 goto handle_quote
 
   # #comment
   if character != 35 goto pre_middle
   if command == 0 goto handle_comment
 
 pre_middle:
+  #print "pre_middle:\n"
   word_length = 0
   word_trailing_length = 0
   last_character = -1
 
-MIDDLE_WORD:
-  .debug("MIDDLE_WORD:\n")
-
+middle_word:
+  #print "middle_word:\n"
   $I0 = start_word + word_length
-  if $I0 != buffer_length goto middle_word_0
-  .debug("premature end of word, stopping...\n")
-  goto END_COMMAND
+  #print "$I0 is '"
+  #print $I0
+  #print "'\n"
+  #print "buffer_len='"
+  #print buffer_length
+  #print "'\n"
+
+  if $I0 >= buffer_length goto end_command
 
 middle_word_0:
-  .debug("checking character at: ")
-  .debug($I0)
-  .debug("\n")
+  #print "middle_word_0:\n"
+  character = ord buffer, $I0
+  #print "CHARACTER='"
+  #print character
+  #print "'\n"
 
-  ord character, buffer, $I0
-
+  if preserve_whitespace == 1 goto middle_word_2
   .is_space(character,$I0)
-  if $I0 == 1 goto END_WORD
+  if $I0 == 1 goto end_word
 
   # if this isn't a newline, skip
   if character != 10 goto middle_word_2
 
 middle_word_1:
-  .debug("middle_word_1:\n")
+  #print "middle_word_1:\n"
   word_trailing_length=1 
-  goto END_COMMAND
+  goto end_command
 
 middle_word_2:
-  .debug("middle_word_2:\n")
+  #print "middle_word_2:\n"
   # wait, this was a semicolon - go back and deal with it.
   if character == 59 goto middle_word_1
 
   # If we've gotten this far and we're in a "" or {} block, barf.
   if end_of_word == 1 goto invalid_word
 
+  # [ ] 
   if character == 91 goto handle_command_block
-  
-  if character != 123 goto middle_continue
-  if character == 36 goto handle_variable_block
+
+  # $
+  if character == 36 goto handle_variable
+ 
+  # \
+  if character == 92 goto handle_backslash
 
 middle_continue:
-  .debug("middle_continue:\n")
   last_character = character
   inc word_length
-  goto MIDDLE_WORD
+  goto middle_word
 
-END_WORD:
-  .debug("END_WORD:\n")
-
-  # XXX from start_word to end_word is a word.
+end_word:
+  #print "end_word:\n"
   # save the word and put it into the command array
-  substr $S0, buffer, start_word, word_length
-  push command, $S0
-  #_dumper("command after END_WORD is",command)
 
-  .debug("END_WORD='")
-  .debug($S0)
-  .debug("'\n")
+  $S0 = substr buffer, start_word, word_length
+  word.concat_const($S0)
+  #_dumper("ADDING WORD",word)
+  push command, word
 
-  start_word = start_word + word_length
-  start_word = start_word + word_trailing_length
+  start_word += word_length
+  start_word += word_trailing_length
   inc start_word
-  .debug("start_word=")
-  .debug(start_word)
-  .debug("\n")
 
-  goto BEGIN_WORD  
+  goto begin_word  
+
+=head2 comments
+
+  Comments are discarded during the parse step.
+
+=cut
 
 handle_comment:
-  .debug("handle_comment:\n")
-  index $I0, buffer, "\n", start_word
-  if $I0 == -1 goto comment_remainder
+  # If the comment is all that's left, quit.
+  $I0 = index buffer, "\n", start_word
+  if $I0 == -1 goto end_command
 
+  # otherwise, stop at the next newline.
   start_word = $I0 + 1
-  goto BEGIN_COMMAND
+  goto begin_command
   
-comment_remainer:
-  .debug("comment_remainder:\n")
-  # There's nothing left to process, the comment ends the string.
-  goto END_COMMAND
+end_command:
+  #print "end_command:\n"
 
-END_COMMAND:
-  .debug("END_COMMAND:\n")
-  .debug("word_length = '")
-  .debug(word_length)
-  .debug("'\n")
-  .debug("word_trailing_length = '")
-  .debug(word_trailing_length)
-  .debug("'\n")
-  .debug("start_word = '")
-  .debug(start_word)
-  .debug("'\n")
+  # if we're preserving whitespace and we're at the end of the command,
+  # we must really be done.
+  if preserve_whitespace==1 goto end_command_0
 
   # If this was an empty line, we'll have a 0 word length but
   # a trailing length of 1. skip the newline
+
+  # unless we finished the word, in which case 
+  if end_of_word == 1 goto end_command_0
+
+  # Because of how we grabbed the command, we could have a word_length
+  # of zero, but have a word object in process.
+  $I0 = word 
+  if $I0 != 0 goto end_command_0
+
+  # If word_length is zero now, don't bother adding the word.
+  # (unless we're preserving whitespace...)
   if word_length == 0 goto end_command_1
- 
-  #$I0 = command
-  #if $I0 == 0 goto end_command_3
-  #goto end_command_2
 
-  substr $S0, buffer, start_word, word_length
-  .debug("salvaged word='")
-  .debug($S0)
-  .debug("'\n") 
-  push command, $S0
-
-
-
-  .debug("END_COMMAND_WORD='")
-  .debug($S0)
-  .debug("'\n")
+end_command_0: 
+  #print "end_command_0:\n"
+  $S0 = substr buffer, start_word, word_length
+  word.concat_const($S0)
+  #_dumper("ADDING WORD",word)
+  push command, word
+  if preserve_whitespace == 1 goto preserve_end_scope
+  #print "Added word to command, no?\n"
 
 end_command_1:
-  .debug("end_command_1:\n")
+  #print "end_command_1:\n"
   # go to the next word
 
   $I0 = command
@@ -219,84 +224,314 @@ end_command_1:
   push commands, command
 
 end_command_2:
-  .debug("end_command_2:\n")
-  
-  #_dumper("I have a command of",command)
-  #_dumper("but my commands are",commands)
+  #print "end_command_2:\n"
+  start_word += word_length
+  start_word += word_trailing_length
+  goto begin_command
 
-  start_word = start_word + word_length
-  start_word = start_word + word_trailing_length
-  goto BEGIN_COMMAND
-
-block_begin:
-  # This handles both { and " style blocks.
-
+handle_brace:
   word_length = __match_close(buffer,start_word)
-
-  .debug("word_length = ")
-  .debug(word_length)
-  .debug("\n")
 
   if word_length < 0 goto bad_block
   end_of_word = 1 
-  goto MIDDLE_WORD
 
-handle_variable_block:
-  # All this needs to do is find the ending } and goto
-  # MIDDLE Word to keep accumulating word fragments...
-  .debug("XXX - handle_variable_block\n")    
-  goto END
-handle_command_block:     
-  # All this needs to do is find the ending ] and goto
-  # MIDDLE Word to keep accumulating word fragments...
-  # XXX this can probably be combined with block_begin...
-  .debug("handle_command_block:\n")
+  #figure out where the new word is going to start.
+  $I1 = start_word + word_length
 
+  # This gets added as a constant.
+  inc start_word
+  dec word_length
+  dec word_length
+  $S0 = substr buffer, start_word, word_length
+  word.concat_const($S0) 
+  start_word = $I1
+  word_length = 0
+  goto middle_word
+
+# This looks very much like handle_brace, eh?
+handle_quote:
   word_length = __match_close(buffer,start_word)
 
-  .debug("word_length = ")
-  .debug(word_length)
-  .debug("\n")
+  if word_length < 0 goto bad_block
+  end_of_word = 1 
+
+  #figure out where the new word is going to start.
+  $I1 = start_word + word_length
+
+  # Since we could have embedded things in our string,
+  # recall the parser, but tell it to preserve the whitespace in
+  # this quote.
+  # (There could be embedded vars, commands, etc.)
+  inc start_word
+  dec word_length
+  dec word_length
+  $S0 = substr buffer, start_word, word_length
+  $P0 = __parse($S0,1)
+  word.concat_words( $P0 )
+  start_word = $I1
+  word_length = 0
+  goto middle_word
+
+handle_variable:
+  #print "HANDLING VARIABLE\n"
+
+# First, save off anything we've gotten so far as a constant.
+  .local int old_length
+  old_length = word_length
+  .local int chunk_start
+  chunk_start = start_word + word_length
+  word_length = __match_close(buffer,chunk_start)
+
+  # if there's any word so far, save it
+  if old_length == 0 goto handle_variable_1
+  $S0 = substr buffer, start_word, old_length
+  word.concat_const( $S0 )
+   
+handle_variable_1:
+  #print "HANDLE_VARIABLE_1\n"
+  # Are we dealing with a {} var name?
+  inc chunk_start #skip the sigil
+  $I0 = ord buffer, chunk_start
+  #print "$I0='"
+  #print $I0
+  #print "'\n"
+  if $I0 != 123 goto handle_variable_nobrace
+
+handle_variable_brace:
+  #print "HANDLING BRACE VAR\n"
+  # Get the closing }, but we don't have to have matched pairs here.
+  $I1 = index buffer, "}", chunk_start
+  if $I1 > buffer_length goto invalid_variable
+  # Save the new start word for when we go to middle word.
+  inc $I1
+  start_word = $I1
+  word_length = 0
+
+  # Name of variable is between the braces..
+  inc chunk_start
+  $I2 = $I1 - chunk_start
+  dec $I2
+  $S0 = substr buffer, chunk_start, $I2
+  #print "VARIBLE NAME IS '"
+  #print $S0
+  #print "'\n"
+  word.concat_variable($S0)
+  goto middle_word
+
+handle_variable_nobrace:
+  #print "HANDLE_VARIABLE_NOBRACE\n"
+  .local int temppos 
+  temppos = chunk_start
+ 
+inner: 
+  #print "INNER:\n"
+  inc temppos
+  #print "temppos=" 
+  #print temppos
+  #print "\n"
+  #print "buffer_length="
+  #print buffer_length
+  #print "\n"
+  if temppos >= buffer_length goto inner_done
+    
+  $I0 = ord buffer, temppos
+  #print "CHARACTER FOUND:\n"
+  #print $I0
+  #print "\n"
+  #A
+  if $I0 < 65 goto check2 
+  #Z
+  if $I0 <= 90 goto inner
+check2:
+  #print "CHECK2\n"
+  #a
+  if $I0 < 97 goto check3
+  #z
+  if $I0 <=122 goto inner
+check3:
+  #print "CHECK3\n"
+  #0
+  if $I0 <48 goto check4
+  #9
+  if $I0 <=57 goto inner
+check4:
+  #print "CHECK4\n"
+  # _
+  if $I0 == 95 goto inner  
+
+inner_done:
+  #print "INNER DONE\n"
+  # Once we get here, we could also have a () to deal with..
+  # ()
+  $I1 = temppos - chunk_start
+  $S0 = substr buffer, chunk_start, $I1
+  start_word = chunk_start + $I1
+  word_length = 0
+
+  if $I0 != 40 goto gotword
+
+  temppos = index buffer, ")", start_word
+  if temppos == -1 goto bad_array
+  # $S0($S1)
+  inc start_word
+  $I1 = temppos - start_word
+  $S1 = substr buffer, start_word, $I1
+  #print "$S1="
+  #print $S1
+  #print "\n"
+  start_word = temppos + 1
+  word.concat_variable($S0,$S1)
+  goto middle_word
+
+gotword:
+  # $S0 was set to the name of the variable above.
+  #print "GOTWORD\n"
+  word.concat_variable($S0)
+
+  goto middle_word
+
+handle_backslash:
+  # dump anything so far as a constant.
+  if word_length == 0 goto backslash_escape
+
+  $S0 = substr buffer, start_word, word_length
+  word.concat_const( $S0 )
+  start_word += word_length
+  word_length =  0
+
+backslash_escape:
+  # get the next character (start_word is now the beginning of the escape)
+  # XXX Need to make sure we don't walk off the edge here.
+  inc start_word 
+  .local int escape_length 
+  escape_length = 1
+  $I0 = ord buffer, start_word 
+  # add this escape as a sequence.
+  # \a
+  if $I0 != 97 goto backslash_escape_b
+  word.concat_char ( 7 )
+  goto escape_done
+backslash_escape_b:
+  if $I0 != 98 goto backslash_escape_f
+  word.concat_char ( 8 )
+  goto escape_done
+backslash_escape_f:
+  if $I0 != 102 goto backslash_escape_n
+  word.concat_char ( 12 )
+  goto escape_done
+backslash_escape_n:
+  if $I0 != 110 goto backslash_escape_r
+  word.concat_char ( 10 )
+  goto escape_done
+backslash_escape_r:
+  if $I0 != 114 goto backslash_escape_t
+  word.concat_char ( 13 )
+  goto escape_done
+backslash_escape_t:
+  if $I0 != 116 goto backslash_escape_v
+  word.concat_char ( 9 )
+  goto escape_done
+backslash_escape_v:
+  if $I0 != 118 goto backslash_escape_not
+  word.concat_char ( 11 )
+  goto escape_done
+
+# XXX - here is where the \o, \x, \u escapes would go.
+#     - You have to twiddle escape_length 
+
+backslash_escape_not:
+  word.concat_char ( $I0 )
+
+escape_done:
+  # skip the escaped char
+  start_word = start_word + escape_length
+  goto middle_word
+
+handle_command_block:     
+  .local int old_length
+  old_length = word_length
+  .local int chunk_start
+  chunk_start = start_word + word_length
+  word_length = __match_close(buffer,chunk_start)
+
   if word_length < 0 goto bad_block
 
-  goto MIDDLE_WORD
+  # if there's any word so far, save it
+  if old_length == 0 goto command_save
+  #print "FOUND THE VAR:"
+  #print $S0
+  #print "\n"
+  $S0 = substr buffer, start_word, old_length
+  word.concat_const( $S0 )
 
-END_SCOPE:
-  .debug("END_SCOPE:\n")
+command_save:
+  # Save this as a command (skip the []'s)
+  $I0 = chunk_start + 1
+  $I1 = word_length - 2
+  $S0 = substr buffer, $I0, $I1
+  word.concat_command( $S0 )
 
+  #print "START_WORD='"
+  #print start_word
+  #print "'\nCHUNK_START='" 
+  #print chunk_start
+  #print "'\nWORD_LENGTH='"
+  #print word_length
+  #print "'\nBUFFER_LENGTH='"
+  #print buffer_length
+  #print "'\n"
+
+  start_word = chunk_start + word_length
+  #print "START_WORD='"
+  #print start_word
+  #print "'\n"
+  #_dumper("WORD",word)
+  word_length = 0
+
+  goto middle_word
+
+# if we're preserving whitespace, just
+# return the single command
+
+preserve_end_scope:
+  #_dumper("preserve_end_scope",command)  
+  .pcc_begin_return
+    .return command
+  .pcc_end_return
+
+end_scope:
+  #print "end_scope:\n"
   # If we have a command in progress, save it!
   $I0 = command
   if $I0 == 0 goto end_scope_2
-  #if command == 0 goto end_scope_2
   push commands, command
-  #_dumper("commands is now(END_SCOPE)",commands)
+
   # At this point, we have parsed the string into an array of commands.
   # return it.
 
 end_scope_2:
-  .debug("there were ")
-  $I12= commands
-  .debug($I12)
-  .debug(" commands in this parsed block.\n")
-
-  #_dumper("parse generated commands of ",commands)
-
   .pcc_begin_return
-  .return commands
+    .return commands
   .pcc_end_return
-  ret
 
-
-END:
+end:
   end
 
  # XXX these really should generate compile-time tcl errors.
  # (perhaps even compile to code that generates an [error]?)
+ # (redo this once "error" is working.)
+
+bad_array:
+  print "XXX - invalid array, no close ) found\n"
+  goto end
 bad_block:
   print "XXX - invalid word, no closing <mumble> found\n"
-  goto END
+  goto end
 invalid_word:
   print "XXX - invalid word, should have ended after block\n"
-  goto END
+  goto end
+invalid_variable:
+  print "XXX - invalid variable, no closing } found\n"
+  goto end
 
 .end

@@ -1,0 +1,415 @@
+###
+# TclWord
+#
+# This object holds the result of parsing a tcl command. Internally,
+# It represents a word as discrete chunks, which are either finalized
+# or require interpolation. Each chunk is marked as such. When the
+# word is /used/ (at interpretation or at execution time), 
+#
+# Attributes:
+#   Each TclWord has the following attributes:
+#   chunks: an array of pairs of (type, content), where type/content ==
+#     CONST    - a string
+#     VARIABLE - a perlArray suitable for passing to _get_var
+#     COMMAND  - the result of a the parse step for a [] command, i.e.
+#                a PerlArray of TclWords. 
+
+# XXX how do I get at global constants like TCL_OK from this namespace?
+
+# Methods:
+#   __get_string - automatically stringify, evaluating code and interpolating
+#                   as necessary.
+#   __set_ - takes a string (can we do this on the initializer, or do we
+#            need a separate setup). This automagically breaks up the
+#            string into the various components.
+#   concat_variable, concat_const, concat_command
+
+# XXX - figure out how to get namespace-mangled constants, to replace:
+#      - const   - 0
+#      - var     - 1
+#      - command - 2
+
+.namespace ["TclWord"]
+
+.sub __class_init @LOAD
+  newclass $P1, "TclWord"
+  addattribute $P1, "chunks"
+.end
+
+.sub __init
+  $P1 = new PerlArray
+  # P2 is our instance
+  setattribute P2, "TclWord\x00chunks", $P1
+.end
+
+=head1 Methods
+
+TclWord defines the following methods:
+
+=head2 concat_words
+
+Given an array of words, append the chunks of a given word to the existing word 
+
+=cut
+
+.sub concat_words method
+  .param pmc words
+
+  .local pmc word
+  .local pmc chunk
+
+  .local pmc these_chunks
+  these_chunks = getattribute self, "TclWord\x00chunks" 
+
+  .local pmc those_chunks
+
+  .local int num_words
+  .local int word_num
+
+  .local int num_chunks
+  .local int chunk_num
+
+  num_words = words
+  word_num = 0
+outer_loop:
+  if word_num == num_words goto outer_loop_done 
+
+  word = words[word_num]
+  those_chunks = getattribute word, "TclWord\x00chunks"
+
+  num_chunks = those_chunks
+  chunk_num = 0
+inner_loop:   
+  if chunk_num == num_chunks goto inner_loop_done
+
+  chunk = those_chunks[chunk_num]
+  push these_chunks, chunk
+  inc chunk_num
+
+  goto inner_loop
+
+inner_loop_done:
+  inc word_num
+
+outer_loop_done:
+.end
+
+
+=head2 concat_char
+
+Add a constant character to a TclWord
+
+=cut
+
+.sub concat_char method
+  .param int arg
+
+  .local pmc chunk
+  .local pmc chunks
+  .local string str
+  
+  str = chr arg
+
+  chunk = new PerlArray
+  chunk[0] = 0
+  chunk[1] = str
+
+  chunks = getattribute self, "TclWord\x00chunks"
+  push chunks, chunk
+.end
+
+
+=head2 concat_const
+
+Add a constant string to a TclWord
+
+=cut
+
+.sub concat_const method
+  .param string arg
+
+  .local pmc chunk
+  .local pmc chunks
+
+  if arg == "" goto end
+  chunk = new PerlArray
+  chunk[0] = 0
+  chunk[1] = arg
+
+  chunks = getattribute self, "TclWord\x00chunks"
+  push chunks, chunk
+end:
+.end
+
+
+=head2 concat_variable
+
+Add the name of a variable to be interpolated to a TclWord. Takes the name
+of the var, and an optional index.
+
+=cut
+
+.sub concat_variable method
+  .param string var
+  .param string idx
+
+  .local pmc chunk
+  .local pmc chunks
+
+
+  chunk = new PerlArray
+  chunk[0] = 1
+  chunk[1] = var
+  if idx == "" goto no_index
+  chunk[2] = idx
+
+no_index:
+  chunks = getattribute self, "TclWord\x00chunks"
+  push chunks, chunk
+.end
+
+=head2 concat_command
+
+Add a command to be interpolated to a TclWord. Takes the
+text of the command, and stores the parsed version for
+later.
+
+=cut
+
+.sub concat_command method
+  .param string cmd
+
+  .local pmc chunk
+  .local pmc chunks
+  .local pmc parsed_cmd
+
+  # XXX I'd really rather not have to lug around another global
+  #     to call 
+
+  $P1 = find_global "__parse"
+  parsed_cmd  = $P1(cmd)
+
+  chunk = new PerlArray
+  chunk[0] = 2
+  chunk[1] = parsed_cmd
+
+  chunks = getattribute self, "TclWord\x00chunks"
+  push chunks, chunk
+.end
+
+=head2 __get_string
+
+Stringify - In our case, we take the individual chunks of the words and
+evaluate them  - so if we have a TclWord that came from a string like:
+
+	"$a + $b = [expr $a + $b]"
+
+We have split it up internally to look like:
+
+	VAR:     a
+	CONST:   " + "
+	VAR:     b
+	CONST:   " = "
+	COMMAND:
+		WORD:
+			CONST: "expr"
+		WORD:
+			VAR: a
+		WORD:
+			CONST: "+"
+		WORD:
+			VAR: b
+
+And, when we ask for the string representation, the two variable interpolations
+are performed, and the command containing "expr" is also evaluated. The
+resulting string, (assuming values of 1 and 2 for a and b, respectively) is
+
+	"1 + 2 = 3"
+
+=cut
+
+.sub __get_string method
+
+  .local int return_type
+
+  return_type = 0
+
+  .local pmc chunks
+  chunks = getattribute self, "TclWord\x00chunks"
+
+  .local pmc interpret 
+  .local pmc get_var
+
+  interpret = global "__interpret"
+  get_var = global "__get_var"
+
+  .local string retval
+  retval = ""
+
+  $I1 = chunks
+  $I0 = 0   
+loop:
+  if $I0 == $I1 goto loop_done
+  $P0 = chunks[$I0]
+  $I2 = $P0[0]
+
+  if $I2 == 0 goto constant
+  if $I2 == 1 goto variable
+  if $I2 == 2 goto command
+
+command:
+  #print "RETURNING COMMAND\n"
+  $P1 = $P0[1]
+  $S1 = typeof $P1
+  ($I0, $S0) = interpret( $P1 )
+  if $I0 == 0 goto loop_next
+  # An exception value was returned. abort.
+  return_type = $I0
+  retval = $S0
+  goto loop_done
+
+variable:
+  #print "RETURNING VARIABLE\n"
+  $P1 = new PerlArray
+  $S1 = $P0[1]
+  #$P9 = global "_dumper"
+  #$P9($P0)
+  $P1[0] = $S1
+  #print "$S1 is"
+  #print $S1
+  #print "\n"
+  $S2 = $P0[2]
+  if $S2 == "" goto get_variable
+  #print "Setting S2\n"
+  $P1[1] = $S2
+get_variable:
+  #print "get_variable:\n"
+  ($I2,$P9) = get_var($P1)
+  $S0 = $P9
+  #print "here?\n"
+  if $I2 == 0 goto loop_next 
+  #print "there?\n"
+  return_type = $I2
+  retval = $S0
+  goto loop_done 
+
+constant:
+  #print "RETURNING CONSTANT\n"
+  $S0 = $P0[1]
+  # goto loop_next 
+
+loop_next:
+  #print "loop next\n"
+  retval .= $S0
+  inc $I0
+  goto loop
+
+loop_done:  
+  #print "(tcl_word, return_type="
+  #print return_type
+  #print ",retval="
+  #print retval
+  #print ")\n"  
+  .pcc_begin_return
+    .return return_type
+    .return retval
+  .pcc_end_return
+.end
+
+=head2 __dump
+
+Allow us to be rendered by Data::Dumper
+
+=cut
+
+.sub __dump method
+  .param pmc dumper
+  .param string name
+
+  .local string subindent
+  .local string indent
+  (subindent, indent) = dumper."newIndent"()
+
+  .local pmc chunks 
+  chunks = getattribute self, "TclWord\x00chunks"
+
+  .local int num_chunks
+  num_chunks = chunks
+  .local int chunk_num
+  chunk_num = 0
+
+  print "(size:"
+  print num_chunks
+  print ") {\n"
+ 
+loop:
+  if chunk_num >= num_chunks goto loop_done
+  if chunk_num == 0 goto skip
+  print ",\n"
+skip:
+
+  $P0 = chunks[chunk_num]
+  $I0 = $P0[0]
+
+  print subindent  
+
+  if $I0 == 2 goto command
+  if $I0 == 1 goto var
+
+  $S0 = $P0[1]
+  print "\""
+  print $S0
+  print "\""
+  goto loop_next
+
+command:
+  $P1 = $P0[1]
+  dumper.pmcPerlArray($P1)
+  goto loop_next
+
+var:
+  $S0 = $P0[1]
+  $S1 = $P0[2]
+  if $S1 != "" goto array_var
+  print "[ set "
+  print $S0   
+  print " ]"
+  goto loop_next
+
+array_var:
+  print "[ set "
+  print $S0
+  print " ("
+  print $S1
+  print ") ]"
+
+loop_next: 
+  inc chunk_num
+  goto loop
+
+loop_done:
+  print "\n"
+
+  print indent
+  print "}"
+
+  dumper."deleteIndent"()
+.end
+
+=head2 __get_integer
+
+Return the number of chunks in this tclword.
+
+=cut
+
+.sub __get_integer method
+  
+  .local pmc chunks 
+  chunks = getattribute self, "TclWord\x00chunks"
+  .local int size
+  size = chunks 
+
+  .pcc_begin_return
+    .return size
+  .pcc_end_return
+.end

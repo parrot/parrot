@@ -5,67 +5,127 @@
 # (as with the [procs], the args are passed in as a
 # perlarray
 
-# XXXXXXXXXX!!!!!!!!!
-# this code isn't our code - it's cut and paste from 
-# cmd_set - all the right logic is buried in it, just need to
-# clean it up (and then rewrite cmd_set to call this code)
-# (when doing a get, anyway)
-
 .sub __get_var
-  .param PerlArray argv
+  .param pmc argv
+
+  #_dumper("get var passed",argv)
 
   .local int argc
   argc = argv
 
-  .include "languages/tcl/lib/macros/debug.imc"
-  .const int debug = 0
+# with recent changes, argv2 is always set (sometimes to a PerlUndef)
+# This tweaks it act as if only one had been passed in. This will
+# eventually need a cleanup.
+
+  if argc == 1 goto continue
+  $P0 = argv[1]
+  $I0 = typeof $P0
+  if $I0 != .PerlUndef goto continue
+  argc=1
+
+continue:
+  #print "ARGC="
+  #print argc
+  #print "\n"
 
   .local string name
   .local pmc lexical
 
   .local string index
-  .local string type
+  .local int type
 
-  .local PerlString value
-  .local string retval
+  .local pmc value
+  .local pmc retval
+
+  .local int return_type
+  return_type = TCL_OK
+
+  .local Exception_Handler ignore
+  newsub ignore, .Exception_Handler, __default_handler
 
   name=argv[0] 
   if argc == 1 goto get_scalar
   index=argv[1] 
 
 get_indexed:
-  print "indexed\n"
-  find_lex lexical, -1, name
+  #print "get_indexed:\n"
+  set_eh ignore
+    find_lex lexical, -1, name
+  clear_eh
+  isnull lexical, no_such_variable
+  $I0 = typeof lexical
+  # get rid of PerlUndef when switch to Tcl*
+  if .PerlUndef == $I0 goto no_such_variable
+  #isnull lexical, no_such_variable
   typeof type, lexical
-  if type != "PerlHash" goto get_indexed_bad
+  if type != .PerlHash goto get_indexed_bad
 
 get_indexed_ok:
   retval = lexical[index]
   goto done
 
 get_indexed_bad:
-  print "That's not an array variable, putz"
+  #print "get_indexed_bad:\n"
+  return_type = TCL_ERROR
+  $S0 =  "can't read \""
+  $S0 .= name
+  $S0 .= "("
+  $S0 .= index
+  $S0 .= ")\": variable isn't array\n"
+  retval = new PerlString
+  retval = $S0
   goto done
 
 get_scalar:
-  find_lex lexical, -1, name
-  typeof type, lexical
-  if type != "PerlHash" goto get_scalar_ok
+  #print "name is"
+  #print name
+  #print "\n"
+  set_eh ignore
+    find_lex lexical, -1, name
+  clear_eh
 
-  print "Can't do that, that's an array variable\n"
+  isnull lexical, no_such_variable 
+  $I0 = typeof lexical
+  # Remove perlundef when we switch back to Tcl*
+  if .PerlUndef == $I0 goto no_such_variable
+
+  typeof type, lexical
+  if type != .PerlHash goto get_scalar_ok
+
+get_scalar_bad:
+  return_type =TCL_ERROR
+  $S0 = "can't read \""
+  $S0 .= name
+  $S0 .= "\": variable is an array\n"
+  retval = new PerlString
+  retval = $S0
   goto done
 
 get_scalar_ok:
+  #print "HERE?\n"
+  #print "lexical is:"
+  #print lexical
+  #print "\n"
   retval = lexical
   goto done
 
+no_such_variable:
+  return_type =TCL_ERROR
+  $S0 = "can't read \""
+  $S0 .= name
+  $S0 .= "\": no such variable"
+  retval = new PerlString
+  retval = $S0
+  # goto done            
+
 done:
-   .debug("retval is '")
-   .debug(retval)
-   .debug("'\n")
-    
+  #print "(get var) return_type is "
+  #print return_type
+  #print ",retval is "
+  #print retval
+  #print "\n"
   .pcc_begin_return
-  .return 0
-  .return retval
+    .return return_type
+    .return retval
   .pcc_end_return
 .end
