@@ -127,7 +127,7 @@ my %arg_maps = (
   'nc' => "interpreter->code->const_table->constants[cur_opcode[%ld]]->number",
   'pc' => "%ld /* ERROR: Don't know how to handle PMC constants yet! */",
   'sc' => "interpreter->code->const_table->constants[cur_opcode[%ld]]->string",
-  'kc' => "interpreter->code->const_table->constants[cur_opcode[%ld]]->string",
+  'kc' => "cur_opcode[%ld]"
 );
 
 sub access_arg

@@ -131,7 +131,7 @@ sub access_arg
     'nc' => "(*(FLOATVAL *)cur_opcode[%ld])",
     'pc' => "%ld /* ERROR: Don't know how to handle PMC constants yet! */",
     'sc' => "(*(STRING **)cur_opcode[%ld])",
-    'kc' => "(*(STRING **)cur_opcode[%ld])",
+    'kc' => "(*(INTVAL *)cur_opcode[%ld])"
   );
 
   die "Unrecognized type '$type' for num '$num' in opcode @{[$op->full_name]}"
