@@ -61,6 +61,8 @@ static int nkeys;
 static int keyvec;
 static SymReg *regs[IMCC_MAX_REGS];
 static int nargs;
+static int cnr;
+
 
 
 /*
@@ -462,7 +464,7 @@ pcc_sub_call:
             SymReg * r;
             Instruction *i;
 
-            sprintf(name, "%cpcc_sub_call_%d", IMCC_INTERNAL_CHAR, line - 1);
+            sprintf(name, "%cpcc_sub_call_%d", IMCC_INTERNAL_CHAR, cnr++);
             $<sr>$ = r = mk_pcc_sub(str_dup(name), 0);
             r->pcc_sub->pragma = $2;
             /* this mid rule action has the semantic value of the
@@ -555,7 +557,7 @@ pcc_ret:
             if(!ins || !ins->r[1] || ins->r[1]->type != VT_PCC_SUB)
                fataly(EX_SOFTWARE, sourcefile, line,
                       "pcc_return not inside pcc subroutine\n");
-            sprintf(name, "%cpcc_sub_ret_%d", IMCC_INTERNAL_CHAR, line - 1);
+            sprintf(name, "%cpcc_sub_ret_%d", IMCC_INTERNAL_CHAR, cnr++);
             $<sr>$ = r = mk_pcc_sub(str_dup(name), 0);
             i = iLABEL(cur_unit, r);
             i->type = ITPCCSUB | ITLABEL;
@@ -576,7 +578,7 @@ pcc_yield:
                fataly(EX_SOFTWARE, sourcefile, line,
                       "pcc_yield not inside pcc subroutine\n");
             ins->r[1]->pcc_sub->calls_a_sub = 1;
-            sprintf(name, "%cpcc_sub_yield_%d", IMCC_INTERNAL_CHAR, line - 1);
+            sprintf(name, "%cpcc_sub_yield_%d", IMCC_INTERNAL_CHAR, cnr++);
             $<sr>$ = r = mk_pcc_sub(str_dup(name), 0);
             i = iLABEL(cur_unit, r);
             i->type = ITPCCSUB | ITLABEL | ITPCCYIELD;
@@ -793,7 +795,7 @@ assignment:
             char name[128];
             SymReg * r;
             Instruction *i;
-            sprintf(name, "%cpcc_sub_call_%d", IMCC_INTERNAL_CHAR, line - 1);
+            sprintf(name, "%cpcc_sub_call_%d", IMCC_INTERNAL_CHAR, cnr++);
             r = mk_pcc_sub(str_dup(name), 0);
             current_call = i = iLABEL(cur_unit, r);
             i->type = ITCALL | ITPCCSUB;
@@ -817,7 +819,7 @@ sub_call:
            char name[128];
            SymReg * r;
            Instruction *i;
-           sprintf(name, "%cpcc_sub_call_%d", IMCC_INTERNAL_CHAR, line - 1);
+           sprintf(name, "%cpcc_sub_call_%d", IMCC_INTERNAL_CHAR, cnr++);
            r = mk_pcc_sub(str_dup(name), 0);
            current_call = i = iLABEL(cur_unit, r);
            i->type = ITCALL | ITPCCSUB;

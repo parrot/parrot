@@ -651,7 +651,7 @@ pcc_emit_flatten(Parrot_Interp interpreter, IMC_Unit * unit, Instruction *ins,
     SymReg *i0, *i1, *i2, *py, *p3, *ic16;
     SymReg *loop, *next, *over, *over1;
     Instruction *tmp;
-    int lin;
+    static int lin;
     char buf[128];
     char * s;
     /*
@@ -718,7 +718,7 @@ pcc_emit_flatten(Parrot_Interp interpreter, IMC_Unit * unit, Instruction *ins,
         regs[1] = mk_const(str_dup(buf), 'I');
         ins = insINS(interpreter, unit, ins, "set", regs, 2);
     }
-    lin = ins->line;
+    ++lin;
     sprintf(buf, "_%carg_loop_%d_%d", IMCC_INTERNAL_CHAR, lin, i);
     loop = mk_address(str_dup(buf), U_add_uniq_label);
     sprintf(buf, "_%cnext_arg_%d_%d", IMCC_INTERNAL_CHAR, lin, i);
