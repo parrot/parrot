@@ -1,6 +1,6 @@
 #! perl -w
 
-use Parrot::Test tests => 5;
+use Parrot::Test tests => 6;
 use Test::More;
 
 output_is(<<'CODE', <<'OUTPUT', "set/getprop");
@@ -80,6 +80,19 @@ Integer
 Float
 OUTPUT
 
+output_is(<<'CODE', <<'OUTPUT', "getting a unset property");
+    new P1, .PerlNum
+    new P2, .PerlInt
+
+    getprop P2, "Wibble", P1
+    defined I2, P2
+    eq I2, 0, OK
+    print "not "
+OK: print "ok\n"
+    end
+CODE
+ok
+OUTPUT
 
 output_is(<<'CODE', <<'OUTPUT', "delprop");
     new P0, .PerlInt
