@@ -227,7 +227,9 @@ obscure.ops
 ops2c.pl
 ops2pm.pl
 optimizer.pl
+packdump.c
 packfile.c
+packout.c
 parrot.c
 pbc2c.pl
 pdump.c
