@@ -18,13 +18,15 @@ sub runstep {
     grep { !/vtable\.ops/ }
     glob "ops/*.ops"
   );
-  
-  
+
+
   my $ops=join ' ', grep { !/obscure\.ops/ } @ops;
-  
+
   $ops=$_[1] if defined $_[1];
-  
-  if($_[0]) {
+
+  # ops selection disabled - until we can build and load
+  # opcode subset libs
+  if (0 && $_[0]) {
   print <<"END";
 
 
@@ -33,14 +35,14 @@ The following opcode files are available:
 END
     {
       $ops=prompt('Which opcode files would you like?', $ops);
-      
+
       if($ops !~ m{^\s*core\.ops}) {
         print "core.ops must be the first selection.\n";
         redo;
       }
     }
   }
-  
+
   Configure::Data->set(
     ops => $ops
   );

@@ -1,10 +1,9 @@
 #!perl
 use strict;
 use TestCompiler tests => 11;
-use lib '../../lib';
 use Parrot::Config;
 
-my $PARROT = "..$PConfig{slash}..$PConfig{slash}parrot$PConfig{exe}";
+my $PARROT = "..$PConfig{slash}parrot$PConfig{exe}";
 
 # include file tests
 
