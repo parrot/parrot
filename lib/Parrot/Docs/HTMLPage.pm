@@ -1,4 +1,4 @@
-# Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+# Copyright: 2004 The Perl Foundation.  All Rights Reserved.
 # $Id$
 
 =head1 NAME
@@ -32,9 +32,10 @@ F<docs/resources>, the image and CSS file directory.
 sub header
 {
     my $self = shift;
-    my $title = shift;
-    my $navigation = shift;
-    my $resources = shift;
+    # Default values to keep warnings quiet in tests.
+    my $title = shift || 'Untitled';
+    my $navigation = shift || '';
+    my $resources = shift || '';
     
     <<"HEADER";
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"

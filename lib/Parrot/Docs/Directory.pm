@@ -39,9 +39,18 @@ Returns C<Parrot::Docs::File>.
 
 sub file_class
 {
-	my $self = shift;
-	
 	return 'Parrot::Docs::File';
+}
+
+=item C<directory_class()>
+
+Returns C<Parrot::Docs::Directory>.
+
+=cut
+
+sub directory_class
+{
+	return 'Parrot::Docs::Directory';
 }
 
 =item C<files_of_type($type, $recursive, $ignore)>

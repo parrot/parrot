@@ -1,14 +1,86 @@
-#!/usr/bin/env perl
-#
+#! perl -w
+# Copyright: 2004 The Perl Foundation.  All Rights Reserved.
 # $Id$
-#
+
+=head1 NAME
+
+parrotbug - Parrot Bug Reporter
+
+=head1 SYNOPSIS
+
+    % ./parrotbug [options]
+
+=head1 DESCRIPTION
+
+A program to help generate bug reports about parrot, and mail them.
+It is designed to be used interactively. Normally no arguments will
+be needed.
+
+=head2 Command-line Options
+
+=over 4
+
+=item C<-A>
+
+Don't send a bug received acknowledgement to the return address.
+
+=item C<-b>
+
+Body of the report. If not included on the command line, or in a file
+with C<-f>, you will get a chance to edit the message.
+
+=item C<-d>
+
+Dump mode. This prints out your configuration data, without mailing
+anything.
+
+=item C<-e>
+
+Editor to use.
+
+=item C<-f>
+
+File containing the body of the report. Use this to quickly send a
+prepared message.
+
+=item C<-h>
+
+Print this help message and exit.
+
+=item C<-nok>
+
+Report unsuccessful build on this system to parrot developpers
+
+=item C<-ok>
+
+Report successful build on this system to parrot developpers Only use
+C<-ok> if B<everything> was ok; if there were B<any> problems at all,
+use C<-nok>.
+
+=item C<-r>
+
+Your return address. The program will ask you to confirm this if you
+don't give it here.
+
+=item C<-s>
+
+Subject to include with the message. You will be prompted if you don't
+supply one on the command line.
+
+=item C<-V>
+
+Print version information and exit.
+
+=back
+
+=head1 Subroutines
+
+=over 4
+
+=cut
 
 eval 'exec perl -w -S $0 ${1+"$@"}'
   if $running_under_some_shell;
-
-#
-# This utility borrows heavily from perlbug.
-#
 
 use strict;
 use Config;
@@ -45,14 +117,12 @@ query_info();
 send_msg();
 exit;
 
+=item C<explain_parrotbug()>
 
+Explain what C<parrotbug> is.
 
+=cut
 
-#------------------------------------------------------------#
-#                         Info subs.                         #
-
-#----
-# Explain what parrotbug is.
 sub explain_parrotbug {
     print <<EOF;
 
@@ -78,9 +148,12 @@ EOF
 #'
 }
 
+=item C<help()>
 
-#----
-# Print synopsis + help message and exit.
+Print synopsis + help message and exit.
+
+=cut
+
 sub help {
     print <<EOF;
 
@@ -121,9 +194,12 @@ EOF
     exit;
 }
 
+=item C<version()>
 
-#----
-# Print version information (of the parrotbug program) and exit.
+Print version information (of the parrotbug program) and exit.
+
+=cut
+
 sub version {
     print <<"EOF";
 
@@ -139,8 +215,12 @@ EOF
 #------------------------------------------------------------#
 #                        Utils subs.                         #
 
-#----
-# Generate random filename to edit report.
+=item C<generate_filename()>
+
+Generate random filename to edit report.
+
+=cut
+
 sub generate_filename {
     my $dir = File::Spec->tmpdir();
     my $filename = "bugrep0$$";
@@ -149,11 +229,15 @@ sub generate_filename {
     return $filename;
 }
 
+=item C<trivial_subject($subject)>
 
-#----
-# Check whether a subject is trivial. A subject is not considered
-# trivial if it's an ok or a nok report.
-# Return 1 if trivial, 0 otherwise (subject acceptable).
+Check whether a subject is trivial. A subject is not considered trivial
+if it's an ok or a nok report.
+
+Return 1 if trivial, 0 otherwise (subject acceptable).
+
+=cut
+
 sub trivial_subject {
     my $subject = shift;
 
@@ -174,12 +258,16 @@ sub trivial_subject {
 #------------------------------------------------------------#
 #                         Init subs.                         #
 
-#----
-# Initialize prog:
-#  - get parrot information
-#  - process options
-#  - create the message information (subject, to, body, etc.)
-#    depending on the type of report (ok, nok or bug report)
+=item C<init()>
+
+Initialize the program. 
+
+Get parrot information, process the options, create the message
+information (subject, to, body, etc.) depending on the type of report
+(ok, nok or bug report).
+
+=cut
+
 sub init {
     $is_linux   = lc($^O) eq 'linux';
     $is_macos   = $^O eq 'MacOS';
@@ -311,8 +399,12 @@ sub init {
 #------------------------------------------------------------#
 #                       Querying subs.                       #
 
-#----
-# Query missing information in order to have a complete report.
+=item C<query_info()>
+
+Query missing information in order to have a complete report.
+
+=cut
+
 sub query_info {
     $subject = "" if trivial_subject( $subject );
     ask_for_subject()        unless $subject;
@@ -326,15 +418,19 @@ sub query_info {
     ask_for_body()           unless $use_file || $body;
 }
 
+=item C<ask_for_alternative($what, $choices, $default)>
 
-#----
-# Prompt for alternatives from a set of choices.
-# Provide:
-#  - the name of alternative
-#  - the choices (array ref)
-#  - the default answer
-# Return the lowercased alternative chosen.
-# Die if more than 5 wrong answers.
+Prompt for alternatives from a set of choices.
+
+The arguments are: the name of alternative, the choices (as an array
+ref), and the default answer.
+
+Return the lowercased alternative chosen.
+
+Die if more than 5 wrong answers.
+
+=cut
+
 sub ask_for_alternative {
     my ( $what, $choices, $default ) = @_;
 
@@ -358,9 +454,12 @@ EOF
     return lc $alt;
 }
 
+=item C<ask_for_body()>
 
-#----
-# Prompt for body, through an external editor.
+Prompt for body, through an external editor.
+
+=cut
+
 sub ask_for_body {
     print <<EOF;
 Now you need to supply the bug report. Try to make the report concise
@@ -395,9 +494,12 @@ EOF
     edit_bug_report( $opts{f} );
 }
 
+=item C<ask_for_editor()>
 
-#----
-# Prompt for editor to use.
+Prompt for editor to use.
+
+=cut
+
 sub ask_for_editor {
     print shift() . "Editor [$editor]: ";
     my $entry = <>;
@@ -405,9 +507,12 @@ sub ask_for_editor {
     $editor = $entry if $entry ne "";
 }
 
+=item C<ask_for_return_address()>
 
-#----
-# Prompt for return address.
+Prompt for return address.
+
+=cut
+
 sub ask_for_return_address {
     print <<EOF;
 Your e-mail address will be useful if you need to be contacted. If the
@@ -442,9 +547,12 @@ EOF
     print "\n\n\n";
 }
 
+=item C<ask_for_subject()>
 
-#----
-# Prompt for subject of message.
+Prompt for subject of message.
+
+=cut
+
 sub ask_for_subject {
     print <<EOF;
 First of all, please provide a subject for the message. It should be a
@@ -465,8 +573,12 @@ EOF
     print "\n\n\n";
 }
 
+=item C<edit_bug_report($filename)>
 
-#----
+Launch an editor in which to edit the bug report.
+
+=cut
+
 sub edit_bug_report {
     my $filename = shift;
 
@@ -495,8 +607,12 @@ EOF
 #------------------------------------------------------------#
 #                        Action subs.                        #
 
-#----
-# Dump everything collected on the specified glob.
+=item C<dump_info()>
+
+Dump everything collected on the specified glob.
+
+=cut
+
 sub dump_info {
     local (*OUT) = @_;
 
@@ -536,9 +652,14 @@ EOF
     }
 }
 
+=item C<send_msg()>
 
-#----
-# Send message to final recipient.
+Send message to final recipient.
+
+The body of this method is currently commented out.
+
+=cut
+
 sub send_msg {
     # Get the body.
     if ( $opts{f} ) {
@@ -601,7 +722,15 @@ EOT
 	} else {
 	    warn "\nSendmail returned status '", $? >> 8, "'\n";
 	}
-    }
+	}
 }
+
+=back
+
+=head1 HISTORY
+
+This utility borrows heavily from perlbug.
+
+=cut
 
 __END__

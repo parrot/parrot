@@ -214,7 +214,8 @@ sub check_pod
 {
 	my $self = shift;
 	
-	return if $self->is_executable or $self->suffix eq 'dump';
+	return if ( $self->is_executable and $self->name ne 'parrotbug' ) 
+	    or $self->suffix eq 'dump';
 	
 	if ( ! exists $self->{POD_ERRORS_TIME} or 
 		$self->modified_since($self->{POD_ERRORS_TIME}) )

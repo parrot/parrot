@@ -52,7 +52,7 @@ sub do_beginning
     $self->{NAV_BAR} = '' unless $self->{NAV_BAR};
     
     my $title = $self->{'Title'};
-    Pod::Simple::HTML::esc($title);
+    esc($title);
 
     print {$self->{'output_fh'}}
         Parrot::Docs::HTMLPage->header(
@@ -65,154 +65,384 @@ sub do_beginning
 
 =item C<do_middle()>
 
-Does the middle of the document.
+Does the middle of the document. This splits up the long C<do_middle()>
+method in C<Pod:Simple::HTML>, calling the various C<process_*> methods
+below. This makes it easier to where the custom bits of Parrot-specific
+formatting have to be inserted.
 
 =cut
 
 sub do_middle 
 {
     my $self = shift;
-    my $fh = $self->{'output_fh'};
-    my ($token, $type, $tagname);
-    my @stack;
-    my $dont_wrap = 0;
-  
+    my $token;
+    my $type;
+    
+    $self->{STACK} = [];
+    $self->{DONT_WRAP} = 0;
+    
     while ( $token = $self->get_token )
     {
-        if ( ($type = $token->type) eq 'start' ) 
+        $type = $token->type;
+        
+        if ( $type eq 'start' ) 
         {
-            if ( ($tagname = $token->tagname) eq 'L' ) 
-            {
-                Pod::Simple::HTML::esc($type = $self->do_link($token));
-                
-                if ( defined $type and length $type ) 
-                {
-                    print $fh "<a href='$type'>";
-                } 
-                else 
-                {
-                    print $fh "<a>";
-                }
-            }
-            elsif ( $tagname eq 'F' )
-            {
-                my $text = Pod::Simple::HTML::esc($self->get_token->text);
-                my $dist = Parrot::Distribution->new;
-                
-                # Only link to files that will have HTML pages.
-                
-                if ( $dist->relative_path_is_file($text) 
-                    and $dist->file_with_relative_path($text)->contains_pod )
-                {
-                    my $path = $self->append_html_suffix($text);
-                    my $file = $self->{TARGET}->file_with_relative_path($path);
-            
-                    $path = $self->{DOCS_FILE}->parent->relative_path($file);
-            
-                    print $fh $self->{'Tagmap'}{$tagname} . 
-                        "<a href='$path'>$text</a>";
-                }
-                else
-                {
-                    print $fh "<i>$text</i>";
-                }
-            }
-            elsif ($tagname eq 'item-text' or $tagname =~ m/^head\d$/s) 
-            {
-                print $fh $self->{'Tagmap'}{$tagname} || next;
-                
-                my @to_unget;
-                
-                while ( 1 )
-                {
-                    push @to_unget, $self->get_token;
-                    
-                    last if $to_unget[-1]->is_end
-                        and $to_unget[-1]->tagname eq $tagname;
-                }
-                
-                my $name = $self->linearize_tokens(@to_unget);
-                
-                if ( defined $name ) 
-                {
-                    $name =~ tr/ /_/;
-                    print $fh "<a name=\"", 
-                        Pod::Simple::HTML::esc($name), "\"\n>";
-                } 
-                else 
-                {
-                    print $fh "<a\n>";
-                }
-                
-                $self->unget_token(@to_unget);
-            } 
-            elsif ($tagname eq 'Data') 
-            {
-                my $next = $self->get_token;
-                
-                next unless defined $next;
-                
-                unless( $next->type eq 'text' )
-                {
-                    $self->unget_token($next);
-                    next;
-                }
-                
-                printf $fh "\n" . $next->text . "\n";
-                next;
-            } 
-            else 
-            {
-                if( $tagname =~ m/^over-(.+)$/s ) 
-                {
-                    push @stack, $1;
-                } 
-                elsif ( $tagname eq 'Para') 
-                {
-                    $tagname = 'Para_item' if @stack and $stack[-1] eq 'text';
-                }
-                
-                print $fh $self->{'Tagmap'}{$tagname} || next;
-                
-                ++$dont_wrap if 
-                    $tagname eq 'Verbatim' 
-                    or $tagname eq "VerbatimFormatted"
-                    or $tagname eq 'X';
-            }
-        } 
+            $self->process_start_token($token);
+        }
         elsif ( $type eq 'end' ) 
         {
-            if( ($tagname = $token->tagname) =~ m/^over-/s ) 
-            {
-                pop @stack;
-            }
-            elsif ( $tagname eq 'Para' ) 
-            {
-                $tagname = 'Para_item' if @stack and $stack[-1] eq 'text';
-            }
-
-            print $fh $self->{'Tagmap'}{"/$tagname"} || next;
-            
-            --$dont_wrap if $tagname eq 'Verbatim' or $tagname eq 'X';
+            $self->process_end_token($token);
         } 
         elsif ( $type eq 'text' ) 
         {
-            Pod::Simple::HTML::esc($type = $token->text);
-            $type =~ s/([\?\!\"\'\.\,]) /$1\n/g unless $dont_wrap;
-            
-            # URLs not in L<>.
-            $type =~ s|(http://[^\s)]+)|<a href="$1">$1</a>|gs;
-    
-            print $fh $type;
+            $self->process_text_token($token);
         }
     }
     
     return 1;
 }
 
-=item C<>
+=item C<process_start_token($token)>
 
-Reimplemented to avoid a bug in C<Pod::Simple::HTML>.
+Process a start token.
+
+=cut
+
+sub process_start_token
+{
+    my $self = shift;
+    my $token = shift;
+    my $tagname = $token->tagname;
+
+    if ( $tagname eq 'L' ) 
+    {
+        $self->process_link_start_token($token);
+    }
+    elsif ( $tagname eq 'F' )
+    {
+        $self->process_file_start_token($token);
+    }
+    elsif ( $tagname eq 'C' )
+    {
+        $self->process_code_start_token($token);
+    }
+    elsif ($tagname eq 'item-text' or $tagname =~ m/^head\d$/s) 
+    {
+        $self->process_item_text_or_head_start_token($token);
+    } 
+    elsif ($tagname eq 'Data') 
+    {
+        $self->process_data_start_token($token);
+    } 
+    else 
+    {
+        $self->process_other_start_token($token);
+    }
+}
+
+=item C<process_link_start_token($token)>
+
+Processes the link start token.
+
+=cut
+
+sub process_link_start_token
+{
+    my $self = shift;
+    my $token = shift;
+    my $text = $self->do_link($token);
+    
+    esc($text);
+    
+    if ( defined $text and length $text ) 
+    {
+        print {$self->{'output_fh'}} "<a href='$text'>";
+    } 
+    else 
+    {
+        print {$self->{'output_fh'}} "<a>";
+    }
+}
+
+=item C<process_code_start_token($token)>
+
+Processes the code start token. If the code text is the name of a Parrot
+Perl module, and the current documentation file is not the file for that
+module, then the documentation file for the module is linked to.
+
+=cut
+
+sub process_code_start_token
+{
+    my $self = shift;
+    my $token = shift;
+    my $tagname = $token->tagname;
+
+    # We make the code tags in items bold because they are almost
+    # always part of function and arguments, or constants listings
+    #Êand should stand out.
+    
+    print {$self->{'output_fh'}} '<b>' if $self->{IN_ITEM_TEXT};
+    
+    print {$self->{'output_fh'}} $self->{'Tagmap'}{$tagname};
+    
+    my $next = $self->get_token;
+    
+    unless ( $next->type eq 'text' )
+    {
+        $self->unget_token($next);
+        return;
+    }
+    
+    my $text = $next->text;
+                    
+    if ( $text =~ /^Parrot::/o )
+    {
+        # TODO - C<Perl::Module> should really be L<Perl::Module>
+        # but this will do until the docs are changed.
+        
+        my $href = $self->href_for_perl_module($text);
+        
+        esc($text);
+    
+        if ( $href )
+        {
+            $text = "<a href='$href'>$text</a>";
+        }
+    }
+    else
+    {
+        # Tidy up the C reference *s.
+        $text =~ s|\b\s*\*\s+\b| \*|gs;
+        
+        esc($text);
+    }
+    
+    print {$self->{'output_fh'}} $text;
+}
+
+=item C<process_file_start_token($token)>
+
+Processes the file start token. If the text of the next token is a file
+path and that file contains POD, then a link will be made to that file's
+documentation file.
+
+=cut
+
+sub process_file_start_token
+{
+    my $self = shift;
+    my $token = shift;
+    my $tagname = $token->tagname;
+    my $next = $self->get_token;
+    
+    if ( $next->type eq 'text' )
+    {
+        my $text = esc($next->text);
+        my $dist = Parrot::Distribution->new;
+        
+        # Only link to files that will have HTML pages.
+        
+        if ( $dist->relative_path_is_file($text) 
+            and $dist->file_with_relative_path($text)->contains_pod )
+        {
+            my $path = $self->append_html_suffix($text);
+            my $file = $self->{TARGET}->file_with_relative_path($path);
+    
+            $path = $self->{DOCS_FILE}->parent->relative_path($file);
+    
+            print {$self->{'output_fh'}} 
+                $self->{'Tagmap'}{$tagname} . "<a href='$path'>$text</a>";
+        }
+        else
+        {
+            print {$self->{'output_fh'}} $self->{'Tagmap'}{$tagname} . $text;
+        }
+    }
+    else
+    {
+        $self->unget_token($next);
+        print {$self->{'output_fh'}} $self->{'Tagmap'}{$tagname};
+    }
+}
+
+=item C<process_item_text_or_head_start_token($token)>
+
+Process the item text or head start token.
+
+=cut
+
+sub process_item_text_or_head_start_token
+{
+    my $self = shift;
+    my $token = shift;
+    my $tagname = $token->tagname;
+    
+    print {$self->{'output_fh'}} $self->{'Tagmap'}{$tagname} || return;
+    
+    if ( $tagname eq 'item-text' )
+    {
+        $self->{IN_ITEM_TEXT} = 1;
+    }
+    
+    my @to_unget;
+    
+    # Get all the contained tokens, including the end token.
+    
+    while ( 1 )
+    {
+        push @to_unget, $self->get_token;
+        
+        last if $to_unget[-1]->is_end
+            and $to_unget[-1]->tagname eq $tagname;
+    }
+    
+    # Convert them into an anchor name;
+    
+    my $name = $self->linearize_tokens(@to_unget);
+    
+    if ( defined $name ) 
+    {
+        $name =~ tr/ /_/;
+        
+        print {$self->{'output_fh'}} 
+            qq(<a name="), esc($name), qq("\n>);
+    
+    } 
+    else 
+    {
+        print {$self->{'output_fh'}} "<a\n>";
+    }
+    
+    $self->unget_token(@to_unget);
+}
+
+=item C<process_data_start_token($token)>
+
+Processes a data start token.
+
+=cut
+
+sub process_data_start_token
+{
+    my $self = shift;
+    my $token = shift;
+    my $next = $self->get_token;
+        
+    return unless defined $next;
+        
+    unless( $next->type eq 'text' )
+    {
+        $self->unget_token($next);
+        return;
+    }
+    
+    printf {$self->{'output_fh'}} "\n" . $next->text . "\n";
+}
+
+=item C<process_other_start_token($token)>
+
+Processes a start token not processable by the above methods.
+
+=cut
+
+sub process_other_start_token
+{
+    my $self = shift;
+    my $token = shift;
+    my $tagname = $token->tagname;
+    
+    if ( $tagname =~ m/^over-(.+)$/s ) 
+    {
+        push @{$self->{STACK}}, $1;
+    } 
+    elsif ( $tagname eq 'Para') 
+    {
+        $tagname = 'Para_item' 
+            if @{$self->{STACK}} and $self->{STACK}->[-1] eq 'text';
+    }
+    
+    print {$self->{'output_fh'}} $self->{'Tagmap'}{$tagname} || return;
+    
+    ++$self->{DONT_WRAP} if 
+        $tagname eq 'Verbatim' 
+        or $tagname eq "VerbatimFormatted"
+        or $tagname eq 'X';
+}
+
+=item C<process_end_token($token)>
+
+Processes an end token.
+
+=cut
+
+sub process_end_token
+{
+    my $self = shift;
+    my $token = shift;
+    my $tagname = $token->tagname;
+    
+    if ( $tagname =~ m/^over-/s ) 
+    {
+        pop @{$self->{STACK}};
+    }
+    elsif ( $tagname eq 'Para' ) 
+    {
+        $tagname = 'Para_item' 
+            if @{$self->{STACK}} and $self->{STACK}->[-1] eq 'text';
+    }
+    elsif ( $tagname =~ /Verbatim(?:Formatted)?/o )
+    {
+        # Give the code sections equal space top and bottom.
+        print {$self->{'output_fh'}} "\n\n" 
+    }
+    elsif ( $tagname =~ /head[12]/o )
+    {
+        # Put the up arrow on the end of a heading. 
+        # The space is needed on the front.
+        print {$self->{'output_fh'}} 
+            " <a href='#_top'><img alt='^' border=0 src='$self->{RESOURCES_URL}/up.gif'></a>";
+    }
+    elsif ( $tagname eq 'C' )
+    {
+        # See the note in process_code_start_token() above.
+        print {$self->{'output_fh'}} '</b>' if $self->{IN_ITEM_TEXT};
+    }
+    elsif ( $tagname eq 'item-text' )
+    {
+        $self->{IN_ITEM_TEXT} = 0;
+    }
+    
+    print {$self->{'output_fh'}} $self->{'Tagmap'}{"/$tagname"} || return;
+    
+    --$self->{DONT_WRAP} if $tagname eq 'Verbatim' or $tagname eq 'X';
+}
+
+=item C<process_text_token($token)>
+
+Processes the specified text token. URLs which are not in link tags
+are linked here for convenience.
+
+=cut
+
+sub process_text_token
+{
+    my $self = shift;
+    my $token = shift;
+    my $text = $token->text;
+    
+    esc($text);
+    $text =~ s/([\?\!\"\'\.\,]) /$1\n/g unless $self->{DONT_WRAP};
+    
+    # URLs not in L<>.
+    $text =~ s|(http://[^\s)]+)|<a href="$1">$1</a>|gs;
+
+    print {$self->{'output_fh'}} $text;
+}
+
+=item C<do_pod_link($link)>
+
+This is reimplemented here to avoid a bug in C<Pod::Simple::HTML>.
 
 =cut
 
@@ -255,6 +485,7 @@ sub do_pod_link
         #  under non-ASCII charsets.  Something should be done about that.
     }
     
+    # Pod::Simple::HTML bug was here.
     my $out;
     
     $out = $to if defined $to and length $to;
@@ -276,29 +507,57 @@ sub resolve_pod_page_link
     my $self = shift;
     my $to = shift;
     my $section = shift;
-    my $dist = Parrot::Distribution->new;
     
-    if ( $to =~ /::/o )
+    if ( $to =~ /^Parrot::/o )
     {
-        # This is not very obvious, so let me explain. We get the file
-        # for the module, then we take its path relative to the 
-        # distribution, then we append the HTML suffix and get the
-        # docs file. Once we have that all we need is the relative
-        # path from the current directory to the file and return that
-        # as the link.
+        my $href = $self->href_for_perl_module($to);
         
-        my $file = $dist->file_for_perl_module($to);
+        # This gets corrupted somewhere down the line, with
+        # Parrot/PackFile/ConstTable.pm.html being turned into
+        # Parrot/PackFile%2FConstTable.pm.html and thus breaking 
+        # the CSS and images somehow.
         
-        return 'TODO' unless $file;
-        
-        my $path = $self->append_html_suffix($dist->relative_path($file));
-            
-        $file = $self->{TARGET}->file_with_relative_path($path);
-        
-        return $self->{DOCS_FILE}->parent->relative_path($file);
+        return $href if defined $href;
     }
     
     return 'TODO';
+}
+
+=item C<href_for_perl_module($module)>
+
+Returns the path to the Perl module's HTML file relative to the current
+documentation page. Currently only F<lib/Parrot> modules are linkable.
+Returns C<undef> if the current documentation file is the file for the 
+module.
+
+=cut
+
+sub href_for_perl_module
+{
+    my $self = shift;
+    my $module = shift;
+    
+    # This is not very obvious, so let me explain. We get the file
+    # for the module, then we take its path relative to the 
+    # distribution, then we append the HTML suffix and get the
+    # docs file. Once we have that all we need is the relative
+    # path from the current directory to the file and return that
+    # as the link.
+    
+    my $dist = Parrot::Distribution->new;
+    my $file = $dist->file_for_perl_module($module);
+    
+    return undef unless $file;
+    
+    my $path = $self->append_html_suffix($dist->relative_path($file));
+    
+    # This is the docs file for the module.
+    $file = $self->{TARGET}->file_with_relative_path($path);
+    
+    # There's no point in linking to the file you are already in.
+    return undef if $file == $self->{DOCS_FILE};
+    
+    return $self->{DOCS_FILE}->parent->relative_path($file);
 }
 
 =item C<do_end()>
@@ -331,19 +590,6 @@ sub html_for_file
     
     $self->output_string(\$string);
     $self->parse_file($file->path);
-    
-    # Give the code sections equal space top and bottom.
-    $string =~ s|</pre>|\n\n</pre>|gs;
-    
-    # Tidy up the C reference *s.
-    $string =~ s|\s\*\s+\b| \*|gs;
-    
-    # Add the up arrows.
-    $string =~ s|</h(\d)| <a href="#_top"><img alt="^" border=0 src="$self->{RESOURCES_URL}/up.gif"></a></h$1|gs;
-    
-    # Make the list items bold. This is for function listings.
-    $string =~ s|<dt>|<dt><b>|gs;
-    $string =~ s|</dt>|</b></dt>|gs;
     
     return $string;
 }
@@ -404,7 +650,63 @@ sub append_html_suffix
     return $path . '.html';
 }
 
+=over
+
+=head2 Functions
+
+=over 4
+
+=item C<esc(@strings)>
+
+=item C<esc($string)>
+
+Reimplemented here to silence a C<Pod::Simple::HTML> warning.
+
+=cut
+
+sub esc 
+{
+    if ( defined wantarray ) 
+    {
+        if ( wantarray ) 
+        {
+            @_ = splice @_; # break aliasing
+        } 
+        else 
+        {
+            my $x = shift;
+            # Pod::Simple::HTML didn't check this.
+            return $x unless $x;
+            $x =~ s/([^\n\t !\#\$\%\(\)\*\+,\.\~\/\:\;=\?\@\[\\\]\^_\`\{\|\}abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789])/'&#'.(ord($1)).';'/eg;
+            return $x;
+        }
+    }
+
+    foreach my $x (@_) 
+    {
+        # Pod::Simple::HTML didn't check this.
+        next unless $x;
+        # Escape things very cautiously:
+        $x =~ s/([^\n\t !\#\$\%\(\)\*\+,\.\~\/\:\;=\?\@\[\\\]\^_\`\{\|\}abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789])/'&#'.(ord($1)).';'/eg;
+        # Leave out "- so that "--" won't make it thru in X-generated comments
+        #  with text in them.
+        
+        # Yes, stipulate the list without a range, so that this can work right on
+        #  all charsets that this module happens to run under.
+        # Altho, hmm, what about that ord?  Presumably that won't work right
+        #  under non-ASCII charsets.  Something should be done about that.
+    }
+    
+    return @_;
+}
+
 =back
+
+=head1 HISTORY
+
+In order to avoid modifying C<Pod:Simple::HTLM> large sections of its code
+have been copied here, and then refactored and adjusted to enable various
+bits of Parrot-specific behaviour.
 
 =cut
 
