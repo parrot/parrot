@@ -20,7 +20,7 @@
 
 void find_basic_blocks () {
     Basic_block *bb;
-    Instruction *ins;
+    Instruction *ins, *lab;
     int nu = 0;
 
     init_basic_blocks();
@@ -30,22 +30,53 @@ void find_basic_blocks () {
     bb = make_basic_block(ins);
     for(ins=ins->next; ins; ins = ins->next) {
 
-		bb->end = ins;
-	ins->bbindex = n_basic_blocks - 1;
+        bb->end = ins;
+        ins->bbindex = n_basic_blocks - 1;
         /* a LABEL starts a new basic block, but not, if we have
          * a new one (last was a branch) */
         if (nu)
             nu = 0;
         else if ( (ins->type & ITLABEL)) {
             bb = make_basic_block(ins);
-	}
+        }
         /* a branch is the end of a basic block
          * so start a new with the next ins */
         if (ins->type & ITBRANCH) {
-            if (ins->next)
-                bb = make_basic_block(ins->next);
-	    nu = 1;
-	}
+            int found = 1;
+            /* if we have a bsr, then consider it only as a branch,
+             * when we have the target here
+             * and it doesn't saveall - like P6C recursive bsr's
+             */
+            if (!strcmp(ins->op, "bsr")) {
+                char *name = ins->r[0]->name;
+                found = 0;
+                for (lab = instructions; lab; lab = lab->next) {
+                    if ((lab->type & ITLABEL) &&
+                            !strcmp(lab->r[0]->name, name)) {
+                        int j = 0;
+                        found = 1;
+                        /* XXX look if first 5 ins have saveall
+                         * this is a ugly but working hack ;-)
+                         */
+                        for (lab = lab->next; j < 5 && lab;
+                                lab = lab->next, j++) {
+                            if (!strcmp(lab->op, "saveall")) {
+                                found = 0;
+                                break;
+                            }
+                        }
+                        break;
+                    }
+                }
+                debug(DEBUG_CFG, "bsr %s local:%s\n",
+                        name, found ? "yes": "no");
+            }
+            if (found) {
+                if (ins->next)
+                    bb = make_basic_block(ins->next);
+                nu = 1;
+            }
+        }
         /* XXX instruction type ITADDR is probably address of a
          * CATCH block - we don't optimize them
          * XXX they are marked as branch, to avoid dead code removal
@@ -63,9 +94,10 @@ void find_basic_blocks () {
    the dependences between them. */
 
 void build_cfg() {
-    int i;
+    int i, j;
     SymReg * addr;
     Basic_block *last, *bb;
+    Edge *pred;
 
     for (i = 0; bb_list[i]; i++) {
         bb = bb_list[i];
@@ -77,6 +109,32 @@ void build_cfg() {
         addr = get_branch_reg(bb->end);
         if (addr)
             bb_findadd_edge(bb, addr);
+        if (!strcmp(bb->end->op, "ret")) {
+            debug(DEBUG_CFG, "found ret in bb %d\n", i);
+            /* now go back, find labels and connect these with
+             * bsrs
+             */
+            for (pred = bb->pred_list; pred; pred=pred->pred_next) {
+                if (!strcmp(pred->from->end->op, "bsr")) {
+                    SymReg *r = pred->from->end->r[0];
+                    int found = 0;
+
+                    j = pred->from->index;
+                    debug(DEBUG_CFG, "\tcalled from bb %d label '%s'? - ",
+                            j, r->name);
+                    if ((bb->start->type & ITLABEL) &&
+                            (!strcmp(bb->start->r[0]->name, r->name)))
+                        found = 1;
+                    if (found) {
+                        debug(DEBUG_CFG, "yep!\n");
+                        bb_add_edge(bb, bb_list[j+1]);
+                    }
+                    else
+                        debug(DEBUG_CFG, "na!\n");
+
+                }
+            }
+        }
 
         last = bb;
     }

@@ -1,4 +1,11 @@
 - 2003-02-07 	leo
+	* first step for bsr handling in the CFG
+	  local bsrs (target in the same compilation unit) can
+	  preserve registers.
+
+	  s. docs/operation.pod
+
+- 2003-02-07 	leo
 	* version 0.0.9.12
 	* changed -d (--debug) options and made more granular
 	  debug output. s. docs/running.pod

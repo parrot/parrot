@@ -360,18 +360,23 @@ iANY(struct Parrot_Interp *interpreter, char * name,
         ins->opnum = op;
         ins->opsize = op_info->arg_count;
         /* set up branch flags */
-        if (op_info->jump) {
+        if (op_info->jump || !strcmp(name, "end")) {
+
+#if 0
             if (!strcmp(name, "bsr") || !strcmp(name, "ret")) {
                 /* ignore subcalls and ret
                  * because they saveall
                  */
             }
-            else {
+            else
+#endif
+            {
+
                 /* XXX: assume the jump is relative and to the last arg.
                  * usually true.
                  */
                 ins->type = ITBRANCH | (1 << (nargs-1));
-                if (!strcmp(name, "branch"))
+                if (!strcmp(name, "branch") || !strcmp(name, "end"))
                     ins->type |= IF_goto;
             }
         }
