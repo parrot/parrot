@@ -762,6 +762,10 @@ make_interpreter(Interp_flags flags)
     interpreter->ctx.pmc_reg_top =
         mem_sys_allocate_zeroed(sizeof(struct PRegChunk));
 
+    /* Set up the MMD struct */
+    interpreter->binop_mmd_funcs =
+        mem_sys_allocate_zeroed(sizeof(struct MMD_table));
+
     /* the SET_NULL macros are only for systems where a NULL pointer
      * isn't represented by zeroes, so don't use these for resetting
      * non-null pointers

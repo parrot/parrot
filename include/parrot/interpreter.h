@@ -57,6 +57,7 @@ typedef Parrot_Interp_flag Interp_flags;
 #include "parrot/rxstacks.h"
 
 #include "parrot/debug.h"
+#include "parrot/mmd.h"
 
 typedef struct warnings_t {
     Warnings_classes classes;
@@ -196,6 +197,7 @@ typedef struct Parrot_Interp {
 /* 3:   PMC *Env;                    hash_like Env PMC */
 /* 4:   PMC *ParrotInterpreter       that's me */
     int has_early_DOD_PMCs;   /* Flag that some want immediate destruction */
+    struct MMD_table *binop_mmd_funcs; /* Table of MMD function pointers */
 } Interp;
 
 /* &gen_from_enum(iglobals.pasm) */
