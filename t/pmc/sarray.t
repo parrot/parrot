@@ -16,7 +16,7 @@ Tests the C<SArray> PMC, which is used for parameter-passing.
 
 =cut
 
-use Parrot::Test tests => 16;
+use Parrot::Test tests => 33;
 use Test::More;
 
 my $fp_equality_macro = <<'ENDOFMACRO';
@@ -582,3 +582,240 @@ ok 2
 ok 3
 ok 4
 OUTPUT
+
+output_is(<< 'CODE', << 'OUTPUT', "Store PMC, get int");
+	new P0, .SArray
+	set P0, 2
+        new P1, .Integer
+        set P1, 11
+        new P2, .Float
+        set P2, 1.1
+	set P0[0], P1
+	set P0[1], P2
+	set I0, P0[0]
+	eq I0, 11, ok1
+	print "not "
+ok1:	print "ok 1\n"
+	set I0, P0[1]
+	eq I0, 1, ok2
+	print "not "
+ok2:	print "ok 2\n"
+        end
+CODE
+ok 1
+ok 2
+OUTPUT
+
+output_like(<< 'CODE', << 'OUTPUT', "Store num, get int");
+	new P0, .SArray
+	set P0, 1
+        set P0[0], 4.2
+        set I0, P0[0]
+        print I0
+        end
+CODE
+/SArray: Entry not an integer!/
+OUTPUT
+
+output_like(<< 'CODE', << 'OUTPUT', "Store string, get int");
+	new P0, .SArray
+	set P0, 1
+        set P0[0], "Non-numeric string"
+        set I0, P0[0]
+        print I0
+        end
+CODE
+/SArray: Entry not an integer!/
+OUTPUT
+
+output_is(<< "CODE", << 'OUTPUT', "Store PMC, get num");
+@{[ $fp_equality_macro ]}
+	new P0, .SArray
+	set P0, 2
+        new P1, .Integer
+        set P1, 11
+        new P2, .Float
+        set P2, 1.1
+	set P0[0], P1
+	set P0[1], P2
+	set N0, P0[0]
+	.fp_eq(N0, 11.0, ok1)
+	print "not "
+ok1:	print "ok 1\\n"
+	set N0, P0[1]
+	.fp_eq(N0, 1.1, ok2)
+	print "not "
+ok2:	print "ok 2\\n"
+        end
+CODE
+ok 1
+ok 2
+OUTPUT
+
+output_like(<< 'CODE', << 'OUTPUT', "Store int, get num");
+	new P0, .SArray
+	set P0, 1
+        set P0[0], 12
+        set N0, P0[0]
+        print N0
+        end
+CODE
+/SArray: Entry not a number!/
+OUTPUT
+
+output_like(<< 'CODE', << 'OUTPUT', "Store string, get num");
+	new P0, .SArray
+	set P0, 1
+        set P0[0], "Non-numeric string"
+        set N0, P0[0]
+        print N0
+        end
+CODE
+/SArray: Entry not a number!/
+OUTPUT
+
+output_is(<< 'CODE', << 'OUTPUT', "Store PMC, get string");
+	new P0, .SArray
+	set P0, 2
+        new P1, .String
+        set P1, "Hello"
+        new P2, .Integer
+        set P2, 1010
+	set P0[0], P1
+	set P0[1], P2
+	set S0, P0[0]
+	eq S0, "Hello", ok1
+	print "not "
+ok1:	print "ok 1\n"
+	set S0, P0[1]
+	eq S0, "1010", ok2
+	print "not "
+ok2:	print "ok 2\n"
+        end
+CODE
+ok 1
+ok 2
+OUTPUT
+
+output_like(<< 'CODE', << 'OUTPUT', "Store int, get string");
+	new P0, .SArray
+	set P0, 1
+        set P0[0], 12
+        set S0, P0[0]
+        print S0
+        end
+CODE
+/SArray: Entry not a string!/
+OUTPUT
+
+output_like(<< 'CODE', << 'OUTPUT', "Store num, get string");
+	new P0, .SArray
+	set P0, 1
+        set P0[0], 12.5
+        set S0, P0[0]
+        print S0
+        end
+CODE
+/SArray: Entry not a string!/
+OUTPUT
+
+output_is(<< "CODE", << 'OUTPUT', "Store num, get PMC");
+@{[ $fp_equality_macro ]}
+	new P0, .SArray
+	set P0, 2
+	set P0[0], 12.239
+	set P0[1], -1.9742
+        new P1, .Float
+        set P1, P0[0]
+        set N0, P1
+	.fp_eq(N0, 12.239, ok1)
+	print "not "
+ok1:	print "ok 1\\n"
+        new P2, .Integer
+        set P2, P0[1]
+        set N0, P2
+	.fp_eq(N0, -1.9742, ok2)
+	print "not "
+ok2:	print "ok 2\\n"
+        end
+CODE
+ok 1
+ok 2
+OUTPUT
+
+output_like(<< 'CODE', << 'OUTPUT', "Out-of-bounds access: int");
+	new P0, .SArray
+	set P0, 1
+        set P0[5], 12
+        set I0, P0[5]
+        print I0
+        end
+CODE
+/SArray index out of bounds/
+OUTPUT
+
+output_like(<< 'CODE', << 'OUTPUT', "Out-of-bounds access: num");
+	new P0, .SArray
+	set P0, 1
+        set P0[5], 12.5
+        set N0, P0[5]
+        print N0
+        end
+CODE
+/SArray index out of bounds/
+OUTPUT
+
+output_like(<< 'CODE', << 'OUTPUT', "Out-of-bounds access: string");
+	new P0, .SArray
+	set P0, 1
+        set P0[5], "asdf"
+        set S0, P0[5]
+        print S0
+        end
+CODE
+/SArray index out of bounds/
+OUTPUT
+
+output_like(<< 'CODE', << 'OUTPUT', "Out-of-bounds access: push int");
+	new P0, .SArray
+        push P0, 12
+        set I0, P0[0]
+        print I0
+        end
+CODE
+/SArray index out of bounds/
+OUTPUT
+
+output_like(<< 'CODE', << 'OUTPUT', "Out-of-bounds access: push num");
+	new P0, .SArray
+        push P0, 12.09
+        set N0, P0[0]
+        print N0
+        end
+CODE
+/SArray index out of bounds/
+OUTPUT
+
+output_like(<< 'CODE', << 'OUTPUT', "Out-of-bounds access: push string");
+	new P0, .SArray
+        push P0, "Ygnve"
+        set S0, P0[0]
+        print S0
+        end
+CODE
+/SArray index out of bounds/
+OUTPUT
+
+output_like(<< 'CODE', << 'OUTPUT', "Out-of-bounds access: push pmc");
+	new P0, .SArray
+        new P1, .Integer
+        set P1, 1234
+        push P0, P1
+        set I0, P0[0]
+        print I0
+        end
+CODE
+/SArray index out of bounds/
+OUTPUT
+
+
