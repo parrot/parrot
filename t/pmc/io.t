@@ -1,6 +1,6 @@
 #! perl -w
 
-use Parrot::Test tests => 19;
+use Parrot::Test tests => 20;
 use Test::More;
 
 output_is(<<'CODE', <<'OUTPUT', "open/close");
@@ -104,6 +104,48 @@ ok 4
 ok 5
 ok 6
 OUTPUT
+
+SKIP: {
+    skip ("read routines currently crash on bad input", 1);
+
+    unlink "no_such_file" if (-e "no_such_file");
+
+output_is(<<'CODE', <<'OUTPUT', "read on invalid fh should throw exception");
+	open P0, "no_such_file", "<"
+	unless P0, ok1
+	print "Huh: 'no_such_file' exists? - not "
+ok1:
+	print "ok 1\n"
+
+        newsub P20, .Exception_Handler, _readline_handler
+        set_eh P20
+        readline S0, P0 # Currently segfaults
+        print "not "
+_readline_handler:
+        print "ok 2\n"
+
+        newsub P20, .Exception_Handler, _read_handler
+        set_eh P20
+        read S0, P0, 1
+        print "not "
+_read_handler:
+        print "ok 3\n"
+
+        newsub P20, .Exception_Handler, _print_handler
+        set_eh P20
+        print P0, "kill me now\n"
+        print "not "
+_print_handler:
+        print "ok 4\n"
+
+        end
+CODE
+ok 1
+ok 2
+ok 3
+ok 4
+OUTPUT
+}
 
 SKIP: {
     skip ("clone not finished yet", 1);
