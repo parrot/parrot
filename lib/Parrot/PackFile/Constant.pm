@@ -195,7 +195,7 @@ sub unpack
   } elsif ($type == $type_codes{'PFC_KEY'}) {
     $value = shift_key($string);
   } else {
-    die;
+    die "Unrecognized constant type code '$type'!";
   }
 
   $self->{TYPE}  = $type;
