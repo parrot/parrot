@@ -1625,6 +1625,8 @@ inline op dec(inout PMC) {
 
 =item B<div>(out PMC, in PMC, in PMC)
 
+=item B<div>(inout PMC, in INT)
+
 Set $1 to the quotient of $2 divided by $3. In the case of INTVAL division, the
 result is truncated (NOT rounded or floored).
 
@@ -1644,6 +1646,13 @@ inline op div (out PMC, out PMC, out PMC) {
   $2->vtable->divide(interpreter, $2, $3, $1);
   goto NEXT();
 }
+
+inline op div (inout PMC, in INT) {
+  $1->vtable->divide_int(interpreter, $1, $2, $1);
+  goto NEXT();
+}
+
+
 
 ########################################
 
@@ -1699,6 +1708,10 @@ References:
 
 Sets $1 to the modulus of $2 and $3.
 
+=item B<mod>(inout PMC, in INT)
+
+Sets $1 to the modulus of $1 and $2.
+
 =cut
 
 op mod(out INT, in INT, in INT) {
@@ -1733,6 +1746,12 @@ inline op mod (out PMC, out PMC, out PMC) {
   goto NEXT();
 }
 
+inline op mod ( inout PMC, in INT ) {
+  $1->vtable->modulus_int(interpreter, $1, $2, $1);
+  goto NEXT();
+}
+
+
 ########################################
 
 =item B<mod>(out NUM, in NUM, in NUM)
@@ -1765,6 +1784,8 @@ op mod(out NUM, in NUM, in NUM) {
 
 =item B<mul>(inout NUM, in NUM)
 
+=item B<mul>(inout PMC, in INT)
+
 =item B<mul>(inout PMC, in PMC)
 
 Set $1 to the product of $1 and $2.
@@ -1786,6 +1807,11 @@ inline op mul(inout INT, in INT) {
 
 inline op mul(inout NUM, in NUM) {
   $1 *= $2;
+  goto NEXT();
+}
+
+inline op mul ( inout PMC, in INT ) {
+  $1->vtable->multiply_int(interpreter, $1, $2, $1);
   goto NEXT();
 }
 
