@@ -60,9 +60,9 @@ nodeType * IMCC_new_const_node(char *name, int set, YYLTYPE *loc);
 nodeType * IMCC_new_node(int nr, nodeType *child, YYLTYPE *loc);
 nodeType * IMCC_append_node(nodeType *head, nodeType *tail, YYLTYPE *loc);
 
-void dump_nodes(nodeType *);
+void IMCC_dump_nodes(nodeType *);
 
-int find_node_type(const char *name);
+int IMCC_find_node_type(const char *name);
 
 
 #endif /* PARROT_AST_H_GUARD */

@@ -19,7 +19,7 @@ extern char* str_dup(char *);
 #endif
 #include "ast.h"
 
-#define YY_DECL int yylex(YYSTYPE *valp, YYLTYPE *locp, Interp *interp)
+#define YY_DECL int ASTlex(YYSTYPE *valp, YYLTYPE *locp, Interp *interp)
 
 YY_DECL;
 
@@ -79,7 +79,7 @@ SP              [ ]
 
 {WS}+		/* eat white space */ ;
 {ID}		   {
-			valp->t = find_node_type(yytext);
+			valp->t = IMCC_find_node_type(yytext);
 			return IDENTIFIER;
 		   }
 {FLOATNUM}         DUP_AND_RET(valp, FLOATC);

@@ -1,4 +1,4 @@
-/* A Bison parser, made from ast/ast.y, by GNU bison 1.75.  */
+/* A Bison parser, made from ast.y, by GNU bison 1.75.  */
 
 /* Skeleton parser for Yacc-like parsing with Bison,
    Copyright (C) 1984, 1989, 1990, 2000, 2001, 2002 Free Software Foundation, Inc.
@@ -76,7 +76,7 @@
 
 
 /* Copy the first part of user declarations.  */
-#line 1 "ast/ast.y"
+#line 1 "ast.y"
 
 /*
  * ast.y
@@ -133,14 +133,14 @@ extern struct nodeType_t *top_node;
 #endif
 
 #ifndef YYSTYPE
-#line 43 "ast/ast.y"
+#line 43 "ast.y"
 typedef union {
     int t;
     char *s;
     struct nodeType_t *n;
 } yystype;
 /* Line 193 of /usr/share/bison/yacc.c.  */
-#line 144 "ast/astparser.c"
+#line 144 "astparser.c"
 # define YYSTYPE yystype
 # define YYSTYPE_IS_TRIVIAL 1
 #endif
@@ -161,7 +161,7 @@ typedef struct yyltype
 
 
 /* Line 213 of /usr/share/bison/yacc.c.  */
-#line 165 "ast/astparser.c"
+#line 165 "astparser.c"
 
 #if ! defined (yyoverflow) || YYERROR_VERBOSE
 
@@ -986,47 +986,47 @@ yyreduce:
   switch (yyn)
     {
         case 2:
-#line 61 "ast/ast.y"
+#line 61 "ast.y"
     { top_node = yyval.n; }
     break;
 
   case 3:
-#line 62 "ast/ast.y"
+#line 62 "ast.y"
     { pr_error(yylsp[0], "Bug"); YYABORT; }
     break;
 
   case 5:
-#line 65 "ast/ast.y"
+#line 65 "ast.y"
     { yyval.n = IMCC_append_node(yyvsp[-1].n, yyvsp[0].n, &yylsp[-1]); }
     break;
 
   case 7:
-#line 69 "ast/ast.y"
+#line 69 "ast.y"
     { yyval.n = IMCC_new_node(yyvsp[-3].t, yyvsp[-1].n, &yylsp[-3]); }
     break;
 
   case 8:
-#line 72 "ast/ast.y"
+#line 72 "ast.y"
     { yyval.n = 0; }
     break;
 
   case 9:
-#line 73 "ast/ast.y"
+#line 73 "ast.y"
     { yyval.n = IMCC_new_const_node(yyvsp[0].s, 'S', &yylsp[0]); }
     break;
 
   case 10:
-#line 74 "ast/ast.y"
+#line 74 "ast.y"
     { yyval.n = IMCC_new_const_node(yyvsp[0].s, 'I', &yylsp[0]); }
     break;
 
   case 11:
-#line 75 "ast/ast.y"
+#line 75 "ast.y"
     { yyval.n = IMCC_new_const_node(yyvsp[0].s, 'N', &yylsp[0]); }
     break;
 
   case 12:
-#line 76 "ast/ast.y"
+#line 76 "ast.y"
     { yyval.n = IMCC_new_const_node(yyvsp[0].s, 'U', &yylsp[0]); }
     break;
 
@@ -1034,7 +1034,7 @@ yyreduce:
     }
 
 /* Line 1016 of /usr/share/bison/yacc.c.  */
-#line 1038 "ast/astparser.c"
+#line 1038 "astparser.c"
 
   yyvsp -= yylen;
   yyssp -= yylen;
@@ -1253,7 +1253,7 @@ yyreturn:
 }
 
 
-#line 79 "ast/ast.y"
+#line 79 "ast.y"
 
 
 static void
