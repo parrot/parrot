@@ -145,6 +145,9 @@ my ($jitarchname, $jitcpuarch, $jitosname, $jitcapable);
 
 $archname                 =  $Config{archname};
 ($cpuarch, $osname)       =  split('-', $archname);
+if (!defined $osname) {
+    ($osname, $cpuarch) = ($cpuarch, "");
+}
 
 $jitarchname              =  "$cpuarch-$osname";
 $jitarchname		  =~ s/i[456]86/i386/i;
