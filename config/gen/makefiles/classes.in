@@ -11,7 +11,7 @@ O_FILES = ${pmc_o}
 #DO NOT ADD C COMPILER FLAGS HERE
 #Add them in Configure.pl--look for the
 #comment 'ADD C COMPILER FLAGS HERE'
-CFLAGS = ${ccflags} ${cc_warn} -I../include
+CFLAGS = ${ccflags} ${cc_debug} ${cc_warn} -I../include
 
 C_LIBS = ${libs}
 
