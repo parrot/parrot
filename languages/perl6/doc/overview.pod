@@ -33,7 +33,7 @@ Register -- are added.
 
 Context objects are defined in F<P6C/Context.pm>, and are actually a data 
 member of Node objects (although they are added during the context 
-propagation phase, rather that the parse tree deciphering phase.) Context 
+propagation phase, rather than the parse tree deciphering phase.) Context 
 objects contain the current context information of the associated node.
 
 =back
@@ -107,7 +107,7 @@ action as the final production, so that the autoaction that turns the match
 into an object can be applied.	To get a real idea of what's going on, you
 should read through the grammar; it's long, but most rules are short.  The base
 rule for the grammar is C<prog>, but you can probably start at C<stmt> unless
-you care about error handling and such like that.  
+you care about error handling and such.  
 
 A few notes about the grammar in general:
 
@@ -179,9 +179,9 @@ node is expected to yield during compilation."	Context information is added to
 a node by adding another member, C<ctx>, to the node, and setting its value
 equal to a context object.  Context objects are defined in F<P6C/Context.pm>,
 which also contains the functions for figuring out context. 
-F<P6C/Addcontext.pm> defines the C<ctx_left> and <ctx_right> methods for 
-each Node type (which deal for lvalue and rvalue context, respectively), 
-which define how each Node type propagates its context.
+F<P6C/Addcontext.pm> defines the C<ctx_left> and C<ctx_right> methods for 
+each Node type (which deal with lvalue and rvalue context, respectively), 
+that define how each Node type propagates its context.
 
 =head2 Compiling to IMC
 
