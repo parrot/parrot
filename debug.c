@@ -158,8 +158,10 @@ parse_command(const char* command, unsigned long* cmdP)
     int i;
     unsigned long c = 0;
 
-    if (*command == '\0')
+    if (*command == '\0') {
+        *cmdP = c;
         return 0;
+    }
 
     for (i = 0; *command && isalpha((int) *command); command++, i++)
         c += (tolower((int) *command) + (i + 1)) * ((i + 1) * 255);
@@ -189,7 +191,7 @@ parse_command(const char* command, unsigned long* cmdP)
 void
 PDB_get_command(struct Parrot_Interp *interpreter)
 {
-    unsigned int i = 0;
+    unsigned int i;
     char *c;
     PDB_t *pdb = interpreter->pdb;
     PDB_line_t *line; 
@@ -220,18 +222,24 @@ PDB_get_command(struct Parrot_Interp *interpreter)
         fprintf(stderr,"\n");
     }
 
-    i = 1;
+    i = 0;
 
     c = (char *)mem_sys_allocate(255);
 
     fprintf(stderr,"\n(pdb) ");
 
-    *c = (char)(ch = fgetc(stdin));
+    /* skip leading whitespace */
+    do {
+        ch = fgetc(stdin);
+    } while (isspace(ch) && ch != '\n');
 
-    while (ch != -1 && (c[i - 1] !=  '\n') && (i < 255))
-        c[i++] = (char)(ch = fgetc(stdin));
-    
-    c[--i] = '\0';
+    /* generate string (no more than 255 chars) */
+     while (ch != EOF && ch != '\n' && (i < 255)) {
+        c[i++] = ch;
+        ch = fgetc(stdin);
+    }
+
+    c[i] = '\0';
 
     if (ch == -1) strcpy(c, "quit");
     pdb->cur_command = c;
@@ -250,13 +258,10 @@ PDB_run_command(struct Parrot_Interp *interpreter, const char *command)
     int i;
     unsigned long c;
 
-    /* Skip trailing spaces */
-    command = skip_ws(command);
-
     /* get a number from what the user typed */
     command = parse_command(command, &c);
 
-    na(command);
+    if (command) na(command);
 
     switch (c) {
         case c_disassemble:
