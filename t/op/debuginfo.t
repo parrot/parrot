@@ -52,9 +52,9 @@ OUTPUT
 
 output_is( <<'CODE', <<OUTPUT, "set/getpackage with regs" );
 	set S0 "foo"
-	set S1 "bar"
-	set I0 1
-	set I1 2
+	set S1, "bar"
+	set I0, 1
+	set I1, 2
 	setpackage S0
 	setfile S1
 	setline I0
