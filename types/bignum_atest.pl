@@ -1,0 +1,64 @@
+#!/usr/bin/perl -w
+
+# $Id$
+# bignum all test.
+# This allows lots of tests to be run, parsed out of *.decTest, available
+# from: http://www2.hursley.ibm.com/decimal/dectest.html
+
+my ($test, $one, $two, $result, $prec, $round, $maxexp,
+    $extended, $skip ,$op, @conds, $line);
+
+my ($testsrun, $testspass, $testsfail) = (0,0,0);
+$maxexp = 10000;
+while (<>) {
+    chomp;
+    next if /^--/;
+    next unless /\S/;
+    /^precision:\s+(\d+)/ && do {
+	$precision = $1; next;
+    };
+    /^rounding:\s*(\w+)/ && do {
+	$round =$1; next;
+    };
+    /^extended:\s*(\d+)/ && do {
+	$extended = $1;next;
+    };
+    /^version/ && next;
+    /^maxexponent:\s*(\d+)/i && do {
+	$expskip = 1 if $1 > $maxexp; next;
+    };
+
+    ($test, $op, $one, $two,undef, $result, @conds) = split(/\s+/, $_);
+
+    if (!defined($result)) {
+	print "$test skip\n";
+	next;
+    }
+
+    if ($extended||$expskip) {
+	print "$test ok \# skip\n";
+	next;
+    }
+
+    for ($one, $two, $result) {
+	s/^'|'$//g;
+    }
+
+    $testsrun++;
+    my ($output) = `perl bignum_test.pl $one $two $op $precision $round 0`;
+    chomp($output);
+    if ($result eq $output || ($result eq '?' && $output =~ /except/i)) {
+	print "$test ok\n";
+	$testspass++;
+    }
+    else {
+	print "$test not ok\n";
+	print "  $one $op $two\n    (p:$precision r:$round)\n";
+	print " => `$output'\n";
+	print " ex `$result'\n";
+	$testsfail++;
+    }
+}
+
+print "Ran $testsrun tests ($testspass,$testsfail) = ".
+    sprintf("%2.00d",100*$testspass/$testsrun )."%\n";
