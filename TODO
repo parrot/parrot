@@ -75,9 +75,7 @@ Debugger
     Add commands history and completion
     Load the commands from a file
     Make breakpoints at labels
-    Conditional breakpoints
     Watchpoints
-    Disassemble the pbc by default
     Read core dumps
     Attach to a running program
     List breakpoints.
