@@ -112,7 +112,7 @@ fixed sized array).
 
 */
     INTVAL get_bool () {
-        INTVAL size = DYNDYNSELF.elements();
+        INTVAL size = SELF.elements();
         return (INTVAL)(size != 0);
     }
 
@@ -139,7 +139,7 @@ Returns the number of elements in the array.
 */
 
     INTVAL get_integer () {
-        return DYNDYNSELF.elements();
+        return SELF.elements();
     }
 
 

@@ -1,5 +1,4 @@
 #! perl -w
-
 # Copyright: 2001-2005 The Perl Foundation.  All Rights Reserved.
 # $Id$
 
@@ -201,7 +200,7 @@ Converted to the current PMC object of type C<PMC *>.
 
 Converted to the interpreter object.
 
-=item C<Otherclass.SELF.method(a,b,c)>
+=item C<OtherClass.SELF.method(a,b,c)>
 
 Calls the static vtable method 'method' in C<OtherClass>.
 
@@ -257,7 +256,7 @@ my %opt;
 main();
 
 sub find_file {
-    my ( $include, $file, $die_unless_found ) = @_;
+    my ($include, $file, $die_unless_found) = @_;
 
     foreach my $dir ( @$include ) {
         my $path = File::Spec->catfile( $dir, $file );
@@ -322,6 +321,7 @@ sub extract_balanced {
 
 sub parse_flags {
     my $c = shift;
+
     $$c =~ s/^(.*?^\s*)pmclass ([\w]*)//ms;
     my ($pre, $classname) = ($1, $2);
     my %has_value = ( does => 1, extends => 1, group => 1, lib => 1 );
@@ -355,8 +355,8 @@ sub parse_flags {
 }
 
 sub parse_pmc {
-
   local $_ = shift;
+
   my $signature_re = qr{
     ^
     (?:             #blank spaces and comments and spurious semicolons
@@ -417,21 +417,20 @@ sub parse_pmc {
     }
 
 
-  return ( $classname, {
-	       'pre'   => $pre,
-	       'flags' => $flags,
-	       'methods' => \@methods,
-	       'post' => $post,
-	       'class' => $classname,
-               'has_method' => \%meth_hash
-	   }
-       );
+    return ( $classname, { 'pre'   => $pre,
+	                   'flags' => $flags,
+	                   'methods' => \@methods,
+	                   'post' => $post,
+	                   'class' => $classname,
+                           'has_method' => \%meth_hash
+	                 }
+           );
 }
 
 # make a linear list of class->{parents} array
 sub gen_parent_list {
-    my $include = shift;
-    my ($this, $all) = @_;
+    my ($include, $this, $all) = @_;
+
     my @todo = ($this);
     my $class = $all->{$this};
     while (@todo) {
@@ -456,6 +455,7 @@ sub gen_parent_list {
 
 sub dump_1_pmc {
     my $file = shift;
+
     $file =~ s/\.\w+$/.pmc/;
     print "Reading $file\n" if $opt{verbose};
     open F, "<$file" or die "Can't read '$file'";
@@ -467,6 +467,7 @@ sub dump_1_pmc {
 
 sub gen_super_meths {
     my ($self, $vt) = @_;
+
     # look through all meths in class and locate the nearest parent
     foreach my $entry (@{ $vt->{methods} } ) {
         my $meth = $entry->{meth};
@@ -498,6 +499,7 @@ sub gen_super_meths {
 
 sub add_defaulted {
     my ($class, $vt) = @_;
+
     my $i = @{ $class->{methods} };
     foreach my $e ( @{$vt->{methods}} ) {
         my $meth = $e->{meth};
@@ -507,6 +509,7 @@ sub add_defaulted {
 
 sub dump_is_newer {
     my $file = shift;
+
     my $pmc;
     ($pmc = $file) =~ s/\.\w+$/\.pmc/;
     my ($pmc_dt, $dump_dt);
@@ -517,6 +520,7 @@ sub dump_is_newer {
 
 sub dump_pmc {
     my $include = shift;
+
     my @files = @_;
     my %all;
     # help these dumb 'shells' that are no shells
@@ -584,8 +588,7 @@ sub print_tree {
 }
 
 sub gen_c {
-    my $include = shift;
-    my (@files) = @_;
+    my ($include, @files) = @_;
 
     my $library = Parrot::Pmc2c::Library->new
       ( \%opt, read_dump($include, "vtable.pmc"),
