@@ -20,13 +20,17 @@ but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See either
 the GNU General Public License or the Artistic License for more details.
 
-IMPORTANT! IMPORTANT! IMPORTANT!
+|                                                              |
+| IMPORTANT! IMPORTANT! IMPORTANT!                             |
+|                                                              |
+| The final license for Parrot has not yet been decided, and   |
+| hence you should *NOT* use this code in any other product    |
+| or project until a final license is determined. By           |
+| submitting code you agree to the above, as well as           |
+| agreeing to relicense any submitted code under whatever      |
+| final license is chosen.                                     |
+|                                                              |
 
-The final license for Parrot has not yet been decided, and hence you
-should *NOT* use this code in any other product or project until a final
-license is determined. By submitting code you agree to the above, as
-well as agreeing to relicense any submitted code under whatever final
-license is chosen.
 
 INSTRUCTIONS
 ------------
