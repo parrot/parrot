@@ -11,7 +11,7 @@ examples/assembly/pcre.imc - String matching
 
 =head1 DESCRIPTION
 
-Experimental string matching with PCRE (http://www.pcre.org/).
+Experimental string matching with PCRE (L<http://www.pcre.org/>).
 
 Note that PCRE must be installed for this to work.
 

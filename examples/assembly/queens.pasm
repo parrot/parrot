@@ -14,7 +14,7 @@ examples/assembly/queens.pasm - 8-Queens Problem
 =head1 DESCRIPTION
 
 A program to find solutions to the 8-queens problem
-(http://burks.brighton.ac.uk/burks/foldoc/7/37.htm).
+(L<http://burks.brighton.ac.uk/burks/foldoc/7/37.htm>).
 
 Note that this Parrot assembler file was produced by the Jako compiler
 (F<languages/jako>).

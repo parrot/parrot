@@ -12,8 +12,7 @@ examples/assembly/life.pasm - Conway's Life
 =head1 DESCRIPTION
 
 Runs Conway's Life cellular automata
-(http://ddi.cs.uni-potsdam.de/HyFISCH/Produzieren/lis_projekt/
-proj_gamelife/ConwayScientificAmerican.htm).
+(L<http://ddi.cs.uni-potsdam.de/HyFISCH/Produzieren/lis_projekt/proj_gamelife/ConwayScientificAmerican.htm>).
 
 =cut
 
