@@ -1059,7 +1059,8 @@ DIMTYPE
 					$type=$th{$sigilmap{$_}};
 				}
 			}
-			$arrays{$var}=1;
+			$arrays{"${var}${seg}"}=1;
+			#print STDERR "Marking ${var}${seg}\n";
 			push @{$code{$seg}->{code}}, <<DIMARR;
 	# Set aside storage for Array $var
 	\$P0 = new PerlHash
@@ -1213,7 +1214,7 @@ sub CALL_BODY {
 				while($syms[CURR] ne ")") {
 					feedme();
 				}
-				push(@params, $a);
+				push(@params, "()$a");
 			} else {
 				push(@params, $a);  # Always here?
 			}
@@ -1232,15 +1233,31 @@ sub CALL_BODY {
 	end
 ${englishname}_ARGOK:
 EOH
+	$main::code{$main::seg}->{declarations}->{$englishname}=1;
 	
 	foreach (@params) {
-		my $t=typeof($_);
-		$t="string" if $t eq "STRING";
-		$t="float" if $t eq "FLO";
-		$_=changename($_);
-		$_=~s/\$/_string/g; 
-		push @{$code{$seg}->{code}}, qq{\t.param $t $_\n};
-		push @{$code{$seg}->{args}}, $_;
+		unless (/\(\)/) {
+			my $t=typeof($_);
+			$t="string" if $t eq "STRING";
+			$t="float" if $t eq "FLO";
+			$_=changename($_);
+			$_=~s/\$/_string/g; 
+			push @{$code{$seg}->{code}}, qq{\t.param $t $_\n};
+			push @{$code{$seg}->{args}}, $_;
+		} else {
+			s/\(\)//g;
+			$_=changename($_);
+			$_=~s/\$/_string/g;
+			#print "Marking ${_}${seg}\n";
+			$arrays{"${_}${seg}"}=1;
+			push @{$code{$seg}->{code}},<<PUSHARR;
+	.param PerlHash array_$englishname
+	find_global \$P1, "BASICARR"
+	set \$P1["${_}$seg"], array_$englishname
+	store_global "BASICARR", \$P1
+PUSHARR
+			# push @{$code{$seg}->{args}}, $_;
+		}
 	}
 	return;
 }

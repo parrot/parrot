@@ -82,7 +82,9 @@ sub isuserfunc {
 	return 0
 }
 sub isarray {
-	$_ =(grep /^\Q$_[0]\E$/i, keys %arrays );
+	#print "Looking up $_[0]$seg...";
+	$_ =(grep /^\Q$_[0]$seg\E$/i, keys %arrays );
+	#print "$_\n";
 	return $_;
 }
 
@@ -519,6 +521,9 @@ sub generate_code {   # Will return a result register, or something.
 				push @code, qq{\t.arg $ac\t\t\t# argc};
 				push @code, qq{\t.arg "$extern$seg"\t\t# array name};
 				push @code, "\tcall _ARRAY_LOOKUP_$optype";
+				if ($ac == 0) {
+					$optype="P";
+				}
 				push @code, "\t.result \$$optype$retcount";
 				push @work, [ "result of $extern()", "RESULT",  "\$$optype$retcount"];
 			} elsif (isbuiltin($sym)) {
@@ -534,7 +539,11 @@ sub generate_code {   # Will return a result register, or something.
 				push @code, "\t.result \$$optype$retcount";
 				push @work, [ "result of $extern()", "RESULT",  "\$$optype$retcount"];
 				$retcount++;
+				# External functions return their arguments, 
+				# except for PMC types.  Figure if you want to locally
+				# modify those, go ahead.  This simulates pass-by-reference.
 				foreach my $arg (@args) {
+					next if $arg->[0] =~ /^\$P\d+$/;
 					if ($arg->[2] eq "BARE") {
 						push @code, "\t.result $arg->[0]";
 					} else {

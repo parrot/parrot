@@ -195,9 +195,9 @@ DEBUG_PRINTLOOP:
         set $S0, $P0[$I1]
         inc $I1
         eq $S0, "", DEBUG_PRINTLOOP
-	
-	print "Can't do this either.\n"
-
+	set $S1, locals[$S0]	
+	print $S1
+	print "\n"
         branch DEBUG_PRINTLOOP
 
 DEBUG_PRINTEND:

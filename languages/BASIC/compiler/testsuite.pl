@@ -32,20 +32,20 @@ while(1) {
 }
 
 __DATA__
-' Function Array scopes, expect 4, 5.6
-function mine(a)
-	dim t(6)
-	t(3)=2
-	mine=a*2
-	print t(3)*2
+' Passing arrays, twice, expect 12
+function aftwo(y())
+	print y(4)
 end function
-dim t(7)
-t(3)=5.6
-a=mine(5)
-print t(3)
+function arrfunc(x())
+	u=aftwo(x())
+	arrfunc=55
+end function
+dim g(10)
+g(5)=666
+g(4)=12
+a=g(5)+0
+y=arrfunc(g())
 
-
-STOPPLEASE
 ' Passing arrays (expect 12)
 function arrfunc(x())
 	print x(4)
@@ -55,7 +55,20 @@ dim g(10)
 g(4)=12
 y=arrfunc(g())
 
-STOPPLEASE
+' Function Array scopes, expect 4, 5.6
+function mine(a)
+	dim t(6)
+	s=32
+	t(3)=2
+	mine=a*2
+	print t(3)*2
+end function
+dim t(7)
+z=55
+t(3)=5.6
+a=mine(5)
+print t(3)
+
 ' Expect 234
 function inkey$(a, b)
 	a=3.14

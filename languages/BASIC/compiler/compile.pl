@@ -65,6 +65,7 @@ foreach my $seg ("_main", "_basicmain", keys %code) {
 	}
 
 	print CODE @{$code{$seg}->{code}};
+	print CODE "\trestoreall\n\tret\n";
 	if ($debug) {
 		print CODE<<'EOD';
 DEBUGGER:
@@ -91,7 +92,8 @@ DEBUGGER_DONE:
 	ret
 EOD
 	}
-	print CODE "\trestoreall\n\tret\n.end\n";
+	print CODE ".end\n";
+	
 	delete $code{$seg};
 }
 print CODE<<RUNTIMESHUTDOWN;
