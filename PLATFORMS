@@ -25,7 +25,7 @@ vms
 win32-bcc
 win32-cygwin
 win32-mingw
-win32-msvc                   Y*1  Y    -     -   -       y      y
+win32-ms-cl_13.00.9466       Y*1  Y/2  -     -   -      Y       Y/2
 
 -   ... no
 Y   ... yes
@@ -45,4 +45,4 @@ Threads . Parrot is multi-threaded
 Signals . Parrot catches kind of a SIGINT (program termination) signal
 
 Remarks:
-1) ~50% test failures with the CGP core
+*1 ~90% test failures with the CGP core, also 00ff-dos.t tests are failing
