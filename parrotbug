@@ -7,6 +7,7 @@
 eval 'exec perl -w -S $0 ${1+"$@"}'
   if $running_under_some_shell;
 
+$^W = 1; # Set warnings;
 use strict;
 
 use Config;
@@ -14,8 +15,9 @@ use File::Spec;
 use Getopt::Long;
 
 
-my $VERSION = "0.3.0";
+my $VERSION = "0.3.1";
 
+# These are the standard addresses for reporting bugs.
 my %std_to = 
   ( bug => 'parrotbug@parrotcode.org',
     ok  => 'parrotstatus-ok@parrotcode.org',
@@ -23,13 +25,11 @@ my %std_to =
   );
 
 my $parrotdir = File::Spec->curdir();
-
-my %opts;
-my ( $user, $domain, $editor, $use_file );
-my ( $to, $cc, $from, $subject, $msgid, $body );
-my ( $category, $severity );
+my ( %opts, %parrot, %report );
+my ( $editor, $user, $domain, $msgid, $tmpfile );
 my ( $is_linux, $is_macos, $is_mswin32, $is_os2, $is_vms );
-my ( $parrot_version, $parrot_myconfig ) ;
+my @categories = qw[ core docs install library utilities ];
+my @severities = qw[ critical high medium low wishlist none ];
 
 
 #------------------------------------------------------------#
@@ -38,14 +38,14 @@ my ( $parrot_version, $parrot_myconfig ) ;
 init();
 help()    if $opts{help};
 version() if $opts{version};
-if ( $opts{dump} ) { dump_info(*STDOUT); exit; }
-explain_parrotbug();
-query_info();
-send_msg();
+explain_parrotbug() unless $opts{quiet};
+query_missing_info();
+what_next();
 exit;
 
 
-#Explain what C<parrotbug> is.
+
+# Explain what C<parrotbug> is.
 sub explain_parrotbug {
     print <<EOF;
 
@@ -68,61 +68,6 @@ mailing list, perl6-internals<at>perl.org.
 
 
 EOF
-#'
-}
-
-
-#Print synopsis + help message and exit.
-sub help {
-    print <<EOF;
-
-A program to help generate bug reports about parrot, and mail them.
-It is designed to be used interactively. Normally no arguments will
-be needed.
-
-Usage:
-
- $0 [-s subject] [-b body] [-f inputfile] [-r returnaddress] [-A]
-    [-e editor] [-t address] ][-ok|-nok|-d]
- $0 {-h|-V}
-
-Simplest usage:  run '$0', and follow the prompts.
-
-Options:
-  -A    Don't send a bug received acknowledgement to the return address.
-  -b    Body of the report. If not included on the command line, or
-        in a file with -f, you will get a chance to edit the message.
-  -d    Dump mode.  This prints out your configuration data, without mailing
-        anything.
-  -e    Editor to use.
-  -f    File containing the body of the report. Use this to
-        quickly send a prepared message.
-  -h    Print this help message and exit.
-  -nok  Report unsuccessful build on this system to parrot developpers
-  -ok   Report successful build on this system to parrot developpers
-        Only use -ok if *everything* was ok: if there were *any* problems
-        at all, use -nok.
-  -r    Your return address. The program will ask you to confirm
-        this if you don't give it here.
-  -s    Subject to include with the message. You will be prompted
-        if you don't supply one on the command line.
-  -t    Test mode, so one can provide an address to send reports to.
-  -V    Print version information and exit.
-
-EOF
-#'
-    exit;
-}
-
-
-# Print version information (of the parrotbug program) and exit.
-sub version {
-    print <<"EOF";
-
-This is $0, version $VERSION.
-
-EOF
-    exit;
 }
 
 
@@ -184,8 +129,8 @@ sub init {
     # There will always be an up-to-date $parrot/VERSION
     my $filename = File::Spec->catfile($parrotdir, "VERSION");
     open(VERSION, "<$filename") or die "Cannot open '$filename': $!";
-    $parrot_version = <VERSION>;
-    chomp $parrot_version;
+    $parrot{version} = <VERSION>;
+    chomp $parrot{version};
     close(VERSION) or die "Cannot close '$filename': $!";
 
     # Get parrot configuration, stored in $parrot/myconfig
@@ -193,7 +138,7 @@ sub init {
     open(MYCONFIG, "<$filename") or die "Cannot open '$filename': $!";
     {
         local $/;
-        $parrot_myconfig = <MYCONFIG>;
+        $parrot{myconfig} = <MYCONFIG>;
     }
     close(MYCONFIG) or die "Cannot close '$filename': $!";
 
@@ -207,10 +152,12 @@ sub init {
     Getopt::Long::Configure("no_bundling", "no_ignore_case", "auto_abbrev");
     help() unless GetOptions
       ( \%opts,
-        "send|S", "dump|D", "help|h", "version|V",
-        "from|f=s", "to|test|t=s", "subject|s=s",
-        "input|i=s", "output|o=s", "ok", "nok", "help|h",
-        "ack!" );
+        "help|h", "version|V",
+        "send", "dump", "save",
+        "from|f=s", "to|test|t=s", "editor|e=s",
+        "subject|s=s", "category|C=s", "severity|S=s",
+        "input|input-file|i=s", "output|output-file|o=s",
+        "ok", "nok", "ack!", "quiet|q!" );
 
     ##
     ## Report to be sent.
@@ -220,23 +167,27 @@ sub init {
             last ok_report unless defined $opts{ok};
 
             # This is an ok report, woohoo!
-            $to = $std_to{ok};
-            $subject = "OK: parrot $parrot_version "
+            $report{to} = $std_to{ok};
+            $report{subject} = "OK: parrot $parrot{version} "
               . "on $Config{archname} $Config{osvers}";
-            $body = "Parrot reported to build OK on this system.\n";
-            $category = "install";
-            $severity = "none";
+            $report{body} = "Parrot reported to build OK on this system.\n";
+            $report{category} = "install";
+            $report{severity} = "none";
+            $report{body} = "";
             last sw;
         };
 
         # Ok reports do not need body, but nok and bug reports do need
-        # a body. It can be done with either -f or -b flag.
+        # a body.
         if ( $opts{input} ) {
-            $use_file = 1;
+            # Report was pre-written, slurp it.
+            open BODY, "<$opts{input}" or die "Can't open '$opts{input}': $!";
+            local $/;
+            $report{body} = <BODY>;
+            close BODY or  die "Can't close '$opts{input}': $!";
         } else {
             # No file provided...
-            $use_file = 0;
-            $body = "";
+            $report{body} = "";
         }
             
 
@@ -244,23 +195,23 @@ sub init {
             last nok_report unless defined $opts{nok};
 
             # This a nok report, how sad... :-(
-            $to = $std_to{nok};
-            $subject = "Not OK: parrot $parrot_version "
+            $report{to} = $std_to{nok};
+            $report{subject} = "Not OK: parrot $parrot{version} "
               . "on $Config{archname} $Config{osvers}";
-            $category = "install";
-            $severity = "none";
+            $report{category} = "install";
+            $report{severity} = "none";
             last sw;
         };
 
         # Neither an ok nor a nok.
-        $to = $std_to{bug};
-        $subject  = $opts{s} || "";
-        $category = "";
-        $severity = "";
+        $report{to} = $std_to{bug};
+        $report{subject}  = $opts{subject}  || "";
+        $report{category} = $opts{category} || "";
+        $report{severity} = $opts{severity} || "";
     };
 
     # Test message, shortcuting recipent.
-    $to = $opts{to} if $opts{to};
+    $report{to} = $opts{to} if $opts{to};
 
     ## 
     ## User information.
@@ -273,14 +224,14 @@ sub init {
 	    : eval { getpwuid($<) };	# May be missing
 
     # User address, used in message and in Reply-To header.
-    $from = $opts{from} || "";
+    $report{from} = $opts{from} || "";
 
    # Editor
     $editor = $ENV{VISUAL} || $ENV{EDITOR} || $ENV{EDIT}
-	|| ( $is_vms && "edit/tpu" )
-	|| ( $is_mswin32 && "notepad" )
-	|| ( $is_macos && "" )
-	|| "vi";
+      || ( $is_vms && "edit/tpu" )
+      || ( $is_mswin32 && "notepad" )
+      || ( $is_macos && "" )
+      || "vi";
 
 
     ## 
@@ -306,23 +257,22 @@ sub init {
 #                       Querying subs.                       #
 
 # Query missing information in order to have a complete report.
-sub query_info {
-    $subject = "" if trivial_subject( $subject );
-    ask_for_subject()        unless $subject;
-    ask_for_alternative
-      ( "category", [ qw[ core docs install library utilities ] ],
-        "core" )             unless $category;
-    ask_for_alternative
-      ( "severity", [ qw[ critical high medium low wishlist none ] ],
-        "low" )              unless $severity;
-    ask_for_return_address() unless $from;
-    ask_for_body()           unless $use_file || $body;
+sub query_missing_info {
+    $report{subject} = "" if trivial_subject( $report{subject} );
+    $report{subject}  = ask_for_subject()     unless $report{subject};
+    $report{category} = ask_for_alternative( "category", \@categories)
+      unless $report{category};
+    $report{severity} = ask_for_alternative( "severity", \@severities)
+      unless $report{severity};
+    $report{from} = ask_for_return_address()  unless $report{from};
+    $report{body} = ask_for_body()            unless $report{body};
 }
+
 
 # Prompt for alternatives from a set of choices.
 # 
 # The arguments are: the name of alternative, the choices (as an array
-# ref), and the default answer.
+# ref), and the default answer. (first element if undef)
 # 
 # Return the lowercased alternative chosen.
 # 
@@ -336,12 +286,13 @@ Please pick a $what from the following:
 
 EOF
 
+    $default ||= $choices->[0];
     my $alt;
     my $err = 0;
     do {
         die "Invalid $alt: aborting.\n" if $err++ > 5;
         print "Please enter a $what [$default]: ";
-        $alt = <>;
+        $alt = <STDIN>;
         chomp $alt;
         $alt = $default if $alt =~ /^\s*$/;
     } until ( ($alt) = grep /^$alt/i, @$choices );
@@ -351,7 +302,7 @@ EOF
 }
 
 
-# Prompt for body, through an external editor.
+# Prompt for a body, through an external editor.
 sub ask_for_body {
     print <<EOF;
 Now you need to supply the bug report. Try to make the report concise
@@ -366,11 +317,12 @@ versions are relevant.
 
 EOF
 
+    print "Press 'Enter' to continue...\n";
+    scalar <STDIN>;
+
     # Prompt for editor to use if none supplied.
     if ( $opts{editor} ) {
         $editor = $opts{editor};
-        print "Press 'Enter' to continue...\n";
-        scalar <>;
 
     } else {
         ask_for_editor(<<EOF) unless $opts{editor};
@@ -382,21 +334,40 @@ EOF
     }
 
     # Launch editor.
-    $opts{input} = generate_filename();
-    edit_bug_report( $opts{input} );
+    $tmpfile = generate_filename();
+    my $body = "";
+    my $err = 0;
+    do {
+        edit_bug_report( $tmpfile );
+        # Slurp bug report.
+        open BODY, "<$tmpfile" or die "Can't open '$tmpfile': $!";
+        {
+            local $/;
+            $body = <BODY>;
+        }
+        close BODY or die "Can't close '$tmpfile': $!";
+        unless ( $body ) {
+            print "\nYou provided an empty bug report!\n";
+            print "Press 'Enter' to continue...\n";
+            scalar <STDIN>;
+        }
+        die "Aborting.\n" if $err++ == 5;
+    } until ( $body );
+
+    return $body;
 }
 
 
 # Prompt for editor to use.
 sub ask_for_editor {
     print shift() . "Editor [$editor]: ";
-    my $entry = <>;
+    my $entry = <STDIN>;
     chomp $entry;
     $editor = $entry if $entry ne "";
 }
 
 
-# Prompt for return address.
+# Prompt for return address, return it.
 sub ask_for_return_address {
     print <<EOF;
 Your e-mail address will be useful if you need to be contacted. If the
@@ -405,7 +376,7 @@ correct it.
 EOF
     
     # Try and guess return address
-    my $guess;
+    my ($from, $guess);
     if ( $is_macos ) {
         require Mac::InternetConfig;
         $guess = $Mac::InternetConfig::InternetConfig{
@@ -425,14 +396,19 @@ EOF
 
     # Verify our guess.
     print "Your address [$guess]: ";
-    $from = <>;
+    $from = <STDIN>;
     chomp $from;
     $from = $guess if $from eq "";
     print "\n\n\n";
+    return $from;
 }
 
 
 # Prompt for subject of message.
+#
+# Return the subject chosen.
+# 
+# Die if more than 5 wrong subjects.
 sub ask_for_subject {
     print <<EOF;
 First of all, please provide a subject for the message. It should be a
@@ -441,16 +417,18 @@ problem" is not a concise description.
 
 EOF
 
+    my $subject;
     my $err = 0;
     do {
         $err and print "\nThat doesn't look like a good subject. "
           . "Please be more verbose.\n";
         print "Subject: ";
-        $subject = <>;
+        $subject = <STDIN>;
         chomp $subject;
         die "Aborting.\n" if $err++ == 5;
     } while ( trivial_subject($subject) );
     print "\n\n\n";
+    return $subject;
 }
 
 
@@ -464,7 +442,7 @@ sub edit_bug_report {
         require ExtUtils::MakeMaker;
         ExtUtils::MM_MacOS::launch_file($filename);
         print "Press Enter when done.\n";
-        scalar <>;
+        scalar <STDIN>;
     } else {
         $retval = system("$editor $filename");
     }
@@ -483,12 +461,17 @@ EOF
 #------------------------------------------------------------#
 #                        Action subs.                        #
 
-# Dump everything collected on the specified glob.
-sub dump_info {
-    local (*OUT) = @_;
+
+# Display everything collected.
+sub dump_message { print format_message(); }
+
+
+# Format the message with everything collected and return it.
+sub format_message {
+    my $report = "";
 
     # OS, arch, compiler...
-    print OUT <<EOF;
+    $report .= <<EOF;
 ---
 osname= $Config{osname}
 osvers= $Config{osvers}
@@ -496,59 +479,92 @@ arch=   $Config{archname}
 EOF
 
     my $cc = $Config{cc};
-    print OUT "cc=     $cc $Config{${cc}.'version'}\n";
+    $report .= "cc=     $cc $Config{${cc}.'version'}\n";
 
 
     # ... flags...
-    print OUT <<EOF;
+    $report .= <<EOF;
 ---
 Flags:
-    category=$category
-    severity=$severity
+    category=$report{category}
+    severity=$report{severity}
 EOF
-    print OUT "    ack=no\n" if ! $opts{ack};
+    $report .= "    ack=no\n" if ! $opts{ack};
+
+    # ... bug report ...
+    $report .= "---\n$report{body}\n";
 
     # ... myconfig ...
-    print OUT "---\n$parrot_myconfig\n---\n";
+    $report .= "---\n$parrot{myconfig}\n---\n";
 
     # ... and environment.
-    print OUT "Environment:\n";
+    $report .= "Environment:\n";
     my @env = qw[ PATH LD_LIBRARY_PATH LANG SHELL HOME LOGDIR LANGUAGE ];
     push @env, $Config{ldlibpthname} if $Config{ldlibpthname} ne '';
     push @env, grep /^(?:PERL|LC_|LANG|CYGWIN)/, keys %ENV;
     my %env; @env{@env} = @env;
     for my $env (sort keys %env) {
-	print OUT "    $env",
+	$report .= "    $env",
           exists $ENV{$env} ? "=$ENV{$env}\n" : " (unset)\n";
     }
+
+    return $report;
+}
+
+
+# Print synopsis + help message and exit.
+sub help {
+    print <<EOF;
+
+A program to help generate bug reports about parrot, and mail them.
+It is designed to be used interactively. Normally no arguments will
+be needed.
+
+Simplest usage:  run '$0', and follow the prompts.
+Usage:           $0 [OPTIONS] [ACTIONS]
+
+Options:
+  --ok                   Report successful build on this system to parrot
+                         developpers. Only use --ok if *everything* was ok:
+                         if there were *any* problems at all, use --nok.
+  --nok                  Report unsuccessful build on this system.
+  --subject <subject>    Subject to include with the message.
+  --category <category>  Category of the bug report.
+  --severity <severity>  Severity of the bug report.
+  --from <address>       Your email address.
+  --editor <editor>      Editor to use for editing the bug report.
+  --ack, --noack         Don't send a bug received acknowledgement.
+  --input-file           File containing the body of the report. Use this
+                         to quickly send a prepared message.
+  --output-file          File where parrotbug will save its bug report.
+  --to <address>         Email adress to send report to. (testing only)
+
+  Note: you will be prompted if the program miss some information.
+
+Actions:
+  --dump           Dump message.
+  --save           Save message.
+  --send           Send message.
+  --help           Print this help message and exit.
+  --version        Print version information and exit.
+
+EOF
+    exit;
 }
 
 
 # Send message to final recipient.
-sub send_msg {
-    # Get the body.
-    if ( $opts{input} ) {
-        open BODY, "<$opts{input}" or die "Can't open '$opts{input}': $!";
-        local $/;
-        $body = <BODY>;
-        close BODY or  die "Can't close '$opts{input}': $!";
-    }
-    
+sub send_message {
     # On linux certain mail implementations won't accept the subject
     # as "~s subject" and thus the Subject header will be corrupted
     # so don't use Mail::Send to be safe
     eval "require Mail::Send";
     if ( $@ eq "" && !$is_linux) {
-	my $msg = new Mail::Send Subject => $subject, To => $to;
-	$msg->add( "Reply-To", $from );
+	my $msg = new Mail::Send Subject => $report{subject}, To => $report{to};
+	$msg->add( "Reply-To", $report{from} );
 
 	my $fh = $msg->open;
-        print $fh <<EOF;
------------------------------------------------------------------
-$body
------------------------------------------------------------------
-EOF
-        dump_info($fh);
+        print $fh format_message();
 	$fh->close;
 
 	print "\nMessage sent.\n";
@@ -566,30 +582,65 @@ equivalent, and the perl package Mail::Send has not been installed, so
 I can't send your bug report. We apologize for the inconvenience.
 
 So you may attempt to find some way of sending your message, it has
-been left in the file '$opts{input}'.
+been left in the file 'tmpfile'.
 EOF
 # '
 	open(SENDMAIL, "|$sendmail -t -oi") || die "'|$sendmail -t -oi' failed: $!";
 
 	print SENDMAIL <<EOT;
-To: $to
-Subject: $subject
-Reply-To: $from
+To: $report{to}
+Subject: $report{subject}
+Reply-To: $report{from}
 Message-Id: $msgid
 
------------------------------------------------------------------
-$body
------------------------------------------------------------------
 EOT
 
-        dump_info( *SENDMAIL );
+        print SENDMAIL format_message();
 	if (close(SENDMAIL)) {
 	    printf "\nMessage sent.\n";
 	} else {
 	    warn "\nSendmail returned status '", $? >> 8, "'\n";
 	}
-	}
+    }
 }
+
+
+# Print version information (of the parrotbug program) and exit.
+sub version {
+    print <<"EOF";
+
+This is $0, version $VERSION.
+
+EOF
+    exit;
+}
+
+
+# Check whether actions have been provided on comand-line, otherwise
+# prompt for what to do with bug report.
+sub what_next {
+    dump_message() if $opts{dump};
+    save_message() if $opts{save};
+    send_message() if $opts{send};
+
+    return if $opts{dump} || $opts{save} || $opts{send};
+
+    # No actions provided on command-line, prompt for action.
+
+    my $action;
+    do {
+        print "Action (send,display,edit,save,quit): ";
+        $action = <STDIN>;
+       sw: for ($action) {
+             dump_message(), last sw if /^d/i;
+             edit_message(), last sw if /^e/i;
+             save_message(), last sw if /^sa/i;
+             send_message(), last sw if /^se/i;
+             print "Uh?\n" unless /^q/i;
+         };
+    } until ( $action =~ /^q/i );
+}
+
 
 __END__
 
