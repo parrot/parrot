@@ -106,6 +106,20 @@ bigint_add_bigint_int(Interp *interpreter, PMC* self, INTVAL value,
     mpz_add_ui(BN(dest), BN(self), (long)value);
 }
 static void
+bigint_sub_bigint(Interp *interpreter, PMC* self, PMC *value, PMC *dest)
+{
+    VTABLE_morph(interpreter, dest, enum_class_BigInt);
+    mpz_sub(BN(dest), BN(self), BN(value));
+}
+
+static void
+bigint_sub_bigint_int(Interp *interpreter, PMC* self, INTVAL value,
+        PMC *dest)
+{
+    VTABLE_morph(interpreter, dest, enum_class_BigInt);
+    mpz_sub_ui(BN(dest), BN(self), (long)value);
+}
+static void
 bigint_mul_bigint(Interp *interpreter, PMC* self, PMC *value, PMC *dest)
 {
     VTABLE_morph(interpreter, dest, enum_class_BigInt);
@@ -265,6 +279,16 @@ bigint_add_bigint_int(Interp *interpreter, PMC* self, INTVAL value, PMC *dest)
     internal_exception(1, "no bigint lib loaded");
 }
 static void
+bigint_sub_bigint(Interp *interpreter, PMC* self, PMC *value, PMC *dest)
+{
+    internal_exception(1, "no bigint lib loaded");
+}
+static void
+bigint_sub_bigint_int(Interp *interpreter, PMC* self, INTVAL value, PMC *dest)
+{
+    internal_exception(1, "no bigint lib loaded");
+}
+static void
 bigint_mul_bigint(Interp *interpreter, PMC* self, PMC *value, PMC *dest)
 {
     internal_exception(1, "no bigint lib loaded");
@@ -329,42 +353,6 @@ pmclass BigInt extends perlscalar {
 
 /*
 
-=item C<void* invoke(void* next)>
-
-Pythonic object constructor. SELF is a BigInt Class object. Return a new
-C<long> object according to 2.1. Built-in Functions.
-
-=cut
-
-*/
-    void* invoke(void* next) {
-        int argcP = REG_INT(3);
-        int base;
-        PMC *res;
-        STRING *num;
-
-        if (!argcP) {
-            REG_PMC(5) = pmc_new(INTERP, enum_class_BigInt);
-            return next;
-        }
-        base = 10;
-        if (argcP == 2)
-            base = VTABLE_get_integer(INTERP, REG_PMC(6));
-        res = pmc_new(interpreter, enum_class_BigInt);
-        num = VTABLE_get_string(interpreter, REG_PMC(5));
-        VTABLE_set_string_keyed_int(interpreter, res, base, num);
-        REG_PMC(5) = res;
-        return next;
-    }
-
-    void class_init () {
-        /* this should be autmatically done - probably */
-        if (pass) {
-        }
-    }
-
-/*
-
 =back
 
 =head2 Methods
@@ -372,6 +360,34 @@ C<long> object according to 2.1. Built-in Functions.
 =over 4
 
 */
+/*
+
+=item C<PMC* instantiate()>
+
+Object constructor. SELF is a BigInt Class object. Return a new
+BigInt object.
+
+=cut
+
+*/
+    PMC* instantiate() {
+        int argcP = REG_INT(3);
+        int base;
+        PMC *res;
+        STRING *num;
+
+        res = pmc_new(interpreter, enum_class_BigInt);
+        if (!argcP) {
+            return res;
+        }
+        base = 10;
+        if (argcP == 2)
+            base = VTABLE_get_integer(INTERP, REG_PMC(6));
+        num = VTABLE_get_string(interpreter, REG_PMC(5));
+        VTABLE_set_string_keyed_int(interpreter, res, base, num);
+        return res;
+    }
+
 
     void init () {
         bigint_init(INTERP, SELF);
@@ -546,7 +562,7 @@ Increments the integer.
 */
 
     void increment() {
-        internal_exception(1, "unimp inc");
+        bigint_add_bigint_int(INTERP, SELF, 1, SELF);
     }
 
 /*
@@ -560,7 +576,7 @@ Decrements the integer.
 */
 
     void decrement() {
-        internal_exception(1, "unimp dec");
+        bigint_sub_bigint_int(INTERP, SELF, 1, SELF);
     }
 
     void add(PMC* value, PMC* dest) {
@@ -578,9 +594,29 @@ MMD_DEFAULT: {
              }
     }
 
+    void subtract(PMC* value, PMC* dest) {
+MMD_BigInt: {
+                bigint_sub_bigint(INTERP, SELF, value, dest);
+            }
+MMD_PerlInt: {
+                bigint_sub_bigint_int(INTERP, SELF, PMC_int_val(value), dest);
+            }
+MMD_Integer: {
+                bigint_sub_bigint_int(INTERP, SELF, PMC_int_val(value), dest);
+            }
+MMD_DEFAULT: {
+                 internal_exception(1, "unimp sub");
+             }
+    }
+
     void add_int(INTVAL value, PMC* dest) {
         bigint_add_bigint_int(INTERP, SELF, value, dest);
     }
+
+    void subtract_int(INTVAL value, PMC* dest) {
+        bigint_sub_bigint_int(INTERP, SELF, value, dest);
+    }
+
 
     void multiply(PMC* value, PMC* dest) {
 MMD_BigInt: {
@@ -655,10 +691,6 @@ MMD_DEFAULT: {
              }
     }
 
-
-    void divide_int(INTVAL value, PMC* dest) {
-        bigint_div_bigint_int(INTERP, SELF, value, dest);
-    }
 
     INTVAL cmp(PMC* value) {
 MMD_BigInt: {

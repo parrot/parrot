@@ -44,7 +44,7 @@ Initializes the string.
 
 =item C<PMC* instantiate()>
 
-Create a new Float from the passed in argument. This is a class method,
+Create a new String from the passed in argument. This is a class method,
 arguments are passed according to pdd03.
 
 =cut
