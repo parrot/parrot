@@ -187,10 +187,9 @@ pmc.c
 pmc_pm.pl
 register.c
 resources.c
-rx.c
-rx.ops
 runops_cores.c
 rx.c
+rx.ops
 stacks.c
 string.c
 t/harness
@@ -206,6 +205,7 @@ t/op/pmc.t
 t/op/pmc_perlarray.t
 t/op/pmc_perlhash.t
 t/op/pmc_perlstring.t
+t/op/rx.t
 t/op/stacks.t
 t/op/string.t
 t/op/time.t
