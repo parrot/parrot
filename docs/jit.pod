@@ -374,6 +374,7 @@ B<Parrot Bytecode:> (only the bytecode segment is shown)
    +---------------------------------------------- set_i_ic (2 arguments)
 
 Please note that the opcode numbers used might have already changed.
+Also generated assembly code might be different.
 
 B<Intel x86 assembly version of the Parrot ops:>
 
@@ -441,8 +442,16 @@ attaches the symbol file, after it got built in F<build_asm>.
 	# dddp
 	# run ddd parrot with given file
 	# gdb confirmations should be off
+	# $ ln -s languages/imcc imcc
+	# is assumed
+	cd languages/imcc
+	make -s
+	cd -
+	imcc -o $1.pbc -d -O1 $1.pasm
 	echo "b runops_jit
 	r -d -j $1.pbc
+	n
+	n
 	n
 	n
 	n
@@ -475,7 +484,6 @@ these tests.
         set S2, "abc"
         print "\n"
         end
-  $ perl assemble.pl j.pasm > j.pbc
   $ dddp j
 
 (ddd shows above source code and assembly (startup code snipped):
