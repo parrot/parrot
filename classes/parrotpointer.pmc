@@ -1,0 +1,151 @@
+/* parrotpointer.pmc
+ *  Copyright: (When this is determined...it will go here)
+ *  CVS Info
+ *     $Id$
+ *  Overview:
+ *     These are the vtable functions for the ParrotPointer base class
+ *  Data Structure and Algorithms:
+ *  History:
+ *  Notes:  The actual pointer is in ->data
+ *  References:
+ */
+
+#include "parrot/parrot.h"
+#define ERROR fprintf(stderr, "An illegal operation was performed on a ParrotPointer (vtable function at %s line %d).\n", __FILE__, __LINE__); exit(1); return 0;
+
+pmclass ParrotPointer {
+   INTVAL type () {
+      return 0;
+   }
+
+   STRING* name () {
+      return whoami;
+   }
+
+   void init () {
+      SELF->data=NULL;
+   }
+
+   void clone (PMC* dest) {
+      dest->vtable=SELF->vtable;
+      dest->data=SELF->data;
+   }
+
+   void morph (INTVAL type) {
+   }
+
+   BOOLVAL move_to (void * destination) {
+      return 0;
+   }
+
+   INTVAL real_size () {
+      return 0;
+   }
+
+   void destroy () {
+   }
+
+   INTVAL get_integer () {
+      return (INTVAL)SELF->data;
+   }
+
+   FLOATVAL get_number () {
+      return (FLOATVAL)(INTVAL)SELF->data;
+   }
+
+   FLOATVAL get_number_index (INTVAL index) {
+   }
+
+   STRING* get_string () {
+      STRING* ret;
+      char *target=mem_sys_allocate(64);
+
+      /* XXX Dangerous if you have a 196-bit system or above
+         (and if you do, you have too comfortable a life and
+         deserve to be tormented by coredumps). */
+      sprintf(target, "ParrotPointer=0x%p", SELF->data);
+      ret=string_make(interpreter, target, strlen(target), 0, 0, 0);
+
+      mem_sys_free(target);
+      return ret;
+   }
+
+   BOOLVAL get_bool () {
+      return (BOOLVAL)SELF->data;
+   }
+
+   void* get_value () {
+     return SELF->data;
+   }
+
+   BOOLVAL is_same (PMC* pmc2) {
+      return SELF->vtable == pmc2->vtable && SELF->data == pmc2->data;
+   }
+
+   void set_integer (PMC * value) {
+      ERROR;
+   }
+
+   void set_integer_native (INTVAL value) {
+      ERROR;
+   }
+
+   void set_integer_bigint (BIGINT value) {
+      ERROR;
+   }
+
+   void set_integer_same (PMC * value) {
+      ERROR;
+   }
+
+   void set_integer_index (INTVAL value, INTVAL index) {
+      ERROR;
+   }
+
+   void set_number (PMC * value) {
+      ERROR;
+   }
+
+   void set_number_native (FLOATVAL value) {
+      ERROR;
+   }
+
+   void set_number_bigfloat (BIGFLOAT value) {
+      ERROR;
+   }
+
+   void set_number_same (PMC * value) {
+      ERROR;
+   }
+
+   void set_number_index (FLOATVAL value, INTVAL index) {
+      ERROR;
+   }
+
+   void set_string (PMC * value) {
+      ERROR;
+   }
+
+   void set_string_native (STRING * value) {
+      ERROR;
+   }
+
+   void set_string_unicode (STRING * value) {
+      ERROR;
+   }
+
+   void set_string_other (STRING * value) {
+      ERROR;
+   }
+
+   void set_string_same (PMC * value) {
+      ERROR;
+   }
+
+   void set_string_index (STRING* value, INTVAL index) {
+      ERROR;
+   }
+   
+   void set_value (void * value) {
+   }
+}
