@@ -397,6 +397,11 @@ Call the subroutine in P0 and generate a new return continuation in P1.
 
 Call the subroutine in $1 and generate a new return continuation in P1.
 
+=item B<tailcall>(in PMC)
+
+Call the subroutine in $1 and use the current continuation as the subs
+continuation.
+
 =item B<updatecc>()
 
 Update the state of the return continuation in P1. This is necessary,
@@ -438,6 +443,16 @@ inline op invokecc(in PMC) {
   PMC * p = $1;
   dest = expr NEXT();
   REG_PMC(1) = new_ret_continuation_pmc(interpreter, dest);
+  dest = (opcode_t *)p->vtable->invoke(interpreter, p, dest);
+  goto ADDRESS(dest);
+}
+
+inline op tailcall(in PMC) {
+  opcode_t *dest;
+  PMC * p = $1;
+  dest = expr NEXT();
+  REG_PMC(1) = interpreter->ctx.current_cont;
+  PObj_get_FLAGS(REG_PMC(1)) |= PObj_private2_FLAG;
   dest = (opcode_t *)p->vtable->invoke(interpreter, p, dest);
   goto ADDRESS(dest);
 }

@@ -19,7 +19,7 @@ These are the vtable functions for the Sub (subroutine) base class
 */
 
 #include "parrot/parrot.h"
-#include "parrot/method_util.h"
+#include <assert.h>
 
 /*
 
@@ -91,7 +91,7 @@ Initializes the subroutine.
      * Sub PMC's flags usage:
      * - private0 ... Coroutine flip/flop - C exception handler
      * - private1 ... Fixup is done
-     * - private2 ... unused
+     * - private2 ... tailcall invoked this Sub
      * - private3 ... pythonic coroutine generator flag
      * - private4 ... @MAIN
      * - private5 ... @LOAD
@@ -225,12 +225,8 @@ Invokes the subroutine.
     void* invoke (void* next) {
         struct Parrot_sub * sub = PMC_sub(SELF);
         struct parrot_regs_t *caller_regs;
+        PMC *ccont;
 
-        if (++interpreter->ctx.recursion_depth >
-                interpreter->recursion_limit) {
-            real_exception(interpreter, next, E_RuntimeError,
-                    "maximum recursion depth exceeded");
-        }
         if (Interp_flags_TEST(interpreter, PARROT_TRACE_FLAG)) {
             print_sub_name(interpreter, SELF);
         }
@@ -246,6 +242,54 @@ Invokes the subroutine.
          * create new register frame, remember old
          */
         caller_regs = interpreter->ctx.bp;
+        ccont = interpreter->ctx.current_cont;
+        /*
+         * we have:
+         * sub A:
+         *    ...
+         *    B()
+         *    ...
+         * sub B:   
+         *    ...
+         *    return C(...)
+         *    # end of B
+         *
+         * that is the sub B() returns in it's last statement whatever
+         * C() returns.
+         *
+         * We are just calling the sub C().
+         * If the private2 flagi is set, this code is called by a 
+         * tailcall opcode.
+         *
+         * We don't allocate a new register frame, we execute the sub
+         * C() in this frame. Therefore we don't have to copy function 
+         * arguments to the new frame.
+         * As no new frame is allocated, we don't check the recursion limit.
+         *
+         * Running in this frame is always safe:
+         * - no return continuation is invoked, which could get 
+         *   recycled
+         * - we just pass the current continuation on to C(), whatever
+         *   kind of continuation it is.
+         *   Using this continuation is as safe as the execution of
+         *   this sub B() was.
+         * - And finally: as continuations don't close over registers
+         *   any changes in the register done by C() can't have any
+         *   impact on possible continuations executing later here.     
+         *
+         */
+        if (!PMC_IS_NULL(ccont)) {
+            if (PObj_get_FLAGS(ccont) & PObj_private2_FLAG) {
+                PObj_get_FLAGS(ccont) &= ~PObj_private2_FLAG;
+                assert(ccont == REG_PMC(1));
+                goto is_tail_call;
+            }
+        }
+        if (++interpreter->ctx.recursion_depth >
+                interpreter->recursion_limit) {
+            real_exception(interpreter, next, E_RuntimeError,
+                    "maximum recursion depth exceeded");
+        }
         interpreter->ctx.bp = new_register_frame(interpreter,
                 &interpreter->ctx.reg_stack);
         /*
@@ -259,12 +303,13 @@ Invokes the subroutine.
             /*
              * and copy P0..P2, S0
              */
-            interpreter->ctx.current_sub = REG_PMC(0) = SELF;
             interpreter->ctx.current_cont = REG_PMC(1) =
                 BP_REG_PMC(caller_regs, 1);
+            REG_STR(0) = BP_REG_STR(caller_regs, 0);
+is_tail_call:
+            interpreter->ctx.current_sub = REG_PMC(0) = SELF;
             interpreter->ctx.current_object = REG_PMC(2) =
                 BP_REG_PMC(caller_regs, 2);
-            REG_STR(0) = BP_REG_STR(caller_regs, 0);
         }
         return sub->address;
     }

@@ -887,7 +887,7 @@ allocate_wanted_regs(IMC_Unit * unit)
     n_symbols = unit->n_symbols;
     for (i = 0; i < n_symbols; i++) {
         r = unit->reglist[i];
-        if (r->color >= 0 || r->want_regno == -1)
+        if (r->color >= 0 || r->want_regno == -1 || strchr("ISPN", r->set == 0))
             continue;
         interf = 0;
         for (y = 0; y < n_symbols; y++) {

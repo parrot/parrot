@@ -47,7 +47,7 @@ Throws a Method_Not_Found_Exception for a non-existent method.
 
 =item B<tailcallmethod>  B<(unimplemented)>
 
-=item B<tailcallmethod>(in STR)  B<(unimplemented)>
+=item B<tailcallmethod>(in STR)
 
 Make a tailcall to method $1. If no method name is given, we assume
 everything is already set up properly.
@@ -121,6 +121,27 @@ op callmethodcc(in STR) :object_base {
 
   REG_STR(0) = $1;
   REG_PMC(1) = new_ret_continuation_pmc(interpreter, next);
+
+  object = REG_PMC(2);
+  method_pmc = VTABLE_find_method(interpreter, object, REG_STR(0));
+  if (!method_pmc) {
+    real_exception(interpreter, next, METH_NOT_FOUND,
+        "Method '%Ss' not found", REG_STR(0));
+  }
+  REG_PMC(0) = method_pmc;
+  interpreter->ctx.current_object = object;
+  dest = (opcode_t *)REG_PMC(0)->vtable->invoke(interpreter, method_pmc, next);
+  goto ADDRESS(dest);
+}
+
+op tailcallmethod(in STR) :object_base {
+  opcode_t *dest;
+  PMC *method_pmc, *object;
+  opcode_t *next = expr NEXT();
+
+  REG_STR(0) = $1;
+  REG_PMC(1) = interpreter->ctx.current_cont;
+  PObj_get_FLAGS(REG_PMC(1)) |= PObj_private2_FLAG;
 
   object = REG_PMC(2);
   method_pmc = VTABLE_find_method(interpreter, object, REG_STR(0));

@@ -556,6 +556,8 @@ expand_pcc_sub_ret(Parrot_Interp interpreter, IMC_Unit * unit, Instruction *ins)
     ins->type |= arg_count == 0 ? ITPCCYIELD : (ITPCCRET|ITPCCSUB);
 }
 
+#define CREATE_TAIL_CALLS
+
 #ifdef CREATE_TAIL_CALLS
 /*
  * check for a sequence of
@@ -572,8 +574,7 @@ static int
 check_tail_call(Parrot_Interp interpreter, IMC_Unit * unit, Instruction *ins)
 {
     Instruction *tmp, *ret_ins;
-    int call_found, ret_found;
-    int i, j, matching;
+    int i, j, matching, nrets;
     struct pcc_sub_t *call, *ret;
     UNUSED(unit);
     /*
@@ -581,37 +582,64 @@ check_tail_call(Parrot_Interp interpreter, IMC_Unit * unit, Instruction *ins)
      */
     if (!(optimizer_level & OPT_SUB))
         return 0;
-    ret_ins = 0;
-    for (i = call_found = ret_found = 0, tmp = ins; tmp && i < 4;
-            tmp = tmp->next) {
-        ++i;    /* ins count */
-        if (tmp->opnum == -1 && (tmp->type & ITPCCSUB)) {
-            if (tmp->type & ITLABEL) {
-                ++ret_found;
+    if (!ins->type & ITPCCSUB)
+        return 0;
+    ret_ins = NULL;
+    tmp = ins->next;
+    if (!tmp)
+        return 0;
+    if (tmp->opnum == -1 && (tmp->type & ITPCCSUB) &&
+            (tmp->type & ITLABEL) && !tmp->next) {
                 ret_ins = tmp;
-            }
-            else
-                ++call_found;
-
-        }
-    }
-    if (i == 3 && call_found == 1 && ret_found == 1 && !tmp) {
         debug(interpreter, DEBUG_OPT1, "check tail call %I \n", ins);
+    }
+    /*
+     * when a sub ends w/o any return sequence, the code
+     * null I0 / null I3 / invoke Px
+     * is already inserted, check for this sequence
+     */
+    else if (!strcmp(tmp->op, "null") &&
+            tmp->r[0]->set == 'I' &&
+            tmp->r[0]->color == 0) {
+        tmp = tmp->next;
+        if (!tmp)
+            return 0;
+
+        if (!strcmp(tmp->op, "null") &&
+                tmp->r[0]->set == 'I' &&
+                tmp->r[0]->color == 3) {
+            tmp = tmp->next;
+            if (!tmp)
+                return 0;
+        }
+        else
+            return 0;
+        if (strcmp(tmp->op, "invoke"))
+            return 0;
+        debug(interpreter, DEBUG_OPT1, "check tail call %I \n", tmp);
+        nrets = 0;
+        goto ok;
     }
     else
         return 0;
     /*
      * now check results vs returns
      */
-    call = ins->r[0]->pcc_sub;
     ret = ret_ins->r[0]->pcc_sub;
-    debug(interpreter, DEBUG_OPT1, "\tcall results %d retvals %d\n", call->nret, ret->nret);
-    if (call->nret != ret->nret)
+    nrets = ret->nret;
+ok:
+
+    call = ins->r[0]->pcc_sub;
+    if (!(call->pragma & P_PROTOTYPED))
+        return 0;
+    debug(interpreter, DEBUG_OPT1, "\tcall call retvals %d retvals %d\n",
+            call->nret, nrets);
+    if (call->nret != nrets)
         return 0;
     for (matching = i = 0; i < call->nret; i++) {
         SymReg *c, *r;
         c = call->ret[i];
-        for (j = 0; j < ret->nret; j++) {
+        for (j = 0; j < nrets; j++) {
             r = ret->ret[i];
             if (!strcmp(c->name, r->name) &&
                     c->set == r->set)
@@ -621,23 +649,31 @@ check_tail_call(Parrot_Interp interpreter, IMC_Unit * unit, Instruction *ins)
     if (matching != call->nret)
         return 0;
     /*
-     * deactivate the return sequence
+     * suppress code generation for return sequence
      */
-    ret_ins->type = 0;
-
+    if (ret_ins)
+        ret_ins->type = 0;
     return 1;
 }
 
 static void
-insert_tail_call(Parrot_Interp interpreter, IMC_Unit * unit, Instruction *ins, SymReg *sub)
+insert_tail_call(Parrot_Interp interpreter, IMC_Unit * unit,
+        Instruction *ins, SymReg *sub, int meth_call, SymReg *s0)
 {
-    SymReg *iaddr = mk_temp_reg('I');
     SymReg *regs[IMCC_MAX_REGS];
 
-    regs[0] = iaddr;
-    regs[1] = sub->pcc_sub->sub;
-    ins = insINS(interpreter, unit, ins, "set", regs, 2);
-    ins = insINS(interpreter, unit, ins, "jump", regs, 1);
+    if (meth_call) {
+        s0 = s0 ? s0 : get_pasm_reg("S0");
+        regs[0] = s0;
+        ins = insINS(interpreter, unit, ins, "tailcallmethod", regs, 1);
+    }
+    else {
+        regs[0] = get_pasm_reg("P0");
+        ins = insINS(interpreter, unit, ins, "tailcall", regs, 1);
+    }
+    ins->type |= ITPCCSUB;
+    ins->r[0]->pcc_sub = sub->pcc_sub;
+    sub->pcc_sub = NULL;
 }
 
 #endif
@@ -900,16 +936,6 @@ expand_pcc_sub_call(Parrot_Interp interp, IMC_Unit * unit, Instruction *ins)
     ins = pcc_put_args(interp, unit, ins, sub->pcc_sub, n,
                 proto, sub->pcc_sub->args);
 
-#ifdef CREATE_TAIL_CALLS
-    /*
-     * if we have a tail call then
-     * insert a jump
-     */
-    if (tail_call) {
-        insert_tail_call(interp, unit, ins, sub);
-        return;
-    }
-#endif
 
     /*
      * setup P0, P1
@@ -953,6 +979,18 @@ move_sub:
         }
     }
 
+#ifdef CREATE_TAIL_CALLS
+    /*
+     * if we have a tail call then
+     * insert a tailcall opcode
+     */
+    if (tail_call) {
+        if (!(meth_call && strcmp(s0->name, "\"new_extended\"") == 0)) {
+            insert_tail_call(interp, unit, ins, sub, meth_call, s0);
+            return;
+        }
+    }
+#endif
     arg = sub->pcc_sub->cc;
     need_cc = 0;
     if (arg) {

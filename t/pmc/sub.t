@@ -1322,6 +1322,8 @@ output_is(<<'CODE', <<'OUTPUT', "caller introspection");
 ##PIR##
 .sub main @MAIN
 .include "interpinfo.pasm"
+    # this test will fail when run with -Oc
+    # as the call chain is cut down with tail calls
     foo()
     $P0 = find_global "Bar", "foo"
     $P0()
