@@ -5,7 +5,7 @@
 
 =head1 TITLE
 
-Parrot JIT i386/gcc
+Parrot JIT (i386/gcc)
 
 =head1 VERSION
 
@@ -20,10 +20,10 @@ This PDD describes the i386 gcc JIT implementation.
 =head1 DESCRIPTION
 
 JIT i386/gcc is a combination of unrolled assembly instructions and
-the Computed CGoto Prederefed (CGP) run loop. For branch instructions
+the Computed Goto Predereferenced (CGP) run loop. For branch instructions
 the function implementation in the standard core is called.
 
-Another difference of JIT/i386 is, that most vtable functions are
+Another difference of JIT/i386 is that most vtable functions are
 JITed instructions which use register mappings.
 
 For a better understanding of the control flow between these basically
@@ -31,8 +31,8 @@ For a better understanding of the control flow between these basically
 
 =head1 EXAMPLE
 
-Given the following PASM program, the right 3 colums show, where which
-opcode gets executed:
+Given the following PASM program, the righthand three columns show where 
+each opcode gets executed:
 
         PASM                 JIT ops   Normal     CGP ops
 
@@ -56,8 +56,8 @@ opcode gets executed:
 
 In B<runops_jit> a prederefed copy of the opcode stream is built by
 B<init_prederef>. Then B<build_asm> generates the assembler code
-seqence as usual. This generated code (shown as B<runops_jit> in
-B<ddd>) then is executed.
+sequence as usual. This generated code (shown as B<runops_jit> in
+B<ddd>) is then executed.
 
 Generate minimal stack frame, save %ebx
 
@@ -103,7 +103,7 @@ The parameter B<*cur_op> (the program counter) is put into B<%esi> and ...
     0x80b5853 <cgp_core+35>:	cmp    $0x1,%esi
     0x80b5856 <cgp_core+38>:	jne    0x80b5860 <cgp_core+48>
 
-and, if yes, the program jumps to the return address of above function
+If true, the program jumps to the return address of above function
 call, i.e. it jumps back again to JIT code.
 
     0x80b5858 <cgp_core+40>:	jmp    *0x4(%ebp)
@@ -120,7 +120,7 @@ Back again in JIT code, the init flag is checked
  [   0x812c533 <jit_func+35>:	pop    %ebp          ]
  [   0x812c535 <jit_func+37>:	ret                  ]
 
-When coming from the init sequence program flow continues with
+When coming from the init sequence, program flow continues by
 checking the B<resume_offset> and jumping to the desired instruction
 
     0x812c536 <jit_func+38>:	mov    %ebx,%eax
@@ -133,7 +133,7 @@ B<set I0, 10> and save_registers
     0x812c546 <jit_func+54>:	mov    $0xa,%ebx
     0x812c54b <jit_func+59>:	mov    %ebx,0x8113db8
 
-Now non-JITed code follows, get the address from the prederefed
+Now non-JITed code follows -- get the address from the prederefed
 op_func_table and call it:
 
     0x812c551 <jit_func+65>:	mov    $0x812ac0c,%esi
@@ -153,7 +153,7 @@ where the B<goto NEXT()> is a simple:
       goto NEXT();
     }
 
-As the last instruction of the non JITed code sequence is a branch,
+As the last instruction of the non-JITed code sequence is a branch,
 this is not executed in CGP, but the opcode:
 
     inline op cpu_ret() {
@@ -162,7 +162,7 @@ this is not executed in CGP, but the opcode:
        asm("ret")
 
 is executed. This opcode is patched into the prederefed code stream
-by Parrot_jit_normal_op at the end of a non JITed code sequence. This
+by Parrot_jit_normal_op at the end of a non-JITed code sequence. This
 returns to JIT code again, where the next instruction gets called as a
 function in the standard core ...
 
@@ -171,8 +171,8 @@ function in the standard core ...
     0x812c562 <jit_func+82>:	call   0x805be60 <Parrot_bsr_ic>
     0x812c567 <jit_func+87>:	add    $0x8,%esp
 
-... and from the return result in B<%eax> the new code position in JIT
-is calculated and gets jumped to
+... and from the return result in B<%eax>, the new code position in JIT
+is calculated and gets jumped to:
 
     0x812c56a <jit_func+90>:	sub    $0x400140c0,%eax
     0x812c570 <jit_func+96>:	mov    $0x812c4a8,%edx
@@ -183,18 +183,18 @@ Now in the subroutine B<inc>:
     0x812c580 <jit_func+112>:	mov    0x8113db8,%ebx
     0x812c586 <jit_func+118>:	inc    %ebx
 
-Save register and arguments and call B<pmc_new_noinit>
+Save register and arguments and call B<pmc_new_noinit>:
 
     0x812c587 <jit_func+119>:	push   %edx
     0x812c588 <jit_func+120>:	push   $0x11
     0x812c58d <jit_func+125>:	push   $0x8113db8
     0x812c592 <jit_func+130>:	call   0x806fc60 <pmc_new_noinit>
 
-put the PMC* into parrots registeer
+put the PMC* into Parrot's register:
 
     0x812c597 <jit_func+135>:	mov    %eax,0x8113fb8
 
-and prepare arguments for a VTABLE call
+and prepare arguments for a VTABLE call:
 
     0x812c59d <jit_func+141>:	push   %eax
     0x812c59e <jit_func+142>:	push   $0x8113db8
@@ -203,19 +203,19 @@ and prepare arguments for a VTABLE call
     0x812c5a9 <jit_func+153>:	add    $0x10,%esp
     0x812c5ac <jit_func+156>:	pop    %edx
 
-and another one
+and another one:
 
     0x812c5ae <jit_func+158>:	push   %edx
 
-here with the mapped register in B<%ebx>, push B<I0>, the PMC and the
-interpreter
+Here, with the mapped register in B<%ebx>, push B<I0>, the PMC and the
+interpreter:
 
     0x812c5af <jit_func+159>:	push   %ebx
     0x812c5b0 <jit_func+160>:	mov    0x8113fb8,%eax
     0x812c5b6 <jit_func+166>:	push   %eax
     0x812c5b7 <jit_func+167>:	push   $0x8113db8
 
-and call the vtable
+and call the vtable:
 
     0x812c5bc <jit_func+172>:	mov    0x10(%eax),%eax
     0x812c5bf <jit_func+175>:	call   *0xdc(%eax)
@@ -223,25 +223,25 @@ and call the vtable
     0x812c5c8 <jit_func+184>:	pop    %edx
 
 As this ends the JITed section, used registers are saved back to
-parrots register
+Parrot's register:
 
     0x812c5ca <jit_func+186>:	mov    %ebx,0x8113db8
 
-and again the code in B<cgp_core> gets called
+and again the code in B<cgp_core> gets called:
 
     0x812c5d0 <jit_func+192>:	mov    $0x812ac48,%esi
     0x812c5d5 <jit_func+197>:	call   *(%esi)
 
 which after executing the B<print> returns back here in JIT, where the
-B<ret> is called
+B<ret> is called:
 
     0x812c5d7 <jit_func+199>:	push   $0x8113db8
     0x812c5dc <jit_func+204>:	push   $0x40014118
     0x812c5e1 <jit_func+209>:	call   0x805d5e0 <Parrot_ret>
     0x812c5e6 <jit_func+214>:	add    $0x8,%esp
 
-and from the returned PC a JIT address is calculated, which gets
-executed then:
+From the returned PC a JIT address is calculated, which gets
+executed:
 
     0x812c5e9 <jit_func+217>:	sub    $0x400140c0,%eax
     0x812c5ef <jit_func+223>:	mov    $0x812c4a8,%edx
@@ -258,7 +258,7 @@ which is:
       HALT();
     }
 
-or, set return result
+or, set return result:
 
     0x80b8b6f <cgp_core+13119>:	xor    %eax,%eax
     ...
@@ -273,7 +273,7 @@ and clean up stack frame and ret:
     0x80bb47b <cgp_core+23627>:	pop    %ebp
     0x80bb47c <cgp_core+23628>:	ret
 
-This returns after the position, where B<cgp_core> was called during
+This returns after the position where B<cgp_core> was called during
 the init sequence, but now the return value B<%eax> is zero and the..
 
     0x812c52b <jit_func+27>:	test   %eax,%eax
@@ -289,10 +289,11 @@ So this is rather simple once it gets going.
 
 =head1 BUGS
 
-The floating point registers do not get saved to parrots before vtable
-calls, this assumes, that external routines do preserve the FP stack
+The floating point registers do not get saved to Parrot before vtable
+calls. This assumes that external routines preserve the FP stack
 pointer and don't use more the 4 floating point registers at once.
 
 =head1 AUTHOR
 
 Leopold Toetsch <lt@toetsch.at>
+
