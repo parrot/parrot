@@ -51,7 +51,7 @@ sub explain_parrotbug {
     print <<EOT;
 
 This program provides an easy way to create a message reporting a bug
-in parrot, and e-mail it to parrot developpers.
+in parrot, and e-mail it to the parrot developers.
 
 It is *NOT* intended for:
   - sending test messages,
