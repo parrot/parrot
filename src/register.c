@@ -92,6 +92,18 @@ mark_pmc_register_stack(Parrot_Interp interpreter, Stack_Chunk_t* chunk)
     UINTVAL j;
     for ( ; ; chunk = chunk->prev) {
         struct PRegFrame *pf = (struct PRegFrame *)STACK_DATAP(chunk);
+        /*
+         * totally ugly hack:
+         * if chunk got recycled it could be now a IntReg_ chunk,
+         * we can't mark the conzext of that
+         *
+         * of course the reverse could be true. we have to get a mark
+         * flag finally into the chunk depending on its current context
+         */
+        if (*chunk->name == 'I') {
+            mark_register_stack(interpreter, chunk);
+            return;
+        }
 
         pobject_lives(interpreter, (PObj*)chunk);
         if (chunk == chunk->prev || chunk->free_p)
@@ -123,6 +135,10 @@ mark_string_register_stack(Parrot_Interp interpreter, Stack_Chunk_t* chunk)
     for ( ; ; chunk = chunk->prev) {
         struct SRegFrame *sf = (struct SRegFrame *)STACK_DATAP(chunk);
 
+        if (*chunk->name == 'I') {
+            mark_register_stack(interpreter, chunk);
+            return;
+        }
         pobject_lives(interpreter, (PObj*)chunk);
         if (chunk == chunk->prev || chunk->free_p)
             break;

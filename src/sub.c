@@ -60,7 +60,6 @@ cow_copy_context(struct Parrot_Interp *interp,
     memcpy(dest, src, sizeof(*src));
     buffer_mark_COW(dest->warns);  /* XXX */
     buffer_mark_COW(dest->errors);
-    mark_stack_not_reusable(interp, dest);
 }
 
 /*
@@ -317,20 +316,20 @@ new_closure(struct Parrot_Interp *interp)
 }
 /*
 
-=item C<void mark_stack_not_reusable(Parrot_Interp, struct Parrot_Context *)>
+=item C<void mark_stack_reusable(Parrot_Interp, struct Parrot_Context *)>
 
-Set continuation context stacks as not recyclable.
+Set continuation context stacks as recyclable.
 
 =cut
 
 */
 void
-mark_stack_not_reusable(Parrot_Interp interpreter, struct Parrot_Context *ctx)
+mark_stack_reusable(Parrot_Interp interpreter, struct Parrot_Context *ctx)
 {
-    PObj_get_FLAGS(ctx->int_reg_stack) |= PObj_private0_FLAG;
-    PObj_get_FLAGS(ctx->num_reg_stack) |= PObj_private0_FLAG;
-    PObj_get_FLAGS(ctx->pmc_reg_stack) |= PObj_private0_FLAG;
-    PObj_get_FLAGS(ctx->string_reg_stack) |= PObj_private0_FLAG;
+    PObj_get_FLAGS(ctx->int_reg_stack) |= PObj_private2_FLAG;
+    PObj_get_FLAGS(ctx->num_reg_stack) |= PObj_private2_FLAG;
+    PObj_get_FLAGS(ctx->pmc_reg_stack) |= PObj_private2_FLAG;
+    PObj_get_FLAGS(ctx->string_reg_stack) |= PObj_private2_FLAG;
 }
 /*
 
@@ -350,7 +349,6 @@ new_continuation(struct Parrot_Interp *interp)
 {
     struct Parrot_Sub *cc = new_sub(interp, sizeof(struct Parrot_Sub));
     cow_copy_context(interp, &cc->ctx, &interp->ctx);
-    mark_stack_not_reusable(interp, &cc->ctx);
     return cc;
 }
 
@@ -437,18 +435,21 @@ void
 add_to_retc_free_list(Parrot_Interp interpreter, PMC *sub)
 {
     Caches *mc = interpreter->caches;
+    struct Parrot_Sub *cc_self = PMC_sub(sub);
     /* is it created from new_ret_continuation_pmc() i.e.
      * from invokecc or callmethodcc
      */
     if (!(PObj_get_FLAGS(sub) & PObj_private2_FLAG) ||
-            DISABLE_RETC_RECYCLING)
+            DISABLE_RETC_RECYCLING) {
         return;
+    }
     /* fprintf(stderr, "** add %p free = %p\n", sub, mc->retc_free_list); */
     PMC_struct_val(sub) = mc->retc_free_list;
     mc->retc_free_list = sub;
     /* don't mark the continuation context */
     PObj_custom_mark_CLEAR(sub);
     PObj_on_free_list_SET(sub);
+    mark_stack_reusable(interpreter, &cc_self->ctx);
 }
 
 PMC *

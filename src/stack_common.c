@@ -232,15 +232,16 @@ stack_prepare_pop(Parrot_Interp interpreter, Stack_Chunk_t **stack_p)
     *stack_p = chunk->prev;
 
     /*
-     * turn this off for correct behavior with continuations
+     * is it reusable?
      */
-    if (! (PObj_get_FLAGS(chunk) & PObj_private0_FLAG)) {
+    if ((PObj_get_FLAGS(chunk) & PObj_private2_FLAG)) {
         assert(s < MAX_CACHED_STACKS);
-     /* fprintf(stderr, "** ADD %d %p free = %p\n", s, chunk, e->free_list); */
+    /* fprintf(stderr, "** ADD %d %p free = %p\n", s, chunk, e->free_list); */
         chunk->free_p = e->free_list;
         e->free_list = chunk;
         PObj_on_free_list_SET(chunk);
-
+        /* clear reuse flag */
+        PObj_get_FLAGS(chunk) &= ~PObj_private2_FLAG;
     }
 
     return STACK_DATAP(chunk);
