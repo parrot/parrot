@@ -21,7 +21,7 @@ pmclass Sub {
    }
 
    void init () {
-       PMC_data(SELF) = new_sub(INTERP);
+       PMC_data(SELF) = new_sub(INTERP, sizeof(struct Parrot_Sub));
        SELF->cache.struct_val = NULL;
        PObj_custom_mark_destroy_SETALL(SELF);
    }

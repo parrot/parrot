@@ -1,6 +1,6 @@
 #!perl
 use strict;
-use TestCompiler tests => 18;
+use TestCompiler tests => 19;
 
 ##############################
 # Parrot Calling Conventions
@@ -697,6 +697,107 @@ CODE
 OUT
 
 
+output_is(<<'CODE', <<'OUT', "coroutine generator throwing exception");
+## this is mainly from Michal Wallace
+## generator_try_bug.imc
+
+## this exposes a bug in parrot exception handling
+## a function returns a function and that function
+## throws an error. The error is not caught.
+
+# count returns a generator, which counts down to zero and then
+# throws an exception, which is caught in main
+
+.sub __main__
+    new_pad 0
+
+    # count() returns a generator
+    .local Sub count
+    newsub count, .Sub, _count
+
+    # here's where we'll store it
+    .local object generator
+
+    # call count and get the generator
+    .local PerlInt start
+    start = new PerlInt
+    start = 3
+    .pcc_begin non_prototyped
+    .arg start
+    .pcc_call count
+ret0:
+    .result generator
+    .pcc_end
 
 
+    ## HERE IS where we want the try block to start ####
+    .local Sub handler
+    newsub handler, .Exception_Handler, catch0
+    set_eh handler
+
+
+    # now call the generator, until that throws 'StopIteration'
+loop:
+    .pcc_begin non_prototyped
+    .arg $P0
+    .pcc_call generator
+ret1:
+    .result $P0
+    .pcc_end
+    print $P0
+    print "\n"
+    goto loop
+
+    # end the "try" block (we never get here)
+    clear_eh
+    goto endtry0
+catch0:
+    print "caught it!\n"
+endtry0:
+    end
+.end
+
+# here is count(), which returns the generator
+.pcc_sub _count non_prototyped
+   .param PerlInt start
+   .local object gen_fun
+   .local object gen_obj
+   store_lex -1, "start", start
+   newsub gen_fun, .Coroutine, _count_g
+   .pcc_begin_return
+   .return gen_fun
+   .pcc_end_return
+.end
+
+# here is the generator itself
+# all it does is throw StopIteration
+.pcc_sub _count_g non_prototyped
+    .local PerlInt c
+    find_lex c, -1, "start"
+    lt c, 0, stop
+    .pcc_begin_yield
+    .return c
+    .pcc_end_yield
+    c = c - 1
+    goto _count_g
+
+stop:
+    .local object ex0
+    .local object msg0
+    ex0 = new Exception
+    msg0 = new PerlString
+    msg0 = 'StopIteration'
+    ex0['_message'] = msg0
+    throw ex0
+.end
+
+## end of test case ###############################
+
+CODE
+3
+2
+1
+0
+caught it!
+OUT
 

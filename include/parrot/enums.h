@@ -5,7 +5,7 @@
  *  Data Structure and Algorithms:
  *  History:
  *  Notes:
- *  References: 
+ *  References:
  */
 
 #if !defined(PARROT_ENUMS_H_GUARD)
@@ -18,7 +18,8 @@ typedef enum {
     STACK_ENTRY_STRING      = 3,
     STACK_ENTRY_PMC         = 4,
     STACK_ENTRY_POINTER     = 5,
-    STACK_ENTRY_DESTINATION = 6
+    STACK_ENTRY_DESTINATION = 6,
+    STACK_ENTRY_CORO_MARK   = 7
 } Stack_entry_type;
 
 typedef enum {

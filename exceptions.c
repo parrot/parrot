@@ -106,16 +106,19 @@ find_exception_handler(Parrot_Interp interpreter, PMC *exception)
     key = key_new_cstring(interpreter, "_message");
     message = VTABLE_get_string_keyed(interpreter, exception, key);
     do {
-        handler =
-            stack_peek(interpreter, interpreter->ctx.control_stack, &type);
-        if (!handler)
+        Stack_Entry_t *e = stack_entry(interpreter,
+                interpreter->ctx.control_stack, 0);
+        if (!e)
             break;
-        if (type == STACK_ENTRY_PMC &&
-                handler->vtable->base_type == enum_class_Exception_Handler) {
-            return handler;
+        if (e->entry_type == STACK_ENTRY_PMC) {
+            handler = e->entry.pmc_val;
+            if (handler &&
+                    handler->vtable->base_type == enum_class_Exception_Handler) {
+                return handler;
+            }
         }
         (void)stack_pop(interpreter, &interpreter->ctx.control_stack,
-                            NULL, 0);
+                        NULL, e->entry_type);
     } while (1);
     m = string_to_cstring(interpreter, message);
     if (m && *m) {

@@ -24,7 +24,7 @@ typedef struct Parrot_Lexicals {
 } * parrot_lexicals_t;
 
 /*
- * all subroutines have the same structure, mainly a interpreter->ctx
+ * Sub, Closure, COntinuation have the same structure
  */
 typedef struct Parrot_Sub {
     struct Parrot_Context ctx;
@@ -33,7 +33,19 @@ typedef struct Parrot_Sub {
     char *packed;       /* to simplify packing Constant Subs */
 } * parrot_sub_t;
 
-struct Parrot_Sub * new_sub(struct Parrot_Interp * interp);
+/* the first entries must match Parrot_Sub, so we can cast
+ * these two to the other type
+ */
+typedef struct Parrot_Coroutine {
+    struct Parrot_Context ctx;
+    struct PackFile_ByteCode *seg;
+    opcode_t *end;      /* end of bytecode in normal (bounds_check run loop */
+    char *packed;       /* to simplify packing Constant Subs */
+    struct Stack_Chunk *co_pad_stack;      /* pad stack state of the cor. */
+    struct Stack_Chunk *co_control_stack;  /* control stack state of the cor.*/
+} * parrot_coroutine_t;
+
+struct Parrot_Sub * new_sub(struct Parrot_Interp * interp, size_t);
 struct Parrot_Sub * new_closure(struct Parrot_Interp * interp);
 struct Parrot_Sub * new_coroutine(struct Parrot_Interp * interp);
 struct Parrot_Sub * new_continuation(struct Parrot_Interp * interp);
@@ -41,7 +53,7 @@ struct Parrot_Sub * new_continuation(struct Parrot_Interp * interp);
 PMC * new_continuation_pmc(struct Parrot_Interp * interp, opcode_t * address);
 
 void save_context(struct Parrot_Interp * interp, struct Parrot_Context * ctx);
-void swap_context(struct Parrot_Interp * interp, struct Parrot_Context * ctx);
+void swap_context(struct Parrot_Interp * , PMC *);
 void restore_context(struct Parrot_Interp * interp,
                      struct Parrot_Context * ctx);
 

@@ -423,7 +423,8 @@ inline op updatecc() {
   	PMC_data(interpreter->pmc_reg.registers[1]);
   sub->ctx.warns = buffer_copy_if_diff(interpreter, interpreter->ctx.warns,
     	sub->ctx.warns);
-  /* FIXME: update stacks too */
+  /* update stacks too */
+  save_context(interpreter, &sub->ctx);
   goto NEXT();
 }
 

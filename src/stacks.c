@@ -279,9 +279,8 @@ stack_push(Interp *interpreter, Stack_Chunk_t **stack_p,
             entry->entry.string_val = (String *)thing;
             break;
         case STACK_ENTRY_POINTER:
-            entry->entry.generic_pointer = thing;
-            break;
         case STACK_ENTRY_DESTINATION:
+        case STACK_ENTRY_CORO_MARK:
             entry->entry.generic_pointer = thing;
             break;
         default:
@@ -343,7 +342,7 @@ stack_pop(Interp *interpreter, Stack_Chunk_t **stack_p,
     }
 
     /* Cleanup routine? */
-    if (entry->cleanup) {
+    if (type != STACK_ENTRY_CORO_MARK && entry->cleanup) {
         (*entry->cleanup) (entry);
     }
 
@@ -367,9 +366,8 @@ stack_pop(Interp *interpreter, Stack_Chunk_t **stack_p,
         *(String **)where = entry->entry.string_val;
         break;
     case STACK_ENTRY_POINTER:
-        *(void **)where = entry->entry.generic_pointer;
-        break;
     case STACK_ENTRY_DESTINATION:
+    case STACK_ENTRY_CORO_MARK:
         *(void **)where = entry->entry.generic_pointer;
         break;
     default:
