@@ -19,13 +19,13 @@
 #define GC_DEBUG_BUFFER_HEADERS_PER_ALLOC 1
 #define GC_DEBUG_STRING_HEADERS_PER_ALLOC 1
 #ifndef GC_IS_MALLOC
-#    define PMC_HEADERS_PER_ALLOC 512
-#    define BUFFER_HEADERS_PER_ALLOC 256
-#    define STRING_HEADERS_PER_ALLOC 256
+#  define PMC_HEADERS_PER_ALLOC 512
+#  define BUFFER_HEADERS_PER_ALLOC 256
+#  define STRING_HEADERS_PER_ALLOC 256
 #else /* GC_IS_MALLOC */
-#    define PMC_HEADERS_PER_ALLOC 512
-#    define BUFFER_HEADERS_PER_ALLOC 512
-#    define STRING_HEADERS_PER_ALLOC 512
+#  define PMC_HEADERS_PER_ALLOC 512
+#  define BUFFER_HEADERS_PER_ALLOC 512
+#  define STRING_HEADERS_PER_ALLOC 512
 #endif /* GC_IS_MALLOC */
 
 /** PMC Header Functions for small-object lookup table **/
@@ -359,9 +359,9 @@ Parrot_initialize_header_pools(struct Parrot_Interp *interpreter)
     interpreter->arena_base->extra_buffer_headers.bufstart  = NULL;
     interpreter->arena_base->extra_buffer_headers.buflen    = 0;
     interpreter->arena_base->extra_buffer_headers.obj.flags = 0;
-# if ! DISABLE_GC_DEBUG
+#  if ! DISABLE_GC_DEBUG
     interpreter->arena_base->extra_buffer_headers.version   = 0;
-# endif
+#  endif
 #endif
     /* Init the constant string header pool */
     interpreter->arena_base->constant_string_header_pool =

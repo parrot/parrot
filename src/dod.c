@@ -28,7 +28,6 @@ static size_t find_common_mask(size_t val1, size_t val2);
  * individual pieces if they have private ones */
 void pobject_lives(struct Parrot_Interp *interpreter, PObj *obj)
 {
-
     /* if object is live or on free list return */
     if (PObj_is_live_or_free_TESTALL(obj)) {
         return;
@@ -409,7 +408,7 @@ find_common_mask(size_t val1, size_t val2)
 
 void
 trace_mem_block(struct Parrot_Interp *interpreter,
- 		size_t lo_var_ptr, size_t hi_var_ptr)
+                size_t lo_var_ptr, size_t hi_var_ptr)
 {
     size_t prefix, tmp_ptr;
     ptrdiff_t cur_var_ptr;
@@ -536,9 +535,9 @@ Parrot_do_dod_run(struct Parrot_Interp *interpreter)
     /* update mem stats - not, it's time consuming, this should
      * be done on demand, i.e. before using/printing it
      */
-#if 0
+#  if 0
     interpreter->memory_allocated = mallinfo().uordblks;
-#endif
+#  endif
 #endif
     /* Note it */
     interpreter->dod_runs++;

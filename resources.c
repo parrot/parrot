@@ -232,7 +232,8 @@ compact_pool(struct Parrot_Interp *interpreter, struct Memory_Pool *pool)
 
                         /* Make sure they know that we own it too */
                         PObj_COW_SET(hdr);
-                        /* Now make sure we point to where the other guy does */
+                        /* Now make sure we point to where the other guy 
+                         * does */
                         b->bufstart = hdr->bufstart;
                         /* And if we're a string, update strstart */
                         /* Somewhat of a hack, but if we get per-pool
@@ -514,7 +515,8 @@ Parrot_initialize_memory_pools(struct Parrot_Interp *interpreter)
 
     interpreter->arena_base->memory_pool =
             new_memory_pool(POOL_SIZE, &compact_pool);
-    alloc_new_block(interpreter, POOL_SIZE, interpreter->arena_base->memory_pool);
+    alloc_new_block(interpreter, POOL_SIZE, 
+                    interpreter->arena_base->memory_pool);
 
     /* Constant strings - not compacted */
     interpreter->arena_base->constant_string_pool =

@@ -948,7 +948,8 @@ string_nprintf(struct Parrot_Interp *interpreter,
 
     if(dest == NULL) {
         return output;
-    } else {
+    }
+    else {
         string_set(interpreter, dest, output);
         return dest;
     }
@@ -1111,7 +1112,7 @@ string_from_num(struct Parrot_Interp * interpreter, FLOATVAL f)
 char *
 string_to_cstring(struct Parrot_Interp * interpreter, STRING * s)
 {
-
+    
 #if 0
 
     if (s->buflen == s->bufused) {
