@@ -1,0 +1,28 @@
+/* perlscalar.pmc
+ *  Copyright: (When this is determined...it will go here)
+ *  CVS Info:
+ *  Overview:
+ *     Abstract base class for perl scalars
+ *  Data Structure and Algorithms:
+ *  History:
+ *  Notes:
+ *     This class implements common perl scalar functionality:
+ *     e.g morphing to another scalar type.
+ *     The morph method replaces the CHANGE_TYPE macro.
+ *  References:
+ */
+
+#include "parrot/parrot.h"
+
+
+pmclass perlscalar abstract noinit extends scalar {
+
+    void morph (INTVAL type) {
+	PObj_is_buffer_ptr_CLEAR(SELF);
+	SELF->vtable = &Parrot_base_vtables[type];
+	if (type == enum_class_PerlString) {
+	    PObj_is_buffer_ptr_SET(SELF);
+	}
+    }
+}
+

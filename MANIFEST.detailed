@@ -39,6 +39,7 @@
 []		classes/perlhash.pmc
 []		classes/perlint.pmc
 []		classes/perlnum.pmc
+[]		classes/perlscalar.pmc
 []		classes/perlstring.pmc
 []		classes/perlundef.pmc
 []		classes/pmc2c.pl

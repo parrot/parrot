@@ -13,7 +13,7 @@
 #include "parrot/parrot.h"
 #include "parrot/perltypes.h"
 
-pmclass PerlInt extends scalar {
+pmclass PerlInt extends perlscalar {
 
     void init () {
         SELF->cache.int_val = 0;
@@ -49,17 +49,17 @@ pmclass PerlInt extends scalar {
     }
 
     void set_number (PMC* value) {
-	CHANGE_TYPE(pmc, PerlNum);
+	DYNSELF.morph(enum_class_PerlNum);
         DYNSELF.set_number(value);
     }
 
     void set_number_native (FLOATVAL value) {
-	CHANGE_TYPE(pmc, PerlNum);
+	DYNSELF.morph(enum_class_PerlNum);
         DYNSELF.set_number_native(value);
     }
 
     void set_number_same (PMC * value) {
-	CHANGE_TYPE(pmc, PerlNum);
+	DYNSELF.morph(enum_class_PerlNum);
         DYNSELF.set_number_same(value);
     }
 
@@ -82,17 +82,17 @@ pmclass PerlInt extends scalar {
     }
 
     void set_string (PMC* value) {
-	CHANGE_TYPE(pmc, PerlString);
+	DYNSELF.morph(enum_class_PerlString);
         DYNSELF.set_string(value);
     }
 
     void set_string_native (STRING* value) {
-	CHANGE_TYPE(pmc, PerlString);
+	DYNSELF.morph(enum_class_PerlString);
         DYNSELF.set_string_native(value);
     }
 
     void set_string_same (PMC* value) {
-	CHANGE_TYPE(pmc, PerlString);
+	DYNSELF.morph(enum_class_PerlString);
         DYNSELF.set_string_same(value);
     }
 

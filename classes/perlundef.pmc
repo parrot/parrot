@@ -60,12 +60,12 @@ pmclass PerlUndef extends PerlInt {
     }
 
     void set_integer (PMC * value) {
-	CHANGE_TYPE(SELF, PerlInt);
+	DYNSELF.morph(enum_class_PerlInt);
         DYNSELF.set_integer(value);
     }
 
     void set_integer_native (INTVAL value) {
-	CHANGE_TYPE(SELF, PerlInt);
+	DYNSELF.morph(enum_class_PerlInt);
         DYNSELF.set_integer_native(value);
     }
 
@@ -76,12 +76,12 @@ pmclass PerlUndef extends PerlInt {
 
 
     void set_string (PMC* value) {
-	CHANGE_TYPE(pmc, PerlString);
+	DYNSELF.morph(enum_class_PerlString);
         DYNSELF.set_string(value);
     }
 
     void set_string_native (STRING* value) {
-	CHANGE_TYPE(pmc, PerlString);
+	DYNSELF.morph(enum_class_PerlString);
         DYNSELF.set_string_native(value);
     }
 

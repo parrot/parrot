@@ -13,7 +13,7 @@
 #include "parrot/parrot.h"
 #include "parrot/perltypes.h"
 
-pmclass PerlString extends scalar {
+pmclass PerlString extends perlscalar {
 
     void init () {
         SELF->data = string_make(INTERP,NULL,0,NULL,0,NULL);
@@ -66,32 +66,32 @@ pmclass PerlString extends scalar {
     }
 
     void set_integer (PMC* value) {
-	CHANGE_TYPE(SELF, PerlInt);
+	DYNSELF.morph(enum_class_PerlInt);
         DYNSELF.set_integer(value);
     }
 
     void set_integer_native (INTVAL value) {
-	CHANGE_TYPE(SELF, PerlInt);
+	DYNSELF.morph(enum_class_PerlInt);
         DYNSELF.set_integer_native(value);
     }
 
     void set_integer_same (PMC* value) {
-	CHANGE_TYPE(SELF, PerlInt);
+	DYNSELF.morph(enum_class_PerlInt);
         DYNSELF.set_integer_same(value);
     }
 
     void set_number (PMC * value) {
-	CHANGE_TYPE(SELF, PerlNum);
+	DYNSELF.morph(enum_class_PerlNum);
         DYNSELF.set_number(value);
     }
 
     void set_number_native (FLOATVAL value) {
-	CHANGE_TYPE(SELF, PerlNum);
+	DYNSELF.morph(enum_class_PerlNum);
         DYNSELF.set_number_native(value);
     }
 
     void set_number_same (PMC * value) {
-	CHANGE_TYPE(SELF, PerlNum);
+	DYNSELF.morph(enum_class_PerlNum);
         DYNSELF.set_number_same(value);
     }
 
@@ -197,7 +197,7 @@ pmclass PerlString extends scalar {
 
     void bitwise_or (PMC* value, PMC* dest) {
     /* XXX or bitwise string?  */
-	CHANGE_TYPE(dest, PerlInt);
+	DYNSELF.morph(enum_class_PerlInt);
         VTABLE_set_integer_native(INTERP, dest,
             VTABLE_get_integer(INTERP, SELF) |
             VTABLE_get_integer(INTERP, value)
@@ -205,7 +205,7 @@ pmclass PerlString extends scalar {
     }
 
     void bitwise_or_int (INTVAL value, PMC* dest) {
-	CHANGE_TYPE(dest, PerlInt);
+	DYNSELF.morph(enum_class_PerlInt);
         VTABLE_set_integer_native(INTERP, dest,
             VTABLE_get_integer(INTERP, SELF) |
             value
@@ -213,7 +213,7 @@ pmclass PerlString extends scalar {
     }
 
     void bitwise_or_same (PMC* value, PMC* dest) {
-	CHANGE_TYPE(dest, PerlInt);
+	DYNSELF.morph(enum_class_PerlInt);
         VTABLE_set_integer_native(INTERP, dest,
             VTABLE_get_integer(INTERP, SELF) |
             VTABLE_get_integer(INTERP, value)
@@ -221,7 +221,7 @@ pmclass PerlString extends scalar {
     }
 
     void bitwise_and (PMC* value, PMC* dest) {
-	CHANGE_TYPE(dest, PerlInt);
+	DYNSELF.morph(enum_class_PerlInt);
         VTABLE_set_integer_native(INTERP, dest,
             VTABLE_get_integer(INTERP, SELF) &
             VTABLE_get_integer(INTERP, value)
@@ -229,7 +229,7 @@ pmclass PerlString extends scalar {
     }
 
     void bitwise_and_int (INTVAL value, PMC* dest) {
-	CHANGE_TYPE(dest, PerlInt);
+	DYNSELF.morph(enum_class_PerlInt);
         VTABLE_set_integer_native(INTERP, dest,
             VTABLE_get_integer(INTERP, SELF) &
             value
@@ -237,7 +237,7 @@ pmclass PerlString extends scalar {
     }
 
     void bitwise_and_same (PMC* value, PMC* dest) {
-	CHANGE_TYPE(dest, PerlInt);
+	DYNSELF.morph(enum_class_PerlInt);
         VTABLE_set_integer_native(INTERP, dest,
             VTABLE_get_integer(INTERP, SELF) &
             VTABLE_get_integer(INTERP, value)
@@ -245,7 +245,7 @@ pmclass PerlString extends scalar {
     }
 
     void bitwise_xor (PMC* value, PMC* dest) {
-	CHANGE_TYPE(dest, PerlInt);
+	DYNSELF.morph(enum_class_PerlInt);
         VTABLE_set_integer_native(INTERP, dest,
             VTABLE_get_integer(INTERP, SELF) ^
             VTABLE_get_integer(INTERP, value)
@@ -253,7 +253,7 @@ pmclass PerlString extends scalar {
     }
 
     void bitwise_xor_int (INTVAL value, PMC* dest) {
-	CHANGE_TYPE(dest, PerlInt);
+	DYNSELF.morph(enum_class_PerlInt);
         VTABLE_set_integer_native(INTERP, dest,
             VTABLE_get_integer(INTERP, SELF) ^
             value
@@ -261,7 +261,7 @@ pmclass PerlString extends scalar {
     }
 
     void bitwise_xor_same (PMC* value, PMC* dest) {
-	CHANGE_TYPE(dest, PerlInt);
+	DYNSELF.morph(enum_class_PerlInt);
         VTABLE_set_integer_native(INTERP, dest,
             VTABLE_get_integer(INTERP, SELF) ^
             VTABLE_get_integer(INTERP, value)
@@ -269,7 +269,7 @@ pmclass PerlString extends scalar {
     }
 
     void bitwise_not (PMC* dest) {
-	CHANGE_TYPE(dest, PerlInt);
+	DYNSELF.morph(enum_class_PerlInt);
         VTABLE_set_integer_native(INTERP, dest,
             ~VTABLE_get_integer(INTERP, SELF)
         );
@@ -320,7 +320,7 @@ pmclass PerlString extends scalar {
     }
 
     void repeat (PMC* value, PMC* dest) {
-	CHANGE_TYPE(dest, PerlString);
+	DYNSELF.morph(enum_class_PerlString);
         dest->data =
            string_repeat(INTERP, SELF->data,
                          (UINTVAL)VTABLE_get_integer(INTERP, value), NULL
@@ -328,7 +328,7 @@ pmclass PerlString extends scalar {
     }
 
     void repeat_int (INTVAL value, PMC* dest) {
-	CHANGE_TYPE(dest, PerlString);
+	DYNSELF.morph(enum_class_PerlString);
         dest->data = string_repeat(INTERP, SELF->data, (UINTVAL)value, NULL);
     }
 
@@ -341,7 +341,7 @@ pmclass PerlString extends scalar {
     }
 
     void substr (INTVAL offset, INTVAL length, PMC* dest) {
-	CHANGE_TYPE(dest, PerlString);
+	DYNSELF.morph(enum_class_PerlString);
         dest->data = string_substr(INTERP, SELF->data, offset, length, NULL);
     }
 

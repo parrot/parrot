@@ -15,7 +15,7 @@
  * as necessary.
  */
 
-#define CHANGE_TYPE(thing, type) { \
+#define DONT_USE_CHANGE_TYPE(thing, type) { \
     if ((thing)->vtable == &Parrot_base_vtables[enum_class_PerlString]) { \
 	PObj_is_buffer_ptr_CLEAR(thing); \
     } \
