@@ -453,7 +453,8 @@ sub gen_parent_list {
         next if $n eq 'default';
         
         my %parent_hash = %{$sub->{flags}{extends}};
-        my @parents     = sort { $parent_hash{a} <=> $parent_hash{$b} } keys %parent_hash;
+        my @parents     = sort { $parent_hash{$a} <=> $parent_hash{$b} }
+		    keys %parent_hash;
         for my $parent (@parents) {
             next if exists $class->{has_parent}{$parent};
             
