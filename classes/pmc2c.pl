@@ -850,7 +850,7 @@ int Parrot_dynext_${lc_classname}_init(Interp *interp, int action, void *param)
 		    info->class_enum;
 		/* copy vtable back to caller */
 		info->base_vtable[info->class_enum] =
-		    *Parrot_base_vtables[info->class_enum];
+		    Parrot_base_vtables[info->class_enum];
 	    }
 	    return ok;
 	case DYNEXT_INIT_PMC:
