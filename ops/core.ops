@@ -73,7 +73,7 @@ environment.
 
 ########################################
 
-=item close(i|ic)
+=item B<close>(i|ic)
 
 Close file opened on file descriptor $1.
 
@@ -87,11 +87,11 @@ inline op close(i|ic) {
 
 ########################################
 
-=item err(i)
+=item B<err>(i)
 
 Store the system error code in $1.
 
-=item err(s)
+=item B<err>(s)
 
 Store the system error message in $1.
 
@@ -329,15 +329,15 @@ op print(i|ic, p) {
 
 ########################################
 
-=item read(i, i|ic)
+=item B<read>(i, i|ic)
 
 Read an INTVAL from file descriptor $2 into $1.
 
-=item read(n, i|ic)
+=item B<read>(n, i|ic)
 
 Read a FLOATVAL from file descriptor $2 into $1.
 
-=item read(s, i|ic, i|ic)
+=item B<read>(s, i|ic, i|ic)
 
 Read $3 bytes from file descriptor $2 into string $1.
 
@@ -399,11 +399,11 @@ inline op time(n) {
 
 ########################################
 
-=item write(i|ic, i|ic)
+=item B<write>(i|ic, i|ic)
 
-=item write(i|ic, n|nc)
+=item B<write>(i|ic, n|nc)
 
-=item write(i|ic, s|sc)
+=item B<write>(i|ic, s|sc)
 
 Write $2 to file descriptor $1.
 
@@ -1081,6 +1081,7 @@ constants into their destination register, $1.
 =over 4
 
 =cut
+
 ########################################
 
 =item B<abs>(i|n, i|ic|n|nc)
@@ -1145,22 +1146,23 @@ inline op add(n, n, n|nc) {
 NOTE: This "uncorrected mod" algorithm uses the C language's built-in
 mod operator (x % y), which is
 
-    ... the remainder when x is divided by y, and thus is zero when y
-    divides x exactly.
+    ... the remainder when x is divided by y, and thus is zero
+    when y divides x exactly.
     ...
-    The direction of truncation for / and the sign of the result for %
-    are machine-dependent for negative operands, as is the action taken
-    on overflow or underflow.
-                                                         -- [1], page 41
+    The direction of truncation for / and the sign of the result
+    for % are machine-dependent for negative operands, as is the
+    action taken on overflow or underflow.
+                                                     -- [1], page 41
 
 Also:
 
-    ... if the second operand is 0, the result is undefined. Otherwise, it
-    is always true that (a/b)*b + a%b is equal to z. If both operands are
-    non-negative, then the remainder is non-negative and smaller than the
-    divisor; if not, it is guaranteed only that the absolute value of the
-    remainder is smaller than the absolute value of the divisor.
-                                                         -- [1], page 205
+    ... if the second operand is 0, the result is undefined. 
+    Otherwise, it is always true that (a/b)*b + a%b is equal to z. If
+    both operands are non-negative, then the remainder is non-
+    negative and smaller than the divisor; if not, it is guaranteed
+    only that the absolute value of the remainder is smaller than
+    the absolute value of the divisor.
+                                                     -- [1], page 205
 
 This op is provided for those who need it (such as speed-sensitive
 applications with heavy use of mod, but using it only with positive
@@ -1191,15 +1193,15 @@ inline op cmod(i, i|ic, i|ic) {
 NOTE: This "uncorrected mod" algorithm uses the built-in C math library's
 fmod() function, which computes
 
-    ... the remainder of dividing x by y. The return value is x - n * y,
-    where n is the quotient of x / y, rounded towards zero to an
-    integer.
-                                    -- fmod() manpage on RedHat Linux 7.0
+    ... the remainder of dividing x by y. The return value is
+    x - n * y, where n is the quotient of x / y, rounded towards
+    zero to an integer.
+                                -- fmod() manpage on RedHat Linux 7.0
 
 In addition, fmod() returns
 
-    the remainder, unless y is zero, when the function fails and errno
-    is set.
+    the remainder, unless y is zero, when the function fails and
+    errno is set.
 
 According to page 251 of [1], the result when y is zero is implementation-
 defined.
@@ -1511,6 +1513,8 @@ inline op sub(n, n|nc, n|nc) {
 =head2 String operations
 
 These operations operate on STRINGs.
+
+=over 4
 
 =cut
 
@@ -2369,6 +2373,23 @@ inline op restore(s) {
 }
 
 
+########################################
+
+=item B<rotate_up>(i)
+
+=item B<rotate_up>(ic)
+
+Rotate the top $1 entries in the user stack so that the top entry
+becomes the bottom entry in that range.
+
+=cut
+
+inline op rotate_up(i|ic) {
+  rotate_entries(interpreter, interpreter->user_stack_base, interpreter->user_stack_top, $1);
+  goto NEXT();
+}
+
+
 =back
 
 =cut
@@ -2382,6 +2403,7 @@ The control flow opcodes check conditions and manage program flow.
 
 =over 4
 
+=cut
 
 ########################################
 
@@ -2436,6 +2458,20 @@ Jump to the address held in register $1.
 inline op jump(i) {
   goto OFFSET($1);
 }
+
+=back
+
+=cut
+
+###############################################################################
+
+=head2 Miscellaneous
+
+Opcodes which need to be sorted into better categories.
+
+=over 4
+
+=cut
 
 ########################################
 
@@ -2504,27 +2540,6 @@ inline op ret() {
   goto POP();
 }
 
-
-########################################
-
-=item B<rotate_up>(i)
-
-=item B<rotate_up>(ic)
-
-Rotate the top $1 entries in the user stack so that the top entry
-becomes the bottom entry in that range.
-
-=cut
-
-inline op rotate_up(i|ic) {
-  rotate_entries(interpreter, interpreter->user_stack_base, interpreter->user_stack_top, $1);
-  goto NEXT();
-}
-
-
-=back
-
-=cut
 
 ########################################
 
@@ -2611,6 +2626,10 @@ inline op getpackage(s) {
   $1 = interpreter->current_package;
   goto NEXT();
 }
+
+=back
+
+=cut
 
 ###############################################################################
 
