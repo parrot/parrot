@@ -13,7 +13,7 @@ void fatal(int code, const char *func, const char *fmt, ...)
 
     va_start(ap, fmt);
     fprintf(stderr, "error:imcc:%s: ", func);
-    vfprintf(stderr, fmt, ap);
+    imcc_vfprintf(stderr, fmt, ap);
     va_end(ap);
     exit(code);
 }
@@ -25,7 +25,7 @@ void fataly(int code, const char *file, int lin, const char *fmt, ...)
 
     va_start(ap, fmt);
     fprintf(stderr, "error:imcc:");
-    vfprintf(stderr, fmt, ap);
+    imcc_vfprintf(stderr, fmt, ap);
     va_end(ap);
     fprintf(stderr, "in file '%s' line %d\n", file, lin);
     print_inc();
@@ -42,7 +42,7 @@ void warning(Parrot_Interp interpreter, const char *func, const char *fmt, ...)
 
     va_start(ap, fmt);
     fprintf(stderr, "warning:imcc:%s: ", func);
-    vfprintf(stderr, fmt, ap);
+    imcc_vfprintf(stderr, fmt, ap);
     va_end(ap);
 }
 
@@ -54,7 +54,7 @@ void info(Parrot_Interp interpreter, int level, const char *fmt, ...)
 	return;
 
     va_start(ap, fmt);
-    vfprintf(stderr, fmt, ap);
+    imcc_vfprintf(stderr, fmt, ap);
     va_end(ap);
 }
 
@@ -66,7 +66,7 @@ debug(Parrot_Interp interpreter, int level, const char *fmt, ...)
     if ( !(level & IMCC_INFO(interpreter)->debug))
 	return;
     va_start(ap, fmt);
-    vfprintf(stderr, fmt, ap);
+    imcc_vfprintf(stderr, fmt, ap);
     va_end(ap);
 }
 

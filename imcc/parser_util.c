@@ -545,6 +545,109 @@ SymReg ** r, int nr, int keyvec, int emit)
     emitb(ins);
     return ins;
 }
+
+int
+imcc_fprintf(FILE *fd, const char *fmt, ...)
+{
+    va_list ap;
+    int len;
+
+    va_start(ap, fmt);
+    len = imcc_vfprintf(fd, fmt, ap);
+    va_end(ap);
+    return len;
+}
+
+int
+imcc_vfprintf(FILE *fd, const char *format, va_list ap) {
+    int len;
+    const char *cp;
+    const char *fmt;
+    int ch, n;
+    int _int;
+    double _double;
+    char _char;
+    Instruction  *_ins;
+    char *_string;
+    char buf[128];
+
+    for (len = 0, fmt = format ; ; ) {
+        for (n = 0, cp = fmt; (ch = *fmt) && ch != '%'; fmt++)
+            n++;
+        /* print prev string */
+        if (n) {
+            fwrite(cp, 1, n, fd);
+            len += n;
+            continue;
+        }
+        /* finished? */
+        if (!ch)
+            break;
+        /* ok, we got at format spec */
+        ch = *++fmt;      /* % */
+        if (ch == '%') {    /* print it */
+            fwrite(fmt, 1, 1, fd);
+            len += 1;
+            ++fmt;
+            continue;
+        }
+        /* look for end of format spec */
+        for ( ; ch && strchr("diouxXeEfFgGcspI", ch) == NULL; ch = *++fmt)
+            ;
+        if (!ch) {
+            /* no fatal here, else we get recursion */
+            fprintf(stderr, "illegal format at %s\n", cp);
+            exit(1);
+        }
+        /* ok, we have a valid format char */
+        ++fmt;
+        switch (ch) {
+            case 'd':
+            case 'i':
+            case 'o':
+            case 'u':
+            case 'x':
+            case 'X':
+            case 'p':
+                _int = va_arg(ap, int);
+                memcpy(buf, cp, n = (fmt - cp));
+                buf[n] = '\0';
+                len += fprintf(fd, buf, _int);
+                break;
+            case 'e':
+            case 'E':
+            case 'f':
+            case 'F':
+            case 'g':
+            case 'G':
+                _double = va_arg(ap, double);
+                memcpy(buf, cp, n = (fmt - cp));
+                buf[n] = '\0';
+                len += fprintf(fd, buf, _double);
+                break;
+            case 'c':
+                _char = va_arg(ap, char);
+                memcpy(buf, cp, n = (fmt - cp));
+                buf[n] = '\0';
+                len += fprintf(fd, buf, _char);
+                break;
+            case 's':
+                _string = va_arg(ap, char *);
+                memcpy(buf, cp, n = (fmt - cp));
+                assert(n<128);
+                buf[n] = '\0';
+                len += fprintf(fd, buf, _string);
+                break;
+            /* this is the reason for the whole mess */
+            case 'I':
+                _ins = va_arg(ap, Instruction *);
+                len += ins_print(fd, _ins);
+                break;
+        }
+    }
+    return len;
+}
+
 /*
  * Local variables:
  * c-indentation-style: bsd

@@ -53,6 +53,9 @@ int get_keyvec(Parrot_Interp, int opnum);
 int is_op(struct Parrot_Interp *, char *);
 void init_tables(struct Parrot_Interp * interp);
 
+int imcc_vfprintf(FILE *fd, const char *format, va_list ap);
+int imcc_fprintf(FILE *fd, const char *fmt, ...);
+
 /* pcc protos */
 void expand_pcc_sub(Parrot_Interp interpreter, Instruction *ins);
 void expand_pcc_sub_call(Parrot_Interp interpreter, Instruction *ins);

@@ -320,16 +320,17 @@ void free_ins(Instruction *ins)
 }
 
 
-static char * ins_fmt(Instruction * ins) {
+int ins_print(FILE *fd, Instruction * ins) {
 
-    static char s[512]; /* XXX */
     char regb[IMCC_MAX_REGS][256];      /* XXX */
+    /* only long key constants can overflow */
     char *regstr[IMCC_MAX_REGS];
     SymReg *p;
     int i;
-    *s = 0;
+    int len;
+
     if (!ins->r[0] || !strchr(ins->fmt, '%')) {	/* comments, labels and such */
-	return ins->fmt;
+	return fprintf(fd, "%s", ins->fmt);
     }
     for (i = 0; i < IMCC_MAX_REGS ; i++) {
 	if (!ins->r[i]) {
@@ -374,40 +375,36 @@ static char * ins_fmt(Instruction * ins) {
     switch (ins->opsize-1) {
         case -1:        /* labels */
         case 1:
-            sprintf(s, ins->fmt, regstr[0]);
+            len = fprintf(fd, ins->fmt, regstr[0]);
             break;
         case 2:
-            sprintf(s, ins->fmt, regstr[0], regstr[1]);
+            len = fprintf(fd, ins->fmt, regstr[0], regstr[1]);
             break;
         case 3:
-            sprintf(s, ins->fmt, regstr[0], regstr[1], regstr[2]);
+            len = fprintf(fd, ins->fmt, regstr[0], regstr[1], regstr[2]);
             break;
         case 4:
-            sprintf(s, ins->fmt, regstr[0], regstr[1], regstr[2], regstr[3]);
+            len = fprintf(fd, ins->fmt, regstr[0], regstr[1], regstr[2],
+                    regstr[3]);
             break;
         case 5:
-            sprintf(s, ins->fmt, regstr[0], regstr[1], regstr[2], regstr[3],
-                    regstr[4]);
+            len = fprintf(fd, ins->fmt, regstr[0], regstr[1], regstr[2],
+                    regstr[3], regstr[4]);
             break;
         case 6:
-            sprintf(s, ins->fmt, regstr[0], regstr[1], regstr[2], regstr[3],
-                    regstr[4], regstr[5]);
+            len = fprintf(fd, ins->fmt, regstr[0], regstr[1], regstr[2],
+                    regstr[3], regstr[4], regstr[5]);
             break;
         default:
-            fatal(1, "ins_fmt", "unhandled: opsize (%d), op %s, fmt %s\n",
+            fprintf(stderr, "unhandled: opsize (%d), op %s, fmt %s\n",
                     ins->opsize, ins->op, ins->fmt);
+            exit(1);
             break;
     }
-    return s;
+    return len;
 }
 
 /* for debug */
-char * ins_string(Instruction * ins) {
-    static char s[512];
-    sprintf(s, "%s %s", ins->op, ins_fmt(ins));
-    return s;
-}
-
 static char *output;
 static int e_file_open(void *param)
 {
@@ -428,12 +425,19 @@ static int e_file_close(void *param) {
 
 }
 
+/* dummy until all are fixed */
+char *ins_string(Instruction * ins) {
+    UNUSED(ins);
+    return "";
+}
 static int e_file_emit(void *param, Instruction * ins) {
     UNUSED(param);
     if ((ins->type & ITLABEL) || ! *ins->op)
-	printf(ins_fmt(ins));
-    else
-	printf("\t%s %s",ins->op, ins_fmt(ins));
+	ins_print(stdout, ins);
+    else {
+	printf("\t%s ",ins->op);
+	ins_print(stdout, ins);
+    }
     printf("\n");
     return 0;
 }
@@ -477,7 +481,7 @@ int emit_flush(void *param) {
     if (emitters[emitter].new_sub)
         (emitters[emitter]).new_sub(param);
     for (ins = instructions; ins; ins = ins->next) {
-        debug(interpreter, DEBUG_IMC, "emit %s\n", ins_string(ins));
+        debug(interpreter, DEBUG_IMC, "emit %s %I\n", ins->op, ins);
         (emitters[emitter]).emit(param, ins);
     }
     for (ins = instructions; ins; ) {

@@ -13,7 +13,7 @@
 #  If you need to modify varaibles, see the save/restore trick for LET
 #
 # $Id$
-# $Log: instructions.pasm,v 
+# $Log: instructions.pasm,v
 # Revision 1.9  2002/06/16 21:23:28  clint
 # Floating Point BASI
 #
@@ -903,7 +903,7 @@ LIST_ONE_LINE:
 	print S0
 	print "\n"
 	branch END_LIST
-	
+
 LIST_RANGE:
 	restore S0  	# -
 	dec I5
@@ -966,7 +966,7 @@ CODELOOP:
 
 
 # Okay, it's not actually an error branch anymore.
-ERROR:  
+ERROR:
 	noop
 
 END:    set I20, 0   # Normal mode
@@ -1013,7 +1013,7 @@ I_LOAD:
 	concat S0, ".bas"
 
 	open P0, S0, "<"
-	ne I0, 0, ERR_IO
+	unless P0, ERR_IO
 	set S1, ""        # Accumulator
 
 LOAD_READ:
@@ -1178,7 +1178,7 @@ ERR_IO:
 	branch ALL_ERR
 
 # This is a Should Not Happen error now.
-ERR_I_NEXT_MS:	
+ERR_I_NEXT_MS:
 	save I5
 	bsr CLEAR
 	restore I0

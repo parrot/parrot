@@ -88,7 +88,8 @@ int ins_reads2(Instruction *, int);
 int ins_writes2(Instruction *, int);
 
 void free_ins(Instruction *);
-char * ins_string(Instruction * ins);
+int ins_print(FILE *fd, Instruction * ins);
+char *ins_string(Instruction * ins);
 
 Instruction *delete_ins(Instruction *ins, int needs_freeing);
 void insert_ins(Instruction *ins, Instruction * tmp);
