@@ -1493,6 +1493,21 @@ DoneCollectWord:
 
 #------------------------------------------------------------------------------
 #
+# CollectToQuote
+#
+CollectToQuote:
+    index .TempInt, .Commands, '"'
+    eq .TempInt, -1, NoQuote
+    substr .CurrentWord, .Commands, 0, .TempInt, ""
+    branch DoneCollectToQuote
+NoQuote:
+    set .CurrentWord, .Commands
+    set .Commands, ""
+DoneCollectToQuote:
+    ret
+
+#------------------------------------------------------------------------------
+#
 # EatLeadingWhitespace
 #
 EatLeadingWhitespace:
@@ -1738,23 +1753,14 @@ AddSpecialWord:
 
   NotCompileComma:
     ne .CurrentWord, 'p"', NotParrotString
+
     # Okay, we need to yank the string out of the input stream
-    set .PendingConstant, ""
-   MoreString:
     bsr EatLeadingWhitespace
-    bsr CollectWord
-    eq '"', .CurrentWord, GotConstant
-    length .TempInt, .PendingConstant
-    unless .TempInt, AfterSpace
-    concat .PendingConstant, " "
-   AfterSpace:
-    concat .PendingConstant, .CurrentWord
-    length .TempInt, .Commands
-    if .TempInt, MoreString    
+    bsr CollectToQuote
 
    GotConstant:
     inc .LastConstant
-    set .ConstantTable[.LastConstant], .PendingConstant
+    set .ConstantTable[.LastConstant], .CurrentWord
     concat .NewBodyString, "set S31, P15["
     set .TempString, .LastConstant
     concat .NewBodyString, .TempString
