@@ -6,6 +6,8 @@ Parrot FAQ - Frequently Asked Questions
 
 =over 4
 
+=item Revision 0.5 - 04 September 2002
+
 =item Revision 0.4 - 26 August 2002
 
 Fixed up the licensing bits
@@ -191,6 +193,12 @@ an interpreter geared towards dynamic languages.
 Sure we will. They're just not our first target. We build our own 
 interpreter/VM, then when that's working we start in on the JVM and/or .NET back 
 ends.
+
+=head2 Why is the development list called perl6-internals?
+
+The mailing list preceeds the Parrot joke and subsequent unveiling of
+the True Grand Project by a number of months. We've just not gotten
+around to renaming the mailing list.
 
 =head1 PARROT AND PERL
 
