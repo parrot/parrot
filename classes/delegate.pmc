@@ -1,30 +1,39 @@
-/* delegate.pmc
- *  Copyright: 2003 The Perl Foundation.  All Rights Reserved.
- *  CVS Info $Id$
- *  Overview:
- *     Delegate each and every function to parrot bytecode
- *  Data Structure and Algorithms:
- *  History:
- *  Notes:
- *     Almost all methods are auto-generated in lib/Parrot/Pmc2c.pm
- *  References:
- */
+/*
+Copyright: 2003 The Perl Foundation.  All Rights Reserved.
+$Id$
+
+=head1 NAME
+
+classes/delegate.pmc - Delegate PMC
+
+=head1 DESCRIPTION
+
+Delegate each and every function to parrot bytecode.
+
+Almost all methods are auto-generated in lib/Parrot/Pmc2c.pm
+
+=head2 Register Save/Restore Functions
+
+The following bit is a fast register save/restore pair. They currently
+count on the registers in the interpreter structure being in the same
+order as in the C<regsave struct>, and that the registers are at the
+beginning of the interpreter structure.
+
+Yes, it's damned evil, but it's what we need, since we have to preserve
+the registers -- vtable methods can't change them.
+
+Also note that if the vtable method clobbers a register that contains a
+string or PMC not otherwise rooted it could be collected too early.
+
+=over 4
+
+=cut
+
+*/
+
 
 #include "parrot/parrot.h"
 
-/* The following bit is a fast register save/restore pair. They
-   currently count on the registers in the interpreter structure being
-   in the same order as in the regsave struct, and that the registers
-   are at the beginning of the interpreter structure.
-
-   Yes, it's damned evil, but it's what we need, since we have to
-   preserve the registers--vtable methods can't change them.
-
-   Also note that if the vtable method clobbers a register that
-   contains a string or PMC not otherwise rooted it could be collected
-   too early
-
-*/
 static struct regsave {
     struct IReg int_reg;
     struct NReg num_reg;
@@ -99,3 +108,12 @@ pmclass delegate {
 
 
 }
+
+/*
+
+=back
+
+=cut
+
+*/
+
