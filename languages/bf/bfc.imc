@@ -5,6 +5,7 @@
 # See http://www.catseye.mb.ca/esoteric/bf/
 # for more information on this silly language
 .sub _main
+  .param pmc argv
   .local int pc
   .local int maxpc
   .local int label
@@ -16,12 +17,12 @@
   .local string program
   .local string char
 
-  program = P5[0]
+  program = argv[0]
   # check argc
-  I0 = P5
-  if I0 < 2 goto usage
+  $I0 = argv
+  if $I0 < 2 goto usage
   # Get the filename
-  filename = P5[1]
+  filename = argv[1]
   if filename goto SOURCE
 usage:
   print "usage: ../../parrot "
@@ -31,24 +32,29 @@ usage:
 
   # Read the file into S1
 SOURCE:
-  open P1, filename, "<"
-  defined I0, P1
-  if I0, SOURCE_LOOP
+  open $P1, filename, "<"
+  defined $I0, $P1
+  if $I0, SOURCE_LOOP
   print filename
   print " not found\n"
   branch usage
 SOURCE_LOOP:
-  read line, P1, 1024
+  read line, $P1, 1024
   file = file . line
   if line goto SOURCE_LOOP
-  close P1
+  close $P1
 
   length maxpc, file
 
   # Initialise
   code =      "set I0, 0          # pc\n"
-  concat code,  "new P0, .PerlArray # memory\n"
-  concat code,  "set I1, 0          # pointer\n"
+  # concat code, "trace 1\n"
+  concat code,  "new P0, .ResizableIntegerArray # memory\n"
+  # this array doesn't support negative indices properly
+  # start with some offset
+  concat code,  "set I1, 256          # pointer\n"
+  concat code,  "getstdout P30\n"
+  concat code,  "pop S0, P30\n        # unbuffer\n"
   concat code,  "getstdin P30\n"
 
   pc    = 0    # pc
@@ -65,46 +71,106 @@ INTERP:
   concat code,  "\n"
 
   if char != "+" goto NOTPLUS
+  .local int n_plus
+  null n_plus
+  $I0 = pc + 1
+plus_loop:
+  inc n_plus
+  if $I0 == maxpc goto emit_plus
+  substr_r char, file, $I0, 1
+  if char != "+" goto emit_plus
+  inc $I0
+  goto plus_loop
+emit_plus:
+  pc = $I0 - 1
   concat code,  "set I2, P0[I1]\n"
-  concat code,  "inc I2\n"
+  concat code,  "add I2, "
+  $S0 = n_plus
+  concat code,  $S0
+  concat code,  "\n"
   concat code,  "band I2, 0xff\n"
   concat code,  "set P0[I1], I2\n"
   goto NEXT
 
 NOTPLUS:
   if char != "-" goto NOTMINUS
+  .local int n_minus
+  null n_minus
+  $I0 = pc + 1
+minus_loop:
+  inc n_minus
+  if $I0 == maxpc goto emit_minus
+  substr_r char, file, $I0, 1
+  if char != "-" goto emit_minus
+  inc $I0
+  goto minus_loop
+emit_minus:
+  pc = $I0 - 1
   concat code,  "set I2, P0[I1]\n"
-  concat code,  "dec I2\n"
+  concat code,  "sub I2, "
+  $S0 = n_minus
+  concat code,  $S0
+  concat code,  "\n"
   concat code,  "band I2, 0xff\n"
   concat code,  "set P0[I1], I2\n"
   goto NEXT
 
 NOTMINUS:
   if char != ">" goto NOTGT
-  concat code,  "inc I1\n"
+  .local int n_gt
+  null n_gt
+  $I0 = pc + 1
+gt_loop:
+  inc n_gt
+  if $I0 == maxpc goto emit_gt
+  substr_r char, file, $I0, 1
+  if char != ">" goto emit_gt
+  inc $I0
+  goto gt_loop
+emit_gt:
+  pc = $I0 - 1
+  concat code,  "add I1, "
+  $S0 = n_gt
+  concat code,  $S0
+  concat code,  "\n"
   goto NEXT
 
 NOTGT:
   if char != "<" goto NOTLT
-  concat code,  "dec I1\n"
+  .local int n_lt
+  null n_lt
+  $I0 = pc + 1
+lt_loop:
+  inc n_lt
+  if $I0 == maxpc goto emit_lt
+  substr_r char, file, $I0, 1
+  if char != "<" goto emit_lt
+  inc $I0
+  goto lt_loop
+emit_lt:
+  pc = $I0 - 1
+  concat code,  "sub I1, "
+  $S0 = n_lt
+  concat code,  $S0
+  concat code,  "\n"
   goto NEXT
 
 NOTLT:
   if char != "[" goto NOTOPEN
 
-  I2 = 0 # "depth"
+  .local int depth
 
   label = pc
 OPEN_LOOP:
   inc label
-  substr S2, file, label, 1
-  if S2 != "[" goto OPEN_NOTOPEN
-  inc I2
+  substr $S2, file, label, 1
+  if $S2 != "[" goto OPEN_NOTOPEN
+  inc depth
   goto OPEN_LOOP
 OPEN_NOTOPEN:
-  if S2 != "]" goto OPEN_LOOP
-  if I2 == 0 goto OPEN_NEXT
-  dec I2
+  if $S2 != "]" goto OPEN_LOOP
+  if depth == 0 goto OPEN_NEXT
+  dec depth
   goto OPEN_LOOP
 OPEN_NEXT:
   inc label
@@ -120,18 +186,18 @@ NOTOPEN:
   if char != "]" goto NOTCLOSE
 
   label = pc
-  I2 = 0 # "height"
+  depth = 0 # "height"
 
 CLOSE_LOOP:
   dec label
-  substr S2, file, label, 1
-  if S2 != "]" goto CLOSE_NOTCLOSE
-  inc I2
+  substr $S2, file, label, 1
+  if $S2 != "]" goto CLOSE_NOTCLOSE
+  inc depth
   goto CLOSE_LOOP
 CLOSE_NOTCLOSE:
-  if S2 != "[" goto CLOSE_LOOP
-  if I2 == 0 goto CLOSE_NEXT
-  dec I2
+  if $S2 != "[" goto CLOSE_LOOP
+  if depth == 0 goto CLOSE_NEXT
+  dec depth
   goto CLOSE_LOOP
 
 CLOSE_NEXT:
@@ -176,12 +242,12 @@ NEXT:
   if pc < maxpc goto INTERP
   concat code,  "end\n"
 
-#  print code
-#  print "\n"
+  # printerr code
+  # printerr "\n"
 
   # Now actually run it
   compreg P1, "PASM"
   compile P0, P1, code
- # invoke
+  invoke
   end
 .end

@@ -28,7 +28,7 @@ typedef struct _SizeIntData {
 #define NEEDED_SIZE(n) ((n-1)*sizeof(INTVAL) + sizeof(SizeIntData))
 
 pmclass ResizableIntegerArray extends FixedIntegerArray need_ext does array {
-    
+
 /*
 
 =item C<INTVAL get_integer_keyed_int(INTVAL key)>
@@ -41,12 +41,12 @@ Returns the integer value of the element at index C<key>.
 
     INTVAL get_integer_keyed_int (INTVAL key) {
         SizeIntData *sd;
-        if (key < 0) 
-            internal_exception(OUT_OF_BOUNDS, 
+        if (key < 0)
+            internal_exception(OUT_OF_BOUNDS,
                 "ResizableIntegerArray: index out of bounds!");
         if(key >= PMC_int_val(SELF))
             DYNSELF.set_integer_native(key+1);
-        
+
         sd = (SizeIntData *)PMC_data(SELF);
         return sd->data[key];
     }
@@ -63,8 +63,8 @@ Sets the integer value of the element at index C<key> to C<value>.
 
     void set_integer_keyed_int (INTVAL key, INTVAL value) {
         SizeIntData *sd;
-        if (key < 0) 
-            internal_exception(OUT_OF_BOUNDS, 
+        if (key < 0)
+            internal_exception(OUT_OF_BOUNDS,
                 "ResizableIntegerArray: index out of bounds!");
         if(key >= PMC_int_val(SELF))
             DYNSELF.set_integer_native(key+1);
@@ -86,17 +86,19 @@ Resizes the array to C<size> elements.
     void set_integer_native (INTVAL size) {
         SizeIntData *sd;
         if (size < 0)
-            internal_exception(OUT_OF_BOUNDS, 
+            internal_exception(OUT_OF_BOUNDS,
                     "ResizableIntegerArray: Can't resize!");
 
         sd = PMC_data(SELF);
         PMC_int_val(SELF) = size;
         if(sd == NULL) {
-            sd = mem_sys_allocate(NEEDED_SIZE(size));
+            sd = mem_sys_allocate_zeroed(NEEDED_SIZE(size));
             sd->size = size;
         } else if(size >= sd->size) {
+            INTVAL old = sd->size;
             sd->size =  size < 2*sd->size ? sd->size*2 : size;
             sd = mem_sys_realloc(sd, NEEDED_SIZE(sd->size));
+            memset(sd->data + old, 0, (sd->size - old) * sizeof(INTVAL));
         } else {
             return;
         }
@@ -140,7 +142,7 @@ Removes and returns the last element in the array.
         sd = (SizeIntData *)PMC_data(SELF);
 
         if (sd == NULL || size == 0) {
-            internal_exception(OUT_OF_BOUNDS, 
+            internal_exception(OUT_OF_BOUNDS,
                     "ResizableIntegerArray: Can't pop from an empty array!");
         }
 
@@ -163,12 +165,12 @@ Creates and returns a copy of the array.
     PMC* clone () {
         SizeIntData *sd;
         PMC * dest = pmc_new(INTERP, SELF->vtable->base_type);
-    
+
         if (!PMC_data(SELF))
             return dest;
         PMC_int_val(dest) = PMC_int_val(SELF);
         sd = PMC_data(SELF);
-        
+
         PMC_data(dest) = mem_sys_allocate(NEEDED_SIZE(sd->size));
         mem_sys_memcopy(PMC_data(dest), PMC_data(SELF), NEEDED_SIZE(sd->size));
         PObj_active_destroy_SET(dest);

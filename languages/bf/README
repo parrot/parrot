@@ -16,6 +16,10 @@ To run an example Brainfuck program:
 
   $ ../../parrot bf.pasm helloworld.bf
 
+There is also a compiler:
+
+  $ ../../parrot bfc.imc helloworld.bf
+
 Clifford Wolf <clifford (at) clifford.at> contributed a nice bf
 program:
 
@@ -24,6 +28,9 @@ program:
   $ cc -o cw cw.c
   $ ./cw
 
+If you want to run it faster, use the bf compiler:
+
+  $ ../../parrot -j bfc.imc cw.bf < cw.txt > cw.c
 
 AUTHOR
 
