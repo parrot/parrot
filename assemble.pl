@@ -144,7 +144,7 @@ they appear in the argument list.
 
 sub new {
   my $class = shift;
-  my $self = { };
+  my $self = { cur_contents => '' };
   #
   # Read the files, strip leading and trailing whitespace, and put the lines
   # into an array in $self->{cur_contents}.
@@ -452,6 +452,7 @@ sub new {
     contents          => [ ],
     num_constants     => 0,
     ordered_constants => [ ],
+    bytecode          => '',
   };
   if(exists $args{-files}) {
     $self->{files} = $args{-files};
