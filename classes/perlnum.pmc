@@ -192,55 +192,6 @@ pmclass PerlNum extends perlscalar {
 	    VTABLE_set_number_native(INTERP, dest, -SELF->cache.num_val);
     }
 
-    void bitwise_or (PMC* value, PMC* dest) {
-        VTABLE_set_integer_native(INTERP, dest,
-	    /* XXX ? */
-            (INTVAL)SELF->cache.num_val |
-            VTABLE_get_integer(INTERP, value)
-        );
-    }
-
-    void bitwise_or_int (INTVAL value, PMC* dest) {
-        VTABLE_set_integer_native(INTERP, dest,
-            (INTVAL)SELF->cache.num_val |
-            value
-        );
-    }
-
-    void bitwise_and (PMC* value, PMC* dest) {
-        VTABLE_set_integer_native(INTERP, dest,
-            (INTVAL)SELF->cache.num_val &
-            VTABLE_get_integer(INTERP, value)
-        );
-    }
-
-    void bitwise_and_int (INTVAL value, PMC* dest) {
-        VTABLE_set_integer_native(INTERP, dest,
-            (INTVAL)SELF->cache.num_val &
-            value
-        );
-    }
-
-    void bitwise_xor (PMC* value, PMC* dest) {
-        VTABLE_set_integer_native(INTERP, dest,
-            (INTVAL)SELF->cache.num_val ^
-            VTABLE_get_integer(INTERP, value)
-        );
-    }
-
-    void bitwise_xor_int (INTVAL value, PMC* dest) {
-        VTABLE_set_integer_native(INTERP, dest,
-            (INTVAL)SELF->cache.num_val ^
-            value
-        );
-    }
-
-    void bitwise_not (PMC* dest) {
-        VTABLE_set_integer_native(INTERP, dest,
-            ~(INTVAL)SELF->cache.num_val
-        );
-    }
-
     /* == operation */
     INTVAL is_equal (PMC* value) {
         return (INTVAL)(SELF->cache.num_val == VTABLE_get_number(INTERP, value));

@@ -175,62 +175,6 @@ pmclass PerlString extends perlscalar {
         }
     }
 
-    void bitwise_or (PMC* value, PMC* dest) {
-    /* XXX or bitwise string?  */
-	DYNSELF.morph(enum_class_PerlInt);
-        VTABLE_set_integer_native(INTERP, dest,
-            VTABLE_get_integer(INTERP, SELF) |
-            VTABLE_get_integer(INTERP, value)
-        );
-    }
-
-    void bitwise_or_int (INTVAL value, PMC* dest) {
-	DYNSELF.morph(enum_class_PerlInt);
-        VTABLE_set_integer_native(INTERP, dest,
-            VTABLE_get_integer(INTERP, SELF) |
-            value
-        );
-    }
-
-
-    void bitwise_and (PMC* value, PMC* dest) {
-	DYNSELF.morph(enum_class_PerlInt);
-        VTABLE_set_integer_native(INTERP, dest,
-            VTABLE_get_integer(INTERP, SELF) &
-            VTABLE_get_integer(INTERP, value)
-        );
-    }
-
-    void bitwise_and_int (INTVAL value, PMC* dest) {
-	DYNSELF.morph(enum_class_PerlInt);
-        VTABLE_set_integer_native(INTERP, dest,
-            VTABLE_get_integer(INTERP, SELF) &
-            value
-        );
-    }
-
-    void bitwise_xor (PMC* value, PMC* dest) {
-	DYNSELF.morph(enum_class_PerlInt);
-        VTABLE_set_integer_native(INTERP, dest,
-            VTABLE_get_integer(INTERP, SELF) ^
-            VTABLE_get_integer(INTERP, value)
-        );
-    }
-
-    void bitwise_xor_int (INTVAL value, PMC* dest) {
-	DYNSELF.morph(enum_class_PerlInt);
-        VTABLE_set_integer_native(INTERP, dest,
-            VTABLE_get_integer(INTERP, SELF) ^
-            value
-        );
-    }
-
-    void bitwise_not (PMC* dest) {
-	DYNSELF.morph(enum_class_PerlInt);
-        VTABLE_set_integer_native(INTERP, dest,
-            ~VTABLE_get_integer(INTERP, SELF)
-        );
-    }
 
     void concatenate (PMC* value, PMC* dest) {
         STRING* s = SELF->cache.string_val;
