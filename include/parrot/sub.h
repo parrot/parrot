@@ -13,7 +13,7 @@
  */
 
 #if !defined(PARROT_SUB_H_GUARD)
-#define PARROT_RX_SUB_GUARD
+#define PARROT_SUB_GUARD
 
 #include "parrot/parrot.h"
 
