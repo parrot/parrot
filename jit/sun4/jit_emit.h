@@ -574,25 +574,29 @@ void Parrot_jit_cpcf_op(Parrot_jit_info_t *jit_info,
 
 /* move reg to mem (i.e. intreg) */
 void
-Parrot_jit_emit_mov_mr(Parrot_jit_info_t *jit_info, char *mem, int reg)
+Parrot_jit_emit_mov_mr(Parrot_jit_info_t *jit_info,
+    struct Parrot_Interp * interpreter, char *mem, int reg)
 {
 }
 
 /* move mem (i.e. intreg) to reg */
 void
-Parrot_jit_emit_mov_rm(Parrot_jit_info_t *jit_info, int reg, char *mem)
+Parrot_jit_emit_mov_rm(Parrot_jit_info_t *jit_info,
+    struct Parrot_Interp * interpreter, int reg, char *mem)
 {
 }
 
 /* move reg to mem (i.e. numreg) */
 void
-Parrot_jit_emit_mov_mr_n(Parrot_jit_info_t *jit_info, char *mem, int reg)
+Parrot_jit_emit_mov_mr_n(Parrot_jit_info_t *jit_info,
+    struct Parrot_Interp * interpreter, char *mem, int reg)
 {
 }
 
 /* move mem (i.e. numreg) to reg */
 void
-Parrot_jit_emit_mov_rm_n(Parrot_jit_info_t *jit_info, int reg, char *mem)
+Parrot_jit_emit_mov_rm_n(Parrot_jit_info_t *jit_info,
+    struct Parrot_Interp * interpreter, int reg, char *mem)
 {
 }
 
