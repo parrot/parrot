@@ -49,27 +49,40 @@ pmclass default abstract noinit {
     }
 
     PMC* getprop(STRING* key) {
-        internal_exception(ILL_INHERIT,
-			   "getprop() not implemented in class '%s'\n",
-			   caller(INTERP, SELF));
+        PMC* p_key = key_new_string(interpreter, key);
+	if (SELF->metadata) {
+	  return (SELF->metadata->vtable->get_pmc_keyed(interpreter, SELF->metadata, p_key));
+	} else {
+	  PMC* undef = pmc_new(INTERP, enum_class_PerlUndef);
+          PObj_constant_SET(undef);
+	  return undef;
+	}
     }
 
-    PMC* setprop(STRING* key, PMC* value) {
-        internal_exception(ILL_INHERIT,
-			   "setprop() not implemented in class '%s'\n",
-			   caller(INTERP, SELF));
+    void setprop(STRING* key, PMC* value) {
+        PMC* p_key = key_new_string(interpreter, key);
+	if (SELF->metadata) {
+	  SELF->metadata->vtable->set_pmc_keyed(interpreter, SELF->metadata, p_key, value, NULL);
+	} else {
+	  SELF->metadata = pmc_new(interpreter, enum_class_PerlHash);
+	  SELF->metadata->vtable->set_pmc_keyed(interpreter, SELF->metadata, p_key, value, NULL);
+	}
+	return;
     }
 
     void delprop(STRING* key) {
-        internal_exception(ILL_INHERIT,
-			   "delprop() not implemented in class '%s'\n",
-			   caller(INTERP, SELF));
+        PMC* p_key = key_new_string(interpreter, key);
+	if (SELF->metadata) {
+	  SELF->metadata->vtable->delete_keyed(interpreter, SELF->metadata, p_key);
+	}
+        return;
     }
 
     PMC* getprops() {
-        internal_exception(ILL_INHERIT,
-			   "getprops() not implemented in class '%s'\n",
-			   caller(INTERP, SELF));
+	if (!SELF->metadata) {
+	  SELF->metadata = pmc_new(interpreter, enum_class_PerlHash);
+	}
+    	return SELF->metadata;
     }
 
     INTVAL type () {

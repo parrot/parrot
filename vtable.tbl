@@ -7,7 +7,7 @@ PMC* mark(PMC* tail)
 void destroy()
 
 PMC* getprop(STRING* key)
-PMC* setprop(STRING* key, PMC* value)
+void setprop(STRING* key, PMC* value)
 void delprop(STRING* key)
 PMC* getprops()
 
