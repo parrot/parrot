@@ -1361,13 +1361,17 @@ OK3:  print "ok 3\\n"
 OK4:  print "ok 4\\n"
       end
 CODE
-/Use of uninitialized value at .*
+/Use of uninitialized value
+\s+in file.*
 ok 1
-Use of uninitialized value at .*
+Use of uninitialized value
+\s+in file.*
 ok 2
-Use of uninitialized value at .*
+Use of uninitialized value
+\s+in file.*
 ok 3
-Use of uninitialized value at .*
+Use of uninitialized value
+\s+in file.*
 ok 4
 /
 OUTPUT

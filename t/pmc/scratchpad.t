@@ -179,7 +179,7 @@ output_is(<<CODE, <<OUTPUT, "clone scratchpads");
 
         new P20, .PerlInt
 
-        set P22, P21[0;"var0"] # original pad should be gc'ed
+        set P22, P21[0;"var0"] # original pad should be gced
         set P23, P21[0;"var1"]
 
         print P22
@@ -192,7 +192,7 @@ CODE
 101
 OUTPUT
 
-output_is(<<'CODE', <<OUTPUT, "delete");
+output_like(<<'CODE', <<'OUTPUT', "delete");
  	new_pad 0
 	new P1, .PerlString
 	set P1, "ok 1\n"
@@ -205,8 +205,9 @@ output_is(<<'CODE', <<OUTPUT, "delete");
 	print P2
 	end
 CODE
-ok 1
+/ok 1
 Lexical 'foo' not found
+/
 OUTPUT
 1;
 

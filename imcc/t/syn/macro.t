@@ -1,6 +1,6 @@
 #!perl
 use strict;
-use TestCompiler tests => 21;
+use TestCompiler tests => 23;
 
 # macro tests
 
@@ -281,5 +281,29 @@ output_like( <<'CODE', <<OUTPUT, "unknown macro" );
 .end
 CODE
 /unknown macro/
+OUTPUT
+
+output_like( <<'CODE', <<OUTPUT, "unexpected IDENTIFIER" );
+.sub _main
+.macro M()
+    this gives a parse error
+.endm
+    .M()
+    end
+.end
+CODE
+/parse error, unexpected IDENTIFIER/
+OUTPUT
+
+output_like( <<'CODE', <<OUTPUT, "unknown macro" );
+.sub _main
+.macro M(A)
+    .arg .A
+.endm
+    .M(a)
+    end
+.end
+CODE
+/in macro '.M'/
 OUTPUT
 

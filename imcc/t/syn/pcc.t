@@ -251,7 +251,7 @@ ok 2
 back
 OUT
 
-output_is(<<'CODE', <<'OUT', "wrong param count exception S arg");
+output_like(<<'CODE', <<'OUT', "wrong param count exception S arg");
 .sub _main
     .local Sub sub
     newsub sub, .Sub, _sub
@@ -273,10 +273,10 @@ output_is(<<'CODE', <<'OUT', "wrong param count exception S arg");
    .pcc_end_return
 .end
 CODE
-wrong param count
+/wrong param count/
 OUT
 
-output_is(<<'CODE', <<'OUT', "wrong param count exception P arg");
+output_like(<<'CODE', <<'OUT', "wrong param count exception P arg");
 .sub _main
     .local Sub sub
     newsub sub, .Sub, _sub
@@ -298,10 +298,10 @@ output_is(<<'CODE', <<'OUT', "wrong param count exception P arg");
    .pcc_end_return
 .end
 CODE
-wrong param count
+/wrong param count/
 OUT
 
-output_is(<<'CODE', <<'OUT', "wrong param count exception, call 2 subs");
+output_like(<<'CODE', <<'OUT', "wrong param count exception, call 2 subs");
 .sub _main
     .local Sub sub
     newsub sub, .Sub, _sub
@@ -341,9 +341,10 @@ output_is(<<'CODE', <<'OUT', "wrong param count exception, call 2 subs");
    .pcc_end_return
 .end
 CODE
-ok 1
+/ok 1
 ok 2
 wrong param count
+/
 OUT
 
 
@@ -384,7 +385,7 @@ CODE
 ok
 OUT
 
-output_is(<<'CODE', <<'OUT', "wrong param type exception");
+output_like(<<'CODE', <<'OUT', "wrong param type exception");
 .sub _main
     .local Sub sub
     newsub sub, .Sub, _sub
@@ -405,10 +406,10 @@ output_is(<<'CODE', <<'OUT', "wrong param type exception");
    .pcc_end_return
 .end
 CODE
-wrong param type
+/wrong param type/
 OUT
 
-output_is(<<'CODE', <<'OUT', "wrong param type exception - 2 params");
+output_like(<<'CODE', <<'OUT', "wrong param type exception - 2 params");
 .sub _main
     .local Sub sub
     $S0 = "ok 1\n"
@@ -432,7 +433,7 @@ output_is(<<'CODE', <<'OUT', "wrong param type exception - 2 params");
    .pcc_end_return
 .end
 CODE
-wrong param type
+/wrong param type/
 OUT
 
 ####################

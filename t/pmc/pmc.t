@@ -2268,22 +2268,23 @@ ok 3
 ok 4
 OUTPUT
 
-output_like(<<"CODE", <<OUTPUT, "undef warning");
+output_like(<<"CODE", <<'OUTPUT', "undef warning");
 	.include "warnings.pasm"
 	warningson .PARROT_WARNINGS_UNDEF_FLAG
 	new P0, .PerlUndef
 	print P0
 	end
 CODE
-/Use of uninitialized.*pasm/i
+/Use of uninitialized.*
+\s+in file .*pasm/i
 OUTPUT
 
-output_is(<<"CODE", <<OUTPUT, "find_method");
+output_like(<<"CODE", <<'OUTPUT', "find_method");
 	new P1, .PerlInt
 	find_method P0, P1, "no_such_meth"
 	end
 CODE
-Method 'no_such_meth' not found
+/Method 'no_such_meth' not found/
 OUTPUT
 
 output_like(<<'CODE', <<'OUTPUT', "new with a native type");
@@ -2299,8 +2300,8 @@ output_is(<<'CODE', <<OUTPUT, "repeat");
         new P1, .PerlString
         new P2, .PerlInt
 
-        set P2, 1024       
-        repeat P1, P0, P2 
+        set P2, 1024
+        repeat P1, P0, P2
         set S1, P1
         eq S1, "", OK1
         print "not "

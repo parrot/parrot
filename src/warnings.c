@@ -24,28 +24,40 @@ find_line(struct Parrot_Interp *interpreter, struct PackFile_Debug * debug)
     return -1;
 }
 
-static INTVAL
-print_warning(struct Parrot_Interp *interpreter, STRING *msg)
+/*
+ * print warning/error location in PBC to stderr
+ * use fprintf only - may called from exceptions
+ */
+void
+print_pbc_location(Parrot_Interp interpreter)
 {
     const char *file;
     int line;
     struct PackFile_Debug * debugs = interpreter->code->cur_cs->debugs;
-
-    if (!msg)
-        return -1;
     if (debugs) {
         file = debugs->filename;
         line = find_line(interpreter, debugs);
     }
     else {
         file = "(unknown file)";
-        line = 0;
+        line = -1;
     }
+    fprintf(stderr, "\tin file '%s' near line %d\n", file, line);
+}
 
-    if (PIO_eprintf(interpreter, "%S at %s line %d.\n", msg, file, line))
-        return -2;
-    else
-        return 1;
+static INTVAL
+print_warning(struct Parrot_Interp *interpreter, STRING *msg)
+{
+
+    if (!msg)
+        fprintf(stderr, "Unknown warning\n");
+    else {
+        PIO_putps(interpreter, PIO_STDERR(interpreter), msg);
+        if (string_ord(msg, -1) != '\n')
+            fprintf(stderr, "%c", '\n');
+    }
+    print_pbc_location(interpreter);
+    return 1;
 }
 
 INTVAL

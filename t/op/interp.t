@@ -45,7 +45,7 @@ output_like(<<'CODE', <<'OUTPUT', "interp - warnings");
 	set I0, P1
 	end
 CODE
-/^nada:Use of uninitialized value in integer context at.*/
+/^nada:Use of uninitialized value in integer context/
 OUTPUT
 
 output_is(<<'CODE', <<'OUTPUT', "getinterp");

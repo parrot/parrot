@@ -380,7 +380,8 @@ _func:
     set I0, P0
     invoke P1
 CODE
-/^main:Use of uninitialized value in integer context at.*:back$/sm
+/^main:Use of uninitialized value in integer context
+\s+in file.*:back$/s
 OUTPUT
 
 output_like(<<'CODE', <<'OUTPUT', "interp - warnings 2");
@@ -402,7 +403,8 @@ _func:
     set I0, P0
     invoke P1
 CODE
-/^Use of uninitialized value in integer context at.*:main:back:Use of un.*$/sm
+/^Use of uninitialized value in integer context
+\s+in file.*:main:back:Use of un.*$/sm
 OUTPUT
 
 output_like(<<'CODE', <<'OUTPUT', "interp - warnings 2 - updatecc");
@@ -429,7 +431,8 @@ _func:
     set I0, P0
     invoke P1
 CODE
-/^Use of uninitialized value in integer context at.*:main:back:Use of un.*$/sm
+/^Use of uninitialized value in integer context
+\s+in file.*:main:back:Use of un.*$/sm
 OUTPUT
 
 output_is(<<'CODE', <<'OUTPUT', "pcc sub");

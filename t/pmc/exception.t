@@ -171,17 +171,17 @@ back again
 43
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "throw - no handler");
+output_like(<<'CODE', <<'OUTPUT', "throw - no handler");
     new P0, .Exception
     set P0["_message"], "something happend"
     throw P0
     print "not reached\n"
     end
 CODE
-something happend
+/something happend/
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "throw - no handler, no message");
+output_like(<<'CODE', <<'OUTPUT', "throw - no handler, no message");
     newsub P20, .Exception_Handler, _handler
     set_eh P20
     new P0, .Exception
@@ -192,17 +192,18 @@ output_is(<<'CODE', <<'OUTPUT', "throw - no handler, no message");
 _handler:
     end
 CODE
-No exception handler and no message
+/No exception handler and no message/
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "throw - no handler, no message");
+output_like(<<'CODE', <<'OUTPUT', "throw - no handler, no message");
     new P0, .Exception
     throw P0
     print "not reached\n"
     end
 CODE
-No exception handler and no message
+/No exception handler and no message/
 OUTPUT
+
 output_is(<<'CODE', <<'OUTPUT', "2 exception handlers");
     print "main\n"
     newsub P20, .Exception_Handler, _handler1
@@ -370,7 +371,7 @@ error 100
 severity 3
 OUT
 
-output_is(<<'CODE', <<OUT, "die_hard - no handler");
+output_like(<<'CODE', <<OUT, "die_hard - no handler");
     die_hard 3, 100
     print "not reached\n"
     end
@@ -378,7 +379,7 @@ _handler:
     print "catched it\n"
     end
 CODE
-No exception handler and no message
+/No exception handler and no message/
 OUT
 
 output_like(<<'CODE', <<OUT, "find_lex");
@@ -472,7 +473,7 @@ Hi from handler
 mark2
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "check that coroutines handler isnt run");
+output_like(<<'CODE', <<'OUTPUT', "check that coroutines handler isnt run");
     print "main\n"
     newsub P0, .Coroutine, _sub
     invokecc
@@ -494,17 +495,20 @@ _handler:
     set P2, P5["_invoke_cc"]	# the return continuation
     invoke P2
 CODE
-main
+/main
 in coro
 back in main
 Lexical 'nix' not found
+/
 OUTPUT
 
-output_is(<<'CODE', '', "exit exception");
+output_like(<<'CODE', <<'OUTPUT', "exit exception");
     noop
     exit 0
     print "not reached\n"
     end
 CODE
+/in file/
+OUTPUT
 1;
 

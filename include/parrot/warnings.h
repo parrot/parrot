@@ -31,11 +31,11 @@ typedef enum {
 
 #include "parrot/parrot.h"
 
-INTVAL Parrot_warn(struct Parrot_Interp *, INTVAL warnclass,
-                   const char *message, ...);
+void print_pbc_location(Parrot_Interp);
 
-INTVAL Parrot_warn_s(struct Parrot_Interp *, INTVAL warnclass,
-                     STRING *message, ...);
+INTVAL Parrot_warn(Parrot_Interp, INTVAL warnclass, const char *message, ...);
+
+INTVAL Parrot_warn_s(Parrot_Interp, INTVAL warnclass, STRING *message, ...);
 
 #endif
 
