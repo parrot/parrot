@@ -254,11 +254,15 @@ sub minlen {
 
 sub maxlen {
     my $op = shift;
-    my $sublen = $op->{args}->[3]->maxlen();
-    if ($op->{args}->[1] == -1) {
-        return $sublen == 0 ? 0 : undef;
+    my ($min, $max, $greedy, $R) = @{ $op->{args} };
+    my $sublen = $R->maxlen();
+    if ($max == -1) {
+        return undef if ! defined($sublen); # [m..INF]*
+        return undef if $sublen > 0;        # [m..sublen]*
+        return 0;                           # [0..0]*
     } else {
-        return $op->{args}->[1] * $sublen;
+        return undef if ! defined($sublen); # [m..INF] repeated up to N times
+        return $max * $sublen;              # [m..sublen] repeated up to N times
     }
 }
 
@@ -287,6 +291,10 @@ sub maxlen { 0 }
 sub startset { return () }
 sub hasback { 0 }
 sub dfa_safe { 1 }
+
+package Regex::Ops::Tree::nop;
+sub minlen { 0 }
+sub maxlen { 0 }
 
 package Regex::Ops::Tree::check;
 sub minlen { $_[0]->{args}->[1]->minlen(); }

@@ -21,7 +21,7 @@ use strict;
 sub expr_to_tree {
     my ($expr, %options) = @_;
 
-    my $parser = Regex::Parse->new();
+    my $parser = Regex::Parse->new(%options);
     my $tree = $parser->compile($expr);
     return $tree if $options{'no-tree-optimize'};
 
@@ -32,7 +32,7 @@ sub expr_to_tree {
 sub tree_to_list {
     my ($tree, %options) = @_;
 
-    my $rewrite = Regex::Rewrite::Stackless->new(DEBUG => $options{DEBUG});
+    my $rewrite = Regex::Rewrite::Stackless->new(%options);
     my @code = $rewrite->run($tree);
     return @code if $options{'no-list-optimize'};
 
@@ -42,7 +42,7 @@ sub tree_to_list {
 
 sub list_to_pasm {
     my ($code, %options) = @_;
-    my $cgen = Regex::CodeGen::Pasm->new(DEBUG => $options{DEBUG});
+    my $cgen = Regex::CodeGen::Pasm->new(%options);
     return $cgen->output(@$code);
 }
 

@@ -34,14 +34,28 @@ END
   exit $status;
 }
 
-if ($ARGV[0] && $ARGV[0] =~ /^(-h|--help)$/) {
-    usage(0);
-}
-
-my $compile = 0; # Compile-only flag
-if ($ARGV[0] && $ARGV[0] =~ /^(-c|--compile)$/) {
-    $compile = 1;
-    shift;
+my $compile = 0;
+my $tree_opt = 1;
+my $list_opt = 1;
+foreach (@ARGV) {
+    if (/^(-h|--help)$/) {
+        usage(0);
+    } elsif (/^(-c|--compile)$/) {
+        $compile = 1; # Compile only
+    } elsif (/--no(-?)optimize/) {
+        $tree_opt = 0;
+        $list_opt = 0;
+    } elsif (/--optimize=(.*)/) {
+        my $opts = $1;
+        $tree_opt = ($opts =~ /t/i);
+        $list_opt = ($opts =~ /l/i);
+    } elsif (! defined $expr) {
+        $expr = $_;
+    } elsif (! defined $operation) {
+        $operation = $_;
+    } else {
+        die "too many args!";
+    }
 }
 
 my $pattern = <>;
@@ -96,37 +110,7 @@ sub generate_regular_pasm {
     depth I31 # Remember starting stack depth
     bsr REGEX
     bsr RESTORE_STACK
-    if I0, matched
-    print "Match failed\\n"
-#    bsr DUMP
-    end
-matched:
-    print "Match found\\n"
-    set I0, 0
-printLoop:
-    set I17, I0
-    bsr printGroup
-    add I0, I17, 1
-    eq I16, 1, printLoop
-    end
-printGroup:
-    set I5, P0
-    lt I0, I5, groupDefined
-    set I16, 0
-    ret
-groupDefined:
-    set I3, P0[I0]
-    set I4, P1[I0]
-    eq I4, -2, skipPrint
-    print I0
-    print ": "
-    print I3
-    print ".."
-    add I4, I4, -1 # Off by one
-    print I4
-    print "\\n"
-skipPrint:
-    set I16, 1
+    bsr printResults
     ret
 
 DUMP:
@@ -194,9 +178,12 @@ RESTORE_STACK_DONE:
 
 END
 
-    print PASM "REGEX:\n";
+#    print PASM "REGEX:\n";
     my $DEBUG = 0;
-    my @asm = Regex::compile($pattern, DEBUG => $DEBUG);
+    my @asm = Regex::compile($pattern,
+                             DEBUG => $DEBUG,
+                             definePrintResults => 1,
+                             startLabel => 'REGEX');
     print PASM "$_\n" foreach (@asm);
 
     close PASM;

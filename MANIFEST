@@ -370,8 +370,10 @@ languages/regex/lib/Regex/Rewrite/Stackless.pm
 languages/regex/regex.pl
 languages/regex/t/a.t
 languages/regex/t/alt.t
+languages/regex/t/backopt.t
 languages/regex/t/example.t
 languages/regex/t/group.t
+languages/regex/t/infinite.t
 languages/regex/t/literal.t
 languages/regex/t/ngplus.t
 languages/regex/t/optional.t

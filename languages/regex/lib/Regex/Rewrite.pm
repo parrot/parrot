@@ -20,7 +20,7 @@ sub aop {
     Regex::Ops::List->op(@_);
 }
 
-sub mark {
+sub genlabel {
     my ($self, $desc) = @_;
     $desc ||= '';
     my $number = ++$self->{_markers}->{$desc};
@@ -63,7 +63,7 @@ sub rewrite_goto {
 
 sub rewrite_test {
     my ($self, $op, $op1, $test, $op2, $dest, $lastback) = @_;
-    my $continue = $self->mark('after_test');
+    my $continue = $self->genlabel('after_test');
     my $rev_test = { "==" => "!=",
 		     "!=" => "==",
 		     "<" => ">=",

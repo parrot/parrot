@@ -74,6 +74,19 @@ Missing perl5 features:
          - conditional expression
  (R?)*   - empty match suppression
 
+Missing perl6 features:
+:
+::
+:::
+<commit>
+<cut>
+hypotheticals - code refs with two entry points (enter and backtrack)
+@var     - run-time alternatives
+<@var>   - run-time alternative regexps (requires run-time regex compiler)
+%var     - sucking in hashes
+<%var>   - as above, but values are always regexps
+<!...>   - negation (is this just negative lookahead?)
+
 Other features I'd like to have:
  (?1)    - recursive expressions
  @A =~   - array matching
@@ -117,8 +130,8 @@ Relatively soon, I would like to add array-based regular
 expressions. A simple cut of this should be nearly trivial.
 
 I'd really like to put in recursive regular expressions. See
-<http://www.puffinry.freeserve.co.uk/regex-extension.html>. UPDATE:
-looks like Larry liked the idea too. Perl6 has 'em.
+<http://www.puffinry.freeserve.co.uk/regex-extension.html>.
+UPDATE: Looks like Larry liked the idea too. Perl6 has 'em.
 
 Near-term optimizations planned:
 
@@ -158,6 +171,11 @@ BUGS
 - The miserable state of documentation
 - The ad-hoc list op data structure
 - The lack of complex test cases
+
+TODO
+====
+- character classes
+- named entry point
 
 DEVELOPER NOTES
 ===============

@@ -22,8 +22,24 @@ use strict;
 sub init {
     my ($self, @args) = @_;
     $self->SUPER::init(@args);
-    my $FAIL = $self->mark("FAIL");
+    my $FAIL = $self->genlabel("FAIL");
     $self->{_labels}{'fail'} = $FAIL;
+}
+
+sub dbprint {
+    my ($self, $what) = @_;
+    return () unless $self->{DEBUG};
+    my @ops;
+    foreach my $part ($what =~ /((?:\%\w+)|[^\%]+)/g) {
+        if ($part =~ /^%/) {
+            push @ops, aop('print', [ substr($part, 1) ]);
+        } else {
+            $part =~ s/(["'\\])/\\$1/g;
+            $part =~ s/\n/\\n/g;
+            push @ops, aop('print', [ "\"$part\"" ]);
+        }
+    }
+    return @ops;
 }
 
 sub need_group_setup {
@@ -41,50 +57,52 @@ sub rewrite_try {
 #
 # ( R ) ->
 #                  push start[n]
-#                  start[n] <- pos
-#                  R or iback
 #                  push end[n]
+#                  start[n] <- pos
+#                  R or rfail
 #                  end[n] <- pos
 #                  goto next
 #
-#           iback: start[n] <- pop
+#           rfail: pop -> end[n]
+#                  pop -> start[n]
 #                  goto lastback
-#
-#            back: end[n] <- pop
-#                  goto R.back
 #
 #            next:
 #
-# Cost: 3 + 4rs + 2rf + 2ff
+# back is R.back
 #
 sub rewrite_group {
     my ($self, $op, $R, $group, $lastback) = @_;
-    my $iback = $self->mark("group_iback");
-    my $back = $self->mark("group_back");
-    my $next = $self->mark("after_group");
+    my $rfail = $self->genlabel("group_iback");
+    my $next = $self->genlabel("group_next");
 
     $self->need_group_setup($group);
 
-    my ($R_back, @R_ops) = $self->rewrite($R, $iback);
+    my ($R_back, @R_ops) = $self->rewrite($R, $rfail);
 
-    my @ops = (         aop('getstart', [ 'I0', $group ]),
-                        aop('pushindex', [ 'I0' ]),
+    my @ops = (
+                        aop('getstart', [ 'I0', $group ]),
+                        $self->dbprint("pushing start[$group]: "),
+                        aop('pushint', [ 'I0' ]),
+                        aop('getend', [ 'I0', $group ]),
+                        $self->dbprint("pushing end[$group]: "),
+                        aop('pushint', [ 'I0' ]),
                         aop('setstart', [ $group, 'pos' ]),
                         @R_ops,
-                        aop('getend', [ 'I0', $group ]),
-                        aop('pushindex', [ 'I0' ]),
+                        $self->dbprint("setting end[$group] := %I1\n"),
                         aop('setend', [ $group, 'pos' ]),
-                        aop('goto', [ $next ] ),
-              $iback => aop('popint', [ 'I0' ]),
+                        aop('goto', [ $next ]),
+              $rfail => $self->dbprint("R in group failed\n"),
+                        aop('popint', [ 'I0' ]),
+                        aop('setend', [ $group, 'I0' ] ),
+                        aop('popint', [ 'I0' ]),
                         aop('setstart', [ $group, 'I0' ] ),
                         aop('goto', [ $lastback ] ),
-               $back => aop('popint', [ 'I0' ]),
-                        aop('setend', [ $group, 'I0' ] ),
-                        aop('goto', [ $R_back ] ),
                $next =>
+
               );
 
-    return ($back, @ops);
+    return ($R_back, @ops);
 }
 
 # Cost: 4 + 2ff (insanely high!) if we need to check the length
@@ -93,23 +111,23 @@ sub rewrite_group {
 sub rewrite_match {
     my ($self, $op, $char, $lastback) = @_;
 
-    my $back = $self->mark('undo_match');
-    my $next = $self->mark('after_match');
+    my $back = $self->genlabel('undo_match');
+    my $next = $self->genlabel('after_match');
 
-    my @check = ();
-    unless ($op->{nocheck}) {
-        @check = (aop('check', [ 1, $lastback ]));
-    }
+    my @ops;
+    push @ops, aop('check', [ 1, $lastback ])
+      unless ($op->{nocheck});
 
-    return (
-            $back => @check,
+    push @ops, (
                      aop('match', [ $char, $lastback ]),
                      aop('increment', [ 1, $lastback ]),
                      aop('goto', [ $next ]),
             $back => aop('increment', [ -1, $lastback ]),
                      aop('goto', [ $lastback ]),
             $next =>
-           );
+               );
+
+    return ($back, @ops);
 }
 
 sub rewrite_check {
@@ -127,32 +145,42 @@ sub rewrite_other {
     return aop($op->{name}, [ @{ $op->{args} }, $lastback ]);
 }
 
+# scan(R) ->   scan: R or advance
+#                    goto next
+#           advance: pos++ or lastback
+#                    goto scan
+#              next:
+#
+# back is R.back
+#
 sub rewrite_scan {
     my ($self, $op, $R, $lastback) = @_;
 
-    my $scan = $self->mark('scan_start');
-    my $advance = $self->mark('scan_advance');
-    my $next = $self->mark('after_scan');
+    my $scan = $self->genlabel('scan_start');
+    my $advance = $self->genlabel('scan_advance');
+    my $next = $self->genlabel('after_scan');
 
     my ($R_back, @R_body) = $self->rewrite($R, $advance);
 
     my @ops = (
-                           aop('goto', [ $scan ]),
-               $advance => aop('advance', [ 1, $lastback ]),
                   $scan => @R_body,
+                           aop('goto', [ $next ]),
+               $advance => $self->dbprint("advancing\n"),
+                           aop('advance', [ 1, $lastback ]),
+                           aop('goto', [ $scan ]),
                   $next =>
               );
 
-    return ($lastback, @ops);
+    return ($R_back, @ops);
 }
 
 sub rewrite_simple_or_simple {
     my ($self, $op, $R, $S, $lastback) = @_;
 
-    my $nextalt = $self->mark('nextalt');
-    my $back = $self->mark('alt_back');
-    my $try_S = $self->mark('alt_S');
-    my $next = $self->mark('next');
+    my $nextalt = $self->genlabel('nextalt');
+    my $back = $self->genlabel('alt_back');
+    my $try_S = $self->genlabel('alt_S');
+    my $next = $self->genlabel('next');
 
     my ($R_back, @R_ops) = $self->rewrite($R, $nextalt);
     my ($S_back, @S_ops) = $self->rewrite($S, $back);
@@ -171,12 +199,63 @@ sub rewrite_simple_or_simple {
                     );
 }
 
+# R|S|T ->       R or tryS
+#                push 0
+#                goto next
+#          tryS: S or tryT
+#                push 1
+#                goto next
+#          tryT: T or lastback
+#                push 2
+#                goto next
+#          back: popint -> I0
+#                eq I0, 0, R.back
+#                eq I0, 1, S.back
+#                goto T.back
+#          next:
+#
 sub rewrite_alternate {
+    my ($self, $op, @args) = @_;
+    my $lastback = pop(@args);
+
+    my $back = $self->genlabel('alt_back');
+    my $next = $self->genlabel('alt_next');
+    my @tries = map { $self->genlabel('alt_try') } 2..@args;
+    my @fails = (@tries, $lastback);
+
+    my (@ibacks, @iops);
+    foreach (@args) {
+        my ($iback, @ops) = $self->rewrite($_, shift(@fails));
+        push @ibacks, $iback;
+        push @iops, \@ops;
+    }
+
+    my @ops;
+    for my $i (0..$#args) {
+        push @ops, $tries[$i-1] unless $i == 0;
+        push @ops, @{ $iops[$i] };
+        push @ops, aop('pushint', [ $i ]);
+        push @ops, aop('goto', [ $next ]);
+    }
+
+    push @ops, $back => aop('popint', [ 'tmp' ]);
+
+    for my $i (0..$#args-1) {
+        $DB::single = 1;
+        push @ops, aop('eq', [ 'tmp', $i, $ibacks[$i] ]);
+    }
+
+    push @ops, aop('goto', [ $ibacks[-1] ]);
+    push @ops, $next;
+
+    return ($back, @ops);
+}
+sub old_rewrite_alternate {
     my ($self, $op, $R, $S, $lastback) = @_;
 
-    my $back = $self->mark('alt_back');
-    my $fail = $self->mark('RS_fail');
-    my $next = $self->mark('next');
+    my $back = $self->genlabel('alt_back');
+    my $fail = $self->genlabel('RS_fail');
+    my $next = $self->genlabel('next');
 
     my ($R_back, @R_ops) = $self->rewrite($R, $fail);
     my ($S_back, @S_ops) = $self->rewrite($S, $fail);
@@ -197,45 +276,68 @@ sub rewrite_alternate {
                     );
 }
 
+# R* ->       push 1
+#       loop: R or next
+#             push 0
+#             goto loop
+#       back: popint -> firstflag
+#             if (!firstflag) goto R.back
+#             goto lastback
+#       next:
+#
+# R*? ->        pushindex
+#               goto next
+#        rfail: popint -> tmp or R.back
+#               goto lastback
+#         back: R or rfail
+#               pushmark
+#         next:
+#
 sub rewrite_star {
     my ($self, $op, $R, $greedy, $lastback) = @_;
 
-    my $back = $self->mark('star_back');
-    my $next = $self->mark('next');
+    my $next = $self->genlabel('star_next');
+    my $back = $self->genlabel('star_back');
 
-    my @ops;
     if ($greedy) {
-        my ($R_back, @R_ops) = $self->rewrite($R, $back);
-        my $loop = $self->mark('loop');
-        @ops =
-(
-                aop('pushmark', [ "*" ]),
-       $loop => aop('pushindex'),
-                @R_ops,
-                aop('goto', [ $loop ]),
-       $back => aop('popindex', [ $lastback ]),
-       $next =>
-);
-    } else {
         my ($R_back, @R_ops) = $self->rewrite($R, $next);
-       @ops =
-(
-                aop('goto', [ $next ]),
-       $back => @R_ops,
-       $next =>
-);
-    }
+        my $loop = $self->genlabel('loop');
+        my @ops = (
+                   aop('pushint', [ 1 ]),
+          $loop => @R_ops,
+                   aop('pushint', [ 0 ]),
+                   aop('goto', [ $loop ]),
+          $back => $self->dbprint("backtracking into *\n"),
+                   aop('popint', [ 'tmp', $lastback ]),
+                   aop('unless', [ 'tmp', $R_back ]),
+                   aop('goto', [ $lastback ]),
+          $next =>
+                  );
 
-    return ($back, @ops);
+        return ($back, @ops);
+    } else {
+        my $rfail = $self->genlabel('nongreedy_star_fail');
+        my ($R_back, @R_ops) = $self->rewrite($R, $rfail);
+        my @ops = (
+                   aop('pushint', [ 0 ]),
+                   aop('goto', [ $next ]),
+         $rfail => aop('popindex', [ 'tmp', $R_back ]),
+                   aop('goto', [ $lastback ]),
+          $back => @R_ops,
+                   aop('pushmark'),
+          $next =>
+                  );
+        return ($back, @ops);
+    }
 }
 
 sub rewrite_plus {
     my ($self, $op, $R, $greedy, $lastback) = @_;
-    my $back = $self->mark('plus_back');
+    my $back = $self->genlabel('plus_back');
 
     my @ops;
     if ($greedy) {
-        my $loop = $self->mark('plus_loop');
+        my $loop = $self->genlabel('plus_loop');
         my (undef, @R_ops) = $self->rewrite($R, $back);
         @ops = (
                          aop('pushmark', [ "+" ]),
@@ -258,38 +360,57 @@ sub rewrite_optional {
                    : $self->rewrite_nongreedy_optional($op, $R, $lastback);
 }
 
+# R? ->       R or rfail
+#             push 1
+#             goto next
+#       back: popint -> tmp
+#             if tmp, R.back
+#             goto lastback
+#      rfail: push 0
+#       next:
+#
 sub rewrite_greedy_optional {
     my ($self, $op, $R, $lastback) = @_;
 
-    my $back = $self->mark('greedy_optional_back');
-    my $next = $self->mark('after_greedy_optional');
-    my ($R_back, @R_ops) = $self->rewrite($R, $next);
+    my $back = $self->genlabel('greedy_optional_back');
+    my $next = $self->genlabel('after_greedy_optional');
+    my $rfail = $self->genlabel('greedy_optional_fail');
+    my ($R_back, @R_ops) = $self->rewrite($R, $rfail);
 
     my @ops = (
-                        aop('pushmark', [ "?" ]),
                         @R_ops,
-                        aop('pushindex'),
+                        aop('pushint', [ 1 ]),
                         aop('goto', [ $next ]),
-               $back => aop('popindex', [ $lastback ]),
+               $back => aop('popint', [ 'tmp' ]),
+                        aop('if', [ 'tmp', $R_back ]),
+                        aop('goto', [ $lastback ]),
+              $rfail => aop('pushint', [ 0 ]),
                $next =>
               );
 
     return ($back, @ops);
 }
 
+# R?? ->       pushindex
+#              goto next
+#        back: popindex or R.back
+#              R or lastback
+#              pushmark
+#        next:
+#
 sub rewrite_nongreedy_optional {
     my ($self, $op, $R, $lastback) = @_;
 
-    my $back = $self->mark('nongreedy_opt_back');
-    my $next = $self->mark('after_greedy_opt');
-    my ($R_back, @R_ops) = $self->rewrite($R, $next);
+    my $back = $self->genlabel('nongreedy_opt_back');
+    my $next = $self->genlabel('after_greedy_opt');
+    my ($R_back, @R_ops) = $self->rewrite($R, $lastback);
 
     my @ops = (
-                        aop('pushmark', [ "??" ]),
                         aop('pushindex'),
                         aop('goto', [ $next ]),
-               $back => aop('popindex', [ $lastback ]),
+               $back => aop('popindex', [ $R_back ]),
                         @R_ops,
+                        aop('pushmark', [ '?? - with R' ]),
                $next =>
               );
 
@@ -316,13 +437,42 @@ sub rewrite_seq {
     return ($fallback, @ops);
 }
 
+sub describe_seq { undef };
+sub describe_check { undef };
+sub describe_group { "group $_[3]" }
+
+sub wrap {
+    my ($self, $op, $back, @ops) = @_;
+    return ($back, @ops) unless $self->{DEBUG};
+
+    my $method = "describe_" . $op->{name};
+    my $desc = $op->{name};
+    if ($self->can($method)) {
+        $desc = $self->$method($op, @{ $op->{args} });
+        return ($back, @ops) if ! defined $desc;
+    }
+
+    my $db_back = $self->genlabel($op->{name}."_back");
+    my $db_start = $self->genlabel($op->{name}."_enter");
+    return ( $db_back,
+                       $self->dbprint("-> $desc ENTER pos=%I1\n"),
+                       aop('goto', [ $db_start ]),
+           $db_back => $self->dbprint("<- $desc BACK pos=%I1\n"),
+                       aop('goto', [ $back ]),
+          $db_start => @ops,
+                       $self->dbprint(".. $desc NEXT pos=%I1\n"),
+           );
+}
+
 sub rewrite {
     my ($self, $op, $lastback) = @_;
 
     if (UNIVERSAL::isa($op, 'Regex::Ops::Tree')) {
         my $method = "rewrite_" . $op->{name};
         if ($self->can($method)) {
-            return $self->$method($op, @{ $op->{args} }, $lastback);
+            return $self->$method($op, @{ $op->{args} }, $lastback)
+              unless $self->{DEBUG};
+            return $self->wrap($op, $self->$method($op, @{ $op->{args} }, $lastback));
         } else {
             return ($lastback, $self->rewrite_other($op, $lastback));
         }
@@ -337,16 +487,16 @@ sub rewrite {
 sub run {
     my $self = shift;
 
-    my $RETURN = $self->{_labels}{'return'} = $self->mark("RETURN");
+    my $RETURN = $self->{_labels}{'return'} = $self->genlabel("RETURN");
     my $FAIL = $self->{_labels}{'fail'};
 
     # Stuff that goes after the regular expression code
     push @_, (
-                  aop('match_succeeded'),
-                  aop('goto', [ $RETURN ]),
-                  $FAIL => aop('match_failed'),
-                  $RETURN =>
-                 );
+              aop('match_succeeded'),
+              aop('goto', [ $RETURN ]),
+              $FAIL => aop('match_failed'),
+              $RETURN =>
+             );
 
     # Generate the main regular expression code
     my $tree = rop('seq', [ @_ ]);
@@ -374,11 +524,11 @@ sub startup {
     my ($self) = @_;
 
     my @ops;
-    foreach my $group (sort %{ $self->{_setup_starts} || {} }) {
+    foreach my $group (sort keys %{ $self->{_setup_starts} || {} }) {
         push @ops, aop('setstart', [ $group, -2 ]);
     }
 
-    foreach my $group (sort %{ $self->{_setup_ends} || {} }) {
+    foreach my $group (sort keys %{ $self->{_setup_ends} || {} }) {
         push @ops, aop('setend', [ $group, -2 ]);
     }
 
