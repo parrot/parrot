@@ -399,6 +399,8 @@ examples/benchmarks/oofib.imc                     [main]doc
 examples/benchmarks/oofib.pl                      [main]doc
 examples/benchmarks/oofib.py                      [main]doc
 examples/benchmarks/oofib.rb                      [main]doc
+examples/benchmarks/overload.imc                  [main]doc
+examples/benchmarks/overload.pl                   [main]doc
 examples/benchmarks/primes.c                      [main]doc
 examples/benchmarks/primes.pasm                   [main]doc
 examples/benchmarks/primes.pl                     [main]doc
