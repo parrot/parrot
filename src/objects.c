@@ -1139,6 +1139,8 @@ Parrot_get_attrib_by_str(Parrot_Interp interpreter, PMC *object, STRING *attr)>
 
 Returns attribute with full qualified name C<attr> from C<object>.
 
+=cut
+
 */
 
 PMC *
@@ -1207,6 +1209,8 @@ Parrot_set_attrib_by_str(Parrot_Interp interpreter, PMC *object,
   STRING *attr, PMC *value)>
 
 Sets attribute with full qualified name C<attr> from C<object> to C<value>.
+
+=cut
 
 */
 
@@ -1280,6 +1284,8 @@ Find and return the constructor method PMC for the named sub. The
 classtoken is an identifier for the class used for fast lookup, or 0
 if you don't have an identifier token. Which, as they're currently
 undefined, is pretty likely
+
+=cut
 
 */
 
