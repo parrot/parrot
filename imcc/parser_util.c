@@ -432,6 +432,7 @@ imcc_compile(Parrot_Interp interp, const char *s)
 #endif
 
     cur_namespace = NULL;
+    IMCC_INFO(interp)->cur_namespace = NULL;
     interp->code = pf;  /* put new packfile in place */
     sprintf(name, "EVAL_" INTVAL_FMT, ++pf_save->eval_nr);
     sourcefile = name;
@@ -526,6 +527,7 @@ imcc_compile_file (Parrot_Interp interp, const char *s)
 #endif
 
     cur_namespace = NULL;
+    IMCC_INFO(interp)->cur_namespace = NULL;
     pf = PackFile_new(0);
     interp->code = pf;  /* put new packfile in place */
     sourcefile = const_cast(s);
