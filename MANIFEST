@@ -269,8 +269,8 @@ languages/BASIC/sampleb.bas
 languages/BASIC/stackops.pasm
 languages/BASIC/tokenize.pasm
 languages/BASIC/wumpus.bas
-languages/Befunge-93/Makefile
 languages/Befunge-93/Changes
+languages/Befunge-93/Makefile
 languages/Befunge-93/README
 languages/Befunge-93/befunge.pasm
 languages/Befunge-93/befunge.pbc
@@ -314,11 +314,10 @@ languages/conversion/test.pl
 languages/converter.pl
 languages/forth/forth.pasm
 languages/imcc/BUGS
-languages/imcc/README
 languages/imcc/ChangeLog
+languages/imcc/README
 languages/imcc/cfg.c
 languages/imcc/cfg.h
-languages/imcc/ChangeLog
 languages/imcc/debug.c
 languages/imcc/debug.h
 languages/imcc/examples/README
