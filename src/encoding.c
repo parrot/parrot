@@ -52,6 +52,39 @@ encoding_lookup_index(INTVAL n)
     return encoding_array[n];
 }
 
+const INTVAL
+encoding_by_encoding(ENCODING *encoding) {
+    int i;
+    for (i = 0; i < enum_encoding_MAX && encoding_array[i]; i++) {
+        if (encoding_array[i] == encoding) {
+            return i;
+        }
+    }
+    internal_exception(INVALID_ENCODING, "Invalid encoding pointer %p\n", encoding);
+    return -1;
+}
+
+const INTVAL
+encoding_find_encoding(const char *name) 
+{
+    if (strcmp(name, "singlebyte") == 0) {
+        return enum_encoding_singlebyte;
+    }
+    else if (strcmp(name, "utf8") == 0) {
+        return enum_encoding_utf8;
+    }
+    else if (strcmp(name, "utf16") == 0) {
+        return enum_encoding_utf16;
+    }
+    else if (strcmp(name, "utf32") == 0) {
+        return enum_encoding_utf32;
+    }
+    else {
+        internal_exception(INVALID_ENCODING, "Invalid encoding '%s'\n", name);
+        return NULL;
+    }
+}
+
 /*
  * Local variables:
  * c-indentation-style: bsd

@@ -1969,6 +1969,59 @@ inline op length(out INT, in STR) {
   goto NEXT();
 }
 
+=item B<buflen>(out INT, in STR)
+
+Set $1 to the total size of the buffer (in bytes) of the string in
+$2. (Pulls from the buflen field)
+
+=cut
+
+inline op buflen(out INT, in STR) {
+  $1 = $2->buflen;
+  goto NEXT();
+}
+
+=item B<bufused>(out INT, in STR)
+
+Set $1 to the used size of the buffer (in bytes) of the string in
+$2. (Pulls from the bufused field)
+
+=cut
+
+inline op bufused(out INT, in STR) {
+  $1 = $2->bufused;
+  goto NEXT();
+}
+
+=item B<pin>(inout STR)
+
+Make the memory in $1 immobile. This memory will I<not> be moved by
+the GC, and may be safely passed to external libraries. (Well, as long
+as they don't free it) Pinning a string will move the contents.
+
+The memory only need be unpinned if you plan on using it for any
+length of time after its pinning is no longer necessary.
+
+=cut
+
+op pin(inout STR) {
+   string_pin(interpreter, $1);
+   goto NEXT();
+}
+
+
+=item B<unpin>(inout STR)
+
+Make the memory in $1 moveable again. This will make the memory in $1
+move.
+
+=cut
+
+op unpin(inout STR) {
+   string_unpin(interpreter, $1);
+   goto NEXT();
+}
+
 
 ########################################
 
@@ -2167,7 +2220,90 @@ inline op sprintf(out PMC, in PMC, in PMC) {
     goto NEXT();
 }
 
+=item B<new>(out STR)
+
+=item B<new>(out STR, in INT)
+
+=item B<new>(out STR, in INT, in INT)
+
+=item B<new>(out STR, in INT, in INT, in INT)
+
+Allocate a new empty string, of length $2 (optional), encoding $3
+(optional) and type $4. (optional)
+
 =cut
+
+inline op new(out STR) {
+  $1 = string_make(interpreter, NULL, 0, NULL, 0, NULL);
+  goto NEXT();
+}
+
+inline op new(out STR, in INT) {
+  $1 = string_make(interpreter, NULL, $2, NULL, 0, NULL);
+  goto NEXT();
+}
+
+inline op new(out STR, in INT, in INT) {
+  $1 = string_make(interpreter, NULL, $2, encoding_lookup_index($3), 0, NULL);
+  goto NEXT();
+}
+
+inline op new(out STR, in INT, in INT, in INT) {
+  internal_exception(INVALID_CHARTYPE, "We don't do this yet");
+  $1 = string_make(interpreter, NULL, $2, encoding_lookup_index($3), 0, NULL);
+  goto NEXT();
+}
+
+=item B<transcode>(inout STR, in INT)
+
+Transcode a string from its current encoding to the encoding in $2. $1
+becomes a new string. (Transcoding is not inplace)
+
+=item B<transcode>(out STR, in STR, in INT)
+
+Put a transcoded version of $2 in $1, turning it to the encoding in $3
+
+=cut
+
+op transcode(inout STR, in INT) {
+  $1 = string_transcode(interpreter, $1, encoding_lookup_index($2), NULL, NULL);
+  goto NEXT();
+}
+
+op transcode(out STR, in STR, in INT) {
+  $1 = string_transcode(interpreter, $2, encoding_lookup_index($3), NULL, NULL);
+  goto NEXT();
+}
+
+=item B<find_encoding>(out INT, in STR)
+
+Find the encoding named in $2 and return its number in $1
+
+=cut
+
+op find_encoding(out INT, in STR) {
+  char *temp_encoding = string_to_cstring(interpreter, $2);
+  char encoding[255];
+
+  /* Copy the string to stack storage and free. Ick. */
+  strncpy(encoding, temp_encoding, 254);
+  encoding[255] = 0;
+  string_cstring_free(encoding);
+
+  $1 = encoding_find_encoding(encoding);
+  goto NEXT();
+}
+
+=item B<string_encoding>(out INT, in STR)
+
+Find the encoding type for $2 and put it in $1
+
+=cut
+
+op string_encoding(out INT, in STR) {
+   $1 = encoding_by_encoding($2->encoding);
+   goto NEXT();
+}
 
 ###############################################################################
 

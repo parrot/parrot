@@ -1238,6 +1238,66 @@ string_to_cstring(struct Parrot_Interp * interpreter, STRING * s)
 #endif
 }
 
+/* 
+   free up a string returned by string_to_cstring. Hopefully this can
+   be a noop at some point, as it's got all sorts of leak potential otherwise.
+ */
+void
+string_cstring_free(void *ptr) {
+    free(ptr);
+}
+
+void
+string_pin(struct Parrot_Interp * interpreter, STRING * s) {
+    void *memory;
+    INTVAL size;
+    
+    /* If this string is marked as immobile, external memory, starts
+    in external memory, is already from system memory, or is a
+    constant, we just don't do this */
+    if (s->obj.flags & (PObj_immobile_FLAG | PObj_external_FLAG |
+                        PObj_bufstart_external_FLAG | PObj_sysmem_FLAG |
+                        PObj_constant_FLAG)) {
+        return;
+    }
+
+    unmake_COW(interpreter, s);
+    Parrot_block_GC(interpreter);
+    Parrot_block_DOD(interpreter);
+    size = s->buflen;
+    memory = mem_sys_allocate(size);
+    memcpy(memory, s->bufstart, size);
+    s->bufstart = memory;
+    /* Mark the memory as both from the system and immobile */
+    s->obj.flags = s->obj.flags | (PObj_immobile_FLAG | PObj_sysmem_FLAG);
+    Parrot_unblock_GC(interpreter);
+    Parrot_unblock_DOD(interpreter);
+}
+
+void
+string_unpin(struct Parrot_Interp * interpreter, STRING * s) {
+    void *memory;
+    INTVAL size;
+
+    /* If this string is marked as immobile, external memory, starts
+    in external memory, is already from system memory, or is a
+    constant, we just don't do this */
+    if (!(s->obj.flags & (PObj_immobile_FLAG | PObj_sysmem_FLAG))) {
+        return;
+    }
+
+    unmake_COW(interpreter, s);
+    size = s->buflen;
+    /* We need a handle on the fixed memory so we can get rid of it
+       later */
+    memory = s->bufstart;
+    /* Reallocate it the same size */
+    Parrot_reallocate_string(interpreter, s, size);
+    /* Mark the memory as neither immobile nor system allocated */
+    s->obj.flags &= !(PObj_immobile_FLAG | PObj_sysmem_FLAG);
+    /* Free up the memory */
+    mem_sys_free(memory);
+}
 
 /*
  * Local variables:
