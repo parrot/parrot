@@ -8,8 +8,12 @@ src/inter_cb.c - Parrot Interpreter - Callback Function Handling
 
 =head1 DESCRIPTION
 
-NCI callback functions may run, whenever the C code executes the calback.
+NCI callback functions may run, whenever the C code executes the callback.
 To be prepared for async callbacks these are converted to callback events.
+
+Often callbacks should run synchronously. This can only happen when 
+the C-library calls the callback, because Parrot called a function in
+the C-library.
 
 =head2 Functions
 
@@ -105,31 +109,31 @@ Parrot_make_cb(Parrot_Interp interpreter, PMC* sub, PMC* user_data,
 
 /*
 
-=item C<static void verify_CD(void *external_data, PMC *callback_info)>
+=item C<static void verify_CD(void *external_data, PMC *user_data)>
 
-Verify callback_info PMC then continue with callback_CD
+Verify user_data PMC then continue with callback_CD
 
 =cut
 
 */
 
-static void callback_CD(Parrot_Interp, void *, PMC *callback_info);
+static void callback_CD(Parrot_Interp, void *, PMC *user_data);
 
 static void
-verify_CD(void *external_data, PMC *callback_info)
+verify_CD(void *external_data, PMC *user_data)
 {
     Parrot_Interp interpreter = NULL;
     size_t i;
 
     /*
-     * 1.) callback_info is from external code so:
+     * 1.) user_data is from external code so:
      *     verify that we get a PMC that is one that we have passed in
      *     as user data, when we prepared the callback
      */
 
     /* a NULL pointer or a pointer not aligned is very likely wrong */
-    if (!callback_info || ((UINTVAL)callback_info & 3))
-        PANIC("callback_info doesn't look like a pointer");
+    if (!user_data || ((UINTVAL)user_data & 3))
+        PANIC("user_data doesn't look like a pointer");
 
     /*
      * we don't have an interpreter yet, where this PMC might be
@@ -142,7 +146,7 @@ verify_CD(void *external_data, PMC *callback_info)
         interpreter = interpreter_array[i];
         if (interpreter)
             if (contained_in_pool(interpreter,
-                        interpreter->arena_base->pmc_pool, callback_info))
+                        interpreter->arena_base->pmc_pool, user_data))
                 break;
     }
     UNLOCK(interpreter_array_mutex);
@@ -156,21 +160,21 @@ verify_CD(void *external_data, PMC *callback_info)
      */
 
     /* if that doesn't look like a PMC we are still lost */
-    if (!PObj_is_PMC_TEST(callback_info))
-        PANIC("callback_info isn't a PMC");
+    if (!PObj_is_PMC_TEST(user_data))
+        PANIC("user_data isn't a PMC");
 
-    if (!callback_info->vtable)
-        PANIC("callback_info hasn't a vtable");
+    if (!user_data->vtable)
+        PANIC("user_data hasn't a vtable");
     /*
      * ok fine till here
      */
-    callback_CD(interpreter, external_data, callback_info);
+    callback_CD(interpreter, external_data, user_data);
 }
 
 /*
 
 =item C<static void
-callback_CD(Parrot_Interp, void *external_data, PMC *callback_info)>
+callback_CD(Parrot_Interp, void *external_data, PMC *user_data)>
 
 Common callback function handler s. pdd16
 
@@ -179,19 +183,26 @@ Common callback function handler s. pdd16
 */
 
 static void
-callback_CD(Parrot_Interp interpreter, void *external_data, PMC *callback_info)
+callback_CD(Parrot_Interp interpreter, void *external_data, PMC *user_data)
 {
 
-    PMC *passed_interp;         /* the interp that originated the CB */
-    int async = 1;              /* cb is hitting this sub somewhen inmidst */
+    PMC *passed_interp;       /* the interp that originated the CB */
+    PMC *passed_synchronous;  /* flagging synchronous execution */ 
+    int synchronous = 0;      /* cb is hitting this sub somewhen inmidst, or not */
     STRING *sc;
     /*
      * 3) check interpreter ...
      */
     sc = CONST_STRING(interpreter, "_interpreter");
-    passed_interp = VTABLE_getprop(interpreter, callback_info, sc);
+    passed_interp = VTABLE_getprop(interpreter, user_data, sc);
     if (PMC_data(passed_interp) != interpreter)
         PANIC("callback gone to wrong interpreter");
+
+    sc = CONST_STRING(interpreter, "_synchronous");
+    passed_synchronous = VTABLE_getprop(interpreter, user_data, sc);
+    if (passed_synchronous && VTABLE_get_bool(interpreter, passed_synchronous))
+        synchronous = 1;
+
     /*
      * 4) check if the call_back is synchronous:
      *    - if yes we are inside the NCI call
@@ -199,7 +210,13 @@ callback_CD(Parrot_Interp interpreter, void *external_data, PMC *callback_info)
      *    - if no, and that's always safe, post a CALLBACK_EVENT
      */
 
-    if (async) {
+    if ( synchronous ) {
+        /*
+         * just call the sub
+         */
+        Parrot_run_callback(interpreter, user_data, external_data);
+    }
+    else {
         /*
          * create a CB_EVENT, put user_data and data inside and finito
          *
@@ -208,12 +225,7 @@ callback_CD(Parrot_Interp interpreter, void *external_data, PMC *callback_info)
          * then wait for the CB_EVENT_xx to finish and return the
          * result
          */
-        Parrot_new_cb_event(interpreter, callback_info, external_data);
-    }
-    else {
-        /*
-         * just call the sub
-         */
+        Parrot_new_cb_event(interpreter, user_data, external_data);
     }
 }
 
@@ -221,7 +233,7 @@ callback_CD(Parrot_Interp interpreter, void *external_data, PMC *callback_info)
 
 =item C<void
 
-Parrot_run_callback(Parrot_Interp interpreter, PMC* user_data, void* ext)>
+Parrot_run_callback(Parrot_Interp interpreter, PMC* user_data, void* external_data)>
 
 Run a callback function. The PMC* user_data holds all
 necessary items in its properties.
@@ -231,7 +243,7 @@ necessary items in its properties.
 */
 
 void
-Parrot_run_callback(Parrot_Interp interpreter, PMC* user_data, void* ext)
+Parrot_run_callback(Parrot_Interp interpreter, PMC* user_data, void* external_data)
 {
     PMC *    signature;
     PMC *    sub;
@@ -265,16 +277,16 @@ Parrot_run_callback(Parrot_Interp interpreter, PMC* user_data, void* ext)
         case '4':
 #endif
         case 'l':
-            i_param = (INTVAL)(long) ext;
+            i_param = (INTVAL)(long) external_data;
             goto case_I;
         case 'i':
-            i_param = (INTVAL)(int)(long) ext;
+            i_param = (INTVAL)(int)(long) external_data;
             goto case_I;
         case 's':
-            i_param = (INTVAL)(short)(long) ext;
+            i_param = (INTVAL)(short)(long) external_data;
             goto case_I;
         case 'c':
-            i_param = (INTVAL)(char)(long)ext;
+            i_param = (INTVAL)(char)(long)external_data;
 case_I:
             pasm_sig[2] = 'I';
             param = (void*) i_param;
@@ -290,7 +302,7 @@ case_I:
         case 'p':
             /* created a UnManagedStruct */
             p_param = pmc_new(interpreter, enum_class_UnManagedStruct);
-            PMC_data(p_param) = ext;
+            PMC_data(p_param) = external_data;
             pasm_sig[2] = 'P';
             param = (void*) p_param;
             break;
@@ -301,7 +313,7 @@ case_I:
 #endif
         case 't':
             pasm_sig[2] = 'S';
-            param = string_from_cstring(interpreter, ext, 0);
+            param = string_from_cstring(interpreter, external_data, 0);
             break;
         default:
             internal_exception(1, "unhandled signature char '%c' in run_cb", *p);
@@ -312,9 +324,9 @@ case_I:
 }
 /*
 
-=item C<void Parrot_callback_C(void *external_data, PMC *callback_info)>
+=item C<void Parrot_callback_C(void *external_data, PMC *user_data)>
 
-=item C<void Parrot_callback_D(PMC *callback_info, void *external_data)>
+=item C<void Parrot_callback_D(PMC *user_data, void *external_data)>
 
 NCI callback functions s. ppd16
 
@@ -323,15 +335,15 @@ NCI callback functions s. ppd16
 */
 
 void
-Parrot_callback_C(void *external_data, PMC *callback_info)
+Parrot_callback_C(void *external_data, PMC *user_data)
 {
-    verify_CD(external_data, callback_info);
+    verify_CD(external_data, user_data);
 }
 
 void
-Parrot_callback_D(PMC *callback_info, void *external_data)
+Parrot_callback_D(PMC *user_data, void *external_data)
 {
-    verify_CD(external_data, callback_info);
+    verify_CD(external_data, user_data);
 }
 
 /*

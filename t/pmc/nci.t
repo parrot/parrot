@@ -24,7 +24,7 @@ Most tests are skipped when the F<libnci.so> library is not found.
 
 =cut
 
-use Parrot::Test tests => 46;
+use Parrot::Test tests => 47;
 use Parrot::Config;
 
 SKIP: {
@@ -1575,6 +1575,76 @@ external data: 111
 the callback has run
 OUTPUT
 
+
+output_is(<<'CODE', <<'OUTPUT', "nci_cb_D4 - synchronous callbacks");
+##PIR##
+
+.include "datatypes.pasm"
+
+.sub _test @MAIN
+
+    # prepare user data
+    .local pmc user_data
+    user_data = new Integer
+    user_data = 42
+
+    # A Sub that can be given to the library
+    # this callback function will eventually by called by the library
+    .local pmc cb
+    cb = newsub _call_back
+    .local pmc cb_wrapped
+    cb_wrapped = new_callback cb, user_data, "Up"	# Z in pdd16
+    print "created a callback sub\n"
+    .local pmc synchronous
+    synchronous = new Integer
+    synchronous = 1
+    setprop user_data, "_synchronous", synchronous
+    print "marked callback as synchronous\n"
+
+    # now call the external sub, that takes a callback and user data
+    .local pmc libnci
+    libnci = loadlib "libnci"
+    .local pmc nci_cb_D4
+    nci_cb_D4 = dlfunc libnci, "nci_cb_D4", "vpP"
+    print "loaded a function that takes a callback\n"
+    nci_cb_D4( cb_wrapped, user_data )
+
+    end
+.end
+
+.sub _call_back
+  # P6 is a UnManagedStruct PMC containing a pointer to an integer
+  new P2, .PerlArray
+  push P2, .DATATYPE_INT
+  push P2, 0
+  push P2, 0
+  assign P6, P2
+
+  print "external data: "
+  I17 = P6[0]
+  print I17
+  print "\n"
+  I17 = I17 * 10
+  P6[0] = I17
+
+  invoke P1
+.end
+
+CODE
+created a callback sub
+marked callback as synchronous
+loaded a function that takes a callback
+external data: 1
+external data: 11
+external data: 111
+external data: 1111
+external data: 11111
+external data: 111111
+external data: 1111111
+external data: 11111111
+external data: 111111111
+external data: 1111111111
+OUTPUT
 
 output_is(<<'CODE', <<'OUTPUT', 'nci_pip - array of structs');
 

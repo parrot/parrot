@@ -81,6 +81,9 @@ void nci_cb_D2(cb_D2_func, void*);
 typedef void (*cb_D3_func)(void*, void*);
 void nci_cb_D3(cb_D3_func, void*);
 
+typedef void (*cb_D4_func)(void*, void*);
+void nci_cb_D4(cb_D4_func, void*);
+
 typedef struct {
     int y;
 } Nested;
@@ -376,12 +379,16 @@ nci_cb_C1(cb_C1_func cb, void* user_data) {
     const char *result = "succeeded";
     /* call the cb synchronously */
     (cb)(result, user_data);
+
+    return;
 }
 
 void
 nci_cb_C2(cb_C2_func cb, void* user_data) {
     /* call the cb synchronously */
     (cb)(77, user_data);
+
+    return;
 }
 
 static int int_cb_C3 = 99;
@@ -389,6 +396,8 @@ void
 nci_cb_C3(cb_C3_func cb, void* user_data) {
     /* call the cb synchronously */
     (cb)(&int_cb_C3, user_data);
+
+    return;
 }
 
 void
@@ -396,12 +405,16 @@ nci_cb_D1(cb_D1_func cb, void* user_data) {
     const char *result = "succeeded";
     /* call the cb synchronously */
     (cb)(user_data, result);
+
+    return;
 }
 
 void
 nci_cb_D2(cb_D2_func cb, void* user_data) {
     /* call the cb synchronously */
     (cb)(user_data, 88);
+
+    return;
 }
 
 static int int_cb_D3 = 111;
@@ -409,8 +422,22 @@ void
 nci_cb_D3(cb_D3_func cb, void* user_data) {
     /* call the cb synchronously */
     (cb)(user_data, &int_cb_D3);
+
+    return;
 }
 
+static int int_cb_D4 = 1;
+void
+nci_cb_D4(cb_D4_func times_ten, void* user_data) {
+    int cnt;
+    for ( cnt = 0; cnt < 10; cnt++ )
+    {
+        (times_ten)(user_data, &int_cb_D4);
+        int_cb_D4++;
+    }
+
+    return;
+}
 
 void
 nci_pip (int count, Rect_Like *rects) {

@@ -19,8 +19,14 @@ EXPORTS
     nci_vP
     nci_cb_C1
     nci_cb_C2
+    nci_cb_C3
     nci_cb_D1
+    nci_cb_D2
+    nci_cb_D3
+    nci_cb_D4
     nci_pip
     nci_i33
     nci_vpii
     nci_piiii
+    nci_dlvar_int
+    nci_dlvar_vv

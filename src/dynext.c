@@ -217,7 +217,7 @@ get_path(Interp *interpreter, STRING *lib, void **handle)
     }
     err = Parrot_dlerror();
     fprintf(stderr, "Couldn't load '%s': %s\n",
-            full_name, err ? err : "unknown reason");
+            file_name, err ? err : "unknown reason");
     return NULL;
 }
 
