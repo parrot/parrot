@@ -1,6 +1,6 @@
 #perl -w
 
-use Parrot::Test tests => 2;
+use Parrot::Test tests => 3;
 
 output_is(<<'CODE', <<'OUTPUT', "data type names");
 	# first (native) type
@@ -56,6 +56,21 @@ output_is(<<'CODE', <<'OUTPUT', "find_type with invalid type");
         end
 CODE
 0
+OUTPUT
+
+output_like(<<'CODE', <<'OUTPUT', "data type sizes");
+       find_type I0, "int"
+       sizeof I1, I0
+       print I1
+       find_type I0, "int32"
+       sizeof I1, I0
+       print I1
+       find_type I0, "no_such_type"
+       sizeof I1, I0
+       print I1
+       end
+CODE
+/^[48]4-1$/
 OUTPUT
 
 1;

@@ -158,6 +158,23 @@ inline op sleep(in INT) {
 
 =cut
 
+########################################
+
+=item B<sizeof>(out INT, in INT)
+
+Get the size of native datatype $2 in $1.
+
+
+inline op sizeof(out INT, in INT) {
+    if ($2 < enum_first_type || $2 >= enum_last_type)
+        $1 = -1;
+    else
+        $1 = data_types[$2 - enum_first_type].size;
+  goto NEXT();
+}
+
+=cut
+
 ###############################################################################
 
 =head1 COPYRIGHT

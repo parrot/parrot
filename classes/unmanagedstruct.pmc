@@ -26,12 +26,46 @@ enum {
 
 pmclass UnManagedStruct extends default need_ext {
 
+    void init() {
+	PMC_ptr2p(SELF) = NULL;
+    }
+
     /* Initialize the struct with some data. This should be an array
-     * of triples - of what -leo
+     * of triples of
+     *   - datatype (enum from datatypes.h)
+     *   - count
+     *   - offset
      */
 
     void init_pmc (PMC* value) {
+	SELF.set_pmc(value);
+    }
 
+    void set_pmc (PMC* value) {
+	size_t i, n = (size_t)VTABLE_elements(interpreter, value);
+	size_t toff = 0;
+
+	if (n % 3)
+	    internal_exception(1, "Illegal initializer for struct");
+	PMC_ptr2p(SELF) = value;
+
+	for (i = 0; i < n; i += 3) {
+	    int type = (int) VTABLE_get_integer_keyed_int(interpreter, value, i);
+	    int count= (int) VTABLE_get_integer_keyed_int(interpreter, value, i+1);
+	    int offs = (int) VTABLE_get_integer_keyed_int(interpreter, value, i+2);
+
+	    if (type < enum_first_type || type >= enum_last_type)
+		internal_exception(1, "Illegal type in initializer for struct");
+	    if (count == 0)
+		++count;
+	    if (offs == 0) {
+		offs = toff;
+		VTABLE_set_integer_keyed_int(interpreter, value, i+2, offs);
+		toff += count * (data_types[type - enum_first_type].size);
+	    }
+	    else
+		toff = offs;
+	}
     }
 
     INTVAL is_equal (PMC* value) {
@@ -43,6 +77,32 @@ pmclass UnManagedStruct extends default need_ext {
 	return PMC_data(SELF) != NULL;
     }
 
+    INTVAL get_integer_keyed_int(INTVAL ix) {
+	size_t offs, n;
+	int type;
+
+	if (ix < 0)
+            return -1;
+	/* assume char array */
+	if (!PMC_ptr2p(SELF))
+	    return  (unsigned char)((char *)PMC_data(SELF))[ix];
+	n = (size_t)VTABLE_elements(interpreter, PMC_ptr2p(SELF));
+	if ((size_t)ix * 3 >= n)
+	    internal_exception(1, "Non existend elements in struct");
+	/* use structure init */
+	type = (int) VTABLE_get_integer_keyed_int(interpreter, PMC_ptr2p(SELF), ix*3);
+	offs = (int) VTABLE_get_integer_keyed_int(interpreter, PMC_ptr2p(SELF), ix*3 + 2);
+	switch (type) {
+	    case enum_type_int:
+		return (INTVAL) ((char *)PMC_data(SELF))[offs];
+	    default:
+		internal_exception(1, "unhandled type in struct");
+	}
+	return -1;
+    }
+
+
+
     /* May cause segfaults if value is out of bounds */
     INTVAL get_integer_keyed(PMC* key) {
 	INTVAL ix;
@@ -50,10 +110,7 @@ pmclass UnManagedStruct extends default need_ext {
 	if (!key)
             return -1;
 	ix = key_integer(INTERP, key);
-	if (ix < 0)
-            return -1;
-	return  (unsigned char)((char *)PMC_data(SELF))[ix];
-
+	return SELF.get_integer_keyed_int(ix);
     }
 
     INTVAL get_integer() {

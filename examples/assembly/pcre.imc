@@ -79,9 +79,19 @@
 
     .local int ovec0s
     .local int ovec0e
-    # a hackish way to extract string (index is per char)
+    .sym var struct
+    struct = new SArray
+    struct = 6
+.include "datatypes.pasm"
+    struct[0] = .DATATYPE_INT
+    struct[1] = 1
+    struct[2] = 0
+    struct[3] = .DATATYPE_INT
+    struct[4] = 1
+    struct[5] = 0
+    assign ovector, struct
     ovec0s = ovector[0]
-    ovec0e = ovector[4]
+    ovec0e = ovector[1]
 
     if ok <= 0 goto nomatch
 

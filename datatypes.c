@@ -20,7 +20,7 @@ Parrot_get_datatype_enum(Interp *interpreter, STRING *typename)
     int i;
 
     for (i = enum_first_type; i < enum_last_type; i++) {
-        if (!strcmp(datatype_names[i - enum_first_type], type))
+        if (!strcmp(data_types[i - enum_first_type].name, type))
             return i;
     }
 
@@ -39,8 +39,8 @@ Parrot_get_datatype_name(Interp *interpreter, INTVAL type)
     if (type < enum_first_type || type >= enum_last_type)
         s = "illegal";
     else
-        s = datatype_names[type - enum_first_type];
-    return string_make(interpreter, s, strlen(s), 0, 0, 0);
+        s = data_types[type - enum_first_type].name;
+    return string_make(interpreter, s, strlen(s), 0, PObj_external_FLAG, 0);
 }
 
 /*

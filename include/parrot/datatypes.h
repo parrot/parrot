@@ -66,54 +66,58 @@ typedef enum {
 } PARROT_DATA_TYPES;
 
 /* &end_gen */
+struct _data_types {
+    const char *name;
+    int size;
+};
 
 #if defined(INSIDE_GLOBAL_SETUP)
-const char *datatype_names[] = {
-    "INTVAL",           /* parrot types */
-    "FLOATVAL",
-    "STRING",
-    "PMC",              /* actual PMCs have positive class numbers */
-    "BIGINT",
-    "BIGNUM",           /* might be different */
-    "DPOINTER",
+const struct _data_types data_types[] = {
+    { "INTVAL",   INTVAL_SIZE },          /* parrot types */
+    { "FLOATVAL", NUMVAL_SIZE },
+    { "STRING", sizeof(void *) },
+    { "PMC",    sizeof(void *) },           /* actual PMCs have positive class numbers */
+    { "BIGINT", sizeof(void *) },
+    { "BIGNUM", sizeof(void *) },          /* might be different */
+    { "DPOINTER",sizeof(void *) },
 
-    "char",             /* native integer types */
-    "short",
-    "int",
-    "long",
-    "longlong",
+    { "char",   sizeof(char) },          /* native integer types */
+    { "short",  sizeof(short) },
+    { "int",    sizeof(int)   },
+    { "long",   sizeof(long)  },
+    { "longlong", 0 },          /* TODO */
 
-    "uchar",            /* native unsigned types */
-    "ushort",
-    "uint",
-    "ulong",
-    "ulonglong",
+    { "uchar",  sizeof(char) },            /* native unsigned types */
+    { "ushort", sizeof(short)},
+    { "uint",   sizeof(int)  },
+    { "ulong",  sizeof(long) },
+    { "ulonglong", 0 },         /* TODO */
 
-    "float",            /* native float types */
-    "double",
-    "longdouble",
+    { "float",  sizeof(float) },          /* native float types */
+    { "double", sizeof(double) },
+    { "longdouble", 0 },        /* TODO */
 
-    "int1",             /*  = bit */
-    "int4",
-    "int8",
-    "int16",
-    "int32",
-    "int64",
+    { "int1",   0 },            /*  = bit */
+    { "int4",   0 },
+    { "int8",   1 },
+    { "int16",  2 },
+    { "int32",  4 },
+    { "int64",  8 },
 
-    "uint8",            /* unsigned variants */
-    "uint16",
-    "uint32",
-    "uint64",
+    { "uint8",  1 },          /* unsigned variants */
+    { "uint16", 2 },
+    { "uint32", 4 },
+    { "uint64", 8 },
 
-    "ptr",
-    "cstr",
+    { "ptr", sizeof(void*) },
+    { "cstr", sizeof(char *) },
 
-    "sized",
+    { "sized", 0 },
 
-    "illegal"
+    { "illegal", 0 }
 };
 #else
-extern const char *datatype_names[];
+extern const struct _data_types data_types[];
 #endif
 
 

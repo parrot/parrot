@@ -17,8 +17,9 @@
 pmclass ManagedStruct extends UnManagedStruct need_ext {
 
     void init () {
-      PObj_active_destroy_SET(SELF);
-      SELF->cache.int_val = 0;
+	SUPER();
+	PObj_active_destroy_SET(SELF);
+	SELF->cache.int_val = 0;
     }
 
     void init_pmc (PMC* value) {
@@ -41,8 +42,14 @@ pmclass ManagedStruct extends UnManagedStruct need_ext {
         ix = key_integer(INTERP, key);
         if (ix < 0 || ix >= SELF->cache.int_val)
 	    return -1;
-	return  (unsigned char)((char *)PMC_data(SELF))[ix];
+	return SUPER(key);
 
+    }
+
+    INTVAL get_integer_keyed_int(INTVAL ix) {
+        if (ix < 0 || ix >= SELF->cache.int_val)
+	    return -1;
+	return SUPER(ix);
     }
 
     /* Does nothing for out-of-bound access */
