@@ -2713,6 +2713,10 @@ char floatval_map[] = { 1,2,3,4 };
  */
 #  define ALLOCATE_REGISTERS_PER_SECTION 1
 
+#define MAP(i) OMAP(i)
+#undef MAP
+#define MAP(i) (i) >= 0 : 0 ? OMAP(i)
+
 #endif /* JIT_EMIT */
 
 /*

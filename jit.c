@@ -52,6 +52,8 @@
 void Parrot_jit_debug(struct Parrot_Interp* interpreter);
 #endif
 
+/* #define JIT_IMCC_OJ */
+
 /*
  * optimizer->map_branch parallels the opcodes with a list of
  * branch information and register mapping information
@@ -193,10 +195,15 @@ set_register_usage(struct Parrot_Interp *interpreter,
      * registers are set per their type [IPSN]
      * */
     for (argn = op_info->arg_count - 1; argn > 0; argn--) {
+        int idx = *(cur_op + argn);
         switch (op_info->types[argn]) {
             case PARROT_ARG_I:
             case PARROT_ARG_KI:
                 typ = 0;
+#ifdef JIT_IMCC_OJ
+                if (idx < 0)
+                    idx = -1 - idx;
+#endif /* JIT_IMCC_OJ */
                 break;
             case PARROT_ARG_P:
             case PARROT_ARG_K:
@@ -206,6 +213,10 @@ set_register_usage(struct Parrot_Interp *interpreter,
                 typ = 2;
                 break;
             case PARROT_ARG_N:
+#ifdef JIT_IMCC_OJ
+                if (idx < 0)
+                    idx = -1 - idx;
+#endif /* JIT_IMCC_OJ */
                 typ = 3;
                 break;
             default:
@@ -216,17 +227,16 @@ set_register_usage(struct Parrot_Interp *interpreter,
             /* remember the register typ (+1) for this op argument
              * for register allocation */
             map[cur_op + argn - code_start] = typ + 1;
-            if ((!ru[typ].reg_count[*(cur_op + argn)]++) &&
+            if ((!ru[typ].reg_count[idx]++) &&
                 (op_info->dirs[argn] & PARROT_ARGDIR_IN))
-                ru[typ].reg_dir[*(cur_op + argn)] |= PARROT_ARGDIR_IN;
+                ru[typ].reg_dir[idx] |= PARROT_ARGDIR_IN;
             if (op_info->dirs[argn] & PARROT_ARGDIR_OUT) {
-                ru[typ].reg_dir[*(cur_op + argn)] |= PARROT_ARGDIR_OUT;
+                ru[typ].reg_dir[idx] |= PARROT_ARGDIR_OUT;
             }
         }
         /* key constants may have register keys */
         else if (op_info->types[argn] == PARROT_ARG_KC) {
-            PMC *key = interpreter->code->const_table->constants[
-                *(cur_op + argn)]->u.key;
+            PMC *key = interpreter->code->const_table->constants[idx]->u.key;
             while (key) {
                 UINTVAL flags = PObj_get_FLAGS(key);
                 if (flags & KEY_register_FLAG) {
@@ -468,6 +478,16 @@ sort_registers(struct Parrot_Interp *interpreter,
                 }
             }
             ru[typ].registers_used = k;
+#ifdef JIT_IMCC_OJ
+            for (i = 0; i < to_map[typ]; i++) {
+                ru[typ].reg_usage[i] = i;
+                /* set rn1, N1 */
+                if (ru[typ].registers_used == 1 &&
+                        ru[typ].reg_usage[i] ==
+                        (PARROT_ARGDIR_IN|PARROT_ARGDIR_OUT))
+                    ru[typ].registers_used = 2;
+            }
+#endif /* JIT_IMCC_OJ */
         }
         next = cur_section->next;
         prev = cur_section;
@@ -478,33 +498,6 @@ sort_registers(struct Parrot_Interp *interpreter,
                 for (i = 0; i < ru[typ].registers_used; i++) {
                     nru[typ].reg_count[i] = ru[typ].reg_count[i];
                     nru[typ].reg_usage[i] = ru[typ].reg_usage[i];
-#if 0
-Not yet: We must classify external functions what they do
-    e.g. stack pop operations change registers, which we dont know
-    because we have no ARGDIR in op_info for e.g. popi
-
-                    /* if register was not used in non JIT section and
-                     * used in next JIT section, avoid loading this
-                     * register, by resetting its ARGDIR_IN
-                     * but only, if prev was not a new block
-                     */
-                    if (prev && !prev->isjit && next->isjit &&
-                            prev != cur_section &&
-                            !(prev->ru[typ].reg_dir[i] & PARROT_ARGDIR_OUT)
-                            && nru[typ].reg_dir[i])
-                        nru[typ].reg_dir[i] &= ~PARROT_ARGDIR_IN;
-
-                    /* if register is used in next non JIT
-                     * section, save register
-                     * XXX don't do that, there might later be a branch
-                     * which loads a non saved register
-                     */
-                    if (prev && prev->isjit && !next->isjit &&
-                            nru[typ].reg_dir[i])
-                        prev->ru[typ].reg_dir[i] |= PARROT_ARGDIR_OUT;
-                    else
-                        prev->ru[typ].reg_dir[i] &= ~PARROT_ARGDIR_OUT;
-#endif
                 }
                 nru[typ].registers_used = ru[typ].registers_used;
             }
@@ -550,8 +543,13 @@ assign_registers(struct Parrot_Interp *interpreter,
                     continue;
                 /* If the argument is in most used list for this typ */
                 for (i = 0; i < cur_section->ru[typ].registers_used; i++)
+#ifndef JIT_IMCC_OJ
                     if (cur_op[op_arg] ==
                             (opcode_t)cur_section->ru[typ].reg_usage[i]) {
+#else /* JIT_IMCC_OJ */
+                    if (-1 - cur_op[op_arg] ==
+                            (opcode_t)cur_section->ru[typ].reg_usage[i]) {
+#endif /* JIT_IMCC_OJ */
                         map[cur_op + op_arg - code_start] = maps[typ][i];
                         cur_section->maps++;
                         break;
@@ -899,9 +897,11 @@ build_asm(struct Parrot_Interp *interpreter, opcode_t *pc,
         cur_op = jit_info->cur_op = cur_section->begin;
 
         /* Load mapped registers for this section, if JIT */
+#ifndef JIT_IMCC_OJ
         if (cur_section->isjit) {
             Parrot_jit_load_registers(jit_info, interpreter);
         }
+#endif /* JIT_IMCC_OJ */
 
         /* The first opcode of each section doesn't have a previous one since
          * it's impossible to be sure which was it */
@@ -933,12 +933,14 @@ build_asm(struct Parrot_Interp *interpreter, opcode_t *pc,
              * and also, if we have a jitted sections and encounter
              * and "end" opcode, e.g. in evaled code
              */
+#ifndef JIT_IMCC_OJ
             if ((((map[cur_op - code_start] == JIT_BRANCH_SOURCE) &&
                     (cur_section->branch_target != cur_section)) ||
                         !cur_opcode_byte) &&
                     cur_section->isjit) {
                 Parrot_jit_save_registers(jit_info, interpreter);
             }
+#endif /* JIT_IMCC_OJ */
 
             /* Generate native code for current op */
             (op_jit[cur_opcode_byte].fn) (jit_info, interpreter);
@@ -971,8 +973,10 @@ build_asm(struct Parrot_Interp *interpreter, opcode_t *pc,
         }
 
         /* Save mapped registers back to the Parrot registers */
+#ifndef JIT_IMCC_OJ
         if (cur_section->isjit)
             Parrot_jit_save_registers(jit_info, interpreter);
+#endif /* JIT_IMCC_OJ */
 
         /* update the offset for saved registers */
         jit_info->arena.op_map[jit_info->op_i].offset =

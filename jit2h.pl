@@ -102,7 +102,7 @@ sub readjit($) {
             $asm =~ s/NATIVECODE/jit_info->native_ptr/g;
             $asm =~ s/CUR_OPCODE/jit_info->cur_op/g;
             $asm =~ s/cur_opcode/jit_info->cur_op/g;
-            $asm =~ s/MAP\[(\d)\]/jit_info->optimizer->map_branch[jit_info->op_i + $1]/g;
+            $asm =~ s/MAP\[(\d)\]/MAP($1)/g;
             $asm =~ s/PUSH_MAPPED_REG\((\d)\)/Parrot_jit_push_registers(jit_info,$1)/g;
             $ops{$function} = [ $asm , $extern ];
             $function = undef;
@@ -178,6 +178,9 @@ print JITCPU<<END_C;
 #define PREG(i) interpreter->ctx.pmc_reg.registers[jit_info->cur_op[i]]
 #define SREG(i) interpreter->ctx.string_reg.registers[jit_info->cur_op[i]]
 #define CONST(i) interpreter->code->const_table->constants[jit_info->cur_op[i]]
+#ifndef MAP
+# define MAP(i) jit_info->optimizer->map_branch[jit_info->op_i + (i)]
+#endif
 END_C
 
 
