@@ -26,6 +26,7 @@
 #  include "parrot/oplib/core_ops_cgp.h"
 #endif
 #include "parrot/method_util.h"
+#include "parrot/dynext.h"
 
 #define ATEXIT_DESTROY
 
@@ -1211,6 +1212,16 @@ dynop_register(Parrot_Interp interpreter, PMC* lib_pmc)
     lib = init_func(1);
 
     interpreter->all_op_libs[interpreter->n_libs++] = lib;
+    /*
+     * if we are registering an op_lib variant, called from below
+     * the base names of this lib and the previous one are the same
+     */
+    if (interpreter->n_libs >= 2 &&
+        !strcmp(interpreter->all_op_libs[interpreter->n_libs-2]->name,
+            lib->name)) {
+        /* registering is handled below */
+        return;
+    }
     n_old = interpreter->op_count;
     n_new = lib->op_count;
     n_tot = n_old + n_new;
@@ -1268,15 +1279,19 @@ static void
 dynop_register_xx(Parrot_Interp interpreter, PMC* lib_pmc,
         size_t n_old, size_t n_new, oplib_init_f init_func)
 {
-    op_lib_t *cg_lib;
+    op_lib_t *cg_lib, *new_lib;
     void **ops_addr = NULL;
     size_t i, n_tot;
+    STRING *op_variant;
+    oplib_init_f new_init_func;
+    PMC *lib_variant;
 
     n_tot = n_old + n_new;
     cg_lib = init_func(1);
 
     if (cg_lib->flags & OP_FUNC_IS_ALLOCATED) {
-        cg_lib = mem_sys_realloc(cg_lib, n_tot * sizeof(void *));
+        ops_addr = mem_sys_realloc(cg_lib->op_func_table,
+                n_tot * sizeof(void *));
     }
     else {
         ops_addr = mem_sys_allocate(n_tot * sizeof(void *));
@@ -1284,12 +1299,27 @@ dynop_register_xx(Parrot_Interp interpreter, PMC* lib_pmc,
         for (i = 0; i < n_old; ++i)
             ops_addr[i] = ((void **)cg_lib->op_func_table)[i];
     }
-    /* TODO check if the lib_pmc exists with a _xx flavor */
-
-    /* if not install wrappers */
-    /* fill new entries with the wrapper op */
-    for (i = n_old; i < n_tot; ++i)
-        ops_addr[i] = ((void **)cg_lib->op_func_table)[CORE_OPS_wrapper__];
+    /* check if the lib_pmc exists with a _xx flavor */
+    new_init_func = get_op_lib_init(0, 0, lib_pmc);
+    new_lib = new_init_func(1);
+    op_variant = Parrot_sprintf_c(interpreter, "%s_ops%s",
+            new_lib->name, cg_lib->suffix);
+    lib_variant = Parrot_load_lib(interpreter, op_variant, NULL);
+    if (lib_variant) {
+        new_init_func = get_op_lib_init(0, 0, lib_variant);
+        new_lib = new_init_func(1);
+        for (i = n_old; i < n_tot; ++i)
+            ops_addr[i] = ((void **)new_lib->op_func_table)[i - n_old];
+        new_lib->op_func_table = (void *) ops_addr;
+        new_lib->op_count = n_tot;
+        new_init_func((int) ops_addr);
+    }
+    else {
+        /* if not install wrappers */
+        /* fill new entries with the wrapper op */
+        for (i = n_old; i < n_tot; ++i)
+            ops_addr[i] = ((void **)cg_lib->op_func_table)[CORE_OPS_wrapper__];
+    }
     /*
      * tell the cg_core about the new jump table
      */

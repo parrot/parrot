@@ -199,7 +199,7 @@ sub ops_addr_decl {
 
 sub run_core_func_start {
     return <<END_C;
-#if defined(__GNUC__) && defined(I386)
+#if defined(__GNUC__) && defined(I386) && defined(NO_DYNOPS)
     register opcode_t *cur_opcode asm ("esi") = cur_op;
 #else
     opcode_t *cur_opcode = cur_op;

@@ -604,7 +604,7 @@ $init_set_dispatch
 END_C
 
 if ($dynamic) {
-    my $load_func = "Parrot_lib_${bs}ops_load";
+    my $load_func = "Parrot_lib_${base}_ops${suffix}_load";
     print SOURCE <<END_C;
 /*
  * dynamic lib load function - called once
