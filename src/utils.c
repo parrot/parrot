@@ -15,9 +15,12 @@
 #include "parrot/parrot.h"
 
 /*
- * s. the comments in math.ops
+ * opcode helper functions that don't really fit elsewhere
  */
 
+/*
+ * s. the comments in math.ops
+ */
 INTVAL
 intval_mod(INTVAL i2, INTVAL i3)
 {
@@ -65,6 +68,64 @@ floatval_mod(FLOATVAL n2, FLOATVAL n3)
      : n2;
 #endif
 }
+
+/*
+ * s. core.ops
+ */
+PMC*
+foldup(Parrot_Interp interpreter, INTVAL skip)
+{
+    /* Should be I3 when we're done */
+    INTVAL max_used_reg = REG_INT(2) + 5;
+    INTVAL reg;
+    INTVAL elems_in_array = 0;
+    INTVAL current_offset = 0;
+    INTVAL total_size;
+    INTVAL start = 5;
+    PMC *destination_pmc = NULL;
+    PMC *overflow = REG_PMC(3);
+
+    destination_pmc = pmc_new_noinit(interpreter, enum_class_Array);
+    VTABLE_init(interpreter, destination_pmc);
+
+    /* see how many are in the overflow, if any */
+    if (max_used_reg == 16 && !PMC_IS_NULL(overflow) &&
+            VTABLE_type(interpreter, overflow) != enum_class_Null) {
+        elems_in_array = VTABLE_get_integer(interpreter, overflow);
+    }
+    /* XXX This needs fixing when IMCC does calling conventions right */
+    total_size = REG_INT(2) + elems_in_array - skip;
+
+    VTABLE_set_integer_native(interpreter, destination_pmc, total_size);
+
+    /* Skip past what we're skipping */
+    start += skip;
+
+    /* First move over the PMCs in registers */
+    for (reg = start; reg < max_used_reg; reg++) {
+        VTABLE_set_pmc_keyed_int(interpreter, destination_pmc,
+                current_offset, REG_PMC(reg));
+        current_offset++;
+    }
+    if (elems_in_array) {
+        INTVAL cur_elem;
+        start = 0;
+        if (skip > 11) {
+            start = skip - 11;
+        }
+        for (cur_elem = start; cur_elem < elems_in_array; cur_elem++) {
+            VTABLE_set_pmc_keyed_int(interpreter, destination_pmc,
+                    current_offset,
+                    VTABLE_get_pmc_keyed_int(interpreter, overflow, cur_elem));
+            current_offset++;
+        }
+    }
+    return destination_pmc;
+}
+
+/*
+ * random number generator
+ */
 
 /*
  * currently undefined
@@ -229,7 +290,7 @@ Parrot_make_la(struct Parrot_Interp *interpreter, PMC *array) {
 
     for (cur = 0; cur < arraylen; cur++) {
         out_array[cur] = VTABLE_get_integer_keyed_int(interpreter, array, cur);
-    }  
+    }
 
     return out_array;
 }
@@ -255,7 +316,7 @@ Parrot_make_cpa(struct Parrot_Interp *interpreter, PMC *array) {
 
     for (cur = 0; cur < arraylen; cur++) {
         out_array[cur] = string_to_cstring(interpreter, VTABLE_get_string_keyed_int(interpreter, array, cur));
-    }  
+    }
 
     return out_array;
 }

@@ -989,86 +989,12 @@ calling conventions.
 =cut
 
 op foldup(out PMC) {
-   /* Should be I3 when we're done */
-   INTVAL max_used_reg = REG_INT(2) + 5;
-   INTVAL reg;
-   INTVAL elems_in_array;
-   INTVAL current_offset = 0;
-   INTVAL total_size;
-   PMC *destination_pmc = NULL;
-   PMC *overflow = REG_PMC(3);
-
-   destination_pmc = pmc_new_noinit(interpreter, enum_class_Array);
-   VTABLE_init(interpreter, destination_pmc);
-   /* XXX This needs fixing when IMCC does calling conventions right */
-   total_size = REG_INT(2);
-   VTABLE_set_integer_native(interpreter, destination_pmc, total_size);
-   /* First move over the PMCs in registers */
-   for (reg = 5; reg < max_used_reg; reg++) {
-       VTABLE_set_pmc_keyed_int(interpreter, destination_pmc, current_offset, REG_PMC(reg));
-       current_offset++;
-   }
-   /* Next see how many are in the overflow, if any */
-   if (max_used_reg == 16 && overflow != NULL &&
-       VTABLE_type(interpreter, overflow) != enum_class_Null &&
-       ((elems_in_array = VTABLE_get_integer(interpreter, overflow)) != 0)) {
-       INTVAL cur_elem;
-       total_size += elems_in_array;
-       VTABLE_set_integer_native(interpreter, destination_pmc, total_size);
-       for (cur_elem = 0; cur_elem < elems_in_array; cur_elem++) {
-           VTABLE_set_pmc_keyed_int(interpreter, destination_pmc, current_offset, VTABLE_get_pmc_keyed_int(interpreter, overflow, cur_elem));
-           current_offset++;
-       }
-   }
-
-   $1 = destination_pmc;
+   $1 = foldup(interpreter, 0);
    goto NEXT();
 }
 
 op foldup(out PMC, in INT) {
-   /* Should be I3 when we're done */
-   INTVAL max_used_reg = REG_INT(2) + 5;
-   INTVAL reg;
-   INTVAL elems_in_array;
-   INTVAL current_offset = 0;
-   INTVAL total_size;
-   INTVAL start = 5;
-   PMC *destination_pmc = NULL;
-   PMC *overflow = REG_PMC(3);
-
-   destination_pmc = pmc_new_noinit(interpreter, enum_class_Array);
-   VTABLE_init(interpreter, destination_pmc);
-   /* XXX This needs fixing when IMCC does calling conventions right */
-   total_size = REG_INT(2);
-   VTABLE_set_integer_native(interpreter, destination_pmc, total_size);
-
-   /* Skip past what we're skipping */
-   start += $2;
-
-   /* First move over the PMCs in registers */
-   for (reg = start; reg < max_used_reg; reg++) {
-       VTABLE_set_pmc_keyed_int(interpreter, destination_pmc, current_offset, REG_PMC(reg));
-       current_offset++;
-   }
-
-   /* Next see how many are in the overflow, if any */
-   if (max_used_reg == 16 && overflow != NULL &&
-       VTABLE_type(interpreter, overflow) != enum_class_Null &&
-       ((elems_in_array = VTABLE_get_integer(interpreter, overflow)) != 0)) {
-       INTVAL cur_elem;
-       start = 0;
-       if ($2 > 11) {
-         start = $2 - 11;
-       }
-       total_size += elems_in_array;
-       VTABLE_set_integer_native(interpreter, destination_pmc, total_size);
-       for (cur_elem = start; cur_elem < elems_in_array; cur_elem++) {
-           VTABLE_set_pmc_keyed_int(interpreter, destination_pmc, current_offset, VTABLE_get_pmc_keyed_int(interpreter, overflow, cur_elem));
-           current_offset++;
-       }
-   }
-
-   $1 = destination_pmc;
+   $1 = foldup(interpreter, $2);
    goto NEXT();
 }
 
