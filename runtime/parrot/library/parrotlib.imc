@@ -10,41 +10,62 @@ This is the parrot bytecode library.
 
 .namespace ["_parrotlib"]
 
-=item HASH = __lib_init()
+=item __onload
 
-__lib_init is the initialization function. It creates an hash with function 
-names as keys, and signatures as values. If you use
-
-        C<Parrot_library_query(interpreter, "foo", ...)>
-
-this hash is used to lookup the signature of "foo", and if one is found the 
-method with the same name is called with this signature. The return value of 
-the bytecode function will be the value returned by Parrot_library_query.
+__onload is the initialization function. It sets the signatures of
+parrotlib's interface functions.
 
 =cut
 
-.sub __lib_init
-    .local pmc sig
+.sub __onload @LOAD
+    .local pmc paths
     .local pmc includes
+    .local string root
+
+
+    # XXX todo: get root from config
+    $P0 = new .Env
+    root = $P0["PARROT_RUNTIME_ROOT"]
+    length $I0, root
+    if $I0 == 0 goto DEFAULT
+    branch OKAY
+DEFAULT:
+    root = "runtime/parrot"
+OKAY:
+
+    # XXX: get include paths from config
+    $S0 = clone root
+    concat $S0, "/include"
+    paths = new .StringArray
+    push paths, "."
+    push paths, $S0
+    push paths, root
     
-    # setup include paths
-    # XXX: use subs
-    includes = new .PerlArray
-    push includes, "runtime/parrot"
-    push includes, "."
-    push includes, "runtime/parrot/include"
+    # create includes array
+    includes = new .PMCArray
     store_global "_parrotlib", "include_paths", includes
     
-    # setup signatures
-    sig = new .PerlHash
-    sig["include_file_location"] = "SS"
-    sig["bytecode_location"] = "SS"
-    sig["dynext_location"] = "SS"
-    
-    # return signatures
-    .pcc_begin_return
-    .return sig
-    .pcc_end_return
+    # get the directory handler
+    $P0 = find_global "_parrotlib::internal", "handle_directory"
+
+    # fill the includes array
+LOOP:
+    $P1 = clone $P0
+    $P2 = new .PerlString
+    $S0 = shift paths
+    concat $S0, "/"
+    $P2 = $S0
+    setprop $P1, "path", $P2
+    push includes, $P1
+    if paths goto LOOP
+
+    # setup the signatures
+    set_signature( "include_file_location", "SS" )
+    set_signature( "bytecode_location", "SS" )
+    set_signature( "dynext_location", "SS" )
+
+    # XXX: turn off DOD runs; does not work with DOD yet :-(
+    sweepoff
 .end
 
 =item STRING = include_file_location( STRING )
@@ -59,7 +80,9 @@ This function returns the absolute filename of the requested file.
 .sub include_file_location
     .param string name
     
-    $S0 = file_path( name )
+    find_global $P0, "_parrotlib", "include_paths"
+    $S0 = find_file_path( name, $P0 )
+    
     .pcc_begin_return
     .return $S0
     .pcc_end_return
@@ -76,8 +99,10 @@ This function returns the absolute filename of the requested file.
 
 .sub bytecode_location
     .param string name
+
+    find_global $P0, "_parrotlib", "include_paths"
+    $S0 = find_file_path( name, $P0 )
     
-    $S0 = file_path( name )
     .pcc_begin_return
     .return $S0
     .pcc_end_return
@@ -131,29 +156,23 @@ END:
 
 .namespace ["_parrotlib::internal"]
 
-.sub file_path
+.sub find_file_path
     .param string name
+    .param pmc array
     .local string ret
     .local pmc iter
     
-    find_global $P0, "_parrotlib", "include_paths"
-    iter = new .Iterator, $P0
-    iter = 0
-    #ITERATE_FROM_START
+    iter = new .Iterator, array
+    iter = 0 #ITERATE_FROM_START
 
 NEXT:
+    null ret
     unless iter goto END
 
     $P0 = shift iter
-    ret = $P0
-
-    concat ret, "/"
-    concat ret, name
-    
-    $I0 = file_exists( ret )
-    unless $I0 goto NEXT
+    ret = $P0( name )
+    isnull ret, NEXT
 END:
-
     .pcc_begin_return
     .return ret
     .pcc_end_return
@@ -174,6 +193,35 @@ END:
     .pcc_begin_return
     .return ret
     .pcc_end_return
+.end
+
+.sub handle_directory
+    .param string name
+    .local string path
+    
+    getprop $P0, "path", P0
+    path = $P0
+    
+    $S0 = clone path
+    concat $S0, name
+    $I0 = file_exists( $S0 )
+    if $I0 goto OK
+    null $S0
+OK:
+    .pcc_begin_return
+    .return $S0
+    .pcc_end_return
+.end
+
+.sub set_signature
+    .param string name
+    .param string sig
+    
+    $P1 = new .PerlString
+    $P1 = sig
+    find_global $P0, "_parrotlib", name
+    setprop $P0, "signature", $P1
+    store_global "_parrotlib", name, $P0
 .end
 
 =back
