@@ -259,8 +259,8 @@ string_compute_strlen(STRING *s)
  * concatenate two strings
  */
 STRING *
-string_concat(struct Parrot_Interp *interpreter, const STRING *a,
-              const STRING *b, UINTVAL Uflags)
+string_concat(struct Parrot_Interp *interpreter, STRING *a,
+              STRING *b, UINTVAL Uflags)
 {
     STRING *result;
 
@@ -412,7 +412,7 @@ string_substr(struct Parrot_Interp *interpreter, const STRING *src,
  */
 STRING *
 string_replace(struct Parrot_Interp *interpreter, STRING *src,
-              INTVAL offset, INTVAL length, const STRING *rep, STRING **d)
+              INTVAL offset, INTVAL length, STRING *rep, STRING **d)
 {
     STRING *dest;
     UINTVAL substart_off;       /* Offset from start of string to our
@@ -555,8 +555,8 @@ string_chopn(STRING *s, INTVAL n)
  * necessary
  */
 INTVAL
-string_compare(struct Parrot_Interp *interpreter, const STRING *s1,
-               const STRING *s2)
+string_compare(struct Parrot_Interp *interpreter, STRING *s1,
+               STRING *s2)
 {
     const char *s1start;
     const char *s1end;

@@ -18,14 +18,14 @@
 /* Declarations of accessors */
 
 INTVAL string_compute_strlen(STRING *);
-STRING *string_concat(struct Parrot_Interp*, const STRING *, const STRING *, UINTVAL);
+STRING *string_concat(struct Parrot_Interp*, STRING *, STRING *, UINTVAL);
 STRING *string_repeat(struct Parrot_Interp*, const STRING *, UINTVAL, STRING **);
 STRING *string_chopn(STRING *, INTVAL);
 STRING *string_substr(struct Parrot_Interp*, const STRING *, INTVAL,
                              INTVAL, STRING **);
 STRING *string_replace(struct Parrot_Interp*, STRING *, INTVAL, INTVAL,
-                             const STRING *, STRING **);
-INTVAL string_compare(struct Parrot_Interp*, const STRING *, const STRING *);
+                             STRING *, STRING **);
+INTVAL string_compare(struct Parrot_Interp*, STRING *, STRING *);
 BOOLVAL string_bool(const STRING *);
 const char *Parrot_string_cstring(const STRING *);
 
