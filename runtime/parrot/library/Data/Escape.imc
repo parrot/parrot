@@ -112,6 +112,10 @@ n39:
 
 gt40: # ascii codes greater than 40 below
 
+    if c != 92 goto DONE 
+    set tmp, "\\\\" 
+    branch DONE
+
 DONE:
     concat ret, tmp
     inc i
