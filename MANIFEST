@@ -354,7 +354,6 @@ lib/Test/Simple.pm
 lib/Text/Balanced.pm
 make.pl
 make_vtable_ops.pl
-manicheck.pl
 memory.c
 misc.c
 obscure.ops
@@ -404,6 +403,7 @@ t/pmc/pmc.t
 test_main.c
 tools/dev/check_source_standards.pl
 tools/dev/lib_deps.pl
+tools/dev/manicheck.pl
 tools/dev/parrot_coverage.pl
 tools/dev/run_indent.pl
 trace.c
