@@ -87,15 +87,17 @@ static void restore_invariants(Interp* interpreter, HASH* hash)
 /*      fprintf(stderr, "Moving hash %p buckets from %p -> %p\n", */
 /*              hash, hash->former_base, current_base); */
 
-    adjust = current_base - hash->former_base;
+    adjust = (char*)current_base - (char*)hash->former_base;
 
     /* Fix up the free list */
-    if (hash->free_list) hash->free_list += adjust;
+    if (hash->free_list)
+        hash->free_list = (HASHBUCKET*)((char*)hash->free_list + adjust);
 
     /* Fix up the hashtable */
     table = (HASHBUCKET**) hash->buffer.bufstart;
     for (i = 0; i < hash->num_buckets; i++) {
-        if (table[i]) table[i] += adjust;
+        if (table[i])
+            table[i] = (HASHBUCKET*)((char*)table[i] + adjust);
     }
 
     /* Fix up the buckets themselves. All buckets in the pool are
@@ -104,7 +106,9 @@ static void restore_invariants(Interp* interpreter, HASH* hash)
      * chains. */
     table_size = hash->bucket_pool->buflen / sizeof(HASHBUCKET);
     for (i = 0; i < table_size; i++) {
-        if (current_base[i].next) current_base[i].next += adjust;
+        if (current_base[i].next)
+            current_base[i].next = (HASHBUCKET*)((char*)current_base[i].next
+                                                 + adjust);
     }
 
     hash->former_base = current_base;
