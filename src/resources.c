@@ -62,7 +62,7 @@ static void alloc_more_pmc_headers(struct Parrot_Interp *interpreter) {
   
   new_arena = mem_sys_allocate(sizeof(struct PMC_Arena));
   new_arena->GC_data = mem_sys_allocate(sizeof(PMC *) * PMC_HEADERS_PER_ALLOC);
-  memset(new_arena->GC_data, NULL, sizeof(PMC *) * PMC_HEADERS_PER_ALLOC);
+  memset(new_arena->GC_data, 0, sizeof(PMC *) * PMC_HEADERS_PER_ALLOC);
   new_arena->start_PMC = mem_sys_allocate(sizeof(PMC) * PMC_HEADERS_PER_ALLOC);
   memset(new_arena->start_PMC, 0, sizeof(PMC) * PMC_HEADERS_PER_ALLOC);
   new_arena->free = 0;
