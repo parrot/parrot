@@ -28,7 +28,7 @@ default.c: default.pmc
 default$(O): $(H_FILES)
 
 default.h: default.c
-	perl -ne 'next unless /Parrot_default/; s/{/;/;s/^/extern /;print' default.c > default.h
+	$(PERL) -ne 'next unless /Parrot_default/; s/{/;/;s/^/extern /;print' default.c > default.h
 
 perlint.c: perlint.pmc 
 	$(PERL) pmc2c.pl perlint.pmc
