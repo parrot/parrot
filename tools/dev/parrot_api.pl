@@ -2,6 +2,71 @@
 # Copyright: 2004 The Perl Foundation.  All Rights Reserved.
 # $Id$
 
+=head1 NAME
+
+tools/dev/parrot_api.pl - Display Parrot API (symbols)
+
+=head1 SYNOPSIS
+
+    % perl tools/dev/parrot_api.pl [libfile]
+
+=head1 DESCRIPTION
+
+Displays the API (the visible symbols, code or data) of the Parrot lib,
+.
+
+First finds out the Parrot public embedding API as described in the
+F<include/parrot/embed.h>, then finds out the visible symbols in
+the Parrot lib (by default F<blib/lib/libparrot.a>), and then
+cross-references the dubious API symbols according to the following
+categories:
+
+=over 4
+
+=item Missing Parrot API
+
+API listed in F<include/parrot/embed.h> but not defined in the Parrot lib.
+
+Why is the planned public API not implemented?
+
+=item No Parrot Prefix
+
+API has no C<Parrot_> prefix.
+
+If code: if the API is really to be public, prefix it with <Parrot_>
+(and not something else), if not, make it private (local).
+
+If data, consider making the data either constant or heap.
+
+=item No Parrot API
+
+API defined in the lib but not in F<inlucde/parrot/embed.h>.
+
+If code, consider making the API private.
+If data, consider making the data constant and/or heap.
+
+=item Uninitialized Modifiable Data
+
+Data symbol that is not initialized with data.
+
+Consider making the data constant and/or heap (and accessed through an API).
+
+=item Initialized Modifiable Data
+
+Data symbol that is initialized with data, but modifiable.
+
+Consider making the data constant and/or heap (and accessed through an API).
+
+=back
+
+Uses F<tools/dev/nm.pl> to list the symbols.
+
+=head1 HISTORY
+
+Author: Jarkko Hietaniemi.
+
+=cut
+
 use strict;
 
 my $Obj;
