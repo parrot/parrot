@@ -10,9 +10,11 @@
 
 # parrot -C oo2.pasm            -g           -O3
 #   with reuse regsave mem                    6.15
+# anchor P1                                   6.7
 
 # parrot -j oo2.pasm            -g           -O3
 #   with reuse regsave mem                    6.1
+# anchor P1                                   6.5
 
 # parrot -C oo2-prop.pasm                     2.8
 # parrot -j oo2-prop.pasm                     2.6

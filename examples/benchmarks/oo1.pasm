@@ -17,11 +17,13 @@
 # find_global hack              2.16          1.6
 # reuse exception               2.00          1.37
 # reuse regsave mem                           1.25
+# anchor P1                                   1.36
 
 # parrot -j oo1.pasm
 # find_global hack                            1.51
 # reuse exception                             1.30
 # reuse regsave mem                           1.23
+# anchor P1                                   1.32
 
 
 # parrot -C oo1-prop.pasm
