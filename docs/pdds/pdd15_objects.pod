@@ -307,6 +307,73 @@ to go.
 
 =item setattr Px, Py, Sz
 
+=item fetchmethod Px, Py, Sz
+
+Find the PMC for method Sz of object Py, and put it in Px. Note that how
+the method PMC returned behaves if it goes out of scope or if the
+class hierarchy changes or the method definitions change is entirely
+up to the class that provides the PMC.
+
+=item callmeth
+
+=item callmeth Sz
+
+call a method. If the method name is provided, we find the PMC for the named
+method and put it in the sub/method slot. If no name is provided we
+assume that all the calling conventions have already been set up and
+the method PMC is already in the proper place.
+
+=item callmethcc
+
+=item callmethcc Sx
+
+Make a method call, automatically generating a return continuation. If
+a method name is passed in we look up the method PMC for the object
+and put it in the method slot. If a method name isn't provided then we
+assume that things are already properly set up.
+
+=item tailcalmeth
+
+=item tailcallmeth Sx
+
+Make a tailcall to method Sx. If no method name is given, we assume
+everything is already set up properly.
+
+=item newclass Px, Sy
+
+Create a new base class named Sy, and put the PMC for it in Px
+
+=item subclass Px, Py, Sz
+
+Create a new class, named Sz, which has Py as its immediate parent. 
+
+=item addparent Px, Py
+
+Add class Py to the end of the list of immediate parents of class
+Px. Adds any attributes of Py (and its parent classes) that aren't
+already in Px.
+
+=item removeparent Px, Py
+
+Remove class Py from the parent list of Px. All parent classes of Py
+which aren't parent classes of what remains of Px's parent list are
+removed, as are their attributes.
+
+=item addattr Px, Sy, Sz
+
+Add attribute Sy, with a fully-qualified name Sz, to class Px. This
+will add the attribute slot to all objects of class Px and children of
+class Px, with a default value of C<Null>.
+
+=item removeattr Px, Sy, Sz
+
+Remove the attribute Sy (fully qualified name Sz) from class Px, all
+objects of class Px, and all objects of a child of class Px.
+
+=item instantiate Px, Py, Sz
+
+Instantiate a brand new class, based on the metadata in Py, named Sz. 
+
 =head2 Vtables
 
 
