@@ -1,6 +1,6 @@
 package P6C::IMCC::Binop;
 use strict;
-use SelfLoader;
+#use SelfLoader;
 use Data::Dumper;
 use Carp 'confess';
 use P6C::IMCC ':all';
@@ -76,7 +76,7 @@ sub simple_binary_pasm {
 
 1;
 
-__DATA__
+# __DATA__
 
 package P6C::IMCC::Binop;
 
