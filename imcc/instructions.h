@@ -69,7 +69,7 @@ Instruction * _mk_instruction(const char *,const char *, SymReg **, int);
 #define _mk_instruction(a,b,c,d) dont_use(a,b)
 #endif
 Instruction * iANY(char * name, char *fmt, SymReg **r, int emit);
-Instruction * INS(char * name, char *fmt, SymReg **regs, int nargs, int keyv);
+Instruction * INS(char * name, char *fmt, SymReg **regs, int nargs, int keyv, int emit);
 Instruction * iNEW(SymReg * r0, char * type, int emit);
 Instruction * emitb(Instruction *);
 int instruction_reads(Instruction *, SymReg *);
