@@ -276,9 +276,10 @@ Parrot_load_lib(Interp *interpreter, STRING *lib, PMC *initializer)
 #endif
     if (!path || !handle) {
         /*
-         * XXX internal_exception? return a PerlUndef?
+         * XXX internal_exception? return a PerlUndef? return PMCNULL?
+         * PMC Undef seems convenient, because it can be queried with get_bool()
          */
-        return PMCNULL;
+        return pmc_new(interpreter, enum_class_Undef);
     }
 
     /*

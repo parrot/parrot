@@ -62,15 +62,19 @@ output_is(<<'CODE', <<'OUTPUT', "nci_d_d - PIR");
   .local pmc lib
   .local NCI dd
   lib = loadlib  "libnci"
-  print "loaded\n"
+  unless lib goto NOT_LOADED
+  print "loaded "
+  print lib
+  print "\n"
   dd = dlfunc lib, "nci_dd", "dd"
   .local float r
   r = dd(4.0)
   print r
+  NOT_LOADED:
   print "\n"
 .end
 CODE
-loaded
+loaded runtime/parrot/dynext/libnci.so
 8.000000
 OUTPUT
 
@@ -1359,5 +1363,3 @@ CODE
 1
 0
 OUTPUT
-
-1;

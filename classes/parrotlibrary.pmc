@@ -83,6 +83,39 @@ Creates and returns a clone of the library.
         }
         return dest;
     }
+
+/*
+
+=item C<INTVAL get_bool()>
+
+Returns wether a library has been successfully loaded.
+
+=cut
+
+*/
+
+    INTVAL get_bool() {
+        return ( PMC_data(SELF) != NULL );
+    }
+
+/*
+
+=item C<STRING* get_string()>
+
+Returns wether a library has been successfully loaded.
+
+=cut
+
+*/
+
+    STRING* get_string() {
+        PMC *prop;
+        STRING *key;
+        key = const_string(interpreter, "_filename");
+        prop = VTABLE_getprop(interpreter, SELF, key);
+        return VTABLE_get_string(interpreter, prop);
+    }
+
 }
 
 /*
