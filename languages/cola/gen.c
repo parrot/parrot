@@ -51,28 +51,6 @@ void gen_ast(AST * ast) {
     }
 }
 
-void gen_bootstrap() {
-    /*
-     *    Kludge, generate a limited support library until
-     *    I can import modules
-     */
-    const char * saveregs        = "pushi\npushn\npushs\n";
-    const char * restoreregs    = "pops\npopn\npopi\n";
-    printf("\n.emit\n");
-    printf("\n__puts:\npushs\nrestore S31\nprint S31\npops\nret\n");
-    printf("\n__puti:\npushi\nrestore I31\nprint I31\npopi\nret\n");
-    printf("\n__putf:\npushn\nrestore N31\nprint N31\npopn\nret\n");
-    printf("\n__substr:\n%srestore I31\nrestore I30\nrestore S31\nsubstr S30, S31, I30, I31\nsave S30\n%sret\n",
-                saveregs, restoreregs);
-    printf("\n__strlen:\npushs\npushi\nrestore S0\nlength I0, S0\nsave I0\npops\npopi\nret\n");
-    printf("\n__strchop:\npushs\nrestore S0\nchopn S0, 1\nsave S0\npops\nret\n");
-    printf("\n__strrep:\npushs\npushi\nrestore S30\nrestore I31\nrestore I30\nrestore S31\nsubstr S31, I30, I31, S30\nsave S31\npops\npopi\nret\n");
-    printf("\n__ord:\npushs\npushi\nrestore S0\nord I0, S0\nsave I0\npops\npopi\nret\n");
-    printf("\n__gets:\npushs\nread S0, 512\nsave S0\npops\nret\n");
-    printf("\n__sleep:\npushi\nrestore I0\nsleep I0\npopi\nret\n");
-    printf(".eom\n");
-}
-
 void gen_namespace_decl(AST * p) {
     printf("#.namespace %s\n", p->sym->name);
     if(p->arg1)

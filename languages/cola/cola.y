@@ -1050,7 +1050,8 @@ int main(int argc, char * argv[])
         gen_ast(ast_start);
     }
 
-    gen_bootstrap();
+    printf("# Include standard API stuff\n");
+    printf(".include \"core.imc\"\n\n");
     fflush(stdout);
     fprintf(stderr, "%ld lines compiled.\n", line);
     fprintf(stderr, "Execing Parrot (IMCC)\n");

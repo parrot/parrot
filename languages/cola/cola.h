@@ -351,7 +351,6 @@ AST                 *get_cur_primary_block();
 AST                 *cur_method;
 
 /* Code generation phase */
-void                gen_bootstrap();
 void                gen_ast(AST * ast);
 void                gen_namespace_decl(AST *);
 void                gen_class_decl(AST *);
