@@ -21,15 +21,6 @@ static INTVAL world_inited = 0;
 struct Parrot_Interp *
 Parrot_new(void)
 {
-    /* global_setup.c:init_world sets up some vtable stuff.
-       We need it called before we make an interpreter, but
-       it must only be called once.                         */
-
-    if (!world_inited) {
-        world_inited = 1;
-        init_world();
-    }
-
     /* interpreter.c:make_interpreter builds a new Parrot_Interp. */
     return make_interpreter(NO_FLAGS);
 }
@@ -42,9 +33,12 @@ Parrot_init(struct Parrot_Interp *interpreter, void* stacktop)
 */
 {
     if (!world_inited) {
-        /* See comments in Parrot_new. */
+        /* global_setup.c:init_world sets up some vtable stuff.
+         * It must only be called once.
+         */
+
         world_inited = 1;
-        init_world();
+        init_world(interpreter);
     }
 
     if (stacktop) interpreter->lo_var_ptr = stacktop;

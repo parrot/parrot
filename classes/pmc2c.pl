@@ -19,11 +19,11 @@ my $signature_re = qr{
       [;\n\s]*
       (?:/\*.*?\*/)?  # C-like comments
     )*
-  
+
     (\w+\**)      #type
     \s+
     (\w+)         #method name
-    \s*    
+    \s*
     \(([^\(]*)\)  #parameters
 }sx;
 
@@ -133,21 +133,21 @@ if ($ARGV[0] eq '--no-lines') {
 while (my $file = shift @ARGV) {
 
   my $base = $file;
-  $base =~ s/\.pmc$//;  
+  $base =~ s/\.pmc$//;
   my $cfile = "$base.c";
   my $hfile = "$base.h";
 
-  die "$0: Could not read class file '$file'!\n" unless -e $file; 
-  
-  open (PMC, $file) || die "$0: Unable to open file '$file'\n";  
+  die "$0: Could not read class file '$file'!\n" unless -e $file;
+
+  open (PMC, $file) || die "$0: Unable to open file '$file'\n";
   my @contents = <PMC>;
   my $contents = join('', @contents);
   close PMC;
-      
+
   my ($coutput, $houtput) = filter($contents, $file, $cfile); # run the filter
 
   open (SOURCE, ">$cfile") || die "$0: Could not write file '$cfile'\n";
-  print SOURCE $coutput;  
+  print SOURCE $coutput;
   close SOURCE;
 
   open (SOURCE, ">$hfile") || die "$0: Could not write file '$hfile'\n";
@@ -205,8 +205,8 @@ sub rewrite_method ($$$$$) {
 sub filter {
   my ($contents, $pmcfile, $cfile) = @_;
   my $lineno = 1;
-    
-  $contents =~ s/^(.*?^\s*)pmclass ([\w]*)//ms; 
+
+  $contents =~ s/^(.*?^\s*)pmclass ([\w]*)//ms;
   my ($pre, $classname) = ($1, $2);
   $lineno += count_newlines($1);
 
@@ -310,11 +310,11 @@ EOC
       my $initline = 1+count_newlines($OUT)+1;
       $OUT .= qq(#line $initline "$cfile"\n) unless $suppress_lines;
       $HOUT .= <<EOH;
-void $initname (int);
+void $initname (Interp *, int);
 EOH
       $OUT .= <<EOC;
 
-void $initname (int entry) {
+void $initname (Interp * interp, int entry) {
 
     struct _vtable temp_base_vtable = {
         NULL,
@@ -325,8 +325,8 @@ void $initname (int entry) {
         0, /* string_type - change me */
         $methodlist
         };
-    
-   whoami = string_make(NULL, /* DIRTY HACK */
+
+   whoami = string_make(interp,
        "$classname", @{[length($classname)]}, 0, 0, 0);
 
    Parrot_base_vtables[entry] = temp_base_vtable;

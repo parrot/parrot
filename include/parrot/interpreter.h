@@ -100,14 +100,14 @@ typedef struct Parrot_Context {
 /*
  * TODO: Parrot_Interp can use a Parrot_Context inline and we
  * can save/restore context with a single memcpy
- */ 
+ */
 typedef struct Parrot_Interp {
     struct Parrot_Context ctx;          /* All the registers and stacks that
                                            matter when context switching */
 
     struct Stash *perl_stash;           /* Pointer to the global variable
                                          * area */
-    struct Arenas *arena_base;          /* Pointer to this interpreter's 
+    struct Arenas *arena_base;          /* Pointer to this interpreter's
                                          * arena */
     void *piodata;                      /* interpreter's IO system */
 
@@ -152,7 +152,7 @@ typedef struct Parrot_Interp {
                                                  * system since the last
                                                  * compaction run */
     size_t  header_allocs_since_last_collect;   /* The number of header
-                                                 * blocks allocated from 
+                                                 * blocks allocated from
                                                  * the system since the last
                                                  * DOD run */
     size_t  active_PMCs;        /* The number of live PMCs */
@@ -183,6 +183,7 @@ typedef struct Parrot_Interp {
 #define PNCONST   PF_NCONST(interpreter->code)
 
 struct Parrot_Interp *make_interpreter(Interp_flags);
+void Parrot_init(Parrot_Interp, void*);
 
 #if 0
 void runops_generic();
@@ -202,7 +203,7 @@ VAR_SCOPE opcode_t *(*run_native)(struct Parrot_Interp * interpreter,
  * Local variables:
  * c-indentation-style: bsd
  * c-basic-offset: 4
- * indent-tabs-mode: nil 
+ * indent-tabs-mode: nil
  * End:
  *
  * vim: expandtab shiftwidth=4:

@@ -310,7 +310,7 @@ runops(struct Parrot_Interp *interpreter, struct PackFile *code, size_t offset)
     interpreter->code = code;
     interpreter->resume_offset = offset;
     interpreter->resume_flag = 1;
-    
+
     while (interpreter->resume_flag) {
         unsigned int which = 0;
         opcode_t *pc = (opcode_t *)
@@ -431,6 +431,8 @@ make_interpreter(Interp_flags flags)
     /* Set up the memory allocation system */
     mem_setup_allocator(interpreter);
 
+    Parrot_init(interpreter, 0);
+
     /* Need an empty stash */
     interpreter->perl_stash = mem_sys_allocate(sizeof(struct Stash));
     interpreter->perl_stash->stash_hash =
@@ -544,7 +546,7 @@ make_interpreter(Interp_flags flags)
  * Local variables:
  * c-indentation-style: bsd
  * c-basic-offset: 4
- * indent-tabs-mode: nil 
+ * indent-tabs-mode: nil
  * End:
  *
  * vim: expandtab shiftwidth=4:

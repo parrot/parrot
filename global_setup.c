@@ -15,25 +15,25 @@
 #include "parrot/parrot.h"
 
 /* These functions are defined in the auto-generated file core_pmcs.c */
-extern void Parrot_initialize_core_pmcs(void);
-extern void Parrot_register_core_pmcs(PMC* registry);
+extern void Parrot_initialize_core_pmcs(Interp *interp);
+extern void Parrot_register_core_pmcs(Interp *interp, PMC* registry);
 
 void
-init_world(void)
+init_world(Interp *interpreter)
 {
     PMC* key;
     string_init();              /* Set up the string subsystem */
 
     /* Call base vtable class constructor methods */
-    Parrot_initialize_core_pmcs();
+    Parrot_initialize_core_pmcs(interpreter);
 
     /* Now register the names of the PMCs */
 
     /* We need a hash */
-    Parrot_base_classname_hash = pmc_new(NULL, enum_class_PerlHash);
+    Parrot_base_classname_hash = pmc_new(interpreter, enum_class_PerlHash);
 
     /* Now fill the hash */
-    Parrot_register_core_pmcs(Parrot_base_classname_hash);
+    Parrot_register_core_pmcs(interpreter, Parrot_base_classname_hash);
 }
 
 /*

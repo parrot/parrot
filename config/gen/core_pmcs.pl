@@ -58,34 +58,34 @@ sub generate_c {
 
 END
 
-    print OUT "extern void Parrot_${_}_class_init(int);\n"
+    print OUT "extern void Parrot_${_}_class_init(Interp *, int);\n"
       foreach (@pmcs);
 
     print OUT <<"END";
 
-extern void Parrot_initialize_core_pmcs(void);
-void Parrot_initialize_core_pmcs(void)
+extern void Parrot_initialize_core_pmcs(Interp *interp);
+void Parrot_initialize_core_pmcs(Interp *interp)
 {
 END
 
-    print OUT "    Parrot_${_}_class_init(enum_class_${_});\n"
+    print OUT "    Parrot_${_}_class_init(interp, enum_class_${_});\n"
       foreach (@pmcs);
     print OUT <<"END";
 }
 
-static void register_pmc(PMC* registry, int pmc_id)
+static void register_pmc(Interp *interp, PMC* registry, int pmc_id)
 {
     PMC* key;
-    key = key_new_string(NULL, Parrot_base_vtables[pmc_id].name(NULL,NULL));
-    registry->vtable->set_integer_keyed(NULL, registry, key, pmc_id);
+    key = key_new_string(interp, Parrot_base_vtables[pmc_id].name(interp,NULL));
+    registry->vtable->set_integer_keyed(interp, registry, key, pmc_id);
 }
 
-extern void Parrot_register_core_pmcs(PMC* registry);
-void Parrot_register_core_pmcs(PMC* registry)
+extern void Parrot_register_core_pmcs(Interp *interp, PMC* registry);
+void Parrot_register_core_pmcs(Interp *interp, PMC* registry)
 {
 END
 
-    print OUT "    register_pmc(registry, enum_class_$_);\n"
+    print OUT "    register_pmc(interp, registry, enum_class_$_);\n"
       foreach (@pmcs);
     print OUT <<"END";
 }

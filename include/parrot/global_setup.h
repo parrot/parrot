@@ -15,8 +15,10 @@
 #define PARROT_GLOBAL_SETUP_H_GUARD
 
 #include "parrot/config.h"
+#include "parrot/interpreter.h"
 
-void init_world(void);
+
+void init_world(Interp * interp);
 
 #endif
 
@@ -24,7 +26,7 @@ void init_world(void);
  * Local variables:
  * c-indentation-style: bsd
  * c-basic-offset: 4
- * indent-tabs-mode: nil 
+ * indent-tabs-mode: nil
  * End:
  *
  * vim: expandtab shiftwidth=4:

@@ -1,11 +1,11 @@
-/* resources.c 
+/* resources.c
  *  Copyright: (When this is determined...it will go here)
  *  CVS Info
  *     $Id$
  *  Overview:
  *     Allocate and deallocate tracked resources
  *  Data Structure and Algorithms:
- *     
+ *
  *  History:
  *     Initial version by Dan on 2001.10.2
  *  Notes:
@@ -31,7 +31,7 @@ alloc_new_block(struct Parrot_Interp *interpreter,
     struct Memory_Block *new_block;
 
     if (pool) {
-        alloc_size = (size > pool->minimum_block_size) 
+        alloc_size = (size > pool->minimum_block_size)
                    ? size : pool->minimum_block_size;
     }
     else {
@@ -85,7 +85,7 @@ mem_allocate(struct Parrot_Interp *interpreter, size_t *req_size,
     char *return_val;
     size_t size = *req_size;
 
-    /* Ensure that our minimum size requirements are met, 
+    /* Ensure that our minimum size requirements are met,
      * so that we have room for a forwarding COW pointer */
     if( size < sizeof(void*) )
         size = sizeof(void*);
@@ -96,11 +96,6 @@ mem_allocate(struct Parrot_Interp *interpreter, size_t *req_size,
 
     /* Round up to requested alignment */
     size = (size + align_1) & ~align_1;
-
-    if (NULL == interpreter) {
-        void *mem = mem_sys_allocate(size);
-        return mem;
-    }
 
     /* If not enough room, try to find some */
     if (pool->top_block == NULL) {
@@ -121,10 +116,10 @@ mem_allocate(struct Parrot_Interp *interpreter, size_t *req_size,
                 > (size_t)(pool->total_allocated * pool->reclaim_factor)
                  /* don't bother reclaiming if it won't even be enough */
                  && (pool->guaranteed_reclaimable > size)
-                 ) 
+                 )
             {
                 (*pool->compact)(interpreter, pool);
-            } 
+            }
             else {
                 Parrot_do_dod_run(interpreter);
             }
@@ -204,10 +199,10 @@ static void compact_pool(struct Parrot_Interp *interpreter,
 
     /* Snag a block big enough for everything */
     new_block = alloc_new_block(interpreter, total_size, pool);
-  
+
     /* Start at the beginning */
     cur_spot = new_block->start;
-  
+
     /* Run through all the Buffer header pools and copy */
     for (j = -2; j < (INTVAL) interpreter->arena_base->num_sized; j++) {
         if (j == -2) header_pool = interpreter->arena_base->buffer_header_pool;
@@ -215,9 +210,9 @@ static void compact_pool(struct Parrot_Interp *interpreter,
             interpreter->arena_base->string_header_pool;
         else header_pool = interpreter->arena_base->sized_header_pools[j];
         if (header_pool == NULL) continue;
-        
+
         object_size = header_pool->object_size;
-        
+
         for (cur_buffer_arena = header_pool->last_Arena;
              NULL != cur_buffer_arena;
              cur_buffer_arena = cur_buffer_arena->prev)
@@ -226,13 +221,13 @@ static void compact_pool(struct Parrot_Interp *interpreter,
             UINTVAL i;
             for (i = 0; i < cur_buffer_arena->used; i++) {
                 if (b->bufstart && buffer_movable(b->flags)) {
-                    struct Buffer_Tail *tail = 
+                    struct Buffer_Tail *tail =
                         (struct Buffer_Tail *)((char *)b->bufstart +b->buflen);
                     ptrdiff_t offset = 0;
-                    /* we can't perform the math all the time, 
+                    /* we can't perform the math all the time,
                      * because strstart might be in unallocated memory */
                     if (b->flags & BUFFER_strstart_FLAG) {
-                        offset = (ptrdiff_t)((STRING*)b)->strstart - 
+                        offset = (ptrdiff_t)((STRING*)b)->strstart -
                             (ptrdiff_t)b->bufstart;
                     }
                     /* buffer has already been moved; just change the header */
@@ -249,14 +244,14 @@ static void compact_pool(struct Parrot_Interp *interpreter,
                         /* Somewhat of a hack, but if we get per-pool
                          * collections, it should help ease the pain */
                         if (b->flags & BUFFER_strstart_FLAG) {
-                            ((STRING*)b)->strstart = (char *)b->bufstart + 
+                            ((STRING*)b)->strstart = (char *)b->bufstart +
                                 offset;
                         }
                     }
                     else if (!(b->flags & BUFFER_external_FLAG))
                     {
-                        struct Buffer_Tail *new_tail = 
-                            (struct Buffer_Tail *)((char *)cur_spot + 
+                        struct Buffer_Tail *new_tail =
+                            (struct Buffer_Tail *)((char *)cur_spot +
                                 b->buflen);
                         /* Copy our memory to the new pool */
                         memcpy(cur_spot, b->bufstart, b->buflen);
@@ -265,7 +260,7 @@ static void compact_pool(struct Parrot_Interp *interpreter,
                         if (b->flags & BUFFER_COW_FLAG) {
                           /* Let the old buffer know how to find us */
                           *(Buffer**)(b->bufstart) = b;
-                          /* No guaranatees that our data is still COW, 
+                          /* No guaranatees that our data is still COW,
                            * so assume not, and let the above code fix-up */
                           b->flags &= ~BUFFER_COW_FLAG;
                           /* Finally, let the tail know that we've moved,
@@ -275,11 +270,11 @@ static void compact_pool(struct Parrot_Interp *interpreter,
                         }
                         b->bufstart = cur_spot;
                         if (b->flags & BUFFER_strstart_FLAG) {
-                            ((STRING*)b)->strstart = (char *)b->bufstart + 
+                            ((STRING*)b)->strstart = (char *)b->bufstart +
                                 offset;
                         }
                         cur_size = b->buflen + sizeof(struct Buffer_Tail);
-                        cur_size = (cur_size + header_pool->align_1) & 
+                        cur_size = (cur_size + header_pool->align_1) &
                             ~header_pool->align_1;
                         cur_spot += cur_size;
                     }
@@ -290,32 +285,32 @@ static void compact_pool(struct Parrot_Interp *interpreter,
     }
 
     /* Run through all the out-of-band Buffer header pools and copy */
-    /* This code ignores COW, for now. This essentially means that if 
-     * any other buffers COW-reference data with the buffers below, 
+    /* This code ignores COW, for now. This essentially means that if
+     * any other buffers COW-reference data with the buffers below,
      * that data will get duplicated during this collection run. */
     for (j = 0;
          j < (INTVAL)( interpreter->arena_base->extra_buffer_headers.buflen /
             sizeof(Buffer*) );
          j++
         ) {
-        Buffer** buffers = 
+        Buffer** buffers =
             interpreter->arena_base->extra_buffer_headers.bufstart;
         Buffer* b = buffers[j];
         if (b->bufstart && buffer_movable(b->flags)) {
-            struct Buffer_Tail *new_tail = 
+            struct Buffer_Tail *new_tail =
                    (struct Buffer_Tail *)((char *)cur_spot + b->buflen);
-            /* we can't perform the math all the time, 
+            /* we can't perform the math all the time,
              * because strstart might be in unallocated memory */
             ptrdiff_t offset = 0;
             if (b->flags & BUFFER_strstart_FLAG) {
-                offset = (ptrdiff_t)((STRING*)b)->strstart - 
+                offset = (ptrdiff_t)((STRING*)b)->strstart -
                     (ptrdiff_t)b->bufstart;
             }
             memcpy(cur_spot, b->bufstart, b->buflen);
             new_tail->flags = 0;
             b->bufstart = cur_spot;
             cur_size = b->buflen;
-            cur_size = (cur_size + BUFFER_ALIGNMENT - 1) & 
+            cur_size = (cur_size + BUFFER_ALIGNMENT - 1) &
                 ~(BUFFER_ALIGNMENT - 1);
             cur_spot += cur_size;
             if (b->flags & BUFFER_strstart_FLAG) {
@@ -336,11 +331,11 @@ static void compact_pool(struct Parrot_Interp *interpreter,
 
     interpreter->memory_collected += (new_block->top - new_block->start);
 
-    /* Now we're done. We're already on the pool's free list, 
+    /* Now we're done. We're already on the pool's free list,
      * so let us be the only one on the free list and free the rest */
     {
         struct Memory_Block *cur_block, *next_block;
-    
+
         assert( new_block == pool->top_block );
         cur_block = pool->top_block->prev;
         while (cur_block) {
@@ -390,19 +385,14 @@ Parrot_reallocate(struct Parrot_Interp *interpreter, void *from, size_t tosize)
 
     buffer = from;
     copysize = (buffer->buflen > tosize ? tosize : buffer->buflen);
-    if (interpreter) {
-        if (!(buffer->flags & BUFFER_COW_FLAG)) {
-            interpreter->arena_base->memory_pool->guaranteed_reclaimable +=
-                buffer->buflen;
-        }
-        interpreter->arena_base->memory_pool->possibly_reclaimable +=
+    if (!(buffer->flags & BUFFER_COW_FLAG)) {
+        interpreter->arena_base->memory_pool->guaranteed_reclaimable +=
             buffer->buflen;
-        mem = mem_allocate(interpreter, &alloc_size, 
+    }
+    interpreter->arena_base->memory_pool->possibly_reclaimable +=
+        buffer->buflen;
+    mem = mem_allocate(interpreter, &alloc_size,
             interpreter->arena_base->memory_pool, BUFFER_ALIGNMENT-1);
-    }
-    else {
-        mem = mem_allocate(NULL, &alloc_size, NULL, BUFFER_ALIGNMENT-1);
-    }
 
     if (!mem) {
         return NULL;
@@ -418,10 +408,10 @@ Parrot_reallocate(struct Parrot_Interp *interpreter, void *from, size_t tosize)
     return mem;
 }
 
-/* Takes an interpreter, a STRING pointer, and a new size. 
+/* Takes an interpreter, a STRING pointer, and a new size.
  * The destination may be bigger, since we round up to the allocation quantum*/
 void *
-Parrot_reallocate_string(struct Parrot_Interp *interpreter, STRING *str, 
+Parrot_reallocate_string(struct Parrot_Interp *interpreter, STRING *str,
                          size_t tosize)
 {
     size_t copysize;
@@ -431,20 +421,15 @@ Parrot_reallocate_string(struct Parrot_Interp *interpreter, STRING *str,
 
     copysize = (str->buflen > tosize ? tosize : str->buflen);
 
-    if (interpreter) {
-        pool = (str->flags & BUFFER_constant_FLAG)
-            ? interpreter->arena_base->constant_string_pool
-            : interpreter->arena_base->memory_pool;
-        if (!(str->flags & BUFFER_COW_FLAG)) {
-            pool->guaranteed_reclaimable += str->buflen;
-        }
-        pool->possibly_reclaimable += str->buflen;
+    pool = (str->flags & BUFFER_constant_FLAG)
+        ? interpreter->arena_base->constant_string_pool
+        : interpreter->arena_base->memory_pool;
+    if (!(str->flags & BUFFER_COW_FLAG)) {
+        pool->guaranteed_reclaimable += str->buflen;
+    }
+    pool->possibly_reclaimable += str->buflen;
 
-        mem = mem_allocate(interpreter, &alloc_size, pool, STRING_ALIGNMENT-1);
-    }
-    else {
-        mem = mem_allocate(NULL, &alloc_size, NULL, STRING_ALIGNMENT-1);
-    }
+    mem = mem_allocate(interpreter, &alloc_size, pool, STRING_ALIGNMENT-1);
 
     if (!mem) {
         return NULL;
@@ -453,7 +438,7 @@ Parrot_reallocate_string(struct Parrot_Interp *interpreter, STRING *str,
      * track down those bugs, this can be removed which would make
      * things cheaper */
     if (copysize) {
-         memcpy(mem, str->bufstart, copysize);
+        memcpy(mem, str->bufstart, copysize);
     }
     str->bufstart = mem;
     str->buflen = alloc_size;
@@ -468,7 +453,7 @@ Parrot_allocate(struct Parrot_Interp *interpreter, void *buffer, size_t size)
     size_t req_size = size;
     ((Buffer *)buffer)->buflen = 0;
     ((Buffer *)buffer)->bufstart = NULL;
-    ((Buffer *)buffer)->bufstart = mem_allocate(interpreter, &req_size, 
+    ((Buffer *)buffer)->bufstart = mem_allocate(interpreter, &req_size,
         interpreter->arena_base->memory_pool, BUFFER_ALIGNMENT-1);
     ((Buffer *)buffer)->buflen = size;
     return buffer;
@@ -477,7 +462,7 @@ Parrot_allocate(struct Parrot_Interp *interpreter, void *buffer, size_t size)
 /* Allocate at least as much memory as they asked for. We round the
  * amount up to the allocation quantum */
 void *
-Parrot_allocate_string(struct Parrot_Interp *interpreter, STRING *str, 
+Parrot_allocate_string(struct Parrot_Interp *interpreter, STRING *str,
                        size_t size)
 {
     size_t req_size = size;
@@ -487,16 +472,11 @@ Parrot_allocate_string(struct Parrot_Interp *interpreter, STRING *str,
     str->bufstart = NULL;
     str->strstart = NULL;
 
-    if (!interpreter) {
-        str->bufstart = mem_allocate(NULL, &req_size, NULL,STRING_ALIGNMENT-1);
-    }
-    else {
-        pool = (str->flags & BUFFER_constant_FLAG)
-             ? interpreter->arena_base->constant_string_pool
-             : interpreter->arena_base->memory_pool;
-        str->bufstart = mem_allocate(interpreter, &req_size, pool,
+    pool = (str->flags & BUFFER_constant_FLAG)
+        ? interpreter->arena_base->constant_string_pool
+        : interpreter->arena_base->memory_pool;
+    str->bufstart = mem_allocate(interpreter, &req_size, pool,
             STRING_ALIGNMENT-1);
-    }
     str->buflen = req_size;
     str->strstart = str->bufstart;
     return str;
@@ -507,7 +487,7 @@ Parrot_allocate_string(struct Parrot_Interp *interpreter, STRING *str,
 
 /* Create a new memory pool */
 static struct Memory_Pool *
-new_memory_pool(size_t min_block, 
+new_memory_pool(size_t min_block,
                 void (*compact)(struct Parrot_Interp *, struct Memory_Pool *))
 {
     struct Memory_Pool *pool;
@@ -530,14 +510,24 @@ void
 Parrot_initialize_memory_pools(struct Parrot_Interp *interpreter)
 {
     /* Buffers */
-    interpreter->arena_base->memory_pool = 
-        new_memory_pool(16384, 
+    /* setting min_size to 16384 makes this assert:
+     *
+     * assert(new_block->size >= (size_t)new_block->top -
+     *  (size_t)new_block->start);
+     *
+     * fail. 16 bytes seem to be missing, or where copied
+     * and not accounted elsewhere. This breaks 2 tests:
+     * t/op/string_29 and _94, when run with --gc-debug
+     */
+
+    interpreter->arena_base->memory_pool =
+        new_memory_pool(32768,
                         &compact_pool);
-    alloc_new_block(interpreter, 32768, 
+    alloc_new_block(interpreter, 32768,
                     interpreter->arena_base->memory_pool);
 
     /* Constant strings - not compacted */
-    interpreter->arena_base->constant_string_pool = 
+    interpreter->arena_base->constant_string_pool =
         new_memory_pool(8192, NULL);
 }
 
@@ -546,7 +536,7 @@ Parrot_initialize_memory_pools(struct Parrot_Interp *interpreter)
  * Local variables:
  * c-indentation-style: bsd
  * c-basic-offset: 4
- * indent-tabs-mode: nil 
+ * indent-tabs-mode: nil
  * End:
  *
  * vim: expandtab shiftwidth=4:

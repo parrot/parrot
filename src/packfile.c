@@ -329,14 +329,14 @@ PackFile_unpack(struct Parrot_Interp *interpreter, struct PackFile *self,
     }
     if (header->major != PARROT_MAJOR_VERSION ||
             header->minor != (PARROT_MINOR_VERSION|PARROT_PATCH_VERSION)) {
-        internal_exception(1, "PackFile_unpack: Bytecode not valid for this "
+        PIO_eprintf(NULL, "PackFile_unpack: Bytecode not valid for this "
                     "interpreter: version mismatch\n");
         return 0;
     }
 
     /* check the fingerprint */
     if (!PackFile_check_fingerprint (header->pad)) {
-        internal_exception(1, "PackFile_unpack: Bytecode not valid for this "
+        PIO_eprintf(NULL, "PackFile_unpack: Bytecode not valid for this "
                     "interpreter: fingerprint mismatch\n");
         return 0;
     }

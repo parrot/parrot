@@ -8,10 +8,10 @@
  *      (io_unix, io_win32, io_buf, io_stdio, io_utf8, etc.)
  *  Data Structure and Algorithms:
  *      Uses the IO PMC defined in io.h
- *      Uses ParrotIO structs in io.h 
+ *      Uses ParrotIO structs in io.h
  *  History:
  *      Initially written by Melvin Smith
- *  Notes:     
+ *  Notes:
  *      In future rework to use copy-on-write IO stacks rather than
  *              creating a new stack for each IO stream.
  *      Add support for loadable layers in Parrot bytecode
@@ -169,7 +169,7 @@ PIO_init_stacks(theINTERP)
 #endif
 #ifdef PIO_OS_STDIO
     PIO_push_layer(interpreter, PIO_base_new_layer(&pio_stdio_layer), NULL);
-#endif  
+#endif
 #if 0
     PIO_push_layer(interpreter, PIO_base_new_layer(&pio_buf_layer), NULL);
 #endif
@@ -618,13 +618,13 @@ INTVAL
 PIO_fprintf(theINTERP, ParrotIO *io, const char *s, ...) {
     va_list args;
     INTVAL ret=-1;
-    
+
     va_start(args, s);
-    
+
     ret=PIO_putps(interpreter, io, Parrot_vsprintf_c(interpreter, s, args));
-    
+
     va_end(args);
-    
+
     return ret;
 }
 
@@ -633,23 +633,23 @@ PIO_printf(theINTERP, const char *s, ...) {
     va_list args;
     STRING *str;
     INTVAL ret=-1;
-    
+
     va_start(args, s);
-    
+
     str=Parrot_vsprintf_c(interpreter, s, args);
-    
+
     if(interpreter) {
         ret=PIO_putps(interpreter, PIO_STDOUT(interpreter), str);
     }
     else {
-        /* Be nice about this... 
+        /* Be nice about this...
         **   XXX BD Should this use the default PIO_STDOUT or something?
         */
         ret=printf("%s", string_to_cstring(interpreter, str));
     }
-    
+
     va_end(args);
-    
+
     return ret;
 }
 
@@ -658,23 +658,23 @@ PIO_eprintf(theINTERP, const char *s, ...) {
     va_list args;
     STRING *str;
     INTVAL ret=-1;
-    
+
     va_start(args, s);
-    
-    str=Parrot_vsprintf_c(interpreter, s, args);
-    
+
     if(interpreter) {
+        str=Parrot_vsprintf_c(interpreter, s, args);
+
         ret=PIO_putps(interpreter, PIO_STDERR(interpreter), str);
     }
     else {
-        /* Be nice about this... 
+        /* Be nice about this...
         **   XXX BD Should this use the default PIO_STDERR or something?
         */
-        ret=fprintf(stderr, "%s", string_to_cstring(interpreter, str));
+        ret=vfprintf(stderr, s, args);
     }
-    
+
     va_end(args);
-    
+
     return ret;
 }
 

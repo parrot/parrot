@@ -239,13 +239,6 @@ get_bufferlike_pool(struct Parrot_Interp *interpreter,
 PMC *
 new_pmc_header(struct Parrot_Interp *interpreter)
 {
-    /* Icky special case. Grab system memory if there's no interpreter
-     * yet */
-    if (interpreter == NULL) {
-        PMC *return_me = mem_sys_allocate(sizeof(PMC));
-        return return_me;
-    }
-
     return get_free_pmc(interpreter, interpreter->arena_base->pmc_pool);
 }
 
@@ -253,17 +246,10 @@ STRING *
 new_string_header(struct Parrot_Interp *interpreter, UINTVAL flags)
 {
     STRING * string;
-    /* Icky special case. Grab system memory if there's no interpreter
-     * yet */
-    if (interpreter == NULL) {
-        STRING *return_me = mem_sys_allocate(sizeof(STRING));
-        return_me->flags = flags;
-        return return_me;
-    }
     string = get_free_buffer(interpreter, (flags & BUFFER_constant_FLAG)
-                             ? interpreter->arena_base->constant_string_header_pool
-                             : interpreter->arena_base->string_header_pool
-                             );
+            ? interpreter->arena_base->constant_string_header_pool
+            : interpreter->arena_base->string_header_pool
+            );
     string->flags |= flags | BUFFER_strstart_FLAG;
     string->strstart = 0;
     return string;
@@ -272,13 +258,6 @@ new_string_header(struct Parrot_Interp *interpreter, UINTVAL flags)
 Buffer *
 new_buffer_header(struct Parrot_Interp *interpreter)
 {
-    /* Icky special case. Grab system memory if there's no interpreter
-     * yet */
-    if (interpreter == NULL) {
-        Buffer *return_me = mem_sys_allocate(sizeof(Buffer));
-        return return_me;
-    }
-
     return get_free_buffer(interpreter,
                               interpreter->arena_base->buffer_header_pool);
 }
@@ -288,13 +267,6 @@ new_bufferlike_header(struct Parrot_Interp *interpreter, size_t size)
 {
     struct Small_Object_Pool* pool;
     Buffer *buffer;
-
-    /* Icky special case. Grab system memory if there's no interpreter
-     * yet */
-    if (interpreter == NULL) {
-        Buffer *return_me = mem_sys_allocate(size);
-        return return_me;
-    }
 
     pool = get_bufferlike_pool(interpreter, size);
 
@@ -434,33 +406,43 @@ Parrot_initialize_header_pools(struct Parrot_Interp *interpreter)
     /* Init the constant string header pool */
     interpreter->arena_base->constant_string_header_pool = new_string_pool(interpreter, 1);
 
+
+    /* Init the buffer header pool - this must be the first pool created! */
+    interpreter->arena_base->buffer_header_pool = new_buffer_pool(interpreter);
+
+    /* Init the string header pool */
+    interpreter->arena_base->string_header_pool =
+        new_string_pool(interpreter, 0);
+
+    /* Init the PMC header pool */
+    interpreter->arena_base->pmc_pool = new_pmc_pool(interpreter);
+
+
+
+}
+#if 0
+
+/* if we want these names, they must be added in DOD */
+void
+Parrot_initialize_header_pool_names(struct Parrot_Interp *interpreter)
+{
+    interpreter->arena_base->string_header_pool->name
+        = string_make(interpreter, "String Pool", strlen("String Pool"),
+                      0, BUFFER_constant_FLAG, 0);
+    interpreter->arena_base->pmc_pool->name
+        = string_make(interpreter, "PMC Pool", strlen("PMC Pool"),
+                      0, BUFFER_constant_FLAG, 0);
     /* Set up names for each header pool,
      * now that we have a constant string pool available to us */
     interpreter->arena_base->constant_string_header_pool->name
         = string_make(interpreter, "Constant String Pool", strlen("Constant String Pool"),
                       0, BUFFER_constant_FLAG, 0);
-
-    /* Init the buffer header pool - this must be the first pool created! */
-    interpreter->arena_base->buffer_header_pool = new_buffer_pool(interpreter);
-
     interpreter->arena_base->buffer_header_pool->name
         = string_make(interpreter, "Generic Header Pool", strlen("Generic Header Pool"),
                       0, BUFFER_constant_FLAG, 0);
-
-    /* Init the string header pool */
-    interpreter->arena_base->string_header_pool = new_string_pool(interpreter, 0);
-
-    interpreter->arena_base->string_header_pool->name
-        = string_make(interpreter, "String Pool", strlen("String Pool"),
-                      0, BUFFER_constant_FLAG, 0);
-
-    /* Init the PMC header pool */
-    interpreter->arena_base->pmc_pool = new_pmc_pool(interpreter);
-
-    interpreter->arena_base->pmc_pool->name
-        = string_make(interpreter, "PMC Pool", strlen("PMC Pool"),
-                      0, BUFFER_constant_FLAG, 0);
 }
+
+#endif
 
 /*
  * Local variables:
