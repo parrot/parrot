@@ -799,6 +799,8 @@ PIO_reads(theINTERP, PMC *pmc, size_t len)
     ParrotIOLayer *l = PMC_struct_val(pmc);
     ParrotIO *io = PMC_data(pmc);
 
+    res->representation = enum_stringrep_one;
+
     if (!io)
         return res;
 

@@ -16,7 +16,7 @@ Tests the Parrot IO operations.
 
 =cut
 
-use Parrot::Test tests => 26;
+use Parrot::Test tests => 27;
 use Test::More;
 
 sub file_content_is {
@@ -468,5 +468,32 @@ CODE
 utf8
 utf8
 buf
+OUTPUT
+
+output_is(<<'CODE', <<'OUTPUT', "substr after reading from file");
+##PIR##
+.sub _main
+    # Write something into a file
+    .local pmc out
+    out = open "temp.file", ">"
+    print out, "0123456789\n"
+    close out
+
+    # read file contents back in
+    .local pmc in
+    in = open "temp.file", "<"
+    .local string from_file
+    from_file = read in, 20
+
+    # Extract part of the read in file
+    .local string head_from_file
+    substr head_from_file, from_file, 0, 5, ''
+    print head_from_file
+    print "\n"
+
+    end
+.end
+CODE
+01234
 OUTPUT
 
