@@ -34,7 +34,6 @@ use vars qw(@steps);
     inter/ops.pl
     inter/exp.pl
     inter/pmc.pl
-    auto/ccflags.pl
     auto/alignptrs.pl
     auto/headers.pl
     auto/sizes.pl
