@@ -243,7 +243,7 @@ void
 string_init(Parrot_Interp interpreter)
 {
     size_t i;
-    char *data_dir;
+    const char *data_dir;
     int free_data_dir = 0;
 
     /* DEFAULT_ICU_DATA_DIR is configured at build time, or it may be
@@ -2895,7 +2895,7 @@ string_hash(Interp * interpreter, STRING *s)
 
 =item C<STRING *
 string_unescape_cstring(Interp * interpreter,
-    char *cstring, char delimiter)>
+    char *cstring, char delimiter, char *charset)>
 
 Unescapes the specified C string. These sequences are covered:
 
@@ -2987,7 +2987,7 @@ set_char_getter(STRING *s)
 
 STRING *
 string_unescape_cstring(Interp * interpreter,
-    char *cstring, char delimiter)
+    const char *cstring, char delimiter, const char *charset)
 {
     size_t clength = strlen(cstring);
     STRING *result;
@@ -2995,11 +2995,16 @@ string_unescape_cstring(Interp * interpreter,
     Parrot_UInt4 r;
     Parrot_unescape_cb char_at;
     char_setter_func set_char_at;
+    UINTVAL flags;
 
     if (delimiter && clength)
         --clength;
-    result = string_make(interpreter, cstring, clength, "iso-8859-1",
-            PObj_constant_FLAG);
+    flags = PObj_constant_FLAG;
+    if (!charset)
+        charset = "iso-8859-1";
+    else
+        flags |= PObj_private7_FLAG;  /* Pythonic unicode flag */
+    result = string_make(interpreter, cstring, clength, charset, flags);
     char_at     = set_char_getter(result);
     set_char_at = set_char_setter(result);
 

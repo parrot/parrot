@@ -24,7 +24,8 @@ enum VARTYPE {		/* variable type can be */
     VT_END_SLICE   = PF_VT_END_SLICE   ,
     VT_START_ZERO  = PF_VT_START_ZERO  ,   /* .. y 0..start */
     VT_END_INF     = PF_VT_END_INF     ,   /* x..  start..inf */
-    VT_SLICE_BITS  = PF_VT_SLICE_BITS
+    VT_SLICE_BITS  = PF_VT_SLICE_BITS,
+    VT_UNICODE  = 1 << 16       /* unicode string constant */
 };
 
 /* this VARTYPE needs register allocation and such */

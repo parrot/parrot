@@ -3,7 +3,7 @@
 use strict;
 use lib '../../lib';
 
-use Parrot::Test tests => 5;
+use Parrot::Test tests => 6;
 
 sub test {
     language_output_is('python', $_[0], '', $_[1]);
@@ -43,5 +43,11 @@ if __name__ == '__main__':
     print `42L`, 42L
     print `42`, 42
     print `"ab"`, "ab"
+CODE
+
+test(<<'CODE', 'repr of strings');
+if __name__ == '__main__':
+    print `"ab"`, "ab"
+    print `u"ab"`, u"ab"
 CODE
 

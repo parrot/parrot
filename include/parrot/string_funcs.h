@@ -86,8 +86,8 @@ STRING *string_bitwise_not(struct Parrot_Interp *interpreter, STRING *s,
 UINTVAL string_decode_and_advance(struct string_iterator_t *i);
 
 size_t string_hash(Interp *interpreter, STRING *s);
-STRING * string_unescape_cstring(struct Parrot_Interp *, char *cstring,
-									char delimiter);
+STRING * string_unescape_cstring(struct Parrot_Interp *,
+        const char *cstring, char delimiter, const char *enc_or_charset);
 
 STRING *string_upcase(struct Parrot_Interp *, const STRING *);
 STRING *string_downcase(struct Parrot_Interp *, const STRING *);

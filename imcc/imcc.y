@@ -277,7 +277,8 @@ itcall_sub(SymReg* sub)
 %token <t> PROTOTYPED NON_PROTOTYPED MAIN LOAD IMMEDIATE POSTCOMP METHOD
 %token <s> LABEL
 %token <t> EMIT EOM
-%token <s> IREG NREG SREG PREG IDENTIFIER STRINGC INTC FLOATC REG MACRO ENDM
+%token <s> IREG NREG SREG PREG IDENTIFIER REG MACRO ENDM
+%token <s> STRINGC INTC FLOATC USTRINGC
 %token <s> PARROT_OP
 %type <t> type newsub ptr
 %type <i> program class class_body member_decls member_decl field_decl
@@ -1064,6 +1065,7 @@ const:
      INTC          {  $$ = mk_const($1, 'I'); }
    | FLOATC        {  $$ = mk_const($1, 'N'); }
    | STRINGC       {  $$ = mk_const($1, 'S'); }
+   | USTRINGC      {  $$ = mk_const($1, 'U'); }
    ;
 
 string:

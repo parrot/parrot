@@ -317,6 +317,10 @@ _mk_const(SymReg *hsh[], char * name, int t)
 {
     SymReg * r = _mk_symreg(hsh, name, t);
     r->type = VTCONST;
+    if (t == 'U') {
+        r->set = 'S';
+        r->type |= VT_UNICODE;
+    }
     r->use_count++;
     return r;
 }

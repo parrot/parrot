@@ -505,7 +505,7 @@ PF_fetch_string(Parrot_Interp interp, struct PackFile *pf, opcode_t **cursor)
 
     flags = PF_fetch_opcode(pf, cursor);
     /* don't let PBC mess our internals - only constant or not */
-    flags &= PObj_constant_FLAG;
+    flags &= (PObj_constant_FLAG | PObj_private7_FLAG);
     representation = PF_fetch_opcode(pf, cursor);
 
     /* These may need to be separate */
@@ -523,13 +523,13 @@ PF_fetch_string(Parrot_Interp interp, struct PackFile *pf, opcode_t **cursor)
     {
         representation = enum_stringrep_one;
     }
-    
+
     /* check if we need to worry about byte order */
-    if( (representation == enum_stringrep_one) 
+    if( (representation == enum_stringrep_one)
         || (pf->header->byteorder == PARROT_BIGENDIAN) ) /* byte order ok*/
     {
-        encoding_name = 
-            string_primary_encoding_for_representation(interp, 
+        encoding_name =
+            string_primary_encoding_for_representation(interp,
                                                     representation);
     }
     else /* byte order mismatch */
@@ -547,7 +547,7 @@ PF_fetch_string(Parrot_Interp interp, struct PackFile *pf, opcode_t **cursor)
             encoding_name = "UTF32_OppositeEndian";
         }
     }
-    
+
     s = string_make(interp, *cursor, size, encoding_name, flags);
 
 #if TRACE_PACKFILE
@@ -589,7 +589,7 @@ PF_store_string(opcode_t *cursor, STRING *s)
         padded_size += sizeof(opcode_t) - (padded_size % sizeof(opcode_t));
     }
 
-    *cursor++ = PObj_get_FLAGS(s); /* only constant_FLAG */
+    *cursor++ = PObj_get_FLAGS(s); /* only constant_FLAG and private7 */
     *cursor++ = s->representation;
     *cursor++ = s->bufused;
 

@@ -68,7 +68,7 @@ static struct globals {
 } globals;
 
 
-static int add_const_str(Interp *, char *str);
+static int add_const_str(Interp *, SymReg *r);
 
 static void imcc_globals_destroy(int ex, void *param);
 static opcode_t build_key(Interp *interpreter, SymReg *reg);
@@ -421,7 +421,7 @@ store_labels(Interp *interpreter, IMC_Unit * unit, int *src_lines, int oldsize)
             code_size += 2;
             /* add inter_segment jump */
             r[0] = mk_const(glabel, 'S');
-            r[0]->color = add_const_str(interpreter, glabel);
+            r[0]->color = add_const_str(interpreter, r[0]);
             INS(interpreter, unit, "branch_cs", "", r, 1, 0, 1);
         }
     }
@@ -489,26 +489,34 @@ fixup_bsrs(Interp *interpreter)
 
 /* add constant string to constant_table */
 static int
-add_const_str(Interp *interpreter, char *str)
+add_const_str(Interp *interpreter, SymReg *r)
 {
     int k;
-    char *buf = str;
+    char *buf = r->name;
     STRING *s = NULL;
+    char *charset = NULL;
 
     /*
      * TODO strip delimiters in lexer, this needs adjustment in printint strings
      */
     if (*buf == '"') {
         buf++;
-        s = string_unescape_cstring(interpreter, buf, '"');
+        if (r->type & VT_UNICODE) {
+            /*
+             * not really a charset but our reprensentation
+             */
+            charset = "iso-8859-1"; /* still begin with ascii */
+        }
+        s = string_unescape_cstring(interpreter, buf, '"', charset);
     }
-    else if (*buf == '\'') {
+    else if (*buf == '\'') {   /* TODO handle python raw strings */
         buf++;
         s = string_make(interpreter, buf, strlen(buf) - 1, "iso-8859-1",
 						PObj_constant_FLAG);
     }
     else {
-        s = string_unescape_cstring(interpreter, buf, 0);
+        /* unquoted bare name - ascii only for now */
+        s = string_unescape_cstring(interpreter, buf, 0, NULL);
     }
 
     k = PDB_extend_const_table(interpreter);
@@ -751,7 +759,7 @@ add_1_const(Interp *interpreter, SymReg *r)
                 r->color = atol(r->name);
             break;
         case 'S':
-            r->color = add_const_str(interpreter, r->name);
+            r->color = add_const_str(interpreter, r);
             break;
         case 'N':
             r->color = add_const_num(interpreter, r->name);

@@ -163,7 +163,7 @@ sub decode_line {
 		for (my $i = 0; $i < $n; $i++) {
 		    my ($a, $def) = split(/=/, $args[$i]);
 		    $a =~ s/\s//g;
-		    $a = "'$a'";   # quote argument
+		    $a = qq!"$a"!;   # quote argument
 		    $def_arg_names{$f}{$a} = $i;
 		    # print STDERR "def $f($a = $i)\n";
 		}
@@ -309,11 +309,14 @@ sub typ {
     elsif ($c =~ /^[+-]?\d+$/) {	# int
 	$t = 'I';
     }
-    elsif ($c =~ /^\d+[lL]$/) {	# bigint   XXX
+    elsif ($c =~ /^\d+[lL]$/) {	# bigint
 	$t = 'B';
     }
-    elsif ($c =~ /^'.*'$/) {	# string
+    elsif ($c =~ /^'.*'$/) {	# string consts are single quoted by dis
 	$t = 'S';
+    }
+    elsif ($c =~ /^u'.*'$/) {	# unicode-string TODO r raw
+	$t = 'U';
     }
     elsif (is_num($c)) {        # num
 	$t = 'N';
@@ -337,28 +340,31 @@ EOC
 
 sub LOAD_CONST {
     my ($n, $c, $cmt) = @_;
-    if ($c =~ /^[_a-zA-Z]/ && !$names{$c}) {	# True, False ...
-	print <<EOC;
+    my $typ = typ($c);
+    if ($typ eq 'P') {
+	if ($c =~ /^[_a-zA-Z]/ && !$names{$c}) {	# True, False ...
+	    print <<EOC;
 	.local pmc $c $cmt
 	$c = new .$c
 EOC
-	$names{$c} = 1;
-    }
-    elsif (typ($c) eq 'P') {
-	my $typ = $DEFVAR;
-	if (is_imag($c)) {
-	    $typ = '.Complex';
-	    $c = qq!"$c"!;
+	    $names{$c} = 1;
 	}
-        my $pmc = temp('P');
-	print <<EOC;
+	else {
+	    my $typ = $DEFVAR;
+	    if (is_imag($c)) {
+		$typ = '.Complex';
+		$c = qq!"$c"!;
+	    }
+	    my $pmc = temp('P');
+	    print <<EOC;
 	$pmc = new $typ $cmt
 	$pmc = $c
 EOC
-	push @stack, [$n, $pmc, 'P'];
-	return;
+	    push @stack, [$n, $pmc, 'P'];
+	    return;
+	}
     }
-    elsif (typ($c) eq 'B') {
+    elsif ($typ eq 'B') {   # bigint
 	my $typ = $DEFVAR;
         my $pmc = temp('P');
 	$c =~ s/[lL]$//;
@@ -369,12 +375,25 @@ EOC
 	push @stack, [$n, $pmc, 'P'];
 	return;
     }
+    elsif ($typ =~ /[US]/) {   # strings
+	# parrot has double quoted escapes
+	$c =~ s/"/\\"/g;	# XXX unescape
+	my $u = defined $1 ? $1 : "";
+	if ($c =~ /^(u|U)?'(.*)'/) {
+	    my $u = defined $1 ? "u:" : "";
+	    my $s = $2;
+	    $c =~ s/.*/$u"$s"/;
+	}
+	print <<EOC;
+	\t$cmt
+EOC
+    }
     else {
 	print <<EOC;
 	\t$cmt
 EOC
     }
-    push @stack, [$n, $c, typ($c)];
+    push @stack, [$n, $c, $typ];
 }
 sub STORE_NAME {
     my ($n, $c, $cmt) = @_;
@@ -854,7 +873,6 @@ EOC
 	my $val = pop @stack;
 	my $arg = pop @stack;
 	my $arg_name = $arg->[1];
-	$val = $val;
 	$j = $def_arg_names{$name}{$arg_name};
 	print <<EOC;
 	# func $name named arg $j name $arg_name val $val->[1]

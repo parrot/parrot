@@ -90,6 +90,10 @@ LETTERDIGIT     [a-zA-Z0-9_]
 LABELLETTERDIGIT     ([a-zA-Z0-9_@]|"::")
 ID              {LETTER}{LABELLETTERDIGIT}*
 STRINGCONSTANT  \"(\\\"|[^"\n]*)*\"
+ENCCHAR         {LETTER}|{DIGIT}|"-"
+ENCCHARS        {ENCCHAR}*
+ENC             {LETTER}{ENCCHARS}":"
+UNICODE         {ENC}{STRINGCONSTANT}
 CHARCONSTANT    \'[^'\n]*\'
 RANKSPEC        \[[,]*\]
 EOL		\r?\n
@@ -426,6 +430,12 @@ SP              [ ]
         return(STRINGC); /* XXX delete quotes, -> emit, pbc */
     }
 
+<*>{UNICODE} {
+        char *p = strchr(yytext, '"');
+	valp->s = str_dup(p);    /* enc:"..." */
+        /* TODO pass charset */
+        return(USTRINGC); /* XXX delete quotes, -> emit, pbc */
+    }
 <*>{CHARCONSTANT} {
         valp->s = str_dup(yytext); /* XXX delete quotes, -> emit, pbc */
         return(STRINGC);
