@@ -1135,7 +1135,7 @@ libnci.so: $(SRC)/nci_test$(O)
 	    $(LD_OUT)$@ $(SRC)/nci_test$(O)
 
 libnci.dll: $(SRC)/nci_test$(O)
-	$(LD) $(LD_SHARED) libnci.def $(LDFLAGS) \
+	$(LD) $(LD_SHARED) -def:libnci.def $(LDFLAGS) \
 	    $(LD_OUT)$@ $(SRC)/nci_test$(O)
 
 # vim ctags

@@ -79,10 +79,14 @@ Returns the number as a Parrot string.
     STRING* get_string () {
         char* buff = mem_sys_allocate(80);
         STRING* s;
+	char* pos = buff;
+
+	if (signbit(PMC_num_val(SELF)))
+	  *pos++ = '-';
 #ifdef HAS_SNPRINTF
-        snprintf(buff,80,FLOATVAL_FMT,PMC_num_val(SELF));
+        snprintf(pos,80,FLOATVAL_FMT,fabs(PMC_num_val(SELF)));
 #else
-        sprintf(buff,FLOATVAL_FMT,PMC_num_val(SELF));  /* XXX buffer overflow! */
+        sprintf(pos,FLOATVAL_FMT,fabs(PMC_num_val(SELF)));  /* XXX buffer overflow! */
 #endif
         s = string_make(INTERP,buff,strlen(buff),"iso-8859-1",0);
         mem_sys_free(buff);

@@ -23,7 +23,7 @@ Parrot_Run_OS_Command(Parrot_Interp interpreter, STRING *command) {
     /* Start the child process. */
     if(
         !CreateProcess( shell, cmd,
-        NULL, NULL, FALSE, 0, NULL, NULL, &si, &pi )
+        NULL, NULL, TRUE, 0, NULL, NULL, &si, &pi )
     ) {
         internal_exception(NOSPAWN, "Can't spawn child process");
     }
