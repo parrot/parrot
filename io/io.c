@@ -719,9 +719,6 @@ Reads up to C<len> bytes from C<*pmc> and copys them into C<*buffer>.
 
 */
 
-/* temporary */
-void Parrot_string_downscale(Interp *interpreter, STRING *s,
-				parrot_string_representation_t representation);
 
 STRING *
 PIO_reads(theINTERP, PMC *pmc, size_t len)

@@ -261,6 +261,7 @@ struct _ParrotIOLayerAPI {
 
 ParrotIOLayer * PIO_utf8_register_layer(void);
 void PIO_push_layer_str(Interp *interpreter, PMC *pmc, STRING *ls);
+STRING* PIO_pop_layer_str(Interp *interpreter, PMC *pmc);
 
 #endif /* PARROT_IO_PRIVATE_H_GUARD */
 

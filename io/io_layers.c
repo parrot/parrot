@@ -89,6 +89,11 @@ PIO_push_layer(theINTERP, ParrotIOLayer *layer, PMC *pmc)>
 
 Push a layer onto an IO object (C<*pmc>) or the default stack.
 
+=item C<void
+PIO_push_layer_str(theINTERP, PMC *pmc, STRING *layer_name)>
+
+Push a layer onto an IO object (C<*pmc>).
+
 =cut
 
 */
@@ -177,6 +182,12 @@ PIO_pop_layer(theINTERP, PMC *pmc)>
 
 Pop a layer from an IO object (C<*pmc>) or the default stack.
 
+=item C<STRING *
+PIO_pop_layer_str(theINTERP, PMC *pmc)>
+
+Pop a layer from an IO object (C<*pmc>) and return the name of the
+popped layer. The layer gets freed.
+
 =cut
 
 */
@@ -190,6 +201,12 @@ PIO_pop_layer(theINTERP, PMC *pmc)
     if (!PMC_IS_NULL(pmc)) {
         if (!io)
             return 0;
+        /*
+         * if this is a global layer create a copy first
+         */
+        if (!(io->stack->flags & PIO_L_LAYER_COPIED)) {
+            io->stack = PIO_copy_stack(io->stack);
+        }
         layer = io->stack;
         if (layer) {
             io->stack = layer->down;
@@ -217,6 +234,19 @@ PIO_pop_layer(theINTERP, PMC *pmc)
     }
 
     return 0;
+}
+
+STRING *
+PIO_pop_layer_str(Interp *interpreter, PMC *pmc)
+{
+    ParrotIOLayer *layer;
+    STRING *ls;
+
+    layer = PIO_pop_layer(interpreter, pmc);
+    ls = string_make(interpreter, layer->name, strlen(layer->name),
+            "iso-8859-1", 0);
+    mem_sys_free(layer);
+    return ls;
 }
 
 /*

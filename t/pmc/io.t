@@ -16,7 +16,7 @@ Tests the Parrot IO operations.
 
 =cut
 
-use Parrot::Test tests => 24;
+use Parrot::Test tests => 25;
 use Test::More;
 
 sub file_content_is {
@@ -431,3 +431,23 @@ output_like(<<'CODE', <<'OUTPUT', "layer names");
 CODE
 /^(unix|win32|stdio)-buf-buf-\1--$/
 OUTPUT
+
+output_is(<<'CODE', <<'OUTPUT', "layer push, pop");
+    getstdin P0
+    push P0, "utf8"
+    set S0, P0[-1]
+    print S0
+    print "\n"
+    pop S1, P0
+    print S1
+    print "\n"
+    set S0, P0[-1]
+    print S0
+    print "\n"
+    end
+CODE
+utf8
+utf8
+buf
+OUTPUT
+

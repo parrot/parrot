@@ -180,12 +180,20 @@ layers an empty string is returned.
 
 Push the layer name C<value> onto the PIO's layer stack.
 
+=item C<STRING* pop_string ()>
+
+Pop a layer off the PIO's layer stack. Returns the layer name.
+
 =cut
 
 */
 
     void push_string (STRING* value) {
         PIO_push_layer_str(INTERP, SELF, value);
+    }
+
+    STRING* pop_string () {
+        return PIO_pop_layer_str(INTERP, SELF);
     }
 }
 
