@@ -127,8 +127,10 @@ A string of length 21
 length 21
 OUTPUT
 
-output_is( <<'CODE', '', "2-param concat, null onto null" );
+output_is( <<'CODE', '<><', "2-param concat, null onto null" );
+    print "<>"
     concat S0,S0
+    print "<"
     end
 CODE
 
