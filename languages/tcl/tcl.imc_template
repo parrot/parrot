@@ -18,7 +18,7 @@
   .local Sub a_sub
   .local int argc
   .local int retcode
-  .local string retval
+  .local pmc retval
 
   # start with a new pad...
   new_pad 0
