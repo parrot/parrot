@@ -16,7 +16,7 @@ Tests the object/class subsystem.
 
 =cut
 
-use Parrot::Test tests => 21;
+use Parrot::Test tests => 23;
 use Test::More;
 
 output_is(<<'CODE', <<'OUTPUT', "findclass (base class)");
@@ -211,8 +211,19 @@ output_is(<<'CODE', <<'OUTPUT', "new object - classname");
     classname S0, P2	# object
     print S0
     print "\n"
+
+    class P3, P1
+    classname S0, P1	# class
+    print S0
+    print "\n"
+    class P3, P1
+    classname S0, P2	# object
+    print S0
+    print "\n"
     end
 CODE
+Foo
+Foo
 Foo
 Foo
 OUTPUT
@@ -305,11 +316,11 @@ output_is(<<'CODE', <<'OUTPUT', "addattribute");
     classname S0, P1
     eq S0, "Foo", ok2
     print "not "
-ok2: 
+ok2:
     print "ok 2\n"
 # Check that we can add multiple attributes
     set I0, 0
-l1: 
+l1:
     set S0, I0
     addattribute P1, S0
     inc I0
@@ -380,7 +391,7 @@ output_is(<<'CODE', <<'OUTPUT', "set/get multiple object attribs");
     new P3, .PerlInt
     set P3, 4201
     new P4, .PerlHash
-    set P4["Key"], "Value" 
+    set P4["Key"], "Value"
 
     setattribute P2, I1, P3
     add I2, I1, 1
@@ -404,10 +415,23 @@ output_like(<<'CODE', <<'OUTPUT', "setting non-existant attribute");
     find_type I0, "Foo"
     new P2, I0
     classoffset I1, P2, "Foo"
-    add I2, I1, 6
 
     new P3, .PerlInt
-    setattribute P2, I2, P3
+    setattribute P2, I1, P3
+    end
+CODE
+/No such attribute/
+OUTPUT
+
+output_like(<<'CODE', <<'OUTPUT', "setting non-existant attribute - 1");
+    newclass P1, "Foo"
+    find_type I0, "Foo"
+    new P2, I0
+    classoffset I1, P2, "Foo"
+
+    new P3, .PerlInt
+    dec I1
+    setattribute P2, I1, P3
     end
 CODE
 /No such attribute/
@@ -468,7 +492,7 @@ output_is(<<'CODE', <<'OUTPUT', "attribute values and subclassing");
     classoffset I1, P2, "Foo"
     new P3, I0
     classoffset I3, P3, "Foo"
- 
+
 # Note that setattribute holds the actual PMC, not a copy, so
 # in this test both attributes get the PMC from P4, and should
 # both have the same value, despite the C<inc>.
@@ -507,6 +531,68 @@ CODE
 11
 101
 101
+OUTPUT
+
+output_is(<<'CODE', <<'OUTPUT', "attribute values and subclassing 2");
+    newclass P1, "Foo"
+    # must add attributes before object instantion
+    addattribute P1, "i"
+    addattribute P1, "j"
+
+    newclass P2, "Bar"		# or subclass P2, P1, "Bar" ???
+    addattribute P2, "k"
+    addattribute P2, "l"
+    addparent P2, P1
+
+    # instantiate a Bar object
+    find_type I1, "Bar"
+    new P3, I1
+
+    classoffset I3, P3, "Foo"   # The parent class
+    # print I3                  # don't assume anything about this offset
+    # print "\n"
+
+
+    set I0, I3			# is this always the first attribute?
+
+    new P10, .PerlString	# set attribute values
+    set P10, "i\n"
+    setattribute P3, I0, P10
+    inc I0
+    new P10, .PerlString
+    set P10, "j\n"
+    setattribute P3, I0, P10
+    inc I0			# is that safe to assume
+    new P10, .PerlString
+    set P10, "k\n"
+    setattribute P3, I0, P10
+    inc I0
+    new P10, .PerlString
+    set P10, "l\n"
+    setattribute P3, I0, P10
+
+    getattribute P11, P3, I3
+    print P11
+    inc I3
+    getattribute P11, P3, I3
+    print P11
+    inc I3
+    getattribute P11, P3, I3
+    print P11
+    inc I3
+    getattribute P11, P3, I3
+    print P11
+
+    classname S0, P3
+    print S0
+    print "\n"
+    end
+CODE
+i
+j
+k
+l
+Bar
 OUTPUT
 
 

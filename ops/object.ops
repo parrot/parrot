@@ -223,7 +223,7 @@ Get the class PMC for the object in $2 and put it in $1.
 =cut
 
 inline op class(out PMC, in PMC) {
-    if (PObj_is_class_TEST($2))
+    if (PObj_is_object_TEST($2))
 	$1 = VTABLE_get_pmc_keyed_int(interpreter,
 		(PMC *)PMC_data($2), POD_CLASS);
     else
