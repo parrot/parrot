@@ -1076,6 +1076,22 @@ string_equal(struct Parrot_Interp *interpreter, STRING *s1, STRING *s2)
     return hash_string_equal(interpreter, s1, s2);
 }
 
+/* 
+ * Make string writable with specified minimum length 
+ * Encoding and type are required in case a new string has to be created
+ */
+static void
+make_writable(struct Parrot_Interp *interpreter, STRING **s, 
+              const size_t len, const ENCODING *enc, const CHARTYPE *type)
+{
+    if (!*s)
+        *s = string_make(interpreter, NULL, len, enc, 0, type);
+    else if ((*s)->buflen < len)
+        string_grow(interpreter, *s, len - (*s)->buflen);
+    else if (PObj_is_cowed_TESTALL(*s)) 
+        unmake_COW(interpreter, *s);
+}
+
 /*=for api string string_bitwise_and
  * and two strings, performing type and encoding conversions if
  * necessary. If *dest != NULL reuse dest, else create a new result
@@ -1090,7 +1106,7 @@ string_bitwise_and(struct Parrot_Interp *interpreter, STRING *s1,
     STRING *res = NULL;
     size_t len;
 
-   if (dest && *dest)
+    if (dest && *dest)
         res = *dest;
     else if (!s1 || !s2)
         res = string_make(interpreter, NULL, 0, NULL, 0, NULL);
@@ -1112,13 +1128,10 @@ string_bitwise_and(struct Parrot_Interp *interpreter, STRING *s1,
                 NULL);
     }
 
-    len = s1 ? s1->bufused : 0;
-    if (s2 && s2->bufused < len)
+    len = s1->bufused;
+    if (s2->bufused < len)
         len = s2->bufused;
-    if (!dest || !*dest)
-        res = string_make(interpreter, NULL, len, s1->encoding, 0, s1->type);
-    else if (res->bufused < len)
-        string_grow(interpreter, res, len - res->bufused);
+    make_writable(interpreter, &res, len, s1->encoding, s1->type);
 
     s1start = s1->strstart;
     s2start = s2->strstart;
@@ -1179,11 +1192,8 @@ string_bitwise_or(struct Parrot_Interp *interpreter, STRING *s1,
     len = s1 ? s1->bufused: 0;
     if (s2 && s2->bufused > len)
         len = s2->bufused;
-    if (!dest || !*dest)
-        res = string_make(interpreter, NULL, len,
-                s1 ? s1->encoding : NULL, 0, s1 ? s1->type : NULL);
-    else if (res->bufused < len)
-        string_grow(interpreter, res, len - res->bufused);
+    make_writable(interpreter, &res, len, s1 ? s1->encoding : s2->encoding, 
+                  s1 ? s1->type : s2->type);
 
     if (s1) {
         s1start = s1->strstart;
@@ -1261,11 +1271,8 @@ string_bitwise_xor(struct Parrot_Interp *interpreter, STRING *s1,
     len = s1 ? s1->bufused: 0;
     if (s2 && s2->bufused > len)
         len = s2->bufused;
-    if (!dest || !*dest)
-        res = string_make(interpreter, NULL, len,
-                s1 ? s1->encoding : NULL, 0, s1 ? s1->type : NULL);
-    else if (res->bufused < len)
-        string_grow(interpreter, res, len - res->bufused);
+    make_writable(interpreter, &res, len, s1 ? s1->encoding : s2->encoding, 
+                  s1 ? s1->type : s2->type);
 
     if (s1) {
         s1start = s1->strstart;

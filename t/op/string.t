@@ -1,6 +1,6 @@
 #! perl -w
 
-use Parrot::Test tests => 121;
+use Parrot::Test tests => 124;
 use Test::More;
 
 output_is( <<'CODE', <<OUTPUT, "set_s_s|sc" );
@@ -1896,6 +1896,17 @@ abc
 EE
 OUTPUT
 
+output_is( <<'CODE', <<OUTPUT, "bands COW");
+  set S1, "foo"
+  substr S2, S1, 0, 3
+  bands S1, "bar"
+  print S2
+  print "\n"
+  end
+CODE
+foo
+OUTPUT
+
 output_is( <<'CODE', <<OUTPUT, "bors NULL string");
      null S1
      null S2
@@ -1999,6 +2010,17 @@ CODE
 egc
 abc
 EE
+OUTPUT
+
+output_is( <<'CODE', <<OUTPUT, "bors COW");
+  set S1, "foo"
+  substr S2, S1, 0, 3
+  bors S1, "bar"
+  print S2
+  print "\n"
+  end
+CODE
+foo
 OUTPUT
 
 output_is( <<'CODE', <<OUTPUT, "bxors NULL string");
@@ -2125,6 +2147,17 @@ Dw
 ABCY
 abc
    Y
+OUTPUT
+
+output_is( <<'CODE', <<OUTPUT, "bxors COW");
+  set S1, "foo"
+  substr S2, S1, 0, 3
+  bxors S1, "bar"
+  print S2
+  print "\n"
+  end
+CODE
+foo
 OUTPUT
 
 output_is( <<'CODE', <<OUTPUT, "transcode to utf8");
