@@ -501,6 +501,7 @@ emit_flush(void *param, IMC_Unit * unit)
 {
     Instruction * ins;
     struct Parrot_Interp *interpreter = (struct Parrot_Interp *)param;
+    UNUSED(unit);
 #if IMC_TRACE
     fprintf(stderr, "instructions.c: emit_flush\n");
 #endif
