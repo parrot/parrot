@@ -1626,6 +1626,7 @@ t/pmc/sub.t
 t/src/basic.t
 t/src/intlist.t
 t/src/list.t
+t/src/manifest.t
 t/src/sprintf.t
 test_main.c
 tools/dev/check_source_standards.pl
