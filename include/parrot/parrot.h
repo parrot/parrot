@@ -155,6 +155,12 @@ typedef void (*funcptr_t)(void);
  * to occur more frequently. It does significantly reduce performance. */
 #define GC_DEBUG 0
 
+/* If you're really digging into things, then turn on GC_VERBOSE to
+ * see warning messages for stuff that might, or might not, be a
+ * problem. (See dod.h) This is disabled by default because the
+ * warning messages cause many tests to fail. */
+#define GC_VERBOSE 0
+
 #include "parrot/platform.h"
 #include "parrot/global_setup.h"
 #include "parrot/interpreter.h"

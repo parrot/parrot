@@ -35,7 +35,7 @@ buffer_lives(Buffer *buffer)
 {
 #if GC_DEBUG
 
-	if (buffer->flags & BUFFER_on_free_list_FLAG) {
+    if (buffer->flags & BUFFER_on_free_list_FLAG) {
         /* If a live buffer is found on the free list, warn. Note that
          * this does NOT necessarily indicate the presence of a bug,
          * because the stack is not zeroed out when a new stack frame
@@ -46,8 +46,12 @@ buffer_lives(Buffer *buffer)
          *
          * If it *is* a bug, you may want to read the notes in
          * get_free_buffer() in headers.c for tips on debugging using
-         * gdb with this pointer and version number. */        
+         * gdb with this pointer and version number. */
+#if ! GC_VERBOSE
+        if (! CONSERVATIVE_POINTER_CHASING)
+#endif
         fprintf(stderr, "GC Warning! Live buffer %p version " INTVAL_FMT " found on free list\n", buffer, buffer->version);
+
         assert(CONSERVATIVE_POINTER_CHASING);
     }
 #endif    
