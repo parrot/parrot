@@ -72,15 +72,13 @@ versions of these)
 
 =over 4
 
-=item INTVAL init(PMC)
+=item void init(PMC)
 
 The init vtable method takes an unused PMC as a parameter, and turns
 it into a PMC appropriate for the class owning the vtable. Called as a
 class method.
 
-Returns 0 if the method has thrown an exception. 
-
-=item INTVAL morph(PMC, type)
+=item void morph(PMC, type)
 
 turns the PMC into a PMC of type C<type>. If the morphing can't be
 reasonably done, for example if an integer is asked to turn into a
@@ -91,8 +89,6 @@ This method is primarily used when the interpreter has need of
 coercing a PMC to a particular type, and isn't meant as a general
 purpose casting tool. Compilers should only emit valid
 transformations.
-
-Returns 0 if the method has thrown an exception.
 
 =item PMC mark(PMC, PMC)
 
@@ -148,15 +144,11 @@ array, or list, and suchlike things.
 
 Return the name of the class for the PMC.
 
-Returns NULL if this throws an exception.
-
 =item PMC *clone(PMC) 
 
 Return a clone of the specified PMC. If the PMC is fake, for example
 we're asking for a clone of an element of an integer array, this must
 return an appropriate real  PMC that holds the fake information.
-
-Returns NULL if this throws an exception.
 
 =item PMC *find_method(PMC, string) 
 
@@ -165,49 +157,31 @@ PMC may be cached, so the method I<must> return an equivalent sub PMC
 each time, or be capable of dealing with the returned sub PMCs being
 reused.
 
-Returns NULL if this throws an exception.
-
 =item INTVAL get_integer(PMC) 
 
 Returns the native integer value of the PMC.
-
-Returns 0 if this method throws an exception, at which point the
-current exception status must be checked to see if an exception was
-really thrown.
 
 =item NUMVAL get_number(PMC) 
 
 Returns the native float value of the PMC.
 
-Returns 0 if this method throws an exception, at which point the
-current exception status must be checked to see if an exception was
-actually thrown. This does I<not> return C<NaN> or other IEEE
-"interesting" constants since we're not requiring IEEE compliant floats.
-
 =item BIGNUM *get_bignum(PMC) 
 
 Returns the value of the PMC as a bignum.
-
-Returns NULL if this method throws an exception.
 
 =item STRING *get_string(PMC) 
 
 Returns the native string value of the PMC. This may be in the
 encoding of the PMC's choice.
 
-Returns 0 if this method throws an exception.
-
 =item INTVAL get_bool(PMC) 
 
-Returns the constant PARROT_TRUE (1) if the PMC is true, or
-PARROT_FALSE(-1) if the PMC is false.
-
-Returns 0 if this method has thrown an exception.
+Returns the constant TRUE if the PMC is true, or FALSE if the PMC is
+false.
 
 =item INTVAL elements(PMC)
 
-Returns the number of elements in the PMC. If it returns 0, check to
-see if an exception has been thrown.
+Returns the number of elements in the PMC.
 
 =item PMC *get_pmc(PMC)
 
@@ -218,54 +192,37 @@ being accessed may return something odd, for example a reference, it
 may return a value different than the PMC that get_pmc is being called
 on.
 
-Returns NULL if this method throws an exception.
-
 =item INTVAL is_same(PMC, PMC)
 
-Returns PARROT_TRUE if the PMCs are the same, and PARROT_FALSE if
+Returns TRUE if the PMCs are the same, and FALSE if
 they're not. In this case, "the same" means identical at a low
 level. For plain equality, use the is_equal method.
 
-This method returns 0 if an exception is thrown.
-
-=item INTVAL set_integer(PMC, INTVAL)
+=item void set_integer(PMC, INTVAL)
 
 Sets the PMC to the integer value passed. What the PMC does with the
 passed in integer depends on the class.
 
-Returns 0 if an exception is thrown.
-
-=item INTVAL set_number(PMC, NUMVAL)
+=item void set_number(PMC, NUMVAL)
 
 Sets the PMC to the numeric value passed in.
 
-Returns 0 if an exception is thrown.
-
-=item INTVAL set_bignum(PMC, BIGNUM *)
+=item void set_bignum(PMC, BIGNUM *)
 
 Sets the PMC to the passed in bignum value.
 
-Returns 0 if the method throws an exception.
-
-=item INTVAL set_string(PMC, STRING *)
+=item void set_string(PMC, STRING *)
 
 Sets the PMC to the passed in string value.
 
-Returns 0 if the method throws an exception.
-
-=item INTVAL set_pmc(PMC, PMC)
+=item void set_pmc(PMC, PMC)
 
 Assigns the source PMC to the destination PMC. 
 
-Returns 0 if the method throws an exception.
-
-=item INTVAL set_same(PMC, PMC)
+=item void set_same(PMC, PMC)
 
 A shortcut version of C<set_pmc> in those cases where the interpreter
 knows the source and destination PMCs are of the same type.
-
-Returns 0 if an exception is thrown.
-
 
 =back
 
@@ -273,8 +230,8 @@ The following vtable functions come in multiple flavors, one for each
 numeric type (INTVAL, NUMVAL, BIGNUM) and a PMC. Each flavor has a
 keyed and non-keyed version.
 
-Each function does what its name implies, returns a PMC with the
-result, and NULL if an exception is thrown.
+Each function does what its name implies and returns a PMC with the
+result.
 
 =over 4
 
@@ -300,78 +257,62 @@ There are two forms of this, where value is a STRING and where it's a
 PMC. In either case, a PMC representing the two source values
 concatenated together is returned.
 
-Returns NULL if an exception is thrown.
-
 =item INTVAL is_equal(PMC, PMC)
 
-Returns PARROT_TRUE if the two PMCs are generically equivalent, or
-PARROT_false if they aren't. Returns 0 on exception.
+Returns TRUE if the two PMCs are generically equivalent, or
+FALSE if they aren't. 
 
 =item INTVAL cmp(PMC, PMC)
 =item INTVAL cmp_num(PMC, PMC)
 =item INTVAL cmp_string(PMC, PMC)
 
-Compares the two PMCs. Returns 1 if the left PMC is smaller, 2 if they
-are equal, and three if the right PMC is smaller. C<cmp> compares the
+Compares the two PMCs. Returns -1 if the left PMC is smaller, 0 if they
+are equal, and 1 if the right PMC is smaller. C<cmp> compares the
 two as PMCs (whatever that means for the class), C<cmp_num> compares
 them numerically, and C<cmp_string> compares them as strings.
-
-Returns 0 if the methods throw an exception.
 
 =item PMC *logical_or(PMC, PMC)
 
 Does a short-circuiting logical or, and returns the PMC that
-wins. Returns NULL on exception.
+wins. 
 
 =item PMC *logical_and(PMC, PMC)
 
 Does a short-circuiting logical and and returns the PMC that
-wins. Returns NULL on exception.
+wins.
 
 =item  PMC *logical_xor(PMC, PMC)
 
 Does a logical xor on the two parameters and returns a PMC
 representing the result.
 
-Returns NULL on exception.
-
 =item PMC *repeat(PMC, value)
 
 Where value can be either an INTVAL or a PMC. Returns a PMC that
 represents the leftmost PMC repeated value times.
 
-Returns NULL on exception.
-
-=item INTVAL increment(PMC)
+=item void increment(PMC)
 
 Autoincrement the PMC.
 
-Returns 0 on exception.
-
-=item INTVAL decrement(PMC)
+=item void decrement(PMC)
 
 Autodecrement the PMC.
 
-Returns 0 on exception.
-
 =item INTVAL exists(PMC, key)
 
-This is only valid for keyed access. Returns PARROT_TRUE or
-PARROT_FALSE if the key exists or doesn't in the aggregate being
+This is only valid for keyed access. Returns TRUE or
+FALSE if the key exists or doesn't in the aggregate being
 queried.
-
-Returns 0 on exception.
 
 =item INTVAL defined(PMC)
 
-Checks to see if the PMC is defined. Returns PARROT_TRUE or
-PARROT_FALSE, or 0 if an exception is thrown.
+Checks to see if the PMC is defined. Returns TRUE or
+FALSE.
 
-=item INTVAL delete(PMC, key)
+=item void delete(PMC, key)
 
 Delete the specified entry from the aggregate.
-
-Returns 0 if an exception is thrown
 
 =item KEY *nextkey(PMC, key)
 
@@ -381,7 +322,7 @@ Given the passed in key for the PMC, return the next key.
 =item STRING *substr_str(PMC, offset, length)
 
 Return a substring of the passed in PMC. Returns a substring, either
-as a PMC or a STRING, or NULL if an exception has been thrown.
+as a PMC or a STRING.
 
 =back
 
