@@ -27,9 +27,6 @@
 #if ARENA_DOD_FLAGS && ! defined(HAS_SOME_MEMALIGN)
 #  undef ARENA_DOD_FLAGS
 #  define ARENA_DOD_FLAGS 0
-#  ifdef DOD_C_SOURCE
-#    warning "ARENA_DOD_FLAGS disabled due to missing memalign()"
-#  endif
 #endif
 
 
