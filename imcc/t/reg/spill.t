@@ -234,10 +234,11 @@ CODE
 OUT
 
 ##############################
-output_is(<<'CODE', <<'OUT', "spill 1");
+output_is(<<'CODE', <<'OUT', "pcc arg overflow 1");
 
 # Test the ability of the register allocator in
 # combination with PCC calling convention and overflow arguments.
+# Slightly redundant with tests in t/syn/pcc.t but please leave.
 #
 
 .sub _MAIN
