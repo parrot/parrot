@@ -160,17 +160,6 @@ Save/restore all registers.
 
 */
 
-/*
- * calculate size to store with save_regs
- *
- * this checks the opcodes in the sub an the reg usage
- * XXX don't do it here - the compiler has all the info
- * TODO attach that information in the metadata of the sub
- * XXX consider e.g. invoke (calling another sub)
- */
-#define SAVE_ALL_REGS 1
-
-#if SAVE_ALL_REGS
 
 #  define used_size(i, s) sizeof(reg_store)
 #  define SAVE_S0_P2 \
@@ -179,82 +168,6 @@ Save/restore all registers.
 
 #  define RESTORE_S0_P2
 
-#else
-
-#  define SAVE_S0_P2 \
-    PMC * p2 = REG_PMC(2); \
-    STRING *s0 = REG_STR(0); \
-    REG_PMC(2) = obj; \
-    REG_STR(0) = meth
-
-#  define RESTORE_S0_P2 \
-    REG_PMC(2) = p2; \
-    REG_STR(0) = s0
-
-#if defined(PARROT_HAS_I386_SSE) || defined(PARROT_HAS_I386_SSE2)
-#  define MIN_SIZE_ALIGN 0x1f
-#else
-#  define MIN_SIZE_ALIGN 0x0f
-#endif
-static size_t
-used_size(Parrot_Interp interpreter, PMC *sub)
-{
-    struct Parrot_Sub *s = PMC_sub(sub);
-    op_info_t *op_info;
-    opcode_t *start, *end, op, arg;
-    int i, n;
-    size_t size, offs;
-
-    if (s->use_reg_offs)
-        return s->use_reg_offs;
-    start = PMC_struct_val(sub);
-    end = s->end;
-    if (!end || start == end)
-        return sizeof(reg_store);
-    size = 0;
-    while (start < end) {
-        op = *start;
-        op_info = &interpreter->op_info_table[op];
-        n = op_info->arg_count;
-        /* printf("# %s\n", op_info->full_name); */
-        for (i = 1; i < n; ++i) {
-            if (!(op_info->dirs[i] & PARROT_ARGDIR_OUT))
-                continue;
-            arg = start[i];
-            switch (op_info->types[i]) {
-                case PARROT_ARG_I:
-                    offs = offsetof(Interp, int_reg.registers[arg]) +
-                        sizeof(INTVAL);
-                    break;
-                case PARROT_ARG_P:
-                    offs = offsetof(Interp, pmc_reg.registers[arg]) +
-                        sizeof(PMC *);
-                    break;
-                case PARROT_ARG_S:
-                    offs = offsetof(Interp, string_reg.registers[arg]) +
-                        sizeof(STRING *);
-                    break;
-                case PARROT_ARG_N:
-                    offs = offsetof(Interp, num_reg.registers[arg]) +
-                        sizeof(FLOATVAL);
-                    break;
-            }
-            if (offs > size)
-                size = offs;
-        }
-        start += n;
-    }
-
-    /* always preserve PCC vars */
-    if (size < 5 * sizeof(INTVAL))
-        size = 5 * sizeof(INTVAL);
-    /* round up for memcpy_aligned */
-    size = (size + MIN_SIZE_ALIGN) & ~MIN_SIZE_ALIGN;
-    s->use_reg_offs = size;
-    return size;
-}
-
-#endif
 
 PARROT_INLINE static regsave *
 save_regs(Parrot_Interp interpreter, PMC *sub)

@@ -378,11 +378,11 @@ PDB_run_command(Interp *interpreter, const char *command)
             break;
         case c_p:
         case c_print:
-            PDB_print(interpreter, command);
+            /* PDB_print(interpreter, command);  XXX */
             break;
         case c_s:
         case c_stack:
-            PDB_print_stack(interpreter, command);
+            /* PDB_print_stack(interpreter, command); XXX */
             break;
         case c_n:
         case c_next:
@@ -2088,6 +2088,10 @@ PDB_extend_const_table(Interp *interpreter)
     return k;
 }
 
+#if 0
+
+/* XXX TODO */
+
 /*
 
 =item C<void
@@ -2253,6 +2257,8 @@ PDB_print_stack_pmc(Interp *interpreter, const char *command)
 
 #undef valid_chunk
 
+#endif
+
 /*
 
 =item C<static void
@@ -2346,6 +2352,8 @@ Print interpreter registers.
 
 */
 
+#if 0
+/* XXX TODO */
 void
 PDB_print(Interp *interpreter, const char *command)
 {
@@ -2729,6 +2737,8 @@ PDB_print_pmc_frame(Interp *interpreter,
         print_pmc(interpreter, pmc);
     }
 }
+
+#endif  /* PDB_print stuff */
 
 /*
 

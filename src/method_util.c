@@ -10,6 +10,8 @@ src/method_util.c - Utility functions for methods
 
 Utility functions to handle Parrot calling conventions, lookup methods, etc.
 
+XXX This all looks totally bogus and is unused - disable --leo
+
 =head2 Functions
 
 =over 4
@@ -20,6 +22,8 @@ Utility functions to handle Parrot calling conventions, lookup methods, etc.
 
 #include "parrot/parrot.h"
 #include "parrot/method_util.h"
+
+#if 0
 
 /*
 
@@ -55,12 +59,12 @@ Push non-prototyped arguments.
 */
 
 void
-Parrot_push_argv(Interp *interp, INTVAL argc, PMC *argv[])
+Parrot_push_argv(Interp *interpreter, INTVAL argc, PMC *argv[])
 {
-    interp->int_reg.registers[0] = 0;       /* no prototype */
-    interp->int_reg.registers[1] = argc;
+    REG_INT(0) = 0;       /* no prototype */
+    REG_INT(1) = argc;
     while (argc--) {
-        stack_push(interp, &(interp->ctx.user_stack), argv[argc],
+        stack_push(interpreter, &(interpreter->ctx.user_stack), argv[argc],
                    STACK_ENTRY_PMC, STACK_CLEANUP_NULL);
     }
 }
@@ -77,15 +81,15 @@ Pop non-prototyped arguments.
 */
 
 INTVAL
-Parrot_pop_argv(Interp *interp, PMC ***argv)
+Parrot_pop_argv(Interp *interpreter, PMC ***argv)
 {
     INTVAL i;
-    INTVAL nret = interp->int_reg.registers[1];
+    INTVAL nret = REG_INT(1);
     /* NOTE: not using GC'd memory -- free this yourself. */
     *argv = (PMC **)mem_sys_allocate(nret * sizeof(PMC *));
 
     for (i = 0; i < nret; i++) {
-        stack_pop(interp, &(interp->ctx.user_stack), &((*argv)[i]),
+        stack_pop(interpreter, &(interp->ctx.user_stack), &((*argv)[i]),
                   STACK_ENTRY_PMC);
     }
     return nret;
@@ -120,7 +124,7 @@ Push prototyped arguments.
 }
 
 void
-Parrot_push_proto(Interp *interp,
+Parrot_push_proto(Interp *interpreter,
                   INTVAL intc, INTVAL *intv,
                   INTVAL numc, FLOATVAL *numv,
                   INTVAL strc, STRING **strv, INTVAL pmcc, PMC **pmcv)
@@ -199,6 +203,8 @@ Parrot_find_method(Interp *interp, struct Stash *stash, PMC *key)
     }
     return NULL;
 }
+
+#endif
 
 /*
 

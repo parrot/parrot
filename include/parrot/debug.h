@@ -168,6 +168,8 @@ void PDB_get_command(Interp *interpreter);
 
 void PDB_print(Interp *interpreter, const char *command);
 
+#if 0
+/* XXX TODO reimplement this cruft */
 void PDB_print_int(Interp *interpreter, struct IReg *int_reg, int regnum);
 void PDB_print_int_frame(Interp *interpreter,
                          struct IRegFrame *int_reg, int regnum);
@@ -185,6 +187,7 @@ void PDB_print_pmc(Interp *interpreter,
                    struct PReg *pmc_reg, int regnum, PMC* key);
 void PDB_print_pmc_frame(Interp *interpreter,
                          struct PRegFrame *pmc_reg, int regnum, PMC* key);
+#endif
 
 void PDB_debug(Interp *interpreter);
 

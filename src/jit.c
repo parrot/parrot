@@ -954,7 +954,12 @@ optimize_imcc_jit(Interp *interpreter, opcode_t *cur_op,
 =item C<static char *
 reg_addr(Interp * interpreter, int typ, int i)>
 
-Returns the address of register C<typ[i]>.
+=item C<size_t
+reg_offs(Interp * interpreter, int typ, int i)>
+
+Returns the offset of register C<typ[i]>.
+
+The latter is used if F<jit_emit.h> defines C<Parrot_jit_emit_get_base_reg_no>.
 
 =cut
 
@@ -976,27 +981,11 @@ reg_offs(Interp * interpreter, int typ, int i)
 static char *
 reg_addr(Interp * interpreter, int typ, int i)
 {
-#ifdef PARROT_I386
-    if (Interp_core_TEST(interpreter, PARROT_EXEC_CORE))
         switch (typ) {
             case 0:
-                return (char*)
-                    (offsetof(Interp, int_reg.registers)
-                        + sizeof(INTVAL) * i);
+                return (char*)&REG_INT(i);
             case 3:
-                return (char*)
-                    (offsetof(Interp, num_reg.registers)
-                        + sizeof(FLOATVAL) * i);
-            default:
-                return 0;   /* not currently */
-        }
-    else
-#endif
-        switch (typ) {
-            case 0:
-                return (char*)&interpreter->int_reg.registers[i];
-            case 3:
-                return (char*)&interpreter->num_reg.registers[i];
+                return (char*)&REG_NUM(i);
             default:
                 return 0;   /* not currently */
         }

@@ -294,9 +294,9 @@ key_integer(Interp *interpreter, PMC *key)
     case KEY_integer_FLAG:
         return PMC_int_val(key);
     case KEY_integer_FLAG | KEY_register_FLAG:
-        return interpreter->int_reg.registers[PMC_int_val(key)];
+        return REG_INT(PMC_int_val(key));
     case KEY_pmc_FLAG | KEY_register_FLAG:
-        reg = interpreter->pmc_reg.registers[PMC_int_val(key)];
+        reg = REG_PMC(PMC_int_val(key));
         return VTABLE_get_integer(interpreter, reg);
     default:
         return VTABLE_get_integer(interpreter,  key);
@@ -326,7 +326,7 @@ key_number(Interp *interpreter, PMC *key)
         return VTABLE_get_number(interpreter, key);
                                                  /*  PMC_pmc_val(key)); */
     case KEY_pmc_FLAG | KEY_register_FLAG:
-        reg = interpreter->pmc_reg.registers[PMC_int_val(key)];
+        reg = REG_PMC(PMC_int_val(key));
         return VTABLE_get_number(interpreter, reg);
     default:
         internal_exception(INVALID_OPERATION, "Key not a number!\n");
@@ -352,15 +352,15 @@ key_string(Interp *interpreter, PMC *key)
     case KEY_string_FLAG:
         return PMC_str_val(key);
     case KEY_string_FLAG | KEY_register_FLAG:
-        return interpreter->string_reg.registers[PMC_int_val(key)];
+        return REG_STR(PMC_int_val(key));
                                                    /*   PMC_pmc_val(key)); */
     case KEY_pmc_FLAG | KEY_register_FLAG:
-        reg = interpreter->pmc_reg.registers[PMC_int_val(key)];
+        reg = REG_PMC(PMC_int_val(key));
         return VTABLE_get_string(interpreter, reg);
     case KEY_integer_FLAG:
         return string_from_int(interpreter, PMC_int_val(key));
     case KEY_integer_FLAG | KEY_register_FLAG:
-        return string_from_int(interpreter, interpreter->int_reg.registers[PMC_int_val(key)]);
+        return string_from_int(interpreter, REG_INT(PMC_int_val(key)));
     default:
     case KEY_pmc_FLAG:
         return VTABLE_get_string(interpreter, key);
@@ -384,7 +384,7 @@ key_pmc(Interp *interpreter, PMC *key)
 {
     switch (PObj_get_FLAGS(key) & KEY_type_FLAGS) {
     case KEY_pmc_FLAG | KEY_register_FLAG:
-        return interpreter->pmc_reg.registers[PMC_int_val(key)];
+        return REG_PMC(PMC_int_val(key));
     default:
         return key; /* PMC_pmc_val(key); */
     }
