@@ -22,6 +22,9 @@ typedef void SYNC;
 
 #define FRAMES_PER_CHUNK 16
 
+/* Default amount of memory to allocate in one whack */
+#define DEFAULT_SIZE 32768
+
 #define FRAMES_PER_PMC_REG_CHUNK FRAMES_PER_CHUNK
 #define FRAMES_PER_NUM_REG_CHUNK FRAMES_PER_CHUNK
 #define FRAMES_PER_INT_REG_CHUNK FRAMES_PER_CHUNK

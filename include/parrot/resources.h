@@ -27,6 +27,9 @@ void free_bigint(void);
 void *new_bignum_header(struct Parrot_Interp *);
 void free_bignum(void);
 
+void *Parrot_allocate(struct Parrot_Interp *, UINTVAL size);
+void Parrot_alloc_new_block(struct Parrot_Interp *, UINTVAL size);
+
 struct PMC_Arena {
     UINTVAL free;	  /* Count of PMCs free in this arena */
     UINTVAL used;         /* Count of PMCs used in this arena */
@@ -49,14 +52,15 @@ struct Memory_Pool {
     UINTVAL size;
     struct Memory_Pool *prev;
     struct Memory_Pool *next;
-    void *start;
-    void *top;
+    char *start;
+    char *top;
 };
 
-struct Arena {
+struct Arenas {
     struct PMC_Arena *last_PMC_Arena;
     struct STRING_Arena *last_STRING_Arena;
     struct Memory_Pool *memory_pool;
+    UINTVAL collections;
 };
 
 

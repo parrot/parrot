@@ -77,6 +77,9 @@ mem_sys_allocate(UINTVAL size) {
 */
 void
 mem_setup_allocator(struct Parrot_Interp *interpreter) {
+    interpreter->arena_base = mem_sys_allocate(sizeof(struct Arenas));
+    interpreter->arena_base->memory_pool = NULL;
+    Parrot_alloc_new_block(interpreter, 0);
 }
 
 void *

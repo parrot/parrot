@@ -44,8 +44,8 @@ string_make(struct Parrot_Interp *interpreter, const void *buffer,
       encoding = encoding_lookup(type->default_encoding);
     }
 
-    s = mem_sys_allocate(sizeof(STRING));
-    s->bufstart = mem_sys_allocate(buflen);
+    s = Parrot_allocate(interpreter, sizeof(STRING));
+    s->bufstart = Parrot_allocate(interpreter, buflen);
     s->encoding = encoding;
     s->flags = flags;
     s->type = type;
