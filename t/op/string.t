@@ -1,6 +1,6 @@
 #! perl -w
 
-use Parrot::Test tests => 76;
+use Parrot::Test tests => 77;
 
 output_is( <<'CODE', <<OUTPUT, "set_s_s|sc" );
 	set	S4, "JAPH\n"
@@ -30,7 +30,7 @@ output_is( <<'CODE', '0', "0 length substr" );
 	end
 CODE
 
-output_is( <<'CODE', <<OUTPUT, "chopn_s_i|ic" );
+output_is( <<'CODE', <<OUTPUT, "chopn with clone" );
 	set	S4, "JAPHxyzw"
 	set	S5, "japhXYZW"
         clone     S3, S4
@@ -50,6 +50,28 @@ CODE
 JAPH
 japh
 JAPHxyzw
+OUTPUT
+
+output_is( <<'CODE', <<OUTPUT, "chopn with set" );
+	set	S4, "JAPHxyzw"
+	set	S5, "japhXYZW"
+        set     S3, S4
+	set	S1, "\n"
+	set	I1, 4
+	chopn	S4, 3
+	chopn	S4, 1
+        chopn S5, I1
+	print	S4
+        print S1
+	print	S5
+        print S1
+	print	S3
+        print S1
+	end
+CODE
+JAPH
+japh
+JAPH
 OUTPUT
 
 output_is(<<'CODE', <<OUTPUT, "chopn, OOB values");
