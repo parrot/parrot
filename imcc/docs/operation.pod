@@ -6,7 +6,7 @@ IMCC - operation
 
 =over 4
 
-=item 0.1 intital
+=item 0.1 initial
 
 =item 0.2 uninitialized warning; optimizations
 
@@ -20,6 +20,8 @@ This document describes the principles of imcc operation.
 
 The main features of imcc are:
 
+=over 4
+
 =item Source file parsing
 
 =item Register allocation
@@ -30,9 +32,11 @@ The main features of imcc are:
 
 =item Running the code
 
+=back
+
 =head1 Source file parsing
 
-S. F<parsing.pod>, F<macros.pod> and F<syntax.pod> for more.
+See F<parsing.pod>, F<macros.pod> and F<syntax.pod> for more.
 
 =head1 Register allocation
 
@@ -70,15 +74,15 @@ which can get jumped to, and ends at a branch instruction.
 Currently, imcc assumes, that a subroutine saves all registers on entry,
 as P6C does per B<saveall>, and thus a B<bsr> doesn't count as a branch.
 
-But there is one exception to this rule: When the target of the
-subroutine is known (the label is in the same compilation unit, and when
+But there is one exception to this rule: when the target of the
+subroutine is known (the label is in the same compilation unit), and when
 no B<saveall> instruction is found in the first 5 instructions after the
 label, then the control flow from the B<bsr> call to the label and from
 the B<ret> to the next basic block is calculated.
 
 =head2 Call graph
 
-All connection between the B<basic block>s are calculated. This allows
+All connections between the B<basic block>s are calculated. This allows
 for:
 
 =head2 Loop detection
@@ -88,7 +92,7 @@ where the range and depth of loops is calculated.
 =head2 Life analysis
 
 Whenever an operand is marked as an B<OUT> argument, this
-operand starts with a new value. This means, that at this point the
+operand starts with a new value. This means that at this point the
 life range of the symbol ends and a new life range is started, which
 allows the allocation of a different register to the same variable or
 the same register to a different variable.
@@ -136,13 +140,13 @@ The latter of these emits the warning:
 
 =head2 Interference graph
 
-With above information calculated, the next step is to look, which
-variable does interfer with which other. Non interfering variables can
+Once the above information is calculated, the next step is to look at
+which variables interfere with which other. Non-interfering variables can
 be given the same parrot register.
 
 =head2 Register allocation
 
-F<imcc> then starts allocating registers according to a variables
+F<imcc> then starts allocating registers according to a variable's
 score. Variables deeply nested inside loops have the highest score and
 get a parrot register first. Variables with a long life range (i.e.
 with many interferences) get allocated last.
@@ -162,7 +166,7 @@ or stored in a B<PerlArray> when they are not used.
   ...
   print $I33
 
-The usage of all these variables makes it necessary, to spill.
+The usage of all these variables makes it necessary to spill.
 
   new P31, .PerlArray
   ...
@@ -174,28 +178,28 @@ The usage of all these variables makes it necessary, to spill.
   set I0, P31[0]	# fetch $I1
   print I0
 
-When $I1 or $I2 are accessed then, code is generated to fetch the
+When $I1 or $I2 are accessed, then code is generated to fetch the
 value from the spill array. The life range of such a spilled variable
 is then only one fetch and/or store operation and the actual usage.
 Therefore the variable has minimal interferences with other variables.
 
 =head1 Optimization
 
-Optimizations are only done, when enabled with the B<-O> switch. Please
+Optimizations are only done when enabled with the B<-O> switch. Please
 consult F<t/imcpasm/*.t> for examples. They occur between various
-stages and may be repeatedly done: E.g. after converting a conditional
+stages and may be repeatedly done: e.g. after converting a conditional
 branch to an absolute one, unreachable code will be removed then,
 which might cause unused labels ...
 
 =head1 Optimizations with -O1
 
-=head2 Constants substitution
+=head2 Constant substitution
 
 Constant arguments to many ops are evaluated. Conditional branches
 with constant conditions are converted to unconditional branches.
 Integer arguments to float operations are converted to float operands.
 
-=head2 If branch optimization
+=head2 If-branch optimization
 
 A sequence of code:
 
@@ -225,7 +229,7 @@ Labels not referenced somewhere get deleted.
 =head2 Dead code removal
 
 Code not reachable after an unconditional branch instruction and basic
-blocks, that are not entered from somewhere get removed.
+blocks that are not entered from somewhere get removed.
 
 =head1 Optimizations with -O2
 
@@ -239,12 +243,12 @@ For a sequence of code
    $I0 = 10
    $I1 = 20
 
-where B<$I0> is not used beyond, the first assignment will be tossed,
+where B<$I0> is not used again, the first assignment will be tossed,
 resulting in code like:
 
    set I0, 20
 
-=head2 Loop optimization.
+=head2 Loop optimization
 
 Instructions which are invariant to a loop are pulled out of the loop
 and inserted in front of the loop entry.
@@ -252,7 +256,8 @@ and inserted in front of the loop entry.
 =head1 Code generation
 
 Imcc either generates PASM output ready to get assembled by
-F<assemble.pl> or directly a PBC file, for running with parrot.
+F<assemble.pl> or else directly generates a PBC file for running with 
+parrot.
 
 =head1 Running code
 

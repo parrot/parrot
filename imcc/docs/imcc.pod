@@ -1,12 +1,12 @@
 =head1 NAME
 
-IMCC - docunentation
+IMCC - documentation
 
 =head1 VERSION
 
 =over 4
 
-=item 0.1 intital
+=item 0.1 initial
 
 =back
 
@@ -21,7 +21,7 @@ This document describes available imcc documentation.
 
 =head2 running.pod
 
-Imccs command line options.
+Imcc's command line options.
 
 =head2 parsing.pod
 
@@ -37,7 +37,7 @@ Imcc operation basics.
 
 =head2 README
 
-Summary of imcc featurs and syntax.
+Summary of imcc features and syntax.
 
 =head2 *.[chly]
 

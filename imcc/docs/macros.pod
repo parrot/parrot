@@ -26,7 +26,7 @@ A macro definition starts with a line consisting of ".macro", the
 name for the newly created macro and an optional list of parameters.
 Thereafter follows the definition of the macro which can span several
 lines. The definition is ended by ".endm". In the macro definition the
-formal parameters, preceeded by a '.', are valid macros.
+formal parameters, preceded by a '.', are valid macros.
 
   .macro swap (A,B,TEMP) # . marks the directive
     set .TEMP,.A         # . marks the special variable.

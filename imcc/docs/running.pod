@@ -26,6 +26,8 @@ This document describes imcc's command line options.
 
 =head2 Imcc options
 
+=over 4
+
 =item -a, --pasm
 
 Assume PASM input on stdin.
@@ -36,7 +38,7 @@ Assume PBC file on stdin, run it.
 
 =item -d, --debug [hexbits]
 
-Tbe B<-d> switch takes an optional argument, which is considered to hold
+The B<-d> switch takes an optional argument which is considered to hold
 a hex value of debug bits. Without a value, debug is set to 1.
 
 The individual bits are:
@@ -56,22 +58,22 @@ To produce really huge output on F<stderr> run "imcc B<-d 0ffff> ...".
 Note: if the argument is separated by whitespace from the B<-d> switch,
 it has to start with a number.
 
-=item -h --help
+=item -h, --help
 
 =item -o outputfile
 
-Act like assembler. Don't run code, except B<-r> is given too. If the
-outputfile ends with B<.pbc> a PBC file is written. If it ends with
-B<.pasm> a PASM output is generated, even from PASM input. This canbe
-handy to check various optimizations including B<-Op>.
+Act like assembler. Don't run code, unless B<-r> is given too. If the
+outputfile ends with B<.pbc>, a PBC file is written. If it ends with
+B<.pasm>, a PASM output is generated, even from PASM input. This can be
+handy to check various optimizations, including B<-Op>.
 
 =item -r, --run-pbc
 
 =item -v, --verbose
 
-One B<-v> shows, which files are worked on and prints a summary
-over register usage and optimization stats perl I<compilation unit>.
-With two B<-v> switches IMCC prints a line per individual processing
+One B<-v> shows which files are worked on and prints a summary
+over register usage and optimization stats per I<compilation unit>.
+With two B<-v> switches, IMCC prints a line per individual processing
 step too.
 
 =item -y, --yydebug
@@ -84,23 +86,27 @@ Turn on yydebug in F<yacc>/F<bison>.
 
 Optimize
 
- -O0 no opimization (default)
+ -O0 no optimization (default)
  -O1 optimizations w/o life info (e.g. branches)
  -O2 optimizations with life info
  -Op rewrite I and N PASM registers most used first
 
 This will probably change.
 
+=back
+
 =head2 Parrot Options
 
-s. parrot B<-h> for description, used, when running a program inside
+See parrot B<-h> for description. Used when running a program inside
 imcc.
 
 =head1 <file>
 
 If the file ends in B<.pbc> it will be interpreted immediately.
-If the file ends in B<.pasm> it is parsed as PASM code else as PIR
-code then it get's run, except B<-o> was given.
+
+If the file ends in B<.pasm>, then it is parsed as PASM code. Otherwise,
+it is parsed as PIR code. In both cases, it will then be run, unless the
+B<-o> flag was given.
 If the B<file> is a single dash, input from B<stdin> is read.
 
 =head2 Generated files
@@ -120,7 +126,7 @@ for running the program.
 
 =head1 Operation table
 
- Commandline		Action		Output
+ Command line		Action		Output
  ---------------------------------------------
  imcc x.imc		run
  imcc x.pasm		run
@@ -134,7 +140,7 @@ for running the program.
 
 =head1 BUGS
 
-The long imcc options are unimplemented.
+None currently known.
 
 =head1 FILES
 

@@ -20,7 +20,7 @@ This document describes subroutine calling conventions.
 
 =head1 DESCRIPTION
 
-A imcc does register allocation, it has to track the life span of
+As imcc does register allocation, it has to track the life span of
 variables. This includes the (possible) data flow in and out of
 subroutines.
 
@@ -56,20 +56,20 @@ The subroutine is responsible for preserving registers.
 
 Pushing arguments in reversed order on the user stack makes the left
 most argument the top of stack entry. This allows for a variable
-amount of function arguments (and return values), where the left most
-argument before a variable amount of following arguments is the
+number of function arguments (and return values), where the left most
+argument before a variable number of following arguments is the
 argument count.
 
 =head2 Status
 
 Implemented. When the subroutine is in the same compilation unit, the
-callee can B<saveall> registers, when the subroutine is in a different
+callee can B<saveall> registers; when the subroutine is in a different
 compilation unit, the callee must preserve all used registers.
 
 =head1 Invoking subroutines
 
-IMCC tries to keep track of the address, where the B<invoke> will branch
-to, but can only succeed to do so, when the B<set_addr> and the
+IMCC tries to keep track of the address where the B<invoke> will branch
+to, but can only succeed to do so when the B<set_addr> and the
 B<invoke> opcodes are located together.
 
   $P10 = new Sub
@@ -88,8 +88,8 @@ But not:
     $P10 = $I1
     ret
 
-The latter example will very likely lead to a wrong CFG and thus to
-wrong register allocation.
+The latter example will very likely lead to an incorrect CFG and thus to
+incorrect register allocation.
 
 =head2 Status
 
@@ -141,7 +141,7 @@ Proposed syntax:
   .result r
   .nci_end
 
-This prepares parameters like described in
+This prepares parameters as described in
 F<pdd03_calling_conventions.pod>, saves the registers and invokes the
 function.  The B<.arg> pseudo ops put the given argument into
 increasing registers of the appropriate type.

@@ -6,7 +6,7 @@ IMCC - parsing
 
 =over 4
 
-=item 0.1 intital
+=item 0.1 initial
 
 =item 0.2 lexicals
 
@@ -19,7 +19,7 @@ This document describes the basic parsing functionality of imcc.
 =head1 DESCRIPTION
 
 Imcc parses and generates code in terms of I<compilation units>. These
-are self contained blocks of code very similar to subroutines.
+are self-contained blocks of code very similar to subroutines.
 
 Code for a compilation unit is created as soon (or not earlier) as the
 end of the unit is reached.
@@ -122,7 +122,7 @@ generates code like this:
 	_inner:
 	    stmt2
 	    ret
-	_ounter:
+	_outer:
 	    stmt1
 	    bsr _inner
 	    ret
@@ -135,12 +135,12 @@ to code in different units.
 
 Lexicals and named constants declared in an outer scope are visible and used,
 when not overridden by a C<.local> or C<.const> directive with the same name.
-S. F<t/syn/scope.t> for examples for this.
+See F<t/syn/scope.t> for examples for this.
 
-Please note that variables declard with C<.local> in an outer scope only
-make the symbol available in inner scopes. It does not mean, that imcc
-keeps track of the usage of such variables, when they are used in
-different compilations units. Such variables have to be passed to other
+Please note that variables declared with C<.local> in an outer scope only
+make the symbol available in inner scopes. It does not mean that imcc
+keeps track of the usage of such variables when they are used in
+different compilation units. Such variables have to be passed to other
 subs like other subroutine arguments - they are not intended to replace
 global variables.
 
@@ -163,7 +163,7 @@ global variables.
 will print 2 (both C<a> and C<I0> are getting the same register).
 
 The current behavior will be replaced by a consistent one in the future
-or tossed alltogether.
+or tossed altogether.
 
 
 Global labels and constants are kept in the global symbol table
@@ -174,7 +174,7 @@ This allows for global constant folding beyond subroutine scope.
 Local labels in different I<compilation units> with the same name are
 allowed, though running the generated PASM through F<assemble.pl>
 doesn't work. Running this code inside imcc is ok.
-This will probably change so that local labels are mangled to be uniq.
+This will probably change so that local labels are mangled to be unique.
 
 =head1 FILES
 
