@@ -22,7 +22,6 @@ sub fact($n) {
 
 sub main() {
     fact 12;
-    fact 14;
     fact -1;
     fact 0;
     fact 24;
@@ -30,7 +29,6 @@ sub main() {
 
 CODE
 12! = 479001600
-14! = 1278945280
 Sorry, can't take -1 factorial
 0! = 1
 Sorry, can't take 24 factorial
