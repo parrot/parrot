@@ -252,7 +252,15 @@ sub disassemble_file {
     printf "#\n";
     printf "# Segments:\n";
     printf "#\n";
+    printf "#   * Wordsize: %8d bytes\n", sizeof('byte');
+    printf "#   * Byteorder: %8d bytes\n", sizeof('byte');
+    printf "#   * Major: %8d bytes\n", sizeof('byte');
+    printf "#   * Minor: %8d bytes\n", sizeof('byte');
+    printf "#   * Flags: %8d bytes\n", sizeof('byte');
+    printf "#   * FloatType: %8d bytes\n", sizeof('byte');
+    printf "#   * Unused: %8d bytes\n", length($pf->pad);
     printf "#   * Magic Number: %8d bytes\n", sizeof('op');
+    printf "#   * Opcode Type: %8d bytes\n", sizeof('op');
     printf "#   * Fixup Table:  %8d bytes\n", $pf->fixup_table->packed_size;
     printf "#   * Const Table:  %8d bytes\n", $pf->const_table->packed_size;
     printf "#   * Byte Code:    %8d bytes (%d opcode_ts)\n", length($pf->byte_code), length($pf->byte_code) / sizeof('op');
