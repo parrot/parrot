@@ -93,7 +93,7 @@ pmclass IntQueue {
     }
 
     INTVAL type () {
-        return 0;
+        return enum_class_IntQueue;
     }
 
     void morph (INTVAL type) {

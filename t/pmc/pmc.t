@@ -1,7 +1,8 @@
 #! perl -w
 
-use Parrot::Test tests => 71;
+use Parrot::Test tests => 72;
 use Test::More;
+use Parrot::PMC qw(%pmc_types);
 
 my $fp_equality_macro = <<'ENDOFMACRO';
 .macro fp_eq (	J, K, L )
@@ -1576,6 +1577,43 @@ Albert
 Beth
 Charlie
 Doris
+OUTPUT
+
+my $checkTypes;
+while (my ($type, $id) = each %pmc_types) {
+    $checkTypes .= <<"CHECK";
+    new P0, .$type
+    set S1, "$type"
+    typeof S0, P0
+    ne S0, S1, L_BadName
+    set I1, $id
+    typeof I0, P0
+    ne I0, I1, L_BadId
+CHECK
+}
+
+output_is(<<"CODE", <<OUTPUT, "PMC type check");
+    new P10, .PerlHash # Type id hash
+    new P11, .PerlHash # Type name hash
+$checkTypes
+    print "All names and ids ok.\\n"
+    end
+L_BadName:
+    print S1
+    print " PMCs have incorrect name \\""
+    print S0
+    print "\\"\\n"
+    end
+L_BadId:
+    print S1
+    print " PMCs should be type "
+    print I1
+    print " but have incorrect type "
+    print I0
+    print "\\n"
+    end
+CODE
+All names and ids ok.
 OUTPUT
 
 1;
