@@ -23,7 +23,7 @@ enum {
     enum_class_PerlHash,
     enum_class_ParrotPointer,
     enum_class_IntQueue,
-    enum_class_max
+    enum_class_max = 100
 };
 VAR_SCOPE VTABLE Parrot_base_vtables[enum_class_max];
 

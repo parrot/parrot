@@ -19,15 +19,15 @@ init_world(void) {
     string_init(); /* Set up the string subsystem */
     
     /* Call base vtable class constructor methods! */
-    Parrot_Array_class_init();
-    Parrot_PerlUndef_class_init();
-    Parrot_PerlInt_class_init();
-    Parrot_PerlNum_class_init();
-    Parrot_PerlString_class_init();
-    Parrot_PerlArray_class_init();
-    Parrot_PerlHash_class_init();
-    Parrot_ParrotPointer_class_init();
-    Parrot_IntQueue_class_init();
+    Parrot_Array_class_init(enum_class_Array);
+    Parrot_PerlUndef_class_init(enum_class_PerlUndef);
+    Parrot_PerlInt_class_init(enum_class_PerlInt);
+    Parrot_PerlNum_class_init(enum_class_PerlNum);
+    Parrot_PerlString_class_init(enum_class_PerlString);
+    Parrot_PerlArray_class_init(enum_class_PerlArray);
+    Parrot_PerlHash_class_init(enum_class_PerlHash);
+    Parrot_ParrotPointer_class_init(enum_class_ParrotPointer);
+    Parrot_IntQueue_class_init(enum_class_IntQueue);
 }
 
 /*

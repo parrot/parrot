@@ -252,11 +252,11 @@ EOC
       my $initline = 1+count_newlines($OUT)+1;
       $OUT .= qq(#line $initline "$cfile"\n) unless $suppress_lines;
       $HOUT .= <<EOH;
-void $initname (void);
+void $initname (INTVAL);
 EOH
       $OUT .= <<EOC;
 
-void $initname (void) {
+void $initname (INTVAL entry) {
 
     struct _vtable temp_base_vtable = {
         NULL,
@@ -271,7 +271,7 @@ void $initname (void) {
    whoami = string_make(NULL, /* DIRTY HACK */
        "$classname", 7, 0, 0, 0);
 
-   Parrot_base_vtables[enum_class_$classname] = temp_base_vtable;
+   Parrot_base_vtables[entry] = temp_base_vtable;
 }
 EOC
   }
