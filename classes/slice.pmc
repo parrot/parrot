@@ -227,6 +227,7 @@ C<xrange> object.
             RVal_int(range->end)--;
         else
             RVal_int(range->end)++;
+        PMC_pmc_val(xro) = pmc_new_noinit(INTERP, enum_class_PerlInt);
         REG_PMC(5) = xro;
         PObj_active_destroy_SET(SELF);
         return next;
@@ -340,7 +341,7 @@ This is used for implementing Pythons xrange()
 
     PMC* get_pmc_keyed(PMC* key) {
         parrot_range_t *r = PMC_struct_val(key);
-        PMC *res = pmc_new_noinit(INTERP, enum_class_PerlInt);
+        PMC *res = PMC_pmc_val(SELF);
         PMC_int_val(res) = RVal_int(r->cur);
         return res;
     }
