@@ -333,12 +333,13 @@ package Assembler;
 
 use POSIX; # Needed for strtol()
 
-use lib './lib';
+use FindBin;
+use lib "$FindBin::Bin/lib";
 use Parrot::Types; # For pack_op()
 use Parrot::OpLib::core;
 
-use lib './lib/Parrot/blib/lib';
-use lib './lib/Parrot/blib/arch/auto/Parrot/PakFile2';
+use lib "$FindBin::Bin/lib/Parrot/blib/lib";
+use lib "$FindBin::Bin/lib/Parrot/blib/arch/auto/Parrot/PakFile2";
 use Parrot::PakFile2;
 
 =head2 Assembler class
