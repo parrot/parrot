@@ -1,0 +1,21 @@
+This directory contains the outcome of the (failed) attempt to
+implement - within five weeks - enough of Python, to run the Pie-thon
+benchmark for OSCON:
+
+http://mail.python.org/pipermail/python-dev/2003-December/040977.html
+
+The bytecode translator pie-thon.pl was just intended as a quick hack,
+to see, what parts of parrot are missing and to get the project
+running. The implementation is a mess and partially wrong, OTOH it's
+enough to get four and half tests running. F<t/pie/b*.t> shows
+implemented features.
+
+IMHO its not a good idea to translate a language at the bytecode
+level: too much information is hidden in the linearized opcode stream,
+the opcodes are already specialized for the target VM. The
+translator has more or less to guess, what's really intended.
+
+A real implementation of a compiler should use the AST to produce
+Parrot bytecode.
+
+leo
