@@ -23,6 +23,48 @@ These are the vtable functions for the Python Dictionary class
 
 STRING * hash_get_idx(Interp *interpreter, Hash *hash, PMC *key);
 
+/*
+
+=item C<static size_t
+key_hash_object(Interp *interpreter, Hash *hash, void *value)>
+
+Return the hashed value of the object C<value>.
+
+=cut
+
+*/
+
+static size_t
+key_hash_object(Interp *interpreter, Hash *hash, void *value)
+{
+    STRING *s = value;
+
+    if (s->hashval) {
+        return s->hashval ^ hash->seed;
+    }
+
+    return string_hash(interpreter, s) ^ hash->seed;
+}
+
+/*
+
+=item C<static int
+object_compare(Parrot_Interp interp, void *a, void *b)>
+
+Compares the two objects, return 0 if they are identical.
+
+C<a> is the search key, C<b> is the bucket key.
+
+=cut
+
+*/
+
+static int
+object_compare(Parrot_Interp interp, void *a, void *b)
+{
+    return string_equal(interp, (STRING *)a, (STRING *) b);
+}
+
 pmclass PyDict extends PyObject need_ext does hash dynpmc group python_group {
 
 /*
@@ -54,7 +96,13 @@ Initializes the instance.
 
     void init () {
         PObj_custom_mark_SET(SELF);
-        new_pmc_hash(INTERP, SELF);
+        new_pmc_hash_x(INTERP, SELF,
+            enum_type_PMC,
+            0,
+            Hash_key_type_none,
+            object_compare,     /* object compare */
+            key_hash_object,    /* object hash    */
+            pobject_lives);     /* object mark    */
     }
 
 /*
@@ -86,15 +134,15 @@ Deletes the element associated with C<*key>.
         STRING * sx;
         Hash * h = (Hash *)PMC_struct_val(SELF);
         HashBucket *b;
+        PMC *nextkey = key_next(INTERP, key);
         sx = key_string(INTERP, key);
-        key = key_next(INTERP, key);
         b = hash_get_bucket(INTERP, h, sx);
         if (b == NULL)
                 return;  /* no such key */
-        else if (key == NULL)
+        else if (nextkey == NULL)
             hash_delete(INTERP, h, sx);
         else
-            VTABLE_delete_keyed(INTERP, (PMC*)b->value, key);
+            VTABLE_delete_keyed(INTERP, (PMC*)b->value, nextkey);
     }
 
 /*
@@ -125,14 +173,14 @@ Returns whether a key C<*key> exists in the hash.
         STRING * sx;
         Hash * h = (Hash *)PMC_struct_val(SELF);
         HashBucket *b;
+        PMC *nextkey = key_next(INTERP, key);
         sx = key_string(INTERP, key);
-        key = key_next(INTERP, key);
         b = hash_get_bucket(INTERP, h, sx);
         if (b == NULL)
             return 0;       /* no such key */
-        if (key == NULL)
+        if (nextkey == NULL)
             return 1;       /* lookup stops here */
-        return VTABLE_exists_keyed(INTERP, (PMC*)b->value, key);
+        return VTABLE_exists_keyed(INTERP, (PMC*)b->value, nextkey);
     }
 
 /*
