@@ -43,7 +43,8 @@ undefined values) is undefined, and may be rather funky.
 
 .pcc_sub _config
     .local pmc CONF
-    .const string conf_file = "library/config.fpmc"
+    # XXX: this works only if parrot is run from its root directory
+    .const string conf_file = "runtime/parrot/include/config.fpmc"
 
     open CONF, conf_file, "<"
     $I0 = defined CONF

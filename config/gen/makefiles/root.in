@@ -112,7 +112,7 @@ GEN_CONFIGS = \
     include/parrot/core_pmcs.h \
     lib/Parrot/Config.pm \
     lib/Parrot/PMC.pm \
-    library/config.fpmc \
+    runtime/parrot/include/config.fpmc \
     $(SRC)/platform.c \
 #CONDITIONED_LINE(platform_asm):    $(SRC)/platform_asm.s \
     $(SRC)/core_pmcs.c \
@@ -393,7 +393,7 @@ MAKE_C = ${make_c}
 #
 ###############################################################################
 
-all : flags_dummy $(TEST_PROG) runtime/parrot/include/parrotlib.pbc library/config.fpmc docs $(LIBNCI_SO)
+all : flags_dummy $(TEST_PROG) runtime/parrot/include/parrotlib.pbc runtime/parrot/include/config.fpmc docs $(LIBNCI_SO)
 
 .SUFFIXES : .c .h .pmc .dump $(O) .str
 
@@ -509,8 +509,8 @@ flags_dummy :
 runtime/parrot/include/parrotlib.pbc: runtime/parrot/library/parrotlib.imc
 	./parrot -o $@ $^
 
-library/config.fpmc : myconfig config_lib.pasm $(TEST_PROG)
-	@echo Invoking Parrot to generate library/config.fpmc--cross your fingers
+runtime/parrot/include/config.fpmc : myconfig config_lib.pasm $(TEST_PROG)
+	@echo Invoking Parrot to generate runtime/parrot/include/config.fpmc --cross your fingers
 	./parrot config_lib.pasm
 	@echo If the next line prints $(VERSION), it did help.
 	./parrot parrot-config.imc VERSION DEVEL
