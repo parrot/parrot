@@ -7,25 +7,40 @@ docs/debug.pod - Debugging Parrot
 
 =head1 ABSTRACT
 
-This document describes ways to debug various parts of Parrot.
+This document describes how to debug various parts of Parrot.
 
-=head1 THE PARROT AND IMCC BINARIES
+=head1 THE PARROT BINARY
 
-First, you'll want to use the C<--debugging> flag with F<Configure.pl> to
-generate debugging symbols for the parrot binary:
+=head2 Using a debugger
 
-    % perl Configure.pl --debugging
-    % make
+Per default the C<parrot> binary is being built with 
+debugging symbols. This means that you can run C<parrot> under 
+an debugger like C<gdb>. 
 
-You can then run the parrot binary under gdb.
+Debugging support can be explictly enabled with: 
 
-You could also run all the tests with valgrind, by running
+    shell> perl Configure.pl --debugging
+    shell> make
 
-    % make test IMCC="valgrind -q languages/imcc/imcc"
+For testing it might be a good idea to make test runs without debug support.
+So debugging can also be turned off with:
+
+  shell> perl Configure.pl --debugging=0
+  shell> make
+
+=head2 Using a memory checker
+
+You could, and should, also run the tests with a memory checker 
+such as C<valgrind>. 
+You can enable C<valgrind>, by running:
+
+  shell> make test VALGRIND="valgrind --logfile=/tmp/grind"
+
+Another possibility is to use Electric Fence, or ...
 
 =head2 MEMORY MANAGEMENT
 
-Some of the more frequent and exasperating parrot bugs are related to
+Some of the more frequent and exasperating C<parrot> bugs are related to
 memory management in general, and garbage collection in particular.
 
 Infant mortality
@@ -36,14 +51,14 @@ the garbage collector runs before you put it into a Parrot register or
 in something else that is itself within a Parrot register.
 
 To help in resolving these issues, the parrot binary accepts a
-C<--gc-debug> flag that makes such problems much more likely to occur (it
-makes garbage collection occur as frequently as possible, to maximize
-the probability that any newborn objects will run afoul of the garbage
-collector if they are improperly coded.)
+C<--gc-debug> flag. This flag makes garbage collection occur as frequently as possible, 
+which maximizes the probability that any newborn objects will run afoul of the garbage
+collector.
 
 Within the C<--gc-debug> mode, there is another tool to help narrow down
-the problem. If you edit F<src/dod.c> and C<#define> the C<GC_VERBOSE> flag to 
-1, then after the garbage collector has traced all objects to find which 
+the problem. You you edit F<src/dod.c> and C<#define> the C<GC_VERBOSE> flag to 
+1. After recompiling C<parrot> the garbage collecter will perform additional checks.
+After the garbage collector has traced all objects to find which 
 ones are still alive, it will scan through all of the dead objects to see 
 if any of them believe they are alive (which will happen for infants, since 
 they come into existence marked live.) If it finds any, it will print them 
@@ -54,23 +69,23 @@ the version number that was reported, because the same memory location
 will probably hold many different objects over the lifetime of the
 program.
 
-=head1 IMCC AND PASM CODE
+=head1 PIR AND PASM CODE
 
 Let's say you have written (or generated) a huge .pasm or .imc file.
 It's not working. You'd like some help in figuring out why.
 
 =head2 pdb
 
-One possible tool is F<pdb>, the Parrot Debugger. See
+One possible tool is C<pdb>, the Parrot Debugger. See
 F<docs/debugger.pod> for details on it.
 
 =head2 stabs
 
 If you are running on a jit-capable machine, you can also try using
-GDB by having the JIT generate C<stabs> metadata and then stepping
-through the code with GDB as if it were any other language.
+C<gdb> by having the JIT compiler generate C<stabs> metadata and then stepping
+through the code with C<gdb> as if it were any other language.
 
-To use this, you'll want to use C<imcc> to generate your bytecode
+To use this, you'll want to use C<parrot> to generate your bytecode
 (.pbc file). It is not strictly necessary, but you'll get more
 information into the bytecode this way.
 
@@ -79,9 +94,9 @@ will also work if you use C<test.imc> everywhere C<test.pasm> occurs.)
 
 Step 1: Generate the .pbc file with extra debugging information.
 
-  % imcc -d -o test.pbc test.pasm
+  shell> parrot -d -o test.pbc test.pasm
 
-Step 2: Start up parrot under GDB
+Step 2: Start up C<parrot> under C<gdb>
 
   % gdb parrot
 
@@ -95,11 +110,11 @@ Step 3: Set a breakpoint on runops_jit
 
   gdb> b runops_jit
 
-Step 4: Run your program under GDB with JIT and debugging on
+Step 4: Run your program under C<gdb> with JIT and debugging on
 
   gdb> run -j -d test.pbc
 
-Step 5: GDB will stop at the beginning of runops_jit. Step through the
+Step 5: C<gdb> will stop at the beginning of runops_jit. Step through the
 lines until just before the JITted code is executed (the line will be
 something like C<(jit_code)(interpreter,pc)>.
 
@@ -119,34 +134,45 @@ Step 7: Step into the JITted code
   gdb> s
 
 At this point, you can step through the instructions, or print out the
-various Parrot registers. GDB will know about I0-I31, N0-N31, S0-S31,
+various Parrot registers. C<gdb> will know about I0-I31, N0-N31, S0-S31,
 and P0-P31.
 
 WARNING: Stepping too far
 
-One thing to watch out for is that GDB gets confused when attempting
+One thing to watch out for is that C<gdb> gets confused when attempting
 to step over certain instructions. The only ones that I have noticed
-having problems is keyed operations. With my version of GDB, if I do
-'n' to step over the instruction, GDB will start running and only stop
+having problems is keyed operations. With my version of C<gdb>, if I do
+'n' to step over the instruction, C<gdb> will start running and only stop
 when the entire parrot program has finished. To work around this, do
-'si' twice just before executing any keyed op. For some reason, GDB
+'si' twice just before executing any keyed op. For some reason, C<gdb>
 can then figure out when it's supposed to stop next. If you know of a
 better technique, please let the mailing list know
 (C<perl6-internals@perl.org>).
 
-=head1 IMCC CODE GENERATION
+=head1 PIR CODE GENERATION
 
-The C<imcc> binary has a bunch of debugging flags for spewing out
+The C<parrot> binary has a bunch of debugging flags for spewing out
 information about various aspects of its processing. See
-F<languages/imcc/docs/running.pod> for a list of flags.
+F<imcc/docs/running.pod> for a list of flags. Or have a look at the 
+information provided by:
+
+  shell> parrot --help
+
+or
+
+  shell> parrot --help-debug
 
 =head1 HISTORY
 
 =over 4
+
+=item Version 1.1
+
+Updates to remove references to C<imcc> by 
+<Bernhard.Schmalhofer@biomax.de>
 
 =item Version 1.0
 
 First version by Steve Fink <steve@fink.com>
 
 =back
-
