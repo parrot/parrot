@@ -16,17 +16,77 @@
 pmclass mmd_default extends default {
 
   void add(PMC* value, PMC* dest) {
+    mmd_dispatch_pmc(interpreter, SELF, value, dest, MMD_ADD);
   }
 
   void subtract(PMC* value, PMC* dest) {
+    mmd_dispatch_pmc(interpreter, SELF, value, dest, MMD_SUBTRACT);
   }
 
   void multiply(PMC* value, PMC* dest) {
+    mmd_dispatch_pmc(interpreter, SELF, value, dest, MMD_MULTIPLY);
   }
 
-  void divide(PMC* value, PMC*dest) {
+  void divide(PMC* value, PMC* dest) {
+    mmd_dispatch_pmc(interpreter, SELF, value, dest, MMD_DIVIDE);
   }
 
-  
+  void modulus(PMC* value, PMC* dest) {
+    mmd_dispatch_pmc(interpreter, SELF, value, dest, MMD_MOD);
+  }
+
+  void cmodulus(PMC* value, PMC* dest) {
+    mmd_dispatch_pmc(interpreter, SELF, value, dest, MMD_CMOD);
+  }
+
+  void bitwise_and(PMC* value, PMC* dest) {
+    mmd_dispatch_pmc(interpreter, SELF, value, dest, MMD_BAND);
+  }
+
+  void bitwise_or(PMC* value, PMC* dest) {
+    mmd_dispatch_pmc(interpreter, SELF, value, dest, MMD_BOR);
+  }
+
+  void bitwise_xor(PMC* value, PMC* dest) {
+    mmd_dispatch_pmc(interpreter, SELF, value, dest, MMD_BXOR);
+  }
+
+  void bitwise_shl(PMC* value, PMC* dest) {
+    mmd_dispatch_pmc(interpreter, SELF, value, dest, MMD_BSL);
+  }
+
+  void bitwise_shr(PMC* value, PMC* dest) {
+    mmd_dispatch_pmc(interpreter, SELF, value, dest, MMD_BSR);
+  }
+
+  void concatenate(PMC* value, PMC* dest) {
+    mmd_dispatch_pmc(interpreter, SELF, value, dest, MMD_CONCAT);
+  }
+
+  void logical_and(PMC* value, PMC* dest) {
+    mmd_dispatch_pmc(interpreter, SELF, value, dest, MMD_LAND);
+  }
+
+  void logical_or(PMC* value, PMC* dest) {
+    mmd_dispatch_pmc(interpreter, SELF, value, dest, MMD_LOR);
+  }
+
+  void logical_xor(PMC* value, PMC* dest) {
+    mmd_dispatch_pmc(interpreter, SELF, value, dest, MMD_LXOR);
+  }
+
+  void repeat(PMC* value, PMC* dest) {
+    mmd_dispatch_pmc(interpreter, SELF, value, dest, MMD_REPEAT);
+  }
+
+  void is_equal(PMC* value, PMC* dest) {
+    mmd_dispatch_pmc(interpreter, SELF, value, dest, MMD_EQ);
+  }
+
+  void cmp(PMC* value, PMC* dest) {
+    mmd_dispatch_pmc(interpreter, SELF, value, dest, MMD_CMP);
+  }
+
+
 
 }
