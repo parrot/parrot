@@ -70,4 +70,5 @@ t/op/trans.t
 t/test.pasm
 t/test2.pasm
 t/test3.pasm
+test_c.in
 test_main.c
