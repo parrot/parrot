@@ -463,7 +463,17 @@ sub _annotate_contents {
   $self->{pc}++;
   return if $line=~/^\s*$/ or $line=~/^\s*#/; # Filter out the comments and blank lines
   $line=~s/^\s+//;           # Remove leading whitespace
-  $line=~s/^((?:[^'"]+|$str_re)*)#.*$/$1/o; # Remove trailing comments
+  # Doing it this way chews infinite CPU on 5.005_03. I suspect 5.6.1
+  # introduces some cunning optimisation in the regexp engine to avoid
+  # backtracking through the brackets with the multiple levels of *s
+  #
+  # $line=~s/^((?:[^'"]+|$str_re)*)#.*$/$1/; # Remove trailing comments
+  #
+  # This is 5.005_03 friendly:
+  if ($line=~ /^(?:[^'"]+|$str_re)#/g) {
+    # pos will point to the character after the #
+    substr ($line, (pos $line) - 1) = '';
+  }
   $line=~s/\s+\z//;           # Remove trailing whitespace
   #
   # Accumulate lines that only have labels until an instruction is found.
