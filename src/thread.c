@@ -325,10 +325,11 @@ pt_join_threads(Parrot_Interp interpreter)
 }
 
 /*
- * detach (make non-joinable) thread
+ * helper for detach and kill
+ * return interpreter, if it didn't finish yet
  */
-void
-pt_thread_detach(UINTVAL tid)
+static Parrot_Interp
+detach(UINTVAL tid)
 {
     Parrot_Interp interpreter;
 
@@ -343,9 +344,20 @@ pt_thread_detach(UINTVAL tid)
         interpreter->thread_data->state |= THREAD_STATE_DETACHED;
         if (interpreter->thread_data->state & THREAD_STATE_FINISHED) {
             interpreter_array[tid] = NULL;
+            Parrot_really_destroy(0, interpreter);
+            interpreter = NULL;
         }
     }
     UNLOCK(interpreter_array_mutex);
+    return interpreter;
+}
+/*
+ * detach (make non-joinable) thread
+ */
+void
+pt_thread_detach(UINTVAL tid)
+{
+    (void) detach(tid);
 }
 
 /*
@@ -354,26 +366,14 @@ pt_thread_detach(UINTVAL tid)
 void
 pt_thread_kill(UINTVAL tid)
 {
-    Parrot_Interp interpreter;
+    Parrot_Interp interpreter = detach(tid);
 
-    LOCK(interpreter_array_mutex);
-    interpreter = pt_check_tid(tid, "kill");
-    /*
-     * if interpreter is joinable, we detach em
-     */
-    if (interpreter->thread_data->state == THREAD_STATE_JOINABLE) {
-        DETACH(interpreter->thread_data->thread);
-        interpreter->thread_data->state |= THREAD_STATE_DETACHED;
+    if (interpreter) {
+        /*
+         * schedule a terminate event for that interpreter
+         */
+        Parrot_new_terminate_event(interpreter);
     }
-    if (interpreter->thread_data->state & THREAD_STATE_FINISHED) {
-        UNLOCK(interpreter_array_mutex);
-        return;
-    }
-    UNLOCK(interpreter_array_mutex);
-    /*
-     * schedule a terminate event for that interpreter
-     */
-    Parrot_new_terminate_event(interpreter);
 }
 
 /*

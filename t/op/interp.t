@@ -1,6 +1,6 @@
 #! perl -w
 
-use Parrot::Test tests => 16;
+use Parrot::Test tests => 17;
 
 output_is(<<'CODE', <<'OUTPUT', "runinterp - new style");
 	new P0, .ParrotInterpreter
@@ -242,7 +242,7 @@ from 1 interp
 OUTPUT
 
 SKIP: {
-  skip("No thread config yet", 5) unless ($^O eq 'linux' or $^O eq 'darwin');
+  skip("No thread config yet", 6) unless ($^O eq 'linux' or $^O eq 'darwin');
 
 output_is(<<'CODE', <<'OUTPUT', "interp identity");
     getinterp P2
@@ -457,6 +457,28 @@ loop:
 CODE
 500500
 500500
+OUTPUT
+
+output_like(<<'CODE', <<'OUTPUT', "thread - detach");
+    find_global P6, "_foo"
+    new P5, .ParrotThread
+    find_method P0, P5, "thread3"
+    set I3, 2
+    invoke	# start the thread
+
+    set I5, P5
+    getinterp P2
+    find_method P0, P2, "detach"
+    invoke
+    print "done\n"
+    sleep 0.1
+    end
+
+.pcc_sub _foo:
+    print "thread\n"
+    invoke P1
+CODE
+/(done\nthread\n)|(thread\ndone\n)/
 OUTPUT
 
 }
