@@ -32,7 +32,7 @@
 pmclass ParrotObject extends ParrotClass need_ext {
 
     void init() {
-	/* make sure all users "new" the register class and not
+	/* make sure all users "new" the registered class PMC and not
 	 * the ParrotObject itself.
 	 * During Parrot_class_register this init() method
 	 * gets replaced by Parrot_instantiate_object
@@ -73,7 +73,7 @@ pmclass ParrotObject extends ParrotClass need_ext {
     INTVAL get_integer_keyed_int (INTVAL idx) {
 	PMC* data_array = (PMC*) PMC_data(SELF);
 	return VTABLE_get_integer_keyed_int(interpreter, data_array,
-			idx + SELF->cache.int_val);
+		idx + SELF->cache.int_val);
     }
 
     INTVAL get_integer_keyed_str (STRING* attr) {
@@ -86,14 +86,25 @@ pmclass ParrotObject extends ParrotClass need_ext {
 	return SELF.get_integer_keyed_int(idx);
     }
 
+    /*
+     * if there is a chance that attributes are accessed with an explicit
+     * Key PMC, we need the test for the key type - if not only the
+     * keyed_str thingy is necessary
+     * This holds for all plain _keyed get_ and set_ variants
+     */
     INTVAL get_integer_keyed (PMC* attr) {
-	return SELF.get_integer_keyed_str(key_string(interpreter, attr));
+	int flag = PObj_get_FLAGS(attr) & KEY_type_FLAGS;
+	if ( flag & KEY_integer_FLAG) {
+	    return SELF.get_integer_keyed_int(key_integer(interpreter, attr));
+	} else {
+	    return SELF.get_integer_keyed_str(key_string(interpreter, attr));
+	}
     }
 
     void set_integer_keyed_int (INTVAL idx, INTVAL value) {
 	PMC* data_array = (PMC*) PMC_data(SELF);
 	VTABLE_set_integer_keyed_int(interpreter, data_array,
-			idx + SELF->cache.int_val, value);
+		idx + SELF->cache.int_val, value);
     }
 
     void set_integer_keyed_str (STRING* attr, INTVAL value) {
@@ -107,6 +118,167 @@ pmclass ParrotObject extends ParrotClass need_ext {
     }
 
     void set_integer_keyed (PMC* attr, INTVAL value) {
-	SELF.set_integer_keyed_str(key_string(interpreter, attr), value);
+	int flag = PObj_get_FLAGS(attr) & KEY_type_FLAGS;
+	if ( flag & KEY_integer_FLAG) {
+	    SELF.set_integer_keyed_int(key_integer(interpreter, attr), value);
+	} else {
+	    SELF.set_integer_keyed_str(key_string(interpreter, attr), value);
+	}
+    }
+
+
+    FLOATVAL get_number_keyed_int (INTVAL idx) {
+	PMC* data_array = (PMC*) PMC_data(SELF);
+	return VTABLE_get_number_keyed_int(interpreter, data_array,
+		idx + SELF->cache.int_val);
+    }
+
+    FLOATVAL get_number_keyed_str (STRING* attr) {
+	PMC* data_array = (PMC*) PMC_data(SELF);
+	PMC *class = VTABLE_get_pmc_keyed_int(interpreter, data_array,
+		POD_CLASS);
+	INTVAL idx = VTABLE_get_integer_keyed_str(interpreter, class, attr);
+	if (idx < 0)
+	    internal_exception(1, "No such attribute");
+	return SELF.get_number_keyed_int(idx);
+    }
+
+    FLOATVAL get_number_keyed (PMC* attr) {
+	int flag = PObj_get_FLAGS(attr) & KEY_type_FLAGS;
+	if ( flag & KEY_integer_FLAG) {
+	    return SELF.get_number_keyed_int(key_integer(interpreter, attr));
+	} else {
+	    return SELF.get_number_keyed_str(key_string(interpreter, attr));
+	}
+
+    }
+
+    void set_number_keyed_int (INTVAL idx, FLOATVAL value) {
+	PMC* data_array = (PMC*) PMC_data(SELF);
+	VTABLE_set_number_keyed_int(interpreter, data_array,
+		idx + SELF->cache.int_val, value);
+    }
+
+    void set_number_keyed_str (STRING* attr, FLOATVAL value) {
+	PMC* data_array = (PMC*) PMC_data(SELF);
+	PMC *class = VTABLE_get_pmc_keyed_int(interpreter, data_array,
+		POD_CLASS);
+	INTVAL idx = VTABLE_get_integer_keyed_str(interpreter, class, attr);
+	if (idx < 0)
+	    internal_exception(1, "No such attribute");
+	SELF.set_number_keyed_int(idx, value);
+    }
+
+    void set_number_keyed (PMC* attr, FLOATVAL value) {
+	int flag = PObj_get_FLAGS(attr) & KEY_type_FLAGS;
+	if ( flag & KEY_integer_FLAG) {
+	    SELF.set_number_keyed_int(key_integer(interpreter, attr), value);
+	} else {
+	    SELF.set_number_keyed_str(key_string(interpreter, attr), value);
+	}
+
+    }
+
+
+    STRING* get_string_keyed_int (INTVAL idx) {
+	PMC* data_array = (PMC*) PMC_data(SELF);
+	return VTABLE_get_string_keyed_int(interpreter, data_array,
+		idx + SELF->cache.int_val);
+    }
+
+    STRING* get_string_keyed_str (STRING* attr) {
+	PMC* data_array = (PMC*) PMC_data(SELF);
+	PMC *class = VTABLE_get_pmc_keyed_int(interpreter, data_array,
+		POD_CLASS);
+	INTVAL idx = VTABLE_get_integer_keyed_str(interpreter, class, attr);
+	if (idx < 0)
+	    internal_exception(1, "No such attribute");
+	return SELF.get_string_keyed_int(idx);
+    }
+
+    STRING* get_string_keyed (PMC* attr) {
+	int flag = PObj_get_FLAGS(attr) & KEY_type_FLAGS;
+	if ( flag & KEY_integer_FLAG) {
+	    return SELF.get_string_keyed_int(key_integer(interpreter, attr));
+	} else {
+	    return SELF.get_string_keyed_str(key_string(interpreter, attr));
+	}
+    }
+
+    void set_string_keyed_int (INTVAL idx, STRING* value) {
+	PMC* data_array = (PMC*) PMC_data(SELF);
+	VTABLE_set_string_keyed_int(interpreter, data_array,
+		idx + SELF->cache.int_val, value);
+    }
+
+    void set_string_keyed_str (STRING* attr, STRING* value) {
+	PMC* data_array = (PMC*) PMC_data(SELF);
+	PMC *class = VTABLE_get_pmc_keyed_int(interpreter, data_array,
+		POD_CLASS);
+	INTVAL idx = VTABLE_get_integer_keyed_str(interpreter, class, attr);
+	if (idx < 0)
+	    internal_exception(1, "No such attribute");
+	SELF.set_string_keyed_int(idx, value);
+    }
+
+    void set_string_keyed (PMC* attr, STRING* value) {
+	int flag = PObj_get_FLAGS(attr) & KEY_type_FLAGS;
+	if ( flag & KEY_integer_FLAG) {
+	    SELF.set_string_keyed_int(key_integer(interpreter, attr), value);
+	} else {
+	    SELF.set_string_keyed_str(key_string(interpreter, attr), value);
+	}
+    }
+
+
+    PMC* get_pmc_keyed_int (INTVAL idx) {
+	PMC* data_array = (PMC*) PMC_data(SELF);
+	return VTABLE_get_pmc_keyed_int(interpreter, data_array,
+		idx + SELF->cache.int_val);
+    }
+
+    PMC* get_pmc_keyed_str (STRING* attr) {
+	PMC* data_array = (PMC*) PMC_data(SELF);
+	PMC *class = VTABLE_get_pmc_keyed_int(interpreter, data_array,
+		POD_CLASS);
+	INTVAL idx = VTABLE_get_integer_keyed_str(interpreter, class, attr);
+	if (idx < 0)
+	    internal_exception(1, "No such attribute");
+	return SELF.get_pmc_keyed_int(idx);
+    }
+
+    PMC* get_pmc_keyed (PMC* attr) {
+	int flag = PObj_get_FLAGS(attr) & KEY_type_FLAGS;
+	if ( flag & KEY_integer_FLAG) {
+	    return SELF.get_pmc_keyed_int(key_integer(interpreter, attr));
+	} else {
+	    return SELF.get_pmc_keyed_str(key_string(interpreter, attr));
+	}
+
+    }
+
+    void set_pmc_keyed_int (INTVAL idx, PMC* value) {
+	PMC* data_array = (PMC*) PMC_data(SELF);
+	VTABLE_set_pmc_keyed_int(interpreter, data_array,
+		idx + SELF->cache.int_val, value);
+    }
+
+    void set_pmc_keyed_str (STRING* attr, PMC* value) {
+	PMC* data_array = (PMC*) PMC_data(SELF);
+	PMC *class = VTABLE_get_pmc_keyed_int(interpreter, data_array,
+		POD_CLASS);
+	INTVAL idx = VTABLE_get_integer_keyed_str(interpreter, class, attr);
+	if (idx < 0)
+	    internal_exception(1, "No such attribute");
+	SELF.set_pmc_keyed_int(idx, value);
+    }
+
+    void set_pmc_keyed (PMC* attr, PMC* value) {
+	int flag = PObj_get_FLAGS(attr) & KEY_type_FLAGS;
+	if ( flag & KEY_integer_FLAG) {
+	    SELF.set_pmc_keyed_int(key_integer(interpreter, attr), value);
+	} else {
+	    SELF.set_pmc_keyed_str(key_string(interpreter, attr), value);
+	}
     }
 }
