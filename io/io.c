@@ -70,8 +70,13 @@ void free_io_header(ParrotIO *io) {
 /*
  * Initialize some stuff.
  */
+INTVAL pio_initialized;
+
 void PIO_init(theINTERP) {
         int err;
+
+        if( pio_initialized != 0 )
+                return;
 
         /* Init IO stacks before creating any handles */
         if((err = PIO_init_stacks(interpreter)) != 0) {
@@ -101,6 +106,7 @@ void PIO_init(theINTERP) {
  */
 INTVAL PIO_init_stacks(theINTERP) {
         ParrotIOLayer * p;
+
         PIO_push_layer(&pio_os_layer, NULL);
         /*PIO_push_layer(&pio_stdio_layer, NULL);*/
 
@@ -117,6 +123,8 @@ INTVAL PIO_init_stacks(theINTERP) {
                         }
                 }
         }
+
+        pio_initialized = 1;
         return 0;
 }
 
@@ -166,6 +174,7 @@ void PIO_base_delete_layer(ParrotIOLayer * layer) {
  * Push a layer onto an IO object or the default stack
  */
 INTVAL PIO_push_layer(ParrotIOLayer * layer, ParrotIO * io) {
+        ParrotIOLayer * t;
         if( !layer )
                 return -1;
         if( io ) {
@@ -174,6 +183,16 @@ INTVAL PIO_push_layer(ParrotIOLayer * layer, ParrotIO * io) {
                         /* Error( 1st layer must be terminal) */
                         return -1;
                 }
+                /* Check and see if this layer already is on stack
+                 * This is a internals sanity check not a user level
+                 * check, at least until I fix copy-on-write stacks.
+                 * -Melvin
+                 */
+                for(t=io->stack; t; t=t->down) {
+                        if( t == layer )
+                                return -1;
+                }
+
                 layer->down = io->stack;
                 if( io->stack )
                         io->stack->up = layer; 
@@ -186,6 +205,12 @@ INTVAL PIO_push_layer(ParrotIOLayer * layer, ParrotIO * io) {
                         /* Error( 1st layer must be terminal) */
                         return -1;
                 }
+                /* Sanity check */
+                for(t=pio_default_stack; t; t=t->down) {
+                        if( t == layer )
+                                return -1;
+                }
+
                 layer->down = pio_default_stack;
                 if( pio_default_stack )
                         pio_default_stack->up = layer;
@@ -319,8 +344,7 @@ INTVAL PIO_close(theINTERP, ParrotIO * io) {
                 while(l) {
                         if(l->api->Close) {
                                 PIO_flush(interpreter, io);
-                                (*l->api->Close)(interpreter, l, io);
-                                return;
+                                return (*l->api->Close)(interpreter,l,io);
                         }
                         l = PIO_DOWNLAYER(l);
                 }

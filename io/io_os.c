@@ -122,7 +122,7 @@ ParrotIO * PIO_os_fdopen(theINTERP, ParrotIOLayer * layer,
         /* Need to make this portable, I haven't checked this
          * on non-UNIX.
          */
-#if 1
+#if 0
         /* Get descriptor flags */
         if((flags = fcntl(fd, F_GETFL, 0)) >= 0) {
                 /*int accmode = flags & O_ACCMODE;*/
@@ -187,7 +187,7 @@ size_t PIO_os_read(theINTERP, ParrotIOLayer * layer, ParrotIO * io,
 size_t PIO_os_write(theINTERP, ParrotIOLayer * layer, ParrotIO * io,
 			const void * buffer, size_t len) {
         int err;
-        int bytes;
+        size_t bytes;
         size_t to_write;
         const char * ptr;
 #if 0
@@ -215,6 +215,7 @@ size_t PIO_os_write(theINTERP, ParrotIOLayer * layer, ParrotIO * io,
 #ifdef EAGAIN
                                 case EAGAIN:    return bytes;
 #endif
+                                default:        return -1;
                         }
                 }
         }
