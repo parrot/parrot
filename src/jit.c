@@ -25,6 +25,7 @@ optimize_jit(struct Parrot_Interp *interpreter, opcode_t *pc, opcode_t *code_sta
 
     optimizer = (Parrot_jit_optimizer_t *)mem_sys_allocate(sizeof(Parrot_jit_optimizer_t));
     branches = (char *)mem_sys_allocate((size_t)(code_end - code_start));
+    memset(branches, 0, (size_t)(code_end - code_start));
 
     while (pc < code_end)
     {
@@ -77,24 +78,27 @@ optimize_jit(struct Parrot_Interp *interpreter, opcode_t *pc, opcode_t *code_sta
     pc = code_start;
     while (pc < code_end)
     {
+        opcode_t *nextpc = pc + op_jit[*pc].nargop;
+        
         op_info = &interpreter->op_info_table[*pc];
 
         for (argn = 0; argn < op_info->arg_count - 1; argn++)
             if (op_info->types[argn] == PARROT_ARG_I)
                 cur_section->int_reg_count[*(pc + argn)]++;
 
-        if ((branches[pc - code_start] == JIT_BRANCH_SOURCE) || (branches[pc - code_start + op_jit[*pc].nargop] == JIT_BRANCH_TARGET))
+        if ((branches[pc - code_start] == JIT_BRANCH_SOURCE) ||
+            (nextpc < code_end && branches[nextpc - code_start] == JIT_BRANCH_TARGET))
         {
             /* cur_section->int_reg_map = registers_tomap(&cur_section->int_reg_count) */
             cur_section->end = (pc - code_start);
             /* If it's not the last op allocate a new section */
-            if ((pc + op_jit[*pc].nargop) < code_end)
+            if (nextpc < code_end)
             {
                 next_section = (Parrot_jit_optimizer_section_t *) mem_sys_allocate(sizeof(Parrot_jit_optimizer_section_t));
                 cur_section->next = next_section;
                 next_section->prev = cur_section;
                 cur_section = next_section; 
-                cur_section->begin = pc + op_jit[*pc].nargop - code_start;
+                cur_section->begin = nextpc - code_start;
                 memset(cur_section->int_reg_count, 0, NUM_REGISTERS * sizeof(INTVAL));
                 cur_section->next=NULL;
                 cur_section->has_jit_op = 1;
@@ -104,7 +108,7 @@ optimize_jit(struct Parrot_Interp *interpreter, opcode_t *pc, opcode_t *code_sta
         if ((op_jit[*pc].fn != Parrot_jit_normal_op) && (op_jit[*pc].fn != Parrot_jit_cpcf_op))
             cur_section->has_jit_op = 0;
         
-        pc += op_jit[*pc].nargop;
+        pc = nextpc;
     }
     cur_section->end = (pc - code_start);
 
@@ -185,8 +189,10 @@ build_asm(struct Parrot_Interp *interpreter,opcode_t *pc, opcode_t *code_start, 
         jit_info.op_i += op_jit[cur_opcode_byte].nargop;
         jit_info.cur_op += op_jit[cur_opcode_byte].nargop;
 
-        jit_info.op_map[jit_info.op_i].offset =
-                                    jit_info.native_ptr - jit_info.arena_start;
+        if (jit_info.cur_op < code_end){
+            jit_info.op_map[jit_info.op_i].offset =
+                jit_info.native_ptr - jit_info.arena_start;
+        }
     }
 
     /* Do fixups before converting offsets */
