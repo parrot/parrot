@@ -84,7 +84,7 @@ sub makefiles {
   # set up docs/Makefile, partly based on the .ops in the root dir
 
   opendir OPS, "ops" or die "opendir ops: $!";
-  my @ops = sort grep { /\.ops$/ } readdir OPS;
+  my @ops = sort grep { !/^\./ && /\.ops$/ } readdir OPS;
   closedir OPS;
 
   my $pod = join " ", map { my $t = $_; $t =~ s/\.ops$/.pod/; "ops/$t" } @ops;
