@@ -94,7 +94,7 @@ typedef enum BUFFER_flag {
     /* Generation in the GC pools */
     BUFFER_generation_FLAG = 1 << 17 | 1 << 18,
     /* Buffer header has a strstart which needs to be updated with bufstart */
-    BUFFER_strstart_FLAG = 1 << 19,
+    BUFFER_strstart_FLAG = 1 << 19
 } BUFFER_flags;
 
 /* stringinfo parameters */
