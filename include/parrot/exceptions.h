@@ -27,6 +27,7 @@ void do_panic(struct Parrot_Interp *interpreter, const char *message,
 /* Exception Types */
 /* &gen_from_def(except_types.pasm) prefix(EXCEPTION_) */
 
+#define NULL_REG_ACCESS 1
 #define NO_REG_FRAMES 1
 #define SUBSTR_OUT_OF_STRING 1
 #define ORD_OUT_OF_STRING 1
