@@ -1486,32 +1486,42 @@ PDB_add_label(PDB_file_t *file, opcode_t *cur_opcode, opcode_t offset)
 }
 
 /* PDB_free_file
- * Frees an allocated file.
+ * Frees any allocated source files.
  */
 void
 PDB_free_file(struct Parrot_Interp *interpreter)
 {
-    PDB_line_t *nline, *line = interpreter->pdb->file->line;
-    PDB_label_t *nlabel, *label = interpreter->pdb->file->label;
+    PDB_line_t *nline, *line;
+    PDB_label_t *nlabel, *label;
+    PDB_file_t *nfile, *file = interpreter->pdb->file;
 
-    /* while there is a line structure allocated, free it */
-    while (line) {
-        nline = line->next;
-        mem_sys_free(line);
-        line = nline;
+    while (file) {
+        /* Free all of the allocated line structures */
+        line = file->line;
+        while (line) {
+            nline = line->next;
+            mem_sys_free(line);
+            line = nline;
+        }
+
+        /* Free all of the allocated label structures */
+        label = file->label;
+        while (label) {
+            nlabel = label->next;
+            mem_sys_free(label);
+            label = nlabel;
+        }
+
+        /* Free the remaining allocated portions of the file structure */
+        if (file->sourcefilename)
+            mem_sys_free(file->sourcefilename);
+        if (file->source)
+            mem_sys_free(file->source);
+        nfile = file->next;
+        mem_sys_free(file);
+        file = nfile;
     }
 
-    /* while there is a label structure allocated, free it */
-    while (label) {
-        nlabel = label->next;
-        mem_sys_free(label);
-        label = nlabel;
-    }
-
-    /* XXX change me when there is more than one file */
-    mem_sys_free(interpreter->pdb->file->source);
-    /* Free the file structure */
-    mem_sys_free(interpreter->pdb->file);
     /* Make sure we don't end up pointing at garbage memory */
     interpreter->pdb->file = NULL;
 }
