@@ -1,0 +1,36 @@
+Parrot-0.0.999 was reported to compile and run tests successfuly on these
+platforms:
+
+Platform                Runloops         Feature        Compile  Tests
+                     CGoto JIT EXEC   Threads Signals
+---------------------------------------------------------------------
+aix
+darwin
+freebsd
+hpux
+?-ia64
+irix6.5                                  Y                 Y       Y/2
+linux-x86-gcc2.92.2    Y    Y    Y       Y      Y          Y       Y
+linux-x86-gcc3.3.3     Y    Y    Y       Y      Y          Y       Y
+linux-x64
+openbsd
+os2
+solaris
+true64
+vms
+win32-bcc
+win32-cygwin
+win32-mingw
+win32-msvc
+
+-   ... no
+Y   ... yes
+Y/n ... tests with n failures
+
+Platform is "OS-processor-compiler" or a unique shortcut.
+
+CGoto ... CGoto runloop is supported
+JIT   ... JIT core is supported
+EXEC  ... compiling to native executables is supported
+Threads . Parrot is multi-threaded
+Signals . Parrot catches kind of a SIGINT (program termination) signal

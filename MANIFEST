@@ -2329,6 +2329,7 @@ ops/sys.ops                                       []
 ops/var.ops                                       []
 parrot.spec                                       []
 PBC_COMPAT                                        [main]doc
+PLATFORMS                                         [main]doc
 pf/pf_items.c                                     []
 README                                            [main]doc
 RELEASE_INSTRUCTIONS                              []
