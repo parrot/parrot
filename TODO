@@ -29,6 +29,7 @@ Regular expression engine
 -------------------------
     Implement case folding
     More speed!
+    Implement a regex compiler
 
 Interpreter
 -----------
