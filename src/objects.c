@@ -130,7 +130,7 @@ rebuild_attrib_stuff(Parrot_Interp interpreter, PMC *class)
 
     class_slots = PMC_data(class);
     attr_offset_hash = pmc_new(interpreter, enum_class_OrderedHash);
-    class_offset_hash = pmc_new(interpreter, enum_class_OrderedHash);
+    class_offset_hash = pmc_new(interpreter, enum_class_PerlHash);
     parent_array = get_attrib_num(class_slots, PCD_ALL_PARENTS);
     parent_class_count = VTABLE_elements(interpreter, parent_array);
 
@@ -296,6 +296,11 @@ Parrot_single_subclass(Parrot_Interp interpreter, PMC *base_class,
     VTABLE_unshift_pmc(interpreter, temp_pmc, base_class);
     set_attrib_num(child_class_array, PCD_ALL_PARENTS, temp_pmc);
 
+#if 0
+    /*
+     * recreated in rebuild_attrib_stuff
+     * -leo
+     */
     /* Our attribute list is our parent's attribute list */
     temp_pmc = clone_array(interpreter,
                            get_attrib_num((SLOTTYPE *)PMC_data(base_class),
@@ -307,6 +312,7 @@ Parrot_single_subclass(Parrot_Interp interpreter, PMC *base_class,
                            get_attrib_num((SLOTTYPE *)PMC_data(base_class),
                                           PCD_ATTRIBUTES));
     set_attrib_num(child_class_array, PCD_ATTRIBUTES, temp_pmc);
+#endif
 
     /* But we have no attributes of our own. Yet */
     temp_pmc = pmc_new(interpreter, enum_class_Array);
@@ -349,13 +355,17 @@ Parrot_new_class(Parrot_Interp interpreter, PMC *class, STRING *class_name)
                    pmc_new(interpreter, enum_class_Array));
     set_attrib_num(class_array, PCD_ALL_PARENTS,
                    pmc_new(interpreter, enum_class_Array));
+#if 0
+    /* these two are created in rebuild_attrib_stuf
+     * -leo
+     */
     set_attrib_num(class_array, PCD_ATTRIB_OFFS,
             pmc_new(interpreter, enum_class_OrderedHash));
     set_attrib_num(class_array, PCD_ATTRIBUTES,
             pmc_new(interpreter, enum_class_OrderedHash));
+#endif
     set_attrib_num(class_array, PCD_CLASS_ATTRIBUTES,
             pmc_new(interpreter, enum_class_Array));
-
 
 
     /* Set the classname, if we have one */
@@ -1279,15 +1289,14 @@ Parrot_class_offset(Parrot_Interp interpreter, PMC *object, STRING *class) {
     }
 #else
     /*
-     * cheat a bit--the offset_hash is an OrderedHash PMC
+     * cheat a bit--the offset_hash is a PerlHash PMC
      */
     b = hash_get_bucket(interpreter,
                 (Hash*) PMC_struct_val(offset_hash), class);
     if (!b)
         offset = -1;
     else {
-        offset = VTABLE_get_integer_keyed_int(interpreter, offset_hash,
-                PMC_int_val((PMC*)b->value));
+        return PMC_int_val((PMC*)b->value);
     }
 #endif
     return offset;
