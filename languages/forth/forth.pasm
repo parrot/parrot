@@ -68,34 +68,36 @@
 
 #
 
-.constant PIRCompiler	P14
-.constant ConstantTable P15
-.constant CoreOps       P16
-.constant UserOps       P18
-.constant SpecialWords	P19
-
-.constant CompiledWordPMC P20
-.constant PASMCompiler	P21
-.constant LinePMC	P22
+.constant CompiledWordPMC P15
+.constant LinePMC	P14
 
 .constant WorkTOS	P17
 
-.constant TempPMC       P23
-.constant TempPMC2	P24
-.constant TempPMC3      P25
+.constant TempPMC       P18
+.constant TempPMC2	P19
+.constant TempPMC3      P13
+
+.constant PASMCompiler	P21
+.constant PIRCompiler	P22
+.constant ConstantTable P23
+.constant CoreOps       P24
+.constant UserOps       P25
+.constant SpecialWords	P26
 
 .constant LabelStack	P27
 .constant TruePMC	P29
 .constant FalsePMC	P28
 .constant ReturnStack	P30
 .constant PMCStack	P31
-.constant CellPMC	P26
+.constant CellPMC	P20
 
 VeryBeginning:
 
     # We need a PMC for the compiler
     compreg .PASMCompiler, "PASM"
+    store_global "__forth::PASMCompiler", .PASMCompiler
     compreg .PIRCompiler, "PIR"
+    store_global "__forth::PIRCompiler", .PIRCompiler
 
     bsr InitializeCoreOps
 
@@ -193,6 +195,11 @@ DonePromptString:
   save .TruePMC
 .endm
 
+.macro DoneInterpretWord
+#  branch DoneInterpretWord
+   ret
+.endm
+
 InitializeCoreOps:
     #
     # Arithmetic, Single precision
@@ -217,6 +224,13 @@ InitializeCoreOps:
 
     store_global "__forth::CoreOps", .CoreOps
     store_global "__forth::UserOps", .UserOps
+    store_global "__forth::SpecialWords", .SpecialWords
+    store_global "__forth::ReturnStack", .ReturnStack
+    store_global "__forth::ConstantTable", .ConstantTable
+    store_global "__forth::True", .TruePMC
+    store_global "__forth::False", .FalsePMC
+    store_global "__forth::CellArray", .CellPMC
+    store_global "__forth::LabelStack", .LabelStack
 
     set .SpecialWords["if"], 1
     set .SpecialWords["then"], 2
@@ -797,7 +811,7 @@ InterpretWord:
     ne .Mode, .CommentMode, MaybeCompileWord
     ne .CurrentWord, ")", DoneInterpretWord
     restore .Mode
-    branch DoneInterpretWord
+    .DoneInterpretWord
 MaybeCompileWord:
     ne .Mode, .CompileMode, MaybeInterpretWord
     eq .CurrentWord, ":", DoneInterpretWord
@@ -811,7 +825,7 @@ MaybeCompileWord:
 
     set .CompileWord, ""
     set .CompileBuffer, ""
-    branch DoneInterpretWord
+    .DoneInterpretWord
 DoCompileStuff:
     ne .CompileWord, "", FillCompileBuffer
     set .CompileWord, .CurrentWord
@@ -820,12 +834,12 @@ FillCompileBuffer:
     concat .CompileBuffer, .CurrentWord
     concat .CompileBuffer, " "
 EndCompileWord:
-    branch DoneInterpretWord
+    .DoneInterpretWord
 MaybeInterpretWord:
 #    bsr IsWordNumber
 #    unless .IntStack, NotNum
 #    .PushNum
-#    branch DoneInterpretWord
+#    .DoneInterpretWord
     set .IntStack, .CurrentWord
     length .TempInt, .CurrentWord
     dec .TempInt
@@ -844,57 +858,57 @@ NotInt:
     bsr CollectWord
     set .IntStack, .CoreOps[.CurrentWord]
     .PushInt
-    branch DoneInterpretWord
+    .DoneInterpretWord
     
 NotTick:
     set .TempInt, .CoreOps[.CurrentWord]
     eq .TempInt, 0, UserWord
     jsr .TempInt
-    branch DoneInterpretWord
+    .DoneInterpretWord
 
 UserWord:
     set .TempString, .UserOps[.CurrentWord]
     concat .TempString, " "
     concat .Commands, .TempString, .Commands
 
-    branch DoneInterpretWord
+    .DoneInterpretWord
 PushInt:
     .PushInt
-    branch DoneInterpretWord
+    .DoneInterpretWord
 
 Int_One_Minus:
     .PopInt
     dec .IntStack
     .PushInt
-    branch DoneInterpretWord
+    .DoneInterpretWord
 Int_Two_Minus:
     .PopInt
     sub .IntStack, .IntStack, 2
     .PushInt
-    branch DoneInterpretWord
+    .DoneInterpretWord
 Int_One_Plus:
     .PopInt 
     inc .IntStack
     .PushInt 
-    branch DoneInterpretWord
+    .DoneInterpretWord
 Thing_Dot:
     .PopPMC
     print .PMCStack
     print " "
-    branch DoneInterpretWord
+    .DoneInterpretWord
 Thing_Dot_Stack:
-    branch DoneInterpretWord
+    .DoneInterpretWord
 Thing_Dup:
     .PopPMC 
     .PushPMC 
     .PushPMC 
-    branch DoneInterpretWord
+    .DoneInterpretWord
 Thing_Drop:
     .PopPMC
-    branch DoneInterpretWord
+    .DoneInterpretWord
 Thing_Swap:
     rotate_up 2
-    branch DoneInterpretWord
+    .DoneInterpretWord
 Quit:
     end
 Int_Abs:
@@ -903,7 +917,7 @@ Int_Abs:
     mul .IntStack, .IntStack, -1
 DoneIntAbs:
     .PushInt 
-    branch DoneInterpretWord
+    .DoneInterpretWord
 Int_Max:
     .PopInt 
     set .TempInt, .IntStack
@@ -912,7 +926,7 @@ Int_Max:
     set .IntStack, .TempInt
 Done_IntMax:
     .PushInt 
-    branch DoneInterpretWord
+    .DoneInterpretWord
 Int_Min:
     .PopInt 
     set .TempInt, .IntStack
@@ -922,47 +936,47 @@ Int_Min:
     set .IntStack, .TempInt
 Done_IntMin:
     .PushInt 
-    branch DoneInterpretWord
+    .DoneInterpretWord
 Int_Add:
     .PopInt 
     set .TempInt, .IntStack
     .PopInt 
     add .IntStack, .IntStack, .TempInt
     .PushInt 
-    branch DoneInterpretWord
+    .DoneInterpretWord
 Int_Sub:
     .PopInt 
     set .TempInt, .IntStack
     .PopInt 
     sub .IntStack, .IntStack, .TempInt
     .PushInt 
-    branch DoneInterpretWord
+    .DoneInterpretWord
 Int_Negate:
     .PopInt 
     mul .IntStack, .IntStack, -1
     .PushInt 
-    branch DoneInterpretWord
+    .DoneInterpretWord
 Int_Mul:
     .PopInt 
     set .TempInt, .IntStack
     .PopInt 
     mul .IntStack, .IntStack, .TempInt
     .PushInt 
-    branch DoneInterpretWord
+    .DoneInterpretWord
 Int_Div:
     .PopInt 
     set .TempInt, .IntStack
     .PopInt 
     div .IntStack, .IntStack, .TempInt
     .PushInt 
-    branch DoneInterpretWord
+    .DoneInterpretWord
 Int_Mod:
     .PopInt 
     set .TempInt, .IntStack
     .PopInt 
     mod .IntStack, .IntStack, .TempInt
     .PushInt 
-    branch DoneInterpretWord
+    .DoneInterpretWord
 Int_Slash_Mod:
     .PopInt 
     set .TempInt, .IntStack
@@ -972,7 +986,7 @@ Int_Slash_Mod:
     .PushInt 
     div .IntStack, .TempInt2, .TempInt
     .PushInt 
-    branch DoneInterpretWord
+    .DoneInterpretWord
 Int_GT:
     .PopInt 
     set .TempInt, .IntStack
@@ -984,7 +998,7 @@ Int_GT:
     set .IntStack, 1
  Int_GT_end:
     .PushInt 
-    branch DoneInterpretWord
+    .DoneInterpretWord
 Int_GE:
     .PopInt 
     set .TempInt, .IntStack
@@ -996,7 +1010,7 @@ Int_GE:
     set .IntStack, 1
  Int_GE_end:
     .PushInt 
-    branch DoneInterpretWord
+    .DoneInterpretWord
 Int_NE:
     .PopInt 
     set .TempInt, .IntStack
@@ -1008,7 +1022,7 @@ Int_NE:
     set .IntStack, 1
  Int_NE_end:
     .PushInt 
-    branch DoneInterpretWord
+    .DoneInterpretWord
 Int_EQ:
     .PopInt 
     set .TempInt, .IntStack
@@ -1020,7 +1034,7 @@ Int_EQ:
     set .IntStack, 1
  Int_EQ_end:
     .PushInt 
-    branch DoneInterpretWord
+    .DoneInterpretWord
 Int_LT:
     .PopInt 
     set .TempInt, .IntStack
@@ -1032,7 +1046,7 @@ Int_LT:
     set .IntStack, 1
  Int_LT_end:
     .PushInt 
-    branch DoneInterpretWord
+    .DoneInterpretWord
 Int_LE:
     .PopInt 
     set .TempInt, .IntStack
@@ -1044,7 +1058,7 @@ Int_LE:
     set .IntStack, 1
  Int_LE_end:
     .PushInt 
-    branch DoneInterpretWord
+    .DoneInterpretWord
 Int_LT0:
     .PopInt 
     lt .IntStack, 0, Int_is_LT0
@@ -1054,7 +1068,7 @@ Int_LT0:
     set .IntStack, 1
  Int_LT0_end:
     .PushInt 
-    branch DoneInterpretWord
+    .DoneInterpretWord
 Int_LE0:
     .PopInt 
     le .IntStack, 0, Int_is_LE0
@@ -1064,7 +1078,7 @@ Int_LE0:
     set .IntStack, 1
  Int_LE0_end:
     .PushInt 
-    branch DoneInterpretWord
+    .DoneInterpretWord
 Int_NE0:
     .PopInt 
     ne .IntStack, 0, Int_is_NE0
@@ -1074,7 +1088,7 @@ Int_NE0:
     set .IntStack, 1
  Int_NE0_end:
     .PushInt 
-    branch DoneInterpretWord
+    .DoneInterpretWord
 Int_EQ0:
     .PopInt 
     eq .IntStack, 0, Int_is_EQ0
@@ -1084,7 +1098,7 @@ Int_EQ0:
     set .IntStack, 1
  Int_EQ0_end:
     .PushInt 
-    branch DoneInterpretWord
+    .DoneInterpretWord
 Int_GT0:
     .PopInt 
     gt .IntStack, 0, Int_is_GT0
@@ -1094,7 +1108,7 @@ Int_GT0:
     set .IntStack, 1
  Int_GT0_end:
     .PushInt 
-    branch DoneInterpretWord
+    .DoneInterpretWord
 Int_GE0:
     .PopInt 
     ge .IntStack, 0, Int_is_GE0
@@ -1104,7 +1118,7 @@ Int_GE0:
     set .IntStack, 1
  Int_GE0_end:
     .PushInt 
-    branch DoneInterpretWord
+    .DoneInterpretWord
 
 Int_And:
     .PopInt 
@@ -1112,40 +1126,40 @@ Int_And:
     .PopInt 
     band .IntStack, .TempInt
     .PushInt 
-    branch DoneInterpretWord
+    .DoneInterpretWord
 Int_Or:
     .PopInt 
     set .TempInt, .IntStack
     .PopInt 
     bor .IntStack, .TempInt
     .PushInt 
-    branch DoneInterpretWord
+    .DoneInterpretWord
 Int_XOr:
     .PopInt 
     set .TempInt, .IntStack
     .PopInt 
     bxor .IntStack, .TempInt
     .PushInt 
-    branch DoneInterpretWord
+    .DoneInterpretWord
 Int_Invert:
     .PopInt 
     bnot .IntStack, .IntStack
     .PushInt 
-    branch DoneInterpretWord
+    .DoneInterpretWord
 Int_LShift:
     .PopInt 
     set .TempInt, .IntStack
     .PopInt 
     shl .IntStack, .IntStack, .TempInt
     .PushInt 
-    branch DoneInterpretWord
+    .DoneInterpretWord
 Int_RShift:
     .PopInt 
     set .TempInt, .IntStack
     .PopInt 
     shr .IntStack, .IntStack, .TempInt
     .PushInt 
-    branch DoneInterpretWord
+    .DoneInterpretWord
 Int_Over:
     .PopInt 
     set .TempInt, .IntStack
@@ -1153,11 +1167,11 @@ Int_Over:
     .PushInt 
     .PushTempInt
     .PushInt 
-    branch DoneInterpretWord
+    .DoneInterpretWord
 
 Print_Space:
     print " "
-    branch DoneInterpretWord
+    .DoneInterpretWord
 
 Print_Spaces:
     .PopInt
@@ -1166,43 +1180,43 @@ Print_Spaces:
     print " "
     dec .IntStack
     gt .IntStack, 0, spaceloop
-    branch DoneInterpretWord
+    .DoneInterpretWord
 
 Stack_Depth:
     depth .IntStack
     .PushInt
-    branch DoneInterpretWord
+    .DoneInterpretWord
 
 Rot_Stack:
     rotate_up -3
-    branch DoneInterpretWord
+    .DoneInterpretWord
 
 Two_Rot_Stack:
     rotate_up -6
     rotate_up -6
-    branch DoneInterpretWord
+    .DoneInterpretWord
 
 Not_Rot_Stack:
     rotate_up 3
-    branch DoneInterpretWord
+    .DoneInterpretWord
 
 Roll_Stack:
     .PopInt
     sub .IntStack, 0, .IntStack
     rotate_up .IntStack
-    branch DoneInterpretWord
+    .DoneInterpretWord
 
 Two_Over:
     lookback .PMCStack, 3
     save .PMCStack
     lookback .PMCStack, 3
     save .PMCStack
-    branch DoneInterpretWord
+    .DoneInterpretWord
 
 Two_Swap:
     rotate_up -4
     rotate_up -4
-    branch DoneInterpretWord
+    .DoneInterpretWord
 
 Maybe_Dup:
     .PopPMC
@@ -1210,85 +1224,85 @@ Maybe_Dup:
     new .PMCStack, .Integer
     set .PMCStack, 0
     .PushPMC
-    branch DoneInterpretWord
+    .DoneInterpretWord
     .PushPMC
     .PushPMC
-    branch DoneInterpretWord
+    .DoneInterpretWord
 
 Print_CR:
     print "\n"
-    branch DoneInterpretWord
+    .DoneInterpretWord
 
 Emit:
     .PopInt
     chr .TempString, .IntStack
     print .TempString
-    branch DoneInterpretWord
+    .DoneInterpretWord
 
 Execute:
     .PopInt
     jsr .IntStack
-    branch DoneInterpretWord
+    .DoneInterpretWord
 
 Pick_Stack:
     .PopInt
     dec .IntStack
     lookback .PMCStack, .IntStack
     .PushPMC
-    branch DoneInterpretWord
+    .DoneInterpretWord
 
 To_R:
     .PopPMC
     push .ReturnStack, .PMCStack
-    branch DoneInterpretWord
+    .DoneInterpretWord
 
 From_R:
     pop .PMCStack, .ReturnStack
     .PushPMC
-    branch DoneInterpretWord
+    .DoneInterpretWord
 
 Copy_From_R:
     pop .PMCStack, .ReturnStack
     push .ReturnStack, .PMCStack
     .PushPMC
-    branch DoneInterpretWord
+    .DoneInterpretWord
 
 Two_To_R:
     restore .TempPMC
     restore .PMCStack
     push .ReturnStack, .PMCStack
     push .ReturnStack, .TempPMC
-    branch DoneInterpretWord
+    .DoneInterpretWord
   
 Two_From_R:
     pop .TempPMC, .ReturnStack
     pop .PMCStack, .ReturnStack
     save .PMCStack
     save .TempPMC
-    branch DoneInterpretWord
+    .DoneInterpretWord
   
 Two_R_Fetch:
     set .TempPMC, .ReturnStack[-2]
     save .TempPMC
     set .TempPMC, .ReturnStack[-1]
     save .TempPMC
-    branch DoneInterpretWord
+    .DoneInterpretWord
 
 Loop_Index_I:
     set .PMCStack, .ReturnStack[-1]
     .PushPMC
-    branch DoneInterpretWord
+    .DoneInterpretWord
 
 Loop_Index_J:
     set .PMCStack, .ReturnStack[-3]
     .PushPMC
-    branch DoneInterpretWord
+    .DoneInterpretWord
 
 Two_RDrop:
     pop .PMCStack, .ReturnStack
 RDrop:
     pop .PMCStack, .ReturnStack
-    branch DoneInterpretWord
+    .DoneInterpretWord
 
 Within:
     restore .TempPMC3
@@ -1305,22 +1319,22 @@ Within:
     branch Is_not_within
  Is_within:
     .PushTrue
-    branch DoneInterpretWord
+    .DoneInterpretWord
  Is_not_within:
     .PushFalse
-    branch DoneInterpretWord
+    .DoneInterpretWord
 
 Store_Cell:
     .PopInt
     .PopPMC
     set .CellPMC[.IntStack], .PMCStack
-    branch DoneInterpretWord
+    .DoneInterpretWord
 
 Get_Cell:
     .PopInt
     set .PMCStack, .CellPMC[.IntStack]
     .PushPMC
-    branch DoneInterpretWord
+    .DoneInterpretWord
 
 Add_Cell:
     .PopInt
@@ -1332,19 +1346,19 @@ Add_Cell:
     new .TempPMC, .Integer
     set .TempPMC, .TempInt
     set .CellPMC[.IntStack], .TempPMC
-    branch DoneInterpretWord
+    .DoneInterpretWord
 
 D_to_F:
     .PopInt
     set .NumStack, .IntStack
     .PushNum
-    branch DoneInterpretWord
+    .DoneInterpretWord
 
 F_to_D:
     .PopNum
     set .IntStack, .NumStack
     .PushInt
-    branch DoneInterpretWord
+    .DoneInterpretWord
 
 Float_Add:
     .PopNum
@@ -1352,7 +1366,7 @@ Float_Add:
     .PopNum
     add .NumStack, .TempNum
     .PushNum
-    branch DoneInterpretWord
+    .DoneInterpretWord
 
 Float_Sub:
     .PopNum
@@ -1360,7 +1374,7 @@ Float_Sub:
     .PopNum
     sub .NumStack, .NumStack, .TempNum
     .PushNum
-    branch DoneInterpretWord
+    .DoneInterpretWord
 
 Float_Mul:
     .PopNum
@@ -1368,7 +1382,7 @@ Float_Mul:
     .PopNum
     mul .NumStack, .NumStack, .TempNum
     .PushNum
-    branch DoneInterpretWord
+    .DoneInterpretWord
 
 Float_Div:
     .PopNum
@@ -1376,44 +1390,44 @@ Float_Div:
     .PopNum
     div .NumStack, .NumStack, .TempNum
     .PushNum
-    branch DoneInterpretWord
+    .DoneInterpretWord
 
 IntReg:
     .PopInt
     set .TempInt, .IntStack
     .PopInt
     seti_ind .TempInt, .IntStack
-    branch DoneInterpretWord
+    .DoneInterpretWord
 
 NReg:
     .PopInt
     .PopNum
     setn_ind .IntStack, .NumStack
-    branch DoneInterpretWord
+    .DoneInterpretWord
 
 SReg:
     .PopInt
     .PopStr
     sets_ind .IntStack, .StringStack
-    branch DoneInterpretWord
+    .DoneInterpretWord
 
 PMCReg:
     .PopInt
     .PopPMC
     setp_ind .IntStack, .PMCStack
-    branch DoneInterpretWord
+    .DoneInterpretWord
 
 Invoke:
     savetop
     invoke
     restoretop
-    branch DoneInterpretWord
+    .DoneInterpretWord
 
 FindGlobal:
     .PopStr
     find_global .PMCStack, .StringStack
     .PushPMC
-    branch DoneInterpretWord
+    .DoneInterpretWord
 
 LoadAssembly:
     .PopStr
@@ -1424,27 +1438,27 @@ LoadAssembly:
     concat .TempString, "\n.end\n"
     compile .CompiledWordPMC, .PIRCompiler, .TempString
     invoke .CompiledWordPMC
-    branch DoneInterpretWord
+    .DoneInterpretWord
 
 SingleReturnP:
     set .PMCStack, P5
     .PushPMC
-    branch DoneInterpretWord
+    .DoneInterpretWord
 
 SingleReturnN:
     set .NumStack, N5
     .PushNum
-    branch DoneInterpretWord
+    .DoneInterpretWord
 
 SingleReturnI:
     set .IntStack, I5
     .PushInt
-    branch DoneInterpretWord
+    .DoneInterpretWord
 
 SingleReturnS:
     set .StringStack, S5
     .PushStr
-    branch DoneInterpretWord
+    .DoneInterpretWord
 
 Constant:
     bsr CollectWord
@@ -1459,7 +1473,7 @@ Constant:
     compile .CompiledWordPMC, .PASMCompiler, .TempStr2
     set .TempInt, .CompiledWordPMC[1]
     set .CoreOps[.CurrentWord], .TempInt
-    branch DoneInterpretWord
+    .DoneInterpretWord
 
 New_Variable:
     bsr CollectWord
@@ -1471,30 +1485,30 @@ New_Variable:
     compile .CompiledWordPMC, .PASMCompiler, .TempStr2
     set .TempInt, .CompiledWordPMC[1]
     set .CoreOps[.CurrentWord], .TempInt
-    branch DoneInterpretWord
+    .DoneInterpretWord
 
 Comma:
     .PopPMC
     inc .LastCellUsed
     set .CellPMC[.LastCellUsed], .PMCStack
-    branch DoneInterpretWord
+    .DoneInterpretWord
 
 Allot:
     .PopInt
     add .LastCellUsed, .IntStack
-    branch DoneInterpretWord
+    .DoneInterpretWord
 
 Here:
     set .IntStack, .LastCellUsed
     .PushInt
-    branch DoneInterpretWord
+    .DoneInterpretWord
 
 Unused:
     set .IntStack, .CellSize
     sub .IntStack, .IntStack, .LastCellUsed
     dec .IntStack
     .PushInt
-    branch DoneInterpretWord
+    .DoneInterpretWord
 
 Type:
     .PopInt
@@ -1519,7 +1533,7 @@ Parrot_Substr:
     substr .TempString, .StringStack, .IntStack, .TempInt
     set .StringStack, .TempString
     .PushStr
-    branch DoneInterpretWord
+    .DoneInterpretWord
 
 Parrot_Concat:
     .PopStr
@@ -1527,7 +1541,7 @@ Parrot_Concat:
     .PopStr
     concat .StringStack, .StringStack, .TempString
     .PushStr
-    branch DoneInterpretWord
+    .DoneInterpretWord
 
 Get_Params:
   dump_Ns:
@@ -1539,12 +1553,12 @@ Get_Params:
     unless I1, p_regs
   p_regs:
     
-    branch DoneInterpretWord
+    .DoneInterpretWord
 
 Get_Time:
     time .NumStack
     .PushNum
-    branch DoneInterpretWord
+    .DoneInterpretWord
 
 Parrot_String:
     # Okay, we need to yank the string out of the input stream
@@ -1552,7 +1566,7 @@ Parrot_String:
     new .PMCStack, .PerlString
     set .PMCStack, .CurrentWord
     save .PMCStack
-    branch DoneInterpretWord
+    .DoneInterpretWord
 
 DoneInterpretWord:
     ret
@@ -1794,8 +1808,8 @@ AddSpecialWord:
     ne .CurrentWord, "do", NotDo
     .NewNestLevel
     concat .NewBodyString, "restore P31\n"
-    concat .NewBodyString, "restore P23\n"
-    concat .NewBodyString, "push P30, P23\n"
+    concat .NewBodyString, "restore P18\n"
+    concat .NewBodyString, "push P30, P18\n"
     concat .NewBodyString, "push P30, P31\n"
     set .TempString, .NestLevel
     concat .TempString, "dolabel", .TempString
@@ -1805,12 +1819,12 @@ AddSpecialWord:
     branch EndSpecWord    
   NotDo:
     ne .CurrentWord, "loop", NotLoop
-    concat .NewBodyString, "pop P23, P30\n"
-    concat .NewBodyString, "inc P23\n"
+    concat .NewBodyString, "pop P18, P30\n"
+    concat .NewBodyString, "inc P18\n"
     concat .NewBodyString, "pop P31, P30\n"
     concat .NewBodyString, "push P30, P31\n"
-    concat .NewBodyString, "push P30, P23\n"
-    concat .NewBodyString, "ne P23, P31, "
+    concat .NewBodyString, "push P30, P18\n"
+    concat .NewBodyString, "ne P18, P31, "
     pop .TempString, .LabelStack
     concat .NewBodyString, .TempString
     concat .NewBodyString, "\n"
@@ -1818,13 +1832,13 @@ AddSpecialWord:
     branch EndSpecWord    
   NotLoop:
     ne .CurrentWord, "+loop", NotPlusLoop
-    concat .NewBodyString, "pop P23, P30\n"
+    concat .NewBodyString, "pop P18, P30\n"
     concat .NewBodyString, "restore P24\n"
-    concat .NewBodyString, "add P23, P23, P24\n"
+    concat .NewBodyString, "add P18, P18, P24\n"
     concat .NewBodyString, "pop P31, P30\n"
     concat .NewBodyString, "push P30, P31\n"
-    concat .NewBodyString, "push P30, P23\n"
-    concat .NewBodyString, "ne P23, P31, "
+    concat .NewBodyString, "push P30, P18\n"
+    concat .NewBodyString, "ne P18, P31, "
     pop .TempString, .LabelStack
     concat .NewBodyString, .TempString
     concat .NewBodyString, "\n"
@@ -1934,8 +1948,17 @@ ExternalEntry:
 
    find_global .CoreOps, "__forth::CoreOps"
    find_global .UserOps, "__forth::UserOps"
+   find_global .SpecialWords, "__forth::SpecialWords"
+   find_global .ReturnStack, "__forth::ReturnStack"
+   find_global .ConstantTable, "__forth::ConstantTable"
+   find_global .TruePMC, "__forth::True"
+   find_global .FalsePMC, "__forth::False"
+   find_global .CellPMC, "__forth::CellArray"
+   find_global .LabelStack, "__forth::LabelStack"
    
 # Magic happens
+   
+ 
 
    restore P0
    invoke
