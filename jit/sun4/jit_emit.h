@@ -309,8 +309,8 @@ static void Parrot_jit_bicc(Parrot_jit_info_t *jit_info, int cond, int annul,
 
     opcode = jit_info->op_i + disp;
     if(opcode <= jit_info->op_i){
-        offset = jit_info->op_map[opcode].offset -
-                    (jit_info->native_ptr - jit_info->arena_start);
+        offset = jit_info->arena.op_map[opcode].offset -
+                    (jit_info->native_ptr - jit_info->arena.start);
 
         if((offset > emitm_branch_max) || (offset < emitm_branch_min))
             internal_exception(JIT_ERROR,
@@ -321,8 +321,8 @@ static void Parrot_jit_bicc(Parrot_jit_info_t *jit_info, int cond, int annul,
     }
 
     Parrot_jit_newfixup(jit_info);
-    jit_info->fixups->type = JIT_BRANCH;
-    jit_info->fixups->param.opcode = opcode;
+    jit_info->arena.fixups->type = JIT_BRANCH;
+    jit_info->arena.fixups->param.opcode = opcode;
     emitm_bicc(jit_info->native_ptr, annul, cond, 0);
 }
 
@@ -478,20 +478,20 @@ void Parrot_jit_dofixup(Parrot_jit_info_t *jit_info,
     char *fixup_ptr;
     int fixup_val;
 
-    fixup = jit_info->fixups;
+    fixup = jit_info->arena.fixups;
 
     while(fixup){
         switch(fixup->type){
         /* This fixes-up a branch to a known opcode offset */
             case JIT_BRANCH:
                 fixup_ptr = Parrot_jit_fixup_target(jit_info, fixup);
-                fixup_val = (jit_info->op_map[fixup->param.opcode].offset
+                fixup_val = (jit_info->arena.op_map[fixup->param.opcode].offset
                                 - fixup->native_offset) / 4;
                 *(int *)(fixup_ptr) |= emitm_mask(22, fixup_val);
                 break;
 
             case JIT_CALL30:
-                fixup_ptr = jit_info->arena_start + fixup->native_offset;
+                fixup_ptr = jit_info->arena.start + fixup->native_offset;
                 fixup_val = (int)fixup->param.fptr - (int)fixup_ptr;
                 emitm_call_30(fixup_ptr, emitm_hi30(fixup_val));
                 break;
@@ -529,9 +529,9 @@ void Parrot_jit_begin(Parrot_jit_info_t *jit_info,
 
     /* Setup the pointer to the opcode map */
     emitm_sethi(jit_info->native_ptr,
-        emitm_hi22(jit_info->op_map), Parrot_jit_opmap);
+        emitm_hi22(jit_info->arena.op_map), Parrot_jit_opmap);
     emitm_or_i(jit_info->native_ptr,
-        emitm_i(3), emitm_lo10(jit_info->op_map), Parrot_jit_opmap);
+        emitm_i(3), emitm_lo10(jit_info->arena.op_map), Parrot_jit_opmap);
 }
 
 void Parrot_jit_normal_op(Parrot_jit_info_t *jit_info,
@@ -542,8 +542,8 @@ void Parrot_jit_normal_op(Parrot_jit_info_t *jit_info,
         emitm_o(0), emitm_lo10(jit_info->cur_op), emitm_o(0));
 
     Parrot_jit_newfixup(jit_info);
-    jit_info->fixups->type = JIT_CALL30;
-    jit_info->fixups->param.fptr =
+    jit_info->arena.fixups->type = JIT_CALL30;
+    jit_info->arena.fixups->param.fptr =
         (void (*)(void))interpreter->op_func_table[*(jit_info->cur_op)];
 
     emitm_call_30(jit_info->native_ptr, 0);
