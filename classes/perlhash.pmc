@@ -135,7 +135,7 @@ pmclass PerlHash {
 	KEY* key = SELF->cache.struct_val;
 	KEY_PAIR key_pair;
 	if(index >= key_size(INTERP,key)) {
-	    key_set_size(INTERP,key,index);
+	    key_set_size(INTERP,key,index+1);
 	}
 	key_pair.type = enum_key_int;
 	key_pair.cache.int_val = value;

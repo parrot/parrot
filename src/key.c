@@ -225,7 +225,7 @@ return the type of element <idx> of KEY <key>
 INTVAL key_element_type(struct Parrot_Interp *interpreter, KEY* key, 
                         INTVAL idx) {
   if(key != NULL) {
-    if((idx >= 0) || (idx < key->size)) {
+    if((idx >= 0) && (idx < key->size)) {
       KEY_PAIR* pair = &key->keys[idx];
       return pair->type;
     }
@@ -248,7 +248,7 @@ return the value of index <idx> of KEY <key>
 KEY_PAIR* key_element_value_i(struct Parrot_Interp *interpreter, KEY* key, 
                               INTVAL idx) {
   if(key != NULL) {
-    if((idx >= 0) || (idx < key->size)) {
+    if((idx >= 0) && (idx < key->size)) {
       KEY_PAIR* pair = &key->keys[idx];
       if(pair != NULL) {
         return pair;
@@ -297,7 +297,7 @@ Set the value of index <idx> of key <key> to integer <value>
 void key_set_element_value_i(struct Parrot_Interp *interpreter, KEY* key, 
                              INTVAL idx, KEY_PAIR* value) {
   if(key != NULL) {
-    if((idx >= 0) || (idx < key->size)) {
+    if((idx >= 0) && (idx < key->size)) {
       memcpy(&key->keys[idx],value,sizeof(KEY_PAIR));
     }
     else {
@@ -393,7 +393,7 @@ Increment the type of index <idx> of key <key>
 
 void key_inc(struct Parrot_Interp *interpreter, KEY* key, INTVAL idx) {
   if(key != NULL) {
-    if(idx > 0 && idx <= key->size) {
+    if((idx >= 0) && (idx < key->size)) {
       KEY_PAIR* pair = &key->keys[idx];
       pair->type++;
     }

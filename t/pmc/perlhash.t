@@ -91,17 +91,17 @@ OUTPUT
 output_is(<<'CODE', <<OUTPUT, "size of the hash");
 	new P0, PerlHash
 	
-	set P0, 1, 1
-	set I0, P0
-	print I0
-	print "\n"	
-
-	set P0, 1, 2
+	set P0, 1, 0
 	set I0, P0
 	print I0
 	print "\n"	
 
 	set P0, 1, 1
+	set I0, P0
+	print I0
+	print "\n"	
+
+	set P0, 1, 0
 	set I0, P0
 	print I0
 	print "\n"	
