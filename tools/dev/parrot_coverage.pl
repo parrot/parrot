@@ -1,8 +1,5 @@
-#! perl -w
-################################################################################
-# Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+# Copyright: 2001-2005 The Perl Foundation.  All Rights Reserved.
 # $Id$
-################################################################################
 
 =head1 NAME
 
@@ -12,6 +9,7 @@ tools/dev/parrot_coverage.pl - Run coverage tests and report
 
     % mkdir parrot_coverage
     % perl tools/dev/parrot_coverage.pl recompile
+    % perl tools/dev/parrot_coverage.pl 
 
 =head1 DESCRIPTION
 
@@ -22,35 +20,35 @@ The reports start at F<parrot_coverage/index.html>.
 
 =cut
 
-################################################################################
+use strict;
 
+use Data::Dumper;
 use File::Basename;
 use File::Find;
 use POSIX qw(strftime);
 
-use strict;
 
 my $SRCDIR  = "./"; # with trailing /
 my $HTMLDIR = "parrot_coverage";
 my $DEBUG   = 1;
 
-if ($ARGV[0] =~ /recompile/) {
+if ($ARGV[0] && $ARGV[0] =~ /recompile/) {
 
-    #### clean up remnants of prior biulds
+    # clean up remnants of prior biulds
     File::Find::find({wanted => sub {
                           /\.(bb|bba|bbf|da|gcov)$/ &&
                             unlink($File::Find::name)
                         }}, $SRCDIR);
 
-    #### build parrot with coverage support
-    system("perl Configure.pl --cc=\"gcc -fprofile-arcs -ftest-coverage\"");
+    # build parrot with coverage support
+    system("perl Configure.pl --ccflags=\"-fprofile-arcs -ftest-coverage\"");
     system("make");
 
-    #### Now run the tests
+    # Now run the tests
     system("make fulltest");
 }
 
-#### And generate the reports.
+# And generate the reports.
 
 my @dafiles;
 File::Find::find({wanted => sub {
@@ -68,28 +66,31 @@ my %totals = (
     covered_calls    => 0
 );
 
+# We parse the output of the 'gcov' command, so we do not want german output
+$ENV{LANG} = 'C';
+
 foreach my $da_file (@dafiles) {
-    my $dirname   = dirname($da_file) || ".";
-    my $filename  = basename($da_file);
-    my $objectfilename = $da_file;
-    $objectfilename =~ s/\.da$//g;
+    my $dirname      = dirname($da_file) || '.';
+    my $filename     = basename($da_file);
+    my $src_filename = $da_file;
+    $src_filename =~ s/\.da$/.c/;
     
-    #gcov must be run from the directory that the compiler was invoked from.
-    #Currently, this is the parrot root directory.
-    #However, it also leaves it output file in this directory, which we need
-    #to move to the appropriate place, alongside the sourcefile that produced it.
-    #Hence, as soon as we know the true name of the object file being profiled, 
-    #we rename the gcov log file.
-    #The -o flag is necessary to help gcov locate it's basic block (.bb) files.
-    my $cmd = "gcov -f -b -o $da_file $objectfilename";
-    print "Running $cmd..\n" if $DEBUG;
-    open (GCOVSUMMARY, "$cmd|") || die "Error invoking '$cmd': $!";
+    # gcov must be run from the directory that the compiler was invoked from.
+    # Currently, this is the parrot root directory.
+    # However, it also leaves it output file in this directory, which we need
+    # to move to the appropriate place, alongside the sourcefile that produced it.
+    # Hence, as soon as we know the true name of the object file being profiled, 
+    # we rename the gcov log file.
+    # The -o flag is necessary to help gcov locate it's basic block (.bb) files.
+    my $cmd = "gcov -f -b -o $dirname $src_filename";
+    print "Running $cmd\n" if $DEBUG;
+    open (GCOVSUMMARY, "$cmd |") or die "Error invoking '$cmd': $!";
     my $tmp;
     my %generated_files;
     while (<GCOVSUMMARY>) {
         if (/^Creating (.*)\./) {
             my $path = "$dirname/$1";
-            rename($1, "$dirname/$1") || die("Couldn't rename $1 to $dirname/$1.");
+            rename($1, "$dirname/$1") or die("Couldn't rename $1 to $dirname/$1.");
             $path =~ s/\Q$SRCDIR\E//g;
             $generated_files{$path} = $tmp;
             $tmp = '';
@@ -122,13 +123,13 @@ foreach my $da_file (@dafiles) {
                 next;
             }
 
-            my ($percent, $total_lines, $function) = /\s*([^%]+)% of (\d+)(?: source)? lines executed in function (.*)/;
+            ($percent, $total_lines, my $function) = /\s*([^%]+)% of (\d+)(?: source)? lines executed in function (.*)/;
             if ($total_lines) {
                 $function_line_coverage{$source_file}{$function} = $percent;
                 next;
             }
 
-            my ($percent, $total_branches) = /\s*([^%]+)% of (\d+) branches taken at least once in file/;
+            ($percent, my $total_branches) = /\s*([^%]+)% of (\d+) branches taken at least once in file/;
             if ($total_branches) {
                 my $covered_branches = int(($percent/100) * $total_branches);
                 $totals{branches} += $total_branches;
@@ -137,19 +138,19 @@ foreach my $da_file (@dafiles) {
                 next;
             }
 
-            my ($percent, $total_branches, $function) = /\s*([^%]+)% of (\d+) branches taken at least once in function (.*)/;
+            ($percent, $total_branches, $function) = /\s*([^%]+)% of (\d+) branches taken at least once in function (.*)/;
             if ($total_branches) {
                 $function_branch_coverage{$source_file}{$function} = $percent;
                 next;
             }
 
-            my ($percent, $total_calls, $function) = /\s*([^%]+)% of (\d+) calls executed in function (.*)/;
+            ($percent, my $total_calls, $function) = /\s*([^%]+)% of (\d+) calls executed in function (.*)/;
             if ($total_calls) {
                 $function_call_coverage{$source_file}{$function} = $percent;
                 next;
             }
 
-            my ($percent, $total_calls) = /\s*([^%]+)% of (\d+) calls executed in file/;
+            ($percent, $total_calls) = /\s*([^%]+)% of (\d+) calls executed in file/;
             if ($total_calls) {
                 my $covered_calls = int(($percent/100) * $total_calls);
                 $totals{calls} += $total_calls;
@@ -172,7 +173,7 @@ exit(0);
 
 sub write_index {
     print "Writing $HTMLDIR/index.html..\n" if $DEBUG;
-    open (OUT, ">$HTMLDIR/index.html") ||
+    open (OUT, ">$HTMLDIR/index.html") or
       die "Can't open $HTMLDIR/index.html for writing: $!\n";
 
     $totals{line_coverage}   = sprintf("%.2f", ($totals{lines}    ? ($totals{covered_lines} / $totals{lines} * 100)       : 0));
@@ -208,7 +209,7 @@ sub write_index {
 sub write_file_coverage_summary {
 
     print "Writing $HTMLDIR/file_summary.html..\n" if $DEBUG;
-    open (OUT, ">$HTMLDIR/file_summary.html") ||
+    open (OUT, ">$HTMLDIR/file_summary.html") or
       die "Can't open $HTMLDIR/file_summary.html for writing: $!\n";
 
     print OUT page_header("File Coverage Summary");
@@ -253,7 +254,7 @@ sub write_file_coverage_summary {
 sub write_function_coverage_summary {
 
     print "Writing $HTMLDIR/function_summary.html..\n" if $DEBUG;
-    open (OUT, ">$HTMLDIR/function_summary.html") ||
+    open (OUT, ">$HTMLDIR/function_summary.html") or
       die "Can't open $HTMLDIR/function_summary.html for writing: $!\n";
 
     print OUT page_header("Function Coverage Summary");
@@ -314,8 +315,8 @@ sub filter_gcov {
 
     my $outfile = "$outfile_base.lines.html";
     print "Writing $outfile..\n" if $DEBUG;
-    open (IN, "<$infile") || die "Can't read $infile: $!\n";
-    open (OUT, ">$outfile") || die "Can't write $outfile: $!\n";
+    open (IN, "<$infile") or die "Can't read $infile: $!\n";
+    open (OUT, ">$outfile") or die "Can't write $outfile: $!\n";
 
     print OUT page_header("Line Coverage for $source_file");
     print OUT "<pre>";
@@ -330,10 +331,10 @@ sub filter_gcov {
     close(IN);
 
 
-    my $outfile = "$outfile_base.branches.html";
+    $outfile = "$outfile_base.branches.html";
     print "Writing $outfile..\n" if $DEBUG;
-    open (IN, "<$infile") || die "Can't read $infile: $!\n";
-    open (OUT, ">$outfile") || die "Can't write $outfile: $!\n";
+    open (IN, "<$infile") or die "Can't read $infile: $!\n";
+    open (OUT, ">$outfile") or die "Can't write $outfile: $!\n";
 
     print OUT page_header("Branch Coverage for $source_file");
     print OUT "<pre>";
@@ -348,10 +349,10 @@ sub filter_gcov {
     close(IN);
 
 
-    my $outfile = "$outfile_base.calls.html";
+    $outfile = "$outfile_base.calls.html";
     print "Writing $outfile..\n" if $DEBUG;
-    open (IN, "<$infile") || die "Can't read $infile: $!\n";
-    open (OUT, ">$outfile") || die "Can't write $outfile: $!\n";
+    open (IN, "<$infile") or die "Can't read $infile: $!\n";
+    open (OUT, ">$outfile") or die "Can't write $outfile: $!\n";
 
     print OUT page_header("Call Coverage for $source_file");
     print OUT "<pre>";
