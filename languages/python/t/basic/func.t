@@ -294,8 +294,6 @@ if __name__ == '__main__':
     print hex(42)
 CODE
 
-SKIP: {
-    skip("not implemented", 1);
 test(<<'CODE', 'f(*a)');
 def p(x):
     print x
@@ -309,7 +307,6 @@ def main():
 if __name__ == '__main__':
     main()
 CODE
-}
 
 test(<<'CODE', 'f(*a), CALL_FUNCTION_VAR');
 def p(x):

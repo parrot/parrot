@@ -322,7 +322,10 @@ TODO implement freeze/thaw and use that instead.
                 val = SELF.get_pmc_keyed_int(j);
                 res = string_append(INTERP, res,
                         VTABLE_get_repr(INTERP, val), 0);
-                if (j < n - 1)
+                if (n == 1)
+                    res = string_append(INTERP, res,
+                            const_string(INTERP, ","), 0);
+                else if (j < n - 1)
                     res = string_append(INTERP, res,
                             const_string(INTERP, ", "), 0);
             }

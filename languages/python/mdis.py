@@ -151,13 +151,21 @@ def disassemble(co, lasti=-1):
 	    if n == ('__module__'):
 		i = 'Build::' + i
 		break
-	print "Disassembly of %s" % i
+	print "Information of %s" % i
 	print "# flags    ", hex(c.co_flags)
 	print "# varnames ", c.co_varnames
 	print "# locals   ", c.co_nlocals
 	print "# names    ", c.co_names
 	print "# consts   ", c.co_consts
 	print "# getargs  ", inspect.getargs(c)
+    for i, c in consts.items():
+	print
+	# class creation code seem to have that name inside
+	for n in c.co_names:
+	    if n == ('__module__'):
+		i = 'Build::' + i
+		break
+	print "Disassembly of %s" % i
 	disassemble(c)
 
 def disassemble_string(code, lasti=-1, varnames=None, names=None,

@@ -32,6 +32,7 @@ stopped. See the L<Glossary|docs/glossary.pod> for more information.
 
 #include "parrot/parrot.h"
 #include "parrot/method_util.h"
+#include <assert.h>
 
 /*
  * XXX put these into exceptions.h
@@ -99,20 +100,7 @@ Swaps the "context".
          * setup
          */
         if (PObj_get_FLAGS(SELF) & PObj_private3_FLAG) {
-            PMC *ret;
-            struct Parrot_Sub * coro;
-            /* this works only once, the generated isn't reusable
-             * inside e.g. range()
-             * so, return a clone of ourself
-             */
-            REG_PMC(5) = ret = pmc_new(INTERP, enum_class_Coroutine);
-            coro = (parrot_sub_t)PMC_sub(ret);
-            coro->end = sub->end;
-
-            PObj_get_FLAGS(ret) |= PObj_private1_FLAG; /* fixup done */
-            PObj_get_FLAGS(ret) &= ~PObj_private3_FLAG;
-            PMC_struct_val(ret) = PMC_struct_val(SELF);
-            PObj_flag_CLEAR(custom_mark, SELF);
+            REG_PMC(5) = SELF.get_iter();
             return next;
         }
         PMC_struct_val(SELF) = next;
@@ -129,7 +117,12 @@ Swaps the "context".
 =item C<PMC* shift_pmc>)
 
 Run the coroutine until it yields a value. The call to the coroutine
-is actually done in C<the_sub> below, a piece of inlined PASM code
+is actually done via the C<call_hook> below, a piece of code at the
+end of a coroutine:
+
+  set P0, P5    # get the reall coroutine
+  invokecc      # run that code
+  end           # terminate the runloop
 
 =cut
 
@@ -138,25 +131,22 @@ is actually done in C<the_sub> below, a piece of inlined PASM code
     PMC* shift_pmc() {
         PMC *res;
         struct Parrot_Sub * sub = (struct Parrot_Sub *)PMC_sub(SELF);
-        opcode_t the_sub[] =
-            { 904, 0, 5,        /* set_p_p P0, P5 */
-              39,               /* invokecc */
-              0                 /* end */
-            };
         void * regs = Parrot_save_register_frames(interpreter, SELF);
-        opcode_t offset;
+        opcode_t offset, *call_hook;
         PMC *ex;
 
         REG_PMC(5) = SELF;
-        offset = the_sub - interpreter->code->byte_code;
+        assert(sub->end);
+        call_hook = sub->end - 5;
+        offset = call_hook - interpreter->code->byte_code;
         /*
          * we should also catch exceptions here, so that register
-         * frames are restores - same as with all such code
+         * frames are restored - same as with all such code
          */
         runops_int(interpreter, offset);
         res = REG_PMC(5);
         /*
-         * the generator return None, when it's finished
+         * the generator returned None, when it's finished
          */
         if (res == Parrot_base_vtables[enum_class_None]->data) {
             Parrot_restore_register_frames(interpreter, regs);
@@ -181,6 +171,19 @@ Return much, we don't know.
     }
 
     PMC* get_iter () {
+        if (PObj_get_FLAGS(SELF) & PObj_private3_FLAG) {
+            struct Parrot_Sub * sub = (struct Parrot_Sub *)PMC_sub(SELF);
+            PMC *ret = pmc_new(INTERP, enum_class_Coroutine);
+            struct Parrot_Sub * coro;
+            coro = (parrot_sub_t)PMC_sub(ret);
+            coro->end = sub->end;
+
+            PObj_get_FLAGS(ret) |= PObj_private1_FLAG; /* fixup done */
+            PObj_get_FLAGS(ret) &= ~PObj_private3_FLAG;
+            PMC_struct_val(ret) = PMC_struct_val(SELF);
+            PObj_flag_CLEAR(custom_mark, SELF);
+            return ret;
+        }
         return SELF;
     }
 

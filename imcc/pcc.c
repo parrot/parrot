@@ -460,6 +460,24 @@ NONAMEDPARAMS: /* If no named params, don't generate any param code */
         debug(interpreter, DEBUG_IMC, "add sub ret - %I\n", tmp);
         insert_ins(unit, unit->last_ins, tmp);
     }
+    /*
+     * a coroutine (generator) needs a small hook that gets called
+     * from the shift_pmc() vtable
+     */
+    if (sub->pcc_sub->calls_a_sub & ITPCCYIELD) {
+        /*
+         * set P0, P5
+         * invokecc
+         * end
+         */
+        ins = unit->last_ins;
+        regs[0] = get_pasm_reg("P0");
+        regs[1] = get_pasm_reg("P5");
+        ins = insINS(interpreter, unit, ins, "set", regs, 2);
+        ins = insINS(interpreter, unit, ins, "invokecc", regs, 0);
+        ins = insINS(interpreter, unit, ins, "end", regs, 0);
+    }
+
 }
 
 

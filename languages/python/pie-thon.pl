@@ -133,7 +133,7 @@ my ($code_l, %params, %lexicals, %names, %def_args, %arg_count,
 sub decode_line {
     my $l = shift;
     my ($pc, $line ,$opcode, $arg, $rest);
-    if ($l =~ /Disassembly of <?(\w+)>?/) {
+    if ($l =~ /Disassembly of <?([\w:]+)>?/) {
 	push @code, [ 0, 0, "New_func", 0, $1, undef ];
 	return;
     }
@@ -264,7 +264,7 @@ sub ARG_count {
 EOC
 }
 
-my (@stack, $temp, $make_f, %pir_functions);
+my (@stack, $temp, $make_f, %pir_functions, %func_info);
 
 sub gen_code {
     $cur_func = 'test::main';
@@ -282,9 +282,34 @@ sub gen_code {
 EOC
     $globals{'__name__'} = '__name__';
     $code_l = 0;
+    my $in_info = 0;
+    my $cur_f;
     for (@dis) {
-	next if /^\s*$/;
-	decode_line($_);
+	if (/Information of <?([\w:]+)>?/) {
+	    $in_info = 1;
+	    $cur_f = $1;
+	}
+	elsif ($in_info) {
+	    if (/^#/) {
+		if (/# getargs\s+\(\[(.*)\], (.*?), (.*?)\)/) {
+		    my ($args, $ar, $kw) = ($1, $2, $3);
+		    $args =~ s/'//g;
+		    $ar =~ s/'//g;
+		    $kw =~ s/'//g;
+		    print "# $cur_f: args='$args' ar= '$ar' kw='$kw'\n";
+		    $func_info{$cur_f}{'args'} = $args;
+		    $func_info{$cur_f}{'ar'} = $ar;
+		    $func_info{$cur_f}{'kw'} = $kw;
+		}
+	    }
+	    else {
+		$in_info = 0;
+	    }
+	}
+	else {
+	    next if /^\s*$/;
+	    decode_line($_);
+	}
     }
     while ($code_l < @code) {
 	my $l = $code[$code_l++];
@@ -995,8 +1020,14 @@ sub CALL_FUNCTION_VAR
 {
     my ($n, $c, $cmt) = @_;
     $n++;	# its for sure not that simple
-    # BUILD_TUPLE($n, "xx", "# _VAR");
-    CALL_FUNCTION(1, $c, $cmt);
+    # we have a tuple argumen
+    my $tupl = $stack[-1];
+    print <<EOC;
+    # tuple $tupl->[1] n = $tupl->[0]
+EOC
+    $n = $tupl->[0];
+    UNPACK_SEQUENCE($n, '', "\t\t #unpack");
+    CALL_FUNCTION($n, $c, $cmt);
 }
 sub CALL_FUNCTION
 {
@@ -1013,37 +1044,54 @@ EOC
     my $func;
     my $nfix =  ($n & 0xff);
     my $nk =  2*($n >> 8);
-    $func = $stack[-1 - $nfix-$nk]->[0];
-    print "\t\t $cmt $func\n";
-    if ($builtin_ops{$func} && $builtin_ops{$func} eq 's') {
+    my $name = $stack[-1 - $nfix-$nk]->[0];
+    print "\t\t $cmt $name\n";
+    if ($builtin_ops{$name} && $builtin_ops{$name} eq 's') {
 	no strict "refs";
-	my $opcode = "OPC_$func";
-	&$opcode($n, $func, $cmt);
+	my $opcode = "OPC_$name";
+	&$opcode($n, $name, $cmt);
 	return;
     }
-    # arguments = $n & 0xff
-    # named args: = ($n >> 8) *2
-    for (my $i = 0; $i < $nfix; $i++) {
-	my $arg = pop @stack;
-	unshift @args, promote($arg);
+
+    if ($func_info{$name} && $func_info{$name}{'ar'} ne 'None') {
+	my $fix_args = $func_info{$name}{'args'};
+	my @fargs = split /,/, $fix_args;
+	my $nf = scalar @fargs;
+	if ($func_info{$name}{'ar'} ne 'None') {
+	    $nfix -= $nf;
+	    BUILD_TUPLE($nfix, '', "\t\t #call_args");
+	    my $t = pop @stack;
+	    unshift @args, $t->[1];
+	}
+	for (my $i = 0; $i < $nf; $i++) {
+	    my $arg = pop @stack;
+	    unshift @args, promote($arg);
+	}
     }
-    my ($i, $j, $arg_name);
-    my $name = $stack[-1 - $nk]->[0];
-    my $pushed_args = scalar @args;
-    #
-    # that's wrong, works only for all or none named arguments
-    #
-    for ($i = 0; $i < $nk; $i+=2,) {
-	my $val = pop @stack;
-	my $arg = pop @stack;
-	my $arg_name = $arg->[1];
-	$j = $def_arg_names{$name}{$arg_name};
-	print <<EOC;
+    else {
+	# arguments = $n & 0xff
+	# named args: = ($n >> 8) *2
+	for (my $i = 0; $i < $nfix; $i++) {
+	    my $arg = pop @stack;
+	    unshift @args, promote($arg);
+	}
+	my ($i, $j, $arg_name);
+	my $pushed_args = scalar @args;
+	#
+	# that's wrong, works only for all or none named arguments
+	#
+	for ($i = 0; $i < $nk; $i+=2,) {
+	    my $val = pop @stack;
+	    my $arg = pop @stack;
+	    my $arg_name = $arg->[1];
+	    $j = $def_arg_names{$name}{$arg_name};
+	    print <<EOC;
 	# func $name named arg $j name $arg_name val $val->[1]
 EOC
-	$args[$pushed_args + $j] = promote($val);
+	    $args[$pushed_args + $j] = promote($val);
+	}
+	$n = $nfix + $nk/2;
     }
-    $n = $nfix + $nk/2;
     my $tos = pop @stack;
     my $args = join ', ', @args;
     my $t;
@@ -1216,7 +1264,7 @@ EOC
 	$ar\[$i\] = $p->[1]
 EOC
     }
-    push @stack, [-1, $ar, 'P'];
+    push @stack, [$n, $ar, 'P'];
 }
 
 sub BUILD_LIST
@@ -1466,6 +1514,16 @@ EOC
     push @stack, ["obj $obj attr $c", $attr, 'P'];
 }
 
+sub STORE_ATTR
+{
+    my ($n, $c, $cmt) = @_;
+    my $attr = pop @stack;
+    my $obj = pop @stack;  # object
+    print <<EOC;
+	# setattribute $obj->[1], .$attr->[1] $cmt
+EOC
+}
+
 sub Slice
 {
     my ($n, $c, $cmt, $sl_n) = @_;
@@ -1610,4 +1668,10 @@ sub DELETE_SLICE_plus_2 {
 }
 sub DELETE_SLICE_plus_3 {
     return Del_Slice(@_, 3);
+}
+sub DELETE_FAST {
+    my ($n, $c, $cmt) = @_;
+    print <<EOC;
+	\t $cmt
+EOC
 }
