@@ -197,11 +197,11 @@ TEMPLATE Parrot_incdec_i {
         jit_emit_store_i(jit_info, interpreter, 1, arg1);
     }
 }
-                                                                                                           
+
 Parrot_inc_i {
     Parrot_incdec_i s/<op>/add/
 }
-                                                                                                           
+
 Parrot_dec_i {
     Parrot_incdec_i s/<op>/sub/
 }
@@ -699,6 +699,131 @@ Parrot_ge_ic_i_ic {
 
 Parrot_ge_i_i_ic {
     Parrot_cmp_ix_ix_ic  s/<a>/bge/
+}
+
+TEMPLATE Parrot_iscmp_ix_ix_ix {
+    if(MAP[2] && MAP[3]){
+        emitm_subcc_r(NATIVECODE, MAP[2], MAP[3], emitm_g(0));
+    }
+    else if (MAP[2]) {
+        jit_emit_load_i(jit_info, interpreter, 3, ISR2);
+        emitm_subcc_r(NATIVECODE, MAP[2], ISR2, emitm_g(0));
+    }
+    else if (MAP[3]) {
+        jit_emit_load_i(jit_info, interpreter, 2, ISR1);
+        emitm_subcc_r(NATIVECODE, ISR1, MAP[3], emitm_g(0));
+    }
+    else {
+        jit_emit_load_i(jit_info, interpreter, 2, ISR1);
+        jit_emit_load_i(jit_info, interpreter, 3, ISR2);
+        emitm_subcc_r(NATIVECODE, ISR1, ISR2, emitm_g(0));
+    }
+
+    emitm_bicc(NATIVECODE, 1, emitm_<a>, 3);
+
+    if(MAP[1]){
+        emitm_mov_i(NATIVECODE, 1, MAP[1]);
+        emitm_or_r(NATIVECODE, emitm_g(0), emitm_g(0), MAP[1]);
+    } else {
+        jit_emit_store_i(jit_info, interpreter, 1, 1);
+        jit_emit_store_i(jit_info, interpreter, 1, 0);
+    }
+}
+
+Parrot_isgt_i_i_i {
+    Parrot_iscmp_ix_ix_ix  s/<a>/bg/
+}
+
+Parrot_isgt_i_ic_i {
+    Parrot_iscmp_ix_ix_ix  s/<a>/bg/
+}
+
+Parrot_isgt_i_i_ic {
+    Parrot_iscmp_ix_ix_ix  s/<a>/bg/
+}
+
+Parrot_isgt_i_ic_ic {
+    Parrot_iscmp_ix_ix_ix  s/<a>/bg/
+}
+
+Parrot_isge_i_i_i {
+    Parrot_iscmp_ix_ix_ix  s/<a>/bge/
+}
+
+Parrot_isge_i_ic_i {
+    Parrot_iscmp_ix_ix_ix  s/<a>/bge/
+}
+
+Parrot_isge_i_i_ic {
+    Parrot_iscmp_ix_ix_ix  s/<a>/bge/
+}
+
+Parrot_isge_i_ic_ic {
+    Parrot_iscmp_ix_ix_ix  s/<a>/bge/
+}
+
+Parrot_isle_i_i_i {
+    Parrot_iscmp_ix_ix_ix  s/<a>/ble/
+}
+
+Parrot_isle_i_ic_i {
+    Parrot_iscmp_ix_ix_ix  s/<a>/ble/
+}
+
+Parrot_isle_i_i_ic {
+    Parrot_iscmp_ix_ix_ix  s/<a>/ble/
+}
+
+Parrot_isle_i_ic_ic {
+    Parrot_iscmp_ix_ix_ix  s/<a>/ble/
+}
+
+Parrot_islt_i_i_i {
+    Parrot_iscmp_ix_ix_ix  s/<a>/bl/
+}
+
+Parrot_islt_i_ic_i {
+    Parrot_iscmp_ix_ix_ix  s/<a>/bl/
+}
+
+Parrot_islt_i_i_ic {
+    Parrot_iscmp_ix_ix_ix  s/<a>/bl/
+}
+
+Parrot_islt_i_ic_ic {
+    Parrot_iscmp_ix_ix_ix  s/<a>/bl/
+}
+
+Parrot_iseq_i_i_i {
+    Parrot_iscmp_ix_ix_ix  s/<a>/be/
+}
+
+Parrot_iseq_i_ic_i {
+    Parrot_iscmp_ix_ix_ix  s/<a>/be/
+}
+
+Parrot_iseq_i_i_ic {
+    Parrot_iscmp_ix_ix_ix  s/<a>/be/
+}
+
+Parrot_iseq_i_ic_ic {
+    Parrot_iscmp_ix_ix_ix  s/<a>/be/
+}
+
+Parrot_isne_i_i_i {
+    Parrot_iscmp_ix_ix_ix  s/<a>/bne/
+}
+
+Parrot_isne_i_ic_i {
+    Parrot_iscmp_ix_ix_ix  s/<a>/bne/
+}
+
+Parrot_isne_i_i_ic {
+    Parrot_iscmp_ix_ix_ix  s/<a>/bne/
+}
+
+Parrot_isne_i_ic_ic {
+    Parrot_iscmp_ix_ix_ix  s/<a>/bne/
 }
 
 /*

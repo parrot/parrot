@@ -77,7 +77,7 @@
         emitm_rs1(rs1) | (low14); \
     pc +=4 ; }
 
-/* format 3b */
+/* format 3a */
 #define emitm_3a(pc, op, rd, op3, rs1, asi, rs2) \
     emitm_fmt3(pc, op, rd, op3, rs1, ((asi) << 5) | (rs2))
 
@@ -107,7 +107,8 @@
 #define emitm_restore_i(pc, rs1, i, rd)   emitm_3b(pc, 2, rd, 075, rs1, i)
 
 /* MOV */
-#define emitm_mov(pc, rs, rd) emitm_or_r(pc, emitm_g(0), rs, rd)
+#define emitm_mov_r(pc, rs, rd) emitm_or_r(pc, emitm_g(0), rs, rd)
+#define emitm_mov_i(pc, i, rd)  emitm_or_i(pc, emitm_g(0), i, rd)
 
 /* Integer Register Loads */
 
@@ -283,7 +284,7 @@
 /* Branch */
 #define emitm_bicc(pc, a, cond, disp22) emitm_2b(pc, a, cond, 02, disp22)
 
-#define jit_emit_mov_rr_i(pc, dst, src) emitm_mov(pc, src, dst)
+#define jit_emit_mov_rr_i(pc, dst, src) emitm_mov_r(pc, src, dst)
 #define jit_emit_mov_rr_n(pc, dst, src) { \
     emitm_fmovs(pc, src, dst); \
     emitm_fmovs(pc, (src)+1, (dst)+1); }
@@ -671,7 +672,7 @@ void Parrot_jit_normal_op(Parrot_jit_info_t *jit_info,
         (void (*)(void))interpreter->op_func_table[*(jit_info->cur_op)];
 
     emitm_call_30(jit_info->native_ptr, 0);
-    emitm_mov(jit_info->native_ptr, Parrot_jit_intrp, emitm_o(1));
+    emitm_mov_r(jit_info->native_ptr, Parrot_jit_intrp, emitm_o(1));
 }
 
 void Parrot_jit_cpcf_op(Parrot_jit_info_t *jit_info,
