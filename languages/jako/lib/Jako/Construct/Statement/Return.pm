@@ -36,8 +36,8 @@ sub new
     VALUE => $value,
 
     DEBUG => 1,
-    FILE  => $value->file,
-    LINE  => $value->line
+    FILE  => defined $value ? $value->file : undef, # TODO: YUCK!
+    LINE  => defined $value ? $value->line : undef, # TODO: YUCK!
   }, $class;
 
   $block->push_content($self);

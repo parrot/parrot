@@ -71,19 +71,61 @@ sub compile
 
   my @args  = $self->args;
 
-  if (exists $props{op}) {
+  my @formal_args = $sym->args;
+
+  $self->SYNTAX_ERROR("Wrong number of arguments (expected %d, got %d) in call to '%s'.",
+    scalar(@formal_args), scalar(@args), $name)
+    unless @formal_args == @args;
+
+  for (my $i = 0; $i < @args; $i++) {
+    my ($formal_arg_type, $formal_arg_name) = @{$formal_args[$i]};
+    my $actual_arg_type;
+
+    if (UNIVERSAL::isa($args[$i], 'Jako::Construct::Expression::Value::Identifier')) {
+      my $arg_sym = $self->block->find_symbol($args[$i]->value);
+      $self->SYNTAX_ERROR("Undefined identifier '%s'.", $args[$i]->value) unless $arg_sym;
+      $actual_arg_type = $arg_sym->type; 
+    }
+    else {
+      $actual_arg_type = $args[$i]->type;
+    }
+
+    $self->INTERNAL_ERROR("Can't determine type of formal argument (%s)!", $formal_arg_name) 
+      unless defined $formal_arg_type;
+
+    $self->INTERNAL_ERROR("Can't determine type of actual argument (%s)!", ref $args[$i])
+      unless defined $actual_arg_type;
+
+    if ($formal_arg_type->name ne $actual_arg_type->name) {
+      my $temp = Jako::Compiler::temp_reg($formal_arg_type);
+      my $value = $args[$i]->compile($fh);
+      print $fh "  $temp = $value\n";
+      $args[$i] = $temp;
+    }
+    else {
+      $args[$i] = $args[$i]->compile($fh);
+    }
+  }
+
+  if (exists $props{fnlib}) {
+    foreach my $arg (@args) {
+      print $fh "  .arg $arg\n";
+    }
+    print $fh "  call _${name}_THUNK\n";
+  }
+  elsif (exists $props{op}) {
     my $op = $props{op};
 
 #    $self->DEBUG(0, "Calling %s%s...", $name, ($op ? ' (op $op)' : ' as op'));
 
     $name = $op if defined $op;
 
-    print $fh "  $name ", join(", ", $dest, map { $_->compile($fh) } @args), "\n";
+    print $fh "  $name ", join(", ", $dest, @args), "\n";
   }
   else {
 #    $self->DEBUG(0, "Calling '%s' as regular sub (props = %s)...", $name, join(", ", %props));
 
-    foreach my $arg (map { $_->compile($fh) } @args) {
+    foreach my $arg (@args) {
       print $fh "  .arg $arg\n";
     }
 

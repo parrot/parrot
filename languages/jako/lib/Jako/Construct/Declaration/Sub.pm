@@ -17,6 +17,7 @@ use Carp;
 
 use base qw(Jako::Construct::Declaration);
 
+use Jako::Symbol;
 use Jako::Construct::Type;
 
 
@@ -88,7 +89,8 @@ sub new
     $self->type,
     $self->name,
     undef,            # No value
-    $props,           # No properties
+    $props,           # Parsed Properties
+    $args,            # Parsed Properties
     $self->file,
     $self->line
   );
@@ -106,14 +108,14 @@ sub new
 
 # block handled by superclass?
 
-sub kind  { return shift->{KIND}; }
-sub type  { return shift->{TYPE}; }
-sub name  { return shift->{NAME}; }
+sub kind  { return shift->{KIND};     }
+sub type  { return shift->{TYPE};     }
+sub name  { return shift->{NAME};     }
 sub props { return %{shift->{PROPS}}; }
-sub args  { return @{shift->{ARGS}}; }
+sub args  { return @{shift->{ARGS}};  }
 
-sub file { return shift->{FILE}; }
-sub line { return shift->{LINE}; }
+sub file  { return shift->{FILE};     }
+sub line  { return shift->{LINE};     }
 
 
 #
@@ -127,7 +129,60 @@ sub compile
 
   my $name  = $self->name;
 
-  print $fh "#  Declaration of sub $name\n";
+  my %reg = ('int' => 5, 'num' => 5, 'obj' => 5, 'str' => 5);
+
+  my $sym = $self->block->find_symbol($name);
+
+  my %props = $sym->props;
+
+  if (exists $props{fnlib}) {
+    my $fnlib = $props{fnlib}->value; # TODO: We should make sure its a string, somewhere.
+    my $fn    = $props{fn} ? $props{fn}->value : "\"$name\"";
+
+    my $thunk = "_${name}_THUNK";
+
+    print $fh "\n";
+    print $fh ".sub $thunk\n";
+    print $fh ".namespace $thunk\n";
+    print $fh "  saveall\n";
+
+    my $sig = defined $self->type ? $self->type->code : 'v';
+    my @params;
+    foreach my $arg ($self->args) {
+      my ($arg_type, $arg_name) = @$arg;
+      push @params, $arg_type->code . $reg{$arg_type->name}++;
+      $sig .= $arg_type->code;
+    }
+
+    $sig =~ tr[INPS][ifpt]; # Defaults.
+
+    foreach my $param (reverse @params) {
+      print $fh "  restore $param\n";
+    }
+
+    my $return = defined $self->type ? -2 : 0; # -2 = one, 0 = none
+
+    print $fh "  #undef P1 # NO SUCH OP\n";     # No continuation
+    print $fh "  #undef P2 # NO SUCH OP\n";     # No object
+    print $fh "  I0 = 0\n";       # Not being called with prototyped parameters.
+    print $fh "  I1 = 0\n";       # Number of items on the stack.
+    print $fh "  I2 = 0\n";       # Number of parameters in PMC registers.
+    print $fh "  I3 = $return\n"; # What we expect in return
+
+    print $fh "  .local obj lib\n";
+    print $fh "  loadlib lib, $fnlib\n";
+    print $fh "  dlfunc P0, lib, $fn, \"$sig\"\n";
+    print $fh "  invoke\n";
+
+    if ($self->type) {
+      print $fh "  save " . $self->type->code . '5' . "\n";
+    }
+
+    print $fh "  restoreall\n";
+    print $fh "  ret\n";
+    print $fh ".endnamespace $thunk\n";
+    print $fh ".end\n";
+  }
 
   return 1;
 }

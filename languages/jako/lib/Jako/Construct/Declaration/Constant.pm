@@ -98,7 +98,8 @@ sub new
     $self->type,
     $self->name,
     $self->value,
-    { },           # No properties
+    undef,           # No properties
+    undef,           # No args
     $self->file,
     $self->line
   );

@@ -1,0 +1,218 @@
+#
+# life.jako
+#
+# Play Conway's (no, not *him*. The other Conway) game of life
+#
+# Based on life.pasm, Hacked by Leon Brocard <acme@astray.com> to use curses.
+#
+# The original version of 2002-12-05 can be found here:
+#
+#     http://archive.develooper.com/perl6-internals@perl.org/msg13935.html
+#
+
+sub num time   {op} ();
+sub     sleep  {op} (int n);
+sub     concat {op} (str dest, str s);
+sub int length {op} (str dest);
+sub str substr {op} (str s, int i, int l);
+
+sub int initscr  {fnlib = "libcurses.so"} ();
+sub int endwin   {fnlib = "libcurses.so"} ();
+sub int curs_set {fnlib = "libcurses.so"} (int x);
+sub int addstr   {fnlib = "libcurses.so"} (str s);
+#sub int refresh  {fnlib = "libcurses.so"} ();
+sub int move     {fnlib = "libcurses.so"} (int x, int y);
+
+var int foo; # Store result from above functions here.
+
+const int G = 5000; # Generation count.
+
+const int WIDTH  = 15;
+const int HEIGHT = 15;
+
+const str r00 = "               ";
+const str r01 = "               ";
+const str r02 = "               ";
+const str r03 = "               ";
+const str r04 = "   **          ";
+const str r05 = " *    *        ";
+const str r06 = "       *       ";
+const str r07 = " *     *       ";
+const str r08 = "  ******       ";
+const str r09 = "               ";
+const str r10 = "               ";
+const str r11 = "               ";
+const str r12 = "               ";
+const str r13 = "               ";
+const str r14 = "               ";
+
+
+#
+# at()
+#
+# Return 1 if the cell at row, col is alive, otherwise 0.
+#
+
+sub int at (str cells, int row, int col)
+{
+  var str temp;
+  var int offset;
+
+  row += HEIGHT; # In case they are slightly negative.
+  col += WIDTH;
+
+  row %= HEIGHT;
+  col %= WIDTH;
+
+  offset = row * WIDTH;
+  offset += col;
+
+#  var int len;
+#  len = length(cells);
+#  foo = move(0, 19);
+#  foo = addstr("length(cells) == $len");
+  foo = move(0, 20);
+  foo = addstr("substr(cells, $offset, 1");
+#  foo = refresh();
+
+  temp = substr(cells, offset, 1);
+
+  if (temp == "*") {
+    return 1;
+  }
+
+  return 0;
+}
+
+
+#
+# generate()
+#
+
+sub str generate (str cells)
+{
+  var str temp = "";
+
+  var int row = 0;
+
+  while (row < HEIGHT) {
+    var int col = 0;
+
+    while (col < WIDTH) {
+      var int count = 0;
+      var int r, c;
+      var int cell;
+
+      r = row - 1; c = col - 1; cell = at(cells, r, c); count += cell; # NW
+      r = row - 1; c = col    ; cell = at(cells, r, c); count += cell; # N
+      r = row - 1; c = col + 1; cell = at(cells, r, c); count += cell; # NE
+
+      r = row    ; c = col - 1; cell = at(cells, r, c); count += cell; # W
+      r = row    ; c = col + 1; cell = at(cells, r, c); count += cell; # E
+
+      r = row + 1; c = col - 1; cell = at(cells, r, c); count += cell; # SW
+      r = row + 1; c = col    ; cell = at(cells, r, c); count += cell; # S
+      r = row + 1; c = col + 1; cell = at(cells, r, c); count += cell; # SE
+
+      var int current;
+      current = at(cells, row, col);
+
+      if (current != 0) {
+        if (count == 3) {
+          concat(temp, "*");
+        }
+        else {
+          concat(temp, " ");
+        }
+      }
+      else {
+        if (count < 2) {
+          concat(temp, " ");
+        }
+        if (count == 2) {
+          concat(temp, "*");
+        }
+        if (count == 3) {
+          concat(temp, "*");
+        }
+        if (count > 3) {
+          concat(temp, " ");
+        }
+      }
+
+      col++;
+    }
+
+    row++;
+  }
+
+  return temp;
+}
+
+
+#
+# dump()
+#
+
+sub dump(str cells, int g)
+{
+  foo = move(0, 0);
+  foo = addstr("Generation: ");
+  foo = addstr(g);
+#  foo = refresh();
+
+  var int offset = 0;
+  var int row;
+  row = HEIGHT - 1;
+
+  while (row >= 0) {
+    var str temp;
+
+    temp = substr(cells, offset, 15);
+
+    foo = addstr(temp);
+    foo = addstr("\n");
+
+    offset += 15;
+    row--;
+  }
+}
+
+
+foo = initscr();
+foo = curs_set(0);
+
+var num start;
+start = time();
+
+var str cells = "";
+
+concat(cells, r00);
+concat(cells, r01);
+concat(cells, r02);
+concat(cells, r03);
+concat(cells, r04);
+concat(cells, r05);
+concat(cells, r06);
+concat(cells, r07);
+concat(cells, r08);
+concat(cells, r09);
+concat(cells, r10);
+concat(cells, r11);
+concat(cells, r12);
+concat(cells, r13);
+concat(cells, r14);
+
+dump(cells, 0);
+
+var int g = 0; # Number of generations so far.
+
+while (g < G) {
+  cells = generate(cells);
+  dump(cells, g);
+  sleep(1);
+}
+
+foo = curs_set(1);
+foo = endwin();
+

@@ -24,9 +24,12 @@ sub new
 {
   my $class = shift;
 
-  confess "Expected 8 args" unless @_ == 8;
+  confess "Expected 9 args" unless @_ == 9;
 
-  my ($block, $kind, $type, $name, $value, $props, $file, $line) = @_;
+  my ($block, $kind, $type, $name, $value, $props, $args, $file, $line) = @_;
+
+  $props = { } unless defined $props;
+  $args  = [ ] unless defined $args;
 
   confess("Undefined identifier block.")
     unless defined $block;
@@ -49,6 +52,7 @@ sub new
     NAME   => $name,
     VALUE  => $value,  # For constants (undef for variables)
     PROPS  => $props,
+    ARGS   => $args,
 
     DEBUG  => 1,
     FILE   => $file,
@@ -70,6 +74,7 @@ sub type   { return shift->{TYPE};     }
 sub name   { return shift->{NAME};     }
 sub value  { return shift->{VALUE};    }
 sub props  { return %{shift->{PROPS}}; }
+sub args   { return @{shift->{ARGS}}; }
 
 sub file   { return shift->{FILE};     }
 sub line   { return shift->{LINE};     }

@@ -17,8 +17,6 @@ use Carp;
 
 use base qw(Jako::Processor);
 
-use Jako::Symbol;
-
 use Jako::Construct::Block;
 use Jako::Construct::Block::Conditional::If;
 use Jako::Construct::Block::Conditional::Unless;
