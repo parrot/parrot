@@ -13,7 +13,7 @@ sub op {
     my ($class, $name, $args, %opts) = @_;
 
     $class = ref($class) if ref $class;
-    $class = "Regex::Ops::Tree::$name";
+#    $class = "Regex::Ops::Tree::$name";
     my $self = bless { name => $name,
                        args => $args || [],
                        %opts }, $class;
@@ -32,7 +32,7 @@ sub rop {
     return __PACKAGE__->op(@_);
 }
 
-%RegexOps =
+my %RegexOps =
   ( atend => [ [ '_onearg' ] ],
     multi_match => [ [ '' ] ],
     bytematch => [ [ '_onematch' ] ],
@@ -44,11 +44,9 @@ while (my ($name, $info) = each %RegexOps) {
     my $var = '@' . "Regex::Ops::Tree::" . $name . "::ISA";
     {
         no strict 'refs';
-        @$var = map { length ? "Regex::Ops::Tree::$_" : "Regex::Ops::Tree" } @$isa;
+        @$var = map { length($_) ? "Regex::Ops::Tree::$_" : "Regex::Ops::Tree" } @$isa;
     };
 }
-
-
 
 #  @RegexOps =
 #    ( [ "atend()" => "return whether at end of input string" ],
@@ -100,12 +98,14 @@ sub startset { die }
 sub hasback { 0 }
 
 package Regex::Ops::Tree::_onearg;
+use vars qw(@ISA); @ISA = qw(Regex::Ops::Tree);
 sub minlen { my ($op) = @_; $op->{args}->[0]->minlen() }
 sub maxlen { my ($op) = @_; $op->{args}->[0]->maxlen() }
 sub startset { my ($op) = @_; $op->{args}->[0]->startset() }
 sub hasback { my ($op) = @_; $op->{args}->[0]->hasback() }
 
 package Regex::Ops::Tree::multi_match;
+use vars qw(@ISA); @ISA = qw(Regex::Ops::Tree);
 
 sub minlen {
     my $op = shift;
@@ -138,11 +138,13 @@ sub startset {
 }
 
 package Regex::Ops::Tree::_onematch;
+use vars qw(@ISA); @ISA = qw(Regex::Ops::Tree);
 
 sub minlen { 1 }
 sub maxlen { 1 }
 
 package Regex::Ops::Tree::seq;
+use vars qw(@ISA); @ISA = qw(Regex::Ops::Tree);
 
 sub minlen {
     my $op = shift;
