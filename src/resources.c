@@ -106,13 +106,9 @@ same.
 
 */
 
-static void *
-mem_allocate(struct Parrot_Interp *interpreter, size_t *req_size,
-        struct Memory_Pool *pool, size_t align_1)
+static size_t
+aligned_size(size_t size, size_t align)
 {
-    char *return_val;
-    size_t size = *req_size;
-
     /* Ensure that our minimum size requirements are met, so that we have room
      * for a forwarding COW pointer */
     if (size < sizeof(void *))
@@ -123,7 +119,16 @@ mem_allocate(struct Parrot_Interp *interpreter, size_t *req_size,
     size += sizeof(struct Buffer_Tail);
 
     /* Round up to requested alignment */
-    size = (size + align_1) & ~align_1;
+    size = (size + align) & ~align;
+    return size;
+}
+
+static void *
+mem_allocate(struct Parrot_Interp *interpreter, size_t *req_size,
+        struct Memory_Pool *pool, size_t align_1)
+{
+    char *return_val;
+    size_t size = aligned_size(*req_size, align_1);
 
     /* If not enough room, try to find some */
     if (pool->top_block == NULL) {
@@ -499,11 +504,36 @@ Parrot_reallocate_string(struct Parrot_Interp *interpreter, STRING *str,
     void *mem;
     struct Memory_Pool *pool;
 
+    pool = PObj_constant_TEST(str)
+        ? interpreter->arena_base->constant_string_pool
+        : interpreter->arena_base->memory_pool;
+    /*
+     * if the requested size is smaller then buflen, we are done
+     */
+    if (tosize <= PObj_buflen(str))
+        return PObj_bufstart(str);
+
+    /*
+     * first check, if we can reallocate:
+     * - if the passed strings buffer is the last string in the pool and
+     * - if there is enough size, we can just move the pool's top pointer
+     */
+    if (pool->top_block) {
+        size_t new_size, needed, old_size;
+        new_size = aligned_size(tosize, STRING_ALIGNMENT - 1);
+        old_size = PObj_buflen(str) + sizeof(struct Buffer_Tail);
+        needed = new_size - old_size;
+        if (pool->top_block->free >= needed &&
+                pool->top_block->top == (char*)PObj_bufstart(str) +
+                old_size) {
+            pool->top_block->free -= needed;
+            pool->top_block->top  += needed;
+            PObj_buflen(str) = new_size - sizeof(struct Buffer_Tail);
+            return PObj_bufstart(str);
+        }
+    }
     copysize = (PObj_buflen(str) > tosize ? tosize : PObj_buflen(str));
 
-    pool = PObj_constant_TEST(str)
-            ? interpreter->arena_base->constant_string_pool
-            : interpreter->arena_base->memory_pool;
     if (!PObj_COW_TEST(str)) {
         pool->guaranteed_reclaimable += PObj_buflen(str);
     }
