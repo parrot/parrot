@@ -72,6 +72,7 @@ encodings/utf8.c
 examples/assembly/Makefile
 examples/assembly/bsr.pasm
 examples/assembly/call.pasm
+examples/assembly/cat.pasm
 examples/assembly/euclid.pasm
 examples/assembly/fact.pasm
 examples/assembly/io1.pasm
@@ -83,6 +84,7 @@ examples/assembly/mops.pasm
 examples/assembly/mops_p.pasm
 examples/assembly/pmcmops.pasm
 examples/assembly/queens.pasm
+examples/assembly/slurp.pasm
 examples/assembly/stack.pasm
 examples/assembly/substr.pasm
 examples/assembly/trace.pasm
@@ -166,6 +168,7 @@ languages/cola/sym.c
 languages/cola/type.c
 languages/cola/examples/calc.cola
 languages/cola/examples/fib.cola
+languages/cola/examples/life.cola
 languages/cola/examples/mandelbrot.cola
 languages/cola/examples/reverse.cola
 languages/jako/MAINTAINER
