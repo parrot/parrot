@@ -21,19 +21,63 @@ programs executing on an embedded device or other restricted environment)
 
 =item Undef
 
+This is the generic no-value type. It has a numeric value of zero, a
+string value of empty string, and a boolean value of false. It will,
+on assignment, turn itself into a PMC of the source type, or if
+assigned a basic type will turn itself into one of the wrapper PMC
+types (detailed below) for the basic types.
+
 =item Integer
+
+The PMC wrapper for Parrot's low-level integer type. Always an
+integer, with other types auto-converted to an integer when stored
+into this PMC.
+
+The boolean value for an Integer is false if zero, otherwise true.
 
 =item Float
 
+The PMC wrapper for Parrot's low-level floating point type. Always a
+float, with other types autoconverted to a float when stored into this
+PMC.
+
+The boolean value for a Float is false if exactly zero, otherwise
+true.
+
 =item String
+
+The PMC wrapper for Parrot's low-level string type. Always a simple
+string, with other types autoconverted to a string when stored into
+this PMC.
+
+The boolean value for a String is false if empty or the string '0' (a
+one character string holding a zero) otherwise true. This PMC
+autoconverts to an integer or float when its integer or float value is
+fetched.
 
 =item Boolean
 
+The PMC wrapper for Parrot's low-level true/false value. Returns 0 for
+false, 1 for true when fetched as an integer or float, empty string
+for false and '1' for true when fetched as a string.
+
 =item BigNum
+
+The PMC wrapper for Parrot's low-level BigNum type.
 
 =item ParrotClass
 
+The PMC for Parrot's class. (Note that this may go away if we
+ultimately make all classes just objects)
+
 =item ParrotObject
+
+The PMC for Parrot's base object type.
+
+=item Reference
+
+The PMC that represents a reference to another PMC. Delegates all
+functions to the referred-to PMC.
 
 =back
 
