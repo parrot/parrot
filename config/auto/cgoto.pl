@@ -44,9 +44,9 @@ sub runstep {
 $(OPS)/core_ops_cg$(O): $(GENERAL_H_FILES) $(OPS)/core_ops_cg.c
 $(OPS)/core_ops_cgp$(O): $(GENERAL_H_FILES) $(OPS)/core_ops_cgp.c
 
-$(OPS)/core_ops_cg.c $(INC)/oplib/core_ops_cg.h: $(OPS_FILES) $(BUILD_TOOL)/ops2c.pl lib/Parrot/OpsFile.pm lib/Parrot/Op.pm lib/Parrot/OpTrans/CGoto.pm
+$(OPS)/core_ops_cg.c $(INC)/oplib/core_ops_cg.h: $(OPS_FILES) $(BUILD_TOOL)/ops2c.pl lib/Parrot/OpsFile.pm lib/Parrot/Op.pm lib/Parrot/OpTrans/CGoto.pm lib/Parrot/OpLib/core.pm
 	$(PERL) $(BUILD_TOOL)/ops2c.pl CGoto --core
-$(OPS)/core_ops_cgp.c $(INC)/oplib/core_ops_cgp.h: $(OPS_FILES) $(BUILD_TOOL)/ops2c.pl lib/Parrot/OpsFile.pm lib/Parrot/Op.pm lib/Parrot/OpTrans/CGP.pm
+$(OPS)/core_ops_cgp.c $(INC)/oplib/core_ops_cgp.h: $(OPS_FILES) $(BUILD_TOOL)/ops2c.pl lib/Parrot/OpsFile.pm lib/Parrot/Op.pm lib/Parrot/OpTrans/CGP.pm lib/Parrot/OpLib/core.pm
 	$(PERL) $(BUILD_TOOL)/ops2c.pl CGP --core
 EOF
       TEMP_cg_o          => '$(OPS)/core_ops_cg$(O) $(OPS)/core_ops_cgp$(O)',
