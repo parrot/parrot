@@ -1,3 +1,4 @@
+
 #! perl -w
 #
 # OpsFile.pm
@@ -16,7 +17,6 @@ BEGIN {
     @ISA = qw(Exporter);
     @EXPORT = qw(%op_body);
 };
-
 
 #my %opcodes = Parrot::Opcode::read_ops();
 #my %opcode;
@@ -52,6 +52,8 @@ sub new
 
   $self->read_ops($_) for @files;
 
+  $self->{FILE}=~s/, $//;
+
   return $self;
 }
 
@@ -68,7 +70,7 @@ sub read_ops
 
   die "Parrot::OpFunc::init(): No file specified!\n" unless defined $file;
 
-  $self->{FILE} = $file;
+  $self->{FILE} .= $file.', ';
 
   my $orig = $file;
   open OPS, $file or die "Can't open $file, $!/$^E";
@@ -91,6 +93,7 @@ sub read_ops
   my @args;
   my $seen_pod;
   my $seen_op;
+  my $line;
 
   while (<OPS>) {
     $seen_pod = 1 if m|^=|;
@@ -117,7 +120,7 @@ sub read_ops
 
       $self->{PREAMBLE} .= $_ unless $seen_pod or $count; # Lines up to first op def.
       next;
-    };
+    }
   
     die "No 'VERSION = ...;' line found before beginning of ops in file '$orig'!\n"
       unless defined $self->version;
@@ -161,6 +164,7 @@ sub read_ops
       @args       = split(/\s*,\s*/, $args);
       $body       = '';
       $seen_op    = 1;
+      $line	      = $.+1;
 
       next;
     }
@@ -174,7 +178,7 @@ sub read_ops
     #
 
     if (/^}\s*$/) {
-      $count += $self->make_op($count, $type, $short_name, $body, \@args);
+      $count += $self->make_op($count, $type, $short_name, $body, \@args, $line, $orig);
 
       $seen_op = 0;
 
@@ -208,7 +212,7 @@ sub read_ops
 
 sub make_op
 {
-  my ($self, $code, $type, $short_name, $body, $args) = @_;
+  my ($self, $code, $type, $short_name, $body, $args, $line, $file) = @_;
   my $counter = 0;
 
   foreach my $variant (expand_args(@$args)) {
@@ -254,7 +258,7 @@ sub make_op
       
       $body =~ s/\$(\d+)/{{\@$1}}/mg;
       
-      $op->body($body);
+      $op->body(qq{#line $line "$file"\n}.$body);
       
       $self->push_op($op);
       $counter++;

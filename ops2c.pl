@@ -52,20 +52,13 @@ my $source  = "${base}_ops${suffix}.c";
 
 die "$0: Could not read ops file '$file'!\n" unless -e $file;
 
-my $ops = new Parrot::OpsFile $file;
+my $ops = new Parrot::OpsFile $file, @ARGV;
 
 my $version       = $ops->version;
 my $major_version = $ops->major_version;
 my $minor_version = $ops->minor_version;
 my $patch_version = $ops->patch_version;
 
-for $file (@ARGV) {
-    die "$0: Could not read ops file '$file'!\n" unless -e $file;
-    my $temp_ops = new Parrot::OpsFile $file;
-    for(@{$temp_ops->{OPS}}) {
-       push @{$ops->{OPS}},$_;
-    }
-}
 my $cur_code = 0;
 for(@{$ops->{OPS}}) {
    $_->{CODE}=$cur_code++;
