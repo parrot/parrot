@@ -2592,6 +2592,52 @@ Parrot_jit_emit_mov_rm(Interp * interpreter, int reg, char *mem)
         ((Parrot_jit_info_t *)(interpreter->jit_info))->native_ptr, reg, mem);
 }
 
+void
+Parrot_jit_emit_mov_mr_n_offs(Interp *interpreter,
+        int base_reg, size_t offs, int src_reg)
+{
+    emitm_fld(((Parrot_jit_info_t *)(interpreter->jit_info))->native_ptr,
+            src_reg);
+#  if NUMVAL_SIZE == 8
+    emitm_fstpl(((Parrot_jit_info_t *)(interpreter->jit_info))->native_ptr,
+            base_reg, emit_None, 1, offs);
+#  else
+    emitm_fstpt(((Parrot_jit_info_t *)(interpreter->jit_info))->native_ptr,
+            base_reg, emit_None, 1, offs);
+#  endif
+}
+
+void
+Parrot_jit_emit_mov_mr_offs(Interp *interpreter,
+        int base_reg, size_t offs, int src_reg)
+{
+    emitm_movl_r_m(((Parrot_jit_info_t *)(interpreter->jit_info))->native_ptr,
+            src_reg, base_reg, emit_None, 1, offs);
+}
+
+void
+Parrot_jit_emit_mov_rm_n_offs(Interp *interpreter,
+        int dst_reg, int base_reg, size_t offs)
+{
+#  if NUMVAL_SIZE == 8
+    emitm_fldl(((Parrot_jit_info_t *)(interpreter->jit_info))->native_ptr,
+            base_reg, emit_None, 1, offs);
+#  else
+    emitm_fldt(((Parrot_jit_info_t *)(interpreter->jit_info))->native_ptr,
+            base_reg, emit_None, 1, offs);
+#  endif
+    emitm_fstp(((Parrot_jit_info_t *)(interpreter->jit_info))->native_ptr,
+            (dst_reg+1));
+}
+
+void
+Parrot_jit_emit_mov_rm_offs(Interp *interpreter,
+        int dst_reg, int base_reg, size_t offs)
+{
+    emitm_movl_m_r(((Parrot_jit_info_t *)(interpreter->jit_info))->native_ptr,
+            dst_reg, base_reg, emit_None, 1, offs);
+}
+
 static void
 Parrot_jit_emit_finit(Parrot_jit_info_t *jit_info)
 {
@@ -3180,6 +3226,20 @@ char floatval_map[] = { 1,2,3,4 };
  * set this to 1 or 0 to change allocation scheme
  */
 #  define ALLOCATE_REGISTERS_PER_SECTION 1
+
+/*
+ * new style move function using offsets relative to the base_reg
+ */
+#  ifdef JIT_CGP
+#    define INTERP_BP_OFFS todo
+#  else
+#    define INTERP_BP_OFFS -16
+#  endif
+
+#  define Parrot_jit_emit_get_base_reg_no(interp) \
+    (Parrot_jit_emit_mov_rm_offs(interpreter, emit_EAX, \
+                                 emit_EBP,INTERP_BP_OFFS), \
+    emit_EAX)
 
 
 /*

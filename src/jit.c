@@ -960,6 +960,19 @@ Returns the address of register C<typ[i]>.
 
 */
 
+#if defined(Parrot_jit_emit_get_base_reg_no)
+static size_t
+reg_offs(Interp * interpreter, int typ, int i)
+{
+    switch (typ) {
+        case 0:
+            return REG_OFFS_INT(i);
+        case 3:
+            return REG_OFFS_NUM(i);
+    }
+    return 0;
+}
+#else
 static char *
 reg_addr(Interp * interpreter, int typ, int i)
 {
@@ -988,6 +1001,7 @@ reg_addr(Interp * interpreter, int typ, int i)
                 return 0;   /* not currently */
         }
 }
+#endif
 
 /*
 
@@ -1000,6 +1014,102 @@ Load registers for the current section from parrot to processor registers.
 =cut
 
 */
+
+
+#if defined(Parrot_jit_emit_get_base_reg_no)
+
+static void
+Parrot_jit_load_registers(Parrot_jit_info_t *jit_info,
+                          Interp * interpreter)
+{
+    Parrot_jit_optimizer_section_t *sect = jit_info->optimizer->cur_section;
+    Parrot_jit_register_usage_t *ru = sect->ru;
+    int i, typ;
+    void (*mov_f[4])(Interp *, int, int, size_t)
+        = { Parrot_jit_emit_mov_rm_offs, 0, 0, Parrot_jit_emit_mov_rm_n_offs};
+    int lasts[] = { PRESERVED_INT_REGS, 0,0,  PRESERVED_FLOAT_REGS };
+    char * maps[] = {0, 0, 0, 0};
+    int first = 1;
+    int base_reg;
+    size_t offs;
+
+    maps[0] = jit_info->intval_map;
+    maps[3] = jit_info->floatval_map;
+
+
+    for (typ = 0; typ < 4; typ++) {
+        if (maps[typ]) {
+            for (i = ru[typ].registers_used-1; i >= 0; --i) {
+                int us = ru[typ].reg_usage[i];
+                if ((i >= lasts[typ] && ru[typ].reg_dir[us]) ||
+                        (ru[typ].reg_dir[us] & PARROT_ARGDIR_IN)) {
+                    if (first) {
+                        base_reg = Parrot_jit_emit_get_base_reg_no(
+                                interpreter);
+                        first = 0;
+                    }
+                    offs = reg_offs(interpreter, typ, us);
+                    (mov_f[typ])(interpreter, maps[typ][i], base_reg, offs);
+                }
+            }
+        }
+    }
+
+    /* The total size of the loads. This is used for branches to
+     * the same section - these skip the load asm bytes */
+    sect->load_size = jit_info->native_ptr -
+        (jit_info->arena.start +
+         jit_info->arena.op_map[jit_info->op_i].offset);
+}
+
+/*
+
+=item C<static void
+Parrot_jit_save_registers(Parrot_jit_info_t *jit_info,
+                          Interp * interpreter)>
+
+Save registers for the current section.
+
+=cut
+
+*/
+
+static void
+Parrot_jit_save_registers(Parrot_jit_info_t *jit_info,
+                          Interp * interpreter)
+{
+    Parrot_jit_optimizer_section_t *sect = jit_info->optimizer->cur_section;
+    Parrot_jit_register_usage_t *ru = sect->ru;
+    int i, typ;
+    void (*mov_f[4])(Interp * ,int, size_t, int)
+        = { Parrot_jit_emit_mov_mr_offs, 0, 0, Parrot_jit_emit_mov_mr_n_offs};
+    int lasts[] = { PRESERVED_INT_REGS, 0,0,  PRESERVED_FLOAT_REGS };
+    char * maps[] = {0, 0, 0, 0};
+    int first = 1;
+    int base_reg;
+    size_t offs;
+
+    maps[0] = jit_info->intval_map;
+    maps[3] = jit_info->floatval_map;
+    for (typ = 0; typ < 4; typ++) {
+        if (maps[typ])
+            for (i = 0; i < ru[typ].registers_used; ++i) {
+                int us = ru[typ].reg_usage[i];
+                if ((i >= lasts[typ] && ru[typ].reg_dir[us]) ||
+                    ru[typ].reg_dir[us] & PARROT_ARGDIR_OUT) {
+                    if (first) {
+                        base_reg = Parrot_jit_emit_get_base_reg_no(
+                                interpreter);
+                        first = 0;
+                    }
+                    offs = reg_offs(interpreter, typ, us);
+                    (mov_f[typ])(interpreter, base_reg, offs, maps[typ][i]);
+                }
+            }
+    }
+}
+
+#else
 
 static void
 Parrot_jit_load_registers(Parrot_jit_info_t *jit_info,
@@ -1087,6 +1197,7 @@ Parrot_jit_save_registers(Parrot_jit_info_t *jit_info,
             }
     }
 }
+#endif
 
 /*
 

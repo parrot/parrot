@@ -1583,6 +1583,8 @@ output_is(<<'CODE', <<'OUTPUT', "nci_cb_D4 - synchronous callbacks");
 
 .sub _test @MAIN
 
+    # turn off JIT or special core - no events yet
+    bounds 1
     # prepare user data
     .local pmc user_data
     user_data = new Integer
