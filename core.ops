@@ -4620,28 +4620,28 @@ Possible values for $2 are:
 
 =over 4
 
-=item 1 The total amount of allocatable memory allocated. This figure
+=item 1 -- The total amount of allocatable memory allocated. This figure
 does not include memory used for headers or for the interpreter's internal
 structures.
 
-=item 2 The number of dead object detection runs performed.
+=item 2 -- The number of dead object detection runs performed.
 
-=item 3 The number of garbage collection runs performed.
+=item 3 -- The number of garbage collection runs performed.
 
-=item 4 The number of active PMCs.
+=item 4 -- The number of active PMCs.
 
-=item 5 The number of active buffers.
+=item 5 -- The number of active buffers.
 
-=item 6 The total number of PMCs allocated.
+=item 6 -- The total number of PMCs allocated.
 
-=item 7 The total number of buffers allocated.
+=item 7 -- The total number of buffers allocated.
 
-=item 8 The number of headers (PMC or buffer) that have been allocated
+=item 8 -- The number of headers (PMC or buffer) that have been allocated
 since the last DOD run.
 
-=item 9 The number of new blocks of memory allocated since the last GC run.
+=item 9 -- The number of new blocks of memory allocated since the last GC run.
 
-=item 10 The total amount of memory copied during garbage collections.
+=item 10 -- The total amount of memory copied during garbage collections.
 
 =back
 
@@ -4663,17 +4663,17 @@ ask. They are:
 
 =over 4
 
-=item 1 The size of a platform integer
+=item 1 -- The size of a platform integer
 
-=item 2 The size of a platform float
+=item 2 -- The size of a platform float
 
-=item 3 The size of a platform pointer. (Largest possible data pointer)
+=item 3 -- The size of a platform pointer. (Largest possible data pointer)
 
-=item 4 The OS name
+=item 4 -- The OS name
 
 This is something like "OS X", "MacOS", "Windows", or "VMS".
 
-=item 5 The OS version string
+=item 5 -- The OS version string
 
 This is the current (hopefully) OS Version. For OSes that have plain
 version numbers it will be the version number. For OSes that name
@@ -4682,18 +4682,18 @@ their versions, it will be the version name.
 On HP/UX, this may be something like 11.2, while on Windows it may be
 "95", "98", "2000", "NT", "ME", or "XP".
 
-=item 6 The OS version number string
+=item 6 -- The OS version number string
 
 On OSes that don't name themselves, this will be the same as what's
 returned in the OS version string. On OSes that I<do> name themselves,
 this will be a more specific version number. In all cases it is OS
 dependent.
 
-=item 7 The CPU architecture
+=item 7 -- The CPU architecture
 
 The name of the CPU family, such as "VAX", "Alpha", "PPC", or "x86".
 
-=item 8 The CPU model
+=item 8 -- The CPU model
 
 The model name of the current system's CPU. This is something like
 "EV68", "Athlon", or "Pentium III".
@@ -4728,17 +4728,17 @@ Possible values for $3 are:
 
 =over 4
 
-=item 1 The location of the string buffer header.
+=item 1 -- The location of the string buffer header.
 
-=item 2 The location of the start of the string.
+=item 2 -- The location of the start of the string.
 
-=item 3 The length of the string buffer (in bytes).
+=item 3 -- The length of the string buffer (in bytes).
 
-=item 4 The flags attached to the string (if any).
+=item 4 -- The flags attached to the string (if any).
 
-=item 5 The amount of the string buffer used (in bytes).
+=item 5 -- The amount of the string buffer used (in bytes).
 
-=item 6 The length of the string (in characters).
+=item 6 -- The length of the string (in characters).
 
 =back
 
