@@ -4,7 +4,7 @@ Parrot - Memory Internals
 
 =head1 VERSION
 
-0.0.8 Oct 2002
+0.0.9 Dec 2002
 
 =head1 ABSTRACT
 
@@ -14,7 +14,7 @@ related to the whole and everything and memory management.
 
 =head1 OVERVIEW
 
-All allocated items are managed in memory pools. Memory pools holds 
+All allocated items are managed in memory pools. Memory pools hold
 collections of similar items. These pools can be roughly divided into
 two kinds: pools holding fixed sized items and variable sized items.
 
@@ -26,7 +26,7 @@ items of one kind.
 DOD ... dead object detection, see F<docs/pdds/pdd09_gc.pod> for details.
 
 By scanning through all the interpreter's registers, stacks and the processor
-stack, all objects that are detected here are marked as alive. Objects in 
+stack, all objects that are detected here are marked as alive. Objects in
 all pools not alive are considered dead.
 
 =head1 Top down: the interpreter
@@ -40,12 +40,11 @@ A overall layout of the interpreter's memory management looks like so:
     } Interp;
 
 All object-like things that get allocated during the execution of
-parrot bytecode are managed here. Exceptions currently are objects
-allocated early in startup e.g. the names of the pools themselves.
+parrot bytecode are managed here.
 
 =head1 Arenas
 
-I<struct Arenas> holds pointers to different subkinds of managed memory. 
+I<struct Arenas> holds pointers to different subkinds of managed memory.
 A simplification looks similar to this:
 
     struct Arenas {
@@ -70,16 +69,14 @@ the space for the fixed sized objects.
 =head1 Fixed sized items
 
 These items are either objects by themselves, like a I<PMC>, or are a
-header structure of a variable sized object like a I<STRING>.
-The general object of this kind is a buffer-like object, which consists
-of a I<Buffer> at the beginning and a variable but fixed sized part after the
-buffer structure. Examples of this are a I<STRING> or an I<IntList>.
+header structure of a variable sized object like a I<STRING>.  The
+general object of this kind is a buffer-like object, which consists of a
+I<Buffer> or a I<PObj> at the beginning and a variable but fixed sized
+part after the buffer structure. Examples of this are a I<STRING> or an
+I<IntList>.
 
 Buffer-like objects of the same size are maintained in the
 I<sized_header_pools>, which manage objects of the same size in one slot.
-
-Actually, with some reorganization, a I<PMC> is not different to the general
-case and will be united in the near future.
 
 All fixed sized objects are allocated with C<alloc_objects()>, and first put
 onto the pool's C<free_list>. When there is need for a new object it is taken
@@ -102,14 +99,13 @@ interpreter, they just get reused or recycled.
 	} b;
 	unsigned flags;
 	...
-    } parrot_object;
+    } PObj;
 
 This does not totally reflect the current implementation, but is the
 spirit of the abstraction of current objects. Above structure including
-I<flags> is the current I<Buffer>. With some additional fields like 
+I<flags> is the current I<Buffer>. With some additional fields like
 I<strstart> and I<bufused>, inserted at the ellipses, you get a I<STRING>.
-
-I<PMC>s will be reworked to fit into this structure.
+Adding a I<vtable> (and some other structure members) yields a I<PMC>.
 
 =head1 Variable sized items
 
@@ -143,7 +139,7 @@ When GC doesn't provide enough free space needed for a new item, a new
 block is added to the memory pool.
 
 This also implies that buffers are moved around during their life. Users of
-these buffers are therefore not allowed to hold pointers to buffers over 
+these buffers are therefore not allowed to hold pointers to buffers over
 pieces of code that might trigger a GC run, like C<Parrot_allocate()> or
 C<string_compare()>.
 
@@ -231,7 +227,8 @@ all the blanks filled in ;-)
 
 =head1 FILES
 
-smallobject.[ch], headers.c, resources.[ch], res_lea.c, dod.c, string.[ch]
+smallobject.[ch], headers.c, resources.[ch], res_lea.c, dod.c, string.[ch],
+pobj.h.
 
 =head1 BUGS
 
