@@ -5,7 +5,7 @@
 #Then blatantly stolen from perl6/t/harness by leo ;-)
 
 use strict;
-use lib '../../lib';
+use lib '../lib';
 use Test::Harness qw(runtests);
 
 #

@@ -1,6 +1,6 @@
 package TestCompiler;
 use strict;
-use lib '../../lib';	# XXX
+use lib '../lib';	# XXX
 use vars qw(@EXPORT @ISA);
 use Parrot::Config;
 require Exporter;
@@ -90,7 +90,7 @@ sub generate_functions {
 	my $TEST_PROG_ARGS = $ENV{TEST_PROG_ARGS} || '';
 	my $s = $PConfig{slash};
 	my $exe = $PConfig{exe};
-	my $PARROT = $ENV{PARROT} || "..${s}..${s}parrot$exe";	# XXX
+	my $PARROT = $ENV{PARROT} || "..${s}parrot$exe";	# XXX
 
 	if ($gen_pasm) {
 	    system("$PARROT $opt -o $out_f $by_f");
