@@ -253,6 +253,8 @@ SP              [ ]
 "!="            return(RELOP_NE);
 "**"            return(POW);
 "->"            return(POINTY);
+{WS}+"."{WS}+   return(CONCAT);
+"."             return(DOT);
 
 <emit,INITIAL>".macro" {
         return read_macro(valp, interp);
@@ -357,7 +359,7 @@ SP              [ ]
 	if (!expand_macro(valp, interp, yytext+1)) {
             /* fataly(1, sourcefile, line, "unknown macro '%s'", yytext); */
             yyless(1);
-            return '.';
+            return DOT;
         }
     }
 

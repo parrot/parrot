@@ -283,7 +283,7 @@ itcall_sub(SymReg* sub)
 %token <t> LINECOMMENT
 %token <s> FILECOMMENT
 
-%nonassoc '.'
+%nonassoc CONCAT DOT
 %nonassoc  <t> POINTY
 
 
@@ -787,7 +787,7 @@ assignment:
    | target '=' var POW var	{ $$ = MK_I(interp, cur_unit, "pow", 3, $1, $3, $5); }
    | target '=' var '/' var	{ $$ = MK_I(interp, cur_unit, "div", 3, $1, $3, $5); }
    | target '=' var '%' var	{ $$ = MK_I(interp, cur_unit, "mod", 3, $1, $3, $5); }
-   | target '=' var '.' var	{ $$ = MK_I(interp, cur_unit, "concat", 3, $1,$3,$5); }
+   | target '=' var CONCAT var	{ $$ = MK_I(interp, cur_unit, "concat", 3, $1,$3,$5); }
    | target '=' var SHIFT_LEFT var
                         { $$ = MK_I(interp, cur_unit, "shl", 3, $1, $3, $5); }
    | target '=' var SHIFT_RIGHT var
@@ -880,7 +880,7 @@ the_sub: IDENTIFIER  { $$ = mk_sub_address($1); }
    ;
 
 ptr:    POINTY { $$=0; }
-      | '.'    { $$=0; }
+      | DOT    { $$=0; }
    ;
 
 sub_call:

@@ -2321,7 +2321,7 @@ output_like(<<'CODE', <<'OUTPUT', "new with a native type");
 	print "never\n"
 	end
 CODE
-/(unknown macro|unexpected '\.')/
+/(unknown macro|unexpected DOT)/
 OUTPUT
 
 output_is(<<'CODE', <<OUTPUT, "repeat");

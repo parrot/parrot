@@ -39,7 +39,7 @@ output_is(<<'CODE', <<'OUT', "meth call syntax m.o(arg)");
     new obj, $I0
     $P0 = new PerlString
     $P0 = "ok\n"
-    obj. _meth($P0)
+    obj._meth($P0)
     print "done\n"
     end
 .end
@@ -85,7 +85,7 @@ ok
 done
 OUT
 
-output_is(<<'CODE', <<'OUT', "meth call syntax");
+output_is(<<'CODE', <<'OUT', "meth call syntax, string");
 .sub _main
     .local pmc class
     .local pmc obj
@@ -217,7 +217,8 @@ output_is(<<'CODE', <<'OUT', "explicit meth call syntax, meth var");
     newclass class, "Foo"
     find_type $I0, "Foo"
     new obj, $I0
-    meth = "_meth"
+    meth = "_me"
+    meth = meth . "th" 	# test concat to
     .pcc_begin prototyped
     .invocant obj
     .meth_call meth
