@@ -9,19 +9,39 @@ Common vtable format for all variables
    Maintainer: Dan Sugalski <dan@sidhe.org>
    Class: Internals
    PDD Number: 2
-   Version: 1
+   Version: 1.1
    Status: Developing
-   Last Modified: 05 February 2001
+   Last Modified: 13 May 2002
    PDD Format: 1
    Language: English
 
 =head2 HISTORY
 
+=over 4
+
+=item 1.1
+
+13 May 2002
+
+=item 1.0
+
 None. First version
+
+=back
 
 =head1 CHANGES
 
+=over 4
+
+=item 1.1
+
+Cleaned up the definition. It was a mess.
+
+=item 1.0
+
 None. First version
+
+=back
 
 =head1 ABSTRACT
 
@@ -45,148 +65,92 @@ which vtable entry does what, so that's the method perl's using.
 
 =head1 IMPLEMENTATION
 
-=head2 Core datatypes
-
-For ease of use, we define the following semi-abstract data types
-
-=over 4
-
-=item INT
-
-This is a generic integral value
-
-=item NUM
-
-This is a generic floating point value
-
-=item STR
-
-This is a generic string value
-
-=item BOOL
-
-This is a generic boolean value
-
-=back
-
-See the PDD specifying perl's internal data types for more details,
-but in a nutshell they are:
-
-=head3 Integer data types
-
-=over 4
-
-=item IV
-
-This is a platform-native integer. Probably 32 or 64 bits, though
-there's no guarantee made.
-
-=item bigint
-
-This is perl's big integer format. It's an infinite (more or less,
-until you run out of memory) precision integer.
-
-=back
-
-=head3 Floating point data types
-
-=over 4
-
-=item NV
-
-The platform-native floating point value. Probably around 80 bits
-(with 53 bits of precision) though that will vary from system to system.
-
-=item bigfloat
-
-Perl's big floating point format. Again potentially infinite
-precision, within the limits of available memory.
-
-=back
-
-=head3 String data types
-
-All perl strings are counted, of course, so we don't have any
-forbidden characters and take steps against buffer overruns reasonably
-easily.
-
-=over 4
-
-=item binary buffer
-
-This is a buffer of binary data. Perl makes no assumptions about its
-contents, and won't ever implicitly translate it to any other representation.
-
-=item UTF-32 string
-
-This is a Unicode string in UTF-32 format.
-
-=item Native string
-
-This is a string in platform native format.
-
-=item Foreign string
-
-This is a string in a non-native format for the platform that perl
-still knows how to deal with.
-
-=back
-
 =head2 vtable functions
 
-The following functions are defined:
-
-   IV            type(PMC[, subtype]);
-   STR          name(PMC[, key]);
-   void         new(PMC[, key]);
-   void         clone(PMC, PMC[, flags[,key]);
-   void         morph(PMC, type[, key]);
-   BOOL         move_to(void *, PMC);
-   IV           real_size(PMC[, key]);
-   void         destroy(PMC[, key]);
-   INT          get_integer(PMC[, key]); ##
-   NUM           get_number(PMC[, key]); ##
-   STR          get_string(PMC[, key]); ##
-   BOOL         get_bool(PMC[, key]); ##
-   void *       get_value(PMC[, key]);
-   BOOL         is_same(PMC, PMC[, key]);
-   void         set_integer(PMC, INT[, key]); ##
-   void         set_number(PMC, NUM[, key]); ##
-   void         set_string(PMC, STR[, key]); ##
-   void         set_value(PMC, void *[, key]);
-   void         add(PMC, PMC, PMC[, key]); ##
-   void         subtract(PMC, PMC, PMC[, key]); ##
-   void         multiply(PMC, PMC, PMC[, key]); ##
-   void         divide(PMC, PMC, PMC[, key]); ##
-   void         modulus(PMC, PMC, PMC[, key]); ##
-   void         concatenate(PMC, PMC, PMC[, key]); ##
-   BOOL         is_equal(PMC, PMC[,key]); ##
-   void         logical_or(PMC, PMC, PMC[, key]); ##
-   void         logical_and(PMC, PMC, PMC[, key]); ##
-   void         logical_not(PMC, PMC[,key]); ##
-   void         match(PMC, PMC, REGEX[, key]);
-   void         repeat(PMC, PMC, PMC[, key]); ##
-   void         nextkey(PMC, PMC, start_key[, key]);
-   BOOL         exists(PMC[, key]);
-
-All the functions marked with ## must have multiple forms, one for
-each possible form of a data type. (IV, bigint, etc) Perl will
-automatically produce conversion code if a v it isn't.
+The following functions are singleton functions. (There are no keyed
+versions of these)
 
 =over 4
 
-=item get_value
+=item INTVAL init(PMC)
 
-   void *       get_value(PMC[, key]);
+The init vtable method takes an unused PMC as a parameter, and turns
+it into a PMC appropriate for the class owning the vtable. Called as a
+class method.
 
-Returns a pointer to the beginning of currently "OK" data; the type of
-this data must be determined by examining the PMCs C<type>. This must
-only be used by other vtable functions inside the core, and must never
-be used if the PMC is of a type defined by a user outside the core,
-unless you know what you're doing. (eg, comparing C<get_value>s from two
-PMCs of the same type, or C<set_value(PMC1,get_valu>
+Returns 0 if the method has thrown an exception. 
 
-WHERE IS THE REST OF THIS FILE?
+=item INTVAL morph(PMC, type)
+
+turns the PMC into a PMC of type C<type>. If the morphing can't be
+reasonably done, for example if an integer is asked to turn into a
+PerlArray, then the PMC is first destroyed, then recreated as an empty
+PMC of the new type.
+
+This method is primarily used when the interpreter has need of
+coercing a PMC to a particular type, and isn't meant as a general
+purpose casting tool. Compilers should only emit valid
+transformations.
+
+Returns 0 if the method has thrown an exception.
+
+=item PMC mark(PMC, PMC)
+
+Called by the DOD when its sweeping through the PMCs and has detected
+that this PMC is both alive and has a custom mark routine. The second
+parameter is the PMC at the tail of the free PMC list, as passed to
+C<mark_used>. This should return the new tail of the free PMC list.
+
+If a PMC has this set, its responsible for marking all buffers and
+PMCs under its control as alive. If it does not, those PMCs or buffers
+may be collected later.
+
+This routine may B<not> throw an exception.
+
+=item destroy(PMC)
+
+=back
+
+The following functions have two forms, a plain form and a _keyed
+form. The keyed form takes a KEY for I<each> PMC parameter. 
+
+=over 4
+
+=item type(PMC) I<keyed>
+=item subtype(PMC, type) I<keyed>
+=item name(PMC) I<keyed>
+=item clone(PMC) I<keyed>
+=item find_method(PMC, string) I<keyed>
+=item get_integer(PMC) I<keyed>
+=item get_number(PMC) I<keyed>
+=item get_bignum(PMC) I<keyed>
+=item get_string(PMC) I<keyed>
+=item get_bool(PMC) I<keyed>
+=item get_pmc
+=item is_same
+=item set_integer
+=item set_number
+=item set_string
+=item set_pmc
+=item add
+=item subtract
+=item multiply
+=item divide
+=item modulus
+=item concatenante
+=item is_equal
+=item logical_or
+=item logical_and
+=item logical_not
+=item repeat
+=item increment
+=item decrement
+=item exists
+=item nextkey
+=item nextvalue
+
+
+
 
 =back
 
