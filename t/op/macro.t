@@ -16,7 +16,7 @@ Tests IMCC C<.macro> syntax.
 
 =cut
 
-use Parrot::Test tests => 16;
+use Parrot::Test tests => 18;
 use Test::More;
 
 output_is( <<'CODE', <<OUTPUT, "macro, zero parameters" );
@@ -217,6 +217,39 @@ CODE
 open FOO, ">macro.tempfile";   # Clobber previous
 close FOO;
 unlink("macro.tempfile");
+
+output_is( <<'CODE', <<OUTPUT, "macro, same args" );
+.macro Test(X)
+    print .X
+    print "\n"
+.endm
+
+.macro XTest(X)
+    .Test(.X)
+.endm
+
+    .XTest("hi")
+    end
+CODE
+hi
+OUTPUT
+
+output_is( <<'CODE', <<OUTPUT, "local labels" );
+.macro Test(X)
+    print "Test label arg\n"
+    branch .X
+.endm
+
+.macro XTest()
+    .Test(.$end)
+.local $end:
+.endm
+
+    .XTest()
+    end
+CODE
+Test label arg
+OUTPUT
 1;
 
 

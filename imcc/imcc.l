@@ -723,6 +723,10 @@ expand_macro (YYSTYPE *valp, void *interp, const char *name)
     struct macro_t *m;
     const char *expansion;
     int start_cond;
+    int i;
+    char *current;
+    char *s;
+    int len;
     union {
         const void * __c_ptr;
         void * __ptr;
@@ -778,6 +782,27 @@ expand_macro (YYSTYPE *valp, void *interp, const char *name)
 		   "Macro '%s' requires %d arguments, but %d given",
 		   m->name, m->params.num_param, frame->expansion.num_param);
 	}
+
+        /* expand arguments */
+        for (i = 0; i < frame->expansion.num_param; i ++) {
+            current = frame->expansion.name[i];
+            if (current[0] == '.') { /* parameter of outer macro */
+                s = find_macro_param(current + 1);
+                if (s) {
+                    frame->expansion.name[i] = strdup(s);
+                    free(current);
+                }
+            } else {
+                len = strlen(current) - 1;
+                if (current[len] == '$') { /* local label */
+                    current[len] = '\0';
+                    s = mem_sys_allocate(len + 1 + 10);
+                    sprintf(s, "%s%d", current, frames->label);
+                    frame->expansion.name[i] = s;
+                    free(current);
+                }
+            }
+        }
 
 	line = m->line;
 	scan_string(frame, m->expansion);
