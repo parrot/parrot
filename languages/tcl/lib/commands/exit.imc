@@ -3,7 +3,7 @@
 
 .namespace [ "Tcl" ]
 
-.sub _exit
+.sub "exit"
   .local pmc argv 
   argv = foldup
 
@@ -14,11 +14,11 @@
   exit_code = 0
 
   if argc > 2 goto badargs
-  if argc == 0 goto exit
+  if argc == 0 goto done
 
   exit_code = argv[0]
 
-exit:
+done:
   exit exit_code
 
 badargs:

@@ -3,7 +3,7 @@
 
 .namespace [ "Tcl" ]
 
-.sub _array
+.sub "array"
   .local pmc argv
   argv = foldup
 
@@ -24,10 +24,7 @@
 
   array_name = argv[1]
 
-  .local pmc ignore
-  newsub ignore, .Exception_Handler, catch
-
-  set_eh ignore
+  push_eh catch
     find_lex the_array, -1, array_name
   clear_eh
 

@@ -8,7 +8,7 @@
 
 .namespace [ "Tcl" ]
 
-.sub _error
+.sub "error"
   .local pmc argv
   argv = foldup
 

@@ -52,7 +52,7 @@ lib${slash}string_to_list.imc \
 tcl.imc_template \
 tcl.pl
 
-tcl.pbc: lib${slash}tcllib.pbc lib${slash}tclword.pbc
+tcl.pbc: lib${slash}tcllib.pbc lib${slash}tclword.pbc tcl.imc
 	(cd $(RELPATH) && $(PARROT) --output=$(MYPATH)tcl.pbc $(MYPATH)tcl.imc)
 
 lib${slash}tcllib.imc: $(DEPS)

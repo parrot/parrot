@@ -3,7 +3,7 @@
 
 .namespace [ "Tcl" ]
 
-.sub _concat
+.sub "concat"
   .local pmc argv 
   argv = foldup
  

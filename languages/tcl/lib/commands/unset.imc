@@ -3,7 +3,7 @@
 
 .namespace [ "Tcl" ]
 
-.sub _unset
+.sub "unset"
   .local pmc argv 
   argv = foldup
 
@@ -20,10 +20,7 @@
 
   retval = new String
 
-  .local pmc ignore
-  newsub ignore, .Exception_Handler, catch
-
-  set_eh ignore
+  push_eh catch
     $P1 = find_lex -1, varname
   clear_eh
 

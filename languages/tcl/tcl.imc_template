@@ -217,17 +217,4 @@ providing a compreg-compatible method.
   .return(compiled_sub)
 .end
 
-# This handler is just supposed to get us back to the next
-# instruction. It's our job to deal with it in the calling
-# code, then.
-
-# WJC - 11/21 - not allowed to use a non-local handler anymore.
-#.namespace [ "_Tcl"]
-#.emit
-#__default_handler:
-  #set P4, P5["_invoke_cc"]
-  #set P5, P5["_P5"]
-  #invoke P4
-#.eom
-
 ${INCLUDES}

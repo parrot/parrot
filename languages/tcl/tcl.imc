@@ -16,7 +16,7 @@
   # start with a new pad...
   new_pad 0
 
-  source = find_global "Tcl", "_source"
+  source = find_global "Tcl", "source"
 
   # If no file was specified, read from stdin.
   argc = argv

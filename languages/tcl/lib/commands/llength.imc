@@ -3,7 +3,7 @@
 
 .namespace [ "Tcl" ]
 
-.sub _llength
+.sub "llength"
   .param pmc listval
 
   # XXX Need error handling.

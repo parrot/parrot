@@ -6,7 +6,7 @@ Create a PIR sub on the fly for this user defined proc.
 
 .namespace [ "Tcl" ]
 
-.sub _proc
+.sub "proc"
   .param pmc name_p
   .param pmc args_p
   .param pmc body_p
@@ -56,9 +56,9 @@ Create a PIR sub on the fly for this user defined proc.
   esc_name = escaper(name)
 
   .local string proc_body
-  proc_body  = ".namespace [\"Tcl\"]\n.sub _"
+  proc_body  = ".namespace [\"Tcl\"]\n.sub \""
   proc_body .= name
-  proc_body .= "\n.param pmc args\nargs = foldup\nnew_pad 1\n"
+  proc_body .= "\"\n.param pmc args\nargs = foldup\nnew_pad 1\n"
   .local int arg_count 
   arg_count = arg_list
   .local int ii

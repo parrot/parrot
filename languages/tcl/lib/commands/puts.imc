@@ -3,7 +3,7 @@
 
 .namespace [ "Tcl" ]
 
-.sub _puts
+.sub "puts"
   .local pmc argv 
   argv = foldup
  

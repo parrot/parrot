@@ -3,7 +3,7 @@
 
 .namespace [ "Tcl" ]
 
-.sub _set
+.sub "set"
   .local pmc argv 
   argv = foldup
 
@@ -13,9 +13,6 @@
 
   .local int TclArray
   TclArray = find_type "TclArray"  
-
-  .local pmc ignore
-  newsub ignore, .Exception_Handler, catch
 
   .local int argc 
   argc = argv
@@ -94,7 +91,7 @@ set_array:
 
   # We need to check to see if this variable already
   # exists, as we cannot switch between array and scalar.
-  set_eh ignore
+  push_eh catch
     find_lex lexical, -1, var
   clear_eh
   isnull lexical, set_array_new

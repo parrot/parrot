@@ -51,9 +51,6 @@ continue:
   .local int return_type
   return_type = TCL_OK
 
-  .local Exception_Handler ignore
-  newsub ignore, .Exception_Handler, catch
-
   #print "a\n"
   name=argv[0] 
   #print "b\n"
@@ -75,7 +72,7 @@ continue:
 
 get_indexed:
   #print "get_indexed:\n"
-  set_eh ignore
+  push_eh catch
     find_lex lexical, -1, name
   clear_eh
   isnull lexical, no_such_variable
@@ -106,7 +103,7 @@ get_scalar:
   #print "name is"
   #print name
   #print "\n"
-  set_eh ignore
+  push_eh catch
     find_lex lexical, -1, name
   clear_eh
 

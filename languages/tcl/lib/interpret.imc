@@ -50,15 +50,10 @@ end_scope:
   # flatten args, so instead we use the PIR directive C<.flatten_arg> 
 
   .local string caller_sub_text
-  .local Exception_Handler ignore
-  newsub ignore, .Exception_Handler, catch
-  .local string fixup_proc
-  fixup_proc  = "_"
-  fixup_proc .= proc
 
   null my_cmd
-  set_eh ignore
-    my_cmd = find_global "Tcl", fixup_proc
+  push_eh catch
+    my_cmd = find_global "Tcl", proc
   clear_eh 
   isnull my_cmd, no_command
 

@@ -3,7 +3,7 @@
 
 .namespace [ "Tcl" ]
 
-.sub _break
+.sub "break"
   .local int return_type
 
   .local pmc retval

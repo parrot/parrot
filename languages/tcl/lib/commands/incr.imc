@@ -7,7 +7,7 @@
 
 .namespace [ "Tcl" ]
 
-.sub _incr
+.sub "incr"
   .local pmc argv 
   argv = foldup
 
@@ -29,14 +29,14 @@
 
   find_lex $P1, -1, $S1
   value = $P1 
-  if argc == 1 goto incr
+  if argc == 1 goto do_incr
   if argc == 2 goto offset
   if argc > 2 goto error
 
 offset:
   increment = argv[1]
 
-incr:
+do_incr:
   value = value + increment
   retval = new Integer
   retval = value

@@ -3,7 +3,7 @@
 
 .namespace [ "Tcl" ]
 
-.sub _rename
+.sub "rename"
   .param pmc old_p
   .param pmc new_p
 
@@ -23,14 +23,10 @@
   oldName = old_p
   newName = new_p
 
-  oldName = "_" . oldName 
-  newName = "_" . newName 
-
   .local pmc theSub
 
-  # If oldname is just _, then just delete
-  length $I1, newName
-  if $I1 == 1 goto delete
+  # If oldname is empty, then just delete
+  if oldName == "" goto delete
 
 add:
   # Grab the original sub 
