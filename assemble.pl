@@ -335,9 +335,11 @@ $output.=$bytecode;
 if(!$options{'checksyntax'}) {
     if(defined $options{'output'} and $options{'output'} ne "") {
 	open O,">$options{'output'}" || die $!;
+	binmode O;
 	print O $output;
 	close O;
     } else {
+	binmode STDOUT;
 	print $output;
     }
 }
