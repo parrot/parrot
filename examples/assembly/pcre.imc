@@ -1,157 +1,56 @@
 # experimental string match with pcre
-
 .pcc_sub _main prototyped
     .param var argv
-
-    .sym string s
-    .sym string pat
-
+.include "library/pcre.imc"
     .sym int argc
     argc = argv
     if argc < 3 goto usage
 
+    .sym string s
+    .sym string pat
     s = argv[1]
     pat = argv[2]
     print s
     print " =~ /"
     print pat
     print "/\n"
-
-    .sym var PCRE
-    .sym var COMPILE
-    .sym var EXEC
-    .sym var COPY_SUBSTRING
-
-    # you should have installed that
-    loadlib PCRE, "libpcre"
-
-    # pcre *pcre_compile(const char *pattern, int options,
-    #            const char **errptr, int *erroffset,
-    #            const unsigned char *tableptr
-    dlfunc COMPILE, PCRE, "pcre_compile", "ptiB3P"
-
-    #int pcre_exec(const pcre *code, const pcre_extra *extra,
-    #        const char *subject, int length, int startoffset,
-    #        int options, int *ovector, int ovecsize);
-    dlfunc EXEC, PCRE, "pcre_exec", "ipPtiiipi"
-
-    #int pcre_copy_substring(const char *subject, int *ovector,
-    #        int stringcount, int stringnumber, char *buffer,
-    #        int buffersize);
-    dlfunc COPY_SUBSTRING, PCRE, "pcre_copy_substring", "itpiibi"
-
-
-    .sym var NULL
-    .sym var code
+    .sym var PCRE_LIB
+    .PCRE_INIT(PCRE_LIB)
     .sym string error
-    repeat error, " ", 500	# could be enough
     .sym int errptr
-    null NULL
-    .pcc_begin prototyped
-    .arg pat
-    .arg 0
-    .arg error
-    .arg errptr
-    .arg NULL
-    .nci_call COMPILE
-    .result code
-    .pcc_end
+    .sym var code
+    .PCRE_COMPILE(pat, 0, code, error, errptr)
+    $I0 = defined code
+    unless $I0 goto match_err
 
-    .sym int len
-    length len, s
-    .sym var ovector
-    ovector = new ManagedStruct
-    ovector = 80	# 4 * 2 * 10 for 10 result pairs
-
-    .pcc_begin prototyped
-    .arg code		# p code
-    .arg NULL		# P extra
-    .arg s		# t subject
-    .arg len		# i length
-    .arg 0		# i start
-    .arg 0		# i options
-    .arg ovector	# p ovector
-    .arg 10		# i ovecsize
-    .nci_call EXEC
-    .local int ok
-    .result ok
-    .pcc_end
-
-    if ok <= 0 goto nomatch
-
-    print "direct access\n"
-    # access unmananged struct directly
-    .local int ovecs
-    .local int ovece
-    .sym var struct
-    struct = new SArray
-    struct = 3
-.include "datatypes.pasm"
-    struct[0] = .DATATYPE_INT
-    $I0 = ok * 2
-    struct[1] = $I0
-    struct[2] = 0
-    assign ovector, struct
+    .sym int ok
+    .sym var result
+    .PCRE_MATCH(code, s, 0, 0, ok, result)
+    if ok < 0 goto nomatch
+    print ok
+    print " match(es):\n"
     .sym int i
+    i = 0
     .sym string match
-    i = 0
-lp0:
-    $I0 = i * 2
-    ovecs = ovector[0;$I0]
-    inc $I0
-    ovece = ovector[0;$I0]
-    $I0 = ovece - ovecs
-    if ovecs >= 0 goto m1
-    match = ""
-    goto m0
-m1:
-    substr match, s, ovecs, $I0
-m0:
-    if i goto subp0
-    print "all "
-    goto all0
-subp0:
-    print "("
-    print i
-    print ") "
-all0:
-    print "matched: '"
+lp: .PCRE_DOLLAR(s, ok, result, i, match)
     print match
-    print "'\n"
+    print "\n"
     inc i
-    if i < ok goto lp0
-
-    # or use convinience function
-    print "copy_substring\n"
-    i = 0
-    repeat match, " ", 500
-loop:
-    .pcc_begin prototyped
-    .arg s
-    .arg ovector
-    .arg ok
-    .arg i
-    .arg match
-    .arg 500
-    .nci_call COPY_SUBSTRING
-    .pcc_end
-    if i goto subp
-    print "all "
-    goto all
-subp:
-    print "("
-    print i
-    print ") "
-all:
-    print "matched: '"
-    print match
-    print "'\n"
-    inc i
-    if i < ok goto loop
+    if i < ok goto lp
     end
 nomatch:
     print "no match\n"
     end
+match_err:
+    print "error in regex: "
+    #print error
+    print "at: '"
+    length $I0, pat
+    $I0 = $I0 - errptr
+    substr $S0, pat, errptr, $I0
+    print $S0
+    print "'\n"
+    exit 1
 usage:
     .sym string prog
     prog = argv[0]
