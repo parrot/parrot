@@ -262,6 +262,19 @@ IMCC_create_itcall_label(Interp* interpreter)
     return i;
 }
 
+
+static SymReg *
+mk_sub_address_fromc(char * name)
+{
+    /* name is a quoted sub name */
+    SymReg *r;
+
+    name[strlen(name) - 1] = '\0';
+    r = mk_sub_address(str_dup(name + 1));
+    mem_sys_free(name);
+    return r;
+}
+
 void
 IMCC_itcall_sub(Interp* interpreter, SymReg* sub)
 {
@@ -357,7 +370,7 @@ begin_return_or_yield(int yield)
 %type <i> opt_invocant
 %type <sr> target reg const var string
 %type <sr> key keylist _keylist
-%type <sr> vars _vars var_or_i _var_or_i label_op sub_label_op
+%type <sr> vars _vars var_or_i _var_or_i label_op sub_label_op sub_label_op_c
 %type <i> pasmcode pasmline pasm_inst
 %type <sr> pasm_args
 %type <symlist> targetlist arglist
@@ -559,7 +572,7 @@ sub:
            cur_unit = (pragmas.fastcall ? imc_open_unit(interp, IMC_FASTSUB)
                                           : imc_open_unit(interp, IMC_PCCSUB));
         }
-     sub_label_op pcc_sub_proto '\n'
+     sub_label_op_c pcc_sub_proto '\n'
         {
           Instruction *i = iSUBROUTINE(cur_unit, $3);
           i->r[1] = $<sr>$ = mk_pcc_sub(str_dup(i->r[0]->name), 0);
@@ -1027,6 +1040,7 @@ func_assign:
    ;
 
 the_sub: IDENTIFIER  { $$ = mk_sub_address($1); }
+       | STRINGC  { $$ = mk_sub_address_fromc($1); }
        | target   { $$ = $1;
                        if ($1->set != 'P')
                           fataly(1, sourcefile, line, "Sub isn't a PMC");
@@ -1115,6 +1129,10 @@ _var_or_i:
                       keyvec |= KEY_BIT(nargs);
                       regs[nargs++] = $3; $$ = $1;
                    }
+   ;
+sub_label_op_c:
+     sub_label_op
+   | STRINGC       { $$ = mk_sub_address_fromc($1); }
    ;
 
 sub_label_op:

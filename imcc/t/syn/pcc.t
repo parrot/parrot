@@ -1,6 +1,6 @@
 #!perl
 use strict;
-use TestCompiler tests => 39;
+use TestCompiler tests => 40;
 
 ##############################
 # Parrot Calling Conventions
@@ -1479,3 +1479,24 @@ CODE
 done in coroutine
 done in main
 OUT
+
+output_is(<<'CODE', <<'OUT', "quoted sub names");
+.sub main @MAIN
+    "foo"()
+    print "ok\n"
+.end
+
+.sub "foo"
+    print "foo\n"
+    "new"()
+.end
+
+.sub "new"
+    print "new\n"
+.end
+CODE
+foo
+new
+ok
+OUT
+
