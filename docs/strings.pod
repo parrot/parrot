@@ -144,6 +144,17 @@ C<dest> may be a null pointer, in which case a new B<native> string will
 be created. If C<len> is zero, the behaviour becomes more C<sprintf>ish
 than C<snprintf>-like.
 
+=head1 Notes for Implementors
+
+=head2 Termination
+
+The character buffer pointed to by *bustart is not expected to be
+terminated by a nul byte and functions which provide the string api
+will not add one.  Any functions which access the buffer directly and
+which require a terminating nul byte must place one there themselves
+and also be very careful about nul bytes within the used portion of
+the character buffer.  In particular, if bufused == buflen more space
+must be allocated to hold a terminating byte.
 
 =head1 Elements of the C<STRING> structure
 
