@@ -2,6 +2,8 @@ Configure.pl
 Config_pm.in
 Makefile.in
 MANIFEST
+Parrot/Opcode.pm
+Parrot/Test.pm
 README
 TODO
 assemble.pl
