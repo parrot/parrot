@@ -119,14 +119,6 @@ pmclass PerlString {
         SELF->data = string_copy(INTERP, value);
     }
 
-    void set_string_unicode (STRING * value) {
-        SELF->data = string_copy(INTERP, value);
-    }
-
-    void set_string_other (STRING * value) {
-        SELF->data = string_copy(INTERP, value);
-    }
-
     void set_string_same (PMC * value) {
         SELF->data = string_copy(INTERP, (STRING*)value->data);
     }
@@ -415,28 +407,6 @@ pmclass PerlString {
     }
 
     void concatenate_native (STRING* value, PMC* dest) {
-        STRING* s = string_copy(INTERP, (STRING*)SELF->data);
-        dest->data =
-            string_concat(INTERP,
-                          s,
-                          value,
-                          0
-                         );
-        /* don't destroy s, as it is dest->data */
-    }
-
-    void concatenate_unicode (STRING* value, PMC* dest) {
-        STRING* s = string_copy(INTERP, (STRING*)SELF->data);
-        dest->data =
-            string_concat(INTERP,
-                          s,
-                          value,
-                          0
-                         );
-            /* don't destroy s, as it is dest->data */
-    }
-
-    void concatenate_other (STRING* value, PMC* dest) {
         STRING* s = string_copy(INTERP, (STRING*)SELF->data);
         dest->data =
             string_concat(INTERP,

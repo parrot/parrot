@@ -127,16 +127,6 @@ pmclass PerlUndef {
         pmc->vtable->set_string_native(interpreter, pmc, value);
     }
 
-    void set_string_unicode (STRING* value) {
-	CHANGE_TYPE(pmc, PerlString);
-        pmc->vtable->set_string_unicode(interpreter, pmc, value);
-    }
-
-    void set_string_other (STRING* value) {
-	CHANGE_TYPE(pmc, PerlString);
-        pmc->vtable->set_string_other(interpreter, pmc, value);
-    }
-
     void set_string_same (PMC* value) {
         /* Do nothing; Can't happen? */ 
     }
