@@ -133,8 +133,8 @@ I<Compilation units> maintain their own symbol table containing local
 labels and variable symbols. This symbol table I<hash> is not visible
 to code in different units.
 
-Lexicals declared in an outer scope are visible and used, when not
-overridden by a C<.local> directive with the same name.
+Lexicals and named constants declared in an outer scope are visible and used,
+when not overridden by a C<.local> or C<.const> directive with the same name.
 S. F<t/syn/scope.t> for examples for this.
 
 Global labels and constants are kept in the global symbol table

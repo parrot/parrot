@@ -13,7 +13,8 @@ enum VARTYPE {		/* variable type can be */
     VTADDRESS	= 1 << 3,	/* address */
     VTREGKEY	= 1 << 4,	/* parrot [key;key..], including registers */
     VTPASM	= 1 << 5,	/* parrot register, colored from .emit */
-    VT_REGP	= 1 << 6	/* pointer to register */
+    VT_REGP	= 1 << 6,	/* pointer to register */
+    VT_CONSTP	= 1 << 7	/* pointer to constant value */
 };
 
 /* this VARTYPE needs register allocation and such */
@@ -83,6 +84,7 @@ EXTERN Namespace * namespace;
 SymReg * mk_symreg(char *, char t);
 SymReg * mk_ident(char *, char t);
 SymReg * mk_const(char *, char t);
+SymReg * mk_const_ident(char *, char t, SymReg *);
 SymReg * mk_address(char *, int uniq);
 enum uniq_t {
 	U_add_once,

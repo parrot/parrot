@@ -270,7 +270,7 @@ static char * ins_fmt(Instruction * ins) {
         p = ins->r[i];
         if (!p)
             continue;
-        if (p->type & VT_REGP)
+        if (p->type & (VT_REGP | VT_CONSTP))
             p = p->reg;
 	if (p->color >= 0 && (p->type & VTREGISTER)) {
 	    sprintf(regb[i], "%c%d", p->set, p->color);

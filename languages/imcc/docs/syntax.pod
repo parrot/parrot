@@ -100,8 +100,14 @@ Define a I<compilation unit> containing PASM code.
 
 =item .local <type> <identifier>
 
+=item .sym <type> <identifier>
+
 Define a local name B<identifier> for this I<compilation unit> and of
 the given B<type>.
+
+=item .const <type> <identifier> = <const>
+
+Define a named constant of tyle I<type> and value I<const>.
 
 =item .namespace <identifier>
 

@@ -93,6 +93,7 @@ EOL		\r?\n
 ".namespace"    return(NAMESPACE);
 ".endnamespace" return(ENDNAMESPACE);
 ".local"        return(LOCAL);
+".const"        return(CONST);
 ".param"        return(PARAM);
 "end"           return(END);
 "goto"          return(GOTO);
@@ -142,7 +143,7 @@ EOL		\r?\n
 <emit,INITIAL>{LETTER}{LETTERDIGIT}* {
 	if (!is_def) {
 		SymReg *r = find_sym(yytext);
-		if (r && (r->type & VTIDENTIFIER)) {
+		if (r && (r->type & (VTIDENTIFIER|VT_CONSTP))) {
 		    yylval.sr = r;
 		    return VAR;
 		}

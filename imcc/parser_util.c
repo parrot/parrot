@@ -63,7 +63,7 @@ op_fullname(char * dest, const char * name, SymReg * args[], int nargs) {
             }
         }
         *dest++ = tolower(args[i]->set);
-        if (args[i]->type & VTCONST)
+        if (args[i]->type & (VTCONST|VT_CONSTP))
             *dest++ = 'c';
     }
     *dest = '\0';

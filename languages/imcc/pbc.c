@@ -540,7 +540,7 @@ int e_pbc_emit(Instruction * ins) {
                 case PARROT_ARG_SC:
                 case PARROT_ARG_NC:
                     r = ins->r[i];
-                    if (r->type & VT_REGP)
+                    if (r->type & (VT_REGP | VT_CONSTP))
                         r = r->reg;
                     *pc++ = (opcode_t) r->color;
                     debug(1," %d", r->color);

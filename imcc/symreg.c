@@ -113,6 +113,16 @@ SymReg * mk_ident(char * name, char t) {
     return r;
 }
 
+/* Makes a new identifier constant with value val */
+SymReg *
+mk_const_ident(char *name, char t, SymReg *val)
+{
+    SymReg *r = mk_ident(name, t);
+    r->type = VT_CONSTP;
+    r->reg = val;
+    return r;
+}
+
 /* Makes a new constant*/
 SymReg * _mk_const(SymReg *hash[], char * name, char t) {
     SymReg * r = _mk_symreg(hash, name, t);

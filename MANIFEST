@@ -1381,6 +1381,7 @@ languages/imcc/t/imcpasm/opt1.t
 languages/imcc/t/imcpasm/opt2.t
 languages/imcc/t/imcpasm/sub.t
 languages/imcc/t/syn/clash.t
+languages/imcc/t/syn/const.t
 languages/imcc/t/syn/labels.t
 languages/imcc/t/syn/namespace.t
 languages/imcc/t/syn/scope.t
