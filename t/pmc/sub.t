@@ -1,6 +1,6 @@
 #! perl -w
 
-use Parrot::Test tests => 54;
+use Parrot::Test tests => 58;
 use Test::More;
 use Parrot::Config;
 
@@ -773,6 +773,20 @@ in sub1
 back
 OUTPUT
 
+system(".$PConfig{slash}parrot$PConfig{exe} -o temp.pbc $temp");
+
+output_is(<<'CODE', <<'OUTPUT', 'load_bytecode @LOAD in pbc');
+.pcc_sub _main:
+    print "main\n"
+    load_bytecode "temp.pbc"
+    print "back\n"
+    end
+CODE
+main
+in sub1
+back
+OUTPUT
+
 open S, ">$temp" or die "Can't write $temp";
 print S <<'EOF';
   .pcc_sub @LOAD _sub1:
@@ -788,6 +802,25 @@ output_is(<<'CODE', <<'OUTPUT', "load_bytecode autorun first");
 .pcc_sub _main:
     print "main\n"
     load_bytecode "temp.pasm"
+    print "loaded\n"
+    find_global P0, "_sub2"
+    invokecc
+    print "back\n"
+    end
+CODE
+main
+in sub1
+loaded
+in sub2
+back
+OUTPUT
+
+system(".$PConfig{slash}parrot$PConfig{exe} -o temp.pbc $temp");
+
+output_is(<<'CODE', <<'OUTPUT', "load_bytecode autorun first in pbc");
+.pcc_sub _main:
+    print "main\n"
+    load_bytecode "temp.pbc"
     print "loaded\n"
     find_global P0, "_sub2"
     invokecc
@@ -829,6 +862,25 @@ in sub1
 back
 OUTPUT
 
+system(".$PConfig{slash}parrot$PConfig{exe} -o temp.pbc $temp");
+
+output_is(<<'CODE', <<'OUTPUT', "load_bytecode autorun second in pbc");
+.pcc_sub _main:
+    print "main\n"
+    load_bytecode "temp.pbc"
+    print "loaded\n"
+    find_global P0, "_sub1"
+    invokecc
+    print "back\n"
+    end
+CODE
+main
+in sub2
+loaded
+in sub1
+back
+OUTPUT
+
 open S, ">$temp" or die "Can't write $temp";
 print S <<'EOF';
   .pcc_sub @LOAD _sub1:
@@ -844,6 +896,26 @@ output_is(<<'CODE', <<'OUTPUT', "load_bytecode autorun both");
 .pcc_sub _main:
     print "main\n"
     load_bytecode "temp.pasm"
+    print "loaded\n"
+    find_global P0, "_sub1"
+    invokecc
+    print "back\n"
+    end
+CODE
+main
+in sub1
+in sub2
+loaded
+in sub1
+back
+OUTPUT
+
+system(".$PConfig{slash}parrot$PConfig{exe} -o temp.pbc $temp");
+
+output_is(<<'CODE', <<'OUTPUT', "load_bytecode autorun both in pbc");
+.pcc_sub _main:
+    print "main\n"
+    load_bytecode "temp.pbc"
     print "loaded\n"
     find_global P0, "_sub1"
     invokecc

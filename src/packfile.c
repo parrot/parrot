@@ -251,6 +251,49 @@ run_sub(Parrot_Interp interpreter, PMC* sub_pmc)
 
 /*
 
+=item <static void
+do_sub_pragmas(Parrot_Interp interpreter, struct PackFile *self, int action)>
+
+Run autoloaded bytecode.
+
+=cut
+
+*/
+
+static void
+do_sub_pragmas(Parrot_Interp interpreter, struct PackFile *self, int action)
+{
+    opcode_t i, ci;
+    struct PackFile_FixupTable *ft;
+    struct PackFile_ConstTable *ct;
+    PMC *sub_pmc;
+
+    ft = self->cur_cs->fixups;
+    ct = self->cur_cs->consts;
+    for (i = 0; i < ft->fixup_count; i++) {
+        switch (ft->fixups[i]->type) {
+            case enum_fixup_sub:
+                /*
+                 * offset is an index into the const_table holding
+                 * the Sub PMC
+                 */
+                ci = ft->fixups[i]->offset;
+                sub_pmc = ct->constants[ci]->u.key;
+                switch (sub_pmc->vtable->base_type) {
+                    case enum_class_Sub:
+                    case enum_class_Closure:
+                    case enum_class_Continuation:
+                    case enum_class_Coroutine:
+                        if (PObj_get_FLAGS(sub_pmc) & PObj_private5_FLAG) {
+                            run_sub(interpreter, sub_pmc);
+                            PObj_get_FLAGS(sub_pmc) &= ~PObj_private5_FLAG;
+                        }
+                }
+        }
+    }
+}
+/*
+
 =item C<static void
 fixup_subs(struct Parrot_Interp *interpreter, struct PackFile *self,
    int action)>
@@ -329,27 +372,7 @@ fixup_subs(struct Parrot_Interp *interpreter, struct PackFile *self, int action)
          * we have to do it there, above not all subs got their
          * absolute address, so we couldn't run these.
          */
-        for (i = 0; i < ft->fixup_count; i++) {
-            switch (ft->fixups[i]->type) {
-                case enum_fixup_sub:
-                    /*
-                     * offset is an index into the const_table holding
-                     * the Sub PMC
-                     */
-                    ci = ft->fixups[i]->offset;
-                    sub_pmc = ct->constants[ci]->u.key;
-                    switch (sub_pmc->vtable->base_type) {
-                        case enum_class_Sub:
-                        case enum_class_Closure:
-                        case enum_class_Continuation:
-                        case enum_class_Coroutine:
-                        if (PObj_get_FLAGS(sub_pmc) & PObj_private5_FLAG) {
-                            run_sub(interpreter, sub_pmc);
-                            PObj_get_FLAGS(sub_pmc) &= ~PObj_private5_FLAG;
-                        }
-                    }
-            }
-        }
+        do_sub_pragmas(interpreter, self, action);
     }
 }
 
@@ -2804,6 +2827,7 @@ Parrot_load_bytecode(struct Parrot_Interp *interpreter, char *filename)
     if (ext && strcmp (ext, ".pbc") == 0) {
         struct PackFile * pf;
         pf = PackFile_append_pbc(interpreter, filename);
+        do_sub_pragmas(interpreter, pf, PBC_LOADED);
     }
     else {
         PMC * compiler, *code;
