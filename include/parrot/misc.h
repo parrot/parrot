@@ -23,6 +23,17 @@
 #include "parrot/parrot.h"
 #include <stdarg.h>
 
+/*
+ * utils.c
+ */
+
+INTVAL   intval_mod(INTVAL i2, INTVAL i3);
+FLOATVAL floatval_mod(FLOATVAL n2, FLOATVAL n3);
+
+/*
+ * misc.c
+ */
+
 STRING *Parrot_vsprintf_s(struct Parrot_Interp *, STRING *pat, va_list);
 
 STRING *Parrot_vsprintf_c(struct Parrot_Interp *, const char *pat, va_list);

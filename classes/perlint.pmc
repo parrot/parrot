@@ -189,9 +189,13 @@ pmclass PerlInt extends perlscalar {
         dest->cache.int_val = SELF->cache.int_val / value->cache.int_val;
     }
 
-    void modulus (PMC* value, PMC* dest) {
+    void cmodulus (PMC* value, PMC* dest) {
         INTVAL i;
         FLOATVAL f;
+	/*
+	 * XXX:leo shouldn't that just call get_integer on value
+	 *     and proceed?
+	 */
         switch(VTABLE_type(INTERP, value)) {
             case enum_class_PerlNum:
                 internal_exception(INVALID_OPERATION,
@@ -215,10 +219,20 @@ pmclass PerlInt extends perlscalar {
                                   VTABLE_get_integer(INTERP, value));
     }
 
+    void cmodulus_int (INTVAL value, PMC* dest) {
+        VTABLE_set_integer_native(INTERP, dest,
+            SELF->cache.int_val % value);
+    }
+
+    void modulus (PMC* value, PMC* dest) {
+        VTABLE_set_integer_native(INTERP, dest,
+		intval_mod(SELF->cache.int_val,
+		    VTABLE_get_integer(INTERP, value)));
+    }
+
     void modulus_int (INTVAL value, PMC* dest) {
         VTABLE_set_integer_native(INTERP, dest,
-            SELF->cache.int_val % value
-        );
+		intval_mod(SELF->cache.int_val, value));
     }
 
     void modulus_same (PMC* value, PMC* dest) {
@@ -226,7 +240,10 @@ pmclass PerlInt extends perlscalar {
     }
 
     void neg (PMC* dest) {
-        VTABLE_set_integer_native(INTERP, dest, -SELF->cache.int_val);
+	if (!dest)
+	    SELF->cache.int_val = -SELF->cache.int_val;
+	else
+	    VTABLE_set_integer_native(INTERP, dest, -SELF->cache.int_val);
     }
 
     void bitwise_or (PMC* value, PMC* dest) {

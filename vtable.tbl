@@ -161,6 +161,12 @@ void modulus_bignum(BIGNUM* value, PMC* dest)
 void modulus_float(FLOATVAL value, PMC* dest)
 void modulus_same(PMC* value, PMC* dest)
 
+void cmodulus(PMC* value, PMC* dest)
+void cmodulus_int(INTVAL value, PMC* dest)
+void cmodulus_bignum(BIGNUM* value, PMC* dest)
+void cmodulus_float(FLOATVAL value, PMC* dest)
+void cmodulus_same(PMC* value, PMC* dest)
+
 void neg(PMC* dest)
 
 [BITWISE]

@@ -184,19 +184,41 @@ pmclass PerlNum extends perlscalar {
         dest->cache.num_val = SELF->cache.num_val / value->cache.num_val;
     }
 
-    void modulus (PMC* value, PMC* dest) {
-        FLOATVAL f = VTABLE_get_number(INTERP, value);
-        VTABLE_set_number_native(INTERP, dest,
-                                        fmod(SELF->cache.num_val, f));
+    void cmodulus (PMC* value, PMC* dest) {
+	FLOATVAL f = VTABLE_get_number(INTERP, value);
+	VTABLE_set_number_native(INTERP, dest,
+		fmod(SELF->cache.num_val, f));
     }
 
+    void cmodulus_float (FLOATVAL value, PMC* dest) {
+	VTABLE_set_number_native(INTERP, dest,
+		fmod(SELF->cache.num_val, value));
+    }
+    void cmodulus_int (INTVAL value, PMC* dest) {
+	VTABLE_set_number_native(INTERP, dest,
+		fmod(SELF->cache.num_val, value));
+    }
+
+    void modulus (PMC* value, PMC* dest) {
+	FLOATVAL f = VTABLE_get_number(INTERP, value);
+	VTABLE_set_number_native(INTERP, dest,
+		floatval_mod(SELF->cache.num_val, f));
+    }
+
+    void modulus_float (FLOATVAL value, PMC* dest) {
+	VTABLE_set_number_native(INTERP, dest,
+		floatval_mod(SELF->cache.num_val, value));
+    }
     void modulus_int (INTVAL value, PMC* dest) {
-        VTABLE_set_number_native(INTERP, dest,
-                                        fmod(SELF->cache.num_val, value));
+	VTABLE_set_number_native(INTERP, dest,
+		floatval_mod(SELF->cache.num_val, value));
     }
 
     void neg (PMC * dest) {
-	VTABLE_set_number_native(INTERP, dest, -SELF->cache.num_val);
+	if (!dest)
+	    SELF->cache.num_val = -SELF->cache.num_val;
+	else
+	    VTABLE_set_number_native(INTERP, dest, -SELF->cache.num_val);
     }
 
     void bitwise_or (PMC* value, PMC* dest) {

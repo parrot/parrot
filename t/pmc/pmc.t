@@ -828,16 +828,16 @@ output_is(<<CODE, <<OUTPUT, "p =  fmod(p,p)");
         new     P3, .PerlInt
 	set	P0, 13.4
 	set	P1, 6.0
-	mod	P2, P0, P1
+	cmod	P2, P0, P1
         .fp_eq(P2, 1.4, OK1)
         print "not "
 OK1:    print "ok 1\\n"
         set     P0, -25.1
-	mod	P3, P0, P1
+	cmod	P3, P0, P1
         .fp_eq(P3, -1.1, OK2)
         print "not "
 OK2:    print "ok 2\\n"
-	mod	P0, P0, P1
+	cmod	P0, P0, P1
         .fp_eq(P0, -1.1, OK3)
         print "not "
 OK3:    print "ok 3\\n"
