@@ -52,18 +52,19 @@ XXX: integral file descriptors may not exist outside of the UNIX
 =cut
 
 inline op fdopen(out PMC, in INT, in STR) {
-#ifdef IO_OS_UNIX
+#ifdef PIO_OS_UNIX
   /* These char * need to go away soon */
   const char * mode;
+  ParrotIO *io;
   mode = string_to_cstring(interpreter, $3);
 
-  ParrotIO *io = PIO_fdopen(interpreter, $2, mode);
+  io = PIO_fdopen(interpreter, $2, mode);
   /* string_cstring_free(mode); */
   /* TODO all results from sring_to_cstring() need freeing
      but this generates ugly warnings WRT discarding the const
      qualifier -lt
    */
-  if(io) {
+  if (io) {
     $1 = pmc_new_noinit(interpreter, enum_class_ParrotIO);
     VTABLE_init(interpreter, $1);
     PMC_data($1) = io;

@@ -1,6 +1,6 @@
 #!perl
 use strict;
-use TestCompiler tests => 6;
+use TestCompiler tests => 7;
 
 ##############################
 output_is(<<'CODE', <<'OUT', "if/unless");
@@ -118,6 +118,26 @@ CODE
 6
 OUT
 
+##############################
+output_is(<<'CODE', <<'OUT', "parrot op as label");
+.sub _test
+	goto set
+set:
+	if I0, err
+	if I0 goto err
+	inc I0
+	unless I0, err
+	unless I0 goto err
+	print "ok\n"
+	end
+err:
+	print "nok\n"
+	end
+.end
+
+CODE
+ok
+OUT
 1;
 
 

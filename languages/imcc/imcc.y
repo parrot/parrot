@@ -418,7 +418,7 @@ iANY(struct Parrot_Interp *interpreter, char * name,
 %type <i> instruction assignment if_statement labeled_inst
 %type <sr> target reg const var rc string
 %type <sr> key keylist _keylist
-%type <sr> vars _vars var_or_i _var_or_i
+%type <sr> vars _vars var_or_i _var_or_i label_op
 %type <i> pasmcode pasmline pasm_inst
 %type <sr> pasm_args lhs
 %token <sr> VAR
@@ -518,8 +518,8 @@ labeled_inst:
     |   RESULT var			{ $$ = MK_I(interp, "restore", R1($2)); }
     |   ARG var				{ $$ = MK_I(interp, "save", R1($2)); }
     |   RETURN var			{ $$ = MK_I(interp, "save", R1($2)); }
-    |   CALL var_or_i			{ $$ = MK_I(interp, "bsr",  R1($2)); }
-    |   GOTO var_or_i			{ $$ = MK_I(interp, "branch",R1($2)); }
+    |   CALL label_op			{ $$ = MK_I(interp, "bsr",  R1($2)); }
+    |   GOTO label_op			{ $$ = MK_I(interp, "branch",R1($2)); }
     |   INC var				{ $$ = MK_I(interp, "inc",R1($2)); }
     |   DEC var				{ $$ = MK_I(interp, "dec",R1($2)); }
     |   SAVEALL				{ $$ = MK_I(interp, "saveall" ,R0()); }
@@ -582,16 +582,11 @@ assignment:
     ;
 
 if_statement:
-       IF var relop var GOTO IDENTIFIER { $$=MK_I(interp, $3,R3($2,$4,
-                                          mk_address($6,U_add_once))); }
-    |  IF var GOTO IDENTIFIER           {$$= MK_I(interp, "if", R2($2,
-                                          mk_address($4, U_add_once))); }
-    |  UNLESS var GOTO IDENTIFIER       {$$= MK_I(interp, "unless",R2($2,
-                                          mk_address($4, U_add_once))); }
-    |  IF var COMMA IDENTIFIER          { $$= MK_I(interp, "if", R2($2,
-                                          mk_address($4, U_add_once))); }
-    |  UNLESS var COMMA IDENTIFIER      { $$= MK_I(interp, "unless", R2($2,
-                                          mk_address($4, U_add_once))); }
+       IF var relop var GOTO label_op {$$=MK_I(interp, $3,R3($2,$4, $6)); }
+    |  IF var GOTO label_op           {$$= MK_I(interp, "if", R2($2, $4)); }
+    |  UNLESS var GOTO label_op       {$$= MK_I(interp, "unless",R2($2, $4)); }
+    |  IF var COMMA label_op          {$$= MK_I(interp, "if", R2($2, $4)); }
+    |  UNLESS var COMMA label_op      {$$= MK_I(interp, "unless", R2($2, $4)); }
 
     ;
 
@@ -624,6 +619,10 @@ _var_or_i: var_or_i                     { regs[nargs++] = $1; }
     | lhs '[' keylist ']'               { regs[nargs++] = $1;
                                           keyvec |= KEY_BIT(nargs);
                                           regs[nargs++] = $3; $$ = $1; }
+    ;
+label_op:
+       IDENTIFIER			{ $$ = mk_address($1, U_add_once); }
+    |  PARROT_OP                        { $$ = mk_address($1, U_add_once); }
     ;
 var_or_i:
        IDENTIFIER			{ $$ = mk_address($1, U_add_once); }
