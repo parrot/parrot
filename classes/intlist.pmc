@@ -119,6 +119,9 @@ Returns the number of elements in the list.
     INTVAL get_integer () {
         return intlist_length(INTERP, (IntList*) PMC_struct_val(SELF));
     }
+    INTVAL elements () {
+        return intlist_length(INTERP, (IntList*) PMC_struct_val(SELF));
+    }
 
 /*
 
@@ -210,8 +213,42 @@ Removes and returns the first element in the list.
     void splice(PMC* value, INTVAL offset, INTVAL count) {
         if (SELF->vtable->base_type != value->vtable->base_type)
             internal_exception(1, "Type mismatch in splice\n");
-        list_splice(INTERP, (List*) PMC_struct_val(SELF), value, offset, count);
+        list_splice(INTERP, (List*) PMC_struct_val(SELF), value,
+                offset, count);
     }
+
+/*
+
+=item C<void multiply_int(INTVAL value,  PMC *dest)>
+
+Python (b6.main):
+
+ # L = [1] * 1000000
+
+  4           0 LOAD_CONST               1 (1)
+              3 BUILD_LIST               1
+              6 LOAD_CONST               2 (1000000)
+              9 BINARY_MULTIPLY
+             10 STORE_FAST               2 (L)
+
+Build a list by duplicating the passed list N times. Only implemented for
+list.elements == 1.
+
+=cut
+
+*/
+
+    void multiply_int (INTVAL value,  PMC* dest) {
+        INTVAL k = DYNSELF.elements();
+        INTVAL i, elem;
+        IntList *l = PMC_struct_val(SELF);
+        if (k != 1)
+            internal_exception(1, "multiply_int: unimplemented list size");
+        elem = intlist_get(INTERP, l, 0);
+        for (i = 1; i < value; ++i)
+            intlist_assign(INTERP, l, i, elem);
+    }
+
 }
 
 /*

@@ -16,7 +16,7 @@ Tests the C<IntList> PMC.
 
 =cut
 
-use Parrot::Test tests => 9;
+use Parrot::Test tests => 10;
 use Test::More;
 
 output_is(<<'CODE', <<'OUTPUT', "creation");
@@ -480,7 +480,7 @@ output_is(<<'CODE', <<'OUTPUT', "access via a PMC key");
         set I0, 0
 
 L1:     set P1, I0
-        mul I1, I0, 2 
+        mul I1, I0, 2
         set P0[P1], I1
         inc I0
         lt I0, 1025, L1
@@ -507,7 +507,7 @@ L4:     set P3, I1
         set I2, P2[P3]
         ne I1, I2, BAD2
         inc I1
-        lt I1, 260, L4        
+        lt I1, 260, L4
         print "ok 2\n"
         end
 
@@ -518,4 +518,20 @@ BAD2:   print "not ok 2\n"
 CODE
 ok 1
 ok 2
+OUTPUT
+
+output_is(<<'CODE', <<'OUTPUT', "intlist mul = repeat");
+    new P0, .IntList
+    set P0[0], 1
+    mul P0, 100
+    set I0, P0
+    print I0
+    print "\n"
+    set I0, P0[99]
+    print I0
+    print "\n"
+    end
+CODE
+100
+1
 OUTPUT

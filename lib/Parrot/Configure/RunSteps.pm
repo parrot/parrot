@@ -54,6 +54,7 @@ use vars qw(@steps);
     auto/signal.pl
     auto/env.pl
     auto/aio.pl
+    auto/gmp.pl
     gen/icu.pl
     gen/config_h.pl
     gen/core_pmcs.pl

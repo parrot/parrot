@@ -1,0 +1,347 @@
+/*
+Copyright: 2004 The Perl Foundation.  All Rights Reserved.
+$Id$
+
+=head1 NAME
+
+classes/bigint.pmc - BigInt PMC class
+
+=head1 DESCRIPTION
+
+C<BigInt> provides arbitray precision integer mathematic functions.
+
+=head2 Functions
+
+=over 4
+
+=item C<static void bigint_set_long(Interp*, PMC*, long value)>
+
+=item C<static void bigint_set_double(Interp*, PMC*, double value)>
+
+=cut
+
+*/
+
+#include "parrot/parrot.h"
+
+/*
+ * TODO split that out into a separate file
+ */
+
+#ifdef PARROT_HAS_GMP
+#include <gmp.h>
+typedef struct {
+    mpz_t b;
+} BIGINT;
+
+#define BN(x) ((BIGINT*)PMC_struct_val(x))->b
+
+static void
+bigint_init(Interp *interpreter, PMC *self) {
+    PMC_struct_val(self) = malloc(sizeof(BIGINT));
+    mpz_init(BN(self));
+}
+
+static void
+bigint_set_long(Interp *interpreter, PMC *self, long value) {
+    mpz_set_si(BN(self), value);
+}
+
+static void
+bigint_set_double(Interp *interpreter, PMC *self, double value) {
+    mpz_set_d(BN(self), value);
+}
+
+static BIGNUM*
+bigint_get_self(Interp *interpreter, PMC *self) {
+    return PMC_struct_val(self);
+}
+
+static long
+bigint_get_long(Interp *interpreter, PMC *self) {
+    if (mpz_fits_slong_p(BN(self)))
+        return mpz_get_si(BN(self));
+    real_exception(interpreter, NULL, 1, "Conversion err");
+    return 0;
+}
+
+static char *
+bigint_get_string(Interp *interpreter, PMC *self) {
+    return mpz_get_str(NULL, 10, BN(self));
+}
+
+static double
+bigint_get_double(Interp *interpreter, PMC *self) {
+    return mpz_get_d( BN(self));
+}
+
+static void
+bigint_add_bigint(Interp *interpreter, PMC* self, PMC *value, PMC *dest)
+{
+    VTABLE_morph(interpreter, dest, enum_class_BigInt);
+    mpz_add(BN(dest), BN(self), BN(value));
+}
+
+static void
+bigint_mul_bigint(Interp *interpreter, PMC* self, PMC *value, PMC *dest)
+{
+    VTABLE_morph(interpreter, dest, enum_class_BigInt);
+    mpz_mul(BN(dest), BN(self), BN(value));
+}
+
+#else
+
+static void
+bigint_init(Interp *interpreter, PMC *self) {
+    internal_exception(1, "no bigint lib loaded");
+}
+static void
+bigint_set_long(Interp *interpreter, PMC *self, long value) {
+    internal_exception(1, "no bigint lib loaded");
+}
+static void
+bigint_set_double(Interp *interpreter, PMC *self, double value) {
+    internal_exception(1, "no bigint lib loaded");
+}
+static BIGNUM*
+bigint_get_self(Interp *interpreter, PMC *self) {
+    internal_exception(1, "no bigint lib loaded");
+    return NULL;
+}
+
+static char *
+bigint_get_string(Interp *interpreter, PMC *self) {
+    internal_exception(1, "no bigint lib loaded");
+    return NULL;
+}
+
+static long
+bigint_get_long(Interp *interpreter, PMC *self) {
+    internal_exception(1, "no bigint lib loaded");
+    return 0L;
+}
+static double
+bigint_get_double(Interp *interpreter, PMC *self) {
+    internal_exception(1, "no bigint lib loaded");
+    return 0.0;
+}
+static void
+bigint_add_bigint(Interp *interpreter, PMC* self, PMC *value, PMC *dest)
+{
+    internal_exception(1, "no bigint lib loaded");
+}
+static void
+bigint_mul_bigint(Interp *interpreter, PMC* self, PMC *value, PMC *dest)
+{
+    internal_exception(1, "no bigint lib loaded");
+}
+#endif
+
+/* XXX derive from perlscalar becaus of moprh */
+pmclass BigInt extends perlscalar {
+
+/*
+
+=back
+
+=head2 Methods
+
+=over 4
+
+*/
+
+    void init () {
+        bigint_init(INTERP, SELF);
+    }
+
+/*
+
+=item C<void set_integer_native(INTVAL value)>
+
+=cut
+
+*/
+
+    void set_integer_native(INTVAL value) {
+        bigint_set_long(INTERP, SELF, (long)value);
+    }
+
+/*
+
+=item C<void set_number_native(FLOATVAL value)>
+
+Sets the value of the bigint to C<value>.
+
+=cut
+
+*/
+
+    void set_number_native(FLOATVAL value) {
+        bigint_set_double(INTERP, SELF, (double)value);
+    }
+
+/*
+
+=item C<void set_string_native(STRING* value)>
+
+Sets the value of the integer to the result of converting C<*value> to a
+number.
+
+=cut
+
+*/
+
+    void set_string_native(STRING* value) {
+
+    }
+
+/*
+
+=item C<void set_pmc(PMC *value)>
+
+Sets the value of the integer to the integer value of C<*value>.
+
+=cut
+
+*/
+
+    void set_pmc(PMC *value) {
+        PMC_struct_val(SELF) = VTABLE_get_bignum(INTERP, value);
+    }
+
+/*
+
+=item C<FLOATVAL get_number()>
+
+Returns the value of the integer as a floating point number.
+
+=cut
+
+*/
+
+    FLOATVAL get_number() {
+        return bigint_get_double(INTERP, SELF);
+    }
+
+/*
+
+=item C<INTVAL get_integer()>
+
+Returns the value of the integer.
+
+=cut
+
+*/
+
+    INTVAL get_integer() {
+        return bigint_get_long(INTERP, SELF);
+    }
+
+/*
+
+=item C<BIGNUM* get_bignum()>
+
+Returns the BIGNUM.
+
+=cut
+
+*/
+
+    BIGNUM* get_bignum() {
+        return bigint_get_self(INTERP, SELF);
+    }
+
+/*
+
+=item C<INTVAL get_bool()>
+
+Returns the boolean value of the integer.
+
+=cut
+
+*/
+
+    INTVAL get_bool() {
+        return 0;
+    }
+
+/*
+
+=item C<STRING* get_string()>
+
+Returns the string representation of the integer.
+
+=cut
+
+*/
+
+    STRING* get_string() {
+        char *s = bigint_get_string(INTERP, SELF);
+        STRING *ps = string_from_cstring(INTERP, s, 0);
+        free(s);
+        return ps;
+    }
+
+/*
+
+=item C<void increment()>
+
+Increments the integer.
+
+=cut
+
+*/
+
+    void increment() {
+    }
+
+/*
+
+=item C<void decrement()>
+
+Decrements the integer.
+
+=cut
+
+*/
+
+    void decrement() {
+    }
+
+    void add(PMC* value, PMC* dest) {
+MMD_BigInt: {
+                bigint_add_bigint(INTERP, SELF, value, dest);
+            }
+MMD_DEFAULT: {
+                 internal_exception(1, "unimp");
+             }
+
+    }
+    void mul(PMC* value, PMC* dest) {
+MMD_BigInt: {
+                bigint_mul_bigint(INTERP, SELF, value, dest);
+            }
+MMD_DEFAULT: {
+                 internal_exception(1, "unimp");
+             }
+
+    }
+}
+
+/*
+
+=back
+
+=cut
+
+*/
+
+/*
+ * Local variables:
+ * c-indentation-style: bsd
+ * c-basic-offset: 4
+ * indent-tabs-mode: nil
+ * End:
+ *
+ * vim: expandtab shiftwidth=4:
+*/

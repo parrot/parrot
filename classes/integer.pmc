@@ -8,7 +8,7 @@ classes/integer.pmc - Integer PMC class
 
 =head1 DESCRIPTION
 
-C<Integer> extends C<mmd_default> to provide an integer for languages
+C<Integer> provides an integer for languages
 that want a value-restricted integer type without going to an I
 register.
 
@@ -42,7 +42,7 @@ integer_divide(Parrot_Interp interp, PMC* self, PMC* value, PMC* destination) {
 }
 
 
-pmclass Integer extends mmd_default {
+pmclass Integer {
 
 /*
 
