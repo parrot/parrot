@@ -12,9 +12,9 @@
 	set I12, 1
 	set S0,  "               "
 	set S1,  "               "
-	set S2,  "               "
-	set S3,  "      ***      "
-        set S4,  "               "
+	set S2,  "      *        "
+	set S3,  "      **       "
+        set S4,  "     * *       "
         set S5,  "               "
 	set S6,  "         *     "
 	set S7,  "         *     "

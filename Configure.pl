@@ -495,8 +495,6 @@ could take a while):
 
 END
 
-RETRY:
-
 {
     my %newc;
 
@@ -514,12 +512,9 @@ if($c{ptrsize} != $c{intvalsize}) {
     print <<"END";
 
 Hmm, I see your chosen INTVAL isn't the same size as your pointers.  Parrot should
-still compile and run, but you may see a ton of warnings.  I'll give you a chance
-to change your INTVAL size.
+still compile and run, but you may see a ton of warnings.
 
 END
-
-    goto RETRY unless $c{iv} eq prompt("What should your integer type be?", 'iv');
 
 print <<"END";
 
