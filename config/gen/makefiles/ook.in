@@ -1,0 +1,18 @@
+RM_F = ${rm_f}
+PERL = ${perl}
+
+ASSEMBLE=$(PERL) ../../assemble.pl
+PARROT=../../parrot
+
+all: build
+
+test: build
+	$(PARROT) ook.pbc hello.ook > foo.pasm
+	$(ASSEMBLE) foo.pasm > foo.pbc
+	$(PARROT) foo.pbc
+
+build: ook.pasm
+	$(ASSEMBLE) ook.pasm > ook.pbc
+
+clean:
+	$(RM_F) core *.pbc *~ foo.p*

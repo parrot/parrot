@@ -1,0 +1,60 @@
+DESCRIPTION
+-----------
+This is an Ook! compiler written in Parrot assembly, version 0.0.1
+
+This is a compiler, and not an interpreter. This means that the code
+is read, then compiled into Parrot assembly (yes, the target language
+is also Parrot). Then, you can fetch the Parrot assembly generated,
+assemble it and interpret it with Parrot just as you would with any
+other Parrot assembly file.
+
+You should compile and test the files with (this will run a hello
+world program):
+
+     $ make test
+
+Then you can compile your Ook! program with: 
+
+     $ ../../parrot ook.pbc > foo.pasm
+     $ perl ../../assemble.pl foo.pasm > foo.pbc
+     $ ../../parrot foo.pbc
+
+
+FILES
+-----
+The files are the following:
+        ook.pasm        well, that's pretty much the whole stuff
+        hello.ook       a ook script that greets the world!
+
+
+TODO
+----
+* implement the "Ook. Ook!" instruction
+* get rid of temp file (Parrot needs an eval thingy)
+
+
+AUTHOR
+------
+Jerome Quelin, <jquelin@cpan.org>
+
+
+ACKNOWLEDGEMENTS
+----------------
+I would like to thank:
+* Nicholas Clark for gaving me this crazy idea. He's the one to take
+  the blame for it. Really. :-)
+* Piers Cawley who unwittingly lead me to write it.
+* Dan Sugalski and all the parrot folks (you know who you are) for
+  providing such a nice toy to play with.
+
+
+COPYRIGHT
+---------
+This program is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+
+SEE ALSO
+--------
+* http://www.parrotcode.org
+* http://www.dangermouse.net/esoteric/ook.html

@@ -82,6 +82,7 @@ config/gen/makefiles/imcc.in
 config/gen/makefiles/jako.in
 config/gen/makefiles/languages.in
 config/gen/makefiles/miniperl.in
+config/gen/makefiles/ook.in
 config/gen/makefiles/perl6.in
 config/gen/makefiles/root.in
 config/gen/makefiles/scheme.in
@@ -1470,6 +1471,11 @@ languages/miniperl/Miniperl/t/002_parser.t
 languages/miniperl/Miniperl/t/003_generator.t
 languages/miniperl/Miniperl/t/004_combined.t
 languages/miniperl/mpc
+languages/ook/Changes
+languages/ook/README
+languages/ook/hello.ook
+languages/ook/ook.pasm
+languages/ook/test.ook
 languages/parrot_compiler/Makefile
 languages/parrot_compiler/gentable.pl
 languages/parrot_compiler/parrot.pasm

@@ -31,6 +31,8 @@ sub runstep {
           commentType => '#');
   genfile('config/gen/makefiles/befunge.in',   'languages/befunge/Makefile',
           commentType => '#');
+  genfile('config/gen/makefiles/ook.in',       'languages/ook/Makefile',
+          commentType => '#');
 }
 
 1;
