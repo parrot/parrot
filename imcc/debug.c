@@ -16,7 +16,7 @@ fatal(int code, const char *func, const char *fmt, ...)
     fprintf(stderr, "error:imcc:%s: ", func);
     imcc_vfprintf(stderr, fmt, ap);
     va_end(ap);
-    exit(code);
+    Parrot_exit(code);
 }
 
 
@@ -31,7 +31,7 @@ fataly(int code, const char *file, int lin, const char *fmt, ...)
     va_end(ap);
     print_inc(file, lin);
     /* TODO through compiler exception */
-    exit(code);
+    Parrot_exit(code);
 }
 
 
