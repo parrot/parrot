@@ -627,7 +627,7 @@ sub interpolate_string
 
   return $string unless $string =~ m/[^\\]\$/;
 
-  $string =~ s/([^\\])\$((([A-Za-z][A-Za-z0-9_]*)\b)|({[A-Za-z][A-Za-z0=9_]*}))/$1", $2, "/g;
+  $string =~ s/([^\\])\$((([A-Za-z][A-Za-z0-9_]*)\b)|({[A-Za-z][A-Za-z0-9_]*}))/$1", $2, "/g;
 
   return parse_args($string);
 }
