@@ -21,7 +21,7 @@ use vars qw(@ISA);
 sub defines
 {
   return <<END;
-#define REL_PC     ((size_t)(cur_opcode - (opcode_t *)interpreter->code->byte_code))
+#define REL_PC     ((size_t)(cur_opcode - interpreter->code->byte_code))
 #define CUR_OPCODE cur_opcode
 END
 }

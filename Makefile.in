@@ -147,6 +147,9 @@ all : $(TEST_PROG) $(PDUMP) docs
 
 mops: examples/assembly/mops${exe} examples/mops/mops${exe}
 
+libparrot$(A) : $(O_FILES)
+	$(AR_CRS) $@ $^
+
 $(TEST_PROG): test_main$(O) $(GEN_HEADERS) $(O_FILES) lib/Parrot/OpLib/core.pm lib/Parrot/PMC.pm
 	$(LD) ${ld_out}$(TEST_PROG) $(LDFLAGS) $(O_FILES) test_main$(O) $(C_LIBS)
 

@@ -16,7 +16,7 @@ int
 main(int argc, char **argv) {
     struct stat       file_stat;
     int               fd;
-    char *            packed;
+    opcode_t *        packed;
     size_t            packed_size;
     struct PackFile * pf;
     struct Parrot_Interp *interpreter = make_interpreter(0);
@@ -43,7 +43,7 @@ main(int argc, char **argv) {
     packed_size = file_stat.st_size;
 
 #ifndef HAS_HEADER_SYSMMAN
-    packed = mem_sys_allocate(packed_size);
+    packed = (opcode_t *) mem_sys_allocate(packed_size);
 
     if (!packed) {
         printf("Can't allocate, code %i\n", errno);
@@ -52,7 +52,7 @@ main(int argc, char **argv) {
 
     read(fd, (void*)packed, packed_size);
 #else
-    packed = mmap(0, packed_size, PROT_READ, MAP_SHARED, fd, (off_t)0);
+    packed = (opcode_t *) mmap(0, packed_size, PROT_READ, MAP_SHARED, fd, (off_t)0);
 
     if (!packed) {
         printf("Can't mmap, code %i\n", errno);

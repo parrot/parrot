@@ -67,12 +67,12 @@ Converts a bytecode file to a native .c file.
 
 Usage information (and malformed pod error message): C<perldoc -F pbc2c.pl>
 
-No documentation is available for compiling the .c file to a binary.
-This works, but produces a binary that crashes:
+To convert the generated foo.c file to a binary, do (on Unix only):
 
-  ./assemble.pl examples/assembly/life.pasm > life.pbc
-  perl pbc2c.pl life.pbc > life.c
-  ls **/*.o | egrep -v 'pdump|test_main' | xargs gcc -Iinclude -o life life.c -lm -ldl
+  make libparrot.a
+  gcc -O3 -g -Iinclude -c foo.c -o foo.o
+  gcc -g -o foo foo.o -L. -lparrot -ldl
+  ./foo # Runs it
 
 =item B<tests>
 
@@ -83,7 +83,7 @@ appropriate test file in the t/ directory:
   perl -Ilib t/op/basic.t
 
 To keep a copy of all of the test C<.pasm> and C<.pbc> files
-generated, set the environment variable POST_MORTEM to 1:
+generated, set the environment variable POSTMORTEM to 1:
 
   POSTMORTEM=1 perl -Ilib t/op/basic.t 
   ls t/op/basic*

@@ -61,14 +61,14 @@ static void
 runops_generic (opcode_t * (*core)(struct Parrot_Interp *, opcode_t *), 
                 struct Parrot_Interp *interpreter, opcode_t * pc) {
     opcode_t * code_start;
-    UINTVAL    code_size;
+    UINTVAL    code_size; /* in opcodes */
     opcode_t * code_end;
 
     check_fingerprint(interpreter);
 
-    code_start = (opcode_t *)interpreter->code->byte_code;
-    code_size  = interpreter->code->byte_code_size;
-    code_end   = (opcode_t *)((char *)interpreter->code->byte_code + code_size);
+    code_start = interpreter->code->byte_code;
+    code_size  = interpreter->code->byte_code_size / sizeof(opcode_t);
+    code_end   = interpreter->code->byte_code + code_size;
 
     pc = core(interpreter, pc);
 
@@ -286,15 +286,15 @@ static void
 runops_jit (struct Parrot_Interp *interpreter, opcode_t * pc) {
 #ifdef HAS_JIT
     opcode_t * code_start;
-    UINTVAL    code_size;
+    UINTVAL    code_size; /* in opcodes */
     opcode_t * code_end;
     jit_f      jit_code;
 
     check_fingerprint(interpreter);
 
-    code_start = (opcode_t *)interpreter->code->byte_code;
-    code_size  = interpreter->code->byte_code_size;
-    code_end   = (opcode_t *)((char *)interpreter->code->byte_code + code_size);
+    code_start = interpreter->code->byte_code;
+    code_size  = interpreter->code->byte_code_size / sizeof(opcode_t);
+    code_end   = interpreter->code->byte_code + code_size;
 
     jit_code = build_asm(interpreter, pc, code_start, code_end);
 #ifdef ALPHA
@@ -337,15 +337,15 @@ static void
 runops_prederef (struct Parrot_Interp *interpreter, opcode_t * pc, 
                  void ** pc_prederef) {
     opcode_t * code_start;
-    UINTVAL    code_size;
+    UINTVAL    code_size; /* in opcodes */
     opcode_t * code_end;
     void **    code_start_prederef;
 
     check_fingerprint(interpreter);
 
-    code_start = (opcode_t *)interpreter->code->byte_code;
-    code_size  = interpreter->code->byte_code_size;
-    code_end   = (opcode_t *)((char *)interpreter->code->byte_code + code_size);
+    code_start = interpreter->code->byte_code;
+    code_size  = interpreter->code->byte_code_size / sizeof(opcode_t);
+    code_end   = interpreter->code->byte_code + code_size;
 
     code_start_prederef = pc_prederef;
 

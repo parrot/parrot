@@ -23,7 +23,7 @@ sub defines
 {
   return <<END;
 #define REL_PC ((size_t)(cur_opcode - interpreter->prederef_code))
-#define CUR_OPCODE (((opcode_t *)interpreter->code->byte_code) + REL_PC)
+#define CUR_OPCODE (interpreter->code->byte_code + REL_PC)
 
 static inline opcode_t* prederef_to_opcode(struct Parrot_Interp* interpreter,
                                            void** prederef_addr)
@@ -69,6 +69,11 @@ sub expr_pop
   my ($self) = @_;
   return "opcode_to_prederef(interpreter, pop_dest(interpreter))";
 }
+
+# expr_address
+#
+# Same logic as expr_pop
+#
 
 sub expr_address
 {

@@ -91,8 +91,12 @@ sub expr_offset {
 sub goto_offset
 {
   my ($self, $offset) = @_;
-#print STDERR "pbcc: map_ret_rel($offset)\n";
+  if ($offset =~ /^-?\d+$/) {
   return sprintf("goto PC_%d", $self->pc + $offset);
+  } else {
+      return sprintf("cur_opcode = &&PC_%d; cur_opcode += %s; goto switch_label", $self->pc, $offset);
+  }
+#print STDERR "pbcc: map_ret_rel($offset)\n";
 }
 
 
@@ -103,7 +107,7 @@ sub goto_offset
 sub goto_pop
 {
   my ($self) = @_;
-  return sprintf("cur_opcode = pop_dest(interpreter);\ngoto switch_label");
+  return "goto *pop_dest(interpreter)";
 }
 
 #

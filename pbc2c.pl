@@ -238,7 +238,7 @@ main(int argc, char **argv) {
 static opcode_t* run_compiled(struct Parrot_Interp *interpreter, opcode_t *cur_opcode, opcode_t *start_code){
 
 switch_label:
-    switch(((ptrcast_t)cur_opcode - (ptrcast_t)start_code) / sizeof(opcode_t)) {
+    switch(cur_opcode - start_code) {
 
 END_C
 
@@ -285,7 +285,8 @@ sub compile_file {
     my ($file_name) = @_;
 
     my $pf = Parrot::PackFile->new;
-    $pf->unpack_file($file_name);
+    $pf->unpack_file($file_name)
+      or die "Unable to unpack file $file_name: $!";
 
 #    dump_const_table($pf);
     compile_byte_code($pf, $file_name);

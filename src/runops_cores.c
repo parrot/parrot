@@ -42,14 +42,14 @@ void trace_op(struct Parrot_Interp *interpreter, opcode_t * code_start,
 opcode_t *
 runops_slow_core (struct Parrot_Interp *interpreter, opcode_t * pc) {
     opcode_t * code_start;
-    INTVAL     code_size;
+    INTVAL     code_size; /* in opcodes */
     opcode_t * code_end;
     opcode_t * lastpc = NULL;
     FLOATVAL starttime = 0;
 
-    code_start = (opcode_t *)interpreter->code->byte_code;
-    code_size  = interpreter->code->byte_code_size;
-    code_end   = (opcode_t *)((char *)interpreter->code->byte_code + code_size);
+    code_start = interpreter->code->byte_code;
+    code_size  = interpreter->code->byte_code_size / sizeof(opcode_t);
+    code_end   = interpreter->code->byte_code + code_size;
 
     if (interpreter->flags & PARROT_TRACE_FLAG) {
       trace_op(interpreter, code_start, code_end, pc);

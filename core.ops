@@ -2443,7 +2443,7 @@ op runinterp(inout PMC, in INT) {
 }
 
 op enternative() {
-  goto ADDRESS(( run_native(interpreter, CUR_OPCODE, (opcode_t *)interpreter->code->byte_code) ));
+  goto ADDRESS(( run_native(interpreter, CUR_OPCODE, interpreter->code->byte_code) ));
 }
 
 ########################################
