@@ -50,13 +50,13 @@ alternation is different, and if every branch is itself dfa_safe. (And
 I've never run the code, even once, so it doesn't actually work
 anyway!)
 
-The code for making use of this information is in Regex/PreOptimize.pm
-(possibly to be renamed to TreeOptimize.pm). Look at
-disable_implicit_checks() for an example of performing the length
-checking optimization described above. This whole module is for
-adding, deleting, and changing nodes in the expression tree according
-to a set of optimizations. You can also subclass it to override the
-optimize_tree() method to add in your optimization, like so:
+The code for making use of this information is in
+Regex/TreeOptimize.pm. Look at disable_implicit_checks() for an
+example of performing the length checking optimization described
+above. This whole module is for adding, deleting, and changing nodes
+in the expression tree according to a set of optimizations. You can
+also subclass it to override the optimize_tree() method to add in your
+optimization, like so:
 
  sub optimize_tree {
      my ($self, tree) = @_;
