@@ -41,49 +41,49 @@ typedef struct spfinfo_t {
 #define FLAG_SPACE  8
 #define FLAG_SHARP  16
 
-#define SIZE_REG	0
-#define SIZE_SHORT	1
-#define SIZE_LONG	2
-#define SIZE_HUGE	3
-#define SIZE_XVAL	4
+#define SIZE_REG    0
+#define SIZE_SHORT  1
+#define SIZE_LONG   2
+#define SIZE_HUGE   3
+#define SIZE_XVAL   4
 
 #define GetInt(targ, whichone)                                               \
-	switch(whichone) {                                                   \
-		case SIZE_REG:	                                             \
-			targ=(HUGEINTVAL)(int)va_arg(*args, int);            \
-			break;                                               \
-		case SIZE_SHORT: /* "'short int' is promoted to 'int' when passed through '...'" */ \
-			targ=(HUGEINTVAL)(short)va_arg(*args, int);          \
-			break;                                               \
+    switch(whichone) {                                                       \
+        case SIZE_REG:                                                       \
+            targ=(HUGEINTVAL)(int)va_arg(*args, int);                        \
+            break;                                                           \
+        case SIZE_SHORT: /* "'short int' is promoted to 'int' when passed through '...'" */ \
+            targ=(HUGEINTVAL)(short)va_arg(*args, int);                      \
+            break;                                                           \
         case SIZE_LONG:                                                      \
-			targ=(HUGEINTVAL)(long)va_arg(*args, long);          \
-			break;                                               \
-		case SIZE_HUGE:                                              \
-			targ=(HUGEINTVAL)(long /*long*/)va_arg(*args, long /*long*/); \
-			break;                                               \
-		case SIZE_XVAL:                                              \
-			targ=(HUGEINTVAL)(INTVAL)va_arg(*args, INTVAL);      \
-			break;                                               \
-	}
+            targ=(HUGEINTVAL)(long)va_arg(*args, long);                      \
+            break;                                                           \
+        case SIZE_HUGE:                                                      \
+            targ=(HUGEINTVAL)(long /*long*/)va_arg(*args, long /*long*/);    \
+            break;                                                           \
+        case SIZE_XVAL:                                                      \
+            targ=(HUGEINTVAL)(INTVAL)va_arg(*args, INTVAL);                  \
+            break;                                                           \
+    }
 
 #define GetUInt(targ, whichone)                                              \
-	switch(whichone) {                                                   \
-		case SIZE_REG:                                               \
-			targ=(UHUGEINTVAL)(unsigned int)va_arg(*args, unsigned int); \
-			break;                                               \
-		case SIZE_SHORT: /* short int promoted HLAGHLAGHLAGH. See note above */ \
-			targ=(UHUGEINTVAL)(unsigned short)va_arg(*args, int); \
-			break;                                               \
-		case SIZE_LONG:                                              \
-			targ=(UHUGEINTVAL)(unsigned long)va_arg(*args, unsigned long);	\
-			break;                                               \
-		case SIZE_HUGE:                                              \
-			targ=(UHUGEINTVAL)(unsigned long /*long*/)va_arg(*args, unsigned long /*long*/); \
-			break;                                               \
-		case SIZE_XVAL:                                              \
-			targ=(UHUGEINTVAL)(UINTVAL)va_arg(*args, UINTVAL);   \
-			break;                                               \
-	}
+    switch(whichone) {                                                       \
+        case SIZE_REG:                                                       \
+            targ=(UHUGEINTVAL)(unsigned int)va_arg(*args, unsigned int);     \
+            break;                                                           \
+        case SIZE_SHORT: /* short int promoted HLAGHLAGHLAGH. See note above */ \
+            targ=(UHUGEINTVAL)(unsigned short)va_arg(*args, int);            \
+            break;                                                           \
+        case SIZE_LONG:                                                      \
+            targ=(UHUGEINTVAL)(unsigned long)va_arg(*args, unsigned long);   \
+            break;                                                           \
+        case SIZE_HUGE:                                                      \
+            targ=(UHUGEINTVAL)(unsigned long /*long*/)va_arg(*args, unsigned long /*long*/); \
+            break;                                                           \
+        case SIZE_XVAL:                                                      \
+            targ=(UHUGEINTVAL)(UINTVAL)va_arg(*args, UINTVAL);               \
+            break;                                                           \
+    }
 
 /*
 void int_to_str(char *, char *, HUGEINTVAL, INTVAL );
@@ -492,7 +492,7 @@ Parrot_vsprintf(struct Parrot_Interp *interpreter, char *targ, const char *pat,
                 va_list *args)
 {
     STRING *ret = Parrot_vsprintf_c(interpreter, pat, args);
-/*	string_transcode(interpreter, ret, NULL, NULL, &ret);*/
+/*    string_transcode(interpreter, ret, NULL, NULL, &ret);*/
 
     memcpy(targ, ret->bufstart, ret->bufused);
     targ[ret->bufused + 1] = 00;
