@@ -24,7 +24,7 @@ contained_in_pool(struct Parrot_Interp *interpreter,
     struct Small_Object_Arena *arena;
     
     for (arena = pool->last_Arena; arena; arena = arena->prev) {
-        size_t ptr_diff = (size_t)ptr - (size_t)arena->start_objects;
+        ptrdiff_t ptr_diff = (ptrdiff_t)ptr - (ptrdiff_t)arena->start_objects;
         if (0 <= ptr_diff && ptr_diff < arena->total_objects * pool->object_size
         &&  ptr_diff % pool->object_size == 0)
             return 1;
