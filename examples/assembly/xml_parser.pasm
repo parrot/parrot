@@ -12,7 +12,7 @@
 #    * elements like &lt; aren't handled yet
 #    * bugs-a-plenty, I'm sure.
 #
-# This is more of a proof-of-concept than anything else.  Try putting 
+# This is more of a proof-of-concept than anything else.  Try putting
 # this in a file:
 # <xml version='1.0'>
 # <top>
@@ -20,7 +20,7 @@
 # <junk>Hello</junk>
 # <empty/>
 # </inner>
-# </top> 
+# </top>
 # And see what it does.  :)
 #
 # See the notes near the read() for IO problem notes.
@@ -34,7 +34,7 @@
 #     I7	     -- Type of current element
 #     I8             -- "In Quotes" flag
 #     I13            -- Type of the last token
-#    
+#
 # The stack is used all to hell.  :)
 #
 # Data is stored on the stack in type/value pairs:
@@ -58,14 +58,14 @@
 #	bsr ISALPHA
 #	restore I2  # False!
 #
-ISALPHA: 
+ISALPHA:
 	restore S1
 
 	ge S1, "A", UPPER
 	branch NONUP
 UPPER:  le S1, "Z", ALPHA
 
-NONUP:  
+NONUP:
 	ge S1, "a", LOWER
 	branch NONLOW
 LOWER:  le S1, "z", ALPHA
@@ -76,7 +76,7 @@ NONLOW:
 NUMBER: le S1, "9", ALPHA
 
 NONUM:  eq S1, "_", ALPHA
-	
+
         # Not A-Z0-9_
 	set I1, 0
 	branch LEAVE_ISALPHA
@@ -94,9 +94,9 @@ LEAVE_ISALPHA:
 #
 # **** BUG BUG BUG *****  TEMPORARY ROUTINE
 # For now Parrot's I/O seems completely b0rk3n
-#    instead, just pull characters off "S10" which 
+#    instead, just pull characters off "S10" which
 #    contains the XML to be processed.  Trying to perform
-#    a read loop with everything else going on smashes the 
+#    a read loop with everything else going on smashes the
 #    user stack.  Sometimes.
 # **** BUG BUG BUG *****  TEMPORARY ROUTINE
 
@@ -119,18 +119,18 @@ EOF:    end
 
 
 # Process the internal bits of tags.  The processor is really, really
-# crude.  For example the first word-thing is the element.  The next 
-# word-thing is an attribute name, and the next word-thing is the value.  
+# crude.  For example the first word-thing is the element.  The next
+# word-thing is an attribute name, and the next word-thing is the value.
 # Lather, rinse, repeat.
 #
 # Quoted things are obeyed.  Because of a string handling SNAFU in either
-# the assembler or Parrot, your attributes have to be *SINGLE* quoted for 
+# the assembler or Parrot, your attributes have to be *SINGLE* quoted for
 # now.
 #
-PROCINTAG: 
+PROCINTAG:
 	restore S1           # Character we're processing
 	restore I7           # Type of thing last on the stack
-	
+
 	ne I7, 1000, NOTEOS
 	save 1000
 	set S7, ""
@@ -162,7 +162,7 @@ NOTEND:
 	save 6			  # OPENCLOSER
 	branch EPITE
 
-NOTBEGEND:	
+NOTBEGEND:
 	save S1
 	bsr ISALPHA		  # isalpha()
 	restore I2
@@ -173,14 +173,14 @@ NOTBEGEND:
 	eq I7, -1, NOSTART
 	save ""
 	save -1
-	
+
 NOSTART:
 	ne I13, 2, NOTVAL   # VALUE
 	set I13, 0
 
 NOTVAL:
 	branch EPITE
-	
+
 PROCALPHA:
 	ne I7, -1, PART2
 	eq I8, 1, FOUNDONE
@@ -219,10 +219,10 @@ EPITE:
 
 # Decide if this is the beginning of a start tag
 # or the beginning of a start/end tag
-#    Peeks at the top thing on the stack to figure 
+#    Peeks at the top thing on the stack to figure
 #    out what a > means.  This way both the start and end
 #    callbacks get called for <foo/>
-DECIDE: 
+DECIDE:
         restore I1
 	save I1
 	ne I1, 5, NOTCLOSER
@@ -243,10 +243,10 @@ NOTOPENCLOSER:
 
 
 # The start callback is called after the start tag
-# is finally processed.  You MUST LEAVE the type 0 
+# is finally processed.  You MUST LEAVE the type 0
 # element on the stack when you're done processing!
 #
-# This sample simply prints the element name and the 
+# This sample simply prints the element name and the
 #    attribute/value pairs.
 
 STARTTAG:
@@ -265,7 +265,7 @@ NOTATEOSERR:  # Should never happen
 	end
 
 NOTATEOSHERE:
-	ne I1, 0, NOTSELEM	
+	ne I1, 0, NOTSELEM
 	print "Start "		# All done w/attrib
 	print S2
 	print S0
@@ -298,7 +298,7 @@ ENDSTART:
 
 # This is a sample "end element" handler.
 #
-# A good "end element" handler will possibly print the 
+# A good "end element" handler will possibly print the
 #   data that's been acumulated on the stack, etc..
 # At the very least it should remove everthing on the stack
 #   back to /and including/ the element itself (type 0).
@@ -324,7 +324,7 @@ NOTELEM:
 	print S1
 	print "\n"
 	branch CLEAN
-	
+
 ENDENDTAG:
 	ret
 
@@ -343,14 +343,17 @@ CHAR:   restore S0
 #
 # Main Body
 #
-MAIN:  
+MAIN:
 	# For now, this is the XML that's going to get parsed.
 	# When the read() stuff gets fixed, this can be read from
 	#    a file as it's being processed.  For now, slurp it.
-	# SMALL FILES ONLY.  SMALL.  SMALL.  SMALL.  Parrots I/O 
+	# SMALL FILES ONLY.  SMALL.  SMALL.  SMALL.  Parrots I/O
 	# GC does not play nice with read().
 	set S10, ""
 	open P0, "small.xml", "<"
+	if P0, READ
+	print "Couldn't open small.xml\n"
+	exit 1
 READ:
 	set S0, ""
 	read S0, P0, 32768
@@ -358,8 +361,8 @@ READ:
 	eq I1, 0, CLOSE
 	concat S10, S0
 	branch READ
-	
-CLOSE:	
+
+CLOSE:
 	close P0
 	save 1000     # EOS marker
 
@@ -376,7 +379,7 @@ LOOP:   bsr FETCH
 	eq I1, 1000, SSTART
         ne I1, -1  , SSTART
         branch EOPEN
-SSTART:	
+SSTART:
 	save ""
 	save -1
 EOPEN:	branch CHARP
@@ -405,8 +408,8 @@ DATAC:
 	save 99
 
 	save S11
-	bsr CHAR	
-	
+	bsr CHAR
+
 	branch CHARP
 
 NOTDATAC:
@@ -427,8 +430,8 @@ CHARP:
 CHARPE:
 	branch LOOP
 
-       
-BAIL: 
+
+BAIL:
 	close P0
 	end
 

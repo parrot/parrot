@@ -20,30 +20,30 @@
 # By Leon Brocard <acme@astray.com>
 
   set I0, P5
+  shift S0, P5
   ne I0, 1, SOURCE
-  set S0, P5[0]
   print "usage: parrot "
   print S0
-  print " [-cdu] filename\n"
+  print " [-c] [-d] [-u] filename\n"
   end
 
 SOURCE:
   # do some simple option parsing
+  shift S0, P5
 
-  set S0, P5[1]
   ne S0, "-c", NOTC
   set I10, 1 # count mode
-  set S0, P5[2]
+  shift S0, P5
 
 NOTC:
   ne S0, "-d", NOTD
   set I11, 1 # duplicate mode
-  set S0, P5[2]
+  shift S0, P5
 
 NOTD:
   ne S0, "-u", GO
   set I12, 1 # unique mode
-  set S0, P5[2]
+  shift S0, P5
 
 GO:
   # S2 is the previous line
@@ -51,6 +51,7 @@ GO:
   set I1, 1 # count
   # Read the file into S1
   open P1, S0, "<"
+  unless P1, err
   readline S2, P1
 
 SOURCE_LOOP:
@@ -81,6 +82,11 @@ NOTC2:
   eq 1, I1, RESET
   print S2
   branch RESET
+
+err:
+  print "Couldn't read "
+  print S0
+  exit 1
 
 NOTD2:
   unless I12, NOTU2
