@@ -35,34 +35,26 @@
   .local int end_of_word
 
   # An array of commands, the current command
-  .local PerlArray commands
+  .local pmc commands
   commands = new PerlArray
-  .local PerlArray command
+  .local pmc command
 
   # our running return value
   # XXX really need to support more than a string
   .local string retval
   retval = ""
 
-  # Various places we need to jump to/return from
-  .local Sub func_variable_subst
-  newsub func_variable_subst, .Sub, __var_subst
-
-  # Define any macros we use.
-  .include "lib/macros/is_space.imc"
-  .include "lib/macros/debug.imc"
-  .include "lib/macros/substitution.imc"
-
   # XXX: This would probably be a good point to create a lexical scope
   # to store variables in.
 
   .debug("Backslash newline substitution\n")
 
-  .arg buffer
-  saveall
-  call __backslash_newline_subst
-  restoreall
-  .result buffer
+  buffer = __backslash_newline_subst( buffer )
+
+  # Define any macros we use.
+  .include "lib/macros/is_space.imc"
+  .include "lib/macros/debug.imc"
+  .include "lib/macros/substitution.imc"
 
 BEGIN_COMMAND:
   .debug("BEGIN COMMAND:\n")
@@ -229,12 +221,7 @@ block_begin:
   # This handles both { and " style blocks.
 
   .debug("block_begin:\n")
-  .arg buffer
-  .arg start_word
-  saveall
-  call __match_close
-  restoreall
-  .result word_length
+  word_length =  __match_close( start_word, buffer )
   .debug("word_length = ")
   .debug(word_length)
   .debug("\n")
@@ -252,7 +239,7 @@ END_SCOPE:
 
   shift command, commands
 
-  .local PerlArray cooked_command
+  .local pmc cooked_command
   cooked_command = new PerlArray
 
 cooking:
@@ -311,12 +298,7 @@ command_subst_loop:
   index $I2, $S0, "["
   if $I2 == -1 goto command_subst_loop
 
-  .arg $S0
-  .arg $I2
-  saveall
-  call __match_close
-  restoreall
-  .result $I3
+  $I3 =  __match_close( $I2, $S0 )
 
   # Ok. we know the [] goes from $I2 to $I3. now, get the output of
   # That parse, and use it to replace...
@@ -333,11 +315,7 @@ command_subst_loop:
 
   $S2 = ""
 
-  .arg $S1
-  saveall
-  call __parse
-  restoreall
-  .result $S2
+  $S2 = __parse( $S1 )
 
   .debug("gives output of \"")
   .debug($S2)
@@ -369,14 +347,7 @@ variable_subst_loop:
   if $I0 == 1 goto backslash_subst 
   $S1 = string_array[current_pointer]
 
-  .pcc_begin prototyped
-  .arg $S1
-  .pcc_call func_variable_subst
-  sillyrequiredret1:
-  .result $S1
-  .result $I1
-  .result $I2
-  .pcc_end
+  ( $S1, $I1, $I2 ) =  __var_subst( $S1 )
 
   #print "String is "
   #print $S1
@@ -409,11 +380,7 @@ backslash_subst_loop:
   .substitution_iter_next($I0)
   if $I0 == 1 goto reintegrate
   $S1 = string_array[current_pointer]
-  .arg $S1
-  saveall
-  call __backslash_subst
-  restoreall
-  .result $S1
+  ( $S1 ) = __backslash_subst( $S1 )
   string_array[current_pointer] = $S1 
   goto backslash_subst_loop
 
@@ -451,10 +418,10 @@ cooked:
   if $S1 == "PerlUndef" goto no_command
 
   .pcc_begin prototyped
-  .arg cooked_command
+    .arg cooked_command
   .pcc_call $P1
-  shouldntneedtodothis:
-  .result retval
+    shouldntneedtodothis:
+    .result retval
   .pcc_end
   .debug("retval of '")
   .debug(retval)
@@ -479,12 +446,7 @@ handle_command_block:
   # MIDDLE Word to keep accumulating word fragments...
   # XXX this can probably be combined with block_begin...
   .debug("handle_command_block:\n")
-  .arg buffer
-  .arg start_word
-  saveall
-  call __match_close
-  restoreall
-  .result word_length
+  word_length =  __match_close( start_word, buffer )
   .debug("word_length = ")
   .debug(word_length)
   .debug("\n")
@@ -496,10 +458,12 @@ DONE:
   .debug("final retval is '")
   .debug(retval)
   .debug("'\n")
-  .return retval
-  ret
+  .pcc_begin_return
+    .return retval
+  .pcc_end_return
 
 END:
   end
 
 .end
+

@@ -19,7 +19,7 @@
 # Copyright (c) 2002-2003 by William J. Coleda
 
 
-.pcc_sub __var_subst prototyped 
+.sub __var_subst prototyped 
   .param string word
 
   .local int start_pos
@@ -129,9 +129,9 @@ done:
   #print "\n"
 
   .pcc_begin_return
-  .return start_pos
-  .return replace_len
-  .return replace_str
+    .return start_pos
+    .return replace_len
+    .return replace_str
   .pcc_end_return
 
 .end

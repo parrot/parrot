@@ -16,9 +16,9 @@
   .local int start_pointer
   .local int iterator
 
-  .local PerlArray next_array
-  .local PerlArray string_array
-  .local PerlArray cooked_array
+  .local pmc next_array
+  .local pmc string_array
+  .local pmc cooked_array
 
 #
 # Given a replacement string and where to put it in the current chunk,

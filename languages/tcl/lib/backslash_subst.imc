@@ -97,7 +97,8 @@ bs_done:
   goto loop_outer
 
 my_end:
-  .return buffer
-  ret
+  .pcc_begin_return
+    .return buffer
+  .pcc_end_return
 
 .end

@@ -6,11 +6,11 @@
 # incr foo
 # incr foo offset
 
-.pcc_sub __cmd_incr prototyped
+.sub __cmd_incr prototyped
   .param PerlArray argv
   .include "lib/macros/debug.imc"
   .local int debug
-  debug = 0
+  debug = 1
 
   .local int value
   .local int increment 

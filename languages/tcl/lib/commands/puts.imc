@@ -2,7 +2,7 @@
 # [puts]
 # Copyright (c) 2002-2003 by William J. Coleda
 
-.pcc_sub __cmd_puts prototyped
+.sub __cmd_puts 
   .param PerlArray argv
 
   .local int argc 

@@ -29,15 +29,16 @@ print <<'EOF';
 #
 # Read in the contents of a file and parse it.
 
-.pcc_sub _main prototyped
-  .param var argv
+.sub _main 
+  .param PerlArray argv
 
+  .local string program_name
   .local string filename
   .local string mode
   .local string chunk
   .local string contents
-  .local PerlHash commands
-  .local sub command_sub
+  .local pmc    commands
+  .local pmc    command_sub
   .local int argc
 
   # If no file was specified, read from stdin.
@@ -47,7 +48,8 @@ print <<'EOF';
   goto loop 
 
 open_file: 
-  filename = argv[1]
+  shift program_name, argv
+  shift filename, argv
 
   $S1="<"  
   open $P1, filename, $S1
@@ -87,12 +89,7 @@ print <<'EOF';
 
   global "commands" = commands
 
-  .arg contents
-  saveall
-  call __parse
-  restoreall
-  .result $S0
-  #print $S0
+  $S0 = __parse( contents )
 
   # don't fall off the end of main, it's rude.
   end 

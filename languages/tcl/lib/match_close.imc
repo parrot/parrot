@@ -11,7 +11,7 @@
   .param string buffer
 
   .local int debug
-  debug=0
+  debug = 0
   .include "lib/macros/debug.imc"
 
   .local int opener
@@ -120,16 +120,21 @@ outer_done:
   $I1 = position - start_pos
   # off by two?
   inc $I1
-  .return $I1
-  ret
+  goto match_close_end
 
 die1:
   .debug("match_close:die1\n")
-  .return -1
-  ret
+  $I1 = -1
+  goto match_close_end
 
 die2:
   .debug("match_close:die2\n")
-  .return -2
-  ret
+  $I1 = -2
+  goto match_close_end
+
+match_close_end:
+  .pcc_begin_return
+    .return $I1
+  .pcc_end_return
+
 .end

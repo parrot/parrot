@@ -2,7 +2,7 @@
 # [rename]
 # Copyright (c) 2002-2003 by William J. Coleda
 
-.pcc_sub __cmd_rename prototyped
+.sub __cmd_rename 
   .param PerlArray argv
   
   .include "lib/macros/debug.imc"
@@ -14,7 +14,7 @@
 
   .local string oldName
   .local string newName
-  .local PerlHash commands
+  .local pmc commands
  
   if argc != 2 goto error
   oldName = argv[0]

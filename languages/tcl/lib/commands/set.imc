@@ -2,22 +2,23 @@
 # [set]
 # Copyright (c) 2002-2003 by William J. Coleda
 
-.pcc_sub __cmd_set prototyped
+.sub __cmd_set 
   .param PerlArray argv
-  
+
   .include "lib/macros/debug.imc"
   .local int debug
   debug = 0
 
   .local int argc 
   argc = argv
-
-  .local PerlString value
+  
+  .local pmc value
   .local string retval
  
   if argc == 0 goto error
 
   $S1 = argv[0] 
+
   if argc == 2 goto setting
   if argc == 1 goto getting
   if argc > 2 goto error
@@ -26,12 +27,12 @@ getting:
   find_lex $P1, $S1
   retval = $P1
   .debug("Trying to get value of: ")
-  .debug(S1)
+  .debug($S1)
   .debug("\n")
   goto done
 
 setting:
-  new value, .PerlString
+  value = new PerlString
   value = argv[1]
   .debug("Trying to save value of: ")
   .debug(value)
@@ -50,6 +51,6 @@ error:
 
 done:
   .pcc_begin_return
-  .return retval
+    .return retval
   .pcc_end_return
 .end

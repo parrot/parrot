@@ -5,12 +5,12 @@
 #
 # append var [...]
 
-.pcc_sub __cmd_append prototyped
+.sub __cmd_append 
   .param PerlArray argv
   
   .include "lib/macros/debug.imc"
   .local int debug
-  debug = 0
+  debug = 1
 
   .local int argc 
   argc = argv
@@ -48,6 +48,6 @@ error:
 
 done:
   .pcc_begin_return
-  .return value
+    .return value
   .pcc_end_return
 .end

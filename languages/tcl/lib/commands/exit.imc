@@ -2,7 +2,7 @@
 # [exit]
 # Copyright (c) 2002-2003 by William J. Coleda
 
-.pcc_sub __cmd_exit
+.sub __cmd_exit
   # we don't care about our arguments. just yet.
   end 
   
