@@ -43,7 +43,8 @@ main(int argc, char **argv) {
             argv[i-1] = argv[i];
         }
         argc--;
-    } else {
+    }
+    else {
         tracing = 0;
     }
 

@@ -24,7 +24,8 @@ void
 check_fingerprint(void) {
     if (Parrot_num_string_constants == 0) {
         fprintf(stderr, "Warning: Bytecode does not include opcode table fingerprint!\n");
-    } else {
+    }
+    else {
         const char * fp_data;
         IV           fp_len;
 
@@ -80,7 +81,8 @@ trace_op(IV * code_start, long code_size, IV *code) {
             fprintf(stderr, ")");
         }
         fprintf(stderr, "\n");
-    } else {
+    }
+    else {
         fprintf(stderr, "PC=%ld; OP=<err>\n", code - code_start);
     }
 }
@@ -139,7 +141,8 @@ runops (struct Parrot_Interp *interpreter, IV *code, IV code_size) {
 
     if (interpreter->flags & PARROT_TRACE_FLAG) {
         core = runops_trace_core;
-    } else {
+    }
+    else {
         core = runops_notrace_core;
     }
 
