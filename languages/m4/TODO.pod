@@ -12,7 +12,7 @@
 
 =over
 
-=item Modify 'output_is' such that GNU m4 is only test when available.
+=item Modify 'output_is' such that GNU m4 is only tested when available.
 
 =item Add tests for new features
 

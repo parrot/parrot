@@ -43,7 +43,9 @@ TODO: recognize nested quoted strings
   .local pmc regex
   .local string err
   err = repeat ' ', 500
-  .local int erroffset
+  .local pmc erroffset
+  erroffset = new PerlInt
+  erroffset = 0
   .local pmc NULL
   NULL = null
 
