@@ -53,8 +53,8 @@ Parrot_set_n_nc {
     }
     else {
         jit_emit_mov_ri_i(NATIVECODE, ISR1, &NUM_CONST[2]);
-        jit_emit_lfd(NATIVECODE, ISR1, 0, ISR1);
-        jit_emit_mov_mr_n(NATIVECODE, &NUM_REG[1], ISR1); 
+        jit_emit_lfd(NATIVECODE, FSR1, 0, ISR1);
+        jit_emit_mov_mr_n(NATIVECODE, &NUM_REG[1], FSR1); 
     }
 }
 

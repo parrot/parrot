@@ -36,7 +36,9 @@ typedef enum {
     r9,
     r10,
     r11,
+    ISR1 = r11,
     r12,
+    ISR2 = r12,
     r13,
     r14,
     r15,
@@ -60,6 +62,7 @@ typedef enum {
 
 typedef enum {
     f0,
+    FSR1 = f0,
     f1,
     f2,
     f3,
@@ -73,6 +76,7 @@ typedef enum {
     f11,
     f12,
     f13,
+    FSR2 = f13, 
     f14,
     f15,
     f16,
@@ -97,10 +101,6 @@ typedef enum {
 
 /* Scratch registers. */
 
-#  define ISR1 r12
-#  define ISR2 r11
-#  define FSR1 f12
-#  define FSR2 f11
 
 enum { JIT_PPC_CALL, JIT_PPC_BRANCH, JIT_PPC_UBRANCH };
 
@@ -579,12 +579,12 @@ jit_emit_bx(Parrot_jit_info_t *jit_info, char type, opcode_t disp)
     jit_emit_add_rrr(pc, D, r15, ISR1)
 
 #  define jit_emit_load_op_map(pc) \
-    jit_emit_lwz(pc, ISR1, offsetof(Interp, jit_info), r13); \
+    jit_emit_lwz(pc, ISR1, offsetof(Interp, jit_info), r16); \
     jit_emit_lwz(pc, r14, (offsetof(Parrot_jit_arena_t, op_map) + \
                            offsetof(Parrot_jit_info_t, arena)), ISR1)
 
 #  define jit_emit_load_code_start(pc) \
-    jit_emit_lwz(pc, ISR1, offsetof(Interp, code), r13); \
+    jit_emit_lwz(pc, ISR1, offsetof(Interp, code), r16); \
     jit_emit_lwz(pc, r15,  offsetof(struct PackFile, byte_code), ISR1)
 
 #  define jit_emit_branch_to_opcode(pc, D) \
@@ -607,11 +607,22 @@ jit_emit_bx(Parrot_jit_info_t *jit_info, char type, opcode_t disp)
 
 #endif /* JIT_EMIT */
 
+/*
+ * r13 - r31 are preserved i.e. 19 GPRs
+ */
 #define PPC_JIT_REGISTER_SAVE_SPACE (4*19)
+/*
+ * 24 linkage area
+ * 32 param area i.e.enough for 8 args
+ * 12 round up so that sum is divisible by 16
+ */
 #define PPC_JIT_FRAME_SIZE (PPC_JIT_REGISTER_SAVE_SPACE + 68)
 
 #if JIT_EMIT == 2
-
+/*
+ * emit stack frame according to ABI
+ * see also jit/ppc/core.jit for Parrot_end
+ */ 
 void
 Parrot_jit_begin(Parrot_jit_info_t *jit_info,
                  Interp * interpreter)
@@ -621,7 +632,8 @@ Parrot_jit_begin(Parrot_jit_info_t *jit_info,
     jit_emit_stw(jit_info->native_ptr, r0, 8, r1);
     jit_emit_stwu(jit_info->native_ptr, r1, -PPC_JIT_FRAME_SIZE, r1);
     jit_emit_xor_rrr(jit_info->native_ptr, r31, r31, r31);
-    jit_emit_mov_rr(jit_info->native_ptr, r13, r3);
+    jit_emit_mov_rr(jit_info->native_ptr, r16, r3);  /* interp */
+    jit_emit_mov_rr(jit_info->native_ptr, r13, r3);  /* fp */
     if (!jit_info->objfile) {
         jit_emit_load_op_map(jit_info->native_ptr);
     }
@@ -649,7 +661,7 @@ Parrot_jit_normal_op(Parrot_jit_info_t *jit_info,
 {
     add_disp(jit_info->native_ptr, r3,
         ((long)jit_info->cur_op - (long)interpreter->code->byte_code));
-    jit_emit_mov_rr(jit_info->native_ptr, r4, r13);
+    jit_emit_mov_rr(jit_info->native_ptr, r4, r16); /* interp */
 
     /*
     Parrot_jit_newfixup(jit_info);
@@ -815,35 +827,55 @@ Parrot_jit_emit_mov_rm_n(Interp * interpreter, int reg,char *mem)
 
 #  define REQUIRES_CONSTANT_POOL 0
 #  ifdef PARROT_EXEC_OS_AIX
-#    define INT_REGISTERS_TO_MAP 23
+#    define INT_REGISTERS_TO_MAP 22
 #  else
-#    define INT_REGISTERS_TO_MAP 24
+#    define INT_REGISTERS_TO_MAP 23
 #  endif
-#  define FLOAT_REGISTERS_TO_MAP 29
+#  define FLOAT_REGISTERS_TO_MAP 12
 
-/* Reserved:
- * r13 interpreter
+/* 
+ * Register usage
+ * r0  special rA/0 not allocatable, not usable as ISR1
+ * r1  SP
+ * r2 TOC (AIX only) / allocated
+ * r3 - r10 allocated
+ * r11 ISR1
+ * r12 ISR2 
+ * r13 Parrot register frame pointer - now interpreter
  * r14 op_map
  * r15 code_start
+ * r16 interpreter
+ * r17 - r30 allocated
  * r31 zero
- * r2 TOC (AIX only)
+ *
+ * f0  FSR1
+ * f1 - f12 allocated
+ * f13 FSR2
+ * f14 - f31 - unused, need preserving if allocated
  */
+
 
 #ifndef JIT_IMCC
 char intval_map[INT_REGISTERS_TO_MAP] =
 
-    { r16, r17, r18, r19, r20, r21, r22, r23,
+    { r17, r18, r19, r20, r21, r22, r23,
       r24, r25, r26, r27, r28, r29, r30,
 #  ifndef PARROT_EXEC_OS_AIX
       /* AIX calling convention reserves r2 */
       r2,
 #  endif
       r3, r4, r5, r6, r7, r8, r9, r10 };
-
+/*
+ * f14 - f31 are not preserved currently
+ * f1  - f11 are usable without preserving
+ */
 char floatval_map[FLOAT_REGISTERS_TO_MAP] =
-    { r13, r14, r15, r16, r17, r18, r19, r20, r21,
-      r22, r23, r24, r25, r26, r27, r28, r29, r30,
-      r31, r1, r2, r3, r4, r5, r6, r7, r8, r9, r10 };
+    { 
+      f1, f2, f3, f4, f5, f6, f7, f8, f9, f10, f11, f12
+      /* not currently saved - so don't use */     
+      /* f14, f15, f16, f17, f18, f19, f20, f21,
+      f22, f23, f24, f25, f26, f27, f28, f29, f30, f31 */ 
+    };
 
 void ppc_flush_line(char *_sync);
 void ppc_sync(void);

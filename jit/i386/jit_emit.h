@@ -2855,7 +2855,8 @@ count_regs(char *sig, char *sig_start)
     return first_reg;
 }
 /*
- * TODO if this is called from an JITed op it has to use MAPs
+ * TODO the interpreter at runtime is at 8(%ebp) - use it
+ * for register addressing and an "I" signature
  */
 void *
 Parrot_jit_build_call_func(Interp *interpreter, PMC *pmc_nci,
