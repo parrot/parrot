@@ -4,18 +4,16 @@
 .namespace [ "Tcl" ]
 
 .sub _while
-  .local pmc argv 
-  argv = foldup
- 
-  .local int argc 
-  argc = argv
+  .param pmc cond_p
+  .param pmc body_p
+
+  .local pmc retval
+  retval = new PerlString
 
   # XXX no bad arg handling...
 
   .local string code
   .local string condition
-  .local pmc retval
-  retval = new PerlString
 
   .local pmc parsed_code
   .local int return_type
@@ -29,11 +27,11 @@
   expression = find_global "_Tcl", "__expression"
   expr_boolean = find_global "_Tcl", "__expr_boolean"
 
-  condition = argv[0]
-  code = argv[1]
+  condition = cond_p
+  code = body_p
 
 while_loop:
-  parsed_code = parse(code,0)
+  parsed_code = parse(code,0,0)
   $P0 = expression(condition)
   # XXX Happy case - expression could have failed.
   $S0 = $P0[1]

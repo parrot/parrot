@@ -4,13 +4,12 @@
 .namespace [ "Tcl" ]
 
 .sub _for
-  .local pmc argv 
-  argv = foldup
- 
-  .local int argc 
-  argc = argv
+  .param pmc start_p
+  .param pmc test_p
+  .param pmc next_p
+  .param pmc body_p
 
-  # XXX no bad arg handling...
+  if I3 != 4 goto bad_args
 
   .local string start
   .local string test
@@ -19,9 +18,11 @@
   .local pmc start_parsed
   .local pmc next_parsed
   .local pmc body_parsed
+  .local pmc retval
+  retval = new PerlString
   .local int return_type
 
-  .local pmc joe
+  .local pmc joe # just a placeholder, not saved.
 
   .local pmc parse
   .local pmc interpret
@@ -32,15 +33,15 @@
   expression = find_global "_Tcl", "__expression"
   expr_boolean = find_global "_Tcl", "__expr_boolean"
 
-  start = argv[0]
-  test  = argv[1]
-  next  = argv[2]
-  body  = argv[3]
+  start = start_p
+  test  = test_p
+  next  = next_p
+  body  = body_p
 
   # Parse the bits that are code.
-  start_parsed = parse(start,0)
-  next_parsed  = parse(next,0)
-  body_parsed  = parse(body,0)
+  start_parsed = parse(start,0,0)
+  next_parsed  = parse(next,0,0)
+  body_parsed  = parse(body,0,0)
 
   # first, execute start.
   (return_type,joe) = interpret(start_parsed)
@@ -62,19 +63,21 @@ continue:
   $S0 = $P0[1]
   $I0 = expr_boolean($S0)
   if $I0 == 1 goto for_loop
+  goto done
+
+bad_args:
+  retval = "wrong # args: should be \"for start test next command\"\n"
+  return_type = TCL_ERROR
+  goto done_cleansed
 
 done:
+  retval = ""
   # Propogate an error out, but not a break or continue.
   if return_type == TCL_RETURN goto done_cleansed
   if return_type == TCL_ERROR goto done_cleansed
   return_type = TCL_OK
 
 done_cleansed:
-  # for always returns "", regardless of the code it may have executed
-
-  .local pmc retval
-  retval = new PerlString
-  retval = ""
   .pcc_begin_return
     .return return_type
     .return retval

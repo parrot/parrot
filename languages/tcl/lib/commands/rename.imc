@@ -4,11 +4,10 @@
 .namespace [ "Tcl" ]
 
 .sub _rename
-  .local pmc argv 
-  argv = foldup
+  .param pmc old_p
+  .param pmc new_p
 
-  .local int argc 
-  argc = argv
+  if I3 != 2 goto error
 
   .local int return_type
   .local pmc retval
@@ -21,9 +20,8 @@
   .local string newName
   .local pmc commands
  
-  if argc != 2 goto error
-  oldName = argv[0]
-  newName = argv[1]
+  oldName = old_p
+  newName = new_p
 
   oldName = "_" . oldName 
   newName = "_" . newName 

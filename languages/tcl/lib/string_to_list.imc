@@ -14,7 +14,7 @@
  
   .local pmc parsed_str
 
-  parsed_str = __parse(str,0)
+  parsed_str = __parse(str,0,1)
   
   $I0 = parsed_str
   if $I0 == 0 goto done

@@ -40,7 +40,7 @@ run:
   script = argv[0]
 
   # is it cheating to parse it here?
-  $P1 = parse(script,0)
+  $P1 = parse(script,0,0)
 
   time $N1 
   $I1 = count

@@ -45,7 +45,7 @@ providing a compreg-compatible method.
 
   # Load any dependant libraries.
   load_bytecode "languages/tcl/lib/tclword.pbc"
-  load_bytecode "library/Data/Escape.imc"
+  load_bytecode "runtime/parrot/library/Data/Escape.pbc"
 
   .local string mode
   .local string chunk
@@ -201,7 +201,7 @@ providing a compreg-compatible method.
   pir_code = ".namespace [ \"_Tcl\" ]\n.sub _throwaway_sub\n.local string code\ncode = \""
   tcl_code = escaper(tcl_code,"\"")
   pir_code .= tcl_code
-  pir_code .= "\"\n.local pmc tcl_parse\n.local pmc tcl_interpret\ntcl_parse = find_global \"_Tcl\", \"__parse\"\ntcl_interpret = find_global \"_Tcl\", \"__interpret\"\n$P1 = tcl_parse(code)\n($I0,$P3) = tcl_interpret($P1)\n.pcc_begin_return\n .return $I0\n .return $P3\n .pcc_end_return\n .end\n"
+  pir_code .= "\"\n.local pmc tcl_parse\n.local pmc tcl_interpret\ntcl_parse = find_global \"_Tcl\", \"__parse\"\ntcl_interpret = find_global \"_Tcl\", \"__interpret\"\n$P1 = tcl_parse(code,0,0)\n($I0,$P3) = tcl_interpret($P1)\n.pcc_begin_return\n .return $I0\n .return $P3\n .pcc_end_return\n .end\n"
 
   .local pmc compiled_sub
   compiled_sub = compile pir_compiler, pir_code

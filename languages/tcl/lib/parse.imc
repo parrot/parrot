@@ -15,6 +15,7 @@ word, and whitespace encountered here is added into the string.
 .sub __parse
   .param string buffer
   .param int preserve_whitespace
+  .param int block_interpolation
 
   #print "BUFFER="
   #print buffer
@@ -147,12 +148,15 @@ middle_word_2:
   # If we've gotten this far and we're in a "" or {} block, barf.
   if end_of_word == 1 goto invalid_word
 
+
   # [ ] 
+  if block_interpolation goto check_bs
   if character == 91 goto handle_command_block
 
   # $
   if character == 36 goto handle_variable
- 
+
+check_bs: 
   # \
   if character == 92 goto handle_backslash
 
@@ -271,7 +275,7 @@ handle_quote:
   dec word_length
   dec word_length
   $S0 = substr buffer, start_word, word_length
-  $P0 = __parse($S0,1)
+  $P0 = __parse($S0,1,0)
   word.concat_words( $P0 )
   start_word = $I1
   word_length = 0

@@ -7,13 +7,11 @@ Create a PIR sub on the fly for this user defined proc.
 .namespace [ "Tcl" ]
 
 .sub _proc
-  .local pmc argv 
-  argv = foldup
+  .param pmc name_p
+  .param pmc args_p
+  .param pmc body_p
 
-  .local int argc 
-  argc = argv
-
-  if argc != 3 goto error
+  if I3 != 3 goto error
 
   .local int return_type
   .local pmc retval
@@ -30,16 +28,16 @@ Create a PIR sub on the fly for this user defined proc.
   .local string args
   .local string body
 
-  name = argv[0]
-  args = argv[1]
-  body = argv[2]
+  name = name_p
+  args = args_p
+  body = body_p
 
   .local pmc arg_list
   arg_list = string2list(args)
 
   # Save the parsed body.
   .local pmc parsed_body
-  parsed_body = parse(body,0)
+  parsed_body = parse(body,0,0)
 
   # XXX these need to go away - for now, we'll just escape
   # the code portion and put it, escaped, into the proc 

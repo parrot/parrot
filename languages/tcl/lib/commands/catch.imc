@@ -23,7 +23,7 @@
   if argc == 0 goto badargs
   if argc  > 2 goto badargs
   code = argv[0]
-  $P1 = parse(code,0)
+  $P1 = parse(code,0,0)
   # ignoring $P0 here.
   ($I0,$P0) = interpret($P1)
   retval = new PerlInt
@@ -32,7 +32,15 @@
   if argc==1 goto done
   # XXX This should probably use the "set" command for better
   # error handling on bad var names.
-  
+
+  #.local pmc set_sub
+  #.local int set_return_type
+  #.local pmc set_retval
+  #set_sub = find_global "Tcl", "_set"
+  #(set_return_type,set_retval) = set_sub(varname,$P0)
+  #if set_return_type != TCL_OK goto done
+  #return_type = TCL_OK
+ 
   varname = argv[1]
   store_lex -1, varname, $P0
   goto done

@@ -46,7 +46,7 @@ loop:
   goto loop
 
 gotfile:
-  $P1 = parse(contents,0)
+  $P1 = parse(contents,0,0)
   (code,retval) = interpret($P1)
   goto done
  

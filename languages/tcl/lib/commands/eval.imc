@@ -35,7 +35,7 @@ loop:
 
 loop_done:
  
-  $P1 = parse(expr,0)
+  $P1 = parse(expr,0,0)
   ($I0,$P0) = interpret($P1) 
 
 done:

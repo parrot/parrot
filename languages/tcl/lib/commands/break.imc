@@ -4,17 +4,11 @@
 .namespace [ "Tcl" ]
 
 .sub _break
-  .local pmc argv
-  argv = foldup 
-
-  .local int argc 
-  argc = argv
-
   .local int return_type
 
   .local pmc retval
   retval = new PerlString
-  if argc == 0 goto noargs
+  if I3 == 0 goto noargs
 
   return_type = TCL_ERROR
   retval = "wrong # args: should be \"break\"\n"

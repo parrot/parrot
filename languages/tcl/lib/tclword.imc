@@ -218,12 +218,10 @@ later interpretation.
   .local pmc chunk
   .local pmc chunks
   .local pmc parsed_cmd
+  .local pmc parser 
 
-  # XXX I'd really rather not have to lug around another global
-  #     to call 
-
-  $P1 = find_global "_Tcl", "__parse"
-  parsed_cmd  = $P1(cmd)
+  parser = find_global "_Tcl", "__parse"
+  parsed_cmd  = parser(cmd,0,0)
 
   chunk = new PerlArray
   chunk[0] = 2

@@ -102,7 +102,7 @@ done:
   #print "CODE='"
   #print code
   #print "'\n"
-  $P1 = parse(code,0)
+  $P1 = parse(code,0,0)
   (return_type,retval) = interpret($P1)
 
   .pcc_begin_return
