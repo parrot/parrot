@@ -193,6 +193,21 @@ pmclass Null {
         return (PMC*)0;
     }
 
+    void* get_pointer () {
+        internal_exception(NULL_REG_ACCESS, "Fatal exception: Null PMC access (PMC::get_pointer)!\n");
+        return (void*)0;
+    }
+
+    void* get_pointer_keyed (PMC* key) {
+        internal_exception(NULL_REG_ACCESS, "Fatal exception: Null PMC access (PMC::get_pointer_keyed)!\n");
+        return (void*)0;
+    }
+
+    void* get_pointer_keyed_int (INTVAL key) {
+        internal_exception(NULL_REG_ACCESS, "Fatal exception: Null PMC access (PMC::get_pointer_keyed_int)!\n");
+        return (void*)0;
+    }
+
     void set_integer (PMC* value) {
         internal_exception(NULL_REG_ACCESS, "Fatal exception: Null PMC access (PMC::set_integer)!\n");
     }
@@ -295,6 +310,18 @@ pmclass Null {
 
     void set_pmc_keyed_int (INTVAL key, PMC* value) {
         internal_exception(NULL_REG_ACCESS, "Fatal exception: Null PMC access (PMC::set_pmc_keyed_int)!\n");
+    }
+
+    void set_pointer (void* value) {
+        internal_exception(NULL_REG_ACCESS, "Fatal exception: Null PMC access (PMC::set_pointer)!\n");
+    }
+
+    void set_pointer_keyed (PMC* key, void* value) {
+        internal_exception(NULL_REG_ACCESS, "Fatal exception: Null PMC access (PMC::set_pointer_keyed)!\n");
+    }
+
+    void set_pointer_keyed_int (INTVAL key, void* value) {
+        internal_exception(NULL_REG_ACCESS, "Fatal exception: Null PMC access (PMC::set_pointer_keyed_int)!\n");
     }
 
     void set_same (PMC* value) {
