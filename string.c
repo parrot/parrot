@@ -1229,10 +1229,11 @@ string_to_cstring(struct Parrot_Interp * interpreter, STRING * s)
      * the real solution WRT leak is this:
      * the caller of this function has to free this cstring that's all
      */
+    char *p;
     if (s == NULL) {
         return NULL;
     }
-    char *p = malloc(s->bufused + 1);
+    p = malloc(s->bufused + 1);
     memcpy(p, s->strstart, s->bufused);
     p[s->bufused] = 0;
     return p;
