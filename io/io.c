@@ -411,8 +411,12 @@ ParrotIO * PIO_open(theINTERP, const char * spath, const char * sflags) {
         while(l) {
                 if(l->api->Open) {
                         io = (*l->api->Open)(interpreter, l, spath, flags);
-                        io->stack = GET_INTERP_IO(interpreter);
-                        return io;
+                        if(io) {
+                                io->stack = GET_INTERP_IO(interpreter);
+                                return io;
+                        } else {
+                                return NULL;
+                        }
                 }
                 l = PIO_DOWNLAYER(l);
         }

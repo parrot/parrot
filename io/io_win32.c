@@ -60,26 +60,21 @@ UINTVAL flags_to_win32(UINTVAL flags, DWORD * fdwAccess,
                         DWORD * fdwShareMode, DWORD * fdwCreate) {
         if((flags&(PIO_F_WRITE|PIO_F_READ)) == (PIO_F_WRITE|PIO_F_READ)) {
                 *fdwAccess = GENERIC_WRITE|GENERIC_READ;
-                *fdwCreate = OPEN_ALWAYS|CREATE_ALWAYS; 
+                *fdwCreate = CREATE_ALWAYS; 
         } else if(flags & PIO_F_WRITE) {
                 *fdwAccess = GENERIC_WRITE;
-                *fdwCreate = OPEN_ALWAYS|CREATE_ALWAYS; 
+                *fdwCreate = CREATE_ALWAYS; 
         } else if(flags & PIO_F_READ) {
                 *fdwAccess = GENERIC_READ;
-                *fdwCreate = OPEN_ALWAYS|CREATE_ALWAYS; 
+                *fdwCreate = OPEN_EXISTING; 
         }
 
-        /* Temporary */
-        *fdwShareMode = 0;
-
-        if((flags & PIO_F_TRUNC) && (flags & PIO_F_WRITE))
+        *fdwShareMode = FILE_SHARE_READ;
+        if((flags & PIO_F_TRUNC) && (flags & PIO_F_WRITE) &&
+                (*fdwCreate & CREATE_ALWAYS) == 0)
                 *fdwCreate |= TRUNCATE_EXISTING;
         else if(flags & PIO_F_APPEND) {
-                /* FIXME - I don't think Win32 has an O_APPEND
-                 * so just open then seek to end.
-                 */
         }
-
         return 1;
 }
 
@@ -117,29 +112,37 @@ INTVAL PIO_win32_getblksize(PIOHANDLE fd) {
 
 ParrotIO * PIO_win32_open(theINTERP, ParrotIOLayer * layer,
 			const char * spath, UINTVAL flags) {
+        ParrotIO * io;
         int type;
         DWORD fAcc, fShare, fCreat;
+        PIOHANDLE fd;
         type = PIO_TYPE_FILE;
 #if 0
         if((interpreter->flags & PARROT_DEBUG_FLAG) != 0) {
-                fprintf(stderr, "PIO_win32_open: %s, %s\n",
-                                spath, modeptr);
+                fprintf(stderr, "PIO_win32_open: %s\n", spath);
         }
 #endif
-        if( (flags & (PIO_F_WRITE|PIO_F_READ)) == 0 )
+        if((flags & (PIO_F_WRITE|PIO_F_READ)) == 0)
                 return (ParrotIO *)NULL;
 
         /* Set open flags - <, >, >>, +<, +> */
         /* add ? and ! for block/non-block */
-        if( flags_to_win32(flags, &fAcc, &fShare, &fCreat) < 0 )
+        if(flags_to_win32(flags, &fAcc, &fShare, &fCreat) < 0)
                 return (ParrotIO *)NULL;
 
         /* Only files for now */
         flags |= PIO_F_FILE;
 
-        /* Try open with no create first */
-       
-        /* FIXME: Unfinished */ 
+        fd = CreateFile(spath, fAcc, 0, NULL, fCreat, FILE_ATTRIBUTE_NORMAL, NULL);
+        if(fd != INVALID_HANDLE_VALUE) {
+                io = PIO_new(interpreter, NULL, type, flags, 0);
+                io->fd = fd;
+                return io;
+        }
+        else {
+                int err = GetLastError();
+        }
+        
         return (ParrotIO *)NULL;
 }
 
@@ -201,9 +204,8 @@ size_t PIO_win32_read(theINTERP, ParrotIOLayer * layer, ParrotIO * io,
 
 size_t PIO_win32_write(theINTERP, ParrotIOLayer * layer, ParrotIO * io,
 			const void * buffer, size_t len) {
-        LPCTSTR msg;
         DWORD countwrote = 0;
-        if(WriteFile(io->fd, (LPCSTR)buffer, (DWORD)len, &countwrote, NULL))
+        if(io && WriteFile(io->fd, (LPCSTR)buffer, (DWORD)len, &countwrote, NULL))
                 return countwrote;
         /* FIXME: Set error flag */
         return -1;
