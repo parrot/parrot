@@ -536,7 +536,7 @@ sub patch_version
 {
   my $self = shift;
 
-  $self->{VERSION} =~ m/^\d+\.\d+\.(.*)$/;
+  $self->{VERSION} =~ m/^\d+\.\d+\.(.d+)$/;
 
   return $1;
 }
