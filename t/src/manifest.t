@@ -26,7 +26,11 @@ my $ignore_re = qr,(?:   \.cvsignore $ ),x;
 ok (-e $ExtUtils::Manifest::MANIFEST, 'MANIFEST exists');
 
 $ExtUtils::Manifest::Quiet = 1;
-ok (!ExtUtils::Manifest::manicheck (), 'manicheck ()');
+my @missing = ExtUtils::Manifest::manicheck ();
+unless (ok (!@missing, 'manicheck ()')) {
+  print "# Missing files:\n";
+  print "# $_\n" foreach @missing;
+}
 
 sub scan_cvs;
 sub list_diff (\@\@);
