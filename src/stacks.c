@@ -52,7 +52,7 @@ stack_entry(struct Parrot_Interp *interpreter, Stack stack, INTVAL depth)
         chunk = chunk->prev;
     }
 
-    if (depth > chunk->used) return NULL;
+    if (depth >= chunk->used) return NULL;
 
     return &chunk->entry[chunk->used - depth - 1];
 }
@@ -228,6 +228,7 @@ void *
 stack_peek(struct Parrot_Interp *interpreter, Stack stack, INTVAL* type)
 {
     Stack_Entry entry = stack_entry(interpreter, stack, 0);
+    if (entry == NULL) return NULL;
     if (type != NULL) *type = entry->entry_type;
     return entry->entry.generic_pointer;
 }
