@@ -29,6 +29,7 @@ new_stack(Interp *interpreter)
     stack->used = 0;
     stack->next = stack;
     stack->prev = stack;
+    stack->buffer = NULL;
     stack->buffer = new_buffer_header(interpreter);
     Parrot_allocate(interpreter, stack->buffer,
                     sizeof(Stack_entry) * STACK_CHUNK_DEPTH);
