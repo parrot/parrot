@@ -34,6 +34,16 @@ Parrot_STRING Parrot_PMC_get_string(Parrot_INTERP interp, Parrot_PMC pmc) {
   return VTABLE_get_string(interp, pmc);
 }
 
+/*=for api extend Parrot_PMC_get_pointer
+ *
+ * Returns a pointer. Used for PMCs that hold pointers to arbitrary data
+ * PMC.
+ */
+
+void *Parrot_PMC_get_pointer(Parrot_INTERP interp, Parrot_PMC pmc) {
+    return VTABLE_get_pointer(interp, pmc);
+}
+
 /*=for api extend Parrot_PMC_get_intval
  *
  * Return the signed integer value of the value in the PMC
@@ -93,6 +103,14 @@ char *Parrot_PMC_get_cstringn(Parrot_INTERP interp, Parrot_PMC pmc, Parrot_Int *
  */
 void Parrot_PMC_set_string(Parrot_INTERP interp, Parrot_PMC pmc, Parrot_STRING value) {
     VTABLE_set_string_native(interp, pmc, value);
+}
+
+/*=for api extend Parrot_PMC_set_pointer
+ *
+ * Assign the passed-in pointer to the passed-in PMC
+ */
+void Parrot_PMC_set_pointer(Parrot_INTERP interp, Parrot_PMC pmc, void *value) {
+    VTABLE_set_pointer(interp, pmc, value);
 }
 
 /*=for api extend Parrot_PMC_set_intval
