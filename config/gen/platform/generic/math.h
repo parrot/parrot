@@ -5,10 +5,14 @@
 
 #ifdef __GNUC__
 
-#  define __USE_ISOC9X 1
 /* for math.h */
+#  define __USE_ISOC9X 1
 
-#  define Parrot_is_nzero(x) ((x) == 0.0 && signbit(x))
+#  ifdef signbit
+#    define Parrot_is_nzero(x) ((x) == 0.0 && signbit(x))
+#  else
+#    define Parrot_is_nzero(x) ((x) == copysign(0.0, -1.0))
+#  endif
 
 #else
 
