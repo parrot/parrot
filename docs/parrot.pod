@@ -1,0 +1,80 @@
+# This file is in POD format; if you're not used to reading POD,
+# you can run the file through "perldoc" for a plain text version.
+
+=head1 The Parrot Bytecode Interpreter
+
+Parrot is a common bytecode format and interpreter for dynamic
+languages; it is designed to run Perl 6 code efficiently, but 
+is intended to be language-agnostic. 
+
+=head2 Documentation
+
+The Parrot documentation is spread across the following files:
+
+=over 3
+
+=item F<intro.pod>
+
+An introductory article on what Parrot is and how to do some
+interesting things with it.
+
+=item F<overview.pod>
+
+An overview of the Parrot architecture and design.
+
+=item F<core_ops.pod>
+
+A description of the core operations in the Parrot assembly language.
+
+=item F<parrot_assembly.pod>
+
+The master list of Parrot assembly operations; not all of these have
+been implemented, so you should stick to F<core_ops> when writing
+your assembly programs.
+
+=item F<vtables.pod>
+
+Describes what PMCs are and how they work.
+
+=item F<parrotbyte.pod>
+
+The Parrot bytecode format.
+
+=item F<packfile-perl.pod>, F<packfile-c.pod>
+
+The APIs for accessing packed bytecode files (packfiles) from Perl
+and C. 
+
+=item F<strings.pod>
+
+A description of the string implementation.
+
+=item F<tests.pod>
+
+Hints on writing tests for the Parrot interpreter.
+
+=back
+
+=head2 Supported Platforms
+
+Parrot compiles and runs on a large number of platforms, including
+all common ones. The Parrot team is committed to supporting the 
+following combinations as "core platforms": Linux (x86), CygWin,
+Win32, Tru64, OpenVMS (Alpha), Solaris (Sparc), FreeBSD (x86).
+
+=head2 Authors
+
+Parrot is developed and maintained by the members of the
+C<perl6-internals@perl.org> mailing list. Dan Sugalski
+(C<dan@sidhe.org>) is the chief architect, and Simon Cozens
+(C<simon@netthink.co.uk>) is the current release manager.
+
+=head2 Web pages
+
+See
+
+    http://dev.perl.org/
+    http://cvs.perl.org/
+    http://www.parrotcode.org/
+
+for more information.

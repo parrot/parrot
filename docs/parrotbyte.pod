@@ -1,7 +1,137 @@
+=head1 Format of the Parrot bytecode
 
-=head1 The Parrot Byte Code / Pack File Format
+  0
+  +----------+----------+----------+----------+
+  |         Parrot Magic = 0x 13155a1         |
+  +----------+----------+----------+----------+
+  
+  For each segment:
 
-See the documentation for Parrot::PackFile (duplicated as L<packfile-perl>).
+  4, 4 + (4 + S0), 4 + (4 + S0) + (4 + S1)
+  +----------+----------+----------+----------+
+  |       Segment length in bytes (S)         |
+  +----------+----------+----------+----------+
+  |                                           |
+  :        S bytes of segment content         :
+  |                                           |
+  +----------+----------+----------+----------+
 
-Also, for the C API, see L<packfile-c>.
+Currently there are three segment types defined, and they must occur
+in precisely the order: FIXUP, CONSTANT TABLE, BYTE CODE. Every
+segment must be present, even if empty.
 
+
+=head2 FIXUP SEGMENT
+
+  << The format for the FIXUP segment is not yet defined. >>
+
+
+=head2 CONSTANT TABLE SEGMENT
+
+  0 (relative)
+  +----------+----------+----------+----------+
+  |            Constant Count (N)             |
+  +----------+----------+----------+----------+
+
+For each constant:
+
+  +----------+----------+----------+----------+
+  |             Constant Type (T)             |
+  +----------+----------+----------+----------+
+  |             Constant Size (S)             |
+  +----------+----------+----------+----------+
+  |                                           |
+  |        S bytes of constant content        |
+  :       appropriate for representing        :
+  |              a value of type T            |
+  |                                           |
+  +----------+----------+----------+----------+
+
+
+=head2 CONSTANTS
+
+For integer constants:
+
+  << integer constants are represented as manifest constants in
+     the byte code stream currently, limiting them to 32 bit values. >>
+
+For number constants (S is constant, and is equal to C<sizeof(FLOATVAL)>):
+
+  +----------+----------+----------+----------+
+  |                                           |
+  |             S' bytes of Data              |
+  |                                           |
+  +----------+----------+----------+----------+
+
+where
+
+  S' = S + (S % 4) ? (4 - (S % 4)) : 0
+
+If S' E<gt> S, then the extra bytes are filled with zeros.
+ 
+
+For string constants (S varies, and is the size of the particular string):
+
+  4, 4 + (16 + S'0), 4 + (16 + S'0) + (16 + S'1)
+  +----------+----------+----------+----------+
+  |                   Flags                   |
+  +----------+----------+----------+----------+
+  |                  Encoding                 |
+  +----------+----------+----------+----------+
+  |                   Type                    |
+  +----------+----------+----------+----------+
+  |                  Size (S)                 |
+  +----------+----------+----------+----------+
+  |                                           |
+  :             S' bytes of Data              :
+  |                                           |
+  +----------+----------+----------+----------+
+
+where
+
+  S' = S + (S % 4) ? (4 - (S % 4)) : 0
+
+If S' E<gt> S, then the extra bytes are filled with zeros.
+ 
+
+=head2 BYTE CODE SEGMENT
+
+The pieces that can be found in the byte code segment are as
+follows:
+
+  +----------+----------+----------+----------+
+  |              Operation Code               |
+  +----------+----------+----------+----------+
+
+  +----------+----------+----------+----------+
+  |             Register Argument             |
+  +----------+----------+----------+----------+
+
+  +----------+----------+----------+----------+
+  |    Integer Argument (Manifest Constant)   |
+  +----------+----------+----------+----------+
+
+  +----------+----------+----------+----------+
+  |   String Argument (Constant Table Index)  |
+  +----------+----------+----------+----------+
+
+  +----------+----------+----------+----------+
+  |   Number Argument (Constant Table Index)  |
+  +----------+----------+----------+----------+
+
+The number and types for each argument can be determined by
+consulting Parrot::Opcode.
+
+
+=head2 SOURCE CODE SEGMENT
+
+Currently there are no utilities that use this segment, even
+though it is mentioned in some of the early Parrot documents.
+
+Eventually there will be a more complete and useful PackFile
+specification, but this simple format works well enough for
+now (c. Parrot 0.0.2).
+
+=head1 AUTHOR
+
+Gregor N. Purdy E<lt>gregor@focusresearch.comE<gt>

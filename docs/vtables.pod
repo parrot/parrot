@@ -77,12 +77,13 @@ You should almost always start by running F<genclass.pl> found in the
 F<classes/> subdirectory to generate a skeleton for the class. Let's
 generate a number type for the beautifully non-existant Fooby language:
 
-    perl -I.. genclass.pl FoobyNumber > foobynumber.c
+    perl -I.. genclass.pl FoobyNumber > foobynumber.pmc
 
-This will produce a C file with stubs for all the methods you need to
-fill in; the final function in the file, C<Parrot_FoobyNumber_init>,
-allows you to set up anything you need to set up, and creates the
-vtable structure containing all the methods.
+This will produce a skeleton C file (to be preprocessed by the
+F<pmc2c.pl> program) with stubs for all the methods you need to fill in;
+the final function in the file, C<Parrot_FoobyNumber_init>, allows you
+to set up anything you need to set up, and creates the vtable structure
+containing all the methods.
 
 Now you'll have to do something a little different depending on whether
 you're writing a built-in class or an extension class. If you're writing
@@ -127,19 +128,163 @@ One slightly (potentially) tricky element of implementing vtables
 is that several of the vtable functions have variant forms depending on
 the type of data that they're being called with.
 
-Typical vtable dispatch for these "multimethod" forms will look like
-this:
+For instance, the C<set_integer> method has multiple forms; the
+default C<set_integer> means that you are being called with a PMC,
+and you should probably use the C<get_integer> method of the PMC to
+find its integer value; C<set_integer_native> means you're being passed
+an C<INTVAL> and C<set_integer_bigint> is for when you receive a
+C<BIGINT> structure. The final form is slightly special; if the
+interpreter calls C<set_integer_same>, you know that the PMC that you
+are being passed is of the same type as you. Hence, you can break the
+class abstraction to save a couple of dereferences - if you want to.
 
-        ($2->vtable->add[$3->vtable->num_type])(interpreter, $1, $2,$3);
-
-And this is where the C<num_type>, C<float_type>, and C<string_type>
-fields of the vtable structure fit in.
-
-  int_type: 0, 1, 2, 3 for "same as you", native int, bigint, object
-  float_type: 0, 1, 2, 3 for "same as you", native float, bigfloat, object
-  num_type: 0, 1, 2, 3, 4, 5 for "same as you", native int, bigint, native float, bigfloat, object
-  string_type: 0, 1, 2, 3, 4 for "same as you", native string, unicode, other, object
-
+Similar shortcuts exist for strings, (C<native>, C<unicode> and C<other>)
+and floating point numbers. (C<native> and C<bigfloat>) Functions which
+take "generic" numbers and may be either integer or float have C<int>,
+C<bigint>, C<float> and C<bigfloat> variants.
 
 =head2 Methods you need to implement
+
+The master list of vtable methods can be found in F<vtable.tbl> in
+the root directory of the Parrot source; since that's not exactly
+verbose, here's a better description of the methods that you need to
+implement:
+
+=over 3
+
+=item C<type>
+
+Return some notion of what 'type' you are; this can be used to
+communicate state information between PMCs of the same class.
+
+=item C<name>
+
+Return a string containing your class name.
+
+=item C<init>
+
+Do any data set-up you need to do.
+
+=item C<clone>
+
+Copy your data, state and vtable into the passed-in PMC.
+
+=item C<morph>
+
+Turn yourself into the specified type.
+
+=item C<move_to>
+
+Move your private data to the given destination in memory.
+
+=item C<real_size>
+
+Return how much memory you are actually taking up.
+
+=item C<destroy>
+
+Do any data shut-down and finalization you need to do.
+
+=item C<get_integer>
+
+Return an integer representation of yourself.
+
+=item C<get_number>
+
+Return a floating-point representation of yourself.
+
+=item C<get_string>
+
+Return a string representation of yourself.
+
+=item C<get_bool>
+
+Return a boolean representation of yourself.
+
+=item C<get_value>
+
+Return your private data as a raw pointer.
+
+=item C<is_same>
+
+True if the passed-in PMC refers to exactly the same B<data> as
+you. (Contrast C<is_equal>)
+
+=item C<set_integer>
+
+Set yourself to the passed-in integer value. This is an integer
+multimethod.
+
+=item C<set_number>
+
+Set yourself to the passed-in float value. This is an floating-point
+multimethod.
+
+=item C<set_string>
+
+Set yourself to the passed-in string. This is a string multimethod.
+
+=item C<set_value>
+
+Set your private data to the raw pointer passed in. This will only
+be used in exceptional circumstances.
+
+=item C<add>
+
+Fetch the number part of C<value> and add your numeric value to it,
+storing the result in C<dest>. (Probably by calling its C<set_integer>
+or C<set_number> method) This is a numeric multimethod.
+
+=item C<subtract>
+
+Fetch the number part of C<value> and subtract your numeric value from it,
+storing the result in C<dest>. (Probably by calling its C<set_integer>
+or C<set_number> method) This is a numeric multimethod.
+
+=item C<multiply>
+
+=item C<divide>
+
+=item C<modulus>
+
+You get the picture.
+
+=item C<concatenate>
+
+Fetch the string part of C<value> and catenate it to yourself,
+storing the result in C<dest>. (Probably by calling its C<set_string>
+method) This is a string multimethod.
+
+=item C<is_equal>
+
+True if the passed-in PMC has the same B<value> as you. For instance,
+a Perl integer and a Python integer could have the same value, but
+could not be the same thing as defined by C<is_same>.
+
+=item C<logical_or>
+
+=item C<logical_and>
+
+Perform the given short-circuiting logical operations between your boolean 
+value and the value passed in, storing the result in C<dest>.
+
+=item C<logical_not>
+
+Set yourself to be a logical negation of the value passed in.
+
+=item C<match>
+
+Execute the given regular expression on C<value> and store the result.
+
+=item C<repeat>
+
+Repeat your string representation C<value> times and store the result
+in C<dest>.
+
+=back
+
+Parrot will provide a set of default methods you can inherit from if
+you don't need to do anything special for a given method. These will
+be named C<Parrot_default_...>.
+
 
