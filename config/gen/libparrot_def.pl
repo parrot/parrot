@@ -4,7 +4,7 @@ use strict;
 use vars qw($description @args);
 use Parrot::Configure::Step ':gen';
 
-$description="Generating config.h...";
+$description="Generating libparrot.def...";
 
 @args=();
 
