@@ -303,6 +303,7 @@ output_is(<<'CODE', <<'OUTPUT', "Clone");
      set S0, P1[2]
      print S0
      print "\n"
+     end
 CODE
 abcdefghijkl
 OUTPUT
