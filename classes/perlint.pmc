@@ -486,14 +486,14 @@ fprintf(stderr,"perlint_modulus not implemented for floating point\n");
         /* No set_bool :( */
         dest->vtable->set_integer_native(INTERP, dest,
             SELF->cache.int_val || 
-            value->vtable->get_integer(INTERP, value)
+            value->vtable->get_bool(INTERP, value)
         );
     }
 
     void logical_and (PMC* value, PMC* dest) {
         dest->vtable->set_integer_native(INTERP, dest,
             SELF->cache.int_val && 
-            value->vtable->get_integer(INTERP, value)
+            value->vtable->get_bool(INTERP, value)
         );
     }
 

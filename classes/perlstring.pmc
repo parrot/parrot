@@ -419,14 +419,11 @@ pmclass PerlString {
     BOOLVAL is_equal (PMC* value) {
     }
 
-    void logical_or (PMC* value, PMC* dest) {
-    }
+    void logical_or (PMC* value, PMC* dest) = default;
 
-    void logical_and (PMC* value, PMC* dest) {
-    }
+    void logical_and (PMC* value, PMC* dest) = default;
 
-    void logical_not (PMC* value) {
-    }
+    void logical_not (PMC* value) = default;
 
     void match (PMC * value,REGEX* re) {
     }

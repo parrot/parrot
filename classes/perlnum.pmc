@@ -416,9 +416,7 @@ fprintf(stderr,"modulus_same not implemented\n");
 
     void logical_and (PMC* value, PMC* dest) = default;
 
-    void logical_not (PMC* value) {
-fprintf(stderr,"logical_not not implemented\n");
-    }
+    void logical_not (PMC* value) = default;
 
     void match (PMC * value,REGEX* re) {
 fprintf(stderr,"match not implemented\n");
