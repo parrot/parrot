@@ -84,6 +84,7 @@
 .constant TempPMC2	P7
 .constant TempPMC3      P8
 
+.constant ReturnStack	P30
 .constant PMCStack	P31
 
 VeryBeginning:
@@ -183,6 +184,7 @@ InitializeCoreOps:
     new .CoreOps, .PerlHash
     new .UserOps, .PerlHash
     new .SpecialWords, .PerlHash
+    new .ReturnStack, .PerlArray
 
     set .SpecialWords["if"], 1
     set .SpecialWords["then"], 2
@@ -392,14 +394,14 @@ InitializeCoreOps:
     # Stack Manipulation, Return stack
     #
 
-# >r
-# r>
-# r@
-# rdrop
-# 2>r
-# 2r>
+  .AddCoreOp(To_R, ">r")
+  .AddCoreOp(From_R, "r>")
+  .AddCoreOp(Copy_From_R, "r@")
+  .AddCoreOp(RDrop, "rdrop"
+  .AddCoreOp(Two_To_R, "2>r")
+  .AddCoreOp(Two_From_R, "2r>")
 # 2r@
-# 2rdrop
+  .AddCoreOp(Two_RDrop, "2rdrop")
 
     #
     # Stack Manipulation, Stack pointer manipulation
@@ -1063,6 +1065,42 @@ Pick_Stack:
     dec .IntStack
     lookback .PMCStack, .IntStack
     .PushPMC
+    branch DoneInterpretWord
+
+To_R:
+    .PopPMC
+    push .ReturnStack, .PMCStack
+    branch DoneInterpretWord
+
+From_R:
+    pop .PMCStack, .ReturnStack
+    .PushPMC
+    branch DoneInterpretWord
+
+Copy_From_R:
+    pop .PMCStack, .ReturnStack
+    push .ReturnStack, .PMCStack
+    .PushPMC
+    branch DoneInterpretWord
+
+Two_To_R:
+    restore .TempPMC
+    restore .PMCStack
+    push .ReturnStack, .PMCStack
+    push .ReturnStack, .TempPMC
+    branch DoneInterpretWord
+  
+Two_From_R:
+    pop .TempPMC, .ReturnStack
+    pop .PMCStack, .ReturnStack
+    save .TempPMC
+    save .PMCStack
+    branch DoneInterpretWord
+  
+Two_RDrop:
+    pop .PMCStack, .ReturnStack
+RDrop:
+    pop .PMCStack, .ReturnStack
     branch DoneInterpretWord
 
 DoneInterpretWord:
