@@ -31,7 +31,6 @@ _main:
     end
 
 .pcc_sub _nano_forth_compiler:
-    set P21, P1		#preserve ret cont
     set S17, S5		#input src code
     new P6, .PerlHash
     .core("+", "_add")
@@ -110,7 +109,7 @@ end_compile:
     set P10, 0
     concat S18, "null I0\n"
     concat S18, "null I3\n"
-    concat S18, "invoke P11\n"
+    concat S18, "returncc\n"
     # print "\n************\n"
     # print S18
     # print "\n************\n"
@@ -120,11 +119,11 @@ end_compile:
     branch parse
 fin:
     set I5, 0
-    invoke P21
+    returncc
 syntax_error:
     printerr "syntax error\n"
     set I5, 1
-    invoke P21
+    returncc
 
 _start_compile:
     substr S16, S17, 0, 1, ""
@@ -135,7 +134,6 @@ _start_compile:
     set S18, ".pcc_sub _entry_"
     concat S18, S19
     concat S18, ":\n"
-    concat S18, "set P11, P1\n"
     find_global P10, "compiling"
     set P10, 1
     branch parse
@@ -149,7 +147,7 @@ _start_compile:
     push P5, I16
     null I0
     null I3
-    invoke P1
+    returncc
 .pcc_sub _sub:
     pop I16, P5
     pop I17, P5
@@ -157,7 +155,7 @@ _start_compile:
     push P5, I16
     null I0
     null I3
-    invoke P1
+    returncc
 .pcc_sub _print:
     null I0
     null I3
@@ -166,7 +164,7 @@ _start_compile:
     print "\n"
     null I0
     null I3
-    invoke P1
+    returncc
 # single digit 0..9 only
 .pcc_sub _const:
     ord I16, S5
@@ -174,5 +172,5 @@ _start_compile:
     push P5, I16
     null I0
     null I3
-    invoke P1
+    returncc
 

@@ -114,11 +114,6 @@ inline op conv_i8(in PMC, in NUM) :dotgnu_core {
   goto NEXT();
 }
 
-inline op conv_r4(out NUM, in INT) :dotgnu_core {
-  $1 =  (FLOATVAL)((Parrot_Float4)($2));
-  goto NEXT();
-}
-
 inline op conv_r4(inout NUM) :dotgnu_core {
   $1 =  (FLOATVAL)((Parrot_Float4)($1));
   goto NEXT();
@@ -126,11 +121,6 @@ inline op conv_r4(inout NUM) :dotgnu_core {
 
 inline op conv_r4(out NUM, in PMC) :dotgnu_core {
   $1 = (FLOATVAL)(Parrot_Float4)($2->vtable->get_number(interpreter, $2));
-  goto NEXT();
-}
-
-inline op conv_r8(out NUM, in INT) :dotgnu_core {
-  $1 =  (FLOATVAL)(Parrot_Float8)($2);
   goto NEXT();
 }
 

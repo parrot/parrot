@@ -43,8 +43,6 @@ Set $1 to its absolute value.
 
 =item B<abs>(out INT, in INT)
 
-=item B<abs>(out INT, in NUM)
-
 =item B<abs>(out NUM, in INT)
 
 =item B<abs>(out NUM, in NUM)
@@ -71,26 +69,6 @@ inline op abs(out INT, in INT) :base_core {
   }
   else {
     $1 = (INTVAL)$2;
-  }
-  goto NEXT();
-}
-
-inline op abs(out INT, in NUM) :base_core {
-  if ($2 < 0) {
-    $1 = - (INTVAL)$2;
-  }
-  else {
-    $1 = (INTVAL)$2;
-  }
-  goto NEXT();
-}
-
-inline op abs(out NUM, in INT) :base_core {
-  if ($2 < 0) {
-    $1 = - (FLOATVAL)$2;
-  }
-  else {
-    $1 = (FLOATVAL)$2;
   }
   goto NEXT();
 }
@@ -152,11 +130,6 @@ inline op add(inout INT, in INT) :base_core {
   goto NEXT();
 }
 
-inline op add(inout NUM, in INT) :base_core {
-  $1 += $2;
-  goto NEXT();
-}
-
 inline op add(inout NUM, in NUM) :base_core {
   $1 += $2;
   goto NEXT();
@@ -178,11 +151,6 @@ inline op add(in PMC, in PMC) :base_core {
 }
 
 inline op add(out INT, in INT, in INT) :base_core {
-  $1 = $2 + $3;
-  goto NEXT();
-}
-
-inline op add(out NUM, in NUM, in INT) :base_core {
   $1 = $2 + $3;
   goto NEXT();
 }
@@ -402,11 +370,6 @@ inline op div(inout INT, in INT) :base_core {
   goto NEXT();
 }
 
-inline op div(inout NUM, in INT) :base_core {
-  $1 /= $2;
-  goto NEXT();
-}
-
 inline op div(inout NUM, in NUM) :base_core {
   $1 /= $2;
   goto NEXT();
@@ -428,11 +391,6 @@ inline op div (in PMC, in NUM) :base_core {
 }
 
 inline op div(out INT, in INT, in INT) :base_core {
-  $1 = $2 / $3;
-  goto NEXT();
-}
-
-inline op div(out NUM, in NUM, in INT) :base_core {
   $1 = $2 / $3;
   goto NEXT();
 }
@@ -462,11 +420,6 @@ inline op fdiv(inout INT, in INT) :base_core {
   goto NEXT();
 }
 
-inline op fdiv(inout NUM, in INT) :base_core {
-  $1 = floor($1 / $2);
-  goto NEXT();
-}
-
 inline op fdiv(inout NUM, in NUM) :base_core {
   $1 = floor($1 / $2);
   goto NEXT();
@@ -488,11 +441,6 @@ inline op fdiv (in PMC, in NUM) :base_core {
 }
 
 inline op fdiv(out INT, in INT, in INT) :base_core {
-  $1 = floor($2 / $3);
-  goto NEXT();
-}
-
-inline op fdiv(out NUM, in NUM, in INT) :base_core {
   $1 = floor($2 / $3);
   goto NEXT();
 }
@@ -744,11 +692,6 @@ inline op mul(inout INT, in INT) :base_core {
   goto NEXT();
 }
 
-inline op mul(inout NUM, in INT) :base_core {
-  $1 *= $2;
-  goto NEXT();
-}
-
 inline op mul(inout NUM, in NUM) :base_core {
   $1 *= $2;
   goto NEXT();
@@ -770,11 +713,6 @@ inline op mul (in PMC, in PMC) :base_core {
 }
 
 inline op mul(out INT, in INT, in INT) :base_core {
-  $1 = $2 * $3;
-  goto NEXT();
-}
-
-inline op mul(out NUM, in NUM, in INT) :base_core {
   $1 = $2 * $3;
   goto NEXT();
 }
@@ -863,21 +801,6 @@ Set $1 to $2 raised to the power $3.
 
 =cut
 
-inline op pow(out NUM, in INT, in INT) :base_core {
-   $1 = pow((FLOATVAL)$2, (FLOATVAL)$3);
-  goto NEXT();
-}
-
-inline op pow(out NUM, in INT, in NUM) :base_core {
-   $1 = pow((FLOATVAL)$2, (FLOATVAL)$3);
-  goto NEXT();
-}
-
-inline op pow(out NUM, in NUM, in INT) :base_core {
-   $1 = pow((FLOATVAL)$2, (FLOATVAL)$3);
-  goto NEXT();
-}
-
 inline op pow(out NUM, in NUM, in NUM) :base_core {
    $1 = pow((FLOATVAL)$2, (FLOATVAL)$3);
   goto NEXT();
@@ -920,11 +843,6 @@ inline op sub(inout INT, in INT) :base_core {
   goto NEXT();
 }
 
-inline op sub(inout NUM, in INT) :base_core {
-  $1 -= $2;
-  goto NEXT();
-}
-
 inline op sub(inout NUM, in NUM) :base_core {
   $1 -= $2;
   goto NEXT();
@@ -946,11 +864,6 @@ inline op sub(in PMC, in PMC) :base_core {
 }
 
 inline op sub(out INT, in INT, in INT) :base_core {
-  $1 = $2 - $3;
-  goto NEXT();
-}
-
-inline op sub(out NUM, in NUM, in INT) :base_core {
   $1 = $2 - $3;
   goto NEXT();
 }
