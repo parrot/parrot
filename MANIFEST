@@ -52,6 +52,10 @@ docs/pdds/pdd06_pasm.pod
 docs/pdds/pdd07_codingstd.pod
 docs/pdds/pdd08_keys.pod
 docs/pdds/pdd09_gc.pod
+docs/pdds/pdd10_embedding.pod
+docs/pdds/pdd11_extending.pod
+docs/pdds/pdd12_assembly.pod
+docs/pdds/pdd13_bytecode.pod
 docs/pdds/pdd_template.pod
 docs/running.pod
 docs/strings.pod
