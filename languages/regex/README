@@ -14,6 +14,9 @@ To compile an arbitrary regexp down to code:
 
   perl regex.pl '(a*|b)a'
 
+(Note that on some platforms, including Windows, you may need to use
+double quotes in place of the single quotes.)
+
 To turn off optimization so you tell what's going on a little better:
 
   perl regex.pl --no-optimize '(a*|b)a'
@@ -49,15 +52,24 @@ but if for some reason they aren't, run 'make' in parrot/dynclasses/
 to generate them.
 
 The above commands only generate subroutines for matching regular
-expressions. They don't provide fun test programs to try out. For
-that, use the test.pl script with the -c flag to generate a test.pbc
-file that will accept an input string on the command line:
+expressions. You will need to provide your own code to call the
+matching routine with some input. Or, just to try it out, you can use
+the --main argument to regex.pl to generate a sample driver program
+that accepts an input string on the command line:
 
-  perl test.pl -c --expr='a*x'
-  ../../parrot test.pbc baax
+  perl regex.pl --main -o mytest.imc 'a*x'
+  ../../parrot mytest.imc baax
  (output)
   Match found
   0: 1..3
+
+Or for the Perl5 backend:
+
+  perl regex.pl --language=perl5 --main -o mytest.pl 'a*x'
+  perl mytest.pl baax
+
+Note that the output in this case is a bunch of nasty Perl data
+structures encoding the matching information.
 
 New stuff: now you can use the compiler as an embedded Parrot
 compiler. Run 'make regex-compiler.pbc' to generate
@@ -87,7 +99,7 @@ compile a simple expression parser, put this in a file 'expr.rx':
 
 and run (on Unix):
 
-  perl regex.pl --language=perl5 --file=expr.rx > expr.pl
+  perl regex.pl --main --language=perl5 --file=expr.rx > expr.pl
   perl expr.pl '3+(45*2)'
 
 All of the <?foo> things are there so that the rules get nicely
@@ -98,20 +110,18 @@ whichever backend you are using), but currently there is no nice way
 of setting the value of a rule, so they are of limited usefulness. An
 example:
 
-  perl regex.pl --language=perl5 'a* { print "Matched $MATCH{0}\n" }'
+  perl regex.pl --language=perl5 --main 'a* { print "Matched some as\n" } b'
 
-The above should now also work with --language=pir as well (actually,
-that's the default). Except that I have everything tangled up. If you
-want a Perl5 program that takes input on stdin and reports the results
-of matching against it, you can use regex.pl. If you want the same for
-PIR code, you'll need to use test.pl.
+In some cases, you can also access the current state of the match:
 
-regex.pl, when using PIR, only generates the core matching
-subroutine(s). The idea is that you would use this script for
-embedding this compiler into your own compiler. Examples of doing this
-on the fly are in 01_basic.imc and 02_date.imc. test.pl, on the other
-hand, is really intended for writing PIR tests of a particular format,
-and doesn't support the Perl5 backend yet.
+  perl regex.pl --language=perl5 --main 'a* { print "Matched $MATCH{0}\n" } b'
+
+The first example should now also work with --language=pir (the
+default) as well. The second example wouldn't, because it isn't valid
+PIR.
+
+Examples of using regex.pl to generate code that is compiled on the
+fly are in 01_basic.imc and 02_date.imc.
 
 If you use the -d flag, you'll get a very verbose description of the
 matching progress as you run.
@@ -274,40 +284,31 @@ Patrick Michaud's PGE (Parrot Grammar Engine) , which you can find in
 compilers/pge. This engine (in languages/regex, referred to in the
 following text as l/rx) predates pge by a year or two, but never
 managed to generate sufficient interest to get anyone else involved.
-Patrick must have been aware of this engine, since I told him about it
-both personally and in a message to perl6-internals, but he has never
-acknowledged its existence nor explained why he felt the need to start
-from scratch. I have to conclude that he either looked at it and
-didn't like the design or the implementation; or he just wanted to
-start from scratch so that he could fully understand the system he was
-working on. All of which are perfectly good reasons, so I bear no ill
-will towards the official effort.
 
-I am assuming that pge is going to get the momentum of the community
+I am assuming that PGE is going to get the momentum of the community
 behind it, so I would advise anyone interested in working on a rule
 engine to look there first. (Look for discussion on the
 perl6-internals and perl6-compiler mailing lists.) However, I still
 intend to work on this engine for a while longer, and welcome any
 interested participants. (Send any requests/comments/suggestions
 either to perl6-internals or directly to me at steve@fink.com.) So
-far, I have only briefly looked at pge, but I think this
+far, I have only briefly looked at PGE, but I think this
 languages/regex engine has enough of a different approach that it is
 still valuable for gathering lessons -- and may still make the most
 sense in the long run.
 
-That last statement demands a bit of explanation, so here's an excerpt
-of a mail I sent out after my first look at pge (remember, pge has
-probably advanced past this point by now):
+My take on the comparison between l/rx and PGE as of the first public
+release of PGE:
 
 It sounds like l/rx handles pretty much exactly the same things as
-pge, probably a few more and a few less. I haven't actually looked at
+PGE, probably a few more and a few less. I haven't actually looked at
 the code, but from the description I'd guess that the main differences
 are:
  
-  - pge is implemented in C; l/rx in Perl5. Both are reaching towards
+  - PGE is implemented in C; l/rx in Perl5. Both are reaching towards
     the "bootstrap point", when they'll be implemented in PIR.
-  - pge generates PIR; l/rx has both PIR and Perl5 backends
-  - pge uses coroutines and continuations; I have always been too
+  - PGE generates PIR; l/rx has both PIR and Perl5 backends
+  - PGE uses coroutines and continuations; I have always been too
     wary of their stability, so I use plain subs (with a 'mode'
     parameter to tell it whether to try to match or backtrack)
   - Both allow you to "continue" a match to find all other possible
@@ -315,19 +316,18 @@ are:
     implementation (you have to keep all that state around somehow
     anyway)
   - l/rx uses match objects (dynclasses/match.pmc) and automatically
-    generates a parse tree out of them
-  - pge has built-in "dump out the matching info" routines; I make my
+    generates a parse tree out of them. PGE has a dynamically created
+    Parrot class "PGE::Match" that I assume does something similar.
+  - PGE has built-in "dump out the matching info" routines; I make my
     test harnesses generate their own. I'm jealous.
   - The feature sets are nearly identical. Makes sense, I suppose --
     low-hanging fruit and all that.
   - It sounds like the internal design is rather different. I try hard
-    to compile down to very minimalistic PIR ops. It sounds like pge
+    to compile down to very minimalistic PIR ops. It sounds like PGE
     uses lots of higher-level operations, to do things like processing
-    a whole chunk at a time. (Although on the other hand, pge uses
-    more native Parrot flow control mechanisms than I do.)
+    a whole chunk of input at a time. (Although on the other hand, PGE
+    uses more native Parrot flow control mechanisms than I do.) (And
+    I really haven't looked closely enough to substantiate this.)
   - Closely related to the above, I have a number of optimizations
-    already implemented, but I suspect pge will end up with a very
+    already implemented, but I suspect PGE will end up with a very
     different set of optimizations.
-  - I have on average about 5 hours a week to work on l/rx; Patrick
-    has quite a bit more :-) (Which does NOT mean that I work faster;
-    my engine is at least a year older than pge.)

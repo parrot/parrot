@@ -56,13 +56,10 @@ END
     print $fh "$_\n" foreach (@$instructions);
 }
 
-# FIXME! This is only valid for a manual test program!
 sub output_footer {
     my ($self, $fh) = @_;
+    return 1 unless $self->{emit_main};
 
-    #     print OUTPUT "\nmy \$m = _rule_default(1, \$ARGV[0], 0);\n";
-    #     print OUTPUT "use Data::Dumper;\n";
-    #     print OUTPUT "print Dumper(\$m);\n";
     print $fh <<'END';
 sub reduce {
     my ($m, $input) = @_;
@@ -84,7 +81,7 @@ sub match {
   my ($input) = @_;
   my $m = _rule_default(1, $input, 0, []);
 use Data::Dumper;
-print Dumper($m);
+print Data::Dumper->Dump([$m],["*DEFAULT_RULE_MATCH"]);
   return reduce($m, $input);
 }
 sub minimatch {
@@ -99,25 +96,76 @@ sub minimatch {
 my $m = match($ARGV[0]);
 $Data::Dumper::Sortkeys = 1;
 use Data::Dumper;
-print Dumper($m);
+print Data::Dumper->Dump([$m],["*MATCH_OBJECT"]);
 my $mini = minimatch($m);
-use Data::Dumper;
-print Dumper($mini);
+print Data::Dumper->Dump([$mini],["*CAPTURES"]);
 END
 }
 
 package Regex::Driver::PIR;
 our @ISA = qw(Regex::Driver);
 
-# sub output_header {
-#     my ($self, $fh) = @_;
-#     print $fh <<'END';
-# .sub __init_regex @LOAD
-#   loadlib $P0, "match_group"
-#   .return ()
-# .end
-# END
-# }
+sub output_header {
+    my ($self, $fh) = @_;
+    $self->SUPER::output_header($fh);
+    return 1 unless $self->{emit_main};
+
+    print $fh <<'END';
+.sub _main @MAIN
+    .param pmc args
+    .local string input_string
+    input_string = args[1]
+
+    $P0 = loadlib "match_group"
+
+    .local pmc regex_sub
+    .local pmc result
+    .local int matched
+    .local pmc stack
+    stack = new PerlArray
+    regex_sub = newsub _default
+    result = regex_sub(1, input_string, 0, stack)
+    matched = result["!RESULT"]
+    if matched goto printResults
+
+printMatchFailed:
+    print "Match failed\n"
+    goto done
+printResults:
+    print "Match found\n"
+    .local int num_groups
+    .local int match_num
+    .local int ii
+    .local int valid_flag
+    set num_groups, result["!GROUPS"]
+    set match_num, 0
+printLoop:
+    ge match_num, num_groups, done
+    bsr printGroup
+    inc match_num
+    goto printLoop
+done:
+    .return ()
+
+printGroup:
+    .local int match_start
+    .local int match_end
+    set match_start, result[match_num;0]
+    set match_end, result[match_num;1]
+    eq match_start, -2, skipPrint
+    eq match_end, -2, skipPrint
+    print match_num
+    print ": "
+    print match_start
+    print ".."
+    print match_end
+    print "\n"
+skipPrint:
+    set valid_flag, 1
+    ret
+.end
+END
+}
 
 sub output_rule_body {
     my ($self, $fh, $subname, $rule, $ctx, $instructions) = @_;

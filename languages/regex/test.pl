@@ -140,8 +140,7 @@ sub generate_regular_imc {
     my $ctx = { };
     my $trees = Regex::expr_to_tree($pattern, $ctx, DEBUG => $DEBUG);
 
-    my $driver = Regex::Driver->new('pir');
-    $driver->output_header(*PIR);
+    my $driver = Regex::Driver->new('pir', emit_main => 1);
 
     print PIR <<"END";
 # Regular expression test
@@ -150,61 +149,7 @@ sub generate_regular_imc {
 
 END
 
-    print PIR <<'END';
-.sub _main @MAIN
-    .param pmc args
-    .local string input_string
-    input_string = args[1]
-
-    $P0 = loadlib "match_group"
-
-    .local pmc regex_sub
-    .local pmc result
-    .local int matched
-    .local pmc stack
-    stack = new PerlArray
-    regex_sub = newsub _default
-    result = regex_sub(1, input_string, 0, stack)
-    matched = result["!RESULT"]
-    if matched goto printResults
-
-printMatchFailed:
-    print "Match failed\n"
-    goto done
-printResults:
-    print "Match found\n"
-    .local int num_groups
-    .local int match_num
-    .local int ii
-    .local int valid_flag
-    set num_groups, result["!GROUPS"]
-    set match_num, 0
-printLoop:
-    ge match_num, num_groups, done
-    bsr printGroup
-    inc match_num
-    goto printLoop
-done:
-    .return ()
-
-printGroup:
-    .local int match_start
-    .local int match_end
-    set match_start, result[match_num;0]
-    set match_end, result[match_num;1]
-    eq match_start, -2, skipPrint
-    eq match_end, -2, skipPrint
-    print match_num
-    print ": "
-    print match_start
-    print ".."
-    print match_end
-    print "\n"
-skipPrint:
-    set valid_flag, 1
-    ret
-.end
-END
+    $driver->output_header(*PIR);
 
     for my $tree (@$trees) {
         $driver->output_rule(*PIR, '_regex', $tree, $ctx, DEBUG => $DEBUG);

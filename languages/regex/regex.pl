@@ -14,6 +14,7 @@ my $debug = 0;
 my $output;
 my $subname;
 my $language = "pir";
+my $main;
 
 while (@ARGV) {
     $_ = shift;
@@ -24,6 +25,8 @@ while (@ARGV) {
         my $opts = $1;
         $tree_opt = ($opts =~ /t/i);
         $list_opt = ($opts =~ /l/i);
+    } elsif (/--main/ || $_ eq '-m') {
+        $main = 1;
     } elsif (/--debug/ || $_ eq '-d') {
         $debug = 1;
     } elsif (/--output-file=(.*)/) {
@@ -66,6 +69,7 @@ $options{'no-tree-optimize'} = 1 if ! $tree_opt;
 $options{'no-list-optimize'} = 1 if ! $list_opt;
 $options{'DEBUG'} = 1 if $debug;
 $options{subname} = $subname if $subname;
+$options{emit_main} = 1 if $main;
 
 if ($language eq 'pir') {
   $options{module} = "Regex::CodeGen::IMCC";
