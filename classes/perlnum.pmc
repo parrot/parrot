@@ -41,7 +41,7 @@ Returns the number as a Parrot string.
 	if (!signbit(PMC_num_val(SELF)))
             sign = "";
         d = fabs(d);
-        return Parrot_sprintf_c(interpreter, "%s" FLOATVAL_FMT, sign, d);
+        return Parrot_sprintf_c(INTERP, "%s" FLOATVAL_FMT, sign, d);
     }
 
 /*

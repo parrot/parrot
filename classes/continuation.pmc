@@ -66,7 +66,7 @@ Initializes the continuation.
          * continuation. To avoid that all return continuations are
          * converted to true continuations.
          */
-        invalidate_retc_context(INTERP, &interpreter->ctx);
+        invalidate_retc_context(INTERP, &INTERP->ctx);
     }
 
 /*
@@ -199,23 +199,23 @@ destination to continue execution.
         struct Parrot_cont * cc = PMC_cont(SELF);
         struct parrot_regs_t *caller_regs;
 
-        caller_regs = interpreter->ctx.bp;
-        restore_context(interpreter, &cc->ctx);
-        if (Interp_flags_TEST(interpreter, PARROT_TRACE_FLAG)) {
-            PMC *sub = interpreter->ctx.current_sub;
-            STRING *unk = CONST_STRING(interpreter, "(unknown");
-            PIO_eprintf(interpreter, "# Back in sub '%Ss'\n",
+        caller_regs = INTERP->ctx.bp;
+        restore_context(INTERP, &cc->ctx);
+        if (Interp_flags_TEST(INTERP, PARROT_TRACE_FLAG)) {
+            PMC *sub = INTERP->ctx.current_sub;
+            STRING *unk = CONST_STRING(INTERP, "(unknown");
+            PIO_eprintf(INTERP, "# Back in sub '%Ss'\n",
                 sub && PMC_sub(sub) && PMC_sub(sub)->name ?
                 PMC_sub(sub)->name : unk);
         }
         if (PMC_struct_val(SELF))
-            copy_regs(interpreter, caller_regs);
+            copy_regs(INTERP, caller_regs);
         else if (!cc->seg) {
             /* no address and no segment */
             return NULL;
         }
-        if (interpreter->code->cur_cs != cc->seg) {
-            Parrot_switch_to_cs(interpreter, cc->seg, 1);
+        if (INTERP->code->cur_cs != cc->seg) {
+            Parrot_switch_to_cs(INTERP, cc->seg, 1);
         }
         return PMC_struct_val(SELF);
     }

@@ -279,7 +279,7 @@ PMC_int_val(-1) means end of iteration.
 */
 
     PMC* nextkey_keyed (PMC* agg, INTVAL what) {
-        INTVAL n = VTABLE_elements(interpreter, agg);
+        INTVAL n = VTABLE_elements(INTERP, agg);
         PMC *ret = SELF;
 
         switch (what) {

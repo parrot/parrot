@@ -26,14 +26,14 @@ bounds access will very likely segfault.
 #include <assert.h>
 
 
-INTVAL key_2_idx(Parrot_Interp interpreter, PMC *pmc, PMC *key);
-static size_t calc_offsets(Parrot_Interp interpreter, PMC*,
+INTVAL key_2_idx(Interp* interpreter, PMC *pmc, PMC *key);
+static size_t calc_offsets(Interp* interpreter, PMC*,
     PMC *init, size_t toff);
 
 /*
 
 =item C<static char *
-char_offset_int(Parrot_Interp interpreter, PMC *pmc, INTVAL ix, int *type)>
+char_offset_int(Interp* interpreter, PMC *pmc, INTVAL ix, int *type)>
 
 Returns the pointer for the element at index C<ix>, and sets the element
 type in C<*type>.
@@ -43,7 +43,7 @@ type in C<*type>.
 */
 
 static char *
-char_offset_int(Parrot_Interp interpreter, PMC *pmc, INTVAL ix, int *type)
+char_offset_int(Interp* interpreter, PMC *pmc, INTVAL ix, int *type)
 {
     size_t offs, n;
     ix *= 3;
@@ -65,7 +65,7 @@ char_offset_int(Parrot_Interp interpreter, PMC *pmc, INTVAL ix, int *type)
 /*
 
 =item C<INTVAL
-key_2_idx(Parrot_Interp interpreter, PMC *pmc, PMC *key)>
+key_2_idx(Interp* interpreter, PMC *pmc, PMC *key)>
 
 Returns the index for the element associated with key C<*key>. Raises an
 exception if the key doesn't exist.
@@ -75,7 +75,7 @@ exception if the key doesn't exist.
 */
 
 INTVAL
-key_2_idx(Parrot_Interp interpreter, PMC *pmc, PMC *key)
+key_2_idx(Interp* interpreter, PMC *pmc, PMC *key)
 {
     int ix = 0;  /* gcc -O uninit warn */
 
@@ -103,7 +103,7 @@ key_2_idx(Parrot_Interp interpreter, PMC *pmc, PMC *key)
 /*
 
 =item C<static char *
-char_offset_key(Parrot_Interp interpreter, PMC *pmc, PMC *key, int *type)>
+char_offset_key(Interp* interpreter, PMC *pmc, PMC *key, int *type)>
 
 Returns the pointer for the element associated with key C<*key>, and
 sets the element type in C<*type>.
@@ -113,7 +113,7 @@ sets the element type in C<*type>.
 */
 
 static char *
-char_offset_key(Parrot_Interp interpreter, PMC *pmc, PMC *key, int *type)
+char_offset_key(Interp* interpreter, PMC *pmc, PMC *key, int *type)
 {
     size_t offs, n, count, size, max;
     PMC *next, *init, *outer_init;
@@ -285,7 +285,7 @@ ret_float(char *p, int type)
 /*
 
 =item C<static STRING*
-ret_string(Parrot_Interp interpreter, char *p, int type)>
+ret_string(Interp* interpreter, char *p, int type)>
 
 Returns the element of type C<type> starting at C<*p> as a Parrot string.
 
@@ -294,7 +294,7 @@ Returns the element of type C<type> starting at C<*p> as a Parrot string.
 */
 
 static STRING*
-ret_string(Parrot_Interp interpreter, char *p, int type)
+ret_string(Interp* interpreter, char *p, int type)
 {
     char *cstr;
     size_t len;
@@ -314,7 +314,7 @@ ret_string(Parrot_Interp interpreter, char *p, int type)
 /*
 
 =item C<static PMC*
-ret_pmc(Parrot_Interp interpreter, PMC* pmc, char *p, int type, INTVAL idx)>
+ret_pmc(Interp* interpreter, PMC* pmc, char *p, int type, INTVAL idx)>
 
 Returns the element of type C<type> starting at C<*p> as a PMC.
 
@@ -323,7 +323,7 @@ Returns the element of type C<type> starting at C<*p> as a PMC.
 */
 
 static PMC*
-ret_pmc(Parrot_Interp interpreter, PMC* pmc, char *p, int type, INTVAL idx)
+ret_pmc(Interp* interpreter, PMC* pmc, char *p, int type, INTVAL idx)
 {
     char *cstr;
     size_t len;
@@ -475,7 +475,7 @@ set_string(char *p, int type, STRING* value)
 /*
 
 =item C<static int
-calc_align(Parrot_Interp interpreter, PMC *pmc, PMC *type_pmc,
+calc_align(Interp* interpreter, PMC *pmc, PMC *type_pmc,
         int type, int offs)>
 
 Alignment of contained structures is the alignment of the
@@ -490,7 +490,7 @@ This is recursive as structure definitions.
 */
 
 static int
-calc_align(Parrot_Interp interpreter, PMC* pmc, PMC* type_pmc,
+calc_align(Interp* interpreter, PMC* pmc, PMC* type_pmc,
         int type, int offs)
 {
     int align = data_types[type - enum_first_type].size;
@@ -541,7 +541,7 @@ calc_align(Parrot_Interp interpreter, PMC* pmc, PMC* type_pmc,
 /*
 
 =item C<static size_t
-calc_offsets(Parrot_Interp interpreter, PMC *pmc, PMC *value, size_t toff)>
+calc_offsets(Interp* interpreter, PMC *pmc, PMC *value, size_t toff)>
 
 Calculates the offsets for the C<struct>. See C<init_pmc()> for a
 description of C<*value>.
@@ -551,7 +551,7 @@ description of C<*value>.
 */
 
 static size_t
-calc_offsets(Parrot_Interp interpreter, PMC* pmc, PMC *value, size_t toff)
+calc_offsets(Interp* interpreter, PMC* pmc, PMC *value, size_t toff)
 {
     size_t i, n = (size_t)VTABLE_elements(interpreter, value);
     int size;
@@ -662,7 +662,7 @@ Sets C<*value> (see C<init_pmc()> and calculates the offsets.
 
     void set_pmc (PMC* value) {
         PMC_pmc_val(SELF) = value;
-        calc_offsets(interpreter, SELF, value, 0);
+        calc_offsets(INTERP, SELF, value, 0);
         PObj_custom_mark_SET(SELF);
     }
 
@@ -678,7 +678,7 @@ Marks the C<struct> as live.
 
     void mark() {
         if (PMC_pmc_val(SELF))
-            pobject_lives(interpreter, (PObj *) PMC_pmc_val(SELF));
+            pobject_lives(INTERP, (PObj *) PMC_pmc_val(SELF));
     }
 
 /*
@@ -750,7 +750,7 @@ Returns the integer value at index C<ix>.
 
     INTVAL get_integer_keyed_int(INTVAL ix) {
         int type;
-        char *p = char_offset_int(interpreter, pmc, ix, &type);
+        char *p = char_offset_int(INTERP, pmc, ix, &type);
         return ret_int(p, type);
     }
 
@@ -766,7 +766,7 @@ Returns the integer value associated with C<*key>.
 
     INTVAL get_integer_keyed(PMC* key) {
         int type;
-        char *p = char_offset_key(interpreter, pmc, key, &type);
+        char *p = char_offset_key(INTERP, pmc, key, &type);
         return ret_int(p, type);
     }
 
@@ -782,7 +782,7 @@ Returns the floating-point value at index C<ix>.
 
     FLOATVAL get_number_keyed_int (INTVAL key) {
         int type;
-        char *p = char_offset_int(interpreter, pmc, key, &type);
+        char *p = char_offset_int(INTERP, pmc, key, &type);
         return ret_float(p, type);
     }
 
@@ -798,7 +798,7 @@ Returns the floating-point value associated with C<*key>.
 
     FLOATVAL get_number_keyed (PMC* key) {
         int type;
-        char *p = char_offset_key(interpreter, pmc, key, &type);
+        char *p = char_offset_key(INTERP, pmc, key, &type);
         return ret_float(p, type);
     }
 
@@ -814,8 +814,8 @@ Returns the Parrot string value at index C<ix>.
 
     STRING* get_string_keyed_int (INTVAL key) {
         int type;
-        char *p = char_offset_int(interpreter, pmc, key, &type);
-        return ret_string(interpreter, p, type);
+        char *p = char_offset_int(INTERP, pmc, key, &type);
+        return ret_string(INTERP, p, type);
     }
 
 /*
@@ -830,8 +830,8 @@ Returns the Parrot string value associated with C<*key>.
 
     STRING* get_string_keyed (PMC* key) {
         int type;
-        char *p = char_offset_key(interpreter, pmc, key, &type);
-        return ret_string(interpreter, p, type);
+        char *p = char_offset_key(INTERP, pmc, key, &type);
+        return ret_string(INTERP, p, type);
     }
 
 /*
@@ -846,8 +846,8 @@ Returns the PMC value at index C<ix>.
 
     PMC* get_pmc_keyed_int (INTVAL key) {
         int type;
-        char *p = char_offset_int(interpreter, pmc, key, &type);
-        return ret_pmc(interpreter, pmc, p, type, key);
+        char *p = char_offset_int(INTERP, pmc, key, &type);
+        return ret_pmc(INTERP, pmc, p, type, key);
     }
 
 /*
@@ -862,9 +862,9 @@ Returns the PMC value associated with C<*key>.
 
     PMC* get_pmc_keyed (PMC* key) {
         int type;
-        char *p = char_offset_key(interpreter, pmc, key, &type);
-        return ret_pmc(interpreter, pmc, p, type,
-            key_2_idx(interpreter, pmc, key));
+        char *p = char_offset_key(INTERP, pmc, key, &type);
+        return ret_pmc(INTERP, pmc, p, type,
+            key_2_idx(INTERP, pmc, key));
     }
 
 /*
@@ -907,7 +907,7 @@ Sets the value of the element at index C<ix> to C<value>.
 
     void set_integer_keyed_int (INTVAL ix, INTVAL value) {
         int type;
-        char *p = char_offset_int(interpreter, pmc, ix, &type);
+        char *p = char_offset_int(INTERP, pmc, ix, &type);
         set_int(p, type, value);
     }
 
@@ -925,7 +925,7 @@ May cause segfaults if value is out of bounds.
 
     void set_integer_keyed (PMC* key, INTVAL value) {
         int type;
-        char *p = char_offset_key(interpreter, pmc, key, &type);
+        char *p = char_offset_key(INTERP, pmc, key, &type);
         set_int(p, type, value);
     }
 
@@ -941,7 +941,7 @@ Sets the value of the element at index C<ix> to C<value>.
 
     void set_number_keyed_int (INTVAL key, FLOATVAL value) {
         int type;
-        char *p = char_offset_int(interpreter, pmc, key, &type);
+        char *p = char_offset_int(INTERP, pmc, key, &type);
         set_float(p, type, value);
     }
 
@@ -957,7 +957,7 @@ Sets the value of the element associated with key C<*key> to C<value>.
 
     void set_number_keyed (PMC *key, FLOATVAL value) {
         int type;
-        char *p = char_offset_key(interpreter, pmc, key, &type);
+        char *p = char_offset_key(INTERP, pmc, key, &type);
         set_float(p, type, value);
     }
 
@@ -973,7 +973,7 @@ Sets the value of the element at index C<key> to C<*value>.
 
     void set_string_keyed_int (INTVAL key, STRING* value) {
         int type;
-        char *p = char_offset_int(interpreter, pmc, key, &type);
+        char *p = char_offset_int(INTERP, pmc, key, &type);
         set_string(p, type, value);
     }
 
@@ -989,7 +989,7 @@ Sets the value of the element associated with key C<*key> to C<*value>.
 
     void set_string_keyed (PMC *key, STRING* value) {
         int type;
-        char *p = char_offset_key(interpreter, pmc, key, &type);
+        char *p = char_offset_key(INTERP, pmc, key, &type);
         set_string(p, type, value);
     }
 

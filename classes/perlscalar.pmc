@@ -89,7 +89,7 @@ according to the type of C<*value>.
                 DYNSELF.set_string_same(value);
                 break;
             case enum_class_PerlUndef:
-                (void) VTABLE_get_pmc(interpreter, value);
+                (void) VTABLE_get_pmc(INTERP, value);
                 break;
             default:
                 DYNSELF.set_pmc(value);

@@ -221,7 +221,7 @@ Returns the integer value of the element at index C<key>.
 
     INTVAL get_integer_keyed_int (INTVAL key) {
         if (key >= DYNSELF.elements() || key < -DYNSELF.elements()) {
-            if (PARROT_WARNINGS_test(interpreter,
+            if (PARROT_WARNINGS_test(INTERP,
                                      PARROT_WARNINGS_UNDEF_FLAG)) {
                 Parrot_warn(INTERP, PARROT_WARNINGS_UNDEF_FLAG,
                             "Use of uninitialized value");
@@ -244,7 +244,7 @@ Returns the floating-point value of the element at index C<key>.
 
     FLOATVAL get_number_keyed_int (INTVAL key) {
         if (key >= DYNSELF.elements() || key < -DYNSELF.elements()) {
-            if (PARROT_WARNINGS_test(interpreter,
+            if (PARROT_WARNINGS_test(INTERP,
                                      PARROT_WARNINGS_UNDEF_FLAG)) {
                 Parrot_warn(INTERP, PARROT_WARNINGS_UNDEF_FLAG,
                             "Use of uninitialized value");
@@ -281,12 +281,12 @@ Returns the Parrot string value of the element at index C<key>.
 
     STRING* get_string_keyed_int (INTVAL key) {
         if (key >= DYNSELF.elements() || key < -DYNSELF.elements()) {
-            if (PARROT_WARNINGS_test(interpreter,
+            if (PARROT_WARNINGS_test(INTERP,
                                      PARROT_WARNINGS_UNDEF_FLAG)) {
                 Parrot_warn(INTERP, PARROT_WARNINGS_UNDEF_FLAG,
                             "Use of uninitialized value");
             }
-            return string_make_empty(interpreter,  enum_stringrep_one, 0);
+            return string_make_empty(INTERP, enum_stringrep_one, 0);
         }
         else
             return SUPER(key);
@@ -304,7 +304,7 @@ Returns the PMC value of the element at index C<key>.
 
     PMC* get_pmc_keyed_int (INTVAL key) {
         if (key >= DYNSELF.elements() || key < -DYNSELF.elements()) {
-            if (PARROT_WARNINGS_test(interpreter,
+            if (PARROT_WARNINGS_test(INTERP,
                                      PARROT_WARNINGS_UNDEF_FLAG)) {
                 Parrot_warn(INTERP, PARROT_WARNINGS_UNDEF_FLAG,
                             "Use of uninitialized value");

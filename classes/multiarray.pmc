@@ -37,7 +37,7 @@ array creation.
 
 /*
 
-=item C<static INTVAL calc_offset(Interp *interp, List *list, PMC *key)>
+=item C<static INTVAL calc_offset(Interp *interpreter, List *list, PMC *key)>
 
 Calculates the offset for C<*key>.
 
@@ -45,20 +45,20 @@ Calculates the offset for C<*key>.
 
 */
 
-static INTVAL calc_offset(Interp* interp, List*list, PMC *key)
+static INTVAL calc_offset(Interp* interpreter, List*list, PMC *key)
 {
     INTVAL l;
     INTVAL ninj;
-    PMC * dim = VTABLE_get_pmc_keyed_int(interp, list->user_data, 1);
+    PMC * dim = VTABLE_get_pmc_keyed_int(interpreter, list->user_data, 1);
 
-    l = key_integer(interp, key);
+    l = key_integer(interpreter, key);
     ninj = 1;
-    for(; dim ; dim = key_next(interp, dim)) {
-        key = key_next(interp, key);
+    for(; dim ; dim = key_next(interpreter, dim)) {
+        key = key_next(interpreter, key);
         if (!key)
             break;
-        ninj *= key_integer(interp, dim);
-        l += key_integer(interp, key) * ninj;
+        ninj *= key_integer(interpreter, dim);
+        l += key_integer(interpreter, key) * ninj;
     }
     return l;
 }

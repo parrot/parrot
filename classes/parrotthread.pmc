@@ -59,7 +59,7 @@ Initializes the thread.
          */
         LOCK(interpreter_array_mutex);
         SUPER();
-        pt_add_to_interpreters(interpreter, PMC_data(SELF));
+        pt_add_to_interpreters(INTERP, PMC_data(SELF));
         UNLOCK(interpreter_array_mutex);
     }
 

@@ -61,12 +61,12 @@ METHOD void sort(PMC *cmp_func) {
     INTVAL type;
     PMC *s;
 
-    the_interp = interpreter;
+    the_interp = INTERP;
     if (REG_INT(3) == 0) {
         first = ((PMC**)PMC_data(SELF))[0];
         /* XXX simulate MMD inheritance: Int isa TT */
         type = first->vtable->base_type - 1;
-        s = mmd_vtfind(interpreter, MMD_CMP, type, 0);
+        s = mmd_vtfind(INTERP, MMD_CMP, type, 0);
         /* cmp was overriden ? */
         if (s->vtable->base_type == enum_class_Sub) {
             cmp_func = s;
@@ -86,7 +86,7 @@ use_func:
          * TODO check, if it's NCI
          */
 use_sub:
-        run_core = interpreter->run_core;
+        run_core = INTERP->run_core;
         if (PMC_IS_NULL(cmp_func) ||
                 cmp_func == Parrot_base_vtables[enum_class_None]->data) {
             /* a NULL or None PMC was passed
@@ -117,14 +117,14 @@ use_sub:
          */
         if (run_core == PARROT_JIT_CORE) {
 #ifdef HAVE_COMPUTED_GOTO
-            interpreter->run_core = PARROT_CGOTO_CORE;
+            INTERP->run_core = PARROT_CGOTO_CORE;
 #else
-            interpreter->run_core = PARROT_FAST_CORE;
+            INTERP->run_core = PARROT_FAST_CORE;
 #endif
         }
         qsort(PMC_data(SELF), PMC_int_val(SELF), sizeof(PMC *),
                 (int (*)(const void*, const void*))func);
-        interpreter->run_core = run_core;
+        INTERP->run_core = run_core;
     }
 }
 
@@ -140,11 +140,11 @@ C<tuple> object according to 2.1. Built-in Functions.
 */
     void* invoke(void* next) {
         int argcP = REG_INT(3);
-        PMC *res = pmc_new(interpreter, enum_class_FixedPMCArray);
+        PMC *res = pmc_new(INTERP, enum_class_FixedPMCArray);
         PMC *arg;
         if (argcP) {
             if (argcP > 1) {
-                real_exception(interpreter, NULL, E_TypeError,
+                real_exception(INTERP, NULL, E_TypeError,
                         "TypeError: tuple expected at most 1 arguments, got %d",
                         (int)argcP);
             }
@@ -152,7 +152,7 @@ C<tuple> object according to 2.1. Built-in Functions.
             if (arg->vtable->base_type == enum_class_FixedPMCArray)
                 res = arg; /* if a tuple is passed, return it */
             else
-                Parrot_py_fill(interpreter, res, arg);
+                Parrot_py_fill(INTERP, res, arg);
         }
         REG_PMC(5) = res;
         return next;
@@ -291,7 +291,7 @@ TODO implement freeze/thaw and use that instead.
 */
 
     STRING* get_string () {
-        if (Interp_flags_TEST(interpreter, PARROT_PYTHON_MODE)) {
+        if (Interp_flags_TEST(INTERP, PARROT_PYTHON_MODE)) {
             STRING *res, *s;
             INTVAL j, n;
             PMC *val;
@@ -679,7 +679,7 @@ Return a new iterator for SELF.
         switch (f) {
             case 0:
                 {
-                    PMC *iter = pmc_new_init(interpreter,
+                    PMC *iter = pmc_new_init(INTERP,
                             enum_class_Iterator, SELF);
                     PMC_struct_val(iter) = key;
                     return iter;
@@ -692,8 +692,8 @@ Return a new iterator for SELF.
     }
 
     PMC* get_iter () {
-	PMC *iter = pmc_new_init(interpreter, enum_class_Iterator, SELF);
-        PMC *key =  pmc_new(interpreter, enum_class_Key);
+	PMC *iter = pmc_new_init(INTERP, enum_class_Iterator, SELF);
+        PMC *key =  pmc_new(INTERP, enum_class_Key);
         PMC_struct_val(iter) = key;
         PObj_get_FLAGS(key) |= KEY_integer_FLAG;
         PMC_int_val(key) = 0;
@@ -730,7 +730,7 @@ Used to unarchive the array.
         pos = (PMC **)PMC_data(SELF);
         for (i = 0; i < n; ++i, ++pos) {
             info->thaw_ptr = pos;
-            (info->visit_pmc_now)(interpreter, *pos, info);
+            (info->visit_pmc_now)(INTERP, *pos, info);
         }
         SUPER(info);
     }

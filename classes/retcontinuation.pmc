@@ -80,7 +80,7 @@ the frame pointer in the stack frame cache.
         /*
          * unwind control stack
          */
-        stack_now = interpreter->ctx.control_stack;
+        stack_now = INTERP->ctx.control_stack;
         ctr_stack = PMC_cont(SELF)->ctx.control_stack;
         while (stack_now != ctr_stack) {
             if (!stack_now || !ctr_stack)
@@ -90,11 +90,11 @@ the frame pointer in the stack frame cache.
              * handler during pop - see cleanup stuff
              * in stack_pop
              */
-            (void)stack_pop(interpreter, &stack_now,
+            (void)stack_pop(INTERP, &stack_now,
                             NULL, NO_STACK_ENTRY_TYPE);
         }
 
-        stack_p = interpreter->ctx.reg_stack;
+        stack_p = INTERP->ctx.reg_stack;
         next = SUPER(next);
         add_to_fp_cache(INTERP, stack_p);
         add_to_retc_cache(INTERP, SELF);

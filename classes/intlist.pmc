@@ -221,7 +221,7 @@ Removes and returns the first element in the list.
         switch (f) {
             case 0:
                 {
-                    PMC *iter = pmc_new_init(interpreter,
+                    PMC *iter = pmc_new_init(INTERP,
                             enum_class_Iterator, SELF);
                     PMC_struct_val(iter) = key;
                     return iter;
@@ -234,8 +234,8 @@ Removes and returns the first element in the list.
     }
 
     PMC* get_iter () {
-	PMC *iter = pmc_new_init(interpreter, enum_class_Iterator, SELF);
-        PMC *key =  pmc_new(interpreter, enum_class_Key);
+	PMC *iter = pmc_new_init(INTERP, enum_class_Iterator, SELF);
+        PMC *key =  pmc_new(INTERP, enum_class_Key);
         PMC_struct_val(iter) = key;
         PObj_get_FLAGS(key) |= KEY_integer_FLAG;
         PMC_int_val(key) = 0;

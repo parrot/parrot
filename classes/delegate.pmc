@@ -42,7 +42,7 @@ string or PMC not otherwise rooted it could be collected too early.
 /*
 
 =item C<static PMC *
-find_meth(Parrot_Interp interpreter, PMC *pmc, STRING *name)>
+find_meth(Interp* interpreter, PMC *pmc, STRING *name)>
 
 Finds and returns the delegated method with string C<name>.
 
@@ -52,7 +52,7 @@ Finds and returns the delegated method with string C<name>.
 
 
 static PMC *
-find_meth(Parrot_Interp interpreter, PMC *pmc, STRING *meth) {
+find_meth(Interp* interpreter, PMC *pmc, STRING *meth) {
     PMC *class = pmc;
 
     if (Interp_flags_TEST(interpreter, PARROT_TRACE_FLAG)) {
@@ -70,7 +70,7 @@ find_meth(Parrot_Interp interpreter, PMC *pmc, STRING *meth) {
 /*
 
 =item C<static PMC *
-find_or_die(Parrot_Interp interpreter, PMC *pmc, STRING *name)>
+find_or_die(Interp* interpreter, PMC *pmc, STRING *name)>
 
 Returns the result of calling C<find_meth()> with the arguments, raising
 an exception if no method is found.
@@ -80,7 +80,7 @@ an exception if no method is found.
 */
 
 static PMC *
-find_or_die(Parrot_Interp interpreter, PMC *pmc, STRING *meth) {
+find_or_die(Interp* interpreter, PMC *pmc, STRING *meth) {
     PMC *returnPMC = find_meth(interpreter, pmc, meth);
     if (PMC_IS_NULL(returnPMC)) {
         PMC *class = pmc;
@@ -115,7 +115,7 @@ let flow through.
 =over 4
 
 =item C<PARROT_INLINE static void
-noarg_noreturn(Parrot_Interp interpreter, PMC *obj, const char *meth, int die)>
+noarg_noreturn(Interp* interpreter, PMC *obj, const char *meth, int die)>
 
 Calls the delegated method with no arguments or return value. If C<die>
 is true then an exception will be raised if the method is not found.
@@ -125,7 +125,7 @@ is true then an exception will be raised if the method is not found.
 */
 
 static void
-noarg_noreturn(Parrot_Interp interpreter, PMC *obj, PMC* class,
+noarg_noreturn(Interp* interpreter, PMC *obj, PMC* class,
         const char *name, int die)
 {
     STRING *meth = const_string(interpreter, name);
@@ -183,15 +183,15 @@ useful defaults and don't throw exceptiions.
     }
 
     PMC* instantiate() {
-        STRING *meth = const_string(interpreter,
+        STRING *meth = const_string(INTERP,
                 PARROT_VTABLE_INSTANTIATE_METHNAME);
-        PMC *sub = find_meth(interpreter, SELF, meth);
+        PMC *sub = find_meth(INTERP, SELF, meth);
 
         if (PMC_IS_NULL(sub)) {
             /* run default fallback that constructs an empty object */
             return SUPER();
         }
-        return (PMC*) Parrot_run_meth_fromc(interpreter, sub, SELF, meth);
+        return (PMC*) Parrot_run_meth_fromc(INTERP, sub, SELF, meth);
     }
 
     void add_method(STRING *method_name, PMC *sub_pmc) {

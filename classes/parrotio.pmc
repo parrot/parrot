@@ -81,10 +81,10 @@ Destroys the IO PMC, flushing and closing as necessary.
         if (io) {
             /* shared filehandles will only get flushed */
             if (io->flags & PIO_F_SHARED) {
-                PIO_flush(interpreter, SELF);
+                PIO_flush(INTERP, SELF);
             }
             else {
-                PIO_close(interpreter, SELF);
+                PIO_close(INTERP, SELF);
             }
         }
     }
@@ -140,7 +140,7 @@ layers an empty string is returned.
         ParrotIO *io = PMC_data(SELF);
         ParrotIOLayer *layer;
         if (!io)
-            return const_string(interpreter, "");
+            return const_string(INTERP, "");
         layer = io->stack;
         if (n >= 0) {
             ParrotIOLayer *last;
@@ -150,14 +150,14 @@ layers an empty string is returned.
             for (; n && last; --n, last = last->up)
                 ;
             if (last)
-                return string_from_cstring(interpreter, last->name, 0);
-            return const_string(interpreter, "");
+                return string_from_cstring(INTERP, last->name, 0);
+            return const_string(INTERP, "");
         }
         for (++n; n && layer; layer = layer->down, ++n)
             ;
         if (layer)
-            return string_from_cstring(interpreter, layer->name, 0);
-        return const_string(interpreter, "");
+            return string_from_cstring(INTERP, layer->name, 0);
+        return const_string(INTERP, "");
     }
 /*
 

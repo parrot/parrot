@@ -1,5 +1,6 @@
 #! perl -w
-# Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+
+# Copyright: 2001-2005 The Perl Foundation.  All Rights Reserved.
 # $Id$
 
 =head1 NAME
@@ -115,7 +116,7 @@ A preamble, consisting of code to be copied directly to the .c file
 
 The C<pmclass> declaration:
 
-	pmclass PMCNAME [extends PMCPARENT] [flags] {
+	pmclass PMCNAME [flags] {
 
 where C<flags> are:
 
@@ -252,9 +253,7 @@ my %opt;
 main();
 
 sub find_file {
-    my $include = shift;
-    my $file = shift;
-    my $die_unless_found = shift;
+    my ( $include, $file, $die_unless_found ) = @_;
 
     foreach my $dir ( @$include ) {
         my $path = File::Spec->catfile( $dir, $file );
@@ -340,9 +339,6 @@ sub parse_flags {
 	}
     }
     # setup some defaults
-    if ($classname eq 'OrderedHash') {
-        #$flags{extends}{PerlHash} = 1;
-    }
     if ($classname ne 'default') {
 	$flags{extends}{default} = 1 unless $flags{extends};
 	$flags{does}{scalar} = 1 unless $flags{does};
@@ -547,10 +543,9 @@ sub dump_pmc {
 }
 
 sub read_dump {
-    my $include = shift;
-    my $file = shift;
-    my $dump;
-    ($dump = $file) =~ s/\.\w+$/.dump/;
+    my ( $include, $file ) = @_;
+
+    ( my $dump = $file) =~ s/\.\w+$/.dump/;
     $dump = find_file($include, $dump, 1);
     print "Reading $dump\n" if $opt{verbose};
 

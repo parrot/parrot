@@ -39,7 +39,7 @@ Initializes the closure.
         PMC_struct_val(SELF) = NULL;
         PObj_custom_mark_destroy_SETALL(SELF);
 #if 0
-        if (Interp_flags_TEST(interpreter, PARROT_DEBUG_FLAG))
+        if (Interp_flags_TEST(INTERP, PARROT_DEBUG_FLAG))
             printf("Address of base segment is %p\n",
                     (PMC_sub(SELF))->seg->base.pf->byte_code);
 #endif

@@ -27,7 +27,7 @@ generated from F<vtable.tbl> by F<classes/pmc2c2.pl>.
 
 /*
 
-=item C<static const char *caller(Parrot_Interp interp, PMC *pmc)>
+=item C<static const char *caller(Interp* interpreter, PMC *pmc)>
 
 Returns a C string for the name of C<*pmc>.
 
@@ -36,15 +36,15 @@ Returns a C string for the name of C<*pmc>.
 */
 
 static const char *
-caller(Parrot_Interp interp, PMC * pmc)
+caller(Interp* interpreter, PMC * pmc)
 {
     return pmc && pmc->vtable && pmc->vtable->whoami ?
-    VTABLE_name(interp, pmc)->strstart : "(null)";
+    VTABLE_name(interpreter, pmc)->strstart : "(null)";
 }
 
 /*
 
-=item C<static void cant_do_method(Parrot_Interp interpreter, PMC * pmc, const char *methname)>
+=item C<static void cant_do_method(Interp* interpreter, PMC * pmc, const char *methname)>
 
 Throws an exception "$methname() not implemented in class '$class'", used by
 all unimplemented messages.
@@ -52,7 +52,7 @@ all unimplemented messages.
 */
 
 static void
-cant_do_method(Parrot_Interp interpreter, PMC * pmc, const char *methname)
+cant_do_method(Interp* interpreter, PMC * pmc, const char *methname)
 {
     internal_exception(ILL_INHERIT,
                        "%s() not implemented in class '%s'", methname,
@@ -62,7 +62,7 @@ cant_do_method(Parrot_Interp interpreter, PMC * pmc, const char *methname)
 /*
 
 =item C<static void
-check_set_std_props(Parrot_Interp interp, PMC *pmc, STRING *key, PMC *value)>
+check_set_std_props(Interp* interpreter, PMC *pmc, STRING *key, PMC *value)>
 
 Called from C<setprop()>.
 
@@ -71,7 +71,7 @@ Called from C<setprop()>.
 */
 
 static void
-check_set_std_props(Parrot_Interp interp, PMC *pmc, STRING *key, PMC *value)
+check_set_std_props(Interp* interpreter, PMC *pmc, STRING *key, PMC *value)
 {
 #if  1
     /* XXX
@@ -80,31 +80,31 @@ check_set_std_props(Parrot_Interp interp, PMC *pmc, STRING *key, PMC *value)
      */
     static STRING *ro;
     if (!ro)
-        ro = string_make(interp, "_ro", 3, "iso-8859-1",
+        ro = string_make(interpreter, "_ro", 3, "iso-8859-1",
             PObj_constant_FLAG|PObj_external_FLAG);
-    if (!string_compare(interp, key, ro)) {
+    if (!string_compare(interpreter, key, ro)) {
 #else
 
     /*
      * s2 in string_compare is freed here
      */
-    if (!string_compare(interp, key,
-        string_from_cstring(interp, "_ro", 0))) {
+    if (!string_compare(interpreter, key,
+        string_from_cstring(interpreter, "_ro", 0))) {
 #endif
         /* pmc should set/clear readonly */
-        INTVAL on = VTABLE_get_bool(interp, value);
+        INTVAL on = VTABLE_get_bool(interpreter, value);
         /* morph to Const/normal class */
         if (on && (pmc->vtable->flags & VTABLE_HAS_CONST_TOO))
             pmc->vtable = Parrot_base_vtables[pmc->vtable->base_type + 1];
         else if (!on && (pmc->vtable->flags & VTABLE_IS_CONST_FLAG))
-            VTABLE_morph(interp, pmc, pmc->vtable->base_type - 1);
+            VTABLE_morph(interpreter, pmc, pmc->vtable->base_type - 1);
     }
 }
 
 /*
 
 =item C<static INTVAL
-does_isa(Parrot_Interp interp, STRING *method, STRING *what)>
+does_isa(Interp* interpreter, STRING *method, STRING *what)>
 
 Compares C<*method> and C<*what>.
 
@@ -113,24 +113,24 @@ Compares C<*method> and C<*what>.
 */
 
 static INTVAL
-does_isa (Parrot_Interp interp, STRING *method, STRING *what)
+does_isa (Interp* interpreter, STRING *method, STRING *what)
 {
     INTVAL len, pos = 0;
 
     do {
-        pos = string_str_index(interp, what, method, pos);
+        pos = string_str_index(interpreter, what, method, pos);
         if (pos < 0)
             return 0;
-        if (pos >= (INTVAL)string_length(interp, what))
+        if (pos >= (INTVAL)string_length(interpreter, what))
             return 0;
-        len = string_length(interp, method);
-        if (pos && string_index(interp, what, pos - 1) != 32) {
+        len = string_length(interpreter, method);
+        if (pos && string_index(interpreter, what, pos - 1) != 32) {
             pos += len;
             continue;
         }
 
-        if (pos+len < (INTVAL)string_length(interp, what) &&
-            string_index(interp, what, pos + len) != 32) {
+        if (pos+len < (INTVAL)string_length(interpreter, what) &&
+            string_index(interpreter, what, pos + len) != 32) {
             pos += len;
             continue;
         }
@@ -188,7 +188,7 @@ C<initializer> if it is supplied, otherwise C<init()> is called.
     void init_pmc_props (PMC* initializer, PMC* properties) {
         if (!SELF->pmc_ext)
             add_pmc_ext(INTERP, SELF);
-        DOD_WRITE_BARRIER(interpreter, SELF, NULL, properties);
+        DOD_WRITE_BARRIER(INTERP, SELF, NULL, properties);
         PMC_metadata(SELF) = properties;
         if (initializer)
             DYNSELF.init_pmc(initializer);
@@ -241,7 +241,7 @@ Returns the property for C<*key>. If no property is defined then an
 
     PMC* getprop(STRING* key) {
         if (SELF->pmc_ext && PMC_metadata(SELF)) {
-          return VTABLE_get_pmc_keyed_str(interpreter, PMC_metadata(SELF), key);
+          return VTABLE_get_pmc_keyed_str(INTERP, PMC_metadata(SELF), key);
         }
         else {
           PMC* undef = pmc_new(INTERP, enum_class_PerlUndef);
@@ -262,7 +262,7 @@ Sets the property for C<*key> to C<*value>.
     void setprop(STRING* key, PMC* value) {
         check_set_std_props(INTERP, SELF, key, value);
         if (SELF->pmc_ext && PMC_metadata(SELF)) {
-            VTABLE_set_pmc_keyed_str(interpreter,
+            VTABLE_set_pmc_keyed_str(INTERP,
                 PMC_metadata(SELF), key, value);
         } else {
             PMC *prop;
@@ -270,11 +270,11 @@ Sets the property for C<*key> to C<*value>.
                 add_pmc_ext(INTERP, SELF);
             /* first make new hash */
             PMC_metadata(SELF) = prop =
-                pmc_new_noinit(interpreter, enum_class_PerlHash);
-            DOD_WRITE_BARRIER(interpreter, SELF, NULL, prop);
-            VTABLE_init(interpreter, prop);
+                pmc_new_noinit(INTERP, enum_class_PerlHash);
+            DOD_WRITE_BARRIER(INTERP, SELF, NULL, prop);
+            VTABLE_init(INTERP, prop);
             /* then the key, else it vanishes with --gc-debug */
-            VTABLE_set_pmc_keyed_str(interpreter, prop, key, value);
+            VTABLE_set_pmc_keyed_str(INTERP, prop, key, value);
 #if 0
     PObj_report_SET(PMC_metadata(SELF));
 #endif
@@ -294,7 +294,7 @@ Deletes the property for C<*key>.
 
     void delprop(STRING* key) {
         if (SELF->pmc_ext && PMC_metadata(SELF)) {
-            VTABLE_delete_keyed_str(interpreter, PMC_metadata(SELF), key);
+            VTABLE_delete_keyed_str(INTERP, PMC_metadata(SELF), key);
         }
         return;
     }
@@ -315,9 +315,9 @@ Returns the PMC's properties.
         if (!PMC_metadata(SELF)) {
             PMC *prop;
             PMC_metadata(SELF) = prop =
-                pmc_new_noinit(interpreter, enum_class_PerlHash);
-            DOD_WRITE_BARRIER(interpreter, SELF, NULL, prop);
-            VTABLE_init(interpreter, prop);
+                pmc_new_noinit(INTERP, enum_class_PerlHash);
+            DOD_WRITE_BARRIER(INTERP, SELF, NULL, prop);
+            VTABLE_init(INTERP, prop);
         }
         return PMC_metadata(SELF);
     }
@@ -397,7 +397,7 @@ Store the method as a global in the namespace of this class.
 
     void add_method(STRING *method_name, PMC *sub_pmc) {
         STRING *names = DYNSELF.namespace_name();
-        Parrot_store_global(interpreter, names, method_name, sub_pmc);
+        Parrot_store_global(INTERP, names, method_name, sub_pmc);
     }
 /*
 
@@ -747,7 +747,7 @@ Returns whether the PMC "can" perform C<*method>.
 */
 
     INTVAL can (STRING* method) {
-        return VTABLE_find_method(interpreter, SELF, method) != NULL;
+        return VTABLE_find_method(INTERP, SELF, method) != NULL;
     }
 
 /*
@@ -837,7 +837,7 @@ Add class C<parent> to the list of our parents.
 */
 
     void add_parent(PMC *parent) {
-        Parrot_add_parent(interpreter, SELF, parent);
+        Parrot_add_parent(INTERP, SELF, parent);
     }
 
 /*
@@ -857,9 +857,9 @@ Used by DOD to mark the PMC.
             info->extra_flags = EXTRA_IS_PROP_HASH;
             info->extra = PMC_metadata(SELF);
             /* place escape mark */
-            (info->visit_pmc_now)(interpreter, SELF, info);
+            (info->visit_pmc_now)(INTERP, SELF, info);
             /* place and the prop hash */
-            (info->visit_pmc_now)(interpreter, PMC_metadata(SELF), info);
+            (info->visit_pmc_now)(INTERP, PMC_metadata(SELF), info);
         }
     }
 
@@ -894,7 +894,7 @@ Initializes the PMC during unarchiving.
                 add_pmc_ext(INTERP, SELF);
             info->thaw_ptr = &PMC_metadata(SELF);
             info->container = SELF;
-            (info->visit_pmc_now)(interpreter, PMC_metadata(SELF), info);
+            (info->visit_pmc_now)(INTERP, PMC_metadata(SELF), info);
         }
         else
             DYNSELF.init();

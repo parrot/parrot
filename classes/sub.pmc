@@ -34,7 +34,7 @@ the globals.
 */
 
 static STRING*
-sub_name(Parrot_Interp interpreter, PMC* sub)
+sub_name(Interp* interpreter, PMC* sub)
 {
     struct Parrot_sub * s = PMC_sub(sub);
 
@@ -45,7 +45,7 @@ sub_name(Parrot_Interp interpreter, PMC* sub)
 }
 
 static void
-clear_fixup(Parrot_Interp interpreter, PMC* self)
+clear_fixup(Interp* interpreter, PMC* self)
 {
     opcode_t i, ci;
     struct PackFile_ByteCode *seg;
@@ -74,7 +74,7 @@ clear_fixup(Parrot_Interp interpreter, PMC* self)
 }
 
 static void
-print_sub_name(Parrot_Interp interpreter, PMC* sub)
+print_sub_name(Interp* interpreter, PMC* sub)
 {
 
         /* sub was located via globals */
@@ -117,7 +117,7 @@ Initializes the subroutine.
         PMC_struct_val(SELF) = NULL;
         PObj_active_destroy_SET(SELF);
 #if 0
-        if (Interp_flags_TEST(interpreter, PARROT_DEBUG_FLAG))
+        if (Interp_flags_TEST(INTERP, PARROT_DEBUG_FLAG))
             printf("Address of base segment is %p\n",
                 ((struct Parrot_Sub *)PMC_sub(SELF))->seg->base.pf->byte_code);
 #endif
@@ -248,11 +248,11 @@ Invokes the subroutine.
         struct parrot_regs_t *caller_regs;
         PMC *ccont;
 
-        if (Interp_flags_TEST(interpreter, PARROT_TRACE_FLAG)) {
-            print_sub_name(interpreter, SELF);
+        if (Interp_flags_TEST(INTERP, PARROT_TRACE_FLAG)) {
+            print_sub_name(INTERP, SELF);
         }
-        if (interpreter->code->cur_cs != sub->seg) {
-            Parrot_switch_to_cs(interpreter, sub->seg, 1);
+        if (INTERP->code->cur_cs != sub->seg) {
+            Parrot_switch_to_cs(INTERP, sub->seg, 1);
         }
         /*
          * if that's really according to pdd03, we now should have
@@ -262,8 +262,8 @@ Invokes the subroutine.
          *
          * create new register frame, remember old
          */
-        caller_regs = interpreter->ctx.bp;
-        ccont = interpreter->ctx.current_cont;
+        caller_regs = INTERP->ctx.bp;
+        ccont = INTERP->ctx.current_cont;
         /*
          * we have:
          * sub A:
@@ -306,13 +306,13 @@ Invokes the subroutine.
                 goto is_tail_call;
             }
         }
-        if (++interpreter->ctx.recursion_depth >
-                interpreter->recursion_limit) {
-            real_exception(interpreter, next, E_RuntimeError,
+        if (++INTERP->ctx.recursion_depth >
+                INTERP->recursion_limit) {
+            real_exception(INTERP, next, E_RuntimeError,
                     "maximum recursion depth exceeded");
         }
-        interpreter->ctx.bp = new_register_frame(interpreter,
-                &interpreter->ctx.reg_stack);
+        INTERP->ctx.bp = new_register_frame(INTERP,
+                &INTERP->ctx.reg_stack);
         /*
          * when next == NULL the call creates args in the
          * new frame, e.g.
@@ -320,13 +320,13 @@ Invokes the subroutine.
          */
         if (next) {
             /* copy function arguments */
-            copy_regs(interpreter, caller_regs);
+            copy_regs(INTERP, caller_regs);
             /*
              * and copy set context variables
              */
-            interpreter->ctx.current_cont = BP_REG_PMC(caller_regs, 1);
+            INTERP->ctx.current_cont = BP_REG_PMC(caller_regs, 1);
 is_tail_call:
-            interpreter->ctx.current_sub = SELF;
+            INTERP->ctx.current_sub = SELF;
         }
         return sub->address;
     }
@@ -350,7 +350,7 @@ Creates and returns a clone of the subroutine.
         PObj_custom_mark_destroy_SETALL(ret);
         sub = PMC_sub(ret) = mem_sys_allocate(sizeof(struct Parrot_sub));
         memcpy(sub, PMC_sub(SELF), sizeof(struct Parrot_sub));
-        sub->name = string_copy(interpreter, sub->name);
+        sub->name = string_copy(INTERP, sub->name);
         PMC_struct_val(ret) = NULL;
         return ret;
     }

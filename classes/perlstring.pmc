@@ -40,15 +40,15 @@ Returns pythons string repr (w/o any escaping, just single quotes around)
 
     STRING* get_repr() {
         STRING *start, *s, *q, *repr;
-        q = const_string(interpreter, "'");
+        q = const_string(INTERP, "'");
         s = DYNSELF.get_string();
         if (PObj_get_FLAGS(s) & PObj_private7_FLAG)
-            start = const_string(interpreter, "u'");
+            start = const_string(INTERP, "u'");
         else
             start = q;
-        repr = string_copy(interpreter, start);
-        repr = string_append(interpreter, repr, s, 0);
-        repr = string_append(interpreter, repr, q, 0);
+        repr = string_copy(INTERP, start);
+        repr = string_append(INTERP, repr, s, 0);
+        repr = string_append(INTERP, repr, q, 0);
         return repr;
     }
 

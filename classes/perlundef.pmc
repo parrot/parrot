@@ -607,15 +607,15 @@ value of C<*value> is false.
 
     void logical_xor (PMC* value,  PMC* dest) {
 MMD_PerlUndef: {
-            VTABLE_set_integer_native(interpreter, dest, 0);
+            VTABLE_set_integer_native(INTERP, dest, 0);
         }
 MMD_DEFAULT: {
 
-        INTVAL value_bool = VTABLE_get_bool(interpreter, value);
+        INTVAL value_bool = VTABLE_get_bool(INTERP, value);
         if (value_bool)
             VTABLE_set_pmc(INTERP, dest, value);
         else
-            VTABLE_set_integer_native(interpreter, dest, 0);
+            VTABLE_set_integer_native(INTERP, dest, 0);
         }
     }
 

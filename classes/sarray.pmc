@@ -48,7 +48,7 @@ implemented
 /*
 
 =item C<static PARROT_INLINE INTVAL
-ret_int(Parrot_Interp interpreter, HashEntry *e)>
+ret_int(Interp* interpreter, HashEntry *e)>
 
 Processes C<*e>, returning the appropriate integer, or raising an
 exception if necessary.
@@ -58,7 +58,7 @@ exception if necessary.
 */
 
 static PARROT_INLINE INTVAL
-ret_int(Parrot_Interp interpreter, HashEntry *e)
+ret_int(Interp* interpreter, HashEntry *e)
 {
     switch (e->type) {
     case enum_hash_int:
@@ -75,7 +75,7 @@ ret_int(Parrot_Interp interpreter, HashEntry *e)
 /*
 
 =item C<static PARROT_INLINE FLOATVAL
-ret_num(Parrot_Interp interpreter, HashEntry *e)>
+ret_num(Interp* interpreter, HashEntry *e)>
 
 Processes C<*e>, returning the appropriate floating-point number, or
 raising an exception if necessary.
@@ -85,7 +85,7 @@ raising an exception if necessary.
 */
 
 static PARROT_INLINE FLOATVAL
-ret_num(Parrot_Interp interpreter, HashEntry *e)
+ret_num(Interp* interpreter, HashEntry *e)
 {
     switch (e->type) {
         case enum_hash_num:
@@ -102,7 +102,7 @@ ret_num(Parrot_Interp interpreter, HashEntry *e)
 /*
 
 =item C<static PARROT_INLINE STRING *
-ret_string(Parrot_Interp interpreter, HashEntry *e)>
+ret_string(Interp* interpreter, HashEntry *e)>
 
 Processes C<*e>, returning the appropriate Parrot string, or raising an
 exception if necessary.
@@ -112,7 +112,7 @@ exception if necessary.
 */
 
 static PARROT_INLINE STRING*
-ret_string(Parrot_Interp interpreter, HashEntry *e)
+ret_string(Interp* interpreter, HashEntry *e)
 {
     switch (e->type) {
         case enum_hash_string:
@@ -129,7 +129,7 @@ ret_string(Parrot_Interp interpreter, HashEntry *e)
 /*
 
 =item C<static PARROT_INLINE PMC *
-ret_pmc(Parrot_Interp interpreter, HashEntry *e)>
+ret_pmc(Interp* interpreter, HashEntry *e)>
 
 Processes C<*e>, returning the appropriate PMC, or raising an exception
 if necessary.
@@ -139,7 +139,7 @@ if necessary.
 */
 
 static PARROT_INLINE PMC*
-ret_pmc(Parrot_Interp interpreter, HashEntry *e)
+ret_pmc(Interp* interpreter, HashEntry *e)
 {
     PMC *ret;
     switch (e->type) {

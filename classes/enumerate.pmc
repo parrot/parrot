@@ -57,13 +57,13 @@ the next one.
         if (i == -1)
             real_exception(INTERP, NULL, E_StopIteration, "StopIteration");
         item = VTABLE_shift_pmc(INTERP, iter);
-        tupl = pmc_new(interpreter, enum_class_FixedPMCArray);
+        tupl = pmc_new(INTERP, enum_class_FixedPMCArray);
         ++PMC_int_val(key);
-        VTABLE_set_integer_native(interpreter, tupl, 2);
-        val = pmc_new(interpreter, enum_class_Integer);
+        VTABLE_set_integer_native(INTERP, tupl, 2);
+        val = pmc_new(INTERP, enum_class_Integer);
         PMC_int_val(val) = i;
-        VTABLE_set_pmc_keyed_int(interpreter, tupl, 0, val);
-        VTABLE_set_pmc_keyed_int(interpreter, tupl, 1, item);
+        VTABLE_set_pmc_keyed_int(INTERP, tupl, 0, val);
+        VTABLE_set_pmc_keyed_int(INTERP, tupl, 1, item);
         return tupl;
     }
 

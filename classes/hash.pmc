@@ -168,11 +168,11 @@ C<dict> object according to 2.1. Built-in Functions.
 */
     void* invoke(void* next) {
         int argcP = REG_INT(3);
-        PMC *res = pmc_new(interpreter, pmc->vtable->base_type);
+        PMC *res = pmc_new(INTERP, pmc->vtable->base_type);
         PMC *arg;
         if (argcP) {
             if (argcP > 1) {
-                real_exception(interpreter, NULL, E_TypeError,
+                real_exception(INTERP, NULL, E_TypeError,
                         "TypeError: dict expected at most 1 arguments, got %d",
                         (int)argcP);
             }
@@ -180,7 +180,7 @@ C<dict> object according to 2.1. Built-in Functions.
             if (arg->vtable->base_type == enum_class_Hash)
                 res = arg; /* a dict was passed, return it */
             else
-                Parrot_py_fill_dict(interpreter, res, arg);
+                Parrot_py_fill_dict(INTERP, res, arg);
         }
         REG_PMC(5) = res;
         return next;
@@ -322,7 +322,7 @@ Returns the size of the hash.
     }
 
     INTVAL get_integer_keyed_int (INTVAL key) {
-        STRING *s = string_from_int(interpreter, key);
+        STRING *s = string_from_int(INTERP, key);
         return SELF.get_integer_keyed_str(s);
     }
 /*
@@ -352,7 +352,7 @@ Returns the integer value for the element at C<*key>.
                 }
                 else {
                     STRING *s = hash_get_idx(INTERP, hash, key);
-                    return string_to_int(interpreter, s);
+                    return string_to_int(INTERP, s);
                 }
             default:
                 keystr = make_hash_key(INTERP, key);
@@ -394,7 +394,7 @@ Returns the integer value for the element at C<*key>.
     }
 
     FLOATVAL get_number_keyed_int (INTVAL key) {
-        STRING *s = string_from_int(interpreter, key);
+        STRING *s = string_from_int(INTERP, key);
         return SELF.get_number_keyed_str(s);
     }
 /*
@@ -441,7 +441,7 @@ For Python returns its repr.
 */
 
     STRING* get_string () {
-        if (Interp_flags_TEST(interpreter, PARROT_PYTHON_MODE)) {
+        if (Interp_flags_TEST(INTERP, PARROT_PYTHON_MODE)) {
             /* TODO use freeze */
             PMC *iter = VTABLE_get_iter(INTERP, SELF);
             STRING *res, *s;
@@ -509,14 +509,15 @@ For Python returns its repr.
     }
 
     STRING* get_string_keyed_int (INTVAL key) {
-        STRING *s = string_from_int(interpreter, key);
+        STRING *s = string_from_int(INTERP, key);
         return SELF.get_string_keyed_str(s);
     }
+
 /*
 
 =item C<STRING *get_string_keyed(PMC *key)>
 
-Returns the big number value for the element at C<*key>.
+Returns the string value for the element at C<*key>.
 
 =cut
 
@@ -534,7 +535,7 @@ Returns the big number value for the element at C<*key>.
                 /* called from iterator with an integer idx in key */
                 if (hash->key_type == Hash_key_type_int) {
                     INTVAL i = (INTVAL)hash_get_idx(INTERP, hash, key);
-                    return string_from_int(interpreter, i);
+                    return string_from_int(INTERP, i);
                 }
                 return hash_get_idx(INTERP, hash, key);
             default:
@@ -603,7 +604,7 @@ Returns the number of elements in the hash.
     }
 
     PMC* get_pmc_keyed_int (INTVAL key) {
-        STRING *s = string_from_int(interpreter, key);
+        STRING *s = string_from_int(INTERP, key);
         return SELF.get_pmc_keyed_str(s);
     }
 
@@ -620,8 +621,8 @@ Returns the PMC value for the element at C<*key>.
 */
 
     PMC* get_iter () {
-	PMC *iter = pmc_new_init(interpreter, enum_class_Iterator, SELF);
-        PMC *key =  pmc_new(interpreter, enum_class_Key);
+	PMC *iter = pmc_new_init(INTERP, enum_class_Iterator, SELF);
+        PMC *key =  pmc_new(INTERP, enum_class_Key);
         PMC_struct_val(iter) = key;
         PObj_get_FLAGS(key) |= KEY_hash_iterator_FLAGS;
         PMC_int_val(key) = 0;
@@ -1036,7 +1037,7 @@ Return a new iterator for the slice PMC C<key>
         switch (f) {
             case 0:
                 {
-                    PMC *iter = pmc_new_init(interpreter,
+                    PMC *iter = pmc_new_init(INTERP,
                             enum_class_Iterator, SELF);
                     PMC_struct_val(iter) = key;
                     return iter;

@@ -22,7 +22,7 @@ evaluation and execution.
 #include "parrot/parrot.h"
 
 static void
-clear_fixups(Parrot_Interp interpreter, PMC* self)
+clear_fixups(Interp* interpreter, PMC* self)
 {
     opcode_t i, ci;
     struct PackFile_ByteCode *seg;
@@ -90,7 +90,7 @@ pmclass Eval extends Closure {
         struct PackFile_Segment *seg;
         struct PackFile_ByteCode *cur_cs;
 
-        clear_fixups(interpreter, SELF);
+        clear_fixups(INTERP, SELF);
         sub_data = PMC_sub(SELF);
 
         if (!sub_data)

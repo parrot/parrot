@@ -376,15 +376,15 @@ BigInt object.
         PMC *res;
         STRING *num;
 
-        res = pmc_new(interpreter, enum_class_BigInt);
+        res = pmc_new(INTERP, enum_class_BigInt);
         if (!argcP) {
             return res;
         }
         base = 10;
         if (argcP == 2)
             base = VTABLE_get_integer(INTERP, REG_PMC(6));
-        num = VTABLE_get_string(interpreter, REG_PMC(5));
-        VTABLE_set_string_keyed_int(interpreter, res, base, num);
+        num = VTABLE_get_string(INTERP, REG_PMC(5));
+        VTABLE_set_string_keyed_int(INTERP, res, base, num);
         return res;
     }
 

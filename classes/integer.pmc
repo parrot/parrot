@@ -25,7 +25,7 @@ register.
 
 /* XXX create MMD headers to in Pmc2c.pm */
 extern INTVAL Parrot_BigInt_is_equal_BigInt(Interp*, PMC*, PMC*);
-extern void Parrot_BigInt_multiply_int(Parrot_Interp interpreter,
+extern void Parrot_BigInt_multiply_int(Interp* interpreter,
         PMC* pmc, INTVAL value, PMC* dest) ;
 
 static void
@@ -114,38 +114,38 @@ Class method to construct an Integer according to passed arguments.
         if (argcP == 2)
             base = VTABLE_get_integer(INTERP, REG_PMC(6));
         arg = REG_PMC(5);
-        isa = CONST_STRING(interpreter, "Integer");
-        if (VTABLE_isa(interpreter, arg, isa) && base == 10) {
-            res = pmc_new(interpreter, type);
+        isa = CONST_STRING(INTERP, "Integer");
+        if (VTABLE_isa(INTERP, arg, isa) && base == 10) {
+            res = pmc_new(INTERP, type);
             PMC_int_val(res) = PMC_int_val(arg);
             return res;
         }
 
-        isa = CONST_STRING(interpreter, "Float");
-        if (VTABLE_isa(interpreter, arg, isa)) {
+        isa = CONST_STRING(INTERP, "Float");
+        if (VTABLE_isa(INTERP, arg, isa)) {
             FLOATVAL d = VTABLE_get_number(INTERP, arg);
             const char *sign = "-";
             INTVAL i = VTABLE_get_integer(INTERP, arg);
             d = floor(d);
             if (d == i) {
-                res = pmc_new(interpreter, type);
+                res = pmc_new(INTERP, type);
                 PMC_int_val(res) = i;
                 return res;
             }
             if (!signbit(d))
                 sign = "";
             d = fabs(d);
-            num = Parrot_sprintf_c(interpreter, "%s%.12g", sign, d);
+            num = Parrot_sprintf_c(INTERP, "%s%.12g", sign, d);
         }
         else
-            num = VTABLE_get_string(interpreter, arg);
+            num = VTABLE_get_string(INTERP, arg);
         /* TODO preserved type */
-        res = pmc_new(interpreter, enum_class_BigInt);
-        VTABLE_set_string_keyed_int(interpreter, res, base, num);
+        res = pmc_new(INTERP, enum_class_BigInt);
+        VTABLE_set_string_keyed_int(INTERP, res, base, num);
         if (num->strlen < 9) {  /* XXX */
             /* TODO not if it would overflow */
-            INTVAL intnum = VTABLE_get_integer(interpreter, res);
-            res = pmc_new(interpreter, type); /*TODO morph */
+            INTVAL intnum = VTABLE_get_integer(INTERP, res);
+            res = pmc_new(INTERP, type); /*TODO morph */
             PMC_int_val(res) = intnum;
         }
         return res;
@@ -270,7 +270,7 @@ according to the type of C<*value>.
                 DYNSELF.set_string_same(value);
                 break;
             case enum_class_PerlUndef:
-                (void) VTABLE_get_pmc(interpreter, value);
+                (void) VTABLE_get_pmc(INTERP, value);
                 break;
             default:
                 DYNSELF.set_pmc(value);
@@ -948,8 +948,8 @@ The C<==> operation.
 */
     INTVAL is_equal (PMC* value) {
 MMD_BigInt: {
-        PMC* temp = pmc_new(interpreter, enum_class_BigInt);
-        VTABLE_set_integer_native(interpreter, temp, PMC_int_val(SELF));
+        PMC* temp = pmc_new(INTERP, enum_class_BigInt);
+        VTABLE_set_integer_native(INTERP, temp, PMC_int_val(SELF));
         return Parrot_BigInt_is_equal_BigInt(INTERP, temp, value);
     }
 MMD_DEFAULT: {

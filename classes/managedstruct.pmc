@@ -23,7 +23,7 @@ C<struct> values that Parrot is responsible for disposing of.
 #include "parrot/method_util.h"
 
 
-INTVAL key_2_idx(Parrot_Interp interpreter, PMC *pmc, PMC *key);
+INTVAL key_2_idx(Interp* interpreter, PMC *pmc, PMC *key);
 
 pmclass ManagedStruct extends UnManagedStruct need_ext {
 

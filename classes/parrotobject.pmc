@@ -141,19 +141,19 @@ Return the class of this object.
     }
 
     PMC* get_attr(INTVAL idx) {
-        return Parrot_get_attrib_by_num(interpreter, SELF, idx);
+        return Parrot_get_attrib_by_num(INTERP, SELF, idx);
     }
 
     PMC* get_attr_str(STRING* idx) {
-        return Parrot_get_attrib_by_str(interpreter, SELF, idx);
+        return Parrot_get_attrib_by_str(INTERP, SELF, idx);
     }
 
     void set_attr(INTVAL idx, PMC* value) {
-        Parrot_set_attrib_by_num(interpreter, SELF, idx, value);
+        Parrot_set_attrib_by_num(INTERP, SELF, idx, value);
     }
 
     void set_attr_str(STRING* idx, PMC* value) {
-        Parrot_set_attrib_by_str(interpreter, SELF, idx, value);
+        Parrot_set_attrib_by_str(INTERP, SELF, idx, value);
     }
 
     PMC* get_class() {
@@ -191,13 +191,13 @@ Used to unarchive the object.
         /* 1) visit class */
         pos = class_data + POD_CLASS;
         info->thaw_ptr = pos;
-        (info->visit_pmc_now)(interpreter, *pos, info);
+        (info->visit_pmc_now)(INTERP, *pos, info);
 
         /* 2) visit the attributes */
         n = ATTRIB_COUNT(SELF);
         for (i = POD_FIRST_ATTRIB; i < n; ++i) {
             info->thaw_ptr = class_data + i;
-            (info->visit_pmc_now)(interpreter, class_data[i], info);
+            (info->visit_pmc_now)(INTERP, class_data[i], info);
         }
     }
     void freeze(visit_info *info) {

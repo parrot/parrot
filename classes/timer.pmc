@@ -74,7 +74,7 @@ typedef enum {
 /*
 
 =item C<static void
-add_timer(Parrot_Interp interpreter, PMC *pmc)>
+add_timer(Interp* interpreter, PMC *pmc)>
 
 Adds a new timer event to the event queue.
 
@@ -83,7 +83,7 @@ Adds a new timer event to the event queue.
 */
 
 static void
-add_timer(Parrot_Interp interpreter, PMC *pmc)
+add_timer(Interp* interpreter, PMC *pmc)
 {
     parrot_timer_event *t = PMC_struct_val(pmc);
     if (!PMC_IS_NULL(t->sub))
@@ -94,7 +94,7 @@ add_timer(Parrot_Interp interpreter, PMC *pmc)
 /*
 
 =item C<static void
-del_timer(Parrot_Interp interpreter, PMC *pmc)>
+del_timer(Interp* interpreter, PMC *pmc)>
 
 Deletes the timer event.
 
@@ -103,7 +103,7 @@ Deletes the timer event.
 */
 
 static void
-del_timer(Parrot_Interp interpreter, PMC *pmc)
+del_timer(Interp* interpreter, PMC *pmc)
 {
    Parrot_del_timer_event(interpreter, pmc);
 }
@@ -130,7 +130,7 @@ Initializes the timer.
             mem_sys_allocate_zeroed(sizeof(parrot_timer_event));
         PMC_struct_val(SELF) = t;
         PObj_active_destroy_SET(SELF);
-        ++interpreter->arena_base->num_early_DOD_PMCs;
+        ++INTERP->arena_base->num_early_DOD_PMCs;
     }
 
 /*
@@ -144,7 +144,7 @@ See F<docs/pdds/pdd02_vtables.pod> for intializers.
 */
 
     void init_pmc(PMC *init) {
-        INTVAL n = VTABLE_get_integer(interpreter, init);
+        INTVAL n = VTABLE_get_integer(INTERP, init);
         INTVAL i;
         INTVAL val;
         FLOATVAL nval;
@@ -152,24 +152,24 @@ See F<docs/pdds/pdd02_vtables.pod> for intializers.
 
         SELF.init();
         for (i = 0; i < n; i += 2) {
-            INTVAL key = VTABLE_get_integer_keyed_int(interpreter, init, i);
+            INTVAL key = VTABLE_get_integer_keyed_int(INTERP, init, i);
             switch (key) {
                 case PARROT_TIMER_SEC:
                 case PARROT_TIMER_USEC:
                 case PARROT_TIMER_REPEAT:
                 case PARROT_TIMER_RUNNING:
                     val =
-                    VTABLE_get_integer_keyed_int(interpreter, init, i+1);
+                    VTABLE_get_integer_keyed_int(INTERP, init, i+1);
                     SELF.set_integer_keyed_int(key, val);
                     break;
                 case PARROT_TIMER_NSEC:
                     nval =
-                    VTABLE_get_number_keyed_int(interpreter, init, i+1);
+                    VTABLE_get_number_keyed_int(INTERP, init, i+1);
                     SELF.set_number_keyed_int(key, nval);
                     break;
                 case PARROT_TIMER_HANDLER:
                     pval =
-                    VTABLE_get_pmc_keyed_int(interpreter, init, i+1);
+                    VTABLE_get_pmc_keyed_int(INTERP, init, i+1);
                     SELF.set_pmc_keyed_int(key, pval);
                     break;
             }

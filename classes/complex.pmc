@@ -29,7 +29,7 @@ string parsing/generating and basic mathematical operations.
 /*
 
 =item C<static void
-complex_parse_string (Parrot_Interp interp,
+complex_parse_string(Interp* interpreter,
         FLOATVAL *re, FLOATVAL *im, STRING *value)>
 
 Parses the string in C<value> to produce a complex number, represented
@@ -43,7 +43,7 @@ use C<j> instead of C<i>.
 */
 
 static void
-complex_parse_string (Parrot_Interp interp,
+complex_parse_string(Interp* interpreter,
         FLOATVAL *re, FLOATVAL *im, STRING *value) {
     char *str;
     INTVAL first_num_length, second_num_length;
@@ -51,7 +51,7 @@ complex_parse_string (Parrot_Interp interp,
     char *first_num_offset, *second_num_offset = NULL, *t;
     STRING *S;
 
-    t = str = string_to_cstring(interp, value);
+    t = str = string_to_cstring(interpreter, value);
     i = 0;
     first_num_offset = str;
     first_num_minus = second_num_minus = 0;
@@ -136,9 +136,9 @@ complex_parse_string (Parrot_Interp interp,
 
     if(first_num_length) {
         /* there is a real part, interpret it */
-        S = string_from_cstring(interp,
+        S = string_from_cstring(interpreter,
                 first_num_offset, first_num_length);
-        *re = string_to_num(interp, S);
+        *re = string_to_num(interpreter, S);
     }
     else {
         /* consider the real part 0.0 */
@@ -147,9 +147,9 @@ complex_parse_string (Parrot_Interp interp,
 
     if(second_num_length) {
         /* there is an imaginary part, interpret it */
-        S = string_from_cstring(interp,
+        S = string_from_cstring(interpreter,
                 second_num_offset, second_num_length);
-        *im = string_to_num(interp, S);
+        *im = string_to_num(interpreter, S);
     }
     else {
         /* consider the imaginary part 0.0 */
@@ -167,7 +167,7 @@ complex_parse_string (Parrot_Interp interp,
 /*
 
 =item C<static FLOATVAL*
-complex_locate_keyed_num(Parrot_Interp interp, PMC* self, STRING *key)>
+complex_locate_keyed_num(Interp* interpreter, PMC* self, STRING *key)>
 
 Interpret the string C<key>; valid keys are C<real> and C<imag>,
 representing the real and imaginary parts of the complex number.
@@ -177,15 +177,15 @@ representing the real and imaginary parts of the complex number.
 */
 
 static FLOATVAL*
-complex_locate_keyed_num(Parrot_Interp interp, PMC* self, STRING *key) {
+complex_locate_keyed_num(Interp* interpreter, PMC* self, STRING *key) {
     /* do imag first since real can be read much faster anyway */
-    STRING *imag = string_from_cstring(interp, "imag", 4);
+    STRING *imag = string_from_cstring(interpreter, "imag", 4);
     STRING *real;
 
-    if(0 == string_equal(interp, key, imag))
+    if(0 == string_equal(interpreter, key, imag))
         return &IM(self);
-    real = string_from_cstring(interp, "real", 4);
-    if(0 == string_equal(interp, key, real))
+    real = string_from_cstring(interpreter, "real", 4);
+    if(0 == string_equal(interpreter, key, real))
         return &RE(self);
     internal_exception(KEY_NOT_FOUND,
         "Complex: key is neither 'real' or 'imag'");
@@ -205,7 +205,7 @@ Create a new complex PMC with passed arguments according to pdd03.
 */
 
     PMC* instantiate() {
-        PMC *res = pmc_new(interpreter, enum_class_Complex);
+        PMC *res = pmc_new(INTERP, enum_class_Complex);
         FLOATVAL re = 0.0, im = 0.0;
         int argcI = REG_INT(1);
         int argcS = REG_INT(2);
@@ -254,18 +254,18 @@ C<complex> object according to 2.1. Built-in Functions.
 */
     void* invoke(void* next) {
         int argcP = REG_INT(3);
-        PMC *res = pmc_new(interpreter, enum_class_Complex);
+        PMC *res = pmc_new(INTERP, enum_class_Complex);
         if (argcP == 1) {
             PMC *arg = REG_PMC(5);
             if (arg->vtable->base_type == enum_class_PerlString) {
                 VTABLE_set_string_native(INTERP, res, PMC_str_val(arg));
             }
             else
-                RE(res) = VTABLE_get_number(interpreter, arg);
+                RE(res) = VTABLE_get_number(INTERP, arg);
         }
         else if (argcP == 2) {
-            RE(res) = VTABLE_get_number(interpreter, REG_PMC(5));
-            IM(res) = VTABLE_get_number(interpreter, REG_PMC(6));
+            RE(res) = VTABLE_get_number(INTERP, REG_PMC(5));
+            IM(res) = VTABLE_get_number(INTERP, REG_PMC(6));
         }
         REG_PMC(5) = res;
         return next;

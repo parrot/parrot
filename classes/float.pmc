@@ -49,11 +49,11 @@ arguments are passed according to pdd03.
     PMC* instantiate() {
         int argcP = REG_INT(3);
         PMC *class = REG_PMC(2);
-        PMC *res = pmc_new(interpreter, class->vtable->base_type);
+        PMC *res = pmc_new(INTERP, class->vtable->base_type);
         /* TODO non-PMC arguments */
         if (argcP)
-            VTABLE_set_number_native(interpreter, res,
-                    VTABLE_get_number(interpreter, REG_PMC(5)));
+            VTABLE_set_number_native(INTERP, res,
+                    VTABLE_get_number(INTERP, REG_PMC(5)));
         return res;
     }
 
@@ -121,7 +121,7 @@ Returns a Parrot string representation of the number.
 	if (!signbit(PMC_num_val(SELF)))
             sign = "";
         d = fabs(d);
-        return Parrot_sprintf_c(interpreter, "%s" FLOATVAL_FMT, sign, d);
+        return Parrot_sprintf_c(INTERP, "%s" FLOATVAL_FMT, sign, d);
     }
 
 /*

@@ -53,10 +53,10 @@ arguments are passed according to pdd03.
     PMC* instantiate() {
         int argcP = REG_INT(3);
         PMC *class = REG_PMC(2);
-        PMC *res = pmc_new(interpreter, class->vtable->base_type);
+        PMC *res = pmc_new(INTERP, class->vtable->base_type);
         if (argcP)
-            VTABLE_set_string_native(interpreter, res,
-                    VTABLE_get_string(interpreter, REG_PMC(5)));
+            VTABLE_set_string_native(INTERP, res,
+                    VTABLE_get_string(INTERP, REG_PMC(5)));
         return res;
     }
 /*
@@ -677,7 +677,7 @@ Return length of the string.
         switch (f) {
             case 0:
                 {
-                    PMC *iter = pmc_new_init(interpreter,
+                    PMC *iter = pmc_new_init(INTERP,
                             enum_class_Iterator, SELF);
                     PMC_struct_val(iter) = key;
                     return iter;
@@ -690,8 +690,8 @@ Return length of the string.
     }
 
     PMC* get_iter () {
-	PMC *iter = pmc_new_init(interpreter, enum_class_Iterator, SELF);
-        PMC *key =  pmc_new(interpreter, enum_class_Key);
+	PMC *iter = pmc_new_init(INTERP, enum_class_Iterator, SELF);
+        PMC *key =  pmc_new(INTERP, enum_class_Key);
         PMC_struct_val(iter) = key;
         PObj_get_FLAGS(key) |= KEY_integer_FLAG;
         PMC_int_val(key) = 0;
@@ -753,8 +753,8 @@ Downcase this string
 */
 
     METHOD PMC* lower() {
-        STRING *s = string_downcase(interpreter, PMC_str_val(SELF));
-        PMC *ret = pmc_new_noinit(interpreter, SELF->vtable->base_type);
+        STRING *s = string_downcase(INTERP, PMC_str_val(SELF));
+        PMC *ret = pmc_new_noinit(INTERP, SELF->vtable->base_type);
         PMC_str_val(ret) = s;
         PObj_custom_mark_SET(ret);
         return ret;

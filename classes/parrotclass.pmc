@@ -91,7 +91,7 @@ Returns whether the class is or inherits from C<*classname>.
         PMC *class;
         if (SUPER(classname))
             return 1;
-        class = Parrot_class_lookup(interpreter, classname);
+        class = Parrot_class_lookup(INTERP, classname);
         return Parrot_object_isa(INTERP, SELF, class);
     }
 
@@ -130,7 +130,7 @@ classes.
 */
 
     INTVAL can(STRING* method) {
-        return VTABLE_find_method(interpreter, SELF, method) != NULL;
+        return VTABLE_find_method(INTERP, SELF, method) != NULL;
     }
 
     PMC* get_class() {
@@ -180,7 +180,7 @@ Create the class from the thawed parents and attributes array.
         else
             pos = class_data + PCD_PARENTS;
         info->thaw_ptr = pos;
-        (info->visit_pmc_now)(interpreter, *pos, info);
+        (info->visit_pmc_now)(INTERP, *pos, info);
 
         /* 3) attributes array */
         if (info->what == VISIT_THAW_NORMAL ||
@@ -189,7 +189,7 @@ Create the class from the thawed parents and attributes array.
         else
             pos = class_data + PCD_CLASS_ATTRIBUTES;
         info->thaw_ptr = pos;
-        (info->visit_pmc_now)(interpreter, *pos, info);
+        (info->visit_pmc_now)(INTERP, *pos, info);
 
         SUPER(info);
     }

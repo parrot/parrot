@@ -218,7 +218,7 @@ C<xrange> object.
             RVal_int(range->end) = VTABLE_get_integer(INTERP, REG_PMC(6));
             RVal_int(range->step) = VTABLE_get_integer(INTERP, REG_PMC(7));
             if (RVal_int(range->step) == 0)
-                real_exception(interpreter, NULL, E_ValueError,
+                real_exception(INTERP, NULL, E_ValueError,
                         "xrange() step argument must not be zero");
         }
         else
@@ -243,7 +243,7 @@ C<xrange> object.
 
     void mark () {
         if (PMC_pmc_val(SELF))
-            pobject_lives(interpreter, (PObj*) PMC_pmc_val(SELF));
+            pobject_lives(INTERP, (PObj*) PMC_pmc_val(SELF));
     }
 
     void init_pmc (PMC* key) {
@@ -318,14 +318,14 @@ This is used for implementing Pythons xrange()
             return NULL;
         }
         else {
-            PMC *iter = pmc_new_init(interpreter, enum_class_Iterator, SELF);
+            PMC *iter = pmc_new_init(INTERP, enum_class_Iterator, SELF);
             PMC_struct_val(iter) = key;
             return iter;
         }
     }
 
     PMC* get_iter() {
-	PMC *iter = pmc_new_init(interpreter, enum_class_Iterator, SELF);
+	PMC *iter = pmc_new_init(INTERP, enum_class_Iterator, SELF);
         PMC_struct_val(iter) = SELF;
         return iter;
     }

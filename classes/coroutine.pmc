@@ -41,8 +41,8 @@ stopped. See the L<Glossary|docs/glossary.pod> for more information.
 
 #define TRY \
     do { \
-        new_internal_exception(interpreter); \
-        if (!setjmp(interpreter->exceptions->destination))
+        new_internal_exception(INTERP); \
+        if (!setjmp(INTERP->exceptions->destination))
 
 #define CATCH \
     else
@@ -50,9 +50,9 @@ stopped. See the L<Glossary|docs/glossary.pod> for more information.
 #define ENDTRY \
     } while(0); \
     do { \
-        Parrot_exception *e = interpreter->exceptions; \
-        interpreter->exceptions = e->prev; \
-        interpreter->exc_free_list = e; \
+        Parrot_exception *e = INTERP->exceptions; \
+        INTERP->exceptions = e->prev; \
+        INTERP->exc_free_list = e; \
     } while(0)
 
 
@@ -101,15 +101,15 @@ Swaps the "context".
         if (!(PObj_get_FLAGS(SELF) & SUB_FLAG_CORO_FF)) {
             wanted_seg = sub->seg;
             /* remember segment of caller */
-            sub->caller_seg = interpreter->code->cur_cs;
+            sub->caller_seg = INTERP->code->cur_cs;
         }
         else {
             wanted_seg = sub->caller_seg;
         }
-        swap_context(interpreter, SELF);
+        swap_context(INTERP, SELF);
 
-        if (interpreter->code->cur_cs != wanted_seg) {
-            Parrot_switch_to_cs(interpreter, wanted_seg, 1);
+        if (INTERP->code->cur_cs != wanted_seg) {
+            Parrot_switch_to_cs(INTERP, wanted_seg, 1);
         }
         return dest;
     }

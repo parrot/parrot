@@ -102,7 +102,7 @@ Returns whether a library has been successfully loaded.
 
 =item C<STRING* get_string()>
 
-Returns whether a library has been successfully loaded.
+Returns the name of the loaded library.
 
 =cut
 
@@ -111,9 +111,9 @@ Returns whether a library has been successfully loaded.
     STRING* get_string() {
         PMC *prop;
         STRING *key;
-        key = const_string(interpreter, "_filename");
-        prop = VTABLE_getprop(interpreter, SELF, key);
-        return VTABLE_get_string(interpreter, prop);
+        key = const_string(INTERP, "_filename");
+        prop = VTABLE_getprop(INTERP, SELF, key);
+        return VTABLE_get_string(INTERP, prop);
     }
 
 }
