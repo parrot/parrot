@@ -101,13 +101,21 @@ get_path(Interp *interpreter, STRING *lib, void **handle)
 #endif
 
     /*
+     * Current dir with no extension
+     */
+    cpath = string_to_cstring(interpreter, lib);
+    *handle = Parrot_dlopen(cpath);
+    /*
      * first look in current dir
      */
-    path = Parrot_sprintf_c(interpreter, "%Ss%s",
-            lib,
-            PARROT_DLL_EXTENSION);
-    cpath = string_to_cstring(interpreter, path);
-    *handle = Parrot_dlopen(cpath);
+    if (!*handle) {
+        string_cstring_free(cpath);
+        path = Parrot_sprintf_c(interpreter, "%Ss%s",
+                                lib,
+                                PARROT_DLL_EXTENSION);
+        cpath = string_to_cstring(interpreter, path);
+        *handle = Parrot_dlopen(cpath);
+    }
     if (!*handle) {
         /*
          * then in runtime/ ...
@@ -118,6 +126,18 @@ get_path(Interp *interpreter, STRING *lib, void **handle)
                 RUNTIME_DYNEXT,
                 lib,
                 PARROT_DLL_EXTENSION);
+        cpath = string_to_cstring(interpreter, path);
+        *handle = Parrot_dlopen(cpath);
+    }
+    if (!*handle) {
+        /*
+         * then in runtime/ with no extension
+         */
+        /* TODO only if not an absolute path */
+        string_cstring_free(cpath);
+        path = Parrot_sprintf_c(interpreter, "%s%Ss",
+                                RUNTIME_DYNEXT,
+                                lib);
         cpath = string_to_cstring(interpreter, path);
         *handle = Parrot_dlopen(cpath);
     }
