@@ -15,40 +15,40 @@
  * References: */
 
 #include "parrot/parrot.h"
+#include <assert.h>
 
 Stack_Chunk_t *
-new_stack(Interp *interpreter)
+new_stack(Interp *interpreter, const char *name)
 {
-#ifdef TIDY
-    int i;
-    Stack_Entry_t *entry;
-#endif
 
-    Stack_Chunk_t *stack = mem_sys_allocate_zeroed(sizeof(Stack_Chunk_t));
+    Stack_Chunk_t *chunk = mem_sys_allocate_zeroed(sizeof(Stack_Chunk_t));
+    Stack_t *stack = mem_sys_allocate_zeroed(sizeof(Stack_t));
 
-    stack->flags = NO_STACK_CHUNK_FLAGS;
-    SET_NULL(stack->next);
-    SET_NULL(stack->prev);
-    SET_NULL(stack->buffer);
-    stack->buffer = new_buffer_header(interpreter);
+    chunk->flags = NO_STACK_CHUNK_FLAGS;
+    SET_NULL(chunk->next);
+    SET_NULL(chunk->prev);
+    SET_NULL(chunk->buffer);
+    chunk->stack = stack;
+    stack->top = stack->base = chunk;
+    stack->n_chunks = 1;
+    stack->chunk_limit = STACK_CHUNK_LIMIT;
+    stack->name = name;
+
+    chunk->buffer = new_buffer_header(interpreter);
 
     /* Block DOD from murdering our newly allocated stack->buffer. */
     Parrot_block_DOD(interpreter);
-    Parrot_allocate(interpreter, stack->buffer,
+    Parrot_allocate(interpreter, chunk->buffer,
                     sizeof(Stack_Entry_t) * STACK_CHUNK_DEPTH);
     Parrot_unblock_DOD(interpreter);
 
-#ifdef TIDY
-    entry = (Stack_Entry_t *)stack->buffer->bufstart;
-    for (i = 0; i < STACK_CHUNK_DEPTH; i++)
-        entry[i].flags = NO_STACK_ENTRY_FLAGS;
-#endif
-    return stack;
+    return chunk;
 }
 
 void
 stack_destroy(Stack_Chunk_t * top)
 {
+    mem_sys_free(top->stack);
     while (top->next)
         top = top->next;
     while(top) {
@@ -73,13 +73,15 @@ stack_mark_cow(Stack_Chunk_t *stack)
 
 /* Returns the height of the stack.  The maximum "depth" is height - 1 */
 size_t
-stack_height(Interp *interpreter, Stack_Chunk_t *stack)
+stack_height(Interp *interpreter, Stack_Chunk_t *top)
 {
     Stack_Chunk_t *chunk;
-    size_t height = stack->used;
+    size_t height = top->used;
 
-    for (chunk = stack->prev; chunk; chunk = chunk->prev)
+    for (chunk = top->prev; chunk; chunk = chunk->prev)
         height += chunk->used;
+    assert(height == (top->stack->n_chunks - 1) * STACK_CHUNK_DEPTH +
+            top->used);
 
     return height;
 }
@@ -95,6 +97,9 @@ stack_copy(struct Parrot_Interp *interp, Stack_Chunk_t *old_top)
     Stack_Chunk_t *new_chunk;
     Stack_Chunk_t *new_top = NULL;
     Stack_Chunk_t *last = NULL;
+    Stack_t *stack = mem_sys_allocate_zeroed(sizeof(Stack_t));
+    stack->n_chunks = 0;
+    stack->name = old_top->stack->name;
     do {
         new_chunk = mem_sys_allocate(sizeof(Stack_Chunk_t));
         if (new_top == NULL) {
@@ -123,8 +128,12 @@ stack_copy(struct Parrot_Interp *interp, Stack_Chunk_t *old_top)
         memcpy(new_chunk->buffer->bufstart, old_chunk->buffer->bufstart,
                old_chunk->buffer->buflen);
         old_chunk = old_chunk->prev;
+        stack->n_chunks++;
+        stack->base = new_chunk;
     }
     while (old_chunk);
+    new_top->stack = stack;
+    stack->top = new_top;
     return new_top;
 }
 
@@ -246,6 +255,11 @@ stack_push(Interp *interpreter, Stack_Chunk_t **stack_p,
             SET_NULL(new_chunk->next);
             new_chunk->prev = chunk;
             chunk->next = new_chunk;
+            new_chunk->stack = chunk->stack;
+            new_chunk->stack->n_chunks++;
+            if (new_chunk->stack->n_chunks == new_chunk->stack->chunk_limit)
+                internal_exception(1, "Stack '%s' too deep\n",
+                        chunk->stack->name);
             *stack_p = chunk = new_chunk;
             SET_NULL(new_chunk->buffer);
             new_chunk->buffer = new_buffer_header(interpreter);
@@ -257,7 +271,9 @@ stack_push(Interp *interpreter, Stack_Chunk_t **stack_p,
             /* Reuse the spare chunk we kept */
             chunk = chunk->next;
             *stack_p = chunk;
+            chunk->stack->n_chunks++;
         }
+        chunk->stack->top = chunk;
     }
 
     entry = (Stack_Entry_t *)(chunk->buffer->bufstart) + chunk->used;
@@ -329,6 +345,8 @@ stack_pop(Interp *interpreter, Stack_Chunk_t **stack_p,
          * just emptied around for now in case we need it again. */
         chunk = chunk->prev;
         *stack_p = chunk;
+        chunk->stack->top = chunk;
+        chunk->stack->n_chunks--;
     }
 
     /* Quick sanity check */

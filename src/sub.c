@@ -59,7 +59,7 @@ new_closure(struct Parrot_Interp *interp)
     struct Parrot_Closure *newsub =
         mem_sys_allocate(sizeof(struct Parrot_Closure));
     PMC * pad = scratchpad_get_current(interp);
-    newsub->ctx.pad_stack = new_stack(interp);
+    newsub->ctx.pad_stack = new_stack(interp, "Pad");
     if (pad) {
         /* put the correct pad in place */
         stack_push(interp, &newsub->ctx.pad_stack, pad,
@@ -75,9 +75,9 @@ new_coroutine(struct Parrot_Interp *interp)
     PMC * pad = NULL;
     struct Parrot_Coroutine *newco =
         mem_sys_allocate(sizeof(struct Parrot_Coroutine));
-    newco->ctx.user_stack = new_stack(interp);
-    newco->ctx.control_stack = new_stack(interp);
-    newco->ctx.pad_stack = new_stack(interp);
+    newco->ctx.user_stack = new_stack(interp, "User");
+    newco->ctx.control_stack = new_stack(interp, "Control");
+    newco->ctx.pad_stack = new_stack(interp, "Pad");
 
     pad = scratchpad_get_current(interp);
 

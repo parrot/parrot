@@ -16,6 +16,7 @@
 #include "parrot/parrot.h"
 
 #define STACK_CHUNK_DEPTH 256
+#define STACK_CHUNK_LIMIT 100
 
 typedef struct Stack_Entry {
     union {
@@ -34,12 +35,16 @@ typedef struct Stack_Chunk {
     Stack_chunk_flags   flags;
     struct Stack_Chunk *next;
     struct Stack_Chunk *prev;
+    struct Stack       *stack;
     Buffer *buffer;
 } Stack_Chunk_t;
 
 typedef struct Stack {
     Stack_Chunk_t * base;
     Stack_Chunk_t * top;
+    int n_chunks;
+    int chunk_limit;
+    const char * name;
 } Stack_t;
 
 
@@ -47,7 +52,7 @@ typedef void (*Stack_cleanup_method)(Stack_Entry_t *);
 
 #define STACK_CLEANUP_NULL ((Stack_cleanup_method)NULLfunc)
 
-Stack_Chunk_t * new_stack(Interp *interpreter);
+Stack_Chunk_t * new_stack(Interp *interpreter, const char *name);
 void stack_destroy(Stack_Chunk_t * top);
 
 Stack_Chunk_t * stack_copy(Interp *interpreter, Stack_Chunk_t *old_stack);
