@@ -1,0 +1,9 @@
+This is a build directory for custom PMCs with a sample foo.pmc
+providing the Foo pmc class.
+
+1) edit/create your foo.pmc source (s. also classes/genclass.pl)
+
+2) edit Makefile (or much better provide a script that generates
+   a platform independent Makefile ;-)
+
+$ make -C dynclasses

@@ -1,0 +1,22 @@
+/*
+ * Sample Foo class
+ */
+
+#include "parrot/parrot.h"
+
+/*
+ * the real class enum is created at load time
+ */
+#define enum_class_Foo -1
+
+pmclass Foo {
+
+    STRING* name () {
+	return whoami;
+    }
+
+    INTVAL get_integer() {
+	return 42;
+    }
+}
+
