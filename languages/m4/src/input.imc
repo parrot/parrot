@@ -1,3 +1,5 @@
+# $Id$
+
 =head1 NAME 
 
 input.imc - Setting up input and reading input
@@ -11,7 +13,7 @@ References: http://www.gnu.org/software/m4/m4.html
 
 =head1 SUBROUTINES
 
-=head2 void input_init( PerlHash state )
+=head2 void input_init( Hash state )
 
 Initialise the input stack and various regexes.
 
@@ -25,26 +27,26 @@ TODO: recognize nested quoted strings
 
 =cut
 
+.include "datatypes.pasm"
+
 .sub input_init 
-  .param PerlHash state 
+  .param Hash state 
 
   .local pmc empty_array
 
   # setup of stacks
-  empty_array = new PerlArray
+  empty_array = new ResizablePMCArray
   state['token_stack'] = empty_array
   empty_array = new PerlArray
   state['input_stack'] = empty_array
-  empty_array = new PerlArray
+  empty_array = new ResizablePMCArray
   state['wrapup_stack'] = empty_array
 
   # setup of regexes
   # regular expressions are needed for finding words and quoted strings
   .local pmc regex
-  .local string err
-  err = repeat ' ', 500
   .local pmc erroffset
-  erroffset = new PerlInt
+  erroffset = new Integer
   erroffset = 0
   .local pmc NULL
   NULL = null
@@ -52,11 +54,20 @@ TODO: recognize nested quoted strings
   .local pmc pcre_lib
   pcre_lib = loadlib "libpcre"
 
+  .local pmc err_decl
+  .local pmc err  
+  err_decl = new ResizablePMCArray
+  push err_decl, .DATATYPE_CSTR
+  push err_decl, 0
+  push err_decl, 0
+  err = new .ManagedStruct
+  assign err, err_decl
+
   # pcre *pcre_compile( const char *pattern, int options,
   #                     const char **errptr, int *erroffset,
   #                     const unsigned char *tableptr
   .local pmc pcre_compile
-  pcre_compile = dlfunc pcre_lib, "pcre_compile", "ptiB3P"
+  pcre_compile = dlfunc pcre_lib, "pcre_compile", "ptip3P"
 
   #int pcre_exec( const pcre *code, const pcre_extra *extra,
   #               const char *subject, int length, int startoffset,
@@ -84,7 +95,7 @@ TODO: recognize nested quoted strings
 .end
 
 
-=head2 void push_file( PerlHash state, string filename )
+=head2 void push_file( Hash state, string filename )
 
 Stores a filename on a stack
 TODO: open these files and complain when they don't or pass filehandles
@@ -92,7 +103,7 @@ TODO: open these files and complain when they don't or pass filehandles
 =cut
 
 .sub push_file 
-  .param PerlHash state 
+  .param Hash state 
   .param string   filename    
 
   # This is needed for m4___file__
@@ -118,7 +129,7 @@ TODO: open these files and complain when they don't or pass filehandles
   .local int stack_size
   stack_size = input_stack
   if stack_size > 0 goto NOT_FIRST_FILE
-    input_block = new PerlHash
+    input_block = new Hash
     input_block['type'] = 'INPUT_STRING'
     input_block['string'] = input_string
     push input_stack, input_block
@@ -134,7 +145,7 @@ TODO: open these files and complain when they don't or pass filehandles
 .end
 
 
-=head2 string next_token( PerlHash state )
+=head2 string next_token( Hash state )
 
 Parse and return a single token from the input stream.  A token can
 either be TOKEN_EOF, if the input_stack is empty; it can be TOKEN_STRING
@@ -149,7 +160,7 @@ Uses regular expressions for finding tokens.
 =cut
 
 .sub next_token 
-  .param PerlHash state 
+  .param Hash state 
 
   .local pmc input_stack    
   input_stack = state['input_stack']
@@ -218,7 +229,6 @@ Uses regular expressions for finding tokens.
     .local pmc struct
     struct = new SArray
     struct = 3
-    .include "../../runtime/parrot/include/datatypes.pasm"
     struct[0] = .DATATYPE_INT
     struct[1] = 2
     struct[2] = 0

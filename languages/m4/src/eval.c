@@ -84,7 +84,7 @@ static eval_error          exp_term( eval_token, eval_t * );
 static eval_error          unary_term( eval_token, eval_t * );
 static eval_error          simple_term( eval_token, eval_t * );
 boolean                    evaluate (const char *, eval_t *);
-PMC *                      m4_eval_compiler(Parrot_Interp interpreter, const char *);
+PMC *                      m4_eval_compiler(Parrot_Interp, const char *);
 void                       Parrot_lib_m4_eval_compiler_init(Parrot_Interp , PMC* );
 
 /*--------------------.
@@ -792,9 +792,9 @@ $ make -C examples/compilers/
  */
 
 void
-Parrot_lib_m4_eval_compiler_init(Parrot_Interp interpreter, PMC* lib)
+Parrot_lib_m4_eval_compiler_init(Parrot_Interp interp, PMC* lib)
 {
-    Parrot_compreg(interpreter, const_string(interpreter, "m4_eval_compiler"), m4_eval_compiler);
+    Parrot_compreg(interp, const_string(interp, "m4_eval_compiler"), m4_eval_compiler);
 }
 
 
@@ -826,7 +826,7 @@ unescape(char *string)
  * simple compiler - no error checking
  */
 PMC *
-m4_eval_compiler( Parrot_Interp interpreter, const char *program )
+m4_eval_compiler( Parrot_Interp interp, const char *program )
 {
     eval_t value;  /* will be returned to caller */
 
@@ -844,8 +844,8 @@ m4_eval_compiler( Parrot_Interp interpreter, const char *program )
     /*
      * need a packfile segment
      */
-    cur_cs = (struct PackFile_ByteCode*)PackFile_Segment_new_seg(&interpreter->code->directory, PF_BYTEC_SEG, "m4_eval_bc", 1);
-    old_cs = Parrot_switch_to_cs(interpreter, cur_cs, 0);
+    cur_cs = (struct PackFile_ByteCode*)PackFile_Segment_new_seg(&interp->code->directory, PF_BYTEC_SEG, "m4_eval_bc", 1);
+    old_cs = Parrot_switch_to_cs(interp, cur_cs, 0);
     /*
      * alloc byte code mem
      */
@@ -856,46 +856,46 @@ m4_eval_compiler( Parrot_Interp interpreter, const char *program )
      * Generate some bytecode
      */
     pc = cur_cs->base.data;
-    /* first integer return value */
-    *pc++ = interpreter->op_lib->op_code("set_i_ic", 1);
+    /* set the single integer return value */
+    *pc++ = interp->op_lib->op_code("set_i_ic", 1);
     *pc++ = 5;
     *pc++ = value;
     /* promise to fill in the counters */
-    *pc++ = interpreter->op_lib->op_code("set_i_ic", 1);
+    *pc++ = interp->op_lib->op_code("set_i_ic", 1);
     *pc++ = 0;
     *pc++ = 1;
     /* one integer return value */
-    *pc++ = interpreter->op_lib->op_code("set_i_ic", 1);
+    *pc++ = interp->op_lib->op_code("set_i_ic", 1);
     *pc++ = 1;
     *pc++ = 1;
     /* no string return values */
-    *pc++ = interpreter->op_lib->op_code("set_i_ic", 1);
+    *pc++ = interp->op_lib->op_code("set_i_ic", 1);
     *pc++ = 2;
     *pc++ = 0;
     /* no PMC return values */
-    *pc++ = interpreter->op_lib->op_code("set_i_ic", 1);
+    *pc++ = interp->op_lib->op_code("set_i_ic", 1);
     *pc++ = 3;
     *pc++ = 0;
     /* no numeric return values */
-    *pc++ = interpreter->op_lib->op_code("set_i_ic", 1);
+    *pc++ = interp->op_lib->op_code("set_i_ic", 1);
     *pc++ = 4;
     *pc++ = 0;
-    /* do something else now */
-    *pc++ = interpreter->op_lib->op_code("invoke_p", 1);
-    *pc++ = 1;
+    /* invoke the return continuation */
+    *pc++ = interp->op_lib->op_code("returncc", 1);
 
     if (old_cs) {
         /* restore old byte_code, */
-        (void)Parrot_switch_to_cs(interpreter, old_cs, 0);
+        (void)Parrot_switch_to_cs(interp, old_cs, 0);
     }
     /*
      * create sub PMC
      */
-    sub = pmc_new(interpreter, enum_class_Eval);
+    sub = pmc_new(interp, enum_class_Eval);
     sub_data = PMC_sub(sub);
     sub_data->seg = cur_cs;
     sub_data->address = cur_cs->base.data;
     sub_data->end = cur_cs->base.data + cur_cs->base.size;
-    sub_data->name = string_from_cstring(interpreter, "m4 eval", 0);
+    sub_data->name = string_from_cstring(interp, "m4 eval", 0);
+
     return sub;
 }

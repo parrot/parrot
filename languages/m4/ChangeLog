@@ -1,5 +1,15 @@
 # $Id$
 
+2005-01-29     Bernhard Schmalhofer
+        * yank it up to revision 0.0.11
+        * Use Integer PMC instead of PerlInt PMC
+        * BUGFIX: Used incorrect signature for pcre_compile
+        * BUGFIX: Non-existing Hash keys no lnager return PerlUndef
+        * BUGFIX: Return with 'returncc' in Sub generated in eval.c
+
+2004-11-16     Bernhard Schmalhofer
+        * Use the Hash PMC insted of the PerlHash PMC
+
 2004-11-16     Bernhard Schmalhofer
         * yank it up to revision 0.0.10
         * The 'm4_eval Compiler' now returns an Eval PMC

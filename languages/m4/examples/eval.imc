@@ -1,6 +1,5 @@
 # $Id$
 
-# See examples/compiler/Makefile for how to generate the needed shared lib
 
 =head1 NAME
 
@@ -9,32 +8,41 @@ eval.imc - Integer arithmetic evaluation for Parrot m4
 =head1 DESCRIPTION
 
 Just a sample.
+See languages/m4/Makefile on how to generate the needed shared lib.
 
 =cut
 
-.sub _main
+.sub example @MAIN
 
-    # load shared lib
-    # There is a init-function in the shared lib,
-    # which registers the new compiler
-    print "Loading shared library, let the library register the compiler\n"
+    print "Trying to load shared library 'm4_eval_compiler'.\n"
+    print "Let the init function of the library register the compiler.\n"
     .local pmc m4_eval_compiler_lib
     m4_eval_compiler_lib = loadlib "m4_eval_compiler"
+    if m4_eval_compiler_lib goto GET_COMPILER
+       printerr "Could not load 'm4_eval_compiler'.\n"     
+       end
 
-    # get compiler
-    print "Getting the compiler\n"
+GET_COMPILER:
+    print "Trying to get the registered compiler.\n"
     .local pmc m4_eval_compiler
     m4_eval_compiler = compreg "m4_eval_compiler"
+    if m4_eval_compiler goto COMPILE_CODE
+       printerr "Could not get the compiler.\n"     
+       end
 
-    # compile code and run it
+COMPILE_CODE:
     .local string expression
     expression = '1 + 1 * 117'
     print "Evaluating expression: "
     print expression
     print "\n"
     .local pmc compiled_code
-    compiled_code = compile m4_eval_compiler, expression
+    compile compiled_code, m4_eval_compiler, expression
+    if compiled_code goto INVOKE_COMPILED_CODE
+       printerr "Could not get the compiler.\n"     
+       end
 
+INVOKE_COMPILED_CODE:
     print "Invoking compiled code, and receive returned expression\n"
     .local int evaluated_expression
     ( evaluated_expression ) = compiled_code()

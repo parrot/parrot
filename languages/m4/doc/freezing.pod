@@ -1,12 +1,12 @@
 # $Id$
 
-=head1 TITLE
+=head1 NAME
 
-Saving and restoring the state of Parrot m4
+freeing.pod - Saving and restoring the state of Parrot m4
 
 =head1 Why?
 
-Performance
+Performance. Exchange with other m4 implementations.
 
 =head1 How?
 

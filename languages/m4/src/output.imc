@@ -1,3 +1,5 @@
+# $Id$
+
 =head1 NAME 
 
 output.imc - handle output for Parrot m4
@@ -12,7 +14,7 @@ References: http://www.gnu.org/software/m4/m4.html
 
 =head1 SUBROUTINES
 
-=head2 void shipout_text( PerlHash state )
+=head2 void shipout_text( Hash state )
 
 Does only a simple print rightnow.
 
@@ -21,7 +23,7 @@ TODO: Support for sync lines.
 =cut
 
 .sub shipout_text 
-  .param PerlHash state 
+  .param Hash state 
   .param string   text 
 
   print text

@@ -58,6 +58,8 @@ L<../TODO.pod>
 
 =head1 SEE ALSO
 
+TODO.pod
+
 =head2 AUTHORS
 
 =cut

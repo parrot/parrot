@@ -1,14 +1,45 @@
+# $Id$
+
 =head1 NAME
 
 m4.imc - An implementation of GNU m4 in Parrot Immediate Representation
 
 =head1 DESCRIPTION
 
-Copyright:  2004 Bernhard Schmalhofer.  All Rights Reserved.
+Copyright:  2004-2005 Bernhard Schmalhofer.  All Rights Reserved.
 CVS Info:   $Id$
 Overview:   Main of Parrot m4.
 History:    Ported from GNU m4 1.4
 References: http://www.gnu.org/software/m4/m4.html
+
+=cut
+
+# The needed subroutines are imported from files in 'src'
+# TODO: private namespaces for local subroutines in the included files
+#
+# The names of these source files should be consistent with 'GNU m4'.
+
+# subs for reading in input
+.include "src/input.imc"
+
+# subs for writing output
+.include "src/output.imc"
+
+# This contains the initialization and execution of the builtin macros.
+.include "src/builtin.imc"
+
+# A dummy implementation of Getopt::Long
+.include "library/Getopt/Long.imc"
+
+# This contains reading and writing of frozen files
+.include "src/freeze.imc"
+
+# Macros are expanded in there.
+.include "src/macro.imc"
+
+# Mainly for debug output
+# .include "library/dumper.imc"
+
 
 =head1 SUBROUTINES
 
@@ -29,7 +60,7 @@ Looks at the command line arguments and acts accordingly.
   # The args are parsed with library/Getopt/Long.imc which should work 
   # somewhat like the Perl5 module Getopt::Long.
   .local pmc opt_spec      
-  opt_spec = new PerlArray
+  opt_spec = new ResizableStringArray
   # --version, boolean
   push opt_spec, "version"
   # --help, boolean
@@ -87,7 +118,7 @@ Looks at the command line arguments and acts accordingly.
   # Was '--version' passed ?
   is_defined = defined opt["version"]
   unless is_defined goto NO_VERSION_FLAG
-    print "Parrot m4 0.0.10\n"
+    print "Parrot m4 0.0.11\n"
     end
 NO_VERSION_FLAG: 
 
@@ -101,7 +132,7 @@ NO_HELP_FLAG:
   # TODO: In near future we propably should use objects here
   # For now let's just just use a hash with all state information
   .local pmc state
-  state = new PerlHash
+  state = new Hash
 
   # Artificial limit for macro expansion in macro.imc
   # default setting of 'nesting_limit' max be overridden by
@@ -127,7 +158,7 @@ NO_NESTING_LIMIT_FLAG:
 NO_PREFIX_BUILTINS_FLAG: 
 
   # Was a yet unimplemented option passed?
-  # TODO: put names of unimplemented options in an PerlArray
+  # TODO: put names of unimplemented options in an ResizableStringArray
   .local string unimplemented_option
 
   unimplemented_option = "traditional"
@@ -215,7 +246,7 @@ NO_UNIMPLEMENTED_OPTION:
 
   # First we set up a table of all symbols, that is macros 
   .local pmc symtab
-  #symtab = new PerlHash
+  #symtab = new Hash
   symtab = new OrderedHash
   state['symtab'] = symtab    
 
@@ -243,17 +274,21 @@ ARGC_IS_OK:
   .local pmc builtin_tab
   builtin_tab = new OrderedHash
   state['builtin_tab'] = builtin_tab    
+  
   builtin_tab_init( state )
 
-  # Check whether the option --reload-state was passed
+  # Was '--reload-state' passed ?
+  is_defined = defined opt['reload-state']
+  unless is_defined goto NO_RELOAD_STATE_FLAG
+
   .local string frozen_file
   frozen_file = opt['reload-state']
   .local int string_len
   string_len = length frozen_file
-  unless string_len > 0 goto BUILTIN_MACROS_INIT
+  unless string_len > 0 goto NO_RELOAD_STATE_FLAG
     reload_frozen_state( state, frozen_file )
     goto COMMANDLINE_MACROS_INIT
-BUILTIN_MACROS_INIT:
+NO_RELOAD_STATE_FLAG:
   builtin_init( state )
 
 COMMANDLINE_MACROS_INIT:
@@ -281,18 +316,22 @@ LAST_FILENAME_LOOP:
 HANDLE_WRAPUP_TEXT:
   # TODO: handle wrapup text, whatever that is
 
-CHECK_FROZEN_FLAG:
+  # Was '--freeze-state' passed ?
+  is_defined = defined opt['freeze-state']
+  unless is_defined goto NO_FREEZE_STATE_FLAG
+
   .local string freeze_file
   freeze_file = opt["freeze-state"]
   string_len = length freeze_file
-  unless string_len > 0 goto MAKE_DIVERSION
+  unless string_len > 0 goto NO_FREEZE_STATE_FLAG
     produce_frozen_state( state, freeze_file )
     goto FINISH_PROGRAM
-MAKE_DIVERSION:
+
+NO_FREEZE_STATE_FLAG:
   # TODO: make_diversion, undiver_all, whatever that does 
 
 FINISH_PROGRAM:
-  end
+
 .end
 
 
@@ -327,29 +366,3 @@ TODO: Pass a flag for EXIT_FAILURE and EXIT_SUCCESS
 
 .end
 
-
-# The needed subroutines are imported from files in 'src'
-# TODO: private namespaces for local subroutines in the included files
-#
-# The names of these source files should be consistent with 'GNU m4'.
-
-# subs for reading in input
-.include "src/input.imc"
-
-# subs for writing output
-.include "src/output.imc"
-
-# This contains the initialization and execution of the builtin macros.
-.include "src/builtin.imc"
-
-# A dummy implementation of Getopt::Long
-.include "library/Getopt/Long.imc"
-
-# This contains reading and writing of frozen files
-.include "src/freeze.imc"
-
-# Macros are expanded in there.
-.include "src/macro.imc"
-
-# Mainly for debug output
-.include "library/dumper.imc"

@@ -1,27 +1,22 @@
 # $Id$
 
 # Setup of some commands
-LN_SF     = ln -s -f
-PARROT    = ..${slash}..${slash}parrot${exe}
-PERL      = ${perl}
-RM_RF     = ${rm_rf}
+LN_SF          = ln -s -f
+PARROT         = ..${slash}..${slash}parrot${exe}
+PERL           = ${perl}
+RM_RF          = ${rm_rf}
 
 # Compile commands and flags
-CC        = ${cc}
-CFLAGS    = ${ccflags} -I../../include
-CC_SHARED = ${cc_shared} # e.g. -fpic
-DEBUG     = ${cc_debug}
-WARN      = ${ccwarn}
-
-# Linker command and flags
-LINK      = ${link}
-LINKFLAGS = ${linkflags}
+CC             = ${cc}
+CFLAGS         = ${ccflags} -I../../include
+CC_SHARED      = ${cc_shared} # e.g. -fpic
+DEBUG          = ${cc_debug}
+WARN           = ${ccwarn}
 
 # Shared-library building
-LD        = ${ld}
-LDFLAGS   = ${ldflags}
+LD             = ${ld}
+LDFLAGS        = ${ldflags}
 LD_SHARE_FLAGS = ${ld_share_flags} # e.g. -shared
-LD_LOAD_FLAGS = ${ld_load_flags}
 
 # some constants
 M4_EVAL_COMPILER_SO = ../../runtime/parrot/dynext/m4_eval_compiler.so

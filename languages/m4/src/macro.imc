@@ -1,3 +1,5 @@
+# $Id$
+
 =head1 NAME
 
 src/macro.imc - does macro substitution
@@ -11,7 +13,7 @@ References: http://www.gnu.org/software/m4/m4.html
 
 =head1 SUBROUTINES
 
-=head2 void expand_input( PerlHash state )
+=head2 void expand_input( Hash state )
 
 Loop through some input files.
 TODO: read files in next_token()
@@ -19,7 +21,7 @@ TODO: read files in next_token()
 =cut
 
 .sub expand_input 
-  .param PerlHash  state    
+  .param Hash  state    
 
   .local string token_data, token_type  # current token data and type        
 
@@ -33,7 +35,7 @@ FINISH_EXPAND_INPUT:
 .end
 
 
-=head2 void expand_token( PerlHash state, string token_type, string token_data )
+=head2 void expand_token( Hash state, string token_type, string token_data )
 
 Expand one token, according to its type.  Potential macro names
 (TOKEN_WORD) are looked up in the symbol table, to see if they have a
@@ -43,7 +45,7 @@ the text are just copied to the output.
 =cut
 
 .sub expand_token 
-  .param PerlHash  state    
+  .param Hash  state    
   .param string    token_type
   .param string    token_data
 
@@ -73,10 +75,6 @@ the text are just copied to the output.
         # Most macros needs a parameter list, but e.g. __file__ has not args
         .local int blind_no_args 
         blind_no_args = symbol['blind_no_args'] 
-      #print token_data
-      #print symbol_type
-      #print blind_no_args 
-      #print "\n"
         unless blind_no_args goto EXPAND_MACRO
           .local string input_string    
           input_string = state['input_stack';0;'string']
@@ -103,21 +101,22 @@ FINISH_EXPAND_TOKEN:
 .end
 
 
-=head2 string processed_token expand_macro( PerlHash state, PerlHash symbol )
+=head2 string processed_token expand_macro( Hash state, Hash symbol )
 
-The macro expansion is handled by expand_macro(). It parses the
-arguments, using collect_arguments(), and builds a PerlArray containing 
-the arguments. The arguments themselves are stored on a local obstack.
-Expand_macro() uses call_macro() to do the call of the macro.	
+The macro expansion is handled by expand_macro().
+It parses the arguments in collect_arguments() and
+builds a PerlArray containing the arguments.
+The arguments themselves are stored on a local obstack.
+expand_macro() uses call_macro() to do the call of the macro.	
 
-Expand_macro() is potentially recursive, since it calls expand_argument(), 
+expand_macro() is potentially recursive, since it calls expand_argument(), 
 which might call expand_token (), which might call expand_macro().
 
 =cut
 
 .sub expand_macro 
-  .param PerlHash  state
-  .param PerlHash  symbol 
+  .param Hash  state
+  .param Hash  symbol 
 
   .local int expansion_level
   expansion_level = state['expansion_level']
@@ -159,9 +158,9 @@ TODO: distinguish between TOKEN_FUNC and TOKEN_WORD
 =cut
 
 .sub call_macro 
-  .param PerlHash  state
+  .param Hash      state
   .param pmc       symbol
-  .param PerlArray arguments
+  .param pmc       arguments
 
   .local string symbol_type, symbol_name
   symbol_type = symbol['type']
@@ -199,8 +198,8 @@ Collect all the arguments to a call of a macro.
 =cut
 
 .sub collect_arguments 
-  .param PerlHash  state    
-  .param PerlArray arguments
+  .param pmc state    
+  .param pmc arguments
 
   # The macro name has already been read in, thus we need to match 
   # something like "('furcht', 'Hallo Welt')"
@@ -225,6 +224,7 @@ Collect all the arguments to a call of a macro.
 EXPAND_ARG:
   # find a string before ')'
   index_closing = index input_string, ')', start_index
+
   if index_closing == -1 goto NO_MORE_ARGS
   if num_args == 0 goto SKIP_SKIP_COMMA
   index_comma = index input_string, ',', start_index

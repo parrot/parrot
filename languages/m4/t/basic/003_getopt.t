@@ -32,7 +32,7 @@ END_OUT
 #--------------------------------------------
 $real_out     = `$parrot_m4 --version 2>&1`; 
 is( $real_out, << 'END_OUT', '--version' );
-Parrot m4 0.0.10
+Parrot m4 0.0.11
 END_OUT
 
 

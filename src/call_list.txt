@@ -247,6 +247,7 @@ i	ptiit33i
 
 # The following are used by library/pcre.imc
 p	tiB3P
+p	tip3P
 i	pPtiiipi
 i	tpiibi
 

@@ -1,3 +1,5 @@
+# $Id$
+
 =head1 NAME
 
 freeze.imc - reading and writing of state files
@@ -19,20 +21,20 @@ Reading and writing state files. Invoced with the command line parameters
 
 =head1 SUBROUTINES
 
-=head2 void produce_frozen_state( PerlHash state, string frozen_file )
+=head2 void produce_frozen_state( Hash state, string frozen_file )
 
 Dump a state file.
 
 =cut
 
 .sub produce_frozen_state 
-  .param PerlHash   state
+  .param Hash   state
   .param string     frozen_file    
 
   .local pmc symtab
   symtab = state['symtab']
 
-  .local PerlHash  symbol
+  .local Hash  symbol
   .local int       len
   .local string    name
   .local string    text
@@ -64,7 +66,7 @@ Dump a state file.
 .end
 
 
-=head2 void reload_frozen_state( PerlHash state, string frozen_file )
+=head2 void reload_frozen_state( Hash state, string frozen_file )
 
 Read a frozen file
 
@@ -77,7 +79,7 @@ For now we just worry about the flags 'F', 'T' and 'V'.
 =cut
 
 .sub reload_frozen_state 
-  .param PerlHash   state    
+  .param Hash   state    
   .param string     frozen_file    
 
   # Read the file into the string file

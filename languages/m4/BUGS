@@ -5,4 +5,4 @@ don't work yet.
 
 Half of the tests will fail, if GNU m4 is not in $ENV{PATH} as 'm4'.
 
-See also the Parrot Request Tracker at http://bugs6.perl.org.
+See also the Parrot Issue Tracker at http://bugs6.perl.org.
