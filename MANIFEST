@@ -286,6 +286,7 @@ examples/assembly/stack.pasm                      [main]doc
 examples/assembly/sub.pasm                        [main]doc
 examples/assembly/substr.pasm                     [main]doc
 examples/assembly/trace.pasm                      [main]doc
+examples/assembly/thr-primes.imc                  [main]doc
 examples/assembly/uniq.pasm                       [main]doc
 examples/assembly/xml_parser.pasm                 [main]doc
 examples/benchmarks/arriter.imc                   [main]doc

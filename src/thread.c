@@ -84,6 +84,8 @@ pt_thread_prepare_for_run(Parrot_Interp d, Parrot_Interp s)
     d->pmc_reg.registers[1] = ret_c;
 }
 
+void clone_interpreter(PMC* dest, PMC* self);
+
 /*
  * ParrotThread emthods
  *
@@ -94,6 +96,10 @@ int
 pt_thread_run(Parrot_Interp interp, PMC* dest_interp, PMC* sub)
 {
     Parrot_Interp interpreter = PMC_data(dest_interp);
+
+    PMC *parent = VTABLE_get_pmc_keyed_int(interp, interp->iglobals,
+                IGLOBALS_INTERPRETER);
+    clone_interpreter(dest_interp, parent);
 
     dest_interp->cache.struct_val = sub->cache.struct_val;
     pt_thread_prepare_for_run(interpreter, interp);

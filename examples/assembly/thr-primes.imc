@@ -1,0 +1,148 @@
+=comment
+
+From perldoc perlthrtut
+
+       1  #!/usr/bin/perl -w
+       2  # prime-pthread, courtesy of Tom Christiansen
+       3
+       4  use strict;
+       5
+       6  use threads;
+       7  use Thread::Queue;
+       8
+       9  my $stream = new Thread::Queue;
+       10 my $kid    = new threads(\&check_num, $stream, 2);
+       11
+       12 for my $i ( 3 .. 1000 ) {
+       13     $stream->enqueue($i);
+       14 }
+       15
+       16 $stream->enqueue(undef);
+       17 $kid->join;
+       18
+       19 sub check_num {
+       20     my ($upstream, $cur_prime) = @_;
+       21     my $kid;
+       22     my $downstream = new Thread::Queue;
+       23     while (my $num = $upstream->dequeue) {
+       24         next unless $num % $cur_prime;
+       25         if ($kid) {
+       26            $downstream->enqueue($num);
+       27                  } else {
+       28            print "Found prime $num\n";
+       29                $kid = new threads(\&check_num, $downstream, $num);
+       30         }
+       31     }
+       32     $downstream->enqueue(undef) if $kid;
+       33     $kid->join           if $kid;
+       34 }
+=cut
+
+# translate to PIR by leo
+
+# Runs currently only with DOD turned off
+# and SIGSEGVs at prime 193 here
+
+.sub _main
+    .sym pmc kid
+    .sym pmc Check_num
+    .sym pmc stream
+    #sweepoff
+    stream = new TQueue
+    Check_num = global "_check_num"
+    kid = new ParrotThread
+    $P2 = new PerlInt
+    $P2 = 2
+    .sym pmc Thread_new
+    find_method Thread_new, kid, "thread"
+    .pcc_begin prototyped
+    .arg kid
+    .arg Check_num
+    .arg stream
+    .arg $P2
+    .nci_call Thread_new
+    .pcc_end
+
+    .sym int i
+    i = 3
+lp:
+    $P3 = new PerlInt
+    $P3 = i
+    push stream, $P3
+    inc i
+    if i <= 100 goto lp
+
+    $P4 = new PerlUndef
+    push stream, $P4
+
+    .sym int tid
+    tid = kid
+    .sym pmc Thread_join
+    find_method Thread_join, kid, "join"
+    .pcc_begin prototyped
+    .arg tid
+    .nci_call Thread_join
+    .pcc_end
+    end
+.end
+
+.sub _check_num prototyped
+   .param pmc self
+   .param pmc sub
+   .param pmc upstream
+   .param pmc cur_prime
+
+    sweepoff
+    .sym pmc downstream
+    downstream = new TQueue
+    .sym pmc Num
+    .sym pmc kid
+    kid = new PerlUndef
+lp:
+    shift Num, upstream
+    $I0 = defined Num
+    unless $I0 goto ewhile
+    $P0 = new PerlInt
+    $P0 = Num % cur_prime
+    unless $P0 goto lp
+    $I1 = defined kid
+    unless $I1 goto no_kid1
+    push downstream, Num
+    goto lp
+no_kid1:
+    print "Found prime "
+    print Num
+    print "\n"
+
+    kid = new ParrotThread
+    .sym pmc Thread_new
+    find_method Thread_new, kid, "thread"
+    .pcc_begin prototyped
+    .arg kid
+    .arg sub
+    .arg downstream
+    .arg Num
+    .nci_call Thread_new
+    .pcc_end
+    goto lp
+ewhile:
+
+    $I1 = defined kid
+    unless $I1 goto no_kid2
+
+    $P4 = new PerlUndef
+    push downstream, $P4
+
+    .sym int tid
+    tid = kid
+    .sym pmc Thread_join
+    find_method Thread_join, kid, "join"
+    .pcc_begin prototyped
+    .arg tid
+    .nci_call Thread_join
+    .pcc_end
+
+no_kid2:
+   .pcc_begin_return
+   .pcc_end_return
+.end

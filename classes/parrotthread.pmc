@@ -28,8 +28,6 @@
 #include "parrot/embed.h"
 #include <assert.h>
 
-void clone_interpreter(PMC* dest, PMC* self);
-
 pmclass ParrotThread extends ParrotInterpreter need_ext {
 
     void class_init() {
@@ -52,7 +50,6 @@ pmclass ParrotThread extends ParrotInterpreter need_ext {
         UNLOCK(interpreter_array_mutex);
         parent = VTABLE_get_pmc_keyed_int(interpreter, interpreter->iglobals,
                 IGLOBALS_INTERPRETER);
-        clone_interpreter(SELF, parent);
     }
 
     /*
@@ -63,7 +60,6 @@ pmclass ParrotThread extends ParrotInterpreter need_ext {
         SUPER(parent);
         pt_add_to_interpreters(PMC_data(parent), PMC_data(SELF));
         UNLOCK(interpreter_array_mutex);
-        clone_interpreter(SELF, parent);
     }
 }
 

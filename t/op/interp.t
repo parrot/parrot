@@ -289,7 +289,7 @@ output_is(<<'CODE', <<'OUTPUT', "thread 1");
     # get tid of thread
     set I5, P5
     # wait for it
-    find_method P0, P2, "join"
+    find_method P0, P5, "join"
     invoke
     end
 
