@@ -79,10 +79,10 @@ Break execution and drop into the debugger.
 If we are already into the debugger and is the first time we are
 called set a breakpoint.
 
-When you re run/continue the program begin debugged it will pay 
-no attention to the debug ops. 
+When you re run/continue the program begin debugged it will pay
+no attention to the debug ops.
 
-TODO: clone the interpreter to allow people to play into the 
+TODO: clone the interpreter to allow people to play into the
 debugger and then continue the normal execution of the program.
 
 =cut
@@ -93,7 +93,7 @@ op debug_break() :base_debug {
     if (!(interpreter->pdb->state & PDB_BREAK)) {
         interpreter->pdb->state |= PDB_BREAK;
         interpreter->pdb->state |= PDB_STOPPED;
-        interpreter->pdb->cur_opcode = (opcode_t *)cur_opcode + 1; 
+        interpreter->pdb->cur_opcode = (opcode_t *)cur_opcode + 1;
         PDB_set_break(interpreter,NULL);
         while (!(interpreter->pdb->state & PDB_EXIT)) {
             PDB_get_command(interpreter);
@@ -103,11 +103,11 @@ op debug_break() :base_debug {
         /* FIXME this is not ok */
         exit(0);
     }
-    interpreter->pdb->cur_opcode = (opcode_t *)cur_opcode + 1; 
+    interpreter->pdb->cur_opcode = (opcode_t *)cur_opcode + 1;
     PDB_set_break(interpreter,NULL);
 
     goto NEXT();
-} 
+}
 
 ########################################
 
@@ -119,14 +119,21 @@ Print all the Parrot registers at once.
 
 op debug_print() :base_debug {
     if (!(interpreter->pdb->state & PDB_BREAK)) {
+#if 1
+	PIO_eprintf(interpreter, "debug_print is disabled\n");
+#else
+	/*
+	 * XXX adjust register layout
+	 */
         PDB_print_int(interpreter, &interpreter->int_reg, -1);
         PDB_print_num(interpreter, &interpreter->num_reg, -1);
         PDB_print_string(interpreter,&interpreter->string_reg, -1);
         PDB_print_pmc(interpreter,&interpreter->pmc_reg, -1, NULL);
+#endif
     }
     goto NEXT();
 }
-    
+
 ########################################
 
 =item B<die>()
@@ -144,7 +151,7 @@ op die(in INT) :base_debug {
   _exit($1);
   goto NEXT();
 }
-  
+
 
 =back
 

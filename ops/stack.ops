@@ -47,26 +47,26 @@ registers to their original state.
 =cut
 
 inline op popi() :base_core {
-  Parrot_pop_i(interpreter, &interpreter->int_reg.registers[16]);
-  Parrot_pop_i(interpreter, &interpreter->int_reg.registers[0]);
+  Parrot_pop_i(interpreter, &REG_INT(16));
+  Parrot_pop_i(interpreter, &REG_INT(0));
   goto NEXT();
 }
 
 inline op popn() :base_core {
-  Parrot_pop_n(interpreter, &interpreter->num_reg.registers[16]);
-  Parrot_pop_n(interpreter, &interpreter->num_reg.registers[0]);
+  Parrot_pop_n(interpreter, &REG_NUM(16));
+  Parrot_pop_n(interpreter, &REG_NUM(0));
   goto NEXT();
 }
 
 inline op pops() :base_core {
-  Parrot_pop_s(interpreter, &interpreter->string_reg.registers[16]);
-  Parrot_pop_s(interpreter, &interpreter->string_reg.registers[0]);
+  Parrot_pop_s(interpreter, &REG_STR(16));
+  Parrot_pop_s(interpreter, &REG_STR(0));
   goto NEXT();
 }
 
 inline op popp() :base_core {
-  Parrot_pop_p(interpreter, &interpreter->pmc_reg.registers[16]);
-  Parrot_pop_p(interpreter, &interpreter->pmc_reg.registers[0]);
+  Parrot_pop_p(interpreter, &REG_PMC(16));
+  Parrot_pop_p(interpreter, &REG_PMC(0));
   goto NEXT();
 }
 
@@ -86,22 +86,22 @@ from a register frame popped off the corresponding frame stack.
 =cut
 
 inline op popbottomi() :base_core {
-  Parrot_pop_i(interpreter, &interpreter->int_reg.registers[0]);
+  Parrot_pop_i(interpreter, &REG_INT(0));
   goto NEXT();
 }
 
 inline op popbottomn() :base_core {
-  Parrot_pop_n(interpreter, &interpreter->num_reg.registers[0]);
+  Parrot_pop_n(interpreter, &REG_NUM(0));
   goto NEXT();
 }
 
 inline op popbottoms() :base_core {
-  Parrot_pop_s(interpreter, &interpreter->string_reg.registers[0]);
+  Parrot_pop_s(interpreter, &REG_STR(0));
   goto NEXT();
 }
 
 inline op popbottomp() :base_core {
-  Parrot_pop_p(interpreter, &interpreter->pmc_reg.registers[0]);
+  Parrot_pop_p(interpreter, &REG_PMC(0));
   goto NEXT();
 }
 
@@ -121,22 +121,22 @@ from a register frame popped off the corresponding frame stack.
 =cut
 
 inline op poptopi() :base_core {
-  Parrot_pop_i(interpreter, &interpreter->int_reg.registers[16]);
+  Parrot_pop_i(interpreter, &REG_INT(16));
   goto NEXT();
 }
 
 inline op poptopn() :base_core {
-  Parrot_pop_n(interpreter, &interpreter->num_reg.registers[16]);
+  Parrot_pop_n(interpreter, &REG_NUM(16));
   goto NEXT();
 }
 
 inline op poptops() :base_core {
-  Parrot_pop_s(interpreter, &interpreter->string_reg.registers[16]);
+  Parrot_pop_s(interpreter, &REG_STR(16));
   goto NEXT();
 }
 
 inline op poptopp() :base_core {
-  Parrot_pop_p(interpreter, &interpreter->pmc_reg.registers[16]);
+  Parrot_pop_p(interpreter, &REG_PMC(16));
   goto NEXT();
 }
 
@@ -161,26 +161,26 @@ frame holds the values from registers 16-31.
 =cut
 
 inline op pushi() :base_core {
-  Parrot_push_i(interpreter, &interpreter->int_reg.registers[0]);
-  Parrot_push_i(interpreter, &interpreter->int_reg.registers[16]);
+  Parrot_push_i(interpreter, &REG_INT(0));
+  Parrot_push_i(interpreter, &REG_INT(16));
   goto NEXT();
 }
 
 inline op pushn() :base_core {
-  Parrot_push_n(interpreter, &interpreter->num_reg.registers[0]);
-  Parrot_push_n(interpreter, &interpreter->num_reg.registers[16]);
+  Parrot_push_n(interpreter, &REG_NUM(0));
+  Parrot_push_n(interpreter, &REG_NUM(16));
   goto NEXT();
 }
 
 inline op pushs() :base_core {
-  Parrot_push_s(interpreter, &interpreter->string_reg.registers[0]);
-  Parrot_push_s(interpreter, &interpreter->string_reg.registers[16]);
+  Parrot_push_s(interpreter, &REG_STR(0));
+  Parrot_push_s(interpreter, &REG_STR(16));
   goto NEXT();
 }
 
 inline op pushp() :base_core {
-  Parrot_push_p(interpreter, &interpreter->pmc_reg.registers[0]);
-  Parrot_push_p(interpreter, &interpreter->pmc_reg.registers[16]);
+  Parrot_push_p(interpreter, &REG_PMC(0));
+  Parrot_push_p(interpreter, &REG_PMC(16));
   goto NEXT();
 }
 
@@ -201,22 +201,22 @@ on the appropriate register frame stack.
 =cut
 
 inline op pushtopi() :base_core {
-  Parrot_push_i(interpreter, &interpreter->int_reg.registers[16]);
+  Parrot_push_i(interpreter, &REG_INT(16));
   goto NEXT();
 }
 
 inline op pushtopn() :base_core {
-  Parrot_push_n(interpreter, &interpreter->num_reg.registers[16]);
+  Parrot_push_n(interpreter, &REG_NUM(16));
   goto NEXT();
 }
 
 inline op pushtops() :base_core {
-  Parrot_push_s(interpreter, &interpreter->string_reg.registers[16]);
+  Parrot_push_s(interpreter, &REG_STR(16));
   goto NEXT();
 }
 
 inline op pushtopp() :base_core {
-  Parrot_push_p(interpreter, &interpreter->pmc_reg.registers[16]);
+  Parrot_push_p(interpreter, &REG_PMC(16));
   goto NEXT();
 }
 
@@ -237,22 +237,22 @@ on the appropriate register frame stack.
 =cut
 
 inline op pushbottomi() :base_core {
-  Parrot_push_i(interpreter, &interpreter->int_reg.registers[0]);
+  Parrot_push_i(interpreter, &REG_INT(0));
   goto NEXT();
 }
 
 inline op pushbottomn() :base_core {
-  Parrot_push_n(interpreter, &interpreter->num_reg.registers[0]);
+  Parrot_push_n(interpreter, &REG_NUM(0));
   goto NEXT();
 }
 
 inline op pushbottoms() :base_core {
-  Parrot_push_s(interpreter, &interpreter->string_reg.registers[0]);
+  Parrot_push_s(interpreter, &REG_STR(0));
   goto NEXT();
 }
 
 inline op pushbottomp() :base_core {
-  Parrot_push_p(interpreter, &interpreter->pmc_reg.registers[0]);
+  Parrot_push_p(interpreter, &REG_PMC(0));
   goto NEXT();
 }
 
@@ -309,42 +309,42 @@ stacks. This op is equivalent to:
 =cut
 
 inline op saveall() :base_core {
-  Parrot_push_i(interpreter, &interpreter->int_reg.registers[0]);
-  Parrot_push_i(interpreter, &interpreter->int_reg.registers[16]);
-  Parrot_push_s(interpreter, &interpreter->string_reg.registers[0]);
-  Parrot_push_s(interpreter, &interpreter->string_reg.registers[16]);
-  Parrot_push_n(interpreter, &interpreter->num_reg.registers[0]);
-  Parrot_push_n(interpreter, &interpreter->num_reg.registers[16]);
-  Parrot_push_p(interpreter, &interpreter->pmc_reg.registers[0]);
-  Parrot_push_p(interpreter, &interpreter->pmc_reg.registers[16]);
+  Parrot_push_i(interpreter, &REG_INT(0));
+  Parrot_push_i(interpreter, &REG_INT(16));
+  Parrot_push_s(interpreter, &REG_STR(0));
+  Parrot_push_s(interpreter, &REG_STR(16));
+  Parrot_push_n(interpreter, &REG_NUM(0));
+  Parrot_push_n(interpreter, &REG_NUM(16));
+  Parrot_push_p(interpreter, &REG_PMC(0));
+  Parrot_push_p(interpreter, &REG_PMC(16));
   goto NEXT();
 }
 
 inline op restoreall() :base_core {
-  Parrot_pop_i(interpreter, &interpreter->int_reg.registers[16]);
-  Parrot_pop_i(interpreter, &interpreter->int_reg.registers[0]);
-  Parrot_pop_s(interpreter, &interpreter->string_reg.registers[16]);
-  Parrot_pop_s(interpreter, &interpreter->string_reg.registers[0]);
-  Parrot_pop_n(interpreter, &interpreter->num_reg.registers[16]);
-  Parrot_pop_n(interpreter, &interpreter->num_reg.registers[0]);
-  Parrot_pop_p(interpreter, &interpreter->pmc_reg.registers[16]);
-  Parrot_pop_p(interpreter, &interpreter->pmc_reg.registers[0]);
+  Parrot_pop_i(interpreter, &REG_INT(16));
+  Parrot_pop_i(interpreter, &REG_INT(0));
+  Parrot_pop_s(interpreter, &REG_STR(16));
+  Parrot_pop_s(interpreter, &REG_STR(0));
+  Parrot_pop_n(interpreter, &REG_NUM(16));
+  Parrot_pop_n(interpreter, &REG_NUM(0));
+  Parrot_pop_p(interpreter, &REG_PMC(16));
+  Parrot_pop_p(interpreter, &REG_PMC(0));
   goto NEXT();
 }
 
 inline op savetop() :base_core {
-  Parrot_push_i(interpreter, &interpreter->int_reg.registers[16]);
-  Parrot_push_s(interpreter, &interpreter->string_reg.registers[16]);
-  Parrot_push_n(interpreter, &interpreter->num_reg.registers[16]);
-  Parrot_push_p(interpreter, &interpreter->pmc_reg.registers[16]);
+  Parrot_push_i(interpreter, &REG_INT(16));
+  Parrot_push_s(interpreter, &REG_STR(16));
+  Parrot_push_n(interpreter, &REG_NUM(16));
+  Parrot_push_p(interpreter, &REG_PMC(16));
   goto NEXT();
 }
 
 inline op restoretop() :base_core {
-  Parrot_pop_i(interpreter, &interpreter->int_reg.registers[16]);
-  Parrot_pop_s(interpreter, &interpreter->string_reg.registers[16]);
-  Parrot_pop_n(interpreter, &interpreter->num_reg.registers[16]);
-  Parrot_pop_p(interpreter, &interpreter->pmc_reg.registers[16]);
+  Parrot_pop_i(interpreter, &REG_INT(16));
+  Parrot_pop_s(interpreter, &REG_STR(16));
+  Parrot_pop_n(interpreter, &REG_NUM(16));
+  Parrot_pop_p(interpreter, &REG_PMC(16));
   goto NEXT();
 }
 

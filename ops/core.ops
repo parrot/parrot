@@ -407,7 +407,7 @@ and invoke'ing it.
 
 inline op invoke() {
   opcode_t *dest;
-  PMC * p = interpreter->pmc_reg.registers[0];
+  PMC * p = REG_PMC(0);
 
   dest = (opcode_t *)p->vtable->invoke(interpreter, p, expr NEXT());
 
@@ -425,7 +425,7 @@ inline op invoke(in PMC) {
 
 inline op invokecc() {
   opcode_t *dest;
-  PMC * p = interpreter->pmc_reg.registers[0];
+  PMC * p = REG_PMC(0);
   dest = expr NEXT();
   REG_PMC(1) = new_ret_continuation_pmc(interpreter, dest);
   dest = (opcode_t *)p->vtable->invoke(interpreter, p, dest);
@@ -520,13 +520,13 @@ inline op newsub(in INT, in INT, labelconst INT, labelconst INT) {
     internal_exception(1, "Illegal PMC enum (%d) in newsub\n", (int)$2);
     abort(); /* Deserve to lose */
   }
-  interpreter->pmc_reg.registers[0] = pmc_new_noinit(interpreter, $1);
-  VTABLE_init(interpreter, interpreter->pmc_reg.registers[0]);
-  VTABLE_set_pointer(interpreter, interpreter->pmc_reg.registers[0],
+  REG_PMC(0) = pmc_new_noinit(interpreter, $1);
+  VTABLE_init(interpreter, REG_PMC(0));
+  VTABLE_set_pointer(interpreter, REG_PMC(0),
       (CUR_OPCODE + $3));
-  interpreter->pmc_reg.registers[1] = pmc_new_noinit(interpreter, $2);
-  VTABLE_init(interpreter, interpreter->pmc_reg.registers[1]);
-  VTABLE_set_pointer(interpreter, interpreter->pmc_reg.registers[1],
+  REG_PMC(1) = pmc_new_noinit(interpreter, $2);
+  VTABLE_init(interpreter, REG_PMC(1));
+  VTABLE_set_pointer(interpreter, REG_PMC(1),
       (CUR_OPCODE + $4));
   goto NEXT();
 }
