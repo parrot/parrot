@@ -273,6 +273,17 @@ pointer, so if you do something like:
 this will copy the pointer in S1 into S0, leaving B<both> registers
 pointing at the same string.
 
+=item assign Px, ty
+
+Takes the contents of Y and assigns them into the existing PMC in X.
+
+While set just copies pointers from one register to another, assign
+actually does a value assignment, as:
+
+    $foo = $bar;
+
+X's assign vtable method is invoked and it does whatever is appropriate.
+
 =item clone Px, Py
 
 =item clone Sx, xy
@@ -950,3 +961,4 @@ Fetches the 'current package' marker.
 =head1 ATTACHMENTS
 
 =head1 REFERENCES
+
