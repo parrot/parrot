@@ -1,6 +1,6 @@
 #! perl -w
 
-use Parrot::Test tests => 18;
+use Parrot::Test tests => 28;
 use Test::More;
 
 # Tests for stack operations, currently push*, push_*_c and pop*
@@ -294,6 +294,180 @@ output_is(<<"CODE", <<'OUTPUT', 'rotate 3');
     end
 CODE
 213
+OUTPUT
+
+
+output_is(<<"CODE", <<'OUTPUT', 'rotate -1');
+    set I0, 1
+    save I0
+    set I0, 2
+    save I0
+    set I0, 3
+    save I0
+    rotate_up -1
+    restore I0
+    print I0
+    restore I0
+    print I0
+    restore I0
+    print I0
+    print "\\n"
+    end
+CODE
+321
+OUTPUT
+
+output_is(<<"CODE", <<'OUTPUT', 'rotate -2');
+    set I0, 1
+    save I0
+    set I0, 2
+    save I0
+    set I0, 3
+    save I0
+    rotate_up -2
+    restore I0
+    print I0
+    restore I0
+    print I0
+    restore I0
+    print I0
+    print "\\n"
+    end
+CODE
+231
+OUTPUT
+
+output_is(<<"CODE", <<'OUTPUT', 'rotate -3');
+    set I0, 1
+    save I0
+    set I0, 2
+    save I0
+    set I0, 3
+    save I0
+    rotate_up -3
+    restore I0
+    print I0
+    restore I0
+    print I0
+    restore I0
+    print I0
+    print "\\n"
+    end
+CODE
+132
+OUTPUT
+
+output_is(<<'CODE', <<'OUTPUT', 'rotate with a full stack chunk');
+      set I0, 0
+FOO:  save I0
+      inc I0
+      lt I0, 256, FOO
+
+      rotate_up 2
+
+      restore I1
+      print I1
+      print "\n"
+      end
+CODE
+254
+OUTPUT
+
+output_is(<<'CODE', <<'OUTPUT', 'rotate across stack chunk boundary');
+      set I0, 0
+FOO:  save I0
+      inc I0
+      lt I0, 257, FOO
+
+      rotate_up 2
+
+      restore I1
+      print I1
+      print "\n"
+      end
+CODE
+255
+OUTPUT
+
+output_is(<<'CODE', <<'OUTPUT', 'rotate by stack chunk size');
+      set I0, 0
+FOO:  save I0
+      inc I0
+      lt I0, 300, FOO
+
+      rotate_up -256
+
+      restore I1
+      print I1
+      print "\n"
+      end
+CODE
+44
+OUTPUT
+
+output_is(<<'CODE', <<'OUTPUT', 'rotate by more than stack chunk size');
+      set I0, 0
+FOO:  save I0
+      inc I0
+      lt I0, 300, FOO
+
+      rotate_up -257
+
+      restore I1
+      print I1
+      print "\n"
+      end
+CODE
+43
+OUTPUT
+
+output_is(<<"CODE", <<'OUTPUT', 'rotate up by more than stack size');
+    set I0, 1
+    save I0
+    set I0, 2
+    save I0
+    rotate_up 3
+    end
+CODE
+Stack too shallow!
+OUTPUT
+
+output_is(<<"CODE", <<'OUTPUT', 'rotate down by more than stack size');
+    set I0, 1
+    save I0
+    set I0, 2
+    save I0
+    rotate_up -3
+    end
+CODE
+Stack too shallow!
+OUTPUT
+
+output_is(<<'CODE', <<'OUTPUT', 'save/savec for strings');
+      set S0, "Foobar"
+      savec S0
+      chopn S0, 3
+      print S0
+      print "\n"
+      restore S2
+      print S2
+      print "\n"
+
+      set S1, "Foobar"
+      save  S1
+      chopn S1, 3
+      print S1
+      print "\n"
+      restore S3
+      print S3
+      print "\n"
+      end
+
+CODE
+Foo
+Foobar
+Foo
+Foo
 OUTPUT
 
 output_is(<<CODE, <<OUTPUT, "save, restore");
