@@ -134,6 +134,10 @@ B<restore> from stack.
 
 B<save> on stack.
 
+=item .pcc_*
+
+Directives used for Parrot Calling Conventions.
+
 =back
 
 =head2 Instructions
@@ -230,7 +234,7 @@ B<set_addr var, var>
 
 =head1 SEE ALSO
 
-F<parsing.pod>
+F<parsing.pod>, F<calling_conventions.pod>
 
 =head1 FILES
 

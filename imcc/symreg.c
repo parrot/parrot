@@ -84,10 +84,8 @@ add_pcc_arg(SymReg *r, SymReg * arg)
     int n = r->pcc_sub->nargs;
     r->pcc_sub->args = realloc(r->pcc_sub->args, (n + 1) * sizeof(SymReg *));
     r->pcc_sub->args[n] = dup_sym(arg);
-    if (arg->type & VTREGISTER) {
-        r->pcc_sub->args[n]->reg = arg;
-        r->pcc_sub->args[n]->type = VT_REGP;
-    }
+    r->pcc_sub->args[n]->reg = arg;
+    r->pcc_sub->args[n]->type = VT_REGP;
     r->pcc_sub->nargs++;
 }
 

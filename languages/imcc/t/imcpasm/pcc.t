@@ -1,10 +1,42 @@
 #!perl
 use strict;
-use TestCompiler tests => 3;
+use TestCompiler tests => 4;
 
 ##############################
 # parrot calling conventions
 #
+output_like(<<'CODE', <<'OUT', "basic syntax - invokecc");
+.sub _main
+    .local Sub sub
+    newsub sub, .Sub, _sub
+    .pcc_begin
+    .arg 10
+    .pcc_call sub
+    ret:
+    .pcc_end
+    end
+.end
+.pcc_sub _sub
+    .param int a
+    print a
+    end
+.end
+CODE
+/_main:
+  newsub P16, \d+, _sub
+#pcc_sub_call_\d:
+  set I5, 10
+  set P0, P16
+  savetop
+  invokecc
+ret:
+  restoretop
+  end
+_sub:
+  print I5
+  end/
+OUT
+
 output_like(<<'CODE', <<'OUT', "basic syntax - constants");
 .sub _main
     .local Sub sub
@@ -32,7 +64,7 @@ CODE
 /_main:
   newsub P16, \d+, _sub
   newsub P17, \d+, ret
-#pcc_sub_call_6:
+#pcc_sub_call_\d:
   set I5, 10
   set I6, 20
   set P0, P16

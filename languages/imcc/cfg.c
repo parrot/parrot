@@ -113,6 +113,7 @@ expand_pcc_sub_call(Parrot_Interp interpreter, Instruction *ins)
     int next[4], i, j, n;
     char types[] = "INSP";
     Instruction *tmp;
+    int need_cc;
 
     for (i = 0; i < 4; i++)
         next[i] = 5;
@@ -123,13 +124,12 @@ expand_pcc_sub_call(Parrot_Interp interpreter, Instruction *ins)
     n = sub->pcc_sub->nargs;
     for (i = 0; i < n; i++) {
         arg = sub->pcc_sub->args[i];
-        /* if arg is constant, set register */
         switch (arg->type) {
+            /* if arg is constant, set register */
             case VT_CONSTP:
-                arg = arg->reg;
-                /* goon */
             case VTCONST:
 lazy:
+                arg = arg->reg;
                 for (j = 0; j < 4; j++) {
                     if (arg->set == types[j]) {
                         char buf[128];
@@ -177,25 +177,32 @@ move_sub:
     }
 
     arg = sub->pcc_sub->cc;
-    if (arg->reg->type & VTPASM) {
+    need_cc = 0;
+    if (arg) {
+        if (arg->reg->type & VTPASM) {
 move_cc:
-        if (arg->reg->color != 1) {
-            reg = mk_pasm_reg(str_dup("P1"));
-            regs[0] = reg;
-            regs[1] = arg;
-            tmp = INS(interpreter, "set", NULL, regs, 2, 0, 0);
-            insert_ins(ins, tmp);
-            ins = tmp;
+            if (arg->reg->color != 1) {
+                reg = mk_pasm_reg(str_dup("P1"));
+                regs[0] = reg;
+                regs[1] = arg;
+                tmp = INS(interpreter, "set", NULL, regs, 2, 0, 0);
+                insert_ins(ins, tmp);
+                ins = tmp;
+            }
+        }
+        else {
+            /* TODO no move */
+            goto move_cc;
         }
     }
-    else {
-        /* TODO no move */
-        goto move_cc;
-    }
+    else
+        need_cc = 1;
     tmp = INS(interpreter, "savetop", NULL, regs, 0, 0, 0);
     insert_ins(ins, tmp);
     ins = tmp;
-    tmp = INS(interpreter, "invoke", NULL, regs, 0, 0, 0);
+    /* TODO updatecc */
+    tmp = INS(interpreter, need_cc ? "invokecc" : "invoke",
+            NULL, regs, 0, 0, 0);
     insert_ins(ins, tmp);
     ins = tmp;
     /*

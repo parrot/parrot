@@ -1,10 +1,36 @@
 #!perl
 use strict;
-use TestCompiler tests => 1;
+use TestCompiler tests => 2;
 
 ##############################
 # Parrot Calling Conventions
 
+output_is(<<'CODE', <<'OUT', "basic syntax - invokecc, constants");
+.sub _main
+    .local Sub sub
+    newsub sub, .Sub, _sub
+    .const int y = 20
+    .pcc_begin
+    .arg 10
+    .arg y
+    .pcc_call sub
+    ret:
+    .pcc_end
+    end
+.end
+.pcc_sub _sub
+    .param int a
+    .param int b
+    print a
+    print "\n"
+    print b
+    print "\n"
+    end
+.end
+CODE
+10
+20
+OUT
 
 ##############################
 # tail recursion - caller saves - parrot calling convention

@@ -61,6 +61,9 @@ defines a subroutine with the entry point B<_name>. Subroutine entry
 points (as all global labels) have to start with an underscore. The
 statements may contain valid PIR or PASM statements.
 
+Subroutines according to Parrot Calling Conventions (PCC) are
+described in F<docs/calling_conventions.pod>.
+
 =head2 Assembly blocks .emit ... .eom
 
 	.emit
@@ -190,6 +193,10 @@ Local labels in different I<compilation units> with the same name are
 allowed, though running the generated PASM through F<assemble.pl>
 doesn't work. Running this code inside imcc is ok.
 This will probably change so that local labels are mangled to be unique.
+
+=head1 SEE ALSO
+
+F<docs/calling_conventions.pod>
 
 =head1 FILES
 

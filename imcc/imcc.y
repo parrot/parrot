@@ -419,7 +419,7 @@ iANY(struct Parrot_Interp *interpreter, char * name,
 %type <i> labels _labels label statements statement
 %type <i> pcc_sub_call
 %type <sr> pcc_arg pcc_result pcc_args pcc_results pcc_params pcc_param
-%type <sr> pcc_returns pcc_return
+%type <sr> pcc_returns pcc_return pcc_call
 %type <t> pcc_proto
 %type <i> instruction assignment if_statement labeled_inst
 %type <sr> target reg const var rc string
@@ -527,10 +527,7 @@ pcc_sub_call: PCC_BEGIN pcc_proto '\n' {
 
            }
            pcc_args
-           PCC_CALL var COMMA var '\n' {
-                      add_pcc_sub($<sr>4, $7);
-                      add_pcc_cc($<sr>4, $9);
-                  }
+           pcc_call
            label '\n'
            pcc_results
            PCC_END  '\n' { $$ = 0; }
@@ -538,6 +535,15 @@ pcc_sub_call: PCC_BEGIN pcc_proto '\n' {
 
 pcc_proto: /* empty */                  { $$ = 0; }
     ;
+
+pcc_call: PCC_CALL var COMMA var '\n' {
+                  add_pcc_sub($<sr>-1, $2);
+                  add_pcc_cc($<sr>-1, $4);
+              }
+       | PCC_CALL var '\n' {
+                  add_pcc_sub($<sr>-1, $2);
+              }
+     ;
 
 pcc_args: /* empty */                   { $$ = 0; }
     | pcc_arg '\n'                      {  add_pcc_arg($<sr>0, $1);}
@@ -548,8 +554,12 @@ pcc_arg: ARG var                        { $$ = $2; }
     ;
 
 pcc_results: /* empty */                { $$ = 0; }
-    |       pcc_result '\n'             { if($1) add_pcc_result($<sr>-9, $1); }
-    | pcc_results pcc_result '\n'       { if($2) add_pcc_result($<sr>-9, $2); }
+    |       pcc_result '\n'             { if($1) add_pcc_result($<sr>-4, $1); }
+    | pcc_results pcc_result '\n'       { if($2) add_pcc_result($<sr>-4, $2); }
+    ;
+
+pcc_result: RESULT var                  { $$ = $2; }
+    |   LOCAL { is_def=1; } type IDENTIFIER { mk_ident($4, $3);is_def=0; $$=0; }
     ;
 
 pcc_ret: PCC_BEGIN_RETURN '\n' {
@@ -574,10 +584,6 @@ pcc_returns: /* empty */                { $$ = 0; }
     ;
 
 pcc_return: RETURN var                  { $$ = $2; }
-    ;
-
-pcc_result: RESULT var                        { $$ = $2; }
-    |   LOCAL { is_def=1; } type IDENTIFIER { mk_ident($4, $3);is_def=0; $$=0; }
     ;
 
 statements: statement
