@@ -558,6 +558,7 @@ output_is(<<CODE, <<OUTPUT, "nasty string -> int");
 	set	I0, P0
 	print	I0
 	print	"\\n"
+       end
 CODE
 1Z1
 1
