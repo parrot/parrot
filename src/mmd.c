@@ -80,22 +80,19 @@ mmd_dispatch_pmc(Interp *interpreter,
         offset = interpreter->binop_mmd_funcs->x[function] *
             right_type + left_type;
         real_function = (pmc_mmd_f)*(interpreter->binop_mmd_funcs->mmd_funcs[function] + offset);
+        if (NULL == real_function) {
+            real_function = (pmc_mmd_f)interpreter->binop_mmd_funcs->default_func[function];
+        }
     }
+
     if ((UINTVAL)real_function & 1) {
         sub = (PMC*)((UINTVAL)real_function & ~1);
         Parrot_runops_fromc_args_save(interpreter, sub, "vPPP",
                 left, right, dest);
     }
-    else
+    else {
         (*real_function)(interpreter, left, right, dest);
-#if 0
-    } else {
-        /* Didn't find it. Go look for a bytecode version */
-        offset = interpreter->binop_mmd_funcs->x[function] *
-            right_type + left_type;
-        sub = (void*)((pmc_mmd_f)*(interpreter->bytecode_binop_mmd_funcs->mmd_funcs[function] + offset));
     }
-#endif
 }
 
 /*
@@ -221,7 +218,7 @@ mmd_add_function(Interp *interpreter,
     UINTVAL func_count = funcnum + 1;
     UINTVAL cur_func_count = interpreter->binop_mmd_funcs->tables;
 
-    /*    printf("Default for %i is %p\n", funcnum, function);*/
+    /*    printf("Default for %i is %p\n", funcnum, function); */
 
     /* Is the new function past where we have expanded to? If so, make
        all the tables bigger
