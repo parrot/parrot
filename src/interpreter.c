@@ -263,6 +263,7 @@ prederef(void **pc_prederef, struct Parrot_Interp *interpreter)
             pc_prederef[i] = (void *)(ptrcast_t)prederef_op_func[pc[i]];
             break;
 
+        case PARROT_ARG_KI:
         case PARROT_ARG_I:
             pc_prederef[i] = (void *)&interpreter->ctx.int_reg.registers[pc[i]];
             break;
@@ -279,6 +280,7 @@ prederef(void **pc_prederef, struct Parrot_Interp *interpreter)
             pc_prederef[i] = (void *)&interpreter->ctx.string_reg.registers[pc[i]];
             break;
 
+        case PARROT_ARG_KIC:
         case PARROT_ARG_IC:
             pc_prederef[i] = (void *)&pc[i];
             break;
@@ -300,7 +302,13 @@ prederef(void **pc_prederef, struct Parrot_Interp *interpreter)
                 &interpreter->code->const_table->constants[pc[i]]->string;
             break;
 
+        case PARROT_ARG_KC:
+            pc_prederef[i] = (void *)
+                &interpreter->code->const_table->constants[pc[i]]->key;
+            break;
         default:
+            internal_exception(ARG_OP_NOT_HANDLED,
+                               "Unhandled argtype %d\n",opinfo->types[i]);
             break;
         }
 
