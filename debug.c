@@ -696,7 +696,7 @@ PDB_init(struct Parrot_Interp *interpreter, const char *command)
 
     /* Restart if we are already running */
     if (pdb->state & PDB_RUNNING)
-        PIO_fprintf(interpreter, PIO_STDERR(interpreter),"Restating\n");
+        PIO_fprintf(interpreter, PIO_STDERR(interpreter),"Restarting\n");
 
     /* Get the bytecode start */
     pdb->cur_opcode = interpreter->code->byte_code;
