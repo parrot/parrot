@@ -74,7 +74,7 @@ sub init() {
 sub class_name {
     my ($self, $class) = @_;
     my %special = ( 'Ref' => 1, 'default' => 1, 'Null' => 1,
-                    'delegate' => 1 );
+                    'delegate' => 1, 'SharedRef' => 1 );
     my $classname = $self->{class};
     my $nclass = $class;
     # bless object into different classes inheriting from
@@ -310,6 +310,9 @@ sub init_func() {
     if (exists $self->{flags}{singleton}) {
         $vtbl_flag .= '|VTABLE_PMC_IS_SINGLETON';
     }
+    if (exists $self->{flags}{is_shared}) {
+        $vtbl_flag .= '|VTABLE_IS_SHARED_FLAG';
+    }
     my @meths;
     foreach my $method (@{ $self->{vtable}{methods}} ) {
         my $meth = $method->{meth};
@@ -542,6 +545,67 @@ EOC
     return <<EOC;
 $l
 $decl {
+    $ret
+}
+
+EOC
+}
+
+# SharedRef is like Ref but wraps all or set_ like methods
+# with locking
+package Parrot::Pmc2c::SharedRef;
+use base 'Parrot::Pmc2c';
+
+sub implements
+{
+    1;
+}
+
+sub gen_ret
+{
+    my ($self, $type) = @_;
+    return "ret_val = ";
+}
+
+sub body
+{
+    my ($self, $method, $line) = @_;
+    my $meth = $method->{meth};
+    # existing methods get emitted
+    if ($self->SUPER::implements($meth)) {
+        my $n = $self->{has_method}{$meth};
+        return $self->SUPER::body($self->{methods}[$n]);
+    }
+    my $parameters = $method->{parameters};
+    my $n=0;
+    my @args = grep {$n++ & 1 ? $_ : 0} split / /, $parameters;
+    my $arg = '';
+    $arg = ", ". join(' ', @args) if @args;
+    $parameters = ", $parameters" if $parameters;
+    my $body = "VTABLE_$meth(interpreter, PMC_ptr2p(pmc)$arg)";
+    my $ret = '';
+    my $decl = $self->decl($self->{class}, $method, 0);
+    my $l = "";
+    my $ret_def = '';
+    my $func_ret = '(void) ';
+    if ($method->{type} ne 'void') {
+        my $type = $method->{type};
+        $ret_def = "$type ret_val;";
+        $func_ret = $self->gen_ret($method->{type});
+        $ret = "return ret_val;";
+    }
+    unless ($self->{opt}{nolines}) {
+        $l = <<"EOC";
+#line $line "sharedref.c"
+EOC
+    }
+    return <<EOC;
+$l
+$decl {
+    $ret_def
+    LOCK_PMC(interpreter, pmc);
+    $func_ret$body;
+    UNLOCK_PMC(interpreter, pmc);
     $ret
 }
 

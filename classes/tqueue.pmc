@@ -29,7 +29,7 @@
 #include "parrot/parrot.h"
 #include <assert.h>
 
-pmclass TQueue need_ext {
+pmclass TQueue need_ext is_shared {
 
     void init () {
         SELF->cache.int_val = 0;
