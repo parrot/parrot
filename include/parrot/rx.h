@@ -108,3 +108,13 @@ void bitmap_destroy(Bitmap);
 #define RxFlagsOff(rx)             ((rx)->flags = enum_rxflags_none)
 
 #endif /* PARROT_RX_H_GUARD */
+
+/*
+ * Local variables:
+ * c-indentation-style: bsd
+ * c-basic-offset: 4
+ * indent-tabs-mode: nil
+ * End:
+ *
+ * vim: expandtab shiftwidth=4:
+ */

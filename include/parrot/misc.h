@@ -22,3 +22,13 @@ void Parrot_snprintf(struct Parrot_Interp *, char *targ, UINTVAL len, const char
 
 
 #endif
+
+/*
+ * Local variables:
+ * c-indentation-style: bsd
+ * c-basic-offset: 4
+ * indent-tabs-mode: nil
+ * End:
+ *
+ * vim: expandtab shiftwidth=4:
+ */

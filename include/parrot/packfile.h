@@ -208,3 +208,12 @@ PackFile_Constant_dump(struct PackFile_Constant * self);
 
 #endif /* PACKFILE_H */
 
+/*
+ * Local variables:
+ * c-indentation-style: bsd
+ * c-basic-offset: 4
+ * indent-tabs-mode: nil
+ * End:
+ *
+ * vim: expandtab shiftwidth=4:
+ */

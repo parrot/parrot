@@ -136,3 +136,13 @@ void BN_power(PINTD_ BIGNUM* result, BIGNUM* bignum,
               BIGNUM* expn, BN_CONTEXT* context);
 INTVAL BN_comp (PINTD_ BIGNUM *one, BIGNUM *two);
 INTVAL BN_is_zero(PINTD_ BIGNUM* test);
+
+/*
+ * Local variables:
+ * c-indentation-style: bsd
+ * c-basic-offset: 4
+ * indent-tabs-mode: nil
+ * End:
+ *
+ * vim: expandtab shiftwidth=4:
+ */
