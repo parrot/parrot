@@ -1244,7 +1244,7 @@ sub body
     my $ret = "";
     if ($method->{type} ne 'void') {
         # This cheats, assuming that all return types can be cast from zero.
-        $ret = "return ($method->{type})";
+        $ret = "return ($method->{type})0;";
     }
     my $l = "";
     unless ($self->{opt}{nolines}) {
@@ -1254,8 +1254,9 @@ EOC
     }
     return <<EOC;
 $l
-${decl} {
-	${ret}cant_do_method(interpreter, pmc, "$meth");
+${decl}\{
+    cant_do_method(interpreter, pmc, "$meth");
+    ${ret}
 }
 
 EOC

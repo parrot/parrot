@@ -25,8 +25,6 @@ generated from F<vtable.tbl> by F<classes/pmc2c2.pl>.
 
 #define INT2KEY(i,k) key_new_integer((i), (k))
 
-static const char * caller(Parrot_Interp interp, PMC * pmc);
-
 /*
 
 =item C<static const char *caller(Parrot_Interp interp, PMC *pmc)>
@@ -37,7 +35,8 @@ Returns a C string for the name of C<*pmc>.
 
 */
 
-static const char * caller(Parrot_Interp interp, PMC * pmc)
+static const char *
+caller(Parrot_Interp interp, PMC * pmc)
 {
     return pmc && pmc->vtable && pmc->vtable->whoami ?
     VTABLE_name(interp, pmc)->strstart : "(null)";
@@ -45,20 +44,19 @@ static const char * caller(Parrot_Interp interp, PMC * pmc)
 
 /*
 
-=item C<static int cant_do_method(Parrot_Interp interpreter, PMC * pmc, const char *methname)>
+=item C<static void cant_do_method(Parrot_Interp interpreter, PMC * pmc, const char *methname)>
 
 Throws an exception "$methnme() not implemented in class '$class'", used by
 all unimplemented messages.
 
 */
 
-static int
+static void
 cant_do_method(Parrot_Interp interpreter, PMC * pmc, const char *methname)
 {
     internal_exception(ILL_INHERIT,
                        "%s() not implemented in class '%s'\n", methname,
         	       caller(interpreter, pmc));
-    return 0;
 }
 
 /*
