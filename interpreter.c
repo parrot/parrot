@@ -28,7 +28,7 @@ check_fingerprint(struct Parrot_Interp *interpreter) {
     }
     else {
         const char * fp_data;
-        IV           fp_len;
+        INTVAL           fp_len;
 
         fp_data = PCONST(0)->string->bufstart;
         fp_len  = PCONST(0)->string->buflen;
@@ -52,7 +52,7 @@ runops_notrace_core (struct Parrot_Interp *interpreter) {
     opcode_t *(* func)();
     opcode_t *(**temp)();
     opcode_t * code_start;
-    IV         code_size;
+    INTVAL         code_size;
     opcode_t * code_end;
     opcode_t * pc;
 
@@ -106,7 +106,7 @@ runops_trace_core (struct Parrot_Interp *interpreter) {
     opcode_t *( *func)();
     opcode_t *(**temp)();
     opcode_t * code_start;
-    IV         code_size;
+    INTVAL         code_size;
     opcode_t * code_end;
     opcode_t * pc;
 
@@ -134,9 +134,9 @@ runops_trace_core (struct Parrot_Interp *interpreter) {
 void
 runops_generic (opcode_t * (*core)(struct Parrot_Interp *), struct Parrot_Interp *interpreter) {
     opcode_t * code_start;
-    IV         code_size;
+    INTVAL         code_size;
     opcode_t * code_end;
-    IV *       pc;
+    INTVAL *       pc;
 
     check_fingerprint(interpreter);
 

@@ -113,7 +113,7 @@ sub unpack
   my $type = shift_op($string);
   my $size = shift_op($string);
 
-  my $align = sizeof("iv");
+  my $align = sizeof("intval");
 
   my $under      = ($size % $align) ? $align - ($size % $align) : 0;
   my $block_size = $size + $under;
@@ -125,7 +125,7 @@ sub unpack
   $self->{SIZE}     = $size;
   $self->{DATA}     = substr($data, 0, $size);
 
-  return 4*sizeof("iv") + $block_size;
+  return 4*sizeof("intval") + $block_size;
 }
 
 
@@ -137,10 +137,10 @@ sub packed_size
 {
   my $self = shift;
   my $size = $self->size;
-  my $align = sizeof("iv");
+  my $align = sizeof("intval");
   my $under      = ($size % $align) ? $align - ($size % $align) : 0;
   my $block_size = $size + $under;
-  return 4*sizeof("iv") + $block_size;
+  return 4*sizeof("intval") + $block_size;
 }
 
 

@@ -22,7 +22,7 @@ actually means.
 The most basic way of creating a string is through the function
 C<string_make>:
 
-    STRING* string_make(void *buffer, IV buflen, IV encoding, IV flags, IV type)
+    STRING* string_make(void *buffer, INTVAL buflen, INTVAL encoding, INTVAL flags, INTVAL type)
 
 In here you pass a pointer to a buffer of a given encoding, and the
 number of bytes in that buffer to examine, the encoding, (see below for
@@ -59,7 +59,7 @@ a string, so it doesn't make sense to give the values in bytes.
 
 To find out the length of a string, use
 
-    IV string_length(STRING *s)
+    INTVAL string_length(STRING *s)
 
 You I<may> explicitly use C<< s->strlen >> for this since it is such a 
 useful operation.
@@ -67,7 +67,7 @@ useful operation.
 To concatenate two strings - that is, to add the contents of string
 C<b> to the end of string C<a>, use:
 
-    STRING* string_concat(STRING* a, STRING *b, IV flag)
+    STRING* string_concat(STRING* a, STRING *b, INTVAL flag)
 
 C<a> is updated, and is also returned as a convenience. If the flag is
 set to a non-zero value, then C<b> will be transcoded to C<a>'s encoding
@@ -78,11 +78,11 @@ a Big-5 string.
 Chopping C<n> characters off the end of a string is achieved with the
 unlikely-sounding
 
-    STRING* string_chopn(STRING* s, IV n)
+    STRING* string_chopn(STRING* s, INTVAL n)
 
 To retrieve a substring of the string, call
 
-    STRING* string_substr(STRING* src, IV offset, IV length, STRING** dest)
+    STRING* string_substr(STRING* src, INTVAL offset, INTVAL length, STRING** dest)
 
 The result will be placed in C<dest>.
 (Passing in C<dest> avoids allocating a new string at runtime. If
@@ -92,7 +92,7 @@ same encoding as C<src>.)
 B<Not implemented>: 
 To format output into a string, use
 
-    STRING* string_nprintf(STRING* dest, IV len, char* format, ...) 
+    STRING* string_nprintf(STRING* dest, INTVAL len, char* format, ...) 
 
 C<dest> may be a null pointer, in which case a new B<native> string will
 be created. If C<len> is zero, the behaviour becomes more C<sprintf>ish
@@ -107,13 +107,13 @@ structure in F<string.h>:
 
     struct parrot_string {
       void *bufstart;
-      IV buflen;
-      IV bufused;
-      IV flags;
-      IV strlen;
-      IV encoding;
-      IV type;
-      IV unused;
+      INTVAL buflen;
+      INTVAL bufused;
+      INTVAL flags;
+      INTVAL strlen;
+      INTVAL encoding;
+      INTVAL type;
+      INTVAL unused;
     };
 
 Let's look at each element of this structure in turn.
@@ -196,7 +196,7 @@ The L</String Manipulation Functions> above are implemented in terms of
 string vtables to create encoding abstraction; here's an example of one:
 
     STRING*
-    string_concat(STRING* a, STRING* b, IV flags) {
+    string_concat(STRING* a, STRING* b, INTVAL flags) {
         return (ENC_VTABLE(a).concat)(a, b, flags);
     }
 
@@ -211,7 +211,7 @@ entry from that vtable. This produces a function pointer we can throw
 the arguments at.
 
 To get the actual position in the array from the vtable, use the 
-C<which> entry, which returns an C<IV> index into
+C<which> entry, which returns an C<INTVAL> index into
 C<Parrot_string_vtable>.
 
 Most of the string vtable functions are self-explanatory as they are
@@ -240,7 +240,7 @@ vtable function:
 
 Check to see whether or not the function's type has a typedef in
 F<string.h>: for instance, if you have a function that takes a string
-and an C<IV> and returns a string, use C<string_iv_to_string_t>;
+and an C<INTVAL> and returns a string, use C<string_iv_to_string_t>;
 otherwise, add your own type.
 
 =item 2
@@ -282,11 +282,11 @@ away now.
 
 The first two functions to note are
 
-    IV string_compute_strlen(STRING* s)
+    INTVAL string_compute_strlen(STRING* s)
 
 and
 
-    IV string_max_bytes(STRING *s, IV iv)
+    INTVAL string_max_bytes(STRING *s, INTVAL iv)
 
 The first updates the contents of C<< s->strlen >> by contemplating the
 buffer C<bufstart> and working out how many characters it contains. The
@@ -295,13 +295,13 @@ added into the string at some point; it returns the maximum number of
 bytes that need to be allocated to admit that number of characters. For
 fixed-width encodings, this is trivial - the "native" encoding, for
 instance, encodes one byte per character, so C<string_native_max_bytes>
-simply returns the C<IV> it is passed; C<string_utf8_max_bytes>, on the
+simply returns the C<INTVAL> it is passed; C<string_utf8_max_bytes>, on the
 other hand, returns three times the value that it is passed because a
 UTF8 character may occupy up to three bytes.
 
 To grow a string to a specified size, use 
 
-    void string_grow(STRING *s, IV newsize)
+    void string_grow(STRING *s, INTVAL newsize)
 
 The size is given in characters; C<string_max_bytes> is called to turn
 this into a size in bytes, and then the buffer is grown to accomodate

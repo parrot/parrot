@@ -18,12 +18,12 @@
 #define STACK_CHUNK_DEPTH 256
 
 struct Stack_Entry {
-    IV entry_type;
-    IV flags;
+    INTVAL entry_type;
+    INTVAL flags;
     void (*cleanup)(struct Stack_Entry *);
     union {
-        NV num_val;
-        IV int_val;
+        FLOATVAL num_val;
+        INTVAL int_val;
         PMC *pmc_val;
         STRING *string_val;
         void *generic_pointer;
@@ -31,15 +31,15 @@ struct Stack_Entry {
 };
 
 struct Stack {
-  IV used;
-  IV free;
+  INTVAL used;
+  INTVAL free;
   struct StackChunk *next;
   struct StackChunk *prev;
   struct Stack_Entry entry[STACK_CHUNK_DEPTH];
 };
 
-struct Stack_Entry *push_generic_entry(void *thing, IV type, void *cleanup);
-void pop_generic_entry(void *where, IV type);
+struct Stack_Entry *push_generic_entry(void *thing, INTVAL type, void *cleanup);
+void pop_generic_entry(void *where, INTVAL type);
 
 #endif
 

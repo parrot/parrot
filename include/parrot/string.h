@@ -28,11 +28,11 @@ typedef enum {
 
 /* String vtable functions */
 
-typedef IV (*string_to_iv_t)(STRING *);
-typedef STRING* (*string_iv_to_string_t)(STRING *, IV);
-typedef STRING* (*two_strings_iv_to_string_t)(STRING *, STRING *, IV);
-typedef STRING* (*substr_t)(STRING*, IV, IV, STRING*);
-typedef IV (*iv_to_iv_t)(IV);
+typedef INTVAL (*string_to_iv_t)(STRING *);
+typedef STRING* (*string_iv_to_string_t)(STRING *, INTVAL);
+typedef STRING* (*two_strings_iv_to_string_t)(STRING *, STRING *, INTVAL);
+typedef STRING* (*substr_t)(STRING*, INTVAL, INTVAL, STRING*);
+typedef INTVAL (*iv_to_iv_t)(INTVAL);
 
 struct string_vtable {
     encoding_t which;                   /* What sort of encoding is this? */
@@ -45,38 +45,38 @@ struct string_vtable {
 
 struct parrot_string {
     void *bufstart;
-    IV buflen;
-    IV bufused;
-    IV flags;
-    IV strlen;
+    INTVAL buflen;
+    INTVAL bufused;
+    INTVAL flags;
+    INTVAL strlen;
     STRING_VTABLE* encoding;
-    IV type;
-    IV unused;
+    INTVAL type;
+    INTVAL unused;
 };
 
 
 /* Declarations of accessors */
 
-IV
+INTVAL
 string_compute_strlen(STRING*);
-IV
-string_max_bytes(STRING*, IV);
+INTVAL
+string_max_bytes(STRING*, INTVAL);
 STRING*
-string_concat(STRING*, STRING*, IV);
+string_concat(STRING*, STRING*, INTVAL);
 STRING*
-string_chopn(STRING*, IV);
+string_chopn(STRING*, INTVAL);
 STRING*
-string_substr(STRING*, IV, IV, STRING**);
+string_substr(STRING*, INTVAL, INTVAL, STRING**);
 
 /* Declarations of other functions */
-IV
+INTVAL
 string_length(STRING*);
 void
-string_grow(STRING* s, IV newsize);
+string_grow(STRING* s, INTVAL newsize);
 void
 string_destroy(STRING* s);
 STRING*
-string_make(void *buffer, IV buflen, IV encoding, IV flags, IV type);
+string_make(void *buffer, INTVAL buflen, INTVAL encoding, INTVAL flags, INTVAL type);
 STRING*
 string_copy(STRING *i);
 void

@@ -9,7 +9,7 @@ my $fingerprint;
 my $revision;
 
 my $nvivsize;
-$nvivsize = $PConfig{nvsize}/$PConfig{ivsize};
+$nvivsize = $PConfig{numvalsize}/$PConfig{intvalsize};
 
 sub _load {
     my $file = @_ ? shift : "opcode_table";

@@ -21,7 +21,7 @@
 /*=for api string_native string_native_compute_strlen
    return the length of s
 */
-static IV 
+static INTVAL 
 string_native_compute_strlen (STRING *s) {
     return s->buflen;
 }
@@ -29,8 +29,8 @@ string_native_compute_strlen (STRING *s) {
 /*=for api string_native string_native_max_bytes
    return the max bytes needed for x characters.
 */
-static IV 
-string_native_max_bytes (IV x) {
+static INTVAL 
+string_native_max_bytes (INTVAL x) {
     return x;
 }
 
@@ -38,13 +38,13 @@ string_native_max_bytes (IV x) {
    concatenate two strings
 */
 static STRING*
-string_native_concat(STRING* a, STRING* b, IV flags) {
+string_native_concat(STRING* a, STRING* b, INTVAL flags) {
     if (flags && a->encoding != b->encoding) {
 	/* Transcode */
     }
     /* b is now in native format */
     string_grow(a, a->strlen + b->strlen);
-    mem_sys_memcopy((void*)((IV)a->bufstart + a->strlen), b->bufstart, b->strlen);
+    mem_sys_memcopy((void*)((INTVAL)a->bufstart + a->strlen), b->bufstart, b->strlen);
     a->strlen = a->bufused = a->strlen + b->strlen;
     return a;
 }
@@ -53,7 +53,7 @@ string_native_concat(STRING* a, STRING* b, IV flags) {
    remove the last n characters from s
 */
 static STRING*
-string_native_chopn(STRING* s, IV n) {
+string_native_chopn(STRING* s, INTVAL n) {
     s->bufused -= n;
     s->strlen -= n;
     return s;
@@ -64,7 +64,7 @@ string_native_chopn(STRING* s, IV n) {
    and store in dest.  Grow dest if needed.  Return dest
 */
 static STRING*
-string_native_substr(STRING* src, IV offset, IV length, STRING* dest)
+string_native_substr(STRING* src, INTVAL offset, INTVAL length, STRING* dest)
 {
     if (dest->encoding->which != enc_native) {
         /* It is now, matey. */
@@ -73,7 +73,7 @@ string_native_substr(STRING* src, IV offset, IV length, STRING* dest)
     
     /* Offset and length have already been "normalized" */
     string_grow(dest, length);
-    mem_sys_memcopy(dest->bufstart, (void*)((IV)src->bufstart + offset), length);
+    mem_sys_memcopy(dest->bufstart, (void*)((INTVAL)src->bufstart + offset), length);
     dest->strlen = dest->bufused = length;
     
     return dest;

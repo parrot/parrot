@@ -167,7 +167,7 @@ sub emit_manual_header {
     
     print OUTPUT ("opcode_t *$opcodes{$name}{FUNC}".
 		  "(opcode_t cur_opcode[], struct Parrot_Interp *interpreter) {\n");
-    print OUTPUT "  IV return_offset = $return_offset;\n";
+    print OUTPUT "  INTVAL return_offset = $return_offset;\n";
     return($name, "  return cur_opcode + return_offset;\n}\n");
 }
 

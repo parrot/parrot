@@ -32,7 +32,7 @@ struct Parrot_Interp {
                                           /* interpreter's arena */
     opcode_t     *(**opcode_funcs)();     /* Opcode function table */
     STRING_FUNCS *(**string_funcs)();     /* String function table */
-    IV flags;				  /* Various interpreter flags
+    INTVAL flags;				  /* Various interpreter flags
                                            that signal that runops
                                            should do something */
 

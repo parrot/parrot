@@ -62,10 +62,10 @@ check_manifest();
 #XXX Figure out better defaults
 my(%c)=(
 	iv =>			($Config{ivtype}   ||'long'),
-	ivsize =>       undef,
+	intvalsize =>       undef,
     
 	nv =>			($Config{nvtype}   ||'double'),
-	nvsize =>       undef,
+	numvalsize =>       undef,
 
 	opcode_t =>		($Config{ivtype}   ||'long'),
 	longsize =>		undef,
@@ -135,10 +135,10 @@ END
 
 buildfile("test_c");
 system("$c{cc} $c{ccflags} -o test_siz$c{exe} test.c") and die "C compiler died!";
-(@c{qw(ivsize longsize nvsize opcode_t_size)})=split('/', `./test_siz$c{exe}`);
+(@c{qw(intvalsize longsize numvalsize opcode_t_size)})=split('/', `./test_siz$c{exe}`);
 die "Something wicked happened!" 
-    unless defined $c{ivsize} and defined $c{longsize} and 
-	   defined $c{nvsize} and defined $c{opcode_t_size};
+    unless defined $c{intvalsize} and defined $c{longsize} and 
+	   defined $c{numvalsize} and defined $c{opcode_t_size};
 unlink('test.c', "test_siz$c{exe}", "test$c{o}");
 
 print <<"END";
@@ -148,10 +148,10 @@ various Parrot internal types.
 END
 
 
-# Alas perl5.7.2 doesn't have an IV flag for pack().
+# Alas perl5.7.2 doesn't have an INTVAL flag for pack().
 # The ! modifier only works for perl 5.6.x or greater.
-foreach ('ivsize', 'opcode_t_size') {
-    my $which = $_ eq 'ivsize' ? 'packtype_i' : 'packtype_op';
+foreach ('intvalsize', 'opcode_t_size') {
+    my $which = $_ eq 'intvalsize' ? 'packtype_i' : 'packtype_op';
     if (($] >= 5.006) && ($c{$_} == $c{longsize}) ) {
 	$c{$which} = 'l!';
     }

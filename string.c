@@ -27,7 +27,7 @@ string_init(void) {
  * and compute its string length
  */
 STRING *
-string_make(void *buffer, IV buflen, IV encoding, IV flags, IV type) {
+string_make(void *buffer, INTVAL buflen, INTVAL encoding, INTVAL flags, INTVAL type) {
     STRING *s = mem_sys_allocate(sizeof(STRING));
     s->bufstart = mem_sys_allocate(buflen);
     mem_sys_memcopy(s->bufstart, buffer, buflen);
@@ -43,8 +43,8 @@ string_make(void *buffer, IV buflen, IV encoding, IV flags, IV type) {
  * reallocate memory for the string if it is too small
  */
 void
-string_grow(STRING* s, IV newsize) {
-    IV newsize_in_bytes = string_max_bytes(s, newsize);
+string_grow(STRING* s, INTVAL newsize) {
+    INTVAL newsize_in_bytes = string_max_bytes(s, newsize);
     if (s->buflen < newsize_in_bytes) {
         s->bufstart = mem_sys_realloc(s->bufstart, newsize_in_bytes);
     }
@@ -65,7 +65,7 @@ string_destroy(STRING *s) {
 /*=for api string string_length
  * return the length of the string
  */
-IV
+INTVAL
 string_length(STRING* s) {
     return s->strlen;
 }
@@ -85,7 +85,7 @@ string_copy(STRING *s) {
 /*=for api string string_compute_strlen
  * get the string length of the string
  */
-IV
+INTVAL
 string_compute_strlen(STRING* s) {
     return (s->strlen = (ENC_VTABLE(s)->compute_strlen)(s));
 }
@@ -93,8 +93,8 @@ string_compute_strlen(STRING* s) {
 /*=for api string string_max_bytes
  * get the maximum number of bytes needed by iv characters
  */
-IV
-string_max_bytes(STRING* s, IV iv) {
+INTVAL
+string_max_bytes(STRING* s, INTVAL iv) {
     return (ENC_VTABLE(s)->max_bytes)(iv);
 }
 
@@ -102,7 +102,7 @@ string_max_bytes(STRING* s, IV iv) {
  * concatenate two strings
  */
 STRING* 
-string_concat(STRING* a, STRING* b, IV flags) {
+string_concat(STRING* a, STRING* b, INTVAL flags) {
     return (ENC_VTABLE(a)->concat)(a, b, flags);
 }
 
@@ -111,7 +111,7 @@ string_concat(STRING* a, STRING* b, IV flags) {
  * Allocate memory for d if necessary.
  */
 STRING*
-string_substr(STRING* src, IV offset, IV length, STRING** d) {
+string_substr(STRING* src, INTVAL offset, INTVAL length, STRING** d) {
     STRING *dest;
     if (offset < 0) {
         offset = src->strlen + offset;
@@ -139,7 +139,7 @@ string_substr(STRING* src, IV offset, IV length, STRING** d) {
  * chop the last n bytes off of s.
  */
 STRING*
-string_chopn(STRING* s, IV n) {
+string_chopn(STRING* s, INTVAL n) {
     if (n > s->strlen) {
         n = s->strlen;
     }

@@ -126,7 +126,7 @@ sub unpack
  
   my $fixup = '';
 
-  my $fixup_length = shift_iv($string);
+  my $fixup_length = shift_intval($string);
 
   if($fixup_length) {
     $fixup = unpack("a$fixup_length", $string);
@@ -142,7 +142,7 @@ sub unpack
  
   my $const = '';
 
-  my $const_length = shift_iv($string);
+  my $const_length = shift_intval($string);
 
   if($const_length) {
     $const = unpack("a$const_length", $string);
@@ -156,7 +156,7 @@ sub unpack
   # Read the byte code:
   #
 
-  my $byte_code_length = shift_iv($string);
+  my $byte_code_length = shift_intval($string);
   my $byte_code = '';
 
   if($byte_code_length) {
@@ -233,18 +233,18 @@ sub pack
 
   my $string = '';
 
-  $string .= pack_iv($self->magic);
+  $string .= pack_intval($self->magic);
 
   my $fixup = $self->fixup_table->pack;
   my $const = $self->const_table->pack;
 
-  $string .= pack_iv(length($fixup));
+  $string .= pack_intval(length($fixup));
   $string .= $fixup;
 
-  $string .= pack_iv(length($const));
+  $string .= pack_intval(length($const));
   $string .= $const;
 
-  $string .= pack_iv(length($self->byte_code));
+  $string .= pack_intval(length($self->byte_code));
   $string .= $self->byte_code;
 
   return $string;

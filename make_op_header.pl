@@ -20,7 +20,7 @@ BEGIN {
 #if !defined(PARROT_OP_H_GUARD)
 #define PARROT_OP_H_GUARD
 
-typedef IV OP;
+typedef INTVAL OP;
 
 #define DEFAULT_OPCODE_TABLE NULL
 }

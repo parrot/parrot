@@ -285,14 +285,14 @@ Parrot_clear_p(struct Parrot_Interp *interpreter) {
    pushes something on the parrot stack
 */
 void
-Parrot_push_on_stack(void *thing, IV size, IV type) {
+Parrot_push_on_stack(void *thing, INTVAL size, INTVAL type) {
 }
 
 /*=for api register Parrot_pop_off_stack
    pops something off the parrot stack
 */
 void
-Parrot_pop_off_stack(void *thing, IV type) {
+Parrot_pop_off_stack(void *thing, INTVAL type) {
 }
 
 /*

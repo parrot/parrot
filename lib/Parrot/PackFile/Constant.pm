@@ -177,17 +177,17 @@ sub unpack
 {
   my ($self, $string) = @_;
 
-  my $type = shift_iv($string);
-  my $size = shift_iv($string);
+  my $type = shift_intval($string);
+  my $size = shift_intval($string);
 
   my $value;
 
   if ($type == $type_codes{'PFC_NONE'}) {
     $value = undef;
   } elsif ($type == $type_codes{'PFC_INTEGER'}) {
-    $value = shift_iv($string);
+    $value = shift_intval($string);
   } elsif ($type == $type_codes{'PFC_NUMBER'}) {
-    $value = shift_nv($string);
+    $value = shift_floatval($string);
   } elsif ($type == $type_codes{'PFC_STRING'}) {
     $value = shift_sv($string);
   } else {
@@ -197,7 +197,7 @@ sub unpack
   $self->{TYPE}  = $type;
   $self->{VALUE} = $value;
 
-  return $size + 2 * sizeof('iv');
+  return $size + 2 * sizeof('intval');
 }
 
 
@@ -209,14 +209,14 @@ sub packed_size
 {
   my $self = shift;
 
-  my $size = 2 * sizeof('iv'); # For type and size
+  my $size = 2 * sizeof('intval'); # For type and size
 
   if ($self->type == $type_codes{'PFC_NONE'}) {
     $size += 0;
   } elsif ($self->type == $type_codes{'PFC_INTEGER'}) {
-    $size += sizeof('iv');
+    $size += sizeof('intval');
   } elsif ($self->type == $type_codes{'PFC_NUMBER'}) {
-    $size += sizeof('nv');
+    $size += sizeof('floatval');
   } elsif ($self->type == $type_codes{'PFC_STRING'}) {
     if (!ref $self->value) { print $self->value, "\n"; die; }
     $size += $self->value->packed_size;
@@ -237,18 +237,18 @@ sub pack
   my $self = shift;
   my $packed = '';
   
-  $packed .= pack_iv($self->type);
+  $packed .= pack_intval($self->type);
 
   if ($self->type == $type_codes{'PFC_NONE'}) {
-    $packed .= pack_iv(0);
+    $packed .= pack_intval(0);
   } elsif ($self->type == $type_codes{'PFC_INTEGER'}) {
-    $packed .= pack_iv(sizeof("iv"));
-    $packed .= pack_iv($self->value);
+    $packed .= pack_intval(sizeof("intval"));
+    $packed .= pack_intval($self->value);
   } elsif ($self->type == $type_codes{'PFC_NUMBER'}) {
-    $packed .= pack_iv(sizeof("nv"));
-    $packed .= pack_nv($self->value);
+    $packed .= pack_intval(sizeof("floatval"));
+    $packed .= pack_floatval($self->value);
   } elsif ($self->type == $type_codes{'PFC_STRING'}) {
-    $packed .= pack_iv($self->value->packed_size);
+    $packed .= pack_intval($self->value->packed_size);
     $packed .= pack_sv($self->value);
   } else {
     die;

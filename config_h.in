@@ -6,8 +6,8 @@
 
 #if !defined(PARROT_CONFIG_H_GUARD)
 #define PARROT_CONFIG_H_GUARD 
-typedef ${iv} IV;
-typedef ${nv} NV;
+typedef ${iv} INTVAL;
+typedef ${nv} FLOATVAL;
 
 typedef ${opcode_t} opcode_t;
 
@@ -15,7 +15,7 @@ typedef struct _vtable VTABLE;
 typedef void DPOINTER;
 typedef void SYNC;
 
-/* typedef IV *(*opcode_funcs)(void *, void *) OPFUNC; */
+/* typedef INTVAL *(*opcode_funcs)(void *, void *) OPFUNC; */
 
 #define FRAMES_PER_CHUNK 16
 

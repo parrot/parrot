@@ -44,15 +44,15 @@ down to a medium-level language before outputting pure Parrot machine
 code.
 
 Operations will be represented by several bytes of Parrot machine code;
-the first C<IV> will specify the operation number, and the remaining
+the first C<INTVAL> will specify the operation number, and the remaining
 arguments will be operator-specific. Operations will usually be targeted
 at a specific data type and register type; so, for instance, the
-C<dec_i_c> takes two C<IV>s as arguments, and decrements contents of the
-integer register designated by the first C<IV> by the value in the
-second C<IV>. Naturally, operations which act on C<NV> registers will
-use C<NV>s for constants; however, since the first argument is almost
+C<dec_i_c> takes two C<INTVAL>s as arguments, and decrements contents of the
+integer register designated by the first C<INTVAL> by the value in the
+second C<INTVAL>. Naturally, operations which act on C<FLOATVAL> registers will
+use C<FLOATVAL>s for constants; however, since the first argument is almost
 always a register B<number> rather than actual data, even operations on
-string and PMC registers will take an C<IV> as the first argument. 
+string and PMC registers will take an C<INTVAL> as the first argument. 
 
 As in Perl, Parrot ops will return the pointer to the next operation in
 the bytecode stream. Although ops will have a predetermined number and

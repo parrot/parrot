@@ -49,11 +49,11 @@
 
 struct PMC {
   VTABLE *vtable;
-  IV flags;
+  INTVAL flags;
   DPOINTER *data;
   union {
-    IV int_val;
-    NV num_val;
+    INTVAL int_val;
+    FLOATVAL num_val;
     DPOINTER *struct_val;
   } cache;
   SYNC *synchronize;

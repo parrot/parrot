@@ -39,10 +39,10 @@
    cheaper, though. 
 */
 void *
-mem_allocate_aligned(IV size) {
-    IV max_to_alloc;
-    IV mask;
-    IV i;
+mem_allocate_aligned(INTVAL size) {
+    INTVAL max_to_alloc;
+    INTVAL mask;
+    INTVAL i;
     void *mem = NULL;
     
     /* Okay, we just brute-force things here. Yeah it's stupid, but it
@@ -58,8 +58,8 @@ mem_allocate_aligned(IV size) {
     }
     
     mem = malloc(max_to_alloc);
-    if (((IV)mem & mask) < (IV)mem) {
-        mem = (void *)(((IV)mem & mask) + ~mask + 1);
+    if (((INTVAL)mem & mask) < (INTVAL)mem) {
+        mem = (void *)(((INTVAL)mem & mask) + ~mask + 1);
     } 
     return mem;
 }
@@ -68,7 +68,7 @@ mem_allocate_aligned(IV size) {
    uses malloc to allocate system memory
 */
 void *
-mem_sys_allocate(IV size) {
+mem_sys_allocate(INTVAL size) {
     return malloc(size);
 }
 

@@ -16,11 +16,11 @@
 #include "parrot/parrot.h"
 
 struct IReg {
-    IV registers[NUM_REGISTERS];
+    INTVAL registers[NUM_REGISTERS];
 };
 
 struct NReg {
-    NV registers[NUM_REGISTERS];
+    FLOATVAL registers[NUM_REGISTERS];
 };
 
 struct SReg {
@@ -32,32 +32,32 @@ struct PReg {
 };
 
 struct IRegChunk {
-    IV used;
-    IV free;
+    INTVAL used;
+    INTVAL free;
     struct IRegChunk *next;
     struct IRegChunk *prev;
     struct IReg IReg[FRAMES_PER_CHUNK];
 };
 
 struct NRegChunk {
-    IV used;
-    IV free;
+    INTVAL used;
+    INTVAL free;
     struct NRegChunk *next;
     struct NRegChunk *prev;
     struct NReg NReg[FRAMES_PER_CHUNK];
 };
 
 struct SRegChunk {
-    IV used;
-    IV free;
+    INTVAL used;
+    INTVAL free;
     struct SRegChunk *next;
     struct SRegChunk *prev;
     struct SReg SReg[FRAMES_PER_CHUNK];
 };
 
 struct PRegChunk {
-    IV used;
-    IV free;
+    INTVAL used;
+    INTVAL free;
     struct PRegChunk *next;
     struct PRegChunk *prev;
     struct PReg PReg[FRAMES_PER_CHUNK];
@@ -65,7 +65,7 @@ struct PRegChunk {
 
 /* This macro masks off the low bits of a register chunk address,
    since we're guaranteed to be aligned */
-#define CHUNK_BASE(x) (void *)(MASK_CHUNK_LOW_BITS & (IV)x)
+#define CHUNK_BASE(x) (void *)(MASK_CHUNK_LOW_BITS & (INTVAL)x)
 
 void Parrot_clear_i(struct Parrot_Interp *);
 void Parrot_clear_s(struct Parrot_Interp *);
