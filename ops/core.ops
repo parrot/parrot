@@ -80,7 +80,7 @@ Close file opened on file descriptor $1.
 =cut
 
 inline op close(i|ic) {
-  close($1);
+  fclose((FILE *)$1);
   goto NEXT();
 }
 
@@ -114,36 +114,63 @@ op err(s) {
 
 =item B<open>(i, s|sc)
 
-Open file named $2 with flags for writing and mode 0644 (rw-r--r--), and save
-the file descriptor into $1.
+Open file named $2 for reading and writing and save the file
+descriptor into $1.
 
-=item B<open>(i, s|sc, i|ic)
+=item B<open>(i, s|sc, s|sc)
 
 Open file named $2 with flags $3 and mode 0644 (rw-r--r--), and save the file
 descriptor into $1.
 
-=item B<open>(i, s|sc, i|ic, i|ic)
-
-Open file named $2 with flags $3 and mode $4, and save the file descriptor
-into $1.
-
 =cut
 
 inline op open(i, s|sc) {
-  $1 = open(($2)->bufstart, O_WRONLY | O_CREAT | O_TRUNC, DEFAULT_OPEN_MODE);
+  if (! ($1 = (INTVAL)fopen(($2)->bufstart, "r+"))) {
+    perror("Can't open");
+    exit(1);
+  }
+  
   goto NEXT();
 }
 
-inline op open(i, s|sc, i|ic) {
-  $1 = open(($2)->bufstart, $3, DEFAULT_OPEN_MODE);
+inline op open(i, s|sc, s|sc) {
+  $1 = (INTVAL)fopen(($2)->bufstart, ($3)->bufstart);
   goto NEXT();
 }
 
-inline op open(i, s|sc, i|ic, i|ic) {
-  $1 = open(($2)->bufstart, $3, $4);
+########################################
+
+=item B<readline>(s, i|ic)
+
+Temporary hack op to read in a line from the file opened on the FILE *
+we've evilly put in the integer register $2. If $2 is 0, 1, or 2 we
+use stdin, stdout, or stderr respectively.
+
+BE AFRAID! THIS IS *EEEEEEEVIL* pure and simple. (From the 8th
+dimension, no less)
+
+If for some reason the line's longer than 64K you get only 64K
+
+=cut
+
+inline op readline(s, i|ic) {
+  FILE *file;
+  switch ($2) {
+	case 0: file = stdin; 
+                break;
+	case 1: file = stdout; 
+                break;
+	case 2: file = stderr; 
+                break;
+	default: file = (FILE *)$2;
+  }
+
+  string_grow($1, 65535);
+  memset(($1)->bufstart, 0, 65535);
+  fgets(($1)->bufstart, 65534, file);
+  ($1)->strlen = strlen(($1)->bufstart);
   goto NEXT();
 }
-
 
 ########################################
 
