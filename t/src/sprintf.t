@@ -200,6 +200,7 @@ int main ()
 
     interp = Parrot_new ();
     Parrot_init(interp);
+    interp->lo_var_ptr = &i; /* we don't have a run-loop so ... */
 
     for (i=0; i<10000; i++) {
          PIO_printf(interp, "%vx", i);

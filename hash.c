@@ -109,7 +109,9 @@ dump_hash(Interp *interpreter, HASH *hash)
             continue;
         PIO_eprintf(interpreter, "  Bucket %vd: ", i);
         while (bucket) {
+            Parrot_block_GC(interpreter); /* don't allow bucket to move */
             PIO_eprintf(interpreter, "type(%d)", bucket->value.type);
+            Parrot_unblock_GC(interpreter);
             bucket = getBucket(hash, bucket->next);
             if (bucket)
                 PIO_eprintf(interpreter, " -> ");
@@ -433,13 +435,14 @@ hash_delete(Interp *interpreter, HASH *hash, STRING *key)
     hashval = key_hash(interpreter, key);
     slot = hashval & hash->max_chain;
 
+    /*
+     * string_compare can trigger GC but we can't allow bucket to move
+     */
+    Parrot_block_GC(interpreter);
     for (bucket = lookupBucket(hash, slot);
          bucket != NULL; bucket = getBucket(hash, bucket->next)) {
         if (string_compare(interpreter, key, bucket->key) == 0) {
             BucketIndex bi;
-            /* FIXME: If string_compare triggers a collection, both
-             * bucket and prev will end up pointing to junk memory.
-             * They need to be BucketIndexes or refetched. */
             if (prev)
                 prev->next = bucket->next;
             else {
@@ -451,6 +454,7 @@ hash_delete(Interp *interpreter, HASH *hash, STRING *key)
             bi = bucket - ((HASHBUCKET *)hash->bucket_pool->bufstart);
             bucket->next = hash->free_list;
             hash->free_list = bi;
+            Parrot_unblock_GC(interpreter);
             return;
         }
         prev = bucket;
@@ -464,12 +468,12 @@ hash_clone(struct Parrot_Interp *interp, HASH *hash, HASH **dest)
 {
     HashIndex i;
 
-    Parrot_block_DOD(interp);
     new_hash(interp, dest);
     for (i = 0; i <= hash->max_chain; i++) {
         BucketIndex bi = lookupBucketIndex(hash, i);
         while (bi != NULLBucketIndex) {
             HASHBUCKET *b = getBucket(hash, bi);
+            STRING *key = b->key;
             HASH_ENTRY valtmp;
             switch (b->value.type) {
             case enum_hash_undef:
@@ -482,8 +486,6 @@ hash_clone(struct Parrot_Interp *interp, HASH *hash, HASH **dest)
                 valtmp.type = enum_hash_string;
                 valtmp.val.string_val
                     = string_copy(interp, b->value.val.string_val);
-                /* b is no longer valid (due to GC) */
-                b = getBucket(hash, bi);
                 break;
 
             case enum_hash_pmc:
@@ -492,19 +494,21 @@ hash_clone(struct Parrot_Interp *interp, HASH *hash, HASH **dest)
                     b->value.val.pmc_val->vtable->base_type);
                 VTABLE_clone(interp,
                     b->value.val.pmc_val, valtmp.val.pmc_val );
-                /* b is no longer valid (due to GC) */
-                b = getBucket(hash, bi);
                 break;
 
             default:
                 internal_exception(-1, "hash corruption: type = %d\n",
                                    b->value.type);
             };
-            hash_put(interp, *dest, b->key, &valtmp);
+            hash_put(interp, *dest, key, &valtmp);
+            /*
+             * hash_put may extend the hash, which can trigger GC
+             * we could also check the GC count and refetch b only when needed
+             */
+            b = getBucket(hash, bi);
             bi = b->next;
         }
     }
-    Parrot_unblock_DOD(interp);
 }
 
 /*

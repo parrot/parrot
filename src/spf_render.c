@@ -217,7 +217,11 @@ Parrot_sprintf_format(struct Parrot_Interp *interpreter, STRING *pat,
                       SPRINTF_OBJ * obj)
 {
     INTVAL i, len, old;
-    STRING *targ = string_make(interpreter, NULL, 0, NULL, 0, NULL);
+    /*
+     * start with some allocated buffer
+     * this speeds up tracing mandel.pasm by a factor of 3
+     */
+    STRING *targ = string_make(interpreter, NULL, 128, NULL, 0, NULL);
 
     /* ts is used almost universally as an intermediate target;
      * tc is used as a temporary buffer by uint_to_string and
@@ -228,7 +232,6 @@ Parrot_sprintf_format(struct Parrot_Interp *interpreter, STRING *pat,
     char tc[PARROT_SPRINTF_BUFFER_SIZE];
 
 
-    Parrot_block_DOD(interpreter);
     for (i = old = len = 0; i < (INTVAL) string_length(pat); i++) {
         if (string_ord(pat, i) == '%') {        /* % */
             if (len) {
@@ -667,7 +670,6 @@ Parrot_sprintf_format(struct Parrot_Interp *interpreter, STRING *pat,
         string_append(interpreter, targ, substr, 0);
     }
 
-    Parrot_unblock_DOD(interpreter);
     return targ;
 }
 

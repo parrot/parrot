@@ -46,11 +46,6 @@ unmake_COW(struct Parrot_Interp *interpreter, STRING *s)
     if (PObj_is_cowed_TESTALL(s)) {
         void *p;
         UINTVAL size, bsize;
-        if (interpreter) {
-            Parrot_block_GC(interpreter);
-            Parrot_block_DOD(interpreter);
-        }
-
         /* Make the copy point to only the portion of the string that
          * we are actually using. */
         p = s->strstart;
@@ -59,15 +54,16 @@ unmake_COW(struct Parrot_Interp *interpreter, STRING *s)
         /* Create new pool data for this header to use,
          * independant of the original COW data */
         PObj_constant_CLEAR(s);
-        /* don't shorten string, string_append may use buflen */
+        /* don't shorten string, string_append may use buflen
+         *
+         * block GC, p points into string memory
+         */
+        Parrot_block_GC(interpreter);
         Parrot_allocate_string(interpreter, s, bsize);
+        Parrot_unblock_GC(interpreter);
         mem_sys_memcopy(s->strstart, p, size);
         /* COW_FLAG | external_FLAG | bufstart_external_FLAG immobile_FLAG */
         PObj_is_external_CLEARALL(s);
-        if (interpreter) {
-            Parrot_unblock_GC(interpreter);
-            Parrot_unblock_DOD(interpreter);
-        }
     }
 }
 
@@ -246,12 +242,7 @@ string_make(struct Parrot_Interp *interpreter, const void *buffer,
         PObj_bufstart_external_SET(s);
     }
     else {
-        /* allocate_string can trigger DOD, which destroys above allocated
-         * string header w/o stack_walk
-         */
-        Parrot_block_DOD(interpreter);
         Parrot_allocate_string(interpreter, s, len);
-        Parrot_unblock_DOD(interpreter);
     }
     s->encoding = encoding;
     s->type = type;
@@ -516,9 +507,9 @@ string_transcode(struct Parrot_Interp *interpreter,
     char *destend;
 
     if (!encoding) {
-        if (type) 
+        if (type)
             encoding = encoding_lookup(type->default_encoding);
-        else 
+        else
             encoding = encoding_lookup_index(0);
         /* XXX This is a hack. I had thought it was:
          * encoding = encoding_lookup(src->type->default_encoding);
@@ -1240,7 +1231,7 @@ string_bool(const STRING *s)
 
         UINTVAL c = s->encoding->decode(s->strstart);
 
-        if (s->type->is_digit(s->type,c) 
+        if (s->type->is_digit(s->type,c)
          && s->type->get_digit(s->type,c) == 0) {
             return 0;
         }
@@ -1547,8 +1538,12 @@ string_unpin(struct Parrot_Interp * interpreter, STRING * s) {
     /* Reallocate it the same size
      * NOTE can't use Parrot_reallocate_string because of the LEA
      * allocator, where this is a noop for the same size
+     *
+     * We have to block GC here, as we have a pointer to bufstart
      */
+    Parrot_block_GC(interpreter);
     Parrot_allocate_string(interpreter, s, size);
+    Parrot_unblock_GC(interpreter);
     mem_sys_memcopy(s->bufstart, memory, size);
     /* Mark the memory as neither immobile nor system allocated */
     PObj_immobile_CLEAR(s);

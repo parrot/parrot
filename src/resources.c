@@ -186,6 +186,7 @@ compact_pool(struct Parrot_Interp *interpreter, struct Memory_Pool *pool)
             cur_block = cur_block->prev;
         }
     }
+    total_size -= pool->guaranteed_reclaimable;
     /* this makes for ever increasing allocations but fewer collect runs */
 #ifdef WE_WANT_EVER_GROWING_ALLOCATIONS
     total_size += pool->minimum_block_size;
@@ -332,7 +333,7 @@ compact_pool(struct Parrot_Interp *interpreter, struct Memory_Pool *pool)
         struct Memory_Block *cur_block, *next_block;
 
         assert(new_block == pool->top_block);
-        cur_block = pool->top_block->prev;
+        cur_block = new_block->prev;
         while (cur_block) {
             next_block = cur_block->prev;
             /* Note that we don't have it any more */

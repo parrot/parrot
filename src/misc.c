@@ -45,12 +45,10 @@ Parrot_vsprintf_c(struct Parrot_Interp *interpreter, const char *pat,
                   va_list args)
 {
     STRING *realpat, *ret;
-        
-    Parrot_block_DOD(interpreter);
+
     realpat = string_make(interpreter, pat, strlen(pat),
                                   NULL, PObj_external_FLAG, NULL);
     ret = Parrot_vsprintf_s(interpreter, realpat, args);
-    Parrot_unblock_DOD(interpreter);
 
     return ret;
 }

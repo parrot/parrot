@@ -660,7 +660,7 @@ PDB_set_break(struct Parrot_Interp *interpreter, const char *command)
         while (line->opcode != pdb->cur_opcode) {
             line = line->next;
             if (!line) {
-                PIO_eprintf(interpreter, 
+                PIO_eprintf(interpreter,
                    "No current line found and no line number specified\n");
                 return;
             }
@@ -1980,7 +1980,6 @@ PDB_print(struct Parrot_Interp *interpreter, const char *command)
         command = skip_ws(command);
     }
 
-    Parrot_block_DOD(interpreter);
 
     if (*command == '[') {
         command = parse_key(interpreter, command, &key);
@@ -2008,7 +2007,6 @@ PDB_print(struct Parrot_Interp *interpreter, const char *command)
                         "must be 'int', 'num', 'str', 'pmc', or a register\n");
     }
 
-    Parrot_unblock_DOD(interpreter);
 }
 
 /* PDB_print_int

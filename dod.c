@@ -183,6 +183,15 @@ trace_active_PMCs(struct Parrot_Interp *interpreter, int trace_stack)
             mark_stack(interpreter, stacks[j]);
 
     }
+    /*
+     * method_table may have PMCs
+     */
+    for (i = 1; i < (UINTVAL)enum_class_max; i++) {
+        pobject_lives(interpreter, (PObj *)Parrot_base_vtables[i].whoami);
+        if (Parrot_base_vtables[i].method_table)
+            pobject_lives(interpreter,
+                    (PObj *)Parrot_base_vtables[i].method_table);
+    }
 
     /* Walk the iodata */
     Parrot_IOData_mark(interpreter, interpreter->piodata);
@@ -275,11 +284,6 @@ trace_active_buffers(struct Parrot_Interp *interpreter)
         pobject_lives(interpreter, (PObj *)interpreter->current_file);
     if (interpreter->current_package)
         pobject_lives(interpreter, (PObj *)interpreter->current_package);
-    for (i = 1; i < (UINTVAL)enum_class_max; i++) {
-        pobject_lives(interpreter, (PObj *)Parrot_base_vtables[i].whoami);
-    if (Parrot_base_vtables[i].method_table)
-        pobject_lives(interpreter, (PObj *)Parrot_base_vtables[i].method_table);
-    }
 
     /* Now walk the string stack. Make sure to walk from top down since stack
      * may have segments above top that we shouldn't walk. */
@@ -672,7 +676,7 @@ trace_mem_block(struct Parrot_Interp *interpreter,
         size_t ptr = *(size_t *)cur_var_ptr;
 
         /* Do a quick approximate range check by bit-masking */
-        if ((ptr & mask) == prefix) {
+        if ((ptr & mask) == prefix || !prefix) {
             /* Note that what we find via the stack or registers are not
              * guaranteed to be live pmcs/buffers, and could very well their
              * bufstart/vtable destroyed due to the linked list of free

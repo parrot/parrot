@@ -2,6 +2,10 @@
 #
 # run parrot tests under run-yamd
 #
+# $expect below is currently:
+# - 3 stdio handles
+# - 2 chartype/encoding init
+# - 1 summary line
 
 cleanup() {
 	mv parrot.orig parrot
