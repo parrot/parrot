@@ -267,7 +267,7 @@ string_concat(struct Parrot_Interp *interpreter, const STRING* a,
                 return string_copy(interpreter, b);
             }
             else {
-                return string_make(interpreter, "", 0, NULL, 0, NULL);
+                return string_make(interpreter, NULL, 0, NULL, 0, NULL);
             }
         }
     }
