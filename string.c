@@ -78,10 +78,9 @@ string_grow(struct Parrot_Interp * interpreter, STRING * s, INTVAL addlen) {
         copysize += addlen;
     if(copysize <= 0)
         return s;
-    /* Don't check buflen, if we are here, we already checked */
+    /* Don't check buflen, if we are here, we already checked. */
     newbuf = Parrot_allocate(interpreter, s->buflen + addlen);
     mem_sys_memcopy(newbuf, s->bufstart, (UINTVAL)copysize);
-    free_buffer(s->bufstart);
     s->bufstart = newbuf;
     s->buflen += addlen;
     return s;
