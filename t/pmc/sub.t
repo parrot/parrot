@@ -1,6 +1,6 @@
 #! perl -w
 
-use Parrot::Test tests => 11;
+use Parrot::Test tests => 35;
 use Test::More;
 
 output_is(<<'CODE', <<'OUTPUT', "PASM subs - newsub");
@@ -323,10 +323,12 @@ func1
 back
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "test COW");
-    print "main\n"
+for my $R (0..4) {
+for my $N (254..258) {
+output_is(<<"CODE", <<'OUTPUT', "test COW");
+    print "main\\n"
     set I16, 0
-    set I17, 255	# 1 chunk full
+    set I17, $N	 	#~1 chunk full
 lp:
     save I16
     inc I16
@@ -343,20 +345,28 @@ lp2:
     print I16
     print " I17: "
     print I17
-    print "\n"
+    print "\\n"
     end
 ok:
     dec I17
     if I17, lp2
-    print "back\n"
+    print "back\\n"
     end
 _func:
-    print "func\n"
+    print "func\\n"
+    set I0, $R
+lp3:
+    unless I0, cont
     save I0
+    dec I0
+    branch lp3
+cont:
     invoke P1
 CODE
 main
 func
 back
 OUTPUT
+}
+}
 1;
