@@ -313,8 +313,6 @@ languages/scheme/t/arith/nested.t
 languages/scheme/t/harness
 languages/scheme/t/io/basic.t
 languages/scheme/t/logic/basic.t
-lib/Parrot/Assembler.pm
-lib/Parrot/Assembler/Utils.pm
 lib/Parrot/BuildUtil.pm
 lib/Parrot/Configure/RunSteps.pm
 lib/Parrot/Configure/Step.pm
@@ -347,7 +345,6 @@ make_vtable_ops.pl
 manicheck.pl
 memory.c
 misc.c
-newasm
 obscure.ops
 ops2c.pl
 ops2cgc.pl
