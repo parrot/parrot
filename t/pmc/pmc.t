@@ -1,6 +1,6 @@
 #! perl -w
 
-use Parrot::Test tests => 40;
+use Parrot::Test tests => 41;
 
 my $fp_equality_macro = <<'ENDOFMACRO';
 fp_eq	macro	J,K,L
@@ -523,7 +523,7 @@ CODE
 -1-1
 OUTPUT
 
-SKIP: { skip("sting->num not finished yet", 1);
+SKIP: { skip("sting->int not finished yet", 1);
 output_is(<<CODE, <<OUTPUT, "nasty string -> int");
 	new	P0, 0
 	set	P0, "Z1"
@@ -541,6 +541,87 @@ CODE
 1
 OUTPUT
 }
+
+output_is(<<CODE, <<OUTPUT, "string to number conversion");
+@{[ $fp_equality_macro ]}
+	new	P0, 0
+
+	set	P0, "1"
+	set	N0, P0
+	fp_eq	N0, 1, EQ1
+	print	N0
+	print	"not "
+EQ1:	print	"ok 1\\n"
+
+	set	P0, "1.2"
+	set	N0, P0
+	fp_eq	N0, 1.2, EQ2
+	print	N0
+	print	"not "
+EQ2:	print	"ok 2\\n"
+
+	set	P0, "1.2e1"
+	set	N0, P0
+	fp_eq	N0, 12, EQ3
+	print	N0
+	print	"not "
+EQ3:	print	"ok 3\\n"
+
+	set	P0, "1.2e-1"
+	set	N0, P0
+	fp_eq	N0, 0.12, EQ4
+	print	N0
+	print	"not "
+EQ4:	print	"ok 4\\n"
+
+	set	P0, "1.2e2.1"
+	set	N0, P0
+	fp_eq	N0, 120, EQ5
+	print	N0
+	print	"not "
+EQ5:	print	"ok 5\\n"
+
+	set	P0, "X1.2X"
+	set	N0, P0
+	fp_eq	N0, 1.2, EQ6
+	print	N0
+	print	"not "
+EQ6:	print	"ok 6\\n"
+
+	set	P0, "E1-1.2e+2"
+	set	N0, P0
+	fp_eq	N0, 1, EQ7
+	print	N0
+	print	"not "
+EQ7:	print	"ok 7\\n"
+
+	set	P0, "++-1"
+	set	N0, P0
+	fp_eq	N0, -1, EQ8
+	print	N0
+	print	"not "
+EQ8:	print	"ok 8\\n"
+
+	set	P0, "1234.1234.5"
+	set	N0, P0
+	fp_eq	N0, 1234.1234, EQ9
+	print	N0
+	print	"not "
+EQ9:	print	"ok 9\\n"
+
+	end
+CODE
+ok 1
+ok 2
+ok 3
+ok 4
+ok 5
+ok 6
+ok 7
+ok 8
+ok 9
+OUTPUT
+
 #
 # Arithmetic operators
 #
