@@ -287,6 +287,8 @@ sub add_defaulted {
 sub dump_pmc {
     my @files = @_;
     my %all;
+    # help these dumb 'shells' that are no shells
+    @files = glob $files[0] if $files[0] eq '*.pmc';
     foreach my $file (@files) {
 	my ($class, $res) = dump_1_pmc($file);
         $res->{file} = $file;
