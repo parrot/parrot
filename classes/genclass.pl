@@ -38,7 +38,7 @@ for (@{$vtbl}) {
     my ($retval, $methname, $args) = @{$_};
 
     print "    $retval $methname ($args) {\n";
-    f($retval !~ /void/) {
+    if($retval !~ /void/) {
         print "        return ($retval)0;\n";
     }
     print "    }\n\n";

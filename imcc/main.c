@@ -449,11 +449,11 @@ int main(int argc, char * argv[])
             info(interpreter, 1,"\n");
     }
     if (run_pbc == 2) {
+        fclose(yyin);
         pf = Parrot_readbc(interpreter, sourcefile);
         if (!pf)
             fatal(1, "main", "Packfile loading failed\n");
         Parrot_loadbc(interpreter, pf);
-        fclose(yyin);
     }
     else {
         int per_pbc = write_pbc | run_pbc;
