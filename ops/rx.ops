@@ -1176,7 +1176,7 @@ code that calls it.  Let's say the Perl code looks like this:
 
 Then the Parrot code would be something like this:
 
-		rx_allocateinfo P0, "zzabbBBBBBBcdcdcdzz"
+		rx_allocinfo P0, "zzabbBBBBBBcdcdcdzz"
 		bsr RX_0
 		rx_info_successful P0, I0
 		rx_freeinfo P0
