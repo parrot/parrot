@@ -277,7 +277,6 @@ parseflags(Parrot_Interp interp, int *argc, char **argv[])
 #endif
                 if (strchr(optimizer_opt, '1')) {
                     optimizer_level |= OPT_PRE;
-                    goto opt_t;
                 }
                 if (strchr(optimizer_opt, '2')) {
                     /* FIXME -O2 is borken */
@@ -286,13 +285,14 @@ parseflags(Parrot_Interp interp, int *argc, char **argv[])
 #else
                     optimizer_level |= OPT_PRE;
 #endif
-                    goto opt_t;
                 }
                 if (strchr(optimizer_opt, 't')) {
-opt_t:
                     setcore(PARROT_SWITCH_CORE);
 #ifdef HAVE_COMPUTED_GOTO
                     setcore(PARROT_CGP_CORE);
+#endif
+#if JIT_CAPABLE
+                    setcore(PARROT_JIT_CORE);
 #endif
                 }
                 break;

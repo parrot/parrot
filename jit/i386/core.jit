@@ -5,7 +5,7 @@
 ;
 
 # TODO complete this
-#define P_ARITH ((PREV_OP == dec_i) || (PREV_OP == inc_i) || (PREV_OP == sub_i_i_i))
+#define P_ARITH ((PREV_OP == dec_i) || (PREV_OP == inc_i) || (PREV_OP == sub_i_i_i) || (PREV_OP == sub_i_i))
 
 #define CALL_FUNCTION(j, f) call_func(j, f)
 
