@@ -6,11 +6,7 @@
 
 #include <parrot/parrot.h>
 #include "parrot/jit.h"
-
-opcode_assembly_t op_assembly[458]= {
 #include "parrot/jit_struct.h"
-};
-
 
 /* Don't ever count on any info here */
 
@@ -79,7 +75,7 @@ build_asm(struct Parrot_Interp *interpreter,opcode_t *pc, opcode_t *code_start, 
     }
 
     bytecode_position = 0;
-    arena_start = arena = malloc(size);
+    arena_start = arena = malloc((unsigned int)size);
 
     pc = code_start;
         
@@ -160,22 +156,22 @@ build_asm(struct Parrot_Interp *interpreter,opcode_t *pc, opcode_t *code_start, 
                         address = (INTVAL *)s->bufstart;
                         break;
                 case 2: 
-                        address = &s->buflen;
+                        address = (INTVAL *)&s->buflen;
                         break;
                 case 3: 
-                        address = &s->flags;
+                        address = (INTVAL *)&s->flags;
                         break;
                 case 4: 
-                        address = &s->bufused;
+                        address = (INTVAL *)&s->bufused;
                         break;
                 case 5: 
-                        address = &s->strlen;
+                        address = (INTVAL *)&s->strlen;
                         break;
                 case 6: 
                         address = (INTVAL *)s->encoding;
                         break;
                 case 7: 
-                        address = (INTVAL *)s->type;
+                        address = (INTVAL *)&s->type;
                         break;
                 case 8: 
                         address = &s->language;

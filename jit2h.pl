@@ -73,6 +73,8 @@ sub readjit($) {
 %string = readjit("jit/$cpuarch/string.jit");
 %lib = readjit("jit/$cpuarch/lib.jit");
 
+print "opcode_assembly_t op_assembly[$core_numops]= {\n";
+
 for ($i = 0; $i < $core_numops; $i++) {
     $body = $core_ops{$core_opfunc[$i]};
     $body = "\\x00" unless defined $body;
@@ -429,5 +431,4 @@ END
 
     print "},\n";
 }
-
-
+print "};\n";

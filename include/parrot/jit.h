@@ -42,7 +42,7 @@ typedef struct {
 
 typedef struct {
     const char *assembly;
-    int size;
+    unsigned int size;
     int nargop;
     /* &interpreter->xxx->register[pc[x]] */
     substitution_t intval_register_address;
