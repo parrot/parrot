@@ -233,7 +233,7 @@ runops_jit(struct Parrot_Interp *interpreter, opcode_t *pc)
     /* if we fall out of runloop with restart, there is
      * currently no way, to continue in JIT, so stop it
      *
-     * This is borken too, but better as endless loops
+     * This is broken too, but better as endless loops
      */
 /*    Interp_flags_CLEAR(interpreter, PARROT_JIT_FLAG); */
 #endif
@@ -434,7 +434,7 @@ make_interpreter(Interp_flags flags)
     /* Set up the memory allocation system */
     mem_setup_allocator(interpreter);
 
-    /* intialize classes */
+    /* initialize classes */
     Parrot_init(interpreter, 0);
 
     /* Need an empty stash */
@@ -466,8 +466,8 @@ make_interpreter(Interp_flags flags)
     interpreter->ctx.num_reg_base->free = FRAMES_PER_NUM_REG_CHUNK;
     interpreter->ctx.string_reg_base->free = FRAMES_PER_STR_REG_CHUNK;
     interpreter->ctx.pmc_reg_base->free = FRAMES_PER_PMC_REG_CHUNK;
-    /* the SET_NULL macros are only for system, where a NULL pointer
-     * isn't represented by zeroes, so don't use these, for resetting
+    /* the SET_NULL macros are only for systems where a NULL pointer
+     * isn't represented by zeroes, so don't use these for resetting
      * non-null pointers
      */
     SET_NULL(interpreter->ctx.int_reg_base->next);
@@ -515,13 +515,13 @@ make_interpreter(Interp_flags flags)
 
     SET_NULL_P(interpreter->code, struct PackFile *);
     SET_NULL_P(interpreter->profile, ProfData *);
-    SET_NULL_P(interpreter->predref_code, void **);
+    SET_NULL_P(interpreter->prederef_code, void **);
     SET_NULL(interpreter->jit_info);
 
     /* Done. Return and be done with it */
 
     /* Okay, we've finished doing anything that might trigger GC.
-     * Actually, we could enbale DOD/GC earlier, but here all setup is
+     * Actually, we could enable DOD/GC earlier, but here all setup is
      * done
      */
     Parrot_unblock_DOD(interpreter);
