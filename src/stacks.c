@@ -19,7 +19,10 @@
  *     COWed and not copied yet.
  *
  *     COWed chunks are NOT magically copied, so any attempts to write should
- *     take care that the chunk may be shared.
+ *     take care that the chunk may be shared. "Write" in this case is not only
+ *     limited to pushing an item on. ANY change to the stack state, including
+ *     a pop, is a "write". Think "write" in terms of changing any execution
+ *     context, not values.
  *
  *     However:
  *     API calls stack_push, stack_pop and rotate_entries will take care of
