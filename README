@@ -31,12 +31,40 @@ the GNU General Public License or the Artistic License for more details.
 | final license is chosen.                                     |
 |                                                              |
 
+PREREQUISITES
+-------------
+
+You'll need a compiler and linker, of course.  A make program
+is currently encouraged, but we have had difficulties with some
+versions (like nmake), so we do have a primitive script
+that attempts to emulate it.
+
+You'll also need Perl 5.005 or above, compiled to support
+the types you wish to support in Parrot.  (Parrot will
+make, but you'll be unable to assemble anything.)  You can find
+what types are support by typing 'perl -V', and examining the
+values for ivtype and nvtype.  Parrot should work with INTVALs
+and NUMVALs up to those types.
+
+For most of the platforms that we are supporting initially,
+Parrot should build out of the box.  We do not have,
+however, native dynamic loading ready for OS X, and are
+currently using Fink (http://fink.sourceforge.net) to fill
+that gap.  Other solutions may also work.  The list of
+targetted platforms can be found in docs/parrot.pod.
+
+The current configure system is primitive, as it's only
+a temporary solution.  It will be happy with most any answers
+you decide to feed it.  Garbage In, Garbage Out.
+
+You may want to peruse the list of KNOWN_ISSUES to see
+what other things may be unexpected.
 
 INSTRUCTIONS
 ------------
 
 For now, unpack your Parrot tarball, (if you're reading this, you've
-probably already done that) type
+probably already done that) and type
 
     perl Configure.pl
 
