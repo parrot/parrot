@@ -18,6 +18,7 @@
 
 #include "parrot/parrot.h"
 #include "parrot/embed.h"
+#include <assert.h>
 
 /*
  * copy / clone interpreter registers
@@ -53,7 +54,81 @@ clone_regs(Parrot_Interp d, Parrot_Interp s, PMC *dest)
     }
 }
 
+/*
+ * copied from parrotio.pmc - this ought to be a global
+ * helper function
+ */
+static void
+enter_nci_method(struct Parrot_Interp *interpreter, PMC *method_table,
+		 void *func, const char *name, const char *proto)
+{
+    PMC *method;
+
+    method = pmc_new(interpreter, enum_class_NCI);
+    VTABLE_set_string_keyed(interpreter, method, func,
+	    string_make(interpreter, proto, strlen(proto),
+		NULL, PObj_constant_FLAG|PObj_external_FLAG, NULL));
+    VTABLE_set_pmc_keyed_str(interpreter, method_table,
+	    string_make(interpreter, name,
+		strlen(name), NULL,
+		PObj_constant_FLAG|PObj_external_FLAG, NULL),
+	    method);
+}
+
+/*
+ * the actual thread function
+ */
+static void*
+thread_func(void *arg)
+{
+    PMC *self = (PMC*) arg;
+    Parrot_Interp interpreter = PMC_data(self);
+    runops(interpreter, (opcode_t *)self->cache.struct_val -
+			(opcode_t *)interpreter->code->byte_code);
+
+    return NULL;
+}
+
+/*
+ * run the sub PMC in a separate thread using interpreter in dest_interp
+ */
+static int
+thread_run(Parrot_Interp interp, PMC* dest_interp, PMC* sub)
+{
+    Parrot_thread t;
+    Parrot_Interp interpreter = PMC_data(dest_interp);
+
+    dest_interp->cache.struct_val = sub->cache.struct_val;
+    Interp_flags_SET(interpreter, PARROT_EXTERN_CODE_FLAG);
+    interpreter->code = interp->code;
+    /*
+     * for now create a detached thread - enough for testing
+     */
+    THREAD_CREATE_DETACHED(t, thread_func, dest_interp);
+    return 0;
+}
+
+void Parrot_NCI_class_init(Parrot_Interp, int);
+void Parrot_PerlHash_class_init(Parrot_Interp, int);
+void Parrot_PerlUndef_class_init(Parrot_Interp, int);
+
 pmclass ParrotInterpreter need_ext {
+
+    void class_init () {
+        PMC *method_table;
+
+        /* These classes are needed now so make sure they are inited */
+        Parrot_NCI_class_init(interp, enum_class_NCI);
+        Parrot_PerlHash_class_init(interp, enum_class_PerlHash);
+        Parrot_PerlUndef_class_init(interp, enum_class_PerlUndef);
+
+        method_table = pmc_new(INTERP, enum_class_PerlHash);
+
+        enter_nci_method(INTERP, method_table,
+                         F2DPTR(thread_run), "thread", "vIPP");
+        Parrot_base_vtables[enum_class_ParrotInterpreter]->method_table =
+	    method_table;
+    }
 
     void init () {
 	struct Parrot_Interp *new_interp;

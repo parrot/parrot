@@ -1,6 +1,6 @@
 #! perl -w
 
-use Parrot::Test tests => 11;
+use Parrot::Test tests => 12;
 
 output_is(<<'CODE', <<'OUTPUT', "runinterp - new style");
 	new P0, .ParrotInterpreter
@@ -243,5 +243,59 @@ ok 1
 hello from 2 clone
 from 1 interp
 OUTPUT
+
+SKIP: {
+  skip("No thread config yet" ,1) unless $^O eq 'linux';
+
+output_is(<<'CODE', <<'OUTPUT', "thread 1");
+    set I5, 1
+    set S5, " interp\n"
+    new P7, .PerlString
+    set P7, "from "
+
+    getinterp P2
+    #
+    # set regs P5 = interp, P6 = sub
+    find_method P0, P2, "thread"
+    print "ok 1\n"
+    find_global P6, "_foo"
+    print "ok 2\n"
+    clone P5, P2
+    invoke	# start the thread
+
+    print P7
+    print I5
+    print S5
+    sleep 1
+    print P7
+    print I5
+    print S5
+    end
+
+.pcc_sub _foo:
+    set I5, 2
+    set S5, " thread\n"
+    set P7, "hello from "
+    print P7
+    print I5
+    print S5
+    typeof S0, P5
+    print S0
+    print "\n"
+    typeof S0, P6
+    print S0
+    print "\n"
+    end
+# output from threads could be reversed
+CODE
+ok 1
+ok 2
+from 1 interp
+hello from 2 thread
+ParrotInterpreter
+Sub
+from 1 interp
+OUTPUT
+}
 
 1;
