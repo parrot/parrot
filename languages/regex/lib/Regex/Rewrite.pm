@@ -32,7 +32,6 @@ sub init {
     $self->{state} ||= Regex->global_state();
     my $FAIL = $self->genlabel("FAIL");
     $self->{_labels}{'fail'} = $FAIL;
-    $self->{num_groups} = 1; # For $0, the full matching region
 }
 
 
@@ -251,29 +250,27 @@ sub rewrite_group {
     my $back = $self->genlabel("group_back");
     my $next = $self->genlabel("group_next");
 
-    $self->{num_groups}++;
-
     $self->need_group_setup($group);
 
     my ($R_back, @R_ops) = $self->rewrite($R, $rfail);
 
     my @ops = (
-                        aop('getstart', [ 'I0', $group ]),
+                        aop('getstart', [ '<tmp>', $group ]),
                         $self->dbprint("pushing start[$group]: "),
-                        aop('pushint', [ 'I0' ]),
-                        aop('getend', [ 'I0', $group ]),
+                        aop('pushint', [ '<tmp>' ]),
+                        aop('getend', [ '<tmp>', $group ]),
                         $self->dbprint("pushing end[$group]: "),
-                        aop('pushint', [ 'I0' ]),
-                        aop('setstart', [ $group, 'pos' ]),
+                        aop('pushint', [ '<tmp>' ]),
+                        aop('setstart', [ $group, '<pos>' ]),
                         @R_ops,
                         $self->dbprint("setting end[$group] := %<rx_pos>-1\n"),
-                        aop('setend', [ $group, 'pos', -1 ]),
+                        aop('setend', [ $group, '<pos>', -1 ]),
                         aop('goto', [ $next ]),
               $rfail => $self->dbprint("R in group failed\n"),
-                        aop('popint', [ 'I0', 'group end' ]),
-                        aop('setend', [ $group, 'I0' ] ),
-                        aop('popint', [ 'I0', 'group start' ]),
-                        aop('setstart', [ $group, 'I0' ] ),
+                        aop('popint', [ '<tmp>', 'group end' ]),
+                        aop('setend', [ $group, '<tmp>' ] ),
+                        aop('popint', [ '<tmp>', 'group start' ]),
+                        aop('setstart', [ $group, '<tmp>' ] ),
                         aop('goto', [ $lastback ] ),
                $back => aop('setend', [ $group, -2 ]),
                         aop('goto', [ $R_back ]),
@@ -531,11 +528,10 @@ sub rewrite_alternate {
         push @ops, aop('goto', [ $next ]);
     }
 
-    push @ops, $back => aop('popint', [ 'tmp', 'branch marker' ]);
+    push @ops, $back => aop('popint', [ '<tmp>', 'branch marker' ]);
 
     for my $i (0..$#args-1) {
-#        $DB::single = 1;
-        push @ops, aop('eq', [ 'tmp', $i, $ibacks[$i] ]);
+        push @ops, aop('eq', [ '<tmp>', $i, $ibacks[$i] ]);
     }
 
     push @ops, aop('goto', [ $ibacks[-1] ]);
@@ -576,7 +572,6 @@ sub rewrite_dynamic_alternate {
     my ($N, @N_ops) = $sizer->($self, $op);
     my ($R_back, @R_ops) = $chooser->($self, $op, $counter, $fail);
 
-#    $DB::single = 1;
     my @ops =  ( aop('assign', [ $counter, 0 ]),
                  @N_ops,
          $try => $self->dbprint("matching dynalt[%<$counter>]\n"),
@@ -736,8 +731,8 @@ sub rewrite_star {
                    aop('pushint', [ 1 ]),
                    aop('goto', [ $loop ]),
           $back => $self->dbprint("backtracking into *\n"),
-                   aop('popint', [ 'tmp', $lastback ]),
-                   aop('if', [ 'tmp', $R_back ]),
+                   aop('popint', [ '<tmp>', $lastback ]),
+                   aop('if', [ '<tmp>', $R_back ]),
                    aop('goto', [ $lastback ]),
           $next =>
                   );
@@ -749,7 +744,7 @@ sub rewrite_star {
         my @ops = (
                    aop('pushint', [ 0 ]),
                    aop('goto', [ $next ]),
-         $rfail => aop('popindex', [ 'tmp', $R_back ]),
+         $rfail => aop('popindex', [ '<tmp>', $R_back ]),
                    aop('goto', [ $lastback ]),
           $back => @R_ops,
                    aop('pushmark'),
@@ -780,7 +775,7 @@ sub rewrite_plus {
                $loop => @R_ops,
                         aop('pushint', [ 0, 'plus matched marker' ]),
                         aop('goto', [ $loop ]),
-              $rfail => aop('popindex', [ '<rx_tmp>', $lastback ]),
+              $rfail => aop('popindex', [ '<tmp>', $lastback ]),
               );
 
     return ($R_back, @ops);
@@ -806,7 +801,7 @@ sub rewrite_nongreedy_plus {
                $back => @R_ops,
                         aop('pushint', [ 0 ]),
                         aop('goto', [ $next ]),
-              $rfail => aop('popindex', [ '<rx_tmp>', $lastback ]),
+              $rfail => aop('popindex', [ '<tmp>', $lastback ]),
                         aop('goto', [ $R_back ]),
                $next =>
               );
@@ -841,8 +836,8 @@ sub rewrite_greedy_optional {
                         @R_ops,
                         aop('pushint', [ 1 ]),
                         aop('goto', [ $next ]),
-               $back => aop('popint', [ 'tmp', 'optional marker' ]),
-                        aop('if', [ 'tmp', $R_back ]),
+               $back => aop('popint', [ '<tmp>', 'optional marker' ]),
+                        aop('if', [ '<tmp>', $R_back ]),
                         aop('goto', [ $lastback ]),
               $rfail => aop('pushint', [ 0 ]),
                $next =>
@@ -875,10 +870,6 @@ sub rewrite_nongreedy_optional {
               );
 
     return ($back, @ops);
-}
-
-sub rewrite_rule {
-    die "rules must be handled by host language";
 }
 
 ###################### New stuff ###################
@@ -964,61 +955,98 @@ sub run {
     my ($self, $tree, $ctx, $pass_label, $fail_label) = @_;
     die "Wrong #args" if @_ != 5;
 
-    my $FAIL = $self->{_labels}{'fail'};
-    my $back = $self->genlabel('regex_back');
+    die "Expected rule!" unless ref($tree) eq 'Regex::Ops::Tree::rule';
 
-    # Generate the main regular expression code
-    my ($backtrack, @ops) = $self->rewrite($tree, $FAIL);
+    my (undef, @ops) = $self->rewrite($tree, undef);
+
+#    return { lastback => $back, code => \@ops };
+    return { code => \@ops };
+}
+
+our $call_uid;
+sub rewrite_call {
+    my ($self, $op, $name, $capture, $lastback) = @_;
+
+#    if ($capture) {
+#        local $op->{args}->[1] = 0;
+#        return $self->rewrite_group(rop('group', [ $op, $name ]), $op, $name, $lastback);
+#    }
+
+    my $uid = "_rule_${name}_" . ++$call_uid;
+
+    my $handle = $self->genlabel('handle_call_result');
+    my $back = $self->genlabel('backtrack_into_call');
+    my $next = $self->genlabel('after_call');
+
+    my @ops = (           aop('call_setup' => [ $name, $uid ]),
+                          aop('call' => [ $name, 1, $uid ]),
+               $handle => aop('call_result' => [ $uid, $capture ? $name : undef, $lastback ]),
+                          aop('goto' => [ $next ]),
+                 $back => aop('call' => [ $name, 0, $uid ]),
+                          aop('goto' => [ $handle ]),
+                 $next =>
+              );
+    return ($back, @ops);
+}
+
+# Handle a rule definition. $lastback is ignored; perhaps I should
+# warn if it's defined at all.
+sub rewrite_rule {
+    my ($self, $op, $name, $R, $num_groups, $lastback) = @_;
 
     # Generate code for saving/restoring the "rxlocals" gathered while
     # rewriting the regex
     my @save_rxlocals;
     my @restore_rxlocals;
-    if ($ctx->{preserve_state}) {
+#    if ($ctx->{preserve_state}) {
         @save_rxlocals = $self->rule_save_rxlocals();
         @restore_rxlocals = $self->rule_restore_rxlocals();
-    }
+#    }
 
-    # Set up the success/failure handling
-    my $post_tree = rop('seq', [ aop('match_succeeded'),
-                                 @save_rxlocals,
-                                 aop('literal', [ "branch", $pass_label ]),
-                        $FAIL => aop('match_failed'),
-                                 aop('literal', [ "branch", $fail_label ]),
-                        $back => @restore_rxlocals,
-                                 aop('goto' => [ $backtrack ])
-                               ]);
-    my (undef, @post_ops) = $self->rewrite($post_tree, $back);
+    my $trymatch = $self->genlabel('rule_try_match');
+    my $backup = $self->genlabel('rule_backtrack');
+
+    # Generate the code for the body of the rule
+    my $back = $self->genlabel('rule_fail');
+    my ($R_back, @R_ops) = $self->rewrite($R, $back);
 
     # Set up the full preamble, including stuff gathered from
-    # rewriting the expression.
-    my $pre_tree = rop('seq', [
-                               aop('preamble', [ $self->{num_groups} ]),
-                               $self->startup()
-                              ] );
-    my (undef, @pre_ops) = $self->rewrite($pre_tree, $FAIL);
+    # rewriting the expression. Then write out the rest of the
+    # expression.
+    my $def = aop('rule_def', [ $name, $trymatch, $backup, $num_groups ]);
 
-    # Glue them together
-    @ops = (@pre_ops, @ops, @post_ops);
+    my @ops =
+      ( $backup =>   @restore_rxlocals,
+                     aop('goto' => [ $R_back ]),
+        $trymatch => @R_ops,
+                     @save_rxlocals,
+                     aop('rule_pass', [ $name ]),
+            $back => aop('rule_fail', [ $name ]),
+                     aop('rule_end', [ $name ]),
+      );
 
-    return { lastback => $back, code => \@ops };
+    push @{ $def->{args} }, [ $self->startup($num_groups) ];
+
+    return (undef, $def, @ops);
 }
 
 sub startup {
-    my ($self) = @_;
+    my ($self, $num_groups) = @_;
+
+    my $group;
 
     my @ops;
-    foreach my $group (0 .. $self->{num_groups}-1) {
+    foreach $group (0 .. $num_groups) {
         push @ops, aop('initgroup', [ $group ]);
     }
 
-    push @ops, aop('setstart', [ "0", 0 ]);
+    push @ops, aop('setstart', [ "0", '<rx_pos>' ]);
 
-    foreach my $group (sort keys %{ $self->{_setup_starts} || {} }) {
+    foreach $group (sort keys %{ $self->{_setup_starts} || {} }) {
         push @ops, aop('setstart', [ $group, -2 ]);
     }
 
-    foreach my $group (sort keys %{ $self->{_setup_ends} || {} }) {
+    foreach $group (sort keys %{ $self->{_setup_ends} || {} }) {
         push @ops, aop('setend', [ $group, -2 ]);
     }
 

@@ -9,7 +9,7 @@ BEGIN {
 
 use Regex::State;
 use Regex::Parse;
-use Regex::PreOptimize;
+use Regex::TreeOptimize;
 use Regex::Optimize;
 
 use Regex::Rewrite;
@@ -39,7 +39,7 @@ sub tree_to_list {
 
     # Tree optimizations
     unless ($options{'no-tree-optimize'}) {
-        my $opt1 = Regex::PreOptimize->new();
+        my $opt1 = Regex::TreeOptimize->new();
         $tree = $opt1->optimize_tree($tree, $ctx);
     }
 
@@ -47,6 +47,9 @@ sub tree_to_list {
     my $code = $rewrite->run($tree, $ctx,
                              $pass_label, $fail_label);
     return $code if $options{'no-list-optimize'};
+
+    $ctx->{external_labels}{$pass_label} = 1;
+    $ctx->{external_labels}{$fail_label} = 1;
 
     my $opt2 = Regex::Optimize->new(%options);
     $code->{code} = [ $opt2->optimize($code->{code}, $ctx) ];
@@ -58,8 +61,15 @@ sub list_to_pasm {
     my $cgen;
 
     $options{state} ||= global_state();
+    $options{module} ||= "Regex::CodeGen::IMCC";
 
-    $cgen = Regex::CodeGen::IMCC->new(%options);
+    if ($options{module} ne 'Regex::CodeGen::IMCC') {
+      eval "use $options{module}";
+      die $@ if $@;
+    }
+
+    $cgen = $options{module}->new(%options);
+    $cgen->init_context($ctx);
     return $cgen->output($list_regex->{code}, $ctx);
 }
 
@@ -68,9 +78,12 @@ sub compile {
 
     $options{state} ||= global_state();
 
-    my $tree = expr_to_tree($expr, $ctx, %options);
-    my $code = tree_to_list($tree, $ctx, $pass_label, $fail_label, %options);
-    return list_to_pasm($code, $ctx, %options);
+    my $trees = expr_to_tree($expr, $ctx, %options);
+    for my $tree (@$trees) {
+        my $code = tree_to_list($tree, $ctx, $pass_label, $fail_label, %options);
+        return list_to_pasm($code, $ctx, %options);
+    }
+    # Heh. Fixme.
 }
 
 1;

@@ -14,6 +14,8 @@ sub op {
     Regex::Ops::Tree->op(@_);
 }
 
+$::paren = 0;
+
 %}
 
 %left '|'
@@ -23,16 +25,40 @@ sub op {
 
 %%
 
-regex : regex1
-   { return $_[1]; }
-      | regex1 '$'
-   { return op('seq' => [ $_[1], op('atend') ]); }
+rules : rules rule
+  { return [ @{ $_[1] }, $_[2] ] }
+      | 
+  { return []; }
 ;
 
-regex1 : '^' expr
+rule : '&' rulename '=' regex
+   { my ($name, $tree) = @_[2,4];
+     # This is really not the place for this...
+     if ($tree->{name} eq 'scan' && $name ne 'default') {
+         $tree = $tree->{args}->[0];
+     }
+     my $op = op('rule' => [ $name, $tree, 1 + $::paren ]);
+     $::paren = 0; # FIXME!
+     return $op;
+   }
+     | regex
+   {
+     my $op = op('rule' => [ 'default', $_[1], 1 + $::paren ]);
+     $::paren = 0; # FIXME!
+     return $op;
+   }
+;
+
+regex : '^' regex1
    { return $_[2]; }
-      | expr
+      | regex1
    { return op('scan' => [ $_[1] ]); }
+;
+
+regex1 : expr
+   { return $_[1]; }
+      | expr '$'
+   { return op('seq' => [ $_[1], op('atend') ]); }
 ;
 
 expr : expr '|' expr
@@ -63,6 +89,16 @@ expr : expr '|' expr
    { return op('group' => [ $_[3], $_[2] ]) }
      | '(' '?' ':' expr ')'
    { return $_[4]; }
+     | '<' rulename '>'
+   { return op('call' => [ $_[2], 0 ]) }
+     | '<' '?' rulename '>'
+   { return op('group', [ op('call' => [ $_[3], 1 ]), ++$::paren ]) }
+;
+
+rulename : rulename CHAR
+   { return $_[1] . $_[2]; }
+     |
+   { return '' }
 ;
 
 range : '{' number ',' number '}'

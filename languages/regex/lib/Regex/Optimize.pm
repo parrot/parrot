@@ -149,8 +149,9 @@ sub optimize {
 
     # First, convert all statements to the form
     #  { label => optional_label, code => original_op }
+    # and construct a mapping from label names to destination tagged_op
     my $curlabel;
-    my @output2; # { label => ?label, code => op } : tagged_op
+    my @output2; # ( { label => ?label, code => op } : tagged_op )
     my %labels; # { label string => tagged_op }
     foreach my $stmt (@output) {
 	if ($stmt->{name} eq 'LABEL') {
@@ -167,6 +168,7 @@ sub optimize {
     # reference.
 
     foreach my $stmt (@output2) {
+        # $stmt : { label => ?label, code => op }
 	my ($label, $actual) = @$stmt{'label','code'};
 
         # Find statements that can branch to a label
@@ -176,8 +178,16 @@ sub optimize {
         foreach my $pos (@labels) {
             my $dest = $actual->{args}->[$pos];
             while (1) {
-                my $dest_stmt = $labels{$dest->{label}}
-                  or die "untargeted label $dest->{label}";
+                my $dest_stmt = $labels{$dest->{label}}; # tagged_op
+                if (! $dest_stmt) {
+                    if ($ctx->{external_labels}{$dest->{label}}) {
+                        # Mark external label as reachable
+                        $dest->{reachable} = 1;
+                        last; # Stop tracing through jumps
+                    } else {
+                        die "untargeted label $dest->{label}";
+                    }
+                }
                 last if $dest_stmt->{code}->{name} ne 'goto';
                 $dest = $dest_stmt->{code}->{args}->[0];
             }
@@ -216,6 +226,7 @@ sub optimize {
                 my @labels = $self->label_indices($stmt->{code});
                 foreach my $pos (@labels) {
                     push @Q, $labels{$stmt->{code}->{args}->[$pos]->{label}};
+                    pop @Q if ! defined $Q[-1]; # External label
                 }
                 if ($stmt->{code}->{name} =~ /^(?:goto|fail)$/) {
                     next BBLOCK;
@@ -280,6 +291,28 @@ sub optimize {
             bless($self->{_label_comments}, 'LABEL_COMMENTS'),
             map { ($_->{label} ? ($_->{label}) : ()), $_->{code} } @output4
            );
+}
+
+sub dbg_render {
+    if (UNIVERSAL::isa($_[0], 'Regex::Ops::List')) {
+        map {
+            if ($_->{name} eq 'LABEL') {
+                "$_->{label}: ";
+            } else {
+                $_->{name} . " " . join(", ", map { ref($_) ? $_->{label} : $_ } @{ $_->{args} || [] });
+            }
+        } @_;
+    } else {
+        map {
+            my $str;
+            if ($_->{label}) {
+                $str .= "**" if $_->{label}{reachable};
+                $str .= "$_->{label}->{label}: ";
+            }
+            $str .= $_->{code}{name} . " " . join(", ", map { ref($_) ? $_->{label} : $_ } @{ $_->{code}{args} || [] });
+            $str;
+        } @_;
+    }
 }
 
 1;

@@ -1,4 +1,4 @@
-package Regex::CodeGen::IMCC;
+package Regex::CodeGen::Perl5;
 use Regex::Ops::Tree (); # For mark()
 use base 'Regex::CodeGen';
 use strict;
@@ -7,37 +7,20 @@ my $fail_label = Regex::Ops::Tree::mark('FAIL');
 
 sub init_context {
     my ($self, $ctx) = @_;
-    $ctx->{rx_match} ||= 'rx_match';
-    $ctx->{rx_stack} ||= 'rx_stack';
-    $ctx->{rx_ptmp} ||= 'rx_ptmp';
-    $ctx->{rx_tmp} ||= 'rx_itmp';
-    $ctx->{rx_pos} ||= 'rx_pos';
-    $ctx->{rx_len} ||= 'rx_len';
-    $ctx->{rx_input} ||= 'rx_input';
+    $ctx->{rx_match} ||= '$rx_match';
+    $ctx->{rx_stack} ||= '$rx_stack';
+    $ctx->{rx_tmp} ||= '$rx_tmp';
+    $ctx->{rx_pos} ||= '$rx_pos';
+    $ctx->{rx_len} ||= '$rx_len';
+    $ctx->{rx_input} ||= '$rx_input';
     $self->SUPER::init_context($ctx);
-}
-
-sub pushop { "push" };
-sub popop { "pop" };
-
-sub output_match_succeeded {
-    return ('set <rx_match>["!POS"], <rx_pos>',
-            'set <rx_match>["!RESULT"], 1',
-            'add <rx_tmp>, <rx_pos>, -1',
-            'set <rx_match>["0";1], <rx_tmp>');
-}
-
-sub output_match_failed {
-    return ('set <rx_match>["!POS"], <rx_pos>',
-            'set <rx_match>["!RESULT"], 0',
-            'set <rx_match>["0";1], -2');
 }
 
 sub value {
     my $name = shift;
-    return '<rx_pos>' if $name eq 'pos' || $name eq '<pos>';
-    return '<rx_tmp>' if $name eq 'tmp' || $name eq '<tmp>';
-    return '<rx_ptmp>' if $name eq 'ptmp' || $name eq '<ptmp>';
+    return '$rx_pos' if $name eq '<pos>';
+    return '$rx_tmp' if $name eq '<tmp>';
+    return '$rx_tmp' if $name eq '<ptmp>';
     return $name;
 }
 
@@ -45,10 +28,15 @@ sub dbgoto {
     my ($self, $label) = @_;
     return () unless $self->{DEBUG};
     return () unless $self->{DEBUG_SUPPORT};
-    return ("bsr $label");
+    return ("goto $label");
 }
 
 ############### SIMPLE OUTPUT ##############
+
+sub output_goto {
+    my ($self, $where) = @_;
+    return "goto ".$self->output_label_use($where).";";
+}
 
 sub output_terminate {
     return "";
@@ -57,9 +45,9 @@ sub output_terminate {
 sub output_advance {
     my ($self, $distance, $failLabel) = @_;
     $failLabel = $self->output_label_use($failLabel);
-    return ("add <rx_pos>, $distance # pos++",
-            "gt <rx_pos>, <rx_len>, $failLabel # past end of input?",
-            'set <rx_match>["0";0], <rx_pos> # group 0 start := pos');
+    return ("<rx_pos> += $distance; # pos++",
+            "goto $failLabel if <rx_pos> > <rx_len>; # past end of input?",
+            '<rx_match>{0}->[0] = <rx_pos>; # group 0 start := pos');
 }
 
 sub output_increment {
@@ -67,93 +55,90 @@ sub output_increment {
     die "invalid distance" if $distance =~ /[^\d\-]/;
     return () if $distance == 0;
 
-    my $comment;
     if ($distance == 1) {
-        $comment = "pos++";
+        return "<rx_pos>++;";
     } elsif ($distance == -1) {
-        $comment = "pos--";
+        return "<rx_pos>--;";
     } elsif ($distance > 0) {
-        $comment = "pos += $distance";
+        return "<rx_pos> += $distance;";
     } elsif ($distance < 0) {
-        $comment = "pos -= ".(-$distance);
+        return "<rx_pos> -= $distance;";
     }
-
-    return ("add <rx_pos>, $distance # $comment");
 }
 
 sub output_add {
     my ($self, $var, $arg1, $arg2) = @_;
     my $realvar = value($var);
-    return "add $realvar, $arg1, $arg2" if defined($arg2);
-    return "add $realvar, $arg1";
+    return "$realvar = $arg1 + $arg2;" if defined($arg2);
+    return "$realvar += $arg1;";
 }
 
 sub output_sub {
     my ($self, $var, $amount) = @_;
     $amount = 1 if ! defined $amount;
     my $realvar = value($var);
-    return "sub $realvar, $amount";
+    return "$realvar -= $amount;";
 }
 
 sub output_set {
     my ($self, $reg, $value) = @_;
     $reg = value($reg);
-    return "set $reg, $value";
+    return "$reg = $value;";
 }
 
 sub output_print {
     my ($self, $what) = @_;
     $what = value($what);
-    return ("print $what");
+    return ("print $what;");
 }
 
 sub output_test {
     my ($self, $test, $val1, $val2, $dest) = @_;
     $val1 = value($val1);
     $val2 = value($val2);
-    return "$test $val1, $val2, " . $self->output_label_use($dest);
+    return "goto " . $self->output_label_use($dest) . " if $val1 $test $val2;";
 }
 
 sub output_eq {
     my ($self, $val1, $val2, $dest) = @_;
-    $self->output_test('eq', $val1, $val2, $dest);
+    $self->output_test('==', $val1, $val2, $dest);
 }
 
 sub output_ne {
     my ($self, $val1, $val2, $dest) = @_;
-    $self->output_test('ne', $val1, $val2, $dest);
+    $self->output_test('!=', $val1, $val2, $dest);
 }
 
 sub output_lt {
     my ($self, $val1, $val2, $dest) = @_;
-    $self->output_test('lt', $val1, $val2, $dest);
+    $self->output_test('<', $val1, $val2, $dest);
 }
 
 sub output_le {
     my ($self, $val1, $val2, $dest) = @_;
-    $self->output_test('le', $val1, $val2, $dest);
+    $self->output_test('<=', $val1, $val2, $dest);
 }
 
 sub output_gt {
     my ($self, $val1, $val2, $dest) = @_;
-    $self->output_test('gt', $val1, $val2, $dest);
+    $self->output_test('>', $val1, $val2, $dest);
 }
 
 sub output_ge {
     my ($self, $val1, $val2, $dest) = @_;
-    $self->output_test('ge', $val1, $val2, $dest);
+    $self->output_test('>=', $val1, $val2, $dest);
 }
 
 sub output_if {
     my ($self, $reg, $dest) = @_;
     $reg = value($reg);
-    return "if $reg, " . $self->output_label_use($dest);
+    return "goto " . $self->output_label_use($dest) . " if $reg;";
 }
 
 sub output_unless {
     my ($self, $reg, $dest) = @_;
     $reg = value($reg);
-    return "unless $reg, " . $self->output_label_use($dest);
+    return "goto " . $self->output_label_use($dest) . " unless $reg;";
 }
 
 sub output_check {
@@ -161,27 +146,23 @@ sub output_check {
     $lenvar ||= "<rx_len>";
     my $fail = $self->output_label_use($failLabel);
     if ($needed eq "1") {
-        return "ge <rx_pos>, $lenvar, $fail # need $needed more chars";
+        return "goto $fail if <rx_pos> >= $lenvar; # need $needed more chars";
     } elsif ($needed eq "0") {
         return ();
     } else {
-        return "sub <rx_tmp>, $lenvar, <rx_pos> # need $needed more chars",
-               "lt <rx_tmp>, $needed, $fail";
+        return "goto $fail if $lenvar - <rx_pos> < $needed; # need $needed more chars";
     }
 }
 
 sub output_match {
     my ($self, $code, $failLabel) = @_;
     my $comment = Regex::Ops::Tree::isplain($code) ? " # match '".chr($code)."'" : "";
-    my @ops =
-      (
-       "ord <rx_tmp>, <rx_input>, <rx_pos> # tmp = INPUT[pos]",
-       "ne <rx_tmp>, $code, ".$self->output_label_use($failLabel).$comment,
-      );
+    my $fail = $self->output_label_use($failLabel);
+    my @ops = ("goto $fail if ord(substr(<rx_input>, <rx_pos>, 1)) != $code;" . $comment);
     if ($self->{DEBUG}) {
-        push @ops, 'print "matched('.chr($code).') at "';
-        push @ops, 'print rx_pos';
-        push @ops, 'print "\n"';
+        push @ops, 'print "matched('.chr($code).') at ";';
+        push @ops, 'print <rx_pos>;';
+        push @ops, 'print "\n";';
     }
     return @ops;
 }
@@ -190,7 +171,7 @@ sub output_classmatch {
     my ($self, $incexc, $failLabel) = @_;
 
     my $passLabel = $self->{state}->genlabel("pass_charclass");
-    my @ops = ("ord <rx_tmp>, <rx_input>, <rx_pos> # tmp = INPUT[pos]");
+    my @ops = ("<rx_tmp> = ord(substr(<rx_input>, <rx_pos>)); # tmp = INPUT[pos]");
     my $fail = $self->output_label_use($failLabel);
     my $pass = $self->output_label_use($passLabel);
 
@@ -198,14 +179,14 @@ sub output_classmatch {
         my $first = shift(@$incexc);
         my $last = shift(@$incexc);
         if (defined($last)) {
-            push @ops, "lt <rx_tmp>, $first, $fail"
+            push @ops, "goto $fail if <rx_tmp> < $first;"
               unless $first == 0;
-            push @ops, "lt <rx_tmp>, $last, $pass";
+            push @ops, "goto $pass if <rx_tmp> < $last;";
         } else {
-            push @ops, "ge <rx_tmp>, $first, $pass";
+            push @ops, "goto $pass if <rx_tmp> >= $first;";
         }
     }
-    push @ops, "branch $fail";
+    push @ops, "goto $fail;";
 
     push @ops, $self->output_label_def($passLabel);
     return @ops;
@@ -213,14 +194,14 @@ sub output_classmatch {
 
 sub output_initgroup {
     my ($self, $group) = @_;
-    return ("new <rx_ptmp>, .MatchRange # new group \"$group\"",
-            "set <rx_match>[\"$group\"], <rx_ptmp>");
+    return ("<rx_match>{\"$group\"} = [];");
 }
 
 sub output_setstart {
     my ($self, $group, $value) = @_;
+    $DB::single = 1;
     $value = value($value);
-    return qq!set <rx_match>["$group";0], $value # open group $group!;
+    return qq!<rx_match>{"$group"}->[0] = $value; # open group $group!;
 }
 
 sub output_setend {
@@ -228,44 +209,44 @@ sub output_setend {
     $value = value($value);
     my @ops;
     if ($adj) {
-        push @ops, "add <rx_tmp>, $value, $adj";
+        push @ops, "<rx_tmp> = $value + $adj;";
         $value = "<rx_tmp>";
     }
-    push @ops, qq!set <rx_match>["$group";1], $value # close group $group!;
+    push @ops, qq!<rx_match>{"$group"}->[1] = $value; # close group $group!;
     return @ops;
 }
 
 sub output_getstart {
     my ($self, $reg, $group) = @_;
     $reg = value($reg);
-    return qq!set $reg, <rx_match>["$group";0] # get group $group start!;
+    return qq!$reg = <rx_match>{"$group"}->[0]; # get group $group start!;
 }
 
 sub output_getend {
     my ($self, $reg, $group) = @_;
     $reg = value($reg);
-    return qq!set $reg, <rx_match>["$group";1] # get group $group end!;
+    return qq!$reg = <rx_match>{"$group"}->[1]; # get group $group end!;
 }
 
 sub output_delete {
     my ($self, $n) = @_;
-    return qq!set <rx_match>["$n";1], -2 # delete group $n!;
+    return qq!<rx_match>{"$n"}->[1] = undef; # delete group $n!;
 }
 
 sub output_atend {
     my ($self, $failLabel) = @_;
     my $fail = $self->output_label_use($failLabel);
     return ($self->dbprint("At end: %<rx_pos> >= %<rx_len>?\n"),
-            "lt <rx_pos>, <rx_len>, $fail # at end?");
+            "goto $fail if <rx_pos> < <rx_len>; # at end?");
 }
 
 sub output_pushmark {
     my ($self) = @_;
     my @ops;
     if ($self->{DEBUG}) {
-	push @ops, (qq(print "PUSHED ).(@_>1?$_[1]:"mark").qq(\\n"));
+	push @ops, (qq(print "PUSHED ).(@_>1?$_[1]:"mark").qq(\\n";));
     }
-    push @ops, $self->pushop . " <rx_stack>, -1 # pushmark";
+    push @ops, "push \@<rx_stack>, -1; # pushmark";
     return @ops;
 }
 
@@ -281,30 +262,30 @@ sub output_pushint {
 
     if ($self->{DEBUG}) {
         my $desc = $db_desc ? " ($db_desc)" : "";
-        return ("set <rx_tmp>, <rx_stack>",
-                $self->pushop . " <rx_stack>, $reg",
+        return ("<rx_tmp> = \@<rx_stack>;",
+                "push \@<rx_stack>, $reg;",
                 $self->dbprint("PUSHED[\%<<rx_tmp>>] INT: \%<$reg>$desc\n"),
                );
     }
-    return $self->pushop . " <rx_stack>, $reg";
+    return "push \@<rx_stack>, $reg;";
 }
 
 sub output_save {
     my ($self, $reg) = @_;
     $reg = value($reg);
-    return ("save $reg");
+    return ("push \@::STATESTACK, $reg;");
 }
 
 sub output_restore {
     my ($self, $reg) = @_;
     $reg = value($reg);
-    return ("restore $reg");
+    return ("$reg = pop \@::STATESTACK;");
 }
 
 sub output_refresh {
     my ($self, $reg) = @_;
     $reg = value($reg);
-    return ("restore $reg", "save $reg");
+    return ("$reg = \$::STATESTACK[-1]");
 }
 
 use vars qw($DEBUG_LABEL);
@@ -324,15 +305,16 @@ sub output_popindex {
 
     $reg = value($reg);
 
-    my @ops = ($self->popop . " <rx_tmp>, <rx_stack> # popindex");
+    my @ops = ("<rx_tmp> = pop \@<rx_stack>; # popindex");
     if ($self->{DEBUG}) {
-        push @ops, 'print "POPPED: "', "print <rx_tmp>", 'print "\n"';
+        push @ops, 'print "POPPED: <rx_tmp>\n";';
     }
 
     # FIXME: Still have extra copy in many cases
-    push @ops, "eq <rx_tmp>, -1, ".$self->output_label_use($fallback)." # was a mark?";
-    push @ops, "set $reg, <rx_tmp> # nope, set pos := popped index"
-      unless $reg eq '<rx_tmp>';
+    my $L_fallback = $self->output_label_use($fallback);
+    push @ops, "goto $L_fallback if <rx_tmp> == -1; # was a mark?";
+    push @ops, "$reg = <rx_tmp>; # nope, set pos := popped index"
+      unless $reg eq '$<rx_tmp>';
     return @ops;
 }
 
@@ -351,9 +333,10 @@ sub output_peekindex {
 
     $reg = value($reg);
 
-    return ("set <rx_tmp>, <rx_stack>[-1\] # peekindex",
-            "eq <rx_tmp>, -1, ".$self->output_label_use($fallback)." # was a mark?",
-            "set $reg, <rx_tmp> # nope, set pos := popped index");
+    my $L_fallback = $self->output_label_use($fallback);
+    return ("<rx_tmp> = <rx_stack>->[-1]; # peekindex",
+            "goto $L_fallback if <rx_tmp> == -1; # was a mark?",
+            "$reg = <rx_tmp>; # nope, set pos := popped index");
 }
 
 sub output_popint {
@@ -361,104 +344,120 @@ sub output_popint {
     $reg = value($reg);
     if ($self->{DEBUG}) {
         my $desc = $db_desc ? " ($db_desc)" : "";
-        return ("set <rx_tmp>, <rx_stack>",
-                $self->popop . " $reg, <rx_stack>",
+        return ("<rx_tmp> = \@<rx_stack>;",
+                "$reg = pop \@<rx_stack>;",
                 $self->dbprint("POPPED[\%<<rx_tmp>>] INT: \%<$reg>$desc\n"),
                 );
     } else {
-        return ($self-> popop . " $reg, <rx_stack> # popint");
+        return ("$reg = pop \@<rx_stack>; # popint");
     }
 }
 
 sub output_substr {
     my ($self, $dest, $src, $offset, $len) = @_;
-    return ("substr $dest, $src, $offset, $len");
+    return ("$dest = substr($src, $offset, $len);");
 }
 
 sub output_length {
     my ($self, $dest, $string) = @_;
-    return ("length $dest, $string");
+    return ("$dest = length $string;");
 }
 
 sub output_arg {
     my ($self, $name, $type, $value) = @_;
     $value = value($value);
-    $DB::single = 1 unless length($value);
-    return ".arg $value";
+    return "$value, ";
 }
 
 sub output_param {
     my ($self, $name, $type, $reg) = @_;
     $reg = value($reg);
-    return ".param $type $reg";
+    return "$reg, ";
 }
 
 
 sub output_return {
     my ($self, $rettype, $retval) = @_;
     $retval = value($retval);
-    return (".return $retval",
-            "ret");
+    return ("return $retval;");
 }
 
 sub output_rule_def {
     my ($self, $name, $L_trymatch, $L_backup, $num_groups, $startup) = @_;
+    my @ops;
+#    if ($name ne 'default') {
+        @ops = ("sub _rule_$name {", 'my ($rx_mode, $rx_input, $rx_pos, $rx_stack) = @_;');
+#    }
 
-    my $trymatch = $self->output_label_use($L_trymatch);
-    my $backup = $self->output_label_use($L_backup);
+    if ($self->{DEBUG}) {
+        push @ops, qq(print "Calling $name at \$rx_pos\\n";);
+        push @ops, qq(print "INPUT:\$rx_input\\n";);
+        push @ops, qq(print "      " . (" " x \$rx_pos) . "^\\n";);
+    }
 
-    my @ops = split(/\n/, <<"END");
-.sub _$name
-  .param int <rx_mode>
-  .param string <rx_input>
-  .param int <rx_pos>
-  .param pmc <rx_stack>
-
-  .local pmc <rx_match>
-  .local pmc <rx_ptmp>
-  .local int <rx_tmp>
-  .local int <rx_len>
-  <rx_match> = new Match
-  <rx_match>["!INPUT"] = <rx_input>
-  <rx_match>["!GROUPS"] = $num_groups
-  length <rx_len>, <rx_input> # cache the length in <rx_len>
-
+    push @ops, split(/\n/, <<'END');
+my %rx_match;
+$rx_match{'!INPUT'} = $rx_input;
+$rx_match{'!GROUPS'} ||= [];
+my $rx_len = length($rx_input);
+my $rx_tmp;
 END
 
     push @ops, $self->output($startup, $self->{ctx});
 
-    push @ops, split(/\n/, <<"END");
-  if <rx_mode> goto $trymatch
-  goto $backup
-END
+    push @ops, "if (\$rx_mode) { goto " . $self->output_label_use($L_trymatch) . "} else { goto " . $self->output_label_use($L_backup) . "};";
 
     return @ops;
 }
 
 sub output_rule_end {
     my ($self, $name) = @_;
-    return ("end", ".end # End of rule $name");
+    return ("# End of rule $name", "}");
 }
 
 sub output_rule_pass {
     my ($self, $name) = @_;
-    return ($self->output_match_succeeded(),
-            ".return (<rx_match>)");
+    return split(/\n/, <<'END');
+$rx_match{'!POS'} = $rx_pos;
+$rx_match{'!RESULT'} = 1;
+$rx_match{'0'}->[1] = $rx_pos - 1;
+$rx_match{'!STACK'} = $rx_stack;
+return \%rx_match;
+END
 }
 
 sub output_rule_fail {
     my ($self, $name) = @_;
-    return ($self->output_match_failed(),
-            ".return (<rx_match>)");
+  return split(/\n/, <<'END');
+$rx_match{'!POS'} = $rx_pos;
+$rx_match{'!RESULT'} = undef;
+$rx_match{'0'}->[1] = undef;
+$rx_match{'!STACK'} = \$rx_stack;
+return \%rx_match;
+END
 }
 
-# There is no language-independent way of calling a rule, because this
-# requires following the host language's calling conventions. If
-# you're trying to trace through a compilation, then look for this
-# method to be overridden in your language-specific code generation
-# subclass, eg languages/perl6/P6C/IMCC/ExtRegex/CodeGen.pm
-sub output_call_rule {
-    die "unimplemented";
+sub output_call_setup {
+    my ($self, $name, $uid) = @_;
+    return "my \$$uid;";
+}
+
+sub output_call {
+    my ($self, $name, $mode, $uid) = @_;
+    return split(/\n/, <<"END");
+\$$uid = _rule_$name($mode, \$rx_input, \$rx_pos, \$rx_stack);
+\$rx_pos = \$$uid\->{'!POS'};
+END
+}
+
+sub output_call_result {
+    my ($self, $uid, $name, $fail) = @_;
+    my $fail_label = $self->output_label_use($fail);
+    my @ops;
+    if (defined $name) {
+        push @ops, "\$rx_match{'$name'} = \$$uid;";
+    }
+    return (@ops, "goto $fail_label if ! \$$uid\->{'!RESULT'};");
 }
 
 1;
