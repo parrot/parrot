@@ -79,7 +79,7 @@ loop_populate:
 	set P1, I0, I1	      #P0=[[1,2,3,...],[0,0,0...],[0,0,0...]]
 	set P2, I0, 0
 	set P3, I0, 0
-	inc I0, 1
+	inc I0
 	lt  I0, I5, loop_populate
 	set I1, I5  # size
 	set I2, 0   # start_col
@@ -110,13 +110,13 @@ loop_cols:
 	repeat S0, " ", I5
 	print S0
 
-	inc I2, 1                # j++
+	inc I2                   # j++
 	eq I2, 3, done_loop      
 	print " | "
 	if 1, loop_cols      # j < 3
 done_loop:
 	print "\n"
-	inc I1, 1                # i++
+	inc I1                   # i++
 	lt I1, I0, loop_rows     # i < size
 	print "\n"
 	ret
@@ -132,7 +132,7 @@ MOVE:	#vars used: I4, I5, I6, I7, I8, P1, P2
 loop_find_start_row:
 	set I7, P1, I4              #I7 = array[start_col][i]
 	ne I7, 0, found_start_row
-	inc I4, 1                         #  i++
+	inc I4                            #  i++
 	lt I4, I0, loop_find_start_row    #  i < size
 found_start_row:
 	set I5, I4			  #I5 = start_row = i
@@ -141,7 +141,7 @@ found_start_row:
 loop_find_dest_row:
 	set I8, P2, I4	          #I8 = array[dest_col][i]
 	ne I8, 0, found_dest_row          #  if(array[dest_col][i])
-	inc I4, 1			  #  i++
+	inc I4   			  #  i++
 	lt I4, I0, loop_find_dest_row     #  i < size
 found_dest_row:
 	sub I6, I4, 1                     #I6 = dest_row = i - 1
@@ -162,7 +162,7 @@ MOVE_STACK:
 	ret
 move_multiple:
 	save I1
-	dec I1, 1
+	dec I1
 	save I4
 	save I3
 	save I2
@@ -187,7 +187,7 @@ move_multiple:
 	save I4
 	save I3
 	save I2
-	dec I1, 1
+	dec I1
 	set I5, I2
 	set I2, I4
 	set I4, I5

@@ -12,13 +12,13 @@
 
 MAIN:       print "Jump test.\n"
             print "Jumping to subroutine...\n"
-            set I1, 5
+            set_addr I1, SUB
             jump I1
 
 RET:        print "Returned from subroutine!\n"
             end
 
 SUB:        print "Entered subroutine...\n"
-            set I2, -8
+            set_addr I2, RET
             jump I2
 
