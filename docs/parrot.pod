@@ -135,13 +135,14 @@ C<http://nntp.perl.org/group/perl.perl6.internals>
 
 =item * Dan Sugalski (C<dan@sidhe.org>) is the chief architect.
 
-=item * Simon Cozens (C<simon@netthink.co.uk>) was the release manager for 
-releases 0.0.1 through 0.0.4.
+=item * Leopold Toetsch (C<lt@toetsch.at>) is the current release manager.
 
-=item * Jeff Goff (C<drforr@hargray.com>) was the release manager for 
-releases 0.0.5 through 0.0.8.
+=item * Simon Cozens, Jeff Goff and Steve Fink were the release managers 
+for releases 0.0.1 - 0.0.4, 0.0.5 - 0.0.8, and 0.0.9 - 0.0.11 respectively.
+They have all subsquently recovered.
 
-=item * Steve Fink (C<steve@fink.com>) is the current release manager.
+=item * Many, many other people have contributed their time and expertise
+to the Parrot project; see the F<CREDITS> file for details.
 
 =back
 
