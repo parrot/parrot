@@ -1,6 +1,6 @@
 #! perl -w
 
-use Parrot::Test tests => 26;
+use Parrot::Test tests => 37;
 
 output_is(<<'CODE', <<'OUTPUT', "newpmc");
 	print "starting\n"
@@ -258,6 +258,122 @@ output_is(<<'CODE', '0.499500', "divide integer by number");
 	set P1, 246.246
 	div P1, P0, P1
 	print P1
+	end
+CODE
+
+#
+# Concat tests
+#
+output_is(<<'CODE', '-5foo', "concatenate integer to string");
+	new P0, 0
+	new P1, 0
+	set P0, -5
+	set P1, "foo"
+	concat P0,P0,P1
+	print P0
+	end
+CODE
+
+output_is(<<'CODE', 'foo-7', "concatenate string to integer");
+	new P0, 0
+	new P1, 0
+	set P0, "foo"
+	set P1, -7
+	concat P0,P0,P1
+	print P0
+	end
+CODE
+
+output_is(<<'CODE', '5.430000bar', "concatenate number to string");
+	new P0, 0
+	new P1, 0
+	set P0, 5.43
+	set P1, "bar"
+	concat P0,P0,P1
+	print P0
+	end
+CODE
+
+output_is(<<'CODE', 'bar2.700000', "concatenate string to number");
+	new P0, 0
+	new P1, 0
+	set P0, "bar"
+	set P1, 2.7
+	concat P0,P0,P1
+	print P0
+	end
+CODE
+
+output_is(<<'CODE', 'foobar', "concatenate string to string");
+	new P0, 0
+	new P1, 0
+	set P0, "foo"
+	set P1, "bar"
+	concat P0,P0,P1
+	print P0
+	end
+CODE
+
+#
+# Arithmetic operators
+#
+output_is(<<'CODE', 13, "add integer to string integer");
+	new P0, 0
+	new P1, 0
+	set P0, 6
+	set P1, "7"
+	add P0,P0,P1
+	print P0
+	end
+CODE
+
+output_is(<<'CODE', 6, "add integer to string");
+	new P0, 0
+	new P1, 0
+	set P0, 6
+	set P1, "ab"
+	add P0,P0,P1
+	print P0
+	end
+CODE
+
+output_is(<<'CODE', sprintf("%f",13.5), "add integer to string number");
+	new P0, 0
+	new P1, 0
+	set P0, 6
+	set P1, "7.5"
+	add P0,P0,P1
+	print P0
+	end
+CODE
+
+output_is(<<'CODE', sprintf("%f",13.1), "add number to string integer");
+	new P0, 0
+	new P1, 0
+	set P0, 6.1
+	set P1, "7"
+	add P0,P0,P1
+	print P0
+	end
+CODE
+
+output_is(<<'CODE', sprintf("%f",6.1), "add number to string");
+	new P0, 0
+	new P1, 0
+	set P0, 6.1
+	set P1, "ab"
+	add P0,P0,P1
+	print P0
+	end
+CODE
+
+output_is(<<'CODE', sprintf("%f",13.6), "add number to string number");
+	new P0, 0
+	new P1, 0
+	set P0, 6.1
+	set P1, "7.5"
+	add P0,P0,P1
+	print P0
 	end
 CODE
 
