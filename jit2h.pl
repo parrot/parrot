@@ -155,6 +155,7 @@ print JITCPU<<END_C;
 #define Parrot_jit_vtable2rk_op Parrot_jit_normal_op
 #define Parrot_jit_vtable3_op Parrot_jit_normal_op
 #define Parrot_jit_vtable31_op Parrot_jit_normal_op
+#define Parrot_jit_vtable32_op Parrot_jit_normal_op
 #define Parrot_jit_vtable3k_op Parrot_jit_normal_op
 #define Parrot_jit_vtable_ifp_op Parrot_jit_cpcf_op
 #define Parrot_jit_vtable_unlessp_op Parrot_jit_cpcf_op
@@ -295,6 +296,20 @@ for ($i = 0; $i < $core_numops; $i++) {
 	\(interpreter,
 	\s*
 	{{\@2}},\s*{{\@3}},\s*{{\@1}}
+	\);
+	\s+{{\+=\d}}/xm) {
+	    $jit_func = "Parrot_jit_vtable32_op";
+	    $extern = vtable_num($1);
+	    #print $op->full_name .": $jit_func $extern ($1)\n";
+	}
+	# *) $1->vtable->{vtable}(interp, $1, $2, $3)
+	elsif ($opbody =~ /
+	core.ops"\s+
+	{{\@1}}->vtable->
+	(\w+)
+	\(interpreter,
+	\s*
+	{{\@1}},\s*{{\@2}},\s*{{\@3}}
 	\);
 	\s+{{\+=\d}}/xm) {
 	    $jit_func = "Parrot_jit_vtable3_op";

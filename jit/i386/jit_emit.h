@@ -1679,6 +1679,7 @@ Parrot_jit_emit_finit(Parrot_jit_info_t *jit_info)
 #    undef Parrot_jit_vtable2rk_op
 #    undef Parrot_jit_vtable3_op
 #    undef Parrot_jit_vtable31_op
+#    undef Parrot_jit_vtable32_op
 #    undef Parrot_jit_vtable3k_op
 #    undef Parrot_jit_vtable_ifp_op
 #    undef Parrot_jit_vtable_unlessp_op
@@ -1792,14 +1793,16 @@ store:
                 st += 8;
 #    endif
                 break;
+
             case PARROT_ARG_SC:
                 emitm_pushl_i(jit_info->native_ptr,
                         interpreter->code->const_table->
                         constants[p[i]]->string);
                 break;
+
             case PARROT_ARG_KC:
                 emitm_pushl_i(jit_info->native_ptr,
-                        &interpreter->code->const_table->
+                        interpreter->code->const_table->
                         constants[p[i]]->key);
                 break;
 
@@ -1899,10 +1902,20 @@ Parrot_jit_vtable2_op(Parrot_jit_info_t *jit_info,
  * $2->vtable(interp, $2, $3, $1)
  */
 static void
-Parrot_jit_vtable3_op(Parrot_jit_info_t *jit_info,
+Parrot_jit_vtable32_op(Parrot_jit_info_t *jit_info,
                      struct Parrot_Interp * interpreter)
 {
     Parrot_jit_vtable_n_op(jit_info, interpreter, 3, 2);
+}
+
+/* emit a call to a vtable func
+ * $1->vtable(interp, $1, $2, $3)
+ */
+static void
+Parrot_jit_vtable3_op(Parrot_jit_info_t *jit_info,
+                     struct Parrot_Interp * interpreter)
+{
+    Parrot_jit_vtable_n_op(jit_info, interpreter, 3, 0);
 }
 
 /* emit a call to a vtable func
