@@ -96,6 +96,8 @@ mark_context(struct Parrot_Interp* interpreter, struct Parrot_Context* ctx)
     mark_stack(interpreter, ctx->pad_stack);
     mark_stack(interpreter, ctx->user_stack);
     mark_stack(interpreter, ctx->control_stack);
+    mark_register_stack(interpreter, ctx->int_reg_stack);
+    mark_register_stack(interpreter, ctx->num_reg_stack);
     mark_string_register_stack(interpreter, ctx->string_reg_stack);
     mark_pmc_register_stack(interpreter, ctx->pmc_reg_stack);
     pobject_lives(interpreter, ctx->warns);

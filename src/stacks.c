@@ -61,7 +61,7 @@ Stack_Chunk_t *
 new_stack(Interp *interpreter, const char *name)
 {
 
-    return cst_new_stack(interpreter, name, sizeof(Stack_Entry_t));
+    return register_new_stack(interpreter, name, sizeof(Stack_Entry_t));
 }
 
 
@@ -86,6 +86,7 @@ mark_stack(struct Parrot_Interp *interpreter,
 
     for (; ; chunk = chunk->prev) {
 
+        pobject_lives(interpreter, (PObj*)chunk);
         if (chunk == chunk->prev)
             break;
         entry = (Stack_Entry_t *)STACK_DATAP(chunk);

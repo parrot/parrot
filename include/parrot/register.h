@@ -68,6 +68,8 @@ struct Stack_Chunk;
 struct Parrot_Context;
 
 void setup_register_stacks(struct Parrot_Interp*, struct Parrot_Context *);
+void mark_register_stack(struct Parrot_Interp* interpreter,
+                             struct Stack_Chunk* stack);
 void mark_pmc_register_stack(struct Parrot_Interp* interpreter,
                              struct Stack_Chunk* stack);
 void mark_string_register_stack(struct Parrot_Interp* interpreter,

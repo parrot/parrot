@@ -77,16 +77,16 @@ Sets up the register stacks.
 void
 setup_register_stacks(Parrot_Interp interpreter, struct Parrot_Context *ctx)
 {
-    ctx->int_reg_stack = cst_new_stack(interpreter,
+    ctx->int_reg_stack = register_new_stack(interpreter,
             "IntReg_", sizeof(struct IRegFrame));
 
-    ctx->string_reg_stack = cst_new_stack(interpreter,
+    ctx->string_reg_stack = register_new_stack(interpreter,
             "StringReg_", sizeof(struct SRegFrame));
 
-    ctx->num_reg_stack = cst_new_stack(interpreter,
+    ctx->num_reg_stack = register_new_stack(interpreter,
             "NumReg_", sizeof(struct NRegFrame));
 
-    ctx->pmc_reg_stack = cst_new_stack(interpreter,
+    ctx->pmc_reg_stack = register_new_stack(interpreter,
             "PMCReg_", sizeof(struct PRegFrame));
 }
 
@@ -103,12 +103,23 @@ Marks the PMC register stack as live.
 */
 
 void
+mark_register_stack(Parrot_Interp interpreter, Stack_Chunk_t* chunk)
+{
+    for (; ; chunk = chunk->prev) {
+        pobject_lives(interpreter, (PObj*)chunk);
+        if (chunk == chunk->prev || chunk->free_p)
+            break;
+    }
+}
+
+void
 mark_pmc_register_stack(Parrot_Interp interpreter, Stack_Chunk_t* chunk)
 {
     UINTVAL j;
     for ( ; ; chunk = chunk->prev) {
         struct PRegFrame *pf = STACK_DATAP(chunk);
 
+        pobject_lives(interpreter, (PObj*)chunk);
         if (chunk == chunk->prev || chunk->free_p)
             break;
         /* TODO for variable sized chunks use buflen */
@@ -138,6 +149,7 @@ mark_string_register_stack(Parrot_Interp interpreter, Stack_Chunk_t* chunk)
     for ( ; ; chunk = chunk->prev) {
         struct SRegFrame *sf = STACK_DATAP(chunk);
 
+        pobject_lives(interpreter, (PObj*)chunk);
         if (chunk == chunk->prev || chunk->free_p)
             break;
         for (j = 0; j < NUM_REGISTERS/2; j++) {

@@ -11,29 +11,20 @@ examples/assembly/sub.pasm - Subroutines
 
 =head1 DESCRIPTION
 
-Sample subroutines in Parrot. 
+Sample subroutines in Parrot.
 
-Shows you how to create a C<.Sub> and C<save> it, create a 2nd C<.Sub>
-and C<invoke> it, and then C<restore> the 1st C<.Sub> and C<invoke> it.
+Shows you how to create a C<.Sub> and C<invoke> it.
 
 =cut
 
-# Create 2 subroutines
+# Create a subroutine
 #
-set_addr I0, SUB
-new P0, .Sub
-set P0, I0
-save P0
-new P0, .Sub
-set P0, I0
-invokecc # Call the sub in P0, store the current continuation in P1
-restore P0
-# Call second one
-invokecc
-end
+    newsub P0, .Sub, _sub
+    invokecc # Call the sub in P0, store the current continuation in P1
+    end
 
 # A subroutine
-SUB:
-print "Hello subroutine\n"
-invoke P1
+_sub:
+    print "Hello subroutine\n"
+    invoke P1
 
