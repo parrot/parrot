@@ -175,6 +175,8 @@ Initializes the array.
 
     void init () {
         PMC_int_val(SELF) = 0;
+        PObj_active_destroy_SET(SELF);
+        PObj_data_is_PMC_array_SET(SELF);
     }
 
 /*
@@ -466,7 +468,6 @@ Resizes the array to C<size> elements.
         for(i = 0; i < size; i++)
             data[i] = PMCNULL;
         PMC_data(SELF) = data;
-        PObj_data_is_PMC_array_SET(SELF);
     }
 
     void set_pmc(PMC *value) {
