@@ -20,6 +20,7 @@ $lambda_count = 0;
 my %builtin_ops = (
     abs => 'o',
     isinstance => 's',
+    ord => 's',
 );
 
 my %builtins = (
@@ -209,7 +210,7 @@ sub New_func {
 EOC
     my (@params, $k, $v, $params);
     while ( ($k, $v) = each(%{$def_arg_names{$arg}})) {
-	$k =~ s/"//g;
+	$k =~ s/[\*"]//g;
 	$params[$v] = $k;
     }
     $params = join("\n\t", map {".param pmc $_"} @params);
@@ -956,9 +957,29 @@ sub OPC_isinstance
 	$b = $i
 EOC
     push @stack, [-1, $b, 'P'];
-    print_stack();
 }
 
+sub OPC_ord
+{
+    my ($n, $c, $cmt) = @_;
+    my $i = temp('I');
+    my $p = pop @stack;
+    pop @stack;	# functions
+    my $s = temp('S');
+    print <<EOC;
+	$s = $p->[1]
+	$i = ord $s
+EOC
+    push @stack, [-1, $i, 'S'];
+}
+
+sub CALL_FUNCTION_VAR
+{
+    my ($n, $c, $cmt) = @_;
+    $n++;	# its for sure not that simple
+    # BUILD_TUPLE($n, "xx", "# _VAR");
+    CALL_FUNCTION(1, $c, $cmt);
+}
 sub CALL_FUNCTION
 {
     my ($n, $c, $cmt) = @_;

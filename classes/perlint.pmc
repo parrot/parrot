@@ -24,6 +24,8 @@ C<PerlInt> extends C<perlscalar> to provide a Perl integer.
 
 /* XXX create MMD headers to in Pmc2c.pm */
 extern INTVAL Parrot_BigInt_is_equal_BigInt(Interp*, PMC*, PMC*);
+extern void Parrot_BigInt_multiply_int(Parrot_Interp interpreter,
+        PMC* pmc, INTVAL value, PMC* dest) ;
 
 static void
 overflow(Interp *interpreter, PMC *self, INTVAL b, PMC *dest, int mmd)
@@ -420,7 +422,7 @@ MMD_PerlInt: {
             overflow(INTERP, SELF, b, dest, MMD_MULTIPLY_INT);
     }
 MMD_BigInt:     {
-            overflow_p(INTERP, SELF, value, dest, MMD_MULTIPLY);
+        Parrot_BigInt_multiply_int(INTERP, value, PMC_int_val(SELF), dest);
         }
 MMD_PerlString: {
         INTVAL a = PMC_int_val(SELF);

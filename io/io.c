@@ -367,7 +367,7 @@ layers (OS-specific first).
 INTVAL
 PIO_init_stacks(theINTERP)
 {
-    ParrotIOLayer *p;
+    ParrotIOLayer *p, *bottom;
     int fill, n, i;
 
     /* First push the platform specific OS layer */
@@ -395,11 +395,19 @@ PIO_init_stacks(theINTERP)
 
     /* Note: All layer pushes should be done before init calls */
     for (i = 0, p = interpreter->piodata->default_stack; p; p = p->down) {
+        bottom = p;
         if (fill) {
             assert(i < n);
             pio_registered_layers[i++] = p;
             pio_registered_layers[i] = NULL;
         }
+    }
+    /*
+     * Init calls where done top down, which seem quite wrong  - lower
+     * levels need first to open e.g. STD*. Then the buffered layer can
+     * set linebuffering or such
+     */
+    for (p = bottom; p; p = p->up) {
         if (p->api->Init) {
             if ((*p->api->Init) (interpreter, p) != 0) {
                 char buf[1024];
@@ -409,6 +417,7 @@ PIO_init_stacks(theINTERP)
         }
     }
     if (fill) {
+        assert(i == 2);
         assert(pio_registered_layers[2] == NULL);
         pio_registered_layers[2] = PIO_utf8_register_layer();
         pio_registered_layers[3] = NULL;

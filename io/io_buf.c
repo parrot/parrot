@@ -634,6 +634,7 @@ PIO_buf_write(theINTERP, ParrotIOLayer *layer, ParrotIO *io, STRING *s)
     long wrote;
     void *buffer = s->strstart;
     size_t len = s->bufused;
+    int need_flush;
 
     if (len <= 0)
         return 0;
@@ -648,6 +649,20 @@ PIO_buf_write(theINTERP, ParrotIOLayer *layer, ParrotIO *io, STRING *s)
     else {
         avail = io->b.size;
     }
+    /* If we are line buffered, check for newlines.
+     * If any, we should flush
+     */
+    need_flush = 0;
+    if (io->flags & PIO_F_LINEBUF) {
+        /* scan from end, it's likely that EOL is at end of string */
+        char *p = (char*)buffer + len - 1;
+        size_t i;
+        for (i = 0; i < len; ++i, --p)
+        if (IS_EOL(io, p)) {
+            need_flush = 1;
+            break;
+        }
+    }
 
     /*
      * Large writes (multiples of blocksize) should write
@@ -655,7 +670,7 @@ PIO_buf_write(theINTERP, ParrotIOLayer *layer, ParrotIO *io, STRING *s)
      * just doing extra memcpys.
      * FIXME: This is badly optimized, will fixup later.
      */
-    if (len >= io->b.size) {
+    if (need_flush || len >= io->b.size) {
         /* Write through, skip buffer. */
         PIO_buf_flush(interpreter, layer, io);
         wrote = PIO_write_down(interpreter, PIO_DOWNLAYER(layer), io, s);
@@ -664,7 +679,7 @@ PIO_buf_write(theINTERP, ParrotIOLayer *layer, ParrotIO *io, STRING *s)
             return wrote;
         }
         else {
-            /* FIXME: Write error */
+            return (size_t)-1; /* Write error */
         }
     }
     else if (avail > len) {

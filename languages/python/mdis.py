@@ -152,6 +152,7 @@ def disassemble(co, lasti=-1):
 		i = 'Build::' + i
 		break
 	print "Disassembly of %s" % i
+	print "# flags    ", hex(c.co_flags)
 	print "# varnames ", c.co_varnames
 	print "# locals   ", c.co_nlocals
 	print "# names    ", c.co_names

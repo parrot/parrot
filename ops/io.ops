@@ -259,7 +259,7 @@ op printerr(in PMC) :base_io {
   PMC *p = $1;
   STRING *s = (VTABLE_get_string(interpreter, p));
   if (s) {
-    PIO_putps(interpreter, PIO_STDOUT(interpreter), s);
+    PIO_putps(interpreter, PIO_STDERR(interpreter), s);
   }
   goto NEXT();
 }

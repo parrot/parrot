@@ -3,7 +3,7 @@
 use strict;
 use lib '../../lib';
 
-use Parrot::Test tests => 33;
+use Parrot::Test tests => 36;
 
 sub test {
     language_output_is('python', $_[0], '', $_[1]);
@@ -290,4 +290,40 @@ CODE
 test(<<'CODE', 'hex()');
 if __name__ == '__main__':
     print hex(42)
+CODE
+
+SKIP: {
+    skip("not implemented", 1);
+test(<<'CODE', 'f(*a)');
+def p(x):
+    print x
+
+def f(f, *a):
+    f(a)
+
+def main():
+    f(p,2)
+
+if __name__ == '__main__':
+    main()
+CODE
+}
+
+test(<<'CODE', 'f(*a), CALL_FUNCTION_VAR');
+def p(x):
+    print x
+
+def f(f, *a):
+    f(*a)
+
+def main():
+    f(p,2)
+
+if __name__ == '__main__':
+    main()
+CODE
+
+test(<<'CODE', 'ord()');
+if __name__ == '__main__':
+   print ord('A')
 CODE
