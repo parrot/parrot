@@ -6,7 +6,8 @@
 
 #include "parrot.h"
 
-void Parrot_push_i(struct Perl_Interp *interpreter) {
+void
+Parrot_push_i(struct Perl_Interp *interpreter) {
   struct IRegChunk *chunk_base;
 
   chunk_base = CHUNK_BASE(interpreter->int_reg);
@@ -18,7 +19,7 @@ void Parrot_push_i(struct Perl_Interp *interpreter) {
   /* Nope, so plan B time. Allocate a new chunk of integer register frames */
   else {
     struct IRegChunk *new_chunk;
-    new_chunk = Allocate_Aligned(sizeof(struct IRegChunk));
+    new_chunk = mem_allocate_aligned(sizeof(struct IRegChunk));
     new_chunk->used = 1;
     new_chunk->free = FRAMES_PER_INT_REG_CHUNK - 1;
     new_chunk->next = NULL;
@@ -28,7 +29,8 @@ void Parrot_push_i(struct Perl_Interp *interpreter) {
   }
 }
 
-void Parrot_pop_i(struct Perl_Interp *interpreter) {
+void
+Parrot_pop_i(struct Perl_Interp *interpreter) {
   struct IRegChunk *chunk_base;
   chunk_base = CHUNK_BASE(interpreter->int_reg);
   /* Is there more than one register frame in use? */
@@ -53,14 +55,16 @@ void Parrot_pop_i(struct Perl_Interp *interpreter) {
   }
 }
 
-void Parrot_clear_i(struct Perl_Interp *interpreter) {
+void
+Parrot_clear_i(struct Perl_Interp *interpreter) {
   int i;
   for (i=0; i<NUM_REGISTERS; i++) {
     INT_REG(i) = 0;
   }
 }
 
-void Parrot_push_s(struct Perl_Interp *interpreter) {
+void
+Parrot_push_s(struct Perl_Interp *interpreter) {
   struct SRegChunk *chunk_base;
 
   chunk_base = CHUNK_BASE(interpreter->string_reg);
@@ -72,7 +76,7 @@ void Parrot_push_s(struct Perl_Interp *interpreter) {
   /* Nope, so plan B time. Allocate a new chunk of string register frames */
   else {
     struct SRegChunk *new_chunk;
-    new_chunk = Allocate_Aligned(sizeof(struct SRegChunk));
+    new_chunk = mem_allocate_aligned(sizeof(struct SRegChunk));
     new_chunk->used = 1;
     new_chunk->free = FRAMES_PER_STR_REG_CHUNK - 1;
     new_chunk->next = NULL;
@@ -82,7 +86,8 @@ void Parrot_push_s(struct Perl_Interp *interpreter) {
   }
 }
 
-void Parrot_pop_s(struct Perl_Interp *interpreter) {
+void
+Parrot_pop_s(struct Perl_Interp *interpreter) {
   struct SRegChunk *chunk_base;
   chunk_base = CHUNK_BASE(interpreter->string_reg);
   /* Is there more than one register frame in use? */
@@ -107,14 +112,16 @@ void Parrot_pop_s(struct Perl_Interp *interpreter) {
   }
 }
 
-void Parrot_clear_s(struct Perl_Interp *interpreter) {
+void
+Parrot_clear_s(struct Perl_Interp *interpreter) {
   int i;
   for (i=0; i<NUM_REGISTERS; i++) {
     STR_REG(i) = NULL;
   }
 }
 
-void Parrot_push_n(struct Perl_Interp *interpreter) {
+void
+Parrot_push_n(struct Perl_Interp *interpreter) {
   struct NRegChunk *chunk_base;
 
   chunk_base = CHUNK_BASE(interpreter->num_reg);
@@ -126,7 +133,7 @@ void Parrot_push_n(struct Perl_Interp *interpreter) {
   /* Nope, so plan B time. Allocate a new chunk of float register frames */
   else {
     struct NRegChunk *new_chunk;
-    new_chunk = Allocate_Aligned(sizeof(struct NRegChunk));
+    new_chunk = mem_allocate_aligned(sizeof(struct NRegChunk));
     new_chunk->used = 1;
     new_chunk->free = FRAMES_PER_NUM_REG_CHUNK - 1;
     new_chunk->next = NULL;
@@ -136,7 +143,8 @@ void Parrot_push_n(struct Perl_Interp *interpreter) {
   }
 }
 
-void Parrot_pop_n(struct Perl_Interp *interpreter) {
+void
+Parrot_pop_n(struct Perl_Interp *interpreter) {
   struct NRegChunk *chunk_base;
   chunk_base = CHUNK_BASE(interpreter->num_reg);
   /* Is there more than one register frame in use? */
@@ -161,14 +169,16 @@ void Parrot_pop_n(struct Perl_Interp *interpreter) {
   }
 }
 
-void Parrot_clear_n(struct Perl_Interp *interpreter) {
+void
+Parrot_clear_n(struct Perl_Interp *interpreter) {
   int i;
   for (i=0; i<NUM_REGISTERS; i++) {
     NUM_REG(i) = 0;
   }
 }
 
-void Parrot_push_p(struct Perl_Interp *interpreter) {
+void
+Parrot_push_p(struct Perl_Interp *interpreter) {
   struct PRegChunk *chunk_base;
 
   chunk_base = CHUNK_BASE(interpreter->pmc_reg);
@@ -180,7 +190,7 @@ void Parrot_push_p(struct Perl_Interp *interpreter) {
   /* Nope, so plan B time. Allocate a new chunk of float register frames */
   else {
     struct PRegChunk *new_chunk;
-    new_chunk = Allocate_Aligned(sizeof(struct PRegChunk));
+    new_chunk = mem_allocate_aligned(sizeof(struct PRegChunk));
     new_chunk->used = 1;
     new_chunk->free = FRAMES_PER_PMC_REG_CHUNK - 1;
     new_chunk->next = NULL;
@@ -190,7 +200,8 @@ void Parrot_push_p(struct Perl_Interp *interpreter) {
   }
 }
 
-void Parrot_pop_p(struct Perl_Interp *interpreter) {
+void
+Parrot_pop_p(struct Perl_Interp *interpreter) {
   struct PRegChunk *chunk_base;
   chunk_base = CHUNK_BASE(interpreter->pmc_reg);
   /* Is there more than one register frame in use? */
@@ -215,15 +226,18 @@ void Parrot_pop_p(struct Perl_Interp *interpreter) {
   }
 }
 
-void Parrot_clear_p(struct Perl_Interp *interpreter) {
+void
+Parrot_clear_p(struct Perl_Interp *interpreter) {
   int i;
   for (i=0; i<NUM_REGISTERS; i++) {
     PMC_REG(i) = NULL;
   }
 }
 
-void Parrot_push_on_stack(void *thing, IV size, IV type) {
+void
+Parrot_push_on_stack(void *thing, IV size, IV type) {
 }
 
-void Parrot_pop_off_stack(void *thing, IV type) {
+void
+Parrot_pop_off_stack(void *thing, IV type) {
 }

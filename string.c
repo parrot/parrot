@@ -15,9 +15,9 @@ string_init(void) {
 
 STRING *
 string_make(void *buffer, IV buflen, IV encoding, IV flags, IV type) {
-    STRING *s = Sys_Allocate(sizeof(STRING));
-    s->bufstart = Sys_Allocate(buflen);
-    Sys_Memcopy(s->bufstart, buffer, buflen);
+    STRING *s = mem_sys_allocate(sizeof(STRING));
+    s->bufstart = mem_sys_allocate(buflen);
+    mem_sys_memcopy(s->bufstart, buffer, buflen);
     s->encoding = &(Parrot_string_vtable[encoding]);
     s->buflen = s->bufused = buflen;
     s->flags = flags;
@@ -30,14 +30,14 @@ void
 string_grow(STRING* s, IV newsize) {
     IV newsize_in_bytes = string_max_bytes(s, newsize);
     if (s->buflen < newsize_in_bytes)
-        Sys_Realloc(s->bufstart, newsize_in_bytes);
+        mem_sys_realloc(s->bufstart, newsize_in_bytes);
     s->buflen = newsize_in_bytes;
 }
 
 void
 string_destroy(STRING *s) {
-    Sys_Free(s->bufstart);
-    Sys_Free(s);
+    mem_sys_free(s->bufstart);
+    mem_sys_free(s);
 }
 
 /* Ordinary user-visible string operations */

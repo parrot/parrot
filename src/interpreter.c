@@ -8,7 +8,8 @@
 #include "parrot.h"
 #include "interp_guts.h"
 
-void runops (struct Perl_Interp *interpreter, IV *code) {
+void
+runops (struct Perl_Interp *interpreter, IV *code) {
   /* Move these out of the inner loop. No need to redeclare 'em each
      time through */
   IV *(*func)();
@@ -18,18 +19,19 @@ void runops (struct Perl_Interp *interpreter, IV *code) {
   }
 }
 
-struct Perl_Interp *make_interpreter() {
+struct Perl_Interp *
+make_interpreter() {
   struct Perl_Interp *interpreter;
   /* Get an empty interpreter from system memory */
-  interpreter = Sys_Allocate(sizeof(struct Perl_Interp));
+  interpreter = mem_sys_allocate(sizeof(struct Perl_Interp));
   /* Set up the memory allocation system */
-  Setup_Allocator(interpreter);
+  mem_setup_allocator(interpreter);
 
   /* Set up the initial register chunks */
-  interpreter->int_reg_base = Allocate_Aligned(sizeof(struct IRegChunk));
-  interpreter->num_reg_base = Allocate_Aligned(sizeof(struct NRegChunk));
-  interpreter->string_reg_base = Allocate_Aligned(sizeof(struct SRegChunk));
-  interpreter->pmc_reg_base = Allocate_Aligned(sizeof(struct PRegChunk));
+  interpreter->int_reg_base = mem_allocate_aligned(sizeof(struct IRegChunk));
+  interpreter->num_reg_base = mem_allocate_aligned(sizeof(struct NRegChunk));
+  interpreter->string_reg_base = mem_allocate_aligned(sizeof(struct SRegChunk));
+  interpreter->pmc_reg_base = mem_allocate_aligned(sizeof(struct PRegChunk));
 
   /* Set up the initial register frame pointers */
   interpreter->int_reg = &interpreter->int_reg_base->IReg[0];
@@ -64,15 +66,15 @@ struct Perl_Interp *make_interpreter() {
   Parrot_clear_p(interpreter);
 
   /* Need a default stack */
-  interpreter->stack_base = Allocate_New_Stack();
+  interpreter->stack_base = mem_allocate_new_stack();
 
   /* Need an empty stash */
-  interpreter->perl_stash = Allocate_New_Stash();
+  interpreter->perl_stash = mem_allocate_new_stash();
 
   /* The default opcode function table would be a good thing here... */
   {
     void **foo;
-    foo = Sys_Allocate(2048 * sizeof(void *));
+    foo = mem_sys_allocate(2048 * sizeof(void *));
 
     BUILD_TABLE(foo);
 

@@ -19,7 +19,8 @@ IV opcodes[] = {3, 1,                /* put the time in reg 1 */
 		6                    /* exit */
                 };
 
-int main(int argc, char **argv) {
+int
+main(int argc, char **argv) {
   struct Perl_Interp *interpreter;
   init_world();
 

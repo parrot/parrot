@@ -9,6 +9,7 @@
 #define INSIDE_GLOBAL_SETUP
 #include "parrot.h"
 
-void init_world() {
+void
+init_world() {
     string_init(); /* Set up the string subsystem */ 
 }

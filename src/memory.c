@@ -7,7 +7,8 @@
 #include "parrot.h"
 
 /* Allocate a chunk of memory aligned on a power-of-2 boundary */
-void *Allocate_Aligned(IV size) {
+void *
+mem_allocate_aligned(IV size) {
   IV max_to_alloc;
   IV mask;
   IV i;
@@ -31,11 +32,13 @@ void *Allocate_Aligned(IV size) {
   return mem;
 }
 
-void *Sys_Allocate(IV size) {
+void *
+mem_sys_allocate(IV size) {
   return malloc(size);
 }
 
-void Setup_Allocator(struct Perl_Interp *interpreter) {
+void
+mem_setup_allocator(struct Perl_Interp *interpreter) {
 }
 
   

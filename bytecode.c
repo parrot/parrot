@@ -72,7 +72,7 @@ read_constants_table(void** program_code)
     num = GRAB_IV(program_code);
     len -= sizeof(IV);
     
-    Parrot_string_constants = Allocate_Aligned(num * sizeof(STRING*));
+    Parrot_string_constants = mem_allocate_aligned(num * sizeof(STRING*));
 
     while (len > 0) {
         IV flags    = GRAB_IV(program_code);

@@ -26,7 +26,7 @@ string_native_concat(STRING* a, STRING* b, IV flags) {
     
     /* b is now in native format */
     string_grow(a, a->strlen + b->strlen);
-    Sys_Memcopy(a->bufstart + a->strlen, b->bufstart, b->strlen);
+    mem_sys_memcopy(a->bufstart + a->strlen, b->bufstart, b->strlen);
     a->strlen = a->bufused = a->strlen + b->strlen;
     return a;
 }
@@ -47,7 +47,7 @@ string_native_substr(STRING* src, IV offset, IV length, STRING* dest)
     
     /* Offset and length have already been "normalized" */
     string_grow(dest, src->strlen - length);
-    Sys_Memcopy(dest->bufstart, src->bufstart + offset, length);
+    mem_sys_memcopy(dest->bufstart, src->bufstart + offset, length);
     dest->strlen = dest->bufused = length;
     
     return dest;

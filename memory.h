@@ -7,16 +7,16 @@
 #if !defined(PARROT_MEMORY_H_GUARD)
 #define PARROT_MEMORY_H_GUARD
 
-void *Allocate_Aligned(IV);
+void *mem_allocate_aligned(IV);
 
-void *Sys_Allocate(IV);
+void *mem_sys_allocate(IV);
 
-void Setup_Allocator(struct Perl_Interp *);
+void mem_setup_allocator(struct Perl_Interp *);
 
-#define Allocate_New_Stash() NULL
-#define Allocate_New_Stack() NULL
-#define Sys_Memcopy memcpy
-#define Sys_Realloc realloc
-#define Sys_Free free
+#define mem_allocate_new_stash() NULL
+#define mem_allocate_new_stack() NULL
+#define mem_sys_memcopy memcpy
+#define mem_sys_realloc realloc
+#define mem_sys_free free
 
 #endif
