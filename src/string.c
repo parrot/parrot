@@ -593,7 +593,7 @@ string_substr(struct Parrot_Interp *interpreter, STRING *src,
 
     if (true_offset > src->strlen - 1) {        /* 0 based... */
         internal_exception(SUBSTR_OUT_OF_STRING,
-                           "Cannot take substr outside string");
+                "Cannot take substr outside string");
     }
 
     true_length = (UINTVAL)length;
@@ -601,24 +601,30 @@ string_substr(struct Parrot_Interp *interpreter, STRING *src,
         true_length = (UINTVAL)(src->strlen - true_offset);
     }
 
-    substart_off = (const char *)src->encoding->skip_forward(src->strstart,
-                                                       true_offset) -
-        (char *)src->strstart;
-    subend_off =
-        (const char *)src->encoding->skip_forward((char *)src->strstart +
-                                            substart_off,
-                                            true_length) -
-        (char *)src->strstart;
-
-    if (subend_off < substart_off) {
-        internal_exception(SUBSTR_OUT_OF_STRING,
-                           "subend somehow is less than substart");
-    }
-
-    /* do in-place if possible */
+    /* do in-place i.e. make a COW string */
     dest = make_COW_reference(interpreter,  src);
-    dest->strstart = (char *)dest->strstart + substart_off;
-    dest->bufused = subend_off - substart_off;
+    if (src->encoding->index == enum_encoding_singlebyte) {
+        dest->strstart = (char *)dest->bufstart + true_offset;
+        dest->bufused = true_length;
+    }
+    else {
+        substart_off = (const char *)src->encoding->skip_forward(src->strstart,
+                true_offset) -
+            (char *)src->strstart;
+        subend_off =
+            (const char *)src->encoding->skip_forward((char *)src->strstart +
+                                                      substart_off,
+                                                      true_length) -
+            (char *)src->strstart;
+
+        if (subend_off < substart_off) {
+            internal_exception(SUBSTR_OUT_OF_STRING,
+                    "subend somehow is less than substart");
+        }
+
+        dest->strstart = (char *)dest->strstart + substart_off;
+        dest->bufused = subend_off - substart_off;
+    }
     dest->strlen = true_length;
 
     if (d != NULL) {
@@ -821,9 +827,9 @@ string_compare(struct Parrot_Interp *interpreter, STRING *s1,
 
     if (s1->type != s2->type || s1->encoding != s2->encoding) {
         s1 = string_transcode(interpreter, s1, NULL, string_unicode_type,
-                              NULL);
+                NULL);
         s2 = string_transcode(interpreter, s2, NULL, string_unicode_type,
-                              NULL);
+                NULL);
     }
 
     s1start = s1->strstart;
@@ -831,20 +837,31 @@ string_compare(struct Parrot_Interp *interpreter, STRING *s1,
     s2start = s2->strstart;
     s2end = s2start + s2->bufused;
 
-    while (cmp == 0 && s1start < s1end && s2start < s2end) {
-        INTVAL c1 = s1->encoding->decode(s1start);
-        INTVAL c2 = s2->encoding->decode(s2start);
+    if (s1->encoding->index == enum_encoding_singlebyte) {
+        size_t minlen = s1->bufused > s2->bufused ? s2->bufused : s1->bufused;
 
-        cmp = c1 - c2;
+        cmp = memcmp(s1start, s2start, minlen);
+        s1start += minlen;
+        s2start += minlen;
+    }
+    else {
+        while (cmp == 0 && s1start < s1end && s2start < s2end) {
+            INTVAL c1 = s1->encoding->decode(s1start);
+            INTVAL c2 = s2->encoding->decode(s2start);
 
-        s1start = s1->encoding->skip_forward(s1start, 1);
-        s2start = s2->encoding->skip_forward(s2start, 1);
+            cmp = c1 - c2;
+
+            s1start = s1->encoding->skip_forward(s1start, 1);
+            s2start = s2->encoding->skip_forward(s2start, 1);
+        }
     }
 
-    if (cmp == 0 && s1start < s1end)
-        cmp = 1;
-    if (cmp == 0 && s2start < s2end)
-        cmp = -1;
+    if (cmp == 0) {
+        if (s1start < s1end)
+            cmp = 1;
+        else if (s2start < s2end)
+            cmp = -1;
+    }
 
     return cmp;
 }
