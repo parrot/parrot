@@ -60,6 +60,8 @@ The individual bits are:
  DEBUG_PBC_CONST      2000
  DEBUG_PBC_FIXUP      4000
 
+These can be listed on the command line by use of the B<--help-debug> switch.
+
 To produce really huge output on F<stderr> run "imcc B<-d 0ffff> ...".
 Note: if the argument is separated by whitespace from the B<-d> switch,
 it has to start with a number.
@@ -68,14 +70,14 @@ it has to start with a number.
 
 =item -o outputfile, --output=outputfile
 
-Act like assembler. Don't run code, unless B<-r> is given too. If the
+Act like an assembler. Don't run code, unless B<-r> is given too. If the
 outputfile ends with B<.pbc>, a PBC file is written. If it ends with
 B<.pasm>, a PASM output is generated, even from PASM input. This can be
 handy to check various optimizations, including B<-Op>.
 
 =item --output-pbc
 
-Act like assembler, but always output a bytecode even though the outputfile
+Act like an assembler, but always output bytecode, even if the output file
 does not end in B<.pbc>
 
 =item -r, --run-pbc
@@ -102,13 +104,15 @@ Turn on yydebug in F<yacc>/F<bison>.
 Optimize
 
  -O0 no optimization (default)
- -O1 optimizations w/o life info (e.g. branches)
+ -O1 optimizations without life info (e.g. branches)
  -O  same
  -O2 optimizations with life info
  -Op rewrite I and N PASM registers most used first
  -Ot select fastest run core (default with -O1 and -O2)
 
-This will probably change.
+See F<imcc/docs/operation.pod> for more information on the optimizer.
+NB. Optimization is currently experimental and these options are likely
+to change.
 
 =item -E, --pre-process-only
 
@@ -125,7 +129,7 @@ Preprocess source file (i.e. expand macros) and print result to stdout. E.g.
 
 =item -b, --bounds-checks, --slow-core
 
-Select the bounds-checking slow clore.
+Select the bounds-checking slow core.
 
 =item -C, --CGP-core
 
@@ -153,7 +157,7 @@ Prederefernce opcode function arguments on the fly.
 
 =item -t, --trace
 
-Run with the slow core and do print trace information to B<stderr>.
+Run with the slow core and print trace information to B<stderr>.
 
 =back
 
@@ -172,9 +176,9 @@ GC subsystem and can slow down execution considerably.
 
 =item -G, --no-gc
 
-This turns of DOD (Dead Object Detection) and GC. This may be useful to find GC
-related bugs. DOn't use this option for longer running programs, this will
-exhaust memory quickly, as it isn't recycled.
+This turns off DOD (Dead Object Detection) and GC. This may be useful to find 
+GC related bugs. Don't use this option for longer running programs: as memory
+is no longer recycled, it may quickly become exhausted.
 
 =item --leak-test, --destroy-at-end
 
@@ -193,6 +197,7 @@ If the file ends in B<.pbc> it will be interpreted immediately.
 If the file ends in B<.pasm>, then it is parsed as PASM code. Otherwise,
 it is parsed as PIR code. In both cases, it will then be run, unless the
 B<-o> flag was given.
+
 If the B<file> is a single dash, input from B<stdin> is read.
 
 =head2 Generated files
@@ -201,14 +206,14 @@ If debugging is enabled these files are generated:
 
   file.stabs.s ... stabsfile for the program
   file.o ... object file with debug information
-  EVAL_n ... source of B<compile> op nr. I<n>
+  EVAL_n ... source of B<compile> op number I<n>
   EVAL_n.stabs.s ... stabsfile for this block
   EVAL_n.o ... object file with debug information
 
 =head1 [arguments ...]
 
-Optional arguments passed to the running program as ARGV, only useful
-for running the program.
+Optional arguments passed to the running program as ARGV. The program is
+assumed to know what to do with these.
 
 =head1 Operation table
 
@@ -227,7 +232,7 @@ for running the program.
 
 Actions above are:
 
-  run ... yes run the program
+  run ... yes, run the program
   ass ... assemble sourcefile
   obj ..  produce native (ELF) object file for the EXEC subsystem
 
