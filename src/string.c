@@ -638,6 +638,12 @@ string_compare(struct Parrot_Interp *interpreter, STRING *s1,
     if (!s1 && !s2) {
         return 0;
     }
+
+#if GC_DEBUG
+    /* It's easy to forget that string comparison can trigger GC */
+    if (interpreter) Parrot_do_dod_run(interpreter);
+#endif
+
     if (s1->type != s2->type || s1->encoding != s2->encoding) {
         s1 = string_transcode(interpreter, s1, NULL, string_unicode_type,
                               NULL);
