@@ -41,7 +41,7 @@ my $pid;
 sub send_SIGINT {
     $SIG{ALRM} = sub {
 	# get PID of parrot
-	my @ps = `ps | grep [p]arrot`;
+	my @ps = `ps -C parrot -o pid`;
 	die 'no output from ps' unless @ps;
 	# the IO thread parrot process
 	# on 2.2.x there are 4 processes, last is the IO thread
