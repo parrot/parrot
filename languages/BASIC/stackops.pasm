@@ -4,6 +4,9 @@
 #
 # $Id$
 # $Log$
+# Revision 1.4  2002/06/02 02:04:12  clintp
+# Removed constant assignment of register names
+#
 # Revision 1.3  2002/06/01 18:23:01  clintp
 # For new assembler
 #
@@ -126,12 +129,6 @@ CLEAREND:
 	pops
 	ret
 
-.constant CS_GAP I0
-.constant CS_SWAPPED I1
-.constant CS_FORI  I2
-.constant CS_FORJ       I3
-.constant CS_ALENGTH I5
-
 # SORTSTACK
 # NSORTSTACK
 #  Inputs: A well-formed stack
@@ -157,34 +154,34 @@ COMBSORT:
 	pushs
 	set I10, 0
 
-DOSORT: restore .CS_ALENGTH
-	set .CS_GAP, .CS_ALENGTH
-COMBTOP:mul .CS_GAP, .CS_GAP, 10
-	div .CS_GAP, .CS_GAP 13
-	eq .CS_GAP, 9, COMBNEWGAP
-	eq .CS_GAP, 10, COMBNEWGAP
+DOSORT: restore I5
+	set I0, I5
+COMBTOP:mul I0, I0, 10
+	div I0, I0 13
+	eq I0, 9, COMBNEWGAP
+	eq I0, 10, COMBNEWGAP
 	branch COMBREST
 COMBNEWGAP:
-	set .CS_GAP, 11
+	set I0, 11
 COMBREST:
-	lt .CS_GAP, 1 COMBNEWGAP2
+	lt I0, 1 COMBNEWGAP2
 	branch COMBREST2
 COMBNEWGAP2:
-	set .CS_GAP, 1
+	set I0, 1
 COMBREST2:
-	set .CS_SWAPPED, 0
-	set .CS_FORI, 1
+	set I1, 0
+	set I2, 1
 COMBTOPCS_FOR:
-	set I6, .CS_ALENGTH
-	sub I6, I6, .CS_GAP
-	gt .CS_FORI, I6, AFTERCS_FOR
-	set .CS_FORJ, .CS_GAP
-	add .CS_FORJ, .CS_FORJ, .CS_FORI
+	set I6, I5
+	sub I6, I6, I0
+	gt I2, I6, AFTERCS_FOR
+	set I3, I0
+	add I3, I3, I2
 
-	save .CS_FORI
+	save I2
 	bsr PEEK
 	restore S0
-	save .CS_FORJ
+	save I3
 	bsr PEEK
 	restore S1
 	eq I10, 1, COMBNSORT
@@ -198,17 +195,17 @@ COMBNSORT:
 	branch SORTSWAP
 
 SORTSWAP:	
-	save .CS_FORI
-	save .CS_FORJ
+	save I2
+	save I3
 	bsr SWAP
-	set .CS_SWAPPED, 1
+	set I1, 1
 COMBENDCS_FOR:
-	inc .CS_FORI
+	inc I2
 	branch COMBTOPCS_FOR
 AFTERCS_FOR:
-	eq .CS_SWAPPED, 1, COMBTOP
-	ne .CS_GAP, 1, COMBTOP
-	save .CS_ALENGTH
+	eq I1, 1, COMBTOP
+	ne I0, 1, COMBTOP
+	save I5
 	pops
 	popi
 	ret
