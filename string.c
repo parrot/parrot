@@ -186,7 +186,7 @@ string_transcode(struct Parrot_Interp *interpreter,
     destend = deststart;
 
     while (srcstart < srcend) {
-        INTVAL c = src->encoding->decode(srcstart);
+        UINTVAL c = src->encoding->decode(srcstart);
 
         if (transcoder1) c = transcoder1(c);
         if (transcoder2) c = transcoder2(c);
@@ -424,7 +424,7 @@ BOOLVAL string_bool (const STRING* s) {
     }
 
     if (len == 1) {
-        INTVAL c = s->encoding->decode(s->bufstart);
+        UINTVAL c = s->encoding->decode(s->bufstart);
         if (s->type->is_digit(c) && s->type->get_digit(c) == 0) {
             return 0;
         }
@@ -456,7 +456,7 @@ INTVAL string_to_int (const STRING *s) {
         BOOLVAL in_number = 0;
 
         while (start < end) {
-            INTVAL c = s->encoding->decode(start);
+            UINTVAL c = s->encoding->decode(start);
 
             if (s->type->is_digit(c)) {
                 in_number = 1;
@@ -500,7 +500,7 @@ FLOATVAL string_to_num (const STRING *s) {
         INTVAL fake_exponent = 0;
 
         while (start < end) {
-            INTVAL c = s->encoding->decode(start);
+            UINTVAL c = s->encoding->decode(start);
 
             if (s->type->is_digit(c)) {
                 if (in_exp) {

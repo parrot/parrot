@@ -23,12 +23,12 @@ unicode_transcode_to(const char *to) {
 }
 
 static BOOLVAL
-unicode_is_digit(INTVAL c) {
+unicode_is_digit(UINTVAL c) {
     return (BOOLVAL)(isdigit(c) ? 1 : 0); /* FIXME - Other code points are also digits */
 }
 
 static INTVAL
-unicode_get_digit(INTVAL c) {
+unicode_get_digit(UINTVAL c) {
     return c - '0'; /* FIXME - many more digits than this... */
 }
 

@@ -13,15 +13,15 @@
 #if !defined(PARROT_CHARTYPE_H_GUARD)
 #define PARROT_ENCODING_H_GUARD
 
-typedef INTVAL (*CHARTYPE_TRANSCODER)(INTVAL c);
+typedef UINTVAL (*CHARTYPE_TRANSCODER)(UINTVAL c);
 
 typedef struct {
     const char *name;
     const char *default_encoding;
     CHARTYPE_TRANSCODER (*transcode_from)(const char *from);
     CHARTYPE_TRANSCODER (*transcode_to)(const char *to);
-    BOOLVAL (*is_digit)(INTVAL c);
-    INTVAL (*get_digit)(INTVAL c);
+    BOOLVAL (*is_digit)(UINTVAL c);
+    INTVAL (*get_digit)(UINTVAL c);
 } CHARTYPE;
 
 const CHARTYPE *

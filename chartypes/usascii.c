@@ -12,9 +12,9 @@
 
 #include "parrot/parrot.h"
 
-static INTVAL
-usascii_transcode_from_unicode(INTVAL c) {
-    if (c < 0 || c > 127) {
+static UINTVAL
+usascii_transcode_from_unicode(UINTVAL c) {
+    if (c > 127) {
         internal_exception(INVALID_CHARACTER, "Invalid character for US-ASCII");
     }
     return c;
@@ -30,8 +30,8 @@ usascii_transcode_from(const char *from) {
     }
 }
 
-static INTVAL
-usascii_transcode_to_unicode(INTVAL c) {
+static UINTVAL
+usascii_transcode_to_unicode(UINTVAL c) {
     return c;
 }
 
@@ -46,13 +46,13 @@ usascii_transcode_to(const char *to) {
 }
 
 static BOOLVAL
-usascii_is_digit(INTVAL c) {
-    return (BOOLVAL)(isdigit(c) ? 1 : 0);
+usascii_is_digit(UINTVAL c) {
+    return (BOOLVAL)(isdigit((int) c) ? 1 : 0);
 }
 
 static INTVAL
-usascii_get_digit(INTVAL c) {
-    return c - '0';
+usascii_get_digit(UINTVAL c) {
+    return ((INTVAL) c) - '0';
 }
 
 const CHARTYPE usascii_chartype = {
