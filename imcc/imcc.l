@@ -1,6 +1,6 @@
 %{
 /*
- * imc.l
+ * imcc.l
  *
  * Intermediate Code Compiler for Parrot
  *
@@ -140,6 +140,13 @@ WS              [\t\f\r ]
 ".arg"          return(ARG);
 ".sub"          return(SUB);
 ".end"          return(ESUB);
+".pcc_begin"    return(PCC_BEGIN);
+".pcc_end"      return(PCC_END);
+".pcc_call"     return(PCC_CALL);
+".pcc_sub"      return(PCC_SUB);
+".pcc_begin_return"    return(PCC_BEGIN_RETURN);
+".pcc_end_return"      return(PCC_END_RETURN);
+
 ".result"       return(RESULT);
 ".return"       return(RETURN);
 ".class"        return(CLASS);

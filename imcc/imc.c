@@ -67,7 +67,7 @@ void allocate(struct Parrot_Interp *interpreter) {
 
     todo = first = 1;
     while (todo) {
-        find_basic_blocks();
+        find_basic_blocks(interpreter);
         build_cfg();
 
         if (first && (IMCC_DEBUG & DEBUG_CFG))
@@ -79,7 +79,7 @@ void allocate(struct Parrot_Interp *interpreter) {
     todo = first = 1;
     while (todo) {
         if (!first) {
-            find_basic_blocks();
+            find_basic_blocks(interpreter);
             build_cfg();
         }
         first = 0;
@@ -122,7 +122,7 @@ void allocate(struct Parrot_Interp *interpreter) {
              * do life analysis there for only the involved regs
              */
 #if DOIT_AGAIN_SAM
-            find_basic_blocks();
+            find_basic_blocks(interpreter);
             build_cfg();
             build_reglist();
             life_analysis();
@@ -638,19 +638,20 @@ int try_allocate() {
     while ((imcstack_depth(nodeStack) > 0) ) {
 	x=imcstack_pop(nodeStack);
 
-	for(t = 0; t < 4; t++) {
+	for (t = 0; t < 4; t++) {
 	    int typ = "INSP"[t];
 	    memset(colors, 0, sizeof(colors));
 	    if (reglist[x]->set == typ && reglist[x]->color == -1) {
 		free_colors = map_colors(x, graph, colors, typ);
 		if (free_colors > 0) {
-		    for(color = 0; color < MAX_COLOR - (typ=='P'); color++) {
-			if(!colors[color]) {
-			    reglist[x]->color = color;
+		    for (color = 0; color < MAX_COLOR; color++) {
+                        int c = (color + 16) % 32;
+			if (!colors[c]) {
+			    reglist[x]->color = c;
 
                             debug(DEBUG_IMC, "#[%s] provisionally gets color [%d]"
                                      "(%d free colors, score %d)\n",
-					reglist[x]->name, color,
+					reglist[x]->name, c,
                                         free_colors, reglist[x]->score);
 			    break;
 			}
@@ -685,6 +686,9 @@ int map_colors(int x, SymReg ** graph, int colors[], int typ) {
     SymReg * r;
     int color, free_colors;
     memset(colors, 0, sizeof(colors[0]) * MAX_COLOR);
+    /* reserved for spilling */
+    if (typ == 'P')
+        colors[31] = 1;
     for(y = 0; y < n_symbols; y++) {
         if((r = graph[x*n_symbols+y])
     	    && r->color != -1
@@ -692,7 +696,7 @@ int map_colors(int x, SymReg ** graph, int colors[], int typ) {
     	    colors[r->color] = 1;
     	}
     }
-    for(color = free_colors = 0; color < MAX_COLOR - (typ=='P'); color++)
+    for(color = free_colors = 0; color < MAX_COLOR; color++)
 	if(!colors[color])
 	    free_colors++;
     return free_colors;

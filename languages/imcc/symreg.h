@@ -14,7 +14,8 @@ enum VARTYPE {		/* variable type can be */
     VTREGKEY	= 1 << 4,	/* parrot [key;key..], including registers */
     VTPASM	= 1 << 5,	/* parrot register, colored from .emit */
     VT_REGP	= 1 << 6,	/* pointer to register */
-    VT_CONSTP	= 1 << 7	/* pointer to constant value */
+    VT_CONSTP	= 1 << 7,	/* pointer to constant value */
+    VT_PCC_SUB  = 1 << 8	/* PCC subroutine call */
 };
 
 /* this VARTYPE needs register allocation and such */
@@ -50,7 +51,8 @@ typedef struct _SymReg {
     enum USAGE usage;	     /* s. USAGE above */
     int set;                /* Which register set/file it belongs to */
     int color;               /* Color: parrot register number
-    				and parrot const table index of VTCONST*/
+    				and parrot const table index of VTCONST */
+    int want_regno;	     /* wanted register number */
     int score;               /* How costly is to spill this symbol */
     int use_count;	     /* how often is this sym used */
     int lhs_use_count;	     /* how often is this sym written to */
@@ -62,6 +64,7 @@ typedef struct _SymReg {
     /* also used by labels as position of label and last reference */
     struct _SymReg * nextkey;	/* keys */
     struct _SymReg * reg;	/* key->register for VTREGKEYs */
+    struct pcc_sub_t *pcc_sub;  /* PCC subroutine */
 } SymReg;
 
 
@@ -88,6 +91,24 @@ SymReg * mk_ident(char *, char t);
 SymReg * mk_const(char *, char t);
 SymReg * mk_const_ident(char *, char t, SymReg *);
 SymReg * mk_address(char *, int uniq);
+SymReg * mk_pcc_sub(char *, char proto);
+void add_pcc_arg(SymReg *r, SymReg * arg);
+void add_pcc_sub(SymReg *r, SymReg * arg);
+void add_pcc_cc(SymReg *r, SymReg * arg);
+void add_pcc_result(SymReg *r, SymReg * arg);
+void add_pcc_param(SymReg *r, SymReg * arg);
+void add_pcc_return(SymReg *r, SymReg * arg);
+
+struct pcc_sub_t {
+    SymReg ** args;
+    int nargs;
+    SymReg *sub;
+    SymReg *cc;
+    SymReg ** ret;
+    int nret;
+};
+
+
 enum uniq_t {
 	U_add_once,
 	U_add_uniq_label,

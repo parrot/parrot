@@ -1,3 +1,11 @@
+- 2003-07-29	leo
+
+	* version 0.0.10.2
+	* first try on implementing PCC from docs/calling_conventions.pod
+	  - no optimizations
+	  - only upper half of registers are preserved
+	  - s. t/imcpasm/pcc.t for generated code
+
 - 2003-07-09	leo
 
 	* version 0.0.10.1

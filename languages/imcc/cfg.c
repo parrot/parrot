@@ -20,8 +20,222 @@ static void propagate_need(Basic_block *bb, SymReg* r, int i);
 
 /* Code: */
 
+static void
+expand_pcc_sub(Parrot_Interp interpreter, Instruction *ins)
+{
+    SymReg *arg, *sub;
+    int next[4], i, j, n;
+    char types[] = "INSP";
 
-void find_basic_blocks () {
+    UNUSED(interpreter);
+    for (i = 0; i < 4; i++)
+        next[i] = 5;
+    sub = ins->r[1];
+    /* insert params */
+    n = sub->pcc_sub->nargs;
+    for (i = 0; i < n; i++) {
+        arg = sub->pcc_sub->args[i];
+        for (j = 0; j < 4; j++) {
+            if (arg->set == types[j]) {
+                if (arg->color == next[j]) {
+                    next[j]++;
+                    break;
+                }
+                arg->reg->color = next[j]++;
+                break;
+            }
+        }
+    }
+}
+
+static void
+expand_pcc_sub_ret(Parrot_Interp interpreter, Instruction *ins)
+{
+    SymReg *arg, *sub, *reg, *regs[IMCC_MAX_REGS];
+    int next[4], i, j, n;
+    char types[] = "INSP";
+    Instruction *tmp;
+
+    for (i = 0; i < 4; i++)
+        next[i] = 5;
+    /* the first ins holds the sub SymReg */
+    sub = instructions->r[1];
+    n = sub->pcc_sub->nret;
+    for (i = 0; i < n; i++) {
+        arg = sub->pcc_sub->ret[i];
+        /* if arg is constant, set register */
+        switch (arg->type) {
+            case VT_CONSTP:
+                arg = arg->reg;
+                /* goon */
+            case VTCONST:
+lazy:
+                for (j = 0; j < 4; j++) {
+                    if (arg->set == types[j]) {
+                        char buf[128];
+                        if (arg->color == next[j]) {
+                            next[j]++;
+                            break;
+                        }
+                        sprintf(buf, "%c%d", arg->set, next[j]++);
+                        reg = mk_pasm_reg(str_dup(buf));
+                        regs[0] = reg;
+                        regs[1] = arg;
+                        tmp = INS(interpreter, "set", NULL, regs, 2, 0, 0);
+                        insert_ins(ins, tmp);
+                        ins = tmp;
+                        break;
+                    }
+                }
+                break;
+            default:
+                if (arg->type & VTREGISTER) {
+                    /* TODO for now just emit a register move */
+                    goto lazy;
+                }
+        }
+
+    }
+    /*
+     * insert return invoke
+     */
+    reg = mk_pasm_reg(str_dup("P1"));
+    regs[0] = reg;
+    tmp = INS(interpreter, "invoke", NULL, regs, 1, 0, 0);
+    insert_ins(ins, tmp);
+    ins = tmp;
+}
+
+static void
+expand_pcc_sub_call(Parrot_Interp interpreter, Instruction *ins)
+{
+    SymReg *arg, *sub, *reg, *regs[IMCC_MAX_REGS];
+    int next[4], i, j, n;
+    char types[] = "INSP";
+    Instruction *tmp;
+
+    for (i = 0; i < 4; i++)
+        next[i] = 5;
+    sub = ins->r[0];
+    /*
+     * insert arguments
+     */
+    n = sub->pcc_sub->nargs;
+    for (i = 0; i < n; i++) {
+        arg = sub->pcc_sub->args[i];
+        /* if arg is constant, set register */
+        switch (arg->type) {
+            case VT_CONSTP:
+                arg = arg->reg;
+                /* goon */
+            case VTCONST:
+lazy:
+                for (j = 0; j < 4; j++) {
+                    if (arg->set == types[j]) {
+                        char buf[128];
+                        if (arg->color == next[j]) {
+                            next[j]++;
+                            break;
+                        }
+                        sprintf(buf, "%c%d", arg->set, next[j]++);
+                        reg = mk_pasm_reg(str_dup(buf));
+                        regs[0] = reg;
+                        regs[1] = arg;
+                        tmp = INS(interpreter, "set", NULL, regs, 2, 0, 0);
+                        insert_ins(ins, tmp);
+                        ins = tmp;
+                        break;
+                    }
+                }
+                break;
+            default:
+                if (arg->type & VTREGISTER) {
+                    /* TODO for now just emit a register move */
+                    goto lazy;
+                }
+        }
+
+    }
+    /*
+     * insert invoke
+     */
+    arg = sub->pcc_sub->sub;
+    if (arg->reg->type & VTPASM) {
+move_sub:
+        if (arg->reg->color != 0) {
+            reg = mk_pasm_reg(str_dup("P0"));
+            regs[0] = reg;
+            regs[1] = arg;
+            tmp = INS(interpreter, "set", NULL, regs, 2, 0, 0);
+            insert_ins(ins, tmp);
+            ins = tmp;
+        }
+    }
+    else {
+        /* TODO no move if possible */
+        goto move_sub;
+    }
+
+    arg = sub->pcc_sub->cc;
+    if (arg->reg->type & VTPASM) {
+move_cc:
+        if (arg->reg->color != 1) {
+            reg = mk_pasm_reg(str_dup("P1"));
+            regs[0] = reg;
+            regs[1] = arg;
+            tmp = INS(interpreter, "set", NULL, regs, 2, 0, 0);
+            insert_ins(ins, tmp);
+            ins = tmp;
+        }
+    }
+    else {
+        /* TODO no move */
+        goto move_cc;
+    }
+    tmp = INS(interpreter, "savetop", NULL, regs, 0, 0, 0);
+    insert_ins(ins, tmp);
+    ins = tmp;
+    tmp = INS(interpreter, "invoke", NULL, regs, 0, 0, 0);
+    insert_ins(ins, tmp);
+    ins = tmp;
+    /*
+     * locate return label
+     */
+    while (ins->type != ITLABEL)
+        ins = ins->next;
+    tmp = INS(interpreter, "restoretop", NULL, regs, 0, 0, 0);
+    insert_ins(ins, tmp);
+    ins = tmp;
+    /*
+     * handle return results
+     */
+    for (i = 0; i < 4; i++)
+        next[i] = 5;
+    n = sub->pcc_sub->nret;
+    for (i = 0; i < n; i++) {
+        arg = sub->pcc_sub->ret[i];
+        for (j = 0; j < 4; j++) {
+            if (arg->set == types[j]) {
+                char buf[128];
+                if (arg->reg->color == next[j]) {
+                    next[j]++;
+                    break;
+                }
+                sprintf(buf, "%c%d", arg->set, next[j]++);
+                reg = mk_pasm_reg(str_dup(buf));
+                regs[0] = arg;
+                regs[1] = reg;
+                tmp = INS(interpreter, "set", NULL, regs, 2, 0, 0);
+                insert_ins(ins, tmp);
+                ins = tmp;
+                break;
+            }
+        }
+    }
+}
+
+
+void find_basic_blocks (Parrot_Interp interpreter) {
     Basic_block *bb;
     Instruction *ins;
     int nu = 0;
@@ -37,6 +251,11 @@ void find_basic_blocks () {
     }
 
     ins = instructions;
+    if (ins->type == ITLABEL && ins->r[1]) {
+        debug(DEBUG_CFG, "pcc_sub %s nparams %d\n",
+                ins->r[0]->name, ins->r[1]->pcc_sub->nargs);
+        expand_pcc_sub(interpreter, ins);
+    }
     ins->index = i = 0;
 
     bb = make_basic_block(ins);
@@ -70,7 +289,17 @@ void find_basic_blocks () {
             add_instruc_writes(ins, p0);
             add_instruc_writes(ins, p1);
         }
-        if ( (ins->type & ITLABEL)) {
+        if (ins->type & ITPCCSUB) {
+            if (ins->type & ITLABEL) {
+                expand_pcc_sub_ret(interpreter, ins);
+                ins->type &= ~ITLABEL;
+            }
+            else {
+                /* if this is a pcc_sub_call expand it */
+                expand_pcc_sub_call(interpreter, ins);
+            }
+        }
+        else if (ins->type & ITLABEL) {
             /* set the labels address (ins) */
             ins->r[0]->first_ins = ins;
         }
@@ -80,10 +309,6 @@ void find_basic_blocks () {
         if (nu)
             nu = 0;
         else if ( (ins->type & ITLABEL)) {
-            /* XXX look at this change bb->end did include the label,
-             * now no more
-             * s. t/rx/basic_6
-             */
             bb->end = ins->prev;
             bb = make_basic_block(ins);
         }
@@ -101,7 +326,8 @@ void find_basic_blocks () {
              *
              * ignore set_addr - no new basic block
              */
-            if (!strcmp(ins->op, "bsr") || !strcmp(ins->op, "set_addr")) {
+            if (!strcmp(ins->op, "bsr") || !strcmp(ins->op, "set_addr") ||
+                    !strcmp(ins->op, "newsub")) {
                 char *name = ins->r[0]->name;
                 SymReg *r = get_sym(name);
                 if (*ins->op == 'b') {  /* bsr */
@@ -125,7 +351,7 @@ void find_basic_blocks () {
                     }
                 }
                 else {
-                    /* don't treat set_addr as jump source */
+                    /* don't treat set_addr/newsub as jump source */
                     found = 0;
                 }
             }

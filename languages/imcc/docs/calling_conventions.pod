@@ -102,7 +102,8 @@ Proposed syntax:
 
 =head2 PASM Subroutines
 
-  newsub $P0, $P1, Sub, Continuation, _sub_label, ret_addr
+  newsub $P0, .Sub, _sub_label
+  newsub $P1, .Continuation, ret_addr
   ...
   .pcc_begin prototyped|non_prototyped
   .arg x	# I5
@@ -124,6 +125,21 @@ Proposed syntax:
   .pcc_end_return
   ...
   .end
+
+Notes:
+
+=over 4
+
+=item * The B<prototyped> args are unimplemented and must not be given.
+
+=item * The B<.param> function params must be the first statements in the
+sub.
+
+=item * B<newsub> currently needs the B<.dot> B<Class> syntax.
+
+=item * Only the top half of registers are preserverd currently.
+
+=back
 
 =head2 NCI
 
@@ -148,7 +164,7 @@ increasing registers of the appropriate type.
 
 =head2 Status
 
-Unimplemented.
+Partially implemented, s. t/imcpasm/pcc.t.
 
 =head1 Exception handlers
 

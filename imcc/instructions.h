@@ -10,7 +10,8 @@ enum INSTYPE {    /*instruction type can be   */
     ITADDR  = 0x200000, /*   set_addr P, addr*/
     ITSPILL = 0x400000, /*   set P31,x ; set x, p31 spilling */
     ITEXT   = 0x800000, /*   instruction is extcall in JIT */
-    ITSAVES = 0x1000000  /*   saveall/restoreall in a bsr */
+    ITSAVES = 0x1000000,  /*   saveall/restoreall in a bsr */
+    ITPCCSUB = 0x2000000  /*  PCC sub call */
 };
 
 

@@ -20,7 +20,7 @@
 #include "pbc.h"
 #include "parser.h"
 
-#define IMCC_VERSION "0.0.10.1"
+#define IMCC_VERSION "0.0.10.2"
 
 static int run_pbc, write_pbc, pre_process;
 static char optimizer_opt[20];

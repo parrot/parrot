@@ -8,6 +8,7 @@
 /* Code: */
 
 void delete_sym(const char * name);
+static SymReg * dup_sym(SymReg *r);
 
 
 void push_namespace(char * name) {
@@ -57,6 +58,7 @@ SymReg * _mk_symreg(SymReg* hsh[],char * name, char t) {
     }
     r->name = name;
     r->color = -1;
+    r->want_regno = -1;
     r->set = t;
     r->type = VTREG;
 
@@ -67,6 +69,69 @@ SymReg * _mk_symreg(SymReg* hsh[],char * name, char t) {
 
 SymReg * mk_symreg(char * name, char t) {
     return _mk_symreg(hash, name, t);
+}
+
+SymReg * mk_pcc_sub(char * name, char proto) {
+    SymReg *r = _mk_symreg(hash, name, proto);
+    r->type = VT_PCC_SUB;
+    r->pcc_sub = calloc(1, sizeof(struct pcc_sub_t));
+    return r;
+}
+
+void
+add_pcc_arg(SymReg *r, SymReg * arg)
+{
+    int n = r->pcc_sub->nargs;
+    r->pcc_sub->args = realloc(r->pcc_sub->args, (n + 1) * sizeof(SymReg *));
+    r->pcc_sub->args[n] = dup_sym(arg);
+    if (arg->type & VTREGISTER) {
+        r->pcc_sub->args[n]->reg = arg;
+        r->pcc_sub->args[n]->type = VT_REGP;
+    }
+    r->pcc_sub->nargs++;
+}
+
+void
+add_pcc_param(SymReg *r, SymReg * arg)
+{
+    add_pcc_arg(r, arg);
+}
+
+void
+add_pcc_result(SymReg *r, SymReg * arg)
+{
+    int n = r->pcc_sub->nret;
+    r->pcc_sub->ret = realloc(r->pcc_sub->ret, (n + 1) * sizeof(SymReg *));
+    r->pcc_sub->ret[n] = dup_sym(arg);
+    if (arg->type & VTREGISTER) {
+        r->pcc_sub->ret[n]->reg = arg;
+        r->pcc_sub->ret[n]->type = VT_REGP;
+    }
+    else
+        fataly(EX_SOFTWARE, "add_pcc_result", line,
+                "result is not a variable '%s'\n", arg->name);
+    r->pcc_sub->nret++;
+}
+
+void
+add_pcc_return(SymReg *r, SymReg * arg)
+{
+    add_pcc_result(r, arg);
+}
+
+void
+add_pcc_sub(SymReg *r, SymReg * arg)
+{
+    r->pcc_sub->sub = dup_sym(arg);
+    r->pcc_sub->sub->reg = arg;
+    r->pcc_sub->sub->type = VT_REGP;
+}
+void
+add_pcc_cc(SymReg *r, SymReg * arg)
+{
+    r->pcc_sub->cc = dup_sym(arg);
+    r->pcc_sub->cc->reg = arg;
+    r->pcc_sub->cc->type = VT_REGP;
 }
 
 SymReg * mk_pasm_reg(char * name) {

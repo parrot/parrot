@@ -408,14 +408,19 @@ iANY(struct Parrot_Interp *interpreter, char * name,
 %token <t> RELOP_EQ RELOP_NE RELOP_GT RELOP_GTE RELOP_LT RELOP_LTE
 %token <t> GLOBAL ADDR CLONE RESULT RETURN POW SHIFT_RIGHT_U LOG_AND LOG_OR
 %token <t> COMMA ESUB
+%token <t> PCC_BEGIN PCC_END PCC_CALL PCC_SUB PCC_BEGIN_RETURN PCC_END_RETURN
 %token <s> LABEL
 %token <t> EMIT EOM
 %token <s> IREG NREG SREG PREG IDENTIFIER STRINGC INTC FLOATC REG MACRO ENDM
 %token <s> PARROT_OP
 %type <t> type
-%type <i> program sub sub_start emit
+%type <i> program sub sub_start emit nsub pcc_sub sub_body pcc_ret
 %type <s> classname relop
 %type <i> labels _labels label statements statement
+%type <i> pcc_sub_call
+%type <sr> pcc_arg pcc_result pcc_args pcc_results pcc_params pcc_param
+%type <sr> pcc_returns pcc_return
+%type <t> pcc_proto
 %type <i> instruction assignment if_statement labeled_inst
 %type <sr> target reg const var rc string
 %type <sr> key keylist _keylist
@@ -463,16 +468,22 @@ emit:
                                           emit_flush(interp); $$=0;}
     ;
 
+nsub:	sub_start
+        sub_body
+    ;
 
-
-sub:	sub_start
+sub_body:
         statements ESUB
         {
           $$ = 0;
 	  allocate(interp);
 	  emit_flush(interp);
         }
-        | emit { $$=0; }
+     ;
+
+sub:    nsub
+        | pcc_sub
+        | emit
     ;
 
 sub_start: SUB                           { open_comp_unit(); }
@@ -481,14 +492,103 @@ sub_start: SUB                           { open_comp_unit(); }
           iSUBROUTINE(mk_address($3, U_add_uniq_sub));
         }
     ;
+pcc_sub: PCC_SUB   { open_comp_unit(); }
+       IDENTIFIER '\n'
+        {
+          Instruction *i =iSUBROUTINE(mk_address($3, U_add_uniq_sub));
+          i->r[1] = $<sr>$ = mk_pcc_sub(str_dup($3), 0);
+        }
+       pcc_params
+       sub_body { $$ = 0; }
+    ;
+
+pcc_params: /* empty */                   { $$ = 0; }
+    | pcc_param '\n'                      { add_pcc_param($<sr>0, $1);}
+    | pcc_params pcc_param '\n'           { add_pcc_param($<sr>0, $2);}
+    ;
+
+pcc_param: PARAM         { is_def=1; }
+         type IDENTIFIER { $$ = mk_ident($4, $3); is_def=0; }
+    ;
+
+pcc_sub_call: PCC_BEGIN pcc_proto '\n' {
+              char name[128];
+              SymReg * r;
+              Instruction *i;
+
+              sprintf(name, "#pcc_sub_call_%d", line - 1);
+              $<sr>$ = r = mk_pcc_sub(str_dup(name), 0);
+              /* this mid rule action has the semantic value of the
+                 sub SymReg.
+                 This is used below to append args & results
+              */
+              i = iLABEL(r);
+              i->type = ITPCCSUB;
+
+           }
+           pcc_args
+           PCC_CALL var COMMA var '\n' {
+                      add_pcc_sub($<sr>4, $7);
+                      add_pcc_cc($<sr>4, $9);
+                  }
+           label '\n'
+           pcc_results
+           PCC_END  '\n' { $$ = 0; }
+    ;
+
+pcc_proto: /* empty */                  { $$ = 0; }
+    ;
+
+pcc_args: /* empty */                   { $$ = 0; }
+    | pcc_arg '\n'                      {  add_pcc_arg($<sr>0, $1);}
+    | pcc_args pcc_arg '\n'             {  add_pcc_arg($<sr>0, $2);}
+    ;
+
+pcc_arg: ARG var                        { $$ = $2; }
+    ;
+
+pcc_results: /* empty */                { $$ = 0; }
+    |       pcc_result '\n'             { if($1) add_pcc_result($<sr>-9, $1); }
+    | pcc_results pcc_result '\n'       { if($2) add_pcc_result($<sr>-9, $2); }
+    ;
+
+pcc_ret: PCC_BEGIN_RETURN '\n' {
+                Instruction *i, *ins = instructions;
+                char name[128];
+                if (!ins || !ins->r[1] || ins->r[1]->type != VT_PCC_SUB)
+                    fataly(EX_SOFTWARE, "pcc_ret", line,
+                        "pcc_return not inside pcc subroutine\n");
+                $<sr>$ = ins->r[1];
+                sprintf(name, "#pcc_sub_ret_%d:", line - 1);
+                i = _mk_instruction("", name, NULL, 0);
+                i = emitb(i);
+                i->type = ITPCCSUB | ITLABEL;
+        }
+        pcc_returns
+        PCC_END_RETURN '\n'             { $$ = 0; }
+    ;
+
+pcc_returns: /* empty */                { $$ = 0; }
+    |       pcc_returns '\n'            { if($1) add_pcc_return($<sr>0, $1); }
+    | pcc_returns pcc_return '\n'       { if($2) add_pcc_return($<sr>0, $2); }
+    ;
+
+pcc_return: RETURN var                  { $$ = $2; }
+    ;
+
+pcc_result: RESULT var                        { $$ = $2; }
+    |   LOCAL { is_def=1; } type IDENTIFIER { mk_ident($4, $3);is_def=0; $$=0; }
+    ;
 
 statements: statement
     |   statements statement
     ;
 
 statement:  { clear_state(); }
-        instruction             { $$ = $2; }
+        instruction                   { $$ = $2; }
         | MACRO '\n'                  { $$ = 0; }
+        | pcc_sub_call                { $$ = 0; }
+        | pcc_ret
     ;
 
 labels:	/* none */         { $$ = NULL; }
