@@ -51,7 +51,7 @@ more_traceable_objects(struct Parrot_Interp *interpreter,
     if (pool->skip)
         pool->skip = 0;
     else {
-        Parrot_do_dod_run(interpreter);
+        Parrot_do_dod_run(interpreter, 1);
         if (pool->num_free_objects <= pool->replenish_level)
             pool->skip = 1;
     }

@@ -116,7 +116,7 @@ void pobject_lives(struct Parrot_Interp *interpreter, PObj *obj)
 
 /* Do a full trace run and mark all the PMCs as active if they are */
 static void
-trace_active_PMCs(struct Parrot_Interp *interpreter)
+trace_active_PMCs(struct Parrot_Interp *interpreter, int trace_stack)
 {
     PMC *current, *prev = NULL;
     /* Pointers to the currently being processed PMC, and
@@ -184,7 +184,8 @@ trace_active_PMCs(struct Parrot_Interp *interpreter)
     }
     /* Find important stuff on the system stack */
 #if TRACE_SYSTEM_AREAS
-    trace_system_areas(interpreter);
+    if (trace_stack)
+        trace_system_areas(interpreter);
 #endif
 
     /* Okay, we've marked the whole root set, and should have a good-sized
@@ -681,7 +682,7 @@ trace_mem_block(struct Parrot_Interp *interpreter,
 
 /* See if we can find some unused headers */
 void
-Parrot_do_dod_run(struct Parrot_Interp *interpreter)
+Parrot_do_dod_run(struct Parrot_Interp *interpreter, int trace_stack)
 {
     struct Small_Object_Pool *header_pool;
     int j;
@@ -702,7 +703,7 @@ Parrot_do_dod_run(struct Parrot_Interp *interpreter)
     }
 #endif
     /* Now go trace the PMCs */
-    trace_active_PMCs(interpreter);
+    trace_active_PMCs(interpreter, trace_stack);
 
     /* And the buffers */
     trace_active_buffers(interpreter);
@@ -712,13 +713,15 @@ Parrot_do_dod_run(struct Parrot_Interp *interpreter)
      * marking everything, if something was missed
      * not - these could also be stale objects
      */
+    if (trace_stack) {
 #  if ! DISABLE_GC_DEBUG
-    CONSERVATIVE_POINTER_CHASING = 1;
+        CONSERVATIVE_POINTER_CHASING = 1;
 #  endif
-    trace_system_areas(interpreter);
+        trace_system_areas(interpreter);
 #  if ! DISABLE_GC_DEBUG
-    CONSERVATIVE_POINTER_CHASING = 0;
+        CONSERVATIVE_POINTER_CHASING = 0;
 #  endif
+    }
 # endif
 #endif
 

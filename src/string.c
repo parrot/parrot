@@ -418,7 +418,7 @@ string_str_index_singlebyte(struct Parrot_Interp *interpreter,
 /*=for api string string_str_index
  * Return the character position of s2 in s at or after start.
  * The return value is a (0 based) offset in characters, not bytes.
- * If s2 is not found, then return -1 
+ * If s2 is not found, then return -1
  */
 INTVAL
 string_str_index(struct Parrot_Interp *interpreter, const STRING *s,
@@ -598,7 +598,7 @@ string_max_bytes(STRING *s, INTVAL nchars)
 /*=for api string string_concat
  * Concatenate two strings. If necessary, convert the second string's
  * encoding and/or type to match those of the first string. If either
- * string is NULL, return a copy of the non-NULL string. If both 
+ * string is NULL, return a copy of the non-NULL string. If both
  * strings are NULL, create and return a new zero-length string.
  */
 STRING *
@@ -943,7 +943,7 @@ string_compare(struct Parrot_Interp *interpreter, STRING *s1,
 
     /* It's easy to forget that string comparison can trigger GC */
     if (interpreter && GC_DEBUG(interpreter))
-        Parrot_do_dod_run(interpreter);
+        Parrot_do_dod_run(interpreter, 1);
 
     if (s1->type != s2->type || s1->encoding != s2->encoding) {
         s1 = string_transcode(interpreter, s1, NULL, string_unicode_type,

@@ -40,7 +40,7 @@
 #define Parrot_is_blocked_GC(interpreter) \
         ((interpreter)->GC_block_level)
 
-void Parrot_do_dod_run(struct Parrot_Interp *);
+void Parrot_do_dod_run(struct Parrot_Interp *, int trace_stack);
 void trace_system_areas(struct Parrot_Interp *);
 void trace_mem_block(struct Parrot_Interp *, size_t, size_t);
 

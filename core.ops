@@ -14,7 +14,7 @@ core.ops - Parrot Core Ops
 
 Parrot's core library of ops.
 
-Core operations are primarily flow control and interpreter 
+Core operations are primarily flow control and interpreter
 introspection.
 
 =cut
@@ -325,7 +325,7 @@ op unless(in PMC, inconst INT) {
 
 =head2 Subroutine  operations
 
-These operations are used to generate and call subroutines and 
+These operations are used to generate and call subroutines and
 continuations.
 
 =over 4
@@ -811,7 +811,7 @@ Opcodes that interact with the DOD and GC subsystems.
 
 op sweep(inconst INT) {
   if ($1 || interpreter->has_early_DOD_PMCs)
-    Parrot_do_dod_run(interpreter);
+    Parrot_do_dod_run(interpreter, 0);
   goto NEXT();
 }
 
