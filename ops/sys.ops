@@ -149,14 +149,6 @@ Day of year (0-365)
 
 Daylight savings/summer time in effect
 
-=item 9
-
-Timezone name
-
-=item 10
-
-Offset from UTC in seconds
-
 =back
 
 Timezone name will be GMT and offset will be 0, since the time is taken and
@@ -204,9 +196,6 @@ op decodetime(out PMC, in INT) {
   VTABLE_set_integer_keyed_int(interpreter, Array, 6, tm.tm_wday);
   VTABLE_set_integer_keyed_int(interpreter, Array, 7, tm.tm_yday);
   VTABLE_set_integer_keyed_int(interpreter, Array, 8, tm.tm_isdst);
-  VTABLE_set_integer_keyed_int(interpreter, Array, 9, tm.tm_sec);
-  VTABLE_set_string_keyed_int(interpreter, Array, 10, string_from_cstring(interpreter, tm.tm_zone, 0));
-  VTABLE_set_integer_keyed_int(interpreter, Array, 11, tm.tm_gmtoff);
   $1 = Array;
   goto NEXT();
 }
@@ -227,9 +216,6 @@ op decodelocaltime(out PMC, in INT) {
   VTABLE_set_integer_keyed_int(interpreter, Array, 6, tm.tm_wday);
   VTABLE_set_integer_keyed_int(interpreter, Array, 7, tm.tm_yday);
   VTABLE_set_integer_keyed_int(interpreter, Array, 8, tm.tm_isdst);
-  VTABLE_set_integer_keyed_int(interpreter, Array, 9, tm.tm_sec);
-  VTABLE_set_string_keyed_int(interpreter, Array, 10, string_from_cstring(interpreter, tm.tm_zone, 0));
-  VTABLE_set_integer_keyed_int(interpreter, Array, 11, tm.tm_gmtoff);
   $1 = Array;
   goto NEXT();
 }
