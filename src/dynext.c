@@ -87,7 +87,7 @@ store_lib_pmc(Parrot_Interp interpreter, PMC* lib_pmc, STRING *path,
 =item C<static PMC*
 is_loaded(Parrot_Interp interpreter, STRING *path)>
 
-Check if a C<ParrotLibrary> PMC with the filename path exists. 
+Check if a C<ParrotLibrary> PMC with the filename path exists.
 If it does, return it. Otherwise, return NULL.
 
 =cut
@@ -306,6 +306,11 @@ Parrot_load_lib(Interp *interpreter, STRING *lib, PMC *initializer)
         /* UNLOCK */
         return lib_pmc;
     }
+    /*
+     * work around gcc 3.3.3 and other problem with dynclasses
+     * something during library loading doesn't stand a DOD run
+     */
+    Parrot_block_DOD(interpreter);
     /* get load_func */
     load_func_name = Parrot_sprintf_c(interpreter, "Parrot_lib_%Ss_load", lib);
     cload_func_name = string_to_cstring(interpreter, load_func_name);
@@ -336,6 +341,7 @@ Parrot_load_lib(Interp *interpreter, STRING *lib, PMC *initializer)
      */
     store_lib_pmc(interpreter, lib_pmc, path, type);
     /* UNLOCK */
+    Parrot_unblock_DOD(interpreter);
     return lib_pmc;
 }
 

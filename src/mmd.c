@@ -398,6 +398,8 @@ mmd_expand_x(Interp *interpreter, INTVAL function, INTVAL new_x)
     funcptr_t default_func;
     UINTVAL i;
     MMD_table *table = interpreter->binop_mmd_funcs + function;
+    char *src_ptr, *dest_ptr;
+    size_t old_dp, new_dp;
 
     /* Is the Y 0? If so, nothing to expand, so just set the X for
        later use */
@@ -423,13 +425,14 @@ mmd_expand_x(Interp *interpreter, INTVAL function, INTVAL new_x)
     /* Then copy the old table over. We have to do this row by row,
        because the rows in the old and new tables are different
        lengths */
+    src_ptr = (char*) table->mmd_funcs;
+    dest_ptr = (char*) new_table;
+    old_dp = sizeof(funcptr_t) * x;
+    new_dp = sizeof(funcptr_t) * new_x;
     for (i = 0; i < y; i++) {
-        INTVAL newoffset, oldoffset;
-        newoffset = i * new_x;
-        oldoffset = i * x;
-        memcpy(new_table + newoffset,
-               table->mmd_funcs + oldoffset,
-               sizeof(funcptr_t) * x);
+        memcpy(dest_ptr, src_ptr, sizeof(funcptr_t) * x);
+        src_ptr  += old_dp;
+        dest_ptr += new_dp;
     }
     if (table->mmd_funcs)
         mem_sys_free(table->mmd_funcs);
@@ -460,6 +463,7 @@ mmd_expand_y(Interp *interpreter, INTVAL function, INTVAL new_y)
     MMD_table *table = interpreter->binop_mmd_funcs + function;
 
     x = table->x;
+    assert(x);
     y = table->y;
     default_func = table->default_func;
 
@@ -573,7 +577,10 @@ mmd_register(Interp *interpreter,
 {
 
     INTVAL offset;
-    MMD_table *table = interpreter->binop_mmd_funcs + function;
+    MMD_table *table;
+
+    assert(function < (INTVAL)interpreter->n_binop_mmd_funcs);
+    table = interpreter->binop_mmd_funcs + function;
     if ((INTVAL)table->x <= left_type) {
         mmd_expand_x(interpreter, function, left_type + 1);
     }

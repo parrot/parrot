@@ -183,7 +183,7 @@ EOC
     while (my ($class, $info) = each %classes) {
 	my $lhs = $info->{flags}->{noinit} ? "" : "type$class = ";
         $cout .= <<"EOC";
-    whoami = string_from_cstring(interpreter, "$class", 0);
+    whoami = const_string(interpreter, "$class");
     ${lhs}pmc_register(interpreter, whoami);
 EOC
     }
