@@ -214,10 +214,33 @@ ret_int(char *p, int type)
 {
     switch (type) {
         case enum_type_INTVAL:
-        case enum_type_int:
             return *(INTVAL*) p;
+#if INT_SIZE == 4
+        case enum_type_int32:
+        case enum_type_uint32:
+#endif
+#if INT_SIZE == 8
+        case enum_type_int64:
+        case enum_type_uint64:
+#endif
+        case enum_type_int:
+            return *(int*) p;
+#if (LONG_SIZE == 4) && !(INT_SIZE == 4) /* Unlikely combination. */
+        case enum_type_int32:
+        case enum_type_uint32:
+#endif
+#if (LONG_SIZE == 8) && !(INT_SIZE == 8)
+        case enum_type_int64:
+        case enum_type_uint64:
+#endif
+        case enum_type_long:
+        case enum_type_ulong:
+            return *(long*) p;
+#if SHORT_SIZE == 2
         case enum_type_int16:
         case enum_type_uint16:
+#endif
+        /* If SHORT_SIZE != 2 getting int16s requires extra tricks. */
         case enum_type_short:
             return *(short*) p;
         case enum_type_uint8:

@@ -62,18 +62,23 @@ with other parameter types.
 =item c
 
 Char. This is an integer type, taken from (or put into) an I register.
+NOTE: it might be signed or unsigned because that is how an unadorned
+C 'char' works.
 
 =item s
 
-short. An integer type, taken from or put into an I register
+short. An integer type, taken from or put into an I register.
+It is always signed, not unsigned.
 
 =item i
 
 int. An integer type.
+It is always signed, not unsigned.
 
 =item l
 
 long. An integer type. You know the drill.
+It is always signed, not unsigned.
 
 =item f
 

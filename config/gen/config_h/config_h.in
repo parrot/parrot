@@ -65,6 +65,8 @@ typedef ${hugefloatval} HUGEFLOATVAL;
 #define NUMVAL_SIZE ${nvsize}
 #define OPCODE_T_SIZE ${opcode_t_size}
 #define PTR_SIZE ${ptrsize}
+#define SHORT_SIZE ${shortsize}
+#define INT_SIZE ${intsize}
 #define LONG_SIZE ${longsize}
 #define HUGEINTVAL_SIZE ${hugeintvalsize}
 

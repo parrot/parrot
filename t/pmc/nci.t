@@ -12,8 +12,8 @@ t/pmc/nci.t - Native Call Interface
 
 =head1 DESCRIPTION
 
-Tests the NCI PMC. These are all skipped unless JIT CPU architecture is
-i386 and the F<libnci.so> library is found.
+Tests the NCI PMC. These are all skipped unless the F<libnci.so>
+library is found.
 
 =cut
 
@@ -174,11 +174,10 @@ output_is(<<'CODE', <<'OUTPUT', "nci_c_sc");
   dlfunc P0, P1, "nci_csc", "csc"
   print "dlfunced\n"
   set I0, 1	# prototype used - unchecked
-  set I5, 64
-  set I6, 3
+  set I5, 6
+  set I6, 7
   invoke
-  abs I5        # 3 * 64 as char may be signed/unsigned
-  ne I5, 64, nok_1
+  ne I5, 42, nok_1
   print "ok 1\n"
   ne I0, 0, nok_2	# test return value convention
   ne I1, 1, nok_2
@@ -192,6 +191,16 @@ nok_1: print "nok 1\n"
   print "\n"
   end
 nok_2: print "nok 2\n"
+  print I0
+  print "\n"
+  print I1
+  print "\n"
+  print I2
+  print "\n"
+  print I3
+  print "\n"
+  print I4
+  print "\n"
   end
 CODE
 loaded
