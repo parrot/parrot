@@ -283,42 +283,33 @@ int emit_open(int type, char *file)
 
 int emit_flush() {
 
-    SymReg *p31;
     Instruction * ins, *next;
-    Instruction *spill = 0;
     /* first instruction should be ".sub" -- make sure we allocate P31
      * _after_ subroutine entry.  And after the "saveall", or any
      * other assortment of pushes. */
-    p31 = mk_pasm_reg(str_dup("P31"));
 
-    ins = instructions;
     if (n_spilled > 0 && n_instructions > 0) {
-        (emitters[emitter]).emit(ins);
-        ins = ins->next;
+        SymReg *p31;
+        Instruction *spill;
+        p31 = mk_pasm_reg(str_dup("P31"));
+        ins = instructions;
         while (ins
-               && (strncmp(ins->fmt, "push", 4) == 0
-                   || strcmp(ins->fmt, "saveall") == 0)) {
-            (emitters[emitter]).emit(ins);
-	    ins = ins->next;
+                && (strncmp(ins->fmt, "push", 4) == 0
+                    || strcmp(ins->fmt, "saveall") == 0)) {
+            ins = ins->next;
         }
-	spill = iNEW(p31, str_dup("PerlArray"), 0);
-        (emitters[emitter]).emit(spill);
+        spill = iNEW(p31, str_dup("PerlArray"), 0);
+        insert_ins(ins, spill);
     }
-    for (; ins; ins = ins->next) {
+    for (ins = instructions; ins; ins = ins->next) {
         (emitters[emitter]).emit(ins);
     }
-    /* XXX imcc -r breaks with free'ing, when
-     * spilled
-     * XXX if first == spilled?
-     */
-    for (ins = instructions; 0 && ins; ) {
-	next = ins->next;
-	free_ins(ins);
-	ins = next;
+    for (ins = instructions; ins; ) {
+        next = ins->next;
+        free_ins(ins);
+        ins = next;
     }
     instructions = NULL;
-    if (0 && spill)     /* XXX */
-        free_ins(spill);
     n_instructions = 0;
     return 0;
 }

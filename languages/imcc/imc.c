@@ -75,6 +75,7 @@ void allocate() {
 
         if ( to_spill >= 0 ) {
             spill(to_spill);
+            build_reglist();
             life_analysis();
         }
         else {
@@ -572,9 +573,9 @@ int map_colors(int x, SymReg ** graph, int colors[], int typ) {
 void spill(int spilled) {
 
     Instruction * tmp, *ins;
-    int i;
+    int i, n;
     int needs_fetch, needs_store;
-    SymReg * old_symbol, *p31;
+    SymReg * old_symbol, *p31, *new_symbol;
     char * buf;
     SymReg *regs[IMCC_MAX_REGS];
 
@@ -585,10 +586,11 @@ void spill(int spilled) {
 
     debug(1, "#Spilling [%s]:\n", reglist[spilled]->name);
 
-    old_symbol = reglist[spilled];
+    new_symbol = old_symbol = reglist[spilled];
     p31 = mk_pasm_reg(str_dup("P31"));
 
     n_spilled++;
+    n = 0;
 
     for(ins = instructions; ins; ins = ins->next) {
 
@@ -602,22 +604,27 @@ void spill(int spilled) {
 	    needs_store = 1;
 
 	if (needs_fetch) {
-	    regs[0] = old_symbol;
+	    regs[0] = new_symbol;
             regs[1] = p31;
             sprintf(buf, "%d", n_spilled);
             regs[2] = mk_const(str_dup(buf), 'I');
-	    sprintf(buf, "%%s, %%s[%%s] #FETCH %s", old_symbol->name);
+	    sprintf(buf, "%%s, %%s[%%s] #FETCH %s", new_symbol->name);
 	    tmp = INS("set", buf, regs, 3, 4);
 	    tmp->bbindex = ins->bbindex;
             tmp->flags |= ITSPILL;
             /* insert tmp before actual ins */
             insert_ins(ins->prev, tmp);
 	}
+        /* change all occurance of old_symbol to new */
+        for (i = 0; old_symbol != new_symbol && ins->r[i] &&
+                i < IMCC_MAX_REGS; i++)
+            if (ins->r[i] == old_symbol)
+                ins->r[i] = new_symbol;
 	if (needs_store) {
             regs[0] = p31;
             sprintf(buf, "%d", n_spilled);
             regs[1] = mk_const(str_dup(buf), 'I');
-	    regs[2] = old_symbol;
+	    regs[2] = new_symbol;
 	    sprintf(buf, "%%s[%%s], %%s #STORE %s", old_symbol->name);
 	    tmp = INS("set", buf, regs, 3, 2);
 	    tmp->bbindex = ins->bbindex;
@@ -626,6 +633,15 @@ void spill(int spilled) {
             insert_ins(ins, tmp);
             ins = tmp;
 	}
+        /* if all symbols are in one basic_block, we need a new
+         * symbol, so that the life_ranges are minimal
+         * It would be nice, to detect, when changing the symbol
+         * is necessary.
+         */
+        if (needs_fetch || needs_store) {
+            sprintf(buf, "%s_%d", old_symbol->name, n++);
+            new_symbol = mk_symreg(str_dup(buf), old_symbol->set);
+        }
     }
 
     free(buf);

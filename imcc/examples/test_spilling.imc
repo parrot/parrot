@@ -2,12 +2,6 @@
 # generate spills.
 #
 
-# currently needed XXX
-.sub main
- 	bsr _MAIN
-	end
-ret
-
 .sub _MAIN
 	$I0 = 0
 	$I1 = 1
@@ -53,12 +47,30 @@ ret
 	$I38 = 38
 	$I39 = 39
 
-	$I40 = 40
-	# XXX if one block holds the whole code
-	# spilling doesn't work because life_analysis is block based
-	# so this statement makes a new basic block
-	eq $I10,1, pri
-pri:
+	$I40 = $I0 + $I1
+	$I41 = $I2 + $I3
+	$I42 = $I4 + $I5
+	$I43 = $I6 + $I7
+	$I44 = $I8 + $I9
+
+	$I50 = $I10 + $I11
+	$I51 = $I12 + $I13
+	$I52 = $I14 + $I15
+	$I53 = $I16 + $I17
+	$I54 = $I18 + $I19
+
+	$I60 = $I20 + $I21
+	$I61 = $I22 + $I23
+	$I62 = $I24 + $I25
+	$I63 = $I26 + $I27
+	$I64 = $I28 + $I29
+
+	$I70 = $I30 + $I31
+	$I71 = $I32 + $I33
+	$I72 = $I34 + $I35
+	$I73 = $I36 + $I37
+	$I74 = $I38 + $I39
+
 	print $I0
 	print $I1
 	print $I2
@@ -104,6 +116,29 @@ pri:
 	print $I39
 	print "\n"
 	print $I40
+	print $I41
+	print $I42
+	print $I43
+	print $I44
 	print "\n"
-	ret
+	print $I50
+	print $I51
+	print $I52
+	print $I53
+	print $I54
+	print "\n"
+	print $I60
+	print $I61
+	print $I62
+	print $I63
+	print $I64
+	print "\n"
+	print $I70
+	print $I71
+	print $I72
+	print $I73
+	print $I74
+	print "\n"
+	end
+ret
 
