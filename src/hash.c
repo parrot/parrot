@@ -122,7 +122,7 @@ mark_hash(Interp *interpreter, HASH *hash, PMC *end_of_used_list)
     buffer_lives((Buffer *)hash);
     buffer_lives(hash->bucket_pool);
     for (i = 0; i < hash->hash_size; i++) {
-        HASHBUCKET* bucket = lookupBucket(hash, i);
+        HASHBUCKET *bucket = lookupBucket(hash, i);
         while (bucket) {
             buffer_lives((Buffer *)bucket->key);
             if (bucket->value.type == enum_key_string)
@@ -172,7 +172,7 @@ expand_hash(Interp *interpreter, HASH *hash)
     UINTVAL old_pool_size = hash->bucket_pool->buflen / sizeof(HASHBUCKET);
     UINTVAL new_pool_size = new_size * MAXFULL_PERCENT / 100;
 
-    Parrot_reallocate(interpreter, hash, new_size * sizeof(HASHBUCKET *));
+    Parrot_reallocate(interpreter, hash, new_size * sizeof(BucketIndex));
     Parrot_reallocate(interpreter, hash->bucket_pool,
                       new_pool_size * sizeof(HASHBUCKET));
 
@@ -186,7 +186,7 @@ expand_hash(Interp *interpreter, HASH *hash)
     /* NULL out new space in table */
     memset((HashIndex *) hash->buffer.bufstart + hash->hash_size,
            NULLBucketIndex,
-           (new_size - hash->hash_size) * sizeof(HASHBUCKET*));
+           (new_size - hash->hash_size) * sizeof(BucketIndex));
 
     /* Warning: for efficiency, we cache the table in a local
      * variable. If any possibly gc-triggering code is added to the
@@ -245,7 +245,7 @@ new_bucket(Interp *interpreter, HASH *hash, STRING *key, KEY_ATOM *value)
         
         hash->free_list = bucket->next;
         bucket->key = key;
-        memcpy(&bucket->value, value, sizeof(*value));
+        bucket->value = *value;
         return bucket_index;
     }
 
