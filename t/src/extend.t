@@ -190,12 +190,19 @@ int main(int argc, char* argv[]) {
 
     type = Parrot_PMC_typenum(interpreter, "PerlArray");
     array = Parrot_PMC_new(interpreter, type);
+ 
+    /* Allocation to the array may trigger a DOD sweep, so we need
+       to ensure that the array is registered beforehand */
+
+    Parrot_register_pmc(interpreter, array);
 
     value = 12345;
     key   = 10;
     Parrot_PMC_set_intval_intkey(interpreter, array, value, key);
 
     new_value = Parrot_PMC_get_intval_intkey(interpreter, array, key);
+
+    Parrot_unregister_pmc(interpreter, array);
 
     printf("%ld\n", (long)new_value);
 
