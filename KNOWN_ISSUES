@@ -75,7 +75,3 @@ Unimplemented
 
 - overflow detection/promotion to bigint/float types
 s. TODO for more
-
-IMCC
-
-- see imcc/BUGS
