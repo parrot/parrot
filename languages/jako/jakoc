@@ -15,9 +15,10 @@ use strict;
 
 use Carp;
 
-use Jako::Compiler::Message; # $source_file, $line, $debug
+use Jako::Compiler::Message; # $file, $line, $debug
 use Jako::Parser::Block;
 use Jako::Parser::Identifier;
+use Jako::Lexer;
 
 our @CARP_NOT = qw(Jako::Compiler::Message);
 
@@ -38,7 +39,7 @@ my %opts;
 getopts('t', \%opts);
 
 die "$0: usage: $0 <source>\n" unless @ARGV == 1;
-$source_file = shift @ARGV;
+$file = shift @ARGV;
 
 
 #
@@ -79,366 +80,6 @@ my %imcc_type_name = (
   P => 'PMC',
   S => 'string'
 );
-
-
-###############################################################################
-###############################################################################
-##
-## Tokenizer
-##
-###############################################################################
-###############################################################################
-
-sub tokenize
-{
-  my $source_file = shift;
-
-  my $fh = FileHandle->new($source_file);
-
-  die "$0: IO Error. Unable to open file '$source_file' for reading.\n"
-    unless $fh;
-
-  my @tokens;
-
-  while(<$fh>) {
-    $line = $.;
-
-    if (m{^(\s*([a-zA-Z][a-zA-Z0-9_]*)\s*:)(.*)$}) {
-      push @tokens, {
-        LINE    => $.,
-        CLASS   => 'label',
-        VALUE   => $2
-      };
-  
-      $_ = $3;
-    }
-
-    while (defined $_ and $_ ne '') {
-      next if s{^\s+}{};
-      next if s{^#.*?$}{};
-
-      #
-      # Numeric literals:
-      #
-
-      if (m{^(-?[0-9]+\.[0-9]+)($|\W.*$)}x) {
-        push @tokens, {
-          LINE    => $.,
-          CLASS   => 'literal',
-          TYPE    => 'N',
-          VALUE   => $1
-        };
-
-        $_ = $2;
-        next;
-      }
-
-      #
-      # Integer literals:
-      #
-
-      if (m{^( 0 | (-?[1-9][0-9]*))($|\W.*$)}x) {
-        push @tokens, {
-          LINE    => $.,
-          CLASS   => 'literal',
-          TYPE    => 'I',
-          VARIANT => 'dec',
-          VALUE   => $1
-        };
-
-        $_ = $3;
-        next;
-      }
-
-      if (m{^( 0x[0-9a-fA-F]+ )($|\W.*$)}x) {
-        push @tokens, {
-          LINE    => $.,
-          CLASS   => 'literal',
-          TYPE    => 'I',
-          VARIANT => 'hex',
-          VALUE   => $1
-        };
-
-        $_ = $2;
-        next;
-      }
-
-      #
-      # String literals:
-      #
-
-      if (m{^((?:\'(?:\\\'|(?!\').)*\'))(.*)$}) {
-        push @tokens, {
-          LINE    => $.,
-          CLASS   => 'literal',
-          TYPE    => 'S',
-          VARIANT => 'single',
-          VALUE   => $1
-        };
-
-        $_ = $2;
-        next;
-      }
-
-      if (m{^((?:\"(?:\\\"|(?!\").)*\"))(.*)$}) {
-        push @tokens, {
-          LINE    => $.,
-          CLASS   => 'literal',
-          TYPE    => 'S',
-          VARIANT => 'double',
-          VALUE   => $1
-        };
-
-        $_ = $2;
-        next;
-      }
-
-      #
-      # Declarators:
-      #
-
-      if (m{^(sub)(?!\w)(.*)$}) {
-        push @tokens, {
-          LINE    => $.,
-          CLASS   => 'decl',
-          VARIANT => 'code',
-          VALUE   => $1
-        };
-
-        $_ = $2;
-        next;
-      }
-
-      if (m{^(var|const)(?!\w)(.*)$}) {
-        push @tokens, {
-          LINE    => $.,
-          CLASS   => 'decl',
-          VARIANT => 'data',
-          VALUE   => $1
-        };
-
-        $_ = $2;
-        next;
-      }
-
-      #
-      # Type:
-      #
-
-      if (m{^(int|num|obj|str)(?!\w)(.*)$}) {
-        push @tokens, {
-          LINE    => $.,
-          CLASS   => 'type',
-          VALUE   => $1,
-          TYPE    => $1 eq 'obj' ? 'P' : uc substr($1, 0, 1)
-        };
-
-        $_ = $2;
-        next;
-      }
-
-      #
-      # Separating:
-      #
-
-      if (m{^([,])(.*)$}) {
-        push @tokens, {
-          LINE    => $.,
-          CLASS   => 'sep',
-          VARIANT => 'expr',
-          VALUE   => $1
-        };
-
-        $_ = $2;
-        next;
-      }
-
-      if (m{^([;])(.*)$}) {
-        push @tokens, {
-          LINE    => $.,
-          CLASS   => 'sep',
-          VARIANT => 'stmt',
-          VALUE   => $1
-        };
-
-        $_ = $2;
-        next;
-      }
-
-      #
-      # Grouping:
-      #
-
-      if (m{^([\(\)])(.*)$}) {
-        push @tokens, {
-          LINE    => $.,
-          CLASS   => 'group',
-          VARIANT => 'paren',
-          VALUE   => $1
-        };
-
-        $_ = $2;
-        next;
-      }
-
-      if (m{^([\[\]])(.*)$}) {
-        push @tokens, {
-          LINE    => $.,
-          CLASS   => 'group',
-          VARIANT => 'bracket',
-          VALUE   => $1
-        };
-
-        $_ = $2;
-        next;
-      }
-
-      if (m{^([\{\}])(.*)$}) {
-        push @tokens, {
-          LINE    => $.,
-          CLASS   => 'group',
-          VARIANT => 'brace',
-          VALUE   => $1
-        };
-
-        $_ = $2;
-        next;
-      }
-
-      #
-      # Control:
-      #
-
-      if (m{^(if|else|elsif|unless)(?!\w)(.*)$}) {
-        push @tokens, {
-          LINE    => $.,
-          CLASS   => 'control',
-          VARIANT => 'cond',
-          VALUE   => $1
-        };
-
-        $_ = $2;
-        next;
-      }
-
-      if (m{^(while|until|for|continue)(?!\w)(.*)$}) {
-        push @tokens, {
-          LINE    => $.,
-          CLASS   => 'control',
-          VARIANT => 'iter',
-          VALUE   => $1
-        };
-
-        $_ = $2;
-        next;
-      }
-
-      if (m{^(next|last|redo|goto|return)(?!\w)(.*)$}) {
-        push @tokens, {
-          LINE    => $.,
-          CLASS   => 'control',
-          VARIANT => 'other',
-          VALUE   => $1
-        };
-
-        $_ = $2;
-        next;
-      }
-
-      #
-      # Ops:
-      #
-
-      if (m{^( == | >= | <= | != | < | > )(.*)$}x) {
-        push @tokens, {
-          LINE    => $.,
-          CLASS   => 'op',
-          VARIANT => 'rel',
-          VALUE   => $1
-        };
-
-        $_ = $2;
-        next;
-      }
-
-      if (m{^( = )(.*)$}x) {
-        push @tokens, {
-          LINE    => $.,
-          CLASS   => 'op',
-          VARIANT => 'assign',
-          VALUE   => $1
-        };
-
-        $_ = $2;
-        next;
-      }
-
-      if (m{^( \+= | \*= | -= | /= | %= )(.*)$}x) {
-        push @tokens, {
-          LINE    => $.,
-          CLASS   => 'op',
-          VARIANT => 'arith_assign',
-          VALUE   => $1
-        };
-
-        $_ = $2;
-        next;
-      }
-
-      if (m{^( \+\+ | -- | \+ | - | \* | / | % )(.*)$}x) {
-        push @tokens, {
-          LINE    => $.,
-          CLASS   => 'op',
-          VARIANT => 'arith',
-          VALUE   => $1
-        };
-
-        $_ = $2;
-        next;
-      }
-
-      #
-      # Identifiers:
-      #
-
-      if (m{^([a-zA-Z][a-zA-Z0-9_]*)(.*)$}) {
-        push @tokens, {
-          LINE    => $.,
-          CLASS   => 'ident',
-          VALUE   => $1
-        };
-
-        $_ = $2;
-        next;
-      }
-   
-      #
-      # Anything else is a syntax error:
-      #
-
-      PARSE_ERROR("Unrecognized text '$_'.");
-    }
-  }
-
-  return @tokens;
-}
-
-
-#
-# dump_token()
-#
-
-sub dump_token
-{
-  my $token = shift;
-  return unless $token;
-
-  print STDERR "{\n";
-  foreach my $key (sort keys %$token) {
-    printf STDERR "%10s => %s\n", $key, $token->{$key};
-  }
-  print STDERR "}\n";
-}
 
 
 ###############################################################################
@@ -814,7 +455,13 @@ sub emit_code
 sub int_lit_q
 {
   my ($value) = @_;
-  return $value =~ m/^-?\d+$/;
+
+  return 'dec' if $value =~ m/^-?\d+$/;
+  return 'hex' if $value =~ m/^0x[0-9a-f]+$/i;
+  return 'oct' if $value =~ m/^0[0-7]+$/;
+  return 'bin' if $value =~ m/^0b[01]+$/;
+
+  return undef;
 }
 
 
@@ -1324,7 +971,7 @@ sub declare_var
     $access,
     $type,
     $name,
-    $source_file,
+    $file,
     $line,
     "\$$name"     # IMCC Name
   );
@@ -1408,7 +1055,7 @@ sub declare_const
     'const',
     $type,
     $name,
-    $source_file,
+    $file,
     $line
   );
 
@@ -1489,7 +1136,7 @@ sub assign_var
   # str_var = "foo";
   #
 
-  if ($ident->type eq $type) {
+  if ($ident->type eq $type or (($ident->type eq 'N' or $ident->type eq 'I') and ($type eq 'N' or $type = 'I'))) {
     emit_code("$name =", [ $value ]);
     return;
   }
@@ -1782,7 +1429,7 @@ sub assign_func
 
 sub begin_cond_block
 {
-  my ($block, $prefix, $type, $left, $relop, $right) = @_;
+  my ($block, $prefix, $type, $left, $op, $right) = @_;
 
   DEBUG(0, "Begining cond block '%s'...", $prefix || '');
 
@@ -1790,7 +1437,7 @@ sub begin_cond_block
 #  my $redo   = $block_types{$type}{REDO};
 #  my $last   = $block_types{$type}{LAST};
 
-  push_source "$prefix: $type ($left $relop $right) {";
+  push_source "$prefix: $type ($left $op $right) {";
 
   push_label "${prefix}_" . uc $type;
 
@@ -1803,9 +1450,9 @@ sub begin_cond_block
   }
 
   if ($type eq 'while') {
-    op_comp($type, $relop, $left, $right, undef, "${prefix}_LAST");
+    op_comp($type, $op, $left, $right, undef, "${prefix}_LAST");
   } elsif ($type eq 'if') {
-    op_comp($type, $relop, $left, $right, undef, "${prefix}_ELSE");
+    op_comp($type, $op, $left, $right, undef, "${prefix}_ELSE");
   }
 
   push_label "${prefix}_REDO";
@@ -1944,7 +1591,7 @@ sub begin_block
 {
   my ($prefix, $kind, $cond, $type, @formal_args) = @_;
   
-  my ($left, $relop, $right) = @$cond if $cond;
+  my ($left, $op, $right) = @$cond if $cond;
 
   $block_count++;
 
@@ -1954,7 +1601,10 @@ sub begin_block
         $prefix, $line, $block_names{$prefix});
     }
   } else {
-    $prefix = "$block_types{$kind}{PREFIX}$block_count";
+    INTERNAL_ERROR("Undefined prefix for $kind blocks")
+      unless defined $block_types{$kind}{PREFIX};
+
+    $prefix = $block_types{$kind}{PREFIX} . "$block_count";
   }
 
   $block_names{$prefix} = $line;
@@ -1973,9 +1623,9 @@ sub begin_block
   emit_code(".namespace", [ (uc $block->kind) . "_BLOCK" ]);
 
   if ($kind eq 'if') {
-    begin_cond_block($block, $prefix, $kind, $left, $relop, $right);
+    begin_cond_block($block, $prefix, $kind, $left, $op, $right);
   } elsif ($kind eq 'while') {
-    begin_cond_block($block, $prefix, $kind, $left, $relop, $right);
+    begin_cond_block($block, $prefix, $kind, $left, $op, $right);
   } elsif ($kind eq 'sub') {
     begin_sub_block($block, $prefix, $type, @formal_args);
   } else {
@@ -1993,6 +1643,8 @@ sub begin_block
 sub end_block
 {
   my ($continue) = @_;
+
+  DEBUG(0, "Ending block with continue '%s'") if $continue;
 
   #
   # If we are not currently 'inside' a block, then we've got no business
@@ -2597,7 +2249,7 @@ sub do_mod
 
 sub do_bit_and
 {
-  my ($dest, $a, $b) = map_args(@_);
+  my ($dest, $a, $b) = @_;
   emit_code("band", [$dest, $a, $b]);
 }
 
@@ -2608,7 +2260,7 @@ sub do_bit_and
 
 sub do_bit_or
 {
-  my ($dest, $a, $b) = map_args(@_);
+  my ($dest, $a, $b) = @_;
   emit_code("bor", [$dest, $a, $b]);
 }
 
@@ -2620,7 +2272,7 @@ sub do_bit_or
 sub do_shift
 {
   my $dir = shift;
-  my ($dest, $a, $amount) = map_args(@_);
+  my ($dest, $a, $amount) = @_;
   emit_code("sh$dir", [$dest, $a, $amount]);
 }
 
@@ -2727,16 +2379,12 @@ sub parse_args
 # Tokenize the input, and possibly dump the tokens.
 #
 
-my @tokens = tokenize($source_file);
+my $lexer = Jako::Lexer->new;
+
+$lexer->scan_file($file);
 
 if ($opts{t}) {
-  foreach my $tok (@tokens) {
-    printf "%-10s: %1s : %-10s : %s\n",
-      $tok->{CLASS},
-      $tok->{TYPE}    || '',
-      $tok->{VARIANT} || '',
-      $tok->{VALUE};
-  }
+  $lexer->dump;
 
   exit 0;
 }
@@ -2748,133 +2396,71 @@ if ($opts{t}) {
 
 emit_code('.sub', [ "__MODULE__" ]);
 
-my $last_token;
-my $token;
+my $last_token = $lexer->at(-1);
+my $token      = $lexer->at(-1);
 
-while(@tokens) {
-  $last_token = $token;
-  $token = shift @tokens;
+while(1) {
+  $token      = $lexer->forth;
+  $last_token = $lexer->get(-1);
 
-  DEBUG(0, "\$last_token is now a label (%s).", $last_token->{VALUE})
-    if $last_token->{CLASS} eq 'label';
-
-  $line = $token->{LINE};
-  $_    = $token->{VALUE};
-
-  last if (/^__END__$/);         # Done after __END__ token
+  last if $token->is_eof;
 
   #
   # Labels:
   #
+  #   <label>:
+  #
 
-  if ($token->{CLASS} eq 'label') {
-    push_label($_);
+  if ($token->is_label) {
+    DEBUG(0, "Pushing label %s", $token->text);
+    push_label($token->text);
     next;
   }
 
   #
   # Variable declarations:
   #
-  # var int foo;
-  # var int foo = 5;
+  #   var <type> <ident>;
+  #   var <type> <ident> = <value>;
+  #   var <type> <ident>, <ident>, ...;
+  #   var <type> <ident>, <ident>, ... = <value>;
   #
-  # var num bar;
-  # var num bar = 3.14;
-  #
-  # var str splee;
-  # var str splee = "Howdy";
-  #
-  # var obj quux;
-  #
-  # var int foo, bar;
-  # var int foo, bar = 5;
-  #
-  # var num bar, splee;
-  # var num bar, splee = 3.14;
-  #
-  # var str splee, quux;
-  # var str splee, quux = "Howdy";
-  #
-  # var obj quux, baz;
-  #
-  # const int foo   = 5;
-  # const num bar   = 3.14;
-  # const str splee = "Howdy";
+  #   const <type> <ident> = <value>;               # TODO: SHOULD BE LIMITED TO LITERAL?
+  #   const <type> <ident>, <ident>, ... = <value>; # TODO: SHOULD BE LIMITED TO LITERAL?
   #
 
-  if ($token->{CLASS} eq 'decl' and $token->{VARIANT} eq 'data') {
-    my $access = $_; # 'const' or 'var'.
+  if ($token->is_var or $token->is_const) {
+    my $access = $token->text; # 'const' or 'var'.
 
-    SYNTAX_ERROR("Expected type name after '$access', but got end of source.")
-      unless @tokens;
+    my $type_token = $lexer->require_type;
+    my $type       = $type_token->text;
+    my $type_code  = $type_code{$type};
 
-    SYNTAX_ERROR("Expected type name after '$access', but got '$tokens[0]{VALUE}'.")
-      unless $tokens[0]{CLASS} eq 'type';
+    INTERNAL_ERROR("Text of type token is undefined") unless defined $type;
 
-    my $type_token = shift @tokens;
-    $line = $type_token->{LINE};
-    my $type = $type_token->{VALUE};
-    my $type_code = $type_code{$type};
-
-    SYNTAX_ERROR("Cannot declare constants of type '$type'.")
+    SYNTAX_ERROR("Cannot declare constants of type '%s'.", $type)
       if ($access eq 'const' and $type eq 'obj');
 
     my @identifiers = ();
 
     while (1) {
-      SYNTAX_ERROR("Expected identifier after '$access $type [ <ident>, ]*', but got end of source.")
-        unless @tokens;
-
-      SYNTAX_ERROR("Expected identifier after '$access $type [ <ident>, ]*', but got '$tokens[0]{VALUE}'.")
-        unless $tokens[0]{CLASS} eq 'ident';
-
-      my $ident_token = shift @tokens;
-      $line = $ident_token->{LINE};
-      push @identifiers, $ident_token->{VALUE};
-
-      last unless @tokens and $tokens[0]{CLASS} eq 'sep' and $tokens[0]{VALUE} eq ',';
-
-      my $sep_token = shift @tokens;
-      $line = $sep_token->{LINE};
+      my $ident_token = $lexer->require_ident;
+      push @identifiers, $ident_token->text;
+      last unless $lexer->skip_comma;
     }
 
     my $value;
 
-    if (@tokens and $tokens[0]{CLASS} eq 'op' and $tokens[0]{VALUE} eq '=') {
-#      DEBUG(0, "Assigning %s...", join(", ", @identifiers));
+    if ($lexer->skip_assign) {
+      my $literal_token = $lexer->require_literal;
 
-      my $op_token = shift @tokens;
-      $line = $op_token->{LINE};
-
-      SYNTAX_ERROR("Expected literal after '$access $type [ <ident>, ]* <ident> =', but got end of source.")
-        unless @tokens;
-
-      SYNTAX_ERROR("Expected literal after '$access $type [ <ident>, ]* <ident> = ', but got '$tokens[0]{VALUE}'.")
-        unless $tokens[0]{CLASS} eq 'literal';
-
-      my $literal_token = shift @tokens;
-      $line = $literal_token->{LINE};
-
-      $value = $literal_token->{VALUE};
+      $value = $literal_token->text;
 
       $value = interpolate_string($value)
-        if str_lit_q($value);
-
-#      DEBUG(0, "%s", $value);
+        if type_of($value) eq 'S';
     }
-    else {
-#      DEBUG(0, "NOT assigning %s...", join(", ", @identifiers));
-    }
-#    dump_token($tokens[0]);
 
-    SYNTAX_ERROR("Expected ';' after declaration of identifier(s) " . join(', ', @identifiers) . ", but got end of source.")
-      unless @tokens;
-
-    SYNTAX_ERROR("Expected ';' after declaration of identifier(s) " . join(', ', @identifiers) . ", but got '$tokens[0]{VALUE}'.")
-      unless ($tokens[0]{CLASS} eq 'sep' and $tokens[0]{VALUE} eq ';');
-
-    my $sep_token = shift @tokens;
-    $line = $sep_token->{LINE};
+    $lexer->require_semicolon;
 
     SYNTAX_ERROR("Cannot declare constant without assigning a value.")
       if ($access eq 'const' and not defined $value);
@@ -2898,16 +2484,13 @@ while(@tokens) {
   #
   # Bare Blocks:
   #
-  # LABEL: {
-  #
-  # {
+  #   <label>: {
+  #   {
   #
  
-  if ($token->{CLASS} eq 'group' and $token->{VALUE} eq '{') {
-    my $label;
-
-    $label = $last_token->{VALUE}
-      if $last_token->{CLASS} eq 'label';
+  if ($token->is_open_brace) {
+    my $label = $last_token->text
+      if $last_token->is_label;
     
     begin_block($label, 'bare', undef);
 
@@ -2917,285 +2500,94 @@ while(@tokens) {
   #
   # Subroutines:
   #
-  # sub     NAME (...) {
-  # sub int NAME (...) {
-  # sub num NAME (...) {
-  # sub str NAME (...) {
+  #   sub        <ident> (<arg>, <arg>, ...) {
+  #   sub <type> <ident> (<arg>, <arg>, ...) {
   #
 
-  if ($token->{CLASS} eq 'decl' and $token->{VARIANT} eq 'code') {
-    SYNTAX_ERROR("Expected type or identifier after 'sub', but got end of source.")
-      unless @tokens;
-
-    SYNTAX_ERROR("Expected type or identifier after 'sub', but got '$tokens[0]{VALUE}'.")
-      unless ($tokens[0]{CLASS} eq 'type' or $tokens[0]{CLASS} eq 'ident');
+  if ($token->is_sub) {
+    my $type_token = $lexer->skip_type;
 
     my $type;
+    $type = $type_token->type if $type_token;
 
-    if ($tokens[0]{CLASS} eq 'type') {
-      my $type_token = shift @tokens;
-      $line = $type_token->{LINE};
-      $type = $type_token->{TYPE};
+    my $ident_token = $lexer->require_ident;
+    my $name = $ident_token->text;
 
-      SYNTAX_ERROR("Expected type or identifier after 'sub %s', but got end of source.", $type_token->value)
-        unless @tokens;
-
-      SYNTAX_ERROR("Expected type or identifier after 'sub %s', but got '$tokens[0]{VALUE}'.", $type_token->value)
-        unless ($tokens[0]{CLASS} eq 'ident');
-    }
-
-    my $ident_token = shift @tokens;
-    $line = $ident_token->{LINE};
-    my $name = $ident_token->{VALUE};
-
-    #
-    # Open paren of arg list:
-    #
-
-    SYNTAX_ERROR("Expected '(' after '$_', but got end of source.")
-      unless @tokens;
-
-    SYNTAX_ERROR("Expected '(' after '$_', but got '$tokens[0]{VALUE}'.")
-      unless ($tokens[0]{CLASS} eq 'group' and $tokens[0]{VALUE} eq '(');
-
-    my $open_paren = shift @tokens;
-    $line = $open_paren->{LINE};
-
-    #
-    # Formal argument list:
-    #
+    $lexer->require_open_paren;
 
     my @formal_args;
 
-    while (1) {
-      SYNTAX_ERROR("Expected formal argument or ')', but got end of source.")
-        unless @tokens;
+    unless ($lexer->skip_close_paren) {
+      while (1) {
+        my $arg_type_token = $lexer->require_type;
+        my $arg_type = $arg_type_token->type;
 
-      SYNTAX_ERROR("Expected formal argument or ')', but got '$tokens[0]{VALUE}'.")
-        unless ($tokens[0]{CLASS} eq 'type')
-        or ($tokens[0]{CLASS} eq 'group' and $tokens[0]{VALUE} eq ')');
+        my $arg_name_token = $lexer->require_ident;
+        my $arg_name = $arg_name_token->text;
 
-      last if $tokens[0]{CLASS} eq 'group' and $tokens[0]{VALUE} eq ')';
+        push @formal_args, [ $arg_type, $arg_name ];
 
-      my $arg_type_token = shift @tokens;
-      $line = $arg_type_token->{LINE};
-      my $arg_type = $arg_type_token->{TYPE};
+        last if $lexer->skip_close_paren;
 
-      SYNTAX_ERROR("Expected identifier after formal argument type, but got end of source.")
-        unless @tokens;
-
-      SYNTAX_ERROR("Expected identifier after formal argument type, but got '$tokens[0]{VALUE}'.")
-        unless $tokens[0]{CLASS} eq 'ident';
-
-      my $arg_name_token = shift @tokens;
-      $line = $arg_type_token->{LINE};
-      my $arg_name = $arg_name_token->{VALUE};
-
-      push @formal_args, [ $arg_type, $arg_name ];
-
-      SYNTAX_ERROR("Expected ',' or ')' after formal argument, but got end of source.")
-        unless @tokens;
-
-      SYNTAX_ERROR("Expected ',' or ')' after formal argument, but got '$tokens[0]{VALUE}'.")
-        unless ($tokens[0]{CLASS} eq 'sep' and $tokens[0]{VALUE} eq ',')
-        or ($tokens[0]{CLASS} eq 'group' and $tokens[0]{VALUE} eq ')');
-
-      last if $tokens[0]{CLASS} eq 'group' and $tokens[0]{VALUE} eq ')';
-
-      my $sep_token = shift @tokens;
-      $line = $sep_token->{LINE};
+        $lexer->require_comma;
+      }
     }
 
-    #
-    # Close paren of arg list:
-    #
-
-    SYNTAX_ERROR("Expected ')' after formal arguments, but got end of source.")
-      unless @tokens;
-
-    SYNTAX_ERROR("Expected ')' after formal arguments, but got '$tokens[0]{VALUE}'.")
-      unless ($tokens[0]{CLASS} eq 'group' and $tokens[0]{VALUE} eq ')');
-
-    my $close_paren = shift @tokens;
-    $line = $close_paren->{LINE};
-
-    #
-    # Open brace of block:
-    #
-
-    SYNTAX_ERROR("Expected '{' after formal argument list, but got end of source.")
-      unless @tokens;
-
-    SYNTAX_ERROR("Expected '{' after formal argument list, but got '$tokens[0]{VALUE}'.")
-      unless ($tokens[0]{CLASS} eq 'group' and $tokens[0]{VALUE} eq '{');
-
-    my $open_brace = shift @tokens;
-    $line = $open_brace->{LINE};
-    
-    #
-    # GOOD TO GO:
-    #
+    $lexer->require_open_brace;
 
     begin_block($name, 'sub', undef, $type, @formal_args);
-
     next;
   }
 
   #
   # Loops:
   #
-  # LABEL: until (...) {
-  #        until (...) {
+  #   <label>: until (<value> <op> <value>) {
+  #            until (<value> <op> <value>) {
   #
-  # LABEL: while (...) {
-  #        while (...) {
+  #   <label>: while (<value> <op> <value>) {
+  #            while (<value> <op> <value>) {
   #
  
-  if ($token->{CLASS} eq 'control' and $token->{VARIANT} eq 'iter') {
+  if ($token->is_until or $token->is_while) {
+    my $kind = $token->text;
+
     my $prefix;
 
-    DEBUG(0, "Starting $_...");
-
-    if ($last_token->{CLASS} eq 'label') {
-      $prefix = $last_token->{VALUE};
-      DEBUG(0, "... with prefix '$prefix'...");
+    if ($last_token->is_label) {
+      $prefix = $last_token->text;
     }
 
-    #
-    # Open paren of condition:
-    #
+    $lexer->require_open_paren;
 
-    SYNTAX_ERROR("Expected '(' after '$_', but got end of source.")
-      unless @tokens;
+    my $left  = $lexer->require_value->text;
+    my $op    = $lexer->require_infix_rel->text;
+    my $right = $lexer->require_value->text;
 
-    SYNTAX_ERROR("Expected '(' after '$_', but got '$tokens[0]{VALUE}'.")
-      unless ($tokens[0]{CLASS} eq 'group' and $tokens[0]{VALUE} eq '(');
+    $lexer->require_close_paren;
+    $lexer->require_open_brace;
 
-    my $open_paren = shift @tokens;
-    $line = $open_paren->{LINE};
-
-    #
-    # Left token of condition:
-    #
-
-    SYNTAX_ERROR("Expected identifier or literal after '(', but got end of source.")
-      unless @tokens;
-
-    SYNTAX_ERROR("Expected identifier or literal after '(', but got '$tokens[0]{VALUE}'.")
-      unless ($tokens[0]{CLASS} eq 'ident' or $tokens[0]{CLASS} eq 'literal');
-
-    my $left_token = shift @tokens;
-    $line = $left_token->{LINE};
-    my $left = $left_token->{VALUE};
-
-    #
-    # Relational operator of condition:
-    #
-
-    SYNTAX_ERROR("Expected relational operator after '$left', but got end of source.")
-      unless @tokens;
-
-    SYNTAX_ERROR("Expected relational operator after '$left', but got '$tokens[0]{VALUE}'.")
-      unless ($tokens[0]{CLASS} eq 'op' and $tokens[0]{VARIANT} eq 'rel');
-
-    my $relop_token = shift @tokens;
-    $line = $relop_token->{LINE};
-    my $relop = $relop_token->{VALUE};
-
-    #
-    # Right token of condition:
-    #
-
-    SYNTAX_ERROR("Expected identifier or literal after '$relop', but got end of source.")
-      unless @tokens;
-
-    SYNTAX_ERROR("Expected identifier or literal after '$relop', but got '$tokens[0]{VALUE}'.")
-      unless ($tokens[0]{CLASS} eq 'ident' or $tokens[0]{CLASS} eq 'literal');
-
-    my $right_token = shift @tokens;
-    $line = $right_token->{LINE};
-    my $right = $right_token->{VALUE};
-
-    #
-    # Close paren of condition:
-    #
-
-    SYNTAX_ERROR("Expected ')' after condition, but got end of source.")
-      unless @tokens;
-
-    SYNTAX_ERROR("Expected ')' after condition, but got '$tokens[0]{VALUE}'.")
-      unless ($tokens[0]{CLASS} eq 'group' and $tokens[0]{VALUE} eq ')');
-
-    my $close_paren = shift @tokens;
-    $line = $close_paren->{LINE};
-
-    #
-    # Open brace of block:
-    #
-
-    SYNTAX_ERROR("Expected '{' after condition, but got end of source.")
-      unless @tokens;
-
-    SYNTAX_ERROR("Expected '{' after condition, but got '$tokens[0]{VALUE}'.")
-      unless ($tokens[0]{CLASS} eq 'group' and $tokens[0]{VALUE} eq '{');
-
-    my $open_brace = shift @tokens;
-    $line = $open_brace->{LINE};
-    
-    #
-    # GOOD TO GO:
-    #
-
-    begin_block($prefix, $_, [$left, $relop, $right]);
-    
+    begin_block($prefix, $kind, [$left, $op, $right]);
     next;
   }
 
   #
   # Increment and Decrement:
   #
-  #   <sum> ++
-  #   <difference> -- 
-  #
-  # a++
-  # b--
+  #   <var> <op>;
   #
 
-  if ($token->{CLASS} eq 'ident'
-    and @tokens >= 1
-    and $tokens[0]{CLASS} eq 'op'
-    and ($tokens[0]{VALUE} eq '++' or $tokens[0]{VALUE} eq '--')
-  ) {
-    #
-    # Operator:
-    #
+  if ($token->is_ident and $lexer->get(1)->is_exfix_arith) {
+    my $ident = $token->text;
+    my $op    = $lexer->forth->text;
 
-    my $op_token = shift @tokens;
-    $line = $op_token->{LINE};
-    my $op = $op_token->{VALUE};
-
-    #
-    # Statement separator:
-    #
-
-    SYNTAX_ERROR("Expected ';' after '$op', but got end of source.")
-      unless @tokens;
-
-    SYNTAX_ERROR("Expected ';' after '$op', but got '$tokens[0]{VALUE}'.")
-      unless ($tokens[0]{CLASS} eq 'sep' and $tokens[0]{VALUE} eq ';');
-
-    my $sep_token = shift @tokens;
-    $line = $sep_token->{LINE};
-   
-    #
-    # GOOD TO GO:
-    #
+    $lexer->require_semicolon;
 
     if ($op eq '++') {
-      do_inc($_);
+      do_inc($ident);
     }
     else {
-      do_dec($_);
+      do_dec($ident);
     }
 
     next;
@@ -3204,57 +2596,48 @@ while(@tokens) {
   #
   # Arithmetic assigns:
   #
-  #   <sum> += <incremend>
-  #
-  #   <a> -= <b>
-  #   <a> *= <b>
-  #   <a> /= <b>
-  #   <a> %= <b>
-  #
-  # a += b;
-  # a += 5;
-  # a += 3.14;
+  #   <var> <op> <value>;
   #
 
-  if ($token->{CLASS} eq 'ident' and @tokens >= 1 and $tokens[0]{CLASS} eq 'op' and $tokens[0]{VARIANT} eq 'arith_assign') {
-    my $op_token = shift @tokens;
-    $line = $op_token->{LINE};
+  if ($token->is_ident and $lexer->get(1)->is_arith_assign) {
+    my $ident = $token->text;
+    my $op    = substr($lexer->forth->text, 0, 1);
+    my $value = $lexer->forth->text;
 
-    my $op = substr($op_token->{VALUE}, 0, 1);
+    $lexer->require_semicolon;
 
-    #
-    # Right hand side:
-    #
+    do_arith($ident, $ident, $op, $value);
+    next;
+  }
 
-    SYNTAX_ERROR("Expected literal or identifier after '[ <ident> = ]* <ident> =', but got end of source.")
-      unless @tokens;
+  #
+  # Bitwise assigns:
+  #
+  #   <var> <op> <value>;
+  #
 
-    SYNTAX_ERROR("Expected literal or identifier after '[ <ident> = ]* <ident> = ', but got '$tokens[0]{VALUE}'.")
-      unless $tokens[0]{CLASS} eq 'literal' or $tokens[0]{CLASS} eq 'ident';
+  if ($token->is_ident and $lexer->get(1)->is_bit_assign) {
+    my $ident = $token->text;
+    my $op    = substr($lexer->forth->text, 0, 1);
+    my $value = $lexer->forth->text;
 
-    my $value_token = shift @tokens;
-    my $line = $value_token->{LINE};
+    $lexer->require_semicolon;
 
-    my $value = $value_token->{VALUE};
-
-    #
-    # Statement separator:
-    #
-
-    SYNTAX_ERROR("Expected ';' after assignment, but got end of source.")
-      unless @tokens;
-
-    SYNTAX_ERROR("Expected ';' after assignment, but got '$tokens[0]{VALUE}'.")
-      unless ($tokens[0]{CLASS} eq 'sep' and $tokens[0]{VALUE} eq ';');
-
-    my $sep_token = shift @tokens;
-    $line = $sep_token->{LINE};
-    
-    #
-    # GOOD TO GO:
-    #
-
-    do_arith($_, $_, $op, $value);
+    if ($op eq '<<=' or $op eq '>>=') {
+      push_source "$ident $op $value";
+      do_bit_shift($op eq '<<=' ? 'l' : 'r', $ident, $ident, $value);
+    }
+    elsif ($op eq '|=') {
+      push_source "$ident |= $value";
+      do_bit_or($ident, $ident, $value);
+    }
+    elsif ($op eq '&=') {
+      push_source "$ident |= $value";
+      do_bit_and($ident, $ident, $value);
+    }
+    else {
+      INTERNAL_ERROR("Unrecognized bitwise op '$op'");
+    }
 
     next;
   }
@@ -3262,32 +2645,17 @@ while(@tokens) {
   #
   # Block Termination:
   #
-  # }
-  # } continue {
-  # } else {
+  #   }
+  #   } continue {
+  #   } else {
   #
  
-  if ($token->{CLASS} eq 'group' and $token->{VALUE} eq '}') {
+  if ($token->is_close_brace) {
     my $cont;
     
-    if (@tokens and $tokens[0]{CLASS} eq 'control' and ($tokens[0]{VALUE} eq 'continue' or $tokens[0]{VALUE} eq 'else')) {
-      my $cont_token = shift @tokens;
-      $line = $cont_token->{LINE};
-
-      $cont = $cont_token->{VALUE};
-
-      #
-      # Open brace of block:
-      #
-
-      SYNTAX_ERROR("Expected '{' after '$cont', but got end of source.")
-        unless @tokens;
-
-      SYNTAX_ERROR("Expected '{' after '$cont', but got '$tokens[0]{VALUE}'.")
-        unless ($tokens[0]{CLASS} eq 'group' and $tokens[0]{VALUE} eq '{');
-
-      my $open_brace = shift @tokens;
-      $line = $open_brace->{LINE};
+    if ($lexer->get(1)->is_continue or $lexer->get(1)->is_else) {
+      $cont = $lexer->forth->text;
+      $lexer->require_open_brace;
     }
 
     end_block($cont);
@@ -3298,34 +2666,70 @@ while(@tokens) {
   #
   # Arithmetic Operators:
   #
-  # a = b % c;
-  # a = b % 4;
-  # a = 9 % b;
-  # a = 9 % 4;
+  #   <var> = <value> <op> <value>;
   #
-  # a %= b;
-  # a %= 4;
-  #
-  # TODO: Numbers in mod (follow Calendrical calculations definition? Knuth definition?)
+  # TODO: Can't really support shift amount as arg until sh[lr]_i_i ops are implemented.
+  # TODO: Should we really be allowing the shift constant to be negative?
   #
 
-  if (@tokens >= 5
-    and $token->{CLASS} eq 'ident'
-    and ($tokens[0]{CLASS} eq 'op' and $tokens[0]{VALUE} eq '=')
-    and ($tokens[1]{CLASS} eq 'literal' or $tokens[1]{CLASS} eq 'ident')
-    and ($tokens[2]{CLASS} eq 'op' and $tokens[2]{VARIANT} eq 'arith')
-    and ($tokens[3]{CLASS} eq 'literal' or $tokens[3]{CLASS} eq 'ident')
-    and ($tokens[4]{CLASS} eq 'sep' and $tokens[4]{VALUE} eq ';')
+  if ($token->is_ident
+    and $lexer->get(1)->is_assign
+    and $lexer->get(2)->is_value
+    and $lexer->get(3)->is_infix_arith
+    and $lexer->get(4)->is_value
   ) {
-    my $assign_op  = shift @tokens;
-    my $left_expr  = shift @tokens;
-    my $arith_op   = shift @tokens;
-    my $right_expr = shift @tokens;
-    my $sep        = shift @tokens;
+    my $ident = $token->text;
 
-    $line = $sep->{LINE};
+    $lexer->require_assign;
 
-    do_arith($_, $left_expr->{VALUE}, $arith_op->{VALUE}, $right_expr->{VALUE});
+    my $left  = $lexer->forth->text;
+    my $op    = $lexer->forth->text;
+    my $right = $lexer->forth->text;
+
+    $lexer->require_semicolon;
+
+    do_arith($ident, $left, $op, $right);
+    next;
+  }
+
+  #
+  # Bitwise Operators:
+  #
+  #   a = b << 4;
+  #   a = b & c;
+  #   a = b | c;
+  #
+
+  if ($token->is_ident
+    and $lexer->get(1)->is_assign
+    and $lexer->get(2)->is_value
+    and $lexer->get(3)->is_infix_bit
+    and $lexer->get(4)->is_value
+  ) {
+    my $ident = $token->text;
+
+    $lexer->require_assign;
+
+    my $left  = $lexer->forth->text;
+    my $op    = $lexer->forth->text;
+    my $right = $lexer->forth->text;
+
+    $lexer->require_semicolon;
+
+    if ($op eq '<<' or $op eq '>>') {
+      do_shift($op eq '<<' ? 'l' : 'r', $ident, $left, $right);
+    }
+    elsif ($op eq '&') {
+      push_source "$ident = $left \& $right";
+      do_bit_and($ident, $left, $right);
+    }
+    elsif ($op eq '|') {
+      push_source "$ident = $left | $right";
+      do_bit_or($ident, $left, $right);
+    }
+    else {
+      INTERNAL_ERROR("Unrecognized bitwise op '$op'");
+    }
 
     next;
   }
@@ -3333,76 +2737,28 @@ while(@tokens) {
   #
   # Subroutine Calls:
   #
-  #     foo(...);
+  #     <ident>(<arg>, <arg>, ...);
   #
  
-  if ($token->{CLASS} eq 'ident'
-    and @tokens 
-    and ($tokens[0]{CLASS} eq 'group' and $tokens[0]{VALUE} eq '(')
-  ) {
-    #
-    # Open paren of call:
-    #
+  if ($token->is_ident and $lexer->get(1)->is_open_paren) {
+    my $sub_name = $token->text;
 
-    my $open_paren = shift @tokens;
-    $line = $open_paren->{LINE};
+    $lexer->require_open_paren;
 
     my @args = ();
 
-    while (1) {
-      SYNTAX_ERROR("Expected expression or ')' after '$_([ <expr>, ]*', but got end of source.")
-        unless @tokens;
-
-      SYNTAX_ERROR("Expected expression or ')' after '$_([ <expr>, ]*', but got '$tokens[0]{VALUE}'.")
-        unless $tokens[0]{CLASS} eq 'literal' or $tokens[0]{CLASS} eq 'ident'
-        or ($tokens[0]{CLASS} eq 'group' and $tokens[0]{VALUE} eq ')');
-
-      last if ($tokens[0]{CLASS} eq 'group' and $tokens[0]{VALUE} eq ')');
-
-      my $expr_token = shift @tokens;
-      $line = $expr_token->{LINE};
-      push @args, $expr_token->{VALUE};
-
-      last unless @tokens and $tokens[0]{CLASS} eq 'sep' and $tokens[0]{VALUE} eq ',';
-
-      SYNTAX_ERROR("Expected ',' or ')' after expression, but got end of source.")
-        unless @tokens;
-
-      SYNTAX_ERROR("Expected ',' or ')' after expression, but got '$tokens[0]{VALUE}'.")
-        unless ($tokens[0]{CLASS} eq 'sep' and $tokens[0]{VALUE} eq ',')
-        or ($tokens[0]{CLASS} eq 'group' and $tokens[0]{VALUE} eq ')');
-
-      last if ($tokens[0]{CLASS} eq 'group' and $tokens[0]{VALUE} eq ')');
-
-      my $sep_token = shift @tokens;
-      $line = $sep_token->{LINE};
+    unless ($lexer->get(1)->is_close_paren) {
+      while (1) {
+        push @args, $lexer->require_value->text;
+        last if $lexer->get(1)->is_close_paren;
+        $lexer->require_comma;
+      }
     }
 
-    #
-    # Close paren of call:
-    #
+    $lexer->require_close_paren;
+    $lexer->require_semicolon;
 
-    my $close_paren = shift @tokens;
-    $line = $close_paren->{LINE};
- 
-    #
-    # Statement separator:
-    #
-
-    SYNTAX_ERROR("Expected ';' after call, but got end of source.")
-      unless @tokens;
-
-    SYNTAX_ERROR("Expected ';' after call, but got '$tokens[0]{VALUE}'.")
-      unless ($tokens[0]{CLASS} eq 'sep' and $tokens[0]{VALUE} eq ';');
-
-    my $sep_token = shift @tokens;
-    $line = $sep_token->{LINE};
-
-    #
-    # GOOD TO GO:
-    #
-
-    void_func($_, @args);
+    void_func($sub_name, @args);
     
     next;
   }
@@ -3413,369 +2769,107 @@ while(@tokens) {
   # a = foo(...);
   #
 
-  if ($token->{CLASS} eq 'ident'
-    and @tokens >= 3
-    and ($tokens[0]{CLASS} eq 'op' and $tokens[0]{VALUE} eq '=')
-    and $tokens[1]{CLASS} eq 'ident'
-    and ($tokens[2]{CLASS} eq 'group' and $tokens[2]{VALUE} eq '(')
+  if ($token->is_ident
+    and $lexer->get(1)->is_assign
+    and $lexer->get(2)->is_ident
+    and $lexer->get(3)->is_open_paren
   ) {
-    #
-    # Assignment operator:
-    #
+    my $left = $token->text;
 
-    my $op_token = shift @tokens;
-    $line = $op_token->{LINE};
+    $lexer->require_assign;
 
-    #
-    # Function name:
-    #
+    my $func_name = $lexer->require_ident->text;
 
-    my $func_name_token = shift @tokens;
-    $line = $func_name_token->{LINE};
-    my $func_name = $func_name_token->{VALUE};
-
-    #
-    # Open paren of call:
-    #
-
-    my $open_paren = shift @tokens;
-    $line = $open_paren->{LINE};
+    $lexer->require_open_paren;
 
     my @args = ();
 
-    while (1) {
-      SYNTAX_ERROR("Expected expression or ')' after '$_([ <expr>, ]*', but got end of source.")
-        unless @tokens;
-
-      SYNTAX_ERROR("Expected expression or ')' after '$_([ <expr>, ]*', but got '$tokens[0]{VALUE}'.")
-        unless $tokens[0]{CLASS} eq 'literal' or $tokens[0]{CLASS} eq 'ident'
-        or ($tokens[0]{CLASS} eq 'group' and $tokens[0]{VALUE} eq ')');
-
-      last if ($tokens[0]{CLASS} eq 'group' and $tokens[0]{VALUE} eq ')');
-
-      my $expr_token = shift @tokens;
-      $line = $expr_token->{LINE};
-      push @args, $expr_token->{VALUE};
-
-      last unless @tokens and $tokens[0]{CLASS} eq 'sep' and $tokens[0]{VALUE} eq ',';
-
-      SYNTAX_ERROR("Expected ',' or ')' after expression, but got end of source.")
-        unless @tokens;
-
-      SYNTAX_ERROR("Expected ',' or ')' after expression, but got '$tokens[0]{VALUE}'.")
-        unless ($tokens[0]{CLASS} eq 'sep' and $tokens[0]{VALUE} eq ',')
-        or ($tokens[0]{CLASS} eq 'group' and $tokens[0]{VALUE} eq ')');
-
-      last if ($tokens[0]{CLASS} eq 'group' and $tokens[0]{VALUE} eq ')');
-
-      my $sep_token = shift @tokens;
-      $line = $sep_token->{LINE};
+    unless ($lexer->get(1)->is_close_paren) {
+      while (1) {
+        push @args, $lexer->require_value->text;
+        last if $lexer->get(1)->is_close_paren;
+        $lexer->require_comma;
+      }
     }
 
-    #
-    # Close paren of call:
-    #
-
-    my $close_paren = shift @tokens;
-    $line = $close_paren->{LINE};
- 
-    #
-    # Statement separator:
-    #
-
-    SYNTAX_ERROR("Expected ';' after call, but got end of source.")
-      unless @tokens;
-
-    SYNTAX_ERROR("Expected ';' after call, but got '$tokens[0]{VALUE}'.")
-      unless ($tokens[0]{CLASS} eq 'sep' and $tokens[0]{VALUE} eq ';');
-
-    my $sep_token = shift @tokens;
-    $line = $sep_token->{LINE};
-
-    assign_func($_, $func_name, @args);
+    $lexer->require_close_paren;
+    $lexer->require_semicolon;
+     
+    assign_func($left, $func_name, @args);
     next;
   }
 
   #
   # Variable Assignments:
   #
-  # var int a, b, c;
-  # var num d, e;
-  # var str f, g;
-  #
-  # a = 5;
-  # a = b = c = 5;
-  #
-  # d = 3.14;
-  # d = e = 3.14;
-  #
-  # f = "Howdy";
-  # f = g = "Howdy";
-  #
-  # a = b;
-  # a = b = c;
+  #   <ident> = <value>;
+  #   <ident> = <ident> = ... = <value>;
   #
  
-  if ($token->{CLASS} eq 'ident'
-    and @tokens >= 1
-    and ($tokens[0]{CLASS} eq 'op' and $tokens[0]{VALUE} eq '=')
-  ) {
-    my $op_token = shift @tokens;
-    $line = $op_token->{LINE};
+  if ($token->is_ident and $lexer->get(1)->is_assign) {
+    my @left = ($token->text);
 
-    #
-    # Left hand side:
-    #
+    $lexer->require_assign;
 
-    my @identifiers = ($_);
-
-    while (@tokens >= 2 and $tokens[0]{CLASS} eq 'ident' and $tokens[1]{CLASS} eq 'op' and $tokens[1]{VALUE} eq '=') {
-      my $ident_token = shift @tokens;
-      $line = $ident_token->{LINE};
-      my $op_token = shift @tokens;
-      $line = $op_token->{LINE};
-
-      push @identifiers, $ident_token->{VALUE};
+    while ($lexer->get()->is_ident and $lexer->get(1)->is_assign) {
+      push @left, $lexer->get()->text;
+      $lexer->require_assign;
     }
 
-    #
-    # Right hand side:
-    #
+    my $right = $lexer->require_value->text;
 
-    SYNTAX_ERROR("Expected literal or identifier after '[ <ident> = ]* <ident> =', but got end of source.")
-      unless @tokens;
+    $lexer->require_semicolon;
 
-    SYNTAX_ERROR("Expected literal or identifier after '[ <ident> = ]* <ident> = ', but got '$tokens[0]{VALUE}'.")
-      unless $tokens[0]{CLASS} eq 'literal' or $tokens[0]{CLASS} eq 'ident';
-
-    my $value_token = shift @tokens;
-    my $line = $value_token->{LINE};
-
-    my $value = $value_token->{VALUE};
-
-    #
-    # Statement separator:
-    #
-
-    SYNTAX_ERROR("Expected ';' after assignment, but got end of source.")
-      unless @tokens;
-
-    SYNTAX_ERROR("Expected ';' after assignment, but got '%s'.", $tokens[0]{VALUE})
-      unless ($tokens[0]{CLASS} eq 'sep' and $tokens[0]{VALUE} eq ';');
-
-    my $sep_token = shift @tokens;
-    $line = $sep_token->{LINE};
-    
-    #
-    # GOOD TO GO:
-    #
-
-    foreach my $ident (@identifiers) {
-      if ($value_token->{CLASS} eq 'literal') {
-        assign_var($ident, $value_token->{TYPE}, $value_token->{VALUE});
-      }
-      elsif ($value_token->{CLASS} eq 'ident') {
-        assign_var($ident, '*', $value_token->{VALUE}); # TODO: Cloning for 'obj' vars?
-      }
-      else {
-        INTERNAL_ERROR("Unexpected value token class.");
-      }
+    foreach my $left (@left) {
+      assign_var($left, type_of($right), $right);
     }
-
     next;
   }
 
   #
   # Subroutine Return Statements:
   #
-  # return
-  # return 0
-  # return 0.0
-  # return "foo"
-  # return bar
+  #   return;
+  #   return <value>;
   #
 
-  if ($token->{CLASS} eq 'control' and $token->{VALUE} eq 'return') {
-    #
-    # Return value:
-    #
+  if ($token->is_return) {
+    my $value = $lexer->skip_value->text;
 
-#    DEBUG(0, "TOKENS: %s", join(" | ", map { $_->{VALUE} } @tokens[0..10]));
-
-    SYNTAX_ERROR("Expected expression or ';' after 'return' but got end of source.")
-      unless @tokens;
-
-    SYNTAX_ERROR("Expected expression or ';' after 'return' but got '$tokens[0]{VALUE}'.")
-      unless $tokens[0]{CLASS} eq 'ident'
-      or $tokens[0]{CLASS} eq 'literal'
-      or ($tokens[0]{CLASS} eq 'sep' and $tokens[0]{CLASS} eq ';');
-
-    my $value;
-
-    unless ($tokens[0]{CLASS} eq 'sep' and $tokens[0]{CLASS} eq ';') {
-      my $value_token = shift @tokens;
-      $line = $value_token->{LINE};
-      $value = $value_token->{VALUE};
-
-#      DEBUG(0, "Got return value '%s'", $value);
-    }
-
-    #
-    # Statement separator:
-    #
-
-    SYNTAX_ERROR("Expected ';' after return statement, but got end of source.")
-      unless @tokens;
-
-    SYNTAX_ERROR("Expected ';' after return statement, but got '%s'.", $tokens[0]{VALUE})
-      unless ($tokens[0]{CLASS} eq 'sep' and $tokens[0]{VALUE} eq ';');
-
-    my $sep_token = shift @tokens;
-    $line = $sep_token->{LINE};
-    
-    #
-    # GOOD TO GO:
-    #
+    $lexer->require_semicolon;
 
     do_return($value);
-
     next;
   }
 
   #
   # Goto Statements:
   #
-  # goto LABEL
-  # goto LABEL if (...)
-  # goto LABEL unless (...)
+  #   goto <label>;
+  #   goto <label> if (<value> <op> <value>);
+  #   goto <label> unless (<value> <op> <value>);
   #
 
-  if ($token->{CLASS} eq 'control' and $token->{VALUE} eq 'goto') {
-    #
-    # Target label:
-    #
+  if ($token->is_goto) {
+    my $target = $lexer->require_ident->text;
 
-    SYNTAX_ERROR("Expected label after 'goto', but got end of source.")
-      unless @tokens;
+    my ($cond, $left, $op, $right);
 
-    SYNTAX_ERROR("Expected label after 'goto', but got '%s'.", $tokens[0]{VALUE})
-      unless $tokens[0]{CLASS} eq 'ident';
+    if ($lexer->get(1)->is_if or $lexer->get(1)->is_unless) {
+      $cond = $lexer->forth->text;
 
-    my $target_token = shift @tokens;
-    $line = $target_token->{LINE};
-    my $target = $target_token->{VALUE};
-
-    #
-    # Check for statement modifiers:
-    #
-
-    SYNTAX_ERROR("Expected 'if', 'unless' or ';' after label, but got end of source.")
-      unless @tokens;
-
-    SYNTAX_ERROR("Expected 'if', 'unless' or ';' after label, but got '%s'.", $tokens[0]{VALUE})
-      unless ($tokens[0]{CLASS} eq 'sep' and $tokens[0]{VARIANT} eq 'stmt')
-      or ($tokens[0]{CLASS} eq 'control' and ($tokens[0]{VALUE} eq 'if' or $tokens[0]{VALUE} eq 'unless'));
-    
-    my $cond;
-
-    my $left;
-    my $relop;
-    my $right;
-
-    if ($tokens[0]{CLASS} ne 'sep') {
-      my $cond_token = shift @tokens;
-      $line = $cond_token->{LINE};
-      $cond = $cond_token->{VALUE};
-
-      #
-      # Open paren of condition:
-      #
-
-      SYNTAX_ERROR("Expected '(' after '$cond', but got end of source.")
-        unless @tokens;
-
-      SYNTAX_ERROR("Expected '(' after '$cond', but got '$tokens[0]{VALUE}'.")
-        unless ($tokens[0]{CLASS} eq 'group' and $tokens[0]{VALUE} eq '(');
-
-      my $open_paren = shift @tokens;
-      $line = $open_paren->{LINE};
-
-      #
-      # Left token of condition:
-      #
-
-      SYNTAX_ERROR("Expected identifier or literal after '(', but got end of source.")
-        unless @tokens;
-
-      SYNTAX_ERROR("Expected identifier or literal after '(', but got '$tokens[0]{VALUE}'.")
-        unless ($tokens[0]{CLASS} eq 'ident' or $tokens[0]{CLASS} eq 'literal');
-
-      my $left_token = shift @tokens;
-      $line = $left_token->{LINE};
-      $left = $left_token->{VALUE};
-
-      #
-      # Relational operator of condition:
-      #
-
-      SYNTAX_ERROR("Expected relational operator after '$left', but got end of source.")
-        unless @tokens;
-
-      SYNTAX_ERROR("Expected relational operator after '$left', but got '$tokens[0]{VALUE}'.")
-        unless ($tokens[0]{CLASS} eq 'op' and $tokens[0]{VARIANT} eq 'rel');
-
-      my $relop_token = shift @tokens;
-      $line = $relop_token->{LINE};
-      $relop = $relop_token->{VALUE};
-
-      #
-      # Right token of condition:
-      #
-
-      SYNTAX_ERROR("Expected identifier or literal after '$relop', but got end of source.")
-        unless @tokens;
-
-      SYNTAX_ERROR("Expected identifier or literal after '$relop', but got '$tokens[0]{VALUE}'.")
-        unless ($tokens[0]{CLASS} eq 'ident' or $tokens[0]{CLASS} eq 'literal');
-
-      my $right_token = shift @tokens;
-      $line = $right_token->{LINE};
-      $right = $right_token->{VALUE};
-
-      #
-      # Close paren of condition:
-      #
-
-      SYNTAX_ERROR("Expected ')' after condition, but got end of source.")
-        unless @tokens;
-
-      SYNTAX_ERROR("Expected ')' after condition, but got '$tokens[0]{VALUE}'.")
-        unless ($tokens[0]{CLASS} eq 'group' and $tokens[0]{VALUE} eq ')');
-
-      my $close_paren = shift @tokens;
-      $line = $close_paren->{LINE};
+      $lexer->require_open_paren;
+      $left  = $lexer->require_value->text;
+      $op    = $lexer->require_infix_rel->text;
+      $right = $lexer->require_value->text;
+      $lexer->require_close_paren;
     }
- 
-    #
-    # Terminating semicolon:
-    #
 
-    SYNTAX_ERROR("Expected ';' after goto statement, but got end of source.")
-      unless @tokens;
-
-    SYNTAX_ERROR("Expected ';' after goto statement, but got '%s'.", $tokens[0]{VALUE})
-      unless ($tokens[0]{CLASS} eq 'sep' and $tokens[0]{VARIANT} eq 'stmt');
-
-    my $sep_token = shift @tokens;
-    $line = $sep_token->{LINE};
-
-    #
-    # GOOD TO GO:
-    #
+    $lexer->require_semicolon;
 
     if ($cond) {
-      push_source "goto $target $cond ($left $relop $right);";
-      op_comp $cond, $relop, $left, $right, $target, undef;
+      push_source "goto $target $cond ($left $op $right);";
+      op_comp $cond, $op, $left, $right, $target, undef;
     }
     else {
       push_source "goto $target;";
@@ -3788,158 +2882,54 @@ while(@tokens) {
   #
   # Loop Control Statements:
   #
-  # next
-  # next          if (...)
-  # next          unless (...)
-  # next LOOPNAME
-  # next LOOPNAME if (...)
-  # next LOOPNAME unless (...)
+  #   next;
+  #   next if     (<value> <op> <value>);
+  #   next unless (<value> <op> <value>);
   #
-  # last
-  # last          if (...)
-  # last          unless (...)
-  # last LOOPNAME
-  # last LOOPNAME if (...)
-  # last LOOPNAME unless (...)
+  #   next <label>;
+  #   next <label> if     (<value> <op> <value>);
+  #   next <label> unless (<value> <op> <value>);
   #
-  # redo
-  # redo          if (...)
-  # redo          unless (...)
-  # redo LOOPNAME
-  # redo LOOPNAME if (...)
-  # redo LOOPNAME unless (...)
+  #   last;
+  #   last if     (<value> <op> <value>);
+  #   last unless (<value> <op> <value>);
   #
-  # NOTE: A LOOPNAME is just the label used when introducing a LOOP.
+  #   last <label>;
+  #   last <label> if     (<value> <op> <value>);
+  #   last <label> unless (<value> <op> <value>);
+  #
+  #   redo;
+  #   redo if     (<value> <op> <value>);
+  #   redo unless (<value> <op> <value>);
+  #
+  #   redo <label>;
+  #   redo <label> if     (<value> <op> <value>);
+  #   redo <label> unless (<value> <op> <value>);
   #
 
-  if ($token->{CLASS} eq 'control' and $token->{VARIANT} eq 'other'
-    and ($token->{VALUE} eq 'next' or $token->{VALUE} eq 'last' or $token->{VALUE} eq 'redo')
-  ) {
-    my $control = $_;
+  if ($token->is_loop_control) {
+    my $control = $token->text;
 
-    #
-    # Target label:
-    #
+    my $target_token = $lexer->skip_ident;
 
     my $target;
+    $target = $target_token->text if $target_token;
 
-    if (@tokens and $tokens[0]{CLASS} eq 'ident') {
-      my $target_token = shift @tokens;
-      $line = $target_token->{LINE};
-      $target = $target_token->{VALUE};
-      $_ = $target;
+    my ($cond, $left, $op, $right);
+
+    if ($lexer->get(1)->is_if or $lexer->get(1)->is_unless) {
+      $cond = $lexer->forth->text;
+
+      $lexer->require_open_paren;
+      $left  = $lexer->require_value->text;
+      $op    = $lexer->require_infix_rel->text;
+      $right = $lexer->require_value->text;
+      $lexer->require_close_paren;
     }
 
-    #
-    # Check for statement modifiers:
-    #
+    $lexer->require_semicolon;
 
-    SYNTAX_ERROR("Expected 'if', 'unless' or ';' after '$_', but got end of source.")
-      unless @tokens;
-
-    SYNTAX_ERROR("Expected 'if', 'unless' or ';' after '$_', but got '%s'.", $tokens[0]{VALUE})
-      unless ($tokens[0]{CLASS} eq 'sep' and $tokens[0]{VARIANT} eq 'stmt')
-      or ($tokens[0]{CLASS} eq 'control' and ($tokens[0]{VALUE} eq 'if' or $tokens[0]{VALUE} eq 'unless'));
-    
-    my $cond;
-
-    my $left;
-    my $relop;
-    my $right;
-
-    if ($tokens[0]{CLASS} ne 'sep') {
-      my $cond_token = shift @tokens;
-      $line = $cond_token->{LINE};
-      $cond = $cond_token->{VALUE};
-
-      #
-      # Open paren of condition:
-      #
-
-      SYNTAX_ERROR("Expected '(' after '$cond', but got end of source.")
-        unless @tokens;
-
-      SYNTAX_ERROR("Expected '(' after '$cond', but got '$tokens[0]{VALUE}'.")
-        unless ($tokens[0]{CLASS} eq 'group' and $tokens[0]{VALUE} eq '(');
-
-      my $open_paren = shift @tokens;
-      $line = $open_paren->{LINE};
-
-      #
-      # Left token of condition:
-      #
-
-      SYNTAX_ERROR("Expected identifier or literal after '(', but got end of source.")
-        unless @tokens;
-
-      SYNTAX_ERROR("Expected identifier or literal after '(', but got '$tokens[0]{VALUE}'.")
-        unless ($tokens[0]{CLASS} eq 'ident' or $tokens[0]{CLASS} eq 'literal');
-
-      my $left_token = shift @tokens;
-      $line = $left_token->{LINE};
-      $left = $left_token->{VALUE};
-
-      #
-      # Relational operator of condition:
-      #
-
-      SYNTAX_ERROR("Expected relational operator after '$left', but got end of source.")
-        unless @tokens;
-
-      SYNTAX_ERROR("Expected relational operator after '$left', but got '$tokens[0]{VALUE}'.")
-        unless ($tokens[0]{CLASS} eq 'op' and $tokens[0]{VARIANT} eq 'rel');
-
-      my $relop_token = shift @tokens;
-      $line = $relop_token->{LINE};
-      $relop = $relop_token->{VALUE};
-
-      #
-      # Right token of condition:
-      #
-
-      SYNTAX_ERROR("Expected identifier or literal after '$relop', but got end of source.")
-        unless @tokens;
-
-      SYNTAX_ERROR("Expected identifier or literal after '$relop', but got '$tokens[0]{VALUE}'.")
-        unless ($tokens[0]{CLASS} eq 'ident' or $tokens[0]{CLASS} eq 'literal');
-
-      my $right_token = shift @tokens;
-      $line = $right_token->{LINE};
-      $right = $right_token->{VALUE};
-
-      #
-      # Close paren of condition:
-      #
-
-      SYNTAX_ERROR("Expected ')' after condition, but got end of source.")
-        unless @tokens;
-
-      SYNTAX_ERROR("Expected ')' after condition, but got '$tokens[0]{VALUE}'.")
-        unless ($tokens[0]{CLASS} eq 'group' and $tokens[0]{VALUE} eq ')');
-
-      my $close_paren = shift @tokens;
-      $line = $close_paren->{LINE};
-    }
- 
-    #
-    # Terminating semicolon:
-    #
-
-    SYNTAX_ERROR("Expected ';' after goto statement, but got end of source.")
-      unless @tokens;
-
-    SYNTAX_ERROR("Expected ';' after goto statement, but got '%s'.", $tokens[0]{VALUE})
-      unless ($tokens[0]{CLASS} eq 'sep' and $tokens[0]{VARIANT} eq 'stmt');
-
-    my $sep_token = shift @tokens;
-    $line = $sep_token->{LINE};
-
-    #
-    # GOOD TO GO:
-    #
-
-    do_loop_control($control, $target, $cond, $left, $relop, $right);
-    
+    do_loop_control($control, $target, $cond, $left, $op, $right);
     next;
   }
 
@@ -3950,23 +2940,10 @@ while(@tokens) {
   # TODO: Implement other stuff and put it before this.
   #
 
-  SYNTAX_ERROR("Don't know what to do with token '$_'.");
+  SYNTAX_ERROR("Don't know what to do with token '%s'.", $token->text);
 
 
 
-
-  #
-  # Arithmetic Operators:
-  #
-  # a %= b;
-  # a %= 4;
-  #
-
-  if (m/^([A-Za-z][A-Za-z0-9_]*)\s*[%]=\s*(([A-Za-z][A-Za-z0-9_]*)|(-?\d+))$/) {
-    push_source "$1 \%= $2";
-    do_mod($1, $1, $2);
-    next;
-  }
 
   #
   # Object Construction:
@@ -3996,250 +2973,6 @@ while(@tokens) {
   if (m/^}\s*(elsif)\s*\(\s*(.*)\s*\)\s*{$/) {
     begin_block(undef, $1, $2);
     # TODO
-    next;
-  }
-
-  #
-  # Additive Operators:
-  #
-  # a = b    + c;     # add_[in]
-  # a = b    + 5;     # add_i_ic (psuedo-op)
-  # a = b    + 3.14;  # add_n_nc (psuedo-op)
-  # a = 5    + b;     # add_ic_i (pseudo-op)
-  # a = 3.14 + b;     # add_nc_n (pseudo-op)
-  # a = 5    + 2;     # set_i (COMPILE-TIME EVALUATION)
-  # a = 3.14 + 0.16;  # set_n (COMPILE-TIME EVALUATION)
-  # a = 5    + 0.16;  # set_n (COMPILE-TIME EVALUATION)
-  # a = 3.14 + 2;     # set_n (COMPILE-TIME EVALUATION)
-  #
-
-  if (m!^([A-Za-z][A-Za-z0-9_]*)\s*=\s*(([A-Za-z][A-Za-z0-9_]*)|(-?\d+(\.\d+)?))\s*[+]\s*(([A-Za-z][A-Za-z0-9_]*)|(-?\d+(\.\d+)?))$!) {
-    #
-    # Regexp Captures:
-    #
-    #  1. LHS sum (variable name)
-    #  2. RHS augend
-    #  3. RHS augend (variable name)
-    #  4. RHS augend (number)
-    #  5. RHS augend (number's decimal places) -- used for grouping, not capture
-    #  6. RHS addend
-    #  7. RHS addend (variable name)
-    #  8. RHS addend (number)
-    #  9. RHS addend (number's decimal places) -- used for grouping, not capture
-    #
-
-    if (defined $3 or defined $7) {
-      do_add($1, $2, $6);
-    } elsif (defined $4 and defined $8) {
-      assign_var($1, (defined $5 or defined $9 ? 'N' : 'I'), $4 + $8);
-    } else {
-      SYNTAX_ERROR("Bad addition '%s'.", $_);
-    }
-    next;
-  }
-
-  #
-  # Subtractive Operators:
-  #
-  # a = b    - c;     # sub_[in]
-  # a = b    - 5;     # sub_i_ic (pseudo-op)
-  # a = b    - 3.14;  # sub_n_nc (pseudo-op)
-  # a = 5    - b;     # sub_ic_i (pseudo-op)
-  # a = 3.14 - b;     # sub_nc_n (pseudo-op)
-  # a = 5    - 2;     # set_i (COMPILE-TIME EVALUATION)
-  # a = 3.14 - 0.16;  # set_n (COMPILE-TIME EVALUATION)
-  # a = 5    - 0.16;  # set_n (COMPILE-TIME EVALUATION)
-  # a = 3.14 - 2;     # set_n (COMPILE-TIME EVALUATION)
-  #
-  # a -= b;           # dec_{i_i,n_n} (pseudo-op)
-  # a -= 5;           # sub_i_ic (pseudo-op)
-  # a -= 3.14;        # sub_n_nc (pseudo-op)
-  #
-  # a--;              # dec_[in]
-  #
-
-  if (m!^([A-Za-z][A-Za-z0-9_]*)\s*=\s*(([A-Za-z][A-Za-z0-9_]*)|(-?\d+(\.\d+)?))\s*[-]\s*(([A-Za-z][A-Za-z0-9_]*)|(-?\d+(\.\d+)?))$!) {
-    #
-    # Regexp Captures:
-    #
-    #  1. LHS difference (variable name)
-    #  2. RHS minuend
-    #  3. RHS minuend (variable name)
-    #  4. RHS minuend (number)
-    #  5. RHS minuend (number's decimal places) -- used for grouping, not capture
-    #  6. RHS subtrahend
-    #  7. RHS subtrahend (variable name)
-    #  8. RHS subtrahend (number)
-    #  9. RHS subtrahend (number's decimal places) -- used for grouping, not capture
-    #
-
-    if (defined $3 or defined $7) {
-      do_sub($1, $2, $6);
-    } elsif (defined $4 and defined $8) {
-      assign_var($1, (defined $5 or defined $9 ? 'N' : 'I'), $4 - $8);
-    } else {
-      SYNTAX_ERROR("... in subtraction");
-    }
-    next;
-  }
-
-  if (m!^([A-Za-z][A-Za-z0-9_]*)\s*[-]=\s*(([A-Za-z][A-Za-z0-9_]*)|(-?\d+(\.\d+)?))$!) {
-    if (defined $3) {
-      do_sub($1, $1, $2);
-    } else {
-      do_dec($1, $2);
-    }
-    next;
-  }
-
-  if (m!^([A-Za-z][A-Za-z0-9_]*)\s*[-][-]$!) {
-    do_dec($1);
-    next;
-  }
-
-  #
-  # Multiplicative Operators:
-  #
-  # a = b    * c;     # mul_[in]
-  # a = b    * 5;     # mul_i_ic (psuedo-op)
-  # a = b    * 3.14;  # mul_n_nc (psuedo-op)
-  # a = 5    * b;     # mul_ic_i (pseudo-op)
-  # a = 3.14 * b;     # mul_nc_n (pseudo-op)
-  # a = 5    * 2;     # set_i (COMPILE-TIME EVALUATION)
-  # a = 3.14 * 0.16;  # set_n (COMPILE-TIME EVALUATION)
-  # a = 5    * 0.16;  # set_n (COMPILE-TIME EVALUATION)
-  # a = 3.14 * 2;     # set_n (COMPILE-TIME EVALUATION)
-  #
-  # a *= b;           # mul_[in]
-  # a *= 5;           # mul_i_ic (pseudo-op)
-  # a *= 3.14;        # mul_n_nc (pseudo-op)
-  #
-
-  if (m!^([A-Za-z][A-Za-z0-9_]*)\s*=\s*(([A-Za-z][A-Za-z0-9_]*)|(-?\d+(\.\d+)?))\s*[*]\s*(([A-Za-z][A-Za-z0-9_]*)|(-?\d+(\.\d+)?))$!) {
-    #
-    # Regexp Captures:
-    #
-    #  1. LHS product (variable name)
-    #  2. RHS multiplicand
-    #  3. RHS multiplicand (variable name)
-    #  4. RHS multiplicand (number)
-    #  5. RHS multiplicand (number's decimal places) -- used for grouping, not capture
-    #  6. RHS multiplier
-    #  7. RHS multiplier (variable name)
-    #  8. RHS multiplier (number)
-    #  9. RHS multiplier (number's decimal places) -- used for grouping, not capture
-    #
-
-    if (defined $3 or defined $7) {
-      do_mul($1, $2, $6);
-    } elsif (defined $4 and defined $8) {
-      assign_var($1, (defined $5 or defined $9 ? 'N' : 'I'), $4 * $8);
-    } else {
-      SYNTAX_ERROR("... in multiplication.");
-    }
-    next;
-  }
-
-  if (m!^([A-Za-z][A-Za-z0-9_]*)\s*[*]=\s*(([A-Za-z][A-Za-z0-9_]*)|(-?\d+(\.\d+)?))$!) {
-    do_mul($1, $1, $2);
-    next;
-  }
-
-  #
-  # Divisive Operators:
-  #
-  # a = b    / c;     # div_[in]
-  # a = b    / 5;     # div_i_ic (psuedo-op)
-  # a = b    / 3.14;  # div_n_nc (psuedo-op)
-  # a = 5    / b;     # div_ic_i (pseudo-op)
-  # a = 3.14 / b;     # div_nc_n (pseudo-op)
-  # a = 5    / 2;     # set_i (COMPILE-TIME EVALUATION)
-  # a = 3.14 / 0.16;  # set_n (COMPILE-TIME EVALUATION)
-  # a = 5    / 0.16;  # set_n (COMPILE-TIME EVALUATION)
-  # a = 3.14 / 2;     # set_n (COMPILE-TIME EVALUATION)
-  #
-  # a /= b;           # div_[in]
-  # a /= 5;           # div_i_ic (pseudo-op)
-  # a /= 3.14;        # div_n_nc (pseudo-op)
-  #
-
-  if (m!^([A-Za-z][A-Za-z0-9_]*)\s*=\s*(([A-Za-z][A-Za-z0-9_]*)|(-?\d+(\.\d+)?))\s*[/]\s*(([A-Za-z][A-Za-z0-9_]*)|(-?\d+(\.\d+)?))$!) {
-    #
-    # Regexp Captures:
-    #
-    #  1. LHS quotient (variable name)
-    #  2. RHS dividend
-    #  3. RHS dividend (variable name)
-    #  4. RHS dividend (number)
-    #  5. RHS dividend (number's decimal places) -- used for grouping, not capture
-    #  6. RHS divisor
-    #  7. RHS divisor (variable name)
-    #  8. RHS divisor (number)
-    #  9. RHS divisor (number's decimal places) -- used for grouping, not capture
-    #
-
-    push_source "$1 = $2 / $6";
-
-    if (defined $3 or defined $7) {
-      do_div($1, $2, $6);
-    } elsif (defined $4 and defined $8) {
-      assign_var($1, (defined $5 or defined $9 ? 'N' : 'I'), $4 / $8);
-    } else {
-      SYNTAX_ERROR("... in division.");
-    }
-
-    next;
-  }
-
-  if (m!^([A-Za-z][A-Za-z0-9_]*)\s*[\/]=\s*(([A-Za-z][A-Za-z0-9_]*)|(-?\d+(\.\d+)?))$!) {
-    do_div($1, $1, $2);
-    next;
-  }
-
-  #
-  # Bitwise Operators:
-  #
-  # a = b << 4;
-  # a <<= 4;
-  # a = b & c;
-  # a = b | c;
-  #
-  # TODO: Can't really support shift amount as arg until sh[lr]_i_i ops are implemented.
-  #
-  # TODO: Should we really be allowing the shift contant to be negative?
-  #
-
-  if (m/^([A-Za-z][A-Za-z0-9_]*)\s*=\s*([A-Za-z][A-Za-z0-9_]*)\s*(<<|>>)\s*(([A-Za-z][A-Za-z0-9_]*)|(-?\d+))$/) {
-    do_shift($3 eq '<<' ? 'l' : 'r', $1, $2, $4);
-    next;
-  }
-
-  if (m/^([A-Za-z][A-Za-z0-9_]*)\s*((<<|>>)=)\s*(([A-Za-z][A-Za-z0-9_]*)|(-?\d+))$/) {
-    do_shift($4 eq '<<' ? 'l' : 'r', $1, $2, $5);
-    next;
-  }
-
-  if (m/^([A-Za-z][A-Za-z0-9_]*)\s*=\s*(([A-Za-z][A-Za-z0-9_]*)|(-?\d+))\s*[&]\s*(([A-Za-z][A-Za-z0-9_]*)|((-?\d+)|(0b[01]+)|(0[0-7]+)|(0x[0-9a-f]+)))$/) {
-    push_source "$1 = $2 \& $5";
-    do_bit_and($1, $2, $5);
-    next;
-  }
-
-  if (m/^([A-Za-z][A-Za-z0-9_]*)\s*[&]=\s*(([A-Za-z][A-Za-z0-9_]*)|(-?\d+))$/) {
-    push_source "$1 \&= $2";
-    do_bit_and($1, $1, $2);
-    next;
-  }
-
-  if (m/^([A-Za-z][A-Za-z0-9_]*)\s*=\s*(([A-Za-z][A-Za-z0-9_]*)|(-?\d+))\s*[|]\s*(([A-Za-z][A-Za-z0-9_]*)|((-?\d+)|(0b[01]+)|(0[0-7]+)|(0x[0-9a-f]+)))$/) {
-    push_source "$1 = $2 | $5";
-    do_bit_or($1, $2, $5);
-    next;
-  }
-
-  if (m/^([A-Za-z][A-Za-z0-9_]*)\s*[|]=\s*(([A-Za-z][A-Za-z0-9_]*)|(-?\d+))$/) {
-    push_source "$1 |= $2";
-    do_bit_or($1, $1, $2);
     next;
   }
 

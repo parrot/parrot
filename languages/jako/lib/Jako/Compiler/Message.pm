@@ -12,11 +12,11 @@ use warnings;
 
 package Jako::Compiler::Message;
 
-our ($source_file, $line, $debug);
+our ($file, $line, $debug);
 
 BEGIN {
   use base qw(Exporter);
-  our @EXPORT = qw($source_file $line $debug &DEBUG &WARNING &PARSE_ERROR &SYNTAX_ERROR &INTERNAL_ERROR);
+  our @EXPORT = qw($file $line $debug &DEBUG &WARNING &PARSE_ERROR &SYNTAX_ERROR &INTERNAL_ERROR);
 
   use Carp;
   our @CARP_NOT = qw(Jako::Compiler::Message);
@@ -31,7 +31,10 @@ sub DEBUG
 
   my $message = $format ? sprintf($format, @args) : '<no message>';
 
-  print STDERR "$source_file [$line]: Debug message: $message\n";
+  $file = '<NO FILE>' unless defined $file;
+  $line = '' unless defined $line;
+
+  print STDERR "$file [$line]: Debug message: $message\n";
 }
 
 sub WARNING
@@ -39,7 +42,10 @@ sub WARNING
   my ($format, @args) = @_;
   my $message = sprintf($format, @args);
 
-  print STDERR "$source_file [$line]: Warning: $message";
+  $file = '<NO FILE>' unless defined $file;
+  $line = '' unless defined $line;
+
+  print STDERR "$file [$line]: Warning: $message";
 }
 
 sub ERROR
@@ -47,11 +53,14 @@ sub ERROR
   my ($kind, $format, @args) = @_;
   my $message = sprintf($format, @args);
 
+  $file = '<NO FILE>' unless defined $file;
+  $line = '' unless defined $line;
+
   if ($debug) {
-    confess "$source_file [$line]: $kind error: $message";
+    confess "$file [$line]: $kind error: $message";
   }
   else {
-    die "$source_file [$line]: $kind error: $message\n";
+    die "$file [$line]: $kind error: $message\n";
   }
 }
 
