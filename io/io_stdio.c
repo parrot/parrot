@@ -92,14 +92,17 @@ flags_to_stdio(INTVAL flags)
 INTVAL
 PIO_stdio_init(theINTERP, ParrotIOLayer *layer)
 {
-    PIO_STDIN(interpreter) =
-        PIO_stdio_fdopen(interpreter, layer, stdin, PIO_F_READ);
+    PIO_STDIN(interpreter)
+        = new_io_pmc(interpreter,
+                     PIO_stdio_fdopen(interpreter, layer, stdin, PIO_F_READ));
 
-    PIO_STDOUT(interpreter) =
-        PIO_stdio_fdopen(interpreter, layer, stdout, PIO_F_WRITE);
+    PIO_STDOUT(interpreter)
+        = new_io_pmc(interpreter,
+                     PIO_stdio_fdopen(interpreter, layer, stdout, PIO_F_WRITE));
 
-    PIO_STDERR(interpreter) =
-        PIO_stdio_fdopen(interpreter, layer, stderr, PIO_F_WRITE);
+    PIO_STDERR(interpreter)
+        = new_io_pmc(interpreter,
+                     PIO_stdio_fdopen(interpreter, layer, stderr, PIO_F_WRITE));
 
     return 0;
 }
