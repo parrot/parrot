@@ -3124,6 +3124,43 @@ inline op popp() {
 
 ########################################
 
+=item B<halfpopi>()
+
+=item B<halfpopn>()
+
+=item B<halfpopp>()
+
+=item B<halfpops>()
+
+Restores registers 16-31 of the type indicated in the name of the operation
+from the most recently B<push>ed copies. Registers 0-15 of the saved set are
+discarded.
+
+=cut
+
+inline op halfpopi() {
+  Parrot_half_pop_i(interpreter);
+  goto NEXT();
+}
+
+inline op halfpopn() {
+  Parrot_half_pop_n(interpreter);
+  goto NEXT();
+}
+
+inline op halfpops() {
+  Parrot_half_pop_s(interpreter);
+  goto NEXT();
+}
+
+inline op halfpopp() {
+  Parrot_half_pop_p(interpreter);
+  goto NEXT();
+}
+
+
+########################################
+
 =item B<pushi>()
 
 =item B<pushn>()
@@ -4279,6 +4316,31 @@ inline op sleep(in INT) {
   }
   Parrot_sleep((UINTVAL)$1);
   goto NEXT();
+}
+
+
+#######################################
+
+=item B<can>(out INT, in PMC, in STR)
+
+Sets $1 to true or false, depending on whether $2 ->can the method in
+$3
+
+=cut
+
+inline op can(out INT, in PMC, in STR) {
+  $1 = $2->vtable->can(interpreter, $2, $3);
+}
+
+=item B<does>(out INT, in PMC, in STR)
+
+Sets $1 to true or false, depending on whether $2 ->does the interface in
+$3
+
+=cut
+
+inline op does(out INT, in PMC, in STR) {
+  $1 = $2->vtable->does(interpreter, $2, $3);
 }
 
 

@@ -482,6 +482,11 @@ new frame. The old frame is preserved.
 
 Pop the current frame of PMC registers off the stack.
 
+=item halfpopi
+
+Pop the current frame of PMC registers off their stack, restoring
+registers 16-31
+
 =item pushi
 
 The same as L<pushp>, for the integer register set.
@@ -489,6 +494,10 @@ The same as L<pushp>, for the integer register set.
 =item popi
 
 The same as L<popp>, for the integer register set.
+
+=item halfpopi
+
+The same as L<halfpopp>, for the integer register set.
 
 =item pushs
 
@@ -498,6 +507,10 @@ The same as L<pushp>, for the string register set.
 
 The same as L<popp>, for the string register set.
 
+=item halfpops
+
+The same as L<halfpopp>, for the string register set.
+
 =item pushn
 
 The same as L<pushp>, for the floating-point register set.
@@ -505,6 +518,10 @@ The same as L<pushp>, for the floating-point register set.
 =item popn
 
 The same as L<popp>, for the floating-point register set.
+
+=item halfpopn
+
+The same as L<halfpopp>, for the floating-point register set.
 
 =item clearp
 

@@ -1639,4 +1639,41 @@ pmclass default abstract noinit {
 		caller(INTERP, SELF));
         return NULL;
     }
+
+    INTVAL can (STRING* method) {
+	internal_exception(ILL_INHERIT,
+		"can() not implemented in class '%s'\n",
+		caller(INTERP, SELF));
+    }
+
+    INTVAL can_keyed (PMC* key, STRING* method) {
+	internal_exception(ILL_INHERIT,
+		"can_keyed() not implemented in class '%s'\n",
+		caller(INTERP, SELF));
+    }
+
+    INTVAL can_keyed_int (INTVAL* key, STRING* method) {
+	internal_exception(ILL_INHERIT,
+		"can_keyed_int() not implemented in class '%s'\n",
+		caller(INTERP, SELF));
+    }
+
+    INTVAL does (STRING* method) {
+	internal_exception(ILL_INHERIT,
+		"can() not implemented in class '%s'\n",
+		caller(INTERP, SELF));
+    }
+
+    INTVAL does_keyed (PMC* key, STRING* method) {
+	internal_exception(ILL_INHERIT,
+		"can_keyed() not implemented in class '%s'\n",
+		caller(INTERP, SELF));
+    }
+
+    INTVAL does_keyed_int (INTVAL* key, STRING* method) {
+	internal_exception(ILL_INHERIT,
+		"can_keyed_int() not implemented in class '%s'\n",
+		caller(INTERP, SELF));
+    }
+
 }

@@ -331,3 +331,11 @@ STRING* substr_str_keyed_int(INTVAL* key, INTVAL offset, INTVAL length)
 
 void* invoke(void* next)
 void* invoke_pmc(PMC* sub, void* next)
+
+INTVAL can(STRING* method)
+INTVAL can_keyed(PMC* key, STRING* method)
+INTVAL can_keyed_int(INTVAL* key, STRING* method)
+
+INTVAL does(STRING* method)
+INTVAL does_keyed(PMC* key, STRING* method)
+INTVAL does_keyed_int(INTVAL* key, STRING* method)

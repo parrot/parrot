@@ -142,6 +142,10 @@ down are the number of expected return variables, negated, minus
 one. (So -2 means we expect 1 variable, -3 means we expect 2, -4
 means we expect 3, and so forth)
 
+=item I4
+
+Hash value of method or sub name. 0 means no hash value
+
 =back
 
 The following registers, with the exception of P registers, are used

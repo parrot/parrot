@@ -78,6 +78,39 @@ Parrot_pop_i(struct Parrot_Interp *interpreter)
     }
 }
 
+/*=for api register Parrot_half_pop_i
+  pops half an integer register frame off of the frame stack. Bottom
+  half is tossed
+*/
+void
+Parrot_half_pop_i(struct Parrot_Interp *interpreter)
+{
+    struct IRegChunk *top = interpreter->ctx.int_reg_top;
+    /* Do we even have anything? */
+    if (top->used > 0) {
+        top->used--;
+        memcpy(&interpreter->ctx.int_reg.registers[16],
+               ((INTVAL *)&top->IReg[top->used]) + 16, sizeof(struct IReg) / 2);
+        top->free++;
+        /* Empty? */
+        if (!top->used) {
+            /* Yep, drop down a frame. Maybe */
+            if (top->prev) {
+                /* Keep one stack segment spare to avoid thrashing */
+                if (top->next) {
+                    mem_sys_free(top->next);
+                    top->next = NULL;
+                }
+                interpreter->ctx.int_reg_top = top->prev;
+            }
+        }
+    }
+    /* Nope. So pitch a fit */
+    else {
+        internal_exception(NO_REG_FRAMES, "No more I register frames to pop!");
+    }
+}
+
 /*=for api register Parrot_clear_i
   sets each register in an integer register frame to 0
 */
@@ -156,6 +189,39 @@ Parrot_pop_s(struct Parrot_Interp *interpreter)
     }
 }
 
+/*=for api register Parrot_pop_s
+  pops half a string register frame off of the frame stack,
+  discarding the lower half
+*/
+void
+Parrot_half_pop_s(struct Parrot_Interp *interpreter)
+{
+    struct SRegChunk *top = interpreter->ctx.string_reg_top;
+    /* Do we even have anything? */
+    if (top->used > 0) {
+        top->used--;
+        memcpy(&interpreter->ctx.string_reg.registers[16],
+               ((STRING *)&top->SReg[top->used]) + 16, sizeof(struct SReg)/2);
+        top->free++;
+        /* Empty? */
+        if (!top->used) {
+            /* Yep, drop down a frame. Maybe */
+            if (top->prev) {
+                /* Keep one stack segment spare to avoid thrashing */
+                if (top->next) {
+                    mem_sys_free(top->next);
+                    top->next = NULL;
+                }
+                interpreter->ctx.string_reg_top = top->prev;
+            }
+        }
+    }
+    /* Nope. So pitch a fit */
+    else {
+        internal_exception(NO_REG_FRAMES, "No more S register frames to pop!");
+    }
+}
+
 /*=for api register Parrot_clear_s
   sets each register in a string register frame to NULL
 */
@@ -203,7 +269,8 @@ Parrot_push_n(struct Parrot_Interp *interpreter)
 }
 
 /*=for api register Parrot_pop_n
-  pops a numeric register frame off of the frame stack
+  pops half a numeric register frame off of the frame stack and
+  discards the lower half
 */
 void
 Parrot_pop_n(struct Parrot_Interp *interpreter)
@@ -214,6 +281,38 @@ Parrot_pop_n(struct Parrot_Interp *interpreter)
         top->used--;
         memcpy(&interpreter->ctx.num_reg,
                &top->NReg[top->used], sizeof(struct NReg));
+        top->free++;
+        /* Empty? */
+        if (!top->used) {
+            /* Yep, drop down a frame. Maybe */
+            if (top->prev) {
+                /* Keep one stack segment spare to avoid thrashing */
+                if (top->next) {
+                    mem_sys_free(top->next);
+                    top->next = NULL;
+                }
+                interpreter->ctx.num_reg_top = top->prev;
+            }
+        }
+    }
+    /* Nope. So pitch a fit */
+    else {
+        internal_exception(NO_REG_FRAMES, "No more N register frames to pop!");
+    }
+}
+
+/*=for api register Parrot_pop_n
+  pops a numeric register frame off of the frame stack
+*/
+void
+Parrot_half_pop_n(struct Parrot_Interp *interpreter)
+{
+    struct NRegChunk *top = interpreter->ctx.num_reg_top;
+    /* Do we even have anything? */
+    if (top->used > 0) {
+        top->used--;
+        memcpy(&interpreter->ctx.num_reg.registers[16],
+               ((FLOATVAL *)&top->NReg[top->used]) + 16, sizeof(struct NReg)/2);
         top->free++;
         /* Empty? */
         if (!top->used) {
@@ -292,6 +391,39 @@ Parrot_pop_p(struct Parrot_Interp *interpreter)
         top->used--;
         memcpy(&interpreter->ctx.pmc_reg,
                &top->PReg[top->used], sizeof(struct PReg));
+        top->free++;
+        /* Empty? */
+        if (!top->used) {
+            /* Yep, drop down a frame. Maybe */
+            if (top->prev) {
+                /* Keep one stack segment spare to avoid thrashing */
+                if (top->next) {
+                    mem_sys_free(top->next);
+                    top->next = NULL;
+                }
+                interpreter->ctx.pmc_reg_top = top->prev;
+            }
+        }
+    }
+    /* Nope. So pitch a fit */
+    else {
+        internal_exception(NO_REG_FRAMES, "No more P register frames to pop!");
+    }
+}
+
+/*=for api register Parrot_pop_p
+  pops half a pmc register frame off of the frame stack, discarding
+  the lower half
+*/
+void
+Parrot_half_pop_p(struct Parrot_Interp *interpreter)
+{
+    struct PRegChunk *top = interpreter->ctx.pmc_reg_top;
+    /* Do we even have anything? */
+    if (top->used > 0) {
+        top->used--;
+        memcpy(&interpreter->ctx.pmc_reg.registers[16],
+               ((PMC *)&top->PReg[top->used]) + 16, sizeof(struct PReg)/2);
         top->free++;
         /* Empty? */
         if (!top->used) {

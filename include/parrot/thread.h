@@ -10,8 +10,8 @@
  *  References:
  */
 
-#if !defined(PARROT_PMC_H_GUARD)
-#define PARROT_PMC_H_GUARD
+#if !defined(PARROT_THREAD_H_GUARD)
+#define PARROT_THREAD_H_GUARD
 
 #include "parrot/parrot.h"
 
@@ -21,8 +21,8 @@
 #define COND_SIGNAL(x)
 #define COND_BROADCAST(x)
 
-typedef Parrot_mutex int
-typedef Parrot_cond int
+typedef INTVAL Parrot_mutex;
+typedef INTVAL Parrot_cond;
 
 #endif
 
