@@ -244,7 +244,7 @@ fetch_buf_le_16(unsigned char * rb, unsigned char * b) {
 void
 fetch_buf_be_16(unsigned char * rb, unsigned char * b) {
 #if PARROT_BIGENDIAN
-    memcpy(rb, b, 12);
+    memcpy(rb, b, 16);
 #else
     rb[0] = b[15];
     rb[1] = b[14];
