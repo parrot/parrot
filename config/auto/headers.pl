@@ -28,7 +28,7 @@ sub runstep {
     # some headers may not be probed-for by perl 5, or might not be 
     # properly reflected in %Config (i_fcntl seems to be wrong on my machine,
     # for instance).
-    my @extra_headers = qw(fcntl.h);
+    my @extra_headers = qw(fcntl.h setjmp.h);
     
     foreach my $header (@extra_headers) {
         my $flag = "i_$header";
