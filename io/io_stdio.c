@@ -317,6 +317,7 @@ INTVAL PIO_stdio_puts(theINTERP, ParrotIOLayer * layer, ParrotIO * io,
 INTVAL PIO_stdio_seek(theINTERP, ParrotIOLayer * l, ParrotIO * io,
                         INTVAL hi, INTVAL lo, INTVAL whence) {
         int hardseek = 0;
+        UNUSED(hardseek)
 
         if( io->flags&PIO_F_SHARED ||
                 !(io->flags&(PIO_F_BLKBUF|PIO_F_LINEBUF))) {

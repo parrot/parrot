@@ -94,7 +94,6 @@ ParrotIO * PIO_new(theINTERP, ParrotIO * old, INTVAL iotype,
  */
 
 void PIO_init(theINTERP) {
-        int err;
         /* Has interp been initialized already? */
         if(interpreter->piodata)
                 return;
@@ -108,7 +107,7 @@ void PIO_init(theINTERP) {
                 internal_exception(PIO_ERROR, "PIO alloc table failure.");
 
         /* Init IO stacks and handles for interp instance.  */
-        if((err = PIO_init_stacks(interpreter)) != 0) {
+        if(PIO_init_stacks(interpreter) != 0) {
                 internal_exception(PIO_ERROR, "PIO init stacks failed.");
         }
 

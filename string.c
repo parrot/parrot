@@ -373,7 +373,6 @@ string_substr(struct Parrot_Interp *interpreter, const STRING *src,
                     src->encoding, 0, src->type);
 
     if (subend_off < substart_off) {
-        char *foo = NULL;
         internal_exception(SUBSTR_OUT_OF_STRING,
                            "subend somehow is less than substart");
     }

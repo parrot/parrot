@@ -51,7 +51,7 @@ static void add_pmc_to_free(struct Parrot_Interp *interpreter,
 /* Just go and get more headers unconditionally */
 void
 Parrot_new_pmc_header_arena(struct Parrot_Interp *interpreter) {
-  struct PMC_Arena *new_arena, *old_arena;
+  struct PMC_Arena *new_arena;
   PMC *cur_pmc;
   int i;
 
@@ -91,9 +91,6 @@ Parrot_new_pmc_header_arena(struct Parrot_Interp *interpreter) {
 /* We have no more headers on the free header pool. Go allocate more
    and put them on */
 static void alloc_more_pmc_headers(struct Parrot_Interp *interpreter) {
-  struct PMC_Arena *new_arena, *old_arena;
-  PMC *cur_pmc;
-  int i;
 
   /* First, try and find some unused headers */
   Parrot_do_dod_run(interpreter);
@@ -163,7 +160,7 @@ Buffer *new_tracked_header(struct Parrot_Interp *interpreter, size_t size) {
    and put them on */
 static void
 alloc_more_buffer_headers(struct Parrot_Interp *interpreter) {
-  struct Buffer_Arena *new_arena, *old_arena;
+  struct Buffer_Arena *new_arena;
   Buffer *cur_buffer;
   int i;
 
@@ -569,7 +566,7 @@ Parrot_do_dod_run(struct Parrot_Interp *interpreter) {
 /* We have no more headers on the free header pool. Go allocate more
    and put them on */
 static void alloc_more_string_headers(struct Parrot_Interp *interpreter) {
-  struct STRING_Arena *new_arena, *old_arena;
+  struct STRING_Arena *new_arena;
   STRING *cur_string;
   int i;
 

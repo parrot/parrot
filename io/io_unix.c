@@ -194,6 +194,7 @@ ParrotIO * PIO_unix_fdopen(theINTERP, ParrotIOLayer * layer,
         mode = 0;
 
         oflags = flags_to_unix(flags);
+        UNUSED(oflags)
 
         /* FIXME - Check file handle flags, validity */
 #ifdef HAS_HEADER_FCNTL
