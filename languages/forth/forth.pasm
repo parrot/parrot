@@ -138,11 +138,17 @@ InitializeCoreOps:
 # >=
     .AddCoreOp(Int_GE,">=")
 # 0<
+    .AddCoreOp(Int_LT0,"0<")
 # 0<=
+    .AddCoreOp(Int_LE0,"0<=")
 # 0<>
+    .AddCoreOp(Int_NE0,"0<>")
 # 0=
+    .AddCoreOp(Int_EQ0,"0=")
 # 0>
+    .AddCoreOp(Int_GT0,"0>")
 # 0>=
+    .AddCoreOp(Int_GE0,"0>=")
 # u<
 # u<=
 # u>
@@ -765,6 +771,66 @@ Int_LE:
  Int_is_LE:
     set .IntStack, 1
  Int_LE_end:
+    save .IntStack
+    branch DoneInterpretWord
+Int_LT0:
+    restore .IntStack
+    lt .IntStack, 0, Int_is_LT0
+    set .IntStack, 0
+    branch Int_LT0_end
+ Int_is_LT0:
+    set .IntStack, 1
+ Int_LT0_end:
+    save .IntStack
+    branch DoneInterpretWord
+Int_LE0:
+    restore .IntStack
+    le .IntStack, 0, Int_is_LE0
+    set .IntStack, 0
+    branch Int_LE0_end
+ Int_is_LE0:
+    set .IntStack, 1
+ Int_LE0_end:
+    save .IntStack
+    branch DoneInterpretWord
+Int_NE0:
+    restore .IntStack
+    ne .IntStack, 0, Int_is_NE0
+    set .IntStack, 0
+    branch Int_NE0_end
+ Int_is_NE0:
+    set .IntStack, 1
+ Int_NE0_end:
+    save .IntStack
+    branch DoneInterpretWord
+Int_EQ0:
+    restore .IntStack
+    eq .IntStack, 0, Int_is_EQ0
+    set .IntStack, 0
+    branch Int_EQ0_end
+ Int_is_EQ0:
+    set .IntStack, 1
+ Int_EQ0_end:
+    save .IntStack
+    branch DoneInterpretWord
+Int_GT0:
+    restore .IntStack
+    gt .IntStack, 0, Int_is_GT0
+    set .IntStack, 0
+    branch Int_GT0_end
+ Int_is_GT0:
+    set .IntStack, 1
+ Int_GT0_end:
+    save .IntStack
+    branch DoneInterpretWord
+Int_GE0:
+    restore .IntStack
+    ge .IntStack, 0, Int_is_GE0
+    set .IntStack, 0
+    branch Int_GE0_end
+ Int_is_GE0:
+    set .IntStack, 1
+ Int_GE0_end:
     save .IntStack
     branch DoneInterpretWord
 
