@@ -28,20 +28,20 @@ F<src/call_list.txt>.
 
 
 my %ret_count;
-%ret_count = (p => [0,0,0,1,0],        # Returning a pointer that we PMC stuff
-              P => [0,0,0,1,0],	       # PMC
-              S => [0,0,1,0,0],	       # STR
-	      i => [0,1,0,0,0],        # Returning an int
-	      3 => [0,1,0,0,0],        # Returning an int pointer
-	      l => [0,1,0,0,0],        # Returning a long
-	      c => [0,1,0,0,0],        # returning a char
-	      s => [0,1,0,0,0],        # returning a short
-	      f => [0,0,0,0,1],        # returning a float
-	      d => [0,0,0,0,1],        # returning a double
-	      t => [0,0,1,0,0],        # returning a string
-	      v => [0,0,0,0,0],        # void return
-#	      b => [0,0,1,0,0],        # Returns a buffer
-#	      B => [0,0,1,0,0],        # Returns a buffer
+%ret_count = (p => [1,0,0,1,0],        # Returning a pointer that we PMC stuff
+              P => [1,0,0,1,0],	       # PMC
+              S => [1,0,1,0,0],	       # STR
+	      i => [1,1,0,0,0],        # Returning an int
+	      3 => [1,1,0,0,0],        # Returning an int pointer
+	      l => [1,1,0,0,0],        # Returning a long
+	      c => [1,1,0,0,0],        # returning a char
+	      s => [1,1,0,0,0],        # returning a short
+	      f => [1,0,0,0,1],        # returning a float
+	      d => [1,0,0,0,1],        # returning a double
+	      t => [1,0,1,0,0],        # returning a string
+	      v => [1,0,0,0,0],        # void return
+#	      b => [1,0,1,0,0],        # Returns a buffer
+#	      B => [1,0,1,0,0],        # Returns a buffer
 	     );
 
 my $tempcounter = 0;
@@ -194,9 +194,9 @@ print NCI <<'HEAD';
    hackish, but that's just fine */
 
 static void
-set_return_val(Interp *interpreter, int stack, int ints,
+set_return_val(Interp *interpreter, int proto, int ints,
                int strings, int pmcs, int nums) {
-    REG_INT(0) = stack;
+    REG_INT(0) = proto;
     REG_INT(1) = ints;
     REG_INT(2) = strings;
     REG_INT(3) = pmcs;

@@ -43,7 +43,7 @@ output_is(<<'CODE', <<'OUTPUT', "nci_dd - PASM");
   invoke
   ne N5, 8.0, nok_1
   print "ok 1\n"
-  ne I0, 0, nok_2	# test return value convention
+  ne I0, 1, nok_2	# test return value convention
   ne I1, 0, nok_2
   ne I2, 0, nok_2
   ne I3, 0, nok_2
@@ -125,7 +125,7 @@ output_is(<<'CODE', <<'OUTPUT', "nci_fff");
   invoke
   ne N5, 4.0, nok_1
   print "ok 1\n"
-  ne I0, 0, nok_2	# test return value convention
+  ne I0, 1, nok_2	# test return value convention
   ne I1, 0, nok_2
   ne I2, 0, nok_2
   ne I3, 0, nok_2
@@ -157,7 +157,7 @@ output_is(<<'CODE', <<'OUTPUT', "nci_isc");
   invoke
   ne I5, 6, nok_1
   print "ok 1\n"
-  ne I0, 0, nok_2	# test return value convention
+  ne I0, 1, nok_2	# test return value convention
   ne I1, 1, nok_2
   ne I2, 0, nok_2
   ne I3, 0, nok_2
@@ -189,7 +189,7 @@ output_is(<<'CODE', <<'OUTPUT', "nci_ssc");
   invoke
   ne I5, 6, nok_1
   print "ok 1\n"
-  ne I0, 0, nok_2	# test return value convention
+  ne I0, 1, nok_2	# test return value convention
   ne I1, 1, nok_2
   ne I2, 0, nok_2
   ne I3, 0, nok_2
@@ -221,7 +221,7 @@ output_is(<<'CODE', <<'OUTPUT', "nci_csc");
   invoke
   ne I5, 42, nok_1
   print "ok 1\n"
-  ne I0, 0, nok_2	# test return value convention
+  ne I0, 1, nok_2	# test return value convention
   ne I1, 1, nok_2
   ne I2, 0, nok_2
   ne I3, 0, nok_2
@@ -261,7 +261,7 @@ output_is(<<'CODE', <<'OUTPUT', "nci_it");
   set S5, "ko\n"
   invoke
   ne I5, 2, nok_1
-  ne I0, 0, nok_2	# test return value convention
+  ne I0, 1, nok_2	# test return value convention
   ne I1, 1, nok_2
   ne I2, 0, nok_2
   ne I3, 0, nok_2
@@ -291,7 +291,7 @@ output_is(<<'CODE', <<'OUTPUT', "nci_tt");
   set S5, "ko\n"
   invoke
   print S5
-  ne I0, 0, nok_2	# test return value convention
+  ne I0, 1, nok_2	# test return value convention
   ne I1, 0, nok_2
   ne I2, 1, nok_2
   ne I3, 0, nok_2
@@ -326,7 +326,7 @@ loop:
   dec I10
   gt I10, 0, loop
   print "ok 1\n"
-  ne I0, 0, nok_2	# test return value convention
+  ne I0, 1, nok_2	# test return value convention
   ne I1, 0, nok_2
   ne I2, 0, nok_2
   ne I3, 0, nok_2
@@ -366,7 +366,7 @@ output_is(<<'CODE', <<'OUTPUT', "nci_dd - clone");
   invoke
   ne N5, 8.0, nok_1
   print "ok 3\n"
-  ne I0, 0, nok_2	# test return value convention
+  ne I0, 1, nok_2	# test return value convention
   ne I1, 0, nok_2
   ne I2, 0, nok_2
   ne I3, 0, nok_2

@@ -2531,10 +2531,14 @@ Parrot_jit_begin(Parrot_jit_info_t *jit_info,
     /* Maintain the stack frame pointer for the sake of gdb */
     jit_emit_stack_frame_enter(jit_info->native_ptr);
     /* stack:
-     * 12   pc
-     *  8   interpreter
-     *  4   retaddr
-     *  0   ebp <----- ebp
+     *  12   pc
+     *   8   interpreter
+     *   4   retaddr
+     *   0   ebp <----- ebp
+     *  -4   ebx .. preserved regs
+     *  -8   esi ..
+     * -12   edi ..
+     * -16   interpreter
      */
 
     /* Save all callee-saved registers (cdecl)
@@ -2546,16 +2550,10 @@ Parrot_jit_begin(Parrot_jit_info_t *jit_info,
     /* Cheat on op function calls by writing the interpreter arg on the stack
      * just once. If an op function ever modifies the interpreter argument on
      * the stack this will stop working !!! */
-    if (!jit_info->objfile) {
-        emitm_pushl_i(jit_info->native_ptr, interpreter);
-    }
-#    if EXEC_CAPABLE
-    else {
-        emitm_pushl_i(jit_info->native_ptr, 0x0);
-        Parrot_exec_add_text_rellocation(jit_info->objfile,
-            jit_info->native_ptr, RTYPE_COM, "interpre", -4);
-    }
-#    endif
+
+    /* get the interpreter from stack:  mov 8(%ebp), %eax */
+    emitm_movl_m_r(jit_info->native_ptr, emit_EAX, emit_EBP, emit_None, 1, 8);
+    emitm_pushl_r(jit_info->native_ptr, emit_EAX);
 
     /* get the pc from stack:  mov 12(%ebp), %eax */
     emitm_movl_m_r(jit_info->native_ptr, emit_EAX, emit_EBP, emit_None, 1, 12);
@@ -2642,20 +2640,16 @@ Parrot_jit_begin(Parrot_jit_info_t *jit_info,
     /* get the pc from stack:  mov 12(%ebp), %ebx */
     emitm_movl_m_r(jit_info->native_ptr, emit_EBX, emit_EBP, emit_None, 1, 12);
     /* emit cgp_core(1, interpreter) */
-    if (!jit_info->objfile) {
-        emitm_pushl_i(jit_info->native_ptr, interpreter);
-    }
-#    if EXEC_CAPABLE
-    else {
-        emitm_pushl_i(jit_info->native_ptr, 0x0);
-        Parrot_exec_add_text_rellocation(jit_info->objfile,
-            jit_info->native_ptr, RTYPE_COM, "interpre", -4);
-    }
-#    endif
+    /* get the interpreter from stack:  mov 8(%ebp), %eax */
+    emitm_movl_m_r(jit_info->native_ptr, emit_EAX, emit_EBP, emit_None, 1, 8);
+    emitm_pushl_r(jit_info->native_ptr, emit_EAX);
+    /*
+     * TODO define the offset of the interpreter on the stack
+     *      relative to %ebp
+     */
     emitm_pushl_i(jit_info->native_ptr, 1);
     /* use EAX as flag, when jumping back on init, EAX==1 */
     jit_emit_mov_ri_i(jit_info->native_ptr, emit_EAX, 1);
-    /* TODO restart code */
     if (!jit_info->objfile)
         call_func(jit_info, (void (*)(void))cgp_core);
 #    if EXEC_CAPABLE
@@ -3095,21 +3089,13 @@ preg:
         case 'S':
             jit_emit_mov_mr_i(pc, &STR_REG(next_s++), emit_EAX);
             break;
-        case 't':   /* string, determine length, make string */
-            /* EAX is char */
-            /* save it */
-            jit_emit_mov_rr_i(pc, emit_EBX, emit_EAX);
-            /* strlen(s) */
-            emitm_pushl_r(pc, emit_EAX);
-            emitm_calll(pc, (char*)strlen - pc - 4);
-
-            emitm_pushl_i(pc, 0);   /* flags */
-            emitm_pushl_i(pc, encoding);
-            emitm_pushl_r(pc, emit_EAX);  /* len */
-            emitm_pushl_r(pc, emit_EBX);  /* string */
+        case 't':   /* string */
+            /* EAX is char* */
+            emitm_pushl_i(pc, 0);   /* len */
+            emitm_pushl_r(pc, emit_EAX);  /* string */
             emitm_pushl_i(pc, interpreter);
-            emitm_calll(pc, (char*)string_make - pc - 4);
-            emitm_addb_i_r(pc, 24, emit_ESP);
+            emitm_calll(pc, (char*)string_from_cstring - pc - 4);
+            emitm_addb_i_r(pc, 12, emit_ESP);
             jit_emit_mov_mr_i(pc, &STR_REG(next_s++), emit_EAX);
             break;
         default:
@@ -3117,7 +3103,7 @@ preg:
             return NULL;
     }
     /* set prototyped return */
-    jit_emit_mov_mi_i(pc, &INT_REG(0), 0);  /* XXX fix tests */
+    jit_emit_mov_mi_i(pc, &INT_REG(0), 1);
     /* set return values in I,S,P,N regs */
     jit_emit_mov_mi_i(pc, &INT_REG(1), next_i-5);
     jit_emit_mov_mi_i(pc, &INT_REG(2), next_s-5);
