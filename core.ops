@@ -4277,7 +4277,7 @@ Load a dynamic link library named $2 and store it in $1.
 
 =item B<dlfunc>(out PMC, in PMC, in STR, in STR)
 
-Look up symbol $3 in library $2 with signature $3, and put the
+Look up symbol $3 in library $2 with signature $4, and put the
 corresponding sub object in $1. Note that you need the signature so we
 can build or find an appropriate thunking function.
 
