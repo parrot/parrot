@@ -1491,6 +1491,8 @@ inline op length(out INT, in STR) {
 
 =item B<substr>(out STR, in STR, in INT, in INT, in STR)
 
+=item B<substr>(inout STR, in INT, in INT, in STR)
+
 Set $1 to the portion of $2 starting at (zero-based) character position
 $3 and having length $4.
 
@@ -1506,6 +1508,9 @@ Finally, if $3 is negative, then it is taken to count backwards from
 the end of the string (ie an offset of -1 corresponds to the last
 character).
 
+The third form is optimized for replace only, ignoring the replaced
+substring and does not waste a register to do the string replace.
+
 =cut
 
 inline op substr(out STR, in STR, in INT, in INT) {
@@ -1515,6 +1520,11 @@ inline op substr(out STR, in STR, in INT, in INT) {
 
 inline op substr(out STR, in STR, in INT, in INT, in STR) {
   $1 = string_replace(interpreter, $2, $3, $4, $5, &$1);
+  goto NEXT();
+}
+
+inline op substr(inout STR, in INT, in INT, in STR) {
+  (void)string_replace(interpreter, $1, $2, $3, $4, NULL);
   goto NEXT();
 }
 
