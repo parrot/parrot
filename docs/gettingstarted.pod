@@ -1,6 +1,7 @@
 =head1 NAME
 
-Parrot Developer FAQ - Getting started with parrot? Learn the ins and outs of Parrot development.
+Parrot Developer FAQ - Getting started with Parrot? Learn the ins and outs of 
+Parrot development.
 
 =head1 VERSION
 
@@ -18,7 +19,9 @@ Written to prepare for the fallout from TPC 6.
 
 =head2 I'm interested in helping out. What should I do?
 
-You're already on the right track. This FAQ should help you find everything you need to become an active member of the Parrot community. Just read the below questions in order, and read what applies to you.
+You're already on the right track. This FAQ should help you find everything 
+you need to become an active member of the Parrot community. Just look 
+through the questions below and read the ones that apply to you.
 
 
 
@@ -28,7 +31,8 @@ You're already on the right track. This FAQ should help you find everything you 
 
 =item *
 
-If you're just interested in browsing the CVS repository without downloading anything, a few interfaces exist.
+If you're just interested in browsing the CVS repository without downloading 
+anything, a few interfaces exist.
 
 http://cvs.perl.org/cvsweb/parrot/
 
@@ -36,13 +40,16 @@ http://cvs.perl.org/viewcvs/parrot/
 
 =item *
 
-The easiest solution is to grab the most recent snapshot of the Parrot CVS repository. It's a tar-gzipped download of a recent checkout of Parrot, updated every six hours. You can find it here:
+The easiest solution is to grab the most recent snapshot of the Parrot CVS 
+repository. It's a tar-gzipped download of a recent checkout of Parrot, 
+updated every six hours. You can find it here:
 
 http://cvs.perl.org/snapshots/parrot/parrot-latest.tar.gz
 
 =item *
 
-Even better is the option to use CVS, which gets you the very latest copy of the Parrot distribution. The procedure for this is:
+Even better is the option to use CVS, which gets you the very latest copy of 
+the Parrot distribution. The procedure for this is:
 
 C<cvs -d :pserver:anonymous@cvs.perl.org:/cvs/public login>
 
@@ -52,7 +59,7 @@ C<cvs -d :pserver:anonymous@cvs.perl.org:/cvs/public co parrot>
 
 =item *
 
-Or, if you're one of those rsync folks, you can access the respository with:
+Or, if you're one of those rsync folks, you can access the repository with:
 
 C<rsync -av --delete cvs.perl.org::parrot-HEAD parrot>
 
@@ -63,15 +70,19 @@ For the Parrot CVS website with the above instructions, check out:
 http://cvs.perl.org/
 
 
-=head2 I've got Parrot, now what do I do?
+=head2 Now that I've got Parrot, what do I do?
 
-Now that you've downloaded Parrot, you probably want to try it out. All you need is Perl 5.005_03 or later, a C compiler (any ANSI C compliant compiler should do), and some reasonable form of C<make>. To do this, follow these three easy steps.
+Now that you've downloaded Parrot, you probably want to try it out. All you 
+need is Perl 5.005_03 or later, a C compiler (any ANSI C compliant compiler 
+should do - if you find one that doesn't work, please report it to us), and 
+some reasonable form of C<make>. To do this, follow these three easy steps.
 
 =over 4
 
 =item 1
 
-C<cd> to your parrot directory and run C<Configure.pl> to setup the makefile for your platform.
+C<cd> to your parrot directory and run C<Configure.pl> to create the makefile 
+for your platform.
 
 =item 2
 
@@ -79,7 +90,8 @@ Run C<make> to compile everything and build parrot.
 
 =item 3
 
-Run C<make quicktest> to run the test suite and verify that everything works on your system.
+Run C<make test> to run the test suite and verify that everything works on 
+your system.
 
 =back
 
@@ -87,48 +99,53 @@ Run C<make quicktest> to run the test suite and verify that everything works on 
 
 =head2 Where's the Parrot documentation?
 
-Well, Parrot documentation is a great place to contribute, should you be looking for something to do. Figure out which parts were confusing, and either help us fix them, or let us know where we should fix them. Luckily, all of the current Parrot documentation is included along with the Parrot distribution, in the /docs/ directory.
+Well, Parrot documentation is a great place to contribute, should you be 
+looking for something to do. Figure out which parts were confusing, and 
+either help us fix them, or let us know where we should fix them. Luckily, 
+all of the current Parrot documentation is included along with the Parrot 
+distribution, in the /docs/ directory.
 
-There are a few categories of documentation, each with different intents. It'll probably help to be aware of them before you go digging in. I highly suggest you check out /docs/pdds/pdd07_codingstd.pod for how documentation is supposed to be laid out. For now, here's the executive summary:
+There are a few categories of documentation, each with different intents. 
+It'll probably help to be aware of them before you go digging in. I highly 
+suggest you check out F</docs/pdds/pdd07_codingstd.pod> for guidelines on
+how documentation is supposed to be laid out. For now, here's the executive 
+summary:
 
 =over 4
 
 =item * PDDs
 
-These are Parrot Design Documents, and can be found in /docs/pdds/. A Parrot Design Document (PDD) is a readily available record  of the Perl community's thought process in regards to a specific structure related to Perl development. They serve three purposes:
+Parrot Design Documents (PDDs) document the basic design of the Parrot 
+interpreter, with each PDD focusing on a particular topic, such as the design 
+of the garbage collector (PDD 09) or the object system (PDD 15). They can
+be found in the F</docs/pdds> directory.
 
-=over 4
-
-=item 1
-
-A clear indication of the direction of current development.  A PDD
-provides a road map from abstraction to implementation of an idea. 
-
-=item 2
-
-An historical record of the rationale behind the decision.  A PDD
-provides context to future developers, who may not have been familiar
-with the original discussion, but are currently involved with the
-resultant implementation.
-
-=item 3
-
-An historical technical and cultural perspective for future development
-work.  Re-implementation or even tangential tasks need only address what
-has changed since the original PDD.
-
-=back
+NB: Some important areas are still missing PDDs; we're working to rectify 
+that.
 
 =item * Developer files
 
-These are files which correspond to a specific source file, and can be found in /docs/dev/. A developer file contains documentation on all the implementation decisions associated with the source file. (Note that
-this is in contrast to PDDs, which describe design decisions). This is the place for mini-essays on how to avoid overflows in unsigned arithmetic, or on the pros and cons of differing hash algorithms, and why the current one was chosen, and how it works.
+These are files which correspond to a specific source file, and can be found 
+in F</docs/dev/>. A developer file contains documentation on all the 
+implementation decisions associated with the source file. (Note that this is 
+in contrast to PDDs, which describe design decisions). This is the place for 
+mini-essays on how to avoid overflows in unsigned arithmetic, or on the pros 
+and cons of differing hash algorithms, and why the current one was chosen, 
+and how it works.
 
-If you are coming to a particular source file for the first time, you should be able to read the F<.dev> file and gain an immediate overview of what the source file is for, the algorithms it implements, etc.
+If you are coming to a particular source file for the first time, you should 
+be able to read the F<.dev> file and gain an immediate overview of what the 
+source file is for, the algorithms it implements, etc.
+
+NB: We need more F<.dev> files too. Patches welcome!
 
 =item * Source file documentation
 
-Each source file includes comments embedded in the document. Usually this means function-level documentation that describes the purpose and intent of a function, along with any other important information. For larger functions, it will include additional documentation that explains the meaning of code, as opposed to a verbatim translation of code.
+Each source file includes comments embedded in the document. Usually this 
+means function-level documentation that describes the purpose and intent of 
+a function, along with any other important information. For larger functions, 
+it will include additional documentation that explains the meaning of code, 
+as opposed to a verbatim translation of code.
 
 =back
 
@@ -136,7 +153,8 @@ Each source file includes comments embedded in the document. Usually this means 
 
 =head2 Where can I find the main developer mailing list?
 
-Most of the Parrot-related development discussion occurs on the perl6-internals mailing list. There are a variety of interfaces to the list
+Most of the Parrot-related development discussion occurs on the 
+perl6-internals mailing list. There are a variety of interfaces to the list:
 
 =over 4
 
@@ -154,11 +172,13 @@ http://nntp.x.perl.org/group/perl.perl6.internals
 
 http://groups.google.com/groups?hl=en&lr=&ie=UTF-8&oe=UTF-8&group=perl.perl6.internals
 
-http://archive.develooper.com/perl6-internals@perl.org/
+http://www.nntp.perl.org/group/perl.perl6.internals
 
 =item * Searching
 
-There are no direct searchable interfaces to hte mailing lists. Instead, google works quite well. After clicking the below links, just add your search terms to the Google search box.
+There are no directly searchable interfaces to the mailing lists. However,
+Google works quite well. After clicking the below links, just add your search 
+terms to the Google search box.
 
 http://www.google.com/search?sourceid=navclient&q=site:archive%2Edevelooper%2Ecom+perl6+internals
 
@@ -166,9 +186,11 @@ http://groups.google.com/groups?hl=en&lr=&ie=UTF-8&oe=UTF-8&group=perl.perl6.int
 
 =item * Summaries
 
-If you find the traffic too much to keep up with, weekly summaries of the discussion on perl6-internals@perl.org and perl6-language@perl.org are posted to perl6-announce@perl.org. Alternately, you can find these summaries here:
+If you find the traffic too much to keep up with, weekly summaries of the 
+discussion on perl6-internals@perl.org and perl6-language@perl.org are posted 
+to perl6-announce@perl.org. Alternately, you can find these summaries here:
 
-http://archive.develooper.com/perl6-announce@perl.org/
+http://www.nntp.perl.org/group/perl.perl6.announce
 
 http://dev.perl.org/perl6/list-summaries/
 
@@ -178,7 +200,9 @@ http://lists.perl.org/showlist.cgi?name=perl6-announce
 
 =back
 
-In addition, there is a mailing list which logs all commits to the Parrot CVS repository. If you're interested in Parrot development, you might find it very helpful to subscribe and keep up on changes that people are making.
+In addition, there is a mailing list which logs all commits to the Parrot CVS 
+repository. If you're interested in Parrot development, you might find it 
+very helpful to subscribe and keep up on changes that people are making.
 
 =over 4
 
@@ -196,7 +220,7 @@ http://nntp.x.perl.org/group/perl.cvs.parrot
 
 http://groups.google.com/groups?hl=en&lr=&ie=UTF-8&oe=UTF-8&group=perl.cvs.parrot
 
-http://archive.develooper.com/cvs-parrot@perl.org/
+http://www.nntp.perl.org/group/perl.cvs.parrot
 
 =item * Searching
 
@@ -212,7 +236,10 @@ http://groups.google.com/groups?hl=en&lr=&ie=UTF-8&oe=UTF-8&group=perl.cvs.parro
 
 =head2 What other ways can I get in contact with the Parrot developers?
 
-The mailing list is the main resource for Parrot development. However, there is an IRC channel which you may find useful if your problem is better solved with real-time discussion. To find this channel, visit the channel #parrot in the following IRC servers (either one will do):
+The mailing list is the main resource for Parrot development. However, there 
+is an IRC channel which you may find useful if your problem is better solved 
+with real-time discussion. To find this channel, visit the channel #parrot in 
+the following IRC servers (either one will do):
 
 irc://irc.rhizomatic.net/ or irc://irc.pobox.com/
 
@@ -220,13 +247,21 @@ irc://irc.rhizomatic.net/ or irc://irc.pobox.com/
 
 =head2 I've developed a patch. What should I do with it?
 
-There's a lot of traffic that goes through the mailing list, and it's quite possible that if you send patches directly to the mailing list, they will get lost in the mailboxes of those with commit access.
+There's a lot of traffic that goes through the mailing list, and it's quite 
+possible that if you send patches directly to the mailing list, they will get 
+lost in the mailboxes of those with commit access.
 
-As such, a better solution would be to submit your patch to RT, the request tracker system that maintains bugs and patches for the Parrot project. To visit RT, go here:
+As such, a better solution would be to submit your patch to RT, the request 
+tracker system that maintains bugs and patches for the Parrot project. To 
+visit RT, go here:
 
 http://bugs6.perl.org/
 
-Or if you want to submit a patch, send an email to bugs-parrot@bugs6.perl.org with the moniker [PATCH] (including the brackets) at the start of the subject so that it can be appropriately tagged in the RT system. Please note that you do B<not> have to CC perl6-internals@perl.org when reporting a bug. The RT system will correctly handle that on its own.
+Or if you want to submit a patch, send an email to bugs-parrot@bugs6.perl.org 
+with the moniker [PATCH] (including the brackets) at the start of the subject 
+so that it can be appropriately tagged in the RT system. Please note that you 
+do B<not> have to CC perl6-internals@perl.org when reporting a bug. The RT 
+system will correctly handle that on its own.
 
 A listing of the pending patches can be found here:
 
@@ -236,33 +271,68 @@ http://www.parrotcode.org/openpatches
 
 =head2 I've found a bug, what now?
 
-Well, if you know enough about the bug that you can fix the problem, please do so. Then you can create a patch and submit it to the list, with a better chance of your bug getting attention. If you're not able to solve it on your own, we're still interested in seeing what the problem is, and hopefully helping to resolve it. To report a bug, email bugs-parrot@bugs6.perl.org with a brief description of your bug in the subject. For more information about the bug management system, see the previous question.
+Well, if you know enough about the bug that you can fix the problem, please 
+do so. Then you can create a patch and submit it to the list, with a better 
+chance of your bug getting attention. If you're not able to solve it on your 
+own, we're still interested in seeing what the problem is, and hopefully 
+helping to resolve it. To report a bug, email bugs-parrot@bugs6.perl.org with 
+a brief description of your bug in the subject. For more information about 
+the bug management system, see the previous question.
 
 
 
 =head2 What other useful resources are there for developers?
 
-Actually, there's a few.
+There are several other useful resources that can be found via:
+
+http://www.parrotcode.org/resources
 
 =over 4
 
+=item * Experimental Parrot Wiki
+
+Located at:
+
+http://www.vendian.org/parrot/wiki/
+
+A collection of various other pieces of useful Parrot information and
+documentation that have yet to make it into the CVS repository. Includes
+a comprehensive guide to getting started with Parrot development (called,
+unsurprisingly, 'Getting Started with Parrot Development').
+
 =item * Tinderbox
 
-The tinderbox consists of two dozen or so computers running various OS and platform configurations, downloading the latest Parrot distribution every few hours and running the test suite to verify that it works on that given combination of software and hardware.
+The tinderbox consists of a number of different computers running various OS 
+and platform configurations, downloading the latest Parrot distribution every 
+few hours and running the test suite to verify that it works on that given 
+combination of software and hardware.
 
 To view the results of the tinderbox system, check out:
 
 http://tinderbox.perl.org/tinderbox/bdshowbuild.cgi?tree=parrot
 
+=item * Tinderbox Failure Summary
+
+A brief summary of the current status of the various tinderbox machines.
+Useful for finding out which tests are failing (if any).
+
 =item * Test Coverage Results
 
-The Parrot test suite is intended to test all aspects of Parrot's code. You can see how successful we are at this goal by checkout the test coverage. It gives line, branch, and call coverage percentages on a per-file or per-function breakdown. Find it here:
+The Parrot test suite is intended to test all aspects of Parrot's code. You 
+can see how successful we are at this goal by checkout the test coverage. It 
+gives line, branch, and call coverage percentages on a per-file or 
+per-function breakdown. Find it here:
 
 http://www.hitchhiker.org/parrot_coverage/
 
 =item * Bonsai
 
-Bonsai is a cvs tree control tool to monitor the status of cvs trees. Whenever a checkin occurs, bonsai adds that person to the "hook," a list of those responcible for the current state of the tree (this should be cleared whenever we know that things are working for sure). Users can then run queries to find out who has changed what files and access their checkin comments in addition to generating diffs.
+Bonsai is a cvs tree control tool to monitor the status of cvs trees. 
+Whenever a checkin occurs, bonsai adds that person to the "hook," a list of 
+those responsible for the current state of the tree (this should be cleared 
+whenever we know that things are working for sure). Users can then run 
+queries to find out who has changed what files and access their checkin 
+comments in addition to generating diffs.
 
 =over 4
 
@@ -280,3 +350,4 @@ http://tinderbox.perl.org/bonsai/rview.cgi?cvsroot=/home/tinder/perlcvs&dir=parr
 =back
 
 =cut
+
