@@ -11,7 +11,7 @@ Parrot JIT Subsystem
 
 =head2 CURRENT
 
-    Maintainer: Daniel Grunblatt 
+    Maintainer: Daniel Grunblatt
     Class: Internals
     PDD Number: 8
     Version: 1.2
@@ -57,7 +57,7 @@ addresses.  Since the location of the buffer holding the native code may move
 as code is generated (due to growing of the buffer), these relative addresses
 may only be calculated once the buffer is guaranteed to no longer move.  To
 handle these instances, the JIT subsystem uses "fixups", which record locations
-in native code where adjustments to the native code are required. 
+in native code where adjustments to the native code are required.
 
 =head1 FILES
 
@@ -97,7 +97,7 @@ either an B<opcode_t> value or a function pointer.
 
 The B<Parrot_jit_info> structure holds data used while producing and executing
 native code.  An important piece of data in this structure is the B<op_map>
-array, which maps from opcode addresses to native code addresses.  
+array, which maps from opcode addresses to native code addresses.
 
 =item jit.c
 
@@ -115,7 +115,7 @@ Once code generation is complete and fixups have been applied, the native code
 offsets are converted to absolute addresses.  This trades the low up-front cost
 of converting all offsets once, for the unknown cost of repeatedly converting
 these offsets while executing native code.
- 
+
 =item jit2h.pl
 
 Preprocesses the .jit files to produce and prints the struct opcode_assembly_t.
@@ -134,6 +134,11 @@ Jit files are interpreted as follows:
 Where I<op-name> is the name of the Parrot opcode, and I<body> consists of C
 syntax code which may contain any of the identifiers listed in the following
 section.
+
+=item Comment lines
+
+Comments are marked with a I<;> in the first column. These and empty
+lines are ignored.
 
 =item Identifiers
 
@@ -251,17 +256,17 @@ The access to Parrot registers is done relative to C<$6>, all other memory acces
 Let's see how this work:
 
 B<Parrot Assembly:>
- 
+
  set I0,8
  set I2,I0
  print "Big piece of JIT\n"
  time I0
  end
 
-B<Parrot Bytecode:> (only the bytecode segment is showed) 
- 
+B<Parrot Bytecode:> (only the bytecode segment is showed)
+
  +-----------------------------------------------+
- | 63 | 0 | 8 | 62 | 2 | 0 | 24 | 0 | 48 | 0 | 0 |  
+ | 63 | 0 | 8 | 62 | 2 | 0 | 24 | 0 | 48 | 0 | 0 |
  +-|------------|------------|--------|--------|-+
    |            |            |        |        |
    |            |            |        |        +-- end (no arguments)
@@ -311,7 +316,7 @@ B<Intel x86 object code of the Parrot ops:>
     \x68\x00\x00\x00\x00                     # push 0x0
     \x68\x00\x00\x00\x00                     # push 0x0
     \xff\x35\x00\x00\x00\x00                 # push $0
-    \x50                                     # push 
+    \x50                                     # push
     \xb8\x04\x00\x00\x00                     # mov $4,%eax
     \xcd\x80                                 # int 80h
     \x72\x00                                 # jb 0
@@ -320,7 +325,7 @@ B<Intel x86 object code of the Parrot ops:>
  Parrot_end {
     \xc9                                     # leave
     \xc3                                     # ret
- } 
+ }
 
  Parrot_time_i {
     \x68\x00\x00\x00\x00                     # pushl 0x0
@@ -329,10 +334,10 @@ B<Intel x86 object code of the Parrot ops:>
     \x83\xc4\x08                             # add $0x8,%esp
  }
 
-The object code for time_i is the same that for any opcode that isn't implemented in core.jit 
+The object code for time_i is the same that for any opcode that isn't implemented in core.jit
 
 B<Build process:>
- 
+
  Memory dump of the JIT code being generated:
 
   +-----------------------------------------+
@@ -340,7 +345,7 @@ B<Build process:>
   | 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 |
   +-----------------------------------------+
 
-That is the state after the code for the first op has been copied. The B<0x55 0x89 0xe5> you see before the object code for Parrot_set_i_ic is the output of Parrot::Jit->init() 
+That is the state after the code for the first op has been copied. The B<0x55 0x89 0xe5> you see before the object code for Parrot_set_i_ic is the output of Parrot::Jit->init()
 
  Fill it with addresses and/or values:
 
@@ -352,7 +357,7 @@ That is the state after the code for the first op has been copied. The B<0x55 0x
 The address of I0 (&intepreter->int_reg.registers[0]) is 0x10a000 (or whatever), so the first 4 bytes after the opcode number are filled with it, and the other contiguous 4 with the constant it self.
 
 The same process is done one time per opcode.
- 
+
  The final result:
 
   +-----------------------------------------+
@@ -360,7 +365,7 @@ The same process is done one time per opcode.
   | 0x00 0x08 0x00 0x00 0x00 0xa1 0x00 0xa0 |
   | 0x10 0x00 0xa3 0x08 0xa0 0x10 0x00 0xc7 |
   | 0x05 0x54 0x7a 0x10 0x00 0x01 0x00 0x00 |
-  | 0x00 0x68 0x11 0x00 0x00 0x00 0x68 0x18 | 
+  | 0x00 0x68 0x11 0x00 0x00 0x00 0x68 0x18 |
   | 0xb0 0x10 0x00 0xff 0x35 0x54 0x7a 0x10 |
   | 0x00 0x50 0xb8 0x04 0x00 0x00 0x00 0xcd |
   | 0x80 0x72 0x00 0x68 0x00 0xa0 0x10 0x00 |

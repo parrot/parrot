@@ -69,8 +69,8 @@ Parrot_mul_i_i {
     }
     else if (MAP[2]) {
         emit_movl_m_r(NATIVECODE, emit_EAX, &INT_REG[1]);
-        emitm_movl_r_r(NATIVECODE, MAP[2], emit_EAX);
-        emit_movl_r_m(NATIVECODE, MAP[2], &INT_REG[1]);
+        emitm_smull_r_r(NATIVECODE, MAP[2], emit_EAX);
+        emit_movl_r_m(NATIVECODE, emit_EAX, &INT_REG[1]);
     }
     else {
         emit_movl_m_r(NATIVECODE, emit_EAX, &INT_REG[1]);
@@ -374,11 +374,11 @@ Parrot_add_i_i_i {
     }
     else if (MAP[1] && MAP[2]) {
         emitm_movl_r_r(NATIVECODE, MAP[2], MAP[1]);
-        emit_addl_r_m(NATIVECODE, MAP[1], &INT_REG[3]);
+        emit_addl_m_r(NATIVECODE, MAP[1], &INT_REG[3]);
     }
     else if (MAP[1] && MAP[3]) {
         emitm_movl_r_r(NATIVECODE, MAP[3], MAP[1]);
-        emit_addl_r_m(NATIVECODE, MAP[1], &INT_REG[2]);
+        emit_addl_m_r(NATIVECODE, MAP[1], &INT_REG[2]);
     }
     else if (MAP[2] && MAP[3]) {
         emitm_movl_r_r(NATIVECODE, MAP[3], emit_EAX);
@@ -387,16 +387,16 @@ Parrot_add_i_i_i {
     }
     else if (MAP[1]) {
         emit_movl_m_r(NATIVECODE, MAP[1], &INT_REG[2]);
-        emit_addl_r_m(NATIVECODE, MAP[1], &INT_REG[3]);
+        emit_addl_m_r(NATIVECODE, MAP[1], &INT_REG[3]);
     }
     else if (MAP[2]) {
         emitm_movl_r_r(NATIVECODE, MAP[2], emit_EAX);
-        emit_addl_r_m(NATIVECODE, emit_EAX, &INT_REG[3]);
+        emit_addl_m_r(NATIVECODE, emit_EAX, &INT_REG[3]);
         emit_movl_r_m(NATIVECODE, emit_EAX, &INT_REG[1]);
     }
     else if (MAP[3]) {
         emitm_movl_r_r(NATIVECODE, MAP[3], emit_EAX);
-        emit_addl_r_m(NATIVECODE, emit_EAX, &INT_REG[2]);
+        emit_addl_m_r(NATIVECODE, emit_EAX, &INT_REG[2]);
         emit_movl_r_m(NATIVECODE, emit_EAX, &INT_REG[1]);
     }
     else {
@@ -514,13 +514,11 @@ Parrot_sub_i_i_i {
     }
     else if (MAP[1] && MAP[2]) {
         emitm_movl_r_r(NATIVECODE, MAP[2], MAP[1]);
-        emit_subl_r_m(NATIVECODE, MAP[1], &INT_REG[3]);
+        emit_subl_m_r(NATIVECODE, MAP[1], &INT_REG[3]);
     }
     else if (MAP[1] && MAP[3]) {
-        if (MAP[1] != MAP[3]) {
-            emitm_movl_r_r(NATIVECODE, MAP[3], MAP[1]);
-        }
-        emit_subl_r_m(NATIVECODE, MAP[1], &INT_REG[2]);
+        emit_movl_m_r(NATIVECODE, MAP[1], &INT_REG[2]);
+        emitm_subl_r_r(NATIVECODE, MAP[3], MAP[1]);
     }
     else if (MAP[2] && MAP[3]) {
         emitm_movl_r_r(NATIVECODE, MAP[3], emit_EAX);
@@ -529,16 +527,16 @@ Parrot_sub_i_i_i {
     }
     else if (MAP[1]) {
         emit_movl_m_r(NATIVECODE, MAP[1], &INT_REG[2]);
-        emit_subl_r_m(NATIVECODE, MAP[1], &INT_REG[3]);
+        emit_subl_m_r(NATIVECODE, MAP[1], &INT_REG[3]);
     }
     else if (MAP[2]) {
         emitm_movl_r_r(NATIVECODE, MAP[2], emit_EAX);
-        emit_subl_r_m(NATIVECODE, emit_EAX, &INT_REG[3]);
+        emit_subl_m_r(NATIVECODE, emit_EAX, &INT_REG[3]);
         emit_movl_r_m(NATIVECODE, emit_EAX, &INT_REG[1]);
     }
     else if (MAP[3]) {
-        emitm_movl_r_r(NATIVECODE, MAP[3], emit_EAX);
-        emit_subl_r_m(NATIVECODE, emit_EAX, &INT_REG[2]);
+        emit_movl_m_r(NATIVECODE, emit_EAX, &INT_REG[2]);
+        emitm_subl_r_r(NATIVECODE, MAP[3], emit_EAX);
         emit_movl_r_m(NATIVECODE, emit_EAX, &INT_REG[1]);
     }
     else {
@@ -634,6 +632,21 @@ Parrot_gt_i_i_ic {
         emit_cmpl_r_m(NATIVECODE, emit_EAX, &INT_REG[2]);
     }
     emit_jcc(jit_info, emitm_jg, *INT_CONST[3]);
+}
+
+Parrot_gt_n_n_ic {
+    /* s. Pentium4.pdf 8.1 */
+    emit_fldl(NATIVECODE, &NUM_REG[1]);
+/*    emit_fldl(NATIVECODE, &NUM_REG[2]); */
+/*    emitm_fcompp(NATIVECODE); */
+    emitm_fcomp_m(NATIVECODE, emit_None, emit_None, emit_None, &NUM_REG[2]);
+    emitm_fstw(NATIVECODE);
+
+    emitm_andl_i_r(NATIVECODE, 0x4500, emit_EAX);
+    emit_jcc(jit_info, emitm_jz, *INT_CONST[3]);
+
+/*    emitm_sahf(NATIVECODE); doesn't work ??? */
+/*    emit_jcc(jit_info, emitm_jg, *INT_CONST[3]); */
 }
 
 Parrot_ge_ic_ic_ic {
