@@ -89,6 +89,17 @@ void * nci_pi(int test) {
                 };
                 return &t;
             }
+        case 1:
+            {
+                static struct {
+                    float f[2];
+                    double d;
+                } t = {
+                    {42.0, 100.0},
+                    47.11
+                };
+                return &t;
+            }
     }
     return NULL;
 }

@@ -61,8 +61,13 @@ pmclass ManagedStruct extends UnManagedStruct need_ext {
         ix = key_integer(INTERP, key);
         if (ix < 0 || ix >= SELF->cache.int_val)
             return;
-        ((char *)PMC_data(SELF))[ix] = (0xff & value);
-        return;
+        SUPER(key, value);
+    }
+
+    void set_integer_keyed_int (INTVAL ix, INTVAL value) {
+        if (ix < 0 || ix >= SELF->cache.int_val)
+            return;
+        SUPER(ix, value);
     }
 
     INTVAL get_integer () {

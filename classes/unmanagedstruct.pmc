@@ -17,12 +17,6 @@
  */
 
 #include "parrot/parrot.h"
-#include "parrot/method_util.h"
-#include "parrot/pobj.h"
-
-enum {
-    PObj_UnManagedStruct_my_memory_FLAG = PObj_private0_FLAG
-};
 
 static char *
 char_offset_int(Parrot_Interp interpreter, PMC *pmc, INTVAL ix, int *type)
@@ -64,17 +58,73 @@ static INTVAL
 ret_int(char *p, int type)
 {
     switch (type) {
+	case enum_type_INTVAL:
 	case enum_type_int:
 	    return *(INTVAL*) p;
 	case enum_type_short:
 	    return *(short*) p;
-	case enum_type_uchar:
 	case enum_type_char:
+	case enum_type_uchar:
 	    return *p;
 	default:
 	    internal_exception(1, "unhandled type in struct");
     }
     return -1;
+}
+
+static FLOATVAL
+ret_float(char *p, int type)
+{
+    switch (type) {
+	case enum_type_FLOATVAL:
+	    return (FLOATVAL) *(FLOATVAL*) p;
+	case enum_type_float:
+	    return (FLOATVAL) *(float*) p;
+	case enum_type_double:
+	    return (FLOATVAL) *(double*) p;
+	default:
+	    internal_exception(1, "unhandled type in struct");
+    }
+    return -1.0;
+}
+
+static void
+set_int(char *p, int type, INTVAL value)
+{
+    switch (type) {
+	case enum_type_char:
+	case enum_type_uchar:
+	    *(char*) p = value & 0xff;
+	    break;
+	case enum_type_INTVAL:
+	    *(INTVAL*) p = value;
+	    break;
+	case enum_type_int:
+	    *(int*) p = value;
+	    break;
+	case enum_type_short:
+	    *(short*)p = (short)value;
+	    break;
+	default:
+	    internal_exception(1, "unhandled type in struct");
+	    break;
+    }
+}
+
+static void
+set_float(char *p, int type, FLOATVAL value)
+{
+    switch (type) {
+	case enum_type_FLOATVAL:
+	    *(FLOATVAL*) p = (FLOATVAL) value;
+	    break;
+	case enum_type_float:
+	    *(float*) p = (float) value;
+	    break;
+	case enum_type_double:
+	    *(double*) p = (double) value;
+	    break;
+    }
 }
 
 pmclass UnManagedStruct extends default need_ext {
@@ -123,7 +173,8 @@ pmclass UnManagedStruct extends default need_ext {
     }
 
     void mark() {
-	pobject_lives(interpreter, (PObj *) PMC_ptr2p(SELF));
+	if (PMC_ptr2p(SELF))
+	    pobject_lives(interpreter, (PObj *) PMC_ptr2p(SELF));
     }
 
     INTVAL is_equal (PMC* value) {
@@ -158,11 +209,11 @@ pmclass UnManagedStruct extends default need_ext {
 	int type;
 	char *p;
 
-	if (!key)
-            return -1;
 	/* assume char array */
 	if (!PMC_ptr2p(SELF)) {
 	    ix = key_integer(INTERP, key);
+	    if (ix < 0)
+		return -1;
 	    type = enum_type_char;
 	    p = ((char *)PMC_data(SELF)) + ix;
 	}
@@ -171,8 +222,38 @@ pmclass UnManagedStruct extends default need_ext {
 	return ret_int(p, type);
     }
 
+    FLOATVAL get_number_keyed_int (INTVAL key) {
+	int type;
+	char *p = char_offset_int(interpreter, pmc, key, &type);
+	return ret_float(p, type);
+    }
+
+    FLOATVAL get_number_keyed (PMC* key) {
+	int type;
+	char *p = char_offset_key(interpreter, pmc, key, &type);
+	return ret_float(p, type);
+    }
+
     INTVAL get_integer() {
        return (INTVAL)*(INTVAL *)PMC_data(SELF);
+    }
+
+    void set_integer_native(INTVAL value) {
+       *(INTVAL *)PMC_data(SELF) = value;
+    }
+
+    void set_integer_keyed_int (INTVAL ix, INTVAL value) {
+	int type;
+	char *p;
+	if (!PMC_ptr2p(SELF)) {
+	    if (ix < 0)
+		return;
+	    type = enum_type_char;
+	    p = ((char *)PMC_data(SELF)) + ix;
+	}
+	else
+	    p = char_offset_int(interpreter, pmc, ix, &type);
+	set_int(p, type, value);
     }
 
     /* May cause segfaults if value is out of bounds */
@@ -181,25 +262,28 @@ pmclass UnManagedStruct extends default need_ext {
 	int type;
 	char *p;
 
-	if (!key)
-            return;
-	ix = key_integer(INTERP, key);
-	if (ix < 0)
-            return;
 	if (!PMC_ptr2p(SELF)) {
-	    ((char *)PMC_data(SELF))[ix]=(0xff & value);
-	    return;
+	    ix = key_integer(INTERP, key);
+	    if (ix < 0)
+		return;
+	    type = enum_type_char;
+	    p = ((char *)PMC_data(SELF)) + ix;
 	}
-	p = char_offset_key(interpreter, pmc, key, &type);
-	switch (type) {
-	    case enum_type_int:
-		*(INTVAL*) p = value;
-	    default:
-		internal_exception(1, "unhandled type in struct");
-	}
+	else
+	    p = char_offset_key(interpreter, pmc, key, &type);
+	set_int(p, type, value);
     }
 
-    void set_integer_native(INTVAL value) {
-       *(INTVAL *)PMC_data(SELF) = value;
+    void set_number_keyed_int (INTVAL key, FLOATVAL value) {
+	int type;
+	char *p = char_offset_int(interpreter, pmc, key, &type);
+	set_float(p, type, value);
     }
+
+    void set_number_keyed (PMC *key, FLOATVAL value) {
+	int type;
+	char *p = char_offset_key(interpreter, pmc, key, &type);
+	set_float(p, type, value);
+    }
+
 }
