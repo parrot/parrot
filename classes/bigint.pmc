@@ -61,7 +61,7 @@ static long
 bigint_get_long(Interp *interpreter, PMC *self) {
     if (mpz_fits_slong_p(BN(self)))
         return mpz_get_si(BN(self));
-    real_exception(interpreter, NULL, 1, "Conversion err");
+    real_exception(interpreter, NULL, 1, "bigint_get_long: number too big");
     return 0;
 }
 
@@ -99,10 +99,49 @@ bigint_mul_bigint(Interp *interpreter, PMC* self, PMC *value, PMC *dest)
     mpz_mul(BN(dest), BN(self), BN(value));
 }
 
+static void
+bigint_mul_bigint_int(Interp *interpreter, PMC* self, INTVAL value,
+        PMC *dest)
+{
+    mpz_t v;
+    mpz_init_set_si(v, (long)value);
+    VTABLE_morph(interpreter, dest, enum_class_BigInt);
+    mpz_mul(BN(dest), BN(self), v);
+    mpz_clear(v);
+}
+
+static void
+bigint_div_bigint(Interp *interpreter, PMC* self, PMC *value, PMC *dest)
+{
+    VTABLE_morph(interpreter, dest, enum_class_BigInt);
+    mpz_div(BN(dest), BN(self), BN(value));
+}
+
+static void
+bigint_div_bigint_int(Interp *interpreter, PMC* self, INTVAL value,
+        PMC *dest)
+{
+    mpz_t v;
+    mpz_init_set_si(v, (long)value);
+    VTABLE_morph(interpreter, dest, enum_class_BigInt);
+    mpz_div(BN(dest), BN(self), v);
+    mpz_clear(v);
+}
 static INTVAL
 bigint_cmp(Interp *interpreter, PMC* self, PMC *value)
 {
     return mpz_cmp(BN(self), BN(value));
+}
+
+static INTVAL
+bigint_cmp_int(Interp *interpreter, PMC* self, INTVAL value)
+{
+    mpz_t v;
+    INTVAL r;
+    mpz_init_set_si(v, (long)value);
+    r = mpz_cmp(BN(self), v);
+    mpz_clear(v);
+    return r;
 }
 
 #else
@@ -156,8 +195,31 @@ bigint_mul_bigint(Interp *interpreter, PMC* self, PMC *value, PMC *dest)
 {
     internal_exception(1, "no bigint lib loaded");
 }
+static void
+bigint_mul_bigint_int(Interp *interpreter, PMC* self, INTVAL value,
+        PMC *dest)
+{
+    internal_exception(1, "no bigint lib loaded");
+}
+static void
+bigint_div_bigint(Interp *interpreter, PMC* self, PMC *value, PMC *dest)
+{
+    internal_exception(1, "no bigint lib loaded");
+}
+static void
+bigint_div_bigint_int(Interp *interpreter, PMC* self, INTVAL value,
+        PMC *dest)
+{
+    internal_exception(1, "no bigint lib loaded");
+}
 static INTVAL
 bigint_cmp(Interp *interpreter, PMC* self, PMC *value)
+{
+    internal_exception(1, "no bigint lib loaded");
+    return 0;
+}
+static INTVAL
+bigint_cmp_int(Interp *interpreter, PMC* self, INTVAL value)
 {
     internal_exception(1, "no bigint lib loaded");
     return 0;
@@ -357,8 +419,40 @@ MMD_DEFAULT: {
              }
 
     }
+
+    void mul_int(INTVAL value, PMC* dest) {
+        bigint_mul_bigint_int(INTERP, SELF, value, dest);
+    }
+
+    void div(PMC* value, PMC* dest) {
+MMD_BigInt: {
+                bigint_div_bigint(INTERP, SELF, value, dest);
+            }
+MMD_DEFAULT: {
+                 internal_exception(1, "unimp");
+             }
+
+    }
+
+    void div_int(INTVAL value, PMC* dest) {
+        bigint_div_bigint_int(INTERP, SELF, value, dest);
+    }
+
     INTVAL cmp(PMC* value) {
+MMD_BigInt: {
         return bigint_cmp(INTERP, SELF, value);
+            }
+MMD_PerlInt: {
+        return bigint_cmp_int(INTERP, SELF, PMC_int_val(value));
+            }
+    }
+    INTVAL is_equal(PMC* value) {
+MMD_BigInt: {
+        return bigint_cmp(INTERP, SELF, value) == 0;
+            }
+MMD_PerlInt: {
+        return bigint_cmp_int(INTERP, SELF, PMC_int_val(value)) == 0;
+            }
     }
 }
 

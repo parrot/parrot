@@ -108,6 +108,9 @@ get_mmd_dispatch_type(Interp *interpreter, UINTVAL left_type,
 
     /*
      * XXX quick hack for delegates
+     *     and something is broken with the tables
+     *     w/o the compare for equal types, mmd_fallback jumps in
+     *     This just depends on *other* PMCs that use MMD
      */
     if (left_type == enum_class_delegate)
         right_type = 0;

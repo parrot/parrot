@@ -217,6 +217,15 @@ Removes and returns the first element in the list.
                 offset, count);
     }
 
+    PMC* slice (PMC* key) {
+	PMC *iter = pmc_new_init(interpreter, enum_class_Iterator, SELF);
+        PMC_struct_val(iter) = key;
+        return iter;
+    }
+
+    PMC* nextkey_keyed (PMC* key, INTVAL what) {
+        return VTABLE_nextkey_keyed(interpreter, key, SELF, what);
+    }
 /*
 
 =item C<void multiply_int(INTVAL value,  PMC *dest)>

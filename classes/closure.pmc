@@ -107,25 +107,6 @@ Makes the closure the same as C<*value>.
         PMC_struct_val(SELF) = PMC_struct_val(value);
     }
 
-/*
-
-=item C<INTVAL is_equal(PMC* value)>
-
-Returns whether the closure is the same as C<*value>.
-
-=cut
-
-*/
-
-    INTVAL is_equal (PMC* value) {
-        return (SELF->vtable == value->vtable &&
-        PMC_struct_val(SELF) == PMC_struct_val(value)
-        /* XXX -lt why?
-         * && memcmp(PMC_sub(value), PMC_sub(SELF) ,
-        sizeof(struct Parrot_Sub)) == 0 */
-        );
-    }
-
 }
 
 /*

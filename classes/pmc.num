@@ -53,34 +53,35 @@ perlnum.pmc		33
 perlstring.pmc		34
 perlundef.pmc		35
 boolean.pmc		36
+bigint.pmc              37
 
-ref.pmc			37
-sharedref.pmc		38
+ref.pmc			38
+sharedref.pmc		39
 
 # arrays
 
-array.pmc		39
-floatvalarray.pmc	40
-intlist.pmc		41
-iterator.pmc		42
-perlarray.pmc		43
-pmcarray.pmc		44
-sarray.pmc		45
-constsarray.pmc 	46
-stringarray.pmc		47
-multiarray.pmc		48
+array.pmc		40
+floatvalarray.pmc	41
+intlist.pmc		42
+iterator.pmc		43
+perlarray.pmc		44
+pmcarray.pmc		45
+sarray.pmc		46
+constsarray.pmc 	47
+stringarray.pmc		48
+multiarray.pmc		49
 
 
 # hashes
-perlhash.pmc		49
-orderedhash.pmc		50
+perlhash.pmc		50
+orderedhash.pmc		51
 
 # other
 
-tqueue.pmc		51
+tqueue.pmc		52
 
-parrotclass.pmc		52
-parrotobject.pmc	53
+parrotclass.pmc		53
+parrotobject.pmc	54
 
 # obsolete soon
-mmd_default.pmc		54
+mmd_default.pmc		55

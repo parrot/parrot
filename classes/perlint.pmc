@@ -330,34 +330,34 @@ Multiplies the integer by C<*value> and returns the result in C<*dest>.
 
 */
     void multiply (PMC* value, PMC* dest) {
-        INTVAL pmci;
-        int vtype = VTABLE_type(INTERP, value);
-        FLOATVAL valf;
-        FLOATVAL mulf;
+MMD_PerlInt: {
+        INTVAL a = PMC_int_val(SELF);
+        INTVAL b = PMC_int_val(value);
+        double cf = (double)a * (double)b;
+        INTVAL c = a * b;
+        if ((double) c == cf)
+            VTABLE_set_integer_native(INTERP, dest, c);
+        else
+            overflow(INTERP, SELF, b, dest, MMD_MULTIPLY_INT);
+    }
+MMD_PerlString: {
+        INTVAL a = PMC_int_val(SELF);
+        INTVAL b = VTABLE_get_integer(INTERP, value);
+        double cf = (double)a * (double)b;
+        INTVAL c = a * b;
+        if ((double) c == cf)
+            VTABLE_set_integer_native(INTERP, dest, c);
+        else
+            overflow(INTERP, SELF, b, dest, MMD_MULTIPLY_INT);
+    }
 
-        pmci = PMC_int_val(SELF);
-        if (vtype == enum_class_PerlUndef) {
-            VTABLE_set_integer_native(INTERP, dest, 0);
-            return;
-        }
-
-        valf = VTABLE_get_number(INTERP, value);
-        mulf = pmci * valf;
-        if (vtype == enum_class_PerlNum) {
-            VTABLE_set_number_native(INTERP, dest, mulf);
-            return;
-        }
-        {
-            INTVAL vali = (INTVAL) valf;
-            INTVAL   muli = pmci * vali;
-            if (mulf == muli)
-                VTABLE_set_integer_native(INTERP, dest, muli);
-            else {
-                overflow(INTERP, SELF, vali, dest, MMD_MULTIPLY_INT);
-            }
-            return;
-
-        }
+MMD_PerlUndef: {
+        VTABLE_set_integer_native(INTERP, dest, 0);
+    }
+MMD_DEFAULT: {
+        FLOATVAL valf = VTABLE_get_number(INTERP, value);
+        VTABLE_set_number_native(INTERP, dest, valf * PMC_int_val(SELF));
+    }
     }
 
 /*
@@ -369,10 +369,14 @@ Multiplies the integer by C<value> and returns the result in C<*dest>.
 =cut
 
 */
-    void multiply_int (INTVAL value, PMC* dest) {
-        VTABLE_set_integer_native(INTERP, dest,
-            PMC_int_val(SELF) * value
-        );
+    void multiply_int (INTVAL b, PMC* dest) {
+        INTVAL a = PMC_int_val(SELF);
+        double cf = (double)a * (double)b;
+        INTVAL c = a * b;
+        if ((double) c == cf)
+            VTABLE_set_integer_native(INTERP, dest, c);
+        else
+            overflow(INTERP, SELF, b, dest, MMD_MULTIPLY_INT);
     }
 
 /*
