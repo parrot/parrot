@@ -85,6 +85,7 @@ examples/mops/mops.py
 examples/mops/mops.rb
 examples/mops/mops.scheme
 global_setup.c
+hints/cygwin.pl
 hints/darwin.pl
 hints/mswin32.pl
 hints/os2.pl
@@ -165,6 +166,7 @@ languages/scheme/t/io/basic.t
 languages/scheme/t/logic/basic.t
 make.pl
 make_vtable_ops.pl
+manicheck.pl
 memory.c
 obscure.ops
 ops2c.pl
