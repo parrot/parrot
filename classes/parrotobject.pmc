@@ -45,8 +45,6 @@ F<src/objects.c>, at least for right now.
 
 #include "parrot/parrot.h"
 
-#define get_attrib_num(x, y) *((PMC **)PObj_bufstart(x)+y)
-
 pmclass ParrotObject extends ParrotClass need_ext {
 
 /*
@@ -132,7 +130,7 @@ Finds the method for C<*name>.
 */
 
     PMC* find_method(STRING* name) {
-        PMC *class = get_attrib_num((PMC *)PMC_data(SELF), POD_CLASS);
+        PMC *class = GET_CLASS((PMC *)PMC_data(SELF), pmc);
         return Parrot_find_method_with_cache(INTERP, class, name);
     }
 

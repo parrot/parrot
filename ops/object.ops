@@ -256,7 +256,7 @@ Get the class PMC for the object in $2 and put it in $1.
 
 inline op class(out PMC, in PMC) :object_classes {
     if (PObj_is_object_TEST($2))
-	$1 = get_attrib_num((Buffer *)PMC_data($2), POD_CLASS);
+	$1 = GET_CLASS((Buffer *)PMC_data($2), $2);
     else
 	$1 = $2;
     goto NEXT();

@@ -518,11 +518,11 @@ Parrot_instantiate_object(Parrot_Interp interpreter, PMC *object) {
     set_attrib_array_size(new_object_array,
                           attrib_count + POD_FIRST_ATTRIB);
     /* 0 - class PMC, 1 - class name */
-    set_attrib_num(new_object_array, POD_CLASS, class);
+    SET_CLASS(new_object_array, object, class);
     set_attrib_num(new_object_array, POD_CLASS_NAME, class_name);
 
     /* Note the number of used slots */
-    object->cache.int_val = POD_FIRST_ATTRIB + attrib_count;
+    ATTRIB_COUNT(object) = POD_FIRST_ATTRIB + attrib_count;
 
     /* We are an object now */
     PObj_is_object_SET(object);
@@ -705,7 +705,7 @@ Parrot_object_isa(Parrot_Interp interpreter, PMC *pmc, PMC *cl) {
     }
     else {
         /* else get the objects class and the data array */
-        t = get_attrib_num(object_array, POD_CLASS);
+        t = GET_CLASS(object_array, pmc);
         object_array = PMC_data(t);
     }
     if (t == cl)
@@ -1059,7 +1059,7 @@ Parrot_get_attrib_by_num(Parrot_Interp interpreter, PMC *object, INTVAL attrib)
     if (PObj_is_object_TEST(object)) {
         INTVAL attrib_count;
         attrib_array = PMC_data(object);
-        attrib_count = get_attrib_count(attrib_array);
+        attrib_count = ATTRIB_COUNT(object);
         if (attrib >= attrib_count || attrib < POD_FIRST_ATTRIB) {
             internal_exception(OUT_OF_BOUNDS, "No such attribute");
         }
@@ -1077,7 +1077,7 @@ Parrot_set_attrib_by_num(Parrot_Interp interpreter, PMC *object, INTVAL attrib, 
     if (PObj_is_object_TEST(object)) {
         INTVAL attrib_count;
         attrib_array = PMC_data(object);
-        attrib_count = get_attrib_count(attrib_array);
+        attrib_count = ATTRIB_COUNT(object);
         if (attrib >= attrib_count || attrib < POD_FIRST_ATTRIB) {
             internal_exception(OUT_OF_BOUNDS, "No such attribute");
         }
@@ -1095,8 +1095,7 @@ Parrot_class_offset(Parrot_Interp interpreter, PMC *object, STRING *class) {
     INTVAL offset;
     HashBucket *b;
 
-    class_pmc = get_attrib_num((SLOTTYPE *)PMC_data(object),
-                               POD_CLASS);
+    class_pmc = GET_CLASS((SLOTTYPE *)PMC_data(object), object);
     offset_hash = get_attrib_num((SLOTTYPE *)PMC_data(class_pmc),
                                  PCD_ATTRIB_OFFS);
 #if 0

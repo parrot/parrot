@@ -85,6 +85,28 @@ void Parrot_set_class_fallback(Parrot_Interp, STRING *, INTVAL, STRING *);
 #endif
 #endif
 
+#if 0
+/*
+ * class = 1st element in object array
+ */
+
+#  define ATTRIB_COUNT(obj) PMC_int_val(obj)
+#  define SET_CLASS(arr, obj, class) \
+       set_attrib_num(obj, POD_CLASS, class)
+#  define GET_CLASS(arr, obj) \
+       get_attrib_num(obj, POD_CLASS)
+#else
+
+/*
+ * class is in the PMC
+ */
+
+#  define SET_CLASS(arr, obj, class) PObj_bufstart(obj) = class
+#  define GET_CLASS(arr, obj) PObj_bufstart(obj)
+#  define ATTRIB_COUNT(obj) PObj_buflen(obj)
+
+#endif
+
 /*
  * Local variables:
  * c-indentation-style: bsd
