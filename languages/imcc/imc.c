@@ -30,12 +30,14 @@ static IMCStack nodeStack;
 /* allocate is the main loop of the allocation algorithm */
 void allocate(struct Parrot_Interp *interpreter) {
     int to_spill;
-    int todo;
+    int todo, first;
 
     if (!instructions)
         return;
     if (!optimizer_level && pasm_file)
         return;
+
+    init_tables(interpreter);
 
     debug(DEBUG_IMC, "\n------------------------\n");
     debug(DEBUG_IMC, "processing sub %s\n", function);
@@ -43,7 +45,6 @@ void allocate(struct Parrot_Interp *interpreter) {
     if (IMCC_VERBOSE > 1 || (IMCC_DEBUG & DEBUG_IMC))
         imc_stat_init();
 
-    info(2, "pre_optimize\n");
     /* consecutive labels, if_branch, unused_labels ... */
     pre_optimize(interpreter);
     if (optimizer_level == OPT_PRE && pasm_file)
@@ -54,25 +55,22 @@ void allocate(struct Parrot_Interp *interpreter) {
 
     todo = 1;
     while (todo) {
-        info(2, "find_basic_blocks\n");
         find_basic_blocks();
+        build_cfg();
         todo = cfg_optimize(interpreter);
     }
-    todo = 1;
+    first = todo = 1;
     while (todo) {
-        find_basic_blocks();
-        info(2, "build_cfg\n");
+        if (!first) {
+            find_basic_blocks();
+            build_cfg();
+        }
+        first = 0;
 
-        build_cfg();
-
-        info(2, "compute_dominators\n");
         compute_dominators();
-        info(2, "find_loops\n");
         find_loops();
 
-        info(2, "build_reglist\n");
         build_reglist();
-        info(2, "life_analysis\n");
         life_analysis();
         /* optimize, as long as there is something to do */
         if (IMCC_DEBUG & DEBUG_IMC)
@@ -80,7 +78,6 @@ void allocate(struct Parrot_Interp *interpreter) {
         if (dont_optimize)
             todo = 0;
         else {
-            info(2, "optimize\n");
             todo = optimize(interpreter);
         }
     }
@@ -205,6 +202,7 @@ static void sort_reglist(void)
 void build_reglist(void) {
     int i, count, unused;
 
+    info(2, "build_reglist\n");
     /* count symbols */
     if (reglist)
         free_reglist();
@@ -236,7 +234,7 @@ void build_reglist(void) {
                     reglist[count++] = r;
                 /* rearange I/N registers
                  * XXX not here, do it, when reading the source
-                 * .nciarg, rx_char, ... !!!1 */
+                 * .nciarg, ... !!!1 */
                 if ((optimizer_level & OPT_PASM) && pasm_file &&
                         (reglist[count-1]->set == 'I' ||
                         reglist[count-1]->set == 'N'))
@@ -283,7 +281,7 @@ void build_interference_graph() {
             for(y = x + 1; y < n_symbols; y++) {
             if (!reglist[y]->first_ins)
 		    continue;
-            if(interferes(reglist[x], reglist[y])) {
+            if (interferes(reglist[x], reglist[y])) {
                 interference_graph[x*n_symbols+y] = reglist[y];
                 interference_graph[y*n_symbols+x] = reglist[x];
             }
@@ -328,7 +326,6 @@ void compute_du_chain() {
 
 static void compute_one_du_chain(SymReg * r) {
     Instruction * ins;
-    int ix;
 
     /* We cannot rely on computing the value of r->first when parsing,
      * since the situation can be changed at any time by the register
@@ -337,7 +334,7 @@ static void compute_one_du_chain(SymReg * r) {
 
     r->first_ins = 0;
     r->use_count = r->lhs_use_count = 0;
-    for(ix=0, ins = instructions; ins; ins = ins->next, ix++) {
+    for(ins = instructions; ins; ins = ins->next) {
 	int ro, rw;
         ro = instruction_reads(ins, r);
         rw = instruction_writes(ins, r);
@@ -359,7 +356,10 @@ static void compute_one_du_chain(SymReg * r) {
 	}
     }
     /* TODO score high if r is a array/hash key */
+    /* TODO score high if -Oj and register is used in JITtable instruction */
+
     r->score = r->use_count + (r->lhs_use_count << 2);
+    /* r->score *= (r->jit_usage - r->use_count + 1) */
 }
 
 /* Computes the cost of spilling each symbol. This is estimated by the number
@@ -376,7 +376,7 @@ void compute_spilling_costs () {
         for (i = 0; ins->r[i] && i < IMCC_MAX_REGS; i++) {
             ins->r[i]->score += 1 << (depth * 3);
             if (ins->flags & ITSPILL)
-                ins->r[i]->score = 50000000;
+                ins->r[i]->score = 100000;
         }
 
     }
@@ -419,7 +419,7 @@ int interferes(SymReg * r0, SymReg * r1) {
 	fatal(1, "interferes", "INTERNAL ERROR: Life range is NULL\n");
     }
 
-    for (i=0; i <n_basic_blocks; i++) {
+    for (i=0; i < n_basic_blocks; i++) {
        Life_range *l0, *l1;
 
        l0 = r0->life_info[i];
@@ -732,9 +732,9 @@ int neighbours(int node) {
  *   for e.g. calling out to unJITted functions
  *   This is of course processor dependend
  *
- * TODO: rx_ ops may have a inout INT parameter for position/mark.
- *       Do not assign registers, if any such inout branching
- *       instruction is encountered.
+ * NOTE: rx_ ops may have a inout INT parameter for position/mark.
+ *       Actually, the either branch or update the inout parameter
+ *       so they are save.
  */
 
 static void

@@ -1,6 +1,7 @@
 
 #include <stdlib.h>
 #include <string.h>
+#include <assert.h>
 #define _PARSER
 #include "imc.h"
 #include "pbc.h"
@@ -137,8 +138,78 @@ Instruction * _mk_instruction(const char *op, const char * fmt,
 }
 
 
+/*
+ * some instructions don't have a hint in op_info, that they work
+ * on all registers:
+ * - push?, pop?, clear?
+ * - saveall/restoreall
+ */
+
+static int r_special[5];
+static int w_special[1+4*3];
+
+void
+init_tables(struct Parrot_Interp * interpreter)
+{
+    size_t i;
+    const char *reads[] = {
+        "saveall",
+        "pushi", "pushn", "pushp", "pushs"
+    };
+    const char *writes[] = {
+        "restoreall",
+        "pushi", "pushn", "pushp", "pushs",
+        "popi", "popn", "popp", "pops",
+        "cleari", "clearn", "clearp", "clears",
+    };
+    /* init opnums */
+    if (!r_special[0]) {
+        for (i = 0; i < sizeof(reads)/sizeof(reads[0]); i++) {
+            int n = interpreter->op_lib->op_code(reads[i], 1);
+            assert(n);
+            r_special[i] = n;
+        }
+        for (i = 0; i < sizeof(writes)/sizeof(writes[0]); i++) {
+            int n = interpreter->op_lib->op_code(writes[i], 1);
+            assert(n);
+            w_special[i] = n;
+        }
+    }
+}
+
+/* return TRUE, if ins reads register of type t */
+int
+ins_reads2(Instruction *ins, char t)
+{
+    size_t i;
+    const char types[] = "INPS";
+    if (ins->opnum == r_special[0])
+        return 1;
+    for (i = 1; i < sizeof(r_special)/sizeof(int); i += 4) {
+        if (ins->opnum == r_special[i + (strchr(types, t) - types)])
+            return 1;
+    }
+    return 0;
+}
+
+/* return TRUE, if ins writes register of type t */
+int
+ins_writes2(Instruction *ins, char t)
+{
+    size_t i;
+    const char types[] = "INPS";
+    if (ins->opnum == w_special[0])
+        return 1;
+    for (i = 1; i < sizeof(w_special)/sizeof(int); i += 4) {
+        if (ins->opnum == w_special[i + (strchr(types, t) - types)])
+            return 1;
+    }
+    return 0;
+}
+
+
 /* next 2 functions are called very often, says gprof
- * theys should be fast
+ * they should be fast
  */
 #ifdef HAS_INLINE
 inline
@@ -326,7 +397,8 @@ static char * ins_fmt(Instruction * ins) {
 	    sprintf(regb[i], "%c%d", p->set, p->color);
 	    regstr[i] = regb[i];
 	}
-        else if (p->set != 'K' && p->color < 0 && (p->type & VTREGISTER)) {
+        else if ((optimizer_level & OPT_J) && p->set != 'K' &&
+                p->color < 0 && (p->type & VTREGISTER)) {
 	    sprintf(regb[i], "r%c%d", tolower(p->set), -1 - p->color);
 	    regstr[i] = regb[i];
 	}
@@ -336,7 +408,8 @@ static char * ins_fmt(Instruction * ins) {
                 if (k->reg && k->reg->color >= 0)
                     sprintf(regb[i]+strlen(regb[i]), "%c%d",
                             k->reg->set, k->reg->color);        /* XXX */
-                else if (k->reg && k->reg->color < 0)
+                else if ((optimizer_level & OPT_J) &&  k->reg &&
+                        k->reg->color < 0)
                     sprintf(regb[i]+strlen(regb[i]), "r%c%d",
                             tolower(k->reg->set), -1 - k->reg->color);
                 else

@@ -63,6 +63,7 @@ static int clone_remove(void);
 
 void pre_optimize(struct Parrot_Interp *interp) {
     if (optimizer_level & OPT_PRE) {
+        info(2, "pre_optimize\n");
         subst_constants_mix(interp);
         subst_constants_umix(interp);
         subst_constants(interp);
@@ -76,6 +77,7 @@ void pre_optimize(struct Parrot_Interp *interp) {
 int cfg_optimize(struct Parrot_Interp *interp) {
     UNUSED(interp);
     if (optimizer_level & OPT_PRE) {
+        info(2, "cfg_optimize\n");
         if (branch_branch())
             return 1;
         /* XXX cfg / loop detection breaks e.g. in t/compiler/5_3 */
@@ -90,6 +92,7 @@ int cfg_optimize(struct Parrot_Interp *interp) {
 int optimize(struct Parrot_Interp *interp) {
 
     if (optimizer_level & OPT_CFG) {
+        info(2, "optimize\n");
         /* constant_propagation(); N/Y */
         if (clone_remove())
             return 1;
@@ -824,7 +827,7 @@ static int dead_code_remove(void)
             int bbi = bb->index;
             debug(DEBUG_OPT1, "found dead block %d\n", bb->index);
             for (ins = bb->start; ins && ins->index == bbi; ) {
-                debug(DEBUG_OPT1, "unreachable ins deleted %s\n",
+                debug(DEBUG_OPT1, "unreachable ins deleted (dead block) %s\n",
                     ins_string(ins));
                 ins = delete_ins(ins, 1);
                 ostat.deleted_ins++;
@@ -838,7 +841,7 @@ static int dead_code_remove(void)
         return changed;
     for (last = instructions, ins=last->next; last && ins; ins = ins->next) {
         if ((last->type & IF_goto) && !(ins->type & ITLABEL)) {
-            debug(DEBUG_OPT1, "unreachable ins deleted %s\n",
+            debug(DEBUG_OPT1, "unreachable ins deleted (after branch) %s\n",
                     ins_string(ins));
             ins = delete_ins(ins, 1);
             ostat.deleted_ins++;

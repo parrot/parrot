@@ -59,6 +59,7 @@ int get_pmc_num(struct Parrot_Interp *interp, char *pmc_type);
 
 int check_op(struct Parrot_Interp *, char * fullname, char *op, SymReg *r[]);
 int is_op(struct Parrot_Interp *, char *);
+void init_tables(struct Parrot_Interp * interp);
 
 /* This should be common with Cola */
 

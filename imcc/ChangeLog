@@ -1,3 +1,10 @@
+- 2003-02-22	leo / Juergen Boemmels
+
+	* correct line numbers for debugger WRT macros
+	  (thanks to Juergen Boemmels)
+	* first try to get effects of clear?, pop?, restoreall
+	  ops into register life info
+
 - 2003-02-21	leo
 
 	* version 0.0.9.15

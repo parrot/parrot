@@ -24,6 +24,7 @@ void find_basic_blocks () {
     int nu = 0;
     int i;
 
+    info(2, "find_basic_blocks\n");
     init_basic_blocks();
     for(i = 0; i < HASH_SIZE; i++) {
         SymReg * r = hash[i];
@@ -122,6 +123,7 @@ void build_cfg() {
     Basic_block *last, *bb;
     Edge *pred;
 
+    info(2, "build_cfg\n");
     for (i = 0; bb_list[i]; i++) {
         bb = bb_list[i];
 
@@ -327,6 +329,7 @@ static void propagate_alias(void)
 void life_analysis() {
     int i;
 
+    info(2, "life_analysis\n");
     propagate_alias();
     for(i = 0; i < n_symbols; i++)
         analyse_life_symbol(reglist[i]);
@@ -383,24 +386,39 @@ void free_life_info(SymReg *r)
  */
 
 void analyse_life_block(Basic_block* bb, SymReg* r) {
-    Instruction* ins;
+    Instruction* ins, *special;
     Life_range* l;
 
     l = make_life_range(r, bb->index);
 
+    special = NULL;
     for (ins = bb->start; ins ; ins = ins->next) {
         if (ins==NULL) {
 		fatal(1,"analyse_life_block",
                         "Index %i of %i has NULL instruction\n",
 				ins->index, bb->end->index);
 	}
-	if (instruction_reads(ins, r)) {
-	    if (! (l->flags & LF_def) ) {
+        /* restoreall and such */
+        if (ins_writes2(ins, r->set))
+            special = ins;
 
-		/* we read before having written before, so the var was
-		 * live at the beggining of the block */
-		l->first_ins = bb->start;
-		l->flags |= LF_use;
+	if (instruction_reads(ins, r)) {
+            /* if instruction gets read after a special, consider
+             * the first read of this instruction, like if a write
+             * had happened at special, so that the reg doesn't pop into
+             * life */
+	    if (! (l->flags & LF_def) ) {
+                if (special) {
+                    l->first_ins = special;
+                    l->flags |= LF_def;
+                    special = NULL;
+                }
+                else {
+                    /* we read before having written before, so the var was
+                     * live at the beggining of the block */
+                    l->first_ins = bb->start;
+                    l->flags |= LF_use;
+                }
 	    }
 	    l->last_ins = ins;
 	}
@@ -473,6 +491,7 @@ void compute_dominators () {
     int i, change, pred_index;
     Edge *edge;
 
+    info(2, "compute_dominators\n");
     dominators = malloc(sizeof(Set*) * n_basic_blocks);
 
     dominators[0] = set_make (n_basic_blocks);
@@ -562,6 +581,7 @@ void find_loops () {
     Set* dom;
     Edge* edge;
 
+    info(2, "find_loops\n");
     for (i = 0; i < n_basic_blocks; i++) {
 	dom = dominators[i];
 

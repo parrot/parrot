@@ -440,9 +440,11 @@ pasm_args:
     ;
 
 emit:
-      EMIT                              { open_comp_unit(); }
+      EMIT                              { open_comp_unit();
+                                          function = "(emit)"; }
       pasmcode
-      EOM 				{ allocate(interp);
+      EOM 				{ if (optimizer_level & OPT_PASM)
+                                                allocate(interp);
                                           emit_flush(interp); $$=0;}
     ;
 

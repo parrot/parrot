@@ -27,6 +27,7 @@ struct macro_t {
     char *name;
     struct params_t params;
     char *expansion;
+    int line;
 };
 
 /* XXX: boe: rework this hack to use a hash */
@@ -41,6 +42,7 @@ struct macro_frame_t {
     struct params_t *params;
     struct params_t expansion;
     int label;
+    int line;
 };
 
 struct macro_frame_t *frames = NULL;
@@ -401,6 +403,7 @@ new_frame (void)
 
     tmp = mem_sys_allocate_zeroed(sizeof(struct macro_frame_t));
     tmp->label = ++label;
+    tmp->line = line;
 
     return tmp;
 }
@@ -426,6 +429,8 @@ destroy_frame (struct macro_frame_t *frame)
     for (i = 0; i < frame->expansion.num_param; i++) {
 	free(frame->expansion.name[i]);
     }
+
+    line = frame->line;
 
     mem_sys_free(frame);
 
@@ -508,6 +513,7 @@ read_macro (YYSTYPE *valp, void *interp)
 	fataly(EX_SOFTWARE, ".macro", line, "Macro names must be identifiers");
 
     m->name = valp->s;
+    m->line = line;
 
     /* white space is allowed between macro and opening paren) */
     c = yylex_skip(valp, interp, " ");
@@ -624,6 +630,7 @@ expand_macro (YYSTYPE *valp, void *interp, const char *name)
 		   frame->expansion.num_param, m->params.num_param);
 	}
 
+	line = m->line;
 	scan_string(frame, m->expansion);
 	return 1;
     }
@@ -652,6 +659,9 @@ scan_file (struct macro_frame_t *frame, FILE *file)
     frame->buffer = YY_CURRENT_BUFFER;
     frame->next = frames;
     frames = frame;
+
+    /* XXX: Switch the filename */
+    line = 1;
 
     yy_switch_to_buffer(yy_create_buffer(file, YY_BUF_SIZE));
 }
