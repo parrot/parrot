@@ -19,7 +19,8 @@ parrotbench - Parrot benchmark
 parrotbench [options]
 
  Options:
-   -b -benchmarks     only use benchmarks matching regex
+   -b -benchmarks     use benchmarks matching regex
+   -n -nobench        skip benchmarks matching regex
    -c -conf           path to configuration file
    -d -directory      path to benchmarks directory
    -e -executables    only use executables matching regex
@@ -50,6 +51,7 @@ Here is an example parrotbench.conf:
 =cut
 
 my $benchmarks  = '.*';
+my $nobench     = '[^\d\D]';  # Need to make sure it fails if not user-defined
 my $conf        = "$FindBin::Bin/parrotbench.conf";
 my $directory   = "$FindBin::Bin/../../examples/benchmarks";
 my $executables = '.*';
@@ -59,6 +61,7 @@ my $time        = 0;
 
 GetOptions
   'benchmarks=s'  => \$benchmarks,
+  'nobench=s'     => \$nobench,
   'conf=s'        => \$conf,
   'directory=s'   => \$directory,
   'executables=s' => \$executables,
@@ -74,8 +77,9 @@ my $file = new IO::File("< $conf")
   or die "Unable to open configuration file \"$conf\"";
 my ( @names, %pathes, %suffixes, @suffixes );
 my $i = 0;
-while (<$file>) {
-    if (/^\s*(.*):\s*(.*):\s*(.*)$/) {
+while (<$file>) {    # This really should be a Config:: module
+    chomp;
+    if (/^\s*([^:]+):\s*([^:]+):\s*([^:]+)$/) {  # Death to .*
         my $name     = $1;
         my $path     = $2;
         my $suffixes = $3;
@@ -89,6 +93,10 @@ while (<$file>) {
             $i++;
         }
     }
+    if ( /^NOBENCH\s*=\s*(.+)$/ ) {   # Added because I couldn't pass to the shell correctly
+        $nobench = $1;                # This code probably shouldn't even exist
+        $nobench =~ tr/\015//d;       # Looks like it turned out to be a Cygwin/Win32 thing
+    }
 }
 $file->close;
 
@@ -96,9 +104,9 @@ $file->close;
 my ( %list, %tree );
 find sub {
     foreach my $suffix ( keys %suffixes ) {
-        if (/(\w*)\.$suffix/) {
+        if (/([\w-]+)\.$suffix/) {    # added - to make hyphens in file names work
             my $benchmark = $1;
-            if ( $benchmark =~ /$benchmarks/ ) {
+            if ( $benchmark =~ /$benchmarks/ && $benchmark !~ /$nobench/ ) { # Allow skipping
                 $list{$benchmark}++;
                 foreach my $name ( @{ $suffixes{$suffix} } ) {
                     $tree{$name}{$suffix}{$benchmark}++;

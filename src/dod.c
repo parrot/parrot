@@ -265,10 +265,7 @@ Parrot_dod_trace_root(Interp *interpreter, int trace_stack)
 
     struct Arenas *arena_base = interpreter->arena_base;
 
-    /* Pointer to the currently being processed PMC
-     *
-     * initialize locals to zero, so no garbage is on stack
-     *
+    /*
      * note: adding locals here did cause increased DOD runs
      */
     unsigned int i = 0;
