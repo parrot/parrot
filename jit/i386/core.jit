@@ -110,6 +110,38 @@ Parrot_set_i_nc {
     }
 }
 
+; -- null op.
+TEMPLATE Parrot_null_x {
+    if (MAP[1]) {
+        jit_emit_mov_ri<_N>(NATIVECODE, MAP[1], <val>);
+    }
+    else {
+        jit_emit_mov_mi<_N>(NATIVECODE, &INT_REG[1], <val>);
+    }
+}
+ 
+Parrot_null_i {
+    Parrot_null_x s/<_N>/_i/ s/<val>/0/
+}
+ 
+Parrot_null_p {
+    Parrot_null_x s/<_N>/_i/ s/INT_R/PMC_R/ s/<val>/NULL/
+}
+ 
+Parrot_null_s {
+    Parrot_null_x s/<_N>/_i/ s/INT_R/STRING_R/ s/<val>/NULL/
+}
+
+Parrot_null_n {
+    FLOATVAL zero = 0;
+    if (MAP[1]) {
+        jit_emit_mov_ri_ni(NATIVECODE, MAP[1], &zero);
+    }
+    else {
+        jit_emit_mov_mi_ni(NATIVECODE, &NUM_REG[1], &zero);
+    }
+}
+
 TEMPLATE Parrot_binop_x_x {
     if (MAP[1] && MAP[2]) {
         jit_emit_<op>_rr<_N>(NATIVECODE, MAP[1], MAP[2]);
