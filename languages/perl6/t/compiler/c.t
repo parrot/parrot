@@ -1,9 +1,13 @@
 #!perl
 use strict;
 use P6C::TestCompiler tests => 6;
+use Test::More;
 
 ##############################
 
+SKIP: {
+skip("running on a perl that does not understand 0b... notation", 1)
+    unless 2 == eval "0b010";
 output_is(<<'CODE', <<'OUT', "Binary");
 sub main() {
 	print 0b0110;
@@ -15,6 +19,7 @@ CODE
 6
 -6
 OUT
+}
 
 ##############################
 

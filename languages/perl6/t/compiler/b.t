@@ -1,6 +1,7 @@
 #!perl
 use strict;
 use P6C::TestCompiler tests => 6;
+use Test::More;
 
 ##############################
 output_is(<<'CODE', <<'OUT', "string interpolation 1");
@@ -67,6 +68,9 @@ CODE
 OUT
 
 ##############################
+SKIP: {
+skip("running on a perl without charnames", 1)
+    unless eval "use charnames (); 1";
 output_is(<<'CODE', <<'OUT', "string interpolation 4");
 sub main() {
     print "\c[^J]"; # Control-Char
@@ -82,6 +86,7 @@ CODE
 16
 @P
 OUT
+}
 
 ##############################
 output_is(<<'CODE', <<'OUT', "string interpolation 5");
