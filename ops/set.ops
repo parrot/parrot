@@ -271,6 +271,51 @@ inline op setp_ind(in INT, in PMC) {
     goto NEXT();
 }
 
+=item B<setn_ind>(in INT, in NUM)
+
+Set the PMC in register $1 to $2.
+Please note, that the register allocator doesn't track the usage of the
+affected register - handle with care.
+
+=cut
+
+inline op setn_ind(in INT, in NUM) {
+    if ($1 < 0 || $1 >= NUM_REGISTERS)
+        PANIC("Out of bound register access");
+    REG_NUM($1) = $2;
+    goto NEXT();
+}
+
+=item B<sets_ind>(in INT, in STR)
+
+Set the string in register $1 to $2.
+Please note, that the register allocator doesn't track the usage of the
+affected register - handle with care.
+
+=cut
+
+inline op sets_ind(in INT, in STR) {
+    if ($1 < 0 || $1 >= NUM_REGISTERS)
+        PANIC("Out of bound register access");
+    REG_STR($1) = $2;
+    goto NEXT();
+}
+
+=item B<seti_ind>(in INT, in INT)
+
+Set the int in register $1 to $2.
+Please note, that the register allocator doesn't track the usage of the
+affected register - handle with care.
+
+=cut
+
+inline op seti_ind(in INT, in INT) {
+    if ($1 < 0 || $1 >= NUM_REGISTERS)
+        PANIC("Out of bound register access");
+    REG_INT($1) = $2;
+    goto NEXT();
+}
+
 =back
 
 =cut

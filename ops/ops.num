@@ -1262,3 +1262,15 @@ store_global_sc_p	1234
 find_global_p_s	1235
 find_global_p_sc	1236
 set_addr_p_ic   1237
+setn_ind_i_n    1238
+setn_ind_ic_n   1239
+setn_ind_i_nc   1240
+setn_ind_ic_nc  1241
+sets_ind_i_s    1242
+sets_ind_ic_s   1243
+sets_ind_i_sc   1244
+sets_ind_ic_sc  1245
+seti_ind_i_i    1246
+seti_ind_ic_i   1247
+seti_ind_i_ic   1248
+seti_ind_ic_ic  1249

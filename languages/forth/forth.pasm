@@ -1513,9 +1513,9 @@ CompileString:
     set .Commands, .WordBody
     set .NewBodyString, "wordtop:\n"
 
-    print "Being asked to compile:"
-    print .WordBody
-    print ":\n"
+#    print "Being asked to compile:"
+#    print .WordBody
+#    print ":\n"
 
 CompileWord:
     # No space!
@@ -1539,8 +1539,8 @@ CompileWord:
     concat .NewBodyString, "ret\n"
 
     # Compile the string
-    print "Compiling:\n"
-    print .NewBodyString
+#    print "Compiling:\n"
+#    print .NewBodyString
     compile .CompiledWordPMC, .PASMCompiler, .NewBodyString
 
     # And we're done
