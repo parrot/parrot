@@ -3,8 +3,8 @@
 use Parrot::Test tests => 9;
 use Test::More;
 
-TODO: {
-  local $TODO = "readline not yet ported to PIO";
+SKIP: {
+  skip "readline not yet ported to PIO", 3;
 
 # It would be very embarrassing if these didn't work...
 open FOO, ">temp.file";
