@@ -76,14 +76,26 @@ sub output_match {
            );
 }
 
-sub output_start {
-    my ($self, $n) = @_;
-    return "set P0[$n], $R_POS # open group $n";
+sub output_setstart {
+    my ($self, $group, $value) = @_;
+    $value = $R_POS if $value eq 'pos';
+    return "set P0[$group], $value # open group $group";
 }
 
-sub output_end {
-    my ($self, $n) = @_;
-    return "set P1[$n], $R_POS # close group $n";
+sub output_setend {
+    my ($self, $group, $value) = @_;
+    $value = $R_POS if $value eq 'pos';
+    return "set P1[$group], $value # close group $group";
+}
+
+sub output_getstart {
+    my ($self, $reg, $group) = @_;
+    return "set $reg, P0[$group] # get group $group start";
+}
+
+sub output_getend {
+    my ($self, $reg, $group) = @_;
+    return "set $reg, P1[$group] # get group $group end";
 }
 
 sub output_delete {
@@ -113,18 +125,31 @@ sub output_pushmark {
 }
 
 sub output_pushindex {
-    my ($self) = @_;
+    my ($self, $reg) = @_;
+    $reg = $R_POS if (! defined($reg) || $reg eq 'pos');
+
     if ($self->{DEBUG}) {
-	return ("save $R_POS", 'print "PUSHED: "', 'bsr DUMPSTACK');
+	return ("save $reg", 'print "PUSHED: "', 'bsr DUMPSTACK');
     } else {
-	return "save $R_POS # pushindex";
+	return "save $reg # pushindex";
     }
 }
 
 use vars qw($DEBUG_LABEL);
 sub output_popindex {
-    my ($self, $fallback) = @_;
-    die "Must always have fallback defined!" if ! $fallback;
+    my $self = shift;
+    my ($reg, $fallback);
+    if (@_ == 1) {
+        ($reg, $fallback) = ('pos', @_);
+    } elsif (@_ == 2) {
+        ($reg, $fallback) = @_;
+    } elsif (@_ == 0) {
+        die "Must always have fallback defined!";
+    } else {
+        die "Too many arguments to popindex!";
+    }
+
+    $reg = $R_POS if $reg eq 'pos';
 
     if ($self->{DEBUG}) {
 	my $index_popped = [ 'label', '@_DEBUG_' . ++$DEBUG_LABEL ];
@@ -146,8 +171,15 @@ sub output_popindex {
     } else {
 	return ("restore I0 # popindex",
 		"eq I0, -1, ".$self->output_label_use($fallback)." # was a mark?",
-		"set $R_POS, I0 # nope, set pos := popped index");
+		"set $reg, I0 # nope, set pos := popped index");
     }
+}
+
+sub output_popint {
+    my ($self, $reg) = @_;
+    $reg = $R_POS if $reg eq 'pos';
+
+    return ("restore $reg # popint");
 }
 
 1;

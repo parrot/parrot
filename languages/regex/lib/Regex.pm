@@ -3,7 +3,7 @@ use Regex::PreOptimize;
 use Regex::Optimize;
 use Regex::Generate;
 
-use Regex::Rewrite::Rx;
+use Regex::Rewrite::Stackless;
 #use Regex::CodeGen::Rx;
 use Regex::CodeGen::Pasm;
 

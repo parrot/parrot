@@ -13,7 +13,7 @@ sub new {
 sub init {
     my $self = shift;
     $self->{_markers} = {};
-    $self->{_temp_int_count} = 0;
+    $self->{_temp_int_count} = 3;
 }
 
 sub aop {
@@ -35,7 +35,7 @@ sub alloc_temp_int {
     my $register = "I" . $self->{_temp_int_count};
 
     if (++$self->{_temp_int_count} > $NUM_REGISTERS) {
-        # I betcha live region detection would be better...
+        # Time to switch to IMCC.
         die "Too many temporaries requested! Implement register spilling!";
     }
 
@@ -120,6 +120,7 @@ sub rewrite_multi_match {
 
 ################################ Main loop #######################
 
+# Unused
 sub run {
     my $self = shift;
 

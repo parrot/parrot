@@ -6,13 +6,13 @@ use Regex::PreOptimize;
 use Regex::Optimize;
 use Regex::Generate;
 
-use Regex::Rewrite::Rx;
+use Regex::Rewrite::Stackless;
 use Regex::CodeGen::Pasm;
 use strict;
 
 my $parser = Regex::Parse->new();
 my $opt1 = Regex::PreOptimize->new();
-my $rewrite = Regex::Rewrite::Rx->new();
+my $rewrite = Regex::Rewrite::Stackless->new();
 my $opt2 = Regex::Optimize->new();
 my $cgen = Regex::CodeGen::Pasm->new();
 

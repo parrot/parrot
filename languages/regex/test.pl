@@ -184,7 +184,7 @@ END
     my $DEBUG = 0;
     my $parser = Regex::Parse->new();
     my $opt1 = Regex::PreOptimize->new();
-    my $rewrite = Regex::Rewrite::Rx->new(DEBUG => $DEBUG);
+    my $rewrite = Regex::Rewrite::Stackless->new(DEBUG => $DEBUG);
     my $opt2 = Regex::Optimize->new();
     my $cgen = Regex::CodeGen::Pasm->new(DEBUG => $DEBUG);
 
