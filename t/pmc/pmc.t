@@ -1267,6 +1267,7 @@ output_is(<<CODE, <<OUTPUT, "mul_p_p");
     mul P0,P1
     print P0
     print "\\n"
+    end
 CODE
 16
 OUTPUT
