@@ -4,3 +4,5 @@ test_prog
 pdump
 Makefile
 *.patch
+vtable.ops
+vtable_ops.c
