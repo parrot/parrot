@@ -99,7 +99,6 @@ Parrot_new_pmc_header_arena(struct Parrot_Interp *interpreter)
 static void
 alloc_more_pmc_headers(struct Parrot_Interp *interpreter)
 {
-
     /* First, try and find some unused headers */
     Parrot_do_dod_run(interpreter);
 
@@ -352,7 +351,6 @@ mark_buffers_unused(struct Parrot_Interp *interpreter)
 static PMC *
 mark_used(PMC *used_pmc, PMC *current_end_of_list)
 {
-
     /* If the PMC we've been handed has already been marked as live
      * (ie we put it on the list already) we just return. Otherwise we
      * could get in some nasty loops */
@@ -510,7 +508,6 @@ trace_active_buffers(struct Parrot_Interp *interpreter)
 static void
 free_unused_PMCs(struct Parrot_Interp *interpreter)
 {
-
     struct PMC_Arena *cur_arena;
     UINTVAL i;
 
@@ -559,7 +556,6 @@ free_unused_buffers(struct Parrot_Interp *interpreter)
 void
 Parrot_do_dod_run(struct Parrot_Interp *interpreter)
 {
-
     /* First go mark all PMCs as unused */
     mark_PMCs_unused(interpreter);
 

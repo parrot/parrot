@@ -104,7 +104,6 @@ void
 trace_op(struct Parrot_Interp *interpreter, opcode_t *code_start,
          opcode_t *code_end, opcode_t *pc)
 {
-
     if (!pc) {
         return;
     }
