@@ -82,6 +82,12 @@ C<value>.
 
 Resizes the array to C<size> elements.
 
+When growing, if the new size stays smaller than twice the old size,
+grow to two twice the old size, otherwise grow to the new size.
+
+When shrinking, if the new size gets smaller than half the old size,
+shrink to one and half times the new size (three thirds of the old size).
+
 =cut
 
 */
@@ -94,11 +100,14 @@ Resizes the array to C<size> elements.
 
         sd = PMC_data(SELF);
         PMC_int_val(SELF) = size;
-        if(sd == NULL) {
+        if (sd == NULL) {
             sd = mem_sys_allocate(NEEDED_SIZE(size));
             sd->size = size;
-        } else if(size >= sd->size) {
-            sd->size = size < 2*sd->size ? sd->size*2 : size;
+        } else if (size >= sd->size) {
+            sd->size = size < 2 * sd->size ? 2 * sd->size : size;
+            sd = mem_sys_realloc(sd, NEEDED_SIZE(sd->size));
+        } else if (size < sd->size / 2) {
+            sd->size = size * 3 / 2;
             sd = mem_sys_realloc(sd, NEEDED_SIZE(sd->size));
         } else {
             return;
@@ -164,7 +173,7 @@ Removes and returns the last element in the array.
 */
 
     FLOATVAL pop_float() {
-        INTVAL size, new_size;
+        INTVAL size;
         FLOATVAL value;
         SizeFloatData *sd;
 
@@ -176,14 +185,9 @@ Removes and returns the last element in the array.
                     "ResizableFloatArray: Can't pop from an empty array!\n");
         }
 
-        new_size = size - 1;
-        value = sd->data[size-1];
+	value = sd->data[size - 1];
+        DYNSELF.set_integer_native(size - 1);
 
-        /* XXX: inefficient, but if we don't do it, we leak the memory */
-        sd = mem_sys_realloc(sd, NEEDED_SIZE(new_size));
-
-        sd->size = new_size;
-        PMC_int_val(SELF) = new_size;
         return value;
     }
 
