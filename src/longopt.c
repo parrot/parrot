@@ -12,11 +12,11 @@
 #include "parrot/parrot.h"
 #include "parrot/longopt.h"
 
-static int longopt_get_longopt(int argc, const char* argv[],
+static int longopt_get_longopt(Parrot_Interp, int argc, const char* argv[],
                                const struct longopt_opt_decl options[],
                                struct longopt_opt_info* info_buf);
 
-static int longopt_get_shortopt(int argc, const char* argv[],
+static int longopt_get_shortopt(Parrot_Interp, int argc, const char* argv[],
                                 const struct longopt_opt_decl options[],
                                 struct longopt_opt_info* info_buf);
 
@@ -30,7 +30,7 @@ static char longopt_error_buffer[512];
  * Any other value is a valid option id.
  */
 int
-longopt_get(int argc, const char* argv[],
+longopt_get(Parrot_Interp interp, int argc, const char* argv[],
             const struct longopt_opt_decl options[],
             struct longopt_opt_info* info_buf)
 {
@@ -47,7 +47,7 @@ longopt_get(int argc, const char* argv[],
         return 0;
 
     if (info_buf->_shortopt_pos)
-        return longopt_get_shortopt(argc, argv, options, info_buf);
+        return longopt_get_shortopt(interp, argc, argv, options, info_buf);
     
     if (argv[dex][1] == '-') { /* Long option or -- */
         if (argv[dex][2] == '\0') {
@@ -55,11 +55,11 @@ longopt_get(int argc, const char* argv[],
             return 0;
         }
         else {                   /* Long option */
-            return longopt_get_longopt(argc, argv, options, info_buf);
+            return longopt_get_longopt(interp, argc, argv, options, info_buf);
         }
     }
     else {                       /* Short option */
-        return longopt_get_shortopt(argc, argv, options, info_buf);
+        return longopt_get_shortopt(interp, argc, argv, options, info_buf);
     }
 }
 
@@ -70,7 +70,7 @@ longopt_get(int argc, const char* argv[],
  * three characters and start with --.
  */
 static int
-longopt_get_longopt(int argc, const char* argv[],
+longopt_get_longopt(Parrot_Interp interp, int argc, const char* argv[],
                     const struct longopt_opt_decl options[],
                     struct longopt_opt_info* info_buf)
 {
@@ -112,7 +112,7 @@ longopt_get_longopt(int argc, const char* argv[],
 
     /* Couldn't find it. */
     info_buf->opt_id = -1;
-    snprintf(longopt_error_buffer, 512, 
+    Parrot_snprintf(interp, longopt_error_buffer, 512, 
              "Option %s not known", argv[dex]);
     info_buf->opt_error = longopt_error_buffer;
     return -1;
@@ -125,7 +125,7 @@ longopt_get_longopt(int argc, const char* argv[],
  * long and start with a dash.
  */
 static int 
-longopt_get_shortopt(int argc, const char* argv[],
+longopt_get_shortopt(Parrot_Interp interp, int argc, const char* argv[],
                      const struct longopt_opt_decl options[],
                      struct longopt_opt_info* info_buf)
 {
@@ -169,7 +169,7 @@ longopt_get_shortopt(int argc, const char* argv[],
     
     /* Couldn't find it in the table */
     info_buf->opt_id = -1;
-    snprintf(longopt_error_buffer, 512, 
+    Parrot_snprintf(interp, longopt_error_buffer, 512, 
              "Option -%c not known", *pos);
     info_buf->opt_error = longopt_error_buffer; 
     return -1;

@@ -41,7 +41,7 @@ struct longopt_opt_info {
 
 #define LONGOPT_OPT_INFO_INIT { 1, 0, NULL, NULL, NULL }
 
-int longopt_get(int argc, const char* argv[], 
+int longopt_get(Parrot_Interp, int argc, const char* argv[], 
                 const struct longopt_opt_decl options[],
                 struct longopt_opt_info* info_buf);
 
