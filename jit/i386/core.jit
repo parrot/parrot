@@ -713,6 +713,43 @@ TEMPLATE Parrot_binop_x_x_x {
     }
 }
 
+TEMPLATE Parrot_op_n_n_i {
+    if (MAP[3]) {
+        /* store integer - only ops with mem defined */
+        jit_emit_mov_MR_i(NATIVECODE, ROFFS_INT(3), MAP(3));
+    }
+    if (MAP[1] && MAP[2]) {
+        jit_emit_mov_rr_n(NATIVECODE, MAP[1], MAP[2]);
+        jit_emit_<op>_RM_ni(NATIVECODE, MAP[1], ROFFS_INT(3));
+    }
+    else {
+        if (MAP[2]) {
+            jit_emit_mov_rr_n(NATIVECODE, FSR1, MAP[2]);
+        }
+        else {
+            jit_emit_mov_RM_n(NATIVECODE, FSR1, ROFFS_NUM(2));
+        }
+        jit_emit_<op>_RM_ni(NATIVECODE, ISR1, ROFFS_INT(3));
+        jit_emit_mov_MR_n(NATIVECODE, ROFFS_NUM(1), FSR1);
+    }
+}
+
+Parrot_add_n_n_i {
+    Parrot_op_n_n_i s/<op>/add/
+}
+
+Parrot_sub_n_n_i {
+    Parrot_op_n_n_i s/<op>/sub/
+}
+
+Parrot_mul_n_n_i {
+    Parrot_op_n_n_i s/<op>/mul/
+}
+
+Parrot_div_n_n_i {
+    Parrot_op_n_n_i s/<op>/div/
+}
+
 TEMPLATE Parrot_divop_x_x_x {
     if (MAP[2]) {
         jit_emit_mov_rr<_N>(NATIVECODE, ISR1, MAP[2]);

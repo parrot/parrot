@@ -1205,22 +1205,22 @@ static unsigned char *lastpc;
 #  define emitm_fucomp(pc, sti) emitm_fl_3(pc, emit_b101, emit_b101, sti)
 
 /* 0xDE ops */
-/* Add ST(i) = ST + ST(i); POP  */
+/* FADDP Add ST(i) = ST + ST(i); POP  */
 #  define emitm_faddp(pc, sti) emitm_fl_3(pc, emit_b110, emit_b000, sti)
 
-/* Mul ST(i) = ST * ST(i); POP  */
+/* FMULP Mul ST(i) = ST * ST(i); POP  */
 #  define emitm_fmulp(pc, sti) emitm_fl_3(pc, emit_b110, emit_b001, sti)
 
-/* SubR ST(i) = ST - ST(i); POP  */
+/* FSUBRP SubR ST(i) = ST - ST(i); POP  */
 #  define emitm_fsubrp(pc, sti) emitm_fl_3(pc, emit_b110, emit_b100, sti)
 
-/* Sub ST(i) = ST(i) - ST; POP  */
+/* FSUBP Sub ST(i) = ST(i) - ST; POP  */
 #  define emitm_fsubp(pc, sti) emitm_fl_3(pc, emit_b110, emit_b101, sti)
 
-/* DivR ST(i) = ST(i) / ST(0); POP  */
+/* FDIVRP DivR ST(i) = ST(i) / ST(0); POP  */
 #  define emitm_fdivrp(pc, sti) emitm_fl_3(pc, emit_b110, emit_b110, sti)
 
-/* Add ST(i) = ST(0) / ST(i); POP ST(0) */
+/* FDIVP Div ST(i) = ST(0) / ST(i); POP ST(0) */
 #  define emitm_fdivp(pc, sti) emitm_fl_3(pc, emit_b110, emit_b111, sti)
 
 /* 0xDF OPS: FCOMIP, FUCOMIP PPRO */
@@ -1264,15 +1264,33 @@ static unsigned char *lastpc;
 /* ST -= real64 */
 #  define emitm_fsub_m(pc,b,i,s,d) \
     emitm_fl_2(pc, emit_b10, 0, emit_b100, b, i, s, d)
+
+/* ST -= int32_mem */
+#  define emitm_fisub_m(pc,b,i,s,d) \
+    emitm_fl_2(pc, emit_b01, 0, emit_b100, b, i, s, d)
+
 #  define emitm_fadd_m(pc,b,i,s,d) \
     emitm_fl_2(pc, emit_b10, 0, emit_b000, b, i, s, d)
+
+/* ST += int32_mem */
+#  define emitm_fiadd_m(pc,b,i,s,d) \
+    emitm_fl_2(pc, emit_b01, 0, emit_b000, b, i, s, d)
 
 /* ST *= real64 */
 #  define emitm_fmul_m(pc,b,i,s,d) \
     emitm_fl_2(pc, emit_b10, 0, emit_b001, b, i, s, d)
+
+/* ST *= int32_mem */
+#  define emitm_fimul_m(pc,b,i,s,d) \
+    emitm_fl_2(pc, emit_b01, 0, emit_b001, b, i, s, d)
+
 /* ST /= real64 */
 #  define emitm_fdiv_m(pc,b,i,s,d) \
     emitm_fl_2(pc, emit_b10, 0, emit_b110, b, i, s, d)
+
+/* ST /= int32_mem */
+#  define emitm_fidiv_m(pc,b,i,s,d) \
+    emitm_fl_2(pc, emit_b01, 0, emit_b110, b, i, s, d)
 
 /* Ops Needed to support loading EFLAGs for conditional branches */
 #  define emitm_fstw(pc) emitm_fl_3(pc, emit_b111, emit_b100, emit_b000)
@@ -1640,11 +1658,28 @@ static unsigned char *lastpc;
     emitm_faddp(pc, (r1+1)); \
 }
 
+/*
+ * ST(r) += INT_REG
+ */
+#  define jit_emit_add_RM_ni(pc, r, offs) { \
+    emitm_fld(pc, r); \
+    emitm_fiadd_m(pc, emit_EBX, 0, 1, offs); \
+    emitm_fstp(pc, (r+1)); \
+}
 
 /* ST(r1) -= ST(r2) */
 #  define jit_emit_sub_rr_n(pc, r1, r2) { \
     emitm_fld(pc, r2); \
     emitm_fsubp(pc, (r1+1)); \
+}
+
+/*
+ * ST(r) -= INT_REG
+ */
+#  define jit_emit_sub_RM_ni(pc, r, offs) { \
+    emitm_fld(pc, r); \
+    emitm_fisub_m(pc, emit_EBX, 0, 1, offs); \
+    emitm_fstp(pc, (r+1)); \
 }
 
 #  define jit_emit_inc_r_n(pc, r) { \
@@ -1665,6 +1700,24 @@ static unsigned char *lastpc;
 #  define jit_emit_mul_rr_n(pc, r1, r2) { \
     emitm_fld(pc, r2); \
     emitm_fmulp(pc, (r1+1)); \
+}
+
+/*
+ * ST(r) *= INT_REG
+ */
+#  define jit_emit_mul_RM_ni(pc, r, offs) { \
+    emitm_fld(pc, r); \
+    emitm_fimul_m(pc, emit_EBX, 0, 1, offs); \
+    emitm_fstp(pc, (r+1)); \
+}
+
+/*
+ * ST(r) /= INT_REG
+ */
+#  define jit_emit_div_RM_ni(pc, r, offs) { \
+    emitm_fld(pc, r); \
+    emitm_fidiv_m(pc, emit_EBX, 0, 1, offs); \
+    emitm_fstp(pc, (r+1)); \
 }
 
 /* ST(r1) /= ST(r2) */
