@@ -1329,6 +1329,7 @@ languages/BASIC/compiler/RT_initialize.pasm
 languages/BASIC/compiler/RT_io.pasm
 languages/BASIC/compiler/RT_math.pasm
 languages/BASIC/compiler/RT_platform.pasm
+languages/BASIC/compiler/RT_platform_ANSIscreen.pasm
 languages/BASIC/compiler/RT_platform_win32.pasm
 languages/BASIC/compiler/RT_support.pasm
 languages/BASIC/compiler/RT_userfunc.pasm
