@@ -34,9 +34,9 @@ void
 add_free_pmc(struct Parrot_Interp *interpreter,
         struct Small_Object_Pool *pool, void *pmc)
 {
-    if (((PMC *)pmc)->flags & PMC_active_destroy_FLAG)
+    if (PObj_active_destroy_TEST((PMC *)pmc))
         ((PMC *)pmc)->vtable->destroy(interpreter, (PMC *)pmc);
-    ((PMC *)pmc)->flags = PMC_on_free_list_FLAG;
+    PObj_flags_SETTO((PMC *)pmc, PObj_on_free_list_FLAG);
 
     /* Don't let it point to garbage memory */
     ((PMC *)pmc)->data = NULL;
@@ -82,18 +82,17 @@ add_free_buffer(struct Parrot_Interp *interpreter,
 {
     Buffer *buffer = (Buffer *)vp_buffer;
 
-    if (GC_DEBUG(interpreter) && (buffer->flags & BUFFER_report_FLAG))
+    if (GC_DEBUG(interpreter) && PObj_report_TEST(buffer))
         fprintf(stderr, "Freeing buffer %p -> %p\n", buffer, buffer->bufstart);
 
 #ifdef GC_IS_MALLOC
     /* free allocated space at bufstart, but not if it is used
      * COW or it is external
      */
-    if (buffer->bufstart &&
-            !(buffer-> flags &
-                (BUFFER_external_FLAG | BUFFER_on_free_list_FLAG)))
+    /* external_FLAG | on_free_list_FLAG */
+    if (buffer->bufstart && !PObj_is_external_or_free_TESTALL(buffer))
     {
-        if (buffer->flags & BUFFER_strstart_FLAG) {
+        if (PObj_is_string_TEST(buffer)) {
             int *refcount = ((int *)buffer->bufstart);
 
             if (!--(*refcount))
@@ -103,7 +102,7 @@ add_free_buffer(struct Parrot_Interp *interpreter,
             free(buffer->bufstart);
     }
 #endif /* GC_IS_MALLOC */
-    buffer->flags = BUFFER_on_free_list_FLAG;
+    PObj_flags_SETTO(buffer, PObj_on_free_list_FLAG);
     /* Use the right length */
     buffer->buflen = 0;
 
@@ -126,8 +125,8 @@ get_free_buffer(struct Parrot_Interp *interpreter,
 
     /* Don't let it point to garbage memory */
     buffer->bufstart = NULL;
-    /* Clear the flagpole (especially BUFFER_on_free_list_FLAG) */
-    buffer->flags = 0;
+    /* Clear the flagpole (especially _on_free_list_FLAG) */
+    PObj_flags_CLEARALL(buffer);
 #if ! DISABLE_GC_DEBUG
     if (GC_DEBUG(interpreter))
         buffer->version++;
@@ -260,11 +259,11 @@ new_string_header(struct Parrot_Interp *interpreter, UINTVAL flags)
 {
     STRING *string;
 
-    string = get_free_buffer(interpreter, (flags & BUFFER_constant_FLAG)
+    string = get_free_buffer(interpreter, (flags & PObj_constant_FLAG)
             ? interpreter->
             arena_base->constant_string_header_pool :
             interpreter->arena_base->string_header_pool);
-    string->flags |= flags | BUFFER_strstart_FLAG;
+    PObj_flags_SETTO(string, flags | PObj_is_string_FLAG);
     string->strstart = 0;
     return string;
 }
@@ -486,20 +485,20 @@ Parrot_initialize_header_pool_names(struct Parrot_Interp *interpreter)
 {
     interpreter->arena_base->string_header_pool->name
             = string_make(interpreter, "String Pool", strlen("String Pool"),
-            0, BUFFER_constant_FLAG, 0);
+            0, PObj_constant_FLAG, 0);
     interpreter->arena_base->pmc_pool->name
             = string_make(interpreter, "PMC Pool", strlen("PMC Pool"),
-            0, BUFFER_constant_FLAG, 0);
+            0, PObj_constant_FLAG, 0);
     /* Set up names for each header pool, * now that we have a constant string
      *
      * * pool available to us */
     interpreter->arena_base->constant_string_header_pool->name
             =
             string_make(interpreter, "Constant String Pool",
-            strlen("Constant String Pool"), 0, BUFFER_constant_FLAG, 0);
+            strlen("Constant String Pool"), 0, PObj_constant_FLAG, 0);
     interpreter->arena_base->buffer_header_pool->name =
             string_make(interpreter, "Generic Header Pool",
-            strlen("Generic Header Pool"), 0, BUFFER_constant_FLAG, 0);
+            strlen("Generic Header Pool"), 0, PObj_constant_FLAG, 0);
 }
 
 #endif

@@ -45,7 +45,7 @@ Parrot_vsprintf_c(struct Parrot_Interp *interpreter, const char *pat,
                   va_list args)
 {
     STRING *realpat = string_make(interpreter, pat, strlen(pat),
-                                  NULL, BUFFER_external_FLAG, NULL);
+                                  NULL, PObj_external_FLAG, NULL);
 
     return Parrot_vsprintf_s(interpreter, realpat, args);
 }

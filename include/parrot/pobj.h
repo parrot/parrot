@@ -100,6 +100,9 @@ typedef enum PObj {
 #define PObj_flag_CLEAR(flag, o) \
         ((o)->flags &= ~(UINTVAL)(PObj_ ## flag ## _FLAG))
 
+#define PObj_flags_SETTO(o, f) (o)->flags = (f)
+#define PObj_flags_CLEARALL(o) PObj_flags_SETTO(o, 0)
+
 #define PObj_COW_TEST(o) PObj_flag_TEST(COW, o)
 #define PObj_COW_SET(o) PObj_flag_SET(COW, o)
 #define PObj_COW_CLEAR(o) PObj_flag_CLEAR(COW, o)
@@ -130,6 +133,10 @@ typedef enum PObj {
 #define PObj_is_string_SET(o) PObj_flag_SET(is_string, o)
 #define PObj_is_string_CLEAR(o) PObj_flag_CLEAR(is_string, o)
 
+#define PObj_active_destroy_TEST(o) PObj_flag_TEST(active_destroy, o)
+#define PObj_active_destroy_SET(o) PObj_flag_SET(active_destroy, o)
+#define PObj_active_destroy_CLEAR(o) PObj_flag_CLEAR(active_destroy, o)
+
 /* some combinations */
 #define PObj_is_cowed_TESTALL(o) ((o)->flags & \
             (PObj_COW_FLAG|PObj_constant_FLAG|PObj_external_FLAG))
@@ -139,6 +146,9 @@ typedef enum PObj {
 #define PObj_is_external_TESTALL(o) ((o)->flags & \
             (UINTVAL)(PObj_COW_FLAG|PObj_bufstart_external_FLAG| \
 		    PObj_external_FLAG|PObj_immobile_FLAG))
+#define PObj_is_external_or_free_TESTALL(o) ((o)->flags & \
+            (UINTVAL)(PObj_external_FLAG|PObj_on_free_list_FLAG))
+
 #define PObj_is_external_CLEARALL(o) ((o)->flags &= \
             ~(UINTVAL)(PObj_COW_FLAG|PObj_bufstart_external_FLAG| \
 		    PObj_external_FLAG|PObj_immobile_FLAG))

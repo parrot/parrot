@@ -256,7 +256,7 @@ setup_argv(struct Parrot_Interp *interpreter, int argc, char ** argv)
     for (i = 0; i < argc; i++) {
         /* Run through argv, adding everything to @ARGS. */
         STRING *arg = string_make(interpreter, argv[i], strlen(argv[i]),
-                                  0, BUFFER_external_FLAG, 0);
+                                  0, PObj_external_FLAG, 0);
 
         if (Interp_flags_TEST(interpreter, PARROT_DEBUG_FLAG)) {
             PIO_eprintf(interpreter, "\t%vd: %s\n", i, argv[i]);

@@ -308,7 +308,7 @@ new_hash(Interp *interpreter, HASH **hash_ptr)
     HASH *hash = (HASH *)new_bufferlike_header(interpreter, sizeof(*hash));
     *hash_ptr = hash;
 
-    /*      hash->buffer.flags |= BUFFER_report_FLAG; */
+    /*      PObj_report_SET(&hash->buffer); */
 
     /* We rely on the fact that expand_hash() will be called before
      * this function returns, so that max_chain will always contain a
@@ -322,7 +322,7 @@ new_hash(Interp *interpreter, HASH **hash_ptr)
     /* Ensure mark_hash doesn't try to mark the buffer live */
     hash->bucket_pool = NULL;
     hash->bucket_pool = new_buffer_header(interpreter);
-    /*      hash->bucket_pool->flags |= BUFFER_report_FLAG; */
+    /*      PObj_report_SET(hash->bucket_pool); */
     hash->free_list = NULLBucketIndex;
     expand_hash(interpreter, hash);
 }
