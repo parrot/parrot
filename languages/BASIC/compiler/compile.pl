@@ -1,4 +1,3 @@
-
 #!/usr/bin/perl -w
 
 # Remember, this is BAD PERL later to be translated to PASM
@@ -6,8 +5,12 @@
 #          @tokens and @tokdsc
 # Then compile.
 use strict;
+use Getopt::Std;
 our @basic=();
-use vars qw(%code);
+use vars qw(%code %options @basic);
+use vars qw( @tokens @tokdsc);
+use vars qw( @syms @type );
+use vars qw( %labels $runtime_jump $debug  $sourceline);
 
 require "COMP_toker.pm";
 require "COMP_parser.pm";
@@ -22,7 +25,11 @@ $SIG{__DIE__}=sub {
 	exit 1;
 };
 
+getopts('d', \%options);
+$debug=1 if $options{d};
+
 if (@ARGV) {
+	print "File: $ARGV[0]\n";
 	open(D, $ARGV[0]) || die;
 	@basic=<D>;
 	chomp(@basic);
@@ -32,11 +39,6 @@ if (@ARGV) {
 }
 shift(@ARGV);
 
-use vars qw( @tokens @tokdsc);
-use vars qw( @syms @type );
-use vars qw( %labels $runtime_jump );
-
-
 tokenize();
 push(@ARGV);
 parse(@ARGV);
@@ -44,79 +46,99 @@ parse(@ARGV);
 open(CODE, ">TARG_test.imc") || die;
 
 print CODE qq{.include "RT_initialize.pasm"\n};
-my $debug=0;
 foreach my $seg ("_main", "_basicmain", keys %code) {
 	next unless exists $code{$seg};
 	my @debdecl=();
-	$debug=1 if (grep /debug/, @ARGV);
 
-	print CODE ".sub $seg\n\tsaveall\n";
+	print CODE ".sub $seg\n";
 	if (exists $code{$seg}->{declarations}) {
 		foreach my $var (sort keys %{$code{$seg}->{declarations}}) {
 			if ($var=~/_string$/) {
 				print CODE "\t.local string $var\n";
-				push @debdecl, "\tset \$P1[\"$var\"], $var\n";
+				push @debdecl, "\t\tset \$P1[\"$var\"], $var\n";
 			} else {
 				print CODE "\t.local float $var\n";
-				push @debdecl, "\tset \$S0, $var\n\tset \$P1[\"$var\"], \$S0\n";
+				push @debdecl, "\t\tset \$S0, $var\n\t\tset \$P1[\"$var\"], \$S0\n";
 			}
 
 		}
 	}
-
+	print CODE<<INIT;
+	.sub ${seg}_run			# Always jump here.
+		call ${seg}_main
+		ret
+	.end
+INIT
+	print CODE "\t.sub ${seg}_main\n\t\tsaveall\n";
 	foreach(@{$code{$seg}->{code}}) {
 		s/#RTJ// if $runtime_jump;
-		print CODE $_;
+		s/^/\t/gm;
+		print CODE;
 	}
-	print CODE "\trestoreall\n\tret\n";
-	if ($debug) {
-		print CODE<<'EOD';
-DEBUGGER:
-	find_global $P0, "DEBUGGER"
-	set $I0, $P0["step"]
-	ne $I0, 0, DEBUGGER_STOP
-	set $P1, $P0["break"]
-	set $I0, $P1
-	eq $I0, 0, DEBUGGER_DONE  # No breakpoints
-	set $S0, $I100
-	exists $I0, $P1[$S0]
-	eq $I0, 0, DEBUGGER_DONE	 # This breakpoint doesn't exist
-
-DEBUGGER_STOP:
-	$P1=new PerlHash
-EOD
-	print CODE "@debdecl";
-
-		print CODE<<'EOD';
-	.arg $P1
-	.arg $I100
-	call _DEBUGGER_STOP
-DEBUGGER_DONE:
-	ret
-EOD
-	}
-	print CODE ".end\n";
-	
+	print CODE "\t\trestoreall\n\t\tret\n";
+	print CODE "\t.end\t# main segment\n";
 	delete $code{$seg};
+	if (! $debug) {
+		print CODE ".end\t# outer segment\n";
+		next;
+	}
+	print CODE<<EOD;
+	.sub ${seg}_debug
+		.param int debline
+		find_global \$P0, "DEBUGGER"
+		set \$I0, \$P0["step"]
+		ne \$I0, 0, DEBUGGER_STOP
+		set \$P1, \$P0["break"]
+		set \$I0, \$P1
+		eq \$I0, 0, DEBUGGER_DONE  # No breakpoints
+		set \$S0, debline
+		exists \$I0, \$P1[\$S0]
+		eq \$I0, 0, DEBUGGER_DONE	 # This breakpoint doesn't exist
+	DEBUGGER_STOP:
+		\$P1=new PerlHash
+@debdecl		.arg \$P1
+		.arg debline
+		call _DEBUGGER_STOP_FOR_REAL
+	DEBUGGER_DONE:
+		ret
+	
+	.end	# End debug segment
+.end 	# End outer segment
+EOD
+}
+if ($debug) {
+	print CODE<<FOO;
+.sub _DEBUG_INIT
+	\$P0=new PerlArray
+	find_global \$P1, "DEBUGGER"
+FOO
+	foreach(0..@main::basic-1) {
+		my $line=$main::basic[$_];
+		$line=~s/"/'/g;
+		print CODE "\tset \$P0[",$_+1,"], \"$line\"\n";
+	}
+	print CODE<<FOO;
+	set \$P1["code"], \$P0
+	set \$P1["step"], 1   # Turn on stepping mode
+	\$P0=new PerlHash
+	set \$P1["break"], \$P0  # Breakpoints
+	\$P0=new PerlArray
+	set \$P1["watch"], \$P0  # Watch
+	store_global "DEBUGGER", \$P1
+	ret
+.end
+FOO
 }
 print CODE<<RUNTIMESHUTDOWN;
 	#
 	# Pull in the runtime libraries
 	#
-#.include "RT_expr.pasm"
-#.include "RT_math.pasm"
-#.include "RT_variables.pasm"
-.include "RT_builtins.pasm"
-#.include "RT_userfunc.pasm"
 .include "RT_aggregates.pasm"
-.include "RT_support.pasm"
+.include "RT_builtins.pasm"
+.include "RT_debugger.pasm"
 .include "RT_io.pasm"
 .include "RT_platform.pasm"
-.include "RT_debugger.pasm"
-	# 
-	# Pull in user-defined functions
-	#
-#.include "TARG_localfuncs.pasm"
+.include "RT_support.pasm"
 RUNTIMESHUTDOWN
 
 close(CODE);

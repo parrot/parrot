@@ -1,7 +1,7 @@
 #!/usr/bin/perl -w
 
 use strict;
-use constant VERSION => 2.0;
+use constant VERSION => 2.2;
 
 use constant PREV => 2;
 use constant CURR => 1;
@@ -73,10 +73,6 @@ use vars qw( %usertypes );
 use vars qw( $funcname );
 use vars qw( $branchseq @selects $sourceline );
 sub parse {
-	my(%opts)=@_;
-	if (%opts) {
-		print STDERR "Options: ", join(',', %opts), "\n";
-	}
 	$runtime_jump=0;
 	init;
 	runtime_init;
@@ -93,11 +89,8 @@ sub parse {
 	my(@lhs, @rhs);
 	my($result, $type, @code);
 
-	#print CODE "set .LINE, $sourceline\n";
-	trace() if $opts{trace};
-	if ($opts{debug}) {
-		push @{$code{$seg}->{code}},"\tbsr DEBUG_INIT\n";
-		$debug=1;
+	if ($debug) {
+		push @{$code{$seg}->{code}},"\tcall _DEBUG_INIT\n";
 		debug();
 	}
 
@@ -109,7 +102,6 @@ PARSE_NOFEED:
 		$sourceline++;
 		unless ($type[PREV] eq "STMT") {
 			#print CODE "set .LINE, $sourceline\n";
-			trace() if $opts{trace};
 			debug() if $debug;
 		}
 	}
@@ -272,7 +264,6 @@ BARE:	# Check for user-subroutine
 		create_label();
 		label_defined($syms[CURR]);
 		push @{$code{$seg}->{code}}, "$labels{$syms[CURR]}:   # For user branch ($syms[CURR])\n";
-		trace() if ($opts{trace});
 		debug() if $debug;
 		$currline="$labels{$syms[CURR]}";
 		feedme;  # Get the :
@@ -344,7 +335,7 @@ UNK:	if (($type[CURR] eq "STMT" or $type[CURR] eq "COMM") and $singleif) {
 		  or
 	    $type[CURR] eq "COMP") { goto PARSE; }
 	if ($type[CURR] eq 'COMM') {
-		print CODE "\t# $syms[CURR]\n";
+		push @{$code{$seg}->{code}}, "\t# $syms[CURR]\n";
 		goto PARSE;
 	}
 	if ($type[CURR] eq "INT" and 
@@ -353,7 +344,6 @@ UNK:	if (($type[CURR] eq "STMT" or $type[CURR] eq "COMM") and $singleif) {
 		$currline="$labels{$syms[CURR]}";
 		label_defined($syms[CURR]);
 		push @{$code{$seg}->{code}}, "$labels{$syms[CURR]}:   # For user branch ($syms[CURR])\n";
-		trace() if ($opts{trace});
 		debug() if $debug;
 		goto PARSE
 	}
@@ -363,19 +353,10 @@ UNK:	if (($type[CURR] eq "STMT" or $type[CURR] eq "COMM") and $singleif) {
 	if ($syms[CURR] eq "") {
 FORCE_FINISH:
 		runtime_shutdown();
-		print CODE <<FINISH;
-	#
-	# All of this crap is generated dynamically because we can't 
-	# compute addresses this early to provide a proper jump-table
-	# and this stuff needs to be done at runtime
-FINISH
-
 		parse_function_dispatch();
 		parse_struct_copy_dispatch();
 		parse_data_setup();
 		check_branches();
-		debug_init($debug);
-		
 		return;
 	}
 
@@ -384,16 +365,10 @@ PARSEERR:
 	dumpq;
 	die;
 }
-sub trace {
-	print CODE<<TRACE;
-print 2, .LINE
-print 2, "\\n"
-TRACE
-}
 sub debug {
 	push @{$code{$seg}->{code}}, <<DEBUG;
-	set \$I100, $sourceline
-	bsr DEBUGGER
+	.arg $sourceline
+	call ${seg}_debug
 DEBUG
 }
 
@@ -410,30 +385,7 @@ my %labdef;
 sub label_defined {
 	$labdef{$_[0]}++;
 }
-sub debug_init {
-	return unless $debug;
-	push @{$code{$seg}->{code}},<<START;
-DEBUG_INIT:
-	\$P0=new PerlArray
-	find_global \$P1, "DEBUGGER"
-START
-	foreach(0..@main::basic) {
-		my $line=$main::basic[$_];
-		$line=~s/"/'/g;
-		push @{$code{$seg}->{code}}, "\tset \$P0[",$_+1,"], \"$line\"\n";
-	}
-	push @{$code{$seg}->{code}},<<DEBEND;
-	set \$P1["code"], \$P0
-	set \$P1["step"], 1   # Turn on stepping mode
-	\$P0=new PerlHash
-	set \$P1["break"], \$P0  # Breakpoints
-	\$P0=new PerlArray
-	set \$P1["watch"], \$P0  # Watch
-	store_global "DEBUGGER", \$P1
-	ret
-DEBEND
 
-}
 sub check_branches {
 	foreach(keys %labels) {
 		print "Label $_ not defined\n" unless exists $labdef{$_};

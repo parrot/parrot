@@ -6,8 +6,10 @@
 
 	set $P0, $P25["code"]
 	set $S0, $P0[line]
+	print "\n"
 	print $S0
 	print "\n"
+	bsr DEBUGGER_PRINTWATCH
 	branch DEBUGGER_COMMAND
 
 	# Commands are:
@@ -64,9 +66,6 @@ DEBUGGER_PRINT:
 	eq $I0, 0, DEBUGGER_PARG
 
 	shift $S0, $P1
-	print "->"
-	print $S0
-	print "<-\n"
 	set $S1, locals[$S0]	
 	print $S1
 	print "\n"
@@ -183,21 +182,22 @@ DEBUG_ADDSLOT:set $P0[$I1], $S0
 DEBUG_ADDNEW: push $P0, $S0
 DEBUG_ADDEND: ret
 
-
 DEBUGGER_PRINTWATCH:  
 	set $P0, $P25["watch"]
 	set $I0, $P0
         eq $I0, 0, DEBUG_PRINTEND
+	print "Watches: "
         set $I1, 0
-
 DEBUG_PRINTLOOP:
         eq $I1, $I0, DEBUG_PRINTEND
         set $S0, $P0[$I1]
         inc $I1
         eq $S0, "", DEBUG_PRINTLOOP
+	print $S0
+	print "="
 	set $S1, locals[$S0]	
 	print $S1
-	print "\n"
+	print "\t"
         branch DEBUG_PRINTLOOP
 
 DEBUG_PRINTEND:

@@ -22,9 +22,9 @@
 
 	JUMPLABEL = ""
 
-	call _data
+	call _data_run
 	call _platform_setup
-	call _basicmain
+	call _basicmain_run
 	end
 
 .end	        

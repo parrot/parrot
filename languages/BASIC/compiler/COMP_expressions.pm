@@ -68,12 +68,14 @@ sub dumpq {
 	print "Previous: $type[2] $syms[2]\n";
 }
 sub isbuiltin {		# Built in functions
+	return 0 unless defined $_[0];
 	return 1 if (grep /^\Q$_[0]\E$/i, @builtins );
 	return 0;
 }
 sub isuserfunc {
 #	print "Isuserfunc $_[0] and $funcname..";
-	return 0 if $funcname eq $_[0];  # We're processing this, don't count!
+	return 0 unless defined $_[0];
+	return 0 if $funcname and $funcname eq $_[0];  # We're processing this, don't count!
 	if (grep /^\Q$_[0]\E$/i, keys %functions ) {
 #		print "Yes\n";
 		return 1;
@@ -496,7 +498,6 @@ sub generate_code {   # Will return a result register, or something.
 	my(@code,@work);
 
 	my $oneop=0;
-	my $result;		# Result from prior operation
 	my $optype="N";
 	my $result="";
 	foreach my $token (@stream) {
@@ -541,7 +542,7 @@ NEST_ARRAY_ASSIGN:		push @code, qq{\t.arg $ac\t\t\t# argc};
 			} else {
 				$extern=~s/\$/_string/g; $extern=~tr/a-z/A-Z/;
 				push @code, qq{\t.arg $ac\t\t\t# argc};
-				push @code, qq{\tcall  _USERFUNC_$extern};
+				push @code, qq{\tcall  _USERFUNC_${extern}_run};
 				push @code, "\t.result \$$optype$retcount";
 				push @work, [ "result of $extern()", "RESULT",  "\$$optype$retcount"];
 				$retcount++;
