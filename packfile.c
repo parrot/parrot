@@ -568,7 +568,7 @@ Returns one (1) if everything is OK, else zero (0).
 
 ***************************************/
 
-opcode_t
+BOOLVAL
 PackFile_Constant_unpack(struct Parrot_Interp *interpreter,
                          struct PackFile_Constant *self, opcode_t *packed,
                          opcode_t packed_size)
@@ -576,7 +576,7 @@ PackFile_Constant_unpack(struct Parrot_Interp *interpreter,
     opcode_t *cursor;
     opcode_t type;
     opcode_t size;
-    opcode_t rc = 1;
+    BOOLVAL rc = 1;
 
     UNUSED(packed_size);
 
@@ -632,7 +632,7 @@ Returns one (1) if everything is OK, else zero (0).
 
 ***************************************/
 
-opcode_t
+BOOLVAL
 PackFile_Constant_unpack_number(struct PackFile_Constant *self,
                                 opcode_t *packed, opcode_t packed_size)
 {
@@ -683,7 +683,7 @@ Returns one (1) if everything is OK, else zero (0).
 
 ***************************************/
 
-opcode_t
+BOOLVAL
 PackFile_Constant_unpack_string(struct Parrot_Interp *interpreter,
                                 struct PackFile_Constant *self,
                                 opcode_t *packed, opcode_t packed_size)

@@ -107,14 +107,14 @@ PackFile_Constant_pack(struct PackFile_Constant * self, opcode_t * packed);
 void
 PackFile_Constant_destroy(struct PackFile_Constant * self);
 
-opcode_t PackFile_Constant_unpack(struct Parrot_Interp *interpreter,
+BOOLVAL PackFile_Constant_unpack(struct Parrot_Interp *interpreter,
                                   struct PackFile_Constant *self,
                                   opcode_t *packed, opcode_t packed_size);
 
-opcode_t
+BOOLVAL
 PackFile_Constant_unpack_number(struct PackFile_Constant * self, opcode_t * packed, opcode_t packed_size);
 
-opcode_t PackFile_Constant_unpack_string(struct Parrot_Interp *interpreter,
+BOOLVAL PackFile_Constant_unpack_string(struct Parrot_Interp *interpreter,
                                          struct PackFile_Constant *self,
                                          opcode_t *packed,
                                          opcode_t packed_size);

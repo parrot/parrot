@@ -15,17 +15,18 @@ Parrot_warn(struct Parrot_Interp *interpreter, INTVAL warnclass,
         return 2;
     }
 
-    if (!(targ = Parrot_vsprintf_c(interpreter, message, &args))) {
+    targ = Parrot_vsprintf_c(interpreter, message, &args);
+    if (!targ) {
         return -1;
     }
 
     va_end(args);
 
-    if (!
-        (targ =
+    targ =
          Parrot_sprintf_c(interpreter, "%S at %S line %d.\n", targ,
                           interpreter->current_file,
-                          interpreter->current_line))) {
+                          interpreter->current_line);
+    if (!targ) {
         return -1;
     }
 
@@ -52,17 +53,18 @@ Parrot_warn_s(struct Parrot_Interp *interpreter, INTVAL warnclass,
         return 2;
     }
 
-    if (!(targ = Parrot_vsprintf_s(interpreter, message, &args))) {
+	targ = Parrot_vsprintf_s(interpreter, message, &args);
+    if (!targ) {
         return -1;
     }
 
     va_end(args);
 
-    if (!
-        (targ =
+    targ =
          Parrot_sprintf_c(interpreter, "%S at %S line %d.\n", targ,
                           interpreter->current_file,
-                          interpreter->current_line))) {
+                          interpreter->current_line);
+    if (!targ) {
         return -1;
     }
 

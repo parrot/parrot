@@ -138,7 +138,7 @@ pmclass IntQueue {
     }
 
     BOOLVAL get_bool () {
-	return queue_length(SELF->data) != 0;
+	return (BOOLVAL)(queue_length(SELF->data) != 0);
     }
 
     void* get_value () {
@@ -147,8 +147,8 @@ pmclass IntQueue {
 
     BOOLVAL is_same (PMC* other) {
         /* Do you refer to exactly the same data that I do? */
-        return other->vtable == SELF->vtable /* You never know if you've been inherited...*/
-            && SELF->cache.int_val == other->cache.int_val;
+        return (BOOLVAL)(other->vtable == SELF->vtable /* You never know if you've been inherited...*/
+            && SELF->cache.int_val == other->cache.int_val);
     }
 
     void set_integer (PMC* value) {
@@ -531,7 +531,7 @@ fprintf(stderr,"perlint_modulus not implemented for floating point\n");
 
     /* == operation */
     BOOLVAL is_equal (PMC* value) {
-        return SELF->cache.int_val == value->vtable->get_integer(INTERP, value);
+        return (BOOLVAL)(SELF->cache.int_val == value->vtable->get_integer(INTERP, value));
     }
 
     void logical_or (PMC* value, PMC* dest) {

@@ -2262,7 +2262,6 @@ Gets the type of entry $2 of the stack and puts in in $1
 =cut
 
 op entrytype(out INT, in INT) {
-  size_t height;
   Stack_entry *entry;
 
   entry = stack_entry(interpreter, interpreter->user_stack, $2);

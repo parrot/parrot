@@ -196,7 +196,6 @@ void
 PackFile_Constant_pack(struct PackFile_Constant *self, opcode_t *packed)
 {
     opcode_t *cursor;
-    FLOATVAL *nv_ptr;
     char *charcursor;
     size_t i;
     opcode_t padded_size;

@@ -178,7 +178,7 @@ bitmap_match(Bitmap bmp, INTVAL ch)
         return 0;
     }
 
-    return bmp->bmp[ch >> 3] & (1 << (ch & 7));
+    return (BOOLVAL)( bmp->bmp[ch >> 3] & (1 << (ch & 7)) ? 1 : 0 );
 }
 
 void

@@ -190,7 +190,6 @@ PIO_win32_close(theINTERP, ParrotIOLayer *layer, ParrotIO *io)
 INTVAL
 PIO_win32_isatty(PIOHANDLE fd)
 {
-    HANDLE h;
     DWORD ftype = GetFileType(fd);
     if (ftype == FILE_TYPE_CHAR)
         return 1;
