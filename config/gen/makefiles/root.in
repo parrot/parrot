@@ -27,11 +27,12 @@ INC=include/parrot
 ###############################################################################
 
 GEN_MAKEFILES = Makefile classes/Makefile languages/Makefile docs/Makefile \
-languages/jako/Makefile languages/miniperl/Makefile languages/scheme/Makefile
+	languages/jako/Makefile languages/miniperl/Makefile \
+	languages/scheme/Makefile
 
 GEN_CONFIGS  = include/parrot/config.h include/parrot/platform.h \
-			   lib/Parrot/Config.pm lib/Parrot/PMC.pm platform.c \
-			   include/parrot/core_pmcs.h core_pmcs.c
+	lib/Parrot/Config.pm lib/Parrot/PMC.pm platform.c \
+	include/parrot/core_pmcs.h core_pmcs.c
 
 STICKY_FILES = $(GEN_CONFIGS) $(GEN_MAKEFILES) myconfig
 
@@ -49,7 +50,7 @@ STICKY_FILES = $(GEN_CONFIGS) $(GEN_MAKEFILES) myconfig
 GEN_OPSFILES =
 
 GEN_HEADERS = $(INC)/vtable.h $(INC)/oplib/core_ops.h \
-$(INC)/oplib/core_ops_prederef.h
+	$(INC)/oplib/core_ops_prederef.h
 
 GEN_SOURCES = core_ops.c core_ops_prederef.c fingerprint.c
 
@@ -65,16 +66,17 @@ FLUID_FILES = $(GEN_OPSFILES) $(GEN_HEADERS) $(GEN_SOURCES) $(GEN_MODULES)
 ###############################################################################
 
 GENERAL_H_FILES = $(INC)/config.h $(INC)/exceptions.h $(INC)/io.h $(INC)/op.h \
-$(INC)/register.h $(INC)/string.h $(INC)/events.h $(INC)/interpreter.h \
-$(INC)/memory.h $(INC)/parrot.h $(INC)/stacks.h $(INC)/packfile.h \
-$(INC)/global_setup.h $(INC)/vtable.h $(INC)/oplib/core_ops.h \
-$(INC)/oplib/core_ops_prederef.h $(INC)/runops_cores.h $(INC)/trace.h \
-$(INC)/pmc.h $(INC)/key.h $(INC)/hash.h $(INC)/resources.h \
-$(INC)/core_pmcs.h $(INC)/platform.h ${cg_h} \
-$(INC)/interp_guts.h $(INC)/rx.h $(INC)/rxstacks.h $(INC)/intlist.h \
-$(INC)/embed.h $(INC)/warnings.h $(INC)/misc.h $(INC)/pmc.h \
-$(INC)/key.h $(INC)/hash.h $(INC)/smallobject.h $(INC)/headers.h $(INC)/dod.h \
-$(INC)/method_util.h $(INC)/list.h $(INC)/datatypes.h
+	$(INC)/register.h $(INC)/string.h $(INC)/events.h \
+	$(INC)/interpreter.h $(INC)/memory.h $(INC)/parrot.h $(INC)/stacks.h \
+	$(INC)/packfile.h $(INC)/global_setup.h $(INC)/vtable.h \
+	$(INC)/oplib/core_ops.h $(INC)/oplib/core_ops_prederef.h \
+	$(INC)/runops_cores.h $(INC)/trace.h $(INC)/pmc.h $(INC)/key.h \
+	$(INC)/hash.h $(INC)/resources.h $(INC)/core_pmcs.h \
+	$(INC)/platform.h ${cg_h} $(INC)/interp_guts.h $(INC)/rx.h \
+	$(INC)/rxstacks.h $(INC)/intlist.h $(INC)/embed.h $(INC)/warnings.h \
+	$(INC)/misc.h $(INC)/pmc.h $(INC)/key.h $(INC)/hash.h \
+	$(INC)/smallobject.h $(INC)/headers.h $(INC)/dod.h \
+	$(INC)/method_util.h $(INC)/list.h $(INC)/datatypes.h
 
 ALL_H_FILES = $(GENERAL_H_FILES)
 
@@ -83,30 +85,26 @@ O_DIRS = classes
 CLASS_O_FILES = ${pmc_classes_o}
 
 ENCODING_O_FILES = encodings/singlebyte$(O) encodings/utf8$(O) \
-				   encodings/utf16$(O) \
-			       encodings/utf32$(O)
+	encodings/utf16$(O) encodings/utf32$(O)
 
 CHARTYPE_O_FILES = chartypes/unicode$(O) chartypes/usascii$(O)
 
 IO_O_FILES = io/io$(O) io/io_buf$(O) io/io_unix$(O) io/io_win32$(O) \
-             io/io_stdio$(O)
+	io/io_stdio$(O)
 
 INTERP_O_FILES = exceptions$(O) global_setup$(O) interpreter$(O) parrot$(O) \
-	 register$(O) core_ops$(O) core_ops_prederef$(O) memory$(O) \
-	 packfile$(O) stacks$(O) string$(O) sub$(O) encoding$(O) \
-	 chartype$(O) runops_cores$(O) trace$(O) pmc$(O) key$(O) hash$(O) \
-	 core_pmcs$(O) platform$(O) ${jit_o} \
-     ${gc_o} rx$(O) rxstacks$(O) intlist$(O) list$(O) \
-	 embed$(O) warnings$(O)  ${cg_o} \
-	 packout$(O) byteorder$(O) debug$(O) smallobject$(O) \
-	 headers$(O) dod$(O) method_util$(O) \
-	 misc$(O) spf_render$(O) spf_vtable$(O) datatypes$(O) fingerprint$(O)
+	register$(O) core_ops$(O) core_ops_prederef$(O) memory$(O) \
+	packfile$(O) stacks$(O) string$(O) sub$(O) encoding$(O) \
+	chartype$(O) runops_cores$(O) trace$(O) pmc$(O) key$(O) hash$(O) \
+	core_pmcs$(O) platform$(O) ${jit_o} \
+	${gc_o} rx$(O) rxstacks$(O) intlist$(O) list$(O) \
+	embed$(O) warnings$(O)  ${cg_o} \
+	packout$(O) byteorder$(O) debug$(O) smallobject$(O) \
+	headers$(O) dod$(O) method_util$(O) \
+	misc$(O) spf_render$(O) spf_vtable$(O) datatypes$(O) fingerprint$(O)
 
-O_FILES = $(INTERP_O_FILES) \
-	      $(IO_O_FILES) \
-		  $(CLASS_O_FILES) \
-		  $(ENCODING_O_FILES) \
-		  $(CHARTYPE_O_FILES)
+O_FILES = $(INTERP_O_FILES) $(IO_O_FILES) $(CLASS_O_FILES) \
+	$(ENCODING_O_FILES) $(CHARTYPE_O_FILES)
 
 OPS_FILES = ${ops} $(GEN_OPSFILES)
 
