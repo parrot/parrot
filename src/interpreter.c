@@ -33,7 +33,9 @@
 #define PREDEREF_FOR_CGP        1
 #define PREDEREF_FOR_SWITCH     2
 
+#if EXEC_CAPABLE
 struct Parrot_Interp interpre;
+#endif
 
 static void setup_default_compreg(Parrot_Interp interpreter);
 
@@ -258,6 +260,7 @@ stop_prederef(struct Parrot_Interp *interpreter)
     (void) PARROT_CORE_PREDEREF_OPLIB_INIT(0);
 }
 
+#if EXEC_CAPABLE
 static void **
 exec_prederef(void **pc_prederef, struct Parrot_Interp *interpreter)
 {
@@ -384,6 +387,7 @@ exec_init_prederef(struct Parrot_Interp *interpreter, void *prederef_arena)
         }
     }
 }
+#endif
 
 
 static opcode_t *
