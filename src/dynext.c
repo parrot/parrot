@@ -19,7 +19,9 @@ src/dynext.c - Dynamic extensions to Parrot
 #include "parrot/parrot.h"
 #include "parrot/dynext.h"
 
-#if !defined(_PARROTLIB)
+/* use parrotlib for dynext finding? */
+/*#define _PARROTLIB*/
+
 /*
 
 =item C<static void
@@ -129,6 +131,7 @@ Return path and handle of a dynamic lib.
 
 */
 
+#if !defined(_PARROTLIB)
 static STRING *
 get_path(Interp *interpreter, STRING *lib, void **handle)
 {
@@ -214,9 +217,6 @@ specific setup. In both functions C<%s> is the name of the library.
 PMC *
 Parrot_load_lib(Interp *interpreter, STRING *lib, PMC *initializer)
 {
-#if defined(_PARROTLIB)
-    return Parrot_library_query(interpreter, "load_lib", lib, initializer);
-#else
     STRING *path, *load_func_name, *init_func_name, *type;
     void * handle;
     PMC *(*load_func)(Interp *);
@@ -225,13 +225,25 @@ Parrot_load_lib(Interp *interpreter, STRING *lib, PMC *initializer)
     PMC *lib_pmc;
 
     UNUSED(initializer);
+#if defined(_PARROTLIB)
+    path = Parrot_library_query(interpreter, "dynext_location", lib, initializer);
+#else
     path = get_path(interpreter, lib, &handle);
+#endif
     if (!path) {
         /*
          * XXX internal_exception? return a PerlUndef?
          */
         return PMCNULL;
     }
+
+#if defined(_PARROTLIB)
+    {
+	char* cpath = string_to_cstring(interpreter, path);
+	handle = Parrot_dlopen(cpath);
+    }
+#endif
+
     /*
      * TODO move the class_count_mutex here
      *
@@ -283,7 +295,6 @@ Parrot_load_lib(Interp *interpreter, STRING *lib, PMC *initializer)
     store_lib_pmc(interpreter, lib_pmc, path, type);
     /* UNLOCK */
     return lib_pmc;
-#endif
 }
 
 /*
