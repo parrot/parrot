@@ -121,7 +121,7 @@ while(<>) {
 		    } elsif(m/^((-?\d+)|(0b[01]+)|(0x[0-9a-f]+))$/i) {
 			# integer
 			push @arg_t,'ic';
-		    } elsif(m/^[a-z][\w]*$/i) {
+		    } elsif(m/^[A-Za-z_][\w]*$/i) {
 			# label
 			push @arg_t,'ic';
 		    } else {
@@ -130,23 +130,32 @@ while(<>) {
 		    }
 		}
 	    }
+
+	    my $found_op = 0;
+	    my @tests;
 	    my $test;
-	    my($first,$last)=($arg_t[0],$arg_t[-1]);
-	    if($first ne $last) {
-		$test="${opcode}_${first}_$last";
+
+	    #
+	    # For many-arg ops, if first two arg types have the same basic type (like 'i' and 'ic'),
+	    # shift off the first one.
+	    #
+
+	    shift @arg_t if (@arg_t > 2) and (substr($arg_t[0],0,1) eq substr($arg_t[1],0,1));
+
+	    while (@arg_t) {
+		$test = $opcode . '_' . join('_', @arg_t);
+		push @tests, $test;
+		$found_op++, last if $opcodes{$test};
+		pop @arg_t;
+	    }
+
+	    if ($found_op) {
+		pop @tests;
+		log_message("substituting $test for $opcode" . (scalar(@tests) ? (" (tried " . join(', ', @tests) . ")") : ''));
+		$opcode = $test;
 	    } else {
-		$test="${opcode}_$first";
+		error("No opcode $opcode (tried " . join(', ', @tests) . ") in <$_>");
 	    }
-	    my($found_op)=0;
-	    foreach my $op (grep($_=~/^$opcode/,keys(%opcodes))) {
-		if($op eq $test) {
-		    log_message("substituting $op for $opcode");
-		    $opcode=$op;
-		    $found_op=1;
-		    last;
-		}
-	    }
-            error("No opcode $opcode in <$_>") if(!$found_op);
         }
         if (@args != $opcodes{$opcode}{ARGS}) {
             error("Wrong arg count--got ".scalar(@args)." needed ".$opcodes{$opcode}{ARGS});
