@@ -58,7 +58,12 @@ static size_t    PIO_buf_readline(theINTERP, ParrotIOLayer *l, ParrotIO *io,
 
 
 /* XXX: This is not portable */
-#define IS_EOL(c) ((*c) == '\n')
+#define DEFAULT_RECSEP '\n'
+#define IS_EOL(io,c) (io->recsep == (*c))
+/*
+#define IS_EOL(io,c) ((*c) == '\n')
+*/
+
 
 static INTVAL
 PIO_buf_init(theINTERP, ParrotIOLayer *layer)
@@ -88,7 +93,9 @@ PIO_buf_open(theINTERP, ParrotIOLayer *layer,
     /*
      * We have an IO stream. Now setup stuff
      * for our layer before returning it.
+     * XXX: Make default behaviour linebuffered?
      */
+    /*PIO_buf_setlinebuf(interpreter, l, io);*/
     PIO_buf_setbuf(interpreter, l, io, PIO_UNBOUND);
     return io;
 }
@@ -152,6 +159,7 @@ PIO_buf_setlinebuf(theINTERP, ParrotIOLayer *l, ParrotIO *io)
         /* Then switch to linebuf */
         io->flags &= ~PIO_F_BLKBUF;
         io->flags |= PIO_F_LINEBUF;
+        io->recsep = DEFAULT_RECSEP;
         return 0;
     }
     return err;
@@ -343,8 +351,9 @@ PIO_buf_readline(theINTERP, ParrotIOLayer *layer, ParrotIO *io,
 
     buf_start = b->next;
     while (l++ < len) {
-        if (IS_EOL(b->next++))
+        if (IS_EOL(io, b->next++)) {
             break;
+        } 
         /* buffer completed; copy out and refill */
         if (b->next == b->endb) {
             memcpy(out_buf, buf_start, b->endb - buf_start);

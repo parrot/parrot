@@ -267,6 +267,7 @@ extern INTVAL PIO_setlinebuf(theINTERP, PMC *);
 extern INTVAL PIO_puts(theINTERP, PMC *, const char *);
 extern INTVAL PIO_seek(theINTERP, PMC *, PIOOFF_T offset, INTVAL whence);
 extern INTVAL PIO_eof(theINTERP, PMC *);
+extern INTVAL PIO_pioctl(theINTERP, PMC *, INTVAL cmd, INTVAL arg);
 
 extern INTVAL PIO_putps(theINTERP, PMC *io, STRING *s);
 extern INTVAL PIO_fprintf(theINTERP, PMC *io, const char *s, ...);
@@ -305,6 +306,28 @@ PIOOFF_T PIO_make_offset_pmc(theINTERP, PMC *pmc);
 extern PMC *PIO_STDIN(theINTERP);
 extern PMC *PIO_STDOUT(theINTERP);
 extern PMC *PIO_STDERR(theINTERP);
+
+/*
+ * pioctl definitions -- These are mostly for reference
+ * or C-API writers.
+ */
+/* pioctl command constants */
+#define PIOCTL_CMDRESERVED         0
+#define PIOCTL_CMDSETRECSEP        1
+#define PIOCTL_CMDGETRECSEP        2
+#define PIOCTL_CMDSETBUFTYPE       3
+#define PIOCTL_CMDGETBUFTYPE       4
+#define PIOCTL_CMDSETBUFSIZE       5
+#define PIOCTL_CMDGETBUFSIZE       6
+
+/*
+ * pioctl argument constants. These don't have to
+ * be unique across io commands.
+ */
+#define PIOCTL_LINEBUF             1
+#define PIOCTL_BLKBUF              2
+
+
 
 #endif
 

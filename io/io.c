@@ -467,6 +467,41 @@ PIO_parse_open_flags(const char *flagstr)
     return flags;
 }
 
+/*
+ * General purpose interface for manipulation of IO objects and
+ * layer attributes. 
+ *
+ * Refer to PIOCTL* values in io.h
+ *
+ * All "set" operations return 0 on success and a negative value on error.
+ * "get" operations will use the return value as the value requested, but
+ * should always be >= 0. A negative value indicates an error.
+ * This may be too limited but we will see. --Melvin
+ */
+INTVAL
+PIO_pioctl(theINTERP, PMC *pmc, INTVAL cmd, INTVAL arg)
+{
+
+    /* Temporary arbitrary negative return vals for debugging */
+    ParrotIO * io = PMC_data(pmc);
+    ParrotIOBuf * b = &io->b;
+    if(!io) return -1;
+
+    switch(cmd) {
+       case PIOCTL_CMDSETRECSEP: io->recsep = arg;
+       case PIOCTL_CMDGETRECSEP: return io->recsep;
+       case PIOCTL_CMDSETBUFTYPE: return -3; /* XXX FIXME */
+       case PIOCTL_CMDGETBUFTYPE: return -4; /* XXX FIXME */
+       case PIOCTL_CMDSETBUFSIZE: return -5; /* XXX FIXME */
+       case PIOCTL_CMDGETBUFSIZE:
+             if(b) return b->size;
+             else return -6;
+       default: return -100;
+    }
+
+    return 0;
+}
+
 
 /*
  * API for controlling buffering specifics on an IO stream

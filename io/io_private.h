@@ -66,6 +66,8 @@ struct _ParrotIO {
     PIOOFF_T lpos;              /* Last file position           */
     ParrotIOBuf b;              /* Buffer structure             */
     ParrotIOLayer *stack;
+    INTVAL recsep;              /* Record Separator             */
+
     /* ParrotIOFilter * filters; */
 };
 
@@ -115,6 +117,7 @@ INTVAL    PIO_puts_down(theINTERP, ParrotIOLayer * layer, ParrotIO * io,
 INTVAL    PIO_gets_down(theINTERP, ParrotIOLayer * layer, ParrotIO * io,
                         char * s, INTVAL maxlen);
 INTVAL    PIO_eof_down(theINTERP, ParrotIOLayer * layer, ParrotIO * io);
+
 
 #endif /* !defined(PARROT_IO_PRIVATE_H_GUARD) */
 
