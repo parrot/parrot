@@ -1,8 +1,8 @@
 RM_F = ${rm_f}
 PERL = ${perl}
 
-ASSEMBLE=$(PERL) ../../assemble.pl
-PARROT=../../parrot
+PARROT = ../../parrot
+ASSEMBLE = $(PARROT)
 
 all: build
 
