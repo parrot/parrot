@@ -86,8 +86,8 @@ Instruction * emitb(Instruction *);
 
 int instruction_reads(Instruction *, SymReg *);
 int instruction_writes(Instruction *, SymReg *);
-int ins_reads2(Instruction *, char);
-int ins_writes2(Instruction *, char);
+int ins_reads2(Instruction *, int);
+int ins_writes2(Instruction *, int);
 
 void compute_spilling_costs(void);
 void free_ins(Instruction *);

@@ -1218,7 +1218,7 @@ directory_destroy (struct PackFile_Segment *self)
 static void
 sort_segs(struct PackFile_Directory *dir)
 {
-    size_t i, j, num_segs;
+    size_t i, j, num_segs = dir->num_segments;
 
     struct PackFile_Segment *seg = dir->segments[0], *s2;
     if (seg->type != PF_BYTEC_SEG) {

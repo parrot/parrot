@@ -212,11 +212,16 @@ static void *imcc_compile_file (Parrot_Interp interp, const char *s)
     char *ext;
     int pasm = pasm_file;
     FILE *new;
+    union {
+        const void * __c_ptr;
+        void * __ptr;
+    } __ptr_u;
+#define const_cast(b) (__ptr_u.__c_ptr = (b), __ptr_u.__ptr)
 
     if(!(new = fopen(s, "r")))
         return NULL;
     interp->code = pf;  /* put new packfile in place */
-    sourcefile = s;
+    sourcefile = const_cast(s);
     ext = strrchr(s, '.');
     if (ext && strcmp (ext, ".pasm") == 0) {
         pasm_file = 1;

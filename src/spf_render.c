@@ -152,7 +152,7 @@ handle_flags(struct Parrot_Interp *interpreter,
 
 static void
 gen_sprintf_call(struct Parrot_Interp *interpreter, char *out,
-                 SpfInfo info, char thingy)
+                 SpfInfo info, int thingy)
 {
     int i = 0;
     char tc[PARROT_SPRINTF_BUFFER_SIZE];

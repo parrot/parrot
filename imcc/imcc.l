@@ -72,6 +72,7 @@ static int in_pod;
 %}
 
 %option outfile="imclexer.c"
+%option never-interactive
 
 LETTER          [a-zA-Z_]
 DIGIT           [0-9]

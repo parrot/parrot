@@ -181,7 +181,7 @@ init_tables(struct Parrot_Interp * interpreter)
 
 /* return TRUE, if ins reads register of type t */
 int
-ins_reads2(Instruction *ins, char t)
+ins_reads2(Instruction *ins, int t)
 {
     size_t i;
     const char types[] = "INPS";
@@ -196,7 +196,7 @@ ins_reads2(Instruction *ins, char t)
 
 /* return TRUE, if ins writes register of type t */
 int
-ins_writes2(Instruction *ins, char t)
+ins_writes2(Instruction *ins, int t)
 {
     size_t i;
     const char types[] = "INPS";
