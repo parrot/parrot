@@ -1020,7 +1020,10 @@ dynop_register_xx(Parrot_Interp interpreter, PMC* lib_pmc,
     op_variant = Parrot_sprintf_c(interpreter, "%s_ops%s",
             new_lib->name, cg_lib->suffix);
     lib_variant = Parrot_load_lib(interpreter, op_variant, NULL);
-    if (lib_variant) {
+    /*
+     * XXX running CG and CGP ops currently works only via the wrapper
+     */
+    if (0 /*lib_variant */) {
         new_init_func = get_op_lib_init(0, 0, lib_variant);
         new_lib = new_init_func(1);
         for (i = n_old; i < n_tot; ++i)
