@@ -867,6 +867,51 @@ Parrot_class_offset(Parrot_Interp interpreter, PMC *object, STRING *class) {
 
 /*
 
+=item C<PMC *
+Parrot_find_class_constructor(Parrot_Interp interpreter, STRING *class, INTVAL classtoken)>
+
+Find and return the constructor method PMC for the named sub. The
+classtoken is an identifier for the class used for fast lookup, or 0
+if you don't have an identifier token. Which, as they're currently
+undefined, is pretty likely
+
+*/
+
+PMC *
+Parrot_find_class_constructor(Parrot_Interp interpreter, STRING *class, INTVAL classtoken)
+{
+    return NULL;
+}
+
+PMC *
+Parrot_find_class_destructor(Parrot_Interp interpreter, STRING *class, INTVAL classtoken)
+{
+    return NULL;
+}
+
+PMC *
+Parrot_find_class_fallback(Parrot_Interp interpreter, STRING *class, INTVAL classtoken)
+{
+    return NULL;
+}
+
+void
+Parrot_set_class_constructor(Parrot_Interp interpreter, STRING *class, INTVAL classtoken, STRING *method)
+{
+}
+
+void
+Parrot_set_class_destructor(Parrot_Interp interpreter, STRING *class, INTVAL classtoken, STRING *method)
+{
+}
+
+void
+Parrot_set_class_fallback(Parrot_Interp interpreter, STRING *class, INTVAL classtoken, STRING *method)
+{
+}
+
+/*
+
 =back
 
 =head1 SEE ALSO

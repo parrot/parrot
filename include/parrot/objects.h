@@ -51,6 +51,12 @@ PMC *Parrot_get_attrib_by_num(Parrot_Interp, PMC *, INTVAL);
 void Parrot_set_attrib_by_num(Parrot_Interp, PMC *, INTVAL, PMC *);
 INTVAL Parrot_get_attrib_num(Parrot_Interp, PMC *, STRING *);
 INTVAL Parrot_class_offset(Parrot_Interp, PMC *, STRING *);
+PMC *Parrot_find_class_constructor(Parrot_Interp, STRING *, INTVAL);
+PMC *Parrot_find_class_destructor(Parrot_Interp, STRING *, INTVAL);
+PMC *Parrot_find_class_fallback(Parrot_Interp, STRING *, INTVAL);
+void Parrot_set_class_constructor(Parrot_Interp, STRING *, INTVAL, STRING *);
+void Parrot_set_class_destructor(Parrot_Interp, STRING *, INTVAL, STRING *);
+void Parrot_set_class_fallback(Parrot_Interp, STRING *, INTVAL, STRING *);
 
 #endif
 
