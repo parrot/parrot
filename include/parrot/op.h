@@ -61,10 +61,8 @@ typedef enum {
 
 /* NOTE: Sure wish we could put the types here... */
 
-struct Parrot_Interp;
-
-typedef opcode_t *(*op_func_t)(opcode_t *, struct Parrot_Interp *);
-typedef void **(*op_func_prederef_t)(void **, struct Parrot_Interp *);
+typedef opcode_t *(*op_func_t)(opcode_t *, Interp *);
+typedef void **(*op_func_prederef_t)(void **, Interp *);
 
 
 /*

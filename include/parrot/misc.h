@@ -36,8 +36,8 @@ INTVAL Parrot_int_rand(INTVAL how_random);
 INTVAL Parrot_range_rand(INTVAL from, INTVAL to, INTVAL how_random);
 void Parrot_srand(INTVAL seed);
 
-void *Parrot_make_la(struct Parrot_Interp *, PMC *);
-void *Parrot_make_cpa(struct Parrot_Interp *, PMC *);
+void *Parrot_make_la(Interp *, PMC *);
+void *Parrot_make_cpa(Interp *, PMC *);
 void Parrot_destroy_la(long *);
 void Parrot_destroy_cpa(char **);
 PMC* tm_to_array(Parrot_Interp interpreter, struct tm *tm);
@@ -46,26 +46,26 @@ PMC* tm_to_array(Parrot_Interp interpreter, struct tm *tm);
  * misc.c
  */
 
-STRING *Parrot_vsprintf_s(struct Parrot_Interp *, STRING *pat, va_list);
+STRING *Parrot_vsprintf_s(Interp *, STRING *pat, va_list);
 
-STRING *Parrot_vsprintf_c(struct Parrot_Interp *, const char *pat, va_list);
+STRING *Parrot_vsprintf_c(Interp *, const char *pat, va_list);
 
-void Parrot_vsprintf(struct Parrot_Interp *, char *targ, const char *pat,
+void Parrot_vsprintf(Interp *, char *targ, const char *pat,
                      va_list);
 
-void Parrot_vsnprintf(struct Parrot_Interp *, char *targ, size_t len,
+void Parrot_vsnprintf(Interp *, char *targ, size_t len,
                       const char *pat, va_list);
 
-STRING *Parrot_sprintf_s(struct Parrot_Interp *, STRING *pat, ...);
+STRING *Parrot_sprintf_s(Interp *, STRING *pat, ...);
 
-STRING *Parrot_sprintf_c(struct Parrot_Interp *, const char *pat, ...);
+STRING *Parrot_sprintf_c(Interp *, const char *pat, ...);
 
-void Parrot_sprintf(struct Parrot_Interp *, char *targ, const char *pat, ...);
+void Parrot_sprintf(Interp *, char *targ, const char *pat, ...);
 
-void Parrot_snprintf(struct Parrot_Interp *, char *targ, size_t len,
+void Parrot_snprintf(Interp *, char *targ, size_t len,
                      const char *pat, ...);
 
-STRING *Parrot_psprintf(struct Parrot_Interp *interpreter, STRING *pat,
+STRING *Parrot_psprintf(Interp *interpreter, STRING *pat,
                         PMC * ary);
 
 
@@ -128,17 +128,17 @@ STRING *Parrot_psprintf(struct Parrot_Interp *interpreter, STRING *pat,
 
     typedef struct sprintf_obj SPRINTF_OBJ;
 
-    typedef STRING *(*sprintf_getchar_t) (struct Parrot_Interp *, INTVAL,
+    typedef STRING *(*sprintf_getchar_t) (Interp *, INTVAL,
                                           SPRINTF_OBJ *);
-    typedef HUGEINTVAL(*sprintf_getint_t) (struct Parrot_Interp *, INTVAL,
+    typedef HUGEINTVAL(*sprintf_getint_t) (Interp *, INTVAL,
                                            SPRINTF_OBJ *);
-    typedef UHUGEINTVAL(*sprintf_getuint_t) (struct Parrot_Interp *, INTVAL,
+    typedef UHUGEINTVAL(*sprintf_getuint_t) (Interp *, INTVAL,
                                              SPRINTF_OBJ *);
-    typedef HUGEFLOATVAL(*sprintf_getfloat_t) (struct Parrot_Interp *, INTVAL,
+    typedef HUGEFLOATVAL(*sprintf_getfloat_t) (Interp *, INTVAL,
                                                SPRINTF_OBJ *);
-    typedef STRING *(*sprintf_getstring_t) (struct Parrot_Interp *, INTVAL,
+    typedef STRING *(*sprintf_getstring_t) (Interp *, INTVAL,
                                             SPRINTF_OBJ *);
-    typedef void *(*sprintf_getptr_t) (struct Parrot_Interp *, INTVAL,
+    typedef void *(*sprintf_getptr_t) (Interp *, INTVAL,
                                        SPRINTF_OBJ *);
 
     struct sprintf_obj {
@@ -156,7 +156,7 @@ STRING *Parrot_psprintf(struct Parrot_Interp *interpreter, STRING *pat,
     extern SPRINTF_OBJ pmc_core;
     extern SPRINTF_OBJ va_core;
 
-    STRING *Parrot_sprintf_format(struct Parrot_Interp *interpreter,
+    STRING *Parrot_sprintf_format(Interp *interpreter,
                                   STRING *pat, SPRINTF_OBJ * obj);
 
 #endif /* IN_SPF_SYSTEM */

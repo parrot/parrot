@@ -14,26 +14,26 @@
 #define PARROT_REGISTER_FUNCS_H_GUARD
 
 #include "parrot/parrot.h"
-void Parrot_clear_i(struct Parrot_Interp *);
-void Parrot_clear_s(struct Parrot_Interp *);
-void Parrot_clear_p(struct Parrot_Interp *);
-void Parrot_clear_n(struct Parrot_Interp *);
+void Parrot_clear_i(Interp *);
+void Parrot_clear_s(Interp *);
+void Parrot_clear_p(Interp *);
+void Parrot_clear_n(Interp *);
 
-void Parrot_push_i(struct Parrot_Interp *, void *where);
-void Parrot_push_n(struct Parrot_Interp *, void *where);
-void Parrot_push_s(struct Parrot_Interp *, void *where);
-void Parrot_push_p(struct Parrot_Interp *, void *where);
+void Parrot_push_i(Interp *, void *where);
+void Parrot_push_n(Interp *, void *where);
+void Parrot_push_s(Interp *, void *where);
+void Parrot_push_p(Interp *, void *where);
 
 /*
-void Parrot_clone_i(struct Parrot_Interp *);
-void Parrot_clone_n(struct Parrot_Interp *);
-void Parrot_clone_s(struct Parrot_Interp *);
-void Parrot_clone_p(struct Parrot_Interp *);
+void Parrot_clone_i(Interp *);
+void Parrot_clone_n(Interp *);
+void Parrot_clone_s(Interp *);
+void Parrot_clone_p(Interp *);
 */
-void Parrot_pop_i(struct Parrot_Interp *, void *where);
-void Parrot_pop_n(struct Parrot_Interp *, void *where);
-void Parrot_pop_s(struct Parrot_Interp *, void *where);
-void Parrot_pop_p(struct Parrot_Interp *, void *where);
+void Parrot_pop_i(Interp *, void *where);
+void Parrot_pop_n(Interp *, void *where);
+void Parrot_pop_s(Interp *, void *where);
+void Parrot_pop_p(Interp *, void *where);
 
 void Parrot_push_on_stack(void *thing, INTVAL size, INTVAL type);
 void Parrot_pop_off_stack(void *thing, INTVAL type);

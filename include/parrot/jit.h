@@ -7,9 +7,9 @@
 #if !defined(PARROT_JIT_H_GUARD)
 #define PARROT_JIT_H_GUARD
 
-typedef void (*jit_f)(struct Parrot_Interp *interpreter, opcode_t *pc);
+typedef void (*jit_f)(Interp *interpreter, opcode_t *pc);
 
-jit_f build_asm(struct Parrot_Interp *interpreter, opcode_t *pc,
+jit_f build_asm(Interp *interpreter, opcode_t *pc,
                 opcode_t *code_start, opcode_t *code_end,
                 void *objfile);
 
@@ -199,7 +199,7 @@ typedef struct {
     ((jit_info)->arena.start + (fixup)->native_offset)
 
 typedef void (*jit_fn_t)(Parrot_jit_info_t *jit_info,
-                         struct Parrot_Interp *interpreter);
+                         Interp *interpreter);
 
 /*  Parrot_jit_fn_info_t
  *      The table of opcodes.
@@ -221,28 +221,28 @@ extern Parrot_jit_fn_info_t op_exec[];
 void Parrot_jit_newfixup(Parrot_jit_info_t *jit_info);
 
 void Parrot_jit_begin(Parrot_jit_info_t *jit_info,
-                      struct Parrot_Interp *interpreter);
+                      Interp *interpreter);
 
 void Parrot_jit_dofixup(Parrot_jit_info_t *jit_info,
-                        struct Parrot_Interp *interpreter);
+                        Interp *interpreter);
 
 void Parrot_jit_cpcf_op(Parrot_jit_info_t *jit_info,
-                        struct Parrot_Interp *interpreter);
+                        Interp *interpreter);
 
 void Parrot_jit_normal_op(Parrot_jit_info_t *jit_info,
-                          struct Parrot_Interp *interpreter);
+                          Interp *interpreter);
 
 void Parrot_jit_restart_op(Parrot_jit_info_t *jit_info,
-                          struct Parrot_Interp *interpreter);
+                          Interp *interpreter);
 
 void Parrot_exec_cpcf_op(Parrot_jit_info_t *jit_info,
-                        struct Parrot_Interp *interpreter);
+                        Interp *interpreter);
 
 void Parrot_exec_normal_op(Parrot_jit_info_t *jit_info,
-                          struct Parrot_Interp *interpreter);
+                          Interp *interpreter);
 
 void Parrot_exec_restart_op(Parrot_jit_info_t *jit_info,
-                          struct Parrot_Interp *interpreter);
+                          Interp *interpreter);
 
 /*
  * interface functions for the register save/restore code
@@ -251,13 +251,13 @@ void Parrot_exec_restart_op(Parrot_jit_info_t *jit_info,
  */
 
 void Parrot_jit_emit_mov_mr_n(
-    struct Parrot_Interp *interpreter, char *mem, int);
+    Interp *interpreter, char *mem, int);
 void Parrot_jit_emit_mov_mr(
-    struct Parrot_Interp *interpreter, char *mem, int);
+    Interp *interpreter, char *mem, int);
 void Parrot_jit_emit_mov_rm_n(
-    struct Parrot_Interp *interpreter, int reg, char *mem);
+    Interp *interpreter, int reg, char *mem);
 void Parrot_jit_emit_mov_rm(
-    struct Parrot_Interp *interpreter, int reg, char *mem);
+    Interp *interpreter, int reg, char *mem);
 
 /*
  * 2) new style with offsets relative to the base register
@@ -276,7 +276,7 @@ void Parrot_jit_emit_mov_rm_offs(
 /*
  * NCI interface
  */
-void *Parrot_jit_build_call_func(struct Parrot_Interp *, PMC *, String *);
+void *Parrot_jit_build_call_func(Interp *, PMC *, String *);
 
 #endif /* PARROT_JIT_H_GUARD */
 

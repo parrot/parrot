@@ -18,9 +18,9 @@
 void Parrot_init_exceptions(Interp *interpreter);
 
 void internal_exception(int exitcode, const char *format, ...);
-void real_exception(struct Parrot_Interp *interpreter,
+void real_exception(Interp *interpreter,
         void *ret_addr, int exitcode,  const char *format, ...);
-void do_panic(struct Parrot_Interp *interpreter, const char *message,
+void do_panic(Interp *interpreter, const char *message,
               const char *file, int line);
 
 #define PANIC(message)\

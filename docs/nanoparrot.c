@@ -65,7 +65,7 @@ struct pf {
     char **const_table;
 };
 
-typedef struct Parrot_Interp {
+typedef Interp {
 #ifdef INDIRECT
     struct Reg *bp;
 #else
@@ -75,7 +75,7 @@ typedef struct Parrot_Interp {
     struct PReg pmc_reg;
 #endif
     struct pf *code;
-    opcode_t *(**op_func)(opcode_t *, struct Parrot_Interp*);
+    opcode_t *(**op_func)(opcode_t *, Interp*);
     const char **op_info;
     int flags;
 } Interp;

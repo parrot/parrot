@@ -92,7 +92,7 @@ typedef struct {
     int                                                 bytecode_header_size;
 } Parrot_exec_objfile_t;
 
-void Parrot_exec(struct Parrot_Interp *interpreter, opcode_t *pc,
+void Parrot_exec(Interp *interpreter, opcode_t *pc,
     opcode_t *code_start, opcode_t *code_end);
 void Parrot_exec_add_text_rellocation_func(Parrot_exec_objfile_t *obj,
     char *nptr, const char *func_name);
@@ -105,13 +105,13 @@ int Parrot_exec_add_symbol(Parrot_exec_objfile_t *obj, const char *symbol,
 
 void Parrot_exec_save(Parrot_exec_objfile_t *obj, const char *file);
 
-void Parrot_exec_emit_mov_mr(struct Parrot_Interp * interpreter, char *mem,
+void Parrot_exec_emit_mov_mr(Interp * interpreter, char *mem,
                              int reg);
-void Parrot_exec_emit_mov_mr_n(struct Parrot_Interp * interpreter, char *mem,
+void Parrot_exec_emit_mov_mr_n(Interp * interpreter, char *mem,
                              int reg);
-void Parrot_exec_emit_mov_rm(struct Parrot_Interp * interpreter, int reg,
+void Parrot_exec_emit_mov_rm(Interp * interpreter, int reg,
                              char *mem);
-void Parrot_exec_emit_mov_rm_n(struct Parrot_Interp * interpreter, int reg,
+void Parrot_exec_emit_mov_rm_n(Interp * interpreter, int reg,
                              char *mem);
 #  endif /* PARROT_EXEC_H_GUARD */
 #endif /* EXEC_CAPABLE */

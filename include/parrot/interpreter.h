@@ -56,9 +56,9 @@ typedef enum {
 } Parrot_Run_core_t;
 
 /* &end_gen */
-struct Parrot_Interp;
+struct parrot_interp_t;
 
-typedef struct Parrot_Interp *Parrot_Interp;
+typedef struct parrot_interp_t *Parrot_Interp;
 
 #if defined(PARROT_IN_CORE)
 
@@ -177,7 +177,7 @@ typedef struct _Prederef {
  * TODO: Parrot_Interp can use a Parrot_Context inline and we
  * can save/restore context with a single memcpy
  */
-typedef struct Parrot_Interp {
+struct parrot_interp_t {
     struct IReg int_reg;
     struct NReg num_reg;
     struct SReg string_reg;
@@ -235,7 +235,7 @@ typedef struct Parrot_Interp {
 
     PDB_t *pdb;                 /* Debug system */
     void *lo_var_ptr;           /* Pointer to memory on runops system stack */
-    struct Parrot_Interp * parent_interpreter;
+    Interp * parent_interpreter;
 
     /* per interpreter global vars */
     INTVAL world_inited;        /* Parrot_init is done */
@@ -258,7 +258,11 @@ typedef struct Parrot_Interp {
     PMC ** exception_list;              /* precreated exception objects */
     struct _Thread_data *thread_data;   /* thread specific items */
     UINTVAL recursion_limit;    /* Sub call resursion limit */
-} Interp;
+};
+
+/* typedef struct parrot_interp_t Interp;    done in parrot.h so that 
+                                             interpreter.h's prereq headers can 
+                                             use 'Interp' */
 
 typedef enum {
     RESUME_NONE         = 0x00,
@@ -303,7 +307,7 @@ typedef enum {
  * The offsets are relative to REG_BASE, which is currently REG_INT(0)
  */
 
-#define REG_BASE struct Parrot_Interp
+#define REG_BASE Interp
 
 #define REG_OFFS_INT(x) offsetof(REG_BASE, int_reg.registers[x])
 #define REG_OFFS_NUM(x) offsetof(REG_BASE, num_reg.registers[x])
@@ -337,15 +341,15 @@ extern PMC * PMCNULL;                     /* Holds single Null PMC         */
 
 /* &end_gen */
 
-struct Parrot_Interp *make_interpreter(Parrot_Interp parent, Interp_flags);
+Interp *make_interpreter(Parrot_Interp parent, Interp_flags);
 void Parrot_init(Parrot_Interp);
 void Parrot_destroy(Parrot_Interp);
 
-INTVAL interpinfo(struct Parrot_Interp *interpreter, INTVAL what);
-PMC*   interpinfo_p(struct Parrot_Interp *interpreter, INTVAL what);
+INTVAL interpinfo(Interp *interpreter, INTVAL what);
+PMC*   interpinfo_p(Interp *interpreter, INTVAL what);
 
-void runops(struct Parrot_Interp *, size_t offset);
-void runops_int(struct Parrot_Interp *, size_t offset);
+void runops(Interp *, size_t offset);
+void runops_int(Interp *, size_t offset);
 void Parrot_runops_fromc(Parrot_Interp, PMC *sub);
 void Parrot_runops_fromc_save(Parrot_Interp, PMC *sub);
 void* Parrot_runops_fromc_args(Parrot_Interp, PMC *sub, const char *sig, ...);
@@ -375,7 +379,7 @@ void Parrot_callback_D(PMC *callback_info, void *external_data);
 PMC* Parrot_make_cb(Parrot_Interp interpreter, PMC* sub, PMC* user_data,
         STRING* cb_signature);
 
-typedef opcode_t *(*native_func_t)(struct Parrot_Interp * interpreter,
+typedef opcode_t *(*native_func_t)(Interp * interpreter,
                                   opcode_t * cur_opcode,
                                   opcode_t * start_code);
 
@@ -384,7 +388,7 @@ VAR_SCOPE native_func_t run_native;
 void Parrot_compreg(Parrot_Interp interpreter, STRING *type, PMC *func);
 INTVAL sysinfo_i(Parrot_Interp interpreter, INTVAL info_wanted);
 STRING *sysinfo_s(Parrot_Interp interpreter, INTVAL info_wanted);
-void exec_init_prederef(struct Parrot_Interp *interpreter,
+void exec_init_prederef(Interp *interpreter,
     void *prederef_arena);
 
 void prepare_for_run(Parrot_Interp interpreter);
@@ -399,7 +403,7 @@ void enter_nci_method(Parrot_Interp, int type,
 
 #else
 
-typedef void * *(*native_func_t)(struct Parrot_Interp *interpreter,
+typedef void * *(*native_func_t)(Parrot_Interp interpreter,
                                  void *cur_opcode,
                                  void *start_code);
 

@@ -162,120 +162,120 @@ typedef struct PDB {
     int                     state;
 } PDB_t;
 
-void PDB_run_command(struct Parrot_Interp *interpreter, const char *command);
+void PDB_run_command(Interp *interpreter, const char *command);
 
-void PDB_get_command(struct Parrot_Interp *interpreter);
+void PDB_get_command(Interp *interpreter);
 
-void PDB_print(struct Parrot_Interp *interpreter, const char *command);
+void PDB_print(Interp *interpreter, const char *command);
 
-void PDB_print_int(struct Parrot_Interp *interpreter, struct IReg *int_reg, int regnum);
-void PDB_print_int_frame(struct Parrot_Interp *interpreter,
+void PDB_print_int(Interp *interpreter, struct IReg *int_reg, int regnum);
+void PDB_print_int_frame(Interp *interpreter,
                          struct IRegFrame *int_reg, int regnum);
 
-void PDB_print_num(struct Parrot_Interp *interpreter, struct NReg *num_reg, int regnum);
-void PDB_print_num_frame(struct Parrot_Interp *interpreter,
+void PDB_print_num(Interp *interpreter, struct NReg *num_reg, int regnum);
+void PDB_print_num_frame(Interp *interpreter,
                          struct NRegFrame *num_reg, int regnum);
 
-void PDB_print_string(struct Parrot_Interp *interpreter,
+void PDB_print_string(Interp *interpreter,
                       struct SReg *string_reg, int regnum);
-void PDB_print_string_frame(struct Parrot_Interp *interpreter,
+void PDB_print_string_frame(Interp *interpreter,
                             struct SRegFrame *string_reg, int regnum);
 
-void PDB_print_pmc(struct Parrot_Interp *interpreter,
+void PDB_print_pmc(Interp *interpreter,
                    struct PReg *pmc_reg, int regnum, PMC* key);
-void PDB_print_pmc_frame(struct Parrot_Interp *interpreter,
+void PDB_print_pmc_frame(Interp *interpreter,
                          struct PRegFrame *pmc_reg, int regnum, PMC* key);
 
-void PDB_debug(struct Parrot_Interp *interpreter);
+void PDB_debug(Interp *interpreter);
 
-void PDB_next(struct Parrot_Interp *interpreter, const char *command);
+void PDB_next(Interp *interpreter, const char *command);
 
-void PDB_trace(struct Parrot_Interp *interpreter, const char *command);
+void PDB_trace(Interp *interpreter, const char *command);
 
-void PDB_eval(struct Parrot_Interp *interpreter, const char *command);
-struct PackFile * PDB_compile(struct Parrot_Interp *, const char *);
+void PDB_eval(Interp *interpreter, const char *command);
+struct PackFile * PDB_compile(Interp *, const char *);
 
-int PDB_extend_const_table(struct Parrot_Interp *interpreter);
+int PDB_extend_const_table(Interp *interpreter);
 
-void PDB_init(struct Parrot_Interp *interpreter, const char *command);
+void PDB_init(Interp *interpreter, const char *command);
 
-void PDB_continue(struct Parrot_Interp *interpreter, const char *command);
+void PDB_continue(Interp *interpreter, const char *command);
 
-char PDB_break(struct Parrot_Interp *interpreter);
+char PDB_break(Interp *interpreter);
 
-PDB_breakpoint_t* PDB_find_breakpoint(struct Parrot_Interp *interpreter,
+PDB_breakpoint_t* PDB_find_breakpoint(Interp *interpreter,
                                      const char *command);
 
-void PDB_disable_breakpoint(struct Parrot_Interp *interpreter,
+void PDB_disable_breakpoint(Interp *interpreter,
                             const char *command);
 
-void PDB_enable_breakpoint(struct Parrot_Interp *interpreter,
+void PDB_enable_breakpoint(Interp *interpreter,
                            const char *command);
 
-void PDB_delete_breakpoint(struct Parrot_Interp *interpreter,
+void PDB_delete_breakpoint(Interp *interpreter,
     const char *command);
 
-void PDB_delete_condition(struct Parrot_Interp *interpreter,
+void PDB_delete_condition(Interp *interpreter,
                           PDB_breakpoint_t *breakpoint);
 
-void PDB_skip_breakpoint(struct Parrot_Interp *interpreter, long i);
+void PDB_skip_breakpoint(Interp *interpreter, long i);
 
 char *PDB_escape(const char *string, INTVAL length);
 
 int PDB_unescape(char *string);
 
-size_t PDB_disassemble_op(struct Parrot_Interp *interpreter,
+size_t PDB_disassemble_op(Interp *interpreter,
                           char* dest, int space,
                           op_info_t* info, opcode_t* op,
                           PDB_file_t *file, opcode_t* code_start,
                           int full_name);
 
-void PDB_disassemble(struct Parrot_Interp *interpreter, const char *command);
+void PDB_disassemble(Interp *interpreter, const char *command);
 
 long PDB_add_label(PDB_file_t *file, opcode_t *cur_opcode, opcode_t offset);
 
-void PDB_load_source(struct Parrot_Interp *interpreter, const char *command);
+void PDB_load_source(Interp *interpreter, const char *command);
 
-void PDB_free_file(struct Parrot_Interp *interpreter);
+void PDB_free_file(Interp *interpreter);
 
-void PDB_list(struct Parrot_Interp *interpreter, const char *command);
+void PDB_list(Interp *interpreter, const char *command);
 
-void PDB_set_break(struct Parrot_Interp *interpreter, const char *command);
+void PDB_set_break(Interp *interpreter, const char *command);
 
-PDB_condition_t *PDB_cond(struct Parrot_Interp *interpreter,
+PDB_condition_t *PDB_cond(Interp *interpreter,
     const char *command);
 
-char PDB_check_condition(struct Parrot_Interp *interpreter,
+char PDB_check_condition(Interp *interpreter,
     PDB_condition_t *condition);
 
-void PDB_watchpoint(struct Parrot_Interp *interpreter,
+void PDB_watchpoint(Interp *interpreter,
     const char *command);
 
-char PDB_program_end(struct Parrot_Interp *interpreter);
+char PDB_program_end(Interp *interpreter);
 
 char PDB_hasinstruction(char *);
 
-void PDB_print_stack(struct Parrot_Interp *interpreter,
+void PDB_print_stack(Interp *interpreter,
     const char *command);
 
-void PDB_print_user_stack(struct Parrot_Interp *interpreter,
+void PDB_print_user_stack(Interp *interpreter,
     const char *command);
 
-void PDB_print_stack_int(struct Parrot_Interp *interpreter,
+void PDB_print_stack_int(Interp *interpreter,
     const char *command);
 
-void PDB_print_stack_num(struct Parrot_Interp *interpreter,
+void PDB_print_stack_num(Interp *interpreter,
     const char *command);
 
-void PDB_print_stack_string(struct Parrot_Interp *interpreter,
+void PDB_print_stack_string(Interp *interpreter,
     const char *command);
 
-void PDB_print_stack_pmc(struct Parrot_Interp *interpreter,
+void PDB_print_stack_pmc(Interp *interpreter,
     const char *command);
 
-void PDB_info(struct Parrot_Interp *interpreter);
+void PDB_info(Interp *interpreter);
 
-void PDB_help(struct Parrot_Interp *interpreter, const char *command);
+void PDB_help(Interp *interpreter, const char *command);
 
 
 #define c_b             25245

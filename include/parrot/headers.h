@@ -25,35 +25,35 @@
 
 
 /* pool creation and access functions */
-struct Small_Object_Pool *new_pmc_pool(struct Parrot_Interp *interpreter);
-struct Small_Object_Pool *new_bufferlike_pool(struct Parrot_Interp *interpreter, size_t unit_size);
-struct Small_Object_Pool *new_buffer_pool(struct Parrot_Interp *interpreter);
-struct Small_Object_Pool *new_string_pool(struct Parrot_Interp *interpreter, INTVAL constant);
-struct Small_Object_Pool *get_bufferlike_pool(struct Parrot_Interp *interpreter, size_t unit_size);
+struct Small_Object_Pool *new_pmc_pool(Interp *interpreter);
+struct Small_Object_Pool *new_bufferlike_pool(Interp *interpreter, size_t unit_size);
+struct Small_Object_Pool *new_buffer_pool(Interp *interpreter);
+struct Small_Object_Pool *new_string_pool(Interp *interpreter, INTVAL constant);
+struct Small_Object_Pool *get_bufferlike_pool(Interp *interpreter, size_t unit_size);
 
-struct Small_Object_Pool *make_bufferlike_pool(struct Parrot_Interp *interpreter, size_t unit_size);
+struct Small_Object_Pool *make_bufferlike_pool(Interp *interpreter, size_t unit_size);
 /* header creation functions */
-PMC *new_pmc_header(struct Parrot_Interp *interpreter, UINTVAL flags);
-void add_pmc_ext(struct Parrot_Interp *interpreter, PMC *pmc);
-STRING *new_string_header(struct Parrot_Interp *interpreter, UINTVAL flags);
-Buffer *new_buffer_header(struct Parrot_Interp *interpreter);
-void *new_bufferlike_header(struct Parrot_Interp *interpreter, size_t size);
+PMC *new_pmc_header(Interp *interpreter, UINTVAL flags);
+void add_pmc_ext(Interp *interpreter, PMC *pmc);
+STRING *new_string_header(Interp *interpreter, UINTVAL flags);
+Buffer *new_buffer_header(Interp *interpreter);
+void *new_bufferlike_header(Interp *interpreter, size_t size);
 
-size_t get_max_buffer_address(struct Parrot_Interp *interpreter);
-size_t get_min_buffer_address(struct Parrot_Interp *interpreter);
-size_t get_max_pmc_address(struct Parrot_Interp *interpreter);
-size_t get_min_pmc_address(struct Parrot_Interp *interpreter);
-int is_buffer_ptr(struct Parrot_Interp *, void *);
-int is_pmc_ptr(struct Parrot_Interp *, void *);
+size_t get_max_buffer_address(Interp *interpreter);
+size_t get_min_buffer_address(Interp *interpreter);
+size_t get_max_pmc_address(Interp *interpreter);
+size_t get_min_pmc_address(Interp *interpreter);
+int is_buffer_ptr(Interp *, void *);
+int is_pmc_ptr(Interp *, void *);
 
 /* COW support */
 void buffer_mark_COW(Buffer *b);
-Buffer * buffer_unmake_COW(struct Parrot_Interp *, Buffer *src);
-Buffer * buffer_copy_if_diff(struct Parrot_Interp *, Buffer *src, Buffer *dst);
+Buffer * buffer_unmake_COW(Interp *, Buffer *src);
+Buffer * buffer_copy_if_diff(Interp *, Buffer *src, Buffer *dst);
 
 /* miscellaneous functions */
-void Parrot_initialize_header_pools(struct Parrot_Interp *);
-void Parrot_destroy_header_pools(struct Parrot_Interp *interpreter);
+void Parrot_initialize_header_pools(Interp *);
+void Parrot_destroy_header_pools(Interp *interpreter);
 
 #endif /* PARROT_HEADERS_H_GUARD */
 

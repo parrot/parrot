@@ -1832,7 +1832,7 @@ Parrot_emit_jump_to_eax(Parrot_jit_info_t *jit_info,
                 emit_EDX, emit_EBP, emit_None, 1, INTERP_BP_OFFS);
         jit_emit_mov_rr_i(jit_info->native_ptr, emit_ECX, emit_EDX);
         emitm_movl_m_r(jit_info->native_ptr, emit_EDX, emit_EDX, 0, 1,
-                offsetof(struct Parrot_Interp, code));
+                offsetof(Interp, code));
         emitm_movl_m_r(jit_info->native_ptr, emit_EDX, emit_EDX, 0, 1,
                 offsetof(struct PackFile, byte_code));
         jit_emit_sub_rr_i(jit_info->native_ptr, emit_EAX, emit_EDX);
@@ -1844,7 +1844,7 @@ Parrot_emit_jump_to_eax(Parrot_jit_info_t *jit_info,
          * TODO interleave these 2 calculations
          */
         emitm_movl_m_r(jit_info->native_ptr, emit_EDX, emit_ECX, 0, 1,
-                offsetof(struct Parrot_Interp, jit_info));
+                offsetof(Interp, jit_info));
         emitm_lea_m_r(jit_info->native_ptr, emit_EDX, emit_EDX, 0, 1,
                 offsetof(Parrot_jit_info_t, arena));
         emitm_movl_m_r(jit_info->native_ptr, emit_EDX, emit_EDX, 0, 1,
@@ -1920,7 +1920,7 @@ static void call_func(Parrot_jit_info_t *jit_info, void *addr)
 #    undef Parrot_jit_vtable_unlessp_op
 #    undef Parrot_jit_vtable_newp_ic_op
 
-#    define EXR(m, s) (int *)(offsetof(struct Parrot_Interp, m) + s)
+#    define EXR(m, s) (int *)(offsetof(Interp, m) + s)
 #    define IREG(i) EXR(int_reg.registers, i * sizeof(INTVAL))
 #    define NREG(i) EXR(num_reg.registers, i * sizeof(FLOATVAL))
 #    define PREG(i) EXR(pmc_reg.registers, i * sizeof(PMC *))

@@ -103,7 +103,7 @@ typedef struct _Thread_data {
  * this global mutex protects the list of interpreters
  */
 VAR_SCOPE Parrot_mutex                  interpreter_array_mutex;
-VAR_SCOPE struct Parrot_Interp          ** interpreter_array;
+VAR_SCOPE Interp          ** interpreter_array;
 VAR_SCOPE size_t                        n_interpreters;
 
 

@@ -3315,7 +3315,7 @@ string_titlecase_inplace(Interp *interpreter, STRING *s)
 
 /*
 
-=item C<STRING *string_increment(struct Parrot_Interp *, const STRING *)>
+=item C<STRING *string_increment(Interp *, const STRING *)>
 
 Perl5ish increment the string. Currently single char only.
 

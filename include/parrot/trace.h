@@ -16,14 +16,14 @@
 #include "parrot/parrot.h"
 
 void
-trace_pmc_dump(struct Parrot_Interp *interpreter, PMC* pmc);
+trace_pmc_dump(Interp *interpreter, PMC* pmc);
 
-void trace_key_dump(struct Parrot_Interp *interpreter, PMC *key);
+void trace_key_dump(Interp *interpreter, PMC *key);
 
-void trace_op_dump(struct Parrot_Interp *interpreter, opcode_t * code_start,
+void trace_op_dump(Interp *interpreter, opcode_t * code_start,
                    opcode_t * pc);
 
-void trace_op(struct Parrot_Interp *interpreter, opcode_t * code_start,
+void trace_op(Interp *interpreter, opcode_t * code_start,
               opcode_t * code_end, opcode_t * pc);
 
 #endif /* PARROT_TRACE_H_GUARD */

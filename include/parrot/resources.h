@@ -26,7 +26,7 @@ struct Memory_Block {
 
 struct Memory_Pool {
     struct Memory_Block *top_block;
-    void (*compact)(struct Parrot_Interp *, struct Memory_Pool *);
+    void (*compact)(Interp *, struct Memory_Pool *);
     size_t minimum_block_size;
     size_t total_allocated; /* total bytes allocated to this pool */
     size_t guaranteed_reclaimable;     /* bytes that can definitely be reclaimed*/
@@ -38,18 +38,18 @@ struct Memory_Pool {
 
 
 
-void *Parrot_allocate(struct Parrot_Interp *, void *, size_t size);
-void *Parrot_allocate_zeroed(struct Parrot_Interp *, void *, size_t size);
-void *Parrot_allocate_string(struct Parrot_Interp *, STRING *, size_t size);
-void *Parrot_reallocate(struct Parrot_Interp *interpreter,
+void *Parrot_allocate(Interp *, void *, size_t size);
+void *Parrot_allocate_zeroed(Interp *, void *, size_t size);
+void *Parrot_allocate_string(Interp *, STRING *, size_t size);
+void *Parrot_reallocate(Interp *interpreter,
                         void *from, size_t tosize);
-void *Parrot_reallocate_string(struct Parrot_Interp *interpreter,
+void *Parrot_reallocate_string(Interp *interpreter,
                                STRING *, size_t tosize);
 
-void Parrot_initialize_memory_pools(struct Parrot_Interp *);
-void Parrot_destroy_memory_pools(struct Parrot_Interp *interpreter);
+void Parrot_initialize_memory_pools(Interp *);
+void Parrot_destroy_memory_pools(Interp *interpreter);
 
-void Parrot_go_collect(struct Parrot_Interp *);
+void Parrot_go_collect(Interp *);
 
 struct Arenas {
     struct Memory_Pool *memory_pool;

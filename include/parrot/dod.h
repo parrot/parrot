@@ -49,21 +49,21 @@ enum {
                                              set, i.e. registers */
 };
 
-void Parrot_do_dod_run(struct Parrot_Interp *, UINTVAL flags);
-void trace_system_areas(struct Parrot_Interp *);
-void trace_mem_block(struct Parrot_Interp *, size_t, size_t);
+void Parrot_do_dod_run(Interp *, UINTVAL flags);
+void trace_system_areas(Interp *);
+void trace_mem_block(Interp *, size_t, size_t);
 
-void free_unused_pobjects(struct Parrot_Interp *interpreter,
+void free_unused_pobjects(Interp *interpreter,
                     struct Small_Object_Pool *pool);
 
-void used_cow(struct Parrot_Interp *interpreter,
+void used_cow(Interp *interpreter,
         struct Small_Object_Pool *pool, int cleanup);
-void clear_cow(struct Parrot_Interp *interpreter,
+void clear_cow(Interp *interpreter,
         struct Small_Object_Pool *pool, int cleanup);
 
 /* mark a PObj live during DOD */
 
-void pobject_lives(struct Parrot_Interp *interpreter, PObj *buffer);
+void pobject_lives(Interp *interpreter, PObj *buffer);
 
 #if ! DISABLE_GC_DEBUG
 /* Set when walking the system stack */

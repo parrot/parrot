@@ -25,7 +25,7 @@
    but that would be really annoying */
 #if defined(PARROT_IN_CORE)
 
-#define Parrot_INTERP struct Parrot_Interp *
+#define Parrot_INTERP Interp *
 #define Parrot_STRING STRING *
 #define Parrot_PMC PMC *
 #define Parrot_Language Parrot_Int

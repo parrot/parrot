@@ -106,7 +106,7 @@ main(int argc, char **argv) {
     extern int Parrot_exec_run;
     extern struct PackFile_Constant *exec_const_table;
     extern struct PackFile_Constant const_table;
-    extern struct Parrot_Interp interpre;
+    extern Interp interpre;
 
     /* s. exec.c */
     Parrot_exec_run = 1;

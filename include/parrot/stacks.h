@@ -59,7 +59,7 @@ void mark_stack_chunk_cache(Parrot_Interp interpreter);
  */
 
 Stack_Chunk_t * new_stack(Interp *interpreter, const char *name);
-void mark_stack(struct Parrot_Interp *, Stack_Chunk_t * cur_stack);
+void mark_stack(Interp *, Stack_Chunk_t * cur_stack);
 
 size_t stack_height(Interp *interpreter, Stack_Chunk_t *stack_base);
 

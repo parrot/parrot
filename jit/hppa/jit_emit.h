@@ -463,7 +463,7 @@ jit_emit_bc(Parrot_jit_info_t *jit_info, hppa_iregister_t s1,
 
 static void
 Parrot_emit_jump_to_ret(Parrot_jit_info_t *jit_info,
-                        struct Parrot_Interp * interpreter)
+                        Interp * interpreter)
 {
     /* This calculates (INDEX into op_map * 4) */
 
@@ -471,7 +471,7 @@ Parrot_emit_jump_to_ret(Parrot_jit_info_t *jit_info,
      * due too intersegment branches
      */
     emit_ldw(jit_info->native_ptr, BASE, CIR,
-        (offsetof(struct Parrot_Interp, code)));
+        (offsetof(Interp, code)));
     emit_ldw(jit_info->native_ptr, CIR, ISR2,
         (offsetof(struct PackFile, byte_code)));
     jit_emit_sub_rrr(jit_info->native_ptr, CIR, RET0, ISR2);
@@ -481,7 +481,7 @@ Parrot_emit_jump_to_ret(Parrot_jit_info_t *jit_info,
      * we have to get the op_map too at runtime
      */
     emit_ldw(jit_info->native_ptr, BASE, ISR1,
-        (offsetof(struct Parrot_Interp, jit_info)));
+        (offsetof(Interp, jit_info)));
     emit_ldo(jit_info->native_ptr, ISR1, ISR2,
         (offsetof(Parrot_jit_info_t, arena)));
     emit_ldw(jit_info->native_ptr, ISR2, ISR1,
@@ -495,7 +495,7 @@ Parrot_emit_jump_to_ret(Parrot_jit_info_t *jit_info,
 
 void
 Parrot_jit_begin(Parrot_jit_info_t *jit_info,
-                 struct Parrot_Interp * interpreter)
+                 Interp * interpreter)
 {
     /* Save the return address in the stack. */
     emit_stw(jit_info->native_ptr, r30, r2, -0x14);
@@ -566,7 +566,7 @@ Parrot_jit_begin(Parrot_jit_info_t *jit_info,
 
 void
 Parrot_jit_normal_op(Parrot_jit_info_t *jit_info,
-                     struct Parrot_Interp * interpreter)
+                     Interp * interpreter)
 {
     jit_emit_mov_rr(jit_info->native_ptr, r25, BASE);
     jit_emit_mov_ri_i(jit_info->native_ptr, r26, ((int)(jit_info->cur_op)));
@@ -582,7 +582,7 @@ Parrot_jit_normal_op(Parrot_jit_info_t *jit_info,
 
 void
 Parrot_jit_cpcf_op(Parrot_jit_info_t *jit_info,
-                   struct Parrot_Interp * interpreter)
+                   Interp * interpreter)
 {
     Parrot_jit_normal_op(jit_info, interpreter);
     Parrot_emit_jump_to_ret(jit_info, interpreter);
@@ -591,7 +591,7 @@ Parrot_jit_cpcf_op(Parrot_jit_info_t *jit_info,
 #  undef Parrot_jit_restart_op
 void
 Parrot_jit_restart_op(Parrot_jit_info_t *jit_info,
-                    struct Parrot_Interp * interpreter)
+                    Interp * interpreter)
 {
     char *jmp_ptr, *sav_ptr;
 
@@ -611,7 +611,7 @@ Parrot_jit_restart_op(Parrot_jit_info_t *jit_info,
 
 void
 Parrot_jit_dofixup(Parrot_jit_info_t *jit_info,
-                   struct Parrot_Interp * interpreter)
+                   Interp * interpreter)
 {
     Parrot_jit_fixup_t *fixup;
     char *fixup_ptr;
@@ -654,7 +654,7 @@ Parrot_jit_dofixup(Parrot_jit_info_t *jit_info,
 
 /* move reg to mem (i.e. intreg) */
 void
-Parrot_jit_emit_mov_mr(struct Parrot_Interp * interpreter, char *mem, int reg)
+Parrot_jit_emit_mov_mr(Interp * interpreter, char *mem, int reg)
 {
     jit_emit_mov_mr_i(
         ((Parrot_jit_info_t *)(interpreter->jit_info))->native_ptr, mem, reg);
@@ -662,7 +662,7 @@ Parrot_jit_emit_mov_mr(struct Parrot_Interp * interpreter, char *mem, int reg)
 
 /* move mem (i.e. intreg) to reg */
 void
-Parrot_jit_emit_mov_rm(struct Parrot_Interp * interpreter, int reg, char *mem)
+Parrot_jit_emit_mov_rm(Interp * interpreter, int reg, char *mem)
 {
     jit_emit_mov_rm_i(
         ((Parrot_jit_info_t *)(interpreter->jit_info))->native_ptr, reg, mem);
@@ -670,13 +670,13 @@ Parrot_jit_emit_mov_rm(struct Parrot_Interp * interpreter, int reg, char *mem)
 
 /* move reg to mem (i.e. numreg) */
 void
-Parrot_jit_emit_mov_mr_n(struct Parrot_Interp * interpreter, char *mem,int reg)
+Parrot_jit_emit_mov_mr_n(Interp * interpreter, char *mem,int reg)
 {
 }
 
 /* move mem (i.e. numreg) to reg */
 void
-Parrot_jit_emit_mov_rm_n(struct Parrot_Interp * interpreter, int reg,char *mem)
+Parrot_jit_emit_mov_rm_n(Interp * interpreter, int reg,char *mem)
 {
 }
 

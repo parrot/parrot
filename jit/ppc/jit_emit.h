@@ -579,12 +579,12 @@ jit_emit_bx(Parrot_jit_info_t *jit_info, char type, opcode_t disp)
     jit_emit_add_rrr(pc, D, r15, ISR1)
 
 #  define jit_emit_load_op_map(pc) \
-    jit_emit_lwz(pc, ISR1, offsetof(struct Parrot_Interp, jit_info), r13); \
+    jit_emit_lwz(pc, ISR1, offsetof(Interp, jit_info), r13); \
     jit_emit_lwz(pc, r14, (offsetof(Parrot_jit_arena_t, op_map) + \
                            offsetof(Parrot_jit_info_t, arena)), ISR1)
 
 #  define jit_emit_load_code_start(pc) \
-    jit_emit_lwz(pc, ISR1, offsetof(struct Parrot_Interp, code), r13); \
+    jit_emit_lwz(pc, ISR1, offsetof(Interp, code), r13); \
     jit_emit_lwz(pc, r15,  offsetof(struct PackFile, byte_code), ISR1)
 
 #  define jit_emit_branch_to_opcode(pc, D) \

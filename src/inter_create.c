@@ -25,7 +25,7 @@ Create or destroy a Parrot interpreter.c
 #include "parrot/oplib/core_ops.h"
 
 #if EXEC_CAPABLE
-struct Parrot_Interp interpre;
+Interp interpre;
 #endif
 
 #define ATEXIT_DESTROY
@@ -102,7 +102,7 @@ make_interpreter(Parrot_Interp parent, Interp_flags flags)
         interpreter = &interpre;
     else
 #endif
-        interpreter = mem_sys_allocate_zeroed(sizeof(struct Parrot_Interp));
+        interpreter = mem_sys_allocate_zeroed(sizeof(Interp));
 
     /*
      * the last interpreter (w/o) parent has to cleanup globals

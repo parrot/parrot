@@ -32,7 +32,7 @@ all pools not alive are considered dead.
 
 A overall layout of the interpreter's memory management looks like so:
 
-    typedef struct Parrot_Interp {
+    typedef Interp {
         ...
         struct Arenas *arena_base;
         ...

@@ -30,15 +30,15 @@ typedef struct IntStack_chunk_t {
 
 typedef IntStack_Chunk IntStack;
 
-IntStack intstack_new(struct Parrot_Interp *);
+IntStack intstack_new(Interp *);
 
-INTVAL intstack_depth(struct Parrot_Interp *, IntStack);
+INTVAL intstack_depth(Interp *, IntStack);
 
-void intstack_push(struct Parrot_Interp *, IntStack, INTVAL);
+void intstack_push(Interp *, IntStack, INTVAL);
 
-INTVAL intstack_pop(struct Parrot_Interp *, IntStack);
+INTVAL intstack_pop(Interp *, IntStack);
 
-void intstack_free(struct Parrot_Interp *, IntStack);
+void intstack_free(Interp *, IntStack);
 
 #endif
 

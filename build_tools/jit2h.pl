@@ -285,7 +285,7 @@ END_C
 }
 else {
     print JITCPU<<END_C;
-#define EXR(m, s) (int *)(offsetof(struct Parrot_Interp, m) + s)
+#define EXR(m, s) (int *)(offsetof(Interp, m) + s)
 #define IREG(i) EXR(int_reg.registers, jit_info->cur_op[i] * sizeof(INTVAL))
 #define NREG(i) EXR(num_reg.registers, jit_info->cur_op[i] * sizeof(FLOATVAL))
 #define PREG(i) EXR(pmc_reg.registers, jit_info->cur_op[i] * sizeof(PMC *))

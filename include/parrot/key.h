@@ -34,30 +34,30 @@ typedef enum {
 
 } KEY_flags;
 
-PMC *key_new(struct Parrot_Interp *interpreter);
-PMC *key_new_integer(struct Parrot_Interp *interpreter, INTVAL value);
-PMC *key_new_number(struct Parrot_Interp *interpreter, FLOATVAL value);
-PMC *key_new_string(struct Parrot_Interp *interpreter, STRING *value);
-PMC *key_new_cstring(struct Parrot_Interp *interpreter, const char *value);
-PMC *key_new_pmc(struct Parrot_Interp *interpreter, PMC *value);
+PMC *key_new(Interp *interpreter);
+PMC *key_new_integer(Interp *interpreter, INTVAL value);
+PMC *key_new_number(Interp *interpreter, FLOATVAL value);
+PMC *key_new_string(Interp *interpreter, STRING *value);
+PMC *key_new_cstring(Interp *interpreter, const char *value);
+PMC *key_new_pmc(Interp *interpreter, PMC *value);
 
-void key_set_integer(struct Parrot_Interp *interpreter, PMC *key, INTVAL value);
-void key_set_number(struct Parrot_Interp *interpreter, PMC *key, FLOATVAL value);
-void key_set_register(struct Parrot_Interp *interpreter, PMC *key, INTVAL value,
+void key_set_integer(Interp *interpreter, PMC *key, INTVAL value);
+void key_set_number(Interp *interpreter, PMC *key, FLOATVAL value);
+void key_set_register(Interp *interpreter, PMC *key, INTVAL value,
         INTVAL flag);
-void key_set_string(struct Parrot_Interp *interpreter, PMC *key, STRING *value);
-void key_set_pmc(struct Parrot_Interp *interpreter, PMC *key, PMC *value);
+void key_set_string(Interp *interpreter, PMC *key, STRING *value);
+void key_set_pmc(Interp *interpreter, PMC *key, PMC *value);
 
-INTVAL key_type(struct Parrot_Interp *interpreter, PMC *key);
-INTVAL key_integer(struct Parrot_Interp *interpreter, PMC *key);
-FLOATVAL key_number(struct Parrot_Interp *interpreter, PMC *key);
-STRING *key_string(struct Parrot_Interp *interpreter, PMC *key);
-PMC *key_pmc(struct Parrot_Interp *interpreter, PMC *key);
-PMC *key_next(struct Parrot_Interp *interpreter, PMC *key);
+INTVAL key_type(Interp *interpreter, PMC *key);
+INTVAL key_integer(Interp *interpreter, PMC *key);
+FLOATVAL key_number(Interp *interpreter, PMC *key);
+STRING *key_string(Interp *interpreter, PMC *key);
+PMC *key_pmc(Interp *interpreter, PMC *key);
+PMC *key_next(Interp *interpreter, PMC *key);
 
-PMC *key_append(struct Parrot_Interp *interpreter, PMC *key1, PMC *key2);
+PMC *key_append(Interp *interpreter, PMC *key1, PMC *key2);
 
-void key_mark(struct Parrot_Interp *interpreter, PMC *key);
+void key_mark(Interp *interpreter, PMC *key);
 
 #endif /* PARROT_KEY_H_GUARD */
 

@@ -112,6 +112,7 @@ typedef jmp_buf Parrot_jump_buff;
 typedef struct PMC PMC;
 typedef void STRING_FUNCS;
 typedef void BIGNUM;
+typedef struct parrot_interp_t Interp;
 
 /* weird architectures might need this, s. C-FAQ 5.17
  *

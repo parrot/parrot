@@ -981,11 +981,11 @@ reg_addr(Interp * interpreter, int typ, int i)
         switch (typ) {
             case 0:
                 return (char*)
-                    (offsetof(struct Parrot_Interp, int_reg.registers)
+                    (offsetof(Interp, int_reg.registers)
                         + sizeof(INTVAL) * i);
             case 3:
                 return (char*)
-                    (offsetof(struct Parrot_Interp, num_reg.registers)
+                    (offsetof(Interp, num_reg.registers)
                         + sizeof(FLOATVAL) * i);
             default:
                 return 0;   /* not currently */

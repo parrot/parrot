@@ -20,7 +20,7 @@
 void string_set_data_directory(const char *dir);
 
 /* Convert from any supported encoding, into our internal format */
-void string_fill_from_buffer(struct Parrot_Interp *interpreter,
+void string_fill_from_buffer(Interp *interpreter,
 	const void *buffer, UINTVAL len, const char *encoding_name, STRING *s);
 
 /* Utility method which knows how to uwind a single escape sequence */
@@ -30,22 +30,22 @@ string_unescape_one(Parrot_unescape_cb cb,
     Parrot_UInt4 *offset, Parrot_UInt4 input_length, void *string);
 
 UINTVAL
-Parrot_char_digit_value(struct Parrot_Interp *interpreter, UINTVAL character);
+Parrot_char_digit_value(Interp *interpreter, UINTVAL character);
 
 /* Character properties */
-INTVAL Parrot_char_is_alnum(struct Parrot_Interp *interpreter, UINTVAL character);
-INTVAL Parrot_char_is_alpha(struct Parrot_Interp *interpreter, UINTVAL character);
-INTVAL Parrot_char_is_ascii(struct Parrot_Interp *interpreter, UINTVAL character);
-INTVAL Parrot_char_is_blank(struct Parrot_Interp *interpreter, UINTVAL character);
-INTVAL Parrot_char_is_cntrl(struct Parrot_Interp *interpreter, UINTVAL character);
-INTVAL Parrot_char_is_digit(struct Parrot_Interp *interpreter, UINTVAL character);
-INTVAL Parrot_char_is_graph(struct Parrot_Interp *interpreter, UINTVAL character);
-INTVAL Parrot_char_is_lower(struct Parrot_Interp *interpreter, UINTVAL character);
-INTVAL Parrot_char_is_print(struct Parrot_Interp *interpreter, UINTVAL character);
-INTVAL Parrot_char_is_punct(struct Parrot_Interp *interpreter, UINTVAL character);
-INTVAL Parrot_char_is_space(struct Parrot_Interp *interpreter, UINTVAL character);
-INTVAL Parrot_char_is_upper(struct Parrot_Interp *interpreter, UINTVAL character);
-INTVAL Parrot_char_is_xdigit(struct Parrot_Interp *interpreter, UINTVAL character);
+INTVAL Parrot_char_is_alnum(Interp *interpreter, UINTVAL character);
+INTVAL Parrot_char_is_alpha(Interp *interpreter, UINTVAL character);
+INTVAL Parrot_char_is_ascii(Interp *interpreter, UINTVAL character);
+INTVAL Parrot_char_is_blank(Interp *interpreter, UINTVAL character);
+INTVAL Parrot_char_is_cntrl(Interp *interpreter, UINTVAL character);
+INTVAL Parrot_char_is_digit(Interp *interpreter, UINTVAL character);
+INTVAL Parrot_char_is_graph(Interp *interpreter, UINTVAL character);
+INTVAL Parrot_char_is_lower(Interp *interpreter, UINTVAL character);
+INTVAL Parrot_char_is_print(Interp *interpreter, UINTVAL character);
+INTVAL Parrot_char_is_punct(Interp *interpreter, UINTVAL character);
+INTVAL Parrot_char_is_space(Interp *interpreter, UINTVAL character);
+INTVAL Parrot_char_is_upper(Interp *interpreter, UINTVAL character);
+INTVAL Parrot_char_is_xdigit(Interp *interpreter, UINTVAL character);
 
 #endif /* PARROT_IN_CORE */
 #endif /* PARROT_STRING_PRIMITIVES_H_GUARD */

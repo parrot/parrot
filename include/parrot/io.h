@@ -139,7 +139,7 @@ extern ParrotIOLayer pio_buf_layer;
 
 
 #ifndef theINTERP
-#  define theINTERP      struct Parrot_Interp * interpreter
+#  define theINTERP      Interp * interpreter
 #endif
 
 extern INTVAL pio_errno;
@@ -155,9 +155,9 @@ extern ParrotIOLayer *PIO_pop_layer(theINTERP, PMC *);
 extern ParrotIOLayer *PIO_copy_stack(ParrotIOLayer *);
 
 
-extern struct PMC *new_io_pmc(struct Parrot_Interp *, ParrotIO *);
+extern struct PMC *new_io_pmc(Interp *, ParrotIO *);
 extern void free_io_header(ParrotIO *);
-extern ParrotIO *PIO_new(struct Parrot_Interp *, INTVAL, INTVAL, INTVAL);
+extern ParrotIO *PIO_new(Interp *, INTVAL, INTVAL, INTVAL);
 extern void PIO_destroy(theINTERP, PMC *io);
 
 extern INTVAL PIO_base_init(theINTERP, ParrotIOLayer *proto);

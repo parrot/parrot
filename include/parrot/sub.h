@@ -62,18 +62,18 @@ typedef struct Parrot_cont {
 
 #define PMC_cont(pmc) LVALUE_CAST(parrot_cont_t, PMC_pmc_val(pmc))
 
-struct Parrot_sub * new_sub(struct Parrot_Interp * interp);
-struct Parrot_sub * new_closure(struct Parrot_Interp * interp);
-struct Parrot_coro * new_coroutine(struct Parrot_Interp * interp);
-struct Parrot_cont * new_continuation(struct Parrot_Interp * interp);
-struct Parrot_cont * new_ret_continuation(struct Parrot_Interp * interp);
+struct Parrot_sub * new_sub(Interp * interp);
+struct Parrot_sub * new_closure(Interp * interp);
+struct Parrot_coro * new_coroutine(Interp * interp);
+struct Parrot_cont * new_continuation(Interp * interp);
+struct Parrot_cont * new_ret_continuation(Interp * interp);
 
-PMC * new_ret_continuation_pmc(struct Parrot_Interp *, opcode_t * address);
+PMC * new_ret_continuation_pmc(Interp *, opcode_t * address);
 
-void save_context(struct Parrot_Interp *, struct Parrot_Context *);
-void swap_context(struct Parrot_Interp *, PMC *);
-void restore_context(struct Parrot_Interp *, struct Parrot_Context *);
-void mark_context(struct Parrot_Interp *, struct Parrot_Context *);
+void save_context(Interp *, struct Parrot_Context *);
+void swap_context(Interp *, PMC *);
+void restore_context(Interp *, struct Parrot_Context *);
+void mark_context(Interp *, struct Parrot_Context *);
 
 
 #endif /* PARROT_SUB_H_GUARD */

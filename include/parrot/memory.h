@@ -34,7 +34,7 @@ void mem__internal_free(void *, const char *, int);
 #define mem_internal_free(x) mem__internal_free(x, __FILE__, __LINE__)
 
 
-void mem_setup_allocator(struct Parrot_Interp *);
+void mem_setup_allocator(Interp *);
 
 #define mem_allocate_new_stash() NULL
 #define mem_allocate_new_stack() NULL
