@@ -746,3 +746,6 @@ miniparrot-update :
 
 exec : exec_start$(O) $(LIBPARROT)
 	$(LINK) ${ld_out}$(EXEC) $(LINKFLAGS) $(EXEC)$(O) exec_start$(O) $(LIBPARROT) $(C_LIBS)
+
+exec_so : exec_start$(O) blib/lib/libparrot$(SO)
+	$(LINK) ${ld_out}$(EXEC) $(LINKFLAGS) $(EXEC)$(O) exec_start$(O) -lparrot $(C_LIBS) -pthread
