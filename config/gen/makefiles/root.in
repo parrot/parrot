@@ -185,7 +185,6 @@ GEN_LIBRARY = \
     runtime/parrot/library/parrotlib.pbc \
     runtime/parrot/library/pcre.pbc \
     runtime/parrot/library/Stream/Base.pbc \
-    runtime/parrot/library/Stream/Buffer.pbc \
     runtime/parrot/library/Stream/Combiner.pbc \
     runtime/parrot/library/Stream/Coroutine.pbc \
     runtime/parrot/library/Stream/Filter.pbc \
