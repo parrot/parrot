@@ -182,7 +182,7 @@ SymReg * iIF(int relop, SymReg * r0, SymReg * r1, SymReg * r2) {
 
 SymReg * iNEW(SymReg * r0, char * type) {
     char op[256];
-    strcpy(op, "new %s, ");
+    strcpy(op, "new %s, .");
     strcat(op, type);
     emitb(mk_instruction(op, r0, NULL, NULL, NULL, IF_r0_write ));
     return r0;
