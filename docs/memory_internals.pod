@@ -107,6 +107,46 @@ I<flags> is the current I<Buffer>. With some additional fields like
 I<strstart> and I<bufused>, inserted at the ellipses, you get a I<STRING>.
 Adding a I<vtable> (and some other structure members) yields a I<PMC>.
 
+=head2 ARENA_DOD_FLAGS
+
+Only four flags need to be checked during a DOD run: C<PObj_live_FLAG>,
+C<PObj_on_free_list_FLAG>, C<PObj_is_special_PMC_FLAG> and 
+C<PObj_needs_early_DOD_FLAG>. Normally these flags are stored in 
+C<PObj->flags>, meaning that each PMC must be accessed during the DOD run.
+
+An alternative approach is to store the DOD-Flags in the Arenas as a packed
+array of bits. This approach will be used if the preprocessor variable 
+C<ARENA_DOD_FLAGS> is defined to 1. Here the I<struct Small_Object_Arena> is
+extended with a pointer to the packed bitarray
+
+    struct Small_Object_Arena {
+        UINTVAL *dod_flags;
+        size_t object_size;
+        ...
+    };
+
+The memory for this Small_Object_Arena is allocated at the beginning of a 
+large aligned block of memory (currently 4MiB) and the objects in this arena 
+come from this memory block. Therefore the arena of an object can be found by 
+simply masking out the lower bits of the pointer to the object:
+
+    arena = object & ARENA_MASK;
+
+The macro C<GET_ARENA> does the exactly this, including the necessary type
+casts to remove warnings. The dod_flags are accessed by getting the element
+number in the arena (this is possible because the object_size is fixed and
+stored in the I<struct Small_Object_Arena>), creating the appropriate
+bitmask by shifting and accessing the right element of dod_flags[].
+
+    n = (object - arena->start_objects) / arena->object_size;
+    arena->dod_flags[n >> ARENA_FLAG_SHIFT] 
+        & flag << ((n & ARENA_FLAG_MASK) << 2)
+
+To simplify this, the macros C<DOD_flag_SET>, C<DOD_flag_CLEAR> and
+C<DOD_flag_TEST> are introduced. As these macros are also defined in the case
+without ARENA_DOD_FLAGS, these macros are a portable way of manipulating the 
+DOD flags.
+
 =head1 Variable sized items
 
 These items never live alone, they are part of a I<Buffer> structure,
@@ -198,7 +238,6 @@ refcount reaches zero.
 
 =head1 Simplified Figure
 
-=item
                              +--------+
       +------------------<---| Arenas |<-----------+
       |                      +--------+-->--+      |
