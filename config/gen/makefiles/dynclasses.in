@@ -7,22 +7,22 @@ O = ${o}
 # add your dynamic pmcs here
 # gdbmhash is only built when 'libgdbm.so' is available
 PMCS = \
-foo \
 #CONDITIONED_LINE(has_gdbm):gdbmhash \
-match matchrange \
-pybuiltin \
-pyclass \
-pyobject \
+  match \
+  matchrange \
+  pybuiltin \
+  pyclass \
+  pyobject \
   pyboolean \
   pycomplex \
   pydict \
   pyexception \
   pyfloat \
   pyfunc \
-    pyboundmeth \
-      pyboundcall \
-    pynci \
-    pystaticmeth \
+  pyboundmeth \
+  pyboundcall \
+  pynci \
+  pystaticmeth \
   pygen \
   pyint \
   pylist \
@@ -33,11 +33,18 @@ pyobject \
   pyslice \
   pystring \
   pytuple \
-pyproxytype \
-pyproxyclass \
-pyiter \
-subproxy \
-tclobject tclstring tclint tclfloat tcllist tclarray
+  pyproxytype \
+  pyproxyclass \
+  pyiter \
+  tclobject \
+  tclstring \
+  tclint \
+  tclfloat \
+  tcllist \
+  tclarray \
+  tclparser \
+  subproxy \
+  foo
 
 BUILD = ${perl} build.pl
 

@@ -12,17 +12,13 @@
 
   if argc != 1 goto fail
 
-  .local string contents
-  .local pmc retval
-  .local string chunk
-  .local int code
-  .local string filename
-  .local int type
-  .local pmc handle
+  .local string chunk, filename, contents
+  .local int code,type
+  .local pmc retval, handle, parser
 
-  .local pmc parse
+  parser = find_global "_Tcl", "parser"
+
   .local pmc interpret
-  parse = find_global "_Tcl", "__parse"
   interpret = find_global "_Tcl", "__interpret"
 
   $P1 = argv[0] 
@@ -46,7 +42,13 @@ loop:
   goto loop
 
 gotfile:
-  $P1 = parse(contents,0,0)
+  .local pmc pmcString
+  pmcString = new String
+  pmcString = contents
+  .local pmc zero
+  zero = new Integer
+  zero = 0
+  $P1 = parser."parse"(pmcString,zero,zero)
   (code,retval) = interpret($P1)
   goto done
  

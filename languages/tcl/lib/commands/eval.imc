@@ -14,9 +14,9 @@
   .local int argc
   .local int looper
  
-  .local pmc parse
+  .local pmc parser
   .local pmc interpret 
-  parse = find_global "_Tcl", "__parse"  
+  parser = find_global "_Tcl", "parser"  
   interpret = find_global "_Tcl", "__interpret"
 
   expr = ""
@@ -34,8 +34,14 @@ loop:
   goto loop
 
 loop_done:
- 
-  $P1 = parse(expr,0,0)
+
+  .local pmc pmcString
+  pmcString = new String
+  pmcString = expr
+  .local pmc zero
+  zero = new Integer
+  zero = 0
+  $P1 = parser."parse"(pmcString,zero,zero)
   ($I0,$P0) = interpret($P1) 
 
 done:

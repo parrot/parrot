@@ -19,25 +19,23 @@ Create a PIR sub on the fly for this user defined proc.
   return_type = TCL_OK
   retval = ""
 
-  .local pmc parse
-  .local pmc string2list
-  parse = find_global "_Tcl", "__parse"
+  .local pmc parser,string2list
+  parser = find_global "_Tcl", "parser"
   string2list = find_global "_Tcl", "__stringToList"
 
-  .local string name
-  .local string args
-  .local string body
+  .local string name,args
 
   name = name_p
   args = args_p
-  body = body_p
 
   .local pmc arg_list
   arg_list = string2list(args)
 
   # Save the parsed body.
-  .local pmc parsed_body
-  parsed_body = parse(body,0,0)
+  .local pmc parsed_body,zero
+  zero = new Integer
+  zero = 0
+  parsed_body = parser."parse"(body_p,zero,zero)
 
   # XXX these need to go away - for now, we'll just escape
   # the code portion and put it, escaped, into the proc 

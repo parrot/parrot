@@ -227,10 +227,24 @@ later interpretation.
   .local pmc chunk
   .local pmc chunks
   .local pmc parsed_cmd
-  .local pmc parser 
 
-  parser = find_global "_Tcl", "__parse"
-  parsed_cmd  = parser(cmd,0,0)
+=for later
+
+  .local pmc parser 
+  parser = find_global "_Tcl", "parser"
+  .local pmc zero
+  zero = new Integer
+  zero = 0
+  .local pmc pmcString
+  pmcString = new String
+  pmcString = cmd
+  parsed_cmd  = parser."parse"(pmcString,zero,zero)
+
+=cut
+ 
+  .local pmc parser
+  parser = find_global "_Tcl", "___parse"
+  parsed_cmd = parser(cmd,0,0)
 
   chunk = new FixedPMCArray
   chunk = 2

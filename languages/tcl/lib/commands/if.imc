@@ -15,7 +15,7 @@
 
   .local pmc elseifs
   elseifs = new TclList
-  .local pmc retval
+  .local pmc retval,condition
   .local string code
   .local pmc condition
   .local string body
@@ -24,11 +24,9 @@
 
   .local int counter
 
-  .local pmc parse
-  .local pmc interpret
-  .local pmc expression_p
-  .local pmc expression_i
-  parse = find_global "_Tcl", "__parse"
+  .local pmc parser,interpret
+  .local pmc expression_p,expression_i
+  parser = find_global "_Tcl", "parser"
   interpret = find_global "_Tcl", "__interpret"
   expression_p = find_global "_Tcl", "__expression_parse"
   expression_i = find_global "_Tcl", "__expression_interpret"
@@ -105,7 +103,13 @@ do_else:
   code = else
 
 done:
-  $P1 = parse(code,0,0)
+  .local pmc zero
+  zero = new Integer
+  .local pmc pmcString
+  pmcString = new String
+  pmcString = code
+ 
+  $P1 = parser."parse"(pmcString,zero,zero)
   (return_type,retval) = interpret($P1)
 
 done_final:

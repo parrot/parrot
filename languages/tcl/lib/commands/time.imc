@@ -15,12 +15,11 @@
   .local int return_type
   return_type = TCL_OK
 
-  .local pmc parse
-  .local pmc interpret
-  parse = find_global "_Tcl", "__parse"
+  .local pmc parser,interpret
+  parser = find_global "_Tcl", "parser"
   interpret = find_global "_Tcl", "__interpret"
 
-  .local string script
+  .local pmc script
   .local int count
 
   count = 1
@@ -38,9 +37,11 @@ twoargs:
 
 run:
   script = argv[0]
-
-  # is it cheating to parse it here?
-  $P1 = parse(script,0,0)
+  .local pmc zero
+  zero = new Integer
+  zero = 0 
+ 
+  $P1 = parser."parse"(script,zero,zero)
 
   time $N1 
   $I1 = count

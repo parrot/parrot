@@ -23,23 +23,22 @@
 
   .local pmc joe # just a placeholder, not saved.
 
-  .local pmc parse
+  .local pmc parser
   .local pmc interpret
   .local pmc expression_p
   .local pmc expression_i
-  parse = find_global "_Tcl", "__parse"
+  parser = find_global "_Tcl", "parser"
   interpret = find_global "_Tcl", "__interpret"
   expression_p = find_global "_Tcl", "__expression_parse"
   expression_i = find_global "_Tcl", "__expression_interpret"
 
-  start = start_p
-  next  = next_p
-  body  = body_p
-
   # Parse the bits that are code.
-  start_parsed = parse(start,0,0)
-  next_parsed  = parse(next,0,0)
-  body_parsed  = parse(body,0,0)
+  .local pmc zero
+  zero = new Integer
+  zero = 0
+  start_parsed = parser."parse"(start_p,zero,zero)
+  next_parsed  = parser."parse"(next_p,zero,zero)
+  body_parsed  = parser."parse"(body_p,zero,zero)
 
   # first, execute start.
   (return_type,joe) = interpret(start_parsed)

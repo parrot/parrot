@@ -12,7 +12,7 @@ word, and whitespace encountered here is added into the string.
 
 .namespace [ "_Tcl" ]
 
-.sub __parse
+.sub ___parse
   .param string buffer
   .param int preserve_whitespace
   .param int block_interpolation
@@ -311,7 +311,21 @@ handle_quote:
   dec word_length
   dec word_length
   $S0 = substr buffer, start_word, word_length
-  $P0 = __parse($S0,1,0)
+
+  .local pmc parser 
+  parser = find_global "_Tcl", "parser"
+
+  .local pmc pmcString
+  pmcString = new String
+  pmcString = $S0
+  .local pmc zero
+  .local pmc one
+  zero = new Integer
+  one = new Integer
+  zero = 0
+  one = 1
+
+  $P0 = parser."parse"(pmcString,one,zero)
   word.concat_words( $P0 )
   start_word = $I1
   word_length = 0

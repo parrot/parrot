@@ -7,7 +7,7 @@
   argv = foldup
 
   .local int return_type
-  .local pmc parse,interpret,retval,string2list
+  .local pmc parser,interpret,retval,string2list
   retval = new String
   retval = ""
 
@@ -16,7 +16,7 @@
   $I0 = argcP % 2
   if $I0 != 1 goto error
 
-  parse = find_global "_Tcl", "__parse"
+  parser = find_global "_Tcl", "parser"
   interpret = find_global "_Tcl", "__interpret"
   string2list = find_global "_Tcl", "__stringToList"
   return_type = TCL_OK
@@ -74,9 +74,10 @@ got_list:
   max_size = size_of
   goto arg_loop
 arg_done: 
-  .local pmc parsed
-  $S0 = body
-  parsed = parse($S0,0,0)
+  .local pmc parsed,zero
+  zero = new Integer
+  zero = 0
+  parsed = parser."parse"(body,zero,zero)
 
   .local pmc iterator
   iterator = new Integer

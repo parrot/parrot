@@ -1,0 +1,82 @@
+/* TclArray.pmc
+ *  Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+ *  CVS Info
+ *     $Id$
+ *  Overview:
+ *     These are the vtable functions for the TclArray base class
+ *  Data Structure and Algorithms:
+ *  History:
+ *  Notes:
+ *     Please remove unneeded entries.
+ *  References:
+
+=head1 AOOOOGAH
+
+This barebones implemenation causes a laod_lib to dump core. Whee!
+
+=head1 NAME
+
+dynclasses/tclparser.pmc - Tcl Parser
+
+=head1 DESCRIPTION
+
+Handle any parsing of Tcl code - putting this into a pmc with state
+allows us to more easily handle [parser]
+
+=cut
+
+*/
+
+#include "parrot/parrot.h"
+
+pmclass TclParser dynpmc group tcl_group {
+
+/*
+
+=item C<void init()>
+
+Initializes the instance.
+
+=cut
+
+*/
+
+    void init () {
+        PMC_str_val(SELF) = string_make_empty(INTERP,enum_stringrep_one,0);
+    }
+
+/*
+
+=item C<METHOD PMC* "parse"(PMC *code, PMC *preserve_whitespace, PMC *block_interpretation)>
+
+Given a string of Tcl Code, return a chunk of data we can then pass
+to the expression sub.
+
+
+
+
+TODO: Skip the evaluate step, and just return an invokable.
+
+=cut
+
+*/
+
+    METHOD PMC* parse(PMC *code, PMC *preserve, PMC *block) {
+      PMC *parser,*retval;      
+      STRING *Tcl,*joe,*parse,*codeS;
+      INTVAL preserveInt, blockInt;
+      codeS = Parrot_PMC_get_string(INTERP, code) ;
+      preserveInt = Parrot_PMC_get_intval(INTERP, preserve);
+      blockInt = Parrot_PMC_get_intval(INTERP, block);
+
+      Tcl = string_from_const_cstring(INTERP, "_Tcl", 4);
+      parse = string_from_const_cstring(INTERP, "___parse", 8);
+      parser = Parrot_find_global(INTERP, Tcl, parse);
+      if (!parser) 
+        internal_exception(INVALID_OPERATION,"Couldn't find parser");
+      /* Need to actually pass in the flags from above! XXX */
+      retval = (PMC*)  Parrot_call_sub(INTERP,parser,"PSII",codeS,preserveInt,blockInt);
+
+      return retval;
+    }
+}

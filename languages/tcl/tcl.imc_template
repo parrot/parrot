@@ -156,6 +156,14 @@ providing a compreg-compatible method.
   store_global "_Tcl", "functions", math_funcs
   store_global "_Tcl", "precedence", precedence
 
+  # Grab a (for now) global instance of TclParser
+  .local int TclParser
+  TclParser = find_type "TclParser"
+  .local pmc parser
+  parser = new TclParser
+ 
+  store_global "_Tcl", "parser", parser
+
   # Eventually, we'll need to register MMD for the various Tcl PMCs
   # (Presuming we don't do this from the .pmc definitions.)
 
@@ -221,10 +229,14 @@ providing a compreg-compatible method.
 
   # should generate a new sub each time, or no?
   # yes, we should.
-  pir_code = ".namespace [ \"_Tcl\" ]\n.sub _throwaway_sub\n.local string code\ncode = \""
+  pir_code = ".namespace [ \"_Tcl\" ]\n.sub _throwaway_sub @ANON\n.local pmc code\n.local pmc zero\nzero = new Integer\nzero = 0\ncode=new String\ncode = \""
   tcl_code = escaper(tcl_code,"\"")
   pir_code .= tcl_code
-  pir_code .= "\"\n.local pmc tcl_parse\n.local pmc tcl_interpret\ntcl_parse = find_global \"_Tcl\", \"__parse\"\ntcl_interpret = find_global \"_Tcl\", \"__interpret\"\n$P1 = tcl_parse(code,0,0)\n($I0,$P3) = tcl_interpret($P1)\n.return($I0,$P3)\n .end\n"
+  pir_code .= "\"\n.local pmc parser\n.local pmc tcl_interpret\nparser = find_global \"_Tcl\", \"parser\"\ntcl_interpret = find_global \"_Tcl\", \"__interpret\"\n$P1 = parse.\"parse\"(code,zero,zero)\n($I0,$P3) = tcl_interpret($P1)\n.return($I0,$P3)\n .end\n"
+
+  print "PIR_CODE:"
+  print pir_code
+  print "\n\n"
 
   .local pmc compiled_sub
   compiled_sub = compile pir_compiler, pir_code

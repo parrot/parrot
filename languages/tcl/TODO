@@ -1,14 +1,21 @@
 =head1 Administrative Issues
 
+For all my prodding on top level parrot issues, tcl really has no
+roadmap, either. If you're at all interested in working on this project,
+let me know, and I'll work on clarifying.
+
 =over 4
 
 =item [interpinfo name]
 
 how to do this from inside parrot?
+[ there's a RT ticket for this now, someone should put the # here.]
 
 =item migrate all these issues to RT.
 
-TODO tests would also suffice, where possible.
+TODO tests would also suffice, where possible -- For those of you
+who know tcl, this would be a great place to contribute code - tests
+based on the latest Tcl man pages will *really* help.
 
 =item update docs/* 
 
@@ -22,16 +29,18 @@ TODO tests would also suffice, where possible.
 
 =over 4
 
-=item List to String (KJ?)
+=item List to String
 
 The current list to string logic in C<dynclasses/tcllist.pmc> is missing logic
 to properly escape string elements.
 
 =item PMC based parser
 
-Instead of the current PIR level parsing, we should instead use
-a pmc - not only should this improve speed slightly, but will help
-us implement the [parser] builtin.
+a TclParser PMC has been added to dynclasses. All uses of _Tcl::__parse now
+use this PMC instead (which calls a hidden PIR version of the original parse.)
+
+Next step: eliminate lib/parse.imc and run this functionality directly in C
+in the TclParser PMC.  (Will is working on this)
 
 =item string to list 
 
@@ -81,13 +90,13 @@ hex & unicode escapes are not supported in C<lib/parser.imc>
 
 =item unimplemented commands/subcommands
 
-[after] [array get]* [array names] [array unset] 
+[after] [array get] [array names] [array unset] 
 [array statistics] [array anymore] [array donesearch]
 [array nextelement] [array startsearch] [bgerror] [binary] 
 [case] [clock] [close] [cd] [dde] [encoding] [eof] [exec]
 [fblocked] [fconfigure] [fcopy] [file] [fileevent]
-[flush] [gets] [glob] [http] [info]* [interp] [library]
-[lindex] [load] [lreplace] [lsearch]* [lset] [lsort] 
+[flush] [gets] [glob] [http] [info] [interp] [library]
+[lindex] [load] [lreplace] [lsearch] [lset] [lsort] 
 [memory] [msgcat] [namespace] [open] [package] [pid] [pwd]
 [read] [registry] [regexp] [regsub] [resource] 
 [safe] [scan] [seek] [socket] [subst]
@@ -97,8 +106,6 @@ hex & unicode escapes are not supported in C<lib/parser.imc>
 [string bytelength] [string is] [string map]
 [string wordstart] [string wordend] [switch] [tcltest]
 [tell] [update] [variable] [vwait]
-
-* - assigned
 
 =back
 
