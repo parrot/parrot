@@ -17,8 +17,8 @@ to use MMD in all circumstances, but currently do not)
 =head2 API
 
 For the purposes of the API, each MMD-able function is assigned a
-unique number which is used to find the right function table. This is
-the C<func_num> parameter in the following functions. While parrot
+unique number which is used to find the correct function table. This 
+is the C<func_num> parameter in the following functions. While Parrot
 isn't restricted to a predefined set of functions, it I<does> set
 things up so that all the binary vtable functions have a MMD table
 preinstalled for them, with default behaviour.
@@ -46,7 +46,7 @@ automatically be expanded.
 
 =item mmd_register(interp, func_num, left_type, right_type, funcptr)
 
-Register a function C<funcptr> for MMD function tabe C<func_num> for
+Register a function C<funcptr> for MMD function table C<func_num> for
 classes C<left_type> and C<right_type>. The left and right types are
 C<INTVAL>s that represent the class ID numbers.
 
@@ -165,7 +165,7 @@ Logical xor (not short-circuiting)
 
 =item MMD_REPEAT
 
-String repition
+String repetition
 
 =item MMD_NUMEQ
 
@@ -199,7 +199,7 @@ Bitwise xor of the string value
 
 =head2 Defaults
 
-By default functions are installed for all the functions that have
+By default, functions are installed for all the functions that have
 constants associated with them. They are all functions suitable for
 calling with C<mmd_dispatch_pmc>.
 
