@@ -285,7 +285,6 @@ Parrot_runcode(struct Parrot_Interp *interpreter, int argc, char *argv[])
     /* immediately anchor pmc to root set */
     interpreter->ctx.pmc_reg.registers[0] = userargv;
 
-    userargv->vtable->set_integer_native(interpreter, userargv, (INTVAL) argc);
     for (i = 0; i < argc; i++) {
         /* Run through argv, adding everything to @ARGS. */
         STRING *arg = string_make(interpreter, argv[i], strlen(argv[i]),
