@@ -30,6 +30,7 @@
 SOURCE:
   # do some simple option parsing
 
+  set S0, P5[1]
   ne S0, "-c", NOTC
   set I10, 1 # count mode
   set S0, P5[2]
