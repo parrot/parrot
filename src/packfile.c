@@ -2301,7 +2301,7 @@ PackFile_Constant_unpack_pmc(struct Parrot_Interp *interpreter,
     /*
      * make a constant subroutine object of the desired class
      */
-    pmc_num = Parrot_get_pmc_num(interpreter, class);
+    pmc_num = pmc_type(interpreter, string_from_cstring(interpreter, class, 0));
     sub_pmc = constant_pmc_new_noinit(interpreter, pmc_num);
     /*
      * this places the current bytecode segment in the Parrot_Sub

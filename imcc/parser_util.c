@@ -38,8 +38,8 @@ iNEW(struct Parrot_Interp *interpreter, SymReg * r0, char * type,
     SymReg *regs[IMCC_MAX_REGS];
     SymReg *pmc;
     int i, nargs;
-    int pmc_num = Parrot_get_pmc_num(interpreter,
-            *type == '.' ?type+1:type);
+    int pmc_num = pmc_type(interpreter,
+            string_from_cstring(interpreter, *type == '.' ?type+1:type, 0));
 
     sprintf(fmt, "%d", pmc_num);
     pmc = mk_const(str_dup(fmt), 'I');

@@ -131,13 +131,7 @@ Find the PMC type or parrot data type by name.
 =cut
 
 op find_type(out INT, in STR) {
-    PMC * key = key_new_string(interpreter, $2);
-    PMC *classname_hash = VTABLE_get_pmc_keyed_int(interpreter,
-      interpreter->iglobals, IGLOBALS_CLASSNAME_HASH);
-
-    $1 = VTABLE_get_integer_keyed(interpreter, classname_hash, key);
-    if ($1 == enum_type_undef)
-	$1 = Parrot_get_datatype_enum(interpreter, $2);
+    $1 = pmc_type(interpreter, $2);
     goto NEXT();
 }
 

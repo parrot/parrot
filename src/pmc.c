@@ -175,6 +175,31 @@ constant_pmc_new_init(struct Parrot_Interp *interpreter, INTVAL base_type,
     return pmc;
 }
 
+/* This segment handles PMC registration and such */
+
+INTVAL
+pmc_register(Parrot_Interp interp, STRING *name)
+{
+    /* Stub for now */
+    return 0;
+}
+
+INTVAL
+pmc_type(Parrot_Interp interp, STRING *name)
+{
+    INTVAL return_val;
+    PMC * key = key_new_string(interp, name);
+    PMC *classname_hash = VTABLE_get_pmc_keyed_int(interp,
+                            interp->iglobals, IGLOBALS_CLASSNAME_HASH);
+
+    return_val = VTABLE_get_integer_keyed(interp, classname_hash, key);
+    if (return_val == enum_type_undef) {
+	return_val = Parrot_get_datatype_enum(interp, name);
+    }
+    return return_val;
+
+}
+
 /* This segment is made up of the 'fallback' functions -- the
    functions we call if we have no clue as to how to do MMD for a
    vtable function */

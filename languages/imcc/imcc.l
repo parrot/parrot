@@ -318,7 +318,7 @@ SP              [ ]
     }
 
 <emit,INITIAL>{DOT}{LETTER}{LETTERDIGIT}* {
-        int type = Parrot_get_pmc_num(interp, yytext+1);
+        int type = pmc_type(interp, string_from_cstring(interp, yytext+1, 0));
 
         if (type) {
             char *buf = malloc(16);

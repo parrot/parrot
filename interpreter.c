@@ -1093,16 +1093,6 @@ sysinfo_s(Parrot_Interp interpreter, INTVAL info_wanted)
     }
 }
 
-/* return the index of a PMC class */
-int
-Parrot_get_pmc_num(struct Parrot_Interp *interp, char *pmc_type)
-{
-    PMC * key = key_new_cstring(interp, pmc_type);
-    PMC * cnames = VTABLE_get_pmc_keyed_int(interp, interp->iglobals,
-            IGLOBALS_CLASSNAME_HASH);
-
-    return VTABLE_get_integer_keyed(interp, cnames, key);
-}
 
 /*
  * Local variables:
