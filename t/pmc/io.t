@@ -16,7 +16,7 @@ Tests the Parrot IO operations.
 
 =cut
 
-use Parrot::Test tests => 21;
+use Parrot::Test tests => 23;
 use Test::More;
 
 output_is(<<'CODE', <<'OUTPUT', "open/close");
@@ -376,6 +376,39 @@ output_is(<<'CODE', <<'OUTPUT', 'seek/tell');
 CODE
 ok 1
 Hello Parrot!
+OUTPUT
+
+output_is(<<'CODE', <<'OUTPUT', "peek");
+        open P0, "temp.file", ">"
+        print P0, "a line\n"
+        close P0
+        open P0, "temp.file", "<"
+        peek S0, P0
+        print S0
+        peek S1, P0
+        print S1
+        print "\n"
+        read S2, P0, 2
+        peek S3, P0
+        print S3
+        print "\n"
+        end
+CODE
+aa
+l
+OUTPUT
+
+output_is(<<'CODE', <<'OUTPUT', "peek on an empty file");
+        open P0, "temp.file", ">"
+        close P0
+        open P0, "temp.file", "<"
+        peek S0, P0
+        eq S0, "", OK1
+        print "not "
+OK1:    print "ok 1\n"
+        end
+CODE
+ok 1
 OUTPUT
 
 unlink "temp.file";
