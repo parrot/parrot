@@ -4330,6 +4330,7 @@ $3
 
 inline op can(out INT, in PMC, in STR) {
   $1 = $2->vtable->can(interpreter, $2, $3);
+  goto NEXT();
 }
 
 =item B<does>(out INT, in PMC, in STR)
@@ -4341,6 +4342,7 @@ $3
 
 inline op does(out INT, in PMC, in STR) {
   $1 = $2->vtable->does(interpreter, $2, $3);
+  goto NEXT();
 }
 
 

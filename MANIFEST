@@ -173,6 +173,7 @@ encodings/singlebyte.c
 encodings/utf16.c
 encodings/utf32.c
 encodings/utf8.c
+events.c
 examples/assembly/99beer.pasm
 examples/assembly/Makefile
 examples/assembly/bsr.pasm
@@ -1280,6 +1281,7 @@ include/parrot/string_funcs.h
 include/parrot/sub.h
 include/parrot/thread.h
 include/parrot/trace.h
+include/parrot/tsq.h
 include/parrot/unicode.h
 include/parrot/warnings.h
 interpreter.c
@@ -1632,7 +1634,6 @@ languages/regex/README.hacking
 languages/regex/lib/Regex.pm
 languages/regex/lib/Regex/CodeGen.pm
 languages/regex/lib/Regex/CodeGen/IMCC.pm
-languages/regex/lib/Regex/CodeGen/Pasm.pm
 languages/regex/lib/Regex/CodeGen/Re.pm
 languages/regex/lib/Regex/CodeGen/Rx.pm
 languages/regex/lib/Regex/Generate.pm
@@ -1827,6 +1828,7 @@ tools/dev/parrot_coverage.pl
 tools/dev/rebuild_miniparrot.pl
 tools/dev/run_indent.pl
 trace.c
+tsq.c
 types/bignum.c
 types/bignum.h
 types/bignum_atest.pl
