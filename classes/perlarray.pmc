@@ -86,8 +86,7 @@ pmclass PerlArray {
 	return key_pair->cache.struct_val;
     }
 
-    BOOLVAL get_bool () {
-    }
+    BOOLVAL get_bool () = default;
 
     void* get_value () {
         return &SELF->cache;

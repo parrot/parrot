@@ -69,10 +69,10 @@ pmclass default noinit {
    }
 
    BOOLVAL get_bool () {
-     /*  Everything has to be true */
+     /*  Everything has to be false */
      if (   SELF->vtable->get_integer(INTERP, SELF) == 0 
 	 && SELF->vtable->get_number(INTERP, SELF) == 0.0
-	 && string_bool(SELF->vtable->get_string(INTERP, SELF))
+	 && string_bool(SELF->vtable->get_string(INTERP, SELF)) == 0
 	    )
        {
 	 return 0;

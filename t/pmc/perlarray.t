@@ -1,6 +1,6 @@
 #! perl -w
 
-use Parrot::Test tests => 3;
+use Parrot::Test tests => 4;
 
 output_is(<<'CODE', <<'OUTPUT', "size of the array");
 	new P0,PerlArray
@@ -76,5 +76,38 @@ CODE
 hey
 OUTPUT
 
+output_is(<<'CODE', <<'OUTPUT', "If P");
+        new P0, PerlArray
+        if P0, TR
+        print "false\n"
+        branch NEXT   
+TR:     print "true\n"
+
+NEXT:   set P0, 1, 0
+        if P0, TR2
+        print "false\n"
+        branch NEXT2
+TR2:    print "true\n"
+
+NEXT2:  new P1, PerlArray
+        set P1, 1
+        if P1, TR3
+        print "false\n"
+        branch NEXT3
+TR3:    print "true\n"
+
+NEXT3:  set P1, 0
+        if P1, TR4
+        print "false\n"
+        end
+TR4:    print "true\n"        
+        end
+
+CODE
+false
+true
+true
+false
+OUTPUT
 
 1;
