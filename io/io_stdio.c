@@ -159,6 +159,10 @@ PIO_stdio_fdopen(theINTERP, ParrotIOLayer *layer, PIOHANDLE fptr, INTVAL flags)
 
     if (PIO_isatty(fptr))
         flags |= PIO_F_CONSOLE;
+
+    /* fdopened files are always shared */
+    flags |= PIO_F_SHARED;
+
     io = PIO_new(interpreter, PIO_F_FILE, flags, mode);
     io->fd = fptr;
     return io;

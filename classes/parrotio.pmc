@@ -78,8 +78,15 @@ pmclass ParrotIO need_ext {
 
     void destroy () {
 	ParrotIO *io = PMC_data(SELF);
-        if (io && !(io->flags & PIO_F_SHARED))
-            PIO_close(interpreter, SELF);
+        if (io) {
+            /* shared filehandles will only get flushed */
+            if (io->flags & PIO_F_SHARED) {
+                PIO_flush(interpreter, SELF);
+            }
+            else {
+                PIO_close(interpreter, SELF);
+            }
+        }
     }
 
     void clone (PMC *dest) {

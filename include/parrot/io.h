@@ -272,7 +272,7 @@ extern INTVAL PIO_putps(theINTERP, PMC *io, STRING *s);
 extern INTVAL PIO_fprintf(theINTERP, PMC *io, const char *s, ...);
 extern INTVAL PIO_printf(theINTERP, const char *s, ...);
 extern INTVAL PIO_eprintf(theINTERP, const char *s, ...);
-extern INTVAL PIO_getfd(theINTERP, PMC *io);
+extern PIOHANDLE PIO_getfd(theINTERP, PMC *io);
 extern PIOOFF_T PIO_tell(theINTERP, PMC *io);
 
 extern void Parrot_IOData_mark(theINTERP, ParrotIOData *piodata);

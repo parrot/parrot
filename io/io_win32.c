@@ -180,6 +180,10 @@ PIO_win32_fdopen(theINTERP, ParrotIOLayer *layer, PIOHANDLE fd, INTVAL flags)
 
     if (PIO_win32_isatty(fd))
         flags |= PIO_F_CONSOLE;
+
+    /* fdopened files are always shared */
+    flags |= PIO_F_SHARED;
+
     io = PIO_new(interpreter, PIO_F_FILE, flags, mode);
     io->fd = fd;
     return io;

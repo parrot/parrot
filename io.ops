@@ -52,7 +52,6 @@ XXX: integral file descriptors may not exist outside of the UNIX
 =cut
 
 inline op fdopen(out PMC, in INT, in STR) {
-#ifdef PIO_OS_UNIX
   /* These char * need to go away soon */
   const char * mode;
   mode = string_to_cstring(interpreter, $3);
@@ -66,9 +65,6 @@ inline op fdopen(out PMC, in INT, in STR) {
      but this generates ugly warnings WRT discarding the const
      qualifier -lt
    */
-#else
-    $1 = pmc_new(interpreter, enum_class_PerlUndef);
-#endif
   goto NEXT();
 }
 
@@ -82,7 +78,7 @@ XXX: integral file descriptors may not exist outside of the UNIX
 =cut
 
 inline op getfd(out INT, in PMC) {
-  $1 = PIO_getfd(interpreter, $2);
+  $1 = (INTVAL)PIO_getfd(interpreter, $2);
   goto NEXT();
 }
 

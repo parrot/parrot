@@ -701,23 +701,16 @@ PIO_eprintf(theINTERP, const char *s, ...) {
     return ret;
 }
 
-INTVAL
+PIOHANDLE
 PIO_getfd(theINTERP, PMC *pmc)
 {
-    INTVAL i;
+    ParrotIO *io = PMC_data(pmc);
 
-    ParrotIOTable table = ((ParrotIOData*)interpreter->piodata)->table;
-
-    for(i = 0; i < PIO_NR_OPEN; i++) {
-        if (table[i] == pmc) return i;
-        if (table[i] == NULL) {
-            table[i] = pmc;
-            return i;
-        }
+    if (io) {
+        return io->fd;
     }
 
-    /* XXX boe: increase size of the fdtable */
-    return -1;
+    return (PIOHANDLE)0;
 }
 
 /* Implemenation of the PIO_STD* functions on basis of the macro */

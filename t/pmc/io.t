@@ -35,12 +35,14 @@ a line
 1
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "fdopen");
-	fdopen P0, 1, ">"
-	defined I0, P0
+output_is(<<'CODE', <<'OUTPUT', "getfd/fdopen");
+        getstdout P0
+        getfd I0, P0
+	fdopen P1, I0, ">"
+	defined I0, P1
 	unless I0, nok
-	print P0, "ok\n"
-	close P0
+	print P1, "ok\n"
+	close P1
 	end
 nok:
 	print "fdopen failed\n"
@@ -50,10 +52,12 @@ ok
 OUTPUT
 
 output_is(<<'CODE', <<'OUTPUT', "fdopen - no close");
-	fdopen P0, 1, ">"
-	defined I0, P0
+        getstdout P0
+        getfd I0, P0
+	fdopen P1, I0, ">"
+	defined I0, P1
 	unless I0, nok
-	print P0, "ok\n"
+	print P1, "ok\n"
 	end
 nok:
 	print "fdopen failed\n"
@@ -233,18 +237,27 @@ close FOO;
 
 unlink("temp.file");
 
-output_is(<<'CODE', '012', 'standard file descriptors');
+output_is(<<'CODE', <<'OUT', 'standard file descriptors');
        getstdin P0
        getfd I0, P0
-       print I0
+       # I0 is 0 on Unix and non-Null on stdio and win32
+       print "ok 1\n"
        getstdout P1
        getfd I1, P1
-       print I1
+       if I1, OK_2
+       print "not "
+OK_2:  print "ok 2\n"
        getstderr P2
        getfd I2, P2
-       print I2
+       if I2, OK_3
+       print "not "
+OK_3:  print "ok 3\n"
        end
 CODE
+ok 1
+ok 2
+ok 3
+OUT
 
 output_is(<<'CODE', <<'OUTPUT', 'printerr');
        new P0, .PerlString
