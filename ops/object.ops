@@ -10,8 +10,6 @@ VERSION = PARROT_VERSION;
 
 object.ops
 
-=cut
-
 =head1 DESCRIPTION
 
 Parrot's library of object ops
@@ -25,7 +23,7 @@ Parrot's library of object ops
 Call a method on an object as per Parrot's calling conventions. We assume
 that all the registers are properly set up.
 
-All calls assume P2 = objects, S0 = method.
+All calls assume P2 = object, S0 = method.
 
 =cut
 
@@ -76,8 +74,7 @@ op callmethcc() {
 
 =item B<can>(out INT, in PMC, in STR)
 
-Sets $1 to true or false, depending on whether $2 ->can the method in
-$3
+Sets $1 to true or false, depending on whether $2 ->can the method in $3.
 
 =cut
 
@@ -225,7 +222,7 @@ inline op class(out PMC, in PMC) {
 
 =item B<classname>(out STR, in PMC)
 
-Get the class name for the class in $2 and put it in $1
+Get the class name for the class in $2 and put it in $1.
 
 =cut
 
@@ -250,7 +247,7 @@ inline op classname(out STR, in PMC) {
 
 =item B<addparent>(in PMC, in PMC)
 
-Add class $2 to the list of parent classes for $1
+Add class $2 to the list of parent classes for $1.
 
 =item B<removeparent>(in PMC, in PMC)
 
@@ -259,12 +256,13 @@ Remove class $2 from class $1's list of parents.
 =item B<addattrib>(out INT, in PMC, in STR)
 
 Add the attribute named $3 to the class $2. $1 is filled in with the
-offset of the new attribute
+offset of the new attribute.
 
 =item B<removeattrib>(in PMC, in STR)
+
 =item B<removeattrib>(in PMC, in INT)
 
-Remove attribute $2 from class $1, specified either by name or offset
+Remove attribute $2 from class $1, specified either by name or offset.
 
 =cut
 
@@ -277,7 +275,7 @@ op addattrib(out INT, in PMC, in STR) {
 
 =item B<adddoes>(in PMC, in STR)
 
-Add $2 to the list of interfaces that this class claims to implement
+Add $2 to the list of interfaces that this class claims to implement.
 
 =item B<removedoes>(in PMC, in STR)
 
@@ -292,7 +290,7 @@ implement.
 
 =head1 COPYRIGHT
 
-Copyright (C) 2001-2003 The Perl Foundation.  All rights reserved.
+Copyright (C) 2001-2004 The Perl Foundation.  All rights reserved.
 
 =head1 LICENSE
 
