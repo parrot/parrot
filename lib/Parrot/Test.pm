@@ -76,12 +76,14 @@ sub generate_pbc_for {
   }
 
   if (!$can_skip_compile) {
-    open ASSEMBLY, "> $as_f" or die "Unable to open '$as_f'";
-    binmode ASSEMBLY;
-    print ASSEMBLY $assembly;
-    close ASSEMBLY;
-
-    _run_command( "$PConfig{perl} ${directory}assemble.pl $as_f --output $by_f" );
+      open ASSEMBLY, "> $as_f" or die "Unable to open '$as_f'";
+      binmode ASSEMBLY;
+      print ASSEMBLY $assembly;
+      close ASSEMBLY;
+      unless($ENV{IMCC}) {
+	  _run_command(
+	      "$PConfig{perl} ${directory}assemble.pl $as_f --output $by_f" );
+	  }
   }
 }
 
@@ -109,35 +111,43 @@ sub generate_functions {
     no strict 'refs';
 
     *{$package.'::'.$func} = sub ($$;$) {
-      my( $assembly, $output, $desc ) = @_;
+	my( $assembly, $output, $desc ) = @_;
 
-      $count++;
+	$count++;
 
-      #set up default description
-      (undef, my $file, my $line) = caller;
-      unless ($desc) {
-        $desc = "($file line $line)";
-      }
+	#set up default description
+	(undef, my $file, my $line) = caller;
+	unless ($desc) {
+	    $desc = "($file line $line)";
+	}
 
-      $output =~ s/\cM\cJ/\n/g;
+	$output =~ s/\cM\cJ/\n/g;
 
-      #generate pbc for this test (may be overriden)
-      $pbc_generator->( $assembly, $directory, $count );
+	#generate pbc for this test (may be overriden)
+	my $imcc;
+	my $out_f = per_test('.out',$count);
+	$TEST_PROG_ARGS = $ENV{TEST_PROG_ARGS} || '';
+	$pbc_generator->( $assembly, $directory, $count );
+	if (($imcc = $ENV{IMCC})) {
+	    my $as_f = per_test('.pasm',$count);
+	    _run_command( "$imcc ${TEST_PROG_ARGS} $as_f",
+	    'STDOUT' => $out_f, 'STDERR' => $out_f);
+	}
+	else {
 
-      my $by_f = per_test('.pbc',$count);
-      my $out_f = per_test('.out',$count);
+	    my $by_f = per_test('.pbc',$count);
 
-      $TEST_PROG_ARGS = $ENV{TEST_PROG_ARGS} || '';
-      _run_command( "${directory}$PConfig{test_prog} ${TEST_PROG_ARGS} $by_f", 'STDOUT' => $out_f, 'STDERR' => $out_f);
+	    _run_command( "${directory}$PConfig{test_prog} ${TEST_PROG_ARGS} $by_f", 'STDOUT' => $out_f, 'STDERR' => $out_f);
+	}
 
-      my $meth = $Test_Map{$func};
-      my $pass = $Builder->$meth( slurp_file($out_f), $output, $desc );
+	my $meth = $Test_Map{$func};
+	my $pass = $Builder->$meth( slurp_file($out_f), $output, $desc );
 
-      unless($ENV{POSTMORTEM}) {
-        unlink $out_f;
-      }
+	unless($ENV{POSTMORTEM}) {
+	    unlink $out_f;
+	}
 
-      return $pass;
+	return $pass;
     }
   }
 
