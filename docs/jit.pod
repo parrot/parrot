@@ -246,7 +246,7 @@ lines are ignored.
 
 =item Identifiers
 
-In general, prefixing an identifier with I<&> yields the address of the
+In general, prefixing an identifier with I<&> yields an address.
 The I<*> prefix specifies a value.  Since Parrot register values vary
 during code execution, their values can not be obtained through
 identifier substitution alone.
@@ -395,7 +395,7 @@ An immediate operand, i.e. an integer constant.
 
 =item I<<type>>
 
-Specifies, if this operations works on integers or floating point
+Specifies if this operation works on integer or floating point
 arguments. If all arguments are of the same type, only one type
 specifier is needed.
 
@@ -442,7 +442,7 @@ mapped and considered as preserved over function calls.
 
 =head1 EXAMPLE
 
-Let's see how this work:
+Let's see how this works:
 
 B<Parrot Assembly:>
 
@@ -454,7 +454,7 @@ B<Parrot Assembly:>
 B<Parrot Bytecode:> (only the bytecode segment is shown)
 
  +--------------------------------------+
- | 73 | 0 | 8 | 72 | 2 | 0 | 21 | 0 | 0 |
+ | 73 | 0 | 8 | 72 | 2 | 0 | 21 | 2 | 0 |
  +-|------------|------------|--------|-+
    |            |            |        |
    |            |            |        +----------- end (no arguments)
@@ -515,7 +515,7 @@ B<Parrot_jit_end>
     0x817de1a <jit_func+74>:	pop    %ebp
     0x817de1c <jit_func+76>:	ret
 
-Please note the reverse argument direction. PASM and JIT notation use
+Please note the reverse argument direction. PASM and JIT notations use
 I<dest,src,src>, while F<gdb> and the internal macros in F<jit_emit.h>
 have I<src,dest>.
 
