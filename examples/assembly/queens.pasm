@@ -12,8 +12,6 @@
 # This program is free software. It is subject to the same
 # license as Perl itself.
 #
-# $Id$
-#
 
 
 # 4 bits per file, represent the rank of the queen, 0xf for none
@@ -24,9 +22,9 @@
                                                     # const int NUM_RANKS = 8;
 clear_file_BEFORE: branch   clear_file_AFTER          #   sub int clear_file (int board, int file) {
 clear_file:
-clear_file_ENTER: clonei                            
-                 clonen                            
-                 clones                            
+clear_file_ENTER: pushi                             
+                 pushn                             
+                 pushs                             
                                                     #   var int board;
                  restore  I0                        #   var int file;
                  restore  I1                        # (argument board)
@@ -48,9 +46,9 @@ clear_file_AFTER:
                                                    
 place_queen_BEFORE: branch   place_queen_AFTER         #   sub int place_queen (int board, int rank, int file) {
 place_queen:
-place_queen_ENTER: clonei                            
-                 clonen                            
-                 clones                            
+place_queen_ENTER: pushi                             
+                 pushn                             
+                 pushs                             
                                                     #   var int board;
                                                     #   var int rank;
                  restore  I0                        #   var int file;
@@ -77,9 +75,9 @@ place_queen_AFTER:
                                                    
 queen_rank_BEFORE: branch   queen_rank_AFTER          #   sub int queen_rank (int board, int file) {
 queen_rank:
-queen_rank_ENTER: clonei                            
-                 clonen                            
-                 clones                            
+queen_rank_ENTER: pushi                             
+                 pushn                             
+                 pushs                             
                                                     #   var int board;
                  restore  I0                        #   var int file;
                  restore  I1                        # (argument board)
@@ -102,9 +100,9 @@ queen_rank_AFTER:
                                                    
 queen_at_BEFORE: branch   queen_at_AFTER            #   sub int queen_at (int board, int rank, int file) {
 queen_at:
-queen_at_ENTER:  clonei                            
-                 clonen                            
-                 clones                            
+queen_at_ENTER:  pushi                             
+                 pushn                             
+                 pushs                             
                                                     #   var int board;
                                                     #   var int rank;
                  restore  I0                        #   var int file;
@@ -164,9 +162,9 @@ queen_at_AFTER:
                                                    
 free_space_BEFORE: branch   free_space_AFTER          #   sub int free_space (int board, int rank, int file) {
 free_space:
-free_space_ENTER: clonei                            
-                 clonen                            
-                 clones                            
+free_space_ENTER: pushi                             
+                 pushn                             
+                 pushs                             
                                                     #   var int board;
                                                     #   var int rank;
                  restore  I0                        #   var int file;
@@ -236,9 +234,9 @@ free_space_AFTER:
                                                    
 print_board_BEFORE: branch   print_board_AFTER         #   sub print_board (int board) {
 print_board:
-print_board_ENTER: clonei                            
-                 clonen                            
-                 clones                            
+print_board_ENTER: pushi                             
+                 pushn                             
+                 pushs                             
                  restore  I0                        #   var int board;
                  restore  I1                        # (argument board)
                                                     #   var int rank;
@@ -297,9 +295,9 @@ print_board_AFTER:
                                                    
 main_BEFORE:     branch   main_AFTER                #   sub main () {
 main:
-main_ENTER:      clonei                            
-                 clonen                            
-                 clones                            
+main_ENTER:      pushi                             
+                 pushn                             
+                 pushs                             
                  restore  I0                       
                                                     #   var int board;
                                                     #   var int rank;
