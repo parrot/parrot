@@ -551,11 +551,8 @@ inline op set_keyed (out PMC, in PMC, in PMC, in PMC)  {
     MAKE_KEY(src_key, src_key_p, $2, enum_key_pmc, pmc_val);
     MAKE_KEY(dest_key, dest_key_p, $4, enum_key_pmc, pmc_val);
 
-/* Delayed XXX
-    $1->vtable->set_keyed(interpreter, 
+    $1->vtable->set_pmc_keyed(interpreter, 
                     $1, $2 ? &src_key : NULL, $3, $4 ? &dest_key : NULL);
-*/
-
     goto NEXT();
 }
 

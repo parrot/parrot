@@ -46,7 +46,7 @@ pmclass default noinit {
    }
 
    INTVAL get_integer_keyed (KEY * key) {
-     return 0;
+     internal_exception(OUT_OF_BOUNDS, "Subscript on something that's not an aggregate!\n");
    }
 
    FLOATVAL get_number () {
@@ -54,7 +54,7 @@ pmclass default noinit {
    }
 
    FLOATVAL get_number_keyed (KEY * key) {
-     return 0.0;
+     internal_exception(OUT_OF_BOUNDS, "Subscript on something that's not an aggregate!\n");
    }
 
    STRING* get_string () {
@@ -63,7 +63,7 @@ pmclass default noinit {
    }
 
    STRING* get_string_keyed (KEY * key) {
-     return NULL;
+     internal_exception(OUT_OF_BOUNDS, "Subscript on something that's not an aggregate!\n");
    }
 
    BOOLVAL get_bool () {
@@ -80,6 +80,10 @@ pmclass default noinit {
 
    void* get_value () {
      return SELF->cache.struct_val;
+   }
+
+   PMC* get_pmc_keyed (KEY* key) {
+       internal_exception(OUT_OF_BOUNDS, "Subscript on something that's not an aggregate!\n");
    }
 
    BOOLVAL is_same (PMC* pmc2) {
@@ -111,6 +115,7 @@ pmclass default noinit {
    }
 
    void set_integer_keyed (KEY * key, INTVAL value) {
+       internal_exception(OUT_OF_BOUNDS, "Subscript on something that's not an aggregate!\n");
    }
 
    void set_number (PMC * value) {
@@ -131,6 +136,7 @@ pmclass default noinit {
    }
 
    void set_number_keyed (KEY * key, FLOATVAL value) {
+       internal_exception(OUT_OF_BOUNDS, "Subscript on something that's not an aggregate!\n");
    }
 
    void set_string (PMC * value) {
@@ -154,6 +160,7 @@ pmclass default noinit {
    }
 
    void set_string_keyed (KEY * key, STRING * string) {
+       internal_exception(OUT_OF_BOUNDS, "Subscript on something that's not an aggregate!\n");
    }
 
    void set_value (void* value) {
@@ -162,6 +169,15 @@ pmclass default noinit {
 
    void set_pmc (PMC* value) {
      SELF->cache.struct_val = value->vtable->get_value(INTERP, value);
+   }
+
+   void set_pmc_keyed (KEY* dest_key, PMC* src, KEY* src_key) {
+     if (dest_key) {
+       internal_exception(OUT_OF_BOUNDS, "Subscript on something that's not an aggregate!\n");
+     }
+     SELF->vtable->set_pmc(INTERP, SELF,
+         src->vtable->get_pmc_keyed(INTERP, src, src_key)
+     );
    }
 
    void add (PMC * value,  PMC* dest) {
@@ -220,6 +236,7 @@ pmclass default noinit {
 
    void add_keyed (KEY * key, PMC * src_value, KEY * src_value_key,
                               PMC * dest_value, KEY * dest_value_key) {
+       internal_exception(OUT_OF_BOUNDS, "Subscript on something that's not an aggregate!\n");
    }
 
    void subtract (PMC * value,  PMC* dest) {
@@ -278,6 +295,7 @@ pmclass default noinit {
 
    void subtract_keyed (KEY * key, PMC * src_value, KEY * src_value_key,
                                    PMC * dest_value, KEY * dest_value_key) {
+       internal_exception(OUT_OF_BOUNDS, "Subscript on something that's not an aggregate!\n");
    }
 
    void multiply (PMC * value,  PMC* dest) {
@@ -333,6 +351,7 @@ pmclass default noinit {
 
    void multiply_keyed (KEY * key, PMC * src_value, KEY * src_value_key,
                                    PMC * dest_value, KEY * dest_value_key) {
+       internal_exception(OUT_OF_BOUNDS, "Subscript on something that's not an aggregate!\n");
    }
 
    void divide (PMC * value,  PMC* dest) {
@@ -391,6 +410,7 @@ pmclass default noinit {
 
    void divide_keyed (KEY * key, PMC * src_value, KEY * src_value_key,
                                  PMC * dest_value, KEY * dest_value_key) {
+       internal_exception(OUT_OF_BOUNDS, "Subscript on something that's not an aggregate!\n");
    }
 
    void modulus (PMC * value,  PMC* dest) {
@@ -443,6 +463,7 @@ pmclass default noinit {
 
    void modulus_keyed (KEY * key, PMC * src_value, KEY * src_value_key,
                                   PMC * dest_value, KEY * dest_value_key) {
+       internal_exception(OUT_OF_BOUNDS, "Subscript on something that's not an aggregate!\n");
    }
 
    void concatenate (PMC * value,  PMC* dest) {
@@ -490,6 +511,7 @@ pmclass default noinit {
 
    void concatenate_keyed (KEY * key, PMC * src_value, KEY * src_value_key,
                                       PMC * dest_value, KEY * dest_value_key) {
+       internal_exception(OUT_OF_BOUNDS, "Subscript on something that's not an aggregate!\n");
    }
 
    BOOLVAL is_equal (PMC* value) {
