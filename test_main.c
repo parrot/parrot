@@ -128,9 +128,9 @@ static void
 usage(void)
 {
 #ifdef HAVE_COMPUTED_GOTO
-    char* cgoto_info = "Deactivate computed goto";
+    const char* cgoto_info = "Deactivate computed goto";
 #else
-    char* cgoto_info = "(already disabled) Deactivate computed goto";
+    const char* cgoto_info = "(already disabled) Deactivate computed goto";
 #endif
 
     fprintf(stderr,

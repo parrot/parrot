@@ -181,6 +181,9 @@ Parrot_runcode(struct Parrot_Interp *interpreter, int argc, char *argv[])
         if (Interp_flags_TEST(interpreter, PARROT_JIT_FLAG)) {
             fprintf(stderr, "*** Parrot VM: JIT enabled. ***\n");
         }
+        if (Interp_flags_TEST(interpreter, PARROT_TRACE_FLAG)) {
+            fprintf(stderr, "*** Parrot VM: Tracing enabled. ***\n");
+        }
     }
 
 #if !defined(JIT_CAPABLE) || !JIT_CAPABLE

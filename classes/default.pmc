@@ -41,6 +41,8 @@ pmclass default noinit {
     * the garbage collector.
     */
    PMC* mark (PMC *end_of_used_list) {
+       PANIC("custom_mark flag set but no custom mark routine defined");
+       return NULL;
    }
 
    INTVAL get_integer () {
