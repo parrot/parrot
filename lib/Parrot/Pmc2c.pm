@@ -221,6 +221,20 @@ sub new {
 
 =over
 
+=item C<line_directive($self,$line,$file)>
+
+Generates the C pre processor string for a #line directive, or an empty string
+if C<$self->{opt}{nolines}> is true. 
+
+=cut
+
+sub line_directive {
+    my ($self, $line, $file) = @_;
+    return '' if $self->{opt}{nolines};
+    return qq{#line $line "$file"\n} if defined $file;
+    return qq{#line $line\n};
+}
+
 =item C<get_vtable_section()>
 
 Creates a hash of all the method names containing vtable section. Called
@@ -524,11 +538,7 @@ sub body
     my $classname = $self->{class};
     my $pmc = lc($classname) .'.pmc';
     my $meth = $method->{meth};
-    unless ($self->{opt}{nolines}) {
-        $cout .= <<"EOC";
-#line $method->{line} "$pmc"
-EOC
-    }
+    $cout .= $self->line_directive($method->{line}, $pmc);
     my $body = $method->{body};
     $body =~ s/^\t/        /mg;
     $body =~ s/^[ ]{4}//mg;
@@ -1117,12 +1127,8 @@ sub body
     my $body = "VTABLE_$meth(interpreter, PMC_pmc_val(pmc)$arg)";
     my $ret = gen_ret($method, $body);
     my $decl = $self->decl($self->{class}, $method, 0);
-    my $l = "";
-    unless ($self->{opt}{nolines}) {
-        $l = <<"EOC";
-#line $line "ref.c"
-EOC
-    }
+    # I think that these will be out by one - NWC
+    my $l = $self->line_directive($line, "ref.c");
     return <<EOC;
 $l
 $decl {
@@ -1194,7 +1200,6 @@ sub body
     my $body = "VTABLE_$meth(interpreter, PMC_pmc_val(pmc)$arg)";
     my $ret = '';
     my $decl = $self->decl($self->{class}, $method, 0);
-    my $l = "";
     my $ret_def = '';
     my $func_ret = '(void) ';
     if ($method->{type} ne 'void') {
@@ -1203,11 +1208,8 @@ sub body
         $func_ret = $self->gen_ret($method->{type});
         $ret = "return ret_val;";
     }
-    unless ($self->{opt}{nolines}) {
-        $l = <<"EOC";
-#line $line "sharedref.c"
-EOC
-    }
+    # I think that these will be out by one - NWC
+    my $l = $self->line_directive($line, "sharedref.c");
     return <<EOC;
 $l
 $decl {
@@ -1268,12 +1270,8 @@ sub body
         # This cheats, assuming that all return types can be cast from zero.
         $ret = "return ($method->{type})0;";
     }
-    my $l = "";
-    unless ($self->{opt}{nolines}) {
-        $l = <<"EOC";
-#line $line "default.c"
-EOC
-    }
+    # I think that these will be out by one - NWC
+    my $l = $self->line_directive($line, "default.c");
     return <<EOC;
 $l
 ${decl}\{
@@ -1325,13 +1323,9 @@ sub body
         return $self->SUPER::body($self->{methods}[$n]);
     }
     my $decl = $self->decl($self->{class}, $method, 0);
-    my $l = "";
     my $ret = gen_ret($method);
-    unless ($self->{opt}{nolines}) {
-        $l = <<"EOC";
-#line $line "null.c"
-EOC
-    }
+    # I think that these will be out by one - NWC
+    my $l = $self->line_directive($line, "null.c");
     return <<EOC;
 $l
 ${decl} {
@@ -1434,7 +1428,6 @@ sub body
     $arg = ", ". join(' ', @args) if @args;
     my $sig = $self->signature($parameters);
     $sig = $self->trans($method->{type}) . $sig;
-    my $l = "";
     my $ret = '';
     my $ret_def = '';
     my $func_ret = '(void) ';
@@ -1451,11 +1444,8 @@ sub body
     }
     my $umeth = uc $meth;
     my $delegate_meth = "PARROT_VTABLE_${umeth}_METHNAME";
-    unless ($self->{opt}{nolines}) {
-        $l = <<"EOC";
-#line $line "delegate.c"
-EOC
-    }
+    # I think that these will be out by one - NWC
+    my $l = $self->line_directive($line, "delegate.c");
     return <<EOC;
 $l
 ${decl} {
@@ -1512,12 +1502,8 @@ sub body
     my $body = "VTABLE_$meth(interpreter, attr$arg)";
     my $ret = gen_ret($method, $body);
     my $decl = $self->decl($self->{class}, $method, 0);
-    my $l = "";
-    unless ($self->{opt}{nolines}) {
-        $l = <<"EOC";
-#line $line "ref.c"
-EOC
-    }
+    # I think that these will be out by one - NWC
+    my $l = $self->line_directive($line, "ref.c");
     return <<EOC;
 $l
 $decl {
