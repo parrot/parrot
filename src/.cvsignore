@@ -5,5 +5,5 @@ jit_cpu.c
 nci.c
 platform.c
 platform_asm.s
-interpreter.str
+inter_cb.str
 objects.str
