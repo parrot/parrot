@@ -338,6 +338,8 @@ sub make_op
                     $body =~ s/\bexpr\s+POP\(\)/{{^*}}/mg;
 
                     $body =~ s/\bHALT\(\)/{{=0}}/mg;
+      $branch ||= $short_name =~ /runinterp/;
+      $next   ||= $short_name =~ /runinterp/;
 
       if($body =~ s/\brestart\s+OFFSET\((.*?)\)/{{=0,+=$1}}/mg) {
  	$branch = 1;
