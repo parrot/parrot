@@ -16,7 +16,7 @@ Tests the object/class subsystem.
 
 =cut
 
-use Parrot::Test tests => 21;
+use Parrot::Test tests => 22;
 use Test::More;
 
 output_is(<<'CODE', <<'OUTPUT', "findclass (base class)");
@@ -509,4 +509,17 @@ CODE
 101
 102
 103
+OUTPUT
+
+output_is(<<'CODE', <<'OUTPUT', "classoffset (single class)");
+    newclass P1, "Foo"
+    addattribute P1, "i"
+    find_type I0, "Foo"
+    new P2, I0
+    classoffset I1, P2, "Foo"
+    print I1
+    print "\n"
+    end
+CODE
+0
 OUTPUT
