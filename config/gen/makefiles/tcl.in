@@ -49,8 +49,6 @@ lib${slash}interpret.imc \
 lib${slash}list.imc \
 lib${slash}macros${slash}boolean.imc \
 lib${slash}macros${slash}is_space.imc \
-lib${slash}macros${slash}match_close.imc \
-lib${slash}parse.imc \
 lib${slash}string_to_list.imc \
 tcl.imc_template \
 tcl.pl

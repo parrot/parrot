@@ -28,6 +28,9 @@ however, then we're returning the invokable PMC.
   .local pmc precedences  # Global list of operator precedence
   precedences = find_global "_Tcl", "precedence"
 
+  .local pmc parser
+  parser = find_global "_Tcl", "parser"
+
   .local int TclList
   TclList = find_type "TclList"
 
@@ -88,7 +91,8 @@ get_parenthetical:
 
   if char != 40 goto get_variable
   # where do we close?  
-  .match_close(expr,chunk_start,$I1)
+  $I1 = parser."match_close"(expr,chunk_start)
+  #.match_close(expr,chunk_start,$I1)
   #error_S = "missing close parenthesis"
   if $I1 <= 0 goto die_horribly 
   $I1 = $I1 - 2
@@ -833,17 +837,20 @@ dd:
   .param int start
 
   .local int len 
-  .local pmc func
-  .local pmc operand
+  .local pmc func,operand
 
   .local int start_paren_pos
+
+  .local pmc parser
+  parser = find_global "_Tcl", "parser"
 
   # if we are starting with the text of a defined function,
   # and it's followed by a (), 
  
   index start_paren_pos, expr, "(", start
   if start_paren_pos == -1 goto fail
-  .match_close(expr,start_paren_pos,$I1)
+  #.match_close(expr,start_paren_pos,$I1)
+  $I1 = parser."match_close"(expr,start_paren_pos)
   if $I1 <= 0 goto fail
  
   # so, we know that the function name must be before the first (
