@@ -1605,19 +1605,15 @@ Parrot_emit_jump_to_eax(Parrot_jit_info_t *jit_info,
                         sizeof(*jit_info->arena.op_map) / 4, 0);
 }
 
-static void
-jit_emit_stack_frame_enter(Parrot_jit_info_t *jit_info)
-{
-    emitm_pushl_r(jit_info->native_ptr, emit_EBP);
-    jit_emit_mov_rr_i(jit_info->native_ptr, emit_EBP, emit_ESP);
-}
+#define jit_emit_stack_frame_enter(pc) do { \
+    emitm_pushl_r(pc, emit_EBP); \
+    jit_emit_mov_rr_i(pc, emit_EBP, emit_ESP); \
+} while(0)
 
-static void
-jit_emit_stack_frame_leave(Parrot_jit_info_t *jit_info)
-{
-    jit_emit_mov_rr_i(jit_info->native_ptr, emit_ESP, emit_EBP);
-    emitm_popl_r(jit_info->native_ptr, emit_EBP);
-}
+#define jit_emit_stack_frame_leave(pc) do { \
+    jit_emit_mov_rr_i(pc, emit_ESP, emit_EBP); \
+    emitm_popl_r(pc, emit_EBP); \
+} while(0)
 
 void
 Parrot_jit_begin(Parrot_jit_info_t *jit_info,
@@ -1629,7 +1625,7 @@ Parrot_jit_begin(Parrot_jit_info_t *jit_info,
      */
 
     /* Maintain the stack frame pointer for the sake of gdb */
-    jit_emit_stack_frame_enter(jit_info);
+    jit_emit_stack_frame_enter(jit_info->native_ptr);
     /* stack:
      * 12   pc
      *  8   interpreter
@@ -1703,6 +1699,19 @@ Parrot_jit_emit_finit(Parrot_jit_info_t *jit_info)
     jit_emit_finit(jit_info->native_ptr);
 }
 
+#if !defined(INT_REG)
+#define INT_REG(x) interpreter->ctx.int_reg.registers[x]
+#endif
+#if !defined(NUM_REG)
+#define NUM_REG(x) interpreter->ctx.num_reg.registers[x]
+#endif
+#if !defined(STR_REG)
+#define STR_REG(x) interpreter->ctx.string_reg.registers[x]
+#endif
+#if !defined(PMC_REG)
+#define PMC_REG(x) interpreter->ctx.pmc_reg.registers[x]
+#endif
+
 #ifndef NO_JIT_VTABLE_OPS
 
 #undef Parrot_jit_vtable1_op
@@ -1740,7 +1749,7 @@ Parrot_jit_vtable_n_op(Parrot_jit_info_t *jit_info,
     if (typ == 3)
         bp = 1;
     if (bp) {
-        jit_emit_stack_frame_enter(jit_info);
+        jit_emit_stack_frame_enter(jit_info->native_ptr);
         jit_emit_sub_ri_i(jit_info->native_ptr, emit_ESP, sizeof(INTVAL));
     }
 
@@ -1768,15 +1777,15 @@ Parrot_jit_vtable_n_op(Parrot_jit_info_t *jit_info,
                 switch (op_info->types[i]) {
                     case PARROT_ARG_I:
                         jit_emit_mov_rm_i(jit_info->native_ptr, emit_EAX,
-                                &interpreter->ctx.int_reg.registers[p[i]]);
+                                &INT_REG(p[i]));
                         break;
                     case PARROT_ARG_S:
                         jit_emit_mov_rm_i(jit_info->native_ptr, emit_EAX,
-                                &interpreter->ctx.string_reg.registers[p[i]]);
+                                &STR_REG(p[i]));
                         break;
                     case PARROT_ARG_P:
                         jit_emit_mov_rm_i(jit_info->native_ptr, emit_EAX,
-                                &interpreter->ctx.pmc_reg.registers[p[i]]);
+                                &PMC_REG(p[i]));
                         break;
                     default:
                         break;
@@ -1787,8 +1796,7 @@ Parrot_jit_vtable_n_op(Parrot_jit_info_t *jit_info,
                 emitm_pushl_r(jit_info->native_ptr, emit_EAX);
                 break;
             case PARROT_ARG_KI:
-                emitm_pushl_i(jit_info->native_ptr,
-                        &interpreter->ctx.int_reg.registers[p[i]]);
+                emitm_pushl_i(jit_info->native_ptr, &INT_REG(p[i]));
                 break;
             case PARROT_ARG_KIC:
                 /* XXX INTVAL_SIZE, make automatic var, push address */
@@ -1806,8 +1814,7 @@ Parrot_jit_vtable_n_op(Parrot_jit_info_t *jit_info,
                 break;
             case PARROT_ARG_N:
                 /* push num on st(0) */
-                jit_emit_fload_m_n(jit_info->native_ptr,
-                        &interpreter->ctx.num_reg.registers[p[i]]);
+                jit_emit_fload_m_n(jit_info->native_ptr, &NUM_REG(p[i]));
                 goto store;
             case PARROT_ARG_NC:
                 jit_emit_fload_m_n(jit_info->native_ptr,
@@ -1851,7 +1858,7 @@ store:
     /* call *(offset)eax */
     emitm_callm(jit_info->native_ptr, emit_EAX, emit_None, emit_None, offset);
     if (bp)
-        jit_emit_stack_frame_leave(jit_info);
+        jit_emit_stack_frame_leave(jit_info->native_ptr);
     else
         emitm_addb_i_r(jit_info->native_ptr,
                 st+sizeof(void*)*(n+1-ret), emit_ESP);
@@ -1878,21 +1885,17 @@ Parrot_jit_store_retval(Parrot_jit_info_t *jit_info,
     switch (op_info->types[1]) {
         case PARROT_ARG_I:
             /* XXX INTVAL_SIZE */
-            jit_emit_mov_mr_i(jit_info->native_ptr,
-                    &interpreter->ctx.int_reg.registers[p1], emit_EAX);
+            jit_emit_mov_mr_i(jit_info->native_ptr, &INT_REG(p1), emit_EAX);
             break;
         case PARROT_ARG_S:
-            jit_emit_mov_mr_i(jit_info->native_ptr,
-                    &interpreter->ctx.string_reg.registers[p1], emit_EAX);
+            jit_emit_mov_mr_i(jit_info->native_ptr, &STR_REG(p1), emit_EAX);
             break;
         case PARROT_ARG_P:
-            jit_emit_mov_mr_i(jit_info->native_ptr,
-                    &interpreter->ctx.pmc_reg.registers[p1], emit_EAX);
+            jit_emit_mov_mr_i(jit_info->native_ptr, &PMC_REG(p1), emit_EAX);
             break;
         case PARROT_ARG_N:
             /* pop num from st(0) and mov to reg */
-            jit_emit_fstore_m_n(jit_info->native_ptr,
-                    &interpreter->ctx.num_reg.registers[p1]);
+            jit_emit_fstore_m_n(jit_info->native_ptr, &NUM_REG(p1));
             break;
         default:
             internal_exception(1, "jit_vtable1r: ill LHS");
@@ -2086,78 +2089,92 @@ Parrot_jit_restart_op(Parrot_jit_info_t *jit_info,
     Parrot_emit_jump_to_eax(jit_info, interpreter);
 }
 
+void * Parrot_jit_build_call_func(struct Parrot_Interp *, String *);
+
 void *
 Parrot_jit_build_call_func(struct Parrot_Interp *interpreter,
         String *signature) {
 
-    Parrot_jit_info_t jit_info, *pj;
-    char *sig;
+    Parrot_jit_info_t jit_info;
+    char *sig, *pc;
     int next_n = 5;
     int next_i = 5;
     int st = 0;
 
+    /* this ought to be enough - the caller of this function
+     * should free the function pointer returned here
+     */
     jit_info.native_ptr = jit_info.arena.start =
         mem_sys_allocate_zeroed((size_t)1024);
-    pj = &jit_info;
+    pc = jit_info.native_ptr;
 
     /* make stack frame */
-    jit_emit_stack_frame_enter(pj);
-    /* get left most param, assume ascii chars */
-    sig = (char *)signature->bufstart + signature->bufused - 1;
+    jit_emit_stack_frame_enter(pc);
+    /* get rightmost param, assume ascii chars */
+    sig = (char *)signature->strstart + signature->bufused - 1;
     /* as long as there are params */
     while (sig > (char *)signature->strstart) {
         switch (*sig) {
             case 'd':
                 /* get a double from next num reg and push it on stack */
-                jit_emit_fload_m_n(pj->native_ptr,
-                        &interpreter->ctx.num_reg.registers[next_n++]);
+                jit_emit_fload_m_n(pc, &NUM_REG(next_n++));
                 /* make room for double */
-                emitm_addb_i_r(pj->native_ptr, -8, emit_ESP);
-                emitm_fstpl(pj->native_ptr, emit_ESP, emit_None, 1, 0);
-                st += 4;
+                emitm_addb_i_r(pc, -8, emit_ESP);
+                emitm_fstpl(pc, emit_ESP, emit_None, 1, 0);
+                st += 4;        /* extra stack for double */
                 break;
             case 'i':
-                jit_emit_mov_rm_i(pj->native_ptr, emit_EAX,
-                        &interpreter->ctx.int_reg.registers[next_i++]);
-                emitm_pushl_r(pj->native_ptr, emit_EAX);
+                jit_emit_mov_rm_i(pc, emit_EAX, &NUM_REG(next_i++));
+                emitm_pushl_r(pc, emit_EAX);
+                break;
+            case 'v':
+                st -= 4;        /* undo default stack usage */
                 break;
             default:
-                internal_exception(1, "Parrot_jit_build_call_func: unimp\n");
+                internal_exception(1,
+                        "Parrot_jit_build_call_func: unimp argument\n");
                 break;
         }
-        /* stack */
+        /* default stack usage */
         st += 4;
         --sig;
     }
-    /* get the pmc from stack */
-    emitm_movl_m_r(pj->native_ptr, emit_EAX, emit_EBP, 0, 1, 12);
-    /* call the thing in struct_val, i.e. offset 12 */
-    emitm_callm(pj->native_ptr, emit_EAX, emit_None, emit_None, 12);
+    /* get the pmc from stack - movl 12(%ebp), %eax */
+    emitm_movl_m_r(pc, emit_EAX, emit_EBP, 0, 1, 12);
+    /* call the thing in struct_val, i.e. offset 12 - call *(12)%eax */
+    emitm_callm(pc, emit_EAX, emit_None, emit_None, 12);
     /* adjust stack */
-    emitm_addb_i_r(pj->native_ptr, st, emit_ESP);
+    if (st)
+        emitm_addb_i_r(pc, st, emit_ESP);
 
-    /* now place return values in registers */
+    /* now place return value in registers */
     next_i = next_n = 5;
+    /* first in signature is the return value */
     switch (*sig) {
         case 'd':
             /* pop num from st(0) and mov to reg */
-            jit_emit_fstore_m_n(pj->native_ptr,
-                    &interpreter->ctx.num_reg.registers[next_n++]);
+            jit_emit_fstore_m_n(pc, &NUM_REG(next_n++));
             break;
         case 'i':
-            jit_emit_mov_mr_i(pj->native_ptr,
-                    &interpreter->ctx.int_reg.registers[next_i++], emit_EAX);
+            jit_emit_mov_mr_i(pc, &INT_REG(next_i++), emit_EAX);
+            /* fall through */
+        case 'v': /* void - do nothing */
+            break;
+        default:
+            internal_exception(1,
+                    "Parrot_jit_build_call_func: unimp return value\n");
             break;
     }
-    /* set regs passed on stack */
-    jit_emit_mov_mi_i(pj->native_ptr, &interpreter->ctx.int_reg.registers[0], 0);
-    jit_emit_mov_mi_i(pj->native_ptr, &interpreter->ctx.int_reg.registers[1], next_i-5);
-    jit_emit_mov_mi_i(pj->native_ptr, &interpreter->ctx.int_reg.registers[2], 0);
-    jit_emit_mov_mi_i(pj->native_ptr, &interpreter->ctx.int_reg.registers[3], 0);
-    jit_emit_mov_mi_i(pj->native_ptr, &interpreter->ctx.int_reg.registers[4], next_n-5);
+    /* set return values passed on stack */
+    jit_emit_mov_mi_i(pc, &INT_REG(0), 0);
+    /* set return values in I,S,P,N regs */
+    jit_emit_mov_mi_i(pc, &INT_REG(1), next_i-5);
+    jit_emit_mov_mi_i(pc, &INT_REG(2), 0);
+    jit_emit_mov_mi_i(pc, &INT_REG(3), 0);
+    jit_emit_mov_mi_i(pc, &INT_REG(4), next_n-5);
 
-    jit_emit_stack_frame_leave(pj);
-    emitm_ret(pj->native_ptr);
+    jit_emit_stack_frame_leave(pc);
+    emitm_ret(pc);
 
     return (jit_f)D2FPTR(jit_info.arena.start);
 }
