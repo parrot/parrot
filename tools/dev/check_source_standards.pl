@@ -20,6 +20,8 @@ if ($files[0] eq "all_source") {
                               $File::Find::prune = 1;	
 			      return;
                           }
+	
+                          return if /malloc/;	
 
                           /^.*\.[ch]\z/s &&
                             push @files, $File::Find::name;
