@@ -156,7 +156,7 @@ Parrot_exec_save(Parrot_exec_objfile_t *obj, const char *file)
     for (i = 0; i < 5; i++)
         save_int(fp, 0);
     save_int(fp, 0x2);
-//    save_int(fp, obj->symbol_count * 0xc);
+    /*    save_int(fp, obj->symbol_count * 0xc); */
     save_int(fp, 0x18);
     /* Offset of stabs */
     save_int(fp, 0x144 +

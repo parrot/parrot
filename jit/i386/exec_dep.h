@@ -440,8 +440,8 @@ Parrot_exec_save(Parrot_exec_objfile_t *obj, const char *file)
                         obj->text_rellocation_table[i].symbol_number + 7, 1);
                 break;
                 /* 3 == data section */
-            //    rellocation.r_info = ELF32_R_INFO(3, 1);
-             //   break;
+                /*   rellocation.r_info = ELF32_R_INFO(3, 1); */
+                /*   break; */
             default:
                 break;
         }
