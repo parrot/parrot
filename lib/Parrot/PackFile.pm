@@ -296,6 +296,8 @@ sub unpack_file
 
   return unless $fh;
 
+  binmode $fh;
+
   return $self->unpack_filehandle($fh);
 }
 
