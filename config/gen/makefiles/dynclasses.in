@@ -29,7 +29,8 @@ all: foo$(SO) subproxy$(SO)
 clean :
 	$(RM_F) *.c *.h *$(SO) *.dump
 
-realclean: clean Makefile
+realclean: clean
+	$(RM_F) Makefile
 
 distclean: realclean
 

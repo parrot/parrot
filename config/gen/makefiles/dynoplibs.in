@@ -32,7 +32,8 @@ all: myops_ops$(SO) myops_ops_cgp$(SO)
 clean :
 	$(RM_F) *.c *.h *$(SO)
 
-realclean: clean Makefile
+realclean: clean
+	$(RM_F) Makefile
 
 distclean: realclean
 
