@@ -4,8 +4,6 @@ use P6C::TestCompiler tests => 3;
 use Test::More qw(skip);
 
 ##############################
-SKIP: {
-skip 'no grep yet', 1;
 output_is(<<'CODE', <<'OUT', "grep");
 sub main() {
 	@array = ("perl6", "is", "fun");
@@ -21,7 +19,6 @@ CODE
 is
 perl6isfun
 OUT
-}
 
 ##############################
 output_is(<<'CODE', <<'OUT', "reverse");

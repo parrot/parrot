@@ -1,7 +1,39 @@
 #!perl
 use strict;
-use P6C::TestCompiler tests => 17;
+use P6C::TestCompiler tests => 21;
 use Test::More;
+
+##############################
+output_is(<<'CODE', <<'OUT', "call - no args, proto def, proto call");
+sub f () { print "hello\n" }
+f();
+CODE
+hello
+OUT
+
+##############################
+output_is(<<'CODE', <<'OUT', "call - no args, unproto def, proto call");
+sub f { print "hello\n" }
+f();
+CODE
+hello
+OUT
+
+##############################
+output_is(<<'CODE', <<'OUT', "call - no args, proto def, unproto call");
+f(); # Should be *f()
+sub f () { print "hello\n" }
+CODE
+hello
+OUT
+
+##############################
+output_is(<<'CODE', <<'OUT', "call - no args, unproto def, unproto call");
+f();
+sub f { print "hello\n" }
+CODE
+hello
+OUT
 
 ##############################
 output_is(<<'CODE', <<'OUT', "subroutine call");
