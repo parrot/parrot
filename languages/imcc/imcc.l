@@ -75,6 +75,7 @@ static int prev_state;
 
 %option outfile="imclexer.c"
 %option never-interactive
+%option stack
 
 LETTER          [a-zA-Z_]
 DIGIT           [0-9]
@@ -109,6 +110,7 @@ SP              [ ]
             BEGIN(emit);
         }
         if (pasm_file && YYSTATE == INITIAL && !in_pod) {
+            yy_top_state(); /* silent warning */
             if (pasm_file == 1) {
                 BEGIN(emit);
                 return EMIT;
@@ -170,8 +172,8 @@ SP              [ ]
 	return REG;
 	}
 
-^"="            { in_pod = 1; BEGIN(pod); }
-<pod>^"=cut"{EOL}    { in_pod = 0; BEGIN(INITIAL); }
+<INITIAL,emit,macro>^"="            { in_pod = 1; yy_push_state(pod); }
+<pod>^"=cut"{EOL}    { in_pod = 0; yy_pop_state(); ++line; }
 <pod>.*         { /*ignore*/ }
 <pod>{EOL}      { ++line; }
 
