@@ -57,10 +57,6 @@ config/auto/jit.pl
 config/auto/pack.pl
 config/auto/sizes.pl
 config/auto/sizes/test_c.in
-config/auto/stackdir.pl
-config/auto/stackdir/test0_c.in
-config/auto/stackdir/test1_c.in
-config/auto/stackdir/test2_c.in
 config/gen/config_h.pl
 config/gen/config_h/config_h.in
 config/gen/config_pm.pl
