@@ -385,6 +385,7 @@ exec_init_prederef(struct Parrot_Interp *interpreter, void *prederef_arena)
 static opcode_t *
 runops_exec(struct Parrot_Interp *interpreter, opcode_t *pc)
 {
+#if EXEC_CAPABLE
     opcode_t *code_start;
     UINTVAL code_size;          /* in opcodes */
     opcode_t *code_end;
@@ -402,6 +403,7 @@ runops_exec(struct Parrot_Interp *interpreter, opcode_t *pc)
 
     Parrot_exec(interpreter, pc, code_start, code_end);
     return NULL;
+#endif
 }
 
 

@@ -11,7 +11,7 @@ typedef void (*jit_f)(struct Parrot_Interp *interpreter, opcode_t *pc);
 
 jit_f build_asm(struct Parrot_Interp *interpreter, opcode_t *pc,
                 opcode_t *code_start, opcode_t *code_end,
-                Parrot_exec_objfile_t *obj);
+                void *objfile);
 
 void Parrot_destroy_jit(void *);
 

@@ -828,10 +828,12 @@ Parrot_jit_load_registers(Parrot_jit_info_t *jit_info,
     maps[0] = jit_info->intval_map;
     maps[3] = jit_info->floatval_map;
 
+#if EXEC_CAPABLE
     if (jit_info->objfile) {
         mov_f[0] = Parrot_exec_emit_mov_rm;
         mov_f[3] = Parrot_exec_emit_mov_rm_n;
     }
+#endif
 
     for (typ = 0; typ < 4; typ++) {
         if (maps[typ]) {
@@ -868,10 +870,12 @@ Parrot_jit_save_registers(Parrot_jit_info_t *jit_info,
     maps[0] = jit_info->intval_map;
     maps[3] = jit_info->floatval_map;
 
+#if EXEC_CAPABLE
     if (jit_info->objfile) {
         mov_f[0] = Parrot_exec_emit_mov_mr;
         mov_f[3] = Parrot_exec_emit_mov_mr_n;
     }
+#endif
 
     for (typ = 0; typ < 4; typ++) {
         if (maps[typ])
@@ -928,7 +932,7 @@ Parrot_destroy_jit(void *ptr)
 jit_f
 build_asm(struct Parrot_Interp *interpreter, opcode_t *pc,
           opcode_t *code_start, opcode_t *code_end,
-          Parrot_exec_objfile_t *obj)
+          void *objfile)
 {
     UINTVAL i;
     char *new_arena;
@@ -939,6 +943,9 @@ build_asm(struct Parrot_Interp *interpreter, opcode_t *pc,
     char *name;
     char *map;
     Parrot_jit_fn_info_t *op_func;
+#if EXEC_CAPABLE
+    Parrot_exec_objfile_t *obj = (Parrot_exec_objfile_t *)objfile;
+#endif
 
 
     /* XXX assume, we restart */
@@ -950,11 +957,13 @@ build_asm(struct Parrot_Interp *interpreter, opcode_t *pc,
         jit_info = interpreter->jit_info =
             mem_sys_allocate(sizeof(Parrot_jit_info_t));
 
-    if (obj) {
+#if EXEC_CAPABLE
+    if (objfile) {
         op_func = op_exec;
         jit_info->objfile = obj;
     }
     else
+#endif
         op_func = op_jit;
 
 
@@ -991,8 +1000,10 @@ build_asm(struct Parrot_Interp *interpreter, opcode_t *pc,
         jit_info->arena.size = jit_info->arena.map_size * 10;
     jit_info->native_ptr = jit_info->arena.start =
         mem_sys_allocate_zeroed((size_t)jit_info->arena.size);
+#  if EXEC_CAPABLE
     if (obj)
         jit_info->objfile->text.code = jit_info->arena.start;
+#  endif
 #endif
 
     jit_info->op_i = 0;
@@ -1047,8 +1058,10 @@ build_asm(struct Parrot_Interp *interpreter, opcode_t *pc,
                 jit_info->native_ptr = new_arena +
                     (jit_info->native_ptr - jit_info->arena.start);
                 jit_info->arena.start = new_arena;
+#  if EXEC_CAPABLE
                 if (obj)
                     obj->text.code = new_arena;
+#  endif
 #endif
             }
 
@@ -1117,7 +1130,7 @@ build_asm(struct Parrot_Interp *interpreter, opcode_t *pc,
     Parrot_jit_dofixup(jit_info, interpreter);
 
     /* Convert offsets to pointers */
-    if (!obj)
+    if (!objfile)
         for (i = 0; i < jit_info->arena.map_size; i++) {
 
             /* Assuming native code chunks contain some initialization code,

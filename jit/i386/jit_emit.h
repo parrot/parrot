@@ -1718,6 +1718,7 @@ Parrot_emit_jump_to_eax(Parrot_jit_info_t *jit_info,
         /* This jumps to the address in op_map[EDX + sizeof(void *) * INDEX] */
         jit_emit_mov_ri_i(jit_info->native_ptr,emit_EDX,jit_info->arena.op_map);
     }
+#  if EXEC_CAPABLE
     else {
         emitm_subl_i_r(jit_info->native_ptr, 0x0 ,emit_EAX);
         Parrot_exec_add_text_rellocation(jit_info->objfile,
@@ -1726,6 +1727,7 @@ Parrot_emit_jump_to_eax(Parrot_jit_info_t *jit_info,
             Parrot_exec_add_text_rellocation_reg(jit_info->objfile,
                 jit_info->native_ptr, "opcode_map", 0, 0));
     }
+#  endif
 
     emitm_jumpm(jit_info->native_ptr, emit_EDX, emit_EAX,
                         sizeof(*jit_info->arena.op_map) / 4, 0);
@@ -2392,22 +2394,26 @@ Parrot_jit_begin(Parrot_jit_info_t *jit_info,
     if (!jit_info->objfile) {
         emitm_pushl_i(jit_info->native_ptr, interpreter);
     }
+#  if EXEC_CAPABLE
     else {
         emitm_pushl_i(jit_info->native_ptr, 0x0);
         Parrot_exec_add_text_rellocation(jit_info->objfile,
             jit_info->native_ptr, RTYPE_COM, "interpre", -4);
     }
+#  endif
     emitm_pushl_i(jit_info->native_ptr, 1);
     /* use EAX as flag, when jumping back on init, EAX==1 */
     jit_emit_mov_ri_i(jit_info->native_ptr, emit_EAX, 1);
     /* TODO restart code */
     if (!jit_info->objfile)
         call_func(jit_info, (void (*)(void))cgp_core);
+#  if EXEC_CAPABLE
     else {
         Parrot_exec_add_text_rellocation_func(jit_info->objfile,
             jit_info->native_ptr, "cgp_core");
         emitm_calll(jit_info->native_ptr, EXEC_CALLDISP);
     }
+#  endif
     /* when cur_opcode == 1, cgp_core jumps back here
      * when EAX == 0, the official return from HALT was called */
     jit_emit_test_r_i(jit_info->native_ptr, emit_EAX);
