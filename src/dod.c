@@ -231,7 +231,7 @@ free_unused_PMCs(struct Parrot_Interp *interpreter)
             /* If it's not live or on the free list, put it on the free list */
             if (!(pmc_array[i].flags & (PMC_live_FLAG | PMC_on_free_list_FLAG |
                                        PMC_constant_FLAG))) {
-                add_to_free_pool(interpreter,
+                add_free_pmc(interpreter,
                                 interpreter->arena_base->pmc_pool,
                                 &pmc_array[i]);
             }
@@ -267,7 +267,7 @@ free_unused_buffers(struct Parrot_Interp *interpreter,
                 if (pool->mem_pool) {
                     ((struct Memory_Pool *)pool->mem_pool)->reclaimable += b->buflen;
                 }
-                add_to_free_pool(interpreter, pool, b);
+                add_free_buffer(interpreter, pool, b);
             }
             else {
                 b->flags &= ~BUFFER_live_FLAG;

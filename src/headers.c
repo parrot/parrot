@@ -197,7 +197,7 @@ new_pmc_header(struct Parrot_Interp *interpreter)
         return return_me;
     }
 
-    return get_from_free_pool(interpreter, interpreter->arena_base->pmc_pool);
+    return get_free_pmc(interpreter, interpreter->arena_base->pmc_pool);
 }
 
 STRING *
@@ -211,10 +211,10 @@ new_string_header(struct Parrot_Interp *interpreter, UINTVAL flags)
         return_me->flags = flags;
         return return_me;
     }
-    string = get_from_free_pool(interpreter, (flags & BUFFER_constant_FLAG)
-                                ? interpreter->arena_base->constant_string_header_pool
-                                : interpreter->arena_base->string_header_pool
-                                );
+    string = get_free_buffer(interpreter, (flags & BUFFER_constant_FLAG)
+                             ? interpreter->arena_base->constant_string_header_pool
+                             : interpreter->arena_base->string_header_pool
+                             );
     string->flags |= flags;
     return string;
 }
@@ -229,7 +229,7 @@ new_buffer_header(struct Parrot_Interp *interpreter)
         return return_me;
     }
 
-    return get_from_free_pool(interpreter, 
+    return get_free_buffer(interpreter, 
                               interpreter->arena_base->buffer_header_pool);
 }
 
@@ -248,7 +248,7 @@ new_bufferlike_header(struct Parrot_Interp *interpreter, size_t size)
 
     pool = get_bufferlike_pool(interpreter, size);
     
-    buffer = get_from_free_pool(interpreter, pool);
+    buffer = get_free_buffer(interpreter, pool);
     buffer->bufstart = NULL;
     buffer->buflen = 0;
     return buffer;
