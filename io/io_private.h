@@ -67,7 +67,8 @@ Some ideas from AT&T SFIO.
  * buffering, translation, compression or encryption layers.
  */
 #define PIO_L_TERMINAL          0x0001
-#define PIO_L_FASTGETS          0x0002
+#define PIO_L_FASTGETS          0x0002  /* ??? */
+#define PIO_L_LAYER_COPIED      0x0004  /* PMC has private layer */
 
 
 #define PIO_ACCMODE     0000003
@@ -136,9 +137,9 @@ ParrotIO *PIO_fdopen_down(theINTERP, ParrotIOLayer * layer, PIOHANDLE fd,
                           INTVAL flags);
 INTVAL    PIO_close_down(theINTERP, ParrotIOLayer * layer, ParrotIO * io);
 size_t    PIO_write_down(theINTERP, ParrotIOLayer * layer, ParrotIO * io,
-                         const void * buf, size_t len);
+                         STRING *);
 size_t    PIO_write_async_down(theINTERP, ParrotIOLayer * layer, ParrotIO * io,
-                               void * buf, size_t len, DummyCodeRef *);
+                               STRING *, DummyCodeRef *);
 size_t    PIO_read_down(theINTERP, ParrotIOLayer * layer, ParrotIO * io,
                         void * buf, size_t len);
 size_t    PIO_read_async_down(theINTERP, ParrotIOLayer * layer, ParrotIO * io,
@@ -185,11 +186,9 @@ struct _ParrotIOLayerAPI {
     INTVAL          (*Close)(theINTERP, ParrotIOLayer * l,
                                 ParrotIO * io);
     size_t          (*Write)(theINTERP, ParrotIOLayer * l,
-                             ParrotIO * io, const void * buf,
-                             size_t len);
+                             ParrotIO * io, STRING *);
     size_t          (*Write_ASync)(theINTERP, ParrotIOLayer * layer,
-                                   ParrotIO * io, void * buf, size_t len,
-                                   DummyCodeRef *);
+                                   ParrotIO * io, STRING *, DummyCodeRef *);
     size_t          (*Read)(theINTERP, ParrotIOLayer * layer,
                             ParrotIO * io, void * buf, size_t len);
     size_t          (*Read_ASync)(theINTERP, ParrotIOLayer * layer,
@@ -224,6 +223,7 @@ struct _ParrotIOLayerAPI {
 
 /* these are defined rather than using NULL because strictly-speaking, ANSI C
  * doesn't like conversions between function and non-function pointers. */
+#define PIO_null_init (INTVAL (*)(theINTERP, ParrotIOLayer *))0
 #define PIO_null_push_layer (INTVAL (*)(ParrotIOLayer *, ParrotIO *))0
 #define PIO_null_pop_layer (INTVAL (*)(ParrotIOLayer *, ParrotIO *))0
 #define PIO_null_open (ParrotIO * (*)(theINTERP, ParrotIOLayer *, const char*, INTVAL))0
@@ -232,11 +232,13 @@ struct _ParrotIOLayerAPI {
 #define PIO_null_open_async (ParrotIO * (*)(theINTERP, ParrotIOLayer *, const char *, const char *, DummyCodeRef *))0
 #define PIO_null_fdopen (ParrotIO * (*)(theINTERP, ParrotIOLayer *, PIOHANDLE, INTVAL))0
 #define PIO_null_close (INTVAL (*)(theINTERP, ParrotIOLayer *, ParrotIO *))0
-#define PIO_null_write (INTVAL (*)(theINTERP, ParrotIOLayer *, ParrotIO *, const void *, size_t))0
-#define PIO_null_write_async (size_t (*)(theINTERP, ParrotIOLayer *, ParrotIO *, void *, size_t, DummyCodeRef *))0
-#define PIO_null_read (INTVAL (*)(theINTERP, ParrotIOLayer *, ParrotIO *, const void *, size_t))0
+#define PIO_null_write (INTVAL (*)(theINTERP, ParrotIOLayer *, ParrotIO *, STRING*))0
+#define PIO_null_write_async (size_t (*)(theINTERP, ParrotIOLayer *, ParrotIO *, STRING *,DummyCodeRef *))0
+#define PIO_null_read (size_t (*)(theINTERP, ParrotIOLayer *, ParrotIO *, void *, size_t))0
 #define PIO_null_read_async (size_t (*)(theINTERP, ParrotIOLayer *, ParrotIO *, void *, size_t, DummyCodeRef *))0
 #define PIO_null_flush (INTVAL (*)(theINTERP, ParrotIOLayer *, ParrotIO *))0
+#define PIO_null_peek (size_t (*)(theINTERP, ParrotIOLayer *, ParrotIO *, void *))0
+#define PIO_null_read_async (size_t (*)(theINTERP, ParrotIOLayer *, ParrotIO *, void *, size_t, DummyCodeRef *))0
 #define PIO_null_seek (PIOOFF_T (*)(theINTERP, ParrotIOLayer *, ParrotIO *, PIOOFF_T, INTVAL))0
 #define PIO_null_tell (PIOOFF_T (*)(theINTERP, ParrotIOLayer *, ParrotIO *))0
 #define PIO_null_setbuf (INTVAL (*)(theINTERP, ParrotIOLayer *, ParrotIO *, size_t))0
@@ -246,7 +248,12 @@ struct _ParrotIOLayerAPI {
 #define PIO_null_eof (INTVAL (*)(theINTERP, ParrotIOLayer *, ParrotIO *))0
 #define PIO_null_socket (ParrotIO * (*)(theINTERP, ParrotIOLayer *, int, int, int))0
 
+/*
+ * more API XXX should be in io.h when things settle
+ */
 
+ParrotIOLayer * PIO_utf8_register_layer(void);
+void PIO_push_layer_str(Interp *interpreter, PMC *pmc, STRING *ls);
 
 #endif /* PARROT_IO_PRIVATE_H_GUARD */
 
@@ -255,9 +262,11 @@ struct _ParrotIOLayerAPI {
 =head1 SEE ALSO
 
 F<io/io_buf.c>,
+F<io/io_layers.c>,
 F<io/io_passdown.c>,
 F<io/io_stdio.c>,
 F<io/io_unix.c>,
+F<io/io_utf8.c>,
 F<io/io_win32.c>,
 F<io/io.c>.
 

@@ -332,7 +332,7 @@ PIO_init_stacks(theINTERP)
 
     fill = 0;
     if (!pio_registered_layers) {
-        n = 2;  /* 2 default layers for now */
+        n = 3;  /* 2 default layers for now + utf8 */
         pio_registered_layers = mem_sys_allocate(
                 sizeof(ParrotIOLayer *) * (n + 1));
         fill = 1;
@@ -352,6 +352,11 @@ PIO_init_stacks(theINTERP)
                 internal_exception(PIO_ERROR, buf);
             }
         }
+    }
+    if (fill) {
+        assert(pio_registered_layers[2] == NULL);
+        pio_registered_layers[2] = PIO_utf8_register_layer();
+        pio_registered_layers[3] = NULL;
     }
 
     return 0;
@@ -726,9 +731,7 @@ PIO_reads(theINTERP, PMC *pmc, size_t len)
 	STRING *temp = NULL;
 
 	length_read = PIO_read(interpreter, pmc, buffer, len);
-	temp = string_make(interpreter, buffer, length_read, "UTF-8", 0);
-	/* this is temporary, to make freeze/thaw work */
-	Parrot_string_downscale(interpreter, temp, enum_stringrep_one); /* squish it */
+	temp = string_make(interpreter, buffer, length_read, "iso-8859-1", 0);
 
 	free(buffer);
 
@@ -762,11 +765,16 @@ PIO_write(theINTERP, PMC *pmc, const void *buffer, size_t len)
 {
     ParrotIOLayer *l = PMC_struct_val(pmc);
     ParrotIO *io = PMC_data(pmc);
+    STRING fake;
     if(!io)
         return -1;
 
-    if (io->flags & PIO_F_WRITE)
-        return PIO_write_down(interpreter, l, io, buffer, len);
+    if (io->flags & PIO_F_WRITE) {
+        /* TODO skip utf8 translation layers if any */
+        fake.strstart = buffer;
+        fake.bufused = len;
+        return PIO_write_down(interpreter, l, io, &fake);
+    }
     else
         return 0;
 }
@@ -878,6 +886,11 @@ Writes C<*s> tp C<*pmc>. Parrot string version.
 INTVAL
 PIO_putps(theINTERP, PMC *pmc, STRING *s)
 {
+#if 1
+    ParrotIOLayer *l = PMC_struct_val(pmc);
+    ParrotIO *io = PMC_data(pmc);
+    return PIO_write_down(interpreter, l, io, s);
+#else
     UINTVAL length = string_length(interpreter, s);
     char *buffer = malloc(4*length);
     char *cursor = buffer;
@@ -895,6 +908,7 @@ PIO_putps(theINTERP, PMC *pmc, STRING *s)
     free(buffer);
 
     return temp;
+#endif
 }
 
 /*

@@ -228,6 +228,7 @@ IO_O_FILES = \
     io/io_buf$(O) \
     io/io_layers$(O) \
     io/io_unix$(O) \
+    io/io_utf8$(O) \
     io/io_win32$(O) \
     io/io_stdio$(O) \
     io/io_passdown$(O)
@@ -764,6 +765,8 @@ io/io_buf$(O) : $(GENERAL_H_FILES) io/io_private.h
 io/io_layers$(O) : $(GENERAL_H_FILES) io/io_private.h
 
 io/io_unix$(O) : $(GENERAL_H_FILES) io/io_private.h
+
+io/io_utf8$(O) : $(GENERAL_H_FILES) io/io_private.h
 
 io/io_win32$(O) : $(GENERAL_H_FILES) io/io_private.h
 

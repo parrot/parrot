@@ -60,7 +60,7 @@ static INTVAL PIO_win32_flush(theINTERP, ParrotIOLayer *layer, ParrotIO *io);
 static size_t    PIO_win32_read(theINTERP, ParrotIOLayer *layer,
                                 ParrotIO *io, void *buffer, size_t len);
 static size_t    PIO_win32_write(theINTERP, ParrotIOLayer *layer,
-                                 ParrotIO *io, const void *buffer, size_t len);
+                                 ParrotIO *io, STRING *);
 static PIOOFF_T  PIO_win32_seek(theINTERP, ParrotIOLayer *l, ParrotIO *io,
                                 PIOOFF_T off, INTVAL whence);
 static PIOOFF_T  PIO_win32_tell(theINTERP, ParrotIOLayer *l, ParrotIO *io);
@@ -380,7 +380,7 @@ PIO_win32_read(theINTERP, ParrotIOLayer *layer, ParrotIO *io,
 
 =item C<static size_t
 PIO_win32_write(theINTERP, ParrotIOLayer *layer, ParrotIO *io,
-                const void *buffer, size_t len)>
+                STRING *)>
 
 Calls C<WriteFile()> to write C<len> bytes from the memory starting at
 C<buffer> to C<*io>'s file descriptor.
@@ -390,10 +390,11 @@ C<buffer> to C<*io>'s file descriptor.
 */
 
 static size_t
-PIO_win32_write(theINTERP, ParrotIOLayer *layer, ParrotIO *io,
-                const void *buffer, size_t len)
+PIO_win32_write(theINTERP, ParrotIOLayer *layer, ParrotIO *io, STRING *s)
 {
     DWORD countwrote = 0;
+    void *buffer = s->strstart;
+    size_t len = s->bufused;
 
     UNUSED(interpreter);
     UNUSED(layer);

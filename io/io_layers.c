@@ -41,6 +41,9 @@ PIO_base_new_layer(ParrotIOLayer *proto)
 {
     ParrotIOLayer *new_layer;
 
+    /*
+     * XXX use managed memory here ?
+     */
     new_layer = mem_sys_allocate(sizeof(ParrotIOLayer));
     if (proto) {
         /* FIXME: Flag here to indicate whether to free strings */
@@ -53,6 +56,7 @@ PIO_base_new_layer(ParrotIOLayer *proto)
         new_layer->flags = 0;
         new_layer->api = NULL;
     }
+    new_layer->flags |= PIO_L_LAYER_COPIED;
     new_layer->self = 0;
     new_layer->up = NULL;
     new_layer->down = NULL;
@@ -113,11 +117,18 @@ PIO_push_layer(theINTERP, ParrotIOLayer *layer, PMC *pmc)
             if (t == layer)
                 return -1;
         }
+        /*
+         * if this is a global layer create a copy first
+         */
+        if (!(io->stack->flags & PIO_L_LAYER_COPIED)) {
+            io->stack = PIO_copy_stack(io->stack);
+        }
 
         layer->down = io->stack;
         if (io->stack)
             io->stack->up = layer;
         io->stack = layer;
+        PMC_struct_val(pmc) = layer;
         if (layer->api->Pushed)
             (*layer->api->Pushed) (layer, io);
     }
@@ -140,6 +151,23 @@ PIO_push_layer(theINTERP, ParrotIOLayer *layer, PMC *pmc)
         return 0;
     }
     return -1;
+}
+
+void
+PIO_push_layer_str(Interp *interpreter, PMC *pmc, STRING *ls)
+{
+    ParrotIOLayer **t, *l;
+    char *cls = string_to_cstring(interpreter, ls);
+    for (t = pio_registered_layers; *t; ++t)
+        if (!strcmp(cls, (*t)->name))
+            break;
+    string_cstring_free(cls);
+    if (!*t)
+        internal_exception(1, "Layer not found");
+
+    /* make private copy */
+    l = PIO_base_new_layer(*t);
+    PIO_push_layer(interpreter, l, pmc);
 }
 
 /*
@@ -206,7 +234,7 @@ we will do some funky copy-on-write stuff.
 ParrotIOLayer *
 PIO_copy_stack(ParrotIOLayer *stack)
 {
-    ParrotIOLayer *ptr_new;
+    ParrotIOLayer *ptr_new = NULL;
     ParrotIOLayer **ptr_ptr_new;
     ParrotIOLayer *ptr_last = NULL;
     ptr_ptr_new = &ptr_new;

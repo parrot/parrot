@@ -2213,6 +2213,8 @@ ok 3
 OUTPUT
 
 output_is( <<'CODE', <<OUTPUT, "bnots 2");
+ getstdout P0
+ push P0, "utf8"
  set S1, "a2c"
  bnots S2, S1
  print S1

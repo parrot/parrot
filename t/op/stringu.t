@@ -21,15 +21,19 @@ use Parrot::Test tests => 14;
 use Test::More;
 
 output_is( <<'CODE', <<OUTPUT, "angstrom" );
+    getstdout P0
+    push P0, "utf8"
     chr S0, 0x212B
-    print S0
-    print "\n"
+    print P0, S0
+    print P0, "\n"
     end
 CODE
 \xe2\x84\xab
 OUTPUT
 
 output_is( <<'CODE', <<OUTPUT, "escaped angstrom" );
+    getstdout P0
+    push P0, "utf8"
     set S0, "\x{212b}"
     print S0
     print "\n"
@@ -39,6 +43,8 @@ CODE
 OUTPUT
 
 output_is( <<'CODE', <<OUTPUT, "escaped angstrom 2" );
+    getstdout P0
+    push P0, "utf8"
     set S0, "aaaaaa\x{212b}"
     print S0
     print "\n"
@@ -48,6 +54,8 @@ aaaaaa\xe2\x84\xab
 OUTPUT
 
 output_is( <<'CODE', <<OUTPUT, "escaped angstrom 3" );
+    getstdout P0
+    push P0, "utf8"
     set S0, "aaaaaa\x{212b}-aaaaaa"
     print S0
     print "\n"
@@ -57,6 +65,8 @@ aaaaaa\xe2\x84\xab-aaaaaa
 OUTPUT
 
 output_is( <<'CODE', <<OUTPUT, 'escaped angstrom 3 \uhhhh' );
+    getstdout P0
+    push P0, "utf8"
     set S0, "aaaaaa\u212b-aaaaaa"
     print S0
     print "\n"
@@ -66,6 +76,8 @@ aaaaaa\xe2\x84\xab-aaaaaa
 OUTPUT
 
 output_is( <<'CODE', <<OUTPUT, "MATHEMATICAL BOLD CAPITAL A");
+    getstdout P0
+    push P0, "utf8"
     set S0, "aaaaaa\x{1d400}-aaaaaa"
     print S0
     print "\n"
@@ -75,6 +87,8 @@ aaaaaa\xf0\x9d\x90\x80-aaaaaa
 OUTPUT
 
 output_is( <<'CODE', <<OUTPUT, 'MATHEMATICAL BOLD CAPITAL A \U');
+    getstdout P0
+    push P0, "utf8"
     set S0, "aaaaaa\U0001d400-aaaaaa"
     print S0
     print "\n"
@@ -84,6 +98,8 @@ aaaaaa\xf0\x9d\x90\x80-aaaaaa
 OUTPUT
 
 output_is( <<'CODE', <<OUTPUT, "two upscales");
+    getstdout P0
+    push P0, "utf8"
     set S0, "aaaaaa\x{212b}-bbbbbb\x{1d400}-cccccc"
     print S0
     print "\n"
@@ -102,6 +118,8 @@ aaaaaa\xe2\x84\xab-bbbbbb\xf0\x9d\x90\x80-cccccc
 OUTPUT
 
 output_is( <<'CODE', <<OUTPUT, "two upscales - don't downscale");
+    getstdout P0
+    push P0, "utf8"
     set S0, "aaaaaa\x{1d400}-bbbbbb\x{212b}-cccccc"
     print S0
     print "\n"
@@ -120,6 +138,8 @@ aaaaaa\xf0\x9d\x90\x80-bbbbbb\xe2\x84\xab-cccccc
 OUTPUT
 
 output_is( <<'CODE', <<OUTPUT, '\cX, \ooo');
+    getstdout P0
+    push P0, "utf8"
     set S0, "ok 1\cJ"
     print S0
     set S0, "ok 2\012"

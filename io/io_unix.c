@@ -59,7 +59,7 @@ static INTVAL    PIO_unix_flush(theINTERP, ParrotIOLayer *layer, ParrotIO *io);
 static size_t    PIO_unix_read(theINTERP, ParrotIOLayer *layer,
                                ParrotIO *io, void *buffer, size_t len);
 static size_t    PIO_unix_write(theINTERP, ParrotIOLayer *layer,
-                                ParrotIO *io, const void *buffer, size_t len);
+                                ParrotIO *io, STRING *);
 static PIOOFF_T  PIO_unix_seek(theINTERP, ParrotIOLayer *l, ParrotIO *io,
                                PIOOFF_T offset, INTVAL whence);
 static PIOOFF_T  PIO_unix_tell(theINTERP, ParrotIOLayer *l, ParrotIO *io);
@@ -481,7 +481,7 @@ PIO_unix_read(theINTERP, ParrotIOLayer *layer, ParrotIO *io,
 
 =item C<static size_t
 PIO_unix_write(theINTERP, ParrotIOLayer *layer, ParrotIO *io,
-               const void *buffer, size_t len)>
+               STRING *)>
 
 Calls C<write()> to write C<len> bytes from the memory starting at
 C<buffer> to the file descriptor in C<*io>.
@@ -491,13 +491,14 @@ C<buffer> to the file descriptor in C<*io>.
 */
 
 static size_t
-PIO_unix_write(theINTERP, ParrotIOLayer *layer, ParrotIO *io,
-               const void *buffer, size_t len)
+PIO_unix_write(theINTERP, ParrotIOLayer *layer, ParrotIO *io, STRING *s)
 {
     int err;
     size_t bytes;
     size_t to_write;
     const char *ptr;
+    void *buffer = s->strstart;
+    size_t len = s->bufused;
 
     UNUSED(interpreter);
     UNUSED(layer);

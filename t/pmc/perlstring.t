@@ -995,6 +995,8 @@ ok 3
 OUTPUT
 
 output_is( <<'CODE', <<OUTPUT, "bnots 2");
+ getstdout P0
+ push P0, "utf8"
  new P1, .PerlString
  new P2, .PerlString
  set P1, "a2c"

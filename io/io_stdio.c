@@ -55,7 +55,7 @@ static INTVAL PIO_stdio_flush(theINTERP, ParrotIOLayer *layer, ParrotIO *io);
 static size_t    PIO_stdio_read(theINTERP, ParrotIOLayer *layer,
                                 ParrotIO *io, void *buffer, size_t len);
 static size_t    PIO_stdio_write(theINTERP, ParrotIOLayer *layer,
-                                 ParrotIO *io, const void *buffer, size_t len);
+                                 ParrotIO *io, STRING *s);
 static size_t    PIO_stdio_peek(theINTERP, ParrotIOLayer *layer,
                                 ParrotIO *io, void *buffer);
 static PIOOFF_T  PIO_stdio_seek(theINTERP, ParrotIOLayer *layer, ParrotIO *io,
@@ -83,17 +83,17 @@ flags_to_stdio(INTVAL flags)
         (PIO_F_WRITE | PIO_F_READ | PIO_F_APPEND)) {
         return "a+b";
     }
-    else if ((flags & (PIO_F_WRITE | PIO_F_READ | PIO_F_TRUNC)) == 
+    else if ((flags & (PIO_F_WRITE | PIO_F_READ | PIO_F_TRUNC)) ==
              (PIO_F_WRITE | PIO_F_READ | PIO_F_TRUNC)) {
         return "w+b";
     }
-    else if ((flags & (PIO_F_WRITE | PIO_F_READ)) == 
+    else if ((flags & (PIO_F_WRITE | PIO_F_READ)) ==
              (PIO_F_WRITE | PIO_F_READ)) {
         return "r+b";
     }
     else if (flags & PIO_F_APPEND) {
         return "ab";
-    }    
+    }
     else if (flags & PIO_F_WRITE) {
         return "wb";
     }
@@ -279,7 +279,7 @@ PIO_stdio_peek(theINTERP, ParrotIOLayer *layer, ParrotIO *io, void *buffer)
     /* if we got anything from the stream, push it back on */
     if (bytes)
         ungetc(((char *)buffer)[0], fptr);
-    
+
     return bytes;
 }
 
@@ -351,9 +351,9 @@ PIO_stdio_read(theINTERP, ParrotIOLayer *layer, ParrotIO *io,
     if (bytes != len) {
         if (feof(fptr)) {
             io->flags |= PIO_F_EOF;
-        } 
+        }
     }
-    
+
     return bytes;
 }
 
@@ -361,7 +361,7 @@ PIO_stdio_read(theINTERP, ParrotIOLayer *layer, ParrotIO *io,
 
 =item C<static size_t
 PIO_stdio_write(theINTERP, ParrotIOLayer *layer, ParrotIO *io,
-               const void *buffer, size_t len)>
+               STRING *s)>
 
 Desc.
 
@@ -370,9 +370,10 @@ Desc.
 */
 
 static size_t
-PIO_stdio_write(theINTERP, ParrotIOLayer *layer, ParrotIO *io,
-               const void *buffer, size_t len)
+PIO_stdio_write(theINTERP, ParrotIOLayer *layer, ParrotIO *io, STRING *s)
 {
+    void *buffer = s->strstart;
+    size_t len = s->bufused;
     UNUSED(interpreter);
     UNUSED(layer);
 
