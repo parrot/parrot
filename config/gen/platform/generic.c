@@ -13,25 +13,6 @@
 
 #define PARROT_DLOPEN_FLAGS RTLD_LAZY
 
-#ifdef HAS_HEADER_PTHREAD
-#  include <pthread.h>
-#  define PARROT_SYNC_PRIMITIVES_DEFINED
-#  undef LOCK
-#  define LOCK(x) pthread_mutex_lock(x)
-#  undef UNLOCK
-#  define UNLOCK(x) pthread_mutex_unlock(x)
-#  undef COND_WAIT
-#  define COND_WAIT(x,y) pthread_cond_wait(x, y)
-#  undef COND_SIGNAL
-#  define COND_SIGNAL(x,y) pthread_cond_signal(x, y)
-#  undef COND_BROADCAST
-#  define COND_BROADCAST(x,y) pthread_cond_broadcast(x, y)
-#  undef Parrot_mutex
-   typedef pthread_mutex_t Parrot_mutex;
-#  undef Parrot_cond
-   typedef pthread_cond_t Parrot_cond;
-#endif
-
 /*
 ** Parrot_intval_time()
 */
