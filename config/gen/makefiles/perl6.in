@@ -25,9 +25,10 @@ imcc:
 	$(asm) $< > $@
 
 clean:
-	$(RM_RF) test-*.imc test-*.pasm test-*.p6 test-*.out test-*.pbc test-*.err
+	$(RM_RF) t/*/*.p6 t/*/*.imc t/*/*.pasm t/*/*.err t/*/*.pbc t/*/*.out
 	$(RM_RF) a.err a.imc a.output a.pasm a.pbc
 	$(RM_RF) core
+
 
 distclean: clean
 	$(RM_RF) Perl6grammar.pm
