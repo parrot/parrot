@@ -145,7 +145,7 @@ void *build_call_func(struct Parrot_Interp *interpreter, String *signature) {
      "here there be hacks" */
   if (0 == string_length(signature)) return pcf_v_v;
 $icky_global_bit
-
+    PANIC("Unknown signature type");
   return NULL;
 #endif
 }
