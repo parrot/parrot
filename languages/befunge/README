@@ -1,6 +1,6 @@
 DESCRIPTION
 -----------
-This is a Befunge interpreter written in Parrot assembler, version 0.1.2
+This is a Befunge interpreter written in Parrot assembler, version 0.2.0
 
 This interpreter should be Befunge-93 compliant. This means the
 playfield is limited to 80x25. This should also mean that the torus
@@ -35,12 +35,14 @@ The files are the following:
                         developement
         test.bef        a befunge script that test almost all the
                         instructions (and is even self-modifying!)
+        pascserp.bef    a befunge script generating variant of Sierpinsky
+                        triangle (by Chris Pressey)
 
 
 BUGS
 ----
-* The "input char" and "input int" instructions are a bit broken since
-  Parrot does not handle I/O very well...
+* pascserp.bef output is not correct (right bottom part of image is just
+noise)
 
 
 TODO

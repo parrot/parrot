@@ -8,6 +8,8 @@
 .include "stack.pasm"
 
 MAIN:
+        getstdout P10
+        pioctl I10, P10, 3, 0   # disable buffering on stdout
         set I0, 0
         set I5, 0               # debug mode
 ARGV_NEXT:

@@ -22,7 +22,8 @@ IO_INPUT_INT:
         restore S2
         length I10, S2
         gt I10, 0, IO_INPUT_INT_PARSE_INPUT
-        read S2, 1
+        getstdin P15
+        readline S2, P15
         length I10, S2
 IO_INPUT_INT_PARSE_INPUT:
         set I11, 0
@@ -38,7 +39,7 @@ IO_INPUT_INT_NEXT_CHAR:
         set I11, 0
 IO_INPUT_INT_NAN:
         substr S2, S2, I11, I10
-        push P2, I10
+        push P2, S10
         pops
         popi
         branch MOVE_PC
@@ -55,7 +56,8 @@ IO_INPUT_CHAR:
         restore S2
         length I10, S2
         gt I10, 0, IO_INPUT_CHAR_SUBSTR
-        read S2, 1
+        getstdin P15
+        readline S2, P15
 IO_INPUT_CHAR_SUBSTR:
         substr S10, S2, 0, 1
         length I10, S2
@@ -80,6 +82,7 @@ IO_OUTPUT_INT:
         pop I10, P2
 IO_OUTPUT_INT_POP_1:    
         print I10
+        print " "
         popi
         branch MOVE_PC
 

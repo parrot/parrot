@@ -1,5 +1,13 @@
 Revision history for a Befunge interpreter written for Parrot.
 
+0.2.0 Sat Oct 23 19:43:11 CEST 2004
+        Befunge-93 is now fully implemented!
+        Thanks to Stepan Roh:
+          - fixed input instruction (now that parrot does better i/o)
+          - fixed output buffering
+          - fixed . instruction which is supposed to output a space
+            after the number
+
 0.1.2 Thu Jan  2 17:50:25 CET 2003
         - new debugger instruction: "delete", that allows to clear
           breakpoints (those created by the "break" instruction)
