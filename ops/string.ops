@@ -434,18 +434,18 @@ inline op new(out STR, in INT) :base_mem {
   goto NEXT();
 }
 
-//=item B<find_encoding>(out INT, in STR)
-//
-//Find the encoding named in $2 and return its number in $1
-//
-//=cut
-//
-//op find_encoding(out INT, in STR) :base_core {
-//  char *encoding = string_to_cstring(interpreter, $2);
-//  $1 = encoding_find_encoding(encoding);
-//  string_cstring_free(encoding);
-//  goto NEXT();
-//}
+#=item B<find_encoding>(out INT, in STR)
+#
+#Find the encoding named in $2 and return its number in $1
+#
+#=cut
+#
+#op find_encoding(out INT, in STR) :base_core {
+#  char *encoding = string_to_cstring(interpreter, $2);
+#  $1 = encoding_find_encoding(encoding);
+#  string_cstring_free(encoding);
+#  goto NEXT();
+#}
 
 ########################################
 

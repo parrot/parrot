@@ -1091,11 +1091,11 @@ struct mallinfo public_mALLINFo();
     if (n <= 0) return 0;
     pool = (struct Node**)(independent_calloc(n, sizeof(struct Node), 0);
     if (pool == 0) die(); 
-    // organize into a linked list... 
+    / / organize into a linked list... 
     struct Node* first = pool[0];
     for (i = 0; i < n-1; ++i) 
       pool[i]->next = pool[i+1];
-    free(pool);     // Can now free the array (or not, if it is needed later)
+    free(pool);     / / Can now free the array (or not, if it is needed later)
     return first;
   }
 */
@@ -1153,7 +1153,7 @@ Void_t** public_iCALLOc();
     struct Head* head = (struct Head*)(chunks[0]);
     char*        body = (char*)(chunks[1]);
     struct Foot* foot = (struct Foot*)(chunks[2]);
-    // ...
+    / / ...
   }
 
   In general though, independent_comalloc is worth using only for
@@ -4892,7 +4892,7 @@ int mALLOPt(param_number, value) int param_number; int value;
       {
         return (void *) MORECORE_FAILURE;
       }
-      // save ptrs so they can be freed during cleanup
+      / / save ptrs so they can be freed during cleanup
       our_os_pools[next_os_pool] = ptr;
       next_os_pool++;
       ptr = (void *) ((((CHUNK_SIZE_T) ptr) + RM_PAGE_MASK) & ~RM_PAGE_MASK);
@@ -4901,7 +4901,7 @@ int mALLOPt(param_number, value) int param_number; int value;
     }
     else if (size < 0)
     {
-      // we don't currently support shrink behavior
+      / / we don't currently support shrink behavior
       return (void *) MORECORE_FAILURE;
     }
     else
@@ -4910,8 +4910,8 @@ int mALLOPt(param_number, value) int param_number; int value;
     }
   }
 
-  // cleanup any allocated memory pools
-  // called as last thing before shutting down driver
+  / / cleanup any allocated memory pools
+  / / called as last thing before shutting down driver
 
   void osCleanupMem(void)
   {
