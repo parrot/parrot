@@ -11,15 +11,19 @@ Parrot Calling Conventions
     Maintainer: Dan Sugalski
     Class: Internals
     PDD Number: 03
-    Version: 1.1
+    Version: 1.3
     Status: Developing
-    Last Modified: 11 March 2003
+    Last Modified: 2 May 2003
     PDD Format: 1
     Language: English
 
 =head2 HISTORY
 
 =over 4
+
+=item Version 1.3
+
+2 May 2003
 
 =item Version 1,2
 
@@ -38,6 +42,12 @@ None. First version
 =head1 CHANGES
 
 =over 4
+
+=item Version 1.3
+
+No longer use the stack, with overflow going into the array in P3.
+
+Clarified some muddy language.
 
 =item Version 1.2
 
@@ -89,6 +99,13 @@ perfectly acceptable for there to be two ways to call into a
 function--one with a language's private calling method, and another
 that follows the standard conventions.
 
+When this document refers to an "array PMC", used for passing
+overflow parameters in and out, this means a PMC that can be accessed
+by integer index and which can return its length. It doesn't need to
+be of any particular class, it just needs to I<act> like an
+array. It specifically does I<not> need to be able to extend itself,
+and may be considered (and actually be) a constant array.
+
 =head2 Responsibility for environment preservation
 
 The caller is responsible for preserving any environment it is
@@ -118,6 +135,13 @@ with callcc. Otherwise NULL.
 
 Holds the object the sub was called on. (For method calls)
 
+=item P3
+
+The overflow parameters. Everything that wouldn't fit in a register
+is in here. This PMC should act as an array, and belongs to the
+called sub/function/method. The caller should not assume anything
+about the state of the PMC passed in here after the call is made.
+
 =item S0
 
 The fully qualified name of the method or sub being called
@@ -128,7 +152,7 @@ True if the sub is being called with prototyped parameters.
 
 =item I1
 
-The number of items pushed onto the stack.
+The number of items pushed onto the parameter list.
 
 =item I2
 
@@ -150,8 +174,8 @@ Hash value of method or sub name. 0 means no hash value
 
 The following registers, with the exception of P registers, are used
 I<only> when calling a subroutine for which there is a compile-time
-prototype. The first 27 PMC parameters may be passed in registers P5
-through P31.
+prototype. The first 11 PMC parameters may be passed in registers P5
+through P15. 
 
 =over 4
 
@@ -173,33 +197,42 @@ The first 11 PMC parameters.
 
 =back
 
-All overflow parameters are pushed on the stack in reverse order--that
-is the topmost entry on the stack is the first entry in the parameter
-list, and the bottom entry the last entry in the parameter list.
+Overflow parameters go in the array PMC passed in P3. Overflow
+entries are in there in order, so element 0 is the first overflow
+parameter, element 1 the second, and so on.
 
 The PMC for a hash, array, or list is passed if one of the entries in
 the parameter list is a hash, array, or list. The aggregate is B<not>
 flattened. (Though when accessing the parameters it may be)
 
 Parameters are passed in S, I, and N registers only if the sub's
-prototype specifically indicates it takes parameters of that type.
+prototype specifically indicates it takes parameters of that type. I0
+must be set to 1 if that is the case. If I0 is 0, then the S, I, and
+N registers can be assumed to be garbage.
 
 Note that it doesn't matter what the order of the integer, string,
 numeric, and PMC parameters are in the parameter list up until
-overflow occurs.
+overflow occurs. Once overflow occurs the parameters must be taken in
+the exact order that they appear in the signature.
 
 =head2 Return conventions
 
 On return from a function, the following registers are set. Return
-values are placed in registers only if the function is prototyped to
-do so. All values on the stack are in reverse order, such that the top
-value on the stack is the first value returned. 
+values are placed in I, S, and N registers only if the function is
+prototyped to do so. It is unlikely that more than one of these
+registers is set, but you never know. (Perl 6 having fancier return
+types if nothing else) If a prototyped return is indicated then
+register I0 B<must> be set to 1. If I0 is set to 0, then this is a
+non-prototyped return and only the PMC registers and overflow in P3
+may be set.
+
+Overflow return values are put in the array PMC in register P3
 
 =over 4
 
 =item I0
 
-Holds the number of return values on the stack.
+True if prototyped return, false otherwise
 
 =item I1
 
@@ -217,6 +250,10 @@ Holds the number of return values in PMC registers.
 
 Holds the number of return values in numeric registers.
 
+=item P3
+
+Holds the overflow return values in an array PMC
+
 =item P5-P15
 
 PMC return values
@@ -232,10 +269,6 @@ String return values
 =item N5-N15
 
 Numeric return values
-
-=item stack
-
-Overflow values, or values for functions that don't have a return prototype.
 
 =back
 
