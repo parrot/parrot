@@ -52,6 +52,11 @@ sub render {
     return $self->$method(@{ $op->{args} });
 }
 
+sub lookup_var {
+    my ($self, $var, $ctx) = @_;
+    return $ctx->{$var} || $var;
+}
+
 sub output {
     my ($self, $ops, $ctx) = @_;
 
@@ -70,7 +75,7 @@ sub output {
             $label .= $self->output_label_def($op);
         } else {
             foreach my $line ($self->render($op)) {
-                $line =~ s/<(\w+)>/$ctx->{$1} || $1/eg;
+                $line =~ s/<(\w+)>/$self->lookup_var($1, $ctx)/eg;
                 if (length($label) >= 8) {
                     push @r, $label;
                     $label = '';

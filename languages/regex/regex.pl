@@ -7,12 +7,14 @@ use strict;
 
 my $operation;
 my $expr;
+my $expr_file;
 my $tree_opt = 1;
 my $list_opt = 1;
 my $debug = 0;
 my $output;
 my $subname;
 my $language = "pir";
+
 while (@ARGV) {
     $_ = shift;
     if (/--no(-?)optimize/) {
@@ -26,6 +28,8 @@ while (@ARGV) {
         $debug = 1;
     } elsif (/--output-file=(.*)/) {
         $output = $1;
+    } elsif (/--file=(.*)/) {
+        $expr_file = $1;
     } elsif (/--language=(.*)/) {
         $language = lc($1);
         $language = 'perl5' if $language eq 'perl';
@@ -42,7 +46,19 @@ while (@ARGV) {
     }
 }
 
-die "need expression!" if ! defined $expr;
+if (! defined $expr && ! defined $expr_file) {
+    die "need expression!";
+}
+
+if (defined $expr_file) {
+    local *IN;
+    local $/;
+    open(IN, "<$expr_file")
+      or die "open $expr_file: $!";
+    $expr = <IN>;
+    close IN;
+}
+
 $operation ||= "compile";
 
 my %options;

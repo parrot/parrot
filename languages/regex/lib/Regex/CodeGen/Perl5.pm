@@ -31,6 +31,15 @@ sub dbgoto {
     return ("goto $label");
 }
 
+sub lookup_var {
+    my ($self, $var, $ctx) = @_;
+    if ($ctx->{$var}) {
+        return $ctx->{$var};
+    } else {
+        return '$' . $var;
+    }
+}
+
 ############### SIMPLE OUTPUT ##############
 
 sub output_goto {
@@ -262,9 +271,9 @@ sub output_pushint {
 
     if ($self->{DEBUG}) {
         my $desc = $db_desc ? " ($db_desc)" : "";
-        return ("<rx_tmp> = \@<rx_stack>;",
+        return ("\$dbg_tmp = \@<rx_stack>;",
                 "push \@<rx_stack>, $reg;",
-                $self->dbprint("PUSHED[\%<<rx_tmp>>] INT: \%<$reg>$desc\n"),
+                $self->dbprint("PUSHED[\$dbg_tmp] INT: \%<$reg>$desc\n"),
                );
     }
     return "push \@<rx_stack>, $reg;";
@@ -344,9 +353,9 @@ sub output_popint {
     $reg = value($reg);
     if ($self->{DEBUG}) {
         my $desc = $db_desc ? " ($db_desc)" : "";
-        return ("<rx_tmp> = \@<rx_stack>;",
+        return ("\$dbg_tmp = \@<rx_stack>;",
                 "$reg = pop \@<rx_stack>;",
-                $self->dbprint("POPPED[\%<<rx_tmp>>] INT: \%<$reg>$desc\n"),
+                $self->dbprint("POPPED[\$dbg_tmp] INT: \%<$reg>$desc\n"),
                 );
     } else {
         return ("$reg = pop \@<rx_stack>; # popint");
@@ -382,18 +391,42 @@ sub output_return {
     return ("return $retval;");
 }
 
+sub output_declare {
+    my ($self, $var) = @_;
+    return ("my \$$var;\n");
+}
+
 sub output_rule_def {
     my ($self, $name, $L_trymatch, $L_backup, $num_groups, $startup) = @_;
     my @ops;
 #    if ($name ne 'default') {
+#     @ops = split(/\n/, <<"END");
+# sub _rule_$name {
+#     my <rx_mode> = shift;
+#     my (<rx_input>, <rx_pos>, <rx_stack>);
+#     my \%rx_match;
+#     if (<rx_mode>) {
+#         (<rx_input>, <rx_pos>, <rx_stack>) = \@_;
+#         \$rx_match{'!INPUT'} = <rx_input>;
+#         \$rx_match{'!GROUPS'} ||= [];
+#     } else {
+#         \%rx_match = %{ shift() };
+#         <rx_input> = <rx_match>{'!INPUT'};
+#         <rx_pos> = <rx_match>{'!POS'};
+#         <rx_stack> = <rx_match>{'!STACK'};
+#     }
+# END
         @ops = ("sub _rule_$name {", 'my ($rx_mode, $rx_input, $rx_pos, $rx_stack) = @_;');
 #    }
 
     if ($self->{DEBUG}) {
-        push @ops, qq(print "Calling $name at \$rx_pos\\n";);
+        push @ops, qq(print "Calling $name at \$rx_pos for ";);
+        push @ops, qq(print \$rx_mode ? "MATCH" : "BACKTRACK", "\\n";);
         push @ops, qq(print "INPUT:\$rx_input\\n";);
         push @ops, qq(print "      " . (" " x \$rx_pos) . "^\\n";);
     }
+
+    push @ops, "my \$dbg_tmp;\n" if $self->{DEBUG};
 
     push @ops, split(/\n/, <<'END');
 my %rx_match;
@@ -444,10 +477,17 @@ sub output_call_setup {
 
 sub output_call {
     my ($self, $name, $mode, $uid) = @_;
-    return split(/\n/, <<"END");
+#    if ($mode) {
+        return split(/\n/, <<"END");
 \$$uid = _rule_$name($mode, \$rx_input, \$rx_pos, \$rx_stack);
 \$rx_pos = \$$uid\->{'!POS'};
 END
+#     } else {
+#         return split(/\n/, <<"END");
+# \$$uid = _rule_$name($mode, \$$uid || <rx_match>{'$uid'});
+# \$rx_pos = \$$uid\->{'!POS'};
+# END
+#     }
 }
 
 sub output_call_result {
@@ -463,7 +503,34 @@ sub output_call_result {
 sub output_code {
     my ($self, $code) = @_;
     # Assume, for now, that the code is Perl5 code
-    return ("# START EMBEDDED CODE", $code, "# END EMBEDDED CODE");
+    my @ops = ("# START EMBEDDED CODE");
+
+    # Set up a %MATCH variable
+    push @ops, <<'END';
+{
+my %MATCH;
+while (my ($key, $val) = each %rx_match) {
+    if (UNIVERSAL::isa($val, 'ARRAY')) {
+        my ($start, $end) = @$val;
+        $end = $rx_pos if $key eq '0';
+        if (defined($start) && defined($end) && $start != -2 && $end != -2) {
+            $MATCH{$key} = substr($rx_match{'!INPUT'}, $start, $end - $start);
+        }
+    } else {
+        # Don't deal with parse tree yet
+        $MATCH{$key} = $val;
+    }
+}
+END
+
+    push @ops, $code;
+
+    push @ops, <<'END';
+}
+# END EMBEDDED CODE
+END
+
+    return @ops;
 }
 
 1;

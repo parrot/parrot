@@ -20,12 +20,16 @@ sub tokenize {
                 $state = 2;
                 $depth = 1;
             } else {
-                push @tokens, $c;
                 if ($c =~ /\d/) {
+                    push @tokens, $c;
                     push @types, 'NUM';
-                } elsif ($c =~ /[\w\s]/) {
+                } elsif ($c =~ /\w/) {
+                    push @tokens, $c;
                     push @types, 'CHAR';
+                } elsif ($c =~ /\s/) {
+                    # Skip whitespace, unless backslashed
                 } else {
+                    push @tokens, $c;
                     push @types, $c;
                 }
             }
@@ -45,6 +49,8 @@ sub tokenize {
         }
     }
 
+#    for (0..$#tokens) { print STDERR "  $tokens[$_] $types[$_]\n"; }
+
     return \@tokens, \@types;
 }
 
@@ -58,7 +64,7 @@ $::paren = 0;
 
 %left '|'
 %left SEQUENCE
-%nonassoc '(' '[' '{' CHAR '.' RANGE '*' '+'
+%nonassoc '(' '[' '<' '>' CHAR '.' RANGE '*' '+'
 %nonassoc '?'
 
 %%
@@ -141,13 +147,13 @@ rulename : rulename CHAR
    { return '' }
 ;
 
-range : '{' number ',' number '}'
-   { return { min => $_[2], max => $_[4] }; }
-      | '{' ',' number '}'
-   { return { min => 0, max => $_[3] }; }
-      | '{' number '}'
+range : '<' number '.' '.' number '>'
+   { return { min => $_[2], max => $_[5] }; }
+      | '<' '.' '.' number '>'
+   { return { min => 0, max => $_[4] }; }
+      | '<' number '>'
    { return { min => $_[2], max => $_[2] }; }
-      | '{' number ',' '}'
+      | '<' number '.' '.' '>'
    { return { min => $_[2], max => -1 }; }
 ;
 

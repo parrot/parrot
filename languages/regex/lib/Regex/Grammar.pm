@@ -512,12 +512,16 @@ sub tokenize {
                 $state = 2;
                 $depth = 1;
             } else {
-                push @tokens, $c;
                 if ($c =~ /\d/) {
+                    push @tokens, $c;
                     push @types, 'NUM';
-                } elsif ($c =~ /[\w\s]/) {
+                } elsif ($c =~ /\w/) {
+                    push @tokens, $c;
                     push @types, 'CHAR';
+                } elsif ($c =~ /\s/) {
+                    # Skip whitespace, unless backslashed
                 } else {
+                    push @tokens, $c;
                     push @types, $c;
                 }
             }
@@ -536,6 +540,8 @@ sub tokenize {
             $tokens[-1] .= $c;
         }
     }
+
+#    for (0..$#tokens) { print STDERR "  $tokens[$_] $types[$_]\n"; }
 
     return \@tokens, \@types;
 }
@@ -638,14 +644,13 @@ sub new {
 	},
 	{#State 11
 		ACTIONS => {
-			"?" => 22,
+			"?" => 23,
 			'CHAR' => 4,
-			"<" => 3,
-			"+" => 23,
-			"{" => 24,
+			"<" => 22,
+			"+" => 24,
 			'CODE' => 6,
-			"|" => 26,
 			"(" => 10,
+			"|" => 26,
 			"*" => 27,
 			"\$" => 29,
 			"[" => 14,
@@ -719,24 +724,27 @@ sub new {
 	},
 	{#State 22
 		ACTIONS => {
+			'NUM' => 40,
+			"?" => 16,
+			"." => 41
+		},
+		DEFAULT => -28,
+		GOTOS => {
+			'number' => 39,
+			'rulename' => 17
+		}
+	},
+	{#State 23
+		ACTIONS => {
 			"?" => undef
 		},
 		DEFAULT => -17
 	},
-	{#State 23
-		ACTIONS => {
-			"?" => 40
-		},
-		DEFAULT => -15
-	},
 	{#State 24
 		ACTIONS => {
-			'NUM' => 43,
-			"," => 42
+			"?" => 43
 		},
-		GOTOS => {
-			'number' => 41
-		}
+		DEFAULT => -15
 	},
 	{#State 25
 		ACTIONS => {
@@ -766,15 +774,14 @@ sub new {
 	},
 	{#State 28
 		ACTIONS => {
-			"?" => 22,
 			'CHAR' => 4,
-			"<" => 3,
-			"+" => 23,
-			"{" => 24,
-			'CODE' => 6,
-			"(" => 10,
+			"<" => 22,
+			"+" => 24,
 			"*" => 27,
 			"[" => 14,
+			"?" => 23,
+			'CODE' => 6,
+			"(" => 10,
 			"." => 15
 		},
 		DEFAULT => -10,
@@ -854,11 +861,10 @@ sub new {
 	},
 	{#State 38
 		ACTIONS => {
-			"?" => 22,
+			"?" => 23,
 			'CHAR' => 4,
-			"<" => 3,
-			"+" => 23,
-			"{" => 24,
+			"<" => 22,
+			"+" => 24,
 			'CODE' => 6,
 			"(" => 10,
 			"|" => 26,
@@ -874,43 +880,39 @@ sub new {
 		}
 	},
 	{#State 39
-		DEFAULT => -18
+		ACTIONS => {
+			'NUM' => 57,
+			"." => 58,
+			">" => 59
+		}
 	},
 	{#State 40
-		DEFAULT => -16
+		DEFAULT => -34
 	},
 	{#State 41
 		ACTIONS => {
-			'NUM' => 59,
-			"}" => 57,
-			"," => 58
+			"." => 60
 		}
 	},
 	{#State 42
-		ACTIONS => {
-			'NUM' => 43
-		},
-		GOTOS => {
-			'number' => 60
-		}
+		DEFAULT => -18
 	},
 	{#State 43
-		DEFAULT => -34
+		DEFAULT => -16
 	},
 	{#State 44
 		DEFAULT => -20
 	},
 	{#State 45
 		ACTIONS => {
-			"?" => 22,
 			'CHAR' => 4,
-			"<" => 3,
-			"+" => 23,
-			"{" => 24,
-			'CODE' => 6,
-			"(" => 10,
+			"<" => 22,
+			"+" => 24,
 			"*" => 27,
 			"[" => 14,
+			"?" => 23,
+			'CODE' => 6,
+			"(" => 10,
 			"." => 15
 		},
 		DEFAULT => -9,
@@ -969,11 +971,10 @@ sub new {
 	},
 	{#State 55
 		ACTIONS => {
-			"?" => 22,
+			"?" => 23,
 			'CHAR' => 4,
-			"<" => 3,
-			"+" => 23,
-			"{" => 24,
+			"<" => 22,
+			"+" => 24,
 			'CODE' => 6,
 			"(" => 10,
 			"|" => 26,
@@ -992,34 +993,32 @@ sub new {
 		DEFAULT => -22
 	},
 	{#State 57
-		DEFAULT => -31
+		DEFAULT => -33
 	},
 	{#State 58
 		ACTIONS => {
-			'NUM' => 43,
-			"}" => 66
+			"." => 66
+		}
+	},
+	{#State 59
+		DEFAULT => -31
+	},
+	{#State 60
+		ACTIONS => {
+			'NUM' => 40
 		},
 		GOTOS => {
 			'number' => 67
 		}
 	},
-	{#State 59
-		DEFAULT => -33
-	},
-	{#State 60
-		ACTIONS => {
-			'NUM' => 59,
-			"}" => 68
-		}
-	},
 	{#State 61
 		ACTIONS => {
-			'CHAR' => 69
+			'CHAR' => 68
 		}
 	},
 	{#State 62
 		ACTIONS => {
-			'NUM' => 70
+			'NUM' => 69
 		}
 	},
 	{#State 63
@@ -1032,24 +1031,39 @@ sub new {
 		DEFAULT => -23
 	},
 	{#State 66
-		DEFAULT => -32
+		ACTIONS => {
+			'NUM' => 40,
+			">" => 71
+		},
+		GOTOS => {
+			'number' => 70
+		}
 	},
 	{#State 67
 		ACTIONS => {
-			'NUM' => 59,
-			"}" => 71
+			'NUM' => 57,
+			">" => 72
 		}
 	},
 	{#State 68
-		DEFAULT => -30
-	},
-	{#State 69
 		DEFAULT => -41
 	},
-	{#State 70
+	{#State 69
 		DEFAULT => -43
 	},
+	{#State 70
+		ACTIONS => {
+			'NUM' => 57,
+			">" => 73
+		}
+	},
 	{#State 71
+		DEFAULT => -32
+	},
+	{#State 72
+		DEFAULT => -30
+	},
+	{#State 73
 		DEFAULT => -29
 	}
 ],
@@ -1061,19 +1075,19 @@ sub new {
 	[#Rule 1
 		 'rules', 2,
 sub
-#line 67 "lib/Regex/Grammar.y"
+#line 73 "lib/Regex/Grammar.y"
 { return [ @{ $_[1] }, $_[2] ] }
 	],
 	[#Rule 2
 		 'rules', 0,
 sub
-#line 69 "lib/Regex/Grammar.y"
+#line 75 "lib/Regex/Grammar.y"
 { return []; }
 	],
 	[#Rule 3
 		 'rule', 4,
 sub
-#line 73 "lib/Regex/Grammar.y"
+#line 79 "lib/Regex/Grammar.y"
 { my ($name, $tree) = @_[2,4];
      # This is really not the place for this...
      if ($tree->{name} eq 'scan' && $name ne 'default') {
@@ -1087,7 +1101,7 @@ sub
 	[#Rule 4
 		 'rule', 1,
 sub
-#line 83 "lib/Regex/Grammar.y"
+#line 89 "lib/Regex/Grammar.y"
 {
      my $op = op('rule' => [ 'default', $_[1], 1 + $::paren ]);
      $::paren = 0; # FIXME!
@@ -1097,241 +1111,241 @@ sub
 	[#Rule 5
 		 'regex', 2,
 sub
-#line 91 "lib/Regex/Grammar.y"
+#line 97 "lib/Regex/Grammar.y"
 { return $_[2]; }
 	],
 	[#Rule 6
 		 'regex', 1,
 sub
-#line 93 "lib/Regex/Grammar.y"
+#line 99 "lib/Regex/Grammar.y"
 { return op('scan' => [ $_[1] ]); }
 	],
 	[#Rule 7
 		 'regex1', 1,
 sub
-#line 97 "lib/Regex/Grammar.y"
+#line 103 "lib/Regex/Grammar.y"
 { return $_[1]; }
 	],
 	[#Rule 8
 		 'regex1', 2,
 sub
-#line 99 "lib/Regex/Grammar.y"
+#line 105 "lib/Regex/Grammar.y"
 { return op('seq' => [ $_[1], op('atend') ]); }
 	],
 	[#Rule 9
 		 'expr', 3,
 sub
-#line 103 "lib/Regex/Grammar.y"
+#line 109 "lib/Regex/Grammar.y"
 { return op('alternate' => [ $_[1], $_[3] ]); }
 	],
 	[#Rule 10
 		 'expr', 2,
 sub
-#line 105 "lib/Regex/Grammar.y"
+#line 111 "lib/Regex/Grammar.y"
 { return op('seq' => [ $_[1], $_[2] ]); }
 	],
 	[#Rule 11
 		 'expr', 1,
 sub
-#line 107 "lib/Regex/Grammar.y"
+#line 113 "lib/Regex/Grammar.y"
 { return op('match' => [ ord($_[1]) ]); }
 	],
 	[#Rule 12
 		 'expr', 1,
 sub
-#line 109 "lib/Regex/Grammar.y"
+#line 115 "lib/Regex/Grammar.y"
 { return op('classpieces' => [ $_[1] ]); }
 	],
 	[#Rule 13
 		 'expr', 2,
 sub
-#line 111 "lib/Regex/Grammar.y"
+#line 117 "lib/Regex/Grammar.y"
 { return op('multi_match' => [ 0, -1, TRUE, $_[1] ]); }
 	],
 	[#Rule 14
 		 'expr', 3,
 sub
-#line 113 "lib/Regex/Grammar.y"
+#line 119 "lib/Regex/Grammar.y"
 { return op('multi_match' => [ 0, -1, FALSE, $_[1] ]); }
 	],
 	[#Rule 15
 		 'expr', 2,
 sub
-#line 115 "lib/Regex/Grammar.y"
+#line 121 "lib/Regex/Grammar.y"
 { return op('multi_match' => [ 1, -1, TRUE, $_[1] ]); }
 	],
 	[#Rule 16
 		 'expr', 3,
 sub
-#line 117 "lib/Regex/Grammar.y"
+#line 123 "lib/Regex/Grammar.y"
 { return op('multi_match' => [ 1, -1, FALSE, $_[1] ]); }
 	],
 	[#Rule 17
 		 'expr', 2,
 sub
-#line 119 "lib/Regex/Grammar.y"
+#line 125 "lib/Regex/Grammar.y"
 { return op('multi_match' => [ 0, 1, TRUE, $_[1] ]); }
 	],
 	[#Rule 18
 		 'expr', 3,
 sub
-#line 121 "lib/Regex/Grammar.y"
+#line 127 "lib/Regex/Grammar.y"
 { return op('multi_match' => [ 0, 1, FALSE, $_[1] ]); }
 	],
 	[#Rule 19
 		 'expr', 2,
 sub
-#line 123 "lib/Regex/Grammar.y"
+#line 129 "lib/Regex/Grammar.y"
 { return op('multi_match' => [ $_[2]->{min}, $_[2]->{max}, TRUE, $_[1] ]); }
 	],
 	[#Rule 20
 		 'expr', 3,
 sub
-#line 125 "lib/Regex/Grammar.y"
+#line 131 "lib/Regex/Grammar.y"
 { return op('multi_match' => [ $_[2]->{min}, $_[2]->{max}, FALSE, $_[1] ]); }
 	],
 	[#Rule 21
 		 '@1-1', 0,
 sub
-#line 126 "lib/Regex/Grammar.y"
+#line 132 "lib/Regex/Grammar.y"
 { ++$::paren }
 	],
 	[#Rule 22
 		 'expr', 4,
 sub
-#line 127 "lib/Regex/Grammar.y"
+#line 133 "lib/Regex/Grammar.y"
 { return op('group' => [ $_[3], $_[2] ]) }
 	],
 	[#Rule 23
 		 'expr', 5,
 sub
-#line 129 "lib/Regex/Grammar.y"
+#line 135 "lib/Regex/Grammar.y"
 { return $_[4]; }
 	],
 	[#Rule 24
 		 'expr', 3,
 sub
-#line 131 "lib/Regex/Grammar.y"
+#line 137 "lib/Regex/Grammar.y"
 { return op('call' => [ $_[2], 0 ]) }
 	],
 	[#Rule 25
 		 'expr', 4,
 sub
-#line 133 "lib/Regex/Grammar.y"
+#line 139 "lib/Regex/Grammar.y"
 { return op('group', [ op('call' => [ $_[3], 1 ]), ++$::paren ]) }
 	],
 	[#Rule 26
 		 'expr', 1,
 sub
-#line 135 "lib/Regex/Grammar.y"
+#line 141 "lib/Regex/Grammar.y"
 { return op('code' => [ $_[1] ]) }
 	],
 	[#Rule 27
 		 'rulename', 2,
 sub
-#line 139 "lib/Regex/Grammar.y"
+#line 145 "lib/Regex/Grammar.y"
 { return $_[1] . $_[2]; }
 	],
 	[#Rule 28
 		 'rulename', 0,
 sub
-#line 141 "lib/Regex/Grammar.y"
+#line 147 "lib/Regex/Grammar.y"
 { return '' }
 	],
 	[#Rule 29
-		 'range', 5,
+		 'range', 6,
 sub
-#line 145 "lib/Regex/Grammar.y"
-{ return { min => $_[2], max => $_[4] }; }
+#line 151 "lib/Regex/Grammar.y"
+{ return { min => $_[2], max => $_[5] }; }
 	],
 	[#Rule 30
-		 'range', 4,
+		 'range', 5,
 sub
-#line 147 "lib/Regex/Grammar.y"
-{ return { min => 0, max => $_[3] }; }
+#line 153 "lib/Regex/Grammar.y"
+{ return { min => 0, max => $_[4] }; }
 	],
 	[#Rule 31
 		 'range', 3,
 sub
-#line 149 "lib/Regex/Grammar.y"
+#line 155 "lib/Regex/Grammar.y"
 { return { min => $_[2], max => $_[2] }; }
 	],
 	[#Rule 32
-		 'range', 4,
+		 'range', 5,
 sub
-#line 151 "lib/Regex/Grammar.y"
+#line 157 "lib/Regex/Grammar.y"
 { return { min => $_[2], max => -1 }; }
 	],
 	[#Rule 33
 		 'number', 2,
 sub
-#line 154 "lib/Regex/Grammar.y"
+#line 160 "lib/Regex/Grammar.y"
 { return $_[1] * 10 + $_[2]; }
 	],
 	[#Rule 34
 		 'number', 1,
 sub
-#line 155 "lib/Regex/Grammar.y"
+#line 161 "lib/Regex/Grammar.y"
 { return $_[1]; }
 	],
 	[#Rule 35
 		 'charclass', 4,
 sub
-#line 158 "lib/Regex/Grammar.y"
+#line 164 "lib/Regex/Grammar.y"
 { return [ 'neg', $_[3] ]; }
 	],
 	[#Rule 36
 		 'charclass', 4,
 sub
-#line 159 "lib/Regex/Grammar.y"
+#line 165 "lib/Regex/Grammar.y"
 { push @{$_[3]}, '-'; return $_[3]; }
 	],
 	[#Rule 37
 		 'charclass', 3,
 sub
-#line 160 "lib/Regex/Grammar.y"
+#line 166 "lib/Regex/Grammar.y"
 { return $_[2]; }
 	],
 	[#Rule 38
 		 'charclass', 1,
 sub
-#line 161 "lib/Regex/Grammar.y"
+#line 167 "lib/Regex/Grammar.y"
 { return [ 'neg', [] ]; }
 	],
 	[#Rule 39
 		 'classpieces', 2,
 sub
-#line 164 "lib/Regex/Grammar.y"
+#line 170 "lib/Regex/Grammar.y"
 { push @{$_[1]}, $_[2]; return $_[1]; }
 	],
 	[#Rule 40
 		 'classpieces', 0,
 sub
-#line 165 "lib/Regex/Grammar.y"
+#line 171 "lib/Regex/Grammar.y"
 { return []; }
 	],
 	[#Rule 41
 		 'classpiece', 3,
 sub
-#line 169 "lib/Regex/Grammar.y"
+#line 175 "lib/Regex/Grammar.y"
 { return [ $_[1], $_[3] ] }
 	],
 	[#Rule 42
 		 'classpiece', 1,
 sub
-#line 171 "lib/Regex/Grammar.y"
+#line 177 "lib/Regex/Grammar.y"
 { return $_[1]; }
 	],
 	[#Rule 43
 		 'classpiece', 3,
 sub
-#line 173 "lib/Regex/Grammar.y"
+#line 179 "lib/Regex/Grammar.y"
 { return [ $_[1], $_[3] ] }
 	],
 	[#Rule 44
 		 'classpiece', 1,
 sub
-#line 175 "lib/Regex/Grammar.y"
+#line 181 "lib/Regex/Grammar.y"
 { return $_[1]; }
 	]
 ],
@@ -1339,7 +1353,7 @@ sub
     bless($self,$class);
 }
 
-#line 178 "lib/Regex/Grammar.y"
+#line 184 "lib/Regex/Grammar.y"
 
 
 1;

@@ -36,7 +36,8 @@ by default it will be the optimized tree):
 
   perl regex.pl '(a*|b)a' dump
 
-Or you can have it render the tree back to a regular expression:
+Or you can have it render the tree back to a (Perl5 syntax) regular
+expression:
 
   perl regex.pl '(a*|b)a' render
 
@@ -65,16 +66,11 @@ regex-compiler.pbc. Then run ../../parrot 01_basic.imc, ../../parrot
 the compiler for the "regex" language, and then use it to compile some
 code and execute it.
 
-Also, I have hacked in multiple rule definitions into the silly
-frontend parser. I don't intend to stick with this syntax for long,
-since I want to get to a point soon where I can bootstrap this
-engine's own parser, but for now you can define rules with
-'&rulename=...'. So to compile a simple expression parser:
-
-  perl regex.pl --language=perl5 '&expr=<?term>\*<?expr>|<?term>\/<?expr>|<?term>&term=<?atom>\+<?term>|<?atom>\-<?term>|<?atom>&atom=[0-9]+|\(<?expr>\)&default=<?expr>'
-
-Sorry, no closure actions yet. Coming soon. And yes, that is a mess,
-but if you format it nicely it should make more sense:
+Also, I have hacked multiple rule definitions into the silly frontend
+parser. I don't intend to stick with this syntax for long, since I
+want to get to a point soon where I can bootstrap this engine's own
+parser, but for now you can define rules with '&rulename=...'. So to
+compile a simple expression parser, put this in a file 'expr.rx':
 
   &expr = <?term> \* <?expr>
         | <?term> \/ <?expr>
@@ -89,14 +85,36 @@ but if you format it nicely it should make more sense:
 
   &default = <?expr>
 
+and run (on Unix):
+
+  perl regex.pl --language=perl5 --file=expr.rx > expr.pl
+  perl expr.pl '3+(45*2)'
+
 All of the <?foo> things are there so that the rules get nicely
 captured -- by default, nested rule calls are *not* capturing.
 
-The above should now also work with --language=pir as well (actually,
-that's the default).
+You can also insert actions (coded in Perl5, or the language of
+whichever backend you are using), but currently there is no nice way
+of setting the value of a rule, so they are of limited usefulness. An
+example:
 
-If you use the -d flag while generating PIR code, you'll get a very
-verbose description of its matching progress.
+  perl regex.pl --language=perl5 'a* { print "Matched $MATCH{0}\n" }'
+
+The above should now also work with --language=pir as well (actually,
+that's the default). Except that I have everything tangled up. If you
+want a Perl5 program that takes input on stdin and reports the results
+of matching against it, you can use regex.pl. If you want the same for
+PIR code, you'll need to use test.pl.
+
+regex.pl, when using PIR, only generates the core matching
+subroutine(s). The idea is that you would use this script for
+embedding this compiler into your own compiler. Examples of doing this
+on the fly are in 01_basic.imc and 02_date.imc. test.pl, on the other
+hand, is really intended for writing PIR tests of a particular format,
+and doesn't support the Perl5 backend yet.
+
+If you use the -d flag, you'll get a very verbose description of the
+matching progress as you run.
 
 STATUS
 ======

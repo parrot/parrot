@@ -46,12 +46,12 @@ sub genlabel {
 
 sub alloc_temp_int {
     my ($self, $name) = @_;
-    my $NUM_REGISTERS = 32; # ?
-    $name ||= "_temp_int_" . $self->{_temp_int_count};
-    my $register = "\$I" . $self->{_temp_int_count};
-
-    $self->{_temps}{$name} = $register;
-    return $register;
+    $name ||= "_temp_int";
+    if (exists $self->{_temps}{$name}) {
+        $name .= ++$self->{_temp_int_count};
+    }
+    $self->{_temps}{$name} = 'int';
+    return "<$name>";
 }
 
 # This implementation should be overridden by the host language,
@@ -1016,17 +1016,27 @@ sub rewrite_rule {
     # expression.
     my $def = aop('rule_def', [ $name, $trymatch, $backup, $num_groups ]);
 
+    my @declarations;
+    while (my ($var, $type) = each %{ $self->{_temps} }) {
+        push @declarations, aop('declare' => [ $var, $type ]);
+    }
+
     my @ops =
-      ( $backup =>   @restore_rxlocals,
+      ( $backup =>   aop('popint', [ '<tmp>', "restore rule $name start" ]),
+                     aop('setstart', [ "0", '<tmp>' ]),
+                     @restore_rxlocals,
                      aop('goto' => [ $R_back ]),
-        $trymatch => @R_ops,
+        $trymatch => $self->startup($num_groups),
+                     @R_ops,
                      @save_rxlocals,
+                     aop('getstart', [ '<tmp>', "0" ]),
+                     aop('pushint', [ '<tmp>', "save rule $name start" ]),
                      aop('rule_pass', [ $name ]),
             $back => aop('rule_fail', [ $name ]),
                      aop('rule_end', [ $name ]),
       );
 
-    push @{ $def->{args} }, [ $self->startup($num_groups) ];
+    push @{ $def->{args} }, \@declarations;
 
     return (undef, $def, @ops);
 }
@@ -1038,17 +1048,17 @@ sub startup {
 
     my @ops;
     foreach $group (0 .. $num_groups) {
-        push @ops, aop('initgroup', [ $group ]);
+        push @ops, aop('initgroup' => [ $group ]);
     }
 
-    push @ops, aop('setstart', [ "0", '<rx_pos>' ]);
+    push @ops, aop('setstart' => [ "0", '<rx_pos>' ]);
 
     foreach $group (sort keys %{ $self->{_setup_starts} || {} }) {
-        push @ops, aop('setstart', [ $group, -2 ]);
+        push @ops, aop('setstart' => [ $group, -2 ]);
     }
 
     foreach $group (sort keys %{ $self->{_setup_ends} || {} }) {
-        push @ops, aop('setend', [ $group, -2 ]);
+        push @ops, aop('setend' => [ $group, -2 ]);
     }
 
     return @ops;

@@ -401,6 +401,11 @@ sub output_return {
             "ret");
 }
 
+sub output_declare {
+    my ($self, $var, $type) = @_;
+    return (".local $type $var");
+}
+
 sub output_rule_def {
     my ($self, $name, $L_trymatch, $L_backup, $num_groups, $startup) = @_;
 
@@ -480,9 +485,9 @@ sub output_call_result {
 sub output_code {
     my ($self, $code) = @_;
     # Assume, for now, that the code is PIR code
-    return ("# START EMBEDDED CODE",
+    return ("# START EMBEDDED PIR CODE",
             split(/\n/, substr($code, 1, -1)),
-            "# END EMBEDDED CODE");
+            "# END EMBEDDED PIR CODE");
 }
 
 1;

@@ -12,7 +12,7 @@
         .local pmc regex2
         load_bytecode "regex-compiler.pbc"
         compile_regex = compreg "regex"
-        regex1 = compile_regex("([a-zA-Z]{3}) ([a-zA-Z]+) *([0-9])+")
+        regex1 = compile_regex("([a-zA-Z]<3>)\\ ([a-zA-Z]+)\\ *([0-9])+")
         match = regex1("Mon Sep  6 22:45:48 PDT 2004")
 
         print "regex match today =~ /<?weekday> <?month> *<?day>/ (sorta): "
