@@ -114,7 +114,16 @@ What you currently CANNOT do even though the Parser may eat it...
     
 Using the Compiler
 
-  Build it by typing:
+  You will need Flex and Bison installed to build the compiler.
+  These are the GNU versions of the classic lex and yacc, but
+  are more modern. The grammars should work with standard lex/yacc
+  but I've not tested this lately.
+
+  If for some odd reason you have Perl and Parrot but no Flex/Bison
+  send me an email <melvin.smith@mindspring.com> and I might take pity
+  on you and send you the generated parser C files.
+
+  Build colac by typing:
 
 	make
 
