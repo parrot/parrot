@@ -554,29 +554,59 @@ propagate_need(Basic_block *bb, SymReg* r, int i) {
  */
 
 void compute_dominators () {
+#define USE_BFS 1
+
+#if !USE_BFS
     int i, change, pred_index;
+#else
+    int i, cur, len, succ_index;
+    int *q;
+    Set *visited;
+#endif
+
     Edge *edge;
 
     info(2, "compute_dominators\n");
     dominators = malloc(sizeof(Set*) * n_basic_blocks);
 
+
     dominators[0] = set_make (n_basic_blocks);
     set_add(dominators[0], 0);
     for (i=1; i < n_basic_blocks; i++) {
-	    dominators[i] = set_make_full (n_basic_blocks);
-	}
+        dominators[i] = set_make_full (n_basic_blocks);
+    }
 
+#if USE_BFS
+    q = calloc(n_basic_blocks, sizeof(int));
+    visited = set_make (n_basic_blocks);
+    set_add(visited, 0);
+    len=1;
+    cur=0;
+
+    while(cur < len) {
+        for(edge = bb_list[q[cur]]->succ_list; edge; edge = edge->succ_next) {
+            succ_index = edge->to->index;
+            set_intersec_inplace(dominators[succ_index], dominators[q[cur]]);
+            set_add(dominators[succ_index],succ_index);
+
+            if(!set_contains(visited, succ_index)) {
+                set_add(visited, succ_index);
+                q[len++] = succ_index;
+            }
+        }
+        cur++;
+    }
+#else
     change = 1;
-    while (change) {
+    while(change) {
         change = 0;
 
-	/* TODO: This 'for' should be a breadth-first search for speed  */
+	/* TODO: This 'for' should be a breadth-first search for speed */
 	for (i = 1; i < n_basic_blocks; i++) {
 	    Set *s = set_copy (dominators[i]);
 
 	    for (edge=bb_list[i]->pred_list; edge; edge=edge->pred_next) {
 		pred_index = edge->from->index;
-
 		set_intersec_inplace(s, dominators[pred_index]);
 	    }
 
@@ -591,10 +621,13 @@ void compute_dominators () {
                 set_free(s);
 	}
     }
-
+#endif
     if (IMCC_DEBUG & DEBUG_CFG)
 	dump_dominators();
-
+#if USE_BFS
+    free(q);
+    set_free(visited);
+#endif
 }
 
 static void free_dominators(void)

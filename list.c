@@ -50,7 +50,7 @@
  *  - Error checking for out of bounds access is minimal, caller knows
  *    better, what should be done.
  *
- * - List structure itself is ifferent from List_chunk, implying:
+ * - List structure itself is different from List_chunk, implying:
  *   - end of list is not list->prev but list->end
  *   - start of list is list->first
  *   - the list of chunks is not closed, detecting the end is more simple
@@ -311,17 +311,35 @@ rebuild_other(Interp *interpreter, List *list)
         /* two adjacent irregular chunks */
         if (prev && (prev->flags & no_power_2) &&
                 (chunk->flags & no_power_2)) {
-            /* TODO don't make chunks bigger then MAX_ITEMS, no - make then
-             * but: if bigger, split them in a next pass */
-            Parrot_reallocate(interpreter, (Buffer *)prev,
-                    (prev->items + chunk->items) * list->item_size);
-            mem_sys_memmove(
-                    (char *)prev->data.bufstart +
-                    prev->items * list->item_size,
-                    (char *)chunk->data.bufstart,
-                    chunk->items * list->item_size);
-            prev->items += chunk->items;
-            chunk->items = 0;
+            /* DONE don't make chunks bigger then MAX_ITEMS, no - make then
+             * but: if bigger, split them in a next pass 
+             * TODO test the logic that solves the above problem */
+            if(prev->items + chunk->items > MAX_ITEMS) {
+                Parrot_reallocate(interpreter, (Buffer *)prev, 
+                    MAX_ITEMS * list->item_size);
+                mem_sys_memmove(
+                        (char *)prev->data.bufstart +
+                        prev->items * list->item_size,
+                        (char *)chunk->data.bufstart,
+                        (MAX_ITEMS - prev->items) * list->item_size);
+                mem_sys_memmove(
+                        (char *)chunk->data.bufstart,
+                        (char *)chunk->data.bufstart +
+                        (MAX_ITEMS - prev->items) * list->item_size,
+                        (chunk->items - (MAX_ITEMS - prev->items)) * list->item_size);
+                chunk->items = chunk->items - (MAX_ITEMS - prev->items);
+                prev->items = MAX_ITEMS;
+            } else {
+                Parrot_reallocate(interpreter, (Buffer *)prev,
+                        (prev->items + chunk->items) * list->item_size);
+                mem_sys_memmove(
+                        (char *)prev->data.bufstart +
+                        prev->items * list->item_size,
+                        (char *)chunk->data.bufstart,
+                        chunk->items * list->item_size);
+                prev->items += chunk->items;
+                chunk->items = 0;
+            }
             changes++;
             continue;
         }
