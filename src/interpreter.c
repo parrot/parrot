@@ -990,11 +990,15 @@ restore_regs(Parrot_Interp interp, struct regsave *data) {
 /*
 
 =item C<void
-Parrot_runops_fromc_save(Parrot_Interp interpreter, PMC *sub)>
+Parrot_runops_fromc_save(Parrot_Interp, PMC *sub)>
 
 Like above but preserve registers.
 
+=item C<void
+Parrot_run_meth_fromc_save(Parrot_Interp, PMC *sub, PMC *obj, STRING *meth)>
 =cut
+
+Run a method sub from C.
 
 */
 
@@ -1002,6 +1006,17 @@ void
 Parrot_runops_fromc_save(Parrot_Interp interpreter, PMC *sub)
 {
     struct regsave *data = save_regs(interpreter);
+    Parrot_runops_fromc(interpreter, sub);
+    restore_regs(interpreter, data);
+}
+
+void
+Parrot_run_meth_fromc_save(Parrot_Interp interpreter,
+        PMC *sub, PMC *obj, STRING *meth)
+{
+    struct regsave *data = save_regs(interpreter);
+    REG_PMC(2) = obj;
+    REG_STR(0) = meth;
     Parrot_runops_fromc(interpreter, sub);
     restore_regs(interpreter, data);
 }
@@ -1016,9 +1031,13 @@ Parrot_runops_fromc_args(Parrot_Interp interpreter, PMC *sub,
 Parrot_runops_fromc_args_save(Parrot_Interp interpreter, PMC *sub,
         const char *sig, ...)>
 
+=item C<void *
+Parrot_runmeth_fromc_args_save(Parrot_Interp interpreter, PMC *sub,
+        PMC* obj, STRING* meth, const char *sig, ...)>
+
 Run parrot ops, called from C code, function arguments are passed as
 C<va_args> according to signature the C<sub> argument is an invocable
-C<Sub> PMC. The latter preserves registers.
+C<Sub> PMC. The C<_save> variants preserve registers.
 
 Signatures are similar to NCI:
 
@@ -1133,6 +1152,22 @@ Parrot_runops_fromc_args_save(Parrot_Interp interpreter, PMC *sub,
     return ret;
 }
 
+void*
+Parrot_run_meth_fromc_args_save(Parrot_Interp interpreter,
+        PMC *sub, PMC *obj, STRING *meth, const char *sig, ...)
+{
+    struct regsave *data = save_regs(interpreter);
+    va_list args;
+    void *ret;
+
+    REG_PMC(2) = obj;
+    REG_STR(0) = meth;
+    va_start(args, sig);
+    ret = runops_args(interpreter, sub, sig, args);
+    va_end(args);
+    restore_regs(interpreter, data);
+    return ret;
+}
 /*
 
 =item C<PMC* Parrot_make_cb(Parrot_Interp interpreter, PMC* sub, PMC* user

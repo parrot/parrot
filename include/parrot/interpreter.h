@@ -343,6 +343,11 @@ void Parrot_runops_fromc_save(Parrot_Interp, PMC *sub);
 void* Parrot_runops_fromc_args(Parrot_Interp, PMC *sub, const char *sig, ...);
 void* Parrot_runops_fromc_args_save(Parrot_Interp, PMC *, const char *, ...);
 
+void Parrot_run_meth_fromc_save(Parrot_Interp, PMC *sub,
+        PMC* obj, STRING *meth);
+void* Parrot_run_meth_fromc_args_save(Parrot_Interp, PMC *sub,
+        PMC* obj, STRING *meth, const char *signature, ...);
+
 void Parrot_callback_C(void *external_data, PMC *callback_info);
 void Parrot_callback_D(PMC *callback_info, void *external_data);
 PMC* Parrot_make_cb(Parrot_Interp interpreter, PMC* sub, PMC* user_data,

@@ -23,6 +23,7 @@ linux-x86-icc8               Y    Y    Y     Y   Y      Y       Y
 linux-x86_64-gcc3.3.3    8   Y    -    -     Y   Y      Y       Y
 netbsd                                 Y                Y       Y*1
 openbsd                      Y    Y/5  Y     Y   -      Y       Y
+openbsd_beta_3.5-vax                                    Y*4     Y/26
 os2
 solaris8-sparc-cc       B    -    Y/84 -     -   -      Y       Y
 tru64-alpha-gcc          8                   Y          Y       Y
@@ -54,3 +55,4 @@ Remarks:
 *1 no recent report
 *2 needs Configure.pl --define=inet_aton
 *3 kernel 2.6.1 NPTL: signal_2 and _4 failing due to test script problems
+*4 need deactivating of  PARROT_HAS_HEADER_DLFCN

@@ -26,7 +26,7 @@ typedef struct _meth_cache_entry {
 } Meth_cache_entry;
 
 /*
- * method cache, continuation freelist, stack chunk freelist
+ * method cache, continuation freelist, stack chunk freelist, regsave cache
  */
 typedef struct _Caches {
     UINTVAL mc_size;            /* sizeof table */
@@ -34,6 +34,8 @@ typedef struct _Caches {
     /* PMC **hash */            /* for non-constant keys */
     PMC *retc_free_list;        /* recycled return continuations */
     void *stack_chunk_cache;    /* stack chunk recycling */
+
+    void *regs_cache;           /* runops_fromc reg save cache */
 } Caches;
 
 void init_object_cache(Parrot_Interp interpreter);
