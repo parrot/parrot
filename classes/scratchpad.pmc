@@ -31,7 +31,8 @@ pmclass Scratchpad {
     }
 
     void destroy () {
-	mem_sys_free(PMC_data(SELF));
+        if (PMC_data(SELF))
+	    mem_sys_free(PMC_data(SELF));
     }
 
     STRING* name () {
