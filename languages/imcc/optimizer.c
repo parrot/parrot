@@ -57,7 +57,7 @@ static void subst_constants(struct Parrot_Interp *interp);
 static void subst_constants_c(struct Parrot_Interp *interp);
 static void subst_constants_if(struct Parrot_Interp *interp);
 
-static void constant_propagation(struct Parrot_Interp *interp);
+static int constant_propagation(struct Parrot_Interp *interp);
 static int used_once(void);
 static int loop_optimization(struct Parrot_Interp *);
 static int clone_remove(void);
@@ -95,9 +95,10 @@ int cfg_optimize(struct Parrot_Interp *interp) {
 
 int optimize(struct Parrot_Interp *interp) {
 
+    int any = 0;
     if (optimizer_level & OPT_CFG) {
         info(2, "optimize\n");
-        constant_propagation(interp);
+        any = constant_propagation(interp);
         if (clone_remove())
             return 1;
         if (used_once())
@@ -105,7 +106,7 @@ int optimize(struct Parrot_Interp *interp) {
         if (loop_optimization(interp))
             return 1;
     }
-    return 0;
+    return any;
 }
 
 /* get negated opterator for op */
@@ -299,7 +300,7 @@ set_it:
  * even though sometimes it may be safe
  */
 
-static void
+static int
 constant_propagation(struct Parrot_Interp *interp)
 {
     Instruction *ins, *ins2;
@@ -307,6 +308,7 @@ constant_propagation(struct Parrot_Interp *interp)
     int i;
     char fullname[128];
     SymReg *c, *old, *o;
+    int any = 0;
 
     info(2, "\tconstant_propagation\n");
     for (ins = instructions; ins; ins = ins->next) {
@@ -344,6 +346,7 @@ constant_propagation(struct Parrot_Interp *interp)
                             else {
                                 --old->use_count;
                                 ins2->opnum = op;
+                                any = 1;
                                 debug(DEBUG_OPT2," -> %s\n", ins_string(ins2));
                             }
                         }
@@ -355,6 +358,7 @@ constant_propagation(struct Parrot_Interp *interp)
 next_constant:;
 
     }/*for(ins ... )*/
+    return any;
 }
 
 

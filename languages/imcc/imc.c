@@ -94,6 +94,8 @@ void allocate(struct Parrot_Interp *interpreter) {
             todo = 0;
         else {
             todo = optimize(interpreter);
+            if (todo)
+                pre_optimize(interpreter);
         }
     }
     todo = 1;

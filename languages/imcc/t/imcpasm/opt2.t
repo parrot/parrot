@@ -1,6 +1,6 @@
 #!perl
 use strict;
-use TestCompiler tests => 4;
+use TestCompiler tests => 5;
 
 # these tests are run with -O2 by TestCompiler and show
 # generated PASM code for various optimizations at level 2
@@ -57,7 +57,7 @@ CODE
 _main:
   set I1, 10
   set I0, 5
-  lt 10, 20, nxt
+  branch nxt
 add:
   add I0, I1, I1
   print I0
@@ -94,5 +94,20 @@ next:
 	print I0
 	lt I1, 4, next
 	end
+OUT
+
+##############################
+output_is(<<'CODE', <<'OUT', "constant prop repeated");
+  .local int a
+  .local int b
+  .local int sum
+  a = 10
+  b = 5
+  sum = a + b
+  print sum
+  end
+CODE
+  print 15
+  end
 OUT
 
