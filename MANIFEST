@@ -340,6 +340,10 @@ examples/benchmarks/oo1.pasm                      [main]doc
 examples/benchmarks/oo1-prop.pasm                 [main]doc
 examples/benchmarks/oo1.pl                        [main]doc
 examples/benchmarks/oo1.py                        [main]doc
+examples/benchmarks/oo2.pasm                      [main]doc
+examples/benchmarks/oo2-prop.pasm                 [main]doc
+examples/benchmarks/oo2.pl                        [main]doc
+examples/benchmarks/oo2.py                        [main]doc
 examples/benchmarks/primes.c                      [main]doc
 examples/benchmarks/primes.pasm                   [main]doc
 examples/benchmarks/primes.pl                     [main]doc
