@@ -1039,73 +1039,59 @@ Parrot_find_method_with_cache(Interp* interpreter, PMC *class,
                               STRING *method_name)
 {
 
-    UINTVAL type = class->vtable->base_type;
-    Caches *mc = interpreter->caches;
+    UINTVAL type;
+    Caches *mc;
     PMC *found;
-    int store_it = 0;
-    int is_const = PObj_constant_TEST(method_name);
-    UINTVAL bits = (((UINTVAL) method_name->strstart ) >> 2) & TBL_SIZE_MASK;
-    Meth_cache_entry *e, *old = NULL;
+    int is_const;
+    UINTVAL bits, i;
+    Meth_cache_entry *e, *old;
 
 #if DISABLE_METH_CACHE
     return find_method_direct(interpreter, class, method_name);
 #endif
 
-    if (!is_const || !mc) {
-        /* TODO use hash - for now just go look up */
-        goto find_it;
+    is_const = PObj_constant_TEST(method_name);
+    if (!is_const) {
+        return find_method_direct(interpreter, class, method_name);
     }
-
-    if (type >= mc->mc_size || !mc->idx[type] || !mc->idx[type][bits]) {
-        store_it = 1;
-find_it:
+    mc = interpreter->caches;
+    type = class->vtable->base_type;
+    bits = (((UINTVAL) method_name->strstart ) >> 2) & TBL_SIZE_MASK;
+    if (type >= mc->mc_size) {
+        if (mc->idx) {
+            mc->idx = mem_sys_realloc(mc->idx, sizeof(UINTVAL*) * (type + 1));
+        } else {
+            mc->idx = mem_sys_allocate(sizeof(UINTVAL*) * (type + 1));
+        }
+        for (i = mc->mc_size; i <= type; ++i)
+            mc->idx[i] = NULL;
+        mc->mc_size = type + 1;
+    }
+    if (!mc->idx[type]) {
+        mc->idx[type] = mem_sys_allocate(sizeof(Meth_cache_entry*) * TBL_SIZE);
+        for (i = 0; i < TBL_SIZE; ++i)
+            mc->idx[type][i] = NULL;
+    }
+    e = mc->idx[type][bits];
+    old = NULL;
+    while (e && e->strstart != method_name->strstart) {
+        old = e;
+        e = e->next;
+    }
+    if (!e) {
         found = find_method_direct(interpreter, class, method_name);
-    }
-    else {
-        e = mc->idx[type][bits];
-        while (e && e->strstart != method_name->strstart) {
-            old = e;
-            e = e->next;
-        }
-        if (!e) {
-            found = find_method_direct(interpreter, class, method_name);
-            goto store_e;
-        }
-        return e->pmc;
-    }
-    if (store_it) {
-        UINTVAL i;
-        if (type >= mc->mc_size) {
-            if (mc->idx) {
-                mc->idx = mem_sys_realloc(mc->idx,
-                                          sizeof(UINTVAL*) * (type + 1));
-            } else {
-                mc->idx = mem_sys_allocate(sizeof(UINTVAL*) * (type + 1));
-            }
-            for (i = mc->mc_size; i <= type; ++i)
-                mc->idx[i] = NULL;
-            mc->mc_size = type + 1;
-        }
-        if (!mc->idx[type]) {
-            mc->idx[type] = mem_sys_allocate(sizeof(Meth_cache_entry*) *
-                    TBL_SIZE);
-            for (i = 0; i < TBL_SIZE; ++i)
-                mc->idx[type][i] = NULL;
-        }
-        old = mc->idx[type][bits];
-store_e:
         /* when here no or no correct entry was at [bits] */
         e = mem_sys_allocate(sizeof(Meth_cache_entry));
         if (old)
             old->next = e;
         else
             mc->idx[type][bits] = e;
-
         e->pmc = found;
         e->next = NULL;
         e->strstart = method_name->strstart;
     }
-    return found;
+
+    return e->pmc;
 }
 
 #ifdef NDEBUG
@@ -1147,26 +1133,15 @@ find_method_direct_1(Interp* interpreter, PMC *class,
                               STRING *method_name)
 {
     PMC* method, *mro;
-    STRING *class_name;
+    STRING *namespace_name;
     INTVAL i, n;
 
     mro = class->vtable->mro;
     n = VTABLE_elements(interpreter, mro);
     for (i = 0; i < n; ++i) {
         class = VTABLE_get_pmc_keyed_int(interpreter, mro, i);
-        /*
-         * TODO add a classname vtable
-         * see also the opcode
-         */
-        if (PObj_is_class_TEST(class)) {
-            class_name = VTABLE_get_string(interpreter,
-                get_attrib_num((SLOTTYPE *)PMC_data(class),
-                    PCD_CLASS_NAME));
-        }
-        else {
-            class_name = class->vtable->whoami;
-        }
-        method = Parrot_find_global(interpreter, class_name, method_name);
+        namespace_name = VTABLE_namespace_name(interpreter, class);
+        method = Parrot_find_global(interpreter, namespace_name, method_name);
         TRACE_FM(interpreter, class, method_name, method);
         if (method) {
             return method;

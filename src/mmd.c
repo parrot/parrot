@@ -669,7 +669,8 @@ static PMC* mmd_arg_tuple_inline(Interp *, STRING *signature, va_list args);
 static PMC* mmd_arg_tuple_func(Interp *, STRING *signature);
 static PMC* mmd_search_default(Interp *, STRING *meth, PMC *arg_tuple);
 static PMC* mmd_search_scopes(Interp *, STRING *meth, PMC *arg_tuple);
-static void mmd_search_classes(Interp *, STRING *meth, PMC *arg_tuple, PMC *);
+static void mmd_search_classes(Interp *, STRING *meth, PMC *arg_tuple, PMC *,
+        INTVAL start);
 static int  mmd_search_lexical(Interp *, STRING *meth, PMC *arg_tuple, PMC *);
 static int  mmd_search_package(Interp *, STRING *meth, PMC *arg_tuple, PMC *);
 static int  mmd_search_global(Interp *, STRING *meth, PMC *arg_tuple, PMC *);
@@ -734,16 +735,26 @@ Parrot_MMD_search_default_func(Interp *interpreter, STRING *meth,
      */
     return mmd_search_default(interpreter, meth, arg_tuple);
 }
+/*
 
-/* XXX */
-PMC * Parrot_MMD_dispatch_func(Interp *, PMC *multi, STRING *signature);
+=item C<PMC* Parrot_MMD_dispatch_func(Interp *, PMC *multi, STRING *signature)>
+
+Given a multi sub PMC (usually the multi method of one class) return the
+best matching function for the call signature and call arguments according
+to pdd03.
+
+=cut
+
+*/
 
 PMC *
-Parrot_MMD_dispatch_func(Interp *interpreter, PMC *multi,
+Parrot_MMD_dispatch_func(Interp *interpreter, PMC *multi, STRING *meth,
         STRING *signature)
 {
     PMC* arg_tuple, *pmc;
+    PMC *candidate_list;
     INTVAL n;
+
     /*
      * 1) create argument tuple
      */
@@ -751,18 +762,28 @@ Parrot_MMD_dispatch_func(Interp *interpreter, PMC *multi,
     n = VTABLE_elements(interpreter, multi);
     if (!n)
         return NULL;
+
+    candidate_list = VTABLE_clone(interpreter, multi);
+    /*
+     * 4) go through all parents of MRO and check for methods
+     *    where the first argument matches
+     *
+     *    XXX do we need this?
+     */
+    if (meth)
+        mmd_search_classes(interpreter, meth, arg_tuple, candidate_list, 1);
     /*
      * 5) sort the list
      */
     if (n > 1)
-        mmd_sort_candidates(interpreter, arg_tuple, multi);
-    n = VTABLE_elements(interpreter, multi);
+        mmd_sort_candidates(interpreter, arg_tuple, candidate_list);
+    n = VTABLE_elements(interpreter, candidate_list);
     if (!n)
         return NULL;
     /*
      * 6) Uff, return first one
      */
-    pmc = VTABLE_get_pmc_keyed_int(interpreter, multi, 0);
+    pmc = VTABLE_get_pmc_keyed_int(interpreter, candidate_list, 0);
     return pmc;
 }
 
@@ -935,7 +956,7 @@ mmd_search_default(Interp *interpreter, STRING *meth, PMC *arg_tuple)
      *    the first arguments MRO, add all MultiSubs and plain methods,
      *    where the first argument matches
      */
-    mmd_search_classes(interpreter, meth, arg_tuple, candidate_list);
+    mmd_search_classes(interpreter, meth, arg_tuple, candidate_list, 0);
     n = VTABLE_elements(interpreter, candidate_list);
     if (!n)
         return NULL;
@@ -956,21 +977,22 @@ mmd_search_default(Interp *interpreter, STRING *meth, PMC *arg_tuple)
 
 /*
 
-=item C<static void mmd_search_classes(Interp *, STRING *meth, PMC *arg_tuple, PMC *cl)>
+=item C<static void mmd_search_classes(Interp *, STRING *meth, PMC *arg_tuple, PMC *cl, INTVAL start_at_parent)>
 
 Search all the classes in all MultiSubs of the candidates C<cl> and return
-a list of all candidates.
+a list of all candidates. C<start_at_parent> is 0 to start at the class itself
+or 1 to search from the first parent class.
 
 =cut
 
 */
 
 static void
-mmd_search_classes(Interp *interpreter, STRING *meth, PMC *arg_tuple, PMC *cl)
+mmd_search_classes(Interp *interpreter, STRING *meth, PMC *arg_tuple,
+        PMC *cl, INTVAL start_at_parent)
 {
     PMC *pmc, *mro, *class;
     INTVAL i, n, type1;
-    STRING *namespace_name;
 
     /*
      * get the class of the first argument
@@ -984,10 +1006,9 @@ mmd_search_classes(Interp *interpreter, STRING *meth, PMC *arg_tuple, PMC *cl)
     else {
         mro = Parrot_base_vtables[type1]->mro;
         n = VTABLE_elements(interpreter, mro);
-        for (i = 0; i < n; ++i) {
+        for (i = start_at_parent; i < n; ++i) {
             class = VTABLE_get_pmc_keyed_int(interpreter, mro, i);
-            namespace_name = VTABLE_namespace_name(interpreter, class);
-            pmc = Parrot_find_global(interpreter, namespace_name, meth);
+            pmc = Parrot_find_method_with_cache(interpreter, class, meth);
             if (pmc) {
                 /*
                  * mmd_is_hidden would consider all previous candidates

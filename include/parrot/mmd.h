@@ -51,6 +51,8 @@ typedef struct _MMD_table {
 
 
 PMC *Parrot_MMD_search_default_func(Interp *, STRING *meth, STRING *signature);
+PMC *Parrot_MMD_dispatch_func(Interp *, PMC *multi, STRING *meth,
+        STRING *signature);
 /*
  * in src/objects.c :
  */

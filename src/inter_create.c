@@ -152,6 +152,9 @@ make_interpreter(Parrot_Interp parent, Interp_flags flags)
     /* Go and init the MMD tables */
     register_fallback_methods(interpreter);
 
+    /* create caches structure */
+    init_object_cache(interpreter);
+
     /* initialize classes - this needs mmd func table */
     Parrot_init(interpreter);
 
@@ -164,8 +167,6 @@ make_interpreter(Parrot_Interp parent, Interp_flags flags)
     /* undefined globals are errors by default */
     PARROT_ERRORS_on(interpreter, PARROT_ERRORS_GLOBALS_FLAG);
 
-    /* create caches structure */
-    init_object_cache(interpreter);
     /* allocate stack chunk cache */
     stack_system_init(interpreter);
     /* Set up the initial register chunks */
