@@ -2747,15 +2747,21 @@ Parrot_jit_normal_op(Parrot_jit_info_t *jit_info,
 }
 
 #  else /* JIT_CGP */
+extern int jit_op_count(void);
 
 void
 Parrot_jit_normal_op(Parrot_jit_info_t *jit_info,
                      struct Parrot_Interp * interpreter)
 {
+    int cur_op = *jit_info->cur_op;
+
+    if (cur_op >= jit_op_count()) {
+        cur_op = CORE_OPS_wrapper__;
+    }
     emitm_pushl_i(jit_info->native_ptr, jit_info->cur_op);
 
     call_func(jit_info,
-        (void (*)(void))interpreter->op_func_table[*(jit_info->cur_op)]);
+            (void (*)(void))interpreter->op_func_table[cur_op]);
     emitm_addb_i_r(jit_info->native_ptr, 4, emit_ESP);
 }
 

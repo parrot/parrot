@@ -243,7 +243,6 @@ print JITCPU<<END_C;
 
 #define Parrot_jit_restart_op Parrot_jit_cpcf_op
 
-
 #include"parrot/jit_emit.h"
 
 #undef CONST
@@ -417,6 +416,13 @@ for ($i = 0; $i < $core_numops; $i++) {
 }
 
 print JITCPU @jit_funcs, "};\n";
+
+if ($genfile eq "jit_cpu.c") {
+    print JITCPU <<EOC;
+    extern int jit_op_count(void);
+    int jit_op_count() { return $core_numops; }
+EOC
+}
 
 print("jit2h: $njit (+ $vjit vtable) of $core_numops ops are JITed.\n");
 sub make_subs {

@@ -113,6 +113,10 @@ sub run_core_finish {
     my ($self, $base) = @_;
     my $c = <<END_C;
 	default:
+	    if (*cur_opcode >= 0 && *cur_opcode < (opcode_t)op_lib.op_count) {
+		*cur_opcode = CORE_OPS_wrapper__;
+		continue;
+	    }
 	    internal_exception(1, "illegal opcode\\n");
 	    break;
 	} /* switch */

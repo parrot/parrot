@@ -1049,8 +1049,10 @@ sysinfo_s(Parrot_Interp interpreter, INTVAL info_wanted)
 /*
  * dynamic loading stuff
  */
-static void dynop_register_xx(Parrot_Interp, PMC*, op_lib_t *, op_lib_t *,
+static void dynop_register_xx(Parrot_Interp, PMC*, size_t, size_t,
         oplib_init_f init_func);
+static void dynop_register_switch(Parrot_Interp, PMC*, size_t, size_t);
+
 
 /*=for api interpreter dynop_register
  *
@@ -1113,13 +1115,14 @@ dynop_register(Parrot_Interp interpreter, PMC* lib_pmc)
     core->flags = OP_FUNC_IS_ALLOCATED | OP_INFO_IS_ALLOCATED;
     /* done for plain core */
 #if defined HAVE_COMPUTED_GOTO
-    dynop_register_xx(interpreter, lib_pmc, lib, core,
+    dynop_register_xx(interpreter, lib_pmc, n_old, n_new,
                       PARROT_CORE_CGP_OPLIB_INIT);
-    dynop_register_xx(interpreter, lib_pmc, lib, core,
+    dynop_register_xx(interpreter, lib_pmc, n_old, n_new,
                       PARROT_CORE_CG_OPLIB_INIT);
 #endif
-    dynop_register_xx(interpreter, lib_pmc, lib, core,
+    dynop_register_xx(interpreter, lib_pmc, n_old, n_new,
                       PARROT_CORE_PREDEREF_OPLIB_INIT);
+    dynop_register_switch(interpreter, lib_pmc, n_old, n_new);
 }
 
 /*
@@ -1127,16 +1130,13 @@ dynop_register(Parrot_Interp interpreter, PMC* lib_pmc)
  */
 static void
 dynop_register_xx(Parrot_Interp interpreter, PMC* lib_pmc,
-        op_lib_t *lib, op_lib_t *core, oplib_init_f init_func)
+        size_t n_old, size_t n_new, oplib_init_f init_func)
 {
     op_lib_t *cg_lib;
     void **ops_addr;
-    size_t i, n_old, n_new, n_tot;
+    size_t i, n_tot;
 
-    n_new = lib->op_count;
-    n_tot = n_old = core->op_count;
-    n_old -= n_new;
-
+    n_tot = n_old + n_new;
     cg_lib = init_func(1);
 
     if (cg_lib->flags & OP_FUNC_IS_ALLOCATED) {
@@ -1160,6 +1160,14 @@ dynop_register_xx(Parrot_Interp interpreter, PMC* lib_pmc,
     cg_lib->op_func_table = (void *) ops_addr;
     cg_lib->op_count = n_tot;
     init_func((int) ops_addr);
+}
+
+static void
+dynop_register_switch(Parrot_Interp interpreter, PMC* lib_pmc,
+        size_t n_old, size_t n_new)
+{
+    op_lib_t *lib = PARROT_CORE_SWITCH_OPLIB_INIT(1);
+    lib->op_count = n_old + n_new;
 }
 
 /*

@@ -14,6 +14,7 @@
 #include "parrot/jit_emit.h"
 #include "parrot/packfile.h"
 
+extern int jit_op_count(void);
 /*
  * s. jit/$arch/jit_emit.h for the meaning of these defs
  */
@@ -154,9 +155,13 @@ make_branch_list(struct Parrot_Interp *interpreter,
      */
 
     while (cur_op < code_end) {
+        opcode_t op = *cur_op;
+        if (*cur_op >= jit_op_count())
+           op = CORE_OPS_wrapper__;
+
         /* Predereference the opcode information table for this opcode
          * early since it's going to be used many times */
-        op_info = &interpreter->op_info_table[*cur_op];
+        op_info = &interpreter->op_info_table[op];
 
         /* if op_info->jump is not 0 this opcode may jump,
          * so mark this opcode as a branch source */
@@ -317,10 +322,13 @@ make_sections(struct Parrot_Interp *interpreter,
 
     cur_op = code_start;
     while (cur_section) {
+        opcode_t op = *cur_op;
+        if (*cur_op >= jit_op_count())
+           op = CORE_OPS_wrapper__;
         branched = start_new = 0;
         /* Predereference the opcode information for this opcode
          * early since it's going to be used many times */
-        op_info = &interpreter->op_info_table[*cur_op];
+        op_info = &interpreter->op_info_table[op];
 
         /* Calculate the next pc */
         next_op = cur_op + op_info->arg_count;
@@ -546,7 +554,10 @@ assign_registers(struct Parrot_Interp *interpreter,
     /* For each opcode in this section */
     cur_op = cur_section->begin;
     while (cur_op <= cur_section->end) {
-        op_info = &interpreter->op_info_table[*cur_op];
+        opcode_t op = *cur_op;
+        if (*cur_op >= jit_op_count())
+           op = CORE_OPS_wrapper__;
+        op_info = &interpreter->op_info_table[op];
         /* For each argument of the current opcode */
         for (op_arg = 1; op_arg < op_info->arg_count; op_arg++) {
             /* get the register typ */
@@ -627,7 +638,10 @@ debug_sections(struct Parrot_Interp *interpreter,
                 cur_section->block);
         for (cur_op = cur_section->begin; cur_op <= cur_section->end;) {
             char instr[256];
-            op_info = &interpreter->op_info_table[*cur_op];
+            opcode_t op = *cur_op;
+            if (*cur_op >= jit_op_count())
+                op = CORE_OPS_wrapper__;
+            op_info = &interpreter->op_info_table[op];
             PDB_disassemble_op(interpreter, instr, sizeof(instr),
                     op_info, cur_op, NULL, code_start, 0);
             PIO_eprintf(interpreter, "\t\tOP%vu: ext %3d\t%s\n",
@@ -769,7 +783,10 @@ optimize_imcc_jit(struct Parrot_Interp *interpreter, opcode_t *cur_op,
 
         }
         while (cur_op <= section->end) {
-            op_info = &interpreter->op_info_table[*cur_op];
+            opcode_t op = *cur_op;
+            if (*cur_op >= jit_op_count())
+                op = CORE_OPS_wrapper__;
+            op_info = &interpreter->op_info_table[op];
             set_register_usage(interpreter, optimizer, section,
                     op_info, cur_op, code_start);
             section->op_count++;
@@ -932,6 +949,8 @@ Parrot_destroy_jit(void *ptr)
 ** build_asm()
 */
 
+
+
 jit_f
 build_asm(struct Parrot_Interp *interpreter, opcode_t *pc,
           opcode_t *code_start, opcode_t *code_end,
@@ -1089,6 +1108,9 @@ build_asm(struct Parrot_Interp *interpreter, opcode_t *pc,
             }
 
             /* Generate native code for current op */
+            if (cur_opcode_byte >= jit_op_count()) {
+                cur_opcode_byte = CORE_OPS_wrapper__;
+            }
             (op_func[cur_opcode_byte].fn) (jit_info, interpreter);
 
             /* Update the previous opcode */
