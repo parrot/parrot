@@ -378,7 +378,7 @@ Parrot_exec_save(Parrot_exec_objfile_t *obj, const char *file)
                 break;
             case STYPE_COM:
                 symlst.st_value = obj->symbol_table[i].value;
-                symlst.st_size = obj->data_size[i];
+                /* symlst.st_size = obj->data_size[i]; XXX daniel why? */
                 symlst.st_info = ELF32_ST_INFO(STB_GLOBAL, STT_OBJECT);
                 symlst.st_shndx = SHN_COMMON;
                 break;
