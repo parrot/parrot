@@ -16,7 +16,7 @@ Tests the C<Iterator> PMC.
 
 =cut
 
-use Parrot::Test tests => 43;
+use Parrot::Test tests => 44;
 use Test::More qw(skip);
 
 output_is(<<'CODE', <<'OUTPUT', "new iter");
@@ -399,10 +399,6 @@ output_is(<< 'CODE', << 'OUTPUT', "Index access for Iterator on PerlArray");
     iter_1 = new Iterator, array_1
     iter_1 = .ITERATE_FROM_START
 
-    print 'Iterator get_string: '
-    print iter_1
-    print "\n"
-
     .local string elem_1
 
     print 'Iterator shift_string: '
@@ -458,10 +454,6 @@ output_is(<< 'CODE', << 'OUTPUT', "Index access for Iterator on PerlArray");
     iter_2 = new Iterator, array_1
     iter_2 = .ITERATE_FROM_END
 
-    print 'Iterator get_string: '
-    print iter_1
-    print "\n"
-
     print 'Iterator shift_float: '
     .local float elem_2
     shift elem_2, iter_2
@@ -478,7 +470,6 @@ output_is(<< 'CODE', << 'OUTPUT', "Index access for Iterator on PerlArray");
 .end
 CODE
 PerlArray get_string: 8
-Iterator get_string: 8
 Iterator shift_string: a
 Iterator get_string_keyed_int 2: d
 Iterator get_string_keyed_int -1: a
@@ -488,7 +479,6 @@ Iterator exists_keyed_int 3: 1
 Iterator exists_keyed_int 28: 0
 Iterator defined_keyed_int 3: 1
 Iterator defined_keyed_int -1278: 0
-Iterator get_string: 8
 Iterator shift_float: -8.800000
 Iterator get_integer: 7
 OUTPUT
@@ -1396,3 +1386,22 @@ ok 1
 4 e
 5 f
 OUTPUT
+
+output_is(<<'CODE', <<'OUTPUT', "iter.next method");
+##PIR##
+.sub main @MAIN
+   new $P0, .PerlString
+   set $P0, "abcdef"
+   iter $P1, $P0
+lp:unless $P1, ex
+   $P2 = $P1."next"()
+   print $P2
+   goto lp
+ex:
+   print "\n"
+.end
+CODE
+abcdef
+OUTPUT
+
+

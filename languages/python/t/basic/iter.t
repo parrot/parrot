@@ -3,7 +3,7 @@
 use strict;
 use lib '../../lib';
 
-use Parrot::Test tests => 5;
+use Parrot::Test tests => 7;
 
 sub test {
     language_output_is('python', $_[0], '', $_[1]);
@@ -65,4 +65,31 @@ def main():
 
 if __name__ == "__main__":
 	main()
+CODE
+
+test(<<'CODE', 'enumerate, it.next');
+
+if __name__ == '__main__':
+    it = iter("abcdef")
+    for i, c in enumerate(it):
+        print i, c
+        if i == 2:
+            break
+    print it.next()
+CODE
+
+test(<<'CODE', 'enumerate, it.next, StopIteration exception');
+if __name__ == '__main__':
+    it = iter("abcde")
+    for i, c in enumerate(it):
+        print i, c
+        if i == 2:
+            break
+    print it.next()
+    print it.next()
+    try:
+	print it.next()
+    except StopIteration:
+	pass
+    print "Ok"
 CODE

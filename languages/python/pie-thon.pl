@@ -855,6 +855,11 @@ EOC
 	$t = $func $args   $cmt
 EOC
     }
+    elsif ($name =~/^obj (\w+) attr (\w+)/) {  # convert to meth call syntax
+	print <<EOC;
+	$1."$2"($args)  $cmt
+EOC
+    }
     else {
 	print <<EOC;
 	$func($args)  $cmt
@@ -1152,7 +1157,7 @@ sub BUILD_CLASS
     print <<EOC;
 	$cl = newclass $tos->[1] $cmt
 EOC
-    push @stack, ['class $tos->[1]', $cl, 'P'];
+    push @stack, ["class $tos->[1]", $cl, 'P'];
 }
 
 sub BREAK_LOOP
@@ -1172,5 +1177,5 @@ sub LOAD_ATTR
     print <<EOC;
 	 $attr = getattribute $tos->[1], "$c" $cmt
 EOC
-    push @stack, [-1, $attr, 'P'];
+    push @stack, ["obj $tos->[1] attr $c", $attr, 'P'];
 }

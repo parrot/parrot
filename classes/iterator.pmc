@@ -103,24 +103,22 @@ TODO: keep track of current position and direction
 */
 
     INTVAL get_integer () {
-        PMC *agg = PMC_pmc_val(SELF);
-        return VTABLE_get_integer(INTERP, agg );
+        return SELF.elements();
     }
 
 /*
 
 =item C<STRING *get_string()>
 
-Returns the number of remaining elements as a Parrot string.
-TODO: keep track of current position and direction
+Returns a textual representation of the iterator.
 
 =cut
 
 */
 
     STRING* get_string () {
-        PMC *agg = PMC_pmc_val(SELF);
-        return string_from_int(INTERP, VTABLE_get_integer(INTERP, agg ) );
+        PMC *key = PMC_struct_val(SELF);
+        return string_from_int(INTERP, key_integer(INTERP, key));
     }
 
 /*
@@ -254,7 +252,7 @@ Returns true if the idx/key is not C<-1>.
 
 =item C<INTVAL elements()>
 
-Returns the number of elements in the aggregate.
+Returns the number of remaining elements in the aggregate. TODO.
 
 =cut
 
@@ -459,12 +457,6 @@ See F<docs/pdds/pdd03_calling_conventions.pod>.
         INTVAL ires;
 
         REG_INT(1) = REG_INT(2) = REG_INT(3) = REG_INT(4) = 0;
-        if (!key)
-            return next;
-        if (PMC_int_val(key) == -1) {
-            real_exception(INTERP, NULL, E_StopIteration, "StopIteration");
-            return next;
-        }
         key = PMC_struct_val(SELF);
         agg = PMC_pmc_val(SELF);
         switch (agg->vtable->base_type) {
@@ -479,6 +471,7 @@ See F<docs/pdds/pdd03_calling_conventions.pod>.
                 REG_PMC(5) = res;
                 return next;
         }
+        return NULL;
     }
 
 /*
@@ -546,7 +539,12 @@ the next one.
     PMC* shift_pmc () {
         PMC *key = PMC_struct_val(SELF);
         PMC *agg = PMC_pmc_val(SELF);
-        PMC *ret = VTABLE_get_pmc_keyed(INTERP, agg, key);
+        PMC *ret;
+        if (key_integer(INTERP, key) == -1) {
+            real_exception(INTERP, NULL, E_StopIteration, "StopIteration");
+            return NULL;
+        }
+        ret = VTABLE_get_pmc_keyed(INTERP, agg, key);
         PMC_struct_val(SELF) =
             VTABLE_nextkey_keyed(INTERP, key, agg, ITERATE_GET_NEXT);
         return ret;

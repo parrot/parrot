@@ -23,10 +23,15 @@ These is an Iterator return [idx, item] tuples.
 pmclass Enumerate extends Iterator {
 
     void init_pmc(PMC* iterable) {
-	SUPER(iterable);
-	PMC_struct_val(SELF) = key_new_integer(INTERP, 0);
-        PMC_pmc_val(SELF) =
-            pmc_new_init(INTERP, enum_class_Iterator, iterable);
+        SUPER(iterable);
+        PMC_struct_val(SELF) = key_new_integer(INTERP, 0);
+        if (iterable->vtable->base_type == enum_class_Iterator) {
+            /* TODO || isa(iter) */
+            PMC_pmc_val(SELF) = iterable;
+        }
+        else
+            PMC_pmc_val(SELF) =
+                pmc_new_init(INTERP, enum_class_Iterator, iterable);
         VTABLE_set_integer_native(INTERP, PMC_pmc_val(SELF), 0);
     }
 

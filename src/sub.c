@@ -391,7 +391,7 @@ new_coroutine(Interp *interp)
     /* we have separate register stacks
      * - or not, with our single item stack
      */
-    /* setup_register_stacks(interp, ctx); */
+    setup_register_stacks(interp, ctx);
 
     /* create new (pad ??) and control stacks,
      * when invoking the coroutine the real stacks are
