@@ -54,7 +54,7 @@
      CLASS = 277,
      ENDCLASS = 278,
      FIELD = 279,
-     METHOD = 280,
+     DOT_METHOD = 280,
      SUB = 281,
      SYM = 282,
      LOCAL = 283,
@@ -104,25 +104,26 @@
      LOAD = 327,
      IMMEDIATE = 328,
      POSTCOMP = 329,
-     LABEL = 330,
-     EMIT = 331,
-     EOM = 332,
-     IREG = 333,
-     NREG = 334,
-     SREG = 335,
-     PREG = 336,
-     IDENTIFIER = 337,
-     STRINGC = 338,
-     INTC = 339,
-     FLOATC = 340,
-     REG = 341,
-     MACRO = 342,
-     ENDM = 343,
-     PARROT_OP = 344,
-     VAR = 345,
-     LINECOMMENT = 346,
-     FILECOMMENT = 347,
-     POINTY = 348
+     METHOD = 330,
+     LABEL = 331,
+     EMIT = 332,
+     EOM = 333,
+     IREG = 334,
+     NREG = 335,
+     SREG = 336,
+     PREG = 337,
+     IDENTIFIER = 338,
+     STRINGC = 339,
+     INTC = 340,
+     FLOATC = 341,
+     REG = 342,
+     MACRO = 343,
+     ENDM = 344,
+     PARROT_OP = 345,
+     VAR = 346,
+     LINECOMMENT = 347,
+     FILECOMMENT = 348,
+     POINTY = 349
    };
 #endif
 #define LOW_PREC 258
@@ -147,7 +148,7 @@
 #define CLASS 277
 #define ENDCLASS 278
 #define FIELD 279
-#define METHOD 280
+#define DOT_METHOD 280
 #define SUB 281
 #define SYM 282
 #define LOCAL 283
@@ -197,25 +198,26 @@
 #define LOAD 327
 #define IMMEDIATE 328
 #define POSTCOMP 329
-#define LABEL 330
-#define EMIT 331
-#define EOM 332
-#define IREG 333
-#define NREG 334
-#define SREG 335
-#define PREG 336
-#define IDENTIFIER 337
-#define STRINGC 338
-#define INTC 339
-#define FLOATC 340
-#define REG 341
-#define MACRO 342
-#define ENDM 343
-#define PARROT_OP 344
-#define VAR 345
-#define LINECOMMENT 346
-#define FILECOMMENT 347
-#define POINTY 348
+#define METHOD 330
+#define LABEL 331
+#define EMIT 332
+#define EOM 333
+#define IREG 334
+#define NREG 335
+#define SREG 336
+#define PREG 337
+#define IDENTIFIER 338
+#define STRINGC 339
+#define INTC 340
+#define FLOATC 341
+#define REG 342
+#define MACRO 343
+#define ENDM 344
+#define PARROT_OP 345
+#define VAR 346
+#define LINECOMMENT 347
+#define FILECOMMENT 348
+#define POINTY 349
 
 
 
@@ -232,7 +234,7 @@ typedef union {
     SymbolTable * symtab;
 } yystype;
 /* Line 1281 of /usr/share/bison/yacc.c.  */
-#line 236 "imcc/imcparser.h"
+#line 238 "imcc/imcparser.h"
 # define YYSTYPE yystype
 #endif
 
