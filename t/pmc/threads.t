@@ -22,6 +22,7 @@ use Test::More;
 
 my %platforms = map {$_=>1} qw/
     aix
+    cygwin
     darwin
     dec_osf
     freebsd
@@ -31,6 +32,14 @@ my %platforms = map {$_=>1} qw/
     openbsd
 /;
 
+if ($^O eq "cygwin" ) {
+    my @uname = split / /, qx'uname -v';
+    
+    if ($uname[0] eq "2004-09-04" ) {
+	plan skip_all => "This cygwin version is known to fail the thread tests";
+	exit;
+    }
+}
 if ($platforms{$^O}) {
    plan tests => 11;
 }
