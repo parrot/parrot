@@ -60,7 +60,9 @@ t/jump.pasm
 t/local_label.pasm
 t/op/basic.t
 t/op/integer.t
+t/op/number.t
 t/op/string.t
+t/op/trans.t
 t/test.pasm
 t/test2.pasm
 t/test3.pasm
