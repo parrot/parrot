@@ -16,7 +16,7 @@ Tests Parrot's string registers and operations.
 
 =cut
 
-use Parrot::Test tests => 132;
+use Parrot::Test tests => 135;
 use Test::More;
 
 output_is( <<'CODE', <<OUTPUT, "set_s_s|sc" );
@@ -2465,4 +2465,39 @@ ok 1
 ok 2
 OUTPUT
 
+output_is( <<'CODE', <<OUTPUT, "upcase");
+  set S0, "abCD012yz\n"
+  upcase S1, S0
+  print S1
+  upcase S0
+  print S0
+  end
+CODE
+ABCD012YZ
+ABCD012YZ
+OUTPUT
+
+output_is( <<'CODE', <<OUTPUT, "downcase");
+  set S0, "ABcd012YZ\n"
+  downcase S1, S0
+  print S1
+  downcase S0
+  print S0
+  end
+CODE
+abcd012yz
+abcd012yz
+OUTPUT
+
+output_is( <<'CODE', <<OUTPUT, "titlecase");
+  set S0, "aBcd012YZ\n"
+  titlecase S1, S0
+  print S1
+  titlecase S0
+  print S0
+  end
+CODE
+Abcd012yz
+Abcd012yz
+OUTPUT
 1;

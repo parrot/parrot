@@ -502,10 +502,12 @@ Uppercase $1 in place
 =cut
 
 inline op upcase(out STR, in STR) :base_core {
+  $1 = string_upcase(interpreter, $2);
   goto NEXT();
 }
 
 inline op upcase(inout STR) :base_core {
+  string_upcase_inplace(interpreter, $1);
   goto NEXT();
 }
 
@@ -520,10 +522,12 @@ Downcase $1 in place
 =cut
 
 inline op downcase(out STR, in STR) :base_core {
+  $1 = string_downcase(interpreter, $2);
   goto NEXT();
 }
 
 inline op downcase(inout STR) :base_core {
+  string_downcase_inplace(interpreter, $1);
   goto NEXT();
 }
 

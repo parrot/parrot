@@ -243,15 +243,19 @@ void
 string_init(Parrot_Interp interpreter)
 {
     size_t i;
-    const char *data_dir;
+    char *data_dir;
     int free_data_dir = 0;
+    union {
+        const void * __c_ptr;
+        void * __ptr;
+    } __ptr_u;
 
     /* DEFAULT_ICU_DATA_DIR is configured at build time, or it may be
        set through the $PARROT_ICU_DATA_DIR environment variable. Need
        a way to specify this via the command line as well. */
     data_dir = Parrot_getenv("PARROT_ICU_DATA_DIR", &free_data_dir);
     if (data_dir == NULL)
-        data_dir = DEFAULT_ICU_DATA_DIR;
+        data_dir = const_cast(DEFAULT_ICU_DATA_DIR);
     string_set_data_directory(data_dir);
     if (free_data_dir)
         mem_sys_free(data_dir);
@@ -2525,9 +2529,16 @@ FLOATVAL
 string_to_num(Interp *interpreter, const STRING *s)
 {
     FLOATVAL f = 0.0;
+    union {
+        const void * __c_ptr;
+        void * __ptr;
+    } __ptr_u;
 
     if (s) {
-        char *cstr = string_to_cstring(interpreter, s);
+        /*
+         * XXX C99 atof interpreters 0x prefix
+         */
+        char *cstr = string_to_cstring(interpreter, const_cast(s));
         f = atof(cstr);
         string_cstring_free(cstr);
         return f;
@@ -3073,7 +3084,7 @@ string_upcase(Interp *interpreter, const STRING *s)>
 Returns a copy of the specified Parrot string converted to upper case.
 Non-caseable characters are left unchanged.
 
-TODO - Not yet implimented.
+TODO - implemented only for ASCII.
 
 =cut
 
@@ -3083,9 +3094,13 @@ TODO - Not yet implimented.
 STRING *
 string_upcase(Interp *interpreter, const STRING *s)
 {
-    internal_exception(INTERNAL_NOT_IMPLEMENTED,
-        "Case mangling not yet implemented");
-    return NULL;
+    union {
+        const void * __c_ptr;
+        void * __ptr;
+    } __ptr_u;
+    STRING *dest = string_copy(interpreter, const_cast(s));
+    string_upcase_inplace(interpreter, dest);
+    return dest;
 }
 
 /*
@@ -3095,7 +3110,7 @@ string_upcase_inplace(Interp *interpreter, STRING *s)>
 
 Converts the specified Parrot string to upper case.
 
-TODO - Not yet implimented.
+TODO - implemented only for ASCII.
 
 =cut
 
@@ -3104,8 +3119,22 @@ TODO - Not yet implimented.
 void
 string_upcase_inplace(Interp *interpreter, STRING *s)
 {
-    internal_exception(INTERNAL_NOT_IMPLEMENTED,
-        "Case mangling not yet implemented");
+    UINTVAL i;
+    INTVAL o;
+    char_setter_func set_char_at;
+
+    if (!s)
+        return;
+    unmake_COW(interpreter, s);
+    set_char_at = set_char_setter(s);
+    for (i = 0; i < s->strlen; ++i) {
+        o = string_ord(interpreter, s, i);
+        if (o >= 'a' && o <= 'z')
+            set_char_at(i, s, o - 32);
+        else if (o >= 0x80)
+            internal_exception(INTERNAL_NOT_IMPLEMENTED,
+                    "Case mangling for non-ASCII not yet implemented");
+    }
 }
 
 /*
@@ -3125,9 +3154,13 @@ TODO - Not yet implimented.
 STRING *
 string_downcase(Interp *interpreter, const STRING *s)
 {
-    internal_exception(INTERNAL_NOT_IMPLEMENTED,
-        "Case mangling not yet implemented");
-    return NULL;
+    union {
+        const void * __c_ptr;
+        void * __ptr;
+    } __ptr_u;
+    STRING *dest = string_copy(interpreter, const_cast(s));
+    string_downcase_inplace(interpreter, dest);
+    return dest;
 }
 
 /*
@@ -3146,8 +3179,22 @@ TODO - Not yet implimented.
 void
 string_downcase_inplace(Interp *interpreter, STRING *s)
 {
-    internal_exception(INTERNAL_NOT_IMPLEMENTED,
-        "Case mangling not yet implemented");
+    UINTVAL i;
+    INTVAL o;
+    char_setter_func set_char_at;
+
+    if (!s)
+        return;
+    unmake_COW(interpreter, s);
+    set_char_at = set_char_setter(s);
+    for (i = 0; i < s->strlen; ++i) {
+        o = string_ord(interpreter, s, i);
+        if (o >= 'A' && o <= 'Z')
+            set_char_at(i, s, o + 32);
+        else if (o >= 0x80)
+            internal_exception(INTERNAL_NOT_IMPLEMENTED,
+                    "Case mangling for non-ASCII not yet implemented");
+    }
 }
 
 /*
@@ -3167,9 +3214,13 @@ TODO - Not yet implimented.
 STRING *
 string_titlecase(Interp *interpreter, const STRING *s)
 {
-    internal_exception(INTERNAL_NOT_IMPLEMENTED,
-        "Case mangling not yet implemented");
-    return NULL;
+    union {
+        const void * __c_ptr;
+        void * __ptr;
+    } __ptr_u;
+    STRING *dest = string_copy(interpreter, const_cast(s));
+    string_titlecase_inplace(interpreter, dest);
+    return dest;
 }
 
 /*
@@ -3188,8 +3239,28 @@ TODO - Not yet implimented.
 void
 string_titlecase_inplace(Interp *interpreter, STRING *s)
 {
-    internal_exception(INTERNAL_NOT_IMPLEMENTED,
-        "Case mangling not yet implemented");
+    UINTVAL i;
+    INTVAL o;
+    char_setter_func set_char_at;
+
+    if (!s)
+        return;
+    unmake_COW(interpreter, s);
+    set_char_at = set_char_setter(s);
+    o = string_ord(interpreter, s, 0);
+    if (o >= 'a' && o <= 'z')
+        set_char_at(0, s, o - 32);
+    else if (o >= 0x80)
+        internal_exception(INTERNAL_NOT_IMPLEMENTED,
+                "Case mangling for non-ASCII not yet implemented");
+    for (i = 1; i < s->strlen; ++i) {
+        o = string_ord(interpreter, s, i);
+        if (o >= 'A' && o <= 'Z')
+            set_char_at(i, s, o + 32);
+        else if (o >= 0x80)
+            internal_exception(INTERNAL_NOT_IMPLEMENTED,
+                    "Case mangling for non-ASCII not yet implemented");
+    }
 }
 
 /*

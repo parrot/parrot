@@ -461,6 +461,16 @@ parrot_py_hash(Interp *interpreter, PMC *pmc)
     return h;
 }
 
+static PMC*
+parrot_py_hex(Interp *interpreter, PMC *pmc)
+{
+    STRING *s = Parrot_sprintf_c(interpreter, "%#x",
+            VTABLE_get_integer(interpreter, pmc));
+    PMC *p = pmc_new(interpreter, enum_class_PerlString);
+    string_set(interpreter, PMC_str_val(p), s);
+    return p;
+}
+
 static INTVAL
 parrot_py_id(PMC *pmc)
 {
@@ -610,6 +620,7 @@ parrot_py_create_funcs(Interp *interpreter)
     STRING *enumerate= CONST_STRING(interpreter, "enumerate");
     STRING *filter   = CONST_STRING(interpreter, "filter");
     STRING *hash     = CONST_STRING(interpreter, "hash");
+    STRING *hex      = CONST_STRING(interpreter, "hex");
     STRING *id       = CONST_STRING(interpreter, "id");
     STRING *list     = CONST_STRING(interpreter, "list");
     STRING *floatf   = CONST_STRING(interpreter, "py_float");
@@ -630,6 +641,7 @@ parrot_py_create_funcs(Interp *interpreter)
     parrot_py_global(interpreter, F2DPTR(parrot_py_enumerate), enumerate, pip);
     parrot_py_global(interpreter, F2DPTR(parrot_py_filter), filter, pipp);
     parrot_py_global(interpreter, F2DPTR(parrot_py_hash), hash, pip);
+    parrot_py_global(interpreter, F2DPTR(parrot_py_hex), hex, pip);
     parrot_py_global(interpreter, F2DPTR(parrot_py_id), id, ip);
     parrot_py_global(interpreter, F2DPTR(parrot_py_list), list, pip);
     parrot_py_global(interpreter, F2DPTR(parrot_py_long), longf, pipp);

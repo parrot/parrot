@@ -32,6 +32,7 @@ my %builtins = (
     enumerate => 1,
     float => 1,
     hash => 1,
+    hex => 1,
     id => 1,
     filter => 1,
     list => 1,
@@ -933,6 +934,7 @@ sub ret_val {
     my $a = shift;
     my %rets = (
 	'__repr__' => 'S',
+	'lower'    => 'S',
 	'id'       => 'I',
     );
     return $rets{$a} if defined $rets{$a};
