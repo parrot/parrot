@@ -1,9 +1,8 @@
 #!/usr/bin/perl
 
 use strict;
-use lib qw(../../../lib .);
-use Test::More tests => 1;
-use run_tcl;
+use lib qw(tcl/t t . ../lib ../../lib ../../../lib);
+use Parrot::Test tests => 1;
 
 my($tcl,$expected);
 
@@ -21,6 +20,6 @@ $expected = <<EOL;
 1
 done
 EOL
-is(output($tcl),$expected,"simple while");
+language_output_is("tcl",$tcl,$expected,"simple while");
 
 # XXX should check return value of exit, also

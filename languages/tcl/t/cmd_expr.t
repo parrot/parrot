@@ -1,107 +1,106 @@
 #!/usr/bin/perl
 
 use strict;
-use lib qw(../../../lib .);
-use Test::More tests => 40;
-use run_tcl;
+use lib qw(tcl/t t . ../lib ../../lib ../../../lib);
+use Parrot::Test tests => 40;
 
 my($tcl,$expected);
 
 $tcl = "puts -nonewline [ expr 2 * 3]";
 $expected = "6";
-is(output($tcl),$expected,"mul");
+language_output_is("tcl",$tcl,$expected,"mul");
 
 $tcl = "puts -nonewline [ expr 6 / 2]";
 $expected = "3";
-is(output($tcl),$expected,"div");
+language_output_is("tcl",$tcl,$expected,"div");
 
 $tcl = "puts -nonewline [ expr 3 % 2]";
 $expected = "1";
-is(output($tcl),$expected,"remainder");
+language_output_is("tcl",$tcl,$expected,"remainder");
 
 $tcl = "puts -nonewline [ expr 2 + 3]";
 $expected = "5";
-is(output($tcl),$expected,"plus");
+language_output_is("tcl",$tcl,$expected,"plus");
 
 $tcl = "puts -nonewline [ expr 2 - 3]";
 $expected = "-1";
-is(output($tcl),$expected,"minus");
+language_output_is("tcl",$tcl,$expected,"minus");
 
 $tcl = "puts -nonewline [ expr 16 << 2]";
 $expected = "64";
-is(output($tcl),$expected,"left shift");
+language_output_is("tcl",$tcl,$expected,"left shift");
 
 $tcl = "puts -nonewline [ expr 16 >> 2]";
 $expected = "4";
-is(output($tcl),$expected,"right shift");
+language_output_is("tcl",$tcl,$expected,"right shift");
 
 $tcl = "puts -nonewline [ expr 2 < 3]";
 $expected = "1";
-is(output($tcl),$expected,"lt, true");
+language_output_is("tcl",$tcl,$expected,"lt, true");
 
 $tcl = "puts -nonewline [ expr 3 < 2]";
 $expected = "0";
-is(output($tcl),$expected,"lt, false");
+language_output_is("tcl",$tcl,$expected,"lt, false");
 
 $tcl = "puts -nonewline [ expr 3 > 2]";
 $expected = "1";
-is(output($tcl),$expected,"gt, true");
+language_output_is("tcl",$tcl,$expected,"gt, true");
 
 $tcl = "puts -nonewline [ expr 2 > 3]";
 $expected = "0";
-is(output($tcl),$expected,"gt, false");
+language_output_is("tcl",$tcl,$expected,"gt, false");
 
 $tcl = "puts -nonewline [ expr 2 <= 3]";
 $expected = "1";
-is(output($tcl),$expected,"lte, lt");
+language_output_is("tcl",$tcl,$expected,"lte, lt");
 
 $tcl = "puts -nonewline [ expr 3 <= 2]";
 $expected = "0";
-is(output($tcl),$expected,"lte, gt");
+language_output_is("tcl",$tcl,$expected,"lte, gt");
 
 $tcl = "puts -nonewline [ expr 3 <= 3]";
 $expected = "1";
-is(output($tcl),$expected,"lte, eq");
+language_output_is("tcl",$tcl,$expected,"lte, eq");
 
 $tcl = "puts -nonewline [ expr 3 >= 2]";
 $expected = "1";
-is(output($tcl),$expected,"gte, gt");
+language_output_is("tcl",$tcl,$expected,"gte, gt");
 
 $tcl = "puts -nonewline [ expr 2 >= 3]";
 $expected = "0";
-is(output($tcl),$expected,"gte, lt");
+language_output_is("tcl",$tcl,$expected,"gte, lt");
 
 $tcl = "puts -nonewline [ expr 3 >= 3]";
 $expected = "1";
-is(output($tcl),$expected,"gte, eq");
+language_output_is("tcl",$tcl,$expected,"gte, eq");
 
 $tcl = "puts -nonewline [ expr 1 == 1]";
 $expected = "1";
-is(output($tcl),$expected,"==, eq");
+language_output_is("tcl",$tcl,$expected,"==, eq");
 
 $tcl = "puts -nonewline [ expr 2 == 1]";
 $expected = "0";
-is(output($tcl),$expected,"==, ne");
+language_output_is("tcl",$tcl,$expected,"==, ne");
 
 $tcl = "puts -nonewline [ expr 1 != 1]";
 $expected = "0";
-is(output($tcl),$expected,"==, ne");
+language_output_is("tcl",$tcl,$expected,"==, ne");
 
 $tcl = "puts -nonewline [ expr 2 != 1]";
 $expected = "1";
-is(output($tcl),$expected,"==, eq");
+language_output_is("tcl",$tcl,$expected,"==, eq");
 
 $tcl = "puts -nonewline [ expr 5 & 6 ]";
 $expected = "4";
-is(output($tcl),$expected,"&");
+language_output_is("tcl",$tcl,$expected,"&");
 
 $tcl = "puts -nonewline [ expr 5 | 6 ]";
 $expected = "7";
-is(output($tcl),$expected,"|");
+language_output_is("tcl",$tcl,$expected,"|");
 
 $tcl = "puts -nonewline [ expr 5 ^ 6 ]";
 $expected = "3";
-is(output($tcl),$expected,"^");
+language_output_is("tcl",$tcl,$expected,"^");
 
 #
 # now, functions - the accuracy and int vs. float nature here is
@@ -112,66 +111,66 @@ is(output($tcl),$expected,"^");
 
 $tcl = "puts -nonewline [ expr abs(1-2)]";
 $expected = "1";
-is(output($tcl),$expected,"abs");
+language_output_is("tcl",$tcl,$expected,"abs");
 
 $tcl = "puts -nonewline [ expr acos(0)]";
 $expected = "1.570796";
-is(output($tcl),$expected,"acos");
+language_output_is("tcl",$tcl,$expected,"acos");
 
 $tcl = "puts -nonewline [ expr asin(1)]";
 $expected = "1.570796";
-is(output($tcl),$expected,"asin");
+language_output_is("tcl",$tcl,$expected,"asin");
 
 $tcl = "puts -nonewline [ expr atan(1)]";
 $expected = "0.785398";
-is(output($tcl),$expected,"atan");
+language_output_is("tcl",$tcl,$expected,"atan");
 
 $tcl = "puts -nonewline [ expr cos(1)]";
 $expected = "0.540302";
-is(output($tcl),$expected,"cos");
+language_output_is("tcl",$tcl,$expected,"cos");
 
 $tcl = "puts -nonewline [ expr cosh(1)]";
 $expected = "1.543081";
-is(output($tcl),$expected,"cosh");
+language_output_is("tcl",$tcl,$expected,"cosh");
 
 $tcl = "puts -nonewline [ expr exp(1)]";
 $expected = "2.718282";
-is(output($tcl),$expected,"exp");
+language_output_is("tcl",$tcl,$expected,"exp");
 
 $tcl = "puts -nonewline [ expr log(32)]";
 $expected = "3.465736";
-is(output($tcl),$expected,"log");
+language_output_is("tcl",$tcl,$expected,"log");
 
 $tcl = "puts -nonewline [ expr log10(32)]";
 $expected = "1.505150";
-is(output($tcl),$expected,"log10");
+language_output_is("tcl",$tcl,$expected,"log10");
 
 $tcl = "puts -nonewline [ expr sin(1)]";
 $expected = "0.841471";
-is(output($tcl),$expected,"sin");
+language_output_is("tcl",$tcl,$expected,"sin");
 
 $tcl = "puts -nonewline [ expr sinh(1)]";
 $expected = "1.175201";
-is(output($tcl),$expected,"sinh");
+language_output_is("tcl",$tcl,$expected,"sinh");
 
 $tcl = "puts -nonewline [ expr sqrt(64)]";
 $expected = "8.0";
-is(output($tcl),$expected,"sqrt");
+language_output_is("tcl",$tcl,$expected,"sqrt");
 
 $tcl = "puts -nonewline [ expr tan(1)]";
 $expected = "1.557408";
-is(output($tcl),$expected,"tan");
+language_output_is("tcl",$tcl,$expected,"tan");
 
 $tcl = "puts -nonewline [ expr tanh(1)]";
 $expected = "0.761594";
-is(output($tcl),$expected,"tanh");
+language_output_is("tcl",$tcl,$expected,"tanh");
 
 # misc.
 
 $tcl = "puts -nonewline [ expr 2*3+4*2]";
 $expected = "14";
-is(output($tcl),$expected,"simple precedence");
+language_output_is("tcl",$tcl,$expected,"simple precedence");
 
 $tcl = "puts -nonewline [ expr 2*(3+4)*2]";
 $expected = "28";
-is(output($tcl),$expected,"parens");
+language_output_is("tcl",$tcl,$expected,"parens");

@@ -1,9 +1,8 @@
 #!/usr/bin/perl
 
 use strict;
-use lib qw(../../../lib .);
-use Test::More tests => 5;
-use run_tcl;
+use lib qw(tcl/t t . ../lib ../../lib ../../../lib);
+use Parrot::Test tests => 5;
 
 my($tcl,$expected);
 
@@ -13,7 +12,7 @@ $tcl = <<'EOTCL';
  puts $a
 EOTCL
 $expected = "3\n";
-is(output($tcl),$expected,"simple");
+language_output_is("tcl",$tcl,$expected,"simple");
 
 $tcl = <<'EOTCL';
  set a 1
@@ -21,7 +20,7 @@ $tcl = <<'EOTCL';
  puts $a
 EOTCL
 $expected = "6\n";
-is(output($tcl),$expected,"offset");
+language_output_is("tcl",$tcl,$expected,"offset");
 
 $tcl = <<'EOTCL';
  set a 2
@@ -29,7 +28,7 @@ $tcl = <<'EOTCL';
  puts $a
 EOTCL
 $expected = "1\n";
-is(output($tcl),$expected,"negative offset");
+language_output_is("tcl",$tcl,$expected,"negative offset");
 
 $tcl = <<'EOTCL';
  set a 1
@@ -37,7 +36,7 @@ $tcl = <<'EOTCL';
  puts $b
 EOTCL
 $expected = "2\n";
-is(output($tcl),$expected,"return value");
+language_output_is("tcl",$tcl,$expected,"return value");
 
 $tcl = <<'EOTCL';
  set a -2
@@ -45,4 +44,4 @@ $tcl = <<'EOTCL';
  puts $a
 EOTCL
 $expected = "-1\n";
-is(output($tcl),$expected,"negative base");
+language_output_is("tcl",$tcl,$expected,"negative base");

@@ -1,9 +1,8 @@
 #!/usr/bin/perl
 
 use strict;
-use lib qw(../../../lib .);
-use Test::More tests => 2;
-use run_tcl;
+use lib qw(tcl/t t . ../lib ../../lib ../../../lib);
+use Parrot::Test tests => 2;
 
 my($tcl,$expected);
 
@@ -13,11 +12,11 @@ $tcl = <<'EOTCL';
  fnord $a
 EOTCL
 $expected = "2\n";
-is(output($tcl),$expected,"rename");
+language_output_is("tcl",$tcl,$expected,"rename");
 
 $tcl = <<'EOTCL';
  rename puts ""
  puts "Whee"
 EOTCL
 $expected = "invalid command name \"puts\"\n";
-is(output($tcl),$expected,"remove");
+language_output_is("tcl",$tcl,$expected,"remove");

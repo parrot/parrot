@@ -1,13 +1,9 @@
 #!/usr/bin/perl
 
 use strict;
-use lib qw(../../../lib .);
-use Test::More tests => 1;
-use run_tcl;
+use lib qw(tcl/t t . ../lib ../../lib ../../../lib);
+use Parrot::Test qw/noplan/;
 
 my($tcl,$expected);
 
-TODO: {
-local $TODO = "XXX NOT TESTED";
-is(1,2,"XXX not tested!");
-}
+# XXX heh. nevermind.

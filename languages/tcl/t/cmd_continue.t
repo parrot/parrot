@@ -1,9 +1,8 @@
 #!/usr/bin/perl
 
 use strict;
-use lib qw(../../../lib .);
-use Test::More tests => 2;
-use run_tcl;
+use lib qw(tcl/t t . ../lib ../../lib ../../../lib);
+use Parrot::Test tests => 2;
 
 my($tcl,$expected);
 
@@ -23,7 +22,7 @@ $expected = <<EOF;
 5
 10
 EOF
-is(output($tcl),$expected,"continue from for");
+language_output_is("tcl",$tcl,$expected,"continue from for");
 
 $tcl = <<'EOTCL';
  set a 0
@@ -46,5 +45,5 @@ $expected = <<EOF;
 --
 11
 EOF
-is(output($tcl),$expected,"continue from while ");
+language_output_is("tcl",$tcl,$expected,"continue from while");
 

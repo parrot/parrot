@@ -1,9 +1,8 @@
 #!/usr/bin/perl
 
 use strict;
-use lib qw(../../../lib .);
-use Test::More tests => 1;
-use run_tcl;
+use lib qw(tcl/t t . ../lib ../../lib ../../../lib);
+use Parrot::Test tests => 1;
 
 my($tcl,$expected);
 
@@ -13,4 +12,4 @@ $tcl = <<'EOTCL';
  puts $b
 EOTCL
 $expected = "2\n";
-is(output($tcl),$expected,"simple eval");
+language_output_is("tcl",$tcl,$expected,"simple eval");

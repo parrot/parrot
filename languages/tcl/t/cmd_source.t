@@ -1,21 +1,23 @@
 #!/usr/bin/perl
 
 use strict;
-use lib qw(../../../lib .);
-use Test::More tests => 1;
-use run_tcl;
+use lib qw(tcl/t t . ../lib ../../lib ../../../lib);
+use Parrot::Test tests => 0; #1
+use Test::More
 
 my($tcl,$expected);
 
+=for TODO
+
 TODO: {
-  local $TODO = "fails when run as .t - running the two tcl files manually works.";
+  local $::TODO = "fails when run as .t - running the two tcl files manually works.";
 # prolly not portable, patches welcome.
 my $source_file = <<'EOF';
  set a 10
  puts $b
 EOF
 
-my $source_filename = "temp.tcl";
+my $source_filename = "tmp.tcl";
 open (TMP,">$source_filename") or die $!;
 print TMP $source_file;
 close(TMP) ;
@@ -29,6 +31,8 @@ $expected = <<EOF;
 20
 10
 EOF
-is(output($tcl),$expected,"simple source");
+language_output_is("tcl",$tcl,$expected,"simple source");
 unlink($source_filename)
 }
+
+=cut

@@ -1,9 +1,9 @@
 #!/usr/bin/perl
 
 use strict;
-use lib qw(../../../lib .);
-use Test::More tests => 5;
-use run_tcl;
+use lib qw(tcl/t t . ../lib ../../lib ../../../lib);
+use Parrot::Test tests => 3; #2
+use Test::More;
 
 my($tcl,$expected);
 
@@ -14,7 +14,7 @@ $tcl = <<'EOTCL';
  me
 EOTCL
 $expected = "2\n";
-is(output($tcl),$expected,"noarg");
+language_output_is("tcl",$tcl,$expected,"noarg");
 
 $tcl = <<'EOTCL';
  proc me {a} {
@@ -23,7 +23,7 @@ $tcl = <<'EOTCL';
  me 2
 EOTCL
 $expected = "2\n";
-is(output($tcl),$expected,"onearg");
+language_output_is("tcl",$tcl,$expected,"onearg");
 
 $tcl = <<'EOTCL';
  proc me {a b} {
@@ -33,7 +33,9 @@ $tcl = <<'EOTCL';
  me 2  3
 EOTCL
 $expected = "2\n3\n";
-is(output($tcl),$expected,"twoarg");
+language_output_is("tcl",$tcl,$expected,"twoarg");
+
+=for TODO
 
 TODO: {
 local $TODO = "not done yet.";
@@ -46,7 +48,7 @@ $tcl = <<'EOTCL';
  me 2 3 4 5 6
 EOTCL
 $expected = "2\n3 4 5 6\n";
-is(output($tcl),$expected,"vararg");
+language_output_is("tcl",$tcl,$expected,"vararg");
 
 $tcl = <<'EOTCL';
  proc me {{a 2}} {
@@ -54,6 +56,9 @@ $tcl = <<'EOTCL';
  }
  me
 EOTCL
-$expected = "2\n3 4 5 6\n";
-is(output($tcl),$expected,"defaultarg");
+$expected = "2\n";
+language_output_is("tcl",$tcl,$expected,"defaultarg");
+
 }
+
+=cut

@@ -1,9 +1,8 @@
 #!/usr/bin/perl
 
 use strict;
-use lib qw(../../../lib .);
-use Test::More tests => 2;
-use run_tcl;
+use lib qw(tcl/t t . ../lib ../../lib ../../../lib);
+use Parrot::Test tests => 2;
 
 my($tcl,$expected);
 
@@ -11,10 +10,12 @@ $tcl = <<'EOTCL';
  puts -nonewline "whee"
 EOTCL
 $expected = "whee";
-is(output($tcl),$expected,"nonewline");
+language_output_is("tcl",$tcl,$expected,"nonewline");
 
 $tcl = <<'EOTCL';
  puts "whee"
 EOTCL
 $expected = "whee\n";
-is(output($tcl),$expected,"with newline");
+language_output_is("tcl",$tcl,$expected,"with newline");
+
+# XXX Missing channelId tests.

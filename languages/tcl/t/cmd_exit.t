@@ -1,9 +1,8 @@
 #!/usr/bin/perl
 
 use strict;
-use lib qw(../../../lib .);
-use Test::More tests => 1;
-use run_tcl;
+use lib qw(tcl/t t . ../lib ../../lib ../../../lib);
+use Parrot::Test tests => 1;
 
 my($tcl,$expected);
 
@@ -13,6 +12,6 @@ $tcl = <<'EOTCL';
  puts nothere
 EOTCL
 $expected = "here\n";
-is(output($tcl),$expected,"noarg");
+language_output_is("tcl",$tcl,$expected,"noarg");
 
 # XXX should check return value of exit, also

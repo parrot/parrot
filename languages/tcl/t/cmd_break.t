@@ -1,9 +1,8 @@
 #!/usr/bin/perl
 
 use strict;
-use lib qw(../../../lib .);
-use Test::More tests => 2;
-use run_tcl;
+use lib qw(tcl/t t . ../lib ../../lib ../../../lib);
+use Parrot::Test tests => 2;
 
 my($tcl,$expected);
 
@@ -14,7 +13,7 @@ $tcl = <<'EOTCL';
  puts $a
 EOTCL
 $expected = "11\n";
-is(output($tcl),$expected,"break from for");
+language_output_is("tcl",$tcl,$expected,"break from for");
 
 $tcl = <<'EOTCL';
  set a 20
@@ -25,5 +24,4 @@ $tcl = <<'EOTCL';
  puts $a
 EOTCL
 $expected = "9\n";
-is(output($tcl),$expected,"break from while ");
-
+language_output_is("tcl",$tcl,$expected,"break from while");
