@@ -99,11 +99,15 @@ Parrot_readbc(struct Parrot_Interp *interpreter, char *filename)
             return NULL;
         }
 
+#ifndef BROKEN_ISREG
+        /* S_ISREG is strangely broken my lcc/linux install (though it did 
+	 * once work */
         if (!S_ISREG(file_stat.st_mode)) {
             PIO_eprintf(interpreter, "Parrot VM: %s is not a normal file.\n",
                     filename);
             return NULL;
         }
+#endif /* BROKEN_ISREG */
 
         program_size = file_stat.st_size;
 
