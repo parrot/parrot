@@ -424,10 +424,15 @@ BEGIN {
 
     $P6C::Context::CONTEXT{return} = new P6C::Context type => 'PerlArray';
     $P6C::Context::CONTEXT{print1} = new P6C::Context type => ['PerlUndef'];
+    my $passthrough = sub {
+	my ($x, $ctx) = @_;
+	$ctx = $ctx->copy;
+	$ctx->{noreturn} = 1;
+	$x->args->ctx_right($ctx);
+    };
     for (qw(try do CATCH BEGIN END INIT AUTOLOAD PRE POST NEXT LAST FIRST
 	    default)) {
-	$P6C::Context::CONTEXT{$_} = new P6C::Context type => 'void';
-	$P6C::Context::CONTEXT{$_}{noreturn} = 1;
+	$P6C::Context::CONTEXT{$_} = $passthrough;
     }
     for (qw(while when given)) {
 	$P6C::Context::CONTEXT{$_}{noreturn} = 1;

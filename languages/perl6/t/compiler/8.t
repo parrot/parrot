@@ -13,10 +13,17 @@ sub main() {
 	print1 "foo";
     }
     print1 "alive";
+    my $x = try { 1 }
+    my $y = try {
+	die;
+	CATCH { default { 2 } }
+    }
+    print1 $x _' ' _$y;
 }
 CODE
 dying
 alive
+1 2
 OUT
 
 ##############################

@@ -53,7 +53,7 @@ BEGIN {
 
 1;
 
-__DATA__
+# __DATA__
 
 package P6C::IMCC::prefix;
 
@@ -517,6 +517,8 @@ sub wrap_with_catch {
     my $cont = newtmp 'Continuation';
     my $label = $endblock;
     my $catch;
+    my $result;
+    my $ret = gentmp 'pmc';
     my $addr = newtmp 'int';
     if ($catcher) {
        $catch = genlabel 'catch';
@@ -530,7 +532,7 @@ sub wrap_with_catch {
        goto $try
 END
     if ($catcher) {
-       code(<<END);
+	code(<<END);
 $catch:
 END
 	push_scope ;
@@ -541,7 +543,7 @@ END
 	$bang->{ctx} = new P6C::Context;
 	set_topic $bang;
 
-	val_noarg($catcher);
+	$result = val_noarg($catcher);
 
 	# If we make it here, the CATCH failed.  Add implicit re-throw.
 	my $ptmp = newtmp 'PerlArray';
@@ -557,9 +559,14 @@ END
 	# Put in break label after implicit rethrow, but inside CATCH scope.
 	emit_label type => 'break';
 	pop_scope ;
+    } else {
+	$result = newtmp 'PerlUndef' unless $block->{ctx}->type eq 'void';
     }
     # Clean catch => reset exception state
     my $ptmp = newtmp 'PerlUndef';
+    code(<<END) if defined($result);
+    $ret = $result
+END
     code(<<END);
 	global "_SV__BANG_" = $ptmp
 	goto $endblock
@@ -568,7 +575,11 @@ END
     code(<<END);
 $try:
 END
-    my $ret = val_noarg($block);
+    if (defined($result = val_noarg($block))) {
+    code(<<END);
+	$ret = $result
+END
+    }
     # Reached end of block => no exception.  Pop the continuation.
     code(<<END);
 	call __pop_catch

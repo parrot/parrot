@@ -257,3 +257,8 @@
 	* Fixes:
 	    - doc updates in perl6 (Leo)
 	    - remove Makefile parsing in pconfig.pl (Leo)
+
+2002-08-28
+
+	* Fixes:
+	    - result values of try/CATCH

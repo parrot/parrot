@@ -166,8 +166,11 @@ sub block_ctx {
 	    $voidctx->{label} = $stmt->name;
 	    $stmt->ctx_right($voidctx);
 	    next;
+	} elsif ($stmt->isa('P6C::prefix') && $stmt->name eq 'CATCH') {
+	    $stmt->ctx_right($ctx->copy);
+	} else {
+	    $stmt->ctx_right($voidctx);
 	}
-	$stmt->ctx_right($voidctx);
 	delete $voidctx->{label};
     }
     # Last statement == value of block
