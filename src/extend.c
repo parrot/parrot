@@ -709,7 +709,7 @@ void Parrot_set_pmcreg(Parrot_INTERP interpreter, Parrot_Int regnum, Parrot_PMC 
                                 Parrot_Int flags)>
 
 Create a new Parrot string from a passed-in buffer. If the encoding,
-charset, or langage are 0, then use the default. Pass in a 0 for flags
+charset, or language are 0, then use the default. Pass in a 0 for flags
 for right now.
 
 A copy of the buffer is made.
@@ -797,7 +797,7 @@ Parrot_register_pmc(Parrot_INTERP interpreter, Parrot_PMC pmc)
 Parrot_unregister_pmc(Parrot_INTERP interpreter, Parrot_PMC pmc)>
 
 Remove a reference of the PMC from the interpreters DOD registry If the
-register count reaches zero, the PMC will be destroyed during the next
+reference count reaches zero, the PMC will be destroyed during the next
 DOD run.
 
 =cut
