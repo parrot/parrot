@@ -1,0 +1,40 @@
+#!/bin/sh
+
+# generate t/native_pbc_{1,2}.pbc
+# this should be run on i386 systems to regenerate the first two
+# native tests
+# NOTE: This will need a perl compiled with long double support
+# NOTE2: Installing ccache speeds this process up considerably
+
+# run it as:
+# $ sh tools/dev/mk_native_pbc
+
+make progclean
+perl Configure.pl --debugging --floatval="long double" --nomanicheck
+tail myconfig
+make -s
+#cp parrot parrot-d12
+cd languages/imcc
+make clean && make -s
+#cp imcc imcc-d12
+cd -
+imcc -o n.pbc t/op/number_1.pasm
+mv n.pbc t/native_pbc/number_2.pbc
+
+make progclean
+perl Configure.pl --debugging --floatval=double --nomanicheck
+tail myconfig
+make -s
+#cp parrot parrot-d8
+cd languages/imcc
+make clean && make -s
+#cp imcc imcc-d8
+cd -
+imcc -o n.pbc t/op/number_1.pasm
+mv n.pbc t/native_pbc/number_1.pbc
+
+make pdump
+pdump -h t/native_pbc/number_1.pbc
+pdump -h t/native_pbc/number_2.pbc
+
+perl t/harness t/native_pbc/number.t

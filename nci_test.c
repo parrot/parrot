@@ -26,12 +26,12 @@ float nci_fff(float l1, float l2) {
 
 /* test calls this with a string */
 int nci_ip(void *p) {
-	printf("%c%c\n", (*(char**) p)[1], (*(char **) p)[0]);
+	fprintf(stderr, "%c%c\n", (*(char**) p)[1], (*(char **) p)[0]);
 	return 2;
 }
 
 int nci_it(void *p) {
-	printf("%c%c\n", ((char*) p)[1], ((char *) p)[0]);
+	fprintf(stderr, "%c%c\n", ((char*) p)[1], ((char *) p)[0]);
 	return 2;
 }
 

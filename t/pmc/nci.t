@@ -178,10 +178,12 @@ ok 2
 OUTPUT
 
 output_is(<<'CODE', <<'OUTPUT', "nci_i_p");
+  # here the nci_i_p prints (now to) stderr. To get things printed
+  # in order, this test prints to stderr too
   loadlib P1, "libnci.so"
-  print "loaded\n"
+  print 2, "loaded\n"
   dlfunc P0, P1, "nci_ip", "ip"
-  print "dlfunced\n"
+  print 2, "dlfunced\n"
   set I0, 1	# prototype used - unchecked
   set I1, 0	# items on stack - unchecked
   new P5, .PerlString
@@ -193,13 +195,13 @@ output_is(<<'CODE', <<'OUTPUT', "nci_i_p");
   ne I2, 0, nok_2
   ne I3, 0, nok_2
   ne I4, 0, nok_2
-  print "ok 2\n"
+  print 2, "ok 2\n"
   end
-nok_1: print "nok 1\n"
-  print I5
-  print "\n"
+nok_1: print 2, "nok 1\n"
+  print 2, I5
+  print 2, "\n"
   end
-nok_2: print "nok 2\n"
+nok_2: print 2, "nok 2\n"
   end
 CODE
 loaded
@@ -210,16 +212,16 @@ OUTPUT
 
 output_is(<<'CODE', <<'OUTPUT', "nci_p_p");
   loadlib P1, "libnci.so"
-  print "loaded\n"
+  print 2, "loaded\n"
   dlfunc P0, P1, "nci_pp", "pp"
-  print "dlfunced\n"
+  print 2, "dlfunced\n"
   set I0, 1	# prototype used - unchecked
   set I1, 0	# items on stack - unchecked
   new P5, .PerlString
   set P5, "ko\n"	# big HACK, broken with GC_IS_MALLOC
   invoke	# cant test ret value yet, print it
   dlfunc P0, P1, "nci_ip", "ip"
-  print "dlfunced\n"
+  print 2, "dlfunced\n"
   invoke
   ne I5, 2, nok_1
   ne I0, 0, nok_2	# test return value convention
@@ -227,13 +229,13 @@ output_is(<<'CODE', <<'OUTPUT', "nci_p_p");
   ne I2, 0, nok_2
   ne I3, 0, nok_2
   ne I4, 0, nok_2
-  print "ok 2\n"
+  print 2, "ok 2\n"
   end
-nok_1: print "nok 1\n"
-  print I5
-  print "\n"
+nok_1: print 2, "nok 1\n"
+  print 2, I5
+  print 2, "\n"
   end
-nok_2: print "nok 2\n"
+nok_2: print 2, "nok 2\n"
   end
 CODE
 loaded
@@ -245,9 +247,9 @@ OUTPUT
 
 output_is(<<'CODE', <<'OUTPUT', "nci_i_t");
   loadlib P1, "libnci.so"
-  print "loaded\n"
+  print 2, "loaded\n"
   dlfunc P0, P1, "nci_it", "it"
-  print "dlfunced\n"
+  print 2, "dlfunced\n"
   set I0, 1	# prototype used - unchecked
   set I1, 0	# items on stack - unchecked
   set S5, "ko\n"
@@ -258,13 +260,13 @@ output_is(<<'CODE', <<'OUTPUT', "nci_i_t");
   ne I2, 0, nok_2
   ne I3, 0, nok_2
   ne I4, 0, nok_2
-  print "ok 2\n"
+  print 2, "ok 2\n"
   end
-nok_1: print "nok 1\n"
-  print I5
-  print "\n"
+nok_1: print 2, "nok 1\n"
+  print 2, I5
+  print 2, "\n"
   end
-nok_2: print "nok 2\n"
+nok_2: print 2, "nok 2\n"
   end
 CODE
 loaded
