@@ -26,10 +26,6 @@ STRING* name()
 STRING* name_keyed(PMC* key)
 STRING* name_keyed_int(INTVAL key)
 
-void clone(PMC* dest)
-void clone_keyed(PMC* key, PMC* dest)
-void clone_keyed_int(INTVAL key, PMC* dest)
-
 PMC* find_method(STRING* method_name)
 PMC* find_method_keyed(PMC* key, STRING* method_name)
 PMC* find_method_keyed_int(INTVAL key, STRING* method_name)
@@ -262,7 +258,6 @@ STRING* substr_str(INTVAL offset, INTVAL length)
 
 [MAIN]
 void* invoke(void* next)
-void* invoke_pmc(PMC* sub, void* next)
 
 INTVAL can(STRING* method)
 INTVAL can_keyed(PMC* key, STRING* method)
@@ -275,4 +270,13 @@ INTVAL does_keyed_int(INTVAL key, STRING* method)
 INTVAL isa(STRING* method)
 INTVAL isa_keyed(PMC* key, STRING* method)
 INTVAL isa_keyed_int(INTVAL key, STRING* method)
+
+# traverse functions
+void traverse(traverse_info* info)
+# compat until new is done
+void clone(PMC* dest)
+void new_clone(traverse_info* info)
+void freeze(traverse_info* info)
+void thaw(traverse_info* info)
+void dump(traverse_info* info)
 
