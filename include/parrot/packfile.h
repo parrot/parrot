@@ -23,6 +23,7 @@
 
 /*
 ** Bytes that we don't have to reorder
+*  PACKFILE_HEADER_BYTES must be an integer times sizeof(opcode_t).
 */
 #define PACKFILE_HEADER_BYTES 16
 
@@ -34,7 +35,7 @@ struct PackFile_Header {
     unsigned char flags;
     unsigned char floattype;
     unsigned char pad[10];
-    /* Start words/opcodes on 8-byte boundary */
+    /* Start words/opcodes on 16-byte boundary */
     opcode_t magic;
     opcode_t opcodetype; 
     opcode_t fixup_ss;  
