@@ -53,7 +53,6 @@ and then in your .imc or .pasm file:
 edit C<../config/gen/makefiles/dynclasses.in> and append your PMC(s) to 
 the build target.
 
-	$ export LD_LIBRARY_PATH=.:blib/lib
 	$ make
 	$ make shared
 	$ cd dynclasses; make
@@ -70,6 +69,10 @@ change over time.
 	42
 
 =item 4
+
+There are two other similar test files: dynmatch.pasm and dyntcl.pasm.
+They do pretty much the same thing as dynfoo, but they load in PMC
+group libraries instead of a standalone PMC library.
 
 If anything changes inside parrot, be sure to:
 

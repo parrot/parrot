@@ -69,10 +69,17 @@ sub runstep {
     link          => $Config{cc},
     linkflags     => $Config{ldflags},
 
-    # ld:  Tool used to build dynamically loadable libraries.  Often
-    # $cc on Unix-ish systems, but apparently sometimes it's ld.
+    # ld: Tool used to build shared libraries and dynamically loadable
+    # modules. Often $cc on Unix-ish systems, but apparently sometimes
+    # it's ld.
     ld            => $Config{ld},
     ldflags       => $Config{ldflags},
+
+    # Shared libraries
+    ld_share_flags => $Config{lddlflags},
+
+    # Dynamically loadable modules
+    ld_load_flags => $Config{lddlflags},
 
     libs          => $Config{libs},
 
@@ -81,7 +88,8 @@ sub runstep {
     link_debug    => '',
 
     o             => '.o',                # object files extension
-    so            => '.so',               # dynamic link library or shared object extension
+    share_ext     => '.so',               # shared library extension
+    load_ext      => '.so',               # dynamically loadable module extension
     a             => '.a',                # library or archive extension
     exe           => $Config{_exe},       # executable files extension
     cc_o_out      => '-o ',               # cc object output file
@@ -91,9 +99,6 @@ sub runstep {
 
     ld_out        => '-o ',               # ld output file
     ld_debug      => '-g ',               # include debug info in executable
-    ld_shared     => $Config{lddlflags},
-    ld_shared_flags=> '', # What is this, exactly?  For GNU ld, it was
-    # '-Wl,-soname,libparrot$(SO)'
 
     # should we have a dependancy upon arc to generate .a's?
     blib_lib_libparrot_a => 'blib/lib/libparrot$(A)',

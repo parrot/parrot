@@ -20,7 +20,8 @@
 #define PARROT_ARCHNAME        "${jitarchname}"
 #define PARROT_JIT_CAPABLE      ${jitcapable}
 #define PARROT_EXEC_CAPABLE     ${execcapable}
-#define PARROT_DLL_EXTENSION   "${so}"
+#define PARROT_SHARE_EXT        "${share_ext}"
+#define PARROT_LOAD_EXT         "${load_ext}"
 
 typedef ${iv}                   Parrot_Int;
 typedef unsigned ${iv}          Parrot_UInt;

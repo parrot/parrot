@@ -13,8 +13,8 @@ Summary of my parrot ${VERSION} configuration:
     cc_ldflags='${cc_ldflags}',
     libs='${libs}'
   Dynamic Linking:
-    so='${so}', ld_shared='${ld_shared}',
-    ld_shared_flags='${ld_shared_flags}'
+    share_ext='${share_ext}', ld_share_flags='${ld_share_flags}',
+    load_ext='${load_ext}', ld_load_flags='${ld_load_flags}'
   Types:
     iv=${iv}, intvalsize=${intvalsize}, intsize=${intsize}, opcode_t=${opcode_t}, opcode_t_size=${opcode_t_size},
     ptrsize=${ptrsize}, ptr_alignment=${ptr_alignment} byteorder=${byteorder}, 

@@ -1,6 +1,7 @@
 PERL = ${perl}
 RM_F = ${rm_f}
-SO = ${so}
+LOAD_EXT = ${load_ext}
+DESTDIR = ${build_dir}${slash}runtime${slash}parrot${slash}dynext
 
 # add your dynamic pmcs here
 
@@ -15,10 +16,10 @@ all :
 	$(BUILD) generate $(PMCS)
 	$(BUILD) compile $(PMCS)
 	$(BUILD) linklibs $(PMCS)
-	$(BUILD) copy --destination=../runtime/parrot/dynext $(PMCS)
+	$(BUILD) copy --destination=$(DESTDIR) $(PMCS)
 
 clean :
-	$(RM_F) *.c *.h *$(SO) *.dump lib-*
+	$(RM_F) *.c *.h *$(LOAD_EXT) *.dump lib-*
 
 realclean: clean
 	$(RM_F) Makefile build.pl

@@ -7,9 +7,9 @@ my $link = 'c++'; # should find g++ in most cases
 if ($libs !~ /-lpthread/) {
     $libs .= ' -lpthread';
 }
-my $ld_shared = Configure::Data->get('ld_shared');
-if ( $ld_shared !~ /-fPIC/ ) {
-    $ld_shared .= ' -fPIC';
+my $ld_share_flags = Configure::Data->get('ld_share_flags');
+if ( $ld_share_flags !~ /-fPIC/ ) {
+    $ld_share_flags .= ' -fPIC';
 }
 
 if ( $cc =~ /icc/ ) {
@@ -24,8 +24,9 @@ else {
 Configure::Data->set(
     ccflags => $cflags,
     libs => $libs,
-    ld_shared     => $ld_shared,
-    i_lib_pthread => 1,		# XXX fake a header entry
-    linkflags     => $linkflags,
-    link          => $link,
+    ld_share_flags => $ld_share_flags,
+    ld_load_flags  => $ld_share_flags,
+    i_lib_pthread  => 1,		# XXX fake a header entry
+    linkflags      => $linkflags,
+    link           => $link,
 );

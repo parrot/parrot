@@ -20,5 +20,8 @@ Configure::Data->set(
   ccwarn => "-Wno-shadow",
   libs => $libs,
   so => '.dylib',
+  dynmod => '.so',
   link => 'c++',
+  ld_share_flags => '-dynamiclib',
+  ld_load_flags => '-bundle -undefined suppress',
 );

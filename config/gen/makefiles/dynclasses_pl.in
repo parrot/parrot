@@ -4,22 +4,20 @@ use File::Copy qw(copy move);
 # Config stuff
 our $CC = "${cc} -c";
 our $LD = "${ld}";
-our $LD_SHARED = "${ld_shared}";
-our $LD_SHARED_FLAGS = "${ld_shared_flags}";
 our $LDFLAGS = "${ldflags}";
+our $LD_LOAD_FLAGS = "${ld_load_flags}";
 our $PERL = "${perl}";
-our $SO = "${so}";
+our $LOAD_EXT = "${load_ext}";
 our $O = "${o}";
 our $CFLAGS = "${ccflags} ${cc_debug} ${ccwarn} ${cc_hasjit} ${cg_flag} ${gc_flag}";
 our $PMC2C = "$PERL ${build_dir}${slash}classes${slash}pmc2c2.pl";
 
 # Actual commands
-sub compile_shared_cmd {
+sub compile_loadable_cmd {
     my ($target, $source) = @_;
-    "$LD $CFLAGS $LD_SHARED $LD_SHARED_FLAGS $LDFLAGS " .
+    "$LD $CFLAGS $LDFLAGS $LD_LOAD_FLAGS " .
     "${cc_o_out}" . $target . " " .
     "-I${build_dir}${slash}include -I${build_dir}${slash}classes " .
-    "-L${build_dir}${slash}blib${slash}lib -lparrot " .
     $source;
 };
 
@@ -33,7 +31,7 @@ sub compile_cmd {
 
 sub partial_link_cmd {
     my ($target, @sources) = @_;
-    "$LD $CFLAGS $LD_SHARED $LD_SHARED_FLAGS $LDFLAGS ".
+    "$LD $CFLAGS $LDFLAGS $LD_LOAD_FLAGS ".
     "${cc_o_out}" . $target . " " .
     join(" ", @sources);
 }
@@ -64,7 +62,7 @@ if ($mode eq 'generate') {
     my @ungrouped_pmcs = grep { ! exists $pmc_group->{$_} } @pmcs;
 
     # Convert X.c -> X.so for all non-grouped X.c
-    compile_shared($_) foreach (@ungrouped_pmcs);
+    compile_loadable($_) foreach (@ungrouped_pmcs);
 
     # Convert X.c -> X.o for all grouped X.c
     compile($_) foreach (@grouped_pmcs);
@@ -90,9 +88,10 @@ if ($mode eq 'generate') {
     my $dest = $1;
 
     my ($group_files, $pmc_group) = gather_groups(@pmcs);
+    my @ungrouped_pmcs = grep { ! exists $pmc_group->{$_} } @pmcs;
 
-    foreach (@pmcs, keys %$group_files) {
-        copy("$_$SO", $dest) or die "Copy $_$SO failed ($?)\n";
+    foreach (@ungrouped_pmcs, keys %$group_files) {
+        copy("$_$LOAD_EXT", $dest) or die "Copy $_$LOAD_EXT failed ($?)\n";
     }
 } else {
     die "invalid command '$mode'\nmust be one of generate, compile, linklibs, or copy\n";
@@ -167,22 +166,22 @@ sub compile {
     }
 }
 
-sub compile_shared {
+sub compile_loadable {
     my ($src_stem, $dest_stem) = @_;
     $dest_stem ||= $src_stem;
-    if (needs_build("$dest_stem$SO", "$src_stem.c")) {
-        run(compile_shared_cmd("$dest_stem$SO", "$src_stem.c"))
+    if (needs_build("$dest_stem$LOAD_EXT", "$src_stem.c")) {
+        run(compile_loadable_cmd("$dest_stem$LOAD_EXT", "$src_stem.c"))
           or die "compile $src_stem.c failed ($?)\n";
     } else {
-        print "$dest_stem$SO is up to date\n";
+        print "$dest_stem$LOAD_EXT is up to date\n";
     }
 }
 
 sub partial_link {
     my ($group, @stems) = @_;
     my @sources = map { "$_$O" } @stems;
-    if (needs_build("$group$SO", @sources)) {
-        run(partial_link_cmd("$group$SO", @sources))
-          or die "partial link $group$SO failed ($?)\n";
+    if (needs_build("$group$LOAD_EXT", @sources)) {
+        run(partial_link_cmd("$group$LOAD_EXT", @sources))
+          or die "partial link $group$LOAD_EXT failed ($?)\n";
     }
 }

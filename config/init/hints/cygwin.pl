@@ -11,7 +11,8 @@ $libs =~ s/-lutil\b//g;
 # A. Dougherty 9/9/2002
 Configure::Data->set(
   ld => 'gcc',
-  ld_shared => '-shared',
+  ld_share_flags => '-shared',
+  ld_load_flags => '-shared',
   libs => $libs,
 );
 

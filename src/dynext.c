@@ -144,9 +144,9 @@ get_path(Interp *interpreter, STRING *lib, void **handle)
     file_name = string_to_cstring(interpreter, lib);
     if (!strchr(file_name, '.')) {
         file_w_ext = malloc(strlen(file_name) +
-                strlen(PARROT_DLL_EXTENSION) + 1);
+                strlen(PARROT_LOAD_EXT) + 1);
         strcpy(file_w_ext, file_name);
-        strcat(file_w_ext, PARROT_DLL_EXTENSION);
+        strcat(file_w_ext, PARROT_LOAD_EXT);
         full_name = Parrot_locate_runtime_file(interpreter, file_w_ext,
                 PARROT_RUNTIME_FT_DYNEXT);
         if (full_name) {

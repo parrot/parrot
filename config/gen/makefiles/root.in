@@ -59,17 +59,18 @@ AR_CR     = ${ar} ${ar_flags}
 RANLIB    = ${ranlib}
 LINK      = ${link}
 LD        = ${ld}
-LD_SHARED = ${ld_shared}
 TOUCH     = $(PERL) -e ${PQ}open(A,qq{>>$$_}) or die foreach @ARGV${PQ}
 YACC      = ${yacc}
 LEX       = ${lex}
 
 # file extensions and util flags
 O               = ${o}
-SO              = ${so}
+SHARE_EXT       = ${share_ext}
+LOAD_EXT        = ${load_ext}
 A               = ${a}
 LD_OUT          = ${ld_out}
-LD_SHARED_FLAGS = ${ld_shared_flags}
+LD_SHARE_FLAGS  = ${ld_share_flags}
+LD_LOAD_FLAGS   = ${ld_load_flags}
 
 INC=./${inc}
 
@@ -431,7 +432,7 @@ ALL_PARROT_LIBS = $(LIBPARROT) $(LIBICUCORE) $(LIBICUDATA) $(C_LIBS)
 
 # dynamic extensions
 DYNEXT_DIR      = runtime/parrot/dynext
-LIBNCI_SO       = $(DYNEXT_DIR)/libnci$(SO)
+LIBNCI_SO       = $(DYNEXT_DIR)/libnci$(SHARE_EXT)
 
 ###############################################################################
 #
@@ -612,7 +613,7 @@ check_source : $(GENERAL_H_FILES)
 #
 ###############################################################################
 
-shared : $(GEN_HEADERS) blib/lib/libparrot$(SO) $(LIBPARROT)
+shared : $(GEN_HEADERS) blib/lib/libparrot$(SHARE_EXT) $(LIBPARROT)
 static : $(GEN_HEADERS) $(LIBPARROT)
 
 # XXX changes don't always propagate into libparrot
@@ -626,48 +627,12 @@ $(LIBPARROT) : $(O_FILES)
 	$(AR_CR) ${ar_out}$@ ${ar_extra} $(O_FILES)
 	$(RANLIB) $@
 
-blib/lib/libparrot$(SO) : $(O_FILES)
+blib/lib/libparrot$(SHARE_EXT) : $(O_FILES)
 	$(MKDIR) blib blib/lib
-	$(LD) $(LD_SHARED) $(LD_SHARED_FLAGS) $(LDFLAGS) $(LD_OUT)blib/lib/libparrot$(SO) $(O_FILES) $(C_LIBS) $(LIBICUCORE) $(LIBICUDATA)
+	$(LD) $(LD_SHARE_FLAGS) $(LDFLAGS) $(LD_OUT)blib/lib/libparrot$(SHARE_EXT) $(O_FILES) $(C_LIBS) $(LIBICUCORE) $(LIBICUDATA)
 
-$(TEST_PROG_SO) : $(PARROT_MAIN)$(O) blib/lib/libparrot$(SO) lib/Parrot/OpLib/core.pm
+$(TEST_PROG_SO) : $(PARROT_MAIN)$(O) blib/lib/libparrot$(SHARE_EXT) lib/Parrot/OpLib/core.pm
 	$(LINK) $(LINKFLAGS) $(LD_OUT)$(TEST_PROG) $(PARROT_MAIN)$(O) $(LIBPARROT) $(C_LIBS)
-
-# XXX The dependancies on SO.MAJOR.MINOR and SO.VERSION are removed
-#     because those should be done at "make install" and not "make shared"
-#     It also makes the task of getting this working on win32 much easier. :)
-#
-#blib/lib/libparrot$(SO).${VERSION} : $(O_FILES)
-#	$(MKDIR) blib blib/lib
-#	$(LD) $(LD_SHARED) -Wl,-soname,libparrot$(SO).${MAJOR} $(LDFLAGS) $(LD_OUT)blib/lib/libparrot$(SO).${VERSION} $(O_FILES)
-#
-#blib/lib/libparrot$(SO).${MAJOR}.${MINOR} : blib/lib/libparrot$(SO).${VERSION}
-#	$(RM_F) $@
-#	cd blib/lib; ln -s libparrot$(SO).${VERSION} libparrot$(SO).${MAJOR}.${MINOR}
-#
-#blib/lib/libparrot$(SO).${MAJOR} : blib/lib/libparrot$(SO).${MAJOR}.${MINOR}
-#	$(RM_F) $@
-#	cd blib/lib; ln -s libparrot$(SO).${MAJOR}.${MINOR} libparrot$(SO).${MAJOR}
-#
-#blib/lib/libparrot$(SO) : blib/lib/libparrot$(SO).${MAJOR}
-#	$(RM_F) $@
-#	cd blib/lib; ln -s libparrot$(SO).${MAJOR} libparrot$(SO)
-#
-#blib/lib/libcore_prederef$(SO).${VERSION} : core_ops_prederef$(O)
-#	$(LD) $(LD_SHARED) -Wl,-soname,libparrot$(SO).${MAJOR} $(LDFLAGS) $(LD_OUT)blib/lib/libcore_prederef$(SO).${VERSION} core_ops_prederef$(O)
-#
-#blib/lib/libcore_prederef$(SO).${MAJOR}.${MINOR} : blib/lib/libcore_prederef$(SO).${VERSION}
-#	$(RM_F) $@
-#	cd blib/lib; ln -s libcore_prederef$(SO).${VERSION} libcore_prederef$(SO).${MAJOR}.${MINOR}
-#
-#blib/lib/libcore_prederef$(SO).${MAJOR} : blib/lib/libcore_prederef$(SO).${MAJOR}.${MINOR}
-#	$(RM_F) $@
-#	cd blib/lib; ln -s libcore_prederef$(SO).${MAJOR}.${MINOR} libcore_prederef$(SO).${MAJOR}
-#
-#blib/lib/libcore_prederef$(SO) : blib/lib/libcore_prederef$(SO).${MAJOR}
-#	$(RM_F) $@
-#	cd blib/lib; ln -s libcore_prederef$(SO).${MAJOR} libcore_prederef$(SO)
-
 
 #
 # Parrot Debugger
@@ -1279,14 +1244,14 @@ miniparrot-update :
 exec : $(SRC)/exec_start$(O) $(LIBPARROT)
 	$(LINK) ${ld_out}$(EXEC) $(LINKFLAGS) $(EXEC)$(O) $(SRC)/exec_start$(O) $(ALL_PARROT_LIBS)
 
-exec_so : $(SRC)/exec_start$(O) blib/lib/libparrot$(SO)
+exec_so : $(SRC)/exec_start$(O) blib/lib/libparrot$(SHARE_EXT)
 	$(LINK) ${ld_out}$(EXEC) $(LINKFLAGS) $(EXEC)$(O) $(SRC)/exec_start$(O) -lparrot $(C_LIBS)
 
 ###### OS depend targets ##########
 # libnci.so used by t/pmc/nci.t
 
 $(LIBNCI_SO): $(SRC)/nci_test$(O)
-	$(LD) $(LD_SHARED) ${ncilib_link_extra} $(LDFLAGS) \
+	$(LD) $(LD_SHARE_FLAGS) ${ncilib_link_extra} $(LDFLAGS) \
 	    $(LD_OUT)$@ $(SRC)/nci_test$(O)
 
 # vim ctags

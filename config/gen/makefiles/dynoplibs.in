@@ -2,23 +2,23 @@
 # sample Makefile
 #
 LD = ${ld}
-LD_SHARED = ${ld_shared}
+LD_LOAD_FLAGS = ${ld_load_flags}
 PERL = ${perl}
 RM_F = ${rm_f}
-SO = ${so}
+LOAD_EXT = ${load_ext}
 OPS2C = -I..${slash}lib ..${slash}build_tools${slash}ops2c.pl
 CFLAGS = ${ccflags} ${cc_debug} ${ccwarn} ${cc_hasjit} ${cg_flag} ${gc_flag}
 
 
 # add your dynamic oplibs here
 
-all: myops_ops$(SO) myops_ops_cg$(SO) myops_ops_cgp$(SO) \
-     myops_ops_prederef$(SO) myops_ops_switch$(SO) \
+all: myops_ops$(LOAD_EXT) myops_ops_cg$(LOAD_EXT) myops_ops_cgp$(LOAD_EXT) \
+     myops_ops_prederef$(LOAD_EXT) myops_ops_switch$(LOAD_EXT) \
      \
-     dan_ops$(SO) dan_ops_cg$(SO) dan_ops_cgp$(SO) \
-     dan_ops_prederef$(SO) dan_ops_switch$(SO)
+     dan_ops$(LOAD_EXT) dan_ops_cg$(LOAD_EXT) dan_ops_cgp$(LOAD_EXT) \
+     dan_ops_prederef$(LOAD_EXT) dan_ops_switch$(LOAD_EXT)
 
-.SUFFIXES: .ops .c $(SO)
+.SUFFIXES: .ops .c $(LOAD_EXT)
 
 # preserve .c if needed
 .PRECIOUS: %_ops.c %_ops_cgp.c %_ops_cg.c %_ops_prederef.c %_ops_switch.c
@@ -38,15 +38,15 @@ all: myops_ops$(SO) myops_ops_cg$(SO) myops_ops_cgp$(SO) \
 %_ops_switch.c  : %.ops
 	$(PERL) $(OPS2C) CSwitch --dynamic $<
 
-%$(SO) : %.c
-	$(LD) $(CFLAGS) $(LD_SHARED) $(LD_SHARED_FLAGS) $(LDFLAGS) \
+.c$(LOAD_EXT) :
+	$(LD) $(CFLAGS) $(LD_LOAD_FLAGS) $(LDFLAGS) \
 	${cc_o_out}$@ \
 		-I..${slash}include \
 		-L..${slash}blib${slash}lib -lparrot $<
 	$(PERL) -MFile::Copy=cp -e ${PQ}cp q|$@|, q|../runtime/parrot/dynext/$@|${PQ}
 
 clean :
-	$(RM_F) *.c *.h *$(SO)
+	$(RM_F) *.c *.h *$(LOAD_EXT)
 
 realclean: clean
 	$(RM_F) Makefile

@@ -11,8 +11,8 @@ t/library/parrotlib.t - testing library/parrotlib.imc
 
 =head1 DESCRIPTION
 
-This test program test wether the library 'parrotlib.imc' returns the expected
-absolut filenames.
+This test program test whether the library 'parrotlib.imc' returns the
+expected absolute filenames.
 
 =cut
 
@@ -89,16 +89,16 @@ END_OUT
 output_is( << "END_CODE", << "END_OUT", 'dynext_location' );
 $template_top
   location_sub = find_global "_parrotlib", "dynext_location"
-  location     = location_sub( 'libnci', '$PConfig{so}' )
+  location     = location_sub( 'libnci', '$PConfig{load_ext}' )
 $template_bottom
 END_CODE
-runtime/parrot/dynext/libnci$PConfig{so}
+runtime/parrot/dynext/libnci$PConfig{load_ext}
 END_OUT
 
 output_is( << "END_CODE", << 'END_OUT', 'dynext_location, non-existent' );
 $template_top
   location_sub = find_global "_parrotlib", "imcc_compile_file_location"
-  location     = location_sub( 'nonexistent', '$PConfig{so}' )
+  location     = location_sub( 'nonexistent', '$PConfig{load_ext}' )
 $template_bottom
 END_CODE
 

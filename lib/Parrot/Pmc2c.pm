@@ -105,19 +105,19 @@ sub class_name {
     $nclass;
 }
 
-=item C<dynext_load_code($library_name, @classes)>
+=item C<dynext_load_code($library_name, %classes)>
 
 C<$library_name> is the name of the dynamic library to be created.
 
-C<@classes> are the names of the PMCs for which initialization
-code is to be generated.
+C<%classes> is a map from the PMC names for which code is to be generated,
+to dump info (PMC metadata).
 
 This function is exported.
 
 =cut
 
 sub dynext_load_code {
-    my ($libname, @classes ) = @_;
+    my ($libname, %classes ) = @_;
     my $lc_libname = lc $libname;
     my $cout;
 
@@ -131,7 +131,7 @@ sub dynext_load_code {
 #include "parrot/dynext.h"
 
 EOC
-    foreach my $class (@classes) {
+    for my $class (keys %classes) {
         my $lc_class = lc $class;
         $cout .= <<"EOC";
 #include "pmc_${lc_class}.h"
@@ -139,13 +139,14 @@ EOC
     }
     $cout .= <<"EOC";
 
-Parrot_PMC Parrot_lib_${lc_libname}_load(Parrot_INTERP interpreter); /* don't warn */
+extern Parrot_PMC Parrot_lib_${lc_libname}_load(Parrot_INTERP interpreter); /* don't warn */
 Parrot_PMC Parrot_lib_${lc_libname}_load(Parrot_INTERP interpreter)
 {
     Parrot_STRING whoami;
     Parrot_PMC pmc;
 EOC
-    foreach my $class (@classes) {
+    while (my ($class, $info) = each %classes) {
+	next if $info->{flags}->{noinit};
         $cout .= <<"EOC";
     Parrot_Int type${class};
 EOC
@@ -165,10 +166,11 @@ EOC
      * for all PMCs we want to register:
      */
 EOC
-    foreach my $class (@classes) {
+    while (my ($class, $info) = each %classes) {
+	my $lhs = $info->{flags}->{noinit} ? "" : "type$class = ";
         $cout .= <<"EOC";
     whoami = string_from_cstring(interpreter, "$class", 0);
-    type${class} = pmc_register(interpreter, whoami);
+    ${lhs}pmc_register(interpreter, whoami);
 EOC
     }
     $cout .= <<"EOC";
@@ -176,7 +178,8 @@ EOC
     /* do class_init code */
     for (pass = 0; pass <= 1; ++pass) {
 EOC
-    foreach my $class (@classes) {
+    while (my ($class, $info) = each %classes) {
+	next if $info->{flags}->{noinit};
         my $lc_class = lc $class;
         $cout .= <<"EOC";
         Parrot_${class}_class_init(interpreter, type$class, pass);
@@ -531,7 +534,7 @@ Returns the C code for loading a library.
 sub lib_load_code() {
     my $self = shift;
     my $classname = $self->{class};
-    return dynext_load_code($classname, $classname);
+    return dynext_load_code($classname, $classname => {});
 }
 
 =item C<pmc_is_dynpmc>
@@ -1523,7 +1526,7 @@ sub gen_c {
     my $cout = Parrot::Pmc2c->dont_edit('various files');
 
     $cout .= Parrot::Pmc2c::dynext_load_code($self->{opt}{library},
-                                             map { $_->{class} }
+                                             map { $_->{class} => $_ }
                                                  values %{$self->{pmcs}} );
 
     return $cout;
