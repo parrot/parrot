@@ -21,3 +21,4 @@ jit_cpu.c
 core_pmcs.c
 *.tmp
 test
+nci.c
