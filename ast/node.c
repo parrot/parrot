@@ -377,6 +377,18 @@ insert_find_global(Interp* interpreter, nodeType *var)
     return insINS(interpreter, cur_unit, ins, "find_global", regs, 2);
 }
 
+static const char*
+default_pmc_type(nodeType *p)
+{
+    const char *pmc;
+    switch (p->u.var.r->set) {
+        case 'I': pmc = INT_TYPE; break;
+        case 'S': pmc = FLOAT_TYPE; break;
+        case 'N': pmc = STRING_TYPE; break;
+        default:  pmc = UNDEF_TYPE; break;
+    }
+    return pmc;
+}
 /*
  * promote a Const or Var to a PMC node, if it isn't yet a PMC
  */
@@ -387,12 +399,9 @@ node_to_pmc(Interp* interpreter, Instruction **ins, nodeType *p)
     const char *pmc;
     nodeType *temp;
 
-    switch (p->u.var.r->set) {
-        case 'I': pmc = INT_TYPE; break;
-        case 'S': pmc = FLOAT_TYPE; break;
-        case 'N': pmc = STRING_TYPE; break;
-        default:  return p;
-    }
+    if (p->u.var.r->set == 'P')
+        return p;
+    pmc = default_pmc_type(p);
     temp = IMCC_new_temp_node(interpreter, 'P', &p->loc);
     *ins = insert_new(interpreter, temp, pmc);
     regs[0] = temp->u.var.r;
@@ -451,19 +460,25 @@ exp_Assign(Interp* interpreter, nodeType *p)
     nodeType *var = CHILD(p);
     nodeType *rhs = var->next;
     int assigned = 0;
+    char buf[128];
 
     if (rhs->expand == exp_Binary) {
-        ins = cur_unit->last_ins;
+        /*
+         * set the destination node, where the binary places
+         * the result
+         */
         rhs->dest = var;
         rhs = rhs->expand(interpreter, rhs);
         assigned = 1;
     }
     else if (rhs->expand == exp_Const) {
+        const char *pmc;
         /* need a new value, because the name might be aliased by
          * a = b
          */
         ins = cur_unit->last_ins;
-        rhs = node_to_pmc(interpreter, &ins, rhs);
+        pmc = default_pmc_type(var);
+        ins = insert_new(interpreter, var, pmc);
     }
     else {
         rhs = rhs->expand(interpreter, rhs);
@@ -472,7 +487,12 @@ exp_Assign(Interp* interpreter, nodeType *p)
     if (!assigned) {
         regs[0] = var->u.var.r;
         regs[1] = rhs->u.var.r;
-        insINS(interpreter, cur_unit, ins, "set", regs, 2);
+        ins = insINS(interpreter, cur_unit, ins, "set", regs, 2);
+        regs[0] = get_const("-1", 'I');
+        sprintf(buf, "\"%s\"", var->u.var.r->name);
+        regs[1] = get_const(buf, 'S');
+        regs[2] = var->u.var.r;
+        insINS(interpreter, cur_unit, ins, "store_lex", regs, 3);
     }
     return var;
 }
@@ -500,7 +520,7 @@ exp_Binary(Interp* interpreter, nodeType *p)
     nodeType *op, *left, *right, *dest;
     Instruction *ins;
     SymReg *regs[IMCC_MAX_REGS];
-    char buf[16];
+    char buf[128];
 
     op = CHILD(p);
     left = op->next;
@@ -527,8 +547,8 @@ exp_Binary(Interp* interpreter, nodeType *p)
          */
         regs[0] = dest->u.var.r;
         regs[1] = get_const("-1", 'I');
-        sprintf(buf, "%d", dest->u.var.local_nr);
-        regs[2] = get_const(buf, 'I');
+        sprintf(buf, "\"%s\"", dest->u.var.r->name);
+        regs[2] = get_const(buf, 'S');
         ins = insINS(interpreter, cur_unit, ins, "find_lex", regs, 3);
     }
     else {
@@ -753,6 +773,7 @@ exp_Py_Local(Interp* interpreter, nodeType *var)
     sprintf(buf, "\"%s\"", var->u.var.r->name);
     regs[1] = get_const(buf, 'S');
     regs[2] = var->u.var.r;
+    var->u.var.local_nr = cur_unit->local_count++;
     insINS(interpreter, cur_unit, ins, "store_lex", regs, 3);
     return NULL;
 }
