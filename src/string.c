@@ -24,7 +24,20 @@
 static const CHARTYPE *string_native_type;
 static const CHARTYPE *string_unicode_type;
 
-#define EXTRA_SIZE 4
+/*
+ * this extra size is in the hope, that some concat ops might
+ * follow in a sequence.
+ *
+ * compiling 3180 chars of a bf programs with bfc gives:
+ *
+ *             extra = 4          512          1024
+ * GC runs          2376           74            36
+ * mem copied      210 MB        6 MB          3 MB
+ * time -C          5.2 s       0.3 s         0.2 s
+ */
+
+#define EXTRA_SIZE 512
+
 /* work around warning:
  * cast discards qualifiers from pointer target type
  * s. usage below
