@@ -141,7 +141,7 @@ add_namespace(Parrot_Interp interpreter, SymReg *sub)
     SymReg *ns = IMCC_INFO(interpreter)->cur_namespace;
     SymReg *r, *g;
 
-    if (!ns)
+    if (!ns || strlen(ns->name) <= 2)
         return;
     g = dup_sym(ns);
     sub->pcc_sub->namespace = g;
@@ -336,20 +336,19 @@ add_ns(char *name)
     if (!cur_namespace || (l = strlen(cur_namespace->name)) <= 2)
         return name;
     /* TODO keyed syntax */
-    len = strlen(name) + l  + 3;
+    len = strlen(name) + l  + 4;
     ns_name = mem_sys_allocate(len);
     strcpy(ns_name, cur_namespace->name);
     *ns_name = '_';
     ns_name[l - 1] = '\0';
-    strcat(ns_name, "::");
+    strcat(ns_name, "@@@");
     strcat(ns_name, name);
     mem_sys_free(name);
-    p = strstr(ns_name, "\";\"");   /* Foo";"Bar  -> Foo::Bar */
+    p = strstr(ns_name, "\";\"");   /* Foo";"Bar  -> Foo@@@Bar */
     while (p) {
-        p[0] = ':';
-        p[1] = ':';
-        l = strlen(p+2);
-        memmove(p+2, p+3, l);
+        p[0] = '@';
+        p[1] = '@';
+        p[2] = '@';
         p = strstr(ns_name, "\";\")");
     }
     return ns_name;

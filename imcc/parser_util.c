@@ -422,6 +422,7 @@ INS(struct Parrot_Interp *interpreter, IMC_Unit * unit, char *name,
  *
  */
 extern void* yy_scan_string(const char *);
+extern SymReg *cur_namespace; /* s. imcc.y */
 
 static void *
 imcc_compile(Parrot_Interp interp, const char *s)
@@ -437,6 +438,7 @@ imcc_compile(Parrot_Interp interp, const char *s)
     opcode_t *pc;
 #endif
 
+    cur_namespace = NULL;
     interp->code = pf;  /* put new packfile in place */
     sprintf(name, "EVAL_" INTVAL_FMT, ++pf_save->eval_nr);
     sourcefile = name;
@@ -466,7 +468,7 @@ imcc_compile(Parrot_Interp interp, const char *s)
 #endif
     PackFile_fixup_subs(interp);
     /* restore old byte_code, */
-    (void)Parrot_switch_to_cs(interp, pf_save->cur_cs);
+    (void)Parrot_switch_to_cs(interp, pf_save->cur_cs, 0);
     sourcefile = source;
     /* append new packfile to current directory */
     PackFile_add_segment(&interp->code->directory,
@@ -530,6 +532,7 @@ imcc_compile_file (Parrot_Interp interp, const char *s)
     fprintf(stderr, "parser_util.c: imcc_compile_file '%s'\n", s);
 #endif
 
+    cur_namespace = NULL;
     pf = PackFile_new(0);
     interp->code = pf;  /* put new packfile in place */
     sourcefile = const_cast(s);
@@ -546,7 +549,7 @@ imcc_compile_file (Parrot_Interp interp, const char *s)
     compile_file(interp, new);
     imc_cleanup(interp);
 
-    (void)Parrot_switch_to_cs(interp, pf_save->cur_cs);
+    (void)Parrot_switch_to_cs(interp, pf_save->cur_cs, 0);
     sourcefile = source;
     pasm_file = pasm;
     fclose(new);

@@ -1971,7 +1971,7 @@ Parrot_switch_to_cs_by_nr(struct Parrot_Interp *interpreter, opcode_t seg)
         if (dir->segments[i]->type == PF_BYTEC_SEG) {
             if (n == seg) {
                 Parrot_switch_to_cs(interpreter, (struct PackFile_ByteCode *)
-                        dir->segments[i]);
+                        dir->segments[i], 1);
                 return;
             }
             n++;
@@ -1984,7 +1984,7 @@ Parrot_switch_to_cs_by_nr(struct Parrot_Interp *interpreter, opcode_t seg)
 
 =item C<struct PackFile_ByteCode *
 Parrot_switch_to_cs(struct Parrot_Interp *interpreter,
-    struct PackFile_ByteCode *new_cs)>
+    struct PackFile_ByteCode *new_cs, int really)>
 
 Switch to a byte code segment C<new_cs>, returning the old segment.
 
@@ -1994,14 +1994,17 @@ Switch to a byte code segment C<new_cs>, returning the old segment.
 
 struct PackFile_ByteCode *
 Parrot_switch_to_cs(struct Parrot_Interp *interpreter,
-    struct PackFile_ByteCode *new_cs)
+    struct PackFile_ByteCode *new_cs, int really)
 {
     struct PackFile_ByteCode *cur_cs = interpreter->code->cur_cs;
 
     if (!new_cs) {
         internal_exception(NO_PREV_CS, "No code segment to switch to\n");
     }
-    if (Interp_flags_TEST(interpreter, PARROT_TRACE_FLAG))
+    /* compiling source code uses this function too,
+     * which gives misleading trace messages
+     */
+    if (really && Interp_flags_TEST(interpreter, PARROT_TRACE_FLAG))
         PIO_eprintf(interpreter, "*** switching to %s\n",
                 new_cs->base.name);
     if (new_cs->base.pf != interpreter->code)
@@ -2035,7 +2038,7 @@ Parrot_pop_cs(struct Parrot_Interp *interpreter)
     struct PackFile_ByteCode *cur_cs = interpreter->code->cur_cs;
     struct PackFile_ByteCode *new_cs = cur_cs->prev;
 
-    Parrot_switch_to_cs(interpreter, new_cs);
+    Parrot_switch_to_cs(interpreter, new_cs, 1);
     PackFile_remove_segment_by_name (cur_cs->base.dir, cur_cs->base.name);
 }
 
@@ -2780,7 +2783,11 @@ global_ns:
         PMC * stash, *part;
         struct PackFile_Constant *pfc_const;
 
-        assert(ns < pf->const_table->const_count);
+        if (ns >= pf->const_table->const_count) {
+            internal_exception(1,
+                "store_sub_in_namespace: sub '%s' namespace #%d too big",
+                name, ns);
+        }
         pfc_const = pf->const_table->constants[ns];
         switch (pfc_const->type) {
             case PFC_STRING:

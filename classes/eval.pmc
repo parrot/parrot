@@ -62,7 +62,7 @@ Invokes the PMC's code.
 #endif
 
         /* switch to code segment */
-        old_cs = Parrot_switch_to_cs(interpreter, eval_pf->cur_cs);
+        old_cs = Parrot_switch_to_cs(interpreter, eval_pf->cur_cs, 1);
         if (Interp_flags_TEST(interpreter, PARROT_TRACE_FLAG)) {
             PIO_eprintf(interpreter, "*** invoking %s\n",
                 eval_pf->cur_cs->base.name);
@@ -84,7 +84,7 @@ Invokes the PMC's code.
             next = 0;
         }
         else
-            (void)Parrot_switch_to_cs(interpreter, old_cs);
+            (void)Parrot_switch_to_cs(interpreter, old_cs, 1);
         return next;
     }
 
@@ -126,7 +126,7 @@ Returns the PMC's code as a Parrot string.
         opcode_t *packed;
         struct PackFile *pf = (struct PackFile *) PMC_struct_val(SELF);
         STRING *s;
-    
+
         size = PackFile_pack_size(pf) * sizeof(opcode_t);
         packed = (opcode_t*) mem_sys_allocate(size);
         PackFile_pack(pf, packed);

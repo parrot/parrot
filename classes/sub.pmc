@@ -188,7 +188,7 @@ Invokes the subroutine.
             print_sub_name(interpreter, SELF);
         }
         if (interpreter->code->cur_cs != sub->seg) {
-            Parrot_switch_to_cs(interpreter, sub->seg);
+            Parrot_switch_to_cs(interpreter, sub->seg, 1);
         }
         return PMC_struct_val(SELF);
     }

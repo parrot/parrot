@@ -2007,10 +2007,10 @@ PDB_eval(struct Parrot_Interp *interpreter, const char *command)
     eval_pf = PDB_compile(interpreter, command);
 
     if (eval_pf) {
-        old_cs = Parrot_switch_to_cs(interpreter, eval_pf->cur_cs);
+        old_cs = Parrot_switch_to_cs(interpreter, eval_pf->cur_cs, 1);
         run = eval_pf->cur_cs->base.data;
         DO_OP(run,interpreter);
-        Parrot_switch_to_cs(interpreter, old_cs);
+        Parrot_switch_to_cs(interpreter, old_cs, 1);
        /* TODO destroy packfile */
     }
 }

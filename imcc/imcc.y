@@ -555,7 +555,7 @@ proto: pcc_proto
    | MAIN           {  $$ = P_MAIN; }
    | IMMEDIATE      {  $$ = P_IMMEDIATE; }
    | POSTCOMP       {  $$ = P_POSTCOMP; }
-   | METHOD         {  $$ = P_METHOD; }
+   | METHOD         {  $$ = P_METHOD | P_NONE ; }
    ;
 
 pcc_call:

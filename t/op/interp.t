@@ -45,10 +45,10 @@ output_like(<<'CODE', <<'OUTPUT', "restart trace");
 	end
 CODE
 /^ok\s1\n
-(?:\s+5.*)?\n
-ok\s2\n
 (?:\s+7.*)?\n
+ok\s2\n
 (?:\s+9.*)?\n
+(?:\s+11.*)?\n
 ok\s3\n$/x
 OUTPUT
 
@@ -116,8 +116,8 @@ foo:
     end
 CODE
 /calling\n
-In\s2\n
 \s+\d+.*\n
+In\s2\n
 \s+\d+.*\n
 ending\n/x
 OUTPUT

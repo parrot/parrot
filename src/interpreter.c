@@ -882,7 +882,7 @@ runops_ex(struct Parrot_Interp *interpreter, size_t offset)
             if (!fe)
                 internal_exception(1, "branch_cs: fixup not found\n");
             offset = fe->offset;
-            Parrot_switch_to_cs(interpreter, fe->seg);
+            Parrot_switch_to_cs(interpreter, fe->seg, 1);
             if (Interp_flags_TEST(interpreter, PARROT_TRACE_FLAG)) {
                 PIO_eprintf(interpreter, "*** Resume at seg %s ofs %d\n",
                         fe->seg->base.name, (int)offset);

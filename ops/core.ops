@@ -189,7 +189,7 @@ inline op branch_cs (in STR) {
 	interpreter->resume_offset = -1;
     else {
 	interpreter->resume_offset = fe->offset;
-        Parrot_switch_to_cs(interpreter, fe->seg);
+        Parrot_switch_to_cs(interpreter, fe->seg, 1);
     }
     interpreter->resume_flag = 2;
     goto ADDRESS(0);

@@ -618,11 +618,12 @@ add_const_pmc_sub(struct Parrot_Interp *interpreter, SymReg *r,
         ns = r->pcc_sub->namespace->reg;
         if (ns->set == 'K')
             ns->color = build_key(interpreter, ns);
-        debug(interpreter, DEBUG_PBC_CONST, "name space const = %d\n",
-                ns->color);
+        debug(interpreter, DEBUG_PBC_CONST,
+                "name space const = %d ns name '%s'\n",
+                ns->color, ns->name);
         ns_const = ns->color;
         /* strip namespace off from front */
-        real_name = strrchr(r->name, ':');
+        real_name = strrchr(r->name, '@');
         if (!real_name)
             real_name = r->name;
         else

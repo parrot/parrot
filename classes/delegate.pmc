@@ -182,9 +182,13 @@ noarg_noreturn(Parrot_Interp interpreter, PMC *obj, PMC* class,
         const char *meth, int die) {
     struct regsave *data = save_regs(interpreter);
     PMC *method = die ? find_or_die(interpreter, class, meth) :
-                    find_meth  (interpreter, class, meth);
-    if (PMC_IS_NULL(method))
+        find_meth  (interpreter, class, meth);
+    if (PMC_IS_NULL(method)) {
+        if (Interp_flags_TEST(interpreter, PARROT_TRACE_FLAG)) {
+            PIO_eprintf(interpreter, "# not found\n");
+        }
         goto ret;
+    }
     REG_PMC(2) = obj;
     REG_INT(0) = 1; /* prototyped */
     REG_INT(1) = 0;
