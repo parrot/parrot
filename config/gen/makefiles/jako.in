@@ -21,8 +21,19 @@ INTERP=../../${test_prog}
 # Default target:
 #
 
-all: bench.pbc euclid.pbc fact.pbc fib.pbc hello.pbc leibniz.pbc \
-mandelbrot.pbc mandelzoom.pbc mops.pbc primes.pbc queens.pbc sub.pbc
+all: \
+	examples/bench.pbc      \
+	examples/euclid.pbc     \
+	examples/fact.pbc       \
+	examples/fib.pbc        \
+	examples/hello.pbc      \
+	examples/leibniz.pbc    \
+	examples/mandelbrot.pbc \
+	examples/mandelzoom.pbc \
+	examples/mops.pbc       \
+	examples/primes.pbc     \
+	examples/queens.pbc     \
+	examples/sub.pbc
 
 
 #
@@ -32,18 +43,18 @@ mandelbrot.pbc mandelzoom.pbc mops.pbc primes.pbc queens.pbc sub.pbc
 .jako.imc:
 	$(JAKOC) $< > $@ || (rm -f $@ && false)
 
-bench.imc: bench.jako jakoc
-euclid.imc: euclid.jako jakoc
-fact.imc: fact.jako jakoc
-fib.imc: fib.jako jakoc
-hello.imc: hello.jako jakoc
-leibniz.imc: leibniz.jako jakoc
-mandelbrot.imc: mandelbrot.jako jakoc
-mandelzoom.imc: mandelzoom.jako jakoc
-mops.imc: mops.jako jakoc
-primes.imc: primes.jako jakoc
-queens.imc: queens.jako jakoc
-sub.imc: sub.jako jakoc
+examples/bench.imc:      examples/bench.jako      jakoc
+examples/euclid.imc:     examples/euclid.jako     jakoc
+examples/fact.imc:       examples/fact.jako       jakoc
+examples/fib.imc:        examples/fib.jako        jakoc
+examples/hello.imc:      examples/hello.jako      jakoc
+examples/leibniz.imc:    examples/leibniz.jako    jakoc
+examples/mandelbrot.imc: examples/mandelbrot.jako jakoc
+examples/mandelzoom.imc: examples/mandelzoom.jako jakoc
+examples/mops.imc:       examples/mops.jako       jakoc
+examples/primes.imc:     examples/primes.jako     jakoc
+examples/queens.imc:     examples/queens.jako     jakoc
+examples/sub.imc:        examples/sub.jako        jakoc
 
 
 #
@@ -59,18 +70,18 @@ sub.imc: sub.jako jakoc
 imcc: ../imcc/imcc
 	ln -s ../imcc/imcc imcc
 
-bench.pasm: bench.imc imcc
-euclid.pasm: euclid.imc imcc
-fact.pasm: fact.imc imcc
-fib.pasm: fib.imc imcc
-hello.pasm: hello.imc imcc
-leibniz.pasm: leibniz.imc imcc
-mandelbrot.pasm: mandelbrot.imc imcc
-mandelzoom.pasm: mandelzoom.imc imcc
-mops.pasm: mops.imc imcc
-primes.pasm: primes.imc imcc
-queens.pasm: queens.imc imcc
-sub.pasm: sub.imc imcc
+examples/bench.pasm:      examples/bench.imc      imcc
+examples/euclid.pasm:     examples/euclid.imc     imcc
+examples/fact.pasm:       examples/fact.imc       imcc
+examples/fib.pasm:        examples/fib.imc        imcc
+examples/hello.pasm:      examples/hello.imc      imcc
+examples/leibniz.pasm:    examples/leibniz.imc    imcc
+examples/mandelbrot.pasm: examples/mandelbrot.imc imcc
+examples/mandelzoom.pasm: examples/mandelzoom.imc imcc
+examples/mops.pasm:       examples/mops.imc       imcc
+examples/primes.pasm:     examples/primes.imc     imcc
+examples/queens.pasm:     examples/queens.imc     imcc
+examples/sub.pasm:        examples/sub.imc        imcc
 
 
 #
@@ -80,18 +91,18 @@ sub.pasm: sub.imc imcc
 .pasm.pbc:
 	$(ASM) $< > $@
 
-bench.pbc: bench.pasm
-euclid.pbc: euclid.pasm
-fact.pbc: fact.pasm
-fib.pbc: fib.pasm
-hello.pbc: hello.pasm
-leibniz.pbc: leibniz.pasm
-mandelbrot.pbc: mandelbrot.pasm
-mandelzoom.pbc: mandelzoom.pasm
-mops.pbc: mops.pasm
-primes.pbc: primes.pasm
-queens.pbc: queens.pasm
-sub.pbc: sub.pasm
+examples/bench.pbc:      examples/bench.pasm
+examples/euclid.pbc:     examples/euclid.pasm
+examples/fact.pbc:       examples/fact.pasm
+examples/fib.pbc:        examples/fib.pasm
+examples/hello.pbc:      examples/hello.pasm
+examples/leibniz.pbc:    examples/leibniz.pasm
+examples/mandelbrot.pbc: examples/mandelbrot.pasm
+examples/mandelzoom.pbc: examples/mandelzoom.pasm
+examples/mops.pbc:       examples/mops.pasm
+examples/primes.pbc:     examples/primes.pasm
+examples/queens.pbc:     examples/queens.pasm
+examples/sub.pbc:        examples/sub.pasm
 
 
 #
@@ -106,18 +117,18 @@ over:
 	@$(MAKE) all
 
 test: all
-	$(INTERP) bench.pbc
-	$(INTERP) euclid.pbc
-	$(INTERP) fact.pbc
-	$(INTERP) fib.pbc
-	$(INTERP) hello.pbc
-	$(INTERP) leibniz.pbc
-	$(INTERP) mandelbrot.pbc
-	$(INTERP) mandelzoom.pbc
-	$(INTERP) mops.pbc
-	$(INTERP) primes.pbc
-	$(INTERP) queens.pbc
-	$(INTERP) sub.pbc
+	$(INTERP) examples/bench.pbc
+	$(INTERP) examples/euclid.pbc
+	$(INTERP) examples/fact.pbc
+	$(INTERP) examples/fib.pbc
+	$(INTERP) examples/hello.pbc
+	$(INTERP) examples/leibniz.pbc
+	$(INTERP) examples/mandelbrot.pbc
+	$(INTERP) examples/mandelzoom.pbc
+	$(INTERP) examples/mops.pbc
+	$(INTERP) examples/primes.pbc
+	$(INTERP) examples/queens.pbc
+	$(INTERP) examples/sub.pbc
 
 
 #
