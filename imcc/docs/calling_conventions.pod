@@ -10,6 +10,8 @@ IMCC - calling conventions
 
 =item 0.2 initial, checked in
 
+=item 0.3 updated parrot calling conventions and invoke
+
 =back
 
 =head1 OVERVIEW
@@ -64,43 +66,79 @@ Implemented. When the subroutine is in the same compilation unit, the
 callee can B<saveall> registers, when the subroutine is in a different
 compilation unit, the callee must preserve all used registers.
 
-=head1 Parrot calling conventions (NCI)
+=head1 Invoking subroutines
+
+IMCC tries to keep track of the address, where the B<invoke> will branch
+to, but can only succeed to do so, when the B<set_addr> and the
+B<invoke> opcodes are located together.
+
+  $P10 = new Sub
+  $I1 = addr _the_sub
+  $P10 = $I1
+  invoke $P10   # ok
+
+But not:
+
+    bsr get_addr
+    invoke $P10 # error
+    ...
+  get_addr:
+    $P10 = new Sub
+    $I1 = addr _the_sub
+    $P10 = $I1
+    ret
+
+The latter example will very likely lead to a wrong CFG and thus to
+wrong register allocation.
+
+=head2 Status
+
+Implemented. When the subroutine does B<saveall>/B<restoreall>, the
+branch from the B<ret> statement back is ignored in the CFG.
+
+=head1 Parrot calling conventions
+
+Proposed syntax:
+
+=head2 PASM Subroutines
+
+  $P0 = new Sub # Continuation / ...
+  .pcc_begin
+  $I0 = addr _sub_label
+  $P0 = $I0
+  .arg x	# I5
+  .arg y	# I6
+  .arg z	# I7
+  .pcc_call $P0	# r = _sub_label(x, y, z)
+  .local int r  # optional - new result var
+  .result r
+  .pcc_end
+
+=head2 NCI
 
 Proposed syntax:
 
   $P0 = load_lib "libname"
   $P1 = dlfunc $P0, "funcname", "signature"
-  .nciarg z	# I5
-  .nciarg y	# I6
-  .nciarg x	# I7
-  ncicall $P1	# r = funcname(x, y, z)
-  .local int r
-  .nciresult r
+  .nci_begin
+  .arg x	# I5
+  .arg y	# I6
+  .arg z	# I7
+  .pcc_call $P1	# r = funcname(x, y, z)
+  .local int r  # optional - new result var
+  .result r
+  .nci_end
 
 This prepares parameters like described in
 F<pdd03_calling_conventions.pod>, saves the registers and invokes the
-function.
-The B<.nciarg> pseudo ops put the given argument into increasing
-registers of the appropriate type. They have to be in reversed
-argument order.
+function.  The B<.arg> pseudo ops put the given argument into
+increasing registers of the appropriate type.
 
 =head2 Status
 
 Unimplemented.
 
-=head1 Continuations
-
-TBD.
-
-=head1 Coroutines
-
-TBD.
-
 =head1 Exception handlers
-
-TBD.
-
-=head1 Parrot calling conventions (Method calls)
 
 TBD.
 
