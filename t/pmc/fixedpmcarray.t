@@ -365,7 +365,7 @@ ok 1
 1 2 5 9 10 x
 compares: [1-9]\d*/, "sort");
 
-output_is(<< 'CODE', << 'OUTPUT', "check wether interface is done");
+output_is(<< 'CODE', << 'OUTPUT', "check whether interface is done");
 ##PIR##
 .sub _main
     .local pmc pmc1
