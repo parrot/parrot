@@ -28,6 +28,7 @@ clear_fixups(Parrot_Interp interpreter, PMC* self)
     struct PackFile_ByteCode *seg;
     struct PackFile_FixupTable *ft;
     struct PackFile_ConstTable *ct;
+    PMC *sub;
 
     seg = PMC_sub(self)->seg;
     if (!seg)
@@ -42,6 +43,8 @@ clear_fixups(Parrot_Interp interpreter, PMC* self)
         switch (ft->fixups[i]->type) {
             case enum_fixup_sub:
                 ci = ft->fixups[i]->offset;
+                sub = ct->constants[ci]->u.key;
+                VTABLE_destroy(interpreter, sub);
                 ct->constants[ci]->u.key = NULL;
                 ft->fixups[i]->type = 0;
         }
@@ -63,6 +66,8 @@ pmclass Eval extends Closure {
         PObj *name;
 
         sub_data = PMC_sub(SELF);
+        if (!sub_data)
+            return;
         name = (PObj*)sub_data->name;
         if (name)
             pobject_lives(INTERP, name);
@@ -87,6 +92,9 @@ pmclass Eval extends Closure {
 
         clear_fixups(interpreter, SELF);
         sub_data = PMC_sub(SELF);
+
+        if (!sub_data)
+            return;
         cur_cs = sub_data->seg;
         if (!cur_cs)
             return;
@@ -104,6 +112,7 @@ pmclass Eval extends Closure {
         seg = (struct PackFile_Segment *)cur_cs;
         PackFile_Segment_destroy(seg);
         sub_data->seg = NULL;
+        PMC_sub(SELF) = NULL;
     }
 
 

@@ -135,6 +135,8 @@ Destroys the subroutine.
 
     void destroy () {
         struct Parrot_sub * sub = PMC_sub(SELF);
+        if (!sub)
+            return;
 #if 0
         STRING *n = sub_name(INTERP, SELF);
         fprintf(stderr, "DESTROY sub %p %s\n", SELF,
@@ -142,6 +144,7 @@ Destroys the subroutine.
 #endif
         clear_fixup(INTERP, SELF);
         mem_sys_free(sub);
+        PMC_sub(SELF) = NULL;
     }
 
 /*
