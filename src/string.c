@@ -211,7 +211,7 @@ string_set(struct Parrot_Interp *interpreter, STRING *dest, STRING *src)
         /* they are different, dest is not an external string */
 #ifdef GC_IS_MALLOC
         if (!PObj_is_external_TESTALL(dest) && PObj_bufstart(dest)) {
-            mem_sys_free((int*)PObj_bufstart(dest) - 1);
+            mem_sys_free((INTVAL*)PObj_bufstart(dest) - 1);
         }
 #endif
         make_COW_reference_from_header(interpreter, src, dest);

@@ -449,7 +449,7 @@ clear_cow(struct Parrot_Interp *interpreter, struct Small_Object_Pool *pool,
     struct Small_Object_Arena *cur_arena;
     UINTVAL i;
     Buffer *b;
-    int *refcount;
+    INTVAL *refcount;
 
     /* clear refcount for COWable objects. */
     for (cur_arena = pool->last_Arena;
@@ -470,7 +470,7 @@ clear_cow(struct Parrot_Interp *interpreter, struct Small_Object_Pool *pool,
 
                 if (PObj_COW_TEST(b) && PObj_bufstart(b) &&
                         !PObj_external_TEST(b)) {
-                    refcount = (int *) PObj_bufstart(b) - 1;
+                    refcount = (INTVAL *) PObj_bufstart(b) - 1;
                     *refcount = 0;
                 }
             }
@@ -499,7 +499,7 @@ used_cow(struct Parrot_Interp *interpreter, struct Small_Object_Pool *pool,
     struct Small_Object_Arena *cur_arena;
     UINTVAL i;
     Buffer *b;
-    int *refcount;
+    INTVAL *refcount;
 
     for (cur_arena = pool->last_Arena;
             NULL != cur_arena; cur_arena = cur_arena->prev) {
@@ -509,7 +509,7 @@ used_cow(struct Parrot_Interp *interpreter, struct Small_Object_Pool *pool,
                     PObj_COW_TEST(b) &&
                     PObj_bufstart(b) &&
                     !PObj_external_TEST(b)) {
-                refcount = (int *) PObj_bufstart(b) - 1;
+                refcount = (INTVAL *) PObj_bufstart(b) - 1;
                 /* mark users of this bufstart by incrementing refcount */
                 if (PObj_live_TEST(b))
                     *refcount = 1 << 29;        /* ~infinite usage */
@@ -730,15 +730,16 @@ free_unused_pobjects(struct Parrot_Interp *interpreter,
                     /* free allocated space at (int*)bufstart - 1,
                      * but not if it is used COW or external
                      */
-                    if (PObj_bufstart(b) && !PObj_is_external_or_free_TESTALL(b)) {
+                    if (PObj_bufstart(b) &&
+                            !PObj_is_external_or_free_TESTALL(b)) {
                         if (PObj_COW_TEST(b)) {
-                            int *refcount = ((int *)PObj_bufstart(b) - 1);
+                            INTVAL *refcount = ((INTVAL *)PObj_bufstart(b) - 1);
 
                             if (!--(*refcount))
                                 free(refcount); /* the actual bufstart */
                         }
                         else
-                            free((int*)PObj_bufstart(b) - 1);
+                            free((INTVAL*)PObj_bufstart(b) - 1);
                     }
 #else
                     /*
