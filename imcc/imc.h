@@ -186,6 +186,7 @@ typedef struct _imc_info_t {
 #define IMCC_INFO(i) ((i)->imc_info)
 
 #define IMC_TRACE 0
+#define IMC_TRACE_HIGH 0
 
 
 extern IMC_Unit * cur_unit;
