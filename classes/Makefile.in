@@ -12,7 +12,7 @@ perlhash$(O) perlundef$(O) parrotpointer$(O) intqueue$(O)
 #DO NOT ADD C COMPILER FLAGS HERE
 #Add them in Configure.pl--look for the
 #comment 'ADD C COMPILER FLAGS HERE'
-CFLAGS = ${ccflags} ${cc_debug} -I../include
+CFLAGS = ${ccflags} ${cc_warn} ${cc_debug} -I../include
 
 C_LIBS = ${libs}
 
