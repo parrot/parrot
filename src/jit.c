@@ -365,12 +365,14 @@ build_asm(struct Parrot_Interp *interpreter,opcode_t *pc, opcode_t *code_start, 
 
             if (address > (INTVAL *)ivalue) {
                 address = (INTVAL *)((char *)address - (char *)ivalue);
-            } else if (address < (INTVAL *)ivalue) {
+            }
+            else if (address < (INTVAL *)ivalue) {
                 address = (INTVAL *)
                           (-(arena - 
                              (char *)address + 
                              op_assembly[*pc].size));
-            } else {
+            }
+            else {
                 address = 0;
             }
 #ifdef ALPHA
@@ -423,7 +425,8 @@ build_asm(struct Parrot_Interp *interpreter,opcode_t *pc, opcode_t *code_start, 
 
             if (address > (INTVAL *)arena) {
                 address = (INTVAL *)((char *)address - (char *)ivalue);
-            } else {
+            }
+            else {
                 address = (INTVAL *)
                           (-(arena - 
                              (char *)address + 
@@ -468,7 +471,8 @@ build_asm(struct Parrot_Interp *interpreter,opcode_t *pc, opcode_t *code_start, 
             {
                 ivalue = (INTVAL)(pc - code_start) + v.info[i].number - 1;
                 memcpy(&arena[v.info[i].position],&ivalue,sizeof(ivalue));
-            } else {
+            }
+            else {
                 address = (INTVAL *)pc;
 #ifdef SUN4
             write_32(&arena[v.info[i].position], (ptrcast_t)address);
@@ -512,7 +516,8 @@ calculate_displacement(INTVAL *src_address, INTVAL *dest_address, INTVAL *high, 
     if (*low > 32767) {
         *high += 1;
         *low -= 65536; 
-    } else if (*low < -32767) {
+    }
+    else if (*low < -32767) {
         *high -= 1;
         *low += 65536; 
     }

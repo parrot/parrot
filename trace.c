@@ -64,7 +64,8 @@ trace_op_dump(struct Parrot_Interp *interpreter, opcode_t *code_start,
                     fprintf(stderr, "S%ld=\"%s\"", (long) *(pc + i), 
                         (char *) interpreter->string_reg.
                             registers[*(pc + i)]->bufstart);
-                } else {
+                }
+                else {
                     fprintf(stderr, "S%ld=(null)", (long) *(pc + i));
                 }
                 break;

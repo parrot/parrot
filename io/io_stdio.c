@@ -211,7 +211,8 @@ void PIO_stdio_flush(theINTERP, ParrotIOLayer * layer, ParrotIO * io) {
                 else {
                         /* FIXME: I/O Error */
                 }
-        } else  {
+        }
+        else {
                 /* Read flush */
                 io->b.flags &= ~PIO_BF_READBUF;
                 io->b.next = io->b.startb;
@@ -236,11 +237,13 @@ size_t PIO_stdio_write(theINTERP, ParrotIOLayer * layer, ParrotIO * io,
                 return 0;
         if(io->b.flags & PIO_BF_WRITEBUF) {
                 avail = io->b.size - (io->b.next - io->b.startb);
-        } else if(io->b.flags & PIO_BF_READBUF) {
+        }
+        else if(io->b.flags & PIO_BF_READBUF) {
                 io->b.flags |= ~PIO_BF_READBUF;
                 io->b.next = io->b.startb;
                 avail = io->b.size;
-        } else {
+        }
+        else {
                 avail = io->b.size;
         }
 
@@ -260,11 +263,13 @@ size_t PIO_stdio_write(theINTERP, ParrotIOLayer * layer, ParrotIO * io,
                 else {
                         /* FIXME: Write error */
                 }
-        } else if(avail > len) {
+        }
+        else if(avail > len) {
                 memcpy(io->b.next, buffer, len);
                 io->b.next += len;
                 return len;
-        } else {
+        }
+        else {
                 /* Fill remainder, flush, then try to buffer more */
                 unsigned int diff = (int)(len - avail);
                 memcpy(io->b.next, buffer, diff);

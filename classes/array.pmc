@@ -286,7 +286,8 @@ pmclass Array {
             INTVAL ix = kp2int(INTERP, *((dest_key->keys)[0]));
             PMC* dest = ((PMC**)(SELF->data))[ix];
             dest->vtable->set_pmc(INTERP, dest, src);
-        } else {
+        } 
+        else {
             /* $#array = $foo[$bar] */
             resize_array(interpreter, SELF, src->vtable->get_integer(INTERP, src));
         }       

@@ -194,7 +194,8 @@ ParrotIOLayer * PIO_base_new_layer(ParrotIOLayer * proto) {
                 new_layer->name = proto->name;
                 new_layer->flags = proto->flags;
                 new_layer->api = proto->api;
-        } else {
+        }
+        else {
                 new_layer->name = NULL;
                 new_layer->flags = 0;
                 new_layer->api = NULL;
@@ -244,7 +245,8 @@ INTVAL PIO_push_layer(theINTERP, ParrotIOLayer * layer, ParrotIO * io) {
                 io->stack = layer;
                 if( layer->api->Pushed )
                         (*layer->api->Pushed)(layer, io);
-        } else {
+        }
+        else {
                 ParrotIOData * d = (ParrotIOData *)interpreter->piodata;
                 if( d->default_stack == NULL
                         && (layer->flags & PIO_L_TERMINAL) == 0 ) {
@@ -411,7 +413,8 @@ ParrotIO * PIO_open(theINTERP, const char * spath, const char * sflags) {
                         if(io) {
                                 io->stack = GET_INTERP_IO(interpreter);
                                 return io;
-                        } else {
+                        }
+                        else {
                                 return NULL;
                         }
                 }

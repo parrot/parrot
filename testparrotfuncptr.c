@@ -9,7 +9,8 @@ int a_function(int some_number) {
    if (some_number == 42) {
       printf("OK\n");
       return 0;
-   } else {
+   }
+   else {
       printf("FAIL\n");
       return -1;
    }

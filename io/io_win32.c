@@ -61,10 +61,12 @@ UINTVAL flags_to_win32(UINTVAL flags, DWORD * fdwAccess,
         if((flags&(PIO_F_WRITE|PIO_F_READ)) == (PIO_F_WRITE|PIO_F_READ)) {
                 *fdwAccess = GENERIC_WRITE|GENERIC_READ;
                 *fdwCreate = CREATE_ALWAYS; 
-        } else if(flags & PIO_F_WRITE) {
+        }
+        else if(flags & PIO_F_WRITE) {
                 *fdwAccess = GENERIC_WRITE;
                 *fdwCreate = CREATE_ALWAYS; 
-        } else if(flags & PIO_F_READ) {
+        }
+        else if(flags & PIO_F_READ) {
                 *fdwAccess = GENERIC_READ;
                 *fdwCreate = OPEN_EXISTING; 
         }
@@ -86,18 +88,21 @@ INTVAL PIO_win32_init(theINTERP, ParrotIOLayer * layer) {
         HANDLE h;
         if((h = GetStdHandle(STD_INPUT_HANDLE)) != INVALID_HANDLE_VALUE) {
                 PIO_STDIN(interpreter) = PIO_win32_fdopen(interpreter, layer, h, PIO_F_READ);
-        } else {
+        }
+        else {
                 return -1;
         }
         if((h = GetStdHandle(STD_OUTPUT_HANDLE))
                                         != INVALID_HANDLE_VALUE){
                 PIO_STDOUT(interpreter) = PIO_win32_fdopen(interpreter, layer, h, PIO_F_WRITE);
-        } else {
+        }
+        else {
                 return -2;
         }
         if((h = GetStdHandle(STD_ERROR_HANDLE)) != INVALID_HANDLE_VALUE) {
                 PIO_STDERR(interpreter) = PIO_win32_fdopen(interpreter, layer, h, PIO_F_WRITE);
-        } else {
+        }
+        else {
                 return -3;
         }
         return 0;
@@ -192,7 +197,8 @@ size_t PIO_win32_read(theINTERP, ParrotIOLayer * layer, ParrotIO * io,
         else {
                 if(GetLastError() != NO_ERROR) {
                         /* FIXME : An error occured */
-                } else if(len > 0) {
+                }
+                else if(len > 0) {
                         /* EOF if read 0 and bytes were requested */
                         io->flags |= PIO_F_EOF;
                 }

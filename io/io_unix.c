@@ -63,15 +63,18 @@ UINTVAL flags_to_unix(UINTVAL flags) {
         oflags = 0;
         if((flags&(PIO_F_WRITE|PIO_F_READ)) == (PIO_F_WRITE|PIO_F_READ)) {
                 oflags |= O_RDWR|O_CREAT;
-        } else if( flags & PIO_F_WRITE ) {
+        }
+        else if( flags & PIO_F_WRITE ) {
                 oflags |= O_WRONLY|O_CREAT;
-        } else if( flags & PIO_F_READ ) {
+        }
+        else if( flags & PIO_F_READ ) {
                 oflags |= O_RDONLY;
         }
 
         if( flags & PIO_F_APPEND ) {
                 oflags |= O_APPEND;
-        } else if( flags & PIO_F_TRUNC ) {
+        }
+        else if( flags & PIO_F_TRUNC ) {
                 oflags |= O_TRUNC;
         }
         return oflags;
@@ -145,7 +148,8 @@ ParrotIO * PIO_unix_open(theINTERP, ParrotIOLayer * layer,
                                 errno = 0;
                         close(tfd);
                 }
-        } else if(oflags&O_CREAT) {
+        }
+        else if(oflags&O_CREAT) {
                 /* O_CREAT and file doesn't exist. */
                 while((fd = creat(spath, PIO_DEFAULTMODE)) < 0
                                 && errno == EINTR)
@@ -159,7 +163,8 @@ ParrotIO * PIO_unix_open(theINTERP, ParrotIOLayer * layer,
                                         mode)) < 0 && errno == EINTR )
                                 errno = 0;
                 }
-        } else {
+        }
+        else {
                 /* File doesn't exist and O_CREAT not specified */
         }
 
@@ -196,7 +201,8 @@ ParrotIO * PIO_unix_fdopen(theINTERP, ParrotIOLayer * layer,
         if((rflags = fcntl(fd, F_GETFL, 0)) >= 0) {
                 /*int accmode = rflags & O_ACCMODE;*/
                 /* Check other flags (APPEND, ASYNC, etc) */
-        } else {
+        }
+        else {
                 /* Probably invalid descriptor */
                 return NULL;
         } 
@@ -278,7 +284,8 @@ size_t PIO_unix_read(theINTERP, ParrotIOLayer * layer, ParrotIO * io,
                                 case EINTR:     continue;
                                 default:        return bytes;
                         }
-                } else {
+                } 
+                else {
                         /* Read returned 0, EOF if len requested > 0 */
                         if( len > 0 )
                                 io->flags |= PIO_F_EOF;
@@ -308,7 +315,8 @@ size_t PIO_unix_write(theINTERP, ParrotIOLayer * layer, ParrotIO * io,
                                 ptr += err;
                                 to_write -= err; 
                                 bytes += err;
-                } else {
+                }
+                else {
                         switch(errno) {
                                 case EINTR:     goto write_through;
 #ifdef EAGAIN
@@ -331,7 +339,8 @@ INTVAL PIO_unix_puts(theINTERP, ParrotIOLayer * l, ParrotIO * io,
                 sz = PIO_unix_write(interpreter, l, io, s, len);
                 if( sz < len ) {
                         return -1;
-                } else {
+                }
+                else {
                         return len;
                 }
         }
