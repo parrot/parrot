@@ -165,7 +165,14 @@ typedef enum PObj_enum {
     /* When both the is_PMC_ptr and is_buffer_ptr flags
        are set, we assume that data is pointing to a buffer of PMCs, and
        will run through that buffer and mark all the PMCs in it as live */
-    PObj_is_buffer_of_PMCs_ptr_FLAG = (1 << 24 | 1 << 25)
+    PObj_is_buffer_of_PMCs_ptr_FLAG = (1 << 24 | 1 << 25),
+    /* a PMC that needs special handling in DOD, i.e one that has either:
+     * - metadata
+     * - is_PMC_ptr_FLAG
+     * - is_buffer_ptr_FLAG
+     * - custom_mark_FLAG
+     */
+    PObj_is_special_PMC_FLAG = 1 << 26
 
 } PObj_flags;
 
@@ -178,12 +185,12 @@ typedef enum PObj_enum {
 
 #define PObj_get_FLAGS(o) ((o)->obj.flags)
 
-#define PObj_flag_TEST(flag, o) ((o)->obj.flags & PObj_ ## flag ## _FLAG)
-#define PObj_flag_SET(flag, o) ((o)->obj.flags |= PObj_ ## flag ## _FLAG)
+#define PObj_flag_TEST(flag, o) (PObj_get_FLAGS(o) & PObj_ ## flag ## _FLAG)
+#define PObj_flag_SET(flag, o) (PObj_get_FLAGS(o) |= PObj_ ## flag ## _FLAG)
 #define PObj_flag_CLEAR(flag, o) \
-        ((o)->obj.flags &= ~(UINTVAL)(PObj_ ## flag ## _FLAG))
+        (PObj_get_FLAGS(o) &= ~(UINTVAL)(PObj_ ## flag ## _FLAG))
 
-#define PObj_flags_SETTO(o, f) (o)->obj.flags = (f)
+#define PObj_flags_SETTO(o, f) PObj_get_FLAGS(o) = (f)
 #define PObj_flags_CLEARALL(o) PObj_flags_SETTO(o, 0)
 
 #define PObj_COW_TEST(o) PObj_flag_TEST(COW, o)
@@ -217,42 +224,66 @@ typedef enum PObj_enum {
 #define PObj_is_string_SET(o) PObj_flag_SET(is_string, o)
 #define PObj_is_string_CLEAR(o) PObj_flag_CLEAR(is_string, o)
 
-#define PObj_active_destroy_TEST(o) PObj_flag_TEST(active_destroy, o)
+
+#define PObj_special_SET(flag, o) do { \
+    PObj_flag_SET(flag, o); \
+    PObj_flag_SET(is_special_PMC, o); \
+} while(0)
+#define PObj_special_CLEAR(flag, o) do { \
+    PObj_flag_CLEAR(flag, o); \
+    if ((PObj_get_FLAGS(o) & (PObj_active_destroy_FLAG | PObj_is_PMC_ptr_FLAG | \
+                PObj_is_buffer_ptr_FLAG)) || \
+            (PObj_is_PMC_TEST(o) && ((struct PMC*)(o))->metadata)) \
+        PObj_flag_SET(is_special_PMC, o); \
+    else \
+        PObj_flag_CLEAR(is_special_PMC, o); \
+} while (0)
+#define PObj_is_special_PMC_TEST(o) PObj_flag_TEST(is_special_PMC, o)
+#define PObj_is_special_PMC_SET(o) PObj_flag_SET(is_special_PMC, o)
+
+#define PObj_is_buffer_ptr_SET(o) PObj_special_SET(is_buffer_ptr, o)
+#define PObj_is_buffer_ptr_CLEAR(o) PObj_special_CLEAR(is_buffer_ptr, o)
+
+#define PObj_custom_mark_SET(o)   PObj_special_SET(custom_mark, o)
+
 #define PObj_active_destroy_SET(o) PObj_flag_SET(active_destroy, o)
+#define PObj_active_destroy_TEST(o) PObj_flag_TEST(active_destroy, o)
 #define PObj_active_destroy_CLEAR(o) PObj_flag_CLEAR(active_destroy, o)
 
-#define PObj_custom_mark_SET(o)   PObj_flag_SET(custom_mark, o)
-#define PObj_is_buffer_ptr_SET(o) PObj_flag_SET(is_buffer_ptr, o)
-#define PObj_is_buffer_ptr_CLEAR(o) PObj_flag_CLEAR(is_buffer_ptr, o)
-
 #define PObj_is_PMC_TEST(o) PObj_flag_TEST(is_PMC, o)
+#define PObj_is_SPMC_TEST(o) PObj_flag_TEST(is_SPMC, o)
+#define PObj_is_any_PMC_TESTALL(o) (PObj_get_FLAGS(o) & \
+            (PObj_is_PMC_FLAG|PObj_is_SPMC_FLAG))
+
 
 /* some combinations */
-#define PObj_is_cowed_TESTALL(o) ((o)->obj.flags & \
+#define PObj_is_cowed_TESTALL(o) (PObj_get_FLAGS(o) & \
             (PObj_COW_FLAG|PObj_constant_FLAG|PObj_external_FLAG))
-#define PObj_is_cowed_SETALL(o) ((o)->obj.flags |= \
+#define PObj_is_cowed_SETALL(o) (PObj_get_FLAGS(o) |= \
             (PObj_COW_FLAG|PObj_constant_FLAG|PObj_external_FLAG))
 
-#define PObj_is_external_TESTALL(o) ((o)->obj.flags & \
+#define PObj_is_external_TESTALL(o) (PObj_get_FLAGS(o) & \
             (UINTVAL)(PObj_COW_FLAG|PObj_bufstart_external_FLAG| \
 		    PObj_external_FLAG|PObj_immobile_FLAG))
 
-#define PObj_is_external_or_free_TESTALL(o) ((o)->obj.flags & \
+#define PObj_is_external_or_free_TESTALL(o) (PObj_get_FLAGS(o) & \
             (UINTVAL)(PObj_external_FLAG|PObj_on_free_list_FLAG))
 
-#define PObj_is_external_CLEARALL(o) ((o)->obj.flags &= \
+#define PObj_is_external_CLEARALL(o) (PObj_get_FLAGS(o) &= \
             ~(UINTVAL)(PObj_COW_FLAG|PObj_bufstart_external_FLAG| \
 		    PObj_external_FLAG|PObj_immobile_FLAG))
 
-#define PObj_is_live_or_free_TESTALL(o) ((o)->obj.flags & \
-        (PObj_live_FLAG | PObj_on_free_list_FLAG | PObj_constant_FLAG))
+#define PObj_is_live_or_free_TESTALL(o) (PObj_get_FLAGS(o) & \
+        (PObj_live_FLAG | PObj_on_free_list_FLAG))
 
-#define PObj_is_movable_TESTALL(o) (!((o)->obj.flags & \
+#define PObj_is_movable_TESTALL(o) (!(PObj_get_FLAGS(o) & \
         (PObj_immobile_FLAG | PObj_on_free_list_FLAG | \
          PObj_constant_FLAG | PObj_external_FLAG)))
 
-#define PObj_custom_mark_destroy_SETALL(o) ((o)->obj.flags |= \
-        (PObj_custom_mark_FLAG | PObj_active_destroy_FLAG))
+#define PObj_custom_mark_destroy_SETALL(o) do { \
+        PObj_custom_mark_SET(o); \
+        PObj_active_destroy_SET(o); \
+} while(0)
 
 #endif
 

@@ -971,14 +971,14 @@ PackFile_Constant_unpack_key(struct Parrot_Interp *interpreter,
 
     while (components-- > 0) {
         if (tail) {
-            tail->data = key_new(interpreter);
+            tail->data = constant_pmc_new_noinit(interpreter, enum_class_Key);
             tail = tail->data;
         }
         else {
-            head = tail = key_new(interpreter);
+            head = tail = constant_pmc_new_noinit(interpreter, enum_class_Key);
         }
 
-        PObj_constant_SET(tail);
+        tail->vtable->init(interpreter, tail);
 
         switch (*cursor++) {
         case PARROT_ARG_IC:

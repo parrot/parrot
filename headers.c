@@ -28,6 +28,7 @@
 #  define STRING_HEADERS_PER_ALLOC 512
 #endif /* GC_IS_MALLOC */
 
+#  define CONSTANT_PMC_HEADERS_PER_ALLOC 64
 /** PMC Header Functions for small-object lookup table **/
 
 void
@@ -380,6 +381,9 @@ Parrot_initialize_header_pools(struct Parrot_Interp *interpreter)
 
     /* Init the PMC header pool */
     interpreter->arena_base->pmc_pool = new_pmc_pool(interpreter);
+    interpreter->arena_base->constant_pmc_pool = new_pmc_pool(interpreter);
+    interpreter->arena_base->constant_pmc_pool->objects_per_alloc =
+       CONSTANT_PMC_HEADERS_PER_ALLOC;
 }
 
 void
@@ -397,15 +401,17 @@ Parrot_destroy_header_pools(struct Parrot_Interp *interpreter)
     start = 2;
 #endif
     for (i = start; i <= 2; i++) {
-        for (j = -2; j < (INTVAL)interpreter->arena_base->num_sized; j++) {
-            if (j == -2)
-                pool = interpreter->arena_base->constant_string_header_pool;
-            else if (j == -1)
+        for (j = -3; j < (INTVAL)interpreter->arena_base->num_sized; j++) {
+            if (j == -3)
+                pool = interpreter->arena_base->constant_pmc_pool;
+            else if (j == -2)
                 pool = interpreter->arena_base->pmc_pool;
+            else if (j == -1)
+                pool = interpreter->arena_base->constant_string_header_pool;
             else
                 pool = interpreter->arena_base->sized_header_pools[j];
             if (pool) {
-                if (j == -1) {
+                if (j <= -2) {
                     if (i == 2)
                         free_unused_pobjects(interpreter, pool);
                 }

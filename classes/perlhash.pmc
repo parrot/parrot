@@ -36,8 +36,8 @@ pmclass PerlHash {
     }
     void init () {
         if (undef == NULL) {
-            undef = pmc_new(INTERP, enum_class_PerlUndef);
-            PObj_constant_SET(undef);
+            undef = constant_pmc_new_noinit(INTERP, enum_class_PerlUndef);
+            undef->vtable->init(INTERP, undef);
         }
         PObj_custom_mark_SET(SELF);
         new_hash(INTERP, (HASH **)&SELF->data);

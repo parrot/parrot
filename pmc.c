@@ -29,7 +29,16 @@
 PMC *
 pmc_new(struct Parrot_Interp *interpreter, INTVAL base_type)
 {
-    PMC *pmc = new_pmc_header(interpreter);
+    PMC *pmc = pmc_new_noinit(interpreter, base_type);
+    pmc->vtable->init(interpreter, pmc);
+    return pmc;
+}
+
+static PMC*
+get_new_pmc_header(struct Parrot_Interp *interpreter, INTVAL base_type,
+    struct Small_Object_Pool *pool)
+{
+    PMC *pmc = get_free_pmc(interpreter, pool);
 
     if (!pmc) {
         internal_exception(ALLOCATION_ERROR,
@@ -46,8 +55,6 @@ pmc_new(struct Parrot_Interp *interpreter, INTVAL base_type)
         PANIC("Null vtable used");
         return NULL;
     }
-
-    pmc->vtable->init(interpreter, pmc);
 
     return pmc;
 }
@@ -66,27 +73,24 @@ pmc_new(struct Parrot_Interp *interpreter, INTVAL base_type)
 PMC *
 pmc_new_noinit(struct Parrot_Interp *interpreter, INTVAL base_type)
 {
-    PMC *pmc = new_pmc_header(interpreter);
-
-    if (!pmc) {
-        internal_exception(ALLOCATION_ERROR,
-                           "Parrot VM: PMC allocation failed!\n");
-        return NULL;
-    }
-
-    pmc->vtable = &(Parrot_base_vtables[base_type]);
-
-    if (!pmc->vtable || !pmc->vtable->init) {
-        /* This is usually because you either didn't call init_world early
-         * enough or you added a new PMC class without adding
-         * Parrot_(classname)_class_init to init_world. */
-        PANIC("Null vtable used");
-        return NULL;
-    }
-
-    return pmc;
+    return get_new_pmc_header(interpreter, base_type,
+            interpreter->arena_base->pmc_pool);
 }
 
+/*=for api pmc constant_pmc_new_noinit
+
+   Creates a new constant PMC of type C<base_type>
+=cut
+*/
+
+PMC *
+constant_pmc_new_noinit(struct Parrot_Interp *interpreter, INTVAL base_type)
+{
+    PMC *pmc = get_new_pmc_header(interpreter, base_type,
+            interpreter->arena_base->constant_pmc_pool);
+    PObj_constant_SET(pmc);
+    return pmc;
+}
 /*=for api pmc pmc_new_init
 
    As C<pmc_new>, but passes C<init> to the PMC's C<init_pmc> method.

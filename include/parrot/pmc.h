@@ -19,12 +19,11 @@
 VAR_SCOPE VTABLE Parrot_base_vtables[enum_class_max];
 
 
-/* XXX add various bit test macros once we have need of them */
-
 /* Prototypes */
 PMC *pmc_new(struct Parrot_Interp *interpreter, INTVAL base_type);
 PMC *pmc_new_noinit(struct Parrot_Interp *interpreter, INTVAL base_type);
 PMC *pmc_new_init(struct Parrot_Interp *interpreter, INTVAL base_type, PMC *p);
+PMC *constant_pmc_new_noinit(struct Parrot_Interp *, INTVAL base_type);
 
 
 #endif
