@@ -246,7 +246,7 @@ main(int argc, char **argv) {
         */
 
         runops(interpreter, pf, 0);
-        
+
         /*
         ** If any profile information was gathered, print it out:
         */

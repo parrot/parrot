@@ -461,6 +461,9 @@ make_interpreter(INTVAL flags) {
     /* Initialize interpreter's flags */
     interpreter->flags = flags;
 
+    interpreter->pmc_count = 0;
+    interpreter->string_count = 0;
+
     /* Set up defaults for line/package/file */
     interpreter->current_line = 0;
     interpreter->current_file = NULL;

@@ -5,7 +5,7 @@
 # of life
 #
 	# First the generation count
-	set I2, 100
+	set I2, 200
 	# Note the time
 	time N5
 	# If true, we don't print

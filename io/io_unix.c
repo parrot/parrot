@@ -98,7 +98,9 @@ INTVAL PIO_unix_init(theINTERP, ParrotIOLayer * layer) {
 ParrotIO * PIO_unix_open(theINTERP, ParrotIOLayer * layer,
 			const char * spath, UINTVAL flags) {
         ParrotIO * io;
-        int oflags, type, mode, fd;
+        UINTVAL mode;
+        INTVAL oflags, type;
+        PIOHANDLE fd;
         const char * modeptr;
         type = PIO_TYPE_FILE;
         mode = DEFAULT_OPEN_MODE;
@@ -229,6 +231,10 @@ INTVAL PIO_unix_close(theINTERP, ParrotIOLayer * layer, ParrotIO * io) {
 	return 0;
 }
 
+
+INTVAL PIO_unix_isatty(PIOHANDLE fd) {
+        return isatty(fd);
+}
 
 /* At lowest layer all we can do for flush is ask kernel to sync().
  */

@@ -356,6 +356,20 @@ INTVAL PIO_setbuf(theINTERP, ParrotIO * io, size_t bufsize) {
 }
 
 
+INTVAL PIO_setlinebuf(theINTERP, ParrotIO * io) {
+        ParrotIOLayer * l = io->stack;
+        PIO_flush(interpreter, io);
+        while(l) {
+                if(l->api->SetLineBuf) {
+                        return (*l->api->SetLineBuf)(interpreter, l, io);
+                }
+                l = PIO_DOWNLAYER(l);
+        }
+
+        return 0;
+}
+
+
 ParrotIO * PIO_open(theINTERP, const char * spath, const char * sflags) {
         ParrotIO * io;
         ParrotIOLayer * l = pio_default_stack;

@@ -158,6 +158,21 @@ INTVAL PIO_win32_close(theINTERP, ParrotIOLayer * layer, ParrotIO * io) {
 }
 
 
+INTVAL PIO_win32_isatty(PIOHANDLE fd) {
+        /* This is the only way I know to do this on Windows */
+        HANDLE h;
+        if((h = GetStdHandle(STD_INPUT_HANDLE)) != INVALID_HANDLE_VALUE
+                && (h == fd))
+                return 1;
+        if((h = GetStdHandle(STD_OUTPUT_HANDLE)) != INVALID_HANDLE_VALUE
+                && (h == fd))
+                return 1;
+        if((h = GetStdHandle(STD_ERROR_HANDLE)) != INVALID_HANDLE_VALUE
+                && (h == fd))
+                return 1;
+        return 0;
+}
+
 void PIO_win32_flush(theINTERP, ParrotIOLayer * layer, ParrotIO * io) {
 }
 

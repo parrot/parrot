@@ -32,11 +32,13 @@ ParrotIOLayer           pio_stdio_layer = {
  */
 
 ParrotIO *      PIO_stdio_open(theINTERP, ParrotIOLayer * layer,
-			const char * spath, const char * smode);
+			const char * path, UINTVAL flags);
 INTVAL          PIO_stdio_setbuf(theINTERP, ParrotIOLayer * layer,
                         ParrotIO * io, size_t bufsize);
+INTVAL          PIO_stdio_setlinebuf(theINTERP, ParrotIOLayer * layer,
+                        ParrotIO * io);
 ParrotIO *      PIO_stdio_fdopen(theINTERP, ParrotIOLayer * layer,
-		        PIOHANDLE fd, const char * smode);
+		        PIOHANDLE fd, UINTVAL flags);
 INTVAL          PIO_stdio_close(theINTERP, ParrotIOLayer * layer,
                         ParrotIO * io);
 void            PIO_stdio_flush(theINTERP, ParrotIOLayer * layer,
@@ -55,13 +57,12 @@ off_t           PIO_stdio_tell(theINTERP, ParrotIOLayer * l,
 
 
 ParrotIO * PIO_stdio_open(theINTERP, ParrotIOLayer * layer,
-			const char * spath, const char * smode) {
+			const char * path, UINTVAL flags) {
         ParrotIO * io;
         ParrotIOLayer * l = layer;
         while(l) {
                 if(l->api->Open) {
-                        io = (*l->api->Open)(interpreter, l, spath,
-                                                smode);
+                        io = (*l->api->Open)(interpreter, l, path, flags);
                         /*
                          * We have an IO stream now setup stuff
                          * for our layer before returning it.
@@ -111,33 +112,40 @@ INTVAL PIO_stdio_setbuf(theINTERP, ParrotIOLayer * layer, ParrotIO * io,
         }
 
         if( bufsize != 0 )
-                /* FIXME: Line buffering not supported yet */
                 io->flags |= PIO_F_BUF;
         else
                 io->flags &= ~(PIO_F_BUF|PIO_F_LINEBUF);
 
-#if 0
-        if((interpreter->flags & PARROT_DEBUG_FLAG) != 0) {
-                fprintf(stderr,
-                "PIO_setbuf: Alloced %d byte buffer for stream (fd %d)\n",
-                        bufsize, io->fd );
+        return 0;
+}
 
+
+INTVAL PIO_stdio_setlinebuf(theINTERP, ParrotIOLayer * l, ParrotIO * io) {
+        /* Reuse setbuf call */
+        int err;
+        if((err = PIO_stdio_setbuf(interpreter, l, io,
+                        PIO_LINEBUFSIZE)) >= 0) {
+                /* Then switch to linebuf */
+                io->flags &= ~PIO_F_BUF;
+                io->flags |= PIO_F_LINEBUF;
+                return 0;
         }
-#endif
-
-        return 1;
+        return err;
 }
 
 
 ParrotIO * PIO_stdio_fdopen(theINTERP, ParrotIOLayer * layer,
-		        PIOHANDLE fd, const char * smode) {
+		        PIOHANDLE fd, UINTVAL flags) {
         ParrotIO * io;
         ParrotIOLayer * l = PIO_DOWNLAYER(layer);
         while(l) {
                 if(l->api->FDOpen) {
-                        io = (*l->api->FDOpen)(interpreter, l, fd,
-                                                smode);
-                        PIO_stdio_setbuf(interpreter, l, io, PIO_BUFSIZE);
+                        io = (*l->api->FDOpen)(interpreter, l, fd, flags);
+                        if(isatty(fd))
+                                PIO_stdio_setlinebuf(interpreter, l, io);
+                        else
+                                PIO_stdio_setbuf(interpreter, l, io,
+                                                        PIO_BUFSIZE);
                         return io;
                 }
                 l = PIO_DOWNLAYER(l);
@@ -264,8 +272,8 @@ ParrotIOLayerAPI        pio_stdio_layer_api = {
         NULL,
         NULL,
         NULL,
-        NULL,
-        NULL,
+        PIO_setbuf,
+        PIO_setlinebuf,
         NULL,
         NULL,
         PIO_stdio_puts,

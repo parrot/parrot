@@ -67,6 +67,8 @@ struct Parrot_Interp {
     INTVAL current_line;                  /* Which line we're executing in the source */
     void *current_file;			/* The file we're currently in */
     void *current_package;              /* The package we're currently in */
+    UINTVAL string_count;
+    UINTVAL pmc_count;
 };
 
 #define PARROT_DEBUG_FLAG    0x01  /* We're debugging */

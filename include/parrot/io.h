@@ -210,6 +210,8 @@ struct _ParrotIOLayerAPI {
 };
 
 
+extern INTVAL           pio_errno;
+
 /* io.c - If you add new layers, register them in init_layers() */
 extern void             PIO_init(theINTERP);
 extern INTVAL           PIO_init_stacks(theINTERP);
@@ -236,9 +238,18 @@ extern void             PIO_flush(theINTERP, ParrotIO *);
 extern INTVAL           PIO_read(theINTERP, ParrotIO *, void *, size_t);
 extern INTVAL           PIO_write(theINTERP, ParrotIO *, void *, size_t);
 extern INTVAL           PIO_setbuf(theINTERP, ParrotIO *, size_t);
+extern INTVAL           PIO_setlinebuf(theINTERP, ParrotIO *);
 extern INTVAL           PIO_puts(theINTERP, ParrotIO *, const char *);
 
 
+/* Put platform specific macros here if you must */
+#ifdef WIN32
+extern INTVAL           PIO_win32_isatty(PIOHANDLE fd);
+# define PIO_isatty(x)   PIO_win32_isatty(x)
+#else
+extern INTVAL           PIO_unix_isatty(PIOHANDLE fd);
+# define PIO_isatty(x)   PIO_unix_isatty(x)
+#endif
 
 extern ParrotIO * pio_stdin;
 extern ParrotIO * pio_stdout;

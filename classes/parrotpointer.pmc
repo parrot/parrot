@@ -24,7 +24,7 @@ pmclass ParrotPointer {
 
    void init () {
       SELF->data=NULL;
-      SELF->flags=PMC_private_gc_FLAG;
+      SELF->flags=PMC_private_GC_FLAG;
    }
 
    void clone (PMC* dest) {
