@@ -18,15 +18,12 @@
   .local pmc string_index
   string_index = find_global "_Tcl", "__string_index"
 
-  #.local pmc string_match
-  #string_match = find_global "_Tcl", "__string_match"
-
   if argc == 0 goto noargs
   command = argv[0]
   if command == "first"  goto first
   if command == "index"  goto index
   if command == "length" goto length
-  #if command == "match"  goto match
+  if command == "match"  goto match
   if command == "range"  goto range
   if command == "repeat" goto repeat
   goto badargs
@@ -99,35 +96,37 @@ bad_length:
   return_type = TCL_ERROR
   goto done
 
-#match:
-  # XXX need better argument handling.
+match:
+  # XXX PGE doesn't support -nocase yet, we don't either.
   # ?-nocase? pattern string 
-  #if argv > 3 goto bad_match
-  #if argv < 2 goto bad_match
-  #.local int match_case
-  #match_case = 1
-  #.local int argpos 
-  #argpos = 1
-  #$S0 = argv[argpos]
-  #if $S0 != "-nocase" goto match_next
-  #match_case = 0
-  #inc argpos
+  if argc != 3 goto bad_match
  
-#match_next:
-  #.local string pattern 
-  #.local string string
+match_next:
+  .local string pattern 
+  .local string the_string
 
-  #pattern = argv[argpos]
-  #inc argpos
-  #string = argv[argpos]
-
-  #$I0 = string_match(pattern,string,match_case)
-  #retval = $I0
+  pattern = argv[1]
+  the_string = argv[2]
  
-#bad_match:
-  #return_type = TCL_ERROR
-  #retval = "wrong # args: should be \"string match ?-nocase? pattern string\""
-  #goto done
+  .local pmc globber
+  globber = find_global "PGE", "glob"
+ 
+  .local pmc rule
+  rule = globber(pattern)
+
+  .local pmc match
+  match = rule(the_string)
+
+  $I0 = match.__get_bool()
+  retval = new TclInt
+  retval = $I0
+  goto done
+ 
+bad_match:
+  retval = new TclString
+  return_type = TCL_ERROR
+  retval = "wrong # args: should be \"string match ?-nocase? pattern string\""
+  goto done
 
 range:
   if argv != 4 goto bad_range

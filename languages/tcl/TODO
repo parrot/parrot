@@ -15,7 +15,8 @@ moving the parser into a pmc.)
 
 =item given PGE
 
-[string match] [regexp] [regsub] [switch] [glob]
+[array get] [array names] [array unset] 
+[regexp] [regsub] [switch] [glob]
 
 =item migrate all these issues to RT.
 
@@ -128,6 +129,11 @@ or a command, invalidate that. (mostly done!)
 
 Move TclWord namespace into _Tcl::Word, less clutter?
 
+=item multiple level lists
+
+This will be much easier to do when we can call into the parser from
+the TclList PMC. (is this already doable?)
+
 =item [[list]] proc
 
 doesn't handle varargs.
@@ -169,7 +175,7 @@ tests so they're consistent.
 
 tclword.imc tcl*.pmc
 [concat] [join] [list] [llength] [lappend] [linsert] [lrepeat]
-[lrange] [array set] [global]
+[lrange] [array set] [global] [string match]
 the macros?
 expr's precedence and parens
 [puts]'s ability to write to other channels.
@@ -202,16 +208,11 @@ who don't play nice with the new tests...
 [string trimright], [string compare], [string equal], [string last]
 
 [string bytelength], [string compare], [sring is], [string map],
-[string match], [string wordstart], [string wordend]
+[string wordstart], [string wordend]
 
 =item given [list]
 
 [foreach]
-
-=item given [string match]
-
-The following items require [string match] to be implemented: [array get],
-[array names], [array unset]
 
 =item given arrays
 
