@@ -291,7 +291,7 @@ ok 3
 OUT
 
 SKIP: {
-    skip("Awaiting resolution of RT ticket 33641", 1);
+    skip("Mixing keyed & indexed access is broken - see ticket 33641", 1);
 output_is(<<'CODE', <<'OUTPUT', "delete with int keys");
     new P0, .OrderedHash
     set P0["abc"], "Foo"
