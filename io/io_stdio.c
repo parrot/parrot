@@ -36,6 +36,7 @@ ParrotIOLayer pio_stdio_layer = {
  * Currently keeping layer prototypes local to each layer
  * file.
  */
+const char * flags_to_stdio(INTVAL flags);
 
 INTVAL PIO_stdio_init(theINTERP, ParrotIOLayer *layer);
 ParrotIO *PIO_stdio_open(theINTERP, ParrotIOLayer *layer,
@@ -56,7 +57,7 @@ PIOOFF_T PIO_stdio_tell(theINTERP, ParrotIOLayer *l, ParrotIO *io);
 
 
 
-char *
+const char *
 flags_to_stdio(INTVAL flags)
 {
     if ((flags & (PIO_F_WRITE | PIO_F_READ | PIO_F_APPEND)) ==
@@ -77,7 +78,8 @@ flags_to_stdio(INTVAL flags)
     else if (flags & PIO_F_WRITE) {
         return "wb";
     }
-    else if (flags & PIO_F_READ) {
+    else {
+        /* PIO_F_READ, hopefully */
         return "rb";
     }
 }
@@ -111,7 +113,7 @@ PIO_stdio_open(theINTERP, ParrotIOLayer *layer,
               const char *spath, INTVAL flags)
 {
     ParrotIO *io;
-    char *oflags;
+    const char *oflags;
     INTVAL type;
     FILE *fptr;
     type = PIO_TYPE_FILE;
