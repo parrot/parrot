@@ -35,11 +35,12 @@ Returns the number as a Parrot string.
     STRING* get_string () {
         double d = (double) PMC_num_val(SELF);
         const char *sign = "-";
+        STRING *s;
         if (!signbit(PMC_num_val(SELF)))
             sign = "";
         d = fabs(d);
         /* XXX make a Python format string */
-        STRING *s = Parrot_sprintf_c(interpreter, "%s%.12g", sign, d);
+        s = Parrot_sprintf_c(interpreter, "%s%.12g", sign, d);
         if (string_str_index(interpreter, s,
                     const_string(interpreter, "."), 0) == -1 &&
                 string_str_index(interpreter, s,

@@ -57,10 +57,10 @@ the instance, try the class.  If still no luck, return None.
 
     PMC* getprop(STRING* key) {
         PMC * prop = SUPER(key);
+        PMC *class = SELF;
 
         if (prop && VTABLE_defined(INTERP, prop)) return prop;
 
-        PMC *class = SELF;
         if (PObj_is_object_TEST(SELF)) {
             class = GET_CLASS((Buffer *)PMC_data(SELF), SELF);
         }
