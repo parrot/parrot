@@ -1,0 +1,41 @@
+#include <stdio.h>
+/*
+ * test for the fcomip float instruction
+ */
+
+/*
+ * c equiv:
+  int t(int i, int j) {
+  return (double)i == (double)j;
+}
+*/
+
+/* this code leaves one op on the fp stack, but this shouldn't harm */
+
+char code[] = {
+   0x55,                 /* pushl %ebp */
+   0x89,0xE5,            /* movl %esp,%ebp */
+   0x83,0xEC,0x18,       /* subl $24,%esp */
+   0xDB,0x45,0x08,       /* fildl 8(%ebp) */
+   0xDB,0x45,0x0C,       /* fildl 12(%ebp)*/
+   0xDF,0xE9,            /* fucomip */
+   0x0F,0x94,0xC0,       /* sete %al */
+   0x31,0xD2,            /* xorl %edx,%edx */
+   0x88,0xC2,            /* movb %al,%dl */
+   0x89,0xD0,            /* movl %edx,%eax */
+   0x89,0xEC,            /* movl %ebp,%esp */
+   0x5D,                 /* popl %ebp */
+   0xC3                  /* ret */
+};
+
+typedef int (*pf)(int, int);
+int main()
+{
+  pf t  = (pf) code;
+  if (t(10,10) && !t(10,20))
+    puts("ok");
+  else
+    return 1;
+  return 0;
+}
+
