@@ -248,7 +248,6 @@ INTERP_O_FILES = \
     $(SRC)/inter_create$(O)  \
     $(SRC)/inter_misc$(O)  \
     $(SRC)/inter_run$(O)  \
-    $(SRC)/py_func$(O)  \
     $(SRC)/register$(O) \
     $(SRC)/memory$(O) \
     $(SRC)/objects$(O) \
@@ -313,6 +312,7 @@ INTERP_O_FILES = \
 O_FILES = \
     $(INTERP_O_FILES) \
     $(IO_O_FILES) $(CLASS_O_FILES) \
+    $(SRC)/py_func$(O)  \
     $(ENCODING_O_FILES) \
     $(IMCC_O_FILES)
 
