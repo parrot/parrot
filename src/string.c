@@ -1755,6 +1755,9 @@ string_equal(struct Parrot_Interp *interpreter, STRING *s1, STRING *s2)
     else if (s1->strlen != s2->strlen) {
         return 1;       /* we don't care which is bigger */
     }
+    else if (s1->hashval != s2->hashval && s1->hashval && s2->hashval) {
+        return 1;
+    }
     else if (!s1->strlen && !s2->strlen) {
         return 0;
     }

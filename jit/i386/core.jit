@@ -1209,7 +1209,7 @@ Parrot_set_s_sc {
     jit_emit_mov_mr_i(NATIVECODE, &STRING_REG[1], emit_EAX );
 }
 
-TEMPLATE Parrot_eq_sx_sx_ic {
+TEMPLATE Parrot_cmp_sx_sx_ic {
 # define push_r(i) \
     jit_emit_mov_rm_i(NATIVECODE, emit_EAX, &SREG(i)); \
     emitm_pushl_r(NATIVECODE, emit_EAX)
@@ -1222,7 +1222,22 @@ TEMPLATE Parrot_eq_sx_sx_ic {
     emitm_addb_i_r(NATIVECODE, 12, emit_ESP);
     jit_emit_test_r_i(NATIVECODE, emit_EAX);
     jit_emit_jcc(jit_info, <op>, *INT_CONST[3]);
+#undef push_r
+#undef push_c
+}
 
+TEMPLATE Parrot_eq_sx_sx_ic {
+# define push_r(i) \
+    jit_emit_mov_rm_i(NATIVECODE, emit_EAX, &SREG(i)); \
+    emitm_pushl_r(NATIVECODE, emit_EAX)
+# define push_c(i) emitm_pushl_i(NATIVECODE, CONST(i)->u.string)
+    push_<typ2>(2);
+    push_<typ1>(1);
+    emitm_pushl_i(NATIVECODE, interpreter);
+    call_func(jit_info, (void*)string_equal);
+    emitm_addb_i_r(NATIVECODE, 12, emit_ESP);
+    jit_emit_test_r_i(NATIVECODE, emit_EAX);
+    jit_emit_jcc(jit_info, <op>, *INT_CONST[3]);
 #undef push_r
 #undef push_c
 }
@@ -1260,68 +1275,68 @@ Parrot_ne_sc_sc_ic {
 }
 
 Parrot_le_s_s_ic {
-    Parrot_eq_sx_sx_ic s/<typ1>/r/ s/<typ2>/r/ s/<op>/emitm_jle/
+    Parrot_cmp_sx_sx_ic s/<typ1>/r/ s/<typ2>/r/ s/<op>/emitm_jle/
 }
 
 Parrot_le_s_sc_ic {
-    Parrot_eq_sx_sx_ic s/<typ1>/r/ s/<typ2>/c/ s/<op>/emitm_jle/
+    Parrot_cmp_sx_sx_ic s/<typ1>/r/ s/<typ2>/c/ s/<op>/emitm_jle/
 }
 
 Parrot_le_sc_s_ic {
-    Parrot_eq_sx_sx_ic s/<typ1>/c/ s/<typ2>/r/ s/<op>/emitm_jle/
+    Parrot_cmp_sx_sx_ic s/<typ1>/c/ s/<typ2>/r/ s/<op>/emitm_jle/
 }
 
 Parrot_le_sc_sc_ic {
-    Parrot_eq_sx_sx_ic s/<typ1>/c/ s/<typ2>/c/ s/<op>/emitm_jle/
+    Parrot_cmp_sx_sx_ic s/<typ1>/c/ s/<typ2>/c/ s/<op>/emitm_jle/
 }
 
 Parrot_lt_s_s_ic {
-    Parrot_eq_sx_sx_ic s/<typ1>/r/ s/<typ2>/r/ s/<op>/emitm_jl/
+    Parrot_cmp_sx_sx_ic s/<typ1>/r/ s/<typ2>/r/ s/<op>/emitm_jl/
 }
 
 Parrot_lt_s_sc_ic {
-    Parrot_eq_sx_sx_ic s/<typ1>/r/ s/<typ2>/c/ s/<op>/emitm_jl/
+    Parrot_cmp_sx_sx_ic s/<typ1>/r/ s/<typ2>/c/ s/<op>/emitm_jl/
 }
 
 Parrot_lt_sc_s_ic {
-    Parrot_eq_sx_sx_ic s/<typ1>/c/ s/<typ2>/r/ s/<op>/emitm_jl/
+    Parrot_cmp_sx_sx_ic s/<typ1>/c/ s/<typ2>/r/ s/<op>/emitm_jl/
 }
 
 Parrot_lt_sc_sc_ic {
-    Parrot_eq_sx_sx_ic s/<typ1>/c/ s/<typ2>/c/ s/<op>/emitm_jl/
+    Parrot_cmp_sx_sx_ic s/<typ1>/c/ s/<typ2>/c/ s/<op>/emitm_jl/
 }
 
 
 Parrot_ge_s_s_ic {
-    Parrot_eq_sx_sx_ic s/<typ1>/r/ s/<typ2>/r/ s/<op>/emitm_jnl/
+    Parrot_cmp_sx_sx_ic s/<typ1>/r/ s/<typ2>/r/ s/<op>/emitm_jnl/
 }
 
 Parrot_ge_s_sc_ic {
-    Parrot_eq_sx_sx_ic s/<typ1>/r/ s/<typ2>/c/ s/<op>/emitm_jnl/
+    Parrot_cmp_sx_sx_ic s/<typ1>/r/ s/<typ2>/c/ s/<op>/emitm_jnl/
 }
 
 Parrot_ge_sc_s_ic {
-    Parrot_eq_sx_sx_ic s/<typ1>/c/ s/<typ2>/r/ s/<op>/emitm_jnl/
+    Parrot_cmp_sx_sx_ic s/<typ1>/c/ s/<typ2>/r/ s/<op>/emitm_jnl/
 }
 
 Parrot_ge_sc_sc_ic {
-    Parrot_eq_sx_sx_ic s/<typ1>/c/ s/<typ2>/c/ s/<op>/emitm_jnl/
+    Parrot_cmp_sx_sx_ic s/<typ1>/c/ s/<typ2>/c/ s/<op>/emitm_jnl/
 }
 
 Parrot_gt_s_s_ic {
-    Parrot_eq_sx_sx_ic s/<typ1>/r/ s/<typ2>/r/ s/<op>/emitm_jg/
+    Parrot_cmp_sx_sx_ic s/<typ1>/r/ s/<typ2>/r/ s/<op>/emitm_jg/
 }
 
 Parrot_gt_s_sc_ic {
-    Parrot_eq_sx_sx_ic s/<typ1>/r/ s/<typ2>/c/ s/<op>/emitm_jg/
+    Parrot_cmp_sx_sx_ic s/<typ1>/r/ s/<typ2>/c/ s/<op>/emitm_jg/
 }
 
 Parrot_gt_sc_s_ic {
-    Parrot_eq_sx_sx_ic s/<typ1>/c/ s/<typ2>/r/ s/<op>/emitm_jg/
+    Parrot_cmp_sx_sx_ic s/<typ1>/c/ s/<typ2>/r/ s/<op>/emitm_jg/
 }
 
 Parrot_gt_sc_sc_ic {
-    Parrot_eq_sx_sx_ic s/<typ1>/c/ s/<typ2>/c/ s/<op>/emitm_jg/
+    Parrot_cmp_sx_sx_ic s/<typ1>/c/ s/<typ2>/c/ s/<op>/emitm_jg/
 }
 
 
