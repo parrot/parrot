@@ -102,58 +102,79 @@
 
 #include <parrot/parrot.h>
 
-PMC* intlist_mark(Interp*i, IntList*l, PMC* last) {
-    return list_mark(i, (List*) l, last);
+PMC *
+intlist_mark(Interp *i, IntList *l, PMC *last)
+{
+    return list_mark(i, (List *)l, last);
 }
 
-IntList *intlist_clone(Interp*i, IntList *list) {
-    return (IntList *) list_clone(i, (List *) list);
+IntList *
+intlist_clone(Interp *i, IntList *list)
+{
+    return (IntList *)list_clone(i, (List *)list);
 }
 
-IntList *intlist_new(Interp*i){
-    return (IntList *) list_new(i, enum_type_int);
+IntList *
+intlist_new(Interp *i)
+{
+    return (IntList *)list_new(i, enum_type_int);
 }
 
-INTVAL intlist_length(Interp* interpreter, IntList* list)
+INTVAL
+intlist_length(Interp *interpreter, IntList *list)
 {
     UNUSED(interpreter);
-    return ((List*)list)->length;
+    return ((List *)list)->length;
 }
 
-void intlist_assign(Interp*i, IntList*l, INTVAL idx, INTVAL val) {
-    list_assign(i, (List*)l, idx, INTVAL2PTR(void*,val), enum_type_int);
+void
+intlist_assign(Interp *i, IntList *l, INTVAL idx, INTVAL val)
+{
+    list_assign(i, (List *)l, idx, INTVAL2PTR(void *, val), enum_type_int);
 }
 
-void intlist_push(Interp*i, IntList*l, INTVAL val) {
-    list_push(i,(List*)l,INTVAL2PTR(void*, val), enum_type_int);
+void
+intlist_push(Interp *i, IntList *l, INTVAL val)
+{
+    list_push(i, (List *)l, INTVAL2PTR(void *, val), enum_type_int);
 }
 
-void intlist_unshift(Interp*i, IntList**l, INTVAL val) {
-    list_unshift(i, (List*)*l, INTVAL2PTR(void*, val), enum_type_int);
+void
+intlist_unshift(Interp *i, IntList **l, INTVAL val)
+{
+    list_unshift(i, (List *)*l, INTVAL2PTR(void *, val), enum_type_int);
 }
 
 /* popping /shifting into a sparse hole returns 0 */
 
-INTVAL intlist_pop(Interp *i, IntList* l) {
-    void *ret =  list_pop(i,(List*)l,enum_type_int);
-    INTVAL retval = ret == (void*) -1 ? 0 : *(INTVAL*) ret;
+INTVAL
+intlist_pop(Interp *i, IntList *l)
+{
+    void *ret = list_pop(i, (List *)l, enum_type_int);
+    INTVAL retval = ret == (void *)-1 ? 0 : *(INTVAL *)ret;
     return retval;
 }
 
-INTVAL intlist_shift(Interp *i, IntList**l) {
-    void *ret = list_shift(i,(List*)*l,enum_type_int);
-    INTVAL retval = ret == (void*) -1 ? 0 : *(INTVAL*) ret;
+INTVAL
+intlist_shift(Interp *i, IntList **l)
+{
+    void *ret = list_shift(i, (List *)*l, enum_type_int);
+    INTVAL retval = ret == (void *)-1 ? 0 : *(INTVAL *)ret;
     return retval;
 }
 
-INTVAL intlist_get(Interp*i, IntList*l, INTVAL idx) {
-    void * ret = list_get(i,(List*)l,idx, enum_type_int);
-    INTVAL retval = ret == (void*) -1 ? 0 : *(INTVAL*) ret;
+INTVAL
+intlist_get(Interp *i, IntList *l, INTVAL idx)
+{
+    void *ret = list_get(i, (List *)l, idx, enum_type_int);
+    INTVAL retval = ret == (void *)-1 ? 0 : *(INTVAL *)ret;
     return retval;
 }
-void intlist_dump(FILE* fp, IntList* list, int verbose) {
+
+void
+intlist_dump(FILE *fp, IntList *list, int verbose)
+{
 #ifdef LIST_DEBUG
-    list_dump(fp, (List*)list, verbose);
+    list_dump(fp, (List *)list, verbose);
 #endif
 }
-

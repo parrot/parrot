@@ -139,25 +139,25 @@
 #include <assert.h>
 
 /* internals */
-static List_chunk* allocate_chunk(Interp *interpreter, List *list,
-        UINTVAL items, UINTVAL size);
+static List_chunk *allocate_chunk(Interp *interpreter, List *list,
+                                  UINTVAL items, UINTVAL size);
 #ifdef LIST_DEBUG
 static void list_dump(FILE *fp, List *list, INTVAL type);
 #endif
 static UINTVAL rebuild_chunk_list(Interp *interpreter, List *list);
-static List_chunk * alloc_next_size(Interp *interpreter, List *list,
-        int where, UINTVAL idx);
-static List_chunk * add_chunk(Interp *interpreter, List *list,
-        int where, UINTVAL idx);
+static List_chunk *alloc_next_size(Interp *interpreter, List *list,
+                                   int where, UINTVAL idx);
+static List_chunk *add_chunk(Interp *interpreter, List *list,
+                             int where, UINTVAL idx);
 static UINTVAL ld(UINTVAL x);
-static List_chunk * get_chunk(Interp * interpreter, List *list, UINTVAL *idx);
+static List_chunk *get_chunk(Interp *interpreter, List *list, UINTVAL *idx);
 static void split_chunk(Interp *interpreter, List *list,
-        List_chunk *chunk, UINTVAL idx);
+                        List_chunk *chunk, UINTVAL idx);
 static void
-list_set(Interp *interpreter, List *list, void *item, INTVAL type, INTVAL idx);
-static void * list_item(Interp *interpreter, List *list, int type, INTVAL idx);
+ list_set(Interp *interpreter, List *list, void *item, INTVAL type, INTVAL idx);
+static void *list_item(Interp *interpreter, List *list, int type, INTVAL idx);
 static void list_append(Interp *interpreter, List *list, void *item,
-        int type, UINTVAL idx);
+                        int type, UINTVAL idx);
 
 #define chunk_list_size(list) \
                 (list->chunk_list.buflen / sizeof(List_chunk *))
@@ -167,16 +167,16 @@ static void list_append(Interp *interpreter, List *list, void *item,
         ((List_chunk**)list->chunk_list.bufstart)[idx]
 
 /* make a new chunk, size bytes big, holding items items */
-static List_chunk*
+static List_chunk *
 allocate_chunk(Interp *interpreter, List *list, UINTVAL items, UINTVAL size)
 {
-    List_chunk* chunk;
+    List_chunk *chunk;
 
     interpreter->DOD_block_level++;
     interpreter->GC_block_level++;
-    chunk = (List_chunk *) new_bufferlike_header(interpreter, sizeof(*chunk));
+    chunk = (List_chunk *)new_bufferlike_header(interpreter, sizeof(*chunk));
     chunk->items = items;
-    Parrot_allocate(interpreter, (Buffer*) chunk, size);
+    Parrot_allocate(interpreter, (Buffer *)chunk, size);
     interpreter->DOD_block_level--;
     interpreter->GC_block_level--;
     return chunk;
@@ -184,9 +184,10 @@ allocate_chunk(Interp *interpreter, List *list, UINTVAL items, UINTVAL size)
 
 #ifdef LIST_DEBUG
 /* only char and int are supported currently */
-static void list_dump(FILE *fp, List *list, INTVAL type)
+static void
+list_dump(FILE *fp, List *list, INTVAL type)
 {
-    List_chunk* chunk = list->first;
+    List_chunk *chunk = list->first;
     UINTVAL i;
     UINTVAL idx = 0;
 
@@ -195,19 +196,19 @@ static void list_dump(FILE *fp, List *list, INTVAL type)
         if (chunk->data.flags & sparse)
             printf(INTVAL_FMT " x ''", chunk->items);
         else
-            for(i=0; i < chunk->items; i++) {
-                if (idx++ >= list->start && idx <= list->length+list->start) {
+            for (i = 0; i < chunk->items; i++) {
+                if (idx++ >= list->start && idx <= list->length + list->start) {
                     switch (list->item_type) {
-                        case enum_type_int:
-                        case enum_type_short:
-                            printf("%d", (int)((int*)chunk->data.bufstart)[i]);
-                            break;
-                        case enum_type_char:
-                            printf("%c", (char)((char*)chunk->data.bufstart)[i]);
-                            break;
+                    case enum_type_int:
+                    case enum_type_short:
+                        printf("%d", (int)((int *)chunk->data.bufstart)[i]);
+                        break;
+                    case enum_type_char:
+                        printf("%c", (char)((char *)chunk->data.bufstart)[i]);
+                        break;
                     }
                 }
-                if (i <chunk->items - 1)
+                if (i < chunk->items - 1)
                     printf(",");
             }
         printf(chunk->data.flags & no_power_2 ? ")" : "]");
@@ -225,7 +226,7 @@ static void list_dump(FILE *fp, List *list, INTVAL type)
 static void
 rebuild_chunk_ptrs(List *list, int cut)
 {
-    List_chunk* chunk, *prev;
+    List_chunk *chunk, *prev;
     UINTVAL len = 0, start = list->start;
     UINTVAL cap;
 
@@ -265,11 +266,11 @@ rebuild_chunk_ptrs(List *list, int cut)
 static void
 rebuild_sparse(List *list)
 {
-    List_chunk* chunk, *prev;
+    List_chunk *chunk, *prev;
     int changes = 0;
     for (prev = 0, chunk = list->first; chunk; chunk = chunk->next) {
         if (prev && (prev->data.flags & sparse) &&
-                    (chunk->data.flags & sparse)) {
+            (chunk->data.flags & sparse)) {
             prev->items += chunk->items;
             chunk->items = 0;
             changes++;
@@ -285,21 +286,21 @@ rebuild_sparse(List *list)
 static void
 rebuild_other(Interp *interpreter, List *list)
 {
-    List_chunk* chunk, *prev;
+    List_chunk *chunk, *prev;
     int changes = 0;
     for (prev = 0, chunk = list->first; chunk; chunk = chunk->next) {
         /* two adjacent irregular chunks */
         if (prev && (prev->data.flags & no_power_2) &&
-                   (chunk->data.flags & no_power_2)) {
+            (chunk->data.flags & no_power_2)) {
             /* TODO don't make chunks bigger then MAX_ITEMS,
              * no  - make then but:
              * if bigger, split them in a next pass */
-            Parrot_reallocate(interpreter, (Buffer *) prev,
-                (prev->items + chunk->items) * list->item_size);
-            mem_sys_memmove(
-                (char *)prev->data.bufstart + prev->items * list->item_size,
-                (char *)chunk->data.bufstart,
-                chunk->items * list->item_size);
+            Parrot_reallocate(interpreter, (Buffer *)prev,
+                              (prev->items + chunk->items) * list->item_size);
+            mem_sys_memmove((char *)prev->data.bufstart +
+                            prev->items * list->item_size,
+                            (char *)chunk->data.bufstart,
+                            chunk->items * list->item_size);
             prev->items += chunk->items;
             chunk->items = 0;
             changes++;
@@ -314,13 +315,13 @@ rebuild_other(Interp *interpreter, List *list)
 static void
 rebuild_fix_ends(Interp *interpreter, List *list)
 {
-    List_chunk* chunk;
+    List_chunk *chunk;
 
     chunk = list->first;
     /* first is irregular, next is empty */
     if (list->n_chunks <= 2 && (chunk->data.flags & no_power_2) &&
-            (!chunk->next || chunk->next->items == 0 ||
-             list->start + list->length <= chunk->items)) {
+        (!chunk->next || chunk->next->items == 0 ||
+         list->start + list->length <= chunk->items)) {
         chunk->data.flags = 0;
         list->grow_policy = enum_grow_unknown;
         list->cap += chunk->data.buflen / list->item_size - chunk->items;
@@ -335,7 +336,7 @@ rebuild_fix_ends(Interp *interpreter, List *list)
 static UINTVAL
 rebuild_chunk_list(Interp *interpreter, List *list)
 {
-    List_chunk* chunk, *prev, *first;
+    List_chunk *chunk, *prev, *first;
     UINTVAL len;
 
     /* count chunks and fix prev pointers */
@@ -351,13 +352,13 @@ rebuild_chunk_list(Interp *interpreter, List *list)
      * is too small */
     len = list->n_chunks;
     if (list->collect_runs != interpreter->collect_runs ||
-            len > chunk_list_size(list)) {
+        len > chunk_list_size(list)) {
         /* round up to reasonable size */
         len = 1 << (ld(len) + 1);
         if (len < 4)
             len = 4;
         Parrot_allocate(interpreter, &list->chunk_list,
-                len * sizeof(List_chunk *));
+                        len * sizeof(List_chunk *));
         list->collect_runs = interpreter->collect_runs;
     }
 
@@ -376,14 +377,14 @@ rebuild_chunk_list(Interp *interpreter, List *list)
         chunk->n_items = chunk->items;
 
         /* sparse hole or irregular chunk */
-        if (chunk->data.flags & (sparse|no_power_2)) {
-            List_chunk * next;
+        if (chunk->data.flags & (sparse | no_power_2)) {
+            List_chunk *next;
             /* add next sparse or no_power_2 chunks up so that
              * get_chunk will skip this range of chunks, when the idx
              * is beyond this block.
              */
-            for (next = chunk->next ; next; next = next->next)
-                if (next->data.flags & (sparse|no_power_2)) {
+            for (next = chunk->next; next; next = next->next)
+                if (next->data.flags & (sparse | no_power_2)) {
                     chunk->n_chunks++;
                     chunk->n_items += next->items;
                 }
@@ -422,8 +423,8 @@ rebuild_chunk_list(Interp *interpreter, List *list)
     }
     /* if we have some mixture of grow_policies, then set it to _mixed */
     if (list->grow_policy && list->grow_policy != enum_grow_growing &&
-            list->grow_policy != enum_grow_fixed)
-        list->grow_policy  = enum_grow_mixed;
+        list->grow_policy != enum_grow_fixed)
+        list->grow_policy = enum_grow_mixed;
     return len;
 }
 
@@ -434,9 +435,9 @@ static List_chunk *
 alloc_next_size(Interp *interpreter, List *list, int where, UINTVAL idx)
 {
     UINTVAL items, size;
-    List_chunk * new_chunk;
+    List_chunk *new_chunk;
     int much = idx - list->cap >= MIN_ITEMS;
-    int do_sparse = (INTVAL)idx - (INTVAL)list->cap >= 2*MAX_ITEMS;
+    int do_sparse = (INTVAL)idx - (INTVAL)list->cap >= 2 * MAX_ITEMS;
 
     if (do_sparse) {
         assert(where);
@@ -496,7 +497,7 @@ alloc_next_size(Interp *interpreter, List *list, int where, UINTVAL idx)
             else {
                 list->grow_policy = enum_grow_growing;
                 if (items > MIN_ITEMS)
-                    items >>= 1;                /* allocate less */
+                    items >>= 1;        /* allocate less */
                 /* if not: second allocation from unshift */
                 else {
                     list->grow_policy = enum_grow_mixed;
@@ -517,12 +518,12 @@ alloc_next_size(Interp *interpreter, List *list, int where, UINTVAL idx)
 static List_chunk *
 add_chunk(Interp *interpreter, List *list, int where, UINTVAL idx)
 {
-    List_chunk * chunk = where ? list->last : list->first;
-    List_chunk * new_chunk;
+    List_chunk *chunk = where ? list->last : list->first;
+    List_chunk *new_chunk;
 
     new_chunk = alloc_next_size(interpreter, list, where, idx);
 
-    if (where) {        /* at end */
+    if (where) {                /* at end */
         if (chunk)
             chunk->next = new_chunk;
         list->last = new_chunk;
@@ -545,34 +546,33 @@ add_chunk(Interp *interpreter, List *list, int where, UINTVAL idx)
 static UINTVAL
 ld(UINTVAL x)
 {
-  UINTVAL m;            /* bit position of highest set bit of m */
+    UINTVAL m;                  /* bit position of highest set bit of m */
 
-  /* On intel, use BSRL instruction to find highest bit */
+    /* On intel, use BSRL instruction to find highest bit */
 #if defined(__GNUC__) && defined(i386)
 
-  __asm__("bsrl %1,%0\n\t"
-          : "=r" (m)
-          : "g"  (x));
+  __asm__("bsrl %1,%0\n\t":"=r"(m)
+  :        "g"(x));
 
 #else
-  {
-    /*
-      Based on branch-free nlz algorithm in chapter 5 of Henry
-      S. Warren Jr's book "Hacker's Delight".
-    */
+    {
+        /*
+         * Based on branch-free nlz algorithm in chapter 5 of Henry
+         * S. Warren Jr's book "Hacker's Delight".
+         */
 
-    unsigned int n = ((x - 0x100) >> 16) & 8;
-    x <<= n;
-    m = ((x - 0x1000) >> 16) & 4;
-    n += m;
-    x <<= m;
-    m = ((x - 0x4000) >> 16) & 2;
-    n += m;
-    x = (x << m) >> 14;
-    m = 13 - n + (x & ~(x>>1));
-  }
+        unsigned int n = ((x - 0x100) >> 16) & 8;
+        x <<= n;
+        m = ((x - 0x1000) >> 16) & 4;
+        n += m;
+        x <<= m;
+        m = ((x - 0x4000) >> 16) & 2;
+        n += m;
+        x = (x << m) >> 14;
+        m = 13 - n + (x & ~(x >> 1));
+    }
 #endif
-  return m;
+    return m;
 }
 
 /* get the chunk for idx, also update the idx to point into the chunk
@@ -624,7 +624,7 @@ ld(UINTVAL x)
  */
 
 static List_chunk *
-get_chunk(Interp * interpreter, List *list, UINTVAL *idx)
+get_chunk(Interp *interpreter, List *list, UINTVAL *idx)
 {
     List_chunk *chunk;
     UINTVAL i;
@@ -639,7 +639,7 @@ get_chunk(Interp * interpreter, List *list, UINTVAL *idx)
             return chunk;
         *idx -= chunk->items;
     }
-    internal_exception(INTERNAL_PANIC , "list structure chaos!\n");
+    internal_exception(INTERNAL_PANIC, "list structure chaos!\n");
 #endif
 
 
@@ -652,7 +652,7 @@ get_chunk(Interp * interpreter, List *list, UINTVAL *idx)
 
     /* else look at chunks flags, what grow type follows and
      * adjust chunks and idx */
-    for (i = 0, chunk = list->first; chunk; ) {
+    for (i = 0, chunk = list->first; chunk;) {
         /* if we have no more items, we have found the chunk */
         if (*idx < chunk->items)
             return chunk;
@@ -691,7 +691,7 @@ get_chunk(Interp * interpreter, List *list, UINTVAL *idx)
         if (chunk->data.flags & grow_items) {
             /* the next chunks are growing from chunk->items ... last->items */
             UINTVAL ld_first, slot;
-            List_chunk * last;
+            List_chunk *last;
 
             last = chunk_list_ptr(list, i + chunk->n_chunks - 1);
             UNUSED(last);
@@ -700,7 +700,7 @@ get_chunk(Interp * interpreter, List *list, UINTVAL *idx)
 
             slot = ld(*idx + chunk->items) - ld_first;
             /* we are in this growing area, so we are done */
-            assert (slot < chunk->n_chunks);
+            assert(slot < chunk->n_chunks);
             *idx -= (1 << (ld_first + slot)) - chunk->items;
             return chunk_list_ptr(list, i + slot);
         }
@@ -712,9 +712,9 @@ get_chunk(Interp * interpreter, List *list, UINTVAL *idx)
             chunk = chunk->next;
             continue;
         }
-        internal_exception(INTERNAL_PANIC , "list structure chaos!\n");
+        internal_exception(INTERNAL_PANIC, "list structure chaos!\n");
     }
-    internal_exception(INTERNAL_PANIC , "list structure chaos!\n");
+    internal_exception(INTERNAL_PANIC, "list structure chaos!\n");
     return 0;
 }
 
@@ -734,8 +734,8 @@ split_chunk(Interp *interpreter, List *list, List_chunk *chunk, UINTVAL ix)
     /* allocate space at idx */
     if (chunk->items <= MAX_ITEMS) {
         /* it fits, just allocate */
-        Parrot_reallocate(interpreter, (Buffer *) chunk,
-                chunk->items * list->item_size);
+        Parrot_reallocate(interpreter, (Buffer *)chunk,
+                          chunk->items * list->item_size);
         chunk->data.flags |= no_power_2;
         chunk->data.flags &= ~sparse;
     }
@@ -745,11 +745,11 @@ split_chunk(Interp *interpreter, List *list, List_chunk *chunk, UINTVAL ix)
          * n2 = MAX_ITEMS chunk
          * n1 = rest before */
         n2 = MAX_ITEMS;
-        n3 = ((chunk->items-idx) / MAX_ITEMS) * MAX_ITEMS;
+        n3 = ((chunk->items - idx) / MAX_ITEMS) * MAX_ITEMS;
         n1 = chunk->items - n2 - n3;
         chunk->items = n2;
-        Parrot_reallocate(interpreter, (Buffer *) chunk,
-                chunk->items * list->item_size);
+        Parrot_reallocate(interpreter, (Buffer *)chunk,
+                          chunk->items * list->item_size);
         chunk->data.flags &= ~sparse;
         if (n3) {
             new_chunk = allocate_chunk(interpreter, list, n3, list->item_size);
@@ -789,40 +789,40 @@ list_set(Interp *interpreter, List *list, void *item, INTVAL type, INTVAL idx)
      * split in possibly 2 sparse parts before and after
      * then make a real chunk, rebuild chunk list
      * and set item */
-    if ( chunk->data.flags & sparse ) {
+    if (chunk->data.flags & sparse) {
         split_chunk(interpreter, list, chunk, idx);
         /* reget chunk and idx */
         idx = oidx;
         chunk = get_chunk(interpreter, list, (UINTVAL *)&idx);
         assert(chunk);
-        assert(!(chunk->data.flags & sparse) );
+        assert(!(chunk->data.flags & sparse));
     }
 
     switch (type) {
-        case enum_type_char:
-            ((char*)chunk->data.bufstart)[idx] = (char)PTR2INTVAL(item);
-            break;
-        case enum_type_short:
-            ((short*)chunk->data.bufstart)[idx] = (short)PTR2INTVAL(item);
-            break;
-        case enum_type_int:
-            ((int*)chunk->data.bufstart)[idx] = (int)PTR2INTVAL(item);
-            break;
-        case enum_type_INTVAL:
-            ((INTVAL*)chunk->data.bufstart)[idx] = PTR2INTVAL(item);
-            break;
-        case enum_type_FLOATVAL:
-            ((FLOATVAL*)chunk->data.bufstart)[idx] = *(FLOATVAL*) item;
-            break;
-        case enum_type_PMC:
-            ((PMC**)chunk->data.bufstart)[idx] = (PMC*)item;
-            break;
-        case enum_type_STRING:
-            ((STRING**)chunk->data.bufstart)[idx] = (STRING*)item;
-            break;
-        default:
-            internal_exception(1, "type N/Y\n");
-            break;
+    case enum_type_char:
+        ((char *)chunk->data.bufstart)[idx] = (char)PTR2INTVAL(item);
+        break;
+    case enum_type_short:
+        ((short *)chunk->data.bufstart)[idx] = (short)PTR2INTVAL(item);
+        break;
+    case enum_type_int:
+        ((int *)chunk->data.bufstart)[idx] = (int)PTR2INTVAL(item);
+        break;
+    case enum_type_INTVAL:
+        ((INTVAL *)chunk->data.bufstart)[idx] = PTR2INTVAL(item);
+        break;
+    case enum_type_FLOATVAL:
+        ((FLOATVAL *)chunk->data.bufstart)[idx] = *(FLOATVAL *)item;
+        break;
+    case enum_type_PMC:
+        ((PMC **)chunk->data.bufstart)[idx] = (PMC *)item;
+        break;
+    case enum_type_STRING:
+        ((STRING **)chunk->data.bufstart)[idx] = (STRING *)item;
+        break;
+    default:
+        internal_exception(1, "type N/Y\n");
+        break;
     }
 }
 
@@ -839,37 +839,37 @@ list_item(Interp *interpreter, List *list, int type, INTVAL idx)
     if (chunk->data.flags & sparse) {
 #ifdef INTLIST_EMUL
         static int null = 0;
-        return (void*)&null;
+        return (void *)&null;
 #else
-        return (void*)-1;
+        return (void *)-1;
 #endif
     }
 
     switch (type) {
-        case enum_type_char:
-            return (void*)&((char*)chunk->data.bufstart)[idx];
-            break;
-        case enum_type_short:
-            return (void*)&((short*)chunk->data.bufstart)[idx];
-            break;
-        case enum_type_int:
-            return (void*)&((int*)chunk->data.bufstart)[idx];
-            break;
-        case enum_type_INTVAL:
-            return (void*)&((INTVAL*)chunk->data.bufstart)[idx];
-            break;
-        case enum_type_FLOATVAL:
-            return (void*)&((FLOATVAL*)chunk->data.bufstart)[idx];
-            break;
-        case enum_type_PMC:
-            return (void*)&((PMC**)chunk->data.bufstart)[idx];
-            break;
-        case enum_type_STRING:
-            return (void*)&((STRING**)chunk->data.bufstart)[idx];
-            break;
-        default:
-            internal_exception(1, "type N/Y\n");
-            break;
+    case enum_type_char:
+        return (void *)&((char *)chunk->data.bufstart)[idx];
+        break;
+    case enum_type_short:
+        return (void *)&((short *)chunk->data.bufstart)[idx];
+        break;
+    case enum_type_int:
+        return (void *)&((int *)chunk->data.bufstart)[idx];
+        break;
+    case enum_type_INTVAL:
+        return (void *)&((INTVAL *)chunk->data.bufstart)[idx];
+        break;
+    case enum_type_FLOATVAL:
+        return (void *)&((FLOATVAL *)chunk->data.bufstart)[idx];
+        break;
+    case enum_type_PMC:
+        return (void *)&((PMC **)chunk->data.bufstart)[idx];
+        break;
+    case enum_type_STRING:
+        return (void *)&((STRING **)chunk->data.bufstart)[idx];
+        break;
+    default:
+        internal_exception(1, "type N/Y\n");
+        break;
     }
     return 0;
 
@@ -884,7 +884,7 @@ list_append(Interp *interpreter, List *list, void *item, int type, UINTVAL idx)
         add_chunk(interpreter, list, enum_add_at_end, idx);
     list_set(interpreter, list, item, type, idx);
     /* invariant: prepare for next push */
-    if (idx >= list->cap-1)
+    if (idx >= list->cap - 1)
         add_chunk(interpreter, list, enum_add_at_end, 0);
 }
 
@@ -898,28 +898,37 @@ list_new(Interp *interpreter, INTVAL type)
 {
     List *list;
 
-    list = (List *) new_bufferlike_header(interpreter, sizeof(*list));
+    list = (List *)new_bufferlike_header(interpreter, sizeof(*list));
     list->item_type = type;
     switch (type) {
-        case enum_type_char:
-            list->item_size = sizeof(char); break;
-        case enum_type_short:
-            list->item_size = sizeof(short); break;
-        case enum_type_int:
-            list->item_size = sizeof(int); break;
-        case enum_type_INTVAL:
-            list->item_size = sizeof(INTVAL); break;
-        case enum_type_FLOATVAL:
-            list->item_size = sizeof(FLOATVAL); break;
-        case enum_type_PMC:
-            list->item_size = sizeof(PMC*); break;
-        case enum_type_STRING:
-            list->item_size = sizeof(STRING*); break;
-        default:
-            internal_exception(1, "N/Y\n"); break;
+    case enum_type_char:
+        list->item_size = sizeof(char);
+        break;
+    case enum_type_short:
+        list->item_size = sizeof(short);
+        break;
+    case enum_type_int:
+        list->item_size = sizeof(int);
+        break;
+    case enum_type_INTVAL:
+        list->item_size = sizeof(INTVAL);
+        break;
+    case enum_type_FLOATVAL:
+        list->item_size = sizeof(FLOATVAL);
+        break;
+    case enum_type_PMC:
+        list->item_size = sizeof(PMC *);
+        break;
+    case enum_type_STRING:
+        list->item_size = sizeof(STRING *);
+        break;
+    default:
+        internal_exception(1, "N/Y\n");
+        break;
     }
     return list;
 }
+
 /*
  * list_new_init uses these initializers:
  * 0 ... size (set initial size of list)
@@ -927,22 +936,23 @@ list_new(Interp *interpreter, INTVAL type)
  *
  */
 List *
-list_new_init(Interp *interpreter, INTVAL type, PMC * init)
+list_new_init(Interp *interpreter, INTVAL type, PMC *init)
 {
-    List * list = list_new(interpreter, type);
+    List *list = list_new(interpreter, type);
     INTVAL i, len, size, key;
 
     if (!init->vtable || init->vtable != Parrot_base_vtables +
-            enum_class_PerlArray)
+        enum_class_PerlArray)
         internal_exception(1, "Illegal initializer for init\n");
     len = init->vtable->elements(interpreter, init);
     if (len & 1)
         internal_exception(1, "Illegal initializer for init: odd elements\n");
-    for (i = size = 0; i < len; i+= 2) {
+    for (i = size = 0; i < len; i += 2) {
         key = init->vtable->get_integer_keyed_int(interpreter, init, &i);
         if (key == 0) {
-            INTVAL val = i+1;
-            size = init->vtable->get_integer_keyed_int(interpreter, init, &val);
+            INTVAL val = i + 1;
+            size =
+                init->vtable->get_integer_keyed_int(interpreter, init, &val);
             break;
         }
     }
@@ -958,8 +968,8 @@ list_new_init(Interp *interpreter, INTVAL type, PMC * init)
 List *
 list_clone(Interp *interpreter, List *other)
 {
-    List * l;
-    List_chunk * chunk, *prev, *new_chunk;
+    List *l;
+    List_chunk *chunk, *prev, *new_chunk;
     UINTVAL i;
     PMC *op, *np;
     STRING *s;
@@ -972,9 +982,9 @@ list_clone(Interp *interpreter, List *other)
     l->chunk_list.buflen = 0;
     l->chunk_list.bufstart = 0;
 
-    for (chunk = other->first, prev = 0; chunk ; chunk = chunk->next) {
+    for (chunk = other->first, prev = 0; chunk; chunk = chunk->next) {
         new_chunk = allocate_chunk(interpreter, l,
-            chunk->items, chunk->data.buflen);
+                                   chunk->items, chunk->data.buflen);
         new_chunk->data.flags = chunk->data.flags;
         if (!prev)
             l->first = new_chunk;
@@ -984,35 +994,34 @@ list_clone(Interp *interpreter, List *other)
 
         if (!(new_chunk->data.flags & sparse)) {
             switch (l->item_type) {
-                case enum_type_PMC:
-                    for (i = 0; i < chunk->items; i++) {
-                        op = ((PMC**) chunk->data.bufstart) [i];
-                        if (op) {
-                            np = op->vtable->clone(interpreter, op);
-                            ((PMC**) new_chunk->data.bufstart)[i] = np;
-                        }
+            case enum_type_PMC:
+                for (i = 0; i < chunk->items; i++) {
+                    op = ((PMC **)chunk->data.bufstart)[i];
+                    if (op) {
+                        np = op->vtable->clone(interpreter, op);
+                        ((PMC **)new_chunk->data.bufstart)[i] = np;
                     }
-                    break;
-                case enum_type_STRING:
-                    for (i = 0; i < chunk->items; i++) {
-                        s = ((STRING**) chunk->data.bufstart) [i];
-                        if (s) {
-                            ((STRING**) new_chunk->data.bufstart)[i] =
-                                string_copy(interpreter, s);
-                        }
+                }
+                break;
+            case enum_type_STRING:
+                for (i = 0; i < chunk->items; i++) {
+                    s = ((STRING **)chunk->data.bufstart)[i];
+                    if (s) {
+                        ((STRING **)new_chunk->data.bufstart)[i] =
+                            string_copy(interpreter, s);
                     }
-                    break;
-                default:
-                    mem_sys_memcopy(new_chunk->data.bufstart,
-                            chunk->data.bufstart,
-                            chunk->data.buflen);
-                    break;
+                }
+                break;
+            default:
+                mem_sys_memcopy(new_chunk->data.bufstart,
+                                chunk->data.bufstart, chunk->data.buflen);
+                break;
             }
         }
     }
     if (other->user_data)
         l->user_data = other->user_data->vtable->clone(interpreter,
-                other->user_data);
+                                                       other->user_data);
     rebuild_chunk_list(interpreter, l);
     interpreter->DOD_block_level--;
     interpreter->GC_block_level--;
@@ -1020,45 +1029,45 @@ list_clone(Interp *interpreter, List *other)
 }
 
 
-PMC*
-list_mark(Interp* interpreter, List* list, PMC* last)
+PMC *
+list_mark(Interp *interpreter, List *list, PMC *last)
 {
-    List_chunk* chunk;
+    List_chunk *chunk;
     PMC *p;
     UINTVAL i;
 
     for (chunk = list->first; chunk; chunk = chunk->next) {
-        buffer_lives(interpreter, (Buffer *) chunk);
+        buffer_lives(interpreter, (Buffer *)chunk);
         if (list->item_type == enum_type_PMC && !(chunk->data.flags & sparse))
             for (i = 0; i < chunk->items; i++) {
-                p = ((PMC**) chunk->data.bufstart) [i];
+                p = ((PMC **)chunk->data.bufstart)[i];
                 if (p)
                     last = mark_used(p, last);
             }
     }
-    buffer_lives(interpreter, (Buffer *) list);
+    buffer_lives(interpreter, (Buffer *)list);
     if (list->user_data)
         last = mark_used(list->user_data, last);
     return last;
 }
 
 INTVAL
-list_length(Interp* interpreter, List* list)
+list_length(Interp *interpreter, List *list)
 {
     UNUSED(interpreter);
     return list->length;
 }
 
 void
-list_set_length(Interp* interpreter, List* list, INTVAL len)
+list_set_length(Interp *interpreter, List *list, INTVAL len)
 {
     UINTVAL idx;
     if (len < 0)
         len += list->length;
     if (len >= 0) {
-        idx = list->start + (UINTVAL) len;
+        idx = list->start + (UINTVAL)len;
         list->length = len;
-        if (len >= (INTVAL) list->length) {
+        if (len >= (INTVAL)list->length) {
             list_append(interpreter, list, 0, list->item_type, idx);
         }
         else {
@@ -1069,8 +1078,10 @@ list_set_length(Interp* interpreter, List* list, INTVAL len)
 }
 
 /* make room for n_items at idx */
-void list_insert(Interp *interpreter, List *list, INTVAL idx, INTVAL n_items) {
-    List_chunk * chunk, *new_chunk, *rest;
+void
+list_insert(Interp *interpreter, List *list, INTVAL idx, INTVAL n_items)
+{
+    List_chunk *chunk, *new_chunk, *rest;
 
     INTVAL items;
     assert(idx >= 0);
@@ -1096,24 +1107,24 @@ void list_insert(Interp *interpreter, List *list, INTVAL idx, INTVAL n_items) {
         /* 1. cut this chunk at idx */
         list->grow_policy = enum_grow_mixed;
         /* allocate a sparse chunk, n_items big */
-        new_chunk = allocate_chunk(interpreter, list, n_items, list->item_size);
+        new_chunk =
+            allocate_chunk(interpreter, list, n_items, list->item_size);
         new_chunk->data.flags |= sparse;
         items = chunk->items - idx;
         if (items) {
             /* allocate a small chunk, holding the rest of chunk beyond idx */
             chunk->data.flags = no_power_2;
             rest = allocate_chunk(interpreter, list, items,
-                    items*list->item_size);
+                                  items * list->item_size);
             rest->data.flags |= no_power_2;
             /* hang them together */
             rest->next = chunk->next;
             chunk->next = new_chunk;
             new_chunk->next = rest;
             /* copy data over */
-            mem_sys_memmove(
-                (char *)rest->data.bufstart,
-                (char *)chunk->data.bufstart + idx * list->item_size,
-                items * list->item_size);
+            mem_sys_memmove((char *)rest->data.bufstart,
+                            (char *)chunk->data.bufstart +
+                            idx * list->item_size, items * list->item_size);
         }
         else {
             new_chunk->next = chunk->next;
@@ -1126,10 +1137,9 @@ void list_insert(Interp *interpreter, List *list, INTVAL idx, INTVAL n_items) {
 
 /* delete n_items at idx */
 void
-list_delete(Interp *interpreter, List *list,
-        INTVAL idx, INTVAL n_items)
+list_delete(Interp *interpreter, List *list, INTVAL idx, INTVAL n_items)
 {
-    List_chunk * chunk;
+    List_chunk *chunk;
 
     assert(idx >= 0);
     assert(n_items >= 0);
@@ -1154,23 +1164,22 @@ list_delete(Interp *interpreter, List *list,
                      * variables created in this one line.  adding an explicit
                      * one fixes things.   No need to force this workaround
                      * on less brain-damaged compilers though */
-                    size_t tmp_size = (chunk->items - idx - n_items) * 
-                                      list->item_size;
-                   
-                    mem_sys_memmove(
-                            (char *)chunk->data.bufstart +
-                            idx * list->item_size,
-                            (char *)chunk->data.bufstart +
-                            (idx + n_items) * list->item_size,
-                            tmp_size);
-#else              
-                    mem_sys_memmove(
-                            (char *)chunk->data.bufstart +
-                            idx * list->item_size,
-                            (char *)chunk->data.bufstart +
-                            (idx + n_items) * list->item_size,
-                            (chunk->items - idx - n_items) * list->item_size);
-#endif             
+                    size_t tmp_size = (chunk->items - idx - n_items) *
+                        list->item_size;
+
+                    mem_sys_memmove((char *)chunk->data.bufstart +
+                                    idx * list->item_size,
+                                    (char *)chunk->data.bufstart +
+                                    (idx + n_items) * list->item_size,
+                                    tmp_size);
+#else
+                    mem_sys_memmove((char *)chunk->data.bufstart +
+                                    idx * list->item_size,
+                                    (char *)chunk->data.bufstart +
+                                    (idx + n_items) * list->item_size,
+                                    (chunk->items - idx -
+                                     n_items) * list->item_size);
+#endif
                 }
             }
             chunk->items -= n_items;
@@ -1208,10 +1217,10 @@ list_push(Interp *interpreter, List *list, void *item, int type)
 void
 list_unshift(Interp *interpreter, List *list, void *item, int type)
 {
-    List_chunk * chunk;
+    List_chunk *chunk;
 
     if (list->start == 0) {
-        chunk  = add_chunk(interpreter, list, enum_add_at_start, 0);
+        chunk = add_chunk(interpreter, list, enum_add_at_start, 0);
         list->start = chunk->items;
     }
     else
@@ -1225,7 +1234,7 @@ list_pop(Interp *interpreter, List *list, int type)
 {
     UINTVAL idx;
     void *ret;
-    List_chunk * chunk = list->last;
+    List_chunk *chunk = list->last;
 
     if (list->length == 0) {
         return 0;
@@ -1250,9 +1259,9 @@ list_pop(Interp *interpreter, List *list, int type)
 void *
 list_shift(Interp *interpreter, List *list, int type)
 {
-    void * ret;
+    void *ret;
     UINTVAL idx = list->start++;
-    List_chunk * chunk = list->first;
+    List_chunk *chunk = list->first;
 
     if (list->length == 0) {
         return 0;
@@ -1261,7 +1270,7 @@ list_shift(Interp *interpreter, List *list, int type)
     /* optimize push + shift on empty lists */
     if (list->length == 0)
         list->start = 0;
-    ret = list_item(interpreter,list, type, idx);
+    ret = list_item(interpreter, list, type, idx);
     if (list->start >= chunk->items) {
         list->cap -= chunk->items;
         chunk = list->first = chunk->next ? chunk->next : list->last;
@@ -1300,16 +1309,17 @@ list_get(Interp *interpreter, List *list, INTVAL idx, int type)
         return 0;
     }
 
-    if (idx < 0) idx += length;
-    idx +=  list->start;
-    return list_item( interpreter, list, type, idx);
+    if (idx < 0)
+        idx += length;
+    idx += list->start;
+    return list_item(interpreter, list, type, idx);
 }
 
 void
-list_splice(Interp *interpreter, List *list, PMC* value, INTVAL offset,
-        INTVAL count)
+list_splice(Interp *interpreter, List *list, PMC *value, INTVAL offset,
+            INTVAL count)
 {
-    List * value_list = (List*) value->data;
+    List *value_list = (List *)value->data;
     INTVAL value_length = value_list->length;
     INTVAL length = list->length;
     INTVAL i, j;
@@ -1331,14 +1341,14 @@ list_splice(Interp *interpreter, List *list, PMC* value, INTVAL offset,
 
     /* replace count items at offset with values */
     for (i = j = 0; i < count && j < value_length; i++, j++) {
-        void * val = list_get(interpreter, value_list, j, type);
+        void *val = list_get(interpreter, value_list, j, type);
         /* no clone here, if the HL want's to reuse the values,
          * the HL has to clone the values
          */
         if (type == enum_type_PMC)
-            val = *(PMC**) val;
+            val = *(PMC **)val;
         else if (type == enum_type_STRING)
-            val = *(STRING**) val;
+            val = *(STRING **)val;
         list_assign(interpreter, list, offset + i, val, type);
     }
     /* if we still have values in value_list, insert them */
@@ -1346,11 +1356,11 @@ list_splice(Interp *interpreter, List *list, PMC* value, INTVAL offset,
         /* make room for the remaining values */
         list_insert(interpreter, list, offset + i, value_length - j);
         for (; j < value_length; i++, j++) {
-            void * val = list_get(interpreter, value_list, j, type);
+            void *val = list_get(interpreter, value_list, j, type);
             if (type == enum_type_PMC)
-                val = *(PMC**) val;
+                val = *(PMC **)val;
             else if (type == enum_type_STRING)
-                val = *(STRING**) val;
+                val = *(STRING **)val;
             list_assign(interpreter, list, offset + i, val, type);
         }
     }
@@ -1369,4 +1379,3 @@ list_splice(Interp *interpreter, List *list, PMC* value, INTVAL offset,
  *
  * vim: expandtab shiftwidth=4:
 */
-
