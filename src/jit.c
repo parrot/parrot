@@ -11,6 +11,9 @@ src/jit.c - JIT
 JIT (Just In Time) compilation converts bytecode to native machine code
 instructions and executes the generated instruction sequence directly.
 
+Actually it's not really just in time, it's just before this piece of code is
+used and not per subroutine or even opcode, it works per bytecode segment.
+
 =head2 Functions
 
 =over 4
@@ -31,7 +34,7 @@ instructions and executes the generated instruction sequence directly.
 
 extern int jit_op_count(void);
 /*
- * s. jit/$arch/jit_emit.h for the meaning of these defs
+ * s. jit/$jitcpuarch/jit_emit.h for the meaning of these defs
  */
 
 #ifndef INT_REGISTERS_TO_MAP
@@ -187,6 +190,12 @@ make_branch_list(Interp *interpreter,
         int i, n;
         size_t rel_offset;
 
+        /*
+         * for all opcodes that are dynamically loaded, we can't have
+         * a JITted version, so we execute the function incarnation
+         * via the wrapper opcode, which just runs one opcode
+         * see ops/core.ops for more
+         */
         if (*cur_op >= jit_op_count())
            op = CORE_OPS_wrapper__;
 
@@ -233,8 +242,19 @@ make_branch_list(Interp *interpreter,
         if ((op_info->jump & PARROT_JUMP_ENEXT) ||
             (op_info->jump & PARROT_JUMP_GNEXT))
             branch[rel_offset + n] |= JIT_BRANCH_TARGET;
-        if (op_info->jump & PARROT_JUMP_UNPREDICTABLE)
+        if (op_info->jump & PARROT_JUMP_UNPREDICTABLE) {
+            /*
+             * TODO 
+             *   this flag is currently not used or set
+             *   and: if we have a branch that isn't going to a constant
+             *   target like a calculated branch used by rx_ opcodes
+             *   we are totally lost WRT register preservation.
+             *   If we don't know, that the code is a branch target, inside
+             *   a JITted code section, mapped registers might be
+             *   not up to date WRT Parrot registers.
+             */
             optimizer->has_unpredictable_jump = 1;
+        }
         /* Move to the next opcode */
         cur_op += n;
     }
@@ -278,11 +298,29 @@ set_register_usage(Interp *interpreter,
             case PARROT_ARG_I:
             case PARROT_ARG_KI:
                 typ = 0;
+                /*
+                 * if the register number is negative, the register mapping
+                 * was done by imcc/jit.c, which used negative numbers
+                 * for allocated CPU registers. That's currently not
+                 * functional because of changed register allocation
+                 * strategy inside imcc.
+                 * The code is still here and should probably be reactivated
+                 * later, when things are stable: imcc has all the 
+                 * necessary information like basic blocks and loop depth
+                 * calculated already. A lot is duplicated here to regain this
+                 * information.
+                 */ 
                 if (idx < 0)
                     idx = -1 - idx;
                 break;
             case PARROT_ARG_P:
             case PARROT_ARG_K:
+                /*
+                 * P and S regs aren't currently used at all. That's not
+                 * really optimal. If we have plenty of mappable registers
+                 * and if we can call vtables or MMD functions directly
+                 * we should finally allocate P and S regs too.
+                 */
                 typ = 1;
                 break;
             case PARROT_ARG_S:
@@ -395,7 +433,7 @@ make_sections(Interp *interpreter,
 
         /*
          * End a section:
-         * If this opcode is jitted and next calls a C function */
+         * If this opcode is jitted and next is a C function */
         if (!EXTCALL(cur_op)) {
             cur_section->jit_op_count++;
 
@@ -536,10 +574,9 @@ sort_registers(Interp *interpreter,
     /* Start from the first section */
     cur_section = optimizer->sections;
 
-    /* While there is section */
     while (cur_section) {
         Parrot_jit_register_usage_t *ru = cur_section->ru;
-        /* some up register usage for one block, don't change
+        /* sum up register usage for one block, don't change
          * reg_dir. If allocation is done per section, block numbers
          * are different, so this is a nop
          */
@@ -552,7 +589,7 @@ sort_registers(Interp *interpreter,
             next = next->next;
         }
 
-        /* now sort registers by there usage count */
+        /* now sort registers by their usage count */
         for (typ = 0; typ < 4; typ++) {
             /* find most used register */
             for (i = max_count = 0; i < NUM_REGISTERS; i++) {
@@ -623,6 +660,40 @@ assign_registers(Interp *interpreter,
 
 Called by C<map_registers()> to actually assign the Parrot registers to
 hardware registers.
+
+TODO
+
+Before actually assigning registers, we should optimize a bit:
+
+1) calculate max use count of register types for all sections 
+
+2) calculate costs for register preserving and restoring
+   for two different allocation strategies:
+
+   a) allocate non-volatiles first
+      overhead for jit_begin, jit_end:
+      - 2 * max_used_non_volatile registers  
+      overhead for register preserving around non-jitted sections:
+      - only used IN arguments are saved
+      - only OUT non-volatile arguments are restored
+   b) allocate volatiles first
+      no overhead for jit_begin, jit_end
+      overhead per JITed op that calls a C function:
+      - 2 * n_used_volatiles_to_preserve for each call
+      overhead for register preserving around non-jitted sections:
+      - all volatiles are saved and restored around non-jitted sections
+
+NB for all cost estimations size does matter: a 64bit double counts as
+   two 32bit ints. Opcode count is assumed to be just one.
+
+3) depending on costs from 2) use one of the strategies
+   That does still not account for any usage patterns. Imcc has loop
+   nesting depth, but that's not available here. OTOH smaller code tends
+   to perform better because of better cache usage.
+
+Usage analysis could show that a mixture of both strategies is best, e.g:
+allocate 2-4 non-volatiles and the rest from volatiles. But that would
+complicate the allocation code a bit.
 
 =cut
 
@@ -742,7 +813,7 @@ debug_sections(Interp *interpreter,
     int i, typ;
     unsigned int j;
     const char *types = "IPSN";
-    int t_l[] = {0,3};
+    int types_to_list[] = {0,3};
 
     cur_section = optimizer->sections;
     while (cur_section) {
@@ -776,9 +847,9 @@ debug_sections(Interp *interpreter,
         PIO_eprintf(interpreter, "\tend:\t%#p\t(%Ou)\n",
                 cur_section->end, *cur_section->end);
 
-        for (j = 0; j < sizeof(t_l)/sizeof(int); j++) {
+        for (j = 0; j < sizeof(types_to_list)/sizeof(int); j++) {
             char t;
-            typ = t_l[j];
+            typ = types_to_list[j];
             t = types[typ];
             PIO_eprintf(interpreter, "\t%c registers used:\t%i\n",
                     t, ru[typ].registers_used);
@@ -814,7 +885,7 @@ debug_sections(Interp *interpreter,
 optimize_jit(Interp *interpreter, opcode_t *cur_op,
              opcode_t *code_start, opcode_t *code_end)>
 
-Called by C<build_asm()> to initialize the optimizer.
+Called by C<build_asm()> to run the optimizer.
 
 =cut
 
@@ -836,7 +907,7 @@ optimize_jit(Interp *interpreter, opcode_t *cur_op,
     /* ok, let's loop again and generate the sections */
     make_sections(interpreter, optimizer, cur_op, code_start, code_end);
 
-    /* look where a section jumps too */
+    /* look where a section jumps to */
     make_branch_targets(interpreter, optimizer, code_start);
 
     /* This is where we start deciding which Parrot registers get
@@ -994,12 +1065,12 @@ Parrot_jit_load_registers(Parrot_jit_info_t *jit_info,
                           Interp * interpreter, int volatiles)>
 
 Load registers for the current section from parrot to processor registers.
+If C<volatiles> is true, this code is used to restore these registers in
+JITted code that calls out to Parrot.
 
 =cut
 
 */
-
-
 
 static void
 Parrot_jit_load_registers(Parrot_jit_info_t *jit_info,
@@ -1012,6 +1083,7 @@ Parrot_jit_load_registers(Parrot_jit_info_t *jit_info,
     void (*mov_f[4])(Interp *, int, int, size_t)
         = { Parrot_jit_emit_mov_rm_offs, 0, 0, Parrot_jit_emit_mov_rm_n_offs};
     size_t offs;
+    int base_reg = 0;   /* -O3 warning */
 #else
     void (*mov_f[4])(Interp *, int, char *)
         = { Parrot_jit_emit_mov_rm, 0, 0, Parrot_jit_emit_mov_rm_n};
@@ -1020,11 +1092,9 @@ Parrot_jit_load_registers(Parrot_jit_info_t *jit_info,
     int lasts[] = { PRESERVED_INT_REGS, 0,0,  PRESERVED_FLOAT_REGS };
     char * maps[] = {0, 0, 0, 0};
     int first = 1;
-    int base_reg = 0;   /* -O3 warning */
 
     maps[0] = jit_info->intval_map;
     maps[3] = jit_info->floatval_map;
-
 
     for (typ = 0; typ < 4; typ++) {
         if (maps[typ]) {
@@ -1065,6 +1135,8 @@ Parrot_jit_save_registers(Parrot_jit_info_t *jit_info,
                           Interp * interpreter, int volatiles)>
 
 Save registers for the current section.
+If C<volatiles> is true, this code is used to preserve these registers in
+JITted code that calls out to Parrot.
 
 =cut
 
@@ -1081,6 +1153,7 @@ Parrot_jit_save_registers(Parrot_jit_info_t *jit_info,
     void (*mov_f[4])(Interp * ,int, size_t, int)
         = { Parrot_jit_emit_mov_mr_offs, 0, 0, Parrot_jit_emit_mov_mr_n_offs};
     size_t offs;
+    int base_reg = 0; /* -O3 warning */
 #else
     void (*mov_f[4])(Interp * , char *, int)
         = { Parrot_jit_emit_mov_mr, 0, 0, Parrot_jit_emit_mov_mr_n};
@@ -1089,7 +1162,6 @@ Parrot_jit_save_registers(Parrot_jit_info_t *jit_info,
     int lasts[] = { PRESERVED_INT_REGS, 0,0,  PRESERVED_FLOAT_REGS };
     char * maps[] = {0, 0, 0, 0};
     int first = 1;
-    int base_reg = 0; /* -O3 warning */
 
     maps[0] = jit_info->intval_map;
     maps[3] = jit_info->floatval_map;
@@ -1181,6 +1253,15 @@ The information obtained is used to perform certain types of fixups on
 native code, as well as by the native code itself to convert bytecode
 program counters values to hardware program counter values.
 
+Finally this code here is used to generate native executables (or better
+object files that are linked to executables), if EXEC_CAPABLE is defined.
+This functionality is triggered by 
+
+  parrot -o foo.o foo.imc
+
+which uses the JIT engine to translate to native code inside the object
+file.
+
 =cut
 
 */
@@ -1203,7 +1284,6 @@ build_asm(Interp *interpreter, opcode_t *pc,
     Parrot_exec_objfile_t *obj = (Parrot_exec_objfile_t *)objfile;
 #endif
 
-
     /* XXX assume, we restart */
     if (interpreter->jit_info) {
         jit_info = interpreter->jit_info;
@@ -1223,12 +1303,16 @@ build_asm(Interp *interpreter, opcode_t *pc,
 #endif
         op_func = op_jit;
 
-
+    /*
+     * check if IMCC did all he work. If yes, we got a PF segment with
+     * register allocation information inside.
+     * See imcc/jit.c for more
+     */
     name = mem_sys_allocate(strlen(interpreter->code->cur_cs->base.name) + 5);
     sprintf(name, "%s_JIT", interpreter->code->cur_cs->base.name);
     jit_seg = PackFile_find_segment(interpreter->code->cur_cs->base.dir,
             name, 0);
-    free(name);
+    mem_sys_free(name);
     if (jit_seg)
         jit_info->optimizer =
             optimize_imcc_jit(interpreter, pc, code_start, code_end, jit_seg);
@@ -1239,7 +1323,6 @@ build_asm(Interp *interpreter, opcode_t *pc,
     /* Attach the register map to the jit_info structure */
     jit_info->intval_map = intval_map;
     jit_info->floatval_map = floatval_map;
-
 
     /* Byte code size in opcode_t's */
     jit_info->arena.map_size = (code_end - code_start) + 1;
@@ -1268,16 +1351,22 @@ build_asm(Interp *interpreter, opcode_t *pc,
     jit_info->arena.fixups = NULL;
 
     /*
-    *   op_map holds the offset from arena.start
-    *   of the parrot op at the given opcode index
-     *
-    *  bytecode:       56  1   1   56  1   1
-    *  op_map:         3   0   0   15  0   0
-    */
-
+     * from C's ABI all the emitted code here is one (probably big)
+     * function. So we have to generate an appropriate function
+     * prolog, that makes all this look like a normal fuction ;)
+     */
     Parrot_jit_begin(jit_info, interpreter);
+    /*
+     * the function epilog can basically be anywhere, that's done
+     * by the Parrot_end opcode somewhere in core.jit
+     */
 
-    /* Set the offset of the first opcode */
+    /*
+     *   op_map holds the offset from arena.start
+     *   of the parrot op at the given opcode index
+     *
+     * Set the offset of the first opcode 
+     */
     jit_info->arena.op_map[jit_info->op_i].offset =
         jit_info->native_ptr - jit_info->arena.start;
 
@@ -1330,7 +1419,14 @@ build_asm(Interp *interpreter, opcode_t *pc,
              * really checking if the target section has the same registers
              * mapped too.
              *
-             * and also, if we have a jitted sections and encounter
+             * Yep so: TODO
+             * during register allocation try to use the same registers, if
+             * its a loop or a plain branch and if register usage doesn't
+             * differ too much. This could save a lot of register reloads.
+             *
+             * --
+             *  
+             * save also, if we have a jitted sections and encounter
              * an "end" opcode, e.g. in evaled code
              */
             if ((((map[cur_op - code_start] == JIT_BRANCH_SOURCE) &&
@@ -1343,7 +1439,9 @@ build_asm(Interp *interpreter, opcode_t *pc,
             else if (CALLS_C_CODE(cur_opcode_byte)) {
                 /*
                  * a JITted function with a function call, we have to
-                 * save volatile registers
+                 * save volatile registers but 
+                 * TODO not if the previous opcode was also one
+                 *      that called C code
                  */
                 Parrot_jit_save_registers(jit_info, interpreter, 1);
             }
@@ -1423,7 +1521,15 @@ build_asm(Interp *interpreter, opcode_t *pc,
     PIO_eprintf(interpreter, "\nTotal size %u bytes\n",
             (unsigned int)(jit_info->native_ptr - jit_info->arena.start));
 #endif
-
+    
+/*
+ * TODO just call a sync function, which the architecture defines
+ *      or not if not
+ *
+ *      This should be generalized and go along with the executable
+ *      allocation functions as e.g. mem_close_executable()
+ */
+ 
 #ifdef PARROT_ARM
     arm_sync_d_i_cache(jit_info->arena.start, jit_info->native_ptr);
 #endif
@@ -1441,8 +1547,13 @@ build_asm(Interp *interpreter, opcode_t *pc,
 
     /* assume gdb is available: generate symbol information  */
 #if defined __GNUC__ || defined __IBMC__
-    if (Interp_flags_TEST(interpreter, PARROT_DEBUG_FLAG))
+    if (Interp_flags_TEST(interpreter, PARROT_DEBUG_FLAG)) {
+        /*
+         * TODO same like above here e.g. create ASM listing of code
+         *      if real debug support isn't available
+         */
         Parrot_jit_debug(interpreter);
+    }
 #endif
 
     return (jit_f)D2FPTR(jit_info->arena.start);
@@ -1466,10 +1577,6 @@ Parrot_jit_newfixup(Parrot_jit_info_t *jit_info)
 
     fixup = mem_sys_allocate_zeroed(sizeof(*fixup));
 
-    if (!fixup)
-        internal_exception(ALLOCATION_ERROR,
-                           "System memory allocation failed\n");
-
     /* Insert fixup at the head of the list */
     fixup->next = jit_info->arena.fixups;
     jit_info->arena.fixups = fixup;
@@ -1485,7 +1592,8 @@ Parrot_jit_newfixup(Parrot_jit_info_t *jit_info)
 
 =head1 SEE ALSO
 
-F<include/parrot/jit.h>, F<docs/jit.pod> and F<src/jit_debug.c>.
+F<include/parrot/jit.h>, F<docs/jit.pod>,d F<src/jit_debug.c>,
+F<jit/$jitcpuarch/jit_emit.h>, F<jit/$jitcpuarch/core.jit>. 
 
 =cut
 
