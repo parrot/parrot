@@ -328,7 +328,7 @@ print S <<'EOF';
   invoke P1
   .pcc_sub _sub2:
   printerr P5
-  print "in sub2\n"
+  printerr "in sub2\n"
   invoke P1
 EOF
 close S;
