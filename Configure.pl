@@ -178,9 +178,17 @@ if ($^O eq 'VMS' || $^O =~ /MSWin/i) {
     $c{PQ} = "'";
 }
 
+#
 # If using gcc, crank up its warnings as much as possible and make it behave
 # ansi-ish.
-if ($Config{ccname} eq "gcc") {
+#
+# Some Perl versions put this in Config variable 'ccname', others in 'cc'. We
+# prefer the former, but accept the latter.
+#
+
+my $ccname = $Config{ccname} || $Config{cc};
+
+if ($ccname eq "gcc") {
    $c{cc_warn} = " -Wall -ansi -pedantic -Wtraditional -Wstrict-prototypes -Wmissing-prototypes -Winline -Wredundant-decls -Wall -Wshadow -Wpointer-arith -Wcast-qual -Wcast-align -Wwrite-strings -Wconversion -Waggregate-return -Winline";
 }
 
