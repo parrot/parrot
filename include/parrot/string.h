@@ -13,6 +13,9 @@
 #if !defined(PARROT_STRING_H_GUARD)
 #define PARROT_STRING_H_GUARD
 
+#include "parrot/config.h"
+#include "parrot/encoding.h"
+#include "parrot/chartype.h"
 #include "parrot/parrot.h"
 
 typedef struct {
@@ -40,7 +43,11 @@ typedef enum BUFFER_flag {
     BUFFER_immobile_FLAG	= 2 << 0,
     /* Private flag for the GC system. Set if the buffer's in use as
        far as the GC's concerned */
-    BUFFER_GC_FLAG		= 2 << 1
+    BUFFER_GC_FLAG		= 2 << 1,
+    /* Marks the contents as shared */
+    BUFFER_shared_FLAG		= 2 << 2,
+    /* Mark the contents as Copy on write */
+    BUFFER_COW_FLAG		= 2 << 3
 } BUFFER_flags;
 
 /* Declarations of accessors */
