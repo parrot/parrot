@@ -837,16 +837,24 @@ sub render_obj_or_literal {
 sub render_list {
     my ($thing, $sep, $term, $pre, $post) = @_;
     if (UNIVERSAL::can($thing, 'render')) {
-        return $thing->render;
-    } else {
-        my $str = '';
-        $str .= $pre if defined($pre);
-        my @lines = map { defined($term) ? $_->render . $term : $_->render }
-          @$thing;
-        $str .= join(defined($sep) ? $sep : "", @lines);
-        $str .= $post if defined($post);
-        return $str;
+        $thing = [ $thing ];
     }
+    my $str = '';
+    $str .= $pre if defined($pre);
+    my @lines = grep { defined $_ } map { $_->render } @$thing;
+    if (defined $term) { $_ .= $term foreach (@lines) }
+    $str .= join(defined($sep) ? $sep : "", @lines);
+    $str .= $post if defined($post);
+    return $str;
+}
+
+sub P6C::sub_def::render {
+    my $obj = shift;
+    my $str = '';
+    $str = $obj->qual . " " if defined $obj->qual;
+    $str .= $obj->name if defined $obj->name;
+    $str .= $obj->closure->render;
+    return $str;
 }
 
 sub P6C::closure::render {
@@ -952,7 +960,11 @@ sub P6C::prefix::render {
     my $obj = shift;
     my $str = render_obj_or_literal($obj->name);
     if (defined($obj->args)) {
-        $str .= render_list($obj->args, ", ", undef, "(", ")");
+        if (ref $obj->args) {
+            $str .= render_list($obj->args, ", ", undef, "(", ")");
+        } else {
+            $str .= "(" . $obj->args . ")";
+        }
     }
     return $str;
 }
@@ -970,7 +982,13 @@ sub P6C::subscript_exp::render {
 sub P6C::indices::render {
     my $obj = shift;
     my $inner = $obj->indices->render;
-    return ($obj->type eq 'PerlArray') ? "[$inner]" : "{$inner}";
+    if ($obj->type eq 'PerlArray') {
+        return "[$inner]";
+    } elsif ($obj->type eq 'PerlHash') {
+        return "{$inner}";
+    } else {
+        return "($inner)"
+    }
 }
 
 sub P6C::sv_literal::render {
@@ -982,7 +1000,9 @@ sub P6C::variable::render {
     my $obj = shift;
     my $str = "";
     $str .= "*" if $obj->global;
-    $str .= $obj->name;
+    $str .= substr($obj->name, 0, 1);
+    $str .= "^" if $obj->implicit;
+    $str .= substr($obj->name, 1);
     return $str;
 }
 
@@ -1043,6 +1063,18 @@ sub P6C::compare::render {
     my $obj = shift;
     return join(" ", map { ref($_) ? $_->render : $_ } @{ $obj->seq });
 }
+
+sub P6C::context::render {
+    my $obj = shift;
+    return $obj->ctx . $obj->thing->render;
+}
+
+sub P6C::label::render {
+    my $obj = shift;
+    return $obj->name . ": ";
+}
+
+sub P6C::debug_info::render { return '' }
 
 "Yep.";
 
