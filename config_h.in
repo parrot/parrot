@@ -72,8 +72,8 @@ typedef void * Parrot_Pointer;
 typedef void * Parrot_Sync;
 
 /* These are temporary until we put them in the proper places. */
-struct Parrot_Interp;  typedef struct Parrot_Interp * Parrot;
-struct PackFile;		typedef struct PackFile * Parrot_PackFile;
+struct Parrot_Interp; typedef struct Parrot_Interp * Parrot;
+struct PackFile;      typedef struct PackFile * Parrot_PackFile;
 
 #endif
 
