@@ -381,9 +381,9 @@ trace_system_stack(struct Parrot_Interp *interpreter, PMC *last)
 
         /* Do a quick approximate range check by bit-masking */
         if((ptr & mask) == prefix){
-            if (pmc_min < ptr && ptr < pmc_max && is_pmc_ptr(interpreter,(void *)ptr)) {
+            if (pmc_min <= ptr && ptr < pmc_max && is_pmc_ptr(interpreter,(void *)ptr)) {
                 last = mark_used((PMC *)ptr, last);
-            } else if (buffer_min < ptr && ptr < buffer_max && is_buffer_ptr(interpreter,(void *)ptr)) {
+            } else if (buffer_min <= ptr && ptr < buffer_max && is_buffer_ptr(interpreter,(void *)ptr)) {
                 buffer_lives((Buffer *)ptr);
             }
         }
