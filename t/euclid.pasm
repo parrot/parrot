@@ -12,7 +12,6 @@
 #
 # I1: m
 # I2: n
-# I3: zero
 # I4: r
 #
 # E1: Find remainder.
@@ -21,11 +20,10 @@
 #
 main:   set    I1, 96
         set    I2, 64
-        set    I3, 0
         set    S1, "Algorithm E (Euclid's algorithm)"
         print  S1
 e1:     mod    I4, I1, I2
-e2:     eq     I4, I3, done, e3
+e2:     eq     I4, 0, done, e3
 e3:     set    I1, I2
         set    I2, I4
         branch e1
