@@ -48,7 +48,7 @@ ${make_set_make}
 
 all : imcc${exe}
 
-../../$(PARROTLIB): ../../parrot$(EXE)
+../../$(PARROTLIB):
 	cd ..${slash}.. && $(MAKE) $(PARROTLIB) && cd languages${slash}imcc
 
 # The .flag files are needed because we are keeping some derived files in CVS,

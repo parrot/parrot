@@ -194,13 +194,14 @@ ${make_set_make}
 .c$(O) :
 	$(CC) $(CFLAGS) ${cc_o_out}$@ -c $<
 
-all : $(TEST_PROG) docs
+all : $(TEST_PROG) docs $(IMCC_PROG)
 
 
 mops : examples/assembly/mops${exe} examples/mops/mops${exe}
 
 $(TEST_PROG) : test_main$(O) $(GEN_HEADERS) $(LIBPARROT) lib/Parrot/OpLib/core.pm
 	$(LINK) ${ld_out}$(TEST_PROG) $(LINKFLAGS) test_main$(O) $(LIBPARROT) $(C_LIBS)
+	$(PERL) -MExtUtils::Command -e mv $(TEST_PROG) test_main$(EXE)
 
 lib_deps_object : $(O_FILES)
 	$(PERL) tools/dev/lib_deps.pl object $(O_FILES)
@@ -515,9 +516,12 @@ $(IMCC_PROG) : $(LIBPARROT)        \
                languages/imcc/*.c \
                languages/imcc/*.h \
                languages/imcc/*.y \
-               languages/imcc/*.l \
-               languages/imcc/*.o
+               languages/imcc/*.l
 	cd languages${slash}imcc && $(MAKE) && cd ..${slash}..
+	$(PERL) -MExtUtils::Command -e mv $(IMCC_PROG) $(TEST_PROG)
+	cd languages${slash}imcc && $(MAKE) && cd ..${slash}..
+	# the chmod doesn't work here, so move imcc and make it again :-(
+	# $(PERL) -MExtUtils::Command -e chmod 0755 $(TEST_PROG)
 
 
 ###############################################################################
@@ -601,7 +605,7 @@ clean : testclean progclean
 	$(RM_F) *.s *~ $(FLUID_FILES) \
 	        examples/assembly/mops${exe} examples/assembly/mops.c \
 	        examples/assembly/mops$(O) examples/assembly/mops.pbc \
-	        examples/mops/mops$(O) examples/mops/mops${exe} 
+	        examples/mops/mops$(O) examples/mops/mops${exe}
 	cd docs && $(MAKE) clean && cd ..
 	cd classes && $(MAKE) clean && cd ..
 	cd languages && $(MAKE) clean && cd ..
