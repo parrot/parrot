@@ -93,12 +93,24 @@ Finds and returns the delegated method with C string C<name>.
 
 */
 
+
 PARROT_INLINE static PMC *
 find_meth(Parrot_Interp interpreter, PMC *pmc, const char *name) {
     STRING *meth = string_from_cstring(interpreter, name, 0);
+    PMC *class;
+    if (PObj_is_class_TEST(pmc)) {
+        class = pmc;
+    }
+    else {
+        if (PObj_is_object_TEST(pmc)) {
+            class = VTABLE_get_pmc_keyed_int(interpreter, (PMC *)PMC_data(pmc), POD_CLASS);
+        }
+        else {
+            class = pmc;
+        }
+    }
     REG_STR(2) = meth;
-
-    return Parrot_find_method_with_cache(interpreter, pmc, meth);
+    return Parrot_find_method_with_cache(interpreter, class, meth);
 }
 
 /*

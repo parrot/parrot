@@ -52,7 +52,7 @@ C<NULL>), while the value is the offset to the attribute.
 
 #include "parrot/parrot.h"
 
-pmclass ParrotClass need_ext {
+pmclass ParrotClass extends delegate need_ext {
 
 /*
 
