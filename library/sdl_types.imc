@@ -409,6 +409,10 @@ _key_event:
 _have_callback:
 	.sym int result
 
+	# no error if the event is not defined
+	typeof result, callback
+	if result == .PerlUndef goto loop
+	
 	.pcc_begin prototyped
 		.pcc_call callback
 		.result result
@@ -644,8 +648,9 @@ XXX - exists, but not quite right and not public
 
 =head1 AUTHOR
 
-Written and maintained by chromatic, E<lt>chromatic at wgz dot orgE<gt>.
-Please send patches and suggestions to the Perl 6 Internals mailing list.
+Written and maintained by chromatic, E<lt>chromatic at wgz dot orgE<gt>, with
+help from Jens Rieks.  Please send patches and suggestions to the Perl 6
+Internals mailing list.
 
 =head1 COPYRIGHT
 
