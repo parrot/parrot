@@ -5,7 +5,7 @@
 
 Parrot is a common bytecode format and interpreter for dynamic
 languages; it is designed to run Perl 6 code efficiently, but 
-is intended to be language-agnostic. 
+is also intended to be language-agnostic. 
 
 =head2 Documentation
 
@@ -24,7 +24,7 @@ An overview of the Parrot architecture and design.
 
 =item F<running.pod>
 
-Brief descriptions of the different executables constructed and how to
+Brief descriptions of the different executables and how to
 run them.
 
 =item F<faq.pod>
@@ -33,7 +33,7 @@ The Parrot FAQ.
 
 =item F<core_ops.pod>
 
-A description of the core operations in the Parrot assembly language.
+Description of the core opcodes in the Parrot assembly language.
 
 =item F<parrot_assembly.pod>
 
@@ -43,7 +43,7 @@ your assembly programs.
 
 =item F<io_ops.pod>
 
-A description of the operations used in Parrot's IO subsystem.
+Description of the opcodes used in Parrot's IO subsystem.
 
 =item F<vtables.pod>
 
@@ -100,10 +100,16 @@ C<perl6-internals@perl.org> mailing list.
 
 =head2 Web pages
 
-See
+See:
 
-    http://dev.perl.org/
-    http://cvs.perl.org/
-    http://www.parrotcode.org/
+=over 4
+
+=item * L<http://dev.perl.org/>
+
+=item * L<http://cvs.perl.org/>
+
+=item * L<http://www.parrotcode.org/>
+
+=back
 
 for more information.
