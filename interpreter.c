@@ -471,31 +471,17 @@ make_interpreter(INTVAL flags) {
     Parrot_clear_p(interpreter);
     
     /* Need a user stack */
-    interpreter->user_stack_base = 
-            mem_allocate_aligned(sizeof(struct StackChunk));
-    interpreter->user_stack_top = &interpreter->user_stack_base->entry[0];
-    /* Unlike the registers, we start with zero used */
-    interpreter->user_stack_base->used = 0;
-    interpreter->user_stack_base->free = STACK_CHUNK_DEPTH;
-    interpreter->user_stack_base->next = NULL;
-    interpreter->user_stack_base->prev = NULL;
+    new_stack(interpreter, &interpreter->user_stack_base,
+              &interpreter->user_stack_top);
     
     /* And a control stack */
-    interpreter->control_stack_base = 
-            mem_allocate_aligned(sizeof(struct StackChunk));
-    interpreter->control_stack_top = 
-            &interpreter->control_stack_base->entry[0];
-    /* Unlike the registers, we start with zero used */
-    interpreter->control_stack_base->used = 0;
-    interpreter->control_stack_base->free = STACK_CHUNK_DEPTH;
-    interpreter->control_stack_base->next = NULL;
-    interpreter->control_stack_base->prev = NULL;
-    
+    new_stack(interpreter, &interpreter->control_stack_base,
+              &interpreter->control_stack_top);
+
     /* Need an empty stash */
     interpreter->perl_stash = mem_allocate_new_stash();
     
     /* Load the core op func and info tables */
-
     interpreter->op_lib        = PARROT_CORE_OPLIB_INIT();
     interpreter->op_count      = interpreter->op_lib->op_count;
     interpreter->op_func_table = interpreter->op_lib->op_func_table;

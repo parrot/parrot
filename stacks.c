@@ -12,6 +12,17 @@
 
 #include "parrot/parrot.h"
 
+void
+new_stack(struct Parrot_Interp *interpreter, struct StackChunk **base, struct Stack_Entry **top) {
+	(*base)=mem_allocate_aligned(sizeof(struct StackChunk));
+	(*top)=&((*base)->entry[0]);
+
+	(*base)->used=0;
+	(*base)->free=STACK_CHUNK_DEPTH;
+	(*base)->next=NULL;
+	(*base)->prev=NULL;
+}
+
 INTVAL
 stack_depth(struct Parrot_Interp *interpreter, struct StackChunk *chunk) {
   INTVAL               depth;
