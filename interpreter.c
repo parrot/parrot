@@ -136,7 +136,7 @@ runops_generic (opcode_t * (*core)(struct Parrot_Interp *), struct Parrot_Interp
     opcode_t * code_start;
     INTVAL         code_size;
     opcode_t * code_end;
-    INTVAL *       pc;
+    opcode_t *       pc;
 
     check_fingerprint(interpreter);
 
