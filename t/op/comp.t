@@ -1,6 +1,6 @@
 #! perl -w
 
-use Parrot::Test tests => 6;
+use Parrot::Test tests => 7;
 
 # some of these were failing with JIT/i386
 
@@ -135,6 +135,34 @@ CODE
 ok 1
 ok 2
 ok 3
+OUTPUT
+
+output_is(<<'CODE', <<OUTPUT, "cmp");
+        set I0, 10
+        cmp I1, I0, 9
+        set N0, -2.4
+        cmp I2, -2.4, N0
+        set S0, "Bruhaha"
+        cmp I3, S0, "Crumbum"
+        new P0, .PerlInt
+        new P1, .PerlInt
+        set P0, 452
+        set P1, -15
+        cmp I4, P0, P1
+
+        print I1
+        print "\n"
+        print I2
+        print "\n"
+        print I3
+        print "\n"
+        print I4
+        print "\n"
+CODE
+1
+0
+-1
+1
 OUTPUT
 
 1;
