@@ -11,6 +11,34 @@ Parrot_go_collect(struct Parrot_Interp *interpreter)
     interpreter->collect_runs++;        /* fake it */
 }
 
+
+static PARROT_INLINE void*
+xmalloc(size_t size)
+{
+    void *p = malloc(size);
+    if (!p)
+        do_panic(NULL, "malloc: out of mem", __FILE__, __LINE__);
+    return p;
+}
+
+static PARROT_INLINE void*
+xcalloc(size_t n, size_t size)
+{
+    void *p = calloc(n, size);
+    if (!p)
+        do_panic(NULL, "calloc: out of mem", __FILE__, __LINE__);
+    return p;
+}
+
+static PARROT_INLINE void*
+xrealloc(void *p, size_t size)
+{
+    void *n = realloc(p, size);
+    if (!n)
+        do_panic(NULL, "realloc: out of mem", __FILE__, __LINE__);
+    return n;
+}
+
 /*
  * COWable objects (strings or Buffers) use an int at bufstart
  * for refcounting in DOD
@@ -23,14 +51,14 @@ Parrot_reallocate(struct Parrot_Interp *interpreter, void *from, size_t size)
     void *p;
     size_t oldlen = buffer->buflen;
     if (!buffer->bufstart) {
-        buffer->bufstart = calloc(1, size + sizeof(int));
+        buffer->bufstart = xcalloc(1, size + sizeof(int));
         LVALUE_CAST(int *, buffer->bufstart)++;
     }
     else {
         if (!size) {    /* realloc(3) does free, if size == 0 here */
             return buffer->bufstart;    /* do nothing */
         }
-        p =  realloc((int*)buffer->bufstart - 1, size + sizeof(int));
+        p = xrealloc((int*)buffer->bufstart - 1, size + sizeof(int));
         *(LVALUE_CAST(int *, p)++) = 0;
         if (size > buffer->buflen)
             memset((char*)p + oldlen, 0, size - oldlen);
@@ -44,7 +72,7 @@ void *
 Parrot_allocate(struct Parrot_Interp *interpreter, void *buffer, size_t size)
 {
     Buffer * b = buffer;
-    b->bufstart = malloc(size + sizeof(int));
+    b->bufstart = xmalloc(size + sizeof(int));
     *(LVALUE_CAST(int *, b->bufstart)++) = 0;
     b->buflen = size;
     return b;
@@ -55,7 +83,7 @@ Parrot_allocate_zeroed(struct Parrot_Interp *interpreter, void *buffer,
         size_t size)
 {
     Buffer * b = buffer;
-    b->bufstart = calloc(1, size + sizeof(int));
+    b->bufstart = xcalloc(1, size + sizeof(int));
     *(LVALUE_CAST(int *, b->bufstart)++) = 0;  /*   *( (int*) b->bufstart ++ ) = 0 */
     b->buflen = size;
     return b;
@@ -73,7 +101,7 @@ Parrot_reallocate_string(struct Parrot_Interp *interpreter, STRING *str,
     else if (size) {
         pad = STRING_ALIGNMENT - 1;
         size = ((size + pad + sizeof(int)) & ~pad);
-        p = realloc((char *)((int*)str->bufstart - 1), size);
+        p = xrealloc((char *)((int*)str->bufstart - 1), size);
         str->bufstart = str->strstart = (char *)p + sizeof(int);
         /* usable size at bufstart */
         str->buflen = size - sizeof(int);
@@ -89,7 +117,7 @@ Parrot_allocate_string(struct Parrot_Interp *interpreter, STRING *str,
     size_t pad;
     pad = STRING_ALIGNMENT - 1;
     size = ((size + pad + sizeof(int)) & ~pad);
-    p = calloc(1, size);
+    p = xcalloc(1, size);
     *(int*)p = 0;
     str->bufstart = str->strstart = (char *)p + sizeof(int);
     str->buflen = size - sizeof(int);
