@@ -30,13 +30,13 @@
  * signal handling
  */
 
-#if defined(HAS_HEADER_SIGNAL) && defined(HAS_HEADER_SYSTYPES)
+#if defined(PARROT_HAS_HEADER_SIGNAL) && defined(PARROT_HAS_HEADER_SYSTYPES)
 #  include <signal.h>
 #  include <sys/types.h>
 #  define dumpcore() kill(0, SIGQUIT)
 #endif
 
-#ifdef HAS_HEADER_SIGNAL
+#ifdef PARROT_HAS_HEADER_SIGNAL
 #  undef Parrot_set_sighandler
 #  ifdef HAS___SIGHANDLER_T
     typedef __sighandler_t Parrot_sighandler_t;
@@ -47,7 +47,7 @@
     Parrot_sighandler_t Parrot_set_sighandler(int s, Parrot_sighandler_t f);
 #endif
 
-#ifdef HAS_HEADER_PTHREAD
+#ifdef PARROT_HAS_HEADER_PTHREAD
 #  include <pthread.h>
 #  define PARROT_SYNC_PRIMITIVES_DEFINED
 #  define LOCK(x) pthread_mutex_lock(&x)

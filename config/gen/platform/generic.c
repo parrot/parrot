@@ -7,7 +7,7 @@
 
 #include "parrot/parrot.h"
 
-#ifdef HAS_HEADER_DLFCN
+#ifdef PARROT_HAS_HEADER_DLFCN
 #  include <dlfcn.h>
 #endif
 
@@ -100,7 +100,7 @@ Parrot_getenv(const char *name)
 void *
 Parrot_dlopen(const char *filename)
 {
-#ifdef HAS_HEADER_DLFCN
+#ifdef PARROT_HAS_HEADER_DLFCN
     return dlopen(filename, PARROT_DLOPEN_FLAGS);
 #else
     return 0;
@@ -115,7 +115,7 @@ Parrot_dlopen(const char *filename)
 const char *
 Parrot_dlerror(void)
 {
-#ifdef HAS_HEADER_DLFCN
+#ifdef PARROT_HAS_HEADER_DLFCN
     return dlerror();
 #else
     return 0;
@@ -130,7 +130,7 @@ Parrot_dlerror(void)
 void *
 Parrot_dlsym(void *handle, const char *symbol)
 {
-#ifdef HAS_HEADER_DLFCN
+#ifdef PARROT_HAS_HEADER_DLFCN
     return dlsym(handle, symbol);
 #else
     return 0;
@@ -145,7 +145,7 @@ Parrot_dlsym(void *handle, const char *symbol)
 int
 Parrot_dlclose(void *handle)
 {
-#ifdef HAS_HEADER_DLFCN
+#ifdef PARROT_HAS_HEADER_DLFCN
     return dlclose(handle);
 #else
     return -1;
@@ -177,7 +177,7 @@ Parrot_memalign_if_possible(size_t align, size_t size)
 
 #elif defined(HAS_MEMALIGN)
 
-#if defined(HAS_HEADER_MALLOC)
+#if defined(PARROT_HAS_HEADER_MALLOC)
 #include <malloc.h>
 #else
 #include <stdlib.h>
@@ -207,7 +207,7 @@ Parrot_free_memalign(void *p)
 /*
  * signal handling
  */
-#ifdef HAS_HEADER_SIGNAL
+#ifdef PARROT_HAS_HEADER_SIGNAL
 #include <signal.h>
 /*
  * for now use signal based functions

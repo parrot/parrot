@@ -54,7 +54,7 @@ trace_system_areas(struct Parrot_Interp *interpreter)
 				(size_t)current_regstore_top);
 #else
 
-#  ifdef HAS_HEADER_SETJMP
+#  ifdef PARROT_HAS_HEADER_SETJMP
     Parrot_jump_buff env;
 
     /* Zero the Parrot_jump_buff, otherwise you will trace stale objects */

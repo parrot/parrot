@@ -37,40 +37,40 @@
 
 /* Other headers, where available */
 
-#ifdef HAS_HEADER_UNISTD
+#ifdef PARROT_HAS_HEADER_UNISTD
 #  include <unistd.h>
 #endif
 
-#ifdef HAS_HEADER_SYSMMAN
+#ifdef PARROT_HAS_HEADER_SYSMMAN
 #  include <sys/mman.h>
 #endif
 
-#ifdef HAS_HEADER_SYSTIME
+#ifdef PARROT_HAS_HEADER_SYSTIME
 #  include <sys/time.h>
 #endif
 
-#ifdef HAS_HEADER_MATH
+#ifdef PARROT_HAS_HEADER_MATH
 #  include <math.h>
 #endif
 
-#ifdef HAS_HEADER_FCNTL
+#ifdef PARROT_HAS_HEADER_FCNTL
 #  include <fcntl.h>
 #endif
 
-#ifdef HAS_HEADER_SYSTYPES
+#ifdef PARROT_HAS_HEADER_SYSTYPES
 #  include <sys/types.h>
 #endif
 
-#ifdef HAS_HEADER_SYSSTAT
+#ifdef PARROT_HAS_HEADER_SYSSTAT
 #  include <sys/stat.h>
 #endif
 
-#ifdef HAS_HEADER_SETJMP
+#ifdef PARROT_HAS_HEADER_SETJMP
 #  include <setjmp.h>
 typedef jmp_buf Parrot_jump_buff;
 #endif
 
-#ifdef HAS_HEADER_PTHREAD
+#ifdef PARROT_HAS_HEADER_PTHREAD
 #  include <pthread.h>
 #endif
 

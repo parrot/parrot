@@ -44,7 +44,7 @@ int Parrot_dlclose(void *handle);
 /*
  * signal handling
  */
-#ifndef HAS_HEADER_SIGNAL
+#ifndef PARROT_HAS_HEADER_SIGNAL
 #  define Parrot_set_sighandler(s, h)
 #endif
 

@@ -26,7 +26,7 @@
 #  ifdef _WIN32
 #    define PIO_OS_WIN32
 #  else
-#    ifdef HAS_HEADER_UNISTD
+#    ifdef PARROT_HAS_HEADER_UNISTD
 #      define PIO_OS_UNIX
 #    else
 #      define PIO_OS_STDIO

@@ -12,7 +12,7 @@
 
 #include "parrot/parrot.h"
 
-#ifdef HAS_HEADER_SETJMP
+#ifdef PARROT_HAS_HEADER_SETJMP
 /* XXX s. exceptions.c */
 void do_exception(exception_severity severity, long error);
 void Parrot_init_signals(void);
@@ -23,7 +23,7 @@ sig_handler(int signum)
 {
     switch (signum) {
         default:
-#ifdef HAS_HEADER_SETJMP
+#ifdef PARROT_HAS_HEADER_SETJMP
             /* quick hack to test signals and exceptions
              */
             do_exception(0, -signum);

@@ -375,7 +375,7 @@ PackFile_destroy(struct PackFile *pf)
         PIO_eprintf(NULL, "PackFile_destroy: pf == NULL!\n");
         return;
     }
-#ifdef HAS_HEADER_SYSMMAN
+#ifdef PARROT_HAS_HEADER_SYSMMAN
     if (pf->is_mmap_ped)
         munmap(pf->src, pf->size);
 #endif
@@ -555,7 +555,7 @@ PackFile_unpack(struct Parrot_Interp *interpreter, struct PackFile *self,
                 (struct PackFile_Segment *) self->directory, cursor);
     }
     self->byte_code = self->cur_cs->base.data;
-#ifdef HAS_HEADER_SYSMMAN
+#ifdef PARROT_HAS_HEADER_SYSMMAN
     if (self->is_mmap_ped && (
             self->need_endianize || self->need_wordsize)) {
         munmap(self->src, self->size);

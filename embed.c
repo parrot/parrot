@@ -67,7 +67,7 @@ Parrot_setwarnings(struct Parrot_Interp *interpreter, Parrot_warnclass wc)
 struct PackFile *
 Parrot_readbc(struct Parrot_Interp *interpreter, char *filename)
 {
-#if HAS_HEADER_UNISTD
+#if PARROT_HAS_HEADER_UNISTD
     off_t program_size, wanted;
 #else
     size_t program_size, wanted;
@@ -77,11 +77,11 @@ Parrot_readbc(struct Parrot_Interp *interpreter, char *filename)
     PMC * io = NULL;
     INTVAL is_mapped = 0;
 
-#ifdef HAS_HEADER_SYSSTAT
+#ifdef PARROT_HAS_HEADER_SYSSTAT
     struct stat file_stat;
 #endif
 
-#ifdef HAS_HEADER_SYSMMAN
+#ifdef PARROT_HAS_HEADER_SYSMMAN
     int fd = -1;
 #endif
 
@@ -93,7 +93,7 @@ Parrot_readbc(struct Parrot_Interp *interpreter, char *filename)
     }
     else {
 
-#ifdef HAS_HEADER_SYSSTAT
+#ifdef PARROT_HAS_HEADER_SYSSTAT
         /* if we have stat(), get the actual file size so we can read it
          * in one chunk. */
         if (stat(filename, &file_stat)) {
@@ -114,14 +114,14 @@ Parrot_readbc(struct Parrot_Interp *interpreter, char *filename)
 
         program_size = file_stat.st_size;
 
-#else   /* HAS_HEADER_SYSSTAT */
+#else   /* PARROT_HAS_HEADER_SYSSTAT */
 
         /* otherwise, we will read it 1k at a time */
         program_size = 0;
 
-#endif  /* HAS_HEADER_SYSSTAT */
+#endif  /* PARROT_HAS_HEADER_SYSSTAT */
 
-#ifndef HAS_HEADER_SYSMMAN
+#ifndef PARROT_HAS_HEADER_SYSMMAN
         io = PIO_open(interpreter, filename, "<");
         if (!io) {
             PIO_eprintf(interpreter, "Parrot VM: Can't open %s, code %i.\n",
@@ -129,17 +129,17 @@ Parrot_readbc(struct Parrot_Interp *interpreter, char *filename)
             return NULL;
         }
 
-#else   /* HAS_HEADER_SYSMMAN */
+#else   /* PARROT_HAS_HEADER_SYSMMAN */
 
         /* the file wasn't from stdin, and we have mmap available- use it */
         io = NULL;
 
-#endif  /* HAS_HEADER_SYSMMAN */
+#endif  /* PARROT_HAS_HEADER_SYSMMAN */
 
         interpreter->current_file = string_make(interpreter, filename,
                 strlen(filename), NULL, 0, NULL);
     }
-#ifdef HAS_HEADER_SYSMMAN
+#ifdef PARROT_HAS_HEADER_SYSMMAN
 again:
 #endif
     /* if we've opened a file (or stdin) with PIO, read it in */
@@ -193,7 +193,7 @@ again:
         /* if we've gotten here, we opted not to use PIO to read the file.
          * use mmap */
 
-#ifdef HAS_HEADER_SYSMMAN
+#ifdef PARROT_HAS_HEADER_SYSMMAN
 
         fd = open(filename, O_RDONLY | O_BINARY);
         if (!fd) {
@@ -221,13 +221,13 @@ again:
         }
         is_mapped = 1;
 
-#else   /* HAS_HEADER_SYSMMAN */
+#else   /* PARROT_HAS_HEADER_SYSMMAN */
 
         PIO_eprintf(interpreter, "Parrot VM: uncaught error occurred reading "
                     "file or mmap not available.\n");
         return NULL;
 
-#endif  /* HAS_HEADER_SYSMMAN */
+#endif  /* PARROT_HAS_HEADER_SYSMMAN */
 
     }
 
@@ -242,7 +242,7 @@ again:
         return NULL;
     }
 
-#ifdef HAS_HEADER_SYSMMAN
+#ifdef PARROT_HAS_HEADER_SYSMMAN
 
     if (fd >= 0) {
         close(fd);   /* the man page states, it's ok to close a mmaped file */

@@ -194,7 +194,7 @@ rethrow_exception(Parrot_Interp interpreter, PMC *exception)
     return handler->cache.struct_val;
 }
 
-#ifdef HAS_HEADER_SETJMP
+#ifdef PARROT_HAS_HEADER_SETJMP
 /* XXX s. interpreter.c */
 Parrot_exception the_exception;
 
@@ -278,7 +278,7 @@ void
 real_exception(struct Parrot_Interp *interpreter, void *ret_addr,
         int exitcode,  const char *format, ...)
 {
-#ifdef HAS_HEADER_SETJMP
+#ifdef PARROT_HAS_HEADER_SETJMP
     STRING *msg;
     opcode_t *dest;     /* absolute address of handler */
 
