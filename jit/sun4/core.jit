@@ -180,6 +180,32 @@ Parrot_div_n_n {
     Parrot_binop_x_x s/<op>/fdivd/ s/<_N>/_n/
 }
 
+TEMPLATE Parrot_incdec_i {
+    int arg1;
+
+    if(MAP[1]){
+        arg1 = MAP[1];
+    }
+    else {
+        arg1 = ISR1;
+        jit_emit_load_i(jit_info, interpreter, 1, arg1);
+    }
+
+    emitm_<op>_i(NATIVECODE, arg1, 1, arg1);
+
+    if(!MAP[1]){
+        jit_emit_store_i(jit_info, interpreter, 1, arg1);
+    }
+}
+                                                                                                           
+Parrot_inc_i {
+    Parrot_incdec_i s/<op>/add/
+}
+                                                                                                           
+Parrot_dec_i {
+    Parrot_incdec_i s/<op>/sub/
+}
+
 TEMPLATE Parrot_binop_i_xc {
     int arg1;
 
