@@ -14,9 +14,9 @@ Parrot JIT Subsystem
     Maintainer: Daniel Grunblatt
     Class: Internals
     PDD Number: 8
-    Version: 1.2
+    Version: 1.3
     Status: Developing
-    Last Modified: 31 January 2002
+    Last Modified: 26 Nov 2002
     PDD Format: 1
     Language:English
 
@@ -31,14 +31,14 @@ code instructions and executes the generated instruction sequence directly.
 
 =head1 IMPLEMENTATION
 
-Currently works on B<Intel x86>, B<ALPHA>, and B<SPARC version 8> processor
-systems, on most operating systems.  Currently only 32-bit INTVALs are
-supported.
+Currently works on B<ALPHA>, B<Arm>, B<Intel x86>, B<PPC>, and B<SPARC
+version 8> processor systems, on most operating systems.  Currently only
+32-bit INTVALs are supported.
 
 The initial step in generating native code is to invoke B<Parrot_jit_begin>,
 which generally provides architecture specific preamble code.  For each parrot
 opcode in the bytecode, either a generic or opcode specific sequence of native
-code is generated.  The B<.jit> files provide functions that generate native
+code is generated.  The F<.jit> files provide functions that generate native
 code for specific opcode functions, for a given instruction set architecture.
 If a function is not provided for a specific opcode, a generic sequence of
 native code is output which calls the interpreter C function that implements
@@ -66,16 +66,20 @@ in native code where adjustments to the native code are required.
 =item jit/${jitcpuarch}/jit_emit.h
 
 This file defines B<Parrot_jit_begin>, B<Parrot_jit_dofixup>,
-B<Parrot_jit_normal_op> and B<Parrot_jit_cpcf_op>.  In addition, this file
-defines the macros and static functions used in B<.jit> files to produce binary
+B<Parrot_jit_normal_op>, B<Parrot_jit_cpcf_op>, B<Parrot_jit_restart_op>
+and optionally B<Parrot_jit_vtable*_op>.  In addition, this file defines
+the macros and static functions used in F<.jit> files to produce binary
 representations of native instructions.
+
+For moving registers from processor to parrot and vv, the
+B<Parrot_jit_emit_mov*> functions have to be implemented.
 
 =item jit/${jitcpuarch}/core.jit
 
 The functions to generate native code for core parrot opcodes are specified
 here. To simplify the maintenance of these functions, they are specified in a
-format that is pre-processed by B<jit2h.pl> to produce a valid C source file,
-B<jit_cpu.c>. See L<Format of .jit Files> below.
+format that is pre-processed by F<jit2h.pl> to produce a valid C source file,
+F<jit_cpu.c>. See L<Format of .jit Files> below.
 
 =item jit/${jitcpuarch}/string.jit
 
@@ -88,7 +92,11 @@ This file contains definitions of generic structures used by the JIT subsystem.
 The B<op_jit> array of B<jit_fn_info_t> structures, provides for each opcode, a
 pointer to the function that generates native code for the opcode, whether the
 generic B<Parrot_jit_normal_op> or B<Parrot_jit_cpcf_op> functions or an opcode
-specific function.
+specific function. B<Parrot_jit_restart_op> is like
+B<Parrot_jit_cpcf_op> with the addition to check for a zero program
+counter. The B<Parrot_jit_vtable*_op> functions are defined as
+B<Parrot_jit_normal_op> or B<Parrot_jit_cpcf_op> and may be implemeted
+to do native vtable calls (s. F<jit/i386/jit_emit.h> for an example).
 
 The B<Parrot_jit_fixup> structure records the offset in native code where a
 fixup must be applied, the type of fixup required and the specific information
@@ -116,9 +124,13 @@ offsets are converted to absolute addresses.  This trades the low up-front cost
 of converting all offsets once, for the unknown cost of repeatedly converting
 these offsets while executing native code.
 
+If the architecture defines B<INT_REGISTERS_TO_MAP> and
+B<FLOAT_REGISTERS_TO_MAP> as nonzero, this amount of most used registers
+per code section are mapped to native processor registers.
+
 =item jit2h.pl
 
-Preprocesses the .jit files to produce and prints the struct opcode_assembly_t.
+Preprocesses the .jit files to produce F<jit_cpu.c>.
 
 =back
 
@@ -129,11 +141,13 @@ Jit files are interpreted as follows:
 
 =over 4
 
-=item I<op-name> { I<body> }
+=item I<op-name> { \n I<body> \n }
 
 Where I<op-name> is the name of the Parrot opcode, and I<body> consists of C
 syntax code which may contain any of the identifiers listed in the following
 section.
+
+The closing curly brace has to be in the first column.
 
 =item Comment lines
 
@@ -143,11 +157,9 @@ lines are ignored.
 =item Identifiers
 
 In general, prefixing an identifier with I<&> yields the address of the
-referenced Parrot register or constant.  If an identifier is given without a
-prefix, the value is returned by default.   To emphasis the use of the value,
-the I<*> prefix may be used.  Since Parrot register values vary during code
-execution, their values can not be obtained through identifier substitution
-alone.
+The I<*> prefix specifies a value.  Since Parrot register values vary
+during code execution, their values can not be obtained through
+identifier substitution alone.
 
 B<INT_REG[n]>
 
@@ -168,6 +180,14 @@ Gets replaced by the C<INTVAL> constant specified in the I<n>th argument.
 B<NUM_CONST[n]>
 
 Gets replaced by the C<FLOATVAL> constant specified in the I<n>th argument.
+
+B<MAP[n]>
+
+The I<n>th integer or floating processor register, mapped in this section.
+
+Note: The register with the physical number zero can not be mapped.
+
+=begin unimp
 
 B<STRING_CONST_strstart[n]>
 
@@ -197,59 +217,140 @@ B<STRING_CONST_language[n]>
 
 Gets replaced by C<language> of the C<STRING> constant specified in the I<n>th argument.
 
-B<CONST_INT[n]>
+=end unimp
 
-Gets replaced by the I<n>th integer constant defined in jit.c
+B<NATIVECODE>
 
-B<CONST_FLOAT[n]>
-
-Gets replaced by the I<n>th floatval constant defined in jit.c
-
-B<CONST_CHAR[n]>
-
-Gets replaced by the I<n>th char constant defined in jit.c
-
-B<TEMP_INT[n]>
-
-Gets replaced by the I<n>th temporary integer array.
-
-B<TEMP_FLOAT[n]>
-
-Gets replaced by the I<n>th temporary float array.
-
-B<TEMP_CHAR[n]>
-
-Gets replaced by the I<n>th temporary char array.
-
-B<&INTERPRETER[n]>
-
-Gets replaced by the address of the interpreter.
+Gets replaced by the current native program counter.
 
 B<*CUR_OPCODE[n]>
 
 Gets replaced by the address of the current opcode in the Parrot bytecode.
 
-=item B<FUNC>(I<func-name>, I<arg1>, ..., I<argN>)
+B<ISRn> B<FSRn>
 
-Call a function defined in another C<.jit> file (except from the core).
+The I<n>th integer or floating point scratch register.
 
-=item B<SYSTEM_CALL>(I<syscall-name>, I<arg1>, ..., I<argN>)
 
-Call a system call.
+=item B<TEMPLATE> I<template-name> { \n I<body> \n }
 
-=item B<CALL>(I<func-name>, I<arg1>, ..., I<argN>)
+Defines a template for similar functions, e.g. all the binary ops taking
+three variable parameters.
 
-Call a C function. The idea is to replace all the B<CALL>() with B<FUNC>().
+=item I<template-name> I<perl-subst> ...
 
-=item Arguments to CALL and SYSTEMCALL
+Take a template and do all substitutions to generate the implementation
+for this jit function.
 
-The arguments to CALL and SYSTEMCALL must be preceeded by I<V> to indicate that the value should be taken as an immediate or I<A> to indicate that the value should be dereferenced.
+Example:
+
+    TEMPLATE Parrot_set_x_ic {
+	if (MAP[1]) {
+	    jit_emit_mov_ri<_N>(NATIVECODE, MAP[1], <typ>_CONST[2]);
+	}
+	else {
+	    jit_emit_mov_mi<_N>(NATIVECODE, &INT_REG[1], <typ>_CONST[2]);
+	}
+    }
+
+    Parrot_set_i_ic {
+	Parrot_set_x_ic s/<_N>/_i/ s/<typ>/*INT/
+    }
+
+    Parrot_set_n_ic {
+	Parrot_set_x_ic s/<_N>/_ni/ s/<typ>/&INT/ s/INT_R/NUM_R/
+    }
+
+The jit function B<Parrot_set_i_ic> is based on the template
+B<Parrot_set_x_ic>, the I<s/x/y/> are substitutions on the template
+body, to generate the actual function body. These substitutions are done
+before the other substitutions.
+
+s. F<jit/i386/core.jit> for more.
 
 =back
 
+=head2 Naming convention for jit_emit functions
+
+To make it easier to share F<core.jit> files between machines of similar
+architecture, the jit_emit functions B<should> follow this syntax:
+
+jit_emit_I<<op>>_I<<args>>_I<<type>>
+
+=item I<<op>>
+
+This is the operation like B<mov>, B<add> or B<bxor>. In normal cases
+this is the PASM name of the op.
+
+=item I<<args>>
+
+B<args> specify the arguments of the function in the PASM sequence
+B<dest>, B<source> ... The B<args> consist of one letter per argument:
+
+=over 4
+
+=item B<r>
+
+A mapped processor register.
+
+=item B<m>
+
+A memory operand, the address of the parrot register.
+
+=item B<i>
+
+An immediate operand, i.e. an integer constant.
+
+=back
+
+=item I<<type>>
+
+Specifies, if this operations works on integers or floating point
+arguments. If all arguments are of the same type, only one type
+specifier is needed.
+
+=over 4
+
+=item B<i>
+
+An integer argument
+
+=item B<n>
+
+A float argument.
+
+=back
+
+Examples:
+
+=item B<jit_emit_sub_rm_i>
+
+Subtract integer at memory from integer processor register.
+
+=item B<jit_emit_mov_ri_ni>
+
+Move integer constant (immediate) to floating point register.
+
 =head1 ALPHA Notes
 
-The access to Parrot registers is done relative to C<$6>, all other memory access is done relative to C<$27>, to access float constants relative to C<$7> so you must preside the instruction with I<ldah $7,0($27)>.
+The access to Parrot registers is done relative to C<$6>, all other
+memory access is done relative to C<$27>, to access float constants
+relative to C<$7> so you must preside the instruction with I<ldah
+$7,0($27)>.
+
+=head1 i386 Notes
+
+Only 32 bit INTVALs are supported. Long double FLOATVALs could work,
+though this is untested currently.
+
+There are four mapped integer registers B<%edi>, B<%ebx>, B<%esi> and
+B<%edx>. The first 3 of these are callee saved, they preserve their
+value around extern function calls. The register B<%ebp> is abused to
+hold the address of the jit function table.
+
+For floating point operations the registers B<ST1> ... B<ST4> are
+mapped.
+
 
 =head1 EXAMPLE
 
@@ -280,12 +381,12 @@ Please note that the opcode numbers used might have already changed.
 B<Intel x86 assembly version of the Parrot ops:>
 
  Parrot_set_i_ic {
-    movl *INT_CONST[2],&INT_REG[1]
+    movl *INT_CONST[2], &INT_REG[1]
  }
 
  Parrot_set_i_i {
-    movl &INT_REG[2],%eax
-    movl %eax,&INT_REG[1]
+    movl &INT_REG[2], %eax
+    movl %eax, &INT_REG[1]
  }
 
  Parrot_print_sc {
@@ -345,7 +446,9 @@ B<Build process:>
   | 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 |
   +-----------------------------------------+
 
-That is the state after the code for the first op has been copied. The B<0x55 0x89 0xe5> you see before the object code for Parrot_set_i_ic is the output of Parrot::Jit->init()
+That is the state after the code for the first op has been copied. The
+B<0x55 0x89 0xe5> you see before the object code for F<Parrot_set_i_ic> is
+the output of F<Parrot_jit_begin>.
 
  Fill it with addresses and/or values:
 
@@ -354,7 +457,7 @@ That is the state after the code for the first op has been copied. The B<0x55 0x
   | 0x00 0x08 0x00 0x00 0x00 0x00 0x00 0x00 |
   +-----------------------------------------+
 
-The address of I0 (&intepreter->int_reg.registers[0]) is 0x10a000 (or whatever), so the first 4 bytes after the opcode number are filled with it, and the other contiguous 4 with the constant it self.
+The address of I0 (&intepreter->ctx.int_reg.registers[0]) is 0x10a000 (or whatever), so the first 4 bytes after the opcode number are filled with it, and the other contiguous 4 with the constant it self.
 
 The same process is done one time per opcode.
 
