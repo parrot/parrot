@@ -19,6 +19,8 @@
 #define MINIMUM_MEMPOOL_SIZE  1
 #define MAXIMUM_MEMPOOL_SIZE  8
 
+typedef void (*compact_f)(struct Parrot_Interp *, struct Memory_Pool *);
+
 /** Parrot Memory Management Code **/
 
 /* Allocate a new memory block. We allocate the larger of however much
@@ -483,12 +485,9 @@ Parrot_allocate_string(struct Parrot_Interp *interpreter, STRING *str,
 }
 
 
-
-
 /* Create a new memory pool */
 static struct Memory_Pool *
-new_memory_pool(size_t min_block,
-                void (*compact)(struct Parrot_Interp *, struct Memory_Pool *))
+new_memory_pool(size_t min_block, compact_f compact) 
 {
     struct Memory_Pool *pool;
 
@@ -528,7 +527,7 @@ Parrot_initialize_memory_pools(struct Parrot_Interp *interpreter)
 
     /* Constant strings - not compacted */
     interpreter->arena_base->constant_string_pool =
-        new_memory_pool(8192, NULL);
+        new_memory_pool(8192, (compact_f)NULLfunc);
 }
 
 

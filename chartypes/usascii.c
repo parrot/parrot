@@ -29,7 +29,7 @@ usascii_transcode_from(const char *from)
         return &usascii_transcode_from_unicode;
     }
     else {
-        return NULL;
+        return (CHARTYPE_TRANSCODER)NULLfunc;
     }
 }
 
@@ -46,7 +46,7 @@ usascii_transcode_to(const char *to)
         return &usascii_transcode_to_unicode;
     }
     else {
-        return NULL;
+        return (CHARTYPE_TRANSCODER)NULLfunc;
     }
 }
 

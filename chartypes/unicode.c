@@ -16,14 +16,14 @@ static CHARTYPE_TRANSCODER
 unicode_transcode_from(const char *from)
 {
     /* NOTE: This cheat silences unused var warnings on gcc */
-    return from ? (CHARTYPE_TRANSCODER)NULL : (CHARTYPE_TRANSCODER)NULL; 
+    return from ? (CHARTYPE_TRANSCODER)NULLfunc : (CHARTYPE_TRANSCODER)NULLfunc; 
 }
 
 static CHARTYPE_TRANSCODER
 unicode_transcode_to(const char *to)
 {
     /* NOTE: This cheat silences unused var warnings on gcc */
-    return to ? (CHARTYPE_TRANSCODER)NULL : (CHARTYPE_TRANSCODER)NULL;
+    return to ? (CHARTYPE_TRANSCODER)NULLfunc : (CHARTYPE_TRANSCODER)NULLfunc;
 }
 
 static Parrot_Int
