@@ -237,7 +237,7 @@ own the memory for the input byte code.
 ***************************************/
 
 void
-PackFile_set_byte_code(struct PackFile * self, opcode_t byte_code_size, char * byte_code) {
+PackFile_set_byte_code(struct PackFile * self, size_t byte_code_size, char * byte_code) {
     if (self->byte_code) {
         mem_sys_free(self->byte_code);
         self->byte_code = NULL;
@@ -252,7 +252,7 @@ PackFile_set_byte_code(struct PackFile * self, opcode_t byte_code_size, char * b
             return;
         }
 
-        mem_sys_memcopy(self->byte_code, byte_code, (INTVAL)byte_code_size);
+        mem_sys_memcopy(self->byte_code, byte_code, byte_code_size);
 
         self->byte_code_size = byte_code_size;
     }
@@ -288,7 +288,7 @@ Returns one (1) if everything is OK, else zero (0).
 ***************************************/
 
 opcode_t
-PackFile_unpack(struct Parrot_Interp *interpreter, struct PackFile * self, char * packed, opcode_t packed_size) {
+PackFile_unpack(struct Parrot_Interp *interpreter, struct PackFile * self, char * packed, size_t packed_size) {
     opcode_t     segment_size;
     char * cursor;
     opcode_t *   op_ptr;
@@ -395,7 +395,9 @@ PackFile_unpack(struct Parrot_Interp *interpreter, struct PackFile * self, char 
         mem_sys_memcopy(self->byte_code, cursor, self->byte_code_size);
     }
 
-    return 1;
+    cursor += segment_size;
+
+    return ((size_t)(cursor - packed)) == packed_size;
 }
 
 
@@ -516,7 +518,7 @@ Dump the PackFile to standard out in a human-readable form.
 
 void
 PackFile_dump(struct PackFile * self) {
-    opcode_t i;
+    size_t i;
 
     printf("MAGIC => 0x%08lx,\n", (long) self->magic);
 
@@ -532,7 +534,7 @@ PackFile_dump(struct PackFile * self) {
 
     printf("],\n");
 
-    printf("BCODE => [ # %ld bytes", self->byte_code_size);
+    printf("BCODE => [ # %ld bytes", (long)self->byte_code_size);
 
     for (i = 0; i < self->byte_code_size / 4; i++) {
         if (i % 8 == 0) {
@@ -849,7 +851,7 @@ PackFile_ConstTable_push_constant(struct PackFile_ConstTable * self, struct Pack
         return;
     }
 
-    temp = mem_sys_allocate((self->const_count + 1) * (INTVAL)sizeof(struct PackFile_Constant *));
+    temp = mem_sys_allocate((self->const_count + 1) * sizeof(struct PackFile_Constant *));
 
     if (!temp) {
         fprintf(stderr, "Unable to reallocate Constant array to push a new Constant!\n");
@@ -937,7 +939,7 @@ PackFile_ConstTable_unpack(struct Parrot_Interp *interpreter, struct PackFile_Co
         return 1;
     }
 
-    self->constants = mem_sys_allocate(self->const_count * (INTVAL)sizeof(struct PackFile_Constant *));
+    self->constants = mem_sys_allocate(self->const_count * sizeof(struct PackFile_Constant *));
 
     if (!self->constants) {
         fprintf(stderr, "PackFile_ConstTable_unpack: Could not allocate memory for array!\n");
@@ -1439,12 +1441,13 @@ Returns one (1) if everything is OK, else zero (0).
 ***************************************/
 
 opcode_t
-PackFile_Constant_unpack_string(struct Parrot_Interp *interpreter, struct PackFile_Constant * self, char * packed, opcode_t packed_size) {
-    char * cursor;
-    opcode_t     flags;
-    opcode_t     encoding;
-    opcode_t     type;
-    opcode_t     size;
+PackFile_Constant_unpack_string(struct Parrot_Interp *interpreter,
+  struct PackFile_Constant * self, char * packed, opcode_t packed_size) {
+    char *   cursor;
+    UINTVAL  flags;
+    opcode_t encoding;
+    opcode_t type;
+    size_t   size;
 
     if (!self) {
         return 0;
@@ -1454,7 +1457,7 @@ PackFile_Constant_unpack_string(struct Parrot_Interp *interpreter, struct PackFi
 
     cursor    = packed;
 
-    flags     = *(opcode_t *)cursor;
+    flags     = (UINTVAL)*(opcode_t *)cursor;
     cursor   += sizeof(opcode_t);
 
 #if TRACE_PACKFILE
@@ -1475,7 +1478,7 @@ PackFile_Constant_unpack_string(struct Parrot_Interp *interpreter, struct PackFi
     printf("PackFile_Constant_unpack_string(): type is %ld...\n", type);
 #endif
 
-    size      = *(opcode_t *)cursor;
+    size      = (size_t)*(opcode_t *)cursor;
     cursor   += sizeof(opcode_t);
 
 #if TRACE_PACKFILE
@@ -1578,7 +1581,7 @@ PackFile_Constant_pack(struct PackFile_Constant * self, char * packed) {
     char * cursor;
     opcode_t *   op_ptr;
     FLOATVAL *   nv_ptr;
-    opcode_t     i;
+    size_t       i;
     opcode_t     padded_size;
     opcode_t     packed_size;
 

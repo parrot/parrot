@@ -40,10 +40,10 @@ struct PackFile_ConstTable {
 
 
 struct PackFile {
-    opcode_t                           magic;
+    opcode_t                     magic;
     struct PackFile_FixupTable * fixup_table;
     struct PackFile_ConstTable * const_table;
-    opcode_t                           byte_code_size;
+    size_t                       byte_code_size;
     char *                       byte_code;
 };
 
@@ -74,10 +74,10 @@ char *
 PackFile_get_byte_code(struct PackFile * self);
 
 void
-PackFile_set_byte_code(struct PackFile * self, opcode_t byte_code_size, char * byte_code);
+PackFile_set_byte_code(struct PackFile * self, size_t byte_code_size, char * byte_code);
 
 opcode_t
-PackFile_unpack(struct Parrot_Interp *interpreter, struct PackFile * self, char * packed, opcode_t packed_size);
+PackFile_unpack(struct Parrot_Interp *interpreter, struct PackFile * self, char * packed, size_t packed_size);
 
 opcode_t
 PackFile_pack_size(struct PackFile * self);
