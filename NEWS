@@ -1,3 +1,33 @@
+New in 0.1.0
+ - "Ladies and gentlemen, I give you... objects!"
+ - Huge documentation overhaul
+ - More supported platforms, s. PLATFORMS
+ - Basic thread support for pthread based architectures
+ - Basic event handling for timers and signals including:
+ - PASM callbacks for NCI (native C) functions.
+ - Improved platform configuration
+ - COW stacks now working, stacks code redone
+ - Structure handling vastly improved
+ - Random PMC and rand primitives
+ - Better subroutine call syntax in PIR
+ - Make PIR subroutines compliant with pdd03
+ - Improved profiling (DOD, GC timings)
+ - Hash code improvements, incl. random key order support
+ - Experimental freeze/thaw code for some PMC types
+ - IO improvements for buffered layer and Win32
+ - String iterators
+ - String bitwise vtables
+ - Many new opcodes
+ - Suppport for JIT, where malloced memory isn't executable
+ - Priority DOD scheme for objects that need timely destruction
+ - Improved byte code loading (e.g. onLoad functions)
+ - Language updates: forth, Perl6/P6C, m4
+ - Libraries: Getopt_Long, SDL, Dumper, Sort
+ - new JAPH examples
+ - Unified imcc and parrot test handling
+ - Many new tests (make test reports 1386 tests)
+ - Numerous bug fixes
+
 New in 0.0.13
  - The Big Move: Parrot source and build files rearranged into sub dirs
  - Build imcc as parrot
