@@ -18,6 +18,10 @@
   return_type = TCL_OK
 
   if argc == 0 goto badargs
+
+  .local int call_level
+  $P0 = find_global "_Tcl", "call_level"
+  call_level = $P0
   
   .local int ii
   ii = 0
@@ -28,7 +32,7 @@ loop:
 
   push_eh catch
     find_lex $P1, 0, $S0
-    store_lex -1, $S0, $P1
+    store_lex call_level, $S0, $P1
   clear_eh
 
   inc ii

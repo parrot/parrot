@@ -59,6 +59,7 @@ Create a PIR sub on the fly for this user defined proc.
   proc_body  = ".namespace [\"Tcl\"]\n.sub \""
   proc_body .= name
   proc_body .= "\"\n.param pmc args\nargs = foldup\nnew_pad 1\n"
+  proc_body .= ".local pmc call_level\ncall_level = find_global \"_Tcl\", \"call_level\"\ninc call_level\n"
   .local int arg_count 
   arg_count = arg_list
   .local int ii
@@ -94,7 +95,7 @@ arg_loop_done:
   # a TCL_RETURN (2) from a sub body should be transformed into a TCL_OK (0)
   # to stop propagation outward.  XXX Should use the real constants here
 
-  proc_body .= "($I0,$P0) = interpret(proc_body)\nif $I0 != 2 goto done\n$I0 = 0\ndone:\npop_pad\n.return($I0,$P0)\n.end\n"
+  proc_body .= "($I0,$P0) = interpret(proc_body)\nif $I0 != 2 goto done\n$I0 = 0\ndone:\npop_pad\ndec call_level\n.return($I0,$P0)\n.end\n"
 
   #print "PROC_BODY=\n"
   #print proc_body

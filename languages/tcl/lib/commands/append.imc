@@ -16,6 +16,10 @@
   .local int return_type
   return_type = TCL_OK
 
+  .local int call_level
+  $P0 = find_global "_Tcl", "call_level"
+  call_level = $P0
+
   .local string value
   .local int looper
  
@@ -23,7 +27,7 @@
   looper = 1
 
   $S1 = argv[0] 
-  find_lex $P1, -1, $S1
+  find_lex $P1, call_level, $S1
   value = $P1 
 
 loop:
@@ -38,7 +42,7 @@ loop_done:
 
   $P1 = new String
   $P1 = value
-  store_lex -1, $S1, $P1
+  store_lex call_level, $S1, $P1
 
   goto done 
 

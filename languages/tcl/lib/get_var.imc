@@ -16,6 +16,10 @@
   .local int TclArray
   TclArray = find_type "TclArray"
 
+  .local int call_level
+  $P1 = find_global "_Tcl", "call_level"
+  call_level = $P1
+
 # with recent changes, argv2 is always set (sometimes to a PerlUndef)
 # This tweaks it act as if only one had been passed in. This will
 # eventually need a cleanup.
@@ -73,7 +77,7 @@ continue:
 get_indexed:
   #print "get_indexed:\n"
   push_eh catch
-    find_lex lexical, -1, name
+    find_lex lexical, call_level, name
   clear_eh
   isnull lexical, no_such_variable
   $I0 = typeof lexical
@@ -104,7 +108,7 @@ get_scalar:
   #print name
   #print "\n"
   push_eh catch
-    find_lex lexical, -1, name
+    find_lex lexical, call_level, name
   clear_eh
 
   isnull lexical, no_such_variable 

@@ -25,9 +25,13 @@
  
   if argc == 0 goto error
 
+  .local int call_level
+  $P0 = find_global "_Tcl", "call_level"
+  call_level = $P0
+
   $S1 = argv[0] 
 
-  find_lex $P1, -1, $S1
+  find_lex $P1, call_level, $S1
   value = $P1 
   if argc == 1 goto do_incr
   if argc == 2 goto offset
@@ -40,7 +44,7 @@ do_incr:
   value = value + increment
   retval = new Integer
   retval = value
-  store_lex -1, $S1, retval
+  store_lex call_level, $S1, retval
 
   goto done 
 

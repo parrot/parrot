@@ -20,14 +20,18 @@
 
   retval = new String
 
+  .local int call_level
+  $P0 = find_global "_Tcl", "call_level"
+  call_level = $P0
+
   push_eh catch
-    $P1 = find_lex -1, varname
+    $P1 = find_lex call_level, varname
   clear_eh
 
   isnull $P1, error
 
   null $P1
-  store_lex -1, varname, $P1
+  store_lex call_level, varname, $P1
   return_type=TCL_OK
   goto done
 

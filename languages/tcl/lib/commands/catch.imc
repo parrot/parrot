@@ -20,6 +20,10 @@
   parse = find_global "_Tcl", "__parse"
   interpret = find_global "_Tcl", "__interpret"
 
+  .local int call_level
+  $P0 = find_global "_Tcl", "call_level"
+  call_level = $P0
+
   if argc == 0 goto badargs
   if argc  > 2 goto badargs
   code = argv[0]
@@ -42,7 +46,7 @@
   #return_type = TCL_OK
  
   varname = argv[1]
-  store_lex -1, varname, $P0
+  store_lex call_level, varname, $P0
   goto done
 
 badargs:

@@ -13,8 +13,13 @@
   .local string listname
   listname = argv[0]
 
+  .local int call_level
+  $P0 = find_global "_Tcl", "call_level"
+  call_level = $P0
+
   .local pmc listvar
-  listvar = find_lex listname
+  listvar = find_lex call_level, listname
+
 
   .local int cnt
   cnt = 1

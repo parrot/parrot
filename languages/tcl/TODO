@@ -2,6 +2,22 @@
 
 =over 4
 
+=item upvar, uplevel
+
+set a global lexical level (_Tcl::call_level) - normally inc'd whenever a UDF proc is called, (done)
+dec'd whenever a UDF is exited.  (done)
+
+Then, anything that set/get's a lexical should do so from the global level
+that we're using. (done)
+
+This will make writing uplevel simple. upvar needs to work like 'global'.
+
+All done except for proper handling of ?level? in uplevel. once that's done,
+steal that code for upvar's level handling.
+
+	uplevel ?level? arg ?arg ...?
+	upvar ?level? otherVar myVar ?otherVar myVar ...?
+
 =item PMC based parser -
 
 Instead of the current PIR level parsing, we should instead use
@@ -81,21 +97,6 @@ each time.
 
 (Though this seems evil, too. There must be a better way.)
 
-=item upvar, uplevel
-
-set a global lexical level - normally inc'd whenever a UDF proc is called,
-dec'd whenever a UDF is exited. 
-
-Then, anything that set/get's a lexical should do so from the global level
-that we're using.
-
-	uplevel ?level? arg ?arg ...?
-	upvar ?level? otherVar myVar ?otherVar myVar ...?
-
-How do we do this and play nice with other languages? I don't think we can.
-
-Language interoperability can presumably be dealt with after we've a language.
-
 =item TclWord
 
 implement C<is_const> to allow for some optimizations in the compiler. 
@@ -151,7 +152,8 @@ tests so they're consistent.
 
 tclword.imc tcl*.pmc
 [concat] [join] [list] [llength] [lappend] [linsert] [lrepeat]
-[lrange] [array set] [global] [string match]
+[lrange] [array set] [global] [string match] [inline]
+[uplevel] [upvar]
 the macros?
 expr's precedence and parens
 [puts]'s ability to write to other channels.
@@ -266,10 +268,6 @@ are so listed, and that related procs are grouped together. Some are SMOPs
 at this point, others require me to add features, or refactor. Many already
 implemented procs will require updating after procs/features are added.
 
-  upvar, uplevel  should be pretty easy with the lexical pad
-    support in parrot. Well, upvar, anyway. implementing uplevel
-    may require a rethunk. 
-
   lreplace, lsearch, lsort, foreach, scan
 
   cd, file, pwd, pid, glob
@@ -305,25 +303,6 @@ run tclsh, sourcing "<tcl distro>tests/all".
 
 The sooner we can do this, the better, as I only want to have tests for
 internals, not for any Tcl.
-
-=item 7.6 test suite
-
-missing quite a bit to be able to think about running this, notably:
-
-from all:
-
-[foreach], [lsort], [glob], [string match], [puts stdout], catch
-
-from incr, one of the (easier?) tests to pass:
-
-[string compare], list, source, info, trace {is this still in tcl 8?}, 
-concat
-
-which calls "def", which uses:
-
-$tcl_platform, [info exists] , [info commands], unset, array vars,
-open, global, uplevel (GAH), regsub (GAH), fconfigure (GAH), file (GAH)
-exec (GAH)
 
 =back 4
 

@@ -189,6 +189,12 @@ providing a compreg-compatible method.
   $P1 = 1
   store_global "_Tcl", "next_channel_id", $P1
 
+  # Setup the calling level (for upvar, uplevel, interpreter)
+  $P1 = new Integer
+  $P1 = 0
+  store_global "_Tcl", "call_level", $P1
+
+  # register the TCL compiler.
   $P1 = find_global "_Tcl", "_tcl_compile"
   compreg "TCL", $P1
 

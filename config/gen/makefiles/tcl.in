@@ -38,6 +38,8 @@ lib${slash}commands${slash}source.imc \
 lib${slash}commands${slash}string.imc \
 lib${slash}commands${slash}time.imc \
 lib${slash}commands${slash}unset.imc \
+lib${slash}commands${slash}uplevel.imc \
+lib${slash}commands${slash}upvar.imc \
 lib${slash}commands${slash}while.imc \
 lib${slash}expression.imc \
 lib${slash}get_var.imc \

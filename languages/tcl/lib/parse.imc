@@ -574,7 +574,7 @@ invalid_word:
   print "XXX - invalid word, should have ended after block\n"
   goto end
 invalid_variable:
-  print "XXX - invalid variable, no closing } found\n"
+  print "missing close-brace for variable name\n"
   goto end
 
 .end

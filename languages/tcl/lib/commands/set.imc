@@ -23,6 +23,10 @@
   .local pmc get_var
   get_var = find_global "_Tcl", "__get_var"
 
+  .local int call_level
+  $P0 = find_global "_Tcl", "call_level"
+  call_level = $P0
+
   .local pmc value
   .local pmc retval
   .local int return_type
@@ -92,14 +96,15 @@ set_array:
   # We need to check to see if this variable already
   # exists, as we cannot switch between array and scalar.
   push_eh catch
-    find_lex lexical, -1, var
+    lexical = find_lex call_level, var
   clear_eh
   isnull lexical, set_array_new
   
   typeof type, lexical 
   $S0 = typeof lexical
   # XXX Too Tcl specific
-  if type != TclArray goto set_array_bad
+  $I0 = does lexical, "hash"
+  if $I0 == 0 goto set_array_bad
   goto set_array_ok
 
 set_array_new:
@@ -118,14 +123,14 @@ set_array_ok:
 
   lexical[key] =  value
 
-  store_lex -1, var, lexical
+  store_lex call_level, var, lexical
 
  
   goto done
 
 set_scalar:
   retval = value
-  store_lex -1, arg0, retval
+  store_lex call_level, arg0, retval
 
   goto done 
 

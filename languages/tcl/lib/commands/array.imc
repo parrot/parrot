@@ -24,8 +24,12 @@
 
   array_name = argv[1]
 
+  .local int call_level
+  $P0 = find_global "_Tcl", "call_level"
+  call_level = $P0
+
   push_eh catch
-    find_lex the_array, -1, array_name
+    find_lex the_array, call_level, array_name
   clear_eh
 
   isnull the_array, array_no 
