@@ -224,9 +224,13 @@ enter_nci_method should create these as locals to begin with.
 
         /* Class objects */
         key = const_string(INTERP, "object");
+        item = make_type(INTERP, PyBuiltin_PyClass, key);
+        item->vtable = Parrot_base_vtables[PyBuiltin_PyType];
+        scratchpad_store_by_name(INTERP, pad, 0, key, item);
+
         parent = make_type(INTERP, PyBuiltin_PyObject, key);
-        parent->vtable = Parrot_base_vtables[PyBuiltin_PyType];
-        scratchpad_store_by_name(INTERP, pad, 0, key, parent);
+        parent->vtable = Parrot_base_vtables[PyBuiltin_PyProxyType];
+        PyBuiltin_PyProxyClass_class = parent;
 
         key = const_string(INTERP, "bool");
         item = make_type(INTERP, PyBuiltin_PyBoolean, key);
@@ -263,6 +267,11 @@ enter_nci_method should create these as locals to begin with.
         VTABLE_setprop(INTERP, item, PyString_bases, parent);
         scratchpad_store_by_name(INTERP, pad, 0, key, item);
         PyBuiltin_PyFloat_class = item;
+
+        key = const_string(INTERP, "function");
+        item = make_type(INTERP, PyBuiltin_PyFunc, key);
+        VTABLE_setprop(INTERP, item, PyString_bases, parent);
+        PyBuiltin_PyFunc_class = item;
 
         key = const_string(INTERP, "list");
         item = make_type(INTERP, PyBuiltin_PyList, key);
@@ -551,6 +560,22 @@ Get the attribute with the given name.
     METHOD PMC* getattr(PMC *object, PMC *name) {
         return VTABLE_get_attr_str(INTERP, object,
             VTABLE_get_string(INTERP, name));
+    }
+
+/*
+
+=item C<PMC* "len"(PMC *object)>
+
+Return the number of elements in a given object.
+
+=cut
+
+*/
+
+    METHOD PMC* len(PMC *object) {
+        PMC *ret = pmc_new(INTERP, PyBuiltin_PyInt);
+        VTABLE_set_integer_native(INTERP, ret, VTABLE_elements(INTERP, object));
+        return ret;
     }
 
 /*

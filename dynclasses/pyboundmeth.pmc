@@ -21,7 +21,7 @@ Extends Parrot's NCI to include attributes, implemented as properties.
 #include "parrot/parrot.h"
 #include "pyconsts.h"
 
-pmclass PyBoundMeth dynpmc group python_group {
+pmclass PyBoundMeth extends PyFunc dynpmc group python_group {
 
 /*
 

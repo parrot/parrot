@@ -20,7 +20,7 @@ Extends Parrot's NCI to include attributes, implemented as properties.
 
 #include "parrot/parrot.h"
 
-pmclass PyNCI extends NCI dynpmc group python_group {
+pmclass PyNCI extends NCI extends PyFunc dynpmc group python_group {
 
 /*
 

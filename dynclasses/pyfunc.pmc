@@ -151,6 +151,20 @@ Return attribute named C<name>.
 
 /*
 
+=item C<PMC *get_class()>
+
+Return the class of this object.
+
+=cut
+
+*/
+
+    PMC* get_class() {
+        return PyBuiltin_PyFunc_class;
+    }
+
+/*
+
 =item C<STRING *get_string()>
 
 Return the representation of this object.
@@ -281,7 +295,7 @@ Return a bound method object.
 
 */
 
-    METHOD PMC* __get__ (PMC *self, PMC *obj) {
+    METHOD PMC* __get__ (PMC *self, PMC *obj, PMC *type) {
         PMC *ret = pmc_new(INTERP, PyBuiltin_PyBoundMeth);
         VTABLE_set_pointer(INTERP, ret, self);
         VTABLE_set_pmc(INTERP, ret, obj);

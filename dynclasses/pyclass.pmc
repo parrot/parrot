@@ -60,16 +60,16 @@ Parrot_PyClass_runops_fromc(Parrot_Interp interpreter, PMC *sub)
 }
 
 static PMC *
-Parrot_PyClass_run_meth_fromc_P(Parrot_Interp interpreter, PMC *sub,
-    PMC *obj, STRING *meth)
+Parrot_PyClass_call_meth_fromc_P(Parrot_Interp interpreter, PMC *obj,
+    STRING *meth)
 {
-    /* TODO: optimize for func->vtable->base_type == enum_class_NCI */
-
     struct parrot_regs_t *bp;
     struct Parrot_Context ctx;
-    PMC *ret;
+    PMC *sub, *ret;
 
     save_context(interpreter, &ctx);
+    interpreter->ctx.bp = new_register_frame(interpreter,
+                &interpreter->ctx.reg_stack);
 
     REG_STR(0) = meth;
     REG_INT(0) = REG_INT(3) = 1;
@@ -77,24 +77,30 @@ Parrot_PyClass_run_meth_fromc_P(Parrot_Interp interpreter, PMC *sub,
     REG_PMC(5) = obj;
     interpreter->ctx.current_object = REG_PMC(2) = obj;
 
-    bp = Parrot_PyClass_runops_fromc(interpreter, sub);
+    sub = VTABLE_find_method(interpreter, obj, meth);
 
-    ret = BP_REG_PMC(bp,5); 
+    if (!sub)
+        ret = NULL;
+    else {
+        bp = Parrot_PyClass_runops_fromc(interpreter, sub);
+        ret = BP_REG_PMC(bp,5); 
+    }
+
     restore_context(interpreter, &ctx);
     return ret;
 }
 
 static PMC *
-Parrot_PyClass_run_meth_fromc_P_P(Parrot_Interp interpreter, PMC *sub,
-    PMC *obj, STRING *meth, PMC* arg1)
+Parrot_PyClass_call_meth_fromc_P_P(Parrot_Interp interpreter, PMC *obj,
+    STRING *meth, PMC* arg1)
 {
-    /* TODO: optimize for func->vtable->base_type == enum_class_NCI */
-
     struct parrot_regs_t *bp;
     struct Parrot_Context ctx;
-    PMC *ret;
+    PMC *sub, *ret;
 
     save_context(interpreter, &ctx);
+    interpreter->ctx.bp = new_register_frame(interpreter,
+                &interpreter->ctx.reg_stack);
 
     REG_STR(0) = meth;
     REG_INT(0) = 1;
@@ -104,9 +110,15 @@ Parrot_PyClass_run_meth_fromc_P_P(Parrot_Interp interpreter, PMC *sub,
     REG_PMC(6) = arg1;
     interpreter->ctx.current_object = REG_PMC(2) = obj;
 
-    bp = Parrot_PyClass_runops_fromc(interpreter, sub);
+    sub = VTABLE_find_method(interpreter, obj, meth);
 
-    ret = BP_REG_PMC(bp,5); 
+    if (!sub)
+        ret = NULL;
+    else {
+        bp = Parrot_PyClass_runops_fromc(interpreter, sub);
+        ret = BP_REG_PMC(bp,5); 
+    }
+
     restore_context(interpreter, &ctx);
     return ret;
 }
@@ -154,7 +166,7 @@ Looks up the method for C<*method_name> and returns it.
         if (method && (method->vtable->base_type != PyBuiltin_PyFunc)) {
             PMC *get = VTABLE_find_method(INTERP, method, PyString_get);
             if (get) {
-                method = Parrot_PyClass_run_meth_fromc_P_P(INTERP, get, method,
+                method = Parrot_PyClass_call_meth_fromc_P_P(INTERP, method,
                     PyString_get, SELF);
             }
         }
@@ -195,11 +207,9 @@ Return attribute named C<name>.
         }
 
         /* is the attribute a Property? */
-        get = VTABLE_find_method(INTERP, attr, PyString_get);
-        if (get) {
-            attr = Parrot_PyClass_run_meth_fromc_P_P(INTERP, get, attr,
-                PyString_get, SELF);
-        }
+        get = Parrot_PyClass_call_meth_fromc_P_P(INTERP, attr, PyString_get,
+            SELF);
+        if (get) attr = get;
 
         return attr;
     }
@@ -232,16 +242,13 @@ TODO: optimize for NCI, PyProxyClass
 */
 
     INTVAL cmp(PMC* value) {
-        PMC *cmpsub, *ret;
+        PMC *ret;
 
         if (SELF == value) return 0;
 
-        cmpsub = VTABLE_find_method(INTERP, SELF, PyString_cmp);
-        if (!cmpsub || !VTABLE_defined(INTERP, cmpsub))
-            return -1;
-
-        ret = Parrot_PyClass_run_meth_fromc_P_P(INTERP, cmpsub, 
-            SELF, PyString_cmp, value);
+        ret = Parrot_PyClass_call_meth_fromc_P_P(INTERP, SELF, PyString_cmp,
+            value);
+        if (!ret) return -1;
 
         return VTABLE_get_integer(INTERP, ret);
     }
@@ -257,13 +264,11 @@ Returns the integer value of the object.
 */
 
     INTVAL get_integer () {
-        PMC *getint = VTABLE_find_method(INTERP, SELF, PyString_int);
-        PMC *ret;
-        if (!getint || !VTABLE_defined(INTERP, getint))
+        PMC *ret = Parrot_PyClass_call_meth_fromc_P(INTERP, SELF,
+            PyString_int);
+        if (!ret)
            real_exception(INTERP, NULL, E_TypeError,
                    "TypeError: int() argument must be a string or a number");
-        ret = Parrot_PyClass_run_meth_fromc_P(INTERP, getint, SELF,
-            PyString_int);
         return VTABLE_get_integer(INTERP, ret);
     }
 
@@ -278,19 +283,19 @@ Return an iterator for this object.
 */
 
     PMC* get_iter() {
-        PMC *gen, *iter, *next;
-        iter = VTABLE_find_method(INTERP, SELF, PyString_iter);
-        if (!iter || !VTABLE_defined(INTERP, iter))
+        PMC *iter, *next;
+
+        iter = Parrot_PyClass_call_meth_fromc_P(INTERP, SELF, PyString_iter);
+        if (!iter)
            real_exception(INTERP, NULL, E_TypeError,
                    "TypeError: iteration over non-sequence");
-        iter = Parrot_PyClass_run_meth_fromc_P(INTERP, iter, SELF,
-             PyString_iter);
+
         next = VTABLE_find_method(INTERP, iter, PyString_next);
 
         if (PObj_get_FLAGS(next) & SUB_FLAG_GENERATOR)
             return iter;
         else {
-            gen = pmc_new(INTERP, PyBuiltin_PyGen);
+            PMC *gen = pmc_new(INTERP, PyBuiltin_PyGen);
             VTABLE_set_pmc(INTERP, gen, iter);
             return gen;
         }
@@ -307,31 +312,12 @@ Return the representation of this object.
 */
 
     STRING* get_repr() {
-        PMC *repr = VTABLE_find_method(INTERP, SELF, PyString_repr);
-
-        if (repr) {
-            PMC *temp;
-            STRING *ret;
-            temp = Parrot_PyClass_run_meth_fromc_P(INTERP, repr, SELF, 
+        PMC *repr = Parrot_PyClass_call_meth_fromc_P(INTERP, SELF, 
                 PyString_repr);
-            ret = VTABLE_get_string(INTERP, temp);
-            return ret;
-        }
-        else {
-            STRING *res;
 
-            res = string_from_cstring(INTERP, "<", 0);
-            res = string_append(INTERP, res,
-                VTABLE_name(INTERP, VTABLE_get_class(INTERP, SELF)), 0);
-            res = string_append(INTERP, res,
-                const_string(INTERP, " instance at "), 0);
-            res = string_append(INTERP, res,
-                Parrot_sprintf_c(INTERP, "%#x", (INTVAL) SELF), 0);
-            res = string_append(INTERP, res,
-                const_string(INTERP, ">"), 0);
+        if (!repr) internal_exception(1, "unable to locate object.__repr__");
 
-            return res;
-        }
+        return VTABLE_get_string(INTERP, repr);
     }
 
 /*
@@ -345,13 +331,10 @@ Return the object in string form.
 */
 
     STRING* get_string() {
-        PMC *str = VTABLE_find_method(INTERP, SELF, PyString_str);
-        if (str) {
-            PMC *ret;
-            ret = Parrot_PyClass_run_meth_fromc_P(INTERP, str, SELF,
-                PyString_str);
-            return VTABLE_get_string(INTERP, ret);
-        }
+        PMC *str = Parrot_PyClass_call_meth_fromc_P(INTERP, SELF, PyString_str);
+
+        if (str)
+            return VTABLE_get_string(INTERP, str);
         else {
             return VTABLE_get_repr(INTERP, SELF);
         }
@@ -368,13 +351,11 @@ Returns a unique hash for this value
 */
 
     INTVAL hash () {
-        PMC *hash_method = VTABLE_find_method(INTERP, SELF, PyString_hash);
-        if (hash_method) {
-            PMC *ret;
-            ret = Parrot_PyClass_run_meth_fromc_P(INTERP, hash_method, SELF,
-                PyString_hash);
+        PMC *ret = Parrot_PyClass_call_meth_fromc_P(INTERP, SELF,
+            PyString_hash);
+
+        if (ret)
             return VTABLE_get_integer(INTERP, ret);
-        }
         else {
             return (INTVAL)SELF;
         }
@@ -391,7 +372,7 @@ Call the object.
 */
 
     void* invoke(void* next) {
-        PMC *call = VTABLE_get_attr_str(INTERP, SELF, PyString_call);
+        PMC *call = VTABLE_find_method(INTERP, SELF, PyString_call);
         return VTABLE_invoke(INTERP, call, next);
     }
 
@@ -406,6 +387,32 @@ Returns the name of this class.
 
     STRING* name() {
         return VTABLE_name(INTERP, VTABLE_get_class(INTERP, SELF));
+    }
+
+/*
+
+=item C<STRING *"__new__"(PMC *self)>
+
+Create a new instance.
+
+*/
+
+    METHOD PMC* __repr__(PMC *self) {
+        PMC *res = pmc_new(INTERP, PyBuiltin_PyString);
+        STRING *repr;
+
+        repr = string_from_cstring(INTERP, "<", 0);
+        repr = string_append(INTERP, repr,
+            VTABLE_name(INTERP, VTABLE_get_class(INTERP, SELF)), 0);
+        repr = string_append(INTERP, repr,
+            const_string(INTERP, " instance at "), 0);
+        repr = string_append(INTERP, repr,
+            Parrot_sprintf_c(INTERP, "%#x", (INTVAL) SELF), 0);
+        repr = string_append(INTERP, repr,
+            const_string(INTERP, ">"), 0);
+
+        VTABLE_set_string_native(INTERP, res, repr);
+        return res;
     }
 
 /*

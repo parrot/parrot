@@ -160,7 +160,8 @@ need to be filled in.
             PMC *proxy_class = pmc_new(INTERP, PyBuiltin_PyProxyClass);
             VTABLE_setprop(INTERP, proxy_class, PyString_bases, SELF);
             VTABLE_setprop(INTERP, newclass, PyString_bases, proxy_class);
-            VTABLE_setprop(INTERP, newclass, PyString_proxy, SELF);
+            VTABLE_setprop(INTERP, newclass, PyString_proxy, 
+                PyBuiltin_PyProxyClass_class);
         }
 
         VTABLE_set_string_native(INTERP, nameprop, name);

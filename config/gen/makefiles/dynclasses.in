@@ -11,16 +11,17 @@ tclobject tclstring tclint tclfloat \
 tcllist tclarray \
 match matchrange \
 pybuiltin \
-pynci \
 pyclass \
 pyobject \
   pyboolean \
-  pyboundmeth \
   pycomplex \
   pydict \
   pyexception \
   pyfloat \
   pyfunc \
+    pyboundmeth \
+    pynci \
+    pystaticmeth \
   pygen \
   pyint \
   pylist \
@@ -28,7 +29,6 @@ pyobject \
   pymodule \
   pynone \
   pytype \
-  pystaticmeth \
   pyslice \
   pystring \
   pytuple \
