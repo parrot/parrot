@@ -3285,22 +3285,22 @@ Save register or constant $1 onto the stack.
 
 inline op save(in INT) {
   INTVAL i = $1;
-  stack_push(interpreter, interpreter->user_stack, &i, STACK_ENTRY_INT, STACK_CLEANUP_NULL);
+  stack_push(interpreter, &interpreter->user_stack, &i, STACK_ENTRY_INT, STACK_CLEANUP_NULL);
   goto NEXT();
 }
 
 inline op save(in NUM) {
-  stack_push(interpreter, interpreter->user_stack, &($1), STACK_ENTRY_FLOAT, STACK_CLEANUP_NULL);
+  stack_push(interpreter, &interpreter->user_stack, &($1), STACK_ENTRY_FLOAT, STACK_CLEANUP_NULL);
   goto NEXT();
 }
 
 inline op save(in PMC) {
-  stack_push(interpreter, interpreter->user_stack, $1, STACK_ENTRY_PMC, STACK_CLEANUP_NULL);
+  stack_push(interpreter, &interpreter->user_stack, $1, STACK_ENTRY_PMC, STACK_CLEANUP_NULL);
   goto NEXT();
 }
 
 inline op save(in STR) {
-  stack_push(interpreter, interpreter->user_stack, $1, STACK_ENTRY_STRING, STACK_CLEANUP_NULL);
+  stack_push(interpreter, &interpreter->user_stack, $1, STACK_ENTRY_STRING, STACK_CLEANUP_NULL);
   goto NEXT();
 }
 
@@ -3316,7 +3316,7 @@ Save a clone of register or constant $1 onto the stack.
 =cut
 
 inline op savec(in STR) {
-  stack_push(interpreter, interpreter->user_stack, string_copy(interpreter, $1), STACK_ENTRY_STRING, STACK_CLEANUP_NULL);
+  stack_push(interpreter, &interpreter->user_stack, string_copy(interpreter, $1), STACK_ENTRY_STRING, STACK_CLEANUP_NULL);
   goto NEXT();
 }
 
@@ -3336,25 +3336,25 @@ Restore register $1 from the appropriate register stack.
 =cut
 
 inline op restore(out INT) {
-  (void)stack_pop(interpreter, interpreter->user_stack, &($1),
+  (void)stack_pop(interpreter, &interpreter->user_stack, &($1),
                   STACK_ENTRY_INT);
   goto NEXT();
 }
 
 inline op restore(out NUM) {
-  (void)stack_pop(interpreter, interpreter->user_stack, &($1),
+  (void)stack_pop(interpreter, &interpreter->user_stack, &($1),
                   STACK_ENTRY_FLOAT);
   goto NEXT();
 }
 
 inline op restore(out PMC) {
-  (void)stack_pop(interpreter, interpreter->user_stack, &($1), 
+  (void)stack_pop(interpreter, &interpreter->user_stack, &($1), 
                   STACK_ENTRY_PMC);
   goto NEXT();
 }
 
 inline op restore(out STR) {
-  (void)stack_pop(interpreter, interpreter->user_stack, &($1),
+  (void)stack_pop(interpreter, &interpreter->user_stack, &($1),
                   STACK_ENTRY_STRING);
   goto NEXT();
 }
@@ -3455,7 +3455,7 @@ stack for later returning.
 =cut
 
 inline op bsr (in INT) {
-  stack_push(interpreter, interpreter->control_stack, expr NEXT(),  STACK_ENTRY_DESTINATION, STACK_CLEANUP_NULL);
+  stack_push(interpreter, &interpreter->control_stack, expr NEXT(),  STACK_ENTRY_DESTINATION, STACK_CLEANUP_NULL);
   goto OFFSET($1);
 }
 
@@ -3472,7 +3472,7 @@ TODO: Implement this, or delete the entry.
 =cut
 
 inline op jsr(in INT) {
-  stack_push(interpreter, interpreter->control_stack, expr NEXT(),  STACK_ENTRY_DESTINATION, STACK_CLEANUP_NULL);
+  stack_push(interpreter, &interpreter->control_stack, expr NEXT(),  STACK_ENTRY_DESTINATION, STACK_CLEANUP_NULL);
   goto ADDRESS($1);
 }
 
@@ -4007,7 +4007,7 @@ inline op callnative(out PMC, in PMC, in PMC, in STR) {
 inline op call() {
   /* This op will be a vtable entry */
   struct Parrot_Sub * sub = (struct Parrot_Sub*)interpreter->pmc_reg.registers[0]->data;
-  stack_push(interpreter, interpreter->control_stack, expr NEXT(),  STACK_ENTRY_DESTINATION, STACK_CLEANUP_NULL);
+  stack_push(interpreter, &interpreter->control_stack, expr NEXT(),  STACK_ENTRY_DESTINATION, STACK_CLEANUP_NULL);
   goto ADDRESS(sub->init);
 }
 
@@ -4017,13 +4017,13 @@ inline op callco() {
   /* FIXME: Here we need to switch in the co-routines context and save the
    * interpreter's context.
    */
-  stack_push(interpreter, interpreter->control_stack, expr NEXT(),  STACK_ENTRY_DESTINATION, STACK_CLEANUP_NULL);
+  stack_push(interpreter, &interpreter->control_stack, expr NEXT(),  STACK_ENTRY_DESTINATION, STACK_CLEANUP_NULL);
   /* Resuming co-routine or fresh call? */
-  if(!co->entry) {
+  if(!co->resume) {
      goto ADDRESS(co->init);
   }
   else {
-     goto ADDRESS(co->entry);
+     goto ADDRESS(co->resume);
   }
 }
 
@@ -4031,9 +4031,38 @@ inline op yield() {
   opcode_t *dest;
   struct Parrot_Coroutine * co = (struct Parrot_Coroutine*)interpreter->pmc_reg.registers[0]->data;
   /* suspend the co-routine */
-  co->entry = expr NEXT();
-  stack_pop(interpreter, interpreter->control_stack, &dest, STACK_ENTRY_DESTINATION);
+  co->resume = expr NEXT();
+  stack_pop(interpreter, &interpreter->control_stack, &dest, STACK_ENTRY_DESTINATION);
   goto ADDRESS(dest);
+}
+
+inline op capturecc(out PMC) {
+  struct Parrot_Continuation * cc;
+  $1 = new_pmc_header(interpreter);
+  /*
+   * Capture continuation -after- setting $1 since it captures
+   * register state.
+   */
+  cc = new_continuation(interpreter, expr NEXT());
+  $1->vtable = YOU_LOSE_VTABLE;
+  $1->data = (void*)cc;
+  goto NEXT();
+}
+
+inline op callcc(in PMC) {
+  if($1) {
+    struct Parrot_Continuation * cc = (struct Parrot_Continuation*)$1->data;
+    if(cc) {
+      restore_context(interpreter, &cc->ctx);
+      goto ADDRESS(cc->continuation);
+    }
+    else {
+      abort();
+    }
+  }
+  else {
+    abort();
+  }
 }
 
 =item B<warningson>(in INT)

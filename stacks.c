@@ -27,6 +27,7 @@ new_stack(Interp *interpreter)
     Stack_chunk *stack = mem_allocate_aligned(sizeof(Stack_chunk));
     
     stack->used = 0;
+    stack->flags = NO_STACK_CHUNK_FLAGS;
     stack->next = stack;
     stack->prev = stack;
     stack->buffer = NULL;
@@ -42,6 +43,14 @@ new_stack(Interp *interpreter)
     return stack;
 }
 
+void
+stack_mark_cow(Stack_chunk *stack_base) {
+    Stack_chunk * chunk = stack_base;
+    chunk->flags |= STACK_CHUNK_COW_FLAG;
+    for (chunk = chunk->next; chunk != stack_base; chunk = chunk->next)
+        chunk->flags |= STACK_CHUNK_COW_FLAG;
+}
+
 /* Returns the height of the stack.  The maximum "depth" is height - 1 */
 size_t
 stack_height(Interp *interpreter, Stack_chunk *stack_base)
@@ -53,6 +62,38 @@ stack_height(Interp *interpreter, Stack_chunk *stack_base)
         height += chunk->used;
 
     return height;
+}
+
+/* Copy a stack (probably with COW flag) to a private writable stack */
+Stack_chunk *
+stack_copy(struct Parrot_Interp * interp, Stack_chunk *old_base) {
+    Stack_chunk *old_chunk = old_base; 
+    Stack_chunk *new_chunk;
+    Stack_chunk *new_base = NULL;
+    do {
+        new_chunk = mem_allocate_aligned(sizeof(Stack_chunk));
+        if(new_base == NULL) {
+            new_base = new_chunk;
+            new_base->next = new_base;
+            new_base->prev = new_base;
+        }
+        else {
+            new_chunk->next = new_base->next;
+            new_chunk->prev = new_base;
+            new_base->prev->next = new_chunk;
+        }
+        new_chunk->used = old_chunk->used;
+        new_chunk->flags = old_chunk->flags & ~STACK_CHUNK_COW_FLAG;
+        /* Copy stack buffer */
+        new_chunk->buffer = new_buffer_header(interp);
+        Parrot_allocate(interp, new_chunk->buffer,
+                    sizeof(Stack_entry) * STACK_CHUNK_DEPTH);
+        memcpy(new_chunk->buffer->bufstart, old_chunk->buffer->bufstart,
+                    old_chunk->buffer->buflen);
+        old_chunk = old_chunk->next;
+    }
+    while(old_chunk != old_base);
+    return new_base;
 }
 
 /* If depth >= 0, return the entry at that depth from the top of the stack,
@@ -151,11 +192,19 @@ rotate_entries(Interp *interpreter, Stack_chunk *stack_base,
    we're calling it) variable or something
  */
 void
-stack_push(Interp *interpreter, Stack_chunk *stack_base,
+stack_push(Interp *interpreter, Stack_chunk **stack_base_p,
            void *thing, Stack_entry_type type, Stack_cleanup_method cleanup)
 {
-    Stack_chunk *chunk = stack_base->prev;
+    Stack_chunk *stack_base = *stack_base_p;
+    Stack_chunk *chunk;
     Stack_entry *entry;
+
+    /* If stack is copy-on-write, copy it before we can execute on it */
+    if (stack_base->flags & STACK_CHUNK_COW_FLAG) {
+        *stack_base_p = stack_base = stack_copy(interpreter, stack_base);
+    }
+
+    chunk = stack_base->prev;
 
     /* Do we need a new chunk? */
     if (chunk->used == STACK_CHUNK_DEPTH) {
@@ -218,11 +267,19 @@ stack_push(Interp *interpreter, Stack_chunk *stack_base,
 
 /* Pop off an entry and return a pointer to the contents */
 void *
-stack_pop(Interp *interpreter, Stack_chunk *stack_base,
+stack_pop(Interp *interpreter, Stack_chunk **stack_base_p,
           void *where, Stack_entry_type type)
 {
-    Stack_chunk *chunk = stack_base->prev;
+    Stack_chunk *stack_base = *stack_base_p;
     Stack_entry *entry;
+    Stack_chunk *chunk;
+
+    /* If stack is copy-on-write, copy it before we can execute on it */
+    if (stack_base->flags & STACK_CHUNK_COW_FLAG) {
+        *stack_base_p = stack_base = stack_copy(interpreter, stack_base);
+    }
+
+    chunk = stack_base->prev;
 
     /* We may have an empty chunk at the end of the list */
     if (chunk->used == 0 && chunk != stack_base) {
@@ -298,7 +355,7 @@ pop_dest(Interp *interpreter)
     /* We don't mind the extra call, so we do this: (previous comment
      * said we *do* mind, but I say let the compiler decide) */
     void *dest;
-    (void)stack_pop(interpreter, interpreter->control_stack,
+    (void)stack_pop(interpreter, &interpreter->control_stack,
                     &dest, STACK_ENTRY_DESTINATION);
     return dest;
 }

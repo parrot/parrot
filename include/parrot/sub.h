@@ -17,6 +17,7 @@
 
 #include "parrot/parrot.h"
 
+
 typedef struct Parrot_Sub { 
     INTVAL              flags;
     struct stack_chunk  *user_stack;
@@ -35,12 +36,20 @@ typedef struct Parrot_Coroutine {
     struct PReg         pmc_reg;
     struct Scratchpad   *lex_pad;
     opcode_t            *init;
-    opcode_t            *entry;
+    opcode_t            *resume;
 } * parrot_coroutine_t;
 
-struct Parrot_Sub *new_sub(struct Parrot_Interp * interp, opcode_t * address);
-struct Parrot_Coroutine *new_coroutine(struct Parrot_Interp * interp, opcode_t * address);
+typedef struct Parrot_Continuation {
+    struct Parrot_Context ctx;
+    opcode_t            *continuation;
+} * parrot_continuation_t;
 
+struct Parrot_Sub * new_sub(struct Parrot_Interp * interp, opcode_t * address);
+struct Parrot_Coroutine * new_coroutine(struct Parrot_Interp * interp, opcode_t * address);
+struct Parrot_Continuation * new_continuation(struct Parrot_Interp * interp, opcode_t * address);
+
+void save_context(struct Parrot_Interp * interp, struct Parrot_Context * ctx);
+void restore_context(struct Parrot_Interp * interp, struct Parrot_Context * ctx);
 
 #endif /* PARROT_SUB_H_GUARD */
 

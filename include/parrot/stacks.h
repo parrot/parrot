@@ -29,9 +29,13 @@ typedef enum {
 
 typedef enum {
     NO_STACK_ENTRY_FLAGS     = 0,
-    STACK_ENTRY_CLEANUP_FLAG = 1 << 0,
-    STACK_ENTRY_COW_FLAG     = 1 << 1
+    STACK_ENTRY_CLEANUP_FLAG = 1 << 0
 } Stack_entry_flags;
+
+typedef enum {
+    NO_STACK_CHUNK_FLAGS     = 0,
+    STACK_CHUNK_COW_FLAG     = 1 << 0
+} Stack_chunk_flags;
 
 typedef struct stack_entry {
     union {
@@ -48,6 +52,7 @@ typedef struct stack_entry {
 
 typedef struct stack_chunk {
     size_t used;
+    Stack_chunk_flags   flags;
     struct stack_chunk *next;
     struct stack_chunk *prev;
     Buffer *buffer;
@@ -59,6 +64,10 @@ typedef void (*Stack_cleanup_method)(Stack_entry *);
 
 Stack_chunk * new_stack(Interp *interpreter);
 
+Stack_chunk * stack_copy(Interp *interpreter, Stack_chunk *old_stack);
+
+void stack_mark_cow(Stack_chunk *stack_base);
+
 size_t stack_height(Interp *interpreter, Stack_chunk *stack_base);
 
 Stack_entry * stack_entry(Interp *intepreter, Stack_chunk *stack_base, 
@@ -67,11 +76,11 @@ Stack_entry * stack_entry(Interp *intepreter, Stack_chunk *stack_base,
 void rotate_entries(Interp *interpreter, Stack_chunk *stack_base,
                     Intval num_entries);
 
-void stack_push(Interp *interpreter, Stack_chunk *stack_base,
+void stack_push(Interp *interpreter, Stack_chunk **stack_base,
                 void *thing, Stack_entry_type type, 
                 Stack_cleanup_method cleanup);
 
-void *stack_pop(Interp *interpreter, Stack_chunk *stack_base, 
+void *stack_pop(Interp *interpreter, Stack_chunk **stack_base, 
                 void *where, Stack_entry_type type);
 
 void *pop_dest(Interp *interpreter);

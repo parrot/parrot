@@ -9,61 +9,61 @@
 int
 PXS_initargs(Parrot_Interp_t interp) {
     INTVAL numargs;
-    stack_pop(interp, interp->user_stack, &numargs, STACK_ENTRY_INT);
+    stack_pop(interp, &interp->user_stack, &numargs, STACK_ENTRY_INT);
     return numargs;
 }
 
 void
 PXS_reti(Parrot_Interp_t interp, INTVAL i) {
-    stack_push(interp, interp->user_stack, &i, STACK_ENTRY_INT, STACK_CLEANUP_NULL);
+    stack_push(interp, &interp->user_stack, &i, STACK_ENTRY_INT, STACK_CLEANUP_NULL);
 }
 
 void 
 PXS_retn(Parrot_Interp_t interp, FLOATVAL f) {
-    stack_push(interp, interp->user_stack, &f, STACK_ENTRY_FLOAT, STACK_CLEANUP_NULL);
+    stack_push(interp, &interp->user_stack, &f, STACK_ENTRY_FLOAT, STACK_CLEANUP_NULL);
 }
 
 void
 PXS_rets(Parrot_Interp_t interp, STRING * s) {
-    stack_push(interp, interp->user_stack, s, STACK_ENTRY_STRING, STACK_CLEANUP_NULL);
+    stack_push(interp, &interp->user_stack, s, STACK_ENTRY_STRING, STACK_CLEANUP_NULL);
 }
 
 void
 PXS_retp(Parrot_Interp_t interp, PMC * p) {
-    stack_push(interp, interp->user_stack, p, STACK_ENTRY_PMC, STACK_CLEANUP_NULL);
+    stack_push(interp, &interp->user_stack, p, STACK_ENTRY_PMC, STACK_CLEANUP_NULL);
 }
 
 INTVAL
 PXS_shifti(Parrot_Interp_t interp) {
     INTVAL i;
-    stack_pop(interp, interp->user_stack, &i, STACK_ENTRY_INT);
+    stack_pop(interp, &interp->user_stack, &i, STACK_ENTRY_INT);
     return i;
 }
 
 FLOATVAL
 PXS_shiftn(Parrot_Interp_t interp) {
     FLOATVAL f;
-    stack_pop(interp, interp->user_stack, &f, STACK_ENTRY_FLOAT);
+    stack_pop(interp, &interp->user_stack, &f, STACK_ENTRY_FLOAT);
     return f;
 }
 
 STRING *
 PXS_shifts(Parrot_Interp_t interp) {
     STRING * s;
-    stack_pop(interp, interp->user_stack, &s, STACK_ENTRY_STRING);
+    stack_pop(interp, &interp->user_stack, &s, STACK_ENTRY_STRING);
     return s;
 }
 
 char * PXS_shiftcs(Parrot_Interp_t interp) {
     STRING * s;
-    stack_pop(interp, interp->user_stack, &s, STACK_ENTRY_STRING);
+    stack_pop(interp, &interp->user_stack, &s, STACK_ENTRY_STRING);
     return string_to_cstring(interp, s);
 } 
 
 PMC *
 PXS_shiftp(Parrot_Interp_t interp) {
     PMC * p;
-    stack_pop(interp, interp->user_stack, &p, STACK_ENTRY_PMC);
+    stack_pop(interp, &interp->user_stack, &p, STACK_ENTRY_PMC);
     return p;
 }
 
