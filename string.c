@@ -72,11 +72,6 @@ string_make(struct Parrot_Interp *interpreter, const void *buffer,
  */
 STRING *
 string_grow(struct Parrot_Interp * interpreter, STRING * s, INTVAL addlen) {
-    INTVAL copysize = s->bufused;
-    if(addlen < 0)
-        copysize += addlen;
-    if(copysize <= 0)
-        return s;
     /* Don't check buflen, if we are here, we already checked. */
     Parrot_reallocate(interpreter, s, s->buflen + addlen);
     return s;
