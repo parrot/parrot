@@ -766,6 +766,7 @@ void spill(struct Parrot_Interp *interpreter, int spilled) {
     n_spilled++;
     n = 0;
     dl = 0;     /* line corr */
+    tmp = NULL;
 
     for(ins = instructions; ins; ins = ins->next) {
 

@@ -7,7 +7,7 @@ The Parrot Primer
 This is an update to the article 'Parrot: Some Assembly Required'
 which appeared on http://www.perl.com for the 0.0.2 release of Parrot. It's
 intended as being the best way for the newcomer to Parrot to learn
-what Parrot is and how to use it. 
+what Parrot is and how to use it.
 
 =head1 What is Parrot?
 
@@ -73,7 +73,7 @@ investigating how to program in the Parrot assembler.
 
 Periodic, numbered releases will appear on CPAN (we're currently on
 version 0.0.3), but at this stage of the project an awful lot is
-changing between releases. To really keep up to date with Parrot, 
+changing between releases. To really keep up to date with Parrot,
 we should get our copy from the CVS repository. Here's how we do that:
 
  % cvs -d :pserver:anonymous@cvs.perl.org:/cvs/public login
@@ -97,7 +97,7 @@ Now we have downloaded Parrot, we need to build it; so:
  % perl Configure.pl
  Parrot Configure
  Copyright (C) 2001 Yet Another Society
- 
+
  Since you're running this script, you obviously have
  Perl 5--I'll be pulling some defaults from its configuration.
  ...
@@ -158,14 +158,13 @@ An abstracted, encoding-independent string type.
 
 =item C<PMC>
 
-A scalar.
+Other types lile a (perl) scalar or an array.
 
 =back
 
-The first three types are pretty much self-explanatory; the final type,
-Parrot Magic Cookies, are slightly more difficult to understand. But
-that's OK, because they're not actually implemented yet! We'll talk
-more about PMCs at the end of the article.
+The first three types are pretty much self-explanatory; the final
+type, Parrot Magic Cookies, are slightly more difficult to understand.
+But that's OK! We'll talk more about PMCs at the end of the article.
 
 =head2 Registers
 
@@ -184,7 +183,7 @@ architecture of a real hardware CPU. This has another advantage: we can
 use all the existing literature on how to write compilers and
 optimizers for register-based CPUs for our software CPU!
 
-Parrot has specialist registers for each type: 32 INTVAL registers, 
+Parrot has specialist registers for each type: 32 INTVAL registers,
 32 FLOATVAL registers, 32 string registers and 32 PMC registers. In Parrot
 assembler, these are named C<I0>...C<I31>, C<N0>...C<N31>,
 C<S0>...C<S31>, C<P0>...C<P31>.
@@ -264,8 +263,8 @@ true value:
  DONE:    print "\n"
           end
 
-Note that C<if> branches to C<REMAIND> if C<I3> contains a true 
-(i.e. non-zero) value; if C<I3> is zero, execution falls through to the 
+Note that C<if> branches to C<REMAIND> if C<I3> contains a true
+(i.e. non-zero) value; if C<I3> is zero, execution falls through to the
 next statement. Here's what that would look like in Perl, for comparison:
 
     $i1 = 12;
@@ -338,7 +337,7 @@ assembler program which finds the first 20 Fibonacci numbers:
 
  # Some simple code to print some Fibonacci numbers
  # Leon Brocard <acme@astray.com>
- 
+
          print   "The first 20 fibonacci numbers are:\n"
          set     I1, 0
          set     I2, 20
@@ -370,8 +369,8 @@ This is the equivalent code in Perl:
 
 =head2 Further examples
 
-Additional examples of what can be done with Parrot assembler can be 
-found in the F<parrot/examples/assembly> subdirectory, and on the web at 
+Additional examples of what can be done with Parrot assembler can be
+found in the F<parrot/examples/assembly> subdirectory, and on the web at
 http://www.parrotcode.org/examples/.
 
 =head2 Jako
@@ -434,7 +433,7 @@ Although we've been able to say C<print "String"> and C<print I3> to
 print a register, Parrots ops are B<not> polymorphic - this is some
 trickery carried out by the assembler. Those two operations would be
 implemented by two different ops, C<print_sc> to print a string
-constant, and C<print_i> to print an integer register. 
+constant, and C<print_i> to print an integer register.
 All this is handled by the preprocessor, so all we need to do to
 add an opcode is to add its implementation to the F<core.ops> file.
 
@@ -479,10 +478,9 @@ exercise!
 
 =head2 Vtable datatypes
 
-Parrot has recently added some basic support for PMCs. PMCs are almost
-like Perl 5's SVs and Python's Objects, only more so. A PMC is an object
-of some type, which can be instructed to perform various operations. So
-when we say
+PMCs are almost like Perl 5's SVs and Python's Objects, only more so.
+A PMC is an object of some type, which can be instructed to perform
+various operations. So when we say
 
       inc P1
 
@@ -498,7 +496,7 @@ library full of Perl-like classes and its PMCs would have Perl-like
 behaviour.
 
 The PMC types available are described in F<doc/vtables.pod>; you can
-create a new PMC with 
+create a new PMC with
 
     new P0, <typename>
 
@@ -520,9 +518,9 @@ ops that we need to implement.
 
 We've got a good number of people working away on Parrot, but we could
 always use a few more. To help out, you'll need a subscription to the
-perl6-internals mailing list, (C<perl6-internals@perl.org>), where all 
-the development takes place. You should also keep up to date with the CVS 
-version of Parrot; if you want to be alerted to CVS commits, 
+perl6-internals mailing list, (C<perl6-internals@perl.org>), where all
+the development takes place. You should also keep up to date with the CVS
+version of Parrot; if you want to be alerted to CVS commits,
 you can subscribe to the cvs-parrot mailing list (C<cvs-parrot@perl.org>).
 CVS commit access is given to those who taken
 responsibility for a particular area of Parrot, or who often commit

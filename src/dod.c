@@ -17,7 +17,7 @@
 #include <assert.h>
 
 /* set this to 1 for tracing the system stack and processor registers */
-#define TRACE_SYSTEM_AREAS 0
+#define TRACE_SYSTEM_AREAS 1
 
 /* set this to 1 and above to zero to see if unanchored objects
  * are found in system areas. Please note: these objects might be bogus

@@ -32,7 +32,4 @@ foreach my $line (@file) {
 close(OUT);
 
 system("./colacc $file.colacctmp");
-system("perl ../../assemble.pl a.pasm > a.pbc");
-system("../../parrot a.pbc");
-
-
+exec("../imcc/imcc a.imc");
