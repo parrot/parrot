@@ -1,6 +1,6 @@
 #! perl -w
 
-use Parrot::Test tests => 1;
+use Parrot::Test tests => 2;
 
 output_is(<<'CODE', <<'OUTPUT', "runinterp");
 	newinterp P0, 0
@@ -16,6 +16,24 @@ CODE
 calling
 In 2
 ending
+OUTPUT
+
+output_like(<<'CODE', <<'OUTPUT', "restart trace");
+	print 2, "ok 1\n"
+	set I0, 1
+	trace I0
+	print 2, "ok 2\n"
+	dec I0
+	trace I0
+	print 2, "ok 3\n"
+	end
+CODE
+/^ok\s1\n
+(?:PC=8.*)?\n
+ok\s2\n
+(?:PC=11.*)?\n
+(?:PC=13.*)?\n
+ok\s3\n$/x
 OUTPUT
 
 1;

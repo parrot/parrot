@@ -114,7 +114,7 @@ sub generate_functions {
       my $by_f = per_test('.pbc',$count);
       my $out_f = per_test('.out',$count);
 
-      $TEST_PROG_ARGS = "" unless defined $TEST_PROG_ARGS;
+      $TEST_PROG_ARGS = $ENV{TEST_PROG_ARGS} || '';
       _run_command( "${directory}$PConfig{test_prog} ${TEST_PROG_ARGS} $by_f", 'STDOUT' => $out_f, 'STDERR' => $out_f);
 
       my $prog_output;

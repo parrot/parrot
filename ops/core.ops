@@ -314,7 +314,7 @@ op print(in INT, in STR) {
     default: file = OPCODE_T2PTR(FILE *, $1);
   }
   if (s && string_length(s)) {
-    fwrite(s->strstart, s->strlen, 1, stdout);
+    fwrite(s->strstart, s->strlen, 1, file);
   }
   goto NEXT();
 }
@@ -333,7 +333,7 @@ op print(in INT, in PMC) {
     default: file = OPCODE_T2PTR(FILE *, $1);
   }
   if (s) {
-    fwrite(s->strstart, s->strlen, 1, stdout);
+    fwrite(s->strstart, s->strlen, 1, file);
   }
   goto NEXT();
 }
