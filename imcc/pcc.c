@@ -380,7 +380,7 @@ expand_pcc_sub(Parrot_Interp interpreter, IMC_Unit * unit, Instruction *ins)
         /* subroutine can handle both */
         i0 = get_pasm_reg("I0");
         regs[0] = i0;
-        sprintf(buf, "_%csub_%s_p1", IMCC_INTERNAL_CHAR, sub->name);
+        sprintf(buf, "%csub_%s_p1", IMCC_INTERNAL_CHAR, sub->name);
         regs[1] = label1 = mk_address(str_dup(buf), U_add_uniq_label);
         ins = insINS(interpreter, unit, ins, "if", regs, 2);
 
@@ -392,7 +392,7 @@ expand_pcc_sub(Parrot_Interp interpreter, IMC_Unit * unit, Instruction *ins)
         if (ps != pe) {
             if (!proto) {
                 /* branch to the end */
-                sprintf(buf, "_%csub_%s_p0", IMCC_INTERNAL_CHAR, sub->name);
+                sprintf(buf, "%csub_%s_p0", IMCC_INTERNAL_CHAR, sub->name);
                 regs[0] = label2 = mk_address(str_dup(buf), U_add_uniq_label);
                 ins = insINS(interpreter, unit, ins, "branch", regs, 1);
                 tmp = INS_LABEL(unit, label1, 0);
@@ -683,13 +683,13 @@ pcc_emit_flatten(Parrot_Interp interpreter, IMC_Unit * unit, Instruction *ins,
         ins = insINS(interpreter, unit, ins, "set", regs, 2);
     }
     ++lin;
-    sprintf(buf, "_%carg_loop_%d_%d", IMCC_INTERNAL_CHAR, lin, i);
+    sprintf(buf, "%carg_loop_%d_%d", IMCC_INTERNAL_CHAR, lin, i);
     loop = mk_address(str_dup(buf), U_add_uniq_label);
-    sprintf(buf, "_%cnext_arg_%d_%d", IMCC_INTERNAL_CHAR, lin, i);
+    sprintf(buf, "%cnext_arg_%d_%d", IMCC_INTERNAL_CHAR, lin, i);
     next = mk_address(str_dup(buf), U_add_uniq_label);
-    sprintf(buf, "_%cover_flow_%d_1_%d", IMCC_INTERNAL_CHAR, lin, i);
+    sprintf(buf, "%cover_flow_%d_1_%d", IMCC_INTERNAL_CHAR, lin, i);
     over1 = mk_address(str_dup(buf), U_add_uniq_label);
-    sprintf(buf, "_%cover_flow_%d_%d", IMCC_INTERNAL_CHAR, lin, i);
+    sprintf(buf, "%cover_flow_%d_%d", IMCC_INTERNAL_CHAR, lin, i);
     over = mk_address(str_dup(buf), U_add_uniq_label);
 
     if (arg->type & VT_FLATTEN) {
