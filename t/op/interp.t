@@ -1,6 +1,6 @@
 #! perl -w
 
-use Parrot::Test tests => 7;
+use Parrot::Test tests => 8;
 
 output_is(<<'CODE', <<'OUTPUT', "runinterp - new style");
 	new P0, .ParrotInterpreter
@@ -114,6 +114,35 @@ output_is(<<'CODE', <<'OUTPUT', "check_events");
 CODE
 before
 after
+OUTPUT
+
+output_is(<<'CODE', <<'OUTPUT', "clone and runinterp");
+    set I0, 1
+    set S0, " interp\n"
+    new P0, .PerlString
+    set P0, "from "
+
+    getinterp P2
+    clone P3, P2
+    print "ok 1\n"
+    runinterp P3, _foo
+    print P0
+    print I0
+    print S0
+    end
+
+_foo:
+    set I0, 2
+    set S0, " clone\n"
+    set P0, "hello from "
+    print P0
+    print I0
+    print S0
+    end
+CODE
+ok 1
+hello from 2 clone
+from 1 interp
 OUTPUT
 
 1;

@@ -170,9 +170,8 @@ dup_entry_interval(QUEUE_ENTRY* entry, FLOATVAL now)
     new_entry = mem_sys_allocate(sizeof(QUEUE_ENTRY));
     new_entry->next = NULL;
     new_entry->type = entry->type;
-    new_entry->data = mem_sys_allocate(sizeof(parrot_event));
-    mem_sys_memcopy(new_entry->data, entry->data, sizeof(parrot_event));
-    event = new_entry->data;
+    event = new_entry->data = mem_sys_allocate(sizeof(parrot_event));
+    mem_sys_memcopy(event, entry->data, sizeof(parrot_event));
     event->u.timer_event.abs_time = now + event->u.timer_event.interval;
     return new_entry;
 }

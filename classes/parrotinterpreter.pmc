@@ -19,6 +19,40 @@
 #include "parrot/parrot.h"
 #include "parrot/embed.h"
 
+/*
+ * copy / clone interpreter registers
+ * all resources are created in the destination interpreter
+ */
+static void
+clone_regs(Parrot_Interp d, Parrot_Interp s, PMC *dest)
+{
+    int i;
+    mem_sys_memcopy(d->int_reg.registers,
+	    s->int_reg.registers, sizeof(struct IReg));
+    mem_sys_memcopy(d->num_reg.registers,
+	    s->num_reg.registers, sizeof(struct NReg));
+    for (i = 0; i < NUM_REGISTERS; i++) {
+	if (s->string_reg.registers[i])
+	    d->string_reg.registers[i] =
+		string_copy(d, s->string_reg.registers[i]);
+	/*
+	 * clone PMCS - ignore the shared case for now
+	 */
+	if (!PMC_IS_NULL(s->pmc_reg.registers[i])) {
+	    PMC *sp = s->pmc_reg.registers[i];
+	    /* special case, dont clone SELF again - ugly */
+	    if (sp->vtable->base_type == enum_class_ParrotInterpreter &&
+		    PMC_data(sp) == s)
+		d->pmc_reg.registers[i] = dest;
+	    else {
+		PMC *dp = pmc_new_noinit(d, sp->vtable->base_type);
+		VTABLE_clone(d, sp, dp);
+		d->pmc_reg.registers[i] = dp;
+	    }
+	}
+    }
+}
+
 pmclass ParrotInterpreter need_ext {
 
     void init () {
@@ -77,5 +111,31 @@ pmclass ParrotInterpreter need_ext {
 		Parrot_set_flag(new_interp, val & allowed);
 		break;
 	}
+    }
+
+    /*
+     * First attempt to make things running, and to see, where problmes
+     * may arise.
+     * Only minimal items are done yet
+     */
+    void clone(PMC* dest) {
+	Parrot_Interp s = PMC_data(SELF);
+	Parrot_Interp d;
+
+	VTABLE_init(INTERP, dest);
+	d = PMC_data(dest);
+	/*
+	 * first a sanity check
+	 */
+	if (d->parent_interpreter != s)
+	    internal_exception(1, "Wrong parent interpreter");
+
+	/*
+	 * copy register files
+	 */
+	clone_regs(d, s, dest);
+	/*
+	 * copy over packfile - done currently in the uninterp opcode
+	 */
     }
 }
