@@ -594,6 +594,80 @@ Parrot_initialize_header_pools(Interp *interpreter)
 
 /*
 
+=item C<int Parrot_forall_header_pools(Interp *, int flag, void *arg, pool_iter_fn)>
+
+Iterate through all header pools by calling the passed function. Returns
+zero if the iteration didn't stop or the returned value.
+
+=over 4
+
+=item flag is one of
+
+  POOL_PMC
+  POOL_BUFFER
+  POOL_CONST
+  POOL_ALL
+
+Only matching pools will be used.
+
+=item arg
+
+This argument is passed on to the iteration function.
+
+=item pool_iter_fn
+
+It is called with C<Interp*, Small_Object_Pool *, int flag, void *arg)>
+If the function returns a non-zero value iteration will stop.
+
+=back
+
+
+=cut
+
+*/
+
+int
+Parrot_forall_header_pools(Interp *interpreter, int flag, void *arg,
+        pool_iter_fn func)
+{
+    struct Small_Object_Pool *pool;
+    struct Arenas *arena_base;
+    int ret_val, i;
+
+    arena_base = interpreter->arena_base;
+
+    if ((flag & (POOL_PMC | POOL_CONST)) == (POOL_PMC | POOL_CONST)) {
+        ret_val = (func)(interpreter, arena_base->constant_pmc_pool,
+                POOL_PMC | POOL_CONST, arg);
+        if (ret_val)
+            return ret_val;
+    }
+    if (flag & POOL_PMC) {
+        ret_val = (func)(interpreter, arena_base->pmc_pool, POOL_PMC, arg);
+        if (ret_val)
+            return ret_val;
+    }
+    if ((flag & (POOL_BUFFER | POOL_CONST)) == (POOL_BUFFER | POOL_CONST)) {
+        ret_val = (func)(interpreter, arena_base->constant_string_header_pool,
+                POOL_BUFFER | POOL_CONST, arg);
+        if (ret_val)
+            return ret_val;
+    }
+    if (!(flag & POOL_BUFFER))
+        return 0;
+    for (i = 0; i < (INTVAL)interpreter->arena_base->num_sized; i++) {
+        pool = arena_base->sized_header_pools[i];
+        if (!pool)
+            continue;
+        ret_val = (func)(interpreter, pool, POOL_BUFFER, arg);
+        if (ret_val)
+            return ret_val;
+    }
+    return 0;
+}
+
+/*
+
 =item C<void
 Parrot_destroy_header_pools(Interp *interpreter)>
 
@@ -603,67 +677,10 @@ Destroys the header pools.
 
 */
 
-void
-Parrot_destroy_header_pools(Interp *interpreter)
+static void
+free_pool(Interp *interpreter, struct Small_Object_Pool *pool)
 {
-    struct Small_Object_Pool *pool;
     struct Small_Object_Arena *cur_arena, *next;
-    int i, j, start;
-
-    /* const/non const COW strings life in different pools
-     * so in first pass
-     * COW refcount is done, in 2. refcounting
-     * in 3rd freeing
-     */
-#ifdef GC_IS_MALLOC
-    start = 0;
-#else
-    start = 2;
-#endif
-    for (i = start; i <= 2; i++) {
-        for (j = -3; j < (INTVAL)interpreter->arena_base->num_sized; j++) {
-            if (j == -3)
-                pool = interpreter->arena_base->constant_pmc_pool;
-            else if (j == -2)
-                pool = interpreter->arena_base->pmc_pool;
-            else if (j == -1)
-                pool = interpreter->arena_base->constant_string_header_pool;
-            else
-                pool = interpreter->arena_base->sized_header_pools[j];
-            if (pool) {
-                if (j <= -2) {
-                    if (i == 2)
-                        Parrot_dod_sweep(interpreter, pool);
-                }
-                else {
-#ifdef GC_IS_MALLOC
-                    if (i == 0)
-                        clear_cow(interpreter, pool, 1);
-                    else if (i == 1)
-                        used_cow(interpreter, pool, 1);
-                    else
-#endif
-                        Parrot_dod_sweep(interpreter, pool);
-                }
-            }
-            if (i == 2 && pool) {
-                for (cur_arena = pool->last_Arena; cur_arena;) {
-                    next = cur_arena->prev;
-#if ARENA_DOD_FLAGS
-                    mem_internal_free(cur_arena->dod_flags);
-                    Parrot_free_memalign(cur_arena);
-#else
-                    mem_internal_free(cur_arena->start_objects);
-                    mem_internal_free(cur_arena);
-#endif
-                    cur_arena = next;
-                }
-                mem_internal_free(pool);
-            }
-
-        }
-    }
-    pool = interpreter->arena_base->pmc_ext_pool;
     for (cur_arena = pool->last_Arena; cur_arena;) {
         next = cur_arena->prev;
 #if ARENA_DOD_FLAGS
@@ -675,7 +692,65 @@ Parrot_destroy_header_pools(Interp *interpreter)
 #endif
         cur_arena = next;
     }
-    mem_internal_free(interpreter->arena_base->pmc_ext_pool);
+    mem_internal_free(pool);
+}
+
+static int
+sweep_cb_buf(Interp *interpreter, struct Small_Object_Pool *pool, int flag,
+        void *arg)
+{
+    int pass = (int)arg;
+
+#ifdef GC_IS_MALLOC
+    if (pass == 0)
+        clear_cow(interpreter, pool, 1);
+    else if (pass == 1)
+        used_cow(interpreter, pool, 1);
+    else
+#endif
+    {
+        Parrot_dod_sweep(interpreter, pool);
+        free_pool(interpreter, pool);
+    }
+    return 0;
+
+}
+
+static int
+sweep_cb_pmc(Interp *interpreter, struct Small_Object_Pool *pool, int flag,
+        void *arg)
+{
+    Parrot_dod_sweep(interpreter, pool);
+    free_pool(interpreter, pool);
+    return 0;
+}
+
+void
+Parrot_destroy_header_pools(Interp *interpreter)
+{
+    struct Small_Object_Pool *pool;
+    struct Small_Object_Arena *cur_arena, *next;
+    int pass, start;
+
+    /* const/non const COW strings life in different pools
+     * so in first pass
+     * COW refcount is done, in 2. refcounting
+     * in 3rd freeing
+     */
+#ifdef GC_IS_MALLOC
+    start = 0;
+#else
+    start = 2;
+#endif
+    Parrot_forall_header_pools(interpreter, POOL_PMC | POOL_CONST, 0,
+            sweep_cb_pmc);
+
+    for (pass = start; pass <= 2; pass++) {
+        Parrot_forall_header_pools(interpreter, POOL_BUFFER | POOL_CONST,
+                (void *)pass, sweep_cb_buf);
+
+    }
+    free_pool(interpreter, interpreter->arena_base->pmc_ext_pool);
     mem_internal_free(interpreter->arena_base->sized_header_pools);
 }
 

@@ -47,6 +47,17 @@ int is_buffer_ptr(Interp *, void *);
 int is_pmc_ptr(Interp *, void *);
 
 
+/* pool iteration */
+typedef enum {
+    POOL_PMC    = 0x01,
+    POOL_BUFFER = 0x02,
+    POOL_CONST  = 0x04,
+    POOL_ALL    = 0x07
+} pool_iter_enum;
+
+typedef int (*pool_iter_fn)(Interp *, struct Small_Object_Pool *, int, void*);
+int Parrot_forall_header_pools(Interp *, int, void *arg, pool_iter_fn func);
+
 /* miscellaneous functions */
 void Parrot_initialize_header_pools(Interp *);
 void Parrot_destroy_header_pools(Interp *interpreter);

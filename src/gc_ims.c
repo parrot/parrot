@@ -637,13 +637,24 @@ TODO split work per pool.
 
 */
 
+static int
+sweep_cb(Interp *interpreter, struct Small_Object_Pool *pool, int flag,
+        void *arg)
+{
+    int *n_obj = (int *) arg;
+
+    Parrot_dod_sweep(interpreter, pool);
+    if (interpreter->profile && (flag & POOL_PMC))
+        Parrot_dod_profile_end(interpreter, PARROT_PROF_DOD_cp);
+    *n_obj += pool->total_objects - pool->num_free_objects;
+    return 0;
+}
+
 static void
 parrot_gc_ims_sweep(Interp* interpreter)
 {
     struct Arenas *arena_base = interpreter->arena_base;
-    struct Small_Object_Pool *header_pool;
     Gc_ims_private *g_ims;
-    int j;
     size_t n_objects;
 
     IMS_DEBUG((stderr, "\nSWEEP\n"));
@@ -659,31 +670,12 @@ parrot_gc_ims_sweep(Interp* interpreter)
      * mark (again) rest of children
      */
     Parrot_dod_trace_children(interpreter, (size_t) -1);
-    /* pmc pool */
-    header_pool = arena_base->pmc_pool;
     /*
-     * TODO profile timings for sweep
+     * now sweep all
      */
-    Parrot_dod_sweep(interpreter, header_pool);
-    if (interpreter->profile)
-        Parrot_dod_profile_end(interpreter, PARROT_PROF_DOD_cp);
-    n_objects = header_pool->total_objects - header_pool->num_free_objects;
-
-    /* and non-empty sized buffer pools */
-    for (j = 0; j < (INTVAL)arena_base->num_sized; j++) {
-        header_pool = arena_base->sized_header_pools[j];
-        if (header_pool) {
-#ifdef GC_IS_MALLOC
-            used_cow(interpreter, header_pool, 0);
-#endif
-            Parrot_dod_sweep(interpreter, header_pool);
-#ifdef GC_IS_MALLOC
-            clear_cow(interpreter, header_pool, 0);
-#endif
-            n_objects += header_pool->total_objects -
-                header_pool->num_free_objects;
-        }
-    }
+    n_objects = 0;
+    Parrot_forall_header_pools(interpreter, POOL_BUFFER | POOL_PMC,
+            (void*)&n_objects, sweep_cb);
     if (interpreter->profile)
         Parrot_dod_profile_end(interpreter, PARROT_PROF_DOD_cb);
     g_ims->state = GC_IMS_COLLECT;
@@ -711,50 +703,57 @@ parrot_gc_ims_collect(Interp* interpreter, int check_only)
 #else
 
 static int
+collect_cb(Interp *interpreter, struct Small_Object_Pool *pool, int flag,
+        void *arg)
+{
+    int check_only = (int)arg;
+    struct Memory_Pool *mem_pool;
+    /*
+     * check if there is an associate memory pool
+     */
+    mem_pool = pool->mem_pool;
+    if (!mem_pool)
+        return 0;
+    /*
+     * and if the memory pool supports compaction
+     */
+    if (!mem_pool->compact)
+        return 0;
+    /*
+     * several header pools can share one memory pool
+     * if that pool is already compacted, the following is zero
+     */
+    if (!mem_pool->guaranteed_reclaimable)
+        return 0;
+    /*
+     * check used size
+     */
+    if ((mem_pool->possibly_reclaimable * mem_pool->reclaim_factor +
+                mem_pool->guaranteed_reclaimable) >=
+            mem_pool->total_allocated * MEM_POOL_RECLAIM) {
+        IMS_DEBUG((stderr, "COMPACT\n"));
+        if (check_only)
+            return 1;
+        mem_pool->compact(interpreter, mem_pool);
+    }
+    return 0;
+}
+
+static int
 parrot_gc_ims_collect(Interp* interpreter, int check_only)
 {
     struct Arenas *arena_base = interpreter->arena_base;
-    struct Small_Object_Pool *header_pool;
-    struct Memory_Pool *mem_pool;
     struct Memory_Block *block;
     Gc_ims_private *g_ims;
-    int j;
+    int ret;
 
     if (!check_only && interpreter->profile)
         Parrot_dod_profile_start(interpreter);
     g_ims = arena_base->gc_private;
-    for (j = 0; j < (INTVAL)arena_base->num_sized; j++) {
-        header_pool = arena_base->sized_header_pools[j];
-        /*
-         * go through header pools check if there is an
-         * associate memory pool
-         */
-        if (header_pool && header_pool->mem_pool) {
-            mem_pool = header_pool->mem_pool;
-            /*
-             * and if the memory pool supports compaction
-             */
-            if (!mem_pool->compact)
-                continue;
-            /*
-             * several header pools can share one memory pool
-             * if that pool is already compacted, the following is zero
-             */
-            if (!mem_pool->guaranteed_reclaimable)
-                continue;
-            /*
-             * check used size
-             */
-            if ((mem_pool->possibly_reclaimable * mem_pool->reclaim_factor +
-                        mem_pool->guaranteed_reclaimable) >=
-                    mem_pool->total_allocated * MEM_POOL_RECLAIM) {
-                IMS_DEBUG((stderr, "COMPACT\n"));
-                if (check_only)
-                    return 1;
-                mem_pool->compact(interpreter, mem_pool);
-            }
-        }
-    }
+    ret = Parrot_forall_header_pools(interpreter, POOL_BUFFER,
+            (void*)check_only, collect_cb);
+    if (ret)
+        return ret;
     if (check_only)
         return 0;
     if (interpreter->profile)
