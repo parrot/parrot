@@ -28,12 +28,7 @@ typedef struct Parrot_Sub {
 
 typedef struct Parrot_Coroutine { 
     INTVAL              flags;
-    struct stack_chunk  *user_stack;
-    struct stack_chunk  *control_stack;
-    struct IReg         int_reg;
-    struct NReg         num_reg;
-    struct SReg         string_reg;
-    struct PReg         pmc_reg;
+    struct Parrot_Context ctx;
     struct Scratchpad   *lex_pad;
     opcode_t            *init;
     opcode_t            *resume;

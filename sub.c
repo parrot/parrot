@@ -49,8 +49,8 @@ new_coroutine(struct Parrot_Interp * interp, opcode_t * address)
         mem_sys_allocate(sizeof(struct Parrot_Coroutine));
     newco->init = address;
     newco->resume = NULL;
-    newco->user_stack = (struct stack_chunk *)new_stack(interp);
-    newco->control_stack = (struct stack_chunk *)new_stack(interp);
+    newco->ctx.user_stack = (struct stack_chunk *)new_stack(interp);
+    newco->ctx.control_stack = (struct stack_chunk *)new_stack(interp);
     newco->lex_pad = NULL;
     return newco;
 }
