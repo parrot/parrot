@@ -304,6 +304,9 @@ emit_popl_r(char *pc, int reg)
     return pc;
 }
 
+#  define emitm_popl_r(pc, reg) \
+    pc = emit_popl_r(pc, reg)
+
 static char *
 emit_popl_m(char *pc, int base, int i, int scale, long disp)
 {
@@ -487,54 +490,9 @@ emit_movb_i_m(char *pc, char imm, int base, int i, int scale, long disp)
 
 #  define jit_emit_cdq(pc) *(pc)++ = 0x99
 
-#if 0
-#  define jit_emit_div_rr_i(pc, r1, r2) { \
-    if (r1 == r2) { \
-      jit_emit_mov_ri_i(pc, r1, 1); \
-    } \
-    else { \
-      if (r1 != emit_EAX) { \
-        jit_emit_mov_rr_i(pc, emit_EAX, r1); \
-      } \
-      jit_emit_mov_rr_i(pc, emit_ECX, emit_EDX); \
-      jit_emit_cdq(pc); \
-      if (r2 == emit_EDX) { \
-        emitm_sdivl_r(pc, emit_ECX); \
-      } \
-      else { \
-        emitm_sdivl_r(pc, r2); \
-      } \
-      jit_emit_mov_rr_i(pc, emit_EDX, emit_ECX); \
-      if (r1 != emit_EAX) { \
-        jit_emit_mov_rr_i(pc, r1, emit_EAX); \
-      } \
-    } \
-}
-
-#  define jit_emit_cmod_rr_i(pc, r1, r2) { \
-    if (r1 == r2) { \
-      jit_emit_mov_ri_i(pc, r1, 0); \
-    } \
-    else { \
-      if (r1 != emit_EAX) { \
-        jit_emit_mov_rr_i(pc, emit_EAX, r1); \
-      } \
-      jit_emit_mov_rr_i(pc, emit_ECX, emit_EDX); \
-      jit_emit_cdq(pc); \
-      if (r2 == emit_EDX) { \
-        emitm_sdivl_r(pc, emit_ECX); \
-      } \
-      else { \
-        emitm_sdivl_r(pc, r2); \
-      } \
-      if (r1 != emit_EDX) { \
-        jit_emit_mov_rr_i(pc, r1, emit_EDX); \
-        jit_emit_mov_rr_i(pc, emit_EDX, emit_ECX); \
-      } \
-    } \
-}
-
-#else
+/* dest /= src
+ * edx:eax /= src, quotient => eax, rem => edx
+ */
 static char *
 opt_div_rr(Parrot_jit_info_t *jit_info, int dest, int src, int is_div)
 {
@@ -543,10 +501,20 @@ opt_div_rr(Parrot_jit_info_t *jit_info, int dest, int src, int is_div)
     if (dest != emit_EAX) {
         jit_emit_mov_rr_i(pc, emit_EAX, dest);
     }
-    /* if EDX is mapped, save it to ECX */
-    if (jit_info->optimizer->cur_section->ru[0].registers_used == 4) {
-        saved = 1;
-        jit_emit_mov_rr_i(pc, emit_ECX, emit_EDX);
+    if (dest == emit_EDX) {
+        /* all ok, we can globber it */
+    }
+    else {
+        /* if ECX is mapped, push EDX on stack */
+        if (jit_info->optimizer->cur_section->ru[0].registers_used == 5) {
+            emitm_pushl_r(pc, emit_EDX);
+            saved = 2;
+        }
+        /* if EDX is mapped, save it in ECX */
+        else if (jit_info->optimizer->cur_section->ru[0].registers_used == 4) {
+            saved = 1;
+            jit_emit_mov_rr_i(pc, emit_ECX, emit_EDX);
+        }
     }
 #if 0
     jit_emit_cdq(pc);
@@ -556,7 +524,7 @@ opt_div_rr(Parrot_jit_info_t *jit_info, int dest, int src, int is_div)
     pc = emit_shift_i_r(pc, emit_b111, 31, emit_EDX); /* SAR 31 */
 #endif
     if (src == emit_EDX) {
-        assert(saved);
+        assert(saved == 1);
         emitm_sdivl_r(pc, emit_ECX);
     }
     else {
@@ -564,20 +532,25 @@ opt_div_rr(Parrot_jit_info_t *jit_info, int dest, int src, int is_div)
     }
     if (is_div) {
         /* result = quotient in EAX */
-        if (saved) {
+        if (saved == 1) {
             jit_emit_mov_rr_i(pc, emit_EDX, emit_ECX);
         }
         if (dest != emit_EAX) {
             jit_emit_mov_rr_i(pc, dest, emit_EAX);
+        }
+        if (saved == 2) {
+            emitm_popl_r(pc, emit_EDX);
         }
     }
     else {
         /* result = remainder in EDX */
         if (dest != emit_EDX) {
             jit_emit_mov_rr_i(pc, dest, emit_EDX);
-            if (saved) {
+            if (saved == 1) {
                 jit_emit_mov_rr_i(pc, emit_EDX, emit_ECX);
             }
+            else if (saved == 2)
+                emitm_popl_r(pc, emit_EDX);
         }
     }
     return pc;
@@ -585,132 +558,99 @@ opt_div_rr(Parrot_jit_info_t *jit_info, int dest, int src, int is_div)
 
 #  define jit_emit_div_rr_i(pc, r1, r2) pc = opt_div_rr(jit_info, r1, r2, 1)
 #  define jit_emit_cmod_rr_i(pc, r1, r2) pc = opt_div_rr(jit_info, r1, r2, 0)
-#endif
 
-#if 0
-#  define jit_emit_div_ri_i(pc, r1, imm) { \
-    if (r1 != emit_EAX) { \
-      jit_emit_mov_rr_i(pc, emit_EAX, r1); \
-    } \
-    jit_emit_mov_rr_i(pc, emit_ECX, emit_EDX); \
-    jit_emit_cdq(pc); \
-    if (r1 != emit_EBX) { \
-      emitm_pushl_r(pc, emit_EBX); \
-      jit_emit_mov_ri_i(pc, emit_EBX, imm); \
-      emitm_sdivl_r(pc, emit_EBX); \
-      emitm_popl_r(pc, emit_EBX); \
-    } \
-    else { \
-      emitm_pushl_r(pc, emit_EDI); \
-      jit_emit_mov_ri_i(pc, emit_EDI, imm); \
-      emitm_sdivl_r(pc, emit_EDI); \
-      emitm_popl_r(pc, emit_EDI); \
-    } \
-    jit_emit_mov_rr_i(pc, emit_EDX, emit_ECX); \
-    if (r1 != emit_EAX) { \
-      jit_emit_mov_rr_i(pc, r1, emit_EAX); \
-    } \
-}
 
-#else
 static char *
-opt_div_ri(Parrot_jit_info_t *jit_info, int dest, INTVAL imm)
+opt_div_ri(Parrot_jit_info_t *jit_info, int dest, INTVAL imm, int is_div)
 {
     char *pc = jit_info->native_ptr;
 
     UINTVAL ld2 = ld((UINTVAL) imm);
-    if (imm > 1 && !(imm & (imm - 1))) {
+    if (is_div && imm > 1 && !(imm & (imm - 1))) {
         /* positive power of 2 - do a shift */
         pc = emit_shift_i_r(pc, emit_b101, ld2, dest);
     }
     else {
-        int saved = 0;
-        if (dest != emit_EAX) {
-            jit_emit_mov_rr_i(pc, emit_EAX, dest);
-        }
-        if (jit_info->optimizer->cur_section->ru[0].registers_used == 4) {
-            saved = 1;
-            jit_emit_mov_rr_i(pc, emit_ECX, emit_EDX);
-        }
-        jit_emit_cdq(pc);
-        if (!saved) {            /* use ECX for imm */
-            jit_emit_mov_ri_i(pc, emit_ECX, imm);
-            emitm_sdivl_r(pc, emit_ECX);
+        if (dest != emit_EBX) {
+            emitm_pushl_r(pc, emit_EBX);
+            jit_emit_mov_ri_i(pc, emit_EBX, imm);
+            jit_info->native_ptr = pc;
+            pc = opt_div_rr(jit_info, dest, emit_EBX, is_div);
+            pc = emit_popl_r(pc, emit_EBX);
         }
         else {
-            if (dest != emit_EBX) {
-                emitm_pushl_r(pc, emit_EBX);
-                jit_emit_mov_ri_i(pc, emit_EBX, imm);
-                emitm_sdivl_r(pc, emit_EBX);
-                pc = emit_popl_r(pc, emit_EBX);
-            }
-            else {
-                emitm_pushl_r(pc, emit_EDI);
-                jit_emit_mov_ri_i(pc, emit_EDI, imm);
-                emitm_sdivl_r(pc, emit_EDI);
-                pc = emit_popl_r(pc, emit_EDI);
-            }
-            jit_emit_mov_rr_i(pc, emit_EDX, emit_ECX);
-        }
-        if (dest != emit_EAX) {
-            jit_emit_mov_rr_i(pc, dest, emit_EAX);
+            emitm_pushl_r(pc, emit_EDI);
+            jit_emit_mov_ri_i(pc, emit_EDI, imm);
+            jit_info->native_ptr = pc;
+            pc = opt_div_rr(jit_info, dest, emit_EDI, is_div);
+            pc = emit_popl_r(pc, emit_EDI);
         }
     }
     return pc;
 }
 
-#  define jit_emit_div_ri_i(pc, r1, imm) pc = opt_div_ri(jit_info, r1, imm)
+#  define jit_emit_div_ri_i(pc, r1, imm) pc = opt_div_ri(jit_info, r1, imm, 1)
+#  define jit_emit_cmod_ri_i(pc, r1, imm) pc = opt_div_ri(jit_info, r1, imm, 0)
+
+static char *
+opt_div_rm(Parrot_jit_info_t *jit_info, int dest, void * mem, int is_div)
+{
+    char *pc = jit_info->native_ptr;
+    int saved = 0;
+    if (dest != emit_EAX) {
+        jit_emit_mov_rr_i(pc, emit_EAX, dest);
+    }
+    if (dest == emit_EDX) {
+        /* all ok, we can globber it */
+    }
+    else {
+        /* if ECX is mapped, push EDX on stack */
+        if (jit_info->optimizer->cur_section->ru[0].registers_used == 5) {
+            emitm_pushl_r(pc, emit_EDX);
+            saved = 2;
+        }
+        /* if EDX is mapped, save it in ECX */
+        else if (jit_info->optimizer->cur_section->ru[0].registers_used == 4) {
+            saved = 1;
+            jit_emit_mov_rr_i(pc, emit_ECX, emit_EDX);
+        }
+    }
+#if 0
+    jit_emit_cdq(pc);
+#else
+    /* this sequence allows 2 other instructions to run parallel */
+    jit_emit_mov_rr_i(pc, emit_EDX, emit_EAX);
+    pc = emit_shift_i_r(pc, emit_b111, 31, emit_EDX); /* SAR 31 */
 #endif
-
-#  define jit_emit_cmod_ri_i(pc, r1, imm) { \
-    if (r1 != emit_EAX) { \
-      jit_emit_mov_rr_i(pc, emit_EAX, r1); \
-    } \
-    jit_emit_mov_rr_i(pc, emit_ECX, emit_EDX); \
-    jit_emit_cdq(pc); \
-    if (r1 != emit_EBX) { \
-      emitm_pushl_r(pc, emit_EBX); \
-      jit_emit_mov_ri_i(pc, emit_EBX, imm); \
-      emitm_sdivl_r(pc, emit_EBX); \
-      emitm_popl_r(pc, emit_EBX); \
-    } \
-    else { \
-      emitm_pushl_r(pc, emit_EDI); \
-      jit_emit_mov_ri_i(pc, emit_EDI, imm); \
-      emitm_sdivl_r(pc, emit_EDI); \
-      emitm_popl_r(pc, emit_EDI); \
-    } \
-    if (r1 != emit_EDX) { \
-      jit_emit_mov_rr_i(pc, r1, emit_EDX); \
-      jit_emit_mov_rr_i(pc, emit_EDX, emit_ECX); \
-    } \
-}
-
-#  define jit_emit_div_rm_i(pc, r1, mem) { \
-    if (r1 != emit_EAX) { \
-      jit_emit_mov_rr_i(pc, emit_EAX, r1); \
-    } \
-    jit_emit_mov_rr_i(pc, emit_ECX, emit_EDX); \
-    jit_emit_cdq(pc); \
     emitm_sdivl_m(pc, 0,0,0, (long)(mem)); \
-    jit_emit_mov_rr_i(pc, emit_EDX, emit_ECX); \
-    if (r1 != emit_EAX) { \
-      jit_emit_mov_rr_i(pc, r1, emit_EAX); \
-    } \
-}
 
-#  define jit_emit_cmod_rm_i(pc, r1, mem) { \
-    if (r1 != emit_EAX) { \
-      jit_emit_mov_rr_i(pc, emit_EAX, r1); \
-    } \
-    jit_emit_mov_rr_i(pc, emit_ECX, emit_EDX); \
-    jit_emit_cdq(pc); \
-    emitm_sdivl_m(pc, 0,0,0, (long)(mem)); \
-    if (r1 != emit_EDX) { \
-      jit_emit_mov_rr_i(pc, r1, emit_EDX); \
-      jit_emit_mov_rr_i(pc, emit_EDX, emit_ECX); \
-    } \
+    if (is_div) {
+        /* result = quotient in EAX */
+        if (saved == 1) {
+            jit_emit_mov_rr_i(pc, emit_EDX, emit_ECX);
+        }
+        if (dest != emit_EAX) {
+            jit_emit_mov_rr_i(pc, dest, emit_EAX);
+        }
+        if (saved == 2) {
+            emitm_popl_r(pc, emit_EDX);
+        }
+    }
+    else {
+        /* result = remainder in EDX */
+        if (dest != emit_EDX) {
+            jit_emit_mov_rr_i(pc, dest, emit_EDX);
+            if (saved == 1) {
+                jit_emit_mov_rr_i(pc, emit_EDX, emit_ECX);
+            }
+            else if (saved == 2)
+                emitm_popl_r(pc, emit_EDX);
+        }
+    }
+    return pc;
 }
+#  define jit_emit_div_rm_i(pc, r, m)  pc = opt_div_rm(jit_info, r, m, 1)
+#  define jit_emit_cmod_rm_i(pc, r, m) pc = opt_div_rm(jit_info, r, m, 0)
 
 #  define emitm_smull_op(pc) { *((pc)++) = 0x0f; *((pc)++) = 0xaf; }
 
@@ -868,6 +808,17 @@ opt_mul(char *pc, int dest, INTVAL imm, int src)
 #  define emitm_notl_m(pc, b, i, s, d) \
     emitm_alu_imp_m(pc, emit_b010, b, i, s, d)
 
+/* XCHG */
+#  define jit_emit_xchg_rr_i(pc, r1, r2) { \
+    if (r1 != r2) { \
+    *(pc++) = 0x87; \
+    *(pc++) = emit_alu_r_r(r1, r2); \
+    } \
+}
+
+#  define jit_emit_xchg_rm_i(pc, r, m) { \
+    emitm_alul_r_m((pc), 0x87, (r), emit_None, emit_None, emit_None, (m)) \
+}
 /* SHL */
 
 #  define jit_emit_shl_ri_i(pc, reg, imm) \
@@ -924,38 +875,82 @@ opt_mul(char *pc, int dest, INTVAL imm, int src)
 #  define emitm_sarl_r_m(pc, reg, b, i, s, d) \
     { pc = emit_shift_r_m(pc, emit_b111, reg, b, i, s, d); }
 
+static char *
+opt_shift_rr(Parrot_jit_info_t *jit_info, int dest, int count, int op)
+{
+    char *pc = jit_info->native_ptr;
+    if (count == emit_ECX) {
+        pc = emit_shift_r_r(pc, op, count, dest);
+    }
+    else {
+        int saved = 0;
+        assert(count != emit_EAX);
+        if (dest == emit_EAX) {
+            if (jit_info->optimizer->cur_section->ru[0].registers_used == 5) {
+                emitm_pushl_r(pc, emit_ECX);
+                saved = 1;
+            }
+            jit_emit_mov_rr_i(pc, emit_ECX, count);
+            pc = emit_shift_r_r(pc, op, emit_ECX, dest);
+            if (saved) {
+                emitm_popl_r(pc, emit_ECX);
+            }
+
+        }
+        else if (dest == emit_ECX) {
+            jit_emit_xchg_rr_i(pc, dest, count);
+            pc = emit_shift_r_r(pc, op, dest, count);
+            jit_emit_xchg_rr_i(pc, dest, count);
+        }
+        else {
+            jit_emit_mov_rr_i(pc, emit_EAX, emit_ECX);
+            jit_emit_mov_rr_i(pc, emit_ECX, count);
+            pc = emit_shift_r_r(pc, op, emit_ECX, dest);
+            jit_emit_mov_rr_i(pc, emit_ECX, emit_EAX);
+        }
+    }
+    return pc;
+}
+static char *
+opt_shift_rm(Parrot_jit_info_t *jit_info, int dest, void * count, int op)
+{
+    char *pc = jit_info->native_ptr;
+    int saved = 0;
+    /* if ECX is mapped, save it */
+    if (jit_info->optimizer->cur_section->ru[0].registers_used == 5) {
+        emitm_pushl_r(pc, emit_ECX);
+        saved = 1;
+    }
+    /* jit_emit_mov_rm_i(pc, emit_ECX, count); */
+    emitm_movl_m_r(pc, emit_ECX, emit_None, emit_None, emit_None, count)
+    pc = emit_shift_r_r(pc, op, emit_ECX, dest);
+    if (saved) {
+        emitm_popl_r(pc, emit_ECX);
+    }
+    return pc;
+}
+
 /* interface, shift r1 by r2 bits */
 
-#  define jit_emit_shl_rr_i(pc, r1, r2) { \
-    jit_emit_mov_rr_i(pc, emit_ECX, r2); \
-    emitm_shll_r_r(pc, emit_ECX, r1); \
-}
+#  define jit_emit_shl_rr_i(pc, r1, r2) \
+        pc = opt_shift_rr(jit_info, r1, r2, emit_b100)
 
-#  define jit_emit_shl_rm_i(pc, r1, m) { \
-    jit_emit_mov_rm_i(pc, emit_ECX, m); \
-    emitm_shll_r_r(pc, emit_ECX, r1); \
-}
+#  define jit_emit_shl_rm_i(pc, r1, m)  \
+        pc = opt_shift_rm(jit_info, r1, m, emit_b100)
 
 /* shr seems to be the arithmetic shift */
-#  define jit_emit_shr_rr_i(pc, r1, r2) { \
-    jit_emit_mov_rr_i(pc, emit_ECX, r2); \
-    emitm_sarl_r_r(pc, emit_ECX, r1); \
-}
+#  define jit_emit_shr_rr_i(pc, r1, r2)  \
+        pc = opt_shift_rr(jit_info, r1, r2, emit_b111)
 
-#  define jit_emit_shr_rm_i(pc, r1, m) { \
-    jit_emit_mov_rm_i(pc, emit_ECX, m); \
-    emitm_sarl_r_r(pc, emit_ECX, r1); \
-}
+#  define jit_emit_shr_rm_i(pc, r1, m)  \
+        pc = opt_shift_rm(jit_info, r1, m, emit_b111)
 
-#  define jit_emit_lsr_rr_i(pc, r1, r2) { \
-    jit_emit_mov_rr_i(pc, emit_ECX, r2); \
-    emitm_shrl_r_r(pc, emit_ECX, r1); \
-}
+#  define jit_emit_lsr_rr_i(pc, r1, r2)  \
+        pc = opt_shift_rr(jit_info, r1, r2, emit_b101)
 
-#  define jit_emit_lsr_rm_i(pc, r1, m) { \
-    jit_emit_mov_rm_i(pc, emit_ECX, m); \
-    emitm_shrl_r_r(pc, emit_ECX, r1); \
-}
+#  define jit_emit_lsr_rm_i(pc, r1, m)  \
+        pc = opt_shift_rm(jit_info, r1, m, emit_b101)
+
 /* MOV (reg),reg */
 #  define emit_movm_r_r(pc, src, dest) \
     *(pc++) = 0x8b; \
@@ -1460,19 +1455,8 @@ static unsigned char *lastpc;
     jit_emit_fstore_m_n(pc, mem); \
 }
 
-#  define jit_emit_xchg_rr_i(pc, r1, r2) { \
-    if (r1 != r2) { \
-      jit_emit_mov_rr_i(pc, emit_ECX, r1); \
-      jit_emit_mov_rr_i(pc, r1, r2); \
-      jit_emit_mov_rr_i(pc, r2, emit_ECX); \
-    } \
-}
 
-#  define jit_emit_xchg_rm_i(pc, r, m) { \
-    jit_emit_mov_rr_i(pc, emit_ECX, r); \
-    jit_emit_mov_rm_i(pc, r, m); \
-    jit_emit_mov_mr_i(pc, m, emit_ECX); \
-}
+#  define jit_emit_xchg_mr_i(pc, m, r) jit_emit_xchg_rm_i((pc), (r), (m))
 
 #  define jit_emit_finit(pc) { *((pc)++) = 0xdb; *((pc)++) = 0xe3; }
 
@@ -1642,9 +1626,6 @@ static unsigned char *lastpc;
 
 #  define jit_emit_bxor_mi_i(pc, d, imm) \
     emitm_xorl_i_m(pc, imm, emit_None, emit_None, emit_None, d)
-
-#  define emitm_popl_r(pc, reg) \
-    pc = emit_popl_r(pc, reg)
 
 enum { JIT_X86BRANCH, JIT_X86JUMP, JIT_X86CALL };
 
@@ -1921,9 +1902,13 @@ Parrot_jit_vtable_n_op(Parrot_jit_info_t *jit_info,
     /* this is not callee saved, emit_EDX is 4th in intval_map
      * should also save floating regs back?
      */
-    if (ru[0].registers_used == 4) {
+    if (ru[0].registers_used >= 4) {
         emitm_pushl_r(jit_info->native_ptr, emit_EDX);
         saved = 1;
+    }
+    if (ru[0].registers_used == 5) {
+        emitm_pushl_r(jit_info->native_ptr, emit_ECX);
+        saved = 2;
     }
     if (bp) {
         jit_emit_stack_frame_enter(jit_info->native_ptr);
@@ -2056,6 +2041,8 @@ store:
     else
         emitm_addb_i_r(jit_info->native_ptr,
                 st+sizeof(void*)*(n+1), emit_ESP);
+    if (saved == 2)
+        emitm_popl_r(jit_info->native_ptr, emit_ECX);
     if (saved)
         emitm_popl_r(jit_info->native_ptr, emit_EDX);
 }
@@ -2265,9 +2252,13 @@ Parrot_jit_vtable_newp_ic_op(Parrot_jit_info_t *jit_info,
     /* this is not callee saved, emit_EDX is 4th in intval_map
      * should also save floating regs back?
      */
-    if (ru[0].registers_used == 4) {
+    if (ru[0].registers_used >= 4) {
         emitm_pushl_r(jit_info->native_ptr, emit_EDX);
         saved = 1;
+    }
+    if (ru[0].registers_used == 5) {
+        emitm_pushl_r(jit_info->native_ptr, emit_ECX);
+        saved = 2;
     }
 
     assert(nvtable == 0);       /* vtable->init */
@@ -2294,6 +2285,8 @@ Parrot_jit_vtable_newp_ic_op(Parrot_jit_info_t *jit_info,
     emitm_callm(jit_info->native_ptr, emit_EAX, emit_None, emit_None, offset);
     /* adjust 4 args pushed */
     emitm_addb_i_r(jit_info->native_ptr, 16, emit_ESP);
+    if (saved == 2)
+        emitm_popl_r(jit_info->native_ptr, emit_ECX);
     if (saved)
         emitm_popl_r(jit_info->native_ptr, emit_EDX);
 }
@@ -2668,15 +2661,14 @@ Parrot_jit_build_call_func(struct Parrot_Interp *interpreter, PMC *pmc_nci,
 
 #else /* JIT_EMIT */
 #  define REQUIRES_CONSTANT_POOL 0
-#  define INT_REGISTERS_TO_MAP 4
+#  define INT_REGISTERS_TO_MAP 5
 #  define FLOAT_REGISTERS_TO_MAP 4
 
 #ifndef JIT_IMCC
 
 char intval_map[] =
-/* we can't use ECX, shift ops need it, push ECX before shift doesn't
- * because, when ECX is mapped you get shrl %cl, %ecx */
-    { emit_EBX, emit_EDI, emit_ESI, emit_EDX };
+    /* Note: don't change order of these */
+    { emit_EBX, emit_EDI, emit_ESI, emit_EDX, emit_ECX };
 
 /* ST(0) is used as a scratch register,
  * using more then 4 registers breaks C<time N0>
@@ -2689,6 +2681,17 @@ char floatval_map[] = { 1,2,3,4 };
  */
 
 #  define PRESERVED_INT_REGS 3
+
+/* XXX
+ * this 4 floatvals are currently assumed to be callee saved,
+ * what is strictly not true conforming to the ABI
+ * but currently, we don't have external functions, which
+ * globber these regs
+ * to be save the following line should be enabled:
+ *
+ * # define PRESERVED_FLOAT_REGS 0
+ *
+ */
 
 
 /*

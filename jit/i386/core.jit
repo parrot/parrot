@@ -128,12 +128,8 @@ TEMPLATE Parrot_binop_x_x {
     }
     else {
         jit_emit_mov_rm<_N>(NATIVECODE, ISR1, &INT_REG[1]);
-# ifdef jit_emit_<op>_mr<_N>
-        jit_emit_<op>_mr<_N>(NATIVECODE, &INT_REG[1], ISR1);
-# else
         jit_emit_<op>_rm<_N>(NATIVECODE, ISR1, &INT_REG[2]);
         jit_emit_mov_mr<_N>(NATIVECODE, &INT_REG[1], ISR1);
-# endif
     }
 }
 
