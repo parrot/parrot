@@ -23,7 +23,7 @@ O_FILES = $(IMCC_O_FILES) \
 #DO NOT ADD C COMPILER FLAGS HERE
 #Add them in Configure.pl--look for the
 #comment 'ADD C COMPILER FLAGS HERE'
-CFLAGS = ${ccflags} -I../../include
+CFLAGS = ${ccflags} ${cc_warn} -I../../include
 
 C_LIBS = ${libs}
 
