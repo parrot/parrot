@@ -88,7 +88,8 @@ Parrot_readbc(struct Parrot_Interp *interpreter, char *filename)
         io = PIO_STDIN(interpreter);
         /* read 1k at a time */
         program_size = 0;
-    } else {
+    }
+    else {
 
 #ifdef HAS_HEADER_SYSSTAT
         /* if we have stat(), get the actual file size so we can read it
