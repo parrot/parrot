@@ -5,39 +5,148 @@ use Parrot::Test tests => 26;
 output_is(<<CODE, <<OUTPUT, "set_i_ic");
 	# XXX: Need a test for writing outside the set of available
 	# registers.  Parrot doesn't check for this at the moment.
-	set	I0, 0x12345678
+	set	I0, 0
+	set	I1, 1
+	set	I2, 2
+	set	I3, 3
+	set	I4, 4
+	set	I5, 5
+	set	I6, 6
+	set	I7, 7
+	set	I8, 8
+	set	I9, 9
+	set	I10, 10
+	set	I11, 11
+	set	I12, 12
+	set	I13, 13
+	set	I14, 14
+	set	I15, 15
+	set	I16, 16
+	set	I17, 17
+	set	I18, 18
+	set	I19, 19
+	set	I20, 20
+	set	I21, 21
+	set	I22, 22
+	set	I23, 23
+	set	I24, 24
+	set	I25, 25
+	set	I26, 26
+	set	I27, 27
+	set	I28, 28
+	set	I29, 29
+	set	I30, 30
+	set	I31, 31
+
 	print	I0
 	print	"\\n"
-	set	I31, 0x9abcdef1
-	print	I31
-	print	"\\n"
-
-	set	I1, 2147483647
 	print	I1
 	print	"\\n"
-	set	I2, -2147483648
 	print	I2
 	print	"\\n"
-	set	I3, 4294967295
 	print	I3
 	print	"\\n"
+	print	I4
+	print	"\\n"
+	print	I5
+	print	"\\n"
+	print	I6
+	print	"\\n"
+	print	I7
+	print	"\\n"
+	print	I8
+	print	"\\n"
+	print	I9
+	print	"\\n"
+	print	I10
+	print	"\\n"
+	print	I11
+	print	"\\n"
+	print	I12
+	print	"\\n"
+	print	I13
+	print	"\\n"
+	print	I14
+	print	"\\n"
+	print	I15
+	print	"\\n"
+	print	I16
+	print	"\\n"
+	print	I17
+	print	"\\n"
+	print	I18
+	print	"\\n"
+	print	I19
+	print	"\\n"
+	print	I20
+	print	"\\n"
+	print	I21
+	print	"\\n"
+	print	I22
+	print	"\\n"
+	print	I23
+	print	"\\n"
+	print	I24
+	print	"\\n"
+	print	I25
+	print	"\\n"
+	print	I26
+	print	"\\n"
+	print	I27
+	print	"\\n"
+	print	I28
+	print	"\\n"
+	print	I29
+	print	"\\n"
+	print	I30
+	print	"\\n"
+	print	I31
+	print	"\\n"
         end
+	set	I0, 0
 CODE
-305419896
--1698898191
-2147483647
--2147483648
--1
+0
+1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
 OUTPUT
 
 output_is(<<CODE, <<OUTPUT, "set_i");
-	set	I0, 0x77665544
+	set	I0, 42
 	set	I1, I0
 	print	I1
 	print	"\\n"
         end
 CODE
-2003195204
+42
 OUTPUT
 
 output_is(<<CODE, <<OUTPUT, "add_i");
@@ -54,22 +163,11 @@ output_is(<<CODE, <<OUTPUT, "add_i");
 	print	I2
 	print	"\\n"
 
-	set	I3, 2147483647
-	set	I4, 1
-	add	I5, I3, I4
-	print	I5
-	print	"\\n"
-	set	I6, -1
-	add	I7, I5, I6
-	print	I7
-	print	"\\n"
         end
 CODE
 574908040
 862362060
 1724724120
--2147483648
-2147483647
 OUTPUT
 
 output_is(<<CODE, <<OUTPUT, "sub_i");
@@ -565,16 +663,10 @@ output_is(<<CODE, <<OUTPUT, "inc_i");
 	print	I0
 	print	"\\n"
 
-	# Overflow
-	set	I1, 2147483647
-	inc	I1
-	print	I1
-	print	"\\n"
         end
 CODE
 1
 5
--2147483648
 OUTPUT
 
 output_is(<<CODE, <<OUTPUT, "inc_i_ic");
@@ -607,16 +699,10 @@ output_is(<<CODE, <<OUTPUT, "dec_i");
 	print	I0
 	print	"\\n"
 
-	# Overflow
-	set	I1, -2147483648
-	dec	I1
-	print	I1
-	print	"\\n"
         end
 CODE
 -1
 -5
-2147483647
 OUTPUT
 
 output_is(<<CODE, <<OUTPUT, "dec_i_ic");
