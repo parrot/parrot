@@ -283,14 +283,14 @@ string_concat(struct Parrot_Interp *interpreter, const STRING *a,
 
     if (a != NULL && a->strlen != 0) {
         if (b != NULL && b->strlen != 0) {
-            result = string_make(interpreter, NULL, a->bufused +
-                                 b->strlen * a->encoding->max_bytes,
-                                 a->encoding, 0, a->type);
-            mem_sys_memcopy(result->bufstart, a->bufstart, a->bufused);
+            /* transcode first so we know the length and avoid infanticide */
             if (a->type != b->type || a->encoding != b->encoding) {
                 b = string_transcode(interpreter, b, a->encoding, a->type,
                                      NULL);
             }
+            result = string_make(interpreter, NULL, a->bufused + b->bufused,
+                                 a->encoding, 0, a->type);
+            mem_sys_memcopy(result->bufstart, a->bufstart, a->bufused);
             mem_sys_memcopy((void *)((ptrcast_t)result->bufstart + a->bufused),
                             b->bufstart, b->bufused);
             result->strlen = a->strlen + b->strlen;
