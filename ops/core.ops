@@ -2699,6 +2699,11 @@ TODO: Implement this, or delete the entry.
 
 =cut
 
+inline op jsr(in INT) {
+  stack_push(interpreter, interpreter->control_stack, expr NEXT(),  STACK_ENTRY_DESTINATION, STACK_CLEANUP_NULL);
+  goto ADDRESS($1);
+}
+
 
 ########################################
 
