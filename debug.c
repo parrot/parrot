@@ -256,7 +256,6 @@ void
 PDB_run_command(struct Parrot_Interp *interpreter, const char *command)
 {
     PDB_t *pdb = interpreter->pdb;
-    int i;
     unsigned long c;
 
     /* get a number from what the user typed */
@@ -418,8 +417,6 @@ PDB_trace(struct Parrot_Interp *interpreter,
 PDB_condition_t *
 PDB_cond(struct Parrot_Interp *interpreter, const char *command)
 {
-    PDB_t *pdb = interpreter->pdb;
-    PDB_breakpoint_t *newbreak,*sbreak;
     PDB_condition_t *condition;
     int i;
     char str[255];
@@ -1010,7 +1007,6 @@ PDB_disassemble_op(struct Parrot_Interp *interpreter, char* dest, int space,
     /* Concat the arguments */
     for (j = 1; j < info->arg_count; j++) {
         char buf[256];
-        INTVAL neg = 0;
         INTVAL i = 0;
         FLOATVAL f;
         PMC* k;
@@ -1222,12 +1218,6 @@ PDB_disassemble(struct Parrot_Interp *interpreter, const char *command)
     PDB_line_t *pline,*newline;
     PDB_label_t *label;
     opcode_t *code_end,*pc = interpreter->code->byte_code;
-    FLOATVAL f;
-    char buf[256];
-    char *ptr,*escaped;
-    int neg = 0, j;
-    long i;
-    PMC *k;
 
     pfile = (PDB_file_t *)mem_sys_allocate(sizeof(PDB_file_t));
     pline = (PDB_line_t *)mem_sys_allocate(sizeof(PDB_line_t));
@@ -1604,7 +1594,6 @@ PDB_extend_const_table(struct Parrot_Interp *interpreter)
 void
 PDB_print_stack(struct Parrot_Interp *interpreter, const char *command)
 {
-    int i;
     unsigned long c = 0;
 
     /* Print from the user stack? */
@@ -1756,7 +1745,6 @@ PDB_print_user_stack(struct Parrot_Interp *interpreter, const char *command)
     unsigned long depth = 0,i;
     Stack_Chunk_t *chunk = interpreter->ctx.user_stack;
     Stack_Entry_t *entry;
-    STRING *s;
 
     valid_chunk(chunk, command, depth, STACK_CHUNK_DEPTH, i);
 
@@ -1799,7 +1787,6 @@ static STRING* cstring_to_string(struct Parrot_Interp *interpreter, char* str)
 void
 PDB_print(struct Parrot_Interp *interpreter, const char *command)
 {
-    int i;
     unsigned long c = 0;
     PMC* key = NULL;
     int regnum = -1;
@@ -1899,7 +1886,6 @@ PDB_print_string(struct Parrot_Interp *interpreter, struct SReg *string_reg,
                  int regnum)
 {
     int i,j = 0, k = NUM_REGISTERS;
-    STRING *s;
 
     if (regnum != -1) {
         j = regnum;
@@ -1933,7 +1919,6 @@ PDB_print_pmc(struct Parrot_Interp *interpreter, struct PReg *pmc_reg,
               int regnum, PMC* key)
 {
     int i,j = 0, k = NUM_REGISTERS;
-    STRING *s;
 
     if (regnum != -1) {
         j = regnum;

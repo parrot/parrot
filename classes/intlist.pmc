@@ -63,7 +63,6 @@ pmclass IntList {
 
 
     void set_number_keyed_int (INTVAL* key, FLOATVAL value) {
-        INTVAL ix;
 
         if (!key) return;
 
@@ -88,7 +87,6 @@ pmclass IntList {
     };
 
     void set_pmc_keyed_int (INTVAL* key, PMC* src, INTVAL* src_key) {
-        INTVAL ix;
         INTVAL value;
 
         if (!key) return;

@@ -264,7 +264,6 @@ setup_argv(struct Parrot_Interp *interpreter, int argc, char ** argv)
 void
 Parrot_runcode(struct Parrot_Interp *interpreter, int argc, char *argv[])
 {
-    INTVAL i;
 
     /* Debugging mode nonsense. */
     if (Interp_flags_TEST(interpreter, PARROT_DEBUG_FLAG)) {

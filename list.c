@@ -694,6 +694,8 @@ get_chunk(Interp * interpreter, List *list, UINTVAL *idx)
             List_chunk * last;
 
             last = chunk_list_ptr(list, i + chunk->n_chunks - 1);
+            UNUSED(last);
+
             ld_first = ld(chunk->items);
 
             slot = ld(*idx + chunk->items) - ld_first;

@@ -77,7 +77,6 @@ static void
 handle_flags(struct Parrot_Interp *interpreter,
              SpfInfo info, STRING *str, INTVAL is_int_type, const char *prefix)
 {
-    UINTVAL i;
     UINTVAL len = string_length(str);
 
     if (is_int_type) {
@@ -251,7 +250,6 @@ Parrot_sprintf_format(struct Parrot_Interp *interpreter, STRING *pat,
                 /* Various data types we may need */
                 void *ptr;
                 STRING *string;
-                PMC *pmc;
                 HUGEFLOATVAL thefloat;
                 HUGEINTVAL theint = 0;
                 UHUGEINTVAL theuint = 0;

@@ -21,7 +21,6 @@ extern void Parrot_register_core_pmcs(Interp *interp, PMC* registry);
 void
 init_world(Interp *interpreter)
 {
-    PMC* key;
     string_init();              /* Set up the string subsystem */
 
     /* Call base vtable class constructor methods */

@@ -457,8 +457,6 @@ pmclass Array {
 
     INTVAL exists_keyed_int (INTVAL* key) {
         void * ret;
-        PMC* value;
-        PMC** array;
 
         if (!key)
             return 0;

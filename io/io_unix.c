@@ -203,6 +203,7 @@ PIO_unix_fdopen(theINTERP, ParrotIOLayer *layer, PIOHANDLE fd, INTVAL flags)
 #  ifdef HAS_HEADER_FCNTL
         /* Get descriptor flags */
         if ((rflags = fcntl(fd, F_GETFL, 0)) >= 0) {
+            UNUSED(rflags);
         /*int accmode = rflags & O_ACCMODE; */
         /* Check other flags (APPEND, ASYNC, etc) */
     }
