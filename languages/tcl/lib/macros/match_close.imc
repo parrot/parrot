@@ -61,6 +61,7 @@ contains the string
 .local $TRYCOMMAND:
   if $I0 != 91 goto .$TRYQUOTE
   $I1 = 93
+  $I7 = 1
   goto .$GOTCLOSER 
 
   # ""
