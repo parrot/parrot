@@ -33,33 +33,32 @@ static STRING *STR;
 static struct parrot_regs_t *
 Parrot_PyClass_runops_fromc(Parrot_Interp interpreter, PMC *sub)
 {
-    PMC *ret_c, *p1;
     opcode_t offset, *dest;
     struct parrot_regs_t *bp_save, *bp_new;
 
-    /* we need one return continuation with a NULL offset */
     bp_save = interpreter->ctx.bp;
-    p1 = REG_PMC(1);
-    REG_PMC(1) = ret_c = new_ret_continuation_pmc(interpreter, NULL);
-    interpreter->ctx.current_cont = ret_c;
-    interpreter->ctx.current_sub = sub;
-#if GC_VERBOSE
-    PObj_report_SET(ret_c);     /* s. also dod.c */
-#endif
-    /* invoke the sub, which places the context of the sub in the
-     * interpreter, and switches code segments if needed
-     * Passing a dummy true destination copies registers
-     */
-    PMC *temp = REG_PMC(5); 
-    dest = VTABLE_invoke(interpreter, sub, (void*)1);
-    temp = REG_PMC(5); 
+
+    dest = VTABLE_invoke(interpreter, sub, NULL);
+
     bp_new = interpreter->ctx.bp;
+
     if (dest) {
+        /* we need one return continuation with a NULL offset */
+        interpreter->ctx.current_cont = REG_PMC(1) =
+            new_ret_continuation_pmc(interpreter, NULL);
+
+#if GC_VERBOSE
+        PObj_report_SET(REG_PMC(1));     /* s. also dod.c */
+#endif
+
+        if (bp_new != bp_save) copy_regs(interpreter, bp_save);
+        interpreter->ctx.current_sub = sub;
+
         offset = dest - interpreter->code->byte_code;
         runops(interpreter, offset);
     }
+
     interpreter->ctx.bp = bp_save;
-    REG_PMC(1) = p1;
     return bp_new;
 }
 
@@ -67,6 +66,8 @@ static PMC *
 Parrot_PyClass_run_meth_fromc_P(Parrot_Interp interpreter, PMC *sub, PMC *obj,
         STRING *meth)
 {
+    /* TODO: optimize for func->vtable->base_type == enum_class_NCI */
+
     struct parrot_regs_t *bp;
     struct Parrot_Context ctx;
     PMC *ret;
