@@ -1009,7 +1009,7 @@ op foldup(out PMC) {
        current_offset++;
    }
    /* Next see how many are in the overflow, if any */
-   if (max_used_reg == 16 && overflow != NULL && 
+   if (max_used_reg == 16 && overflow != NULL &&
        VTABLE_type(interpreter, overflow) != enum_class_Null &&
        ((elems_in_array = VTABLE_get_integer(interpreter, overflow)) != 0)) {
        INTVAL cur_elem;
@@ -1052,11 +1052,11 @@ op foldup(out PMC, in INT) {
    }
 
    /* Next see how many are in the overflow, if any */
-   if (max_used_reg == 16 && overflow != NULL && 
+   if (max_used_reg == 16 && overflow != NULL &&
        VTABLE_type(interpreter, overflow) != enum_class_Null &&
        ((elems_in_array = VTABLE_get_integer(interpreter, overflow)) != 0)) {
        INTVAL cur_elem;
-       INTVAL start = 0;
+       start = 0;
        if ($2 > 11) {
          start = $2 - 11;
        }

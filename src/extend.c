@@ -339,6 +339,35 @@ Parrot_Language Parrot_find_language(Parrot_INTERP interpreter, char *langauge) 
 Parrot_Const_CharType Parrot_find_chartype(Parrot_INTERP interpreter, char *chartype) {
     return Parrot_chartype_lookup(chartype);
 }
+
+/*=for api extend Parrot_register_pmc
+ *
+ * Add a reference of the PMC to the interpreters DOD registry.
+ * This prevents PMCs only known to extension from getting destroyed
+ * during DOD runs.
+ *
+ */
+
+void
+Parrot_register_pmc(Parrot_INTERP interpreter, Parrot_PMC pmc)
+{
+    dod_register_pmc(interpreter, pmc);
+}
+
+/*=for api extend Parrot_unregister_pmc
+ *
+ * Remove a reference of the PMC from the interpreters DOD registry
+ * If the register count reaches zero, the PMC will be destroyed during
+ * the next DOD run.
+ *
+ */
+
+void
+Parrot_unregister_pmc(Parrot_INTERP interpreter, Parrot_PMC pmc)
+{
+    dod_unregister_pmc(interpreter, pmc);
+}
+
 /*
  * Local variables:
  * c-indentation-style: bsd

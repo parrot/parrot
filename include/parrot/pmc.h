@@ -37,6 +37,12 @@ PMC *constant_pmc_new_init(struct Parrot_Interp *, INTVAL base_type, PMC *);
 INTVAL pmc_register(struct Parrot_Interp *, STRING *);
 INTVAL pmc_type(struct Parrot_Interp *, STRING *);
 
+/*
+ * DOD registry interface
+ */
+void dod_register_pmc(Parrot_Interp, PMC*);
+void dod_unregister_pmc(Parrot_Interp, PMC*);
+
 /* multi method fallbacks */
 void register_fallback_methods(Parrot_Interp);
 void mmd_fallback_add_pmc(Parrot_Interp, PMC *left, PMC *right, PMC *dest);

@@ -534,6 +534,44 @@ op thaw(out PMC, in STR) {
 
 =cut
 
+###############################################################################
+
+=head2 Misc PMC related ops
+
+=over 4
+
+=cut
+
+########################################
+
+=item B<register>(in PMC)
+
+Add a reference of PMC $1 to the interpreters root set of PMCs. This is needed
+for extensions to make sure, that the PMC is properly marked during DOD, if
+that PMC is not known to Parrots core elsewhere.
+
+A PMC can be registered multiple times, if its unregistered and the
+registration count reaches zero, it will be destroyed during the next DOD run.
+
+=item B<unregister>(in PMC)
+
+Remove one reference of $1.
+
+=cut
+
+op register(in PMC) {
+  dod_register_pmc(interpreter, $1);
+  goto NEXT();
+}
+
+op unregister(in PMC) {
+  dod_unregister_pmc(interpreter, $1);
+  goto NEXT();
+}
+
+=back
+
+
 =head1 COPYRIGHT
 
 Copyright (C) 2001-2003 The Perl Foundation.  All rights reserved.

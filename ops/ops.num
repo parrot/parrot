@@ -1343,3 +1343,7 @@ ne_addr_p_p_ic  1315
 isnull_p_ic     1316
 deref_p_p	1317
 foldup_p	1318
+foldup_p_i	1319
+foldup_p_ic	1320
+register_p	1321
+unregister_p	1322

@@ -84,6 +84,9 @@ Parrot_Const_CharType Parrot_find_chartype(Parrot_INTERP, char*);
 Parrot_Language Parrot_find_language(Parrot_INTERP, char*);
 Parrot_Const_Encoding Parrot_find_encoding(Parrot_INTERP, char*);
 
+void Parrot_register_pmc(Parrot_INTERP, Parrot_PMC);
+void Parrot_unregister_pmc(Parrot_INTERP, Parrot_PMC);
+
 #endif
 
 /*

@@ -540,6 +540,67 @@ mmd_fallback_stringxor_pmc(Parrot_Interp interp, PMC *left, PMC *right, PMC *des
 
 
 
+static size_t
+key_hash_int(Interp *interp, Hash *hash, void *value)
+{
+    UNUSED(interp);
+    UNUSED(hash);
+    return (size_t) value;
+}
+
+static int
+int_compare(Parrot_Interp interp, void *a, void *b)
+{
+    UNUSED(interp);
+    return a != b;
+}
+/*
+ * DOD registry interface
+ */
+void
+dod_register_pmc(Parrot_Interp interpreter, PMC* pmc)
+{
+    Hash *hash;
+    HashBucket *bucket;
+
+    if (!interpreter->DOD_registry) {
+        PMC *registry;
+        registry = interpreter->DOD_registry = pmc_new_noinit(interpreter,
+                enum_class_PerlHash);
+        new_hash_x(interpreter, &hash, enum_type_int, 0, Hash_key_type_int,
+                int_compare, key_hash_int, pobject_lives);
+        PObj_custom_mark_SET(registry);
+        PMC_ptr1v(registry) = hash;
+    }
+    else
+        hash = PMC_ptr1v(interpreter->DOD_registry);
+
+    bucket = hash_get_bucket(interpreter, hash, pmc);
+    if (bucket)
+        LVALUE_CAST(int, bucket->value) ++;
+    else
+        hash_put(interpreter, hash, pmc, (void *) 1);
+}
+
+void
+dod_unregister_pmc(Parrot_Interp interpreter, PMC* pmc)
+{
+    Hash *hash;
+    HashBucket *bucket;
+
+    if (!interpreter->DOD_registry)
+        return; /* XXX or signal exception? */
+    hash = PMC_ptr1v(interpreter->DOD_registry);
+
+    bucket = hash_get_bucket(interpreter, hash, pmc);
+    if (bucket) {
+        if ((int) bucket->value == 1)
+            hash_delete(interpreter, hash, pmc);
+        else
+            LVALUE_CAST(int, bucket->value) --;
+    }
+}
+
 /*
  * Local variables:
  * c-indentation-style: bsd

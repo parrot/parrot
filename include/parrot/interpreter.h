@@ -256,6 +256,7 @@ typedef struct Parrot_Interp {
 /* 4:   PMC *ParrotInterpreter       that's me */
 /* 5:   PMC *Dyn_libs           Array of dynamically loaded ParrotLibrary  */
     int has_early_DOD_PMCs;   /* Flag that some want immediate destruction */
+    PMC* DOD_registry;          /* registered PMCs added to the root set */
     struct MMD_table *binop_mmd_funcs; /* Table of MMD function pointers */
     struct QUEUE* task_queue;       /* per interpreter queue */
     struct _Thread_data *thread_data;    /* thread specific items */

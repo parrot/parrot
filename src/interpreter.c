@@ -1056,6 +1056,9 @@ make_interpreter(Parrot_Interp parent, Interp_flags flags)
     SET_NULL_P(interpreter->prederef.branches, Prederef_btanch*);
     SET_NULL(interpreter->jit_info);
 
+    /* null out the root set registry */
+    SET_NULL_P(interpreter->DOD_registry, PMC *);
+
     /* register assembler/compilers */
     setup_default_compreg(interpreter);
 

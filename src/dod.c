@@ -158,6 +158,10 @@ trace_active_PMCs(struct Parrot_Interp *interpreter, int trace_stack)
     /* Now mark the class hash */
     pobject_lives(interpreter, (PObj *)interpreter->class_hash);
 
+    /* Mark the registry if any */
+    if (interpreter->DOD_registry)
+        pobject_lives(interpreter, (PObj *)interpreter->DOD_registry);
+
     /* Now walk the pmc stack. Make sure to walk from top down since stack may
      * have segments above top that we shouldn't walk. */
     for (cur_chunk = interpreter->ctx.pmc_reg_top; cur_chunk;
