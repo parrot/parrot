@@ -334,6 +334,8 @@ Parrot_really_destroy(int exit_code, void *vinterp)
                 Interp_flags_TEST(interpreter, PARROT_DESTROY_FLAG)))
         return;
 
+    if (interpreter->arena_base->de_init_gc_system)
+        interpreter->arena_base->de_init_gc_system(interpreter);
     /* buffer headers, PMCs */
     Parrot_destroy_header_pools(interpreter);
     /* memory pools in resources */

@@ -62,10 +62,16 @@ struct Arenas {
     struct Small_Object_Pool *constant_string_header_pool;
     struct Small_Object_Pool **sized_header_pools;
     size_t num_sized;
-    void *  gc_private;         /* gc subsystem data */
-    /* Some counters for the garbage collector */
-    size_t  dod_runs;           /* Number of times we've * done a DOD sweep */
-    size_t  lazy_dod_runs;      /* Number of lazy DOD sweep */
+    /*
+     * function slots that each subsystem must provide
+     */
+    void (*do_dod_run)(Interp*, int flags);
+    void (*de_init_gc_system) (Interp*);
+    /*
+     * statistics for DOD and GC
+     */
+    size_t  dod_runs;           /* Number of times we've done a DOD sweep */
+    size_t  lazy_dod_runs;      /* Number of successful lazy DOD sweep */
     size_t  collect_runs;       /* Number of times we've
                                  * done a memory compaction
                                  */
@@ -85,10 +91,6 @@ struct Arenas {
                                  * anything */
     UINTVAL memory_collected;   /* Total amount of memory copied
                                    during collection */
-    UINTVAL DOD_block_level;    /* How many outstanding DOD block
-                                   requests are there? */
-    UINTVAL GC_block_level;     /* How many outstanding GC block
-                                   requests are there? */
     UINTVAL num_early_DOD_PMCs; /* how many PMCs want immediate destruction */
     UINTVAL num_early_PMCs_seen;/* how many such PMCs has DOD seen */
     UINTVAL num_extended_PMCs;  /* active PMCs having pmc_ext */
@@ -97,6 +99,17 @@ struct Arenas {
     PMC* dod_trace_ptr;         /* last PMC trace_children was called on */
     int lazy_dod;               /* flag that indicates whether we should stop
                                    when we've seen all impatient PMCs */
+    /*
+     * DOD, GC blocking
+     */
+    UINTVAL DOD_block_level;    /* How many outstanding DOD block
+                                   requests are there? */
+    UINTVAL GC_block_level;     /* How many outstanding GC block
+                                   requests are there? */
+    /*
+     * private data for the GC subsystem
+     */
+    void *  gc_private;         /* gc subsystem data */
 };
 
 struct Stash {

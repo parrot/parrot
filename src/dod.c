@@ -1085,7 +1085,7 @@ Parrot_do_dod_run(Interp *interpreter, UINTVAL flags)>
 
 Call the configured garbage collector to reclaim unused headers.
 
-=item C<static void
+=item C<void
 parrot_dod_ms_run(Interp *interpreter, UINTVAL flags)>
 
 Run the stop-the-world mark & sweep collector.
@@ -1120,8 +1120,8 @@ Parrot_dod_ms_run_init(Interp *interpreter)
 #endif
 }
 
-static void
-parrot_dod_ms_run(Interp *interpreter, UINTVAL flags)
+void
+Parrot_dod_ms_run(Interp *interpreter, UINTVAL flags)
 {
     struct Arenas *arena_base = interpreter->arena_base;
     struct Small_Object_Pool *header_pool;
@@ -1203,12 +1203,7 @@ parrot_dod_ms_run(Interp *interpreter, UINTVAL flags)
 void
 Parrot_do_dod_run(Interp *interpreter, UINTVAL flags)
 {
-#if PARROT_GC_MS
-    parrot_dod_ms_run(interpreter, flags);
-#endif
-#if PARROT_GC_IMS
-    Parrot_dod_ims_run(interpreter, flags);
-#endif
+    interpreter->arena_base->do_dod_run(interpreter, flags);
 }
 
 /*

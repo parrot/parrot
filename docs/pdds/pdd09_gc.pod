@@ -185,6 +185,10 @@ Called during interpreter destruction. The GC subsystem must clear the
 live state of all objects and perform a sweep in the PMC header pool,
 so that destructors and finalizers get called.
 
+=item DOD_no_trace_volatile_roots
+
+Trace root set except volatile roots. That is skip e.g. registers.
+
 =back
 
 =item C<void (*de_init_gc_system) (Interp*)>

@@ -504,9 +504,14 @@ C<more_object_fn>.
 void
 Parrot_gc_ms_init(Interp* interpreter)
 {
+    struct Arenas *arena_base;
+
+    arena_base = interpreter->arena_base;
     add_free_object_fn = gc_ms_add_free_object;
     get_free_object_fn = gc_ms_get_free_object;
     alloc_objects_fn   = gc_ms_alloc_objects;
+    arena_base->do_dod_run = Parrot_dod_ms_run;
+    arena_base->de_init_gc_system = (void (*)(Interp*)) NULLfunc;
 }
 /*
 

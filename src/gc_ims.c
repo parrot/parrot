@@ -207,7 +207,7 @@ To keep the memory usage limited k > 1 must hold.
 
 The rest of the root set is scanned i.e. the registers. By defering
 scanning of registers all temporaries that might have exist somewhen
-just stay unscanned - they will be collected in the this DOD cycle, if
+just stay unscanned - they will be collected in this DOD cycle, if
 we allocate new objects white or in the next DOD cycle.
 
 =item d) finishing a DOD cycle
@@ -402,6 +402,7 @@ typedef struct {
 } Gc_ims_private;
 
 static void parrot_gc_ims_run_increment(Interp*);
+static void parrot_gc_ims_run(Interp *interpreter, int flags);
 
 /*
 
@@ -495,6 +496,15 @@ gc_ims_alloc_objects(Interp *interpreter,
     Parrot_add_to_free_list(interpreter, pool, new_arena, start, end);
 }
 
+static void
+parrot_gc_ims_deinit(Interp* interpreter)
+{
+    struct Arenas *arena_base;
+
+    arena_base = interpreter->arena_base;
+    mem_sys_free(arena_base->gc_private);
+}
+
 /*
 
 =item C<void Parrot_gc_ims_init(Interp* interpreter)>
@@ -511,9 +521,21 @@ C<more_objects_fn>.
 void
 Parrot_gc_ims_init(Interp* interpreter)
 {
-    interpreter->arena_base->gc_private =
-        mem_sys_allocate_zeroed(sizeof(Gc_ims_private));
-    /* TODO deallocate */
+    struct Arenas *arena_base;
+
+    arena_base = interpreter->arena_base;
+    arena_base->gc_private = mem_sys_allocate_zeroed(sizeof(Gc_ims_private));
+    /*
+     * set function hooks according to pdd09
+     */
+    arena_base->do_dod_run = parrot_gc_ims_run;
+    arena_base->de_init_gc_system = parrot_gc_ims_deinit;
+
+    /*
+     * IMS and MS use a lot of common code in src/headers.c, src/dod.c,
+     * and src/smallobject.c. These global function pointers simplify
+     * common setup.
+     */
     add_free_object_fn = gc_ims_add_free_object;
     get_free_object_fn = gc_ims_get_free_object;
     alloc_objects_fn   = gc_ims_alloc_objects;
@@ -539,16 +561,17 @@ parrot_gc_ims_reinit(Interp* interpreter)
 {
     Gc_ims_private *g_ims;
     struct Arenas *arena_base;
-    int lazy;
 
     arena_base = interpreter->arena_base;
     arena_base->lazy_dod = 0;
-    g_ims = arena_base->gc_private;
     Parrot_dod_ms_run_init(interpreter);
     /*
      * trace root set w/o system areas
+     * TODO also skip volatile roots
      */
     Parrot_dod_trace_root(interpreter, 0);
+
+    g_ims = arena_base->gc_private;
     g_ims->state = GC_IMS_MARKING;
 
 }
@@ -805,7 +828,7 @@ parrot_gc_ims_run_increment(Interp* interpreter)
 /*
 
 =item C<void
-Parrot_dod_ims_run(Interp *interpreter, UINTVAL flags)>
+parrot_gc_ims_run(Interp *interpreter, int flags)>
 
 Interface to C<Parrot_do_dod_run>. C<flags> is one of:
 
@@ -816,8 +839,8 @@ Interface to C<Parrot_do_dod_run>. C<flags> is one of:
 
 */
 
-void
-Parrot_dod_ims_run(Interp *interpreter, UINTVAL flags)
+static void
+parrot_gc_ims_run(Interp *interpreter, int flags)
 {
     int lazy;
     struct Arenas *arena_base = interpreter->arena_base;

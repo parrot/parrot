@@ -42,8 +42,11 @@
 
 enum {
     DOD_trace_stack_FLAG = 1 << 0,      /* trace system areads and stack */
+    DOD_trace_normal     = 1 << 0,      /* the same */
     DOD_lazy_FLAG        = 1 << 1,      /* timely destruction run */
-    DOD_finish_FLAG      = 1 << 2       /* run async past sweep */
+    DOD_finish_FLAG      = 1 << 2,      /* run async past sweep */
+    DOD_no_trace_volatile_roots = 1 << 3  /* trace all but volatile root
+                                             set, i.e. registers */
 };
 
 void Parrot_do_dod_run(struct Parrot_Interp *, UINTVAL flags);
@@ -76,8 +79,8 @@ void Parrot_dod_clear_live_bits(Interp*);
 /* GC subsystem init functions */
 void Parrot_gc_ms_init(Interp* interpreter);
 void Parrot_gc_ims_init(Interp* interpreter);
-/* synchron entry point, mainly for lazy sweeps */
-void Parrot_dod_ims_run(Interp *interpreter, UINTVAL flags);
+/* do_dod_run function for MS */
+void Parrot_dod_ms_run(Interp *interpreter, UINTVAL flags);
 
 void Parrot_dod_ims_wb(Interp*, PMC *, PMC *);
 /*
