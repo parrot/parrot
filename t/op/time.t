@@ -13,6 +13,11 @@ OK1:	print "ok, (!= 1970) Grateful Dead not\n"
 OK2:	print "ok, (now>before) timelords need not apply\n"
 	branch	OK_ALL
 FAIL:	print "failure\n"
+	print "I0 was: "
+	print I0
+	print "\nI1 was: "
+	print I0
+	print "\n"
 OK_ALL:
 	end
 CODE

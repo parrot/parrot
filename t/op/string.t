@@ -49,6 +49,7 @@ output_is(<<'CODE', <<OUTPUT, "chopn, OOB values");
 	chopn	S1, 1000
 	print	S1
 	print	"** nothing **\n"
+    end
 CODE
 A string of length 21
 A string of lengt
