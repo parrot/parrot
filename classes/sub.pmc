@@ -21,9 +21,20 @@ pmclass Sub {
    }
 
    void init () {
+       PMC_data(SELF) = new_sub(INTERP);
        SELF->cache.struct_val = NULL;
+       PObj_custom_mark_destroy_SETALL(SELF);
    }
 
+   void destroy () {
+       struct Parrot_Sub * sub = (struct Parrot_Sub *)PMC_data(SELF);
+       mem_sys_free(sub);
+   }
+
+   void mark () {
+        struct Parrot_Sub * sub = (struct Parrot_Sub *)PMC_data(SELF);
+        pobject_lives(INTERP, sub->ctx.warns);
+   }
 
    void set_integer (PMC * value) {
        SELF->cache.struct_val = (void *)VTABLE_get_integer(INTERP, value);
@@ -42,6 +53,11 @@ pmclass Sub {
    }
 
    void clone (PMC *ret) {
+       struct Parrot_Sub * sub;
+       PObj_custom_mark_destroy_SETALL(ret);
+       sub = PMC_data(ret) = mem_sys_allocate(sizeof(struct Parrot_Sub));
+       memcpy(sub, PMC_data(SELF), sizeof(struct Parrot_Sub));
+       buffer_mark_COW(sub->ctx.warns);
        ret->cache.struct_val = SELF->cache.struct_val;
    }
 

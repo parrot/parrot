@@ -14,7 +14,7 @@
 #include "parrot/parrot.h"
 #include "parrot/method_util.h"
 
-pmclass Coroutine extends Closure {
+pmclass Coroutine extends Continuation {
 
     STRING* name () {
         return whoami;
@@ -22,31 +22,13 @@ pmclass Coroutine extends Closure {
 
     void init () {
         PMC_data(SELF) = new_coroutine(INTERP);
+        SELF->cache.struct_val = NULL;
         PObj_custom_mark_destroy_SETALL(SELF);
     }
 
-    void destroy () {
-	struct Parrot_Coroutine * co =
-	    (struct Parrot_Coroutine *)PMC_data(SELF);
-	stack_destroy(co->ctx.pad_stack);
-	stack_destroy(co->ctx.control_stack);
-	stack_destroy(co->ctx.user_stack);
-	mem_sys_free(PMC_data(SELF));
-    }
-
-    void mark () {
-        struct Parrot_Coroutine * co =
-	    (struct Parrot_Coroutine *)PMC_data(SELF);
-        mark_stack(INTERP, co->ctx.user_stack);
-        mark_stack(INTERP, co->ctx.control_stack);
-	SUPER();	/* mark pad_stack, warns in closure */
-
-    }
-
-
 
     void* invoke (void* next) {
-        struct Parrot_Coroutine* co = (struct Parrot_Coroutine*)PMC_data(SELF);
+        struct Parrot_Sub* co = (struct Parrot_Sub*)PMC_data(SELF);
         void * dest = SELF->cache.struct_val;
         SELF->cache.struct_val = next;
 	swap_context(interpreter, &co->ctx);
@@ -54,13 +36,4 @@ pmclass Coroutine extends Closure {
         return dest;
     }
 
-    void clone(PMC *ret) {
-        struct Parrot_Coroutine * retc;
-        PMC_data(ret) = retc = mem_sys_allocate(sizeof(struct Parrot_Coroutine));
-        PObj_custom_mark_destroy_SETALL(ret);
-        memcpy(PMC_data(ret), PMC_data(SELF), sizeof(struct Parrot_Coroutine));
-        stack_mark_cow(retc->ctx.user_stack);
-        stack_mark_cow(retc->ctx.control_stack);
-        stack_mark_cow(retc->ctx.pad_stack);
-    }
 }

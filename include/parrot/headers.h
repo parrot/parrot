@@ -59,7 +59,8 @@ int is_pmc_ptr(struct Parrot_Interp *, void *);
 
 /* COW support */
 void buffer_mark_COW(Buffer *b);
-Buffer * buffer_unmake_COW(struct Parrot_Interp *interpreter, Buffer *src);
+Buffer * buffer_unmake_COW(struct Parrot_Interp *, Buffer *src);
+Buffer * buffer_copy_if_diff(struct Parrot_Interp *, Buffer *src, Buffer *dst);
 
 /* miscellaneous functions */
 void add_extra_buffer_header(struct Parrot_Interp *, void *);

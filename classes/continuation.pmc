@@ -17,21 +17,15 @@
 pmclass Continuation extends Closure {
 
     void init () {
-	struct Parrot_Continuation * cc;
-	cc = new_continuation(interpreter);
-	PMC_data(SELF) = cc;
+        PMC_data(SELF) = new_continuation(INTERP);
 	SELF->cache.struct_val = NULL;
 	PObj_custom_mark_destroy_SETALL(SELF);
     }
 
-    void destroy () {
-        mem_sys_free(PMC_data(SELF));
-    }
-
 
     void mark () {
-        struct Parrot_Continuation * cc
-            = (struct Parrot_Continuation*)PMC_data(SELF);
+        struct Parrot_Sub * cc
+            = (struct Parrot_Sub*)PMC_data(SELF);
 	mark_stack(INTERP, cc->ctx.user_stack);
 	mark_stack(INTERP, cc->ctx.control_stack);
 	SUPER();	/* mark pad_stack, warns in closure */
@@ -41,22 +35,16 @@ pmclass Continuation extends Closure {
         return whoami;
     }
 
-    void clone (PMC *ret) {
-	struct Parrot_Continuation * retc
-	    = mem_sys_allocate(sizeof(struct Parrot_Continuation));
-	PMC_data(ret) = retc;
-	ret->cache.struct_val = SELF->cache.struct_val;
-	PObj_custom_mark_destroy_SETALL(ret);
-	memcpy(retc, PMC_data(SELF), sizeof(struct Parrot_Continuation));
-	/* we may have copied our stack already, so we need to re-COW
-	 * it */
-	stack_mark_cow(retc->ctx.user_stack);
-	stack_mark_cow(retc->ctx.control_stack);
+    void clone(PMC *ret) {
+	struct Parrot_Sub * sub;
+	SUPER(ret);
+	sub = PMC_data(ret);
+	stack_mark_cow(sub->ctx.user_stack);
+	stack_mark_cow(sub->ctx.control_stack);
     }
 
     void* invoke (void* next) {
-	struct Parrot_Continuation * cc
-	    = (struct Parrot_Continuation*)PMC_data(SELF);
+	struct Parrot_Sub * cc = (struct Parrot_Sub*)PMC_data(SELF);
 	restore_context(interpreter, &cc->ctx);
 	return SELF->cache.struct_val;
     }

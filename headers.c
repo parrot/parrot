@@ -225,6 +225,21 @@ buffer_unmake_COW(struct Parrot_Interp *interpreter, Buffer *src)
     return src;
 }
 
+Buffer *
+buffer_copy_if_diff(struct Parrot_Interp *interpreter, Buffer *src, Buffer *dst)
+{
+    Buffer *b;
+    /* if src and dst point to the same COWed bufstart,
+     * src hadn't changed yet
+     */
+    if (src->bufstart == dst->bufstart)
+        return dst;
+    b = new_buffer_header(interpreter);
+    Parrot_allocate(interpreter, b, src->buflen);
+    mem_sys_memcopy(b->bufstart, src->bufstart, src->buflen);
+    return b;
+}
+
 void *
 new_bufferlike_header(struct Parrot_Interp *interpreter, size_t size)
 {

@@ -28,32 +28,24 @@ pmclass Closure extends Sub {
    }
 
    void mark () {
-        struct Parrot_Closure * sub = (struct Parrot_Closure *)PMC_data(SELF);
+        struct Parrot_Sub * sub = (struct Parrot_Sub *)PMC_data(SELF);
         mark_stack(INTERP, sub->ctx.pad_stack);
-        pobject_lives(INTERP, sub->ctx.warns);
+        SUPER();	/* mark warns ... in class Sub */
    }
 
-   void destroy () {
-       struct Parrot_Closure * sub = (struct Parrot_Closure *)PMC_data(SELF);
-       stack_destroy(sub->ctx.pad_stack);
-       mem_sys_free(sub);
-   }
 
 
    void* invoke (void* next) {
-       struct Parrot_Closure * sub = (struct Parrot_Closure *)PMC_data(SELF);
+       struct Parrot_Sub * sub = (struct Parrot_Sub *)PMC_data(SELF);
        INTERP->ctx.pad_stack = sub->ctx.pad_stack;
-
        return SELF->cache.struct_val;
    }
 
    void clone (PMC *ret) {
-       struct Parrot_Closure * sub;
-       PObj_custom_mark_destroy_SETALL(ret);
-       sub = PMC_data(ret) = mem_sys_allocate(sizeof(struct Parrot_Closure));
-       memcpy(sub, PMC_data(SELF), sizeof(struct Parrot_Closure));
+       struct Parrot_Sub * sub;
+       SUPER(ret);
+       sub = PMC_data(ret);
        stack_mark_cow(sub->ctx.pad_stack);
-       ret->cache.struct_val = SELF->cache.struct_val;
    }
 
     void set_same (PMC* value) {
@@ -65,7 +57,7 @@ pmclass Closure extends Sub {
 	return (SELF->vtable == value->vtable &&
 		SELF->cache.struct_val == value->cache.struct_val &&
 		memcmp(PMC_data(value), PMC_data(SELF),
-		    sizeof(struct Parrot_Closure)) == 0);
+		    sizeof(struct Parrot_Sub)) == 0);
     }
 
 }

@@ -58,12 +58,21 @@ restore_context(struct Parrot_Interp *interp, struct Parrot_Context *ctx)
     memcpy(&interp->ctx, ctx, sizeof(*ctx));
 }
 
-struct Parrot_Closure *
-new_closure(struct Parrot_Interp *interp)
+struct Parrot_Sub *
+new_sub(struct Parrot_Interp *interp)
 {
     /* Using system memory until I figure out GC issues */
-    struct Parrot_Closure *newsub =
-        mem_sys_allocate(sizeof(struct Parrot_Closure));
+    struct Parrot_Sub *newsub =
+        mem_sys_allocate(sizeof(struct Parrot_Sub));
+    newsub->ctx.warns = interp->ctx.warns;
+    buffer_mark_COW(interp->ctx.warns);
+    return newsub;
+}
+
+struct Parrot_Sub *
+new_closure(struct Parrot_Interp *interp)
+{
+    struct Parrot_Sub *newsub = new_sub(interp);
     PMC * pad = scratchpad_get_current(interp);
     newsub->ctx.pad_stack = new_stack(interp, "Pad");
     if (pad) {
@@ -74,19 +83,19 @@ new_closure(struct Parrot_Interp *interp)
     return newsub;
 }
 
-struct Parrot_Coroutine *
+struct Parrot_Sub *
+new_continuation(struct Parrot_Interp *interp)
+{
+    struct Parrot_Sub *cc = new_sub(interp);
+    save_context(interp, &cc->ctx);
+    return cc;
+}
+
+struct Parrot_Sub *
 new_coroutine(struct Parrot_Interp *interp)
 {
-    /* Using system memory until I figure out GC issues */
-    PMC * pad = NULL;
-    struct Parrot_Coroutine *newco =
-        mem_sys_allocate(sizeof(struct Parrot_Coroutine));
-    newco->ctx.user_stack = new_stack(interp, "User");
-    newco->ctx.control_stack = interp->ctx.control_stack;
-    stack_mark_cow(newco->ctx.control_stack);
-    newco->ctx.pad_stack = new_stack(interp, "Pad");
-    newco->ctx.warns = interp->ctx.warns;
-    buffer_mark_COW(interp->ctx.warns);
+    PMC * pad;
+    struct Parrot_Sub *newco = new_continuation(interp);
 
     pad = scratchpad_get_current(interp);
 
@@ -95,15 +104,6 @@ new_coroutine(struct Parrot_Interp *interp)
                    STACK_ENTRY_PMC, STACK_CLEANUP_NULL);
     }
     return newco;
-}
-
-struct Parrot_Continuation *
-new_continuation(struct Parrot_Interp *interp)
-{
-    struct Parrot_Continuation *cc =
-        mem_sys_allocate(sizeof(struct Parrot_Continuation));
-    save_context(interp, &cc->ctx);
-    return cc;
 }
 
 

@@ -22,26 +22,18 @@ typedef struct Parrot_Lexicals {
     List * values;    /* lexicals go here */
     List * names;     /* names of lexicals go here */
 } * parrot_lexicals_t;
+
 /*
- * we currently use the same structure for all 3 sub types
- * so that we can unify the Sub classes
- * if one structure needs more data, pleas append them at the end
+ * all subroutines have the same structure, mainly a interpreter->ctx
  */
-typedef struct Parrot_Closure {
+typedef struct Parrot_Sub {
     struct Parrot_Context ctx;
 } * parrot_sub_t;
 
-typedef struct Parrot_Coroutine {
-    struct Parrot_Context ctx;
-} * parrot_coroutine_t;
-
-typedef struct Parrot_Continuation {
-    struct Parrot_Context ctx;
-} * parrot_continuation_t;
-
-struct Parrot_Closure * new_closure(struct Parrot_Interp * interp);
-struct Parrot_Coroutine * new_coroutine(struct Parrot_Interp * interp);
-struct Parrot_Continuation * new_continuation(struct Parrot_Interp * interp);
+struct Parrot_Sub * new_sub(struct Parrot_Interp * interp);
+struct Parrot_Sub * new_closure(struct Parrot_Interp * interp);
+struct Parrot_Sub * new_coroutine(struct Parrot_Interp * interp);
+struct Parrot_Sub * new_continuation(struct Parrot_Interp * interp);
 
 PMC * new_continuation_pmc(struct Parrot_Interp * interp, opcode_t * address);
 

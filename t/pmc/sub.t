@@ -1,6 +1,6 @@
 #! perl -w
 
-use Parrot::Test tests => 36;
+use Parrot::Test tests => 37;
 use Test::More;
 
 output_is(<<'CODE', <<'OUTPUT', "PASM subs - newsub");
@@ -388,5 +388,27 @@ _func:
     invoke P1
 CODE
 /^main:Use of uninitialized value in integer context at.*:back$/sm
+OUTPUT
+
+output_like(<<'CODE', <<'OUTPUT', "interp - warnings 2");
+    warningson 1
+    newsub .Sub, .Continuation, _func, _ret
+    new P10, .PerlUndef
+    set I0, P10
+    printerr ":main"
+    invoke
+_ret:
+    printerr ":back:"
+    new P10, .PerlUndef
+    set I0, P10
+    printerr ":end"
+    end
+_func:
+    warningsoff 1
+    new P0, .PerlUndef
+    set I0, P0
+    invoke P1
+CODE
+/^Use of uninitialized value in integer context at.*:main:back:Use of un.*$/sm
 OUTPUT
 1;
