@@ -53,7 +53,7 @@ $(INC)/oplib/core_ops_prederef.h
 
 GEN_SOURCES = core_ops.c core_ops_prederef.c
 
-GEN_MODULES = lib/Parrot/Jit.pm lib/Parrot/OpLib/core.pm lib/Parrot/PMC.pm
+GEN_MODULES = lib/Parrot/Jit.pm lib/Parrot/OpLib/core.pm
 
 FLUID_FILES = $(GEN_OPSFILES) $(GEN_HEADERS) $(GEN_SOURCES) $(GEN_MODULES)
 
