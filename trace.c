@@ -50,6 +50,10 @@ trace_op_dump(struct Parrot_Interp *interpreter, opcode_t *code_start,
                         (char *)interpreter->code->const_table->
                         constants[*(pc + i)]->string->bufstart);
                 break;
+            case PARROT_ARG_KC:
+                /* what will a KEY constant look like? */
+                fprintf(stderr, "%ld", (long)*(pc + i));
+                break;
             case PARROT_ARG_I:
                 fprintf(stderr, "I%ld=%ld", (long)*(pc + i),
                         (long)interpreter->int_reg.registers[*(pc + i)]);
@@ -72,6 +76,11 @@ trace_op_dump(struct Parrot_Interp *interpreter, opcode_t *code_start,
                 else {
                     fprintf(stderr, "S%ld=(null)", (long)*(pc + i));
                 }
+                break;
+            case PARROT_ARG_K:
+                /* what does a KEY constant look like? */
+                fprintf(stderr, "K%ld=%p", (long)*(pc + i),
+                        interpreter->pmc_reg.registers[*(pc + i)]);
                 break;
             case PARROT_ARG_OP:
                 /* this isn't handled, so at least report the error

@@ -154,6 +154,7 @@ sub read_ops
     #   nc   Number constant index
     #   pc   PMC constant index
     #   sc   String constant index
+    #   kc   Key constant index
     #
 
     if (/^(inline\s+)?op\s+([a-zA-Z]\w*)\s*\((.*)\)\s*{/) {
@@ -173,7 +174,7 @@ sub read_ops
       my @temp = ();
 
       foreach my $arg (@args) {
-	my ($use, $type) = $arg =~ m/^(in|out|inout|inconst|invar)\s+(INT|NUM|STR|PMC)$/i;
+	my ($use, $type) = $arg =~ m/^(in|out|inout|inconst|invar)\s+(INT|NUM|STR|PMC|KEY)$/i;
 
         die "Unrecognized arg format '$arg' in '$_'!" unless defined($use) and defined($type);
 

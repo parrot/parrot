@@ -29,11 +29,13 @@ typedef enum {
     PARROT_ARG_NC,
     PARROT_ARG_PC,
     PARROT_ARG_SC,
+    PARROT_ARG_KC,
 
     PARROT_ARG_I,
     PARROT_ARG_N,
     PARROT_ARG_P,
-    PARROT_ARG_S
+    PARROT_ARG_S,
+    PARROT_ARG_K,
 } arg_type_t;
 
 typedef enum {

@@ -693,6 +693,24 @@ inline op get_keyed(out PMC, in PMC, in STR) {
   goto NEXT();
 }
 
+=item B<set>(out INT, in PMC, in KEY)
+
+Not implemented yet, working on it
+
+=item B<set>(out PMC, inconst KEY, inconst INT)
+
+=cut
+
+inline op set(out INT, in PMC, in KEY) {
+  fprintf(stderr,"*** calling keyed set\n");
+  goto NEXT();
+}
+
+inline op set(out PMC, inconst KEY, inconst INT) {
+  fprintf(stderr,"*** calling keyed set\n");
+  goto NEXT();
+}
+
 =item B<set_keyed>(out PMC, out PMC, in PMC, in PMC)
 
     $1[$2] = $3[$4];
