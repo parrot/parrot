@@ -29,7 +29,8 @@ Parrot_warn(struct Parrot_Interp *interpreter, INTVAL warnclass,
     if (PIO_eprintf(interpreter, "%S%S.\n",
             targ,
             interpreter ? Parrot_sprintf_c(
-                interpreter, " at %S line %d", interpreter->current_file, interpreter->current_line
+                interpreter, " at %S line %d", interpreter->current_file, 
+                                               interpreter->current_line
             ) : NULL
         ) < 0)
     {
@@ -64,7 +65,8 @@ Parrot_warn_s(struct Parrot_Interp *interpreter, INTVAL warnclass,
     if (PIO_eprintf(interpreter, "%S%S.\n",
             targ,
             interpreter ? Parrot_sprintf_c(
-                interpreter, " at %S line %d", interpreter->current_file, interpreter->current_line
+                interpreter, " at %S line %d", interpreter->current_file,
+                                               interpreter->current_line
             ) : NULL
         ) < 0)
     {

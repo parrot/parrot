@@ -264,7 +264,6 @@ setup_argv(struct Parrot_Interp *interpreter, int argc, char ** argv)
 void
 Parrot_runcode(struct Parrot_Interp *interpreter, int argc, char *argv[])
 {
-
     /* Debugging mode nonsense. */
     if (Interp_flags_TEST(interpreter, PARROT_DEBUG_FLAG)) {
         PIO_eprintf(interpreter, "*** Parrot VM: Debugging enabled. ***\n");

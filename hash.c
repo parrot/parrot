@@ -146,7 +146,8 @@ mark_hash(Interp *interpreter, HASH *hash, PMC *end_of_used_list)
         while (bucket) {
             buffer_lives(interpreter, (Buffer *)bucket->key);
             if (bucket->value.type == enum_hash_string)
-                buffer_lives(interpreter, (Buffer *)bucket->value.val.string_val);
+                buffer_lives(interpreter,
+                             (Buffer *)bucket->value.val.string_val);
             else if (bucket->value.type == enum_hash_pmc)
                 end_of_used_list = mark_used(bucket->value.val.pmc_val,
                                              end_of_used_list);

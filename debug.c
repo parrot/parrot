@@ -331,8 +331,9 @@ PDB_run_command(struct Parrot_Interp *interpreter, const char *command)
                 PDB_run_command(interpreter,pdb->last_command);
             break;
         default:
-            PIO_eprintf(interpreter, "Undefined command: \"%s\".  Try \"help\".",
-                    command);
+            PIO_eprintf(interpreter,
+                        "Undefined command: \"%s\".  Try \"help\".",
+                        command);
             break;
     }
 }
@@ -578,7 +579,8 @@ PDB_set_break(struct Parrot_Interp *interpreter, const char *command)
 
         /* Abort if the line number provided doesn't exists */
         if (!line->next) {
-            PIO_eprintf(interpreter, "Can't set a breakpoint at line number %li\n",ln);
+            PIO_eprintf(interpreter, 
+                        "Can't set a breakpoint at line number %li\n",ln);
             return;
         }
     }
@@ -603,13 +605,15 @@ PDB_set_break(struct Parrot_Interp *interpreter, const char *command)
 
     /* Revive the breakpoint if was deleted */
     if (sbreak && sbreak->skip == -1) {
-        PIO_fprintf(interpreter, PIO_STDERR(interpreter),"Breakpoint %li at line %li\n",i,line->number);
+        PIO_fprintf(interpreter, PIO_STDERR(interpreter),
+                    "Breakpoint %li at line %li\n",i,line->number);
         sbreak->skip = 0;
         return;
     }
     /* Don't do anything if there is already a breakpoint at this line */
     if (sbreak) {
-        PIO_fprintf(interpreter, PIO_STDERR(interpreter),"Breakpoint %li already at line %li\n",i,line->number);
+        PIO_fprintf(interpreter, PIO_STDERR(interpreter),
+                    "Breakpoint %li already at line %li\n",i,line->number);
         return;
     }
 
@@ -1033,11 +1037,13 @@ PDB_disassemble_op(struct Parrot_Interp *interpreter, char* dest, int space,
                 if (file) {
                     dest[size++] = 'L';
                     i = PDB_add_label(file, op, op[j]);
-                } else if (code_start) {
+                }
+                else if (code_start) {
                     dest[size++] = 'O';
                     dest[size++] = 'P';
                     i = op[j] + (op - code_start);
-                } else {
+                }
+                else {
                     if (op[j] > 0) dest[size++] = '+';
                     i = op[j];
                 }

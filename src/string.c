@@ -205,11 +205,11 @@ string_make(struct Parrot_Interp *interpreter, const void *buffer,
 
     s = new_string_header(interpreter, flags);
     if (flags & BUFFER_external_FLAG) {
-	/* The following cast discards the 'const'.  That raises
-	   a warning with gcc, but is ok since the caller indicated
-	   it was safe by setting BUFFER_external_FLAG.
-	   (The cast is necessary to pacify TenDRA's tcc.)
-	*/
+        /* The following cast discards the 'const'.  That raises
+           a warning with gcc, but is ok since the caller indicated
+           it was safe by setting BUFFER_external_FLAG.
+           (The cast is necessary to pacify TenDRA's tcc.)
+        */
         s->bufstart = (void *) buffer;
         s->buflen = buflen;
     }

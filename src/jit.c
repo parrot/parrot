@@ -229,7 +229,8 @@ END_SECTION:
                     cur_section->float_reg_usage[i] = i;
 #endif
                 }
-            } else {
+            }
+            else {
                 cur_section = NULL;
             }
         } 
@@ -381,7 +382,8 @@ END_SECTION:
     cur_section = optimizer->sections;
     while (cur_section) {
         PIO_eprintf(interpreter, "\nSection:\n");
-        PIO_eprintf(interpreter, "%s\n", (cur_section->type) ? "JITTED" : "NOT JITTED");
+        PIO_eprintf(interpreter, "%s\n",
+                    (cur_section->type) ? "JITTED" : "NOT JITTED");
         for (cur_op = cur_section->begin; cur_op <= cur_section->end; ) {
             char instr[256];
             op_info = &interpreter->op_info_table[*cur_op];
@@ -414,11 +416,14 @@ END_SECTION:
             PIO_eprintf(interpreter, "%i ", cur_section->float_reg_usage[i]);
         PIO_eprintf(interpreter, "\n\tFloat register direction:\t");
         for (i = 0; i < NUM_REGISTERS; i++)
-            PIO_eprintf(interpreter, "%i ", (int)cur_section->float_reg_dir[i]);
+            PIO_eprintf(interpreter, "%i ",
+                        (int)cur_section->float_reg_dir[i]);
         PIO_eprintf(interpreter, "\n\tFloat Registers used:\t%i\n", 
             cur_section->float_registers_used);
-        PIO_eprintf(interpreter, "\tJit opcodes:\t%u\n", cur_section->jit_op_count);
-        PIO_eprintf(interpreter, "\tTotal opcodes:\t%u\n", cur_section->op_count);
+        PIO_eprintf(interpreter, "\tJit opcodes:\t%u\n",
+                    cur_section->jit_op_count);
+        PIO_eprintf(interpreter, "\tTotal opcodes:\t%u\n", 
+                    cur_section->op_count);
         cur_section = cur_section->next;
     }
 #endif

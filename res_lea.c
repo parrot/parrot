@@ -1,6 +1,7 @@
 /* resources */
 #include <assert.h>
 #include "parrot/parrot.h"
+
 void
 Parrot_go_collect(struct Parrot_Interp *interpreter)
 {
@@ -9,6 +10,7 @@ Parrot_go_collect(struct Parrot_Interp *interpreter)
     }
     interpreter->collect_runs++;        /* fake it */
 }
+
 void *
 Parrot_reallocate(struct Parrot_Interp *interpreter, void *from, size_t size)
 {
@@ -17,7 +19,7 @@ Parrot_reallocate(struct Parrot_Interp *interpreter, void *from, size_t size)
     size_t oldlen = buffer->buflen;
     p =  realloc(buffer->bufstart, size);
     if (size > buffer->buflen)
-	memset((char*)p + oldlen, 0, size - oldlen);
+        memset((char*)p + oldlen, 0, size - oldlen);
     buffer->buflen = size;
     buffer->bufstart = p;
     return p;
