@@ -131,11 +131,11 @@ Parrot_runops_fromc(Parrot_Interp interpreter, PMC *sub)
      * Passing a dummy true destination copies registers
      */
     dest = VTABLE_invoke(interpreter, sub, (void*) 1);
+    if (!dest)
+        internal_exception(1, "Subroutine retuned a NULL address");
     bp = interpreter->ctx.bp;
-    if (dest) {
-        offset = dest - interpreter->code->byte_code;
-        runops(interpreter, offset);
-    }
+    offset = dest - interpreter->code->byte_code;
+    runops(interpreter, offset);
     REG_PMC(1) = p1;
     return bp;
 }
@@ -232,6 +232,8 @@ runops_args(Parrot_Interp interpreter, PMC *sub, PMC *obj,
     interpreter->ctx.current_cont = ret_c;
     interpreter->ctx.current_object = obj;
     dest = VTABLE_invoke(interpreter, sub, NULL);
+    if (!dest)
+        internal_exception(1, "Subroutine retuned a NULL address");
 
     /*
      * count arguments, check for overflow
@@ -343,10 +345,8 @@ runops_args(Parrot_Interp interpreter, PMC *sub, PMC *obj,
     }
 
     bp = interpreter->ctx.bp;
-    if (dest) {
-        offset = dest - interpreter->code->byte_code;
-        runops(interpreter, offset);
-    }
+    offset = dest - interpreter->code->byte_code;
+    runops(interpreter, offset);
     return bp;
 }
 
@@ -425,11 +425,11 @@ Parrot_run_meth_fromc(Parrot_Interp interpreter,
     REG_PMC(1) = new_ret_continuation_pmc(interpreter, NULL);
     interpreter->ctx.current_object = obj;
     dest = VTABLE_invoke(interpreter, sub, (void*)1);
+    if (!dest)
+        internal_exception(1, "Subroutine retuned a NULL address");
     bp = interpreter->ctx.bp;
-    if (dest) {
-        offset = dest - interpreter->code->byte_code;
-        runops(interpreter, offset);
-    }
+    offset = dest - interpreter->code->byte_code;
+    runops(interpreter, offset);
     REG_PMC(1) = p1;
     REG_PMC(2) = p2;
     REG_STR(0) = s0;

@@ -207,9 +207,8 @@ Set $1 to a string reprentation of $2
 
 =cut
 
-inline op get_repr(out STR, in PMC) {
-    STRING *s = $2->vtable->get_repr(interpreter, $2);
-    $1 = s;
+op get_repr(out STR, in PMC) {
+    $1 = $2->vtable->get_repr(interpreter, $2);
     goto NEXT();
 }
 
