@@ -25,6 +25,7 @@ library search path. Right now the parrot library search path consists of
 This is executed when you call getopt_demo.imc
 
 =cut
+
 .sub _main prototyped
   .param PerlArray argv
 
@@ -157,6 +158,7 @@ Print the usage message.
 TODO: Pass a flag for EXIT_FAILURE and EXIT_SUCCESS
 
 =cut
+
 .sub _usage prototyped
   .param string program_name
 
