@@ -29,12 +29,17 @@ my $line;    # Current source line number
 
 my %ident;   # Identifiers
 
-my %regs = ( # Registers
-  I => [ { USE => 'temp' } ], # $regs{I}[0] reserved for int  temporaries
-  N => [ { USE => 'temp' } ], # $regs{N}[0] reserved for num  temporaries
-  P => [ { USE => 'temp' } ], # $regs{P}[0] reserved for poly temporaries
-  S => [ { USE => 'temp' } ], # $regs{S}[0] reserved for str  temporaries
+my %reg_count = ( # Registers
+  I => 0,
+  N => 0,
+  P => 0,
+  S => 0
 );
+
+sub temp_reg { my $type = shift; return '$$' . $type . $reg_count{$type}++; }
+sub temp_int { return temp_reg('I'); }
+sub temp_num { return temp_reg('N'); }
+sub temp_str { return temp_reg('S'); }
 
 my %types = (
  'I' => 'int',
@@ -551,7 +556,7 @@ sub type_of
 {
   my $value = shift;
 
-  return substr($value, 0, 1) if reg_q($value);
+  return substr($value, 2, 1) if reg_q($value);
 
   if ($value =~ m/^\$\$([INPS])\d+$/) { # IMCC "VIRTUAL" REGISTERS ($$I99 to jakoc, $I99 to imcc)
     return $1;
@@ -663,7 +668,7 @@ sub op_comp
   my $a_type = type_of($a);
   my $b_type = type_of($b);
 
-  if (int_or_num_q($b)) {
+  if (int_or_num_lit_q($b)) {
     #
     # reg-const comparisons:
     #
@@ -672,8 +677,9 @@ sub op_comp
     #
 
     if ($a_type eq 'I' and num_q($b)) {
-      emit_code('set', ['$$N0', $a]);
-      $a = '$$N0'; # XXX: Could confuse type_of()
+      my $temp = temp_num();
+      emit_code('set', [$temp, $a]);
+      $a = $temp;
     }
   } else {
     #
@@ -682,11 +688,13 @@ sub op_comp
 
     if ($a_type ne $b_type) {
       if ($a_type eq 'I') {
-        emit_code('set', ['$$N0', $a]);
-        $a = '$$N0'; # XXX: Could confuse type_of()
+        my $temp = temp_num();
+        emit_code('set', [$temp, $a]);
+        $a = $temp;
       } elsif ($b_type eq 'I') {
-        emit_code('set', ['$$N0', $b]);
-        $b = '$$N0'; # XXX: Could confuse type_of()
+        my $temp = temp_num();
+        emit_code('set', [$temp, $b]);
+        $b = $temp;
       } else {
         confess "jakoc: Internal compiler error. Expected to have to use iton op.";
       }
@@ -918,37 +926,34 @@ sub declare_var
 
   my $block = top_block();
 
-  my $num;
-  my $reg;
+#  my $num;
+#  my $reg;
   my $value;
 
   if ($class eq 'param') {
-    $num   = undef;
-    $reg   = undef;
+#    $num   = undef;
+#    $reg   = undef;
     $value = "\$$ident";
   }
   elsif ($class eq 'local') {
-    $num   = undef;
-    $reg   = undef;
+#    $num   = undef;
+#    $reg   = undef;
     $value = "\$$ident";
   }
+  elsif ($class eq 'global') {
+#    $num   = undef;
+#    $reg   = undef;
+    $value = temp_reg($type);
+  }
   else {
-    my $reg_num = scalar @{$regs{$type}};
-
-    $regs{$type}[$reg_num]{LINE}  = $line;
-    $regs{$type}[$reg_num]{NAME}  = $ident;
-    $regs{$type}[$reg_num]{BLOCK} = $block;
-
-    $num   = $reg_num;
-    $reg   = "$type$reg_num";
-    $value = "$type$reg_num";
+    confess "Unexpected class '$class'";
   }
 
   $block->{IDENT}{$ident}{LINE}  = $line;
   $block->{IDENT}{$ident}{TYPE}  = $type;
   $block->{IDENT}{$ident}{CLASS} = $class;
-  $block->{IDENT}{$ident}{NUM}   = $num;
-  $block->{IDENT}{$ident}{REG}   = $reg;
+#  $block->{IDENT}{$ident}{NUM}   = $num;
+#  $block->{IDENT}{$ident}{REG}   = $reg;
   $block->{IDENT}{$ident}{VALUE} = $value;
 
   #
@@ -1189,34 +1194,25 @@ sub map_args
     $arg =~ s/^\s+//;
     $arg =~ s/\s+$//;
 
-    #
-    # Attempt to find the argument as an identifier.
-    #
-    # NOTE: This lookup doesn't give the info itself, but rather a hashref with
-    # the LEVELS away the definition was found, and IDENT with the actual info
-    # about the identifier.
-    #
-    # TODO: This isn't the most efficient way to do this. We really should do
-    # some pattern matches first, and *then* the lookup.
-    #
-
-    my $arg_ident_info = find_ident($arg);
-
-    if (defined $arg_ident_info) {
-      $arg_ident_info = $arg_ident_info->{IDENT};
-
-      confess "jakoc: Internal compiler error: Unable to fetch value for identifier '$arg'!"
-        unless defined $arg_ident_info->{VALUE};
-      push @result, $arg_ident_info->{VALUE};
-    } elsif ($arg =~ m/^"/) {
+    if (lit_q($arg)) {
       push @result, $arg;
-    } elsif (int_q($arg)) {
-      push @result, $arg;
-    } elsif (num_q($arg)) {
-      push @result, $arg;
-    } else {
-      printf(STDERR "jakoc: Unrecognized argument '%s' on line %d.\n", $arg, $line);
-      push @result, "<err>";
+    }
+    elsif (reg_q($arg)) {
+      push @result, substr($arg, 1, );
+    }
+    else {
+      my $arg_ident_info = find_ident($arg);
+
+      if (defined $arg_ident_info) {
+        $arg_ident_info = $arg_ident_info->{IDENT};
+
+        confess "jakoc: Internal compiler error: Unable to fetch value for identifier '$arg'!"
+          unless defined $arg_ident_info->{VALUE};
+        push @result, $arg_ident_info->{VALUE};
+      } else {
+        printf(STDERR "jakoc: Unrecognized argument '%s' on line %d.\n", $arg, $line);
+        push @result, "<err>";
+      }
     }
   }
 
@@ -1287,12 +1283,8 @@ sub void_func
 #      }
     }
 
-#    emit_code 'save', [  scalar(@args) ]; # Push the arg count.
+    emit_code "call", [ "_$name" ];
 
-#    emit_code "bsr", [ $name ];
-     emit_code "call", [ "_$name" ];
-
-#    emit_code 'restore', [ 'I0' ]; # Pop off the result count.
   } else {
     printf(STDERR "jakoc: Call to unrecognized void function '%s' on line %d (Not in {%s}).\n",
       $name, $line, join(", ", sort keys %subs));
@@ -1356,13 +1348,9 @@ sub assign_func
 #      }
     }
 
-#    emit_code('save', [ scalar(@args) ]); # Save the arg count.
-
     #
     # Now, we can jump to the subroutine's entry point:
     #
-
-#    emit_code('bsr', [ $name ]);
 
     emit_code('call', [ "_$name" ]);
 
@@ -1370,9 +1358,6 @@ sub assign_func
     # Our calling convention dictates that upon return from the subroutine,
     # the result will be on the top of the stack.
     #
-
-#    emit_code('restore', [ 'I0' ]);     # Pop off the result count
-#    emit_code('restore', [ $dest ]);
 
     emit_code('.result', [ $dest ]);
   } else {
@@ -1551,8 +1536,6 @@ sub begin_sub_block
   #
   # TODO: Should we bother checking that argc is what we expected?
   #
-
-#  emit_code 'restore', [ 'I0' ]; # Pop off the arg count.
 
   foreach my $formal_arg (@formal_args) {
     my ($arg_type, $arg_name) = @$formal_arg;
@@ -1797,15 +1780,15 @@ sub end_block
     foreach my $ident (keys %{$block->{IDENT}}) {
       my $ident_info = $block->{IDENT}{$ident};
 
-      if (defined $ident_info->{NUM}) {
-        undef $regs{$ident_info->{TYPE}}[$ident_info->{NUM}];
-      }
+#      if (defined $ident_info->{NUM}) {
+#        undef $regs{$ident_info->{TYPE}}[$ident_info->{NUM}];
+#      }
     }
 
-    $regs{'I'} = [ grep { defined } @{$regs{I}} ];
-    $regs{'N'} = [ grep { defined } @{$regs{N}} ];
+#    $regs{'I'} = [ grep { defined } @{$regs{I}} ];
+#    $regs{'N'} = [ grep { defined } @{$regs{N}} ];
 #    $regs{'P'} = [ grep { defined } @{$regs{P}} ];
-    $regs{'S'} = [ grep { defined } @{$regs{S}} ];
+#    $regs{'S'} = [ grep { defined } @{$regs{S}} ];
 
     #
     # Erase all the identifiers. Since the block might have been pushed
@@ -1996,7 +1979,7 @@ sub do_add
       if ($dest eq $b && int_q($a)) {
         emit_code('add', [$dest, $a]);
       } else {
-        my $temp = int_q($a) ? '$$I0' : '$$N0';
+        my $temp = int_q($a) ? temp_int() : temp_num();
         emit_code('set', [$temp, $a]);
         emit_code('add', [$dest, $temp, $b]);
       }
@@ -2008,7 +1991,7 @@ sub do_add
       if ($dest eq $a && int_q($b)) {
         emit_code('add', [$dest, $b]);
       } else {
-        my $temp = int_q($b) ? '$$I0' : '$$N0';
+        my $temp = int_q($b) ? temp_int() : temp_num();
         emit_code('set', [$temp, $b]);
         emit_code('add', [$dest, $a, $temp]);
       }
@@ -2068,7 +2051,7 @@ sub do_sub
       if ($dest eq $b && int_q($a)) {
         emit_code('sub', [$dest, $a]);
       } else {
-        my $temp = int_q($a) ? '$$I0' : '$$N0';
+        my $temp = int_q($a) ? temp_int() : temp_num();
         emit_code('set', [$temp, $a]);
         emit_code('sub', [$dest, $temp, $b]);
       }
@@ -2080,7 +2063,7 @@ sub do_sub
       if ($dest eq $a && int_q($b)) {
         emit_code('sub', [$dest, $b]);
       } else {
-        my $temp = int_q($b) ? '$$I0' : '$$N0';
+        my $temp = int_q($b) ? temp_int() : temp_num();
         emit_code('set', [$temp, $b]);
         emit_code('sub', [$dest, $a, $temp]);
       }
@@ -2137,7 +2120,7 @@ sub do_mul
       $temp .= ".0" if (num_q($a) or num_q($b)) and not $temp =~ m/\./;
       emit_code('set', [$dest, $temp]);
     } elsif (reg_q($b) or var_q($b)) {
-      my $temp = int_q($a) ? '$$I0' : '$$N0';
+      my $temp = int_q($a) ? temp_int() : temp_num();
       emit_code('set', [$temp, $a]);
       emit_code('mul', [$dest, $temp, $b]);
     } else {
@@ -2145,7 +2128,7 @@ sub do_mul
     }
   } elsif (reg_q($a) or var_q($a)) {
     if (int_or_num_lit_q($b)) {
-      my $temp = int_q($b) ? '$$I0' : '$$N0';
+      my $temp = int_q($b) ? temp_int() : temp_num();
       emit_code('set', [$temp, $b]);
       emit_code('mul', [$dest, $a, $temp]);
     } elsif (reg_q($b) or var_q($b)) {
@@ -2171,16 +2154,24 @@ sub do_div
 
   ($dest, $a, $b) = map_args($dest, $a, $b);
 
-  if (type_of($dest) ne type_of($a)) {
-    my $temp = int_q($dest) ? '$$I0' : '$$N0';
+  my $dest_type = type_of($dest);
+  my $a_type    = type_of($a);
+  my $b_type    = type_of($b);
+
+  if ($dest_type ne $a_type) {
+    warn "Converting a ($a) from $a_type to $dest_type";
+    my $temp = temp_reg($dest_type);
     emit_code('set', [$temp, $a]);
     $a = $temp;
+    $a_type = $dest_type;
   }
 
-  if (type_of($dest) ne type_of($a)) {
-    my $temp = int_q($dest) ? '$$I1' : '$$N1';
+  if ($dest_type ne $b_type) {
+    warn "Converting b ($b) from $b_type to $dest_type";
+    my $temp = int_q($dest) ? temp_int() : temp_num();
     emit_code('set', [$temp, $b]);
     $b = $temp;
+    $b_type = $dest_type;
   }
 
   #
@@ -2233,7 +2224,7 @@ sub do_mod
     if (int_lit_q($b)) {
       emit_code('set', [$dest, $a % $b]);
     } elsif (reg_q($b) or var_q($b)) {
-      my $temp = '$$I0';
+      my $temp = temp_int();
       emit_code('set', [$temp, $a]);
       emit_code('mod', [$dest, $temp, $b]);
     } else {
@@ -2241,7 +2232,7 @@ sub do_mod
     }
   } elsif (reg_q($a) or var_q($a)) {
     if (int_lit_q($b)) {
-      my $temp = '$$I0';
+      my $temp = temp_int();
       emit_code('set', [$temp, $b]);
       emit_code('mod', [$dest, $a, $temp]);
     } elsif (reg_q($b) or var_q($b)) {
@@ -2421,7 +2412,7 @@ while(<>) {
       (m/^var\s+(n)um\s+([A-Za-z][A-Za-z0-9_]*)(\s*=\s*(-?\d+(\.\d+)))?$/) ||
       (m/^var\s+(s)tr\s+([A-Za-z][A-Za-z0-9_]*)(\s*=\s*(\"[^\\\"]*(?:\\.[^\\\"]*)*\"))?$/)
   ) { 
-    declare_var($2, uc($1), 'local');
+    declare_var($2, uc($1), $block_count ? 'local' : 'global');
     assign_var($2, uc($1), $4) if defined $4;
     next;
   }
@@ -2444,7 +2435,7 @@ while(<>) {
       (m/^var\s+(s)tr\s+(([A-Za-z][A-Za-z0-9_]*)(\s*,\s*[A-Za-z][A-Za-z0-9_]*)+)(\s*=\s*(\"[^\\\"]*(?:\\.[^\\\"]*)*\"))?$/)
   ) {
     foreach my $var (split(/\s*,\s*/, $2)) {
-      declare_var($var, uc($1), 'local');
+      declare_var($var, uc($1), $block_count ? 'local' : 'global');
       assign_var($var, uc($1), $6) if defined $6;
     }
     next;
@@ -2457,7 +2448,7 @@ while(<>) {
   #
 
   if (m/^var\s+poly\s+([A-Za-z][A-Za-z0-9_]*)$/) {
-    declare_var($2, 'P', 'local');
+    declare_var($2, 'P', $block_count ? 'local' : 'global');
     next;
   }
 
