@@ -62,11 +62,13 @@ A preamble, consisting of code to be copied directly to the .c file
 
 =item 2.
 
-pmclass PMCNAME [extends PMCPARENT] [flags] {
+The C<pmclass> declaration:
+
+	pmclass PMCNAME [extends PMCPARENT] [flags] {
+
+where C<flags> are:
 
 =over 4
-
-=head2 pmclass flags
 
 =item extends PMCPARENT
 
@@ -109,13 +111,13 @@ The default is "scalar". Other currently used interfaces are:
 
 =back
 
-=item 3.
+=item 3. 
 
 A list of vtable method implementations
 
-=item 4.
+=item 4. 
 
-The final close }
+The final close C<}>
 
 =back
 
