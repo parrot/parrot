@@ -37,7 +37,7 @@ in C<*destination>.
 static void
 integer_divide(Parrot_Interp interp, PMC* self, PMC* value, PMC* destination) {
      INTVAL result;
-     result = VTABLE_get_integer(interp, self) / VTABLE_get_integer(interp, value);
+     result = PMC_int_val(self) / VTABLE_get_integer(interp, value);
      VTABLE_set_integer_native(interp, destination, result);
 }
 

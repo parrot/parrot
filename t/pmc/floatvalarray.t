@@ -16,7 +16,7 @@ Tests the C<FloatvalArray> PMC.
 
 =cut
 
-use Parrot::Test tests => 8;
+use Parrot::Test tests => 9;
 use Test::More;
 
 output_is(<<'CODE', <<'OUTPUT', 'creation');
@@ -111,3 +111,11 @@ CODE
 3
 OUTPUT
 
+output_is(<<'CODE', <<'OUTPUT', 'set array size');
+    new P0, .FloatvalArray
+    set P0, 10
+    print "Done\n"
+    end
+CODE
+Done
+OUTPUT

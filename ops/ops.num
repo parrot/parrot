@@ -1451,3 +1451,7 @@ setattribute_p_sc_p     1423
 fetchmethod_p_p_s       1424
 fetchmethod_p_p_sc      1425
 setref_p_p      1426
+sqrt_n_i        1427
+sqrt_n_ic       1428
+sqrt_n_n        1429
+sqrt_n_nc       1430

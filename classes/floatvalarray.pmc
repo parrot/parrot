@@ -85,7 +85,9 @@ Sets C<value> at index C<key>.
     }
 
     void set_integer_native(INTVAL len) {
-        list_set_length(INTERP, (List*) PMC_struct_val(SELF), len);
+        FLOATVAL nul = 0.0;
+        list_assign(INTERP, (List*) PMC_struct_val(SELF), len-1, &nul,
+                enum_type_FLOATVAL);
     }
 
     INTVAL get_integer() {
