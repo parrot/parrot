@@ -1,0 +1,78 @@
+#
+# Makefile
+#
+# $Id$
+#
+
+DIR=languages/scheme
+TOOL_DIR=../..
+ASM=./assemble.pl
+SCHEMEC=./schemec
+INTERP=./test_prog
+
+#
+# Default target:
+#
+
+default: test
+#	echo "make: Makefile: no default target"
+
+foo: foo.scheme schemec
+	$(SCHEMEC) foo.scheme > foo.pasm
+	cd $(TOOL_DIR); perl $(ASM) $(DIR)/foo.pasm > $(DIR)/foo.pbc
+	cd $(TOOL_DIR); $(INTERP) $(DIR)/foo.pbc
+	cat foo.pasm
+
+#
+# Compilation:
+#
+
+test.pasm: test.scheme schemec
+	$(SCHEMEC) test.scheme > test.pasm
+
+and.pasm: and.scheme schemec
+	$(SCHEMEC) and.scheme > and.pasm
+
+foo.pasm: foo.scheme schemec
+	$(SCHEMEC) foo.scheme > foo.pasm
+
+#
+# Assembly:
+#
+
+test.pbc: test.pasm
+	cd $(TOOL_DIR); $(ASM) $(DIR)/test.pasm > $(DIR)/test.pbc
+
+and.pbc: and.pasm
+	cd $(TOOL_DIR); $(ASM) $(DIR)/and.pasm > $(DIR)/and.pbc
+
+foo.pbc: foo.pasm
+	cd $(TOOL_DIR); $(ASM) $(DIR)/foo.pasm > $(DIR)/foo.pbc
+
+#
+# Other targets:
+#
+
+all: test.pbc and.pbc foo.pbc
+
+clean:
+	rm -f \
+foo.pasm foo.pbc \
+t/*/*.pasm \
+t/*/*.pbc \
+t/*/*.scheme \
+t/*/*.out
+
+over:
+	@make clean
+	@make all
+
+test:
+	t/harness
+#	cd $(TOOL_DIR); $(INTERP) $(DIR)/test.pbc
+#	cd $(TOOL_DIR); $(INTERP) $(DIR)/and.pbc
+#	cd $(TOOL_DIR); $(INTERP) $(DIR)/foo.pbc
+
+#
+# End of file.
+#

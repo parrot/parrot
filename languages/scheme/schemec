@@ -1,0 +1,17 @@
+#!/usr/bin/perl -w
+
+use strict;
+use lib '.';
+use Scheme;
+
+sub Usage {
+  print <<_EOF_;
+usage: $0 <file.scheme>
+_EOF_
+  exit;
+}
+
+defined $ARGV[0] or Usage();
+$ARGV[0]=~/.scheme$/i or Usage();
+
+Scheme->new($ARGV[0])->compile();

@@ -1,0 +1,8 @@
+#!/usr/bin/perl -w
+
+use strict;
+use Test::Harness qw(runtests);
+use lib '../..';
+
+my @tests = map { glob( "t/$_/*.t" ) } ( qw(io arith logic) );
+runtests( @tests );
