@@ -4,8 +4,6 @@ if ($libs !~ /-lpthread/) {
     $libs .= ' -lpthread';
 }
 
-$cflags = "-falign-functions=3 " . $cflags;
-
 Configure::Data->set(
     ccflags => $cflags,
     libs => $libs,
