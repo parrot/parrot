@@ -83,7 +83,6 @@ SV* output_bytecode(SV* sv) {
     /* Now format the output as an SV */
     out = newSVpv((char*)outbyte, tmp);
 
-    // PackFile_destroy(pf);
     return out;
 }
 
