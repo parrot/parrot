@@ -627,7 +627,6 @@ sub setup_catch_blocks {
 
 sub is_anon_sub {
     my ($x, $ctx) = @_;
-    $DB::single = 1;
     return !($ctx->{noreturn}
 	     || $ctx->{is_sub_def}
 	     || ($ctx->{last_stmt} && $x->bare));

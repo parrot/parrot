@@ -235,11 +235,6 @@ sub emit {
         .pcc_begin_return # fallback
         .pcc_end_return
 END
-#    print <<END;
-#	restoreall
-#	invoke $saved_continuation
-#	end
-#END
 }
 
 1;

@@ -1699,7 +1699,8 @@ sub val {
     my @catchers;
     foreach (@stmts) {
         if ($_->isa('P6C::prefix') && defined($_->name)
-            && $_->name eq 'CATCH') {
+            && $_->name eq 'CATCH')
+        {
             push @catchers, $_->args;
             $_->name(undef);
         }
@@ -1721,7 +1722,7 @@ sub val {
         $ret = newtmp 'PerlUndef';
     }
 
-	unless ($ctx->{noreturn}) {
+    unless ($ctx->{noreturn}) {
         code("\t.pcc_begin_return");
         if ($x->is_rule) {
             # FIXME: The general return mechanism should be able to
@@ -1978,7 +1979,8 @@ use P6C::IMCC ':all';
 # Temporary types for different slices:
 use vars '%temptype';
 BEGIN {
-%temptype = qw(PerlArray int PerlHash str);
+%temptype = (PerlArray => 'int',
+             PerlHash => 'str');
 }
 
 # Slice value.  Probably doesn't handle every single case, but it
