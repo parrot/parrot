@@ -108,4 +108,11 @@ pmclass Key need_ext {
 	key_append(INTERP, SELF, value);
     }
 
+    /* actually doesn't remove the entry but might be useful
+     * to traverse a key chain
+     */
+    PMC* shift_pmc() {
+	return key_next(INTERP, SELF);
+    }
+
 }
