@@ -17,7 +17,7 @@
 # $Id$
 #
 
-sub print {op} (str a);
+sub print :op (str a);
 
 var int m, n, r;
 

@@ -3,39 +3,46 @@
 #
 # Elementary Function ops.
 #
+# Copyright (C) 2003 Gregor N. Purdy. All rights reserved.
+# This program is free software. Its use is subject to the same
+# license as Parrot.
+#
 # $Id$
 #
 
-sub num acos  {op} (int x);
-sub num acos  {op} (num x);
-sub num asec  {op} (int x);
-sub num asec  {op} (num x);
-sub num atan  {op} (num x);
-sub num atan  {op} (num x);
-sub num atan2 {op} (int x, int y);
-sub num atan2 {op} (int x, num y);
-sub num atan2 {op} (num x, int y);
-sub num atan2 {op} (num x, num y);
-sub num cos   {op} (int x);
-sub num cos   {op} (num x);
-sub num cosh  {op} (int x);
-sub num cosh  {op} (num x);
-sub num exp   {op} (int x);
-sub num exp   {op} (num x);
-sub num ln    {op} (int x);
-sub num ln    {op} (num x);
-sub num log10 {op} (int x);
-sub num log10 {op} (num x);
-sub num log2  {op} (int x);
-sub num log2  {op} (num x);
-sub num sec   {op} (int x);
-sub num sec   {op} (num x);
-sub num sech  {op} (int x);
-sub num sech  {op} (num x);
-sub num sin   {op} (int x);
-sub num sin   {op} (num x);
-sub num sinh  {op} (int x);
-sub num sinh  {op} (num x);
-sub num tanh  {op} (int x);
-sub num tanh  {op} (num x);
+module elem
+{
+  sub num acos  :op (int x);
+  sub num acos  :op (num x);
+  sub num asec  :op (int x);
+  sub num asec  :op (num x);
+  sub num atan  :op (num x);
+  sub num atan  :op (num x);
+  sub num atan2 :op (int x, int y);
+  sub num atan2 :op (int x, num y);
+  sub num atan2 :op (num x, int y);
+  sub num atan2 :op (num x, num y);
+  sub num cos   :op (int x);
+  sub num cos   :op (num x);
+  sub num cosh  :op (int x);
+  sub num cosh  :op (num x);
+  sub num exp   :op (int x);
+  sub num exp   :op (num x);
+  sub num ln    :op (int x);
+  sub num ln    :op (num x);
+  sub num log10 :op (int x);
+  sub num log10 :op (num x);
+  sub num log2  :op (int x);
+  sub num log2  :op (num x);
+  sub num sec   :op (int x);
+  sub num sec   :op (num x);
+  sub num sech  :op (int x);
+  sub num sech  :op (num x);
+  sub num sin   :op (int x);
+  sub num sin   :op (num x);
+  sub num sinh  :op (int x);
+  sub num sinh  :op (num x);
+  sub num tanh  :op (int x);
+  sub num tanh  :op (num x);
+}
 

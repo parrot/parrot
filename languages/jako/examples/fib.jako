@@ -10,7 +10,7 @@
 # $Id$
 #
 
-sub print {op} (str s);
+sub print :op (str s);
 
 const int n = 24;
 

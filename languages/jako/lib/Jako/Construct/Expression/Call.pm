@@ -65,7 +65,10 @@ sub compile
 
   my $sym = $self->block->find_symbol($name);
 
-  $self->SYNTAX_ERROR("Call to unknown sub '%s'.", $name) unless $sym;
+  unless ($sym) {
+#    $self->block->dump_symbols;
+    $self->SYNTAX_ERROR("Call to unknown sub '%s'.", $name);
+  }
 
   my %props = $sym->props;
 
@@ -107,10 +110,13 @@ sub compile
     }
   }
 
-  if (exists $props{fnlib}) {
+  if (exists $props{fn} or exists $props{fnlib}) {
     foreach my $arg (@args) {
       $compiler->emit("  .arg $arg");
     }
+
+    $name =~ s/::/__/g;
+ 
     $compiler->emit("  call _${name}_THUNK");
   }
   elsif (exists $props{op}) {
@@ -120,6 +126,8 @@ sub compile
 
     $name = $op if defined $op;
 
+    $name =~ s/^.*:://; # Delete namespaces from ops
+
     $compiler->emit("  $name ", join(", ", $dest, @args));
   }
   else {
@@ -128,6 +136,8 @@ sub compile
     foreach my $arg (@args) {
       $compiler->emit("  .arg $arg");
     }
+
+    $name =~ s/::/__/g;
 
     $compiler->emit("  call _${name}");
     $compiler->emit("  .result $dest");

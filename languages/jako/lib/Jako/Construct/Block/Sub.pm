@@ -56,8 +56,6 @@ sub new
   return $self;
 }
 
-1;
-
 
 #
 # ACCESSORS:
@@ -83,9 +81,13 @@ sub compile
   my %props = $self->props;
   my @args  = $self->args;
 
-  my $namespace = "_SUB_$name";
+  my $subname = $name;
 
-  $compiler->emit(".sub _${name}");
+  $subname =~ s/::/__/g;
+
+  my $namespace = "_SUB_$subname";
+
+  $compiler->emit(".sub _${subname}");
   $compiler->emit(".namespace $namespace");
   $compiler->emit("saveall");
 

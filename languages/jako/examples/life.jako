@@ -1,7 +1,7 @@
 #
 # life.jako
 #
-# Play Conway's (no, not *him*. The other Conway) game of life
+# Play Conway's (no, not *him*. The other Conway) game of life.
 #
 # Based on life.pasm, Hacked by Leon Brocard <acme@astray.com> to use curses.
 #
@@ -10,18 +10,18 @@
 #     http://archive.develooper.com/perl6-internals@perl.org/msg13935.html
 #
 
-sub num time   {op} ();
-sub     sleep  {op} (int n);
-sub     concat {op} (str dest, str s);
-sub int length {op} (str dest);
-sub str substr {op} (str s, int i, int l);
+sub num time   :op ();
+sub     sleep  :op (int n);
+sub     concat :op (str dest, str s);
+sub int length :op (str dest);
+sub str substr :op (str s, int i, int l);
 
-sub int initscr  {fnlib = "libcurses.so"} ();
-sub int endwin   {fnlib = "libcurses.so"} ();
-sub int curs_set {fnlib = "libcurses.so"} (int x);
-sub int addstr   {fnlib = "libcurses.so"} (str s);
-sub int refresh  {fnlib = "libcurses.so"} ();
-sub int move     {fnlib = "libcurses.so"} (int x, int y);
+sub int initscr  :fnlib = "libcurses.so" ();
+sub int endwin   :fnlib = "libcurses.so" ();
+sub int curs_set :fnlib = "libcurses.so" (int x);
+sub int addstr   :fnlib = "libcurses.so" (str s);
+sub int refresh  :fnlib = "libcurses.so" ();
+sub int move     :fnlib = "libcurses.so" (int x, int y);
 
 var int foo; # Store result from above functions here.
 

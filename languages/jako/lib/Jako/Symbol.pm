@@ -41,8 +41,8 @@ sub new
   confess("Undefined identifier kind attribute.")
     unless defined $kind;
  
-  confess("Unrecognized identifier kind attribute '%s'.", $kind)
-    unless $kind eq 'sub' or $kind eq 'var' or $kind eq 'arg' or $kind eq 'const';
+  confess("Unrecognized identifier kind attribute '" . $kind . "'.")
+    unless $kind eq 'module' or $kind eq 'sub' or $kind eq 'var' or $kind eq 'arg' or $kind eq 'const';
 
   my $self = bless {
     BLOCK  => $block,
@@ -82,6 +82,7 @@ sub line   { return shift->{LINE};     }
 sub is_constant { return shift->kind eq 'const'; }
 sub is_variable { my $self = shift; return $self->kind eq 'var' or $self->kind = 'arg'; }
 sub is_sub      { my $self = shift; return $self->kind eq 'sub'; }
+sub is_module   { my $self = shift; return $self->kind eq 'module'; }
 
 1;
 

@@ -104,10 +104,13 @@ sub compile
     }
   }
 
-  if (exists $props{fnlib}) {
+  if (exists $props{fn} or exists $props{fnlib}) {
     foreach my $arg (@args) {
       $compiler->emit("  .arg $arg");
     }
+
+    $name =~ s/::/__/g;
+
     $compiler->emit("  call _${name}_THUNK");
   }
   elsif (exists $props{op}) {
@@ -115,7 +118,12 @@ sub compile
 
 #    $self->DEBUG(0, "Calling %s%s...", $name, ($op ? ' (op $op)' : ' as op'));
 
-    $name = $op if defined $op;
+    if (defined $op) {
+      $name = $op->value;
+      $name =~ s/(^"|"$)//g;
+    }
+
+    $name =~ s/^.*:://; # Strip namespaces off ops.
 
     $compiler->emit("  $name ", join(", ", @args));
   }
@@ -125,6 +133,9 @@ sub compile
     foreach my $arg (@args) {
       $compiler->emit("  .arg $arg");
     }
+
+    $name =~ s/::/__/;
+
     $compiler->emit("  call _${name}");
   }
 

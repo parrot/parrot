@@ -63,7 +63,9 @@ sub new
   # Lookup the identifier:
   #
 
-  my $sym = $block->find_symbol($self->name);
+  my $name = $self->name;
+
+  my $sym = $block->find_symbol($name);
 
   #
   # If the identifier is already defined at ANY lexical scope, we want to complain
@@ -73,7 +75,7 @@ sub new
 
   if (defined $sym) {
     $self->SYNTAX_ERROR("Redeclaration of identifier '%s'. Previous declaration on line %d of file '%s'.",
-      $self->name, $sym->line, $sym->file);
+      $name, $sym->line, $sym->file);
   }
 
   #
@@ -87,15 +89,13 @@ sub new
     $self->block,
     $self->kind,
     $self->type,
-    $self->name,
+    $name,
     undef,            # No value
     $props,           # Parsed Properties
     $args,            # Parsed Properties
     $self->file,
     $self->line
   );
-
-  my $name = $self->name;
 
 #  $self->DEBUG(0, "Remembering symbol '$name' as sub...");
 
@@ -110,7 +110,19 @@ sub new
 
 sub kind  { return shift->{KIND};     }
 sub type  { return shift->{TYPE};     }
-sub name  { return shift->{NAME};     }
+
+sub name
+{
+  my $self = shift;
+  my $name = $self->{NAME};
+
+  if ($self->block->kind eq 'module') {
+    $name = $self->block->name . "::" . $name;
+  }
+
+  return $name;
+}
+
 sub props { return %{shift->{PROPS}}; }
 sub args  { return @{shift->{ARGS}};  }
 
@@ -135,11 +147,28 @@ sub compile
 
   my %props = $sym->props;
 
-  if (exists $props{fnlib}) {
-    my $fnlib = $props{fnlib}->value; # TODO: We should make sure its a string, somewhere.
-    my $fn    = $props{fn} ? $props{fn}->value : "\"$name\"";
+  if (exists $props{fn} or exists $props{fnlib}) {
+    my $fnlib;
+
+    if (exists $props{fnlib} and $props{fnlib}) {
+      $fnlib = $props{fnlib}->value; # TODO: We should make sure its a string, somewhere.
+    }
+    else {
+      $self->SYNTAX_ERROR("Sub declaration has no fnlib property, and parent block is not a module!")
+        unless $self->block->kind eq 'module';
+
+      my %module_props = $self->block->props;
+
+      $self->SYNTAX_ERROR("Sub declaration has no fnlib property, and parent module has no fnlib property either!")
+        unless $module_props{fnlib};
+
+      $fnlib = $module_props{fnlib}->value;
+    }
+
+    my $fn = $props{fn} ? $props{fn}->value : "\"$name\"";
 
     my $thunk = "_${name}_THUNK";
+    $thunk =~ s/::/__/g;
 
     $compiler->emit(".sub $thunk");
     $compiler->emit(".namespace $thunk");
@@ -168,9 +197,13 @@ sub compile
     $compiler->emit("  I2 = 0");       # Number of parameters in PMC registers.
     $compiler->emit("  I3 = $return"); # What we expect in return
 
+    my $fn_name = $fn;
+
+    $fn_name =~ s/^.*::/"/;
+
     $compiler->emit("  .local obj lib");
     $compiler->emit("  loadlib lib, $fnlib");
-    $compiler->emit("  dlfunc P0, lib, $fn, \"$sig\"");
+    $compiler->emit("  dlfunc P0, lib, $fn_name, \"$sig\"");
     $compiler->emit("  invoke");
 
     if ($self->type) {

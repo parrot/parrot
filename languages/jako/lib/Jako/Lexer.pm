@@ -118,6 +118,13 @@ sub scan_line
     # Declarators:
     #
 
+    if ($text =~ m{^(module)(?!\w)(.*)$}) {
+      push @tokens, Jako::Token->new(
+        $file, $line, 'module', undef, $1);
+      $text = $2;
+      next;
+    }
+
     if ($text =~ m{^(sub)(?!\w)(.*)$}) {
       push @tokens, Jako::Token->new(
         $file, $line, 'sub', undef, $1);
@@ -151,6 +158,13 @@ sub scan_line
     if ($text =~ m{^([,])(.*)$}) {
       push @tokens, Jako::Token->new(
         $file, $line, 'comma', undef, $1);
+      $text = $2;
+      next;
+    }
+
+    if ($text =~ m{^([:])(.*)$}) {
+      push @tokens, Jako::Token->new(
+        $file, $line, 'colon', undef, $1);
       $text = $2;
       next;
     }
@@ -269,10 +283,10 @@ sub scan_line
     # Identifiers:
     #
 
-    if ($text =~ m{^([a-zA-Z][a-zA-Z0-9_]*)(.*)$}) {
+    if ($text =~ m{^([a-zA-Z][a-zA-Z0-9_]*(::[a-zA-Z][a-zA-Z0-9_]*)*)(.*)$}) {
       push @tokens, Jako::Token->new(
         $file, $line, 'ident', undef, $1);
-      $text = $2;
+      $text = $3;
       next;
     }
    

@@ -10,10 +10,10 @@
 # $Id$
 #
 
-sub     print  {op} (str s);
-sub str substr {op} (str s, int i, int l);
-sub str concat {op} (str s, str t);
-sub int length {op} (str s);
+sub     print  :op (str s);
+sub str substr :op (str s, int i, int l);
+sub str concat :op (str s, str t);
+sub int length :op (str s);
 
 const int NUM_FILES = 8;
 const int NUM_RANKS = 8;

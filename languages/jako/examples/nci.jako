@@ -9,41 +9,45 @@
 # license as Parrot.
 #
 
-sub int initscr  {fnlib = "libcurses.so"} ();
-sub int endwin   {fnlib = "libcurses.so"} ();
-sub int curs_set {fnlib = "libcurses.so"} (int x);
+module Curses
+  :fnlib = "libcurses.so"
+{
+  sub int initscr  :fn ();
+  sub int endwin   :fn ();
+  sub int curs_set :fn (int x);
 
-sub int addstr   {fnlib = "libcurses.so"} (str s);
-sub int refresh  {fnlib = "libcurses.so"} ();
-sub int move     {fnlib = "libcurses.so"} (int x, int y);
+  sub int addstr   :fn (str s);
+  sub int refresh  :fn ();
+  sub int move     :fn (int x, int y);
 
-sub int getch    {fnlib = "libcurses.so"} ();
-sub int box      {fnlib = "libcurses.so"} (int screen, int v, int h);
-sub int hline    {fnlib = "libcurses.so"} (int ch, int n);
-
-sub str readline {op} (int fd);
+  sub int getch    :fn ();
+  sub int box      :fn (int screen, int v, int h);
+  sub int hline    :fn (int ch, int n);
+}
 
 var int foo; # Store result from above functions here.
 
 var int screen;
-screen = initscr();
 
-foo = curs_set(0);
-foo = box(screen, 42, 42);
-foo = move(10, 20);
-foo = addstr("Hello, world!");
-foo = move(12, 15);
-foo = addstr("(Press any key to exit)");
+screen = Curses::initscr();
 
-foo = move(8, 10);
-foo = hline(42, 33);
+foo = Curses::curs_set(0);
+foo = Curses::box(screen, 42, 42);
+foo = Curses::move(10, 20);
+foo = Curses::addstr("Hello, world!");
+foo = Curses::move(12, 15);
+foo = Curses::addstr("(Press any key to exit)");
 
-foo = move(14, 10);
-foo = hline(42, 33);
+foo = Curses::move(8, 10);
+foo = Curses::hline(42, 33);
 
-foo = refresh();
+foo = Curses::move(14, 10);
+foo = Curses::hline(42, 33);
 
-foo = getch();
+foo = Curses::refresh();
 
-foo = curs_set(1);
-foo = endwin();
+foo = Curses::getch();
+
+foo = Curses::curs_set(1);
+foo = Curses::endwin();
+

@@ -368,6 +368,7 @@ sub skip
 #
 
 sub skip_assign        { return shift->skip('assign');        }
+sub skip_colon         { return shift->skip('colon');         }
 sub skip_comma         { return shift->skip('comma');         }
 sub skip_close_brace   { return shift->skip('close-brace');   }
 sub skip_close_bracket { return shift->skip('close-bracket'); }

@@ -101,11 +101,12 @@ sub is { my $self = shift; return grep { $self->kind eq $_ } @_; }
 
 sub is_arith_assign  { return shift->is('arith-assign');  }
 sub is_assign        { return shift->is('assign');        }
-sub is_bit_assign    { return shift->is('bit-assign');  }
+sub is_bit_assign    { return shift->is('bit-assign');    }
 sub is_bof           { return shift->is('bof');           }
 sub is_close_brace   { return shift->is('close-brace');   }
 sub is_close_bracket { return shift->is('close-bracket'); }
 sub is_close_paren   { return shift->is('close-paren');   }
+sub is_colon         { return shift->is('colon');         }
 sub is_const         { return shift->is('const');         }
 sub is_continue      { return shift->is('continue');      }
 sub is_else          { return shift->is('else');          }
@@ -120,6 +121,7 @@ sub is_infix_rel     { return shift->is('infix-rel');     }
 sub is_label         { return shift->is('label');         }
 sub is_last          { return shift->is('last');          }
 sub is_literal       { return shift->is('literal');       }
+sub is_module        { return shift->is('module');        }
 sub is_next          { return shift->is('next');          }
 sub is_open_brace    { return shift->is('open-brace');    }
 sub is_open_bracket  { return shift->is('open-bracket');  }

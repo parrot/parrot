@@ -11,7 +11,7 @@
 # $Id$
 #
 
-sub print {op} (str s);
+sub print :op (str s);
 
 var int x;
 

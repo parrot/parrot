@@ -22,6 +22,7 @@ use Jako::Construct::Block::Bare;
 use Jako::Construct::Block::Conditional::Else;
 use Jako::Construct::Block::Conditional::If;
 use Jako::Construct::Block::Conditional::Unless;
+use Jako::Construct::Block::Module;
 use Jako::Construct::Block::Sub;
 use Jako::Construct::Block::Loop::Continue;
 use Jako::Construct::Block::Loop::Until;
@@ -221,6 +222,45 @@ sub parse
     }
 
     #
+    # Modules:
+    #
+    #   module <ident> [:<prop>[=<value] ...] {
+    #
+
+    if ($token->is_module) {
+      my $block = $self->current_block;
+
+      my $ident = Jako::Construct::Expression::Value::Identifier->new($block, $self->require_ident);
+      my $name = $ident->value;
+
+      #
+      # Allow there to be Properties:
+      #
+
+      my %props;
+
+      while ($self->skip_colon) {
+        my $prop = $self->require_ident->text;
+
+        my $value;
+
+        if ($self->skip_assign) {
+          $value = Jako::Construct::Expression::Value::Literal->new($block, $self->require_literal);
+        }
+
+        $props{$prop} = $value;
+      }
+
+      $self->require_open_brace;
+
+      my $module = Jako::Construct::Block::Module->new($block, $ident, { %props });
+      push @{$self->{BLOCKS}}, $module;
+
+      next;
+
+    }
+
+    #
     # Variable declarations:
     #
     #   var <type> <ident>;
@@ -282,10 +322,7 @@ sub parse
     #
     # Subroutines:
     #
-    #   sub        <ident>          (<arg>, <arg>, ...) {
-    #   sub <type> <ident>          (<arg>, <arg>, ...) {
-    #   sub        <ident> {<prop>} (<arg>, <arg>, ...) {
-    #   sub <type> <ident> {<prop>} (<arg>, <arg>, ...) {
+    #   sub [<type>] <ident> [:<prop>[=<value] ...] (<arg>, <arg>, ...) {
     #
 
     if ($token->is_sub) {
@@ -305,22 +342,16 @@ sub parse
 
       my %props;
 
-      if ($self->skip_open_brace and not $self->skip_close_brace) { # In case empty.
-        while (1) {
-          my $prop = $self->require_ident->text;
+      while ($self->skip_colon) {
+        my $prop = $self->require_ident->text;
       
-          my $value;
+        my $value;
 
-          if ($self->skip_assign) {
-            $value = Jako::Construct::Expression::Value::Literal->new($block, $self->require_literal);
-          }
-
-          $props{$prop} = $value;
-          last if $self->get(1)->is_close_brace;
-          $self->require_comma;
+        if ($self->skip_assign) {
+          $value = Jako::Construct::Expression::Value::Literal->new($block, $self->require_literal);
         }
 
-        $self->skip_close_brace;
+        $props{$prop} = $value;
       }
 
       #
@@ -549,6 +580,15 @@ sub parse
       #
 
       elsif ($peer_block->kind eq 'sub') {
+        # DO NOTHING
+      }
+
+      #
+      # Handle the ending of module blocks:
+      #
+
+      elsif ($peer_block->kind eq 'module') {
+        # DO NOTHING
       }
 
       #

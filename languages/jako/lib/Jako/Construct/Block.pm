@@ -82,6 +82,48 @@ sub symbol
 
 
 #
+# symbols()
+#
+
+sub symbols
+{
+  my $self = shift;
+
+  return keys %{$self->{SYMBOLS}};
+}
+
+
+#
+# dump_symbols()
+#
+
+sub dump_symbols
+{
+  my $self = shift;
+
+  my $block = $self;
+
+  my %table = ();
+
+  my $level = 0;
+
+  while ($block) {
+    foreach my $symbol ($block->symbols) {
+      next if exists $table{$symbol};
+      $table{$symbol} = $level;
+    }
+
+    $block = $block->block;
+    $level++;
+  }
+
+  foreach my $symbol (sort keys %table) {
+    printf STDERR "%s: %d\n", $symbol, $table{$symbol};
+  }
+}
+
+
+#
 # find_symbol()
 #
 
