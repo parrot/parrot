@@ -386,6 +386,8 @@ objects of class Px, and all objects of a child of class Px.
 
 Instantiate a brand new class, based on the metadata in Py, named Sz. 
 
+=back
+
 =head2 Vtables
 
 

@@ -375,6 +375,8 @@ dump_end:
     .pcc_end_return
 .end
 
+=back
+
 =head1 AUTHOR
 
 Jens Rieks E<lt>parrot at jensbeimsurfen dot deE<gt> is the author

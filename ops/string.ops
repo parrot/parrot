@@ -583,8 +583,6 @@ inline op stringinfo(out INT, in STR, in INT) {
   goto NEXT();
 }
 
-=cut
-
 ########################################
 
 =item B<upcase>(out STR, in STR)
@@ -645,8 +643,6 @@ inline op titlecase(inout STR) {
 
 ###############################################################################
 
-=back
-
 =item B<join>(out STR, in STR, in PMC)
 
 Create a new PerlString $1 by joining array elements from array $3
@@ -699,6 +695,8 @@ op split(out PMC, in STR, in STR) {
     }
     goto NEXT();
 }
+
+=back
 
 =head1 COPYRIGHT
 
