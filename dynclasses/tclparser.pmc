@@ -264,7 +264,7 @@ middle_continue:
 end_word:
   /*  save the word and put it into the command array */
 
-  S0 = string_substr(INTERP, buffer, start_word, word_length, NULL, NULL);
+  S0 = string_substr(INTERP, buffer, start_word, word_length, NULL, 0);
   P1 = VTABLE_find_method(INTERP, word, ConcatConst);
   Parrot_call_method(INTERP, P1, word, ConcatConst, "vS", S0);
 
@@ -322,7 +322,7 @@ end_command:
   }
 
 end_command_0: 
-  S0 = string_substr(INTERP, buffer, start_word, word_length, NULL, NULL);
+  S0 = string_substr(INTERP, buffer, start_word, word_length, NULL, 0);
   P1 = VTABLE_find_method(INTERP, word, ConcatConst);
   Parrot_call_method(INTERP, P1, word, ConcatConst, "vS", S0);
   VTABLE_push_pmc(INTERP, command, word);
@@ -358,7 +358,7 @@ handle_brace:
   start_word++;
   word_length-=2;
 
-  S0 = string_substr(INTERP, buffer, start_word, word_length, NULL, NULL);
+  S0 = string_substr(INTERP, buffer, start_word, word_length, NULL, 0);
   P1 = VTABLE_find_method(INTERP, word, ConcatConst);
   Parrot_call_method(INTERP, P1, word, ConcatConst, "vS", S0);
   start_word = I1;
@@ -385,7 +385,7 @@ handle_quote:
 
   start_word++;
   word_length-=2;
-  S0 = string_substr(INTERP, buffer, start_word, word_length, NULL, NULL);
+  S0 = string_substr(INTERP, buffer, start_word, word_length, NULL, 0);
 
   /* XXX Really need to switch parse to not need PMC's passed in,
          basic types are really what we need */
@@ -415,7 +415,7 @@ handle_variable:
   if (old_length == 0) {
     goto handle_variable_1;
   }
-  S0 = string_substr(INTERP, buffer, start_word, old_length, NULL, NULL);
+  S0 = string_substr(INTERP, buffer, start_word, old_length, NULL, 0);
   P1 = VTABLE_find_method(INTERP, word, ConcatConst);
   Parrot_call_method(INTERP, P1, word, ConcatConst, "vS", S0);
    
@@ -439,7 +439,7 @@ handle_variable_brace:
   /* Name of variable is between the braces..*/
   chunk_start++;
   I2 = I1 - chunk_start - 1;
-  S0 = string_substr(INTERP, buffer, chunk_start, I2, NULL, NULL);
+  S0 = string_substr(INTERP, buffer, chunk_start, I2, NULL, 0);
   P1 = VTABLE_find_method(INTERP, word, ConcatVariable);
   Parrot_call_method(INTERP, P1, word, ConcatVariable, "vS", S0);
   goto middle_word;
@@ -489,7 +489,7 @@ inner_done:
   /* Once we get here, we could also have a () to deal with..   */
   /* () */
   I1 = temppos - chunk_start;
-  S0 = string_substr(INTERP, buffer, chunk_start, I1, NULL, NULL);
+  S0 = string_substr(INTERP, buffer, chunk_start, I1, NULL, 0);
   start_word = chunk_start + I1;
   word_length = 0;
 
@@ -503,7 +503,7 @@ inner_done:
   /* $S0($S1) */
   start_word++;
   I1 = temppos - start_word;
-  S1 = string_substr(INTERP, buffer, start_word, I1, NULL, NULL);
+  S1 = string_substr(INTERP, buffer, start_word, I1, NULL, 0);
   start_word = temppos + 1;
   P1 = VTABLE_find_method(INTERP, word, ConcatVariable);
   Parrot_call_method(INTERP, P1, word, ConcatVariable, "vSS", S0, S1);
@@ -522,7 +522,7 @@ handle_backslash:
     goto backslash_escape;
   }
 
-  S0 = string_substr(INTERP, buffer, start_word, word_length, NULL, NULL);
+  S0 = string_substr(INTERP, buffer, start_word, word_length, NULL, 0);
   P1 = VTABLE_find_method(INTERP, word, ConcatConst);
   Parrot_call_method(INTERP, P1, word, ConcatConst, "vS", S0);
 
@@ -606,7 +606,7 @@ handle_command_block:
   if (old_length == 0) {
     goto command_save;
   }
-  S0 = string_substr(INTERP, buffer, start_word, old_length, NULL, NULL);
+  S0 = string_substr(INTERP, buffer, start_word, old_length, NULL, 0);
   P1 = VTABLE_find_method(INTERP, word, ConcatConst);
   Parrot_call_method(INTERP, P1, word, ConcatConst, "vS", S0);
 
@@ -614,7 +614,7 @@ command_save:
   /* Save this as a command (skip the []'s)*/
   I0 = chunk_start + 1;
   I1 = word_length - 2;
-  S0 = string_substr(INTERP, buffer, I0, I1, NULL, NULL);
+  S0 = string_substr(INTERP, buffer, I0, I1, NULL, 0);
   P1 = VTABLE_find_method(INTERP, word, ConcatCommand);
   Parrot_call_method(INTERP, P1, word, ConcatCommand, "vS", S0);
 
