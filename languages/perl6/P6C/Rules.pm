@@ -1,21 +1,23 @@
 package P6C::Rules;
 
+require P6C::Parser;
+
 =head1 B<P6C::Rules>
 
 Implementation of rule definitions and rule calls.
 
 =cut
 
-use vars qw($DEFAULT_RULE_SIGNATURE $DEFAULT_RULE_ARGUMENT_CONTEXT);
+use vars qw($DEFAULT_RULE_SIGNATURE $DEFAULT_RULE_ARGUMENT_CONTEXT $INITED);
 
 sub _parse_default_sig {
     ($DEFAULT_RULE_SIGNATURE, $DEFAULT_RULE_ARGUMENT_CONTEXT) =
-      P6C::Parser::parse_sig(<<'END', no_named => 1);
+      P6C::Parser::parse_sig(<<'END');
 int $rx_mode,
-IntList @rx_stack,
+ARRAY @rx_stack,
 str $rx_input,
 int $rx_pos,
-PerlArray *@_
+ARRAY *@_
 END
 }
 
@@ -91,11 +93,7 @@ sub adjust_call {
                     ($LIT->new(type => 'str')), # input
                     ($LIT->new(type => 'int')) ); # pos
     die unless $args->isa('P6C::ValueList');
-#    if ($args->isa('P6C::ValueList')) {
-        unshift @{ $args->vals }, @argvals;
-#    } else {
-#        $call->args(new P6C::ValueList vals => [ @argvals, $args ]);
-#    }
+    unshift @{ $args->vals }, @argvals;
 }
 
 # Rules return their status result and the updated rx_pos
