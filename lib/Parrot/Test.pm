@@ -270,10 +270,7 @@ sub generate_functions {
 	    $run_pbc = 0;
 	}
 	else {
-	    # flatten filenames (don't use directories)
-	    $as_f = (File::Spec->splitpath($as_f))[2];
-	    # but, always put the test in a tempdir, so we're not cluttering
-	    $as_f = File::Spec->catfile(File::Spec->tmpdir(),$as_f);
+	    $as_f = File::Spec->rel2abs($as_f);
 	    $pbc_generator->( $assembly, $path_to_parrot, $count, $as_f );
 	}
 
