@@ -12,7 +12,7 @@ loop:
 	lt I1, I0, loop
 
 	inc I3
-	set I1 0
+	set I1, 0
 	lt I3, I2, doubleloop
 
 

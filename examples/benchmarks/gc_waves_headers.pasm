@@ -24,7 +24,7 @@ loopdown:
 	pops
 	dec I1
 	gt I1, 0, loopdown
-	
+
 	inc I3
 	lt I3, I2, mainloop
 

@@ -1,9 +1,11 @@
-	set I0, 5
+# a rather useless test to check if your system does swapping
+# if sizes are too big
+	set I0, 6
 	set I1, 0
-	set S1,  "                                                 "
+	set S1,  "1234567890"
 	time N5
 loop:
-	repeat S1, S1, 20
+	repeat S1, S1, 10
 	inc I1
 	lt I1, I0, loop
 
