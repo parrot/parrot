@@ -1897,31 +1897,77 @@ EE
 OUTPUT
 
 output_is( <<'CODE', <<OUTPUT, "bors NULL string");
-	null S1
-	set S2, "abc"
-	bors S1, S2
- 	print S1
- 	print "\n"
-	set S1, ""
-	bors S1, S2
- 	print S1
- 	print "\n"
+     null S1
+     null S2
+     bors S1, S2
+     null S3
+     eq S1, S3, OK1
+     print "not "
+OK1: print "ok 1\n"
 
-	null S2
-	set S1, "abc"
-	bors S1, S2
- 	print S1
- 	print "\n"
-	set S2, ""
-	bors S1, S2
- 	print S1
- 	print "\n"
-	end
+     null S1
+     set S2, ""
+     bors S1, S2
+     null S3
+     eq S1, S3, OK2
+     print "not "
+OK2: print "ok 2\n"
+     bors S2, S1
+     eq S2, S3, OK3
+     print "not "
+OK3: print "ok 3\n"
+
+     null S1
+     set S2, "def"
+     bors S1, S2
+     eq S1, "def", OK4
+     print "not "
+OK4: print "ok 4\n"
+     null S2
+     bors S1, S2
+     eq S1, "def", OK5
+     print "not "
+OK5: print "ok 5\n"
+
+     null S1
+     null S2
+     bors S3, S1, S2
+     null S4
+     eq S3, S4, OK6
+     print "not "
+OK6: print "ok 6\n"
+
+     set S1, ""
+     bors S3, S1, S2
+     eq S3, S4, OK7
+     print "not "
+OK7: print "ok 7\n"
+     bors S3, S2, S1
+     eq S3, S4, OK8
+     print "not "
+OK8: print "ok 8\n"
+
+     set S1, "def"
+     bors S3, S1, S2
+     eq S3, "def", OK9
+     print "not "
+OK9: print "ok 9\n"
+     bors S3, S2, S1
+     eq S3, "def", OK10
+     print "not "
+OK10: print "ok 10\n"
+     end
 CODE
-abc
-abc
-abc
-abc
+ok 1
+ok 2
+ok 3
+ok 4
+ok 5
+ok 6
+ok 7
+ok 8
+ok 9
+ok 10
 OUTPUT
 
 output_is( <<'CODE', <<OUTPUT, "bors 2");
@@ -1956,34 +2002,77 @@ EE
 OUTPUT
 
 output_is( <<'CODE', <<OUTPUT, "bxors NULL string");
- null S1
- set S2, ""
- bxors S1, S2
-    null S3
- eq S1, S3, ok1
- print "not "
-ok1: print "ok 1\n"
- bxors S2, S1
- eq S2, S3, ok2
- print "not "
-ok2: print "ok 2\n"
-    null S1
- set S2, "abc"
-    bxors S1, S2
- eq S1, "abc", ok3
- print "not "
-ok3: print "ok 3\n"
-    null S2
-    bxors S1, S2
- eq S1, "abc", ok4
- print "not "
-ok4: print "ok 4\n"
-    end
+     null S1
+     null S2
+     bxors S1, S2
+     null S3
+     eq S1, S3, OK1
+     print "not "
+OK1: print "ok 1\n"
+
+     null S1
+     set S2, ""
+     bxors S1, S2
+     null S3
+     eq S1, S3, OK2
+     print "not "
+OK2: print "ok 2\n"
+     bxors S2, S1
+     eq S2, S3, OK3
+     print "not "
+OK3: print "ok 3\n"
+
+     null S1
+     set S2, "abc"
+     bxors S1, S2
+     eq S1, "abc", OK4
+     print "not "
+OK4: print "ok 4\n"
+     null S2
+     bxors S1, S2
+     eq S1, "abc", OK5
+     print "not "
+OK5: print "ok 5\n"
+
+     null S1
+     null S2
+     bxors S3, S1, S2
+     null S4
+     eq S3, S4, OK6
+     print "not "
+OK6: print "ok 6\n"
+
+     set S1, ""
+     bxors S3, S1, S2
+     eq S3, S4, OK7
+     print "not "
+OK7: print "ok 7\n"
+     bxors S3, S2, S1
+     eq S3, S4, OK8
+     print "not "
+OK8: print "ok 8\n"
+
+     set S1, "abc"
+     bxors S3, S1, S2
+     eq S3, "abc", OK9
+     print "not "
+OK9: print "ok 9\n"
+     bxors S3, S2, S1
+     eq S3, "abc", OK10
+     print "not "
+OK10: print "ok 10\n"
+     end
 CODE
 ok 1
 ok 2
 ok 3
 ok 4
+ok 5
+ok 6
+ok 7
+ok 8
+ok 9
+ok 10
 OUTPUT
 
 output_is( <<'CODE', <<OUTPUT, "bxors 2");
