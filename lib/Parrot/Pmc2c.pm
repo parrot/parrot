@@ -541,15 +541,17 @@ sub rewrite_vtable_method ($$$$$) {
     return $_;
 }
 
-=item C<body($method)>
+=item C<body($method, $line, $out_name)>
 
-Returns the C code for the method body.
+Returns the C code for the method body. C<$line> is used to accumulate
+the number of lines, C<$out_name> is the name of the output file we are
+generating.
 
 =cut
 
 sub body
 {
-    my ($self, $method) = @_;
+    my ($self, $method, $line, $out_name) = @_;
     my $cout = "";
     my $classname = $self->{class};
     my $meth = $method->{meth};
@@ -603,15 +605,16 @@ EOH
     $cout .= "\n\n";
 }
 
-=item C<methods($line)>
+=item C<methods($line, $out_name)>
 
 Returns the C code for the vtable methods. C<$line> is used to accumulate
-the number of lines.
+the number of lines, C<$out_name> is the name of the output file we are
+generating.
 
 =cut
 
-sub methods() {
-    my ($self, $line) = @_;
+sub methods {
+    my ($self, $line, $out_name) = @_;
     my $cout = "";
 
     # vtable methods
@@ -619,7 +622,7 @@ sub methods() {
         my $meth = $method->{meth};
         next if $meth eq 'class_init';
         if ($self->implements($meth)) {
-            my $ret = $self->body($method, $line);
+            my $ret = $self->body($method, $line, $out_name);
             $line += count_newlines($ret);
             $cout .= $ret;
         }
@@ -628,7 +631,7 @@ sub methods() {
     # nci methods
     foreach my $method (@{ $self->{methods}} ) {
         next unless $method->{loc} eq 'nci';
-        my $ret = $self->body($method, $line);
+        my $ret = $self->body($method, $line, $out_name);
         $line += count_newlines($ret);
         $cout .= $ret;
     }
@@ -924,10 +927,10 @@ sub gen_c {
     $cout .= $self->line_directive_here($cout, $out_name)
 	. $self->includes;
     my $l = count_newlines($cout);
-    $cout .= $self->methods($l);
+    $cout .= $self->methods($l, $out_name);
     $cout .= $self->init_func;
     if ($self->{const}) {
-        $cout .= $self->{const}->methods($l);
+        $cout .= $self->{const}->methods($l, $out_name);
         $cout .= $self->{const}->init_func;
     }
     $cout .= $self->{post};
@@ -1023,15 +1026,17 @@ Standard behavior.
 package Parrot::Pmc2c::Standard;
 use base 'Parrot::Pmc2c';
 
-=item C<body($method)>
+=item C<body($method, $line, $out_name)>
 
-Returns the C code for the method body.
+Returns the C code for the method body. C<$line> is used to accumulate
+the number of lines, C<$out_name> is the name of the output file we are
+generating.
 
 =cut
 
 sub body
 {
-    my ($self, $method) = @_;
+    my ($self, $method, $line, $out_name) = @_;
     my $meth = $method->{meth};
     my $n = $self->{has_method}{$meth};
     return $self->SUPER::body($self->{methods}[$n]);
@@ -1051,15 +1056,17 @@ package Parrot::Pmc2c::Standard::Const;
 use base 'Parrot::Pmc2c::Standard';
 import Parrot::Pmc2c qw( gen_ret );
 
-=item C<body($method)>
+=item C<body($method, $line, $out_name)>
 
-Overrides the default implementation to throw exception if the method
-writes.
+Returns the C code for the method body. C<$line> is used to accumulate
+the number of lines, C<$out_name> is the name of the output file we are
+generating.
 
 =cut
 
-sub body {
-    my ($self, $method) = @_;
+sub body
+{
+    my ($self, $method, $line, $out_name) = @_;
     my $meth = $method->{meth};
 
     my $decl = $self->decl($self->{class}, $method, 0);
@@ -1115,9 +1122,11 @@ sub implements
     1;
 }
 
-=item C<body($method, $line)>
+=item C<body($method, $line, $out_name)>
 
-Returns the C code for the method body.
+Returns the C code for the method body. C<$line> is used to accumulate
+the number of lines, C<$out_name> is the name of the output file we are
+generating.
 
 Overrides the default implementation to direct all unknown methods to
 the thing referred to.
@@ -1126,7 +1135,7 @@ the thing referred to.
 
 sub body
 {
-    my ($self, $method, $line) = @_;
+    my ($self, $method, $line, $out_name) = @_;
     my $meth = $method->{meth};
     # existing methods get emitted
     if ($self->SUPER::implements($meth)) {
@@ -1189,9 +1198,11 @@ sub gen_ret
     return "ret_val = ";
 }
 
-=item C<body($method, $line)>
+=item C<body($method, $line, $out_name)>
 
-Returns the C code for the method body.
+Returns the C code for the method body. C<$line> is used to accumulate
+the number of lines, C<$out_name> is the name of the output file we are
+generating.
 
 Overrides the default implementation to perform locking.
 
@@ -1199,7 +1210,7 @@ Overrides the default implementation to perform locking.
 
 sub body
 {
-    my ($self, $method, $line) = @_;
+    my ($self, $method, $line, $out_name) = @_;
     my $meth = $method->{meth};
     # existing methods get emitted
     if ($self->SUPER::implements($meth)) {
@@ -1261,9 +1272,11 @@ sub implements
     1;
 }
 
-=item C<body($method, $line)>
+=item C<body($method, $line, $out_name)>
 
-Returns the C code for the method body.
+Returns the C code for the method body. C<$line> is used to accumulate
+the number of lines, C<$out_name> is the name of the output file we are
+generating.
 
 Overrides the default implementation to throw an execption for unknown
 methods.
@@ -1272,7 +1285,7 @@ methods.
 
 sub body
 {
-    my ($self, $method, $line) = @_;
+    my ($self, $method, $line, $out_name) = @_;
     my $meth = $method->{meth};
     # existing methods get emitted
     if ($self->SUPER::implements($meth)) {
@@ -1320,9 +1333,11 @@ sub implements
     1;
 }
 
-=item C<body($method, $line)>
+=item C<body($method, $line, $out_name)>
 
-Returns the C code for the method body.
+Returns the C code for the method body. C<$line> is used to accumulate
+the number of lines, C<$out_name> is the name of the output file we are
+generating.
 
 The C<Null> PMC throws an execption for all methods.
 
@@ -1330,7 +1345,7 @@ The C<Null> PMC throws an execption for all methods.
 
 sub body
 {
-    my ($self, $method, $line) = @_;
+    my ($self, $method, $line, $out_name) = @_;
     my $meth = $method->{meth};
     # existing methods get emitted
     if ($self->SUPER::implements($meth)) {
@@ -1418,9 +1433,11 @@ sub gen_ret
     return "ret_val = ($type) ";
 }
 
-=item C<body($method, $line)>
+=item C<body($method, $line, $out_name)>
 
-Returns the C code for the method body.
+Returns the C code for the method body. C<$line> is used to accumulate
+the number of lines, C<$out_name> is the name of the output file we are
+generating.
 
 The C<delegate> PMC redirects all methods to bytecode.
 
@@ -1428,7 +1445,7 @@ The C<delegate> PMC redirects all methods to bytecode.
 
 sub body
 {
-    my ($self, $method, $line) = @_;
+    my ($self, $method, $line, $out_name) = @_;
     my $meth = $method->{meth};
     # existing methods get emitted
     if ($self->SUPER::implements($meth)) {
@@ -1490,9 +1507,11 @@ sub implements
     1;
 }
 
-=item C<body($method, $line)>
+=item C<body($method, $line, $out_name)>
 
-Returns the C code for the method body.
+Returns the C code for the method body. C<$line> is used to accumulate
+the number of lines, C<$out_name> is the name of the output file we are
+generating.
 
 Overrides the default implementation to direct all unknown methods to
 the PMC in the first attribute slot.
@@ -1501,7 +1520,7 @@ the PMC in the first attribute slot.
 
 sub body
 {
-    my ($self, $method, $line) = @_;
+    my ($self, $method, $line, $out_name) = @_;
     my $meth = $method->{meth};
     # existing methods get emitted
     if ($self->SUPER::implements($meth)) {
