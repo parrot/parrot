@@ -36,12 +36,29 @@ sort_compare(void *a, void *b)
     return mmd_dispatch_i_pp(the_interp, pa, pb, MMD_CMP);
 }
 
+static void
+runops_fast_cmp(Interp *interpreter, PMC *sub, PMC *left, PMC *right)
+{
+    opcode_t offset, *dest;
+
+    dest = VTABLE_invoke(interpreter, sub, NULL);
+    REG_PMC(5) = left;
+    REG_PMC(6) = right;
+    offset = dest - interpreter->code->byte_code;
+    runops_int(interpreter, offset);
+}
+
+#define RUN_FAST_CMP
 static int
 sort_ext_compare(void *a, void *b)
 {
     PMC *pa = *(PMC**)a;
     PMC *pb = *(PMC**)b;
+#ifdef RUN_FAST_CMP
+    runops_fast_cmp(the_interp, sort_cmp_pmc, pa, pb);
+#else
     Parrot_runops_fromc_args(the_interp, sort_cmp_pmc, "IPP", pa, pb);
+#endif
     return the_interp->int_reg.registers[5];
 }
 
@@ -76,6 +93,12 @@ default_sort:
         regs = Parrot_save_register_frames(interpreter, cmp_func);
         func = sort_ext_compare;
         sort_cmp_pmc = cmp_func;
+#ifdef RUN_FAST_CMP
+        REG_PMC(1) = new_ret_continuation_pmc(interpreter, NULL);
+        /* don't recycle it */
+        PObj_get_FLAGS(REG_PMC(1)) &= ~PObj_private2_FLAG;
+        /* TODO create one exception frame */
+#endif
         /*
          * TODO fix SEGV with JIT
          */

@@ -42,12 +42,12 @@ Returns the PMC value of the element at index C<key>.
 
     PMC* get_pmc_keyed_int (INTVAL key) {
         SizePMCData *sd;
-        if (key < 0) 
-            internal_exception(OUT_OF_BOUNDS, 
+        if (key < 0)
+            internal_exception(OUT_OF_BOUNDS,
                 "ResizablePMCArray: index out of bounds!\n");
         if(key >= PMC_int_val(SELF))
             DYNSELF.set_integer_native(key+1);
-        
+
         sd = (SizePMCData *)PMC_data(SELF);
         if(sd->data[key] == PMCNULL)
             sd->data[key] = pmc_new(INTERP, enum_class_Undef);
@@ -66,8 +66,8 @@ Sets the PMC value of the element at index C<key> to C<*src>.
 
     void set_pmc_keyed_int (INTVAL key, PMC* src) {
         SizePMCData *sd;
-        if (key < 0) 
-            internal_exception(OUT_OF_BOUNDS, 
+        if (key < 0)
+            internal_exception(OUT_OF_BOUNDS,
                 "ResizablePMCArray: index out of bounds!\n");
         if(key >= PMC_int_val(SELF))
             DYNSELF.set_integer_native(key+1);
@@ -90,11 +90,11 @@ Resizes the array to C<size> elements.
     void set_integer_native (INTVAL size) {
         int i;
         SizePMCData *sd;
-        
+
         if (size < 0)
-            internal_exception(OUT_OF_BOUNDS, 
+            internal_exception(OUT_OF_BOUNDS,
                     "ResizablePMCArray: Can't resize!\n");
-        
+
         sd = (SizePMCData *)PMC_data(SELF);
         PMC_int_val(SELF) = size;
         if(sd == NULL) {
@@ -128,12 +128,12 @@ Creates and returns a copy of the array.
     PMC* clone () {
         SizePMCData *sd;
         PMC * dest = pmc_new(INTERP, SELF->vtable->base_type);
-    
+
         if (!PMC_data(SELF))
             return dest;
         PMC_int_val(dest) = PMC_int_val(SELF);
         sd = (SizePMCData *)PMC_data(SELF);
-        
+
         PMC_data(dest) = mem_sys_allocate(NEEDED_SIZE(sd->size));
         mem_sys_memcopy(PMC_data(dest), PMC_data(SELF), NEEDED_SIZE(sd->size));
         PObj_custom_mark_destroy_SETALL(SELF);
@@ -153,7 +153,7 @@ Marks the array as live.
     void mark () {
         SizePMCData *sd;
         int i, end;
-        STRING **data;
+        PMC **data;
         if (!PMC_data(SELF))
             return;
         sd = (SizePMCData *)PMC_data(SELF);

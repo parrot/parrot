@@ -3,7 +3,7 @@
 use strict;
 use lib '../../lib';
 
-use Parrot::Test tests => 12;
+use Parrot::Test tests => 14;
 
 sub test {
     language_output_is('python', $_[0], '', $_[1]);
@@ -318,3 +318,61 @@ def main():
 if __name__ == '__main__':
     main()
 CODE
+
+test(<<'CODE', 'check_functions list');
+show = True
+
+def check(a, b):
+    if __debug__:
+        if show:
+            print `a`, "==", `b`
+    if not a == b:
+        raise AssertionError("%.30r != %.30r" % (a, b))
+
+def check_functions(i=0, j=0):
+    check(divmod(7, 4), (1, 3))
+
+def main():
+    check_functions()
+    check_functions(j=10, i=10)
+    for i in range(0,500,249):
+	print "i:", i
+	check(list((1, 2, 3)), [1, 2, 3])
+	check(list("abc"), ['a', 'b', 'c'])
+	check(list(u"abc"), ['a', 'b', 'c'])
+
+if __name__ == '__main__':
+    main()
+CODE
+
+test(<<'CODE', 'check_functions long');
+show = True
+
+def check(a, b):
+    if __debug__:
+        if show:
+            print `a`, "==", `b`
+    if not a == b:
+        raise AssertionError("%.30r != %.30r" % (a, b))
+
+def check_functions(i=0, j=0):
+    check(divmod(7, 4), (1, 3))
+
+def main():
+    check_functions()
+    check_functions(j=10, i=10)
+    for i in range(0,500,249):
+	print "i:", i
+	check(long("42"), 42)
+	check(long("12345678910"), 12345678910)
+	check(long("42", 0), 42)
+	check(long("042", 0), 34)
+	check(long("0x42", 0), 66)
+	check(long("42", 8), 34)
+	check(long("42", 16), 66)
+
+if __name__ == '__main__':
+    main()
+CODE
+
+

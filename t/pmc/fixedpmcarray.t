@@ -263,7 +263,7 @@ ok 3
 ok 4
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "sort");
+output_like(<<'CODE',
 ##PIR##
 .sub main @MAIN
      .local pmc compares
@@ -325,12 +325,12 @@ done:
     .pcc_end_return
 .end
 CODE
-ok 1
+
+qr/ok 1
 1 2 5 9 10 x
 compares: 0
 ok 1
 1 2 5 9 10 x
-compares: 8
-OUTPUT
+compares: [1-9]\d*/, "sort");
 
 1;

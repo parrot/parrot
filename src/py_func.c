@@ -148,6 +148,12 @@ parrot_py_list(Interp *interpreter, PMC *arg)
     iter = NULL;
     switch (arg->vtable->base_type) {
         case enum_class_FixedPMCArray:  /* sequence from BUILD_TUPLE */
+            list = pmc_new(interpreter, enum_class_PerlArray);
+            for (i = 0; i < VTABLE_elements(interpreter, arg); ++i) {
+                PMC *item = VTABLE_get_pmc_keyed_int(interpreter, arg, i);
+                VTABLE_set_pmc_keyed_int(interpreter, list, i, item);
+            }
+            return list;
         case enum_class_PerlArray:      /* sequence from BUILD_LIST */
             /* TODO return copy */
             return arg;
