@@ -83,7 +83,7 @@ platform$(O) ${jit_o} resources$(O)
 
 O_FILES = $(INTERP_O_FILES) $(IO_O_FILES) $(CLASS_O_FILES) $(ENCODING_O_FILES) $(CHARTYPE_O_FILES)
 
-OPS_FILES = ${ops}
+OPS_FILES = ${ops} $(GEN_OPSFILES)
 
 ###############################################################################
 #
