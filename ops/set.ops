@@ -191,11 +191,16 @@ inline op set(in PMC, in NUM) :base_core {
   goto NEXT();
 }
 
-inline op set(in PMC, in STR) :base_core {
+inline op set(in PMC, invar STR) :base_core {
   $1->vtable->set_string_native(interpreter, $1, $2);
   goto NEXT();
 }
 
+inline op set(in PMC, inconst STR) :base_core {
+  $1->vtable->set_string_native(interpreter, $1,
+    string_copy(interpreter, $2));
+  goto NEXT();
+}
 inline op set(out INT, in PMC) :base_core {
   $1 = $2->vtable->get_integer(interpreter, $2);
   goto NEXT();

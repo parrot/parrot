@@ -16,7 +16,7 @@ Tests the C<PerlString> PMC. Checks Perl-specific string behaviour.
 
 =cut
 
-use Parrot::Test tests => 34;
+use Parrot::Test tests => 35;
 use Test::More; # Included for skip().
 
 my $fp_equality_macro = <<'ENDOFMACRO';
@@ -1083,6 +1083,18 @@ ok 1
 ok 2
 ok 3
 ok 4
+OUTPUT
+
+output_is( <<'CODE', <<OUTPUT, "set const and chop");
+   new P0, .PerlString
+   set P0, "str"
+   set S0, P0
+   chopn S0, 2
+   print "str"
+   print "\n"
+   end
+CODE
+str
 OUTPUT
 
 1;
