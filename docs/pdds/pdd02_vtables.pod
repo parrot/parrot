@@ -1174,7 +1174,7 @@ Autoincrement the PMC.
 
 =item void increment_keyed(INTERP, PMC* self, KEY* key)
 
-=item void increment_keyed(INTERP, PMC* self, INTVAL* key)
+=item void increment_keyed_int(INTERP, PMC* self, INTVAL* key)
 
 Autoincrement the PMC keyed by B<key>.  The key is
 guaranteed to be non-NULL.
@@ -1185,7 +1185,7 @@ Autodecrement the PMC.
 
 =item void decrement_keyed(INTERP, PMC* self, KEY* key)
 
-=item void decrement_keyed(INTERP, PMC* self, INTVAL* key)
+=item void decrement_keyed_int(INTERP, PMC* self, INTVAL* key)
 
 Autodecrement the PMC keyed by B<key>.  The key is
 guaranteed to be non-NULL.
