@@ -1,6 +1,6 @@
 #! perl
 
-use Parrot::Test tests => 30;
+use Parrot::Test tests => 31;
 use Test::More;
 
 output_is(<<CODE, <<OUTPUT, "Initial PerlHash tests");
@@ -937,6 +937,45 @@ value for key1
 1
 0
 OUTPUT
+
+output_is(<<'CODE', <<OUTPUT, "compare keys with different type");
+    set S0, "\xA4"	# currency/euro depending on type
+    clone S1, S0
+    find_chartype I0, "8859-1"
+    set_chartype S0, I0
+    find_chartype I0, "8859-15"
+    set_chartype S1, I0
+
+    ord I0, S0		# both have the same ord
+    print I0
+    print "\n"
+    ord I0, S1
+    print I0
+    print "\n"
+
+    eq S0, S1, equal	# but are not equal
+    print "not "
+equal:
+    print "equal\n"
+
+    new P0, .PerlHash
+    set P0[S0], "currency"
+    set P0[S1], "euro"
+    set S2, P0[S0]
+    print S2
+    print "\n"
+    set S2, P0[S1]
+    print S2
+    print "\n"
+    end
+CODE
+164
+164
+not equal
+currency
+euro
+OUTPUT
+
 
 1;
 

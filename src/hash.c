@@ -30,6 +30,7 @@
  *                     to Hash and HashBucket
  *     2003.11.11 leo randomize key_hash seed
  *                    extend new_hash_x() init call by value_type and _size.
+ *     2003.11.14 leo USE_STRING_COMPARE define, s. comment below
  *
  *  Notes:
  *     Future optimizations:
@@ -46,6 +47,33 @@
 
 #define INITIAL_BUCKETS 16
 #define MAXFULL_PERCENT 80
+
+/*
+ * The following define allows 2 different strategys to deal with non-ASCII
+ * hash keys.
+ * 1 ... Original code. Keys are stored as is. Each compare (which can happen
+ *       more then once per lookup) possibly transcodes keys and then
+ *       compare these keys.
+ * 0 ... Ascii keys are stored as is. As soon as the first non-ASCII key is
+ *       stored in the Hash, all keys are converted to utf8 and the key is
+ *       stored in that encoding too.
+ *       Keys are transcoded once before insert or lookup.
+ *       The only (theoretical?) problem is, that keys are either just stored
+ *       or (after transcoding) a copy of a key is stored. This could
+ *       probably be solved by transcoding the string in place.
+ *
+ * Timing of
+ * $ parrot -C examples/benchmarks/hash-utf8.pasm
+ * #define USE_STRING_COMPARE 1
+ * 0.479678
+ * 9.243186
+ * #define USE_STRING_COMPARE 0
+ * 0.485383
+ * 0.650183
+ */
+
+#define USE_STRING_COMPARE 0
+
 
 /* Assumes 2's complement? */
 const BucketIndex NULLBucketIndex = (BucketIndex)-1;
@@ -100,25 +128,17 @@ key_hash_STRING(Interp *interpreter, Hash *hash, void *value)
     return h;
 }
 
+/*
+ * compare 2 strings, return 0 if ident
+ *
+ * a = search key, b = bucket key
+ */
 static int
 STRING_compare(Parrot_Interp interp, void *a, void *b)
 {
 #if USE_STRING_COMPARE
     return string_compare(interp, (STRING *)a, (STRING *) b);
 #else
-    /*
-     * We only won't to know if strings are the same or not,
-     * so this is a specialized version of string_compare.
-     * Also transcoding inside here is the wrong place.
-     * hash->compare may be called repeatedly for the same key.
-     *
-     * XXX we have to consider string->type too:
-     * * as long as there are only ascii keys: noop
-     * * on first non ascii key, convert all hash to utf8 - doesn't change
-     *   hash values
-     * * then if key is non-ascii and non-utf8 transcode it in
-     *   find_bucket()
-     */
     STRING *s1 = (STRING*) a;
     STRING *s2 = (STRING*) b;
     const char *s1start, *s1end;
@@ -139,7 +159,7 @@ STRING_compare(Parrot_Interp interp, void *a, void *b)
     len = (size_t) s1->bufused;
 
     /* speed up ascii, slow down general case
-     * TODO if above is done, just swap the compare function
+     * TODO we could save some cylces, if we use 2 compare functions
      */
     if (s1->encoding->index == enum_encoding_singlebyte &&
         s2->encoding->index == enum_encoding_singlebyte) {
@@ -157,6 +177,85 @@ STRING_compare(Parrot_Interp interp, void *a, void *b)
 #endif
 }
 
+#if USE_STRING_COMPARE
+#  define promote_hash_key(i,h,k,f) (k)
+#else
+
+/*
+ * just replace the type and encoding, all keys are ascii
+ * til now, so the hash_values of the keys are unchanged
+ *
+ * if any allocation is done inside the loop, that might trigger GC
+ * the HashBucket must be refetched
+ */
+
+static void
+convert_hash_keys_to_utf8(Parrot_Interp interpreter, Hash *hash)
+{
+    HashIndex i;
+    const ENCODING * enc = encoding_lookup_index(enum_encoding_utf8);
+    const CHARTYPE * typ = chartype_lookup_index(enum_chartype_unicode);
+
+    for (i = 0; i <= hash->max_chain; i++) {
+        BucketIndex bi = lookupBucketIndex(hash, i);
+        while (bi != NULLBucketIndex) {
+            HashBucket *b = getBucket(hash, bi);
+            STRING *key = (STRING*) b->key;
+            assert(key->type->index == enum_chartype_usascii);
+            assert(key->encoding->index == enum_encoding_singlebyte);
+            key->type = typ;
+            key->encoding = enc;
+            bi = b->next;
+        }
+    }
+    hash->key_type = Hash_key_type_utf8;
+}
+
+/*
+ * check and possibly promote a hash key to utf8
+ * - if hash->key_type matches key, ok
+ * - if hash is ascii and key is for insert convert all hash keys to utf8
+ * - and convert key to utf8
+ */
+
+static void*
+promote_hash_key(Interp *interpreter, Hash *hash, void *key, int for_insert)
+{
+    STRING *s;
+    const ENCODING * enc;
+    const CHARTYPE * typ;
+
+    switch (hash->key_type) {
+        case Hash_key_type_int:
+        case Hash_key_type_cstring:
+            return key;
+        case Hash_key_type_ascii:
+            s = (STRING*) key;
+            if (s->type->index == enum_chartype_usascii)
+                return key;
+            if (for_insert)
+                convert_hash_keys_to_utf8(interpreter, hash);
+            enc = encoding_lookup_index(enum_encoding_utf8);
+            typ = chartype_lookup_index(enum_chartype_unicode);
+            return string_transcode(interpreter, s, enc, typ, NULL);
+        case Hash_key_type_utf8:
+            s = (STRING*) key;
+            if (s->encoding->index != enum_encoding_utf8) {
+                enc = encoding_lookup_index(enum_encoding_utf8);
+                typ = chartype_lookup_index(enum_chartype_unicode);
+                return string_transcode(interpreter, s, enc, typ, NULL);
+            }
+            return key;
+        default:
+            internal_exception(1, "Illegal key_type");
+    }
+    return key;
+}
+#endif
+
+/*
+ * cstring compare and hash functions
+ */
 static size_t
 key_hash_cstring(Interp *interpreter, Hash* hash, void *value)
 {
@@ -221,6 +320,9 @@ mark_hash(Interp *interpreter, Hash *hash)
     if (!hash->buffer.bufstart|| !hash->bucket_pool->bufstart) {
         return;
     }
+    if (!hash->mark_key && hash->entry_type != enum_hash_string &&
+            hash->entry_type != enum_hash_pmc)
+        return;
 
     for (i = 0; i <= hash->max_chain; i++) {
         HashBucket *bucket = lookupBucket(hash, i);
@@ -325,7 +427,7 @@ expand_hash(Interp *interpreter, Hash *hash)
 }
 
 static BucketIndex
-new_bucket(Interp *interpreter, Hash *hash, STRING *key, void *value)
+new_bucket(Interp *interpreter, Hash *hash, void *key, void *value)
 {
     BucketIndex bucket_index;
 
@@ -369,6 +471,7 @@ new_hash(Interp *interpreter)
     return new_hash_x(interpreter,
             enum_type_PMC,
             0,
+            Hash_key_type_ascii,
             STRING_compare,     /* STRING compare */
             key_hash_STRING,    /*        hash */
             pobject_lives);     /*        mark */
@@ -380,6 +483,7 @@ new_cstring_hash(Interp *interpreter)
     return new_hash_x(interpreter,
             enum_type_PMC,
             0,
+            Hash_key_type_cstring,
             cstring_compare,     /* cstring compare */
             key_hash_cstring,    /*        hash */
             (hash_mark_key_fn)0);/* no     mark */
@@ -387,6 +491,7 @@ new_cstring_hash(Interp *interpreter)
 
 Hash *
 new_hash_x(Interp *interpreter, PARROT_DATA_TYPES val_type, size_t val_size,
+        Hash_key_type hkey_type,
         hash_comp_fn compare, hash_hash_key_fn keyhash,
         hash_mark_key_fn mark)
 {
@@ -395,6 +500,7 @@ new_hash_x(Interp *interpreter, PARROT_DATA_TYPES val_type, size_t val_size,
     hash->hash_val = keyhash;
     hash->mark_key = mark;
     hash->entry_type = val_type;
+    hash->key_type = hkey_type;
     hash->value_size = val_size;       /* extra size */
     hash->seed = (size_t) Parrot_uint_rand(0);
 
@@ -473,8 +579,9 @@ hash_get_idx(Interp *interpreter, Hash *hash, PMC * key)
 
 
 HashBucket *
-hash_get_bucket(Interp *interpreter, Hash *hash, void *key)
+hash_get_bucket(Interp *interpreter, Hash *hash, void *okey)
 {
+    void *key = promote_hash_key(interpreter, hash, okey, 0);
     UINTVAL hashval = (hash->hash_val)(interpreter, hash, key);
     HashIndex *table = (HashIndex *)hash->buffer.bufstart;
     BucketIndex chain = table[hashval & hash->max_chain];
@@ -497,13 +604,15 @@ hash_exists(Interp *interpreter, Hash *hash, void *key)
 
 /* The key is *not* copied. */
 void
-hash_put(Interp *interpreter, Hash *hash, void *key, void *value)
+hash_put(Interp *interpreter, Hash *hash, void *okey, void *value)
 {
     BucketIndex *table;
     UINTVAL hashval;
     BucketIndex bucket_index;
     BucketIndex chain;
     HashBucket *bucket;
+
+    void *key = promote_hash_key(interpreter, hash, okey, 1);
 
     /*      dump_hash(interpreter, hash); */
 
@@ -533,12 +642,13 @@ hash_put(Interp *interpreter, Hash *hash, void *key, void *value)
 }
 
 void
-hash_delete(Interp *interpreter, Hash *hash, void *key)
+hash_delete(Interp *interpreter, Hash *hash, void *okey)
 {
     UINTVAL hashval;
     HashIndex slot;
     HashBucket *bucket;
     HashBucket *prev = NULL;
+    void *key = promote_hash_key(interpreter, hash, okey, 0);
 
     hashval = (hash->hash_val)(interpreter, hash, key);
     slot = hashval & hash->max_chain;
@@ -576,7 +686,7 @@ hash_clone(struct Parrot_Interp *interp, Hash *hash)
     Hash *dest;
 
     dest = new_hash_x(interp, hash->entry_type, hash->value_size,
-            hash->compare, hash->hash_val, hash->mark_key);
+            hash->key_type, hash->compare, hash->hash_val, hash->mark_key);
     for (i = 0; i <= hash->max_chain; i++) {
         BucketIndex bi = lookupBucketIndex(hash, i);
         while (bi != NULLBucketIndex) {

@@ -50,6 +50,14 @@ typedef int    (*hash_comp_fn)(Parrot_Interp, void*, void*);
 typedef void   (*hash_mark_key_fn)(Parrot_Interp, PObj *);
 typedef size_t (*hash_hash_key_fn)(Parrot_Interp, struct _hash*, void*);
 
+typedef enum {
+    Hash_key_type_none,
+    Hash_key_type_int,
+    Hash_key_type_cstring,
+    Hash_key_type_ascii,
+    Hash_key_type_utf8
+} Hash_key_type;
+
 struct _hash {
     Buffer buffer;              /* This struct is a Buffer subclass! */
     HashIndex max_chain;
@@ -61,13 +69,14 @@ struct _hash {
                                    at value is copied as a hash_entry */
     size_t seed;                /* randomizes the hash_key generation
                                    updated for each new hash */
+    Hash_key_type key_type;     /* cstring, ascii-string, utf8-string */
     hash_comp_fn   compare;     /* compare two keys, 0 = equal */
     hash_hash_key_fn hash_val;  /* generate a hash value for key */
     hash_mark_key_fn mark_key;  /* mark a key being alive */
 };
 
 Hash * new_hash(Interp * interpreter);
-Hash * new_hash_x(Interp *, PARROT_DATA_TYPES, size_t val_size,
+Hash * new_hash_x(Interp *, PARROT_DATA_TYPES, size_t val_size, Hash_key_type,
         hash_comp_fn, hash_hash_key_fn, hash_mark_key_fn);
 Hash * new_cstring_hash(Interp *interpreter);
 Hash * hash_clone(Interp * interpreter, Hash * src);
