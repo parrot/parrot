@@ -19,6 +19,11 @@
 #define STRING_ALIGNMENT 4
 #define CONSTANT_STRING_ALIGNMENT 4
 
+/* Parameters for dynamic memory allocation calculations */
+#define INITIAL_REPLENISH_LEVEL_FACTOR 2
+#define UNITS_PER_ALLOC_GROWTH_FACTOR 4
+#define REPLENISH_LEVEL_GROWTH_FACTOR 2
+
 /* Function prototypes for static functions */
 static void *mem_allocate(struct Parrot_Interp *interpreter, size_t *req_size,
                           struct Memory_Pool *pool);
@@ -37,17 +42,47 @@ new_resource_pool(struct Parrot_Interp *interpreter, size_t free_pool_size,
 
     pool = mem_sys_allocate(sizeof(struct Resource_Pool));
     temp_len = free_pool_size * sizeof(void *);
-    pool->free_pool_buffer.bufstart = 
+    if (interpreter->arena_base->buffer_header_pool) {
+        pool->free_pool_buffer = new_buffer_header(interpreter);
+    }
+    else {
+        pool->free_pool_buffer = mem_sys_allocate(sizeof(Buffer));
+    }
+    pool->free_pool_buffer->bufstart = 
         mem_allocate(interpreter, &temp_len, 
                      interpreter->arena_base->memory_pool);
-    pool->free_pool_buffer.buflen = temp_len;
-    pool->free_pool_buffer.flags = BUFFER_live_FLAG;
+    pool->free_pool_buffer->buflen = temp_len;
+    pool->free_pool_buffer->flags = BUFFER_immune_FLAG;
+    pool->free_pool_size = temp_len / sizeof(void *);
     pool->free_entries = 0;
     pool->unit_size = unit_size;
     pool->units_per_alloc = units_per_alloc;
+    pool->replenish_level =  units_per_alloc / INITIAL_REPLENISH_LEVEL_FACTOR;
     pool->replenish = replenish;
     return pool;
 }
+
+/* Expand free pool to accomdate at least n additional entries 
+ * Currently, the minimum expansion is 20% of the current size
+*/
+static void
+expand_free_pool(struct Parrot_Interp *interpreter,
+                 struct Resource_Pool *pool, size_t n)
+{
+    size_t growth;
+
+    if (pool->free_pool_size - pool->free_entries < n) {
+        growth = (n - (pool->free_pool_size - pool->free_entries)) * 
+                 sizeof(void *);
+        if (growth < pool->free_pool_buffer->buflen / 5) {
+            growth = pool->free_pool_buffer->buflen / 5;
+        }
+        Parrot_reallocate(interpreter, pool->free_pool_buffer, 
+                          pool->free_pool_buffer->buflen + growth);
+        pool->free_pool_size += (growth / sizeof(void *));
+    }
+}
+
 
 /* Add entry to free pool 
  * Requires that any object-specific processing (eg flag setting, statistics) 
@@ -59,21 +94,16 @@ add_to_free_pool(struct Parrot_Interp *interpreter,
 {
     void **temp_ptr;
 
-    /* First, check and see if there's enough space in the free pool. If
-     * we're within the size of a pointer, we make it bigger */
-    if (pool->free_entries * sizeof(void *) >=
-        pool->free_pool_buffer.buflen - sizeof(void *)) {
-        /* If not, make the free pool bigger. We enlarge it by 20% */
-        Parrot_reallocate(interpreter,
-                          &pool->free_pool_buffer,
-                          (UINTVAL)(pool->free_pool_buffer.buflen * 1.2));
+    if (pool->free_pool_size == pool->free_entries) {
+        expand_free_pool(interpreter, pool, 1);
     }
+
 #ifdef GC_DEBUG
     Parrot_go_collect(interpreter);
 #endif
 
     /* Okay, so there's space. Add the header on */
-    temp_ptr = pool->free_pool_buffer.bufstart;
+    temp_ptr = pool->free_pool_buffer->bufstart;
     temp_ptr += pool->free_entries;
     *temp_ptr = to_add;
     pool->free_entries++;
@@ -91,17 +121,16 @@ get_from_free_pool(struct Parrot_Interp *interpreter,
 
     if (!pool->free_entries) {
         Parrot_do_dod_run(interpreter);
-    }
-
-    if (!pool->free_entries) {
-        (*pool->replenish)(interpreter, pool);
+        if (pool->free_entries < pool->replenish_level) {
+            (*pool->replenish)(interpreter, pool);
+        }
     }
 
     if (!pool->free_entries) {
         return NULL;
     }
 
-    ptr = pool->free_pool_buffer.bufstart;
+    ptr = pool->free_pool_buffer->bufstart;
     ptr += --pool->free_entries;
     return *ptr;
 }
@@ -136,11 +165,16 @@ alloc_more_pmc_headers(struct Parrot_Interp *interpreter,
     /* Note it in our stats */
     interpreter->total_PMCs += pool->units_per_alloc;
 
+    expand_free_pool(interpreter, pool, pool->units_per_alloc);
     cur_pmc = new_arena->start_PMC;
     for (i = 0; i < pool->units_per_alloc; i++) {
         cur_pmc->flags = PMC_on_free_list_FLAG;
         add_to_free_pool(interpreter, pool, cur_pmc++);
     }
+
+    /* Allocate more next time */
+    pool->units_per_alloc *= UNITS_PER_ALLOC_GROWTH_FACTOR;
+    pool->replenish_level *= REPLENISH_LEVEL_GROWTH_FACTOR;
 }
 
 PMC *
@@ -151,9 +185,10 @@ new_pmc_header(struct Parrot_Interp *interpreter)
     /* We return system memory if we've got no interpreter yet */
     if (NULL == interpreter) {
         return_me = mem_sys_allocate(sizeof(PMC));
-        return_me->flags = PMC_live_FLAG;
+        return_me->flags = 0;
         return_me->vtable = NULL;
         return_me->data = NULL;
+        return_me->next_for_GC = NULL;
         return return_me;
     }
 
@@ -163,9 +198,11 @@ new_pmc_header(struct Parrot_Interp *interpreter)
     /* Count that we've allocated it */
     interpreter->active_PMCs++;
     /* Mark it live */
-    return_me->flags = PMC_live_FLAG;
+    return_me->flags = 0;
     /* Don't let it point to garbage memory */
     return_me->data = NULL;
+    /* Make sure it doesn't seem to be on the GC list */
+    return_me->next_for_GC = NULL;
     /* Return it */
     return return_me;
 }
@@ -206,12 +243,17 @@ alloc_more_buffer_headers(struct Parrot_Interp *interpreter,
     /* Note it in our stats */
     interpreter->total_Buffers += pool->units_per_alloc;
 
+    expand_free_pool(interpreter, pool, pool->units_per_alloc);
     cur_buffer = new_arena->start_Buffer;
     for (i = 0; i < pool->units_per_alloc; i++) {
         cur_buffer->flags = BUFFER_on_free_list_FLAG;
         add_to_free_pool(interpreter, pool, cur_buffer);
         cur_buffer = (Buffer *)((char *)cur_buffer + pool->unit_size);
     }
+
+    /* Allocate twice as many next time */
+    pool->units_per_alloc *= UNITS_PER_ALLOC_GROWTH_FACTOR;
+    pool->replenish_level *= REPLENISH_LEVEL_GROWTH_FACTOR;
 }
 
 /* Get a buffer out of our free pool */
@@ -224,7 +266,7 @@ new_buffer_header(struct Parrot_Interp *interpreter)
      * yet */
     if (interpreter == NULL) {
         return_me = mem_sys_allocate(sizeof(Buffer));
-        return_me->flags = BUFFER_live_FLAG;
+        return_me->flags = 0;
         return return_me;
     }
 
@@ -234,7 +276,7 @@ new_buffer_header(struct Parrot_Interp *interpreter)
     /* Count that we've allocated it */
     interpreter->active_Buffers++;
     /* Mark it live */
-    return_me->flags = BUFFER_live_FLAG;
+    return_me->flags = 0;
     /* Don't let it point to garbage memory */
     return_me->bufstart = NULL;
     /* Return it */
@@ -251,52 +293,6 @@ free_buffer(Buffer *thing)
         thing->bufstart = NULL;
         thing->buflen = 0;
         thing->flags = 0;
-    }
-}
-
-/* Mark all the PMCs as not in use.  */
-static void
-mark_PMCs_unused(struct Parrot_Interp *interpreter)
-{
-    struct PMC_Arena *cur_arena;
-    UINTVAL i;
-
-    /* Run through all the buffer header pools and mark */
-    for (cur_arena = interpreter->arena_base->pmc_pool->last_Arena;
-         NULL != cur_arena;
-         cur_arena = cur_arena->prev) {
-        PMC *pmc_array = cur_arena->start_PMC;
-        for (i = 0; i < cur_arena->used; i++) {
-            /* Tentatively unused, unless it's a constant */
-            if (!(pmc_array[i].flags & PMC_constant_FLAG)) {
-                pmc_array[i].flags &= ~PMC_live_FLAG;
-            }
-            /* But the GC pointer's NULLed anyway */
-            pmc_array[i].next_for_GC = NULL;
-        }
-    }
-}
-
-/* Mark all the buffers as unused */
-static void
-mark_buffers_unused(struct Parrot_Interp *interpreter,
-                    struct Resource_Pool *pool) 
-{
-    struct Buffer_Arena *cur_arena;
-    UINTVAL i;
-
-    /* Run through all the buffer header pools and mark */
-    for (cur_arena = pool->last_Arena;
-         NULL != cur_arena;
-         cur_arena = cur_arena->prev) {
-        Buffer *b = cur_arena->start_Buffer;
-        for (i = 0; i < cur_arena->used; i++) {
-            /* Tentatively unused, unless it's a constant */
-            if (!(b->flags & BUFFER_constant_FLAG)) {
-                b->flags &= ~BUFFER_live_FLAG;
-            }
-            b = (Buffer *)((char *)b + pool->unit_size);
-        }
     }
 }
 
@@ -490,19 +486,24 @@ free_unused_PMCs(struct Parrot_Interp *interpreter)
         PMC *pmc_array = cur_arena->start_PMC;
         for (i = 0; i < cur_arena->used; i++) {
             /* If it's not live or on the free list, put it on the free list */
-            if (!(pmc_array[i].flags & (PMC_live_FLAG | PMC_immune_FLAG |
-                                        PMC_on_free_list_FLAG))) {
+            if (!(pmc_array[i].flags & (PMC_live_FLAG | PMC_on_free_list_FLAG |
+                                       PMC_constant_FLAG | PMC_immune_FLAG))) {
                 interpreter->active_PMCs--;
                 pmc_array[i].flags = PMC_on_free_list_FLAG;
                 add_to_free_pool(interpreter,
                                 interpreter->arena_base->pmc_pool,
                                 &pmc_array[i]);
             }
+            else {
+                pmc_array[i].flags &= ~PMC_live_FLAG;
+                pmc_array[i].next_for_GC = NULL;
+            }
         }
     }
 }
 
-/* Put any free buffers that aren't on the free list on the free list */
+/* Put any free buffers that aren't on the free list on the free list 
+ * Free means: not 'live' and not immune */
 static void
 free_unused_buffers(struct Parrot_Interp *interpreter, 
                     struct Resource_Pool *pool)
@@ -517,11 +518,16 @@ free_unused_buffers(struct Parrot_Interp *interpreter,
         Buffer *b = cur_arena->start_Buffer;
         for (i = 0; i < cur_arena->used; i++) {
             /* If it's not live or on the free list, put it on the free list */
-            if (!(b->flags & (BUFFER_live_FLAG |
-                              BUFFER_on_free_list_FLAG))) {
+            if (!(b->flags & (BUFFER_immune_FLAG | BUFFER_live_FLAG | 
+                              BUFFER_on_free_list_FLAG)) &&
+                (!(b->flags & BUFFER_constant_FLAG) || 
+                 (b->flags & BUFFER_COW_FLAG))) {
                 interpreter->active_Buffers--;
                 b->flags = BUFFER_on_free_list_FLAG;
                 add_to_free_pool(interpreter, pool, b);
+            }
+            else {
+                b->flags &= ~BUFFER_live_FLAG;
             }
             b = (Buffer *)((char *)b + pool->unit_size);
         }
@@ -535,15 +541,6 @@ Parrot_do_dod_run(struct Parrot_Interp *interpreter)
     if (interpreter->DOD_block_level) {
         return;
     }
-
-    /* First go mark all PMCs as unused */
-    mark_PMCs_unused(interpreter);
-
-    /* Then mark the buffers as unused */
-    mark_buffers_unused(interpreter, 
-                        interpreter->arena_base->buffer_header_pool);
-    mark_buffers_unused(interpreter,
-                        interpreter->arena_base->string_header_pool);
 
     /* Now go trace the PMCs */
     trace_active_PMCs(interpreter);
@@ -576,7 +573,7 @@ new_string_header(struct Parrot_Interp *interpreter, UINTVAL flags)
      * yet */
     if (interpreter == NULL) {
         return_me = mem_sys_allocate(sizeof(STRING));
-        return_me->flags = flags | BUFFER_live_FLAG;
+        return_me->flags = flags;
         return return_me;
     }
 
@@ -594,7 +591,7 @@ new_string_header(struct Parrot_Interp *interpreter, UINTVAL flags)
     /* Count that we've allocated it */
     interpreter->active_Buffers++;
     /* Mark it live */
-    return_me->flags = flags | BUFFER_live_FLAG;
+    return_me->flags = flags;
     /* Don't let it point to garbage memory */
     return_me->bufstart = NULL;
     /* Return it */
@@ -605,16 +602,24 @@ new_string_header(struct Parrot_Interp *interpreter, UINTVAL flags)
 void
 Parrot_initialize_resource_pools(struct Parrot_Interp *interpreter)
 {
+    Buffer *old_b, *new_b;
+
+    /* Init the buffer header pool - this must be the first pool created! */
+    interpreter->arena_base->buffer_header_pool =
+        new_resource_pool(interpreter, 256, sizeof(Buffer),
+                          BUFFER_HEADERS_PER_ALLOC,
+                          alloc_more_buffer_headers);
+    /* Re-allocate the temporary buffer header from the new pool */
+    old_b = interpreter->arena_base->buffer_header_pool->free_pool_buffer;
+    new_b = new_buffer_header(interpreter);
+    mem_sys_memcopy(new_b, old_b, sizeof(Buffer));
+    interpreter->arena_base->buffer_header_pool->free_pool_buffer = new_b;
+    mem_sys_free(old_b);
+    
     /* Init the string header pool */
     interpreter->arena_base->string_header_pool = 
         new_resource_pool(interpreter, 256, sizeof(STRING), 
                           STRING_HEADERS_PER_ALLOC,
-                          alloc_more_buffer_headers);
-    
-    /* Init the buffer header pool */
-    interpreter->arena_base->buffer_header_pool =
-        new_resource_pool(interpreter, 256, sizeof(Buffer),
-                          BUFFER_HEADERS_PER_ALLOC,
                           alloc_more_buffer_headers);
     
     /* Init the PMC header pool */
@@ -676,7 +681,7 @@ new_tracked_header(struct Parrot_Interp *interpreter, size_t size)
     
     buffer = get_from_free_pool(interpreter, pool);
     interpreter->active_Buffers++;
-    buffer->flags = BUFFER_live_FLAG;
+    buffer->flags = 0;
     buffer->bufstart = NULL;
     buffer->buflen = 0;
     return buffer;
@@ -706,7 +711,6 @@ compact_buffer_pool(struct Parrot_Interp *interpreter,
     UINTVAL cur_size;     /* How big our chunk is going to be */
     struct Buffer_Arena *cur_buffer_arena;
     struct Resource_Pool *header_pool;
-    Buffer *b;   /* temporary tidy-up for free pool collection */
     INTVAL j;
 
     /* Bail if we're blocked */
@@ -727,88 +731,40 @@ compact_buffer_pool(struct Parrot_Interp *interpreter,
     /* Start at the beginning */
     cur_spot = new_block->start;
   
-    /* FIXME: This is a mess! */
-
-    /* First collect the free string header pool */
-    b = &interpreter->arena_base->string_header_pool->free_pool_buffer;
-    memcpy(cur_spot, b->bufstart, b->buflen);
-    b->bufstart = cur_spot;
-    cur_size = b->buflen;
-    cur_size = (cur_size + pool->align_1) & ~pool->align_1;
-    cur_spot += cur_size;
-
-    /* Collect the PMC header pool */
-    b = &interpreter->arena_base->pmc_pool->free_pool_buffer;
-    memcpy(cur_spot, b->bufstart, b->buflen);
-    b->bufstart = cur_spot;
-    cur_size = b->buflen;
-    cur_size = (cur_size + pool->align_1) & ~pool->align_1;
-    cur_spot += cur_size;
-
-    /* And the buffer header pool */
-    b = &interpreter->arena_base->buffer_header_pool->free_pool_buffer;
-    memcpy(cur_spot, b->bufstart, b->buflen);
-    b->bufstart = cur_spot;
-    cur_size = b->buflen;
-    cur_size = (cur_size + pool->align_1) & ~pool->align_1;
-    cur_spot += cur_size;
-
-    /* And the constant string header pool */
-    b = &interpreter->arena_base->constant_string_header_pool->free_pool_buffer;
-    memcpy(cur_spot, b->bufstart, b->buflen);
-    b->bufstart = cur_spot;
-    cur_size = b->buflen;
-    cur_size = (cur_size + pool->align_1) & ~pool->align_1;
-    cur_spot += cur_size;
-
-    /* And finally the sized buffer header pools */
-    for (j = 0; j < (INTVAL) interpreter->arena_base->num_sized; j++) {
-        struct Resource_Pool* sized_pool;
-        sized_pool = interpreter->arena_base->sized_header_pools[j];
-        if (sized_pool == NULL) continue;
-
-        b = &sized_pool->free_pool_buffer;
-        memcpy(cur_spot, b->bufstart, b->buflen);
-        b->bufstart = cur_spot;
-        cur_size = b->buflen;
-        cur_size = (cur_size + pool->align_1) & ~pool->align_1;
-        cur_spot += cur_size;
-    }
-
     /* Run through all the Buffer header pools and copy */
     for (j = -1; j < (INTVAL) interpreter->arena_base->num_sized; j++) {
         if (j == -1) header_pool = interpreter->arena_base->buffer_header_pool;
         else header_pool = interpreter->arena_base->sized_header_pools[j];
         if (header_pool == NULL) continue;
                  
-    for (cur_buffer_arena = header_pool->last_Arena;
-         NULL != cur_buffer_arena;
+        for (cur_buffer_arena = header_pool->last_Arena;
+             NULL != cur_buffer_arena;
              cur_buffer_arena = cur_buffer_arena->prev)
         {
-        Buffer *buffer_array = cur_buffer_arena->start_Buffer;
+            Buffer *b = cur_buffer_arena->start_Buffer;
             UINTVAL i;
-        for (i = 0; i < cur_buffer_arena->used; i++) {
-                Buffer *buffer = (Buffer*)((char*)cur_buffer_arena->start_Buffer + i * header_pool->unit_size);
-
-            /* Is the string live, and can we move it? */
-                if (buffer->flags & BUFFER_live_FLAG
-                    && !(buffer->flags & BUFFER_immobile_FLAG)
-                    && buffer->bufstart)
+            for (i = 0; i < cur_buffer_arena->used; i++) {
+                /* Is the buffer live, and can we move it? */
+                if (!(b->flags & (BUFFER_on_free_list_FLAG | 
+                                  BUFFER_immobile_FLAG))
+                    && b->bufstart) 
                 {
-                    if (buffer->flags & BUFFER_report_FLAG) {
+                    if (b->flags & BUFFER_report_FLAG) {
                         fprintf(stderr, "  copying buffer %p+%ld -> %p\n",
-                                buffer->bufstart, buffer->buflen, cur_spot);
+                                b->bufstart, b->buflen, cur_spot);
                     }
-                    memcpy(cur_spot, buffer->bufstart, buffer->buflen);
-                    buffer->bufstart = cur_spot;
-                    cur_size = buffer->buflen;
-                cur_size = (cur_size + pool->align_1) & ~pool->align_1;
-                cur_spot += cur_size;
-                } else if (buffer->flags & BUFFER_report_FLAG) {
-                    if (buffer->bufstart != NULL)
+                    memcpy(cur_spot, b->bufstart, b->buflen);
+                    b->bufstart = cur_spot;
+                    cur_size = b->buflen;
+                    cur_size = (cur_size + pool->align_1) & ~pool->align_1;
+                    cur_spot += cur_size;
+                } 
+                else if (b->flags & BUFFER_report_FLAG) {
+                    if (b->bufstart != NULL)
                         fprintf(stderr, "  not copying buffer %p+%ld\n",
-                                buffer->bufstart, buffer->buflen);
+                                b->bufstart, b->buflen);
                 }
+                b = (Buffer *)((char *)b + header_pool->unit_size);
             }
         }
     }
@@ -886,9 +842,8 @@ compact_string_pool(struct Parrot_Interp *interpreter,
 
         for (i = 0; i < cur_arena->used; i++) {
             /* Is the string live, and can we move it? */
-            if (s->flags & BUFFER_live_FLAG
-                && !(s->flags & BUFFER_immobile_FLAG)
-                && !(s->flags & BUFFER_constant_FLAG)
+            if (!(s->flags & (BUFFER_on_free_list_FLAG | 
+                              BUFFER_constant_FLAG | BUFFER_immobile_FLAG))
                 && s->bufstart) {
                 memcpy(cur_spot, s->bufstart, s->buflen);
                 s->bufstart = cur_spot;
