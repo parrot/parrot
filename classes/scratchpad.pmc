@@ -17,6 +17,7 @@ pmclass Scratchpad {
 
     void init () {
         SELF->flags |= PMC_custom_mark_FLAG | PMC_active_destroy_FLAG;
+        SELF->cache.int_val = 0;
     }
 
     PMC* mark (PMC* last) {
@@ -79,10 +80,10 @@ pmclass Scratchpad {
 
         if (key_type(INTERP, name_key) == KEY_integer_FLAG) {
             position = key_integer(INTERP, name_key);
-        } 
+        }
         else if (key_type(INTERP, name_key) == KEY_string_FLAG) {
             name = key_string(INTERP, name_key);
-        } 
+        }
         else {
             internal_exception(-1, "Invalid key");
         }
@@ -90,13 +91,13 @@ pmclass Scratchpad {
         if (key2) {
             if (key_type(INTERP, key) == KEY_integer_FLAG) {
                 pad_index = key_integer(INTERP, key);
-            } 
+            }
             else {
                 internal_exception(-1, "Invalid key");
             }
-            ret = scratchpad_get_index(INTERP, SELF, pad_index, 
+            ret = scratchpad_get_index(INTERP, SELF, pad_index,
                                        name, position);
-        } 
+        }
         else {
             ret = scratchpad_get(INTERP, SELF, name, position);
         }
@@ -116,10 +117,10 @@ pmclass Scratchpad {
 
         if (key_type(INTERP, name_key) == KEY_integer_FLAG) {
             position = key_integer(INTERP, name_key);
-        } 
+        }
         else if (key_type(INTERP, name_key) == KEY_string_FLAG) {
             name = key_string(INTERP, name_key);
-        } 
+        }
         else {
             internal_exception(-1, "Invalid key");
         }
@@ -127,13 +128,13 @@ pmclass Scratchpad {
         if (key2) {
             if (key_type(INTERP, key) == KEY_integer_FLAG) {
                 pad_index = key_integer(INTERP, key);
-            } 
+            }
             else {
                 internal_exception(-1, "Invalid key");
             }
-            scratchpad_store_index(INTERP, SELF, pad_index, name, 
+            scratchpad_store_index(INTERP, SELF, pad_index, name,
                                    position, value);
-        } 
+        }
         else {
             scratchpad_store(INTERP, SELF, name, position, value);
         }
