@@ -9,7 +9,7 @@ RM_F = ${rm_f}
 
 DIR=languages/scheme
 TOOL_DIR=../..
-ASM= $(PERL) assemble.pl
+ASM=$(PERL) -I ../../lib ../../assemble.pl
 SCHEMEC=$(PERL) schemec
 INTERP=./${test_prog}
 
@@ -22,7 +22,7 @@ default: test
 
 foo: foo.scheme schemec
 	$(SCHEMEC) foo.scheme > foo.pasm
-	cd $(TOOL_DIR); perl $(ASM) $(DIR)/foo.pasm > $(DIR)/foo.pbc
+	$(ASM) -o foo.pbc foo.pasm
 	cd $(TOOL_DIR); $(INTERP) $(DIR)/foo.pbc
 	cat foo.pasm
 
@@ -44,13 +44,13 @@ foo.pasm: foo.scheme schemec
 #
 
 test.pbc: test.pasm
-	cd $(TOOL_DIR); $(ASM) $(DIR)/test.pasm > $(DIR)/test.pbc
+	$(ASM) -o $@ $?
 
 and.pbc: and.pasm
-	cd $(TOOL_DIR); $(ASM) $(DIR)/and.pasm > $(DIR)/and.pbc
+	$(ASM) -o $@ $?
 
 foo.pbc: foo.pasm
-	cd $(TOOL_DIR); $(ASM) $(DIR)/foo.pasm > $(DIR)/foo.pbc
+	$(ASM) -o $@ $?
 
 #
 # Other targets:

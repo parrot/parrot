@@ -12,7 +12,7 @@ test: build
 	$(IMCC) -r bfc.pbc test.bf
 
 build: bf.pasm
-	$(ASSEMBLE) bf.pasm > bf.pbc
+	$(ASSEMBLE) -o bf.pbc bf.pasm
 	$(IMCC) -o bfc.pbc bfc.pasm
 
 clean:

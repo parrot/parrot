@@ -10,7 +10,7 @@ test: build
 	$(PARROT) befunge.pbc test.bef
 
 build: befunge.pasm debug.pasm flow.pasm io.pasm load.pasm maths.pasm stack.pasm
-	$(ASSEMBLE) befunge.pasm > befunge.pbc
+	$(ASSEMBLE) -o befunge.pbc befunge.pasm
 
 clean:
 	$(RM_F) core *.pbc *~

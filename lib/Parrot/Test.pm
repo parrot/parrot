@@ -102,7 +102,7 @@ sub generate_pbc_for {
       print ASSEMBLY $assembly;
       close ASSEMBLY;
       unless($ENV{IMCC}) {
-        my $cmd = "$PConfig{perl} ${directory}assemble.pl $as_f --output $by_f";
+        my $cmd = "$PConfig{perl} ${directory}assemble.pl -o $by_f $as_f";
         my $exit_code = _run_command($cmd);
         $Builder->diag("'$cmd' failed with exit code $exit_code") if $exit_code;
       }

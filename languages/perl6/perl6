@@ -691,7 +691,7 @@ sub pass3($$) {
     my $opt = '';
     $opt .= ' -E' if ($OPT{E});
     $opt .= ' -c' if ($OPT{checksyntax});
-    my $cmd = "$ASM $opt $file -o $outfile";
+    my $cmd = "$ASM $opt -o $outfile $file";
     verbose(1, "assembling $cmd");
     warnings(sub {
 	if (system($cmd)) {

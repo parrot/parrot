@@ -94,7 +94,7 @@ examples/sub.pasm:        examples/sub.imc        imcc
 #
 
 .pasm.pbc:
-	$(ASM) $< > $@
+	$(ASM) -o $@ $<
 
 examples/bench.pbc:      examples/bench.pasm
 examples/board.pbc:      examples/board.pasm

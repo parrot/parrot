@@ -10,7 +10,7 @@ test: build
 	../imcc/imcc -r ook.pasm test.ook
 
 build: ook.pasm
-	$(ASSEMBLE) ook.pasm > ook.pbc
+	$(ASSEMBLE) -o ook.pbc ook.pasm
 
 clean:
 	$(RM_F) core *.pbc *~ foo.p*

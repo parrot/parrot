@@ -7,7 +7,7 @@
 PERL=${perl}
 DIR=languages/miniperl
 TOOL_DIR=../..
-ASM=./assemble.pl
+ASM=$(PERL) -I ../../lib ../../assemble.pl
 MINIPERLC=$(PERL) miniperlc
 INTERP=./${test_prog}
 
@@ -20,7 +20,7 @@ default: test
 
 foo: foo.mpl miniperlc
 	$(MINIPERLC) foo.mpl > foo.pasm
-	cd $(TOOL_DIR); perl $(ASM) $(DIR)/foo.pasm > $(DIR)/foo.pbc
+	$(ASM) -o foo.pbc foo.pasm
 	cd $(TOOL_DIR); $(INTERP) $(DIR)/foo.pbc
 	cat foo.pasm
 
@@ -42,13 +42,13 @@ foo.pasm: foo.mpl miniperlc
 #
 
 test.pbc: test.pasm
-	cd $(TOOL_DIR); $(ASM) $(DIR)/test.pasm > $(DIR)/test.pbc
+	$(ASM) -o $@ $?
 
 and.pbc: and.pasm
-	cd $(TOOL_DIR); $(ASM) $(DIR)/and.pasm > $(DIR)/and.pbc
+	$(ASM) -o $@ $?
 
 foo.pbc: foo.pasm
-	cd $(TOOL_DIR); $(ASM) $(DIR)/foo.pasm > $(DIR)/foo.pbc
+	$(ASM) -o $@ $?
 
 #
 # Other targets:

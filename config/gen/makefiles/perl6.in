@@ -25,7 +25,7 @@ imcc:
 	$(compile) < $< > $@
 
 %.pbc: %.pasm
-	$(asm) $< > $@
+	$(asm) -o $@ $<
 
 clean:
 	$(RM_RF) t/*/*.p6 t/*/*.imc t/*/*.pasm t/*/*.err t/*/*.pbc t/*/*.out
