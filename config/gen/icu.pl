@@ -28,10 +28,17 @@ sub runstep {
            $icushared, $icuheaders, $icuconfig) = @_;
   my $icu_configure_command;
   my @icu_headers = qw(ucnv.h utypes.h uchar.h);
+  my $autodetect = !defined($icudatadir)
+                && !defined($icuplatform)
+	        && !defined($icushared)
+	        && !defined($icuheaders);
 
   print "\n" if $verbose;
-  
-  if (!defined $icuconfig || !$icuconfig) {
+
+  if (!$autodetect) {
+    print "specified a icu config parameter,\nICU autodetection disabled.\n"
+       if $verbose;
+  } elsif (!defined $icuconfig || !$icuconfig) {
     `icu-config --exists`;
     if (($? == -1) || ($? >> 8) != 0 ) {
       undef $icuconfig;
@@ -42,7 +49,7 @@ sub runstep {
     }
   }
 
-  if ($icuconfig && $icuconfig ne "none") {
+  if ($autodetect && $icuconfig && $icuconfig ne "none") {
     my $slash = Configure::Data->get('slash');
 
     # icu-config script to use
