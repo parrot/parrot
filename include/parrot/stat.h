@@ -28,6 +28,13 @@
 #define STAT_BACKUPTIME 8
 #define STAT_UID        9
 #define STAT_GID        10
+#define STAT_PLATFORM_DEV -1
+#define STAT_PLATFORM_INODE -2
+#define STAT_PLATFORM_MODE -3
+#define STAT_PLATFORM_NLINKS -4
+#define STAT_PLATFORM_DEVTYPE -5
+#define STAT_PLATFORM_BLOCKSIZE -6
+#define STAT_PLATFORM_BLOCKS -7
 
 /* &end_gen */
 
@@ -35,6 +42,7 @@ PMC *Parrot_stat_file(Parrot_Interp, STRING *);
 PMC *Parrot_stat_info_pmc(Parrot_Interp, STRING *, INTVAL);
 STRING *Parrot_stat_info_string(Parrot_Interp, STRING *, INTVAL);
 INTVAL Parrot_stat_info_intval(Parrot_Interp, STRING *, INTVAL);
+INTVAL Parrot_fstat_info_intval(Parrot_Interp, INTVAL, INTVAL);
 FLOATVAL Parrot_stat_info_floatval(Parrot_Interp, STRING *, INTVAL);
 
 #endif /* PARROT_STRING_H_GUARD */

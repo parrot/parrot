@@ -409,6 +409,7 @@ op peek(out STR, in PMC) :base_io {
 ##########################################
 
 =item B<stat>(out INT, in STR, in INT)
+=item B<stat>(out INT, in INT, in INT)
 
 Stat the file. Return stat element $3 for file $2 into $1. The queryable
 items currently are:
@@ -430,6 +431,11 @@ items currently are:
 
 op stat(out INT, in STR, in INT) {
   $1 = Parrot_stat_info_intval(interpreter, $2, $3);
+  goto NEXT();
+}
+
+op stat(out INT, in INT, in INT) {
+  $1 = Parrot_fstat_info_intval(interpreter, $2, $3);
   goto NEXT();
 }
 
