@@ -48,6 +48,7 @@ foreach my $i ( qw(is isnt like) ) {
   *{"Parrot::Test::output_$i"} = sub ($$;$) {
     ++$count;
     my( $assembly, $output, $desc ) = @_;
+    $output =~ s/\cM\cJ/\n/g;
     local( *ASSEMBLY, *OUTPUT );
     my( $as_f, $by_f, $out_f ) = map {
       my $t = $0; $t =~ s/\.t$/$count\.$_/; $t
@@ -66,6 +67,7 @@ foreach my $i ( qw(is isnt like) ) {
     {
       local $/ = undef;
       $prog_output = <OUTPUT>;
+      $prog_output =~ s/\cM\cJ/\n/g;
     }
     close OUTPUT;
 
