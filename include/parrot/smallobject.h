@@ -23,13 +23,14 @@ struct Small_Object_Arena {
  * this data structure just for resetting
  * the on_free_list FLAG cheaper
  *
+ * this structure should not be bigger then a PMC
  */
 typedef struct {
     void *free_list_ptr;        /* generic free list ptr */
-    UINTVAL object_buflen_dont_use;
+    size_t object_buflen_dont_use;
     UINTVAL object_flags_dont_use;
     UINTVAL *arena_dod_flag_ptr;/* ptr to the dod flag nibble */
-    UINTVAL flag_shift;         /* shift inside dod_flags */
+    int flag_shift;         /* shift inside dod_flags */
 } Dead_PObj;
 
 #endif /* ARENA_DOD_FLAGS */
