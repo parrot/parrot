@@ -2,15 +2,15 @@
 
 use strict;
 use lib qw(tcl/t t . ../lib ../../lib ../../../lib);
-use Parrot::Test tests => 0; #1
-use Test::More
+use Parrot::Test tests => 1;
+use vars qw($TODO);
+
 
 my($tcl,$expected);
 
-=for TODO
-
 TODO: {
-  local $::TODO = "fails when run as .t - running the two tcl files manually works.";
+  local $TODO = "fails when run as .t - running the two tcl files manually works.";
+    
 # prolly not portable, patches welcome.
 my $source_file = <<'EOF';
  set a 10
@@ -32,7 +32,6 @@ $expected = <<EOF;
 10
 EOF
 language_output_is("tcl",$tcl,$expected,"simple source");
-unlink($source_filename)
+unlink($source_filename);
 }
 
-=cut

@@ -2,8 +2,8 @@
 
 use strict;
 use lib qw(tcl/t t . ../lib ../../lib ../../../lib);
-use Parrot::Test tests => 3; #2
-use Test::More;
+use Parrot::Test tests => 5;
+use vars qw($TODO);
 
 my($tcl,$expected);
 
@@ -35,7 +35,6 @@ EOTCL
 $expected = "2\n3\n";
 language_output_is("tcl",$tcl,$expected,"twoarg");
 
-=for TODO
 
 TODO: {
 local $TODO = "not done yet.";
@@ -61,4 +60,3 @@ language_output_is("tcl",$tcl,$expected,"defaultarg");
 
 }
 
-=cut

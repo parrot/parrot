@@ -219,6 +219,12 @@ sub generate_functions {
         *{$package.'::'.$func} = sub ($$$;$) {
           my $language = $_[0];
           $language = ucfirst($language) unless ( $language eq 'm4' );
+	    
+	  # make sure TODO will work, by telling Test::Builder which package
+	  # the .t file is in (one more than usual, due to the extra layer
+	  # of package indirection
+          $Builder->level(2);
+	    
           # get modified PARROT command.
           require "Parrot/Test/$language.pm";
 	  # set the builder object, and parrot config.

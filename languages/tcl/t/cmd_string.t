@@ -2,7 +2,8 @@
 
 use strict;
 use lib qw(tcl/t t . ../lib ../../lib ../../../lib);
-use Parrot::Test tests => 24; #1
+use Parrot::Test tests => 25;
+use vars qw($TODO);
 
 my($tcl,$expected);
 
@@ -96,10 +97,9 @@ EOTCL
 $expected = "";
 language_output_is("tcl",$tcl,$expected,"index, too far");
 
-=for TODO
 
 TODO: {
-local $::TODO = "don't handle negative indices yet.";
+local $TODO = "don't handle negative indices yet.";
 $tcl = <<'EOTCL';
  puts -nonewline [string index abcde -1]
 EOTCL
@@ -107,7 +107,6 @@ $expected = "";
 language_output_is("tcl",$tcl,$expected,"index, too near?");
 }
 
-=cut
 
 $tcl = <<'EOTCL';
  puts -nonewline [string length a b]

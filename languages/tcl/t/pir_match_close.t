@@ -2,7 +2,8 @@
 
 use strict;
 use lib qw(tcl/t t . ../lib ../../lib ../../../lib);
-use Parrot::Test tests => 3; #1
+use Parrot::Test tests => 5;
+use vars qw($TODO);
 
 my($pir,$expected);
 
@@ -35,12 +36,10 @@ pir_output_is(match_close(1),-1,"invalid start char");
 pir_output_is(match_close(19),-2,"unterminated quote");
 pir_output_is(match_close(25),-2,"unterminated brace");
 
-=for TODO
 
 TODO: {
-local $::TODO = "not sure if this is the right way for these to behave. research tcl.\n";
+local $TODO = "not sure if this is the right way for these to behave. research tcl.\n";
   pir_output_is(match_close(8),19,"matched quote");
   pir_output_is(match_close(25),34,"matched brace");
 }
 
-=cut
