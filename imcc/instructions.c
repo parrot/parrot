@@ -500,6 +500,7 @@ e_file_open(Interp *interp, void *param)
     if (strcmp(file, "-"))
         freopen(file, "w", stdout);
     output = file;
+    printf( "# IMCC does produce b0rken PASM files\n# see http://guest@rt.perl.org/rt3/Ticket/Display.html?id=32392\n" );
     return 1;
 }
 
