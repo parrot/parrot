@@ -1,4 +1,22 @@
-VERSION 0.0.8
+VERSION 0.0.9
+
+New in 0.0.9
+
+- Native function calling interface (Dan)
+- Stack/list aggregate rewrite (Leo)
+- Scratchpads (Jonathan Sillito)
+- Preliminary DotGNU support -- type conversion ops (Gopal V + Leo)
+- Buffer/PMC unification (Leo)
+- stabs debugging support for JIT (Leo)
+- Jako overhaul (Gregor)
+- Optional Lea allocator (Leo)
+- Parrot sprintf (Brent)
+- Miniparrot (Josh)
+- PMC Properties (Dan)
+- Various JIT improvements (D. Grunblatt + Leo)
+- Extensible packfiles (Juergen)
+- Restructured PMC hierarchy (Leo)
+- Real Scheme (Juergen)
 
 New in 0.0.8
 
@@ -9,7 +27,7 @@ New in 0.0.8
 - Better Documentation
 - New COW semantics
 - GC acceleration (Mike Lambert)
-- Lexical scope (Jonathan Sillto)
+- Lexical scope (Jonathan Sillito)
 - IMCC patches
 - JIT for the ARM
 
