@@ -1127,8 +1127,12 @@ PDB_disassemble_op(struct Parrot_Interp *interpreter, char* dest, int space,
                     break;
                 case KEY_string_FLAG:
                     dest[size++] = '"';
-                    strcpy(&dest[size],
-                           string_to_cstring(interpreter,k->cache.string_val));
+                    {
+                    	char *temp = string_to_cstring(
+                    		interpreter,k->cache.string_val);
+	                    strcpy(&dest[size], temp);
+	                    free(temp);
+                    }
                     size += string_length(k->cache.string_val);
                     dest[size++] = '"';
                     break;
