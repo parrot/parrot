@@ -1110,7 +1110,7 @@ parrot_py_set_attr_num(Interp* interpreter, PMC *obj, INTVAL nr, PMC *v)
             case -41:       /* MMD_CMP */
                 f = NULL;
                 if (v->vtable->base_type == enum_class_NCI) {
-                    f = PMC_struct_val(v);
+                    f = (funcptr_t) PMC_struct_val(v);
                     mmd_register(interpreter, -nr, type, type, f);
                     mmd_register(interpreter, -nr, type, 0, f);
                     return;

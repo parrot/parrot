@@ -501,6 +501,7 @@ PIO_buf_peek(theINTERP, ParrotIOLayer *layer, ParrotIO *io, STRING **buf)
     ParrotIOBuf *b;
     size_t len = 1;
     STRING *s;
+    size_t avail;
 
     s = PIO_make_io_string(interpreter, buf, 1);
 
@@ -513,7 +514,7 @@ PIO_buf_peek(theINTERP, ParrotIOLayer *layer, ParrotIO *io, STRING **buf)
 
     /* read Data from buffer */
     if (b->flags & PIO_BF_READBUF) {
-        size_t avail = b->endb - b->next;
+        avail = b->endb - b->next;
 
         /* if we have data available, copy out the next byte */
         if (avail) {
@@ -584,7 +585,7 @@ PIO_buf_readline(theINTERP, ParrotIOLayer *layer, ParrotIO *io,
                 else
                     internal_exception(1, "readline: buffer too short");
             }
-            out_buf = (char*)s->strstart + s->strlen;
+            out_buf = (unsigned char*)s->strstart + s->strlen;
             memcpy(out_buf, buf_start, len);
             s->strlen = l;
             if (PIO_buf_fill_readbuf(interpreter, layer, io, b) == 0)
@@ -601,7 +602,7 @@ PIO_buf_readline(theINTERP, ParrotIOLayer *layer, ParrotIO *io,
         else
             internal_exception(1, "readline: buffer too short");
     }
-    out_buf = (char*)s->strstart + s->strlen;
+    out_buf = (unsigned char*)s->strstart + s->strlen;
     len = b->next - buf_start;
     memcpy(out_buf, buf_start, len);
     s->strlen = s->bufused = l;

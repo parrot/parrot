@@ -65,12 +65,15 @@ sort_ext_compare(void *a, void *b)
 static void array_sort(Interp *interpreter, PMC *self, PMC *cmp_func)
 {
     int (*func)(void*, void*);
+    PMC *first;
+    INTVAL type;
+    PMC *s;
 
     if (REG_INT(3) == 0) {
-        PMC *first = ((PMC**)PMC_data(self))[0];
+        first = ((PMC**)PMC_data(self))[0];
         /* XXX simulate MMD inheritance: Int isa TT */
-        INTVAL type = first->vtable->base_type - 1;
-        PMC *s = mmd_vtfind(interpreter, MMD_CMP, type, 0);
+        type = first->vtable->base_type - 1;
+        s = mmd_vtfind(interpreter, MMD_CMP, type, 0);
         /* cmp was overriden ? */
         if (s->vtable->base_type == enum_class_Sub) {
             cmp_func = s;

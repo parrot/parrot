@@ -1095,8 +1095,8 @@ string_str_index(Interp *interpreter, const STRING *s,
     {
         internal_exception(UNIMPLEMENTED,
             "string_str_index: case not implemented yet");
-        return -1;
     }
+    return -1;
 }
 
 /*

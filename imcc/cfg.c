@@ -253,9 +253,10 @@ build_cfg(Parrot_Interp interpreter, IMC_Unit * unit)
 
             for (pred = bb->pred_list; pred; pred = pred->next) {
                 int found = 0;
+                SymReg *r;
                 if (!strcmp(pred->from->end->op, "bsr")) {
 
-                    SymReg *r = pred->from->end->r[0];
+                    r = pred->from->end->r[0];
 
                     sub = pred->to->start;
                     if ((sub->type & ITLABEL) &&

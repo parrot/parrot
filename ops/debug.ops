@@ -137,10 +137,12 @@ Die. Hard. Calls _exit, and won't do any process cleanup
 
 op die() :base_debug {
   _exit(0);
+  goto NEXT();
 }
 
 op die(in INT) :base_debug {
   _exit($1);
+  goto NEXT();
 }
   
 
