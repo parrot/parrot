@@ -1,6 +1,7 @@
 # See tools/dev/install_files.pl for documentation on the
 # format of this file.
-ChangeLog                                         []
+#ChangeLog                                         []
+FriedFish
 Configure.pl                                      []
 DEVELOPING                                        []
 KNOWN_ISSUES                                      [main]doc
