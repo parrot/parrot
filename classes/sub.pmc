@@ -54,7 +54,11 @@ clear_fixup(Parrot_Interp interpreter, PMC* self)
 
     seg = PMC_sub(self)->seg;
     ft = seg->fixups;
+    if (!ft)
+        return;
     ct = seg->consts;
+    if (!ct)
+        return;
     for (i = 0; i < ft->fixup_count; i++) {
         switch (ft->fixups[i]->type) {
             case enum_fixup_sub:

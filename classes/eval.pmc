@@ -21,6 +21,33 @@ evaluation and execution.
 
 #include "parrot/parrot.h"
 
+static void
+clear_fixups(Parrot_Interp interpreter, PMC* self)
+{
+    opcode_t i, ci;
+    struct PackFile_ByteCode *seg;
+    struct PackFile_FixupTable *ft;
+    struct PackFile_ConstTable *ct;
+
+    seg = PMC_sub(self)->seg;
+    if (!seg)
+        return;
+    ft = seg->fixups;
+    if (!ft)
+        return;
+    ct = seg->consts;
+    if (!ct)
+        return;
+    for (i = 0; i < ft->fixup_count; i++) {
+        switch (ft->fixups[i]->type) {
+            case enum_fixup_sub:
+                ci = ft->fixups[i]->offset;
+                ct->constants[ci]->u.key = NULL;
+                ft->fixups[i]->type = 0;
+        }
+    }
+}
+
 pmclass Eval extends Closure {
 
     void init() {
@@ -51,12 +78,14 @@ pmclass Eval extends Closure {
          * as the segment is destroyed now.
          *
          * TODO walk the fixups for this segment, locate globals
-         *      and nullify the Sub PMC
+         *      and nullify the Sub PMC.
+         * This probably needs a pointer into the globals.
          */
         parrot_sub_t sub_data;
         struct PackFile_Segment *seg;
         struct PackFile_ByteCode *cur_cs;
 
+        clear_fixups(interpreter, SELF);
         sub_data = PMC_sub(SELF);
         cur_cs = sub_data->seg;
         if (!cur_cs)
@@ -64,11 +93,14 @@ pmclass Eval extends Closure {
 
         if (cur_cs->consts)
             PackFile_ConstTable_clear(cur_cs->consts);
+        cur_cs->consts = NULL;
         seg = (struct PackFile_Segment *)cur_cs->debugs;
         if (seg)
             PackFile_Segment_destroy(seg);
+        cur_cs->debugs = NULL;
         if (cur_cs->fixups)
             PackFile_FixupTable_clear(cur_cs->fixups);
+        cur_cs->fixups = NULL;
         seg = (struct PackFile_Segment *)cur_cs;
         PackFile_Segment_destroy(seg);
         sub_data->seg = NULL;
