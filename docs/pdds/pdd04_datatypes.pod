@@ -114,12 +114,12 @@ implementation, see L<docs/pdds/pdd14_bignum.pod>.
 
 We can represent a bigint with:
 
-   struct bigint {
-     void *buffer;
-     UINTVAL length;
-     INTVAL exponent;
-     UINTVAL flags;
-   }
+    struct bigint {
+         void *buffer;
+         UINTVAL length;
+         INTVAL exponent;
+         UINTVAL flags;
+    }
 
 =begin question
 
@@ -161,12 +161,12 @@ implementation, see L<docs/pdds/pdd14_bignum.pod>.
 
 Bignums could be represented by the structure:
 
-   struct bignum {
-     void *buffer;
-     UINTVAL length;
-     INTVAL exponent;
-     UINTVAL flags;
-   }
+    struct bignum {
+        void *buffer;
+        UINTVAL length;
+        INTVAL exponent;
+        UINTVAL flags;
+    }
 
 The similarity to the suggested bigint structure is not accidental; we
 want upgrading from bigint to bignum to be quick.
@@ -184,15 +184,15 @@ tack the data on the end?
 
 Parrot has a single internal string form:
 
-   struct parrot_string_t {
-     pobj_t obj;
-     UINTVAL bufused;
-     void *strstart;
-     UINTVAL strlen;
-     const ENCODING *encoding;
-     const CHARTYPE *type;
-     INTVAL language;
-   }
+    struct parrot_string_t {
+        pobj_t obj;
+        UINTVAL bufused;
+        void *strstart;
+        UINTVAL strlen;
+        const ENCODING *encoding;
+        const CHARTYPE *type;
+        INTVAL language;
+    }
 
 The fields are:
 
@@ -246,46 +246,50 @@ and are encoded in UTF-8.
 
 Note that language-agnostic utilities are at liberty to ignore this entry.
 
+=back
+
 =head2 Parrot Magic Cookies (PMCs)
+
+=over 4
 
 Parrot Magic Cookies, or PMCs, are the last of Parrot's basic datatypes,
 but are also potentially the most important. Their basic structure is
 as follows. All PMCs have the form:
 
-  struct PMC {
-      pobj_t obj;
-      VTABLE *vtable;
-#if ! PMC_DATA_IN_EXT
-      DPOINTER *data;
-#endif
-      struct PMC_EXT *pmc_ext;
-  };
+    struct PMC {
+        pobj_t obj;
+        VTABLE *vtable;
+ #if ! PMC_DATA_IN_EXT
+        DPOINTER *data;
+ #endif
+        struct PMC_EXT *pmc_ext;
+    };
 
 where C<obj> is a pointer to an C<pobj_t> structure:
 
-typedef struct pobj_t {
-    UnionVal u;
-    Parrot_UInt flags;
-#if ! DISABLE_GC_DEBUG
-    UINTVAL _pobj_version;
-#endif
-} pobj_t;
+    typedef struct pobj_t {
+        UnionVal u;
+        Parrot_UInt flags;
+ #if ! DISABLE_GC_DEBUG
+        UINTVAL _pobj_version;
+ #endif
+    } pobj_t;
 
 and where:
 
-typedef union UnionVal {
-    struct {
-        void * _bufstart;
-        size_t _buflen;
-    } _b;
-    struct {
-        DPOINTER* _struct_val;
-        PMC* _pmc_val;
-    } _ptrs;
-    INTVAL _int_val;
-    FLOATVAL _num_val;
-    struct parrot_string_t * _string_val;
-} UnionVal;
+    typedef union UnionVal {
+        struct {
+            void * _bufstart;
+            size_t _buflen;
+        } _b;
+        struct {
+            DPOINTER* _struct_val;
+            PMC* _pmc_val;
+        } _ptrs;
+        INTVAL _int_val;
+        FLOATVAL _num_val;
+        struct parrot_string_t * _string_val;
+    } UnionVal;
 
 C<u> holds data associated with the PMC. This can be in the form of an 
 integer value, a floating point value, a string value, or a pointer 
@@ -311,14 +315,14 @@ with the PMC. This may be NULL.
 
 C<pmc_ext> points to an extended PMC structure. This has the form:
 
-struct PMC_EXT {
-#if PMC_DATA_IN_EXT
-    DPOINTER *data;
-#endif
-    PMC *_metadata;
-    struct _Sync *_synchronize;
-    PMC *_next_for_GC;
-};
+    struct PMC_EXT {
+ #if PMC_DATA_IN_EXT
+        DPOINTER *data;
+ #endif
+        PMC *_metadata;
+        struct _Sync *_synchronize;
+        PMC *_next_for_GC;
+    };
 
 C<data> is a generic data pointer, as described above.
 
