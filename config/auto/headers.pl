@@ -54,7 +54,7 @@ sub runstep {
     # the header.
     my @extra_headers = qw(malloc.h fcntl.h setjmp.h pthread.h signal.h
 			   sys/types.h sys/socket.h netinet/in.h arpa/inet.h
-			   sysexit.h);
+			   sys/stat.h sysexit.h);
 
     my @found_headers;
     foreach my $header (@extra_headers) {

@@ -279,6 +279,7 @@ typedef void (*funcptr_t)(void);
 #include "parrot/mmd.h"
 #include "parrot/library.h"
 #include "parrot/global.h"
+#include "parrot/stat.h"
 
 #endif /* PARROT_PARROT_H_GUARD */
 

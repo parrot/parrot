@@ -43,6 +43,7 @@ sub runstep {
     misc.h
     dl.h
     signal.h
+    stat.h
     threads.h
   /;
 
@@ -122,6 +123,7 @@ HERE
     time.c
     env.c
     dl.c
+    stat.c
     math.c
     memalign.c
     signal.c
