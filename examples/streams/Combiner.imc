@@ -122,9 +122,7 @@ of the Combiner stream.
     str = strings[1]
     concat ret, str
 
-    .pcc_begin_return
-    .return ret
-    .pcc_end_return
+    .return(ret)
 .end
 
 =back

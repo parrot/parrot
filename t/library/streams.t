@@ -18,15 +18,15 @@ Tests string streams.
 
 use strict;
 
-my @streams = qw[Buffer Combiner Coroutine Filter Lines ParrotIO Replay Sub Writer];
+my @streams = qw[Combiner Coroutine Filter Lines ParrotIO Replay Sub Writer];
 
-use Parrot::Test tests => 21;
+use Parrot::Test tests => 20;
 use Test::More;
 
 for my $a ( @streams ) {
 
 #
-# 1..9
+# 1..8
 #
 output_is(<<"CODE", <<"OUT", "load and create a Stream::$a");
 ##PIR##
@@ -54,7 +54,7 @@ OUT
 }
 
 #
-# 10
+# 9
 #
 output_is(<<'CODE', <<'OUT', "Stream::Sub");
 ##PIR##
@@ -73,7 +73,13 @@ output_is(<<'CODE', <<'OUT', "Stream::Sub");
 
     # dump the stream
     stream."dump"()
-
+    # read again to see if read returns null
+    $S0 = stream."read"()
+    isnull $S0, OK
+    print "error: read returned '"
+    print $S0
+    print "' instead of (null)\n"
+OK:
     print "done\n"
     sweep 1
     collect
@@ -96,7 +102,7 @@ finished
 OUT
 
 #
-# 11
+# 10
 #
 output_is(<<'CODE', <<'OUT', "Stream::read_bytes");
 ##PIR##
@@ -174,7 +180,7 @@ finished
 OUT
 
 #
-# 12
+# 11
 #
 output_is(<<'CODE', <<'OUT', "Stream::Combiner");
 ##PIR##
@@ -254,9 +260,7 @@ LOOP:
     str = strings[1]
     concat ret, str
 
-    .pcc_begin_return
-    .return ret
-    .pcc_end_return
+    .return(ret)
 .end
 CODE
 read:[1 hello]
@@ -268,7 +272,7 @@ finished
 OUT
 
 #
-# 13
+# 12
 #
 output_is(<<'CODE', <<'OUT', "Stream::Coroutine");
 ##PIR##
@@ -307,9 +311,7 @@ output_is(<<'CODE', <<'OUT', "Stream::Coroutine");
 LOOP:
     str = i
 
-    .pcc_begin_yield
-    .return str
-    .pcc_end_yield
+    .yield(str)
 
     inc i
     if i < 10 goto LOOP
@@ -320,9 +322,7 @@ LOOP:
     # in which case it doesn't matter what you are returning.
 
     null str
-    .pcc_begin_return
-    .return str
-    .pcc_end_return
+    .return(str)
 .end
 CODE
 read:[0]
@@ -340,7 +340,7 @@ finished
 OUT
 
 #
-# 14
+# 13
 #
 output_is(<<'CODE', <<'OUT', "Stream::ParrotIO");
 ##PIR##
@@ -703,7 +703,7 @@ finished
 OUT
 
 #
-# 15
+# 14
 #
 output_is(<<'CODE', <<'OUT', "Stream::Filter");
 ##PIR##
@@ -754,9 +754,6 @@ LOOP:
 
     inc i
     if i < 10 goto LOOP
-
-    .pcc_begin_return
-    .pcc_end_return
 .end
 
 .sub _filter
@@ -774,15 +771,11 @@ LOOP:
     concat str, " * 2 = "
     concat str, tmp
 
-    .pcc_begin_return
-    .return str
-    .pcc_end_return
+    .return(str)
 
 SKIP:
     null str
-    .pcc_begin_return
-    .return str
-    .pcc_end_return
+    .return(str)
 .end
 CODE
 read:[0 * 2 = 0]
@@ -799,7 +792,7 @@ finished
 OUT
 
 #
-# 16
+# 15
 #
 output_is(<<'CODE', <<'OUT', "Stream::include");
 ##PIR##
@@ -854,9 +847,6 @@ SKIP:
 
     inc i
     if i < 10 goto LOOP
-
-    .pcc_begin_return
-    .pcc_end_return
 .end
 
 .sub _included method
@@ -875,9 +865,6 @@ SKIP:
     self."include"( temp )
 
     self."write"( "world" )
-
-    .pcc_begin_return
-    .pcc_end_return
 .end
 
 .sub _counter2 method
@@ -892,9 +879,6 @@ LOOP:
     chr str, I0
 
     if str != "G" goto LOOP
-
-    .pcc_begin_return
-    .pcc_end_return
 .end
 CODE
 read:[0]
@@ -920,7 +904,7 @@ finished
 OUT
 
 #
-# 17
+# 16
 #
 output_is(<<'CODE', <<'OUT', "Stream::Lines");
 ##PIR##
@@ -970,7 +954,7 @@ finished
 OUT
 
 #
-# 18
+# 17
 #
 output_is(<<'CODE', <<'OUT', "Stream::ParrotIO");
 ##PIR##
@@ -1276,7 +1260,7 @@ finished
 OUT
 
 #
-# 19
+# 18
 #
 output_is(<<'CODE', <<'OUT', "Stream::Replay");
 ##PIR##
@@ -1378,7 +1362,7 @@ OUT
 
 
 #
-# 20
+# 19
 #
 output_is(<<'CODE', <<'OUT', "Stream::Sub");
 ##PIR##
@@ -1422,9 +1406,6 @@ LOOP:
 
     inc i
     if i < 10 goto LOOP
-
-    .pcc_begin_return
-    .pcc_end_return
 .end
 CODE
 read:[0]
@@ -1442,7 +1423,7 @@ finished
 OUT
 
 #
-# 21
+# 20
 #
 output_is(<<'CODE', <<'OUT', "Stream::Write");
 ##PIR##

@@ -70,9 +70,6 @@ SKIP:
 
     inc i
     if i < 10 goto LOOP
-
-    .pcc_begin_return
-    .pcc_end_return
 .end
 
 =item _included
@@ -100,9 +97,6 @@ writes "world".
     self."include"( temp )
 
     self."write"( "world" )
-    
-    .pcc_begin_return
-    .pcc_end_return
 .end
 
 =item _counter2
@@ -125,9 +119,6 @@ LOOP:
     chr str, $I0
     
     if str != "G" goto LOOP
-
-    .pcc_begin_return
-    .pcc_end_return
 .end
 
 =back

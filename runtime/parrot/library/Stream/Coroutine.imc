@@ -20,7 +20,7 @@ TBD
 
 =cut
 
-.sub __stream_coroutine_onload @LOAD
+.sub onload @LOAD, @ANON
     .local pmc base
     .local pmc coro
     .local int i
@@ -34,8 +34,6 @@ TBD
     subclass coro, base, "Stream::Coroutine"
     
 END:
-    .pcc_begin_return
-    .pcc_end_return
 .end
 
 .namespace ["Stream::Coroutine"]
@@ -52,15 +50,13 @@ END:
 
     null str
     coro = self."source"()
-    typeof I0, coro
-    if I0 == .PerlUndef goto END
+    typeof $I0, coro
+    if $I0 == .PerlUndef goto END
 
     str = coro( self )
 END:
 
-    .pcc_begin_return
-    .return str
-    .pcc_end_return
+    .return(str)
 .end
 
 =back

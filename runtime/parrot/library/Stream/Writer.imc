@@ -9,8 +9,8 @@ version 0.1
 =head1 SYNOPSIS
 
     # create the stream
-    find_type I0, "Stream::Writer"
-    new stream, I0
+    find_type $I0, "Stream::Writer"
+    new stream, $I0
 
     # set the source sub
     newsub temp, .Sub, _reader
@@ -28,7 +28,7 @@ version 0.1
 =head1 DESCRIPTION
 
 =cut
-
+.include "interpinfo.pasm"
 .namespace ["Stream::Writer"]
 
 .sub __onload @LOAD
@@ -53,19 +53,23 @@ END:
 
 .sub _reader_stub method
     .local pmc source
+    .local pmc mysub
+    #.local pmc myself
 
-    getprop source, "CALL", P0		# XXX
+    interpinfo mysub, .INTERPINFO_CURRENT_SUB
+    #interpinfo myself, .INTERPINFO_CURRENT_OBJECT
+    getprop source, "CALL", mysub
     source()
 
     # close the source
     source = find_global "Stream::Base", "close"
-    P2 = self		                # XXX
-    source()
+    self."setSource"()
 
     # mark it as closed
     classoffset $I0, self, "Stream::Writer"
     inc $I0
     .local pmc status
+    interpinfo self, .INTERPINFO_CURRENT_OBJECT
     getattribute status, self, $I0
     status = 0
 .end
@@ -96,7 +100,6 @@ END:
 .end
 
 .sub close method
-    .local pmc super
     .local string str
 
     null str
@@ -116,9 +119,7 @@ END:
     inc $I0
     getattribute status, self, $I0
     ret = status
-    .pcc_begin_return
-    .return ret
-    .pcc_end_return
+    .return(ret)
 .end
 
 =item source."write"()
@@ -140,7 +141,6 @@ END:
     getattribute status, self, $I0
 
     if status == 0 goto END
-
     if status == 2 goto WRITE
     status = 2
     self."write"( "" )
@@ -158,8 +158,6 @@ WRITE:
 
     source( str )
 END:
-    .pcc_begin_return
-    .pcc_end_return
 .end
 
 =item source."rawRead"() (B<internal>)
@@ -188,17 +186,15 @@ _CONT:
     .result str
     .pcc_end
 
-    .pcc_begin_return
-    .return str
-    .pcc_end_return
+    .return(str)
+    
 END_OF_STREAM:
     null writer
     classoffset $I0, self, "Stream::Writer"
     setattribute self, $I0, writer
     null str
-    .pcc_begin_return
-    .return str
-    .pcc_end_return
+
+    .return(str)
 .end
 
 =back

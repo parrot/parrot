@@ -20,7 +20,7 @@ TDB
 
 =cut
 
-.sub __stream_parrotio_onload @LOAD
+.sub onload @LOAD, @ANON
     .local int i
     .local pmc base
     .local pmc io
@@ -35,8 +35,6 @@ TDB
     
     addattribute io, "blocksize"
 END:
-    .pcc_begin_return
-    .pcc_end_return
 .end
 
 .namespace ["Stream::ParrotIO"]
@@ -71,21 +69,19 @@ Sets or returns the current block size.
     .local pmc temp
     .local int ret
     
-    classoffset I0, self, "Stream::ParrotIO"
+    classoffset $I0, self, "Stream::ParrotIO"
     if argcI == 0 goto GET
     
     temp = new .PerlInt
     temp = bs
-    setattribute self, I0, temp
+    setattribute self, $I0, temp
     branch RET
 GET:
-    getattribute temp, self, I0
+    getattribute temp, self, $I0
 RET:
     ret = temp
 
-    .pcc_begin_return
-    .return ret
-    .pcc_end_return
+    .return(ret)
 .end
 
 =item source."rawRead"() (B<internal>)
@@ -102,14 +98,12 @@ RET:
     bs = self."blockSize"()
     pio = self."source"()
     read str, pio, bs
-    length I0, str
-    if I0 > 0 goto OK
+    length $I0, str
+    if $I0 > 0 goto OK
     self."close"()
     null str
 OK:
-    .pcc_begin_return
-    .return str
-    .pcc_end_return
+    .return(str)
 .end
 
 =back

@@ -22,7 +22,7 @@ TBD
 
 .include "library/Data/Escape.imc"
 
-.sub __stream_lines_onload @LOAD
+.sub onload @LOAD, @ANON
     .local int i
     .local pmc base
     .local pmc lines
@@ -44,12 +44,9 @@ END:
 .sub __init method
     .local pmc temp
     
-    classoffset I0, self, "Stream::Lines"
+    classoffset $I0, self, "Stream::Lines"
     temp = new .PerlString
-    setattribute self, I0, temp
-    
-    .pcc_begin_return
-    .pcc_end_return
+    setattribute self, $I0, temp
 .end
 
 =item is = stream."connected"()
@@ -60,19 +57,15 @@ END:
 
 .sub connected method
     # XXX: check if the buffer is empty if the source stream is not connected
-    save I0
-    classoffset I0, self, "Stream::Base"
-    getattribute self, self, I0
-    isnull self, NOT
-    typeof I0, self
-    if I0 == .PerlUndef goto NOT
-    restore I0
-    callmethod
-NOT:
-    restore I0
-    .pcc_begin_return
-    .return 0
-    .pcc_end_return
+    classoffset $I0, self, "Stream::Base"
+    getattribute $P0, self, $I0
+    isnull $P0, NOT_CONNECTED
+    typeof $I0, $P0
+    if $I0 == .PerlUndef goto NOT_CONNECTED
+    $I0 = $P0."connected"()
+    .return($I0)
+NOT_CONNECTED:
+    .return(0)
 .end
 
 =item is = stream."rawRead"() (B<internal>)
@@ -110,9 +103,7 @@ BUFFER_OK:
     self."setBuffer"( buffer )
 
 BUFFER_END:
-    .pcc_begin_return
-    .return ret
-    .pcc_end_return
+    .return(ret)
 .end
 
 =item is = stream."buffer"() (B<internal>)
@@ -125,14 +116,11 @@ BUFFER_END:
     .local pmc temp
     .local string _buffer
 
-    classoffset I0, self, "Stream::Lines"
-    getattribute temp, self, I0
+    classoffset $I0, self, "Stream::Lines"
+    getattribute temp, self, $I0
     _buffer = temp
 
-    .pcc_begin_return
-    .return temp
-    .return _buffer
-    .pcc_end_return
+    .return(temp,_buffer)
 .end
 
 =item is = stream."setBuffer"() (B<internal>)
@@ -147,8 +135,8 @@ BUFFER_END:
     
     new temp, .PerlString
     temp = buffer
-    classoffset I0, self, "Stream::Lines"
-    setattribute self, I0, temp
+    classoffset $I0, self, "Stream::Lines"
+    setattribute self, $I0, temp
 .end
 
 =item stream."fillBuffer"() (B<internal>)
@@ -167,8 +155,8 @@ BUFFER_END:
     temp = self."source"()
     str = temp."read"()
 
-    classoffset I0, self, "Stream::Lines"
-    getattribute temp, self, I0
+    classoffset $I0, self, "Stream::Lines"
+    getattribute temp, self, $I0
     buffer = temp
     code = 0
 
@@ -177,7 +165,7 @@ BUFFER_END:
     # concat to the buffer
     concat buffer, str
     temp = buffer
-    setattribute self, I0, temp
+    setattribute self, $I0, temp
     code = 1
 
 END:
@@ -187,11 +175,7 @@ END:
     null buffer
     null temp
 NO_CLOSE:
-    .pcc_begin_return
-    .return temp
-    .return buffer
-    .return code
-    .pcc_end_return
+    .return(temp, buffer, code)
 .end
 
 =back

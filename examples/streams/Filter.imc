@@ -67,9 +67,6 @@ LOOP:
 
     inc i
     if i < 10 goto LOOP
-
-    .pcc_begin_return
-    .pcc_end_return
 .end
 
 =item _filter
@@ -96,15 +93,11 @@ It also filters the value 4 out, which will be missing in the output.
     concat str, " * 2 = "
     concat str, tmp
 
-    .pcc_begin_return
-    .return str
-    .pcc_end_return
+    .return(str)
 
 SKIP:
     null str
-    .pcc_begin_return
-    .return str
-    .pcc_end_return
+    .return(str)
 .end
 
 =back

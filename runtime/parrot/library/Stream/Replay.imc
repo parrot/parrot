@@ -37,7 +37,7 @@ By using C<clone>, you can read data from a stream as often as you want.
 
 .namespace ["Stream::Replay"]
 
-.sub __onload @LOAD
+.sub onload @LOAD, @ANON
     find_type $I0, "Stream::Replay"
     if $I0 > 1 goto END
     
@@ -53,9 +53,14 @@ By using C<clone>, you can read data from a stream as often as you want.
     newclass $P0, "Stream::Replay::Buffer"
     addattribute $P0, "strings"
     addattribute $P0, "clones"
-
 END:
 .end
+
+=item __init
+
+...
+
+=cut
 
 .sub __init method
     .local pmc temp
@@ -66,6 +71,12 @@ END:
     temp = new PerlInt
     setattribute self, $I0, temp
 .end
+
+=item assign stream, source
+
+...
+
+=cut
 
 .sub __set_pmc method
     .param pmc val
@@ -106,9 +117,14 @@ NOTA:
     classoffset $I0, self, "Stream::Replay"
     setattribute self, $I0, buffer
 ASSIGN:
-    $P0 = find_global "Stream::Base", "__set_pmc"
-    $P0( val )
+    self."setSource"( val )
 .end
+
+=item stream."rawRead"() (B<internal>)
+
+...
+
+=cut
 
 .sub rawRead method
     .local pmc source
@@ -124,12 +140,17 @@ ASSIGN:
     isnull buffer, END
     inc $I0
     getattribute pos, self, $I0
+
     ret = buffer."read"( pos, source )
 END:
-    .pcc_begin_return
-    .return ret
-    .pcc_end_return
+    .return(ret)
 .end
+
+=item stream2 = clone stream
+
+...
+
+=cut
 
 .sub __clone method
     .local pmc ret
@@ -145,11 +166,8 @@ END:
     $P0 = clone $P0
     ret."byte_buffer"( $P0 )
 END:
-    .pcc_begin_return
-    .return ret
-    .pcc_end_return
+    .return(ret)
 .end
-
 
 
 .namespace ["Stream::Replay::Buffer"]
@@ -168,6 +186,7 @@ END:
 .end
 
 .sub compact method
+    # XXX check the begin of the queue for stale entries
     noop
 .end
 
@@ -177,6 +196,10 @@ END:
     .local string ret
     .local pmc strings
     .local pmc clones
+    
+    null ret
+    typeof $I0, source
+    if $I0==.PerlUndef goto END
     
     classoffset $I0, self, "Stream::Replay::Buffer"
     getattribute strings, self, $I0
@@ -202,10 +225,9 @@ READ_SOURCE:
     if $I0 <= 1 goto END
     inc pos
     push strings, ret
-END:    
-    .pcc_begin_return
-    .return ret
-    .pcc_end_return
+END:   
+ 
+    .return(ret)
 .end
 
 .sub add method

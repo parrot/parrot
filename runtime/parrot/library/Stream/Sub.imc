@@ -9,8 +9,8 @@ version 0.1
 =head1 SYNOPSIS
 
     # create the stream
-    find_type I0, "Stream::Sub"
-    new stream, I0
+    find_type $I0, "Stream::Sub"
+    new stream, $I0
 
     # set the source sub
     newsub temp, .Sub, _test
@@ -52,7 +52,7 @@ The stream will be disconnected automatically if the provided sub returns.
 
 =cut
 
-.sub __stream_sub_onload @LOAD
+.sub onload @LOAD, @ANON
     .local int i
     .local pmc base
     .local pmc sub
@@ -67,8 +67,6 @@ The stream will be disconnected automatically if the provided sub returns.
 
     addattribute sub, "write_cont"
 END:
-    .pcc_begin_return
-    .pcc_end_return
 .end
 
 .namespace ["Stream::Sub"]
@@ -90,8 +88,8 @@ END:
     .local pmc _write
     .local pmc ret
 
-    classoffset I0, self, "Stream::Sub"
-    getattribute _write, self, I0
+    classoffset $I0, self, "Stream::Sub"
+    getattribute _write, self, $I0
 
     newsub ret, .Continuation, _sub_write_ret
     assign self, ret
@@ -101,9 +99,7 @@ END:
     .pcc_call _write, ret
 _sub_write_ret:
     .pcc_end
-
-    .pcc_begin_return
-    .pcc_end_return
+    
 .end
 
 =item source."rawRead"() (B<internal>)
@@ -131,26 +127,18 @@ _sub_write_ret:
     self."setSource"( temp )
 
     # write null-string to terminate the read request
+TERMINATED:
     null str
     self."write"( str )
-
-    # should never be executed
-    new temp, .Exception
-    set temp["_message"], "fatal error in library/Streams/Sub.imc: rawRead()"
-    throw temp
-    end
+    # if we are here,
+    # someone tried to read again, just return null again
+    branch TERMINATED
 
 END:
     # return a null string to indicate end of stream
     null str
 
-    .pcc_begin_return
-    .return str
-    .pcc_end_return
-.end
-
-.sub __set_pointer method
-    print "Stream::Sub::__set_pointer\n"
+    .return(str)
 .end
 
 =back

@@ -22,7 +22,7 @@ TBD
 
 =cut
 
-.sub __stream_combiner_onload @LOAD
+.sub onload @LOAD, @ANON
     .local int i
     .local pmc base
     .local pmc comb
@@ -37,8 +37,6 @@ TBD
     
     addattribute comb, "combiner"
 END:
-    .pcc_begin_return
-    .pcc_end_return
 .end
 
 .sub _default_combiner
@@ -47,9 +45,7 @@ END:
 
     join ret, "", args
 
-    .pcc_begin_return
-    .return ret
-    .pcc_end_return
+    .return(ret)
 .end
 
 .include "iterator.pasm"
@@ -76,17 +72,15 @@ Sets (or just returns) the combiner sub.
     .param pmc _combiner
     .local pmc ret
     
-    classoffset I0, self, "Stream::Combiner"
+    classoffset $I0, self, "Stream::Combiner"
     if argcP == 0 goto GET    
-    setattribute self, I0, _combiner
+    setattribute self, $I0, _combiner
     ret = _combiner
     branch END
 GET:
-    getattribute ret, self, I0
+    getattribute ret, self, $I0
 END:
-    .pcc_begin_return
-    .return ret
-    .pcc_end_return
+    .return(ret)
 .end
 
 =item assign stream, source
@@ -138,14 +132,10 @@ LOOP:
     if i goto LOOP
     
 NOT_CONNECTED:
-    .pcc_begin_return
-    .return 0
-    .pcc_end_return
+    .return(0)
     
 IS_CONNECTED:
-    .pcc_begin_return
-    .return 1
-    .pcc_end_return
+    .return(1)
 .end
 
 =item source."rawRead"() (B<internal>)
@@ -196,16 +186,12 @@ CALL:
     getattribute combiner, self, i
 
     ret = combiner( args )
-    .pcc_begin_return
-    .return ret
-    .pcc_end_return
+    .return(ret)
 
 END_OF_STREAM:
     self."close"()
     null ret
-    .pcc_begin_return
-    .return ret
-    .pcc_end_return
+    .return(ret)
 .end
 
 =back

@@ -26,7 +26,7 @@ TBD
 .const int aIncludes = 1
 .const int aBuffer = 2
 
-.sub __stream_base_onload prototyped, @LOAD
+.sub onload prototyped, @LOAD, @ANON
     find_type $I0, "Stream::Base"
     if $I0 > 1 goto END
 
@@ -60,10 +60,16 @@ END:
 .end
 
 .sub setSource method
-    .param pmc src
-    newsub $P0, .Sub, __set_pmc
-    $P0(src)
+    .param pmc source
+
+    classoffset $I0, self, "Stream::Base"
+    setattribute self, $I0, source
+    null source
 .end
+
+=item close
+
+=cut
 
 .sub close method
     .local pmc temp
@@ -104,9 +110,11 @@ LOOP:
     print "]\n"
     branch LOOP
 END:
-    .pcc_begin_return
-    .pcc_end_return
 .end
+
+=item copyTo
+
+=cut
 
 .sub copyTo method
     .param pmc to
@@ -121,8 +129,6 @@ LOOP:
     print to, str
     branch LOOP
 END:
-    .pcc_begin_return
-    .pcc_end_return
 .end
 
 =item source = stream."source"()
@@ -142,9 +148,7 @@ Returns the currently set source.
     add $I0, aSource
     getattribute ret, self, $I0
 
-    .pcc_begin_return
-    .return ret
-    .pcc_end_return
+    .return(ret)
 ERROR:
     print "Stream::Base::source(): parameters passed\n"
     end
@@ -172,13 +176,9 @@ It is connected until the source sub returns.
     $I0 = $P0."connected"()
     unless $I0 goto NOT
 SKIP:
-    .pcc_begin_return
-    .return 1
-    .pcc_end_return
+    .return(1)
 NOT:
-    .pcc_begin_return
-    .return 0
-    .pcc_end_return
+    .return(0)
 .end
 
 =item str = stream."read"()
@@ -216,9 +216,7 @@ SELF:
     isnull ret, INCLUDE_CHECK
 
 DONE:
-    .pcc_begin_return
-    .return ret
-    .pcc_end_return
+    .return(ret)
 
 INCLUDE_CHECK:
     $I0 = includes
@@ -260,9 +258,6 @@ Please have a look at F<examples/streams/Include.imc> to see how it works.
     push includes, stream
 
     self."flush"()
-
-    .pcc_begin_return
-    .pcc_end_return
 .end
 
 =item stream."flush"() (B<internal>)
@@ -290,9 +285,7 @@ Used to flush the stream when including another stream.
     i = self."write"( str )
 
 CANT:
-    .pcc_begin_return
-    .return i
-    .pcc_end_return
+    .return(i)
 .end
 
 =item stream."read_bytes"( number )
@@ -351,9 +344,7 @@ DONE:
     setattribute self, $I0, buffer
 
 END:
-    .pcc_begin_return
-    .return ret
-    .pcc_end_return
+    .return(ret)
 .end
 
 =item stream."byte_buffer"() (B<internal>)
@@ -377,9 +368,7 @@ Returns or sets the byte buffer.
 SET:
     setattribute self, $I0, buf
 END:
-    .pcc_begin_return
-    .return $P0
-    .pcc_end_return
+    .return($P0)
 .end
 
 =back

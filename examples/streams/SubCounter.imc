@@ -56,9 +56,6 @@ LOOP:
 
     inc i
     if i < 10 goto LOOP
-
-    .pcc_begin_return
-    .pcc_end_return
 .end
 
 =back

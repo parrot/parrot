@@ -20,7 +20,7 @@ TBD
 
 =cut
 
-.sub __stream_filter_onload @LOAD
+.sub onload @LOAD, @ANON
     .local int i
     .local pmc base
     .local pmc filter
@@ -35,8 +35,6 @@ TBD
 
     addattribute filter, "filter"
 END:
-    .pcc_begin_return
-    .pcc_end_return
 .end
 
 .namespace ["Stream::Filter"]
@@ -52,16 +50,14 @@ Sets or returns the filter sub.
     .local pmc ret
 
     ret = _filter
-    classoffset I0, self, "Stream::Filter"
+    classoffset $I0, self, "Stream::Filter"
     if argcP == 0 goto GET    
-    setattribute self, I0, _filter
+    setattribute self, $I0, _filter
     branch END
 GET:
-    getattribute ret, self, I0
+    getattribute ret, self, $I0
 END:
-    .pcc_begin_return
-    .return ret
-    .pcc_end_return
+    .return(ret)
 .end
 
 =item source."rawRead"() (B<internal>)
@@ -83,9 +79,7 @@ REDO:
     str = filter( str )
     isnull str, REDO
 END:
-    .pcc_begin_return
-    .return str
-    .pcc_end_return
+    .return(str)
 .end
 
 =back

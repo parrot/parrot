@@ -58,9 +58,7 @@ It just writes the numbers 0 to 9 to the stream.
 LOOP:
     str = i
     
-    .pcc_begin_yield
-    .return str
-    .pcc_end_yield
+    .yield(str)
 
     inc i
     if i < 10 goto LOOP
@@ -71,9 +69,7 @@ LOOP:
     # in which case it doesn't matter what you are returning.
     
     null str
-    .pcc_begin_return
-    .return str
-    .pcc_end_return
+    .return(str)
 .end
 
 =back
