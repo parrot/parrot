@@ -1,6 +1,6 @@
 #!perl
 use strict;
-use TestCompiler tests => 16;
+use TestCompiler tests => 17;
 
 ##############################
 # Parrot Calling Conventions
@@ -582,4 +582,49 @@ ok 4
 ok 1
 ok 2
 back
+OUT
+
+output_is(<<'CODE', <<'OUT', "in, out different P param, 2 subs");
+.sub _main
+    .local Sub sub
+    .local PerlUndef x
+    x = new PerlUndef
+    x = 42
+    newsub sub, .Sub, _sub
+    .pcc_begin prototyped
+    .arg x
+    .pcc_call sub
+    ret:
+    .local PerlUndef y
+    .result y
+    .pcc_end
+    .local PerlUndef z
+    z = y
+    .pcc_begin prototyped
+    .arg y
+    .pcc_call sub
+    ret2:
+    .result y
+    .pcc_end
+    print x
+    print "\n"
+    print y
+    print "\n"
+    print z
+    print "\n"
+    end
+.end
+.pcc_sub _sub prototyped
+    .param PerlUndef a
+    .local PerlUndef res
+    res = new PerlUndef
+    res = a + 1
+    .pcc_begin_return
+    .return res
+    .pcc_end_return
+.end
+CODE
+42
+44
+43
 OUT
