@@ -60,7 +60,7 @@ sub interpolate_expand {
     my ($list) = shift;
     my @flat;
     foreach my $item (@$list) {
-        if ($item) {
+        if (defined $item) {
             if (ref $item eq 'ARRAY') {
                     push (@flat, interpolate_expand($item))
             }
@@ -83,13 +83,13 @@ sub interpolate_concat_literal {
 #      something weird done to them.
 
         if (ref $item eq 'P6C::variable') {
-            push (@short, escape($string)) if $string;
+            push (@short, escape($string)) if defined $string;
             push (@short, $item->tree);
             $string='';
         }
         elsif (ref $item eq 'P6C::interpolated_value') {
 
-            push (@short, escape($string)) if $string;
+            push (@short, escape($string)) if defined $string;
             push (@short, $item->tree);
             $string='';
 
@@ -97,7 +97,7 @@ sub interpolate_concat_literal {
         else { $string.=$item }
     }
 
-    push (@short, escape($string)) if $string;
+    push (@short, escape($string)) if defined $string;
 
     return \@short
 }
@@ -119,7 +119,8 @@ sub concat_list
     }
     else {
         return new P6C::sv_literal type => $type,
-	    lval => ($list->[0] || '""')
+	    #lval => ($list->[0] || '""')
+	    lval => (defined $list->[0] ? $list->[0] : '""')
     }
 }
 
