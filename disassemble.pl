@@ -5,7 +5,6 @@
 # Turn a parrot bytecode file into text
 
 use strict;
-use Digest::MD5 qw(&md5_hex);
 use Parrot::Opcode;
 
 my %unpack_type = (i => 'l',

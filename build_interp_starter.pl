@@ -1,6 +1,5 @@
 # !/usr/bin/perl -w
 use strict;
-use Digest::MD5 qw(&md5_hex);
 use Parrot::Opcode;
 
 open INTERP, "> interp_guts.h" or die "Can't open interp_guts.h, $!/$^E";

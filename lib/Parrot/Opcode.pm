@@ -2,7 +2,6 @@ package Parrot::Opcode;
 
 use strict;
 use Symbol;
-use Digest::MD5 qw(&md5_hex);
 
 my %opcode;
 my $fingerprint;
@@ -14,10 +13,9 @@ sub _load {
     my $fh = gensym;
     open $fh, $file or die "$file: $!\n";
 
-    my $md5 = Digest::MD5->new;
     my $count = 1;
     while (<$fh>) {
-	$md5->add($_);
+	$fingerprint += unpack('%32C*', $_);
 
 	if (m/^# \$Id: opcode_table,v ([0-9.]+) /) {
 	  $revision = $1;
@@ -46,8 +44,6 @@ sub _load {
 	my $num_n = () = grep {/n/} @params;
 	$opcode{$name}{RETURN_OFFSET} = 1 + $num_i + $num_n * 2;
     }
-
-    $fingerprint = $md5->hexdigest;
 }
 
 sub read_ops {

@@ -5,7 +5,6 @@
 # Brian Wheeler (bdwheele@indiana.edu)
 
 use strict;
-use Digest::MD5 qw(&md5_hex);
 use Getopt::Long;
 use Parrot::Opcode;
 
