@@ -1,7 +1,7 @@
 #!/usr/bin/perl -w
 
 use strict;
-use lib '.';
+use lib 'lib';
 use Parrot::Optimizer;
 
 my $file = $ARGV[0];

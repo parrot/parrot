@@ -12,6 +12,7 @@
 #
 
 use strict;
+use lib 'lib';
 
 use lib 'lib';
 use Parrot::Types;

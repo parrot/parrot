@@ -6,6 +6,7 @@
 #
 
 use strict;
+use lib 'lib';
 use Parrot::Assembler;
 
 init_assembler(@ARGV);

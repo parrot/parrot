@@ -6,6 +6,7 @@
 #
 
 use FindBin;
+use lib 'lib';
 use lib "$FindBin::Bin/..";
 use lib "$FindBin::Bin/../lib";
 use Parrot::Vtable;

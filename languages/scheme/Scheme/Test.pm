@@ -4,7 +4,7 @@ package Scheme::Test;
 
 use strict;
 use vars qw(@EXPORT @ISA);
-use lib '../..';
+use lib '../../lib';
 use Parrot::Config;
 
 require Exporter;

@@ -12,7 +12,7 @@
 #
 
 use strict;
-
+use lib 'lib';
 use Parrot::Config;
 
 use Parrot::OpLib::core;
