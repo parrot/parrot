@@ -253,7 +253,7 @@ and stderr)
 =cut
 
 inline op print(in INT) {
-  printf(INTVAL_FMT, $1);
+  printf(INTVAL_FMT, (INTVAL)$1);
   goto NEXT();
 }
 
@@ -301,7 +301,7 @@ op print(in INT, in INT) {
                 break;
 	default: file = (FILE *)$1;
   }
-  fprintf(file, INTVAL_FMT, $2);
+  fprintf(file, INTVAL_FMT, (INTVAL)$2);
   goto NEXT();
 }
 
