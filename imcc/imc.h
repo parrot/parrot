@@ -54,8 +54,9 @@
 /*
  * imc.c
  */
-void imc_compile_unit(struct Parrot_Interp *, Instruction * unit);
-
+void imc_compile_all_units(struct Parrot_Interp *);
+void imc_compile_unit(struct Parrot_Interp *, IMC_Unit * unit);
+IMC_Unit * imc_cur_unit(struct Parrot_Interp *);
 
 /*
  * instructions.c
@@ -70,8 +71,8 @@ const char * get_neg_op(char *op, int *nargs);
 /*
  * reg_alloc.c
  */
-void imc_reg_alloc(struct Parrot_Interp *, Instruction * unit);
-void free_reglist(struct Parrot_Interp *);
+void imc_reg_alloc(struct Parrot_Interp *, IMC_Unit * unit);
+void free_reglist(IMC_Unit *);
 
 /*
  * parser_util.c
@@ -88,10 +89,10 @@ int imcc_fprintf(FILE *fd, const char *fmt, ...);
 /* 
  * pcc.c
  */
-void expand_pcc_sub(Parrot_Interp interpreter, Instruction *ins);
-void expand_pcc_sub_call(Parrot_Interp interpreter, Instruction *ins);
-void expand_pcc_sub_ret(Parrot_Interp interpreter, Instruction *ins);
-void pcc_optimize(Parrot_Interp interpreter);
+void expand_pcc_sub(Parrot_Interp interpreter, IMC_Unit *, Instruction *ins);
+void expand_pcc_sub_call(Parrot_Interp interpreter, IMC_Unit *, Instruction *ins);
+void expand_pcc_sub_ret(Parrot_Interp interpreter, IMC_Unit *, Instruction *ins);
+void pcc_optimize(Parrot_Interp interpreter, IMC_Unit *);
 
 int pcc_sub_reads(Instruction* ins, SymReg* r);
 int pcc_sub_writes(Instruction* ins, SymReg* r);
@@ -130,27 +131,18 @@ struct imcc_ostat {
 
 EXTERN struct imcc_ostat ostat;
 
-typedef struct {
+typedef struct _imc_info_t {
+
+    IMC_Unit * imc_units;
+    IMC_Unit * cur_unit;
     int imcc_warn;
     int verbose;
     int debug;
-    /* CFG stuff */
-    int bb_list_size;
-    int n_basic_blocks;
-    Basic_block **bb_list;
-    Set** dominators;
-    int n_loops;
-    Loop_info ** loop_info;
-    Edge * edge_list;
-    /* register allocation */
-    int n_spilled;
-    SymReg * p31;
-    SymReg** interference_graph;
-    SymReg** reglist;
-    int n_symbols;
-} imcc_info_t;
+    int n_comp_units;
 
-#define IMCC_INFO(i) ((imcc_info_t*) (i)->imcc_info)
+} imc_info_t;
+
+#define IMCC_INFO(i) ((i)->imc_info)
 #endif
 
 

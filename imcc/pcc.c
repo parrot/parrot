@@ -12,16 +12,16 @@
  */
 
 static Instruction *
-insINS(struct Parrot_Interp *interpreter, Instruction *ins,
+insINS(struct Parrot_Interp *interpreter, IMC_Unit * unit, Instruction *ins,
         char *name, SymReg **regs, int n)
 {
-    Instruction *tmp = INS(interpreter, name, NULL, regs, n, 0, 0);
-    insert_ins(ins, tmp);
+    Instruction *tmp = INS(interpreter, unit, name, NULL, regs, n, 0, 0);
+    insert_ins(unit, ins, tmp);
     return tmp;
 }
 
 static Instruction *
-set_I_const(struct Parrot_Interp *interpreter, Instruction *ins,
+set_I_const(struct Parrot_Interp *interpreter, IMC_Unit * unit, Instruction *ins,
             int regno, int value)
 {
     SymReg *ix, *regs[IMCC_MAX_REGS], *arg;
@@ -33,11 +33,11 @@ set_I_const(struct Parrot_Interp *interpreter, Instruction *ins,
     arg = mk_const(str_dup(buf), 'I');
     regs[0] = ix;
     regs[1] = arg;
-    return insINS(interpreter, ins, "set", regs, 2);
+    return insINS(interpreter, unit, ins, "set", regs, 2);
 }
 
 static void
-pcc_emit_err(Parrot_Interp interpreter, SymReg *err, const char *msg)
+pcc_emit_err(Parrot_Interp interpreter, IMC_Unit * unit, SymReg *err, const char *msg)
 {
     SymReg *p0;
     SymReg *regs[IMCC_MAX_REGS];
@@ -48,19 +48,19 @@ pcc_emit_err(Parrot_Interp interpreter, SymReg *err, const char *msg)
      *   throw $P0
      *   ret
      */
-    INS_LABEL(err, 1);
+    INS_LABEL(unit, err, 1);
     p0 = mk_symreg(str_dup("$P0"), 'P');
-    iNEW(interpreter, p0, str_dup("Exception"), NULL, 1);
+    iNEW(interpreter, unit, p0, str_dup("Exception"), NULL, 1);
     regs[0] = p0;
     regs[1] = mk_const(str_dup("\"_message\""), 'S');
     regs[2] = mk_const(str_dup(msg), 'S');
-    INS(interpreter, "set", NULL, regs, 3, 2, 1);
-    INS(interpreter, "throw", NULL, regs, 1, 0, 1);
-    INS(interpreter, "ret", NULL, regs, 0, 0, 1);
+    INS(interpreter, unit, "set", NULL, regs, 3, 2, 1);
+    INS(interpreter, unit, "throw", NULL, regs, 1, 0, 1);
+    INS(interpreter, unit, "ret", NULL, regs, 0, 0, 1);
 }
 
 static Instruction *
-pcc_emit_check_param(Parrot_Interp interpreter, Instruction *ins,
+pcc_emit_check_param(Parrot_Interp interpreter, IMC_Unit * unit, Instruction *ins,
         SymReg *sub, SymReg *i0, SymReg *p3, int first, int type)
 {
     SymReg *check_sub, *regs[IMCC_MAX_REGS], *check_type, *what, *check_pmc;
@@ -77,7 +77,7 @@ pcc_emit_check_param(Parrot_Interp interpreter, Instruction *ins,
 
         check_sub = mk_address(str_dup(buf), U_add_uniq_label);
         /* we just append to the current ins stream */
-        INS_LABEL(check_sub, 1);
+        INS_LABEL(unit, check_sub, 1);
         /*
          * first time check: amount of params, elements in P3
          * we can globber I0
@@ -89,7 +89,7 @@ pcc_emit_check_param(Parrot_Interp interpreter, Instruction *ins,
             regs[0] = i0;
             regs[1] = p3;
             /* set I0, P3 */
-            INS(interpreter, "set", NULL, regs, 2, 0, 1);
+            INS(interpreter, unit, "set", NULL, regs, 2, 0, 1);
             /* lt I0, nparam, check_err_nparam */
             /* the param count in passed by the sub in what
             */
@@ -102,12 +102,12 @@ pcc_emit_check_param(Parrot_Interp interpreter, Instruction *ins,
 
         regs[1] = what;
         regs[2] = err_nparam;
-        INS(interpreter, "lt", NULL, regs, 3, 0, 1);
-        INS(interpreter, "ret", NULL, regs, 0, 0, 1);
+        INS(interpreter, unit, "lt", NULL, regs, 3, 0, 1);
+        INS(interpreter, unit, "ret", NULL, regs, 0, 0, 1);
         /* emit err handler routines
          * param count
          */
-        pcc_emit_err(interpreter, err_nparam, "\"wrong param count\"");
+        pcc_emit_err(interpreter, unit, err_nparam, "\"wrong param count\"");
     }
 
     strcpy(buf, "_#check_param_type");
@@ -117,7 +117,7 @@ pcc_emit_check_param(Parrot_Interp interpreter, Instruction *ins,
          * type check entry to check sub
          */
         check_type = mk_address(str_dup(buf), U_add_uniq_label);
-        INS_LABEL(check_type, 1);
+        INS_LABEL(unit, check_type, 1);
         /*
          * param type check, we get the entry type in what
          */
@@ -125,20 +125,20 @@ pcc_emit_check_param(Parrot_Interp interpreter, Instruction *ins,
         regs[0] = i0;
         regs[1] = p3;
         regs[2] = mk_const(str_dup("0"), 'I');
-        INS(interpreter, "typeof", NULL, regs, 3, 4, 1);
+        INS(interpreter, unit, "typeof", NULL, regs, 3, 4, 1);
         err_type = mk_address(str_dup("#check_err_type"), U_add_uniq_label);
         regs[0] = i0;
         regs[1] = what;
         regs[2] = err_type;
-        INS(interpreter, "ne", NULL, regs, 3, 0, 1);
-        INS(interpreter, "ret", NULL, regs, 0, 0, 1);
+        INS(interpreter, unit, "ne", NULL, regs, 3, 0, 1);
+        INS(interpreter, unit, "ret", NULL, regs, 0, 0, 1);
 
         /*
          * PMC type check entry to check sub
          */
         check_pmc = mk_address(str_dup("_#check_param_type_pmc"),
                 U_add_uniq_label);
-        INS_LABEL(check_pmc, 1);
+        INS_LABEL(unit, check_pmc, 1);
         /*
          * either type = enum_type_PMC || > 0
          */
@@ -146,16 +146,16 @@ pcc_emit_check_param(Parrot_Interp interpreter, Instruction *ins,
         regs[0] = i0;
         regs[1] = p3;
         regs[2] = mk_const(str_dup("0"), 'I');
-        INS(interpreter, "typeof", NULL, regs, 3, 4, 1);
+        INS(interpreter, unit, "typeof", NULL, regs, 3, 4, 1);
         regs[0] = i0;
         regs[1] = mk_const(str_dup("0"), 'I');
         regs[2] = check_type;
-        INS(interpreter, "lt", NULL, regs, 3, 0, 1);
-        INS(interpreter, "ret", NULL, regs, 0, 0, 1);
+        INS(interpreter, unit, "lt", NULL, regs, 3, 0, 1);
+        INS(interpreter, unit, "ret", NULL, regs, 0, 0, 1);
         /*
          * param type
          */
-        pcc_emit_err(interpreter, err_type, "\"wrong param type\"");
+        pcc_emit_err(interpreter, unit, err_type, "\"wrong param type\"");
     }
     if (first) {
         /* emit first time check
@@ -164,9 +164,9 @@ pcc_emit_check_param(Parrot_Interp interpreter, Instruction *ins,
         regs[0] = what;
         sprintf(buf, "%d", sub->pcc_sub->nargs);
         regs[1] = mk_const(str_dup(buf), 'I');
-        ins = insINS(interpreter, ins, "set", regs, 2);
+        ins = insINS(interpreter, unit, ins, "set", regs, 2);
         regs[0] = check_sub;
-        ins = insINS(interpreter, ins, "bsr", regs, 1);
+        ins = insINS(interpreter, unit, ins, "bsr", regs, 1);
     }
     if (!type)
         return ins;
@@ -174,17 +174,17 @@ pcc_emit_check_param(Parrot_Interp interpreter, Instruction *ins,
     regs[0] = what;
     sprintf(buf, "%d", type);
     regs[1] = mk_const(str_dup(buf), 'I');
-    ins = insINS(interpreter, ins, "set", regs, 2);
+    ins = insINS(interpreter, unit, ins, "set", regs, 2);
     strcpy(buf, enum_type_PMC == type ?
             "_#check_param_type_pmc" : "_#check_param_type");
     check_type = _get_sym(ghash, buf);
     regs[0] = check_type;
-    ins = insINS(interpreter, ins, "bsr", regs, 1);
+    ins = insINS(interpreter, unit, ins, "bsr", regs, 1);
     return ins;
 }
 
 void
-expand_pcc_sub(Parrot_Interp interpreter, Instruction *ins)
+expand_pcc_sub(Parrot_Interp interpreter, IMC_Unit * unit, Instruction *ins)
 {
     SymReg *arg, *sub;
     int next[4], i, j, n;
@@ -205,7 +205,7 @@ expand_pcc_sub(Parrot_Interp interpreter, Instruction *ins)
 	regs[0] = i0;
 	sprintf(buf, "#sub_%s_p1", sub->name);
         regs[1] = label1 = mk_address(str_dup(buf), U_add_uniq_label);
-	ins = insINS(interpreter, ins, "if", regs, 2);
+	ins = insINS(interpreter, unit, ins, "if", regs, 2);
 
     }
     for (proto = ps; proto <= pe; ++proto) {
@@ -227,7 +227,7 @@ expand_pcc_sub(Parrot_Interp interpreter, Instruction *ins)
 			}
                         /* if unprototyped check param count */
                         if (ps != pe && !proto)
-                            ins = pcc_emit_check_param(interpreter,
+                            ins = pcc_emit_check_param(interpreter, unit,
                                     ins, sub, i0, NULL, i == 0, 0);
 			/* assign register to that param
                          *
@@ -241,7 +241,7 @@ expand_pcc_sub(Parrot_Interp interpreter, Instruction *ins)
                             sprintf(buf, "%c%d", arg->set, next[j]++);
                             regs[1] = mk_pasm_reg(str_dup(buf));
                             /* e.g. set $I0, I5 */
-                            ins = insINS(interpreter, ins, "set", regs, 2);
+                            ins = insINS(interpreter, unit, ins, "set", regs, 2);
                         }
                         else {
                             /*
@@ -273,14 +273,14 @@ overflow:
                  * emit code to inspect the argument type
                  * if something is wrong, an exception gets thrown
                  */
-                ins = pcc_emit_check_param(interpreter, ins, sub, i0, p3,
+                ins = pcc_emit_check_param(interpreter, unit, ins, sub, i0, p3,
                         i == 0, type);
                 /* this uses register numbers (if any)
                  * from the first prototyped pass
                  */
 		regs[0] = sub->pcc_sub->args[i];
 		regs[1] = p3;
-		ins = insINS(interpreter, ins, "shift", regs, 2);
+		ins = insINS(interpreter, unit, ins, "shift", regs, 2);
 	    }
 	} /* n params */
         if (ps != pe) {
@@ -288,14 +288,14 @@ overflow:
                 /* branch to the end */
                 sprintf(buf, "#sub_%s_p0", sub->name);
                 regs[0] = label2 = mk_address(str_dup(buf), U_add_uniq_label);
-                ins = insINS(interpreter, ins, "branch", regs, 1);
-                tmp = INS_LABEL(label1, 0);
-                insert_ins(ins, tmp);
+                ins = insINS(interpreter, unit, ins, "branch", regs, 1);
+                tmp = INS_LABEL(unit, label1, 0);
+                insert_ins(unit, ins, tmp);
                 ins = tmp;
             }
             else {
-                tmp = INS_LABEL(label2, 0);
-                insert_ins(ins, tmp);
+                tmp = INS_LABEL(unit, label2, 0);
+                insert_ins(unit, ins, tmp);
                 ins = tmp;
             }
         }
@@ -307,12 +307,12 @@ overflow:
     if (sub->pcc_sub->calls_a_sub) {
         regs[0] = sub->pcc_sub->cc_sym = mk_temp_reg('P');
         regs[1] = mk_pasm_reg(str_dup("P1"));
-        insINS(interpreter, ins, "set", regs, 2);
+        insINS(interpreter, unit, ins, "set", regs, 2);
     }
 }
 
 void
-expand_pcc_sub_ret(Parrot_Interp interpreter, Instruction *ins)
+expand_pcc_sub_ret(Parrot_Interp interpreter, IMC_Unit * unit, Instruction *ins)
 {
     SymReg *arg, *sub, *reg, *regs[IMCC_MAX_REGS], *p3;
     int next[4], i, j, n, arg_count;
@@ -331,11 +331,11 @@ expand_pcc_sub_ret(Parrot_Interp interpreter, Instruction *ins)
      * if we have preserved the return continuation
      * restore it
      */
-    sub = instructions->r[1];
+    sub = unit->instructions->r[1];
     if (sub->pcc_sub->cc_sym) {
         regs[0] = mk_pasm_reg(str_dup("P1"));
         regs[1] = sub->pcc_sub->cc_sym;
-        tmp = insINS(interpreter, ins, "set", regs, 2);
+        tmp = insINS(interpreter, unit, ins, "set", regs, 2);
     }
     /* FIXME
      * fake prototyped
@@ -375,7 +375,7 @@ lazy:
                             reg = mk_pasm_reg(str_dup(buf));
                             regs[0] = reg;
                             regs[1] = arg;
-                            ins = insINS(interpreter, ins, "set", regs, 2);
+                            ins = insINS(interpreter, unit, ins, "set", regs, 2);
                             sub->pcc_sub->ret[i]->used = reg;
                             break;
                         }
@@ -399,17 +399,17 @@ lazy:
 overflow:
             if (!p3) {
                 p3 = mk_pasm_reg(str_dup("P3"));
-                tmp = iNEW(interpreter, p3, str_dup("SArray"), NULL, 0);
-                insert_ins(ins, tmp);
+                tmp = iNEW(interpreter, unit, p3, str_dup("SArray"), NULL, 0);
+                insert_ins(unit, ins, tmp);
                 ins = tmp;
                 sprintf(buf, "%d", n);
                 regs[0] = p3;
                 regs[1] = mk_const(str_dup(buf), 'I');
-                ins = insINS(interpreter, ins, "set", regs, 2);
+                ins = insINS(interpreter, unit, ins, "set", regs, 2);
             }
             regs[0] = p3;
             regs[1] = arg;
-            ins = insINS(interpreter, ins, "push", regs, 2);
+            ins = insINS(interpreter, unit, ins, "push", regs, 2);
             n_p3++;
         }
 
@@ -417,9 +417,9 @@ overflow:
     /*
      * setup I regs
      */
-    ins = set_I_const(interpreter, ins, 0, sub->pcc_sub->prototyped);
+    ins = set_I_const(interpreter, unit, ins, 0, sub->pcc_sub->prototyped);
     for (i = 0; i < 4; i++)
-        ins = set_I_const(interpreter, ins, i + 1, next[i] - 5);
+        ins = set_I_const(interpreter, unit, ins, i + 1, next[i] - 5);
 
     /*
      * we have a pcc_begin_yield
@@ -430,14 +430,14 @@ overflow:
          *
          * TODO optimize this later
          */
-        ins = insINS(interpreter, ins, "savetop", regs, 0);
+        ins = insINS(interpreter, unit, ins, "savetop", regs, 0);
     }
     /*
      * insert return invoke
      */
     reg = mk_pasm_reg(str_dup("P1"));
     regs[0] = reg;
-    ins = insINS(interpreter, ins, "invoke", regs, arg_count);
+    ins = insINS(interpreter, unit, ins, "invoke", regs, arg_count);
     /*
      * move the pcc_sub structure to the invoke
      */
@@ -452,7 +452,7 @@ overflow:
     ins->type |= arg_count == 0 ? ITPCCYIELD : (ITPCCRET|ITPCCSUB);
     if (arg_count == 0) {
         /* optimize this later */
-        ins = insINS(interpreter, ins, "restoretop", regs, 0);
+        ins = insINS(interpreter, unit, ins, "restoretop", regs, 0);
     }
 }
 
@@ -468,7 +468,7 @@ overflow:
  * with the results in [1] matching return values in [2]
  */
 static int
-check_tail_call(Parrot_Interp interpreter, Instruction *ins)
+check_tail_call(Parrot_Interp interpreter, IMC_Unit * unit, Instruction *ins)
 {
     Instruction *tmp, *ret_ins;
     int call_found, ret_found;
@@ -477,7 +477,6 @@ check_tail_call(Parrot_Interp interpreter, Instruction *ins)
     /*
      * currently only with -Oc
      */
-    UNUSED(interpreter);
     if (!(optimizer_level & OPT_SUB))
         return 0;
     ret_ins = 0;
@@ -528,19 +527,19 @@ check_tail_call(Parrot_Interp interpreter, Instruction *ins)
 }
 
 static void
-insert_tail_call(Parrot_Interp interpreter, Instruction *ins, SymReg *sub)
+insert_tail_call(Parrot_Interp interpreter, IMC_Unit * unit, Instruction *ins, SymReg *sub)
 {
     SymReg *iaddr = mk_temp_reg('I');
     SymReg *regs[IMCC_MAX_REGS];
 
     regs[0] = iaddr;
     regs[1] = sub->pcc_sub->sub;
-    ins = insINS(interpreter, ins, "set", regs, 2);
-    ins = insINS(interpreter, ins, "jump", regs, 1);
+    ins = insINS(interpreter, unit, ins, "set", regs, 2);
+    ins = insINS(interpreter, unit, ins, "jump", regs, 1);
 }
 
 static Instruction *
-pcc_emit_flatten(Parrot_Interp interpreter, Instruction *ins,
+pcc_emit_flatten(Parrot_Interp interpreter, IMC_Unit * unit, Instruction *ins,
         SymReg *arg, int i, int *flatten)
 {
 
@@ -597,7 +596,7 @@ pcc_emit_flatten(Parrot_Interp interpreter, Instruction *ins,
         regs[0] = i2;
         sprintf(buf, "%d", i+5);
         regs[1] = mk_const(str_dup(buf), 'I');
-        ins = insINS(interpreter, ins, "set", regs, 2);
+        ins = insINS(interpreter, unit, ins, "set", regs, 2);
     }
     lin = ins->line;
     sprintf(buf, "#arg_loop_%d_%d", lin, i);
@@ -611,69 +610,69 @@ pcc_emit_flatten(Parrot_Interp interpreter, Instruction *ins,
 
     if (arg->type & VT_FLATTEN) {
         regs[0] = i0;
-        ins = insINS(interpreter, ins, "null", regs, 1);
+        ins = insINS(interpreter, unit, ins, "null", regs, 1);
         regs[0] = i1;
         regs[1] = arg;
-        ins = insINS(interpreter, ins, "set", regs, 2);
-        tmp = INS_LABEL(loop, 0);
-        insert_ins(ins, tmp);
+        ins = insINS(interpreter, unit, ins, "set", regs, 2);
+        tmp = INS_LABEL(unit, loop, 0);
+        insert_ins(unit, ins, tmp);
         ins = tmp;
         regs[0] = i0;
         regs[1] = i1;
         regs[2] = next;
-        ins = insINS(interpreter, ins, "ge", regs, 3);
+        ins = insINS(interpreter, unit, ins, "ge", regs, 3);
         regs[0] = py;
         regs[1] = arg;
         regs[2] = i0;
-        tmp = INS(interpreter, "set", NULL, regs, 3, KEY_BIT(2), 0);
-        insert_ins(ins, tmp);
+        tmp = INS(interpreter, unit, "set", NULL, regs, 3, KEY_BIT(2), 0);
+        insert_ins(unit, ins, tmp);
         ins = tmp;
         regs[0] = i0;
-        ins = insINS(interpreter, ins, "inc", regs, 1);
+        ins = insINS(interpreter, unit, ins, "inc", regs, 1);
     }
     else
         py = arg;
     regs[0] = i2;
     regs[1] = ic16 = mk_const(str_dup("16"), 'I');
     regs[2] = over1;
-    ins = insINS(interpreter, ins, "eq", regs, 3);
+    ins = insINS(interpreter, unit, ins, "eq", regs, 3);
     regs[0] = i2;
     regs[1] = ic16;
     regs[2] = over;
-    ins = insINS(interpreter, ins, "gt", regs, 3);
+    ins = insINS(interpreter, unit, ins, "gt", regs, 3);
     regs[0] = i2;
     regs[1] = py;
-    ins = insINS(interpreter, ins, "setp_ind", regs, 2);
+    ins = insINS(interpreter, unit, ins, "setp_ind", regs, 2);
     regs[0] = i2;
-    ins = insINS(interpreter, ins, "inc", regs, 1);
+    ins = insINS(interpreter, unit, ins, "inc", regs, 1);
 
     regs[0] = (arg->type & VT_FLATTEN) ? loop : next;
-    ins = insINS(interpreter, ins, "branch", regs, 1);
-    tmp = INS_LABEL(over1, 0);
-    insert_ins(ins, tmp);
+    ins = insINS(interpreter, unit, ins, "branch", regs, 1);
+    tmp = INS_LABEL(unit, over1, 0);
+    insert_ins(unit, ins, tmp);
     ins = tmp;
     p3 = mk_pasm_reg(str_dup("P3"));
-    tmp = iNEW(interpreter, p3, str_dup("PerlArray"), NULL, 0);
-    insert_ins(ins, tmp);
+    tmp = iNEW(interpreter, unit, p3, str_dup("PerlArray"), NULL, 0);
+    insert_ins(unit, ins, tmp);
     ins = tmp;
-    tmp = INS_LABEL(over, 0);
-    insert_ins(ins, tmp);
+    tmp = INS_LABEL(unit, over, 0);
+    insert_ins(unit, ins, tmp);
     ins = tmp;
     regs[0] = p3;
     regs[1] = py;
-    ins = insINS(interpreter, ins, "push", regs, 2);
+    ins = insINS(interpreter, unit, ins, "push", regs, 2);
     regs[0] = i2;
-    ins = insINS(interpreter, ins, "inc", regs, 1);
+    ins = insINS(interpreter, unit, ins, "inc", regs, 1);
     regs[0] = (arg->type & VT_FLATTEN) ? loop : next;
-    ins = insINS(interpreter, ins, "branch", regs, 1);
-    tmp = INS_LABEL(next, 0);
-    insert_ins(ins, tmp);
+    ins = insINS(interpreter, unit, ins, "branch", regs, 1);
+    tmp = INS_LABEL(unit, next, 0);
+    insert_ins(unit, ins, tmp);
     ins = tmp;
     return ins;
 }
 
 void
-expand_pcc_sub_call(Parrot_Interp interpreter, Instruction *ins)
+expand_pcc_sub_call(Parrot_Interp interpreter, IMC_Unit * unit, Instruction *ins)
 {
     SymReg *arg, *sub, *reg, *arg_reg, *regs[IMCC_MAX_REGS];
     int next[4], i, j, n;
@@ -686,7 +685,7 @@ expand_pcc_sub_call(Parrot_Interp interpreter, Instruction *ins)
     int tail_call;
     int flatten;
 
-    tail_call = check_tail_call(interpreter, ins);
+    tail_call = check_tail_call(interpreter, unit, ins);
     if (tail_call)
         debug(interpreter, DEBUG_OPT1, "found tail call %I \n", ins);
     for (i = 0; i < 4; i++)
@@ -725,7 +724,7 @@ lazy:
                             reg = mk_pasm_reg(str_dup(buf));
                             regs[0] = reg;
                             regs[1] = arg_reg;
-                            ins = insINS(interpreter, ins, "set", regs, 2);
+                            ins = insINS(interpreter, unit, ins, "set", regs, 2);
                             /* remember reg for life analysis */
                             sub->pcc_sub->args[i]->used = reg;
 
@@ -755,19 +754,19 @@ lazy:
 overflow:
             if (!p3) {
                 p3 = mk_pasm_reg(str_dup("P3"));
-                tmp = iNEW(interpreter, p3, str_dup("SArray"), NULL, 0);
-                insert_ins(ins, tmp);
+                tmp = iNEW(interpreter, unit, p3, str_dup("SArray"), NULL, 0);
+                insert_ins(unit, ins, tmp);
                 ins = tmp;
                 sprintf(buf, "%d", n);
                 regs[0] = p3;
                 regs[1] = mk_const(str_dup(buf), 'I');
-                ins = insINS(interpreter, ins, "set", regs, 2);
+                ins = insINS(interpreter, unit, ins, "set", regs, 2);
             }
             if (flatten || (arg_reg->type & VT_FLATTEN))
                 goto flatten;
             regs[0] = p3;
             regs[1] = arg;
-            ins = insINS(interpreter, ins, "push", regs, 2);
+            ins = insINS(interpreter, unit, ins, "push", regs, 2);
             n_p3++;
         }
         continue;
@@ -775,7 +774,7 @@ flatten:
         /* if we had a flattening arg, we must continue emitting
          * code to do all at runtime
          */
-        ins = pcc_emit_flatten(interpreter, ins, arg_reg, i, &flatten);
+        ins = pcc_emit_flatten(interpreter, unit, ins, arg_reg, i, &flatten);
     } /* for i */
 
     /*
@@ -783,7 +782,7 @@ flatten:
      * insert a jump
      */
     if (tail_call) {
-        insert_tail_call(interpreter, ins, sub);
+        insert_tail_call(interpreter, unit, ins, sub);
         return;
     }
 
@@ -798,7 +797,7 @@ move_sub:
             regs[0] = reg;
             regs[1] = arg;
             arg->reg->want_regno = 0;
-            ins = insINS(interpreter, ins, "set", regs, 2);
+            ins = insINS(interpreter, unit, ins, "set", regs, 2);
         }
     }
     else {
@@ -816,7 +815,7 @@ move_cc:
                 regs[0] = reg;
                 regs[1] = arg;
                 arg->reg->want_regno = 1;
-                ins = insINS(interpreter, ins, "set", regs, 2);
+                ins = insINS(interpreter, unit, ins, "set", regs, 2);
             }
         }
         else {
@@ -827,24 +826,24 @@ move_cc:
     else if (!sub->pcc_sub->nci)
         need_cc = 1;
     /* set prototyped: I0 */
-    ins = set_I_const(interpreter, ins, 0, sub->pcc_sub->prototyped);
+    ins = set_I_const(interpreter, unit, ins, 0, sub->pcc_sub->prototyped);
     /* set items in P3: I1 */
-    ins = set_I_const(interpreter, ins, 1, n_p3);
+    ins = set_I_const(interpreter, unit, ins, 1, n_p3);
     /* set items in PRegs: I2 */
     if (flatten) {
         regs[0] = mk_pasm_reg(str_dup("I2"));;
         regs[1] = mk_const(str_dup("5"), 'I');
-        ins = insINS(interpreter, ins, "sub", regs, 2);
+        ins = insINS(interpreter, unit, ins, "sub", regs, 2);
     }
     else
-        ins = set_I_const(interpreter, ins, 2, next[2] - 5);
+        ins = set_I_const(interpreter, unit, ins, 2, next[2] - 5);
     /* return type 0=void, or -n-1: I3 */
-    ins = set_I_const(interpreter, ins, 3,
+    ins = set_I_const(interpreter, unit, ins, 3,
             sub->pcc_sub->nret ? -1 - sub->pcc_sub->nret : 0);
 #if 0
     /* TODO method calls */
     /* meth hash value: I4 */
-    ins = set_I_const(interpreter, ins, 4, 0);
+    ins = set_I_const(interpreter, unit, ins, 4, 0);
     /* meth name: S0 */
     /* object: P2 */
 #endif
@@ -853,12 +852,12 @@ move_cc:
      */
     if (!sub->pcc_sub->nci)
         if (!need_cc)
-            ins = insINS(interpreter, ins, "updatecc", regs, 0);
+            ins = insINS(interpreter, unit, ins, "updatecc", regs, 0);
     /*
      * emit a savetop for now
      */
-    ins = insINS(interpreter, ins, "savetop", regs, 0);
-    ins = insINS(interpreter, ins, need_cc ? "invokecc" : "invoke", regs, 0);
+    ins = insINS(interpreter, unit, ins, "savetop", regs, 0);
+    ins = insINS(interpreter, unit, ins, need_cc ? "invokecc" : "invoke", regs, 0);
     ins->type |= ITPCCSUB;
     /*
      * move the pcc_sub structure to the invoke
@@ -873,7 +872,7 @@ move_cc:
      */
     if (ins->next->type == ITLABEL && sub->pcc_sub->label)
         ins = ins->next;
-    ins = insINS(interpreter, ins, "restoretop", regs, 0);
+    ins = insINS(interpreter, unit, ins, "restoretop", regs, 0);
     /*
      * handle return results
      * TODO: overflow
@@ -896,7 +895,7 @@ move_cc:
                     reg = mk_pasm_reg(str_dup(buf));
                     regs[0] = arg;
                     regs[1] = reg;
-                    ins = insINS(interpreter, ins, "set", regs, 2);
+                    ins = insINS(interpreter, unit, ins, "set", regs, 2);
                     sub->pcc_sub->ret[i]->used = reg;
                     break;
                 }
@@ -907,7 +906,7 @@ move_cc:
                 p3 = mk_pasm_reg(str_dup("P3"));
             regs[0] = arg;
             regs[1] = p3;
-            ins = insINS(interpreter, ins, "shift", regs, 2);
+            ins = insINS(interpreter, unit, ins, "shift", regs, 2);
         }
     }
 }
@@ -918,12 +917,12 @@ move_cc:
  * TODO saveall
  */
 static void
-optc_savetop(Parrot_Interp interpreter, Instruction *ins)
+optc_savetop(Parrot_Interp interpreter, IMC_Unit * unit, Instruction *ins)
 {
     char types[] = "ISPN";
     Instruction *tmp;
     SymReg * regs[IMCC_MAX_REGS], *r;
-    SymReg** reglist = IMCC_INFO(interpreter)->reglist;
+    SymReg** reglist = unit->reglist;
     char *new_save[] = {
         "pushtopi",
         "pushtops",
@@ -941,7 +940,7 @@ optc_savetop(Parrot_Interp interpreter, Instruction *ins)
 
     for (i = 0; i < 4; i++)
         needs_save[i] = 0;
-    for (i = 0; i < IMCC_INFO(interpreter)->n_symbols; i++) {
+    for (i = 0; i < unit->n_symbols; i++) {
         r = reglist[i];
         if ((r->type & VTREGISTER) && r->color >= 16) {
             t = strchr(types, r->set) - types;
@@ -954,14 +953,14 @@ optc_savetop(Parrot_Interp interpreter, Instruction *ins)
     switch (nsave) {
         case 0:
             debug(interpreter, DEBUG_OPT1, "opt1 %I => ", ins);
-            ins = delete_ins(ins, 1);
+            ins = delete_ins(unit, ins, 1);
             debug(interpreter, DEBUG_OPT1, "deleted\n");
             ostat.deleted_ins++;
             for (; ins ; ins = ins->next)
                 if (!strcmp(ins->op, "restoretop"))
                     break;
             debug(interpreter, DEBUG_OPT1, "opt1 %I => ", ins);
-            ins = delete_ins(ins, 1);
+            ins = delete_ins(unit, ins, 1);
             debug(interpreter, DEBUG_OPT1, "deleted\n");
             ostat.deleted_ins++;
             break;
@@ -970,15 +969,15 @@ optc_savetop(Parrot_Interp interpreter, Instruction *ins)
             for (i = 0; i < 4; i++)
                 if (needs_save[i])
                     break;
-            tmp = INS(interpreter, new_save[i], NULL, regs, 0, 0, 0);
-            subst_ins(ins, tmp, 1);
+            tmp = INS(interpreter, unit, new_save[i], NULL, regs, 0, 0, 0);
+            subst_ins(unit, ins, tmp, 1);
             debug(interpreter, DEBUG_OPT1, "%I\n", tmp);
             for (ins = tmp; ins ; ins = ins->next)
                 if (!strcmp(ins->op, "restoretop"))
                     break;
             debug(interpreter, DEBUG_OPT1, "opt1 %I => ", ins);
-            tmp = INS(interpreter, new_restore[i], NULL, regs, 0, 0, 0);
-            subst_ins(ins, tmp, 1);
+            tmp = INS(interpreter, unit, new_restore[i], NULL, regs, 0, 0, 0);
+            subst_ins(unit, ins, tmp, 1);
             debug(interpreter, DEBUG_OPT1, "%I\n", tmp);
             break;
     }
@@ -988,20 +987,20 @@ optc_savetop(Parrot_Interp interpreter, Instruction *ins)
  * above functions
  */
 void
-pcc_optimize(Parrot_Interp interpreter)
+pcc_optimize(Parrot_Interp interpreter, IMC_Unit * unit)
 {
     Instruction *ins, *tmp;
     info(interpreter, 2, "\tpcc_optimize\n");
-    for (ins = instructions; ins; ins = ins->next) {
+    for (ins = unit->instructions; ins; ins = ins->next) {
         if (ins->opsize == 3 &&
                 ins->r[1]->type == VTCONST &&
                 (ins->r[0]->set == 'I' || ins->r[0]->set == 'N') &&
                 atof(ins->r[1]->name) == 0.0 &&
                 !strcmp(ins->op, "set")) {
             debug(interpreter, DEBUG_OPT1, "opt1 %I => ", ins);
-            tmp = INS(interpreter, "null", NULL, ins->r, 1, 0, 0);
+            tmp = INS(interpreter, unit,"null", NULL, ins->r, 1, 0, 0);
             debug(interpreter, DEBUG_OPT1, "%I\n", tmp);
-            subst_ins(ins, tmp, 1);
+            subst_ins(unit, ins, tmp, 1);
             ins = tmp;
         }
         else if (ins->opsize == 3 &&
@@ -1014,8 +1013,8 @@ pcc_optimize(Parrot_Interp interpreter)
                 r1 = r1->reg;
             if (r0->set == r1->set && r0->color == r1->color) {
                 debug(interpreter, DEBUG_OPT1, "opt1 %I => ", ins);
-                ins = delete_ins(ins, 1);
-                ins = ins->prev ? ins->prev : instructions;
+                ins = delete_ins(unit, ins, 1);
+                ins = ins->prev ? ins->prev : unit->instructions;
                 debug(interpreter, DEBUG_OPT1, "deleted\n");
                 ostat.deleted_ins++;
             }
@@ -1024,11 +1023,11 @@ pcc_optimize(Parrot_Interp interpreter)
             tmp = ins;
             tmp = tmp->prev;
             if (!strcmp(tmp->op, "savetop"))
-                optc_savetop(interpreter, tmp);
+                optc_savetop(interpreter, unit, tmp);
             else {
                 tmp = tmp->prev;
                 if (!strcmp(tmp->op, "savetop"))
-                    optc_savetop(interpreter, tmp);
+                    optc_savetop(interpreter, unit, tmp);
             }
         }
     }

@@ -31,7 +31,7 @@
  * best would be to have a flag in core.ops, where a PMC type is expected
  */
 Instruction *
-iNEW(struct Parrot_Interp *interpreter, SymReg * r0, char * type,
+iNEW(struct Parrot_Interp *interpreter, IMC_Unit * unit, SymReg * r0, char * type,
         SymReg *init, int emit)
 {
     char fmt[256];
@@ -62,7 +62,7 @@ iNEW(struct Parrot_Interp *interpreter, SymReg * r0, char * type,
     i = nargs;
     while (i < IMCC_MAX_REGS)
 	regs[i++] = NULL;
-    return INS(interpreter, "new", fmt, regs, nargs,0, emit);
+    return INS(interpreter, unit, "new", fmt, regs, nargs,0, emit);
 }
 
 /*
@@ -80,7 +80,7 @@ iNEW(struct Parrot_Interp *interpreter, SymReg * r0, char * type,
  */
 
 Instruction *
-iNEWSUB(struct Parrot_Interp *interpreter, SymReg * r0, int type,
+iNEWSUB(struct Parrot_Interp *interpreter, IMC_Unit * unit, SymReg * r0, int type,
         SymReg *init, int emit)
 {
     char fmt[256];
@@ -121,7 +121,7 @@ iNEWSUB(struct Parrot_Interp *interpreter, SymReg * r0, int type,
     i = nargs;
     while (i < IMCC_MAX_REGS)
 	regs[i++] = NULL;
-    return INS(interpreter, "newsub", NULL, regs, nargs,0, emit);
+    return INS(interpreter, unit, "newsub", NULL, regs, nargs,0, emit);
 }
 
 void
@@ -182,7 +182,8 @@ check_op(struct Parrot_Interp *interpreter, char *fullname,
 
 }
 
-int is_op(struct Parrot_Interp *interpreter, char *name)
+int
+is_op(struct Parrot_Interp *interpreter, char *name)
 {
     return interpreter->op_lib->op_code(name, 0) >= 0
         || interpreter->op_lib->op_code(name, 1) >= 0;
@@ -199,8 +200,8 @@ int is_op(struct Parrot_Interp *interpreter, char *name)
  * s. e.g. imc.c for usage
  */
 Instruction *
-INS(struct Parrot_Interp *interpreter, char *name, const char *fmt, SymReg **r,
-        int n, int keyvec, int emit)
+INS(struct Parrot_Interp *interpreter, IMC_Unit * unit, char *name, const char *fmt,
+      SymReg **r, int n, int keyvec, int emit)
 {
     char fullname[64];
     int i;
@@ -209,7 +210,7 @@ INS(struct Parrot_Interp *interpreter, char *name, const char *fmt, SymReg **r,
     Instruction * ins;
 
 #if 1
-    ins = multi_keyed(interpreter, name, r, n, keyvec, emit);
+    ins = multi_keyed(interpreter, unit, name, r, n, keyvec, emit);
     if (ins)
         return ins;
 #endif
@@ -218,7 +219,7 @@ INS(struct Parrot_Interp *interpreter, char *name, const char *fmt, SymReg **r,
     if (op < 0)         /* maybe we got a fullname */
         op = interpreter->op_lib->op_code(name, 1);
     if (op < 0)         /* still wrong, try to find an existing op */
-        op = try_find_op(interpreter, name, r, n, keyvec, emit);
+        op = try_find_op(interpreter, unit, name, r, n, keyvec, emit);
     if (op >= 0) {
         op_info_t * op_info = &interpreter->op_info_table[op];
 	char format[128];
@@ -321,7 +322,7 @@ INS(struct Parrot_Interp *interpreter, char *name, const char *fmt, SymReg **r,
             ++has_compile;
 
         if (emit)
-             emitb(ins);
+             emitb(unit, ins);
     } else {
         fataly(EX_SOFTWARE, sourcefile, line,"op not found '%s' (%s<%d>)\n",
                 fullname, name, n);
@@ -339,7 +340,8 @@ INS(struct Parrot_Interp *interpreter, char *name, const char *fmt, SymReg **r,
  */
 extern void* yy_scan_string(const char *);
 
-static void *imcc_compile(Parrot_Interp interp, const char *s)
+static void *
+imcc_compile(Parrot_Interp interp, const char *s)
 {
     /* imcc always compiles to interp->code->byte_code
      * save old cs, make new
@@ -387,7 +389,8 @@ static void *imcc_compile(Parrot_Interp interp, const char *s)
     return pf;
 }
 
-static void *imcc_compile_pasm(Parrot_Interp interp, const char *s)
+static void *
+imcc_compile_pasm(Parrot_Interp interp, const char *s)
 {
     int pasm = pasm_file;
     void *pf;
@@ -399,7 +402,8 @@ static void *imcc_compile_pasm(Parrot_Interp interp, const char *s)
     return pf;
 }
 
-static void *imcc_compile_pir (Parrot_Interp interp, const char *s)
+static void *
+imcc_compile_pir (Parrot_Interp interp, const char *s)
 {
     int pasm = pasm_file;
     void *pf;
@@ -412,7 +416,8 @@ static void *imcc_compile_pir (Parrot_Interp interp, const char *s)
 }
 
 
-static void *imcc_compile_file (Parrot_Interp interp, const char *s)
+static void *
+imcc_compile_file (Parrot_Interp interp, const char *s)
 {
     struct PackFile *pf_save = interp->code;
     struct PackFile *pf;
@@ -441,6 +446,8 @@ static void *imcc_compile_file (Parrot_Interp interp, const char *s)
         pasm_file = 0;
 
     line = 1;
+
+    /* see imcc.l */
     compile_file(interp, new);
 
     (void)Parrot_switch_to_cs(interp, pf_save->cur_cs);
@@ -451,7 +458,8 @@ static void *imcc_compile_file (Parrot_Interp interp, const char *s)
 }
 
 /* tell the parrot core, which compilers we provide */
-void register_compilers(Parrot_Interp interp)
+void
+register_compilers(Parrot_Interp interp)
 {
     STRING *pasm = string_from_cstring(interp, "PASM", 0);
     STRING *pir = string_from_cstring(interp, "PIR", 0);
@@ -475,7 +483,7 @@ void register_compilers(Parrot_Interp interp)
  *      ge_n_ic_ic => ge_n_nc_ic
  */
 int
-try_find_op(Parrot_Interp interpreter, char *name, SymReg ** r,
+try_find_op(Parrot_Interp interpreter, IMC_Unit * unit, char *name, SymReg ** r,
         int n, int keyvec, int emit)
 {
     char fullname[64];
@@ -506,7 +514,7 @@ try_find_op(Parrot_Interp interpreter, char *name, SymReg ** r,
 
                 rr[0] = mk_temp_reg('N');
                 rr[1] = r[1];
-                INS(interpreter, "set", NULL, rr, 2, 0, 1);
+                INS(interpreter, unit, "set", NULL, rr, 2, 0, 1);
                 r[1] = rr[0];
                 changed = 1;
             }
@@ -520,8 +528,8 @@ try_find_op(Parrot_Interp interpreter, char *name, SymReg ** r,
 }
 
 Instruction *
-multi_keyed(struct Parrot_Interp *interpreter,char *name,
-SymReg ** r, int nr, int keyvec, int emit)
+multi_keyed(struct Parrot_Interp *interpreter, IMC_Unit * unit, char *name,
+            SymReg ** r, int nr, int keyvec, int emit)
 {
     int i, keyf, kv, n;
     char buf[16];
@@ -571,14 +579,14 @@ SymReg ** r, int nr, int keyvec, int emit)
                 nreg[1] = r[i+1];
                 nreg[2] = preg[n];
                 /* set p_k px */
-                ins = INS(interpreter, str_dup("set"), 0, nreg, 3,KEY_BIT(1),0);
+                ins = INS(interpreter, unit, str_dup("set"), 0, nreg, 3,KEY_BIT(1),0);
             }
             else {
                 nreg[0] = preg[n];
                 nreg[1] = r[i];
                 nreg[2] = r[i+1];
                 /* set py|z p_k */
-                INS(interpreter, str_dup("set"), 0, nreg, 3, KEY_BIT(2), 1);
+                INS(interpreter, unit, str_dup("set"), 0, nreg, 3, KEY_BIT(2), 1);
             }
             i++;
         }
@@ -588,22 +596,22 @@ SymReg ** r, int nr, int keyvec, int emit)
                 nreg[0] = r[i];
                 nreg[1] = preg[n];
                 /* set n, px */
-                ins = INS(interpreter, str_dup("set"), 0, nreg, 2, 0, 0);
+                ins = INS(interpreter, unit, str_dup("set"), 0, nreg, 2, 0, 0);
             }
             else {
                 nreg[0] = preg[n];
                 nreg[1] = r[i];
                 /* set px, n */
-                INS(interpreter, str_dup("set"), 0, nreg, 2, 0, 1);
+                INS(interpreter, unit, str_dup("set"), 0, nreg, 2, 0, 1);
             }
         }
     }
     /* make a new undef */
-    iNEW(interpreter, preg[0], str_dup("PerlUndef"), NULL, 1);
+    iNEW(interpreter, unit, preg[0], str_dup("PerlUndef"), NULL, 1);
     /* emit the operand */
-    INS(interpreter, name, 0, preg, 3, 0, 1);
+    INS(interpreter, unit, name, 0, preg, 3, 0, 1);
     /* emit the LHS op */
-    emitb(ins);
+    emitb(unit, ins);
     return ins;
 }
 

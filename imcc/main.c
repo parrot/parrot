@@ -191,17 +191,17 @@ parseflags(Parrot_Interp interp, int *argc, char **argv[])
                 break;
             case 'd':
                 if (opt.opt_arg) {
-                    IMCC_INFO(interp)->debug = strtoul(opt.opt_arg, 0, 16);
+                    interp->imc_info->debug = strtoul(opt.opt_arg, 0, 16);
                 }
                 else {
-                    IMCC_INFO(interp)->debug++;
+                    interp->imc_info->debug++;
                 }
-                if (IMCC_INFO(interp)->debug & 1)
+                if (interp->imc_info->debug & 1)
                     setopt(PARROT_DEBUG_FLAG);
                 break;
             case 'w':
                 Parrot_setwarnings(interp, PARROT_WARNINGS_ALL_FLAG);
-                IMCC_INFO(interp)->imcc_warn = 1;
+                interp->imc_info->imcc_warn = 1;
                 break;
             case 'G':
                 gc_off = 1;
@@ -231,7 +231,7 @@ parseflags(Parrot_Interp interp, int *argc, char **argv[])
                 load_pbc = 1;
                 break;
             case 'v':
-                IMCC_INFO(interp)->verbose++;
+                interp->imc_info->verbose++;
                 break;
             case 'y':
                 yydebug = 1;
@@ -403,7 +403,7 @@ main(int argc, char * argv[])
     struct Parrot_Interp *interpreter = Parrot_new();
 
     Parrot_init(interpreter);
-    interpreter->imcc_info = mem_sys_allocate_zeroed(sizeof(imcc_info_t));
+    interpreter->imc_info = mem_sys_allocate_zeroed(sizeof(imc_info_t));
 
     interpreter->DOD_block_level++;
 
@@ -467,8 +467,8 @@ main(int argc, char * argv[])
             fatal(1, "main", "outputfile is sourcefile\n");
     }
 
-    if (IMCC_INFO(interpreter)->verbose) {
-        info(interpreter, 1,"debug = 0x%x\n", IMCC_INFO(interpreter)->debug);
+    if (interpreter->imc_info->verbose) {
+        info(interpreter, 1,"debug = 0x%x\n", interpreter->imc_info->debug);
         info(interpreter, 1,"Reading %s\n", yyin == stdin ? "stdin":sourcefile);
     }
     if (load_pbc) {
@@ -491,6 +491,9 @@ main(int argc, char * argv[])
         info(interpreter, 1, "Starting parse...\n");
 
         yyparse((void *) interpreter);
+
+        imc_compile_all_units(interpreter);
+
         emit_close(interpreter);
         fclose(yyin);
 
@@ -529,7 +532,7 @@ main(int argc, char * argv[])
         load_pbc = 1;
     }
     if (run_pbc) {
-        if (IMCC_INFO(interpreter)->imcc_warn)
+        if (interpreter->imc_info->imcc_warn)
             PARROT_WARNINGS_on(interpreter, PARROT_WARNINGS_ALL_FLAG);
         else
             PARROT_WARNINGS_off(interpreter, PARROT_WARNINGS_ALL_FLAG);
@@ -547,7 +550,7 @@ main(int argc, char * argv[])
     Parrot_destroy(interpreter);
     if (output)
         free(output);
-    mem_sys_free(IMCC_INFO(interpreter));
+    mem_sys_free(interpreter->imc_info);
     Parrot_exit(0);
 
     return 0;

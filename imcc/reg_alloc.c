@@ -34,19 +34,20 @@
 
 static void make_stat(int *sets, int *cols);
 static void imc_stat_init(void);
-static void print_stat(Parrot_Interp);
+static void print_stat(Parrot_Interp, IMC_Unit *);
 static void allocate_wanted_regs(void);
-static void build_reglist(Parrot_Interp, Instruction * unit);
-static void build_interference_graph(Parrot_Interp);
-static void compute_du_chain(Instruction * unit);
-static int interferes(Parrot_Interp, SymReg * r0, SymReg * r1);
+static void build_reglist(Parrot_Interp, IMC_Unit * unit);
+static void build_interference_graph(Parrot_Interp, IMC_Unit *);
+static void compute_du_chain(IMC_Unit * unit);
+static void compute_one_du_chain(SymReg * r, IMC_Unit * unit);
+static int interferes(IMC_Unit *, SymReg * r0, SymReg * r1);
 static int map_colors(int x, SymReg ** graph, int colors[], int typ);
 #ifdef DO_SIMPLIFY
 static int simplify (void);
 #endif
-static void compute_spilling_costs (Parrot_Interp);
+static void compute_spilling_costs (Parrot_Interp, IMC_Unit *);
 static void order_spilling (void);
-static void spill (struct Parrot_Interp *, Instruction * unit, int);
+static void spill (struct Parrot_Interp *, IMC_Unit * unit, int);
 static int try_allocate(Parrot_Interp);
 static void restore_interference_graph(void);
 static int neighbours(int node);
@@ -63,7 +64,7 @@ static int n_symbols;
  * on a single compilation unit at a time.
  */
 void
-imc_reg_alloc(struct Parrot_Interp *interpreter, Instruction * unit)
+imc_reg_alloc(struct Parrot_Interp *interpreter, IMC_Unit * unit)
 {
     int to_spill;
     int todo, first;
@@ -84,57 +85,57 @@ imc_reg_alloc(struct Parrot_Interp *interpreter, Instruction * unit)
         imc_stat_init();
 
     /* consecutive labels, if_branch, unused_labels ... */
-    pre_optimize(interpreter);
+    pre_optimize(interpreter, unit);
     if (optimizer_level == OPT_PRE && pasm_file)
         return;
 
     nodeStack = imcstack_new();
-    IMCC_INFO(interpreter)->n_spilled = 0;
+    unit->n_spilled = 0;
 
     todo = first = 1;
     while (todo) {
-        find_basic_blocks(interpreter, first);
-        build_cfg(interpreter);
+        find_basic_blocks(interpreter, unit, first);
+        build_cfg(interpreter, unit);
 
         if (first && (IMCC_INFO(interpreter)->debug & DEBUG_CFG))
-            dump_cfg(interpreter);
+            dump_cfg(unit);
         first = 0;
-        todo = cfg_optimize(interpreter);
+        todo = cfg_optimize(interpreter, unit);
     }
 
     todo = first = 1;
     while (todo) {
         if (!first) {
-            find_basic_blocks(interpreter, 0);
-            build_cfg(interpreter);
+            find_basic_blocks(interpreter, unit, 0);
+            build_cfg(interpreter, unit);
         }
         first = 0;
 
-        compute_dominators(interpreter);
-        find_loops(interpreter);
+        compute_dominators(interpreter, unit);
+        find_loops(interpreter, unit);
 
         build_reglist(interpreter, unit);
-        life_analysis(interpreter);
+        life_analysis(interpreter, unit);
         /* optimize, as long as there is something to do */
         if (dont_optimize)
             todo = 0;
         else {
-            todo = optimize(interpreter);
+            todo = optimize(interpreter, unit);
             if (todo)
-                pre_optimize(interpreter);
+                pre_optimize(interpreter, unit);
         }
     }
     todo = 1;
 #if !DOIT_AGAIN_SAM
-    build_interference_graph(interpreter);
+    build_interference_graph(interpreter, unit);
 #endif
     while (todo) {
 #if DOIT_AGAIN_SAM
-        build_interference_graph(interpreter);
+        build_interference_graph(interpreter, unit);
 #endif
         if (optimizer_level & OPT_SUB)
             allocate_wanted_regs();
-        compute_spilling_costs(interpreter);
+        compute_spilling_costs(interpreter, unit);
 #ifdef DO_SIMPLIFY
         /* simplify until no changes can be made */
         while (simplify()) {}
@@ -152,9 +153,9 @@ imc_reg_alloc(struct Parrot_Interp *interpreter, Instruction * unit)
              * do life analysis there for only the involved regs
              */
 #if DOIT_AGAIN_SAM
-            find_basic_blocks(interpreter, 0);
-            build_cfg(interpreter);
-            build_reglist(interpreter);
+            find_basic_blocks(interpreter, unit, 0);
+            build_cfg(interpreter, unit);
+            build_reglist(interpreter, unit);
             life_analysis(interpreter);
 #endif
         }
@@ -164,29 +165,29 @@ imc_reg_alloc(struct Parrot_Interp *interpreter, Instruction * unit)
         }
     }
     if (optimizer_level & OPT_SUB)
-        pcc_optimize(interpreter);
+        pcc_optimize(interpreter, unit);
     if (IMCC_INFO(interpreter)->debug & DEBUG_IMC)
-        dump_instructions(interpreter);
+        dump_instructions(unit);
     if (IMCC_INFO(interpreter)->verbose  ||
             (IMCC_INFO(interpreter)->debug & DEBUG_IMC))
-        print_stat(interpreter);
+        print_stat(interpreter, unit);
     imcstack_free(nodeStack);
 }
 
 void
-free_reglist(Parrot_Interp interpreter)
+free_reglist(IMC_Unit * unit)
 {
     if (interference_graph) {
         free(interference_graph);
-        IMCC_INFO(interpreter)->interference_graph = interference_graph = 0;
+        unit->interference_graph = interference_graph = 0;
     }
     if (reglist) {
         int i;
         for (i = 0; i < n_symbols; i++)
-            free_life_info(interpreter, reglist[i]);
+            free_life_info(unit, reglist[i]);
         free(reglist);
-        IMCC_INFO(interpreter)->reglist = reglist = NULL;
-        IMCC_INFO(interpreter)->n_symbols = n_symbols = 0;
+        unit->reglist = reglist = NULL;
+        unit->n_symbols = n_symbols = 0;
     }
 }
 
@@ -220,7 +221,7 @@ static void imc_stat_init() {
 }
 
 /* and final */
-static void print_stat(Parrot_Interp interpreter)
+static void print_stat(Parrot_Interp interpreter, IMC_Unit * unit)
 {
     int sets[4] = {0,0,0,0};
     int cols[4] = {-1,-1,-1,-1};
@@ -238,9 +239,9 @@ static void print_stat(Parrot_Interp interpreter)
             sets[0], sets[1], sets[2], sets[3]);
     info(interpreter, 1, "\tregisters in .pasm:\t I%d, N%d, S%d, P%d - %d spilled\n",
             cols[0]+1, cols[1]+1, cols[2]+1, cols[3]+1,
-            IMCC_INFO(interpreter)->n_spilled);
+            unit->n_spilled);
     info(interpreter, 1, "\t%d basic_blocks, %d edges\n",
-            IMCC_INFO(interpreter)->n_basic_blocks, edge_count(interpreter));
+            unit->n_basic_blocks, edge_count(unit));
 
 }
 
@@ -268,14 +269,14 @@ sort_reglist(void)
 /* make a linear list of IDENTs and VARs, set n_symbols */
 
 static void
-build_reglist(Parrot_Interp interpreter, Instruction * unit)
+build_reglist(Parrot_Interp interpreter, IMC_Unit * unit)
 {
     int i, count, unused;
 
     info(interpreter, 2, "build_reglist\n");
     /* count symbols */
     if (reglist)
-        free_reglist(interpreter);
+        free_reglist(unit);
     for(i = count = 0; i < HASH_SIZE; i++) {
         SymReg * r = hash[i];
         for(; r; r = r->next)
@@ -292,7 +293,7 @@ build_reglist(Parrot_Interp interpreter, Instruction * unit)
     if (reglist == NULL) {
         fatal(1, "build_reglist","Out of mem\n");
     }
-    IMCC_INFO(interpreter)->reglist = reglist;
+    unit->reglist = reglist;
 
     for(i = count = 0; i < HASH_SIZE; i++) {
         SymReg * r = hash[i];
@@ -324,7 +325,7 @@ build_reglist(Parrot_Interp interpreter, Instruction * unit)
             reglist[count++] = reglist[i];
     }
     n_symbols -= unused;
-    IMCC_INFO(interpreter)->n_symbols = n_symbols;
+    unit->n_symbols = n_symbols;
     sort_reglist();
 }
 
@@ -335,7 +336,7 @@ build_reglist(Parrot_Interp interpreter, Instruction * unit)
  */
 
 static void
-build_interference_graph(Parrot_Interp interpreter)
+build_interference_graph(Parrot_Interp interpreter, IMC_Unit * unit)
 {
     int x, y;
 
@@ -348,7 +349,7 @@ build_interference_graph(Parrot_Interp interpreter)
     interference_graph = calloc(n_symbols * n_symbols, sizeof(SymReg*));
     if (interference_graph == NULL)
         fatal(1, "build_interference_graph","Out of mem\n");
-    IMCC_INFO(interpreter)->interference_graph = interference_graph;
+    unit->interference_graph = interference_graph;
 
     /* Calculate interferences between each chain and populate the the Y-axis */
     for (x = 0; x < n_symbols; x++) {
@@ -358,7 +359,7 @@ build_interference_graph(Parrot_Interp interpreter)
         for (y = x + 1; y < n_symbols; y++) {
             if (!reglist[y]->first_ins)
                 continue;
-            if (interferes(interpreter, reglist[x], reglist[y])) {
+            if (interferes(unit, reglist[x], reglist[y])) {
                 interference_graph[x*n_symbols+y] = reglist[y];
                 interference_graph[y*n_symbols+x] = reglist[x];
             }
@@ -366,22 +367,22 @@ build_interference_graph(Parrot_Interp interpreter)
     }
 
     if (IMCC_INFO(interpreter)->debug & DEBUG_IMC)
-        dump_interference_graph(interpreter);
+        dump_interference_graph(unit);
 }
 
 
-static void compute_one_du_chain(SymReg * r, Instruction * unit);
 /* Compute a DU-chain for each symbolic in a compilation unit
  */
 static void
-compute_du_chain(Instruction * unit) {
+compute_du_chain(IMC_Unit * unit)
+{
     Instruction * ins, *lastbranch;
     int i;
 
     lastbranch = 0;
 
     /* Compute last branch in this procedure, update instruction index */
-    for(i = 0, ins = unit; ins; ins = ins->next) {
+    for(i = 0, ins = unit->instructions; ins; ins = ins->next) {
         ins->index = i++;
         if(ins->type == ITBRANCH)
             lastbranch = ins;
@@ -401,7 +402,7 @@ compute_du_chain(Instruction * unit) {
 }
 
 static void
-compute_one_du_chain(SymReg * r, Instruction * unit)
+compute_one_du_chain(SymReg * r, IMC_Unit * unit)
 {
     Instruction * ins;
 
@@ -412,7 +413,7 @@ compute_one_du_chain(SymReg * r, Instruction * unit)
 
     r->first_ins = 0;
     r->use_count = r->lhs_use_count = 0;
-    for(ins = unit; ins; ins = ins->next) {
+    for(ins = unit->instructions; ins; ins = ins->next) {
         int ro, rw;
         ro = instruction_reads(ins, r);
         rw = instruction_writes(ins, r);
@@ -439,7 +440,8 @@ compute_one_du_chain(SymReg * r, Instruction * unit)
  * of times the symbol appears, weighted by X*loop_depth */
 
 static void
-compute_spilling_costs (Parrot_Interp interpreter) {
+compute_spilling_costs (Parrot_Interp interpreter, IMC_Unit * unit)
+{
     int depth, i, j, k, max_depth;
     SymReg *r;
     Instruction * ins;
@@ -455,7 +457,7 @@ compute_spilling_costs (Parrot_Interp interpreter) {
          * - store max_depth in reg
          * - store a flag, when this reg was already spilled
          */
-        for (j = max_depth = 0; j < IMCC_INFO(interpreter)->n_basic_blocks;
+        for (j = max_depth = 0; j < unit->n_basic_blocks;
                 j++) {
             Life_range *l;
             int used = 0;
@@ -478,7 +480,7 @@ compute_spilling_costs (Parrot_Interp interpreter) {
             }
 
             if (used) {
-                depth = IMCC_INFO(interpreter)->bb_list[j]->loop_depth;
+                depth = unit->bb_list[j]->loop_depth;
                 if (depth > max_depth)
                     max_depth = depth;
             }
@@ -489,7 +491,7 @@ done:
     }
 
     if (IMCC_INFO(interpreter)->debug & DEBUG_IMC)
-        dump_symreg(interpreter);
+        dump_symreg(unit);
 
 }
 /* See if r0's chain interferes with r1. */
@@ -499,7 +501,7 @@ done:
  */
 
 static int
-interferes(Parrot_Interp interpreter, SymReg * r0, SymReg * r1) {
+interferes(IMC_Unit * unit, SymReg * r0, SymReg * r1) {
 
     int i;
 
@@ -525,7 +527,7 @@ interferes(Parrot_Interp interpreter, SymReg * r0, SymReg * r1) {
         fatal(1, "interferes", "INTERNAL ERROR: Life range is NULL\n");
     }
 
-    for (i=0; i < IMCC_INFO(interpreter)->n_basic_blocks; i++) {
+    for (i=0; i < unit->n_basic_blocks; i++) {
         Life_range *l0, *l1;
 
         l0 = r0->life_info[i];
@@ -792,15 +794,15 @@ map_colors(int x, SymReg ** graph, int colors[], int typ) {
  *
  */
 static void
-update_life(Parrot_Interp interpreter, Instruction * unit, Instruction *ins,
+update_life(Parrot_Interp interpreter, IMC_Unit * unit, Instruction *ins,
         SymReg *r, int needs_fetch, int needs_store, int add)
 {
     Life_range *l;
     int i;
     Instruction *ins2;
-    Basic_block **bb_list = IMCC_INFO(interpreter)->bb_list;
+    Basic_block **bb_list = unit->bb_list;
 
-    for(i = 0, ins2 = unit; ins2; ins2 = ins2->next) {
+    for(i = 0, ins2 = unit->instructions; ins2; ins2 = ins2->next) {
         ins2->index = i++;
     }
     /* add this sym to reglist, if not there */
@@ -826,17 +828,17 @@ update_life(Parrot_Interp interpreter, Instruction * unit, Instruction *ins,
             bb_list[ins->bbindex]->end = ins->next;
     }
     /* now set life_info */
-    free_life_info(interpreter, r);
-    r->life_info = calloc(IMCC_INFO(interpreter)->n_basic_blocks,
+    free_life_info(unit, r);
+    r->life_info = calloc(unit->n_basic_blocks,
             sizeof(Life_range*));
-    for (i=0; i < IMCC_INFO(interpreter)->n_basic_blocks; i++)
+    for (i=0; i < unit->n_basic_blocks; i++)
         make_life_range(r, i);
     l = r->life_info[ins->bbindex];
     l->first_ins = r->first_ins;
     l->last_ins = r->last_ins;
     if (IMCC_INFO(interpreter)->debug & DEBUG_IMC) {
-        dump_instructions(interpreter);
-        dump_symreg(interpreter);
+        dump_instructions(unit);
+        dump_symreg(unit);
     }
 }
 /*
@@ -845,7 +847,7 @@ update_life(Parrot_Interp interpreter, Instruction * unit, Instruction *ins,
  */
 
 static void
-update_interference(Parrot_Interp interpreter, SymReg *old, SymReg *new)
+update_interference(Parrot_Interp interpreter, IMC_Unit * unit, SymReg *old, SymReg *new)
 {
     int x, y;
     if (old != new) {
@@ -866,7 +868,7 @@ update_interference(Parrot_Interp interpreter, SymReg *old, SymReg *new)
         for (y = x + 1; y < n_symbols; y++) {
             if (reglist[x] == old || reglist[x] == new ||
                     reglist[y] == old || reglist[y] == new) {
-                if (interferes(interpreter, reglist[x], reglist[y])) {
+                if (interferes(unit, reglist[x], reglist[y])) {
                     interference_graph[x*n_symbols+y] = reglist[y];
                     interference_graph[y*n_symbols+x] = reglist[x];
                 }
@@ -878,7 +880,7 @@ update_interference(Parrot_Interp interpreter, SymReg *old, SymReg *new)
         }
     }
     if (IMCC_INFO(interpreter)->debug & DEBUG_IMC) {
-        dump_interference_graph(interpreter);
+        dump_interference_graph(unit);
     }
 }
 #endif
@@ -888,7 +890,7 @@ update_interference(Parrot_Interp interpreter, SymReg *old, SymReg *new)
  */
 
 static void
-spill(struct Parrot_Interp *interpreter, Instruction * unit, int spilled)
+spill(struct Parrot_Interp *interpreter, IMC_Unit * unit, int spilled)
 {
     Instruction * tmp, *ins;
     int i, n, dl;
@@ -909,7 +911,7 @@ spill(struct Parrot_Interp *interpreter, Instruction * unit, int spilled)
         fatal(1, "spill", "double spill - program too complex\n");
     new_sym->usage |= U_SPILL;
 
-    IMCC_INFO(interpreter)->n_spilled++;
+    unit->n_spilled++;
     n = 0;
     dl = 0;     /* line corr */
     tmp = NULL;
@@ -919,23 +921,23 @@ spill(struct Parrot_Interp *interpreter, Instruction * unit, int spilled)
      * _after_ subroutine entry.  And after the "saveall", or any
      * other assortment of pushes. */
 
-    if (!IMCC_INFO(interpreter)->p31) {
+    if (!unit->p31) {
         Instruction *spill_ins;
 
-        p31 = IMCC_INFO(interpreter)->p31 = mk_pasm_reg(str_dup("P31"));
-        ins = unit;
+        p31 = unit->p31 = mk_pasm_reg(str_dup("P31"));
+        ins = unit->instructions;
         while (ins
                 && (strncmp(ins->fmt, "push", 4) == 0
                     || strcmp(ins->fmt, "saveall") == 0)) {
             ins = ins->next;
         }
-        spill_ins = iNEW(interpreter, p31, str_dup("PerlArray"), NULL, 0);
-        insert_ins(ins, spill_ins);
+        spill_ins = iNEW(interpreter, unit, p31, str_dup("PerlArray"), NULL, 0);
+        insert_ins(unit, ins, spill_ins);
     }
     else
-        p31 = IMCC_INFO(interpreter)->p31;
+        p31 = unit->p31;
 
-    for(ins = unit; ins; ins = ins->next) {
+    for(ins = unit->instructions; ins; ins = ins->next) {
 	needs_store = 0;
 	needs_fetch = 0;
 
@@ -950,16 +952,16 @@ spill(struct Parrot_Interp *interpreter, Instruction * unit, int spilled)
 	if (needs_fetch) {
 	    regs[0] = new_sym;
             regs[1] = p31;
-            sprintf(buf, "%d", IMCC_INFO(interpreter)->n_spilled);
+            sprintf(buf, "%d", unit->n_spilled);
             regs[2] = mk_const(str_dup(buf), 'I');
 	    sprintf(buf, "%%s, %%s[%%s] #FETCH %s", old_sym->name);
-	    tmp = INS(interpreter, "set", buf, regs, 3, 4, 0);
+	    tmp = INS(interpreter, unit, "set", buf, regs, 3, 4, 0);
 	    tmp->bbindex = ins->bbindex;
             tmp->flags |= ITSPILL;
             tmp->index = ins->index;
             ins->index++;
             /* insert tmp before actual ins */
-            insert_ins(ins->prev, tmp);
+            insert_ins(unit, ins->prev, tmp);
             dl++;
 	}
         /* change all occurance of old_sym to new */
@@ -969,15 +971,15 @@ spill(struct Parrot_Interp *interpreter, Instruction * unit, int spilled)
                 ins->r[i] = new_sym;
 	if (needs_store) {
             regs[0] = p31;
-            sprintf(buf, "%d", IMCC_INFO(interpreter)->n_spilled);
+            sprintf(buf, "%d", unit->n_spilled);
             regs[1] = mk_const(str_dup(buf), 'I');
 	    regs[2] = new_sym;
 	    sprintf(buf, "%%s[%%s], %%s #STORE %s", old_sym->name);
-	    tmp = INS(interpreter, "set", buf, regs, 3, 2, 0);
+	    tmp = INS(interpreter, unit, "set", buf, regs, 3, 2, 0);
 	    tmp->bbindex = ins->bbindex;
             tmp->flags |= ITSPILL;
             /* insert tmp after ins */
-            insert_ins(ins, tmp);
+            insert_ins(unit, ins, tmp);
             tmp->index = ins->index + 1;
             dl++;
 	}
@@ -987,7 +989,7 @@ spill(struct Parrot_Interp *interpreter, Instruction * unit, int spilled)
             update_life(interpreter, unit, ins, new_sym, needs_fetch, needs_store,
                     old_sym != new_sym);
             /* and interference of both */
-            update_interference(interpreter, old_sym, new_sym);
+            update_interference(interpreter, unit, old_sym, new_sym);
 #endif
             /* if all symbols are in one basic_block, we need a new
              * symbol, so that the life_ranges are minimal
@@ -1011,7 +1013,7 @@ spill(struct Parrot_Interp *interpreter, Instruction * unit, int spilled)
     }
 #endif
     if (IMCC_INFO(interpreter)->debug & DEBUG_IMC)
-        dump_instructions(interpreter);
+        dump_instructions(unit);
 
 }
 

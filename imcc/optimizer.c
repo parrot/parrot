@@ -44,71 +44,72 @@
  *  because Px where different before
  *
  */
-static void if_branch(struct Parrot_Interp *);
+static void if_branch(struct Parrot_Interp *, IMC_Unit *);
 
-static int branch_branch(struct Parrot_Interp *interpreter);
-static int unused_label(struct Parrot_Interp *interpreter);
-static int dead_code_remove(struct Parrot_Interp *interpreter);
+static int branch_branch(struct Parrot_Interp *interpreter, IMC_Unit *);
+static int unused_label(struct Parrot_Interp *interpreter, IMC_Unit *);
+static int dead_code_remove(struct Parrot_Interp *interpreter, IMC_Unit *);
 
-static void strength_reduce(struct Parrot_Interp *interpreter);
-static void subst_constants_mix(struct Parrot_Interp *interpreter);
-static void subst_constants_umix(struct Parrot_Interp *interpreter);
-static void subst_constants(struct Parrot_Interp *interpreter);
-static void subst_constants_c(struct Parrot_Interp *interpreter);
-static void subst_constants_if(struct Parrot_Interp *interpreter);
+static void strength_reduce(struct Parrot_Interp *interpreter, IMC_Unit *);
+static void subst_constants_mix(struct Parrot_Interp *interpreter, IMC_Unit *);
+static void subst_constants_umix(struct Parrot_Interp *interpreter, IMC_Unit *);
+static void subst_constants(struct Parrot_Interp *interpreter, IMC_Unit *);
+static void subst_constants_c(struct Parrot_Interp *interpreter, IMC_Unit *);
+static void subst_constants_if(struct Parrot_Interp *interpreter, IMC_Unit *);
 
-static int constant_propagation(struct Parrot_Interp *interpreter);
-static int used_once(struct Parrot_Interp *);
-static int loop_optimization(struct Parrot_Interp *);
-static int clone_remove(struct Parrot_Interp *);
+static int constant_propagation(struct Parrot_Interp *interpreter, IMC_Unit *);
+static int used_once(struct Parrot_Interp *, IMC_Unit *);
+static int loop_optimization(struct Parrot_Interp *, IMC_Unit *);
+static int clone_remove(struct Parrot_Interp *, IMC_Unit *);
 
 void
-pre_optimize(struct Parrot_Interp *interpreter)
+pre_optimize(struct Parrot_Interp *interpreter, IMC_Unit * unit)
 {
     if (optimizer_level & OPT_PRE) {
         info(interpreter, 2, "pre_optimize\n");
-        subst_constants_mix(interpreter);
-        subst_constants_umix(interpreter);
-        subst_constants(interpreter);
-        subst_constants_c(interpreter);
-        subst_constants_if(interpreter);
-        strength_reduce(interpreter);
+        subst_constants_mix(interpreter, unit);
+        subst_constants_umix(interpreter, unit);
+        subst_constants(interpreter, unit);
+        subst_constants_c(interpreter, unit);
+        subst_constants_if(interpreter, unit);
+        strength_reduce(interpreter, unit);
         if (!dont_optimize)
-            if_branch(interpreter);
+            if_branch(interpreter, unit);
     }
 }
 
 int
-cfg_optimize(struct Parrot_Interp *interpreter)
+cfg_optimize(struct Parrot_Interp *interpreter, IMC_Unit * unit)
 {
     UNUSED(interpreter);
+ 
     if (dont_optimize)
         return 0;
     if (optimizer_level & OPT_PRE) {
         info(interpreter, 2, "cfg_optimize\n");
-        if (branch_branch(interpreter))
+        if (branch_branch(interpreter, unit))
             return 1;
         /* XXX cfg / loop detection breaks e.g. in t/compiler/5_3 */
-        if (unused_label(interpreter))
+        if (unused_label(interpreter, unit))
             return 1;
-        if (dead_code_remove(interpreter))
+        if (dead_code_remove(interpreter, unit))
             return 1;
     }
     return 0;
 }
 
 int
-optimize(struct Parrot_Interp *interpreter)
+optimize(struct Parrot_Interp *interpreter, IMC_Unit * unit)
 {
     int any = 0;
     if (optimizer_level & OPT_CFG) {
         info(interpreter, 2, "optimize\n");
-        any = constant_propagation(interpreter);
-        if (0 && clone_remove(interpreter))
+        any = constant_propagation(interpreter, unit);
+        if (0 && clone_remove(interpreter, unit))
             return 1;
-        if (used_once(interpreter))
+        if (used_once(interpreter, unit))
             return 1;
-        if (loop_optimization(interpreter))
+        if (loop_optimization(interpreter, unit))
             return 1;
     }
     return any;
@@ -145,12 +146,12 @@ get_neg_op(char *op, int *n)
  * L1:                  L2:
  */
 static void
-if_branch(struct Parrot_Interp *interpreter)
+if_branch(struct Parrot_Interp *interpreter, IMC_Unit * unit)
 {
     Instruction *ins, *last;
     int reg;
 
-    last = instructions;
+    last = unit->instructions;
     if (!last->next)
         return;
     info(interpreter, 2, "\tif_branch\n");
@@ -173,7 +174,7 @@ if_branch(struct Parrot_Interp *interpreter)
                 if ((neg_op = get_neg_op(last->op, &args)) != 0) {
                     Instruction * tmp;
                     last->r[reg] = go;
-                    tmp = INS(interpreter, (char*)neg_op, "", last->r, args, 0, 0);
+                    tmp = INS(interpreter, unit, (char*)neg_op, "", last->r, args, 0, 0);
                     last->opnum = tmp->opnum;
                     last->opsize = tmp->opsize;
                     free(last->op);
@@ -182,7 +183,7 @@ if_branch(struct Parrot_Interp *interpreter)
 
                     /* delete branch */
                     ostat.deleted_ins++;
-                    ins = delete_ins(ins, 1);
+                    ins = delete_ins(unit, ins, 1);
                     ostat.if_branch++;
                 }
             } /* label found */
@@ -196,7 +197,7 @@ if_branch(struct Parrot_Interp *interpreter)
  * guaranteed, that one operand is non constant, if opsize == 4
  */
 static void
-strength_reduce(struct Parrot_Interp *interpreter)
+strength_reduce(struct Parrot_Interp *interpreter, IMC_Unit * unit)
 {
     Instruction *ins, *tmp;
     const char *ops[] = { "add", "sub", "mul", "div" };
@@ -204,7 +205,7 @@ strength_reduce(struct Parrot_Interp *interpreter)
     SymReg *r;
 
     info(interpreter, 2, "\tstrength_reduce\n");
-    for (ins = instructions; ins; ins = ins->next) {
+    for (ins = unit->instructions; ins; ins = ins->next) {
         /*
          * add Ix, Ix, Iy => add Ix, Iy
          * sub Ix, Ix, Iy => sub Ix, Iy
@@ -218,9 +219,9 @@ strength_reduce(struct Parrot_Interp *interpreter)
                     !strcmp(ins->op, ops[i])) {
                 debug(interpreter, DEBUG_OPT1, "opt1 %I => ", ins);
                 ins->r[1] = ins->r[2];
-                tmp = INS(interpreter, ins->op, "", ins->r, 2, 0, 0);
+                tmp = INS(interpreter, unit, ins->op, "", ins->r, 2, 0, 0);
                 debug(interpreter, DEBUG_OPT1, "%I\n", tmp);
-                subst_ins(ins, tmp, 1);
+                subst_ins(unit, ins, tmp, 1);
                 ins = tmp;
                 found = 1;
                 break;
@@ -246,9 +247,9 @@ strength_reduce(struct Parrot_Interp *interpreter)
             if (ins->opsize == 4)
                 --ins->r[2]->use_count;
             ins->r[1] = r;
-            tmp = INS(interpreter, "set", "", ins->r, 2, 0, 0);
+            tmp = INS(interpreter, unit, "set", "", ins->r, 2, 0, 0);
             debug(interpreter, DEBUG_OPT1, "%I\n", tmp);
-            subst_ins(ins, tmp, 1);
+            subst_ins(unit, ins, tmp, 1);
             ins = tmp;
             continue;
         }
@@ -268,8 +269,8 @@ set_it:
             debug(interpreter, DEBUG_OPT1, "opt1 %I => ", ins);
             if (ins->opsize == 3) {
                 /* mul Ix, 1 */
-                ins = delete_ins(ins, 1);
-                ins = ins->prev ? ins->prev : instructions;
+                ins = delete_ins(unit, ins, 1);
+                ins = ins->prev ? ins->prev : unit->instructions;
                 debug(interpreter, DEBUG_OPT1, "deleted\n");
                 continue;
             }
@@ -280,9 +281,9 @@ set_it:
             else {
                 --ins->r[2]->use_count;
             }
-            tmp = INS(interpreter, "set", "", ins->r, 2, 0, 0);
+            tmp = INS(interpreter, unit, "set", "", ins->r, 2, 0, 0);
             debug(interpreter, DEBUG_OPT1, "%I\n", tmp);
-            subst_ins(ins, tmp, 1);
+            subst_ins(unit, ins, tmp, 1);
             ins = tmp;
             continue;
         }
@@ -310,7 +311,7 @@ set_it:
  */
 
 static int
-constant_propagation(struct Parrot_Interp *interpreter)
+constant_propagation(struct Parrot_Interp *interpreter, IMC_Unit * unit)
 {
     Instruction *ins, *ins2;
     int op;
@@ -320,7 +321,7 @@ constant_propagation(struct Parrot_Interp *interpreter)
     int any = 0;
 
     info(interpreter, 2, "\tconstant_propagation\n");
-    for (ins = instructions; ins; ins = ins->next) {
+    for (ins = unit->instructions; ins; ins = ins->next) {
         if (!strcmp(ins->op, "set") &&
                 ins->opsize == 3 &&             /* no keyed set */
                 ins->r[1]->type == VTCONST &&
@@ -377,7 +378,7 @@ next_constant:;
  * rewrite e.g. add_n_nc_ic => add_n_nc_nc
  */
 static void
-subst_constants_mix(struct Parrot_Interp *interpreter)
+subst_constants_mix(struct Parrot_Interp *interpreter, IMC_Unit * unit)
 {
     Instruction *ins, *tmp;
     const char *ops[] = {
@@ -388,7 +389,7 @@ subst_constants_mix(struct Parrot_Interp *interpreter)
     SymReg *r;
 
     info(interpreter, 2, "\tsubst_constants_mix\n");
-    for (ins = instructions; ins; ins = ins->next) {
+    for (ins = unit->instructions; ins; ins = ins->next) {
         for (i = 0; i < sizeof(ops)/sizeof(ops[0]); i++) {
             /* TODO compare ins->opnum with a list of instructions
              * containing add_n_nc_ic, ...
@@ -403,9 +404,9 @@ subst_constants_mix(struct Parrot_Interp *interpreter)
                 r = mk_const(str_dup(b), 'N');
                 --ins->r[2]->use_count;
                 ins->r[2] = r;
-                tmp = INS(interpreter, ins->op, "", ins->r, 3, 0, 0);
+                tmp = INS(interpreter, unit, ins->op, "", ins->r, 3, 0, 0);
                 debug(interpreter, DEBUG_OPT1, "%I\n", tmp);
-                subst_ins(ins, tmp, 1);
+                subst_ins(unit, ins, tmp, 1);
                 ins = tmp;
             }
         }
@@ -416,7 +417,7 @@ subst_constants_mix(struct Parrot_Interp *interpreter)
  * rewrite e.g. add_n_ic => add_n_nc
  */
 static void
-subst_constants_umix(struct Parrot_Interp *interpreter)
+subst_constants_umix(struct Parrot_Interp *interpreter, IMC_Unit * unit)
 {
     Instruction *ins, *tmp;
     const char *ops[] = {
@@ -427,7 +428,7 @@ subst_constants_umix(struct Parrot_Interp *interpreter)
     SymReg *r;
 
     info(interpreter, 2, "\tsubst_constants_umix\n");
-    for (ins = instructions; ins; ins = ins->next) {
+    for (ins = unit->instructions; ins; ins = ins->next) {
         for (i = 0; i < sizeof(ops)/sizeof(ops[0]); i++) {
             /* TODO compare ins->opnum with a list of instructions
              * containing add_n_ic, ...
@@ -442,9 +443,9 @@ subst_constants_umix(struct Parrot_Interp *interpreter)
                 r = mk_const(str_dup(b), 'N');
                 --ins->r[1]->use_count;
                 ins->r[1] = r;
-                tmp = INS(interpreter, ins->op, "", ins->r, 2, 0, 0);
+                tmp = INS(interpreter, unit, ins->op, "", ins->r, 2, 0, 0);
                 debug(interpreter, DEBUG_OPT1, "%I\n", tmp);
-                subst_ins(ins, tmp, 1);
+                subst_ins(unit, ins, tmp, 1);
                 ins = tmp;
             }
         }
@@ -508,7 +509,7 @@ eval_ins(struct Parrot_Interp *interpreter, Instruction *ins, size_t ops)
  *          or  abs_i_ic => set_i_ic
  */
 static void
-subst_constants(struct Parrot_Interp *interpreter)
+subst_constants(struct Parrot_Interp *interpreter, IMC_Unit * unit)
 {
     Instruction *ins, *tmp;
     const char *ops[] = {
@@ -546,7 +547,7 @@ subst_constants(struct Parrot_Interp *interpreter)
             break;
     }
 
-    for (ins = instructions; ins; ins = ins->next) {
+    for (ins = unit->instructions; ins; ins = ins->next) {
         found = 0;
         for (i = 0; i < sizeof(ops)/sizeof(ops[0]); i++) {
             /* TODO compare ins->opnum with a list of instructions
@@ -591,9 +592,9 @@ subst_constants(struct Parrot_Interp *interpreter)
         if (ins->opsize == 4)
             --ins->r[2]->use_count;
         ins->r[1] = r;
-        tmp = INS(interpreter, "set", "", ins->r, 2, 0, 0);
+        tmp = INS(interpreter, unit, "set", "", ins->r, 2, 0, 0);
         debug(interpreter, DEBUG_OPT1, "%I\n", tmp);
-        subst_ins(ins, tmp, 1);
+        subst_ins(unit, ins, tmp, 1);
         ins = tmp;
     }
     mem_sys_memcopy(&interpreter->ctx, ctx, sizeof(struct Parrot_Context));
@@ -604,7 +605,7 @@ subst_constants(struct Parrot_Interp *interpreter)
  * rewrite e.g. eq_ic_ic_ic => branch_ic/nothing
  */
 static void
-subst_constants_c(struct Parrot_Interp *interpreter)
+subst_constants_c(struct Parrot_Interp *interpreter, IMC_Unit * unit)
 {
     Instruction *ins, *tmp;
     const char *ops[] = { "eq", "ne", "gt", "ge", "lt", "le" };
@@ -612,7 +613,7 @@ subst_constants_c(struct Parrot_Interp *interpreter)
     int res;
 
     info(interpreter, 2, "\tsubst_constants_c\n");
-    for (ins = instructions; ins; ins = ins->next) {
+    for (ins = unit->instructions; ins; ins = ins->next) {
         for (i = 0; i < sizeof(ops)/sizeof(ops[0]); i++) {
             /* TODO s. above */
             if (ins->opsize == 4 &&
@@ -631,16 +632,16 @@ do_res:
                                 --ins->r[1]->use_count;
                                 if (res) {
                                     ins->r[0] = ins->r[2];
-                                    tmp = INS(interpreter, "branch", "", ins->r,
+                                    tmp = INS(interpreter, unit, "branch", "", ins->r,
                                             1, 0, 0);
                                     debug(interpreter, DEBUG_OPT1, "%I\n", tmp);
-                                    subst_ins(ins, tmp, 1);
+                                    subst_ins(unit, ins, tmp, 1);
                                     ins = tmp;
                                 }
                                 else {
                                     debug(interpreter, DEBUG_OPT1, "deleted\n");
-                                    ins = delete_ins(ins, 1);
-                                    ins = ins->prev ? ins->prev : instructions;
+                                    ins = delete_ins(unit, ins, 1);
+                                    ins = ins->prev ? ins->prev : unit->instructions;
                                 }
                                 break;
                             case 'N':
@@ -743,7 +744,7 @@ do_res:
  * rewrite e.g. if_ic_ic => branch_ic/nothing
  */
 static void
-subst_constants_if(struct Parrot_Interp *interpreter)
+subst_constants_if(struct Parrot_Interp *interpreter, IMC_Unit * unit)
 {
     Instruction *ins, *tmp;
     const char *ops[] = { "if", "unless" };
@@ -751,7 +752,7 @@ subst_constants_if(struct Parrot_Interp *interpreter)
     int res;
 
     info(interpreter, 2, "\tsubst_constants_if\n");
-    for (ins = instructions; ins; ins = ins->next) {
+    for (ins = unit->instructions; ins; ins = ins->next) {
         for (i = 0; i < sizeof(ops)/sizeof(ops[0]); i++) {
             /* TODO s. above */
             if (ins->opsize == 3 &&
@@ -770,16 +771,16 @@ do_res:
                                     res = !res;
                                 if (res) {
                                     ins->r[0] = ins->r[1];
-                                    tmp = INS(interpreter, "branch", "", ins->r,
+                                    tmp = INS(interpreter, unit, "branch", "", ins->r,
                                             1, 0, 0);
                                     debug(interpreter, DEBUG_OPT1, "%I\n", tmp);
-                                    subst_ins(ins, tmp, 1);
+                                    subst_ins(unit, ins, tmp, 1);
                                     ins = tmp;
                                 }
                                 else {
                                     debug(interpreter, DEBUG_OPT1, "deleted\n");
-                                    ins = delete_ins(ins, 1);
-                                    ins = ins->prev ? ins->prev : instructions;
+                                    ins = delete_ins(unit, ins, 1);
+                                    ins = ins->prev ? ins->prev : unit->instructions;
                                 }
                                 break;
                             case 'N':
@@ -815,7 +816,7 @@ do_res:
  *
  */
 static int
-branch_branch(struct Parrot_Interp *interpreter)
+branch_branch(struct Parrot_Interp *interpreter, IMC_Unit * unit)
 {
     Instruction *ins, *next;
     SymReg * r;
@@ -823,7 +824,7 @@ branch_branch(struct Parrot_Interp *interpreter)
 
     info(interpreter, 2, "\tbranch_branch\n");
     /* reset statistic globals */
-    for (ins = instructions; ins; ins = ins->next) {
+    for (ins = unit->instructions; ins; ins = ins->next) {
         if ((ins->type & IF_goto) && !strcmp(ins->op, "branch")) {
             r = get_sym(ins->r[0]->name);
 
@@ -847,7 +848,7 @@ branch_branch(struct Parrot_Interp *interpreter)
 }
 
 static int
-unused_label(struct Parrot_Interp *interpreter)
+unused_label(struct Parrot_Interp *interpreter, IMC_Unit * unit)
 {
     Instruction *ins;
     int used;
@@ -855,8 +856,8 @@ unused_label(struct Parrot_Interp *interpreter)
     int changed = 0;
 
     info(interpreter, 2, "\tunused_label\n");
-    for (i=1; i < IMCC_INFO(interpreter)->n_basic_blocks; i++) {
-	ins = IMCC_INFO(interpreter)->bb_list[i]->start;
+    for (i=1; i < unit->n_basic_blocks; i++) {
+	ins = unit->bb_list[i]->start;
         if ((ins->type & ITLABEL) && *ins->r[0]->name != '_') {
             SymReg * lab = ins->r[0];
             used = 0;
@@ -872,12 +873,12 @@ unused_label(struct Parrot_Interp *interpreter)
                 Instruction *ins2;
                 int j;
                 SymReg * addr;
-                for (j=0; IMCC_INFO(interpreter)->bb_list[j]; j++) {
+                for (j=0; unit->bb_list[j]; j++) {
                     /* a branch can be the first ins in a block
                      * (if prev ins was a label)
                      * or the last ins in a block
                      */
-                    ins2 = IMCC_INFO(interpreter)->bb_list[j]->start;
+                    ins2 = unit->bb_list[j]->start;
                     if ((ins2->type & ITBRANCH) &&
                             (addr = get_branch_reg(ins2)) != 0) {
                         if (addr == lab && addr->type == VTADDRESS) {
@@ -885,7 +886,7 @@ unused_label(struct Parrot_Interp *interpreter)
                             break;
                         }
                     }
-                    ins2 = IMCC_INFO(interpreter)->bb_list[j]->end;
+                    ins2 = unit->bb_list[j]->end;
                     if ((ins2->type & ITBRANCH) &&
                             (addr = get_branch_reg(ins2)) != 0) {
                         if (addr == lab && addr->type == VTADDRESS) {
@@ -900,7 +901,7 @@ unused_label(struct Parrot_Interp *interpreter)
                 ostat.deleted_labels++;
                 debug(interpreter, DEBUG_OPT1, "block %d label %s deleted\n", i, lab->name);
                 ostat.deleted_ins++;
-                ins = delete_ins(ins, 1);
+                ins = delete_ins(unit, ins, 1);
                 changed = 1;
             }
 
@@ -910,7 +911,7 @@ unused_label(struct Parrot_Interp *interpreter)
 }
 
 static int
-dead_code_remove(struct Parrot_Interp *interpreter)
+dead_code_remove(struct Parrot_Interp *interpreter, IMC_Unit * unit)
 {
     Basic_block *bb;
     int i;
@@ -921,8 +922,8 @@ dead_code_remove(struct Parrot_Interp *interpreter)
     if (!(optimizer_level & OPT_PRE))
         return 0;
     info(interpreter, 2, "\tdead_code_remove\n");
-    for (i=1; i < IMCC_INFO(interpreter)->n_basic_blocks; i++) {
-	bb = IMCC_INFO(interpreter)->bb_list[i];
+    for (i=1; i < unit->n_basic_blocks; i++) {
+	bb = unit->bb_list[i];
         if ((bb->start->type & ITLABEL) && *bb->start->r[0]->name == '_')
             continue;
         /* this block isn't entered from anywhere */
@@ -932,18 +933,18 @@ dead_code_remove(struct Parrot_Interp *interpreter)
             for (ins = bb->start; ins && ins->bbindex == bbi; ) {
                 debug(interpreter, DEBUG_OPT1,
                         "\tins deleted (dead block) %I\n", ins);
-                ins = delete_ins(ins, 1);
+                ins = delete_ins(unit, ins, 1);
                 ostat.deleted_ins++;
                 changed++;
             }
         }
     }
-    for (last = instructions, ins=last->next; last && ins; ins = ins->next) {
+    for (last = unit->instructions, ins=last->next; last && ins; ins = ins->next) {
         if ((last->type & IF_goto) && !(ins->type & ITLABEL) &&
                 !strcmp(last->op, "branch")) {
             debug(interpreter, DEBUG_OPT1,
                     "unreachable ins deleted (after branch) %I\n", ins);
-            ins = delete_ins(ins, 1);
+            ins = delete_ins(unit, ins, 1);
             ostat.deleted_ins++;
             changed++;
         }
@@ -955,7 +956,7 @@ dead_code_remove(struct Parrot_Interp *interpreter)
                 !strcmp(last->op, "branch") &&
                 !strcmp(last->r[0]->name, ins->r[0]->name)) {
             debug(interpreter, DEBUG_OPT1, "dead branch deleted %I\n", ins);
-            ins = delete_ins(last, 1);
+            ins = delete_ins(unit, last, 1);
             ostat.deleted_ins++;
             changed++;
         }
@@ -968,13 +969,13 @@ dead_code_remove(struct Parrot_Interp *interpreter)
 
 /* optimizations with CFG & life info built */
 static int
-used_once(Parrot_Interp interpreter)
+used_once(Parrot_Interp interpreter, IMC_Unit * unit)
 {
     Instruction *ins;
     SymReg * r;
     int opt = 0;
 
-    for (ins = instructions; ins; ins = ins->next) {
+    for (ins = unit->instructions; ins; ins = ins->next) {
         if (!ins->r)
             continue;
         r = ins->r[0];
@@ -982,8 +983,8 @@ used_once(Parrot_Interp interpreter)
             continue;
         if (r->use_count == 1 && r->lhs_use_count == 1) {
             debug(interpreter, DEBUG_OPT2, "used once '%I' deleted\n", ins);
-            ins = delete_ins(ins, 1);
-            ins = ins->prev ? ins->prev : instructions;
+            ins = delete_ins(unit, ins, 1);
+            ins = ins->prev ? ins->prev : unit->instructions;
             ostat.deleted_ins++;
             ostat.used_once++;
             opt++;
@@ -993,13 +994,13 @@ used_once(Parrot_Interp interpreter)
 }
 
 static int
-max_loop_depth(Parrot_Interp interpreter)
+max_loop_depth(IMC_Unit * unit)
 {
     int i, d;
     d = 0;
-    for (i = 0; i < IMCC_INFO(interpreter)->n_basic_blocks; i++)
-        if (IMCC_INFO(interpreter)->bb_list[i]->loop_depth > d)
-            d = IMCC_INFO(interpreter)->bb_list[i]->loop_depth;
+    for (i = 0; i < unit->n_basic_blocks; i++)
+        if (unit->bb_list[i]->loop_depth > d)
+            d = unit->bb_list[i]->loop_depth;
     return d;
 }
 
@@ -1007,7 +1008,7 @@ static int reason;
 enum check_t { CHK_INV_NEW, CHK_INV_SET, CHK_CLONE };
 
 static int
-_is_ins_save(Parrot_Interp interpreter, Instruction *check_ins,
+_is_ins_save(IMC_Unit * unit, Instruction *check_ins,
         SymReg *r, int what)
 {
     Instruction *ins;
@@ -1035,7 +1036,7 @@ _is_ins_save(Parrot_Interp interpreter, Instruction *check_ins,
 
     use_count = r->use_count;
     lhs_use_count = r->lhs_use_count;
-    for (bb = 0; bb < IMCC_INFO(interpreter)->n_basic_blocks; bb++) {
+    for (bb = 0; bb < unit->n_basic_blocks; bb++) {
         Life_range *lr = r->life_info[bb];
 
         for (ins = lr->first_ins; ins; ins = ins->next) {
@@ -1096,11 +1097,12 @@ _is_ins_save(Parrot_Interp interpreter, Instruction *check_ins,
 }
 
 static int
-is_ins_save(Parrot_Interp interpreter, Instruction *ins, SymReg *r, int what) {
+is_ins_save(Parrot_Interp interpreter, IMC_Unit * unit, Instruction *ins, SymReg *r, int what)
+{
     int save;
 
     reason = 0;
-    save = _is_ins_save(interpreter, ins, r, what);
+    save = _is_ins_save(unit, ins, r, what);
     if (!save && reason)
         debug(interpreter, DEBUG_OPT2, "ins not save var %s reason %d %I\n",
                 r->name, reason, ins);
@@ -1108,7 +1110,7 @@ is_ins_save(Parrot_Interp interpreter, Instruction *ins, SymReg *r, int what) {
 }
 
 static int
-is_invariant(Parrot_Interp interpreter, Instruction *ins)
+is_invariant(Parrot_Interp interpreter, IMC_Unit * unit, Instruction *ins)
 {
     int ok = 0;
     int what = 0;
@@ -1125,32 +1127,33 @@ is_invariant(Parrot_Interp interpreter, Instruction *ins)
         what = CHK_INV_SET;
     }
     if (ok)
-        return is_ins_save(interpreter, ins, ins->r[0], what);
+        return is_ins_save(interpreter, unit, ins, ins->r[0], what);
     return 0;
 }
 
 #define MOVE_INS_1_BL
 #ifdef MOVE_INS_1_BL
 static Basic_block *
-find_outer(Parrot_Interp interpreter, Basic_block * blk)
+find_outer(IMC_Unit * unit, Basic_block * blk)
 {
     int bb = blk->index;
     int i;
-    int n_loops = IMCC_INFO(interpreter)->n_loops;
-    Loop_info ** loop_info = IMCC_INFO(interpreter)->loop_info;
+    int n_loops = unit->n_loops;
+    Loop_info ** loop_info = unit->loop_info;
 
     /* loops are sorted depth last */
     for (i = n_loops-1; i >= 0; i--)
         if (set_contains(loop_info[i]->loop, bb))
             if (loop_info[i]->entry >= 0)
-                return IMCC_INFO(interpreter)->bb_list[loop_info[i]->entry];
+                return unit->bb_list[loop_info[i]->entry];
     return 0;
 }
 #endif
 
 /* move the instruction ins before loop in bb */
 static int
-move_ins_out(struct Parrot_Interp *interpreter, Instruction **ins, Basic_block *bb)
+move_ins_out(struct Parrot_Interp *interpreter, IMC_Unit * unit,
+                     Instruction **ins, Basic_block *bb)
 {
     Basic_block *pred;
     Instruction * next, *out;
@@ -1158,10 +1161,10 @@ move_ins_out(struct Parrot_Interp *interpreter, Instruction **ins, Basic_block *
     /* check loop_info, where this loop started
      * actually, this moves instruction to block 0 */
 #ifdef MOVE_INS_1_BL
-    pred = find_outer(interpreter, bb);
+    pred = find_outer(unit, bb);
 #else
     UNUSED(bb);
-    pred = IMCC_INFO(interpreter)->bb_list[0];
+    pred = unit->bb_list[0];
 #endif
     if (!pred) {
         debug(interpreter, DEBUG_OPT2, "outer loop not found (CFG?)\n");
@@ -1172,7 +1175,7 @@ move_ins_out(struct Parrot_Interp *interpreter, Instruction **ins, Basic_block *
     (*ins)->bbindex = pred->index;
     debug(interpreter, DEBUG_OPT2, "inserting it in blk %d after %I\n",
             pred->index, out);
-    *ins = move_ins(*ins, out);
+    *ins = move_ins(unit, *ins, out);
     if (0 && (DEBUG_OPT2 & IMCC_INFO(interpreter)->debug)) {
         char buf[256];
         SymReg * regs[IMCC_MAX_REGS];
@@ -1180,8 +1183,8 @@ move_ins_out(struct Parrot_Interp *interpreter, Instruction **ins, Basic_block *
 
         regs[0] = 0;
         sprintf(buf, "# Invar moved: %s",out->next->op);
-        tmp = INS(interpreter, "", buf, regs, 0, 0, 0);
-        insert_ins((*ins)->prev, tmp);
+        tmp = INS(interpreter, unit, "", buf, regs, 0, 0, 0);
+        insert_ins(unit, (*ins)->prev, tmp);
     }
     ostat.invariants_moved++;
     /* XXX CFG is changed here, which also means
@@ -1191,9 +1194,9 @@ move_ins_out(struct Parrot_Interp *interpreter, Instruction **ins, Basic_block *
 }
 
 static int
-loop_one(struct Parrot_Interp *interpreter, int bnr)
+loop_one(struct Parrot_Interp *interpreter, IMC_Unit * unit, int bnr)
 {
-    Basic_block *bb = IMCC_INFO(interpreter)->bb_list[bnr];
+    Basic_block *bb = unit->bb_list[bnr];
     Instruction *ins;
     int changed = 0;
 
@@ -1204,9 +1207,9 @@ loop_one(struct Parrot_Interp *interpreter, int bnr)
     debug(interpreter, DEBUG_OPT2, "loop_one blk %d\n", bnr);
     for (ins = bb->start ; ins ; ins = ins->next) {
         reason = 0;
-        if (is_invariant(interpreter, ins)) {
+        if (is_invariant(interpreter, unit, ins)) {
             debug(interpreter, DEBUG_OPT2, "found invariant %I\n", ins);
-            if (move_ins_out(interpreter, &ins, bb)) {
+            if (move_ins_out(interpreter, unit, &ins, bb)) {
                 changed++;
                 ins = ins->prev;
             }
@@ -1219,20 +1222,20 @@ loop_one(struct Parrot_Interp *interpreter, int bnr)
 }
 
 static int
-loop_optimization(struct Parrot_Interp *interpreter)
+loop_optimization(struct Parrot_Interp *interpreter, IMC_Unit * unit)
 {
     int l, bb, loop_depth;
     int changed = 0;
     static int prev_depth;
 
-    loop_depth = prev_depth ? prev_depth : max_loop_depth(interpreter);
+    loop_depth = prev_depth ? prev_depth : max_loop_depth(unit);
     /* work from inside out */
     debug(interpreter, DEBUG_OPT2, "loop_optimization\n");
     for (l = loop_depth; l > 0; l--) {
         debug(interpreter, DEBUG_OPT2, "loop_depth %d\n", l);
-        for (bb = 0; bb < IMCC_INFO(interpreter)->n_basic_blocks; bb++)
-            if (IMCC_INFO(interpreter)->bb_list[bb]->loop_depth == l) {
-                changed |= loop_one(interpreter, bb);
+        for (bb = 0; bb < unit->n_basic_blocks; bb++)
+            if (unit->bb_list[bb]->loop_depth == l) {
+                changed |= loop_one(interpreter, unit, bb);
             }
         /* currently e.g. mandel.p6 breaks, if not only the most
          * inner loop is changed, but outer loops too */
@@ -1240,7 +1243,7 @@ loop_optimization(struct Parrot_Interp *interpreter)
             prev_depth = l-1;
             debug(interpreter, DEBUG_OPT2,"after loop_opt\n");
             if (IMCC_INFO(interpreter)->debug>1)
-                dump_instructions(interpreter);
+                dump_instructions(unit);
             return changed;
         }
     }
@@ -1249,12 +1252,12 @@ loop_optimization(struct Parrot_Interp *interpreter)
 }
 
 static int
-check_clone(Parrot_Interp interpreter, Instruction *ins)
+check_clone(Parrot_Interp interpreter, IMC_Unit * unit, Instruction *ins)
 {
     SymReg * rl = ins->r[0];
     SymReg * rr = ins->r[1];
-    if (0 && is_ins_save(interpreter, ins, rl, CHK_CLONE) &&
-        is_ins_save(interpreter, ins, rr, CHK_CLONE)) {
+    if (0 && is_ins_save(interpreter, unit, ins, rl, CHK_CLONE) &&
+        is_ins_save(interpreter, unit, ins, rr, CHK_CLONE)) {
         debug(interpreter, DEBUG_OPT2, "clone %I removed\n", ins);
         free(ins->op);
         ins->op = str_dup("set");
@@ -1264,14 +1267,14 @@ check_clone(Parrot_Interp interpreter, Instruction *ins)
 }
 
 static int
-clone_remove(Parrot_Interp interpreter)
+clone_remove(Parrot_Interp interpreter, IMC_Unit * unit)
 {
     Instruction *ins;
     int changes = 0;
     debug(interpreter, DEBUG_OPT2, "clone_remove\n");
-    for (ins = instructions; ins; ins = ins->next)
+    for (ins = unit->instructions; ins; ins = ins->next)
         if (!strcmp(ins->op, "clone"))
-            changes |= check_clone(interpreter, ins);
+            changes |= check_clone(interpreter, unit, ins);
     return changes;
 }
 

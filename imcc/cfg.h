@@ -37,19 +37,21 @@ typedef struct _loop_info {
 
 
 /* Functions: */
+struct _IMC_Unit;
 
-void find_basic_blocks (Parrot_Interp, int first);
-void build_cfg(Parrot_Interp);
+void find_basic_blocks (Parrot_Interp, struct _IMC_Unit *, int first);
+void build_cfg(Parrot_Interp, struct _IMC_Unit *);
 
-void compute_dominators(Parrot_Interp interpreter);
-void find_loops(Parrot_Interp);
+void compute_dominators(Parrot_Interp interpreter, struct _IMC_Unit *);
+void find_loops(Parrot_Interp, struct _IMC_Unit *);
 void search_predecessors_not_in(Basic_block*, Set*);
 
-void life_analysis(Parrot_Interp interpreter);
+void life_analysis(Parrot_Interp interpreter, struct _IMC_Unit *);
 void add_life_interval(Life_range*, int, int);
+void free_life_info(struct _IMC_Unit *, SymReg *r);
 
-void clear_basic_blocks(Parrot_Interp);
+void clear_basic_blocks(struct _IMC_Unit *);
 Life_range* make_life_range(SymReg*, int);
 int blocks_are_connected(Basic_block *from, Basic_block *to);
-int edge_count(Parrot_Interp);
+int edge_count(struct _IMC_Unit *);
 

@@ -22,80 +22,30 @@
 
 /* Global variables , forward def */
 
-static IMC_Unit * imc_units;
-static IMC_Unit * cur_unit;
-
+#if 0
 static Instruction * last_ins;
 
 int n_comp_units;
+#endif
+
 
 static int e_file_open(void *);
 static int e_file_close(void *);
-static int e_file_emit(void *param, Instruction *);
+static int e_file_emit(void *param, IMC_Unit *, Instruction *);
 
 Emitter emitters[2] = {
-    {e_file_open, e_file_emit, (int (*)(void *))NULLfunc, e_file_close},
-    {e_pbc_open, e_pbc_emit, e_pbc_new_sub, e_pbc_close},
+    {e_file_open,
+     e_file_emit,
+     (int (*)(void *))NULLfunc,
+     e_file_close},
+
+    {e_pbc_open,
+     e_pbc_emit,
+     e_pbc_new_sub,
+     e_pbc_close},
 };
 
 static int emitter;
-
-/* all code is collected in compilation units, which may be:
- * - .sub/.end
- * - .emit/.eom
- * - stuff outside of these
- */
-
-
-/*
- * Create a new IMC_Unit.
- */
-IMC_Unit *
-imc_new_unit(IMC_Unit_Type t)
-{
-   IMC_Unit * unit = calloc(1, sizeof(IMC_Unit));
-   unit->type = t;
-   return unit;
-}
-
-/*
- * Create a new IMC_Unit and "open" it for construction.
- * This sets the current state of the parser. The unit
- * can be closed later retaining all the current state.
- */
-IMC_Unit *
-imc_open_unit(IMC_Unit_Type t)
-{
-    IMC_Unit * unit;
-    unit = imc_new_unit(t);
-    if(!cur_unit)
-       imc_units = unit;
-    unit->prev = cur_unit;
-    if(cur_unit)
-       cur_unit->next = unit;
-    cur_unit = unit;
-    n_comp_units++;
-#if 0
-    fprintf(stderr, "imc_open_unit()\n");
-#endif
-    return cur_unit;
-}
-
-
-void
-imc_close_unit(Parrot_Interp interpreter)
-{
-    free_reglist(interpreter);
-    clear_basic_blocks(interpreter);       /* and cfg ... */
-    if (!n_comp_units)
-        fatal(1, "close_comp_unit", "non existent comp_unit\n");
-    n_comp_units--;
-    clear_tables(interpreter, hash);
-#if 0
-    fprintf(stderr, "imc_close_unit()\n");
-#endif
-    instructions = last_ins = NULL;
-}
 
 
 /* Creates a new instruction */
@@ -276,7 +226,7 @@ get_branch_reg(Instruction * ins)
  * actual new ins is returned
  */
 Instruction *
-delete_ins(Instruction *ins, int needs_freeing)
+delete_ins(IMC_Unit *unit, Instruction *ins, int needs_freeing)
 {
     Instruction *next, *prev;
 
@@ -285,7 +235,7 @@ delete_ins(Instruction *ins, int needs_freeing)
     if (prev)
         prev->next = next;
     else
-        instructions = next;
+        unit->instructions = next;
     if (next)
         next->prev = prev;
     if (needs_freeing)
@@ -298,12 +248,12 @@ delete_ins(Instruction *ins, int needs_freeing)
  */
 
 void
-insert_ins(Instruction *ins, Instruction * tmp)
+insert_ins(IMC_Unit *unit, Instruction *ins, Instruction * tmp)
 {
     Instruction *next;
     if (!ins) {
-        next = instructions;
-        instructions = tmp;
+        next = unit->instructions;
+        unit->instructions = tmp;
         tmp->next = next;
         next->prev = tmp;
         tmp->line = next->line;
@@ -325,13 +275,13 @@ insert_ins(Instruction *ins, Instruction * tmp)
  */
 
 void
-subst_ins(Instruction *ins, Instruction * tmp, int needs_freeing)
+subst_ins(IMC_Unit *unit, Instruction *ins, Instruction * tmp, int needs_freeing)
 {
     Instruction *prev = ins->prev;
     if (prev)
         prev->next = tmp;
     else
-        instructions = tmp;
+        unit->instructions = tmp;
     tmp->prev = prev;
     tmp->next = ins->next;
     if (ins->next)
@@ -344,27 +294,27 @@ subst_ins(Instruction *ins, Instruction * tmp, int needs_freeing)
 
 /* move instruction ins to to */
 Instruction *
-move_ins(Instruction *ins, Instruction *to)
+move_ins(IMC_Unit * unit, Instruction *ins, Instruction *to)
 {
-    Instruction *next = delete_ins(ins, 0);
-    insert_ins(to, ins);
+    Instruction *next = delete_ins(unit, ins, 0);
+    insert_ins(unit, to, ins);
     return next;
 }
 
 
-/* Emits the instructions buffered in 'instructions' */
+/* Emit a single instruction into the current unit buffer. */
 Instruction *
-emitb(Instruction * i)
+emitb(IMC_Unit * unit, Instruction * i)
 {
 
-    if (!i)
+    if (!unit || !i)
 	return 0;
-    if(!instructions)
-        last_ins = instructions = i;
+    if(!unit->instructions)
+        unit->last_ins = unit->instructions = i;
     else {
-	last_ins->next = i;
-        i->prev = last_ins;
-	last_ins = i;
+	unit->last_ins->next = i;
+        i->prev = unit->last_ins;
+	unit->last_ins = i;
     }
     i->line = line - 1;         /* lexer is in next line already */
     return i;
@@ -488,7 +438,7 @@ e_file_close(void *param)
 }
 
 static int
-e_file_emit(void *param, Instruction * ins)
+e_file_emit(void *param, IMC_Unit * unit, Instruction * ins)
 {
     UNUSED(param);
     if ((ins->type & ITLABEL) || ! *ins->op)
@@ -510,17 +460,17 @@ emit_open(int type, void *param)
 }
 
 int
-emit_flush(void *param)
+emit_flush(void *param, IMC_Unit * unit)
 {
     Instruction * ins, *next;
     struct Parrot_Interp *interpreter = (struct Parrot_Interp *)param;
     if (emitters[emitter].new_sub)
-        (emitters[emitter]).new_sub(param);
-    for (ins = instructions; ins; ins = ins->next) {
+        (emitters[emitter]).new_sub(param, unit);
+    for (ins = unit->instructions; ins; ins = ins->next) {
         debug(interpreter, DEBUG_IMC, "emit %I\n", ins);
-        (emitters[emitter]).emit(param, ins);
+        (emitters[emitter]).emit(param, unit, ins);
     }
-    for (ins = instructions; ins; ) {
+    for (ins = unit->instructions; ins; ) {
         next = ins->next;
         free_ins(ins);
         ins = next;

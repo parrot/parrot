@@ -65,12 +65,12 @@
  * check life range of all symbols, find the max used mapped
  */
 static int
-max_used(Parrot_Interp interpreter, int bbi, char t, int typ, int mapped[])
+max_used(IMC_Unit * unit, int bbi, char t, int typ, int mapped[])
 {
     int max, j, c;
-    SymReg** reglist = IMCC_INFO(interpreter)->reglist;
+    SymReg** reglist = unit->reglist;
 
-    for (j = 0, max = 0; j < IMCC_INFO(interpreter)->n_symbols; j++) {
+    for (j = 0, max = 0; j < unit->n_symbols; j++) {
         SymReg * r = reglist[j];
         if (r->set != t)
             continue;
@@ -89,13 +89,13 @@ max_used(Parrot_Interp interpreter, int bbi, char t, int typ, int mapped[])
  * if none found, don't emit load/store for preserved regs
  */
 static int
-min_used(Parrot_Interp interpreter, int bbi, char t, int typ,
+min_used(IMC_Unit * unit, int bbi, char t, int typ,
         int preserved[], int mapped[])
 {
     int max, j, c;
-    SymReg** reglist = IMCC_INFO(interpreter)->reglist;
+    SymReg** reglist = unit->reglist;
 
-    for (j = 0, max = mapped[typ]; j < IMCC_INFO(interpreter)->n_symbols; j++) {
+    for (j = 0, max = mapped[typ]; j < unit->n_symbols; j++) {
         SymReg * r = reglist[j];
         if (r->set != t)
             continue;
@@ -110,7 +110,7 @@ min_used(Parrot_Interp interpreter, int bbi, char t, int typ,
 }
 
 void
-allocate_jit(struct Parrot_Interp *interpreter)
+allocate_jit(struct Parrot_Interp *interpreter, IMC_Unit * unit)
 {
     int c, i, j, k, typ;
     int to_map[4] = {0,0,0,0};
@@ -129,7 +129,7 @@ allocate_jit(struct Parrot_Interp *interpreter)
     opcode_t pc;
     static int nsubs;
     opcode_t * jit_info_ptr;
-    SymReg** reglist = IMCC_INFO(interpreter)->reglist;
+    SymReg** reglist = unit->reglist;
 
     assert(INT_REGISTERS_TO_MAP < MAX_MAPPED);
     assert(FLOAT_REGISTERS_TO_MAP < MAX_MAPPED);
@@ -156,7 +156,7 @@ allocate_jit(struct Parrot_Interp *interpreter)
      * compiled code - so track PMCs and invokes too
      */
     if (!has_compile && !dont_optimize) {
-        for (j = 0; j < IMCC_INFO(interpreter)->n_symbols; j++) {
+        for (j = 0; j < unit->n_symbols; j++) {
             r = reglist[j];
             if (r->set == 'K')
                 continue;
@@ -176,29 +176,29 @@ allocate_jit(struct Parrot_Interp *interpreter)
     to_map[3] = maxc[3];
     if (!nsubs++) {
         /* clear all used regs at beginning */
-        last = instructions->type & ITLABEL ? instructions : NULL;
+        last = unit->instructions->type & ITLABEL ? unit->instructions : NULL;
         for (typ = 0; typ < 4; typ++)
             for (j = 0; j < to_map[typ]; j++) {
                 regs[0] = cpu[typ][j];
                 regs[1] = par[typ][j];
-                tmp = INS(interpreter, "set", "%s, %s\t# init",
+                tmp = INS(interpreter, unit, "set", "%s, %s\t# init",
                         regs, 2, 0, 0);
-                insert_ins(last, tmp);
+                insert_ins(unit, last, tmp);
             }
     }
     /* now run through basic blocks
      * and insert register save/load instructions where needed
      */
-    for (i=0; i < IMCC_INFO(interpreter)->n_basic_blocks; i++) {
-        bb = IMCC_INFO(interpreter)->bb_list[i];
+    for (i=0; i < unit->n_basic_blocks; i++) {
+        bb = unit->bb_list[i];
         /* TODO: set minimum register usage for this block */
 
         for (ins = bb->start; ins; ins = ins->next) {
             /* clear preserved regs, set rw of non preserved regs */
-            for (typ = 0; ins != instructions && typ < 4; typ++)
+            for (typ = 0; ins != unit->instructions && typ < 4; typ++)
                 for (k = 0; k < to_map[typ]; k++) {
                     reads[typ][k] = writes[typ][k] =
-                        k >= min_used(interpreter, i, types[typ], typ,
+                        k >= min_used(unit, i, types[typ], typ,
                                 preserved, to_map);
                 }
             /* if extern, go through regs and check the usage */
@@ -216,7 +216,7 @@ allocate_jit(struct Parrot_Interp *interpreter)
                      * if a reg was writen, we reload it after the
                      * extern code block
                      */
-                    for (j = 0; j < IMCC_INFO(interpreter)->n_symbols; j++) {
+                    for (j = 0; j < unit->n_symbols; j++) {
                         r = reglist[j];
                         if (r->set == 'K')
                             continue;
@@ -228,7 +228,7 @@ allocate_jit(struct Parrot_Interp *interpreter)
                                 (ins->type & ITSAVES)) {
                             int bb_sub =
                                 find_sym(ins->r[0]->name)->first_ins->bbindex;
-                            if (max_used(interpreter, bb_sub, types[typ],
+                            if (max_used(unit, bb_sub, types[typ],
                                         typ, to_map))
                                 reads[typ][c] = writes[typ][c] = nr = nw = 1;
                         }
@@ -275,9 +275,9 @@ allocate_jit(struct Parrot_Interp *interpreter)
                             continue;
                         regs[0] = cpu[typ][j];
                         regs[1] = par[typ][j];
-                        tmp = INS(interpreter, "set", "%s, %s\t# load",
+                        tmp = INS(interpreter, unit,"set", "%s, %s\t# load",
                                 regs, 2, 0, 0);
-                        insert_ins(last, tmp);
+                        insert_ins(unit, last, tmp);
                     }
                 nw = 0;
             }
@@ -289,9 +289,9 @@ allocate_jit(struct Parrot_Interp *interpreter)
                             continue;
                         regs[0] = par[typ][j];
                         regs[1] = cpu[typ][j];
-                        tmp = INS(interpreter, "set", "%s, %s\t# save",
+                        tmp = INS(interpreter, unit, "set", "%s, %s\t# save",
                                 regs, 2, 0, 0);
-                        insert_ins(prev, tmp);
+                        insert_ins(unit, prev, tmp);
                     }
                 nr = 0;
             }
@@ -300,15 +300,15 @@ allocate_jit(struct Parrot_Interp *interpreter)
         }
     }
 
-    find_basic_blocks(interpreter, 0);
+    find_basic_blocks(interpreter, unit, 0);
     /* allocate a jit_info packfile segment holding
      * some CFG and register usage info
      */
-    jit_info_ptr = make_jit_info(interpreter);
+    jit_info_ptr = make_jit_info(interpreter, unit);
     /* write out minimal CFG and register_usage */
-    for (i = 0, pc = 0; i < IMCC_INFO(interpreter)->n_basic_blocks; i++) {
+    for (i = 0, pc = 0; i < unit->n_basic_blocks; i++) {
         int branch_target = 0;
-        bb = IMCC_INFO(interpreter)->bb_list[i];
+        bb = unit->bb_list[i];
         ins = bb->start;
         /* mark branch targets with hight bit set */
         if (ins->type & ITLABEL)
@@ -325,7 +325,7 @@ allocate_jit(struct Parrot_Interp *interpreter)
          */
         for (typ = 0; typ < 4; typ++)
             *jit_info_ptr++ = to_map[typ];
-        /*  = max_used(i, types[typ], typ, to_map); */
+        /*  = max_used(unit, types[typ], typ, to_map); */
     }
 }
 

@@ -88,9 +88,9 @@ imcc_globals_destroy(int ex, void *param)
         while (s) {
             prev_s = s->prev;
             h = s->labels;
-            clear_tables(interpreter, h);
+            clear_tables(NULL, h);
             h = s->bsrs;
-            clear_tables(interpreter, h);
+            clear_tables(NULL, h);
             mem_sys_free(s);
             s = prev_s;
         }
@@ -154,7 +154,7 @@ e_pbc_open(void *param)
     /* free previous cached key constants if any */
     if (globals.cs) {
         SymReg **h = globals.cs->key_consts;
-        clear_tables(interpreter, h);
+        clear_tables(NULL, h);
     }
     cs->next = NULL;
     cs->subs = NULL;
@@ -190,7 +190,7 @@ old_blocks(void)
 }
 
 opcode_t *
-make_jit_info(struct Parrot_Interp *interpreter)
+make_jit_info(struct Parrot_Interp *interpreter, IMC_Unit * unit)
 {
     char *name;
     size_t size, old;
@@ -203,9 +203,9 @@ make_jit_info(struct Parrot_Interp *interpreter)
                     PF_UNKNOWN_SEG, name, 1);
         free(name);
     }
-    size = IMCC_INFO(interpreter)->n_basic_blocks + (old = old_blocks());
+    size = unit->n_basic_blocks + (old = old_blocks());
     /* store current size */
-    globals.cs->subs->n_basic_blocks = IMCC_INFO(interpreter)->n_basic_blocks;
+    globals.cs->subs->n_basic_blocks = unit->n_basic_blocks;
     /* offset of block start and end, 4 * registers_used */
     globals.cs->jit_info->data = realloc(globals.cs->jit_info->data,
             size * sizeof(opcode_t) * 6);
@@ -216,7 +216,7 @@ make_jit_info(struct Parrot_Interp *interpreter)
 
 /* allocate a new globals.cs->subs structure */
 static void
-make_new_sub(struct Parrot_Interp *interpreter)
+make_new_sub(struct Parrot_Interp *interpreter, IMC_Unit * unit)
 {
     struct subs *s = mem_sys_allocate_zeroed(sizeof(struct subs));
     if (!s)
@@ -230,7 +230,7 @@ make_new_sub(struct Parrot_Interp *interpreter)
     globals.cs->subs = s;
 #ifdef HAS_JIT
     if ((optimizer_level & OPT_J)) {
-        allocate_jit(interpreter);
+        allocate_jit(interpreter, unit);
     }
 #else
     UNUSED(interpreter);
@@ -303,7 +303,7 @@ find_label_cs(struct Parrot_Interp *interpreter, char *name)
  * return size in ops
  */
 static int
-store_labels(struct Parrot_Interp *interpreter, int *src_lines, int oldsize)
+store_labels(struct Parrot_Interp *interpreter, IMC_Unit * unit, int *src_lines, int oldsize)
 {
     Instruction * ins;
     int code_size;
@@ -316,7 +316,7 @@ store_labels(struct Parrot_Interp *interpreter, int *src_lines, int oldsize)
      * - calc nr of src lines for debug info
      */
     *src_lines = 0;
-    for (code_size = 0, ins = instructions; ins ; ins = ins->next) {
+    for (code_size = 0, ins = unit->instructions; ins ; ins = ins->next) {
         if (ins->op && *ins->op) {
             (*src_lines)++;
             if (ins->opnum < 0)
@@ -332,7 +332,7 @@ store_labels(struct Parrot_Interp *interpreter, int *src_lines, int oldsize)
      * remember subroutine calls (bsr, addr (closures)) and labels
      * for fixup
      * */
-    for (pc = 0, ins = instructions; ins ; ins = ins->next) {
+    for (pc = 0, ins = unit->instructions; ins ; ins = ins->next) {
         if (ins->type & ITLABEL) {
             store_label(ins->r[0], pc);
             ins->r[0]->color = pc;
@@ -365,7 +365,7 @@ store_labels(struct Parrot_Interp *interpreter, int *src_lines, int oldsize)
      * for all local labels
      * and write fixup records for global _labels.
      */
-    for (ins = instructions; ins ; ins = ins->next) {
+    for (ins = unit->instructions; ins ; ins = ins->next) {
         SymReg *addr, *label;
         if ((ins->type & ITLABEL) &&
                 (has_compile || *ins->r[0]->name == '_')) {
@@ -407,7 +407,7 @@ store_labels(struct Parrot_Interp *interpreter, int *src_lines, int oldsize)
             /* append inter_cs jump */
             sprintf(buf, "#isc_%d", globals.inter_seg_n++);
             addr->name = str_dup(buf);
-            INS_LABEL(addr, 1);
+            INS_LABEL(unit, addr, 1);
             /* this is the new location */
             store_label(addr, code_size);
             /* increase code_size by 2 ops */
@@ -415,7 +415,7 @@ store_labels(struct Parrot_Interp *interpreter, int *src_lines, int oldsize)
             /* add inter_segment jump */
             r[0] = mk_const(glabel, 'S');
             r[0]->color = add_const_str(interpreter, glabel);
-            INS(interpreter, "branch_cs", "", r, 1, 0, 1);
+            INS(interpreter, unit, "branch_cs", "", r, 1, 0, 1);
         }
     }
     /* return code size */
@@ -799,13 +799,13 @@ constant_folding(struct Parrot_Interp *interpreter)
 }
 
 int
-e_pbc_new_sub(void *param)
+e_pbc_new_sub(void *param, IMC_Unit * unit)
 {
     struct Parrot_Interp *interpreter = (struct Parrot_Interp *)param;
 
-    if (!instructions)
+    if (!unit->instructions)
         return 0;
-    make_new_sub(interpreter);     /* we start a new compilation unit */
+    make_new_sub(interpreter, unit);     /* we start a new compilation unit */
     return 0;
 }
 
@@ -814,7 +814,7 @@ e_pbc_new_sub(void *param)
  */
 
 int
-e_pbc_emit(void *param, Instruction * ins)
+e_pbc_emit(void *param, IMC_Unit * unit, Instruction * ins)
 {
     struct Parrot_Interp *interpreter = (struct Parrot_Interp *)param;
     int ok = 0;
@@ -825,13 +825,13 @@ e_pbc_emit(void *param, Instruction * ins)
     static int ins_line;
 
     /* first instruction, do initialisation ... */
-    if (ins == instructions) {
+    if (ins == unit->instructions) {
         int code_size, ins_size;
         int oldsize;
         int bytes;
 
         oldsize = get_old_size(interpreter, &ins_line);
-        code_size = store_labels(interpreter, &ins_size, oldsize);
+        code_size = store_labels(interpreter, unit, &ins_size, oldsize);
         debug(interpreter, DEBUG_PBC, "code_size(ops) %d  oldsize %d\n",
                 code_size, oldsize);
         constant_folding(interpreter);
@@ -940,7 +940,7 @@ e_pbc_close(void *param)
     struct Parrot_Interp *interpreter = (struct Parrot_Interp *)param;
 
     fixup_bsrs(interpreter);
-    clear_tables(interpreter, ghash);
+    clear_tables(NULL, ghash);
     return 0;
 }
 

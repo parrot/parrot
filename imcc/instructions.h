@@ -63,6 +63,9 @@ typedef enum {
 } Instruction_Flags;
 
 
+/* Forward decl */
+struct _IMC_Unit;
+
 
 /* Functions */
 /*
@@ -74,15 +77,15 @@ Instruction * _mk_instruction(const char *,const char *, SymReg **, int);
 #else
 #define _mk_instruction(a,b,c,d) dont_use(a,b)
 #endif
-Instruction * INS(struct Parrot_Interp *, char * name,
+Instruction * INS(struct Parrot_Interp *, struct _IMC_Unit *, char * name,
 	const char *fmt, SymReg **regs, int nargs, int keyv, int emit);
-Instruction * INS_LABEL(SymReg * r0, int emit);
+Instruction * INS_LABEL(struct _IMC_Unit *, SymReg * r0, int emit);
 
-Instruction * iNEW(struct Parrot_Interp *,SymReg * r0, char * type,
+Instruction * iNEW(struct Parrot_Interp *, struct _IMC_Unit *, SymReg * r0, char * type,
 	SymReg *init, int emit);
-Instruction * iNEWSUB(struct Parrot_Interp *,SymReg * r0, int type,
+Instruction * iNEWSUB(struct Parrot_Interp *, struct _IMC_Unit *, SymReg * r0, int type,
 	SymReg *init, int emit);
-Instruction * emitb(Instruction *);
+Instruction * emitb(struct _IMC_Unit *, Instruction *);
 
 int instruction_reads(Instruction *, SymReg *);
 int instruction_writes(Instruction *, SymReg *);
@@ -92,29 +95,32 @@ int ins_writes2(Instruction *, int);
 void free_ins(Instruction *);
 int ins_print(FILE *fd, Instruction * ins);
 
-Instruction *delete_ins(Instruction *ins, int needs_freeing);
-void insert_ins(Instruction *ins, Instruction * tmp);
-Instruction *move_ins(Instruction *cur, Instruction *to);
-void subst_ins(Instruction *ins, Instruction * tmp, int);
+Instruction *delete_ins(struct _IMC_Unit *, Instruction *ins, int needs_freeing);
+void insert_ins(struct _IMC_Unit *, Instruction *ins, Instruction * tmp);
+Instruction *move_ins(struct _IMC_Unit *, Instruction *cur, Instruction *to);
+void subst_ins(struct _IMC_Unit *, Instruction *ins, Instruction * tmp, int);
 
 int get_branch_regno(Instruction * ins);
 SymReg *get_branch_reg(Instruction * ins);
 
 /* Globals */
 
+#if 0
+/* per-unit instructions now (imc_info->imc_units) */
 EXTERN Instruction* instructions;
+#endif
 
 typedef struct _emittert {
 	int (*open)(void *param);
-	int (*emit)(void *param, Instruction *ins);
-	int (*new_sub)(void *param);
+	int (*emit)(void *param, struct _IMC_Unit *, Instruction *ins);
+	int (*new_sub)(void *param, struct _IMC_Unit *);
 	int (*close)(void *param);
 } Emitter;
 
 enum Emitter_type { EMIT_FILE, EMIT_PBC };
 
 int emit_open(int type, void *param);
-int emit_flush(void *param);
+int emit_flush(void *param, struct _IMC_Unit *);
 int emit_close(void *param);
 
 void open_comp_unit(void);

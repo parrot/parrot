@@ -19,6 +19,7 @@ typedef enum {
 typedef struct _IMC_Unit {
     IMC_Unit_Type type;
     Instruction * instructions;
+    Instruction * last_ins;
     Symbol * sym;
     int bb_list_size;
     int n_basic_blocks;
@@ -38,9 +39,8 @@ typedef struct _IMC_Unit {
 } IMC_Unit;
 
 
-void imc_unit_close(void);
-IMC_Unit * imc_open_unit(IMC_Unit_Type);
-void imc_close_unit(Parrot_Interp);
+IMC_Unit * imc_open_unit(Parrot_Interp, IMC_Unit_Type);
+void imc_close_unit(Parrot_Interp, IMC_Unit *);
 IMC_Unit * imc_new_unit(IMC_Unit_Type);
 IMC_Unit * imc_order_for_emit(IMC_Unit * list);
 
