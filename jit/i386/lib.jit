@@ -13,7 +13,7 @@ jump {
 }
 
 move {
-    movl *CUR_OPCODE[0],%ecx
+    movl *CUR_OPCODE[1],%ecx
     movl &ARG[0],%eax
     add %ecx,%eax
     mov %eax,%edx
@@ -23,10 +23,10 @@ move {
 }
 
 get_interpreter {
-    mov &ARG[0],%eax
+    mov *ARG[0],%eax
 }
 
 get_interpreter_control_stack_top {
-    mov &ARG[0],%eax 
+    mov *ARG[0],%eax 
     addl $0x14,%eax
 }

@@ -313,6 +313,9 @@ build_asm(struct Parrot_Interp *interpreter,opcode_t *pc, opcode_t *code_start, 
                 case 5: 
                         address = (INTVAL *)push_generic_entry; 
                         break;
+                case 6: 
+                        address = (INTVAL *)interpreter->op_func_table[*pc];
+                        break;
             }
 
             ivalue = (INTVAL) (arena+v.info[i].position) + 4;
@@ -334,7 +337,7 @@ build_asm(struct Parrot_Interp *interpreter,opcode_t *pc, opcode_t *code_start, 
         {
             switch(v.info[i].number) {
                 case 0: 
-                        address = (INTVAL *)&interpreter; 
+                        address = (INTVAL *)interpreter; 
                         break;
                 case 1: 
                         address = (INTVAL *)&interpreter->control_stack_top; 
@@ -348,8 +351,14 @@ build_asm(struct Parrot_Interp *interpreter,opcode_t *pc, opcode_t *code_start, 
         /* cur_opcode */
         for (i = 0; i < v.amount; i++)
         {
-            ivalue = (INTVAL)(pc - code_start) + v.info[i].number;
-            memcpy(&arena[v.info[i].position],&ivalue,sizeof(ivalue));
+            if (v.info[i].number)
+            {
+                ivalue = (INTVAL)(pc - code_start) + v.info[i].number - 1;
+                memcpy(&arena[v.info[i].position],&ivalue,sizeof(ivalue));
+            } else {
+                address = (INTVAL *)pc;
+                memcpy(&arena[v.info[i].position],&address,sizeof(address));
+            }
         }
  
         /* Keep it pointing to "where the code goes" */

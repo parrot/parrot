@@ -193,6 +193,8 @@ sub disassemble($$$$) {
     # These 2 are OK by now.
     $result =~ s/\\x\w\w \\xff \\xff \\xff JUMP/JUMP/g;
     $result =~ s/\\x00 JUMP/JUMP/g;
+
+    $result =~ s/\s+//g;
     return $result;
 }
 

@@ -213,6 +213,8 @@ sub disassemble($$$$) {
     $result =~ s/\\x00 JUMP/JUMP/g;
     # XXX:These is a hack to make the jit in redhat.
     $result =~ s/\\x90 $//;
+
+    $result =~ s/\s+//g;
     return $result;
 }
 

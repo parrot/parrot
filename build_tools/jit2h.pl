@@ -40,7 +40,8 @@ my %Call = (
     "string_copy"           => 2,
     "string_compare"        => 3,
     "pop_generic_entry"     => 4,
-    "push_generic_entry"    => 5
+    "push_generic_entry"    => 5,
+    "Parrot_op"             => 6
 );
 
 sub readjit($) {
@@ -58,9 +59,7 @@ sub readjit($) {
             next;
         }
         if ($line =~ m/}/) {
-            $body = Parrot::Jit::Assemble($asm);
-            $body =~ s/\s+//g;
-            $ops{$function} = $body;
+            $ops{$function} = Parrot::Jit::Assemble($asm);
             $function = undef;
             $body = undef;
         }
@@ -77,7 +76,7 @@ print "opcode_assembly_t op_assembly[$core_numops]= {\n";
 
 for ($i = 0; $i < $core_numops; $i++) {
     $body = $core_ops{$core_opfunc[$i]};
-    $body = "\\x00" unless defined $body;
+    $body = "C(Parrot_op,V*CUR_OPCODE[0]V&INTERPRETER[0])" . Parrot::Jit::Assemble("addl \$8,\%esp\n") unless defined $body;
 
     my $op = $Parrot::OpLib::core::ops->[$i];
 
