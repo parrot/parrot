@@ -27,15 +27,22 @@ sub runstep {
           commentType => '#');
   genfile('config/gen/makefiles/imcc.in',      'languages/imcc/Makefile',
           commentType => '#');
-  system("$^X -pi -e's/ -Wwrite-strings//' 	languages/imcc/Makefile");
-  system("$^X -pi -e's/ -Wcast-qual//' 	  	languages/imcc/Makefile");
-  system("$^X -pi -e's/ -Wno-unused/ -Wunused/' languages/imcc/Makefile");
   genfile('config/gen/makefiles/bf.in',        'languages/bf/Makefile',
           commentType => '#');
   genfile('config/gen/makefiles/befunge.in',   'languages/befunge/Makefile',
           commentType => '#');
   genfile('config/gen/makefiles/ook.in',       'languages/ook/Makefile',
           commentType => '#');
+
+  # Change compiler flags in IMCC's makefile using inplace edit.
+  my $PQ   = Configure::Data->get('PQ');
+  my $imcc = 'languages/imcc/Makefile';
+  my $pgm  = ' s/ -Wwrite-strings//;'
+           . ' s/ -Wcast-qual//;'
+           . ' s/ -Wno-unused/ -Wunused/;';
+  system "$^X -pi.bak -e$PQ$pgm$PQ $imcc" and warn;
+  unlink "$imcc.bak" or warn;
+
 }
 
 1;
