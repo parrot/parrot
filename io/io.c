@@ -18,7 +18,7 @@ This file implements the generic functionality. Specific layers are in
 separate files: F<io/io_buf.c>, F<io/io_stdio.c>, F<io/io_unix.c>,
 F<io/io_win32.c>.
 
-The C<ParrotIO> PMC provides th class-based interface that is used in
+The C<ParrotIO> PMC provides the class-based interface that is used in
 Parrot ops. The C<ParrotIO struct> is defined in F<io/io_private.h>.
 
 =head2 Resource Functions

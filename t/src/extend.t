@@ -11,7 +11,7 @@ t/src/extend.t - Parrot Extension API
 
 	% perl t/src/extend.t
 
-=head1 DECSRIPTION
+=head1 DESCRIPTION
 
 Tests the extension API.
 

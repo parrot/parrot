@@ -268,7 +268,7 @@ may look like:
 
 The escape flag marks places in the image, where additional data will
 follow. After the escape flag is an int defining the kind of the
-follwing data, passed on in B<extra_flags>.  During B<thaw> the PMCs
+following data, passed on in B<extra_flags>.  During B<thaw> the PMCs
 vtable is called again, to restore these data. So a PMCs B<thaw>
 vtable has to check B<extra_flags> if normal or extra data have to be
 shifted from the image.
