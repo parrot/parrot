@@ -67,9 +67,14 @@ static FIXME_INLINE HASHBUCKET* getBucket(HASH* hash, BucketIndex idx)
     return &((HASHBUCKET*) hash->bucket_pool->bufstart)[idx];
 }
 
+static FIXME_INLINE BucketIndex lookupBucketIndex(HASH* hash, HashIndex slot)
+{
+    return ((BucketIndex*) hash->buffer.bufstart)[slot];
+}
+
 static FIXME_INLINE HASHBUCKET* lookupBucket(HASH* hash, HashIndex slot)
 {
-    return getBucket(hash, ((BucketIndex*) hash->buffer.bufstart)[slot]);
+    return getBucket(hash, lookupBucketIndex(hash, slot));
 }
 
 /*=for api key key_hash
@@ -426,11 +431,12 @@ hash_delete(Interp *interpreter, HASH *hash, STRING *key)
 void
 hash_clone(struct Parrot_Interp * interp, HASH * hash, HASH ** clone)
 {
-    BucketIndex i;
+    HashIndex i;
     new_hash(interp, clone);
     for (i = 0; i <= hash->max_chain; i++) {
-        HASHBUCKET * b = lookupBucket(hash, i);
-        while (b) {
+        BucketIndex bi = lookupBucketIndex(hash, i);
+        while (bi != NULLBucketIndex) {
+            HASHBUCKET * b = getBucket(hash, bi);
             KEY_ATOM valtmp;
             switch (b->value.type) {
             case enum_key_undef:
@@ -443,14 +449,16 @@ hash_clone(struct Parrot_Interp * interp, HASH * hash, HASH ** clone)
                 valtmp.type = enum_key_string;
                 valtmp.val.string_val
                     = string_copy(interp, b->value.val.string_val);
-                b = lookupBucket(hash, i);
+                /* b is no longer valid (due to GC) */
+                b = getBucket(hash, bi);
                 break;
 
             case enum_key_pmc:
                 valtmp.type = enum_key_pmc;
                 valtmp.val.pmc_val = b->value.val.pmc_val->vtable->clone(
                     interp, b->value.val.pmc_val);
-                b = lookupBucket(hash, i);
+                /* b is no longer valid (due to GC) */
+                b = getBucket(hash, bi);
                 break;
 
             default:
@@ -458,7 +466,7 @@ hash_clone(struct Parrot_Interp * interp, HASH * hash, HASH ** clone)
                                    b->value.type);
             };
             hash_put(interp, *clone, b->key, &valtmp);
-            b = getBucket(hash, b->next);
+            bi = b->next;
         }
     }
 }
