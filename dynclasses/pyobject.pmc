@@ -51,8 +51,6 @@ static STRING* __xor__;
         REG_PMC(2) = SELF; \
         return REG_PMC(5);
 
-extern PMC* Parrot_PyType_subclass(Interp* interpreter, PMC *pmc, STRING* name);
-
 pmclass PyObject dynpmc group python_group {
 
 /*
@@ -784,9 +782,12 @@ direct pointer to the global hash for this particular class.
 
 =item C<PMC* subclass(STRING *name)>
 
-Create a subclass of the given class.  Note that this merely creates
-a new PyType... all the interesting details that make it a subclass
-need to be filled in.
+Create a subclass of the builtin class.  In additon to creating a
+new class (of type PyProxyType), an instance of PyProxyClass is also
+created and defined as the base class for the new class.
+
+See the description of PyProxyType and PyProxyClass to see how
+new instances are created and how methods are forwarded respectively.
 
 =cut
 
@@ -796,9 +797,27 @@ this logic with a TypeError.
 */
 
     PMC* subclass(STRING* name) {
-        PMC *ret = Parrot_PyType_subclass(INTERP, SELF, name);
-        INTVAL dynclass_PyType = Parrot_PMC_typenum(INTERP, "PyType");
-        return ret;
+        INTVAL dynclass_PyProxyType, dynclass_PyProxyClass;
+        PMC *proxy_type, *adaptor_class, *nameprop;
+        STRING *NAME, *BASES;
+
+        dynclass_PyProxyClass = Parrot_PMC_typenum(INTERP, "PyProxyClass");
+        adaptor_class = pmc_new(INTERP, dynclass_PyProxyClass);
+
+        BASES = const_string(INTERP, "__bases__");
+        VTABLE_setprop(INTERP, adaptor_class, BASES, SELF);
+
+        dynclass_PyProxyType = Parrot_PMC_typenum(INTERP, "PyProxyType");
+        proxy_type = pmc_new(INTERP, dynclass_PyProxyType);
+
+        NAME  = const_string(INTERP, "__name__");
+        nameprop = pmc_new(INTERP, dynclass_PyString);
+        VTABLE_setprop(INTERP, proxy_type, NAME, nameprop);
+        VTABLE_set_string_native(INTERP, nameprop, name);
+
+        VTABLE_setprop(INTERP, proxy_type, BASES, adaptor_class);
+
+        return proxy_type;
     }
 
 /*

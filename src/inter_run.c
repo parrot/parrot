@@ -225,10 +225,10 @@ runops_args(Parrot_Interp interpreter, PMC *sub, PMC *obj,
 
     bp = interpreter->ctx.bp;
     ret_c = new_ret_continuation_pmc(interpreter, NULL);
-    dest = VTABLE_invoke(interpreter, sub, NULL);
     interpreter->ctx.current_sub = sub;
     interpreter->ctx.current_cont = ret_c;
     interpreter->ctx.current_object = obj;
+    dest = VTABLE_invoke(interpreter, sub, NULL);
 
     /*
      * count arguments, check for overflow

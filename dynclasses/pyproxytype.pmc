@@ -1,0 +1,155 @@
+/*
+Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+$Id$
+
+=head1 NAME
+
+classes/pyproxytype.pmc - Python Proxy Type
+
+=head1 DESCRIPTION
+
+This is the type that you get when you subclass a non-PyClass
+(i.e., a builtin PyObject, like PyInt).
+
+Invoking instances of this type (which is Python's way of
+instantiating instances) actually causes two objects to be created:
+one of type PyClass (the "proxy"), and one of intended class
+(the "real object").
+
+The one "trick" is that the an additional parent is inserted into
+the inheritance hierarchy of type PyProxyClass.  The sole function of
+PyProxyClass is to delegate of all method and attribute calls back onto
+the real object.
+
+The combination of PyClass, PyProxyClass, and PyObject allows subclasses
+of builtins to redefine methods.  This is because PyClass knows how to
+translate Parrot calls (like "get_string") into Python methods (like
+"__str__"), find_method on PyClass knows how to look up the inheritance
+chain, and having a PyProxyClass on the top of the chain knows how to
+forward such method talls to a PyObject, which in turn knows how to
+map Python method calls onto Parrot calls.
+
+While this seems like a lot of work, lets consider all the cases:
+
+  "pure" builtins (not subclassed by Python):
+     * operations like indexing and addition are done at Parrot
+       speeds with no lookaside to see if methods have been
+       overridden.
+     * explict calls to methods (such as __str__) are relatively
+       rare, but are handled by an NCI method which maps between 
+       Python and Parrot syntax and semantics.
+
+  "pure" Python classes (base class is object):
+     * operations like addition are relatively rare, but are
+       accomplished by an NCI method which maps between Python
+       and Parrot syntax and semantics.
+     * explicit calls to methods directly check the set of
+       properties (currently a hash) for each class.
+
+  "mixed" classes (base class is builin - relatively rare):
+     * operations like indexing and addition require a
+       mapping to Python method names, an inheritance search,
+       and mapping back to Parrot method names.
+     * explicit calls to methods require only the ProxyClass and
+       a mapping to Parrot methods.
+
+=head2 Methods
+
+=over 4
+
+=cut
+
+*/
+
+#include "parrot/parrot.h"
+
+INTVAL dynclass_PyClass;
+STRING *BASES;
+STRING *CLASS;
+STRING *INIT;
+STRING *PROXY;
+
+pmclass PyProxyType extends PyType dynpmc group python_group {
+
+/*
+
+=item C<void class_init()>
+
+Class initialization. Caches the type id of various PMCs because
+they will be used frequently here.
+
+=cut
+
+*/
+
+    void class_init() {
+        if (pass) {
+            dynclass_PyClass = Parrot_PMC_typenum(INTERP, "PyClass");
+            BASES = const_string(INTERP, "__bases__");
+            CLASS = const_string(INTERP, "__class__");
+            INIT  = const_string(INTERP, "__init__");
+            PROXY = const_string(INTERP, "__proxy__");
+        }
+    }
+
+
+/*
+
+=item C<void* invoke(void *next)>
+
+Create a new object and proxy.  Note: invokes C<invoke> on the
+object without touching any parrot registers... this enables
+initializers with arguments to be run.
+
+=cut
+
+TODO: reconcile this with Parrot's instantiate VTABLE entry.
+
+*/
+
+    void* invoke(void *next) {
+        PMC *proxy_class, *object_class, *proxy, *object, *init;
+
+        proxy_class = VTABLE_getprop(INTERP, SELF, BASES);
+        object_class = VTABLE_getprop(INTERP, proxy_class, BASES);
+
+        object = pmc_new(INTERP, object_class->vtable->base_type);
+
+        proxy = pmc_new(interpreter, dynclass_PyClass);
+        VTABLE_setprop(INTERP, proxy, CLASS, REG_PMC(0));
+
+        init = VTABLE_find_method(INTERP, proxy, INIT);
+        if (init) {
+            INTERP->ctx.current_object = proxy;
+            Parrot_runops_fromc(INTERP, init);
+        }
+        else {
+            VTABLE_invoke(INTERP, object, next);
+            object = REG_PMC(5);
+        }
+
+        VTABLE_setprop(INTERP, proxy, PROXY, object);
+
+        REG_PMC(5) = proxy;
+        return next;
+    }
+
+/*
+
+=back
+
+=cut
+
+*/
+
+}
+
+/*
+ * Local variables:
+ * c-indentation-style: bsd
+ * c-basic-offset: 4
+ * indent-tabs-mode: nil
+ * End:
+ *
+ * vim: expandtab shiftwidth=4:
+*/

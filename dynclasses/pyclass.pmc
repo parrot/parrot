@@ -169,9 +169,11 @@ Return the representation of this object.
     STRING* get_repr() {
         PMC *repr = VTABLE_find_method(INTERP, SELF, REPR);
 
-        if (repr)
-            return (STRING*) Parrot_run_meth_fromc_args(INTERP, repr, SELF,
-                REPR, "S");
+        if (repr) {
+            PMC *ret;
+            ret = Parrot_run_meth_fromc_args(INTERP, repr, SELF, REPR, "P");
+            return VTABLE_get_string(INTERP, ret);
+        }
         else {
             STRING *res;
 
@@ -201,9 +203,11 @@ Return the object in string form.
 
     STRING* get_string() {
         PMC *repr = VTABLE_find_method(INTERP, SELF, STR);
-        if (repr)
-            return (STRING*) Parrot_run_meth_fromc_args(INTERP, repr, SELF,
-                REPR, "S");
+        if (repr) {
+            PMC *ret;
+            ret = Parrot_run_meth_fromc_args(INTERP, repr, SELF, REPR, "P");
+            return VTABLE_get_string(INTERP, ret);
+        }
         else {
             return VTABLE_get_repr(INTERP, SELF);
         }

@@ -26,6 +26,8 @@ static INTVAL dynclass_PyComplex;
 static INTVAL dynclass_PyFloat;
 static INTVAL dynclass_PyString;
 
+static PMC* base_class;
+
 pmclass PyInt extends PyObject dynpmc group python_group {
 
 /*
@@ -45,6 +47,9 @@ they will be used frequently here.
             dynclass_PyComplex = Parrot_PMC_typenum(INTERP, "PyComplex");
             dynclass_PyFloat   = Parrot_PMC_typenum(INTERP, "PyFloat");
             dynclass_PyString  = Parrot_PMC_typenum(INTERP, "PyString");
+
+            /* TODO: make Int have a real base class */
+            base_class = pmc_new(INTERP, dynclass_PyInt);
         }
     }
 
@@ -500,6 +505,20 @@ Returns the boolean value of the integer.
 
 /*
 
+=item C<PMC *get_class()>
+
+Return the class of this object.
+
+=cut
+
+*/
+
+    PMC* get_class() {
+        return base_class;
+    }
+
+/*
+
 =item C<INTVAL get_integer()>
 
 Returns the integer value of the integer.
@@ -558,7 +577,7 @@ Returns a unique hash for this value
 
 =item C<void* invoke(void *next)>
 
-Create a new dictionary from a sequence
+Create a new integer
 
 =cut
 

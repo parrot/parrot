@@ -118,12 +118,10 @@ Returns true if there are more elements to return
         if (!setjmp(INTERP->exceptions->destination)) {
             PMC_struct_val(SELF) =
                 Parrot_runops_fromc_args(INTERP, PMC_pmc_val(SELF), "P");
-            pop_exception(INTERP);
         } else {
-            /* TODO: check for something better than the message */
             PMC *exception = REG_PMC(5);
-            STRING *message = VTABLE_get_string_keyed_int(INTERP, exception, 0);
-            if (0 != string_compare(INTERP, message, STOPITERATION)) {
+            INTVAL extype = VTABLE_get_integer_keyed_int(INTERP, exception, 1);
+            if (extype != E_StopIteration) {
                 rethrow_exception(INTERP, REG_PMC(5));
             }
         }

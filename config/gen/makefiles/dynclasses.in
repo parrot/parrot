@@ -27,7 +27,9 @@ pyobject \
   pynone \
   pytype \
   pystring \
-  pytuple
+  pytuple \
+pyproxytype \
+pyproxyclass
 
 BUILD = ${perl} build.pl
 

@@ -1,0 +1,128 @@
+/*
+Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+$Id$
+
+=head1 NAME
+
+classes/pyproxyclass.pmc - Python Proxy Class
+
+=head1 DESCRIPTION
+
+Forward method and attribute requests onto the object that is
+being proxied.
+
+=head2 Methods
+
+=over 4
+
+TODO: handle attributes.
+
+=cut
+
+*/
+
+#include "parrot/parrot.h"
+
+static INTVAL dynclass_PyProxyClass;
+STRING *PROXY;
+
+pmclass PyProxyClass extends PyObject dynpmc group python_group {
+
+/*
+
+=item C<void class_init()>
+
+Class initialization. Caches the type id of various PMCs because
+they will be used frequently here.
+
+=cut
+
+*/
+
+    void class_init() {
+        if (pass) {
+            dynclass_PyProxyClass = Parrot_PMC_typenum(INTERP, "PyProxyClass");
+
+            PROXY = const_string(INTERP, "__proxy__");
+        }
+    }
+
+/*
+
+=item C<void init()>
+
+Initializes the instance.
+
+=cut
+
+*/
+
+    void init () {
+        PMC_pmc_val(SELF) = 0;
+        PMC_struct_val(SELF) = 0;
+    }
+
+/*
+
+=item C<PMC *find_method(STRING *method_name)>
+
+Looks up the method for C<*method_name> and returns it.
+
+=cut
+
+*/
+
+    PMC* find_method(STRING* method_name) {
+        PMC *method = SUPER(method_name);
+
+        if (method) {
+            PMC *forwarder = pmc_new(INTERP, dynclass_PyProxyClass);
+            PMC_struct_val(forwarder) = method;
+            method = forwarder;
+        }
+
+        return method;
+    }
+
+/*
+
+=item C<void* invoke(void *next)>
+
+Invoke the real method
+
+=cut
+
+*/
+
+    void* invoke(void *next) {
+        PMC *proxy = INTERP->ctx.current_object;
+
+        if (!PMC_struct_val(SELF))
+            internal_exception(1, "Invoke() called on a PyProxyClass object");
+
+        INTERP->ctx.current_object = REG_PMC(2) = 
+            VTABLE_getprop(INTERP, proxy, PROXY);
+
+        return VTABLE_invoke(INTERP, (PMC*)PMC_struct_val(SELF), next);
+    }
+
+ 
+/*
+
+=back
+
+=cut
+
+*/
+
+}
+
+/*
+ * Local variables:
+ * c-indentation-style: bsd
+ * c-basic-offset: 4
+ * indent-tabs-mode: nil
+ * End:
+ *
+ * vim: expandtab shiftwidth=4:
+*/
