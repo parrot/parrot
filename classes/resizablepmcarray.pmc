@@ -139,6 +139,10 @@ Returns the PMC value of the element at index C<key>.
 
 Sets the PMC value of the element at index C<key> to C<*src>.
 
+=item C<void set_pmc_keyed(PMC *key, PMC *src)>
+
+If key is a slice, do a splice as set that item.
+
 =cut
 
 */
@@ -155,6 +159,21 @@ Sets the PMC value of the element at index C<key> to C<*src>.
         if (key >= PMC_int_val(SELF))
             DYNSELF.set_integer_native(key+1);
         ((PMC**)PMC_data(SELF))[key] = src;
+    }
+
+    void set_pmc_keyed (PMC* key, PMC* src) {
+        if (key->vtable->base_type == enum_class_Slice)
+            Parrot_py_set_slice(INTERP, SELF, key, src);
+        else
+            SUPER(key, src);
+    }
+
+    void delete_keyed (PMC* key) {
+        if (key->vtable->base_type == enum_class_Slice)
+            Parrot_py_set_slice(INTERP, SELF, key, NULL);
+        else
+            internal_exception(OUT_OF_BOUNDS,
+                "ResizablePMCArray: unimplemented delete!\n");
     }
 
     void push_pmc(PMC* value) {

@@ -798,11 +798,15 @@ Returns the string value for C<SELF[key]>.
     }
     PMC* get_pmc_keyed(PMC* key) {
         STRING *s = PMC_str_val(SELF);
-        PMC *ret = pmc_new_noinit(INTERP, enum_class_PerlString);
+        PMC *ret;
+
+        if (key->vtable->base_type == enum_class_Slice)
+            return Parrot_py_get_slice(INTERP, SELF, key);
+        ret = pmc_new_noinit(INTERP, enum_class_PerlString);
         PMC_str_val(ret) = string_substr(INTERP, s,
-		key_integer(INTERP,key), 1, NULL, 0);
+                key_integer(INTERP,key), 1, NULL, 0);
         PObj_custom_mark_SET(ret);
-	return ret;
+        return ret;
     }
 
 /*

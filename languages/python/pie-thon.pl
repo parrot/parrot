@@ -1529,10 +1529,100 @@ sub SLICE_plus_3 {
     return Slice(@_, 3);
 }
 
+sub Store_Slice
+{
+    my ($n, $c, $cmt, $sl_n) = @_;
+    my ($v, $w, $vv, $ww);
+    $vv = 0;
+    $ww =  "";
+    if ($sl_n & 2) {
+	$w = pop @stack;
+	$ww = $w->[1];
+	if ($w->[2] eq 'P') {
+	   $ww = temp('I');
+	   print <<EOC;
+	$ww = $w->[1]
+EOC
+       }
+    }
+    if ($sl_n & 1) {
+	$v = pop @stack;
+	$vv = $v->[1];
+	if ($v->[2] eq 'P') {
+	   $vv = temp('I');
+	   print <<EOC;
+	$vv = $v->[1]
+EOC
+       }
+    }
+    my $dest =  (pop @stack)->[1];
+    my $ag = (pop @stack)->[1];
+    print <<EOC;
+	\t $cmt
+	set $dest\[ $vv .. $ww ], $ag
+EOC
+    #push @stack, [-1, $dest, 'P'];
+}
+sub STORE_SLICE_plus_0 {
+    return Store_Slice(@_, 0);
+}
+sub STORE_SLICE_plus_1 {
+    return Store_Slice(@_, 1);
+}
+sub STORE_SLICE_plus_2 {
+    return Store_Slice(@_, 2);
+}
+sub STORE_SLICE_plus_3 {
+    return Store_Slice(@_, 3);
+}
+
 sub DELETE_SLICE_plus_0 {
     my ($n, $c, $cmt) = @_;
     my $agg = pop @stack;
     print <<EOC;
 	$agg->[1] = 0
 EOC
+}
+
+sub Del_Slice
+{
+    my ($n, $c, $cmt, $sl_n) = @_;
+    my ($v, $w, $vv, $ww);
+    $vv = 0;
+    $ww =  "";
+    if ($sl_n & 2) {
+	$w = pop @stack;
+	$ww = $w->[1];
+	if ($w->[2] eq 'P') {
+	   $ww = temp('I');
+	   print <<EOC;
+	$ww = $w->[1]
+EOC
+       }
+    }
+    if ($sl_n & 1) {
+	$v = pop @stack;
+	$vv = $v->[1];
+	if ($v->[2] eq 'P') {
+	   $vv = temp('I');
+	   print <<EOC;
+	$vv = $v->[1]
+EOC
+       }
+    }
+    my $dest =  (pop @stack)->[1];
+    print <<EOC;
+	\t $cmt
+	delete $dest\[ $vv .. $ww ]
+EOC
+    #push @stack, [-1, $dest, 'P'];
+}
+sub DELETE_SLICE_plus_1 {
+    return Del_Slice(@_, 1);
+}
+sub DELETE_SLICE_plus_2 {
+    return Del_Slice(@_, 2);
+}
+sub DELETE_SLICE_plus_3 {
+    return Del_Slice(@_, 3);
 }

@@ -708,43 +708,33 @@ Parrot_py_init(Interp *interpreter)
     parrot_py_create_default_meths(interpreter);
 }
 
-
-PMC*
-Parrot_py_get_slice(Interp *interpreter, PMC *self, PMC *key)
+/*
+ * convert a key chain PMC to a range slice with end adjusted to
+ * the aggregate.
+ */
+static PMC*
+parrot_py_make_slice(Interp *interpreter, PMC *self, PMC *key)
 {
-    INTVAL i, n, type;
     parrot_range_t *range;
-    PMC *res, *slice, *item;
-    INTVAL start, end, iitem;
-
-    type = self->vtable->base_type;
+    PMC *slice;
+    INTVAL start, end, n;
     /*
      * key is a keychain PMC
      */
     slice = pmc_new_init(interpreter, enum_class_Slice, key);
     range = PMC_struct_val(slice);
-    /*
-     * fprintf(stderr, "range %d - %d\n", RVal_int(range->start),
-     *    RVal_int(range->end));
-     */
-    res = pmc_new(interpreter, type);
     start = RVal_int(range->start);
-    /*
-     * set_slice_start did already decrement it
-     */
     if ((PObj_get_FLAGS(key) &
                         (KEY_inf_slice_FLAG|KEY_start_slice_FLAG)) ==
                     (KEY_inf_slice_FLAG|KEY_start_slice_FLAG)) {
         /* last range "start .." */
         RVal_int(range->end) = VTABLE_elements(interpreter, self) - 1;
     }
+    /*
+     * set_slice_start did already decrement it
+     */
     end = RVal_int(range->end) + 1;
     n = VTABLE_elements(interpreter, self);
-    if (!n) {
-        /* slice of empty is empty
-         */
-        return res;
-    }
     if (start < 0)
         start += n;
     if (end < 0)
@@ -757,6 +747,92 @@ Parrot_py_get_slice(Interp *interpreter, PMC *self, PMC *key)
         end = start;
     else if (end > n)
         end = n;
+    RVal_int(range->start) = start;
+    RVal_int(range->end)   = end;
+    return slice;
+}
+
+PMC*
+Parrot_py_set_slice(Interp *interpreter, PMC *self, PMC *key, PMC *src)
+{
+    INTVAL i, type;
+    parrot_range_t *range;
+    PMC *res, *slice, *item;
+    INTVAL start, end, iitem;
+    INTVAL j, count, value_length;
+
+    slice = parrot_py_make_slice(interpreter, self, key);
+    range = PMC_struct_val(slice);
+
+    type = self->vtable->base_type;
+    /*
+     * fprintf(stderr, "range %d - %d\n", RVal_int(range->start),
+     *    RVal_int(range->end));
+     */
+    res = pmc_new(interpreter, type);
+    start = RVal_int(range->start);
+    end = RVal_int(range->end);
+
+    count = end - start;
+    if (PMC_IS_NULL(src) || src->vtable->base_type == enum_class_None)
+        value_length = 0;
+    else
+        value_length = VTABLE_elements(interpreter, src);
+    /* replace count items at offset with values */
+    for (i = j = 0; i < count && j < value_length; i++, j++) {
+        item = VTABLE_get_pmc_keyed_int(interpreter, src, j);
+        VTABLE_set_pmc_keyed_int(interpreter, self, start + i, item);
+    }
+    /* if we still have values in value_list, insert them */
+    if (j < value_length) {
+        /* make room for the remaining values */
+        PMC **data;
+        INTVAL n = VTABLE_elements(interpreter, self);
+        INTVAL diff = value_length - j;
+        INTVAL st = start + i;
+        /* need value_length -j more room in data */
+        VTABLE_set_integer_native(interpreter, self, n + diff);
+        data = PMC_data(self);
+        mem_sys_memmove(data + st + diff, data + st,
+                (n - st) * sizeof(PMC*));
+        for (; j < value_length; i++, j++) {
+            item = VTABLE_get_pmc_keyed_int(interpreter, src, j);
+            VTABLE_set_pmc_keyed_int(interpreter, self, start + i, item);
+        }
+    }
+    else {
+        /* delete count -i values at start + i */
+        PMC **data = PMC_data(self);
+        INTVAL n = VTABLE_elements(interpreter, self);
+        INTVAL diff = count - i;
+        INTVAL st = start + i;
+        mem_sys_memmove(data + st, data + st + diff,
+                (n - st - diff) * sizeof(PMC*));
+        VTABLE_set_integer_native(interpreter, self, n - diff);
+    }
+
+    return self;
+}
+
+PMC*
+Parrot_py_get_slice(Interp *interpreter, PMC *self, PMC *key)
+{
+    INTVAL i, type;
+    parrot_range_t *range;
+    PMC *res, *slice, *item;
+    INTVAL start, end, iitem;
+
+    slice = parrot_py_make_slice(interpreter, self, key);
+    range = PMC_struct_val(slice);
+
+    type = self->vtable->base_type;
+    /*
+     * fprintf(stderr, "range %d - %d\n", RVal_int(range->start),
+     *    RVal_int(range->end));
+     */
+    res = pmc_new(interpreter, type);
+    start = RVal_int(range->start);
+    end = RVal_int(range->end);
     for (i = start; i < end; ++i) {
         switch (type) {
             case enum_class_Array:

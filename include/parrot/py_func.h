@@ -17,6 +17,7 @@ void Parrot_py_fill(Interp *interpreter, PMC *arr, PMC *seq);
 void Parrot_py_fill_dict(Interp *interpreter, PMC *dict, PMC *seq);
 void Parrot_py_init(Interp *interpreter);
 PMC* Parrot_py_get_slice(Interp*, PMC*, PMC* key);
+PMC* Parrot_py_set_slice(Interp*, PMC*, PMC* key, PMC* src);
 
 #endif   /* PARROT_PY_FUNC_H_GUARD */
 
