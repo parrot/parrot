@@ -359,7 +359,7 @@ PDB_init(struct Parrot_Interp *interpreter, const char *command)
         while (command[i] && !isspace(command[i])) {
             c[i] = command[i];
             i++;
-	}
+    }
         c[i] = '\0';
         na(command);
 
@@ -1372,10 +1372,10 @@ PDB_print_pmc(struct Parrot_Interp *interpreter, struct PReg *pmc_reg,
     for (i = j; i < k; i++) {
         fprintf(stderr,"%2i =",i);
         if (pmc_reg->registers[i] && pmc_reg->registers[i]->vtable) {
-			s = (pmc_reg->registers[i]->vtable->name(interpreter, pmc_reg->registers[i]));
-			if (s) {
-				fprintf(stderr, " [%s]\n", string_to_cstring(interpreter, (s)));
-			}
+            s = (pmc_reg->registers[i]->vtable->name(interpreter, pmc_reg->registers[i]));
+            if (s) {
+                fprintf(stderr, " [%s]\n", string_to_cstring(interpreter, (s)));
+            }
             s = (pmc_reg->registers[i]->vtable->get_string(
                  interpreter, pmc_reg->registers[i]));
 
@@ -1383,7 +1383,7 @@ PDB_print_pmc(struct Parrot_Interp *interpreter, struct PReg *pmc_reg,
                 fprintf(stderr,"%s\n", string_to_cstring(interpreter, (s)));
             }
         } else {
-			fprintf(stderr, "\n");
+            fprintf(stderr, "\n");
         }
     }
 }
