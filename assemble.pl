@@ -1,38 +1,42 @@
 #! /usr/bin/perl -w
 #
 # assemble.pl - take a parrot assembly file and spit out a bytecode file
+#   This is based heavily on assemble.pl by Dan Sugalski
+# Brian Wheeler (bdwheele@indiana.edu)
 
 use strict;
 
-my(%opcodes, %labels);
-my ($output, $opt_c);
+my $opt_c;
 if (@ARGV and $ARGV[0] eq "-c") {
     shift @ARGV;
     $opt_c = 1;
 }
 
-my %pack_type;
-%pack_type = (i => 'l',
-	      n => 'd',
-	  );
 
-my %real_type=('i'=>'l',
-              'n'=>'d',
-              'N'=>'l',
-              'I'=>'l',
-              'S'=>'l',
-              's'=>'l',
-              'D'=>'l');
+# define data types
+my(%pack_type)=('i'=>'l','n'=>'d');
+my(%real_type)=('I'=>'i','i'=>'i',
+                'N'=>'i','n'=>'n',
+                'S'=>'i','s'=>'i',
+                'D'=>'i');
 
-my $sizeof_packi = length(pack($pack_type{i},1024));
+# compute sizes
+my(%sizeof);
+foreach (keys(%real_type)) {
+    $sizeof{$_}=length(pack($pack_type{$real_type{$_}},0));
+}
+                
 
+# get opcodes from guts.
 open GUTS, "interp_guts.h";
-my $opcode;
+my %opcodes;
 while (<GUTS>) {
-    next unless /\tx\[(\d+)\] = ([a-z0-9_]+);/;
+    next unless /\tx\[(\d+)\] = ([a-z_]+);/;
     $opcodes{$2}{CODE} = $1;
 }
+close GUTS;
 
+# get opcodes and their arg lists
 open OPCODES, "<opcode_table" or die "Can't get opcode table, $!/$^E";
 while (<OPCODES>) {
     next if /^\s*#/;
@@ -46,110 +50,174 @@ while (<OPCODES>) {
     $opcodes{$name}{TYPES} = [@types];
     $opcodes{$name}{RTYPES}=[@rtypes];
 }
+close OPCODES;
 
-my $pc = 0;
-my @code;
-my %constants;
-my @constants;
 
-# First scan for labels and strings
-while (<>) {
-    next if /^\s?#/;
-    s/^\s*//;
-    if (s/^\s*([a-zA-Z_]\w+):\s*//) { $labels{$1} = $pc; }
-    1 while s/\"([^\\\"]*(?:\\.[^\\\"]*)*)\"/constantize($1)/eg;
-    my ($opcode, @args) = split /\s+/, $_;
-    push @code, $_;
-    $pc += 1+@args;
-}
-
-emit_magic();
-emit_fixup_section();
-emit_constants_section();
-
-# Now assemble
-$pc = 0;
-my $line = 0;
-foreach (@code) {
+# read source and assemble
+my $pc=0; my $op_pc=0;
+my ($bytecode,%label,%fixup,%constants,@constants);
+my $line=0;
+while(<>) {
     $line++;
     chomp;
-    next if(m/^\s*$/); # blank lines
-    s/,/ /g;
-    
-    my ($opcode, @args) = split /\s+/, $_;
+    s/^\s*//;
+    s/\s*$//;
+    next if(/^\#/ || $_ eq "");
+    if(m/^((\S+):)?\s*(.+)?/) {
+        my($label,$code)=($2,$3);
+        if(defined($label) && $label ne "") {
+            if(exists($label{$label})) {
+                error("'$label' already defined!");
+            }
+            if(exists($fixup{$label})) {
+                # backpatch everything with this PC.
+                while(scalar(@{$fixup{$label}})) {
+                    my $op_pc=shift(@{$fixup{$label}});
+                    my $offset=shift(@{$fixup{$label}});
+                    substr($bytecode,$offset,4)=pack('l',($pc-$op_pc)/4);
+                }
+                delete($fixup{$label});  
+            }
+            $label{$label}=$pc; # store it.
+        }
+        next if(!defined($code));
+        1 while $code=~s/\"([^\\\"]*(?:\\.[^\\\"]*)*)\"/constantize($1)/eg;
+        $code=~s/,/ /g;
+        my($opcode,@args)=split(/\s+/,$code);
+	$opcode=lc($opcode);
+        if (!exists $opcodes{$opcode}) {
+	    # try to determine _real_ opcode.
+	    my @arg_t=();
+	    foreach (@args) {
+		if(m/^([INPS])\d+$/) {
+		    # a register.
+		    push @arg_t,lc($1);
+		} elsif(m/^\d+$/) {
+		    # a constant of some sort
+		    push @arg_t,'(ic|nc|sc)';
+		} else {
+		    # a label
+		    push @arg_t,'ic';
+		}
+	    }
+	    my $test;
+	    my($first,$last)=($arg_t[0],$arg_t[-1]);
+	    if($first ne $last) {
+		$test="$opcode\_$first\_$last";
+	    } else {
+		$test="$opcode\_$first";
+	    }
+	    my($found_op)=0;
+	    foreach my $op (grep($_=~/^$opcode/,keys(%opcodes))) {
+		if($op=~/$test/) {
+		    $opcode=$op;
+		    $found_op=1;
+		    last;
+		}
+	    }
+            error("No opcode $opcode in <$_>") if(!$found_op);
+        }
+        if (@args != $opcodes{$opcode}{ARGS}) {
+            error("Wrong arg count--got ".scalar(@args)." needed
+".$opcodes{$opcode}{ARGS});
+        }
+        $bytecode .= pack "l", $opcodes{$opcode}{CODE};
+        $op_pc=$pc;
+        $pc+=4;
 
-    if (!exists $opcodes{lc $opcode}) {
-	die "No opcode $opcode at line $line:\n  <$_>\n";
+        foreach (0..$#args) {
+            my($rtype)=$opcodes{$opcode}{RTYPES}[$_];
+            my($type)=$opcodes{$opcode}{TYPES}[$_];
+            if($rtype eq "I" || $rtype eq "N" || $rtype eq "P" || $rtype eq
+"S") {
+                # its a register argument
+                $args[$_]=~s/^[INPS](\d+)$/$1/i;
+                $pc+=$sizeof{$rtype}
+            } elsif($rtype eq "D") {
+                # a destination
+                if(!exists($label{$args[$_]})) {
+                    # we have not seen it yet...put it on the fixup list
+                    push(@{$fixup{$args[$_]}},$op_pc,$pc);
+                    $args[$_]=0xffffffff;
+                } else {                    
+                    $args[$_]=($label{$args[$_]}-$op_pc)/4;
+                }
+                $pc+=$sizeof{$rtype};
+            } else {
+                $args[$_]=oct($args[$_]) if($args[$_]=~/^0/);
+                $pc+=$sizeof{$rtype};           
+            }
+            $bytecode .= pack $type, $args[$_];
+        }
     }
-    if (@args != $opcodes{$opcode}{ARGS}) {
-	die "wrong arg count--got ". scalar @args. " needed " . $opcodes{$opcode}{ARGS};
+}
+
+my $output;
+
+# build file in memory
+
+# MAGIC COOKIE
+$output=pack($pack_type{i},0x13155a1);
+
+
+# FIXUP
+if(keys(%fixup)) {
+    print STDERR "SQUAWK!  These symbols were referenced but not
+defined:\n";
+    foreach (sort(keys(%fixup))) {
+        print STDERR "\t$_ at pc: ";
+        foreach my $pc (@{$fixup{$_}}) {
+            print STDERR sprintf("%08x ",$pc);
+        }
+        print STDERR "\n";
     }
-    $output .= pack "l", $opcodes{$opcode}{CODE};
-    foreach (0..$#args) {
-       my($rtype)=$opcodes{$opcode}{RTYPES}[$_];
-       my($type)=$opcodes{$opcode}{TYPES}[$_];
-       if($rtype eq "I" || $rtype eq "N" || $rtype eq "P" || $rtype eq "S") {
-           # its a register argument
-           $args[$_]=~s/^[INPS](\d+)$/$1/i;
-       } elsif($rtype eq "D") {
-           # a destination
-           $args[$_]=fixup($args[$_]);
-       } else {
-	   $args[$_]=oct($args[$_]) if($args[$_]=~/^0/);
+    exit;
+} else {
+    # dump empty header
+    $output.=pack($pack_type{i},0);
+}
+
+# CONSTANTS
+if(@constants) {
+    my($const);
+    # Then spit out how many constants there are, so we can allocate
+    $const .= pack($pack_type{i}, scalar @constants);
+
+    # Now emit each constant
+    for (@constants) {
+        $const .= pack($pack_type{i},0) x 3; # Flags, encoding, type
+        $const .= pack($pack_type{i},length($_)); # Strlen followed by that many bytes.
+        $const .= $_;
+        my $pad=(length($_) % $sizeof{i});
+        if($pad) {
+            $const .= "\0" x ($sizeof{i}-(length($_) % $sizeof{i})); # Padding;
        }
-       $output .= pack $type, $args[$_];
     }
-    $pc += 1+@args;
+
+    $output.=pack($pack_type{i},length($const));
+    $output.=$const;
+} else {
+    # no constants, dump empty header.
+    $output.=pack($pack_type{i},0);
 }
 
-print $output unless (defined $opt_c and $opt_c);
+## BYTECODE
+$output.=$bytecode;
 
-sub fixup {
-    my $l = shift;
-    die "Unknown label $l" unless exists $labels{$l};
-    return $labels{$l} - $pc;
+if(!$opt_c) {
+    print $output;
 }
+
+sub error {
+    my($message)=@_;
+    print STDERR "Error ($line): $message\n";
+    exit;
+}
+
 
 sub constantize {
     my $s = shift;
     return $constants{$s} if exists $constants{$s};
     push @constants, $s;
     return $constants{$s} = $#constants;
-}
-
-sub emit_magic { $output .= pack($pack_type{i}, 0x13155a1) }
-
-# Dummy for now.
-sub emit_fixup_section { $output .= pack($pack_type{i}, 0) }
-
-sub emit_constants_section {
-    # First, compute how big it's going to be.
-    # The fields we'll need to fill in are: strlen, flags, encoding, type
-    my $size =0 ;
-    for (@constants) {
-        $size += 4*$sizeof_packi;
-        $size += length($_);
-	my($pad)=length($_) % $sizeof_packi;
-	if($pad) {
-	    $size+=$sizeof_packi-$pad;
-	}
-    }
-
-    $size += $sizeof_packi if @constants; # That's for the number of constants
-    $output .= pack($pack_type{i}, $size);
-    return unless @constants; # Zero means end of segment.
-
-    # Then spit out how many constants there are, so we can allocate
-    $output .= pack($pack_type{i}, scalar @constants);
-
-    # Now emit each constant
-    for (@constants) {
-        $output .= pack($pack_type{i},0) x 3; # Flags, encoding, type
-        $output .= pack($pack_type{i},length($_)); # Strlen followed by that many bytes.
-        $output .= $_;
-	my $pad=(length($_) % $sizeof_packi);
-	if($pad) {
-	    $output .= "\0" x ($sizeof_packi-(length($_) % $sizeof_packi)); # Padding;
-       }
-    }
 }
