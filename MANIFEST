@@ -326,9 +326,6 @@ languages/imcc/examples/sample.imc
 languages/imcc/examples/test_spilling.imc
 languages/imcc/imc.c
 languages/imcc/imc.h
-languages/imcc/imcparser.c
-languages/imcc/imcparser.h
-languages/imcc/imclexer.c
 languages/imcc/imcc.l
 languages/imcc/imcc.y
 languages/imcc/instructions.c
