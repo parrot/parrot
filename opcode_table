@@ -33,6 +33,12 @@
 27	dec_n	1	i
 28	dec_n_nc	2	i n
 
+# String ops
+
+31	set_s_sc	2	i i
+33	length_s_i	2	i i
+34	chopn_s_ic	2	i i
+
 # Comparators
 
 2	eq_i_ic	4	i i i i
@@ -57,3 +63,4 @@
 4	print_i	1	i
 22	time_n	1	i
 23	print_n	1	i
+32	print_s	1	i

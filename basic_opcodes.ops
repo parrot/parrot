@@ -188,3 +188,24 @@ AUTO_OP ntoi_i_n {
   number = NUM_REG(P2);
   INT_REG(P1) = number;
 }
+
+// SET Sx, CONSTANT
+AUTO_OP set_s_sc {
+  STR_REG(P1) = Parrot_string_constants[P2];
+}
+
+// PRINT Sx
+AUTO_OP print_s {
+  STRING *s = STR_REG(P1); 
+   printf("S reg %i is %.*s\n", P1, string_length(s), s->bufstart);
+}
+
+// LEN Ix, Sx
+AUTO_OP length_s_i {
+  INT_REG(P1) = string_length(STR_REG(P2));
+}
+
+// CHOPN Sx, CONSTANT
+AUTO_OP chopn_s_ic {
+   string_chopn(STR_REG(P1), P2);
+}
