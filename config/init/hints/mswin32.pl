@@ -37,6 +37,9 @@
 			slash      => '\\',
 			ccflags    => $ccflags
 		);
+		# 'link' needs to be link.exe, not cl.exe.
+		# This makes 'link' and 'ld' the same.
+		Configure::Data->set('link', Configure::Data->get('ld'));
 	    }
 	if( $is_bcc ) {
 		Configure::Data->set(
