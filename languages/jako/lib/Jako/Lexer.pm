@@ -215,14 +215,14 @@ sub scan_line
     # Ops:
     #
 
-    if ($text =~ m{^( \|= | &= | <<= )(.*)$}x) {
+    if ($text =~ m{^( \|= | &= | <<= | >>= )(.*)$}x) {
       push @tokens, Jako::Lexer::Token->new(
         $file, $line, 'bit-assign', undef, $1);
       $text = $2;
       next;
     }
 
-    if ($text =~ m{^( \| | & | << )(.*)$}x) {
+    if ($text =~ m{^( \| | & | << | >> )(.*)$}x) {
       push @tokens, Jako::Lexer::Token->new(
         $file, $line, 'infix-bit', undef, $1);
       $text = $2;

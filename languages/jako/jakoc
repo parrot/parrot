@@ -382,7 +382,8 @@ sub emit_code
   # Print out all but the last label, each on a line by itself:
   #
 
-  my $label = pop @label_stack if @label_stack;
+#  my $label = pop @label_stack if @label_stack;
+  my $label = undef;
 
   foreach my $label (@label_stack) {
     print "$label:\n";
@@ -982,11 +983,23 @@ sub declare_var
   # Push the source comment about the variable declaration.
   #
 
-  push_source "var $type_name{$type} $name;";
-
   my $imcc_type = $imcc_type_name{$type};
 
-  emit_code(".local", [ "$imcc_type $name" ]);
+  if ($access eq 'arg') {
+    push_comment "(argument " . $name . ")";
+    emit_code '.param', [ "$imcc_type $name" ];
+  }
+  elsif ($access eq 'const') {
+    push_source "const $type_name{$type} $name = ...";
+    emit_code(".local", [ "$imcc_type $name" ]); # TODO: A better IMCC way?
+  }
+  elsif ($access eq 'var') {
+    push_source "var $type_name{$type} $name;";
+    emit_code(".local", [ "$imcc_type $name" ]);
+  }
+  else {
+    INTERNAL_ERROR("Unrecognized access '$access' for identifier '$name'");
+  }
 
   return 1;
 }
@@ -1431,8 +1444,6 @@ sub begin_cond_block
 {
   my ($block, $prefix, $type, $left, $op, $right) = @_;
 
-  DEBUG(0, "Begining cond block '%s'...", $prefix || '');
-
 #  my $next   = $block_types{$type}{NEXT};
 #  my $redo   = $block_types{$type}{REDO};
 #  my $last   = $block_types{$type}{LAST};
@@ -1543,33 +1554,6 @@ sub begin_sub_block
 
     declare_var($arg_name, uc substr($arg_type, 0, 1), 'arg');
   }
-
-  #
-  # Generate code to load the arguments into their registers:
-  #
-  # First, we pop the argument count off the top of the stack, then we pop the
-  # arguments off the stack.
-  #
-  # NOTE: We restore them in their order of declaration, which means they must
-  # be saved in reverse order. This will come in handy later for being able to
-  # handle variable numbers of arguments, since we'll be able to restore an
-  # arg count before having to restore the variable args themselves.
-  #
-  # TODO: Should we bother checking that argc is what we expected?
-  #
-
-  foreach my $formal_arg (@formal_args) {
-    my ($arg_type, $arg_name) = @$formal_arg;
-
-    my $ident_info = find_ident($arg_name);
-    $ident_info = $ident_info->{IDENT};
-
-    push_comment "(argument " . $arg_name . ")";
-
-    my $param_type = $imcc_type_name{$arg_type};
-
-    emit_code '.param', [ "$param_type $arg_name" ];
-  }
 }
 
 
@@ -1596,7 +1580,7 @@ sub begin_block
   $block_count++;
 
   if (defined $prefix) {
-    if ($block_names{$prefix}) {
+    if ($block_names{$prefix} and $kind ne 'sub') {
       SYNTAX_ERROR("Loop named '%s' already defined at line %d (previously defined at line %d)!",
         $prefix, $line, $block_names{$prefix});
     }
@@ -1620,7 +1604,7 @@ sub begin_block
 
   push_block($block);
 
-  emit_code(".namespace", [ (uc $block->kind) . "_BLOCK" ]);
+  emit_code(".namespace", [ $kind eq 'sub' ? "_$prefix" : $prefix ]);
 
   if ($kind eq 'if') {
     begin_cond_block($block, $prefix, $kind, $left, $op, $right);
@@ -1643,8 +1627,6 @@ sub begin_block
 sub end_block
 {
   my ($continue) = @_;
-
-  DEBUG(0, "Ending block with continue '%s'") if $continue;
 
   #
   # If we are not currently 'inside' a block, then we've got no business
@@ -1715,7 +1697,7 @@ sub end_block
       if (defined $block->else) {
         SYNTAX_ERROR("No more than one else block allowed.");
       } else {
-        $block->else = $line;
+        $block->else($line);
       }
 
       emit_code("branch", [ "${prefix}_LAST" ]); # Jump over the 'else'.
@@ -1781,7 +1763,11 @@ sub end_block
   #
 
   if (defined $block) {
-    emit_code(".endnamespace", [ (uc $block->kind) . "_BLOCK" ]);
+    emit_code(".endnamespace", [ $block->kind eq 'sub' ? "_$prefix" : $prefix ]);
+ 
+    if ($continue) { # Reopen the namespace for 'else'
+      emit_code(".namespace", [ $block->kind eq 'sub' ? "_$prefix" : $prefix ]);
+    }
   }
 }
 
@@ -2412,7 +2398,6 @@ while(1) {
   #
 
   if ($token->is_label) {
-    DEBUG(0, "Pushing label %s", $token->text);
     push_label($token->text);
     next;
   }
@@ -2618,7 +2603,7 @@ while(1) {
 
   if ($token->is_ident and $lexer->get(1)->is_bit_assign) {
     my $ident = $token->text;
-    my $op    = substr($lexer->forth->text, 0, 1);
+    my $op    = $lexer->forth->text;
     my $value = $lexer->forth->text;
 
     $lexer->require_semicolon;
@@ -2834,7 +2819,8 @@ while(1) {
   #
 
   if ($token->is_return) {
-    my $value = $lexer->skip_value->text;
+    my $value_token = $lexer->skip_value;
+    my $value = $value_token->text if defined $value_token;
 
     $lexer->require_semicolon;
 
@@ -2933,6 +2919,45 @@ while(1) {
     next;
   }
 
+  #
+  # Conditionals Blocks:
+  #
+  #   if     (<value> <op> <value>) {
+  #   unless (<value> <op> <value>) {
+  #
+
+  if ($token->is_if or $token->is_unless) {
+    my $kind = $token->text;
+
+    $lexer->require_open_paren;
+
+    my $left  = $lexer->require_value->text;
+    my $op    = $lexer->require_infix_rel->text;
+    my $right = $lexer->require_value->text;
+
+    $lexer->require_close_paren;
+    $lexer->require_open_brace;
+
+    begin_block(undef, $kind, [$left, $op, $right]);
+    next;
+  }
+
+  #
+  # Conditional Continuations:
+  #
+  #   } elsif (<value> <op> <value>) {
+  #
+
+=no
+
+  if (m/^}\s*(elsif)\s*\(\s*(.*)\s*\)\s*{$/) {
+    begin_block(undef, $1, $2);
+    # TODO
+    next;
+  }
+
+=cut
+
 
 
 
@@ -2953,26 +2978,6 @@ while(1) {
 
   if (m/^([A-Za-z][A-Za-z0-9_]*)\s*=\s*new\s+([A-Za-z][A-Za-z0-9_]*)$/) {
     new_obj($1, $2);
-    next;
-  }
-
-  #
-  # Conditionals:
-  #
-  #   if     (...) {
-  #   unless (...) {
-  #
-  # } elsif  (...) {
-  #
-
-  if (m/^(if|unless)\s*\(\s*(.*)\s*\)\s*{$/) {
-    begin_block(undef, $1, $2);
-    next;
-  }
-
-  if (m/^}\s*(elsif)\s*\(\s*(.*)\s*\)\s*{$/) {
-    begin_block(undef, $1, $2);
-    # TODO
     next;
   }
 
