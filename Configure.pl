@@ -50,13 +50,14 @@ General Options:
    --nomanicheck        Don't check the MANIFEST
    --maintainer         Use this option if you are hacking Parrot.
                         This needs working lex/flex/yacc/bison programs.
+   --verbose            Output extra information
 
 Parrot Configuration Options:
    --ask                Have Configure ask for commonly-changed info
                         you can remove parts of a line with :rem{<opt>}
                         and add options with :add{<opt>} e.g.
                         :rem{-g} :add{-O2}
-   --debugging = 0      Disable debugging, default = 1
+   --debugging=0        Disable debugging, default = 1
    --optimize           Optimized compile
    --cc=(compiler)      Use the given compiler
    --ld=(linker)        Use the given linker
