@@ -782,10 +782,10 @@ pcc_emit_flatten(Parrot_Interp interpreter, IMC_Unit * unit, Instruction *ins,
     regs[1] = ic16 = mk_const(str_dup("16"), 'I');
     regs[2] = over1;
     ins = insINS(interpreter, unit, ins, "eq", regs, 3);
-    regs[0] = i3;
-    regs[1] = ic16;
+    regs[0] = ic16;
+    regs[1] = i3;
     regs[2] = over;
-    ins = insINS(interpreter, unit, ins, "gt", regs, 3);
+    ins = insINS(interpreter, unit, ins, "lt", regs, 3);
     regs[0] = i3;
     regs[1] = py;
     ins = insINS(interpreter, unit, ins, "setp_ind", regs, 2);

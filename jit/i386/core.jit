@@ -974,22 +974,6 @@ Parrot_ne_n_nc_ic {
     Parrot_cmp_x_xc_ic s/<_N>/_n/ s/<je>/emitm_jne/ s/<t>/NUM/ s/<c>/&NUM/ s/ISR/FSR/
 }
 
-Parrot_gt_i_ic_ic {
-    Parrot_cmp_x_xc_ic s/<_N>/_i/ s/<je>/emitm_jg/ s/<c>/*INT/ s/<t>/INT/
-}
-
-Parrot_gt_n_nc_ic {
-    Parrot_cmp_x_xc_ic s/<_N>/_n/ s/<je>/emitm_ja/ s/<t>/NUM/ s/<c>/&NUM/ s/ISR/FSR/
-}
-
-Parrot_ge_i_ic_ic {
-    Parrot_cmp_x_xc_ic s/<_N>/_i/ s/<je>/emitm_jnl/ s/<c>/*INT/ s/<t>/INT/
-}
-
-Parrot_ge_n_nc_ic {
-    Parrot_cmp_x_xc_ic s/<_N>/_n/ s/<je>/emitm_jnb/ s/<t>/NUM/ s/<c>/&NUM/ s/ISR/FSR/
-}
-
 Parrot_lt_i_ic_ic {
     Parrot_cmp_x_xc_ic s/<_N>/_i/ s/<je>/emitm_jl/ s/<c>/*INT/ s/<t>/INT/
 }
@@ -1031,22 +1015,6 @@ Parrot_ne_ic_i_ic {
 
 Parrot_ne_nc_n_ic {
     Parrot_cmp_xc_x_ic s/<_N>/_n/ s/<je>/emitm_jne/ s/<c>/&NUM/ s/ISR/FSR/ s/<t>/NUM/
-}
-
-Parrot_gt_ic_i_ic {
-    Parrot_cmp_xc_x_ic s/<_N>/_i/ s/<je>/emitm_jg/ s/<c>/*INT/ s/<t>/INT/
-}
-
-Parrot_gt_nc_n_ic {
-    Parrot_cmp_xc_x_ic s/<_N>/_n/ s/<je>/emitm_ja/ s/<c>/&NUM/ s/ISR/FSR/ s/<t>/NUM/
-}
-
-Parrot_ge_ic_i_ic {
-    Parrot_cmp_xc_x_ic s/<_N>/_i/ s/<je>/emitm_jnl/ s/<c>/*INT/ s/<t>/INT/
-}
-
-Parrot_ge_nc_n_ic {
-    Parrot_cmp_xc_x_ic s/<_N>/_n/ s/<je>/emitm_jnb/ s/<c>/&NUM/ s/ISR/FSR/ s/<t>/NUM/
 }
 
 Parrot_lt_ic_i_ic {
@@ -1096,22 +1064,6 @@ Parrot_ne_i_i_ic {
 
 Parrot_ne_n_n_ic {
     Parrot_cmp_x_x_ic s/<_N>/_n/ s/<je>/emitm_jne/ s/<typ>/NUM/ s/ISR/FSR/
-}
-
-Parrot_gt_i_i_ic {
-    Parrot_cmp_x_x_ic s/<_N>/_i/ s/<je>/emitm_jg/ s/<typ>/INT/
-}
-
-Parrot_gt_n_n_ic {
-    Parrot_cmp_x_x_ic s/<_N>/_n/ s/<je>/emitm_ja/ s/<typ>/NUM/ s/ISR/FSR/
-}
-
-Parrot_ge_i_i_ic {
-    Parrot_cmp_x_x_ic s/<_N>/_i/ s/<je>/emitm_jnl/ s/<typ>/INT/
-}
-
-Parrot_ge_n_n_ic {
-    Parrot_cmp_x_x_ic s/<_N>/_n/ s/<je>/emitm_jnb/ s/<typ>/NUM/ s/ISR/FSR/
 }
 
 Parrot_lt_i_i_ic {
@@ -1254,30 +1206,6 @@ Parrot_lt_s_sc_ic {
 
 Parrot_lt_sc_s_ic {
     Parrot_cmp_sx_sx_ic s/<typ1>/c/ s/<typ2>/r/ s/<op>/emitm_jl/
-}
-
-Parrot_ge_s_s_ic {
-    Parrot_cmp_sx_sx_ic s/<typ1>/r/ s/<typ2>/r/ s/<op>/emitm_jnl/
-}
-
-Parrot_ge_s_sc_ic {
-    Parrot_cmp_sx_sx_ic s/<typ1>/r/ s/<typ2>/c/ s/<op>/emitm_jnl/
-}
-
-Parrot_ge_sc_s_ic {
-    Parrot_cmp_sx_sx_ic s/<typ1>/c/ s/<typ2>/r/ s/<op>/emitm_jnl/
-}
-
-Parrot_gt_s_s_ic {
-    Parrot_cmp_sx_sx_ic s/<typ1>/r/ s/<typ2>/r/ s/<op>/emitm_jg/
-}
-
-Parrot_gt_s_sc_ic {
-    Parrot_cmp_sx_sx_ic s/<typ1>/r/ s/<typ2>/c/ s/<op>/emitm_jg/
-}
-
-Parrot_gt_sc_s_ic {
-    Parrot_cmp_sx_sx_ic s/<typ1>/c/ s/<typ2>/r/ s/<op>/emitm_jg/
 }
 
 
