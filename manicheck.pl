@@ -27,7 +27,7 @@ foreach my $dir (@ignore_dirs) {
   open CVSIGNORE, "<$cvsignore" or die "Could not open $cvsignore.\n";
   my @patterns = <CVSIGNORE>;
   close CVSIGNORE;
-  @patterns = map { chomp; s/\*/.*/g; $_; } @patterns;
+  @patterns = map { chomp; s/\*/.*/g; "^$_\$"; } @patterns;
 
   $ignore_dirs{$dir} = [ @patterns, @base_patterns ];
 }
