@@ -81,11 +81,10 @@ struct Buffer_Arena {
 /* Tracked resource pool */
 struct Resource_Pool {
     void *last_Arena;
-    Buffer *free_pool_buffer;
+    void *free_list;
     size_t unit_size;     /* size in bytes of an individual pool item */
     size_t units_per_alloc; 
     size_t free_entries;    /* number of resources in the free pool */
-    size_t free_pool_size;  /* total number of slots in the free pool */
     size_t replenish_level; /* minimum free entries before replenishing */
     void (*replenish)(struct Parrot_Interp *, struct Resource_Pool *);
     struct Memory_Pool *mem_pool;

@@ -41,28 +41,15 @@ static void *alloc_new_block(struct Parrot_Interp *, size_t,
 
 /* Create a new tracked resource pool */
 static struct Resource_Pool *
-new_resource_pool(struct Parrot_Interp *interpreter, size_t free_pool_size,
+new_resource_pool(struct Parrot_Interp *interpreter,
                   size_t unit_size, size_t units_per_alloc,
              void (*replenish)(struct Parrot_Interp *, struct Resource_Pool *),
                   struct Memory_Pool *mem_pool)
 {
     struct Resource_Pool *pool;
-    size_t temp_len;
 
     pool = mem_sys_allocate(sizeof(struct Resource_Pool));
-    temp_len = free_pool_size * sizeof(void *);
-    if (interpreter->arena_base->buffer_header_pool) {
-        pool->free_pool_buffer = new_buffer_header(interpreter);
-    }
-    else {
-        pool->free_pool_buffer = mem_sys_allocate(sizeof(Buffer));
-    }
-    pool->free_pool_buffer->bufstart = 
-        mem_allocate(interpreter, &temp_len, 
-                     interpreter->arena_base->memory_pool);
-    pool->free_pool_buffer->buflen = temp_len;
-    pool->free_pool_buffer->flags = BUFFER_immune_FLAG;
-    pool->free_pool_size = temp_len / sizeof(void *);
+    pool->free_list = NULL;
     pool->free_entries = 0;
     pool->unit_size = unit_size;
     pool->units_per_alloc = units_per_alloc;
@@ -72,28 +59,6 @@ new_resource_pool(struct Parrot_Interp *interpreter, size_t free_pool_size,
     return pool;
 }
 
-/* Expand free pool to accomdate at least n additional entries 
- * Currently, the minimum expansion is 20% of the current size
-*/
-static void
-expand_free_pool(struct Parrot_Interp *interpreter,
-                 struct Resource_Pool *pool, size_t n)
-{
-    size_t growth;
-
-    if (pool->free_pool_size - pool->free_entries < n) {
-        growth = (n - (pool->free_pool_size - pool->free_entries)) * 
-                 sizeof(void *);
-        if (growth < pool->free_pool_buffer->buflen / 5) {
-            growth = pool->free_pool_buffer->buflen / 5;
-        }
-        Parrot_reallocate(interpreter, pool->free_pool_buffer, 
-                          pool->free_pool_buffer->buflen + growth);
-        pool->free_pool_size += (growth / sizeof(void *));
-    }
-}
-
-
 /* Add entry to free pool 
  * Requires that any object-specific processing (eg flag setting, statistics) 
  * has already been done by the caller 
@@ -102,20 +67,8 @@ static void
 add_to_free_pool(struct Parrot_Interp *interpreter,
                  struct Resource_Pool *pool, void *to_add)
 {
-    void **temp_ptr;
-
-    if (pool->free_pool_size == pool->free_entries) {
-        expand_free_pool(interpreter, pool, 1);
-    }
-
-#ifdef GC_DEBUG
-    Parrot_go_collect(interpreter);
-#endif
-
-    /* Okay, so there's space. Add the header on */
-    temp_ptr = pool->free_pool_buffer->bufstart;
-    temp_ptr += pool->free_entries;
-    *temp_ptr = to_add;
+    *(void **)to_add = pool->free_list;
+    pool->free_list = to_add;
     pool->free_entries++;
 }
 
@@ -127,7 +80,7 @@ static void *
 get_from_free_pool(struct Parrot_Interp *interpreter,
                    struct Resource_Pool *pool)
 {
-    void ** ptr;
+    void * ptr;
 
     if (!pool->free_entries) {
         Parrot_do_dod_run(interpreter);
@@ -140,9 +93,10 @@ get_from_free_pool(struct Parrot_Interp *interpreter,
         return NULL;
     }
 
-    ptr = pool->free_pool_buffer->bufstart;
-    ptr += --pool->free_entries;
-    return *ptr;
+    ptr = pool->free_list;
+    pool->free_list = *(void **)ptr;
+    pool->free_entries--;
+    return ptr;
 }
 
 /* We have no more headers on the free header pool. Go allocate more
@@ -175,7 +129,6 @@ alloc_more_pmc_headers(struct Parrot_Interp *interpreter,
     /* Note it in our stats */
     interpreter->total_PMCs += pool->units_per_alloc;
 
-    expand_free_pool(interpreter, pool, pool->units_per_alloc);
     cur_pmc = new_arena->start_PMC;
     for (i = 0; i < pool->units_per_alloc; i++) {
         cur_pmc->flags = PMC_on_free_list_FLAG;
@@ -253,7 +206,6 @@ alloc_more_buffer_headers(struct Parrot_Interp *interpreter,
     /* Note it in our stats */
     interpreter->total_Buffers += pool->units_per_alloc;
 
-    expand_free_pool(interpreter, pool, pool->units_per_alloc);
     cur_buffer = new_arena->start_Buffer;
     for (i = 0; i < pool->units_per_alloc; i++) {
         cur_buffer->flags = BUFFER_on_free_list_FLAG;
@@ -625,34 +577,28 @@ Parrot_initialize_resource_pools(struct Parrot_Interp *interpreter)
 
     /* Init the buffer header pool - this must be the first pool created! */
     interpreter->arena_base->buffer_header_pool =
-        new_resource_pool(interpreter, 256, sizeof(Buffer),
+        new_resource_pool(interpreter, sizeof(Buffer),
                           BUFFER_HEADERS_PER_ALLOC,
                           alloc_more_buffer_headers,
                           interpreter->arena_base->memory_pool);
-    /* Re-allocate the temporary buffer header from the new pool */
-    old_b = interpreter->arena_base->buffer_header_pool->free_pool_buffer;
-    new_b = new_buffer_header(interpreter);
-    mem_sys_memcopy(new_b, old_b, sizeof(Buffer));
-    interpreter->arena_base->buffer_header_pool->free_pool_buffer = new_b;
-    mem_sys_free(old_b);
-    
+
     /* Init the string header pool */
     interpreter->arena_base->string_header_pool = 
-        new_resource_pool(interpreter, 256, sizeof(STRING), 
+        new_resource_pool(interpreter, sizeof(STRING),
                           STRING_HEADERS_PER_ALLOC,
                           alloc_more_buffer_headers,
                           interpreter->arena_base->string_pool);
     
     /* Init the PMC header pool */
     interpreter->arena_base->pmc_pool =
-        new_resource_pool(interpreter, 256, sizeof(PMC),
+        new_resource_pool(interpreter, sizeof(PMC),
                           PMC_HEADERS_PER_ALLOC,
                           alloc_more_pmc_headers,
                           NULL);
 
     /* Init the constant string header pool */
     interpreter->arena_base->constant_string_header_pool = 
-        new_resource_pool(interpreter, 256, sizeof(STRING),
+        new_resource_pool(interpreter, sizeof(STRING),
                           STRING_HEADERS_PER_ALLOC,
                           alloc_more_buffer_headers,
                           interpreter->arena_base->constant_string_pool);
@@ -687,7 +633,7 @@ new_sized_resource_pool(struct Parrot_Interp *interpreter,
 
     if (sized_pools[idx] == NULL)
         sized_pools[idx] = 
-            new_resource_pool(interpreter, 256, unit_size,
+            new_resource_pool(interpreter, unit_size,
                               SIZED_HEADERS_PER_ALLOC,
                               alloc_more_buffer_headers,
                               interpreter->arena_base->memory_pool);
