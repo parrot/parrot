@@ -45,7 +45,7 @@ int yylex(YYSTYPE*, YYLTYPE*, Interp*);
 }
 
 %token <s> STRINGC INTC FLOATC USTRINGC NAME
-%token <t> IDENTIFIER MODULE FUNCTION
+%token <t> IDENTIFIER MODULE PCCSUB FUNCTION
 
 %type <n> program nodes nodes0 node const var opcode
 %type <t> type
@@ -77,6 +77,8 @@ node: IDENTIFIER '(' nodes0 ')'   { $$ = IMCC_new_node(interp, $1, $3, &@1); }
 		                  $$->unit = cur_unit;
 		                  cur_unit = cur_unit->prev; }
     | MODULE            { cur_unit = imc_open_unit(interp, IMC_PCCSUB); }
+                 '(' nodes ')'  { $$ = IMCC_new_node(interp, $1, $4, &@1); }
+    | PCCSUB            { cur_unit = imc_open_unit(interp, IMC_PCCSUB); }
                  '(' nodes ')'  { $$ = IMCC_new_node(interp, $1, $4, &@1); }
 	;
 

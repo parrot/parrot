@@ -852,6 +852,33 @@ exp_Py_Local(Interp* interpreter, nodeType *var)
 }
 
 /*
+ * this is the main init code for compiled code
+ */
+static SymReg*
+exp_PCC_Sub(Interp* interpreter, nodeType *p)
+{
+    nodeType *doc;
+    SymReg *sub;
+    Instruction *ins;
+    SymReg *regs[IMCC_MAX_REGS];
+
+    if (!cur_unit)
+        IMCC_fatal(interpreter, 1, "exp_PCC_Sub: no cur_unit");
+    sub = mk_sub_address(interpreter, str_dup("pcc_sub"));
+    ins = INS_LABEL(cur_unit, sub, 1);
+
+    ins->r[1] = mk_pcc_sub(interpreter, str_dup(ins->r[0]->name), 0);
+    add_namespace(interpreter, cur_unit);
+    ins->r[1]->pcc_sub->pragma = P_PROTOTYPED ;
+    regs[0] = get_const(interpreter, "0", 'I');
+    insINS(interpreter, cur_unit, ins, "new_pad", regs, 1);
+    /*
+     * TODO create locals for __builtins__, __name__, __doc__
+     */
+    return exp_default(interpreter, p);
+}
+
+/*
  * this is the main init code
  * Py_Module
  *   Py_doc,
@@ -947,6 +974,7 @@ static node_names ast_list[] = {
     { "Line_no",        create_1,  NULL, NULL, NULL, NULL },
     { "Name",           create_Name, NULL, NULL, NULL, ctx_Var },
     { "Op",             create_Name, NULL, NULL, NULL, NULL },
+    { "PCC_Sub", 	create_1, exp_PCC_Sub, NULL, NULL, NULL },
     { "Params", 	create_1, exp_Params, NULL, NULL, NULL },
     { "Parrot_AST", 	create_1, exp_default, NULL, NULL, NULL },
     { "Py_Call", 	create_1, exp_Py_Call, NULL, NULL, NULL },

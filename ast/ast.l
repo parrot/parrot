@@ -82,6 +82,10 @@ SP              [ ]
 			valp->t = IMCC_find_node_nr(yytext);
 			return MODULE;
 		   }
+"PCC_Sub"          {
+			valp->t = IMCC_find_node_nr(yytext);
+			return PCCSUB;
+		   }
 "Function"         {
 			valp->t = IMCC_find_node_nr(yytext);
 			return FUNCTION;

@@ -1,4 +1,4 @@
-/* A Bison parser, made from ast/ast.y, by GNU bison 1.75.  */
+/* A Bison parser, made by GNU Bison 1.875.  */
 
 /* Skeleton parser for Yacc-like parsing with Bison,
    Copyright (C) 1984, 1989, 1990, 2000, 2001, 2002 Free Software Foundation, Inc.
@@ -23,9 +23,6 @@
    This special exception was added by the Free Software Foundation
    in version 1.24 of Bison.  */
 
-#ifndef BISON_AST_ASTPARSER_H
-# define BISON_AST_ASTPARSER_H
-
 /* Tokens.  */
 #ifndef YYTOKENTYPE
 # define YYTOKENTYPE
@@ -39,7 +36,8 @@
      NAME = 262,
      IDENTIFIER = 263,
      MODULE = 264,
-     FUNCTION = 265
+     PCCSUB = 265,
+     FUNCTION = 266
    };
 #endif
 #define STRINGC 258
@@ -49,37 +47,41 @@
 #define NAME 262
 #define IDENTIFIER 263
 #define MODULE 264
-#define FUNCTION 265
+#define PCCSUB 265
+#define FUNCTION 266
 
 
 
 
-#ifndef YYSTYPE
+#if ! defined (YYSTYPE) && ! defined (YYSTYPE_IS_DECLARED)
 #line 41 "ast/ast.y"
-typedef union {
+typedef union YYSTYPE {
     int t;
     char *s;
     struct nodeType_t *n;
-} yystype;
-/* Line 1281 of /usr/share/bison/yacc.c.  */
-#line 66 "ast/astparser.h"
-# define YYSTYPE yystype
+} YYSTYPE;
+/* Line 1248 of yacc.c.  */
+#line 64 "ast/astparser.h"
+# define yystype YYSTYPE /* obsolescent; will be withdrawn */
+# define YYSTYPE_IS_DECLARED 1
+# define YYSTYPE_IS_TRIVIAL 1
 #endif
 
 
 
-#ifndef YYLTYPE
-typedef struct yyltype
+#if ! defined (YYLTYPE) && ! defined (YYLTYPE_IS_DECLARED)
+typedef struct YYLTYPE
 {
   int first_line;
   int first_column;
   int last_line;
   int last_column;
-} yyltype;
-# define YYLTYPE yyltype
+} YYLTYPE;
+# define yyltype YYLTYPE /* obsolescent; will be withdrawn */
+# define YYLTYPE_IS_DECLARED 1
+# define YYLTYPE_IS_TRIVIAL 1
 #endif
 
 
 
-#endif /* not BISON_AST_ASTPARSER_H */
 

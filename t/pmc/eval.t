@@ -1,5 +1,5 @@
 #! perl -w
-# Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+# Copyright: 2001-2004 The Perl Foundation.  All Rights Reserved.
 # $Id$
 
 =head1 NAME
@@ -12,11 +12,11 @@ t/pmc/eval.t - Dynamic Code Evaluation
 
 =head1 DESCRIPTION
 
-Tests on-the-fly PASM compilation and invocation.
+Tests on-the-fly PASM, PIR and PAST compilation and invocation.
 
 =cut
 
-use Parrot::Test tests => 6;
+use Parrot::Test tests => 9;
 use Test::More;
 
 output_is(<<'CODE', <<'OUTPUT', "eval_sc");
@@ -183,4 +183,83 @@ output_is(<<'CODE', <<'OUTPUT', "bug #31467");
 CODE
 dynamic
 builtin
+OUTPUT
+
+output_is(<<'CODE', <<'OUTPUT', "compile PAST in PIR");
+##PIR##
+.sub main @MAIN
+    .local pmc past_compiler
+    past_compiler = compreg "PAST"
+    .local string past_source
+    past_source = 'Parrot_AST( PCC_Sub( Stmts( Py_Print( Const(7) ) Py_Print_nl() ) ) )'
+    .local pmc past_compiled_sub
+    past_compiled_sub = compile past_compiler, past_source
+    print "before\n"
+    past_compiled_sub()
+    print "after\n"
+.end
+CODE
+before
+7
+after
+OUTPUT
+
+output_is(<<'CODE', <<'OUTPUT', "compile PAST in PASM");
+    compreg P1, "PAST"	# get compiler
+    compile P0, P1, 'Parrot_AST( PCC_Sub( Stmts( Py_Print( Const(8) ) Py_Print_nl() ) ) )'
+    print "before\n"
+    invokecc
+    invokecc
+    invokecc
+    invokecc
+    print "after\n"
+    end
+CODE
+before
+8
+8
+8
+8
+after
+OUTPUT
+
+output_is(<<'CODE', <<'OUTPUT', "compile PAST in PASM in PIR");
+##PIR##
+.sub test @MAIN
+
+    # PIR
+    .local pmc pasm_compiler
+    pasm_compiler = compreg "PASM"
+
+        # PASM  
+        .local string pasm_source
+        pasm_source = "compreg P1, 'PAST'\n"
+
+            # PAST  
+            pasm_source .= "compile P0, P1, 'Parrot_AST( PCC_Sub( Stmts( Py_Print( Const(8) ) Py_Print_nl() ) ) )'\n"
+        # PASM  
+        pasm_source .= "print \"PASM: before\\n\"\n"
+        pasm_source .= "invokecc\n"
+        pasm_source .= "invokecc\n"
+        pasm_source .= "invokecc\n"
+        pasm_source .= "invokecc\n"
+        pasm_source .= "print \"PASM: after\\n\"\n"
+        pasm_source .= "returncc\n"
+
+    # PIR
+    .local pmc pasm_compiled_sub
+    pasm_compiled_sub = compile pasm_compiler, pasm_source
+    print "PIR: before\n"
+    pasm_compiled_sub()
+    print "PIR: after\n"
+.end
+CODE
+PIR: before
+PASM: before
+8
+8
+8
+8
+PASM: after
+PIR: after
 OUTPUT
