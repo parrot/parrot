@@ -295,6 +295,14 @@ encoding/utf32$(O): $(H_FILES)
 
 interpreter$(O): interpreter.c $(H_FILES)
 
+io/io$(O): $(H_FILES)
+
+io/io_stdio$(O): $(H_FILES)
+
+io/io_unix$(O): $(H_FILES)
+
+io/io_win32$(O): $(H_FILES)
+
 memory$(O): $(H_FILES)
 
 packfile$(O): $(H_FILES)
