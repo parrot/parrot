@@ -56,6 +56,7 @@ pmclass default noinit {
 
    INTVAL get_integer_keyed (KEY * key) {
      internal_exception(OUT_OF_BOUNDS, "Subscript on something that's not an aggregate!\n");
+     return 0;
    }
 
    FLOATVAL get_number () {
@@ -64,6 +65,7 @@ pmclass default noinit {
 
    FLOATVAL get_number_keyed (KEY * key) {
      internal_exception(OUT_OF_BOUNDS, "Subscript on something that's not an aggregate!\n");
+     return 0.0;
    }
 
    STRING* get_string () {
@@ -73,6 +75,7 @@ pmclass default noinit {
 
    STRING* get_string_keyed (KEY * key) {
      internal_exception(OUT_OF_BOUNDS, "Subscript on something that's not an aggregate!\n");
+     return NULL;
    }
 
    BOOLVAL get_bool () {
@@ -93,6 +96,7 @@ pmclass default noinit {
 
    PMC* get_pmc_keyed (KEY* key) {
        internal_exception(OUT_OF_BOUNDS, "Subscript on something that's not an aggregate!\n");
+       return NULL;
    }
 
    BOOLVAL is_same (PMC* pmc2) {
