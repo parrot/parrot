@@ -14,6 +14,31 @@
 #define INSIDE_GLOBAL_SETUP
 #include "parrot/parrot.h"
 
+/* Needed because this might get compiled before pmcs have been built */
+extern void Parrot_PerlUndef_class_init(INTVAL);
+extern void Parrot_PerlInt_class_init(INTVAL);
+extern void Parrot_PerlNum_class_init(INTVAL);
+extern void Parrot_PerlString_class_init(INTVAL);
+extern void Parrot_Array_class_init(INTVAL);
+extern void Parrot_Boolean_class_init(INTVAL);
+extern void Parrot_PerlArray_class_init(INTVAL);
+extern void Parrot_PerlHash_class_init(INTVAL);
+extern void Parrot_Pointer_class_init(INTVAL);
+extern void Parrot_IntQueue_class_init(INTVAL);
+extern void Parrot_Sub_class_init(INTVAL);
+extern void Parrot_Coroutine_class_init(INTVAL);
+extern void Parrot_Continuation_class_init(INTVAL);
+extern void Parrot_CSub_class_init(INTVAL);
+extern void Parrot_MultiArray_class_init(INTVAL);
+extern void Parrot_Key_class_init(INTVAL);
+
+static void register_pmc(PMC* registry, int pmc_id)
+{
+    PMC* key;
+    key = key_new_string(NULL, Parrot_base_vtables[pmc_id].name(NULL,NULL));
+    registry->vtable->set_integer_keyed(NULL, registry, key, pmc_id);
+}
+
 void
 init_world(void)
 {
@@ -44,72 +69,22 @@ init_world(void)
     Parrot_base_classname_hash = pmc_new(NULL, enum_class_PerlHash);
 
     /* Now start filling the hash */
-    
-    /* Array */
-    key = key_new_string(NULL, Parrot_base_vtables[enum_class_Array].name(NULL,NULL));
-    Parrot_base_classname_hash->vtable->set_integer_keyed(NULL,
-                                                          Parrot_base_classname_hash, key, enum_class_Array);
-
-    key = key_new_string(NULL, Parrot_base_vtables[enum_class_Boolean].name(NULL, NULL));
-    Parrot_base_classname_hash->vtable->set_integer_keyed(NULL,
-                                                          Parrot_base_classname_hash, key, enum_class_Boolean);
-
-    key = key_new_string(NULL, Parrot_base_vtables[enum_class_PerlUndef].name(NULL, NULL));
-    Parrot_base_classname_hash->vtable->set_integer_keyed(NULL,
-                                                          Parrot_base_classname_hash, key, enum_class_PerlUndef);
-
-    key = key_new_string(NULL, Parrot_base_vtables[enum_class_PerlInt].name(NULL, NULL));
-    Parrot_base_classname_hash->vtable->set_integer_keyed(NULL,
-                                                          Parrot_base_classname_hash, key, enum_class_PerlInt);
-
-    key = key_new_string(NULL, Parrot_base_vtables[enum_class_PerlNum].name(NULL, NULL));
-    Parrot_base_classname_hash->vtable->set_integer_keyed(NULL,
-                                                          Parrot_base_classname_hash, key, enum_class_PerlNum);
-
-    key = key_new_string(NULL, Parrot_base_vtables[enum_class_PerlString].name(NULL, NULL));
-    Parrot_base_classname_hash->vtable->set_integer_keyed(NULL,
-                                                          Parrot_base_classname_hash, key, enum_class_PerlString);
-
-    key = key_new_string(NULL, Parrot_base_vtables[enum_class_PerlArray].name(NULL, NULL));
-    Parrot_base_classname_hash->vtable->set_integer_keyed(NULL,
-                                                          Parrot_base_classname_hash, key, enum_class_PerlArray);
-
-    key = key_new_string(NULL, Parrot_base_vtables[enum_class_PerlHash].name(NULL, NULL));
-    Parrot_base_classname_hash->vtable->set_integer_keyed(NULL,
-                                                          Parrot_base_classname_hash, key, enum_class_PerlHash);
-
-    key = key_new_string(NULL, Parrot_base_vtables[enum_class_Pointer].name(NULL, NULL));
-    Parrot_base_classname_hash->vtable->set_integer_keyed(NULL,
-                                                          Parrot_base_classname_hash, key, enum_class_Pointer);
-
-    key = key_new_string(NULL, Parrot_base_vtables[enum_class_IntQueue].name(NULL, NULL));
-    Parrot_base_classname_hash->vtable->set_integer_keyed(NULL,
-                                                          Parrot_base_classname_hash, key, enum_class_IntQueue);
-
-    key = key_new_string(NULL, Parrot_base_vtables[enum_class_Sub].name(NULL, NULL));
-    Parrot_base_classname_hash->vtable->set_integer_keyed(NULL,
-                                                          Parrot_base_classname_hash, key, enum_class_Sub);
-
-    key = key_new_string(NULL, Parrot_base_vtables[enum_class_Coroutine].name(NULL, NULL));
-    Parrot_base_classname_hash->vtable->set_integer_keyed(NULL,
-                                                          Parrot_base_classname_hash, key, enum_class_Coroutine);
-
-    key = key_new_string(NULL, Parrot_base_vtables[enum_class_CSub].name(NULL, NULL));
-    Parrot_base_classname_hash->vtable->set_integer_keyed(NULL,
-                                                          Parrot_base_classname_hash, key, enum_class_CSub);
-
-    key = key_new_string(NULL, Parrot_base_vtables[enum_class_Continuation].name(NULL, NULL));
-    Parrot_base_classname_hash->vtable->set_integer_keyed(NULL,
-                                                          Parrot_base_classname_hash, key, enum_class_Continuation);
-
-    key= key_new_string(NULL, Parrot_base_vtables[enum_class_MultiArray].name(NULL, NULL));
-    Parrot_base_classname_hash->vtable->set_integer_keyed(NULL,
-                                                          Parrot_base_classname_hash, key, enum_class_MultiArray);
-
-    key = key_new_string(NULL, Parrot_base_vtables[enum_class_Key].name(NULL, NULL));
-    Parrot_base_classname_hash->vtable->set_integer_keyed(NULL,
-                                                          Parrot_base_classname_hash, key, enum_class_Key);
-   
+    register_pmc(Parrot_base_classname_hash, enum_class_Array);
+    register_pmc(Parrot_base_classname_hash, enum_class_Boolean);
+    register_pmc(Parrot_base_classname_hash, enum_class_PerlUndef);
+    register_pmc(Parrot_base_classname_hash, enum_class_PerlInt);
+    register_pmc(Parrot_base_classname_hash, enum_class_PerlNum);
+    register_pmc(Parrot_base_classname_hash, enum_class_PerlString);
+    register_pmc(Parrot_base_classname_hash, enum_class_PerlArray);
+    register_pmc(Parrot_base_classname_hash, enum_class_PerlHash);
+    register_pmc(Parrot_base_classname_hash, enum_class_Pointer);
+    register_pmc(Parrot_base_classname_hash, enum_class_IntQueue);
+    register_pmc(Parrot_base_classname_hash, enum_class_Sub);
+    register_pmc(Parrot_base_classname_hash, enum_class_Coroutine);
+    register_pmc(Parrot_base_classname_hash, enum_class_CSub);
+    register_pmc(Parrot_base_classname_hash, enum_class_Continuation);
+    register_pmc(Parrot_base_classname_hash, enum_class_MultiArray);
+    register_pmc(Parrot_base_classname_hash, enum_class_Key);
 }
 
 /*
