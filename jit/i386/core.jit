@@ -2,6 +2,8 @@
 ;   i386.jit 
 ;
 
+Parrot_noop: \x90
+
 Parrot_set_i_ic: \xc7 \x05 &IR1 *IC2
 
 Parrot_set_i_i: \x8b \x0d &IR2 \x89 \x0d &IR1
