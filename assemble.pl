@@ -773,6 +773,7 @@ exit if exists $args{-c};
 if(exists $args{-o}) {
   open FILE,">$args{-o}"
     or die "Could not write to '$args{-o}': $!";
+  binmode FILE;
   print FILE $bytecode;
   close FILE;
 }
