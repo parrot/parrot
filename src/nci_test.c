@@ -99,6 +99,12 @@ int nci_ii3(int a, int *bp) {
     return r;
 }
 
+static int call_back(char *str) {
+    puts(str);
+    fflush(stdout);
+    return 4711;
+}
+
 void * nci_pi(int test) {
     switch (test) {
         case 0:
@@ -158,6 +164,15 @@ void * nci_pi(int test) {
                 } t = {
                      10,
                      &xx
+                };
+                return &t;
+            }
+        case 5:
+            {
+                static struct {
+                    int (*f)(char *);
+                } t = {
+                     call_back
                 };
                 return &t;
             }

@@ -1,4 +1,4 @@
-use Parrot::Test tests => 21;
+use Parrot::Test tests => 22;
 use Parrot::Config;
 
 print STDERR $PConfig{jitcpuarch}, " JIT CPU\n";
@@ -515,7 +515,7 @@ output_is(<<'CODE', <<'OUTPUT', "nci_p_i - nested struct *");
   push P2, .DATATYPE_CHAR
   push P2, 0
   push P2, 0
-  push P2, .DATATYPE_PTR
+  push P2, .DATATYPE_STRUCT_PTR
   # attach the unmanged struct as property
   set P1, P2[-1]
   setprop P1, "_struct", P4
@@ -543,6 +543,35 @@ CODE
 100
 77
 200.000000
+OUTPUT
+
+output_is(<<'CODE', <<'OUTPUT', "nci_p_i - func_ptr*");
+  loadlib P1, "libnci"
+  dlfunc P0, P1, "nci_pi", "pi"
+  # this test function returns a struct { int (*f)(char *) }
+  set I5, 5
+  invoke
+  new P2, .PerlArray
+.include "datatypes.pasm"
+  push P2, .DATATYPE_FUNC_PTR
+  push P2, 0
+  push P2, 0
+  assign P5, P2
+  # P1 isnt a real PMC, its only suited for passing on to
+  # the NCI PMC as a Key
+  set P1, P5[0]
+  # TODO handled that inside the struct PMC
+  # e.g. attach a function signature property to the initializer
+  new P0, .NCI
+  set P0[P1], "it"
+  set S5, "hello call_back"
+  invoke
+  print I5
+  print "\n"
+  end
+CODE
+hello call_back
+4711
 OUTPUT
 
 output_is(<<'CODE', <<'OUTPUT', "nci_i_p");

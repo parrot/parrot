@@ -85,8 +85,7 @@ char_offset_key(Parrot_Interp interpreter, PMC *pmc, PMC *key, int *type)
     count = (size_t) key_integer(interpreter, next);
     init = PMC_pmc_val(pmc);
     max = (size_t) VTABLE_get_integer_keyed_int(interpreter, init, ix + 1);
-    /* TODO make that _struct_ptr */
-    if (*type == enum_type_ptr) {
+    if (*type == enum_type_struct_ptr) {
 	PMC *ptr;
 	/* for now ignore count */
 	assert((int)max <= 1);
@@ -165,6 +164,21 @@ ret_string(Parrot_Interp interpreter, char *p, int type)
 		    PObj_external_FLAG, NULL);
 	default:
 	    internal_exception(1, "returning unhandled string type in struct");
+    }
+    return NULL;
+}
+
+static PMC*
+ret_pmc(Parrot_Interp interpreter, char *p, int type)
+{
+    char *cstr;
+    size_t len;
+
+    switch (type) {
+	case enum_type_func_ptr:
+	    return *(PMC**) p;
+	default:
+	    internal_exception(1, "returning unhandled pmc type in struct");
     }
     return NULL;
 }
@@ -405,6 +419,18 @@ pmclass UnManagedStruct extends default need_ext {
 	int type;
 	char *p = char_offset_key(interpreter, pmc, key, &type);
 	return ret_string(interpreter, p, type);
+    }
+
+    PMC* get_pmc_keyed_int (INTVAL key) {
+	int type;
+	char *p = char_offset_int(interpreter, pmc, key, &type);
+	return ret_pmc(interpreter, p, type);
+    }
+
+    PMC* get_pmc_keyed (PMC* key) {
+	int type;
+	char *p = char_offset_key(interpreter, pmc, key, &type);
+	return ret_pmc(interpreter, p, type);
     }
 
     INTVAL get_integer() {
