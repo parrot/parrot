@@ -26,7 +26,7 @@
 
 #if SPILL_STRESS
 # undef MAX_COLOR
-# define MAX_COLOR 8
+# define MAX_COLOR 4
 #endif
 
 static void make_stat(int *sets, int *cols);
@@ -99,8 +99,13 @@ void allocate(struct Parrot_Interp *interpreter) {
         }
     }
     todo = 1;
+#if !DOIT_AGAIN_SAM
+    build_interference_graph();
+#endif
     while (todo) {
+#if DOIT_AGAIN_SAM
         build_interference_graph();
+#endif
         compute_spilling_costs();
         /* simplify until no changes can be made */
         /* while (simplify()) {} */
@@ -303,6 +308,7 @@ build_interference_graph()
 
     /* Calculate interferences between each chain and populate the the Y-axis */
     for (x = 0; x < n_symbols; x++) {
+        /* If symbol was never used in a statment, it can't interfere */
         if (!reglist[x]->first_ins)
             continue;
         for (y = x + 1; y < n_symbols; y++) {
@@ -448,12 +454,14 @@ int interferes(SymReg * r0, SymReg * r1) {
 
     int i;
 
-    /* Register doesn't interfere with itself, and register sets
-     * don't interfere with each other.
-     */
-    if(r0 == r1) return 0;
-    else if(r0->set != r1->set) return 0;
+    /* Register doesn't interfere with itself
+    */
+    if (r0 == r1)
+        return 0;
 
+    /* different register sets don't interfer */
+    if (r0->set != r1->set)
+        return 0;
     /* if the first time r0 appears is after (or in the same instruction)
      * than the last appearance of r1, then they can't interfere.
      *
@@ -462,14 +470,10 @@ int interferes(SymReg * r0, SymReg * r1) {
      * later, then they can share the same register
      */
 
-    /* If symbol was never used in a statment, it can't interfere */
-    if(!r0->first_ins || !r1->first_ins)
-	return 0;
-
     /* Now: */
 
     if (r0->life_info == NULL || r1->life_info == NULL) {
-	fatal(1, "interferes", "INTERNAL ERROR: Life range is NULL\n");
+        fatal(1, "interferes", "INTERNAL ERROR: Life range is NULL\n");
     }
 
     for (i=0; i < n_basic_blocks; i++) {
@@ -699,6 +703,7 @@ int map_colors(int x, SymReg ** graph, int colors[], int typ) {
  * this saves 4 costy routines
  * NOTE {lhs_,}use_count are not set again, this is save, when no
  *      further optimization pass follows
+ *
  */
 static void
 update_life(Instruction *ins, SymReg *r, int needs_fetch, int needs_store,
@@ -706,7 +711,11 @@ update_life(Instruction *ins, SymReg *r, int needs_fetch, int needs_store,
 {
     Life_range *l;
     int i;
+    Instruction *ins2;
 
+    for(i = 0, ins2 = instructions; ins2; ins2 = ins2->next) {
+        ins2->index = i++;
+    }
     /* add this sym to reglist, if not there */
     if (add) {
         reglist = realloc(reglist, (n_symbols + 1) * sizeof(SymReg *));
@@ -737,6 +746,52 @@ update_life(Instruction *ins, SymReg *r, int needs_fetch, int needs_store,
     l = r->life_info[ins->bbindex];
     l->first_ins = r->first_ins;
     l->last_ins = r->last_ins;
+    if (IMCC_DEBUG & DEBUG_IMC) {
+        dump_instructions();
+        dump_symreg();
+    }
+}
+/*
+ * update the interference_graph too and don't call
+ *      build_interference_graph again
+ */
+
+static void
+update_interference(SymReg *old, SymReg *new)
+{
+    int x, y;
+    if (old != new) {
+        /* n_symbols is already increased */
+        SymReg ** new_graph = calloc(n_symbols * n_symbols, sizeof(SymReg*));
+        /* old symbols count of previous graph */
+        int o = n_symbols - 1;
+        for (x = 0; x < o; x++) {
+            for (y = x + 1; y < o; y++) {
+                new_graph[x*n_symbols+y] = interference_graph[x*o+y];
+                new_graph[y*n_symbols+x] = interference_graph[y*o+x];
+            }
+        }
+        free(interference_graph);
+        interference_graph = new_graph;
+    }
+    for (x = 0; x < n_symbols; x++) {
+        for (y = x + 1; y < n_symbols; y++) {
+            if (reglist[x] == old || reglist[x] == new ||
+                    reglist[y] == old || reglist[y] == new) {
+                if (interferes(reglist[x], reglist[y])) {
+                    interference_graph[x*n_symbols+y] = reglist[y];
+                    interference_graph[y*n_symbols+x] = reglist[x];
+                }
+                else {
+                    interference_graph[x*n_symbols+y] = NULL;
+                    interference_graph[y*n_symbols+x] = NULL;
+                }
+            }
+        }
+    }
+    if (IMCC_DEBUG & DEBUG_IMC) {
+        dump_interference_graph();
+    }
 }
 #endif
 
@@ -818,17 +873,19 @@ void spill(struct Parrot_Interp *interpreter, int spilled) {
             tmp->index = ins->index + 1;
             dl++;
 	}
-        /* if all symbols are in one basic_block, we need a new
-         * symbol, so that the life_ranges are minimal
-         * It would be nice, to detect, when changing the symbol
-         * is necessary.
-         */
         if (needs_fetch || needs_store) {
 #if ! DOIT_AGAIN_SAM
             /* update life info of prev sym */
             update_life(ins, new_symbol, needs_fetch, needs_store,
                     old_symbol != new_symbol);
+            /* and interference of both */
+            update_interference(old_symbol, new_symbol);
 #endif
+            /* if all symbols are in one basic_block, we need a new
+             * symbol, so that the life_ranges are minimal
+             * It would be nice, to detect, when changing the symbol
+             * is necessary.
+             */
             sprintf(buf, "%s_%d", old_symbol->name, n++);
             new_symbol = mk_symreg(str_dup(buf), old_symbol->set);
             new_symbol->usage |= U_SPILL;
