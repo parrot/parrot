@@ -13,7 +13,6 @@
 #include "parrot/parrot.h"
 #include "parrot/interp_guts.h"
 #include "parrot/oplib/core_ops.h"
-#include "parrot/oplib/core_ops_prederef.h"
 #include "parrot/runops_cores.h"
 #ifdef HAS_JIT
 #include "parrot/jit.h"
