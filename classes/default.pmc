@@ -338,6 +338,9 @@ found then C<NULL> is returned.
 */
 
     PMC* find_method(STRING* method_name) {
+        return Parrot_find_method_with_cache(INTERP, SELF, method_name);
+
+#if 0
         PMC *meth_hash;
         int type = SELF->vtable->base_type;
 
@@ -348,6 +351,7 @@ found then C<NULL> is returned.
         if (!meth_hash)
             return NULL;
         return VTABLE_get_pmc_keyed_str(INTERP, meth_hash, method_name);
+#endif
     }
 
 /*
@@ -730,6 +734,8 @@ Returns whether the PMC "can" perform C<*method>.
 */
 
     INTVAL can (STRING* method) {
+        return VTABLE_find_method(interpreter, SELF, method) != NULL;
+#if 0
         PMC *meth_hash;
         int type = SELF->vtable->base_type;
 
@@ -740,6 +746,7 @@ Returns whether the PMC "can" perform C<*method>.
         if (!meth_hash)
             return 0;
         return VTABLE_exists_keyed_str(INTERP, meth_hash, method);
+#endif
     }
 
 /*

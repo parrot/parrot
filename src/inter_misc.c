@@ -39,6 +39,7 @@ void
 enter_nci_method(Parrot_Interp interpreter, int type,
 		 void *func, const char *name, const char *proto)
 {
+#if 0
     PMC *method, *method_table, **table;
     int i;
 
@@ -75,6 +76,21 @@ enter_nci_method(Parrot_Interp interpreter, int type,
                 strlen(name), "iso-8859-1",
                 PObj_constant_FLAG|PObj_external_FLAG),
             method);
+#else
+    PMC *method;
+    method = pmc_new(interpreter, enum_class_NCI);
+    VTABLE_set_pointer_keyed_str(interpreter, method,
+            string_make(interpreter, proto, strlen(proto),
+                "iso-8859-1", PObj_constant_FLAG|PObj_external_FLAG),
+            func);
+    Parrot_store_global(interpreter,
+        Parrot_base_vtables[type]->whoami,
+            string_make(interpreter, name,
+                strlen(name), "iso-8859-1",
+                PObj_constant_FLAG|PObj_external_FLAG),
+            method);
+
+#endif
 }
 
 /*

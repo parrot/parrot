@@ -1533,6 +1533,7 @@ L_BadId:
     print "\\n"
     end
 # delegate calls these 2 functions
+.namespace ["delegate"]
 .pcc_sub __name:
    set S5, "delegate"
    set I0, 1

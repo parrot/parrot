@@ -162,12 +162,6 @@ make_interpreter(Parrot_Interp parent, Interp_flags flags)
     pmc_init_null(interpreter);
 #endif
 
-    /* Need an empty stash */
-    interpreter->globals = mem_sys_allocate(sizeof(struct Stash));
-    interpreter->globals->stash_hash =
-        pmc_new(interpreter, enum_class_PerlHash);
-    interpreter->globals->parent_stash = NULL;
-
     /* context data */
     /* Initialize interpreter's flags */
     interpreter->ctx.warns = new_buffer_header(interpreter);

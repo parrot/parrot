@@ -269,10 +269,8 @@ typedef struct Parrot_Interp {
     PMC* DOD_registry;          /* registered PMCs added to the root set */
     MMD_table *binop_mmd_funcs; /* Table of MMD functions */
     UINTVAL n_binop_mmd_funcs;   /* function count */
-    PMC** nci_method_table;     /* Method table PMC for NCI stubs per class */
     struct _Caches * caches;            /* s. caches.h */
     STRING **const_cstring_table;       /* CONST_STRING(x) items */
-    size_t nci_method_table_size;       /* allocated size of this table */
     struct QUEUE* task_queue;           /* per interpreter queue */
     int sleeping;                       /* used during sleep in events */
     struct parrot_exception_t *exceptions; /* internal exception stack */

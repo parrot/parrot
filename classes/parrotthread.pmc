@@ -44,25 +44,6 @@ pmclass ParrotThread extends ParrotInterpreter need_ext {
 
 /*
 
-=item C<void class_init()>
-
-Class initializer.
-
-=cut
-
-*/
-
-    void class_init() {
-        /*
-         * inherit interpreter methods - needs interpreter already
-         * initialized
-         */
-        INTERP->nci_method_table[enum_class_ParrotThread] =
-            INTERP->nci_method_table[enum_class_ParrotInterpreter];
-    }
-
-/*
-
 =item C<void init()>
 
 Initializes the thread.

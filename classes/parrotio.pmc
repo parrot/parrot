@@ -24,10 +24,6 @@ These are the vtable functions for Parrot IO.
 #include "../io/io_private.h"
 
 
-void Parrot_NCI_class_init(Parrot_Interp, int);
-void Parrot_PerlHash_class_init(Parrot_Interp, int);
-void Parrot_PerlUndef_class_init(Parrot_Interp, int);
-
 pmclass ParrotIO need_ext {
 
 /*
@@ -42,21 +38,18 @@ Class initialization.
 
     void class_init () {
 
-        /* These classes are needed now so make sure they are inited */
-        Parrot_NCI_class_init(interp, enum_class_NCI);
-        Parrot_PerlHash_class_init(interp, enum_class_PerlHash);
-        Parrot_PerlUndef_class_init(interp, enum_class_PerlUndef);
-
-        enter_nci_method(INTERP, enum_class_ParrotIO,
-                         F2DPTR(PIO_flush), "flush", "vIO");
-        enter_nci_method(INTERP, enum_class_ParrotIO,
-                         F2DPTR(PIO_setbuf), "setbuf", "iIOi");
-        enter_nci_method(INTERP, enum_class_ParrotIO,
-                         F2DPTR(PIO_setlinebuf), "setlinebuf", "iIO");
-        enter_nci_method(INTERP, enum_class_ParrotIO,
-                         F2DPTR(PIO_puts), "puts", "iIOt");
-        enter_nci_method(INTERP, enum_class_ParrotIO,
-                         F2DPTR(PIO_eof), "eof", "iIO");
+        if (pass) {
+            enter_nci_method(INTERP, enum_class_ParrotIO,
+                    F2DPTR(PIO_flush), "flush", "vIO");
+            enter_nci_method(INTERP, enum_class_ParrotIO,
+                    F2DPTR(PIO_setbuf), "setbuf", "iIOi");
+            enter_nci_method(INTERP, enum_class_ParrotIO,
+                    F2DPTR(PIO_setlinebuf), "setlinebuf", "iIO");
+            enter_nci_method(INTERP, enum_class_ParrotIO,
+                    F2DPTR(PIO_puts), "puts", "iIOt");
+            enter_nci_method(INTERP, enum_class_ParrotIO,
+                    F2DPTR(PIO_eof), "eof", "iIO");
+        }
     }
 
 /*

@@ -16,7 +16,7 @@ Tests the Parrot IO operations.
 
 =cut
 
-use Parrot::Test tests => 25;
+use Parrot::Test tests => 26;
 use Test::More;
 
 sub file_content_is {
@@ -338,6 +338,25 @@ ok1:   print "ok 1\n"
        find_method P0, P2, "puts"
        invoke
        end
+CODE
+ok 1
+ok 2
+OUTPUT
+
+output_is(<<'CODE', <<'OUTPUT', 'puts method - PIR');
+##PIR##
+.sub main @MAIN
+       .local string s
+       s = "ok 2\n"
+       .local pmc io
+       io = getstdout
+       $I0 = can io, "puts"
+       if $I0 goto ok1
+       print "not "
+ok1:   print "ok 1\n"
+       io."puts"(s)
+.end
+
 CODE
 ok 1
 ok 2

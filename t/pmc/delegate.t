@@ -25,6 +25,7 @@ output_is(<<'CODE', <<'OUTPUT', "delegate set_integer_native");
     new P0, .delegate
     set P0, 42
     end
+.namespace ["delegate"]
 .pcc_sub __set_integer_native:
     # need a private store to keep state - we dont have that yet
     # for now check param passing
@@ -42,6 +43,7 @@ output_is(<<'CODE', <<'OUTPUT', "delegate get_integer");
     print I0
     print "\n"
     end
+.namespace ["delegate"]
 .pcc_sub __get_integer:
     set I5, 42
     invoke P1
@@ -53,6 +55,7 @@ output_is(<<'CODE', <<'OUTPUT', "delegate set_string_native");
     new P0, .delegate
     set P0, "fortytwo"
     end
+.namespace ["delegate"]
 .pcc_sub __set_string_native:
     print S5
     print "\n"
@@ -67,6 +70,7 @@ output_is(<<'CODE', <<'OUTPUT', "delegate get_string");
     print S0
     print "\n"
     end
+.namespace ["delegate"]
 .pcc_sub __get_string:
     set S5, "fortytwo"
     invoke P1
@@ -78,6 +82,7 @@ output_is(<<'CODE', <<'OUTPUT', "delegate set_number_native");
     new P0, .delegate
     set P0, 47.11
     end
+.namespace ["delegate"]
 .pcc_sub __set_number_native:
     print N5
     print "\n"
@@ -92,6 +97,7 @@ output_is(<<'CODE', <<'OUTPUT', "delegate get_number");
     print N0
     print "\n"
     end
+.namespace ["delegate"]
 .pcc_sub __get_number:
     set N5, 47.11
     invoke P1
@@ -105,6 +111,7 @@ output_is(<<'CODE', <<'OUTPUT', "delegate assign_pmc");
     set P1, 42
     assign P0, P1
     end
+.namespace ["delegate"]
 .pcc_sub __assign_pmc:
     print P5
     print "\n"
@@ -123,6 +130,7 @@ output_is(<<'CODE', <<'OUTPUT', "delegate add_p_p_i");
     print P2	# yeah 1+1 = 3
     print "\n"
     end
+.namespace ["delegate"]
 .pcc_sub __set_integer_native:
     # cant keep state yet
     # just return
@@ -152,6 +160,7 @@ output_is(<<'CODE', <<'OUTPUT', "delegate add_p_p_p");
     print P2	# yeah 1+1 = 3
     print "\n"
     end
+.namespace ["delegate"]
 .pcc_sub __set_integer_native:
     # cant keep state yet
     # just print arg and return
@@ -193,6 +202,7 @@ output_is(<<'CODE', <<'OUTPUT', "delegate add_p_p_p - clobber regs");
     print "\n"
     print S5
     end
+.namespace ["delegate"]
 .pcc_sub __set_integer_native:
     # cant keep state yet
     # just print arg and return

@@ -988,11 +988,42 @@ find_method_direct(Parrot_Interp interpreter, PMC *class,
     INTVAL classcount = 0;   /* The number of classes we need to
                                 search */
 
-    /* if its a non-classes, just return the sub */
+    /*
+     * if its a non-ParrotClass PMC, then the namespace
+     * is the PMC's class name
+     * see also enter_nci_method()
+     */
     if (!PObj_is_class_TEST(class)) {
-        return Parrot_find_global(interpreter,
-                           NULL,
+        STRING *class_name = class->vtable->whoami;
+        STRING *isa;
+        UINTVAL start;
+        INTVAL pos;
+        method = Parrot_find_global(interpreter,
+                           class_name,
                            method_name);
+        if (method)
+            return method;
+        /*
+         * now look into that PMCs parents
+         * the parent classes are in vtable->isa_str as blank
+         * terminated class names - suboptimal but good enough for now
+         */
+        start = class_name->strlen + 1;
+        for (isa = class->vtable->isa_str; ;) {
+            if (isa->strlen <= start)
+                return NULL;
+            pos = string_str_index(interpreter, isa,
+                    CONST_STRING(interpreter, " "), start);
+            if (pos == -1) {
+                return Parrot_find_global(interpreter,
+                        string_substr(interpreter, isa, start,
+                            isa->strlen - start, NULL, 0),
+                        method_name);
+            }
+            /* TODO */
+            break;
+        }
+        return NULL;
     }
 
     /* The order of operations:

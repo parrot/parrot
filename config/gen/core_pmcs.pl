@@ -79,7 +79,7 @@ sub generate_c {
 
 END
 
-    print OUT "extern void Parrot_${_}_class_init(Interp *, int);\n"
+    print OUT "extern void Parrot_${_}_class_init(Interp *, int, int);\n"
       foreach (@pmcs);
 
     print OUT <<"END";
@@ -87,11 +87,14 @@ END
 extern void Parrot_initialize_core_pmcs(Interp *interp);
 void Parrot_initialize_core_pmcs(Interp *interp)
 {
+    int pass;
+    for (pass = 0; pass <= 1; ++pass) {
 END
 
-    print OUT "    Parrot_${_}_class_init(interp, enum_class_${_});\n"
+    print OUT "        Parrot_${_}_class_init(interp, enum_class_${_}, pass);\n"
       foreach (@pmcs);
     print OUT <<"END";
+    }
 }
 
 static void register_pmc(Interp *interp, PMC* registry, int pmc_id)

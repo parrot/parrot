@@ -488,7 +488,7 @@ sub lib_load_code() {
     my $classname = $self->{class};
     # TODO multiple (e.g. Const subclasses)
     my $call_class_init =
-        "Parrot_${classname}_class_init(interpreter, type);\n";
+        "Parrot_${classname}_class_init(interpreter, type, pass);\n";
     return dynext_load_code($classname, $call_class_init);
 }
 
@@ -566,7 +566,7 @@ sub init_func() {
     $class_init_code =~ s/INTERP/interp/g;
     $cout .= <<"EOC";
 void
-Parrot_${classname}_class_init(Parrot_Interp interp, int entry)
+Parrot_${classname}_class_init(Parrot_Interp interp, int entry, int pass)
 {
     struct _vtable temp_base_vtable = {
         NULL,	/* package */
@@ -684,7 +684,7 @@ sub hdecls() {
     }
     # class init decl
     $hout .= <<"EOC";
-void Parrot_${classname}_class_init(Parrot_Interp, int);
+void Parrot_${classname}_class_init(Parrot_Interp, int, int);
 EOC
     $hout;
 }
