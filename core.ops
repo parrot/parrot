@@ -2901,7 +2901,7 @@ Test for PMC definedness.
 
 =item B<exists>(out INT, in PMC, in KEY)
 
-Test for key existance.
+Test for key existence.
 
 =cut
 
@@ -4185,14 +4185,14 @@ op enternative() {
 
 =item B<new>(out PMC, in INT, in PMC)
 
-Create a new PMC of class $2; look in F<pmc.h> for the base
+Create a new PMC of class $2; look in F<core_pmcs.h> for the base
 vtable types. The assembler allows you to specify PMCs by type
 name as well as by integer - you should do this for compatibility,
 to avoid problems if the base types get reassigned. For example:
 
   new P0, .PerlScalar
 
-Optionally a pmc may be passed to the constructor. It's up to the
+Optionally a PMC may be passed to the constructor. It's up to the
 class, what to do with the intializer.
 s. PDD02 for more.
 
