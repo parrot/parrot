@@ -5,7 +5,9 @@
 ;
 
 Parrot_end {
+    emitm_addl_i_r(jit_info->native_ptr, 4, emit_ESP);
     NATIVECODE = emit_popl_r(NATIVECODE, emit_ESI);
+    NATIVECODE = emit_popl_r(NATIVECODE, emit_EBP);
     emitm_ret(NATIVECODE);
 }
 

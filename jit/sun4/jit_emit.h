@@ -6,6 +6,17 @@
 ** $Id$
 **/
 
+/* 
+ * SPARC JIT overview:
+ * 
+ * The interpreter pointer is kept in i0.
+ * The address of register I0 is stored in i1, with all parrot register access
+ * performed relative to this register.
+ * The address of the opcode - native code mapping array is kept in i3.
+ *
+ * See IMPORTANT SHORTCUTS below.
+ * /
+
 /* Sparc register numbers */
 #define emitm_g(n) (n)
 #define emitm_o(n) ((n) + 8)
@@ -264,13 +275,27 @@ void main(){
 /* Fixup types */
 enum  {JIT_BRANCH, JIT_CALL30 };
 
-/* Shortcuts for registers */
+/* 
+ *
+ * IMPORTANT SHORTCUTS
+ *
+ * */ 
+    
+/* The register holding the interpreter pointer */
 #define Parrot_jit_intrp emitm_i(0)
+
+/* The register holding the address of I0 */
 #define Parrot_jit_regbase emitm_i(1)
+
+/* The register containing the address of the opmap */
 #define Parrot_jit_opmap emitm_i(3)
+
+/* The scratch register used for certain address calculations */
 #define Parrot_jit_tmp emitm_l(7)
 
 #define Parrot_jit_regbase_ptr(i) &((i)->ctx.int_reg.registers[0])
+
+/* The offset of a Parrot register from the base register */
 #define Parrot_jit_regoff(a, i) (unsigned)(a) - (unsigned)(Parrot_jit_regbase_ptr(i))
 
 /* Generate conditional branch to offset from current parrot op */
@@ -299,6 +324,7 @@ static void Parrot_jit_bicc(Parrot_jit_info *jit_info, int cond, int annul,
     emitm_bicc(jit_info->native_ptr, annul, cond, 0);
 }
 
+/* This function loads a value */
 static void Parrot_jit_int_load(Parrot_jit_info *jit_info,
                              struct Parrot_Interp *interpreter,
                              int param,

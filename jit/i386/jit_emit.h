@@ -98,7 +98,7 @@ static void emit_sib(char *pc, int scale, int i, int base){
             break;
         default :
             internal_exception(JIT_ERROR, "Invalid scale factor %d\n", scale);
-            break;
+            return;
     }
 
     *pc = scale_byte | (i == emit_None ? emit_Index_None : emit_reg_Index(i)) |
@@ -108,8 +108,8 @@ static void emit_sib(char *pc, int scale, int i, int base){
 static char *emit_r_X(char *pc, int reg_opcode, int base, int i, int scale,
             long disp)
 {
-    if((i && !scale) || (scale && !i)){
-    internal_exception(JIT_ERROR,
+    if(i && !scale){
+        internal_exception(JIT_ERROR,
                             "emit_r_X passed invalid scale+index combo\n");
     }
 
@@ -341,6 +341,8 @@ static char *emit_movb_i_m(char *pc, char imm, int base, int i, int scale,
 
 #define emitm_alul_i_r(pc, op1, op2, imm, reg) { *(pc++) = op1; *(pc++) = emit_alu_X_r(op2, reg); *(long *)((pc)) = (long)(imm); (pc) += 4; }
 
+#define emitm_alub_i_r(pc, op1, op2, imm, reg) { *(pc++) = op1; *(pc++) = emit_alu_X_r(op2, reg); *(pc++) = (char)(imm); }
+
 #define emitm_alul_i_m(pc, op1, op2, imm, b, i, s, d) { \
  *(pc++) = op1; \
  (pc) = emit_r_X(pc, emit_reg(op2), b, i, s, d); \
@@ -366,6 +368,8 @@ static char *emit_movb_i_m(char *pc, char imm, int base, int i, int scale,
 /* ADDs */
 
 #define emitm_addb_r_r(pc, reg1, reg2) emitm_alul_r_r(pc, 0x00, reg1, reg2)
+#define emitm_addb_i_r(pc, imm, reg)   emitm_alub_i_r(pc, 0x83, emit_b000, imm, reg)
+
 #define emitm_addl_r_r(pc, reg1, reg2) emitm_alul_r_r(pc, 0x01, reg1, reg2)
 #define emitm_addl_i_r(pc, imm, reg)   emitm_alul_i_r(pc, 0x81, emit_b000, imm, reg)
 #define emitm_addl_r_m(pc, reg, b, i, s, d) emitm_alul_r_m(pc, 0x01, reg, b, i, s, d)
@@ -667,14 +671,25 @@ void Parrot_jit_dofixup(Parrot_jit_info *jit_info,
 void Parrot_jit_begin(Parrot_jit_info *jit_info,
                       struct Parrot_Interp * interpreter)
 {
+    /* Maintain the stack frame pointer for the sake of gdb */
+    jit_info->native_ptr = emit_pushl_r(jit_info->native_ptr, emit_EBP);
+    emitm_movl_r_r(jit_info->native_ptr, emit_ESP, emit_EBP);
+
+    /* Save ESI, as it's value is clobbered by jit_cpcf_op */
     jit_info->native_ptr = emit_pushl_r(jit_info->native_ptr, emit_ESI);
+
+    /* Cheat on op function calls by writing the interpreter arg on the stack
+     * just once. If an op function ever modifies the interpreter argument on
+     * the stack this will stop working !!! */
+    emitm_pushl_i(jit_info->native_ptr, interpreter);
+
+    /* Point ESI to the opcode-native code map array */ 
     emitm_movl_i_r(jit_info->native_ptr, jit_info->op_map, emit_ESI);
 }
 
 void Parrot_jit_normal_op(Parrot_jit_info *jit_info,
                           struct Parrot_Interp * interpreter)
 {
-    emitm_pushl_i(jit_info->native_ptr, interpreter);
     emitm_pushl_i(jit_info->native_ptr, jit_info->cur_op);
 
     Parrot_jit_newfixup(jit_info);
@@ -683,7 +698,7 @@ void Parrot_jit_normal_op(Parrot_jit_info *jit_info,
         (void (*)(void))interpreter->op_func_table[*(jit_info->cur_op)];
 
     emitm_calll(jit_info->native_ptr, 0xdeafc0de);
-    emitm_addl_i_r(jit_info->native_ptr, 8, emit_ESP);
+    emitm_addb_i_r(jit_info->native_ptr, 4, emit_ESP);
 }
 
 void Parrot_jit_cpcf_op(Parrot_jit_info *jit_info,

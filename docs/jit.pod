@@ -73,7 +73,9 @@ representations of native instructions.
 =item jit/${jitcpuarch}/core.jit
 
 The functions to generate native code for core parrot opcodes are specified
-here.
+here. To simplify the maintenance of these functions, they are specified in a
+format that is pre-processed by B<jit2h.pl> to produce a valid C source file,
+B<jit_cpu.c>. See L<Format of .jit Files> below.
 
 =item jit/${jitcpuarch}/string.jit
 
@@ -116,7 +118,7 @@ these offsets while executing native code.
  
 =item jit2h.pl
 
-Reads the .jit files and prints the struct opcode_assembly_t.
+Preprocesses the .jit files to produce and prints the struct opcode_assembly_t.
 
 =back
 
@@ -129,12 +131,18 @@ Jit files are interpreted as follows:
 
 =item I<op-name> { I<body> }
 
-Where I<op-name> is the name of the Parrot opcode, and I<body> consists
-of a sequence of the following forms:
+Where I<op-name> is the name of the Parrot opcode, and I<body> consists of C
+syntax code which may contain any of the identifiers listed in the following
+section.
 
-=item Assembly instruction.
+=item Identifiers
 
-Which may have one of this B<Identifiers> as an argument: 
+In general, prefixing an identifier with I<&> yields the address of the
+referenced Parrot register or constant.  If an identifier is given without a
+prefix, the value is returned by default.   To emphasis the use of the value,
+the I<*> prefix may be used.  Since Parrot register values vary during code
+execution, their values can not be obtained through identifier substitution
+alone.
 
 B<INT_REG[n]>
 
@@ -207,8 +215,6 @@ Gets replaced by the I<n>th temporary float array.
 B<TEMP_CHAR[n]>
 
 Gets replaced by the I<n>th temporary char array.
-
-You must preside all the identifiers with I<&> requesting the address of that identifier, or I<*> requesting the value, I<*> can be used only with constants since the replacement is done before start running.
 
 B<&INTERPRETER[n]>
 
