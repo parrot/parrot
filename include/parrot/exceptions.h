@@ -82,6 +82,11 @@ struct parrot_exception_t {
 
 typedef struct parrot_exception_t Parrot_exception;
 
+void push_exception(Parrot_Interp, PMC *);
+void pop_exception(Parrot_Interp);
+void throw_exception(Parrot_Interp, PMC *);
+void rethrow_exception(Parrot_Interp, PMC *);
+
 #endif
 
 /*

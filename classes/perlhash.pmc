@@ -49,10 +49,6 @@ pmclass PerlHash {
             mark_hash(INTERP, PMC_data(SELF));
     }
 
-    INTVAL type () {
-        return enum_class_PerlHash;
-    }
-
     INTVAL type_keyed (PMC* key) {
         PMC* valpmc;
         STRING* keystr = make_hash_key(INTERP, key);
