@@ -4,7 +4,7 @@ use Parrot::Test tests => 1;
 
 #SKIP: { skip("runinterp not working at the moment", 1);
 output_is(<<'CODE', <<'OUTPUT', "runinterp");
-	newinterp P0, 1
+	newinterp P0, 0
 	print "calling\n"
 	runinterp P0, foo
 	print "ending\n"
