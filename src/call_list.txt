@@ -151,3 +151,6 @@ i	i3
 t	b
 t	B
 v	P
+
+# For threads
+v	IPP
