@@ -429,6 +429,7 @@ examples/assembly/euclid.pasm                     [main]doc
 examples/assembly/fact.pasm                       [main]doc
 examples/assembly/getopt_demo.imc                 [main]doc
 examples/assembly/hanoi.pasm                      [main]doc
+examples/assembly/hello.pasm                      [main]doc
 examples/assembly/hello-dwim.imc                  [main]doc
 examples/assembly/io1.pasm                        [main]doc
 examples/assembly/io2.pasm                        [main]doc
