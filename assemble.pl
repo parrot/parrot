@@ -339,7 +339,7 @@ while(my $l=shift(@program)) {
 	} elsif($rtype eq 's') {
 	    $args[$_]=~s/[\[\]]//g;
 	} else {
-	    $args[$_]=oct($args[$_]) if($args[$_]=~/^0/);
+	    $args[$_]=oct($args[$_]) if($args[$_]=~/^0[xb]?[0-9a-f]*$/);
 	}
         $pc+=sizeof($rtype);
 	$bytecode .= pack_arg($rtype, $args[$_]);
