@@ -107,7 +107,7 @@ pmclass PerlInt {
         SELF->cache.int_val = value->cache.int_val;
     }
 
-    void set_integer_index (INTVAL index) {
+    void set_integer_index (INTVAL value, INTVAL index) {
     }
 
     void set_number (PMC * value) {
@@ -129,7 +129,7 @@ pmclass PerlInt {
 	SELF->cache.num_val = (FLOATVAL)value->cache.int_val;
     }
 
-    void set_number_index (INTVAL index) {
+    void set_number_index (FLOATVAL value, INTVAL index) {
     }
 
     void set_string (PMC * value) {
@@ -157,7 +157,7 @@ pmclass PerlInt {
 	SELF->cache.struct_val = value->cache.struct_val;
     }
 
-    void set_string_index (INTVAL index) {
+    void set_string_index (STRING * value, INTVAL index) {
     }
 
     void set_value (void* value) {

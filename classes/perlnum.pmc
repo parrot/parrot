@@ -56,7 +56,7 @@ fprintf(stderr,"morph not implemented\n");
         return SELF->cache.num_val;
     }
 
-    FLOATVAL get_number_index () {
+    FLOATVAL get_number_index (INTVAL index) {
     }
 
     STRING* get_string () {
@@ -72,7 +72,7 @@ fprintf(stderr,"morph not implemented\n");
 	return s;
     }
 
-    STRING* get_string_index () {
+    STRING* get_string_index (INTVAL index) {
     }
 
     BOOLVAL get_bool () {

@@ -50,7 +50,7 @@ pmclass PerlString {
 	return string_to_int(interpreter, s);
     }
 
-    INTVAL get_integer_index () {
+    INTVAL get_integer_index (INTVAL index) {
     }
 
     FLOATVAL get_number () {
@@ -58,14 +58,14 @@ pmclass PerlString {
 	return string_to_num(interpreter, s);
     }
 
-    FLOATVAL get_number_index () {
+    FLOATVAL get_number_index (INTVAL index) {
     }
 
     STRING* get_string () {
 	return (STRING*)SELF->cache.struct_val;
     }
 
-    STRING* get_string_index () {
+    STRING* get_string_index (INTVAL index) {
     }
 
     BOOLVAL get_bool () {
