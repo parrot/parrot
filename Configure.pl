@@ -178,6 +178,8 @@ my(%c)=(
     MAJOR   =>    $parrot_version[0],
     MINOR   =>    $parrot_version[1],
     PATCH   =>    $parrot_version[2],
+
+    ops		=>    "",
 );
 
 # What's the platform shell quote character?
@@ -239,6 +241,40 @@ prompt("How big would you like integers to be?", 'iv');
 prompt("And your floats?", 'nv');
 prompt("What is your native opcode type?", 'opcode_t');
 
+
+{
+	my(@ops)=glob("*.ops");
+
+	$c{ops}=join ' ', sort {
+		if   ($a eq 'core.ops') { -1 }
+		elsif($b eq 'core.ops') {  1 }
+		else             { $a cmp $b }
+	} grep {!/obscure\.ops/} @ops;
+
+	my $msg;
+
+	chomp($msg=<<"END");
+
+Now I have to find out what opcode files you would like to compile into your
+Parrot.
+
+The following opcode files are available:
+@ops
+
+WARNING: Bad Things may happen if the first file on the list isn't core.ops.
+
+WARNING: These file names will not be checked for spelling, and typing them
+         wrong will force you to run Configure again.
+
+WARNING: I worry way too much about Configure users.
+
+Which opcode files would you like?
+END
+
+	prompt($msg, 'ops');
+}
+
+
 print <<"END";
 
 Determining if your C compiler is actually gcc (this could take a while):
@@ -253,7 +289,7 @@ END
     unlink("test_siz$c{exe}", "test$c{o}");
 
     unless (exists $gnuc{__GNUC__}) {
-        print << 'END';
+        print <<'END';
 
 The test program didn't give the expected result - assuming your compiler is
 not gcc.
@@ -264,7 +300,7 @@ END
 	my $major = $gnuc{__GNUC__};
         my $minor = $gnuc{__GNUC_MINOR__};
         unless (defined $major) {
-            print << 'END';
+            print <<'END';
 
 Your C compiler is not gcc.
 
@@ -594,7 +630,12 @@ sub prompt {
     my($input);
     print "$message [$c{$field}] ";
     chomp($input=<STDIN>);
-    $c{$field}=$input||$c{$field};
+
+    if($input =~ /^\+/) {
+		$input="$c{$field} $input";
+	}
+
+	$c{$field}=$input||$c{$field};
 }
 
 
@@ -685,9 +726,11 @@ END
     else {
                 print <<"END";
 Okay, we found everything.  Next you'll need to answer
-a few questions about your system.  Rules are the same
-as Perl 5's Configure--defaults are in square brackets,
-and you can hit enter to accept them.
+a few questions about your system.  Defaults are in square
+brackets, and you can hit enter to accept them.  If you
+don't want the default, type a new value in.  If that new
+value starts with a '+', it will be concatenated to the
+default value.
 
 END
     }
