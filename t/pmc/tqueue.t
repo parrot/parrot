@@ -46,7 +46,7 @@ output_is(<<'CODE', <<'OUT', "multi-threaded");
 
     new P5, .ParrotThread
     find_global P6, "_foo"
-    find_method P0, P5, "thread"
+    find_method P0, P5, "thread3"
     invoke	# start the thread
     set I5, P5
     getinterp P2

@@ -18,15 +18,24 @@
 /* General flags */
 /* &gen_from_enum(interpflags.pasm) prefix(INTERPFLAG_) */
 typedef enum {
-    NO_FLAGS             = 0x00,
-    PARROT_DEBUG_FLAG    = 0x01,  /* We're debugging */
-    PARROT_TRACE_FLAG    = 0x02,  /* We're tracing execution */
-    PARROT_BOUNDS_FLAG   = 0x04,  /* We're tracking byte code bounds */
-    PARROT_PROFILE_FLAG  = 0x08,  /* We're gathering profile information */
-    PARROT_GC_DEBUG_FLAG = 0x10,  /* We're debugging memory management */
-    PARROT_EXTERN_CODE_FLAG = 0x100,    /* reusing anothers interps code */
-    PARROT_DESTROY_FLAG  = 0x200,  /* the last interpreter shall cleanup */
-    PARROT_IS_THREAD     = 0x400   /* true if interpreter is a thread */
+    NO_FLAGS                = 0x00,
+    PARROT_DEBUG_FLAG       = 0x01,  /* We're debugging */
+    PARROT_TRACE_FLAG       = 0x02,  /* We're tracing execution */
+    PARROT_BOUNDS_FLAG      = 0x04,  /* We're tracking byte code bounds */
+    PARROT_PROFILE_FLAG     = 0x08,  /* gathering profile information */
+    PARROT_GC_DEBUG_FLAG    = 0x10,  /* debugging memory management */
+
+    PARROT_EXTERN_CODE_FLAG = 0x100, /* reusing anothers interps code */
+    PARROT_DESTROY_FLAG     = 0x200, /* the last interpreter shall cleanup */
+
+    PARROT_IS_THREAD        = 0x1000, /* interpreter is a thread */
+    PARROT_THR_COPY_INTERP  = 0x2000, /* thread start copies interp state */
+    PARROT_THR_THREAD_POOL  = 0x4000, /* type3 threads */
+
+    PARROT_THR_TYPE_1 = PARROT_IS_THREAD,
+    PARROT_THR_TYPE_2 = PARROT_IS_THREAD | PARROT_THR_COPY_INTERP,
+    PARROT_THR_TYPE_3 = PARROT_IS_THREAD | PARROT_THR_COPY_INTERP |
+                        PARROT_THR_THREAD_POOL
 } Parrot_Interp_flag;
 
 /* &end_gen */
@@ -321,6 +330,8 @@ void prepare_for_run(Parrot_Interp interpreter);
 void *init_jit(Parrot_Interp interpreter, opcode_t *pc);
 void dynop_register(Parrot_Interp interpreter, PMC* op_lib);
 void do_prederef(void **pc_prederef, Parrot_Interp interpreter, int type);
+
+void clone_interpreter(PMC* dest, PMC* self);
 
 #else
 

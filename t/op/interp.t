@@ -1,6 +1,6 @@
 #! perl -w
 
-use Parrot::Test tests => 14;
+use Parrot::Test tests => 15;
 
 output_is(<<'CODE', <<'OUTPUT', "runinterp - new style");
 	new P0, .ParrotInterpreter
@@ -242,7 +242,7 @@ from 1 interp
 OUTPUT
 
 SKIP: {
-  skip("No thread config yet" ,3) unless $^O eq 'linux';
+  skip("No thread config yet" ,4) unless $^O eq 'linux';
 
 output_is(<<'CODE', <<'OUTPUT', "interp identity");
     getinterp P2
@@ -262,8 +262,42 @@ ok 1
 ok 2
 OUTPUT
 
+output_is(<<'CODE', <<'OUTPUT', "thread type 1");
+    set I5, 10
+    #
+    # set regs P5 = thread-interp, P6 = sub
+    find_global P6, "_foo"
+    new P5, .ParrotThread
+    find_method P0, P5, "thread1"
+    invoke	# start the thread
 
-output_is(<<'CODE', <<'OUTPUT', "thread 1");
+    sleep 1
+    print "main "
+    print I5
+    print "\n"
+    # get tid of thread
+    set I5, P5
+    # wait for it
+    find_method P0, P5, "join"
+    invoke
+    end
+
+.pcc_sub _foo:
+    # check if vars are fresh
+    inc I5
+    print "thread "
+    print I5
+    print "\n"
+    invoke P1	# ret and be done with thread
+
+# output from threads could be reversed
+CODE
+thread 1
+main 10
+OUTPUT
+
+
+output_is(<<'CODE', <<'OUTPUT', "thread type 2");
     set I5, 1
     set S5, " interp\n"
     new P7, .PerlString
@@ -276,13 +310,10 @@ output_is(<<'CODE', <<'OUTPUT', "thread 1");
     find_global P6, "_foo"
     print "ok 2\n"
     new P5, .ParrotThread
-    find_method P0, P5, "thread"
+    find_method P0, P5, "thread2"
     invoke	# start the thread
 
-    print P7
-    print I5
-    print S5
-    sleep 1
+    sleep 1	# now the thread should run
     print P7
     print I5
     print S5
@@ -312,11 +343,9 @@ output_is(<<'CODE', <<'OUTPUT', "thread 1");
     print "\n"
     invoke P1	# ret and be done with thread
 
-# output from threads could be reversed
 CODE
 ok 1
 ok 2
-from 1 interp
 hello from 2 thread
 ParrotThread tid 1
 Sub
@@ -331,7 +360,7 @@ output_is(<<'CODE', <<'OUTPUT', "thread - kill");
     print "start "
     print I10
     print "\n"
-    find_method P0, P5, "thread"
+    find_method P0, P5, "thread3"
     invoke	# start the thread
     sleep 1
 

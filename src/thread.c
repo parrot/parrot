@@ -86,8 +86,6 @@ pt_thread_prepare_for_run(Parrot_Interp d, Parrot_Interp s)
     d->pmc_reg.registers[1] = ret_c;
 }
 
-void clone_interpreter(PMC* dest, PMC* self);
-
 /*
  * ParrotThread emthods
  *
@@ -101,7 +99,15 @@ pt_thread_run(Parrot_Interp interp, PMC* dest_interp, PMC* sub)
 
     PMC *parent = VTABLE_get_pmc_keyed_int(interp, interp->iglobals,
                 IGLOBALS_INTERPRETER);
-    clone_interpreter(dest_interp, parent);
+
+    /*
+     * TODO check if thread flags are consistent
+     */
+    if (interp->flags & PARROT_THR_COPY_INTERP)
+        clone_interpreter(dest_interp, parent);
+    /*
+     * TODO thread pools
+     */
 
     dest_interp->cache.struct_val = sub->cache.struct_val;
     pt_thread_prepare_for_run(interpreter, interp);
@@ -120,6 +126,41 @@ pt_thread_run(Parrot_Interp interp, PMC* dest_interp, PMC* sub)
     THREAD_CREATE_JOINABLE(interpreter->thread_data->thread,
             thread_func, dest_interp);
     return 0;
+}
+
+/*
+ * run a type 1 thread
+ * nothing is shared, both interpreters are free running
+ * w/o any communication
+ */
+
+int
+pt_thread_run_1(Parrot_Interp interp, PMC* dest_interp, PMC* sub)
+{
+    interp->flags |= PARROT_THR_TYPE_1;
+    return pt_thread_run(interp, dest_interp, sub);
+}
+
+/*
+ * run a type 2 thread
+ * no shared variables, threads are communicating by sending messages
+ */
+int
+pt_thread_run_2(Parrot_Interp interp, PMC* dest_interp, PMC* sub)
+{
+    interp->flags |= PARROT_THR_TYPE_2;
+    return pt_thread_run(interp, dest_interp, sub);
+}
+
+/*
+ * run a type 3 thread
+ * threads may have shared variables and are managed in a thread pool
+ */
+int
+pt_thread_run_3(Parrot_Interp interp, PMC* dest_interp, PMC* sub)
+{
+    interp->flags |= PARROT_THR_TYPE_3;
+    return pt_thread_run(interp, dest_interp, sub);
 }
 
 /*

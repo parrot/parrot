@@ -59,7 +59,7 @@ From perldoc perlthrtut
     $P2 = new PerlInt
     $P2 = 2
     .sym pmc Thread_new
-    find_method Thread_new, kid, "thread"
+    find_method Thread_new, kid, "thread3"
     .pcc_begin prototyped
     .arg kid
     .arg Check_num
@@ -137,7 +137,7 @@ no_kid1:
 #       29                $kid = new threads(\&check_num, $downstream, $num);
     kid = new ParrotThread
     .sym pmc Thread_new
-    find_method Thread_new, kid, "thread"
+    find_method Thread_new, kid, "thread3"
     .pcc_begin prototyped
     .arg kid
     .arg sub

@@ -10,16 +10,20 @@
  *  Notes:
  *     Additionally to ParrotInterpreter a ParrotThread supports:
  *
- *     getinterp P2             # get current interpreter
- *     new P0, .ParrotThread, P2        # create thread P0 from interp P2
- *     set I0, P0               # get thread id
+ *     new P0, .ParrotThread     # create new threaded interp
+ *     getinterp P2
+ *     new P0, .ParrotThread, P2 # create thread P0 from interp P2
+ *     set I0, P0                # get thread id
  *
  *     and these methods:
  *
- *     thread ()
+ *     thread1
+ *     thread2
+ *     thread3                   # start thread of type 1..3
  *     join
  *     detach
  *     yield
+ *     kill
  *
  *  References:
  */
