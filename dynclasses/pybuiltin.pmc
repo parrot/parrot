@@ -450,19 +450,7 @@ Returns an iterator over a sequence.
         /*
          * need an iterator - that's the original construction code
          */
-        PMC *iter = pmc_new_init(INTERP, enum_class_Iterator, obj);
-        PMC *next, *obj_iter;
-        STRING *next_meth = const_string(INTERP, "next");
-        STRING *class_name;
-
-        PMC_struct_val(iter) = obj_iter =
-            Parrot_delegate_get_iter(INTERP, obj);
-
-        next = Parrot_find_method_with_cache(INTERP, obj_iter, next_meth);
-        assert(next);
-        class_name = VTABLE_name(INTERP, obj);
-        Parrot_store_global(INTERP, class_name, next_meth, next);
-        return iter;
+        return VTABLE_get_iter(INTERP, obj);
     }
 
 /*
