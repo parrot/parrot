@@ -31,7 +31,7 @@ A short-term list of todo items:
 
 - Add tests for operator precedence (noticed some problems with bitwise ops).
 
-- Make vector operators (P6C::IMCC::hype.pm) use the standard binary
+- Make hyper operators (P6C::IMCC::hype.pm) use the standard binary
   and unary operator implementations, instead of re-implementing every
   one in hype.pm.
 
