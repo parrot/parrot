@@ -312,12 +312,6 @@ runops(struct Parrot_Interp *interpreter, struct PackFile *code, size_t offset)
     interpreter->code = code;
     interpreter->resume_offset = offset;
     interpreter->resume_flag = 1;
-    /* Okay, we've finished doing anything that might trigger GC.
-     * Actually, we could enbale DOD/GC earlier, but here all setup is
-     * done
-     */
-    interpreter->DOD_block_level--;
-    interpreter->GC_block_level--;
 
     while (interpreter->resume_flag) {
         unsigned int slow;
@@ -555,6 +549,12 @@ make_interpreter(Interp_flags flags)
 
     /* Done. Return and be done with it */
 
+    /* Okay, we've finished doing anything that might trigger GC.
+     * Actually, we could enbale DOD/GC earlier, but here all setup is
+     * done
+     */
+    interpreter->DOD_block_level--;
+    interpreter->GC_block_level--;
     interpreter->code = (struct PackFile *)NULL;
     interpreter->profile = (ProfData *)NULL;
 
@@ -603,6 +603,10 @@ Parrot_really_destroy(int exit_code, void *vinterp)
     mem_sys_free(interpreter->perl_stash);
     if (interpreter->profile)
         mem_sys_free(interpreter->profile);
+    if (interpreter->prederef_code)
+        free(interpreter->prederef_code);
+    /* TODO cleanup JIT structures */
+
     mem_sys_free(interpreter->warns);
 
     /* XXX move this to register.c */
