@@ -339,7 +339,18 @@ sub assign_var
   if ($ident{$name}) {
     if ($type eq '*') {
       if ($ident{$value}) {
-        printf "%-12s %-8s %s\n", '', 'set', "$ident{$name}{REG}, $ident{$value}{REG}";
+        if ($ident{$name}{TYPE} ne $ident{$value}{TYPE}) {
+          if ($ident{$name}{TYPE} eq "N" and $ident{$value}{TYPE} eq "I") {
+            printf "%-12s %-8s %s\n", '', 'iton', "$ident{$name}{REG}, $ident{$value}{REG}";
+          } elsif ($ident{$name}{TYPE} eq "I" and $ident{$value}{TYPE} eq "N") {
+            printf "%-12s %-8s %s\n", '', 'ntoi', "$ident{$name}{REG}, $ident{$value}{REG}";
+          } else {
+            printf(STDERR "jako: Cannot assign type '%s' to type '%s' on line %d.\n", 
+                    $ident{$value}{TYPE}, $ident{$name}{TYPE}, $line);
+          }
+        } else {
+            printf "%-12s %-8s %s\n", '', 'set', "$ident{$name}{REG}, $ident{$value}{REG}";
+        }
       } else {
         printf(STDERR "jako: Assignment from undefined variable '%s' on line %d.\n",
           $value, $line);
@@ -402,7 +413,7 @@ sub void_func
       printf "%-12s %-8s %s\n", '', $name, $arg;
     }
   } else {
-    printf(STDERR "jako: Unrecognized function '$name' on line %d.\n", $name, $line);
+    printf(STDERR "jako: Unrecognized function '%s' on line %d.\n", $name, $line);
   }
 }
 
@@ -419,7 +430,7 @@ sub assign_func
     @args = map_args($dest, @args);
     printf "%-12s %-8s %s\n", '', $name, join(", ", @args);
   } else {
-    printf(STDERR "jako: Unrecognized function '$name' on line %d.\n", $name, $line);
+    printf(STDERR "jako: Unrecognized function '%s' on line %d.\n", $name, $line);
   }
 }
 
@@ -675,7 +686,7 @@ while(<>) {
   #
 
   if ((m/^var\s+(i)nt(eger)?\s+([A-Za-z][A-Za-z0-9_]*)(\s*=\s*(\d+))?$/) ||
-      (m/^var\s+(n)um(ber)?\s+([A-Za-z][A-Za-z0-9_]*)(\s*=\s*(\d+(\.\d+)))$/) ||
+      (m/^var\s+(n)um(ber)?\s+([A-Za-z][A-Za-z0-9_]*)(\s*=\s*(\d+(\.\d+)))?$/) ||
       (m/^var\s+(s)tr(ing)?\s+([A-Za-z][A-Za-z0-9_]*)(\s*=\s*(\"[^\\\"]*(?:\\.[^\\\"]*)*\"))?$/)) { 
     declare_var($3, uc($1));
     assign_var($3, uc($1), $5) if defined $5;
