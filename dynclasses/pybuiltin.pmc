@@ -98,6 +98,7 @@ they will be used frequently here.
             PyBuiltin_PyProxyType  = Parrot_PMC_typenum(INTERP, "PyProxyType");
             PyBuiltin_PySlice      = Parrot_PMC_typenum(INTERP, "PySlice");
             PyBuiltin_PyString     = Parrot_PMC_typenum(INTERP, "PyString");
+            PyBuiltin_PyStaticMeth = Parrot_PMC_typenum(INTERP, "PyStaticMeth");
             PyBuiltin_PyTuple      = Parrot_PMC_typenum(INTERP, "PyTuple");
             PyBuiltin_PyType       = Parrot_PMC_typenum(INTERP, "PyType");
 
@@ -236,6 +237,12 @@ enter_nci_method should create these as locals to begin with.
         scratchpad_store_by_name(INTERP, pad, 0, key, item);
         PyBuiltin_PyDict_class = item;
 
+        key = const_string(INTERP, "Exception");
+        item = make_type(INTERP, PyBuiltin_PyException, key);
+        VTABLE_setprop(INTERP, item, PyString_bases, parent);
+        scratchpad_store_by_name(INTERP, pad, 0, key, item);
+        PyBuiltin_PyException_class = item;
+
         key = const_string(INTERP, "int");
         item = make_type(INTERP, PyBuiltin_PyInt, key);
         VTABLE_setprop(INTERP, item, PyString_bases, parent);
@@ -265,6 +272,19 @@ enter_nci_method should create these as locals to begin with.
         VTABLE_setprop(INTERP, item, PyString_bases, parent);
         scratchpad_store_by_name(INTERP, pad, 0, key, item);
         PyBuiltin_PyTuple_class = item;
+
+        key = const_string(INTERP, "type");
+        item = make_type(INTERP, PyBuiltin_PyType, key);
+        VTABLE_setprop(INTERP, item, PyString_bases, parent);
+        scratchpad_store_by_name(INTERP, pad, 0, key, item);
+        PyBuiltin_PyType_class = item;
+        item->vtable = Parrot_base_vtables[PyBuiltin_PyType];
+
+        key = const_string(INTERP, "staticmethod");
+        item = make_type(INTERP, PyBuiltin_PyStaticMeth, key);
+        VTABLE_setprop(INTERP, item, PyString_bases, parent);
+        scratchpad_store_by_name(INTERP, pad, 0, key, item);
+        PyBuiltin_PyStaticMeth_class = item;
 
         key = const_string(INTERP, "xrange");
         item = make_type(INTERP, PyBuiltin_PySlice, key);

@@ -27,6 +27,7 @@ pyobject \
   pymodule \
   pynone \
   pytype \
+  pystaticmeth \
   pyslice \
   pystring \
   pytuple \

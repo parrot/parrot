@@ -104,6 +104,20 @@ Return attribute named C<name>.
 
 /*
 
+=item C<PMC *get_class()>
+
+Return the class of this object.
+
+=cut
+
+*/
+
+    PMC* get_class() {
+        return PyBuiltin_PyType_class;
+    }
+
+/*
+
 =item C<void* invoke(void* next)>
 
 Pythonic object constructor.
@@ -190,6 +204,32 @@ Returns the name of this class.
     STRING* name() {
         PMC *name = VTABLE_getprop(INTERP, SELF, PyString_name);
         return VTABLE_get_string(INTERP, name);
+    }
+
+/*
+
+=item C<PMC* "__new__"(PMC *class, PMC *source)>
+
+Create a new integer
+
+=cut
+
+*/
+
+    METHOD PMC* __new__(PMC *instance, PMC *metaclass, PMC *name, PMC *bases, PMC *dict)
+    {
+        INTVAL argc = REG_INT(3);
+        if (argc == 1)
+            return VTABLE_get_class(INTERP, instance);
+        else {
+            /* XXX: quick hack: class method called directly */
+            /* TODO: multiple bases */
+            /* TODO: vars */
+            PMC *base = VTABLE_get_pmc_keyed_int(INTERP, bases, 0);
+            PMC *type = VTABLE_subclass(INTERP, base, 
+                VTABLE_get_string(INTERP, name));
+            return type;
+        }
     }
 
 /*

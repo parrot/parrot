@@ -252,6 +252,7 @@ P	IOPP
 P	IOPPP
 v	IOPP
 P	IOPPPP
+P	IOPPPPP
 
 # Parrot builtins
 d	IOd

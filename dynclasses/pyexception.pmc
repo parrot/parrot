@@ -65,6 +65,26 @@ object.  Else, rethrow.
 
 /*
 
+=item C<PMC* "__new__"(PMC *class, PMC *source)>
+
+Create a new integer
+
+=cut
+
+*/
+
+    METHOD PMC* __new__(PMC *class) {
+        PMC *exception = pmc_new(interpreter, enum_class_Exception);
+
+        /* set type, severity */
+        VTABLE_set_integer_keyed_int(interpreter, exception, 1, 1);
+        VTABLE_set_integer_keyed_int(interpreter, exception, 2, 2);
+
+        return  exception;
+    }
+
+/*
+
 =back
 
 =cut

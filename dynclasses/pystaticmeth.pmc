@@ -1,0 +1,71 @@
+/*
+Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+$Id$
+
+=head1 NAME
+
+classes/nci.pmc - Python Native Call Interface Functions
+
+=head1 DESCRIPTION
+
+Extends Parrot's NCI to include attributes, implemented as properties.
+
+=head2 Methods
+
+=over 4
+
+=cut
+
+*/
+
+#include "parrot/parrot.h"
+#include "pyconsts.h"
+
+pmclass PyStaticMeth extends PyFunc dynpmc group python_group {
+
+/*
+
+=item C<PMC* "__new__"(PMC *class, PMC *source)>
+
+Create a new static method
+
+=cut
+
+*/
+
+    METHOD PMC* __new__(PMC *class, PMC *source) {
+        INTVAL argc = REG_INT(3);
+
+        if (argc > 1)
+            return source;
+        else
+            return pmc_new(INTERP, PyBuiltin_PyStaticMeth);
+    }
+
+}
+
+/*
+
+=back
+
+=head1 SEE ALSO
+
+F<docs/pdds/pdd03_calling_conventions.pod>.
+
+=head1 HISTORY
+
+Initial revision by sean 2002/08/04.
+
+=cut
+
+*/
+
+/*
+ * Local variables:
+ * c-indentation-style: bsd
+ * c-basic-offset: 4
+ * indent-tabs-mode: nil
+ * End:
+ *
+ * vim: expandtab shiftwidth=4:
+*/

@@ -349,6 +349,22 @@ Sets the PMC value of the element at index C<key> to C<*src>.
 
 /*
 
+=item C<void set_string_keyed_int(INTVAL key, STRING* value)>
+
+Sets the string value of the PMC at element C<key> to C<value>.
+
+=cut
+
+*/
+
+    void set_string_keyed_int (INTVAL key, STRING* value) {
+        PMC *src = pmc_new_noinit(INTERP, PyBuiltin_PyString);
+        VTABLE_set_string_native(INTERP, src, value);
+        DYNSELF.set_pmc_keyed_int(key, src);
+    }
+
+/*
+
 =back
 
 =cut
