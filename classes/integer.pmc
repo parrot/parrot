@@ -51,15 +51,22 @@ pmclass Integer extends mmd_default {
       return SELF->cache.int_val;
     }
 
-   INTVAL get_integer() {
+    INTVAL get_integer() {
       return (INTVAL)SELF->cache.int_val;
-   }
+    }
 
-   INTVAL get_bool() {
+    INTVAL get_bool() {
       return(SELF->cache.int_val != 0);
-   }
+    }
 
-   STRING* get_string() {
+    STRING* get_string() {
       return string_from_num(INTERP, SELF->cache.int_val);
-   }
+    }
+
+    void increment() {
+      SELF->cache.int_val++;
+    }
+    void decrement() {
+      SELF->cache.int_val--;
+    }
 }

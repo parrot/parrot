@@ -206,6 +206,9 @@ InitializeCoreOps:
     set .SpecialWords["until"], 4
     set .SpecialWords["again"], 5
     set .SpecialWords["exit"], 6
+    set .SpecialWords["do"], 7
+    set .SpecialWords["loop"], 8
+    set .SpecialWords["+loop"], 9
 
     .AddCoreOp(Int_Dot,".")
     .AddCoreOp(Int_Dot, "u.")
@@ -1365,7 +1368,40 @@ AddSpecialWord:
     concat .NewBodyString, "\n"
     branch EndSpecWord    
   NotUntil:
+    ne .CurrentWord, "do", NotDo
+    .IncNestLevel
+    .GetNestLevel
+    concat .NewBodyString, "restore P31\n"
+    concat .NewBodyString, "restore P6\n"
+    concat .NewBodyString, "push P30, P6\n"
+    concat .NewBodyString, "push P30, P31\n"
+    concat .NewBodyString, "dolabel"
+    set .TempString, .NestLevel
+    concat .NewBodyString, .TempString
+    concat .NewBodyString, ":\n"    
     branch EndSpecWord    
+  NotDo:
+    ne .CurrentWord, "loop", NotLoop
+    concat .NewBodyString, "pop P6, P30\n"
+    concat .NewBodyString, "inc P6\n"
+    concat .NewBodyString, "pop P31, P30\n"
+    concat .NewBodyString, "push P30, P31\n"
+    concat .NewBodyString, "push P30, P6\n"
+    concat .NewBodyString, "ne P6, P31, dolabel"
+    .GetNestLevel
+    set .TempString, .NestLevel
+    concat .NewBodyString, .TempString
+    concat .NewBodyString, "\n"
+    concat .NewBodyString, "pop P31, P30\npop P31, P30\n"
+    branch EndSpecWord    
+  NotLoop:
+    ne .CurrentWord, "+loop", NotPlusLoop
+    branch EndSpecWord    
+  NotPlusLoop:
+
+    branch EndSpecWord    
+
+
 EndSpecWord:
     ret
 
