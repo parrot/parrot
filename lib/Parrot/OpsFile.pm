@@ -128,7 +128,7 @@ sub read_ops
     #   sc   String constant index
     #
 
-    if (/^(AUTO|MANUAL)_OP\s+([a-zA-Z][a-zA-Z0-9]*)\s*\((.*)\)\s*{/) {
+    if (/^(AUTO|MANUAL)_OP\s+([a-zA-Z]\w*)\s*\((.*)\)\s*{/) {
       if ($seen_op) {
         die "Parrot::OpsFile: Cannot define an op within an op definition!\n";
       }

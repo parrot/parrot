@@ -154,7 +154,7 @@ sub source
 
   my $full_body = $self->full_body;
 
-  $full_body =~ s/{{\@(.*?)}}/ &$arg_sub($self->arg_type($1), $1); /mge;
+  $full_body =~ s/{{\@(.*?)}}/ &$arg_sub($self->arg_type($1), $1, $self); /mge;
 
   $full_body =~ s/{{=0,=(.*?)}}/   &$res_sub_abs($1)  . "; " . &$ret_sub_abs(0); /mge;
   $full_body =~ s/{{=0,\+=(.*?)}}/ &$res_sub_rel($1)  . "; " . &$ret_sub_abs(0); /mge;

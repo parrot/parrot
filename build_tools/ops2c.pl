@@ -231,7 +231,7 @@ sub map_ret_rel
 
 sub map_arg
 {
-  my ($type, $num) = @_;
+  my ($type, $num, $self) = @_;
 
   my %arg_maps = (
     'op' => "cur_opcode[%ld]",
@@ -247,7 +247,7 @@ sub map_arg
     'sc' => "interpreter->code->const_table->constants[cur_opcode[%ld]]->string",
   );
 
-  die "Unrecognized type '$type' for num '$num'" unless exists $arg_maps{$type};
+  die "Unrecognized type '$type' for num '$num' in opcode @{[$self->full_name]}" unless exists $arg_maps{$type};
 
   return sprintf($arg_maps{$type}, $num);
 }
