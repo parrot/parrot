@@ -10,7 +10,10 @@ BUGS:
    Also label fixup handling is different so just don't compile
    PIR files to PASM except for debugging.
 
- - the parser doesn't like empty subs:
+ - the parser doesn't like empty subs or compilation units:
    .sub _foo
    .end
+   
+   .emit
+   .eom
    inserting a 'noop' helps.
