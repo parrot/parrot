@@ -635,7 +635,7 @@ PackFile_assign_transforms(struct PackFile *pf)
         if (NUMVAL_SIZE == 8 && pf->header->floattype == 1)
             pf->fetch_nv = cvt_num12_num8;
         else if (NUMVAL_SIZE != 8 && pf->header->floattype == 0)
-            pf->fetch_nv = fetch_buf_be_8;
+            pf->fetch_nv = fetch_buf_le_8;
     }
 #endif
 }
