@@ -33,9 +33,15 @@ init_world(Interp *interpreter)
 
     string_init();              /* Set up the string subsystem */
 
-    /* allocate core vtable table */
-    Parrot_base_vtables =
-        mem_sys_allocate_zeroed(sizeof(VTABLE *) * PARROT_MAX_CLASSES);
+    /* TODO allocate core vtable table only once - or per interpreter
+     *
+     * this interfers with JITted NCI on i386, where the method stubs
+     * are stored inside vtable->method_table - different threads get
+     * the same code
+     */
+    if (!Parrot_base_vtables)
+        Parrot_base_vtables =
+            mem_sys_allocate_zeroed(sizeof(VTABLE *) * PARROT_MAX_CLASSES);
     enum_class_max = enum_class_core_max;
     class_table_size = PARROT_MAX_CLASSES;
 

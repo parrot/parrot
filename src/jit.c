@@ -107,7 +107,7 @@ make_branch_list(struct Parrot_Interp *interpreter,
 
     /* Allocate space for the branch information and register map */
     optimizer->map_branch = branch =
-        (char *)mem_sys_allocate_zeroed((size_t)(code_end - code_start));
+        (char *)mem_sys_allocate_zeroed((size_t)(code_end - code_start + 1));
 
     /* Allocate space for the branch list */
     optimizer->branch_list = (opcode_t **)
@@ -990,7 +990,7 @@ build_asm(struct Parrot_Interp *interpreter, opcode_t *pc,
         op_func = op_jit;
 
 
-    name = malloc(strlen(interpreter->code->cur_cs->base.name) + 5);
+    name = mem_sys_allocate(strlen(interpreter->code->cur_cs->base.name) + 5);
     sprintf(name, "%s_JIT", interpreter->code->cur_cs->base.name);
     jit_seg = PackFile_find_segment(interpreter->code->cur_cs->base.dir,
             name, 0);

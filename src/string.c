@@ -1560,7 +1560,7 @@ string_to_cstring(struct Parrot_Interp * interpreter, STRING * s)
     if (s == NULL) {
         return NULL;
     }
-    p = malloc(s->bufused + 1);
+    p = mem_sys_allocate(s->bufused + 1);
     memcpy(p, s->strstart, s->bufused);
     p[s->bufused] = 0;
     return p;

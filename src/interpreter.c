@@ -1133,7 +1133,13 @@ Parrot_really_destroy(int exit_code, void *vinterp)
         encoding_destroy();
     }
 
-    mem_sys_free(interpreter);
+    else {
+        /* don't free a thread interpreter, if it isn't joined yet */
+        if (!interpreter->thread_data || (
+                    interpreter->thread_data &&
+                    interpreter->thread_data->state == THREAD_STATE_JOINED))
+            mem_sys_free(interpreter);
+    }
 }
 
 #ifdef GC_IS_MALLOC

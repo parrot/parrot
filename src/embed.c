@@ -170,7 +170,7 @@ again:
         INTVAL read_result;
 
         chunk_size = program_size > 0 ? program_size : 1024;
-        program_code = (char *)malloc(chunk_size);
+        program_code = (char *)mem_sys_allocate(chunk_size);
         wanted = program_size;
         program_size = 0;
 
@@ -192,7 +192,7 @@ again:
                 break;
             chunk_size = 1024;
             program_code =
-                realloc(program_code, program_size + chunk_size);
+                mem_sys_realloc(program_code, program_size + chunk_size);
 
             if (NULL == program_code) {
                 PIO_eprintf(interpreter,
@@ -526,7 +526,7 @@ argv_join(char ** argv)
     for (i = 0; argv[i]; i++)
         space += strlen(argv[i]) + 1;
 
-    command = (char*) malloc(space == 0 ? 1 : space);
+    command = (char*) mem_sys_allocate(space == 0 ? 1 : space);
     p = command;
     for (i = 0; argv[i]; i++) {
         strcpy(p, argv[i]);

@@ -48,8 +48,6 @@ pmclass ParrotThread extends ParrotInterpreter need_ext {
         SUPER();
         pt_add_to_interpreters(interpreter, PMC_data(SELF));
         UNLOCK(interpreter_array_mutex);
-        parent = VTABLE_get_pmc_keyed_int(interpreter, interpreter->iglobals,
-                IGLOBALS_INTERPRETER);
     }
 
     /*

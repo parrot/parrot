@@ -15,10 +15,17 @@
 /*=for api mem mem_sys_allocate
    uses malloc to allocate system memory
 */
+
+/* for PANIC */
+#define interpreter NULL
+
 void *
 mem_sys_allocate(size_t size)
 {
-    return malloc((size_t)size);
+    void *ptr = malloc((size_t)size);
+    if (!ptr)
+        PANIC("Out of mem");
+    return ptr;
 }
 
 /*=for api mem mem_sys_allocate_zeroed
@@ -27,7 +34,10 @@ mem_sys_allocate(size_t size)
 void *
 mem_sys_allocate_zeroed(size_t size)
 {
-    return calloc(1, (size_t)size);
+    void *ptr = calloc(1, (size_t)size);
+    if (!ptr)
+        PANIC("Out of mem");
+    return ptr;
 }
 
 /*=for api mem mem_sys_realloc
@@ -36,8 +46,12 @@ mem_sys_allocate_zeroed(size_t size)
 void *
 mem_sys_realloc(void *from, size_t size)
 {
-    return realloc(from, size);
+    void *ptr = realloc(from, size);
+    if (!ptr)
+        PANIC("Out of mem");
+    return ptr;
 }
+#undef interpreter
 
 /*=for api mem mem_sys_free
    free a chunk of memory back to the system

@@ -143,8 +143,10 @@ pmclass ParrotInterpreter need_ext {
         if (!PMC_data(SELF)) {
             Parrot_Interp new_interp = make_interpreter(INTERP, 0);
             PMC_data(SELF) = new_interp;
+            VTABLE_set_pmc_keyed_int(new_interp, new_interp->iglobals,
+                    (INTVAL) IGLOBALS_INTERPRETER, SELF);
         }
-	SELF->cache.struct_val = NULL;
+        SELF->cache.struct_val = NULL;
     }
 
     void init_pmc (PMC *parent) {
@@ -153,8 +155,10 @@ pmclass ParrotInterpreter need_ext {
         if (!PMC_data(SELF)) {
             Parrot_Interp new_interp = make_interpreter(p, 0);
             PMC_data(SELF) = new_interp;
+            VTABLE_set_pmc_keyed_int(new_interp, new_interp->iglobals,
+                    (INTVAL) IGLOBALS_INTERPRETER, SELF);
         }
-	SELF->cache.struct_val = NULL;
+        SELF->cache.struct_val = NULL;
     }
 
     void set_pointer (void* value) {

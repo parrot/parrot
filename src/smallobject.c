@@ -261,7 +261,7 @@ alloc_objects(struct Parrot_Interp *interpreter,
      */
     new_arena = Parrot_memalign(ARENA_ALIGN, size);
     if (!new_arena)
-        internal_exception(ALLOCATION_ERROR, "Out of arena memory");
+        PANIC("Out of arena memory");
     /* offset in bytes of whole Objects */
     offset = ( 1 + sizeof(struct Small_Object_Arena) / pool->object_size) *
         pool->object_size;
@@ -280,6 +280,8 @@ alloc_objects(struct Parrot_Interp *interpreter,
     new_arena->free_list = NULL;
 #else
     new_arena = mem_sys_allocate(sizeof(struct Small_Object_Arena));
+    if (!new_arena)
+        PANIC("Out of arena memory");
     size = pool->object_size * pool->objects_per_alloc;
     /* could be mem_sys_allocate too, but calloc is fast */
     new_arena->start_objects = mem_sys_allocate_zeroed(size);

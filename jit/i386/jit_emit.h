@@ -2959,7 +2959,7 @@ Parrot_jit_build_call_func(struct Parrot_Interp *interpreter, PMC *pmc_nci,
                         &PMC_REG(count_regs(sig, signature->strstart)));
 #if PARROT_CATCH_NULL
                 jit_emit_cmp_rm_i(pc, emit_EAX, &PMCNULL);
-                emitm_jxs(pc, emitm_jnz, 2); /* skip the xor */
+                emitm_jxs(pc, emitm_jne, 2); /* skip the xor */
                 jit_emit_bxor_rr_i(pc, emit_EAX, emit_EAX);
 #endif
                 emitm_pushl_r(pc, emit_EAX);
