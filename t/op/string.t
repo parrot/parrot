@@ -1,6 +1,6 @@
 #! perl -w
 
-use Parrot::Test tests => 94;
+use Parrot::Test tests => 95;
 use Test::More;
 
 output_is( <<'CODE', <<OUTPUT, "set_s_s|sc" );
@@ -1372,6 +1372,31 @@ output_is( <<'CODE', <<OUTPUT, "Check that bug #16874 was fixed" );
   end
 CODE
 [foo     bar     quux    ]
+OUTPUT
+
+output_is( <<'CODE', <<OUTPUT, "ord and substring (see #17035)" );
+  set S0, "abcdef"
+  substr S1, S0, 2, 3
+  ord I0, S0, 2
+  ord I1, S1, 0
+  ne I0, I1, fail
+  ord I0, S0, 3
+  ord I1, S1, 1
+  ne I0, I1, fail
+  ord I0, S0, 4
+  ord I1, S1, 2
+  ne I0, I1, fail
+  print "It's all good\n"
+  end
+fail:
+  print "Not good: original string="
+  print I0
+  print ", substring="
+  print I1
+  print "\n"
+  end
+CODE
+It's all good
 OUTPUT
 
 # Set all string registers to values given by &$_[0](reg num)

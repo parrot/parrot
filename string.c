@@ -256,10 +256,10 @@ string_index(const STRING *s, UINTVAL idx)
          * in a singlebyte encoding. 
          * This assumes that any singlebyte encoding uses is us-ascii, which is wrong,
          * but consistent withthe result of calling s->encoding->decode */
-        return *((unsigned char*) s->bufstart + idx);
+        return *((unsigned char*) s->strstart + idx);
     }
     else {
-        return s->encoding->decode(s->encoding->skip_forward(s->bufstart, idx));
+        return s->encoding->decode(s->encoding->skip_forward(s->strstart, idx));
     }
 }
 
