@@ -12,6 +12,8 @@ typedef void (*jit_f)(struct Parrot_Interp *interpreter, opcode_t *pc);
 jit_f build_asm(struct Parrot_Interp *interpreter, opcode_t *pc,
                 opcode_t *code_start, opcode_t *code_end);
 
+void Parrot_destroy_jit(struct Parrot_Interp *interpreter);
+
 /*  Parrot_jit_fixup_t
  *      Platform generic fixup information
  *
@@ -53,10 +55,6 @@ enum {
     JIT_BRANCH_SOURCE   /* The opcode is a branch source */
 };
 
-typedef unsigned int Parrot_jit_register_count_t;
-typedef unsigned int Parrot_jit_register_usage_t;
-typedef char Parrot_jit_register_dir_t;
-typedef char Parrot_jit_map_branch_t;
 
 /*  Parrot_jit_arena_t
  *      Holds pointers to the native code of one or more sections.
@@ -82,46 +80,47 @@ typedef struct {
  *
  *  begin:              Points where sections begins in the bytecode.
  *  end:                Points where sections ends in the bytecode.
- *  int_reg_count:      An array with one position for each integer register
- *                      holding the number of times each register is used in the
- *                      section.
- *  int_reg_usage:      An array with the registers sorted by the usage.
- *  int_reg_dir:        If the register needs to be loaded or saved.
- *  float_reg_count:    Same as int_ but for floats.
- *  float_reg_usage:    Same as int_ but for floats.
- *  float_reg_dir:      Same as int_ but for floats.
  *  arena:              The first arena for this section, or NULL if the
  *                      section is in the arena inlined in jit_info.
- *  int_registers_used: The number of used registers.
+ *  ru[4]:              register_usage_t per [IPSN]
  *  maps:               Total maps done.
  *  jit_op_count:       How many opcodes are jitted.
  *  op_count:           Opcodes in this section.
  *  load_size:          The size of the register load instructions to be
  *                      skipped in an in-section branch.
- *  type:               If this section is a jitted one or not.
+ *  isjit:              If this section is a jitted one or not.
+ *  block:              block number of section
  *  branch_target:      The section where execution continues if this section
  *                      ends at a branch source the targeted section is used.
  */
 
 typedef struct Parrot_jit_optimizer_section *Parrot_jit_optimizer_section_ptr;
 
+/*  reg_count:      An array with one position for each register
+ *                  holding the number of times each register is used in the
+ *                  section.
+ *  reg_usage:      An array with the registers sorted by the usage.
+ *  reg_dir:        If the register needs to be loaded or saved.
+ *  registers_used: count of used registers
+ */
+typedef struct {
+    int                                 reg_count[NUM_REGISTERS];
+    unsigned int                        reg_usage[NUM_REGISTERS];
+    char                                reg_dir[NUM_REGISTERS];
+    int                        registers_used;
+} Parrot_jit_register_usage_t;
+
 typedef struct Parrot_jit_optimizer_section {
     opcode_t                            *begin;
     opcode_t                            *end;
-    Parrot_jit_register_count_t          int_reg_count[NUM_REGISTERS];
-    Parrot_jit_register_usage_t          int_reg_usage[NUM_REGISTERS];
-    Parrot_jit_register_dir_t            int_reg_dir[NUM_REGISTERS];
-    unsigned char                        int_registers_used;
-    Parrot_jit_register_count_t          float_reg_count[NUM_REGISTERS];
-    Parrot_jit_register_usage_t          float_reg_usage[NUM_REGISTERS];
-    Parrot_jit_register_dir_t            float_reg_dir[NUM_REGISTERS];
-    unsigned char                        float_registers_used;
+    Parrot_jit_register_usage_t          ru[4];
     Parrot_jit_arena_t                  *arena;
     unsigned int                         maps;
     unsigned int                         jit_op_count;
     unsigned int                         op_count;
     ptrdiff_t                            load_size;
-    char                                 type;
+    char                                 isjit;
+    int                                  block;
     Parrot_jit_optimizer_section_ptr     branch_target;
     Parrot_jit_optimizer_section_ptr     prev;
     Parrot_jit_optimizer_section_ptr     next;
@@ -144,7 +143,7 @@ typedef struct Parrot_jit_optimizer_section {
 typedef struct {
     Parrot_jit_optimizer_section_t  *sections;
     Parrot_jit_optimizer_section_t  *cur_section;
-    Parrot_jit_map_branch_t         *map_branch;
+    char                            *map_branch;
     opcode_t                       **branch_list;
     unsigned char                    has_unpredictable_jump;
 } Parrot_jit_optimizer_t;

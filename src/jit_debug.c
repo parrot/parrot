@@ -96,6 +96,7 @@ Parrot_jit_debug_stabs(struct Parrot_Interp *interpreter)
     /* jit_func start addr */
     fprintf(stabs, ".stabs \"jit_func:F(0,1)\",36,0,1,%p\n",
             jit_info->arena.start);
+
     write_types(stabs);
     write_vars(stabs, interpreter);
     /* we don't have line numbers yet, emit dummys, assuming there are
@@ -115,7 +116,7 @@ Parrot_jit_debug_stabs(struct Parrot_Interp *interpreter)
     }
     /* eof */
     fprintf(stabs, ".stabs \"\",36,0,1,%p\n",
-            (char *)jit_info->arena.start+ jit_info->arena.size);
+            (char *) jit_info->arena.size);
     fclose(stabs);
     /* run the stabs file through C<as> generating file.o */
     cmd = Parrot_sprintf_c(interpreter, "as %Ss -o %Ss", stabsfile, ofile);

@@ -22,7 +22,7 @@
 #  include "parrot/oplib/core_ops_cg.h"
 #endif
 
-/* #define ATEXIT_DESTROY */
+#define ATEXIT_DESTROY
 
 extern op_lib_t *PARROT_CORE_PREDEREF_OPLIB_INIT(void);
 
@@ -615,6 +615,7 @@ Parrot_really_destroy(int exit_code, void *vinterp)
     intstack_free(interpreter, interpreter->ctx.intstack);
 
     PIO_destroy(interpreter);
+    Parrot_destroy_jit(interpreter);
 
     mem_sys_free(interpreter);
 }

@@ -1920,7 +1920,7 @@ Parrot_jit_vtable2rk_op(Parrot_jit_info_t *jit_info,
                      struct Parrot_Interp * interpreter)
 {
 
-    Parrot_jit_vtable_n_op(jit_info, interpreter, 3, 0x80);
+    Parrot_jit_vtable_n_op(jit_info, interpreter, 3, 0x83);
     Parrot_jit_store_retval(jit_info, interpreter);
 }
 
@@ -2093,15 +2093,62 @@ Parrot_jit_restart_op(Parrot_jit_info_t *jit_info,
 #  define INT_REGISTERS_TO_MAP 4
 #  define FLOAT_REGISTERS_TO_MAP 4
 
-char intval_map[INT_REGISTERS_TO_MAP] =
+char intval_map[] =
 /* we can't use ECX, shift ops need it, push ECX before shift doesn't
  * because, when ECX is mapped you get shrl %cl, %ecx */
-    { emit_EDI, emit_EBX, emit_ESI, emit_EDX };
+    { emit_EBX, emit_EDI, emit_ESI, emit_EDX };
+
+/* of these registers that much (from 0 < n) are callee saved, i.e. are
+ * not changed around external calls
+ */
+
+#define PRESERVED_INT_REGS 3
 
 /* ST(0) is used as a scratch register,
  * using more then 4 registers breaks C<time N0>
  */
 char floatval_map[] = { 1,2,3,4 };
+
+/* my i386/athlon has a drastic speed penalty for what?
+ * not for unaligned odd jump targets
+ *
+ * But:
+ * mops.pbc 790 => 300-530  if code gets just 4 bytes bigger
+ * (loop is at 200 instead of 196 ???)
+ *
+ * FAST:
+ * 0x818100a <jit_func+194>:	sub    %edi,%ebx
+ * 0x818100c <jit_func+196>:	jne    0x818100a <jit_func+194)
+ *
+ * Same fast speed w/o 2nd register
+ * 0x8181102 <jit_func+186>:	sub    0x8164c2c,%ebx
+ * 0x8181108 <jit_func+192>:	jne    0x8181102 <jit_func+186>
+ *
+ * SLOW (same slow with register or odd aligned)
+ * 0x818118a <jit_func+194>:	sub    0x8164cac,%ebx
+ * 0x8181190 <jit_func+200>:	jne    0x818118a <jit_func+194>
+ *
+ */
+
+/*
+ * if jit_emit_noop is defined, it does align a jump target
+ * (it is called, when pc is odd)
+ */
+
+/* #define jit_emit_noop(pc) *pc++ = 0x90; */
+
+/* for a reg_count of 1 and the register is used RHS only,
+ * we don't allocate a register - it's not worth the effort
+ *
+ * if the following is true, registers are always used
+ */
+
+#define ALLOCATE_REGISTERS_ALWAYS 1
+
+/* registers are either allocate per section or per basic block
+ * set this to 1 or 0 to change allocation scheme
+ */
+#define ALLOCATE_REGISTERS_PER_SECTION 1
 
 #endif /* JIT_EMIT */
 
