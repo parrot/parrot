@@ -317,7 +317,9 @@ put it in Px.
 
 =item setattribute Px, Iy, Pz
 
-Set the attribute Iy of object Px to Pz
+Set the attribute Iy of object Px to Pz. Note that this op stores the
+B<actual> PMC rather than a copy, and so if the PMC's value is subsequently 
+changed, the value of the attribute will also change.
 
 =item setattribute Px, Sy, Pz (Unimplemented)
 
