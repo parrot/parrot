@@ -17,7 +17,7 @@ out-of-bounds test. Checks INT and PMC keys.
 
 =cut
 
-use Parrot::Test tests => 9;
+use Parrot::Test tests => 13;
 use Test::More;
 
 my $fp_equality_macro = <<'ENDOFMACRO';
@@ -312,4 +312,80 @@ output_is(<< 'CODE', << 'OUTPUT', "push integer");
 CODE
 10001
 10001
+OUTPUT
+
+output_is(<<'CODE', <<'OUTPUT', 'basic pop');
+     new P0, .ResizableIntegerArray
+     set P0[0], 4
+     set P0[1], 8
+     set P0[2], 16
+     pop I0, P0
+     eq I0, 16, OK1
+     print "not "
+     print I0
+OK1: print "ok 1\n"
+
+     pop I0, P0
+     eq I0, 8, OK2
+     print "not "
+     print I0
+OK2: print "ok 2\n"
+
+     pop I0, P0
+     eq I0, 4, OK3
+     print "not "
+     print I0
+OK3: print "ok 3\n"
+     end
+CODE
+ok 1
+ok 2
+ok 3
+OUTPUT
+
+output_is(<<'CODE', <<'OUTPUT', 'pop many values');
+     new P0, .ResizableIntegerArray
+     set I0, 0
+L1:  set P0[I0], I0
+     inc I0
+     lt I0, 100000, L1
+     
+L2:  dec I0
+     pop I1, P0
+     eq I0, I1, OK
+     branch NOT_OK
+OK:  gt I0, 0, L2
+     print "ok\n"
+     end
+
+NOT_OK:
+     print I0
+     print "\n"
+     print I1
+     print "\n"
+     end
+CODE
+ok
+OUTPUT
+
+output_is(<<'CODE', <<'OUTPUT', 'push/pop');
+     new P0, .ResizableIntegerArray
+     push P0, 2
+     push P0, 4
+     push P0, 6
+     pop I0, P0
+     eq I0, 6, OK1
+     print "not "
+OK1: print "ok 1\n"
+     end
+CODE
+ok 1
+OUTPUT
+
+output_like(<<'CODE', <<'OUTPUT', 'pop from empty array');
+     new P0, .ResizableIntegerArray
+     pop I0, P0
+     end
+CODE
+/ResizableIntegerArray: Can't pop from an empty array!/
 OUTPUT

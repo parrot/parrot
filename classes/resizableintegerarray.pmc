@@ -107,9 +107,9 @@ Resizes the array to C<size> elements.
 
 /*
 
-=item C<void push_integer (STRING* value)>
+=item C<void push_integer (INTVAL value)>
 
-Extends the array by adding an element of value C<*value> to the end of
+Extends the array by adding an element of value C<value> to the end of
 the array.
 
 =cut
@@ -119,6 +119,35 @@ the array.
     void push_integer (INTVAL value) {
         INTVAL nextix = DYNSELF.elements();
         DYNSELF.set_integer_keyed_int(nextix, value);
+    }
+
+/*
+
+=item C<INTVAL pop_integer()>
+
+Removes and returns the last element in the array.
+
+=cut
+
+*/
+
+    INTVAL pop_integer() {
+        INTVAL size;
+        INTVAL value;
+        SizeIntData *sd;
+
+        size = PMC_int_val(SELF);
+        sd = (SizeIntData *)PMC_data(SELF);
+
+        if (sd == NULL || size == 0) {
+            internal_exception(OUT_OF_BOUNDS, 
+                    "ResizableIntegerArray: Can't pop from an empty array!");
+        }
+
+	value = sd->data[size - 1];
+        DYNSELF.set_integer_native(size - 1);
+
+        return value;
     }
 
 /*
