@@ -1,0 +1,42 @@
+/*
+Copyright: 2004 The Perl Foundation.  All Rights Reserved.
+$Id$
+
+=head1 NAME
+
+classes/undef.pmc - Generic undefined value
+
+=head1 DESCRIPTION
+
+Parrot's generic undef type. This pmc has no defined value. It returns a
+numeric value of 0, a boolean of false, and an empty string. When assigned
+a number, integer, or string it morphs to a Number, Integer, or String PMC
+respectively, and when assigned a generic PMC it morphs into a PMC of the
+passed-in type and does a same-type assignment from there.
+
+=head2 Methods
+
+=over 4
+
+=cut
+
+*/
+
+#include "parrot/parrot.h"
+
+
+pmclass undef extends default {
+
+  INTVAL get_integer() {
+    return 0;
+  }
+
+  FLOATVAL get_number() {
+    return 0.0;
+  }
+
+  STRING* get_string() {
+    return string_make(INTERP, NULL, 0, NULL, 0);
+  }
+
+}
