@@ -42,7 +42,7 @@ static void resize_array ( struct Parrot_Interp *interpreter, PMC* self, INTVAL 
 	}
     }
     else {
-	(Buffer *)self->data = new_buffer_header(interpreter);
+	self->data = new_buffer_header(interpreter);
 	Parrot_allocate(interpreter, (Buffer *)self->data, sizeof(PMC*)*size);
         self->cache.int_val = size;
     }
