@@ -862,6 +862,7 @@ sub op_gt
 # Assign a register to the identifier within the scope of the current block.
 #
 # Class is one of 'const', 'param', 'local'.
+#
 
 sub declare_var
 {
@@ -928,6 +929,11 @@ sub declare_var
     $reg   = undef;
     $value = "\$$ident";
   }
+  elsif ($class eq 'local') {
+    $num   = undef;
+    $reg   = undef;
+    $value = "\$$ident";
+  }
   else {
     my $reg_num = scalar @{$regs{$type}};
 
@@ -952,6 +958,13 @@ sub declare_var
   #
 
   push_source "var $types{$type} $ident;";
+
+  if ($class eq 'local') {
+    my %var_types = ( I => 'int', N => 'float', P => 'PMC', S => 'string');
+    my $var_type = $var_types{$type};
+
+    emit_code(".local", [ "$var_type $ident" ]);
+  }
 
   return 1;
 }
@@ -1018,6 +1031,7 @@ sub declare_const
 
   $block->{IDENT}{$ident}{LINE}  = $line;
   $block->{IDENT}{$ident}{TYPE}  = $type;
+  $block->{IDENT}{$ident}{CLASS} = 'const';
   $block->{IDENT}{$ident}{NUM}   = undef;
   $block->{IDENT}{$ident}{REG}   = undef;
   $block->{IDENT}{$ident}{VALUE} = $value;
@@ -1076,7 +1090,7 @@ sub assign_var
   # bound to a variable, not a constant.
   #
 
-  unless (defined $ident_info->{REG}) {
+  if ($ident_info->{CLASS} eq 'const') {
     printf(STDERR "jakoc: Cannot assign to constant '%s' on line %d.\n",
       $ident, $line);
     return;
@@ -1310,8 +1324,11 @@ sub assign_func
     printf(STDERR "jakoc: Call to void function %s in non-void context on line %d!\n", $name, $line)
       unless defined $subs{$name}{RETURN};
 
-    printf(STDERR "jakoc: Type mismatch in destination type and call to %s on line %d!\n", $name, $line)
-      if uc substr($dest, 0, 1) ne uc $subs{$name}{RETURN};
+    my $dest_type   = type_of($dest);
+    my $return_type = uc $subs{$name}{RETURN};
+
+    printf(STDERR "jakoc: Type mismatch in destination type (%s) and call to %s (returns %s) on line %d!\n", $dest_type, $name, $return_type, $line)
+      if $dest_type ne $return_type;
 
     #
     # Now, we have to push (save) the arguments onto the stack in reverse
@@ -1548,7 +1565,11 @@ sub begin_sub_block
     push_comment "(argument " . $arg_name . ")";
 
 #    emit_code 'restore', [ $ident_info->{REG} ];
-     emit_code '.param', [ "$arg_type $arg_name" ];
+
+     my $param_type = $arg_type;
+     $param_type = 'float' if $param_type eq 'num';
+
+     emit_code '.param', [ "$param_type $arg_name" ];
   }
 }
 
