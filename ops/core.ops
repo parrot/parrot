@@ -2413,6 +2413,31 @@ Opcodes which need to be sorted into better categories.
 
 ########################################
 
+=item B<sweep>()
+
+Trigger a dead object detection sweep
+
+=cut
+
+op sweep() {
+  Parrot_do_dod_run(interpreter);
+  goto NEXT();
+}
+
+
+=item B<collect>()
+
+Trigger a GC collection
+
+=cut
+
+op collect() {
+  Parrot_go_collect(interpreter);
+  goto NEXT();
+}
+
+########################################
+
 =item B<interpinfo>(out INT, in INT)
 
 Fetch some piece of information about the interpreter and put it in $1

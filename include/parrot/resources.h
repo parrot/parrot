@@ -33,6 +33,9 @@ void free_bignum(void);
 void *Parrot_allocate(struct Parrot_Interp *, UINTVAL size);
 void *Parrot_alloc_new_block(struct Parrot_Interp *, UINTVAL, UINTVAL);
 
+void Parrot_do_dod_run(struct Parrot_Interp *);
+void Parrot_go_collect(struct Parrot_Interp *);
+
 void buffer_lives(Buffer *);
 
 #define STRING_HEADERS_PER_ALLOC 128

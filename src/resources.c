@@ -15,8 +15,6 @@
 #include "parrot/parrot.h"
 #include "assert.h"
 
-static void do_dod_run(struct Parrot_Interp *);
-
 PMC *new_pmc_header(struct Parrot_Interp *interpreter) {
   UNUSED (interpreter);
 
@@ -187,8 +185,8 @@ free_unused_buffers(struct Parrot_Interp *interpreter) {
 }
 
 /* See if we can find some unused headers */
-static void
-do_dod_run(struct Parrot_Interp *interpreter) {
+void
+Parrot_do_dod_run(struct Parrot_Interp *interpreter) {
 
   /* First go mark all PMCs as unused */
   mark_PMCs_unused(interpreter);  
@@ -222,7 +220,7 @@ static void alloc_more_string_headers(struct Parrot_Interp *interpreter) {
   int i;
 
   /* First, try and find some unused headers */
-  do_dod_run(interpreter);
+  Parrot_do_dod_run(interpreter);
 
   /* If we found some, then bail as we don't need to do anything */
   if (interpreter->arena_base->string_header_pool->entries_in_pool) {
@@ -332,8 +330,8 @@ calc_total_size(struct Parrot_Interp *interpreter) {
 
 /* Go do a GC run. This only scans the string pools and compacts them,
    it doesn't check for string liveness */
-static void
-go_collect(struct Parrot_Interp *interpreter) {
+void
+Parrot_go_collect(struct Parrot_Interp *interpreter) {
   UINTVAL total_size;
   struct Memory_Pool *new_block;	/* A pointer to our working pool */
   char *cur_spot;		/* Where we're currently copying to */
@@ -486,7 +484,7 @@ Parrot_allocate(struct Parrot_Interp *interpreter, UINTVAL size) {
   /* Or not. Go do what we need to */
   else {
     /* Trigger a collection */
-    go_collect(interpreter);
+    Parrot_go_collect(interpreter);
     /* Was that enough? */
     if (interpreter->arena_base->memory_pool->free >= size) {
       return_val = interpreter->arena_base->memory_pool->top;
