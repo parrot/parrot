@@ -28,7 +28,7 @@ runops_fast_core (struct Parrot_Interp *interpreter, opcode_t * pc) {
     return pc;
 }
 
-/*=for api interpreter runops_t1p1b1_core
+/*=for api interpreter runops_slow_core
  *
  * With tracing.
  * With profiling.
