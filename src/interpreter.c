@@ -167,14 +167,23 @@ make_interpreter() {
     interpreter->pmc_reg_base->prev = NULL;
     Parrot_clear_p(interpreter);
     
-    /* Need a default stack */
-    interpreter->stack_base = mem_allocate_aligned(sizeof(struct StackChunk));
-    interpreter->stack_top = &interpreter->stack_base->entry[0];
+    /* Need a user stack */
+    interpreter->user_stack_base = mem_allocate_aligned(sizeof(struct StackChunk));
+    interpreter->user_stack_top = &interpreter->user_stack_base->entry[0];
     /* Unlike the registers, we start with zero used */
-    interpreter->stack_base->used = 0;
-    interpreter->stack_base->free = STACK_CHUNK_DEPTH;
-    interpreter->stack_base->next = NULL;
-    interpreter->stack_base->prev = NULL;
+    interpreter->user_stack_base->used = 0;
+    interpreter->user_stack_base->free = STACK_CHUNK_DEPTH;
+    interpreter->user_stack_base->next = NULL;
+    interpreter->user_stack_base->prev = NULL;
+    
+    /* And a control stack */
+    interpreter->control_stack_base = mem_allocate_aligned(sizeof(struct StackChunk));
+    interpreter->control_stack_top = &interpreter->control_stack_base->entry[0];
+    /* Unlike the registers, we start with zero used */
+    interpreter->control_stack_base->used = 0;
+    interpreter->control_stack_base->free = STACK_CHUNK_DEPTH;
+    interpreter->control_stack_base->next = NULL;
+    interpreter->control_stack_base->prev = NULL;
     
     /* Need an empty stash */
     interpreter->perl_stash = mem_allocate_new_stash();

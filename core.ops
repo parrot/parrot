@@ -1624,19 +1624,19 @@ Save register $1 onto the appropriate register stack.
 =cut
 
 AUTO_OP save(i) {
-  push_generic_entry(interpreter, &($1), STACK_ENTRY_INT, NULL);
+  push_generic_entry(interpreter, &interpreter->user_stack_top, &($1), STACK_ENTRY_INT, NULL);
 }
 
 AUTO_OP save(n) {
-  push_generic_entry(interpreter, &($1), STACK_ENTRY_FLOAT, NULL);
+  push_generic_entry(interpreter, &interpreter->user_stack_top, &($1), STACK_ENTRY_FLOAT, NULL);
 }
 
 AUTO_OP save(p) {
-  push_generic_entry(interpreter, $1, STACK_ENTRY_PMC, NULL);
+  push_generic_entry(interpreter, &interpreter->user_stack_top, $1, STACK_ENTRY_PMC, NULL);
 }
 
 AUTO_OP save(s) {
-  push_generic_entry(interpreter,  $1, STACK_ENTRY_STRING, NULL);
+  push_generic_entry(interpreter,  &interpreter->user_stack_top, $1, STACK_ENTRY_STRING, NULL);
 }
 
 
@@ -1655,19 +1655,19 @@ Restore register $1 from the appropriate register stack.
 =cut
 
 AUTO_OP restore(i) {
-  pop_generic_entry(interpreter, &($1), STACK_ENTRY_INT);
+  pop_generic_entry(interpreter, &interpreter->user_stack_top, &($1), STACK_ENTRY_INT);
 }
 
 AUTO_OP restore(n) {
-  pop_generic_entry(interpreter, &($1), STACK_ENTRY_FLOAT);
+  pop_generic_entry(interpreter, &interpreter->user_stack_top, &($1), STACK_ENTRY_FLOAT);
 }
 
 AUTO_OP restore(p) {
-  pop_generic_entry(interpreter, &($1), STACK_ENTRY_PMC);
+  pop_generic_entry(interpreter, &interpreter->user_stack_top, &($1), STACK_ENTRY_PMC);
 }
 
 AUTO_OP restore(s) {
-  pop_generic_entry(interpreter, &($1), STACK_ENTRY_STRING);
+  pop_generic_entry(interpreter, &interpreter->user_stack_top, &($1), STACK_ENTRY_STRING);
 }
 
 
@@ -1710,7 +1710,7 @@ stack for later returning.
 =cut
 
 MANUAL_OP bsr(i|ic) {
-  push_generic_entry(interpreter, cur_opcode + 2,  STACK_ENTRY_DESTINATION, NULL);
+  push_generic_entry(interpreter, &interpreter->control_stack_top, cur_opcode + 2,  STACK_ENTRY_DESTINATION, NULL);
   RETREL($1);
 }
 
@@ -1750,7 +1750,7 @@ Pop the location off the top of the stack and go there.
 
 MANUAL_OP ret() {
   opcode_t *dest;
-  pop_generic_entry(interpreter, &dest, STACK_ENTRY_DESTINATION);
+  pop_generic_entry(interpreter, &interpreter->control_stack_top, &dest, STACK_ENTRY_DESTINATION);
   RETABS(dest);
 }
 

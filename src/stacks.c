@@ -13,11 +13,9 @@
 #include "parrot/parrot.h"
 
 INTVAL
-stack_depth(struct Parrot_Interp *interpreter) {
-  struct StackChunk * chunk;
+stack_depth(struct Parrot_Interp *interpreter, struct StackChunk *chunk) {
   INTVAL               depth;
 
-  chunk = interpreter->stack_base;
   depth = chunk->used;
 
   while (chunk->next) {
@@ -29,10 +27,7 @@ stack_depth(struct Parrot_Interp *interpreter) {
 }
 
 struct Stack_Entry *
-stack_entry(struct Parrot_Interp *interpreter, INTVAL depth) {
-    struct StackChunk * chunk;
-    
-    chunk = interpreter->stack_base;
+stack_entry(struct Parrot_Interp *interpreter, struct StackChunk *chunk, INTVAL depth) {
     while (chunk->next) {
       chunk = chunk->next;
     }
@@ -46,7 +41,7 @@ stack_entry(struct Parrot_Interp *interpreter, INTVAL depth) {
 }
 
 /* Rotate the top N entries by one */
-void rotate_entries(struct Parrot_Interp *interpreter, INTVAL depth) {
+void rotate_entries(struct Parrot_Interp *interpreter, struct StackChunk *base_chunk, struct Stack_Entry *top, INTVAL depth) {
     struct Stack_Entry temp;
     INTVAL i;
 
@@ -54,7 +49,7 @@ void rotate_entries(struct Parrot_Interp *interpreter, INTVAL depth) {
         return;
     }
 
-    if (stack_depth(interpreter) < depth) {
+    if (stack_depth(interpreter, base_chunk) < depth) {
         INTERNAL_EXCEPTION(ERROR_STACK_SHALLOW, "Stack too shallow!\n");
     }
 
@@ -62,27 +57,27 @@ void rotate_entries(struct Parrot_Interp *interpreter, INTVAL depth) {
         return;
     }
 
-    temp = *(interpreter->stack_top);
+    temp = *(top);
 
     for(i = 0; i < depth - 1; i++) {
-      *stack_entry(interpreter, i) = *stack_entry(interpreter, i + 1);
+      *stack_entry(interpreter, base_chunk, i) = *stack_entry(interpreter, base_chunk, i + 1);
     }
 
-    *stack_entry(interpreter, depth - 1) = temp;
+    *stack_entry(interpreter, base_chunk, depth - 1) = temp;
 }
 
 /* Push something on the generic stack. Return a pointer to the entry */
-struct Stack_Entry *push_generic_entry(struct Parrot_Interp *interpreter, void *thing, INTVAL type, void *cleanup) {
+struct Stack_Entry *push_generic_entry(struct Parrot_Interp *interpreter, struct Stack_Entry **top, void *thing, INTVAL type, void *cleanup) {
     struct StackChunk *chunk_base;
     
-    chunk_base = STACK_CHUNK_BASE(interpreter->stack_top);
+    chunk_base = STACK_CHUNK_BASE(*top);
     /* Do we have any slots left in the current chunk? */
     if (chunk_base->free) {
         chunk_base->used++;
         chunk_base->free--;
-        interpreter->stack_top = &chunk_base->entry[chunk_base->used-1];
+        *top = &chunk_base->entry[chunk_base->used-1];
     }
-    /* Nope, so plan B time. Allocate a new chunk of integer register frames */
+    /* Nope, so plan B time. Allocate a new chunk of stack entries */
     else {
         struct StackChunk *new_chunk;
         new_chunk = mem_allocate_aligned(sizeof(struct StackChunk));
@@ -91,7 +86,7 @@ struct Stack_Entry *push_generic_entry(struct Parrot_Interp *interpreter, void *
         new_chunk->next = NULL;
         new_chunk->prev = chunk_base;
         chunk_base->next = new_chunk;
-        interpreter->stack_top = &new_chunk->entry[0];
+        *top = &new_chunk->entry[0];
         chunk_base = new_chunk;
     }
 
@@ -125,47 +120,47 @@ struct Stack_Entry *push_generic_entry(struct Parrot_Interp *interpreter, void *
         break;
     }
 
-    return interpreter->stack_top;
+    return *top;
 
 }
 
 /* Pop off an entry and return a pointer to the contents*/
-void *pop_generic_entry(struct Parrot_Interp *interpreter, void *where, INTVAL type) {
+void *pop_generic_entry(struct Parrot_Interp *interpreter, struct Stack_Entry **top, void *where, INTVAL type) {
     struct StackChunk *chunk_base;
     
-    chunk_base = STACK_CHUNK_BASE(interpreter->stack_top);
+    chunk_base = STACK_CHUNK_BASE(*top);
     /* Quick sanity check */
     if (chunk_base->used == 0) {
         INTERNAL_EXCEPTION(ERROR_STACK_EMPTY, "No entries on stack!\n");
     }
-    if (interpreter->stack_top->entry_type != type) {
+    if ((*top)->entry_type != type) {
         INTERNAL_EXCEPTION(ERROR_BAD_STACK_TYPE, "Wrong type on top of stack!\n");
     }
 
     /* Snag the value */
     switch(type) {
     case STACK_ENTRY_INT:
-        *(INTVAL *)where = interpreter->stack_top->entry.int_val;
+        *(INTVAL *)where = (*top)->entry.int_val;
         break;
     case STACK_ENTRY_FLOAT:
-        *(FLOATVAL *)where = interpreter->stack_top->entry.num_val;
+        *(FLOATVAL *)where = (*top)->entry.num_val;
         break;
     case STACK_ENTRY_PMC:
-        *(PMC **)where = interpreter->stack_top->entry.pmc_val;
+        *(PMC **)where = (*top)->entry.pmc_val;
         break;
     case STACK_ENTRY_STRING:
-        *(STRING **)where = interpreter->stack_top->entry.string_val;
+        *(STRING **)where = (*top)->entry.string_val;
         break;
     case STACK_ENTRY_POINTER:
-        *(void **)where = interpreter->stack_top->entry.generic_pointer;
+        *(void **)where = (*top)->entry.generic_pointer;
         break;
     case STACK_ENTRY_DESTINATION:
-        *(void **)where = interpreter->stack_top->entry.generic_pointer;
+        *(void **)where = (*top)->entry.generic_pointer;
         break;
     }
     /* Cleanup routine? */
-    if (interpreter->stack_top->flags && STACK_ENTRY_CLEANUP) {
-        (interpreter->stack_top->cleanup)(interpreter->stack_top);
+    if ((*top)->flags && STACK_ENTRY_CLEANUP) {
+        ((*top)->cleanup)(*top);
     }
 
     /* Now decrement the SP */
@@ -176,16 +171,16 @@ void *pop_generic_entry(struct Parrot_Interp *interpreter, void *where, INTVAL t
         chunk_base = chunk_base->prev;
     } 
     if (chunk_base->used) {
-        interpreter->stack_top = &chunk_base->entry[chunk_base->used - 1];
+        *top = &chunk_base->entry[chunk_base->used - 1];
     }
     
     return where;
 }
 
 /* Pop off an entry and throw it out */
-void toss_generic_entry(struct Parrot_Interp *interpreter, INTVAL type) {
+void toss_generic_entry(struct Parrot_Interp *interpreter, struct Stack_Entry **top, INTVAL type) {
     void *foo;
-    pop_generic_entry(interpreter, &foo, type);
+    pop_generic_entry(interpreter, top, &foo, type);
 }
 
 /*

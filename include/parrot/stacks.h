@@ -38,13 +38,13 @@ struct StackChunk {
   struct Stack_Entry entry[STACK_CHUNK_DEPTH];
 };
 
-INTVAL stack_depth(struct Parrot_Interp *);
-struct Stack_Entry *stack_entry(struct Parrot_Interp *, INTVAL);
+INTVAL stack_depth(struct Parrot_Interp *,struct StackChunk *chunk);
+struct Stack_Entry *stack_entry(struct Parrot_Interp *, struct StackChunk *chunk,INTVAL);
 void rotate_stack(struct Parrot_Interp *, INTVAL);
 
-struct Stack_Entry *push_generic_entry(struct Parrot_Interp *, void *thing, INTVAL type, void *cleanup);
-void *pop_generic_entry(struct Parrot_Interp *, void *where, INTVAL type);
-void toss_generic_entry(struct Parrot_Interp *, INTVAL type);
+struct Stack_Entry *push_generic_entry(struct Parrot_Interp *, struct Stack_Entry **top, void *thing, INTVAL type, void *cleanup);
+void *pop_generic_entry(struct Parrot_Interp *, struct Stack_Entry **top, void *where, INTVAL type);
+void toss_generic_entry(struct Parrot_Interp *, struct Stack_Entry **top, INTVAL type);
 
 #define STACK_ENTRY_INT 1
 #define STACK_ENTRY_FLOAT 2

@@ -22,12 +22,14 @@ struct Parrot_Interp {
     struct NReg *num_reg;            /* Current top of the float reg stack */
     struct SReg *string_reg;         /* Current top of the string stack */
     struct PReg *pmc_reg;            /* Current top of the PMC stack */
-    struct Stack_Entry *stack_top;         /* Current top of the generic stack */
+    struct Stack_Entry *user_stack_top;         /* Current top of the scratch stack */
+    struct Stack_Entry *control_stack_top;	/* Current top of the flow control stack */
     struct IRegChunk *int_reg_base;            /* base of the int reg stack */
     struct NRegChunk *num_reg_base;            /* Base of the float reg stack */
     struct SRegChunk *string_reg_base;         /* Base of the string stack */
     struct PRegChunk *pmc_reg_base;            /* Base of the PMC stack */
-    struct StackChunk *stack_base;             /* Base of the generic stack */
+    struct StackChunk *user_stack_base;             /* Base of the scratch stack */
+    struct StackChunk *control_stack_base;          /* Base of the flow control stack */
     struct Stash *perl_stash;             /* Pointer to the global */
                                           /* variable area */
     struct Arenas *arena_base;            /* Pointer to this */
