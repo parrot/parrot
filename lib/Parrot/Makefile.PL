@@ -12,8 +12,6 @@ WriteMakefile(
     'LIBS'		=> [''], # e.g., '-lm'
     'DEFINE'		=> '', # e.g., '-DHAVE_SOMETHING'
     'INC'		=> '-I../../include', # e.g., '-I/usr/include/other'
-    'LDFROM'    => 
-$objects,
-#'$(BASEEXT)$(OBJ_EXT) byteorder.o string.o encoding.o encodings/singlebyte.o encodings/utf16.o encodings/utf32.o encodings/utf8.o chartype.o chartypes/unicode.o chartypes/usascii.o exceptions.o resources.o memory.o packout.o packfile.o'
+    'LDFROM'		=> $objects,
 );
 
