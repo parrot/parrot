@@ -1,9 +1,7 @@
 /* list.h */
 
-/* these for current test status ... */
+/* for current test status ... */
 #define INTLIST_EMUL
-/* grrmml */
-#define intlist_length xx_x
 
 #include "parrot/parrot.h"
 #ifdef LIST_TEST
@@ -11,9 +9,6 @@
 #include "parrot/embed.h"
 #undef INTLIST_EMUL
 #endif
-
-#undef  intlist_length
-#define intlist_length intlist_length
 
 /* ... til here */
 
@@ -119,6 +114,7 @@ void list_delete(Interp *interpreter, List *list, INTVAL idx, INTVAL n_items);
  *      1.2     11.10.2002 more docu, optimized irregular chunk blocks
  *                         fixed indexed access WRT list->start
  *                         cosmetics
+ *      1.3     13.10.2002 put intlist_length into intlist.c
  *
  *  Data Structure and Algorithms:
  *  ==============================

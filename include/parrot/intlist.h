@@ -42,11 +42,7 @@ PMC* intlist_mark(Interp*, IntList*, PMC* last);
 
 IntList *intlist_new(Interp*);
 
-static INTVAL intlist_length(Interp* interpreter, IntList* list)
-{
-    UNUSED(interpreter);
-    return list->length;
-}
+INTVAL intlist_length(Interp* interpreter, IntList* list);
 
 void intlist_assign(Interp*, IntList*, INTVAL idx, INTVAL val);
 
@@ -69,7 +65,7 @@ void intlist_dump(FILE* fp, IntList* list, int verbose);
  * Local variables:
  * c-indentation-style: bsd
  * c-basic-offset: 4
- * indent-tabs-mode: nil 
+ * indent-tabs-mode: nil
  * End:
  *
  * vim: expandtab shiftwidth=4:

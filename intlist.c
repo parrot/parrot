@@ -257,6 +257,13 @@ unshift_chunk(Interp* interpreter, IntList* list)
     list->prev->end = INTLIST_CHUNK_SIZE;
 }
 
+INTVAL
+intlist_length(Interp* interpreter, IntList* list)
+{
+    UNUSED(interpreter);
+    return list->length;
+}
+
 void
 intlist_push(Interp *interpreter, IntList* list, INTVAL data)
 {
