@@ -1,6 +1,6 @@
 compile=perl prd-perl6.pl --batch --imc
-imcc=../languages/imcc/imcc
-asm=perl ../assemble.pl
+imcc=../imcc/imcc
+asm=perl ../../assemble.pl
 
 all:
 
