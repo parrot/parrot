@@ -1,0 +1,70 @@
+=head1 TITLE
+
+Stream::Buffer
+
+=head1 VERSION
+
+version 0.1
+
+=head1 SYNOPSIS
+
+please see F<examples/streams/Buffer.imc>
+
+=head1 DESCRIPTION
+
+TBD
+
+=head1 METHODS
+
+=over 4
+
+=cut
+
+.sub __stream_buffer_onload @LOAD
+    .local pmc base
+    .local pmc buf
+    .local int i
+    
+    find_type i, "Stream::Buffer"
+    if i > 1 goto END
+    
+    load_bytecode "library/Stream/Base.imc"
+
+    getclass base, "Stream::Base"
+    subclass buf, base, "Stream::Buffer"
+    
+END:
+    .pcc_begin_return
+    .pcc_end_return
+.end
+
+.namespace ["Stream::Buffer"]
+
+=item source."rawRead"() (B<internal>)
+
+...
+
+=cut
+
+.sub rawRead method
+    .local string str
+    
+    null str
+    .pcc_begin_return
+    .return str
+    .pcc_end_return
+.end
+
+=back
+
+=head1 AUTHOR
+
+Jens Rieks E<lt>parrot at jensbeimsurfen dot deE<gt> is the author
+and maintainer.
+Please send patches and suggestions to the Perl 6 Internals mailing list.
+
+=head1 COPYRIGHT
+
+Copyright (c) 2004, the Perl Foundation.
+
+=cut

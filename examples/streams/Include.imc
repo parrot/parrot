@@ -1,0 +1,145 @@
+=head1 INFORMATION
+
+This example demonstrates how to include another stream inside a stream.
+
+=head1 FUNCTIONS
+
+=over 4
+
+=item _main
+
+Creates a counter stream and dumps it.
+
+=cut
+
+.sub _main
+    .local pmc stream
+    .local pmc temp
+
+    load_bytecode "library/Stream/Sub.imc"
+    
+    find_type I0, "Stream::Sub"
+    new stream, I0
+
+    # set the stream's source sub
+    newsub temp, .Sub, _counter
+    assign stream, temp
+    
+    # dump the stream
+    stream."dump"()
+    
+    end
+.end
+
+=item _counter
+
+This sub is used as the source for the counter stream.
+
+It writes the numbers 0 to 9 as strings to the stream.
+
+After writing "4", it will create another stream (with the sub C<_included> as source)
+and then includes it in its own stream.
+
+=cut
+
+.sub _counter method
+    .local string str
+    .local int i
+    
+    i = 0
+
+LOOP:
+    str = i
+
+    self."write"( str )
+
+    # include another stream after '4'
+    if i != 4 goto SKIP
+    .local pmc temp
+    .local pmc func
+    
+    find_type I0, "Stream::Sub"
+    new temp, I0
+
+    newsub func, .Sub, _included
+    assign temp, func
+    
+    # include it
+    self."include"( temp )
+SKIP:
+
+    inc i
+    if i < 10 goto LOOP
+
+    .pcc_begin_return
+    .pcc_end_return
+.end
+
+=item _included
+
+This sub is the source of the stream included into the counter stream.
+
+It writes "hello", then includes another stream (C<_counter2>) and then
+writes "world".
+
+=cut
+
+.sub _included method
+    .local pmc temp
+    .local pmc func
+    
+    self."write"( "hello" )
+
+    # create another stream
+    find_type I0, "Stream::Sub"
+    new temp, I0
+    newsub func, .Sub, _counter2
+    assign temp, func
+    
+    # include it
+    self."include"( temp )
+
+    self."write"( "world" )
+    
+    .pcc_begin_return
+    .pcc_end_return
+.end
+
+=item _counter2
+
+This sub is the source of the stream included between the "hello" and the "world".
+
+Writes the letters "A" till "F" into the stream.
+
+=cut
+
+.sub _counter2 method
+    .local string str
+
+    str = 'A'
+LOOP:
+    self."write"( str )
+
+    ord I0, str
+    inc I0
+    chr str, I0
+    
+    if str != "G" goto LOOP
+
+    .pcc_begin_return
+    .pcc_end_return
+.end
+
+=back
+
+=head1 AUTHOR
+
+Jens Rieks E<lt>parrot at jensbeimsurfen dot deE<gt> is the author
+and maintainer.
+Please send patches and suggestions to the Perl 6 Internals mailing list.
+
+=head1 COPYRIGHT
+
+Copyright (c) 2004, the Perl Foundation.
+
+=cut
