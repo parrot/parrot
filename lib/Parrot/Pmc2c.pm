@@ -539,7 +539,9 @@ sub init_func() {
         if ($method->{mmd} =~ /MMD_/) {
             my ($func, $left, $right);
             $func = $method->{mmd};
-            $left = "enum_class_$classname";
+            # dynamic classes need the runtime type
+            # which is passed in entry to class_init
+            $left = "entry"; #"enum_class_$classname";
             $right = 0;
             push @mmds, [ $func, $left, $right, $meth_name ];
             foreach my $variant (@{ $self->{mmd_variants}{$meth} }) {
