@@ -179,6 +179,13 @@ typedef void BIGNUM;
 #endif /* __GCC__ */
 
 
+/* some SGI compilers have an offsetof()
+ * definition that doesn't work for us. */
+#if defined(__sgi) && defined(_COMPILER_VERSION) && (_COMPILER_VERSION >= 400)
+#undef offsetof
+#define offsetof(s, m) (size_t)(&(((s *)0)->m))
+#endif
+
 /* work around warning:
  * cast discards qualifiers from pointer target type
  * for usage grep e.g. in string.c

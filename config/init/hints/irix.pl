@@ -16,3 +16,18 @@ if ( $libs !~ /-lpthread/ ) {
 Configure::Data->set(
     libs => $libs,
 );
+
+my $cc   = Configure::Data->get('cc');
+my $cxx  = Configure::Data->get('cxx');
+my $ld   = Configure::Data->get('ld');
+my $link = Configure::Data->get('link');
+if ( $cc =~ /cc -64/ ) {
+    $cxx  = 'CC -64';
+    $ld   = 'ld -64';
+    $link = 'CC -64';
+    Configure::Data->set(
+        cxx  => $cxx,
+        ld   => $ld,
+        link => $link,
+    );
+}

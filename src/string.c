@@ -258,7 +258,7 @@ string_init(Parrot_Interp interpreter)
         data_dir = const_cast(DEFAULT_ICU_DATA_DIR);
     string_set_data_directory(data_dir);
     if (free_data_dir)
-        mem_sys_free(data_dir);
+        mem_sys_free((void*)data_dir); /* cast away the constness */
 /*
     encoding_init();
     chartype_init();
