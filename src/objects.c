@@ -16,12 +16,12 @@
 static PMC *
 find_global(Parrot_Interp interpreter, STRING *globalname) {
     if (!VTABLE_exists_keyed_str(interpreter,
-                             interpreter->globals->stash_hash, globalname)) {
+                interpreter->globals->stash_hash, globalname)) {
         return NULL;
     }
 
     return VTABLE_get_pmc_keyed_str(interpreter,
-				interpreter->globals->stash_hash, globalname);
+            interpreter->globals->stash_hash, globalname);
 }
 
 /* Subclass a class. Single parent class, nice and
@@ -33,75 +33,75 @@ PMC *
 Parrot_single_subclass(Parrot_Interp interpreter, PMC *base_class,
                        STRING *child_class_name)
 {
-  PMC *child_class;
-  PMC *child_class_array;
-  PMC *classname_pmc;
-  PMC *temp_pmc;
+    PMC *child_class;
+    PMC *child_class_array;
+    PMC *classname_pmc;
+    PMC *temp_pmc;
 
-  if (!PObj_is_class_TEST(base_class)) {
-      internal_exception(NO_CLASS, "Can't subclass a non-class!");
-  }
+    if (!PObj_is_class_TEST(base_class)) {
+        internal_exception(NO_CLASS, "Can't subclass a non-class!");
+    }
 
-  child_class = pmc_new(interpreter, enum_class_ParrotClass);
-  child_class_array = PMC_data(child_class);
+    child_class = pmc_new(interpreter, enum_class_ParrotClass);
+    child_class_array = PMC_data(child_class);
 
-  /* We have the same number of attributes as our parent */
-  child_class->cache.int_val = base_class->cache.int_val;
+    /* We have the same number of attributes as our parent */
+    child_class->cache.int_val = base_class->cache.int_val;
 
-  /* Our parent class array has a single member in it */
-  temp_pmc = pmc_new(interpreter, enum_class_Array);
-  VTABLE_set_integer_native(interpreter, temp_pmc, 1);
-  VTABLE_set_pmc_keyed_int(interpreter, child_class_array, 0, temp_pmc);
-  VTABLE_set_pmc_keyed_int(interpreter, temp_pmc, 0, base_class);
+    /* Our parent class array has a single member in it */
+    temp_pmc = pmc_new(interpreter, enum_class_Array);
+    VTABLE_set_integer_native(interpreter, temp_pmc, 1);
+    VTABLE_set_pmc_keyed_int(interpreter, child_class_array, 0, temp_pmc);
+    VTABLE_set_pmc_keyed_int(interpreter, temp_pmc, 0, base_class);
 
-  /* Set the classname, if we have one */
-  classname_pmc = pmc_new(interpreter, enum_class_PerlString);
-  if (child_class_name) {
-      VTABLE_set_string_native(interpreter, classname_pmc, child_class_name);
+    /* Set the classname, if we have one */
+    classname_pmc = pmc_new(interpreter, enum_class_PerlString);
+    if (child_class_name) {
+        VTABLE_set_string_native(interpreter, classname_pmc, child_class_name);
 
-    /* Add ourselves to the interpreter's class hash */
-      VTABLE_set_pmc_keyed_str(interpreter, interpreter->class_hash,
-                           child_class_name, child_class);
-  }
-  else {
-      VTABLE_set_string_native(interpreter, classname_pmc,
-                               string_make(interpreter,
-                                           "\0\0anonymous",
-                                           11, NULL, 0, NULL));
-  }
+        /* Add ourselves to the interpreter's class hash */
+        VTABLE_set_pmc_keyed_str(interpreter, interpreter->class_hash,
+                child_class_name, child_class);
+    }
+    else {
+        VTABLE_set_string_native(interpreter, classname_pmc,
+                string_make(interpreter,
+                    "\0\0anonymous",
+                    11, NULL, 0, NULL));
+    }
 
-  VTABLE_set_pmc_keyed_int(interpreter, child_class_array, 1, classname_pmc);
+    VTABLE_set_pmc_keyed_int(interpreter, child_class_array, 1, classname_pmc);
 
-  /* Our penultimate parent list is a clone of our parent's parent
-     list, with our parent unshifted onto the beginning */
-  temp_pmc = pmc_new_noinit(interpreter, enum_class_Array);
-  VTABLE_clone(interpreter,
-               VTABLE_get_pmc_keyed_int(interpreter,
-                                        (PMC *)PMC_data(base_class), 2),
-               temp_pmc);
-  VTABLE_unshift_pmc(interpreter, temp_pmc, base_class);
-  VTABLE_set_pmc_keyed_int(interpreter, child_class_array, 2, temp_pmc);
+    /* Our penultimate parent list is a clone of our parent's parent
+       list, with our parent unshifted onto the beginning */
+    temp_pmc = pmc_new_noinit(interpreter, enum_class_Array);
+    VTABLE_clone(interpreter,
+            VTABLE_get_pmc_keyed_int(interpreter,
+                (PMC *)PMC_data(base_class), 2),
+            temp_pmc);
+    VTABLE_unshift_pmc(interpreter, temp_pmc, base_class);
+    VTABLE_set_pmc_keyed_int(interpreter, child_class_array, 2, temp_pmc);
 
-  /* Our attribute list is our parent's attribute list */
-  temp_pmc = pmc_new_noinit(interpreter, enum_class_OrderedHash);
-  VTABLE_clone(interpreter,
-               VTABLE_get_pmc_keyed_int(interpreter,
-                                        (PMC *)PMC_data(base_class), 3),
-               temp_pmc);
-  VTABLE_set_pmc_keyed_int(interpreter, child_class_array, 3, temp_pmc);
+    /* Our attribute list is our parent's attribute list */
+    temp_pmc = pmc_new_noinit(interpreter, enum_class_OrderedHash);
+    VTABLE_clone(interpreter,
+            VTABLE_get_pmc_keyed_int(interpreter,
+                (PMC *)PMC_data(base_class), 3),
+            temp_pmc);
+    VTABLE_set_pmc_keyed_int(interpreter, child_class_array, 3, temp_pmc);
 
-  /* And our full keyed attribute list is our parent's */
-  temp_pmc = pmc_new_noinit(interpreter, enum_class_OrderedHash);
-  VTABLE_clone(interpreter,
-               VTABLE_get_pmc_keyed_int(interpreter,
-                                        (PMC *)PMC_data(base_class), 4),
-               temp_pmc);
-  VTABLE_set_pmc_keyed_int(interpreter, child_class_array, 4, temp_pmc);
+    /* And our full keyed attribute list is our parent's */
+    temp_pmc = pmc_new_noinit(interpreter, enum_class_OrderedHash);
+    VTABLE_clone(interpreter,
+            VTABLE_get_pmc_keyed_int(interpreter,
+                (PMC *)PMC_data(base_class), 4),
+            temp_pmc);
+    VTABLE_set_pmc_keyed_int(interpreter, child_class_array, 4, temp_pmc);
 
 
-  Parrot_class_register(interpreter, child_class_name, child_class);
+    Parrot_class_register(interpreter, child_class_name, child_class);
 
-  return child_class;
+    return child_class;
 }
 
 /*=for api objects Parrot_new_class
@@ -111,87 +111,88 @@ Parrot_single_subclass(Parrot_Interp interpreter, PMC *base_class,
 PMC *
 Parrot_new_class(Parrot_Interp interpreter, STRING *class_name)
 {
-  PMC *new_class;
-  PMC *new_class_array;
-  PMC *classname_pmc;
+    PMC *new_class;
+    PMC *new_class_array;
+    PMC *classname_pmc;
 
-  new_class = pmc_new(interpreter, enum_class_ParrotClass);
-  new_class_array = PMC_data(new_class);
-  /* We have the same number of attributes as our parent */
-  new_class->cache.int_val = 0;
-  /* Our parent class array has nothing in it */
-  VTABLE_set_pmc_keyed_int(interpreter, new_class_array, 0,
-                           pmc_new(interpreter, enum_class_Array));
-  VTABLE_set_pmc_keyed_int(interpreter, new_class_array, 2,
-                           pmc_new(interpreter, enum_class_Array));
-  VTABLE_set_pmc_keyed_int(interpreter, new_class_array, 3,
-                           pmc_new(interpreter, enum_class_OrderedHash));
-  VTABLE_set_pmc_keyed_int(interpreter, new_class_array, 4,
-                           pmc_new(interpreter, enum_class_OrderedHash));
+    new_class = pmc_new(interpreter, enum_class_ParrotClass);
+    new_class_array = PMC_data(new_class);
+    /* We have the same number of attributes as our parent */
+    new_class->cache.int_val = 0;
+    /* Our parent class array has nothing in it */
+    VTABLE_set_pmc_keyed_int(interpreter, new_class_array, 0,
+            pmc_new(interpreter, enum_class_Array));
+    VTABLE_set_pmc_keyed_int(interpreter, new_class_array, 2,
+            pmc_new(interpreter, enum_class_Array));
+    VTABLE_set_pmc_keyed_int(interpreter, new_class_array, 3,
+            pmc_new(interpreter, enum_class_OrderedHash));
+    VTABLE_set_pmc_keyed_int(interpreter, new_class_array, 4,
+            pmc_new(interpreter, enum_class_OrderedHash));
 
-  /* Set the classname, if we have one */
-  classname_pmc = pmc_new(interpreter, enum_class_PerlString);
-  VTABLE_set_string_native(interpreter, classname_pmc, class_name);
-  VTABLE_set_pmc_keyed_int(interpreter, new_class_array, 1, classname_pmc);
+    /* Set the classname, if we have one */
+    classname_pmc = pmc_new(interpreter, enum_class_PerlString);
+    VTABLE_set_string_native(interpreter, classname_pmc, class_name);
+    VTABLE_set_pmc_keyed_int(interpreter, new_class_array, 1, classname_pmc);
 
-  /* Add ourselves to the interpreter's class hash */
-  if(Parrot_class_lookup(interpreter, class_name) != PMCNULL) {
-     internal_exception(1, "Class %s already registered!\n",
-                        string_to_cstring(interpreter, class_name));
-  }
+    /* Add ourselves to the interpreter's class hash */
+    if(Parrot_class_lookup(interpreter, class_name) != PMCNULL) {
+        internal_exception(1, "Class %s already registered!\n",
+                string_to_cstring(interpreter, class_name));
+    }
 
-  Parrot_class_register(interpreter, class_name, new_class);
+    Parrot_class_register(interpreter, class_name, new_class);
 
-  return new_class;
+    return new_class;
 }
 
 
 PMC *
 Parrot_class_lookup(Parrot_Interp interpreter, STRING *class_name)
 {
-  if (VTABLE_exists_keyed_str(interpreter, interpreter->class_hash,
-                          class_name))
-     return VTABLE_get_pmc_keyed_str(interpreter, interpreter->class_hash,
-                                 class_name);
-  return PMCNULL;
+    if (VTABLE_exists_keyed_str(interpreter, interpreter->class_hash,
+                class_name))
+        return VTABLE_get_pmc_keyed_str(interpreter, interpreter->class_hash,
+                class_name);
+    return PMCNULL;
 }
 
 /* This is the method to register a new Parrot class as an
-   instantiatable type. Doing this invoves putting it in the class
+   instantiatable type. Doing this involves putting it in the class
    hash, setting its vtable so that the init method inits objects of
    the class rather than the class itself, and adding it to the
    interpreter's base type table so you can "new Px, foo" the things.
 */
 void
-Parrot_class_register(Parrot_Interp interpreter, STRING *class_name, PMC *new_class)
+Parrot_class_register(Parrot_Interp interpreter, STRING *class_name,
+        PMC *new_class)
 {
-  VTABLE_set_pmc_keyed_str(interpreter, interpreter->class_hash,
-                       class_name, new_class);
+    /* Build a new vtable for this class and register it in the
+     * global registry .
+     * The child class PMC has a ParrotObject vtable, which is a
+     * good base to work from
+     */
+    VTABLE *new_vtable = Parrot_clone_vtable(interpreter,
+            Parrot_base_vtables[enum_class_ParrotObject]);
+    INTVAL new_type = pmc_register(interpreter, class_name);
 
-  /* Now build a new vtable for this class and register it in the
-     global registry */
-  {
-      /* The child class PMC has a ParrotClass vtable, which is a
-         good base to work from */
-      VTABLE *new_vtable = Parrot_clone_vtable(interpreter, new_class->vtable);
-      INTVAL new_type = pmc_register(interpreter, class_name);
+    /* register the class */
+    VTABLE_set_pmc_keyed_str(interpreter, interpreter->class_hash,
+            class_name, new_class);
 
-      /* Set the vtable's type to the newly allocated type */
-      Parrot_vtable_set_type(interpreter, new_vtable, new_type);
 
-      /* And cache our class PMC in the vtable so we can find it later
-       */
-      Parrot_vtable_set_data(interpreter, new_vtable, new_class);
+    /* Set the vtable's type to the newly allocated type */
+    Parrot_vtable_set_type(interpreter, new_vtable, new_type);
 
-      /* Reset the init method to our instantiation method */
-      new_vtable->init = Parrot_instantiate_object;
-      new_class->vtable = new_vtable;
+    /* And cache our class PMC in the vtable so we can find it later
+    */
+    Parrot_vtable_set_data(interpreter, new_vtable, new_class);
 
-      /* Put our new vtable in the global table */
-      Parrot_base_vtables[new_type] = new_vtable;
+    /* Reset the init method to our instantiation method */
+    new_vtable->init = Parrot_instantiate_object;
+    new_class->vtable = new_vtable;
 
-  }
-
+    /* Put our new vtable in the global table */
+    Parrot_base_vtables[new_type] = new_vtable;
 }
 
 
@@ -223,7 +224,7 @@ Parrot_instantiate_object(Parrot_Interp interpreter, PMC *object) {
     /* 0 - class PMC, 1 - class name */
     VTABLE_set_pmc_keyed_int(interpreter, new_object_array, 0, class);
     VTABLE_set_pmc_keyed_int(interpreter, new_object_array, 1,
-                             VTABLE_get_pmc_keyed_int(interpreter, class_array, 1));
+            VTABLE_get_pmc_keyed_int(interpreter, class_array, 1));
 
     /* Note the number of used slots */
     object->cache.int_val = 2;
@@ -263,7 +264,7 @@ Parrot_object_isa(Parrot_Interp interpreter, PMC *obj, PMC *cl) {
     PMC * object_array = PMC_data(obj);
     t = VTABLE_get_pmc_keyed_int(interpreter, object_array, 0);
     if(t == cl)
-       return 1;
+        return 1;
     return 0;
 }
 
@@ -314,7 +315,10 @@ Parrot_find_method_with_cache(Parrot_Interp interpreter, PMC *class,
 
     /* We're going to make this over and over, so get it once and
        skip the repeated string makes */
-    shortcut_name = string_concat(interpreter, string_from_cstring(interpreter, PARROT_NAMESPACE_SEPARATOR, PARROT_NAMESPACE_SEPARATOR_LENGTH), method_name, 0);
+    shortcut_name = string_concat(interpreter,
+            string_from_cstring(interpreter, PARROT_NAMESPACE_SEPARATOR,
+                PARROT_NAMESPACE_SEPARATOR_LENGTH),
+            method_name, 0);
 
     /* The order of operations:
      *
@@ -326,7 +330,11 @@ Parrot_find_method_with_cache(Parrot_Interp interpreter, PMC *class,
      */
 
     /* See if we get lucky and its in the class of the PMC */
-    FQ_method = string_concat(interpreter, VTABLE_get_string(interpreter, VTABLE_get_pmc_keyed_int(interpreter, (PMC *)PMC_data(class), 1)), shortcut_name, 0);
+    FQ_method = string_concat(interpreter,
+            VTABLE_get_string(interpreter,
+                VTABLE_get_pmc_keyed_int(interpreter,
+                    (PMC *)PMC_data(class), 1)),
+            shortcut_name, 0);
 
     method = find_global(interpreter, FQ_method);
 
@@ -336,13 +344,19 @@ Parrot_find_method_with_cache(Parrot_Interp interpreter, PMC *class,
     }
 
     /* If not, time to walk through the parent class array. Wheee */
-    classsearch_array = VTABLE_get_pmc_keyed_int(interpreter, (PMC *)PMC_data(class), 2);
+    classsearch_array =
+        VTABLE_get_pmc_keyed_int(interpreter, (PMC *)PMC_data(class), 2);
     classcount = VTABLE_get_integer(interpreter, classsearch_array);
 
-    for (searchoffset = 0; NULL == method && searchoffset < classcount; searchoffset++) {
-        curclass = VTABLE_get_pmc_keyed_int(interpreter, classsearch_array, searchoffset);
+    for (searchoffset = 0; NULL == method && searchoffset < classcount;
+            searchoffset++) {
+        curclass = VTABLE_get_pmc_keyed_int(interpreter,
+                classsearch_array, searchoffset);
 
-        FQ_method = string_concat(interpreter, VTABLE_get_string(interpreter, VTABLE_get_pmc_keyed_int(interpreter, (PMC *)PMC_data(curclass), 1)), shortcut_name, 0);
+        FQ_method = string_concat(interpreter,
+                VTABLE_get_string(interpreter,
+                    VTABLE_get_pmc_keyed_int(interpreter,
+                        (PMC *)PMC_data(curclass), 1)), shortcut_name, 0);
         method = find_global(interpreter, FQ_method);
     }
 
@@ -350,8 +364,8 @@ Parrot_find_method_with_cache(Parrot_Interp interpreter, PMC *class,
     /* Ultimately, if we've failed, pitch an exception */
     if (NULL == method) {
         real_exception(interpreter, NULL, METH_NOT_FOUND,
-                       "Method '%s' not found\n",
-                       string_to_cstring(interpreter, method_name));
+                "Method '%s' not found\n",
+                string_to_cstring(interpreter, method_name));
     }
     return method;
 }
