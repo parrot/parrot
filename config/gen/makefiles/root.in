@@ -122,7 +122,7 @@ INTERP_O_FILES = exceptions$(O) global_setup$(O) interpreter$(O) parrot$(O) \
 	packout$(O) byteorder$(O) debug$(O) smallobject$(O) \
 	headers$(O) dod$(O) method_util$(O) exit$(O) \
 	misc$(O) spf_render$(O) spf_vtable$(O) datatypes$(O) fingerprint$(O) \
-	nci$(O) cpu_dep$(O) ${asmfun_o} tsq$(O) longopt$(O)
+	nci$(O) cpu_dep$(O) ${asmfun_o} tsq$(O) longopt$(O) events$(O)
 
 O_FILES = $(INTERP_O_FILES) $(IO_O_FILES) $(CLASS_O_FILES) \
 	$(ENCODING_O_FILES) $(CHARTYPE_O_FILES)
@@ -413,6 +413,8 @@ encoding/utf8$(O) : $(GENERAL_H_FILES)
 encoding/utf16$(O) : $(GENERAL_H_FILES)
 
 encoding/utf32$(O) : $(GENERAL_H_FILES)
+
+events$(O) : $(GENERAL_H_FILES)
 
 interpreter$(O) : interpreter.c $(GENERAL_H_FILES) ${jit_h}
 

@@ -33,6 +33,14 @@
 #  define dumpcore() kill(0, SIGQUIT)
 #endif
 
+#ifdef HAS_HEADER_SIGNAL
+#  undef Parrot_set_sighandler
+#  ifndef HAS___SIGHANDLER_T
+    typedef void (*__sighandler_t) (int);
+#  endif
+    typedef __sighandler_t Parrot_sighandler_t;
+    Parrot_sighandler_t Parrot_set_sighandler(int s, Parrot_sighandler_t f);
+#endif
 /*
  * Local variables:
  * c-indentation-style: bsd

@@ -15,13 +15,15 @@
 
 #define CHECK_EVENTS(x)
 
+void Parrot_init_signals(void);
+
 #endif
 
 /*
  * Local variables:
  * c-indentation-style: bsd
  * c-basic-offset: 4
- * indent-tabs-mode: nil 
+ * indent-tabs-mode: nil
  * End:
  *
  * vim: expandtab shiftwidth=4:

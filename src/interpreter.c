@@ -610,6 +610,9 @@ make_interpreter(Interp_flags flags)
     Parrot_unblock_DOD(interpreter);
     Parrot_unblock_GC(interpreter);
 
+    /* all sys running, init the signal stuff */
+    Parrot_init_signals();
+
 #ifdef ATEXIT_DESTROY
     Parrot_on_exit(Parrot_really_destroy, (void*)interpreter);
 #endif

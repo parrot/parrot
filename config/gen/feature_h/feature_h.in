@@ -54,5 +54,22 @@ END
 #endif
 END
 
+    print OUT <<'END';
+
+/* signal stuff */
+END
+
+if (${has_sigaction}) {
+    print OUT <<'END';
+#define HAS_SIGACTION 1
+END
+}
+
+if (${has___sighandler_t}) {
+    print OUT <<'END';
+#define HAS___SIGHANDLER_T 1
+END
+}
+
 #endif guard
 print OUT "\n\n#endif\n"

@@ -3,7 +3,7 @@
 /*
 ** platform_interface.h
 */
-#include "feature.h"
+#include "parrot/config.h"
 
 /*
 ** I/O:
@@ -39,6 +39,13 @@ void *Parrot_dlopen(const char *filename);
 const char *Parrot_dlerror(void);
 void *Parrot_dlsym(void *handle, const char *symbol);
 int Parrot_dlclose(void *handle);
+
+/*
+ * signal handling
+ */
+#ifndef HAS_HEADER_SIGNAL
+#  define Parrot_set_sighandler(s, h)
+#endif
 
 /*
  * Local variables:
