@@ -10,8 +10,6 @@ if (!defined $c{exe}) {
 	        my $name;
 		$name = shift;
 		$name = "test" unless $name;
-		print "In ", cwd(), "\n";
-		print "Doing ($c{cc} $c{ccflags} $name.c)\n";
 		system("$c{cc} $c{ccflags} $name.c") and die "C compiler died!";
 		system("link/exe=test_siz $name") and die "Link failed!";
 	};
