@@ -632,71 +632,153 @@ void Parrot_free_cstring(char *string) {
 
 /*
 
-=item C<void
-Parrot_call(Parrot_INTERP interpreter, Parrot_PMC sub,
-            Parrot_Int argcount, ...)>
+=item C<void*
+Parrot_call_sub(Parrot_INTERP interpreter, Parrot_PMC sub,
+            const char *signature, ...)>
 
-Call a parrot subroutine, with PMC parameters.
+Call a parrot subroutine the given function signature. The first char in
+C<signature> denotes the return value. Next chars are arguments.
+
+The return value of this function can be void or a pointer type.
+
+Signature chars are:
+
+    v ... void return
+    I ... Parrot_Int
+    N ... Parrot_Float
+    S ... Parrot_STRING
+    P ... Parrot_PMC
+
+=item C<Parrot_Int>
+Parrot_call_sub_ret_int(Parrot_INTERP interpreter, Parrot_PMC sub,
+            const char *signature, ...)>
+
+=item C<Parrot_Float>
+Parrot_call_sub_ret_float(Parrot_INTERP interpreter, Parrot_PMC sub,
+            const char *signature, ...)>
+
+Like above, with Parrot_Int or Parrot_Float return result.
 
 =cut
 
 */
 
-void Parrot_call(Parrot_INTERP interpreter, Parrot_PMC sub,
-                 Parrot_Int argcount, ...) {
-    Parrot_Int inreg = 0;
+void*
+Parrot_call_sub(Parrot_INTERP interpreter, Parrot_PMC sub,
+                 const char *signature, ...)
+{
     va_list ap;
+    void *result;
+
     PARROT_CALLIN_START(interpreter);
 
-    va_start(ap, argcount);
-
-    /* Will all the arguments fit into registers? */
-    REG_INT(0) = 0;
-    if (argcount < 12) {
-        REG_INT(3) = argcount;
-        for (inreg = 0; inreg < argcount; inreg++) {
-            REG_PMC(inreg + 5) = va_arg(ap, Parrot_PMC);
-        }
-    } else {
-        /* Nope, so we need an overflow array */
-        Parrot_PMC overflow;
-        Parrot_Int ocount;
-        REG_INT(3) = 11;
-        REG_PMC(3) = overflow = Parrot_PMC_new(interpreter,
-                                  Parrot_PMC_typenum(interpreter, "Array"));
-        Parrot_PMC_set_intval(interpreter, overflow, argcount - 11);
-        for (inreg = 0; inreg < 11; inreg++) {
-            REG_PMC(inreg + 5) = va_arg(ap, Parrot_PMC);
-        }
-        for (ocount = 0; ocount < argcount - 11; ocount++) {
-            VTABLE_set_pmc_keyed_int(interpreter, overflow, ocount,
-                                     (Parrot_PMC)va_arg(ap, Parrot_PMC));
-        }
-    }
+    va_start(ap, signature);
+    result = Parrot_runops_fromc_arglist(interpreter, sub, signature, ap);
     va_end(ap);
 
-    Parrot_runops_fromc(interpreter, sub);
     PARROT_CALLIN_END(interpreter);
+    return result;
+}
 
+Parrot_Int
+Parrot_call_sub_ret_int(Parrot_INTERP interpreter, Parrot_PMC sub,
+                 const char *signature, ...)
+{
+    va_list ap;
+    Parrot_Int result;
+
+    PARROT_CALLIN_START(interpreter);
+
+    va_start(ap, signature);
+    result = Parrot_runops_fromc_arglist_reti(interpreter, sub, signature, ap);
+    va_end(ap);
+
+    PARROT_CALLIN_END(interpreter);
+    return result;
+}
+
+Parrot_Float
+Parrot_call_sub_ret_float(Parrot_INTERP interpreter, Parrot_PMC sub,
+                 const char *signature, ...)
+{
+    va_list ap;
+    Parrot_Float result;
+
+    PARROT_CALLIN_START(interpreter);
+
+    va_start(ap, signature);
+    result = Parrot_runops_fromc_arglist_retf(interpreter, sub, signature, ap);
+    va_end(ap);
+
+    PARROT_CALLIN_END(interpreter);
+    return result;
 }
 
 /*
 
-=item C<void Parrot_call_method(Parrot_INTERP interp, Parrot_PMC sub,
-                        Parrot_STRING method, Parrot_Int argcount, ...)>
+=item C<void* Parrot_call_method(Parrot_INTERP interp, Parrot_PMC sub,
+        Parrot_PMC object, Parrot_STRING method, const char *signature, ...)>
 
-Call a parrot method, with PMC parameters.
+=item C<Parrot_Int Parrot_call_method_ret_int(Parrot_INTERP interp,
+    Parrot_PMC sub, Parrot_PMC object, Parrot_STRING method,
+    const char *signature, ...)>
 
-XXX Not implemented yet.
+=item C<Parrot_Float Parrot_call_method_ret_float(Parrot_INTERP interp,
+    Parrot_PMC sub, Parrot_PMC object, Parrot_STRING method,
+    const char *signature, ...)>
+
+Call a parrot method for the given object.
 
 =cut
 
 */
 
-void Parrot_call_method(Parrot_INTERP interp, Parrot_PMC sub,
-                        Parrot_STRING method, Parrot_Int argcount, ...) {
-    PARROT_CALLIN_START(interp);
-    PARROT_CALLIN_END(interp);
+void *
+Parrot_call_method(Parrot_INTERP interpreter, Parrot_PMC sub, Parrot_PMC obj,
+                        Parrot_STRING method, const char *signature, ...)
+{
+    void *result;
+    va_list ap;
+
+    PARROT_CALLIN_START(interpreter);
+    va_start(ap, signature);
+    result = Parrot_run_meth_fromc_arglist(interpreter, sub,
+            obj, method, signature, ap);
+    va_end(ap);
+    PARROT_CALLIN_END(interpreter);
+    return result;
+}
+
+Parrot_Int
+Parrot_call_method_ret_int(Parrot_INTERP interpreter, Parrot_PMC sub,
+        Parrot_PMC obj, Parrot_STRING method, const char *signature, ...)
+{
+    Parrot_Int result;
+    va_list ap;
+
+    PARROT_CALLIN_START(interpreter);
+    va_start(ap, signature);
+    result = Parrot_run_meth_fromc_arglist_reti(interpreter, sub,
+            obj, method, signature, ap);
+    va_end(ap);
+    PARROT_CALLIN_END(interpreter);
+    return result;
+}
+
+Parrot_Float
+Parrot_call_method_ret_float(Parrot_INTERP interpreter, Parrot_PMC sub,
+        Parrot_PMC obj, Parrot_STRING method, const char *signature, ...)
+{
+    Parrot_Float result;
+    va_list ap;
+
+    PARROT_CALLIN_START(interpreter);
+    va_start(ap, signature);
+    result = Parrot_run_meth_fromc_arglist_retf(interpreter, sub,
+            obj, method, signature, ap);
+    va_end(ap);
+    PARROT_CALLIN_END(interpreter);
+    return result;
 }
 
 /*

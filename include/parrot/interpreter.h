@@ -388,6 +388,9 @@ INTVAL Parrot_runops_fromc_args_reti(Interp *, PMC *, const char *, ...);
 FLOATVAL Parrot_runops_fromc_args_retf(Interp *, PMC *, const char *, ...);
 
 void* Parrot_runops_fromc_arglist(Interp *, PMC *, const char *sig, va_list);
+INTVAL Parrot_runops_fromc_arglist_reti(Interp *, PMC *, const char *, va_list);
+FLOATVAL Parrot_runops_fromc_arglist_retf(Interp *, PMC *, const char *,
+        va_list);
 
 void* Parrot_run_meth_fromc(Interp *, PMC *sub, PMC* obj, STRING *meth);
 void* Parrot_run_meth_fromc_args(Interp *, PMC *sub,
@@ -396,6 +399,13 @@ INTVAL Parrot_run_meth_fromc_args_reti(Interp *, PMC *sub,
         PMC* obj, STRING *meth, const char *signature, ...);
 FLOATVAL Parrot_run_meth_fromc_args_retf(Interp *, PMC *sub,
         PMC* obj, STRING *meth, const char *signature, ...);
+
+void* Parrot_run_meth_fromc_arglist(Interp *, PMC *sub,
+        PMC* obj, STRING *meth, const char *signature, va_list);
+INTVAL Parrot_run_meth_fromc_arglist_reti(Interp *, PMC *sub,
+        PMC* obj, STRING *meth, const char *signature, va_list);
+FLOATVAL Parrot_run_meth_fromc_arglist_retf(Interp *, PMC *sub,
+        PMC* obj, STRING *meth, const char *signature, va_list);
 
 void Parrot_callback_C(void *external_data, PMC *callback_info);
 void Parrot_callback_D(PMC *callback_info, void *external_data);

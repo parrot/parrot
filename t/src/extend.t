@@ -439,7 +439,7 @@ the_test(Parrot_Interp interpreter, opcode_t *cur_op, opcode_t *start)
     key = key_new_cstring(interpreter, "_sub1");
     sub = VTABLE_get_pmc_keyed(interpreter,
 			       interpreter->globals->stash_hash, key);
-    Parrot_call(interpreter, sub, 0);
+    Parrot_call_sub(interpreter, sub, "v");
     PIO_eprintf(interpreter, "back\n");
 
     /* win32 seems to buffer stderr ? */
@@ -451,7 +451,7 @@ the_test(Parrot_Interp interpreter, opcode_t *cur_op, opcode_t *start)
     arg = pmc_new(interpreter, enum_class_PerlString);
     VTABLE_set_string_native(interpreter, arg,
 			     string_from_cstring(interpreter, "hello ", 0));
-    Parrot_call(interpreter, sub, 1, arg);
+    Parrot_call_sub(interpreter, sub, "vP", arg);
     PIO_eprintf(interpreter, "back\n");
 
     return NULL;
@@ -520,7 +520,7 @@ the_test(Parrot_Interp interpreter, opcode_t *cur_op, opcode_t *start)
     }
     else {
 	push_new_c_exception_handler(interpreter, &jb);
-	Parrot_call(interpreter, sub, 0);
+	Parrot_call_sub(interpreter, sub, "v");
     }
     PIO_eprintf(interpreter, "back\n");
 

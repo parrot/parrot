@@ -432,6 +432,56 @@ Parrot_runops_fromc_arglist(Parrot_Interp interpreter, PMC *sub,
     return set_retval(interpreter, *sig, bp);
 }
 
+INTVAL
+Parrot_runops_fromc_arglist_reti(Parrot_Interp interpreter, PMC *sub,
+        const char *sig, va_list args)
+{
+    struct parrot_regs_t *bp;
+
+    bp = runops_args(interpreter, sub, PMCNULL, NULL, sig, args);
+    return set_retval_i(interpreter, *sig, bp);
+}
+
+FLOATVAL
+Parrot_runops_fromc_arglist_retf(Parrot_Interp interpreter, PMC *sub,
+        const char *sig, va_list args)
+{
+    struct parrot_regs_t *bp;
+
+    bp = runops_args(interpreter, sub, PMCNULL, NULL, sig, args);
+    return set_retval_f(interpreter, *sig, bp);
+}
+
+void*
+Parrot_run_meth_fromc_arglist(Parrot_Interp interpreter,
+        PMC *sub, PMC *obj, STRING *meth, const char *sig, va_list args)
+{
+    struct parrot_regs_t *bp;
+
+    bp = runops_args(interpreter, sub, obj, meth, sig, args);
+    return set_retval(interpreter, *sig, bp);
+}
+
+INTVAL
+Parrot_run_meth_fromc_arglist_reti(Parrot_Interp interpreter,
+        PMC *sub, PMC *obj, STRING *meth, const char *sig, va_list args)
+{
+    struct parrot_regs_t *bp;
+
+    bp = runops_args(interpreter, sub, obj, meth, sig, args);
+    return set_retval_i(interpreter, *sig, bp);
+}
+
+FLOATVAL
+Parrot_run_meth_fromc_arglist_retf(Parrot_Interp interpreter,
+        PMC *sub, PMC *obj, STRING *meth, const char *sig, va_list args)
+{
+    struct parrot_regs_t *bp;
+
+    bp = runops_args(interpreter, sub, obj, meth, sig, args);
+    return set_retval_f(interpreter, *sig, bp);
+}
+
 /*
 
 =back

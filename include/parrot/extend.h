@@ -91,8 +91,17 @@ Parrot_Int Parrot_PMC_typenum(Parrot_INTERP, const char *);
 
 void Parrot_free_cstring(char *);
 
-void Parrot_call(Parrot_INTERP, Parrot_PMC, Parrot_Int, ...);
-void Parrot_call_method(Parrot_INTERP, Parrot_PMC, Parrot_STRING, Parrot_Int, ...);
+void *        Parrot_call_sub(Parrot_INTERP, Parrot_PMC, const char *, ...);
+Parrot_Int    Parrot_call_sub_ret_int(Parrot_INTERP, Parrot_PMC,
+                    const char *, ...);
+Parrot_Float  Parrot_call_sub_ret_float(Parrot_INTERP, Parrot_PMC,
+                    const char *, ...);
+void *        Parrot_call_method(Parrot_INTERP, Parrot_PMC,
+                    Parrot_PMC, Parrot_STRING, const char *, ...);
+Parrot_Int    Parrot_call_method_ret_int(Parrot_INTERP, Parrot_PMC,
+                    Parrot_PMC, Parrot_STRING, const char *, ...);
+Parrot_Float  Parrot_call_method_ret_float(Parrot_INTERP, Parrot_PMC,
+                    Parrot_PMC, Parrot_STRING, const char *, ...);
 
 Parrot_Int    Parrot_get_intreg(Parrot_INTERP, Parrot_Int);
 Parrot_Float  Parrot_get_numreg(Parrot_INTERP, Parrot_Int);
