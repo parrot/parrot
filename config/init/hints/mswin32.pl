@@ -1,3 +1,6 @@
+# Copyright: 2005 The Perl Foundation.  All Rights Reserved.
+# $Id$
+
 {
 	my %args;
 	@args{@args}=@_;
@@ -139,12 +142,33 @@
 		);
 	}
 	elsif( $is_mingw ) {
-		$libs='' if $libs =~ /\.lib\s/i;
-		Configure::Data->set(
-			link      => 'gcc',
-			libs      => $libs,
-			slash     => '/',
-			ar        => 'ar',
-		);
+		my $make=Configure::Data->get(qw(make));
+		if ($make =~ /nmake/i) {
+			# ActiveState Perl
+			Configure::Data->set(
+				'a' => '.a',
+				'ar' => 'ar',
+				'cc' => 'gcc',
+				'ccflags' => '-s -O2 -DWIN32 ',
+				'cp' => 'copy',
+				'ld' => 'g++',
+				'ld_load_flags' => '-mdll -s ',
+				'ld_share_flags' => '-mdll -s ',
+				'ldflags' => '-s ',
+				'libs' => '-lmsvcrt -lmoldname -lkernel32 -luser32 -lgdi32 -lwinspool -lcomdlg32 -ladvapi32 -lshell32 -lole32 -loleaut32 -lnetapi32 -luuid -lws2_32 -lmpr -lwinmm -lversion -lodbc32 ',
+				'link' => 'gcc',
+				'linkflags' => '-s ',
+				'make' => 'mingw32-make',
+				'o' => '.o',
+			);
+		} elsif ($make =~ /dmake/i) {
+			# mingw Perl
+			Configure::Data->set(
+				'cp' => 'copy',
+				'make' => 'mingw32-make',
+			);
+		} else {
+			warn "unknown configuration";
+		}
 	}
 }
