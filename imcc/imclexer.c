@@ -10,7 +10,6 @@
 #define YY_FLEX_MINOR_VERSION 5
 
 #include <stdio.h>
-#include <unistd.h>
 
 
 /* cfront 1.2 defines "c_plusplus" instead of "__cplusplus" */
@@ -24,6 +23,7 @@
 #ifdef __cplusplus
 
 #include <stdlib.h>
+#include <unistd.h>
 
 /* Use prototypes in function declarations. */
 #define YY_USE_PROTOS
@@ -1234,7 +1234,7 @@ YY_MALLOC_DECL
 YY_DECL
 	{
 	register yy_state_type yy_current_state;
-	register char *yy_cp = NULL, *yy_bp = NULL;
+	register char *yy_cp, *yy_bp;
 	register int yy_act;
 
 #line 107 "imcc/imcc.l"
@@ -2643,6 +2643,11 @@ YY_BUFFER_STATE b;
 	}
 
 
+#ifndef YY_ALWAYS_INTERACTIVE
+#ifndef YY_NEVER_INTERACTIVE
+extern int isatty YY_PROTO(( int ));
+#endif
+#endif
 
 #ifdef YY_USE_PROTOS
 void yy_init_buffer( YY_BUFFER_STATE b, FILE *file )
@@ -3261,7 +3266,6 @@ include_file (char *file_name)
     char *ext;
 
     frame = new_frame();
-    sourcefile = file_name;
 
     file = fopen(file_name, "r");
     if (!file) {
@@ -3279,11 +3283,15 @@ include_file (char *file_name)
         }
 #endif
         file = fopen(s, "r");
-        sourcefile = s;
         /* free(s); FIXME leak */
+        if (!file)
+            fataly(EX_SOFTWARE, sourcefile, line, strerror(errno));
+        sourcefile = s;
     }
-    if (!file)
-        fataly(EX_SOFTWARE, file_name, line, strerror(errno));
+    else {
+        sourcefile = file_name;
+    }
+
     ext = strrchr(file_name, '.');
     if (ext) {
         if (strcmp (ext, ".pasm") == 0) {
