@@ -1,6 +1,6 @@
 #! perl
 
-use Parrot::Test tests => 28;
+use Parrot::Test tests => 29;
 use Test::More;
 
 output_is(<<CODE, <<OUTPUT, "Initial PerlHash tests");
@@ -938,5 +938,16 @@ ok 9
 ok 10
 10
 OUTPUT
+
+output_is(<<'CODE', '', "reusing the undef");
+    new P0, .PerlHash
+    set P1, P0["no"]
+    print P1
+    set P1, "one"
+    set P2, P0["nada"]
+    print P2
+    end
+CODE
+
 1;
 

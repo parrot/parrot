@@ -14,8 +14,6 @@
 
 #include "parrot/parrot.h"
 
-#define INT2KEY(i,k) ((k) ? key_new_integer((i), *(k)) : NULL)
-
 static PMC* undef = NULL;
 STRING * hash_get_idx(Interp *interpreter, HASH *hash, PMC *key);
 
@@ -94,7 +92,7 @@ pmclass PerlHash {
 	    nextkey = key_next(INTERP, key);
             valpmc = entry->val.pmc_val;
 	    if (!nextkey)
-            return VTABLE_get_integer(INTERP, valpmc);
+		return VTABLE_get_integer(INTERP, valpmc);
 	    return VTABLE_get_integer_keyed(INTERP, valpmc, nextkey);
 
         }
@@ -117,7 +115,7 @@ pmclass PerlHash {
 	    nextkey = key_next(INTERP, key);
             valpmc = entry->val.pmc_val;
 	    if (!nextkey)
-            return VTABLE_get_number(INTERP, valpmc);
+		return VTABLE_get_number(INTERP, valpmc);
 	    return VTABLE_get_number_keyed(INTERP, valpmc, nextkey);
         }
         internal_exception(OUT_OF_BOUNDS,
@@ -139,7 +137,7 @@ pmclass PerlHash {
 	    nextkey = key_next(INTERP, key);
             valpmc = entry->val.pmc_val;
 	    if (!nextkey)
-            return VTABLE_get_bignum(INTERP, valpmc);
+		return VTABLE_get_bignum(INTERP, valpmc);
 	    return VTABLE_get_bignum_keyed(INTERP, valpmc, nextkey);
         }
         internal_exception(OUT_OF_BOUNDS,
@@ -174,7 +172,7 @@ pmclass PerlHash {
 	    nextkey = key_next(INTERP, key);
             valpmc = entry->val.pmc_val;
 	    if (!nextkey)
-            return VTABLE_get_string(INTERP, valpmc);
+		return VTABLE_get_string(INTERP, valpmc);
 	    return VTABLE_get_string_keyed(INTERP, valpmc, nextkey);
         }
         internal_exception(OUT_OF_BOUNDS,
@@ -194,14 +192,14 @@ pmclass PerlHash {
         STRING* keystr = make_hash_key(INTERP, key);
         HASH_ENTRY* entry = hash_get(INTERP, (HASH*) PMC_data(SELF), keystr);
         if (entry == NULL) {
-            /* XXX Warning: use of uninitialized value */
-            return (PMC*)VTABLE_get_pmc(INTERP, undef);
+            PMC *new_undef = pmc_new(INTERP, enum_class_PerlUndef);
+            return new_undef;
         }
         if (entry->type == enum_hash_pmc) {
 	    PMC* nextkey;
 	    nextkey = key_next(INTERP, key);
 	    if (!nextkey)
-            return entry->val.pmc_val;
+		return entry->val.pmc_val;
 	    return VTABLE_get_pmc_keyed(INTERP,
 		    entry->val.pmc_val, nextkey);
 
@@ -317,8 +315,7 @@ pmclass PerlHash {
 	    return 0;		/* no such key */
 	if (key == NULL)
 	    return 1;		/* lookup stops here */
-	return VTABLE_exists_keyed(INTERP, he->val.pmc_val,
-						     key);
+	return VTABLE_exists_keyed(INTERP, he->val.pmc_val, key);
     }
 
     INTVAL defined_keyed(PMC* key) {
@@ -354,8 +351,7 @@ pmclass PerlHash {
 	else if (key == NULL)
 	    hash_delete(INTERP, h, sx);
 	else
-	    VTABLE_delete_keyed(INTERP, he->val.pmc_val,
-						  key);
+	    VTABLE_delete_keyed(INTERP, he->val.pmc_val, key);
     }
 
     PMC* nextkey_keyed (PMC* key, INTVAL what) {
