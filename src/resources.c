@@ -304,7 +304,7 @@ compact_pool(Interp *interpreter, struct Memory_Pool *pool)
             UINTVAL i;
 
             for (i = 0; i < cur_buffer_arena->used; i++) {
-                /* ! (immobile | on_free_list | constant | external) */
+                /* ! (immobile | on_free_list | constant | external | sysmem) */
                 if (PObj_buflen(b) && PObj_is_movable_TESTALL(b)) {
                     struct Buffer_Tail *tail =
                             (struct Buffer_Tail *)((char *)PObj_bufstart(b) +

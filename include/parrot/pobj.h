@@ -516,13 +516,13 @@ typedef enum PObj_enum {
 
 #define PObj_is_external_CLEARALL(o) (PObj_get_FLAGS(o) &= \
             ~(UINTVAL)(PObj_COW_FLAG|PObj_bufstart_external_FLAG| \
-                       PObj_external_FLAG|PObj_immobile_FLAG))
+                       PObj_external_FLAG|PObj_immobile_FLAG|PObj_sysmem_FLAG))
 
 #define PObj_is_live_or_free_TESTALL(o) (PObj_get_FLAGS(o) & \
         (PObj_live_FLAG | PObj_on_free_list_FLAG))
 
 #define PObj_is_movable_TESTALL(o) (!(PObj_get_FLAGS(o) & \
-        (PObj_immobile_FLAG |  \
+        (PObj_immobile_FLAG | PObj_sysmem_FLAG |  \
          PObj_constant_FLAG | PObj_external_FLAG)))
 
 #define PObj_custom_mark_destroy_SETALL(o) do { \

@@ -118,7 +118,7 @@ Initializes the allocator.
 void
 mem_setup_allocator(Interp *interpreter)
 {
-    interpreter->arena_base = mem_sys_allocate(sizeof(struct Arenas));
+    interpreter->arena_base = mem_sys_allocate_zeroed(sizeof(struct Arenas));
     interpreter->arena_base->sized_header_pools = NULL;
     interpreter->arena_base->num_sized = 0;
 

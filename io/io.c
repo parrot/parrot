@@ -115,6 +115,7 @@ PIO_make_io_string(Interp *interpreter, STRING **buf, size_t default_len)
         PObj_bufstart(s) = s->strstart = mem_sys_allocate(len);
         PObj_buflen(s) = len;
         PObj_sysmem_SET(s);
+        PObj_external_SET(s);
         s->representation = enum_stringrep_one;
         /*
          * TODO encoding = raw
