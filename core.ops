@@ -3935,7 +3935,8 @@ may not be used by the particular class. For example:
 =cut
 
 op new(out PMC, in INT) {
-  if ($2 <0 || $2 >= enum_class_max) {
+  if ($2 <= 0 || $2 >= enum_class_max) {
+    internal_exception(1, "Illegal PMC enum (%d) in new\n", $2);
     abort(); /* Deserve to lose */
   }
 
@@ -3949,8 +3950,8 @@ op new(out PMC, in INT) {
 
 op new(out PMC, in INT, in INT) {
   PMC* newpmc;
-  if ($2 <0 || $2 >= enum_class_max) {
-    abort(); /* Deserve to lose */
+  if ($2 <= 0 || $2 >= enum_class_max) {
+    internal_exception(1, "Illegal PMC enum (%d) in new\n", $2);
   }
   newpmc = pmc_new_sized(interpreter, $2, $3);
   $1 = newpmc;

@@ -44,7 +44,7 @@ void Parrot_Array_resize_array (struct Parrot_Interp *interpreter, PMC* self, IN
     }
     else {
         buffer = (Buffer *) (self->data = new_buffer_header(interpreter));
-        
+
         self->flags |= PMC_is_buffer_ptr_FLAG;
         self->flags |= PMC_is_PMC_ptr_FLAG;
         Parrot_allocate(interpreter, buffer, sizeof(PMC*)*size);
@@ -62,12 +62,6 @@ pmclass Array {
         resize_array(INTERP, SELF, 0);
     }
 
-    void morph (INTVAL type) {
-    }
-
-    void destroy () {
-    }
-
     INTVAL type () {
         return enum_class_Array;
     }
@@ -76,7 +70,7 @@ pmclass Array {
         return whoami;
     }
 
-    PMC* clone () { 
+    PMC* clone () {
         PMC* dest;
         INTVAL ix, size;
         PMC* element;
@@ -192,7 +186,7 @@ pmclass Array {
     }
 
     STRING* get_string () {
-        return NULL;
+	return Parrot_sprintf_c(INTERP, "array[%p]", SELF);
     }
 
     STRING* get_string_keyed_int (INTVAL* key) {
@@ -348,20 +342,6 @@ pmclass Array {
         SELF.set_integer_keyed_int(&ix, value);
     }
 
-    void set_number (PMC* value) {
-        INTVAL size = (INTVAL)value->cache.num_val;
-        resize_array(interpreter, SELF, size+1);
-    }
-
-    void set_number_native (FLOATVAL size) {
-        resize_array(interpreter, SELF, (INTVAL)size);
-    }
-
-    void set_number_same (PMC* value) {
-        INTVAL size = value->cache.int_val;
-        resize_array(interpreter, SELF, size);
-    }
-
     void set_number_keyed_int (INTVAL* key, FLOATVAL value) {
         INTVAL ix;
         PMC* element;
@@ -398,18 +378,6 @@ pmclass Array {
         if (!key) return;
         ix = key_integer(INTERP, key);
         SELF.set_number_keyed_int(&ix, value);
-    }
-
-    void set_string (PMC* value) {
-        THROW_UNSUPPORTED;
-    }
-
-    void set_string_native (STRING* value) {
-        THROW_UNSUPPORTED;
-    }
-
-    void set_string_same (PMC* value) {
-        THROW_UNSUPPORTED;
     }
 
     void set_string_keyed_int (INTVAL* key, STRING* value) {
@@ -509,6 +477,27 @@ pmclass Array {
         DYNSELF.set_string_keyed_int(&nextix, value);
     }
 
+    INTVAL pop_integer () {
+        INTVAL nextix = SELF->cache.int_val - 1;
+        INTVAL ret =  DYNSELF.get_integer_keyed_int(&nextix);
+	SELF->cache.int_val--;
+	return ret;
+    }
+
+    FLOATVAL pop_float () {
+        INTVAL nextix = SELF->cache.int_val - 1;
+        FLOATVAL ret = DYNSELF.get_number_keyed_int(&nextix);
+	SELF->cache.int_val--;
+	return ret;
+    }
+
+    STRING * pop_string () {
+        INTVAL nextix = SELF->cache.int_val - 1;
+        STRING *ret = DYNSELF.get_string_keyed_int(&nextix);
+	SELF->cache.int_val--;
+	return ret;
+    }
+
     void push_pmc (PMC* value) {
         INTVAL nextix = SELF->cache.int_val;
         DYNSELF.set_pmc_keyed_int(&nextix, value, NULL);
@@ -595,198 +584,18 @@ pmclass Array {
 
     /* == operation */
     INTVAL is_equal (PMC* value) {
+	/* XXX */
         return 0;
     }
-    
+
     INTVAL is_equal_keyed (PMC* key, PMC* value, PMC* value_key) {
+	/* XXX */
         return 0;
     }
 
     INTVAL is_equal_keyed_int (INTVAL* key, PMC* value, INTVAL* value_key) {
+	/* XXX */
         return 0;
     }
-
-    void logical_or (PMC* value, PMC* dest) {
-        THROW_UNSUPPORTED;
-    }
-
-    void logical_and (PMC* value, PMC* dest) {
-        THROW_UNSUPPORTED;
-    }
-
-    void logical_not (PMC* value) {
-        THROW_UNSUPPORTED;
-    }
-
-    void add (PMC* value, PMC* dest) {
-        THROW_UNSUPPORTED;
-    }
-
-    void add_int (INTVAL value, PMC* dest) {
-        THROW_UNSUPPORTED;
-    }
-
-    void add_bignum (BIGNUM* value, PMC* dest) {
-        THROW_UNSUPPORTED;
-    }
-
-    void add_float (FLOATVAL value, PMC* dest) {
-        THROW_UNSUPPORTED;
-    }
-
-    void add_same (PMC* value, PMC* dest) {
-        THROW_UNSUPPORTED;
-    }
-
-    void add_keyed (PMC* key, PMC* value, PMC* value_key,
-                               PMC* dest, PMC* dest_key) {
-        THROW_UNSUPPORTED;
-    }
-
-    void add_keyed_int (INTVAL* key, PMC* value, INTVAL* value_key,
-                                      PMC* dest, INTVAL* dest_key) {
-        THROW_UNSUPPORTED;
-    }
-
-    void subtract (PMC* value, PMC* dest) {
-        THROW_UNSUPPORTED;
-    }
-
-    void subtract_int (INTVAL value, PMC* dest) {
-        THROW_UNSUPPORTED;
-    }
-
-    void subtract_bignum (BIGNUM* value, PMC* dest) {
-        THROW_UNSUPPORTED;
-    }
-
-    void subtract_float (FLOATVAL value, PMC* dest) {
-        THROW_UNSUPPORTED;
-    }
-
-    void subtract_same (PMC* value, PMC* dest) {
-        THROW_UNSUPPORTED;
-    }
-
-    void subtract_keyed (PMC* key, PMC* value, PMC* value_key,
-                                    PMC* dest, PMC* dest_key) {
-        THROW_UNSUPPORTED;
-    }
-
-    void subtract_keyed_int (INTVAL* key, PMC* value, INTVAL* value_key,
-                                           PMC* dest, INTVAL* dest_key) {
-        THROW_UNSUPPORTED;
-    }
-
-    void multiply (PMC* value, PMC* dest) {
-        THROW_UNSUPPORTED;
-    }
-
-    void multiply_int (INTVAL value, PMC* dest) {
-        THROW_UNSUPPORTED;
-    }
-
-    void multiply_bignum (BIGNUM* value, PMC* dest) {
-        THROW_UNSUPPORTED;
-    }
-
-    void multiply_float (FLOATVAL value, PMC* dest) {
-        THROW_UNSUPPORTED;
-    }
-
-    void multiply_same (PMC* value, PMC* dest) {
-        THROW_UNSUPPORTED;
-    }
-
-    void multiply_keyed (PMC* key, PMC* value, PMC* value_key,
-                                    PMC* dest, PMC* dest_key) {
-        THROW_UNSUPPORTED;
-    }
-
-    void multiply_keyed_int (INTVAL* key, PMC* value, INTVAL* value_key,
-                                           PMC* dest, INTVAL* dest_key) {
-        THROW_UNSUPPORTED;
-    }
-
-    void divide (PMC* value, PMC* dest) {
-        THROW_UNSUPPORTED;
-    }
-
-    void divide_int (INTVAL value, PMC* dest) {
-        THROW_UNSUPPORTED;
-    }
-
-    void divide_bignum (BIGNUM* value, PMC* dest) {
-        THROW_UNSUPPORTED;
-    }
-
-    void divide_float (FLOATVAL value, PMC* dest) {
-        THROW_UNSUPPORTED;
-    }
-
-    void divide_same (PMC* value, PMC* dest) {
-        THROW_UNSUPPORTED;
-    }
-
-    void divide_keyed (PMC* key, PMC* value, PMC* value_key,
-                                  PMC* dest, PMC* dest_key) {
-        THROW_UNSUPPORTED;
-    }
-
-    void divide_keyed_int (INTVAL* key, PMC* value, INTVAL* value_key,
-                                         PMC* dest, INTVAL* dest_key) {
-        THROW_UNSUPPORTED;
-    }
-
-    void modulus (PMC* value, PMC* dest) {
-        THROW_UNSUPPORTED;
-    }
-
-    void modulus_int (INTVAL value, PMC* dest) {
-        THROW_UNSUPPORTED;
-    }
-
-    void modulus_bignum (BIGNUM* value, PMC* dest) {
-        THROW_UNSUPPORTED;
-    }
-
-    void modulus_float (FLOATVAL value, PMC* dest) {
-        THROW_UNSUPPORTED;
-    }
-
-    void modulus_same (PMC* value, PMC* dest) {
-        THROW_UNSUPPORTED;
-    }
-
-    void modulus_keyed (PMC* key, PMC* value, PMC* value_key,
-                                   PMC* dest, PMC* dest_key) {
-        THROW_UNSUPPORTED;
-    }
-
-    void modulus_keyed_int (INTVAL* key, PMC* value, INTVAL* value_key,
-                                          PMC* dest, INTVAL* dest_key) {
-        THROW_UNSUPPORTED;
-    }
-
-    void concatenate (PMC* value, PMC* dest) {
-        THROW_UNSUPPORTED;
-    }
-
-    void concatenate_native (STRING* value, PMC* dest) {
-        THROW_UNSUPPORTED;
-    }
-
-    void concatenate_same (PMC* value, PMC* dest) {
-        THROW_UNSUPPORTED;
-    }
-
-    void concatenate_keyed (PMC* key, PMC* value, PMC* value_key,
-                                       PMC* dest, PMC* dest_key) {
-        THROW_UNSUPPORTED;
-    }
-
-    void concatenate_keyed_int (INTVAL* key, PMC* value, INTVAL* value_key,
-                                              PMC* dest, INTVAL* dest_key) {
-        THROW_UNSUPPORTED;
-    }
 }
+

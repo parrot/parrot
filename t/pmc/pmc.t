@@ -1,8 +1,9 @@
 #! perl -w
 
-use Parrot::Test tests => 72;
+use Parrot::Test tests => 74;
 use Test::More;
 use Parrot::PMC qw(%pmc_types);
+my $max_pmc = scalar(keys(%pmc_types)) + 1;
 
 my $fp_equality_macro = <<'ENDOFMACRO';
 .macro fp_eq (	J, K, L )
@@ -55,6 +56,20 @@ output_is(<<'CODE', <<'OUTPUT', "newpmc");
 CODE
 starting
 ending
+OUTPUT
+
+output_is(<<'CODE', <<'OUTPUT', "illegal min newpmc");
+	new P0, 0
+	end
+CODE
+Illegal PMC enum (0) in new
+OUTPUT
+
+output_is(<<"CODE", <<"OUTPUT", "illegal max newpmc");
+	new P0, $max_pmc
+	end
+CODE
+Illegal PMC enum ($max_pmc) in new
 OUTPUT
 
 output_is(<<'CODE', <<'OUTPUT', "set/print integer");
@@ -1107,7 +1122,7 @@ output_is(<<"CODE", <<'OUTPUT', "undef-logical");
 	print "y"
 	print P0
 	print "z"
-	print "\\n" 
+	print "\\n"
 	end
 CODE
 0010xy1z
@@ -1117,22 +1132,22 @@ output_is(<<"CODE", <<'OUTPUT', "undef-add");
 @{[ $fp_equality_macro ]}
 	new P1, .PerlUndef
 
-# undef + perlundef 
+# undef + perlundef
 	new P0, .PerlUndef
 	add P0, P1, P1
 	print P0
-	print "\\n" 
+	print "\\n"
 
-# undef + perlint 
+# undef + perlint
 
 	new P0, .PerlUndef
 	new P2, .PerlInt
 	set P2, 947
 	add P0, P1, P2
 	print P0
-	print "\\n" 
+	print "\\n"
 
-# undef + perlnum 
+# undef + perlnum
 
 	new P0, .PerlUndef
 	new P2, .PerlNum
@@ -1140,7 +1155,7 @@ output_is(<<"CODE", <<'OUTPUT', "undef-add");
 	add P0, P1, P2
 	.fp_eq( P0, 385.623, OK)
 
-	print "not" 
+	print "not"
 OK:	print "ok"
 	print "\\n"
 
@@ -1161,21 +1176,21 @@ output_is(<<"CODE", <<'OUTPUT', "undef-subtract");
 	print P0
 	print "\\n"
 
-# undef - perlint 
+# undef - perlint
 	new P2, .PerlInt
 	set P2, 947
 	sub P0, P1, P2
 	print P0
-	print "\\n" 
+	print "\\n"
 
-# undef - perlnum 
+# undef - perlnum
 
 	new P2, .PerlNum
 	set P2, 385.623
 	sub P0, P1, P2
 	.fp_eq( P0, -385.623, OK2)
 
-	print "not" 
+	print "not"
 OK2:	print "ok"
 	print "\\n"
 
@@ -1247,7 +1262,7 @@ output_is(<<"CODE", <<'OUTPUT', "undef-string");
         set S0, P0
         eq S0, "", OK
         print "not "
-OK:     print "ok\\n"        
+OK:     print "ok\\n"
 	end
 CODE
 ok
@@ -1427,7 +1442,7 @@ ok 1
 OUTPUT
 
 
-output_is(<<CODE, <<OUTPUT, "typeof");	
+output_is(<<CODE, <<OUTPUT, "typeof");
     new P0,.PerlInt
     typeof S0,P0
     eq     S0,"PerlInt",OK_1

@@ -34,31 +34,6 @@ pmclass PerlArray extends Array {
         return whoami;
     }
 
-    PMC* clone () { 
-        PMC* dest;
-        INTVAL ix, size;
-        PMC* element;
-        PMC** array;
-
-        dest = pmc_new(INTERP, enum_class_PerlArray);
-        dest->vtable = SELF->vtable;
-	dest->vtable->init(interpreter, dest);
-	size = SELF->cache.int_val;
-	resize_array(interpreter, dest, size);
-	for (ix = 0; ix < size; ix++) {
-	    PMC *new;
-	    array = ((Buffer *) SELF->data)->bufstart;
-	    element = array[ix];
-
-	    if (element) {
-		new = element->vtable->clone(interpreter, element);
-		((PMC**)((Buffer *) dest->data)->bufstart)[ix] = new;
-	    }
-
-	}
-        return dest;
-    }
-
     void set_integer_keyed_int (INTVAL* key, INTVAL value) {
         INTVAL ix;
 
@@ -69,6 +44,8 @@ pmclass PerlArray extends Array {
         if (ix >= SELF->cache.int_val) {
             resize_array(interpreter, SELF, ix+1);
         }
+	else if (ix < -SELF->cache.int_val)
+            resize_array(interpreter, SELF, -ix-SELF->cache.int_val);
 
         SUPER(key, value);
     };
@@ -84,6 +61,8 @@ pmclass PerlArray extends Array {
         if (ix >= SELF->cache.int_val) {
             resize_array(interpreter, SELF, ix+1);
         }
+	else if (ix < -SELF->cache.int_val)
+            resize_array(interpreter, SELF, -ix-SELF->cache.int_val);
 
         SUPER(key, value);
     };
@@ -99,6 +78,8 @@ pmclass PerlArray extends Array {
         if (ix >= SELF->cache.int_val) {
             resize_array(interpreter, SELF, ix+1);
         }
+	else if (ix < -SELF->cache.int_val)
+            resize_array(interpreter, SELF, -ix-SELF->cache.int_val);
 
         SUPER(key, value);
     };
@@ -113,6 +94,8 @@ pmclass PerlArray extends Array {
         if (ix >= SELF->cache.int_val) {
             resize_array(interpreter, SELF, ix+1);
         }
+	else if (ix < -SELF->cache.int_val)
+            resize_array(interpreter, SELF, -ix-SELF->cache.int_val);
 
         SUPER(key, value);
     };
@@ -128,6 +111,8 @@ pmclass PerlArray extends Array {
         if (ix >= SELF->cache.int_val) {
             resize_array(interpreter, SELF, ix+1);
         }
+	else if (ix < -SELF->cache.int_val)
+            resize_array(interpreter, SELF, -ix-SELF->cache.int_val);
 
         SUPER(key, value);
     };
@@ -142,6 +127,8 @@ pmclass PerlArray extends Array {
         if (ix >= SELF->cache.int_val) {
             resize_array(interpreter, SELF, ix+1);
         }
+	else if (ix < -SELF->cache.int_val)
+            resize_array(interpreter, SELF, -ix-SELF->cache.int_val);
 
         SUPER(key, value);
     };
@@ -156,6 +143,8 @@ pmclass PerlArray extends Array {
         if (ix >= SELF->cache.int_val) {
             resize_array(interpreter, SELF, ix+1);
         }
+	else if (ix < -SELF->cache.int_val)
+            resize_array(interpreter, SELF, -ix-SELF->cache.int_val);
 
         SUPER(key, src, src_key);
     };
@@ -170,6 +159,8 @@ pmclass PerlArray extends Array {
         if (ix >= SELF->cache.int_val) {
             resize_array(interpreter, SELF, ix+1);
         }
+	else if (ix < -SELF->cache.int_val)
+            resize_array(interpreter, SELF, -ix-SELF->cache.int_val);
 
         SUPER(key, src, src_key);
     };
@@ -184,18 +175,7 @@ pmclass PerlArray extends Array {
     }
 
     INTVAL get_integer_keyed (PMC* key) {
-        INTVAL ix;
-        PMC* nextkey;
-        PMC* box;
-
-        if (!key) return 0;
-        ix = key_integer(INTERP, key);
-        nextkey = key_next(INTERP, key);
-        if (nextkey == NULL) return SELF.get_integer_keyed_int(&ix);
-
-        box = SELF.get_pmc_keyed_int(&ix);
-        if (box == NULL) box = undef(INTERP);
-        return box->vtable->get_integer_keyed(INTERP, box, nextkey);
+	return SUPER(key);
     }
 
     FLOATVAL get_number_keyed_int (INTVAL* key) {
@@ -208,26 +188,15 @@ pmclass PerlArray extends Array {
     }
 
     FLOATVAL get_number_keyed (PMC* key) {
-        INTVAL ix;
-        PMC* nextkey;
-        PMC* box;
-
-        if (!key) return 0;
-        ix = key_integer(INTERP, key);
-        nextkey = key_next(INTERP, key);
-        if (nextkey == NULL) return SELF.get_number_keyed_int(&ix);
-
-        box = SELF.get_pmc_keyed_int(&ix);
-        if (box == NULL) box = undef(INTERP);
-        return box->vtable->get_number_keyed(INTERP, box, nextkey);
+	return SUPER(key);
     }
 
-/*     STRING* get_string () { */
-/* 	return string_from_int(INTERP, SELF->cache.int_val); */
-/*     } */
+    STRING* get_string () {
+	return string_from_int(INTERP, SELF->cache.int_val);
+    }
 
     STRING* get_string_keyed_int (INTVAL* key) {
-        if (*key >= SELF->cache.int_val) {
+        if (*key >= SELF->cache.int_val || *key < -SELF->cache.int_val) {
             PMC* value = undef(INTERP);
             return value->vtable->get_string(INTERP, value);
         }
@@ -236,18 +205,7 @@ pmclass PerlArray extends Array {
     }
 
     STRING* get_string_keyed (PMC* key) {
-        INTVAL ix;
-        PMC* nextkey;
-        PMC* box;
-
-        if (!key) return 0;
-        ix = key_integer(INTERP, key);
-        nextkey = key_next(INTERP, key);
-        if (nextkey == NULL) return SELF.get_string_keyed_int(&ix);
-
-        box = SELF.get_pmc_keyed_int(&ix);
-        if (box == NULL) box = undef(INTERP);
-        return box->vtable->get_string_keyed(INTERP, box, nextkey);
+	return SUPER(key);
     }
 
     PMC* get_pmc_keyed_int (INTVAL* key) {
@@ -258,210 +216,7 @@ pmclass PerlArray extends Array {
     }
 
     PMC* get_pmc_keyed (PMC* key) {
-        INTVAL ix;
-        PMC* nextkey;
-        PMC* box;
-
-        if (!key) return 0;
-        ix = key_integer(INTERP, key);
-        nextkey = key_next(INTERP, key);
-        if (nextkey == NULL) return SELF.get_pmc_keyed_int(&ix);
-
-        box = SELF.get_pmc_keyed_int(&ix);
-        if (box == NULL) box = undef(INTERP);
-        return box->vtable->get_pmc_keyed(INTERP, box, nextkey);
+	return SUPER(key);
     }
 
-    void add (PMC * value, PMC* dest) {
-        if(value->vtable == &Parrot_base_vtables[enum_class_PerlInt]) {
-            dest->vtable = &Parrot_base_vtables[enum_class_PerlInt];
-            dest->vtable->set_integer_native(INTERP, dest, 
-                DYNSELF.get_integer() + value->cache.int_val
-            );
-        }
-        else if(value->vtable == &Parrot_base_vtables[enum_class_PerlNum]) {
-            dest->vtable = &Parrot_base_vtables[enum_class_PerlNum];
-            dest->vtable->set_number_native(INTERP, dest, 
-                DYNSELF.get_number() + value->cache.num_val
-            );
-        }
-        else {
-            dest->vtable->set_integer_native(INTERP, dest,
-                DYNSELF.get_integer() +
-                value->vtable->get_integer(INTERP, value)
-            );
-        }
-    }
-
-    void add_int (INTVAL value, PMC* dest) {
-        dest->vtable = &Parrot_base_vtables[enum_class_PerlInt];
-        dest->vtable->set_integer_native(INTERP, dest, 
-            DYNSELF.get_integer() + value
-        );
-    }
-
-    void add_bignum (BIGNUM* value, PMC* dest) {
-        /* XXX - You know it */
-    }
-
-    void add_float (FLOATVAL value, PMC* dest) {
-        dest->vtable = &Parrot_base_vtables[enum_class_PerlNum];
-        dest->vtable->set_number_native(INTERP, dest, 
-            DYNSELF.get_number() + value
-        );
-    }
-
-    void subtract (PMC * value, PMC* dest) {
-        if(value->vtable == &Parrot_base_vtables[enum_class_PerlInt]) {
-            dest->vtable = &Parrot_base_vtables[enum_class_PerlInt];
-            dest->vtable->set_integer_native(INTERP, dest, 
-                DYNSELF.get_integer() - value->cache.int_val
-            );
-        }
-        else if(value->vtable == &Parrot_base_vtables[enum_class_PerlNum]) {
-            dest->vtable = &Parrot_base_vtables[enum_class_PerlNum];
-            dest->vtable->set_number_native(INTERP, dest, 
-                DYNSELF.get_number() - value->cache.num_val
-            );
-        }
-        else {
-            dest->vtable->set_integer_native(INTERP, dest,
-                DYNSELF.get_integer() -
-                value->vtable->get_integer(INTERP, value)
-            );
-        }
-    }
-
-    void subtract_int (INTVAL value, PMC* dest) {
-        dest->vtable = &Parrot_base_vtables[enum_class_PerlInt];
-        dest->vtable->set_integer_native(INTERP, dest, 
-            DYNSELF.get_integer() - value
-        );
-    }
-
-    void subtract_float (FLOATVAL value, PMC* dest) {
-        dest->vtable = &Parrot_base_vtables[enum_class_PerlNum];
-        dest->vtable->set_number_native(INTERP, dest, 
-            DYNSELF.get_number() - value
-        );
-    }
-
-    void multiply (PMC * value, PMC* dest) {
-        if(value->vtable == &Parrot_base_vtables[enum_class_PerlInt]) {
-            dest->vtable = &Parrot_base_vtables[enum_class_PerlInt];
-            dest->vtable->set_integer_native(INTERP, dest, 
-                DYNSELF.get_integer() * value->cache.int_val
-            );
-        }
-        else if(value->vtable == &Parrot_base_vtables[enum_class_PerlNum]) {
-            dest->vtable = &Parrot_base_vtables[enum_class_PerlNum];
-            dest->vtable->set_number_native(INTERP, dest, 
-                DYNSELF.get_number() * value->cache.num_val
-            );
-        }
-        else {
-            dest->vtable->set_integer_native(INTERP, dest,
-                DYNSELF.get_integer() *
-                value->vtable->get_integer(INTERP, value)
-            );
-        }
-    }
-
-    void multiply_int (INTVAL value, PMC* dest) {
-        dest->vtable = &Parrot_base_vtables[enum_class_PerlInt];
-        dest->vtable->set_integer_native(INTERP, dest, 
-            DYNSELF.get_integer() * value
-        );
-    }
-
-    void multiply_float (FLOATVAL value, PMC* dest) {
-        dest->vtable = &Parrot_base_vtables[enum_class_PerlNum];
-        dest->vtable->set_number_native(INTERP, dest, 
-            DYNSELF.get_number() * value
-        );
-    }
-
-    void divide (PMC * value, PMC* dest) {
-        if(value->vtable == &Parrot_base_vtables[enum_class_PerlInt]) {
-            dest->vtable = &Parrot_base_vtables[enum_class_PerlInt];
-            dest->vtable->set_integer_native(INTERP, dest, 
-                DYNSELF.get_integer() / value->cache.int_val
-            );
-        }
-        else if(value->vtable == &Parrot_base_vtables[enum_class_PerlNum]) {
-            dest->vtable = &Parrot_base_vtables[enum_class_PerlNum];
-            dest->vtable->set_number_native(INTERP, dest, 
-                DYNSELF.get_number() / value->cache.num_val
-            );
-        }
-        else {
-            dest->vtable->set_integer_native(INTERP, dest,
-                DYNSELF.get_integer() /
-                value->vtable->get_integer(INTERP, value)
-            );
-        }
-    }
-
-    void divide_int (INTVAL value, PMC* dest) {
-        dest->vtable = &Parrot_base_vtables[enum_class_PerlInt];
-        dest->vtable->set_integer_native(INTERP, dest, 
-            DYNSELF.get_integer() / value
-        );
-    }
-
-    void divide_float (FLOATVAL value, PMC* dest) {
-        dest->vtable = &Parrot_base_vtables[enum_class_PerlNum];
-        dest->vtable->set_number_native(INTERP, dest, 
-            DYNSELF.get_number() / value
-        );
-    }
-
-    void modulus (PMC * value, PMC* dest) {
-        if(value->vtable == &Parrot_base_vtables[enum_class_PerlInt]) {
-            dest->vtable = &Parrot_base_vtables[enum_class_PerlInt];
-            dest->vtable->set_integer_native(INTERP, dest, 
-                DYNSELF.get_integer() % value->cache.int_val
-            );
-        }
-        else {
-            dest->vtable->set_integer_native(INTERP, dest,
-                DYNSELF.get_integer() %
-                value->vtable->get_integer(INTERP, value)
-            );
-        }
-    }
-
-    void modulus_int (INTVAL value, PMC* dest) {
-        dest->vtable = &Parrot_base_vtables[enum_class_PerlInt];
-        dest->vtable->set_integer_native(INTERP, dest, 
-            DYNSELF.get_integer() % value
-        );
-    }
-
-    void concatenate (PMC * value, PMC* dest) {
-        dest->cache.struct_val =
-            string_concat(INTERP,
-                      SELF->cache.struct_val,
-                      value->vtable->get_string(INTERP, value),
-                      0
-                     );
-    }
-
-    void concatenate_native (STRING * value, PMC* dest) {
-        dest->cache.struct_val =
-            string_concat(INTERP,
-                      SELF->cache.struct_val,
-                      value,
-                      0
-                     );
-    }
-
-    void concatenate_same (PMC * value, PMC* dest) {
-        dest->cache.struct_val =
-            string_concat(INTERP,
-                      SELF->cache.struct_val,
-                      value->cache.struct_val,
-                      0
-                     );
-    }
 }

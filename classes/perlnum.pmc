@@ -13,42 +13,20 @@
 #include "parrot/parrot.h"
 #include "parrot/perltypes.h"
 
-pmclass PerlNum {
-        
+pmclass PerlNum extends scalar {
+
     void init () {
         SELF->cache.num_val = 0.0;
-    }
-
-    void morph (INTVAL type) {
-fprintf(stderr,"morph not implemented\n");
-    }
-
-    void destroy () {
-    }
-
-    INTVAL type () {
-        return enum_class_PerlNum;
     }
 
     STRING* name() {
         return whoami;
     }
 
-    PMC* clone () { 
-        PMC* dest;
-        dest = pmc_new(INTERP, enum_class_PerlNum);
-        dest->vtable = SELF->vtable;
-        dest->cache.num_val = SELF->cache.num_val;
-        return dest;
-    }
-
     INTVAL get_integer () {
         return (INTVAL)SELF->cache.num_val;
     }
 
-    FLOATVAL get_number () {
-        return SELF->cache.num_val;
-    }
 
     BIGNUM* get_bignum () {
         /* XXX */
@@ -70,12 +48,6 @@ fprintf(stderr,"morph not implemented\n");
 
     INTVAL get_bool () {
         return (INTVAL)(pmc->cache.num_val != 0.0);
-    }
-
-    INTVAL is_same (PMC* other) {
-        /* Do you refer to exactly the same data that I do? */
-        return (INTVAL)( other->vtable == SELF->vtable /* You never know if you've been inherited...*/
-            && SELF->cache.num_val == other->cache.num_val );
     }
 
     void set_integer (PMC* value) {
@@ -107,13 +79,13 @@ fprintf(stderr,"morph not implemented\n");
 
     void set_bignum (PMC* value) {
     }
-    
+
     void set_bignum_native (BIGNUM* value) {
     }
-    
+
     void set_bignum_same (PMC* value) {
     }
-    
+
     void set_string (PMC* value) {
 	CHANGE_TYPE(SELF, PerlString);
         SELF->data = value->data;
@@ -130,38 +102,23 @@ fprintf(stderr,"morph not implemented\n");
     }
 
     void add (PMC* value, PMC* dest) {
-        if(value->vtable == &Parrot_base_vtables[enum_class_PerlInt]) {
-	    CHANGE_TYPE(dest, PerlNum);
-            dest->vtable->set_number_native(INTERP, dest, 
-                SELF->cache.num_val +
-                value->vtable->get_number(INTERP, value)
-            );
-        }
-        else if(value->vtable == &Parrot_base_vtables[enum_class_PerlNum]) {
-	    CHANGE_TYPE(dest, PerlNum);
-            dest->vtable->set_number_native(INTERP, dest, 
-                SELF->cache.num_val +
-                value->vtable->get_number(INTERP, value)
-            );
-        }
-        else if(value->vtable == &Parrot_base_vtables[enum_class_PerlString]) {
-	    CHANGE_TYPE(dest, PerlNum);
-            dest->vtable->set_number_native(INTERP, dest, 
-                SELF->cache.num_val +
-                value->vtable->get_number(INTERP, value)
-            );
-        }
+	dest->vtable->set_number_native(INTERP, dest,
+	    SELF->cache.num_val +
+	    value->vtable->get_number(INTERP, value)
+	);
     }
 
     void add_int (INTVAL value, PMC* dest) {
-        dest->vtable->set_number_native(INTERP, dest, SELF->cache.num_val + value);
+        dest->vtable->set_number_native(INTERP, dest,
+	SELF->cache.num_val + value);
     }
 
     void add_bignum (BIGNUM* value, PMC* dest) {
     }
 
     void add_float (FLOATVAL value, PMC* dest) {
-        dest->vtable->set_number_native(INTERP, dest, SELF->cache.num_val + value);
+        dest->vtable->set_number_native(INTERP, dest,
+	SELF->cache.num_val + value);
     }
 
     void add_same (PMC* value, PMC* dest) {
@@ -169,26 +126,14 @@ fprintf(stderr,"morph not implemented\n");
     }
 
     void subtract (PMC* value, PMC* dest) {
-        if(value->vtable == &Parrot_base_vtables[enum_class_PerlInt]) {
-	    CHANGE_TYPE(dest, PerlNum);
-            dest->vtable->set_number_native(INTERP, dest, 
-                SELF->cache.num_val -
-                value->vtable->get_number(INTERP, value)
-            );
-        }
-        else if(value->vtable == &Parrot_base_vtables[enum_class_PerlNum]) {
-	    CHANGE_TYPE(dest, PerlNum);
-            dest->vtable->set_number_native(INTERP, dest, 
-                SELF->cache.num_val -
-                value->vtable->get_number(INTERP, value)
-            );
-        }
-        else {
-        }
+	dest->vtable->set_number_native(INTERP, dest,
+	    SELF->cache.num_val -
+	    value->vtable->get_number(INTERP, value)
+	);
     }
 
     void subtract_int (INTVAL value, PMC* dest) {
-        dest->vtable->set_number_native(INTERP, dest, 
+        dest->vtable->set_number_native(INTERP, dest,
             SELF->cache.num_val - (FLOATVAL)value
         );
     }
@@ -197,7 +142,8 @@ fprintf(stderr,"morph not implemented\n");
     }
 
     void subtract_float (FLOATVAL value, PMC* dest) {
-        dest->vtable->set_number_native(INTERP, dest, SELF->cache.num_val - value);
+        dest->vtable->set_number_native(INTERP, dest,
+	SELF->cache.num_val - value);
     }
 
     void subtract_same (PMC* value, PMC* dest) {
@@ -205,26 +151,14 @@ fprintf(stderr,"morph not implemented\n");
     }
 
     void multiply (PMC* value, PMC* dest) {
-        if(value->vtable == &Parrot_base_vtables[enum_class_PerlInt]) {
-	    CHANGE_TYPE(dest, PerlNum);
-            dest->vtable->set_number_native(INTERP, dest, 
-                SELF->cache.num_val *
-                value->vtable->get_number(INTERP, value)
-            );
-        }
-        else if(value->vtable == &Parrot_base_vtables[enum_class_PerlNum]) {
-	    CHANGE_TYPE(dest, PerlNum);
-            dest->vtable->set_number_native(INTERP, dest, 
-                SELF->cache.num_val *
-                value->vtable->get_number(INTERP, value)
-            );
-        }
-        else {
-        }
+	dest->vtable->set_number_native(INTERP, dest,
+	    SELF->cache.num_val *
+	    value->vtable->get_number(INTERP, value)
+	);
     }
 
     void multiply_int (INTVAL value, PMC* dest) {
-        dest->vtable->set_number_native(INTERP, dest, 
+        dest->vtable->set_number_native(INTERP, dest,
             SELF->cache.num_val * value
         );
     }
@@ -233,7 +167,8 @@ fprintf(stderr,"morph not implemented\n");
     }
 
     void multiply_float (FLOATVAL value, PMC* dest) {
-        dest->vtable->set_number_native(INTERP, dest, SELF->cache.num_val * value);
+        dest->vtable->set_number_native(INTERP, dest,
+	SELF->cache.num_val * value);
     }
 
     void multiply_same (PMC* value, PMC* dest) {
@@ -241,35 +176,20 @@ fprintf(stderr,"morph not implemented\n");
     }
 
     void divide (PMC* value, PMC* dest) {
-        if(value->vtable == &Parrot_base_vtables[enum_class_PerlInt]) {
-	    CHANGE_TYPE(dest, PerlNum);
-            dest->vtable->set_number_native(INTERP, dest, 
-                SELF->cache.num_val /
-                value->vtable->get_number(INTERP, value)
-            );
-        }
-        else if(value->vtable == &Parrot_base_vtables[enum_class_PerlNum]) {
-	    CHANGE_TYPE(dest, PerlNum);
-            dest->vtable->set_number_native(INTERP, dest, 
-                SELF->cache.num_val /
-                value->vtable->get_number(INTERP, value)
-            );
-        }
-        else {
-        }
+	dest->vtable->set_number_native(INTERP, dest,
+	    SELF->cache.num_val /
+	    value->vtable->get_number(INTERP, value)
+	);
     }
 
     void divide_int (INTVAL value, PMC* dest) {
-        dest->vtable->set_number_native(INTERP, dest, 
+        dest->vtable->set_number_native(INTERP, dest,
             SELF->cache.num_val / value
         );
     }
 
-    void divide_bignum (BIGNUM* value, PMC* dest) {
-    }
-
     void divide_float (FLOATVAL value, PMC* dest) {
-        dest->vtable->set_number_native(INTERP, dest, 
+        dest->vtable->set_number_native(INTERP, dest,
             SELF->cache.num_val / value
         );
     }
@@ -279,24 +199,14 @@ fprintf(stderr,"morph not implemented\n");
     }
 
     void modulus (PMC* value, PMC* dest) {
-    /* XXX - Exception here */
-fprintf(stderr,"modulus not implemented\n");
+        FLOATVAL f = value->vtable->get_number(INTERP, value);
+        dest->vtable->set_number_native(INTERP, dest,
+                                        fmod(SELF->cache.num_val, f));
     }
 
     void modulus_int (INTVAL value, PMC* dest) {
-fprintf(stderr,"modulus_int not implemented\n");
-    }
-
-    void modulus_bignum (BIGNUM* value, PMC* dest) {
-fprintf(stderr,"modulus_bigint not implemented\n");
-    }
-
-    void modulus_float (FLOATVAL value, PMC* dest) {
-fprintf(stderr,"modulus_float not implemented\n");
-    }
-
-    void modulus_same (PMC* value, PMC* dest) {
-fprintf(stderr,"modulus_same not implemented\n");
+        dest->vtable->set_number_native(INTERP, dest,
+                                        fmod(SELF->cache.num_val, value));
     }
 
     void neg (PMC * dest) {
@@ -305,6 +215,7 @@ fprintf(stderr,"modulus_same not implemented\n");
 
     void bitwise_or (PMC* value, PMC* dest) {
         dest->vtable->set_integer_native(INTERP, dest,
+	    /* XXX ? */
             (INTVAL)SELF->cache.num_val |
             value->vtable->get_integer(INTERP, value)
         );
@@ -372,39 +283,6 @@ fprintf(stderr,"modulus_same not implemented\n");
         );
     }
 
-    void concatenate (PMC* value, PMC* dest) {
-        STRING* s;
-        s = string_concat(INTERP,
-                          SELF->vtable->get_string(INTERP, SELF),
-                          value->vtable->get_string(INTERP, value),
-                          0
-        );
-	CHANGE_TYPE(dest, PerlString);
-        dest->vtable->set_string_native(INTERP,dest,s);
-    }
-
-    void concatenate_native (STRING* value, PMC* dest) {
-        STRING* s;
-        s = string_concat(INTERP,
-                          SELF->vtable->get_string(INTERP, SELF),
-                          value,
-                          0
-        );
-	CHANGE_TYPE(dest, PerlString);
-        dest->vtable->set_string_native(INTERP,dest,s);
-    }
-
-    void concatenate_same (PMC* value, PMC* dest) {
-        STRING* s;
-        s = string_concat(INTERP,
-                          SELF->vtable->get_string(INTERP, SELF),
-                          value->vtable->get_string(INTERP, value),
-                          0
-        );
-	CHANGE_TYPE(dest, PerlString);
-        dest->vtable->set_string_native(INTERP,dest,s);
-    }
-
     /* == operation */
     INTVAL is_equal (PMC* value) {
         return (INTVAL)(SELF->cache.num_val == value->vtable->get_number(INTERP, value));
@@ -421,13 +299,15 @@ fprintf(stderr,"modulus_same not implemented\n");
         diff = SELF->cache.num_val - value->vtable->get_number(INTERP, value);
         return diff > 0 ? 1 : diff < 0 ? -1 : 0;
     }
-    
+
     void repeat (PMC* value, PMC* dest) {
-fprintf(stderr,"repeat not implemented\n");
+	internal_exception(INVALID_OPERATION,
+		"repeat() not implemented for PerlNum\n");
     }
 
     void repeat_int (INTVAL value, PMC* dest) {
-fprintf(stderr,"repeat_int not implemented\n");
+	internal_exception(INVALID_OPERATION,
+		"repeat() not implemented for PerlNum\n");
     }
 
     void increment () {

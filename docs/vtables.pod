@@ -20,7 +20,7 @@ scalars and Python scalars. In Perl, if you have
 
 you end up with C<$a> being C<1b>. This is a factor of the way Perl
 scalars increment themselves. In Python, on the other hand, you'd get a
-runtime error. 
+runtime error.
 
 =over 3
 
@@ -93,7 +93,7 @@ you're writing a built-in class or an extension class. If you're writing
 a built-in class, then you'll see a reference to
 C<enum_class_FoobyNumber> in the C<init> function. For built-in classes,
 this is automatically defined in F<pmc.h> when you run Configure.pl.
-If you're not writing a built-in class, you need to indicate this by 
+If you're not writing a built-in class, you need to indicate this by
 using the 'extension' keyword after the 'pmclass YOURCLASS' declaration
 in classes/YOURCLASS.pmc. Then, change the
 type of the C<init> function to return C<struct _vtable>, and then
@@ -139,7 +139,7 @@ You're quite at liberty to declare these in a separate header file, but I
 find it more convenient to keep everything together in F<foobynumber.c>.
 
 You may also use the C<cache> union in the PMC structure to remove
-some extraneous dereferences in your code if that would help. 
+some extraneous dereferences in your code if that would help.
 
 =head2 Multimethods
 
@@ -170,8 +170,7 @@ implement:
 
 =item C<type>
 
-Return some notion of what 'type' you are; this can be used to
-communicate state information between PMCs of the same class.
+Return the enumeration value of your class.
 
 =item C<name>
 
@@ -180,6 +179,18 @@ Return a string containing your class name.
 =item C<init>
 
 Do any data set-up you need to do.
+
+=item C<is_equal>
+
+True if the passed-in PMC has the same B<value> as you. For instance,
+a Perl integer and a Python integer could have the same value, but
+could not be the same thing as defined by C<is_same>.
+
+=back
+
+=head2 Methods, you might need, depending on your class
+
+=over 3
 
 =item C<clone>
 
@@ -191,7 +202,8 @@ Turn yourself into the specified type.
 
 =item C<destroy>
 
-Do any data shut-down and finalization you need to do.
+Do any data shut-down and finalization you need to do. To have this
+method called, you must set the C<PMC_active_destroy_FLAG>.
 
 =item C<get_integer>
 
@@ -266,17 +278,11 @@ Fetch the string part of C<value> and catenate it to yourself,
 storing the result in C<dest>. (Probably by calling its C<set_string>
 method) This is a string multimethod.
 
-=item C<is_equal>
-
-True if the passed-in PMC has the same B<value> as you. For instance,
-a Perl integer and a Python integer could have the same value, but
-could not be the same thing as defined by C<is_same>.
-
 =item C<logical_or>
 
 =item C<logical_and>
 
-Perform the given short-circuiting logical operations between your boolean 
+Perform the given short-circuiting logical operations between your boolean
 value and the value passed in, storing the result in C<dest>.
 
 =item C<logical_not>
@@ -294,14 +300,10 @@ in C<dest>.
 
 =back
 
-Parrot will provide a set of default methods you can inherit from if
-you don't need to do anything special for a given method. These will
-be named C<Parrot_default_...>. If you don't want to implement a
-specific method, simply say something like
-
-    void logical_not (PMC* value) = default;
-
-and a sensible default will be provided for you.
+If any method doesn't fit into your class, just don't implement it
+and don't provide an empty function body. The default class, which all
+classes inherit from, will through an exception, if this method would
+be called.
 
 If your class is a modification of an existing class, you may wish to
 use inheritance. At the beginning of your vtable specification in

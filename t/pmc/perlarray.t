@@ -19,7 +19,7 @@ output_is(<<'CODE', <<'OUTPUT', "size of the array");
         set I0,P0
         print I0
         print "\n"
-       
+
         end
 CODE
 0
@@ -98,7 +98,7 @@ output_is(<<'CODE', <<'OUTPUT', "If P");
         new P0, .PerlArray
         if P0, TR
         print "false\n"
-        branch NEXT   
+        branch NEXT
 TR:     print "true\n"
 
 NEXT:   set P0[0], 1
@@ -118,7 +118,7 @@ NEXT3:  set P1, 0
         if P1, TR4
         print "false\n"
         end
-TR4:    print "true\n"        
+TR4:    print "true\n"
         end
 
 CODE
@@ -431,7 +431,7 @@ OK_13: print "ok 13\n"
        # Set index zero to 3.7
        #
        set   P0[I31], 3.7
- 
+
        #
        # Make sure the length is 1
        #
@@ -452,7 +452,7 @@ OK_15: print "ok 15\n"
        # Set index zero to "foo"
        #
        set   P0[I31], "foo"
- 
+
        #
        # Make sure the length is 1
        #
@@ -712,79 +712,53 @@ ok 3
 ok 4
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "Math on two PerlArrays");
+output_is(<<'CODE', <<OUTPUT, "Resize negative index");
     new P0, .PerlArray
-    new P1, .PerlArray
-    set P0, 3
-    set P1, 6
-    new P2, .PerlInt
-    add P2, P0, P1
-    set I0, P2
-    eq I0, 9, ok1
+    set P0[-1], 55
+    set I0, P0[0]
+    eq I0,55,ok1
     print "not "
 ok1:
     print "ok 1\n"
-    sub P2, P1, P0
-    set I0, P2
-    eq I0, 3, ok2
+    set I0, P0
+    eq I0,1,ok2
     print "not "
 ok2:
     print "ok 2\n"
-    mul P2, P0, P1
-    set I0, P2
-    eq I0, 18, ok3
-    print "not "
-ok3:
-    print "ok 3\n"
-    div P2, P1, P0
-    set I0, P2
-    eq I0, 2, ok4
-    print "not "
-ok4:
-    print "ok 4\n"
-    mod P2, P0, P1
-    set I0, P2
-    eq I0, 3, ok5
-    print "not "
-ok5:
-    print "ok 5\n"
     end
 CODE
 ok 1
 ok 2
-ok 3
-ok 4
-ok 5
 OUTPUT
 
 output_is(<<'CODE', <<OUTPUT, "Testing clone");
     new P0, .PerlArray
     set P0[0], 1
     set P0[1], 2
-    	
+
     clone P1, P0
     set P1[0], 3
     set P0[2], 4
     set P1[3], 5
-    
+
     set I0, P0[0]
     eq I0, 1, ok1
     print "not "
 ok1:
     print "ok 1\n"
-    
+
     set I0, P1[0]
     eq I0, 3, ok2
     print "not "
 ok2:
     print "ok 2\n"
-    
+
     set P2, P1[2]
     unless P2, ok3
     print "not "
 ok3:
     print "ok 3\n"
-    
+
     set P2, P0[3]
     unless P2, ok4
     print "not "

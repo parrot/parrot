@@ -13,60 +13,45 @@
 #include "parrot/parrot.h"
 #include "parrot/perltypes.h"
 
-pmclass PerlUndef {
-
-    void init () {
-        /* Nothing */
-    }
-
-    void morph (INTVAL type) {
-    }
-
-    void destroy () {
-        /* Nothing */
-    }
-
-    INTVAL type () {
-        return enum_class_PerlUndef;
-    }
+pmclass PerlUndef extends PerlInt {
 
     STRING* name () {
         return whoami;
     }
 
-    PMC* clone () {
-        /* All undefs are alike.. */
-        PMC* dest = pmc_new(INTERP, enum_class_PerlUndef);
-        return dest;
-    }
-
     INTVAL get_integer () {
-        Parrot_warn(INTERP, PARROT_WARNINGS_UNDEF_FLAG, "Use of uninitialized value in integer context");
+        Parrot_warn(INTERP, PARROT_WARNINGS_UNDEF_FLAG,
+	    "Use of uninitialized value in integer context");
         return 0;
     }
 
     FLOATVAL get_number () {
-        Parrot_warn(INTERP, PARROT_WARNINGS_UNDEF_FLAG, "Use of uninitialized value in numeric context");
-        return 0;
+        Parrot_warn(INTERP, PARROT_WARNINGS_UNDEF_FLAG,
+	    "Use of uninitialized value in numeric context");
+        return 0.0;
     }
-    
+
     BIGNUM* get_bignum () {
-        Parrot_warn(INTERP, PARROT_WARNINGS_UNDEF_FLAG, "Use of uninitialized value in numeric context");
+        Parrot_warn(INTERP, PARROT_WARNINGS_UNDEF_FLAG,
+	    "Use of uninitialized value in numeric context");
         return NULL; /* XXX - this should be zero in BIGNUM-ese */
     }
 
     STRING* get_string () {
-        Parrot_warn(INTERP, PARROT_WARNINGS_UNDEF_FLAG, "Use of uninitialized value in string context");
+        Parrot_warn(INTERP, PARROT_WARNINGS_UNDEF_FLAG,
+	    "Use of uninitialized value in string context");
         return string_make(interpreter,  NULL, 0, NULL, 0, NULL);
     }
 
     PMC* get_pmc() {
-        Parrot_warn(INTERP, PARROT_WARNINGS_UNDEF_FLAG, "Use of uninitialized value in PMC context");
+        Parrot_warn(INTERP, PARROT_WARNINGS_UNDEF_FLAG,
+	    "Use of uninitialized value in PMC context");
         return SELF;
     }
 
     INTVAL get_bool () {
-        Parrot_warn(INTERP, PARROT_WARNINGS_UNDEF_FLAG, "Use of uninitialized value in boolean context");
+        Parrot_warn(INTERP, PARROT_WARNINGS_UNDEF_FLAG,
+	    "Use of uninitialized value in boolean context");
         return 0;
     }
 
@@ -85,31 +70,10 @@ pmclass PerlUndef {
     }
 
     void set_integer_same (PMC* value) {
-        /* Do nothing; Can't happen? */ 
+        /* Do nothing; Can't happen? */
     }
 
-    void set_number (PMC* value) {
-	CHANGE_TYPE(pmc, PerlNum);
-        pmc->vtable->set_number(interpreter, pmc, value);
-    }
 
-    void set_number_native (FLOATVAL value) {
-	CHANGE_TYPE(pmc, PerlNum);
-        pmc->vtable->set_number_native(interpreter, pmc, value);
-    }
-
-    void set_number_same (PMC* value) {
-        /* Do nothing; Can't happen? */ 
-    }
-
-    void set_bignum (PMC* value) {
-    }
-
-    void set_bignum_native (BIGNUM* value) {
-    }
-
-    void set_bignum_same (PMC* value) {
-    }
 
     void set_string (PMC* value) {
 	CHANGE_TYPE(pmc, PerlString);
@@ -121,104 +85,100 @@ pmclass PerlUndef {
         pmc->vtable->set_string_native(interpreter, pmc, value);
     }
 
-    void set_string_same (PMC* value) {
-        /* Do nothing; Can't happen? */ 
-    }
-
     void add (PMC* value,  PMC* dest) {
-        Parrot_warn(INTERP, PARROT_WARNINGS_UNDEF_FLAG, "Use of uninitialized value in addition");
+        Parrot_warn(INTERP, PARROT_WARNINGS_UNDEF_FLAG,
+	    "Use of uninitialized value in addition");
+	SUPER(value, dest);
 
-        if(value->vtable == &Parrot_base_vtables[enum_class_PerlUndef]) {
-            dest->vtable->set_integer_native(INTERP, dest, 0);
-        }
-        else if(value->vtable == &Parrot_base_vtables[enum_class_PerlInt]) {
-            dest->vtable->set_integer(INTERP, dest, value);
-        }
-        else {
-            dest->vtable->set_number(INTERP, dest, value);
-        }
     }
 
     void add_int (INTVAL value,  PMC* dest) {
-        Parrot_warn(INTERP, PARROT_WARNINGS_UNDEF_FLAG, "Use of uninitialized value in integer addition");
+        Parrot_warn(INTERP, PARROT_WARNINGS_UNDEF_FLAG,
+	    "Use of uninitialized value in integer addition");
         dest->vtable->set_integer_native(INTERP, dest, value);
     }
 
     void add_bignum (BIGNUM* value,  PMC* dest) {
+        Parrot_warn(INTERP, PARROT_WARNINGS_UNDEF_FLAG,
+	    "Use of uninitialized value in addition");
+	SUPER(value, dest);
     }
 
     void add_float (FLOATVAL value,  PMC* dest) {
-        Parrot_warn(INTERP, PARROT_WARNINGS_UNDEF_FLAG, "Use of uninitialized value in numeric addition");
+        Parrot_warn(INTERP, PARROT_WARNINGS_UNDEF_FLAG,
+	    "Use of uninitialized value in numeric addition");
         dest->vtable->set_number_native(INTERP, dest, value);
     }
 
     void add_same (PMC* value,  PMC* dest) {
-        Parrot_warn(INTERP, PARROT_WARNINGS_UNDEF_FLAG, "Use of two uninitialized values in addition");
+        Parrot_warn(INTERP, PARROT_WARNINGS_UNDEF_FLAG,
+	    "Use of two uninitialized values in addition");
         dest->vtable->set_integer_native(INTERP, dest, 0);
     }
 
     void subtract (PMC* value,  PMC* dest) {
-        Parrot_warn(INTERP, PARROT_WARNINGS_UNDEF_FLAG, "Use of uninitialized value in subtraction");
-
-        if(value->vtable == &Parrot_base_vtables[enum_class_PerlUndef]) {
-            dest->vtable->set_integer_native(INTERP, dest, 0);
-        }
-        else if(value->vtable == &Parrot_base_vtables[enum_class_PerlInt]) {
-            dest->vtable->set_integer_native(
-                INTERP, dest, 0-value->vtable->get_integer(INTERP, value) 
-                /* It doesn't hurt to be more explicit */
-            );
-        }
-        else {
-         dest->vtable->set_number_native(INTERP, dest, 0-value->vtable->get_number(INTERP, value));
-        }
+        Parrot_warn(INTERP, PARROT_WARNINGS_UNDEF_FLAG,
+	    "Use of uninitialized value in subtraction");
+	SUPER(value, dest);
     }
 
     void subtract_int (INTVAL value,  PMC* dest) {
-        Parrot_warn(INTERP, PARROT_WARNINGS_UNDEF_FLAG, "Use of uninitialized value in integer subtraction");
+        Parrot_warn(INTERP, PARROT_WARNINGS_UNDEF_FLAG,
+	    "Use of uninitialized value in integer subtraction");
         dest->vtable->set_integer_native(INTERP, dest, 0-value);
     }
 
     void subtract_bignum (BIGNUM* value,  PMC* dest) {
+        Parrot_warn(INTERP, PARROT_WARNINGS_UNDEF_FLAG,
+	    "Use of uninitialized value in subtraction");
+	SUPER(value, dest);
     }
 
     void subtract_float (FLOATVAL value,  PMC* dest) {
-        Parrot_warn(INTERP, PARROT_WARNINGS_UNDEF_FLAG, "Use of uninitialized value in numeric subtraction");
+        Parrot_warn(INTERP, PARROT_WARNINGS_UNDEF_FLAG,
+	    "Use of uninitialized value in numeric subtraction");
         dest->vtable->set_number_native(INTERP, dest, 0-value);
     }
 
     void subtract_same (PMC* value,  PMC* dest) {
-        Parrot_warn(INTERP, PARROT_WARNINGS_UNDEF_FLAG, "Use of two uninitialized values in subtraction");
+        Parrot_warn(INTERP, PARROT_WARNINGS_UNDEF_FLAG,
+	    "Use of two uninitialized values in subtraction");
         dest->vtable->set_integer_native(INTERP, dest, 0);
     }
 
     void multiply (PMC* value,  PMC* dest) {
-        Parrot_warn(INTERP, PARROT_WARNINGS_UNDEF_FLAG, "Use of uninitialized value in multiplication");
+        Parrot_warn(INTERP, PARROT_WARNINGS_UNDEF_FLAG,
+	    "Use of uninitialized value in multiplication");
         dest->vtable->set_integer_native(INTERP, dest, 0);
     }
 
     void multiply_int (INTVAL value,  PMC* dest) {
-        Parrot_warn(INTERP, PARROT_WARNINGS_UNDEF_FLAG, "Use of uninitialized value in integer multiplication");
+        Parrot_warn(INTERP, PARROT_WARNINGS_UNDEF_FLAG,
+	    "Use of uninitialized value in integer multiplication");
         dest->vtable->set_integer_native(INTERP, dest, 0);
     }
 
     void multiply_bignum (BIGNUM* value,  PMC* dest) {
-        Parrot_warn(INTERP, PARROT_WARNINGS_UNDEF_FLAG, "Use of uninitialized value in bignum multiplication");
+        Parrot_warn(INTERP, PARROT_WARNINGS_UNDEF_FLAG,
+	    "Use of uninitialized value in bignum multiplication");
         dest->vtable->set_integer_native(INTERP, dest, 0);
     }
 
     void multiply_float (FLOATVAL value,  PMC* dest) {
-        Parrot_warn(INTERP, PARROT_WARNINGS_UNDEF_FLAG, "Use of uninitialized value in numeric multiplication");
+        Parrot_warn(INTERP, PARROT_WARNINGS_UNDEF_FLAG,
+	    "Use of uninitialized value in numeric multiplication");
         dest->vtable->set_integer_native(INTERP, dest, 0);
     }
 
     void multiply_same (PMC* value,  PMC* dest) {
-        Parrot_warn(INTERP, PARROT_WARNINGS_UNDEF_FLAG, "Use of two uninitialized values in multiplication");
+        Parrot_warn(INTERP, PARROT_WARNINGS_UNDEF_FLAG,
+	    "Use of two uninitialized values in multiplication");
         dest->vtable->set_integer_native(INTERP, dest, 0);
     }
 
     void divide (PMC* value,  PMC* dest) {
-        Parrot_warn(INTERP, PARROT_WARNINGS_UNDEF_FLAG, "Use of uninitialized value in division");
+        Parrot_warn(INTERP, PARROT_WARNINGS_UNDEF_FLAG,
+	    "Use of uninitialized value in division");
         if(value->vtable == &Parrot_base_vtables[enum_class_PerlUndef]) {
             internal_exception(DIV_BY_ZERO, "division by zero!\n");
         }
@@ -235,7 +195,8 @@ pmclass PerlUndef {
     }
 
     void divide_int (INTVAL value,  PMC* dest) {
-        Parrot_warn(INTERP, PARROT_WARNINGS_UNDEF_FLAG, "Use of uninitialized value in integer division");
+        Parrot_warn(INTERP, PARROT_WARNINGS_UNDEF_FLAG,
+	    "Use of uninitialized value in integer division");
         if(value == 0) {
             internal_exception(DIV_BY_ZERO, "division by zero!\n");
         }
@@ -243,13 +204,15 @@ pmclass PerlUndef {
     }
 
     void divide_bignum (BIGNUM* value,  PMC* dest) {
-        Parrot_warn(INTERP, PARROT_WARNINGS_UNDEF_FLAG, "Use of uninitialized value in bignum division");
+        Parrot_warn(INTERP, PARROT_WARNINGS_UNDEF_FLAG,
+	    "Use of uninitialized value in bignum division");
         /* need test for value == 0 */
         dest->vtable->set_integer_native(INTERP, dest, 0);
     }
 
     void divide_float (FLOATVAL value,  PMC* dest) {
-        Parrot_warn(INTERP, PARROT_WARNINGS_UNDEF_FLAG, "Use of uninitialized value in numeric division");
+        Parrot_warn(INTERP, PARROT_WARNINGS_UNDEF_FLAG,
+	    "Use of uninitialized value in numeric division");
         if(value == 0) {
             internal_exception(DIV_BY_ZERO, "division by zero!\n");
         }
@@ -257,12 +220,14 @@ pmclass PerlUndef {
     }
 
     void divide_same (PMC* value,  PMC* dest) {
-        Parrot_warn(INTERP, PARROT_WARNINGS_UNDEF_FLAG, "Use of two uninitialized values in division");
+        Parrot_warn(INTERP, PARROT_WARNINGS_UNDEF_FLAG,
+	    "Use of two uninitialized values in division");
         internal_exception(DIV_BY_ZERO, "division by zero!\n");
     }
 
     void modulus (PMC* value,  PMC* dest) {
-        Parrot_warn(INTERP, PARROT_WARNINGS_UNDEF_FLAG, "Use of uninitialized value in modulus");
+        Parrot_warn(INTERP, PARROT_WARNINGS_UNDEF_FLAG,
+	    "Use of uninitialized value in modulus");
         if(value->vtable == &Parrot_base_vtables[enum_class_PerlUndef]) {
             internal_exception(DIV_BY_ZERO, "division by zero!\n");
         }
@@ -279,7 +244,8 @@ pmclass PerlUndef {
     }
 
     void modulus_int (INTVAL value,  PMC* dest) {
-        Parrot_warn(INTERP, PARROT_WARNINGS_UNDEF_FLAG, "Use of uninitialized value in integer modulus");
+        Parrot_warn(INTERP, PARROT_WARNINGS_UNDEF_FLAG,
+	    "Use of uninitialized value in integer modulus");
         if(value == 0) {
             internal_exception(DIV_BY_ZERO, "division by zero!\n");
         }
@@ -287,13 +253,15 @@ pmclass PerlUndef {
     }
 
     void modulus_bignum (BIGNUM* value,  PMC* dest) {
-        Parrot_warn(INTERP, PARROT_WARNINGS_UNDEF_FLAG, "Use of uninitialized value in bignum modulus");
+        Parrot_warn(INTERP, PARROT_WARNINGS_UNDEF_FLAG,
+	    "Use of uninitialized value in bignum modulus");
         /* need test for value == 0 */
         dest->vtable->set_integer_native(INTERP, dest, 0);
     }
 
     void modulus_float (FLOATVAL value,  PMC* dest) {
-        Parrot_warn(INTERP, PARROT_WARNINGS_UNDEF_FLAG, "Use of uninitialized value in numeric modulus");
+        Parrot_warn(INTERP, PARROT_WARNINGS_UNDEF_FLAG,
+	    "Use of uninitialized value in numeric modulus");
         if(value == 0) {
             internal_exception(DIV_BY_ZERO, "division by zero!\n");
         }
@@ -301,84 +269,100 @@ pmclass PerlUndef {
     }
 
     void modulus_same (PMC* value,  PMC* dest) {
-        Parrot_warn(INTERP, PARROT_WARNINGS_UNDEF_FLAG, "Use of two uninitialized values in modulus");
+        Parrot_warn(INTERP, PARROT_WARNINGS_UNDEF_FLAG,
+	    "Use of two uninitialized values in modulus");
         internal_exception(DIV_BY_ZERO, "division by zero!\n");
     }
-    
+
     void bitwise_or (PMC* value, PMC* dest) {
-        Parrot_warn(INTERP, PARROT_WARNINGS_UNDEF_FLAG, "Use of uninitialized value in bitwise or");
+        Parrot_warn(INTERP, PARROT_WARNINGS_UNDEF_FLAG,
+	    "Use of uninitialized value in bitwise or");
         dest->vtable->set_integer(INTERP, dest, value);
     }
 
     void bitwise_or_int (INTVAL value, PMC* dest) {
-        Parrot_warn(INTERP, PARROT_WARNINGS_UNDEF_FLAG, "Use of uninitialized value in bitwise or");
+        Parrot_warn(INTERP, PARROT_WARNINGS_UNDEF_FLAG,
+	    "Use of uninitialized value in bitwise or");
         dest->vtable->set_integer_native(INTERP, dest, value);
     }
 
     void bitwise_or_same (PMC* value, PMC* dest) {
-        Parrot_warn(INTERP, PARROT_WARNINGS_UNDEF_FLAG, "Use of two uninitialized values in bitwise or");
+        Parrot_warn(INTERP, PARROT_WARNINGS_UNDEF_FLAG,
+	    "Use of two uninitialized values in bitwise or");
         dest->vtable->set_integer(INTERP, dest, value);
     }
 
     void bitwise_and (PMC* value, PMC* dest) {
-        Parrot_warn(INTERP, PARROT_WARNINGS_UNDEF_FLAG, "Use of uninitialized value in bitwise and");
+        Parrot_warn(INTERP, PARROT_WARNINGS_UNDEF_FLAG,
+	    "Use of uninitialized value in bitwise and");
         dest->vtable->set_integer_native(INTERP, dest, 0);
     }
 
     void bitwise_and_int (INTVAL value, PMC* dest) {
-        Parrot_warn(INTERP, PARROT_WARNINGS_UNDEF_FLAG, "Use of uninitialized value in bitwise and");
+        Parrot_warn(INTERP, PARROT_WARNINGS_UNDEF_FLAG,
+	    "Use of uninitialized value in bitwise and");
         dest->vtable->set_integer_native(INTERP, dest, 0);
     }
 
     void bitwise_and_same (PMC* value, PMC* dest) {
-        Parrot_warn(INTERP, PARROT_WARNINGS_UNDEF_FLAG, "Use of two uninitialized values in bitwise and");
+        Parrot_warn(INTERP, PARROT_WARNINGS_UNDEF_FLAG,
+	    "Use of two uninitialized values in bitwise and");
         dest->vtable->set_integer_native(INTERP, dest, 0);
     }
 
     void bitwise_xor (PMC* value, PMC* dest) {
-        Parrot_warn(INTERP, PARROT_WARNINGS_UNDEF_FLAG, "Use of uninitialized value in bitwise xor");
+        Parrot_warn(INTERP, PARROT_WARNINGS_UNDEF_FLAG,
+	    "Use of uninitialized value in bitwise xor");
         dest->vtable->set_integer(INTERP, dest, value);
     }
 
     void bitwise_xor_int (INTVAL value, PMC* dest) {
-        Parrot_warn(INTERP, PARROT_WARNINGS_UNDEF_FLAG, "Use of uninitialized value in bitwise xor");
+        Parrot_warn(INTERP, PARROT_WARNINGS_UNDEF_FLAG,
+	    "Use of uninitialized value in bitwise xor");
         dest->vtable->set_integer_native(INTERP, dest, value);
     }
 
     void bitwise_xor_same (PMC* value, PMC* dest) {
-        Parrot_warn(INTERP, PARROT_WARNINGS_UNDEF_FLAG, "Use of two uninitialized values in bitwise xor");
+        Parrot_warn(INTERP, PARROT_WARNINGS_UNDEF_FLAG,
+	    "Use of two uninitialized values in bitwise xor");
         dest->vtable->set_integer(INTERP, dest, value);
     }
 
     void bitwise_not (PMC* dest) {
-        Parrot_warn(INTERP, PARROT_WARNINGS_UNDEF_FLAG, "Use of uninitialized value in bitwise not");
+        Parrot_warn(INTERP, PARROT_WARNINGS_UNDEF_FLAG,
+	    "Use of uninitialized value in bitwise not");
         dest->vtable->set_integer_native(INTERP, dest, ~((INTVAL)0));
     }
 
     void concatenate (PMC* value,  PMC* dest) {
-        Parrot_warn(INTERP, PARROT_WARNINGS_UNDEF_FLAG, "Use of uninitialized value in concatenation");
+        Parrot_warn(INTERP, PARROT_WARNINGS_UNDEF_FLAG,
+	    "Use of uninitialized value in concatenation");
         dest->vtable->set_string(INTERP, dest, value);
     }
 
     void concatenate_native (STRING* value,  PMC* dest) {
-        Parrot_warn(INTERP, PARROT_WARNINGS_UNDEF_FLAG, "Use of uninitialized value in concatenation");
+        Parrot_warn(INTERP, PARROT_WARNINGS_UNDEF_FLAG,
+	    "Use of uninitialized value in concatenation");
         dest->vtable->set_string_native(INTERP, dest, value);
     }
 
     void concatenate_same (PMC * value,  PMC* dest) {
-        Parrot_warn(INTERP, PARROT_WARNINGS_UNDEF_FLAG, "Use of uninitialized value in concatenation");
+        Parrot_warn(INTERP, PARROT_WARNINGS_UNDEF_FLAG,
+	    "Use of uninitialized value in concatenation");
         dest->vtable->set_string_native(INTERP, dest, NULL);
     }
 
     INTVAL is_equal (PMC* value) {
-        Parrot_warn(INTERP, PARROT_WARNINGS_UNDEF_FLAG, "Use of uninitialized value in equals");
+        Parrot_warn(INTERP, PARROT_WARNINGS_UNDEF_FLAG,
+	    "Use of uninitialized value in equals");
         if(value->vtable==SELF->vtable) {
             return 1;
         }
         else if(value->vtable->get_integer(INTERP, value) == 0) {
             return 1;
         }
-        else if(0==string_compare(INTERP, value->vtable->get_string(INTERP, value), NULL)) {
+        else if(0==string_compare(INTERP,
+	    value->vtable->get_string(INTERP, value), NULL)) {
             return 1;
         }
         else {
@@ -387,7 +371,8 @@ pmclass PerlUndef {
     }
 
     void logical_or (PMC* value,  PMC* dest) {
-        dest->vtable->set_integer_native(INTERP, dest, value->vtable->get_bool(INTERP, value));
+        dest->vtable->set_integer_native(INTERP, dest,
+	    value->vtable->get_bool(INTERP, value));
     }
 
     void logical_and (PMC* value,  PMC* dest) {
@@ -399,7 +384,8 @@ pmclass PerlUndef {
     }
 
     void repeat (PMC* value,  PMC* dest) {
-        Parrot_warn(INTERP, PARROT_WARNINGS_UNDEF_FLAG, "Use of uninitialized value in repeat");
+        Parrot_warn(INTERP, PARROT_WARNINGS_UNDEF_FLAG,
+	    "Use of uninitialized value in repeat");
         dest->vtable->set_string(INTERP, dest, NULL);
     }
 

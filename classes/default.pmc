@@ -13,9 +13,21 @@
 
 #define INT2KEY(i,k) ((k) ? key_new_integer((i), *(k)) : NULL)
 
+static char * caller(Parrot_Interp interp, PMC * pmc);
+
+static char * caller(Parrot_Interp interp, PMC * pmc)
+{
+    return pmc && pmc->vtable && pmc->vtable->name ?
+	pmc->vtable->name(interp, pmc)->strstart : "(null)";
+}
+
 pmclass default abstract noinit {
 
     void init () {
+	internal_exception(ILL_INHERIT,
+		"init() not implemented in class '%s'\n",
+		caller(INTERP, SELF));
+
     }
 
     void init_pmc (PMC* value) {
@@ -23,6 +35,9 @@ pmclass default abstract noinit {
     }
 
     void morph (INTVAL type) {
+	internal_exception(ILL_INHERIT,
+		"morph() not implemented in class '%s'\n",
+		caller(INTERP, SELF));
     }
 
     /* The end of used parameter is passed into the mark_used function of
@@ -34,6 +49,7 @@ pmclass default abstract noinit {
     }
 
     void destroy () {
+        PANIC("custom_destroy flag set but no custom destroy routine defined");
     }
 
     INTVAL type () {
@@ -41,7 +57,9 @@ pmclass default abstract noinit {
     }
 
     INTVAL type_keyed (PMC* key) {
-        internal_exception(OUT_OF_BOUNDS, "Subscript on something that's not an aggregate!\n");
+	internal_exception(ILL_INHERIT,
+		"type_keyed() not implemented in class '%s'\n",
+		caller(INTERP, SELF));
         return 0;
     }
 
@@ -51,11 +69,16 @@ pmclass default abstract noinit {
     }
 
     UINTVAL subtype (INTVAL type) {
+	internal_exception(ILL_INHERIT,
+		"subtype() not implemented in class '%s'\n",
+		caller(INTERP, SELF));
         return 0;
     }
 
     UINTVAL subtype_keyed (PMC* key, INTVAL type) {
-        internal_exception(OUT_OF_BOUNDS, "Subscript on something that's not an aggregate!\n");
+	internal_exception(ILL_INHERIT,
+		"subtype_keyed() not implemented in class '%s'\n",
+		caller(INTERP, SELF));
         return 0;
     }
 
@@ -65,11 +88,16 @@ pmclass default abstract noinit {
     }
 
     STRING* name () {
+	internal_exception(ILL_INHERIT,
+		"name() not implemented in class '%s'\n",
+		caller(INTERP, SELF));
         return NULL;
     }
 
     STRING* name_keyed (PMC* key) {
-        internal_exception(OUT_OF_BOUNDS, "Subscript on something that's not an aggregate!\n");
+	internal_exception(ILL_INHERIT,
+		"name_keyed() not implemented in class '%s'\n",
+		caller(INTERP, SELF));
         return NULL;
     }
 
@@ -79,15 +107,16 @@ pmclass default abstract noinit {
     }
 
     PMC* clone () {
-        PMC* dest;
-        dest = pmc_new(INTERP, SELF->vtable->base_type);
-        memcpy(&dest->cache, &SELF->cache, sizeof(UnionVal));
-        dest->data = SELF->data;
-        return dest;
+	internal_exception(ILL_INHERIT,
+		"clone() not implemented in class '%s'\n",
+		caller(INTERP, SELF));
+        return NULL;
     }
 
     PMC* clone_keyed (PMC* key) {
-        internal_exception(OUT_OF_BOUNDS, "Subscript on something that's not an aggregate!\n");
+	internal_exception(ILL_INHERIT,
+		"clone_keyed() not implemented in class '%s'\n",
+		caller(INTERP, SELF));
         return NULL;
     }
 
@@ -97,11 +126,16 @@ pmclass default abstract noinit {
     }
 
     PMC* find_method(STRING* method_name) {
+	internal_exception(ILL_INHERIT,
+		"find_method() not implemented in class '%s'\n",
+		caller(INTERP, SELF));
         return NULL;
     }
 
     PMC* find_method_keyed(PMC* key, STRING* method_name) {
-        internal_exception(OUT_OF_BOUNDS, "Subscript on something that's not an aggregate!\n");
+	internal_exception(ILL_INHERIT,
+		"find_method_keyed() not implemented in class '%s'\n",
+		caller(INTERP, SELF));
         return NULL;
     }
 
@@ -111,11 +145,16 @@ pmclass default abstract noinit {
     }
 
     INTVAL get_integer () {
-        return SELF->cache.int_val;
+	internal_exception(ILL_INHERIT,
+		"get_integer() not implemented in class '%s'\n",
+		caller(INTERP, SELF));
+	return 0;
     }
 
     INTVAL get_integer_keyed (PMC* key) {
-        internal_exception(OUT_OF_BOUNDS, "Subscript on something that's not an aggregate!\n");
+	internal_exception(ILL_INHERIT,
+		"get_integer_keyed() not implemented in class '%s'\n",
+		caller(INTERP, SELF));
         return 0;
     }
 
@@ -125,11 +164,16 @@ pmclass default abstract noinit {
     }
 
     FLOATVAL get_number () {
-        return SELF->cache.num_val;
+	internal_exception(ILL_INHERIT,
+		"get_number() not implemented in class '%s'\n",
+		caller(INTERP, SELF));
+	return 0.0;
     }
 
     FLOATVAL get_number_keyed (PMC* key) {
-        internal_exception(OUT_OF_BOUNDS, "Subscript on something that's not an aggregate!\n");
+	internal_exception(ILL_INHERIT,
+		"get_number_keyed() not implemented in class '%s'\n",
+		caller(INTERP, SELF));
         return 0.0;
     }
 
@@ -139,11 +183,16 @@ pmclass default abstract noinit {
     }
 
     BIGNUM* get_bignum () {
-        return (BIGNUM*)SELF->cache.struct_val;
+	internal_exception(ILL_INHERIT,
+		"get_bignum() not implemented in class '%s'\n",
+		caller(INTERP, SELF));
+        return NULL;
     }
 
     BIGNUM* get_bignum_keyed (PMC* key) {
-        internal_exception(OUT_OF_BOUNDS, "Subscript on something that's not an aggregate!\n");
+	internal_exception(ILL_INHERIT,
+		"get_bignum_keyed() not implemented in class '%s'\n",
+		caller(INTERP, SELF));
         return NULL;
     }
 
@@ -153,12 +202,16 @@ pmclass default abstract noinit {
     }
 
     STRING* get_string () {
-        STRING*s = string_copy(INTERP, SELF->cache.struct_val);
-        return s;
+	internal_exception(ILL_INHERIT,
+		"get_string() not implemented in class '%s'\n",
+		caller(INTERP, SELF));
+        return NULL;
     }
 
     STRING* get_string_keyed (PMC* key) {
-        internal_exception(OUT_OF_BOUNDS, "Subscript on something that's not an aggregate!\n");
+	internal_exception(ILL_INHERIT,
+		"get_string_keyed() not implemented in class '%s'\n",
+		caller(INTERP, SELF));
         return NULL;
     }
 
@@ -168,19 +221,16 @@ pmclass default abstract noinit {
     }
 
     INTVAL get_bool () {
-        /*  Everything has to be 0 */
-        if (   DYNSELF.get_integer() == 0
-            && DYNSELF.get_number() == 0.0
-            && string_bool(DYNSELF.get_string()) == 0
-            )
-        {
-            return 0;
-        }
-        return 1;
+	internal_exception(ILL_INHERIT,
+		"get_bool() not implemented in class '%s'\n",
+		caller(INTERP, SELF));
+        return 0;
     }
 
     INTVAL get_bool_keyed (PMC* key) {
-        internal_exception(OUT_OF_BOUNDS, "Subscript on something that's not an aggregate!\n");
+	internal_exception(ILL_INHERIT,
+		"get_bool_keyed() not implemented in class '%s'\n",
+		caller(INTERP, SELF));
         return 0;
     }
 
@@ -190,12 +240,16 @@ pmclass default abstract noinit {
     }
 
     INTVAL elements () {
-        /* XXX maybe this should be one */
+	internal_exception(ILL_INHERIT,
+		"elements() not implemented in class '%s'\n",
+		caller(INTERP, SELF));
         return 0;
     }
 
     INTVAL elements_keyed (PMC* key) {
-        internal_exception(OUT_OF_BOUNDS, "Subscript on something that's not an aggregate!\n");
+	internal_exception(ILL_INHERIT,
+		"elements_keyed() not implemented in class '%s'\n",
+		caller(INTERP, SELF));
         return 0;
     }
 
@@ -209,7 +263,9 @@ pmclass default abstract noinit {
     }
 
     PMC* get_pmc_keyed (PMC* key) {
-        internal_exception(OUT_OF_BOUNDS, "Subscript on something that's not an aggregate!\n");
+	internal_exception(ILL_INHERIT,
+		"get_pmc_keyed() not implemented in class '%s'\n",
+		caller(INTERP, SELF));
         return NULL;
     }
 
@@ -222,15 +278,15 @@ pmclass default abstract noinit {
         /* I think this should cover this correctly, is_same implies that
         same B<data> used by each, but as meaning of data is a little
         vtable reliant, I include that test as well */
-        return (INTVAL)(SELF->vtable == pmc2->vtable && &SELF->cache == &pmc2->cache);
+        return (INTVAL)(SELF->vtable == pmc2->vtable &&
+		&SELF->cache == &pmc2->cache &&
+		&SELF->data == &pmc2->data);
     }
 
     INTVAL is_same_keyed (PMC* key, PMC* value, PMC* value_key) {
-        if (key == NULL) {
-            /* pmc2_key must not be null, else why did you call me? */
-            return SELF->vtable->is_same(INTERP, SELF, value->vtable->get_pmc_keyed(INTERP, value, value_key));
-        }
-        internal_exception(OUT_OF_BOUNDS, "Subscript on something that's not an aggregate!\n");
+	internal_exception(ILL_INHERIT,
+		"is_same_keyed() not implemented in class '%s'\n",
+		caller(INTERP, SELF));
         return 0;
     }
 
@@ -240,24 +296,28 @@ pmclass default abstract noinit {
         return DYNSELF.is_same_keyed(r_key, value, r_value_key);
     }
 
-    /* The set methods merely make the appropriate part of the cache
-      be what it should be, more complex behaviour is left as an
-      exercise for the inheriting class. */
-
     void set_integer (PMC* value) {
-        SELF->cache.int_val = value->vtable->get_integer(INTERP, value);
+	internal_exception(ILL_INHERIT,
+		"set_integer() not implemented in class '%s'\n",
+		caller(INTERP, SELF));
     }
 
     void set_integer_native (INTVAL value) {
-        SELF->cache.int_val = value;
+	internal_exception(ILL_INHERIT,
+		"set_integer_native() not implemented in class '%s'\n",
+		caller(INTERP, SELF));
     }
 
     void set_integer_same (PMC* value) {
-        SELF->cache.int_val = value->vtable->get_integer(INTERP, value);
+	internal_exception(ILL_INHERIT,
+		"set_integer_same() not implemented in class '%s'\n",
+		caller(INTERP, SELF));
     }
 
     void set_integer_keyed (PMC* key, INTVAL value) {
-        internal_exception(OUT_OF_BOUNDS, "Subscript on something that's not an aggregate!\n");
+	internal_exception(ILL_INHERIT,
+		"set_integer_keyed() not implemented in class '%s'\n",
+		caller(INTERP, SELF));
     }
 
     void set_integer_keyed_int (INTVAL* key, INTVAL value) {
@@ -266,19 +326,27 @@ pmclass default abstract noinit {
     }
 
     void set_number (PMC* value) {
-        SELF->cache.num_val = value->vtable->get_number(INTERP, value);
+	internal_exception(ILL_INHERIT,
+		"set_number() not implemented in class '%s'\n",
+		caller(INTERP, SELF));
     }
 
     void set_number_native (FLOATVAL value) {
-        SELF->cache.num_val = value;
+	internal_exception(ILL_INHERIT,
+		"set_number_native() not implemented in class '%s'\n",
+		caller(INTERP, SELF));
     }
 
     void set_number_same (PMC* value) {
-        SELF->cache.num_val = value->vtable->get_number(INTERP, value);
+	internal_exception(ILL_INHERIT,
+		"set_number_same() not implemented in class '%s'\n",
+		caller(INTERP, SELF));
     }
 
     void set_number_keyed (PMC* key, FLOATVAL value) {
-        internal_exception(OUT_OF_BOUNDS, "Subscript on something that's not an aggregate!\n");
+	internal_exception(ILL_INHERIT,
+		"set_number_keyed() not implemented in class '%s'\n",
+		caller(INTERP, SELF));
     }
 
     void set_number_keyed_int (INTVAL* key, FLOATVAL value) {
@@ -287,19 +355,27 @@ pmclass default abstract noinit {
     }
 
     void set_bignum (PMC* value) {
-        SELF->cache.struct_val = (DPOINTER*)value->vtable->get_bignum(INTERP, value);
+	internal_exception(ILL_INHERIT,
+		"set_bignum() not implemented in class '%s'\n",
+		caller(INTERP, SELF));
     }
 
     void set_bignum_native (BIGNUM* value) {
-        SELF->cache.struct_val = (DPOINTER*)value;
+	internal_exception(ILL_INHERIT,
+		"set_bignum_native() not implemented in class '%s'\n",
+		caller(INTERP, SELF));
     }
 
     void set_bignum_same (PMC* value) {
-        SELF->cache.struct_val = (DPOINTER*)value->vtable->get_bignum(INTERP, value);
+	internal_exception(ILL_INHERIT,
+		"set_bignum_same() not implemented in class '%s'\n",
+		caller(INTERP, SELF));
     }
 
     void set_bignum_keyed (PMC* key, BIGNUM* value) {
-        internal_exception(OUT_OF_BOUNDS, "Subscript on something that's not an aggregate!\n");
+	internal_exception(ILL_INHERIT,
+		"set_bignum_keyed() not implemented in class '%s'\n",
+		caller(INTERP, SELF));
     }
 
     void set_bignum_keyed_int (INTVAL* key, BIGNUM* value) {
@@ -308,19 +384,27 @@ pmclass default abstract noinit {
     }
 
     void set_string (PMC* value) {
-        SELF->cache.struct_val = value->vtable->get_string(INTERP, value);
+	internal_exception(ILL_INHERIT,
+		"set_string() not implemented in class '%s'\n",
+		caller(INTERP, SELF));
     }
 
     void set_string_native (STRING* value) {
-        SELF->cache.struct_val = string_copy(INTERP, value);
+	internal_exception(ILL_INHERIT,
+		"set_string_native() not implemented in class '%s'\n",
+		caller(INTERP, SELF));
     }
 
     void set_string_same (PMC* value) {
-        SELF->cache.struct_val = value->vtable->get_string(INTERP, value);
+	internal_exception(ILL_INHERIT,
+		"set_string_same() not implemented in class '%s'\n",
+		caller(INTERP, SELF));
     }
 
     void set_string_keyed (PMC* key, STRING* string) {
-        internal_exception(OUT_OF_BOUNDS, "Subscript on something that's not an aggregate!\n");
+	internal_exception(ILL_INHERIT,
+		"set_string_keyed() not implemented in class '%s'\n",
+		caller(INTERP, SELF));
     }
 
     void set_string_keyed_int (INTVAL* key, STRING* string) {
@@ -333,11 +417,9 @@ pmclass default abstract noinit {
     }
 
     void set_pmc_keyed (PMC* key, PMC* value, PMC* value_key) {
-        /* Either key or value must NOT be NULL */
-        if (key == NULL)
-            SELF->vtable->set_pmc(INTERP, SELF, value->vtable->get_pmc_keyed(INTERP, value, value_key));
-        else
-            internal_exception(OUT_OF_BOUNDS, "Subscript on something that's not an aggregate!\n");
+	internal_exception(ILL_INHERIT,
+		"set_pmc_keyed() not implemented in class '%s'\n",
+		caller(INTERP, SELF));
     }
 
     void set_pmc_keyed_int (INTVAL* key, PMC* value, INTVAL* value_key) {
@@ -351,7 +433,9 @@ pmclass default abstract noinit {
     }
 
     void set_same_keyed (PMC* dest_key, PMC* src, PMC* src_key) {
-        internal_exception(OUT_OF_BOUNDS, "Subscript on something that's not an aggregate!\n");
+	internal_exception(ILL_INHERIT,
+		"set_keyed_keyed() not implemented in class '%s'\n",
+		caller(INTERP, SELF));
     }
 
     void set_same_keyed_int (INTVAL* key, PMC* value, INTVAL* value_key) {
@@ -361,521 +445,497 @@ pmclass default abstract noinit {
     }
 
     INTVAL pop_integer() {
-        internal_exception(OUT_OF_BOUNDS, "Pop on something that's not an aggregate!\n");
+	internal_exception(ILL_INHERIT,
+		"pop_integer() not implemented in class '%s'\n",
+		caller(INTERP, SELF));
         return 0;
     }
 
     INTVAL pop_integer_keyed(PMC* key) {
-        internal_exception(OUT_OF_BOUNDS, "Subscript on something that's not an aggregate!\n");
+	internal_exception(ILL_INHERIT,
+		"pop_integer_keyed() not implemented in class '%s'\n",
+		caller(INTERP, SELF));
         return 0;
     }
-    
+
     INTVAL pop_integer_keyed_int(INTVAL* key) {
         PMC* r_key = INT2KEY(INTERP, key);
         return DYNSELF.pop_integer_keyed(r_key);
-    }    
+    }
 
     FLOATVAL pop_float() {
-        internal_exception(OUT_OF_BOUNDS, "Pop on something that's not an aggregate!\n");
+	internal_exception(ILL_INHERIT,
+		"pop_float() not implemented in class '%s'\n",
+		caller(INTERP, SELF));
         return 0.0;
     }
 
     FLOATVAL pop_float_keyed(PMC* key) {
-        internal_exception(OUT_OF_BOUNDS, "Subscript on something that's not an aggregate!\n");
+	internal_exception(ILL_INHERIT,
+		"pop_float_keyed() not implemented in class '%s'\n",
+		caller(INTERP, SELF));
         return 0.0;
     }
-    
+
     FLOATVAL pop_float_keyed_int(INTVAL* key) {
         PMC* r_key = INT2KEY(INTERP, key);
         return DYNSELF.pop_float_keyed(r_key);
-    }    
+    }
 
     BIGNUM* pop_bignum() {
-        internal_exception(OUT_OF_BOUNDS, "Pop on something that's not an aggregate!\n");
+	internal_exception(ILL_INHERIT,
+		"pop_bignum() not implemented in class '%s'\n",
+		caller(INTERP, SELF));
         return NULL;
     }
 
     BIGNUM* pop_bignum_keyed(PMC* key) {
-        internal_exception(OUT_OF_BOUNDS, "Subscript on something that's not an aggregate!\n");
+	internal_exception(ILL_INHERIT,
+		"pop_bignum_keyed() not implemented in class '%s'\n",
+		caller(INTERP, SELF));
         return NULL;
     }
-    
+
     BIGNUM* pop_bignum_keyed_int(INTVAL* key) {
         PMC* r_key = INT2KEY(INTERP, key);
         return DYNSELF.pop_bignum_keyed(r_key);
-    }    
+    }
 
     STRING* pop_string() {
-        internal_exception(OUT_OF_BOUNDS, "Pop on something that's not an aggregate!\n");
+	internal_exception(ILL_INHERIT,
+		"pop_string() not implemented in class '%s'\n",
+		caller(INTERP, SELF));
         return NULL;
     }
 
     STRING* pop_string_keyed(PMC* key) {
-        internal_exception(OUT_OF_BOUNDS, "Subscript on something that's not an aggregate!\n");
+	internal_exception(ILL_INHERIT,
+		"pop_string_keyed() not implemented in class '%s'\n",
+		caller(INTERP, SELF));
         return NULL;
     }
-    
+
     STRING* pop_string_keyed_int(INTVAL* key) {
         PMC* r_key = INT2KEY(INTERP, key);
         return DYNSELF.pop_string_keyed(r_key);
-    }    
+    }
 
     PMC* pop_pmc() {
-        internal_exception(OUT_OF_BOUNDS, "Pop on something that's not an aggregate!\n");
+	internal_exception(ILL_INHERIT,
+		"pop_pmc() not implemented in class '%s'\n",
+		caller(INTERP, SELF));
         return NULL;
     }
 
     PMC* pop_pmc_keyed(PMC* key) {
-        internal_exception(OUT_OF_BOUNDS, "Subscript on something that's not an aggregate!\n");
+	internal_exception(ILL_INHERIT,
+		"pop_pmc_keyed() not implemented in class '%s'\n",
+		caller(INTERP, SELF));
         return NULL;
     }
-    
+
     PMC* pop_pmc_keyed_int(INTVAL* key) {
         PMC* r_key = INT2KEY(INTERP, key);
         return DYNSELF.pop_pmc_keyed(r_key);
-    }    
+    }
 
     void push_integer (INTVAL value) {
-        internal_exception(OUT_OF_BOUNDS, "Push on something that's not an aggregate!\n");
+	internal_exception(ILL_INHERIT,
+		"push_integer() not implemented in class '%s'\n",
+		caller(INTERP, SELF));
     }
 
     void push_integer_keyed (PMC* key, INTVAL value) {
-        internal_exception(OUT_OF_BOUNDS, "Subscript on something that's not an aggregate!\n");
+	internal_exception(ILL_INHERIT,
+		"push_integer_keyed() not implemented in class '%s'\n",
+		caller(INTERP, SELF));
     }
-    
+
     void push_integer_keyed_int (INTVAL* key, INTVAL value) {
         PMC* r_key = INT2KEY(INTERP, key);
         DYNSELF.push_integer_keyed(r_key, value);
-    }    
+    }
 
     void push_float (FLOATVAL value) {
-        internal_exception(OUT_OF_BOUNDS, "Push on something that's not an aggregate!\n");
+	internal_exception(ILL_INHERIT,
+		"push_float() not implemented in class '%s'\n",
+		caller(INTERP, SELF));
     }
 
     void push_float_keyed (PMC* key, FLOATVAL value) {
-        internal_exception(OUT_OF_BOUNDS, "Subscript on something that's not an aggregate!\n");
+	internal_exception(ILL_INHERIT,
+		"push_float_keyed() not implemented in class '%s'\n",
+		caller(INTERP, SELF));
     }
-    
+
     void push_float_keyed_int (INTVAL* key, FLOATVAL value) {
         PMC* r_key = INT2KEY(INTERP, key);
         DYNSELF.push_float_keyed(r_key, value);
-    }    
+    }
 
     void push_bignum (BIGNUM* value) {
-        internal_exception(OUT_OF_BOUNDS, "Push on something that's not an aggregate!\n");
+	internal_exception(ILL_INHERIT,
+		"push_bignum() not implemented in class '%s'\n",
+		caller(INTERP, SELF));
     }
 
     void push_bignum_keyed (PMC* key, BIGNUM* value) {
-        internal_exception(OUT_OF_BOUNDS, "Subscript on something that's not an aggregate!\n");
+	internal_exception(ILL_INHERIT,
+		"push_bignum_keyed() not implemented in class '%s'\n",
+		caller(INTERP, SELF));
     }
-    
+
     void push_bignum_keyed_int (INTVAL* key, BIGNUM* value) {
         PMC* r_key = INT2KEY(INTERP, key);
         DYNSELF.push_bignum_keyed(r_key, value);
-    }    
+    }
 
     void push_string (STRING* value) {
-        internal_exception(OUT_OF_BOUNDS, "Push on something that's not an aggregate!\n");
+	internal_exception(ILL_INHERIT,
+		"push_string() not implemented in class '%s'\n",
+		caller(INTERP, SELF));
     }
 
     void push_string_keyed (PMC* key, STRING* value) {
-        internal_exception(OUT_OF_BOUNDS, "Subscript on something that's not an aggregate!\n");
+	internal_exception(ILL_INHERIT,
+		"push_string_keyed() not implemented in class '%s'\n",
+		caller(INTERP, SELF));
     }
-    
+
     void push_string_keyed_int (INTVAL* key, STRING* value) {
         PMC* r_key = INT2KEY(INTERP, key);
         DYNSELF.push_string_keyed(r_key, value);
-    }    
+    }
 
     void push_pmc (PMC* value) {
-        internal_exception(OUT_OF_BOUNDS, "Push on something that's not an aggregate!\n");
+	internal_exception(ILL_INHERIT,
+		"push_pmc() not implemented in class '%s'\n",
+		caller(INTERP, SELF));
     }
 
     void push_pmc_keyed (PMC* key, PMC* value, PMC* value_key) {
-        internal_exception(OUT_OF_BOUNDS, "Subscript on something that's not an aggregate!\n");
+	internal_exception(ILL_INHERIT,
+		"push_pmc_keyed() not implemented in class '%s'\n",
+		caller(INTERP, SELF));
     }
-    
+
     void push_pmc_keyed_int (INTVAL* key, PMC* value, INTVAL* value_key) {
         PMC* r_key = INT2KEY(INTERP, key);
         PMC* r_value_key = INT2KEY(INTERP, value_key);
         DYNSELF.push_pmc_keyed(r_key, value, r_value_key);
-    }    
+    }
 
     INTVAL shift_integer() {
-        internal_exception(OUT_OF_BOUNDS, "Shift on something that's not an aggregate!\n");
+	internal_exception(ILL_INHERIT,
+		"shift_integer() not implemented in class '%s'\n",
+		caller(INTERP, SELF));
         return 0;
     }
 
     INTVAL shift_integer_keyed(PMC* key) {
-        internal_exception(OUT_OF_BOUNDS, "Subscript on something that's not an aggregate!\n");
+	internal_exception(ILL_INHERIT,
+		"shift_integer_keyed() not implemented in class '%s'\n",
+		caller(INTERP, SELF));
         return 0;
     }
-    
+
     INTVAL shift_integer_keyed_int(INTVAL* key) {
         PMC* r_key = INT2KEY(INTERP, key);
         return DYNSELF.shift_integer_keyed(r_key);
-    }    
+    }
 
     FLOATVAL shift_float() {
-        internal_exception(OUT_OF_BOUNDS, "Shift on something that's not an aggregate!\n");
+	internal_exception(ILL_INHERIT,
+		"shift_float() not implemented in class '%s'\n",
+		caller(INTERP, SELF));
         return 0.0;
     }
 
     FLOATVAL shift_float_keyed(PMC* key) {
-        internal_exception(OUT_OF_BOUNDS, "Subscript on something that's not an aggregate!\n");
+	internal_exception(ILL_INHERIT,
+		"shift_float_keyed() not implemented in class '%s'\n",
+		caller(INTERP, SELF));
         return 0.0;
     }
-    
+
     FLOATVAL shift_float_keyed_int(INTVAL* key) {
         PMC* r_key = INT2KEY(INTERP, key);
         return DYNSELF.shift_float_keyed(r_key);
-    }    
+    }
 
     BIGNUM* shift_bignum() {
-        internal_exception(OUT_OF_BOUNDS, "Shift on something that's not an aggregate!\n");
+	internal_exception(ILL_INHERIT,
+		"shift_bignum() not implemented in class '%s'\n",
+		caller(INTERP, SELF));
         return NULL;
     }
 
     BIGNUM* shift_bignum_keyed(PMC* key) {
-        internal_exception(OUT_OF_BOUNDS, "Subscript on something that's not an aggregate!\n");
+	internal_exception(ILL_INHERIT,
+		"shift_bignum_keyed() not implemented in class '%s'\n",
+		caller(INTERP, SELF));
         return NULL;
     }
-    
+
     BIGNUM* shift_bignum_keyed_int(INTVAL* key) {
         PMC* r_key = INT2KEY(INTERP, key);
         return DYNSELF.shift_bignum_keyed(r_key);
-    }    
+    }
 
     STRING* shift_string() {
-        internal_exception(OUT_OF_BOUNDS, "Shift on something that's not an aggregate!\n");
+	internal_exception(ILL_INHERIT,
+		"shift_string() not implemented in class '%s'\n",
+		caller(INTERP, SELF));
         return NULL;
     }
 
     STRING* shift_string_keyed(PMC* key) {
-        internal_exception(OUT_OF_BOUNDS, "Subscript on something that's not an aggregate!\n");
+	internal_exception(ILL_INHERIT,
+		"shift_string_keyed() not implemented in class '%s'\n",
+		caller(INTERP, SELF));
         return NULL;
     }
-    
+
     STRING* shift_string_keyed_int(INTVAL* key) {
         PMC* r_key = INT2KEY(INTERP, key);
         return DYNSELF.shift_string_keyed(r_key);
-    }    
+    }
 
     PMC* shift_pmc() {
-        internal_exception(OUT_OF_BOUNDS, "Shift on something that's not an aggregate!\n");
+	internal_exception(ILL_INHERIT,
+		"shift_pmc() not implemented in class '%s'\n",
+		caller(INTERP, SELF));
         return NULL;
     }
 
     PMC* shift_pmc_keyed(PMC* key) {
-        internal_exception(OUT_OF_BOUNDS, "Subscript on something that's not an aggregate!\n");
+	internal_exception(ILL_INHERIT,
+		"shift_pmc_keyed() not implemented in class '%s'\n",
+		caller(INTERP, SELF));
         return NULL;
     }
-    
+
     PMC* shift_pmc_keyed_int(INTVAL* key) {
         PMC* r_key = INT2KEY(INTERP, key);
         return DYNSELF.shift_pmc_keyed(r_key);
-    }    
+    }
 
     void unshift_integer (INTVAL value) {
-        internal_exception(OUT_OF_BOUNDS, "Unshift on something that's not an aggregate!\n");
+	internal_exception(ILL_INHERIT,
+		"unshift_integer() not implemented in class '%s'\n",
+		caller(INTERP, SELF));
     }
 
     void unshift_integer_keyed (PMC* key, INTVAL value) {
-        internal_exception(OUT_OF_BOUNDS, "Subscript on something that's not an aggregate!\n");
+	internal_exception(ILL_INHERIT,
+		"unshift_integer_keyed() not implemented in class '%s'\n",
+		caller(INTERP, SELF));
     }
-    
+
     void unshift_integer_keyed_int (INTVAL* key, INTVAL value) {
         PMC* r_key = INT2KEY(INTERP, key);
         DYNSELF.unshift_integer_keyed(r_key, value);
-    }    
+    }
 
     void unshift_float (FLOATVAL value) {
-        internal_exception(OUT_OF_BOUNDS, "Unshift on something that's not an aggregate!\n");
+	internal_exception(ILL_INHERIT,
+		"unshift_float() not implemented in class '%s'\n",
+		caller(INTERP, SELF));
     }
 
     void unshift_float_keyed (PMC* key, FLOATVAL value) {
-        internal_exception(OUT_OF_BOUNDS, "Subscript on something that's not an aggregate!\n");
+	internal_exception(ILL_INHERIT,
+		"unshift_float_keyed() not implemented in class '%s'\n",
+		caller(INTERP, SELF));
     }
-    
+
     void unshift_float_keyed_int (INTVAL* key, FLOATVAL value) {
         PMC* r_key = INT2KEY(INTERP, key);
         DYNSELF.unshift_float_keyed(r_key, value);
-    }    
+    }
 
     void unshift_bignum (BIGNUM* value) {
-        internal_exception(OUT_OF_BOUNDS, "Unshift on something that's not an aggregate!\n");
+	internal_exception(ILL_INHERIT,
+		"unshift_bignum() not implemented in class '%s'\n",
+		caller(INTERP, SELF));
     }
 
     void unshift_bignum_keyed (PMC* key, BIGNUM* value) {
-        internal_exception(OUT_OF_BOUNDS, "Subscript on something that's not an aggregate!\n");
+	internal_exception(ILL_INHERIT,
+		"unshift_bignum_keyed() not implemented in class '%s'\n",
+		caller(INTERP, SELF));
     }
-    
+
     void unshift_bignum_keyed_int (INTVAL* key, BIGNUM* value) {
         PMC* r_key = INT2KEY(INTERP, key);
         DYNSELF.unshift_bignum_keyed(r_key, value);
-    }    
+    }
 
     void unshift_string (STRING* value) {
-        internal_exception(OUT_OF_BOUNDS, "Unshift on something that's not an aggregate!\n");
+	internal_exception(ILL_INHERIT,
+		"unshift_string() not implemented in class '%s'\n",
+		caller(INTERP, SELF));
     }
 
     void unshift_string_keyed (PMC* key, STRING* value) {
-        internal_exception(OUT_OF_BOUNDS, "Subscript on something that's not an aggregate!\n");
+	internal_exception(ILL_INHERIT,
+		"unshift_string_keyed() not implemented in class '%s'\n",
+		caller(INTERP, SELF));
     }
-    
+
     void unshift_string_keyed_int (INTVAL* key, STRING* value) {
         PMC* r_key = INT2KEY(INTERP, key);
         DYNSELF.unshift_string_keyed(r_key, value);
-    }    
+    }
 
     void unshift_pmc (PMC* value) {
-        internal_exception(OUT_OF_BOUNDS, "Unshift on something that's not an aggregate!\n");
+	internal_exception(ILL_INHERIT,
+		"unshift_pmc() not implemented in class '%s'\n",
+		caller(INTERP, SELF));
     }
 
     void unshift_pmc_keyed (PMC* key, PMC* value, PMC* value_key) {
-        internal_exception(OUT_OF_BOUNDS, "Subscript on something that's not an aggregate!\n");
+	internal_exception(ILL_INHERIT,
+		"unshift_pmc_keyed() not implemented in class '%s'\n",
+		caller(INTERP, SELF));
     }
-    
+
     void unshift_pmc_keyed_int (INTVAL* key, PMC* value, INTVAL* value_key) {
         PMC* r_key = INT2KEY(INTERP, key);
         PMC* r_value_key = INT2KEY(INTERP, value_key);
         DYNSELF.unshift_pmc_keyed(r_key, value, r_value_key);
-    }    
+    }
 
     void add (PMC* value, PMC* dest) {
-        /* XXX: overflow detection, bignum promotion? */
-
-        FLOATVAL result;
-
-        result = DYNSELF.get_number()
-            + value->vtable->get_number(INTERP, value);
-
-        dest->vtable->set_number_native(INTERP, dest, result);
+	internal_exception(ILL_INHERIT,
+		"add() not implemented in class '%s'\n",
+		caller(INTERP, SELF));
     }
 
     void add_int (INTVAL value, PMC* dest) {
-        /* dest = SELF + value */
-        /* XXX: overflow detection, bignum promotion? */
-
-        FLOATVAL result;
-
-        result = DYNSELF.get_number()
-            + value;
-
-        dest->vtable->set_number_native(INTERP, dest, result);
+	internal_exception(ILL_INHERIT,
+		"add_int() not implemented in class '%s'\n",
+		caller(INTERP, SELF));
     }
 
     void add_bignum (BIGNUM* value, PMC* dest) {
-        /* XXX: bignum magic */
+	internal_exception(ILL_INHERIT,
+		"add_bignum() not implemented in class '%s'\n",
+		caller(INTERP, SELF));
     }
 
     void add_float (FLOATVAL value, PMC* dest) {
-        /* dest = SELF + value */
-        /* XXX: overflow detection, bignum promotion? */
-
-        FLOATVAL result;
-
-        result = DYNSELF.get_number()
-            + value;
-
-        dest->vtable->set_number_native(INTERP, dest, result);
+	internal_exception(ILL_INHERIT,
+		"add_float() not implemented in class '%s'\n",
+		caller(INTERP, SELF));
     }
 
     void add_same (PMC* value,  PMC* dest) {
-        /* XXX: overflow detection, bignum promotion? */
-
-        FLOATVAL result;
-
-        result = DYNSELF.get_number()
-            + value->vtable->get_number(INTERP, value);
-
-        dest->vtable->set_number_native(INTERP, dest, result);
+	internal_exception(ILL_INHERIT,
+		"add_same() not implemented in class '%s'\n",
+		caller(INTERP, SELF));
     }
 
     void add_keyed (PMC* key, PMC* value, PMC* value_key,
         PMC* dest, PMC* dest_key) {
-
-        /* At least one key MUST NOT be NULL */
-
-        if (key == NULL) {
-            FLOATVAL result;
-
-            result = DYNSELF.get_number() + (
-                value_key == NULL ?
-                value->vtable->get_number(INTERP, value) :
-                value->vtable->get_number_keyed(INTERP, value, value_key)
-            );
-
-            if (dest_key == NULL)
-                dest->vtable->set_number_native(INTERP, dest, result);
-            else
-                dest->vtable->set_number_keyed(INTERP, dest, dest_key, result);
-        }
-        else
-            internal_exception(OUT_OF_BOUNDS, "Subscript on something that's not an aggregate!\n");
+	internal_exception(ILL_INHERIT,
+		"add_keyed() not implemented in class '%s'\n",
+		caller(INTERP, SELF));
     }
 
     void add_keyed_int (INTVAL* key, PMC* value, INTVAL* value_key, PMC* dest, INTVAL* dest_key) {
         PMC* r_key = INT2KEY(INTERP, key);
         PMC* r_value_key = INT2KEY(INTERP, value_key);
         PMC* r_dest_key = INT2KEY(INTERP, dest_key);
-        
+
         DYNSELF.add_keyed(r_key, value, r_value_key, dest, r_dest_key);
     }
 
     void subtract (PMC* value,  PMC* dest) {
-        /* XXX: overflow detection, bignum promotion? */
-
-        FLOATVAL result;
-
-        result = DYNSELF.get_number()
-            - value->vtable->get_number(INTERP, value);
-
-        dest->vtable->set_number_native(INTERP, dest, result);
+	internal_exception(ILL_INHERIT,
+		"subtract() not implemented in class '%s'\n",
+		caller(INTERP, SELF));
     }
 
     void subtract_int (INTVAL value,  PMC* dest) {
-        /* dest = SELF - value */
-        /* XXX: overflow detection, bignum promotion? */
-
-        FLOATVAL result;
-
-        result = DYNSELF.get_number()
-            - value;
-
-        dest->vtable->set_number_native(INTERP, dest, result);
+	internal_exception(ILL_INHERIT,
+		"subtract_int() not implemented in class '%s'\n",
+		caller(INTERP, SELF));
     }
 
     void subtract_bignum (BIGNUM* value,  PMC* dest) {
-        /* XXX: bignum magic */
+	internal_exception(ILL_INHERIT,
+		"subtract_bignum() not implemented in class '%s'\n",
+		caller(INTERP, SELF));
     }
 
     void subtract_float (FLOATVAL value,  PMC* dest) {
-        /* dest = SELF - value */
-        /* XXX: overflow detection, bignum promotion? */
-
-        FLOATVAL result;
-
-        result = DYNSELF.get_number()
-            - value;
-
-        dest->vtable->set_number_native(INTERP, dest, result);
+	internal_exception(ILL_INHERIT,
+		"subtract_float() not implemented in class '%s'\n",
+		caller(INTERP, SELF));
     }
 
     void subtract_same (PMC* value,  PMC* dest) {
-        /* XXX: overflow detection, bignum promotion? */
-
-        FLOATVAL result;
-
-        result = DYNSELF.get_number()
-            - value->vtable->get_number(INTERP, value);
-
-        dest->vtable->set_number_native(INTERP, dest, result);
+	internal_exception(ILL_INHERIT,
+		"subtract_same() not implemented in class '%s'\n",
+		caller(INTERP, SELF));
     }
 
     void subtract_keyed (PMC* key, PMC* value, PMC* value_key,
             PMC* dest, PMC* dest_key) {
 
-        /* At least one key MUST NOT be NULL */
-
-        if (key == NULL) {
-            FLOATVAL result;
-
-            result = DYNSELF.get_number() - (
-                value_key == NULL ?
-                value->vtable->get_number(INTERP, value) :
-                value->vtable->get_number_keyed(INTERP, value, value_key)
-            );
-
-            if (dest_key == NULL)
-                dest->vtable->set_number_native(INTERP, dest, result);
-            else
-                dest->vtable->set_number_keyed(INTERP, dest, dest_key, result);
-        }
-        else
-            internal_exception(OUT_OF_BOUNDS, "Subscript on something that's not an aggregate!\n");
+	internal_exception(ILL_INHERIT,
+		"subtract_keyed() not implemented in class '%s'\n",
+		caller(INTERP, SELF));
     }
 
     void subtract_keyed_int (INTVAL* key, PMC* value, INTVAL* value_key, PMC* dest, INTVAL* dest_key) {
         PMC* r_key = INT2KEY(INTERP, key);
         PMC* r_value_key = INT2KEY(INTERP, value_key);
         PMC* r_dest_key = INT2KEY(INTERP, dest_key);
-        
+
         DYNSELF.subtract_keyed(r_key, value, r_value_key, dest, r_dest_key);
     }
 
     void multiply (PMC* value,  PMC* dest) {
-        /* XXX: overflow detection, bignum promotion? */
-
-        FLOATVAL result;
-
-        result = DYNSELF.get_number()
-            * value->vtable->get_number(INTERP, value);
-
-        dest->vtable->set_number_native(INTERP, dest, result);
+	internal_exception(ILL_INHERIT,
+		"multiply() not implemented in class '%s'\n",
+		caller(INTERP, SELF));
     }
 
     void multiply_int (INTVAL value,  PMC* dest) {
-        /* XXX: overflow detection, bignum promotion? */
-
-        FLOATVAL result;
-
-        result = DYNSELF.get_number()
-            * value;
-
-        dest->vtable->set_number_native(INTERP, dest, result);
+	internal_exception(ILL_INHERIT,
+		"multiply_int() not implemented in class '%s'\n",
+		caller(INTERP, SELF));
     }
 
     void multiply_bignum (BIGNUM* value,  PMC* dest) {
-        /* XXX: bignum magic */
+	internal_exception(ILL_INHERIT,
+		"multiply_bignum() not implemented in class '%s'\n",
+		caller(INTERP, SELF));
     }
 
     void multiply_float (FLOATVAL value,  PMC* dest) {
-        /* XXX: overflow detection, bignum promotion? */
-
-        FLOATVAL result;
-
-        result = DYNSELF.get_number()
-            * value;
-
-        dest->vtable->set_number_native(INTERP, dest, result);
+	internal_exception(ILL_INHERIT,
+		"multiply_float() not implemented in class '%s'\n",
+		caller(INTERP, SELF));
     }
 
     void multiply_same (PMC* value,  PMC* dest) {
-        /* XXX: overflow detection, bignum promotion? */
-
-        FLOATVAL result;
-
-        result = DYNSELF.get_number()
-            * value->vtable->get_number(INTERP, value);
-
-        dest->vtable->set_number_native(INTERP, dest, result);
+	internal_exception(ILL_INHERIT,
+		"multiply_same() not implemented in class '%s'\n",
+		caller(INTERP, SELF));
     }
 
     void multiply_keyed (PMC* key, PMC* value, PMC* value_key,
             PMC* dest, PMC* dest_key) {
-
-        /* At least one key MUST NOT be NULL */
-
-        if (key == NULL) {
-            FLOATVAL result;
-
-            result = DYNSELF.get_number() * (
-                value_key == NULL ?
-                value->vtable->get_number(INTERP, value) :
-                value->vtable->get_number_keyed(INTERP, value, value_key)
-            );
-
-            if (dest_key == NULL)
-                dest->vtable->set_number_native(INTERP, dest, result);
-            else
-                dest->vtable->set_number_keyed(INTERP, dest, dest_key, result);
-        }
-        else
-            internal_exception(OUT_OF_BOUNDS, "Subscript on something that's not an aggregate!\n");
+	internal_exception(ILL_INHERIT,
+		"multiply_keyed() not implemented in class '%s'\n",
+		caller(INTERP, SELF));
     }
 
-    void multiply_keyed_int (INTVAL* key, PMC* value, INTVAL* value_key, PMC* dest, INTVAL* dest_key) {
+    void multiply_keyed_int (INTVAL* key, PMC* value,
+	    INTVAL* value_key, PMC* dest, INTVAL* dest_key) {
         PMC* r_key = INT2KEY(INTERP, key);
         PMC* r_value_key = INT2KEY(INTERP, value_key);
         PMC* r_dest_key = INT2KEY(INTERP, dest_key);
@@ -884,173 +944,106 @@ pmclass default abstract noinit {
     }
 
     void divide (PMC* value,  PMC* dest) {
-        /* XXX: overflow detection, bignum promotion? */
-
-        FLOATVAL result;
-
-        result = DYNSELF.get_number()
-            / value->vtable->get_number(INTERP, value);
-
-        dest->vtable->set_number_native(INTERP, dest, result);
+	internal_exception(ILL_INHERIT,
+		"divide() not implemented in class '%s'\n",
+		caller(INTERP, SELF));
     }
 
     void divide_int (INTVAL value,  PMC* dest) {
-        /* dest = SELF / value */
-
-        /* XXX: overflow detection, bignum promotion? */
-
-        FLOATVAL result;
-
-        result = DYNSELF.get_number()
-            / value;
-
-        dest->vtable->set_number_native(INTERP, dest, result);
+	internal_exception(ILL_INHERIT,
+		"divide_int() not implemented in class '%s'\n",
+		caller(INTERP, SELF));
     }
 
     void divide_bignum (BIGNUM* value,  PMC* dest) {
-        /* XXX: bignum magic */
+	internal_exception(ILL_INHERIT,
+		"divide_bignum() not implemented in class '%s'\n",
+		caller(INTERP, SELF));
     }
 
     void divide_float (FLOATVAL value,  PMC* dest) {
-        /* dest = SELF / value */
-
-        /* XXX: overflow detection, bignum promotion? */
-
-        FLOATVAL result;
-
-        result = DYNSELF.get_number()
-            / value;
-
-        dest->vtable->set_number_native(INTERP, dest, result);
+	internal_exception(ILL_INHERIT,
+		"divide_float() not implemented in class '%s'\n",
+		caller(INTERP, SELF));
     }
 
     void divide_same (PMC* value,  PMC* dest) {
-        /* XXX: overflow detection, bignum promotion? */
-
-        FLOATVAL result;
-
-        result = DYNSELF.get_number()
-            / value->vtable->get_number(INTERP, value);
-
-        dest->vtable->set_number_native(INTERP, dest, result);
+	internal_exception(ILL_INHERIT,
+		"divide_same() not implemented in class '%s'\n",
+		caller(INTERP, SELF));
     }
 
     void divide_keyed (PMC* key, PMC* value, PMC* value_key,
             PMC* dest, PMC* dest_key) {
-
-        /* At least one key MUST NOT be NULL */
-
-        if (key == NULL) {
-            FLOATVAL result;
-
-            result = DYNSELF.get_number() / (
-                value_key == NULL ?
-                value->vtable->get_number(INTERP, value) :
-                value->vtable->get_number_keyed(INTERP, value, value_key)
-            );
-
-            if (dest_key == NULL)
-                dest->vtable->set_number_native(INTERP, dest, result);
-            else
-                dest->vtable->set_number_keyed(INTERP, dest, dest_key, result);
-        }
-        else
-            internal_exception(OUT_OF_BOUNDS, "Subscript on something that's not an aggregate!\n");
+	internal_exception(ILL_INHERIT,
+		"divide_keyed() not implemented in class '%s'\n",
+		caller(INTERP, SELF));
     }
 
     void divide_keyed_int (INTVAL* key, PMC* value, INTVAL* value_key, PMC* dest, INTVAL* dest_key) {
         PMC* r_key = INT2KEY(INTERP, key);
         PMC* r_value_key = INT2KEY(INTERP, value_key);
         PMC* r_dest_key = INT2KEY(INTERP, dest_key);
-        
+
         DYNSELF.divide_keyed(r_key, value, r_value_key, dest, r_dest_key);
     }
 
     void modulus (PMC* value,  PMC* dest) {
-        /* This does perl-like modulus */
-
-        INTVAL result;
-
-        result = DYNSELF.get_integer()
-            % value->vtable->get_integer(INTERP, value);
-
-        dest->vtable->set_integer_native(INTERP, dest, result);
+	internal_exception(ILL_INHERIT,
+		"modulus() not implemented in class '%s'\n",
+		caller(INTERP, SELF));
     }
 
     void modulus_int (INTVAL value,  PMC* dest) {
-        INTVAL result;
-
-        result = DYNSELF.get_integer()
-            % value;
-
-        dest->vtable->set_integer_native(INTERP, dest, result);
+	internal_exception(ILL_INHERIT,
+		"modulus_int() not implemented in class '%s'\n",
+		caller(INTERP, SELF));
     }
 
     void modulus_bignum (BIGNUM* value,  PMC* dest) {
-        /* XXX: Can't sleep, clown'll eat me */
+	internal_exception(ILL_INHERIT,
+		"modulus_bignum() not implemented in class '%s'\n",
+		caller(INTERP, SELF));
     }
 
     void modulus_float (FLOATVAL value,  PMC* dest) {
-        /* XXX: makes all arguments integers...*/
-        INTVAL result;
-
-        result = DYNSELF.get_integer()
-            % (INTVAL)value;
-
-        dest->vtable->set_integer_native(INTERP, dest, result);
+	internal_exception(ILL_INHERIT,
+		"modulus_float() not implemented in class '%s'\n",
+		caller(INTERP, SELF));
     }
 
     void modulus_same (PMC* value,  PMC* dest) {
-        /* This does perl-like modulus */
-        INTVAL result;
-
-        result = DYNSELF.get_integer()
-            % value->vtable->get_integer(INTERP, value);
-
-        dest->vtable->set_integer_native(INTERP, dest, result);
+	internal_exception(ILL_INHERIT,
+		"modulus_same() not implemented in class '%s'\n",
+		caller(INTERP, SELF));
     }
 
     void modulus_keyed (PMC* key, PMC* value, PMC* value_key,
             PMC* dest, PMC* dest_key) {
+	internal_exception(ILL_INHERIT,
+		"modulus_keyed() not implemented in class '%s'\n",
+		caller(INTERP, SELF));
 
-        /* At least one key MUST NOT be NULL */
-
-        if (key == NULL) {
-            INTVAL result;
-
-            result = DYNSELF.get_integer() % (
-                value_key == NULL ?
-                value->vtable->get_integer(INTERP, value) :
-                value->vtable->get_integer_keyed(INTERP, value, value_key)
-            );
-
-            if (dest_key == NULL)
-                dest->vtable->set_integer_native(INTERP, dest, result);
-            else
-                dest->vtable->set_integer_keyed(INTERP, dest, dest_key, result);
-        }
-        else
-            internal_exception(OUT_OF_BOUNDS, "Subscript on something that's not an aggregate!\n");
     }
 
     void modulus_keyed_int (INTVAL* key, PMC* value, INTVAL* value_key, PMC* dest, INTVAL* dest_key) {
         PMC* r_key = INT2KEY(INTERP, key);
         PMC* r_value_key = INT2KEY(INTERP, value_key);
         PMC* r_dest_key = INT2KEY(INTERP, dest_key);
-        
+
         DYNSELF.modulus_keyed(r_key, value, r_value_key, dest, r_dest_key);
     }
 
     void neg (PMC* dest) {
-        dest->vtable->set_integer_native(INTERP, dest, -DYNSELF.get_integer());
+	internal_exception(ILL_INHERIT,
+		"neg() not implemented in class '%s'\n",
+		caller(INTERP, SELF));
     }
 
     void neg_keyed (PMC* key, PMC* dest, PMC* dest_key) {
-        if (key == NULL)
-            dest->vtable->set_integer_keyed(INTERP, dest,
-                dest_key, -DYNSELF.get_integer());
-        else
-            internal_exception(OUT_OF_BOUNDS, "Subscript on something that's not an aggregate!\n");
+	internal_exception(ILL_INHERIT,
+		"neg_keyed() not implemented in class '%s'\n",
+		caller(INTERP, SELF));
     }
 
     void neg_keyed_int (INTVAL* key, PMC* dest, INTVAL* dest_key) {
@@ -1060,189 +1053,114 @@ pmclass default abstract noinit {
     }
 
     void bitwise_or (PMC* value, PMC* dest) {
-        INTVAL result;
-
-        result = DYNSELF.get_integer()
-            | value->vtable->get_integer(INTERP, value);
-
-        dest->vtable->set_integer_native(INTERP, dest, result);
+	internal_exception(ILL_INHERIT,
+		"bitwise_or() not implemented in class '%s'\n",
+		caller(INTERP, SELF));
     }
 
     void bitwise_or_int (INTVAL value, PMC* dest) {
-        INTVAL result;
-
-        result = DYNSELF.get_integer()
-            | value;
-
-        dest->vtable->set_integer_native(INTERP, dest, result);
+	internal_exception(ILL_INHERIT,
+		"bitwise_or_int() not implemented in class '%s'\n",
+		caller(INTERP, SELF));
     }
 
     void bitwise_or_same (PMC* value, PMC* dest) {
-        INTVAL result;
-
-        result = DYNSELF.get_integer()
-            | value->vtable->get_integer(INTERP, value);
-
-        dest->vtable->set_integer_native(INTERP, dest, result);
+	internal_exception(ILL_INHERIT,
+		"bitwise_or_same() not implemented in class '%s'\n",
+		caller(INTERP, SELF));
     }
 
     void bitwise_or_keyed (PMC* key, PMC* value, PMC* value_key,
             PMC* dest, PMC* dest_key) {
-
-        /* At least one key MUST NOT be NULL */
-
-        if (key == NULL) {
-            INTVAL result;
-
-            result = DYNSELF.get_integer() | (
-                value_key == NULL ?
-                value->vtable->get_integer(INTERP, value) :
-                value->vtable->get_integer_keyed(INTERP, value, value_key)
-            );
-
-            if (dest_key == NULL)
-                dest->vtable->set_integer_native(INTERP, dest, result);
-            else
-                dest->vtable->set_integer_keyed(INTERP, dest, dest_key, result);
-        }
-        else
-            internal_exception(OUT_OF_BOUNDS, "Subscript on something that's not an aggregate!\n");
+	internal_exception(ILL_INHERIT,
+		"bitwise_or_keyed() not implemented in class '%s'\n",
+		caller(INTERP, SELF));
     }
 
     void bitwise_or_keyed_int (INTVAL* key, PMC* value, INTVAL* value_key, PMC* dest, INTVAL* dest_key) {
         PMC* r_key = INT2KEY(INTERP, key);
         PMC* r_value_key = INT2KEY(INTERP, value_key);
         PMC* r_dest_key = INT2KEY(INTERP, dest_key);
-        
+
         DYNSELF.bitwise_or_keyed(r_key, value, r_value_key, dest, r_dest_key);
     }
 
     void bitwise_and (PMC* value, PMC* dest) {
-        INTVAL result;
-
-        result = DYNSELF.get_integer()
-            & value->vtable->get_integer(INTERP, value);
-
-        dest->vtable->set_integer_native(INTERP, dest, result);
+	internal_exception(ILL_INHERIT,
+		"bitwise_and() not implemented in class '%s'\n",
+		caller(INTERP, SELF));
     }
 
     void bitwise_and_int (INTVAL value, PMC* dest) {
-        INTVAL result;
-
-        result = DYNSELF.get_integer()
-            & value;
-
-        dest->vtable->set_integer_native(INTERP, dest, result);
+	internal_exception(ILL_INHERIT,
+		"bitwise_and_int() not implemented in class '%s'\n",
+		caller(INTERP, SELF));
     }
 
     void bitwise_and_same (PMC* value, PMC* dest) {
-        INTVAL result;
-
-        result = DYNSELF.get_integer()
-            & value->vtable->get_integer(INTERP, value);
-
-        dest->vtable->set_integer_native(INTERP, dest, result);
+	internal_exception(ILL_INHERIT,
+		"bitwise_and_same() not implemented in class '%s'\n",
+		caller(INTERP, SELF));
     }
 
     void bitwise_and_keyed (PMC* key, PMC* value, PMC* value_key,
             PMC* dest, PMC* dest_key) {
-
-        /* At least one key MUST NOT be NULL */
-
-        if (key == NULL) {
-            INTVAL result;
-
-            result = DYNSELF.get_integer() & (
-                value_key == NULL ?
-                value->vtable->get_integer(INTERP, value) :
-                value->vtable->get_integer_keyed(INTERP, value, value_key)
-            );
-
-            if (dest_key == NULL)
-                dest->vtable->set_integer_native(INTERP, dest, result);
-            else
-                dest->vtable->set_integer_keyed(INTERP, dest, dest_key, result);
-        }
-        else
-            internal_exception(OUT_OF_BOUNDS, "Subscript on something that's not an aggregate!\n");
+	internal_exception(ILL_INHERIT,
+		"bitwise_and_keyed() not implemented in class '%s'\n",
+		caller(INTERP, SELF));
     }
 
     void bitwise_and_keyed_int (INTVAL* key, PMC* value, INTVAL* value_key, PMC* dest, INTVAL* dest_key) {
         PMC* r_key = INT2KEY(INTERP, key);
         PMC* r_value_key = INT2KEY(INTERP, value_key);
         PMC* r_dest_key = INT2KEY(INTERP, dest_key);
-        
+
         DYNSELF.bitwise_and_keyed(r_key, value, r_value_key, dest, r_dest_key);
     }
 
     void bitwise_xor (PMC* value, PMC* dest) {
-        INTVAL result;
-
-        result = DYNSELF.get_integer()
-            ^ value->vtable->get_integer(INTERP, value);
-
-        dest->vtable->set_integer_native(INTERP, dest, result);
+	internal_exception(ILL_INHERIT,
+		"bitwise_xor() not implemented in class '%s'\n",
+		caller(INTERP, SELF));
     }
 
     void bitwise_xor_int (INTVAL value, PMC* dest) {
-        INTVAL result;
-
-        result = DYNSELF.get_integer()
-            ^ value;
-
-        dest->vtable->set_integer_native(INTERP, dest, result);
+	internal_exception(ILL_INHERIT,
+		"bitwise_xor_int() not implemented in class '%s'\n",
+		caller(INTERP, SELF));
     }
 
     void bitwise_xor_same (PMC* value, PMC* dest) {
-        INTVAL result;
-
-        result = DYNSELF.get_integer()
-            ^ value->vtable->get_integer(INTERP, value);
-
-        dest->vtable->set_integer_native(INTERP, dest, result);
+	internal_exception(ILL_INHERIT,
+		"bitwise_xor_same() not implemented in class '%s'\n",
+		caller(INTERP, SELF));
     }
 
     void bitwise_xor_keyed (PMC* key, PMC* value, PMC* value_key,
             PMC* dest, PMC* dest_key) {
-
-        /* At least one key MUST NOT be NULL */
-
-        if (key == NULL) {
-            INTVAL result;
-
-            result = DYNSELF.get_integer() ^ (
-                value_key == NULL ?
-                value->vtable->get_integer(INTERP, value) :
-                value->vtable->get_integer_keyed(INTERP, value, value_key)
-            );
-
-            if (dest_key == NULL)
-                dest->vtable->set_integer_native(INTERP, dest, result);
-            else
-                dest->vtable->set_integer_keyed(INTERP, dest, dest_key, result);
-        }
-        else
-            internal_exception(OUT_OF_BOUNDS, "Subscript on something that's not an aggregate!\n");
+	internal_exception(ILL_INHERIT,
+		"bitwise_xor_keyed() not implemented in class '%s'\n",
+		caller(INTERP, SELF));
     }
 
     void bitwise_xor_keyed_int (INTVAL* key, PMC* value, INTVAL* value_key, PMC* dest, INTVAL* dest_key) {
         PMC* r_key = INT2KEY(INTERP, key);
         PMC* r_value_key = INT2KEY(INTERP, value_key);
         PMC* r_dest_key = INT2KEY(INTERP, dest_key);
-        
+
         DYNSELF.bitwise_xor_keyed(r_key, value, r_value_key, dest, r_dest_key);
     }
 
     void bitwise_not (PMC* dest) {
-        dest->vtable->set_integer_native(INTERP, dest, ~DYNSELF.get_integer());
+	internal_exception(ILL_INHERIT,
+		"bitwise_not() not implemented in class '%s'\n",
+		caller(INTERP, SELF));
     }
 
     void bitwise_not_keyed (PMC* key, PMC* dest, PMC* dest_key) {
-        if (key == NULL)
-            dest->vtable->set_integer_keyed(INTERP, dest,
-                dest_key, ~DYNSELF.get_integer());
-        else
-            internal_exception(OUT_OF_BOUNDS, "Subscript on something that's not an aggregate!\n");
+	internal_exception(ILL_INHERIT,
+		"bitwise_not_keyed() not implemented in class '%s'\n",
+		caller(INTERP, SELF));
     }
 
     void bitwise_not_keyed_int (INTVAL* key, PMC* dest, INTVAL* dest_key) {
@@ -1252,213 +1170,115 @@ pmclass default abstract noinit {
     }
 
     void bitwise_shr (PMC* value, PMC* dest) {
-        INTVAL result;
-
-        result = DYNSELF.get_integer()
-            >> value->vtable->get_integer(INTERP, value);
-
-        dest->vtable->set_integer_native(INTERP, dest, result);
+	internal_exception(ILL_INHERIT,
+		"bitwise_shr() not implemented in class '%s'\n",
+		caller(INTERP, SELF));
     }
 
     void bitwise_shr_int (INTVAL value, PMC* dest) {
-        INTVAL result;
-
-        result = DYNSELF.get_integer()
-            >> value;
-
-        dest->vtable->set_integer_native(INTERP, dest, result);
+	internal_exception(ILL_INHERIT,
+		"bitwise_shr_int() not implemented in class '%s'\n",
+		caller(INTERP, SELF));
     }
 
     void bitwise_shr_same (PMC* value, PMC* dest) {
-        INTVAL result;
-
-        result = DYNSELF.get_integer()
-            >> value->vtable->get_integer(INTERP, value);
-
-        dest->vtable->set_integer_native(INTERP, dest, result);
+	internal_exception(ILL_INHERIT,
+		"bitwise_shr_same() not implemented in class '%s'\n",
+		caller(INTERP, SELF));
     }
 
     void bitwise_shr_keyed (PMC* key, PMC* value, PMC* value_key,
             PMC* dest, PMC* dest_key) {
-
-        /* At least one key MUST NOT be NULL */
-
-        if (key == NULL) {
-            INTVAL result;
-
-            result = DYNSELF.get_integer() >> (
-                value_key == NULL ?
-                value->vtable->get_integer(INTERP, value) :
-                value->vtable->get_integer_keyed(INTERP, value, value_key)
-            );
-
-            if (dest_key == NULL)
-                dest->vtable->set_integer_native(INTERP, dest, result);
-            else
-                dest->vtable->set_integer_keyed(INTERP, dest, dest_key, result);
-        }
-        else
-            internal_exception(OUT_OF_BOUNDS, "Subscript on something that's not an aggregate!\n");
+	internal_exception(ILL_INHERIT,
+		"bitwise_shr_keyed() not implemented in class '%s'\n",
+		caller(INTERP, SELF));
     }
 
     void bitwise_shr_keyed_int (INTVAL* key, PMC* value, INTVAL* value_key, PMC* dest, INTVAL* dest_key) {
         PMC* r_key = INT2KEY(INTERP, key);
         PMC* r_value_key = INT2KEY(INTERP, value_key);
         PMC* r_dest_key = INT2KEY(INTERP, dest_key);
-        
+
         DYNSELF.bitwise_shr_keyed(r_key, value, r_value_key, dest, r_dest_key);
     }
 
     void bitwise_shl (PMC* value, PMC* dest) {
-        INTVAL result;
-
-        result = DYNSELF.get_integer()
-            << value->vtable->get_integer(INTERP, value);
-
-        dest->vtable->set_integer_native(INTERP, dest, result);
+	internal_exception(ILL_INHERIT,
+		"bitwise_shl() not implemented in class '%s'\n",
+		caller(INTERP, SELF));
     }
 
     void bitwise_shl_int (INTVAL value, PMC* dest) {
-        INTVAL result;
-
-        result = DYNSELF.get_integer()
-            << value;
-
-        dest->vtable->set_integer_native(INTERP, dest, result);
+	internal_exception(ILL_INHERIT,
+		"bitwise_shl_int() not implemented in class '%s'\n",
+		caller(INTERP, SELF));
     }
 
     void bitwise_shl_same (PMC* value, PMC* dest) {
-        INTVAL result;
-
-        result = DYNSELF.get_integer()
-            << value->vtable->get_integer(INTERP, value);
-
-        dest->vtable->set_integer_native(INTERP, dest, result);
+	internal_exception(ILL_INHERIT,
+		"bitwise_shl_same() not implemented in class '%s'\n",
+		caller(INTERP, SELF));
     }
 
     void bitwise_shl_keyed (PMC* key, PMC* value, PMC* value_key,
             PMC* dest, PMC* dest_key) {
-
-        /* At least one key MUST NOT be NULL */
-
-        if (key == NULL) {
-            INTVAL result;
-
-            result = DYNSELF.get_integer() << (
-                value_key == NULL ?
-                value->vtable->get_integer(INTERP, value) :
-                value->vtable->get_integer_keyed(INTERP, value, value_key)
-            );
-
-            if (dest_key == NULL)
-                dest->vtable->set_integer_native(INTERP, dest, result);
-            else
-                dest->vtable->set_integer_keyed(INTERP, dest, dest_key, result);
-        }
-        else
-            internal_exception(OUT_OF_BOUNDS, "Subscript on something that's not an aggregate!\n");
+	internal_exception(ILL_INHERIT,
+		"bitwise_shl_keyed() not implemented in class '%s'\n",
+		caller(INTERP, SELF));
     }
 
     void bitwise_shl_keyed_int (INTVAL* key, PMC* value, INTVAL* value_key, PMC* dest, INTVAL* dest_key) {
         PMC* r_key = INT2KEY(INTERP, key);
         PMC* r_value_key = INT2KEY(INTERP, value_key);
         PMC* r_dest_key = INT2KEY(INTERP, dest_key);
-        
+
         DYNSELF.bitwise_shl_keyed(r_key, value, r_value_key, dest, r_dest_key);
     }
 
     void concatenate (PMC* value,  PMC* dest) {
-        STRING* s = string_concat(INTERP,
-            DYNSELF.get_string(),
-            value->vtable->get_string(INTERP, value), 0);
-
-        dest->vtable->set_string_native(INTERP, dest, s);
+	internal_exception(ILL_INHERIT,
+		"concatenate() not implemented in class '%s'\n",
+		caller(INTERP, SELF));
     }
 
     void concatenate_native (STRING* value,  PMC* dest) {
-        /* dest = SELF (concat) value */
-        STRING* s = string_concat(INTERP,
-            DYNSELF.get_string(),
-            value, 0);
-
-        dest->vtable->set_string_native(INTERP, dest, s);
+	internal_exception(ILL_INHERIT,
+		"concatenate_native() not implemented in class '%s'\n",
+		caller(INTERP, SELF));
     }
 
     void concatenate_same (PMC* value,  PMC* dest) {
-        STRING* s = string_concat(INTERP,
-            DYNSELF.get_string(),
-            value->vtable->get_string(INTERP, value), 0);
-
-        dest->vtable->set_string_native(INTERP, dest, s);
+	internal_exception(ILL_INHERIT,
+		"concatenate_same() not implemented in class '%s'\n",
+		caller(INTERP, SELF));
     }
 
     void concatenate_keyed (PMC* key, PMC* value, PMC* value_key,
             PMC* dest, PMC* dest_key) {
-
-        /* At least one key MUST NOT be NULL */
-
-        if (key == NULL) {
-
-            STRING* result;
-
-            if (value_key == NULL)
-                result = string_concat(INTERP,
-                    DYNSELF.get_string(),
-                    value->vtable->get_string(INTERP, value), 0);
-            else
-                result = string_concat(INTERP,
-                    DYNSELF.get_string(),
-                    value->vtable->get_string_keyed(INTERP, value, value_key), 0);
-
-            if (dest_key == NULL)
-                dest->vtable->set_string_native(INTERP, dest, result);
-            else
-                dest->vtable->set_string_keyed(INTERP, dest, dest_key, result);
-        }
-        else
-            internal_exception(OUT_OF_BOUNDS, "Subscript on something that's not an aggregate!\n");
+	internal_exception(ILL_INHERIT,
+		"concatenate_keyed() not implemented in class '%s'\n",
+		caller(INTERP, SELF));
     }
 
     void concatenate_keyed_int (INTVAL* key, PMC* value, INTVAL* value_key, PMC* dest, INTVAL* dest_key) {
         PMC* r_key = INT2KEY(INTERP, key);
         PMC* r_value_key = INT2KEY(INTERP, value_key);
         PMC* r_dest_key = INT2KEY(INTERP, dest_key);
-        
+
         DYNSELF.concatenate_keyed(r_key, value, r_value_key, dest, r_dest_key);
     }
 
     INTVAL is_equal (PMC* value) {
-        /* I think we need to check everything, do the easiest first... */
-        if (DYNSELF.get_integer()
-                == value->vtable->get_integer(INTERP, value)
-            && DYNSELF.get_number()
-                == value->vtable->get_number(INTERP, value)
-            && 0 == string_compare(INTERP,
-                DYNSELF.get_string(),
-                value->vtable->get_string(INTERP, value))
-            )
-        {
-            return 1;
-        }
+	internal_exception(ILL_INHERIT,
+		"is_equal() not implemented in class '%s'\n",
+		caller(INTERP, SELF));
         return 0;
     }
 
     INTVAL is_equal_keyed (PMC* key, PMC* value, PMC* value_key) {
-        if (key == NULL) {
-            if (DYNSELF.get_integer()
-                    == value->vtable->get_integer_keyed(INTERP, value, value_key)
-                && DYNSELF.get_number()
-                    == value->vtable->get_number_keyed(INTERP, value, value_key)
-                && 0 == string_compare(INTERP,
-                    DYNSELF.get_string(),
-                    value->vtable->get_string_keyed(INTERP, value, value_key))
-                )
-            {
-                return 1;
-            }
-            return 0;
-        }
-        internal_exception(OUT_OF_BOUNDS, "Subscript on something that's not an aggregate!\n");
+	internal_exception(ILL_INHERIT,
+		"is_equal_keyed() not implemented in class '%s'\n",
+		caller(INTERP, SELF));
         return 0;
     }
 
@@ -1469,15 +1289,16 @@ pmclass default abstract noinit {
     }
 
     INTVAL cmp (PMC* value) {
-        /* XXX: What does this mean for this class? */
+	internal_exception(ILL_INHERIT,
+		"cmp() not implemented in class '%s'\n",
+		caller(INTERP, SELF));
         return 0;
     }
 
     INTVAL cmp_keyed (PMC* key, PMC* value, PMC* value_key) {
-        if (key == NULL)
-            /* XXX: What does this mean for this class? */
-            return 0;
-        internal_exception(OUT_OF_BOUNDS, "Subscript on something that's not an aggregate!\n");
+	internal_exception(ILL_INHERIT,
+		"cmp_keyed() not implemented in class '%s'\n",
+		caller(INTERP, SELF));
         return 0;
     }
 
@@ -1488,22 +1309,16 @@ pmclass default abstract noinit {
     }
 
     INTVAL cmp_num (PMC* value) {
-        /* XXX - Floating-point precision errors possible? */
-        FLOATVAL diff = value->vtable->get_number(INTERP, value) -
-                        DYNSELF.get_number();
-
-        return diff == 0.0 ? 0 : diff < 0.0 ? -1 : 1;
+	internal_exception(ILL_INHERIT,
+		"cmp_num() not implemented in class '%s'\n",
+		caller(INTERP, SELF));
+        return 0;
     }
 
     INTVAL cmp_num_keyed (PMC* key, PMC* value, PMC* value_key) {
-        if (key == NULL) {
-            /* XXX - Floating-point precision errors possible? */
-            FLOATVAL diff = value->vtable->get_number_keyed(INTERP, value, value_key) -
-                            DYNSELF.get_number();
-
-            return diff == 0.0 ? 0 : diff < 0.0 ? -1 : 1;
-        }
-        internal_exception(OUT_OF_BOUNDS, "Subscript on something that's not an aggregate!\n");
+	internal_exception(ILL_INHERIT,
+		"cmp_num_keyed() not implemented in class '%s'\n",
+		caller(INTERP, SELF));
         return 0;
     }
 
@@ -1514,15 +1329,16 @@ pmclass default abstract noinit {
     }
 
     INTVAL cmp_string (PMC* value) {
-        return string_compare(INTERP, DYNSELF.get_string(),
-            value->vtable->get_string(INTERP, value));
+	internal_exception(ILL_INHERIT,
+		"cmp_string() not implemented in class '%s'\n",
+		caller(INTERP, SELF));
+        return 0;
     }
 
     INTVAL cmp_string_keyed (PMC* key, PMC* value, PMC* value_key) {
-        if (key == NULL)
-            return string_compare(INTERP, DYNSELF.get_string(),
-                value->vtable->get_string_keyed(INTERP, value, value_key));
-        internal_exception(OUT_OF_BOUNDS, "Subscript on something that's not an aggregate!\n");
+	internal_exception(ILL_INHERIT,
+		"cmp_string_keyed() not implemented in class '%s'\n",
+		caller(INTERP, SELF));
         return 0;
     }
 
@@ -1533,123 +1349,55 @@ pmclass default abstract noinit {
     }
 
     void logical_or (PMC* value,  PMC* dest) {
-        if (DYNSELF.get_bool()) {
-            dest->vtable->set_pmc(INTERP, dest, SELF);
-        }
-        else {
-            dest->vtable->set_pmc(INTERP, dest, value);
-        }
+	internal_exception(ILL_INHERIT,
+		"logical_or() not implemented in class '%s'\n",
+		caller(INTERP, SELF));
     }
 
     void logical_or_keyed (PMC* key, PMC* value, PMC* value_key, PMC* dest, PMC* dest_key) {
-        if (key == NULL) {
-            if (DYNSELF.get_bool()) {
-                if (dest_key != NULL)
-                    dest->vtable->set_pmc_keyed(INTERP, dest, dest_key, SELF, NULL);
-                else
-                    dest->vtable->set_pmc(INTERP, dest, SELF);
-            }
-            else
-                /* Either value_key or dest_key is not NULL */
-                dest->vtable->set_pmc_keyed(INTERP, dest, dest_key, value, value_key);
-        }
-        else
-            internal_exception(OUT_OF_BOUNDS, "Subscript on something that's not an aggregate!\n");
+	internal_exception(ILL_INHERIT,
+		"logical_or_keyed() not implemented in class '%s'\n",
+		caller(INTERP, SELF));
     }
 
     void logical_or_keyed_int (INTVAL* key, PMC* value, INTVAL* value_key, PMC* dest, INTVAL* dest_key) {
         PMC* r_key = INT2KEY(INTERP, key);
         PMC* r_value_key = INT2KEY(INTERP, value_key);
         PMC* r_dest_key = INT2KEY(INTERP, dest_key);
-        
+
         DYNSELF.logical_or_keyed(r_key, value, r_value_key, dest, r_dest_key);
     }
 
     void logical_and (PMC* value,  PMC* dest) {
-        if (DYNSELF.get_bool()) {
-            dest->vtable->set_pmc(INTERP, dest, value);
-        }
-        else {
-            dest->vtable->set_pmc(INTERP, dest, SELF);
-        }
+	internal_exception(ILL_INHERIT,
+		"logical_and() not implemented in class '%s'\n",
+		caller(INTERP, SELF));
     }
 
     void logical_and_keyed (PMC* key, PMC* value, PMC* value_key, PMC* dest, PMC* dest_key) {
-        if (key == NULL) {
-            if (DYNSELF.get_bool())
-                /* Either value_key or dest_key is not NULL */
-                dest->vtable->set_pmc_keyed(INTERP, dest, dest_key, value, value_key);
-            else {
-                if (dest_key != NULL)
-                    dest->vtable->set_pmc_keyed(INTERP, dest, dest_key, SELF, NULL);
-                else
-                    dest->vtable->set_pmc(INTERP, dest, SELF);
-            }
-        }
-        else
-            internal_exception(OUT_OF_BOUNDS, "Subscript on something that's not an aggregate!\n");
+	internal_exception(ILL_INHERIT,
+		"logical_and_keyed() not implemented in class '%s'\n",
+		caller(INTERP, SELF));
     }
 
     void logical_and_keyed_int (INTVAL* key, PMC* value, INTVAL* value_key, PMC* dest, INTVAL* dest_key) {
         PMC* r_key = INT2KEY(INTERP, key);
         PMC* r_value_key = INT2KEY(INTERP, value_key);
         PMC* r_dest_key = INT2KEY(INTERP, dest_key);
-        
+
         DYNSELF.logical_and_keyed(r_key, value, r_value_key, dest, r_dest_key);
     }
 
     void logical_xor (PMC* value,  PMC* dest) {
-
-        INTVAL my_bool, value_bool;
-
-        my_bool = DYNSELF.get_bool();
-        value_bool = value->vtable->get_bool(INTERP, value);
-
-        if (my_bool && ! value_bool) {
-            dest->vtable->set_pmc(INTERP, dest, SELF);
-        }
-        else if (value_bool && ! my_bool) {
-            dest->vtable->set_pmc(INTERP, dest, value);
-        }
-        else {
-            /* XXX - Need a better way to set FALSE */
-            dest->vtable->set_integer_native(INTERP, dest, 0);
-        }
+	internal_exception(ILL_INHERIT,
+		"logical_xor() not implemented in class '%s'\n",
+		caller(INTERP, SELF));
     }
 
     void logical_xor_keyed (PMC* key, PMC* value, PMC* value_key, PMC* dest, PMC* dest_key) {
-
-        if (key == NULL) {
-
-            INTVAL my_bool, value_bool;
-
-            my_bool = DYNSELF.get_bool();
-
-            if (value_key == NULL)
-                value_bool = value->vtable->get_bool(INTERP, value);
-            else
-                value_bool = value->vtable->get_bool_keyed(INTERP, value, value_key);
-
-            if (my_bool && ! value_bool) {
-                if (dest_key == NULL)
-                    dest->vtable->set_pmc(INTERP, dest, SELF);
-                else
-                    dest->vtable->set_pmc_keyed(INTERP, dest, dest_key, SELF, NULL);
-            }
-            else if (value_bool && ! my_bool) {
-                /* Either dest_key or value_key must be non-NULL */
-                dest->vtable->set_pmc_keyed(INTERP, dest, dest_key, value, value_key);
-            }
-            else {
-                /* XXX - Need a better way to set FALSE */
-                if (dest_key == NULL)
-                    dest->vtable->set_integer_native(INTERP, dest, 0);
-                else
-                    dest->vtable->set_integer_keyed(INTERP, dest, dest_key, 0);
-            }
-        }
-        else
-            internal_exception(OUT_OF_BOUNDS, "Subscript on something that's not an aggregate!\n");
+	internal_exception(ILL_INHERIT,
+		"logical_xor_keyed() not implemented in class '%s'\n",
+		caller(INTERP, SELF));
     }
 
 
@@ -1657,23 +1405,20 @@ pmclass default abstract noinit {
         PMC* r_key = INT2KEY(INTERP, key);
         PMC* r_value_key = INT2KEY(INTERP, value_key);
         PMC* r_dest_key = INT2KEY(INTERP, dest_key);
-        
+
         DYNSELF.logical_xor_keyed(r_key, value, r_value_key, dest, r_dest_key);
     }
 
     void logical_not (PMC* dest) {
-        /* XXX - Need a better way to set boolean state */
-        dest->vtable->set_integer_native(INTERP, dest,
-            ! DYNSELF.get_bool());
+	internal_exception(ILL_INHERIT,
+		"logical_not() not implemented in class '%s'\n",
+		caller(INTERP, SELF));
     }
 
     void logical_not_keyed (PMC* key, PMC* dest, PMC* dest_key) {
-        /* XXX - Need a better way to set boolean state */
-        if (key == NULL)
-            dest->vtable->set_integer_keyed(INTERP, dest,
-                dest_key, ! DYNSELF.get_bool());
-        else
-            internal_exception(OUT_OF_BOUNDS, "Subscript on something that's not an aggregate!\n");
+	internal_exception(ILL_INHERIT,
+		"logical_not_keyed() not implemented in class '%s'\n",
+		caller(INTERP, SELF));
     }
 
     void logical_not_keyed_int (INTVAL* key, PMC* dest, INTVAL* dest_key) {
@@ -1683,31 +1428,35 @@ pmclass default abstract noinit {
     }
 
     void repeat (PMC* value,  PMC* dest) {
-        dest->vtable->set_string_native(INTERP, dest,
-            string_repeat(INTERP, SELF->vtable->get_string(INTERP,SELF),
-                (UINTVAL)value->vtable->get_integer(INTERP, value), NULL) );
+	internal_exception(ILL_INHERIT,
+		"repeat() not implemented in class '%s'\n",
+		caller(INTERP, SELF));
     }
 
     void repeat_keyed (PMC* key, PMC* value, PMC* value_key, PMC* dest, PMC* dest_key) {
-        internal_exception(OUT_OF_BOUNDS, "Subscript on something that's not an aggregate!\n");
+	internal_exception(ILL_INHERIT,
+		"repeat_keyed() not implemented in class '%s'\n",
+		caller(INTERP, SELF));
     }
 
     void repeat_keyed_int (INTVAL* key, PMC* value, INTVAL* value_key, PMC* dest, INTVAL* dest_key) {
         PMC* r_key = INT2KEY(INTERP, key);
         PMC* r_value_key = INT2KEY(INTERP, value_key);
         PMC* r_dest_key = INT2KEY(INTERP, dest_key);
-        
+
         DYNSELF.repeat_keyed(r_key, value, r_value_key, dest, r_dest_key);
     }
 
     void repeat_int (INTVAL value, PMC* dest) {
-        SELF->vtable->set_string_native(INTERP, dest,
-            string_repeat(INTERP, SELF->vtable->get_string(INTERP,SELF),
-                (UINTVAL)value, NULL) );
+	internal_exception(ILL_INHERIT,
+		"repeat_int() not implemented in class '%s'\n",
+		caller(INTERP, SELF));
     }
 
     void repeat_int_keyed (PMC* key, INTVAL value, PMC* dest, PMC* dest_key) {
-        internal_exception(OUT_OF_BOUNDS, "Subscript on something that's not an aggregate!\n");
+	internal_exception(ILL_INHERIT,
+		"repeat_keyed() not implemented in class '%s'\n",
+		caller(INTERP, SELF));
     }
 
     void repeat_int_keyed_int (INTVAL* key, INTVAL value, PMC* dest, INTVAL* dest_key) {
@@ -1717,11 +1466,15 @@ pmclass default abstract noinit {
     }
 
     void increment () {
-        SELF->cache.int_val = DYNSELF.get_integer() + 1;
+	internal_exception(ILL_INHERIT,
+		"increment() not implemented in class '%s'\n",
+		caller(INTERP, SELF));
     }
 
     void increment_keyed (PMC* key) {
-        internal_exception(OUT_OF_BOUNDS, "Subscript on something that's not an aggregate!\n");
+	internal_exception(ILL_INHERIT,
+		"increment_keyed() not implemented in class '%s'\n",
+		caller(INTERP, SELF));
     }
 
     void increment_keyed_int (INTVAL* key) {
@@ -1730,11 +1483,15 @@ pmclass default abstract noinit {
     }
 
     void decrement () {
-        SELF->cache.int_val = DYNSELF.get_integer() - 1;
+	internal_exception(ILL_INHERIT,
+		"decrement() not implemented in class '%s'\n",
+		caller(INTERP, SELF));
     }
 
     void decrement_keyed (PMC* key) {
-        internal_exception(OUT_OF_BOUNDS, "Subscript on something that's not an aggregate!\n");
+	internal_exception(ILL_INHERIT,
+		"decrement_keyed() not implemented in class '%s'\n",
+		caller(INTERP, SELF));
     }
 
     void decrement_keyed_int (INTVAL* key) {
@@ -1743,7 +1500,9 @@ pmclass default abstract noinit {
     }
 
     INTVAL exists_keyed (PMC* key) {
-        internal_exception(OUT_OF_BOUNDS, "Subscript on something that's not an aggregate!\n");
+	internal_exception(ILL_INHERIT,
+		"exists_keyed() not implemented in class '%s'\n",
+		caller(INTERP, SELF));
         return 0;
     }
 
@@ -1757,7 +1516,9 @@ pmclass default abstract noinit {
     }
 
     INTVAL defined_keyed (PMC* key) {
-        internal_exception(OUT_OF_BOUNDS, "Subscript on something that's not an aggregate!\n");
+	internal_exception(ILL_INHERIT,
+		"defined_keyed() not implemented in class '%s'\n",
+		caller(INTERP, SELF));
         return 0;
     }
 
@@ -1767,7 +1528,9 @@ pmclass default abstract noinit {
     }
 
     void delete_keyed(PMC* key) {
-        internal_exception(OUT_OF_BOUNDS, "Subscript on something that's not an aggregate!\n");
+	internal_exception(ILL_INHERIT,
+		"delete_keyed() not implemented in class '%s'\n",
+		caller(INTERP, SELF));
     }
 
     void delete_keyed_int(INTVAL* key) {
@@ -1776,7 +1539,9 @@ pmclass default abstract noinit {
     }
 
     PMC* nextkey_keyed (PMC* key) {
-        internal_exception(OUT_OF_BOUNDS, "Subscript on something that's not an aggregate!\n");
+	internal_exception(ILL_INHERIT,
+		"nextkey_keyed() not implemented in class '%s'\n",
+		caller(INTERP, SELF));
         return NULL;
     }
 
@@ -1787,10 +1552,15 @@ pmclass default abstract noinit {
     }
 
     void substr(INTVAL offset, INTVAL length, PMC* dest) {
+	internal_exception(ILL_INHERIT,
+		"substr() not implemented in class '%s'\n",
+		caller(INTERP, SELF));
     }
 
     void substr_keyed(PMC* key, INTVAL offset, INTVAL length, PMC* dest, PMC* dest_key) {
-        internal_exception(OUT_OF_BOUNDS, "Subscript on something that's not an aggregate!\n");
+	internal_exception(ILL_INHERIT,
+		"substr_keyed() not implemented in class '%s'\n",
+		caller(INTERP, SELF));
     }
 
     void substr_keyed_int(INTVAL* key, INTVAL offset, INTVAL length, PMC* dest, INTVAL* dest_key) {
@@ -1800,12 +1570,16 @@ pmclass default abstract noinit {
     }
 
     STRING* substr_str(INTVAL offset, INTVAL length) {
-        return string_substr(INTERP, SELF->vtable->get_string(INTERP,SELF),
-            offset, length, NULL);
+	internal_exception(ILL_INHERIT,
+		"substr_str() not implemented in class '%s'\n",
+		caller(INTERP, SELF));
+	return NULL;
     }
 
     STRING* substr_str_keyed(PMC* key, INTVAL offset, INTVAL length) {
-        internal_exception(OUT_OF_BOUNDS, "Subscript on something that's not an aggregate!\n");
+	internal_exception(ILL_INHERIT,
+		"substr_keyed() not implemented in class '%s'\n",
+		caller(INTERP, SELF));
         return NULL;
     }
 
@@ -1815,7 +1589,9 @@ pmclass default abstract noinit {
     }
 
     void* invoke (void* next) {
-	internal_exception(-1, "Invocation of something uninvocable\n");
+	internal_exception(ILL_INHERIT,
+		"invoke() not implemented in class '%s'\n",
+		caller(INTERP, SELF));
         return NULL;
     }
 }

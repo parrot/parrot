@@ -29,9 +29,10 @@ enum {
 END
 
     my @pmcs = split(/ /, Configure::Data->get('pmc_names'));
+    print OUT "    enum_class_default,\n";
     print OUT "    enum_class_$_,\n" foreach (@pmcs);
     print OUT <<"END";
-    enum_class_max = 100
+    enum_class_max
 };
 END
 
@@ -116,7 +117,8 @@ use vars qw(@ISA %pmc_types @EXPORT_OK);
 END
 
     for my $num (0..$#pmcs) {
-        print OUT "\t$pmcs[$num] => $num,\n";
+	my $id = $num+1;
+        print OUT "\t$pmcs[$num] => $id,\n";
     }
 
     print OUT <<"END";

@@ -17,7 +17,7 @@ OK_1:	print "ok 1\n"
 	print "not "
 OK_2:	print "ok 2\n"
 
-	set P0,2.0
+	set P0,2
 	set I0,P0
 	eq I0,2,OK_3
 	print "not "
