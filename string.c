@@ -153,7 +153,8 @@ STRING *
 string_copy(struct Parrot_Interp *interpreter, const STRING *s)
 {
     STRING *d;
-    d = new_string_header(interpreter, s->flags & ~BUFFER_constant_FLAG);
+    d = new_string_header(interpreter, 
+                          s->flags & ~(UINTVAL)BUFFER_constant_FLAG);
     Parrot_allocate_string(interpreter, d, s->buflen);
     d->bufused = s->bufused;
     d->strlen = s->strlen;
@@ -265,27 +266,21 @@ string_concat(struct Parrot_Interp *interpreter, const STRING *a,
 
     UNUSED(Uflags);
 
-
     if (a != NULL && a->strlen != 0) {
         if (b != NULL && b->strlen != 0) {
-            /* transcode first so we know the length and avoid infanticide */
-            /* XXX But it doesn't avoid anything. string_transcode
-             * returns a copy that isn't anchored to the root set. For
-             * now, I'll just block DOD (collection is ok, because b
-             * is marked live.) */
-            interpreter->DOD_block_level++;
             if (a->type != b->type || a->encoding != b->encoding) {
                 b = string_transcode(interpreter, b, a->encoding, a->type,
                                      NULL);
+                b->flags |= BUFFER_neonate_FLAG;
             }
             result = string_make(interpreter, NULL, a->bufused + b->bufused,
                                  a->encoding, 0, a->type);
             mem_sys_memcopy(result->bufstart, a->bufstart, a->bufused);
             mem_sys_memcopy((void *)((ptrcast_t)result->bufstart + a->bufused),
                             b->bufstart, b->bufused);
+            b->flags &= ~(UINTVAL)BUFFER_neonate_FLAG;
             result->strlen = a->strlen + b->strlen;
             result->bufused = a->bufused + b->bufused;
-            interpreter->DOD_block_level--;
         }
         else {
             return string_copy(interpreter, a);
@@ -431,8 +426,11 @@ string_replace(struct Parrot_Interp *interpreter, STRING *src,
     true_offset = (UINTVAL)offset;
     true_length = (UINTVAL)length;
 
-    if(rep->encoding != src->encoding || rep->type != src->type)
-        rep = string_transcode(interpreter, rep, src->encoding, src->type, NULL);
+    if (rep->encoding != src->encoding || rep->type != src->type) {
+        rep = string_transcode(interpreter, rep, src->encoding, src->type, 
+                               NULL);
+        rep->flags |= BUFFER_neonate_FLAG;
+    }
 
     /* abs(-offset) may not be > strlen-1 */
     if (offset < 0) {
@@ -452,11 +450,11 @@ string_replace(struct Parrot_Interp *interpreter, STRING *src,
     }
 
     /* Save the substring that is replaced for the return value */
-    substart_off = (char *)src->encoding->skip_forward(src->bufstart,
+    substart_off = (const char *)src->encoding->skip_forward(src->bufstart,
                                                        true_offset) -
         (char *)src->bufstart;
     subend_off =
-        (char *)src->encoding->skip_forward((char *)src->bufstart +
+        (const char *)src->encoding->skip_forward((char *)src->bufstart +
                                             substart_off,
                                             true_length) -
         (char *)src->bufstart;
@@ -520,6 +518,7 @@ string_replace(struct Parrot_Interp *interpreter, STRING *src,
         src->bufused += diff;
         (void)string_compute_strlen(src);
     } 
+    rep->flags &= ~(UINTVAL)BUFFER_neonate_FLAG;
 
     /* src is modified, now return the original substring */    
     return dest;
@@ -577,8 +576,10 @@ string_compare(struct Parrot_Interp *interpreter, const STRING *s1,
     if (s1->type != s2->type || s1->encoding != s2->encoding) {
         s1 = string_transcode(interpreter, s1, NULL, string_unicode_type,
                               NULL);
+        s1->flags |= BUFFER_neonate_FLAG;
         s2 = string_transcode(interpreter, s2, NULL, string_unicode_type,
                               NULL);
+        s2->flags |= BUFFER_neonate_FLAG;
     }
 
     s1start = s1->bufstart;
@@ -595,6 +596,8 @@ string_compare(struct Parrot_Interp *interpreter, const STRING *s1,
         s1start = s1->encoding->skip_forward(s1start, 1);
         s2start = s2->encoding->skip_forward(s2start, 1);
     }
+    s1->flags &= ~(UINTVAL)BUFFER_neonate_FLAG;
+    s2->flags &= ~(UINTVAL)BUFFER_neonate_FLAG;
 
     if (cmp == 0 && s1start < s1end)
         cmp = 1;

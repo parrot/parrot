@@ -503,7 +503,8 @@ free_unused_PMCs(struct Parrot_Interp *interpreter)
 }
 
 /* Put any free buffers that aren't on the free list on the free list 
- * Free means: not 'live' and not immune */
+ * Free means: not 'live' and not immune 
+ * Temporary immunity is also granted to newborns */
 static void
 free_unused_buffers(struct Parrot_Interp *interpreter, 
                     struct Resource_Pool *pool)
@@ -518,8 +519,8 @@ free_unused_buffers(struct Parrot_Interp *interpreter,
         Buffer *b = cur_arena->start_Buffer;
         for (i = 0; i < cur_arena->used; i++) {
             /* If it's not live or on the free list, put it on the free list */
-            if (!(b->flags & (BUFFER_immune_FLAG | BUFFER_live_FLAG | 
-                              BUFFER_on_free_list_FLAG)) &&
+            if (!(b->flags & (BUFFER_immune_FLAG | BUFFER_neonate_FLAG | 
+                              BUFFER_live_FLAG | BUFFER_on_free_list_FLAG)) &&
                 (!(b->flags & BUFFER_constant_FLAG) || 
                  (b->flags & BUFFER_COW_FLAG))) {
                 interpreter->active_Buffers--;

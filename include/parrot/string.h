@@ -76,16 +76,10 @@ typedef enum BUFFER_flag {
     /* For debugging, report when this buffer gets moved around */
     BUFFER_report_FLAG = 1 << 16,
     /* Mark buffer as immune from deletion during DOD/GC */
-    BUFFER_immune_FLAG = 1 << 17
+    BUFFER_immune_FLAG = 1 << 17,
+    /* Mark buffer as newborn; temporarily protected from DOD/GC */
+    BUFFER_neonate_FLAG = 1 << 18
 } BUFFER_flags;
-
-/* stringinfo parameters */
-#define STRINGINFO_HEADER   1
-#define STRINGINFO_BUFSTART 2
-#define STRINGINFO_BUFLEN   3
-#define STRINGINFO_FLAGS    4
-#define STRINGINFO_BUFUSED  5
-#define STRINGINFO_STRLEN   6
 
 /* stringinfo parameters */
 #define STRINGINFO_HEADER   1
