@@ -87,7 +87,7 @@ Parrot_load_pmc(Interp *interpreter, STRING *lib, PMC *initializer)
     string_cstring_free(cpath);
     init_func = Parrot_sprintf_c(interpreter, "Parrot_dynext_%Ss_init", lib);
     cinit_func = string_to_cstring(interpreter, init_func);
-    func = (void (*)(Interp *, int, void*))Parrot_dlsym(handle, cinit_func);
+    func = (void (*)(Interp *, int, void*))D2FPTR(Parrot_dlsym(handle, cinit_func));
     if (!func) {
         fprintf(stderr, "Failed to find symbol '%s' in native library\n",
                 cinit_func);
