@@ -516,6 +516,70 @@ exp_Function(Interp* interpreter, nodeType *p)
     return NULL; /* XXX return retval */
 }
 
+static SymReg*
+gen_label(Interp *interpreter, const char *prefix)
+{
+    static int nr;
+    char buf[128];
+
+    sprintf(buf, "%s_%d", prefix, ++nr);
+    return mk_local_label(cur_unit, str_dup(buf));
+}
+
+/*
+ * If
+ *   Tests      if foo
+ *     test
+ *     stmts
+ *     ...      else if bar
+ *   Else_      else
+ */
+static nodeType*
+exp_If(Interp* interpreter, nodeType *p)
+{
+    nodeType *tests, *else_, *test, *stmts, *true_;
+    SymReg *else_label, *endif_label;
+    Instruction *ins;
+    SymReg *regs[IMCC_MAX_REGS];
+
+    tests = CHILD(p);
+    else_ = tests->next;
+    endif_label = gen_label(interpreter, "endif");
+    for (test = CHILD(tests); test; test = stmts->next) {
+        stmts = test->next;
+        else_label = gen_label(interpreter, "else");
+        /*
+         * TODO if test == Compare create compare ops
+         */
+        true_ = test->expand(interpreter, test);
+        ins = cur_unit->last_ins;
+        regs[0] = true_->u.r;
+        regs[1] = else_label;
+        insINS(interpreter, cur_unit, ins, "unless", regs, 2);
+        /*
+         * statements of this test
+         */
+        stmts->expand(interpreter, stmts);
+        /*
+         * branch past all
+         */
+        ins = cur_unit->last_ins;
+        regs[0] = endif_label;
+        insINS(interpreter, cur_unit, ins, "branch", regs, 1);
+        /*
+         * insert label for next test
+         */
+        INS_LABEL(cur_unit, else_label, 1);
+    }
+    /* final else block if present */
+    if (else_ && else_->expand)
+        else_->expand(interpreter, else_);
+    /* endif label */
+    INS_LABEL(cur_unit, endif_label, 1);
+
+    return NULL;
+}
+
 /*
  * TODO
  */
@@ -651,6 +715,7 @@ static node_names ast_list[] = {
     { "Const", 		NULL,     exp_Const, NULL, dump_Const, ctx_Const },
     { "Defaults", 	create_1, exp_Defaults, NULL, NULL, NULL },
     { "Function", 	create_Func, exp_Function, NULL, NULL, NULL },
+    { "If", 	        create_1, exp_If, NULL, NULL, NULL },
     { "Line_no",        create_1,  NULL, NULL, NULL, NULL },
     { "Name",           create_Name, NULL, NULL, NULL, ctx_Var },
     { "Op",             create_Name, NULL, NULL, NULL, NULL },
@@ -664,6 +729,7 @@ static node_names ast_list[] = {
     { "Src_File",    	create_1, NULL, NULL, NULL, NULL },
     { "Src_Line",    	create_1, NULL, NULL, NULL, NULL },
     { "Stmts",          create_1, exp_default, NULL, NULL, NULL },
+    { "Tests",          create_1, NULL, NULL, NULL, NULL },
     { "Void",           create_1, exp_default, NULL, NULL, NULL },
     { "_",              create_0, NULL, NULL, NULL, NULL },
     { "_options",       create_1, NULL, NULL, NULL, NULL },

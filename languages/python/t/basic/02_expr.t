@@ -3,7 +3,7 @@
 use strict;
 use lib '../../lib';
 
-use Parrot::Test tests => 13;
+use Parrot::Test tests => 16;
 
 sub test {
     language_output_is('python', $_[0], '', $_[1]);
@@ -63,6 +63,27 @@ def f():
 print "main"
 f()
 print "ok"
+CODE
+
+test( <<'CODE', 'simple if' );
+if 1:
+    print "ok"
+CODE
+
+test( <<'CODE', 'simple if, elif' );
+if 0:
+    print "nok"
+elif 1:
+    print "ok"
+CODE
+
+test( <<'CODE', 'simple if, elif, else' );
+if 0:
+    print "nok"
+elif 0:
+    print "nok"
+else:
+    print "ok"
 CODE
 
 SKIP: {
