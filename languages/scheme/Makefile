@@ -8,7 +8,7 @@ DIR=languages/scheme
 TOOL_DIR=../..
 ASM=./assemble.pl
 SCHEMEC=./schemec
-INTERP=./parrot
+INTERP=./test_parrot
 
 #
 # Default target:

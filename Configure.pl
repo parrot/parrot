@@ -84,6 +84,7 @@ my(%c)=(
 	ld_debug =>     '',			# include debug info in executable
 
   	perl =>			$^X,
+	test_prog =>	'test_parrot' . $Config{_exe},
 	debugging =>	$opt_debugging,
 	rm_f =>		'rm -f',
 	stacklow =>	'(~0xfff)',

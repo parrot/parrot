@@ -31,7 +31,7 @@ C_LIBS = ${libs}
 CC = ${cc}
 LD = ${ld}
 PERL = ${perl}
-TEST_PROG = test_parrot${exe}
+TEST_PROG = ${test_prog}
 PDUMP = pdump${exe}
 # This is set to  MAKE=$make if your $make command doesn't
 # do it for you.
