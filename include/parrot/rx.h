@@ -60,22 +60,26 @@ typedef struct rxinfo {
         struct Stack_chunk_t* stack;
 } rxinfo;
 
+#if __cplusplus
+	#define INLINE inline
+#else
+	#define INLINE 
+#endif /* __cplusplus */
+
 rxinfo * rx_allocate_info(struct Parrot_Interp *, STRING *);
 
-BOOLVAL  rx_is_word_character(struct Parrot_Interp *, INTVAL ch);
-BOOLVAL  rx_is_number_character(struct Parrot_Interp *, INTVAL ch);
-BOOLVAL  rx_is_whitespace_character(struct Parrot_Interp *, INTVAL ch);
+INLINE BOOLVAL  rx_is_word_character(struct Parrot_Interp *, INTVAL ch);
+INLINE BOOLVAL  rx_is_number_character(struct Parrot_Interp *, INTVAL ch);
+INLINE BOOLVAL  rx_is_whitespace_character(struct Parrot_Interp *, INTVAL ch);
 
 Bitmap bitmap_make(struct Parrot_Interp *, STRING*);
+Bitmap bitmap_make_cstr(struct Parrot_Interp *, const char*);
 void bitmap_add(struct Parrot_Interp *, Bitmap, INTVAL);
 BOOLVAL bitmap_match(Bitmap, INTVAL);
 void bitmap_destroy(Bitmap);
 
-STRING *rxP_get_substr(struct Parrot_Interp *, STRING *, INTVAL, INTVAL);
-
 #define RX_dUNPACK(pmc)				rxinfo *rx=(rxinfo *)pmc->data
 #define RxCurChar(rx)				(char)string_ord(rx->string, rx->index)
-#define RxCurCharS(rx)				rxP_get_substr(interpreter, rx->string, rx->index, 1)
 
 #define RxAdvance(rx)				RxAdvanceX(rx, 1)
 #define RxAdvanceX(rx, x)			rx->index += x * rx->whichway
@@ -102,4 +106,4 @@ STRING *rxP_get_substr(struct Parrot_Interp *, STRING *, INTVAL, INTVAL);
 
 #define RxFlagsOff(rx)				rx->flags = enum_rxflags_none
 
-#endif
+#endif /* PARROT_RX_H_GUARD */

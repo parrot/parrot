@@ -178,9 +178,9 @@ The documentation for each opcode follows.
 
 ########################################
 
-=item C<rx_allocateinfo>(out pmc, in str)
+=item C<rx_allocinfo>(out pmc, in str)
 
-=item C<rx_allocateinfo>(out pmc, in pmc)
+=item C<rx_allocinfo>(out pmc, in pmc)
 
 Allocates a new info structure and puts it into the first parameter.  The second parameter
 is the string to match against.
@@ -207,6 +207,16 @@ op rx_allocinfo(out pmc, in pmc) {
 	goto NEXT();
 }
 
+########################################
+
+=item C<rx_clearinfo>(out pmc, in str)
+
+Clears the data out of an existing info structure, preparing it for reuse.  The second 
+parameter is the new string to match against.  This is used to avoid memory reallocations;
+many programs will only need one info structure allocation over the program's lifetime.
+
+=cut
+
 op rx_clearinfo(inout pmc, in str) {
 	RX_dUNPACK($1);
 	rx->index=rx->startindex=0;
@@ -220,6 +230,8 @@ op rx_clearinfo(inout pmc, in str) {
 	}
 	
 	rx->string=$2;
+	
+	string_transcode(interpreter, rx->string, encoding_lookup("utf32"), rx->string->type, &rx->string);
 	
 	goto NEXT();
 }
@@ -592,7 +604,7 @@ op rx_setprops(in pmc, in str, in int) {
 				break;
 			case 'r':
 				RxReverse_on(rx);
-				rx->index=rx->startindex=string_length(rx->string);
+				rx->index=rx->startindex=string_length(rx->string) - rx->minlength - 1;
 				break;
 			default:
 				fprintf(stderr, "Unknown regular expression option '%c'.", (char)string_ord($2, (INTVAL)i));
@@ -834,7 +846,7 @@ op rx_dot(in pmc, in int) {
 	}
 	else {
 		if(!bmp) {
-			bmp=bitmap_make(interpreter, cstr2pstr("\r\n"));
+			bmp=bitmap_make_cstr(interpreter, "\r\n");
 		}
 
 		if(!bitmap_match(bmp, RxCurChar(rx))) {

@@ -38,21 +38,23 @@ rxinfo * rx_allocate_info(struct Parrot_Interp *interpreter, STRING *string) {
 	rx->groupend=pmc_new(interpreter, enum_class_PerlArray);
 
 	rx->stack = new_stack(interpreter);
+	
+	string_transcode(interpreter, rx->string, encoding_lookup("utf32"), rx->string->type, &rx->string);
 
 	return rx;
 }
 
-BOOLVAL rx_is_word_character(struct Parrot_Interp *interpreter, INTVAL ch) {
+INLINE BOOLVAL rx_is_word_character(struct Parrot_Interp *interpreter, INTVAL ch) {
 	static Bitmap bmp=NULL;
 	
 	if(!bmp) {
-		bmp=bitmap_make(interpreter, cstr2pstr(RX_WORDCHARS));
+		bmp=bitmap_make_cstr(interpreter, RX_WORDCHARS);
 	}
 	
 	return bitmap_match(bmp, ch);
 }
 
-BOOLVAL rx_is_number_character(struct Parrot_Interp *interpreter, INTVAL ch) {
+INLINE BOOLVAL rx_is_number_character(struct Parrot_Interp *interpreter, INTVAL ch) {
 	/* faster to do less-than/greater-than */
 	
 	if(ch >= '0' && ch <= '9') {
@@ -63,11 +65,11 @@ BOOLVAL rx_is_number_character(struct Parrot_Interp *interpreter, INTVAL ch) {
 	}
 }
 
-BOOLVAL rx_is_whitespace_character(struct Parrot_Interp *interpreter, INTVAL ch) {
+INLINE BOOLVAL rx_is_whitespace_character(struct Parrot_Interp *interpreter, INTVAL ch) {
 	static Bitmap bmp=NULL;
 	
 	if(!bmp) {
-		bmp=bitmap_make(interpreter, cstr2pstr(RX_SPACECHARS));
+		bmp=bitmap_make_cstr(interpreter, RX_SPACECHARS);
 	}
 
 	return bitmap_match(bmp, ch);
@@ -104,6 +106,26 @@ Bitmap bitmap_make(struct Parrot_Interp *interpreter, STRING* str) {
 		else {
 			bmp->bmp[ch>>3] |= (1<<(ch & 7));
 		}
+	}
+	
+	return bmp;
+}
+
+
+Bitmap bitmap_make_cstr(struct Parrot_Interp *interpreter, const char* str) {
+	UINTVAL i, ch;
+	Bitmap bmp=mem_sys_allocate(sizeof(struct bitmap_t));
+	bmp->bmp=mem_sys_allocate(32);
+	bmp->bigchars=NULL;
+	
+	for(i=0; i < 32; i++) {
+		bmp->bmp[i]=0;
+	}
+	
+	for(i=0; i < strlen(str); i++) {
+		ch=str[i];
+
+		bmp->bmp[ch>>3] |= (1<<(ch & 7));
 	}
 	
 	return bmp;
