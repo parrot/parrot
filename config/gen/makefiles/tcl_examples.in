@@ -7,3 +7,7 @@ default:
 
 %:%.tcl
 	cd $(UP_PATH) && $(PARROT) $(DOWN_PATH)tcl.pbc $(DOWN_PATH)examples${slash}$@.tcl
+
+# (for development testing)
+test:
+	cd $(UP_PATH) && $(PARROT) -t $(DOWN_PATH)tcl.pbc $(DOWN_PATH)examples${slash}foo.tcl
