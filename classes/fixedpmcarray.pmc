@@ -286,9 +286,16 @@ Returns the integer value of the element at index C<*key>.
 */
 
     INTVAL get_integer_keyed (PMC* key) {
-        /* simple int keys only */
         INTVAL k = key_integer(INTERP, key);
-        return DYNSELF.get_integer_keyed_int(k);
+        PMC *box, *nextkey;
+
+        nextkey = key_next(INTERP, key);
+        if (!nextkey)
+            return DYNSELF.get_integer_keyed_int(k);
+        box = SELF.get_pmc_keyed_int(k);
+        if (box == NULL)
+            box = pmc_new(INTERP, enum_class_Undef);
+        return VTABLE_get_integer_keyed(INTERP, box, nextkey);
     }
 
 
@@ -319,7 +326,15 @@ Returns the floating-point value of the element at index C<*key>.
 
     FLOATVAL get_number_keyed (PMC* key) {
         INTVAL k = key_integer(INTERP, key);
-        return DYNSELF.get_number_keyed_int(k);
+        PMC *box, *nextkey;
+
+        nextkey = key_next(INTERP, key);
+        if (!nextkey)
+            return DYNSELF.get_number_keyed_int(k);
+        box = SELF.get_pmc_keyed_int(k);
+        if (box == NULL)
+            box = pmc_new(INTERP, enum_class_Undef);
+        return VTABLE_get_number_keyed(INTERP, box, nextkey);
     }
 
 /*
@@ -349,7 +364,15 @@ Returns the Parrot string value of the element at index C<*key>.
 
     STRING* get_string_keyed(PMC* key) {
         INTVAL k = key_integer(INTERP, key);
-        return DYNSELF.get_string_keyed_int(k);
+        PMC *box, *nextkey;
+
+        nextkey = key_next(INTERP, key);
+        if (!nextkey)
+            return DYNSELF.get_string_keyed_int(k);
+        box = SELF.get_pmc_keyed_int(k);
+        if (box == NULL)
+            box = pmc_new(INTERP, enum_class_Undef);
+        return VTABLE_get_string_keyed(INTERP, box, nextkey);
     }
 
 
@@ -385,7 +408,15 @@ Returns the PMC value of the element at index C<*key>.
 
     PMC* get_pmc_keyed(PMC* key) {
         INTVAL k = key_integer(INTERP, key);
-        return DYNSELF.get_pmc_keyed_int(k);
+        PMC *box, *nextkey;
+
+        nextkey = key_next(INTERP, key);
+        if (!nextkey)
+            return DYNSELF.get_pmc_keyed_int(k);
+        box = SELF.get_pmc_keyed_int(k);
+        if (box == NULL)
+            box = pmc_new(INTERP, enum_class_Undef);
+        return VTABLE_get_pmc_keyed(INTERP, box, nextkey);
     }
 
 /*

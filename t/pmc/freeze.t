@@ -17,7 +17,7 @@ Tests the freeze/thaw archiving subsystem.
 
 =cut
 
-use Parrot::Test tests => 24;
+use Parrot::Test tests => 25;
 use Test::More;
 
 END { unlink "temp.fpmc"; };
@@ -728,3 +728,38 @@ ok 4
 ok 5
 ok 6
 OUTPUT
+
+output_is(<<'CODE', <<'OUTPUT', "freeze Key");
+    new P0, .Hash
+    new P1, .FixedPMCArray
+    set P1, 2
+    set P1[1], P0
+    set P0["foo"], "ok\n"
+    set S0, P1[1; "foo"]
+    print S0
+
+    new P3, .Key
+    set P3, 1
+    new P4, .Key
+    set P4, "foo"
+    push P3, P4
+
+    set S0, P1[P3]
+    print S0
+
+    freeze S0, P3
+    print "ok 1\n"
+    thaw P5, S0
+    print "ok 2\n"
+
+    set S0, P1[P5]
+    print S0
+    end
+CODE
+ok
+ok
+ok 1
+ok 2
+ok
+OUTPUT
+
