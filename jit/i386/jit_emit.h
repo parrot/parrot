@@ -447,7 +447,45 @@ emit_movb_i_m(char *pc, char imm, int base, int i, int scale, long disp)
 #define emitm_sdivl_r(pc, reg2) emitm_alu_imp_r((pc), emit_b111, (reg2))
 
 #define emitm_sdivl_m(pc, b, i, s, d) \
-  emitm_alu_imp_m((pc), emit_b111, b, i, s, d,)
+  emitm_alu_imp_m((pc), emit_b111, b, i, s, d)
+
+#define jit_emit_cdq(pc) *(pc)++ = 0x99
+
+#define jit_emit_div_rr(pc, r1, r2) { \
+    if (r1 == r2) { \
+        jit_emit_mov_ri_i(pc, r1, 1); \
+    } \
+    else { \
+        if (r1 != emit_EAX) { \
+            jit_emit_mov_rr(pc, emit_EAX, r1); \
+        } \
+        jit_emit_mov_rr(pc, emit_ECX, emit_EDX); \
+        jit_emit_cdq(pc); \
+        if (r2 == emit_EDX) { \
+            emitm_sdivl_r(pc, emit_ECX); \
+        } \
+        else { \
+            emitm_sdivl_r(pc, r2); \
+        } \
+        jit_emit_mov_rr(pc, emit_EDX, emit_ECX); \
+        if (r1 != emit_EAX) { \
+            jit_emit_mov_rr(pc, r1, emit_EAX); \
+        } \
+    } \
+}
+
+#define jit_emit_div_rm(pc, r1, mem) { \
+    if (r1 != emit_EAX) { \
+        jit_emit_mov_rr(pc, emit_EAX, r1); \
+    } \
+    jit_emit_mov_rr(pc, emit_ECX, emit_EDX); \
+    jit_emit_cdq(pc); \
+    emitm_sdivl_m(pc, 0,0,0, (long)(mem)); \
+    jit_emit_mov_rr(pc, emit_EDX, emit_ECX); \
+    if (r1 != emit_EAX) { \
+        jit_emit_mov_rr(pc, r1, emit_EAX); \
+    } \
+}
 
 #define emitm_smull_op(pc) { *((pc)++) = 0x0f; *((pc)++) = 0xaf; }
 
@@ -484,7 +522,7 @@ emit_movb_i_m(char *pc, char imm, int base, int i, int scale, long disp)
 /* AND */
 
 #define emit_andl_r_r(pc, reg1, reg2) emitm_alul_r_r(pc, 0x21, reg1, reg2)
-#define emit_test_r_r(pc, reg1, reg2) emitm_alul_r_r(pc, 0x85, reg1, reg2)
+#define jit_emit_band_rr(pc, r1, r2) emit_andl_r_r(pc, r2, r1)
 
 #define emitm_andl_i_r(pc, imm, reg) \
   emitm_alul_i_r(pc, 0x81, emit_b100, imm, reg)
@@ -498,9 +536,13 @@ emit_movb_i_m(char *pc, char imm, int base, int i, int scale, long disp)
 #define emitm_andl_i_m(pc, imm, b, i, s, d) \
   emitm_alul_i_m(pc, 0x81, emit_b100, imm, b, i, s, d)
 
+/* TEST for zero */
+#define jit_emit_test_r(pc, reg1) emitm_alul_r_r(pc, 0x85, reg1, reg1)
+
 /* OR */
 
 #define emit_orl_r_r(pc, reg1, reg2) emitm_alul_r_r(pc, 0x9, reg1, reg2)
+#define jit_emit_bor_rr(pc, r1, r2) emit_orl_r_r(pc, r2, r1)
 
 #define emitm_orl_i_r(pc, imm, reg) \
   emitm_alul_i_r(pc, 0x81, emit_b001, imm, reg)
@@ -516,7 +558,7 @@ emit_movb_i_m(char *pc, char imm, int base, int i, int scale, long disp)
 
 /* XOR */
 
-#define emit_xorl_r_r(pc, reg1, reg2) emitm_alul_r_r(pc, 0x31, reg1, reg2)
+#define jit_emit_bxor_rr(pc, reg1, reg2) emitm_alul_r_r(pc, 0x31, reg2, reg1)
 
 #define emitm_xorl_i_r(pc, imm, reg) \
   emitm_alul_i_r(pc, 0x81, emit_b110, imm, reg)
@@ -603,8 +645,8 @@ emit_movb_i_m(char *pc, char imm, int base, int i, int scale, long disp)
   *(pc++) = imm
 
 /* INC / DEC */
-#define emit_inc_r(pc, reg) *(pc++) = 0x40 | (reg - 1)
-#define emit_dec_r(pc, reg) *(pc++) = 0x48 | (reg - 1)
+#define jit_emit_inc_r(pc, reg) *(pc++) = 0x40 | (reg - 1)
+#define jit_emit_dec_r(pc, reg) *(pc++) = 0x48 | (reg - 1)
 
 /* Floating point ops */
 
@@ -648,8 +690,8 @@ emit_movb_i_m(char *pc, char imm, int base, int i, int scale, long disp)
 /* 0xD8 ops */
 #define emitm_fadd(pc, sti) emitm_fl_3(pc, emit_b000, emit_b000, sti)
 #define emitm_fmul(pc, sti) emitm_fl_3(pc, emit_b000, emit_b001, sti)
-/* Sub ST = ST - ST(i); */
 #define emitm_fsub(pc, sti) emitm_fl_3(pc, emit_b000, emit_b100, sti)
+#define emitm_fdiv(pc, sti) emitm_fl_3(pc, emit_b000, emit_b110, sti)
 
 /* 0xD9 ops */
 /* FLD ST,ST(i) */
@@ -733,11 +775,37 @@ emit_movb_i_m(char *pc, char imm, int base, int i, int scale, long disp)
 /* ST *= real64 */
 #define emitm_fmul_m(pc,b,i,s,d) \
   emitm_fl_2(pc, emit_b10, 0, emit_b001, b, i, s, d)
+/* ST /= real64 */
+#define emitm_fdiv_m(pc,b,i,s,d) \
+  emitm_fl_2(pc, emit_b10, 0, emit_b110, b, i, s, d)
 
 /* Ops Needed to support loading EFLAGs for conditional branches */
 #define emitm_fstw(pc) emitm_fl_3(pc, emit_b111, emit_b100, emit_b000)
 
 #define emitm_sahf(pc) *((pc)++) = 0x9e
+
+/* misc float */
+#define emit_fchs(pc) { *(pc)++ = 0xd9; *(pc)++ = 0xE0; }
+#define emit_fabs(pc) { *(pc)++ = 0xd9; *(pc)++ = 0xE1; }
+#define emit_ftst(pc) { *(pc)++ = 0xd9; *(pc)++ = 0xE4; }
+#define emit_faddp(pc) { *(pc)++ = 0xde; *(pc)++ = 0xc1; }
+#define emit_fsubp(pc) { *(pc)++ = 0xde; *(pc)++ = 0xe9; }
+
+#define jit_emit_neg_r_n(pc, r) { \
+    if (r) { \
+        emitm_fld(pc, r); \
+    } \
+    emit_fchs(pc); \
+    if (r) { \
+        emitm_fstp(pc, r); \
+    } \
+}
+
+#define jit_emit_neg_m_n(pc, mem) { \
+    jit_emit_fload_m_n(pc, mem); \
+    emit_fchs(pc); \
+    jit_emit_fstore_m_n(pc, mem); \
+}
 
 /* Integer comparisions */
 #define jit_emit_cmp_rr(pc, reg1, reg2) \
@@ -749,7 +817,7 @@ emit_movb_i_m(char *pc, char imm, int base, int i, int scale, long disp)
 #define emitm_cmpl_m_r(pc, reg, b, i, s, d) \
   emitm_alul_r_m(pc, 0x39, reg, b, i, s, d)
 
-#define emitm_cmpl_i_r(pc, imm, reg) \
+#define jit_emit_cmp_ri(pc, reg, imm) \
   emitm_alul_i_r(pc, 0x81, emit_b111, imm, reg)
 
 /* Unconditional Jump/Call */
@@ -948,6 +1016,20 @@ emit_movb_i_m(char *pc, char imm, int base, int i, int scale, long disp)
     } \
 }
 
+#define jit_emit_inc_r_n(pc, r) { \
+    emitm_fld(pc, r); \
+    emitm_fld1(pc); \
+    emit_faddp(pc); \
+    emitm_fstp(pc, (r+1)); \
+}
+
+#define jit_emit_dec_r_n(pc, r) { \
+    emitm_fld(pc, r); \
+    emitm_fld1(pc); \
+    emit_fsubp(pc); \
+    emitm_fstp(pc, (r+1)); \
+}
+
 /* ST(i) *= MEM */
 #define jit_emit_mul_rm_n(pc, r, m) { \
     if (r) { \
@@ -975,6 +1057,35 @@ emit_movb_i_m(char *pc, char imm, int base, int i, int scale, long disp)
         emitm_fmul(pc, r2); \
     } \
 }
+
+/* ST(i) /= MEM */
+#define jit_emit_div_rm_n(pc, r, m) { \
+    if (r) { \
+        emitm_fxch(pc, r); \
+        emitm_fdiv_m(pc, 0,0,0, m); \
+        emitm_fxch(pc, r); \
+    } else { \
+        emitm_fdiv_m(pc, 0,0,0, m); \
+    } \
+}
+
+/* ST(r1) /= ST(r2) */
+#define jit_emit_div_rr_n(pc, r1, r2) { \
+    if (r1 == r2) { \
+        emitm_fld(pc, r1); \
+        emitm_fdiv(pc, 0); \
+        emitm_fstp(pc, (r1+1)); \
+    } \
+    else if (r1) { \
+        emitm_fxch(pc, r1); \
+        emitm_fdiv(pc, r2); \
+        emitm_fxch(pc, r1); \
+    } \
+    else { \
+        emitm_fmul(pc, r2); \
+    } \
+}
+
 /* TODO config option, if fcomi* is available */
 /* compare ST(r) <-> mem */
 #define jit_emit_cmp_rm_n(pc, r, mem) { \
@@ -1008,8 +1119,29 @@ emit_movb_i_m(char *pc, char imm, int base, int i, int scale, long disp)
     } \
 }
 
+/* test r for zero */
+#define jit_emit_test_r_n(pc, r) { \
+    if (r) { \
+        emitm_fxch(pc, r); \
+    } \
+    emit_ftst(pc); \
+    emitm_fstw(pc); \
+    emitm_sahf(pc); \
+    if (r) { \
+        emitm_fxch(pc, r); \
+    } \
+}
 
-#define jit_emit_neg_m_i(pc, address) \
+#define jit_emit_cmp_ri_n(pc, r, m64) { \
+    jit_emit_fload_m_n(pc, m64); \
+    emitm_fxch(pc, (r+1)); \
+    emitm_fcomp(pc, (r+1)); \
+    emitm_fxch(pc, r); \
+    emitm_fstw(pc); \
+    emitm_sahf(pc); \
+}
+
+#define jit_emit_neg_m(pc, address) \
   emitm_negl_m(pc, emit_None, emit_None, emit_None, (long)address)
 
 #define emit_shrl_r_m(pc, reg, d) \
@@ -1021,7 +1153,7 @@ emit_movb_i_m(char *pc, char imm, int base, int i, int scale, long disp)
 #define emit_andl_r_m(pc, reg, d) \
   emitm_andl_r_m(pc, reg, emit_None, emit_None, emit_None, d)
 
-#define emit_andl_m_r(pc, reg, d) \
+#define jit_emit_band_rm(pc, reg, d) \
   emitm_andl_m_r(pc, reg, emit_None, emit_None, emit_None, d)
 
 #define emit_andl_i_m(pc, imm, d) \
@@ -1030,7 +1162,7 @@ emit_movb_i_m(char *pc, char imm, int base, int i, int scale, long disp)
 #define emit_orl_r_m(pc, reg, d) \
   emitm_orl_r_m(pc, reg, emit_None, emit_None, emit_None, d)
 
-#define emit_orl_m_r(pc, reg, d) \
+#define jit_emit_bor_rm(pc, reg, d) \
   emitm_orl_m_r(pc, reg, emit_None, emit_None, emit_None, d)
 
 #define emit_orl_i_m(pc, imm, d) \
@@ -1039,7 +1171,7 @@ emit_movb_i_m(char *pc, char imm, int base, int i, int scale, long disp)
 #define emit_xorl_r_m(pc, reg, d) \
   emitm_xorl_r_m(pc, reg, emit_None, emit_None, emit_None, d)
 
-#define emit_xorl_m_r(pc, reg, d) \
+#define jit_emit_bxor_rm(pc, reg, d) \
   emitm_xorl_m_r(pc, reg, emit_None, emit_None, emit_None, d)
 
 #define emit_xorl_i_m(pc, imm, d) \
@@ -1051,7 +1183,7 @@ emit_movb_i_m(char *pc, char imm, int base, int i, int scale, long disp)
 enum { JIT_X86BRANCH, JIT_X86JUMP, JIT_X86CALL };
 
 static void
-emit_jcc(Parrot_jit_info_t *jit_info, int code, opcode_t disp)
+jit_emit_jcc(Parrot_jit_info_t *jit_info, int code, opcode_t disp)
 {
     long offset;
     opcode_t opcode;
@@ -1242,14 +1374,14 @@ Parrot_jit_emit_mov_mr(struct Parrot_Interp * interpreter, char *mem, int reg)
         ((Parrot_jit_info_t *)(interpreter->jit_info))->native_ptr, mem, reg);
 }
 
-void 
+void
 Parrot_jit_emit_mov_rm_n(struct Parrot_Interp * interpreter, int reg, char *mem)
 {
     jit_emit_mov_rm_n(
         ((Parrot_jit_info_t *)(interpreter->jit_info))->native_ptr, reg, mem);
 }
 
-void 
+void
 Parrot_jit_emit_mov_rm(struct Parrot_Interp * interpreter, int reg, char *mem)
 {
     jit_emit_mov_rm(
@@ -1461,8 +1593,8 @@ Parrot_jit_vtable_if_unless_op(Parrot_jit_info_t *jit_info,
     /* emit call  vtable function i.e. get_bool, result eax */
     Parrot_jit_vtable1_op(jit_info, interpreter);
     /* test result */
-    emit_test_r_r(jit_info->native_ptr, emit_EAX, emit_EAX);
-    emit_jcc(jit_info, unless ? emitm_jz : emitm_jnz, ic);
+    jit_emit_test_r(jit_info->native_ptr, emit_EAX);
+    jit_emit_jcc(jit_info, unless ? emitm_jz : emitm_jnz, ic);
 }
 
 /* unless_p_ic */
@@ -1545,7 +1677,7 @@ Parrot_jit_cpcf_op(Parrot_jit_info_t *jit_info,
 
     Parrot_jit_normal_op(jit_info, interpreter);
     /* test eax, if zero (e.g after restart), return from JIT */
-    emit_test_r_r(jit_info->native_ptr, emit_EAX, emit_EAX);
+    jit_emit_test_r(jit_info->native_ptr, emit_EAX);
     /* remember PC */
     jmp_ptr = jit_info->native_ptr;
     /* emit jump past exit code, dummy offset

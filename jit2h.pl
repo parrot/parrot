@@ -82,7 +82,7 @@ sub readjit($) {
 	    while (my($t, $body) = each(%templates)) {
 		if ($asm =~ /$t\s+/){
 		    my $tbody = $body;
-		    while ($asm =~ s/(s(.).+?\2.*?\2)\s*//) {
+		    while ($asm =~ s/\b(s(.).+?\2.*?\2)(?:\s+)?//) {
 			eval "\$tbody =~ ${1}g";
 		    }
 		    $asm = $tbody;
