@@ -944,17 +944,19 @@ sub OPC_isinstance
     my ($n, $c, $cmt) = @_;
     my $i = temp('I');
     my $cl = pop @stack;
-    my $ob = pop @stack;
+    my $ob = promote(pop @stack);
+    pop @stack;	# functions
     my $s = temp('S');
     my $b = temp('P');
     # TODO make op or function
     print <<EOC;
         $s = classname $cl->[1]
-	$i = isa $ob->[1], $s
+	$i = isa $ob, $s
 	$b = new Boolean
 	$b = $i
 EOC
     push @stack, [-1, $b, 'P'];
+    print_stack();
 }
 
 sub CALL_FUNCTION

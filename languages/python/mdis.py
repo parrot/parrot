@@ -4,6 +4,7 @@
 
 import sys
 import types
+import inspect
 
 from opcode import *
 from opcode import __all__ as _opcodes_all
@@ -151,7 +152,11 @@ def disassemble(co, lasti=-1):
 		i = 'Build::' + i
 		break
 	print "Disassembly of %s" % i
-	print "#dir %s" % dir(c)
+	print "# varnames ", c.co_varnames
+	print "# locals   ", c.co_nlocals
+	print "# names    ", c.co_names
+	print "# consts   ", c.co_consts
+	print "# getargs  ", inspect.getargs(c)
 	disassemble(c)
 
 def disassemble_string(code, lasti=-1, varnames=None, names=None,

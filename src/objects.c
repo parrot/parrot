@@ -525,6 +525,41 @@ get_init_meth(Parrot_Interp interpreter, PMC *class,
 }
 
 static void
+do_py_initcall(Parrot_Interp interpreter, PMC* class, PMC *object)
+{
+    SLOTTYPE *class_data = PMC_data(class);
+    PMC *classsearch_array = get_attrib_num(class_data, PCD_ALL_PARENTS);
+    PMC *parent_class;
+    INTVAL nparents;
+    STRING *meth_str;
+    PMC *meth;
+    PMC *arg = REG_PMC(5);  /* TODO more args */
+
+    nparents = VTABLE_elements(interpreter, classsearch_array);
+    if (nparents) {
+        parent_class = VTABLE_get_pmc_keyed_int(interpreter,
+                classsearch_array, nparents - 1);
+        /* if its a PMC, we put one PMC of that type into
+         * the attribute slot #0.
+         */
+        if (!PObj_is_class_TEST(parent_class)) {
+            PMC *attr;
+            SLOTTYPE *obj_data = PMC_data(object);
+            VTABLE_invoke(interpreter, parent_class, NULL);
+            attr = REG_PMC(5);
+            set_attrib_num(obj_data, POD_FIRST_ATTRIB, attr);
+        }
+    }
+    meth_str = CONST_STRING(interpreter, "__init__");
+    meth = Parrot_find_method_with_cache(interpreter,
+            class, meth_str);
+    if (meth) {
+        Parrot_runops_fromc_args_save(interpreter, meth,
+                "vPP", object, arg);
+    }
+}
+
+static void
 do_initcall(Parrot_Interp interpreter, PMC* class, PMC *object, PMC *init)
 {
     SLOTTYPE *class_data = PMC_data(class);
@@ -655,7 +690,7 @@ instantiate_py_object(Interp* interpreter, PMC* class, void* next)
 {
     INTVAL type = class->vtable->base_type;
     PMC *object = pmc_new_noinit(interpreter, type);
-    VTABLE_init(interpreter, object);
+    instantiate_object(interpreter, object, (void*)-1);
     REG_PMC(5) = object;
     return next;
 }
@@ -705,7 +740,15 @@ instantiate_object(Parrot_Interp interpreter, PMC *object, PMC *init)
     /* We really ought to call the class init routines here...
      * this assumes that an object isa delegate
      */
-    do_initcall(interpreter, class, object, init);
+    if (init == (void*)-1) {
+        /*
+         * we are coming from Python
+         */
+        do_py_initcall(interpreter, class, object);
+
+    }
+    else
+        do_initcall(interpreter, class, object, init);
 }
 
 /*

@@ -3,7 +3,7 @@
 use strict;
 use lib '../../lib';
 
-use Parrot::Test tests => 14;
+use Parrot::Test tests => 15;
 
 sub test {
     language_output_is('python', $_[0], '', $_[1]);
@@ -375,4 +375,31 @@ if __name__ == '__main__':
     main()
 CODE
 
+test(<<'CODE', 'check isinstance');
+show = True
+
+def check(a, b):
+    if __debug__:
+	if show:
+            print `a`, "==", `b`
+    if not a == b:
+        raise AssertionError("%.30r != %.30r" % (a, b))
+
+def main():
+    check(isinstance(42, int), True)
+    check(isinstance(42, long), False)
+    check(isinstance(42L, int), False)
+    check(isinstance(42L, long), True)
+    check(isinstance(12345678910, int), False)
+    check(isinstance(12345678910, long), True)
+    check(isinstance(3.14, int), False)
+    check(isinstance(3.14, float), True)
+    # check(isinstance(int, type), True)
+    # check(isinstance(int, object), True)
+    # check(isinstance(type, object), True)
+
+if __name__ == '__main__':
+    main()
+
+CODE
 
