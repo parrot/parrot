@@ -305,7 +305,7 @@ emit_movb_r_r(char *pc, int reg1, int reg2)
     *(pc++) = emit_alu_r_r(reg1, reg2);
     return pc;
 }
-#define emitm_movl_r_r(pc, reg1, reg2) if (reg1 != reg2) { \
+#define jit_emit_mov_rr(pc, reg2, reg1) if (reg1 != reg2) { \
   *(pc++) = 0x89; \
   *(pc++) = emit_alu_r_r(reg1, reg2); }
 
@@ -751,10 +751,10 @@ emit_movb_i_m(char *pc, char imm, int base, int i, int scale, long disp)
 #define jit_emit_mov_mi_ii(pc, dest, immediate) \
   emitm_movl_i_m(pc, immediate, emit_None, emit_None, emit_None, dest)
 
-#define emit_movl_m_r(pc, reg, address) \
+#define jit_emit_mov_rm_i(pc, reg, address) \
   emitm_movl_m_r(pc, reg, emit_None, emit_None, emit_None, address)
 
-#define emit_movl_r_m(pc, reg, address) \
+#define jit_emit_mov_mr_i(pc, address, reg) \
   emitm_movl_r_m(pc, reg, emit_None, emit_None, emit_None, address)
 
 #define emit_smull_r_m(pc, reg, address) \
@@ -966,7 +966,7 @@ Parrot_jit_begin(Parrot_jit_info_t *jit_info,
 
     /* Maintain the stack frame pointer for the sake of gdb */
     emit_pushl_r(jit_info->native_ptr, emit_EBP);
-    emitm_movl_r_r(jit_info->native_ptr, emit_ESP, emit_EBP);
+    jit_emit_mov_rr(jit_info->native_ptr, emit_EBP, emit_ESP);
     /* stack:
      * 12   pc
      *  8   interpreter
@@ -1047,15 +1047,15 @@ Parrot_jit_vtable_n_op(Parrot_jit_info_t *jit_info,
                 switch (op_info->types[i]) {
                     case PARROT_ARG_KI:
                     case PARROT_ARG_I:
-                        emit_movl_m_r(jit_info->native_ptr, emit_EAX,
+                        jit_emit_mov_rm_i(jit_info->native_ptr, emit_EAX,
                                 &interpreter->ctx.int_reg.registers[p[i]]);
                         break;
                     case PARROT_ARG_S:
-                        emit_movl_m_r(jit_info->native_ptr, emit_EAX,
+                        jit_emit_mov_rm_i(jit_info->native_ptr, emit_EAX,
                                 &interpreter->ctx.string_reg.registers[p[i]]);
                         break;
                     case PARROT_ARG_P:
-                        emit_movl_m_r(jit_info->native_ptr, emit_EAX,
+                        jit_emit_mov_rm_i(jit_info->native_ptr, emit_EAX,
                                 &interpreter->ctx.pmc_reg.registers[p[i]]);
                         break;
                     default:
@@ -1141,16 +1141,16 @@ Parrot_jit_vtable1r_op(Parrot_jit_info_t *jit_info,
     /* return result is in EAX or ST(0) */
     switch (op_info->types[1]) {
         case PARROT_ARG_I:
-            emit_movl_r_m(jit_info->native_ptr, emit_EAX,
-                    &interpreter->ctx.int_reg.registers[p1]);
+            jit_emit_mov_mr_i(jit_info->native_ptr,
+                    &interpreter->ctx.int_reg.registers[p1], emit_EAX);
             break;
         case PARROT_ARG_S:
-            emit_movl_r_m(jit_info->native_ptr, emit_EAX,
-                    &interpreter->ctx.string_reg.registers[p1]);
+            jit_emit_mov_mr_i(jit_info->native_ptr,
+                    &interpreter->ctx.string_reg.registers[p1], emit_EAX);
             break;
         case PARROT_ARG_P:
-            emit_movl_r_m(jit_info->native_ptr, emit_EAX,
-                    &interpreter->ctx.pmc_reg.registers[p1]);
+            jit_emit_mov_mr_i(jit_info->native_ptr,
+                    &interpreter->ctx.pmc_reg.registers[p1], emit_EAX);
             break;
         case PARROT_ARG_N:
             /* pop num from st(0) and mov to reg */
@@ -1240,8 +1240,8 @@ Parrot_jit_vtable_newp_ic_op(Parrot_jit_info_t *jit_info,
     jit_info->arena.fixups->param.fptr = (void (*)(void))pmc_new_noinit;
     emitm_calll(jit_info->native_ptr, 0xdeafc0de);
     /* result = eax = PMC */
-    emit_movl_r_m(jit_info->native_ptr, emit_EAX,
-            &interpreter->ctx.pmc_reg.registers[p1]);
+    jit_emit_mov_mr_i(jit_info->native_ptr,
+            &interpreter->ctx.pmc_reg.registers[p1], emit_EAX);
     emit_pushl_r(jit_info->native_ptr, emit_EAX);
     /* push interpreter */
     emitm_pushl_i(jit_info->native_ptr, interpreter);
@@ -1308,7 +1308,7 @@ Parrot_jit_load_registers(Parrot_jit_info_t *jit_info,
 
     for (i = sect->int_registers_used-1; i >= 0; --i)
         if (sect->int_reg_dir[sect->int_reg_usage[i]] & PARROT_ARGDIR_IN)
-            emit_movl_m_r(jit_info->native_ptr, jit_info->intval_map[i],
+            jit_emit_mov_rm_i(jit_info->native_ptr, jit_info->intval_map[i],
                &interpreter->ctx.int_reg.registers[sect->int_reg_usage[i]]);
 
     /* The total size of the loads */
@@ -1329,8 +1329,9 @@ Parrot_jit_save_registers(Parrot_jit_info_t *jit_info,
 
     for (i = sect->int_registers_used-1; i >= 0; --i)
         if (sect->int_reg_dir[sect->int_reg_usage[i]] & PARROT_ARGDIR_OUT)
-            emit_movl_r_m(jit_info->native_ptr, jit_info->intval_map[i],
-                &interpreter->ctx.int_reg.registers[sect->int_reg_usage[i]]);
+            jit_emit_mov_mr_i(jit_info->native_ptr,
+                &interpreter->ctx.int_reg.registers[sect->int_reg_usage[i]],
+                    jit_info->intval_map[i]);
 }
 
 #else /* JIT_EMIT */
