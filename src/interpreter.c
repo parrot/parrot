@@ -900,6 +900,9 @@ Parrot_really_destroy(int exit_code, void *vinterp)
         mem_sys_free(stash);
         stash = next_stash;
     }
+    /* free vtables */
+    for (i = 1; i < (int)enum_class_max; i++)
+        Parrot_destroy_vtable(interpreter, Parrot_base_vtables[i]);
 
     if (interpreter->profile)
         mem_sys_free(interpreter->profile);
