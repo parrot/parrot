@@ -49,48 +49,49 @@
      ENDCLASS = 272,
      SYM = 273,
      LOCAL = 274,
-     PARAM = 275,
-     INC = 276,
-     DEC = 277,
-     SHIFT_LEFT = 278,
-     SHIFT_RIGHT = 279,
-     INTV = 280,
-     FLOATV = 281,
-     STRINGV = 282,
-     DEFINED = 283,
-     LOG_XOR = 284,
-     RELOP_EQ = 285,
-     RELOP_NE = 286,
-     RELOP_GT = 287,
-     RELOP_GTE = 288,
-     RELOP_LT = 289,
-     RELOP_LTE = 290,
-     GLOBAL = 291,
-     ADDR = 292,
-     CLONE = 293,
-     RESULT = 294,
-     RETURN = 295,
-     POW = 296,
-     SHIFT_RIGHT_U = 297,
-     LOG_AND = 298,
-     LOG_OR = 299,
-     COMMA = 300,
-     ESUB = 301,
-     LABEL = 302,
-     EMIT = 303,
-     EOM = 304,
-     IREG = 305,
-     NREG = 306,
-     SREG = 307,
-     PREG = 308,
-     IDENTIFIER = 309,
-     STRINGC = 310,
-     INTC = 311,
-     FLOATC = 312,
-     REG = 313,
-     MACRO = 314,
-     PARROT_OP = 315,
-     VAR = 316
+     CONST = 275,
+     PARAM = 276,
+     INC = 277,
+     DEC = 278,
+     SHIFT_LEFT = 279,
+     SHIFT_RIGHT = 280,
+     INTV = 281,
+     FLOATV = 282,
+     STRINGV = 283,
+     DEFINED = 284,
+     LOG_XOR = 285,
+     RELOP_EQ = 286,
+     RELOP_NE = 287,
+     RELOP_GT = 288,
+     RELOP_GTE = 289,
+     RELOP_LT = 290,
+     RELOP_LTE = 291,
+     GLOBAL = 292,
+     ADDR = 293,
+     CLONE = 294,
+     RESULT = 295,
+     RETURN = 296,
+     POW = 297,
+     SHIFT_RIGHT_U = 298,
+     LOG_AND = 299,
+     LOG_OR = 300,
+     COMMA = 301,
+     ESUB = 302,
+     LABEL = 303,
+     EMIT = 304,
+     EOM = 305,
+     IREG = 306,
+     NREG = 307,
+     SREG = 308,
+     PREG = 309,
+     IDENTIFIER = 310,
+     STRINGC = 311,
+     INTC = 312,
+     FLOATC = 313,
+     REG = 314,
+     MACRO = 315,
+     PARROT_OP = 316,
+     VAR = 317
    };
 #endif
 #define CALL 258
@@ -110,48 +111,49 @@
 #define ENDCLASS 272
 #define SYM 273
 #define LOCAL 274
-#define PARAM 275
-#define INC 276
-#define DEC 277
-#define SHIFT_LEFT 278
-#define SHIFT_RIGHT 279
-#define INTV 280
-#define FLOATV 281
-#define STRINGV 282
-#define DEFINED 283
-#define LOG_XOR 284
-#define RELOP_EQ 285
-#define RELOP_NE 286
-#define RELOP_GT 287
-#define RELOP_GTE 288
-#define RELOP_LT 289
-#define RELOP_LTE 290
-#define GLOBAL 291
-#define ADDR 292
-#define CLONE 293
-#define RESULT 294
-#define RETURN 295
-#define POW 296
-#define SHIFT_RIGHT_U 297
-#define LOG_AND 298
-#define LOG_OR 299
-#define COMMA 300
-#define ESUB 301
-#define LABEL 302
-#define EMIT 303
-#define EOM 304
-#define IREG 305
-#define NREG 306
-#define SREG 307
-#define PREG 308
-#define IDENTIFIER 309
-#define STRINGC 310
-#define INTC 311
-#define FLOATC 312
-#define REG 313
-#define MACRO 314
-#define PARROT_OP 315
-#define VAR 316
+#define CONST 275
+#define PARAM 276
+#define INC 277
+#define DEC 278
+#define SHIFT_LEFT 279
+#define SHIFT_RIGHT 280
+#define INTV 281
+#define FLOATV 282
+#define STRINGV 283
+#define DEFINED 284
+#define LOG_XOR 285
+#define RELOP_EQ 286
+#define RELOP_NE 287
+#define RELOP_GT 288
+#define RELOP_GTE 289
+#define RELOP_LT 290
+#define RELOP_LTE 291
+#define GLOBAL 292
+#define ADDR 293
+#define CLONE 294
+#define RESULT 295
+#define RETURN 296
+#define POW 297
+#define SHIFT_RIGHT_U 298
+#define LOG_AND 299
+#define LOG_OR 300
+#define COMMA 301
+#define ESUB 302
+#define LABEL 303
+#define EMIT 304
+#define EOM 305
+#define IREG 306
+#define NREG 307
+#define SREG 308
+#define PREG 309
+#define IDENTIFIER 310
+#define STRINGC 311
+#define INTC 312
+#define FLOATC 313
+#define REG 314
+#define MACRO 315
+#define PARROT_OP 316
+#define VAR 317
 
 
 
@@ -165,7 +167,7 @@ typedef union {
     Instruction *i;
 } yystype;
 /* Line 1281 of /usr/share/bison/yacc.c.  */
-#line 169 "imcparser.h"
+#line 171 "imcparser.h"
 # define YYSTYPE yystype
 #endif
 
