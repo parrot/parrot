@@ -195,12 +195,19 @@ inline op isle(out INT, in PMC, in PMC) {
 
 =item B<islt>(out INT, in PMC, in PMC)
 
+=item B<islt>(out INT, in INT, in INT)
+
 Sets $1 to 1 if $2 is less than $3
 
 =cut
 
 inline op islt(out INT, in PMC, in PMC) {
   $1 = (mmd_dispatch_i_pp(interpreter, $2, $3, MMD_CMP) < 0);
+  goto NEXT();
+}
+
+inline op islt(out INT, in INT, in INT) {
+  $1 = ($2 < $3) ? 1 : 0;
   goto NEXT();
 }
 
