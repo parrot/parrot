@@ -80,7 +80,7 @@ Close file opened on file descriptor $1.
 =cut
 
 inline op close(inout INT) {
-  fclose((FILE *)$1);
+  fclose(OPCODE_T2PTR(FILE *,$1));
   goto NEXT();
 }
 
@@ -123,7 +123,7 @@ descriptor into $1.
 =cut
 
 inline op open(out INT, in STR) {
-  $1 = (INTVAL)fopen(string_to_cstring(interpreter, ($2)), "r+");
+  $1 = PTR2OPCODE_T(fopen(string_to_cstring(interpreter, ($2)), "r+"));
   if (!$1) {
     perror("Can't open");
     exit(1);
@@ -133,7 +133,7 @@ inline op open(out INT, in STR) {
 }
 
 inline op open(out INT, in STR, in STR) {
-  $1 = (INTVAL)fopen(string_to_cstring(interpreter, ($2)), string_to_cstring(interpreter, ($3)));
+  $1 = PTR2OPCODE_T(fopen(string_to_cstring(interpreter, ($2)), string_to_cstring(interpreter, ($3))));
   goto NEXT();
 }
 
@@ -161,7 +161,7 @@ inline op readline(out STR, in INT) {
                 break;
 	case 2: file = stderr; 
                 break;
-	default: file = (FILE *)$2;
+	default: file = OPCODE_T2PTR(FILE *, $2);
   }
 
   $1 = string_make(interpreter, NULL, 65535, NULL, 0, NULL);
@@ -263,7 +263,7 @@ op print(in INT, in INT) {
                 break;
 	case 2: file = stderr; 
                 break;
-	default: file = (FILE *)$1;
+	default: file = OPCODE_T2PTR(FILE *, $1);
   }
   fprintf(file, INTVAL_FMT, (INTVAL)$2);
   goto NEXT();
@@ -278,7 +278,7 @@ op print(in INT, in NUM) {
                 break;
 	case 2: file = stderr; 
                 break;
-	default: file = (FILE *)$1;
+	default: file = OPCODE_T2PTR(FILE *, $1);
   }
   fprintf(file, FLOATVAL_FMT, $2);
   goto NEXT();
@@ -294,7 +294,7 @@ op print(in INT, in STR) {
                 break;
 	case 2: file = stderr; 
                 break;
-	default: file = (FILE *)$1;
+	default: file = OPCODE_T2PTR(FILE *, $1);
   }
   if (s && string_length(s)) {
     fprintf(file, "%s", string_to_cstring(interpreter, (s)));
@@ -313,7 +313,7 @@ op print(in INT, in PMC) {
                 break;
 	case 2: file = stderr; 
                 break;
-	default: file = (FILE *)$1;
+	default: file = OPCODE_T2PTR(FILE *, $1);
   }
   if (s) {
     fprintf(file, "%s", string_to_cstring(interpreter, (s)));
@@ -461,7 +461,7 @@ Sets register $1 to the current address plus the offset $2.
 =cut
 
 inline op set_addr(out INT, in INT) {
-  $1 = (INTVAL) (CUR_OPCODE + $2);
+  $1 = PTR2OPCODE_T(CUR_OPCODE + $2);
   goto NEXT();
 }
 
@@ -3597,8 +3597,10 @@ location onto the call stack for later returning.
 =cut
 
 inline op jsr(in INT) {
+  opcode_t * loc;
   stack_push(interpreter, &interpreter->ctx.control_stack, expr NEXT(),  STACK_ENTRY_DESTINATION, STACK_CLEANUP_NULL);
-  goto ADDRESS($1);
+  loc = INTVAL2PTR(opcode_t *, $1);
+  goto ADDRESS(loc);
 }
 
 
@@ -3611,7 +3613,9 @@ Jump to the address held in register $1.
 =cut
 
 inline op jump(in INT) {
-  goto ADDRESS($1);
+  opcode_t * loc;
+  loc = INTVAL2PTR(opcode_t *, $1);
+  goto ADDRESS(loc);
 }
 
 =back
@@ -3886,9 +3890,9 @@ Possible values for $3 are:
 
 inline op stringinfo(out INT, in STR, in INT) {
   switch ($3) {
-    case STRINGINFO_HEADER:   $1 = (UINTVAL)$2;
+    case STRINGINFO_HEADER:   $1 = PTR2UINTVAL($2);
                               break;
-    case STRINGINFO_BUFSTART: $1 = (UINTVAL)$2->bufstart;
+    case STRINGINFO_BUFSTART: $1 = PTR2UINTVAL($2->bufstart);
                               break;
     case STRINGINFO_BUFLEN:   $1 = $2->buflen;
                               break;
@@ -4194,7 +4198,6 @@ op dlfunc (out PMC, in PMC, in STR) {
   const char * name = string_to_cstring(interpreter, ($3));
   extern PMC * Parrot_new_csub(struct Parrot_Interp * ,
 			       void (*p)(Interp *, PMC *));
-
   void (*p)(Interp *, PMC *) = (void (*)(Interp *, PMC *))D2FPTR(Parrot_dlsym(
                                                 ($2)->data, name));
   if(p == NULL) {

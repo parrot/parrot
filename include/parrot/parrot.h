@@ -78,6 +78,46 @@ typedef struct PMC PMC;
 typedef void STRING_FUNCS;
 typedef void BIGNUM;
 
+/*  Casting between pointers and integers:  If pointers and integers
+    are the same size, then direct casting is fine.  If pointers and
+    integers are not the same size, then the compiler might complain.
+    Also, there's a possible loss of information in going from (for
+    example) a 64-bit integer to a 32-bit pointer.
+
+    These casts silence the warnings but do no limits checks.
+    Perhaps a different set should be defined (and only compiled if
+    explicitly Configured in) which do limits checks?
+    A. D. Aug. 6, 2002.
+*/
+#if (INTVAL_SIZE == PTR_SIZE) && (UINTVAL_SIZE == PTR_SIZE)
+#  define INTVAL2PTR(any,d)	(any)(d)
+#  define UINTVAL2PTR(any,d)	(any)(d)
+#else
+#  if PTR_SIZE == LONG_SIZE
+#    define INTVAL2PTR(any,d)	(any)(unsigned long)(d)
+#    define UINTVAL2PTR(any,d)	(any)(unsigned long)(d)
+#  else
+#    define INTVAL2PTR(any,d)	(any)(unsigned int)(d)
+#    define UINTVAL2PTR(any,d)	(any)(unsigned int)(d)
+#  endif
+#endif
+#define PTR2INTVAL(p)	INTVAL2PTR(INTVAL,p)
+#define PTR2UINTVAL(p)	UINTVAL2PTR(UINTVAL,p)
+
+/* Use similar macros for casting between pointers and opcode_t.
+   (We can't assume that sizeof(opcode_t) == sizeof(intval).
+*/
+#if (OPCODE_T_SIZE == PTR_SIZE)
+#  define OPCODE_T2PTR(any,d)	(any)(d)
+#else
+#  if PTR_SIZE == LONG_SIZE
+#    define OPCODE_T2PTR(any,d)	(any)(unsigned long)(d)
+#  else
+#    define OPCODE_T2PTR(any,d)	(any)(unsigned int)(d)
+#  endif
+#endif
+#define PTR2OPCODE_T(p)	OPCODE_T2PTR(opcode_t,p)
+
 /* define some shortcuts for dealing with function pointers */
 /* according to ANSI C, casting between function and non-function pointers is
  * no good.  So we should use "funcptr_t" in place of void* when dealing with
@@ -94,14 +134,8 @@ typedef void (*funcptr_t)(void);
  * that. The equivalent of C99's uintptr_t- a non-pointer data type that can 
  * hold a pointer.
  */
-#define D2FPTR(x) (funcptr_t)(UINTVAL) x
-#define F2DPTR(x) (void*)(UINTVAL)(funcptr_t) x
-
-/*
- * Macroized in case more complex casts required in some platforms.
- */
-#define PTR2INTVAL(p)   (INTVAL)(p)
-#define INTVAL2PTR(i,p) (p*)(i)
+#define D2FPTR(x) UINTVAL2PTR(funcptr_t, PTR2UINTVAL(x))
+#define F2DPTR(x) UINTVAL2PTR(void *, PTR2UINTVAL((funcptr_t) x))
 
 /* On Win32 we need the constant O_BINARY for open() (at least for Borland C), 
    but on UNIX it doesn't exist, so set it to 0 if it's not defined
