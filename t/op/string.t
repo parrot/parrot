@@ -1263,6 +1263,7 @@ LOOP:
       index I1, S1, S2, 50000
       print I1
       print "\n"
+      end
 CODE
 46368
 -1
