@@ -31,7 +31,7 @@ TEST_PROG = test_prog${exe}
 PDUMP = pdump${exe}
 
 .c$(O):
-	$(CC) $(CFLAGS) -o $@ -c $<
+	$(CC) $(CFLAGS) ${ld_out}$@ -c $<
 
 all : $(TEST_PROG) $(PDUMP) examples/assembly/mops${exe}
 

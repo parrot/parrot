@@ -6,7 +6,7 @@
 
 	if( $is_msvc ) {
 		$c{o} = '.obj';
-		$c{ld_out} = '-out:';
+		$c{ld_out} = '-Fo';
 		$c{cc_debug} = '-Zi';
 		$c{ld_debug} = '-debug';
 	}
