@@ -228,6 +228,68 @@ PIO_eof_down(theINTERP, ParrotIOLayer * layer, ParrotIO * io)
     return -1;
 }
 
+INTVAL
+PIO_poll_down(theINTERP, ParrotIOLayer *layer, ParrotIO *io,
+    INTVAL which, INTVAL sec, INTVAL usec)
+{
+    while (layer) {
+        if (layer->api->Poll) {
+            return layer->api->Poll(interpreter, layer, io, which, sec, usec);
+        }
+        layer = PIO_DOWNLAYER(layer);
+    }
+    return -1;
+}
+
+ParrotIO *
+PIO_socket_down(theINTERP, ParrotIOLayer *layer, INTVAL fam, INTVAL type, INTVAL proto)
+{
+    while (layer) {
+        if (layer->api->Socket) {
+            return layer->api->Socket(interpreter, layer, fam, type, proto);
+        }
+        layer = PIO_DOWNLAYER(layer);
+    }
+    return NULL;
+}
+
+INTVAL
+PIO_recv_down(theINTERP, ParrotIOLayer *layer, ParrotIO *io, STRING **buf)
+{
+    while (layer) {
+        if (layer->api->Recv) {
+            return layer->api->Recv(interpreter, layer, io, buf);
+        }
+        layer = PIO_DOWNLAYER(layer);
+    }
+    return -1;
+}
+
+INTVAL
+PIO_send_down(theINTERP, ParrotIOLayer *layer, ParrotIO *io, STRING *buf)
+{
+    while (layer) {
+        if (layer->api->Send) {
+            return layer->api->Send(interpreter, layer, io, buf);
+        }
+        layer = PIO_DOWNLAYER(layer);
+    }
+    return -1;
+}
+
+INTVAL
+PIO_connect_down(theINTERP, ParrotIOLayer *layer, ParrotIO *io, STRING *address)
+{
+    while (layer) {
+        if (layer->api->Connect) {
+            return layer->api->Connect(interpreter, layer, io, address);
+        }
+        layer = PIO_DOWNLAYER(layer);
+    }
+    return -1;
+}
+
+
 /*
  * Local variables:
  * c-indentation-style: bsd

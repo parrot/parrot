@@ -7,6 +7,7 @@
  *  Data Structure and Algorithms:
  *  History:
  *      Originally written by Melvin Smith
+ *      Refactored by Juergen Boemmels
  *      2003-08-18: Internal structures moved to io/io_private.h
  *  Notes:
  *  References:
@@ -203,6 +204,15 @@ struct _ParrotIOLayerAPI {
     INTVAL          (*Fill)(theINTERP, ParrotIOLayer * layer);
     INTVAL          (*Eof)(theINTERP, ParrotIOLayer * l,
                            ParrotIO * io);
+    /* Network API */
+    INTVAL          (*Poll)(theINTERP, ParrotIOLayer *l, ParrotIO *io,
+                            int which, int sec, int usec);
+    ParrotIO *      (*Socket)(theINTERP, ParrotIOLayer *,
+                            int dom, int type, int proto);
+    INTVAL          (*Connect)(theINTERP, ParrotIOLayer *, ParrotIO *,
+                            STRING *);
+    INTVAL          (*Send)(theINTERP, ParrotIOLayer *, ParrotIO *, STRING *);
+    INTVAL          (*Recv)(theINTERP, ParrotIOLayer *, ParrotIO *, STRING **);
 };
 
 /* these are defined rather than using NULL because strictly-speaking, ANSI C
@@ -226,9 +236,9 @@ struct _ParrotIOLayerAPI {
 #define PIO_null_setlinebuf (INTVAL (*)(theINTERP, ParrotIOLayer *, ParrotIO *))0
 #define PIO_null_getcount (INTVAL (*)(theINTERP, ParrotIOLayer *))0
 #define PIO_null_fill (INTVAL (*)(theINTERP, ParrotIOLayer *))0
-#define PIO_null_puts (INTVAL (*)(theINTERP, ParrotIOLayer *, ParrotIO *, const char *))0
-#define PIO_null_gets (INTVAL (*)(theINTERP, ParrotIOLayer *, ParrotIO *, char *, INTVAL))0
 #define PIO_null_eof (INTVAL (*)(theINTERP, ParrotIOLayer *, ParrotIO *))0
+#define PIO_null_socket (ParrotIO * (*)(theINTERP, ParrotIOLayer *, int, int, int))0
+
 
 extern INTVAL pio_errno;
 
@@ -264,6 +274,12 @@ extern INTVAL PIO_puts(theINTERP, PMC *, const char *);
 extern INTVAL PIO_seek(theINTERP, PMC *, PIOOFF_T offset, INTVAL whence);
 extern INTVAL PIO_eof(theINTERP, PMC *);
 extern INTVAL PIO_pioctl(theINTERP, PMC *, INTVAL cmd, INTVAL arg);
+extern INTVAL PIO_poll(theINTERP, PMC *pmc, INTVAL which, INTVAL sec, INTVAL usec);
+extern PMC *PIO_socket(theINTERP, INTVAL fam, INTVAL type, INTVAL proto);
+extern INTVAL PIO_recv(theINTERP, PMC *pmc, STRING **buf);
+extern INTVAL PIO_send(theINTERP, PMC *pmc, STRING *buf);
+extern INTVAL PIO_connect(theINTERP, PMC *pmc, STRING *address);
+
 
 extern INTVAL PIO_putps(theINTERP, PMC *io, STRING *s);
 extern INTVAL PIO_fprintf(theINTERP, PMC *io, const char *s, ...);
@@ -277,20 +293,25 @@ extern void Parrot_IOData_mark(theINTERP, ParrotIOData *piodata);
 /* Put platform specific macros here if you must */
 #ifdef PIO_OS_WIN32
 extern INTVAL           PIO_win32_isatty(PIOHANDLE fd);
-#  define PIO_isatty(x)   PIO_win32_isatty(x)
+extern STRING          *PIO_sockaddr_in(theINTERP, unsigned short, STRING *);
 extern INTVAL           PIO_win32_getblksize(PIOHANDLE fd);
+#  define PIO_isatty(x)   PIO_win32_isatty(x)
 #  define PIO_getblksize(x)   PIO_win32_getblksize(x)
 #endif
+
 #ifdef PIO_OS_UNIX
 extern INTVAL           PIO_unix_isatty(PIOHANDLE fd);
-#  define PIO_isatty(x)   PIO_unix_isatty(x)
+extern STRING          *PIO_sockaddr_in(theINTERP, unsigned short, STRING *);
 extern INTVAL           PIO_unix_getblksize(PIOHANDLE fd);
+#  define PIO_isatty(x)   PIO_unix_isatty(x)
 #  define PIO_getblksize(x)   PIO_unix_getblksize(x)
 #endif
+
 #ifdef PIO_OS_STDIO
 extern INTVAL           PIO_stdio_isatty(PIOHANDLE fd);
-#  define PIO_isatty(x)   PIO_stdio_isatty(x)
 extern INTVAL           PIO_stdio_getblksize(PIOHANDLE fd);
+#  define PIO_isatty(x)   PIO_stdio_isatty(x)
+#  define PIO_sockaddr_in(i,p,a)
 #  define PIO_getblksize(x)   PIO_stdio_getblksize(x)
 #endif
 

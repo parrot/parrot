@@ -843,6 +843,54 @@ PIO_make_offset_pmc(theINTERP, PMC *pmc)
 }
 
 /*
+ * Networking API
+ */
+
+INTVAL
+PIO_poll(theINTERP, PMC *pmc, INTVAL which, INTVAL sec, INTVAL usec)
+{
+    ParrotIOLayer *l = pmc->cache.struct_val;
+    ParrotIO *io = PMC_data(pmc);
+    return PIO_poll_down(interpreter, l, io, which, sec, usec);
+}
+
+PMC *
+PIO_socket(theINTERP, INTVAL fam, INTVAL type, INTVAL proto)
+{
+    ParrotIO *io;
+    ParrotIOLayer *l = GET_INTERP_IO(interpreter);
+    io = PIO_socket_down(interpreter, l, fam, type, proto);
+    if(io)
+        return new_io_pmc(interpreter, io);
+    return NULL;
+}
+
+INTVAL
+PIO_recv(theINTERP, PMC *pmc, STRING **buf)
+{
+    ParrotIOLayer *l = pmc->cache.struct_val;
+    ParrotIO *io = PMC_data(pmc);
+    return PIO_recv_down(interpreter, l, io, buf);
+}
+
+INTVAL
+PIO_send(theINTERP, PMC *pmc, STRING *buf)
+{
+    ParrotIOLayer *l = pmc->cache.struct_val;
+    ParrotIO *io = PMC_data(pmc);
+    return PIO_send_down(interpreter, l, io, buf);
+}
+
+INTVAL
+PIO_connect(theINTERP, PMC *pmc, STRING *address)
+{
+    ParrotIOLayer *l = pmc->cache.struct_val;
+    ParrotIO *io = PMC_data(pmc);
+    return PIO_connect_down(interpreter, l, io, address);
+}
+
+
+/*
  * Local variables:
  * c-indentation-style: bsd
  * c-basic-offset: 4

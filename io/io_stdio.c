@@ -286,7 +286,12 @@ ParrotIOLayerAPI pio_stdio_layer_api = {
     PIO_null_setlinebuf,
     PIO_null_getcount,
     PIO_null_fill,
-    PIO_null_eof
+    PIO_null_eof,
+    0, /* no poll */
+    0, /* no socket */
+    0, /* no connect */
+    0, /* no send */
+    0 /* no recv */
 };
 
 #endif /* PIO_OS_STDIO */

@@ -6,6 +6,8 @@
  *      Internal Details of the Parrot IO subsystem
  *  Data Structure and Algorithms:
  *  History:
+ *      Originally written by Melvin Smith
+ *      Refactored by Juergen Boemmels
  *      Internal Definitions moved from include/parrot/io.h
  *  Notes:
  *      TODO: move the Layer structure to here also
@@ -20,8 +22,16 @@
 
 #define PARROT_IN_IO 1
 #define PARROT_ASYNC_DEVEL 0
+#define PARROT_NET_DEVEL 0
 
 #include <parrot/io.h>
+
+#if PARROT_NET_DEVEL
+/* XXX: Parrot config is currently not probing for all headers so
+ * I'm sticking here rather than parrot.h
+ */
+#include <sys/socket.h>
+#endif
 
 /* IO object flags */
 #define PIO_F_READ      00000001
@@ -61,6 +71,7 @@ struct _ParrotIOBuf {
 
 struct _ParrotIO {
     PIOHANDLE fd;               /* Low level OS descriptor      */
+    PIOHANDLE fd2;              /* For pipes we need 2nd handle */ 
     INTVAL mode;                /* Read/Write/etc.              */
     INTVAL flags;               /* Da flags                     */
     PIOOFF_T fsize;             /* Current file size            */
@@ -69,7 +80,10 @@ struct _ParrotIO {
     ParrotIOBuf b;              /* Buffer structure             */
     ParrotIOLayer *stack;
     INTVAL recsep;              /* Record Separator             */
-
+#if PARROT_NET_DEVEL
+    struct sockaddr_in local;
+    struct sockaddr_in remote;
+#endif
     /* ParrotIOFilter * filters; */
 };
 
@@ -115,6 +129,13 @@ INTVAL    PIO_setbuf_down(theINTERP, ParrotIOLayer * layer, ParrotIO * io,
                           size_t bufsize);
 INTVAL    PIO_setlinebuf_down(theINTERP, ParrotIOLayer * layer, ParrotIO * io);
 INTVAL    PIO_eof_down(theINTERP, ParrotIOLayer * layer, ParrotIO * io);
+INTVAL    PIO_poll_down(theINTERP, ParrotIOLayer * layer, ParrotIO *io,
+                        INTVAL which, INTVAL sec, INTVAL usec);
+ParrotIO *PIO_socket_down(theINTERP, ParrotIOLayer *layer, INTVAL fam,
+                          INTVAL type, INTVAL proto);
+INTVAL    PIO_recv_down(theINTERP, ParrotIOLayer *layer, ParrotIO *io, STRING **buf);
+INTVAL    PIO_send_down(theINTERP, ParrotIOLayer *layer, ParrotIO *io, STRING *buf);
+INTVAL    PIO_connect_down(theINTERP, ParrotIOLayer *layer, ParrotIO *io, STRING *address);
 
 
 #endif /* !defined(PARROT_IO_PRIVATE_H_GUARD) */

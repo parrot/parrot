@@ -340,6 +340,32 @@ PIO_win32_tell(theINTERP, ParrotIOLayer *l, ParrotIO *io)
 }
 
 
+/*
+ * PIO_sockaddr_in is not part of the layer and so must be extern
+ * XXX: We can probably just write our own routines (htons, inet_aton, etc.)
+ * and take this out of platform specific compilation
+ */
+STRING *
+PIO_sockaddr_in(theINTERP, unsigned short port, STRING * addr)
+{       
+#if 0
+    /* Not sure if this compiles on Win32 yet, rather not break things */
+
+    STRING * packed;
+    struct sockaddr_in sa;
+    /* XXX: Fixme, inet_addr obsolete, replace with inet_aton */
+    sa.sin_addr.s_addr =
+                inet_addr(string_to_cstring(interpreter, addr));
+    sa.sin_port = htons(port);
+    packed = string_make(interpreter, &sa, sizeof(struct sockaddr), NULL, 0,
+                                NULL);
+    if(!packed)
+        PANIC("unix_sockaddr: failed to create string");
+    return packed;
+#endif
+    return NULL;
+}   
+
 
 ParrotIOLayerAPI pio_win32_layer_api = {
     PIO_win32_init,
@@ -364,7 +390,12 @@ ParrotIOLayerAPI pio_win32_layer_api = {
     PIO_null_setlinebuf,
     PIO_null_getcount,
     PIO_null_fill,
-    PIO_null_eof
+    PIO_null_eof,
+    0, /* no poll */
+    0, /* no socket */
+    0, /* no connect */
+    0, /* no send */
+    0 /* no recv */
 };
 
 

@@ -420,6 +420,248 @@ PIO_unix_tell(theINTERP, ParrotIOLayer *l, ParrotIO *io)
 
 
 
+/*
+ * These could be native extensions but they probably should be
+ * here if we wish to make them integrated with the async IO system.
+ */
+
+
+/*
+ *  Networking Section of IO Layer
+ *  Very minimal stubs for now, maybe someone will run with these.
+ */
+
+
+/*
+ * PIO_sockaddr_in is not part of the layer and so must be extern
+ * XXX: We can probably just write our own routines (htons, inet_aton, etc.) 
+ * and take this out of platform specific compilation
+ */
+STRING *
+PIO_sockaddr_in(theINTERP, unsigned short port, STRING * addr)
+{
+    STRING * packed;
+    struct sockaddr_in sa;
+    /* XXX: Fixme, inet_addr obsolete, replace with inet_aton */
+    sa.sin_addr.s_addr =
+                inet_addr(string_to_cstring(interpreter, addr));
+    sa.sin_port = htons(port);
+
+    fprintf(stderr, "sockaddr_in: port %d\n", port);
+    packed = string_make(interpreter, &sa, sizeof(struct sockaddr), NULL, 0,
+                                NULL);
+    if(!packed)
+        PANIC("unix_sockaddr: failed to create string");
+    return packed;
+}
+
+#if PARROT_NET_DEVEL
+
+
+static ParrotIO *
+PIO_unix_socket(theINTERP, ParrotIOLayer *layer, int fam, int type, int proto)
+{
+    int sock;
+    ParrotIO * io;
+    if((sock = socket(fam, type, proto)) >= 0) {
+        io = PIO_new(interpreter, PIO_F_SOCKET, 0, PIO_F_READ|PIO_F_WRITE);
+        io->fd = sock;
+        io->remote.sin_family = fam;
+        fprintf(stderr, "socket: fd = %d\n", sock);
+        return io;
+    }
+    perror("socket:");
+    return 0;
+}
+
+static INTVAL
+PIO_unix_connect(theINTERP, ParrotIOLayer *layer, ParrotIO *io, STRING *r)
+{
+    if(r) {
+        struct sockaddr_in sa;
+        memcpy(&sa, r->bufstart, sizeof(struct sockaddr));
+        io->remote.sin_addr.s_addr = sa.sin_addr.s_addr;
+        io->remote.sin_port = sa.sin_port;
+    }
+AGAIN:
+    fprintf(stderr, "connect: fd = %d port = %d\n", io->fd, ntohs(io->remote.sin_port));
+    if((connect(io->fd, (struct sockaddr*)&io->remote,
+                   sizeof(struct sockaddr))) != 0) {
+        switch(errno) {
+            case EINTR:        goto AGAIN;
+            case EINPROGRESS:  goto AGAIN;
+            case EISCONN:      return 0;
+            case EINVAL:
+            default:           perror("connect:"); return -1;
+        }
+    }
+
+    return 0;
+}
+
+
+static INTVAL
+PIO_unix_send(theINTERP, ParrotIOLayer *layer, ParrotIO * io, STRING *s)
+{
+    int error, bytes, byteswrote, maxwrite;
+    bytes = string_length(s);
+    byteswrote = 0;
+    maxwrite = 2048;
+AGAIN:
+    /*
+     * Ignore encoding issues for now.
+     */
+    if((error = send(io->fd, (char *)s->bufstart + byteswrote,
+                            s->buflen, 0)) >= 0) {
+        byteswrote += error;
+        if(byteswrote >= bytes) {
+            return byteswrote;
+        }
+        else if(bytes - byteswrote < maxwrite) {
+            maxwrite = bytes - byteswrote;
+        }
+        goto AGAIN;
+    }
+    else {
+        switch(errno) {
+            case EINTR:        goto AGAIN;
+#ifdef EWOULDBLOCK
+            case EWOULDBLOCK:  goto AGAIN;
+#else
+            case EAGAIN:       goto AGAIN;
+#endif
+            case EPIPE:        close(io->fd);
+                               return -1;
+            default:           return -1;
+        }
+    }
+}
+
+static INTVAL
+PIO_unix_recv(theINTERP, ParrotIOLayer *layer, ParrotIO * io, STRING **s)
+{
+    int error;
+    unsigned int bytesread = 0;
+    char buf[2048+1];
+AGAIN:
+    if((error = recv(io->fd, buf, 2048, 0)) >= 0) {
+        if(error > 0)
+            bytesread += error;
+        else {
+            close(io->fd);
+        }
+        *s = string_make(interpreter, buf, bytesread + 1, NULL, 0, NULL);
+        if(!*s) {
+            PANIC("PIO_recv: Failed to allocate string");
+        }
+        return bytesread;
+    } else {
+        switch(errno) {
+            case EINTR:        goto AGAIN;
+#ifdef EWOULDBLOCK
+            case EWOULDBLOCK:  goto AGAIN;
+#else
+            case EGAIN:        goto AGAIN;
+#endif
+            case ECONNRESET:   close(io->fd);
+                               return -1;
+            default:           close(io->fd);
+                               return -1;
+        }
+    }
+}
+
+
+/*
+ * Utility function for polling a single IO stream with a timeout.
+ * Returns 1 | 2 | 4 (read, write, error) value
+ * This is not equivalent to any speficic POSIX or BSD Socket
+ * call, however it is a useful, common primitive.
+ * Also, a buffering layer above this may choose to reimpliment
+ * by checking the read buffer.
+ */
+static INTVAL
+PIO_unix_poll(theINTERP, ParrotIOLayer *l, ParrotIO *io, int which,
+               int sec, int usec)
+{
+    int n;
+    fd_set r, w, e;
+    struct timeval t;
+    t.tv_sec = sec;
+    t.tv_usec = usec;
+    FD_ZERO(&r); FD_ZERO(&w); FD_ZERO(&e);
+    /* These should be defined in header */
+    if(which & 1) FD_SET(io->fd, &r);
+    if(which & 2) FD_SET(io->fd, &w);
+    if(which & 4) FD_SET(io->fd, &e);
+AGAIN:
+    if((select(io->fd+1, &r, &w, &e, &t)) >= 0) {
+        n = (FD_ISSET(io->fd, &r) ? 1 : 0);
+        n |= (FD_ISSET(io->fd, &w) ? 2 : 0);
+        n |= (FD_ISSET(io->fd, &e) ? 4 : 0);
+        return n;
+    }
+    else {
+        switch(errno) {
+            case EINTR:        goto AGAIN;
+            default:           return -1;
+        }
+    }
+}
+
+/*
+ * Very limited exec for now.
+ * XXX: Where does this fit, should it belong in the ParrotIOLayerAPI?
+ */
+static ParrotIO *
+PIO_unix_pipe(theINTERP, ParrotIOLayer *l, STRING *cmd, int flags)
+{
+#if defined (linux) || defined (solaris)
+    ParrotIO *io;
+    int pid, err, fds[2];
+    char *ccmd = string_to_cstring(interpreter, cmd);
+
+    if((err = pipe(fds)) < 0) {
+        perror("pipe:");
+        return NULL;
+    }
+
+    /* Parent - return IO stream */
+    if((pid = fork()) > 0) {
+        io = PIO_new(interpreter, PIO_F_PIPE, 0, PIO_F_READ|PIO_F_WRITE);
+        io->fd = fds[0];
+        io->fd2 = fds[1];
+        return io;
+    }
+
+    /* Child - exec process */
+    if(pid == 0) {
+        close(STDIN_FILENO);
+        close(STDOUT_FILENO);
+        close(STDERR_FILENO);
+        if( dup(fds[0]) != STDIN_FILENO || dup(fds[1]) != STDOUT_FILENO
+               || dup(fds[1]) != STDERR_FILENO )
+        {
+            exit(0);
+        }
+
+        execl(ccmd, ccmd, (char*)0);
+        /* Will never reach this unless exec fails. */
+        perror("execvp:");
+        return NULL;
+    }
+
+    perror("fork:");
+#endif
+    return NULL;
+}
+
+#endif
+
+
+
+
+
 ParrotIOLayerAPI pio_unix_layer_api = {
     PIO_unix_init,
     PIO_base_new_layer,
@@ -443,7 +685,20 @@ ParrotIOLayerAPI pio_unix_layer_api = {
     PIO_null_setlinebuf,
     PIO_null_getcount,
     PIO_null_fill,
-    PIO_null_eof
+    PIO_null_eof,
+#if PARROT_NET_DEVEL
+    PIO_unix_poll,
+    PIO_unix_socket,
+    PIO_unix_connect,
+    PIO_unix_send,
+    PIO_unix_recv
+#else
+    0, /* no poll */
+    0, /* no socket */
+    0, /* no connect */
+    0, /* no send */
+    0 /* no recv */
+#endif
 };
 
 
