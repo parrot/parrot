@@ -9,7 +9,73 @@ virtual machine.
 
 =head1 DESCRIPTION
 
-No frills here, either, for now.
+Jako should be familiar to those who have seen C and Perl.
+
+=head2 LEXICAL STRUCTURE
+
+=over 4
+
+=item * Literals
+
+=over 4
+
+=item * Integers
+
+=over 4
+
+=item * Binary
+
+"0b" followed by any number of binary digits ("0" or "1").
+
+=item * Octal
+
+"0" followed by any number of octal digita ("0" to "7").
+
+=item * Decimal
+
+Starting with a non-zero decimal digit, with any number of decimal digits
+following. Optional prefixed "-" for negative integers.
+
+=item * Hexadecimal
+
+"0x" followed by any number of hexadecimal digits ("0" to "9", "a", "b", "c", "d", "e", or "f").
+
+=back
+
+=item * Numbers
+
+One or more decimal digits, a decimal point, and one ore more decimal digits.
+Optional prefixed "-" for negative numbers.
+
+=item * Strings
+
+A double-quote character, followed by the contents of the string, and another double-quote
+character. Inside the string literal, double quotes are to be escaped with "\" (back slash,
+a.k.a. "whack"). To include a back slash in the string, precede it with another back slash.
+
+=back
+
+=item * Identifiers
+
+Start with a letter, followed by any combination of letters, decimal digits and underscores.
+
+=back
+
+=head2 SYNTAX
+
+=head2 SEMANTICS
+
+=over 4
+
+=item * String interpolation
+
+An unescaped dollar sign ("$") in a string causes Jako to interpolate variables
+into a final string before the string is used in an expression. In case the
+text to follow the interpolated value starts with identifier characters that
+would interfere with the correct determination of the variable to interpolate,
+use the form "${...}".
+
+=back
 
 =head1 HISTORY
 
