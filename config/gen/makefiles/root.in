@@ -385,11 +385,11 @@ jit_debug$(O) : $(GENERAL_H_FILES) ${jit_h}
 
 jit_cpu$(O): $(GENERAL_H_FILES) ${jit_h} $(INC)/jit_emit.h
 
-exec$(O) : $(GENERAL_H_FILES) ${exec_h} $(INC)/exec_dep.h ${jit_h} $(INC)/jit_emit.h
+exec$(O) : $(GENERAL_H_FILES) ${exec_h} ${jit_h} $(INC)/jit_emit.h
 
-exec_cpu$(O): $(GENERAL_H_FILES) ${exec_h} $(INC)/exec_dep.h ${jit_h} $(INC)/jit_emit.h
+exec_cpu$(O): $(GENERAL_H_FILES) ${exec_h} ${jit_h} $(INC)/jit_emit.h
 
-exec_start$(O) : $(GENERAL_H_FILES) ${exec_h} $(INC)/exec_dep.h
+exec_start$(O) : $(GENERAL_H_FILES) ${exec_h}
 
 exec_save$(O) : $(GENERAL_H_FILES) ${exec_h}
 
