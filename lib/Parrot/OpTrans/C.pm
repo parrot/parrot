@@ -28,7 +28,7 @@ END
 
 sub gen_goto {
     my ($self, $where_str) = @_;
-    return "return $where_str";
+    return "return (opcode_t *)$where_str";
 }
 
 sub expr_address {

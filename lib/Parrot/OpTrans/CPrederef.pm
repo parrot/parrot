@@ -101,7 +101,7 @@ sub goto_offset {
 
 sub goto_address {
     my ($self, $addr) = @_;
-    return "return opcode_to_prederef(interpreter, $addr)";
+    return "return opcode_to_prederef(interpreter,  (opcode_t *)$addr)";
 }
 
 #
