@@ -34,33 +34,29 @@ void
 do_panic(struct Parrot_Interp *interpreter, const char *message,
          const char *file, int line)
 {
-    printf("Parrot VM: PANIC: %s!\n\
-C file %s, line %d\n\
-Parrot file %s, line %d\n\
-\n\
+    printf("Parrot VM: PANIC: %s!\n", message ? message : "(no message available)");
+    printf("C file %s, line %d\n", file ? file : "(file name not available)", line);
+    printf("Parrot file %s, ", "(not available)");
+    if (interpreter)
+        printf("line %d\n", interpreter->current_line);
+    else
+        printf("line ((not available)\n");
+    printf("\n\
 We highly suggest you notify the Parrot team if you have not been working on \n\
 Parrot.  Use bugs6.perl.org or send an e-mail to perl6-internals@perl.org.  \n\
 Include the entire text of this error message and the text of the script that \n\
 generated the error.  If you've made any modifications to Parrot, please \n\
-describe them as well.\n\
-\n\
-Version     : " PARROT_VERSION     "\n\
-Configured  : " PARROT_CONFIG_DATE "\n\
-Architecture: " PARROT_ARCHNAME    "\n\
-JIT Capable : %s\n\
-\n\
-Interp Flags: 0x%x\n\
-Exceptions  : (missing from core)\n\
-\n\
-Dumping core...\n\
-\n",
-        message, 
-        file, 
-        line, 
-        "(not available)", 
-        (int)interpreter->current_line, 
-        (JIT_CAPABLE ? "Yes" : "No"),
-        interpreter->flags);
+describe them as well.\n");
+    printf("Version     : %s\n", PARROT_VERSION);
+    printf("Configured  : %s\n", PARROT_CONFIG_DATE);
+    printf("Architecture: %s\n", PARROT_ARCHNAME);
+    printf("JIT Capable : %s\n", (JIT_CAPABLE ? "Yes" : "No"));
+    if (interpreter)
+        printf("Interp Flags: 0x%x\n", interpreter->flags);
+    else
+        printf("Interp Flags: (not available)\n");
+    printf("Exceptions  : (missing from core)\n");
+    printf("\nDumping core...\n\n");
     dumpcore();
 }  
 
