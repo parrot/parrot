@@ -375,22 +375,16 @@ ok 1
 ok 2
 OUTPUT
 
-SKIP: { skip("ne_i_nc_ic not added yet", 1);
-
 output_is(<<CODE, <<OUTPUT, "ne_n_nc_ic");
 	set	N0, 1073741824.0
 
-	# XXX: This should be just ne, but the assembler can't handler it
-	# at the moment.
-#	ne_n_nc_ic	N0, 1073741824.0, ERROR
 	ne	N0, 1073741824.0, ERROR
-        branch          ONE
+        branch  ONE
 	print	"bad\\n"
 
 ONE:
 	print	"ok 1\\n"
-#	ne_n_nc_ic	I0, 0.0, TWO
-	ne	I0, 0.0, TWO
+	ne	N0, 0.0, TWO
         branch  ERROR
 	print	"bad\\n"
 
@@ -405,7 +399,6 @@ CODE
 ok 1
 ok 2
 OUTPUT
-}
 
 output_is(<<CODE, <<OUTPUT, "lt_n_ic");
 	set	N0, 1000.0
