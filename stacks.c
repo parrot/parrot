@@ -149,7 +149,21 @@ stack_push(Interp *interpreter, Stack_chunk *stack_base,
            void *thing, Stack_entry_type type, Stack_cleanup_method cleanup)
 {
     Stack_chunk *chunk = stack_base->prev;
-    Stack_entry *entry = &chunk->entry[chunk->used];
+    Stack_entry *entry;
+
+    /* Do we need a new chunk? */
+    if (chunk->used == STACK_CHUNK_DEPTH) {
+        /* Need to add a new chunk */
+        Stack_chunk *new_chunk = mem_allocate_aligned(sizeof(Stack_chunk));
+        new_chunk->used = 0;
+        new_chunk->next = stack_base;
+        new_chunk->prev = chunk;
+        chunk->next = new_chunk;
+        stack_base->prev = new_chunk;
+        chunk = new_chunk;
+    }
+
+    entry = &chunk->entry[chunk->used];
 
     /* Remember the type */
     entry->entry_type = type;
@@ -185,16 +199,7 @@ stack_push(Interp *interpreter, Stack_chunk *stack_base,
             break;
     }
 
-    /* Register the new entry */
-    if (++chunk->used == STACK_CHUNK_DEPTH) {
-        /* Need to add a new chunk */
-        Stack_chunk *new_chunk = mem_allocate_aligned(sizeof(Stack_chunk));
-        new_chunk->used  = 0;
-        new_chunk->next  = stack_base;
-        new_chunk->prev  = chunk;
-        chunk->next      = new_chunk;
-        stack_base->prev = new_chunk;
-    }
+    chunk->used++;
 }
 
 /* Pop off an entry and return a pointer to the contents */
@@ -222,7 +227,10 @@ stack_pop(Interp *interpreter, Stack_chunk *stack_base,
         internal_exception(ERROR_STACK_EMPTY, "No entries on stack!\n");
     }
 
-    entry = &chunk->entry[chunk->used - 1];
+    /* Now decrement the SP */
+    chunk->used--;
+
+    entry = &chunk->entry[chunk->used];
 
     /* Types of 0 mean we don't care */
     if (type && entry->entry_type != type) {
@@ -234,9 +242,6 @@ stack_pop(Interp *interpreter, Stack_chunk *stack_base,
     if (entry->flags & STACK_ENTRY_CLEANUP_FLAG) {
         (*entry->cleanup)(entry);
     }
-
-    /* Now decrement the SP */
-    chunk->used--;
 
     /* Sometimes the caller doesn't care what the value was */
     if (where == NULL) {
