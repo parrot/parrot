@@ -29,25 +29,26 @@ sub pmc_parent {
     return $PMC_PARENTS{$pmc} = "default";
 }
 
-# Return an array of all 
+# Return an array of all
 sub pmc_parents {
     my ($pmc) = @_;
     my @parents = ($pmc);
     push @parents, pmc_parent($parents[-1]) until $parents[-1] eq 'default';
     shift(@parents);
+    push (@parents, 'perlhash') if ($pmc eq 'OrderedHash');
     return @parents;
 }
 
 sub runstep {
   my @pmc=(
-    sort 
+    sort
     map  { m{\./classes/(.*)} }
     glob "./classes/*.pmc"
   );
-  
-  
+
+
   my $pmc_list = $_[1] || join(' ', @pmc);
-  
+
   if($_[0]) {
   print <<"END";
 
@@ -70,9 +71,11 @@ END
 
       # make each pmc depend upon its parent.
       my $parent = pmc_parent($pmc).".pmc";
+      $parent = "perlhash.pmc $parent" if ($pmc eq 'orderedhash');
       my $parent_headers = '';
       $parent_headers .= "$_.h " foreach (pmc_parents($pmc));
       $pmc_build .= "$pmc.c $pmc.h: $parent $pmc.pmc\n";
+      $pmc_build .= "\t\$(PMC2C) perlhash.pmc\n" if ($pmc eq 'orderedhash');
       $pmc_build .= "\t\$(PMC2C) $pmc.pmc\n";
       $pmc_build .= "\n";
       $pmc_build .= "$pmc\$(O): \$(NONGEN_HEADERS) $parent_headers $pmc.h\n";
