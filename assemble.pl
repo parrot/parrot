@@ -68,11 +68,16 @@ my $listing="PARROT ASSEMBLY LISTING - ".scalar(localtime)."\n\n";
 
 
 
+
 # read source and assemble
 my $pc=0; my $op_pc=0;
-my ($bytecode,%label,%fixup,%constants,@constants,%equate);
+my ($bytecode,%label,%fixup,%constants,@constants);
 my (%local_label, %local_fixup, $last_label);
 my $line=0;
+my %equate=('*'=>sub { return $pc },
+	    '__DATE__'=>'"'.scalar(localtime).'"',
+	    '__VERSION__'=>'" $Revision$ "',
+	    '__LINE__' => sub { return $line });
 while(<>) {
     $line++;
     chomp;
@@ -150,7 +155,11 @@ while(<>) {
 	foreach (@args) {
 	    if(exists($equate{$_})) {
 		# substitute the equate value
-		$_=$equate{$_};
+		if(ref($equate{$_})) {
+		    $_=&{$equate{$_}};
+		} else {
+		    $_=$equate{$_};
+		}
 		s/\"([^\\\"]*(?:\\.[^\\\"]*)*)\"/constantize($1)/eg;
 	    }
 	    if(m/^([INPS])\d+$/) {
