@@ -41,8 +41,6 @@ B<Note:>  expect changes as there's lots of SDL wrapper yet to write.
 
 .include "datatypes.pasm"
 
-=cut
-
 =head1 FUNCTIONS
 
 This library provides the following functions:
@@ -112,8 +110,6 @@ This function returns a C<ManagedStruct> pmc.
 	.return screen
 	.pcc_end_return
 .end
-
-=cut
 
 =item _new_SDL_Rect()
 
@@ -192,8 +188,6 @@ For example:
 	.pcc_end_return
 .end
 
-=cut
-
 =item _new_SDL_Color( red, green, blue )
 
 Create and return an I<integer> representing an SDL Color.  All three arguments
@@ -228,8 +222,6 @@ behavior.
 	.pcc_end_return
 .end
 
-=cut
-
 =item _new_SDL_Image( filename )
 
 Create and return a new SDL Structure containing the named image.  This will
@@ -259,8 +251,6 @@ the returned PMC will be null, in whatever sense that makes sense to SDL.
 	.return image
 	.pcc_end_return
 .end
-
-=cut
 
 =back
 
