@@ -1856,7 +1856,7 @@ PDB_print_stack(struct Parrot_Interp *interpreter, const char *command)
                 PDB_print_stack_int(interpreter, command);
                 break;
             case c_n:
-            case c_next:
+            case c_num:
                 na(command);
                 PDB_print_stack_num(interpreter, command);
                 break;
