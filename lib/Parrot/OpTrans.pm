@@ -17,6 +17,10 @@ sub suffix { return ''; }
 sub opsarraytype { return 'opcode_t' };
 
 # Default implementation of the goto_X methods is gen_goto(expr_X())
+#
+sub core_type {
+    die "OpTrans::XX doesn't have core_type";
+}
 
 sub gen_goto {
     my ($self, $where_str) = @_;

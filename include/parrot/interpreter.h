@@ -33,6 +33,7 @@ typedef enum {
 /* &gen_from_enum(interpcores.pasm) */
 typedef enum {
     PARROT_SLOW_CORE,           /* slow bounds/trace/profile core */
+    PARROT_FUNCTION_CORE = PARROT_SLOW_CORE,
     PARROT_FAST_CORE,           /* fast DO_OP core */
     PARROT_PREDEREF_CORE,       /*  P   = prederefed */
     PARROT_SWITCH_CORE,         /*  P                */
@@ -274,6 +275,7 @@ void exec_init_prederef(struct Parrot_Interp *interpreter,
 void prepare_for_run(Parrot_Interp interpreter);
 void *init_jit(Parrot_Interp interpreter, opcode_t *pc);
 void dynop_register(Parrot_Interp interpreter, PMC* op_lib);
+void do_prederef(void **pc_prederef, Parrot_Interp interpreter, int type);
 
 #else
 

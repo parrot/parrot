@@ -20,6 +20,10 @@ use vars qw(@ISA);
 @ISA = qw(Parrot::OpTrans::CPrederef);
 
 
+sub core_type {
+    return 'PARROT_CGP_CORE';
+}
+
 #
 # suffix()
 #

@@ -15,6 +15,10 @@ use vars qw(@ISA);
 
 sub suffix { return "_cg"; }
 
+sub core_type {
+    return 'PARROT_CGOTO_CORE';
+}
+
 sub defines
 {
   return <<END;

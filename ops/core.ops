@@ -6,6 +6,8 @@
 #include "parrot/embed.h"
 #include "parrot/interp_guts.h"
 
+static op_lib_t op_lib;
+
 VERSION = PARROT_VERSION;
 
 =head1 NAME
@@ -81,6 +83,12 @@ Internal opcode to wrap unknown ops from loaded opcode libs.
 Don't use.
 (Must be op #5).
 
+=item B<prederef__>()
+
+Internal opcode to prederef opcodes on the fly.
+Don't use.
+(Must be op #6).
+
 =item B<load_bytecode>(in STR)
 
 Load Parrot bytecode from file $1, and (TODO) search the library path,
@@ -117,6 +125,11 @@ inline op wrapper__() {
     opcode_t *pc = CUR_OPCODE;
     DO_OP(pc, interpreter);
     goto ADDRESS(pc);
+}
+
+inline op prederef__() {
+    do_prederef((void**)cur_opcode, interpreter, op_lib.core_type);
+    goto OFFSET(0);
 }
 
 inline op reserved(in INT) {

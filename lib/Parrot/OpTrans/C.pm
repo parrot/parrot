@@ -13,6 +13,9 @@ use Parrot::OpTrans;
 use vars qw(@ISA %arg_maps);
 @ISA = qw(Parrot::OpTrans);
 
+sub core_type {
+    return 'PARROT_FUNCTION_CORE';
+}
 
 #
 # defines()

@@ -42,6 +42,7 @@ my $prefix  = $trans->prefix;
 my $suffix  = $trans->suffix;
 my $defines = $trans->defines;
 my $opsarraytype = $trans->opsarraytype;
+my $core_type = $trans->core_type;
 
 my $file = shift @ARGV;
 
@@ -577,14 +578,16 @@ print SOURCE <<END_C;
 */
 
 static op_lib_t op_lib = {
-  "$base",
-  $major_version,
-  $minor_version,
-  $patch_version,
-  $num_ops,
-  $op_info,
-  $op_func,
-  $getop
+  "$base",		/* name */
+  $core_type,	        /* core_type = PARROT_XX_CORE */
+  0,			/* flags */
+  $major_version,	/* major_version */
+  $minor_version,	/* minor_version */
+  $patch_version,	/* patch_version */
+  $num_ops,		/* op_count */
+  $op_info,		/* op_info_table */
+  $op_func,		/* op_func_table */
+  $getop		/* op_code() */
 };
 
 op_lib_t *

@@ -14,6 +14,10 @@ use vars qw(@ISA);
 use Parrot::OpTrans::C;
 @ISA = qw(Parrot::OpTrans::C);
 
+sub core_type {
+    return 'PARROT_PREDEREF_CORE';
+}
+
 
 #
 # defines()

@@ -19,6 +19,10 @@ use Parrot::OpTrans::CPrederef;
 use vars qw(@ISA);
 @ISA = qw(Parrot::OpTrans::CPrederef);
 
+sub core_type {
+    return 'PARROT_SWITCH_CORE';
+}
+
 
 #
 # suffix()

@@ -23,9 +23,11 @@
 
 typedef struct {
     const char *name;
-    INTVAL      major_version;
-    INTVAL      minor_version;
-    INTVAL      patch_version;
+    int      core_type;
+    int      flags;
+    int      major_version;
+    int      minor_version;
+    int      patch_version;
     size_t      op_count;
     op_info_t * op_info_table;
     void *      op_func_table;
