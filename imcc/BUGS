@@ -15,3 +15,8 @@ BUGS:
    from an identifier, because ops definition files are missing hints,
    which argument might really be a label.
    (Both "branch x" and "print x" are equivalent, basically)
+
+ - the parser doesn't like empty subs:
+   .sub _foo
+   .end
+   inserting a 'noop' helps.
