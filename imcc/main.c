@@ -413,7 +413,6 @@ main(int argc, char * argv[])
 {
     struct PackFile *pf;
     int obj_file, ast_file = 0;
-    Run_Cores core;
 
     Interp *interpreter = Parrot_new(NULL);
 
@@ -427,8 +426,6 @@ main(int argc, char * argv[])
     IMCC_ast_init(interpreter);
 
     sourcefile = parseflags(interpreter, &argc, &argv);
-    /* can't run JIT or prederefed yet */
-    core = interpreter->run_core;
     interpreter->run_core = 0;
 
     if (Interp_flags_TEST(interpreter, PARROT_PYTHON_MODE))
@@ -566,7 +563,6 @@ main(int argc, char * argv[])
     }
     if (run_pbc) {
 
-        interpreter->run_core = core;
         if (interpreter->imc_info->imcc_warn)
             PARROT_WARNINGS_on(interpreter, PARROT_WARNINGS_ALL_FLAG);
         else
