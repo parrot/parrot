@@ -621,6 +621,20 @@ add_const_key(Interp *interpreter, opcode_t key[],
     return k;
 }
 
+static char *
+slice_deb(int bits) {
+    if ((bits & VT_SLICE_BITS) == (VT_START_SLICE|VT_END_SLICE))
+        return "start+end";
+    if ((bits & VT_SLICE_BITS) == (VT_START_ZERO|VT_END_SLICE))
+        return "..end";
+    if ((bits & VT_SLICE_BITS) == (VT_START_SLICE|VT_END_INF))
+        return "start..";
+    if (bits & VT_START_SLICE)
+        return "start";
+    if (bits & VT_END_SLICE)
+        return "end";
+    return "";
+}
 /*
  * color is a parrot register number
  *       or a constant table index
@@ -642,6 +656,7 @@ build_key(Interp *interpreter, SymReg *reg)
     char *s;
     int k;
     SymReg * r;
+    int var_type, slice_bits;
 
     pc = key + 1;       /* 0 is length */
     s = s_key;          /* stringified key */
@@ -656,7 +671,9 @@ build_key(Interp *interpreter, SymReg *reg)
         /* if key is a register, the original sym is in r->reg */
         if (r->reg)
             r = r->reg;
-        switch (r->type) {
+        var_type = r->type & ~VT_SLICE_BITS;
+        slice_bits = r->type & VT_SLICE_BITS;
+        switch (var_type) {
             case VTIDENTIFIER:       /* P[S0] */
             case VTPASM:       /* P[S0] */
             case VTREG:        /* P[S0] */
@@ -672,8 +689,10 @@ build_key(Interp *interpreter, SymReg *reg)
                 else
                     *pc++ = r->color;
                 sprintf(s+strlen(s), "%c%d", r->set, (int)r->color);
-                debug(interpreter, DEBUG_PBC_CONST, " keypart reg %s %c%d\n",
-                        r->name, r->set, (int)r->color);
+                debug(interpreter, DEBUG_PBC_CONST,
+                        " keypart reg %s %c%d slice %s\n",
+                        r->name, r->set, (int)r->color,
+                        slice_deb(slice_bits));
                 break;
             case VTCONST:
                 switch (r->set) {
@@ -681,13 +700,17 @@ build_key(Interp *interpreter, SymReg *reg)
                         *pc++ = PARROT_ARG_SC;      /* str constant */
                         *pc++ = r->color;       /* constant idx */
                         debug(interpreter, DEBUG_PBC_CONST,
-                                " keypart SC %s #%d\n", r->name, r->color);
+                                " keypart SC %s #%d slice %s\n",
+                                r->name, r->color,
+                                slice_deb(slice_bits));
                         break;
                     case 'I':                       /* P[;42;..] */
                         *pc++ = PARROT_ARG_IC;      /* int constant */
                         *pc++ = r->color = atol(r->name);   /* value */
                         debug(interpreter, DEBUG_PBC_CONST,
-                                " keypart IC %s #%d\n", r->name, r->color);
+                                " keypart IC %s #%d slice %s\n",
+                                r->name, r->color,
+                                slice_deb(slice_bits));
                         break;
                     default:
                         fatal(1,"build_key", "unknown set\n");

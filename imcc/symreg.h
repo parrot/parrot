@@ -18,7 +18,12 @@ enum VARTYPE {		/* variable type can be */
     VT_REGP	= 1 << 6,	/* pointer to register */
     VT_CONSTP	= 1 << 7,	/* pointer to constant value */
     VT_PCC_SUB  = 1 << 8,	/* PCC subroutine call */
-    VT_FLATTEN  = 1 << 9	/* .flatten_arg IDENT | VTIDENT ... */
+    VT_FLATTEN  = 1 << 9,	/* .flatten_arg IDENT | VTIDENT ... */
+    VT_START_SLICE = 1 << 10,   /* x .. y slice range */
+    VT_END_SLICE   = 1 << 11,
+    VT_START_ZERO  = 1 << 12,   /* .. y 0..start */
+    VT_END_INF     = 1 << 13,   /* x..  start..inf */
+    VT_SLICE_BITS  = VT_START_SLICE | VT_END_SLICE | VT_START_ZERO | VT_END_INF
 };
 
 /* this VARTYPE needs register allocation and such */

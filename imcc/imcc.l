@@ -248,6 +248,7 @@ SP              [ ]
 "->"            return(POINTY);
 {WS}+"."{WS}+   return(CONCAT);
 "."             return(DOT);
+<emit,INITIAL>".."     return(DOTDOT);
 "+="            return(PLUS_ASSIGN);
 "-="            return(MINUS_ASSIGN);
 "*="            return(MUL_ASSIGN);
@@ -825,10 +826,10 @@ include_file (void* interp, char *file_name)
 #if !defined(_PARROTLIB)
     extern const char* Parrot_imcc_include_paths[];
     STRING *str = Parrot_library_fallback_locate(interp, file_name, Parrot_imcc_include_paths);
-    
+
     if (str) {
 	char* s = string_to_cstring(interp, str);
-	
+
 	file = fopen(s, "r");
 	if (file)
 	    sourcefile = s;

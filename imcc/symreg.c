@@ -500,7 +500,7 @@ SymReg *
 link_keys(int nargs, SymReg * keys[])
 {
     SymReg * first, *key, *keychain;
-    int i, len;
+    int i, len, any_slice;
     char *key_str;
     /* namespace keys are global consts - no cur_unit */
     SymReg **h = cur_unit ? cur_unit->hash : ghash;
@@ -508,14 +508,21 @@ link_keys(int nargs, SymReg * keys[])
     if (nargs == 0)
         fatal(1, "link_keys", "hu? no keys\n");
     first = keys[0];
-    if (nargs == 1)
+    if (nargs == 1 && !(keys[0]->type & VT_SLICE_BITS))
         return first;
-    /* calc len of key_str */
-    for (i = 0, len = 1; i < nargs; i++) {
+    /* calc len of key_str
+     * also check if this is a slice - the first key might not
+     * have the slice flag set
+     */
+    for (i = any_slice = 0, len = 1; i < nargs; i++) {
         len += strlen(keys[i]->name);
         if (i < nargs - 1)
             ++len;
+        if (keys[i]->type & VT_SLICE_BITS)
+            any_slice = 1;
     }
+    if (any_slice & !(keys[0]->type & VT_SLICE_BITS))
+        keys[0]->type |= (VT_START_SLICE|VT_END_SLICE);
     key_str = malloc(len);
     *key_str = 0;
     /* first look, if we already have this exact key chain */

@@ -60,7 +60,7 @@ SymReg *cur_namespace; /* ugly hack for mk_address */
  * these are used for constructing one INS
  */
 static SymReg *keys[IMCC_MAX_REGS];
-static int nkeys;
+static int nkeys, in_slice;
 static int keyvec;
 static SymReg *regs[IMCC_MAX_REGS];
 static int nargs;
@@ -271,7 +271,7 @@ itcall_sub(SymReg* sub)
 %token <t> SHIFT_LEFT SHIFT_RIGHT INTV FLOATV STRINGV PMCV OBJECTV  LOG_XOR
 %token <t> RELOP_EQ RELOP_NE RELOP_GT RELOP_GTE RELOP_LT RELOP_LTE
 %token <t> GLOBAL GLOBALOP ADDR RESULT RETURN POW SHIFT_RIGHT_U LOG_AND LOG_OR
-%token <t> COMMA ESUB
+%token <t> COMMA ESUB DOTDOT
 %token <t> PCC_BEGIN PCC_END PCC_CALL PCC_SUB PCC_BEGIN_RETURN PCC_END_RETURN
 %token <t> PCC_BEGIN_YIELD PCC_END_YIELD NCI_CALL METH_CALL INVOCANT
 %token <t> PROTOTYPED NON_PROTOTYPED MAIN LOAD IMMEDIATE POSTCOMP METHOD
@@ -1021,7 +1021,7 @@ var:
    | const
    ;
 
-keylist:           {  nkeys=0; }
+keylist:           {  nkeys=0; in_slice = 0; }
      _keylist      {  $$ = link_keys(nkeys, keys); }
    ;
 
@@ -1029,10 +1029,21 @@ _keylist:
      key           {  keys[nkeys++] = $1; }
    | _keylist ';' key
                    {  keys[nkeys++] = $3; $$ =  keys[0]; }
+   | _keylist COMMA  { in_slice = 1; }
+         key         { keys[nkeys++] = $4; $$ =  keys[0]; }
    ;
 
 key:
-     var
+     var           { if (in_slice) {
+                         $1->type |= VT_START_SLICE | VT_END_SLICE;
+                     }
+                     $$ = $1;
+                   }
+   | var DOTDOT var
+                   { $1->type |= VT_START_SLICE;  $3->type |= VT_END_SLICE;
+                     keys[nkeys++] = $1; $$ = $3; }
+   | DOTDOT var    { $2->type |= VT_START_ZERO | VT_END_SLICE; $$ = $2; }
+   | var DOTDOT    { $1->type |= VT_START_SLICE | VT_END_INF; $$ = $1; }
    ;
 
 reg:
