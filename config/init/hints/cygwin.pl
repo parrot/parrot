@@ -3,9 +3,6 @@
 my $libs = Configure::Data->get('libs');
 $libs =~ s/-lutil\b//g;
 
-my @define = split ',', (Configure::Data->get('define') || '');
-push @define, 'inet_aton' unless grep { /^inet_[ap]ton$/ } @define;
-
 # A note about building shared libraries:  Perl5 uses the 'ld2' tool, which
 # is installed as part of the perl5 installation.  So far, it appears
 # parrot can get by with simply using gcc -shared, so we override the
@@ -18,6 +15,11 @@ Configure::Data->set(
   libs => $libs,
 );
 
+#We need to define inet_aton on Cygwin.  The contents of the --define switch 
+# are in $_[2].
+# XXX EVIL EVIL EVIL HACK.  If you need to do this elsewhere, please do 
+# everyone a favor and write a proper interface for modifying the command-line
+# args, or even better do something to make the define interface not suck.
 unless($_[2]) {
   $_[2]='inet_aton';
 }
