@@ -77,7 +77,7 @@ static int prev_state;
 %option never-interactive
 %option stack
 
-LETTER          [a-zA-Z_]
+LETTER          [a-zA-Z_@]
 DIGIT           [0-9]
 DIGITS          {DIGIT}+
 HEX		0x[0-9A-Fa-f]+
@@ -158,7 +158,6 @@ SP              [ ]
         return '\n';
     }
 
-
 ^".emit"\n {
 	BEGIN(emit);
 	return(EMIT);
@@ -205,6 +204,7 @@ SP              [ ]
 ".field"        return(FIELD);
 ".method"       return(METHOD);
 ".local"        return(LOCAL);
+".global"       return(GLOBAL);
 ".const"        return(CONST);
 ".globalconst"  return(GLOBAL_CONST);
 ".param"        return(PARAM);
@@ -224,8 +224,10 @@ SP              [ ]
 "newsub"        return(NEWSUB);
 "defined"       return(DEFINED);
 "addr"          return(ADDR);
-"global"        return(GLOBAL);
+"global"        return(GLOBALOP);
 "clone"         return(CLONE);
+"object"        return(OBJECTV);
+"pmc"           return(PMCV);
 "string"        return(STRINGV);
 "call"          return(CALL);
 "saveall"       return(SAVEALL);

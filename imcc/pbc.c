@@ -279,6 +279,11 @@ store_bsr(SymReg * r, int pc, int offset)
     bsr = _mk_address(globals.cs->subs->bsrs, str_dup(r->name), U_add_all);
     bsr->color = pc;
     bsr->score = offset;        /* bsr = 1, set_addr I,x = 2, newsub = 3 */
+    /* This is hackish but its better to have it here than in the
+     * fixup code until we decide if we need the _globallabel semantic.
+     */
+    if(r->name[0] == '_')
+       bsr->usage |= U_FIXUP;
 }
 
 static void
@@ -369,7 +374,7 @@ store_labels(struct Parrot_Interp *interpreter, IMC_Unit * unit, int *src_lines,
     for (ins = unit->instructions; ins ; ins = ins->next) {
         SymReg *addr, *label;
         if ((ins->type & ITLABEL) &&
-                (has_compile || *ins->r[0]->name == '_')) {
+              (has_compile || ins->r[0]->usage & U_FIXUP)) {
             /* XXX labels should be mangled with current subroutine name
              * they should only be reachable from eval's in current sub
              */
@@ -453,8 +458,16 @@ fixup_bsrs(struct Parrot_Interp *interpreter)
     for (s = globals.cs->first; s; s = s->next) {
         for(i = 0; i < HASH_SIZE; i++) {
             for(bsr = s->bsrs[i]; bsr; bsr = bsr->next ) {
-                if (*bsr->name != '_')
+#if IMC_TRACE_HIGH
+                fprintf(stderr, "fixup_bsr %s\n", bsr->name);
+#endif
+                if (!(bsr->usage & U_FIXUP))
+                {
+#if IMC_TRACE_HIGH
+                    fprintf(stderr, "skip fixup %s\n", bsr->name);
+#endif
                     continue;
+                }
                 lab = find_global_label(bsr->name, &pc);
                 if (!lab) {
                     /* TODO continue; */
