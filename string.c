@@ -317,6 +317,67 @@ string_index(const STRING *s, UINTVAL idx)
     }
 }
 
+/* This is a helper function for string_str_index.  It is based on the
+ * failure function (a lightweight sort of DFA), and runs in O(m + n)
+ * instead of O(m n).
+ */
+static INTVAL
+string_str_index_internal(struct Parrot_Interp *interp, const STRING *str2,
+        const STRING *str, UINTVAL start)
+{
+    Buffer* failure = NULL;
+    UINTVAL s, i, t, len, len2;
+    
+    len  = string_length(str);
+    len2 = string_length(str2);
+    
+    /* Check whether we need the failure function */
+    for (s = 1; s < len; s++) {
+        if (string_ord(str, s) == string_ord(str, 0))
+            break;
+    }
+    
+    /* We only allocate the failure buffer if we need it */
+    if (s < len) {
+        Parrot_block_DOD(interp);
+        failure = new_buffer_header(interp);
+        Parrot_allocate_zeroed(interp, failure, sizeof(UINTVAL) * (len + 1));
+        Parrot_unblock_DOD(interp);
+    }
+    
+    /* Compute the rest of the failure function (if we ended up needing it) */
+    t = 0;
+    for (; s < len; s++) {
+        while (t > 0 && string_ord(str, s) != string_ord(str, t))
+            t = ((UINTVAL*)failure->bufstart)[t];
+        if (string_ord(str, s) == string_ord(str, t)) {
+            ((UINTVAL*)failure->bufstart)[s + 1] = ++t;
+        }
+        else {
+            ((UINTVAL*)failure->bufstart)[s + 1] = 0;
+        }       
+    }
+
+    /* Perform match */
+    s = 0;
+    for (i = start; i < len2; i++) {
+        if (s == len)
+            break;
+        while (s > 0 && string_ord(str2, i) != string_ord(str, s))
+            if (failure)
+                s = ((UINTVAL*)failure->bufstart)[s];
+            else
+                s = 0;
+        if (string_ord(str2, i) == string_ord(str, s))
+            s++;
+    }
+
+    if (s == len)
+        return i - s;
+    else 
+        return -1;
+}
+
 /*=for api string string_str_index
  * return the character position of s2 in s at or after start
  * the return value is a (0 based) offset in characters, not bytes.
@@ -342,18 +403,9 @@ string_str_index(struct Parrot_Interp *interpreter, const STRING *s,
         s2 = string_transcode(interpreter, const_cast(s2), s->encoding,
                 s->type, NULL);
 
-    ls = string_length(s);
-    lp = string_length(s2);
-
-    for(i = start; i <= ls - lp; i++) {
-        for(j = 0; j < lp; j++)
-            if (string_ord(s, i + j) != string_ord(s2, j))
-                break;
-        if (j == lp)
-            return i;
-    }
-    return -1;
+    return string_str_index_internal(interpreter, s, s2, start);
 }
+
 
 
 /*=for api string string_ord
