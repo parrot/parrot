@@ -530,11 +530,6 @@ make_interpreter(Interp_flags flags)
     interpreter->ctx.string_reg_top = interpreter->ctx.string_reg_base;
     interpreter->ctx.pmc_reg_top = interpreter->ctx.pmc_reg_base;
 
-    /* Initialize the register chunks */
-    //    interpreter->ctx.int_reg_base->used = 0;
-    //interpreter->ctx.num_reg_base->used = 0;
-    //interpreter->ctx.string_reg_base->used = 0;
-    //interpreter->ctx.pmc_reg_base->used = 0;
     /* the SET_NULL macros are only for systems where a NULL pointer
      * isn't represented by zeroes, so don't use these for resetting
      * non-null pointers
