@@ -4,7 +4,7 @@ people with CVS commit access, just those who have an area they've
 taken responsibility for.
 
 Release pumpking		Steve Fink
-JIT				Daniel Grunblatt
+JIT				Daniel Grunblatt, Leopold Toetsch
 Configure			Brent Dax
 I/O				Melvin Smith, Juergen Boemmels
 Vtables 			David Lloyd

@@ -69,7 +69,7 @@ pdump
 
 Stability
 ---------
-    Purify and other memory badness detectors
+    Purify, Valgrind, and other memory badness detectors
 
 Performance
 -----------

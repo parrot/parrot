@@ -4,12 +4,13 @@ To prepare a release:
         couple days in advance, asking if there are any
         showstopping bugs.
 
-    1.  cvs update.
+    1.  cvs update -dP
 
     2.  Update files with version-specific information:
 
-        a.  Increment the version number in VERSION and
-	    adjust IMCC_VERSION in languages/imcc/main.c.
+        a.  Increment the version number in VERSION,
+	    adjust IMCC_VERSION in languages/imcc/main.c,
+            and update VERSION in languages/perl6/perl6.
 
         b.  Change the information in DEVELOPING to reflect
             this release's version number and date.
@@ -25,15 +26,18 @@ To prepare a release:
 
     3.  cvs commit.
 
-    5.  make release
+    4.  make release VERSION=<version>
 
-    6.  untar parrot-<version>.tar.gz into another area
+    5.  untar parrot-<version>.tar.gz into another area
 
-    7.  Make sure everything works--Configure, make and
+    6.  Make sure everything works--Configure, make and
         make fulltest.  Check the Tinderbox and make sure that
         everything's green (or that any yellows and reds are
         due to problems with the particular box, like a
         botched compiler upgrade).
+
+    7.  cvs tag RELEASE_a_b_c
+        where a.b.c is the version number
 
     8.  upload to CPAN.
 
