@@ -17,7 +17,7 @@ out-of-bounds test. Checks INT and PMC keys.
 
 =cut
 
-use Parrot::Test tests => 12;
+use Parrot::Test tests => 16;
 use Test::More;
 
 my $fp_equality_macro = <<'ENDOFMACRO';
@@ -313,6 +313,81 @@ output_is(<< 'CODE', << 'OUTPUT', "push string");
 CODE
 2011
 two zero one zero
+OUTPUT
+
+output_is(<<'CODE', <<'OUTPUT', 'basic pop');
+     new P0, .ResizableStringArray
+     set P0[0], "foo"
+     set P0[1], "bar"
+     set P0[2], "bax"
+     pop S0, P0
+     eq S0, "bax", OK1
+     print "not "
+OK1: print "ok 1\n"
+
+     pop S0, P0
+     eq S0, "bar", OK2
+     print "not "
+OK2: print "ok 2\n"
+
+     pop S0, P0
+     eq S0, "foo", OK3
+     print "not "
+OK3: print "ok 3\n"
+     end
+CODE
+ok 1
+ok 2
+ok 3
+OUTPUT
+
+output_is(<<'CODE', <<'OUTPUT', 'pop many values');
+     new P0, .ResizableStringArray
+     set I0, 0
+L1:  set S0, I0
+     set P0[I0], S0
+     inc I0
+     lt I0, 100000, L1
+     
+L2:  dec I0
+     set S1, I0
+     pop S0, P0
+     eq S0, S1, OK
+     branch NOT_OK
+OK:  gt I0, 0, L2
+     print "ok\n"
+     end
+
+NOT_OK:
+     print S0
+     print "\n"
+     print S1
+     print "\n"
+     end
+CODE
+ok
+OUTPUT
+
+output_is(<<'CODE', <<'OUTPUT', 'push/pop');
+     new P0, .ResizableStringArray
+     push P0, "abcde"
+     push P0, "bcdea"
+     push P0, "cdeab"
+     pop S0, P0
+     eq S0, "cdeab", OK1
+     print "not "
+OK1: print "ok 1\n"
+     end
+CODE
+ok 1
+OUTPUT
+
+output_like(<<'CODE', <<'OUTPUT', 'pop from empty array');
+     new P0, .ResizableStringArray
+     pop S0, P0
+     end
+CODE
+/ResizableStringArray: Can't pop from an empty array!/
 OUTPUT
 
 output_is(<< 'CODE', << 'OUTPUT', "clone");

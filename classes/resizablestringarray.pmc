@@ -92,6 +92,35 @@ the array.
 
 /*
 
+=item C<STRING* pop_string()>
+
+Removes and returns the last element in the array.
+
+=cut
+
+*/
+
+    STRING* pop_string() {
+        INTVAL size;
+        STRING* value;
+        SizeStringData *sd;
+
+        size = PMC_int_val(SELF);
+        sd = (SizeStringData *)PMC_data(SELF);
+
+        if (sd == NULL || size == 0) {
+            internal_exception(OUT_OF_BOUNDS, 
+                    "ResizableStringArray: Can't pop from an empty array!");
+        }
+
+	value = sd->data[size - 1];
+        DYNSELF.set_integer_native(size - 1);
+
+        return value;
+    }
+
+/*
+
 =item C<void set_integer_native(INTVAL size)>
 
 Resizes the array to C<size> elements.
