@@ -16,7 +16,7 @@ Tests PMC object methods.
 
 =cut
 
-use Parrot::Test tests => 21;
+use Parrot::Test tests => 22;
 use Test::More;
 
 output_like(<<'CODE', <<'OUTPUT', "callmethod - unknown method");
@@ -160,7 +160,7 @@ output_is(<<'CODE', <<'OUTPUT', "specified constructor method does not exist");
 
     newsub P20, .Exception_Handler, _handler
     set_eh P20
-    
+
     find_type I1, "Foo"
     new P3, I1
     print "not ok 1\n"
@@ -724,6 +724,32 @@ output_is(<<'CODE', <<'OUTPUT', "same method name in two namespaces");
 .namespace [""]
 .sub _main @MAIN
     print "ok\n"
+.end
+CODE
+ok
+OUTPUT
+
+output_is(<<'CODE', <<'OUTPUT', "self - CURRENT_OBJECT");
+##PIR##
+.sub _main
+    .local pmc A
+
+    newclass A, "A"
+    find_type I0, "A"
+
+    new A, I0
+    A."foo"()
+    end
+.end
+
+.namespace ["A"]
+
+.sub foo method
+    .include "interpinfo.pasm"
+    $P0 = interpinfo .INTERPINFO_CURRENT_OBJECT
+    eq_addr self, $P0, ok
+    print "not "
+ok: print "ok\n"
 .end
 CODE
 ok

@@ -293,6 +293,15 @@ Parrot_dod_trace_root(Interp *interpreter, int trace_stack)
                     (PObj *)interpreter->pmc_reg.registers[i]);
         }
     }
+    /*
+     * mark current context stuff
+     */
+    if (interpreter->ctx.current_sub)
+        pobject_lives(interpreter, (PObj*)interpreter->ctx.current_sub);
+    if (interpreter->ctx.current_cont)
+        pobject_lives(interpreter, (PObj*)interpreter->ctx.current_cont);
+    if (interpreter->ctx.current_object)
+        pobject_lives(interpreter, (PObj*)interpreter->ctx.current_object);
 
     /*
      * mark vtable->data
