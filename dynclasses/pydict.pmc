@@ -40,6 +40,11 @@ key_hash_object(Interp *interpreter, Hash *hash, void *value)
     return VTABLE_hash(interpreter, (PMC*)value) ^ hash->seed;
 }
 
+static void
+pobject_lives_fn(Interp *interp, PObj *o)
+{
+    pobject_lives(interp, o);
+}
 /*
 
 =item C<static int
@@ -96,7 +101,7 @@ Initializes the instance.
             Hash_key_type_none,
             object_compare,     /* object compare */
             key_hash_object,    /* object hash    */
-            pobject_lives);     /* object mark    */
+            pobject_lives_fn);     /* object mark    */
     }
 
 /*

@@ -146,7 +146,7 @@ struct Small_Object_Pool {
 #if PARROT_GC_GMS
 #  define GC_HEADER_SIZE (sizeof(Gc_gms_hdr))
 #  define PObj_to_ARENA(o) PObj_to_GMSH(o)
-#  define ARENA_to_PObj(p) GMSH_to_PObj(p)
+#  define ARENA_to_PObj(p) GMSH_to_PObj((Gc_gms_hdr*)(p))
 #else
 #  define GC_HEADER_SIZE 0
 #  define PObj_to_ARENA(o) (o)

@@ -140,7 +140,7 @@ mem_allocate(Interp *interpreter, size_t *req_size,
          *      so that collection can be skipped if needed
          */
         Parrot_do_dod_run(interpreter, DOD_trace_stack_FLAG);
-#if PARROT_GC_MS
+#if !PARROT_GC_IMS
         /* Compact the pool if allowed and worthwhile */
         if (pool->compact) {
             /* don't bother reclaiming if it's just chicken feed */
