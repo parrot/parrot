@@ -51,6 +51,7 @@ static void pcf_d_v(struct Parrot_Interp *interpreter, PMC *self) {
   double return_data;
   pointer = self->cache.struct_val;
   return_data = (double)(*pointer)();
+  interpreter->ctx.num_reg.registers[5] = return_data;
   interpreter->ctx.int_reg.registers[0] = 0;
   interpreter->ctx.int_reg.registers[1] = 0;
   interpreter->ctx.int_reg.registers[2] = 0;
