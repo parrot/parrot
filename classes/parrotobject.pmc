@@ -93,6 +93,12 @@ These two methods just call C<init()>. The arguments are ignored.
         SELF.init();
     }
 
+
+    STRING* name() {
+        return VTABLE_get_string_keyed_int(INTERP, (PMC *)PMC_data(SELF), POD_CLASS_NAME);
+    }
+
+
 /*
 
 =item C<PMC *find_method(STRING *name)>

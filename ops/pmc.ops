@@ -103,7 +103,7 @@ Return the type of the entry in aggregate PMC in $2 at key $3.
 =cut
 
 inline op typeof (out STR, in PMC) {
-  $1 = $2->vtable->name(interpreter, $2);
+  $1 = VTABLE_name(interpreter, $2);
   goto NEXT();
 }
 
