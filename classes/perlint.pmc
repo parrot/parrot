@@ -64,9 +64,9 @@ pmclass PerlInt {
 	char* buff = mem_sys_allocate(80);
 	STRING* s;
 #ifdef HAS_SNPRINTF
-        snprintf(buff,80,"%ld",SELF->cache.int_val);
+        snprintf(buff,80,INTVAL_FMT,SELF->cache.int_val);
 #else
-        sprintf(buff,"%ld",SELF->cache.int_val);  /* XXX buffer overflow! */
+        sprintf(buff,INTVAL_FMT,SELF->cache.int_val);  /* XXX buffer overflow! */
 #endif
 	s = string_make(INTERP,buff,strlen(buff),NULL,0,NULL);
 	free(buff);

@@ -272,7 +272,7 @@ key_element_value_s(struct Parrot_Interp *interpreter, KEY* key, STRING* idx) {
     if(idx != NULL) {
       INTVAL hash = key_hash(interpreter,idx);
       hash = hash % NUM_BUCKETS;
-      pair = find_bucket(interpreter,key->keys[hash].cache.struct_val,idx);
+      pair = find_bucket(interpreter,(BUCKET *)key->keys[hash].cache.struct_val,idx);
       if(pair == NULL) {
         fprintf(stderr,"*** key_element_value_s pair returning a null key\n");
       }
@@ -336,7 +336,7 @@ void key_set_element_value_s(struct Parrot_Interp *interpreter, KEY* key,
           }
           else {
           }
-          key->keys[hash].cache.struct_val = bucket;
+          key->keys[hash].cache.struct_val = (STRING *)bucket;
           key->keys[hash].type = enum_key_bucket;
         }
         else {

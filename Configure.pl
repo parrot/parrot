@@ -170,6 +170,9 @@ my(%c)=(
     opcode_t      => ($Config{ivtype} || 'long'),
     longsize      => undef,
 
+    intvalfmt     => '%ld',
+    numvalfmt     => '%f',
+
     cc            => $Config{cc},
 
     #
@@ -542,6 +545,28 @@ if ($c{intsize} == $c{ptrsize}) {
     die <<"AARGH";
 Configure.pl:  Unable to find an integer type that fits a pointer.
 AARGH
+}
+
+#"
+# Determine format strings for INTVAL and FLOATVAL.
+#
+
+if ($c{iv} eq "int") {
+    $c{intvalfmt} = "%d";
+} elsif (($c{iv} eq "long") || ($c{iv} eq "long int")) {
+    $c{intvalfmt} = "%ld";
+} elsif (($c{iv} eq "long long") || ($c{iv} eq "long long int")) {
+    $c{intvalfmt} = "%lld";
+} else {
+    die "Configure.pl:  Can't find a printf-style format specifier for type \"$c{iv}\"\n";
+}
+
+if ($c{nv} eq "double") {
+    $c{numvalfmt} = "%f";
+} elsif ($c{nv} eq "long double") {
+    $c{numvalfmt} = "%lf";
+} else {
+    die "Configure.pl:  Can't find a printf-style format specifier for type \"$c{nv}\"\n";
 }
 
 #

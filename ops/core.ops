@@ -253,14 +253,12 @@ and stderr)
 =cut
 
 inline op print(in INT) {
-  /* TODO: Configure for format */
-  printf("%li", (long) $1);
+  printf(INTVAL_FMT, $1);
   goto NEXT();
 }
 
 inline op print(in NUM) {
-  /* TODO: Configure for format */
-  printf("%f", $1);
+  printf(NUMVAL_FMT, $1);
   goto NEXT();
 }
 
@@ -303,8 +301,7 @@ op print(in INT, in INT) {
                 break;
 	default: file = (FILE *)$1;
   }
-  /* TODO: Configure for format */
-  fprintf(file, "%li", (long) $2);
+  fprintf(file, INTVAL_FMT, $2);
   goto NEXT();
 }
 
@@ -319,8 +316,7 @@ op print(in INT, in NUM) {
                 break;
 	default: file = (FILE *)$1;
   }
-  /* TODO: Configure for format */
-  fprintf(file, "%f", $2);
+  fprintf(file, NUMVAL_FMT, $2);
   goto NEXT();
 }
 

@@ -64,9 +64,9 @@ fprintf(stderr,"morph not implemented\n");
 	char* buff = mem_sys_allocate(80);
 	STRING* s;
 #ifdef HAS_SNPRINTF
-        snprintf(buff,80,"%f",SELF->cache.num_val);
+        snprintf(buff,80,NUMVAL_FMT,SELF->cache.num_val);
 #else
-        sprintf(buff,"%f",SELF->cache.num_val);  /* XXX buffer overflow! */
+        sprintf(buff,NUMVAL_FMT,SELF->cache.num_val);  /* XXX buffer overflow! */
 #endif
 	s = string_make(INTERP,buff,strlen(buff),NULL,0,NULL);
 	free(buff);
