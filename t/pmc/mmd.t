@@ -317,7 +317,7 @@ output_is(<<'CODE', <<'OUTPUT', "PASM INTVAL");
     set I10, P5
     bxor I11, I10, I5
     set P6, I11
-    invoke P1
+    returncc
 CODE
 ok
 1

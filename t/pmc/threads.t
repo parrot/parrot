@@ -34,7 +34,7 @@ my %platforms = map {$_=>1} qw/
 
 if ($^O eq "cygwin" ) {
     my @uname = split / /, qx'uname -v';
-    
+
     if ($uname[0] eq "2004-09-04" ) {
 	plan skip_all => "This cygwin version is known to fail the thread tests";
 	exit;
@@ -94,7 +94,7 @@ output_is(<<'CODE', <<'OUTPUT', "thread type 1");
     print I5
     print "\n"
     set I3, 0   # no retval
-    invoke P1	# ret and be done with thread
+    returncc	# ret and be done with thread
 
 # output from threads could be reversed
 CODE
@@ -148,7 +148,7 @@ output_is(<<'CODE', <<'OUTPUT', "thread type 2");
     print S0
     print "\n"
     set I3, 0
-    invoke P1	# ret and be done with thread
+    returncc	# ret and be done with thread
 
 CODE
 ok 1
@@ -187,7 +187,7 @@ lp:
     noop
     branch lp
     print "never\n"
-    invoke P1
+    returncc
 CODE
 start 1
 in thread
@@ -285,7 +285,7 @@ wait:
     sleep 0.1
     new P2, .PerlInt
     push P6, P2		# push item on queue
-    invoke P1
+    returncc
 CODE
 /(done\nthread\n)|(thread\ndone\n)/
 OUTPUT
@@ -316,7 +316,7 @@ output_is(<<'CODE', <<'OUTPUT', "share a PMC");
     print P6
     print "\n"
     inc P6
-    invoke P1
+    returncc
 CODE
 thread
 20
@@ -363,7 +363,7 @@ loop:
     branch loop
 ex:
     print "done thread\n"
-    invoke P1
+    returncc
 CODE
 3
 1
@@ -413,7 +413,7 @@ loop:
     branch loop
 ex:
     print "done thread\n"
-    invoke P1
+    returncc
 CODE
 3
 ok 1
@@ -490,7 +490,7 @@ loop:
     branch loop
 ex:
     print "done thread\n"
-    invoke P1
+    returncc
 CODE
 3
 ok 1

@@ -61,9 +61,7 @@ output_is(<<'CODE', <<OUTPUT, "foldup");
     set I2,0
     set I3,11
     set I4,0
-    savetop
     invokecc
-    restoretop
     end
 _foo:
     foldup P17
@@ -78,7 +76,7 @@ _foo:
     set I2,0
     set I3,0
     set I4,0
-    invoke P1
+    returncc
 
 CODE
 Foobar!
@@ -125,9 +123,7 @@ output_is(<<'CODE', <<OUTPUT, "foldup_p_i w. skip");
     set I1,4
     set I2,0
     set I3,11
-    savetop
     invokecc
-    restoretop
     end
 _foo:
     foldup P17, 2
@@ -142,7 +138,7 @@ _foo:
     set I2,0
     set I3,0
     set I4,0
-    invoke P1
+    returncc
 
 CODE
 Foobar!

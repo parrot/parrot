@@ -407,7 +407,7 @@ return_here:
         .pcc_end_yield
         x = x + 1
     if x <= 10 goto iloop
-    invoke P1
+    returncc
 .end
 CODE
 0 0

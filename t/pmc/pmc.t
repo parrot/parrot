@@ -1556,13 +1556,13 @@ L_BadId:
    set I0, 1
    set I1, 1	# 1 string retval
    set I3, 0	# no pmc
-   invoke P1
+   returncc
 .pcc_sub __type:
    find_type I5, "delegate"
    set I0, 1
    set I1, 1
    set I3, 0
-   invoke P1
+   returncc
 CODE
 All names and ids ok.
 OUTPUT
@@ -2625,7 +2625,7 @@ OUTPUT
 output_is(<<'CODE', '1foo23', "set_p_pc - Sub constant");
 .pcc_sub foo:      # be sure, this is constant #0
     print 2
-    invoke P1
+    returncc
 .pcc_sub @MAIN main:
     print 1
     set_p_pc P0, 0
@@ -2644,7 +2644,7 @@ output_is(<<'CODE', <<'OUT', ".const - Sub constant");
     end
 .pcc_sub foo:
     print "ok 2\n"
-    invoke P1
+    returncc
 CODE
 ok 1
 ok 2

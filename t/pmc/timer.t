@@ -115,7 +115,7 @@ output_is(<<'CODE', <<'OUT', "Timer setup - initializer/start");
     end
 .pcc_sub _timer_sub:
     print "ok 2\n"
-    invoke P1
+    returncc
 CODE
 ok 1
 ok 2
@@ -143,7 +143,7 @@ output_is(<<'CODE', <<'OUT', "Timer setup - initializer/start/stop");
     end
 .pcc_sub _timer_sub:
     print "never\n"
-    invoke P1
+    returncc
 CODE
 ok 1
 ok 2
@@ -170,7 +170,7 @@ output_is(<<'CODE', <<'OUT', "Timer setup - initializer/start/repeat");
     end
 .pcc_sub _timer_sub:
     print "ok 2\n"
-    invoke P1
+    returncc
 CODE
 ok 1
 ok 2
@@ -204,7 +204,7 @@ output_is(<<'CODE', <<'OUT', "Timer setup - initializer/start/destroy");
     end
 .pcc_sub _timer_sub:
     print "never\n"
-    invoke P1
+    returncc
 CODE
 ok 1
 ok 2
@@ -238,7 +238,7 @@ output_is(<<'CODE', <<'OUT', "Timer setup - timer in array destroy");
     end
 .pcc_sub _timer_sub:
     print "never\n"
-    invoke P1
+    returncc
 CODE
 ok 1
 ok 2

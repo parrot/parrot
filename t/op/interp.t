@@ -257,7 +257,7 @@ _foo:
     print P0
     print I0
     print S0
-    invoke P1
+    returncc
 CODE
 ok 1
 hello from 2 clone

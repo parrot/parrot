@@ -32,7 +32,7 @@ output_is(<<'CODE', <<'OUTPUT', "delegate set_integer_native");
     print I5
     print "\n"
     # just return
-    invoke P1
+    returncc
 CODE
 42
 OUTPUT
@@ -46,7 +46,7 @@ output_is(<<'CODE', <<'OUTPUT', "delegate get_integer");
 .namespace ["delegate"]
 .pcc_sub __get_integer:
     set I5, 42
-    invoke P1
+    returncc
 CODE
 42
 OUTPUT
@@ -59,7 +59,7 @@ output_is(<<'CODE', <<'OUTPUT', "delegate set_string_native");
 .pcc_sub __set_string_native:
     print S5
     print "\n"
-    invoke P1
+    returncc
 CODE
 fortytwo
 OUTPUT
@@ -73,7 +73,7 @@ output_is(<<'CODE', <<'OUTPUT', "delegate get_string");
 .namespace ["delegate"]
 .pcc_sub __get_string:
     set S5, "fortytwo"
-    invoke P1
+    returncc
 CODE
 fortytwo
 OUTPUT
@@ -86,7 +86,7 @@ output_is(<<'CODE', <<'OUTPUT', "delegate set_number_native");
 .pcc_sub __set_number_native:
     print N5
     print "\n"
-    invoke P1
+    returncc
 CODE
 47.110000
 OUTPUT
@@ -100,7 +100,7 @@ output_is(<<'CODE', <<'OUTPUT', "delegate get_number");
 .namespace ["delegate"]
 .pcc_sub __get_number:
     set N5, 47.11
-    invoke P1
+    returncc
 CODE
 47.110000
 OUTPUT
@@ -116,7 +116,7 @@ output_is(<<'CODE', <<'OUTPUT', "delegate assign_pmc");
     print P5
     print "\n"
     # just return
-    invoke P1
+    returncc
 CODE
 42
 OUTPUT
@@ -136,12 +136,12 @@ output_is(<<'CODE', <<'OUTPUT', "delegate add_p_p_i");
     # just return
     print I5
     print "\n"
-    invoke P1
+    returncc
 .pcc_sub __add_int:
     print I5
     print "\n"
     set P5, 3
-    invoke P1
+    returncc
 CODE
 1
 1
@@ -166,7 +166,7 @@ output_is(<<'CODE', <<'OUTPUT', "delegate add_p_p_p");
     # just print arg and return
     print I5
     print "\n"
-    invoke P1
+    returncc
 .pcc_sub __add:
     print "in __add\n"
     print P2	# self - this triggers __get_string
@@ -176,10 +176,10 @@ output_is(<<'CODE', <<'OUTPUT', "delegate add_p_p_p");
     print P6	# dest
     print "\n"
     set P6, 3
-    invoke P1
+    returncc
 .pcc_sub __get_string:
     set S5, "one"
-    invoke P1
+    returncc
 CODE
 1
 in __add
@@ -208,7 +208,7 @@ output_is(<<'CODE', <<'OUTPUT', "delegate add_p_p_p - clobber regs");
     # just print arg and return
     print I5
     print "\n"
-    invoke P1
+    returncc
 .pcc_sub __add:
     print "in __add\n"
     print P2	# self - this triggers __get_string
@@ -219,13 +219,13 @@ output_is(<<'CODE', <<'OUTPUT', "delegate add_p_p_p - clobber regs");
     print "\n"
     set P6, 3
     set S5, "nok"
-    invoke P1
+    returncc
 .pcc_sub __get_string:
     set S5, "one"
     null P2	# clobber registers these must be restored
     null P5
     null P6
-    invoke P1
+    returncc
 CODE
 1
 in __add

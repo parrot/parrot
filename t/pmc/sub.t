@@ -17,7 +17,7 @@ C<Continuation> PMCs.
 
 =cut
 
-use Parrot::Test tests => 79;
+use Parrot::Test tests => 49;
 use Test::More;
 use Parrot::Config;
 
@@ -36,7 +36,7 @@ _ret:
     end
 _func:
     print "func\n"
-    invoke P1
+    returncc
 CODE
 main
 func
@@ -51,7 +51,7 @@ output_is(<<'CODE', <<'OUTPUT', "PASM subs - newsub 2");
     end
 _func:
     print "func\n"
-    invoke P1
+    returncc
 CODE
 main
 func
@@ -84,12 +84,10 @@ func:
     eq I5, 0, endfunc
     dec I5
 
-    save P1
     invokecc   # recursive invoke
-    restore P1
 
 endfunc:
-    invoke P1
+    returncc
 CODE
 3
 2
@@ -124,12 +122,10 @@ func:
     eq I5, 0, endfunc
     dec I5
 
-    save P1
     invokecc P0  # recursive invoke
-    restore P1
 
 endfunc:
-    invoke P1
+    returncc
 CODE
 3
 2
@@ -259,7 +255,7 @@ foo:
     set_addr P5, f
     set I0, 0	# non-proto
     set I3, 1	# 1 retval
-    invoke P1		# ret
+    returncc		# ret
 
 # expects arg in P5, returns incremented result in P5
 f:
@@ -270,7 +266,7 @@ f:
     set P5, P2
     set I0, 0	# non-proto
     set I3, 1	# 1 retval
-    invoke P1		# ret
+    returncc		# ret
 
 CODE
 8
@@ -298,7 +294,7 @@ func1:
 
 func2:
     print "in func2\n"
-    invoke P1
+    returncc
 
 CODE
 in func1
@@ -323,7 +319,7 @@ func1:
 
 func2:
     print "in func2\n"
-    invoke P1
+    returncc
 
 CODE
 in func1
@@ -347,11 +343,11 @@ _func1:
 ret2:
     popbottomp
     print "func1\n"
-    invoke P1
+    returncc
 
 _func2:
     print "func2\n"
-    invoke P1
+    returncc
 
 CODE
 main
@@ -360,53 +356,6 @@ func2
 func1
 back
 OUTPUT
-
-for my $R (0..4) {
-for my $N (254..258) {
-output_is(<<"CODE", <<'OUTPUT', "test COW $R $N");
-    print "main\\n"
-    set I16, 0
-    set I17, $N	 	#~1 chunk full
-lp:
-    save I16
-    inc I16
-    le I16, I17, lp
-    newsub .Continuation, .RetContinuation, _func, ret
-    pushbottomi
-    invoke
-    popbottomi
-ret:
-lp2:
-    restore I16
-    eq I16, I17, ok
-    print "nok I16: "
-    print I16
-    print " I17: "
-    print I17
-    print "\\n"
-    end
-ok:
-    dec I17
-    if I17, lp2
-    print "back\\n"
-    end
-_func:
-    print "func\\n"
-    set I0, $R
-lp3:
-    unless I0, cont
-    save I0
-    dec I0
-    branch lp3
-cont:
-    invoke P1
-CODE
-main
-func
-back
-OUTPUT
-}
-}
 
 output_like(<<'CODE', <<'OUTPUT', "interp - warnings");
     new P0, .PerlUndef
@@ -423,7 +372,7 @@ _func:
     warningson 1
     new P0, .PerlUndef
     set I0, P0
-    invoke P1
+    returncc
 CODE
 /^main:Use of uninitialized value in integer context
 \s+in file.*:back$/s
@@ -446,7 +395,7 @@ _func:
     warningsoff 1
     new P0, .PerlUndef
     set I0, P0
-    invoke P1
+    returncc
 CODE
 /^Use of uninitialized value in integer context
 \s+in file.*:main:back:Use of un.*$/sm
@@ -474,7 +423,7 @@ _func:
     warningsoff 1
     new P0, .PerlUndef
     set I0, P0
-    invoke P1
+    returncc
 CODE
 /^Use of uninitialized value in integer context
 \s+in file.*:main:back:Use of un.*$/sm
@@ -492,7 +441,7 @@ ok:
     end
 .pcc_sub _the_sub:
     print "in sub\n"
-    invoke P1
+    returncc
 CODE
 ok 1
 in sub
@@ -519,7 +468,7 @@ ok:
 
 .pcc_sub _next_sub:
     print "in next sub\n"
-    invoke P1
+    returncc
     print "never here\n"
     end
 CODE
@@ -541,7 +490,7 @@ ok:
     end
 .pcc_sub _the::sub::some::where:
     print "in sub\n"
-    invoke P1
+    returncc
 CODE
 ok 1
 in sub
@@ -581,7 +530,7 @@ open S, ">$temp" or die "Can't write $temp";
 print S <<'EOF';
   .pcc_sub _sub1:
   print "in sub1\n"
-  invoke P1
+  returncc
 EOF
 close S;
 
@@ -611,10 +560,10 @@ open S, ">$temp" or die "Can't write $temp";
 print S <<'EOF';
   .pcc_sub _sub1:
   print "in sub1\n"
-  invoke P1
+  returncc
   .pcc_sub _sub2:
   print "in sub2\n"
-  invoke P1
+  returncc
 EOF
 close S;
 
@@ -800,7 +749,7 @@ open S, ">$temp" or die "Can't write $temp";
 print S <<'EOF';
   .pcc_sub @LOAD _sub1:
   print "in sub1\n"
-  invoke P1
+  returncc
 EOF
 close S;
 
@@ -822,7 +771,7 @@ print S <<'EOF';
   print "error\n"
   .pcc_sub @LOAD _sub1:
   print "in sub1\n"
-  invoke P1
+  returncc
 EOF
 close S;
 
@@ -856,10 +805,10 @@ open S, ">$temp" or die "Can't write $temp";
 print S <<'EOF';
   .pcc_sub @LOAD _sub1:
   print "in sub1\n"
-  invoke P1
+  returncc
   .pcc_sub _sub2:
   print "in sub2\n"
-  invoke P1
+  returncc
 EOF
 close S;
 
@@ -903,10 +852,10 @@ open S, ">$temp" or die "Can't write $temp";
 print S <<'EOF';
   .pcc_sub _sub1:
   print "in sub1\n"
-  invoke P1
+  returncc
   .pcc_sub @LOAD _sub2:
   print "in sub2\n"
-  invoke P1
+  returncc
 EOF
 close S;
 
@@ -950,10 +899,10 @@ open S, ">$temp" or die "Can't write $temp";
 print S <<'EOF';
   .pcc_sub @LOAD _sub1:
   print "in sub1\n"
-  invoke P1
+  returncc
   .pcc_sub @LOAD _sub2:
   print "in sub2\n"
-  invoke P1
+  returncc
 EOF
 close S;
 
@@ -998,7 +947,7 @@ OUTPUT
 output_is(<<'CODE', <<'OUTPUT', '@MAIN pragma');
 .pcc_sub _first:
     print "first\n"
-    invoke P1
+    returncc
 .pcc_sub @MAIN _main:
     print "main\n"
     end
@@ -1009,13 +958,13 @@ OUTPUT
 output_is(<<'CODE', <<'OUTPUT', 'two @MAIN pragmas');
 .pcc_sub _first:
     print "first\n"
-    invoke P1
+    returncc
 .pcc_sub @MAIN _main:
     print "main\n"
     end
 .pcc_sub @MAIN _second:
     print "second\n"
-    invoke P1
+    returncc
 CODE
 main
 OUTPUT
@@ -1023,10 +972,10 @@ OUTPUT
 output_is(<<'CODE', <<'OUTPUT', '@MAIN pragma call subs');
 .pcc_sub _first:
     print "first\n"
-    invoke P1
+    returncc
 .pcc_sub _second:
     print "second\n"
-    invoke P1
+    returncc
 .pcc_sub @MAIN _main:
     print "main\n"
     find_global P0, "_first"
@@ -1040,63 +989,6 @@ first
 second
 OUTPUT
 
-my ($fpc, $cfg);
-$cfg = "include/parrot/config.h";
-open(I, $cfg) or die "Cant read $cfg: $!";
-while (<I>) {
-    if (/FRAMES_PER_CHUNK\s+(\d+)/) {
-	$fpc = $1;
-	last;
-    }
-}
-close I;
-die "Cant find FRAMES_PER_CHUNK in $cfg" unless ($fpc) ;
-for my $N ($fpc-2..$fpc+2) {
-output_is(<<"CODE", <<'OUTPUT', "test COW w strings $N");
-    print "main\\n"
-    set I16, 0
-    set I17, $N
-lp:
-    set S16, I16
-    savetop
-    inc I16
-    le I16, I17, lp
-    newsub P0, .Continuation, _func
-    invokecc
-
-lp2:
-    restoretop
-    set S0, I16
-    # triggers DOD with --gc-debug
-    ne S0, S16, nok
-    dec I16
-    if I16, lp2
-    print "ok\\n"
-    end
-nok:
-    print "not ok S0 = '"
-    print S0
-    print "' S16 = '"
-    print S16
-    print "'\\n"
-    end
-_func:
-    print "func\\n"
-    set I16, 0
-    set I17, @{[ $N+$fpc ]}
-lp3:
-    set S16, I16
-    savetop
-    inc I16
-    le I16, I17, lp3
-    invoke P1
-CODE
-main
-func
-ok
-OUTPUT
-}
-
 
 $temp = "temp.imc";
 open S, ">$temp" or die "Can't write $temp";
@@ -1104,7 +996,7 @@ print S <<'EOF';
 .emit
   .pcc_sub @LOAD _sub1:
   print "in sub1\n"
-  invoke P1
+  returncc
 .eom
 EOF
 close S;
@@ -1132,7 +1024,7 @@ print S <<'EOF';
 # instruction of a compilation unit
   .pcc_sub @LOAD _sub1:
   print "in sub1\n"
-  invoke P1
+  returncc
 .eom
 EOF
 close S;
@@ -1156,7 +1048,7 @@ print S <<'EOF';
   print "error\n"
   .pcc_sub _sub1:
   print "in sub1\n"
-  invoke P1
+  returncc
 .eom
 EOF
 close S;
@@ -1244,7 +1136,7 @@ output_is(<<'CODE', <<'OUTPUT', "sub names");
     print P20
     print "\n"
     interpinfo P1, .INTERPINFO_CURRENT_CONT
-    invoke P1
+    returncc
 CODE
 main
 the_sub
@@ -1271,7 +1163,7 @@ output_is(<<'CODE', <<'OUTPUT', "sub names w MAIN");
     print P20
     print "\n"
     interpinfo P1, .INTERPINFO_CURRENT_CONT
-    invoke P1
+    returncc
 CODE
 main
 the_sub

@@ -24,7 +24,7 @@ output_is(<<'CODE', <<'OUTPUT', "eval_sc");
 	set S5, "in eval\n"
 	set I0, 1
 	set I2, 1
-	compile P0, P1, "print S5\ninvoke P1\n"
+	compile P0, P1, "print S5\nreturncc\n"
 	invokecc			# eval code P0
 	print "back again\n"
 	end
@@ -37,7 +37,7 @@ OUTPUT
 output_is(<<'CODE', <<'OUTPUT', "call subs in evaled code ");
     set S5, ".pcc_sub _foo:\n"
     concat S5, "print \"foo\\n\"\n"
-    concat S5, "invoke P1\n"
+    concat S5, "returncc\n"
     compreg P1, "PASM"
     compile P0, P1, S5
     find_global P0, "_foo"
@@ -52,10 +52,10 @@ OUTPUT
 output_is(<<'CODE', <<'OUTPUT', "call 2 subs in evaled code ");
     set S5, ".pcc_sub _foo:\n"
     concat S5, "print \"foo\\n\"\n"
-    concat S5, "invoke P1\n"
+    concat S5, "returncc\n"
     concat S5, ".pcc_sub _bar:\n"
     concat S5, "print \"bar\\n\"\n"
-    concat S5, "invoke P1\n"
+    concat S5, "returncc\n"
     compreg P1, "PASM"
     compile P0, P1, S5
     set P6, P0		# keep Sub PMC segment alive
@@ -125,7 +125,7 @@ output_is(<<'CODE', <<'OUTPUT', "PIR compiler sub");
     .local pmc the_sub
     .local string code
     code = "print \"ok\\n\"\n"
-    code .= "invoke P1\n"
+    code .= "returncc\n"
     the_sub = my_compiler("_foo", code)
     the_sub()
     the_sub = global "_foo"
@@ -160,7 +160,7 @@ output_is(<<'CODE', <<'OUTPUT', "bug #31467");
      $P1['builtin'] = $P0
 
      $P2 = compreg "PIR"
-     $S0 = ".sub main\nprint \"dynamic\\n\"\ninvoke P1\n.end"
+     $S0 = ".sub main\nprint \"dynamic\\n\"\nreturncc\n.end"
      $P0 = compile $P2, $S0
      $P1['dynamic'] = $P0
 
@@ -169,7 +169,7 @@ output_is(<<'CODE', <<'OUTPUT', "bug #31467");
      $S0 = ".sub main\n$P1 = find_global\"funcs\"\n"
      $S0 .= "$P0 = $P1['dynamic']\n$P0()\n"
      $S0 .= "$P0 = $P1['builtin']\n$P0()\n"
-     $S0 .= "invoke P1\n.end"
+     $S0 .= "returncc\n.end"
 
      $P2 = compreg "PIR"
      $P0 = compile $P2, $S0

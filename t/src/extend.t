@@ -393,11 +393,11 @@ open S, ">$temp.pasm" or die "Can't write $temp.pasm";
 print S <<'EOF';
   .pcc_sub _sub1:
   printerr "in sub1\n"
-  invoke P1
+  returncc
   .pcc_sub _sub2:
   printerr P5
   printerr "in sub2\n"
-  invoke P1
+  returncc
 EOF
 close S;
 # compile to pbc
@@ -471,7 +471,7 @@ print S <<'EOF';
   new_pad 0
   find_lex P2, "no_such_var"
   printerr "never\n"
-  invoke P1
+  returncc
 EOF
 close S;
 # compile to pbc

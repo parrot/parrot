@@ -1065,7 +1065,7 @@ _call_back:
   print "\n"
   find_global P12, "cb_done"
   inc P12
-  invoke P1
+  returncc
 
 CODE
 ok 1
@@ -1138,7 +1138,7 @@ ERROR:
   print "\n"
   find_global P12, "cb_done"
   inc P12
-  invoke P1
+  returncc
 .end
 
 CODE
@@ -1197,7 +1197,7 @@ _call_back:
   print "\n"
   find_global P12, "cb_done"
   inc P12
-  invoke P1
+  returncc
 
 
 CODE
@@ -1285,7 +1285,7 @@ ERROR:
 
   find_global P12, "cb_done"
   inc P12
-  invoke P1
+  returncc
 .end
 
 CODE
@@ -1344,7 +1344,7 @@ _call_back:
   print "\n"
   find_global P12, "cb_done"
   inc P12
-  invoke P1
+  returncc
 
 CODE
 ok 1
@@ -1402,7 +1402,7 @@ _call_back:
   print "\n"
   find_global P12, "cb_done"
   inc P12
-  invoke P1
+  returncc
 
 
 CODE
@@ -1475,7 +1475,7 @@ ERROR:
   print "\n"
   find_global P12, "cb_done"
   inc P12
-  invoke P1
+  returncc
 .end
 
 CODE
@@ -1563,7 +1563,7 @@ ERROR:
 
   find_global P12, "cb_done"
   inc P12
-  invoke P1
+  returncc
 .end
 
 CODE
@@ -1647,7 +1647,7 @@ output_is(<<'CODE', <<'OUTPUT', "nci_cb_D4 - synchronous callbacks");
   I17 = I17 * 10
   P6[0] = I17
 
-  invoke P1
+  returncc
 .end
 
 CODE

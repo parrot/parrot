@@ -717,7 +717,7 @@ output_is(<<'CODE', <<'OUTPUT', "attribute values, subclassing access meths ");
     classoffset I3, P2, "Foo"
     add I4, I3, I5
     setattribute P2, I4, P5	# so always put new PMCs in
-    invoke P1
+    returncc
 
 # Pattr = get(obj: Iattr_idx)
 .pcc_sub Foo::get:
@@ -725,7 +725,7 @@ output_is(<<'CODE', <<'OUTPUT', "attribute values, subclassing access meths ");
     classoffset I3, P2, "Foo"
     add I4, I3, I5
     getattribute P5, P2, I4
-    invoke P1
+    returncc
 
 .pcc_sub Bar::set:
     print "in Bar::set\n"
@@ -734,7 +734,7 @@ output_is(<<'CODE', <<'OUTPUT', "attribute values, subclassing access meths ");
     setattribute P2, I4, P5	# so always put new PMCs in
     set I0, 0
     set I3, 0
-    invoke P1
+    returncc
 
 .pcc_sub Bar::get:
     print "in Bar::get\n"
@@ -743,7 +743,7 @@ output_is(<<'CODE', <<'OUTPUT', "attribute values, subclassing access meths ");
     getattribute P5, P2, I4
     set I0, 0
     set I3, 1
-    invoke P1
+    returncc
 CODE
 in Foo::set
 in Foo::set
@@ -895,7 +895,7 @@ output_is(<<'CODE', <<'OUTPUT', "attribute values, inherited access meths");
     setattribute P2, I4, P5
     set I0, 0
     set I3, 0
-    invoke P1
+    returncc
 
 # Pattr = get(obj: SClass, Iattr_idx)
 .pcc_sub get:
@@ -904,7 +904,7 @@ output_is(<<'CODE', <<'OUTPUT', "attribute values, inherited access meths");
     getattribute P5, P2, I4
     set I0, 0
     set I3, 1
-    invoke P1
+    returncc
 
 CODE
 i
@@ -952,7 +952,7 @@ output_is(<<'CODE', <<'OUTPUT', "overriden vtables");
     new P6, .PerlInt
     set P6, I5
     setattribute P2, I0, P6
-    invoke P1
+    returncc
 .pcc_sub add:
     print "in add\n"
     classoffset I0, P5, "Foo"
@@ -961,7 +961,7 @@ output_is(<<'CODE', <<'OUTPUT', "overriden vtables");
     new P12, .PerlInt
     add P12, P10, P11
     setattribute P7, I0, P12
-    invoke P1
+    returncc
 .pcc_sub get_s:
     print "in get_string\n"
     classoffset I0, P2, "Foo"
@@ -971,7 +971,7 @@ output_is(<<'CODE', <<'OUTPUT', "overriden vtables");
     ne I0, 2, no_2
     set S5, "two"
 no_2:
-    invoke P1
+    returncc
 CODE
 in set_integer
 in set_integer
@@ -1674,7 +1674,7 @@ output_is(<<'CODE', <<'OUTPUT', "new_extended");
     set P5, P10			# set return value
     set I0, 0
     set I3, 1
-    invoke P1
+    returncc
 CODE
 42
 OUTPUT

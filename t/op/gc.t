@@ -146,9 +146,7 @@ _main:
     set I17, 0
 loop:
     sweep 1
-    savetop
     invokecc
-    restoretop
     inc I17
     lt I17, I16, loop
     print "ok\n"
@@ -159,7 +157,7 @@ _rand:
     set I5, P16[10]
     gt I5, 10, err
     lt I5, 0, err
-    invoke P1
+    returncc
 err:
     print "singleton destroyed .Random = ."
     new P16, .Random
@@ -191,24 +189,22 @@ output_is(<<'CODE', <<OUTPUT, "vanishing return continuation in method calls");
     new P6, .PerlString
     set P6, "hi"
     newsub P0, .Sub, _do_inc
-    savetop
     invokecc
-    restoretop
     sweep 1
     set P1, P16
-    invoke P1
+    returncc
 
 _do_inc:
     sweep 1
     inc P2
     sweep 1
     print "back from _inc\n"
-    invoke P1
+    returncc
 
 .pcc_sub _inc:
     print "inc\n"
     sweep 1
-    invoke P1
+    returncc
 CODE
 init
 inc
@@ -247,7 +243,7 @@ buffer_ok:
     null I3
     null I4
     set S5, P12
-    invoke P1
+    returncc
 
 .namespace ["Source::Buffer"]
 .pcc_sub __get_string:
@@ -260,7 +256,7 @@ buffer_ok:
     set I2, 1
     null I3
     null I4
-    invoke P1
+    returncc
 CODE
 hello
 hello
@@ -271,9 +267,7 @@ OUTPUT
 output_is(<<'CODE', <<OUTPUT, "coro context and invalid return continuations");
     newsub P0, .Coroutine, co1
 l:
-    savetop
     invokecc
-    restoretop
     inc I20
     lt I20, 3, l
     print "done\n"
@@ -283,9 +277,7 @@ co1:
 col:
     print "coro\n"
     sweep 1
-    savetop
     invoke P0
-    restoretop
     branch col
 CODE
 coro

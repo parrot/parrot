@@ -351,7 +351,7 @@ output_is(<<'CODE', <<'OUTPUT', "freeze/thaw a Sub");
     end
 .pcc_sub _foo:
     print "in sub _foo\n"
-    invoke P1
+    returncc
 CODE
 Sub
 in sub _foo
