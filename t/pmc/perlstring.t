@@ -1,6 +1,6 @@
 #! perl -w
 
-use Parrot::Test tests => 17;
+use Parrot::Test tests => 20;
 use Test::More; # Included for skip().
 
 my $fp_equality_macro = <<'ENDOFMACRO';
@@ -539,4 +539,41 @@ CODE
 0
 OUTPUT
 
+output_is(<<'CODE', <<OUTPUT, "substr");
+        new P0, .PerlString
+        set P0, "This is a test\n"
+        substr S0, P0, 0, 5
+        substr S1, P0, 10, 4
+        substr S2, P0, -11, 3
+        substr S3, P0, 7, 1000  # Valid offset, but length > string length
+        print S0
+        print S1
+        print S2
+        print S3
+        print P0 # Check that the original is unmodified
+        end
+CODE
+This test is a test
+This is a test
+OUTPUT
+
+output_like(<<'CODE', <<'OUTPUT', "Out-of-bounds substr, +ve offset");
+        new P0, .PerlString
+        set P0, "Woburn"
+        substr S0, P0, 123, 22
+        end
+CODE
+/^Cannot take substr outside string$/
+OUTPUT
+
+output_like(<<'CODE', <<'OUTPUT', "Out-of-bounds substr, -ve offset");
+        new P0, .PerlString
+        set P0, "Woburn"
+        substr S0, P0, -123, 22
+        end
+CODE
+/^Cannot take substr outside string$/
+OUTPUT
+
 1;
+
