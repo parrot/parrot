@@ -576,7 +576,7 @@ inline op clone(out PMC, in PMC) {
 
 =head2 Conditional branch operations
 
-These opertions perform a conditional relative branch. If the condition is
+These operations perform a conditional relative branch. If the condition is
 met, the branch happens, otherwise control falls to the next operation.
 
 =over 4
@@ -1133,7 +1133,7 @@ inline op dec(inout NUM) {
 
 =item B<dec>(inout INT, in INT)
 
-=item B<dec>(inout NUM, in INT)
+=item B<dec>(inout NUM, in NUM)
 
 Decrease $1 by the amount in $2.
 
@@ -1298,8 +1298,6 @@ op mod(out NUM, in NUM, in NUM) {
 
 =item B<mul>(out NUM, in NUM, in NUM)
 
-=item B<mul>(n, n, nc)
-
 Set $1 to the product of $2 and $3.
 
 =cut
@@ -1317,7 +1315,9 @@ inline op mul(out NUM, in NUM, in NUM) {
 
 ########################################
 
-=item B<not>(out INT, in INT)
+=item B<neg>(out INT, in INT)
+
+=item B<neg>(out NUM, in NUM)
 
 Set $1 to the negative of $2.
 
