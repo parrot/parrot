@@ -36,9 +36,6 @@ pmclass default abstract noinit {
 		caller(INTERP, SELF));
     }
 
-    /* The end of used parameter is passed into the mark_used function of
-    * the garbage collector.
-    */
     void mark () {
         PANIC("custom_mark flag set but no custom mark routine defined");
     }
