@@ -811,8 +811,8 @@ expand_macro (YYSTYPE *valp, void *interp, const char *name)
     return 0;
 }
 
-/* _PARROTLIB is now the default */
-#define _PARROTLIB
+/* _PARROTLIB is now the default; XXX: "make testr" is not working yet */
+/*#define _PARROTLIB*/
 
 /* XXX: use this code for miniparrot */
 #if !defined(_PARROTLIB)
