@@ -484,7 +484,7 @@ inline op null(out INT) {
 }
 
 inline op null(out PMC) {
-  $1 = NULL;
+  $1 = PMCNULL;
   goto NEXT();
 }
 
