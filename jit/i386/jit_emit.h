@@ -1787,10 +1787,10 @@ static void call_func(Parrot_jit_info_t *jit_info, void *addr)
 #    undef Parrot_jit_vtable_newp_ic_op
 
 #define EXR(m, s) (int *)(offsetof(struct Parrot_Interp, m) + s)
-#define IREG(i) EXR(ctx.int_reg.registers, jit_info->cur_op[i] * sizeof(INTVAL))
-#define NREG(i) EXR(ctx.num_reg.registers, jit_info->cur_op[i] * sizeof(FLOATVAL))
-#define PREG(i) EXR(ctx.pmc_reg.registers, jit_info->cur_op[i] * sizeof(PMC *))
-#define SREG(i) EXR(ctx.string_reg.registers, jit_info->cur_op[i] * sizeof(STRING *))
+#define IREG(i) EXR(int_reg.registers, jit_info->cur_op[i] * sizeof(INTVAL))
+#define NREG(i) EXR(num_reg.registers, jit_info->cur_op[i] * sizeof(FLOATVAL))
+#define PREG(i) EXR(pmc_reg.registers, jit_info->cur_op[i] * sizeof(PMC *))
+#define SREG(i) EXR(string_reg.registers, jit_info->cur_op[i] * sizeof(STRING *))
 #define CONST(i) (int *)(jit_info->cur_op[i] * sizeof(struct PackFile_Constant) + 4)
 #define CALL(f) Parrot_exec_add_text_rellocation_func(jit_info->objfile, jit_info->native_ptr, f); \
 emitm_calll(jit_info->native_ptr, EXEC_CALLDISP);
