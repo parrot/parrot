@@ -365,6 +365,10 @@ ins_print(FILE *fd, Instruction * ins)
     int i;
     int len;
 
+#if IMC_TRACE
+    PIO_eprintf(NULL, "ins_print\n");
+#endif
+
     if (!ins->r[0] || !strchr(ins->fmt, '%')) {	/* comments, labels and such */
 	return fprintf(fd, "%s", ins->fmt);
     }
@@ -467,6 +471,9 @@ static int
 e_file_emit(void *param, IMC_Unit * unit, Instruction * ins)
 {
     UNUSED(param);
+#if IMC_TRACE
+    PIO_eprintf(NULL, "e_file_emit\n");
+#endif
     if ((ins->type & ITLABEL) || ! *ins->op)
 	ins_print(stdout, ins);
     else {
