@@ -150,6 +150,14 @@ Describe the components of a C<struct PMC_EXT>. L<PDD04>
 
 =item *
 
+ requestor: leo
+
+Ok. In the long run I expect a multi-stage config system. First is to
+get miniparrot built and running, then Parrot core. Extensions like gdbm
+could be configured at that point or even in a third step.
+
+=item *
+
 IO: Add IO tables, right now IO's just float around.
 
 =item *
