@@ -82,7 +82,7 @@ the returned string.
 
 Like C<mmd_dispatch_string>, only it returns an INTVAL.
 
-=item FLOATVAL mmd_dispatch_numval(interp, left, right, func_num)
+=item FLOATVAL mmd_dispatch_floatval(interp, left, right, func_num)
 
 Like C<mmd_dispatch_string>, only it returns a FLOATVAL.
 

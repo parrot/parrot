@@ -67,7 +67,7 @@ mmd_dispatch_intval(struct Parrot_Interp *interpreter,
 }
 
 FLOATVAL
-mmd_dispatch_numval(struct Parrot_Interp *interpreter,
+mmd_dispatch_floatval(struct Parrot_Interp *interpreter,
 		 PMC *left, PMC *right, INTVAL function)
 {
 
