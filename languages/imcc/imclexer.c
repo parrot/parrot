@@ -2689,6 +2689,23 @@ include_file (const char *file_name)
     frame = new_frame();
 
     file = fopen(file_name, "r");
+    if (!file) {
+        /* TODO make include patch configurable */
+        const char * incl_path =  "runtime/parrot/include";
+        char *s = malloc(strlen(incl_path) + strlen(file_name) + 2);
+        strcpy(s, incl_path);
+        strcat(s, "/");
+        strcat(s, file_name);
+#ifdef WIN32
+        {
+            char *p;
+            while ( (p = strchr(s, '/')) )
+                *p = '\\';
+        }
+#endif
+        file = fopen(s, "r");
+        free(s);
+    }
     if (!file)
         fataly(EX_SOFTWARE, file_name, line, strerror(errno));
     ext = strrchr(file_name, '.');
