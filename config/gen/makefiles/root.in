@@ -154,6 +154,7 @@ PERL = ${perl}
 
 TEST_PROG = ${test_prog}${exe}
 TEST_PROG_SO = ${test_prog}_so${exe}
+LIBPARROT = ${blib_lib_libparrot_a}
 PDUMP = pdump${exe}
 
 # lclint has changed name to split at v3.0
@@ -190,8 +191,8 @@ all : $(TEST_PROG) docs
 
 mops : examples/assembly/mops${exe} examples/mops/mops${exe}
 
-$(TEST_PROG) : test_main$(O) $(GEN_HEADERS) $(O_DIRS) $(O_FILES) lib/Parrot/OpLib/core.pm
-	$(LINK) ${ld_out}$(TEST_PROG) $(LINKFLAGS) $(O_FILES) test_main$(O) $(C_LIBS)
+$(TEST_PROG) : test_main$(O) $(GEN_HEADERS) $(LIBPARROT) lib/Parrot/OpLib/core.pm
+	$(LINK) ${ld_out}$(TEST_PROG) $(LINKFLAGS) test_main$(O) $(LIBPARROT) $(C_LIBS)
 
 lib_deps_object : $(O_DIRS) $(O_FILES)
 	$(PERL) tools/dev/lib_deps.pl object $(O_FILES)
@@ -216,10 +217,10 @@ blib :
 blib/lib : blib
 	-mkdir blib${slash}lib
 
-shared : $(GEN_HEADERS) blib/lib blib/lib/libparrot$(SO) ${blib_lib_libparrot_a}
-static : $(GEN_HEADERS) ${blib_lib_libparrot_a}
+shared : $(GEN_HEADERS) blib/lib blib/lib/libparrot$(SO) $(LIBPARROT)
+static : $(GEN_HEADERS) $(LIBPARROT)
 
-${blib_lib_libparrot_a} : blib/lib $(O_DIRS) $(O_FILES)
+$(LIBPARROT) : blib/lib $(O_DIRS) $(O_FILES)
 	$(AR_CR) ${ar_out}$@ $(O_FILES)
 	$(RANLIB) $@
 
@@ -227,7 +228,7 @@ blib/lib/libparrot$(SO) : blib/lib $(O_DIRS) $(O_FILES)
 	$(LD) $(LD_SHARED) $(LD_SHARED_FLAGS) $(LDFLAGS) $(LD_OUT)blib/lib/libparrot$(SO) $(O_FILES) $(C_LIBS)
 
 $(TEST_PROG_SO) : test_main$(O) blib/lib/libparrot$(SO) lib/Parrot/OpLib/core.pm
-	$(LINK) $(LINKFLAGS) $(LD_OUT)$(TEST_PROG) test_main$(O) ${blib_lib_libparrot_a} $(C_LIBS)
+	$(LINK) $(LINKFLAGS) $(LD_OUT)$(TEST_PROG) test_main$(O) $(LIBPARROT) $(C_LIBS)
 
 # XXX The dependancies on SO.MAJOR.MINOR and SO.VERSION are removed
 #     because those should be done at "make install" and not "make shared"
@@ -271,8 +272,8 @@ PDB=pdb
 
 pdb$(O) : $(GENERAL_H_FILES)
 
-$(PDB) : pdb$(O) $(O_DIRS) $(O_FILES)
-	$(LINK) ${ld_out}$(PDB) pdb$(O) $(LINKFLAGS) $(O_FILES) $(C_LIBS)
+$(PDB) : pdb$(O) $(LIBPARROT)
+	$(LINK) ${ld_out}$(PDB) pdb$(O) $(LINKFLAGS) $(LIBPARROT) $(C_LIBS)
 
 #
 # Parrot Disassembler
@@ -281,15 +282,15 @@ DIS=disassemble
 
 disassemble$(O) : $(GENERAL_H_FILES)
 
-$(DIS) : disassemble$(O) $(O_DIRS) $(O_FILES)
-	$(LINK) ${ld_out}$(DIS) disassemble$(O) $(LINKFLAGS) $(O_FILES) $(C_LIBS)
+$(DIS) : disassemble$(O) $(LIBPARROT)
+	$(LINK) ${ld_out}$(DIS) disassemble$(O) $(LINKFLAGS) $(LIBPARROT) $(C_LIBS)
 
 #
 # Parrot Dump
 #
 
-$(PDUMP) : pdump$(O) packdump$(O) $(O_FILES) $(O_DIRS)
-	$(LINK) ${ld_out}$(PDUMP) pdump$(O) packdump$(O) $(LINKFLAGS) $(O_FILES) $(C_LIBS)
+$(PDUMP) : pdump$(O) packdump$(O) $(LIBPARROT)
+	$(LINK) ${ld_out}$(PDUMP) pdump$(O) packdump$(O) $(LINKFLAGS) $(LIBPARROT) $(C_LIBS)
 
 
 ###############################################################################
@@ -318,8 +319,8 @@ examples/assembly/mops.pbc : examples/assembly/mops.pasm assemble.pl
 examples/assembly/mops.c : examples/assembly/mops.pbc pbc2c.pl
 	$(PERL) pbc2c.pl examples/assembly/mops.pbc > examples/assembly/mops.c
 
-examples/assembly/mops${exe} : examples/assembly/mops$(O) $(O_DIRS) $(O_FILES)
-	$(LINK) $(LINKFLAGS) ${ld_out}examples/assembly/mops${exe} examples/assembly/mops$(O) $(O_FILES) $(C_LIBS)
+examples/assembly/mops${exe} : examples/assembly/mops$(O) $(LIBPARROT)
+	$(LINK) $(LINKFLAGS) ${ld_out}examples/assembly/mops${exe} examples/assembly/mops$(O) $(LIBPARROT) $(C_LIBS)
 
 examples/assembly/life.pbc : examples/assembly/life.pasm assemble.pl
 	cd examples && cd assembly && $(MAKE) life.pbc PERL=$(PERL) && cd .. && cd ..
@@ -327,8 +328,8 @@ examples/assembly/life.pbc : examples/assembly/life.pasm assemble.pl
 examples/assembly/life.c : examples/assembly/life.pbc pbc2c.pl
 	$(PERL) pbc2c.pl examples/assembly/life.pbc > examples/assembly/life.c
 
-examples/assembly/life${exe} : examples/assembly/life$(O) $(O_DIRS) $(O_FILES)
-	$(LINK) $(LINKFLAGS) ${ld_out}examples/assembly/life${exe} examples/assembly/life$(O) $(O_FILES) $(C_LIBS)
+examples/assembly/life${exe} : examples/assembly/life$(O) $(LIBPARROT)
+	$(LINK) $(LINKFLAGS) ${ld_out}examples/assembly/life${exe} examples/assembly/life$(O) $(LIBPARROT) $(C_LIBS)
 
 ###############################################################################
 #
@@ -340,7 +341,7 @@ examples/mops/mops$(O) : examples/mops/mops.c
 
 examples/mops/mops${exe} : examples/mops/mops$(O)
 	$(LINK) $(LINKFLAGS) ${ld_out}examples/mops/mops${exe} \
-	examples/mops/mops$(O) ${blib_lib_libparrot_a} $(C_LIBS)
+	examples/mops/mops$(O) $(LIBPARROT) $(C_LIBS)
 
 
 ###############################################################################
@@ -531,7 +532,7 @@ quickfulltest_dummy :
 	$(PERL) t/harness $(EXTRA_TEST_ARGS) -b $(TEST_PROG_ARGS) quick
 
 # Common prep for all test targets
-test_prep : ${blib_lib_libparrot_a} assemble.pl
+test_prep : $(LIBPARROT) assemble.pl
 
 test_dummy :
 	$(PERL) t/harness $(EXTRA_TEST_ARGS) $(TEST_PROG_ARGS)
