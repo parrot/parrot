@@ -54,7 +54,7 @@ examples/assembly/mops.pbc: examples/assembly/mops.pasm assemble.pl
 	cd examples/assembly; make mops.pbc PERL=$(PERL)
 
 Parrot/OpLib/core.pm: core.ops ops2pm.pl
-       $(PERL) ops2pm.pl core.ops vtable.ops
+	$(PERL) ops2pm.pl core.ops vtable.ops
 
 examples/assembly/mops.c: examples/assembly/mops.pbc pbc2c.pl
 	$(PERL) pbc2c.pl examples/assembly/mops.pbc > examples/assembly/mops.c
@@ -109,7 +109,7 @@ stacks$(O): $(H_FILES)
 core_ops$(O): $(H_FILES) core_ops.c
 
 core_ops.c $(INC)/oplib/core_ops.h: core.ops vtable.ops ops2c.pl
-       $(PERL) ops2c.pl core.ops vtable.ops
+	$(PERL) ops2c.pl core.ops vtable.ops
 
 vtable.ops: make_vtable_ops.pl
 	$(PERL) make_vtable_ops.pl > vtable.ops
@@ -130,7 +130,7 @@ clean:
 	$(RM_F) *.s core_ops.c $(TEST_PROG) $(PDISASM) $(PDUMP)
 	$(RM_F) $(INC)/vtable.h
 	$(RM_F) $(INC)/oplib/core_ops.h
-       $(RM_F) vtable.ops
+	$(RM_F) vtable.ops
 	$(RM_F) $(TEST_PROG) $(PDISASM) $(PDUMP)
 	$(RM_F) t/op/*.pasm t/op/*.pbc t/op/*.out
 	$(RM_F) examples/assembly/mops$(EXE) examples/assembly/mops.c
