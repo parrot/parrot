@@ -23,13 +23,13 @@ S. F<imcc/docs/calling_conventions.pod>
 
 =head2 Items in the Subs Context
 
-  Subtype	Controlstack	PadStack   UserStack  Warnings
-  ------------------------------------------------------------
-  Sub                -             -           -         C
-  Closure            -             C           -         C
-  Continuation       C             C           C         C
-  Coroutine          C             C           C         C
-  RetContinuation    X             X           X         X
+  Subtype	Controlstack  PadStack UserStack RegStacks Warnings
+  ------------------------------------------------------------------
+  Sub                -           -         -         -        C
+  Closure            -           C         -         -        C
+  Continuation       C           C         C         C        C
+  Coroutine          C           C         C         C        C
+  RetContinuation    X           X         X         X        X
 
   "C" ... COWed copy is in context
   "X" ... is in context
@@ -51,6 +51,12 @@ This can be done with one opcode:
 Create a subroutine (in P0) and a return continuation (in P1):
 
   newsub .Sub, .RetContinuation, _sub_label, ret_label
+
+Get a reference to a (possibly) external subroutine:
+
+  find_global P0, "_the_sub"
+  ...
+  .pcc_sub _the_sub:
 
 =head2 Invocation i.e. calling the sub
 
