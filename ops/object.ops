@@ -322,7 +322,7 @@ inline op setattribute(in PMC, in INT, in PMC) {
 =item B<classoffset>(out INT, in PMC, in STR)
 
 Returns the offset of the first attribute for class $3 in object $2.
-Throws an exception $3 isn't in $2's hierarchy.
+Throws an exception if $3 isn't in $2's hierarchy.
 
 =cut
 
