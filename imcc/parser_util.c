@@ -26,7 +26,8 @@
  * new P, .SomeThing
  */
 Instruction *
-iNEW(struct Parrot_Interp *interpreter, SymReg * r0, char * type, int emit)
+iNEW(struct Parrot_Interp *interpreter, SymReg * r0, char * type,
+        SymReg *init, int emit)
 {
     char fmt[256];
     SymReg *pmc;
@@ -42,7 +43,12 @@ iNEW(struct Parrot_Interp *interpreter, SymReg * r0, char * type, int emit)
     free(type);
     regs[0] = r0;
     regs[1] = pmc;
-    nargs = 2;
+    if (init) {
+        regs[2] = init;
+        nargs = 3;
+    }
+    else
+        nargs = 2;
     return iANY(interpreter, "new", fmt, regs, emit);
 }
 

@@ -196,6 +196,10 @@ A keyed B<set> operation or the assign B<substr> op with a length of
 
 B<new var, .type>
 
+=item <var> = new <type>, <var>
+
+B<new var, .type, var>
+
 =item <var> = defined <var>
 
 B<defined var, var>

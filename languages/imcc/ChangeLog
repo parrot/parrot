@@ -1,3 +1,8 @@
+- 2003-07-06	leo
+
+	* new instruction:
+	  $Preg = new classname, $Pinitializer
+
 - 2003-07-03	leo
 
 	* switch to PASM/PIR mode, when reading .pasm/.imc include files

@@ -78,7 +78,8 @@ Instruction * INS(struct Parrot_Interp *, char * name,
 		char *fmt, SymReg **regs, int nargs, int keyv, int emit);
 Instruction * INS_LABEL(SymReg * r0, int emit);
 
-Instruction * iNEW(struct Parrot_Interp *,SymReg * r0, char * type, int emit);
+Instruction * iNEW(struct Parrot_Interp *,SymReg * r0, char * type,
+	SymReg *init, int emit);
 Instruction * emitb(Instruction *);
 
 int instruction_reads(Instruction *, SymReg *);

@@ -262,7 +262,7 @@ SymReg ** r, int nr, int emit)
         }
     }
     /* make a new undef */
-    iNEW(interpreter, preg[0], str_dup("PerlUndef"), 1);
+    iNEW(interpreter, preg[0], str_dup("PerlUndef"), NULL, 1);
     /* emit the operand */
     nargs = 3;
     keyvec = 0;
@@ -564,7 +564,8 @@ assignment:
     |  target '=' var '~' var		{ $$ = MK_I(interp, "bxor", R3($1, $3, $5)); }
     |  target '=' var '[' keylist ']'   { $$ = iINDEXFETCH(interp, $1, $3, $5); }
     |  var '[' keylist ']' '=' var	{ $$ = iINDEXSET(interp, $1, $3, $6); }
-    |  target '=' NEW classname		{ $$ = iNEW(interp, $1, $4, 1); }
+    |  target '=' NEW classname COMMA var { $$ = iNEW(interp, $1, $4, $6, 1); }
+    |  target '=' NEW classname		{ $$ = iNEW(interp, $1, $4, NULL,1); }
     |  target '=' DEFINED var	        { $$ = MK_I(interp, "defined",R2($1,$4)); }
     |  target '=' DEFINED var '[' keylist ']' { keyvec=KEY_BIT(2);
                                      $$ = MK_I(interp, "defined", R3($1, $4, $6));}

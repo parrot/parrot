@@ -532,7 +532,7 @@ int emit_flush(void *param) {
                     || strcmp(ins->fmt, "saveall") == 0)) {
             ins = ins->next;
         }
-        spill_ins = iNEW(interpreter, p31, str_dup("PerlArray"), 0);
+        spill_ins = iNEW(interpreter, p31, str_dup("PerlArray"), NULL, 0);
         insert_ins(ins, spill_ins);
     }
     if (emitters[emitter].new_sub)
