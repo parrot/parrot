@@ -2257,7 +2257,7 @@ languages/parrot_compiler/lib/Parrot/Test/ParrotCompiler.pm      [parrot_compile
 languages/parrot_compiler/parrot_compiler.imc                    [parrot_compiler]
 languages/parrot_compiler/parrot.pasm                            [parrot_compiler]
 languages/parrot_compiler/sample.pasm                            [parrot_compiler]
-languages/parrot_compiler/t/harness.t                            [parrot_compiler]
+languages/parrot_compiler/t/harness                              [parrot_compiler]
 languages/parrot_compiler/t/basic/hello.t                        [parrot_compiler]
 languages/perl6/ChangeLog                         [perl6]
 languages/perl6/P6C/Addcontext.pm                 [perl6]
