@@ -237,6 +237,8 @@ As above, but uses the actual dynamic type of C<SELF>.
 
 Leopold Toetsch.
 
+Cleaned up by Matt Diephouse.
+
 Many thanks to the author of F<pmc2c.pl>, many useful code pieces got
 reused.
 
@@ -263,39 +265,42 @@ sub find_file {
         return $path if -e $path;
     }
 
-    die "can't find file '$file' in path '",
-      ( join "', '", @$include ), "'"
+    die "can't find file '$file' in path '", join("', '", @$include), "'"
         if $die_unless_found;
 
     undef;
 }
 
 sub dump_default {
-    my $file = "$FindBin::Bin/../vtable.tbl";
+    my $file    = "$FindBin::Bin/../vtable.tbl";
     my $default = parse_vtable($file);
-    my $dump;
-    ($dump = $file) =~ s/\.\w+$/\.dump/;
+    my $dump    = $file;
+    $dump =~ s/\.\w+$/\.dump/;
+    
     print "Writing $dump\n" if $opt{verbose};
-    open(VTD, ">$dump") or die "Can't write $dump";
-    my %vt;
-    $vt{flags} = {};
-    $vt{pre} = '';
-    $vt{post} = '';
+    open VTD, ">", $dump or die "Can't write '$dump'";
+    
+    my %vtable = (
+        flags   => {},
+        pre     => '',
+        post    => '',
+    );
     my %meth_hash;
     my $i = 0;
     foreach my $entry (@$default) {
         $meth_hash{$entry->[1]} = $i++;
-        push ( @{$vt{methods}},
-        {
-            parameters => $entry->[2],
-            meth =>       $entry->[1],
-            type =>       $entry->[0],
-            section =>    $entry->[3],
-            mmd =>        $entry->[4]
-        });
+        push @{$vtable{methods}},
+            {
+                parameters  => $entry->[2],
+                meth        => $entry->[1],
+                type        => $entry->[0],
+                section     => $entry->[3],
+                mmd         => $entry->[4]
+            };
     }
-    $vt{'has_method'} = \%meth_hash;
-    my $Dumper = Data::Dumper->new([\%vt], [qw(class)]);
+    $vtable{'has_method'} = \%meth_hash;
+    
+    my $Dumper = Data::Dumper->new([\%vtable], ['class']);
     $Dumper->Indent(3);
     print VTD $Dumper->Dump();
     close VTD;
@@ -303,16 +308,20 @@ sub dump_default {
 
 sub extract_balanced {
     my $balance = 0;
-    my $lines = 0;
+    my $lines   = 0;
+    
     for(shift) {
         s/^(\s+)//;
         $lines += count_newlines($1);
         /^\{/ or die "bad block open: ".substr($_,0,10),"..."; # }
-        while(/(\{)|(\})/g) {
+        
+        while(/ (\{) | (\}) /gx) {
             if($1) {
                 $balance++;
             } else { # $2
-                --$balance or return (substr($_, 0, pos, ""),  $_, $lines);
+                $balance--;
+                return substr($_, 0, pos, ""), $_, $lines
+                    if not $balance;
             }
         }
         die "Badly balanced" if $balance;
@@ -324,130 +333,136 @@ sub parse_flags {
 
     $$c =~ s/^(.*?^\s*)pmclass ([\w]*)//ms;
     my ($pre, $classname) = ($1, $2);
-    my %has_value = ( does => 1, extends => 1, group => 1, lib => 1 );
+    
+    # flags that have values passed with them
+    my %has_value = map { $_ => 1 } qw(does extends group lib);
 
     my (%flags, $parent_nr);
     # look through the pmc declaration header for flags such as noinit
-    while ($$c =~ s/^(?:\s*)(\w+)//s) {
-	if ($has_value{$1}) {
-	    my $what = $1;
-	    if (s/^(?:\s+)(\w+)//s) {
-                if ($what eq 'extends') {
-                    $flags{$what}{$1} = ++$parent_nr;
-                } else {
-                    $flags{$what}{$1} = 1;
-                }
-	    }
-	    else {
-		die "Parser error: no value for '$what'";
-	    }
-	}
-	else {
-	    $flags{$1} = 1;
-	}
+    while ($$c =~ s/^\s*(\w+)//s) {
+        my $flag = $1;
+        if ($has_value{$flag}) {
+            $$c =~ s/^\s+(\w+)//s
+                or die "Parser error: no value for '$flag'";
+            
+            $flags{$flag}{$1} =
+                $flag eq 'extends' ? ++$parent_nr : 1;
+        }
+        else {
+            $flags{$flag} = 1;
+        }
     }
+    
     # setup some defaults
     if ($classname ne 'default') {
-	$flags{extends}{default} = 1 unless $flags{extends};
-	$flags{does}{scalar} = 1 unless $flags{does};
+        $flags{extends}{default} = 1 unless $flags{extends};
+        $flags{does}{scalar}     = 1 unless $flags{does};
     }
-    ($pre, $classname, \%flags);
+    
+    return $pre, $classname, \%flags;
 }
 
 sub parse_pmc {
-  local $_ = shift;
+    my $code = shift;
 
-  my $signature_re = qr{
+    my $signature_re = qr{
     ^
-    (?:             #blank spaces and comments and spurious semicolons
+    (?:                 #blank spaces and comments and spurious semicolons
       [;\n\s]*
-      (?:/\*.*?\*/)?  # C-like comments
+      (?:/\*.*?\*/)?    # C-like comments
     )*
 
-    (METHOD\s+)?  #method flag
-    (\w+\**)      #type
-    \s+
-    (\w+)         #method name
-    \s*
-    \(([^\(]*)\)  #parameters
+    (METHOD\s+)?        #method flag
+    
+    (\w+\**)            #type
+      \s+
+        (\w+)           #method name
+      \s*
+        \( ([^\(]*) \)  #parameters
     }sx;
 
-  my ($pre, $classname, $flags) = parse_flags(\$_);
-  my $lineno = 1;
-  $lineno += count_newlines($pre);
-  my ($classblock, $post, $lines) = extract_balanced($_);
-  $classblock = substr($classblock, 1,-1); # trim out the { }
+    my ($pre, $classname, $flags)     = parse_flags(\$code);
+    my ($classblock, $post, $lines)   = extract_balanced($code);
+  
+    my $lineno  = 1 + count_newlines($pre);
+    $classblock = substr($classblock, 1,-1); # trim out the { }
 
-  my (@methods, %meth_hash, $class_init);
+    my (@methods, %meth_hash, $class_init);
 
-  while ($classblock =~ s/($signature_re)//) {
-     $lineno += count_newlines($1);
-     my ($flag, $type, $methodname, $parameters) = ($2,$3,$4,$5);
-     my ($methodblock, $rema, $lines) = extract_balanced($classblock);
-     $lineno += $lines;
-     $methodblock = "" if $opt{nobody};
-     if ($methodname eq 'class_init') {
-         $class_init =
-	  {   'meth' => $methodname,
-              'body' => $methodblock,
-              'line' => $lineno,
-              'type' => $type,
-              'parameters' => $parameters,
-              'loc' => "vtable"
-          };
-      }
-      else {
-         # name => method idx mapping
-         $meth_hash{$methodname} = scalar @methods;
-         push @methods,
-            { 'meth' => $methodname,
-              'body' => $methodblock,
-              'line' => $lineno,
-              'type' => $type,
-              'parameters' => $parameters,
-              'loc' => $flag ? "nci" : "vtable"
-          };
-     }
-     $classblock = $rema;
-     $lineno += count_newlines($methodblock);
+    while ($classblock =~ s/($signature_re)//) {
+        $lineno += count_newlines($1);
+        my ($flag, $type, $methodname, $parameters) = ($2,$3,$4,$5);
+        my ($methodblock, $rema, $lines) = extract_balanced($classblock);
+        $lineno += $lines;
+        
+        $methodblock = "" if $opt{nobody};
+        if ($methodname eq 'class_init') {
+            $class_init = {
+                meth        => $methodname,
+                body    	=> $methodblock,
+                line        => $lineno,
+                type        => $type,
+                parameters  => $parameters,
+                loc         => "vtable"
+            };
+        }
+        else {
+            # name => method idx mapping
+            $meth_hash{$methodname} = scalar @methods;
+            push @methods,
+                {
+                    meth        => $methodname,
+                    body        => $methodblock,
+                    line        => $lineno,
+                    type        => $type,
+                    parameters  => $parameters,
+                    loc         => $flag ? "nci" : "vtable"
+                };
+        }
+        $classblock = $rema;
+        $lineno += count_newlines($methodblock);
     }
+    
     if ($class_init) {
         $meth_hash{'class_init'} = scalar @methods;
         push @methods, $class_init;
     }
 
 
-    return ( $classname, { 'pre'   => $pre,
-	                   'flags' => $flags,
-	                   'methods' => \@methods,
-	                   'post' => $post,
-	                   'class' => $classname,
-                           'has_method' => \%meth_hash
-	                 }
-           );
+    return $classname,
+           {
+               pre          => $pre,
+	           flags        => $flags,
+	           methods      => \@methods,
+	           post         => $post,
+	           class        => $classname,
+               has_method   => \%meth_hash
+           };
 }
 
 # make a linear list of class->{parents} array
 sub gen_parent_list {
     my ($include, $this, $all) = @_;
 
-    my @todo = ($this);
+    my @todo  = ($this);
     my $class = $all->{$this};
+    
     while (@todo) {
-        my $n = shift @todo;
+        my $n   = shift @todo;
         my $sub = $all->{$n};
         next if $n eq 'default';
+        
         my %parent_hash = %{$sub->{flags}{extends}};
-        foreach my $parent (sort {$parent_hash{$a} <=> $parent_hash{$b} }
-                (keys (%parent_hash) ) ) {
+        my @parents     = sort { $parent_hash{a} <=> $parent_hash{$b} } keys %parent_hash;
+        for my $parent (@parents) {
             next if exists $class->{has_parent}{$parent};
-            if (!$all->{$parent}) {
-                my $pf = lc $parent;
-                $all->{$parent} = read_dump($include, "$pf.pmc");
-            }
+            
+            $all->{$parent} = read_dump($include, lc("$parent.pmc"))
+                if not $all->{$parent};
+            
             $class->{has_parent}{$parent} = { %{$all->{$parent}{has_method} }};
-            push(@todo, $parent);
-            push(@{ $class->{parents} }, $parent);
+            push @todo, $parent;
+            push @{ $class->{parents} }, $parent;
         }
     }
 }
@@ -455,13 +470,12 @@ sub gen_parent_list {
 
 sub dump_1_pmc {
     my $file = shift;
-
     $file =~ s/\.\w+$/.pmc/;
+    
     print "Reading $file\n" if $opt{verbose};
-    open F, "<$file" or die "Can't read '$file'";
-    local $/;
-    my $contents = <F>;
-    close F;
+    open my $fh, "<", $file
+        or die "Can't read '$file'";
+    my $contents = do { local $/; <$fh> };
     return parse_pmc($contents);
 }
 
@@ -500,7 +514,6 @@ sub gen_super_meths {
 sub add_defaulted {
     my ($class, $vt) = @_;
 
-    my $i = @{ $class->{methods} };
     foreach my $e ( @{$vt->{methods}} ) {
         my $meth = $e->{meth};
         $class->{super}{$meth} = 'default';
@@ -508,133 +521,116 @@ sub add_defaulted {
 }
 
 sub dump_is_newer {
-    my $file = shift;
-
-    my $pmc;
-    ($pmc = $file) =~ s/\.\w+$/\.pmc/;
-    my ($pmc_dt, $dump_dt);
-    $pmc_dt = (stat($pmc))[9];
-    $dump_dt = (stat($file))[9];
+    my $pmc = my $file = shift;
+    $pmc =~ s/\.\w+$/.pmc/;
+    
+    my $pmc_dt  = (stat $pmc)[9];
+    my $dump_dt = (stat $file)[9];
+    
     return $dump_dt > $pmc_dt;
 }
 
 sub dump_pmc {
-    my $include = shift;
-
-    my @files = @_;
-    my %all;
+    my ($include, @files) = @_;
     # help these dumb 'shells' that are no shells
     @files = glob $files[0] if $files[0] eq '*.pmc';
-    foreach my $file (@files) {
-	my ($class, $res) = dump_1_pmc($file);
+
+    my %all;
+    for my $file (@files) {
+        my ($class, $res) = dump_1_pmc($file);
         $res->{file} = $file;
         $all{$class} = $res;
     }
 
+    $all{default} = read_dump($include, "classes/default.pmc")
+        if not $all{default};
+    
     my $vt = read_dump($include, "vtable.pmc");
-    if (!$all{default}) {
-        $all{default} = read_dump($include, "classes/default.pmc");
-    }
     add_defaulted($all{default}, $vt);
 
     foreach my $name (keys %all) {
-        my $dump;
         my $file = $all{$name}->{file};
-        ($dump = $file) =~ s/\.\w+$/\.dump/;
-        gen_parent_list($include, $name, \%all);
-        my $class = $all{$name};
-        gen_super_meths($class, $vt);
+        $file =~ s/\.\w+$/\.dump/;
+        
         # XXX write default.dump only once
-        my $existing = find_file($include, $dump);
-        next if ($existing && -e $existing && dump_is_newer($existing));
-        my $Dumper = Data::Dumper->new([$class], [qw(class)]);
+        my $existing = find_file($include, $file);
+        next if $existing && -e $existing && dump_is_newer($existing);
+        
+        my $class = $all{$name};
+        gen_parent_list($include, $name, \%all);
+        gen_super_meths($class, $vt);
+        
+        my $Dumper = Data::Dumper->new([$class], ['class']);
         $Dumper->Indent(1);
-        print "Writing $dump\n" if $opt{verbose};
-        open PMD, ">$dump" or die "Can't write '$dump'";
-        print PMD $Dumper->Dump;
-        close PMD;
+        
+        print "Writing $file\n" if $opt{verbose};
+        open my $fh, ">", $file or die "Can't write '$file'";
+        print $fh $Dumper->Dump;
+        close $fh;
     }
 }
 
 sub read_dump {
-    my ( $include, $file ) = @_;
-
-    ( my $dump = $file) =~ s/\.\w+$/.dump/;
-    $dump = find_file($include, $dump, 1);
-    print "Reading $dump\n" if $opt{verbose};
-
-    open D, "<$dump" or die "Can't read '$dump'";
-    local $/;
-    my $contents = <D>;
-    close D;
+    my ($include, $file) = @_;
+    
+    $file =~ s/\.\w+$/.dump/;
+    $file = find_file($include, $file, 1);
+    
+    print "Reading $file\n" if $opt{verbose};
+    open my $fh, "<", $file or die "Can't read '$file'";
+    
     my $class;
-    # $class => { ... };
-    eval $contents;
+    eval do { local $/; <$fh> };
     die $@ if $@;
+    
+    close $fh;
     $class;
 }
 
 sub print_tree {
     my ($include,$depth, @files) = @_;
 
-    foreach my $file (@files) {
-	my $class = read_dump($include, $file);
-	print "    " x $depth, $class->{class}, "\n";
-	foreach my $parent (keys %{$class->{flags}{extends}}) {
-	    my $pmc = lc($parent) . '.pmc';
-	    print_tree($include, $depth + 1, $pmc);
-	}
+    for my $file (@files) {
+        my $class = read_dump($include, $file);
+        
+        print "    " x $depth, $class->{class}, "\n";
+        print_tree($include, $depth + 1, lc("$_.pmc"))
+            for keys %{$class->{flags}{extends}};
     }
 }
 
 sub gen_c {
     my ($include, @files) = @_;
-
-    my $library = Parrot::Pmc2c::Library->new
-      ( \%opt, read_dump($include, "vtable.pmc"),
-        map { $_, read_dump($include, $_) }
-            @files );
-
-    $library->write_all_files;
+    my %pmcs = map { $_, read_dump($include, $_) } @files;
+    
+    Parrot::Pmc2c::Library
+        ->new( \%opt, read_dump($include, "vtable.pmc"), %pmcs )
+        ->write_all_files;
 }
 
 sub main {
-    my ($default, $dump, $gen_c, $result, $tree, $debug, $verbose, $nobody, $nolines, @include, $library);
-    $result = GetOptions(
-	"vtable"        => \$default,
-	"dump"          => \$dump,
-	"c|gen-c"       => \$gen_c,
-	"tree"          => \$tree,
-	"no-body"       => \$nobody,
-	"no-lines"      => \$nolines,
-	"debug+"        => \$debug,
-	"verbose+"      => \$verbose,
+    my ($default, $dump, $gen_c, $tree, @include);
+    # initialization to prevent warnings
+    %opt = map { $_ => 0 } qw(nobody nolines debug verbose);
+    
+    my $result = GetOptions(
+        "vtable"        => \$default,
+        "dump"          => \$dump,
+        "c|gen-c"       => \$gen_c,
+        "tree"          => \$tree,
         "include=s"     => \@include,
-        "library=s"     => \$library,
+        "no-body"       => \$opt{nobody},
+        "no-lines"      => \$opt{nolines},
+        "debug+"        => \$opt{debug},
+        "verbose+"      => \$opt{verbose},
+        "library=s"     => \$opt{library},
     );
-    $opt{debug} = $debug || 0;
-    $opt{verbose} = $verbose || 0;
-    $opt{nobody} = $nobody || 0;
-    $opt{nolines} = $nolines || 0;
-    $opt{library} = $library;
     unshift @include, ".", "$FindBin::Bin/..", $FindBin::Bin;
 
-    $default and do {
-	dump_default();
-	exit;
-    };
-    $dump and do {
-	dump_pmc(\@include, @ARGV);
-	exit;
-    };
-    $tree and do {
-	print_tree(\@include, 0, @ARGV);
-	exit;
-    };
-    $gen_c and do {
-	gen_c(\@include, @ARGV);
-	exit;
-    };
+    dump_default()                  and exit if $default;
+    dump_pmc(\@include, @ARGV)      and exit if $dump;
+    print_tree(\@include, 0, @ARGV) and exit if $tree;
+    gen_c(\@include, @ARGV)         and exit if $gen_c;
 }
 
 # vim: expandtab shiftwidth=4:
