@@ -69,7 +69,7 @@ OUT
 
 ##############################
 SKIP: {
-skip("running on a perl without charnames", 1)
+skip("running on a perl without charnames", 2)
     unless eval "use charnames (); 1";
 output_is(<<'CODE', <<'OUT', "string interpolation 4");
 sub main() {
@@ -86,7 +86,6 @@ CODE
 16
 @P
 OUT
-}
 
 ##############################
 output_is(<<'CODE', <<'OUT', "string interpolation 5");
@@ -103,6 +102,7 @@ XXX
 xxx
 OUT
 
+}
 ##############################
 output_is(<<'CODE', <<'OUT', "string interpolation 6");
 sub main() {
