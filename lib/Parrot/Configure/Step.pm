@@ -16,7 +16,7 @@ use vars qw(@ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
 	gen   => ['genfile']
 );
 	
-my $redir_err = ($ENV{COMSPEC} =~ /command\.com/i) ? "" : "2>&1";
+my $redir_err = (($ENV{COMSPEC} || "")=~ /command\.com/i) ? "" : "2>&1";
 
 #Configure::Data->get('key')
 #Configure::Data->set('key', 'value')
