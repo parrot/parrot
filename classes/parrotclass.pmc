@@ -1,0 +1,26 @@
+/* parrotclass.pmc
+ *  Copyright: 2003 Yet Another Society
+ *  CVS Info
+ *     $Id$
+ *  Overview:
+ *     These are the vtable functions for the ParrotClass base class
+ *  Data Structure and Algorithms:
+ *  History:
+ *  Notes:
+ *  References:
+ */
+
+#include "parrot/parrot.h"
+
+pmclass ParrotClass {
+
+    INTVAL type () {
+        return enum_class_ParrotClass;
+    }
+
+    STRING* name() {
+        return whoami;
+    }
+
+
+}

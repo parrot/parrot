@@ -4488,31 +4488,6 @@ inline op sleep(in INT) {
 
 #######################################
 
-=item B<can>(out INT, in PMC, in STR)
-
-Sets $1 to true or false, depending on whether $2 ->can the method in
-$3
-
-=cut
-
-inline op can(out INT, in PMC, in STR) {
-  $1 = $2->vtable->can(interpreter, $2, $3);
-  goto NEXT();
-}
-
-=item B<does>(out INT, in PMC, in STR)
-
-Sets $1 to true or false, depending on whether $2 ->does the interface in
-$3
-
-=cut
-
-inline op does(out INT, in PMC, in STR) {
-  $1 = $2->vtable->does(interpreter, $2, $3);
-  goto NEXT();
-}
-
-
 #######################################
 
 =item B<setline>(in INT)
@@ -4767,7 +4742,7 @@ inline op warningsoff(in INT) {
 
 =head1 COPYRIGHT
 
-Copyright (C) 2001 Yet Another Society. All rights reserved.
+Copyright (C) 2001, 2002, 2003 Yet Another Society. All rights reserved.
 
 =head1 LICENSE
 
