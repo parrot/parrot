@@ -345,6 +345,7 @@ TEST_PROG_SO = ${test_prog}_so${exe}
 LIBPARROT = ${blib_lib_libparrot_a}
 LIBICUCORE = ${blib_lib_libsicuuc_a}
 LIBICUDATA =  ${blib_lib_libsicudata_a}
+ALL_PARROT_LIBS = $(LIBPARROT) $(LIBICUCORE) $(LIBICUDATA) $(C_LIBS)
 # utils
 DIS=disassemble${exe}
 PDUMP = pdump${exe}
@@ -463,7 +464,7 @@ library/config.fpmc: myconfig config_lib.pasm $(TEST_PROG)
 mops : examples/assembly/mops${exe} examples/mops/mops${exe}
 
 $(TEST_PROG) : $(PARROT_MAIN)$(O) $(GEN_HEADERS) $(LIBPARROT) lib/Parrot/OpLib/core.pm $(LIBICUCORE) $(LIBICUDATA)
-	$(LINK) ${ld_out}$(TEST_PROG) $(LINKFLAGS) $(PARROT_MAIN)$(O) $(LIBPARROT) $(LIBICUCORE) $(LIBICUDATA) $(C_LIBS)
+	$(LINK) ${ld_out}$(TEST_PROG) $(LINKFLAGS) $(PARROT_MAIN)$(O) $(ALL_PARROT_LIBS)
 
 lib_deps_object : $(O_FILES)
 	$(PERL) tools/dev/lib_deps.pl object $(O_FILES)
@@ -546,7 +547,7 @@ $(TEST_PROG_SO) : $(PARROT_MAIN)$(O) blib/lib/libparrot$(SO) lib/Parrot/OpLib/co
 $(SRC)/pdb$(O) : $(GENERAL_H_FILES)
 
 $(PDB) : $(SRC)/pdb$(O) $(LIBPARROT)
-	$(LINK) ${ld_out}$(PDB) $(SRC)/pdb$(O) $(LINKFLAGS) $(LIBPARROT) $(C_LIBS)
+	$(LINK) ${ld_out}$(PDB) $(SRC)/pdb$(O) $(LINKFLAGS) $(ALL_PARROT_LIBS)
 
 #
 # Parrot Disassembler
@@ -555,19 +556,19 @@ $(PDB) : $(SRC)/pdb$(O) $(LIBPARROT)
 $(SRC)/disassemble$(O) : $(GENERAL_H_FILES)
 
 $(DIS) : $(SRC)/disassemble$(O) $(LIBPARROT)
-	$(LINK) ${ld_out}$(DIS) $(SRC)/disassemble$(O) $(LINKFLAGS) $(LIBPARROT) $(C_LIBS)
+	$(LINK) ${ld_out}$(DIS) $(SRC)/disassemble$(O) $(LINKFLAGS) $(ALL_PARROT_LIBS)
 
 #
 # Parrot Dump
 #
 
 $(PDUMP) : $(SRC)/pdump$(O) $(SRC)/packdump$(O) $(LIBPARROT)
-	$(LINK) ${ld_out}$(PDUMP) $(SRC)/pdump$(O) $(SRC)/packdump$(O) $(LINKFLAGS) $(LIBPARROT) $(C_LIBS)
+	$(LINK) -o $(PDUMP) $(SRC)/pdump$(O) $(SRC)/packdump$(O) $(LINKFLAGS) $(ALL_PARROT_LIBS)
 
 
 # pbc_info
 $(PINFO) : $(SRC)/pbc_info$(O) $(LIBPARROT)
-	$(LINK) ${ld_out}$(PINFO) $(SRC)/pbc_info$(O) $(LINKFLAGS) $(LIBPARROT) $(C_LIBS)
+	$(LINK) ${ld_out}$(PINFO) $(SRC)/pbc_info$(O) $(LINKFLAGS) $(ALL_PARROT_LIBS)
 
 ###############################################################################
 #
@@ -1090,7 +1091,7 @@ miniparrot-update :
 ###############################################################################
 
 exec : $(SRC)/exec_start$(O) $(LIBPARROT)
-	$(LINK) ${ld_out}$(EXEC) $(LINKFLAGS) $(EXEC)$(O) $(SRC)/exec_start$(O) $(LIBPARROT) $(C_LIBS)
+	$(LINK) ${ld_out}$(EXEC) $(LINKFLAGS) $(EXEC)$(O) $(SRC)/exec_start$(O) $(ALL_PARROT_LIBS)
 
 exec_so : $(SRC)/exec_start$(O) blib/lib/libparrot$(SO)
 	$(LINK) ${ld_out}$(EXEC) $(LINKFLAGS) $(EXEC)$(O) $(SRC)/exec_start$(O) -lparrot $(C_LIBS)
