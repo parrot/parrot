@@ -775,7 +775,7 @@ expand_pcc_sub_call(Parrot_Interp interp, IMC_Unit * unit, Instruction *ins)
     int tail_call;
     int proto;
     int meth_call = 0;
-    SymReg * p2 = NULL;
+    SymReg * p2 = NULL, *s0 = NULL;
 
     /*
      * we must preserve P2 too
@@ -864,10 +864,10 @@ expand_pcc_sub_call(Parrot_Interp interp, IMC_Unit * unit, Instruction *ins)
                 (arg->reg->type == VTIDENTIFIER ||
                  arg->reg->type == VTPASM ||
                  arg->reg->type == VTREG))
-            regs[1] = arg->reg;
+            s0 = arg->reg;
         else
-            regs[1] = mk_const(str_dup(arg->name), 'S');
-        ins = insINS(interp, unit, ins, "set", regs, 2);
+            s0 = mk_const(str_dup(arg->name), 'S');
+        /* ins = insINS(interp, unit, ins, "set", regs, 2); */
         /* set P2, obj */
         if (sub->pcc_sub->object->color != 2) {
             regs[0] = get_pasm_reg("P2");
@@ -930,9 +930,14 @@ move_cc:
      */
     /* restore self */
     ins = insINS(interp, unit, ins, "savetop", regs, 0);
-    if (meth_call)
+    if (meth_call) {
+        regs[0] = s0;
+        n = 0;
+        if (s0)
+            n = 1;
         ins = insINS(interp, unit, ins,
-                need_cc ? "callmethodcc" : "callmethod", regs, 0);
+                need_cc ? "callmethodcc" : "callmethod", regs, n);
+    }
     else
         ins = insINS(interp, unit, ins,
                 need_cc ? "invokecc" : "invoke", regs, 0);
@@ -940,7 +945,7 @@ move_cc:
     /*
      * move the pcc_sub structure to the invoke
      */
-    ins->r[0] = get_pasm_reg("P0");  /* XXX or P2 */
+    ins->r[0] = meth_call ? s0 ? s0 : get_pasm_reg("S0") : get_pasm_reg("P0");
     ins->r[0]->pcc_sub = sub->pcc_sub;
     sub->pcc_sub = NULL;
     sub = ins->r[0];

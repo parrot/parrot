@@ -1418,3 +1418,7 @@ decodetime_p_i  1390
 decodetime_p_ic 1391
 decodelocaltime_p_i     1392
 decodelocaltime_p_ic    1393
+callmethod_s    1394
+callmethod_sc   1395
+callmethodcc_s  1396
+callmethodcc_sc 1397
