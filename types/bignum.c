@@ -74,7 +74,9 @@ Get value of digit at pos.
 #define CHECK_UNDERFLOW(expn, sub, min, msg) \
     if (min - expn > (-sub)) { BN_EXCEPT(PINT_ BN_UNDERFLOW, msg); }
 
-char* lazygdbprint(BIGNUM* foo) {
+/* This can be called while within a debugger, don't use in normal
+   operation */
+char* BN_lazygdbprint(BIGNUM* foo) {
   char*s;
   BN_to_scientific_string(foo, &s);
   return s;
@@ -109,8 +111,6 @@ BN_arith_cleanup(PINTD_ BIGNUM* result, BIGNUM *one, BIGNUM *two, BN_CONTEXT *co
 void BN_iadd(PINTD_ BIGNUM* result, BIGNUM *one, BIGNUM *two, BN_CONTEXT *context);
 void BN_isubtract(PINTD_ BIGNUM* result, BIGNUM *one, BIGNUM *two, BN_CONTEXT *context);
 void BN_align(PINTD_ BIGNUM* one, BIGNUM* two);
-int BN_comp (PINTD_ BIGNUM *one, BIGNUM *two);
-int BN_iszero(PINTD_ BIGNUM* test);
 
 /*=head1 Memory Management and BIGNUM creation
 
@@ -135,6 +135,7 @@ BIGNUM* BN_new(PINTD_ INTVAL length) {
   bn->sign = 0;
   bn->expn = 0;
   bn->digits = 1;
+  bn->flags = 0;
 
   return bn;
 }
@@ -606,6 +607,7 @@ is possible.
 
 =cut*/
 void BN_make_integer(PINTD_ BIGNUM* bn, BN_CONTEXT* context) {
+  /* Normal bignum */
   if (bn->expn > 0 && bn->digits + bn->expn <= context->precision) {
     INTVAL i;
     BN_grow(PINT_ bn, context->precision);
@@ -619,7 +621,7 @@ void BN_make_integer(PINTD_ BIGNUM* bn, BN_CONTEXT* context) {
     bn->expn = 0;
   }
   else {
-    return;
+    return; /* XXX: fixed precision, bigints */
   }
 }
 
@@ -645,13 +647,24 @@ void BN_really_zero(PINTD_ BIGNUM* bn) {
 
 Rounds victim according to context.
 
-If I<precision> is negative 0, numbers are rounded at their decimal
-point (this is *not* specified in the sda, but is useful for parrot).
-If this would cause digits to be lost, and I<lost_digits> is true,
-an appropriate exception is generated.
-
 Round assumes that any leading zeros are significant (after an
 addition operation, for instance).
+
+If I<precision> is positive, the digit string is rounded
+to have no more than I<precision> digits.  If I<precision> is
+equal to zero, the number is treated as an integer, and any
+digits after the number's decimal point are removed.  If I<precision>
+is negative, the number is rounded so that there are no more
+than - I<precision> digits after the decimal point.
+
+eg. for  1.234567E+3 with rounding of ROUND_DOWN
+
+ precision:  4 =>  1.234E+3      1234
+ precision:  6 =>  1.234567E+3   1234.56
+ precision:  9 =>  1.234567E+3   1234.567
+ precision:  0 =>  1234          1234
+ precision: -1 =>  1.2345E+3     1234.5
+ precision: -9 =>  1.234567E+3   1234.567
 
 =cut*/
 
@@ -659,11 +672,11 @@ int BN_round (PINTD_ BIGNUM *bn, BN_CONTEXT* context) {
   assert(bn!= NULL);
   assert(context != NULL);
 
-  if (context->precision < 0) { /* Rounding a BigInt */
+  if (context->precision < 1) { /* Rounding a BigInt or fixed */
     BN_round_as_integer(PINT_ bn, context);
     return;
   }
-  
+
   /* Rounding a BigNum or sdaNum*/
   if (bn->digits > context->precision) {
     if (context->lost_digits) {
@@ -719,16 +732,18 @@ int BN_round (PINTD_ BIGNUM *bn, BN_CONTEXT* context) {
   return;
 }
 
+/* These are internal functions, don't call them with -ve precision */
 int BN_round_up(PINTD_ BIGNUM *bn, BN_CONTEXT* context) {
   INTVAL i, carry;
 
+  /* Do a cheap num += 1E+(num->expn) */
   carry = 1;
   for (i = bn->digits - context->precision; i< bn->digits; i++) {
     carry += BN_getd(bn, i);
     BN_setd(bn, i-bn->digits + context->precision, carry%10);
     carry = carry / 10;
   }
-  if (carry) {
+  if (carry) { /* We had 999999999 + 1, extend number */
     INTVAL extra = bn->digits - context->precision;
     BN_setd(bn, context->precision, carry);
     CHECK_OVERFLOW(bn->expn, extra, BN_EXPN_MAX,
@@ -747,6 +762,7 @@ int BN_round_up(PINTD_ BIGNUM *bn, BN_CONTEXT* context) {
   }
 }
 
+/* These are internal functions, don't call them with -ve precision */
 int BN_round_down(PINT_ BIGNUM *bn, BN_CONTEXT* context) {
   INTVAL i =0;
   INTVAL extra;
@@ -768,17 +784,18 @@ int BN_round_down(PINT_ BIGNUM *bn, BN_CONTEXT* context) {
 
 /*=head2 BN_round_as_integer(BIGNUM* bn, BN_CONTEXT* context)
 
-Removes any digits after the decimal point, warns if lost_digits.
+I<precision> must be less than one.  This rounds so that I<expn> is at
+least I<precision>.
 
 =cut*/
 void BN_round_as_integer(PINTD_ BIGNUM *bn, BN_CONTEXT *context) {
   INTVAL i;
   BN_CONTEXT temp_context;
 
-  if (bn->expn < 0) {
+  if (bn->expn < context->precision) {
     if (context->lost_digits) {
       /* Are we losing information? */
-      for (i=0; i<-bn->expn && i<bn->digits; i++) {
+      for (i=0; i< (context->precision - bn->expn) && i<bn->digits; i++) {
 	if (BN_getd(bn, i) != 0)
 	  BN_EXCEPT(BN_LOST_DIGITS, "truncating IntVal");
       }
@@ -787,7 +804,7 @@ void BN_round_as_integer(PINTD_ BIGNUM *bn, BN_CONTEXT *context) {
     /* We'll cheat by passing a false context to the normal rounding.
        If "precision" < 1, we add a false zero to front and set p to 1 */
     temp_context = *context;
-    temp_context.precision = bn->digits + bn->expn;
+    temp_context.precision = bn->digits + bn->expn - context->precision;
     if (temp_context.precision < 1) {
       temp_context.precision = 1;
       BN_grow(bn, bn->digits + 1);
@@ -1281,9 +1298,10 @@ Divide two into one, storing up to I<precision> digits in result.
 Performs own rounding.  We also assume that this function B<will not
 be used> to produce a BigInt.  That is the job of divide_integer.
 
-If you want to divide two integers to produce a float, you must
-do so with I<precision> greater than the number of significant
-digits in either operand.
+If you want to divide two integers to produce a float, you must do so
+with I<precision> greater than the number of significant digits in
+either operand.  If you want the result to be an integer or a numer
+with a fixed fractional part
 
 =cut*/
 
@@ -1297,6 +1315,7 @@ void BN_divide(PINTD_ BIGNUM* result, BIGNUM *one, BIGNUM *two, BN_CONTEXT *cont
 
   BN_strip_lead_zeros(PINT_ result);
 
+  /*XXX: write this rounding to cope with precision < 1 */
   if (context->rounding == ROUND_HALF_EVEN) {
     if (result->digits > context->precision) {
       if (context->lost_digits) {
@@ -1440,19 +1459,17 @@ BN_idivide (PINT_ BIGNUM* result, BIGNUM *one, BIGNUM *two,
   int s2, value;
 
   /* Are we doing something stupid, can we skip all the hassle? */
-  if (one->digits == 1 && BN_getd(one, 0)==0) {
-    if (two->digits == 1 && BN_getd(two, 0)==0){
+  if (BN_is_zero(PINT_ one)) {
+    if (BN_is_zero(PINT_ two)){
       BN_EXCEPT(PINT_ BN_DIVISION_UNDEFINED, "0/0 in division");
     }
-    result->digits = 1;
+    result->digits = 1; /* 0/ x, return 0 */
     result->sign = 0;
     BN_setd(result, 0, 0);
     return;
   }
-  if (two->digits == 1) {
-    if (BN_getd(two, 0)==0) {
-      BN_EXCEPT(PINT_ BN_DIVISION_BY_ZERO, "x/0 in division");
-    }
+  if (BN_is_zero(PINT_ two)) {
+    BN_EXCEPT(PINT_ BN_DIVISION_BY_ZERO, "x/0 in division");
   }
   /* That's quite enough shortcuts for now... */
 
@@ -1464,9 +1481,8 @@ BN_idivide (PINT_ BIGNUM* result, BIGNUM *one, BIGNUM *two,
   div->sign = 0;
   t1 = BN_new(PINT_ 1);
   t2 = BN_new(PINT_ 1);
-  BN_grow(PINT_ t2, context->precision + 1);
-  t2->digits = 0;
-  s2 = two->sign;
+  t2->digits = 0; /* ok, as all internal */
+  s2 = two->sign; /* store the sign of 2, as we set it +ve internally */
   two->sign = 0;
   result->digits = 1;
   rem->digits = 1;
@@ -1479,6 +1495,7 @@ BN_idivide (PINT_ BIGNUM* result, BIGNUM *one, BIGNUM *two,
 
   value = 0;
   for (;;) {
+    if (!(t2->digits % 10)) BN_grow(PINT_ t2, t2->digits+11);
     if ((operation == BN_DIV_DIVINT || operation == BN_DIV_REMAIN) &&
 	t1->expn < 0) break;
     divided = 0;
@@ -1511,7 +1528,16 @@ BN_idivide (PINT_ BIGNUM* result, BIGNUM *one, BIGNUM *two,
     }
     /* Are we done yet? */
     if (value && rem->digits ==1 && BN_getd(rem, 0)==0) break;
-    if (t2->digits == context->precision +1 && context->precision >0) break;
+
+    /* We collect one more digit than precision requires, then
+       round in divide, if we're doing divint or rem then we terminate
+       at the decimal point and return */
+    if (context->precison > 0) {
+      if (t2->digits == context->precision + 1) break;
+    }
+    else {
+      if (t1->expn == context->precision -1) break;
+    }
     if (operation == BN_DIV_DIVINT|| operation == BN_DIV_REMAIN) {
       if (t1->expn ==0) break;
     }
@@ -1546,7 +1572,7 @@ BN_idivide (PINT_ BIGNUM* result, BIGNUM *one, BIGNUM *two,
 }
 
 /* Comparison with no rounding etc. */
-int BN_comp (PINTD_ BIGNUM *one, BIGNUM *two) {
+INTVAL BN_comp (PINTD_ BIGNUM *one, BIGNUM *two) {
   INTVAL i,j;
   int cmp;
 
@@ -1672,7 +1698,7 @@ INTVAL BN_to_int(PINT_ BIGNUM* bn, BN_CONTEXT* context) {
   return bn->sign ? -result : result;
 }
 
-int BN_is_zero(BIGNUM* foo) {
+INTVAL BN_is_zero(BIGNUM* foo) {
   BN_really_zero(foo);
   if (foo->digits == 1 && foo->expn == 0 && BN_getd(foo, 0) == 0) {
     return 1;

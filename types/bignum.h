@@ -46,13 +46,16 @@ typedef UINTVAL BN_NIB;
  nibs == 3, digits == 14
 */
 
-typedef struct {
-  BN_NIB* buffer;  /* string of nibbles */
-  UINTVAL nibs;      /* nibs allocated */
+struct parrot_bignum_t {
+  BN_NIB* buffer;   /* string of nibbles */
+  UINTVAL nibs;     /* nibs allocated, in sizeof(BN_NIB) */
+  UNITVAL flags;    /* May store, say +Inf */
   INTVAL digits;    /* digits used */
   int sign;         /* sign of number, 0=> positive or zero, 1 => negative */
   INTVAL expn;      /* exponent of number */
-} BIGNUM;
+};
+
+#define BIGNUM parrot_bignum_t
 
 /* CONTEXT: defines the context for the operation, precision and rounding */
 
@@ -63,9 +66,10 @@ typedef enum {
 } BN_ROUNDING;
 
 typedef struct {
-  INTVAL precision;     /* number of digits to retain (-ve for none)*/
+  INTVAL precision;     /* number of digs to retain (-ve values interesting)*/
   BN_ROUNDING rounding; /* rounding type to perform */
   int lost_digits;      /* 0 => round, 1 => raise exception */
+  UINTVAL flags;        /* records possible errors */
 } BN_CONTEXT;
 
 /* Exceptional Conditions */
@@ -130,3 +134,5 @@ void BN_rescale(PINTD_ BIGNUM* result, BIGNUM* bignum, BIGNUM* expn, BN_CONTEXT*
 INTVAL BN_to_int(PINTD_ BIGNUM* bignum, BN_CONTEXT* context);
 void BN_power(PINTD_ BIGNUM* result, BIGNUM* bignum,
               BIGNUM* expn, BN_CONTEXT* context);
+INTVAL BN_comp (PINTD_ BIGNUM *one, BIGNUM *two);
+INTVAL BN_is_zero(PINTD_ BIGNUM* test);

@@ -44,7 +44,7 @@ while (<>) {
 	s/^'|'$//g;
     }
 
-    $testsrun++;
+    $testsrun += 2;
     my ($output) = `perl bignum_test.pl $one $two $op $precision $round 0`;
     chomp($output);
     if ($result eq $output || ($result eq '?' && $output =~ /except/i)) {
@@ -58,6 +58,37 @@ while (<>) {
 	print " ex `$result'\n";
 	$testsfail++;
     }
+
+    my ($ld_out) = `perl bignum_test.pl $one $two $op $precision $round 1`;
+    chomp($ld_out);
+
+    if (@conds && "@conds" =~ /Lost_digits/) {
+	if ($ld_out =~ /Exception 512/) {
+	    print "$test lost_digits ok\n";
+	    $testspass++;
+	}
+	else {
+	    print "$test lost_digits not ok\n";
+	    print "  $one $op $two\n    (p:$precision r:$round)\n";
+	    print " => `$output'\n";
+	    print " ex `$result' (digits lost)\n";
+	    $testsfail++;
+	}
+    }
+    else {
+	if ($ld_out !~ /Exception 512/) {
+	    print "$test lost_digits ok\n";
+	    $testspass++;
+	}
+	else {
+	    print "$test lost_digits not ok\n";
+	    print "  $one $op $two\n    (p:$precision r:$round)\n";
+	    print " => `$output'\n";
+	    print " ex `$result' ()\n";
+	    $testsfail++;
+	}
+    }
+
 }
 
 print "Ran $testsrun tests ($testspass,$testsfail) = ".
