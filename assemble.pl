@@ -103,9 +103,9 @@ while(<>) {
 	    my $test;
 	    my($first,$last)=($arg_t[0],$arg_t[-1]);
 	    if($first ne $last) {
-		$test="$opcode\_$first\_$last";
+		$test="${opcode}_${first}_$last";
 	    } else {
-		$test="$opcode\_$first";
+		$test="${opcode}_$first";
 	    }
 	    my($found_op)=0;
 	    foreach my $op (grep($_=~/^$opcode/,keys(%opcodes))) {
